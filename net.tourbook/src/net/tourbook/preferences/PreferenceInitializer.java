@@ -203,6 +203,10 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.APPEARANCE_SHOW_TOUR_TYPE_CONTEXT_MENU, true);
 		store.setDefault(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR, true);
 
+		store.setDefault(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN, true);
+		store.setDefault(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION, true);
+		store.setDefault(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY, 500);
+
 		/*
 		 * merge tour dialog
 		 */

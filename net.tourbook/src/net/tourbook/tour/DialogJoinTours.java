@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -32,9 +32,7 @@ import net.tourbook.data.TourWayPoint;
 import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tag.ActionRemoveAllTags;
-import net.tourbook.tag.ActionSetTourTag;
-import net.tourbook.tag.TagManager;
+import net.tourbook.tag.TagMenuManager;
 import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionOpenPrefDialog;
@@ -54,9 +52,12 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.MenuAdapter;
+import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -65,6 +66,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.joda.time.DateTime;
@@ -158,10 +160,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 																								.shortDateTime();
 	private final DateTimeFormatter				_dtFormatterFull						= DateTimeFormat.fullDateTime();
 
-	private ActionSetTourTag					_actionAddTag;
-	private ActionSetTourTag					_actionRemoveTag;
-	private ActionRemoveAllTags					_actionRemoveAllTags;
-	private ActionOpenPrefDialog				_actionOpenTagPrefs;
+	private TagMenuManager						_tagMenuMgr;
 	private ActionOpenPrefDialog				_actionOpenTourTypePrefs;
 
 	private TourData							_joinedTourData;
@@ -285,13 +284,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
 	private void createActions() {
 
-		_actionAddTag = new ActionSetTourTag(this, true, false);
-		_actionRemoveTag = new ActionSetTourTag(this, false, false);
-		_actionRemoveAllTags = new ActionRemoveAllTags(this, false);
-
-		_actionOpenTagPrefs = new ActionOpenPrefDialog(
-				Messages.action_tag_open_tagging_structure,
-				ITourbookPreferences.PREF_PAGE_TAGS);
+		_tagMenuMgr = new TagMenuManager(this, false);
 
 		_actionOpenTourTypePrefs = new ActionOpenPrefDialog(
 				Messages.action_tourType_modify_tourTypes,
@@ -329,34 +322,42 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 		/*
 		 * tag menu
 		 */
-		final MenuManager tagMenuMgr = new MenuManager();
+		final MenuManager menuMgr = new MenuManager();
 
-		tagMenuMgr.setRemoveAllWhenShown(true);
-		tagMenuMgr.addMenuListener(new IMenuListener() {
+		menuMgr.setRemoveAllWhenShown(true);
+		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
 			public void menuAboutToShow(final IMenuManager menuMgr) {
 
 				final Set<TourTag> joinedTourTags = _joinedTourData.getTourTags();
 				final boolean isTagInTour = joinedTourTags != null && joinedTourTags.size() > 0;
 
-				// enable actions
-				_actionAddTag.setEnabled(true); // 			// !!! action enablement is overwritten
-				_actionRemoveTag.setEnabled(isTagInTour);
-				_actionRemoveAllTags.setEnabled(isTagInTour);
-
-				// set menu items
-				menuMgr.add(_actionAddTag);
-				menuMgr.add(_actionRemoveTag);
-				menuMgr.add(_actionRemoveAllTags);
-
-				TagManager.fillMenuRecentTags(menuMgr, DialogJoinTours.this, true, false);
-
-				menuMgr.add(new Separator());
-				menuMgr.add(_actionOpenTagPrefs);
+				_tagMenuMgr.fillTagMenu(menuMgr);
+				_tagMenuMgr.enableTagActions(true, isTagInTour, joinedTourTags);
 			}
 		});
 
 		// set menu for the tag item
-		_linkTag.setMenu(tagMenuMgr.createContextMenu(_linkTag));
+
+		final Menu tagContextMenu = menuMgr.createContextMenu(_linkTag);
+		tagContextMenu.addMenuListener(new MenuAdapter() {
+			@Override
+			public void menuHidden(final MenuEvent e) {
+				_tagMenuMgr.onHideMenu();
+			}
+
+			@Override
+			public void menuShown(final MenuEvent menuEvent) {
+
+				final Rectangle rect = _linkTag.getBounds();
+				Point pt = new Point(rect.x, rect.y + rect.height);
+				pt = _linkTag.getParent().toDisplay(pt);
+
+				_tagMenuMgr.onShowMenu(menuEvent, _linkTag, pt);
+			}
+		});
+
+		_linkTag.setMenu(tagContextMenu);
 
 		/*
 		 * tour type menu

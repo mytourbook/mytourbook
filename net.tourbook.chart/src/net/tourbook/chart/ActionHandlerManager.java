@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -37,10 +37,10 @@ import org.eclipse.ui.services.IServiceLocator;
  */
 public class ActionHandlerManager {
 
-	private static ActionHandlerManager		fInstance;
+	private static ActionHandlerManager		_instance;
 
-	private ICommandService					fCommandService;
-	private IHandlerService					fHandlerService;
+	private ICommandService					_commandService;
+	private IHandlerService					_handlerService;
 
 	/**
 	 * map for all action handlers
@@ -51,10 +51,10 @@ public class ActionHandlerManager {
 
 	static ActionHandlerManager getInstance() {
 
-		if (fInstance == null) {
-			fInstance = new ActionHandlerManager();
+		if (_instance == null) {
+			_instance = new ActionHandlerManager();
 		}
-		return fInstance;
+		return _instance;
 	}
 
 	private void activateHandlers() {
@@ -98,7 +98,8 @@ public class ActionHandlerManager {
 		// activate the handler for all tour chart actions
 		for (final ActionHandler actionHandler : fActionHandlers.values()) {
 
-			final IHandlerActivation handlerActivation = fHandlerService.activateHandler(actionHandler.getCommandId(),
+			final IHandlerActivation handlerActivation = _handlerService.activateHandler(
+					actionHandler.getCommandId(),
 					actionHandler,
 					partIdExpression);
 
@@ -118,8 +119,8 @@ public class ActionHandlerManager {
 		}
 
 		final IServiceLocator workbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		fCommandService = ((ICommandService) workbenchWindow.getService(ICommandService.class));
-		fHandlerService = ((IHandlerService) workbenchWindow.getService(IHandlerService.class));
+		_commandService = ((ICommandService) workbenchWindow.getService(ICommandService.class));
+		_handlerService = ((IHandlerService) workbenchWindow.getService(IHandlerService.class));
 
 		fActionHandlers = new HashMap<String, ActionHandler>();
 
@@ -176,7 +177,7 @@ public class ActionHandlerManager {
 	 * Update the UI check state for one action
 	 */
 	void updateUICheckState(final String commandId) {
-		fCommandService.refreshElements(commandId, null);
+		_commandService.refreshElements(commandId, null);
 	}
 
 	/**
@@ -200,7 +201,7 @@ public class ActionHandlerManager {
 
 		for (final ActionHandler actionHandler : fActionHandlers.values()) {
 			actionHandler.fireHandlerChanged();
-			fCommandService.refreshElements(actionHandler.getCommandId(), null);
+			_commandService.refreshElements(actionHandler.getCommandId(), null);
 		}
 	}
 

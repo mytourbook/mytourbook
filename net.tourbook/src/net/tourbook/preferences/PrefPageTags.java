@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,7 +29,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.tag.TVIPrefTag;
 import net.tourbook.tag.TVIPrefTagCategory;
 import net.tourbook.tag.TVIPrefTagRoot;
-import net.tourbook.tag.TagManager;
+import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.TreeViewerItem;
@@ -84,11 +84,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 
 public class PrefPageTags extends PreferencePage implements IWorkbenchPreferencePage, ITourViewer {
 
@@ -236,67 +238,12 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		_prefStore.addPropertyChangeListener(_prefChangeListener);
 	}
 
-	private void createButtons(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.indent(5, 0)
-				.applyTo(container);
-		GridLayoutFactory.fillDefaults().applyTo(container);
-
-		// button: new tag
-		_btnNewTag = new Button(container, SWT.NONE);
-		_btnNewTag.setText(Messages.pref_tourtag_btn_new_tag);
-		setButtonLayoutData(_btnNewTag);
-		_btnNewTag.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onNewTag();
-			}
-		});
-
-		// button: new tag category
-		_btnNewTagCategory = new Button(container, SWT.NONE);
-		_btnNewTagCategory.setText(Messages.pref_tourtag_btn_new_tag_category);
-		setButtonLayoutData(_btnNewTagCategory);
-		_btnNewTagCategory.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onNewCategory();
-			}
-		});
-
-		// button: rename
-		_btnRename = new Button(container, SWT.NONE);
-		_btnRename.setText(Messages.pref_tourtag_btn_rename);
-		setButtonLayoutData(_btnRename);
-		_btnRename.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onRenameTourTag();
-			}
-		});
-
-		// button: reset
-		_btnReset = new Button(container, SWT.NONE);
-		_btnReset.setText(Messages.pref_tourtag_btn_reset);
-		setButtonLayoutData(_btnReset);
-		final GridData gd = (GridData) _btnReset.getLayoutData();
-		gd.verticalIndent = 50;
-
-		_btnReset.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onReset();
-			}
-		});
-
-	}
-
 	@Override
 	protected Control createContents(final Composite parent) {
 
-		final Composite viewerContainer = createUI(parent);
+		final Composite ui = createUI(parent);
+
+		fillToolbar();
 
 		// set root item
 		_rootItem = new TVIPrefTagRoot(_tagViewer);
@@ -305,10 +252,54 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		enableButtons();
 		addPrefListener();
 
-		return viewerContainer;
+		return ui;
 	}
 
-	private void createTagViewer(final Composite parent) {
+	private Composite createUI(final Composite parent) {
+
+		// container
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+		GridLayoutFactory.fillDefaults()//
+				.margins(0, 0)
+				.spacing(SWT.DEFAULT, 0)
+				.numColumns(2)
+				.applyTo(container);
+		{
+			createUI10Title(container);
+
+			createUI20TagViewer(container);
+			createUI30Buttons(container);
+
+			createUI40Bottom(container);
+		}
+
+		// spacer
+		new Label(parent, SWT.NONE);
+
+		return container;
+	}
+
+	private void createUI10Title(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+			// label: title
+			final Label label = new Label(container, SWT.WRAP);
+			label.setText(Messages.pref_tourtag_viewer_title);
+			GridDataFactory.swtDefaults().grab(true, false).applyTo(label);
+
+			// toolbar
+			_toolBar = new ToolBar(container, SWT.FLAT);
+		}
+
+		// spacer
+		new Label(parent, SWT.NONE);
+	}
+
+	private void createUI20TagViewer(final Composite parent) {
 
 		/*
 		 * create tree layout
@@ -318,7 +309,6 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		GridDataFactory.fillDefaults()//
 				.grab(true, true)
 				.hint(200, 100)
-				.span(2, 1)
 				.applyTo(layoutContainer);
 
 		final TreeColumnLayout treeLayout = new TreeColumnLayout();
@@ -392,7 +382,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 					}
 
 					public void dragSetData(final DragSourceEvent event) {
-					// data are set in LocalSelectionTransfer
+						// data are set in LocalSelectionTransfer
 					}
 
 					public void dragStart(final DragSourceEvent event) {
@@ -472,54 +462,83 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		treeLayout.setColumnData(tvcColumn, new ColumnWeightData(100, true));
 	}
 
-	/**
-	 * set the toolbar action after the {@link #_tagViewer} is created
-	 */
-	private void createToolbarActions() {
+	private void createUI30Buttons(final Composite parent) {
 
-		final ToolBarManager tbm = new ToolBarManager(_toolBar);
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.indent(5, 0)
+				.applyTo(container);
+		GridLayoutFactory.fillDefaults().applyTo(container);
+		{
+			// button: new tag
+			_btnNewTag = new Button(container, SWT.NONE);
+			_btnNewTag.setText(Messages.pref_tourtag_btn_new_tag);
+			setButtonLayoutData(_btnNewTag);
+			_btnNewTag.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onNewTag();
+				}
+			});
 
-		tbm.add(new ActionExpandSelection(this));
-		tbm.add(new ActionCollapseAll(this));
+			// button: new tag category
+			_btnNewTagCategory = new Button(container, SWT.NONE);
+			_btnNewTagCategory.setText(Messages.pref_tourtag_btn_new_tag_category);
+			setButtonLayoutData(_btnNewTagCategory);
+			_btnNewTagCategory.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onNewCategory();
+				}
+			});
 
-		tbm.update(true);
+			// button: rename
+			_btnRename = new Button(container, SWT.NONE);
+			_btnRename.setText(Messages.pref_tourtag_btn_rename);
+			setButtonLayoutData(_btnRename);
+			_btnRename.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onRenameTourTag();
+				}
+			});
+
+			// button: reset
+			_btnReset = new Button(container, SWT.NONE);
+			_btnReset.setText(Messages.pref_tourtag_btn_reset);
+			setButtonLayoutData(_btnReset);
+			final GridData gd = (GridData) _btnReset.getLayoutData();
+			gd.verticalIndent = 50;
+
+			_btnReset.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onReset();
+				}
+			});
+		}
 	}
 
-	private Composite createUI(final Composite parent) {
+	private void createUI40Bottom(final Composite parent) {
 
-		// container
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-		GridLayoutFactory.fillDefaults()//
-				.margins(0, 0)
-				.spacing(SWT.DEFAULT, 0)
-				.numColumns(3)
-				.applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+		{
+			final Label label = new Label(container, SWT.WRAP);
+			label.setText(Messages.pref_tourtag_hint);
+			GridDataFactory.swtDefaults().grab(true, false).applyTo(label);
 
-		Label label = new Label(container, SWT.WRAP);
-		label.setText(Messages.pref_tourtag_viewer_title);
-		GridDataFactory.swtDefaults().grab(true, false).applyTo(label);
-
-		// toolbar
-		_toolBar = new ToolBar(container, SWT.FLAT);
-
-		// spacer
-		new Label(container, SWT.NONE);
-
-		createTagViewer(container);
-		createButtons(container);
-
-		label = new Label(container, SWT.WRAP);
-		label.setText(Messages.pref_tourtag_hint);
-		GridDataFactory.swtDefaults().grab(true, false).span(3, 1).applyTo(label);
-
-		// spacer
-		new Label(container, SWT.NONE);
-
-		createToolbarActions();
-
-		return container;
+			final Link link = new Link(container, SWT.WRAP);
+			GridDataFactory.swtDefaults().grab(true, false).applyTo(link);
+			link.setText(Messages.Pref_TourTag_Link_AppearanceOptions);
+			link.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					PreferencesUtil.createPreferenceDialogOn(getShell(), PrefPageAppearance.ID, null, null);
+				}
+			});
+		}
 	}
 
 	@Override
@@ -554,6 +573,19 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		_btnRename.setEnabled(selectedTags.size() == 1);
 	}
 
+	/**
+	 * set the toolbar action after the {@link #_tagViewer} is created
+	 */
+	private void fillToolbar() {
+
+		final ToolBarManager tbm = new ToolBarManager(_toolBar);
+
+		tbm.add(new ActionExpandSelection(this));
+		tbm.add(new ActionCollapseAll(this));
+
+		tbm.update(true);
+	}
+
 	private void fireModifyEvent() {
 
 		if (_isModified) {
@@ -562,7 +594,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 			// remove old tags from cached tours
 			TourDatabase.clearTourTags();
 
-			TagManager.updateTagNames();
+			TagMenuManager.updateRecentTagNames();
 
 			TourManager.getInstance().clearTourDataCache();
 

@@ -140,9 +140,9 @@ public class TourTypeFilterManager {
 
 			_selectedFilterAction = this;
 
-			setActiveTourTypeFilter(__ttFilter);
-
 			_tourTypeContribItem.updateUI(__ttFilter);
+
+			setActiveTourTypeFilter(__ttFilter);
 		}
 
 		@Override
@@ -584,7 +584,7 @@ public class TourTypeFilterManager {
 		TourbookPlugin.setActiveTourTypeFilter(ttFilter);
 
 		/*
-		 * fire in an asynch that the combo box drop down is hidden and the combo text ist displayed
+		 * fire as asynch that the combo box drop down is hidden and the combo text ist displayed
 		 */
 		Display.getCurrent().asyncExec(new Runnable() {
 			@Override

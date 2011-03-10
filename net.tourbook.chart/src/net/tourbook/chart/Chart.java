@@ -30,10 +30,12 @@ import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ViewForm;
+import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ToolBar;
@@ -49,9 +51,6 @@ public class Chart extends ViewForm {
 	static final String					COMMAND_ID_ZOOM_FIT_GRAPH			= "net.tourbook.chart.command.fitGraph";			//$NON-NLS-1$
 
 	static final String					COMMAND_ID_MOUSE_MODE				= "net.tourbook.chart.command.mouseMode";			//$NON-NLS-1$
-
-//	static final String					COMMAND_ID_PART_NEXT				= "net.tourbook.chart.command.partNext";			//$NON-NLS-1$
-//	static final String					COMMAND_ID_PART_PREVIOUS			= "net.tourbook.chart.command.partPrevious";		//$NON-NLS-1$
 
 	private static final String			COMMAND_ID_MOVE_LEFT_SLIDER_HERE	= "net.tourbook.chart.command.moveLeftSliderHere";	//$NON-NLS-1$
 	private static final String			COMMAND_ID_MOVE_RIGHT_SLIDER_HERE	= "net.tourbook.chart.command.moveRightSliderHere"; //$NON-NLS-1$
@@ -104,18 +103,16 @@ public class Chart extends ViewForm {
 	 * is outsite of the chart
 	 */
 	boolean								_useInternalActionBar				= true;
-
 	boolean								_useActionHandlers					= false;
 
-	private int							_barSelectionSerieIndex;
-
-	private int							_barSelectionValueIndex;
 	private final ActionHandlerManager	_actionHandlerManager				= ActionHandlerManager.getInstance();
-
 	HashMap<String, ActionProxy>		_chartActionProxies;
 	private boolean						_isFillToolbar						= true;
-
 	private boolean						_isToolbarCreated;
+
+	private int							_barSelectionSerieIndex;
+	private int							_barSelectionValueIndex;
+
 	int									_synchMode;
 
 	/**
@@ -223,7 +220,7 @@ public class Chart extends ViewForm {
 	}
 
 	/**
-	 * Creates the action proxys for all chart actions
+	 * Creates action proxys for all chart actions
 	 */
 	private void createChartActionProxies() {
 
@@ -371,10 +368,14 @@ public class Chart extends ViewForm {
 		// fit to graph is always enabled because the y-slider can change the chart
 		_chartActionProxies.get(COMMAND_ID_ZOOM_FIT_GRAPH).setEnabled(true);
 
+		_chartActionProxies.get(COMMAND_ID_MOUSE_MODE).setEnabled(true);
+		_chartActionProxies.get(COMMAND_ID_MOVE_LEFT_SLIDER_HERE).setEnabled(true);
+		_chartActionProxies.get(COMMAND_ID_MOVE_RIGHT_SLIDER_HERE).setEnabled(true);
+		_chartActionProxies.get(COMMAND_ID_MOVE_SLIDERS_TO_BORDER).setEnabled(true);
+
 		if (_useActionHandlers) {
 			_actionHandlerManager.updateUIState();
 		}
-
 	}
 
 	void fillContextMenu(	final IMenuManager menuMgr,
@@ -434,12 +435,14 @@ public class Chart extends ViewForm {
 				_chartContextProvider.fillXSliderContextMenu(menuMgr, leftSlider, rightSlider);
 			}
 
-			menuMgr.add(new Separator());
-			menuMgr.add(actionMouseMode);
-			menuMgr.add(_chartActionProxies.get(COMMAND_ID_MOVE_LEFT_SLIDER_HERE).getAction());
-			menuMgr.add(_chartActionProxies.get(COMMAND_ID_MOVE_RIGHT_SLIDER_HERE).getAction());
-			menuMgr.add(_chartActionProxies.get(COMMAND_ID_MOVE_SLIDERS_TO_BORDER).getAction());
-			menuMgr.add(_chartActionProxies.get(COMMAND_ID_ZOOM_IN_TO_SLIDER).getAction());
+			if (_isShowZoomActions) {
+				menuMgr.add(new Separator());
+				menuMgr.add(actionMouseMode);
+				menuMgr.add(_chartActionProxies.get(COMMAND_ID_MOVE_LEFT_SLIDER_HERE).getAction());
+				menuMgr.add(_chartActionProxies.get(COMMAND_ID_MOVE_RIGHT_SLIDER_HERE).getAction());
+				menuMgr.add(_chartActionProxies.get(COMMAND_ID_MOVE_SLIDERS_TO_BORDER).getAction());
+				menuMgr.add(_chartActionProxies.get(COMMAND_ID_ZOOM_IN_TO_SLIDER).getAction());
+			}
 		}
 
 		if (_chartContextProvider != null && showOnlySliderContext == false && _isFirstContextMenu == false) {
@@ -732,18 +735,6 @@ public class Chart extends ViewForm {
 		return getChartComponents().getAxisLeft();
 	}
 
-	/**
-	 * returns the value index for the x-sliders
-	 */
-	public SelectionChartXSliderPosition getXSliderPosition() {
-
-		final ChartComponentGraph chartGraph = _chartComponents.getChartComponentGraph();
-
-		return new SelectionChartXSliderPosition(this, chartGraph.getLeftSlider().getValuesIndex(), chartGraph
-				.getRightSlider()
-				.getValuesIndex());
-	}
-
 //	boolean isMouseDownExternalPost(final int devXMouse, final int devYMouse, final int devXGraph) {
 //
 //		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseDownPost);
@@ -756,6 +747,18 @@ public class Chart extends ViewForm {
 //
 //		return event.isWorked;
 //	}
+
+	/**
+	 * returns the value index for the x-sliders
+	 */
+	public SelectionChartXSliderPosition getXSliderPosition() {
+
+		final ChartComponentGraph chartGraph = _chartComponents.getChartComponentGraph();
+
+		return new SelectionChartXSliderPosition(this, chartGraph.getLeftSlider().getValuesIndex(), chartGraph
+				.getRightSlider()
+				.getValuesIndex());
+	}
 
 	boolean isMouseDownExternalPre(final int devXMouse, final int devYMouse, final int devXGraph) {
 
@@ -854,6 +857,20 @@ public class Chart extends ViewForm {
 		_chartComponents.getChartComponentGraph().zoomOutWithMouse(updateChart);
 	}
 
+	void onHideContextMenu(final MenuEvent e, final Control menuParentControl) {
+		
+		if (_chartContextProvider != null) {
+			_chartContextProvider.onHideContextMenu(e, menuParentControl);
+		}
+	}
+
+	void onShowContextMenu(final MenuEvent menuEvent, final Control menuParentControl) {
+
+		if (_chartContextProvider != null) {
+			_chartContextProvider.onShowContextMenu(menuEvent, menuParentControl);
+		}
+	}
+
 	/**
 	 * make the graph dirty and redraw it
 	 */
@@ -882,6 +899,13 @@ public class Chart extends ViewForm {
 	}
 
 	/**
+	 * Do a resize for all chart components which creates new drawing data
+	 */
+	public void resizeChart() {
+		_chartComponents.onResize();
+	}
+
+	/**
 	 * Set the background color for the chart, the default is SWT.COLOR_WHITE
 	 * 
 	 * @param backgroundColor
@@ -890,6 +914,16 @@ public class Chart extends ViewForm {
 	public void setBackgroundColor(final Color backgroundColor) {
 		this._backgroundColor = backgroundColor;
 	}
+
+//	/**
+//	 * Set <code>true</code> when the internal action bar should be used, set <code>false</code>
+//	 * when the workbench action should be used.
+//	 *
+//	 * @param useInternalActionBar
+//	 */
+//	public void setUseInternalActionBar(boolean useInternalActionBar) {
+//		fUseInternalActionBar = useInternalActionBar;
+//	}
 
 	/**
 	 * Set the option to move the sliders to the border when the chart is zoomed
@@ -930,16 +964,6 @@ public class Chart extends ViewForm {
 		}
 	}
 
-//	/**
-//	 * Set <code>true</code> when the internal action bar should be used, set <code>false</code>
-//	 * when the workbench action should be used.
-//	 *
-//	 * @param useInternalActionBar
-//	 */
-//	public void setUseInternalActionBar(boolean useInternalActionBar) {
-//		fUseInternalActionBar = useInternalActionBar;
-//	}
-
 	public void setContextProvider(final IChartContextProvider chartContextProvider) {
 		_chartContextProvider = chartContextProvider;
 	}
@@ -968,6 +992,10 @@ public class Chart extends ViewForm {
 	public void setDrawBarChartAtBottom(final boolean fDrawBarCharttAtBottom) {
 		this._isDrawBarChartAtBottom = fDrawBarCharttAtBottom;
 	}
+
+//	public void setShowPartNavigation(final boolean showPartNavigation) {
+//		fShowPartNavigation = showPartNavigation;
+//	}
 
 	@Override
 	public boolean setFocus() {
@@ -1010,10 +1038,6 @@ public class Chart extends ViewForm {
 		_chartComponents.getChartComponentGraph().setDefaultCursor();
 
 	}
-
-//	public void setShowPartNavigation(final boolean showPartNavigation) {
-//		fShowPartNavigation = showPartNavigation;
-//	}
 
 	public void setMouseMode(final Object newMouseMode) {
 
@@ -1200,16 +1224,42 @@ public class Chart extends ViewForm {
 
 			final ChartDataModel emptyModel = new ChartDataModel(ChartDataModel.CHART_TYPE_LINE);
 
+			if (chartDataModel != null) {
+				String errorMessage = chartDataModel.getErrorMessage();
+				if (errorMessage == null) {
+					/*
+					 * error message is disabled because it confuses the user because it is
+					 * displayed when a graph is not displayed but another graph could be selected
+					 */
+					errorMessage = Messages.Error_Message_001_Default;
+				}
+				_chartComponents.setErrorMessage(errorMessage);
+			}
+
 			_chartDataModel = emptyModel;
 			_chartComponents.setModel(emptyModel, false);
 
+			if (_chartActionProxies != null) {
+
+				// disable all actions
+
+				for (final ActionProxy actionProxy : _chartActionProxies.values()) {
+					actionProxy.setEnabled(false);
+				}
+				_actionHandlerManager.updateUIState();
+			}
+
 			return;
 		}
+
+		// reset error
+		_chartComponents.setErrorMessage(null);
 
 		_chartDataModel = chartDataModel;
 
 		createActions();
 		_chartComponents.setModel(chartDataModel, isShowAllData);
+		enableActions();
 
 		// reset last selected x-data
 		if (isResetSelection) {
@@ -1227,7 +1277,10 @@ public class Chart extends ViewForm {
 		_actionHandlerManager.updateActionHandlers(this);
 	}
 
-	public void updateChartLayers() {
+	/**
+	 * Updates only chart layers not the chart itself
+	 */
+	public void updateCustomLayers() {
 		_chartComponents.updateChartLayers();
 	}
 

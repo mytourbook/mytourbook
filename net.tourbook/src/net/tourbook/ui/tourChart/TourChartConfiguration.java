@@ -94,11 +94,6 @@ public class TourChartConfiguration {
 	public boolean					canShowSRTMData;
 
 	/**
-	 * chart type defines how the chart is painted
-	 */
-	public TourChartType			tourChartType;
-
-	/**
 	 * @param keepMinMaxValues
 	 *            set <code>true</code> to keep min/max values when tour data will change
 	 */

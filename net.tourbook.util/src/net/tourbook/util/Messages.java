@@ -21,6 +21,8 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.util.messages"; //$NON-NLS-1$
 
+	public static String	Advanced_Menu_AnimationSymbol;
+
 	public static String		ColumnModifyDialog_Button_default;
 	public static String		ColumnModifyDialog_Button_deselect_all;
 	public static String		ColumnModifyDialog_Button_move_down;

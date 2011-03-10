@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -49,27 +49,6 @@ public class ChangedTags {
 		}
 
 		_modifiedTags.putAll(modifiedTags);
-		_modifiedTours = (ArrayList<TourData>) modifiedTours.clone();
-		_isAddMode = isAddMode;
-	}
-
-	/**
-	 * @param modifiedTag
-	 *            tag which was added or removed from the tours
-	 * @param modifiedTours
-	 *            tours which have been modified
-	 * @param isAddMode
-	 *            <code>true</code> when tags were added to tours, <code>false</code> when a tag was
-	 *            removed from tours
-	 */
-	@SuppressWarnings("unchecked")
-	public ChangedTags(final TourTag modifiedTag, final ArrayList<TourData> modifiedTours, final boolean isAddMode) {
-
-		if (_modifiedTags == null) {
-			_modifiedTags = new HashMap<Long, TourTag>();
-		}
-
-		_modifiedTags.put(modifiedTag.getTagId(), modifiedTag);
 		_modifiedTours = (ArrayList<TourData>) modifiedTours.clone();
 		_isAddMode = isAddMode;
 	}

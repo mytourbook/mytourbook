@@ -191,7 +191,7 @@ public class TourTypeMenuManager {
 	 * @param tourProvider
 	 * @param isSaveTour
 	 */
-	public static void fillMenuRecentTourTypes(	final IMenuManager menuMgr,
+	public static void fillMenuWithRecentTourTypes(	final IMenuManager menuMgr,
 												final ITourProvider tourProvider,
 												final boolean isSaveTour) {
 

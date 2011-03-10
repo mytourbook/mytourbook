@@ -12,4 +12,5 @@ Require-Bundle: org.eclipse.ui,
 Bundle-ActivationPolicy: lazy
 Export-Package: net.tourbook.chart
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: net.tourbook.util
+Import-Package: gnu.trove.list.array,
+ net.tourbook.util

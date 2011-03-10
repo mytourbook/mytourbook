@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,11 +31,9 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceView;
 import net.tourbook.tag.ActionMenuSetAllTagStructures;
 import net.tourbook.tag.ActionMenuSetTagStructure;
-import net.tourbook.tag.ActionRemoveAllTags;
 import net.tourbook.tag.ActionRenameTag;
-import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.ChangedTags;
-import net.tourbook.tag.TagManager;
+import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.ITourItem;
 import net.tourbook.tour.SelectionDeletedTours;
@@ -56,7 +54,6 @@ import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.action.ActionExpandSelection;
 import net.tourbook.ui.action.ActionModifyColumns;
-import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionRefreshView;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
@@ -97,10 +94,13 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MenuAdapter;
+import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IPartListener2;
@@ -118,12 +118,16 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	static final int						TAG_VIEW_LAYOUT_FLAT			= 0;
 	static final int						TAG_VIEW_LAYOUT_HIERARCHICAL	= 10;
 
-	private final IPreferenceStore			_prefStore						= TourbookPlugin
-																					.getDefault()
+	private static final NumberFormat		_nf1							= NumberFormat.getNumberInstance();
+	{
+		_nf1.setMinimumFractionDigits(1);
+		_nf1.setMaximumFractionDigits(1);
+	}
+
+	private final IPreferenceStore			_prefStore						= TourbookPlugin.getDefault() //
 																					.getPreferenceStore();
 
-	private final IDialogSettings			_state							= TourbookPlugin
-																					.getDefault()
+	private final IDialogSettings			_state							= TourbookPlugin.getDefault() //
 																					.getDialogSettingsSection(ID);
 
 	private int								_tagViewLayout					= TAG_VIEW_LAYOUT_HIERARCHICAL;
@@ -135,13 +139,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	private boolean							_isToolTipInTitle;
 	private boolean							_isToolTipInTags;
 
+	private TagMenuManager					_tagMenuMgr;
 	private TourDoubleClickState			_tourDoubleClickState			= new TourDoubleClickState();
-
-	private static final NumberFormat		_nf1							= NumberFormat.getNumberInstance();
-	{
-		_nf1.setMinimumFractionDigits(1);
-		_nf1.setMaximumFractionDigits(1);
-	}
 
 	/*
 	 * resources
@@ -173,18 +172,14 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	private IPropertyChangeListener			_prefChangeListener;
 	private IPartListener2					_partListener;
 
-	private ActionSetTourTag				_actionAddTag;
 	private ActionCollapseAll				_actionCollapseAll;
 	private ActionCollapseOthers			_actionCollapseOthers;
 	private ActionEditQuick					_actionEditQuick;
 	private ActionEditTour					_actionEditTour;
 	private ActionExpandSelection			_actionExpandSelection;
-	private ActionOpenPrefDialog			_actionOpenTagPrefs;
 	private ActionSetLayoutHierarchical		_actionSetLayoutHierarchical;
 	private ActionSetLayoutFlat				_actionSetLayoutFlat;
 	private ActionRefreshView				_actionRefreshView;
-	private ActionRemoveAllTags				_actionRemoveAllTags;
-	private ActionSetTourTag				_actionRemoveTag;
 	private ActionRenameTag					_actionRenameTag;
 	private ActionMenuSetAllTagStructures	_actionSetAllTagStructures;
 	private ActionMenuSetTagStructure		_actionSetTagStructure;
@@ -467,9 +462,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 		_actionSetTourType = new ActionSetTourTypeMenu(this);
 
-		_actionAddTag = new ActionSetTourTag(this, true);
-		_actionRemoveTag = new ActionSetTourTag(this, false);
-		_actionRemoveAllTags = new ActionRemoveAllTags(this);
+		_tagMenuMgr = new TagMenuManager(this, true);
 
 		_actionRefreshView = new ActionRefreshView(this);
 		_actionSetTagStructure = new ActionMenuSetTagStructure(this);
@@ -479,10 +472,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		_actionExpandSelection = new ActionExpandSelection(this);
 		_actionCollapseAll = new ActionCollapseAll(this);
 		_actionCollapseOthers = new ActionCollapseOthers(this);
-
-		_actionOpenTagPrefs = new ActionOpenPrefDialog(
-				Messages.action_tag_open_tagging_structure,
-				ITourbookPreferences.PREF_PAGE_TAGS);
 
 		_actionSetLayoutFlat = new ActionSetLayoutFlat(this);
 		_actionSetLayoutHierarchical = new ActionSetLayoutHierarchical(this);
@@ -495,6 +484,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	 */
 	private void createContextMenu() {
 
+		final Control controlMenuParent = _tagViewer.getControl();
+
 		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
@@ -504,9 +495,25 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		});
 
 		// add the context menu to the table viewer
-		final Control tourViewer = _tagViewer.getControl();
-		final Menu menu = menuMgr.createContextMenu(tourViewer);
-		tourViewer.setMenu(menu);
+
+		final Menu menu = menuMgr.createContextMenu(controlMenuParent);
+		controlMenuParent.setMenu(menu);
+
+		final Menu contextMenu = menuMgr.createContextMenu(controlMenuParent);
+		contextMenu.addMenuListener(new MenuAdapter() {
+			@Override
+			public void menuHidden(final MenuEvent e) {
+				_tagMenuMgr.onHideMenu();
+			}
+
+			@Override
+			public void menuShown(final MenuEvent menuEvent) {
+				_tagMenuMgr.onShowMenu(menuEvent, controlMenuParent, Display.getCurrent().getCursorLocation());
+			}
+		});
+
+		// add the context menu to the table viewer
+		controlMenuParent.setMenu(contextMenu);
 	}
 
 	@Override
@@ -1261,37 +1268,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
 		_actionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
 
-		// action: add tag
-		_actionAddTag.setEnabled(isTourSelected);
-
-		ArrayList<Long> existingTagIds = null;
-		long existingTourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
-		if (firstTour != null && isOneTour) {
-
-			// one tour is selected
-
-			existingTagIds = firstTour.tagIds;
-			existingTourTypeId = firstTour.tourTypeId;
-
-			if (existingTagIds != null && existingTagIds.size() > 0) {
-
-				// at least one tag is within the tour
-
-				_actionRemoveAllTags.setEnabled(true);
-				_actionRemoveTag.setEnabled(true);
-			} else {
-				// tags are not available
-				_actionRemoveAllTags.setEnabled(false);
-				_actionRemoveTag.setEnabled(false);
-			}
-		} else {
-
-			// multiple tours are selected
-
-			_actionRemoveTag.setEnabled(isTourSelected);
-			_actionRemoveAllTags.setEnabled(isTourSelected);
-		}
-
 		// enable rename action
 		if (selectedItems == 1) {
 			if (isTagSelected) {
@@ -1322,9 +1298,11 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		_actionCollapseOthers.setEnabled(selectedItems == 1 && firstElementHasChildren);
 		_actionCollapseAll.setEnabled(treeItems > 0);
 
-		// enable/disable actions for tags/tour types
-		TagManager.enableRecentTagActions(isTourSelected, existingTagIds);
-		TourTypeMenuManager.enableRecentTourTypeActions(isTourSelected, existingTourTypeId);
+		_tagMenuMgr.enableTagActions(isTourSelected, isOneTour, firstTour == null ? null : firstTour.tagIds);
+
+		TourTypeMenuManager.enableRecentTourTypeActions(isTourSelected, isOneTour
+				? firstTour.tourTypeId
+				: TourDatabase.ENTITY_IS_NOT_SAVED);
 	}
 
 	private void fillContextMenu(final IMenuManager menuMgr) {
@@ -1343,18 +1321,12 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		menuMgr.add(_actionEditTour);
 		menuMgr.add(_actionOpenTour);
 
+		_tagMenuMgr.fillTagMenu(menuMgr);
+
 		// tour type actions
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionSetTourType);
-		TourTypeMenuManager.fillMenuRecentTourTypes(menuMgr, this, true);
-
-		// tour tag actions
-		menuMgr.add(new Separator());
-		menuMgr.add(_actionAddTag);
-		TagManager.fillMenuRecentTags(menuMgr, this, true, true);
-		menuMgr.add(_actionRemoveTag);
-		menuMgr.add(_actionRemoveAllTags);
-		menuMgr.add(_actionOpenTagPrefs);
+		TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, this, true);
 
 		enableActions();
 	}

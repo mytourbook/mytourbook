@@ -33,7 +33,7 @@ public class ChartDataModel {
 	public static final String			BAR_TOOLTIP_INFO_PROVIDER	= "BarToolTipInfoProvider";		//$NON-NLS-1$
 	public static final String			BAR_CONTEXT_PROVIDER		= "BarContextProvider";			//$NON-NLS-1$
 
-	private int							_chartType					= CHART_TYPE_LINE;
+	private int							_chartType;
 
 	private ChartDataXSerie				_xData						= null;
 	private ChartDataXSerie				_xData2nd					= null;
@@ -72,6 +72,11 @@ public class ChartDataModel {
 	 */
 	private int							_chartMinWidth				= ChartComponents.CHART_MIN_WIDTH;
 
+	/**
+	 * this error message is displayed when data for the chart are not available
+	 */
+	private String						_errorMessage;
+
 	public ChartDataModel(final int chartType) {
 		_chartType = chartType;
 	}
@@ -108,6 +113,10 @@ public class ChartDataModel {
 		} else {
 			return null;
 		}
+	}
+
+	public String getErrorMessage() {
+		return _errorMessage;
 	}
 
 	public String getTitle() {
@@ -160,7 +169,7 @@ public class ChartDataModel {
 	}
 
 	public void setChartMinWidth(final int chartMinWidth) {
-		this._chartMinWidth = chartMinWidth;
+		_chartMinWidth = chartMinWidth;
 	}
 
 	/**
@@ -171,12 +180,16 @@ public class ChartDataModel {
 		_customData.put(key, value);
 	}
 
+	public void setErrorMessage(final String errorMessage) {
+		_errorMessage=errorMessage;
+	}
+
 	public void setStackedChart(final boolean isStackedChart) {
-		this._isStackedChart = isStackedChart;
+		_isStackedChart = isStackedChart;
 	}
 
 	public void setTitle(final String title) {
-		this._title = title;
+		_title = title;
 	}
 
 	public void setXData(final ChartDataXSerie data) {

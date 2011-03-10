@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.tourChart.action;
 
@@ -25,9 +25,9 @@ import org.eclipse.jface.action.Action;
 
 public class ActionGraph extends Action {
 
-	private final TourChart	fTourChart;
+	private final TourChart	_tourChart;
 
-	private final int		fGraphId;
+	private final int		_graphId;
 
 	/**
 	 * Creates an action for a toggle button
@@ -49,8 +49,8 @@ public class ActionGraph extends Action {
 
 		super(label, AS_CHECK_BOX);
 
-		fTourChart = tourChart;
-		fGraphId = graphId;
+		_tourChart = tourChart;
+		_graphId = graphId;
 
 		setToolTipText(toolTip);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(imageEnabled));
@@ -65,7 +65,7 @@ public class ActionGraph extends Action {
 	@Override
 	public void run() {
 
-		final TourChartConfiguration chartConfig = fTourChart.getTourChartConfig();
+		final TourChartConfiguration chartConfig = _tourChart.getTourChartConfig();
 		
 		if (chartConfig == null) {
 			return;
@@ -73,7 +73,7 @@ public class ActionGraph extends Action {
 		
 		final ArrayList<Integer> visibleGraphs = chartConfig.getVisibleGraphs();
 
-		final boolean isThisGraphVisible = visibleGraphs.contains(fGraphId);
+		final boolean isThisGraphVisible = visibleGraphs.contains(_graphId);
 
 		// check that at least one graph is visible
 		if (isThisGraphVisible && visibleGraphs.size() == 1) {
@@ -86,14 +86,14 @@ public class ActionGraph extends Action {
 
 		if (!isThisGraphVisible) {
 			// add the graph to the list
-			chartConfig.addVisibleGraph(fGraphId);
+			chartConfig.addVisibleGraph(_graphId);
 		} else {
 			// remove the graph from the list
-			chartConfig.removeVisibleGraph(fGraphId);
+			chartConfig.removeVisibleGraph(_graphId);
 		}
 
-		fTourChart.enableTourActions();
-		fTourChart.updateTourChart(true);
+		_tourChart.enableTourActions();
+		_tourChart.updateTourChart(true);
 	}
 
 }

@@ -1,0 +1,36 @@
+Index: src/org/eclipse/babel/editor/i18n/EntryRightBanner.java
+===================================================================
+RCS file: /cvsroot/technology/org.eclipse.babel/plugins/org.eclipse.babel.editor/src/org/eclipse/babel/editor/i18n/EntryRightBanner.java,v
+retrieving revision 1.3
+diff -u -r1.3 EntryRightBanner.java
+--- src/org/eclipse/babel/editor/i18n/EntryRightBanner.java	12 Feb 2009 05:02:38 -0000	1.3
++++ src/org/eclipse/babel/editor/i18n/EntryRightBanner.java	15 Jul 2009 08:57:36 -0000
+@@ -110,15 +110,19 @@
+                     String key = editor.getSelectedKey();
+                     Collection<IMessageCheck> checks = editor.getMarkers().getFailedChecks(
+                             key, locale);
+-                    for (IMessageCheck check : checks) {
+-                        Action action = getCheckAction(key, check);
+-                        if (action != null) {
+-                            toolBarMgr.add(action);
+-                            toolBarMgr.update(true);
+-                            getParent().layout(true, true);
+-                            isMarked = true;
+-                        }
+-                    }
++                            
++					if (checks != null) {
++						for (final IMessageCheck check : checks) {
++							final Action action = getCheckAction(key, check);
++							if (action != null) {
++								toolBarMgr.add(action);
++								toolBarMgr.update(true);
++								getParent().layout(true, true);
++								isMarked = true;
++							}
++						}
++					}
++					
+                     toolBarMgr.update(true);
+                     getParent().layout(true, true);
+ 

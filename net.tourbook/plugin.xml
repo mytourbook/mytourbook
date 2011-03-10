@@ -491,7 +491,6 @@
                mnemonic="%command_tour_map_name_Mnemonic"
                tooltip="%command_tour_map_name_tooltip">
          </command>
-
          <command
 	           commandId="command.net.tourbook.views.TourMarkerView"
                icon="icons/tour-marker.png"
@@ -502,6 +501,11 @@
                icon="icons/tour-waypoint.png"
                label="%View_Name_Waypoint"
                mnemonic="%View_Name_Waypoint_Mnemonic"/>
+         <command
+               commandId="command.net.tourbook.views.ConconiChart"
+               icon="icons/conconi-chart.png"
+               label="%View_Name_ConconiChart"
+               mnemonic="%View_Name_ConconiChart_Mnemonic"/>
 
 
          <separator
@@ -753,7 +757,6 @@
             name="%view_name_Statistics"
             defaultHandler="net.tourbook.statistic.ActionHandlerOpenViewStatistic"
             />
-
       <command
             id="command.net.tourbook.views.TourMarkerView"
             name="%view_name_Marker"
@@ -763,6 +766,11 @@
             id="command.net.tourbook.views.TourWaypointView"
             name="%View_Name_Waypoint"
             defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourWaypoint"
+	  		/>
+      <command
+            id="command.net.tourbook.views.ConconiChart"
+            name="%View_Name_ConconiChart"
+            defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewConconiChart"
 	  		/>
 
 
@@ -1052,6 +1060,13 @@
 	            icon="icons/tour-waypoint.png"
 	            id="net.tourbook.views.TourWaypointView"
 	            name="%View_Name_Waypoint">
+	      </view>
+	      <view
+	            category="net.tourbook.category.tour"
+	            class="net.tourbook.ui.tourChart.ConconiChartView"
+	            icon="icons/conconi-chart.png"
+	            id="net.tourbook.views.ConconiChartView"
+	            name="%View_Name_ConconiChart">
 	      </view>
 
       <category

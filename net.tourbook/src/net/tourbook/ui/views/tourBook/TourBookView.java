@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
-import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
@@ -35,9 +34,7 @@ import net.tourbook.extension.export.ActionExport;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceView;
 import net.tourbook.printing.ActionPrint;
-import net.tourbook.tag.ActionRemoveAllTags;
-import net.tourbook.tag.ActionSetTourTag;
-import net.tourbook.tag.TagManager;
+import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
 import net.tourbook.tour.ITourEventListener;
@@ -60,7 +57,6 @@ import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.action.ActionExpandSelection;
 import net.tourbook.ui.action.ActionJoinTours;
 import net.tourbook.ui.action.ActionModifyColumns;
-import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionRefreshView;
 import net.tourbook.ui.action.ActionSetAltitudeValuesFromSRTM;
@@ -105,6 +101,8 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.events.MenuAdapter;
+import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -124,75 +122,78 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	static public final String							ID									= "net.tourbook.views.tourListView";		//$NON-NLS-1$
 
 	private static final String							STATE_SELECTED_YEAR					= "SelectedYear";							//$NON-NLS-1$
+
 	private static final String							STATE_SELECTED_MONTH				= "SelectedMonth";							//$NON-NLS-1$
 	private static final String							STATE_SELECTED_TOURS				= "SelectedTours";							//$NON-NLS-1$
-
 	private static final String							STATE_IS_SELECT_YEAR_MONTH_TOURS	= "IsSelectYearMonthTours";				//$NON-NLS-1$
 
 	private final IPreferenceStore						_prefStore							= TourbookPlugin
 																									.getDefault()
 																									//
 																									.getPreferenceStore();
+
 	private final IDialogSettings						_state								= TourbookPlugin
 																									.getDefault()
 																									//
 																									.getDialogSettingsSection(
 																											ID);
-
 	private ColumnManager								_columnManager;
 
 	private PostSelectionProvider						_postSelectionProvider;
+
 	private ISelectionListener							_postSelectionListener;
 	private IPartListener2								_partListener;
 	private ITourEventListener							_tourPropertyListener;
 	private IPropertyChangeListener						_prefChangeListener;
-
 	private TVITourBookRoot								_rootItem;
 
 	private final NumberFormat							_nf1								= NumberFormat
 																									.getNumberInstance();
+
 	{
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
 	}
-
 	private final Calendar								_calendar							= GregorianCalendar
 																									.getInstance();
+
 	private final DateFormat							_timeFormatter						= DateFormat
 																									.getTimeInstance(DateFormat.SHORT);
-
 	private static final String[]						_weekDays							= DateFormatSymbols
 																									.getInstance()
 																									.getShortWeekdays();
 
 	private int											_selectedYear						= -1;
+
 	private int											_selectedMonth						= -1;
 	private final ArrayList<Long>						_selectedTourIds					= new ArrayList<Long>();
-
 	private boolean										_isRecTimeFormat_hhmmss;
-	private boolean										_isDriveTimeFormat_hhmmss;
 
+	private boolean										_isDriveTimeFormat_hhmmss;
 	private boolean										_isToolTipInDate;
+
 	private boolean										_isToolTipInTags;
 	private boolean										_isToolTipInTime;
 	private boolean										_isToolTipInTitle;
 	private boolean										_isToolTipInWeekDay;
 
 	private final TourDoubleClickState					_tourDoubleClickState				= new TourDoubleClickState();
+	private TagMenuManager								_tagMenuMgr;
 
 	/*
 	 * UI controls
 	 */
 	private Composite									_viewerContainer;
-	private TreeViewer									_tourViewer;
 
+	private TreeViewer									_tourViewer;
 	private ActionEditQuick								_actionEditQuick;
 
 	private ActionCollapseAll							_actionCollapseAll;
+
 	private ActionCollapseOthers						_actionCollapseOthers;
 	private ActionExpandSelection						_actionExpandSelection;
-
 	private ActionDeleteTourMenu						_actionDeleteTour;
+
 	private ActionEditTour								_actionEditTour;
 	private ActionOpenTour								_actionOpenTour;
 	private ActionOpenMarkerDialog						_actionOpenMarkerDialog;
@@ -201,18 +202,14 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private ActionJoinTours								_actionJoinTours;
 	private ActionComputeDistanceValuesFromGeoposition	_actionComputeDistanceValuesFromGeoposition;
 	private ActionSetAltitudeValuesFromSRTM				_actionSetAltitudeFromSRTM;
-
 	private ActionSetTourTypeMenu						_actionSetTourType;
-	private ActionSetTourTag							_actionAddTag;
-	private ActionSetTourTag							_actionRemoveTag;
-	private ActionRemoveAllTags							_actionRemoveAllTags;
-	private ActionOpenPrefDialog						_actionOpenTagPrefs;
 
 	private ActionSelectAllTours						_actionSelectAllTours;
+
 	private ActionModifyColumns							_actionModifyColumns;
 	private ActionRefreshView							_actionRefreshView;
-
 	private ActionSetPerson								_actionSetOtherPerson;
+
 	private ActionExport								_actionExportTour;
 	private ActionPrint									_actionPrintTour;
 
@@ -444,9 +441,6 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		_actionSetOtherPerson = new ActionSetPerson(this);
 
 		_actionSetTourType = new ActionSetTourTypeMenu(this);
-		_actionAddTag = new ActionSetTourTag(this, true);
-		_actionRemoveTag = new ActionSetTourTag(this, false);
-		_actionRemoveAllTags = new ActionRemoveAllTags(this);
 
 		_actionModifyColumns = new ActionModifyColumns(this);
 		_actionSelectAllTours = new ActionSelectAllTours(this);
@@ -456,34 +450,12 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		_actionCollapseAll = new ActionCollapseAll(this);
 		_actionCollapseOthers = new ActionCollapseOthers(this);
 
-		_actionOpenTagPrefs = new ActionOpenPrefDialog(
-				Messages.action_tag_open_tagging_structure,
-				ITourbookPreferences.PREF_PAGE_TAGS);
-
 		_actionExportTour = new ActionExport(this);
 		_actionPrintTour = new ActionPrint(this);
 
-		fillActions();
-	}
+		_tagMenuMgr = new TagMenuManager(this, true);
 
-	/**
-	 * create the views context menu
-	 */
-	private void createContextMenu() {
-
-		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
-		menuMgr.setRemoveAllWhenShown(true);
-		menuMgr.addMenuListener(new IMenuListener() {
-			@Override
-			public void menuAboutToShow(final IMenuManager manager) {
-				fillContextMenu(manager);
-			}
-		});
-
-		// add the context menu to the table viewer
-		final Control tourViewer = _tourViewer.getControl();
-		final Menu menu = menuMgr.createContextMenu(tourViewer);
-		tourViewer.setMenu(menu);
+		fillActionBars();
 	}
 
 	@Override
@@ -496,7 +468,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		_viewerContainer = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
 
-		createTourViewer(_viewerContainer);
+		createUI10TourViewer(_viewerContainer);
 
 		createActions();
 
@@ -520,7 +492,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		reselectTourViewer();
 	}
 
-	private void createTourViewer(final Composite parent) {
+	private void createUI10TourViewer(final Composite parent) {
 
 		// tour tree
 		final Tree tree = new Tree(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FLAT | SWT.FULL_SELECTION | SWT.MULTI);
@@ -574,10 +546,42 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		 * the context menu must be created after the viewer is created which is also done after the
 		 * measurement system has changed
 		 */
-		createContextMenu();
+		createUI20ContextMenu();
 
 		// set tour info tooltip provider
 		new TreeViewerTourInfoToolTip(_tourViewer);
+	}
+
+	/**
+	 * create the views context menu
+	 */
+	private void createUI20ContextMenu() {
+
+		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+		menuMgr.setRemoveAllWhenShown(true);
+		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
+			public void menuAboutToShow(final IMenuManager manager) {
+				fillContextMenu(manager);
+			}
+		});
+
+		final Control controlMenuParent = _tourViewer.getControl();
+		final Menu contextMenu = menuMgr.createContextMenu(controlMenuParent);
+		contextMenu.addMenuListener(new MenuAdapter() {
+			@Override
+			public void menuHidden(final MenuEvent e) {
+				_tagMenuMgr.onHideMenu();
+			}
+
+			@Override
+			public void menuShown(final MenuEvent menuEvent) {
+				_tagMenuMgr.onShowMenu(menuEvent, controlMenuParent, Display.getCurrent().getCursorLocation());
+			}
+		});
+
+		// add the context menu to the table viewer
+		controlMenuParent.setMenu(contextMenu);
 	}
 
 	/**
@@ -1603,15 +1607,15 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			isDeviceTour = firstSavedTour.isManualTour() == false;
 		}
 
+		/*
+		 * enable actions
+		 */
 		_tourDoubleClickState.canEditTour = isOneTour;
 		_tourDoubleClickState.canOpenTour = isOneTour;
 		_tourDoubleClickState.canQuickEditTour = isOneTour;
 		_tourDoubleClickState.canEditMarker = isOneTour;
 		_tourDoubleClickState.canAdjustAltitude = isOneTour;
 
-		/*
-		 * enable actions
-		 */
 		_actionEditTour.setEnabled(isOneTour);
 		_actionOpenTour.setEnabled(isOneTour);
 		_actionEditQuick.setEnabled(isOneTour);
@@ -1638,38 +1642,6 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
 		_actionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
 
-		// add tag
-		_actionAddTag.setEnabled(isTourSelected);
-
-		// remove tags
-		ArrayList<Long> existingTagIds = null;
-		long existingTourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
-		if (isOneTour) {
-
-			// one tour is selected
-
-			existingTagIds = firstTour.getTagIds();
-			existingTourTypeId = firstTour.getTourTypeId();
-
-			if (existingTagIds != null && existingTagIds.size() > 0) {
-
-				// at least one tag is within the tour
-
-				_actionRemoveAllTags.setEnabled(true);
-				_actionRemoveTag.setEnabled(true);
-			} else {
-				// tags are not available
-				_actionRemoveAllTags.setEnabled(false);
-				_actionRemoveTag.setEnabled(false);
-			}
-		} else {
-
-			// multiple tours are selected
-
-			_actionRemoveTag.setEnabled(isTourSelected);
-			_actionRemoveAllTags.setEnabled(isTourSelected);
-		}
-
 		_actionExpandSelection.setEnabled(selection.size() == 0 ? false : true);
 
 		_actionExpandSelection.setEnabled(firstElement == null ? false : //
@@ -1678,12 +1650,14 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		_actionCollapseOthers.setEnabled(selectedItems == 1 && firstElementHasChildren);
 
-		// enable/disable actions for tags/tour types
-		TagManager.enableRecentTagActions(isTourSelected, existingTagIds);
-		TourTypeMenuManager.enableRecentTourTypeActions(isTourSelected, existingTourTypeId);
+		_tagMenuMgr.enableTagActions(isTourSelected, isOneTour, firstTour == null ? null : firstTour.getTagIds());
+
+		TourTypeMenuManager.enableRecentTourTypeActions(isTourSelected, isOneTour
+				? firstTour.getTourTypeId()
+				: TourDatabase.ENTITY_IS_NOT_SAVED);
 	}
 
-	private void fillActions() {
+	private void fillActionBars() {
 
 		/*
 		 * fill view menu
@@ -1707,11 +1681,6 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 	private void fillContextMenu(final IMenuManager menuMgr) {
 
-		menuMgr.add(_actionCollapseOthers);
-		menuMgr.add(_actionExpandSelection);
-		menuMgr.add(_actionCollapseAll);
-
-		menuMgr.add(new Separator());
 		menuMgr.add(_actionEditQuick);
 		menuMgr.add(_actionEditTour);
 		menuMgr.add(_actionOpenMarkerDialog);
@@ -1722,22 +1691,21 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		menuMgr.add(_actionComputeDistanceValuesFromGeoposition);
 		menuMgr.add(_actionSetAltitudeFromSRTM);
 
-		menuMgr.add(new Separator());
-		menuMgr.add(_actionExportTour);
-		menuMgr.add(_actionPrintTour);
+		_tagMenuMgr.fillTagMenu(menuMgr);
 
 		// tour type actions
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionSetTourType);
-		TourTypeMenuManager.fillMenuRecentTourTypes(menuMgr, this, true);
+		TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, this, true);
 
-		// tour tag actions
 		menuMgr.add(new Separator());
-		menuMgr.add(_actionAddTag);
-		TagManager.fillMenuRecentTags(menuMgr, this, true, true);
-		menuMgr.add(_actionRemoveTag);
-		menuMgr.add(_actionRemoveAllTags);
-		menuMgr.add(_actionOpenTagPrefs);
+		menuMgr.add(_actionCollapseOthers);
+		menuMgr.add(_actionExpandSelection);
+		menuMgr.add(_actionCollapseAll);
+
+		menuMgr.add(new Separator());
+		menuMgr.add(_actionExportTour);
+		menuMgr.add(_actionPrintTour);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionSetOtherPerson);
@@ -1749,16 +1717,6 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	void firePostSelection(final ISelection selection) {
 		_postSelectionProvider.setSelection(selection);
 	}
-
-//	@Override
-//	public Object getAdapter(final Class adapter) {
-//
-//		if (adapter == ColumnViewer.class) {
-//			return _tourViewer;
-//		}
-//
-//		return Platform.getAdapterManager().getAdapter(this, adapter);
-//	}
 
 	@Override
 	public ColumnManager getColumnManager() {
@@ -1994,7 +1952,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 			_tourViewer.getTree().dispose();
 
-			createTourViewer(_viewerContainer);
+			createUI10TourViewer(_viewerContainer);
 			_viewerContainer.layout();
 
 			_tourViewer.setInput(_rootItem = new TVITourBookRoot(this));
