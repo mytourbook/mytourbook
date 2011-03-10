@@ -80,7 +80,6 @@ public class Messages extends NLS {
 	public static String		Action_Tag_Add_RecentTags;
 	public static String		Action_Tag_AutoOpenCancel;
 	public static String		Action_Tag_AutoOpenOK;
-	public static String		Action_Tag_Remove_AutoOpen;
 	public static String		Action_TourType_ModifyTourTypeFilter;
 
 	public static String		Adjust_Altitude_CreateDummyAltitudeData_Message;
@@ -199,7 +198,6 @@ public class Messages extends NLS {
 	public static String		App_Dlg_first_startup_title;
 
 	public static String		App_Label_ISO8601;
-	public static String		App_Label_NA;
 
 	public static String		App_Title;
 
@@ -547,7 +545,7 @@ public class Messages extends NLS {
 	public static String		Pref_Appearance_Label_AutoOpenTagging_Tooltip;
 	public static String		Pref_Appearance_Label_AutoOpenTaggingDelay;
 
-	public static String	Pref_Appearance_Label_NoOSXSupport;
+	public static String		Pref_Appearance_Label_NoOSXSupport;
 	public static String		Pref_Appearance_NumberOfRecent_TourTypes;
 	public static String		Pref_Appearance_NumberOfRecent_TourTypes_Tooltip;
 	public static String		Pref_Appearance_ShowTourTypeContextMenu;
@@ -1060,11 +1058,6 @@ public class Messages extends NLS {
 	public static String		tourCatalog_wizard_Page_compared_tours_title;
 	public static String		tourCatalog_wizard_Page_reference_tour_title;
 	public static String		tourCatalog_wizard_Wizard_title;
-
-	public static String		TourChart_Action_ChartType_ConconiPower;
-	public static String		TourChart_Action_ChartType_Title;
-	public static String		TourChart_Action_ChartType_TourChart;
-	public static String		TourChart_Action_ChartType_TourChart_Tooltip;
 
 	public static String		TourChart_Property_chart_type_bar;
 	public static String		TourChart_Property_chart_type_line;

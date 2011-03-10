@@ -99,7 +99,7 @@ public class LinearRegression {
 
 	/** Returns Y=mX+b with full precision, no rounding of numbers. */
 	public String getModel() {
-		return "Y= " + slope + "X + " + intercept + " RSqrd=" + getRSquared();
+		return "Y= " + slope + "X + " + intercept + " RSqrd=" + getRSquared(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	public double getRSquared() {
