@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,10 +27,7 @@ import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.extension.export.ActionExport;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tag.ActionRemoveAllTags;
-import net.tourbook.tag.ActionSetTourTag;
-import net.tourbook.tag.TagManager;
+import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
 import net.tourbook.tour.TourTypeMenuManager;
@@ -38,7 +35,6 @@ import net.tourbook.ui.ITourChartViewer;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
-import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.tourChart.action.ActionCreateMarker;
@@ -46,6 +42,9 @@ import net.tourbook.ui.tourChart.action.ActionCreateRefTour;
 
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 
 public class TourChartContextProvicer implements IChartContextProvider, ITourProvider {
 
@@ -63,11 +62,8 @@ public class TourChartContextProvicer implements IChartContextProvider, ITourPro
 	private ActionCreateMarker				_actionCreateMarkerRight;
 	private ActionExport					_actionExportTour;
 
+	private TagMenuManager					_tagMenuMgr;
 	private ActionSetTourTypeMenu			_actionSetTourType;
-	private ActionSetTourTag				_actionAddTag;
-	private ActionSetTourTag				_actionRemoveTag;
-	private ActionRemoveAllTags				_actionRemoveAllTags;
-	private ActionOpenPrefDialog			_actionOpenTagPrefDialog;
 
 	private ChartXSlider					_leftSlider;
 	private ChartXSlider					_rightSlider;
@@ -112,12 +108,37 @@ public class TourChartContextProvicer implements IChartContextProvider, ITourPro
 		_actionOpenAdjustAltitudeDialog.setEnabled(true);
 
 		_actionSetTourType = new ActionSetTourTypeMenu(this);
-		_actionAddTag = new ActionSetTourTag(this, true);
-		_actionRemoveTag = new ActionSetTourTag(this, false);
-		_actionRemoveAllTags = new ActionRemoveAllTags(this);
-		_actionOpenTagPrefDialog = new ActionOpenPrefDialog(
-				Messages.action_tag_open_tagging_structure,
-				ITourbookPreferences.PREF_PAGE_TAGS);
+
+		_tagMenuMgr = new TagMenuManager(this, true);
+	}
+
+	private void enableActions() {
+
+		final TourChart tourChart = _tourChartViewer.getTourChart();
+		final TourData tourData = tourChart.getTourData();
+
+		final boolean isDataAvailable = tourData != null && tourData.getTourPerson() != null;
+		final Set<TourTag> tourTags = tourData == null ? null : tourData.getTourTags();
+
+		long existingTourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
+		if (tourData != null) {
+			final TourType tourType = tourData.getTourType();
+			existingTourTypeId = tourType == null ? TourDatabase.ENTITY_IS_NOT_SAVED : tourType.getTypeId();
+		}
+		_actionQuickEdit.setEnabled(isDataAvailable);
+		_actionEditTour.setEnabled(isDataAvailable);
+		_actionOpenMarkerDialog.setEnabled(isDataAvailable);
+		_actionOpenAdjustAltitudeDialog.setEnabled(isDataAvailable);
+		_actionOpenTour.setEnabled(isDataAvailable);
+		_actionExportTour.setEnabled(true);
+
+		_tagMenuMgr.enableTagActions(//
+				isDataAvailable,
+				isDataAvailable && tourTags.size() > 0,
+				tourTags);
+
+		_actionSetTourType.setEnabled(isDataAvailable);
+		TourTypeMenuManager.enableRecentTourTypeActions(isDataAvailable, existingTourTypeId);
 	}
 
 	public void fillBarChartContextMenu(final IMenuManager menuMgr,
@@ -129,18 +150,6 @@ public class TourChartContextProvicer implements IChartContextProvider, ITourPro
 								final int mouseDownDevPositionY) {
 
 		final TourChart tourChart = _tourChartViewer.getTourChart();
-		final TourData tourData = tourChart.getTourData();
-
-		final boolean isTourSaved = tourData != null && tourData.getTourPerson() != null;
-
-		final Set<TourTag> allExistingTags = tourData == null ? null : tourData.getTourTags();
-		final boolean isTagAvailable = allExistingTags == null ? false : allExistingTags.size() > 0;
-
-		long existingTourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
-		if (tourData != null) {
-			final TourType tourType = tourData.getTourType();
-			existingTourTypeId = tourType == null ? TourDatabase.ENTITY_IS_NOT_SAVED : tourType.getTypeId();
-		}
 
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionQuickEdit);
@@ -150,44 +159,19 @@ public class TourChartContextProvicer implements IChartContextProvider, ITourPro
 		menuMgr.add(_actionOpenTour);
 		menuMgr.add(_actionExportTour);
 
+		// tour tag actions
+		_tagMenuMgr.fillTagMenu(menuMgr);
+
 		// tour type actions
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionSetTourType);
-		if (isTourSaved) {
-			TourTypeMenuManager.fillMenuRecentTourTypes(menuMgr, this, true);
-		}
-
-		// tour tag actions
-		menuMgr.add(new Separator());
-		menuMgr.add(_actionAddTag);
-		menuMgr.add(_actionRemoveTag);
-		menuMgr.add(_actionRemoveAllTags);
-		if (isTourSaved) {
-			TagManager.fillMenuRecentTags(menuMgr, this, true, true);
-		}
-		menuMgr.add(_actionOpenTagPrefDialog);
+		TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, this, true);
 
 		// set slider position in export action
 		_actionExportTour.setTourRange(tourChart.getLeftSlider().getValuesIndex(), //
 				tourChart.getRightSlider().getValuesIndex());
-		/*
-		 * enable actions
-		 */
-		_actionQuickEdit.setEnabled(isTourSaved);
-		_actionEditTour.setEnabled(isTourSaved);
-		_actionOpenMarkerDialog.setEnabled(isTourSaved);
-		_actionOpenAdjustAltitudeDialog.setEnabled(isTourSaved);
-		_actionOpenTour.setEnabled(isTourSaved);
-		_actionExportTour.setEnabled(true);
 
-		_actionSetTourType.setEnabled(isTourSaved);
-		_actionAddTag.setEnabled(isTourSaved);
-		_actionRemoveTag.setEnabled(isTourSaved);
-		_actionRemoveAllTags.setEnabled(isTourSaved && isTagAvailable);
-
-		// enable/disable actions for tags/tour types
-		TagManager.enableRecentTagActions(isTourSaved, allExistingTags);
-		TourTypeMenuManager.enableRecentTourTypeActions(isTourSaved, existingTourTypeId);
+		enableActions();
 	}
 
 	public void fillXSliderContextMenu(	final IMenuManager menuMgr,
@@ -246,6 +230,21 @@ public class TourChartContextProvicer implements IChartContextProvider, ITourPro
 		tourList.add(_tourChartViewer.getTourChart().getTourData());
 
 		return tourList;
+	}
+
+	@Override
+	public void onHideContextMenu(final MenuEvent menuEvent, final Control menuParentControl) {
+
+		_tagMenuMgr.onHideMenu();
+	}
+
+	@Override
+	public void onShowContextMenu(final MenuEvent menuEvent, final Control menuParentControl) {
+
+		_tagMenuMgr.onShowMenu(//
+				menuEvent,
+				menuParentControl,
+				Display.getCurrent().getCursorLocation());
 	}
 
 	public boolean showOnlySliderContextMenu() {

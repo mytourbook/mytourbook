@@ -1,0 +1,18 @@
+2008-01-10:
+---------------
+* New: Wizard for creating new resource bundles.
+* Added some support for NL structures.
+* Added resource location tooltips to locale.
+
+2007-12-16:
+---------------
+* New: Option to sort keys or not when serializing properties files.
+* New: "Add key" action added to key contextual menu.
+* Fix: No longer trying to add a key that already exists when pressing the enter
+          key in the quick-add field below the key tree.
+* Fix: Added text validation on key rename action dialog. 
+
+2007-12-12:
+---------------
+* Messages Editor markers now updated upon leaving fields.
+* Delete and Rename actions now functional.

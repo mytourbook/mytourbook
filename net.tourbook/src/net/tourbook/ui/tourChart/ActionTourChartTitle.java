@@ -24,7 +24,7 @@ public class ActionTourChartTitle extends Action {
 
 	public ActionTourChartTitle() {
 
-		super(Messages.TourChart_Action_ChartTypeTitle, AS_PUSH_BUTTON);
+		super(Messages.TourChart_Action_ChartType_Title, AS_PUSH_BUTTON);
 	}
 
 	@Override

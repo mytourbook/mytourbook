@@ -204,7 +204,7 @@ public abstract class ChartDataSerie {
 	}
 
 	public void setAxisUnit(final int axisUnit) {
-		this._axisUnit = axisUnit;
+		_axisUnit = axisUnit;
 	}
 
 	/**
@@ -215,12 +215,17 @@ public abstract class ChartDataSerie {
 		_customData.put(key, value);
 	}
 
+	/**
+	 * This value is also used to draw the axis text for the data serie
+	 * 
+	 * @param color
+	 */
 	public void setDefaultRGB(final RGB color) {
 		_defaultRGB = color;
 	}
 
 	public void setLabel(final String label) {
-		this._label = label;
+		_label = label;
 	}
 
 	void setMinMaxValues(final int valueSeries[][]) {
@@ -287,11 +292,11 @@ public abstract class ChartDataSerie {
 	 *            The measurement to set.
 	 */
 	public void setUnitLabel(final String unit) {
-		this._unitLabel = unit == null ? Util.EMPTY_STRING : unit;
+		_unitLabel = unit == null ? Util.EMPTY_STRING : unit;
 	}
 
 	public void setValueDivisor(final int valueDivisor) {
-		this._valueDivisor = valueDivisor;
+		_valueDivisor = valueDivisor;
 	}
 
 	public void setVisibleMaxValue(final int maxValue) {

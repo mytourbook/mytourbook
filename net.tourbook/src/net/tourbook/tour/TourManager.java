@@ -45,7 +45,6 @@ import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
-import net.tourbook.ui.tourChart.TourChartType;
 import net.tourbook.ui.views.TourChartAnalyzerInfo;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.util.IExternalTourEvents;
@@ -92,6 +91,7 @@ public class TourManager {
 
 	public static final String					CUSTOM_DATA_SEGMENT_VALUES	= "segmentValues";							//$NON-NLS-1$
 	public static final String					CUSTOM_DATA_ANALYZER_INFO	= "analyzerInfo";							//$NON-NLS-1$
+	public static final String					CUSTOM_DATA_CONCONI_TEST	= "CUSTOM_DATA_CONCONI_TEST";				//$NON-NLS-1$
 
 	public static final String					X_AXIS_TIME					= "time";									//$NON-NLS-1$
 	public static final String					X_AXIS_DISTANCE				= "distance";								//$NON-NLS-1$
@@ -187,7 +187,7 @@ public class TourManager {
 	 * @param tourData2
 	 * @return Returns <code>true</code> when they are the same, otherwise this is an internal error
 	 * @throws MyTourbookException
-	 *             throws this exception when {@link TourData} are corrupted
+	 *             throws an exception when {@link TourData} are corrupted
 	 */
 	public static boolean checkTourData(final TourData tourData1, final TourData tourData2) throws MyTourbookException {
 
@@ -585,11 +585,17 @@ public class TourManager {
 	 * @return Returns <code>true</code> when the tour is modified in the {@link TourDataEditorView}
 	 */
 	public static boolean isTourEditorModified() {
+		return isTourEditorModified(true);
+	}
+
+	public static boolean isTourEditorModified(final boolean isOpenEditor) {
 
 		final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
 		if (tourDataEditor != null && tourDataEditor.isDirty()) {
 
-			openTourEditor(true);
+			if (isOpenEditor) {
+				openTourEditor(true);
+			}
 
 			MessageDialog.openInformation(
 					Display.getCurrent().getActiveShell(),
@@ -1025,7 +1031,9 @@ public class TourManager {
 			try {
 				checkTourData(tourData, tourDataInEditor);
 			} catch (final MyTourbookException e) {
+				// error is already displayed, just log it
 				e.printStackTrace();
+				return;
 			}
 
 			if (tourDataInEditor == tourData) {
@@ -1136,21 +1144,23 @@ public class TourManager {
 
 		final String prefGraphName = ITourbookPreferences.GRAPH_COLORS + graphName + "."; //$NON-NLS-1$
 
-		final RGB lineColor = PreferenceConverter.getColor(//
+		final RGB prefLineColor = PreferenceConverter.getColor(//
 				prefStore,
 				prefGraphName + GraphColorProvider.PREF_COLOR_LINE);
 
-		yData.setDefaultRGB(lineColor);
-
-		yData.setRgbLine(new RGB[] { lineColor });
-
-		yData.setRgbDark(new RGB[] { PreferenceConverter.getColor(//
+		final RGB prefDarkColor = PreferenceConverter.getColor(//
 				prefStore,
-				prefGraphName + GraphColorProvider.PREF_COLOR_DARK) });
+				prefGraphName + GraphColorProvider.PREF_COLOR_DARK);
 
-		yData.setRgbBright(new RGB[] { PreferenceConverter.getColor(//
+		final RGB prefBrightColor = PreferenceConverter.getColor(//
 				prefStore,
-				prefGraphName + GraphColorProvider.PREF_COLOR_BRIGHT) });
+				prefGraphName + GraphColorProvider.PREF_COLOR_BRIGHT);
+
+		yData.setDefaultRGB(prefLineColor);
+
+		yData.setRgbLine(new RGB[] { prefLineColor });
+		yData.setRgbDark(new RGB[] { prefDarkColor });
+		yData.setRgbBright(new RGB[] { prefBrightColor });
 	}
 
 	public static void setTourDataEditor(final TourDataEditorView tourDataEditorView) {
@@ -1563,11 +1573,7 @@ public class TourManager {
 			createAvgCallbacks();
 		}
 
-		final boolean isDefault = chartConfig.tourChartType == TourChartType.DEFAULT;
-
-		final ChartDataModel chartDataModel = new ChartDataModel(isDefault
-				? ChartDataModel.CHART_TYPE_LINE
-				: ChartDataModel.CHART_TYPE_XY_SCATTER);
+		final ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_LINE);
 
 		if (tourData.timeSerie == null || tourData.timeSerie.length == 0) {
 			return chartDataModel;
@@ -1581,65 +1587,6 @@ public class TourManager {
 		tourData.computeAltimeterGradientSerie();
 
 		computeValueClipping(tourData);
-
-		if (isDefault) {
-			createChartDataModelInternalDefault(tourData, chartConfig, chartDataModel);
-		} else {
-			createChartDataModelInternalConconiTest(tourData, chartConfig, chartDataModel);
-		}
-
-		return chartDataModel;
-	}
-
-	private void createChartDataModelInternalConconiTest(	final TourData tourData,
-															final TourChartConfiguration chartConfig,
-															final ChartDataModel chartDataModel) {
-
-		/*
-		 * power
-		 */
-		final int[] powerSerie = tourData.getPowerSerie();
-		ChartDataXSerie xDataPower = null;
-		if (powerSerie != null) {
-
-			xDataPower = new ChartDataXSerie(powerSerie);
-			xDataPower.setLabel(Messages.Graph_Label_Power);
-			xDataPower.setUnitLabel(Messages.Graph_Label_Power_unit);
-			xDataPower.setDefaultRGB(new RGB(0, 0, 0));
-
-			chartDataModel.setXData(xDataPower);
-//			chartDataModel.addXyData(xDataPower);
-		}
-
-		/*
-		 * heartbeat
-		 */
-		ChartDataYSerie yDataPulse = null;
-
-		final int[] pulseSerie = tourData.pulseSerie;
-		if (pulseSerie != null) {
-
-			yDataPulse = new ChartDataYSerie(ChartDataModel.CHART_TYPE_XY_SCATTER, pulseSerie);
-
-			yDataPulse.setYTitle(Messages.Graph_Label_Heartbeat);
-			yDataPulse.setUnitLabel(Messages.Graph_Label_Heartbeat_unit);
-			yDataPulse.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
-			yDataPulse.setShowYSlider(true);
-			yDataPulse.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_PULSE);
-			yDataPulse.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true));
-
-			setGraphColor(_prefStore, yDataPulse, GraphColorProvider.PREF_GRAPH_HEARTBEAT);
-
-			chartDataModel.addYData(yDataPulse);
-//			chartDataModel.addXyData(yDataPulse);
-		}
-
-		chartDataModel.setCustomData(CUSTOM_DATA_TOUR_ID, tourData.getTourId());
-	}
-
-	private void createChartDataModelInternalDefault(	final TourData tourData,
-														final TourChartConfiguration chartConfig,
-														final ChartDataModel chartDataModel) {
 
 		/*
 		 * distance
@@ -2054,26 +2001,9 @@ public class TourManager {
 		chartDataModel.setCustomData(CUSTOM_DATA_DISTANCE, xDataDistance);
 
 		chartDataModel.setCustomData(CUSTOM_DATA_TOUR_ID, tourData.getTourId());
-	}
 
-//	/**
-//	 * @param tourData
-//	 * @param useNormalizedData
-//	 */
-//	// public void createTour(final TourData tourData) {
-//	//
-//	// openTourEditor(createTourEditorInput(tourData));
-//	// }
-//	/**
-//	 * @param tourData
-//	 */
-//	public void createTour(TourData tourData) {
-//
-//		if (tourData.getTourPerson() != null) {
-//			// load tour from database
-//			tourData = TourManager.getInstance().getTourData(tourData.getTourId());
-//		}
-//	}
+		return chartDataModel;
+	}
 
 	private ChartDataYSerie createChartDataSerie(final int[] dataSerie, final int chartType) {
 
@@ -2096,6 +2026,25 @@ public class TourManager {
 
 	public TourChart getActiveTourChart() {
 		return _activeTourChart;
+	}
+
+	/**
+	 * @param tourIds
+	 * @return Returns a list with {@link TourData} for all tour ids. <code>Null</code> is returned
+	 *         when {@link TourData} are not available.
+	 */
+	public ArrayList<TourData> getTourData(final ArrayList<Long> tourIds) {
+
+		final ArrayList<TourData> tourDataList = new ArrayList<TourData>();
+
+		for (final Long tourId : tourIds) {
+			final TourData tourData = getTourData(tourId);
+			if (tourData != null) {
+				tourDataList.add(tourData);
+			}
+		}
+
+		return tourDataList.size() == 0 ? null : tourDataList;
 	}
 
 	/**
@@ -2245,8 +2194,8 @@ public class TourManager {
 	}
 
 	/**
-	 * Check tour in tour editor, when the tour is modified and it contains a wrong tourData
-	 * instance, show an error, otherwise replace (silently) the tour data in the editor
+	 * Check tour in tour editor. When tour is modified and it contains a wrong tourData instance,
+	 * show an error, otherwise replace (silently) the tour data in the editor
 	 */
 	private void replaceTourInTourEditor(final TourData tourDataForEditor) {
 

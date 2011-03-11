@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,8 +31,8 @@ import org.eclipse.ui.menus.UIElement;
  */
 public abstract class TCActionHandler extends AbstractHandler implements IElementUpdater {
 
-	String			_commandId;
-	TourChart		_tourChart;
+	String			commandId;
+	TourChart		tourChart;
 
 	private boolean	_isEnabled;
 	private boolean	_isChecked;
@@ -45,7 +45,7 @@ public abstract class TCActionHandler extends AbstractHandler implements IElemen
 	}
 
 	public String getCommandId() {
-		return _commandId;
+		return commandId;
 	}
 
 	@Override
@@ -86,15 +86,15 @@ public abstract class TCActionHandler extends AbstractHandler implements IElemen
 	 */
 	public void setHandlerActivation(final IHandlerActivation handlerActivation) {
 
-	/*
-	 * handlerActivation is currently disabled because it's currently not used
-	 */
+		/*
+		 * handlerActivation is currently disabled because it's currently not used
+		 */
 
-	//		fHandlerActivation = handlerActivation;
+		//		fHandlerActivation = handlerActivation;
 	}
 
 	public void setTourChart(final TourChart tourChart) {
-		_tourChart = tourChart;
+		this.tourChart = tourChart;
 	}
 
 	@SuppressWarnings("rawtypes")
