@@ -784,6 +784,7 @@ public class TourChart extends Chart {
 		_actionProxies.get(COMMAND_ID_SHOW_SRTM_DATA).setChecked(
 				canShowSRTMData ? _tourChartConfig.isSRTMDataVisible : false);
 
+		_actionProxies.get(COMMAND_ID_X_AXIS_TIME).setEnabled(true); // time data are always available
 		_actionProxies.get(COMMAND_ID_X_AXIS_TIME).setChecked(_tourChartConfig.showTimeOnXAxis);
 		_actionProxies.get(COMMAND_ID_X_AXIS_DISTANCE).setChecked(!_tourChartConfig.showTimeOnXAxis);
 		_actionProxies.get(COMMAND_ID_X_AXIS_DISTANCE).setEnabled(!_tourChartConfig.isForceTimeOnXAxis);

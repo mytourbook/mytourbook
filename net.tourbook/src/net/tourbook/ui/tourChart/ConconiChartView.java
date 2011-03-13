@@ -125,7 +125,7 @@ public class ConconiChartView extends ViewPart {
 	private Chart					_chartConconiTest;
 	private ChartLayerConconiTest	_conconiLayer;
 
-	private Combo					_comboTours;
+	private Combo					_comboTests;
 	private Scale					_scaleDeflection;
 	private Label					_lblDeflactionPulse;
 	private Label					_lblDeflactionPower;
@@ -201,6 +201,9 @@ public class ConconiChartView extends ViewPart {
 	 * @return
 	 */
 	private ChartDataModel createChartDataModelConconiTest(final ArrayList<TourData> conconiTours, TourData markedTour) {
+
+		// reset data
+		_conconiDataForSelectedTour = null;
 
 		final ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_XY_SCATTER);
 
@@ -526,12 +529,12 @@ public class ConconiChartView extends ViewPart {
 		GridLayoutFactory.fillDefaults().spacing(0, 0).numColumns(2).applyTo(container);
 		_pageConconiTest.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
-			createUI30Tour(container);
+			createUI30Test(container);
 			createUI40ExtendedScaling(container);
 		}
 	}
 
-	private void createUI30Tour(final Composite parent) {
+	private void createUI30Test(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -552,14 +555,14 @@ public class ConconiChartView extends ViewPart {
 			/*
 			 * combo: tour date/time
 			 */
-			_comboTours = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+			_comboTests = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
 			GridDataFactory
 					.fillDefaults()
 					.hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
 					.grab(true, false)
-					.applyTo(_comboTours);
-			_comboTours.setVisibleItemCount(20);
-			_comboTours.addSelectionListener(new SelectionAdapter() {
+					.applyTo(_comboTests);
+			_comboTests.setVisibleItemCount(20);
+			_comboTests.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					onSelectTour();
@@ -742,9 +745,6 @@ public class ConconiChartView extends ViewPart {
 		_modifiedTourDeflection = newDeflection;
 
 		updateUI20ConconiValues();
-
-		// update tolerance into the tour data
-//		_tourData.setConconiDeflection(_scaleDeflection.getSelection());
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
@@ -761,9 +761,6 @@ public class ConconiChartView extends ViewPart {
 
 			final TourData tourData = ((SelectionTourData) selection).getTourData();
 			if (tourData != null) {
-
-//				savePreviousTour(selectionTourData);
-
 				updateChart20(tourData);
 			}
 
@@ -772,9 +769,6 @@ public class ConconiChartView extends ViewPart {
 			final SelectionTourIds selectionTourId = (SelectionTourIds) selection;
 			final ArrayList<Long> tourIds = selectionTourId.getTourIds();
 			if (tourIds != null && tourIds.size() > 0) {
-
-//				savePreviousTour(tourId);
-
 				updateChart12(tourIds);
 			}
 
@@ -797,7 +791,7 @@ public class ConconiChartView extends ViewPart {
 			return;
 		}
 
-		int selectedIndex = _comboTours.getSelectionIndex();
+		int selectedIndex = _comboTests.getSelectionIndex();
 		if (selectedIndex == -1) {
 			selectedIndex = 0;
 		}
@@ -949,6 +943,7 @@ public class ConconiChartView extends ViewPart {
 	 */
 	private void updateChart30NewTour(final TourData markedTour) {
 
+		// save modified tour before chart data for a new tour is created
 		saveTour();
 
 		final ChartDataModel conconiChartDataModel = createChartDataModelConconiTest(_conconiTours, markedTour);
@@ -972,19 +967,23 @@ public class ConconiChartView extends ViewPart {
 			/*
 			 * tour combo box
 			 */
-			_comboTours.removeAll();
+			_comboTests.removeAll();
 
 			for (final TourData tourData : _conconiTours) {
-				_comboTours.add(TourManager.getTourTitleDetailed(tourData));
+				_comboTests.add(TourManager.getTourTitleDetailed(tourData));
 			}
 
-			_comboTours.select(0);
-			_comboTours.setEnabled(_conconiTours.size() > 1);
+			_comboTests.select(0);
+			_comboTests.setEnabled(_conconiTours.size() > 1);
 		}
 		_isSelectionDisabled = false;
 	}
 
 	private void updateUI12SetupNewTour() {
+
+		if (_conconiDataForSelectedTour == null) {
+			return;
+		}
 
 		// update deflection scale
 		final int maxDeflection = _conconiDataForSelectedTour.maxXValues.size();
@@ -1017,6 +1016,10 @@ public class ConconiChartView extends ViewPart {
 	}
 
 	private void updateUI20ConconiValues() {
+
+		if (_conconiDataForSelectedTour == null) {
+			return;
+		}
 
 		// deflation values
 		final int scaleIndex = _scaleDeflection.getSelection();

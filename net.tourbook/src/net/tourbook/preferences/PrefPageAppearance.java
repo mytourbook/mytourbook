@@ -91,16 +91,39 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
 	private Composite createUI(final Composite parent) {
 
-		Label label;
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().spacing(5, 15).applyTo(container);
+		{
+			createUI10MemoryMonitor(container);
+			createUI20RecentEntries(container);
+			createUI30TaggingAutoOpen(container);
+		}
+
+		return container;
+	}
+
+	/**
+	 * memory monitor
+	 */
+	private void createUI10MemoryMonitor(final Composite parent) {
+
+		_chkMemMonitor = new Button(parent, SWT.CHECK);
+		GridDataFactory.fillDefaults().indent(0, 10).applyTo(_chkMemMonitor);
+		_chkMemMonitor.setText(Messages.pref_appearance_showMemoryMonitor);
+	}
+
+	private void createUI20RecentEntries(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 		{
+
 			/*
 			 * number of recent tour types
 			 */
-			label = new Label(container, NONE);
+			Label label = new Label(container, NONE);
 			label.setText(Messages.Pref_Appearance_NumberOfRecent_TourTypes);
 			label.setToolTipText(Messages.Pref_Appearance_NumberOfRecent_TourTypes_Tooltip);
 
@@ -134,20 +157,10 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 			_spinnerRecentTags.setMaximum(9);
 			_spinnerRecentTags.addSelectionListener(_defaultSelectionAdapter);
 			_spinnerRecentTags.addMouseWheelListener(_defaultMouseWheelListener);
-
-			createUI20TaggingAutoOpen(container);
-
-			/*
-			 * memory monitor
-			 */
-			_chkMemMonitor = new Button(container, SWT.CHECK);
-			GridDataFactory.fillDefaults().span(2, 1).indent(0, 10).applyTo(_chkMemMonitor);
-			_chkMemMonitor.setText(Messages.pref_appearance_showMemoryMonitor);
 		}
-		return container;
 	}
 
-	private void createUI20TaggingAutoOpen(final Composite parent) {
+	private void createUI30TaggingAutoOpen(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
