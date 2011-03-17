@@ -1,7 +1,7 @@
 ## Velocity Config:
 #set( $google = true )
-#set( $bing = true )
-#set( $yahoo = true )
+#set( $bing = false )
+#set( $yahoo = false )
 #set( $slider = true )
 ##
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -56,6 +56,56 @@
 #end
             ];
 
+			/** 
+			 * Add zoom level to MousePosition display
+			 * Parameters:
+			 * lonLat - OpenLayers.LonLat - Location to display
+			 * see OpenLayers.Control.MousePosition.formatOutput
+			 */
+			function myMousePositionFormat(lonLat) {
+			        var digits = parseInt(this.numDigits);
+			        var newHtml =
+			            this.prefix +
+			            lonLat.lon.toFixed(digits) +
+			            this.separator + 
+			            lonLat.lat.toFixed(digits) +
+			            this.separator +
+			            this.map.getZoom() +
+			            this.suffix;
+			        return newHtml;
+			};
+
+			/** 
+			 * "zoomend" event callback to update zoom level display. The context object this refers to 
+			 * OpenLayers.Control.MousePosition.
+			 * Parameters:
+			 * evt - OpenLayers.Event - event object
+			 */
+			function myZoomend(evt) {
+			   if (this.lastXy != null) {
+			      var lonLat = map.getLonLatFromPixel(this.lastXy);
+			      if (this.displayProjection) {
+			          lonLat.transform(this.map.getProjectionObject(), 
+			                           this.displayProjection );
+			      }
+			
+			      var newHtml = this.formatOutput(lonLat);
+			      if (newHtml != this.element.innerHTML) {
+			         this.element.innerHTML = newHtml;
+			      }
+			   }
+			};
+			
+    
+            // Zoom Level 18 and above slows down Internet Explorer when track is shown.
+            var isIE = navigator.userAgent.toLowerCase().indexOf("msie") != -1;
+            var maxZoomLevel;
+            if (isIE && lgpx.length > 0) {
+               maxZoomLevel = 17;
+            } else {
+               maxZoomLevel = 18;
+            }
+
             var map;
 
             // avoid pink error tiles (see CSS style olImageLoadError)
@@ -69,7 +119,7 @@
                    projection: new OpenLayers.Projection("EPSG:900913"),
                    displayProjection: new OpenLayers.Projection("EPSG:4326"),
                    units: "m",
-                   numZoomLevels: 18,
+                   numZoomLevels: maxZoomLevel + 1,
                    maxResolution: 156543.0339,
                    maxExtent: new OpenLayers.Bounds(-20037508, -20037508, 20037508, 20037508.34)
                };
@@ -80,17 +130,20 @@
                map.addControl(new OpenLayers.Control.ArgParser());
                map.addControl(new OpenLayers.Control.Attribution());
                map.addControl(new OpenLayers.Control.LayerSwitcher());
-               map.addControl(new OpenLayers.Control.MousePosition());
+               var mousePositionControl = new OpenLayers.Control.MousePosition({formatOutput: myMousePositionFormat});
+               map.addControl(mousePositionControl);
                map.addControl(new OpenLayers.Control.Navigation());
                map.addControl(new OpenLayers.Control.PanZoomBar());
                map.addControl(new OpenLayers.Control.Permalink());
 
+               map.events.register("zoomend", mousePositionControl, myZoomend);
+               
 #if ( $google )
                // Google
-               var gsat = new OpenLayers.Layer.Google("Google Satellite", {type: google.maps.MapTypeId.SATELLITE, numZoomLevels: 22});
-               var ghyb = new OpenLayers.Layer.Google("Google Hybrid",{type: google.maps.MapTypeId.HYBRID, numZoomLevels: 20});
-               var gphy = new OpenLayers.Layer.Google("Google Terrain",{type: google.maps.MapTypeId.TERRAIN});
-               var gmap = new OpenLayers.Layer.Google("Google Streets", /* the default type*/ {numZoomLevels: 20});
+               var gsat = new OpenLayers.Layer.Google("Google Satellite", {type: google.maps.MapTypeId.SATELLITE});
+               var ghyb = new OpenLayers.Layer.Google("Google Hybrid", {type: google.maps.MapTypeId.HYBRID});
+               var gphy = new OpenLayers.Layer.Google("Google Terrain", {type: google.maps.MapTypeId.TERRAIN});
+               var gmap = new OpenLayers.Layer.Google("Google Streets", { /* the default type*/ });
                map.addLayers([gsat, ghyb, gphy, gmap]);
 
 #end
@@ -157,7 +210,8 @@
                // Start position for the map
                var lat=$map.lat;
                var lon=$map.lon;
-               var zoom=$map.zoom;
+               // don't exceed max zoom level of current base layer 
+               var zoom=Math.min($map.zoom, map.baseLayer.numZoomLevels - 1);
 
                map.setCenter(new OpenLayers.LonLat(lon, lat).transform(
                  new OpenLayers.Projection("EPSG:4326"),
@@ -182,9 +236,10 @@
          </script>
 
 #if ( $slider )
-        <!-- Overlay Opacity Slider (source: http://sautter.com/map/) -->
-        <script type="text/javascript" src="http://sautter.com/map/slider/utilities.js"></script>
-        <script type="text/javascript" src="http://sautter.com/map/slider/slider-min.js"></script>
+         <!-- Overlay Opacity Slider (source: http://sautter.com/map/) -->
+         <script src="http://yui.yahooapis.com/2.8.2r1/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+         <script src="http://yui.yahooapis.com/2.8.2r1/build/dragdrop/dragdrop-min.js"></script>
+         <script src="http://yui.yahooapis.com/2.8.2r1/build/slider/slider-min.js"></script>
          <script type="text/javascript">
             function sliderInit() {
               var slider = YAHOO.widget.Slider.getHorizSlider("sliderbg", "sliderthumb", -16, 220+16-4-1);
@@ -204,9 +259,9 @@
             }
          </script>
          <style type="text/css">
-            #slider { position:absolute; top:10px; left:50%; margin-left:-128px; z-index:999; }
+            #slider { position:absolute; top:10px; left:50%; margin-left:-128px; z-index:9999; }
             #sliderbg { position:relative; height:18px; width:256px; background:url(http://sautter.com/map/slider/sliderbg.png) no-repeat; }
-            #sliderthumb { position:relative; top:-1px; }
+            #sliderthumb { position:absolute; top:-1px; }
          </style>
 #end
     </head>
