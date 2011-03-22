@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -129,10 +129,12 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 		TourTypeMenuManager.enableRecentTourTypeActions(isDataAvailable, existingTourTypeId);
 	}
 
+	@Override
 	public void fillBarChartContextMenu(final IMenuManager menuMgr,
 										final int hoveredBarSerieIndex,
 										final int hoveredBarValueIndex) {}
 
+	@Override
 	public void fillContextMenu(final IMenuManager menuMgr,
 								final int mouseDownDevPositionX,
 								final int mouseDownDevPositionY) {
@@ -154,6 +156,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 		enableActions();
 	}
 
+	@Override
 	public void fillXSliderContextMenu(	final IMenuManager menuMgr,
 										final ChartXSlider leftSlider,
 										final ChartXSlider rightSlider) {
@@ -183,18 +186,22 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 		}
 	}
 
+	@Override
 	public Chart getChart() {
 		return _tourEditor.getTourChart();
 	}
 
+	@Override
 	public ChartXSlider getLeftSlider() {
 		return _leftSlider;
 	}
 
+	@Override
 	public ChartXSlider getRightSlider() {
 		return _rightSlider;
 	}
 
+	@Override
 	public ArrayList<TourData> getSelectedTours() {
 
 		final ArrayList<TourData> tourList = new ArrayList<TourData>();
@@ -214,9 +221,11 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 		_tagMenuMgr.onShowMenu(//
 				menuEvent,
 				menuParentControl,
-				Display.getCurrent().getCursorLocation());
+				Display.getCurrent().getCursorLocation(),
+				null);
 	}
 
+	@Override
 	public boolean showOnlySliderContextMenu() {
 		return false;
 	}

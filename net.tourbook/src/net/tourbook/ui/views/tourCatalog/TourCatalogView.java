@@ -150,6 +150,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	private boolean						_isToolTipInTags;
 
 	private TagMenuManager				_tagMenuMgr;
+	private TreeViewerTourInfoToolTip	_tourInfoToolTip;
 	private TourDoubleClickState		_tourDoubleClickState				= new TourDoubleClickState();
 
 	/*
@@ -173,26 +174,33 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	private ActionTourCompareWizard		_actionTourCompareWizard;
 	private ActionOpenTour				_actionOpenTour;
 
+
 	class TourContentProvider implements ITreeContentProvider {
 
+		@Override
 		public void dispose() {}
 
+		@Override
 		public Object[] getChildren(final Object parentElement) {
 			return ((TreeViewerItem) parentElement).getFetchedChildrenAsArray();
 		}
 
+		@Override
 		public Object[] getElements(final Object inputElement) {
 			return _rootItem.getFetchedChildrenAsArray();
 		}
 
+		@Override
 		public Object getParent(final Object element) {
 			return ((TreeViewerItem) element).getParentItem();
 		}
 
+		@Override
 		public boolean hasChildren(final Object element) {
 			return ((TreeViewerItem) element).hasChildren();
 		}
 
+		@Override
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
@@ -204,7 +212,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	 * Find the compared tours in the tour map tree viewer<br>
 	 * <br>
 	 * !!! Recursive !!!<br>
-	 * 
+	 *
 	 * @param comparedTours
 	 * @param parentItem
 	 * @param findCompIds
@@ -244,6 +252,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	private void addCompareTourPropertyListener() {
 
 		_compareTourPropertyListener = new ITourEventListener() {
+			@Override
 			public void tourChanged(final IWorkbenchPart part, final TourEventId propertyId, final Object propertyData) {
 
 				if (propertyId == TourEventId.COMPARE_TOUR_CHANGED
@@ -285,10 +294,13 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	private void addPartListener() {
 
 		_partListener = new IPartListener2() {
+			@Override
 			public void partActivated(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourCatalogView.this) {
 
@@ -298,12 +310,16 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 				}
 			}
 
+			@Override
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partHidden(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partOpened(final IWorkbenchPartReference partRef) {
 				/*
 				 * add the actions in the part open event so they are appended AFTER the actions
@@ -312,6 +328,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 				fillToolbar();
 			}
 
+			@Override
 			public void partVisible(final IWorkbenchPartReference partRef) {}
 		};
 
@@ -323,6 +340,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		// this view part is a selection listener
 		_postSelectionListener = new ISelectionListener() {
 
+			@Override
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
 				// update the view when a new tour reference was created
@@ -390,6 +408,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	private void addPrefListener() {
 
 		_prefChangeListener = new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
@@ -436,6 +455,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	private void addTourEventListener() {
 
 		_tourEventListener = new ITourEventListener() {
+			@Override
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
 				if (part == TourCatalogView.this) {
@@ -506,7 +526,11 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 			@Override
 			public void menuShown(final MenuEvent menuEvent) {
-				_tagMenuMgr.onShowMenu(menuEvent, controlMenuParent, Display.getCurrent().getCursorLocation());
+				_tagMenuMgr.onShowMenu(
+						menuEvent,
+						controlMenuParent,
+						Display.getCurrent().getCursorLocation(),
+						_tourInfoToolTip);
 			}
 		});
 
@@ -566,12 +590,14 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		_tourViewer.setUseHashlookup(true);
 
 		_tourViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
 				onSelectionChanged((IStructuredSelection) event.getSelection());
 			}
 		});
 
 		_tourViewer.addDoubleClickListener(new IDoubleClickListener() {
+			@Override
 			public void doubleClick(final DoubleClickEvent event) {
 
 				final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
@@ -602,7 +628,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		createContextMenu();
 
 		// set tour info tooltip provider
-		new TreeViewerTourInfoToolTip(_tourViewer);
+		_tourInfoToolTip = new TreeViewerTourInfoToolTip(_tourViewer);
 	}
 
 	private void defineAllColumns(final Composite parent) {
@@ -953,10 +979,12 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		_postSelectionProvider.setSelection(selection);
 	}
 
+	@Override
 	public ColumnManager getColumnManager() {
 		return _columnManager;
 	}
 
+	@Override
 	public ArrayList<Long> getSelectedReferenceTours() {
 
 		final IStructuredSelection selectedItems = ((IStructuredSelection) _tourViewer.getSelection());
@@ -974,6 +1002,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		return selectedReferenceTour;
 	}
 
+	@Override
 	public ArrayList<TourData> getSelectedTours() {
 
 		// get selected tours
@@ -1012,13 +1041,14 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		return _tourViewer;
 	}
 
+	@Override
 	public ColumnViewer getViewer() {
 		return _tourViewer;
 	}
 
 	/**
 	 * Selection changes in the tour map viewer
-	 * 
+	 *
 	 * @param selection
 	 */
 	private void onSelectionChanged(final IStructuredSelection selection) {
@@ -1072,6 +1102,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		}
 	}
 
+	@Override
 	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
 		final Object[] expandedElements = _tourViewer.getExpandedElements();
@@ -1094,6 +1125,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		return _tourViewer;
 	}
 
+	@Override
 	public void reloadViewer() {
 
 		final Tree tree = _tourViewer.getTree();
@@ -1147,7 +1179,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 	/**
 	 * Select the reference tour in the tour viewer
-	 * 
+	 *
 	 * @param refId
 	 */
 	private void selectRefTour(final long refId) {
@@ -1183,7 +1215,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 	/**
 	 * Update viewer with new saved compared tours
-	 * 
+	 *
 	 * @param persistedCompareResults
 	 */
 	private void updateTourViewer(final ArrayList<TVICompareResultComparedTour> persistedCompareResults) {
@@ -1230,7 +1262,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 	/**
 	 * !!!Recursive !!! update all tour items with new data
-	 * 
+	 *
 	 * @param rootItem
 	 * @param modifiedTours
 	 */

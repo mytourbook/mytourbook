@@ -155,6 +155,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 																					.getImageDescriptor(
 																							Messages.Image__tag_root)
 																					.createImage();
+	private TreeViewerTourInfoToolTip		_tourInfoToolTip;
+
 	/*
 	 * UI controls
 	 */
@@ -186,6 +188,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	private ActionSetTourTypeMenu			_actionSetTourType;
 	private ActionOpenTour					_actionOpenTour;
 	private ActionModifyColumns				_actionModifyColumns;
+
 
 	/**
 	 * comparatore is sorting the tree items
@@ -230,6 +233,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	 */
 	private class TagComparer implements IElementComparer {
 
+		@Override
 		public boolean equals(final Object a, final Object b) {
 
 			if (a == b) {
@@ -268,6 +272,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 			return false;
 		}
 
+		@Override
 		public int hashCode(final Object element) {
 			return 0;
 		}
@@ -276,8 +281,10 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 	private class TagContentProvider implements ITreeContentProvider {
 
+		@Override
 		public void dispose() {}
 
+		@Override
 		public Object[] getChildren(final Object parentElement) {
 
 			if (parentElement instanceof TVITagViewItem) {
@@ -287,18 +294,22 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 			return new Object[0];
 		}
 
+		@Override
 		public Object[] getElements(final Object inputElement) {
 			return getChildren(inputElement);
 		}
 
+		@Override
 		public Object getParent(final Object element) {
 			return ((TreeViewerItem) element).getParentItem();
 		}
 
+		@Override
 		public boolean hasChildren(final Object element) {
 			return ((TreeViewerItem) element).hasChildren();
 		}
 
+		@Override
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {
 
 			if (newInput == null) {
@@ -312,10 +323,13 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	private void addPartListener() {
 
 		_partListener = new IPartListener2() {
+			@Override
 			public void partActivated(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TaggingView.this) {
 
@@ -325,14 +339,19 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 				}
 			}
 
+			@Override
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partHidden(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partOpened(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partVisible(final IWorkbenchPartReference partRef) {}
 		};
 
@@ -342,6 +361,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	private void addPrefListener() {
 
 		_prefChangeListener = new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
@@ -398,6 +418,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		// this view part is a selection listener
 		_postSelectionListener = new ISelectionListener() {
 
+			@Override
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
 				if (selection instanceof SelectionDeletedTours) {
@@ -415,6 +436,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	private void addTourEventListener() {
 
 		_tourEventListener = new ITourEventListener() {
+			@Override
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
 				if (part == TaggingView.this) {
@@ -489,6 +511,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
 			public void menuAboutToShow(final IMenuManager manager) {
 				fillContextMenu(manager);
 			}
@@ -508,7 +531,11 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 			@Override
 			public void menuShown(final MenuEvent menuEvent) {
-				_tagMenuMgr.onShowMenu(menuEvent, controlMenuParent, Display.getCurrent().getCursorLocation());
+				_tagMenuMgr.onShowMenu(
+						menuEvent,
+						controlMenuParent,
+						Display.getCurrent().getCursorLocation(),
+						_tourInfoToolTip);
 			}
 		});
 
@@ -567,6 +594,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		_tagViewer.setUseHashlookup(true);
 
 		_tagViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
 
 				final IStructuredSelection selectedTours = (IStructuredSelection) (event.getSelection());
@@ -601,6 +629,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 		_tagViewer.addDoubleClickListener(new IDoubleClickListener() {
 
+			@Override
 			public void doubleClick(final DoubleClickEvent event) {
 
 				final Object selection = ((IStructuredSelection) _tagViewer.getSelection()).getFirstElement();
@@ -634,12 +663,12 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		fillToolBar();
 
 		// set tour info tooltip provider
-		new TreeViewerTourInfoToolTip(_tagViewer);
+		_tourInfoToolTip = new TreeViewerTourInfoToolTip(_tagViewer);
 	}
 
 	/**
 	 * Defines all columns for the table viewer in the column manager
-	 * 
+	 *
 	 * @param parent
 	 */
 	private void defineAllColumns(final Composite parent) {
@@ -1363,6 +1392,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 	}
 
+	@Override
 	public ColumnManager getColumnManager() {
 		return _columnManager;
 	}
@@ -1378,6 +1408,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 //		return Platform.getAdapterManager().getAdapter(this, adapter);
 //	}
 
+	@Override
 	public ArrayList<TourData> getSelectedTours() {
 
 		// get selected tours
@@ -1403,6 +1434,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		return selectedTourData;
 	}
 
+	@Override
 	public ColumnViewer getViewer() {
 		return _tagViewer;
 	}
@@ -1416,6 +1448,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 				PrefPageAppearanceView.VIEW_TIME_LAYOUT_HH_MM_SS);
 	}
 
+	@Override
 	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
 		_viewerContainer.setRedraw(false);
@@ -1441,6 +1474,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	/**
 	 * reload the content of the tag viewer
 	 */
+	@Override
 	public void reloadViewer() {
 
 		final Tree tree = _tagViewer.getTree();
@@ -1550,7 +1584,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	/**
 	 * !!! Recursive !!! method to update the tags in the viewer, this method handles changes in the
 	 * tag structure
-	 * 
+	 *
 	 * @param rootItem
 	 * @param changedTags
 	 * @param isAddMode
@@ -1619,7 +1653,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 	/**
 	 * !!!Recursive !!! delete tour items
-	 * 
+	 *
 	 * @param rootItem
 	 * @param deletedTourIds
 	 */
@@ -1674,7 +1708,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 	/**
 	 * !!!Recursive !!! update the data for all tour items
-	 * 
+	 *
 	 * @param rootItem
 	 * @param modifiedTours
 	 */

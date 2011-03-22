@@ -34,6 +34,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.IWorkbench;
@@ -95,59 +96,31 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.fillDefaults().spacing(5, 15).applyTo(container);
 		{
-			createUI10MemoryMonitor(container);
+
+			createUI10Tagging(container);
 			createUI20RecentEntries(container);
-			createUI30TaggingAutoOpen(container);
+			createUI30MemoryMonitor(container);
 		}
 
 		return container;
 	}
 
-	/**
-	 * memory monitor
-	 */
-	private void createUI10MemoryMonitor(final Composite parent) {
+	private void createUI10Tagging(final Composite parent) {
 
-		_chkMemMonitor = new Button(parent, SWT.CHECK);
-		GridDataFactory.fillDefaults().indent(0, 10).applyTo(_chkMemMonitor);
-		_chkMemMonitor.setText(Messages.pref_appearance_showMemoryMonitor);
-	}
-
-	private void createUI20RecentEntries(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		final Group group = new Group(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
+		group.setText(Messages.Pref_Appearance_Group_Tagging);
+		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
 		{
-
-			/*
-			 * number of recent tour types
-			 */
-			Label label = new Label(container, NONE);
-			label.setText(Messages.Pref_Appearance_NumberOfRecent_TourTypes);
-			label.setToolTipText(Messages.Pref_Appearance_NumberOfRecent_TourTypes_Tooltip);
-
-			// spinner
-			_spinnerRecentTourTypes = new Spinner(container, SWT.BORDER);
-			GridDataFactory.fillDefaults()//
-					.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
-					.align(SWT.BEGINNING, SWT.CENTER)
-					.applyTo(_spinnerRecentTourTypes);
-			_spinnerRecentTourTypes.setToolTipText(Messages.Pref_Appearance_NumberOfRecent_TourTypes_Tooltip);
-			_spinnerRecentTourTypes.setMinimum(0);
-			_spinnerRecentTourTypes.setMaximum(9);
-			_spinnerRecentTourTypes.addSelectionListener(_defaultSelectionAdapter);
-			_spinnerRecentTourTypes.addMouseWheelListener(_defaultMouseWheelListener);
-
 			/*
 			 * number of recent tags
 			 */
-			label = new Label(container, NONE);
+			final Label label = new Label(group, NONE);
 			label.setText(Messages.pref_appearance_number_of_recent_tags);
 			label.setToolTipText(Messages.pref_appearance_number_of_recent_tags_tooltip);
 
 			// spinner
-			_spinnerRecentTags = new Spinner(container, SWT.BORDER);
+			_spinnerRecentTags = new Spinner(group, SWT.BORDER);
 			GridDataFactory.fillDefaults()//
 					.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
 					.align(SWT.BEGINNING, SWT.CENTER)
@@ -157,33 +130,25 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 			_spinnerRecentTags.setMaximum(9);
 			_spinnerRecentTags.addSelectionListener(_defaultSelectionAdapter);
 			_spinnerRecentTags.addMouseWheelListener(_defaultMouseWheelListener);
-		}
-	}
-
-	private void createUI30TaggingAutoOpen(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, 2).applyTo(container);
-		{
-			if (_isOSX) {
-				// label: OSX is not supported, feature is not working
-				final Label label = new Label(container, SWT.WRAP);
-				GridDataFactory.fillDefaults().span(3, 1).applyTo(label);
-				label.setText(Messages.Pref_Appearance_Label_NoOSXSupport);
-			}
 
 			/*
 			 * autoopen tagging
 			 */
-			_chkAutoOpenTagging = new Button(container, SWT.CHECK);
+//				eclipse 3.7 supports this feature
+//				if (_isOSX) {
+//					// label: OSX is not supported, feature is not working
+//					final Label label = new Label(container, SWT.WRAP);
+//					GridDataFactory.fillDefaults().span(3, 1).applyTo(label);
+//					label.setText(Messages.Pref_Appearance_Label_NoOSXSupport);
+//				}
+			_chkAutoOpenTagging = new Button(group, SWT.CHECK);
 			GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkAutoOpenTagging);
 			_chkAutoOpenTagging.setText(Messages.Pref_Appearance_Check_AutoOpenTagging);
 			_chkAutoOpenTagging.addSelectionListener(_defaultSelectionAdapter);
 			_chkAutoOpenTagging.setToolTipText(Messages.Pref_Appearance_Label_AutoOpenTagging_Tooltip);
 
-			final Composite autoTagContainer = new Composite(container, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(false, false).indent(16, 0).applyTo(autoTagContainer);
+			final Composite autoTagContainer = new Composite(group, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(false, false).indent(16, 0).span(2, 1).applyTo(autoTagContainer);
 			GridLayoutFactory.fillDefaults().numColumns(3).applyTo(autoTagContainer);
 			{
 
@@ -216,10 +181,48 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 		}
 	}
 
+	private void createUI20RecentEntries(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+
+			/*
+			 * number of recent tour types
+			 */
+			final Label label = new Label(container, NONE);
+			label.setText(Messages.Pref_Appearance_NumberOfRecent_TourTypes);
+			label.setToolTipText(Messages.Pref_Appearance_NumberOfRecent_TourTypes_Tooltip);
+
+			// spinner
+			_spinnerRecentTourTypes = new Spinner(container, SWT.BORDER);
+			GridDataFactory.fillDefaults()//
+					.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+					.align(SWT.BEGINNING, SWT.CENTER)
+					.applyTo(_spinnerRecentTourTypes);
+			_spinnerRecentTourTypes.setToolTipText(Messages.Pref_Appearance_NumberOfRecent_TourTypes_Tooltip);
+			_spinnerRecentTourTypes.setMinimum(0);
+			_spinnerRecentTourTypes.setMaximum(9);
+			_spinnerRecentTourTypes.addSelectionListener(_defaultSelectionAdapter);
+			_spinnerRecentTourTypes.addMouseWheelListener(_defaultMouseWheelListener);
+		}
+	}
+
+	/**
+	 * memory monitor
+	 */
+	private void createUI30MemoryMonitor(final Composite parent) {
+
+		_chkMemMonitor = new Button(parent, SWT.CHECK);
+		GridDataFactory.fillDefaults().indent(0, 10).applyTo(_chkMemMonitor);
+		_chkMemMonitor.setText(Messages.pref_appearance_showMemoryMonitor);
+	}
+
 	private void enableControls() {
 
 		final boolean isTagAutoOpen = _chkAutoOpenTagging.getSelection();
-		final boolean isEnabled = _isOSX == false;
+		final boolean isEnabled = true; // eclipse 3.7 supports this feature in OSX
 
 		_chkAutoOpenTagging.setEnabled(isEnabled);
 		_lblAutoOpenMS.setEnabled(isEnabled && isTagAutoOpen);

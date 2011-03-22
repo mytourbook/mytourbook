@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -222,7 +222,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
 	/**
 	 * Split or extract a tour
-	 * 
+	 *
 	 * @param parentShell
 	 * @param tourData
 	 * @param extractStartIndex
@@ -272,6 +272,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 		});
 
 		shell.addListener(SWT.Resize, new Listener() {
+			@Override
 			public void handleEvent(final Event event) {
 
 				// allow resizing the width but not the height
@@ -353,6 +354,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
 		typeMenuMgr.setRemoveAllWhenShown(true);
 		typeMenuMgr.addMenuListener(new IMenuListener() {
+			@Override
 			public void menuAboutToShow(final IMenuManager menuMgr) {
 
 				// set menu items
@@ -402,7 +404,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 				Point pt = new Point(rect.x, rect.y + rect.height);
 				pt = _linkTag.getParent().toDisplay(pt);
 
-				_tagMenuMgr.onShowMenu(e, _linkTag, pt);
+				_tagMenuMgr.onShowMenu(e, _linkTag, pt, null);
 			}
 		});
 
@@ -561,7 +563,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
 	/**
 	 * tour type & tags
-	 * 
+	 *
 	 * @param defaultSelectionAdapter
 	 */
 	private void createUI30TypeTags(final Composite parent) {

@@ -238,12 +238,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		public TourDataContentProvider() {}
 
+		@Override
 		public void dispose() {}
 
+		@Override
 		public Object[] getElements(final Object parent) {
 			return (Object[]) (parent);
 		}
 
+		@Override
 		public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
 	}
 
@@ -431,6 +434,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 				// reselect tours
 				Display.getDefault().asyncExec(new Runnable() {
+					@Override
 					public void run() {
 						_tourViewer.setSelection(selection, true);
 					}
@@ -474,6 +478,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final IStructuredSelection selection = ((IStructuredSelection) _tourViewer.getSelection());
 
 		final IRunnableWithProgress saveRunnable = new IRunnableWithProgress() {
+			@Override
 			public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
 				int saveCounter = 0;
@@ -510,10 +515,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private void addPartListener() {
 		_partListener = new IPartListener2() {
 
+			@Override
 			public void partActivated(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == RawDataView.this) {
 
@@ -526,18 +534,23 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				}
 			}
 
+			@Override
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partHidden(final IWorkbenchPartReference partRef) {
 				if (RawDataView.this == partRef.getPart(false)) {
 					_isPartVisible = false;
 				}
 			}
 
+			@Override
 			public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partOpened(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partVisible(final IWorkbenchPartReference partRef) {
 				if (RawDataView.this == partRef.getPart(false)) {
 					_isPartVisible = true;
@@ -556,6 +569,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private void addPrefListener() {
 
 		_prefChangeListener = new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
@@ -617,6 +631,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private void addSelectionListener() {
 
 		_postSelectionListener = new ISelectionListener() {
+			@Override
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
 				if (part == RawDataView.this) {
@@ -632,6 +647,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private void addTourEventListener() {
 
 		_tourEventListener = new ITourEventListener() {
+			@Override
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
 				if (part == RawDataView.this) {
@@ -675,7 +691,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	/**
 	 * Only time slices will be reimported.
-	 * 
+	 *
 	 * @param importFile
 	 * @param importedTours
 	 * @param oldTourData
@@ -840,6 +856,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_tourViewer.setSorter(new DeviceImportSorter());
 
 		_tourViewer.addDoubleClickListener(new IDoubleClickListener() {
+			@Override
 			public void doubleClick(final DoubleClickEvent event) {
 
 				final Object firstElement = ((IStructuredSelection) _tourViewer.getSelection()).getFirstElement();
@@ -851,6 +868,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		});
 
 		_tourViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
 				fireSelectedTour();
 			}
@@ -872,6 +890,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
 			public void menuAboutToShow(final IMenuManager manager) {
 				fillContextMenu(manager);
 			}
@@ -889,7 +908,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			@Override
 			public void menuShown(final MenuEvent menuEvent) {
-				_tagMenuMgr.onShowMenu(menuEvent, controlMenuParent, Display.getCurrent().getCursorLocation());
+				_tagMenuMgr.onShowMenu(
+						menuEvent,
+						controlMenuParent,
+						Display.getCurrent().getCursorLocation(),
+						_tourInfoToolTip);
 			}
 		});
 
@@ -902,7 +925,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * Defines all columns for the table viewer in the column manager, the sequenze defines the
 	 * default columns
-	 * 
+	 *
 	 * @param parent
 	 */
 	private void defineAllColumns() {
@@ -1473,7 +1496,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	/**
 	 * After tours are saved, the internal structures and ui viewers must be updated
-	 * 
+	 *
 	 * @param savedTours
 	 *            contains the saved {@link TourData}
 	 */
@@ -1753,6 +1776,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 	}
 
+	@Override
 	public ArrayList<TourData> getAllSelectedTours() {
 
 		final TourManager tourManager = TourManager.getInstance();
@@ -1797,6 +1821,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		return selectedTourData;
 	}
 
+	@Override
 	public ColumnManager getColumnManager() {
 		return _columnManager;
 	}
@@ -1815,6 +1840,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		return dbImage;
 	}
 
+	@Override
 	public ArrayList<TourData> getSelectedTours() {
 
 		final TourManager tourManager = TourManager.getInstance();
@@ -1853,6 +1879,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		return selectedTourData;
 	}
 
+	@Override
 	public ColumnViewer getViewer() {
 		return _tourViewer;
 	}
@@ -1882,6 +1909,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 	}
 
+	@Override
 	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
 		_viewerContainer.setRedraw(false);
@@ -1918,6 +1946,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					false,
 					new IRunnableWithProgress() {
 
+						@Override
 						public void run(final IProgressMonitor monitor) throws InvocationTargetException,
 								InterruptedException {
 
@@ -1934,7 +1963,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	/**
 	 * reimport previous imported tours
-	 * 
+	 *
 	 * @param monitor
 	 * @param importedFiles
 	 */
@@ -1979,6 +2008,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			rawDataMgr.updateTourDataFromDb(monitor);
 
 			Display.getDefault().asyncExec(new Runnable() {
+				@Override
 				public void run() {
 
 					reloadViewer();
@@ -2021,6 +2051,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 	}
 
+	@Override
 	public void reloadViewer() {
 
 		// update tour data viewer
@@ -2076,6 +2107,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		updateToolTipState();
 
 		Display.getCurrent().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				reimportAllImportFiles();
 			}
@@ -2178,6 +2210,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			// fire a selected tour when the selection provider was cleared sometime before
 			Display.getCurrent().asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					fireSelectedTour();
 				}

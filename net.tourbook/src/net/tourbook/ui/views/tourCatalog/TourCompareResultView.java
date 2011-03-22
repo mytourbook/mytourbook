@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -135,6 +135,8 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	private Image								_dbImage			= TourbookPlugin.getImageDescriptor(//
 																			Messages.Image__database).createImage(true);
 
+	private TreeViewerTourInfoToolTip			_tourInfoToolTip;
+
 	/*
 	 * UI controls
 	 */
@@ -153,26 +155,33 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	private ActionSetTourTypeMenu				_actionSetTourType;
 	private ActionOpenTour						_actionOpenTour;
 
+
 	class ResultContentProvider implements ITreeContentProvider {
 
+		@Override
 		public void dispose() {}
 
+		@Override
 		public Object[] getChildren(final Object parentElement) {
 			return ((TreeViewerItem) parentElement).getFetchedChildrenAsArray();
 		}
 
+		@Override
 		public Object[] getElements(final Object inputElement) {
 			return _tootItem.getFetchedChildrenAsArray();
 		}
 
+		@Override
 		public Object getParent(final Object element) {
 			return ((TreeViewerItem) element).getParentItem();
 		}
 
+		@Override
 		public boolean hasChildren(final Object element) {
 			return ((TreeViewerItem) element).hasChildren();
 		}
 
+		@Override
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
@@ -181,6 +190,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	private void addCompareTourPropertyListener() {
 
 		_compareTourPropertyListener = new ITourEventListener() {
+			@Override
 			public void tourChanged(final IWorkbenchPart part, final TourEventId propertyId, final Object propertyData) {
 
 				if (propertyId == TourEventId.COMPARE_TOUR_CHANGED
@@ -256,10 +266,13 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 		_partListener = new IPartListener2() {
 
+			@Override
 			public void partActivated(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourCompareResultView.this) {
 
@@ -269,12 +282,16 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 				}
 			}
 
+			@Override
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partHidden(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partOpened(final IWorkbenchPartReference partRef) {
 				/*
 				 * add the actions in the part open event so they are appended AFTER the actions
@@ -283,6 +300,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 				fillToolbar();
 			}
 
+			@Override
 			public void partVisible(final IWorkbenchPartReference partRef) {}
 		};
 
@@ -292,6 +310,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	private void addPrefListener() {
 
 		_prefChangeListener = new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
@@ -334,6 +353,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 		_postSelectionListener = new ISelectionListener() {
 
+			@Override
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
 				if (selection instanceof SelectionRemovedComparedTours) {
@@ -369,6 +389,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	private void addTourEventListener() {
 
 		_tourPropertyListener = new ITourEventListener() {
+			@Override
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
 				if (part == TourCompareResultView.this) {
@@ -440,7 +461,11 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 			@Override
 			public void menuShown(final MenuEvent menuEvent) {
-				_tagMenuMgr.onShowMenu(menuEvent, controlMenuParent, Display.getCurrent().getCursorLocation());
+				_tagMenuMgr.onShowMenu(
+						menuEvent,
+						controlMenuParent,
+						Display.getCurrent().getCursorLocation(),
+						_tourInfoToolTip);
 			}
 		});
 
@@ -509,12 +534,14 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		});
 
 		_tourViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
 				onSelectionChanged(event);
 			}
 		});
 
 		_tourViewer.addDoubleClickListener(new IDoubleClickListener() {
+			@Override
 			public void doubleClick(final DoubleClickEvent event) {
 
 				// expand/collapse current item
@@ -539,6 +566,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		});
 
 		_tourViewer.addCheckStateListener(new ICheckStateListener() {
+			@Override
 			public void checkStateChanged(final CheckStateChangedEvent event) {
 
 				if (event.getElement() instanceof TVICompareResultComparedTour) {
@@ -564,7 +592,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		createContextMenu();
 
 		// set tour info tooltip provider
-		new TreeViewerTourInfoToolTip(_tourViewer);
+		_tourInfoToolTip = new TreeViewerTourInfoToolTip(_tourViewer);
 
 		return tree;
 	}
@@ -1014,13 +1042,14 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		menuMgr.add(_actionModifyColumns);
 	}
 
+	@Override
 	public ColumnManager getColumnManager() {
 		return _columnManager;
 	}
 
 	/**
 	 * Recursive method to walk down the tour tree items and find the compared tours
-	 * 
+	 *
 	 * @param parentItem
 	 * @param CompareIds
 	 */
@@ -1052,6 +1081,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		}
 	}
 
+	@Override
 	public ArrayList<TourData> getSelectedTours() {
 
 		// get selected tours
@@ -1081,6 +1111,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	/**
 	 * @return Returns the tour viewer
 	 */
+	@Override
 	public CheckboxTreeViewer getViewer() {
 		return _tourViewer;
 	}
@@ -1105,6 +1136,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		}
 	}
 
+	@Override
 	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
 		_viewerContainer.setRedraw(false);
@@ -1127,6 +1159,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		return _tourViewer;
 	}
 
+	@Override
 	public void reloadViewer() {
 
 		final Tree tree = _tourViewer.getTree();
@@ -1318,7 +1351,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 	/**
 	 * !!!Recursive !!! update all tour items with new data
-	 * 
+	 *
 	 * @param rootItem
 	 * @param modifiedTours
 	 */

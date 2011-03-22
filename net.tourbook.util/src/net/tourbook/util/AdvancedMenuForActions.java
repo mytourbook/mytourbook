@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -68,6 +68,8 @@ public class AdvancedMenuForActions {
 	private MenuItem					_armMenuItem;
 	private String						_armActionText;
 
+	private ToolTip						_toolTip;
+
 	private class ContextArmListener implements ArmListener {
 
 		@Override
@@ -90,6 +92,7 @@ public class AdvancedMenuForActions {
 
 		_display = Display.getCurrent();
 		_animationRunnable = new Runnable() {
+			@Override
 			public void run() {
 				onAnimation20Run(this);
 			}
@@ -128,13 +131,11 @@ public class AdvancedMenuForActions {
 			if (_isAnimationEnabled) {
 
 				int animationTime = _consumedAnimationTime;
-				int counter = 0;
 
 				final StringBuilder sb = new StringBuilder();
 				while (animationTime > 0) {
 					sb.append(Messages.Advanced_Menu_AnimationSymbol);
 					animationTime -= _animationDelay;
-					counter++;
 				}
 
 				_armMenuItem.setText(_armActionText + UI.SPACE + sb.toString());
@@ -162,7 +163,7 @@ public class AdvancedMenuForActions {
 					 * the item is hovered which is associated with the action for the advanced menu
 					 */
 
-					_armItemTimeAction = event.time & 0xFFFFFFFFL;
+					_armItemTimeAction = System.currentTimeMillis();
 
 					_armMenuItem = menuItem;
 					_armActionText = _actionContributionItem.getAction().getText();
@@ -179,10 +180,16 @@ public class AdvancedMenuForActions {
 		_armMenuItem = null;
 		_isAnimating = false;
 
-		_armItemTimeOther = event.time & 0xFFFFFFFFL;
+		// system time is needed because OSX has the same time for all arm events until the menu is closed
+		_armItemTimeOther = System.currentTimeMillis();
 	}
 
 	private void onArmEventOpenMenu() {
+
+		// it's possible that a tool tip is displayed
+		if (_toolTip != null) {
+			_toolTip.hide();
+		}
 
 		// check if menu is already open
 		if (_isAdvMenuOpen) {
@@ -202,6 +209,7 @@ public class AdvancedMenuForActions {
 
 		// run async because the hide menu action is also doing cleanup in async mode
 		Display.getCurrent().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				openAdvancedMenu();
 			}
@@ -215,25 +223,28 @@ public class AdvancedMenuForActions {
 	/**
 	 * This is called when the parent menu is displayed. An arm listener is added to each menu item
 	 * in the parent menu.
-	 * 
+	 *
 	 * @param menuEvent
 	 * @param menuParentControl
 	 * @param isAutoOpen
 	 * @param autoOpenDelay
 	 * @param menuPosition
+	 * @param toolTip
 	 */
 	public void onShowParentMenu(	final MenuEvent menuEvent,
 									final Control menuParentControl,
 									final boolean isAutoOpen,
 									final boolean isAnimationEnabled,
 									final int autoOpenDelay,
-									final Point menuPosition) {
+									final Point menuPosition,
+									final ToolTip toolTip) {
 
 		_menuParentControl = menuParentControl;
 		_isAutoOpen = isAutoOpen;
 		_isAnimationEnabled = isAnimationEnabled;
 		_autoOpenDelay = autoOpenDelay;
 		_advMenuPosition = menuPosition;
+		_toolTip = toolTip;
 
 		final Menu menu = (Menu) menuEvent.widget;
 
@@ -279,6 +290,11 @@ public class AdvancedMenuForActions {
 	 * Open menu which is associated with this {@link AdvancedMenuForActions}
 	 */
 	public void openAdvancedMenu() {
+
+		// it's possible that a tool tip is displayed
+		if (_toolTip != null) {
+			_toolTip.hide();
+		}
 
 		if (_isAdvMenuOpen) {
 			return;

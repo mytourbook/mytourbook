@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -36,6 +36,7 @@ import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.UI;
 import net.tourbook.util.AdvancedMenuForActions;
+import net.tourbook.util.ToolTip;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -178,6 +179,7 @@ public class TagMenuManager {
 		@Override
 		public void run() {
 			BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+				@Override
 				public void run() {
 					runnableRemoveAllTags();
 				}
@@ -216,6 +218,7 @@ public class TagMenuManager {
 
 		// create pref listener
 		_prefChangeListener = new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 				final String property = event.getProperty();
 
@@ -455,7 +458,7 @@ public class TagMenuManager {
 
 	/**
 	 * Add/remove tags
-	 * 
+	 *
 	 * @param isTourSelected
 	 *            Is <code>true</code> when at least one tour is selected
 	 * @param isOneTour
@@ -640,8 +643,12 @@ public class TagMenuManager {
 	 * @param menuEvent
 	 * @param menuParentControl
 	 * @param menuPosition
+	 * @param toolTip
 	 */
-	public void onShowMenu(final MenuEvent menuEvent, final Control menuParentControl, final Point menuPosition) {
+	public void onShowMenu(	final MenuEvent menuEvent,
+							final Control menuParentControl,
+							final Point menuPosition,
+							final ToolTip toolTip) {
 
 		_advancedMenuToAddTags.onShowParentMenu(//
 				menuEvent,
@@ -649,7 +656,8 @@ public class TagMenuManager {
 				_isTaggingAutoOpen,
 				_isTaggingAnimation,
 				_taggingAutoOpenDelay,
-				menuPosition);
+				menuPosition,
+				toolTip);
 	}
 
 	private void runnableRemoveAllTags() {
@@ -682,7 +690,7 @@ public class TagMenuManager {
 
 	/**
 	 * Save modified tours and notify tour provider
-	 * 
+	 *
 	 * @param modifiedTags
 	 * @param modifiedTours
 	 */
@@ -710,7 +718,7 @@ public class TagMenuManager {
 
 	/**
 	 * Set/Save for multiple tour tags
-	 * 
+	 *
 	 * @param modifiedTags
 	 * @param isAddMode
 	 */
@@ -718,6 +726,7 @@ public class TagMenuManager {
 
 		final Runnable runnable = new Runnable() {
 
+			@Override
 			public void run() {
 
 				final ArrayList<TourData> modifiedTours = _tourProvider.getSelectedTours();
@@ -765,7 +774,7 @@ public class TagMenuManager {
 
 	/**
 	 * Set/Save one tour tag
-	 * 
+	 *
 	 * @param tag
 	 * @param tourProvider
 	 * @param isAddMode

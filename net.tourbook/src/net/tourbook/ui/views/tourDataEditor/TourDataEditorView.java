@@ -202,7 +202,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	public static final String					ID								= "net.tourbook.views.TourDataEditorView";	//$NON-NLS-1$
 
-	public static final int						DEFAULT_TEXT_INPUT_WIDTH		= 200;
+	private static final int					COLUMN_SPACING					= 20;
 
 	private static final String					CSV_FILE_EXTENSION				= "csv";									//$NON-NLS-1$
 
@@ -364,7 +364,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 * this width is used as a hint for the width of the description field, this value also
 	 * influences the width of the columns in this editor
 	 */
-	private final int							_hintTextColumnWidth			= _isOSX ? 300 : 150;
+	private final int							_hintTextColumnWidth			= _isOSX ? 200 : 150;
 	private int									_hintDefaultSpinnerWidth;
 
 	/**
@@ -1555,7 +1555,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	/**
 	 * delete selected time slices
-	 * 
+	 *
 	 * @param isRemoveTime
 	 */
 	void actionDeleteTimeSlices(final boolean isRemoveTime) {
@@ -2027,7 +2027,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	/**
 	 * Checks if a marker is within the selected time slices
-	 * 
+	 *
 	 * @param firstSliceIndex
 	 * @param lastSliceIndex
 	 * @return Returns <code>true</code> when the marker can be deleted or there is no marker <br>
@@ -2111,7 +2111,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	/**
 	 * Convert temperature serie into double
-	 * 
+	 *
 	 * @param temperatureSerie
 	 */
 	private double[] convertTemperatureSerie(final int[] temperatureSerie) {
@@ -2438,7 +2438,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	/**
 	 * create the views context menu
-	 * 
+	 *
 	 * @param table
 	 */
 	private void createMarkerViewerContextMenu(final Table table) {
@@ -2520,7 +2520,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				Point pt = new Point(rect.x, rect.y + rect.height);
 				pt = _linkTag.getParent().toDisplay(pt);
 
-				_tagMenuMgr.onShowMenu(menuEvent, _linkTag, pt);
+				_tagMenuMgr.onShowMenu(menuEvent, _linkTag, pt, null);
 			}
 		});
 
@@ -2855,7 +2855,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			GridDataFactory
 					.fillDefaults()
 					.grab(true, false)
-					.hint(DEFAULT_TEXT_INPUT_WIDTH, SWT.DEFAULT)
+					.hint(_hintTextColumnWidth, SWT.DEFAULT)
 					.applyTo(_comboStartLocation);
 
 			// fill combobox
@@ -2887,7 +2887,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			GridDataFactory
 					.fillDefaults()
 					.grab(true, false)
-					.hint(DEFAULT_TEXT_INPUT_WIDTH, SWT.DEFAULT)
+					.hint(_hintTextColumnWidth, SWT.DEFAULT)
 					.applyTo(_comboEndLocation);
 
 			// fill combobox
@@ -2915,8 +2915,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		GridLayoutFactory.fillDefaults()//
 //				.equalWidth(true)
 				.numColumns(2)
-				.spacing(20, 5)
+				.spacing(COLUMN_SPACING, 5)
 				.applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
 			createUISection122DateTimeCol1(container);
 			createUISection124DateTimeCol2(container);
@@ -3069,7 +3070,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		final Composite container = (Composite) _sectionPersonal.getClient();
 		GridLayoutFactory.fillDefaults()//
 				.numColumns(2)
-				.spacing(20, 5)
+				.spacing(COLUMN_SPACING, 5)
 				.applyTo(container);
 		{
 			createUISection132PersonalCol1(container);
@@ -3153,7 +3154,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		final Composite container = (Composite) _sectionWeather.getClient();
 		GridLayoutFactory.fillDefaults()//
 				.numColumns(2)
-				.spacing(20, 5)
+				.spacing(COLUMN_SPACING, 5)
 				.applyTo(container);
 		{
 			createUISection141Weather(container);
@@ -3417,8 +3418,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		final Composite container = _tk.createComposite(section);
 		GridDataFactory.fillDefaults().applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
-		_firstColumnContainerControls.add(container);
+		GridLayoutFactory.fillDefaults()//
+//				.spacing(2, 1)
+				.numColumns(3)
+				.applyTo(container);
+//		_firstColumnContainerControls.add(container);
 		{
 			/*
 			 * temperature
@@ -4822,7 +4826,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	/**
 	 * select the chart slider(s) according to the selected marker(s)
-	 * 
+	 *
 	 * @return
 	 */
 	private ISelection fireSliderPosition(final StructuredSelection selection) {
@@ -4996,7 +5000,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	/**
 	 * Converts a string into a float value
-	 * 
+	 *
 	 * @param valueText
 	 * @return Returns the float value for the parameter valueText, return <code>0</code>
 	 * @throws IllegalArgumentException
@@ -5214,7 +5218,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * check row/cell mode, row mode must be set, it works with the cell mode but can be confusing
 	 * because multiple rows can be selected but they are not visible
-	 * 
+	 *
 	 * @return
 	 */
 	private boolean isRowSelectionMode() {
@@ -5266,7 +5270,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * Checks the selection if it contains the current tour, {@link #_selectionTourId} contains the
 	 * tour id which is within the selection
-	 * 
+	 *
 	 * @param selection
 	 * @return Returns <code>true</code> when the current tour is within the selection
 	 */
@@ -5406,7 +5410,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	/**
 	 * Checks if tour has no errors
-	 * 
+	 *
 	 * @return Returns <code>true</code> when all data for the tour are valid, <code>false</code>
 	 *         otherwise
 	 */
@@ -6149,7 +6153,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	/**
 	 * saves the tour in the {@link TourDataEditorView}
-	 * 
+	 *
 	 * @return Returns <code>true</code> when the tour is saved or <code>false</code> when the tour
 	 *         could not saved because the user canceled saving
 	 */
@@ -6235,7 +6239,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	/**
 	 * initialize cell editing
-	 * 
+	 *
 	 * @param viewer
 	 */
 	private void setCellEditSupport(final TableViewer viewer) {
@@ -6304,7 +6308,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * Set {@link TourData} for the editor, when the editor is dirty, nothing is done, the calling
 	 * method must check if the tour editor is dirty
-	 * 
+	 *
 	 * @param tourDataForEditor
 	 */
 	public void setTourData(final TourData tourDataForEditor) {
@@ -6548,7 +6552,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	/**
 	 * Updates the UI from {@link TourData}, dirty flag is not set
-	 * 
+	 *
 	 * @param tourData
 	 */
 	public void updateUI(final TourData tourData) {
@@ -6607,7 +6611,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	/**
 	 * updates the fields in the tour data editor and enables actions and controls
-	 * 
+	 *
 	 * @param tourData
 	 * @param forceTimeSliceReload
 	 *            <code>true</code> will reload time slices
@@ -7059,7 +7063,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	/**
 	 * update title of the view with the modified date/time
-	 * 
+	 *
 	 * @param tourYear
 	 * @param tourMonth
 	 * @param tourDay

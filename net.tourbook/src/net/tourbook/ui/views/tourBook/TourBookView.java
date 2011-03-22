@@ -179,6 +179,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 	private final TourDoubleClickState					_tourDoubleClickState				= new TourDoubleClickState();
 	private TagMenuManager								_tagMenuMgr;
+	private TreeViewerTourInfoToolTip					_tourInfoToolTip;
 
 	/*
 	 * UI controls
@@ -549,7 +550,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		createUI20ContextMenu();
 
 		// set tour info tooltip provider
-		new TreeViewerTourInfoToolTip(_tourViewer);
+		_tourInfoToolTip = new TreeViewerTourInfoToolTip(_tourViewer);
 	}
 
 	/**
@@ -576,7 +577,11 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 			@Override
 			public void menuShown(final MenuEvent menuEvent) {
-				_tagMenuMgr.onShowMenu(menuEvent, controlMenuParent, Display.getCurrent().getCursorLocation());
+				_tagMenuMgr.onShowMenu(
+						menuEvent,
+						controlMenuParent,
+						Display.getCurrent().getCursorLocation(),
+						_tourInfoToolTip);
 			}
 		});
 
@@ -587,7 +592,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	/**
 	 * Defines all columns for the table viewer in the column manager, the sequence defines the
 	 * default columns
-	 * 
+	 *
 	 * @param parent
 	 */
 	private void defineAllColumns(final Composite parent) {
