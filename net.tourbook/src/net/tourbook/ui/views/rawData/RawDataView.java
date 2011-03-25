@@ -68,7 +68,6 @@ import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
 import net.tourbook.util.ColumnDefinition;
 import net.tourbook.util.ColumnManager;
 import net.tourbook.util.ITourViewer;
-import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 import net.tourbook.util.StatusUtil;
 import net.tourbook.util.Util;
@@ -84,6 +83,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.DeviceResourceException;
@@ -113,7 +113,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
@@ -691,7 +690,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	/**
 	 * Only time slices will be reimported.
-	 *
+	 * 
 	 * @param importFile
 	 * @param importedTours
 	 * @param oldTourData
@@ -789,8 +788,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		defineAllColumns();
 
 		createUI(parent);
-
 		createActions();
+
 		fillToolbar();
 
 		addPartListener();
@@ -885,7 +884,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 */
 	private void createUI20ContextMenu() {
 
-		final Control controlMenuParent = _tourViewer.getControl();
+		final Table table = (Table) _tourViewer.getControl();
 
 		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
 		menuMgr.setRemoveAllWhenShown(true);
@@ -896,11 +895,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			}
 		});
 
-		final Menu menu = menuMgr.createContextMenu(controlMenuParent);
-		controlMenuParent.setMenu(menu);
-
-		final Menu contextMenu = menuMgr.createContextMenu(controlMenuParent);
-		contextMenu.addMenuListener(new MenuAdapter() {
+		final Menu tableContextMenu = menuMgr.createContextMenu(table);
+		tableContextMenu.addMenuListener(new MenuAdapter() {
 			@Override
 			public void menuHidden(final MenuEvent e) {
 				_tagMenuMgr.onHideMenu();
@@ -908,24 +904,19 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			@Override
 			public void menuShown(final MenuEvent menuEvent) {
-				_tagMenuMgr.onShowMenu(
-						menuEvent,
-						controlMenuParent,
-						Display.getCurrent().getCursorLocation(),
-						_tourInfoToolTip);
+				_tagMenuMgr.onShowMenu(menuEvent, table, Display.getCurrent().getCursorLocation(), _tourInfoToolTip);
 			}
 		});
 
-		// add the context menu to the table viewer
-		controlMenuParent.setMenu(contextMenu);
-
 		getSite().registerContextMenu(menuMgr, _tourViewer);
+
+		_columnManager.createHeaderContextMenu(table, tableContextMenu);
 	}
 
 	/**
 	 * Defines all columns for the table viewer in the column manager, the sequenze defines the
 	 * default columns
-	 *
+	 * 
 	 * @param parent
 	 */
 	private void defineAllColumns() {
@@ -1496,7 +1487,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	/**
 	 * After tours are saved, the internal structures and ui viewers must be updated
-	 *
+	 * 
 	 * @param savedTours
 	 *            contains the saved {@link TourData}
 	 */
@@ -1963,7 +1954,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	/**
 	 * reimport previous imported tours
-	 *
+	 * 
 	 * @param monitor
 	 * @param importedFiles
 	 */

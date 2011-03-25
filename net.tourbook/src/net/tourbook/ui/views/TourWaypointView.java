@@ -42,7 +42,6 @@ import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 import net.tourbook.util.ColumnDefinition;
 import net.tourbook.util.ColumnManager;
 import net.tourbook.util.ITourViewer;
-import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 
 import org.eclipse.jface.action.IMenuListener;
@@ -51,6 +50,7 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -111,6 +111,8 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 	private ITourEventListener		_tourPropertyListener;
 	private IPartListener2			_partListener;
 
+	private PixelConverter			_pc;
+
 	/*
 	 * UI controls
 	 */
@@ -136,6 +138,7 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 	private final DateTimeFormatter	_timeFormatter			= DateTimeFormat.mediumTime();
 
 	private final NumberFormat		_nf_1_1					= NumberFormat.getNumberInstance();
+
 	{
 		_nf_1_1.setMinimumFractionDigits(1);
 		_nf_1_1.setMaximumFractionDigits(1);
@@ -370,6 +373,8 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 	@Override
 	public void createPartControl(final Composite parent) {
 
+		_pc = new PixelConverter(parent);
+
 		updateInternalUnitValues();
 
 		_columnManager = new ColumnManager(this, _state);
@@ -412,11 +417,12 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 
 		_viewerContainer = new Composite(_pageBook, SWT.NONE);
 		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
-
-		createUIWaypointViewer(_viewerContainer);
+		{
+			createUI10WaypointViewer(_viewerContainer);
+		}
 	}
 
-	private void createUIWaypointViewer(final Composite parent) {
+	private void createUI10WaypointViewer(final Composite parent) {
 
 		final Table table = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
 
@@ -480,31 +486,41 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 //				}
 			}
 		});
+
+		createUI40ContextMenu();
+	}
+
+	/**
+	 * create the views context menu
+	 */
+	private void createUI40ContextMenu() {
+
+		final Table table = (Table) _wpViewer.getControl();
+
+		_columnManager.createHeaderContextMenu(table, null);
 	}
 
 	private void defineAllColumns(final Composite parent) {
 
-		final PixelConverter pc = new PixelConverter(parent);
-
-		defineColumnName(pc);
-		defineColumnDescription(pc);
-		defineColumnComment(pc);
-		defineColumnCategory(pc);
-		defineColumnSymbol(pc);
-		defineColumnAltitude(pc);
-		defineColumnTime(pc);
-		defineColumnDate(pc);
-		defineColumnLatitude(pc);
-		defineColumnLongitude(pc);
-		defineColumnId(pc);
+		defineColumnName();
+		defineColumnDescription();
+		defineColumnComment();
+		defineColumnCategory();
+		defineColumnSymbol();
+		defineColumnAltitude();
+		defineColumnTime();
+		defineColumnDate();
+		defineColumnLatitude();
+		defineColumnLongitude();
+		defineColumnId();
 	}
 
 	/**
 	 * column: altitude
 	 */
-	private void defineColumnAltitude(final PixelConverter pc) {
+	private void defineColumnAltitude() {
 
-		final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_ALTITUDE.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_ALTITUDE.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -528,9 +544,9 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 	/**
 	 * column: category
 	 */
-	private void defineColumnCategory(final PixelConverter pc) {
+	private void defineColumnCategory() {
 
-		final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_CATEGORY.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_CATEGORY.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -545,9 +561,9 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 	/**
 	 * column: comment
 	 */
-	private void defineColumnComment(final PixelConverter pc) {
+	private void defineColumnComment() {
 
-		final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_COMMENT.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_COMMENT.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -562,9 +578,9 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 	/**
 	 * column: date/time
 	 */
-	private void defineColumnDate(final PixelConverter pc) {
+	private void defineColumnDate() {
 
-		final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_DATE.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_DATE.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -581,9 +597,9 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 	/**
 	 * column: description
 	 */
-	private void defineColumnDescription(final PixelConverter pc) {
+	private void defineColumnDescription() {
 
-		final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_DESCRIPTION.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_DESCRIPTION.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -598,9 +614,9 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 	/**
 	 * column: id
 	 */
-	private void defineColumnId(final PixelConverter pc) {
+	private void defineColumnId() {
 
-		final ColumnDefinition colDef = TableColumnFactory.ID.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.ID.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -620,9 +636,9 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 	/**
 	 * column: latitude
 	 */
-	private void defineColumnLatitude(final PixelConverter pc) {
+	private void defineColumnLatitude() {
 
-		final ColumnDefinition colDef = TableColumnFactory.LATITUDE.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.LATITUDE.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -637,9 +653,9 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 	/**
 	 * column: longitude
 	 */
-	private void defineColumnLongitude(final PixelConverter pc) {
+	private void defineColumnLongitude() {
 
-		final ColumnDefinition colDef = TableColumnFactory.LONGITUDE.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.LONGITUDE.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(true);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -655,9 +671,9 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 	/**
 	 * column: name
 	 */
-	private void defineColumnName(final PixelConverter pc) {
+	private void defineColumnName() {
 
-		final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_NAME.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_NAME.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -672,9 +688,9 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 	/**
 	 * column: symbol
 	 */
-	private void defineColumnSymbol(final PixelConverter pc) {
+	private void defineColumnSymbol() {
 
-		final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_SYMBOL.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_SYMBOL.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -689,9 +705,9 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 	/**
 	 * column: time
 	 */
-	private void defineColumnTime(final PixelConverter pc) {
+	private void defineColumnTime() {
 
-		final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_TIME.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_TIME.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -860,7 +876,7 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 		{
 			_wpViewer.getTable().dispose();
 
-			createUIWaypointViewer(_viewerContainer);
+			createUI10WaypointViewer(_viewerContainer);
 			_viewerContainer.layout();
 
 			// update the viewer

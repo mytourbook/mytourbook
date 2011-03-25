@@ -46,6 +46,7 @@ import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
@@ -120,7 +121,6 @@ import de.byteholder.geoclipse.mapprovider.MPWrapper;
 import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 import de.byteholder.geoclipse.mapprovider.MapProviderNavigator;
 import de.byteholder.geoclipse.ui.MessageDialogNoClose;
-import de.byteholder.geoclipse.util.PixelConverter;
 import de.byteholder.geoclipse.util.Util;
 
 public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPreferencePage {
@@ -229,8 +229,9 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 	private ActionCancelRefreshOfflineInfo		_actionCancelRefresh;
 	private ActionRefreshOfflineInfoNotAssessed	_actionRefreshNotAssessed;
 
-	final static NumberFormat					_nf								= NumberFormat.getNumberInstance();
+	private PixelConverter						_pc;
 
+	final static NumberFormat					_nf								= NumberFormat.getNumberInstance();
 	{
 		_nf.setMinimumFractionDigits(2);
 		_nf.setMaximumFractionDigits(2);
@@ -513,6 +514,8 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 	private Composite createUI(final Composite parent) {
 
+		_pc = new PixelConverter(parent);
+
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(2).spacing(5, 0).applyTo(container);
@@ -573,14 +576,12 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 	private void createUI20MapViewer(final Composite parent) {
 
-		final PixelConverter pixelConverter = new PixelConverter(parent);
-
 		final TableColumnLayout tableLayout = new TableColumnLayout();
 
 		final Composite layoutContainer = new Composite(parent, SWT.NONE);
 		layoutContainer.setLayout(tableLayout);
 		GridDataFactory.fillDefaults()//
-				.hint(400, pixelConverter.convertHeightInCharsToPixels(10))
+				.hint(400, _pc.convertHeightInCharsToPixels(10))
 				.grab(true, true)
 				.applyTo(layoutContainer);
 
@@ -625,7 +626,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 				}
 			}
 		});
-		tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(4)));
+		tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(4)));
 
 		// column: map provider
 		tvc = new TableViewerColumn(_mpViewer, SWT.LEAD);
@@ -680,7 +681,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 				cell.setText(layer);
 			}
 		});
-		tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(10)));
+		tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(10)));
 
 		// column: offline file counter
 		tvc = new TableViewerColumn(_mpViewer, SWT.TRAIL);
@@ -700,7 +701,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 				}
 			}
 		});
-		tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(10)));
+		tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(10)));
 
 		// column: offline file size
 		tvc = new TableViewerColumn(_mpViewer, SWT.TRAIL);
@@ -720,7 +721,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 				}
 			}
 		});
-		tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(12)));
+		tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(12)));
 
 		/*
 		 * create table viewer
@@ -978,8 +979,6 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 	private void createUI52DetailsDetails(final Group parent) {
 
-		final PixelConverter pixCon = new PixelConverter(parent);
-
 		final VerifyListener verifyListener = new VerifyListener() {
 			@Override
 			public void verifyText(final VerifyEvent e) {
@@ -1022,7 +1021,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			// text: description
 			_txtDescription = new Text(detailContainer, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
 			GridDataFactory.fillDefaults()//
-					.hint(pixCon.convertWidthInCharsToPixels(20), pixCon.convertHeightInCharsToPixels(5))
+					.hint(_pc.convertWidthInCharsToPixels(20), _pc.convertHeightInCharsToPixels(5))
 					.grab(true, false)
 					.applyTo(_txtDescription);
 			_txtDescription.addModifyListener(_modifyListener);
@@ -1041,7 +1040,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 				// text: offline folder
 				_txtOfflineFolder = new Text(_offlineContainer, SWT.BORDER);
 				GridDataFactory.fillDefaults()//
-						.hint(pixCon.convertWidthInCharsToPixels(20), SWT.DEFAULT)
+						.hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
 						.applyTo(_txtOfflineFolder);
 				_txtOfflineFolder.setTextLimit(MAX_ID_LENGTH);
 				_txtOfflineFolder.addVerifyListener(verifyListener);
@@ -1535,8 +1534,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 	}
 
 	/**
-	 * @return Returns the next map provider or <code>null</code> when there is no WMS map
-	 *         provider
+	 * @return Returns the next map provider or <code>null</code> when there is no WMS map provider
 	 */
 	public MapProviderNavigator getNextMapProvider() {
 

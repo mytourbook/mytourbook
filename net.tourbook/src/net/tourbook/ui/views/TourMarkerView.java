@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.ui.views;
 
 import java.text.NumberFormat;
@@ -44,7 +43,6 @@ import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
-import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 
 import org.eclipse.jface.action.IMenuListener;
@@ -53,6 +51,7 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -113,6 +112,8 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 	private IPropertyChangeListener	_prefChangeListener;
 	private ITourEventListener		_tourPropertyListener;
 	private IPartListener2			_partListener;
+
+	private PixelConverter			_pc;
 
 	private final NumberFormat		_nf_3_3					= NumberFormat.getNumberInstance();
 	{
@@ -208,7 +209,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 						element.dispose();
 					}
 
-					createTableViewer(_viewerContainer);
+					createUI10TableViewer(_viewerContainer);
 					_viewerContainer.layout();
 
 					// update the viewer
@@ -305,40 +306,10 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 		_pageBook.showPage(_pageNoChart);
 	}
 
-	/**
-	 * create the views context menu
-	 */
-	private void createContextMenu() {
-
-		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
-		menuMgr.setRemoveAllWhenShown(true);
-		menuMgr.addMenuListener(new IMenuListener() {
-			public void menuAboutToShow(final IMenuManager manager) {
-				fillContextMenu(manager);
-			}
-		});
-
-		final Control viewerControl = _markerViewer.getControl();
-		final Menu menu = menuMgr.createContextMenu(viewerControl);
-		viewerControl.setMenu(menu);
-
-		getSite().registerContextMenu(menuMgr, _markerViewer);
-	}
-
 	@Override
 	public void createPartControl(final Composite parent) {
 
-		_pageBook = new PageBook(parent, SWT.NONE);
-		_pageBook.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-
-		_pageNoChart = new Label(_pageBook, SWT.NONE);
-		_pageNoChart.setText(Messages.UI_Label_no_chart_is_selected);
-
-		_viewerContainer = new Composite(_pageBook, SWT.NONE);
-		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
-		createTableViewer(_viewerContainer);
-
-		createContextMenu();
+		createUI(parent);
 
 		_actionEditTourMarkers = new ActionOpenMarkerDialog(this, true);
 
@@ -361,7 +332,26 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 		}
 	}
 
-	private void createTableViewer(final Composite parent) {
+	private void createUI(final Composite parent) {
+
+		_pc = new PixelConverter(parent);
+
+		_pageBook = new PageBook(parent, SWT.NONE);
+		_pageBook.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+		_pageNoChart = new Label(_pageBook, SWT.NONE);
+		_pageNoChart.setText(Messages.UI_Label_no_chart_is_selected);
+
+		_viewerContainer = new Composite(_pageBook, SWT.NONE);
+		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
+		{
+			createUI10TableViewer(_viewerContainer);
+		}
+
+		createUI20ContextMenu();
+	}
+
+	private void createUI10TableViewer(final Composite parent) {
 
 		final TableColumnLayout tableLayout = new TableColumnLayout();
 
@@ -408,7 +398,6 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 		 */
 		TableViewerColumn tvc;
 		TableColumn tvcColumn;
-		final PixelConverter pixelConverter = new PixelConverter(table);
 
 		// column: time
 		tvc = new TableViewerColumn(_markerViewer, SWT.TRAIL);
@@ -420,8 +409,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 				cell.setText(UI.format_hh_mm_ss(((TourMarker) cell.getElement()).getTime()));
 			}
 		});
-		tableLayout
-				.setColumnData(tvcColumn, new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(12), false));
+		tableLayout.setColumnData(tvcColumn, new ColumnPixelData(_pc.convertWidthInCharsToPixels(12), false));
 
 		// column: distance km/mi
 		tvc = new TableViewerColumn(_markerViewer, SWT.TRAIL);
@@ -447,8 +435,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 				}
 			}
 		});
-		tableLayout
-				.setColumnData(tvcColumn, new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(11), false));
+		tableLayout.setColumnData(tvcColumn, new ColumnPixelData(_pc.convertWidthInCharsToPixels(11), false));
 
 		// column: remark
 		tvc = new TableViewerColumn(_markerViewer, SWT.LEAD);
@@ -496,6 +483,27 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 				}
 			}
 		});
+	}
+
+	/**
+	 * create the views context menu
+	 */
+	private void createUI20ContextMenu() {
+
+		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+		menuMgr.setRemoveAllWhenShown(true);
+		menuMgr.addMenuListener(new IMenuListener() {
+			public void menuAboutToShow(final IMenuManager manager) {
+				fillContextMenu(manager);
+			}
+		});
+
+		final Table table = (Table) _markerViewer.getControl();
+		final Menu menu = menuMgr.createContextMenu(table);
+
+		table.setMenu(menu);
+
+		getSite().registerContextMenu(menuMgr, _markerViewer);
 	}
 
 	@Override

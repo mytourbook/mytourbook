@@ -68,7 +68,6 @@ import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
 import net.tourbook.ui.views.rawData.ActionMergeTour;
 import net.tourbook.util.ColumnManager;
 import net.tourbook.util.ITourViewer;
-import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 import net.tourbook.util.TreeColumnDefinition;
 
@@ -79,6 +78,7 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -106,7 +106,6 @@ import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ScrollBar;
@@ -213,6 +212,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 	private ActionExport								_actionExportTour;
 	private ActionPrint									_actionPrintTour;
+
+	private PixelConverter								_pc;
 
 	private static class ItemComparer implements IElementComparer {
 
@@ -462,24 +463,22 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	@Override
 	public void createPartControl(final Composite parent) {
 
+		_pc = new PixelConverter(parent);
+
 		// define all columns for the viewer
 		_columnManager = new ColumnManager(this, _state);
 		defineAllColumns(parent);
 
-		_viewerContainer = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
-
-		createUI10TourViewer(_viewerContainer);
-
+		createUI(parent);
 		createActions();
-
-		// set selection provider
-		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider());
 
 		addSelectionListener();
 		addPartListener();
 		addPrefListener();
 		addTourEventListener();
+
+		// set selection provider
+		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider());
 
 		readDisplayFormats();
 		restoreState();
@@ -491,6 +490,15 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		_tourViewer.setInput(this);
 
 		reselectTourViewer();
+	}
+
+	private void createUI(final Composite parent) {
+
+		_viewerContainer = new Composite(parent, SWT.NONE);
+		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
+		{
+			createUI10TourViewer(_viewerContainer);
+		}
 	}
 
 	private void createUI10TourViewer(final Composite parent) {
@@ -567,9 +575,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			}
 		});
 
-		final Control controlMenuParent = _tourViewer.getControl();
-		final Menu contextMenu = menuMgr.createContextMenu(controlMenuParent);
-		contextMenu.addMenuListener(new MenuAdapter() {
+		final Tree tree = (Tree) _tourViewer.getControl();
+		final Menu treeContextMenu = menuMgr.createContextMenu(tree);
+		treeContextMenu.addMenuListener(new MenuAdapter() {
 			@Override
 			public void menuHidden(final MenuEvent e) {
 				_tagMenuMgr.onHideMenu();
@@ -577,79 +585,71 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 			@Override
 			public void menuShown(final MenuEvent menuEvent) {
-				_tagMenuMgr.onShowMenu(
-						menuEvent,
-						controlMenuParent,
-						Display.getCurrent().getCursorLocation(),
-						_tourInfoToolTip);
+				_tagMenuMgr.onShowMenu(menuEvent, tree, Display.getCurrent().getCursorLocation(), _tourInfoToolTip);
 			}
 		});
 
-		// add the context menu to the table viewer
-		controlMenuParent.setMenu(contextMenu);
+		_columnManager.createHeaderContextMenu(tree, treeContextMenu);
 	}
 
 	/**
 	 * Defines all columns for the table viewer in the column manager, the sequence defines the
 	 * default columns
-	 *
+	 * 
 	 * @param parent
 	 */
 	private void defineAllColumns(final Composite parent) {
 
-		final PixelConverter pc = new PixelConverter(parent);
+		defineColumnDate();
+		defineColumnWeekDay();
+		defineColumnTime();
+		defineColumnTourType();
 
-		defineColumnDate(pc);
-		defineColumnWeekDay(pc);
-		defineColumnTime(pc);
-		defineColumnTourType(pc);
+		defineColumnDistance();
+		defineColumnAltitudeUp();
+		defineColumnTimeDriving();
 
-		defineColumnDistance(pc);
-		defineColumnAltitudeUp(pc);
-		defineColumnTimeDriving(pc);
+		defineColumnWeatherClouds();
+		defineColumnTitle();
+		defineColumnTags();
 
-		defineColumnWeatherClouds(pc);
-		defineColumnTitle(pc);
-		defineColumnTags(pc);
+		defineColumnMarker();
+		defineColumnCalories();
+		defineColumnRestPulse();
 
-		defineColumnMarker(pc);
-		defineColumnCalories(pc);
-		defineColumnRestPulse(pc);
+		defineColumnTimeRecording();
+		defineColumnTimeBreak();
+		defineColumnTimeBreakRelative();
 
-		defineColumnTimeRecording(pc);
-		defineColumnTimeBreak(pc);
-		defineColumnTimeBreakRelative(pc);
+		defineColumnAltitudeDown();
 
-		defineColumnAltitudeDown(pc);
+		defineColumnMaxAltitude();
+		defineColumnMaxSpeed();
+		defineColumnMaxPulse();
 
-		defineColumnMaxAltitude(pc);
-		defineColumnMaxSpeed(pc);
-		defineColumnMaxPulse(pc);
+		defineColumnAvgSpeed();
+		defineColumnAvgPace();
+		defineColumnAvgPulse();
+		defineColumnAvgCadence();
+		defineColumnAvgTemperature();
 
-		defineColumnAvgSpeed(pc);
-		defineColumnAvgPace(pc);
-		defineColumnAvgPulse(pc);
-		defineColumnAvgCadence(pc);
-		defineColumnAvgTemperature(pc);
+		defineColumnWeatherWindSpeed();
+		defineColumnWeatherWindDirection();
 
-		defineColumnWeatherWindSpeed(pc);
-		defineColumnWeatherWindDirection(pc);
+		defineColumnWeekNo();
+		defineColumnWeekYear();
+		defineColumnTimeInterval();
+		defineColumnDeviceDistance();
 
-		defineColumnWeekNo(pc);
-		defineColumnWeekYear(pc);
-		defineColumnTimeInterval(pc);
-		defineColumnDeviceDistance(pc);
-
-		defineColumnPerson(pc);
+		defineColumnPerson();
 	}
 
 	/**
 	 * column: altitude down (m)
 	 */
-	private void defineColumnAltitudeDown(final PixelConverter pixelConverter) {
+	private void defineColumnAltitudeDown() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.ALTITUDE_DOWN
-				.createColumn(_columnManager, pixelConverter);
+		final TreeColumnDefinition colDef = TreeColumnFactory.ALTITUDE_DOWN.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -671,9 +671,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	/**
 	 * column: altitude up (m)
 	 */
-	private void defineColumnAltitudeUp(final PixelConverter pixelConverter) {
+	private void defineColumnAltitudeUp() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.ALTITUDE_UP.createColumn(_columnManager, pixelConverter);
+		final TreeColumnDefinition colDef = TreeColumnFactory.ALTITUDE_UP.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -696,9 +696,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	/**
 	 * column: avg cadence
 	 */
-	private void defineColumnAvgCadence(final PixelConverter pixelConverter) {
+	private void defineColumnAvgCadence() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.AVG_CADENCE.createColumn(_columnManager, pixelConverter);
+		final TreeColumnDefinition colDef = TreeColumnFactory.AVG_CADENCE.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -720,9 +720,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	/**
 	 * column: avg pace min/km - min/mi
 	 */
-	private void defineColumnAvgPace(final PixelConverter pixelConverter) {
+	private void defineColumnAvgPace() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.AVG_PACE.createColumn(_columnManager, pixelConverter);
+		final TreeColumnDefinition colDef = TreeColumnFactory.AVG_PACE.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -744,9 +744,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	/**
 	 * column: avg pulse
 	 */
-	private void defineColumnAvgPulse(final PixelConverter pixelConverter) {
+	private void defineColumnAvgPulse() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.AVG_PULSE.createColumn(_columnManager, pixelConverter);
+		final TreeColumnDefinition colDef = TreeColumnFactory.AVG_PULSE.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -768,9 +768,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	/**
 	 * column: avg speed km/h - mph
 	 */
-	private void defineColumnAvgSpeed(final PixelConverter pixelConverter) {
+	private void defineColumnAvgSpeed() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.AVG_SPEED.createColumn(_columnManager, pixelConverter);
+		final TreeColumnDefinition colDef = TreeColumnFactory.AVG_SPEED.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -792,11 +792,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	/**
 	 * column: avg temperature
 	 */
-	private void defineColumnAvgTemperature(final PixelConverter pixelConverter) {
+	private void defineColumnAvgTemperature() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.AVG_TEMPERATURE.createColumn(
-				_columnManager,
-				pixelConverter);
+		final TreeColumnDefinition colDef = TreeColumnFactory.AVG_TEMPERATURE.createColumn(_columnManager, _pc);
 
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -824,9 +822,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	/**
 	 * column: calories
 	 */
-	private void defineColumnCalories(final PixelConverter pixelConverter) {
+	private void defineColumnCalories() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.CALORIES.createColumn(_columnManager, pixelConverter);
+		final TreeColumnDefinition colDef = TreeColumnFactory.CALORIES.createColumn(_columnManager, _pc);
 		//colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -845,9 +843,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	/**
 	 * tree column: date
 	 */
-	private void defineColumnDate(final PixelConverter pixelConverter) {
+	private void defineColumnDate() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.DATE.createColumn(_columnManager, pixelConverter);
+		final TreeColumnDefinition colDef = TreeColumnFactory.DATE.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
 		colDef.setLabelProvider(new TourInfoToolTipStyledCellLabelProvider() {
@@ -902,11 +900,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	/**
 	 * column: device distance
 	 */
-	private void defineColumnDeviceDistance(final PixelConverter pixelConverter) {
+	private void defineColumnDeviceDistance() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.DEVICE_DISTANCE.createColumn(
-				_columnManager,
-				pixelConverter);
+		final TreeColumnDefinition colDef = TreeColumnFactory.DEVICE_DISTANCE.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -930,9 +926,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	/**
 	 * column: distance (km/miles)
 	 */
-	private void defineColumnDistance(final PixelConverter pixelConverter) {
+	private void defineColumnDistance() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.DISTANCE.createColumn(_columnManager, pixelConverter);
+		final TreeColumnDefinition colDef = TreeColumnFactory.DISTANCE.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -955,9 +951,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	/**
 	 * column: markers
 	 */
-	private void defineColumnMarker(final PixelConverter pixelConverter) {
+	private void defineColumnMarker() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_MARKERS.createColumn(_columnManager, pixelConverter);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_MARKERS.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -981,9 +977,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	/**
 	 * column: max altitude
 	 */
-	private void defineColumnMaxAltitude(final PixelConverter pixelConverter) {
+	private void defineColumnMaxAltitude() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.MAX_ALTITUDE.createColumn(_columnManager, pixelConverter);
+		final TreeColumnDefinition colDef = TreeColumnFactory.MAX_ALTITUDE.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1005,9 +1001,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	/**
 	 * column: max pulse
 	 */
-	private void defineColumnMaxPulse(final PixelConverter pixelConverter) {
+	private void defineColumnMaxPulse() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.MAX_PULSE.createColumn(_columnManager, pixelConverter);
+		final TreeColumnDefinition colDef = TreeColumnFactory.MAX_PULSE.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1028,9 +1024,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	/**
 	 * column: max speed
 	 */
-	private void defineColumnMaxSpeed(final PixelConverter pixelConverter) {
+	private void defineColumnMaxSpeed() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.MAX_SPEED.createColumn(_columnManager, pixelConverter);
+		final TreeColumnDefinition colDef = TreeColumnFactory.MAX_SPEED.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1052,9 +1048,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	/**
 	 * column: person
 	 */
-	private void defineColumnPerson(final PixelConverter pixelConverter) {
+	private void defineColumnPerson() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.PERSON.createColumn(_columnManager, pixelConverter);
+		final TreeColumnDefinition colDef = TreeColumnFactory.PERSON.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1074,9 +1070,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	/**
 	 * column: rest pulse
 	 */
-	private void defineColumnRestPulse(final PixelConverter pixelConverter) {
+	private void defineColumnRestPulse() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.RESTPULSE.createColumn(_columnManager, pixelConverter);
+		final TreeColumnDefinition colDef = TreeColumnFactory.RESTPULSE.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 
 			@Override
@@ -1099,9 +1095,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	/**
 	 * column: tags
 	 */
-	private void defineColumnTags(final PixelConverter pixelConverter) {
+	private void defineColumnTags() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TAGS.createColumn(_columnManager, pixelConverter);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TAGS.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
 
@@ -1135,10 +1131,10 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	/**
 	 * column: time
 	 */
-	private void defineColumnTime(final PixelConverter pixelConverter) {
+	private void defineColumnTime() {
 
 		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_START_TIME //
-				.createColumn(_columnManager, pixelConverter);
+				.createColumn(_columnManager, _pc);
 
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
@@ -1176,9 +1172,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	/**
 	 * column: paused time (h)
 	 */
-	private void defineColumnTimeBreak(final PixelConverter pixelConverter) {
+	private void defineColumnTimeBreak() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.PAUSED_TIME.createColumn(_columnManager, pixelConverter);
+		final TreeColumnDefinition colDef = TreeColumnFactory.PAUSED_TIME.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1210,11 +1206,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	/**
 	 * column: relative paused time %
 	 */
-	private void defineColumnTimeBreakRelative(final PixelConverter pixelConverter) {
+	private void defineColumnTimeBreakRelative() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.PAUSED_TIME_RELATIVE.createColumn(
-				_columnManager,
-				pixelConverter);
+		final TreeColumnDefinition colDef = TreeColumnFactory.PAUSED_TIME_RELATIVE.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1243,9 +1237,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	/**
 	 * column: driving time (h)
 	 */
-	private void defineColumnTimeDriving(final PixelConverter pixelConverter) {
+	private void defineColumnTimeDriving() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.DRIVING_TIME.createColumn(_columnManager, pixelConverter);
+		final TreeColumnDefinition colDef = TreeColumnFactory.DRIVING_TIME.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -1273,10 +1267,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	 * column: timeinterval
 	 */
 
-	private void defineColumnTimeInterval(final PixelConverter pixelConverter) {
+	private void defineColumnTimeInterval() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.TIME_INTERVAL
-				.createColumn(_columnManager, pixelConverter);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TIME_INTERVAL.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1299,11 +1292,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	/**
 	 * column: recording time (h)
 	 */
-	private void defineColumnTimeRecording(final PixelConverter pixelConverter) {
+	private void defineColumnTimeRecording() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.RECORDING_TIME.createColumn(
-				_columnManager,
-				pixelConverter);
+		final TreeColumnDefinition colDef = TreeColumnFactory.RECORDING_TIME.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1329,9 +1320,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	/**
 	 * column: title
 	 */
-	private void defineColumnTitle(final PixelConverter pixelConverter) {
+	private void defineColumnTitle() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.TITLE.createColumn(_columnManager, pixelConverter);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TITLE.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
 
@@ -1365,9 +1356,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	/**
 	 * column: tour type
 	 */
-	private void defineColumnTourType(final PixelConverter pixelConverter) {
+	private void defineColumnTourType() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TYPE.createColumn(_columnManager, pixelConverter);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TYPE.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -1393,9 +1384,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	/**
 	 * column: clouds
 	 */
-	private void defineColumnWeatherClouds(final PixelConverter pixelConverter) {
+	private void defineColumnWeatherClouds() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.CLOUDS.createColumn(_columnManager, pixelConverter);
+		final TreeColumnDefinition colDef = TreeColumnFactory.CLOUDS.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 
@@ -1425,9 +1416,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	/**
 	 * column: wind direction
 	 */
-	private void defineColumnWeatherWindDirection(final PixelConverter pixelConverter) {
+	private void defineColumnWeatherWindDirection() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.WIND_DIR.createColumn(_columnManager, pixelConverter);
+		final TreeColumnDefinition colDef = TreeColumnFactory.WIND_DIR.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 
 			@Override
@@ -1450,9 +1441,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	/**
 	 * column: weather
 	 */
-	private void defineColumnWeatherWindSpeed(final PixelConverter pixelConverter) {
+	private void defineColumnWeatherWindSpeed() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.WIND_SPEED.createColumn(_columnManager, pixelConverter);
+		final TreeColumnDefinition colDef = TreeColumnFactory.WIND_SPEED.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 
 			@Override
@@ -1475,9 +1466,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	/**
 	 * column: week day
 	 */
-	private void defineColumnWeekDay(final PixelConverter pixelConverter) {
+	private void defineColumnWeekDay() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.WEEK_DAY.createColumn(_columnManager, pixelConverter);
+		final TreeColumnDefinition colDef = TreeColumnFactory.WEEK_DAY.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
 
@@ -1513,9 +1504,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	/**
 	 * column: week
 	 */
-	private void defineColumnWeekNo(final PixelConverter pixelConverter) {
+	private void defineColumnWeekNo() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.WEEK_NO.createColumn(_columnManager, pixelConverter);
+		final TreeColumnDefinition colDef = TreeColumnFactory.WEEK_NO.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 
 			@Override
@@ -1538,9 +1529,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	/**
 	 * column: week year
 	 */
-	private void defineColumnWeekYear(final PixelConverter pixelConverter) {
+	private void defineColumnWeekYear() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.WEEKYEAR.createColumn(_columnManager, pixelConverter);
+		final TreeColumnDefinition colDef = TreeColumnFactory.WEEKYEAR.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 
 			@Override
@@ -1580,8 +1571,6 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		 * count number of selected items
 		 */
 		int tourItems = 0;
-		int items = 0;
-		int otherItems = 0;
 
 		TVITourBookTour firstTour = null;
 
@@ -1592,10 +1581,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 					firstTour = (TVITourBookTour) treeItem;
 				}
 				tourItems++;
-			} else {
-				otherItems++;
 			}
-			items++;
 		}
 
 		final int selectedItems = selection.size();

@@ -35,12 +35,12 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEvent;
-import net.tourbook.util.PixelConverter;
 import net.tourbook.util.StatusUtil;
 import net.tourbook.util.Util;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.preference.StringFieldEditor;

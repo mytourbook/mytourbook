@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,9 +20,9 @@ import java.io.File;
 import net.tourbook.data.TourData;
 import net.tourbook.util.ColumnDefinition;
 import net.tourbook.util.ColumnManager;
-import net.tourbook.util.PixelConverter;
 import net.tourbook.util.TableColumnDefinition;
 
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;

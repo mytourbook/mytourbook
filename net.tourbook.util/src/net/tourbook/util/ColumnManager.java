@@ -28,9 +28,18 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Decorations;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -126,6 +135,89 @@ public class ColumnManager {
 				createTreeColumn((TreeColumnDefinition) colDef, (TreeViewer) columnViewer);
 			}
 		}
+	}
+
+	/**
+	 * set context menu depending on the position of the mouse
+	 * 
+	 * @param table
+	 * @param tableContextMenu
+	 *            can be <code>null</code>
+	 */
+	public void createHeaderContextMenu(final Table table, final Menu tableContextMenu) {
+
+		final Menu headerContextMenu = createHeaderContextMenuInternal(table, tableContextMenu);
+
+		// add the context menu to the table viewer
+		table.addListener(SWT.MenuDetect, new Listener() {
+			public void handleEvent(final Event event) {
+
+				final Decorations shell = table.getShell();
+				final Display display = shell.getDisplay();
+				final Point pt = display.map(null, table, new Point(event.x, event.y));
+				final Rectangle clientArea = table.getClientArea();
+
+				final boolean header = clientArea.y <= pt.y && pt.y < (clientArea.y + table.getHeaderHeight());
+
+				table.setMenu(header ? headerContextMenu : tableContextMenu);
+			}
+		});
+	}
+
+	/**
+	 * set context menu depending on the position of the mouse
+	 * 
+	 * @param tree
+	 * @param treeContextMenu
+	 *            can be <code>null</code>
+	 */
+	public void createHeaderContextMenu(final Tree tree, final Menu treeContextMenu) {
+
+		final Menu headerContextMenu = createHeaderContextMenuInternal(tree, treeContextMenu);
+
+		// add the context menu to the table viewer
+		tree.addListener(SWT.MenuDetect, new Listener() {
+			public void handleEvent(final Event event) {
+
+				final Decorations shell = tree.getShell();
+				final Display display = shell.getDisplay();
+				final Point pt = display.map(null, tree, new Point(event.x, event.y));
+				final Rectangle clientArea = tree.getClientArea();
+
+				final boolean header = clientArea.y <= pt.y && pt.y < (clientArea.y + tree.getHeaderHeight());
+
+				tree.setMenu(header ? headerContextMenu : treeContextMenu);
+			}
+		});
+	}
+
+	private Menu createHeaderContextMenuInternal(final Composite composite, final Menu compositeContextMenu) {
+
+		final Decorations shell = composite.getShell();
+		final Menu headerContextMenu = new Menu(shell, SWT.POP_UP);
+
+		final MenuItem itemName = new MenuItem(headerContextMenu, SWT.PUSH);
+		itemName.setText(Messages.Action_App_ConfigureColumns);
+//		itemName.setImage(image)
+		itemName.addListener(SWT.Selection, new Listener() {
+			public void handleEvent(final Event event) {
+				openColumnDialog();
+			}
+		});
+
+		/*
+		 * IMPORTANT: Dispose the menus (only the current menu, set with setMenu(), will be
+		 * automatically disposed)
+		 */
+		composite.addListener(SWT.Dispose, new Listener() {
+			public void handleEvent(final Event event) {
+				headerContextMenu.dispose();
+				if (compositeContextMenu != null) {
+					compositeContextMenu.dispose();
+				}
+			}
+		});
+		return headerContextMenu;
 	}
 
 	/**
@@ -723,5 +815,4 @@ public class ColumnManager {
 
 		_columnViewer = _tourViewer.recreateViewer(_columnViewer);
 	}
-
 }

@@ -16,9 +16,9 @@
 package net.tourbook.ui;
 
 import net.tourbook.util.ColumnManager;
-import net.tourbook.util.PixelConverter;
 import net.tourbook.util.TreeColumnDefinition;
 
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
 
 public abstract class TreeColumnFactory {

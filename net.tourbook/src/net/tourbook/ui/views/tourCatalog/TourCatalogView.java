@@ -54,7 +54,6 @@ import net.tourbook.ui.views.TourInfoToolTipStyledCellLabelProvider;
 import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
 import net.tourbook.util.ColumnManager;
 import net.tourbook.util.ITourViewer;
-import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 import net.tourbook.util.TreeColumnDefinition;
 
@@ -65,6 +64,7 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -88,7 +88,6 @@ import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ScrollBar;
@@ -153,6 +152,8 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	private TreeViewerTourInfoToolTip	_tourInfoToolTip;
 	private TourDoubleClickState		_tourDoubleClickState				= new TourDoubleClickState();
 
+	private PixelConverter				_pc;
+
 	/*
 	 * UI controls
 	 */
@@ -212,7 +213,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	 * Find the compared tours in the tour map tree viewer<br>
 	 * <br>
 	 * !!! Recursive !!!<br>
-	 *
+	 * 
 	 * @param comparedTours
 	 * @param parentItem
 	 * @param findCompIds
@@ -501,54 +502,16 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		_tagMenuMgr = new TagMenuManager(this, true);
 	}
 
-	/**
-	 * create the views context menu
-	 */
-	private void createContextMenu() {
-
-		final Control controlMenuParent = _tourViewer.getControl();
-
-		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
-		menuMgr.setRemoveAllWhenShown(true);
-		menuMgr.addMenuListener(new IMenuListener() {
-			@Override
-			public void menuAboutToShow(final IMenuManager manager) {
-				fillContextMenu(manager);
-			}
-		});
-
-		final Menu contextMenu = menuMgr.createContextMenu(controlMenuParent);
-		contextMenu.addMenuListener(new MenuAdapter() {
-			@Override
-			public void menuHidden(final MenuEvent e) {
-				_tagMenuMgr.onHideMenu();
-			}
-
-			@Override
-			public void menuShown(final MenuEvent menuEvent) {
-				_tagMenuMgr.onShowMenu(
-						menuEvent,
-						controlMenuParent,
-						Display.getCurrent().getCursorLocation(),
-						_tourInfoToolTip);
-			}
-		});
-
-		// add the context menu to the table viewer
-		controlMenuParent.setMenu(contextMenu);
-	}
-
 	@Override
 	public void createPartControl(final Composite parent) {
+
+		_pc = new PixelConverter(parent);
 
 		// define all columns for the viewer
 		_columnManager = new ColumnManager(this, _state);
 		defineAllColumns(parent);
 
-		_viewerContainer = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
-
-		createTourViewer(_viewerContainer);
+		createUI(parent);
 
 		createActions();
 		fillViewMenu();
@@ -573,7 +536,16 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		}
 	}
 
-	private void createTourViewer(final Composite parent) {
+	private void createUI(final Composite parent) {
+
+		_viewerContainer = new Composite(parent, SWT.NONE);
+		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
+		{
+			createUI10TourViewer(_viewerContainer);
+		}
+	}
+
+	private void createUI10TourViewer(final Composite parent) {
 
 		// tour tree
 		final Tree tree = new Tree(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FLAT | SWT.MULTI | SWT.FULL_SELECTION);
@@ -625,30 +597,60 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 			}
 		});
 
-		createContextMenu();
+		createUI20ContextMenu();
 
 		// set tour info tooltip provider
 		_tourInfoToolTip = new TreeViewerTourInfoToolTip(_tourViewer);
 	}
 
+	/**
+	 * create the views context menu
+	 */
+	private void createUI20ContextMenu() {
+
+		final Tree tree = (Tree) _tourViewer.getControl();
+
+		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+		menuMgr.setRemoveAllWhenShown(true);
+		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
+			public void menuAboutToShow(final IMenuManager manager) {
+				fillContextMenu(manager);
+			}
+		});
+
+		final Menu treeContextMenu = menuMgr.createContextMenu(tree);
+		treeContextMenu.addMenuListener(new MenuAdapter() {
+			@Override
+			public void menuHidden(final MenuEvent e) {
+				_tagMenuMgr.onHideMenu();
+			}
+
+			@Override
+			public void menuShown(final MenuEvent menuEvent) {
+				_tagMenuMgr.onShowMenu(menuEvent, tree, Display.getCurrent().getCursorLocation(), _tourInfoToolTip);
+			}
+		});
+
+		_columnManager.createHeaderContextMenu(tree, treeContextMenu);
+	}
+
 	private void defineAllColumns(final Composite parent) {
 
-		final PixelConverter pc = new PixelConverter(parent);
-
-		defineColumn1stColumn(pc);
-		defineColumnTourType(pc);
-		defineColumnTitle(pc);
-		defineColumnTags(pc);
-		defineColumnSpeed(pc);
+		defineColumn1stColumn();
+		defineColumnTourType();
+		defineColumnTitle();
+		defineColumnTags();
+		defineColumnSpeed();
 
 	}
 
 	/**
 	 * first column: ref tour name/compare tour name /year
 	 */
-	private void defineColumn1stColumn(final PixelConverter pc) {
+	private void defineColumn1stColumn() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.REF_TOUR.createColumn(_columnManager, pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.REF_TOUR.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
 		colDef.setLabelProvider(new TourInfoToolTipStyledCellLabelProvider() {
@@ -723,9 +725,9 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	/**
 	 * column: speed
 	 */
-	private void defineColumnSpeed(final PixelConverter pc) {
+	private void defineColumnSpeed() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.SPEED.createColumn(_columnManager, pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.SPEED.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -748,9 +750,9 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	/**
 	 * column: tags
 	 */
-	private void defineColumnTags(final PixelConverter pc) {
+	private void defineColumnTags() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TAGS.createColumn(_columnManager, pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TAGS.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
 
@@ -782,9 +784,9 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	/**
 	 * column: title
 	 */
-	private void defineColumnTitle(final PixelConverter pc) {
+	private void defineColumnTitle() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.TITLE.createColumn(_columnManager, pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TITLE.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
 
@@ -816,9 +818,9 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	/**
 	 * column: tour type
 	 */
-	private void defineColumnTourType(final PixelConverter pc) {
+	private void defineColumnTourType() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TYPE.createColumn(_columnManager, pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TYPE.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -1048,7 +1050,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 	/**
 	 * Selection changes in the tour map viewer
-	 *
+	 * 
 	 * @param selection
 	 */
 	private void onSelectionChanged(final IStructuredSelection selection) {
@@ -1112,7 +1114,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		{
 			_tourViewer.getTree().dispose();
 
-			createTourViewer(_viewerContainer);
+			createUI10TourViewer(_viewerContainer);
 			_viewerContainer.layout();
 
 			_tourViewer.setInput(_rootItem = new TVICatalogRootItem(this));
@@ -1179,7 +1181,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 	/**
 	 * Select the reference tour in the tour viewer
-	 *
+	 * 
 	 * @param refId
 	 */
 	private void selectRefTour(final long refId) {
@@ -1215,7 +1217,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 	/**
 	 * Update viewer with new saved compared tours
-	 *
+	 * 
 	 * @param persistedCompareResults
 	 */
 	private void updateTourViewer(final ArrayList<TVICompareResultComparedTour> persistedCompareResults) {
@@ -1262,7 +1264,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 	/**
 	 * !!!Recursive !!! update all tour items with new data
-	 *
+	 * 
 	 * @param rootItem
 	 * @param modifiedTours
 	 */

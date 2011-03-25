@@ -18,11 +18,11 @@ package net.tourbook.preferences;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.ui.UI;
+import net.tourbook.util.Util;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.ColorFieldEditor;
 import org.eclipse.jface.preference.FieldEditor;
@@ -31,20 +31,23 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.Bullet;
+import org.eclipse.swt.custom.StyleRange;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.graphics.GlyphMetrics;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
- 
+import org.eclipse.ui.part.PageBook;
+
 public class PrefPageAppearanceMap extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
 	public static final String		MAP_TOUR_SYMBOL_LINE		= "line";											//$NON-NLS-1$
@@ -60,9 +63,13 @@ public class PrefPageAppearanceMap extends FieldEditorPreferencePage implements 
 	private Label					_lblBorderWidth;
 	private Spinner					_spinnerLineWidth;
 	private Spinner					_spinnerBorderWidth;
-	private Text					_txtTourPaintMethod;
+//	private Text					_txtTourPaintMethod;
 	private BooleanFieldEditor		_editorTourWithBorder;
 	private RadioGroupFieldEditor	_editorTourPaintMethod;
+	private PageBook				_pageBookPaintMethod;
+	private StyledText				_pageSimple;
+	private StyledText				_pageComplex;
+	private Composite				_containerPage;
 
 	@Override
 	protected void createFieldEditors() {
@@ -70,40 +77,29 @@ public class PrefPageAppearanceMap extends FieldEditorPreferencePage implements 
 		final Composite parent = getFieldEditorParent();
 		GridLayoutFactory.fillDefaults().applyTo(parent);
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-		{
-			createUITourInMap(container);
-
-			// spacer
-			new Label(container, NONE);
-			new Label(container, NONE);
-
-			/*
-			 * dimming color
-			 */
-			addField(new ColorFieldEditor(
-					ITourbookPreferences.MAP_LAYOUT_DIM_COLOR,
-					Messages.pref_map_layout_dim_color,
-					container));
-
-		}
-		// force layout after the fields are set
-		final GridLayout gl = (GridLayout) container.getLayout();
-		gl.numColumns = 2;
+		createUI(parent);
 
 		restoreState();
 	}
 
-	private void createUITourInMap(final Composite parent) {
+	private void createUI(final Composite parent) {
+
+		_containerPage = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_containerPage);
+		GridLayoutFactory.fillDefaults().applyTo(_containerPage);
+		{
+			createUI10TourProperties(_containerPage);
+			createUI20PaintingMethod(_containerPage);
+			createUI30DimmingColor(_containerPage);
+		}
+	}
+
+	private void createUI10TourProperties(final Composite parent) {
 
 		final Group groupContainer = new Group(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).span(2, 1).applyTo(groupContainer);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(groupContainer);
 		groupContainer.setText(Messages.Pref_MapLayout_Group_TourInMapProperties);
 		{
-			final PixelConverter pc = new PixelConverter(groupContainer);
-
 			/*
 			 * checkbox: plot symbol
 			 */
@@ -182,40 +178,102 @@ public class PrefPageAppearanceMap extends FieldEditorPreferencePage implements 
 					}
 				});
 			}
-
-			/*
-			 * checkbox: paint tour method
-			 */
-
-			final Group groupMethod = new Group(parent, SWT.NONE);
-			GridDataFactory.fillDefaults().span(2, 1).applyTo(groupMethod);
-			groupMethod.setText(Messages.Pref_MapLayout_Label_TourPaintMethod);
-			{
-				_editorTourPaintMethod = new RadioGroupFieldEditor(
-						ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD,
-						UI.EMPTY_STRING,
-						2,
-						new String[][] {
-								{ Messages.Pref_MapLayout_Label_TourPaintMethod_Simple, TOUR_PAINT_METHOD_SIMPLE },
-								{ Messages.Pref_MapLayout_Label_TourPaintMethod_Complex, TOUR_PAINT_METHOD_COMPLEX } },
-						groupMethod);
-
-				addField(_editorTourPaintMethod);
-
-				_txtTourPaintMethod = new Text(groupMethod, SWT.WRAP | SWT.READ_ONLY);
-				GridDataFactory.fillDefaults()//
-						.grab(true, true)
-						.span(2, 1)
-						.hint(pc.convertWidthInCharsToPixels(40), pc.convertHeightInCharsToPixels(12))
-						.applyTo(_txtTourPaintMethod);
-				_txtTourPaintMethod.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-			}
-			// set group margin after the fields are created
-			GridLayoutFactory.swtDefaults().margins(5, 5).numColumns(2).applyTo(groupMethod);
 		}
 
 		// force layout after the fields are set !!!
 		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(groupContainer);
+	}
+
+	private void createUI20PaintingMethod(final Composite parent) {
+
+		final Display display = parent.getDisplay();
+
+		/*
+		 * checkbox: paint tour method
+		 */
+
+		final Group groupMethod = new Group(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().applyTo(groupMethod);
+		groupMethod.setText(Messages.Pref_MapLayout_Label_TourPaintMethod);
+//		groupMethod.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+		{
+			_editorTourPaintMethod = new RadioGroupFieldEditor(
+					ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD,
+					UI.EMPTY_STRING,
+					2,
+					new String[][] {
+							{ Messages.Pref_MapLayout_Label_TourPaintMethod_Simple, TOUR_PAINT_METHOD_SIMPLE },
+							{ Messages.Pref_MapLayout_Label_TourPaintMethod_Complex, TOUR_PAINT_METHOD_COMPLEX } },
+					groupMethod);
+
+			addField(_editorTourPaintMethod);
+
+			_pageBookPaintMethod = new PageBook(groupMethod, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.grab(true, false)
+					.span(2, 1)
+					.hint(350, SWT.DEFAULT)
+					.indent(16, 0)
+					.applyTo(_pageBookPaintMethod);
+
+			// use a bulleted list to display this info
+			final StyleRange style = new StyleRange();
+			style.metrics = new GlyphMetrics(0, 0, 10);
+			final Bullet bullet = new Bullet(style);
+
+			/*
+			 * simple painting method
+			 */
+			String infoText = Messages.Pref_MapLayout_Label_TourPaintMethod_Simple_Tooltip;
+			int lineCount = Util.countCharacter(infoText, '\n');
+
+			_pageSimple = new StyledText(_pageBookPaintMethod, SWT.READ_ONLY | SWT.WRAP | SWT.MULTI);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_pageSimple);
+			_pageSimple.setText(infoText);
+			_pageSimple.setBackground(display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+			_pageSimple.setLineBullet(0, lineCount + 1, bullet);
+			_pageSimple.setLineWrapIndent(0, lineCount + 1, 10);
+
+			/*
+			 * complex painting method
+			 */
+			infoText = Messages.Pref_MapLayout_Label_TourPaintMethod_Complex_Tooltip;
+			lineCount = Util.countCharacter(infoText, '\n');
+
+			_pageComplex = new StyledText(_pageBookPaintMethod, SWT.READ_ONLY | SWT.WRAP | SWT.MULTI);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_pageComplex);
+			_pageComplex.setText(infoText);
+			_pageComplex.setBackground(display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+			_pageComplex.setLineBullet(0, lineCount + 1, bullet);
+			_pageComplex.setLineWrapIndent(0, lineCount + 1, 10);
+
+//			_txtTourPaintMethod = new Text(groupMethod, SWT.WRAP | SWT.READ_ONLY);
+//			GridDataFactory.fillDefaults()//
+//					.grab(true, true)
+//					.span(2, 1)
+//					.indent(16, 0)
+//					.hint(_pc.convertWidthInCharsToPixels(40), _pc.convertHeightInCharsToPixels(12))
+//					.applyTo(_txtTourPaintMethod);
+//			_txtTourPaintMethod.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+		}
+		// set group margin after the fields are created
+		GridLayoutFactory.swtDefaults().margins(0, 5).numColumns(2).applyTo(groupMethod);
+	}
+
+	private void createUI30DimmingColor(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+		{
+			/*
+			 * dimming color
+			 */
+			addField(new ColorFieldEditor(
+					ITourbookPreferences.MAP_LAYOUT_DIM_COLOR,
+					Messages.pref_map_layout_dim_color,
+					container));
+		}
 	}
 
 	private void enableControls(final boolean isWithBorder) {
@@ -338,9 +396,12 @@ public class PrefPageAppearanceMap extends FieldEditorPreferencePage implements 
 	private void setUIPaintMethodInfo(final String value) {
 
 		if (value.equals(TOUR_PAINT_METHOD_SIMPLE)) {
-			_txtTourPaintMethod.setText(Messages.Pref_MapLayout_Label_TourPaintMethod_Simple_Tooltip);
+			_pageBookPaintMethod.showPage(_pageSimple);
+//			_txtTourPaintMethod.setText(Messages.Pref_MapLayout_Label_TourPaintMethod_Simple_Tooltip);
 		} else {
-			_txtTourPaintMethod.setText(Messages.Pref_MapLayout_Label_TourPaintMethod_Complex_Tooltip);
+			_pageBookPaintMethod.showPage(_pageComplex);
+//			_txtTourPaintMethod.setText(Messages.Pref_MapLayout_Label_TourPaintMethod_Complex_Tooltip);
 		}
+		_containerPage.layout(true, true);
 	}
 }

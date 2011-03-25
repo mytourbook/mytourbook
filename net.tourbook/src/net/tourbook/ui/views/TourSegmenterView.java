@@ -53,7 +53,6 @@ import net.tourbook.util.ArrayListToArray;
 import net.tourbook.util.ColumnDefinition;
 import net.tourbook.util.ColumnManager;
 import net.tourbook.util.ITourViewer;
-import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 
 import org.eclipse.jface.action.Action;
@@ -62,6 +61,7 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -196,6 +196,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	 * segmenter type which the user has selected
 	 */
 	private SegmenterType									_userSelectedSegmenterType;
+
+	private PixelConverter									_pc;
 
 	/*
 	 * UI controls
@@ -677,6 +679,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	@Override
 	public void createPartControl(final Composite parent) {
 
+		_pc = new PixelConverter(parent);
+
 		createAllTourSegmenter();
 		setMaxDistanceScale();
 
@@ -698,6 +702,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		// set default value, show segments in opened charts
 		_isShowSegmentsInChart = true;
 		_actionShowSegments.setChecked(_isShowSegmentsInChart);
+
+		_pageBook.showPage(_pageNoData);
 
 		restoreState();
 
@@ -920,52 +926,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		}
 	}
 
-	private void createSegmentViewer(final Composite parent) {
-
-		final Table table = new Table(parent, //
-				SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.MULTI /* | SWT.BORDER */);
-
-		table.setHeaderVisible(true);
-		table.setLinesVisible(true);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
-
-		_segmentViewer = new TableViewer(table);
-		_columnManager.createColumns(_segmentViewer);
-
-		_segmentViewer.setContentProvider(new ViewContentProvider());
-		_segmentViewer.setSorter(new ViewSorter());
-
-		_segmentViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			public void selectionChanged(final SelectionChangedEvent event) {
-
-				final StructuredSelection selection = (StructuredSelection) event.getSelection();
-				if (selection != null) {
-
-					/*
-					 * select the chart sliders according to the selected segment(s)
-					 */
-
-					final Object[] segments = selection.toArray();
-
-					if (segments.length > 0) {
-
-						if (_tourChart == null) {
-							_tourChart = getActiveTourChart(_tourData);
-						}
-
-						final SelectionChartXSliderPosition selectionSliderPosition = //
-						new SelectionChartXSliderPosition(
-								_tourChart,
-								((TourSegment) (segments[0])).serieIndexStart,
-								((TourSegment) (segments[segments.length - 1])).serieIndexEnd);
-
-						_postSelectionProvider.setSelection(selectionSliderPosition);
-					}
-				}
-			}
-		});
-	}
-
 	private void createUI(final Composite parent) {
 
 		_pageBook = new PageBook(parent, SWT.NONE);
@@ -975,16 +935,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		_pageSegmenter = new Composite(_pageBook, SWT.NONE);
 		GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(_pageSegmenter);
-
-		_pageBook.showPage(_pageNoData);
-
-		createUIHeader(_pageSegmenter);
-		createUIViewer(_pageSegmenter);
+		{
+			createUI10Header(_pageSegmenter);
+			createUI20Viewer(_pageSegmenter);
+		}
 	}
 
-	private void createUIHeader(final Composite parent) {
-
-		final PixelConverter pc = new PixelConverter(parent);
+	private void createUI10Header(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -1028,7 +985,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				GridDataFactory.fillDefaults()//
 						.align(SWT.END, SWT.CENTER)
 						.grab(true, false)
-						.hint(pc.convertWidthInCharsToPixels(18), SWT.DEFAULT)
+						.hint(_pc.convertWidthInCharsToPixels(18), SWT.DEFAULT)
 						.applyTo(_lblAltitudeUp);
 				_lblAltitudeUp.setToolTipText(Messages.tour_segmenter_label_tourAltitude_tooltip);
 
@@ -1049,101 +1006,16 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			_pageBookSegmenter = new PageBook(container, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(_pageBookSegmenter);
 			{
-				_pageSegTypeDP = createUISegmenterDP(_pageBookSegmenter);
-				_pageSegTypeByMarker = createUISegmenterByMarker(_pageBookSegmenter);
-				_pageSegTypeByDistance = createUISegmenterByDistance(_pageBookSegmenter);
-				_pageSegTypeByComputedAltiUpDown = createUISegmenterByAltiUpDown(_pageBookSegmenter);
+				_pageSegTypeDP = createUI11SegmenterDP(_pageBookSegmenter);
+				_pageSegTypeByMarker = createUI12SegmenterByMarker(_pageBookSegmenter);
+				_pageSegTypeByDistance = createUI13SegmenterByDistance(_pageBookSegmenter);
+				_pageSegTypeByComputedAltiUpDown = createUI14SegmenterByAltiUpDown(_pageBookSegmenter);
 			}
 		}
 
 	}
 
-	private Composite createUISegmenterByAltiUpDown(final Composite parent) {
-
-//		final PixelConverter pc = new PixelConverter(parent);
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
-		{
-			// label: min alti diff
-			final Label label = new Label(container, SWT.NONE);
-			label.setText(Messages.tour_segmenter_segType_byUpDownAlti_label);
-
-			// combo: min altitude
-			_cboMinAltitude = new Combo(container, SWT.READ_ONLY);
-			_cboMinAltitude.setVisibleItemCount(20);
-			_cboMinAltitude.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					createSegments();
-				}
-			});
-
-			// label: unit
-			_lblMinAltitude = new Label(container, SWT.NONE);
-			_lblMinAltitude.setText(UI.UNIT_LABEL_ALTITUDE);
-		}
-
-		return container;
-	}
-
-	private Composite createUISegmenterByDistance(final Composite parent) {
-
-		final PixelConverter pc = new PixelConverter(parent);
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
-		{
-
-			// label: distance
-			final Label label = new Label(container, SWT.NONE);
-			label.setText(Messages.tour_segmenter_segType_byDistance_label);
-
-			// scale: distance
-			_scaleDistance = new Scale(container, SWT.HORIZONTAL);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleDistance);
-			_scaleDistance.setMaximum(_maxDistanceScale);
-			_scaleDistance.setPageIncrement(_scaleDistancePage);
-			_scaleDistance.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onChangedDistance();
-				}
-			});
-
-			// text: distance value
-			_lblDistanceValue = new Label(container, SWT.TRAIL);
-			_lblDistanceValue.setText(Messages.tour_segmenter_segType_byDistance_defaultDistance);
-			GridDataFactory.fillDefaults()//
-					.align(SWT.FILL, SWT.CENTER)
-					.hint(pc.convertWidthInCharsToPixels(8), SWT.DEFAULT)
-					.applyTo(_lblDistanceValue);
-		}
-
-		return container;
-	}
-
-	private Composite createUISegmenterByMarker(final Composite parent) {
-
-		/*
-		 * display NONE, this is not easy to do - or I didn't find an easier way
-		 */
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().applyTo(container);
-		{
-			final Canvas canvas = new Canvas(container, SWT.NONE);
-			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).hint(1, 1).applyTo(canvas);
-		}
-
-		return container;
-	}
-
-	private Composite createUISegmenterDP(final Composite parent) {
-
-		final PixelConverter pc = new PixelConverter(parent);
+	private Composite createUI11SegmenterDP(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -1172,25 +1044,161 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			GridDataFactory
 					.fillDefaults()
 					.align(SWT.FILL, SWT.CENTER)
-					.hint(pc.convertWidthInCharsToPixels(4), SWT.DEFAULT)
+					.hint(_pc.convertWidthInCharsToPixels(4), SWT.DEFAULT)
 					.applyTo(_lblToleranceValue);
 		}
 
 		return container;
 	}
 
-	private void createUIViewer(final Composite parent) {
+	private Composite createUI12SegmenterByMarker(final Composite parent) {
+
+		/*
+		 * display NONE, this is not easy to do - or I didn't find an easier way
+		 */
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().applyTo(container);
+		{
+			final Canvas canvas = new Canvas(container, SWT.NONE);
+			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).hint(1, 1).applyTo(canvas);
+		}
+
+		return container;
+	}
+
+	private Composite createUI13SegmenterByDistance(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+		{
+
+			// label: distance
+			final Label label = new Label(container, SWT.NONE);
+			label.setText(Messages.tour_segmenter_segType_byDistance_label);
+
+			// scale: distance
+			_scaleDistance = new Scale(container, SWT.HORIZONTAL);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleDistance);
+			_scaleDistance.setMaximum(_maxDistanceScale);
+			_scaleDistance.setPageIncrement(_scaleDistancePage);
+			_scaleDistance.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onChangedDistance();
+				}
+			});
+
+			// text: distance value
+			_lblDistanceValue = new Label(container, SWT.TRAIL);
+			_lblDistanceValue.setText(Messages.tour_segmenter_segType_byDistance_defaultDistance);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.FILL, SWT.CENTER)
+					.hint(_pc.convertWidthInCharsToPixels(8), SWT.DEFAULT)
+					.applyTo(_lblDistanceValue);
+		}
+
+		return container;
+	}
+
+	private Composite createUI14SegmenterByAltiUpDown(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+		{
+			// label: min alti diff
+			final Label label = new Label(container, SWT.NONE);
+			label.setText(Messages.tour_segmenter_segType_byUpDownAlti_label);
+
+			// combo: min altitude
+			_cboMinAltitude = new Combo(container, SWT.READ_ONLY);
+			_cboMinAltitude.setVisibleItemCount(20);
+			_cboMinAltitude.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					createSegments();
+				}
+			});
+
+			// label: unit
+			_lblMinAltitude = new Label(container, SWT.NONE);
+			_lblMinAltitude.setText(UI.UNIT_LABEL_ALTITUDE);
+		}
+
+		return container;
+	}
+
+	private void createUI20Viewer(final Composite parent) {
 
 		_viewerContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(_viewerContainer);
 		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
+		{
+			createUI30SegmentViewer(_viewerContainer);
+		}
+	}
 
-		createSegmentViewer(_viewerContainer);
+	private void createUI30SegmentViewer(final Composite parent) {
+
+		final Table table = new Table(parent, //
+				SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.MULTI /* | SWT.BORDER */);
+
+		table.setHeaderVisible(true);
+		table.setLinesVisible(true);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
+
+		_segmentViewer = new TableViewer(table);
+		_columnManager.createColumns(_segmentViewer);
+
+		_segmentViewer.setContentProvider(new ViewContentProvider());
+		_segmentViewer.setSorter(new ViewSorter());
+
+		_segmentViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			public void selectionChanged(final SelectionChangedEvent event) {
+
+				final StructuredSelection selection = (StructuredSelection) event.getSelection();
+				if (selection != null) {
+
+					/*
+					 * select the chart sliders according to the selected segment(s)
+					 */
+
+					final Object[] segments = selection.toArray();
+
+					if (segments.length > 0) {
+
+						if (_tourChart == null) {
+							_tourChart = getActiveTourChart(_tourData);
+						}
+
+						final SelectionChartXSliderPosition selectionSliderPosition = //
+						new SelectionChartXSliderPosition(
+								_tourChart,
+								((TourSegment) (segments[0])).serieIndexStart,
+								((TourSegment) (segments[segments.length - 1])).serieIndexEnd);
+
+						_postSelectionProvider.setSelection(selectionSliderPosition);
+					}
+				}
+			}
+		});
+
+		createUI40ContextMenu();
+	}
+
+	/**
+	 * create the views context menu
+	 */
+	private void createUI40ContextMenu() {
+
+		final Table table = (Table) _segmentViewer.getControl();
+
+		_columnManager.createHeaderContextMenu(table, null);
 	}
 
 	private void defineAllColumns(final Composite parent) {
-
-		final PixelConverter pc = new PixelConverter(parent);
 
 		final SelectionAdapter defaultListener = new SelectionAdapter() {
 			@Override
@@ -1200,44 +1208,43 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			}
 		};
 
-		defineColumnRecordingTimeTotal(pc, defaultListener);
+		defineColumnRecordingTimeTotal(defaultListener);
 
-		defineColumnDistanceTotal(pc, defaultListener);
-		defineColumnDistance(pc, defaultListener);
+		defineColumnDistanceTotal(defaultListener);
+		defineColumnDistance(defaultListener);
 
-		defineColumnRecordingTime(pc, defaultListener);
-		defineColumnDrivingTime(pc, defaultListener);
-		defineColumnPausedTime(pc, defaultListener);
+		defineColumnRecordingTime(defaultListener);
+		defineColumnDrivingTime(defaultListener);
+		defineColumnPausedTime(defaultListener);
 
-		defineColumnAltitudeDiffSegmentBorder(pc, defaultListener);
-		defineColumnAltitudeDiffSegmentComputed(pc, defaultListener);
-		defineColumnAltitudeUpSummarizedComputed(pc, defaultListener);
-		defineColumnAltitudeDownSummarizedComputed(pc, defaultListener);
+		defineColumnAltitudeDiffSegmentBorder(defaultListener);
+		defineColumnAltitudeDiffSegmentComputed(defaultListener);
+		defineColumnAltitudeUpSummarizedComputed(defaultListener);
+		defineColumnAltitudeDownSummarizedComputed(defaultListener);
 
-		defineColumnGradient(pc);
+		defineColumnGradient();
 
-		defineColumnAltitudeUpHour(pc, defaultListener);
-		defineColumnAltitudeDownHour(pc, defaultListener);
+		defineColumnAltitudeUpHour(defaultListener);
+		defineColumnAltitudeDownHour(defaultListener);
 
-		defineColumnAvgSpeed(pc);
-		defineColumnAvgPace(pc);
-		defineColumnAvgPaceDifference(pc);
-		defineColumnAvgPulse(pc);
-		defineColumnAvgPulseDifference(pc);
+		defineColumnAvgSpeed();
+		defineColumnAvgPace();
+		defineColumnAvgPaceDifference();
+		defineColumnAvgPulse();
+		defineColumnAvgPulseDifference();
 
-		defineColumnAltitudeUpSummarizedBorder(pc, defaultListener);
-		defineColumnAltitudeDownSummarizedBorder(pc, defaultListener);
+		defineColumnAltitudeUpSummarizedBorder(defaultListener);
+		defineColumnAltitudeDownSummarizedBorder(defaultListener);
 	}
 
 	/**
 	 * column: altitude diff segment border (m/ft)
 	 */
-	private void defineColumnAltitudeDiffSegmentBorder(	final PixelConverter pc,
-														final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumnAltitudeDiffSegmentBorder(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
-		colDef = TableColumnFactory.ALTITUDE_DIFF_SEGMENT_BORDER.createColumn(_columnManager, pc);
+		colDef = TableColumnFactory.ALTITUDE_DIFF_SEGMENT_BORDER.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.addSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -1257,12 +1264,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: computed altitude diff (m/ft)
 	 */
-	private void defineColumnAltitudeDiffSegmentComputed(	final PixelConverter pc,
-															final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumnAltitudeDiffSegmentComputed(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
-		colDef = TableColumnFactory.ALTITUDE_DIFF_SEGMENT_COMPUTED.createColumn(_columnManager, pc);
+		colDef = TableColumnFactory.ALTITUDE_DIFF_SEGMENT_COMPUTED.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.addSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -1282,12 +1288,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: altitude down m/h
 	 */
-	private void defineColumnAltitudeDownHour(	final PixelConverter pc,
-												final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumnAltitudeDownHour(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
-		colDef = TableColumnFactory.ALTITUDE_DOWN_H.createColumn(_columnManager, pc);
+		colDef = TableColumnFactory.ALTITUDE_DOWN_H.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.addSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -1314,12 +1319,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: total altitude down (m/ft)
 	 */
-	private void defineColumnAltitudeDownSummarizedBorder(	final PixelConverter pc,
-															final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumnAltitudeDownSummarizedBorder(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
-		colDef = TableColumnFactory.ALTITUDE_DOWN_SUMMARIZED_BORDER.createColumn(_columnManager, pc);
+		colDef = TableColumnFactory.ALTITUDE_DOWN_SUMMARIZED_BORDER.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.addSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -1336,12 +1340,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: total altitude down (m/ft)
 	 */
-	private void defineColumnAltitudeDownSummarizedComputed(final PixelConverter pc,
-															final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumnAltitudeDownSummarizedComputed(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
-		colDef = TableColumnFactory.ALTITUDE_DOWN_SUMMARIZED_COMPUTED.createColumn(_columnManager, pc);
+		colDef = TableColumnFactory.ALTITUDE_DOWN_SUMMARIZED_COMPUTED.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.addSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -1358,12 +1361,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: altitude up m/h
 	 */
-	private void defineColumnAltitudeUpHour(final PixelConverter pc,
-											final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumnAltitudeUpHour(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
-		colDef = TableColumnFactory.ALTITUDE_UP_H.createColumn(_columnManager, pc);
+		colDef = TableColumnFactory.ALTITUDE_UP_H.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.addSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -1388,12 +1390,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: total altitude up (m/ft)
 	 */
-	private void defineColumnAltitudeUpSummarizedBorder(final PixelConverter pc,
-														final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumnAltitudeUpSummarizedBorder(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
-		colDef = TableColumnFactory.ALTITUDE_UP_SUMMARIZED_BORDER.createColumn(_columnManager, pc);
+		colDef = TableColumnFactory.ALTITUDE_UP_SUMMARIZED_BORDER.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.addSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -1410,12 +1411,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: total altitude up (m/ft)
 	 */
-	private void defineColumnAltitudeUpSummarizedComputed(	final PixelConverter pc,
-															final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumnAltitudeUpSummarizedComputed(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
-		colDef = TableColumnFactory.ALTITUDE_UP_SUMMARIZED_COMPUTED.createColumn(_columnManager, pc);
+		colDef = TableColumnFactory.ALTITUDE_UP_SUMMARIZED_COMPUTED.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.addSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -1432,11 +1432,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: average pace
 	 */
-	private void defineColumnAvgPace(final PixelConverter pc) {
+	private void defineColumnAvgPace() {
 
 		final ColumnDefinition colDef;
 
-		colDef = TableColumnFactory.AVG_PACE.createColumn(_columnManager, pc);
+		colDef = TableColumnFactory.AVG_PACE.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -1458,11 +1458,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: pace difference
 	 */
-	private void defineColumnAvgPaceDifference(final PixelConverter pc) {
+	private void defineColumnAvgPaceDifference() {
 
 		final ColumnDefinition colDef;
 
-		colDef = TableColumnFactory.AVG_PACE_DIFFERENCE.createColumn(_columnManager, pc);
+		colDef = TableColumnFactory.AVG_PACE_DIFFERENCE.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -1477,11 +1477,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: average pulse
 	 */
-	private void defineColumnAvgPulse(final PixelConverter pc) {
+	private void defineColumnAvgPulse() {
 
 		final ColumnDefinition colDef;
 
-		colDef = TableColumnFactory.AVG_PULSE.createColumn(_columnManager, pc);
+		colDef = TableColumnFactory.AVG_PULSE.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -1508,11 +1508,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: pulse difference
 	 */
-	private void defineColumnAvgPulseDifference(final PixelConverter pc) {
+	private void defineColumnAvgPulseDifference() {
 
 		final ColumnDefinition colDef;
 
-		colDef = TableColumnFactory.AVG_PULSE_DIFFERENCE.createColumn(_columnManager, pc);
+		colDef = TableColumnFactory.AVG_PULSE_DIFFERENCE.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -1534,11 +1534,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: average speed
 	 */
-	private void defineColumnAvgSpeed(final PixelConverter pc) {
+	private void defineColumnAvgSpeed() {
 
 		final ColumnDefinition colDef;
 
-		colDef = TableColumnFactory.AVG_SPEED.createColumn(_columnManager, pc);
+		colDef = TableColumnFactory.AVG_SPEED.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -1560,11 +1560,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: distance (km/mile)
 	 */
-	private void defineColumnDistance(final PixelConverter pc, final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumnDistance(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
-		colDef = TableColumnFactory.DISTANCE.createColumn(_columnManager, pc);
+		colDef = TableColumnFactory.DISTANCE.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.addSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -1581,12 +1581,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: TOTAL distance (km/mile)
 	 */
-	private void defineColumnDistanceTotal(	final PixelConverter pc,
-											final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumnDistanceTotal(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
-		colDef = TableColumnFactory.DISTANCE_TOTAL.createColumn(_columnManager, pc);
+		colDef = TableColumnFactory.DISTANCE_TOTAL.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.addSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -1603,11 +1602,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: driving time
 	 */
-	private void defineColumnDrivingTime(final PixelConverter pc, final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumnDrivingTime(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
-		colDef = TableColumnFactory.DRIVING_TIME.createColumn(_columnManager, pc);
+		colDef = TableColumnFactory.DRIVING_TIME.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.addSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -1622,11 +1621,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: gradient
 	 */
-	private void defineColumnGradient(final PixelConverter pc) {
+	private void defineColumnGradient() {
 
 		final ColumnDefinition colDef;
 
-		colDef = TableColumnFactory.GRADIENT.createColumn(_columnManager, pc);
+		colDef = TableColumnFactory.GRADIENT.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -1649,11 +1648,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: break time
 	 */
-	private void defineColumnPausedTime(final PixelConverter pc, final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumnPausedTime(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
-		colDef = TableColumnFactory.PAUSED_TIME.createColumn(_columnManager, pc);
+		colDef = TableColumnFactory.PAUSED_TIME.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.addSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -1673,12 +1672,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: recording time
 	 */
-	private void defineColumnRecordingTime(	final PixelConverter pc,
-											final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumnRecordingTime(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
-		colDef = TableColumnFactory.RECORDING_TIME.createColumn(_columnManager, pc);
+		colDef = TableColumnFactory.RECORDING_TIME.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.addSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -1693,12 +1691,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: TOTAL recording time
 	 */
-	private void defineColumnRecordingTimeTotal(final PixelConverter pc,
-												final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumnRecordingTimeTotal(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
-		colDef = TableColumnFactory.RECORDING_TIME_TOTAL.createColumn(_columnManager, pc);
+		colDef = TableColumnFactory.RECORDING_TIME_TOTAL.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.addSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -2081,7 +2078,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		{
 			_segmentViewer.getTable().dispose();
 
-			createSegmentViewer(_viewerContainer);
+			createUI30SegmentViewer(_viewerContainer);
 			_viewerContainer.layout();
 
 			// update the viewer

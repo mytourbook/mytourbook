@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -258,7 +258,9 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 			}
 		});
 
-		// set drag adapter
+		/*
+		 * set drag adapter
+		 */
 		_filterViewer.addDragSupport(
 				DND.DROP_MOVE,
 				new Transfer[] { LocalSelectionTransfer.getTransfer() },
@@ -292,18 +294,20 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 					}
 				});
 
-		// set drop adapter
+		/*
+		 * set drop adapter
+		 */
 		final ViewerDropAdapter viewerDropAdapter = new ViewerDropAdapter(_filterViewer) {
 
-			private Widget	fTableItem;
+			private Widget	_tableItem;
 
 			@Override
-			public void dragOver(final DropTargetEvent event) {
+			public void dragOver(final DropTargetEvent dropEvent) {
 
 				// keep table item
-				fTableItem = event.item;
+				_tableItem = dropEvent.item;
 
-				super.dragOver(event);
+				super.dragOver(dropEvent);
 			}
 
 			@Override
@@ -329,7 +333,7 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 
 						int filterIndex;
 
-						if (fTableItem == null) {
+						if (_tableItem == null) {
 
 							_filterViewer.add(filterItem);
 							filterIndex = filterTable.getItemCount() - 1;
@@ -337,7 +341,7 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 						} else {
 
 							// get index of the target in the table
-							filterIndex = filterTable.indexOf((TableItem) fTableItem);
+							filterIndex = filterTable.indexOf((TableItem) _tableItem);
 							if (filterIndex == -1) {
 								return false;
 							}

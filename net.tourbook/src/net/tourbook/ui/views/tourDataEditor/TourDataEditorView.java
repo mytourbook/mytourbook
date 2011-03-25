@@ -85,7 +85,6 @@ import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 import net.tourbook.util.ColumnDefinition;
 import net.tourbook.util.ColumnManager;
 import net.tourbook.util.ITourViewer;
-import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 import net.tourbook.util.StatusUtil;
 import net.tourbook.util.Util;
@@ -107,6 +106,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -1555,7 +1555,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	/**
 	 * delete selected time slices
-	 *
+	 * 
 	 * @param isRemoveTime
 	 */
 	void actionDeleteTimeSlices(final boolean isRemoveTime) {
@@ -2027,7 +2027,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	/**
 	 * Checks if a marker is within the selected time slices
-	 *
+	 * 
 	 * @param firstSliceIndex
 	 * @param lastSliceIndex
 	 * @return Returns <code>true</code> when the marker can be deleted or there is no marker <br>
@@ -2111,7 +2111,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	/**
 	 * Convert temperature serie into double
-	 *
+	 * 
 	 * @param temperatureSerie
 	 */
 	private double[] convertTemperatureSerie(final int[] temperatureSerie) {
@@ -2356,108 +2356,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	}
 
 	/**
-	 * @param parent
-	 */
-	private void createMarkerViewer(final Composite parent) {
-
-		final Composite layoutContainer = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(layoutContainer);
-
-		final TableColumnLayout tableLayout = new TableColumnLayout();
-		layoutContainer.setLayout(tableLayout);
-
-		/*
-		 * create table
-		 */
-		final Table table = new Table(layoutContainer, SWT.FULL_SELECTION | SWT.MULTI);
-
-		table.setHeaderVisible(true);
-		table.setLinesVisible(true);
-//		table.setLinesVisible(TourbookPlugin.getDefault()
-//				.getPreferenceStore()
-//				.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
-
-		/*
-		 * create viewer
-		 */
-		_markerViewer = new TableViewer(table);
-		if (_isRowEditMode == false) {
-			setCellEditSupport(_markerViewer);
-		}
-
-		// create editing support after the viewer is created but before the columns are created
-		final TextCellEditor cellEditor = new TextCellEditorCustomized(_markerViewer.getTable());
-		_colDefMarker.setEditingSupport(new MarkerEditingSupport(cellEditor));
-
-		_markerColumnManager.setColumnLayout(tableLayout);
-		_markerColumnManager.createColumns(_markerViewer);
-
-		_markerViewer.setUseHashlookup(true);
-		_markerViewer.setContentProvider(new MarkerViewerContentProvicer());
-		_markerViewer.setSorter(new MarkerViewerSorter());
-		createMarkerViewerContextMenu(table);
-
-		_markerViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			@Override
-			public void selectionChanged(final SelectionChangedEvent event) {
-				onMarkerViewerSelectionChanged();
-			}
-		});
-
-		_markerViewer.addDoubleClickListener(new IDoubleClickListener() {
-			@Override
-			public void doubleClick(final DoubleClickEvent event) {
-
-				if (_isEditMode == false || isTourInDb() == false) {
-					return;
-				}
-
-				// edit selected marker
-				final IStructuredSelection selection = (IStructuredSelection) _markerViewer.getSelection();
-				if (selection.size() > 0) {
-					_actionOpenMarkerDialog.setSelectedMarker((TourMarker) selection.getFirstElement());
-					_actionOpenMarkerDialog.run();
-				}
-			}
-		});
-
-		table.addKeyListener(new KeyAdapter() {
-			@Override
-			public void keyPressed(final KeyEvent e) {
-
-				if ((_isEditMode == false) || (isTourInDb() == false)) {
-					return;
-				}
-
-				if (e.keyCode == SWT.DEL) {
-					actionDeleteTourMarker();
-				}
-			}
-		});
-	}
-
-	/**
-	 * create the views context menu
-	 *
-	 * @param table
-	 */
-	private void createMarkerViewerContextMenu(final Table table) {
-
-		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
-		menuMgr.setRemoveAllWhenShown(true);
-		menuMgr.addMenuListener(new IMenuListener() {
-			@Override
-			public void menuAboutToShow(final IMenuManager manager) {
-				fillMarkerContextMenu(manager);
-			}
-		});
-
-		table.setMenu(menuMgr.createContextMenu(table));
-
-		getSite().registerContextMenu(menuMgr, _markerViewer);
-	}
-
-	/**
 	 * create the drop down menus, this must be created after the parent control is created
 	 */
 	private void createMenus() {
@@ -2530,14 +2428,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	@Override
 	public void createPartControl(final Composite parent) {
 
+		_pc = new PixelConverter(parent);
+
 		updateInternalUnitValues();
 
 		// define columns for the viewers
 		_sliceColumnManager = new ColumnManager(this, _viewStateSlice);
-		defineSliceViewerColumns(parent);
+		defineSliceViewerAllColumns(parent);
 
 		_markerColumnManager = new ColumnManager(this, _viewStateMarker);
-		defineMarkerViewerColumns(parent);
+		defineMarkerViewerAllColumns(parent);
 
 		restoreStateBeforeUI();
 
@@ -2595,10 +2495,59 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		return section;
 	}
 
+	private void createUI(final Composite parent) {
+
+		_hintDefaultSpinnerWidth = _isLinux ? SWT.DEFAULT : _pc.convertWidthInCharsToPixels(_isOSX ? 14 : 7);
+
+		_pageBook = new PageBook(parent, SWT.NONE);
+		_pageBook.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+		_pageNoTour = new Label(_pageBook, SWT.NONE);
+		_pageNoTour.setText(Messages.UI_Label_no_chart_is_selected);
+
+		_tk = new FormToolkit(parent.getDisplay());
+
+		_pageEditorForm = _tk.createForm(_pageBook);
+		_tk.decorateFormHeading(_pageEditorForm);
+
+		_messageManager = new MessageManager(_pageEditorForm);
+
+		final Composite formBody = _pageEditorForm.getBody();
+		GridLayoutFactory.fillDefaults().applyTo(formBody);
+		formBody.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+
+		_tabFolder = new CTabFolder(formBody, SWT.FLAT | SWT.BOTTOM);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_tabFolder);
+
+		_tabFolder.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				onSelectTab();
+			}
+		});
+		{
+			_tabTour = new CTabItem(_tabFolder, SWT.FLAT);
+			_tabTour.setText(Messages.tour_editor_tabLabel_tour);
+			_tabTour.setControl(createUITab10Tour(_tabFolder));
+
+			_tabMarker = new CTabItem(_tabFolder, SWT.FLAT);
+			_tabMarker.setText(Messages.tour_editor_tabLabel_tour_marker);
+			_tabMarker.setControl(createUITab20Marker(_tabFolder));
+
+			_tabSlices = new CTabItem(_tabFolder, SWT.FLAT);
+			_tabSlices.setText(Messages.tour_editor_tabLabel_tour_data);
+			_tabSlices.setControl(createUITab30Slices(_tabFolder));
+
+			_tabInfo = new CTabItem(_tabFolder, SWT.FLAT);
+			_tabInfo.setText(Messages.tour_editor_tabLabel_info);
+			_tabInfo.setControl(createUITab40Info(_tabFolder));
+		}
+	}
+
 	/**
 	 * @param parent
 	 */
-	private void createSliceViewer(final Composite parent) {
+	private void createUI10SliceViewer(final Composite parent) {
 
 		// table
 		final Table table = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.MULTI);
@@ -2608,7 +2557,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		table.setLinesVisible(true);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
 
-		createSliceViewerContextMenu(table);
+		createUI12SliceViewerContextMenu(table);
 
 //		table.addTraverseListener(new TraverseListener() {
 //			public void keyTraversed(final TraverseEvent e) {
@@ -2707,7 +2656,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		table.getColumn(0).setWidth(0);
 	}
 
-	private void createSliceViewerContextMenu(final Table table) {
+	private void createUI12SliceViewerContextMenu(final Table table) {
 
 		final MenuManager menuMgr = new MenuManager();
 
@@ -2722,55 +2671,106 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		table.setMenu(menuMgr.createContextMenu(table));
 	}
 
-	private void createUI(final Composite parent) {
+	/**
+	 * @param parent
+	 */
+	private void createUI20MarkerViewer(final Composite parent) {
 
-		final PixelConverter pixelConverter = new PixelConverter(parent);
-		_hintDefaultSpinnerWidth = _isLinux ? SWT.DEFAULT : pixelConverter.convertWidthInCharsToPixels(_isOSX ? 14 : 7);
+		final Composite layoutContainer = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(layoutContainer);
 
-		_pageBook = new PageBook(parent, SWT.NONE);
-		_pageBook.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		final TableColumnLayout tableLayout = new TableColumnLayout();
+		layoutContainer.setLayout(tableLayout);
 
-		_pageNoTour = new Label(_pageBook, SWT.NONE);
-		_pageNoTour.setText(Messages.UI_Label_no_chart_is_selected);
+		/*
+		 * create table
+		 */
+		final Table table = new Table(layoutContainer, SWT.FULL_SELECTION | SWT.MULTI);
 
-		_tk = new FormToolkit(parent.getDisplay());
+		table.setHeaderVisible(true);
+		table.setLinesVisible(true);
+//		table.setLinesVisible(TourbookPlugin.getDefault()
+//				.getPreferenceStore()
+//				.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
-		_pageEditorForm = _tk.createForm(_pageBook);
-		_tk.decorateFormHeading(_pageEditorForm);
+		/*
+		 * create viewer
+		 */
+		_markerViewer = new TableViewer(table);
+		if (_isRowEditMode == false) {
+			setCellEditSupport(_markerViewer);
+		}
 
-		_messageManager = new MessageManager(_pageEditorForm);
-		_pc = new PixelConverter(parent);
+		// create editing support after the viewer is created but before the columns are created
+		final TextCellEditor cellEditor = new TextCellEditorCustomized(_markerViewer.getTable());
+		_colDefMarker.setEditingSupport(new MarkerEditingSupport(cellEditor));
 
-		final Composite formBody = _pageEditorForm.getBody();
-		GridLayoutFactory.fillDefaults().applyTo(formBody);
-		formBody.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+		_markerColumnManager.setColumnLayout(tableLayout);
+		_markerColumnManager.createColumns(_markerViewer);
 
-		_tabFolder = new CTabFolder(formBody, SWT.FLAT | SWT.BOTTOM);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(_tabFolder);
+		_markerViewer.setUseHashlookup(true);
+		_markerViewer.setContentProvider(new MarkerViewerContentProvicer());
+		_markerViewer.setSorter(new MarkerViewerSorter());
+		createUI22MarkerViewerContextMenu(table);
 
-		_tabFolder.addSelectionListener(new SelectionAdapter() {
+		_markerViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onSelectTab();
+			public void selectionChanged(final SelectionChangedEvent event) {
+				onMarkerViewerSelectionChanged();
 			}
 		});
 
-		_tabTour = new CTabItem(_tabFolder, SWT.FLAT);
-		_tabTour.setText(Messages.tour_editor_tabLabel_tour);
-		_tabTour.setControl(createUITab10Tour(_tabFolder));
+		_markerViewer.addDoubleClickListener(new IDoubleClickListener() {
+			@Override
+			public void doubleClick(final DoubleClickEvent event) {
 
-		_tabMarker = new CTabItem(_tabFolder, SWT.FLAT);
-		_tabMarker.setText(Messages.tour_editor_tabLabel_tour_marker);
-		_tabMarker.setControl(createUITab20Marker(_tabFolder));
+				if (_isEditMode == false || isTourInDb() == false) {
+					return;
+				}
 
-		_tabSlices = new CTabItem(_tabFolder, SWT.FLAT);
-		_tabSlices.setText(Messages.tour_editor_tabLabel_tour_data);
-		_tabSlices.setControl(createUITab30Slices(_tabFolder));
+				// edit selected marker
+				final IStructuredSelection selection = (IStructuredSelection) _markerViewer.getSelection();
+				if (selection.size() > 0) {
+					_actionOpenMarkerDialog.setSelectedMarker((TourMarker) selection.getFirstElement());
+					_actionOpenMarkerDialog.run();
+				}
+			}
+		});
 
-		_tabInfo = new CTabItem(_tabFolder, SWT.FLAT);
-		_tabInfo.setText(Messages.tour_editor_tabLabel_info);
-		_tabInfo.setControl(createUITab40Info(_tabFolder));
+		table.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(final KeyEvent e) {
 
+				if ((_isEditMode == false) || (isTourInDb() == false)) {
+					return;
+				}
+
+				if (e.keyCode == SWT.DEL) {
+					actionDeleteTourMarker();
+				}
+			}
+		});
+	}
+
+	/**
+	 * create the views context menu
+	 * 
+	 * @param table
+	 */
+	private void createUI22MarkerViewerContextMenu(final Table table) {
+
+		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+		menuMgr.setRemoveAllWhenShown(true);
+		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
+			public void menuAboutToShow(final IMenuManager manager) {
+				fillMarkerContextMenu(manager);
+			}
+		});
+
+		table.setMenu(menuMgr.createContextMenu(table));
+
+		getSite().registerContextMenu(menuMgr, _markerViewer);
 	}
 
 	private void createUISection110Title(final Composite parent) {
@@ -3813,7 +3813,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			GridDataFactory.fillDefaults().grab(true, true).applyTo(_markerViewerContainer);
 			GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(_markerViewerContainer);
 
-			createMarkerViewer(_markerViewerContainer);
+			createUI20MarkerViewer(_markerViewerContainer);
 		}
 
 		return markerContainer;
@@ -3833,7 +3833,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			GridDataFactory.fillDefaults().grab(true, true).applyTo(_sliceViewerContainer);
 			GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(_sliceViewerContainer);
 
-			createSliceViewer(_sliceViewerContainer);
+			createUI10SliceViewer(_sliceViewerContainer);
 
 			_timeSliceLabel = new Label(_tab3Container, SWT.WRAP);
 			_timeSliceLabel.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_INFO_FOREGROUND));
@@ -3874,28 +3874,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		return _tab4Container;
 	}
 
-	private void defineMarkerViewerColumns(final Composite parent) {
+	private void defineMarkerViewerAllColumns(final Composite parent) {
 
-		final PixelConverter pixelConverter = new PixelConverter(parent);
+		defineMarkerViewerColumnTime();
+		defineMarkerViewerColumnDistance();
+		defineMarkerViewerColumnMarker();
+	}
 
-		ColumnDefinition colDef;
+	/**
+	 * column: distance
+	 */
+	private void defineMarkerViewerColumnDistance() {
 
-		/*
-		 * column: time
-		 */
-		colDef = TableColumnFactory.TOUR_TIME_HH_MM_SS.createColumn(_markerColumnManager, pixelConverter);
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				cell.setText(UI.format_hh_mm_ss(((TourMarker) cell.getElement()).getTime()));
-			}
-		});
-
-		/*
-		 * column: distance
-		 */
-		colDef = TableColumnFactory.DISTANCE.createColumn(_markerColumnManager, pixelConverter);
+		final ColumnDefinition colDef = TableColumnFactory.DISTANCE.createColumn(_markerColumnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -3915,11 +3906,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				}
 			}
 		});
+	}
 
-		/*
-		 * column: marker
-		 */
-		_colDefMarker = colDef = TableColumnFactory.MARKER.createColumn(_markerColumnManager, pixelConverter);
+	/**
+	 * column: marker
+	 */
+	private void defineMarkerViewerColumnMarker() {
+
+		ColumnDefinition colDef;
+		_colDefMarker = colDef = TableColumnFactory.MARKER.createColumn(_markerColumnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -3931,37 +3926,48 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		});
 	}
 
-	private void defineSliceViewerColumns(final Composite parent) {
+	/**
+	 * column: time
+	 */
+	private void defineMarkerViewerColumnTime() {
 
-		final PixelConverter pc = new PixelConverter(parent);
+		final ColumnDefinition colDef = TableColumnFactory.TOUR_TIME_HH_MM_SS.createColumn(_markerColumnManager, _pc);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				cell.setText(UI.format_hh_mm_ss(((TourMarker) cell.getElement()).getTime()));
+			}
+		});
+	}
 
-		defineSliceViewerColumns_1_First(pc);
-		defineSliceViewerColumns_Sequence(pc);
-		defineSliceViewerColumns_TimeInHHMMSSRelative(pc);
-		defineSliceViewerColumns_TimeOfDay(pc);
-		defineSliceViewerColumns_TimeInSeconds(pc);
-		defineSliceViewerColumns_Distance(pc);
-		defineSliceViewerColumns_Altitude(pc);
-		defineSliceViewerColumns_Gradient(pc);
-		defineSliceViewerColumns_Pulse(pc);
-		defineSliceViewerColumns_Marker(pc);
-		defineSliceViewerColumns_Temperature(pc);
-		defineSliceViewerColumns_Cadence(pc);
-		defineSliceViewerColumns_Speed(pc);
-		defineSliceViewerColumns_Pace(pc);
-		defineSliceViewerColumns_Power(pc);
-		defineSliceViewerColumns_Latitude(pc);
-		defineSliceViewerColumns_Longitude(pc);
+	private void defineSliceViewerAllColumns(final Composite parent) {
+
+		defineSliceViewerColumns_1_First();
+		defineSliceViewerColumns_Sequence();
+		defineSliceViewerColumns_TimeInHHMMSSRelative();
+		defineSliceViewerColumns_TimeOfDay();
+		defineSliceViewerColumns_TimeInSeconds();
+		defineSliceViewerColumns_Distance();
+		defineSliceViewerColumns_Altitude();
+		defineSliceViewerColumns_Gradient();
+		defineSliceViewerColumns_Pulse();
+		defineSliceViewerColumns_Marker();
+		defineSliceViewerColumns_Temperature();
+		defineSliceViewerColumns_Cadence();
+		defineSliceViewerColumns_Speed();
+		defineSliceViewerColumns_Pace();
+		defineSliceViewerColumns_Power();
+		defineSliceViewerColumns_Latitude();
+		defineSliceViewerColumns_Longitude();
 	}
 
 	/**
 	 * 1. column will be hidden because the alignment for the first column is always to the left
 	 */
-	private void defineSliceViewerColumns_1_First(final PixelConverter pixelConverter) {
+	private void defineSliceViewerColumns_1_First() {
 
-		final ColumnDefinition colDef = TableColumnFactory.FIRST_COLUMN.createColumn(
-				_sliceColumnManager,
-				pixelConverter);
+		final ColumnDefinition colDef = TableColumnFactory.FIRST_COLUMN.createColumn(_sliceColumnManager, _pc);
 
 		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
@@ -3976,11 +3982,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * column: altitude
 	 */
-	private void defineSliceViewerColumns_Altitude(final PixelConverter pixelConverter) {
+	private void defineSliceViewerColumns_Altitude() {
 
 		ColumnDefinition colDef;
 
-		_colDefAltitude = colDef = TableColumnFactory.ALTITUDE.createColumn(_sliceColumnManager, pixelConverter);
+		_colDefAltitude = colDef = TableColumnFactory.ALTITUDE.createColumn(_sliceColumnManager, _pc);
 
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -4000,11 +4006,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * column: cadence
 	 */
-	private void defineSliceViewerColumns_Cadence(final PixelConverter pixelConverter) {
+	private void defineSliceViewerColumns_Cadence() {
 
 		ColumnDefinition colDef;
 
-		_colDefCadence = colDef = TableColumnFactory.CADENCE.createColumn(_sliceColumnManager, pixelConverter);
+		_colDefCadence = colDef = TableColumnFactory.CADENCE.createColumn(_sliceColumnManager, _pc);
 
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -4022,9 +4028,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * column: distance
 	 */
-	private void defineSliceViewerColumns_Distance(final PixelConverter pixelConverter) {
+	private void defineSliceViewerColumns_Distance() {
 
-		final ColumnDefinition colDef = TableColumnFactory.DISTANCE.createColumn(_sliceColumnManager, pixelConverter);
+		final ColumnDefinition colDef = TableColumnFactory.DISTANCE.createColumn(_sliceColumnManager, _pc);
 
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -4050,9 +4056,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * column: gradient
 	 */
-	private void defineSliceViewerColumns_Gradient(final PixelConverter pixelConverter) {
+	private void defineSliceViewerColumns_Gradient() {
 
-		final ColumnDefinition colDef = TableColumnFactory.GRADIENT.createColumn(_sliceColumnManager, pixelConverter);
+		final ColumnDefinition colDef = TableColumnFactory.GRADIENT.createColumn(_sliceColumnManager, _pc);
 
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -4072,11 +4078,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * column: latitude
 	 */
-	private void defineSliceViewerColumns_Latitude(final PixelConverter pixelConverter) {
+	private void defineSliceViewerColumns_Latitude() {
 
 		ColumnDefinition colDef;
 
-		_colDefLatitude = colDef = TableColumnFactory.LATITUDE.createColumn(_sliceColumnManager, pixelConverter);
+		_colDefLatitude = colDef = TableColumnFactory.LATITUDE.createColumn(_sliceColumnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -4095,10 +4101,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * column: longitude
 	 */
-	private void defineSliceViewerColumns_Longitude(final PixelConverter pixelConverter) {
+	private void defineSliceViewerColumns_Longitude() {
 
 		ColumnDefinition colDef;
-		_colDefLongitude = colDef = TableColumnFactory.LONGITUDE.createColumn(_sliceColumnManager, pixelConverter);
+		_colDefLongitude = colDef = TableColumnFactory.LONGITUDE.createColumn(_sliceColumnManager, _pc);
 
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -4118,10 +4124,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * column: marker
 	 */
-	private void defineSliceViewerColumns_Marker(final PixelConverter pixelConverter) {
+	private void defineSliceViewerColumns_Marker() {
 
 		ColumnDefinition colDef;
-		_colDefSliceMarker = colDef = TableColumnFactory.MARKER.createColumn(_sliceColumnManager, pixelConverter);
+		_colDefSliceMarker = colDef = TableColumnFactory.MARKER.createColumn(_sliceColumnManager, _pc);
 
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -4148,9 +4154,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * column: pace
 	 */
-	private void defineSliceViewerColumns_Pace(final PixelConverter pixelConverter) {
+	private void defineSliceViewerColumns_Pace() {
 
-		final ColumnDefinition colDef = TableColumnFactory.PACE.createColumn(_sliceColumnManager, pixelConverter);
+		final ColumnDefinition colDef = TableColumnFactory.PACE.createColumn(_sliceColumnManager, _pc);
 
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -4170,9 +4176,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * column: power
 	 */
-	private void defineSliceViewerColumns_Power(final PixelConverter pixelConverter) {
+	private void defineSliceViewerColumns_Power() {
 
-		final ColumnDefinition colDef = TableColumnFactory.POWER.createColumn(_sliceColumnManager, pixelConverter);
+		final ColumnDefinition colDef = TableColumnFactory.POWER.createColumn(_sliceColumnManager, _pc);
 
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -4191,10 +4197,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * column: pulse
 	 */
-	private void defineSliceViewerColumns_Pulse(final PixelConverter pixelConverter) {
+	private void defineSliceViewerColumns_Pulse() {
 
 		ColumnDefinition colDef;
-		_colDefPulse = colDef = TableColumnFactory.PULSE.createColumn(_sliceColumnManager, pixelConverter);
+		_colDefPulse = colDef = TableColumnFactory.PULSE.createColumn(_sliceColumnManager, _pc);
 
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -4212,9 +4218,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * column: #
 	 */
-	private void defineSliceViewerColumns_Sequence(final PixelConverter pixelConverter) {
+	private void defineSliceViewerColumns_Sequence() {
 
-		final ColumnDefinition colDef = TableColumnFactory.SEQUENCE.createColumn(_sliceColumnManager, pixelConverter);
+		final ColumnDefinition colDef = TableColumnFactory.SEQUENCE.createColumn(_sliceColumnManager, _pc);
 
 		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
@@ -4252,9 +4258,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * column: speed
 	 */
-	private void defineSliceViewerColumns_Speed(final PixelConverter pixelConverter) {
+	private void defineSliceViewerColumns_Speed() {
 
-		final ColumnDefinition colDef = TableColumnFactory.SPEED.createColumn(_sliceColumnManager, pixelConverter);
+		final ColumnDefinition colDef = TableColumnFactory.SPEED.createColumn(_sliceColumnManager, _pc);
 
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -4276,10 +4282,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * column: temperature
 	 */
-	private void defineSliceViewerColumns_Temperature(final PixelConverter pixelConverter) {
+	private void defineSliceViewerColumns_Temperature() {
 
 		ColumnDefinition colDef;
-		_colDefTemperature = colDef = TableColumnFactory.TEMPERATURE.createColumn(_sliceColumnManager, pixelConverter);
+		_colDefTemperature = colDef = TableColumnFactory.TEMPERATURE.createColumn(_sliceColumnManager, _pc);
 
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -4315,11 +4321,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * column: time hh:mm:ss relative to tour start
 	 */
-	private void defineSliceViewerColumns_TimeInHHMMSSRelative(final PixelConverter pixelConverter) {
+	private void defineSliceViewerColumns_TimeInHHMMSSRelative() {
 
-		final ColumnDefinition colDef = TableColumnFactory.TOUR_TIME_HH_MM_SS.createColumn(
-				_sliceColumnManager,
-				pixelConverter);
+		final ColumnDefinition colDef = TableColumnFactory.TOUR_TIME_HH_MM_SS.createColumn(_sliceColumnManager, _pc);
 
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -4338,9 +4342,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * column: time in seconds
 	 */
-	private void defineSliceViewerColumns_TimeInSeconds(final PixelConverter pixelConverter) {
+	private void defineSliceViewerColumns_TimeInSeconds() {
 
-		final ColumnDefinition colDef = TableColumnFactory.TOUR_TIME.createColumn(_sliceColumnManager, pixelConverter);
+		final ColumnDefinition colDef = TableColumnFactory.TOUR_TIME.createColumn(_sliceColumnManager, _pc);
 
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -4360,11 +4364,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * column: time of day in hh:mm:ss
 	 */
-	private void defineSliceViewerColumns_TimeOfDay(final PixelConverter pixelConverter) {
+	private void defineSliceViewerColumns_TimeOfDay() {
 
 		final ColumnDefinition colDef = TableColumnFactory.TOUR_TIME_OF_DAY_HH_MM_SS.createColumn(
 				_sliceColumnManager,
-				pixelConverter);
+				_pc);
 
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -4826,7 +4830,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	/**
 	 * select the chart slider(s) according to the selected marker(s)
-	 *
+	 * 
 	 * @return
 	 */
 	private ISelection fireSliderPosition(final StructuredSelection selection) {
@@ -5000,7 +5004,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	/**
 	 * Converts a string into a float value
-	 *
+	 * 
 	 * @param valueText
 	 * @return Returns the float value for the parameter valueText, return <code>0</code>
 	 * @throws IllegalArgumentException
@@ -5218,7 +5222,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * check row/cell mode, row mode must be set, it works with the cell mode but can be confusing
 	 * because multiple rows can be selected but they are not visible
-	 *
+	 * 
 	 * @return
 	 */
 	private boolean isRowSelectionMode() {
@@ -5270,7 +5274,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * Checks the selection if it contains the current tour, {@link #_selectionTourId} contains the
 	 * tour id which is within the selection
-	 *
+	 * 
 	 * @param selection
 	 * @return Returns <code>true</code> when the current tour is within the selection
 	 */
@@ -5410,7 +5414,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	/**
 	 * Checks if tour has no errors
-	 *
+	 * 
 	 * @return Returns <code>true</code> when all data for the tour are valid, <code>false</code>
 	 *         otherwise
 	 */
@@ -5785,14 +5789,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_sliceColumnManager.saveState(_viewStateSlice);
 		_sliceColumnManager.clearColumns();
 
-		defineSliceViewerColumns(_sliceViewerContainer);
+		defineSliceViewerAllColumns(_sliceViewerContainer);
 		_sliceViewer = (TableViewer) recreateViewer(_sliceViewer);
 
 		// recreate marker viewer
 		_markerColumnManager.saveState(_viewStateMarker);
 		_markerColumnManager.clearColumns();
 
-		defineMarkerViewerColumns(_markerViewerContainer);
+		defineMarkerViewerAllColumns(_markerViewerContainer);
 		_markerViewer = (TableViewer) recreateViewer(_markerViewer);
 	}
 
@@ -5815,7 +5819,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				{
 					_markerViewerContainer.getChildren()[0].dispose();
 
-					createMarkerViewer(_markerViewerContainer);
+					createUI20MarkerViewer(_markerViewerContainer);
 
 					_markerViewerContainer.layout();
 
@@ -5844,7 +5848,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				{
 					table.dispose();
 
-					createSliceViewer(_sliceViewerContainer);
+					createUI10SliceViewer(_sliceViewerContainer);
 
 					_sliceViewerContainer.layout();
 
@@ -6153,7 +6157,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	/**
 	 * saves the tour in the {@link TourDataEditorView}
-	 *
+	 * 
 	 * @return Returns <code>true</code> when the tour is saved or <code>false</code> when the tour
 	 *         could not saved because the user canceled saving
 	 */
@@ -6239,7 +6243,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	/**
 	 * initialize cell editing
-	 *
+	 * 
 	 * @param viewer
 	 */
 	private void setCellEditSupport(final TableViewer viewer) {
@@ -6308,7 +6312,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * Set {@link TourData} for the editor, when the editor is dirty, nothing is done, the calling
 	 * method must check if the tour editor is dirty
-	 *
+	 * 
 	 * @param tourDataForEditor
 	 */
 	public void setTourData(final TourData tourDataForEditor) {
@@ -6552,7 +6556,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	/**
 	 * Updates the UI from {@link TourData}, dirty flag is not set
-	 *
+	 * 
 	 * @param tourData
 	 */
 	public void updateUI(final TourData tourData) {
@@ -6611,7 +6615,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	/**
 	 * updates the fields in the tour data editor and enables actions and controls
-	 *
+	 * 
 	 * @param tourData
 	 * @param forceTimeSliceReload
 	 *            <code>true</code> will reload time slices
@@ -7063,7 +7067,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	/**
 	 * update title of the view with the modified date/time
-	 *
+	 * 
 	 * @param tourYear
 	 * @param tourMonth
 	 * @param tourDay

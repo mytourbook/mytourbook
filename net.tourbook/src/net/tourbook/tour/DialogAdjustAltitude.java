@@ -36,7 +36,6 @@ import net.tourbook.ui.tourChart.IXAxisSelectionListener;
 import net.tourbook.ui.tourChart.SplineDrawingData;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
-import net.tourbook.util.PixelConverter;
 import net.tourbook.util.Util;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -44,6 +43,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;

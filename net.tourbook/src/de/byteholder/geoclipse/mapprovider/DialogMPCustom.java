@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,6 +31,7 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
@@ -68,7 +69,6 @@ import de.byteholder.geoclipse.map.event.MapPositionEvent;
 import de.byteholder.geoclipse.map.event.TileEventId;
 import de.byteholder.geoclipse.preferences.PrefPageMapProviders;
 import de.byteholder.geoclipse.ui.ViewerDetailForm;
-import de.byteholder.geoclipse.util.PixelConverter;
 import de.byteholder.gpx.GeoPosition;
 
 public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefaultActions {
@@ -214,6 +214,8 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 	private int										_previousMinZoom;
 	private int										_previousMaxZoom;
+
+	private PixelConverter							_pc;
 
 	private static final ReentrantLock				LOG_LOCK								= new ReentrantLock();
 
@@ -416,7 +418,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 	private void createUI(final Composite parent) {
 
-		final PixelConverter pixelConverter = new PixelConverter(parent);
+		_pc = new PixelConverter(parent);
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
@@ -424,12 +426,12 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 				.applyTo(container);
 		GridLayoutFactory.fillDefaults().margins(10, 10).applyTo(container);
 		{
-			createUI100Container(container, pixelConverter);
-			createUI400UrlLogInfo(container, pixelConverter);
+			createUI100Container(container);
+			createUI400UrlLogInfo(container);
 		}
 	}
 
-	private void createUI100Container(final Composite parent, final PixelConverter pixelConverter) {
+	private void createUI100Container(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
@@ -438,7 +440,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 			// left part (layer selection)
 			_leftContainer = new Composite(container, SWT.NONE);
 			GridLayoutFactory.fillDefaults().extendedMargins(0, 5, 0, 0).applyTo(_leftContainer);
-			createUI200LeftPart(_leftContainer, pixelConverter);
+			createUI200LeftPart(_leftContainer);
 
 			// sash
 			final Sash sash = new Sash(container, SWT.VERTICAL);
@@ -447,13 +449,13 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 			// right part (map)
 			final Composite mapContainer = new Composite(container, SWT.NONE);
 			GridLayoutFactory.fillDefaults().extendedMargins(5, 0, 0, 0).spacing(0, 0).applyTo(mapContainer);
-			createUI300Map(mapContainer, pixelConverter);
+			createUI300Map(mapContainer);
 
 			_detailForm = new ViewerDetailForm(container, _leftContainer, sash, mapContainer, 30);
 		}
 	}
 
-	private void createUI200LeftPart(final Composite parent, final PixelConverter pixelConverter) {
+	private void createUI200LeftPart(final Composite parent) {
 
 		Label label;
 
@@ -471,26 +473,26 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 			GridDataFactory.fillDefaults().grab(true, true).span(1, 1).applyTo(_partContainer);
 			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(_partContainer);
 			{
-				PART_ROWS.add(createUI210PartRow(_partContainer, 0, pixelConverter));
-				PART_ROWS.add(createUI210PartRow(_partContainer, 1, pixelConverter));
-				PART_ROWS.add(createUI210PartRow(_partContainer, 2, pixelConverter));
-				PART_ROWS.add(createUI210PartRow(_partContainer, 3, pixelConverter));
-				PART_ROWS.add(createUI210PartRow(_partContainer, 4, pixelConverter));
-				PART_ROWS.add(createUI210PartRow(_partContainer, 5, pixelConverter));
-				PART_ROWS.add(createUI210PartRow(_partContainer, 6, pixelConverter));
-				PART_ROWS.add(createUI210PartRow(_partContainer, 7, pixelConverter));
-				PART_ROWS.add(createUI210PartRow(_partContainer, 8, pixelConverter));
-				PART_ROWS.add(createUI210PartRow(_partContainer, 9, pixelConverter));
-				PART_ROWS.add(createUI210PartRow(_partContainer, 10, pixelConverter));
-				PART_ROWS.add(createUI210PartRow(_partContainer, 11, pixelConverter));
+				PART_ROWS.add(createUI210PartRow(_partContainer, 0));
+				PART_ROWS.add(createUI210PartRow(_partContainer, 1));
+				PART_ROWS.add(createUI210PartRow(_partContainer, 2));
+				PART_ROWS.add(createUI210PartRow(_partContainer, 3));
+				PART_ROWS.add(createUI210PartRow(_partContainer, 4));
+				PART_ROWS.add(createUI210PartRow(_partContainer, 5));
+				PART_ROWS.add(createUI210PartRow(_partContainer, 6));
+				PART_ROWS.add(createUI210PartRow(_partContainer, 7));
+				PART_ROWS.add(createUI210PartRow(_partContainer, 8));
+				PART_ROWS.add(createUI210PartRow(_partContainer, 9));
+				PART_ROWS.add(createUI210PartRow(_partContainer, 10));
+				PART_ROWS.add(createUI210PartRow(_partContainer, 11));
 			}
 
-			createUI220Detail(container, pixelConverter);
+			createUI220Detail(container);
 			createUI240DebugInfo(container);
 		}
 	}
 
-	private PartRow createUI210PartRow(final Composite container, final int row, final PixelConverter pixelConverter) {
+	private PartRow createUI210PartRow(final Composite container, final int row) {
 
 		// combo: parameter item type
 		final Combo combo = new Combo(container, SWT.READ_ONLY);
@@ -525,13 +527,12 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		/*
 		 * pagebook: parameter widgets
 		 */
-		final HashMap<WIDGET_KEY, Widget> paraWidgets = createUI212ParaWidgets(container, pixelConverter);
+		final HashMap<WIDGET_KEY, Widget> paraWidgets = createUI212ParaWidgets(container);
 
 		return new PartRow(combo, paraWidgets);
 	}
 
-	private HashMap<WIDGET_KEY, Widget> createUI212ParaWidgets(	final Composite parent,
-																final PixelConverter pixelConverter) {
+	private HashMap<WIDGET_KEY, Widget> createUI212ParaWidgets(final Composite parent) {
 
 		final HashMap<WIDGET_KEY, Widget> paraWidgets = new HashMap<WIDGET_KEY, Widget>();
 
@@ -705,7 +706,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		return UI.EMPTY_STRING;
 	}
 
-	private void createUI220Detail(final Composite parent, final PixelConverter pixelConverter) {
+	private void createUI220Detail(final Composite parent) {
 
 		Label label;
 		final MouseWheelListener mouseWheelListener = new MouseWheelListener() {
@@ -850,7 +851,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		}
 	}
 
-	private void createUI300Map(final Composite parent, final PixelConverter pixelConverter) {
+	private void createUI300Map(final Composite parent) {
 
 		final Composite toolbarContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(toolbarContainer);
@@ -932,23 +933,20 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 			// label: tile info
 			_lblTileInfo = new Label(infoContainer, SWT.TRAIL);
-			GridDataFactory
-					.fillDefaults()
-					.hint(pixelConverter.convertWidthInCharsToPixels(25), SWT.DEFAULT)
-					.applyTo(_lblTileInfo);
+			GridDataFactory.fillDefaults().hint(_pc.convertWidthInCharsToPixels(25), SWT.DEFAULT).applyTo(_lblTileInfo);
 			_lblTileInfo.setToolTipText(Messages.Dialog_MapConfig_TileInfo_Tooltip_Line1
 					+ Messages.Dialog_MapConfig_TileInfo_Tooltip_Line2
 					+ Messages.Dialog_MapConfig_TileInfo_Tooltip_Line3);
 		}
 
 		/*
-		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		 * !!! don't do any map initialization until the tile factory is set !!!
+		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! !!! don't do any
+		 * map initialization until the tile factory is set !!!
 		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		 */
 	}
 
-	private void createUI400UrlLogInfo(final Composite parent, final PixelConverter pixelConverter) {
+	private void createUI400UrlLogInfo(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//

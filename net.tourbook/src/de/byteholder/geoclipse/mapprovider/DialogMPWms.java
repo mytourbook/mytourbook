@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -33,6 +33,7 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.viewers.CellLabelProvider;
@@ -94,31 +95,30 @@ import de.byteholder.geoclipse.map.event.MapPositionEvent;
 import de.byteholder.geoclipse.map.event.TileEventId;
 import de.byteholder.geoclipse.preferences.PrefPageMapProviders;
 import de.byteholder.geoclipse.ui.ViewerDetailForm;
-import de.byteholder.geoclipse.util.PixelConverter;
 import de.byteholder.gpx.GeoPosition;
 
 public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultActions {
 
-	private static final String				DIALOG_SETTINGS_VIEWER_WIDTH			= "viewerWidth";							//$NON-NLS-1$
-	private static final String				DIALOG_SETTINGS_IS_SHOW_TILE_INFO		= "isShowTileInfo";						//$NON-NLS-1$
-	private static final String				DIALOG_SETTINGS_IS_SHOW_TILE_IMAGE_LOG	= "IsShowTileImageLogging";				//$NON-NLS-1$
+	private static final String						DIALOG_SETTINGS_VIEWER_WIDTH			= "viewerWidth";							//$NON-NLS-1$
+	private static final String						DIALOG_SETTINGS_IS_SHOW_TILE_INFO		= "isShowTileInfo";						//$NON-NLS-1$
+	private static final String						DIALOG_SETTINGS_IS_SHOW_TILE_IMAGE_LOG	= "IsShowTileImageLogging";				//$NON-NLS-1$
 
 	/*
 	 * UI components
 	 */
-	private Display							_display;
-	private Composite						_leftContainer;
-	private ViewerDetailForm				_detailForm;
+	private Display									_display;
+	private Composite								_leftContainer;
+	private ViewerDetailForm						_detailForm;
 
-	private CheckboxTableViewer				_layerViewer;
-	private Composite						_viewerContainer;
+	private CheckboxTableViewer						_layerViewer;
+	private Composite								_viewerContainer;
 
-	private Combo							_comboImageSize;
-	private Label							_lblMapInfo;
-	private Label							_lblTileInfo;
+	private Combo									_comboImageSize;
+	private Label									_lblMapInfo;
+	private Label									_lblTileInfo;
 
-	private Combo							_cboImageFormat;
-	private Button							_btnOk;
+	private Combo									_cboImageFormat;
+	private Button									_btnOk;
 
 	/*
 	 * next/prev buttons are disabled because the offline folder is wront
@@ -126,27 +126,28 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 //	private Button							fBtnPrevMapProvider;
 //	private Button							fBtnNextMapProvider;
 
-	private ToolBar							_toolbar;
-	private Button							_btnShowMap;
-	private Button							_btnShowOsmMap;
+	private ToolBar									_toolbar;
+	private Button									_btnShowMap;
+	private Button									_btnShowOsmMap;
 
-	private Button							_chkLoadTransparentImages;
-	private Button							_chkShowTileInfo;
-	private Button							_chkShowTileImageLog;
+	private Button									_chkLoadTransparentImages;
+	private Button									_chkShowTileInfo;
+	private Button									_chkShowTileImageLog;
 
-	private Combo							_cboTileImageLog;
-	private Text							_txtLogDetail;
+	private Combo									_cboTileImageLog;
+	private Text									_txtLogDetail;
 
-	private final FormToolkit						_formTk									= new FormToolkit(Display
-																							.getCurrent());
-	private ExpandableComposite				_logContainer;
+	private final FormToolkit						_formTk									= new FormToolkit(
+																									Display
+																											.getCurrent());
+	private ExpandableComposite						_logContainer;
 
 	/*
 	 * none UI fields
 	 */
-	private final IDialogSettings			_dialogSettings;
+	private final IDialogSettings					_dialogSettings;
 
-	private final PrefPageMapProviders			_prefPageMapFactory;
+	private final PrefPageMapProviders				_prefPageMapFactory;
 
 	/**
 	 * all visible {@link MtLayer}'s
@@ -154,32 +155,35 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 	private final ArrayList<MtLayer>				_allMtLayers							= new ArrayList<MtLayer>();
 	private final ArrayList<MtLayer>				_displayedLayers						= new ArrayList<MtLayer>();
 
-	private int								_statIsQueued;
-	private int								_statStartLoading;
-	private int								_statEndLoading;
-	private int								_statErrorLoading;
+	private int										_statIsQueued;
+	private int										_statStartLoading;
+	private int										_statEndLoading;
+	private int										_statErrorLoading;
 
-	private String							_defaultMessage;
+	private String									_defaultMessage;
 
-	private String							_tileUrl;
-	private long							_dragStartViewerLeft;
+	private String									_tileUrl;
+	private long									_dragStartViewerLeft;
 
-	private final NumberFormat					_nfLatLon								= NumberFormat.getNumberInstance();
+	private final NumberFormat						_nfLatLon								= NumberFormat
+																									.getNumberInstance();
 	{
 		// initialize lat/lon formatter
 		_nfLatLon.setMinimumFractionDigits(6);
 		_nfLatLon.setMaximumFractionDigits(6);
 	}
 
-	private int								_statUpdateCounter						= 0;
+	private int										_statUpdateCounter						= 0;
 
-	private MPWms							_mpWms;
+	private MPWms									_mpWms;
 
-	private final MPPlugin						_defaultMapProvider;
+	private final MPPlugin							_defaultMapProvider;
 
 	// load tile image logging
-	private boolean							_isTileImageLogging;
+	private boolean									_isTileImageLogging;
 	private final ConcurrentLinkedQueue<LogEntry>	_logEntries								= new ConcurrentLinkedQueue<LogEntry>();
+
+	private PixelConverter							_pc;
 
 	public DialogMPWms(final Shell parentShell, final PrefPageMapProviders mapFactory, final MPWms wmsMapProvider) {
 
@@ -362,19 +366,19 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 	private void createUI(final Composite parent) {
 
-		final PixelConverter pixelConverter = new PixelConverter(parent);
+		_pc = new PixelConverter(parent);
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
 		GridLayoutFactory.fillDefaults().margins(10, 10).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
-			createUIContainer(container, pixelConverter);
-			createUILog(container, pixelConverter);
+			createUIContainer(container);
+			createUILog(container);
 		}
 	}
 
-	private void createUIContainer(final Composite parent, final PixelConverter pixelConverter) {
+	private void createUIContainer(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -383,7 +387,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 			// left part (layer selection)
 			_leftContainer = new Composite(container, SWT.NONE);
 			GridLayoutFactory.fillDefaults().extendedMargins(0, 5, 0, 0).applyTo(_leftContainer);
-			createUILayer(_leftContainer, pixelConverter);
+			createUILayer(_leftContainer);
 
 			// sash
 			final Sash sash = new Sash(container, SWT.VERTICAL);
@@ -392,13 +396,13 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 			// right part (map)
 			final Composite mapContainer = new Composite(container, SWT.NONE);
 			GridLayoutFactory.fillDefaults().extendedMargins(5, 0, 0, 0).spacing(0, 0).applyTo(mapContainer);
-			createUIMap(mapContainer, pixelConverter);
+			createUIMap(mapContainer);
 
 			_detailForm = new ViewerDetailForm(container, _leftContainer, sash, mapContainer, 30);
 		}
 	}
 
-	private void createUILayer(final Composite parent, final PixelConverter pixelConverter) {
+	private void createUILayer(final Composite parent) {
 
 		Label label;
 
@@ -414,7 +418,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 				createUILayer10Header(viewerContainer);
 
 				// table: layers
-				createUILayer20Viewer(viewerContainer, pixelConverter);
+				createUILayer20Viewer(viewerContainer);
 
 				// label: hint
 				label = new Label(viewerContainer, SWT.NONE);
@@ -423,7 +427,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 			// ############################################################
 
-			createUILayer30Details(container, pixelConverter);
+			createUILayer30Details(container);
 		}
 	}
 
@@ -475,7 +479,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		}
 	}
 
-	private void createUILayer20Viewer(final Composite parent, final PixelConverter pixelConverter) {
+	private void createUILayer20Viewer(final Composite parent) {
 
 		final TableColumnLayout tableLayout = new TableColumnLayout();
 		_viewerContainer = new Composite(parent, SWT.NONE);
@@ -612,7 +616,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 					}
 
 					public void dragSetData(final DragSourceEvent event) {
-					// data are set in LocalSelectionTransfer
+						// data are set in LocalSelectionTransfer
 					}
 
 					public void dragStart(final DragSourceEvent event) {
@@ -738,7 +742,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 				viewerDropAdapter);
 	}
 
-	private void createUILayer30Details(final Composite parent, final PixelConverter pixelConverter) {
+	private void createUILayer30Details(final Composite parent) {
 
 		Label label;
 
@@ -779,7 +783,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 				_cboImageFormat = new Combo(leftContainer, SWT.BORDER | SWT.READ_ONLY);
 				GridDataFactory
 						.fillDefaults()
-						.hint(pixelConverter.convertWidthInCharsToPixels(20), SWT.DEFAULT)
+						.hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
 						.applyTo(_cboImageFormat);
 				_cboImageFormat.addSelectionListener(new SelectionAdapter() {
 					@Override
@@ -839,7 +843,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		}
 	}
 
-	private void createUILog(final Composite parent, final PixelConverter pixelConverter) {
+	private void createUILog(final Composite parent) {
 
 		final Font monoFont = getMonoFont();
 		final Color parentBackground = parent.getBackground();
@@ -895,7 +899,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 				GridDataFactory.fillDefaults()//
 						.grab(true, false)
 						.span(2, 1)
-						.hint(SWT.DEFAULT, pixelConverter.convertHeightInCharsToPixels(5))
+						.hint(SWT.DEFAULT, _pc.convertHeightInCharsToPixels(5))
 						.applyTo(_txtLogDetail);
 				_formTk.adapt(_txtLogDetail, false, false);
 				_txtLogDetail.setFont(monoFont);
@@ -904,7 +908,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		}
 	}
 
-	private void createUIMap(final Composite parent, final PixelConverter pixelConverter) {
+	private void createUIMap(final Composite parent) {
 
 		final Composite toolbarContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(toolbarContainer);
@@ -963,10 +967,12 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 								lon + 360
 								: lon;
 
-				_lblMapInfo.setText(NLS.bind(Messages.Dialog_MapConfig_Label_MapInfo, new Object[] {
-						_nfLatLon.format(mousePosition.latitude),
-						_nfLatLon.format(lon),
-						Integer.toString(event.mapZoomLevel + 1) }));
+				_lblMapInfo.setText(NLS.bind(
+						Messages.Dialog_MapConfig_Label_MapInfo,
+						new Object[] {
+								_nfLatLon.format(mousePosition.latitude),
+								_nfLatLon.format(lon),
+								Integer.toString(event.mapZoomLevel + 1) }));
 			}
 		});
 
@@ -983,8 +989,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 			// label: tile info
 			_lblTileInfo = new Label(infoContainer, SWT.TRAIL);
-			GridDataFactory.fillDefaults().hint(pixelConverter.convertWidthInCharsToPixels(25), SWT.DEFAULT).applyTo(
-					_lblTileInfo);
+			GridDataFactory.fillDefaults().hint(_pc.convertWidthInCharsToPixels(25), SWT.DEFAULT).applyTo(_lblTileInfo);
 
 			_lblTileInfo.setToolTipText(Messages.Dialog_MapConfig_TileInfo_Tooltip_Line1
 					+ Messages.Dialog_MapConfig_TileInfo_Tooltip_Line2
@@ -1044,7 +1049,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		}
 
 		return _dialogSettings;
- 
+
 		// disable bounds
 		// return null;
 	}
@@ -1586,12 +1591,14 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 				}
 
 				// show at most 3 decimals
-				_lblTileInfo.setText(NLS.bind(Messages.Dialog_MapConfig_TileInfo_Statistics, new Object[] {
-						Integer.toString(_statIsQueued % 1000),
-						Integer.toString(_statEndLoading % 1000),
-						Integer.toString(_statStartLoading % 1000),
-						Integer.toString(_statErrorLoading % 1000), //
-				}));
+				_lblTileInfo.setText(NLS.bind(
+						Messages.Dialog_MapConfig_TileInfo_Statistics,
+						new Object[] {
+								Integer.toString(_statIsQueued % 1000),
+								Integer.toString(_statEndLoading % 1000),
+								Integer.toString(_statStartLoading % 1000),
+								Integer.toString(_statErrorLoading % 1000), //
+						}));
 
 				final String logEntry = displayLogEntries(_logEntries, _cboTileImageLog);
 

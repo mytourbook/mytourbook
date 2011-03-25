@@ -40,7 +40,6 @@ import net.tourbook.ui.tourChart.ChartLayer2ndAltiSerie;
 import net.tourbook.ui.tourChart.I2ndAltiLayer;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
-import net.tourbook.util.PixelConverter;
 import net.tourbook.util.Util;
 
 import org.eclipse.jface.action.IMenuListener;
@@ -52,6 +51,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -100,6 +100,8 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
 	private TourChart										_tourChart;
 	private TourChartConfiguration							_tourChartConfig;
+
+	private PixelConverter									_pc;
 
 	/*
 	 * vertical adjustment options
@@ -717,6 +719,8 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
 	private void createUI(final Composite parent) {
 
+		_pc = new PixelConverter(parent);
+
 		final Composite dlgContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(dlgContainer);
 		GridLayoutFactory.fillDefaults().margins(10, 0).numColumns(1).applyTo(dlgContainer);
@@ -755,8 +759,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 	 */
 	private void createUIGroupHorizAdjustment(final Composite parent) {
 
-		final PixelConverter pc = new PixelConverter(parent);
-		final int valueWidth = pc.convertWidthInCharsToPixels(4);
+		final int valueWidth = _pc.convertWidthInCharsToPixels(4);
 		Label label;
 
 		final Group groupTime = new Group(parent, SWT.NONE);
@@ -882,8 +885,6 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 	 */
 	private void createUIGroupVertAdjustment(final Composite parent) {
 
-		final PixelConverter pc = new PixelConverter(parent);
-
 		_groupAltitude = new Group(parent, SWT.NONE);
 		_groupAltitude.setText(Messages.tour_merger_group_adjust_altitude);
 		GridDataFactory.swtDefaults().grab(true, false).align(SWT.FILL, SWT.BEGINNING).applyTo(_groupAltitude);
@@ -900,7 +901,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 		GridDataFactory
 				.fillDefaults()
 				.align(SWT.END, SWT.CENTER)
-				.hint(pc.convertWidthInCharsToPixels(8), SWT.DEFAULT)
+				.hint(_pc.convertWidthInCharsToPixels(8), SWT.DEFAULT)
 				.applyTo(_lblAltitudeDiff1);
 
 		_scaleAltitude1 = new Scale(_groupAltitude, SWT.HORIZONTAL);
@@ -927,7 +928,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 		GridDataFactory
 				.fillDefaults()
 				.align(SWT.END, SWT.CENTER)
-				.hint(pc.convertWidthInCharsToPixels(8), SWT.DEFAULT)
+				.hint(_pc.convertWidthInCharsToPixels(8), SWT.DEFAULT)
 				.applyTo(_lblAltitudeDiff10);
 
 		_scaleAltitude10 = new Scale(_groupAltitude, SWT.HORIZONTAL);
@@ -1074,10 +1075,8 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 	 */
 	private void createUISectionSaveActions(final Composite parent) {
 
-		final PixelConverter pc = new PixelConverter(parent);
-
-		final int indentOption = pc.convertHorizontalDLUsToPixels(20);
-		final int indentOption2 = pc.convertHorizontalDLUsToPixels(13);
+		final int indentOption = _pc.convertHorizontalDLUsToPixels(20);
+		final int indentOption2 = _pc.convertHorizontalDLUsToPixels(13);
 
 		/*
 		 * group: save options
@@ -1238,7 +1237,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 		_lblAdjustAltiValueTime = new Label(aaContainer, SWT.TRAIL);
 		GridDataFactory
 				.fillDefaults()
-				.hint(pc.convertWidthInCharsToPixels(10), SWT.DEFAULT)
+				.hint(_pc.convertWidthInCharsToPixels(10), SWT.DEFAULT)
 				.applyTo(_lblAdjustAltiValueTime);
 
 		_lblAdjustAltiValueTimeUnit = new Label(aaContainer, SWT.NONE);
@@ -1247,7 +1246,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 		_lblAdjustAltiValueDistance = new Label(aaContainer, SWT.TRAIL);
 		GridDataFactory
 				.fillDefaults()
-				.hint(pc.convertWidthInCharsToPixels(10), SWT.DEFAULT)
+				.hint(_pc.convertWidthInCharsToPixels(10), SWT.DEFAULT)
 				.applyTo(_lblAdjustAltiValueDistance);
 
 		_lblAdjustAltiValueDistanceUnit = new Label(aaContainer, SWT.NONE);

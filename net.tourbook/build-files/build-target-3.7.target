@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?pde version="3.6"?>
+
+<target name="3.7 - 32 Target" sequenceNumber="14">
+<locations>
+<location path="L:\e-3.7M6-32\eclipse" type="Directory"/>
+</locations>
+<environment>
+<os>win32</os>
+<ws>win32</ws>
+<arch>x86</arch>
+<nl>en</nl>
+</environment>
+<launcherArgs>
+<vmArgs>-Xms40m -Xmx384m</vmArgs>
+</launcherArgs>
+</target>

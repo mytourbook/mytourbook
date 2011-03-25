@@ -50,7 +50,6 @@ import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
 import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
 import net.tourbook.util.ColumnManager;
 import net.tourbook.util.ITourViewer;
-import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 import net.tourbook.util.TreeColumnDefinition;
 
@@ -62,6 +61,7 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -136,6 +136,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 																			Messages.Image__database).createImage(true);
 
 	private TreeViewerTourInfoToolTip			_tourInfoToolTip;
+	private PixelConverter						_pc;
 
 	/*
 	 * UI controls
@@ -154,7 +155,6 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	private ActionEditTour						_actionEditTour;
 	private ActionSetTourTypeMenu				_actionSetTourType;
 	private ActionOpenTour						_actionOpenTour;
-
 
 	class ResultContentProvider implements ITreeContentProvider {
 
@@ -323,7 +323,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 					_columnManager.saveState(_state);
 					_columnManager.clearColumns();
-					defineViewerColumns(_viewerContainer);
+					defineAllViewerColumns(_viewerContainer);
 
 					recreateViewer(null);
 
@@ -437,53 +437,16 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		_actionCollapseAll = new ActionCollapseAll(this);
 	}
 
-	/**
-	 * create the views context menu
-	 */
-	private void createContextMenu() {
-
-		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
-		menuMgr.setRemoveAllWhenShown(true);
-		menuMgr.addMenuListener(new IMenuListener() {
-			@Override
-			public void menuAboutToShow(final IMenuManager manager) {
-				fillContextMenu(manager);
-			}
-		});
-
-		final Control controlMenuParent = _tourViewer.getControl();
-		final Menu contextMenu = menuMgr.createContextMenu(controlMenuParent);
-		contextMenu.addMenuListener(new MenuAdapter() {
-			@Override
-			public void menuHidden(final MenuEvent e) {
-				_tagMenuMgr.onHideMenu();
-			}
-
-			@Override
-			public void menuShown(final MenuEvent menuEvent) {
-				_tagMenuMgr.onShowMenu(
-						menuEvent,
-						controlMenuParent,
-						Display.getCurrent().getCursorLocation(),
-						_tourInfoToolTip);
-			}
-		});
-
-		// add the context menu to the table viewer
-		controlMenuParent.setMenu(contextMenu);
-	}
-
 	@Override
 	public void createPartControl(final Composite parent) {
 
+		_pc = new PixelConverter(parent);
+
 		// define all columns for the viewer
 		_columnManager = new ColumnManager(this, _state);
-		defineViewerColumns(parent);
+		defineAllViewerColumns(parent);
 
-		_viewerContainer = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
-
-		createTourViewer(_viewerContainer);
+		createUI(parent);
 
 		addPartListeners();
 		addSelectionListeners();
@@ -499,7 +462,16 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		_tourViewer.setInput(_tootItem = new TVICompareResultRootItem());
 	}
 
-	private Control createTourViewer(final Composite parent) {
+	private void createUI(final Composite parent) {
+
+		_viewerContainer = new Composite(parent, SWT.NONE);
+		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
+		{
+			createUI10TourViewer(_viewerContainer);
+		}
+	}
+
+	private Control createUI10TourViewer(final Composite parent) {
 
 		// tour tree
 		final Tree tree = new Tree(parent, SWT.H_SCROLL
@@ -589,7 +561,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 			}
 		});
 
-		createContextMenu();
+		createUI20ContextMenu();
 
 		// set tour info tooltip provider
 		_tourInfoToolTip = new TreeViewerTourInfoToolTip(_tourViewer);
@@ -597,20 +569,62 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		return tree;
 	}
 
-	private void defineViewerColumns(final Composite parent) {
+	/**
+	 * create the views context menu
+	 */
+	private void createUI20ContextMenu() {
 
-		final PixelConverter pixelConverter = new PixelConverter(parent);
-		TreeColumnDefinition colDef;
+		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+		menuMgr.setRemoveAllWhenShown(true);
+		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
+			public void menuAboutToShow(final IMenuManager manager) {
+				fillContextMenu(manager);
+			}
+		});
 
-		/*
-		 * tree column: reference tour/date
-		 */
-		colDef = new TreeColumnDefinition(_columnManager, "comparedTour", SWT.LEAD); //$NON-NLS-1$
+		final Tree tree = (Tree) _tourViewer.getControl();
+		final Menu treeContextMenu = menuMgr.createContextMenu(tree);
+		treeContextMenu.addMenuListener(new MenuAdapter() {
+			@Override
+			public void menuHidden(final MenuEvent e) {
+				_tagMenuMgr.onHideMenu();
+			}
+
+			@Override
+			public void menuShown(final MenuEvent menuEvent) {
+				_tagMenuMgr.onShowMenu(menuEvent, tree, Display.getCurrent().getCursorLocation(), _tourInfoToolTip);
+			}
+		});
+
+		_columnManager.createHeaderContextMenu(tree, treeContextMenu);
+	}
+
+	private void defineAllViewerColumns(final Composite parent) {
+
+		defineViewerColumnComparedTour();
+		defineViewerColumnDiff();
+		defineViewerColumnSpeedComputed();
+		defineViewerColumnSpeedSaved();
+		defineViewerColumnSpeedMoved();
+		defineViewerColumnDistance();
+		defineViewerColumnTimeInterval();
+		defineViewerColumnTourType();
+		defineViewerColumnTitle();
+		defineViewerColumnTags();
+	}
+
+	/**
+	 * tree column: reference tour/date
+	 */
+	private void defineViewerColumnComparedTour() {
+
+		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "comparedTour", SWT.LEAD); //$NON-NLS-1$
 
 		colDef.setIsDefaultColumn();
 		colDef.setColumnLabel(Messages.Compare_Result_Column_tour);
 		colDef.setColumnHeader(Messages.Compare_Result_Column_tour);
-		colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(25) + 16);
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(25) + 16);
 		colDef.setCanModifyVisibility(false);
 		colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
 
@@ -655,17 +669,20 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 				setCellColor(cell, element);
 			}
 		});
+	}
 
-		/*
-		 * column: altitude difference
-		 */
-		colDef = new TreeColumnDefinition(_columnManager, "diff", SWT.TRAIL); //$NON-NLS-1$
+	/**
+	 * column: altitude difference
+	 */
+	private void defineViewerColumnDiff() {
+
+		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "diff", SWT.TRAIL); //$NON-NLS-1$
 
 		colDef.setIsDefaultColumn();
 		colDef.setColumnHeader(Messages.Compare_Result_Column_diff);
 		colDef.setColumnToolTipText(Messages.Compare_Result_Column_diff_tooltip);
 		colDef.setColumnLabel(Messages.Compare_Result_Column_diff_label);
-		colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -681,90 +698,14 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 				}
 			}
 		});
+	}
 
-		/*
-		 * column: speed computed
-		 */
-		colDef = new TreeColumnDefinition(_columnManager, "speedComputed", SWT.TRAIL); //$NON-NLS-1$
+	/**
+	 * column: distance
+	 */
+	private void defineViewerColumnDistance() {
 
-		colDef.setIsDefaultColumn();
-		colDef.setColumnHeader(UI.UNIT_LABEL_SPEED);
-		colDef.setColumnUnit(UI.UNIT_LABEL_SPEED);
-		colDef.setColumnToolTipText(Messages.Compare_Result_Column_kmh_tooltip);
-		colDef.setColumnLabel(Messages.Compare_Result_Column_kmh_label);
-		colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final Object element = cell.getElement();
-				if (element instanceof TVICompareResultComparedTour) {
-
-					final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
-
-					_nf.setMinimumFractionDigits(1);
-					_nf.setMaximumFractionDigits(1);
-					cell.setText(_nf.format(compareItem.compareSpeed / UI.UNIT_VALUE_DISTANCE));
-					setCellColor(cell, element);
-				}
-			}
-		});
-
-		/*
-		 * column: speed saved
-		 */
-		colDef = new TreeColumnDefinition(_columnManager, "speedSaved", SWT.TRAIL); //$NON-NLS-1$
-
-		colDef.setColumnHeader(UI.UNIT_LABEL_SPEED);
-		colDef.setColumnUnit(UI.UNIT_LABEL_SPEED);
-		colDef.setColumnToolTipText(Messages.Compare_Result_Column_kmh_db_tooltip);
-		colDef.setColumnLabel(Messages.Compare_Result_Column_kmh_db_label);
-		colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final Object element = cell.getElement();
-				if (element instanceof TVICompareResultComparedTour) {
-
-					final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
-
-					_nf.setMinimumFractionDigits(1);
-					_nf.setMaximumFractionDigits(1);
-					cell.setText(_nf.format(compareItem.dbSpeed / UI.UNIT_VALUE_DISTANCE));
-					setCellColor(cell, element);
-				}
-			}
-		});
-
-		/*
-		 * column: speed moved
-		 */
-		colDef = new TreeColumnDefinition(_columnManager, "speedMoved", SWT.TRAIL); //$NON-NLS-1$
-
-		colDef.setColumnHeader(UI.UNIT_LABEL_SPEED);
-		colDef.setColumnUnit(UI.UNIT_LABEL_SPEED);
-		colDef.setColumnToolTipText(Messages.Compare_Result_Column_kmh_moved_tooltip);
-		colDef.setColumnLabel(Messages.Compare_Result_Column_kmh_moved_label);
-		colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final Object element = cell.getElement();
-				if (element instanceof TVICompareResultComparedTour) {
-
-					final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
-
-					_nf.setMinimumFractionDigits(1);
-					_nf.setMaximumFractionDigits(1);
-					cell.setText(_nf.format(compareItem.movedSpeed / UI.UNIT_VALUE_DISTANCE));
-					setCellColor(cell, element);
-				}
-			}
-		});
-
-		/*
-		 * column: distance
-		 */
-		colDef = TreeColumnFactory.DISTANCE.createColumn(_columnManager, pixelConverter);
+		final TreeColumnDefinition colDef = TreeColumnFactory.DISTANCE.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -780,60 +721,102 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 				}
 			}
 		});
+	}
 
-		/*
-		 * column: time interval
-		 */
-		colDef = TreeColumnFactory.TIME_INTERVAL.createColumn(_columnManager, pixelConverter);
+	/**
+	 * column: speed computed
+	 */
+	private void defineViewerColumnSpeedComputed() {
+
+		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "speedComputed", SWT.TRAIL); //$NON-NLS-1$
+
+		colDef.setIsDefaultColumn();
+		colDef.setColumnHeader(UI.UNIT_LABEL_SPEED);
+		colDef.setColumnUnit(UI.UNIT_LABEL_SPEED);
+		colDef.setColumnToolTipText(Messages.Compare_Result_Column_kmh_tooltip);
+		colDef.setColumnLabel(Messages.Compare_Result_Column_kmh_label);
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 				final Object element = cell.getElement();
 				if (element instanceof TVICompareResultComparedTour) {
 
-					cell.setText(Integer.toString(((TVICompareResultComparedTour) element).timeIntervall));
+					final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
+
+					_nf.setMinimumFractionDigits(1);
+					_nf.setMaximumFractionDigits(1);
+					cell.setText(_nf.format(compareItem.compareSpeed / UI.UNIT_VALUE_DISTANCE));
 					setCellColor(cell, element);
 				}
 			}
 		});
+	}
 
-		/*
-		 * column: tour type
-		 */
-		colDef = TreeColumnFactory.TOUR_TYPE.createColumn(_columnManager, pixelConverter);
+	/**
+	 * column: speed moved
+	 */
+	private void defineViewerColumnSpeedMoved() {
+
+		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "speedMoved", SWT.TRAIL); //$NON-NLS-1$
+
+		colDef.setColumnHeader(UI.UNIT_LABEL_SPEED);
+		colDef.setColumnUnit(UI.UNIT_LABEL_SPEED);
+		colDef.setColumnToolTipText(Messages.Compare_Result_Column_kmh_moved_tooltip);
+		colDef.setColumnLabel(Messages.Compare_Result_Column_kmh_moved_label);
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 				final Object element = cell.getElement();
 				if (element instanceof TVICompareResultComparedTour) {
-					final TourData comparedTourData = ((TVICompareResultComparedTour) element).comparedTourData;
-					final TourType tourType = comparedTourData.getTourType();
-					if (tourType != null) {
-						cell.setImage(UI.getInstance().getTourTypeImage(tourType.getTypeId()));
-					}
-				}
-			}
-		});
 
-		/*
-		 * column: title
-		 */
-		colDef = TreeColumnFactory.TITLE.createColumn(_columnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final Object element = cell.getElement();
-				if (element instanceof TVICompareResultComparedTour) {
-					cell.setText(((TVICompareResultComparedTour) element).comparedTourData.getTourTitle());
+					final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
+
+					_nf.setMinimumFractionDigits(1);
+					_nf.setMaximumFractionDigits(1);
+					cell.setText(_nf.format(compareItem.movedSpeed / UI.UNIT_VALUE_DISTANCE));
 					setCellColor(cell, element);
 				}
 			}
 		});
+	}
 
-		/*
-		 * column: tags
-		 */
-		colDef = TreeColumnFactory.TOUR_TAGS.createColumn(_columnManager, pixelConverter);
+	/**
+	 * column: speed saved
+	 */
+	private void defineViewerColumnSpeedSaved() {
+
+		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "speedSaved", SWT.TRAIL); //$NON-NLS-1$
+
+		colDef.setColumnHeader(UI.UNIT_LABEL_SPEED);
+		colDef.setColumnUnit(UI.UNIT_LABEL_SPEED);
+		colDef.setColumnToolTipText(Messages.Compare_Result_Column_kmh_db_tooltip);
+		colDef.setColumnLabel(Messages.Compare_Result_Column_kmh_db_label);
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final Object element = cell.getElement();
+				if (element instanceof TVICompareResultComparedTour) {
+
+					final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
+
+					_nf.setMinimumFractionDigits(1);
+					_nf.setMaximumFractionDigits(1);
+					cell.setText(_nf.format(compareItem.dbSpeed / UI.UNIT_VALUE_DISTANCE));
+					setCellColor(cell, element);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: tags
+	 */
+	private void defineViewerColumnTags() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TAGS.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -861,7 +844,64 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 				}
 			}
 		});
+	}
 
+	/**
+	 * column: time interval
+	 */
+	private void defineViewerColumnTimeInterval() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.TIME_INTERVAL.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final Object element = cell.getElement();
+				if (element instanceof TVICompareResultComparedTour) {
+
+					cell.setText(Integer.toString(((TVICompareResultComparedTour) element).timeIntervall));
+					setCellColor(cell, element);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: title
+	 */
+	private void defineViewerColumnTitle() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.TITLE.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final Object element = cell.getElement();
+				if (element instanceof TVICompareResultComparedTour) {
+					cell.setText(((TVICompareResultComparedTour) element).comparedTourData.getTourTitle());
+					setCellColor(cell, element);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: tour type
+	 */
+	private void defineViewerColumnTourType() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TYPE.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final Object element = cell.getElement();
+				if (element instanceof TVICompareResultComparedTour) {
+					final TourData comparedTourData = ((TVICompareResultComparedTour) element).comparedTourData;
+					final TourType tourType = comparedTourData.getTourType();
+					if (tourType != null) {
+						cell.setImage(UI.getInstance().getTourTypeImage(tourType.getTypeId()));
+					}
+				}
+			}
+		});
 	}
 
 	@Override
@@ -1049,7 +1089,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 	/**
 	 * Recursive method to walk down the tour tree items and find the compared tours
-	 *
+	 * 
 	 * @param parentItem
 	 * @param CompareIds
 	 */
@@ -1146,7 +1186,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 			_tourViewer.getTree().dispose();
 
-			createTourViewer(_viewerContainer);
+			createUI10TourViewer(_viewerContainer);
 			_viewerContainer.layout();
 
 			_tourViewer.setInput(_tootItem = new TVICompareResultRootItem());
@@ -1351,7 +1391,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 	/**
 	 * !!!Recursive !!! update all tour items with new data
-	 *
+	 * 
 	 * @param rootItem
 	 * @param modifiedTours
 	 */

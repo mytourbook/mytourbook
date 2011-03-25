@@ -29,13 +29,13 @@ import net.tourbook.ui.UI;
 import net.tourbook.ui.ViewerDetailForm;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
-import net.tourbook.util.PixelConverter;
 import net.tourbook.util.TableLayoutComposite;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
@@ -139,9 +139,10 @@ public class DialogMarker extends TitleAreaDialog {
 	/*
 	 * none UI
 	 */
-	private NumberFormat			_nf								= NumberFormat.getNumberInstance();
-
 	private boolean					_isOkPressed					= false;
+	private PixelConverter			_pc;
+
+	private NumberFormat			_nf								= NumberFormat.getNumberInstance();
 	{
 		_nf.setMinimumFractionDigits(3);
 		_nf.setMaximumFractionDigits(3);
@@ -335,6 +336,8 @@ public class DialogMarker extends TitleAreaDialog {
 
 	private void createUI(final Composite parent) {
 
+		_pc = new PixelConverter(parent);
+
 		final Composite marginContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(marginContainer);
 		GridLayoutFactory.swtDefaults().applyTo(marginContainer);
@@ -444,7 +447,6 @@ public class DialogMarker extends TitleAreaDialog {
 		 * create columns
 		 */
 		TableViewerColumn tvc;
-		final PixelConverter pixelConverter = new PixelConverter(table);
 
 		final MarkerViewerLabelProvider labelProvider = new MarkerViewerLabelProvider();
 
@@ -457,7 +459,7 @@ public class DialogMarker extends TitleAreaDialog {
 		tvc.getColumn().setText(UI.UNIT_LABEL_DISTANCE);
 		tvc.getColumn().setToolTipText(Messages.Tour_Marker_Column_km_tooltip);
 		tvc.setLabelProvider(labelProvider);
-		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(11), false));
+		tableLayouter.addColumnData(new ColumnPixelData(_pc.convertWidthInCharsToPixels(11), false));
 
 		// column: marker
 		tvc = new TableViewerColumn(_markerViewer, SWT.LEAD);
@@ -470,14 +472,14 @@ public class DialogMarker extends TitleAreaDialog {
 		tvc.getColumn().setText(Messages.Tour_Marker_Column_horizontal_offset);
 		tvc.getColumn().setToolTipText(Messages.Tour_Marker_Column_horizontal_offset_tooltip);
 		tvc.setLabelProvider(labelProvider);
-		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(6), false));
+		tableLayouter.addColumnData(new ColumnPixelData(_pc.convertWidthInCharsToPixels(6), false));
 
 		// column: vertical offset
 		tvc = new TableViewerColumn(_markerViewer, SWT.TRAIL);
 		tvc.getColumn().setText(Messages.Tour_Marker_Column_vertical_offset);
 		tvc.getColumn().setToolTipText(Messages.Tour_Marker_Column_vertical_offset_tooltip);
 		tvc.setLabelProvider(labelProvider);
-		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(6), false));
+		tableLayouter.addColumnData(new ColumnPixelData(_pc.convertWidthInCharsToPixels(6), false));
 
 		/*
 		 * create table viewer

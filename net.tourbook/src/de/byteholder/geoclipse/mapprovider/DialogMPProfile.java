@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,6 +28,7 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.layout.TreeColumnLayout;
 import org.eclipse.jface.preference.ColorSelector;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -118,7 +119,6 @@ import de.byteholder.geoclipse.map.event.TileEventId;
 import de.byteholder.geoclipse.map.event.ZoomEvent;
 import de.byteholder.geoclipse.preferences.PrefPageMapProviders;
 import de.byteholder.geoclipse.ui.ViewerDetailForm;
-import de.byteholder.geoclipse.util.PixelConverter;
 import de.byteholder.gpx.GeoPosition;
 
 public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefaultActions {
@@ -238,6 +238,8 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 	private final NumberFormat						_nfLatLon								= NumberFormat
 																									.getNumberInstance();
+
+	private PixelConverter							_pc;
 
 	{
 		// initialize lat/lon formatter
@@ -462,7 +464,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 	private void createUI(final Composite parent) {
 
-		final PixelConverter pixelConverter = new PixelConverter(parent);
+		_pc = new PixelConverter(parent);
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
@@ -470,12 +472,12 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 				.applyTo(container);
 		GridLayoutFactory.fillDefaults().margins(10, 10).applyTo(container);
 		{
-			createUI100Container(container, pixelConverter);
-			createUI200Log(container, pixelConverter);
+			createUI100Container(container);
+			createUI200Log(container);
 		}
 	}
 
-	private void createUI100Container(final Composite parent, final PixelConverter pixelConverter) {
+	private void createUI100Container(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
@@ -484,7 +486,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			// left part (layer selection)
 			_leftContainer = new Composite(container, SWT.NONE);
 			GridLayoutFactory.fillDefaults().extendedMargins(0, 5, 0, 0).applyTo(_leftContainer);
-			createUI110LeftContainer(_leftContainer, pixelConverter);
+			createUI110LeftContainer(_leftContainer);
 
 			// sash
 			final Sash sash = new Sash(container, SWT.VERTICAL);
@@ -493,13 +495,13 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			// right part (map)
 			final Composite mapContainer = new Composite(container, SWT.NONE);
 			GridLayoutFactory.fillDefaults().extendedMargins(5, 0, 0, 0).spacing(0, 0).applyTo(mapContainer);
-			createUI180Map(mapContainer, pixelConverter);
+			createUI180Map(mapContainer);
 
 			_detailForm = new ViewerDetailForm(container, _leftContainer, sash, mapContainer, 30);
 		}
 	}
 
-	private void createUI110LeftContainer(final Composite parent, final PixelConverter pixelConverter) {
+	private void createUI110LeftContainer(final Composite parent) {
 
 		_innerContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(_innerContainer);
@@ -510,7 +512,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			label.setText(Messages.Dialog_MapConfig_Label_MapProvider);
 			label.setToolTipText(Messages.Dialog_MapConfig_Label_HintDragAndDrop);
 
-			createUI114Viewer(_innerContainer, pixelConverter);
+			createUI114Viewer(_innerContainer);
 			createUI140DialogProperties(_innerContainer);
 
 			/*
@@ -550,7 +552,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		}
 	}
 
-	private Control createUI114Viewer(final Composite parent, final PixelConverter pixelConverter) {
+	private Control createUI114Viewer(final Composite parent) {
 
 		final TreeColumnLayout treeLayout = new TreeColumnLayout();
 
@@ -699,7 +701,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 		}
 
-		createUI116ViewerColumns(treeLayout, pixelConverter);
+		createUI116ViewerColumns(treeLayout);
 
 		return layoutContainer;
 	}
@@ -709,7 +711,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 	 * 
 	 * @param pixelConverter
 	 */
-	private void createUI116ViewerColumns(final TreeColumnLayout treeLayout, final PixelConverter pixelConverter) {
+	private void createUI116ViewerColumns(final TreeColumnLayout treeLayout) {
 
 		TreeViewerColumn tvc;
 		TreeColumn tc;
@@ -875,7 +877,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 				updateLiveView();
 			}
 		});
-		treeLayout.setColumnData(tc, new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(10)));
+		treeLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(10)));
 
 		/*
 		 * column: alpha
@@ -902,7 +904,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 				}
 			}
 		});
-		treeLayout.setColumnData(tc, new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(10)));
+		treeLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(10)));
 
 		/*
 		 * column: brightness
@@ -930,7 +932,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 				}
 			}
 		});
-		treeLayout.setColumnData(tc, new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(10)));
+		treeLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(10)));
 
 		/*
 		 * column: empty to prevent scrolling to the right when the right column is selected
@@ -945,7 +947,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			}
 		});
 		tc = tvc.getColumn();
-		treeLayout.setColumnData(tc, new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(4)));
+		treeLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(4)));
 
 	}
 
@@ -1391,7 +1393,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		}
 	}
 
-	private void createUI180Map(final Composite parent, final PixelConverter pixelConverter) {
+	private void createUI180Map(final Composite parent) {
 
 		final Composite toolbarContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(toolbarContainer);
@@ -1481,23 +1483,20 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 			// label: tile info
 			_lblTileInfo = new Label(infoContainer, SWT.TRAIL);
-			GridDataFactory
-					.fillDefaults()
-					.hint(pixelConverter.convertWidthInCharsToPixels(25), SWT.DEFAULT)
-					.applyTo(_lblTileInfo);
+			GridDataFactory.fillDefaults().hint(_pc.convertWidthInCharsToPixels(25), SWT.DEFAULT).applyTo(_lblTileInfo);
 			_lblTileInfo.setToolTipText(Messages.Dialog_MapConfig_TileInfo_Tooltip_Line1
 					+ Messages.Dialog_MapConfig_TileInfo_Tooltip_Line2
 					+ Messages.Dialog_MapConfig_TileInfo_Tooltip_Line3);
 		}
 
 		/*
-		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		 * !!! don't do any map initialization until the map provider is set !!!
+		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! !!! don't do any
+		 * map initialization until the map provider is set !!!
 		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		 */
 	}
 
-	private void createUI200Log(final Composite parent, final PixelConverter pixelConverter) {
+	private void createUI200Log(final Composite parent) {
 
 		final Font monoFont = getMonoFont();
 		final Color parentBackground = parent.getBackground();
@@ -1553,7 +1552,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 				GridDataFactory.fillDefaults()//
 						.grab(true, false)
 						.span(2, 1)
-						.hint(SWT.DEFAULT, pixelConverter.convertHeightInCharsToPixels(5))
+						.hint(SWT.DEFAULT, _pc.convertHeightInCharsToPixels(5))
 						.applyTo(_txtLogDetail);
 				_formTk.adapt(_txtLogDetail, false, false);
 				_txtLogDetail.setFont(monoFont);
@@ -2386,8 +2385,8 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 				if (isWmsDisplayed) {
 
 					/*
-					 * remove parent tiles from loading cache because they can have loading
-					 * errors (from their children) which prevents them to be loaded again
+					 * remove parent tiles from loading cache because they can have loading errors
+					 * (from their children) which prevents them to be loaded again
 					 */
 					_mpProfile.resetParentTiles();
 				}
