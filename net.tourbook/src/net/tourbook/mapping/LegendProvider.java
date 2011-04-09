@@ -151,10 +151,20 @@ public class LegendProvider implements ILegendProvider {
 
 		final int unitFactor = _legendConfig.unitFactor;
 
-		if (_legendColor.isMinValueOverwrite && minValue < _legendColor.overwriteMinValue * unitFactor) {
+		/*
+		 * enforce min/max values, another option is necessary in the pref dialog to not enforce
+		 * min/max values
+		 */
+		if (_legendColor.isMinValueOverwrite /*
+											 * && minValue < _legendColor.overwriteMinValue *
+											 * unitFactor
+											 */) {
 			minValue = _legendColor.overwriteMinValue * unitFactor;
 		}
-		if (_legendColor.isMaxValueOverwrite && maxValue > _legendColor.overwriteMaxValue * unitFactor) {
+		if (_legendColor.isMaxValueOverwrite /*
+											 * && maxValue > _legendColor.overwriteMaxValue *
+											 * unitFactor
+											 */) {
 			maxValue = _legendColor.overwriteMaxValue * unitFactor;
 		}
 
