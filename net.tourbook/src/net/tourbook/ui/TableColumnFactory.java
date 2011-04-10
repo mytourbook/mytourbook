@@ -278,6 +278,22 @@ public abstract class TableColumnFactory {
 		};
 	};
 	
+	public static final TableColumnFactory BREAK_TIME = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "breakTime", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_BreakTime_Label);
+			colDef.setColumnHeader(Messages.ColumnFactory_BreakTime_Header);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_BreakTime_Tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(3));
+			
+			return colDef;
+		};
+	};
+	
 	public static final TableColumnFactory CADENCE = new TableColumnFactory() {
 		
 		@Override
@@ -294,7 +310,7 @@ public abstract class TableColumnFactory {
 			return colDef;
 		};
 	};
-	
+
 	public static final TableColumnFactory CALORIES = new TableColumnFactory() {
 		
 		@Override
@@ -834,6 +850,44 @@ public abstract class TableColumnFactory {
 			return colDef;
 		};
 	};
+	
+	public static final TableColumnFactory TOUR_TIME_DIFF = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "tourTimeDiff", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_TourTimeDiff_Label);
+			colDef.setColumnHeader(Messages.ColumnFactory_TourTimeDiff_Header);
+			colDef.setColumnUnit(Messages.ColumnFactory_tour_time);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_TourTimeDiff_Tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+			
+			return colDef;
+		};
+	};
+	
+	public static final TableColumnFactory DISTANCE_DIFF = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			String header = Messages.ColumnFactory_TourDistanceDiff_Header
+					+ UI.SPACE
+					+ UI.UNIT_LABEL_DISTANCE;
+
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "tourDistanceDiff", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_TourDistanceDiff_Label);
+			colDef.setColumnHeader(header);
+			colDef.setColumnUnit(UI.UNIT_LABEL_DISTANCE);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_TourDistanceDiff_Tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+			
+			return colDef;
+		};
+	};
 
 	public static final TableColumnFactory TOUR_TIME_HH_MM_SS = new TableColumnFactory() {
 		
@@ -904,13 +958,28 @@ public abstract class TableColumnFactory {
 		};
 	};
 	
+	public static final TableColumnFactory SERIE_START_END_INDEX = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "serieStartEndIndex", SWT.LEAD); //$NON-NLS-1$
+	
+			colDef.setColumnLabel(Messages.ColumnFactory_SerieStartEndIndex_Label);
+			colDef.setColumnHeader(Messages.ColumnFactory_SerieStartEndIndex);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
+			
+			return colDef;
+		};
+	};
+
 	public static final TableColumnFactory SEQUENCE = new TableColumnFactory() {
 		
 		@Override
 		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "sequence", SWT.TRAIL); //$NON-NLS-1$
-	
+			
 			colDef.setColumnLabel(Messages.ColumnFactory_sequence_label);
 			colDef.setColumnHeader(Messages.ColumnFactory_sequence);
 			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
@@ -1064,6 +1133,7 @@ public abstract class TableColumnFactory {
 			return colDef;
 		};
 	};
+
 	/**
 	 * @param columnManager
 	 * @param pixelConverter

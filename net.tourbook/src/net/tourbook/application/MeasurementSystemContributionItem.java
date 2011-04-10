@@ -19,6 +19,7 @@ package net.tourbook.application;
 import net.tourbook.Messages;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.CustomControlContribution;
+import net.tourbook.ui.UI;
 
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -135,6 +136,8 @@ public class MeasurementSystemContributionItem extends CustomControlContribution
 							ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE,
 							ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPTERATURE_F);
 				}
+
+				UI.updateUnits();
 
 				// fire modify event
 				_prefStore.setValue(ITourbookPreferences.MEASUREMENT_SYSTEM, Math.random());

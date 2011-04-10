@@ -191,6 +191,13 @@ public class ColumnManager {
 		});
 	}
 
+	/**
+	 * Create header context menu which has the action to modify columns
+	 * 
+	 * @param composite
+	 * @param compositeContextMenu
+	 * @return
+	 */
 	private Menu createHeaderContextMenuInternal(final Composite composite, final Menu compositeContextMenu) {
 
 		final Decorations shell = composite.getShell();

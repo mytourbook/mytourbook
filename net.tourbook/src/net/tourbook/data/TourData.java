@@ -595,6 +595,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public int[]											pulseSerie;
 
 	/**
+	 * Is <code>true</code> when the time slice is a break
+	 */
+	@Transient
+	public boolean[]										breakTimeSerie;
+
+	/**
 	 * contains the temperature in the metric measurement system
 	 */
 	@Transient
@@ -1032,6 +1038,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		altimeterSerie = null;
 		gradientSerie = null;
 
+		breakTimeSerie = null;
+
 		speedSerieImperial = null;
 		paceSerieMinuteImperial = null;
 		altimeterSerieImperial = null;
@@ -1373,9 +1381,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	public boolean computeAltitudeUpDown() {
 
-		final int prefMinAltitude = TourbookPlugin.getDefault()//
-				.getPreferenceStore()
-				.getInt(PrefPageComputedValues.STATE_COMPUTED_VALUE_MIN_ALTITUDE);
+		final int prefMinAltitude = _prefStore.getInt(PrefPageComputedValues.STATE_COMPUTED_VALUE_MIN_ALTITUDE);
 
 		final AltitudeUpDown altiUpDown = computeAltitudeUpDownInternal(null, prefMinAltitude);
 
@@ -1688,9 +1694,61 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 	}
 
-	private int computeBreakTimeVariable(final int minStopTime, final int startIndex, int endIndex) {
+	private int computeBreakTimeVariable(final int startIndex, final int endIndex) {
+
+		final float prefBreakMaxDistance = _prefStore
+				.getFloat(ITourbookPreferences.APP_DATA_BREAK_TIME_MAX_DISTANCE_VALUE) / UI.UNIT_VALUE_DISTANCE_SMALL;
+
+		final int breakMaxDistance = (int) (prefBreakMaxDistance + 0.5);
+		final int shortestBreakTime = _prefStore.getInt(ITourbookPreferences.APP_DATA_BREAK_TIME_MIN_TIME_VALUE);
+
+		return computeBreakTimeVariable(startIndex, endIndex, shortestBreakTime, breakMaxDistance);
+	}
+
+	private int computeBreakTimeVariable(	final int startIndex,
+											int endIndex,
+											final int shortestBreakTime,
+											final int breakMaxDistance) {
 
 		endIndex = Math.min(endIndex, timeSerie.length - 1);
+
+		int totalBreakTime = 0;
+
+		if (breakTimeSerie != null) {
+
+			int prevTime = timeSerie[startIndex];
+
+			for (int serieIndex = startIndex + 1; serieIndex <= endIndex; serieIndex++) {
+
+				final int currentTime = timeSerie[serieIndex];
+				final boolean isBreak = breakTimeSerie[serieIndex];
+
+				if (isBreak) {
+					totalBreakTime += currentTime - prevTime;
+				}
+
+				prevTime = currentTime;
+			}
+
+			return totalBreakTime;
+		}
+
+		/*
+		 * this is not yet implemented
+		 */
+
+		return totalBreakTime;
+	}
+
+	private int computeBreakTimeVariableOLD(final int startIndex,
+											int endIndex,
+											final int shortestBreakTime,
+											final int breakDistance) {
+
+		endIndex = Math.min(endIndex, timeSerie.length - 1);
+
+//		final int breakDistance = 10;
+//		final int shortestBreakTime = 20;
 
 		int lastMovingDistance = 0;
 		int lastMovingTime = 0;
@@ -1707,16 +1765,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			final int timeDiff = currentTime - lastMovingTime;
 			final int distDiff = currentDistance - lastMovingDistance;
 
-			if ((distDiff == 0) || ((timeDiff > minStopTime) && (distDiff < 10))) {
+			if ((distDiff == 0) || ((timeDiff > shortestBreakTime) && (distDiff < breakDistance))) {
 
 				// distance has not changed, check if a longer stop is done
 				// speed must be greater than 1.8 km/h (10m in 20 sec)
 
-				final int breakDiff = currentTime - currentBreakTime;
+				final int breakTimeDiff = currentTime - currentBreakTime;
 
-				breakTime += breakDiff;
+				breakTime += breakTimeDiff;
 
-				if (timeDiff > minStopTime) {
+				if (timeDiff > shortestBreakTime) {
 
 					// person has stopped for a break
 					totalBreakTime += breakTime;
@@ -1727,7 +1785,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 			} else {
 
-				// keep time and distance when the distance is changing
+				// keep time and distance when distance is changing
+
 				lastMovingTime = currentTime;
 				lastMovingDistance = currentDistance;
 
@@ -2040,10 +2099,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			return;
 		}
 
-		int minTimeDiff;
-		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-
-		minTimeDiff = prefStore.getInt(ITourbookPreferences.APP_DATA_SPEED_MIN_TIMESLICE_VALUE);
+		final int minTimeDiff = _prefStore.getInt(ITourbookPreferences.APP_DATA_SPEED_MIN_TIMESLICE_VALUE);
 
 		final int serieLength = timeSerie.length;
 		final int lastSerieIndex = serieLength - 1;
@@ -2150,7 +2206,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 				}
 				swapIndexDirection = !swapIndexDirection;
 
-				// check array scope
+				// check bounds
 				if ((lowIndex < 0) || (highIndex >= serieLength)) {
 					break;
 				}
@@ -2879,9 +2935,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	/**
 	 * Create the tour segment list from the segment index array
 	 * 
+	 * @param segmenterBreakDistance
+	 * @param segmenterBreakTime
 	 * @return
 	 */
-	public Object[] createTourSegments() {
+	public Object[] createTourSegments(final int segmenterBreakTime, final int segmenterBreakDistance) {
 
 		if ((segmentSerieIndex == null) || (segmentSerieIndex.length < 2)) {
 			// at least two points are required to build a segment
@@ -2964,12 +3022,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			 */
 			final int timeEnd = timeSerie[segmentEndIndex];
 			final int recordingTime = timeEnd - timeStart;
-			final int breakTime = getBreakTime(segmentStartIndex, segmentEndIndex);
-			final float drivingTime = recordingTime - breakTime;
+			final int segmentBreakTime = getBreakTime(
+					segmentStartIndex,
+					segmentEndIndex,
+					segmenterBreakTime,
+					segmenterBreakDistance);
+
+			final float drivingTime = recordingTime - segmentBreakTime;
 
 			segmentSerieRecordingTime[segmentIndex] = segment.recordingTime = recordingTime;
 			segmentSerieDrivingTime[segmentIndex] = segment.drivingTime = (int) drivingTime;
-			segmentSerieBreakTime[segmentIndex] = segment.breakTime = breakTime;
+			segmentSerieBreakTime[segmentIndex] = segment.breakTime = segmentBreakTime;
 			segmentSerieTimeTotal[segmentIndex] = segment.timeTotal = timeTotal += recordingTime;
 
 			float segmentDistance = 0.0f;
@@ -3273,7 +3336,36 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 			// variable time slices
 
-			return computeBreakTimeVariable(minBreakTime, startIndex, endIndex);
+			return computeBreakTimeVariable(startIndex, endIndex);
+
+		} else {
+
+			// fixed time slices
+
+			final int ignoreTimeSlices = deviceTimeInterval == 0 ? //
+					0
+					: getBreakTimeSlices(distanceSerie, startIndex, endIndex, minBreakTime / deviceTimeInterval);
+
+			return ignoreTimeSlices * deviceTimeInterval;
+		}
+	}
+
+	private int getBreakTime(	final int startIndex,
+								final int endIndex,
+								final int segmenterBreakTime,
+								final int segmenterBreakDistance) {
+
+		if (distanceSerie == null) {
+			return 0;
+		}
+
+		final int minBreakTime = 20;
+
+		if (deviceTimeInterval == -1) {
+
+			// variable time slices
+
+			return computeBreakTimeVariable(startIndex, endIndex, segmenterBreakTime, segmenterBreakDistance);
 
 		} else {
 

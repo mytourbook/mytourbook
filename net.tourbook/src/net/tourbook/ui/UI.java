@@ -40,6 +40,7 @@ import net.tourbook.util.Util;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
@@ -53,11 +54,15 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.Bullet;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.custom.StyleRange;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.GlyphMetrics;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.layout.GridData;
@@ -94,6 +99,8 @@ public class UI {
 	public static final String								SLASH_WITH_SPACE				= " / ";									//$NON-NLS-1$
 	public static final String								EMPTY_STRING_FORMAT				= "%s";									//$NON-NLS-1$
 	public static final String								MNEMONIC						= "&";										//$NON-NLS-1$
+	public static final String								BREAK_TIME_MARKER				= "x";										//$NON-NLS-1$
+
 	public static final char								TAB								= '\t';
 	public static final char								DOT								= '.';
 
@@ -128,6 +135,7 @@ public class UI {
 	/*
 	 * labels for the different measurement systems
 	 */
+	private static final String								UNIT_DISTANCE_METER				= "m";										//$NON-NLS-1$
 	private static final String								UNIT_ALTITUDE_M					= "m";										//$NON-NLS-1$
 	public static final String								UNIT_DISTANCE_KM				= "km";									//$NON-NLS-1$
 	private static final String								UNIT_SPEED_KM_H					= "km/h";									//$NON-NLS-1$
@@ -135,6 +143,7 @@ public class UI {
 	private static final String								UNIT_ALTIMETER_M_H				= "m/h";									//$NON-NLS-1$
 	private static final String								UNIT_PACE_MIN_P_KM				= "min/km";								//$NON-NLS-1$
 
+	private static final String								UNIT_DISTANCE_YARD				= "yd";									//$NON-NLS-1$
 	private static final String								UNIT_ALTITUDE_FT				= "ft";									//$NON-NLS-1$
 	public static final String								UNIT_DISTANCE_MI				= "mi";									//$NON-NLS-1$
 	private static final String								UNIT_SPEED_MPH					= "mph";									//$NON-NLS-1$
@@ -159,6 +168,11 @@ public class UI {
 	public static final float								UNIT_MILE						= 1.609344f;
 
 	/**
+	 * Imperial system for small distance, 1 yard = 3 feet = 36 inches = 0,9144 Meter
+	 */
+	public static final float								UNIT_YARD						= 0.9144f;
+
+	/**
 	 * Imperial system for height
 	 */
 	public static final float								UNIT_FOOT						= 0.3048f;
@@ -168,6 +182,12 @@ public class UI {
 	 * metric system is <code>1</code>
 	 */
 	public static float										UNIT_VALUE_DISTANCE				= 1;
+
+	/**
+	 * contains the system of measurement value for small distances relative to the metric system,
+	 * the metric system is <code>1</code>
+	 */
+	public static float										UNIT_VALUE_DISTANCE_SMALL		= 1;
 
 	/**
 	 * contains the system of measurement value for altitudes relative to the metric system, the
@@ -191,6 +211,7 @@ public class UI {
 	 * contains the unit label in the currenty measurement system for the distance values
 	 */
 	public static String									UNIT_LABEL_DISTANCE;
+	public static String									UNIT_LABEL_DISTANCE_SMALL;
 	public static String									UNIT_LABEL_ALTITUDE;
 	public static String									UNIT_LABEL_ALTIMETER;
 	public static String									UNIT_LABEL_TEMPERATURE;
@@ -510,6 +531,55 @@ public class UI {
 //	}
 
 	/**
+	 * Display text as a bulleted list
+	 * 
+	 * @param parent
+	 * @param bulletText
+	 * @param startLine
+	 *            Line where bullets should be started, 0 is the first line
+	 * @param spanHorizontal
+	 * @param horizontalHint
+	 * @param backgroundColor
+	 *            background color or <code>null</code> when color should not be set
+	 */
+	public static void createBullets(	final Composite parent,
+										final String bulletText,
+										final int startLine,
+										final int spanHorizontal,
+										final int horizontalHint,
+										final Color backgroundColor) {
+
+		try {
+
+			final StyleRange style = new StyleRange();
+			style.metrics = new GlyphMetrics(0, 0, 10);
+
+			final Bullet bullet = new Bullet(style);
+			final int lineCount = Util.countCharacter(bulletText, '\n');
+
+			final StyledText styledText = new StyledText(parent, SWT.READ_ONLY | SWT.WRAP | SWT.MULTI);
+			GridDataFactory
+					.fillDefaults()
+					.grab(true, false)
+					.span(spanHorizontal, 1)
+					.hint(horizontalHint, SWT.DEFAULT)
+					.applyTo(styledText);
+			styledText.setText(bulletText);
+
+			if (backgroundColor != null) {
+				styledText.setBackground(backgroundColor);
+			}
+
+			styledText.setLineBullet(startLine, lineCount, bullet);
+			styledText.setLineWrapIndent(startLine, lineCount, 10);
+
+		} catch (final Exception e) {
+			// ignore exception when there are less lines as required
+			StatusUtil.log(e);
+		}
+	}
+
+	/**
 	 * Disables all controls and their children
 	 */
 	public static void disableAllControls(final Composite container) {
@@ -781,15 +851,6 @@ public class UI {
 		return _timeFormatterShort;
 	}
 
-	public static UI getInstance() {
-
-		if (instance == null) {
-			instance = new UI();
-		}
-
-		return instance;
-	}
-
 //	private static String getSQLExceptionText(final SQLException e) {
 //
 //		final StringBuilder sb = new StringBuilder()//
@@ -804,6 +865,15 @@ public class UI {
 //
 //		return sb.toString();
 //	}
+
+	public static UI getInstance() {
+
+		if (instance == null) {
+			instance = new UI();
+		}
+
+		return instance;
+	}
 
 	/**
 	 * Checks if propertyData has the same tour as the oldTourData
@@ -976,23 +1046,23 @@ public class UI {
 		 * set colors
 		 */
 		final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
-		final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
+		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
 		colorRegistry.put(VIEW_COLOR_CATEGORY, //
-				PreferenceConverter.getColor(store, ITourbookPreferences.VIEW_LAYOUT_COLOR_CATEGORY));
+				PreferenceConverter.getColor(prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_CATEGORY));
 		colorRegistry.put(VIEW_COLOR_TITLE, //
-				PreferenceConverter.getColor(store, ITourbookPreferences.VIEW_LAYOUT_COLOR_TITLE));
+				PreferenceConverter.getColor(prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_TITLE));
 		colorRegistry.put(VIEW_COLOR_SUB, //
-				PreferenceConverter.getColor(store, ITourbookPreferences.VIEW_LAYOUT_COLOR_SUB));
+				PreferenceConverter.getColor(prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_SUB));
 		colorRegistry.put(VIEW_COLOR_SUB_SUB, //
-				PreferenceConverter.getColor(store, ITourbookPreferences.VIEW_LAYOUT_COLOR_SUB_SUB));
+				PreferenceConverter.getColor(prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_SUB_SUB));
 		colorRegistry.put(VIEW_COLOR_TOUR, //
-				PreferenceConverter.getColor(store, ITourbookPreferences.VIEW_LAYOUT_COLOR_TOUR));
+				PreferenceConverter.getColor(prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_TOUR));
 
 		colorRegistry.put(VIEW_COLOR_BG_SEGMENTER_UP, //
-				PreferenceConverter.getColor(store, ITourbookPreferences.VIEW_LAYOUT_COLOR_BG_SEGMENTER_UP));
+				PreferenceConverter.getColor(prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_BG_SEGMENTER_UP));
 		colorRegistry.put(VIEW_COLOR_BG_SEGMENTER_DOWN, //
-				PreferenceConverter.getColor(store, ITourbookPreferences.VIEW_LAYOUT_COLOR_BG_SEGMENTER_DOWN));
+				PreferenceConverter.getColor(prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_BG_SEGMENTER_DOWN));
 	}
 
 	public static GridData setWidth(final Control control, final int width) {
@@ -1093,6 +1163,9 @@ public class UI {
 	 */
 	public static void updateUnits() {
 
+		/*
+		 * this cannot be set from a static field because it can be null !!!
+		 */
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
 		/*
@@ -1104,8 +1177,11 @@ public class UI {
 			// set imperial measure system
 
 			UNIT_VALUE_DISTANCE = UNIT_MILE;
+			UNIT_VALUE_DISTANCE_SMALL = UNIT_YARD;
 
 			UNIT_LABEL_DISTANCE = UNIT_DISTANCE_MI;
+			UNIT_LABEL_DISTANCE_SMALL = UNIT_DISTANCE_YARD;
+
 			UNIT_LABEL_SPEED = UNIT_SPEED_MPH;
 			UNIT_LABEL_PACE = UNIT_PACE_MIN_P_MILE;
 
@@ -1114,8 +1190,11 @@ public class UI {
 			// default is the metric measure system
 
 			UNIT_VALUE_DISTANCE = 1;
+			UNIT_VALUE_DISTANCE_SMALL = 1;
 
 			UNIT_LABEL_DISTANCE = UNIT_DISTANCE_KM;
+			UNIT_LABEL_DISTANCE_SMALL = UNIT_DISTANCE_METER;
+
 			UNIT_LABEL_SPEED = UNIT_SPEED_KM_H;
 			UNIT_LABEL_PACE = UNIT_PACE_MIN_P_KM;
 		}

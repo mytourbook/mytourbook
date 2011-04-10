@@ -92,6 +92,8 @@ public interface ITourbookPreferences {
 	public static final String	APP_DATA_FILTER_IS_MODIFIED					= "application.data-filter-is-modified";					//$NON-NLS-1$
 
 	public static final String	APP_DATA_SPEED_MIN_TIMESLICE_VALUE			= "application.data-speed-min-timeslice-value";			//$NON-NLS-1$
+	public static final String	APP_DATA_BREAK_TIME_MIN_TIME_VALUE			= "APP_DATA_BREAK_TIME_MIN_TIME_VALUE";					//$NON-NLS-1$
+	public static final String	APP_DATA_BREAK_TIME_MAX_DISTANCE_VALUE		= "APP_DATA_BREAK_TIME_MAX_DISTANCE_VALUE";				//$NON-NLS-1$
 
 	public static final String	GRAPH_PROPERTY_CHARTTYPE					= "graph.property.chartType";								//$NON-NLS-1$
 
@@ -173,11 +175,11 @@ public interface ITourbookPreferences {
 	 * tour data editor
 	 */
 	public static final String	TOURDATA_EDITOR_CONFIRMATION_REVERT_TOUR	= "tourdata.editor.confirmation.revert-tour";				//$NON-NLS-1$
-	public static final String	TOUR_EDITOR_DESCRIPTION_HEIGHT				= "tourdata.editor.description-height";						//$NON-NLS-1$
+	public static final String	TOUR_EDITOR_DESCRIPTION_HEIGHT				= "tourdata.editor.description-height";					//$NON-NLS-1$
 	public static final String	TOUR_EDITOR_TITLE_HISTORY					= "tourdata.editor.title.history";							//$NON-NLS-1$
-	public static final String	TOUR_EDITOR_START_LOCATION_HISTORY			= "tourdata.editor.start.location.history";					//$NON-NLS-1$
+	public static final String	TOUR_EDITOR_START_LOCATION_HISTORY			= "tourdata.editor.start.location.history";				//$NON-NLS-1$
 	public static final String	TOUR_EDITOR_END_LOCATION_HISTORY			= "tourdata.editor.end.location.history";					//$NON-NLS-1$
-	
+
 	/*
 	 * common appearance
 	 */
@@ -187,7 +189,7 @@ public interface ITourbookPreferences {
 	public static final String	APPEARANCE_SHOW_TOUR_TYPE_CONTEXT_MENU		= "appearance.ShowTourTypeContextMenuOnMouseHovering";		//$NON-NLS-1$
 
 	public static final String	APPEARANCE_IS_TAGGING_AUTO_OPEN				= "Appearance.IsAutoOpenTagging";							//$NON-NLS-1$
-	public static final String	APPEARANCE_IS_TAGGING_ANIMATION		= "Appearance.IsTaggingAnimation";							//$NON-NLS-1$
+	public static final String	APPEARANCE_IS_TAGGING_ANIMATION				= "Appearance.IsTaggingAnimation";							//$NON-NLS-1$
 	public static final String	APPEARANCE_TAGGING_AUTO_OPEN_DELAY			= "Appearance.AutoOpenTaggingDelay";						//$NON-NLS-1$
 
 	/*
@@ -251,5 +253,6 @@ public interface ITourbookPreferences {
 	 * view actions
 	 */
 	public static final String	VIEW_DOUBLE_CLICK_ACTIONS					= "ViewDoubleClickActions";								//$NON-NLS-1$
+
 
 }

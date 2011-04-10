@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -25,12 +25,19 @@ public class SelectionChartXSliderPosition implements ISelection {
 	public static final int	IGNORE_SLIDER_POSITION			= -1;
 	public static final int	SLIDER_POSITION_AT_CHART_BORDER	= -2;
 
+	private int				_beforeLeftSliderIndex			= IGNORE_SLIDER_POSITION;
 	private int				_leftSliderValueIndex			= IGNORE_SLIDER_POSITION;
 	private int				_rightSliderValueIndex			= IGNORE_SLIDER_POSITION;
 
 	private boolean			_isCenterSliderPosition			= false;
 
 	private Chart			_chart;
+
+	/**
+	 * When <code>true</code> the start index must be adjusted to the next time slice, this bug
+	 * exists since the beginning but is visible since the break time is visualized.
+	 */
+	private boolean			_isAdjustStartIndex;
 
 	public SelectionChartXSliderPosition(final Chart chart, final int leftValueIndex, final int rightValueIndex) {
 
@@ -41,13 +48,31 @@ public class SelectionChartXSliderPosition implements ISelection {
 	}
 
 	public SelectionChartXSliderPosition(	final Chart chart,
+											final int startIndex,
+											final int endIndex,
+											final boolean isAdjustStartIndex) {
+
+		this(chart, startIndex, endIndex);
+
+		_isAdjustStartIndex = isAdjustStartIndex;
+
+	}
+
+	public SelectionChartXSliderPosition(	final Chart chart,
+											final int serieIndex0,
 											final int serieIndex1,
 											final int serieIndex2,
 											final boolean centerSliderPosition) {
 
 		this(chart, serieIndex1, serieIndex2);
 
-		this._isCenterSliderPosition = centerSliderPosition;
+		_beforeLeftSliderIndex = serieIndex0;
+
+		_isCenterSliderPosition = centerSliderPosition;
+	}
+
+	public int getBeforeLeftSliderIndex() {
+		return _beforeLeftSliderIndex;
 	}
 
 	public Chart getChart() {
@@ -62,6 +87,10 @@ public class SelectionChartXSliderPosition implements ISelection {
 		return _rightSliderValueIndex;
 	}
 
+	public boolean isAdjustStartIndex() {
+		return _isAdjustStartIndex;
+	}
+
 	public boolean isCenterSliderPosition() {
 		return _isCenterSliderPosition;
 	}
@@ -73,4 +102,5 @@ public class SelectionChartXSliderPosition implements ISelection {
 	public void setChart(final Chart chart) {
 		_chart = chart;
 	}
+
 }

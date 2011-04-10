@@ -1253,6 +1253,7 @@ public class ChartComponents extends Composite {
 		final ChartXSlider leftSlider = _componentGraph.getLeftSlider();
 		final ChartXSlider rightSlider = _componentGraph.getRightSlider();
 
+		final int slider0ValueIndex = sliderPosition.getBeforeLeftSliderIndex();
 		final int slider1ValueIndex = sliderPosition.getLeftSliderValueIndex();
 		final int slider2ValueIndex = sliderPosition.getRightSliderValueIndex();
 
@@ -1266,11 +1267,20 @@ public class ChartComponents extends Composite {
 			_componentGraph.setXSliderValueIndex(leftSlider, slider1ValueIndex, centerSliderPosition);
 		}
 
-		// move right slider
-		if (slider2ValueIndex == SelectionChartXSliderPosition.SLIDER_POSITION_AT_CHART_BORDER) {
-			_componentGraph.setXSliderValueIndex(rightSlider, xValues.length - 1, centerSliderPosition);
-		} else if (slider2ValueIndex != SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
-			_componentGraph.setXSliderValueIndex(rightSlider, slider2ValueIndex, centerSliderPosition);
+		if (slider0ValueIndex != SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
+
+			// move second slider before the first slider
+
+			_componentGraph.setXSliderValueIndex(rightSlider, slider0ValueIndex, centerSliderPosition);
+
+		} else {
+
+			// move right slider
+			if (slider2ValueIndex == SelectionChartXSliderPosition.SLIDER_POSITION_AT_CHART_BORDER) {
+				_componentGraph.setXSliderValueIndex(rightSlider, xValues.length - 1, centerSliderPosition);
+			} else if (slider2ValueIndex != SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
+				_componentGraph.setXSliderValueIndex(rightSlider, slider2ValueIndex, centerSliderPosition);
+			}
 		}
 
 		_componentGraph.redraw();

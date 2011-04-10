@@ -238,6 +238,10 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		// speed minimum time slice value in seconds
 		store.setDefault(ITourbookPreferences.APP_DATA_SPEED_MIN_TIMESLICE_VALUE, 10);
 
+		// break time, default is 1.8 km/h (10m in 20 sec)
+		store.setDefault(ITourbookPreferences.APP_DATA_BREAK_TIME_MAX_DISTANCE_VALUE, 10.0f);
+		store.setDefault(ITourbookPreferences.APP_DATA_BREAK_TIME_MIN_TIME_VALUE, 20);
+
 		/*
 		 * calendar week
 		 */

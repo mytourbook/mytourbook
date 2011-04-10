@@ -356,7 +356,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 					// measurement system has changed
 
-					UI.updateUnits();
+//					UI.updateUnits();
 
 					_columnManager.saveState(_state);
 					_columnManager.clearColumns();

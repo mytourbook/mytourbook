@@ -206,6 +206,8 @@ public class Messages extends NLS {
 	public static String		App_TourType_ToolTip;
 	public static String		App_TourType_ToolTipTitle;
 
+	public static String	App_Unit_Seconds_Small;
+
 	public static String		App_Window_Title;
 
 	public static String		Compare_Result_Action_check_selected_tours;
@@ -225,6 +227,30 @@ public class Messages extends NLS {
 	public static String		Compare_Result_Column_kmh_tooltip;
 	public static String		Compare_Result_Column_tour;
 
+	public static String	Compute_BreakTime_Button_ComputeValues;
+
+	public static String	Compute_BreakTime_Button_ComputeValues_Tooltip;
+
+	public static String	Compute_BreakTime_Button_SetDefaultValues;
+
+	public static String	Compute_BreakTime_Button_SetDefaultValues_Tooltip;
+
+	public static String	Compute_BreakTime_Group_BreakTime;
+
+	public static String	Compute_BreakTime_Label_Description;
+
+	public static String	Compute_BreakTime_Label_MinimumDistance;
+
+	public static String	Compute_BreakTime_Label_MinimumSpeed;
+
+	public static String	Compute_BreakTime_Label_MinimumTime;
+
+	public static String	Compute_BreakTime_Label_TourBreakTime;
+
+	public static String	Compute_BreakTime_Link_SetDefaultValues;
+
+	public static String	Compute_BreakTime_Link_SetDefaultValues_Tooltip;
+
 	public static String		Conconi_Chart_Chk_LogScaling;
 	public static String		Conconi_Chart_Chk_LogScaling_Tooltip;
 	public static String		Conconi_Chart_DeflactionPoint;
@@ -239,6 +265,8 @@ public class Messages extends NLS {
 	public static String		compute_tourValueElevation_dlg_computeValues_title;
 	public static String		compute_tourValueElevation_group_computeTourAltitude;
 	public static String		compute_tourValueElevation_label_description;
+
+	public static String	compute_tourValueElevation_label_description_Hints;
 	public static String		compute_tourValueElevation_label_minAltiDifference;
 	public static String		compute_tourValueElevation_resultText;
 	public static String		compute_tourValueElevation_subTaskText;
@@ -249,6 +277,8 @@ public class Messages extends NLS {
 	public static String		compute_tourValueSpeed_dlg_computeValues_title;
 	public static String		compute_tourValueSpeed_group_speed;
 	public static String		compute_tourValueSpeed_label_description;
+
+	public static String	compute_tourValueSpeed_label_description_Hints;
 	public static String		compute_tourValueSpeed_label_speedTimeSlice;
 	public static String		compute_tourValueSpeed_resultText;
 	public static String		compute_tourValueSpeed_subTaskText;
@@ -862,6 +892,8 @@ public class Messages extends NLS {
 	public static String		Tour_Segmenter_Label_default_tolerance;
 	public static String		Tour_Segmenter_Label_no_chart;
 	public static String		Tour_Segmenter_Label_tolerance;
+
+	public static String	Tour_Segmenter_Type_ByBreakTime;
 
 	public static String		tag_view_action_refresh_view_tooltip;
 	public static String		tag_view_title_tag;

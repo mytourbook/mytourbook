@@ -274,15 +274,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private int[]								_seriePulse;
 	private double[]							_serieLatitude;
 	private double[]							_serieLongitude;
+	private boolean[]							_serieBreakTime;
+
 	// slice viewer
 	private ColumnDefinition					_colDefAltitude;
-
 	private ColumnDefinition					_colDefCadence;
 	private ColumnDefinition					_colDefPulse;
 	private ColumnDefinition					_colDefTemperature;
 	private ColumnDefinition					_colDefSliceMarker;
 	private ColumnDefinition					_colDefLatitude;
 	private ColumnDefinition					_colDefLongitude;
+
 	// marker viewer
 	private ColumnDefinition					_colDefMarker;
 
@@ -1411,7 +1413,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				sb.setLength(0);
 
 				// no.
-				sb.append(Integer.toString(serieIndex + 1));
+				sb.append(Integer.toString(serieIndex + 0));
 				sb.append(UI.TAB);
 
 				// time hh:mm:ss
@@ -1508,6 +1510,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				// latitude
 				if (_serieLatitude != null) {
 					sb.append(Double.toString(_serieLatitude[serieIndex]));
+				}
+				sb.append(UI.TAB);
+
+				// break time
+				if (_serieBreakTime != null) {
+					sb.append(_serieBreakTime[serieIndex] ? 1 : 0);
 				}
 				sb.append(UI.TAB);
 
@@ -1984,6 +1992,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				} else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
 
 					clearEditorContent();
+
+				} else if (eventId == TourEventId.SEGMENT_LAYER_CHANGED) {
+
+					updateUIFromModel(_tourData, true, true);
 
 				} else if (eventId == TourEventId.UPDATE_UI) {
 
@@ -2668,7 +2680,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			}
 		});
 
-		table.setMenu(menuMgr.createContextMenu(table));
+		final Menu tableContextMenu = menuMgr.createContextMenu(table);
+
+		_sliceColumnManager.createHeaderContextMenu(table, tableContextMenu);
 	}
 
 	/**
@@ -2768,9 +2782,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			}
 		});
 
-		table.setMenu(menuMgr.createContextMenu(table));
+		final Menu tableContextMenu = menuMgr.createContextMenu(table);
 
-		getSite().registerContextMenu(menuMgr, _markerViewer);
+		_markerColumnManager.createHeaderContextMenu(table, tableContextMenu);
 	}
 
 	private void createUISection110Title(final Composite parent) {
@@ -3960,6 +3974,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		defineSliceViewerColumns_Power();
 		defineSliceViewerColumns_Latitude();
 		defineSliceViewerColumns_Longitude();
+		defineSliceViewerColumns_TimeDiff();
+		defineSliceViewerColumns_DistanceDiff();
+		defineSliceViewerColumns_BreakTime();
 	}
 
 	/**
@@ -3996,6 +4013,28 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
 					cell.setText(Integer.toString((int) (_serieAltitude[timeSlice.serieIndex] / _unitValueAltitude)));
 
+				} else {
+					cell.setText(UI.EMPTY_STRING);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: cadence
+	 */
+	private void defineSliceViewerColumns_BreakTime() {
+
+		ColumnDefinition colDef;
+
+		_colDefCadence = colDef = TableColumnFactory.BREAK_TIME.createColumn(_sliceColumnManager, _pc);
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				if (_serieBreakTime != null) {
+					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+					cell.setText(_serieBreakTime[timeSlice.serieIndex] ? UI.BREAK_TIME_MARKER : UI.EMPTY_STRING);
 				} else {
 					cell.setText(UI.EMPTY_STRING);
 				}
@@ -4046,6 +4085,42 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 					cell.setText(_nf3.format(distance));
 
+				} else {
+					cell.setText(UI.EMPTY_STRING);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: distance difference in seconds to previous slice
+	 */
+	private void defineSliceViewerColumns_DistanceDiff() {
+
+		final ColumnDefinition colDef = TableColumnFactory.DISTANCE_DIFF.createColumn(_sliceColumnManager, _pc);
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				if (_serieDistance != null) {
+
+					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+					final int serieIndex = timeSlice.serieIndex;
+
+					if (serieIndex == 0) {
+						cell.setText(Integer.toString(0));
+					} else {
+
+						final float distancePrevious = ((float) _serieDistance[serieIndex - 1])
+								/ 1000
+								/ _unitValueDistance;
+						final float distance = ((float) _serieDistance[serieIndex])//
+								/ 1000
+								/ _unitValueDistance;
+
+						cell.setText(_nf3.format(distance - distancePrevious));
+					}
 				} else {
 					cell.setText(UI.EMPTY_STRING);
 				}
@@ -4233,7 +4308,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				final int logIndex = ((TimeSlice) cell.getElement()).uniqueCreateIndex;
 
 				// the UI shows the time slice number starting with 1 and not with 0
-				cell.setText(Integer.toString(logIndex + 1));
+				cell.setText(Integer.toString(logIndex + 0));
 
 				// mark reference tour with a different background color
 				boolean isBgSet = false;
@@ -4311,6 +4386,32 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 						cell.setText(_nf1.format(metricTemperature));
 					}
 
+				} else {
+					cell.setText(UI.EMPTY_STRING);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: time difference in seconds to previous slice
+	 */
+	private void defineSliceViewerColumns_TimeDiff() {
+
+		final ColumnDefinition colDef = TableColumnFactory.TOUR_TIME_DIFF.createColumn(_sliceColumnManager, _pc);
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				if (_serieTime != null) {
+					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+					final int serieIndex = timeSlice.serieIndex;
+					if (serieIndex == 0) {
+						cell.setText(Integer.toString(0));
+					} else {
+						cell.setText(Integer.toString(_serieTime[serieIndex] - _serieTime[serieIndex - 1]));
+					}
 				} else {
 					cell.setText(UI.EMPTY_STRING);
 				}
@@ -4851,6 +4952,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		final Object firstItem = selectedData[0];
 
+		int serieIndex0 = -1;
 		int serieIndex1 = -1;
 		int serieIndex2 = -1;
 
@@ -4860,7 +4962,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			if (firstItem instanceof TimeSlice) {
 
-				serieIndex1 = ((TimeSlice) firstItem).serieIndex;
+				final int serieIndexFirst = ((TimeSlice) firstItem).serieIndex;
+
+				/*
+				 * position slider at the beginning of the first slice
+				 */
+				serieIndex1 = serieIndexFirst > 0 ? serieIndexFirst - 1 : 0;
 				serieIndex2 = ((TimeSlice) selectedData[selectedData.length - 1]).serieIndex;
 
 			} else if (firstItem instanceof TourMarker) {
@@ -4875,7 +4982,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			if (firstItem instanceof TimeSlice) {
 
-				serieIndex1 = ((TimeSlice) firstItem).serieIndex;
+				final int serieIndexFirst = ((TimeSlice) firstItem).serieIndex;
+
+				/*
+				 * position slider at the beginning of the slice so that each slice borders has an
+				 * slider
+				 */
+				serieIndex0 = serieIndexFirst > 0
+						? serieIndexFirst - 1
+						: SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION;
+
+				serieIndex1 = serieIndexFirst;
 				serieIndex2 = SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION;
 
 			} else if (firstItem instanceof TourMarker) {
@@ -4900,7 +5017,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				}
 
 			} else {
-				sliderSelection = new SelectionChartXSliderPosition(_tourChart, serieIndex1, serieIndex2, true);
+
+				sliderSelection = new SelectionChartXSliderPosition(
+						_tourChart,
+						serieIndex0,
+						serieIndex1,
+						serieIndex2,
+						true);
 			}
 
 			_postSelectionProvider.setSelection(sliderSelection);
@@ -4935,6 +5058,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		_serieLatitude = _tourData.latitudeSerie;
 		_serieLongitude = _tourData.longitudeSerie;
+
+		_serieBreakTime = _tourData.breakTimeSerie;
 
 		_serieGradient = _tourData.getGradientSerie();
 		_serieSpeed = _tourData.getSpeedSerie();
@@ -6218,21 +6343,27 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		final Table table = (Table) _sliceViewer.getControl();
 		final int itemCount = table.getItemCount();
 
-		final int valueIndex1 = sliderPosition.getLeftSliderValueIndex();
-		final int valueIndex2 = sliderPosition.getRightSliderValueIndex();
+		int valueIndexStart = sliderPosition.getLeftSliderValueIndex();
+		final int valueIndexEnd = sliderPosition.getRightSliderValueIndex();
+
+		final boolean isAdjustStartIndex = sliderPosition.isAdjustStartIndex();
+
+		if (isAdjustStartIndex && (valueIndexStart < valueIndexEnd && valueIndexStart != 0)) {
+			valueIndexStart++;
+		}
 
 		// adjust to array bounds
-		final int checkedValueIndex1 = Math.max(0, Math.min(valueIndex1, itemCount - 1));
-		final int checkedValueIndex2 = Math.max(0, Math.min(valueIndex2, itemCount - 1));
+		final int checkedValueIndex1 = Math.max(0, Math.min(valueIndexStart, itemCount - 1));
+		final int checkedValueIndex2 = Math.max(0, Math.min(valueIndexEnd, itemCount - 1));
 
-		if ((valueIndex1 == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION)
-				&& (valueIndex1 == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION)) {
+		if ((valueIndexStart == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION)
+				&& (valueIndexStart == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION)) {
 			return;
 		}
 
-		if (valueIndex1 == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
+		if (valueIndexStart == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
 			table.setSelection(checkedValueIndex2);
-		} else if (valueIndex2 == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
+		} else if (valueIndexEnd == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
 			table.setSelection(checkedValueIndex1);
 		} else {
 			table.setSelection(checkedValueIndex1, checkedValueIndex2);
@@ -7177,6 +7308,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		// latitude
 		sb.append("latitude"); //$NON-NLS-1$
+		sb.append(UI.TAB);
+
+		// break time
+		sb.append("break"); //$NON-NLS-1$
 		sb.append(UI.TAB);
 
 		// end of line
