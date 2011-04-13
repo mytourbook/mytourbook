@@ -92,8 +92,7 @@ public interface ITourbookPreferences {
 	public static final String	APP_DATA_FILTER_IS_MODIFIED					= "application.data-filter-is-modified";					//$NON-NLS-1$
 
 	public static final String	APP_DATA_SPEED_MIN_TIMESLICE_VALUE			= "application.data-speed-min-timeslice-value";			//$NON-NLS-1$
-	public static final String	APP_DATA_BREAK_TIME_MIN_TIME_VALUE			= "APP_DATA_BREAK_TIME_MIN_TIME_VALUE";					//$NON-NLS-1$
-	public static final String	APP_DATA_BREAK_TIME_MAX_DISTANCE_VALUE		= "APP_DATA_BREAK_TIME_MAX_DISTANCE_VALUE";				//$NON-NLS-1$
+	public static final String	APP_DATA_BREAK_TIME_MIN_SPEED_VALUE			= "app.data.break-time-min-speed-value";					//$NON-NLS-1$
 
 	public static final String	GRAPH_PROPERTY_CHARTTYPE					= "graph.property.chartType";								//$NON-NLS-1$
 
@@ -253,6 +252,5 @@ public interface ITourbookPreferences {
 	 * view actions
 	 */
 	public static final String	VIEW_DOUBLE_CLICK_ACTIONS					= "ViewDoubleClickActions";								//$NON-NLS-1$
-
 
 }

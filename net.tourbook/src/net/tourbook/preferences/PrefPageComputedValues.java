@@ -632,13 +632,13 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 		_spinnerSpeedMinTime.setSelection(//
 				_prefStore.getDefaultInt(ITourbookPreferences.APP_DATA_SPEED_MIN_TIMESLICE_VALUE));
 
-		final float breakDistance = _prefStore
-				.getDefaultFloat(ITourbookPreferences.APP_DATA_BREAK_TIME_MAX_DISTANCE_VALUE)
-				/ UI.UNIT_VALUE_DISTANCE_SMALL;
-
-		_spinnerBreakMaxDistance.setSelection((int) (breakDistance + 0.5));
-		_spinnerBreakMinTime.setSelection(//
-				_prefStore.getDefaultInt(ITourbookPreferences.APP_DATA_BREAK_TIME_MIN_TIME_VALUE));
+//		final float breakDistance = _prefStore
+//				.getDefaultFloat(ITourbookPreferences.APP_DATA_BREAK_TIME_MAX_DISTANCE_VALUE)
+//				/ UI.UNIT_VALUE_DISTANCE_SMALL;
+//
+//		_spinnerBreakMaxDistance.setSelection((int) (breakDistance + 0.5));
+//		_spinnerBreakMinTime.setSelection(//
+//				_prefStore.getDefaultInt(ITourbookPreferences.APP_DATA_BREAK_TIME_MIN_TIME_VALUE));
 
 		onChangeProperty();
 
@@ -682,12 +682,12 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 		 */
 		_spinnerSpeedMinTime.setSelection(_prefStore.getInt(ITourbookPreferences.APP_DATA_SPEED_MIN_TIMESLICE_VALUE));
 
-		final float breakDistance = _prefStore.getFloat(ITourbookPreferences.APP_DATA_BREAK_TIME_MAX_DISTANCE_VALUE)
-				/ UI.UNIT_VALUE_DISTANCE_SMALL;
-
-		_spinnerBreakMaxDistance.setSelection((int) (breakDistance + 0.5));
-		_spinnerBreakMinTime.setSelection(//
-				_prefStore.getInt(ITourbookPreferences.APP_DATA_BREAK_TIME_MIN_TIME_VALUE));
+//		final float breakDistance = _prefStore.getFloat(ITourbookPreferences.APP_DATA_BREAK_TIME_MAX_DISTANCE_VALUE)
+//				/ UI.UNIT_VALUE_DISTANCE_SMALL;
+//
+//		_spinnerBreakMaxDistance.setSelection((int) (breakDistance + 0.5));
+//		_spinnerBreakMinTime.setSelection(//
+//				_prefStore.getInt(ITourbookPreferences.APP_DATA_BREAK_TIME_MIN_TIME_VALUE));
 
 		// compute min speed
 		onChangeBreakTime();
@@ -706,10 +706,10 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 				_spinnerSpeedMinTime.getSelection());
 
 		final float breakDistance = _spinnerBreakMaxDistance.getSelection() * UI.UNIT_VALUE_DISTANCE_SMALL;
-		_prefStore.setValue(ITourbookPreferences.APP_DATA_BREAK_TIME_MAX_DISTANCE_VALUE, breakDistance);
-		_prefStore.setValue(
-				ITourbookPreferences.APP_DATA_BREAK_TIME_MIN_TIME_VALUE,
-				_spinnerBreakMinTime.getSelection());
+//		_prefStore.setValue(ITourbookPreferences.APP_DATA_BREAK_TIME_MAX_DISTANCE_VALUE, breakDistance);
+//		_prefStore.setValue(
+//				ITourbookPreferences.APP_DATA_BREAK_TIME_MIN_TIME_VALUE,
+//				_spinnerBreakMinTime.getSelection());
 	}
 
 	private void saveUIState() {

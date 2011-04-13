@@ -237,6 +237,8 @@ public class Messages extends NLS {
 
 	public static String	Compute_BreakTime_Group_BreakTime;
 
+	public static String	Compute_BreakTime_Label_ComputeBreakTimeBy;
+
 	public static String	Compute_BreakTime_Label_Description;
 
 	public static String	Compute_BreakTime_Label_MinimumDistance;
@@ -252,6 +254,10 @@ public class Messages extends NLS {
 	public static String	Compute_BreakTime_Link_SetDefaultValues;
 
 	public static String	Compute_BreakTime_Link_SetDefaultValues_Tooltip;
+
+	public static String	Compute_BreakTime_Radio_Speed;
+
+	public static String	Compute_BreakTime_Radio_TimeDistance;
 
 	public static String		Conconi_Chart_Chk_LogScaling;
 	public static String		Conconi_Chart_Chk_LogScaling_Tooltip;

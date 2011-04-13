@@ -61,14 +61,14 @@ public class Util {
 	private static final String	URL_SPACE								= " ";											//$NON-NLS-1$
 	private static final String	URL_SPACE_REPLACEMENT					= "%20";										//$NON-NLS-1$
 
-	public static final String	UNIQUE_ID_SUFFIX_GARMIN_FIT				= "12653"; //$NON-NLS-1$
-	public static final String	UNIQUE_ID_SUFFIX_GARMIN_TCX				= "42984"; //$NON-NLS-1$
-	public static final String	UNIQUE_ID_SUFFIX_GPX					= "31683"; //$NON-NLS-1$
-	public static final String	UNIQUE_ID_SUFFIX_NMEA					= "32481"; //$NON-NLS-1$
-	public static final String	UNIQUE_ID_SUFFIX_POLAR_HRM				= "63193"; //$NON-NLS-1$
-	public static final String	UNIQUE_ID_SUFFIX_POLAR_PDD				= "76913"; //$NON-NLS-1$
-	public static final String	UNIQUE_ID_SUFFIX_POLAR_TRAINER			= "13457"; //$NON-NLS-1$
-	public static final String	UNIQUE_ID_SUFFIX_SPORT_TRACKS_FITLOG	= "24168"; //$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_GARMIN_FIT				= "12653";										//$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_GARMIN_TCX				= "42984";										//$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_GPX					= "31683";										//$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_NMEA					= "32481";										//$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_POLAR_HRM				= "63193";										//$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_POLAR_PDD				= "76913";										//$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_POLAR_TRAINER			= "13457";										//$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_SPORT_TRACKS_FITLOG	= "24168";										//$NON-NLS-1$
 
 	public static int adjustScaleValueOnMouseScroll(final MouseEvent event) {
 
@@ -439,6 +439,21 @@ public class Util {
 	public static double getStateDouble(final IDialogSettings state, final String key, final double defaultValue) {
 		try {
 			return state.get(key) == null ? defaultValue : state.getDouble(key);
+		} catch (final NumberFormatException e) {
+			return defaultValue;
+		}
+	}
+
+	/**
+	 * @param state
+	 * @param key
+	 * @param defaultValue
+	 * @return Returns a float value from {@link IDialogSettings}. When the key is not found, the
+	 *         default value is returned.
+	 */
+	public static float getStateFloat(final IDialogSettings state, final String key, final float defaultValue) {
+		try {
+			return state.get(key) == null ? defaultValue : state.getFloat(key);
 		} catch (final NumberFormatException e) {
 			return defaultValue;
 		}
