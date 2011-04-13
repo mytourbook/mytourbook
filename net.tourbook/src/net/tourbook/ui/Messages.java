@@ -57,12 +57,9 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_avg_speed_tooltip;
 	public static String		ColumnFactory_avg_temperature_label;
 	public static String		ColumnFactory_avg_temperature_tooltip;
-	public static String	ColumnFactory_BreakTime_Header;
-
-	public static String	ColumnFactory_BreakTime_Label;
-
-	public static String	ColumnFactory_BreakTime_Tooltip;
-
+	public static String		ColumnFactory_BreakTime_Header;
+	public static String		ColumnFactory_BreakTime_Label;
+	public static String		ColumnFactory_BreakTime_Tooltip;
 	public static String		ColumnFactory_cadence;
 	public static String		ColumnFactory_cadence_label;
 	public static String		ColumnFactory_cadence_tooltip;
@@ -177,6 +174,7 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_clouds_label;
 	public static String		ColumnFactory_clouds;
 	public static String		ColumnFactory_clouds_tooltip;
+	public static String		ColumnFactory_Diff_Header;
 	public static String		ColumnFactory_Id_Label;
 	public static String		ColumnFactory_Id_Tooltip;
 	public static String		ColumnFactory_restpulse_label;
@@ -184,6 +182,9 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_restpulse_tooltip;
 	public static String		ColumnFactory_SerieStartEndIndex;
 	public static String		ColumnFactory_SerieStartEndIndex_Label;
+	public static String		ColumnFactory_SerieStartEndIndex_Tooltip;
+	public static String		ColumnFactory_SpeedDiff_Label;
+	public static String		ColumnFactory_SpeedDiff_Tooltip;
 	public static String		ColumnFactory_tour_week_header;
 	public static String		ColumnFactory_tour_week_label;
 	public static String		ColumnFactory_tour_week_tooltip;
@@ -192,7 +193,6 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_Tour_WeekDay_Header;
 	public static String		ColumnFactory_Tour_WeekDay_Label;
 	public static String		ColumnFactory_Tour_WeekDay_Tooltip;
-	public static String		ColumnFactory_TourDistanceDiff_Header;
 	public static String		ColumnFactory_TourDistanceDiff_Label;
 	public static String		ColumnFactory_TourDistanceDiff_Tooltip;
 	public static String		ColumnFactory_TourPerson;
@@ -259,10 +259,8 @@ public class Messages extends NLS {
 	public static String		Tour_Tooltip_Label_RestPulse;
 	public static String		Tour_Tooltip_Label_Tags;
 	public static String		Tour_Tooltip_Label_Temperature;
-
 	public static String		Tour_Tooltip_Label_TourType;
 	public static String		Tour_Tooltip_Label_Weather;
-
 	public static String		Tour_Tooltip_Label_WindDirection;
 	public static String		Tour_Tooltip_Label_WindSpeed;
 

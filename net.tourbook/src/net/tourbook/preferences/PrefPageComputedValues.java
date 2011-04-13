@@ -397,6 +397,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			// label: min speed
 			label = new Label(container, SWT.NONE);
 			label.setText(Messages.Compute_BreakTime_Label_MinimumSpeed);
+			label.setToolTipText(Messages.Compute_BreakTime_Label_MinimumSpeed_Tooltip);
 
 			// label: unit
 			_lblMinSpeed = new Label(container, SWT.NONE);

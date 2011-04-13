@@ -936,24 +936,36 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				 * go back in the data serie to find all time slices which are within the shortest
 				 * break time
 				 */
-				int lowIndex = serieIndex;
-				int timeDiffInnerLoop = 0;
-				int distDiffInnerLoop = 0;
+				int prevIndex = serieIndex;
+				int timeDiffPrevSlices = 0;
+				int distDiffPrevSlices = 0;
 
-				while (timeDiffInnerLoop <= _breakUIShortestBreakTime) {
+				while (timeDiffPrevSlices <= _breakUIShortestBreakTime) {
 
-					lowIndex--;
+					prevIndex--;
 
 					// check bounds
-					if ((lowIndex < 0)) {
+					if ((prevIndex < 0)) {
 						break;
 					}
 
-					timeDiffInnerLoop = currentTime - timeSerie[lowIndex];
-					distDiffInnerLoop = currentDistance - distanceSerie[lowIndex];
+					/*
+					 * ignore previous time slices when the first previous time slice was a longer
+					 * break, because the start after the break is always slowly
+					 */
+//					if (prevIndex == serieIndex - 1
+//							&& (timeDiffSlice > _breakUIShortestBreakTime && distDiffSlice < _breakUIMaxDistance)) {
+//						break;
+//					}
+
+					final int prevTime = timeSerie[prevIndex];
+					final int prevDist = distanceSerie[prevIndex];
+
+					timeDiffPrevSlices = currentTime - prevTime;
+					distDiffPrevSlices = currentDistance - prevDist;
 				}
 
-				if (timeDiffInnerLoop > _breakUIShortestBreakTime && distDiffInnerLoop < _breakUIMaxDistance) {
+				if (timeDiffPrevSlices > _breakUIShortestBreakTime && distDiffPrevSlices < _breakUIMaxDistance) {
 
 					// current time slice is also a break
 
@@ -1404,6 +1416,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				// label: break min time
 				Label label = new Label(_containerBreakTime, SWT.NONE);
 				label.setText(Messages.Compute_BreakTime_Label_MinimumTime);
+				label.setToolTipText(Messages.Compute_BreakTime_Label_Description);
 
 				// spinner: break minimum time
 				_spinnerBreakMinTime = new Spinner(_containerBreakTime, SWT.BORDER);
@@ -1441,6 +1454,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				// label: min speed
 				final Label label = new Label(containerSpeed, SWT.NONE);
 				label.setText(Messages.Compute_BreakTime_Label_MinimumSpeed);
+				label.setToolTipText(Messages.Compute_BreakTime_Label_MinimumSpeed_Tooltip);
 				GridDataFactory.fillDefaults()//
 						.indent(10, 0)
 						.align(SWT.END, SWT.CENTER)
@@ -1460,6 +1474,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				// label: break min distance
 				final Label label = new Label(_containerBreakTime, SWT.NONE);
 				label.setText(Messages.Compute_BreakTime_Label_MinimumDistance);
+				label.setToolTipText(Messages.Compute_BreakTime_Label_Description);
 
 				// spinner: break minimum time
 				_spinnerBreakMaxDistance = new Spinner(_containerBreakTime, SWT.BORDER);
@@ -1482,8 +1497,32 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				// label: unit
 				_lblBreakDistanceUnit = new Label(_containerBreakTime, SWT.NONE);
 				_lblBreakDistanceUnit.setText(UI.UNIT_LABEL_DISTANCE_SMALL);
-				GridDataFactory.fillDefaults().span(2, 1).align(SWT.FILL, SWT.CENTER).applyTo(_lblBreakDistanceUnit);
+				GridDataFactory.fillDefaults()//
+//						.span(2, 1)
+						.align(SWT.FILL, SWT.CENTER)
+						.applyTo(_lblBreakDistanceUnit);
 			}
+
+			/*
+			 * link: set default values
+			 */
+			final Link link = new Link(_containerBreakTime, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.grab(true, false)
+					.align(SWT.END, SWT.CENTER)
+					.applyTo(link);
+			link.setText(Messages.Compute_BreakTime_Link_SetDefaultValues);
+			link.setToolTipText(Messages.Compute_BreakTime_Link_SetDefaultValues_Tooltip);
+			link.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					PreferencesUtil.createPreferenceDialogOn(
+							parent.getShell(),
+							PrefPageComputedValues.ID,
+							null,
+							PrefPageComputedValues.TAB_FOLDER_BREAK_TIME).open();
+				}
+			});
 
 			/*
 			 * tour break time
@@ -1507,39 +1546,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			/*
 			 * defaults
 			 */
-			final Composite containerDefaults = new Composite(_containerBreakTime, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.grab(true, false)
-					.applyTo(containerDefaults);
-			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerDefaults);
 			{
-				/*
-				 * link: set default values
-				 */
-				final Link link = new Link(containerDefaults, SWT.NONE);
+				// button: restore default
+				final Button btnRestore = new Button(_containerBreakTime, SWT.NONE);
 				GridDataFactory.fillDefaults()//
-						.grab(true, false)
+//						.span(2, 1)
 						.align(SWT.END, SWT.CENTER)
-						.applyTo(link);
-				link.setText(Messages.Compute_BreakTime_Link_SetDefaultValues);
-				link.setToolTipText(Messages.Compute_BreakTime_Link_SetDefaultValues_Tooltip);
-				link.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent e) {
-						PreferencesUtil.createPreferenceDialogOn(
-								parent.getShell(),
-								PrefPageComputedValues.ID,
-								null,
-								PrefPageComputedValues.TAB_FOLDER_BREAK_TIME).open();
-					}
-				});
-
-				/*
-				 * button: restore default
-				 */
-				final Button btnRestore = new Button(containerDefaults, SWT.NONE);
-				GridDataFactory.fillDefaults()//
-						.align(SWT.FILL, SWT.CENTER)
 						.applyTo(btnRestore);
 				btnRestore.setText(Messages.Compute_BreakTime_Button_SetDefaultValues);
 				btnRestore.setToolTipText(Messages.Compute_BreakTime_Button_SetDefaultValues_Tooltip);
@@ -2043,7 +2055,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			@Override
 			public void update(final ViewerCell cell) {
 				final TourSegment segment = (TourSegment) cell.getElement();
-				cell.setText(UI.format_hh_mm_ss(segment.drivingTime));
+				final int drivingTime = segment.drivingTime;
+				if (drivingTime == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(UI.format_hh_mm_ss(drivingTime));
+				}
 			}
 		});
 	}

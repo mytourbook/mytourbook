@@ -243,6 +243,8 @@ public class Messages extends NLS {
 
 	public static String	Compute_BreakTime_Label_MinimumSpeed;
 
+	public static String	Compute_BreakTime_Label_MinimumSpeed_Tooltip;
+
 	public static String	Compute_BreakTime_Label_MinimumTime;
 
 	public static String	Compute_BreakTime_Label_TourBreakTime;

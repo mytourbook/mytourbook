@@ -728,6 +728,27 @@ public abstract class TableColumnFactory {
 			return colDef;
 		};
 	};
+
+	public static final TableColumnFactory SPEED_DIFF = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			String header = Messages.ColumnFactory_Diff_Header
+					+ UI.SPACE
+					+ UI.UNIT_LABEL_SPEED;
+			
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "speedDiff", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_SpeedDiff_Label);
+			colDef.setColumnHeader(header);
+			colDef.setColumnUnit(header);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_SpeedDiff_Tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+			
+			return colDef;
+		};
+	};
 	
 	public static final TableColumnFactory TEMPERATURE = new TableColumnFactory() {
 		
@@ -873,7 +894,7 @@ public abstract class TableColumnFactory {
 		@Override
 		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
-			String header = Messages.ColumnFactory_TourDistanceDiff_Header
+			String header = Messages.ColumnFactory_Diff_Header
 					+ UI.SPACE
 					+ UI.UNIT_LABEL_DISTANCE;
 
@@ -967,6 +988,7 @@ public abstract class TableColumnFactory {
 	
 			colDef.setColumnLabel(Messages.ColumnFactory_SerieStartEndIndex_Label);
 			colDef.setColumnHeader(Messages.ColumnFactory_SerieStartEndIndex);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_SerieStartEndIndex_Tooltip);
 			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
 			
 			return colDef;

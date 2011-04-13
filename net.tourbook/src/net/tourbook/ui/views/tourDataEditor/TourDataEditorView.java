@@ -3977,6 +3977,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		defineSliceViewerColumns_TimeDiff();
 		defineSliceViewerColumns_DistanceDiff();
 		defineSliceViewerColumns_BreakTime();
+		defineSliceViewerColumns_SpeedDiff();
 	}
 
 	/**
@@ -4346,6 +4347,48 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					final float speed = (float) _serieSpeed[timeSlice.serieIndex] / 10;
 
 					cell.setText(_nf1.format(speed));
+
+				} else {
+					cell.setText(UI.EMPTY_STRING);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: speed diff
+	 */
+	private void defineSliceViewerColumns_SpeedDiff() {
+
+		final ColumnDefinition colDef = TableColumnFactory.SPEED_DIFF.createColumn(_sliceColumnManager, _pc);
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				if (_serieTime != null && _serieDistance != null) {
+
+					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+					final int serieIndex = timeSlice.serieIndex;
+
+					if (serieIndex == 0) {
+						cell.setText(Integer.toString(0));
+					} else {
+
+						final float timeDiff = (_serieTime[serieIndex] - _serieTime[serieIndex - 1]);
+
+						final float distancePrevious = ((float) _serieDistance[serieIndex - 1])
+								/ 1000
+								/ _unitValueDistance;
+						final float distance = ((float) _serieDistance[serieIndex])//
+								/ 1000
+								/ _unitValueDistance;
+
+						final float distDiff = distance - distancePrevious;
+						final float speed = distDiff * 3600f / timeDiff;
+
+						cell.setText(_nf1.format(speed));
+					}
 
 				} else {
 					cell.setText(UI.EMPTY_STRING);
