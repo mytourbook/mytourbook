@@ -2282,7 +2282,8 @@ public class ChartComponentGraph extends Canvas {
 			}
 
 			// optimization: draw only ONE line for the current x-position
-			if ((int) devX != (int) devXPrev) {
+			// but draw to the 0 line otherwise it's possible that a triangle is painted
+			if ((int) devX != (int) devXPrev || yValue == 0 || yValue2 == 0) {
 
 				// draw line to the next point
 				path.lineTo(devX, devY0 - (yValue * scaleY));
