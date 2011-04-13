@@ -227,7 +227,7 @@ public class DialogExportTour extends TitleAreaDialog {
 
 	/**
 	 * Adds some important values to the velocity context (e.g. date, ...).
-	 *
+	 * 
 	 * @param context
 	 *            the velocity context holding all the data
 	 */
@@ -1159,7 +1159,7 @@ public class DialogExportTour extends TitleAreaDialog {
 		final double[] longitudeSerie = tourData.longitudeSerie;
 
 		// check if all dataseries are available
-		if ((timeSerie == null) || (latitudeSerie == null) || (longitudeSerie == null)) {
+		if ((timeSerie == null) /* || (latitudeSerie == null) || (longitudeSerie == null) */) {
 			return null;
 		}
 
@@ -1204,8 +1204,11 @@ public class DialogExportTour extends TitleAreaDialog {
 				trackPoint.setAltitude(altitudeSerie[serieIndex]);
 			}
 
-			trackPoint.setLongitude(longitudeSerie[serieIndex]);
-			trackPoint.setLatitude(latitudeSerie[serieIndex]);
+			// I don't know if this is according to the rules to have a gpx/tcx without lat/lon
+			if (latitudeSerie != null && longitudeSerie != null) {
+				trackPoint.setLatitude(latitudeSerie[serieIndex]);
+				trackPoint.setLongitude(longitudeSerie[serieIndex]);
+			}
 
 			int currentTime;
 
