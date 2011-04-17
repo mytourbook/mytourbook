@@ -1824,12 +1824,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			@Override
 			public void partOpened(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourDataEditorView.this) {
+					// when part is opened it also should be visible
+					_isPartVisible = true;
 					TourManager.setTourDataEditor(TourDataEditorView.this);
 				}
 			}
 
 			@Override
 			public void partVisible(final IWorkbenchPartReference partRef) {
+
 				if (partRef.getPart(false) == TourDataEditorView.this) {
 
 					_isPartVisible = true;
