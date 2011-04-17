@@ -541,13 +541,16 @@ public class UI {
 	 * @param horizontalHint
 	 * @param backgroundColor
 	 *            background color or <code>null</code> when color should not be set
+	 * @return Returns the bulleted list as styled text
 	 */
-	public static void createBullets(	final Composite parent,
-										final String bulletText,
-										final int startLine,
-										final int spanHorizontal,
-										final int horizontalHint,
-										final Color backgroundColor) {
+	public static StyledText createBullets(	final Composite parent,
+											final String bulletText,
+											final int startLine,
+											final int spanHorizontal,
+											final int horizontalHint,
+											final Color backgroundColor) {
+
+		StyledText styledText = null;
 
 		try {
 
@@ -557,7 +560,7 @@ public class UI {
 			final Bullet bullet = new Bullet(style);
 			final int lineCount = Util.countCharacter(bulletText, '\n');
 
-			final StyledText styledText = new StyledText(parent, SWT.READ_ONLY | SWT.WRAP | SWT.MULTI);
+			styledText = new StyledText(parent, SWT.READ_ONLY | SWT.WRAP | SWT.MULTI);
 			GridDataFactory
 					.fillDefaults()
 					.grab(true, false)
@@ -577,6 +580,8 @@ public class UI {
 			// ignore exception when there are less lines as required
 			StatusUtil.log(e);
 		}
+
+		return styledText;
 	}
 
 	/**

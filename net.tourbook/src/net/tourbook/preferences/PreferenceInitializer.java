@@ -22,6 +22,7 @@ import net.tourbook.chart.Chart;
 import net.tourbook.colors.ColorDefinition;
 import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.tour.BreakTimeTool;
 import net.tourbook.tour.TourManager;
 import net.tourbook.util.StringToArrayConverter;
 
@@ -238,8 +239,18 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		// speed minimum time slice value in seconds
 		store.setDefault(ITourbookPreferences.APP_DATA_SPEED_MIN_TIMESLICE_VALUE, 10);
 
-		// minimum speed for a break, default is 2.0 km/h for a time slice
-		store.setDefault(ITourbookPreferences.APP_DATA_BREAK_TIME_MIN_SPEED_VALUE, 20);
+		/*
+		 * break time, which contains metric values
+		 */
+		store.setDefault(ITourbookPreferences.BREAK_TIME_METHOD, BreakTimeTool.BREAK_TIME_METHOD_BY_TIME_DISTANCE);
+
+		// break time, default is 1.8 km/h (10m in 20 sec)
+		store.setDefault(ITourbookPreferences.BREAK_TIME_SHORTEST_TIME, 20);
+		store.setDefault(ITourbookPreferences.BREAK_TIME_MAX_DISTANCE, 10.0f);
+
+		// minimum speed for a break, default is 2.0 km/h
+		store.setDefault(ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED, 2.0f);
+		store.setDefault(ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED, 2.0f);
 
 		/*
 		 * calendar week

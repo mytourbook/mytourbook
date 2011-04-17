@@ -231,19 +231,45 @@ public class Messages extends NLS {
 
 	public static String	Compute_BreakTime_Button_ComputeValues_Tooltip;
 
+	public static String	Compute_BreakTime_Button_RestoreDefaultValues;
+
+	public static String	Compute_BreakTime_Button_RestoreDefaultValues_Tooltip;
+
 	public static String	Compute_BreakTime_Button_SetDefaultValues;
 
 	public static String	Compute_BreakTime_Button_SetDefaultValues_Tooltip;
 
+	public static String	Compute_BreakTime_Dialog_ComputeForAllTours_Message;
+
+	public static String	Compute_BreakTime_Dialog_ComputeForAllTours_Title;
+
+	public static String	Compute_BreakTime_ForAllTour_Job_Result;
+
+	public static String	Compute_BreakTime_ForAllTour_Job_SubTask;
+
 	public static String	Compute_BreakTime_Group_BreakTime;
+
+	public static String	Compute_BreakTime_Label_ComputeAllTours;
+
+	public static String	Compute_BreakTime_Label_ComputeAllTours_Tooltip;
 
 	public static String	Compute_BreakTime_Label_ComputeBreakTimeBy;
 
 	public static String	Compute_BreakTime_Label_Description;
 
+	public static String	Compute_BreakTime_Label_Description_ComputeByAvgSpeed;
+
+	public static String	Compute_BreakTime_Label_Description_ComputeBySliceSpeed;
+
+	public static String	Compute_BreakTime_Label_Description_ComputeByTime;
+
+	public static String	Compute_BreakTime_Label_Hints;
+
+	public static String	Compute_BreakTime_Label_MinimumAvgSpeed;
+
 	public static String	Compute_BreakTime_Label_MinimumDistance;
 
-	public static String	Compute_BreakTime_Label_MinimumSpeed;
+	public static String	Compute_BreakTime_Label_MinimumSliceSpeed;
 
 	public static String	Compute_BreakTime_Label_MinimumSpeed_Tooltip;
 
@@ -251,13 +277,17 @@ public class Messages extends NLS {
 
 	public static String	Compute_BreakTime_Label_TourBreakTime;
 
-	public static String	Compute_BreakTime_Link_SetDefaultValues;
+	public static String	Compute_BreakTime_Method_SpeedByAverage;
 
-	public static String	Compute_BreakTime_Link_SetDefaultValues_Tooltip;
+	public static String	Compute_BreakTime_Method_SpeedBySlice;
+
+	public static String	Compute_BreakTime_Method_TimeDistance;
 
 	public static String	Compute_BreakTime_Radio_Speed;
 
 	public static String	Compute_BreakTime_Radio_TimeDistance;
+
+	public static String	Compute_Values_Label_Info;
 
 	public static String		Conconi_Chart_Chk_LogScaling;
 	public static String		Conconi_Chart_Chk_LogScaling_Tooltip;

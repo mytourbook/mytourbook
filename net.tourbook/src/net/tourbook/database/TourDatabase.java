@@ -255,7 +255,7 @@ public class TourDatabase {
 
 				monitor.subTask(Messages.tour_database_computeComputeValues_mainTask);
 
-				// loop over all tours and calculate and set new columns
+				// loop over all tours and compute values
 				for (final Long tourId : tourList) {
 
 					final TourData oldTourData = getTourFromDb(tourId);

@@ -68,6 +68,8 @@ import net.tourbook.srtm.ElevationSRTM3;
 import net.tourbook.srtm.GeoLat;
 import net.tourbook.srtm.GeoLon;
 import net.tourbook.srtm.NumberForm;
+import net.tourbook.tour.BreakTimeResult;
+import net.tourbook.tour.BreakTimeTool;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.ChartLayer2ndAltiSerie;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
@@ -613,7 +615,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private int[]											temperatureSerieImperial;
 
 	/**
-	 * the metric speed serie is required form computing the power even if the current measurement
+	 * contains speed in km/h multiplied by 10
+	 * <p>
+	 * the metric speed serie is required when computing the power even if the current measurement
 	 * system is imperial
 	 */
 	@Transient
@@ -1694,20 +1698,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 	}
 
-	private int computeBreakTimeVariable(final int startIndex, final int endIndex) {
-
-		final int breakMinSpeed = _prefStore.getInt(ITourbookPreferences.APP_DATA_BREAK_TIME_MIN_SPEED_VALUE);
-
-		return computeBreakTimeVariable(startIndex, endIndex, breakMinSpeed);
-	}
-
-	private int computeBreakTimeVariable(final int startIndex, int endIndex, final float breakMinSpeed) {
+	private int computeBreakTimeVariable(final int startIndex, int endIndex, final BreakTimeTool btConfig) {
 
 		endIndex = Math.min(endIndex, timeSerie.length - 1);
 
 		int totalBreakTime = 0;
 
 		if (breakTimeSerie != null) {
+
+			// break time is already computed
 
 			int prevTime = timeSerie[startIndex];
 
@@ -1727,116 +1726,48 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 
 		/*
-		 * this is not yet implemented
+		 * compute break time according to the selected method
 		 */
+		BreakTimeResult breakTimeResult;
+
+		if (btConfig.breakTimeMethod == BreakTimeTool.BREAK_TIME_METHOD_BY_TIME_DISTANCE) {
+
+			breakTimeResult = BreakTimeTool.computeBreakTimeByTimeDistance(
+					this,
+					btConfig.breakShortestTime,
+					btConfig.breakMaxDistance);
+
+			breakTimeSerie = breakTimeResult.breakTimeSerie;
+
+			return breakTimeResult.tourBreakTime;
+
+		} else if (btConfig.breakTimeMethod == BreakTimeTool.BREAK_TIME_METHOD_BY_SLICE_SPEED) {
+
+			breakTimeResult = BreakTimeTool.computeBreakTimeBySpeed(
+					this,
+					btConfig.breakTimeMethod,
+					btConfig.breakMinSliceSpeed);
+
+			breakTimeSerie = breakTimeResult.breakTimeSerie;
+
+			return breakTimeResult.tourBreakTime;
+
+		} else if (btConfig.breakTimeMethod == BreakTimeTool.BREAK_TIME_METHOD_BY_AVG_SPEED) {
+
+			breakTimeResult = BreakTimeTool.computeBreakTimeBySpeed(
+					this,
+					btConfig.breakTimeMethod,
+					btConfig.breakMinAvgSpeed);
+
+			breakTimeSerie = breakTimeResult.breakTimeSerie;
+
+			return breakTimeResult.tourBreakTime;
+		}
+
+		// this case should not occure !!!
 
 		return totalBreakTime;
 	}
-
-//	private int computeBreakTimeVariableOLD(final int startIndex,
-//											int endIndex,
-//											final int shortestBreakTime,
-//											final int breakDistance) {
-//
-//		endIndex = Math.min(endIndex, timeSerie.length - 1);
-//
-////		final int breakDistance = 10;
-////		final int shortestBreakTime = 20;
-//
-//		int lastMovingDistance = 0;
-//		int lastMovingTime = 0;
-//
-//		int totalBreakTime = 0;
-//		int breakTime = 0;
-//		int currentBreakTime = 0;
-//
-//		for (int serieIndex = startIndex; serieIndex <= endIndex; serieIndex++) {
-//
-//			final int currentDistance = distanceSerie[serieIndex];
-//			final int currentTime = timeSerie[serieIndex];
-//
-//			final int timeDiff = currentTime - lastMovingTime;
-//			final int distDiff = currentDistance - lastMovingDistance;
-//
-//			if ((distDiff == 0) || ((timeDiff > shortestBreakTime) && (distDiff < breakDistance))) {
-//
-//				// distance has not changed, check if a longer stop is done
-//				// speed must be greater than 1.8 km/h (10m in 20 sec)
-//
-//				final int breakTimeDiff = currentTime - currentBreakTime;
-//
-//				breakTime += breakTimeDiff;
-//
-//				if (timeDiff > shortestBreakTime) {
-//
-//					// person has stopped for a break
-//					totalBreakTime += breakTime;
-//
-//					breakTime = 0;
-//					currentBreakTime = currentTime;
-//				}
-//
-//			} else {
-//
-//				// keep time and distance when distance is changing
-//
-//				lastMovingTime = currentTime;
-//				lastMovingDistance = currentDistance;
-//
-//				breakTime = 0;
-//				currentBreakTime = currentTime;
-//			}
-//		}
-//
-//		return totalBreakTime;
-//	}
-
-//	/**
-//	 * compute altitude up/down which was used until version 9.07.0
-//	 */
-//	private void computeAltitudeUpDownWithTime() {
-//
-//		if (altitudeSerie == null || timeSerie == null || timeSerie.length < 2) {
-//			return;
-//		}
-//
-//		final int serieLength = timeSerie.length;
-//
-//		int lastTime = 0;
-//		int currentAltitude = altitudeSerie[0];
-//		int lastAltitude = currentAltitude;
-//
-//		int altitudeUp = 0;
-//		int altitudeDown = 0;
-//
-//		final int minTimeDiff = 10;
-//
-//		for (int timeIndex = 0; timeIndex < serieLength; timeIndex++) {
-//
-//			final int currentTime = timeSerie[timeIndex];
-//
-//			final int timeDiff = currentTime - lastTime;
-//
-//			currentAltitude = altitudeSerie[timeIndex];
-//
-//			if (timeDiff >= minTimeDiff) {
-//
-//				final int altitudeDiff = currentAltitude - lastAltitude;
-//
-//				if (altitudeDiff >= 0) {
-//					altitudeUp += altitudeDiff;
-//				} else {
-//					altitudeDown += altitudeDiff;
-//				}
-//
-//				lastTime = currentTime;
-//				lastAltitude = currentAltitude;
-//			}
-//		}
-//
-//		setTourAltUp(altitudeUp);
-//		setTourAltDown(-altitudeDown);
-//	}
 
 	/**
 	 * compute maximum and average fields
@@ -2272,6 +2203,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		maxSpeed /= 10;
 	}
 
+	/**
+	 * Computes the tour driving time in seconds, this is the tour recording time - tour break time.
+	 * This value is store in {@link #tourDrivingTime}.
+	 */
 	public void computeTourDrivingTime() {
 
 		if (isManualTour()) {
@@ -2282,7 +2217,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		if ((timeSerie == null) || (timeSerie.length == 0)) {
 			tourDrivingTime = 0;
 		} else {
-			tourDrivingTime = Math.max(0, timeSerie[timeSerie.length - 1] - getBreakTime(0, timeSerie.length));
+			final int tourDrivingTimeRaw = timeSerie[timeSerie.length - 1] - getBreakTime(0, timeSerie.length);
+			tourDrivingTime = Math.max(0, tourDrivingTimeRaw);
 		}
 	}
 
@@ -2928,12 +2864,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	/**
 	 * Create the tour segment list from the segment index array
 	 * 
+	 * @param breakMinSpeedDiff
+	 * @param breakMaxDistance
+	 * @param breakMinTime
 	 * @param segmenterBreakDistance
-	 * @param breakMinSpeed
+	 * @param breakMinSpeedDiff
 	 *            in km/h
+	 * @param breakMinSpeed2
+	 * @param breakDistance
 	 * @return
 	 */
-	public Object[] createTourSegments(final float breakMinSpeed) {
+	public Object[] createTourSegments(final BreakTimeTool btConfig) {
 
 		if ((segmentSerieIndex == null) || (segmentSerieIndex.length < 2)) {
 			// at least two points are required to build a segment
@@ -3016,10 +2957,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			 */
 			final int timeEnd = timeSerie[segmentEndIndex];
 			final int recordingTime = timeEnd - timeStart;
-			final int segmentBreakTime = getBreakTime(
-					segmentStartIndex,
-					segmentEndIndex,
- breakMinSpeed);
+			final int segmentBreakTime = getSegmentBreakTime(segmentStartIndex, segmentEndIndex, btConfig);
 
 			final float drivingTime = recordingTime - segmentBreakTime;
 
@@ -3320,6 +3258,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public int getBreakTime(final int startIndex, final int endIndex) {
 
 		if (distanceSerie == null) {
+			// distance is required
 			return 0;
 		}
 
@@ -3329,33 +3268,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 			// variable time slices
 
-			return computeBreakTimeVariable(startIndex, endIndex);
-
-		} else {
-
-			// fixed time slices
-
-			final int ignoreTimeSlices = deviceTimeInterval == 0 ? //
-					0
-					: getBreakTimeSlices(distanceSerie, startIndex, endIndex, minBreakTime / deviceTimeInterval);
-
-			return ignoreTimeSlices * deviceTimeInterval;
-		}
-	}
-
-	private int getBreakTime(final int startIndex, final int endIndex, final float breakMinSpeed) {
-
-		if (distanceSerie == null) {
-			return 0;
-		}
-
-		final int minBreakTime = 20;
-
-		if (deviceTimeInterval == -1) {
-
-			// variable time slices
-
-			return computeBreakTimeVariable(startIndex, endIndex, breakMinSpeed);
+			return computeBreakTimeVariable(startIndex, endIndex, BreakTimeTool.getPrefValues());
 
 		} else {
 
@@ -3486,6 +3399,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 	}
 
+	/**
+	 * @return Returns the time difference between 2 time slices or <code>-1</code> when the time
+	 *         slices are unequally
+	 */
+	public short getDeviceTimeInterval() {
+		return deviceTimeInterval;
+	}
+
 // NOT USED 18.8.2010
 //	public long getDeviceTravelTime() {
 //		return deviceTravelTime;
@@ -3503,14 +3424,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 //	public int getDeviceDistance() {
 //		return deviceDistance;
 //	}
-
-	/**
-	 * @return Returns the time difference between 2 time slices or <code>-1</code> when the time
-	 *         slices are unequally
-	 */
-	public short getDeviceTimeInterval() {
-		return deviceTimeInterval;
-	}
 
 	public String getDeviceTourType() {
 		return deviceTourType;
@@ -3572,6 +3485,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return gradientSerie;
 	}
 
+	/**
+	 * @return the maxAltitude
+	 */
+	public int getMaxAltitude() {
+		return maxAltitude;
+	}
+
 // not used 5.10.2008
 //	public int getDeviceTotalDown() {
 //		return deviceTotalDown;
@@ -3580,13 +3500,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 //	public int getDeviceTotalUp() {
 //		return deviceTotalUp;
 //	}
-
-	/**
-	 * @return the maxAltitude
-	 */
-	public int getMaxAltitude() {
-		return maxAltitude;
-	}
 
 	/**
 	 * @return the maxPulse
@@ -3723,8 +3636,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		final float fSlope = weightTotal * 9.81f; // * gradient/100
 		final float fAir = 0.5f * p * cD * aP;// * v2;
 
-		int joule = 0;
-		int prefTime = 0;
+//		int joule = 0;
+//		int prefTime = 0;
 
 		for (int timeIndex = 0; timeIndex < timeSerie.length; timeIndex++) {
 
@@ -3759,10 +3672,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 			powerSerie[timeIndex] = pTotal;
 
-			final int currentTime = timeSerie[timeIndex];
-			joule += pTotal * (currentTime - prefTime);
+//			final int currentTime = timeSerie[timeIndex];
+//			joule += pTotal * (currentTime - prefTime);
 
-			prefTime = currentTime;
+//			prefTime = currentTime;
 		}
 
 		return powerSerie;
@@ -3770,6 +3683,32 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	public int getRestPulse() {
 		return restPulse;
+	}
+
+	private int getSegmentBreakTime(final int startIndex, final int endIndex, final BreakTimeTool btConfig) {
+
+		if (distanceSerie == null) {
+			return 0;
+		}
+
+		final int minBreakTime = 20;
+
+		if (deviceTimeInterval == -1) {
+
+			// variable time slices
+
+			return computeBreakTimeVariable(startIndex, endIndex, btConfig);
+
+		} else {
+
+			// fixed time slices
+
+			final int ignoreTimeSlices = deviceTimeInterval == 0 ? //
+					0
+					: getBreakTimeSlices(distanceSerie, startIndex, endIndex, minBreakTime / deviceTimeInterval);
+
+			return ignoreTimeSlices * deviceTimeInterval;
+		}
 	}
 
 	public SerieData getSerieData() {
@@ -3821,6 +3760,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 			return speedSerieImperial;
 		}
+	}
+
+	/**
+	 * @return returns the speed data in the metric measurement system
+	 */
+	public int[] getSpeedSerieMetric() {
+
+		computeSpeedSerie();
+
+		return speedSerie;
 	}
 
 	/**

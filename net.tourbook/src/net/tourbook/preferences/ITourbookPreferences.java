@@ -92,7 +92,13 @@ public interface ITourbookPreferences {
 	public static final String	APP_DATA_FILTER_IS_MODIFIED					= "application.data-filter-is-modified";					//$NON-NLS-1$
 
 	public static final String	APP_DATA_SPEED_MIN_TIMESLICE_VALUE			= "application.data-speed-min-timeslice-value";			//$NON-NLS-1$
-	public static final String	APP_DATA_BREAK_TIME_MIN_SPEED_VALUE			= "app.data.break-time-min-speed-value";					//$NON-NLS-1$
+
+	public static final String	BREAK_TIME_METHOD							= "BreakTime_Method";										//$NON-NLS-1$
+	public static final String	BREAK_TIME_IS_MODIFIED						= "BreakTime_IsModified";									//$NON-NLS-1$
+	public static final String	BREAK_TIME_SHORTEST_TIME					= "BreakTime_ShortestTime";								//$NON-NLS-1$
+	public static final String	BREAK_TIME_MAX_DISTANCE						= "BreakTime_MaxDistance";									//$NON-NLS-1$
+	public static final String	BREAK_TIME_MIN_SLICE_SPEED					= "BreakTime_MinSliceSpeed";								//$NON-NLS-1$
+	public static final String	BREAK_TIME_MIN_AVG_SPEED					= "BreakTime_MinAvgSpeed";									//$NON-NLS-1$
 
 	public static final String	GRAPH_PROPERTY_CHARTTYPE					= "graph.property.chartType";								//$NON-NLS-1$
 
