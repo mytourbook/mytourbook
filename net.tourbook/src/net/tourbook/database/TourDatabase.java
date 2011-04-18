@@ -87,7 +87,7 @@ public class TourDatabase {
 	 */
 	private static final int						TOURBOOK_DB_VERSION							= 14;
 
-//	private static final int						TOURBOOK_DB_VERSION							= 14;	// 11.??
+//	private static final int						TOURBOOK_DB_VERSION							= 14;	// 11.3
 //	private static final int						TOURBOOK_DB_VERSION							= 13;	// 10.11
 //	private static final int						TOURBOOK_DB_VERSION							= 12;	// 10.9.1
 //	private static final int						TOURBOOK_DB_VERSION							= 11;	// 10.7.0 - 11-07-2010
@@ -246,12 +246,14 @@ public class TourDatabase {
 		nf.setMaximumFractionDigits(0);
 
 		final int[] tourCounter = new int[] { 0 };
+		final int[] tourListSize = new int[] { 0 };
 
 		final IRunnableWithProgress runnable = new IRunnableWithProgress() {
 			@Override
 			public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
 				final ArrayList<Long> tourList = getAllTourIds();
+				tourListSize[0] = tourList.size();
 
 				monitor.subTask(Messages.tour_database_computeComputeValues_mainTask);
 
@@ -270,7 +272,7 @@ public class TourDatabase {
 					// create sub task text
 					final StringBuilder sb = new StringBuilder();
 					sb.append(NLS.bind(Messages.tour_database_computeComputeValues_subTask,//
-							new Object[] { tourCounter[0]++, tourList.size(), }));
+							new Object[] { tourCounter[0]++, tourListSize[0], }));
 
 					final String runnerSubTaskText = runner.getSubTaskText(savedTourData);
 					if (runnerSubTaskText != null) {
@@ -285,8 +287,8 @@ public class TourDatabase {
 						break;
 					}
 
-//					// debug test
-//					if (tourCounter[0] > 100) {
+////					// debug test
+//					if (tourCounter[0] > 0) {
 //						break;
 //					}
 				}
@@ -305,16 +307,15 @@ public class TourDatabase {
 
 			// create result text
 			final StringBuilder sb = new StringBuilder();
-			{
-				sb.append(NLS.bind(
-						Messages.tour_database_computeComputedValues_resultMessage,
-						Integer.toString(tourCounter[0])));
+			sb.append(NLS.bind(
+					Messages.tour_database_computeComputedValues_resultMessage,
+					tourCounter[0],
+					tourListSize[0]));
 
-				final String runnerResultText = runner.getResultText();
-				if (runnerResultText != null) {
-					sb.append(UI.NEW_LINE2);
-					sb.append(runnerResultText);
-				}
+			final String runnerResultText = runner.getResultText();
+			if (runnerResultText != null) {
+				sb.append(UI.NEW_LINE2);
+				sb.append(runnerResultText);
 			}
 
 			MessageDialog.openInformation(

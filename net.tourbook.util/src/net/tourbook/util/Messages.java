@@ -34,7 +34,6 @@ public class Messages extends NLS {
 	public static String		ColumnModifyDialog_column_unit;
 	public static String		ColumnModifyDialog_column_width;
 	public static String		ColumnModifyDialog_Dialog_title;
-	public static String		ColumnModifyDialog_Label_hint;
 	public static String		ColumnModifyDialog_Label_Hints;
 	public static String		ColumnModifyDialog_Label_info;
 

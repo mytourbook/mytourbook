@@ -442,8 +442,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 				// button: compute computed values
 				final Button btnComputValues = new Button(btnContainer, SWT.NONE);
 				GridDataFactory.fillDefaults().indent(0, 10).applyTo(btnComputValues);
-				btnComputValues.setText(Messages.Compute_BreakTime_Label_ComputeAllTours);
-				btnComputValues.setToolTipText(Messages.Compute_BreakTime_Label_ComputeAllTours_Tooltip);
+				btnComputValues.setText(Messages.Compute_BreakTime_Button_ComputeAllTours);
+				btnComputValues.setToolTipText(Messages.Compute_BreakTime_Button_ComputeAllTours_Tooltip);
 				btnComputValues.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
@@ -732,7 +732,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 				final int tourRecordingTime = oldTourData.getTourRecordingTime();
 
 				// get old break time
-				oldBreakTime[0] += tourRecordingTime - oldTourData.getTourDrivingTime();
+				final int tourDrivingTime = oldTourData.getTourDrivingTime();
+				oldBreakTime[0] += tourRecordingTime - tourDrivingTime;
 
 				// force the break time to be recomputed with the current values which are already store in the pref store
 				oldTourData.breakTimeSerie = null;
@@ -740,24 +741,10 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 				// recompute break time
 				oldTourData.computeTourDrivingTime();
 
-				newBreakTime[0] += tourRecordingTime - oldTourData.getTourDrivingTime();
-
 				return true;
 			}
 
 			public String getResultText() {
-
-//				final String msgOld = Long.toString(oldBreakTime[0])
-//						+ UI.SPACE
-//						+ Messages.App_Unit_Seconds_Small
-//						+ UI.SPACE4
-//						+ UI.format_hh_mm_ss(oldBreakTime[0]);
-//
-//				final String msgNew = Long.toString(newBreakTime[0])
-//						+ UI.SPACE
-//						+ Messages.App_Unit_Seconds_Small
-//						+ UI.SPACE4
-//						+ UI.format_hh_mm_ss(newBreakTime[0]);
 
 				return NLS.bind(Messages.Compute_BreakTime_ForAllTour_Job_Result, //
 						new Object[] { UI.format_hh_mm_ss(oldBreakTime[0]), UI.format_hh_mm_ss(newBreakTime[0]), });
@@ -769,20 +756,12 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 				if (savedTourData != null) {
 
-//					final String msgOld = Long.toString(oldBreakTime[0])
-//							+ UI.SPACE
-//							+ Messages.App_Unit_Seconds_Small
-//							+ UI.SPACE4
-//							+ UI.format_hh_mm_ss(oldBreakTime[0]);
-//
-//					final String msgNew = Long.toString(newBreakTime[0])
-//							+ UI.SPACE
-//							+ Messages.App_Unit_Seconds_Small
-//							+ UI.SPACE4
-//							+ UI.format_hh_mm_ss(newBreakTime[0]);
-
 					// get new value
-					oldBreakTime[0] += savedTourData.getMaxSpeed();
+					final int tourRecordingTime = savedTourData.getTourRecordingTime();
+
+					// get old break time
+					final int tourDrivingTime = savedTourData.getTourDrivingTime();
+					newBreakTime[0] += tourRecordingTime - tourDrivingTime;
 
 					subTaskText = NLS.bind(Messages.Compute_BreakTime_ForAllTour_Job_SubTask,//
 							new Object[] { UI.format_hh_mm_ss(oldBreakTime[0]), UI.format_hh_mm_ss(newBreakTime[0]), });

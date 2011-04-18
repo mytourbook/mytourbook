@@ -206,7 +206,7 @@ public class Messages extends NLS {
 	public static String		App_TourType_ToolTip;
 	public static String		App_TourType_ToolTipTitle;
 
-	public static String	App_Unit_Seconds_Small;
+	public static String		App_Unit_Seconds_Small;
 
 	public static String		App_Window_Title;
 
@@ -215,7 +215,6 @@ public class Messages extends NLS {
 	public static String		Compare_Result_Action_save_checked_tours;
 	public static String		Compare_Result_Action_save_checked_tours_tooltip;
 	public static String		Compare_Result_Action_uncheck_selected_tours;
-
 	public static String		Compare_Result_Column_diff;
 	public static String		Compare_Result_Column_diff_label;
 	public static String		Compare_Result_Column_diff_tooltip;
@@ -227,67 +226,35 @@ public class Messages extends NLS {
 	public static String		Compare_Result_Column_kmh_tooltip;
 	public static String		Compare_Result_Column_tour;
 
-	public static String	Compute_BreakTime_Button_ComputeValues;
+	public static String	Compute_BreakTime_Button_ComputeAllTours;
 
-	public static String	Compute_BreakTime_Button_ComputeValues_Tooltip;
+	public static String	Compute_BreakTime_Button_ComputeAllTours_Tooltip;
 
-	public static String	Compute_BreakTime_Button_RestoreDefaultValues;
+	public static String		Compute_BreakTime_Button_RestoreDefaultValues;
+	public static String		Compute_BreakTime_Button_RestoreDefaultValues_Tooltip;
+	public static String		Compute_BreakTime_Button_SetDefaultValues;
+	public static String		Compute_BreakTime_Button_SetDefaultValues_Tooltip;
+	public static String		Compute_BreakTime_Dialog_ComputeForAllTours_Message;
+	public static String		Compute_BreakTime_Dialog_ComputeForAllTours_Title;
+	public static String		Compute_BreakTime_ForAllTour_Job_Result;
+	public static String		Compute_BreakTime_ForAllTour_Job_SubTask;
+	public static String		Compute_BreakTime_Group_BreakTime;
+	public static String		Compute_BreakTime_Label_ComputeBreakTimeBy;
+	public static String		Compute_BreakTime_Label_Description;
+	public static String		Compute_BreakTime_Label_Description_ComputeByAvgSpeed;
+	public static String		Compute_BreakTime_Label_Description_ComputeBySliceSpeed;
+	public static String		Compute_BreakTime_Label_Description_ComputeByTime;
+	public static String		Compute_BreakTime_Label_Hints;
+	public static String		Compute_BreakTime_Label_MinimumAvgSpeed;
+	public static String		Compute_BreakTime_Label_MinimumDistance;
+	public static String		Compute_BreakTime_Label_MinimumSliceSpeed;
+	public static String		Compute_BreakTime_Label_MinimumTime;
+	public static String		Compute_BreakTime_Label_TourBreakTime;
+	public static String		Compute_BreakTime_Method_SpeedByAverage;
+	public static String		Compute_BreakTime_Method_SpeedBySlice;
+	public static String		Compute_BreakTime_Method_TimeDistance;
 
-	public static String	Compute_BreakTime_Button_RestoreDefaultValues_Tooltip;
-
-	public static String	Compute_BreakTime_Button_SetDefaultValues;
-
-	public static String	Compute_BreakTime_Button_SetDefaultValues_Tooltip;
-
-	public static String	Compute_BreakTime_Dialog_ComputeForAllTours_Message;
-
-	public static String	Compute_BreakTime_Dialog_ComputeForAllTours_Title;
-
-	public static String	Compute_BreakTime_ForAllTour_Job_Result;
-
-	public static String	Compute_BreakTime_ForAllTour_Job_SubTask;
-
-	public static String	Compute_BreakTime_Group_BreakTime;
-
-	public static String	Compute_BreakTime_Label_ComputeAllTours;
-
-	public static String	Compute_BreakTime_Label_ComputeAllTours_Tooltip;
-
-	public static String	Compute_BreakTime_Label_ComputeBreakTimeBy;
-
-	public static String	Compute_BreakTime_Label_Description;
-
-	public static String	Compute_BreakTime_Label_Description_ComputeByAvgSpeed;
-
-	public static String	Compute_BreakTime_Label_Description_ComputeBySliceSpeed;
-
-	public static String	Compute_BreakTime_Label_Description_ComputeByTime;
-
-	public static String	Compute_BreakTime_Label_Hints;
-
-	public static String	Compute_BreakTime_Label_MinimumAvgSpeed;
-
-	public static String	Compute_BreakTime_Label_MinimumDistance;
-
-	public static String	Compute_BreakTime_Label_MinimumSliceSpeed;
-
-	public static String	Compute_BreakTime_Label_MinimumSpeed_Tooltip;
-
-	public static String	Compute_BreakTime_Label_MinimumTime;
-
-	public static String	Compute_BreakTime_Label_TourBreakTime;
-
-	public static String	Compute_BreakTime_Method_SpeedByAverage;
-
-	public static String	Compute_BreakTime_Method_SpeedBySlice;
-
-	public static String	Compute_BreakTime_Method_TimeDistance;
-
-	public static String	Compute_BreakTime_Radio_Speed;
-
-	public static String	Compute_BreakTime_Radio_TimeDistance;
-
-	public static String	Compute_Values_Label_Info;
+	public static String		Compute_Values_Label_Info;
 
 	public static String		Conconi_Chart_Chk_LogScaling;
 	public static String		Conconi_Chart_Chk_LogScaling_Tooltip;
@@ -304,7 +271,7 @@ public class Messages extends NLS {
 	public static String		compute_tourValueElevation_group_computeTourAltitude;
 	public static String		compute_tourValueElevation_label_description;
 
-	public static String	compute_tourValueElevation_label_description_Hints;
+	public static String		compute_tourValueElevation_label_description_Hints;
 	public static String		compute_tourValueElevation_label_minAltiDifference;
 	public static String		compute_tourValueElevation_resultText;
 	public static String		compute_tourValueElevation_subTaskText;
@@ -316,7 +283,7 @@ public class Messages extends NLS {
 	public static String		compute_tourValueSpeed_group_speed;
 	public static String		compute_tourValueSpeed_label_description;
 
-	public static String	compute_tourValueSpeed_label_description_Hints;
+	public static String		compute_tourValueSpeed_label_description_Hints;
 	public static String		compute_tourValueSpeed_label_speedTimeSlice;
 	public static String		compute_tourValueSpeed_resultText;
 	public static String		compute_tourValueSpeed_subTaskText;
@@ -611,11 +578,11 @@ public class Messages extends NLS {
 	public static String		Pref_Appearance_Check_AutoOpenTagging;
 	public static String		Pref_Appearance_Check_TaggingAnimation;
 
-	public static String	Pref_Appearance_Group_Tagging;
+	public static String		Pref_Appearance_Group_Tagging;
 	public static String		Pref_Appearance_Label_AutoOpenTagging_Tooltip;
 	public static String		Pref_Appearance_Label_AutoOpenTaggingDelay;
 
-	public static String		Pref_Appearance_Label_NoOSXSupport;
+//	public static String		Pref_Appearance_Label_NoOSXSupport;
 	public static String		Pref_Appearance_NumberOfRecent_TourTypes;
 	public static String		Pref_Appearance_NumberOfRecent_TourTypes_Tooltip;
 	public static String		Pref_Appearance_ShowTourTypeContextMenu;
@@ -931,7 +898,7 @@ public class Messages extends NLS {
 	public static String		Tour_Segmenter_Label_no_chart;
 	public static String		Tour_Segmenter_Label_tolerance;
 
-	public static String	Tour_Segmenter_Type_ByBreakTime;
+	public static String		Tour_Segmenter_Type_ByBreakTime;
 
 	public static String		tag_view_action_refresh_view_tooltip;
 	public static String		tag_view_title_tag;
