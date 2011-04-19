@@ -61,7 +61,8 @@ public class TileInfoContribution extends WorkbenchWindowControlContribution {
 		_updateRunnable = new Runnable() {
 			public void run() {
 
-				if (_infoWidget == null && _infoWidget.isDisposed()) {
+				if (_infoWidget == null || _infoWidget.isDisposed()) {
+
 					return;
 				}
 
