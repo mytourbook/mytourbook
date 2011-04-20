@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -102,8 +102,6 @@ import org.osgi.framework.Version;
 public class DialogExportTour extends TitleAreaDialog {
 
 	private static final String						ZERO						= "0";											//$NON-NLS-1$
-
-	private static final String						UI_AVERAGE_SYMBOL			= "Ø ";										//$NON-NLS-1$
 
 	private static final int						VERTICAL_SECTION_MARGIN		= 10;
 	private static final int						SIZING_TEXT_FIELD_WIDTH		= 250;
@@ -573,7 +571,7 @@ public class DialogExportTour extends TitleAreaDialog {
 
 			// label: unit
 			_lblCoumouflageSpeedUnit = new Label(container, SWT.NONE);
-			_lblCoumouflageSpeedUnit.setText(UI_AVERAGE_SYMBOL + UI.UNIT_LABEL_SPEED);
+			_lblCoumouflageSpeedUnit.setText(UI.SYMBOL_AVERAGE_WITH_SPACE + UI.UNIT_LABEL_SPEED);
 			GridDataFactory
 					.fillDefaults()
 					.grab(true, false)

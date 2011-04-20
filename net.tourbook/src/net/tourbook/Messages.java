@@ -89,6 +89,8 @@ public class Messages extends NLS {
 	public static String		Adjust_Altitude_Type_HorizontalGeoPosition;
 
 	public static String		App_Action_About;
+
+	public static String	App_Action_Cancel;
 	public static String		App_Action_edit_tour;
 	public static String		App_Action_ExtractTour;
 	public static String		App_Action_JoinTours;
@@ -186,6 +188,8 @@ public class Messages extends NLS {
 	public static String		App_Action_set_tour_type;
 	public static String		App_Action_SetPerson;
 	public static String		App_Action_SplitTour;
+
+	public static String	App_Action_Update;
 
 	public static String		App_measurement_imperial;
 	public static String		App_measurement_metric;

@@ -135,13 +135,14 @@ public class UI {
 	/*
 	 * labels for the different measurement systems
 	 */
-	private static final String								UNIT_DISTANCE_METER				= "m";										//$NON-NLS-1$
+	public static final String								UNIT_METER						= "m";										//$NON-NLS-1$
 	private static final String								UNIT_ALTITUDE_M					= "m";										//$NON-NLS-1$
 	public static final String								UNIT_DISTANCE_KM				= "km";									//$NON-NLS-1$
 	private static final String								UNIT_SPEED_KM_H					= "km/h";									//$NON-NLS-1$
 	private static final String								UNIT_FAHRENHEIT_C				= "\u00B0C";								//$NON-NLS-1$
 	private static final String								UNIT_ALTIMETER_M_H				= "m/h";									//$NON-NLS-1$
 	private static final String								UNIT_PACE_MIN_P_KM				= "min/km";								//$NON-NLS-1$
+	public static final String								UNIT_WEIGHT_KG					= "kg";									//$NON-NLS-1$
 
 	private static final String								UNIT_DISTANCE_YARD				= "yd";									//$NON-NLS-1$
 	private static final String								UNIT_ALTITUDE_FT				= "ft";									//$NON-NLS-1$
@@ -154,8 +155,8 @@ public class UI {
 	public static final String								UNIT_LABEL_POWER				= "Watt";									//$NON-NLS-1$
 	public static final String								UNIT_LABEL_MS					= "ms";									//$NON-NLS-1$
 
-	public static final String								SYMBOL_AVERAGE					= "\u00d8";								//$NON-NLS-1$
-	public static final String								SYMBOL_AVERAGE_WITH_SPACE		= "\u00d8 ";								//$NON-NLS-1$
+	public static final String								SYMBOL_AVERAGE					= "\u00f8";								//$NON-NLS-1$
+	public static final String								SYMBOL_AVERAGE_WITH_SPACE		= "\u00f8 ";								//$NON-NLS-1$
 	public static final String								SYMBOL_DIFFERENCE_WITH_SPACE	= "\u0394 ";								//$NON-NLS-1$
 	public static final String								SYMBOL_SUM_WITH_SPACE			= "\u2211 ";								//$NON-NLS-1$
 	public static final String								SYMBOL_DOUBLE_HORIZONTAL		= "\u2550";								//$NON-NLS-1$
@@ -1198,7 +1199,7 @@ public class UI {
 			UNIT_VALUE_DISTANCE_SMALL = 1;
 
 			UNIT_LABEL_DISTANCE = UNIT_DISTANCE_KM;
-			UNIT_LABEL_DISTANCE_SMALL = UNIT_DISTANCE_METER;
+			UNIT_LABEL_DISTANCE_SMALL = UNIT_METER;
 
 			UNIT_LABEL_SPEED = UNIT_SPEED_KM_H;
 			UNIT_LABEL_PACE = UNIT_PACE_MIN_P_KM;

@@ -54,6 +54,13 @@ public class TourPerson {
 	private float			height;
 
 	/**
+	 * Date/Time when tour data was modified, default value is 0
+	 * <p>
+	 * since: db version 15
+	 */
+	private long			birthDay;
+
+	/**
 	 * Device used by this person, reference to the device plugin
 	 */
 	private String			deviceReaderId;
@@ -73,6 +80,10 @@ public class TourPerson {
 	 * default constructor used in ejb
 	 */
 	public TourPerson() {}
+
+	public long getBirthDay() {
+		return birthDay;
+	}
 
 	public String getDeviceReaderId() {
 		return deviceReaderId;
@@ -153,6 +164,10 @@ public class TourPerson {
 		}
 
 		return isSaved;
+	}
+
+	public void setBirthDay(final long birthDay) {
+		this.birthDay = birthDay;
 	}
 
 	public void setDeviceReaderId(final String deviceId) {

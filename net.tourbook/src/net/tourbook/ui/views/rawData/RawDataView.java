@@ -167,7 +167,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private final Calendar						_calendar							= GregorianCalendar.getInstance();
 
-	private final NumberFormat					_nf									= NumberFormat.getNumberInstance();
 	private final DateFormat					_dateFormatter						= DateFormat
 																							.getDateInstance(DateFormat.SHORT);
 	private final DateFormat					_timeFormatter						= DateFormat
@@ -175,6 +174,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private final DateFormat					_durationFormatter					= DateFormat.getTimeInstance(
 																							DateFormat.SHORT,
 																							Locale.GERMAN);
+
+	private final NumberFormat					_nf1								= NumberFormat.getNumberInstance();
+	private final NumberFormat					_nf3								= NumberFormat.getNumberInstance();
+	{
+		_nf1.setMinimumFractionDigits(1);
+		_nf1.setMaximumFractionDigits(1);
+		_nf3.setMinimumFractionDigits(3);
+		_nf3.setMaximumFractionDigits(3);
+	}
 
 	private boolean								_isToolTipInDate;
 	private boolean								_isToolTipInTime;
@@ -1024,10 +1032,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				final int tourDistance = tourData.getTourDistance();
 				final int drivingTime = tourData.getTourDrivingTime();
 				if (drivingTime != 0) {
-					_nf.setMinimumFractionDigits(1);
-					_nf.setMaximumFractionDigits(1);
 
-					cell.setText(_nf.format(((float) tourDistance) / drivingTime * 3.6 / UI.UNIT_VALUE_DISTANCE));
+					cell.setText(_nf1.format(((float) tourDistance) / drivingTime * 3.6 / UI.UNIT_VALUE_DISTANCE));
 				}
 			}
 		});
@@ -1147,9 +1153,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				if (tourDistance == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					_nf.setMinimumFractionDigits(3);
-					_nf.setMaximumFractionDigits(3);
-					cell.setText(_nf.format(((float) tourDistance) / 1000 / UI.UNIT_VALUE_DISTANCE));
+					cell.setText(_nf3.format(((float) tourDistance) / 1000 / UI.UNIT_VALUE_DISTANCE));
 				}
 			}
 		});

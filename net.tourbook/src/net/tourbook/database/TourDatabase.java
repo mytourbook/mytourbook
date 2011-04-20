@@ -85,8 +85,9 @@ public class TourDatabase {
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int						TOURBOOK_DB_VERSION							= 14;
+	private static final int						TOURBOOK_DB_VERSION							= 15;
 
+//	private static final int						TOURBOOK_DB_VERSION							= 15;	// 11.???
 //	private static final int						TOURBOOK_DB_VERSION							= 14;	// 11.3
 //	private static final int						TOURBOOK_DB_VERSION							= 13;	// 10.11
 //	private static final int						TOURBOOK_DB_VERSION							= 12;	// 10.9.1
@@ -2090,6 +2091,13 @@ public class TourDatabase {
 				+ ("	firstName 		" + varCharKomma(TourPerson.DB_LENGTH_FIRST_NAME)) //$NON-NLS-1$
 				+ "	weight 				FLOAT,									\n" //$NON-NLS-1$ // kg
 				+ "	height 				FLOAT,									\n" //$NON-NLS-1$ // m
+
+				// version 15 start
+				//
+				+ "	BirthDay			BIGINT DEFAULT 0,						\n" //$NON-NLS-1$
+				//
+				// version 15 end ---------
+
 				+ ("	rawDataPath		" + varCharKomma(TourPerson.DB_LENGTH_RAW_DATA_PATH)) //$NON-NLS-1$
 				+ ("	deviceReaderId	" + varCharKomma(TourPerson.DB_LENGTH_DEVICE_READER_ID)) //$NON-NLS-1$
 				+ "	tourBike_bikeId 	BIGINT									\n" //$NON-NLS-1$
@@ -2696,6 +2704,10 @@ public class TourDatabase {
 				currentDbVersion = newVersion = updateDbDesign_013_014(conn, monitor);
 			}
 
+			if (currentDbVersion == 14) {
+				currentDbVersion = newVersion = updateDbDesign_014_015(conn, monitor);
+			}
+
 			/*
 			 * update version number
 			 */
@@ -3277,6 +3289,33 @@ public class TourDatabase {
 		final Statement stmt = conn.createStatement();
 		{
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN ConconiDeflection			INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+			exec(stmt, sql);
+		}
+		stmt.close();
+
+		logDbUpdateEnd(newDbVersion);
+
+		return newDbVersion;
+	}
+
+	private int updateDbDesign_014_015(final Connection conn, final IProgressMonitor monitor) throws SQLException {
+
+		final int newDbVersion = 15;
+
+		logDbUpdateStart(newDbVersion);
+
+		if (monitor != null) {
+			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, newDbVersion));
+		}
+
+//		TOURPERSON TOURPERSON TOURPERSON TOURPERSON TOURPERSON TOURPERSON
+//
+//		+ "	BirthDay			BIGINT DEFAULT 0,						\n" //$NON-NLS-1$
+
+		String sql;
+		final Statement stmt = conn.createStatement();
+		{
+			sql = "ALTER TABLE " + TABLE_TOUR_PERSON + " ADD COLUMN BirthDay			BIGINT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
 			exec(stmt, sql);
 		}
 		stmt.close();
