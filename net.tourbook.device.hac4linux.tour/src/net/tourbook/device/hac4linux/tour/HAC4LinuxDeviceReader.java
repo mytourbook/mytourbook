@@ -37,7 +37,6 @@ import net.tourbook.chart.ChartLabel;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
-import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
@@ -297,7 +296,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 
 			fileHac4LinuxData = new BufferedReader(new FileReader(importFileName));
 			final TourData tourData = new TourData();
-			final TourPerson tourPerson = new TourPerson();
+//			final TourPerson tourPerson = new TourPerson();
 
 			String line = null;
 			final StringBuffer tourDescription = new StringBuffer();
@@ -405,10 +404,10 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 						break;
 					}
 					if (fields[0].equals("LastName")) { //$NON-NLS-1$
-						tourPerson.setLastName(fields[1]);
+//						tourPerson.setLastName(fields[1]);
 					}
 					if (fields[0].equals("FirstName")) { //$NON-NLS-1$
-						tourPerson.setFirstName(fields[1]);
+//						tourPerson.setFirstName(fields[1]);
 					}
 					if (fields[0].equals("DateOfBirth")) //$NON-NLS-1$
 					{
@@ -430,7 +429,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 						tourData.setRestPulse(Integer.parseInt(fields[1]));
 					}
 					if (fields[0].equals("Weight")) { //$NON-NLS-1$
-						tourPerson.setWeight(Float.parseFloat(fields[1]));
+//						tourPerson.setWeight(Float.parseFloat(fields[1]));
 					}
 					break;
 				case SECTION_STATISTICS:
