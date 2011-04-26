@@ -90,7 +90,7 @@ public class Messages extends NLS {
 
 	public static String		App_Action_About;
 
-	public static String	App_Action_Cancel;
+	public static String		App_Action_Cancel;
 	public static String		App_Action_edit_tour;
 	public static String		App_Action_ExtractTour;
 	public static String		App_Action_JoinTours;
@@ -102,6 +102,8 @@ public class Messages extends NLS {
 	public static String		App_Action_open_preferences;
 	public static String		App_Action_open_tour_segmenter;
 	public static String		App_Action_open_tour_segmenter_tooltip;
+
+	public static String		App_Action_OpenOtherViews;
 
 	public static String		action_export_tour;
 	public static String		action_print_tour;
@@ -189,7 +191,7 @@ public class Messages extends NLS {
 	public static String		App_Action_SetPerson;
 	public static String		App_Action_SplitTour;
 
-	public static String	App_Action_Update;
+	public static String		App_Action_Update;
 
 	public static String		App_measurement_imperial;
 	public static String		App_measurement_metric;
@@ -198,8 +200,10 @@ public class Messages extends NLS {
 	public static String		App_People_item_all;
 	public static String		App_People_tooltip;
 
-	public static String		App_Dlg_first_startup_msg;
-	public static String		App_Dlg_first_startup_title;
+	public static String		App_Default_PersonFirstName;
+
+	public static String		App_Dialog_FirstStartup_Message;
+	public static String		App_Dialog_FirstStartup_Title;
 
 	public static String		App_Label_ISO8601;
 
@@ -230,9 +234,9 @@ public class Messages extends NLS {
 	public static String		Compare_Result_Column_kmh_tooltip;
 	public static String		Compare_Result_Column_tour;
 
-	public static String	Compute_BreakTime_Button_ComputeAllTours;
+	public static String		Compute_BreakTime_Button_ComputeAllTours;
 
-	public static String	Compute_BreakTime_Button_ComputeAllTours_Tooltip;
+	public static String		Compute_BreakTime_Button_ComputeAllTours_Tooltip;
 
 	public static String		Compute_BreakTime_Button_RestoreDefaultValues;
 	public static String		Compute_BreakTime_Button_RestoreDefaultValues_Tooltip;
@@ -599,6 +603,8 @@ public class Messages extends NLS {
 	public static String		Pref_ChartColors_unit_mid;
 	public static String		Pref_ChartColors_unit_min;
 
+	public static String	Pref_DataImport_Label;
+
 	public static String		Pref_general_imperial_unit_fahrenheit;
 	public static String		Pref_general_imperial_unit_feet;
 	public static String		Pref_general_imperial_unit_mi;
@@ -659,16 +665,27 @@ public class Messages extends NLS {
 	public static String		Pref_MapLayout_Label_TourPaintMethod_Simple_Tooltip;
 
 	public static String		Pref_People_Action_add_person;
+	public static String		Pref_People_Column_Birthday;
+
 	public static String		Pref_People_Column_device;
 	public static String		Pref_People_Column_first_name;
 	public static String		Pref_People_Column_height;
 	public static String		Pref_People_Column_last_name;
 	public static String		Pref_People_Column_weight;
+	public static String		Pref_People_Dialog_SaveModifiedPerson_Message;
+
+	public static String		Pref_People_Dialog_SaveModifiedPerson_Title;
+
 	public static String		Pref_People_Error_first_name_is_required;
 	public static String		Pref_People_Error_invalid_number;
 	public static String		Pref_People_Error_path_is_invalid;
+	public static String		Pref_People_Group_Device;
+
 	public static String		Pref_People_Group_person;
 	public static String		Pref_People_Label_bike;
+	public static String		Pref_People_Label_Birthday;
+	public static String		Pref_People_Label_DefaultDataTransferFilePath;
+	public static String		Pref_People_Label_DefaultDataTransferFilePath_Tooltip;
 	public static String		Pref_People_Label_device;
 	public static String		Pref_People_Label_first_name;
 	public static String		Pref_People_Label_height;
@@ -694,13 +711,6 @@ public class Messages extends NLS {
 	public static String		pref_map_layout_symbol_line;
 	public static String		pref_map_layout_symbol_square;
 	public static String		pref_map_layout_symbol_width;
-
-	public static String		pref_regional_decimalSeparator;
-	public static String		pref_regional_description;
-	public static String		pref_regional_groupSeparator;
-	public static String		pref_regional_title;
-	public static String		pref_regional_useCustomDecimalFormat;
-	public static String		pref_regional_value_example;
 
 	public static String		pref_statistic_lbl_info;
 

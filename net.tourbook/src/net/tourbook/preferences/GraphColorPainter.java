@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,8 +22,6 @@ import net.tourbook.colors.GraphColorItem;
 import net.tourbook.mapping.ILegendProvider;
 import net.tourbook.mapping.TourPainter;
 
-import org.eclipse.jface.viewers.ITableLabelProvider;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
@@ -31,7 +29,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
-public class GraphColorLabelProvider extends LabelProvider implements ITableLabelProvider {
+public class GraphColorPainter {
 
 	private final IColorTreeViewer			_colorTreeViewer;
 
@@ -43,21 +41,13 @@ public class GraphColorLabelProvider extends LabelProvider implements ITableLabe
 	/**
 	 * @param colorTree
 	 */
-	GraphColorLabelProvider(final IColorTreeViewer colorTreeViewer) {
+	GraphColorPainter(final IColorTreeViewer colorTreeViewer) {
 
 		_colorTreeViewer = colorTreeViewer;
 		_treeItemHeight = _colorTreeViewer.getTreeViewer().getTree().getItemHeight();
 	}
 
-	@Override
-	public void dispose() {
-
-		super.dispose();
-
-		disposeGraphImages();
-	}
-
-	void disposeGraphImages() {
+	void disposeAllResources() {
 
 		for (final Image image : _imageCache.values()) {
 			(image).dispose();
@@ -90,7 +80,7 @@ public class GraphColorLabelProvider extends LabelProvider implements ITableLabe
 		_imageCache.remove(imageId);
 	}
 
-	private Image drawColorImage(final GraphColorItem graphColor) {
+	Image drawColorImage(final GraphColorItem graphColor) {
 
 		final Display display = Display.getCurrent();
 
@@ -102,7 +92,8 @@ public class GraphColorLabelProvider extends LabelProvider implements ITableLabe
 			final int imageHeight = _treeItemHeight;
 			final int imageWidth = imageHeight * 4;
 
-			final Rectangle borderRect = new Rectangle(0, 1, imageWidth - 1, imageHeight - 2);
+//			final Rectangle borderRect = new Rectangle(0, 1, imageWidth - 1, imageHeight - 2);
+			final Rectangle borderRect = new Rectangle(10, 1, imageWidth - 11, imageHeight - 3);
 
 			image = new Image(display, imageWidth, imageHeight);
 
@@ -139,7 +130,7 @@ public class GraphColorLabelProvider extends LabelProvider implements ITableLabe
 		return image;
 	}
 
-	private Image drawDefinitionImage(final ColorDefinition colorDefinition) {
+	Image drawDefinitionImage(final ColorDefinition colorDefinition) {
 
 		final Display display = Display.getCurrent();
 		final GraphColorItem[] graphColors = colorDefinition.getGraphColorParts();
@@ -190,7 +181,7 @@ public class GraphColorLabelProvider extends LabelProvider implements ITableLabe
 								yPosition + 1,
 								colorHeight - 1,
 								colorWidth - 1);
-						
+
 						gc.drawRectangle(borderRect);
 					}
 
@@ -203,32 +194,6 @@ public class GraphColorLabelProvider extends LabelProvider implements ITableLabe
 		}
 
 		return definitionImage;
-	}
-
-	public Image getColumnImage(final Object element, final int columnIndex) {
-
-		if (columnIndex == 1 && element instanceof ColorDefinition) {
-
-			return drawDefinitionImage((ColorDefinition) element);
-
-		} else if (columnIndex == 2 && element instanceof GraphColorItem) {
-
-			return drawColorImage((GraphColorItem) element);
-		}
-
-		return null;
-	}
-
-	public String getColumnText(final Object element, final int columnIndex) {
-
-		if (columnIndex == 0 && element instanceof ColorDefinition) {
-			return ((ColorDefinition) (element)).getVisibleName();
-		}
-
-		if (columnIndex == 0 && element instanceof GraphColorItem) {
-			return ((GraphColorItem) (element)).getName();
-		}
-		return null;
 	}
 
 	/**

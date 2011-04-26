@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -48,7 +48,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 	private IWorkbenchWindow					_window;
 
-	private IContributionItem					_actionViewShortList;
 	private IWorkbenchAction					_actionPreferences;
 
 	private IWorkbenchAction					_actionAbout;
@@ -63,6 +62,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	PersonContributionItem						_personContribItem;
 	private TourTypeContributionItem			_tourTypeContribItem;
 	private MeasurementSystemContributionItem	_measurementContribItem;
+
+	private ActionOtherViews					_actionOtherViews;
 
 	public ApplicationActionBarAdvisor(final IActionBarConfigurer configurer) {
 		super(configurer);
@@ -153,9 +154,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		final MenuManager viewMenu = new MenuManager(Messages.App_Action_Menu_view, "views"); //$NON-NLS-1$
 
 		viewMenu.add(new Separator("defaultViews")); //$NON-NLS-1$
-		viewMenu.add(_actionViewShortList);
 
 		viewMenu.add(new Separator());
+		viewMenu.add(_actionOtherViews);
 		addPerspectiveActions(viewMenu);
 
 		viewMenu.add(new Separator("adminViews")); //$NON-NLS-1$
@@ -235,7 +236,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		_actionPreferences.setText(Messages.App_Action_open_preferences);
 		register(_actionPreferences);
 
-		_actionViewShortList = ContributionItemFactory.VIEWS_SHORTLIST.create(window);
+		_actionOtherViews = new ActionOtherViews(window);
 
 		_actionEditActionSets = ActionFactory.EDIT_ACTION_SETS.create(window);
 		register(_actionEditActionSets);

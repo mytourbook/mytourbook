@@ -35,7 +35,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
@@ -236,6 +235,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	}
 
 	private void loadPeopleData() {
+
 		final String sqlString = "SELECT *  FROM " + TourDatabase.TABLE_TOUR_PERSON; //$NON-NLS-1$
 
 		try {
@@ -254,16 +254,20 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 				MessageDialog.openInformation(
 						activeShell,
-						Messages.App_Dlg_first_startup_title,
-						Messages.App_Dlg_first_startup_msg);
+						Messages.App_Dialog_FirstStartup_Title,
+						Messages.App_Dialog_FirstStartup_Message);
 
-				final PreferenceDialog dialog = PreferencesUtil.createPreferenceDialogOn(//
+				// tell the pref page to create a new default person
+				final Boolean isCreatePerson = new Boolean(true);
+
+				PreferencesUtil.createPreferenceDialogOn(//
 						activeShell,
 						PrefPagePeople.ID,
 						new String[] { PrefPagePeople.ID },
-						null);
-
-				dialog.open();
+						isCreatePerson,
+						PreferencesUtil.OPTION_FILTER_LOCKED //
+						)
+						.open();
 
 				// open raw data view
 				try {
@@ -311,7 +315,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 			public void run() {
 
 				TagMenuManager.restoreTagState();
-
 				TourTypeMenuManager.restoreState();
 
 				loadPeopleData();
