@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,6 +28,7 @@ import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.rawData.RawDataView;
+import net.tourbook.util.StatusUtil;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProduct;
@@ -35,7 +36,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
@@ -75,14 +75,15 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	private IWorkbenchPart						_lastActivePart;
 	private String								_lastPartTitle	= UI.EMPTY_STRING;
 
-	private final ApplicationWorkbenchAdvisor	wbAdvisor;
+	private final ApplicationWorkbenchAdvisor	_wbAdvisor;
 
-	private IPropertyListener					partPropertyListener;
+	private IPropertyListener					_partPropertyListener;
 
 	public ApplicationWorkbenchWindowAdvisor(	final ApplicationWorkbenchAdvisor wbAdvisor,
 												final IWorkbenchWindowConfigurer configurer) {
 		super(configurer);
-		this.wbAdvisor = wbAdvisor;
+
+		_wbAdvisor = wbAdvisor;
 	}
 
 	private String computeTitle() {
@@ -125,7 +126,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 			}
 
 			final IAdaptable input = currentPage.getInput();
-			if ((input != null) && !input.equals(wbAdvisor.getDefaultPageInput())) {
+			if ((input != null) && !input.equals(_wbAdvisor.getDefaultPageInput())) {
 				label = currentPage.getLabel();
 			}
 
@@ -146,6 +147,48 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	@Override
 	public void dispose() {
 		UI.getInstance().dispose();
+	}
+
+	private void firstApplicationStart() {
+
+		final Shell activeShell = Display.getCurrent().getActiveShell();
+
+		MessageDialog.openInformation(
+				activeShell,
+				Messages.App_Dialog_FirstStartup_Title,
+				Messages.App_Dialog_FirstStartup_Message);
+
+		// tell the pref page to create a new default person
+		final Boolean isCreatePerson = new Boolean(true);
+
+		// this dialog fires an event that the person list is modified
+		PreferencesUtil.createPreferenceDialogOn(//
+				activeShell,
+				PrefPagePeople.ID,
+				new String[] { PrefPagePeople.ID },
+				isCreatePerson,
+				PreferencesUtil.OPTION_FILTER_LOCKED //
+				)
+				.open();
+
+		// select measurement system
+		new DialogSelectMeasurementSystem(activeShell).open();
+
+		// tip to save tour
+		MessageDialog.openInformation(
+				activeShell,
+				Messages.App_Dialog_FirstStartupTip_Title,
+				Messages.App_Dialog_FirstStartupTip_Message);
+
+		// open raw data view
+		try {
+			getWindowConfigurer()
+					.getWindow()
+					.getActivePage()
+					.showView(RawDataView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
+		} catch (final PartInitException e) {
+			StatusUtil.log(e);
+		}
 	}
 
 	/**
@@ -219,7 +262,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 			public void partVisible(final IWorkbenchPartReference ref) {}
 		});
 
-		partPropertyListener = new IPropertyListener() {
+		_partPropertyListener = new IPropertyListener() {
 			public void propertyChanged(final Object source, final int propId) {
 
 				if (propId == IWorkbenchPartConstants.PROP_TITLE) {
@@ -236,10 +279,12 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	}
 
 	private void loadPeopleData() {
+
+		Connection conn = null;
 		final String sqlString = "SELECT *  FROM " + TourDatabase.TABLE_TOUR_PERSON; //$NON-NLS-1$
 
 		try {
-			final Connection conn = TourDatabase.getInstance().getConnection();
+			conn = TourDatabase.getInstance().getConnection();
 			final PreparedStatement statement = conn.prepareStatement(sqlString);
 			final ResultSet result = statement.executeQuery();
 
@@ -247,42 +292,24 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 				// people are available, nothing more to do
 				return;
 			} else {
-
-				// no people are in the db, open the pref dialog to enter people
-
-				final Shell activeShell = Display.getCurrent().getActiveShell();
-
-				MessageDialog.openInformation(
-						activeShell,
-						Messages.App_Dlg_first_startup_title,
-						Messages.App_Dlg_first_startup_msg);
-
-				final PreferenceDialog dialog = PreferencesUtil.createPreferenceDialogOn(//
-						activeShell,
-						PrefPagePeople.ID,
-						new String[] { PrefPagePeople.ID },
-						null);
-
-				dialog.open();
-
-				// open raw data view
-				try {
-					getWindowConfigurer()
-							.getWindow()
-							.getActivePage()
-							.showView(RawDataView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
-				} catch (final PartInitException e) {
-					e.printStackTrace();
-				}
-
+				// no people are in the db -> this is the first startup of the application
+				firstApplicationStart();
 			}
-			conn.close();
 
-			// select person/tour type which was selected in the last session
-			_applicationActionBarAdvisor._personContribItem.fireEventNewPersonIsSelected();
+			// select new person
+			_applicationActionBarAdvisor._personContribItem.selectFirstPerson();
 
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
+		} finally {
+
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (final SQLException e) {
+					UI.showSQLException(e);
+				}
+			}
 		}
 	}
 
@@ -311,7 +338,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 			public void run() {
 
 				TagMenuManager.restoreTagState();
-
 				TourTypeMenuManager.restoreState();
 
 				loadPeopleData();
@@ -405,7 +431,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		}
 
 		if (_lastActivePart != null) {
-			_lastActivePart.removePropertyListener(partPropertyListener);
+			_lastActivePart.removePropertyListener(_partPropertyListener);
 		}
 
 		_lastActivePart = activePart;
@@ -413,7 +439,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		_lastPerspective = persp;
 
 		if (activePart != null) {
-			activePart.addPropertyListener(partPropertyListener);
+			activePart.addPropertyListener(_partPropertyListener);
 		}
 
 		recomputeTitle();

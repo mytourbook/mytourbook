@@ -74,7 +74,7 @@ public class TourTag implements Comparable<Object> {
 	private final Set<TourTagCategory>	tourTagCategory				= new HashSet<TourTagCategory>();
 
 	/**
-	 * unique id for manually created tour types because the {@link #typeId} is -1 when it's not
+	 * unique id for manually created tour types because the {@link #tagId} is -1 when it's not
 	 * persisted
 	 */
 	@Transient

@@ -7,7 +7,7 @@
 	<classpathentry exported="true" kind="lib" path="log4j.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-entitymanager-3.4.0/hibernate-entitymanager.jar" sourcepath="L:/java-resources/hibernate-3.4.0/hibernate-entitymanager-3.4.0.GA/src"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-entitymanager-3.4.0/lib/dom4j.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/hibernate-entitymanager-3.4.0/lib/ejb3-persistence.jar" sourcepath="L:/java-resources/ejb3-persistence"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-entitymanager-3.4.0/lib/ejb3-persistence.jar" sourcepath="C:/E/java-resources/ejb3-persistence"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-entitymanager-3.4.0/lib/hibernate-annotations.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-entitymanager-3.4.0/lib/hibernate-commons-annotations.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-core-3.3.2/hibernate3.jar" sourcepath="L:/java-resources/hibernate-3.4.0/hibernate-core-3.3.2.GA/project/core/src"/>

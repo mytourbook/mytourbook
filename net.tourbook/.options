@@ -9,4 +9,5 @@
 #org.eclipse.ui/trace/contexts=true
 #org.eclipse.ui/trace/contexts.verbose=true
 
-org.eclipse.ui/perf/showHeapStatus=true
+# heap is not displayed by default since version 11.7
+#org.eclipse.ui/perf/showHeapStatus=true

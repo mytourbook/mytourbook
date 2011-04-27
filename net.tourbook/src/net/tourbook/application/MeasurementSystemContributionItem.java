@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.application;
 
 import net.tourbook.Messages;
@@ -37,17 +36,15 @@ import org.eclipse.swt.widgets.Control;
 
 public class MeasurementSystemContributionItem extends CustomControlContribution {
 
-	private static final String		ID						= "net.tourbook.measurementSelector";				//$NON-NLS-1$
+	private static final String				ID						= "net.tourbook.measurementSelector";				//$NON-NLS-1$
 
-	private static final boolean	IS_OSX					= "carbon".equals(SWT.getPlatform());				//$NON-NLS-1$
+	private final static IPreferenceStore	_prefStore				= TourbookPlugin.getDefault().getPreferenceStore();
 
-	private final IPreferenceStore	_prefStore				= TourbookPlugin.getDefault().getPreferenceStore();
+	private IPropertyChangeListener			_prefChangeListener;
 
-	private IPropertyChangeListener	_prefChangeListener;
+	private boolean							_isFireSelectionEvent	= true;
 
-	private boolean					_isFireSelectionEvent	= true;
-
-	private Combo					_combo;
+	private Combo							_combo;
 
 	public MeasurementSystemContributionItem() {
 		this(ID);
@@ -55,6 +52,67 @@ public class MeasurementSystemContributionItem extends CustomControlContribution
 
 	protected MeasurementSystemContributionItem(final String id) {
 		super(id);
+	}
+
+	public static void selectSystemFromPrefStore(final Combo combo) {
+
+		final String system = _prefStore.getString(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE);
+
+		if (system.equals(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_KM)) {
+			combo.select(0);
+		} else if (system.equals(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_MI)) {
+			combo.select(1);
+		} else {
+			combo.select(0);
+		}
+	}
+
+	/**
+	 * Sets measurement system in the pref store, updates {@link UI#UNIT_VALUE_ALTITUDE}... var's
+	 * and fires modify event {@link ITourbookPreferences#MEASUREMENT_SYSTEM}
+	 * 
+	 * @param systemIndex
+	 *            0...metric, 1...imperial
+	 */
+	public static void selectSystemInPrefStore(final int systemIndex) {
+
+		if (systemIndex == 0) {
+
+			// set metric system
+
+			_prefStore.putValue(
+					ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE,
+					ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_KM);
+
+			_prefStore.putValue(
+					ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE,
+					ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE_M);
+
+			_prefStore.putValue(
+					ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE,
+					ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE_C);
+
+		} else {
+
+			// set imperial system
+
+			_prefStore.putValue(
+					ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE,
+					ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_MI);
+
+			_prefStore.putValue(
+					ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE,
+					ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE_FOOT);
+
+			_prefStore.putValue(
+					ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE,
+					ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPTERATURE_F);
+		}
+
+		UI.updateUnits();
+
+		// fire modify event
+		_prefStore.setValue(ITourbookPreferences.MEASUREMENT_SYSTEM, Math.random());
 	}
 
 	/**
@@ -69,8 +127,11 @@ public class MeasurementSystemContributionItem extends CustomControlContribution
 				final String property = event.getProperty();
 
 				if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
+
 					_isFireSelectionEvent = false;
-					selectSystem();
+					{
+						selectSystemFromPrefStore(_combo);
+					}
 					_isFireSelectionEvent = true;
 				}
 			}
@@ -80,7 +141,40 @@ public class MeasurementSystemContributionItem extends CustomControlContribution
 		_prefStore.addPropertyChangeListener(_prefChangeListener);
 	}
 
-	private Composite createComboBox(final Composite parent) {
+	@Override
+	protected Control createControl(final Composite parent) {
+
+		final Composite ui = createUI(parent);
+
+		addPrefListener();
+
+		return ui;
+	}
+
+	private Composite createUI(final Composite parent) {
+
+		if (net.tourbook.util.UI.IS_OSX) {
+
+			return createUI10ComboBox(parent);
+
+		} else {
+
+			/*
+			 * on win32 a few pixel above and below the combobox are drawn, wrapping it into a
+			 * composite removes the pixels
+			 */
+			final Composite container = new Composite(parent, SWT.NONE);
+			GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(container);
+			{
+				final Composite control = createUI10ComboBox(container);
+				control.setLayoutData(new GridData(SWT.NONE, SWT.CENTER, false, true));
+			}
+
+			return container;
+		}
+	}
+
+	private Composite createUI10ComboBox(final Composite parent) {
 
 		_combo = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
 		_combo.setToolTipText(Messages.App_measurement_tooltip);
@@ -99,48 +193,7 @@ public class MeasurementSystemContributionItem extends CustomControlContribution
 					return;
 				}
 
-				final int selectedIndex = _combo.getSelectionIndex();
-				if (selectedIndex == -1) {
-					return;
-				}
-
-				if (selectedIndex == 0) {
-
-					// set metric system
-
-					_prefStore.putValue(
-							ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE,
-							ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_KM);
-
-					_prefStore.putValue(
-							ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE,
-							ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE_M);
-
-					_prefStore.putValue(
-							ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE,
-							ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE_C);
-
-				} else {
-
-					// set imperial system
-
-					_prefStore.putValue(
-							ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE,
-							ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_MI);
-
-					_prefStore.putValue(
-							ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE,
-							ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE_FOOT);
-
-					_prefStore.putValue(
-							ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE,
-							ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPTERATURE_F);
-				}
-
-				UI.updateUnits();
-
-				// fire modify event
-				_prefStore.setValue(ITourbookPreferences.MEASUREMENT_SYSTEM, Math.random());
+				onSelectSystem();
 			}
 		});
 
@@ -149,48 +202,19 @@ public class MeasurementSystemContributionItem extends CustomControlContribution
 		_combo.add(Messages.App_measurement_imperial); // imperial system
 
 		// select previous value
-		selectSystem();
+		selectSystemFromPrefStore(_combo);
 
 		return _combo;
 	}
 
-	@Override
-	protected Control createControl(final Composite parent) {
+	private void onSelectSystem() {
 
-		Composite content;
+		final int selectedIndex = _combo.getSelectionIndex();
 
-		if (IS_OSX) {
-
-			content = createComboBox(parent);
-
-		} else {
-
-			/*
-			 * on win32 a few pixel above and below the combobox are drawn, wrapping it into a
-			 * composite removes the pixels
-			 */
-			content = new Composite(parent, SWT.NONE);
-			GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(content);
-
-			final Composite control = createComboBox(content);
-			control.setLayoutData(new GridData(SWT.NONE, SWT.CENTER, false, true));
+		if (selectedIndex == -1) {
+			return;
 		}
 
-		addPrefListener();
-
-		return content;
-	}
-
-	private void selectSystem() {
-
-		final String system = _prefStore.getString(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE);
-
-		if (system.equals(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_KM)) {
-			_combo.select(0);
-		} else if (system.equals(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_MI)) {
-			_combo.select(1);
-		} else {
-			_combo.select(0);
-		}
+		selectSystemInPrefStore(selectedIndex);
 	}
 }

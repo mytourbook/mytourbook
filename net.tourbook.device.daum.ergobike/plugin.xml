@@ -10,4 +10,14 @@
             name="Daum Ergometer"/>
    </extension>
 
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="net.tourbook.preferences.PrefPageDataImport"
+            class="net.tourbook.device.daum.ergobike.PrefPageDaumErgoBike"
+            id="net.tourbook.device.daum.ergobike.id"
+            name="Daum Ergometer">
+      </page>
+   </extension>
+
 </plugin>

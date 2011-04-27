@@ -43,7 +43,7 @@ import org.eclipse.ui.IMemento;
 
 public class PersonContributionItem extends CustomControlContribution {
 
-	private static final String		ID			= "net.tourbook.clientselector";		//$NON-NLS-1$
+	private static final String		ID			= "net.tourbook.clientselector";	//$NON-NLS-1$
 
 	private static TourbookPlugin	_activator	= TourbookPlugin.getDefault();
 
@@ -143,20 +143,7 @@ public class PersonContributionItem extends CustomControlContribution {
 		_cboPeople.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
-				final int selectedIndex = _cboPeople.getSelectionIndex();
-				if (selectedIndex == -1) {
-					return;
-				}
-
-				if (selectedIndex == 0) {
-					// all people are selected
-					TourbookPlugin.setActivePerson(null);
-				} else {
-					// a person is selected
-					TourbookPlugin.setActivePerson(_allPeople.get(selectedIndex - 1));
-				}
-
-				fireEventNewPersonIsSelected();
+				onSelectPerson();
 			}
 		});
 
@@ -189,10 +176,28 @@ public class PersonContributionItem extends CustomControlContribution {
 	}
 
 	/**
-	 * fire event that client has changed
+	 * fire event that person has changed
 	 */
-	void fireEventNewPersonIsSelected() {
+	private void fireEventNewPersonIsSelected() {
 		_prefStore.setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED, Math.random());
+	}
+
+	private void onSelectPerson() {
+
+		final int selectedIndex = _cboPeople.getSelectionIndex();
+		if (selectedIndex == -1) {
+			return;
+		}
+
+		if (selectedIndex == 0) {
+			// all people are selected
+			TourbookPlugin.setActivePerson(null);
+		} else {
+			// a person is selected
+			TourbookPlugin.setActivePerson(_allPeople.get(selectedIndex - 1));
+		}
+
+		fireEventNewPersonIsSelected();
 	}
 
 	/**
@@ -261,6 +266,15 @@ public class PersonContributionItem extends CustomControlContribution {
 		}
 
 		_state.put(ITourbookPreferences.APP_LAST_SELECTED_PERSON_ID, personId);
+	}
+
+	public void selectFirstPerson() {
+
+		final int peopleCount = _cboPeople.getItemCount();
+
+		if (peopleCount > 1) {
+			_cboPeople.select(1);
+		}
 	}
 
 }

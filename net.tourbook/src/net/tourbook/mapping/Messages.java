@@ -109,6 +109,8 @@ public class Messages extends NLS {
 	public static String		Map_Properties_ShowTileBorder;
 	public static String		Map_Properties_ShowTileInfo;
 
+	public static String		Modify_MapProvider_Label_Hints;
+
 	public static String		map_action_show_legend_in_map;
 	public static String		map_action_show_scale_in_map;
 	public static String		map_action_show_slider_in_legend;
@@ -143,7 +145,6 @@ public class Messages extends NLS {
 	public static String		modify_mapprovider_dialog_area_message;
 	public static String		modify_mapprovider_dialog_area_title;
 	public static String		modify_mapprovider_dialog_title;
-	public static String		modify_mapprovider_lbl_toggle_info;
 
 	public static String		statusLine_mapInfo_data;
 	public static String		statusLine_mapInfo_defaultText;

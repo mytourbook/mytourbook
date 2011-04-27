@@ -283,11 +283,19 @@
             id="net.tourbook.preferences.PrefPageDataImport"
             name="%preference_page_data_import">
       </page>
+      
+<!-- 
+
+	pref page for bikes is disabled since version 11.07 because bikes 
+	are currently not used and is confusing the user
+      
       <page
             class="net.tourbook.preferences.PrefPageBikes"
             id="net.tourbook.preferences.PrefPageBikes"
             name="%preference_page_Bikes">
       </page>
+-->
+
       <page
             class="net.tourbook.preferences.PrefPagePeople"
             id="net.tourbook.preferences.PrefPagePeopleId"

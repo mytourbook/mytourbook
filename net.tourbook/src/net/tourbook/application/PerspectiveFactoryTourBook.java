@@ -85,10 +85,8 @@ public class PerspectiveFactoryTourBook implements IPerspectiveFactory {
 				0.7f,
 				FOLDER_ID_LIST);
 
+		markerFolder.addView(TourStatisticsView.ID);
 		markerFolder.addView(TourMarkerView.ID);
 		markerFolder.addView(TourWaypointView.ID);
-		markerFolder.addView(TourStatisticsView.ID);
-
 	}
-
 }

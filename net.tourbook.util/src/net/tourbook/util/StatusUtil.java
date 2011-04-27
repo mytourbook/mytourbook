@@ -119,7 +119,7 @@ public class StatusUtil {
 	}
 
 	/**
-	 * Log into log
+	 * Log error into the log
 	 * 
 	 * @param exception
 	 */

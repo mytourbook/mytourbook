@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,13 +34,13 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.mapping.ILegendProvider;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
-import net.tourbook.util.TreeColumnLayout;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.TreeColumnLayout;
 import org.eclipse.jface.preference.ColorSelector;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -56,9 +56,12 @@ import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.ITreeViewerListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
@@ -77,12 +80,12 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
- 
+
 public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPreferencePage, IColorTreeViewer {
 
 	private static final String[]				SORT_PROPERTY	= new String[] { "this property is needed for sorting !!!" };	//$NON-NLS-1$
 
-	private GraphColorLabelProvider				_colorLabelProvider;
+	private GraphColorPainter					_graphColorPainter;
 
 	private ColorDefinition						_expandedItem;
 	private GraphColorItem						_selectedColor;
@@ -231,56 +234,48 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 		{
-			createUI10TourTypeViewer(container);
+			createUI10ColorViewer(container);
 			createUI20Buttons(container);
 		}
 
 		return container;
 	}
 
-	private void createUI10TourTypeViewer(final Composite parent) {
+	private void createUI10ColorViewer(final Composite parent) {
 
-		// tree container
-		final Composite treeContainer = new Composite(parent, SWT.NONE);
-		final GridLayout gl = new GridLayout();
-		gl.marginHeight = 0;
-		gl.marginWidth = 0;
-		treeContainer.setLayout(gl);
+		/*
+		 * create tree layout
+		 */
+		final Composite layoutContainer = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.grab(true, true)
+				.hint(200, 100)
+				.applyTo(layoutContainer);
 
-		final GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-		gd.widthHint = 100;
-		treeContainer.setLayoutData(gd);
+		final TreeColumnLayout treeLayout = new TreeColumnLayout();
+		layoutContainer.setLayout(treeLayout);
 
-		final TreeColumnLayout treeLayouter = new TreeColumnLayout();
-		treeContainer.setLayout(treeLayouter);
+		/*
+		 * create viewer
+		 */
+		final Tree tree = new Tree(layoutContainer, SWT.H_SCROLL
+				| SWT.V_SCROLL
+				| SWT.BORDER
+				| SWT.MULTI
+				| SWT.FULL_SELECTION);
 
-		// tour tree
-		final Tree tree = new Tree(treeContainer, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
-
-		tree.setLinesVisible(false);
-		final int colorColumnWidth = tree.getItemHeight() * 4 + 5;
-
-		// tree columns
-		TreeColumn tc;
-
-		tc = new TreeColumn(tree, SWT.NONE);
-		tc.setText(Messages.Pref_TourTypes_Column_Color);
-		treeLayouter.addColumnData(new ColumnWeightData(3, true));
-
-		new TreeColumn(tree, SWT.NONE);
-		treeLayouter.addColumnData(new ColumnPixelData(colorColumnWidth, true));
-
-		new TreeColumn(tree, SWT.NONE);
-		treeLayouter.addColumnData(new ColumnPixelData(colorColumnWidth, true));
+		tree.setHeaderVisible(false);
+		tree.setLinesVisible(getPreferenceStore().getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 		_tourTypeViewer = new TreeViewer(tree);
+		defineAllColumns(treeLayout, tree);
 
 		_tourTypeViewer.setContentProvider(new ColorContentProvider());
+
+		_graphColorPainter = new GraphColorPainter(this);
+
 		_tourTypeViewer.setComparator(new TourTypeComparator());
 		_tourTypeViewer.setUseHashlookup(true);
-
-		_colorLabelProvider = new GraphColorLabelProvider(this);
-		_tourTypeViewer.setLabelProvider(_colorLabelProvider);
 
 		_tourTypeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(final SelectionChangedEvent event) {
@@ -307,6 +302,9 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 						}
 						_tourTypeViewer.expandToLevel(treeItem, 1);
 						_expandedItem = treeItem;
+
+						// expanding the treeangle, the layout is correctly done but not with double click
+						layoutContainer.layout(true, true);
 					}
 				} else if (selection instanceof GraphColorItem) {
 
@@ -349,8 +347,45 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 				}
 			}
 		});
-
 	}
+
+//	private void createUI10TourTypeViewerOLD(final Composite parent) {
+//
+//		// tree container
+//		final Composite treeContainer = new Composite(parent, SWT.NONE);
+//		final GridLayout gl = new GridLayout();
+//		gl.marginHeight = 0;
+//		gl.marginWidth = 0;
+//		treeContainer.setLayout(gl);
+//
+//		final GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+//		gd.widthHint = 100;
+//		treeContainer.setLayoutData(gd);
+//
+//		final TreeColumnLayout treeLayouter = new TreeColumnLayout();
+//		treeContainer.setLayout(treeLayouter);
+//
+//		// tour tree
+//		final Tree tree = new Tree(treeContainer, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
+//
+//		tree.setLinesVisible(false);
+//		final int colorColumnWidth = tree.getItemHeight() * 4 + 5;
+//
+//		// tree columns
+//		TreeColumn tc;
+//
+//		tc = new TreeColumn(tree, SWT.NONE);
+//		tc.setText(Messages.Pref_TourTypes_Column_Color);
+//		treeLayouter.addColumnData(new ColumnWeightData(3, true));
+//
+//		new TreeColumn(tree, SWT.NONE);
+//		treeLayouter.addColumnData(new ColumnPixelData(colorColumnWidth, true));
+//
+//		new TreeColumn(tree, SWT.NONE);
+//		treeLayouter.addColumnData(new ColumnPixelData(colorColumnWidth, true));
+//
+//
+//	}
 
 	private void createUI20Buttons(final Composite parent) {
 
@@ -411,6 +446,56 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		_btnTourTypeImage = new Button(container, SWT.NONE);
 		_btnTourTypeImage.setImage(UI.getInstance().getTourTypeImage(-1));
 
+	}
+
+	/**
+	 * create columns
+	 */
+	private void defineAllColumns(final TreeColumnLayout treeLayout, final Tree tree) {
+
+		TreeViewerColumn tvc;
+		TreeColumn tc;
+		final int colorWidth = (tree.getItemHeight() + 0) * 4 + 10;
+
+		// 1. column: color item/color definition
+		tvc = new TreeViewerColumn(_tourTypeViewer, SWT.TRAIL);
+		tc = tvc.getColumn();
+		tvc.setLabelProvider(new StyledCellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+
+				if (element instanceof ColorDefinition) {
+					cell.setText(((ColorDefinition) (element)).getVisibleName());
+				} else if (element instanceof GraphColorItem) {
+					cell.setText(((GraphColorItem) (element)).getName());
+				} else {
+					cell.setText(UI.EMPTY_STRING);
+				}
+			}
+		});
+		treeLayout.setColumnData(tc, new ColumnWeightData(1, true));
+
+		// 2. column: color for definition/item
+		tvc = new TreeViewerColumn(_tourTypeViewer, SWT.TRAIL);
+		tc = tvc.getColumn();
+		tvc.setLabelProvider(new StyledCellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+
+				if (element instanceof ColorDefinition) {
+					cell.setImage(_graphColorPainter.drawDefinitionImage((ColorDefinition) element));
+				} else if (element instanceof GraphColorItem) {
+					cell.setImage(_graphColorPainter.drawColorImage((GraphColorItem) element));
+				} else {
+					cell.setImage(null);
+				}
+			}
+		});
+		treeLayout.setColumnData(tc, new ColumnPixelData(colorWidth, true));
 	}
 
 	private boolean deleteTourType(final TourType tourType) {
@@ -650,7 +735,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 			/*
 			 * dispose the old color/image from the graph
 			 */
-			_colorLabelProvider.disposeResources(_selectedColor.getColorId(), colorDefinition.getImageId());
+			_graphColorPainter.disposeResources(_selectedColor.getColorId(), colorDefinition.getImageId());
 
 			/*
 			 * update the tree viewer, the color images will be recreated in the label provider
@@ -806,9 +891,18 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 	}
 
 	@Override
+	public boolean performCancel() {
+
+		_graphColorPainter.disposeAllResources();
+
+		return super.performCancel();
+	}
+
+	@Override
 	public boolean performOk() {
 
 		fireModifyEvent();
+		_graphColorPainter.disposeAllResources();
 
 		return super.performOk();
 	}

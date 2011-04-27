@@ -16,6 +16,7 @@
 package net.tourbook.util;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -208,35 +209,6 @@ public class Util {
 		return null;
 	}
 
-	/*
-	 * vincenty algorithm is much more accurate compared with haversine
-	 */
-//	/**
-//	 * Haversine Formula to calculate distance between 2 geo points
-//	 * <p>
-//	 * <a href="http://en.wikipedia.org/wiki/Haversine_formula"
-//	 * >http://en.wikipedia.org/wiki/Haversine_formula</a>
-//	 */
-//	public static double distanceHaversine(final double lat1, final double lon1, final double lat2, final double lon2) {
-//
-//		if (lat1 == lat2 && lon1 == lon2) {
-//			return 0;
-//		}
-//
-//		final double dLat = Math.toRadians(lat2 - lat1);
-//		final double dLon = Math.toRadians(lon2 - lon1);
-//
-//		final double a = (Math.sin(dLat / 2))
-//				* (Math.sin(dLat / 2))
-//				+ (Math.cos(lat1) * Math.cos(lat2) * (Math.sin(dLon / 2)))
-//				* (Math.cos(lat1) * Math.cos(lat2) * (Math.sin(dLon / 2)));
-//
-//		final double c = 2 * Math.asin(Math.min(1.0, Math.sqrt(a)));
-//		final double km = EARTH_RADIUS * c;
-//
-//		return km * 1000;
-//	}
-
 	/**
 	 * Calculates geodetic distance between two points specified by latitude/longitude using
 	 * Vincenty inverse formula for ellipsoids
@@ -329,6 +301,35 @@ public class Util {
 		return s * 1000;
 	}
 
+	/*
+	 * vincenty algorithm is much more accurate compared with haversine
+	 */
+//	/**
+//	 * Haversine Formula to calculate distance between 2 geo points
+//	 * <p>
+//	 * <a href="http://en.wikipedia.org/wiki/Haversine_formula"
+//	 * >http://en.wikipedia.org/wiki/Haversine_formula</a>
+//	 */
+//	public static double distanceHaversine(final double lat1, final double lon1, final double lat2, final double lon2) {
+//
+//		if (lat1 == lat2 && lon1 == lon2) {
+//			return 0;
+//		}
+//
+//		final double dLat = Math.toRadians(lat2 - lat1);
+//		final double dLon = Math.toRadians(lon2 - lon1);
+//
+//		final double a = (Math.sin(dLat / 2))
+//				* (Math.sin(dLat / 2))
+//				+ (Math.cos(lat1) * Math.cos(lat2) * (Math.sin(dLon / 2)))
+//				* (Math.cos(lat1) * Math.cos(lat2) * (Math.sin(dLon / 2)));
+//
+//		final double c = 2 * Math.asin(Math.min(1.0, Math.sqrt(a)));
+//		final double km = EARTH_RADIUS * c;
+//
+//		return km * 1000;
+//	}
+
 	public static String encodeSpace(final String urlString) {
 		return urlString.replaceAll(URL_SPACE, URL_SPACE_REPLACEMENT);
 	}
@@ -343,6 +344,21 @@ public class Util {
 		}
 
 		return counter;
+	}
+
+	public static String getSQLExceptionText(final SQLException e) {
+
+		final StringBuilder sb = new StringBuilder()//
+				.append("SQLException") //$NON-NLS-1$
+				.append(UI.NEW_LINE2)
+				.append("SQLState: " + (e).getSQLState()) //$NON-NLS-1$
+				.append(UI.NEW_LINE)
+				.append("Severity: " + (e).getErrorCode()) //$NON-NLS-1$
+				.append(UI.NEW_LINE)
+				.append("Message: " + (e).getMessage()) //$NON-NLS-1$
+				.append(UI.NEW_LINE);
+
+		return sb.toString();
 	}
 
 	/*
@@ -402,21 +418,6 @@ public class Util {
 //	  s = s.toFixed(3); // round to 1mm precision
 //	  return s;
 //	}
-
-	public static String getSQLExceptionText(final SQLException e) {
-
-		final StringBuilder sb = new StringBuilder()//
-				.append("SQLException") //$NON-NLS-1$
-				.append(UI.NEW_LINE2)
-				.append("SQLState: " + (e).getSQLState()) //$NON-NLS-1$
-				.append(UI.NEW_LINE)
-				.append("Severity: " + (e).getErrorCode()) //$NON-NLS-1$
-				.append(UI.NEW_LINE)
-				.append("Message: " + (e).getMessage()) //$NON-NLS-1$
-				.append(UI.NEW_LINE);
-
-		return sb.toString();
-	}
 
 	/**
 	 * @param state
@@ -549,6 +550,18 @@ public class Util {
 		}
 
 		return year;
+	}
+
+	/**
+	 * @param fileName
+	 * @return Returns true when the fileName is a valid directory
+	 */
+	public static boolean isDirectory(String fileName) {
+
+		fileName = fileName.trim();
+		final File file = new File(fileName);
+
+		return file.isDirectory();
 	}
 
 	/**

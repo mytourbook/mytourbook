@@ -279,7 +279,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 	void actionOpenMapProviderDialog() {
 
-		final ModifyMapProviderDialog dialog = new ModifyMapProviderDialog(Display.getCurrent().getActiveShell());
+		final DialogModifyMapProvider dialog = new DialogModifyMapProvider(Display.getCurrent().getActiveShell());
 
 		if (dialog.open() == Window.OK) {
 			_actionSelectMapProvider.updateMapProviders();

@@ -139,7 +139,7 @@ public class UI {
 	private static final String								UNIT_ALTITUDE_M					= "m";										//$NON-NLS-1$
 	public static final String								UNIT_DISTANCE_KM				= "km";									//$NON-NLS-1$
 	private static final String								UNIT_SPEED_KM_H					= "km/h";									//$NON-NLS-1$
-	private static final String								UNIT_FAHRENHEIT_C				= "\u00B0C";								//$NON-NLS-1$
+	private static final String								UNIT_TEMPERATURE_C				= "\u00B0C";								//$NON-NLS-1$
 	private static final String								UNIT_ALTIMETER_M_H				= "m/h";									//$NON-NLS-1$
 	private static final String								UNIT_PACE_MIN_P_KM				= "min/km";								//$NON-NLS-1$
 	public static final String								UNIT_WEIGHT_KG					= "kg";									//$NON-NLS-1$
@@ -148,7 +148,7 @@ public class UI {
 	private static final String								UNIT_ALTITUDE_FT				= "ft";									//$NON-NLS-1$
 	public static final String								UNIT_DISTANCE_MI				= "mi";									//$NON-NLS-1$
 	private static final String								UNIT_SPEED_MPH					= "mph";									//$NON-NLS-1$
-	private static final String								UNIT_FAHRENHEIT_F				= "\u00B0F";								//$NON-NLS-1$
+	private static final String								UNIT_TEMPERATURE_F				= "\u00B0F";								//$NON-NLS-1$
 	private static final String								UNIT_ALTIMETER_FT_H				= "ft/h";									//$NON-NLS-1$
 	private static final String								UNIT_PACE_MIN_P_MILE			= "min/mi";								//$NON-NLS-1$
 
@@ -1237,14 +1237,14 @@ public class UI {
 			// set imperial measure system
 
 			UNIT_VALUE_TEMPERATURE = UNIT_FAHRENHEIT_ADD;
-			UNIT_LABEL_TEMPERATURE = UNIT_FAHRENHEIT_F;
+			UNIT_LABEL_TEMPERATURE = UNIT_TEMPERATURE_F;
 
 		} else {
 
 			// default is the metric measure system
 
 			UNIT_VALUE_TEMPERATURE = 1;
-			UNIT_LABEL_TEMPERATURE = UNIT_FAHRENHEIT_C;
+			UNIT_LABEL_TEMPERATURE = UNIT_TEMPERATURE_C;
 		}
 	}
 

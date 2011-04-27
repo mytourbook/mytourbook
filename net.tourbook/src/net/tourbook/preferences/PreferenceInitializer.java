@@ -44,7 +44,10 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		/*
 		 * regional settings
 		 */
-		store.setDefault(ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI, true);
+
+		// disabled since version 11.7
+		store.setDefault(ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI, false);
+
 		store.setDefault(
 				ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE,
 				ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_KM);
@@ -202,7 +205,9 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TOUR_TYPES, 3);
 		store.setDefault(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS, 3);
 		store.setDefault(ITourbookPreferences.APPEARANCE_SHOW_TOUR_TYPE_CONTEXT_MENU, true);
-		store.setDefault(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR, true);
+
+		// heap is not displayed by default since version 11.7
+		store.setDefault(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR, false);
 
 		store.setDefault(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN, true);
 		store.setDefault(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION, true);
