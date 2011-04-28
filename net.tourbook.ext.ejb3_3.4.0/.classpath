@@ -5,7 +5,7 @@
 	<classpathentry exported="true" kind="lib" path="slf4j-api-1.5.8.jar" sourcepath="L:/java-resources/slf4j/slf4j-1.5.8/slf4j-api/src"/>
 	<classpathentry exported="true" kind="lib" path="slf4j-log4j12-1.5.8.jar"/>
 	<classpathentry exported="true" kind="lib" path="log4j.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/hibernate-entitymanager-3.4.0/hibernate-entitymanager.jar" sourcepath="L:/java-resources/hibernate-3.4.0/hibernate-entitymanager-3.4.0.GA/src"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-entitymanager-3.4.0/hibernate-entitymanager.jar" sourcepath="C:/E/java-resources/hibernate-3.4.0/hibernate-entitymanager-3.4.0.GA/src"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-entitymanager-3.4.0/lib/dom4j.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-entitymanager-3.4.0/lib/ejb3-persistence.jar" sourcepath="C:/E/java-resources/ejb3-persistence"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-entitymanager-3.4.0/lib/hibernate-annotations.jar"/>

@@ -82,6 +82,7 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -106,6 +107,7 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -114,6 +116,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IPartListener2;
@@ -121,6 +125,7 @@ import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
 /**
@@ -141,6 +146,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private static final String					STATE_IS_MERGE_TRACKS				= "isMergeTracks";							//$NON-NLS-1$
 	private static final String					STATE_IS_CHECKSUM_VALIDATION		= "isChecksumValidation";					//$NON-NLS-1$
 	private static final String					STATE_IS_CREATE_TOUR_ID_WITH_TIME	= "isCreateTourIdWithTime";				//$NON-NLS-1$
+
+	public static final String					IMAGE_DATA_TRANSFER					= "IMAGE_DATA_TRANSFER";					//$NON-NLS-1$
+	public static final String					IMAGE_DATA_TRANSFER_DIRECT			= "IMAGE_DATA_TRANSFER_DIRECT";			//$NON-NLS-1$
+	public static final String					IMAGE_IMPORT						= "IMAGE_IMPORT";							//$NON-NLS-1$
 
 	private final IPreferenceStore				_prefStore							= TourbookPlugin
 																							.getDefault()
@@ -210,7 +219,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/*
 	 * UI controls
 	 */
-	private Composite							_viewerContainer;
+	private PageBook							_pageBook;
+	private Composite							_pageTips;
+	private Composite							_pageViewerContainer;
+
 	private TableViewer							_tourViewer;
 
 	private ActionClearView						_actionClearView;
@@ -810,6 +822,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		_activePerson = TourbookPlugin.getActivePerson();
 
+		// set default page
+		_pageBook.showPage(_pageTips);
+
 		restoreState();
 	}
 
@@ -836,17 +851,124 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private void createUI(final Composite parent) {
 
-		_viewerContainer = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
+		_pageBook = new PageBook(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBook);
+
+		_pageTips = createUI10Tips(_pageBook);
+
+		_pageViewerContainer = new Composite(_pageBook, SWT.NONE);
+		GridLayoutFactory.fillDefaults().applyTo(_pageViewerContainer);
 		{
-			createUI10TourViewer(_viewerContainer);
+			createUI15TourViewer(_pageViewerContainer);
 		}
+	}
+
+	private Composite createUI10Tips(final Composite parent) {
+
+		final int defaultWidth = 300;
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+		{
+			/*
+			 * label: info
+			 */
+			Label label = new Label(container, SWT.WRAP);
+			GridDataFactory.fillDefaults()//
+					.hint(defaultWidth, SWT.DEFAULT)
+					.grab(true, false)
+					.span(2, 1)
+					.applyTo(label);
+			label.setText(Messages.Import_Data_Label_Info);
+
+			/*
+			 * link: import
+			 */
+			final CLabel iconImport = new CLabel(container, SWT.NONE);
+			GridDataFactory.fillDefaults().indent(0, 10).applyTo(iconImport);
+			iconImport.setImage(UI.IMAGE_REGISTRY.get(IMAGE_IMPORT));
+
+			final Link linkImport = new Link(container, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.hint(defaultWidth, SWT.DEFAULT)
+					.align(SWT.FILL, SWT.CENTER)
+					.grab(true, false)
+					.indent(0, 10)
+					.applyTo(linkImport);
+			linkImport.setText(Messages.Import_Data_Link_Import);
+			linkImport.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					RawDataManager.getInstance().actionImportFromFile();
+				}
+			});
+
+			/*
+			 * link: data transfer
+			 */
+			final CLabel iconTransfer = new CLabel(container, SWT.NONE);
+			GridDataFactory.fillDefaults().indent(0, 10).applyTo(iconTransfer);
+			iconTransfer.setImage(UI.IMAGE_REGISTRY.get(IMAGE_DATA_TRANSFER));
+
+			final Link linkTransfer = new Link(container, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.hint(defaultWidth, SWT.DEFAULT)
+					.align(SWT.FILL, SWT.CENTER)
+					.grab(true, false)
+					.indent(0, 10)
+					.applyTo(linkTransfer);
+			linkTransfer.setText(Messages.Import_Data_Link_Transfer);
+			linkTransfer.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					RawDataManager.getInstance().actionImportFromDevice();
+				}
+			});
+
+			/*
+			 * link: direct data transfer
+			 */
+			final CLabel iconDirectTransfer = new CLabel(container, SWT.NONE);
+			GridDataFactory.fillDefaults().indent(0, 10).applyTo(iconDirectTransfer);
+			iconDirectTransfer.setImage(UI.IMAGE_REGISTRY.get(IMAGE_DATA_TRANSFER_DIRECT));
+
+			final Link linkTransferDirect = new Link(container, SWT.NONE);
+			GridDataFactory.fillDefaults() //
+					.hint(defaultWidth, SWT.DEFAULT)
+					.align(SWT.FILL, SWT.CENTER)
+					.grab(true, false)
+					.indent(0, 10)
+					.applyTo(linkTransferDirect);
+			linkTransferDirect.setText(Messages.Import_Data_Link_TransferDirectly);
+			linkTransferDirect.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					RawDataManager.getInstance().actionImportFromDeviceDirect();
+				}
+			});
+
+			/*
+			 * label: hint
+			 */
+			label = new Label(container, SWT.WRAP);
+			GridDataFactory.fillDefaults()//
+					.hint(defaultWidth, SWT.DEFAULT)
+					.grab(true, false)
+					.indent(0, 20)
+					.span(2, 1)
+					.applyTo(label);
+			label.setText(Messages.Import_Data_Label_Hint);
+		}
+
+		return container;
 	}
 
 	/**
 	 * @param parent
 	 */
-	private void createUI10TourViewer(final Composite parent) {
+	private void createUI15TourViewer(final Composite parent) {
 
 		// table
 		final Table table = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.MULTI);
@@ -1907,16 +2029,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	@Override
 	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
-		_viewerContainer.setRedraw(false);
+		_pageViewerContainer.setRedraw(false);
 		{
 			_tourViewer.getTable().dispose();
-			createUI10TourViewer(_viewerContainer);
-			_viewerContainer.layout();
+			createUI15TourViewer(_pageViewerContainer);
+			_pageViewerContainer.layout();
 
 			// update the viewer
 			reloadViewer();
 		}
-		_viewerContainer.setRedraw(true);
+		_pageViewerContainer.setRedraw(true);
 
 		return _tourViewer;
 	}
@@ -2049,8 +2171,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	@Override
 	public void reloadViewer() {
 
+		final Object[] rawData = RawDataManager.getInstance().getImportedTours().values().toArray();
+
+		_pageBook.showPage(rawData.length > 0 ? _pageViewerContainer : _pageTips);
+
 		// update tour data viewer
-		_tourViewer.setInput(RawDataManager.getInstance().getImportedTours().values().toArray());
+		_tourViewer.setInput(rawData);
 	}
 
 	private void removeTours(final ArrayList<ITourItem> removedTours) {

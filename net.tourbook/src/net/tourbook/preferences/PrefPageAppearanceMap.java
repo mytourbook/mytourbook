@@ -397,11 +397,11 @@ public class PrefPageAppearanceMap extends FieldEditorPreferencePage implements 
 
 		if (value.equals(TOUR_PAINT_METHOD_SIMPLE)) {
 			_pageBookPaintMethod.showPage(_pageSimple);
-//			_txtTourPaintMethod.setText(Messages.Pref_MapLayout_Label_TourPaintMethod_Simple_Tooltip);
 		} else {
 			_pageBookPaintMethod.showPage(_pageComplex);
-//			_txtTourPaintMethod.setText(Messages.Pref_MapLayout_Label_TourPaintMethod_Complex_Tooltip);
 		}
-		_containerPage.layout(true, true);
+
+		// 2x parents are required that the pagebook page is correctly rendered
+		_containerPage.getParent().getParent().layout(true, true);
 	}
 }

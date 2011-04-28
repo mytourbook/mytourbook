@@ -19,8 +19,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import net.tourbook.Messages;
+import net.tourbook.data.TourPerson;
+import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPagePeople;
@@ -78,6 +81,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	private final ApplicationWorkbenchAdvisor	_wbAdvisor;
 
 	private IPropertyListener					_partPropertyListener;
+
+	private IPreferenceStore					_prefStore		= TourbookPlugin.getDefault().getPreferenceStore();
 
 	public ApplicationWorkbenchWindowAdvisor(	final ApplicationWorkbenchAdvisor wbAdvisor,
 												final IWorkbenchWindowConfigurer configurer) {
@@ -170,6 +175,11 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 				PreferencesUtil.OPTION_FILTER_LOCKED //
 				)
 				.open();
+
+		// set first person as active person
+		final ArrayList<TourPerson> allPeople = PersonManager.getTourPeople();
+		TourbookPlugin.setActivePerson(allPeople.get(0));
+		_prefStore.setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED, Math.random());
 
 		// select measurement system
 		new DialogSelectMeasurementSystem(activeShell).open();

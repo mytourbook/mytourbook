@@ -140,7 +140,7 @@ public class RawDataManager {
 		});
 	}
 
-	void actionImportFromDevice() {
+	public void actionImportFromDevice() {
 
 		final WizardImportDialog dialog = new WizardImportDialog(PlatformUI
 				.getWorkbench()
@@ -152,7 +152,7 @@ public class RawDataManager {
 		}
 	}
 
-	void actionImportFromDeviceDirect() {
+	public void actionImportFromDeviceDirect() {
 
 		final WizardImportData importWizard = new WizardImportData();
 
@@ -174,7 +174,7 @@ public class RawDataManager {
 	/**
 	 * Import tours from files which are selected in a file selection dialog.
 	 */
-	void actionImportFromFile() {
+	public void actionImportFromFile() {
 
 		final List<TourbookDevice> deviceList = DeviceManager.getDeviceList();
 

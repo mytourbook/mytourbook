@@ -71,7 +71,7 @@ public class PerspectiveFactoryTourBook implements IPerspectiveFactory {
 		final IFolderLayout listFolder = layout.createFolder(
 				FOLDER_ID_LIST,
 				IPageLayout.TOP,
-				0.5f,
+				0.6f,
 				IPageLayout.ID_EDITOR_AREA);
 
 		listFolder.addView(RawDataView.ID);
@@ -82,7 +82,7 @@ public class PerspectiveFactoryTourBook implements IPerspectiveFactory {
 		final IFolderLayout markerFolder = layout.createFolder(
 				FOLDER_ID_MARKER,
 				IPageLayout.BOTTOM,
-				0.7f,
+				0.6f,
 				FOLDER_ID_LIST);
 
 		markerFolder.addView(TourStatisticsView.ID);

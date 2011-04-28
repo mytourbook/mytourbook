@@ -35,6 +35,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEvent;
+import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.util.StatusUtil;
 import net.tourbook.util.Util;
 
@@ -278,11 +279,21 @@ public class UI {
 
 		IMAGE_REGISTRY.put(IMAGE_EMPTY_16, TourbookPlugin.getImageDescriptor(Messages.Image___Empty16));
 
+		// tour type images
 		IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER, //
 				TourbookPlugin.getImageDescriptor(Messages.Image__undo_tour_type_filter));
 		IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER_SYSTEM,//
 				TourbookPlugin.getImageDescriptor(Messages.Image__undo_tour_type_filter_system));
 
+		// data transfer
+		IMAGE_REGISTRY.put(RawDataView.IMAGE_DATA_TRANSFER,//
+				TourbookPlugin.getImageDescriptor(Messages.Image__RawData_Transfer));
+		IMAGE_REGISTRY.put(RawDataView.IMAGE_DATA_TRANSFER_DIRECT,//
+				TourbookPlugin.getImageDescriptor(Messages.Image__RawData_TransferDirect));
+		IMAGE_REGISTRY.put(RawDataView.IMAGE_IMPORT,//
+				TourbookPlugin.getImageDescriptor(Messages.Image__RawData_Import));
+
+		// weather images
 		IMAGE_REGISTRY.put(IWeather.WEATHER_ID_CLEAR, //
 				TourbookPlugin.getImageDescriptor(Messages.Image__weather_sunny));
 		IMAGE_REGISTRY.put(IWeather.WEATHER_ID_PART_CLOUDS, //

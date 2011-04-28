@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -67,8 +67,8 @@ import org.osgi.framework.Version;
 
 public class GarminExternalDevice extends ExternalDevice {
 
-	private List<File>	fReceivedFiles;
-	private boolean		fCancelImport;
+	private List<File>	_receivedFiles;
+	private boolean		_isCancelImport;
 
 	public GarminExternalDevice() {
 		buildNewFileNames = false;
@@ -77,13 +77,13 @@ public class GarminExternalDevice extends ExternalDevice {
 
 	@Override
 	public IRunnableWithProgress createImportRunnable(final String portName, List<File> receivedFiles) {
-		fReceivedFiles = receivedFiles;
+		_receivedFiles = receivedFiles;
 
 		return new IRunnableWithProgress() {
 
 			@SuppressWarnings("unchecked")//$NON-NLS-1$
 			public void run(final IProgressMonitor monitor) {
-				fCancelImport = false;
+				_isCancelImport = false;
 				final Thread currentThread = Thread.currentThread();
 
 				Hashtable environment = new Hashtable();
@@ -103,7 +103,7 @@ public class GarminExternalDevice extends ExternalDevice {
 							}
 						}
 
-						fCancelImport = true;
+						_isCancelImport = true;
 
 						// we have to be a little bit insistent because
 						// InterruptedException is catched at GPSGarminDataProcessor.putPacket(GarminPacket, long)
@@ -230,12 +230,12 @@ public class GarminExternalDevice extends ExternalDevice {
 							Velocity.evaluate(context, writer, "MyTourbook", reader); //$NON-NLS-1$
 							writer.close();
 
-							fReceivedFiles.add(receivedFile);
+							_receivedFiles.add(receivedFile);
 						}
 					}
 
 				} catch (final Exception ex) {
-					if (!fCancelImport) {
+					if (!_isCancelImport) {
 						final Display display = PlatformUI.getWorkbench().getDisplay();
 						Runnable runnable;
 
@@ -493,7 +493,7 @@ public class GarminExternalDevice extends ExternalDevice {
 
 	@Override
 	public boolean isImportCanceled() {
-		return fCancelImport;
+		return _isCancelImport;
 	}
 
 }

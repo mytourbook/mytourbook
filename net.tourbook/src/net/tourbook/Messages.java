@@ -204,20 +204,13 @@ public class Messages extends NLS {
 
 	public static String		App_Dialog_FirstStartup_Message;
 	public static String		App_Dialog_FirstStartup_Title;
-
-	public static String	App_Dialog_FirstStartupSystem_Label_Info;
-
-	public static String	App_Dialog_FirstStartupSystem_Label_System;
-
-	public static String	App_Dialog_FirstStartupSystem_Radio_Imperial;
-
-	public static String	App_Dialog_FirstStartupSystem_Radio_Metric;
-
-	public static String	App_Dialog_FirstStartupSystem_Title;
-
-	public static String	App_Dialog_FirstStartupTip_Message;
-
-	public static String	App_Dialog_FirstStartupTip_Title;
+	public static String		App_Dialog_FirstStartupSystem_Label_Info;
+	public static String		App_Dialog_FirstStartupSystem_Label_System;
+	public static String		App_Dialog_FirstStartupSystem_Radio_Imperial;
+	public static String		App_Dialog_FirstStartupSystem_Radio_Metric;
+	public static String		App_Dialog_FirstStartupSystem_Title;
+	public static String		App_Dialog_FirstStartupTip_Message;
+	public static String		App_Dialog_FirstStartupTip_Title;
 
 	public static String		App_Label_ISO8601;
 
@@ -490,6 +483,9 @@ public class Messages extends NLS {
 	public static String		Image__open_folder_add;
 	public static String		Image__options;
 	public static String		Image__quick_edit;
+	public static String		Image__RawData_Import;
+	public static String		Image__RawData_Transfer;
+	public static String		Image__RawData_TransferDirect;
 	public static String		Image__refresh;
 	public static String		Image__remove_all;
 	public static String		Image__remove_all_disabled;
@@ -560,6 +556,16 @@ public class Messages extends NLS {
 	public static String		Import_Data_Dialog_ConfirmReimport_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportTimeSlices_Message;
 	public static String		Import_Data_Dialog_ReimportIsInvalid_WrongSliceNumbers_Message;
+
+	public static String		Import_Data_Label_Hint;
+
+	public static String		Import_Data_Label_Info;
+
+	public static String		Import_Data_Link_Import;
+
+	public static String		Import_Data_Link_Transfer;
+
+	public static String		Import_Data_Link_TransferDirectly;
 
 	public static String		Import_Wizard_Control_combo_person_default_settings;
 	public static String		Import_Wizard_Control_combo_ports_not_available;

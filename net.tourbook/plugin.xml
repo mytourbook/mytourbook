@@ -376,12 +376,11 @@
       <menuContribution
             locationURI="menu:file?after=fileNew">
          <command
-               commandId="net.tourbook.command.device.synchronize.direct"
-               icon="icons/device-synchronize-direct.gif"
-               label="%command_device_synchronize_direct"
-               mnemonic="%command_device_synchronize_direct_mnemonic"
-               tooltip="%command_device_synchronize_direct_tooltip">
-         </command>
+               commandId="net.tourbook.command.device.importFromFile"
+               icon="icons/folder_open_add.gif"
+               label="%command_device_importFromFile"
+               mnemonic="%command_device_importFromFile_mnemonic"
+		 />
          <command
                commandId="net.tourbook.command.device.synchronize"
                icon="icons/device-synchronize.gif"
@@ -390,11 +389,12 @@
                tooltip="%command_device_synchronize_configured_tooltip">
          </command>
          <command
-               commandId="net.tourbook.command.device.importFromFile"
-               icon="icons/folder_open_add.gif"
-               label="%command_device_importFromFile"
-               mnemonic="%command_device_importFromFile_mnemonic"
-		 />
+               commandId="net.tourbook.command.device.synchronize.direct"
+               icon="icons/device-synchronize-direct.gif"
+               label="%command_device_synchronize_direct"
+               mnemonic="%command_device_synchronize_direct_mnemonic"
+               tooltip="%command_device_synchronize_direct_tooltip">
+         </command>
          <separator
                name="net.tourbook.separator"
                visible="true">
@@ -708,15 +708,14 @@
             </control>
          </toolbar>
       </menuContribution>
+
       <menuContribution
             locationURI="toolbar:net.tourbook.views.rawData.RawDataView?after=import">
          <command
-               commandId="net.tourbook.command.device.synchronize.direct"
-               icon="icons/device-synchronize-direct.gif"
-               label="%command_device_synchronize_direct"
-               mnemonic="%command_device_synchronize_direct_mnemonic"
-               style="push"
-               tooltip="%command_device_synchronize_direct_tooltip">
+               commandId="net.tourbook.command.device.importFromFile"
+               icon="icons/open_folder_add.gif"
+               label="%command_device_importFromFile"
+               mnemonic="%command_device_importFromFile_mnemonic">
          </command>
          <command
                commandId="net.tourbook.command.device.synchronize"
@@ -727,10 +726,12 @@
                tooltip="%command_device_synchronize_configured_tooltip">
          </command>
          <command
-               commandId="net.tourbook.command.device.importFromFile"
-               icon="icons/open_folder_add.gif"
-               label="%command_device_importFromFile"
-               mnemonic="%command_device_importFromFile_mnemonic">
+               commandId="net.tourbook.command.device.synchronize.direct"
+               icon="icons/device-synchronize-direct.gif"
+               label="%command_device_synchronize_direct"
+               mnemonic="%command_device_synchronize_direct_mnemonic"
+               style="push"
+               tooltip="%command_device_synchronize_direct_tooltip">
          </command>
       </menuContribution>
 

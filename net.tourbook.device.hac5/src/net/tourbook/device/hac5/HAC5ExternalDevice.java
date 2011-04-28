@@ -24,10 +24,10 @@ public class HAC5ExternalDevice extends SimpleSerialDevice {
 
 	@Override
 	public TourbookDevice getTourbookDevice() {
-		if (fTourbookDevice == null) {
+		if (tourbookDevice == null) {
 			return new HAC5DeviceDataReader();
 		}
-		return fTourbookDevice;
+		return tourbookDevice;
 	}
 
 	@Override

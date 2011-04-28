@@ -545,8 +545,9 @@ public class DialogModifyColumns extends TrayDialog {
 		final int lineCount = Util.countCharacter(infoText, '\n');
 
 		final StyledText styledText = new StyledText(parent, SWT.READ_ONLY | SWT.WRAP | SWT.MULTI);
-		GridDataFactory.fillDefaults()
+		GridDataFactory.fillDefaults()//
 				.grab(true, false)
+				.span(2, 1)
 				.applyTo(styledText);
 		styledText.setText(infoText);
 		styledText.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));

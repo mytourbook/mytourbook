@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -37,7 +37,7 @@ public class DeviceManager {
 	private static List<ExternalDevice>	_externalDeviceList;
 
 	/**
-	 * Read devices from the extension registry
+	 * Read devices from the extension registry which can import data
 	 * 
 	 * @return Returns a list with devices sorted by name
 	 */
@@ -45,6 +45,7 @@ public class DeviceManager {
 	public static List<TourbookDevice> getDeviceList() {
 
 		if (_deviceList == null) {
+
 			_deviceList = readDeviceExtensions(TourbookPlugin.EXT_POINT_DEVICE_DATA_READER);
 
 			// sort device list alphabetically
@@ -53,13 +54,13 @@ public class DeviceManager {
 					return o1.visibleName.compareTo(o2.visibleName);
 				}
 			});
-
 		}
+
 		return _deviceList;
 	}
 
 	/**
-	 * read external devices from the extension registry
+	 * Read external devices from the extension registry
 	 * 
 	 * @return
 	 */
@@ -67,7 +68,16 @@ public class DeviceManager {
 	public static List<ExternalDevice> getExternalDeviceList() {
 
 		if (_externalDeviceList == null) {
+
 			_externalDeviceList = readDeviceExtensions(TourbookPlugin.EXT_POINT_EXTERNAL_DEVICE_DATA_READER);
+
+			// sort device list alphabetically
+			Collections.sort(_externalDeviceList, new Comparator<ExternalDevice>() {
+				public int compare(final ExternalDevice o1, final ExternalDevice o2) {
+					return o1.visibleName.compareTo(o2.visibleName);
+				}
+			});
+
 		}
 		return _externalDeviceList;
 	}

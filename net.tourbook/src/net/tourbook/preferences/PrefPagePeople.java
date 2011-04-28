@@ -1016,16 +1016,16 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			updatePersonFromUI(person);
 			person.persist();
 
-			// .persist() updates the people list
+			// .persist() updates the people list, the model, retrieve updated people list
 			_people = PersonManager.getTourPeople();
 
 			// update state
 			_isFireModifyEvent = true;
 			_isPersonModified = false;
 
-			// update model/ui
+			// update ui
 			if (isNewPerson) {
-				_people.add(person);
+//				_people.add(person);
 				_peopleViewer.add(person);
 			} else {
 				// !!! refreshing a person do not resort the table when sorting has changed !!!

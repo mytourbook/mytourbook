@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
- *  
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.device;
 
@@ -34,14 +34,14 @@ import org.eclipse.osgi.util.NLS;
 
 public abstract class SimpleSerialDevice extends ExternalDevice {
 
-	protected TourbookDevice			fTourbookDevice;
-	protected boolean					fCancelImport;
+	protected TourbookDevice			tourbookDevice;
+	protected boolean					isCancelImport;
 
-	private final ByteArrayOutputStream	fRawDataBuffer	= new ByteArrayOutputStream();
-	private List<File>					fReceivedFiles;
+	private final ByteArrayOutputStream	_rawDataBuffer	= new ByteArrayOutputStream();
+	private List<File>					_receivedFiles;
 
 	public SimpleSerialDevice() {
-		fTourbookDevice = getTourbookDevice();
+		tourbookDevice = getTourbookDevice();
 	}
 
 	/**
@@ -51,22 +51,22 @@ public abstract class SimpleSerialDevice extends ExternalDevice {
 	 *            data being written into the buffer
 	 */
 	public void appendReceivedData(final int newData) {
-		fRawDataBuffer.write(newData);
+		_rawDataBuffer.write(newData);
 	}
 
 	public void cancelImport() {
-		fCancelImport = true;
+		isCancelImport = true;
 	}
 
 	@Override
 	public IRunnableWithProgress createImportRunnable(final String portName, final List<File> receivedFiles) {
 
-		fReceivedFiles = receivedFiles;
+		_receivedFiles = receivedFiles;
 
 		return new IRunnableWithProgress() {
 			public void run(final IProgressMonitor monitor) {
 
-				final SerialParameters portParameters = fTourbookDevice.getPortParameters(portName);
+				final SerialParameters portParameters = tourbookDevice.getPortParameters(portName);
 
 				if (portParameters == null) {
 					return;
@@ -77,7 +77,7 @@ public abstract class SimpleSerialDevice extends ExternalDevice {
 						portName,
 						portParameters.getBaudRate() });
 
-				monitor.beginTask(msg, fTourbookDevice.getTransferDataSize());
+				monitor.beginTask(msg, tourbookDevice.getTransferDataSize());
 
 				readDeviceData(monitor, portName);
 				saveReceivedData();
@@ -92,7 +92,7 @@ public abstract class SimpleSerialDevice extends ExternalDevice {
 
 	@Override
 	public boolean isImportCanceled() {
-		return fCancelImport;
+		return isCancelImport;
 	}
 
 	/**
@@ -103,16 +103,16 @@ public abstract class SimpleSerialDevice extends ExternalDevice {
 	private void readDeviceData(final IProgressMonitor monitor, final String portName) {
 
 		// truncate databuffer
-		fRawDataBuffer.reset();
+		_rawDataBuffer.reset();
 
 		int receiveTimeout = 0;
 		int receiveTimer = 0;
 		int receivedData = 0;
 		boolean isReceivingStarted = false;
 
-		fCancelImport = false;
+		isCancelImport = false;
 
-		final int importDataSize = fTourbookDevice.getTransferDataSize();
+		final int importDataSize = tourbookDevice.getTransferDataSize();
 		int timer = 0;
 
 		// start the port thread which reads data from the com port
@@ -139,7 +139,7 @@ public abstract class SimpleSerialDevice extends ExternalDevice {
 						(RECEIVE_TIMEOUT / 10 - (receiveTimeout / 10))));
 			}
 
-			final int rawDataSize = fRawDataBuffer.size();
+			final int rawDataSize = _rawDataBuffer.size();
 
 			/*
 			 * if receiving data was started and no more data are coming in, stop receiving
@@ -150,13 +150,13 @@ public abstract class SimpleSerialDevice extends ExternalDevice {
 			}
 
 			// if user pressed the cancel button, exit the import
-			if (monitor.isCanceled() || fCancelImport == true) {
+			if (monitor.isCanceled() || isCancelImport == true) {
 
 				// close the dialog when the monitor was canceled
-				fCancelImport = true;
+				isCancelImport = true;
 
 				// reset databuffer to prevent saving the content
-				fRawDataBuffer.reset();
+				_rawDataBuffer.reset();
 				break;
 			}
 
@@ -212,10 +212,10 @@ public abstract class SimpleSerialDevice extends ExternalDevice {
 					new File(RawDataManager.getTempDir()));
 
 			final FileOutputStream fileStream = new FileOutputStream(tempFile);
-			fileStream.write(fRawDataBuffer.toByteArray());
+			fileStream.write(_rawDataBuffer.toByteArray());
 			fileStream.close();
 
-			fReceivedFiles.add(tempFile);
+			_receivedFiles.add(tempFile);
 
 		} catch (final FileNotFoundException e) {
 			e.printStackTrace();

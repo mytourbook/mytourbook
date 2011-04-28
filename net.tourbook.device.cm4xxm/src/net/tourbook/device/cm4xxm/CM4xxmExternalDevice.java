@@ -24,10 +24,10 @@ public class CM4xxmExternalDevice extends SimpleSerialDevice {
 
 	@Override
 	public TourbookDevice getTourbookDevice() {
-		if (fTourbookDevice == null) {
+		if (tourbookDevice == null) {
 			return new CM4XXMDeviceReader();
 		}
-		return fTourbookDevice;
+		return tourbookDevice;
 	}
 
 	@Override

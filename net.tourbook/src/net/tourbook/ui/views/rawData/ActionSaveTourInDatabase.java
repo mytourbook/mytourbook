@@ -23,8 +23,9 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.PersonManager;
 import net.tourbook.importdata.DeviceManager;
-import net.tourbook.importdata.TourbookDevice;
+import net.tourbook.importdata.ExternalDevice;
 import net.tourbook.ui.ResizeableListDialog;
+import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.Dialog;
@@ -38,14 +39,17 @@ import org.eclipse.swt.graphics.Image;
 
 public class ActionSaveTourInDatabase extends Action {
 
-	private static final String		MEMENTO_SELECTED_PERSON	= "action-save-tour.selected-person";	//$NON-NLS-1$
+	private static final String		STATE_SELECTED_PERSON	= "selectedPerson";										//$NON-NLS-1$
+
+	private final IDialogSettings	_state					= TourbookPlugin.getDefault()//
+																	.getDialogSettingsSection("DialogSelectPerson");	//$NON-NLS-1$
 
 	private RawDataView				_rawDataView;
 
 	private ArrayList<TourPerson>	_people;
 	private TourPerson				_tourPerson;
 
-	private List<TourbookDevice>	_deviceList;
+	private List<ExternalDevice>	_deviceList;
 
 	private class PeopleContentProvider implements IStructuredContentProvider {
 
@@ -69,7 +73,7 @@ public class ActionSaveTourInDatabase extends Action {
 			final TourPerson person = (TourPerson) element;
 			switch (columnIndex) {
 			case 0:
-				return person.getName() + " (" + getPersonDevice(person) + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+				return person.getName() + getPersonDevice(person);
 			}
 			return null;
 		}
@@ -79,8 +83,9 @@ public class ActionSaveTourInDatabase extends Action {
 
 		_rawDataView = viewPart;
 
-		setImageDescriptor(isWithPerson ? TourbookPlugin.getImageDescriptor(Messages.Image__save_tour) : TourbookPlugin
-				.getImageDescriptor(Messages.Image__database_other_person));
+		setImageDescriptor(isWithPerson //
+				? TourbookPlugin.getImageDescriptor(Messages.Image__save_tour)
+				: TourbookPlugin.getImageDescriptor(Messages.Image__database_other_person));
 
 		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save_tour_disabled));
 
@@ -88,20 +93,7 @@ public class ActionSaveTourInDatabase extends Action {
 		// other views");
 		setEnabled(false);
 
-		_deviceList = DeviceManager.getDeviceList();
-	}
-
-	public IDialogSettings getDialogSettings() {
-
-		final String DIALOG_SETTINGS_SECTION = "DialogSelectPerson"; //$NON-NLS-1$
-
-		final IDialogSettings pluginSettings = TourbookPlugin.getDefault().getDialogSettings();
-		IDialogSettings dialogSettings = pluginSettings.getSection(DIALOG_SETTINGS_SECTION);
-
-		if (dialogSettings == null) {
-			dialogSettings = pluginSettings.addNewSection(DIALOG_SETTINGS_SECTION);
-		}
-		return dialogSettings;
+		_deviceList = DeviceManager.getExternalDeviceList();
 	}
 
 	/**
@@ -115,14 +107,14 @@ public class ActionSaveTourInDatabase extends Action {
 		final String deviceId = person.getDeviceReaderId();
 
 		if (deviceId != null) {
-			for (final TourbookDevice device : _deviceList) {
+			for (final ExternalDevice device : _deviceList) {
 				if (deviceId.equals(device.deviceId)) {
-					return device.visibleName;
+					return " (" + device.visibleName + ")";//$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
 		}
 
-		return Messages.import_data_label_unknown_device;
+		return UI.EMPTY_STRING;
 	}
 
 	/**
@@ -168,12 +160,11 @@ public class ActionSaveTourInDatabase extends Action {
 
 		dialog.setTitle(Messages.import_data_dlg_save_tour_title);
 		dialog.setMessage(Messages.import_data_dlg_save_tour_msg);
-		dialog.setDialogBoundsSettings(getDialogSettings(), Dialog.DIALOG_PERSISTLOCATION | Dialog.DIALOG_PERSISTSIZE);
+		dialog.setDialogBoundsSettings(_state, Dialog.DIALOG_PERSISTLOCATION | Dialog.DIALOG_PERSISTSIZE);
 
 		// select last person
-		final IDialogSettings settings = getDialogSettings();
 		try {
-			final long personId = settings.getLong(MEMENTO_SELECTED_PERSON);
+			final long personId = _state.getLong(STATE_SELECTED_PERSON);
 			for (final TourPerson person : _people) {
 				if (person.getPersonId() == personId) {
 					dialog.setInitialSelections(new TourPerson[] { person });
@@ -198,7 +189,7 @@ public class ActionSaveTourInDatabase extends Action {
 		if (people != null && people.length > 0) {
 			final TourPerson selectedPerson = (TourPerson) people[0];
 
-			settings.put(MEMENTO_SELECTED_PERSON, selectedPerson.getPersonId());
+			_state.put(STATE_SELECTED_PERSON, selectedPerson.getPersonId());
 
 			return selectedPerson;
 		} else {
