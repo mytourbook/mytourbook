@@ -1142,8 +1142,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		private void createUI(final Composite parent) {
 
-			final int spinnerWidthHour = _pc.convertWidthInCharsToPixels(_isOSX ? 8 : 4);
-			final int spinnerWidth = _pc.convertWidthInCharsToPixels(_isOSX ? 6 : 3);
+			// fixed bug: https://sourceforge.net/tracker/index.php?func=detail&aid=3292465&group_id=179799&atid=890601
+			// let the system decide which field width is used by setting min/max values
+//			final int spinnerWidthHour = _pc.convertWidthInCharsToPixels(_isOSX ? 8 : 4);
+//			final int spinnerWidth = _pc.convertWidthInCharsToPixels(_isOSX ? 6 : 3);
 
 			_pageBook = new PageBook(parent, SWT.NONE);
 
@@ -1175,7 +1177,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				 */
 				_spinHours = new Spinner(_pageEditMode, SWT.BORDER);
 				GridDataFactory.fillDefaults()//
-						.hint(spinnerWidthHour, SWT.DEFAULT)
+//						.hint(spinnerWidthHour, SWT.DEFAULT)
 						.align(SWT.BEGINNING, SWT.CENTER)
 						.applyTo(_spinHours);
 				_spinHours.setMinimum(-1);
@@ -1192,7 +1194,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				 */
 				_spinMinutes = new Spinner(_pageEditMode, SWT.BORDER);
 				GridDataFactory.fillDefaults()//
-						.hint(spinnerWidth, SWT.DEFAULT)
+//						.hint(spinnerWidth, SWT.DEFAULT)
 						.align(SWT.BEGINNING, SWT.CENTER)
 						.applyTo(_spinMinutes);
 				_spinMinutes.setMinimum(-1);
@@ -1209,7 +1211,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				 */
 				_spinSeconds = new Spinner(_pageEditMode, SWT.BORDER);
 				GridDataFactory.fillDefaults()//
-						.hint(spinnerWidth, SWT.DEFAULT)
+//						.hint(spinnerWidth, SWT.DEFAULT)
 						.align(SWT.BEGINNING, SWT.CENTER)
 						.applyTo(_spinSeconds);
 				_spinSeconds.setMinimum(-1);

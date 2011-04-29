@@ -468,7 +468,8 @@ public class FitLogSAXHandler extends DefaultHandler {
 		}
 
 		final int[] timeSerie = tourData.timeSerie;
-		if (timeSerie.length == 0) {
+		if (timeSerie == null || timeSerie.length == 0) {
+			// fixed bug: http://sourceforge.net/support/tracker.php?aid=3232030
 			return;
 		}
 

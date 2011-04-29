@@ -946,6 +946,12 @@ public class ConconiChartView extends ViewPart {
 		// save modified tour before chart data for a new tour is created
 		saveTour();
 
+		if (_conconiTours == null) {
+			// bugfix for: http://sourceforge.net/tracker/?func=detail&atid=890601&aid=3269916&group_id=179799
+			_pageBook.showPage(_pageNoChart);
+			return;
+		}
+
 		final ChartDataModel conconiChartDataModel = createChartDataModelConconiTest(_conconiTours, markedTour);
 
 		updateUI12SetupNewTour();
