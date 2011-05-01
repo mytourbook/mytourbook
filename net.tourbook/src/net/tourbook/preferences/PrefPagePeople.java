@@ -26,6 +26,8 @@ import net.tourbook.database.PersonManager;
 import net.tourbook.importdata.DeviceManager;
 import net.tourbook.importdata.ExternalDevice;
 import net.tourbook.tour.TourManager;
+import net.tourbook.training.DialogHRZones;
+import net.tourbook.training.TrainingManager;
 import net.tourbook.ui.UI;
 import net.tourbook.util.Util;
 
@@ -55,6 +57,8 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseEvent;
@@ -69,31 +73,30 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
+import org.eclipse.swt.widgets.TabFolder;
+import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.joda.time.Period;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferencePage {
 
-	public static final String			ID						= "net.tourbook.preferences.PrefPagePeopleId";	//$NON-NLS-1$
+	public static final String			ID							= "net.tourbook.preferences.PrefPagePeopleId";			//$NON-NLS-1$
 
-	private static final String			STATE_SELECTED_PERSON	= "selectedPersonId";							//$NON-NLS-1$
+	private static final String			STATE_SELECTED_PERSON		= "selectedPersonId";									//$NON-NLS-1$
+	private static final String			STATE_SELECTED_TAB_FOLDER	= "selectedTabFolder";									//$NON-NLS-1$
 
-//	private final IPreferenceStore		_prefStore				= TourbookPlugin.getDefault()//
-//																		.getPreferenceStore();
-	private final IDialogSettings		_state					= TourbookPlugin.getDefault()//
-																		.getDialogSettingsSection(ID);
+	private final IDialogSettings		_state						= TourbookPlugin.getDefault()//
+																			.getDialogSettingsSection(ID);
 
-//	private IPropertyChangeListener		_prefChangeListener;
-//	private TourBike[]					_bikes;
+	// REMOVED BIKES 30.4.2011
 
 	private ArrayList<TourPerson>		_people;
 
@@ -102,30 +105,31 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	 */
 	private ArrayList<ExternalDevice>	_deviceList;
 
-	private final DateTimeFormatter		_dtFormatter			= DateTimeFormat.shortDate();
-
-	private final NumberFormat			_nf1					= NumberFormat.getNumberInstance();
-
-	private final NumberFormat			_nf2					= NumberFormat.getNumberInstance();
+	private final DateTimeFormatter		_dtFormatter				= DateTimeFormat.shortDate();
+	private final NumberFormat			_nf1						= NumberFormat.getNumberInstance();
+	private final NumberFormat			_nf2						= NumberFormat.getNumberInstance();
 	{
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
 		_nf2.setMinimumFractionDigits(2);
 		_nf2.setMaximumFractionDigits(2);
 	}
-	private final boolean				_isOSX					= net.tourbook.util.UI.IS_OSX;
+	private final boolean				_isOSX						= net.tourbook.util.UI.IS_OSX;
 
 	private int							_spinnerWidth;
 
 	private SelectionListener			_defaultSelectionListener;
 	private ModifyListener				_defaultModifyListener;
 
-	private boolean						_isFireModifyEvent		= false;
-	private boolean						_isPersonModified		= false;
-	private boolean						_isUpdateUI				= false;
+	private boolean						_isFireModifyEvent			= false;
+	private boolean						_isPersonModified			= false;
+	private boolean						_isUpdateUI					= false;
 
 	private TourPerson					_selectedPerson;
 	private TourPerson					_newPerson;
+
+	private org.joda.time.DateTime		_today						= new org.joda.time.DateTime().withTime(0, 0, 0, 0);
+//	private org.joda.time.DateTime		_today1970					= new org.joda.time.DateTime().getMillis();
 
 	/*
 	 * UI controls
@@ -134,21 +138,29 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	private TableViewer					_peopleViewer;
 
 	private Button						_btnAdd;
-
-	private Text						_txtFirstName;
-	private Text						_txtLastName;
-	private Combo						_cboDevice;
-	private Spinner						_spinnerWeight;
-	private Spinner						_spinnerHeight;
-	private Composite					_containerRawPath;
-	private DirectoryFieldEditor		_rawDataPathEditor;
-
 	private Button						_btnUpdate;
 	private Button						_btnCancel;
 
+	private TabFolder					_tabFolderPerson;
+	private Text						_txtFirstName;
+	private Text						_txtLastName;
+	private Combo						_cboSportComputer;
+	private Spinner						_spinnerWeight;
+	private Spinner						_spinnerHeight;
+	private Spinner						_spinnerRestingHR;
+	private Spinner						_spinnerMaxHR;
+
+	private Combo						_cboHrMaxFormula;
 	private DateTime					_dtBirthday;
+	private Label						_lblAge;
+
+	private Button						_rdoGenderMale;
+	private Button						_rdoGenderFemale;
 
 	private Text						_txtRawDataPath;
+	private DirectoryFieldEditor		_rawDataPathEditor;
+
+	private Button						_btnAddHRZone;
 
 	private class ClientsContentProvider implements IStructuredContentProvider {
 
@@ -165,30 +177,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		}
 	}
 
-//	private void addPrefListener() {
-//
-//		_prefChangeListener = new IPropertyChangeListener() {
-//			@Override
-//			public void propertyChange(final PropertyChangeEvent event) {
-//
-//				final String property = event.getProperty();
-//
-//				if (property.equals(ITourbookPreferences.TOUR_BIKE_LIST_IS_MODIFIED)) {
-//
-//					// create new bike list
-////					_cboBike.removeAll();
-////					updateUIBikeList();
-//
-//					// update person details
-////					updateUIPersonDetails();
-//				}
-//			}
-//
-//		};
-//		// register the listener
-//		_prefStore.addPropertyChangeListener(_prefChangeListener);
-//	}
-
 	@Override
 	public void applyData(final Object data) {
 
@@ -198,7 +186,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			final Boolean isCreatePerson = (Boolean) data;
 			if (isCreatePerson && _people.size() == 0) {
 
-				// it's requested to create a new person
+				// this is a request, to create a new person
 
 				final TourPerson newPerson = createDefaultPerson();
 
@@ -222,6 +210,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 				_peopleViewer.getTable().setEnabled(false);
 
 				// select first name
+				_tabFolderPerson.setSelection(0);
 				_txtFirstName.selectAll();
 				_txtFirstName.setFocus();
 			}
@@ -237,14 +226,11 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 		updateUIDeviceList();
 
-//		updateUIBikeList();
-//		addPrefListener();
-
 		// update people viewer
 		_people = PersonManager.getTourPeople();
 		_peopleViewer.setInput(new Object());
 
-		// reselect previous person
+		// reselect previous person and tabfolder
 		restoreState();
 
 		enableActions();
@@ -259,6 +245,9 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		newPerson.setHeight(1.77f);
 		newPerson.setWeight(77.7f);
 		newPerson.setBirthDay(new org.joda.time.DateTime(1977, 7, 7, 0, 0, 0, 0).getMillis());
+
+		newPerson.setGender(0);
+		newPerson.setRestPulse(TourPerson.DEFAULT_REST_PULSE);
 
 		return newPerson;
 	}
@@ -288,9 +277,9 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 		{
 			createUI10PeopleViewer(container);
-			createUI20PeopleViewerButtons(container);
+			createUI20Buttons(container);
 
-			createUI30PersonDetails(container);
+			createUI30PersonFolder(container);
 		}
 
 		// placeholder
@@ -362,11 +351,12 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 	}
 
-	private void createUI20PeopleViewerButtons(final Composite parent) {
+	private void createUI20Buttons(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
+		GridDataFactory.fillDefaults().grab(false, true).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
 			/*
 			 * button: add
@@ -380,64 +370,128 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 					onAddPerson();
 				}
 			});
+
+			/*
+			 * button: update
+			 */
+			_btnUpdate = new Button(container, SWT.NONE);
+			_btnUpdate.setText(Messages.App_Action_Update);
+			_btnUpdate.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onUpdatePerson();
+				}
+			});
+			setButtonLayoutData(_btnUpdate);
+			final GridData gd = (GridData) _btnUpdate.getLayoutData();
+			gd.verticalAlignment = SWT.BOTTOM;
+			gd.grabExcessVerticalSpace = true;
+
+			/*
+			 * button: cancel
+			 */
+			_btnCancel = new Button(container, SWT.NONE);
+			_btnCancel.setText(Messages.App_Action_Cancel);
+			_btnCancel.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onCancelPerson();
+				}
+			});
+			setButtonLayoutData(_btnCancel);
 		}
 	}
 
-	private void createUI30PersonDetails(final Composite parent) {
+	private void createUI30PersonFolder(final Composite parent) {
 
-		/*
-		 * group: person
-		 */
-		final Group groupPerson = new Group(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(groupPerson);
-		groupPerson.setText(Messages.Pref_People_Group_person);
-		GridLayoutFactory.fillDefaults().numColumns(2).spacing(0, 0).applyTo(groupPerson);
-//		_groupPerson.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+		_tabFolderPerson = new TabFolder(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_tabFolderPerson);
 		{
-			createUI50PersonFields(groupPerson);
-			createUI70PersonDetailsAction(groupPerson);
-		}
+			// tab: person
+			final TabItem tabItemDetails = new TabItem(_tabFolderPerson, SWT.NONE);
+			tabItemDetails.setText(Messages.Pref_People_Tab_Person);
+			tabItemDetails.setControl(createUI32TabPerson(_tabFolderPerson));
 
-		/*
-		 * group: device/data transfer
-		 */
-		final Group groupDevice = new Group(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(groupDevice);
-		groupDevice.setText(Messages.Pref_People_Group_Device);
-		GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, 0).applyTo(groupDevice);
-//		_groupDevice.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-		{
-			createUI82RawDataPath(groupDevice);
-		}
+			// tab: hr zone
+			final TabItem tabItemHRZone = new TabItem(_tabFolderPerson, SWT.NONE);
+			tabItemHRZone.setText(Messages.Pref_People_Tab_HRZone);
+			final Control hrZone = createUI34TabHRZone(_tabFolderPerson);
+			tabItemHRZone.setControl(hrZone);
 
+			// tab: data transfer
+			final TabItem tabItemDataTransfer = new TabItem(_tabFolderPerson, SWT.NONE);
+			tabItemDataTransfer.setText(Messages.Pref_People_Tab_DataTransfer);
+			final Control dataTransfer = createUI36TabDataTransfer(_tabFolderPerson);
+			tabItemDataTransfer.setControl(dataTransfer);
+		}
 	}
 
-	private void createUI50PersonFields(final Composite parent) {
+	private Control createUI32TabPerson(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.swtDefaults().numColumns(3).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
-			createUI52FieldFirstName(container);
-			createUI54FieldLastName(container);
-			createUI56FieldBirthday(container);
-			createUI58FieldWeight(container);
-			createUI60FieldHeight(container);
-
-			/*
-			 * bike is disabled because it is currently not used, 21.04.2011
-			 */
-//			createUI64FieldBike(container);
+			createUI50FieldFirstName(container);
+			createUI52FieldLastName(container);
+			createUI54FieldWeight(container);
+			createUI56FieldHeight(container);
 		}
 
 		container.layout(true, true);
+
+		return container;
+	}
+
+	private Control createUI34TabHRZone(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
+		{
+
+			final Composite containerPerson = new Composite(container, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(containerPerson);
+			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerPerson);
+			{
+				createUI60FieldGender(containerPerson);
+				createUI62FieldBirthday(containerPerson);
+				createUI66RestingHR(containerPerson);
+				createUI68MaxHR(containerPerson);
+			}
+
+			createUI70HRZone(container);
+		}
+
+		return container;
+	}
+
+	private Control createUI36TabDataTransfer(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		{
+			createUI90FieldSportComputer(container);
+			createUI92FieldRawDataPath(container);
+		}
+
+		// set layout after the fields are created
+		GridLayoutFactory.swtDefaults().numColumns(3).extendedMargins(0, 0, 10, 0).applyTo(container);
+
+		/*
+		 * set width for the text control that the pref dialog is not as wide as the full path
+		 */
+		final Text rawPathControl = _rawDataPathEditor.getTextControl(container);
+		final GridData gd = (GridData) rawPathControl.getLayoutData();
+		gd.widthHint = 200;
+
+		return container;
 	}
 
 	/**
 	 * field: first name
 	 */
-	private void createUI52FieldFirstName(final Composite parent) {
+	private void createUI50FieldFirstName(final Composite parent) {
 
 		final Label label = new Label(parent, SWT.NONE);
 		label.setText(Messages.Pref_People_Label_first_name);
@@ -450,7 +504,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	/**
 	 * field: last name
 	 */
-	private void createUI54FieldLastName(final Composite parent) {
+	private void createUI52FieldLastName(final Composite parent) {
 
 		final Label label = new Label(parent, SWT.NONE);
 		label.setText(Messages.Pref_People_Label_last_name);
@@ -460,20 +514,10 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		_txtLastName.addModifyListener(_defaultModifyListener);
 	}
 
-	private void createUI56FieldBirthday(final Composite parent) {
-
-		final Label label = new Label(parent, SWT.NONE);
-		label.setText(Messages.Pref_People_Label_Birthday);
-
-		_dtBirthday = new DateTime(parent, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
-		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).span(2, 1).applyTo(_dtBirthday);
-		_dtBirthday.addSelectionListener(_defaultSelectionListener);
-	}
-
 	/**
 	 * field: weight
 	 */
-	private void createUI58FieldWeight(final Composite parent) {
+	private void createUI54FieldWeight(final Composite parent) {
 
 		Label label = new Label(parent, SWT.NONE);
 		label.setText(Messages.Pref_People_Label_weight);
@@ -512,7 +556,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	/**
 	 * field: height
 	 */
-	private void createUI60FieldHeight(final Composite parent) {
+	private void createUI56FieldHeight(final Composite parent) {
 
 		Label label = new Label(parent, SWT.NONE);
 		label.setText(Messages.Pref_People_Label_height);
@@ -549,103 +593,250 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	}
 
 	/**
-	 * Actions: Update / Cancel
+	 * field: gender
 	 */
-	private void createUI70PersonDetailsAction(final Composite parent) {
+	private void createUI60FieldGender(final Composite parent) {
 
-		final Composite btnContainer = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().indent(0, 0).applyTo(btnContainer);
-		GridLayoutFactory.swtDefaults().applyTo(btnContainer);
+		// label
+		final Label label = new Label(parent, SWT.NONE);
+		label.setText(Messages.Pref_People_Label_Gender);
+
+		// radio
+		final Composite containerGender = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(containerGender);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerGender);
 		{
-			// button: update
-			_btnUpdate = new Button(btnContainer, SWT.NONE);
-			_btnUpdate.setText(Messages.App_Action_Update);
-			_btnUpdate.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onUpdatePerson();
-				}
-			});
-			setButtonLayoutData(_btnUpdate);
+			_rdoGenderMale = new Button(containerGender, SWT.RADIO);
+			_rdoGenderMale.setText(Messages.Pref_People_Label_GenderMale);
+			_rdoGenderMale.addSelectionListener(_defaultSelectionListener);
 
-			// button: cancel
-			_btnCancel = new Button(btnContainer, SWT.NONE);
-			_btnCancel.setText(Messages.App_Action_Cancel);
-			_btnCancel.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onCancelPerson();
-				}
-			});
-			setButtonLayoutData(_btnCancel);
+			_rdoGenderFemale = new Button(containerGender, SWT.RADIO);
+			_rdoGenderFemale.setText(Messages.Pref_People_Label_GenderFemale);
+			_rdoGenderFemale.addSelectionListener(_defaultSelectionListener);
 		}
 	}
 
-//	/**
-//	 * field: bike
-//	 */
-//	private void createUI64FieldBike(final Composite parent) {
-//
-//		// label
-//		final Label label = new Label(parent, SWT.NONE);
-//		label.setText(Messages.Pref_People_Label_bike);
-//
-//		// combo
-//		_cboBike = new Combo(parent, SWT.READ_ONLY | SWT.DROP_DOWN);
-//		_cboBike.setVisibleItemCount(20);
-//		_cboBike.addSelectionListener(_defaultSelectionListener);
-//
-//		// filler
-//		new Label(parent, SWT.NONE);
-//	}
-
-	private void createUI82RawDataPath(final Composite parent) {
-
-		_containerRawPath = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_containerRawPath);
-//		_containerRawPath.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-		{
-			/*
-			 * field: device
-			 */
-
-			// label
-			final Label label = new Label(_containerRawPath, SWT.NONE);
-			label.setText(Messages.Pref_People_Label_device);
-
-			// combo
-			_cboDevice = new Combo(_containerRawPath, SWT.READ_ONLY | SWT.DROP_DOWN);
-			_cboDevice.setVisibleItemCount(20);
-			_cboDevice.addSelectionListener(_defaultSelectionListener);
-
-			// spacer
-			new Label(_containerRawPath, SWT.NONE);
-
-			/*
-			 * field: path to save raw tour data
-			 */
-			_rawDataPathEditor = new DirectoryFieldEditor(
-					ITourbookPreferences.DUMMY_FIELD,
-					Messages.Pref_People_Label_DefaultDataTransferFilePath,
-					_containerRawPath);
-			_rawDataPathEditor.setEmptyStringAllowed(true);
-			_rawDataPathEditor.setValidateStrategy(StringFieldEditor.VALIDATE_ON_KEY_STROKE);
-
-			final Label lblPath = _rawDataPathEditor.getLabelControl(_containerRawPath);
-			lblPath.setToolTipText(Messages.Pref_People_Label_DefaultDataTransferFilePath_Tooltip);
-
-			_txtRawDataPath = _rawDataPathEditor.getTextControl(_containerRawPath);
-			_txtRawDataPath.addModifyListener(_defaultModifyListener);
-		}
-
-		GridLayoutFactory.swtDefaults().numColumns(3).applyTo(_containerRawPath);
+	/**
+	 * field: birthday
+	 */
+	private void createUI62FieldBirthday(final Composite parent) {
 
 		/*
-		 * set width for the text control that the pref dialog is not as wide as the full path
+		 * date-time: birthday
 		 */
-		final Text rawPathControl = _rawDataPathEditor.getTextControl(_containerRawPath);
-		final GridData gd = (GridData) rawPathControl.getLayoutData();
-		gd.widthHint = 200;
+		final Label label = new Label(parent, SWT.NONE);
+		label.setText(Messages.Pref_People_Label_Birthday);
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+
+			_dtBirthday = new DateTime(container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.BEGINNING, SWT.FILL)
+					.applyTo(_dtBirthday);
+			_dtBirthday.addSelectionListener(_defaultSelectionListener);
+			_dtBirthday.addKeyListener(new KeyListener() {
+
+				@Override
+				public void keyPressed(final KeyEvent e) {}
+
+				@Override
+				public void keyReleased(final KeyEvent e) {
+					/*
+					 * listener is necessary because the selection listener is not fired when the
+					 * values are modified with mouse up/down
+					 */
+					updateUIAge();
+				}
+			});
+
+			/*
+			 * label: age
+			 */
+			_lblAge = new Label(container, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).align(SWT.FILL, SWT.CENTER).applyTo(_lblAge);
+		}
+	}
+
+	/**
+	 * field: resting hr
+	 */
+	private void createUI66RestingHR(final Composite parent) {
+
+		Label label = new Label(parent, SWT.NONE);
+		label.setText(Messages.Pref_People_Label_RestingHR);
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+			// spinner: weight
+			_spinnerRestingHR = new Spinner(container, SWT.BORDER);
+			GridDataFactory.fillDefaults() //
+					.grab(false, false)
+					.align(SWT.BEGINNING, SWT.FILL)
+					.hint(_spinnerWidth, SWT.DEFAULT)
+					.applyTo(_spinnerRestingHR);
+			_spinnerRestingHR.setMinimum(10);
+			_spinnerRestingHR.setMaximum(200);
+			_spinnerRestingHR.addSelectionListener(_defaultSelectionListener);
+			_spinnerRestingHR.addMouseWheelListener(new MouseWheelListener() {
+				public void mouseScrolled(final MouseEvent event) {
+					UI.adjustSpinnerValueOnMouseScroll(event);
+					onModifyPerson();
+				}
+			});
+
+			// label: unit
+			label = new Label(container, SWT.NONE);
+			label.setText(Messages.Graph_Label_Heartbeat_unit);
+		}
+	}
+
+	/**
+	 * field: max hr
+	 */
+	private void createUI68MaxHR(final Composite parent) {
+
+		Label label = new Label(parent, SWT.NONE);
+		label.setText(Messages.Pref_People_Label_MaxHR);
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+		{
+			/*
+			 * spinner: weight
+			 */
+			_spinnerMaxHR = new Spinner(container, SWT.BORDER);
+			GridDataFactory.fillDefaults() //
+					.grab(false, false)
+					.align(SWT.BEGINNING, SWT.FILL)
+					.hint(_spinnerWidth, SWT.DEFAULT)
+					.applyTo(_spinnerMaxHR);
+			_spinnerMaxHR.setMinimum(10);
+			_spinnerMaxHR.setMaximum(300);
+			_spinnerMaxHR.addSelectionListener(_defaultSelectionListener);
+			_spinnerMaxHR.addMouseWheelListener(new MouseWheelListener() {
+				public void mouseScrolled(final MouseEvent event) {
+					UI.adjustSpinnerValueOnMouseScroll(event);
+					onModifyPerson();
+				}
+			});
+
+			/*
+			 * label: unit
+			 */
+			label = new Label(container, SWT.NONE);
+			label.setText(Messages.Graph_Label_Heartbeat_unit);
+
+			/*
+			 * combo: formula to compute hr max
+			 */
+			_cboHrMaxFormula = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
+			GridDataFactory
+					.fillDefaults()
+					.grab(true, false)
+					.indent(5, 0)
+					.hint(50, SWT.DEFAULT)
+					.applyTo(_cboHrMaxFormula);
+			_cboHrMaxFormula.setVisibleItemCount(20);
+			_cboHrMaxFormula.addSelectionListener(_defaultSelectionListener);
+
+			// fill combobox
+			final String[] hrMaxFormulaNames = TrainingManager.HRMaxFormulaNames;
+			for (final String formulaName : hrMaxFormulaNames) {
+				_cboHrMaxFormula.add(formulaName);
+			}
+		}
+	}
+
+	private void createUI70HRZone(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+			final Button button = new Button(container, SWT.PUSH);
+			GridDataFactory.fillDefaults().applyTo(button);
+			button.setText("Edit HR &Zones...");
+			button.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					new DialogHRZones(getShell(), _selectedPerson).open();
+				}
+			});
+//			createUI72HRZoneTable(container);
+//			createUI80HRZoneActions(container);
+		}
+	}
+
+//
+//	private void createUI80HRZoneActions(final Composite parent) {
+//
+//		final Composite container = new Composite(parent, SWT.NONE);
+//		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+//		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+//		{
+//
+//		/*
+//			 * button: add
+//			 */
+//			_btnAddHRZone = new Button(container, NONE);
+//			_btnAddHRZone.setText(Messages.Pref_People_Action_AddZone);
+//		}
+//	}
+
+	/**
+	 * field: sport computer
+	 */
+	private void createUI90FieldSportComputer(final Composite parent) {
+
+		// label
+		final Label label = new Label(parent, SWT.NONE);
+		label.setText(Messages.Pref_People_Label_device);
+
+		// combo
+		_cboSportComputer = new Combo(parent, SWT.READ_ONLY | SWT.DROP_DOWN);
+//			GridDataFactory.fillDefaults().indent(0, 10).align(SWT.BEGINNING, SWT.FILL).applyTo(_cboSportComputer);
+		_cboSportComputer.setVisibleItemCount(20);
+		_cboSportComputer.addSelectionListener(_defaultSelectionListener);
+
+		// spacer
+		new Label(parent, SWT.NONE);
+	}
+
+	/**
+	 * field: path to save raw tour data
+	 */
+	private void createUI92FieldRawDataPath(final Composite parent) {
+
+		_rawDataPathEditor = new DirectoryFieldEditor(
+				ITourbookPreferences.DUMMY_FIELD,
+				Messages.Pref_People_Label_DefaultDataTransferFilePath,
+				parent);
+		_rawDataPathEditor.setEmptyStringAllowed(true);
+		_rawDataPathEditor.setValidateStrategy(StringFieldEditor.VALIDATE_ON_KEY_STROKE);
+
+		final Label lblPath = _rawDataPathEditor.getLabelControl(parent);
+		lblPath.setToolTipText(Messages.Pref_People_Label_DefaultDataTransferFilePath_Tooltip);
+
+		_txtRawDataPath = _rawDataPathEditor.getTextControl(parent);
+		_txtRawDataPath.addModifyListener(_defaultModifyListener);
+
+		/*
+		 * label: info
+		 */
+		final Label label = new Label(parent, SWT.WRAP);
+		GridDataFactory
+				.fillDefaults()
+				.span(3, 1)
+				.indent(0, 15)
+				.hint(UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
+				.applyTo(label);
+		label.setText(Messages.Pref_People_Label_DataTransfer);
 	}
 
 	private void defineAllColumns(final TableColumnLayout tableLayout) {
@@ -773,13 +964,20 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	private void enableActions() {
 
 		final boolean isValid = isPersonValid();
+		final boolean isNewPerson = _newPerson != null;
 
 		_btnAdd.setEnabled(!_isPersonModified && isValid);
 		_peopleViewer.getTable().setEnabled(!_isPersonModified && isValid);
 
+		_btnUpdate.setText(isNewPerson ? Messages.App_Action_Save : Messages.App_Action_Update);
 		_btnUpdate.setEnabled(_isPersonModified && isValid);
 		_btnCancel.setEnabled(_isPersonModified);
 
+		final int selectedHrMaxFormulaKey = getSelectedHrMaxFormulaKey();
+
+		_spinnerMaxHR.setEnabled(selectedHrMaxFormulaKey == TrainingManager.HR_MAX_FORMULA_MANUAL);
+
+		updateUIOnModify(selectedHrMaxFormulaKey);
 	}
 
 	private void fireModifyEvent() {
@@ -793,6 +991,32 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 			_isFireModifyEvent = false;
 		}
+	}
+
+	private long getBirthdayFromUI() {
+
+		return new org.joda.time.DateTime(
+				_dtBirthday.getYear(),
+				_dtBirthday.getMonth() + 1,
+				_dtBirthday.getDay(),
+				0,
+				0,
+				0,
+				0).getMillis();
+	}
+
+	/**
+	 * @return Returns the key for the selected Hr max formula.
+	 */
+	private int getSelectedHrMaxFormulaKey() {
+
+		int selectedIndex = _cboHrMaxFormula.getSelectionIndex();
+		if (selectedIndex == -1) {
+			selectedIndex = 0;
+			_cboHrMaxFormula.select(0);
+		}
+
+		return TrainingManager.HRMaxFormulaKeys[selectedIndex];
 	}
 
 	public void init(final IWorkbench workbench) {
@@ -876,10 +1100,11 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		_newPerson = createDefaultPerson();
 		_isPersonModified = true;
 
-		updateUIPerson(_newPerson);
+		updateUIFromPerson(_newPerson);
 		enableActions();
 
 		// edit first name
+		_tabFolderPerson.setSelection(0);
 		_txtFirstName.selectAll();
 		_txtFirstName.setFocus();
 	}
@@ -889,7 +1114,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		_newPerson = null;
 		_isPersonModified = false;
 
-		updateUIPerson(_selectedPerson);
+		updateUIFromPerson(_selectedPerson);
 		enableActions();
 
 		_peopleViewer.getTable().setFocus();
@@ -920,7 +1145,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 			_selectedPerson = person;
 
-			updateUIPerson(_selectedPerson);
+			updateUIFromPerson(_selectedPerson);
 		} else {
 			// irgnore, this can happen when a refresh() of the table viewer is done
 		}
@@ -966,23 +1191,32 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		 * selected person
 		 */
 		final long personId = Util.getStateLong(_state, STATE_SELECTED_PERSON, -1);
+		StructuredSelection personSelection = null;
 		if (personId != -1) {
 
 			for (final TourPerson person : _people) {
 				if (person.getPersonId() == personId) {
-					_peopleViewer.setSelection(new StructuredSelection(person));
-					return;
+					personSelection = new StructuredSelection(person);
+					break;
 				}
 			}
 		}
+		if (personSelection == null && _people.size() > 0) {
 
-		// previous person could not be reselected, select first person
-		if (_people.size() > 0) {
+			/*
+			 * previous person could not be reselected, select first person, a person MUST always be
+			 * available since version 11.7
+			 */
 
-			final TableItem tblItem = _peopleViewer.getTable().getItem(0);
-
-			_peopleViewer.setSelection(new StructuredSelection(tblItem.getData()));
+			personSelection = new StructuredSelection(_peopleViewer.getTable().getItem(0).getData());
 		}
+
+		if (personSelection != null) {
+			_peopleViewer.setSelection(personSelection);
+		}
+
+		// reselected tab folder
+		_tabFolderPerson.setSelection(Util.getStateInt(_state, STATE_SELECTED_TAB_FOLDER, 0));
 	}
 
 	private void savePerson(final boolean isAskToSave) {
@@ -1007,7 +1241,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 					_isPersonModified = false;
 
 					// update ui from the previous selected person
-					updateUIPerson(_selectedPerson);
+					updateUIFromPerson(_selectedPerson);
 
 					return;
 				}
@@ -1044,6 +1278,10 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		if (firstElement instanceof TourPerson) {
 			_state.put(STATE_SELECTED_PERSON, ((TourPerson) firstElement).getPersonId());
 		}
+
+		// selected tab folder
+		final int selectedTab = _tabFolderPerson.getSelectionIndex();
+		_state.put(STATE_SELECTED_TAB_FOLDER, selectedTab < 0 ? 0 : selectedTab);
 	}
 
 	/**
@@ -1054,7 +1292,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		final String deviceId = person.getDeviceReaderId();
 
 		if (deviceId == null) {
-			_cboDevice.select(0);
+			_cboSportComputer.select(0);
 		} else {
 
 			int deviceIndex = 0;
@@ -1063,7 +1301,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 				if (device != null) {
 					if (deviceId.equals(device.deviceId)) {
-						_cboDevice.select(deviceIndex);
+						_cboSportComputer.select(deviceIndex);
 						break;
 					}
 				}
@@ -1073,70 +1311,35 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 			// when the device id was not found, select "<no selection>" entry
 			if (deviceIndex == 0) {
-				_cboDevice.select(0);
+				_cboSportComputer.select(0);
 			}
 		}
 	}
 
-	//	/**
-//	 * select bike in the combo box
-//	 */
-//	private void selectBike(final TourPerson person) {
-//
-//		// select default value
-//		int bikeIndex = 0;
-//		final TourBike personBike = person.getTourBike();
-//
-//		if (personBike == null || _bikes == null) {
-//			_cboBike.select(0);
-//		} else {
-//			boolean isBikeFound = false;
-//			for (final TourBike bike : _bikes) {
-//				if (personBike.getBikeId() == bike.getBikeId()) {
-//					_cboBike.select(bikeIndex + 1);
-//					isBikeFound = true;
-//					break;
-//				}
-//				bikeIndex++;
-//			}
-//
-//			// when the bike id was not found, select "<no selection>" entry
-//			if (!isBikeFound) {
-//				_cboBike.select(0);
-//			}
-//		}
-//	}
-//
-//	private void updateUIBikeList() {
-//
-//		// create bike list
-//		_cboBike.add(DeviceManager.DEVICE_IS_NOT_SELECTED);
-//
-//		final ArrayList<TourBike> bikes = TourDatabase.getTourBikes();
-//
-//		if (bikes == null) {
-//			_bikes = new TourBike[0];
-//		} else {
-//			_bikes = bikes.toArray(new TourBike[bikes.size()]);
-//			for (final TourBike bike : _bikes) {
-//				_cboBike.add(bike.getName());
-//			}
-//		}
-//	}
+	/**
+	 * hr max formula
+	 */
+	private void selectHrMaxFormula(final TourPerson person) {
+
+		final int hrMaxFormula = person.getHrMaxFormula();
+		int selectionIndex = -1;
+		for (final int formulaKey : TrainingManager.HRMaxFormulaKeys) {
+			if (formulaKey == hrMaxFormula) {
+				selectionIndex = hrMaxFormula;
+				break;
+			}
+		}
+		if (selectionIndex == -1) {
+			// set default value
+			selectionIndex = 0;
+		}
+		_cboHrMaxFormula.select(selectionIndex);
+	}
 
 	private void updatePersonFromUI(final TourPerson person) {
 
-		final long birthDay = new org.joda.time.DateTime(
-				_dtBirthday.getYear(),
-				_dtBirthday.getMonth() + 1,
-				_dtBirthday.getDay(),
-				0,
-				0,
-				0,
-				0).getMillis();
-
 		String deviceId = null;
-		final int selectedIndex = _cboDevice.getSelectionIndex();
+		final int selectedIndex = _cboSportComputer.getSelectionIndex();
 		if (selectedIndex > 0) {
 			deviceId = _deviceList.get(selectedIndex).deviceId;
 		}
@@ -1147,30 +1350,50 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		person.setFirstName(_txtFirstName.getText());
 		person.setLastName(_txtLastName.getText());
 
-		person.setBirthDay(birthDay);
+		person.setBirthDay(getBirthdayFromUI());
 		person.setWeight(_spinnerWeight.getSelection() / 10.0f);
 		person.setHeight(_spinnerHeight.getSelection() / 100.0f);
 
+		person.setGender(_rdoGenderMale.getSelection() ? 0 : 1);
+		person.setRestPulse(_spinnerRestingHR.getSelection());
+
 		person.setRawDataPath(_rawDataPathEditor.getStringValue());
 		person.setDeviceReaderId(deviceId);
+
+		// hr max formula
+		final int hrMaxSelectionIndex = _cboHrMaxFormula.getSelectionIndex();
+		person.setHrMaxFormula(TrainingManager.HRMaxFormulaKeys[hrMaxSelectionIndex]);
+	}
+
+	private int updateUIAge() {
+
+		final Period age = new Period(getBirthdayFromUI(), _today.getMillis());
+
+		final int ageYears = age.getYears();
+		_lblAge.setText(UI.SPACE + ageYears + UI.SPACE2 + Messages.Pref_People_Label_Years);
+
+		return ageYears;
 	}
 
 	private void updateUIDeviceList() {
+
 		// add all devices to the combobox
 		for (final ExternalDevice device : _deviceList) {
 			if (device == null) {
-				_cboDevice.add(DeviceManager.DEVICE_IS_NOT_SELECTED);
+				_cboSportComputer.add(DeviceManager.DEVICE_IS_NOT_SELECTED);
 			} else {
-				_cboDevice.add(device.visibleName);
+				_cboSportComputer.add(device.visibleName);
 			}
 		}
 	}
 
-	private void updateUIPerson(final TourPerson person) {
+	private void updateUIFromPerson(final TourPerson person) {
 
 		_isUpdateUI = true;
 		{
 			final org.joda.time.DateTime dtBirthday = new org.joda.time.DateTime(person.getBirthDay());
+			final int gender = person.getGender();
+			final int restPulse = person.getRestPulse();
 
 			_txtFirstName.setText(person.getFirstName());
 			_txtLastName.setText(person.getLastName());
@@ -1178,10 +1401,46 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			_spinnerWeight.setSelection((int) (person.getWeight() * 10));
 			_spinnerHeight.setSelection((int) (person.getHeight() * 100));
 			_rawDataPathEditor.setStringValue(person.getRawDataPath());
+			_rdoGenderMale.setSelection(gender == 0);
+			_rdoGenderFemale.setSelection(gender != 0);
+			_spinnerRestingHR.setSelection(restPulse == 0 ? TourPerson.DEFAULT_REST_PULSE : restPulse);
 
+			updateUIAge();
+
+			selectHrMaxFormula(person);
 			selectDevice(person);
 		}
 		_isUpdateUI = false;
 	}
 
+	private void updateUIOnModify(final int selectedHrMaxFormulaKey) {
+
+		final int age = updateUIAge();
+
+		if (selectedHrMaxFormulaKey == TrainingManager.HR_MAX_FORMULA_220_AGE) {
+
+			// HRmax = 220 - age
+
+			_spinnerMaxHR.setSelection(220 - age);
+
+		} else if (selectedHrMaxFormulaKey == TrainingManager.HR_MAX_FORMULA_205_8) {
+
+			// HRmax = 205.8 - (0.685 x age)
+
+			_spinnerMaxHR.setSelection((int) (205.8 - (0.685 * age)));
+
+		} else if (selectedHrMaxFormulaKey == TrainingManager.HR_MAX_FORMULA_206_9) {
+
+			//  HRmax = 206.9 - (0.67 x age)
+
+			_spinnerMaxHR.setSelection((int) (206.9 - (0.67 * age)));
+
+		} else if (selectedHrMaxFormulaKey == TrainingManager.HR_MAX_FORMULA_191_5) {
+
+			//  HRmax = 191.5 - (0.007 x age2)
+
+			_spinnerMaxHR.setSelection((int) (191.5 - (0.007 * age * age)));
+		}
+
+	}
 }

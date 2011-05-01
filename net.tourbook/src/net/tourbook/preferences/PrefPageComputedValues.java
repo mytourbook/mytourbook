@@ -58,8 +58,6 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 	public static final String			ID									= "net.tourbook.preferences.PrefPageComputedValues";	//$NON-NLS-1$
 
-	private static final int			DESCRIPTION_HINT					= 300;
-
 	public static final String			STATE_COMPUTED_VALUE_MIN_ALTITUDE	= "computedValue.minAltitude";							//$NON-NLS-1$
 	private static final String			STATE_COMPUTED_VALUE_SELECTED_TAB	= "computedValue.selectedTab";							//$NON-NLS-1$
 
@@ -260,7 +258,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			GridDataFactory.fillDefaults()//
 					.span(3, 1)
 					.indent(0, 10)
-					.hint(DESCRIPTION_HINT, SWT.DEFAULT)
+					.hint(UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
 					.grab(true, false)
 					.applyTo(label);
 			label.setText(Messages.compute_tourValueElevation_label_description);
@@ -269,7 +267,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 					Messages.compute_tourValueElevation_label_description_Hints,
 					1,
 					3,
-					DESCRIPTION_HINT,
+					UI.DEFAULT_DESCRIPTION_WIDTH,
 					null);
 
 			final Composite btnContainer = new Composite(container, SWT.NONE);
@@ -328,7 +326,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			GridDataFactory.fillDefaults()//
 					.span(3, 1)
 					.indent(0, 10)
-					.hint(DESCRIPTION_HINT, SWT.DEFAULT)
+					.hint(UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
 					.grab(true, false)
 					.applyTo(label);
 			label.setText(Messages.compute_tourValueSpeed_label_description);
@@ -337,7 +335,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 					Messages.compute_tourValueSpeed_label_description_Hints,
 					1,
 					3,
-					DESCRIPTION_HINT,
+					UI.DEFAULT_DESCRIPTION_WIDTH,
 					null);
 
 			/*
@@ -412,7 +410,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			GridDataFactory.fillDefaults()//
 					.span(2, 1)
 					.indent(0, 10)
-					.hint(DESCRIPTION_HINT, SWT.DEFAULT)
+					.hint(UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
 					.grab(true, false)
 					.applyTo(label);
 			label.setText(Messages.Compute_BreakTime_Label_Description);
@@ -424,11 +422,11 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 					Messages.Compute_BreakTime_Label_Hints,
 					1,
 					2,
-					DESCRIPTION_HINT,
+					UI.DEFAULT_DESCRIPTION_WIDTH,
 					null);
 			GridDataFactory.fillDefaults()//
 					.span(2, 1)
-					.hint(DESCRIPTION_HINT, SWT.DEFAULT)
+					.hint(UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
 					.indent(0, 30)
 					.applyTo(listHints);
 
@@ -546,7 +544,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			GridDataFactory.fillDefaults()//
 					.span(3, 1)
 					.indent(0, 10)
-					.hint(DESCRIPTION_HINT, SWT.DEFAULT)
+					.hint(UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
 					.grab(true, false)
 					.applyTo(label);
 			label.setText(Messages.Compute_BreakTime_Label_Description_ComputeByTime);
@@ -601,7 +599,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			GridDataFactory.fillDefaults()//
 					.span(3, 1)
 					.indent(0, 10)
-					.hint(DESCRIPTION_HINT, SWT.DEFAULT)
+					.hint(UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
 					.grab(true, false)
 					.applyTo(label);
 			label.setText(Messages.Compute_BreakTime_Label_Description_ComputeBySliceSpeed);
@@ -656,7 +654,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			GridDataFactory.fillDefaults()//
 					.span(3, 1)
 					.indent(0, 10)
-					.hint(DESCRIPTION_HINT, SWT.DEFAULT)
+					.hint(UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
 					.grab(true, false)
 					.applyTo(label);
 			label.setText(Messages.Compute_BreakTime_Label_Description_ComputeByAvgSpeed);

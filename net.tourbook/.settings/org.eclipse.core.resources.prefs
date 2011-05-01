@@ -1,4 +1,5 @@
-#Sat Aug 14 14:05:40 CEST 2010
+#Sun May 01 08:48:10 CEST 2011
 eclipse.preferences.version=1
 encoding//src/net/tourbook/messages.properties=8859_1
 encoding//src/net/tourbook/tour/TourTypeFilterManager.java=UTF-8
+encoding//src/net/tourbook/training/TrainingManager.java=UTF-8

@@ -85,8 +85,9 @@ public class TourDatabase {
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int						TOURBOOK_DB_VERSION							= 15;
+	private static final int						TOURBOOK_DB_VERSION							= 16;
 
+//	private static final int						TOURBOOK_DB_VERSION							= 16;	// 11.???
 //	private static final int						TOURBOOK_DB_VERSION							= 15;	// 11.???
 //	private static final int						TOURBOOK_DB_VERSION							= 14;	// 11.3
 //	private static final int						TOURBOOK_DB_VERSION							= 13;	// 10.11
@@ -2098,6 +2099,15 @@ public class TourDatabase {
 				//
 				// version 15 end ---------
 
+				// version 16 start
+				//
+				+ "	Gender				INTEGER DEFAULT 0,						\n" //$NON-NLS-1$
+				+ "	RestPulse			INTEGER DEFAULT 0,						\n" //$NON-NLS-1$
+				+ "	MaxPulse			INTEGER DEFAULT 0,						\n" //$NON-NLS-1$
+				+ "	HrMaxFormula		INTEGER DEFAULT 0,						\n" //$NON-NLS-1$
+				//
+				// version 16 end ---------
+
 				+ ("	rawDataPath		" + varCharKomma(TourPerson.DB_LENGTH_RAW_DATA_PATH)) //$NON-NLS-1$
 				+ ("	deviceReaderId	" + varCharKomma(TourPerson.DB_LENGTH_DEVICE_READER_ID)) //$NON-NLS-1$
 				+ "	tourBike_bikeId 	BIGINT									\n" //$NON-NLS-1$
@@ -2708,6 +2718,10 @@ public class TourDatabase {
 				currentDbVersion = newVersion = updateDbDesign_014_015(conn, monitor);
 			}
 
+			if (currentDbVersion == 15) {
+				currentDbVersion = newVersion = updateDbDesign_015_016(conn, monitor);
+			}
+
 			/*
 			 * update version number
 			 */
@@ -3316,6 +3330,47 @@ public class TourDatabase {
 		final Statement stmt = conn.createStatement();
 		{
 			sql = "ALTER TABLE " + TABLE_TOUR_PERSON + " ADD COLUMN BirthDay			BIGINT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+			exec(stmt, sql);
+		}
+		stmt.close();
+
+		logDbUpdateEnd(newDbVersion);
+
+		return newDbVersion;
+	}
+
+	private int updateDbDesign_015_016(final Connection conn, final IProgressMonitor monitor) throws SQLException {
+
+		final int newDbVersion = 16;
+
+		logDbUpdateStart(newDbVersion);
+
+		if (monitor != null) {
+			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, newDbVersion));
+		}
+
+//		TOURPERSON TOURPERSON TOURPERSON TOURPERSON TOURPERSON TOURPERSON
+//
+//		+ "	Gender				INTEGER DEFAULT 0,						\n" //$NON-NLS-1$
+//		+ "	RestPulse			INTEGER DEFAULT 0,						\n" //$NON-NLS-1$
+//		+ "	MaxPulse			INTEGER DEFAULT 0,						\n" //$NON-NLS-1$
+//		+ "	HrMaxFormula		INTEGER DEFAULT 0,						\n" //$NON-NLS-1$
+//
+//		TOURPERSON TOURPERSON TOURPERSON TOURPERSON TOURPERSON TOURPERSON
+
+		String sql;
+		final Statement stmt = conn.createStatement();
+		{
+			sql = "ALTER TABLE " + TABLE_TOUR_PERSON + " ADD COLUMN Gender				INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+			exec(stmt, sql);
+
+			sql = "ALTER TABLE " + TABLE_TOUR_PERSON + " ADD COLUMN RestPulse			INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+			exec(stmt, sql);
+
+			sql = "ALTER TABLE " + TABLE_TOUR_PERSON + " ADD COLUMN MaxPulse			INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+			exec(stmt, sql);
+
+			sql = "ALTER TABLE " + TABLE_TOUR_PERSON + " ADD COLUMN HrMaxFormula		INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
 			exec(stmt, sql);
 		}
 		stmt.close();

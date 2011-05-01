@@ -188,6 +188,8 @@ public class Messages extends NLS {
 	public static String		app_unit_seconds;
 
 	public static String		App_Action_set_tour_type;
+	public static String	App_Action_Save;
+
 	public static String		App_Action_SetPerson;
 	public static String		App_Action_SplitTour;
 
@@ -679,6 +681,8 @@ public class Messages extends NLS {
 	public static String		Pref_MapLayout_Label_TourPaintMethod_Simple_Tooltip;
 
 	public static String		Pref_People_Action_add_person;
+
+	public static String	Pref_People_Action_AddZone;
 	public static String		Pref_People_Column_Birthday;
 
 	public static String		Pref_People_Column_device;
@@ -694,14 +698,40 @@ public class Messages extends NLS {
 	public static String		Pref_People_Error_path_is_invalid;
 	public static String		Pref_People_Group_Device;
 	public static String		Pref_People_Group_person;
+	public static String	Pref_People_Label_Age;
+
 	public static String		Pref_People_Label_Birthday;
+	public static String	Pref_People_Label_DataTransfer;
+
 	public static String		Pref_People_Label_DefaultDataTransferFilePath;
 	public static String		Pref_People_Label_DefaultDataTransferFilePath_Tooltip;
 	public static String		Pref_People_Label_device;
 	public static String		Pref_People_Label_first_name;
+
+	public static String	Pref_People_Label_Gender;
+
+	public static String	Pref_People_Label_GenderFemale;
+
+	public static String	Pref_People_Label_GenderMale;
 	public static String		Pref_People_Label_height;
+
+	public static String	Pref_People_Label_HRZoneHeaderPulse;
+
+	public static String	Pref_People_Label_HRZoneHeaderZone;
 	public static String		Pref_People_Label_last_name;
+
+	public static String	Pref_People_Label_MaxHR;
+
+	public static String	Pref_People_Label_RestingHR;
 	public static String		Pref_People_Label_weight;
+
+	public static String	Pref_People_Label_Years;
+	public static String	Pref_People_Tab_DataTransfer;
+
+	public static String	Pref_People_Tab_HRZone;
+
+	public static String	Pref_People_Tab_Person;
+
 	public static String		Pref_People_Title;
 
 	public static String		pref_appearance_number_of_recent_tags;

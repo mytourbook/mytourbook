@@ -39,7 +39,7 @@ public class UI {
 
 	public static final String	EMPTY_STRING			= "";																		//$NON-NLS-1$
 	public static final String	SPACE					= " ";																		//$NON-NLS-1$
-	public static final String	SPACE2					= "  "; //$NON-NLS-1$
+	public static final String	SPACE2					= "  ";																	//$NON-NLS-1$
 	public static final String	DOT						= ".";																		//$NON-NLS-1$
 	public static final String	STRING_0				= "0";																		//$NON-NLS-1$
 

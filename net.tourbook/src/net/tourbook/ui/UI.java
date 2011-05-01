@@ -131,6 +131,11 @@ public class UI {
 	public static final int									DEFAULT_FIELD_WIDTH				= 40;
 	public static final int									FORM_FIRST_COLUMN_INDENT		= 16;
 
+	/**
+	 * layout hint for a description field
+	 */
+	public static final int									DEFAULT_DESCRIPTION_WIDTH		= 300;
+
 	public static final String								UTF_8							= "UTF-8";									//$NON-NLS-1$
 
 	/*
