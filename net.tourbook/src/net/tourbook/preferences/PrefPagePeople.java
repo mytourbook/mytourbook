@@ -17,11 +17,14 @@ package net.tourbook.preferences;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourPerson;
+import net.tourbook.data.TourPersonHRZone;
 import net.tourbook.database.PersonManager;
 import net.tourbook.importdata.DeviceManager;
 import net.tourbook.importdata.ExternalDevice;
@@ -55,8 +58,12 @@ import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
@@ -66,6 +73,7 @@ import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
@@ -131,10 +139,12 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	private org.joda.time.DateTime		_today						= new org.joda.time.DateTime().withTime(0, 0, 0, 0);
 //	private org.joda.time.DateTime		_today1970					= new org.joda.time.DateTime().getMillis();
 
+	private PixelConverter				_pc;
+
 	/*
 	 * UI controls
 	 */
-	private PixelConverter				_pc;
+	private Composite					_prefPageContainer;
 	private TableViewer					_peopleViewer;
 
 	private Button						_btnAdd;
@@ -160,7 +170,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	private Text						_txtRawDataPath;
 	private DirectoryFieldEditor		_rawDataPathEditor;
 
-	private Button						_btnAddHRZone;
+	private Composite					_hrZoneOuterContainer;
+	private ScrolledComposite			_hrZoneScrolledContainer;
 
 	private class ClientsContentProvider implements IStructuredContentProvider {
 
@@ -173,6 +184,22 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		}
 
 		public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {
+
+		}
+	}
+
+	private void actionEditHrZones() {
+
+		if (new DialogHRZones(getShell(), _selectedPerson).open() == Window.OK) {
+
+			createUI72HrZoneScrolledContainer(_hrZoneOuterContainer);
+
+			// update layout that hr zones are displayed
+			final Point folderSize = _tabFolderPerson.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+			final GridData gd = (GridData) _tabFolderPerson.getLayoutData();
+			gd.minimumHeight = folderSize.y;
+
+			_prefPageContainer.layout(true, true);
 
 		}
 	}
@@ -269,24 +296,29 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 	private Composite createUI(final Composite parent) {
 
-		final Label label = new Label(parent, SWT.WRAP);
-		label.setText(Messages.Pref_People_Title);
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		_prefPageContainer = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_prefPageContainer);
+		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(_prefPageContainer);
 		{
-			createUI10PeopleViewer(container);
-			createUI20Buttons(container);
 
-			createUI30PersonFolder(container);
+			final Label label = new Label(_prefPageContainer, SWT.WRAP);
+			label.setText(Messages.Pref_People_Title);
+
+			final Composite innerContainer = new Composite(_prefPageContainer, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, true).applyTo(innerContainer);
+			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(innerContainer);
+			{
+				createUI10PeopleViewer(innerContainer);
+				createUI20Buttons(innerContainer);
+
+				createUI30PersonFolder(innerContainer);
+			}
+
+			// placeholder
+			new Label(_prefPageContainer, SWT.NONE);
 		}
 
-		// placeholder
-//		new Label(parent, SWT.NONE);
-		new Label(parent, SWT.NONE);
-
-		return container;
+		return _prefPageContainer;
 	}
 
 	private void createUI10PeopleViewer(final Composite parent) {
@@ -297,7 +329,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		layoutContainer.setLayout(tableLayout);
 		GridDataFactory
 				.fillDefaults()
-				.grab(true, true)
+				.grab(true, false)
 				.hint(convertWidthInCharsToPixels(30), SWT.DEFAULT)
 				.applyTo(layoutContainer);
 
@@ -354,7 +386,9 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	private void createUI20Buttons(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(false, true).applyTo(container);
+		GridDataFactory.fillDefaults()//
+				.grab(false, true)
+				.applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
@@ -405,7 +439,10 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	private void createUI30PersonFolder(final Composite parent) {
 
 		_tabFolderPerson = new TabFolder(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_tabFolderPerson);
+		GridDataFactory.fillDefaults()//
+				.grab(true, false)
+				.span(2, 1)
+				.applyTo(_tabFolderPerson);
 		{
 			// tab: person
 			final TabItem tabItemDetails = new TabItem(_tabFolderPerson, SWT.NONE);
@@ -757,37 +794,186 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 		{
+			/*
+			 * hr zone fields
+			 */
+			_hrZoneOuterContainer = new Composite(container, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_hrZoneOuterContainer);
+			GridLayoutFactory.fillDefaults().applyTo(_hrZoneOuterContainer);
+
+			createUI72HrZoneScrolledContainer(_hrZoneOuterContainer);
+
+			/*
+			 * button: edit hr zones
+			 */
 			final Button button = new Button(container, SWT.PUSH);
-			GridDataFactory.fillDefaults().applyTo(button);
-			button.setText("Edit HR &Zones...");
+			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(button);
+			button.setText(Messages.Dialog_HRZone_Button_ModifyHrZones);
 			button.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					new DialogHRZones(getShell(), _selectedPerson).open();
+					actionEditHrZones();
 				}
 			});
-//			createUI72HRZoneTable(container);
-//			createUI80HRZoneActions(container);
 		}
 	}
 
-//
-//	private void createUI80HRZoneActions(final Composite parent) {
-//
-//		final Composite container = new Composite(parent, SWT.NONE);
-//		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-//		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-//		{
-//
-//		/*
-//			 * button: add
-//			 */
-//			_btnAddHRZone = new Button(container, NONE);
-//			_btnAddHRZone.setText(Messages.Pref_People_Action_AddZone);
-//		}
-//	}
+	private void createUI72HrZoneScrolledContainer(final Composite parent) {
+
+		Point scrollBackup = null;
+
+		// dispose previous ui
+		if (_hrZoneScrolledContainer != null) {
+
+			// get current scroll position
+			scrollBackup = _hrZoneScrolledContainer.getOrigin();
+
+			// dispose previous fields
+			_hrZoneScrolledContainer.dispose();
+		}
+
+		// scrolled container
+		_hrZoneScrolledContainer = new ScrolledComposite(parent, SWT.V_SCROLL);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_hrZoneScrolledContainer);
+
+		final Composite hrZoneInnerContainer = createUI74HrZoneInnerContainer(_hrZoneScrolledContainer);
+
+		_hrZoneScrolledContainer.setContent(hrZoneInnerContainer);
+		_hrZoneScrolledContainer.setExpandVertical(true);
+		_hrZoneScrolledContainer.setExpandHorizontal(true);
+		_hrZoneScrolledContainer.addControlListener(new ControlAdapter() {
+			@Override
+			public void controlResized(final ControlEvent e) {
+				_hrZoneScrolledContainer.setMinSize(hrZoneInnerContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+			}
+		});
+
+		parent.layout(true, true);
+
+		// set scroll position to previous position
+		if (scrollBackup != null) {
+			_hrZoneScrolledContainer.setOrigin(scrollBackup);
+		}
+	}
+
+	private Composite createUI74HrZoneInnerContainer(final Composite parent) {
+
+		// hr zone container
+		final Composite hrZoneContainer = new Composite(parent, SWT.NONE);
+		GridLayoutFactory.fillDefaults().numColumns(5).applyTo(hrZoneContainer);
+//		hrZoneContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+		{
+			createUI76HrZoneHeader(hrZoneContainer);
+			createUI78HrZoneFields(hrZoneContainer);
+		}
+
+		return hrZoneContainer;
+	}
+
+	private void createUI76HrZoneHeader(final Composite parent) {
+
+		/*
+		 * label: zone
+		 */
+		Label label = new Label(parent, SWT.NONE);
+		GridDataFactory
+				.fillDefaults()
+				.grab(true, false)
+				.hint(250, SWT.DEFAULT)
+				.align(SWT.FILL, SWT.BOTTOM)
+				.applyTo(label);
+		label.setText(Messages.Dialog_HRZone_Label_Header_Zone);
+
+		/*
+		 * header label: min pulse
+		 */
+		label = new Label(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.BOTTOM).applyTo(label);
+		label.setText(Messages.Dialog_HRZone_Label_Header_Pulse);
+
+		/*
+		 * label: ...
+		 */
+		label = new Label(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().hint(_pc.convertWidthInCharsToPixels(2), SWT.DEFAULT).applyTo(label);
+		label.setText(UI.EMPTY_STRING);
+
+		/*
+		 * header label: max pulse
+		 */
+		label = new Label(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.BOTTOM).applyTo(label);
+		label.setText(Messages.Dialog_HRZone_Label_Header_MaxPulse);
+
+		/*
+		 * label: %
+		 */
+		label = new Label(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().applyTo(label);
+		label.setText(UI.EMPTY_STRING);
+	}
+
+	private void createUI78HrZoneFields(final Composite parent) {
+
+		if (_selectedPerson == null) {
+			return;
+		}
+
+		final Set<TourPersonHRZone> setHrZones = _selectedPerson.getHrZones();
+		final ArrayList<TourPersonHRZone> hrZones = new ArrayList<TourPersonHRZone>(setHrZones);
+
+		Collections.sort(hrZones);
+
+		final int hrZoneSize = hrZones.size();
+
+		for (int zoneIndex = 0; zoneIndex < hrZoneSize; zoneIndex++) {
+
+			final TourPersonHRZone hrZone = hrZones.get(zoneIndex);
+
+			final String zoneName = hrZone.getZoneName();
+			final int zoneMinValue = hrZone.getZoneMinValue();
+			final int zoneMaxValue = hrZone.getZoneMaxValue();
+
+			/*
+			 * label: hr zone name
+			 */
+			Label label = new Label(parent, SWT.NONE);
+			GridDataFactory.fillDefaults().applyTo(label);
+			label.setText(zoneName == null ? UI.EMPTY_STRING : zoneName);
+
+			/*
+			 * label: min pulse
+			 */
+			label = new Label(parent, SWT.NONE);
+			GridDataFactory.fillDefaults().applyTo(label);
+			label.setText(zoneMinValue == Integer.MIN_VALUE ? UI.EMPTY_STRING : Integer.toString(zoneMinValue));
+
+			/*
+			 * label: ...
+			 */
+			label = new Label(parent, SWT.NONE);
+			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+			label.setText(zoneMinValue == Integer.MIN_VALUE || zoneMaxValue == Integer.MAX_VALUE
+					? UI.EMPTY_STRING
+					: UI.SYMBOL_DASH);
+
+			/*
+			 * spinner: max pulse
+			 */
+			label = new Label(parent, SWT.NONE);
+			GridDataFactory.fillDefaults().applyTo(label);
+			label.setText(zoneMaxValue == Integer.MAX_VALUE ? UI.EMPTY_STRING : Integer.toString(zoneMaxValue));
+
+			/*
+			 * label: %
+			 */
+			label = new Label(parent, SWT.NONE);
+			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+			label.setText(UI.SYMBOL_PERCENTAGE);
+		}
+	}
 
 	/**
 	 * field: sport computer
@@ -1409,6 +1595,12 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 			selectHrMaxFormula(person);
 			selectDevice(person);
+
+//			// update layout that hr zones are displayed
+//			_tabFolderPerson.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+//			GridData gd = (GridData) _tabFolderPerson.getLayoutData();
+//
+//			_prefPageContainer.layout(true, true);
 		}
 		_isUpdateUI = false;
 	}

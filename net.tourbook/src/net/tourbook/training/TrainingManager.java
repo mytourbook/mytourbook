@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.training;
 
+import net.tourbook.Messages;
+
 public class TrainingManager {
 
 	// keys to identify the hr max formula

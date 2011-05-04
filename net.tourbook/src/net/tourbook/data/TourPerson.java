@@ -122,7 +122,7 @@ public class TourPerson implements Comparable<Object> {
 	private TourBike				tourBike;
 
 	/**
-	 * Tour marker
+	 * Tour hr zones
 	 */
 	@OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourPerson")
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
