@@ -349,44 +349,6 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		});
 	}
 
-//	private void createUI10TourTypeViewerOLD(final Composite parent) {
-//
-//		// tree container
-//		final Composite treeContainer = new Composite(parent, SWT.NONE);
-//		final GridLayout gl = new GridLayout();
-//		gl.marginHeight = 0;
-//		gl.marginWidth = 0;
-//		treeContainer.setLayout(gl);
-//
-//		final GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-//		gd.widthHint = 100;
-//		treeContainer.setLayoutData(gd);
-//
-//		final TreeColumnLayout treeLayouter = new TreeColumnLayout();
-//		treeContainer.setLayout(treeLayouter);
-//
-//		// tour tree
-//		final Tree tree = new Tree(treeContainer, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
-//
-//		tree.setLinesVisible(false);
-//		final int colorColumnWidth = tree.getItemHeight() * 4 + 5;
-//
-//		// tree columns
-//		TreeColumn tc;
-//
-//		tc = new TreeColumn(tree, SWT.NONE);
-//		tc.setText(Messages.Pref_TourTypes_Column_Color);
-//		treeLayouter.addColumnData(new ColumnWeightData(3, true));
-//
-//		new TreeColumn(tree, SWT.NONE);
-//		treeLayouter.addColumnData(new ColumnPixelData(colorColumnWidth, true));
-//
-//		new TreeColumn(tree, SWT.NONE);
-//		treeLayouter.addColumnData(new ColumnPixelData(colorColumnWidth, true));
-//
-//
-//	}
-
 	private void createUI20Buttons(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);

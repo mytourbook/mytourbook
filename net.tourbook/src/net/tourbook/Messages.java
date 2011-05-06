@@ -55,6 +55,20 @@ public class Messages extends NLS {
 	public static String		dialog_export_shell_text;
 	public static String		dialog_export_txt_filePath_tooltip;
 
+	public static String		Dialog_HRZone_Button_AddZone;
+
+	public static String	Dialog_HRZone_Button_ModifyHrZones;
+	public static String		Dialog_HRZone_Button_RemoveZone;
+	public static String		Dialog_HRZone_Button_SortZone;
+	public static String		Dialog_HRZone_DialogMessage;
+	public static String		Dialog_HRZone_DialogTitle;
+	public static String	Dialog_HRZone_Label_Header_MaxPulse;
+
+	public static String		Dialog_HRZone_Label_Header_Pulse;
+	public static String		Dialog_HRZone_Label_Header_Zone;
+
+	public static String	Dialog_HRZone_Label_Trash_Tooltip;
+
 	public static String		Dialog_DoubleClickAction_InvalidAction_Message;
 	public static String		Dialog_DoubleClickAction_InvalidAction_Title;
 	public static String		Dialog_DoubleClickAction_NoAction_Message;
@@ -188,7 +202,7 @@ public class Messages extends NLS {
 	public static String		app_unit_seconds;
 
 	public static String		App_Action_set_tour_type;
-	public static String	App_Action_Save;
+	public static String		App_Action_Save;
 
 	public static String		App_Action_SetPerson;
 	public static String		App_Action_SplitTour;
@@ -436,9 +450,30 @@ public class Messages extends NLS {
 	public static String		Graph_Pref_color_statistic_distance;
 	public static String		Graph_Pref_color_statistic_time;
 
+	public static String	HR_Zone_01_060_Moderate;
+
+	public static String	HR_Zone_01_070_FatBurning;
+
+	public static String	HR_Zone_01_080_Aerobic;
+
+	public static String	HR_Zone_01_090_Anaerobic;
+
+	public static String	HR_Zone_01_100_Maximum;
+
+	public static String	HR_Zone_Template_Select;
+
+	public static String	HR_Zone_Template01_Moderate60Max100;
+
+	public static String		HRMaxFormula_Name_HRmax_191_5;
+	public static String		HRMaxFormula_Name_HRmax_205_8;
+	public static String		HRMaxFormula_Name_HRmax_206_9;
+	public static String		HRMaxFormula_Name_HRmax_220_age;
+	public static String		HRMaxFormula_Name_Manual;
+
 	public static String		Image___Empty16;
 	public static String		Image__App_Cancel;
 	public static String		Image__App_OK;
+	public static String		Image__App_Trash;
 	public static String		Image__assignMergedTour;
 	public static String		Image__assignMergedTour_disabled;
 	public static String		Image__chart_analyzer;
@@ -558,15 +593,10 @@ public class Messages extends NLS {
 	public static String		Import_Data_Dialog_ConfirmReimport_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportTimeSlices_Message;
 	public static String		Import_Data_Dialog_ReimportIsInvalid_WrongSliceNumbers_Message;
-
 	public static String		Import_Data_Label_Hint;
-
 	public static String		Import_Data_Label_Info;
-
 	public static String		Import_Data_Link_Import;
-
 	public static String		Import_Data_Link_Transfer;
-
 	public static String		Import_Data_Link_TransferDirectly;
 
 	public static String		Import_Wizard_Control_combo_person_default_settings;
@@ -681,57 +711,46 @@ public class Messages extends NLS {
 	public static String		Pref_MapLayout_Label_TourPaintMethod_Simple_Tooltip;
 
 	public static String		Pref_People_Action_add_person;
-
-	public static String	Pref_People_Action_AddZone;
+	public static String		Pref_People_Action_AddZone;
 	public static String		Pref_People_Column_Birthday;
-
 	public static String		Pref_People_Column_device;
 	public static String		Pref_People_Column_first_name;
 	public static String		Pref_People_Column_height;
 	public static String		Pref_People_Column_last_name;
 	public static String		Pref_People_Column_weight;
+
+	public static String	Pref_People_Combo_Template_Tooltip;
+	public static String	Pref_People_Dialog_ReplaceHrZones_Message;
+
+	public static String	Pref_People_Dialog_ReplaceHrZones_Title;
+
 	public static String		Pref_People_Dialog_SaveModifiedPerson_Message;
-
 	public static String		Pref_People_Dialog_SaveModifiedPerson_Title;
-
 	public static String		Pref_People_Error_first_name_is_required;
 	public static String		Pref_People_Error_path_is_invalid;
 	public static String		Pref_People_Group_Device;
 	public static String		Pref_People_Group_person;
-	public static String	Pref_People_Label_Age;
-
+	public static String		Pref_People_Label_Age;
 	public static String		Pref_People_Label_Birthday;
-	public static String	Pref_People_Label_DataTransfer;
-
+	public static String		Pref_People_Label_DataTransfer;
 	public static String		Pref_People_Label_DefaultDataTransferFilePath;
 	public static String		Pref_People_Label_DefaultDataTransferFilePath_Tooltip;
 	public static String		Pref_People_Label_device;
 	public static String		Pref_People_Label_first_name;
-
-	public static String	Pref_People_Label_Gender;
-
-	public static String	Pref_People_Label_GenderFemale;
-
-	public static String	Pref_People_Label_GenderMale;
+	public static String		Pref_People_Label_Gender;
+	public static String		Pref_People_Label_GenderFemale;
+	public static String		Pref_People_Label_GenderMale;
 	public static String		Pref_People_Label_height;
-
-	public static String	Pref_People_Label_HRZoneHeaderPulse;
-
-	public static String	Pref_People_Label_HRZoneHeaderZone;
+	public static String		Pref_People_Label_HRZoneHeaderPulse;
+	public static String		Pref_People_Label_HRZoneHeaderZone;
 	public static String		Pref_People_Label_last_name;
-
-	public static String	Pref_People_Label_MaxHR;
-
-	public static String	Pref_People_Label_RestingHR;
+	public static String		Pref_People_Label_MaxHR;
+	public static String		Pref_People_Label_RestingHR;
 	public static String		Pref_People_Label_weight;
-
-	public static String	Pref_People_Label_Years;
-	public static String	Pref_People_Tab_DataTransfer;
-
-	public static String	Pref_People_Tab_HRZone;
-
-	public static String	Pref_People_Tab_Person;
-
+	public static String		Pref_People_Label_Years;
+	public static String		Pref_People_Tab_DataTransfer;
+	public static String		Pref_People_Tab_HRZone;
+	public static String		Pref_People_Tab_Person;
 	public static String		Pref_People_Title;
 
 	public static String		pref_appearance_number_of_recent_tags;

@@ -27,28 +27,45 @@ import net.tourbook.database.TourDatabase;
 @Entity
 public class TourPersonHRZone implements Comparable<TourPersonHRZone> {
 
+	public static final int	DB_LENGTH_ZONE_NAME	= 255;
+
 	/**
 	 * Unique id for the {@link TourPersonHRZone} entity
 	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long		hrZoneId		= TourDatabase.ENTITY_IS_NOT_SAVED;
+	private long			hrZoneId			= TourDatabase.ENTITY_IS_NOT_SAVED;
 
 	@ManyToOne(optional = false)
-	private TourPerson	tourPerson;
+	private TourPerson		tourPerson;
+
+	/**
+	 * Name for the zone
+	 */
+	private String			zoneName;
+
+	/**
+	 * Minimum value of the hr zone
+	 */
+	private int				zoneMinValue;
+
+	/**
+	 * Maximum value of the hr zone
+	 */
+	private int				zoneMaxValue;
 
 	/**
 	 * unique id for manually created markers because the {@link #hrZoneId} is 0 when the marker is
 	 * not persisted
 	 */
 	@Transient
-	private long		_createId		= 0;
+	private long			_createId			= 0;
 
 	/**
 	 * manually created marker or imported marker create a unique id to identify them, saved marker
 	 * are compared with the marker id
 	 */
-	private static int	_createCounter	= 0;
+	private static int		_createCounter		= 0;
 
 	public TourPersonHRZone() {}
 
@@ -59,10 +76,33 @@ public class TourPersonHRZone implements Comparable<TourPersonHRZone> {
 		_createId = ++_createCounter;
 	}
 
+//    public int compareTo(Integer anotherInteger) {
+//	int thisVal = this.value;
+//	int anotherVal = anotherInteger.value;
+//	return (thisVal<anotherVal ? -1 : (thisVal==anotherVal ? 0 : 1));
+//    }
+
 	@Override
-	public int compareTo(final TourPersonHRZone o) {
-		// TODO Auto-generated method stub
-		return 0;
+	public int compareTo(final TourPersonHRZone otherHrZone) {
+
+		/*
+		 * check if first or last entry is set
+		 */
+		if (zoneMinValue == Integer.MIN_VALUE) {
+//			return Integer.MIN_VALUE;
+			return -1;
+		}
+
+		if (zoneMaxValue == Integer.MAX_VALUE) {
+//			return Integer.MAX_VALUE;
+			return 1;
+		}
+
+//		final int minDiff = zoneMinValue - otherHrZone.zoneMinValue;
+//		final int maxDiff = zoneMaxValue - otherHrZone.zoneMaxValue;
+
+//		return zoneMinValue < otherHrZone.zoneMinValue ? -1 : zoneMinValue == otherHrZone.zoneMinValue ? 0 : 1;
+		return zoneMaxValue < otherHrZone.zoneMaxValue ? -1 : zoneMaxValue == otherHrZone.zoneMaxValue ? 0 : 1;
 	}
 
 	@Override
@@ -101,6 +141,18 @@ public class TourPersonHRZone implements Comparable<TourPersonHRZone> {
 		return tourPerson;
 	}
 
+	public int getZoneMaxValue() {
+		return zoneMaxValue;
+	}
+
+	public int getZoneMinValue() {
+		return zoneMinValue;
+	}
+
+	public String getZoneName() {
+		return zoneName;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -112,6 +164,29 @@ public class TourPersonHRZone implements Comparable<TourPersonHRZone> {
 
 	public void setTourPerson(final TourPerson tourPerson) {
 		this.tourPerson = tourPerson;
+	}
+
+	public void setZoneMaxValue(final int zoneMaxValue) {
+		this.zoneMaxValue = zoneMaxValue;
+	}
+
+	public void setZoneMinValue(final int zoneMinValue) {
+		this.zoneMinValue = zoneMinValue;
+	}
+
+	public void setZoneName(final String zoneName) {
+		this.zoneName = zoneName;
+	}
+
+	@Override
+	public String toString() {
+		return "TourPersonHRZone [zoneMinValue=" //$NON-NLS-1$
+				+ zoneMinValue
+				+ ", zoneMaxValue=" //$NON-NLS-1$
+				+ zoneMaxValue
+				+ ", zoneName=" //$NON-NLS-1$
+				+ zoneName
+				+ "]"; //$NON-NLS-1$
 	}
 
 }

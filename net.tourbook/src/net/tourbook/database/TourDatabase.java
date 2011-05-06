@@ -48,6 +48,7 @@ import net.tourbook.data.TourBike;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourPerson;
+import net.tourbook.data.TourPersonHRZone;
 import net.tourbook.data.TourReference;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
@@ -106,8 +107,8 @@ public class TourDatabase {
 	private static final String						DERBY_URL									= "jdbc:derby://localhost:1527/tourbook;create=true";	//$NON-NLS-1$
 
 	/*
-	 * !!! database tables, renamed table names to uppercase otherwise
-	 * conn.getMetaData().getColumns() would not work !!!
+	 * !!! database tables, names are set to uppercase otherwise conn.getMetaData().getColumns()
+	 * would not work !!!
 	 */
 	public static final String						TABLE_SCHEMA								= "USER";												//$NON-NLS-1$
 	private static final String						TABLE_DB_VERSION							= "DBVERSION";											// "DbVersion";			//$NON-NLS-1$
@@ -117,6 +118,7 @@ public class TourDatabase {
 	public static final String						TABLE_TOUR_MARKER							= "TOURMARKER";										// "TourMarker";			//$NON-NLS-1$
 	public static final String						TABLE_TOUR_WAYPOINT							= "TOURWAYPOINT";										// "TourWayPoint";		//$NON-NLS-1$
 	public static final String						TABLE_TOUR_PERSON							= "TOURPERSON";										// "TourPerson";			//$NON-NLS-1$
+	public static final String						TABLE_TOUR_PERSON_HRZONE					= "TOURPERSONHRZONE";									// "TourPersonHRZone";			//$NON-NLS-1$
 	public static final String						TABLE_TOUR_REFERENCE						= "TOURREFERENCE";										// "TourReference";		//$NON-NLS-1$
 	public static final String						TABLE_TOUR_TAG								= "TOURTAG";											// "TourTag";			//$NON-NLS-1$
 	public static final String						TABLE_TOUR_TAG_CATEGORY						= "TOURTAGCATEGORY";									// "TourTagCategory";	//$NON-NLS-1$
@@ -138,6 +140,8 @@ public class TourDatabase {
 																										+ "_" + TABLE_TOUR_TAG);						//$NON-NLS-1$
 	public static final String						JOINTABLE_TOURTAGCATEGORY_TOURTAGCATEGORY	= (TABLE_TOUR_TAG_CATEGORY
 																										+ "_" + TABLE_TOUR_TAG_CATEGORY);				//$NON-NLS-1$
+	public static final String						JOINTABLE_TOURPERSON__TOURPERSON_HRZONE		= (TABLE_TOUR_PERSON
+																										+ "_" + TABLE_TOUR_PERSON_HRZONE);				//$NON-NLS-1$
 //	public static final String						JOINTABLE_TOURCATEGORY__TOURDATA			= (TABLE_TOUR_CATEGORY
 //																									+ "_" + TABLE_TOUR_DATA);						//$NON-NLS-1$
 	/**
@@ -1582,18 +1586,20 @@ public class TourDatabase {
 
 				createTableTourData(stmt);
 
-				createTableTourBike(stmt);
 				createTableTourPerson(stmt);
+				createTableTourPersonHRZone(stmt);
 				createTableTourType(stmt);
 				createTableTourMarker(stmt);
 				createTableTourReference(stmt);
 				createTableTourCompared(stmt);
+				createTableTourBike(stmt);
+
 				createTableVersion(stmt);
 
-				createTableTourTagV5(stmt);
-				createTableTourTagCategoryV5(stmt);
+				createTableTourTag(stmt);
+				createTableTourTagCategory(stmt);
 
-				createTableTourWayPointV10(stmt);
+				createTableTourWayPoint(stmt);
 
 				_isTableChecked = true;
 
@@ -1701,12 +1707,14 @@ public class TourDatabase {
 	}
 
 	/**
-	 * Create index for {@link TourData} will dramatically improve performance
+	 * Create index for {@link TourData} will dramatically improve performance *
+	 * <p>
+	 * since db version 5
 	 * 
 	 * @param stmt
 	 * @throws SQLException
 	 */
-	private void createIndexTourDataV5(final Statement stmt) throws SQLException {
+	private void createIndexTourData(final Statement stmt) throws SQLException {
 
 		String sql;
 
@@ -1727,6 +1735,44 @@ public class TourDatabase {
 		 */
 		sql = "CREATE INDEX TourPerson" + " ON " + TABLE_TOUR_DATA + " (tourPerson_personId)"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		exec(stmt, sql);
+	}
+
+	/**
+	 * create table {@link #TABLE_TOUR_BIKE}
+	 * 
+	 * @param stmt
+	 * @throws SQLException
+	 */
+	private void createTableTourBike(final Statement stmt) throws SQLException {
+
+		String sql;
+
+		/*
+		 * CREATE TABLE TourBike
+		 */
+		sql = "CREATE TABLE " + TABLE_TOUR_BIKE //									//$NON-NLS-1$
+				+ "(															\n" //$NON-NLS-1$
+				//
+				+ "	bikeId	 		BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1), \n" //$NON-NLS-1$
+				+ "	name			" + varCharKomma(TourBike.DB_LENGTH_NAME) //	//$NON-NLS-1$
+				+ "	weight 			FLOAT,										\n" //$NON-NLS-1$ // kg
+				+ "	typeId 			INTEGER,									\n" //$NON-NLS-1$
+				+ "	frontTyreId	 	INTEGER,									\n" //$NON-NLS-1$
+				+ "	rearTyreId 		INTEGER										\n" //$NON-NLS-1$
+				//
+				+ ")"; //															//$NON-NLS-1$
+
+		exec(stmt, sql);
+
+		/*
+		 * ALTER TABLE TourBike
+		 */
+		sql = "ALTER TABLE " + TABLE_TOUR_BIKE + "								\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	ADD CONSTRAINT " + TABLE_TOUR_BIKE + "_pk					\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	PRIMARY KEY (bikeId)"; //										//$NON-NLS-1$
+
+		exec(stmt, sql);
+
 	}
 
 //	/**
@@ -1766,44 +1812,6 @@ public class TourDatabase {
 //				+ (" ADD CONSTRAINT " + JOINTABLE_TOURCATEGORY__TOURDATA + "_pk") //$NON-NLS-1$ //$NON-NLS-2$
 //				+ (" PRIMARY KEY (" + TABLE_TOUR_CATEGORY + "_categoryId)")); //$NON-NLS-1$ //$NON-NLS-2$
 //	}
-
-	/**
-	 * create table {@link #TABLE_TOUR_BIKE}
-	 * 
-	 * @param stmt
-	 * @throws SQLException
-	 */
-	private void createTableTourBike(final Statement stmt) throws SQLException {
-
-		String sql;
-
-		/*
-		 * CREATE TABLE TourBike
-		 */
-		sql = "CREATE TABLE " + TABLE_TOUR_BIKE //									//$NON-NLS-1$
-				+ "(															\n" //$NON-NLS-1$
-				//
-				+ "	bikeId	 		BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1), \n" //$NON-NLS-1$
-				+ "	name			" + varCharKomma(TourBike.DB_LENGTH_NAME) //	//$NON-NLS-1$
-				+ "	weight 			FLOAT,										\n" //$NON-NLS-1$ // kg
-				+ "	typeId 			INTEGER,									\n" //$NON-NLS-1$
-				+ "	frontTyreId	 	INTEGER,									\n" //$NON-NLS-1$
-				+ "	rearTyreId 		INTEGER										\n" //$NON-NLS-1$
-				//
-				+ ")"; //															//$NON-NLS-1$
-
-		exec(stmt, sql);
-
-		/*
-		 * ALTER TABLE TourBike
-		 */
-		sql = "ALTER TABLE " + TABLE_TOUR_BIKE + "								\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "	ADD CONSTRAINT " + TABLE_TOUR_BIKE + "_pk					\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "	PRIMARY KEY (bikeId)"; //										//$NON-NLS-1$
-
-		exec(stmt, sql);
-
-	}
 
 	/**
 	 * create table {@link #TABLE_TOUR_COMPARED}
@@ -2003,7 +2011,7 @@ public class TourDatabase {
 
 		exec(stmt, sql);
 
-		createIndexTourDataV5(stmt);
+		createIndexTourData(stmt);
 	}
 
 	/**
@@ -2127,6 +2135,66 @@ public class TourDatabase {
 	}
 
 	/**
+	 * Create table {@link #TABLE_TOUR_PERSON_HRZONE}
+	 * <p>
+	 * since db version 16
+	 * 
+	 * @param stmt
+	 * @throws SQLException
+	 */
+	private void createTableTourPersonHRZone(final Statement stmt) throws SQLException {
+
+		String sql;
+
+		/*
+		 * CREATE TABLE TourPersonHRZone
+		 */
+		sql = "CREATE TABLE " + TABLE_TOUR_PERSON_HRZONE //						//$NON-NLS-1$
+				+ "(														\n" //$NON-NLS-1$
+				//
+				+ "	hrZoneId			BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1),\n" //$NON-NLS-1$
+				+ "	" + (TABLE_TOUR_PERSON + "_personId	BIGINT,				\n") //$NON-NLS-1$ //$NON-NLS-2$
+				//
+				+ ("	zoneName		" + varCharKomma(TourPersonHRZone.DB_LENGTH_ZONE_NAME)) //$NON-NLS-1$
+				//
+				+ "	zoneMinValue		INTEGER NOT NULL,					\n" //$NON-NLS-1$
+				+ "	zoneMaxValue		INTEGER NOT NULL					\n" //$NON-NLS-1$
+				//
+				+ ")"; //														//$NON-NLS-1$
+
+		exec(stmt, sql);
+
+		/*
+		 * ALTER TABLE TourPersonHRZone ADD CONSTRAINT TourPersonHRZone_pk PRIMARY KEY (hrZoneId);
+		 */
+		sql = "ALTER TABLE " + TABLE_TOUR_PERSON_HRZONE + "					\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	ADD CONSTRAINT " + TABLE_TOUR_PERSON_HRZONE + "_pk		\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	PRIMARY KEY (hrZoneId)"; //									//$NON-NLS-1$
+
+		exec(stmt, sql);
+
+		sql = "CREATE TABLE " + JOINTABLE_TOURPERSON__TOURPERSON_HRZONE //							//$NON-NLS-1$
+				+ "(																			\n" //$NON-NLS-1$
+				//
+				+ ("	" + TABLE_TOUR_PERSON + "_personId				BIGINT NOT NULL,		\n")//$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	" + TABLE_TOUR_PERSON_HRZONE + "_hrZoneId		BIGINT NOT NULL			\n")//$NON-NLS-1$ //$NON-NLS-2$
+				//
+				+ ")"; //																			//$NON-NLS-1$
+
+		exec(stmt, sql);
+
+		/*
+		 * ALTER TABLE TourPerson_TourPersonHRZone ADD CONSTRAINT TourPerson_TourPersonHRZone_pk
+		 * PRIMARY KEY (TourPerson_personId);
+		 */
+		sql = "ALTER TABLE " + JOINTABLE_TOURPERSON__TOURPERSON_HRZONE + "						\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	ADD CONSTRAINT " + JOINTABLE_TOURPERSON__TOURPERSON_HRZONE + "_pk			\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	PRIMARY KEY (" + TABLE_TOUR_PERSON + "_personId)"; //							//$NON-NLS-1$ //$NON-NLS-2$
+
+		exec(stmt, sql);
+	}
+
+	/**
 	 * create table {@link #TABLE_TOUR_REFERENCE}
 	 * 
 	 * @param stmt
@@ -2185,7 +2253,89 @@ public class TourDatabase {
 		exec(stmt, sql);
 	}
 
-	private void createTableTourTagCategoryV5(final Statement stmt) throws SQLException {
+	/**
+	 * create table {@link #TABLE_TOUR_TAG} *
+	 * <p>
+	 * since db version 5
+	 * 
+	 * @param stmt
+	 * @throws SQLException
+	 */
+	private void createTableTourTag(final Statement stmt) throws SQLException {
+
+		String sql;
+
+		/*
+		 * creates the tables for the tour tags for VERSION 5
+		 */
+
+		/*
+		 * CREATE TABLE TourTag
+		 */
+		sql = "CREATE TABLE " + TABLE_TOUR_TAG //									//$NON-NLS-1$
+				+ "(															\n" //$NON-NLS-1$
+				//
+				+ "	tagId 		BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1),\n" //$NON-NLS-1$
+				+ "	isRoot 		INTEGER,										\n" //$NON-NLS-1$
+				+ "	expandType 	INTEGER,										\n" //$NON-NLS-1$
+				+ ("	name 	" + varCharNoKomma(TourTag.DB_LENGTH_NAME)) //		//$NON-NLS-1$
+				//
+				+ ")"; //															//$NON-NLS-1$
+
+		exec(stmt, sql);
+
+		/*
+		 * ALTER TABLE TourTag ADD CONSTRAINT TourTag_pk PRIMARY KEY (refId);
+		 */
+		sql = "ALTER TABLE " + TABLE_TOUR_TAG + "								\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	ADD CONSTRAINT " + TABLE_TOUR_TAG + "_pk 					\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	PRIMARY KEY (tagId)"; //										//$NON-NLS-1$
+
+		exec(stmt, sql);
+
+		/*
+		 * CREATE TABLE TourData_TourTag
+		 */
+		final String field_TourData_tourId = TABLE_TOUR_DATA + "_tourId"; //		//$NON-NLS-1$
+		final String field_TourTag_tagId = TABLE_TOUR_TAG + "_tagId"; //			//$NON-NLS-1$
+
+		sql = "CREATE TABLE " + JOINTABLE_TOURDATA__TOURTAG //						//$NON-NLS-1$
+				+ "(															\n" //$NON-NLS-1$
+				//
+				+ ("	" + TABLE_TOUR_TAG + "_tagId" + "		BIGINT NOT NULL,	\n")//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				+ ("	" + TABLE_TOUR_DATA + "_tourId" + "		BIGINT NOT NULL		\n")//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				//
+				+ ")"; //															//$NON-NLS-1$
+
+		exec(stmt, sql);
+
+		/*
+		 * Add Constrainsts
+		 */
+		sql = "ALTER TABLE " + JOINTABLE_TOURDATA__TOURTAG + "					\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	ADD CONSTRAINT fk_" + JOINTABLE_TOURDATA__TOURTAG + "_" + field_TourTag_tagId + "\n" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				+ "	FOREIGN KEY (" + TABLE_TOUR_TAG + "_tagId) 					\n"//$NON-NLS-1$ //$NON-NLS-2$
+				+ "	REFERENCES " + TABLE_TOUR_TAG + " (tagId)"; //					//$NON-NLS-1$ //$NON-NLS-2$
+
+		exec(stmt, sql);
+
+		sql = "ALTER TABLE " + JOINTABLE_TOURDATA__TOURTAG + "					\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	ADD CONSTRAINT fk_" + JOINTABLE_TOURDATA__TOURTAG + "_" + field_TourData_tourId //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	FOREIGN KEY (" + TABLE_TOUR_DATA + "_tourId)				\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	REFERENCES " + TABLE_TOUR_DATA + " (tourId)"; //			//$NON-NLS-1$ //$NON-NLS-2$
+
+		exec(stmt, sql);
+	}
+
+	/**
+	 * *
+	 * <p>
+	 * since db version 5
+	 * 
+	 * @param stmt
+	 * @throws SQLException
+	 */
+	private void createTableTourTagCategory(final Statement stmt) throws SQLException {
 
 		/*
 		 * creates the tables for the tour tag categories for VERSION 5
@@ -2287,78 +2437,6 @@ public class TourDatabase {
 	}
 
 	/**
-	 * create table {@link #TABLE_TOUR_TAG}
-	 * 
-	 * @param stmt
-	 * @throws SQLException
-	 */
-	private void createTableTourTagV5(final Statement stmt) throws SQLException {
-
-		String sql;
-
-		/*
-		 * creates the tables for the tour tags for VERSION 5
-		 */
-
-		/*
-		 * CREATE TABLE TourTag
-		 */
-		sql = "CREATE TABLE " + TABLE_TOUR_TAG //									//$NON-NLS-1$
-				+ "(															\n" //$NON-NLS-1$
-				//
-				+ "	tagId 		BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1),\n" //$NON-NLS-1$
-				+ "	isRoot 		INTEGER,										\n" //$NON-NLS-1$
-				+ "	expandType 	INTEGER,										\n" //$NON-NLS-1$
-				+ ("	name 	" + varCharNoKomma(TourTag.DB_LENGTH_NAME)) //		//$NON-NLS-1$
-				//
-				+ ")"; //															//$NON-NLS-1$
-
-		exec(stmt, sql);
-
-		/*
-		 * ALTER TABLE TourTag ADD CONSTRAINT TourTag_pk PRIMARY KEY (refId);
-		 */
-		sql = "ALTER TABLE " + TABLE_TOUR_TAG + "								\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "	ADD CONSTRAINT " + TABLE_TOUR_TAG + "_pk 					\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "	PRIMARY KEY (tagId)"; //										//$NON-NLS-1$
-
-		exec(stmt, sql);
-
-		/*
-		 * CREATE TABLE TourData_TourTag
-		 */
-		final String field_TourData_tourId = TABLE_TOUR_DATA + "_tourId"; //		//$NON-NLS-1$
-		final String field_TourTag_tagId = TABLE_TOUR_TAG + "_tagId"; //			//$NON-NLS-1$
-
-		sql = "CREATE TABLE " + JOINTABLE_TOURDATA__TOURTAG //						//$NON-NLS-1$
-				+ "(															\n" //$NON-NLS-1$
-				//
-				+ ("	" + TABLE_TOUR_TAG + "_tagId" + "		BIGINT NOT NULL,	\n")//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				+ ("	" + TABLE_TOUR_DATA + "_tourId" + "		BIGINT NOT NULL		\n")//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				//
-				+ ")"; //															//$NON-NLS-1$
-
-		exec(stmt, sql);
-
-		/*
-		 * Add Constrainsts
-		 */
-		sql = "ALTER TABLE " + JOINTABLE_TOURDATA__TOURTAG + "					\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "	ADD CONSTRAINT fk_" + JOINTABLE_TOURDATA__TOURTAG + "_" + field_TourTag_tagId + "\n" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				+ "	FOREIGN KEY (" + TABLE_TOUR_TAG + "_tagId) 					\n"//$NON-NLS-1$ //$NON-NLS-2$
-				+ "	REFERENCES " + TABLE_TOUR_TAG + " (tagId)"; //					//$NON-NLS-1$ //$NON-NLS-2$
-
-		exec(stmt, sql);
-
-		sql = "ALTER TABLE " + JOINTABLE_TOURDATA__TOURTAG + "					\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "	ADD CONSTRAINT fk_" + JOINTABLE_TOURDATA__TOURTAG + "_" + field_TourData_tourId //$NON-NLS-1$ //$NON-NLS-2$
-				+ "	FOREIGN KEY (" + TABLE_TOUR_DATA + "_tourId)				\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "	REFERENCES " + TABLE_TOUR_DATA + " (tourId)"; //			//$NON-NLS-1$ //$NON-NLS-2$
-
-		exec(stmt, sql);
-	}
-
-	/**
 	 * create table {@link #TABLE_TOUR_TYPE}
 	 * 
 	 * @param stmt
@@ -2401,12 +2479,14 @@ public class TourDatabase {
 	}
 
 	/**
-	 * create table {@link #TABLE_TOUR_WAYPOINT}
+	 * create table {@link #TABLE_TOUR_WAYPOINT} *
+	 * <p>
+	 * since db version 10
 	 * 
 	 * @param stmt
 	 * @throws SQLException
 	 */
-	private void createTableTourWayPointV10(final Statement stmt) throws SQLException {
+	private void createTableTourWayPoint(final Statement stmt) throws SQLException {
 
 		String sql;
 
@@ -2719,7 +2799,7 @@ public class TourDatabase {
 			}
 
 			if (currentDbVersion == 15) {
-				currentDbVersion = newVersion = updateDbDesign_015_016(conn, monitor);
+				currentDbVersion = newVersion = updateDbDesign_015_to_016(conn, monitor);
 			}
 
 			/*
@@ -2914,9 +2994,9 @@ public class TourDatabase {
 
 		final Statement stmt = conn.createStatement();
 		{
-			createTableTourTagV5(stmt);
-			createTableTourTagCategoryV5(stmt);
-			createIndexTourDataV5(stmt);
+			createTableTourTag(stmt);
+			createTableTourTagCategory(stmt);
+			createIndexTourData(stmt);
 		}
 		stmt.close();
 
@@ -3058,7 +3138,7 @@ public class TourDatabase {
 
 		final Statement stmt = conn.createStatement();
 		{
-			createTableTourWayPointV10(stmt);
+			createTableTourWayPoint(stmt);
 
 			/**
 			 * resize description column: ref derby docu page 24
@@ -3339,7 +3419,7 @@ public class TourDatabase {
 		return newDbVersion;
 	}
 
-	private int updateDbDesign_015_016(final Connection conn, final IProgressMonitor monitor) throws SQLException {
+	private int updateDbDesign_015_to_016(final Connection conn, final IProgressMonitor monitor) throws SQLException {
 
 		final int newDbVersion = 16;
 
@@ -3348,6 +3428,12 @@ public class TourDatabase {
 		if (monitor != null) {
 			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, newDbVersion));
 		}
+
+		String sql;
+		final Statement stmt = conn.createStatement();
+		{
+
+			createTableTourPersonHRZone(stmt);
 
 //		TOURPERSON TOURPERSON TOURPERSON TOURPERSON TOURPERSON TOURPERSON
 //
@@ -3358,9 +3444,6 @@ public class TourDatabase {
 //
 //		TOURPERSON TOURPERSON TOURPERSON TOURPERSON TOURPERSON TOURPERSON
 
-		String sql;
-		final Statement stmt = conn.createStatement();
-		{
 			sql = "ALTER TABLE " + TABLE_TOUR_PERSON + " ADD COLUMN Gender				INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
 			exec(stmt, sql);
 
