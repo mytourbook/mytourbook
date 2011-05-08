@@ -135,9 +135,9 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 	private TourPerson					_selectedPerson;
 	private TourPerson					_newPerson;
+	private Set<TourPersonHRZone>		_backupSelectedPersonHrZones;
 
 	private org.joda.time.DateTime		_today						= new org.joda.time.DateTime().withTime(0, 0, 0, 0);
-//	private org.joda.time.DateTime		_today1970					= new org.joda.time.DateTime().getMillis();
 
 	private PixelConverter				_pc;
 
@@ -163,6 +163,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	private Button						_rdoGenderFemale;
 
 	private ScrolledComposite			_hrZoneScrolledContainer;
+	private Button						_btnModifyHrZones;
 	private Combo						_cboTemplate;
 	private Combo						_cboHrMaxFormula;
 	private DateTime					_dtBirthday;
@@ -186,9 +187,42 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		}
 	}
 
+	private void actionCreateFromTemplate() {
+
+		final int selectedTemplate = _cboTemplate.getSelectionIndex();
+
+		// reselect first item
+		_cboTemplate.select(TrainingManager.HR_ZONE_TEMPLATE_00);
+
+		if (selectedTemplate == TrainingManager.HR_ZONE_TEMPLATE_00) {
+			// just ignore it
+			return;
+		}
+
+		final TourPerson person = getCurrentPerson();
+		final Set<TourPersonHRZone> hrZones = person.getHrZones();
+
+		// check if hr zones are already available
+		if (hrZones != null && hrZones.size() > 0) {
+
+			// hr zones are availabe
+			if (MessageDialog.openQuestion(
+					getShell(),
+					Messages.Pref_People_Dialog_ReplaceHrZones_Title,
+					Messages.Pref_People_Dialog_ReplaceHrZones_Message) == false) {
+				return;
+			}
+		}
+
+		person.setHrZones(TrainingManager.createHrZones(person, selectedTemplate));
+
+		updateUIFromPerson(getCurrentPerson());
+		onModifyPerson();
+	}
+
 	private void actionEditHrZones() {
 
-		if (new DialogHRZones(getShell(), _selectedPerson).open() == Window.OK) {
+		if (new DialogHRZones(getShell(), getCurrentPerson()).open() == Window.OK) {
 
 			createUI80HrZoneInnerContainer();
 			onModifyPerson();
@@ -370,6 +404,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 		_peopleViewer.addDoubleClickListener(new IDoubleClickListener() {
 			public void doubleClick(final DoubleClickEvent event) {
+				_tabFolderPerson.setSelection(0);
 				_txtFirstName.setFocus();
 				_txtFirstName.selectAll();
 			}
@@ -446,14 +481,12 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			// tab: hr zone
 			final TabItem tabItemHRZone = new TabItem(_tabFolderPerson, SWT.NONE);
 			tabItemHRZone.setText(Messages.Pref_People_Tab_HRZone);
-			final Control hrZone = createUI60TabHRZone(_tabFolderPerson);
-			tabItemHRZone.setControl(hrZone);
+			tabItemHRZone.setControl(createUI60TabHRZone(_tabFolderPerson));
 
 			// tab: data transfer
 			final TabItem tabItemDataTransfer = new TabItem(_tabFolderPerson, SWT.NONE);
 			tabItemDataTransfer.setText(Messages.Pref_People_Tab_DataTransfer);
-			final Control dataTransfer = createUI90TabDataTransfer(_tabFolderPerson);
-			tabItemDataTransfer.setControl(dataTransfer);
+			tabItemDataTransfer.setControl(createUI90TabDataTransfer(_tabFolderPerson));
 		}
 	}
 
@@ -467,10 +500,15 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		{
 			createUI51FieldFirstName(container);
 			createUI52FieldLastName(container);
-			createUI54FieldWeight(container);
-			createUI56FieldHeight(container);
-		}
 
+			createUI53FieldBirthday(container);
+			createUI54FieldGender(container);
+			createUI55FieldWeight(container);
+			createUI56FieldHeight(container);
+
+			createUI57RestingHR(container);
+			createUI58MaxHR(container);
+		}
 		container.layout(true, true);
 
 		return container;
@@ -509,9 +547,83 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	}
 
 	/**
+	 * field: birthday
+	 */
+	private void createUI53FieldBirthday(final Composite parent) {
+
+		/*
+		 * date-time: birthday
+		 */
+		final Label label = new Label(parent, SWT.NONE);
+		label.setText(Messages.Pref_People_Label_Birthday);
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.span(2, 1)
+				.applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+
+			_dtBirthday = new DateTime(container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.BEGINNING, SWT.FILL)
+					.applyTo(_dtBirthday);
+			_dtBirthday.addSelectionListener(_defaultSelectionListener);
+			_dtBirthday.addKeyListener(new KeyListener() {
+
+				@Override
+				public void keyPressed(final KeyEvent e) {}
+
+				@Override
+				public void keyReleased(final KeyEvent e) {
+					/*
+					 * key listener is necessary because the selection listener is not fired when
+					 * the values are modified with mouse wheel up/down
+					 */
+					updateUIHrMax(getSelectedHrMaxFormulaKey(), _spinnerMaxHR.getSelection());
+				}
+			});
+
+			/*
+			 * label: age
+			 */
+			_lblAge = new Label(container, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.FILL, SWT.CENTER)
+					.applyTo(_lblAge);
+		}
+	}
+
+	/**
+	 * field: gender
+	 */
+	private void createUI54FieldGender(final Composite parent) {
+
+		// label
+		final Label label = new Label(parent, SWT.NONE);
+		label.setText(Messages.Pref_People_Label_Gender);
+
+		// radio
+		final Composite containerGender = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.span(2, 1)
+				.applyTo(containerGender);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerGender);
+		{
+			_rdoGenderMale = new Button(containerGender, SWT.RADIO);
+			_rdoGenderMale.setText(Messages.Pref_People_Label_GenderMale);
+			_rdoGenderMale.addSelectionListener(_defaultSelectionListener);
+
+			_rdoGenderFemale = new Button(containerGender, SWT.RADIO);
+			_rdoGenderFemale.setText(Messages.Pref_People_Label_GenderFemale);
+			_rdoGenderFemale.addSelectionListener(_defaultSelectionListener);
+		}
+	}
+
+	/**
 	 * field: weight
 	 */
-	private void createUI54FieldWeight(final Composite parent) {
+	private void createUI55FieldWeight(final Composite parent) {
 
 		Label label = new Label(parent, SWT.NONE);
 		label.setText(Messages.Pref_People_Label_weight);
@@ -586,115 +698,17 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		new Label(parent, SWT.NONE);
 	}
 
-	private Control createUI60TabHRZone(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.grab(true, true)
-				.applyTo(container);
-		GridLayoutFactory.swtDefaults().numColumns(1).extendedMargins(0, 0, 7, 0).applyTo(container);
-		{
-
-			final Composite containerPerson = new Composite(container, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-//					.grab(true, true)
-					.applyTo(containerPerson);
-			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerPerson);
-			{
-				createUI61FieldGender(containerPerson);
-				createUI62FieldBirthday(containerPerson);
-				createUI66RestingHR(containerPerson);
-				createUI68MaxHR(containerPerson);
-			}
-
-			createUI70HRZone(container);
-		}
-
-		return container;
-	}
-
-	/**
-	 * field: gender
-	 */
-	private void createUI61FieldGender(final Composite parent) {
-
-		// label
-		final Label label = new Label(parent, SWT.NONE);
-		label.setText(Messages.Pref_People_Label_Gender);
-
-		// radio
-		final Composite containerGender = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.applyTo(containerGender);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerGender);
-		{
-			_rdoGenderMale = new Button(containerGender, SWT.RADIO);
-			_rdoGenderMale.setText(Messages.Pref_People_Label_GenderMale);
-			_rdoGenderMale.addSelectionListener(_defaultSelectionListener);
-
-			_rdoGenderFemale = new Button(containerGender, SWT.RADIO);
-			_rdoGenderFemale.setText(Messages.Pref_People_Label_GenderFemale);
-			_rdoGenderFemale.addSelectionListener(_defaultSelectionListener);
-		}
-	}
-
-	/**
-	 * field: birthday
-	 */
-	private void createUI62FieldBirthday(final Composite parent) {
-
-		/*
-		 * date-time: birthday
-		 */
-		final Label label = new Label(parent, SWT.NONE);
-		label.setText(Messages.Pref_People_Label_Birthday);
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-		{
-
-			_dtBirthday = new DateTime(container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
-			GridDataFactory.fillDefaults()//
-					.align(SWT.BEGINNING, SWT.FILL)
-					.applyTo(_dtBirthday);
-			_dtBirthday.addSelectionListener(_defaultSelectionListener);
-			_dtBirthday.addKeyListener(new KeyListener() {
-
-				@Override
-				public void keyPressed(final KeyEvent e) {}
-
-				@Override
-				public void keyReleased(final KeyEvent e) {
-					/*
-					 * listener is necessary because the selection listener is not fired when the
-					 * values are modified with mouse up/down
-					 */
-					updateUIAge();
-				}
-			});
-
-			/*
-			 * label: age
-			 */
-			_lblAge = new Label(container, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.align(SWT.FILL, SWT.CENTER)
-					.applyTo(_lblAge);
-		}
-	}
-
 	/**
 	 * field: resting hr
 	 */
-	private void createUI66RestingHR(final Composite parent) {
+	private void createUI57RestingHR(final Composite parent) {
 
 		Label label = new Label(parent, SWT.NONE);
 		label.setText(Messages.Pref_People_Label_RestingHR);
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
+				.span(2, 1)
 				.applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 		{
@@ -723,7 +737,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	/**
 	 * field: max hr
 	 */
-	private void createUI68MaxHR(final Composite parent) {
+	private void createUI58MaxHR(final Composite parent) {
 
 		Label label = new Label(parent, SWT.NONE);
 		label.setText(Messages.Pref_People_Label_MaxHR);
@@ -731,6 +745,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
 				.grab(true, false)
+				.span(2, 1)
 				.applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 		{
@@ -768,7 +783,12 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 					.hint(50, SWT.DEFAULT)
 					.applyTo(_cboHrMaxFormula);
 			_cboHrMaxFormula.setVisibleItemCount(20);
-			_cboHrMaxFormula.addSelectionListener(_defaultSelectionListener);
+			_cboHrMaxFormula.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onSelectHrMax();
+				}
+			});
 
 			// fill combobox
 			final String[] hrMaxFormulaNames = TrainingManager.HRMaxFormulaNames;
@@ -776,6 +796,21 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 				_cboHrMaxFormula.add(formulaName);
 			}
 		}
+	}
+
+	private Control createUI60TabHRZone(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.grab(true, true)
+				.applyTo(container);
+		GridLayoutFactory.swtDefaults().numColumns(1).extendedMargins(0, 0, 7, 0).applyTo(container);
+		{
+
+			createUI70HRZone(container);
+		}
+
+		return container;
 	}
 
 	private void createUI70HRZone(final Composite parent) {
@@ -792,13 +827,15 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			 */
 
 			// scrolled container
-			_hrZoneScrolledContainer = new ScrolledComposite(hrZoneContainer, SWT.V_SCROLL | SWT.BORDER);
+			_hrZoneScrolledContainer = new ScrolledComposite(hrZoneContainer, //
+					SWT.V_SCROLL
+//					| SWT.BORDER
+			);
 			GridDataFactory.fillDefaults()//
 					.grab(true, true)
-					.indent(0, 15)
-					.hint(SWT.DEFAULT, convertHeightInCharsToPixels(10))
+					.hint(SWT.DEFAULT, convertHeightInCharsToPixels(9))
 					.applyTo(_hrZoneScrolledContainer);
-			_hrZoneScrolledContainer.setAlwaysShowScrollBars(true);
+//			_hrZoneScrolledContainer.setAlwaysShowScrollBars(true);
 			_hrZoneScrolledContainer.setExpandVertical(true);
 			_hrZoneScrolledContainer.setExpandHorizontal(true);
 
@@ -812,47 +849,67 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 				}
 			});
 
-			final Composite actionContainer = new Composite(hrZoneContainer, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(actionContainer);
-			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(actionContainer);
-			{
-				/*
-				 * combo: formula to compute hr max
-				 */
-				_cboTemplate = new Combo(actionContainer, SWT.READ_ONLY | SWT.DROP_DOWN);
-				GridDataFactory.fillDefaults() //
-//						.grab(true, false)
-//						.indent(5, 0)
-//						.hint(50, SWT.DEFAULT)
-						.applyTo(_cboTemplate);
-				_cboTemplate.setToolTipText(Messages.Pref_People_Combo_Template_Tooltip);
-				_cboTemplate.setVisibleItemCount(20);
-				_cboTemplate.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent e) {
-						onCreateFromTemplate();
-					}
-				});
+			createUI72HrZoneActions(hrZoneContainer);
+		}
+	}
 
-				// fill combobox
-				for (final String hrZoneTemplate : TrainingManager.HR_ZONE_TEMPLATES) {
-					_cboTemplate.add(hrZoneTemplate);
+	private void createUI72HrZoneActions(final Composite parent) {
+
+		// compute size for the combo first item
+		Label label = new Label(parent, SWT.NONE);
+		label.setText(Messages.HR_Zone_Template_Select);
+		final Point comboSize = label.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+		label.dispose();
+
+		final Composite actionContainer = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(actionContainer);
+		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(actionContainer);
+		{
+			/*
+			 * label
+			 */
+			label = new Label(actionContainer, SWT.NONE);
+			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+			label.setText(Messages.Pref_People_Label_HrZoneTemplate);
+
+			/*
+			 * combo: formula to compute hr max
+			 */
+
+			_cboTemplate = new Combo(actionContainer, SWT.READ_ONLY | SWT.DROP_DOWN);
+			GridDataFactory.fillDefaults() //
+					.hint(comboSize.x, SWT.DEFAULT)
+					.applyTo(_cboTemplate);
+			_cboTemplate.setToolTipText(Messages.Pref_People_Label_HrZoneTemplate_Tooltip);
+			_cboTemplate.setVisibleItemCount(20);
+			_cboTemplate.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					actionCreateFromTemplate();
 				}
-				_cboTemplate.select(TrainingManager.HR_ZONE_TEMPLATE_00);
+			});
 
-				/*
-				 * button: edit hr zones
-				 */
-				final Button button = new Button(actionContainer, SWT.PUSH);
-				GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(button);
-				button.setText(Messages.Dialog_HRZone_Button_ModifyHrZones);
-				button.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent e) {
-						actionEditHrZones();
-					}
-				});
+			// fill combobox
+			for (final String hrZoneTemplate : TrainingManager.HR_ZONE_TEMPLATES) {
+				_cboTemplate.add(hrZoneTemplate);
 			}
+			_cboTemplate.select(TrainingManager.HR_ZONE_TEMPLATE_00);
+
+			/*
+			 * button: edit hr zones
+			 */
+			_btnModifyHrZones = new Button(actionContainer, SWT.PUSH);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.END, SWT.FILL)
+					.grab(true, false)
+					.applyTo(_btnModifyHrZones);
+			_btnModifyHrZones.setText(Messages.Dialog_HRZone_Button_EditHrZones);
+			_btnModifyHrZones.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					actionEditHrZones();
+				}
+			});
 		}
 	}
 
@@ -869,11 +926,18 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 		// hr zone container
 		final Composite innerContainer = new Composite(_hrZoneScrolledContainer, SWT.NONE);
-		GridLayoutFactory.swtDefaults().numColumns(5).applyTo(innerContainer);
+		GridLayoutFactory.fillDefaults().numColumns(5).extendedMargins(0, 5, 0, 0).applyTo(innerContainer);
 //		innerContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
-			createUI82HrZoneHeader(innerContainer);
-			createUI84HrZoneFields(innerContainer);
+			final Set<TourPersonHRZone> hrZones = getCurrentPerson().getHrZones();
+
+			if (hrZones == null || hrZones.size() == 0) {
+				// hr zones are not available, show info
+				createUI81HrZoneInfo(innerContainer);
+			} else {
+				createUI82HrZoneHeader(innerContainer);
+				createUI84HrZoneFields(innerContainer);
+			}
 		}
 
 		_hrZoneScrolledContainer.setContent(innerContainer);
@@ -887,16 +951,21 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		}
 	}
 
+	private void createUI81HrZoneInfo(final Composite parent) {
+
+		final Label label = new Label(parent, SWT.WRAP);
+		GridDataFactory.fillDefaults().applyTo(label);
+		label.setText(Messages.Pref_People_Label_HrZoneInfo);
+	}
+
 	private void createUI82HrZoneHeader(final Composite parent) {
 
 		/*
 		 * label: zone
 		 */
 		Label label = new Label(parent, SWT.NONE);
-		GridDataFactory
-				.fillDefaults()
-				.grab(true, false)
-				.hint(250, SWT.DEFAULT)
+		GridDataFactory.fillDefaults().grab(true, false)
+//				.hint(250, SWT.DEFAULT)
 				.align(SWT.FILL, SWT.BOTTOM)
 				.applyTo(label);
 		label.setText(Messages.Dialog_HRZone_Label_Header_Zone);
@@ -932,12 +1001,12 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 	private void createUI84HrZoneFields(final Composite parent) {
 
-		if (_selectedPerson == null) {
+		final TourPerson currentPerson = getCurrentPerson();
+		if (currentPerson == null) {
 			return;
 		}
 
-		final Set<TourPersonHRZone> setHrZones = _selectedPerson.getHrZones();
-		final ArrayList<TourPersonHRZone> hrZones = new ArrayList<TourPersonHRZone>(setHrZones);
+		final ArrayList<TourPersonHRZone> hrZones = new ArrayList<TourPersonHRZone>(currentPerson.getHrZones());
 
 		Collections.sort(hrZones);
 
@@ -947,7 +1016,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 			final TourPersonHRZone hrZone = hrZones.get(zoneIndex);
 
-			final String zoneName = hrZone.getZoneName();
 			final int zoneMinValue = hrZone.getZoneMinValue();
 			final int zoneMaxValue = hrZone.getZoneMaxValue();
 
@@ -956,20 +1024,20 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			 */
 			Label label = new Label(parent, SWT.NONE);
 			GridDataFactory.fillDefaults().applyTo(label);
-			label.setText(zoneName == null ? UI.EMPTY_STRING : zoneName);
+			label.setText(hrZone.getName());
 
 			/*
 			 * label: min pulse
 			 */
 			label = new Label(parent, SWT.NONE);
-			GridDataFactory.fillDefaults().applyTo(label);
+			GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.FILL).applyTo(label);
 			label.setText(zoneMinValue == Integer.MIN_VALUE ? UI.EMPTY_STRING : Integer.toString(zoneMinValue));
 
 			/*
 			 * label: ...
 			 */
 			label = new Label(parent, SWT.NONE);
-			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+			GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.FILL).applyTo(label);
 			label.setText(zoneMinValue == Integer.MIN_VALUE || zoneMaxValue == Integer.MAX_VALUE
 					? UI.EMPTY_STRING
 					: UI.SYMBOL_DASH);
@@ -978,7 +1046,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			 * spinner: max pulse
 			 */
 			label = new Label(parent, SWT.NONE);
-			GridDataFactory.fillDefaults().applyTo(label);
+			GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.FILL).applyTo(label);
 			label.setText(zoneMaxValue == Integer.MAX_VALUE ? UI.EMPTY_STRING : Integer.toString(zoneMaxValue));
 
 			/*
@@ -997,6 +1065,17 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 //				.grab(true, false)
 				.applyTo(container);
 		{
+			/*
+			 * label: info
+			 */
+			final Label label = new Label(container, SWT.WRAP);
+			GridDataFactory.fillDefaults()//
+					.span(3, 1)
+//					.indent(0, 15)
+					.hint(UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
+					.applyTo(label);
+			label.setText(Messages.Pref_People_Label_DataTransfer);
+
 			createUI92FieldSportComputer(container);
 			createUI94FieldRawDataPath(container);
 		}
@@ -1021,10 +1100,12 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 		// label
 		final Label label = new Label(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().indent(0, 15).align(SWT.FILL, SWT.CENTER).applyTo(label);
 		label.setText(Messages.Pref_People_Label_device);
 
 		// combo
 		_cboSportComputer = new Combo(parent, SWT.READ_ONLY | SWT.DROP_DOWN);
+		GridDataFactory.swtDefaults().indent(0, 15).applyTo(_cboSportComputer);
 		_cboSportComputer.setVisibleItemCount(20);
 		_cboSportComputer.addSelectionListener(_defaultSelectionListener);
 
@@ -1037,6 +1118,9 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	 */
 	private void createUI94FieldRawDataPath(final Composite parent) {
 
+		/*
+		 * editor: raw data path
+		 */
 		_rawDataPathEditor = new DirectoryFieldEditor(
 				ITourbookPreferences.DUMMY_FIELD,
 				Messages.Pref_People_Label_DefaultDataTransferFilePath,
@@ -1049,18 +1133,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 		_txtRawDataPath = _rawDataPathEditor.getTextControl(parent);
 		_txtRawDataPath.addModifyListener(_defaultModifyListener);
-
-		/*
-		 * label: info
-		 */
-		final Label label = new Label(parent, SWT.WRAP);
-		GridDataFactory
-				.fillDefaults()
-				.span(3, 1)
-				.indent(0, 15)
-				.hint(UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
-				.applyTo(label);
-		label.setText(Messages.Pref_People_Label_DataTransfer);
 	}
 
 	private void defineAllColumns(final TableColumnLayout tableLayout) {
@@ -1196,11 +1268,15 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		_btnUpdate.setEnabled(_isPersonModified && isValid);
 		_btnCancel.setEnabled(_isPersonModified);
 
-		final int selectedHrMaxFormulaKey = getSelectedHrMaxFormulaKey();
+		_spinnerMaxHR.setEnabled(getSelectedHrMaxFormulaKey() == TrainingManager.HR_MAX_NOT_COMPUTED);
 
-		_spinnerMaxHR.setEnabled(selectedHrMaxFormulaKey == TrainingManager.HR_MAX_FORMULA_MANUAL);
+		final TourPerson currentPerson = getCurrentPerson();
+		if (currentPerson != null) {
 
-		updateUIOnModify(selectedHrMaxFormulaKey);
+			final Set<TourPersonHRZone> hrZones = currentPerson.getHrZones();
+			final boolean isHrZoneAvailable = hrZones != null && hrZones.size() > 0;
+			_btnModifyHrZones.setEnabled(isHrZoneAvailable);
+		}
 	}
 
 	private void fireModifyEvent() {
@@ -1230,7 +1306,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 	/**
 	 * @return Returns person which is currently displayed, one person is at least available
-	 *         therefor this should never return <code>null</code>.
+	 *         therefor this should never return <code>null</code> but it can be <code>null</code>
+	 *         when the application is started the first time and people are not yet created.
 	 */
 	private TourPerson getCurrentPerson() {
 
@@ -1239,11 +1316,12 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	}
 
 	/**
-	 * @return Returns the key for the selected Hr max formula.
+	 * @return Returns the key for the selected HR max formula in the combo box.
 	 */
 	private int getSelectedHrMaxFormulaKey() {
 
 		int selectedIndex = _cboHrMaxFormula.getSelectionIndex();
+
 		if (selectedIndex == -1) {
 			selectedIndex = 0;
 			_cboHrMaxFormula.select(0);
@@ -1347,43 +1425,12 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		_newPerson = null;
 		_isPersonModified = false;
 
+		_selectedPerson.setHrZones(_backupSelectedPersonHrZones);
+
 		updateUIFromPerson(_selectedPerson);
 		enableActions();
 
 		_peopleViewer.getTable().setFocus();
-	}
-
-	private void onCreateFromTemplate() {
-
-		final int selectedTemplate = _cboTemplate.getSelectionIndex();
-
-		// reselect first item
-		_cboTemplate.select(TrainingManager.HR_ZONE_TEMPLATE_00);
-
-		if (selectedTemplate == TrainingManager.HR_ZONE_TEMPLATE_00) {
-			// just ignore
-			return;
-		}
-
-		final TourPerson person = getCurrentPerson();
-		final Set<TourPersonHRZone> hrZones = person.getHrZones();
-
-		// check if hr zones are already available
-		if (hrZones != null && hrZones.size() > 0) {
-
-			// hr zones are availabe
-			if (MessageDialog.openQuestion(
-					getShell(),
-					Messages.Pref_People_Dialog_ReplaceHrZones_Title,
-					Messages.Pref_People_Dialog_ReplaceHrZones_Message) == false) {
-				return;
-			}
-		}
-
-		person.setHrZones(TrainingManager.createHrZones(person, selectedTemplate));
-
-		updateUIFromPerson(getCurrentPerson());
-		onModifyPerson();
 	}
 
 	/**
@@ -1400,6 +1447,13 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		enableActions();
 	}
 
+	private void onSelectHrMax() {
+
+		updateUIHrMax(getSelectedHrMaxFormulaKey(), _spinnerMaxHR.getSelection());
+
+		onModifyPerson();
+	}
+
 	private void onSelectPerson() {
 
 		final IStructuredSelection selection = (IStructuredSelection) _peopleViewer.getSelection();
@@ -1409,11 +1463,15 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 			_selectedPerson = person;
 
+			_backupSelectedPersonHrZones = person.getHrZones();
+
 			updateUIFromPerson(_selectedPerson);
 
 		} else {
 			// irgnore, this can happen when a refresh() of the table viewer is done
 		}
+
+		enableActions();
 	}
 
 	private void onUpdatePerson() {
@@ -1428,6 +1486,13 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 	@Override
 	public boolean performCancel() {
+
+		if (_isPersonModified && _newPerson == null) {
+
+			// existing person is modified, reset hr zones
+
+			_selectedPerson.setHrZones(_backupSelectedPersonHrZones);
+		}
 
 		saveState();
 		fireModifyEvent();
@@ -1487,7 +1552,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	private void savePerson(final boolean isAskToSave) {
 
 		final boolean isNewPerson = _newPerson != null;
-		final TourPerson person = isNewPerson ? _newPerson : _selectedPerson;
+		final TourPerson person = getCurrentPerson();
 		_newPerson = null;
 
 		if (_isPersonModified) {
@@ -1506,6 +1571,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 					_isPersonModified = false;
 
 					// update ui from the previous selected person
+					_selectedPerson.setHrZones(_backupSelectedPersonHrZones);
 					updateUIFromPerson(_selectedPerson);
 
 					return;
@@ -1549,58 +1615,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		_state.put(STATE_SELECTED_TAB_FOLDER, selectedTab < 0 ? 0 : selectedTab);
 	}
 
-	/**
-	 * select device in the combo box
-	 */
-	private void selectDevice(final TourPerson person) {
-
-		final String deviceId = person.getDeviceReaderId();
-
-		if (deviceId == null) {
-			_cboSportComputer.select(0);
-		} else {
-
-			int deviceIndex = 0;
-
-			for (final ExternalDevice device : _deviceList) {
-
-				if (device != null) {
-					if (deviceId.equals(device.deviceId)) {
-						_cboSportComputer.select(deviceIndex);
-						break;
-					}
-				}
-
-				deviceIndex++;
-			}
-
-			// when the device id was not found, select "<no selection>" entry
-			if (deviceIndex == 0) {
-				_cboSportComputer.select(0);
-			}
-		}
-	}
-
-	/**
-	 * hr max formula
-	 */
-	private void selectHrMaxFormula(final TourPerson person) {
-
-		final int hrMaxFormula = person.getHrMaxFormula();
-		int selectionIndex = -1;
-		for (final int formulaKey : TrainingManager.HRMaxFormulaKeys) {
-			if (formulaKey == hrMaxFormula) {
-				selectionIndex = hrMaxFormula;
-				break;
-			}
-		}
-		if (selectionIndex == -1) {
-			// set default value
-			selectionIndex = 0;
-		}
-		_cboHrMaxFormula.select(selectionIndex);
-	}
-
 	private void updatePersonFromUI(final TourPerson person) {
 
 		String deviceId = null;
@@ -1628,8 +1642,12 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		// hr max formula
 		final int hrMaxSelectionIndex = _cboHrMaxFormula.getSelectionIndex();
 		person.setHrMaxFormula(TrainingManager.HRMaxFormulaKeys[hrMaxSelectionIndex]);
+		person.setMaxPulse(_spinnerMaxHR.getSelection());
 	}
 
+	/**
+	 * @return Returns age from the birthday in the UI
+	 */
 	private int updateUIAge() {
 
 		final Period age = new Period(getBirthdayFromUI(), _today.getMillis());
@@ -1670,44 +1688,103 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			_rdoGenderFemale.setSelection(gender != 0);
 			_spinnerRestingHR.setSelection(restPulse == 0 ? TourPerson.DEFAULT_REST_PULSE : restPulse);
 
-			updateUIAge();
-
-			selectHrMaxFormula(person);
-			selectDevice(person);
+			updateUIHrMax(person.getHrMaxFormula(), person.getMaxPulse());
+			updateUISportComputer(person);
 
 			createUI80HrZoneInnerContainer();
 		}
 		_isUpdateUI = false;
 	}
 
-	private void updateUIOnModify(final int selectedHrMaxFormulaKey) {
+	/**
+	 * hr max formula
+	 * 
+	 * @param hrMaxFormulaKey
+	 * @param maxPulse
+	 */
+	private void updateUIHrMax(final int hrMaxFormulaKey, final int maxPulse) {
 
-		final int age = updateUIAge();
+		if (hrMaxFormulaKey == TrainingManager.HR_MAX_NOT_COMPUTED) {
 
-		if (selectedHrMaxFormulaKey == TrainingManager.HR_MAX_FORMULA_220_AGE) {
+			// hr max is not computed
 
-			// HRmax = 220 - age
+			_cboHrMaxFormula.select(TrainingManager.HRMaxFormulaKeys.length - 1);
+			_spinnerMaxHR.setSelection(maxPulse);
 
-			_spinnerMaxHR.setSelection(220 - age);
+		} else {
 
-		} else if (selectedHrMaxFormulaKey == TrainingManager.HR_MAX_FORMULA_205_8) {
+			int selectionIndex = -1;
+			for (final int formulaKey : TrainingManager.HRMaxFormulaKeys) {
+				if (formulaKey == hrMaxFormulaKey) {
+					selectionIndex = hrMaxFormulaKey;
+					break;
+				}
+			}
 
-			// HRmax = 205.8 - (0.685 x age)
+			if (selectionIndex == -1) {
+				// set default value
+				selectionIndex = 0;
+			}
+			_cboHrMaxFormula.select(selectionIndex);
 
-			_spinnerMaxHR.setSelection((int) (205.8 - (0.685 * age)));
+			final int age = updateUIAge();
 
-		} else if (selectedHrMaxFormulaKey == TrainingManager.HR_MAX_FORMULA_206_9) {
+			if (hrMaxFormulaKey == TrainingManager.HR_MAX_FORMULA_220_AGE) {
 
-			//  HRmax = 206.9 - (0.67 x age)
+				// HRmax = 220 - age
 
-			_spinnerMaxHR.setSelection((int) (206.9 - (0.67 * age)));
+				_spinnerMaxHR.setSelection(220 - age);
 
-		} else if (selectedHrMaxFormulaKey == TrainingManager.HR_MAX_FORMULA_191_5) {
+			} else if (hrMaxFormulaKey == TrainingManager.HR_MAX_FORMULA_205_8) {
 
-			//  HRmax = 191.5 - (0.007 x age2)
+				// HRmax = 205.8 - (0.685 x age)
 
-			_spinnerMaxHR.setSelection((int) (191.5 - (0.007 * age * age)));
+				_spinnerMaxHR.setSelection((int) (205.8 - (0.685 * age)));
+
+			} else if (hrMaxFormulaKey == TrainingManager.HR_MAX_FORMULA_206_9) {
+
+				//  HRmax = 206.9 - (0.67 x age)
+
+				_spinnerMaxHR.setSelection((int) (206.9 - (0.67 * age)));
+
+			} else if (hrMaxFormulaKey == TrainingManager.HR_MAX_FORMULA_191_5) {
+
+				//  HRmax = 191.5 - (0.007 x age2)
+
+				_spinnerMaxHR.setSelection((int) (191.5 - (0.007 * age * age)));
+			}
 		}
+	}
 
+	/**
+	 * select device in the combo box
+	 */
+	private void updateUISportComputer(final TourPerson person) {
+
+		final String deviceId = person.getDeviceReaderId();
+
+		if (deviceId == null) {
+			_cboSportComputer.select(0);
+		} else {
+
+			int deviceIndex = 0;
+
+			for (final ExternalDevice device : _deviceList) {
+
+				if (device != null) {
+					if (deviceId.equals(device.deviceId)) {
+						_cboSportComputer.select(deviceIndex);
+						break;
+					}
+				}
+
+				deviceIndex++;
+			}
+
+			// when the device id was not found, select "<no selection>" entry
+			if (deviceIndex == 0) {
+				_cboSportComputer.select(0);
+			}
+		}
 	}
 }

@@ -2156,6 +2156,8 @@ public class TourDatabase {
 				+ "	" + (TABLE_TOUR_PERSON + "_personId	BIGINT,				\n") //$NON-NLS-1$ //$NON-NLS-2$
 				//
 				+ ("	zoneName		" + varCharKomma(TourPersonHRZone.DB_LENGTH_ZONE_NAME)) //$NON-NLS-1$
+				+ ("	nameShortcut	" + varCharKomma(TourPersonHRZone.DB_LENGTH_ZONE_NAME)) //$NON-NLS-1$
+				+ ("	description		" + varCharKomma(TourPersonHRZone.DB_LENGTH_DESCRIPTION)) //$NON-NLS-1$
 				//
 				+ "	zoneMinValue		INTEGER NOT NULL,					\n" //$NON-NLS-1$
 				+ "	zoneMaxValue		INTEGER NOT NULL					\n" //$NON-NLS-1$
