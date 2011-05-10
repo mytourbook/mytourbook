@@ -455,13 +455,23 @@ public class Messages extends NLS {
 
 	public static String	HR_Zone_01_060_Moderate;
 
+	public static String	HR_Zone_01_060_Moderate_Shortcut;
+
 	public static String	HR_Zone_01_070_FatBurning;
+
+	public static String	HR_Zone_01_070_FatBurning_Shortcut;
 
 	public static String	HR_Zone_01_080_Aerobic;
 
+	public static String	HR_Zone_01_080_Aerobic_Shortcut;
+
 	public static String	HR_Zone_01_090_Anaerobic;
 
+	public static String	HR_Zone_01_090_Anaerobic_Shortcut;
+
 	public static String	HR_Zone_01_100_Maximum;
+
+	public static String	HR_Zone_01_100_Maximum_Shortcut;
 
 	public static String	HR_Zone_02_065_KB;
 

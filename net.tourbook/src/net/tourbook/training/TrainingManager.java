@@ -94,11 +94,25 @@ public class TrainingManager {
 
 		if (selectedTemplate == HR_ZONE_TEMPLATE_01) {
 
-			createHrZone(person, hrZones, Integer.MIN_VALUE, 60, Messages.HR_Zone_01_060_Moderate, null);
-			createHrZone(person, hrZones, 60, 70, Messages.HR_Zone_01_070_FatBurning, null);
-			createHrZone(person, hrZones, 70, 80, Messages.HR_Zone_01_080_Aerobic, null);
-			createHrZone(person, hrZones, 80, 90, Messages.HR_Zone_01_090_Anaerobic, null);
-			createHrZone(person, hrZones, 90, Integer.MAX_VALUE, Messages.HR_Zone_01_100_Maximum, null);
+			createHrZone(person, hrZones, Integer.MIN_VALUE, 60, //
+					Messages.HR_Zone_01_060_Moderate,
+					Messages.HR_Zone_01_060_Moderate_Shortcut);
+
+			createHrZone(person, hrZones, 60, 70, //
+					Messages.HR_Zone_01_070_FatBurning,
+					Messages.HR_Zone_01_070_FatBurning_Shortcut);
+
+			createHrZone(person, hrZones, 70, 80, //
+					Messages.HR_Zone_01_080_Aerobic,
+					Messages.HR_Zone_01_080_Aerobic_Shortcut);
+
+			createHrZone(person, hrZones, 80, 90, //
+					Messages.HR_Zone_01_090_Anaerobic,
+					Messages.HR_Zone_01_090_Anaerobic_Shortcut);
+
+			createHrZone(person, hrZones, 90, Integer.MAX_VALUE, //
+					Messages.HR_Zone_01_100_Maximum,
+					Messages.HR_Zone_01_100_Maximum_Shortcut);
 
 		} else if (selectedTemplate == HR_ZONE_TEMPLATE_02) {
 

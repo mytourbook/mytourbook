@@ -43,6 +43,7 @@ import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.preference.DirectoryFieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.preference.StringFieldEditor;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
@@ -73,6 +74,7 @@ import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
@@ -96,81 +98,89 @@ import org.joda.time.format.DateTimeFormatter;
 
 public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferencePage {
 
-	public static final String			ID							= "net.tourbook.preferences.PrefPagePeopleId";			//$NON-NLS-1$
+	public static final String					ID							= "net.tourbook.preferences.PrefPagePeopleId";	//$NON-NLS-1$
 
-	private static final String			STATE_SELECTED_PERSON		= "selectedPersonId";									//$NON-NLS-1$
-	private static final String			STATE_SELECTED_TAB_FOLDER	= "selectedTabFolder";									//$NON-NLS-1$
+	private static final String					STATE_SELECTED_PERSON		= "selectedPersonId";							//$NON-NLS-1$
+	private static final String					STATE_SELECTED_TAB_FOLDER	= "selectedTabFolder";							//$NON-NLS-1$
 
-	private final IDialogSettings		_state						= TourbookPlugin.getDefault()//
-																			.getDialogSettingsSection(ID);
+	public static final org.joda.time.DateTime	PERSON_DEFAULT_BIRTHDAY		= new org.joda.time.DateTime(1977, 7, 7, //
+																					0,
+																					0,
+																					0,
+																					0);
+
+	private final IDialogSettings				_state						= TourbookPlugin.getDefault()//
+																					.getDialogSettingsSection(ID);
 
 	// REMOVED BIKES 30.4.2011
 
-	private ArrayList<TourPerson>		_people;
+	private ArrayList<TourPerson>				_people;
 
 	/**
 	 * this device list has all the devices which are visible in the device combobox
 	 */
-	private ArrayList<ExternalDevice>	_deviceList;
+	private ArrayList<ExternalDevice>			_deviceList;
 
-	private final DateTimeFormatter		_dtFormatter				= DateTimeFormat.shortDate();
-	private final NumberFormat			_nf1						= NumberFormat.getNumberInstance();
-	private final NumberFormat			_nf2						= NumberFormat.getNumberInstance();
+	private final DateTimeFormatter				_dtFormatter				= DateTimeFormat.shortDate();
+	private final NumberFormat					_nf1						= NumberFormat.getNumberInstance();
+	private final NumberFormat					_nf2						= NumberFormat.getNumberInstance();
 	{
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
 		_nf2.setMinimumFractionDigits(2);
 		_nf2.setMaximumFractionDigits(2);
 	}
-	private final boolean				_isOSX						= net.tourbook.util.UI.IS_OSX;
+	private final boolean						_isOSX						= net.tourbook.util.UI.IS_OSX;
 
-	private int							_spinnerWidth;
+	private int									_spinnerWidth;
 
-	private SelectionListener			_defaultSelectionListener;
-	private ModifyListener				_defaultModifyListener;
+	private SelectionListener					_defaultSelectionListener;
+	private ModifyListener						_defaultModifyListener;
 
-	private boolean						_isFireModifyEvent			= false;
-	private boolean						_isPersonModified			= false;
-	private boolean						_isUpdateUI					= false;
+	private boolean								_isFireModifyEvent			= false;
+	private boolean								_isPersonModified			= false;
+	private boolean								_isUpdateUI					= false;
 
-	private TourPerson					_selectedPerson;
-	private TourPerson					_newPerson;
-	private Set<TourPersonHRZone>		_backupSelectedPersonHrZones;
+	private TourPerson							_selectedPerson;
+	private TourPerson							_newPerson;
+	private Set<TourPersonHRZone>				_backupSelectedPersonHrZones;
 
-	private org.joda.time.DateTime		_today						= new org.joda.time.DateTime().withTime(0, 0, 0, 0);
+	private org.joda.time.DateTime				_today						= new org.joda.time.DateTime()//
+																					.withTime(0, 0, 0, 0);
 
-	private PixelConverter				_pc;
+	private PixelConverter						_pc;
+	private Font								_fontItalic;
 
 	/*
 	 * UI controls
 	 */
-	private Composite					_prefPageContainer;
-	private TableViewer					_peopleViewer;
+	private Composite							_prefPageContainer;
+	private TableViewer							_peopleViewer;
 
-	private Button						_btnAdd;
-	private Button						_btnUpdate;
-	private Button						_btnCancel;
+	private Button								_btnAdd;
+	private Button								_btnUpdate;
+	private Button								_btnCancel;
 
-	private TabFolder					_tabFolderPerson;
-	private Text						_txtFirstName;
-	private Text						_txtLastName;
-	private Combo						_cboSportComputer;
-	private Spinner						_spinnerWeight;
-	private Spinner						_spinnerHeight;
-	private Spinner						_spinnerRestingHR;
-	private Spinner						_spinnerMaxHR;
-	private Button						_rdoGenderMale;
-	private Button						_rdoGenderFemale;
+	private TabFolder							_tabFolderPerson;
+	private Text								_txtFirstName;
+	private Text								_txtLastName;
+	private Combo								_cboSportComputer;
+	private Spinner								_spinnerWeight;
+	private Spinner								_spinnerHeight;
+	private Spinner								_spinnerRestingHR;
+	private Spinner								_spinnerMaxHR;
+	private Button								_rdoGenderMale;
+	private Button								_rdoGenderFemale;
 
-	private ScrolledComposite			_hrZoneScrolledContainer;
-	private Button						_btnModifyHrZones;
-	private Combo						_cboTemplate;
-	private Combo						_cboHrMaxFormula;
-	private DateTime					_dtBirthday;
-	private Label						_lblAge;
+	private ScrolledComposite					_hrZoneScrolledContainer;
+	private Button								_btnModifyHrZones;
+	private Combo								_cboTemplate;
+	private Combo								_cboHrMaxFormula;
+	private DateTime							_dtBirthday;
+	private Label								_lblAge;
 
-	private Text						_txtRawDataPath;
-	private DirectoryFieldEditor		_rawDataPathEditor;
+	private Text								_txtRawDataPath;
+	private DirectoryFieldEditor				_rawDataPathEditor;
 
 	private class ClientsContentProvider implements IStructuredContentProvider {
 
@@ -296,7 +306,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 		newPerson.setHeight(1.77f);
 		newPerson.setWeight(77.7f);
-		newPerson.setBirthDay(new org.joda.time.DateTime(1977, 7, 7, 0, 0, 0, 0).getMillis());
+		newPerson.setBirthDay(PERSON_DEFAULT_BIRTHDAY.getMillis());
 
 		newPerson.setGender(0);
 		newPerson.setRestPulse(TourPerson.DEFAULT_REST_PULSE);
@@ -968,6 +978,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 //				.hint(250, SWT.DEFAULT)
 				.align(SWT.FILL, SWT.BOTTOM)
 				.applyTo(label);
+		label.setFont(_fontItalic);
 		label.setText(Messages.Dialog_HRZone_Label_Header_Zone);
 
 		/*
@@ -975,6 +986,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		 */
 		label = new Label(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.BOTTOM).applyTo(label);
+		label.setFont(_fontItalic);
 		label.setText(Messages.Dialog_HRZone_Label_Header_Pulse);
 
 		/*
@@ -989,6 +1001,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		 */
 		label = new Label(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.BOTTOM).applyTo(label);
+		label.setFont(_fontItalic);
 		label.setText(Messages.Dialog_HRZone_Label_Header_MaxPulse);
 
 		/*
@@ -1341,6 +1354,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 		_pc = new PixelConverter(parent);
 		_spinnerWidth = _pc.convertWidthInCharsToPixels(_isOSX ? 10 : 5);
+
+		_fontItalic = JFaceResources.getFontRegistry().getItalic(JFaceResources.DIALOG_FONT);
 
 		_defaultSelectionListener = new SelectionAdapter() {
 			@Override
