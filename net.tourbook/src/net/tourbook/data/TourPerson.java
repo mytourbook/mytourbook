@@ -38,62 +38,69 @@ import net.tourbook.training.TrainingManager;
 import net.tourbook.ui.UI;
 
 import org.hibernate.annotations.Cascade;
+import org.joda.time.DateTime;
+import org.joda.time.Period;
 
 @Entity
 public class TourPerson implements Comparable<Object> {
 
-	public static final int			DB_LENGTH_LAST_NAME			= 80;
-	public static final int			DB_LENGTH_FIRST_NAME		= 80;
-	public static final int			DB_LENGTH_RAW_DATA_PATH		= 255;
-	public static final int			DB_LENGTH_DEVICE_READER_ID	= 255;
+	public static final org.joda.time.DateTime	DEFAULT_BIRTHDAY			= new org.joda.time.DateTime(1977, 7, 7, //
+																					0,
+																					0,
+																					0,
+																					0);
+	public static final int						DB_LENGTH_LAST_NAME			= 80;
+	public static final int						DB_LENGTH_FIRST_NAME		= 80;
+	public static final int						DB_LENGTH_RAW_DATA_PATH		= 255;
+	public static final int						DB_LENGTH_DEVICE_READER_ID	= 255;
 
-	public static final int			PERSON_ID_NOT_DEFINED		= -1;
+	public static final int						PERSON_ID_NOT_DEFINED		= -1;
 
 	/**
 	 * Default rest pulse
 	 */
-	public static final int			DEFAULT_REST_PULSE			= 60;
+	public static final int						DEFAULT_REST_PULSE			= 60;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long					personId					= PERSON_ID_NOT_DEFINED;
+	private long								personId					= PERSON_ID_NOT_DEFINED;
 
 	@Basic(optional = false)
-	private String					firstName;
+	private String								firstName;
 
-	private String					lastName;
+	private String								lastName;
 
-	private float					weight;
+	private float								weight;
 
-	private float					height;
+	private float								height;
 
 	/**
 	 * Date/Time when tour data was modified, default value is 0
 	 * <p>
 	 * since: db version 15
 	 */
-	private long					birthDay;
+	private long								birthDay;
 
 	/**
 	 * Gender: Male = 0, Female = 1
 	 * <p>
 	 * since: db version 16
 	 */
-	private int						gender;
+	private int									gender;
 
 	/**
 	 * Resting heart rate
 	 * <p>
 	 * since: db version 16
 	 */
-	private int						restPulse;
+	private int									restPulse;
 
 	/**
-	 * Max heart rate
+	 * Max heart rate, when {@link #hrMaxFormula} is not computed
 	 * <p>
 	 * since: db version 16
 	 */
-	private int						maxPulse;
+	private int									maxPulse;
 
 	/**
 	 * Formula how max heart rate is computed. The formulas are defined in
@@ -103,43 +110,43 @@ public class TourPerson implements Comparable<Object> {
 	 * <p>
 	 * since: db version 16
 	 */
-	private int						hrMaxFormula;
+	private int									hrMaxFormula;
 
 	/**
 	 * Device used by this person, reference to the device plugin
 	 */
-	private String					deviceReaderId;
+	private String								deviceReaderId;
 
 	/**
 	 * path where the raw tour data will be saved after import
 	 */
-	private String					rawDataPath;
+	private String								rawDataPath;
 
 	/**
 	 * default bike being used by this person
 	 */
 	@ManyToOne
-	private TourBike				tourBike;
+	private TourBike							tourBike;
 
 	/**
 	 * Tour hr zones
 	 */
 	@OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourPerson")
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-	private Set<TourPersonHRZone>	hrZones						= new HashSet<TourPersonHRZone>();
+	private Set<TourPersonHRZone>				hrZones						= new HashSet<TourPersonHRZone>();
 
 	/**
 	 * manually created person creates a unique id to identify it, saved person is compared with the
 	 * person id
 	 */
-	private static int				_createCounter				= 0;
+	private static int							_createCounter				= 0;
 
 	/**
 	 * unique id for manually created person because the {@link #personId} is
 	 * {@value #PERSON_ID_NOT_DEFINED} when it's not persisted
 	 */
 	@Transient
-	private long					_createId					= 0;
+	private long								_createId					= 0;
 
 	/**
 	 * default constructor used in ejb
@@ -152,6 +159,65 @@ public class TourPerson implements Comparable<Object> {
 
 		this.firstName = firstName;
 		this.lastName = lastName;
+	}
+
+	/**
+	 * @return Returns HR max depending on the HR max formula.
+	 * @param hrMaxFormulaKey
+	 * @param maxPulse
+	 * @param age
+	 */
+	public static int getHrMax(int hrMaxFormulaKey, final int maxPulse, final int age) {
+
+		if (hrMaxFormulaKey == TrainingManager.HR_MAX_NOT_COMPUTED) {
+
+			// hr max is not computed
+
+			return maxPulse;
+
+		} else {
+
+			int keyIndex = -1;
+			for (final int formulaKey : TrainingManager.HRMaxFormulaKeys) {
+				if (formulaKey == hrMaxFormulaKey) {
+					keyIndex = hrMaxFormulaKey;
+					break;
+				}
+			}
+
+			if (keyIndex == -1) {
+				// key not found, use default value
+				hrMaxFormulaKey = TrainingManager.HR_MAX_FORMULA_220_AGE;
+			}
+
+			if (hrMaxFormulaKey == TrainingManager.HR_MAX_FORMULA_220_AGE) {
+
+				// HRmax = 220 - age
+
+				return 220 - age;
+
+			} else if (hrMaxFormulaKey == TrainingManager.HR_MAX_FORMULA_205_8) {
+
+				// HRmax = 205.8 - (0.685 x age)
+
+				return (int) (205.8 - (0.685 * age));
+
+			} else if (hrMaxFormulaKey == TrainingManager.HR_MAX_FORMULA_206_9) {
+
+				//  HRmax = 206.9 - (0.67 x age)
+
+				return (int) (206.9 - (0.67 * age));
+
+			} else if (hrMaxFormulaKey == TrainingManager.HR_MAX_FORMULA_191_5) {
+
+				//  HRmax = 191.5 - (0.007 x age2)
+
+				return (int) (191.5 - (0.007 * age * age));
+			}
+
+			// return default, this case should never happen
+			return 220 - age;
+		}
 	}
 
 	@Override
@@ -208,6 +274,16 @@ public class TourPerson implements Comparable<Object> {
 		return true;
 	}
 
+	private int getAge() {
+
+		final DateTime _today = new DateTime().withTime(0, 0, 0, 0);
+		final DateTime personBirthDay = birthDay == 0 ? DEFAULT_BIRTHDAY : new DateTime(birthDay);
+
+		final Period age = new Period(personBirthDay.getMillis(), _today.getMillis());
+
+		return age.getYears();
+	}
+
 	public long getBirthDay() {
 		return birthDay;
 	}
@@ -228,6 +304,13 @@ public class TourPerson implements Comparable<Object> {
 		return height;
 	}
 
+	/**
+	 * @return Returns HR max depending on the HR max formula
+	 */
+	public int getHrMax() {
+		return getHrMax(hrMaxFormula, maxPulse, getAge());
+	}
+
 	public int getHrMaxFormula() {
 		return hrMaxFormula;
 	}
@@ -245,7 +328,7 @@ public class TourPerson implements Comparable<Object> {
 	}
 
 	/**
-	 * @return Return the person first and last name
+	 * @return Return the person first name and the last name when available.
 	 */
 	public String getName() {
 		return firstName + //

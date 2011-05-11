@@ -57,7 +57,8 @@ public class Messages extends NLS {
 
 	public static String		Dialog_HRZone_Button_AddZone;
 
-	public static String	Dialog_HRZone_Button_ModifyHrZones;
+	public static String	Dialog_HRZone_Button_EditHrZones;
+
 	public static String		Dialog_HRZone_Button_RemoveZone;
 	public static String		Dialog_HRZone_Button_SortZone;
 	public static String		Dialog_HRZone_DialogMessage;
@@ -66,6 +67,8 @@ public class Messages extends NLS {
 
 	public static String		Dialog_HRZone_Label_Header_Pulse;
 	public static String		Dialog_HRZone_Label_Header_Zone;
+
+	public static String	Dialog_HRZone_Label_Header_ZoneShortcut;
 
 	public static String	Dialog_HRZone_Label_Trash_Tooltip;
 
@@ -452,17 +455,49 @@ public class Messages extends NLS {
 
 	public static String	HR_Zone_01_060_Moderate;
 
+	public static String	HR_Zone_01_060_Moderate_Shortcut;
+
 	public static String	HR_Zone_01_070_FatBurning;
+
+	public static String	HR_Zone_01_070_FatBurning_Shortcut;
 
 	public static String	HR_Zone_01_080_Aerobic;
 
+	public static String	HR_Zone_01_080_Aerobic_Shortcut;
+
 	public static String	HR_Zone_01_090_Anaerobic;
+
+	public static String	HR_Zone_01_090_Anaerobic_Shortcut;
 
 	public static String	HR_Zone_01_100_Maximum;
 
-	public static String	HR_Zone_Template_Select;
+	public static String	HR_Zone_01_100_Maximum_Shortcut;
 
-	public static String	HR_Zone_Template01_Moderate60Max100;
+	public static String	HR_Zone_02_065_KB;
+
+	public static String	HR_Zone_02_065_KB_Shortcut;
+
+	public static String	HR_Zone_02_075_GA1;
+
+	public static String	HR_Zone_02_075_GA1_Shortcut;
+
+	public static String	HR_Zone_02_085_GA2;
+
+	public static String	HR_Zone_02_085_GA2_Shortcut;
+
+	public static String	HR_Zone_02_095_EB;
+
+	public static String	HR_Zone_02_095_EB_Shortcut;
+
+	public static String	HR_Zone_02_095_SB;
+
+	public static String	HR_Zone_02_095_SB_Shortcut;
+
+	public static String	HR_Zone_Template_01_Moderate60Max100;
+
+	public static String	HR_Zone_Template_02_GA1GA2;
+
+	public static String	HR_Zone_Template_Select;
 
 	public static String		HRMaxFormula_Name_HRmax_191_5;
 	public static String		HRMaxFormula_Name_HRmax_205_8;
@@ -719,7 +754,6 @@ public class Messages extends NLS {
 	public static String		Pref_People_Column_last_name;
 	public static String		Pref_People_Column_weight;
 
-	public static String	Pref_People_Combo_Template_Tooltip;
 	public static String	Pref_People_Dialog_ReplaceHrZones_Message;
 
 	public static String	Pref_People_Dialog_ReplaceHrZones_Title;
@@ -743,6 +777,12 @@ public class Messages extends NLS {
 	public static String		Pref_People_Label_height;
 	public static String		Pref_People_Label_HRZoneHeaderPulse;
 	public static String		Pref_People_Label_HRZoneHeaderZone;
+
+	public static String	Pref_People_Label_HrZoneInfo;
+
+	public static String	Pref_People_Label_HrZoneTemplate;
+
+	public static String	Pref_People_Label_HrZoneTemplate_Tooltip;
 	public static String		Pref_People_Label_last_name;
 	public static String		Pref_People_Label_MaxHR;
 	public static String		Pref_People_Label_RestingHR;
@@ -1195,7 +1235,15 @@ public class Messages extends NLS {
 	public static String		TourEditor_Dialog_SetAltitudeFromSRTM_Message;
 	public static String		TourEditor_Dialog_SetAltitudeFromSRTM_Title;
 
+	public static String	Training_HRZone_Label_Header_Zone;
+
+	public static String	Training_View_Label_NoHrZones;
+
+	public static String	Training_View_Link_NoHrZones;
+
 	public static String		UI_Label_no_chart_is_selected;
+
+	public static String	UI_Label_PersonIsNotSelected;
 	public static String		UI_Label_TourIsNotSelected;
 
 	public static String		ui_tour_not_defined;

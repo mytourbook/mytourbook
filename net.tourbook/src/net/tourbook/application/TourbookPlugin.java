@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -65,7 +65,7 @@ public class TourbookPlugin extends AbstractUIPlugin {
 	public TourbookPlugin() {}
 
 	/**
-	 * @return Returns the active selected person or <code>null</code> when no person is selected
+	 * @return Returns the active selected person or <code>null</code> when all people are selected
 	 */
 	public static TourPerson getActivePerson() {
 		return _activePerson;
