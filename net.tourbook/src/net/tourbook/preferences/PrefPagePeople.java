@@ -98,89 +98,89 @@ import org.joda.time.format.DateTimeFormatter;
 
 public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferencePage {
 
-	public static final String					ID							= "net.tourbook.preferences.PrefPagePeopleId";	//$NON-NLS-1$
+	public static final String			ID							= "net.tourbook.preferences.PrefPagePeopleId";	//$NON-NLS-1$
 
-	private static final String					STATE_SELECTED_PERSON		= "selectedPersonId";							//$NON-NLS-1$
-	private static final String					STATE_SELECTED_TAB_FOLDER	= "selectedTabFolder";							//$NON-NLS-1$
+	private static final String			STATE_SELECTED_PERSON		= "selectedPersonId";							//$NON-NLS-1$
+	private static final String			STATE_SELECTED_TAB_FOLDER	= "selectedTabFolder";							//$NON-NLS-1$
 
-	public static final org.joda.time.DateTime	PERSON_DEFAULT_BIRTHDAY		= new org.joda.time.DateTime(1977, 7, 7, //
-																					0,
-																					0,
-																					0,
-																					0);
+	/**
+	 * Id to indicate that the hr zones should be displayed for the active person when the pref
+	 * dialog is opened
+	 */
+	public static final String			PREF_DATA_SELECT_HR_ZONES	= "SelectHrZones";								//$NON-NLS-1$
 
-	private final IDialogSettings				_state						= TourbookPlugin.getDefault()//
-																					.getDialogSettingsSection(ID);
+	private final IDialogSettings		_state						= TourbookPlugin.getDefault()//
+																			.getDialogSettingsSection(ID);
 
 	// REMOVED BIKES 30.4.2011
 
-	private ArrayList<TourPerson>				_people;
+	private ArrayList<TourPerson>		_people;
 
 	/**
 	 * this device list has all the devices which are visible in the device combobox
 	 */
-	private ArrayList<ExternalDevice>			_deviceList;
+	private ArrayList<ExternalDevice>	_deviceList;
 
-	private final DateTimeFormatter				_dtFormatter				= DateTimeFormat.shortDate();
-	private final NumberFormat					_nf1						= NumberFormat.getNumberInstance();
-	private final NumberFormat					_nf2						= NumberFormat.getNumberInstance();
+	private final DateTimeFormatter		_dtFormatter				= DateTimeFormat.shortDate();
+	private final NumberFormat			_nf1						= NumberFormat.getNumberInstance();
+	private final NumberFormat			_nf2						= NumberFormat.getNumberInstance();
 	{
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
 		_nf2.setMinimumFractionDigits(2);
 		_nf2.setMaximumFractionDigits(2);
 	}
-	private final boolean						_isOSX						= net.tourbook.util.UI.IS_OSX;
+	private final boolean				_isOSX						= net.tourbook.util.UI.IS_OSX;
 
-	private int									_spinnerWidth;
+	private int							_spinnerWidth;
 
-	private SelectionListener					_defaultSelectionListener;
-	private ModifyListener						_defaultModifyListener;
+	private SelectionListener			_defaultSelectionListener;
+	private ModifyListener				_defaultModifyListener;
 
-	private boolean								_isFireModifyEvent			= false;
-	private boolean								_isPersonModified			= false;
-	private boolean								_isUpdateUI					= false;
+	private boolean						_isFireModifyEvent			= false;
+	private boolean						_isPersonModified			= false;
+	private boolean						_isUpdateUI					= false;
 
-	private TourPerson							_selectedPerson;
-	private TourPerson							_newPerson;
-	private Set<TourPersonHRZone>				_backupSelectedPersonHrZones;
+	private TourPerson					_selectedPerson;
+	private TourPerson					_newPerson;
+	private Set<TourPersonHRZone>		_backupSelectedPersonHrZones;
 
-	private org.joda.time.DateTime				_today						= new org.joda.time.DateTime()//
-																					.withTime(0, 0, 0, 0);
+	private org.joda.time.DateTime		_today						= new org.joda.time.DateTime()//
+																			.withTime(0, 0, 0, 0);
 
-	private PixelConverter						_pc;
-	private Font								_fontItalic;
+	private PixelConverter				_pc;
+	private Font						_fontItalic;
 
 	/*
 	 * UI controls
 	 */
-	private Composite							_prefPageContainer;
-	private TableViewer							_peopleViewer;
+	private Composite					_prefPageContainer;
+	private TableViewer					_peopleViewer;
 
-	private Button								_btnAdd;
-	private Button								_btnUpdate;
-	private Button								_btnCancel;
+	private Button						_btnAdd;
+	private Button						_btnUpdate;
+	private Button						_btnCancel;
 
-	private TabFolder							_tabFolderPerson;
-	private Text								_txtFirstName;
-	private Text								_txtLastName;
-	private Combo								_cboSportComputer;
-	private Spinner								_spinnerWeight;
-	private Spinner								_spinnerHeight;
-	private Spinner								_spinnerRestingHR;
-	private Spinner								_spinnerMaxHR;
-	private Button								_rdoGenderMale;
-	private Button								_rdoGenderFemale;
+	private TabFolder					_tabFolderPerson;
+	private Text						_txtFirstName;
+	private Text						_txtLastName;
+	private Combo						_cboSportComputer;
+	private Spinner						_spinnerWeight;
+	private Spinner						_spinnerHeight;
+	private Spinner						_spinnerRestingHR;
+	private Spinner						_spinnerMaxHR;
+	private Button						_rdoGenderMale;
+	private Button						_rdoGenderFemale;
 
-	private ScrolledComposite					_hrZoneScrolledContainer;
-	private Button								_btnModifyHrZones;
-	private Combo								_cboTemplate;
-	private Combo								_cboHrMaxFormula;
-	private DateTime							_dtBirthday;
-	private Label								_lblAge;
+	private ScrolledComposite			_hrZoneScrolledContainer;
+	private Button						_btnModifyHrZones;
+	private Combo						_cboTemplate;
+	private Combo						_cboHrMaxFormula;
+	private DateTime					_dtBirthday;
+	private Label						_lblAge;
 
-	private Text								_txtRawDataPath;
-	private DirectoryFieldEditor				_rawDataPathEditor;
+	private Text						_txtRawDataPath;
+	private DirectoryFieldEditor		_rawDataPathEditor;
 
 	private class ClientsContentProvider implements IStructuredContentProvider {
 
@@ -245,6 +245,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		// this is called after the UI is created
 
 		if (data instanceof Boolean) {
+
 			final Boolean isCreatePerson = (Boolean) data;
 			if (isCreatePerson && _people.size() == 0) {
 
@@ -276,7 +277,26 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 				_txtFirstName.selectAll();
 				_txtFirstName.setFocus();
 			}
+
+		} else if (data.equals(PREF_DATA_SELECT_HR_ZONES)) {
+
+			// select hr zones for the active person
+
+			final TourPerson activePerson = TourbookPlugin.getActivePerson();
+
+			if (activePerson != null) {
+
+				_peopleViewer.setSelection(new StructuredSelection(activePerson));
+
+				final Table table = _peopleViewer.getTable();
+
+				// set focus to selected person
+				table.setSelection(table.getSelectionIndex());
+			}
+
+			_tabFolderPerson.setSelection(1);
 		}
+
 	}
 
 	@Override
@@ -306,7 +326,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 		newPerson.setHeight(1.77f);
 		newPerson.setWeight(77.7f);
-		newPerson.setBirthDay(PERSON_DEFAULT_BIRTHDAY.getMillis());
+		newPerson.setBirthDay(TourPerson.DEFAULT_BIRTHDAY.getMillis());
 
 		newPerson.setGender(0);
 		newPerson.setRestPulse(TourPerson.DEFAULT_REST_PULSE);
@@ -876,7 +896,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(actionContainer);
 		{
 			/*
-			 * label
+			 * label: create hr zones
 			 */
 			label = new Label(actionContainer, SWT.NONE);
 			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
@@ -1298,7 +1318,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 			TourManager.getInstance().clearTourDataCache();
 
-			// fire bike list modify event
+			// fire event that person is modified
 			getPreferenceStore().setValue(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED, Math.random());
 
 			_isFireModifyEvent = false;
@@ -1719,6 +1739,9 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	 */
 	private void updateUIHrMax(final int hrMaxFormulaKey, final int maxPulse) {
 
+		final int age = updateUIAge();
+		final int hrMax = TourPerson.getHrMax(hrMaxFormulaKey, maxPulse, age);
+
 		if (hrMaxFormulaKey == TrainingManager.HR_MAX_NOT_COMPUTED) {
 
 			// hr max is not computed
@@ -1728,46 +1751,21 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 		} else {
 
-			int selectionIndex = -1;
+			int comboIndex = -1;
 			for (final int formulaKey : TrainingManager.HRMaxFormulaKeys) {
 				if (formulaKey == hrMaxFormulaKey) {
-					selectionIndex = hrMaxFormulaKey;
+					comboIndex = hrMaxFormulaKey;
 					break;
 				}
 			}
 
-			if (selectionIndex == -1) {
+			if (comboIndex == -1) {
 				// set default value
-				selectionIndex = 0;
+				comboIndex = 0;
 			}
-			_cboHrMaxFormula.select(selectionIndex);
 
-			final int age = updateUIAge();
-
-			if (hrMaxFormulaKey == TrainingManager.HR_MAX_FORMULA_220_AGE) {
-
-				// HRmax = 220 - age
-
-				_spinnerMaxHR.setSelection(220 - age);
-
-			} else if (hrMaxFormulaKey == TrainingManager.HR_MAX_FORMULA_205_8) {
-
-				// HRmax = 205.8 - (0.685 x age)
-
-				_spinnerMaxHR.setSelection((int) (205.8 - (0.685 * age)));
-
-			} else if (hrMaxFormulaKey == TrainingManager.HR_MAX_FORMULA_206_9) {
-
-				//  HRmax = 206.9 - (0.67 x age)
-
-				_spinnerMaxHR.setSelection((int) (206.9 - (0.67 * age)));
-
-			} else if (hrMaxFormulaKey == TrainingManager.HR_MAX_FORMULA_191_5) {
-
-				//  HRmax = 191.5 - (0.007 x age2)
-
-				_spinnerMaxHR.setSelection((int) (191.5 - (0.007 * age * age)));
-			}
+			_cboHrMaxFormula.select(comboIndex);
+			_spinnerMaxHR.setSelection(hrMax);
 		}
 	}
 

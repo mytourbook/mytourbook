@@ -509,11 +509,6 @@
                icon="icons/tour-waypoint.png"
                label="%View_Name_Waypoint"
                mnemonic="%View_Name_Waypoint_Mnemonic"/>
-         <command
-               commandId="command.net.tourbook.views.ConconiChart"
-               icon="icons/conconi-chart.png"
-               label="%View_Name_ConconiChart"
-               mnemonic="%View_Name_ConconiChart_Mnemonic"/>
 
 
          <separator
@@ -537,6 +532,16 @@
                style="push"
                tooltip="%command_tourChart_tool_tourSegmenter_tooltip">
          </command>
+         <command
+               commandId="command.net.tourbook.training.Training"
+               icon="icons/pulse-zones.png"
+               label="%View_Name_Training"
+               mnemonic="%View_Name_Training_Mnemonic"/>
+         <command
+               commandId="command.net.tourbook.views.ConconiChart"
+               icon="icons/conconi-chart.png"
+               label="%View_Name_ConconiChart"
+               mnemonic="%View_Name_ConconiChart_Mnemonic"/>
       </menuContribution>
 
       <menuContribution
@@ -781,6 +786,11 @@
             name="%View_Name_ConconiChart"
             defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewConconiChart"
 	  		/>
+      <command
+            id="command.net.tourbook.training.Training"
+            name="%View_Name_Training"
+            defaultHandler="net.tourbook.training.ActionHandlerOpenViewTraining"
+	  		/>
 
 
       <command
@@ -988,6 +998,8 @@
 			class="de.byteholder.geoclipse.tileinfo.TrimPropertyTester">
 	  	</propertyTester>
 	</extension>
+	
+	
    <extension
          point="org.eclipse.ui.views">
 
@@ -1070,18 +1082,18 @@
 	            id="net.tourbook.views.TourWaypointView"
 	            name="%View_Name_Waypoint">
 	      </view>
-	      <view
-	            category="net.tourbook.category.tour"
-	            class="net.tourbook.ui.tourChart.ConconiChartView"
-	            icon="icons/conconi-chart.png"
-	            id="net.tourbook.views.ConconiChartView"
-	            name="%View_Name_ConconiChart">
-	      </view>
 
       <category
             id="net.tourbook.category.Tools"
             name="%View_Category_Tools">
       </category>
+	      <view
+	            category="net.tourbook.category.Tools"
+	            class="net.tourbook.ui.tourChart.ConconiChartView"
+	            icon="icons/conconi-chart.png"
+	            id="net.tourbook.views.ConconiChartView"
+	            name="%View_Name_ConconiChart">
+	      </view>
 	      <view
 	            category="net.tourbook.category.Tools"
 	            class="net.tourbook.ui.views.TourChartAnalyzerView"
@@ -1096,14 +1108,21 @@
 	            id="net.tourbook.views.TourSegmenter"
 	            name="%view_name_Segmenter">
 	      </view>
-       <view
-             allowMultiple="false"
-             category="net.tourbook.category.Tools"
-             class="de.byteholder.geoclipse.poi.PoiView"
-             icon="icons/find.png"
-             id="de.byteholder.geoclipse.poi.poiView"
-             name="Places">
-       </view>
+	      <view
+	            category="net.tourbook.category.Tools"
+	            class="net.tourbook.training.TrainingView"
+	            icon="icons/pulse-zones.png"
+	            id="net.tourbook.training.TrainingView"
+	            name="%View_Name_Training">
+	      </view>
+	      <view
+	            allowMultiple="false"
+	            category="net.tourbook.category.Tools"
+	            class="de.byteholder.geoclipse.poi.PoiView"
+	            icon="icons/find.png"
+	            id="de.byteholder.geoclipse.poi.poiView"
+	            name="Places">
+	      </view>
 
       <category
             id="net.tourbook.category.compareTours"

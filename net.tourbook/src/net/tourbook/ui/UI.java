@@ -42,6 +42,7 @@ import net.tourbook.util.Util;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
@@ -79,6 +80,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.forms.widgets.FormToolkit;
 
 public class UI {
 
@@ -607,6 +609,27 @@ public class UI {
 	}
 
 	/**
+	 * Creates a label which is wrapped and grabs the width.
+	 * 
+	 * @param formToolkit
+	 * @param parent
+	 * @param labelText
+	 * @return
+	 */
+	public static Composite createLabel(final FormToolkit formToolkit, final Composite parent, final String labelText) {
+
+		final Composite container = formToolkit.createComposite(parent);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
+		{
+			final Label label = formToolkit.createLabel(container, labelText, SWT.WRAP);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
+		}
+
+		return container;
+	}
+
+	/**
 	 * Disables all controls and their children
 	 */
 	public static void disableAllControls(final Composite container) {
@@ -822,6 +845,21 @@ public class UI {
 		return _dateFormatterShort;
 	}
 
+//	private static String getSQLExceptionText(final SQLException e) {
+//
+//		final StringBuilder sb = new StringBuilder()//
+//				.append("SQLException") //$NON-NLS-1$
+//				.append(UI.NEW_LINE2)
+//				.append("SQLState: " + (e).getSQLState()) //$NON-NLS-1$
+//				.append(UI.NEW_LINE)
+//				.append("Severity: " + (e).getErrorCode()) //$NON-NLS-1$
+//				.append(UI.NEW_LINE)
+//				.append("Message: " + (e).getMessage()) //$NON-NLS-1$
+//				.append(UI.NEW_LINE);
+//
+//		return sb.toString();
+//	}
+
 	/******************************************************************************
 	 * this method is copied from the following source and was adjusted
 	 * 
@@ -877,21 +915,6 @@ public class UI {
 
 		return _timeFormatterShort;
 	}
-
-//	private static String getSQLExceptionText(final SQLException e) {
-//
-//		final StringBuilder sb = new StringBuilder()//
-//				.append("SQLException") //$NON-NLS-1$
-//				.append(UI.NEW_LINE2)
-//				.append("SQLState: " + (e).getSQLState()) //$NON-NLS-1$
-//				.append(UI.NEW_LINE)
-//				.append("Severity: " + (e).getErrorCode()) //$NON-NLS-1$
-//				.append(UI.NEW_LINE)
-//				.append("Message: " + (e).getMessage()) //$NON-NLS-1$
-//				.append(UI.NEW_LINE);
-//
-//		return sb.toString();
-//	}
 
 	public static UI getInstance() {
 

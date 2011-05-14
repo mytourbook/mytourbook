@@ -586,7 +586,7 @@ public class DialogHRZones extends TitleAreaDialog {
 			int minValue = _spinnerMinPulse[hrZoneIndex].getSelection();
 			int maxValue = _spinnerMaxPulse[hrZoneIndex].getSelection();
 
-			// keep zone border
+			// keep zone borders
 			if (hrZone.getZoneMinValue() == Integer.MIN_VALUE) {
 				minValue = Integer.MIN_VALUE;
 			}
@@ -632,7 +632,6 @@ public class DialogHRZones extends TitleAreaDialog {
 				_spinnerMinPulse[hrZoneIndex].setVisible(false);
 				_spinnerMaxPulse[hrZoneIndex].setSelection(hrZone.getZoneMaxValue());
 
-//				_labelGtLt[hrZoneIndex].setText(UI.SYMBOL_LESS_THAN);
 				_btnTrash[hrZoneIndex].setVisible(false);
 
 				continue;
@@ -643,7 +642,6 @@ public class DialogHRZones extends TitleAreaDialog {
 				_spinnerMinPulse[hrZoneIndex].setSelection(hrZone.getZoneMinValue());
 				_spinnerMaxPulse[hrZoneIndex].setVisible(false);
 
-//				_labelGtLt[hrZoneIndex].setText(UI.SYMBOL_GREATER_THAN);
 				_btnTrash[hrZoneIndex].setVisible(false);
 
 				continue;

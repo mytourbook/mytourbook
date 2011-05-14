@@ -1235,7 +1235,19 @@ public class Messages extends NLS {
 	public static String		TourEditor_Dialog_SetAltitudeFromSRTM_Message;
 	public static String		TourEditor_Dialog_SetAltitudeFromSRTM_Title;
 
+	public static String	Training_Action_EditHrZones;
+
+	public static String	Training_HRZone_Label_Header_Zone;
+
+	public static String	Training_View_Label_NoHrZones;
+
+	public static String	Training_View_Label_NoPulseData;
+
+	public static String	Training_View_Link_NoHrZones;
+
 	public static String		UI_Label_no_chart_is_selected;
+
+	public static String	UI_Label_PersonIsNotSelected;
 	public static String		UI_Label_TourIsNotSelected;
 
 	public static String		ui_tour_not_defined;

@@ -88,6 +88,15 @@ public class TrainingManager {
 		hrZones.add(hrZone);
 	}
 
+	/**
+	 * {@link Integer#MIN_VALUE} occures once in a set for the lowest value<br>
+	 * {@link Integer#MAX_VALUE} occures once in a set for the highest value.<br>
+	 * These two values in a set cannot be deleted, they will occure always.
+	 * 
+	 * @param person
+	 * @param selectedTemplate
+	 * @return
+	 */
 	public static Set<TourPersonHRZone> createHrZones(final TourPerson person, final int selectedTemplate) {
 
 		final Set<TourPersonHRZone> hrZones = new HashSet<TourPersonHRZone>();
