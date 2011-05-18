@@ -17,6 +17,8 @@ package net.tourbook.data;
 
 import static javax.persistence.CascadeType.ALL;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -148,6 +150,12 @@ public class TourPerson implements Comparable<Object> {
 	@Transient
 	private long								_createId					= 0;
 
+	@Transient
+	private int[]								_hrZoneMinBpm;
+
+	@Transient
+	private int[]								_hrZoneMaxBpm;
+
 	/**
 	 * default constructor used in ejb
 	 */
@@ -242,6 +250,34 @@ public class TourPerson implements Comparable<Object> {
 		return 0;
 	}
 
+	private void computeHrZoneMinMaxBpm() {
+
+		if (hrZones == null || hrZones.size() == 0) {
+			return;
+		}
+
+		final int hrMax = getHrMax();
+		final int zoneSize = hrZones.size();
+
+		final int[] zoneMinValues = new int[zoneSize];
+		final int[] zoneMaxValues = new int[zoneSize];
+
+		final ArrayList<TourPersonHRZone> hrZonesList = new ArrayList<TourPersonHRZone>(hrZones);
+		Collections.sort(hrZonesList);
+
+		// fill zone min/max values
+		for (int zoneIndex = 0; zoneIndex < hrZones.size(); zoneIndex++) {
+
+			final TourPersonHRZone hrZone = hrZonesList.get(zoneIndex);
+
+			zoneMinValues[zoneIndex] = (hrZone.getZoneMinValue() * hrMax / 100);
+			zoneMaxValues[zoneIndex] = (hrZone.getZoneMaxValue() * hrMax / 100);
+		}
+
+		_hrZoneMinBpm = zoneMinValues;
+		_hrZoneMaxBpm = zoneMaxValues;
+	}
+
 	@Override
 	public boolean equals(final Object obj) {
 
@@ -313,6 +349,34 @@ public class TourPerson implements Comparable<Object> {
 
 	public int getHrMaxFormula() {
 		return hrMaxFormula;
+	}
+
+	/**
+	 * @return Returns HR zone max bpm values or <code>null</code> when hr zones are not defined.
+	 */
+	public int[] getHrZoneMaxBpm() {
+
+		if (_hrZoneMaxBpm != null) {
+			return _hrZoneMaxBpm;
+		}
+
+		computeHrZoneMinMaxBpm();
+
+		return _hrZoneMaxBpm;
+	}
+
+	/**
+	 * @return Returns HR zone min bpm values or <code>null</code> when hr zones are not defined.
+	 */
+	public int[] getHrZoneMinBpm() {
+
+		if (_hrZoneMinBpm != null) {
+			return _hrZoneMinBpm;
+		}
+
+		computeHrZoneMinMaxBpm();
+
+		return _hrZoneMinBpm;
 	}
 
 	public Set<TourPersonHRZone> getHrZones() {
@@ -430,7 +494,12 @@ public class TourPerson implements Comparable<Object> {
 	}
 
 	public void setHrZones(final Set<TourPersonHRZone> hrZones) {
+
 		this.hrZones = hrZones;
+
+		// reset values which are computed from hr zones when data are requested
+		_hrZoneMinBpm = null;
+		_hrZoneMaxBpm = null;
 	}
 
 	public void setLastName(final String lastName) {

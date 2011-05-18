@@ -60,12 +60,12 @@ public class TourPersonHRZone implements Comparable<TourPersonHRZone> {
 	private String				description;
 
 	/**
-	 * Minimum value of the hr zone
+	 * Minimum value of the hr zone in % of hr max
 	 */
 	private int					zoneMinValue;
 
 	/**
-	 * Maximum value of the hr zone
+	 * Maximum value of the hr zone in % of hr max
 	 */
 	private int					zoneMaxValue;
 
@@ -91,32 +91,9 @@ public class TourPersonHRZone implements Comparable<TourPersonHRZone> {
 		_createId = ++_createCounter;
 	}
 
-//    public int compareTo(Integer anotherInteger) {
-//	int thisVal = this.value;
-//	int anotherVal = anotherInteger.value;
-//	return (thisVal<anotherVal ? -1 : (thisVal==anotherVal ? 0 : 1));
-//    }
-
 	@Override
 	public int compareTo(final TourPersonHRZone otherHrZone) {
 
-		/*
-		 * check if first or last entry is sorted
-		 */
-//		if (zoneMinValue == Integer.MIN_VALUE || zoneMinValue == Integer.MIN_VALUE) {
-//			return Integer.MIN_VALUE;
-////			return -1;
-//		}
-//
-//		if (zoneMaxValue == Integer.MAX_VALUE) {
-//			return Integer.MAX_VALUE;
-////			return 1;
-//		}
-
-//		final int minDiff = zoneMinValue - otherHrZone.zoneMinValue;
-//		final int maxDiff = zoneMaxValue - otherHrZone.zoneMaxValue;
-
-//		return zoneMinValue < otherHrZone.zoneMinValue ? -1 : zoneMinValue == otherHrZone.zoneMinValue ? 0 : 1;
 		return zoneMaxValue < otherHrZone.zoneMaxValue ? -1 : zoneMaxValue == otherHrZone.zoneMaxValue ? 0 : 1;
 	}
 
@@ -185,10 +162,16 @@ public class TourPersonHRZone implements Comparable<TourPersonHRZone> {
 		return tourPerson;
 	}
 
+	/**
+	 * @return Returns maximum value of the hr zone in % of hr max
+	 */
 	public int getZoneMaxValue() {
 		return zoneMaxValue;
 	}
 
+	/**
+	 * @return Returns minimum value of the hr zone in % of hr max
+	 */
 	public int getZoneMinValue() {
 		return zoneMinValue;
 	}

@@ -28,6 +28,11 @@
             name="%Pref_Year_Summary"/>
 
       <statistic
+            class="net.tourbook.statistics.StatisticTourHrZone"
+            id="net.tourbook.statistics.StatisticTourHrZone"
+            name="%Hr_Zone_Tour"/>
+
+      <statistic
             class="net.tourbook.statistics.StatisticDayTourTime"
             id="net.tourbook.statistics.StatisticSummaryDayTourTime"
             name="%Pref_Day_Summary_Duration"/>

@@ -234,6 +234,12 @@
 	            id="net.tourbook.preferences.PrefPageComputedValues"
 	            name="%preference_page_computedValues">
 	      </page>
+	      <page
+	            category="net.tourbook.preferences.PrefPageGeneralId"
+	            class="net.tourbook.preferences.PrefPageTour"
+	            id="net.tourbook.preferences.PrefPageTour"
+	            name="%Pref_Page_Tour">
+	      </page>
 
 
       <page

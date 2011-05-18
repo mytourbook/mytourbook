@@ -57,6 +57,10 @@ public class Messages extends NLS {
 
 	public static String		Dialog_HRZone_Button_AddZone;
 
+	public static String	Dialog_HRZone_Button_ComputeAllTours;
+
+	public static String	Dialog_HRZone_Button_ComputeAllTours_Tooltip;
+
 	public static String	Dialog_HRZone_Button_EditHrZones;
 
 	public static String		Dialog_HRZone_Button_RemoveZone;
@@ -231,6 +235,8 @@ public class Messages extends NLS {
 	public static String		App_Dialog_FirstStartupTip_Message;
 	public static String		App_Dialog_FirstStartupTip_Title;
 
+	public static String	App_Label_H_MM;
+
 	public static String		App_Label_ISO8601;
 
 	public static String		App_Title;
@@ -285,6 +291,14 @@ public class Messages extends NLS {
 	public static String		Compute_BreakTime_Method_SpeedByAverage;
 	public static String		Compute_BreakTime_Method_SpeedBySlice;
 	public static String		Compute_BreakTime_Method_TimeDistance;
+
+	public static String	Compute_HrZones_Dialog_ComputeAllTours_Title;
+
+	public static String	Compute_HrZones_Dialog_ComputeAllTours_Title_Message;
+
+	public static String	Compute_HrZones_Job_ComputeAllTours_Result;
+
+	public static String	Compute_HrZones_Job_ComputeAllTours_SubTask;
 
 	public static String		Compute_Values_Label_Info;
 
@@ -747,6 +761,10 @@ public class Messages extends NLS {
 
 	public static String		Pref_People_Action_add_person;
 	public static String		Pref_People_Action_AddZone;
+
+	public static String	Pref_People_Button_HrZones_ComputeAllTours;
+
+	public static String	Pref_People_Button_HrZones_ComputeAllTours_Tooltip;
 	public static String		Pref_People_Column_Birthday;
 	public static String		Pref_People_Column_device;
 	public static String		Pref_People_Column_first_name;
@@ -863,6 +881,16 @@ public class Messages extends NLS {
 	public static String		Pref_Statistic_Label_h;
 	public static String		Pref_Statistic_Label_interval;
 	public static String		Pref_Statistic_Label_separator;
+
+	public static String	Pref_Tour_Dialog_TourCacheIsModified_Message;
+
+	public static String	Pref_Tour_Dialog_TourCacheIsModified_Title;
+
+	public static String	Pref_Tour_Group_TourCache;
+
+	public static String	Pref_Tour_Label_TourCacheSize;
+
+	public static String	Pref_Tour_Label_TourCacheSize_Info;
 
 	public static String		Pref_TourTag_Link_AppearanceOptions;
 
