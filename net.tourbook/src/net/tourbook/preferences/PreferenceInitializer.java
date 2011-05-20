@@ -234,6 +234,11 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.MERGE_TOUR_SET_TOUR_TYPE_ID, TourDatabase.ENTITY_IS_NOT_SAVED);
 
 		/*
+		 * system
+		 */
+		store.setDefault(ITourbookPreferences.TOUR_CACHE_SIZE, 500);
+
+		/*
 		 * computed values
 		 */
 		// minimum altitude difference

@@ -194,8 +194,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			/*
 			 * label: info
 			 */
-			final Label label = new Label(container, SWT.NONE);
-			GridDataFactory.fillDefaults().applyTo(label);
+			final Label label = new Label(container, SWT.WRAP);
+			GridDataFactory.fillDefaults().hint(350, SWT.DEFAULT).applyTo(label);
 			label.setText(Messages.Compute_Values_Label_Info);
 
 			/*
@@ -663,7 +663,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 		return container;
 	}
 
-	private void fireTourModifyEvent() {
+	public void fireTourModifyEvent() {
 
 		TourManager.getInstance().removeAllToursFromCache();
 		TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR);
@@ -734,7 +734,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 				oldBreakTime[0] += tourRecordingTime - tourDrivingTime;
 
 				// force the break time to be recomputed with the current values which are already store in the pref store
-				oldTourData.breakTimeSerie = null;
+				oldTourData.setBreakTimeSerie(null);
 
 				// recompute break time
 				oldTourData.computeTourDrivingTime();

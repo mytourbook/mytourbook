@@ -147,59 +147,6 @@ public class TrainingManager {
 
 		}
 
-// #######################################################################################################
-//
-//		a) Kompensationsbereich (KB): weniger als 65% der Maximal-Leistung
-//		- Zur Erholung nach anstrengendem Rennen/Training
-//		- ausschließlich Fettverbrennung
-//		- Dauer 1-2 Stunden
-//
-//		b) Grundlagen-Ausdauer 1 (GA1): 65–75% der Maximalleistung
-//		- Zum Aufbau der Grundlagenausdauer (besonders wichtig im Winter und Frühjahr)
-//		- fast ausschließlich Fettverbrennung
-//		- Dauer 5 Stunden und länger
-//
-//		c) Grundlagen-Ausdauer 2 (GA2): 75–85% der Maximalleistung
-//		– Zur Stabilisierung und zum Ausbau der Grundlagenausdauer
-//		- Fett- und Kohlehydrate
-//		- Dauer 1-2 Stunden
-//
-//		d) Entwicklungs-Bereich (EB): 85–95% der Maximalleistung
-//		– Zur Erhöhung der IANS
-//		- Wichtig z.B. für längere Ausreißversuche oder am Berg
-//		- Vorwiegend Kohlehydrate
-//		- Dauer 5-20 min, aber mehrmals hintereinander
-//
-//		e) Spitzenbereich (SB): mehr als 95% der Maximalleistung
-//		- Sprints, kurze Ausreißversuche. Nur für Leistungssportler!
-//		- Fast ausschließlich Kohlehydrate
-//		- Dauer: wenige Sekunden bis maximal 5 min
-
-//
-// #######################################################################################################
-//
-//	    Gesundheitszone: 50 bis 60 % der maximalen Herzfrequenz (HFmax) (Faktor 0,5 bis 0,6)
-//	    Fettverbrennungszone: 60 bis 70 % der HFmax (Faktor 0,6 bis 0,7)
-//	    Aerobe Zone: 70 bis 80 % der HFmax (Faktor 0,7 bis 0,8)
-//	    Anaerobe Zone: 80 bis 90 % der HFmax (Faktor 0,8 bis 0,9)
-//	    Warnzone: 90 bis 100 % der HFmax (Faktor 0,9 bis 1,0)
-//
-//
-// #######################################################################################################
-//
-//		Folgende Trainingsbereiche sind die gebräuchlichsten:
-//			REKOM 	Regenerations- u. Kompensationsbereich 	< 70% HFmax
-//			GA1 	Grundlagenausdauerbereich 1 	70 – 85% HFmax
-//			GA2 	Grundlagenausdauerbereich 2 	85 – 95% HFmax
-//			WSA 	Wettkampfspezifische Ausdauer 	95 – 100% HFmax
-//
-//			Weitere Trainingsbereiche:
-//			GA1/2 	Zwischenbereich von GA1 und GA2
-//			KA 	Kraftausdauerbereich (überschneidet sich mit GA2, anderer Fokus)
-//			SA 	Schnelligkeitsausdauerbereich (überschneidet sich mit WSA, anderer Fokus)
-//			EB 	Entwicklungsbereich (v.a. Radsport, Inlineskating)
-//			SB 	Spitzenbereich (v.a. Radsport)
-//			GB 	Grenzbereich (v.a. Skilanglauf)
 		return hrZones;
 	}
 }

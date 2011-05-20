@@ -52,6 +52,9 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
@@ -68,9 +71,9 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TrainingView extends ViewPart {
 
-	private static final String			HEADER_HR_MAX_100	= "100% = ";										//$NON-NLS-1$
+	private static final String			HEADER_HR_MAX_100	= "100% = ";							//$NON-NLS-1$
 
-	public static final String			ID					= "net.tourbook.training.TrainingView";			//$NON-NLS-1$
+	public static final String			ID					= "net.tourbook.training.TrainingView"; //$NON-NLS-1$
 
 	private final NumberFormat			_nf1				= NumberFormat.getNumberInstance();
 	{
@@ -78,7 +81,8 @@ public class TrainingView extends ViewPart {
 		_nf1.setMaximumFractionDigits(1);
 	}
 
-	private final IPreferenceStore		_prefStore			= TourbookPlugin.getDefault().getPreferenceStore();
+	private final IPreferenceStore		_prefStore			= TourbookPlugin.getDefault()//
+																	.getPreferenceStore();
 
 	private ISelectionListener			_postSelectionListener;
 	private IPropertyChangeListener		_prefChangeListener;
@@ -113,8 +117,10 @@ public class TrainingView extends ViewPart {
 	private Label						_lblNoHrZone;
 
 	private Composite					_hrZoneContainer;
-	private Composite					_hrZoneInnerContainer;
-	private Label[]						_lblTourMinMax;
+	private ScrolledComposite			_hrZoneContainerContent;
+
+	private Label[]						_lblTourMinMaxPercent;
+	private Label[]						_lblTourMinMaxHours;
 
 	public TrainingView() {}
 
@@ -205,7 +211,9 @@ public class TrainingView extends ViewPart {
 	public void createPartControl(final Composite parent) {
 
 		_currentPerson = TourbookPlugin.getActivePerson();
-		_hrMax = _currentPerson.getHrMax();
+		if (_currentPerson != null) {
+			_hrMax = _currentPerson.getHrMax();
+		}
 
 		createUI(parent);
 		createActions();
@@ -235,12 +243,12 @@ public class TrainingView extends ViewPart {
 		_pageNoPerson = UI.createLabel(_tk, _pageBook, Messages.UI_Label_PersonIsNotSelected);
 		_pageNoTour = UI.createLabel(_tk, _pageBook, Messages.UI_Label_no_chart_is_selected);
 		_pageNoPulse = UI.createLabel(_tk, _pageBook, Messages.Training_View_Label_NoPulseData);
-		_pageNoHrZones = createUI05NoHrZones(_pageBook);
+		_pageNoHrZones = createUI10PageNoHrZones(_pageBook);
 
-		_pageTraining = createUI10Training(_pageBook);
+		_pageTraining = createUI30PageHrZone(_pageBook);
 	}
 
-	private Composite createUI05NoHrZones(final Composite parent) {
+	private Composite createUI10PageNoHrZones(final Composite parent) {
 
 		final Composite container = _tk.createComposite(parent);
 		GridDataFactory.fillDefaults().grab(true, true).align(SWT.BEGINNING, SWT.CENTER).applyTo(container);
@@ -271,54 +279,68 @@ public class TrainingView extends ViewPart {
 		return container;
 	}
 
-	private Composite createUI10Training(final Composite parent) {
+	private Composite createUI30PageHrZone(final Composite parent) {
 
 		final Composite container = _tk.createComposite(parent);
-		GridDataFactory.fillDefaults()//
-//				.grab(true, false)
-				.applyTo(container);
-		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
+		GridDataFactory.fillDefaults().applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 		{
-			createUI20HrZoneContainer(container);
+			_hrZoneContainer = _tk.createComposite(container);
+			GridDataFactory.fillDefaults().grab(true, true).applyTo(_hrZoneContainer);
+			GridLayoutFactory.fillDefaults().numColumns(1).applyTo(_hrZoneContainer);
 		}
+
 		return container;
 	}
 
-	private Composite createUI20HrZoneContainer(final Composite parent) {
-
-		_hrZoneContainer = _tk.createComposite(parent);
-		GridDataFactory.fillDefaults()//
-//				.grab(true, false)
-				.applyTo(_hrZoneContainer);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(_hrZoneContainer);
-
-		return _hrZoneContainer;
-	}
-
-	private void createUI22HrZoneInnerContainer(final Composite parent) {
+	private void createUI35HrZoneContent() {
 
 		// person and zones are already checked
 
 		_hrZones = new ArrayList<TourPersonHRZone>(_currentPerson.getHrZones());
 		Collections.sort(_hrZones);
 
-		if (_hrZoneInnerContainer != null) {
-			_hrZoneInnerContainer.dispose();
+		if (_hrZoneContainerContent != null) {
+			_hrZoneContainerContent.dispose();
 		}
 
-		_hrZoneInnerContainer = _tk.createComposite(parent);
-		GridLayoutFactory.fillDefaults().numColumns(4).applyTo(_hrZoneInnerContainer);
-//		_hrZoneInnerContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+		final Composite scrolledContent;
+
+		_hrZoneContainerContent = new ScrolledComposite(_hrZoneContainer, SWT.V_SCROLL | SWT.H_SCROLL);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_hrZoneContainerContent);
 		{
-			createUI23HrZoneHeader(_hrZoneInnerContainer);
-			createUI24HrZoneFields(_hrZoneInnerContainer);
+			scrolledContent = createUI36HrZone(_hrZoneContainerContent);
 		}
+
+		_hrZoneContainerContent.setContent(scrolledContent);
+		_hrZoneContainerContent.setExpandVertical(true);
+		_hrZoneContainerContent.setExpandHorizontal(true);
+		_hrZoneContainerContent.addControlListener(new ControlAdapter() {
+			@Override
+			public void controlResized(final ControlEvent e) {
+				_hrZoneContainerContent.setMinSize(scrolledContent.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+			}
+		});
 
 		// layout is necessary, dependent which other view is previously opened
 		_pageBook.layout(true, true);
 	}
 
-	private void createUI23HrZoneHeader(final Composite parent) {
+	private Composite createUI36HrZone(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.swtDefaults().numColumns(5).applyTo(container);
+		{
+			createUI37HrZoneHeader(container);
+			createUI38HrZoneFields(container);
+		}
+		_tk.adapt(container);
+
+		return container;
+	}
+
+	private void createUI37HrZoneHeader(final Composite parent) {
 
 		/*
 		 * label: zone name
@@ -327,7 +349,7 @@ public class TrainingView extends ViewPart {
 		label.setFont(_fontItalic);
 
 		/*
-		 * header label: min/max pulse
+		 * label: min/max pulse
 		 */
 		label = _tk.createLabel(parent, //
 				HEADER_HR_MAX_100
@@ -338,22 +360,28 @@ public class TrainingView extends ViewPart {
 		GridDataFactory.fillDefaults().span(2, 1).align(SWT.END, SWT.FILL).applyTo(label);
 		label.setFont(_fontItalic);
 
-		// spacer
+		// label: %
 		label = _tk.createLabel(parent, UI.SYMBOL_PERCENTAGE);
 		GridDataFactory.fillDefaults()//
-//				.grab(true, false)
+				.align(SWT.END, SWT.FILL)
+				.applyTo(label);
+
+		// label: h:mm
+		label = _tk.createLabel(parent, Messages.App_Label_H_MM);
+		GridDataFactory.fillDefaults()//
 				.align(SWT.END, SWT.FILL)
 				.applyTo(label);
 	}
 
-	private void createUI24HrZoneFields(final Composite parent) {
+	private void createUI38HrZoneFields(final Composite parent) {
 
 		final int hrZoneSize = _hrZones.size();
 
 		/*
 		 * fields
 		 */
-		_lblTourMinMax = new Label[hrZoneSize];
+		_lblTourMinMaxPercent = new Label[hrZoneSize];
+		_lblTourMinMaxHours = new Label[hrZoneSize];
 
 		for (int zoneIndex = 0; zoneIndex < hrZoneSize; zoneIndex++) {
 
@@ -387,12 +415,23 @@ public class TrainingView extends ViewPart {
 					.applyTo(lblHRZoneMinMaxBpm);
 
 			/*
-			 * label: tour hr min/max values
+			 * label: tour hr min/max %
 			 */
-			final Label lblTourMinMax = _lblTourMinMax[zoneIndex] = _tk.createLabel(parent, null, SWT.TRAIL);
+			final Label lblTourMinMaxPercent = _lblTourMinMaxPercent[zoneIndex] = _tk.createLabel(
+					parent,
+					null,
+					SWT.TRAIL);
 			GridDataFactory.fillDefaults() //
 					.hint(_pc.convertWidthInCharsToPixels(6), SWT.DEFAULT)
-					.applyTo(lblTourMinMax);
+					.applyTo(lblTourMinMaxPercent);
+
+			/*
+			 * label: tour hr min/max h:mm
+			 */
+			final Label lblTourMinMaxHours = _lblTourMinMaxHours[zoneIndex] = _tk.createLabel(parent, null, SWT.TRAIL);
+			GridDataFactory.fillDefaults() //
+					.hint(_pc.convertWidthInCharsToPixels(6), SWT.DEFAULT)
+					.applyTo(lblTourMinMaxHours);
 		}
 	}
 
@@ -488,11 +527,14 @@ public class TrainingView extends ViewPart {
 	private void onModifyPerson() {
 
 		_currentPerson = TourbookPlugin.getActivePerson();
-		_hrMax = _currentPerson.getHrMax();
+
+		if (_currentPerson != null) {
+			_hrMax = _currentPerson.getHrMax();
+		}
 
 		// hr zones could be changed
-		if (_hrZoneInnerContainer != null) {
-			_hrZoneInnerContainer.dispose();
+		if (_hrZoneContainerContent != null) {
+			_hrZoneContainerContent.dispose();
 		}
 
 		updateUI();
@@ -627,7 +669,7 @@ public class TrainingView extends ViewPart {
 
 		_pageBook.showPage(_pageTraining);
 
-		updateUITraining();
+//		updateUITraining();
 
 		// set application window title
 		setTitleToolTip(TourManager.getTourDateShort(_tourData));
@@ -655,59 +697,54 @@ public class TrainingView extends ViewPart {
 		updateUI();
 	}
 
-	private void updateUITraining() {
-
-		// create hr zones when not yet done
-		if (_hrZoneInnerContainer == null || _hrZoneInnerContainer.isDisposed()) {
-			createUI22HrZoneInnerContainer(_hrZoneContainer);
-		}
-
-		final int zoneSize = _hrZones.size();
-		final int[] zoneMinValues = new int[zoneSize];
-		final int[] zoneMaxValues = new int[zoneSize];
-
-		// fill zone min/max values
-		for (int zoneIndex = 0; zoneIndex < _hrZones.size(); zoneIndex++) {
-
-			final TourPersonHRZone hrZone = _hrZones.get(zoneIndex);
-
-			zoneMinValues[zoneIndex] = (int) (hrZone.getZoneMinValue() * _hrMax / 100);
-			zoneMaxValues[zoneIndex] = (int) (hrZone.getZoneMaxValue() * _hrMax / 100);
-		}
-
-		final int[] zoneValues = new int[zoneSize];
-		final int[] pulseSerie = _tourData.pulseSerie;
-		final int[] timeSerie = _tourData.timeSerie;
-		int prevTime = 0;
-
-		for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
-
-			final int pulse = pulseSerie[serieIndex];
-			final int time = timeSerie[serieIndex];
-
-			final int timeDiff = time - prevTime;
-
-			for (int zoneIndex = 0; zoneIndex < zoneMinValues.length; zoneIndex++) {
-
-				final int minValue = zoneMinValues[zoneIndex];
-				final int maxValue = zoneMaxValues[zoneIndex];
-
-				if (pulse >= minValue && pulse < maxValue) {
-					zoneValues[zoneIndex] += timeDiff;
-					break;
-				}
-			}
-
-			prevTime = time;
-		}
-
-		final int time100 = timeSerie[timeSerie.length - 1];
-
-		for (int zoneIndex = 0; zoneIndex < zoneValues.length; zoneIndex++) {
-
-			final double zoneValue = zoneValues[zoneIndex];
-
-			_lblTourMinMax[zoneIndex].setText(_nf1.format(zoneValue * 100.0 / time100));
-		}
-	}
+//	private void updateUITraining() {
+//
+//		// create hr zones when not yet done
+//		if (_hrZoneContainerContent == null || _hrZoneContainerContent.isDisposed()) {
+//			createUI35HrZoneContent();
+//		}
+//
+////		final int zoneSize = _hrZones.size();
+////		final int[] zoneMinBpm = _currentPerson.getHrZoneMinBpm();
+////		final int[] zoneMaxBpm = _currentPerson.getHrZoneMaxBpm();
+////
+//		final int[] zoneTimes = _tourData.computeHrZones(_currentPerson);
+////		final int[] pulseSerie = _tourData.pulseSerie;
+//		final int[] timeSerie = _tourData.timeSerie;
+////		int prevTime = 0;
+////
+////		// compute zone values
+////		for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
+////
+////			final int pulse = pulseSerie[serieIndex];
+////			final int time = timeSerie[serieIndex];
+////
+////			final int timeDiff = time - prevTime;
+////
+////			for (int zoneIndex = 0; zoneIndex < zoneMinBpm.length; zoneIndex++) {
+////
+////				final int minValue = zoneMinBpm[zoneIndex];
+////				final int maxValue = zoneMaxBpm[zoneIndex];
+////
+////				if (pulse >= minValue && pulse < maxValue) {
+////					zoneTimes[zoneIndex] += timeDiff;
+////					break;
+////				}
+////			}
+////
+////			prevTime = time;
+////		}
+//
+//		// display zone values
+//		final int time100 = timeSerie[timeSerie.length - 1];
+//
+//		for (int zoneIndex = 0; zoneIndex < zoneTimes.length; zoneIndex++) {
+//
+//			final double zoneTime = zoneTimes[zoneIndex];
+//			final double zoneTimePercent = zoneTime * 100.0 / time100;
+//
+//			_lblTourMinMaxPercent[zoneIndex].setText(_nf1.format(zoneTimePercent));
+//			_lblTourMinMaxHours[zoneIndex].setText(UI.format_hh_mm((long) (zoneTime + 30)).toString());
+//		}
+//	}
 }

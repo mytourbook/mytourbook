@@ -21,6 +21,7 @@ import java.util.HashSet;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourPersonHRZone;
 import net.tourbook.ui.UI;
@@ -508,18 +509,9 @@ public class DialogHRZones extends TitleAreaDialog {
 			}
 		}
 
+		_btnAddZone.setEnabled(hrZoneSize < TourData.MAX_HR_ZONES);
 		_btnSortZones.setEnabled(hrZoneSize > 1);
 		_btnRemoveZone.setEnabled(isRemoveAllowed);
-
-//		/*
-//		 * disable checkboxes when only 2 hr zones are available
-//		 */
-//		if (hrZoneSize <= 2) {
-//			for (int ix = 0; ix < hrZoneSize; ix++) {
-//				_btnTrash[ix].setEnabled(false);
-//			}
-//		}
-
 	}
 
 	@Override

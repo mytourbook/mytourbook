@@ -18,16 +18,22 @@ package net.tourbook.preferences;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourPersonHRZone;
+import net.tourbook.database.IComputeTourValues;
 import net.tourbook.database.PersonManager;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.DeviceManager;
 import net.tourbook.importdata.ExternalDevice;
+import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.training.DialogHRZones;
 import net.tourbook.training.TrainingManager;
@@ -141,6 +147,9 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	private boolean						_isPersonModified			= false;
 	private boolean						_isUpdateUI					= false;
 
+	private HashMap<Long, TourPerson>	_peopleWithModifiedHrZones	= new HashMap<Long, TourPerson>();
+	private boolean						_isHrZoneModified			= false;
+
 	private TourPerson					_selectedPerson;
 	private TourPerson					_newPerson;
 	private Set<TourPersonHRZone>		_backupSelectedPersonHrZones;
@@ -150,6 +159,11 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 	private PixelConverter				_pc;
 	private Font						_fontItalic;
+
+	/**
+	 * Is <code>true</code> when a tour in the tour editor is modified.
+	 */
+	private boolean						_isNoUI						= false;
 
 	/*
 	 * UI controls
@@ -174,6 +188,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 	private ScrolledComposite			_hrZoneScrolledContainer;
 	private Button						_btnModifyHrZones;
+	private Button						_btnComputeHrZonesForAllTours;
 	private Combo						_cboTemplate;
 	private Combo						_cboHrMaxFormula;
 	private DateTime					_dtBirthday;
@@ -197,52 +212,14 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		}
 	}
 
-	private void actionCreateFromTemplate() {
-
-		final int selectedTemplate = _cboTemplate.getSelectionIndex();
-
-		// reselect first item
-		_cboTemplate.select(TrainingManager.HR_ZONE_TEMPLATE_00);
-
-		if (selectedTemplate == TrainingManager.HR_ZONE_TEMPLATE_00) {
-			// just ignore it
-			return;
-		}
-
-		final TourPerson person = getCurrentPerson();
-		final Set<TourPersonHRZone> hrZones = person.getHrZones();
-
-		// check if hr zones are already available
-		if (hrZones != null && hrZones.size() > 0) {
-
-			// hr zones are availabe
-			if (MessageDialog.openQuestion(
-					getShell(),
-					Messages.Pref_People_Dialog_ReplaceHrZones_Title,
-					Messages.Pref_People_Dialog_ReplaceHrZones_Message) == false) {
-				return;
-			}
-		}
-
-		person.setHrZones(TrainingManager.createHrZones(person, selectedTemplate));
-
-		updateUIFromPerson(getCurrentPerson());
-		onModifyPerson();
-	}
-
-	private void actionEditHrZones() {
-
-		if (new DialogHRZones(getShell(), getCurrentPerson()).open() == Window.OK) {
-
-			createUI80HrZoneInnerContainer();
-			onModifyPerson();
-		}
-	}
-
 	@Override
 	public void applyData(final Object data) {
 
 		// this is called after the UI is created
+
+		if (_isNoUI) {
+			return;
+		}
 
 		if (data instanceof Boolean) {
 
@@ -299,8 +276,110 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 	}
 
+	private Set<TourPersonHRZone> cloneHrZones(final Set<TourPersonHRZone> hrZones) {
+
+		final HashSet<TourPersonHRZone> hrZonesClone = new HashSet<TourPersonHRZone>();
+
+		for (final TourPersonHRZone tourPersonHRZone : hrZones) {
+			hrZonesClone.add(tourPersonHRZone.clone());
+		}
+
+		return hrZonesClone;
+	}
+
+	/**
+	 * @param isConfirm
+	 * @return Returns <code>true</code> when all tours has been updated and the update process was
+	 *         not canceled.
+	 */
+	private boolean computeHrZonesForAllTours(final boolean isCheckPeople) {
+
+		setErrorMessage(null);
+
+		final int[] tourCounter = { 0 };
+		final int[] tourCounterWithHrZones = { 0 };
+
+		final boolean isCanceled = TourDatabase.computeValuesForAllTours(new IComputeTourValues() {
+
+			@Override
+			public boolean computeTourValues(final TourData originalTourData) {
+
+				tourCounter[0]++;
+
+				if (isCheckPeople) {
+
+					// check if hr zone was modified for the person which owns the tour
+					final long personId = originalTourData.getTourPerson().getPersonId();
+					if (_peopleWithModifiedHrZones.containsKey(personId) == false) {
+						return false;
+					}
+				}
+
+				originalTourData.computeHrZones();
+
+				final int[] allHrZones = originalTourData.getHrZones();
+
+				// check if hr zones are computed
+				for (final int hrZone : allHrZones) {
+					if (hrZone != -1) {
+						// hr zone is set
+						tourCounterWithHrZones[0]++;
+						return true;
+					}
+				}
+
+				return false;
+			}
+
+			public String getResultText() {
+
+				return NLS.bind(Messages.Compute_HrZones_Job_ComputeAllTours_Result, //
+						new Object[] { tourCounterWithHrZones[0] });
+			}
+
+			@Override
+			public String getSubTaskText(final TourData savedTourData) {
+				return NLS.bind(Messages.Compute_HrZones_Job_ComputeAllTours_SubTask, //
+						new Object[] { tourCounterWithHrZones[0], tourCounter[0] });
+			}
+		});
+
+		if (isCheckPeople && isCanceled) {
+
+			setErrorMessage(Messages.Pref_People_Error_ComputeHrZonesForAllTours);
+
+			MessageDialog.openInformation(
+					getShell(),
+					Messages.Compute_HrZones_Dialog_ComputeAllTours_Title,
+					Messages.Pref_People_Dialog_ComputeHrZonesForAllToursIsCanceled_Message);
+
+			return false;
+		}
+
+		TourManager.getInstance().removeAllToursFromCache();
+		TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR);
+
+		// fire unique event for all changes
+		TourManager.fireEvent(TourEventId.ALL_TOURS_ARE_MODIFIED);
+
+		_isFireModifyEvent = true;
+		fireModifyEvent();
+
+		_peopleWithModifiedHrZones.clear();
+
+		return true;
+	}
+
 	@Override
 	protected Control createContents(final Composite parent) {
+
+		// check: if a tour is modified in the tour editor
+		if (TourManager.isTourEditorModified()) {
+
+			_isNoUI = true;
+
+			return createUI01NoUI(parent);
+		}
 
 		initUI(parent);
 
@@ -378,6 +457,20 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		}
 
 		return _prefPageContainer;
+	}
+
+	private Control createUI01NoUI(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+		{
+			final Label label = new Label(container, SWT.WRAP);
+			GridDataFactory.fillDefaults().grab(true, false).hint(350, SWT.DEFAULT).applyTo(label);
+			label.setText(Messages.Pref_App_Label_TourEditorIsModified);
+		}
+
+		return container;
 	}
 
 	private void createUI10PeopleViewer(final Composite parent) {
@@ -831,19 +924,16 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	private Control createUI60TabHRZone(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.grab(true, true)
-				.applyTo(container);
 		GridLayoutFactory.swtDefaults().numColumns(1).extendedMargins(0, 0, 7, 0).applyTo(container);
 		{
-
-			createUI70HRZone(container);
+			createUI70HrZone(container);
+			createUI72HrZoneActions(container);
 		}
 
 		return container;
 	}
 
-	private void createUI70HRZone(final Composite parent) {
+	private void createUI70HrZone(final Composite parent) {
 
 		final Composite hrZoneContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
@@ -878,35 +968,34 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 					}
 				}
 			});
-
-			createUI72HrZoneActions(hrZoneContainer);
 		}
 	}
 
 	private void createUI72HrZoneActions(final Composite parent) {
 
-		// compute size for the combo first item
+		// compute size for the first combo item
 		Label label = new Label(parent, SWT.NONE);
 		label.setText(Messages.HR_Zone_Template_Select);
 		final Point comboSize = label.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 		label.dispose();
 
-		final Composite actionContainer = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(actionContainer);
-		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(actionContainer);
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
 			/*
 			 * label: create hr zones
 			 */
-			label = new Label(actionContainer, SWT.NONE);
+			label = new Label(container, SWT.NONE);
 			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
 			label.setText(Messages.Pref_People_Label_HrZoneTemplate);
 
 			/*
 			 * combo: formula to compute hr max
 			 */
-
-			_cboTemplate = new Combo(actionContainer, SWT.READ_ONLY | SWT.DROP_DOWN);
+			_cboTemplate = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
 			GridDataFactory.fillDefaults() //
 					.hint(comboSize.x, SWT.DEFAULT)
 					.applyTo(_cboTemplate);
@@ -915,7 +1004,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			_cboTemplate.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					actionCreateFromTemplate();
+					onCreateHrZonesFromTemplate();
 				}
 			});
 
@@ -928,18 +1017,51 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			/*
 			 * button: edit hr zones
 			 */
-			_btnModifyHrZones = new Button(actionContainer, SWT.PUSH);
+			_btnModifyHrZones = new Button(container, SWT.PUSH);
 			GridDataFactory.fillDefaults()//
 					.align(SWT.END, SWT.FILL)
 					.grab(true, false)
+					.indent(10, 0)
 					.applyTo(_btnModifyHrZones);
 			_btnModifyHrZones.setText(Messages.Dialog_HRZone_Button_EditHrZones);
 			_btnModifyHrZones.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					actionEditHrZones();
+					onEditHrZones();
 				}
 			});
+
+			/*
+			 * compute speed values for all tours
+			 */
+			final Composite btnContainer = new Composite(container, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.span(3, 1)
+					.applyTo(btnContainer);
+			GridLayoutFactory.fillDefaults().applyTo(btnContainer);
+			{
+				// button: compute computed values
+				_btnComputeHrZonesForAllTours = new Button(btnContainer, SWT.NONE);
+				GridDataFactory.fillDefaults()//
+						.indent(0, 10)
+						.applyTo(_btnComputeHrZonesForAllTours);
+				_btnComputeHrZonesForAllTours.setText(Messages.Pref_People_Button_HrZones_ComputeAllTours);
+				_btnComputeHrZonesForAllTours
+						.setToolTipText(Messages.Pref_People_Button_HrZones_ComputeAllTours_Tooltip);
+				_btnComputeHrZonesForAllTours.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+
+						if (MessageDialog.openConfirm(
+								Display.getCurrent().getActiveShell(),
+								Messages.Compute_HrZones_Dialog_ComputeAllTours_Title,
+								Messages.Compute_HrZones_Dialog_ComputeAllTours_Title_Message)) {
+
+							computeHrZonesForAllTours(false);
+						}
+					}
+				});
+			}
 		}
 	}
 
@@ -1287,12 +1409,25 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 //			_prefStore.removePropertyChangeListener(_prefChangeListener);
 //		}
 
+		if (_isNoUI) {
+			super.dispose();
+			return;
+		}
+
 		super.dispose();
 	}
 
 	private void enableActions() {
 
 		final boolean isValid = isPersonValid();
+
+		boolean isHrZoneAvailable = false;
+		final TourPerson currentPerson = getCurrentPerson();
+		if (currentPerson != null) {
+
+			final Set<TourPersonHRZone> hrZones = currentPerson.getHrZones();
+			isHrZoneAvailable = hrZones != null && hrZones.size() > 0;
+		}
 
 		_btnAdd.setEnabled(!_isPersonModified && isValid);
 		_peopleViewer.getTable().setEnabled(!_isPersonModified && isValid);
@@ -1303,13 +1438,9 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 		_spinnerMaxHR.setEnabled(getSelectedHrMaxFormulaKey() == TrainingManager.HR_MAX_NOT_COMPUTED);
 
-		final TourPerson currentPerson = getCurrentPerson();
-		if (currentPerson != null) {
-
-			final Set<TourPersonHRZone> hrZones = currentPerson.getHrZones();
-			final boolean isHrZoneAvailable = hrZones != null && hrZones.size() > 0;
-			_btnModifyHrZones.setEnabled(isHrZoneAvailable);
-		}
+		_btnModifyHrZones.setEnabled(isHrZoneAvailable);
+//		_btnComputeHrZonesForAllTours.setEnabled(_isPersonModified && isValid);
+		_btnComputeHrZonesForAllTours.setEnabled(_isPersonModified == false);
 	}
 
 	private void fireModifyEvent() {
@@ -1402,7 +1533,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 			setErrorMessage(Messages.Pref_People_Error_first_name_is_required);
 
-			_txtFirstName.setFocus();
+			// don't set focus because another field could be edited
+//			_txtFirstName.setFocus();
 
 			return false;
 
@@ -1413,8 +1545,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			if (!transferPath.equals(UI.EMPTY_STRING) && Util.isDirectory(transferPath) == false) {
 
 				setErrorMessage(Messages.Pref_People_Error_path_is_invalid);
-
-				_txtRawDataPath.selectAll();
 
 				return false;
 			}
@@ -1428,15 +1558,24 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	@Override
 	public boolean okToLeave() {
 
+		if (_isNoUI) {
+			super.okToLeave();
+			return true;
+		}
+
 		if (isPersonValid() == false) {
 			return false;
 		}
 
 		saveState();
-		savePerson(true);
+		savePerson(true, true);
 
 		// enable action because the user can go back to this pref page
 		enableActions();
+
+		if (updateToursWithModifiedHrZones() == false) {
+			return false;
+		}
 
 		return super.okToLeave();
 	}
@@ -1460,12 +1599,68 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		_newPerson = null;
 		_isPersonModified = false;
 
-		_selectedPerson.setHrZones(_backupSelectedPersonHrZones);
+		if (_backupSelectedPersonHrZones != null) {
+			_selectedPerson.setHrZones(_backupSelectedPersonHrZones);
+		}
 
 		updateUIFromPerson(_selectedPerson);
 		enableActions();
 
 		_peopleViewer.getTable().setFocus();
+	}
+
+	private void onCreateHrZonesFromTemplate() {
+
+		final int selectedTemplate = _cboTemplate.getSelectionIndex();
+
+		// reselect first item
+		_cboTemplate.select(TrainingManager.HR_ZONE_TEMPLATE_00);
+
+		if (selectedTemplate == TrainingManager.HR_ZONE_TEMPLATE_00) {
+			// just ignore it
+			return;
+		}
+
+		final TourPerson person = getCurrentPerson();
+		final Set<TourPersonHRZone> hrZones = person.getHrZones();
+
+		// check if hr zones are already available
+		if (hrZones != null && hrZones.size() > 0) {
+
+			// hr zones are availabe
+			if (MessageDialog.openQuestion(
+					getShell(),
+					Messages.Pref_People_Dialog_ReplaceHrZones_Title,
+					Messages.Pref_People_Dialog_ReplaceHrZones_Message) == false) {
+				return;
+			}
+		}
+
+		if (_backupSelectedPersonHrZones == null) {
+			_backupSelectedPersonHrZones = cloneHrZones(hrZones);
+		}
+
+		person.setHrZones(TrainingManager.createHrZones(person, selectedTemplate));
+
+		_isHrZoneModified = true;
+
+		createUI80HrZoneInnerContainer();
+		onModifyPerson();
+	}
+
+	private void onEditHrZones() {
+
+		if (_backupSelectedPersonHrZones == null) {
+			_backupSelectedPersonHrZones = cloneHrZones(getCurrentPerson().getHrZones());
+		}
+
+		if (new DialogHRZones(getShell(), getCurrentPerson()).open() == Window.OK) {
+
+			_isHrZoneModified = true;
+
+			createUI80HrZoneInnerContainer();
+			onModifyPerson();
+		}
 	}
 
 	/**
@@ -1498,7 +1693,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 			_selectedPerson = person;
 
-			_backupSelectedPersonHrZones = person.getHrZones();
+			_backupSelectedPersonHrZones = null;
 
 			updateUIFromPerson(_selectedPerson);
 
@@ -1515,22 +1710,33 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			return;
 		}
 
-		savePerson(false);
+		savePerson(false, false);
 		enableActions();
 	}
 
 	@Override
 	public boolean performCancel() {
 
+		if (_isNoUI) {
+			super.performCancel();
+			return true;
+		}
+
 		if (_isPersonModified && _newPerson == null) {
 
 			// existing person is modified, reset hr zones
 
-			_selectedPerson.setHrZones(_backupSelectedPersonHrZones);
+			if (_backupSelectedPersonHrZones != null) {
+				_selectedPerson.setHrZones(_backupSelectedPersonHrZones);
+			}
 		}
 
 		saveState();
 		fireModifyEvent();
+
+		if (updateToursWithModifiedHrZones() == false) {
+			return false;
+		}
 
 		return super.performCancel();
 	}
@@ -1538,14 +1744,29 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	@Override
 	public boolean performOk() {
 
+		if (_isNoUI) {
+			super.performOk();
+			return true;
+		}
+
 		if (isPersonValid() == false) {
 			return false;
 		}
 
-		savePerson(false);
+		savePerson(false, false);
+
+		/*
+		 * update UI because it's possible that other dialog boxes are displayed before the pref
+		 * dialog is closed
+		 */
+		enableActions();
 
 		saveState();
 		fireModifyEvent();
+
+		if (updateToursWithModifiedHrZones() == false) {
+			return false;
+		}
 
 		return super.performOk();
 	}
@@ -1584,7 +1805,12 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		_tabFolderPerson.setSelection(Util.getStateInt(_state, STATE_SELECTED_TAB_FOLDER, 0));
 	}
 
-	private void savePerson(final boolean isAskToSave) {
+	/**
+	 * @param isAskToSave
+	 * @param isRevert
+	 * @return Returns <code>false</code> when person is not saved, modifications will be reverted.
+	 */
+	private boolean savePerson(final boolean isAskToSave, final boolean isRevert) {
 
 		final boolean isNewPerson = _newPerson != null;
 		final TourPerson person = getCurrentPerson();
@@ -1602,14 +1828,21 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 						// use name from the ui because it could be modified
 								_txtFirstName.getText())) == false) {
 
-					// update state
-					_isPersonModified = false;
+					// revert person
 
-					// update ui from the previous selected person
-					_selectedPerson.setHrZones(_backupSelectedPersonHrZones);
-					updateUIFromPerson(_selectedPerson);
+					if (isRevert) {
 
-					return;
+						// update state
+						_isPersonModified = false;
+
+						// update ui from the previous selected person
+						if (_backupSelectedPersonHrZones != null) {
+							_selectedPerson.setHrZones(_backupSelectedPersonHrZones);
+						}
+						updateUIFromPerson(_selectedPerson);
+					}
+
+					return false;
 				}
 			}
 
@@ -1627,14 +1860,24 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			if (isNewPerson) {
 //				_people.add(person);
 				_peopleViewer.add(person);
+
 			} else {
 				// !!! refreshing a person do not resort the table when sorting has changed !!!
 				_peopleViewer.refresh();
 			}
 
+			if (_isHrZoneModified) {
+				// keep person which hr zone was modified
+				_peopleWithModifiedHrZones.put(person.getPersonId(), person);
+			}
+
+			_isHrZoneModified = false;
+
 			// select updated/new person
 			_peopleViewer.setSelection(new StructuredSelection(person), true);
 		}
+
+		return true;
 	}
 
 	private void saveState() {
@@ -1678,6 +1921,26 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		final int hrMaxSelectionIndex = _cboHrMaxFormula.getSelectionIndex();
 		person.setHrMaxFormula(TrainingManager.HRMaxFormulaKeys[hrMaxSelectionIndex]);
 		person.setMaxPulse(_spinnerMaxHR.getSelection());
+	}
+
+	/**
+	 * @return Return <code>true</code> when HR zones are not modified or when HR zones has been
+	 *         updated. Returns <code>false</code> when tour data update has been canceled.
+	 */
+	private boolean updateToursWithModifiedHrZones() {
+
+		setErrorMessage(null);
+
+		if (_peopleWithModifiedHrZones.size() == 0) {
+			return true;
+		}
+
+		MessageDialog.openInformation(
+				getShell(),
+				Messages.Compute_HrZones_Dialog_ComputeAllTours_Title,
+				Messages.Pref_People_Dialog_ComputeHrZonesForAllTours_Message);
+
+		return computeHrZonesForAllTours(true);
 	}
 
 	/**

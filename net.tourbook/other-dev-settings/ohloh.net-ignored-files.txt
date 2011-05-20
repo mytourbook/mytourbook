@@ -1,0 +1,29 @@
+# these files are ignored on ohloh.net
+
+Disallow: de.byteholder.geoclipse.ext.geotools/
+
+Disallow: net.tourbook.device.garmin.fit/fit-source.jar
+Disallow: net.tourbook.device.garmin.fit/fit.jar
+Disallow: net.tourbook.device.garmin.fit/FIT SDK 1.0.zip
+Disallow: net.tourbook.device.garmin.fit/Profile.zip
+
+Disallow: net.tourbook.ext.ejb3_3.4.0/
+Disallow: net.tourbook.ext.jars/
+Disallow: net.tourbook.ext.jars.printing/
+Disallow: net.tourbook.ext.velocity/
+
+Disallow: net.tourbook.rxtx_2.2/
+Disallow: net.tourbook.rxtx.linux32_2.2/
+Disallow: net.tourbook.rxtx.linux64_2.2/
+Disallow: net.tourbook.rxtx.macosx_2.2/
+Disallow: net.tourbook.rxtx.win32_2.2/
+Disallow: net.tourbook.rxtx.win64_2.2/
+
+Disallow: org.apache.derby.core 10.5.1.1/
+
+Disallow: FEATURES/
+Disallow: INSTALL-UPDATES/
+Disallow: LANGUAGE-FRAGMENTS/
+Disallow: MESSAGES-EDITOR/
+Disallow: NOT-USED-PLUGINS/
+

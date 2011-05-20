@@ -24,9 +24,10 @@ import javax.persistence.Transient;
 
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.UI;
+import net.tourbook.util.StatusUtil;
 
 @Entity
-public class TourPersonHRZone implements Comparable<TourPersonHRZone> {
+public class TourPersonHRZone implements Cloneable, Comparable<TourPersonHRZone> {
 
 	private static final String	NAME_SHORTCUT_PREFIX	= " (";							//$NON-NLS-1$
 	private static final String	NAME_SHORTCUT_POSTFIX	= ")";								//$NON-NLS-1$
@@ -60,12 +61,12 @@ public class TourPersonHRZone implements Comparable<TourPersonHRZone> {
 	private String				description;
 
 	/**
-	 * Minimum value of the hr zone
+	 * Minimum value of the hr zone in % of hr max
 	 */
 	private int					zoneMinValue;
 
 	/**
-	 * Maximum value of the hr zone
+	 * Maximum value of the hr zone in % of hr max
 	 */
 	private int					zoneMaxValue;
 
@@ -91,32 +92,54 @@ public class TourPersonHRZone implements Comparable<TourPersonHRZone> {
 		_createId = ++_createCounter;
 	}
 
-//    public int compareTo(Integer anotherInteger) {
-//	int thisVal = this.value;
-//	int anotherVal = anotherInteger.value;
-//	return (thisVal<anotherVal ? -1 : (thisVal==anotherVal ? 0 : 1));
-//    }
+	@Override
+	public TourPersonHRZone clone() {
+
+		try {
+
+			// create clones for shallow copied fields so that they can be modified
+
+			final TourPersonHRZone newHrZone = (TourPersonHRZone) super.clone();
+
+			newHrZone.zoneName = zoneName == null ? null : new String(zoneName);
+			newHrZone.nameShortcut = nameShortcut == null ? null : new String(nameShortcut);
+			newHrZone.description = description == null ? null : new String(description);
+
+			return newHrZone;
+
+		} catch (final CloneNotSupportedException e) {
+			StatusUtil.log(e);
+			return null;
+		}
+	}
+
+//	/**
+//	 * @return Returns a deep clone of {@link TourPersonHRZone}
+//	 */
+//	public TourPersonHRZone deepClone() {
+//
+//		try {
+//
+//			final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//			final ObjectOutputStream oos = new ObjectOutputStream(baos);
+//			oos.writeObject(this);
+//
+//			final ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+//			final ObjectInputStream ois = new ObjectInputStream(bais);
+//
+//			final TourPersonHRZone newObject = (TourPersonHRZone) ois.readObject();
+//
+//			return newObject;
+//
+//		} catch (final Exception e) {
+//			StatusUtil.log(e);
+//			return null;
+//		}
+//	}
 
 	@Override
 	public int compareTo(final TourPersonHRZone otherHrZone) {
 
-		/*
-		 * check if first or last entry is sorted
-		 */
-//		if (zoneMinValue == Integer.MIN_VALUE || zoneMinValue == Integer.MIN_VALUE) {
-//			return Integer.MIN_VALUE;
-////			return -1;
-//		}
-//
-//		if (zoneMaxValue == Integer.MAX_VALUE) {
-//			return Integer.MAX_VALUE;
-////			return 1;
-//		}
-
-//		final int minDiff = zoneMinValue - otherHrZone.zoneMinValue;
-//		final int maxDiff = zoneMaxValue - otherHrZone.zoneMaxValue;
-
-//		return zoneMinValue < otherHrZone.zoneMinValue ? -1 : zoneMinValue == otherHrZone.zoneMinValue ? 0 : 1;
 		return zoneMaxValue < otherHrZone.zoneMaxValue ? -1 : zoneMaxValue == otherHrZone.zoneMaxValue ? 0 : 1;
 	}
 
@@ -185,10 +208,16 @@ public class TourPersonHRZone implements Comparable<TourPersonHRZone> {
 		return tourPerson;
 	}
 
+	/**
+	 * @return Returns maximum value of the hr zone in % of hr max
+	 */
 	public int getZoneMaxValue() {
 		return zoneMaxValue;
 	}
 
+	/**
+	 * @return Returns minimum value of the hr zone in % of hr max
+	 */
 	public int getZoneMinValue() {
 		return zoneMinValue;
 	}

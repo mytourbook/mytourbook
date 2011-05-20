@@ -107,12 +107,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public static final int									DB_LENGTH_WEATHER					= 1000;
 	public static final int									DB_LENGTH_WEATHER_CLOUDS			= 255;
 
-	/**
-	 *
-	 */
 	public static final int									MIN_TIMEINTERVAL_FOR_MAX_SPEED		= 20;
 
 	public static final float								MAX_BIKE_SPEED						= 120f;
+
+	/**
+	 * Number of defined hr zone fields which is currently {@link #hrZone0} ... {@link #hrZone9} =
+	 * 10
+	 */
+	public static final int									MAX_HR_ZONES						= 10;
 
 	/**
 	 * Device Id for manually created tours
@@ -275,15 +278,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private float											bikerWeight;																			// db-version 4
 
 	/**
-	 * A flag indicating that the pulse is from a sensor. This is the state of the device which is
-	 * not related to the availability of pulse data. Pulse data should be available but is not
-	 * checked.<br>
-	 * <br>
-	 * 0 == false, 1 == true
-	 */
-	private int												isPulseSensorPresent				= 0;												// db-version 12
-
-	/**
 	 * A flag indicating that the power is from a sensor. This is the state of the device which is
 	 * not related to the availability of power data. Power data should be available but is not
 	 * checked.<br>
@@ -291,6 +285,38 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * 0 == false, 1 == true
 	 */
 	private int												isPowerSensorPresent				= 0;												// db-version 12
+
+	// ############################################# PULSE #############################################
+
+	@XmlElement
+	private int												avgPulse;																				// db-version 4
+
+	@XmlElement
+	private int												maxPulse;																				// db-version 4
+
+	/**
+	 * Time for all HR zones are contained in {@link #hrZone0} ... {@link #hrZone9}. Each tour can
+	 * have up to 10 HR zones, when HR zone is <code>-1</code> then this zone is not set.
+	 */
+	private int												hrZone0								= -1;												// db-version 16
+	private int												hrZone1								= -1;												// db-version 16
+	private int												hrZone2								= -1;												// db-version 16
+	private int												hrZone3								= -1;												// db-version 16
+	private int												hrZone4								= -1;												// db-version 16
+	private int												hrZone5								= -1;												// db-version 16
+	private int												hrZone6								= -1;												// db-version 16
+	private int												hrZone7								= -1;												// db-version 16
+	private int												hrZone8								= -1;												// db-version 16
+	private int												hrZone9								= -1;												// db-version 16
+
+	/**
+	 * A flag indicating that the pulse is from a sensor. This is the state of the device which is
+	 * not related to the availability of pulse data. Pulse data should be available but is not
+	 * checked.<br>
+	 * <br>
+	 * 0 == false, 1 == true
+	 */
+	private int												isPulseSensorPresent				= 0;												// db-version 12
 
 	// ############################################# DEVICE TOUR TYPE #############################################
 
@@ -317,16 +343,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	private String											deviceModeName;																		// db-version 4
 
-	// ############################################# MAX VALUES #############################################
-
 	/**
 	 * maximum altitude in metric system
 	 */
 	@XmlElement
 	private int												maxAltitude;																			// db-version 4
 
-	@XmlElement
-	private int												maxPulse;																				// db-version 4
+	// ############################################# MAX VALUES #############################################
 
 	/**
 	 * maximum speed in metric system
@@ -337,23 +360,20 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	// ############################################# AVERAGE VALUES #############################################
 
 	@XmlElement
-	private int												avgPulse;																				// db-version 4
-
-	@XmlElement
 	private int												avgCadence;																			// db-version 4
-	private int												avgTemperature;																		// db-version 4
 
+	private int												avgTemperature;																		// db-version 4
 	private int												weatherWindDir;																		// db-version 8
+
 	private int												weatherWindSpd;																		// db-version 8
 	private String											weatherClouds;																			// db-version 8
 	private String											weather;																				// db-version 13
-
 	private float											deviceAvgSpeed;																		// db-version 12
-
-	// ############################################# OTHER TOUR/DEVICE DATA #############################################
 
 	@XmlElement
 	private String											tourTitle;																				// db-version 4
+
+	// ############################################# OTHER TOUR/DEVICE DATA #############################################
 
 	@XmlElement
 	private String											tourDescription;																		// db-version 4
@@ -402,13 +422,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	private String											deviceFirmwareVersion;																	// db-version 12
 
-	// ############################################# MERGED DATA #############################################
-
 	/**
 	 * when a tour is merged with another tour, {@link #mergeSourceTourId} contains the tour id of
 	 * the tour which is merged into this tour
 	 */
 	private Long											mergeSourceTourId;																		// db-version 7
+
+	// ############################################# MERGED DATA #############################################
 
 	/**
 	 * when a tour is merged into another tour, {@link #mergeTargetTourId} contains the tour id of
@@ -426,8 +446,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	private int												mergedAltitudeOffset;																	// db-version 7
 
-	// ############################################# PLUGIN DATA #############################################
-
 	/**
 	 * Unique plugin id for the device data reader which created this tour, this id is defined in
 	 * plugin.xml
@@ -436,6 +454,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	private String											devicePluginId;
 
+	// ############################################# PLUGIN DATA #############################################
+
 	/**
 	 * Visible name for the used {@link TourbookDevice}, this name is defined in plugin.xml
 	 * <p>
@@ -443,15 +463,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	private String											devicePluginName;																		// db-version 4
 
-	// ############################################# CONCONI TEST #############################################
-
 	/**
 	 * Deflection point in the conconi test, this value is the index for the data serie on the
 	 * x-axis
 	 */
 	private int												conconiDeflection;
 
-	// ############################################# UNUSED FIELDS #############################################
+	// ############################################# CONCONI TEST #############################################
 
 	/**
 	 * ssss distance msw
@@ -460,6 +478,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	@SuppressWarnings("unused")
 	private int												distance;
+
+	// ############################################# UNUSED FIELDS #############################################
 
 	@SuppressWarnings("unused")
 	private int												deviceDistance;
@@ -485,8 +505,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	@Basic(optional = false)
 	private SerieData										serieData;
 
-	// ############################################# ASSOCIATED ENTITIES #############################################
-
 	/**
 	 * Tour marker
 	 */
@@ -495,6 +513,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	@XmlElementWrapper(name = "TourMarkers")
 	@XmlElement(name = "TourMarker")
 	private Set<TourMarker>									tourMarkers							= new HashSet<TourMarker>();
+
+	// ############################################# ASSOCIATED ENTITIES #############################################
 
 	/**
 	 * Contains the tour way points
@@ -536,15 +556,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	@ManyToOne
 	private TourBike										tourBike;
 
-	/*
-	 * tourCategory is currently (version 1.6) not used but is defined in older databases, it is
-	 * disabled because the field is not available in the database table
-	 */
-	//	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "tourData")
-	//	private Set<TourCategory>	tourCategory					= new HashSet<TourCategory>();
-
-	// ############################################# TRANSIENT DATA #############################################
-
 	/**
 	 * Contains time in seconds relativ to the tour start which is defined in: {@link #startYear},
 	 * {@link #startMonth}, {@link #startDay}, {@link #startHour}, {@link #startMinute} and
@@ -555,6 +566,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	@Transient
 	public int[]											timeSerie;
+
+	/*
+	 * tourCategory is currently (version 1.6) not used but is defined in older databases, it is
+	 * disabled because the field is not available in the database table
+	 */
+	//	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "tourData")
+	//	private Set<TourCategory>	tourCategory					= new HashSet<TourCategory>();
+
+	// ############################################# TRANSIENT DATA #############################################
 
 	/**
 	 * contains the absolute distance in m (metric system)
@@ -597,10 +617,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public int[]											pulseSerie;
 
 	/**
-	 * Is <code>true</code> when the time slice is a break
+	 * Contains <code>true</code> or <code>false</code> for each time slice of the whole tour.
+	 * <code>true</code> is set when a time slice is a break.
 	 */
 	@Transient
-	public boolean[]										breakTimeSerie;
+	private boolean[]										breakTimeSerie;
+
+//	@Transient
+//	private boolean	_isBreakTimeComputed;
 
 	/**
 	 * contains the temperature in the metric measurement system
@@ -676,12 +700,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	@Transient
 	public int[]											gradientSerie;
 
+	@Transient
+	public int[]											tourCompareSerie;
+
 	/*
 	 * computed data series
 	 */
-
-	@Transient
-	public int[]											tourCompareSerie;
 
 	/*
 	 * GPS data
@@ -715,40 +739,40 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	@Transient
 	public int[]											segmentSerieTimeTotal;
+
 	@Transient
 	public int[]											segmentSerieRecordingTime;
 	@Transient
 	public int[]											segmentSerieDrivingTime;
 	@Transient
 	public int[]											segmentSerieBreakTime;
-
 	@Transient
 	public int[]											segmentSerieDistanceDiff;
+
 	@Transient
 	public int[]											segmentSerieDistanceTotal;
-
 	@Transient
 	public int[]											segmentSerieAltitudeDiff;
+
 	@Transient
 	public int[]											segmentSerieComputedAltitudeDiff;
-
 	@Transient
 	public float[]											segmentSerieAltitudeUpH;
-	@Transient
-	public int[]											segmentSerieAltitudeDownH;
 
 	@Transient
+	public int[]											segmentSerieAltitudeDownH;
+	@Transient
 	public float[]											segmentSerieSpeed;
+
 	@Transient
 	public float[]											segmentSeriePace;
 	@Transient
 	public float[]											segmentSeriePaceDiff;
-
 	@Transient
 	public float[]											segmentSeriePower;
+
 	@Transient
 	public float[]											segmentSerieGradient;
-
 	@Transient
 	public float[]											segmentSeriePulse;
 
@@ -869,6 +893,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	@Transient
 	private ArrayList<TourMarker>							_sortedMarkers;
+
+	/**
+	 * Contains seconds from all hr zones: {@link #hrZone0} ... {@link #hrZone9}
+	 */
+	@Transient
+	private int[]											_hrZones;
 
 	public TourData() {}
 
@@ -1635,27 +1665,63 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			return (int) (((float) pulseSerie[firstIndex] + pulseSerie[lastIndex]) / 2 + 0.5f);
 		}
 
+		// get break time when not yet set
+		if (breakTimeSerie == null) {
+			getBreakTime();
+		}
+
 		// at least 3 points are available
 		int prevTime = timeSerie[firstIndex];
 		int currentTime = timeSerie[firstIndex];
 		int nextTime = timeSerie[firstIndex + 1];
+
+		/**
+		 * a break is set from the previous to the current time slice
+		 */
+		boolean isPrevBreak = breakTimeSerie == null ? false : breakTimeSerie[firstIndex];
+		boolean isNextBreak = breakTimeSerie == null ? false : breakTimeSerie[firstIndex + 1];
 
 		float pulseSquare = 0;
 		float timeSquare = 0;
 
 		for (int serieIndex = firstIndex; serieIndex <= lastIndex; serieIndex++) {
 
+			if (breakTimeSerie != null) {
+
+				/*
+				 * break time requires distance data, so it's possible that break time data are not
+				 * available
+				 */
+
+				if (breakTimeSerie[serieIndex] == true) {
+
+					// break has occured in this time slice
+
+					if (serieIndex < lastIndex) {
+
+						isPrevBreak = isNextBreak;
+						isNextBreak = breakTimeSerie == null ? false : breakTimeSerie[serieIndex + 1];
+
+						prevTime = currentTime;
+						currentTime = nextTime;
+						nextTime = timeSerie[serieIndex + 1];
+					}
+
+					continue;
+				}
+			}
+
 			final float pulse = pulseSerie[serieIndex];
 
 			float timeDiffPrev = 0;
 			float timeDiffNext = 0;
 
-			if (serieIndex > firstIndex) {
+			if (serieIndex > firstIndex && isPrevBreak == false) {
 				// prev is available
 				timeDiffPrev = ((float) currentTime - prevTime) / 2;
 			}
 
-			if (serieIndex < lastIndex) {
+			if (serieIndex < lastIndex && isNextBreak == false) {
 				// next is available
 				timeDiffNext = ((float) nextTime - currentTime) / 2;
 			}
@@ -1666,10 +1732,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			}
 
 			if (serieIndex < lastIndex) {
+
+				isPrevBreak = isNextBreak;
+				isNextBreak = breakTimeSerie == null ? false : breakTimeSerie[serieIndex + 1];
+
 				prevTime = currentTime;
 				currentTime = nextTime;
 				nextTime = timeSerie[serieIndex + 1];
 			}
+
 		}
 
 		return timeSquare == 0f ? 0 : (int) (pulseSquare / timeSquare + 0.5f);
@@ -1698,32 +1769,70 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 	}
 
-	private int computeBreakTimeVariable(final int startIndex, int endIndex, final BreakTimeTool btConfig) {
-
-		endIndex = Math.min(endIndex, timeSerie.length - 1);
+	private int computeBreakTime(final int startIndex, int endIndex) {
 
 		int totalBreakTime = 0;
 
-		if (breakTimeSerie != null) {
+		endIndex = Math.min(endIndex, timeSerie.length - 1);
 
-			// break time is already computed
+		int prevTime = timeSerie[startIndex];
 
-			int prevTime = timeSerie[startIndex];
+		for (int serieIndex = startIndex + 1; serieIndex <= endIndex; serieIndex++) {
 
-			for (int serieIndex = startIndex + 1; serieIndex <= endIndex; serieIndex++) {
+			final int currentTime = timeSerie[serieIndex];
+			final boolean isBreak = breakTimeSerie[serieIndex];
 
-				final int currentTime = timeSerie[serieIndex];
-				final boolean isBreak = breakTimeSerie[serieIndex];
-
-				if (isBreak) {
-					totalBreakTime += currentTime - prevTime;
-				}
-
-				prevTime = currentTime;
+			if (isBreak) {
+				totalBreakTime += currentTime - prevTime;
 			}
 
-			return totalBreakTime;
+			prevTime = currentTime;
 		}
+
+		return totalBreakTime;
+	}
+
+	/**
+	 * calculate the driving time, ignore the time when the distance is 0 within a time period which
+	 * is defined by <code>sliceMin</code>
+	 * 
+	 * @param minSlices
+	 *            A break will occure when the distance will not change within the minimum number of
+	 *            time slices.
+	 * @return Returns the number of slices which can be ignored
+	 */
+	private void computeBreakTimeFixed(int minSlices) {
+
+		final int[] distanceSerieMetric = getMetricDistanceSerie();
+
+		breakTimeSerie = new boolean[timeSerie.length];
+
+		int minSlicesDistance = 0;
+
+		minSlices = (minSlices >= 1) ? minSlices : 1;
+
+		for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
+
+			breakTimeSerie[serieIndex] = distanceSerieMetric[serieIndex] == minSlicesDistance;
+
+			int minSlicesIndex = serieIndex - minSlices;
+			if (minSlicesIndex < 0) {
+				minSlicesIndex = 0;
+			}
+
+			minSlicesDistance = distanceSerieMetric[minSlicesIndex];
+		}
+	}
+
+	/**
+	 * Computes tour break time
+	 * 
+	 * @param startIndex
+	 * @param endIndex
+	 * @param btConfig
+	 * @return Returns break time for the whole tour.
+	 */
+	private int computeBreakTimeVariable(final int startIndex, final int endIndex, final BreakTimeTool btConfig) {
 
 		/*
 		 * compute break time according to the selected method
@@ -1766,7 +1875,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 		// this case should not occure !!!
 
-		return totalBreakTime;
+		return 0;
 	}
 
 	/**
@@ -1781,6 +1890,79 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		computeAvgPulse();
 		computeAvgCadence();
 		computeAvgTemperature();
+
+		computeHrZones();
+	}
+
+	/**
+	 * Computes seconds for each hr zone.
+	 */
+	public void computeHrZones() {
+
+		if (timeSerie == null || pulseSerie == null || tourPerson == null) {
+			return;
+		}
+
+		final int[] zoneMinBpm = tourPerson.getHrZoneMinBpm();
+		if (zoneMinBpm == null) {
+			// hr zones are not defined
+			return;
+		}
+
+		if (breakTimeSerie == null) {
+			getBreakTime();
+		}
+
+		final int[] zoneMaxBpm = tourPerson.getHrZoneMaxBpm();
+
+		final int zoneSize = zoneMinBpm.length;
+		final int[] hrZones = new int[zoneSize];
+		int prevTime = 0;
+
+		// compute zone values
+		for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
+
+			final int pulse = pulseSerie[serieIndex];
+			final int time = timeSerie[serieIndex];
+
+			final int timeDiff = time - prevTime;
+			prevTime = time;
+
+			if (breakTimeSerie != null) {
+
+				/*
+				 * break time requires distance data, so it's possible that break time data are not
+				 * available
+				 */
+
+				if (breakTimeSerie[serieIndex] == true) {
+					// hr zones are not set for break time
+					continue;
+				}
+			}
+
+			for (int zoneIndex = 0; zoneIndex < zoneMinBpm.length; zoneIndex++) {
+
+				final int minValue = zoneMinBpm[zoneIndex];
+				final int maxValue = zoneMaxBpm[zoneIndex];
+
+				if (pulse >= minValue && pulse < maxValue) {
+					hrZones[zoneIndex] += timeDiff;
+					break;
+				}
+			}
+		}
+
+		hrZone0 = zoneSize > 0 ? hrZones[0] : -1;
+		hrZone1 = zoneSize > 1 ? hrZones[1] : -1;
+		hrZone2 = zoneSize > 2 ? hrZones[2] : -1;
+		hrZone3 = zoneSize > 3 ? hrZones[3] : -1;
+		hrZone4 = zoneSize > 4 ? hrZones[4] : -1;
+		hrZone5 = zoneSize > 5 ? hrZones[5] : -1;
+		hrZone6 = zoneSize > 6 ? hrZones[6] : -1;
+		hrZone7 = zoneSize > 7 ? hrZones[7] : -1;
+		hrZone8 = zoneSize > 8 ? hrZones[8] : -1;
+		hrZone9 = zoneSize > 9 ? hrZones[9] : -1;
 	}
 
 	private void computeMaxAltitude() {
@@ -2217,7 +2399,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		if ((timeSerie == null) || (timeSerie.length == 0)) {
 			tourDrivingTime = 0;
 		} else {
-			final int tourDrivingTimeRaw = timeSerie[timeSerie.length - 1] - getBreakTime(0, timeSerie.length);
+			final int tourDrivingTimeRaw = timeSerie[timeSerie.length - 1] - getBreakTime();
 			tourDrivingTime = Math.max(0, tourDrivingTimeRaw);
 		}
 	}
@@ -2957,7 +3139,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			 */
 			final int timeEnd = timeSerie[segmentEndIndex];
 			final int recordingTime = timeEnd - timeStart;
-			final int segmentBreakTime = getSegmentBreakTime(segmentStartIndex, segmentEndIndex, btConfig);
+			final int segmentBreakTime = getBreakTime(segmentStartIndex, segmentEndIndex, btConfig);
 
 			final float drivingTime = recordingTime - segmentBreakTime;
 
@@ -3248,73 +3430,72 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return bikerWeight;
 	}
 
-	/**
-	 * Computes the time between start index and end index when the speed is <code>0</code>
-	 * 
-	 * @param startIndex
-	 * @param endIndex
-	 * @return Returns the break time in seconds
-	 */
-	public int getBreakTime(final int startIndex, final int endIndex) {
+	private int getBreakTime() {
 
-		if (distanceSerie == null) {
-			// distance is required
+		if (timeSerie == null) {
 			return 0;
 		}
 
-		final int minBreakTime = 20;
+		return getBreakTime(0, timeSerie.length, BreakTimeTool.getPrefValues());
+	}
 
-		if (deviceTimeInterval == -1) {
+	public int getBreakTime(final int startIndex, final int endIndex) {
 
-			// variable time slices
-
-			return computeBreakTimeVariable(startIndex, endIndex, BreakTimeTool.getPrefValues());
-
-		} else {
-
-			// fixed time slices
-
-			final int ignoreTimeSlices = deviceTimeInterval == 0 ? //
-					0
-					: getBreakTimeSlices(distanceSerie, startIndex, endIndex, minBreakTime / deviceTimeInterval);
-
-			return ignoreTimeSlices * deviceTimeInterval;
+		if (timeSerie == null) {
+			return 0;
 		}
+
+		return getBreakTime(startIndex, endIndex, BreakTimeTool.getPrefValues());
 	}
 
 	/**
-	 * calculate the driving time, ignore the time when the distance is 0 within a time period which
-	 * is defined by <code>sliceMin</code>
+	 * Computes break time between start and end index when and when a break occures
 	 * 
-	 * @param distanceValues
-	 * @param indexLeft
-	 * @param indexRight
-	 * @param sliceMin
-	 * @return Returns the number of slices which can be ignored
+	 * @param startIndex
+	 * @param endIndex
+	 * @param breakTimeTool
+	 * @return Returns the break time in seconds
 	 */
-	private int getBreakTimeSlices(final int[] distanceValues, final int indexLeft, int indexRight, int sliceMin) {
+	private int getBreakTime(final int startIndex, final int endIndex, final BreakTimeTool breakTimeTool) {
 
-		final int distanceLengthLast = distanceValues.length - 1;
-
-		int ignoreTimeCounter = 0;
-		int oldDistance = 0;
-
-		sliceMin = (sliceMin >= 1) ? sliceMin : 1;
-		indexRight = (indexRight <= distanceLengthLast) ? indexRight : distanceLengthLast;
-
-		for (int valueIndex = indexLeft; valueIndex <= indexRight; valueIndex++) {
-
-			if (distanceValues[valueIndex] == oldDistance) {
-				ignoreTimeCounter++;
-			}
-
-			int oldIndex = valueIndex - sliceMin;
-			if (oldIndex < 0) {
-				oldIndex = 0;
-			}
-			oldDistance = distanceValues[oldIndex];
+		// check required data
+		if (timeSerie == null || distanceSerie == null) {
+			return 0;
 		}
-		return ignoreTimeCounter;
+
+		// check if break time for each time slice is already computed (for the whole tour)
+		if (breakTimeSerie == null) {
+
+			if (deviceTimeInterval == -1) {
+
+				// variable time slices
+
+				computeBreakTimeVariable(startIndex, endIndex, breakTimeTool);
+
+			} else {
+
+				// fixed time slices
+
+				if (deviceTimeInterval == 0) {
+					return 0;
+				}
+
+				final int minBreakTime = 20;
+
+				computeBreakTimeFixed(minBreakTime / deviceTimeInterval);
+			}
+		}
+
+		return computeBreakTime(startIndex, endIndex);
+	}
+
+	public boolean[] getBreakTimeSerie() {
+
+		if (breakTimeSerie == null) {
+			getBreakTime();
+		}
+
+		return breakTimeSerie;
 	}
 
 	/**
@@ -3399,14 +3580,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 	}
 
-	/**
-	 * @return Returns the time difference between 2 time slices or <code>-1</code> when the time
-	 *         slices are unequally
-	 */
-	public short getDeviceTimeInterval() {
-		return deviceTimeInterval;
-	}
-
 // NOT USED 18.8.2010
 //	public long getDeviceTravelTime() {
 //		return deviceTravelTime;
@@ -3424,6 +3597,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 //	public int getDeviceDistance() {
 //		return deviceDistance;
 //	}
+
+	/**
+	 * @return Returns the time difference between 2 time slices or <code>-1</code> when the time
+	 *         slices are unequally
+	 */
+	public short getDeviceTimeInterval() {
+		return deviceTimeInterval;
+	}
 
 	public String getDeviceTourType() {
 		return deviceTourType;
@@ -3485,13 +3666,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return gradientSerie;
 	}
 
-	/**
-	 * @return the maxAltitude
-	 */
-	public int getMaxAltitude() {
-		return maxAltitude;
-	}
-
 // not used 5.10.2008
 //	public int getDeviceTotalDown() {
 //		return deviceTotalDown;
@@ -3500,6 +3674,39 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 //	public int getDeviceTotalUp() {
 //		return deviceTotalUp;
 //	}
+
+	/**
+	 * @return Returns all available HR zones. How many zones are really used, depends on the
+	 *         {@link TourPerson} and how many zones are defined for the person.
+	 *         <p>
+	 *         Each tour can have up to 10 HR zones, when HR zone is <code>-1</code> then this zone
+	 *         is not set.
+	 */
+	public int[] getHrZones() {
+
+		if (_hrZones == null) {
+			_hrZones = new int[] {
+					hrZone0,
+					hrZone1,
+					hrZone2,
+					hrZone3,
+					hrZone4,
+					hrZone5,
+					hrZone6,
+					hrZone7,
+					hrZone8,
+					hrZone9 };
+		}
+
+		return _hrZones;
+	}
+
+	/**
+	 * @return the maxAltitude
+	 */
+	public int getMaxAltitude() {
+		return maxAltitude;
+	}
 
 	/**
 	 * @return the maxPulse
@@ -3683,32 +3890,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	public int getRestPulse() {
 		return restPulse;
-	}
-
-	private int getSegmentBreakTime(final int startIndex, final int endIndex, final BreakTimeTool btConfig) {
-
-		if (distanceSerie == null) {
-			return 0;
-		}
-
-		final int minBreakTime = 20;
-
-		if (deviceTimeInterval == -1) {
-
-			// variable time slices
-
-			return computeBreakTimeVariable(startIndex, endIndex, btConfig);
-
-		} else {
-
-			// fixed time slices
-
-			final int ignoreTimeSlices = deviceTimeInterval == 0 ? //
-					0
-					: getBreakTimeSlices(distanceSerie, startIndex, endIndex, minBreakTime / deviceTimeInterval);
-
-			return ignoreTimeSlices * deviceTimeInterval;
-		}
 	}
 
 	public SerieData getSerieData() {
@@ -4484,6 +4665,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	public void setBikerWeight(final float bikerWeight) {
 		this.bikerWeight = bikerWeight;
+	}
+
+	public void setBreakTimeSerie(final boolean[] breakTimeSerie) {
+		this.breakTimeSerie = breakTimeSerie;
 	}
 
 	/**

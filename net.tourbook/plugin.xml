@@ -234,6 +234,15 @@
 	            id="net.tourbook.preferences.PrefPageComputedValues"
 	            name="%preference_page_computedValues">
 	      </page>
+	      <page
+	            category="net.tourbook.preferences.PrefPageGeneralId"
+	            class="net.tourbook.preferences.PrefPageTour"
+	            id="net.tourbook.preferences.PrefPageTour"
+	            name="%Pref_Page_Tour">
+          <keywordReference
+                id="net.tourbook.keywordReference.PrefPageTour">
+          </keywordReference>
+	      </page>
 
 
       <page
@@ -1161,6 +1170,7 @@
             id="net.tourbook.category.system"
             name="%view_category_system">
       </category>
+
 	      <view
 	            category="net.tourbook.category.system"
 	            class="org.eclipse.ui.ExtensionFactory:progressView"
@@ -1182,6 +1192,17 @@
 	            id="net.tourbook.mapping.TourMapPropertyView"
 	            name="%view_name_map_properties">
 	      </view>
+
+   </extension>
+   
+   <extension
+         point="org.eclipse.ui.keywords">
+
+      <keyword
+            id="net.tourbook.keywordReference.PrefPageTour"
+            label="%Pref_Page_Tour_Keywords">
+      </keyword>
+
    </extension>
 
 </plugin>

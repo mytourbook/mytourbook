@@ -86,8 +86,9 @@ public class TourDatabase {
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int						TOURBOOK_DB_VERSION							= 16;
+	private static final int						TOURBOOK_DB_VERSION							= 17;
 
+//	private static final int						TOURBOOK_DB_VERSION							= 17;	// 11.???
 //	private static final int						TOURBOOK_DB_VERSION							= 16;	// 11.???
 //	private static final int						TOURBOOK_DB_VERSION							= 15;	// 11.???
 //	private static final int						TOURBOOK_DB_VERSION							= 14;	// 11.3
@@ -242,8 +243,9 @@ public class TourDatabase {
 
 	/**
 	 * @param {@link IComputeTourValues} interface to compute values for one tour
+	 * @return
 	 */
-	public static void computeValuesForAllTours(final IComputeTourValues runner) {
+	public static boolean computeValuesForAllTours(final IComputeTourValues runner) {
 
 		final Shell shell = Display.getDefault().getActiveShell();
 
@@ -253,6 +255,7 @@ public class TourDatabase {
 
 		final int[] tourCounter = new int[] { 0 };
 		final int[] tourListSize = new int[] { 0 };
+		final boolean[] isCanceled = new boolean[] { false };
 
 		final IRunnableWithProgress runnable = new IRunnableWithProgress() {
 			@Override
@@ -266,12 +269,16 @@ public class TourDatabase {
 				// loop over all tours and compute values
 				for (final Long tourId : tourList) {
 
-					final TourData oldTourData = getTourFromDb(tourId);
+					final TourData dbTourData = getTourFromDb(tourId);
 					TourData savedTourData = null;
 
-					if (oldTourData != null) {
-						if (runner.computeTourValues(oldTourData)) {
-							savedTourData = saveTour(oldTourData);
+					if (dbTourData != null) {
+						if (runner.computeTourValues(dbTourData)) {
+
+							// ensure that all computed values are set
+							dbTourData.computeComputedValues();
+
+							savedTourData = saveTour(dbTourData);
 						}
 					}
 
@@ -290,6 +297,7 @@ public class TourDatabase {
 
 					// check if canceled
 					if (monitor.isCanceled()) {
+						isCanceled[0] = true;
 						break;
 					}
 
@@ -329,6 +337,8 @@ public class TourDatabase {
 					Messages.tour_database_computeComputedValues_resultTitle,
 					sb.toString());
 		}
+
+		return isCanceled[0];
 	}
 
 	/**
@@ -1996,6 +2006,21 @@ public class TourDatabase {
 				//
 				// version 14 end ---------
 
+				// version 17 start
+				//
+				+ "	hrZone0						INTEGER DEFAULT -1,				\n" //$NON-NLS-1$
+				+ "	hrZone1						INTEGER DEFAULT -1, 			\n" //$NON-NLS-1$
+				+ "	hrZone2						INTEGER DEFAULT -1, 			\n" //$NON-NLS-1$
+				+ "	hrZone3						INTEGER DEFAULT -1, 			\n" //$NON-NLS-1$
+				+ "	hrZone4						INTEGER DEFAULT -1, 			\n" //$NON-NLS-1$
+				+ "	hrZone5						INTEGER DEFAULT -1, 			\n" //$NON-NLS-1$
+				+ "	hrZone6						INTEGER DEFAULT -1, 			\n" //$NON-NLS-1$
+				+ "	hrZone7						INTEGER DEFAULT -1, 			\n" //$NON-NLS-1$
+				+ "	hrZone8						INTEGER DEFAULT -1, 			\n" //$NON-NLS-1$
+				+ "	hrZone9						INTEGER DEFAULT -1, 			\n" //$NON-NLS-1$
+				//
+				// version 17 end ---------
+
 				+ "	serieData 					BLOB NOT NULL					\n" //$NON-NLS-1$
 				//
 				+ ")"; //														//$NON-NLS-1$
@@ -2804,6 +2829,9 @@ public class TourDatabase {
 				currentDbVersion = newVersion = updateDbDesign_015_to_016(conn, monitor);
 			}
 
+			currentDbVersion = newVersion = updateDbDesign_016_to_017(conn, monitor);
+			if (currentDbVersion == 16) {}
+
 			/*
 			 * update version number
 			 */
@@ -3456,6 +3484,72 @@ public class TourDatabase {
 			exec(stmt, sql);
 
 			sql = "ALTER TABLE " + TABLE_TOUR_PERSON + " ADD COLUMN HrMaxFormula		INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+			exec(stmt, sql);
+		}
+		stmt.close();
+
+		logDbUpdateEnd(newDbVersion);
+
+		return newDbVersion;
+	}
+
+	private int updateDbDesign_016_to_017(final Connection conn, final IProgressMonitor monitor) throws SQLException {
+
+		final int newDbVersion = 17;
+
+		logDbUpdateStart(newDbVersion);
+
+		if (monitor != null) {
+			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, newDbVersion));
+		}
+
+		String sql;
+		final Statement stmt = conn.createStatement();
+		{
+
+//			TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA
+//
+//			+ "	hrZone0						INTEGER DEFAULT -1,				\n" //$NON-NLS-1$
+//			+ "	hrZone1						INTEGER DEFAULT -1, 			\n" //$NON-NLS-1$
+//			+ "	hrZone2						INTEGER DEFAULT -1, 			\n" //$NON-NLS-1$
+//			+ "	hrZone3						INTEGER DEFAULT -1, 			\n" //$NON-NLS-1$
+//			+ "	hrZone4						INTEGER DEFAULT -1, 			\n" //$NON-NLS-1$
+//			+ "	hrZone5						INTEGER DEFAULT -1, 			\n" //$NON-NLS-1$
+//			+ "	hrZone6						INTEGER DEFAULT -1, 			\n" //$NON-NLS-1$
+//			+ "	hrZone7						INTEGER DEFAULT -1, 			\n" //$NON-NLS-1$
+//			+ "	hrZone8						INTEGER DEFAULT -1, 			\n" //$NON-NLS-1$
+//			+ "	hrZone9						INTEGER DEFAULT -1, 			\n" //$NON-NLS-1$
+//
+//			TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA
+
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN HrZone0		INTEGER DEFAULT -1"; //$NON-NLS-1$ //$NON-NLS-2$
+			exec(stmt, sql);
+
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN HrZone1		INTEGER DEFAULT -1"; //$NON-NLS-1$ //$NON-NLS-2$
+			exec(stmt, sql);
+
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN HrZone2		INTEGER DEFAULT -1"; //$NON-NLS-1$ //$NON-NLS-2$
+			exec(stmt, sql);
+
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN HrZone3		INTEGER DEFAULT -1"; //$NON-NLS-1$ //$NON-NLS-2$
+			exec(stmt, sql);
+
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN HrZone4		INTEGER DEFAULT -1"; //$NON-NLS-1$ //$NON-NLS-2$
+			exec(stmt, sql);
+
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN HrZone5		INTEGER DEFAULT -1"; //$NON-NLS-1$ //$NON-NLS-2$
+			exec(stmt, sql);
+
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN HrZone6		INTEGER DEFAULT -1"; //$NON-NLS-1$ //$NON-NLS-2$
+			exec(stmt, sql);
+
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN HrZone7		INTEGER DEFAULT -1"; //$NON-NLS-1$ //$NON-NLS-2$
+			exec(stmt, sql);
+
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN HrZone8		INTEGER DEFAULT -1"; //$NON-NLS-1$ //$NON-NLS-2$
+			exec(stmt, sql);
+
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN HrZone9		INTEGER DEFAULT -1"; //$NON-NLS-1$ //$NON-NLS-2$
 			exec(stmt, sql);
 		}
 		stmt.close();

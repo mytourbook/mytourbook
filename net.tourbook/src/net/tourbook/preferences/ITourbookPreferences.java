@@ -109,6 +109,11 @@ public interface ITourbookPreferences {
 	public static final String	GRAPH_PROPERTY_PACE_CLIPPING_VALUE			= "graph.property.is.pace_clipping.value";					//$NON-NLS-1$
 
 	/*
+	 * system
+	 */
+	public static final String	TOUR_CACHE_SIZE								= "TourCacheSize";											//$NON-NLS-1$
+
+	/*
 	 * measurement system
 	 */
 	public static final String	MEASUREMENT_SYSTEM							= "system.of.measurement";									//$NON-NLS-1$
