@@ -31,6 +31,7 @@ import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.jface.preference.ColorSelector;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -78,6 +79,7 @@ public class DialogHRZones extends TitleAreaDialog {
 	private Text[]						_txtNameShortcut;
 	private Spinner[]					_spinnerMinPulse;
 	private Spinner[]					_spinnerMaxPulse;
+	private ColorSelector[]				_colorSelector;
 	private Button[]					_btnTrash;
 	private Label[]						_labelGtLt;															// Gt... greater than, Lt...Lower than
 
@@ -269,7 +271,7 @@ public class DialogHRZones extends TitleAreaDialog {
 
 		// hr zone container
 		final Composite hrZoneContainer = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.fillDefaults().numColumns(7).applyTo(hrZoneContainer);
+		GridLayoutFactory.fillDefaults().numColumns(8).applyTo(hrZoneContainer);
 //		hrZoneContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
 			createUI23HrZoneHeader(hrZoneContainer);
@@ -301,6 +303,13 @@ public class DialogHRZones extends TitleAreaDialog {
 		label.setText(Messages.Dialog_HRZone_Label_Header_ZoneShortcut);
 
 		/*
+		 * label: color
+		 */
+		label = new Label(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.BOTTOM).applyTo(label);
+		label.setText(Messages.Dialog_HRZone_Label_Header_Color);
+
+		/*
 		 * header label: min pulse
 		 */
 		label = new Label(parent, SWT.NONE);
@@ -329,7 +338,7 @@ public class DialogHRZones extends TitleAreaDialog {
 		label.setText(UI.EMPTY_STRING);
 
 		/*
-		 * header label: trash
+		 * label: trash
 		 */
 		final CLabel iconImport = new CLabel(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.CENTER).applyTo(iconImport);
@@ -381,6 +390,7 @@ public class DialogHRZones extends TitleAreaDialog {
 		_txtNameShortcut = new Text[hrZoneSize];
 		_spinnerMinPulse = new Spinner[hrZoneSize];
 		_spinnerMaxPulse = new Spinner[hrZoneSize];
+		_colorSelector = new ColorSelector[hrZoneSize];
 		_labelGtLt = new Label[hrZoneSize];
 		_btnTrash = new Button[hrZoneSize];
 
@@ -399,6 +409,11 @@ public class DialogHRZones extends TitleAreaDialog {
 					| SWT.LEAD
 					| SWT.BORDER);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(txtNameShortcut);
+
+			/*
+			 * color: hr zone
+			 */
+			_colorSelector[zoneIndex] = new ColorSelector(parent);
 
 			/*
 			 * spinner: min pulse
@@ -437,7 +452,7 @@ public class DialogHRZones extends TitleAreaDialog {
 			label.setText(UI.SYMBOL_PERCENTAGE);
 
 			/*
-			 * checkbox
+			 * checkbox: trash
 			 */
 			final Button checkbox = _btnTrash[zoneIndex] = new Button(parent, SWT.CHECK);
 			GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.FILL).applyTo(checkbox);
@@ -591,6 +606,8 @@ public class DialogHRZones extends TitleAreaDialog {
 
 			hrZone.setZoneName(_txtZoneName[hrZoneIndex].getText());
 			hrZone.setNameShortcut(_txtNameShortcut[hrZoneIndex].getText());
+
+			hrZone.setColor(_colorSelector[hrZoneIndex].getColorValue());
 		}
 
 		Collections.sort(_hrZones);
@@ -618,6 +635,8 @@ public class DialogHRZones extends TitleAreaDialog {
 
 			final String nameShortcut = hrZone.getNameShortcut();
 			_txtNameShortcut[hrZoneIndex].setText(nameShortcut == null ? UI.EMPTY_STRING : nameShortcut);
+
+			_colorSelector[hrZoneIndex].setColorValue(hrZone.getColor());
 
 			if (hrZone.getZoneMinValue() == Integer.MIN_VALUE) {
 

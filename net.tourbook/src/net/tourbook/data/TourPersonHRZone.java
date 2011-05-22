@@ -26,6 +26,8 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.UI;
 import net.tourbook.util.StatusUtil;
 
+import org.eclipse.swt.graphics.RGB;
+
 @Entity
 public class TourPersonHRZone implements Cloneable, Comparable<TourPersonHRZone> {
 
@@ -71,11 +73,24 @@ public class TourPersonHRZone implements Cloneable, Comparable<TourPersonHRZone>
 	private int					zoneMaxValue;
 
 	/**
+	 * HR zone color
+	 */
+	private int					colorRed;
+	private int					colorGreen;
+	private int					colorBlue;
+
+	/**
 	 * unique id for manually created markers because the {@link #hrZoneId} is 0 when the marker is
 	 * not persisted
 	 */
 	@Transient
 	private long				_createId				= 0;
+
+	/**
+	 * cached color
+	 */
+	@Transient
+	private RGB					_color;
 
 	/**
 	 * manually created marker or imported marker create a unique id to identify them, saved marker
@@ -175,6 +190,15 @@ public class TourPersonHRZone implements Cloneable, Comparable<TourPersonHRZone>
 		return true;
 	}
 
+	public RGB getColor() {
+
+		if (_color == null) {
+			_color = new RGB(colorRed, colorGreen, colorBlue);
+		}
+
+		return _color;
+	}
+
 	public String getDescription() {
 		return description;
 	}
@@ -233,6 +257,16 @@ public class TourPersonHRZone implements Cloneable, Comparable<TourPersonHRZone>
 		result = prime * result + (int) (_createId ^ (_createId >>> 32));
 		result = prime * result + (int) (hrZoneId ^ (hrZoneId >>> 32));
 		return result;
+	}
+
+	public void setColor(final RGB rgb) {
+
+		// cache rgb values
+		_color = rgb;
+
+		colorRed = rgb.red;
+		colorGreen = rgb.green;
+		colorBlue = rgb.blue;
 	}
 
 	public void setDescription(final String description) {

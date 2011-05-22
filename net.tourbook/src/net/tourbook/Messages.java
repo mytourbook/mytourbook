@@ -67,6 +67,8 @@ public class Messages extends NLS {
 	public static String		Dialog_HRZone_Button_SortZone;
 	public static String		Dialog_HRZone_DialogMessage;
 	public static String		Dialog_HRZone_DialogTitle;
+	public static String	Dialog_HRZone_Label_Header_Color;
+
 	public static String	Dialog_HRZone_Label_Header_MaxPulse;
 
 	public static String		Dialog_HRZone_Label_Header_Pulse;
@@ -692,6 +694,8 @@ public class Messages extends NLS {
 	public static String		Pref_Appearance_NumberOfRecent_TourTypes;
 	public static String		Pref_Appearance_NumberOfRecent_TourTypes_Tooltip;
 	public static String		Pref_Appearance_ShowTourTypeContextMenu;
+
+	public static String	Pref_Appearance_ShowTourTypeContextMenu_Tooltip;
 
 	public static String		Pref_ChartColors_btn_legend;
 	public static String		Pref_ChartColors_unit_high;

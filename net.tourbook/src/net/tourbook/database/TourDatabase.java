@@ -86,8 +86,9 @@ public class TourDatabase {
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int						TOURBOOK_DB_VERSION							= 17;
+	private static final int						TOURBOOK_DB_VERSION							= 18;
 
+//	private static final int						TOURBOOK_DB_VERSION							= 18;	// 11.???
 //	private static final int						TOURBOOK_DB_VERSION							= 17;	// 11.???
 //	private static final int						TOURBOOK_DB_VERSION							= 16;	// 11.???
 //	private static final int						TOURBOOK_DB_VERSION							= 15;	// 11.???
@@ -175,6 +176,11 @@ public class TourDatabase {
 																										.getPath() + "derby-database");				//$NON-NLS-1$
 
 	private boolean									_isSQLUpdateError							= false;
+
+	/**
+	 * Database version before a db update is performed
+	 */
+	private int										_dbVersionBeforeUpdate;
 
 	{
 		// set storage location for the database
@@ -1664,26 +1670,27 @@ public class TourDatabase {
 
 					// version record was found, check if the database contains the correct version
 
-					final int currentDbVersion = result.getInt(1);
+					_dbVersionBeforeUpdate = result.getInt(1);
 
-					StatusUtil.logInfo("Database version: " + currentDbVersion); //$NON-NLS-1$
+					StatusUtil.logInfo("Database version: " + _dbVersionBeforeUpdate); //$NON-NLS-1$
 
-					if (currentDbVersion < TOURBOOK_DB_VERSION) {
+					if (_dbVersionBeforeUpdate < TOURBOOK_DB_VERSION) {
 
-						if (updateDbDesign(conn, currentDbVersion, monitor) == false) {
+						if (updateDbDesign(conn, _dbVersionBeforeUpdate, monitor) == false) {
 							return false;
 						}
 
-					} else if (currentDbVersion > TOURBOOK_DB_VERSION) {
+					} else if (_dbVersionBeforeUpdate > TOURBOOK_DB_VERSION) {
 
 						MessageDialog.openInformation(
 								Display.getCurrent().getActiveShell(),
 								Messages.tour_database_version_info_title,
 								NLS.bind(
 										Messages.tour_database_version_info_message,
-										currentDbVersion,
+										_dbVersionBeforeUpdate,
 										TOURBOOK_DB_VERSION));
 					}
+
 				} else {
 
 					// a version record is not available
@@ -2021,6 +2028,12 @@ public class TourDatabase {
 				//
 				// version 17 end ---------
 
+				// version 18 start
+				//
+				+ "	NumberOfHrZones				INTEGER DEFAULT 0, 				\n" //$NON-NLS-1$
+				//
+				// version 18 end ---------
+
 				+ "	serieData 					BLOB NOT NULL					\n" //$NON-NLS-1$
 				//
 				+ ")"; //														//$NON-NLS-1$
@@ -2162,7 +2175,7 @@ public class TourDatabase {
 	/**
 	 * Create table {@link #TABLE_TOUR_PERSON_HRZONE}
 	 * <p>
-	 * since db version 16
+	 * Table is available since db version 16
 	 * 
 	 * @param stmt
 	 * @throws SQLException
@@ -2183,6 +2196,15 @@ public class TourDatabase {
 				+ ("	zoneName		" + varCharKomma(TourPersonHRZone.DB_LENGTH_ZONE_NAME)) //$NON-NLS-1$
 				+ ("	nameShortcut	" + varCharKomma(TourPersonHRZone.DB_LENGTH_ZONE_NAME)) //$NON-NLS-1$
 				+ ("	description		" + varCharKomma(TourPersonHRZone.DB_LENGTH_DESCRIPTION)) //$NON-NLS-1$
+
+				// version 18 start
+				//
+				+ "	ColorRed			INTEGER DEFAULT 0, 					\n" //$NON-NLS-1$
+				+ "	ColorGreen			INTEGER DEFAULT 0, 					\n" //$NON-NLS-1$
+				+ "	ColorBlue			INTEGER DEFAULT 0, 					\n" //$NON-NLS-1$
+				//
+				// version 18 end ---------
+
 				//
 				+ "	zoneMinValue		INTEGER NOT NULL,					\n" //$NON-NLS-1$
 				+ "	zoneMaxValue		INTEGER NOT NULL					\n" //$NON-NLS-1$
@@ -2829,8 +2851,13 @@ public class TourDatabase {
 				currentDbVersion = newVersion = updateDbDesign_015_to_016(conn, monitor);
 			}
 
-			currentDbVersion = newVersion = updateDbDesign_016_to_017(conn, monitor);
-			if (currentDbVersion == 16) {}
+			if (currentDbVersion == 16) {
+				currentDbVersion = newVersion = updateDbDesign_016_to_017(conn, monitor);
+			}
+
+			if (currentDbVersion == 17) {
+				currentDbVersion = newVersion = updateDbDesign_017_to_018(conn, monitor);
+			}
 
 			/*
 			 * update version number
@@ -3551,6 +3578,70 @@ public class TourDatabase {
 
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN HrZone9		INTEGER DEFAULT -1"; //$NON-NLS-1$ //$NON-NLS-2$
 			exec(stmt, sql);
+		}
+		stmt.close();
+
+		logDbUpdateEnd(newDbVersion);
+
+		return newDbVersion;
+	}
+
+	private int updateDbDesign_017_to_018(final Connection conn, final IProgressMonitor monitor) throws SQLException {
+
+		final int newDbVersion = 18;
+
+		logDbUpdateStart(newDbVersion);
+
+		if (monitor != null) {
+			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, newDbVersion));
+		}
+
+		String sql;
+		final Statement stmt = conn.createStatement();
+		{
+
+			if (_dbVersionBeforeUpdate > 16) {
+
+				/*
+				 * db update 16 creates the HR zone db, doing this update causes an sql exception
+				 * because the fields are already available
+				 */
+
+//				TABLE_TOUR_PERSON_HRZONE	TABLE_TOUR_PERSON_HRZONE	TABLE_TOUR_PERSON_HRZONE	TABLE_TOUR_PERSON_HRZONE
+//
+//				// version 18 start
+//				//
+//				+ "	ColorRed			INTEGER DEFAULT 0, 					\n" //$NON-NLS-1$
+//				+ "	ColorGreen			INTEGER DEFAULT 0, 					\n" //$NON-NLS-1$
+//				+ "	ColorBlue			INTEGER DEFAULT 0, 					\n" //$NON-NLS-1$
+//				//
+//				// version 18 end ---------
+//
+//				TABLE_TOUR_PERSON_HRZONE	TABLE_TOUR_PERSON_HRZONE	TABLE_TOUR_PERSON_HRZONE	TABLE_TOUR_PERSON_HRZONE
+
+				sql = "ALTER TABLE " + TABLE_TOUR_PERSON_HRZONE + " ADD COLUMN ColorRed		INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+				exec(stmt, sql);
+
+				sql = "ALTER TABLE " + TABLE_TOUR_PERSON_HRZONE + " ADD COLUMN ColorGreen	INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+				exec(stmt, sql);
+
+				sql = "ALTER TABLE " + TABLE_TOUR_PERSON_HRZONE + " ADD COLUMN ColorBlue	INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+				exec(stmt, sql);
+			}
+
+//			TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA
+//
+//			// version 18 start
+//			//
+//			+ "	NumberOfHrZones				INTEGER DEFAULT 0, 				\n" //$NON-NLS-1$
+//			//
+//			// version 18 end ---------
+//
+//			TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA
+
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN NumberOfHrZones	INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+			exec(stmt, sql);
+
 		}
 		stmt.close();
 

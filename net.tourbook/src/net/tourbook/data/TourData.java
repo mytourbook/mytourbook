@@ -288,11 +288,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	// ############################################# PULSE #############################################
 
+	/**
+	 * Average pulse, this data can also be set from device data and pulse data are not available
+	 */
 	@XmlElement
 	private int												avgPulse;																				// db-version 4
 
 	@XmlElement
 	private int												maxPulse;																				// db-version 4
+
+	private int												numberOfHrZones						= 0;												// db-version 18
 
 	/**
 	 * Time for all HR zones are contained in {@link #hrZone0} ... {@link #hrZone9}. Each tour can
@@ -1639,7 +1644,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 	}
 
-	private void computeAvgPulse() {
+	public void computeAvgPulse() {
 
 		if ((pulseSerie == null) || (pulseSerie.length == 0) || (timeSerie == null) || (timeSerie.length == 0)) {
 			return;
@@ -1952,6 +1957,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 				}
 			}
 		}
+
+		numberOfHrZones = zoneSize;
 
 		hrZone0 = zoneSize > 0 ? hrZones[0] : -1;
 		hrZone1 = zoneSize > 1 ? hrZones[1] : -1;
@@ -3757,6 +3764,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return distanceSerie;
 	}
 
+	public int getNumberOfHrZones() {
+		return numberOfHrZones;
+	}
+
 	public int[] getPaceSerie() {
 
 		if (UI.UNIT_VALUE_DISTANCE == 1) {
@@ -5161,4 +5172,5 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 		return null;
 	}
+
 }

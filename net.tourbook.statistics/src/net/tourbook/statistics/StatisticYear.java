@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 
 package net.tourbook.statistics;
@@ -43,23 +43,24 @@ import org.eclipse.ui.IWorkbenchPartSite;
 
 public abstract class StatisticYear extends YearStatistic {
 
-	private static final String			STRING_SEPARATOR	= " - "; //$NON-NLS-1$
-	private TourPerson					fActivePerson;
-	private TourTypeFilter				fActiveTourTypeFilter;
+	private static final String			STRING_SEPARATOR	= " - ";						//$NON-NLS-1$
 
-	private int							fCurrentYear;
-	private int							fNumberOfYears;
+	private TourPerson					_activePerson;
+	private TourTypeFilter				_activeTourTypeFilter;
 
-	private Chart						fChart;
+	private int							_currentYear;
+	private int							_numberOfYears;
 
-	private final BarChartMinMaxKeeper	fMinMaxKeeper		= new BarChartMinMaxKeeper();
-	private TourDataYear				fTourYearData;
+	private Chart						_chart;
 
-	private boolean						fIsSynchScaleEnabled;
+	private final BarChartMinMaxKeeper	_minMaxKeeper		= new BarChartMinMaxKeeper();
+	private TourDataYear				_tourYearData;
+
+	private boolean						_isSynchScaleEnabled;
 
 	@Override
 	public void activateActions(final IWorkbenchPartSite partSite) {
-		fChart.updateChartActionHandlers();
+		_chart.updateChartActionHandlers();
 	}
 
 	public boolean canTourBeVisible() {
@@ -70,11 +71,11 @@ public abstract class StatisticYear extends YearStatistic {
 
 		final int yearCounter = tourDataYear.fAltitudeHigh[0].length;
 
-		final int segmentStart[] = new int[fNumberOfYears];
-		final int segmentEnd[] = new int[fNumberOfYears];
-		final String[] segmentTitle = new String[fNumberOfYears];
+		final int segmentStart[] = new int[_numberOfYears];
+		final int segmentEnd[] = new int[_numberOfYears];
+		final String[] segmentTitle = new String[_numberOfYears];
 
-		final int oldestYear = fCurrentYear - fNumberOfYears + 1;
+		final int oldestYear = _currentYear - _numberOfYears + 1;
 
 		for (int yearIndex = 0; yearIndex < yearCounter; yearIndex++) {
 
@@ -101,18 +102,18 @@ public abstract class StatisticYear extends YearStatistic {
 		super.createControl(parent);
 
 		// create chart
-		fChart = new Chart(parent, SWT.BORDER | SWT.FLAT);
-		fChart.setShowZoomActions(true);
-		fChart.setCanScrollZoomedChart(true);
-		fChart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
+		_chart = new Chart(parent, SWT.BORDER | SWT.FLAT);
+		_chart.setShowZoomActions(true);
+		_chart.setCanScrollZoomedChart(true);
+		_chart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
 	}
 
 	private ChartToolTipInfo createToolTipInfo(final int serieIndex, final int valueIndex) {
 
-		final int oldestYear = fCurrentYear - fNumberOfYears + 1;
+		final int oldestYear = _currentYear - _numberOfYears + 1;
 
-		final Integer recordingTime = fTourYearData.fRecordingTime[serieIndex][valueIndex];
-		final Integer drivingTime = fTourYearData.fDrivingTime[serieIndex][valueIndex];
+		final Integer recordingTime = _tourYearData.fRecordingTime[serieIndex][valueIndex];
+		final Integer drivingTime = _tourYearData.fDrivingTime[serieIndex][valueIndex];
 		final int breakTime = recordingTime - drivingTime;
 
 		/*
@@ -120,7 +121,7 @@ public abstract class StatisticYear extends YearStatistic {
 		 */
 		final StringBuilder titleString = new StringBuilder();
 
-		final String tourTypeName = getTourTypeName(serieIndex, fActiveTourTypeFilter);
+		final String tourTypeName = getTourTypeName(serieIndex, _activeTourTypeFilter);
 		final boolean isTourType = tourTypeName != null && tourTypeName.length() > 0;
 
 		if (isTourType) {
@@ -150,10 +151,10 @@ public abstract class StatisticYear extends YearStatistic {
 		final String toolTipLabel = new Formatter().format(toolTipFormat.toString(), //
 				//
 				//
-				fTourYearData.fDistanceHigh[serieIndex][valueIndex],
+				_tourYearData.fDistanceHigh[serieIndex][valueIndex],
 				UI.UNIT_LABEL_DISTANCE,
 				//
-				fTourYearData.fAltitudeHigh[serieIndex][valueIndex],
+				_tourYearData.fAltitudeHigh[serieIndex][valueIndex],
 				UI.UNIT_LABEL_ALTITUDE,
 				//
 				recordingTime / 3600,
@@ -165,7 +166,7 @@ public abstract class StatisticYear extends YearStatistic {
 				breakTime / 3600,
 				(breakTime % 3600) / 60
 		//
-		)
+				)
 				.toString();
 
 		/*
@@ -182,9 +183,9 @@ public abstract class StatisticYear extends YearStatistic {
 
 	void createXDataYear(final ChartDataModel chartDataModel) {
 		// set the x-axis
-		final ChartDataXSerie xData = new ChartDataXSerie(createYearData(fTourYearData));
+		final ChartDataXSerie xData = new ChartDataXSerie(createYearData(_tourYearData));
 		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_YEAR);
-		xData.setChartSegments(createChartSegments(fTourYearData));
+		xData.setChartSegments(createChartSegments(_tourYearData));
 		chartDataModel.setXData(xData);
 	}
 
@@ -195,15 +196,16 @@ public abstract class StatisticYear extends YearStatistic {
 	 */
 	void createYDataAltitude(final ChartDataModel chartDataModel) {
 
-		final ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
+		final ChartDataYSerie yData = new ChartDataYSerie(
+				ChartDataModel.CHART_TYPE_BAR,
 				ChartDataYSerie.BAR_LAYOUT_BESIDE,
-				fTourYearData.fAltitudeLow,
-				fTourYearData.fAltitudeHigh);
+				_tourYearData.fAltitudeLow,
+				_tourYearData.fAltitudeHigh);
 		yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
 		yData.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
-		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_ALTITUDE, fActiveTourTypeFilter);
-		StatisticServices.setTourTypeColorIndex(yData, fTourYearData.fTypeIds, fActiveTourTypeFilter);
+		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_ALTITUDE, _activeTourTypeFilter);
+		StatisticServices.setTourTypeColorIndex(yData, _tourYearData.fTypeIds, _activeTourTypeFilter);
 		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_ALTITUDE);
 
 		chartDataModel.addYData(yData);
@@ -216,15 +218,16 @@ public abstract class StatisticYear extends YearStatistic {
 	 */
 	void createYDataDistance(final ChartDataModel chartDataModel) {
 
-		final ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
+		final ChartDataYSerie yData = new ChartDataYSerie(
+				ChartDataModel.CHART_TYPE_BAR,
 				ChartDataYSerie.BAR_LAYOUT_BESIDE,
-				fTourYearData.fDistanceLow,
-				fTourYearData.fDistanceHigh);
+				_tourYearData.fDistanceLow,
+				_tourYearData.fDistanceHigh);
 		yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
 		yData.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
-		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE, fActiveTourTypeFilter);
-		StatisticServices.setTourTypeColorIndex(yData, fTourYearData.fTypeIds, fActiveTourTypeFilter);
+		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE, _activeTourTypeFilter);
+		StatisticServices.setTourTypeColorIndex(yData, _tourYearData.fTypeIds, _activeTourTypeFilter);
 		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE);
 
 		chartDataModel.addYData(yData);
@@ -237,15 +240,16 @@ public abstract class StatisticYear extends YearStatistic {
 	 */
 	void createYDataDuration(final ChartDataModel chartDataModel) {
 
-		final ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
+		final ChartDataYSerie yData = new ChartDataYSerie(
+				ChartDataModel.CHART_TYPE_BAR,
 				ChartDataYSerie.BAR_LAYOUT_BESIDE,
-				fTourYearData.fTimeLow,
-				fTourYearData.fTimeHigh);
+				_tourYearData.fTimeLow,
+				_tourYearData.fTimeHigh);
 		yData.setYTitle(Messages.LABEL_GRAPH_TIME);
 		yData.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
-		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_TIME, fActiveTourTypeFilter);
-		StatisticServices.setTourTypeColorIndex(yData, fTourYearData.fTypeIds, fActiveTourTypeFilter);
+		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_TIME, _activeTourTypeFilter);
+		StatisticServices.setTourTypeColorIndex(yData, _tourYearData.fTypeIds, _activeTourTypeFilter);
 		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_TIME);
 
 		chartDataModel.addYData(yData);
@@ -267,7 +271,7 @@ public abstract class StatisticYear extends YearStatistic {
 	public void deactivateActions(final IWorkbenchPartSite partSite) {}
 
 	public void prefColorChanged() {
-		refreshStatistic(fActivePerson, fActiveTourTypeFilter, fCurrentYear, fNumberOfYears, false);
+		refreshStatistic(_activePerson, _activeTourTypeFilter, _currentYear, _numberOfYears, false);
 	}
 
 	public void refreshStatistic(	final TourPerson person,
@@ -276,43 +280,45 @@ public abstract class StatisticYear extends YearStatistic {
 									final int numberOfYears,
 									final boolean refreshData) {
 
-		fActivePerson = person;
-		fActiveTourTypeFilter = tourTypeFilter;
-		fCurrentYear = currentYear;
-		fNumberOfYears = numberOfYears;
+		_activePerson = person;
+		_activeTourTypeFilter = tourTypeFilter;
+		_currentYear = currentYear;
+		_numberOfYears = numberOfYears;
 
-		fTourYearData = DataProviderTourYear.getInstance().getYearData(person,
+		_tourYearData = DataProviderTourYear.getInstance().getYearData(
+				person,
 				tourTypeFilter,
 				currentYear,
 				numberOfYears,
 				isDataDirtyWithReset() || refreshData);
 
 		// reset min/max values
-		if (fIsSynchScaleEnabled == false && refreshData) {
-			fMinMaxKeeper.resetMinMax();
+		if (_isSynchScaleEnabled == false && refreshData) {
+			_minMaxKeeper.resetMinMax();
 		}
 
 		final ChartDataModel chartDataModel = updateChart();
 
 		setChartProviders(chartDataModel);
 
-		if (fIsSynchScaleEnabled) {
-			fMinMaxKeeper.setMinMaxValues(chartDataModel);
+		if (_isSynchScaleEnabled) {
+			_minMaxKeeper.setMinMaxValues(chartDataModel);
 		}
 
 		// set grid size
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-		fChart.setGridDistance(prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
+		_chart.setGridDistance(
+				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
 				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
 
 		// show the fDataModel in the chart
-		fChart.updateChart(chartDataModel, true);
+		_chart.updateChart(chartDataModel, true);
 
 	}
 
 	@Override
 	public void resetSelection() {
-		fChart.setSelectedBars(null);
+		_chart.setSelectedBars(null);
 	}
 
 	private void setChartProviders(final ChartDataModel chartModel) {
@@ -327,13 +333,13 @@ public abstract class StatisticYear extends YearStatistic {
 
 	@Override
 	public void setSynchScale(final boolean isSynchScaleEnabled) {
-		fIsSynchScaleEnabled = isSynchScaleEnabled;
+		_isSynchScaleEnabled = isSynchScaleEnabled;
 	}
 
 	abstract ChartDataModel updateChart();
 
 	@Override
 	public void updateToolBar(final boolean refreshToolbar) {
-		fChart.fillToolbar(refreshToolbar);
+		_chart.fillToolbar(refreshToolbar);
 	}
 }

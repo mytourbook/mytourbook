@@ -80,6 +80,7 @@ import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
@@ -159,6 +160,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 	private PixelConverter				_pc;
 	private Font						_fontItalic;
+	private Color[]						_hrZoneColors;
 
 	/**
 	 * Is <code>true</code> when a tour in the tour editor is modified.
@@ -316,6 +318,11 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 				}
 
 				originalTourData.computeHrZones();
+
+				/*
+				 * algorithmus for avg pulse is changed in version 11.7 (break time is now ignored)
+				 */
+				originalTourData.computeAvgPulse();
 
 				final int[] allHrZones = originalTourData.getHrZones();
 
@@ -948,7 +955,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 			// scrolled container
 			_hrZoneScrolledContainer = new ScrolledComposite(hrZoneContainer, //
-					SWT.V_SCROLL
+					SWT.V_SCROLL //
+							| SWT.H_SCROLL
 //					| SWT.BORDER
 			);
 			GridDataFactory.fillDefaults()//
@@ -981,6 +989,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
+				.indent(0, 20)
 				.applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
@@ -1043,7 +1052,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 				// button: compute computed values
 				_btnComputeHrZonesForAllTours = new Button(btnContainer, SWT.NONE);
 				GridDataFactory.fillDefaults()//
-						.indent(0, 10)
+						.indent(0, 0)
 						.applyTo(_btnComputeHrZonesForAllTours);
 				_btnComputeHrZonesForAllTours.setText(Messages.Pref_People_Button_HrZones_ComputeAllTours);
 				_btnComputeHrZonesForAllTours
@@ -1078,7 +1087,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 		// hr zone container
 		final Composite innerContainer = new Composite(_hrZoneScrolledContainer, SWT.NONE);
-		GridLayoutFactory.fillDefaults().numColumns(5).extendedMargins(0, 5, 0, 0).applyTo(innerContainer);
+		GridLayoutFactory.fillDefaults().numColumns(6).extendedMargins(0, 5, 0, 0).applyTo(innerContainer);
 //		innerContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
 			final Set<TourPersonHRZone> hrZones = getCurrentPerson().getHrZones();
@@ -1124,7 +1133,15 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		label.setText(Messages.Dialog_HRZone_Label_Header_Zone);
 
 		/*
-		 * header label: min pulse
+		 * label: color
+		 */
+		label = new Label(parent, SWT.NONE);
+//		GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.BOTTOM).applyTo(label);
+//		label.setFont(_fontItalic);
+//		label.setText(Messages.Dialog_HRZone_Label_Header_Pulse);
+
+		/*
+		 * label: min pulse
 		 */
 		label = new Label(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.BOTTOM).applyTo(label);
@@ -1139,7 +1156,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		label.setText(UI.EMPTY_STRING);
 
 		/*
-		 * header label: max pulse
+		 * label: max pulse
 		 */
 		label = new Label(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.BOTTOM).applyTo(label);
@@ -1161,11 +1178,15 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			return;
 		}
 
+		// get sorted hr zones
 		final ArrayList<TourPersonHRZone> hrZones = new ArrayList<TourPersonHRZone>(currentPerson.getHrZones());
-
+		final int hrZoneSize = hrZones.size();
 		Collections.sort(hrZones);
 
-		final int hrZoneSize = hrZones.size();
+		// init hr zone colors
+		final Display display = parent.getDisplay();
+		disposeHrZoneColors();
+		_hrZoneColors = new Color[hrZoneSize];
 
 		for (int zoneIndex = 0; zoneIndex < hrZoneSize; zoneIndex++) {
 
@@ -1173,6 +1194,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 			final int zoneMinValue = hrZone.getZoneMinValue();
 			final int zoneMaxValue = hrZone.getZoneMaxValue();
+			_hrZoneColors[zoneIndex] = new Color(display, hrZone.getColor());
 
 			/*
 			 * label: hr zone name
@@ -1180,6 +1202,14 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			Label label = new Label(parent, SWT.NONE);
 			GridDataFactory.fillDefaults().applyTo(label);
 			label.setText(hrZone.getName());
+
+			/*
+			 * label: color
+			 */
+			label = new Label(parent, SWT.NONE);
+			GridDataFactory.fillDefaults().hint(16, 16).applyTo(label);
+			label.setText(UI.EMPTY_STRING);
+			label.setBackground(_hrZoneColors[zoneIndex]);
 
 			/*
 			 * label: min pulse
@@ -1405,9 +1435,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	@Override
 	public void dispose() {
 
-//		if (_prefChangeListener != null) {
-//			_prefStore.removePropertyChangeListener(_prefChangeListener);
-//		}
+		disposeHrZoneColors();
 
 		if (_isNoUI) {
 			super.dispose();
@@ -1415,6 +1443,17 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		}
 
 		super.dispose();
+	}
+
+	private void disposeHrZoneColors() {
+
+		if (_hrZoneColors == null) {
+			return;
+		}
+
+		for (final Color hrZoneColor : _hrZoneColors) {
+			hrZoneColor.dispose();
+		}
 	}
 
 	private void enableActions() {
