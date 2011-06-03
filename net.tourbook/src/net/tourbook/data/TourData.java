@@ -3779,10 +3779,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return numberOfHrZones;
 	}
 
-	public int getNumberOfHrZones() {
-		return numberOfHrZones;
-	}
-
 	public int[] getPaceSerie() {
 
 		if (UI.UNIT_VALUE_DISTANCE == 1) {

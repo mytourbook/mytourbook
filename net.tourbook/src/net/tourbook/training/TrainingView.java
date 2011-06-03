@@ -39,6 +39,7 @@ import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
+import net.tourbook.util.Util;
 
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -75,11 +76,11 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TrainingView extends ViewPart {
 
-	private static final String			HEADER_HR_MAX_100			= "100% = ";											//$NON-NLS-1$
+	private static final String			HEADER_HR_MAX_100			= "100% = ";							//$NON-NLS-1$
 
-	public static final String			ID							= "net.tourbook.training.TrainingView";				//$NON-NLS-1$
+	public static final String			ID							= "net.tourbook.training.TrainingView"; //$NON-NLS-1$
 
-	private static final String			STATE_SELECTED_CHART		= "SelectedChart";										//$NON-NLS-1$
+	private static final String			STATE_SELECTED_CHART		= "SelectedChart";						//$NON-NLS-1$
 
 	private static final int			CHART_ID_HR_TIME			= 0;
 	private static final int			CHART_ID_HR_ZONES_WITH_TEXT	= 1;
@@ -87,7 +88,11 @@ public class TrainingView extends ViewPart {
 	/**
 	 * {@link #_chartId} must be in sync with {@link #_chartNames}
 	 */
-	private static final int[]			_chartId					= { CHART_ID_HR_ZONES_WITH_TEXT, CHART_ID_HR_TIME, };
+	private static final int[]			_chartId					= { //
+																	CHART_ID_HR_TIME, //
+			CHART_ID_HR_ZONES_WITH_TEXT, //
+											//
+																	};
 
 	private static final String[]		_chartNames					= {
 			Messages.Training_Chart_Name_HrTime,
@@ -127,7 +132,7 @@ public class TrainingView extends ViewPart {
 	/**
 	 * Pagebook for the training view
 	 */
-	private PageBook					_pageBookTraining;
+	private PageBook					_pageBookView;
 	private Composite					_pageNoTour;
 	private Composite					_pageNoPerson;
 	private Composite					_pageNoHrZones;
@@ -159,7 +164,7 @@ public class TrainingView extends ViewPart {
 	void actionEditHrZones() {
 
 		PreferencesUtil.createPreferenceDialogOn(
-				_pageBookTraining.getShell(),
+				_pageBookView.getShell(),
 				PrefPagePeople.ID,
 				null,
 				PrefPagePeople.PREF_DATA_SELECT_HR_ZONES).open();
@@ -263,7 +268,7 @@ public class TrainingView extends ViewPart {
 		_tourData = null;
 //		_tourChart.updateChart(null, false);
 
-		_pageBookTraining.showPage(_pageNoTour);
+		_pageBookView.showPage(_pageNoTour);
 	}
 
 	private void createActions() {
@@ -282,12 +287,14 @@ public class TrainingView extends ViewPart {
 		createActions();
 
 		// show default page
-		_pageBookTraining.showPage(_pageNoTour);
+		_pageBookView.showPage(_pageNoTour);
 
 		addSelectionListener();
 		addPrefListener();
 		addTourEventListener();
 		addPartListener();
+
+		restoreState();
 
 		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
 
@@ -302,14 +309,14 @@ public class TrainingView extends ViewPart {
 		_tk = new FormToolkit(parent.getDisplay());
 		_fontItalic = JFaceResources.getFontRegistry().getItalic(JFaceResources.DIALOG_FONT);
 
-		_pageBookTraining = new PageBook(parent, SWT.NONE);
+		_pageBookView = new PageBook(parent, SWT.NONE);
 
-		_pageNoPerson = UI.createLabel(_tk, _pageBookTraining, Messages.UI_Label_PersonIsNotSelected);
-		_pageNoTour = UI.createLabel(_tk, _pageBookTraining, Messages.UI_Label_no_chart_is_selected);
-		_pageNoPulse = UI.createLabel(_tk, _pageBookTraining, Messages.Training_View_Label_NoPulseData);
-		_pageNoHrZones = createUI10PageNoHrZones(_pageBookTraining);
+		_pageNoPerson = UI.createLabel(_tk, _pageBookView, Messages.UI_Label_PersonIsRequired);
+		_pageNoTour = UI.createLabel(_tk, _pageBookView, Messages.UI_Label_no_chart_is_selected);
+		_pageNoPulse = UI.createLabel(_tk, _pageBookView, Messages.Training_View_Label_NoPulseData);
+		_pageNoHrZones = createUI10PageNoHrZones(_pageBookView);
 
-		_pageTraining = createUI20Training(_pageBookTraining);
+		_pageTraining = createUI20Training(_pageBookView);
 	}
 
 	private Composite createUI10PageNoHrZones(final Composite parent) {
@@ -347,9 +354,19 @@ public class TrainingView extends ViewPart {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+		GridLayoutFactory.fillDefaults().spacing(0, 0).numColumns(1).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 		{
 			createUI22Header(container);
+
+			// label: horizontal separator
+			final Label label = new Label(container, SWT.SEPARATOR | SWT.HORIZONTAL);
+			GridDataFactory.fillDefaults()//
+					.grab(true, false)
+					.hint(SWT.DEFAULT, 1)
+					.applyTo(label);
+			label.setText(UI.EMPTY_STRING);
+
 			createUI24Charts(container);
 		}
 
@@ -361,12 +378,13 @@ public class TrainingView extends ViewPart {
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
-			_comboTrainingChart = new Combo(container, SWT.NONE);
+			_comboTrainingChart = new Combo(container, SWT.READ_ONLY);
 			_comboTrainingChart.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					onSelectChart();
+					updateUI30ValidateData(false);
 				}
 			});
 
@@ -380,16 +398,17 @@ public class TrainingView extends ViewPart {
 	private void createUI24Charts(final Composite parent) {
 
 		_pageBookCharts = new PageBook(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBookCharts);
 	}
 
 	private Composite createUI26ChartContent(final int chartId) {
 
 		switch (chartId) {
 		case CHART_ID_HR_TIME:
-			return createUI30PageHrTime(_pageBookTraining);
+			return createUI30PageHrTime(_pageBookCharts);
 
 		case CHART_ID_HR_ZONES_WITH_TEXT:
-			return createUI31PageHrZone(_pageBookTraining);
+			return createUI40PageHrZone(_pageBookCharts);
 
 		default:
 			break;
@@ -401,23 +420,24 @@ public class TrainingView extends ViewPart {
 	private Composite createUI30PageHrTime(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 		{
 			final Label label = new Label(container, SWT.NONE);
 			GridDataFactory.fillDefaults().applyTo(label);
-			label.setText("test");
+			label.setText("test"); //$NON-NLS-1$
 
 		}
 
 		return container;
 	}
 
-	private Composite createUI31PageHrZone(final Composite parent) {
+	private Composite createUI40PageHrZone(final Composite parent) {
 
 		final Composite container = _tk.createComposite(parent);
-		GridDataFactory.fillDefaults().applyTo(container);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 		{
 			_hrZoneContainer = _tk.createComposite(container);
 			GridDataFactory.fillDefaults().grab(true, true).applyTo(_hrZoneContainer);
@@ -427,7 +447,7 @@ public class TrainingView extends ViewPart {
 		return container;
 	}
 
-	private void createUI35HrZoneContent() {
+	private void createUI42HrZoneContent() {
 
 		// person and zones are already checked
 
@@ -443,7 +463,7 @@ public class TrainingView extends ViewPart {
 		_hrZoneTextContainerContent = new ScrolledComposite(_hrZoneContainer, SWT.V_SCROLL | SWT.H_SCROLL);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(_hrZoneTextContainerContent);
 		{
-			scrolledContent = createUI36HrZone(_hrZoneTextContainerContent);
+			scrolledContent = createUI44HrZone(_hrZoneTextContainerContent);
 		}
 
 		_hrZoneTextContainerContent.setContent(scrolledContent);
@@ -457,24 +477,25 @@ public class TrainingView extends ViewPart {
 		});
 
 		// layout is necessary, dependent which other view is previously opened
-		_pageBookTraining.layout(true, true);
+		_pageBookView.layout(true, true);
 	}
 
-	private Composite createUI36HrZone(final Composite parent) {
+	private Composite createUI44HrZone(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
 		GridLayoutFactory.swtDefaults().numColumns(5).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
-			createUI37HrZoneHeader(container);
-			createUI38HrZoneFields(container);
+			createUI46HrZoneHeader(container);
+			createUI48HrZoneFields(container);
 		}
 		_tk.adapt(container);
 
 		return container;
 	}
 
-	private void createUI37HrZoneHeader(final Composite parent) {
+	private void createUI46HrZoneHeader(final Composite parent) {
 
 		/*
 		 * label: zone name
@@ -506,7 +527,7 @@ public class TrainingView extends ViewPart {
 				.applyTo(label);
 	}
 
-	private void createUI38HrZoneFields(final Composite parent) {
+	private void createUI48HrZoneFields(final Composite parent) {
 
 		final int hrZoneSize = _personHrZones.size();
 
@@ -594,6 +615,18 @@ public class TrainingView extends ViewPart {
 		menuMgr.add(_actionEditHrZones);
 	}
 
+	private int getChartIndex(final int requestedChartId) {
+
+		for (final int chartId : _chartId) {
+			if (chartId == requestedChartId) {
+				return chartId;
+			}
+		}
+
+		// return default, this case should not happen
+		return CHART_ID_HR_TIME;
+	}
+
 	/**
 	 * @return Returns the id of the selected chart
 	 */
@@ -675,43 +708,12 @@ public class TrainingView extends ViewPart {
 	 */
 	private void onModifyPerson() {
 
-		_currentPerson = TourbookPlugin.getActivePerson();
-
 		// hr zones could be changed
 		if (_hrZoneTextContainerContent != null) {
 			_hrZoneTextContainerContent.dispose();
 		}
 
-		updateUI30();
-	}
-
-	private void onSelectChart() {
-
-		int selectedIndex = _comboTrainingChart.getSelectionIndex();
-
-		if (selectedIndex == -1) {
-			selectedIndex = 0;
-		}
-
-		Composite chartContainer = _chartContainer[selectedIndex];
-		if (chartContainer == null) {
-
-			// create UI for the selected chart
-
-			chartContainer = createUI26ChartContent(_chartId[selectedIndex]);
-
-			_chartContainer[selectedIndex] = chartContainer;
-		}
-
-		if (chartContainer != null) {
-			// chart should never be null
-			return;
-		}
-
-		// display page for the selected chart
-		_pageBookCharts.showPage(chartContainer);
-
-		updateUI30();
+		updateUI30ValidateData(false);
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
@@ -774,6 +776,12 @@ public class TrainingView extends ViewPart {
 		}
 	}
 
+	private void restoreState() {
+
+		final int stateSelectedChart = Util.getStateInt(_state, STATE_SELECTED_CHART, CHART_ID_HR_TIME);
+		_comboTrainingChart.select(getChartIndex(stateSelectedChart));
+	}
+
 	private void saveState() {
 
 		_state.put(STATE_SELECTED_CHART, getSelectedChartId());
@@ -791,7 +799,7 @@ public class TrainingView extends ViewPart {
 			public void run() {
 
 				// validate widget
-				if (_pageBookTraining.isDisposed()) {
+				if (_pageBookView.isDisposed()) {
 					return;
 				}
 
@@ -829,17 +837,36 @@ public class TrainingView extends ViewPart {
 
 		_tourData = tourData;
 
-		updateUI30();
+		final TourPerson tourPerson = tourData.getTourPerson();
+		if (tourPerson != _currentPerson) {
+
+			// another person is contained in the tour
+
+			/*
+			 * dispose resources which depends on the current person
+			 */
+			// hr zones could be changed
+			if (_hrZoneTextContainerContent != null) {
+				_hrZoneTextContainerContent.dispose();
+			}
+
+			_currentPerson = tourPerson;
+		}
+
+		updateUI30ValidateData(true);
 	}
 
 	/**
 	 * Displays training data when a tour is available
 	 */
-	private void updateUI30() {
+	private void updateUI30ValidateData(final boolean isTourModified) {
 
 		if (_currentPerson == null) {
-			// a single person is not selected
-			_pageBookTraining.showPage(_pageNoPerson);
+
+			// selected tour do not contain a person
+			_pageBookView.showPage(_pageNoPerson);
+
+			_comboTrainingChart.setEnabled(false);
 			return;
 		}
 
@@ -852,36 +879,91 @@ public class TrainingView extends ViewPart {
 			_lblNoHrZone.setText(NLS.bind(Messages.Training_View_Label_NoHrZones, _currentPerson.getName()));
 			_lblNoHrZone.getParent().layout(true, true);
 
-			_pageBookTraining.showPage(_pageNoHrZones);
+			_pageBookView.showPage(_pageNoHrZones);
+
+			_comboTrainingChart.setEnabled(false);
 			return;
 		}
 
 		if (_tourData == null) {
+
 			// a tour is not selected
-			_pageBookTraining.showPage(_pageNoTour);
+			_pageBookView.showPage(_pageNoTour);
+
+			_comboTrainingChart.setEnabled(false);
 			return;
 		}
 
 		final int[] pulseSerie = _tourData.pulseSerie;
 		if (pulseSerie == null || pulseSerie.length == 0) {
+
 			// pulse data are not available
-			_pageBookTraining.showPage(_pageNoPulse);
+			_pageBookView.showPage(_pageNoPulse);
+
+			_comboTrainingChart.setEnabled(false);
 			return;
 		}
 
-		_pageBookTraining.showPage(_pageTraining);
+		/*
+		 * required data are available
+		 */
+		_pageBookView.showPage(_pageTraining);
+		_comboTrainingChart.setEnabled(true);
 
 		// set tooltip for the part title
 		setTitleToolTip(TourManager.getTourDateShort(_tourData));
 
-//		x ??? onSelectChart();
+		// get selected chart id
+		int selectedIndex = _comboTrainingChart.getSelectionIndex();
+		if (selectedIndex == -1) {
+			selectedIndex = 0;
+		}
+
+		final int chartId = _chartId[selectedIndex];
+
+		Composite chartContainer = _chartContainer[selectedIndex];
+		if (chartContainer == null) {
+
+			// create UI for the selected chart
+
+			chartContainer = createUI26ChartContent(chartId);
+
+			_chartContainer[selectedIndex] = chartContainer;
+		}
+
+		if (chartContainer == null) {
+			// chart should never be null
+			return;
+		}
+
+		// display page for the selected chart
+		_pageBookCharts.showPage(chartContainer);
+
+		if (isTourModified) {
+			switch (chartId) {
+			case CHART_ID_HR_TIME:
+				updateUI40HrTime();
+
+			case CHART_ID_HR_ZONES_WITH_TEXT:
+				updateUI41HrZoneText();
+
+			default:
+				break;
+			}
+
+		}
 	}
 
-	private void updateUI40TrainingHrZoneText() {
+	private void updateUI40HrTime() {
+		// TODO Auto-generated method stub
 
-		// create hr zones when not yet done
+	}
+
+	private void updateUI41HrZoneText() {
+
+		// create hr zones when not yet done or disposed
 		if (_hrZoneTextContainerContent == null || _hrZoneTextContainerContent.isDisposed()) {
-			createUI35HrZoneContent();
+			createUI42HrZoneContent();
 		}
 
 		final int personZoneSize = _personHrZones.size();

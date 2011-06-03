@@ -1295,7 +1295,8 @@ public class Messages extends NLS {
 
 	public static String		UI_Label_no_chart_is_selected;
 
-	public static String	UI_Label_PersonIsNotSelected;
+	public static String	UI_Label_PersonIsRequired;
+
 	public static String		UI_Label_TourIsNotSelected;
 
 	public static String		ui_tour_not_defined;

@@ -203,15 +203,6 @@ public class TourPersonHRZone implements Cloneable, Comparable<TourPersonHRZone>
 		return _color;
 	}
 
-	public RGB getColor() {
-
-		if (_color == null) {
-			_color = new RGB(colorRed, colorGreen, colorBlue);
-		}
-
-		return _color;
-	}
-
 	public String getDescription() {
 		return description;
 	}
