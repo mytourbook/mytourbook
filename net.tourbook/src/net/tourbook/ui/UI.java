@@ -170,6 +170,8 @@ public class UI {
 	public static final String								SYMBOL_DOUBLE_HORIZONTAL		= "\u2550";								//$NON-NLS-1$
 	public static final String								SYMBOL_DOUBLE_VERTICAL			= "\u2551";								//$NON-NLS-1$
 	public static final String								SYMBOL_DASH						= "\u2212";								//$NON-NLS-1$
+	public static final String								SYMBOL_ELLIPSIS					= "\u2026";								//$NON-NLS-1$
+	public static final String								SYMBOL_INFINITY					= "\u221E";								//$NON-NLS-1$
 
 	public static final String								SYMBOL_WIND_WITH_SPACE			= "W ";									//$NON-NLS-1$
 	public static final String								SYMBOL_PERCENTAGE				= "%";										//$NON-NLS-1$

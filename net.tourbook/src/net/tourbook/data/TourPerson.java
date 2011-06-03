@@ -19,6 +19,7 @@ import static javax.persistence.CascadeType.ALL;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -77,7 +78,7 @@ public class TourPerson implements Comparable<Object> {
 	private float								height;
 
 	/**
-	 * Date/Time when tour data was modified, default value is 0
+	 * Birthday of this person, default value is 0 when birthday is not set.
 	 * <p>
 	 * since: db version 15
 	 */
@@ -151,10 +152,13 @@ public class TourPerson implements Comparable<Object> {
 	private long								_createId					= 0;
 
 	@Transient
-	private int[]								_hrZoneMinBpm;
+	private DateTime							_birthDay;
 
+	/**
+	 * Key is the age of the person
+	 */
 	@Transient
-	private int[]								_hrZoneMaxBpm;
+	private HashMap<Integer, int[][]>			_hrZoneMinMaxBpm			= new HashMap<Integer, int[][]>();
 
 	/**
 	 * default constructor used in ejb
@@ -250,34 +254,6 @@ public class TourPerson implements Comparable<Object> {
 		return 0;
 	}
 
-	private void computeHrZoneMinMaxBpm() {
-
-		if (hrZones == null || hrZones.size() == 0) {
-			return;
-		}
-
-		final int hrMax = getHrMax();
-		final int zoneSize = hrZones.size();
-
-		final int[] zoneMinValues = new int[zoneSize];
-		final int[] zoneMaxValues = new int[zoneSize];
-
-		final ArrayList<TourPersonHRZone> hrZonesList = new ArrayList<TourPersonHRZone>(hrZones);
-		Collections.sort(hrZonesList);
-
-		// fill zone min/max values
-		for (int zoneIndex = 0; zoneIndex < hrZones.size(); zoneIndex++) {
-
-			final TourPersonHRZone hrZone = hrZonesList.get(zoneIndex);
-
-			zoneMinValues[zoneIndex] = (hrZone.getZoneMinValue() * hrMax / 100);
-			zoneMaxValues[zoneIndex] = (hrZone.getZoneMaxValue() * hrMax / 100);
-		}
-
-		_hrZoneMinBpm = zoneMinValues;
-		_hrZoneMaxBpm = zoneMaxValues;
-	}
-
 	@Override
 	public boolean equals(final Object obj) {
 
@@ -310,18 +286,31 @@ public class TourPerson implements Comparable<Object> {
 		return true;
 	}
 
-	private int getAge() {
+	/**
+	 * @param dateTime
+	 * @return Returns age for this person at a specific day
+	 */
+	private int getAge(final DateTime birthDay, final DateTime dateTime) {
 
-		final DateTime _today = new DateTime().withTime(0, 0, 0, 0);
-		final DateTime personBirthDay = birthDay == 0 ? DEFAULT_BIRTHDAY : new DateTime(birthDay);
-
-		final Period age = new Period(personBirthDay.getMillis(), _today.getMillis());
+		final Period age = new Period(birthDay.getMillis(), dateTime.getMillis());
 
 		return age.getYears();
 	}
 
+	/**
+	 * @return Returns birthday of this person, is 0 when birthday is not set.
+	 */
 	public long getBirthDay() {
 		return birthDay;
+	}
+
+	public DateTime getBirthDayWithDefault() {
+
+		if (_birthDay == null) {
+			_birthDay = birthDay == 0 ? DEFAULT_BIRTHDAY : new DateTime(birthDay);
+		}
+
+		return _birthDay;
 	}
 
 	public String getDeviceReaderId() {
@@ -340,43 +329,69 @@ public class TourPerson implements Comparable<Object> {
 		return height;
 	}
 
-	/**
-	 * @return Returns HR max depending on the HR max formula
-	 */
-	public int getHrMax() {
-		return getHrMax(hrMaxFormula, maxPulse, getAge());
-	}
+//	/**
+//	 * @param dateTime
+//	 *            Date when HR max should be computed.
+//	 * @return Returns HR max depending on the HR max formula and the age of the person at a
+//	 *         specific date.
+//	 */
+//	private int getHrMax(final int age) {
+//		return getHrMax(hrMaxFormula, maxPulse, age);
+//	}
 
 	public int getHrMaxFormula() {
 		return hrMaxFormula;
 	}
 
 	/**
-	 * @return Returns HR zone max bpm values or <code>null</code> when hr zones are not defined.
+	 * @param hrMaxFormulaKey
+	 * @param hrMaxPulse
+	 * @param dateTime
+	 *            Date when the HR zones should be computed, this is the tour date.
+	 * @return Returns HR zone min/max bpm values or <code>null</code> when hr zones are not
+	 *         defined.
 	 */
-	public int[] getHrZoneMaxBpm() {
+	public int[][] getHrZoneMinMaxBpm(	final int hrMaxFormulaKey,
+										final int hrMaxPulse,
+										final DateTime birthDay,
+										final DateTime dateTime) {
 
-		if (_hrZoneMaxBpm != null) {
-			return _hrZoneMaxBpm;
+		if (hrZones == null || hrZones.size() == 0) {
+			return null;
 		}
 
-		computeHrZoneMinMaxBpm();
+		final int age = getAge(birthDay, dateTime);
 
-		return _hrZoneMaxBpm;
-	}
+		final int[][] hrZoneMinMax = _hrZoneMinMaxBpm.get(age);
 
-	/**
-	 * @return Returns HR zone min bpm values or <code>null</code> when hr zones are not defined.
-	 */
-	public int[] getHrZoneMinBpm() {
-
-		if (_hrZoneMinBpm != null) {
-			return _hrZoneMinBpm;
+		if (hrZoneMinMax != null) {
+			// hr zones for the age is already available
+			return hrZoneMinMax;
 		}
 
-		computeHrZoneMinMaxBpm();
+		final int hrMax = getHrMax(hrMaxFormulaKey, hrMaxPulse, age);
+		final int zoneSize = hrZones.size();
 
-		return _hrZoneMinBpm;
+		final int[] zoneMinValues = new int[zoneSize];
+		final int[] zoneMaxValues = new int[zoneSize];
+
+		final ArrayList<TourPersonHRZone> hrZonesList = new ArrayList<TourPersonHRZone>(hrZones);
+		Collections.sort(hrZonesList);
+
+		// fill zone min/max values
+		for (int zoneIndex = 0; zoneIndex < hrZones.size(); zoneIndex++) {
+
+			final TourPersonHRZone hrZone = hrZonesList.get(zoneIndex);
+
+			zoneMinValues[zoneIndex] = (hrZone.getZoneMinValue() * hrMax / 100);
+			zoneMaxValues[zoneIndex] = (hrZone.getZoneMaxValue() * hrMax / 100);
+		}
+
+		final int[][] hrZoneMinMax1 = new int[][] { zoneMinValues, zoneMaxValues };
+
+		_hrZoneMinMaxBpm.put(age, hrZoneMinMax1);
+
+		return hrZoneMinMax1;
 	}
 
 	public Set<TourPersonHRZone> getHrZones() {
@@ -469,6 +484,11 @@ public class TourPerson implements Comparable<Object> {
 		return isSaved;
 	}
 
+	public void resetHrZones() {
+
+		_hrZoneMinMaxBpm.clear();
+	}
+
 	public void setBirthDay(final long birthDay) {
 		this.birthDay = birthDay;
 	}
@@ -497,9 +517,7 @@ public class TourPerson implements Comparable<Object> {
 
 		this.hrZones = hrZones;
 
-		// reset values which are computed from hr zones when data are requested
-		_hrZoneMinBpm = null;
-		_hrZoneMaxBpm = null;
+		_hrZoneMinMaxBpm.clear();
 	}
 
 	public void setLastName(final String lastName) {

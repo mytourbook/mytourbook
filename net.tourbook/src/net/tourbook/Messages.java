@@ -65,8 +65,12 @@ public class Messages extends NLS {
 
 	public static String		Dialog_HRZone_Button_RemoveZone;
 	public static String		Dialog_HRZone_Button_SortZone;
+
+	public static String	Dialog_HRZone_Button_SortZone_Tooltip;
 	public static String		Dialog_HRZone_DialogMessage;
 	public static String		Dialog_HRZone_DialogTitle;
+	public static String	Dialog_HRZone_Label_Header_Color;
+
 	public static String	Dialog_HRZone_Label_Header_MaxPulse;
 
 	public static String		Dialog_HRZone_Label_Header_Pulse;
@@ -693,6 +697,8 @@ public class Messages extends NLS {
 	public static String		Pref_Appearance_NumberOfRecent_TourTypes_Tooltip;
 	public static String		Pref_Appearance_ShowTourTypeContextMenu;
 
+	public static String	Pref_Appearance_ShowTourTypeContextMenu_Tooltip;
+
 	public static String		Pref_ChartColors_btn_legend;
 	public static String		Pref_ChartColors_unit_high;
 	public static String		Pref_ChartColors_unit_low;
@@ -777,6 +783,8 @@ public class Messages extends NLS {
 	public static String	Pref_People_Dialog_ComputeHrZonesForAllTours_Message;
 
 	public static String	Pref_People_Dialog_ComputeHrZonesForAllToursIsCanceled_Message;
+
+	public static String	Pref_People_Dialog_HrZonesAreInconsistent_Message;
 
 	public static String	Pref_People_Dialog_ReplaceHrZones_Message;
 
@@ -1272,6 +1280,10 @@ public class Messages extends NLS {
 	public static String		TourEditor_Dialog_SetAltitudeFromSRTM_Title;
 
 	public static String	Training_Action_EditHrZones;
+
+	public static String	Training_Chart_Name_HrTime;
+
+	public static String	Training_Chart_Name_HrZonesText;
 
 	public static String	Training_HRZone_Label_Header_Zone;
 

@@ -30,7 +30,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.jface.preference.ColorSelector;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -51,7 +51,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.Widget;
 
 public class DialogHRZones extends TitleAreaDialog {
 
@@ -65,8 +64,6 @@ public class DialogHRZones extends TitleAreaDialog {
 
 	private ArrayList<TourPersonHRZone>	_hrZones;
 
-	private PixelConverter				_pc;
-
 	/*
 	 * UI controls
 	 */
@@ -77,9 +74,9 @@ public class DialogHRZones extends TitleAreaDialog {
 	private Text[]						_txtZoneName;
 	private Text[]						_txtNameShortcut;
 	private Spinner[]					_spinnerMinPulse;
-	private Spinner[]					_spinnerMaxPulse;
+	private Label[]						_labelMaxPulse;
+	private ColorSelector[]				_colorSelector;
 	private Button[]					_btnTrash;
-	private Label[]						_labelGtLt;															// Gt... greater than, Lt...Lower than
 
 	private Button						_btnAddZone;
 	private Button						_btnRemoveZone;
@@ -131,6 +128,7 @@ public class DialogHRZones extends TitleAreaDialog {
 
 		_hrZones.removeAll(removedZones);
 
+		updateModelMaxValues();
 		updateUIFromModel();
 	}
 
@@ -204,8 +202,6 @@ public class DialogHRZones extends TitleAreaDialog {
 
 	private void createUI(final Composite parent) {
 
-		_pc = new PixelConverter(parent);
-
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
 		GridLayoutFactory.swtDefaults().numColumns(2).spacing(20, 0).applyTo(container);
@@ -269,7 +265,7 @@ public class DialogHRZones extends TitleAreaDialog {
 
 		// hr zone container
 		final Composite hrZoneContainer = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.fillDefaults().numColumns(7).applyTo(hrZoneContainer);
+		GridLayoutFactory.fillDefaults().numColumns(8).applyTo(hrZoneContainer);
 //		hrZoneContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
 			createUI23HrZoneHeader(hrZoneContainer);
@@ -282,9 +278,18 @@ public class DialogHRZones extends TitleAreaDialog {
 	private void createUI23HrZoneHeader(final Composite parent) {
 
 		/*
-		 * label: zone name
+		 * label: color
 		 */
 		Label label = new Label(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.align(SWT.FILL, SWT.BOTTOM)
+				.applyTo(label);
+		label.setText(Messages.Dialog_HRZone_Label_Header_Color);
+
+		/*
+		 * label: zone name
+		 */
+		label = new Label(parent, SWT.NONE);
 		GridDataFactory
 				.fillDefaults()
 				.grab(true, false)
@@ -301,25 +306,11 @@ public class DialogHRZones extends TitleAreaDialog {
 		label.setText(Messages.Dialog_HRZone_Label_Header_ZoneShortcut);
 
 		/*
-		 * header label: min pulse
+		 * header label: pulse
 		 */
 		label = new Label(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.BOTTOM).applyTo(label);
+		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BOTTOM).span(3, 1).applyTo(label);
 		label.setText(Messages.Dialog_HRZone_Label_Header_Pulse);
-
-		/*
-		 * label: ...
-		 */
-		label = new Label(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().hint(_pc.convertWidthInCharsToPixels(2), SWT.DEFAULT).applyTo(label);
-		label.setText(UI.EMPTY_STRING);
-
-		/*
-		 * header label: max pulse
-		 */
-		label = new Label(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.BOTTOM).applyTo(label);
-		label.setText(Messages.Dialog_HRZone_Label_Header_MaxPulse);
 
 		/*
 		 * label: %
@@ -329,10 +320,10 @@ public class DialogHRZones extends TitleAreaDialog {
 		label.setText(UI.EMPTY_STRING);
 
 		/*
-		 * header label: trash
+		 * label: trash
 		 */
 		final CLabel iconImport = new CLabel(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.CENTER).applyTo(iconImport);
+		GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.CENTER).indent(10, 0).applyTo(iconImport);
 		iconImport.setImage(_imageTrash);
 		iconImport.setToolTipText(Messages.Dialog_HRZone_Label_Trash_Tooltip);
 	}
@@ -344,26 +335,13 @@ public class DialogHRZones extends TitleAreaDialog {
 		final SelectionAdapter minSelectListener = new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
-				onSelectMinPulse(e.widget);
+//				onSelectMinPulse(e.widget);
 			}
 		};
 		final MouseWheelListener minMouseListener = new MouseWheelListener() {
 			public void mouseScrolled(final MouseEvent event) {
 				UI.adjustSpinnerValueOnMouseScroll(event);
-				onSelectMinPulse(event.widget);
-			}
-		};
-
-		final SelectionAdapter maxSelectListener = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onSelectMaxPulse(e.widget);
-			}
-		};
-		final MouseWheelListener maxMouseListener = new MouseWheelListener() {
-			public void mouseScrolled(final MouseEvent event) {
-				UI.adjustSpinnerValueOnMouseScroll(event);
-				onSelectMaxPulse(event.widget);
+//				onSelectMinPulse(event.widget);
 			}
 		};
 
@@ -380,11 +358,16 @@ public class DialogHRZones extends TitleAreaDialog {
 		_txtZoneName = new Text[hrZoneSize];
 		_txtNameShortcut = new Text[hrZoneSize];
 		_spinnerMinPulse = new Spinner[hrZoneSize];
-		_spinnerMaxPulse = new Spinner[hrZoneSize];
-		_labelGtLt = new Label[hrZoneSize];
+		_labelMaxPulse = new Label[hrZoneSize];
+		_colorSelector = new ColorSelector[hrZoneSize];
 		_btnTrash = new Button[hrZoneSize];
 
 		for (int zoneIndex = 0; zoneIndex < hrZoneSize; zoneIndex++) {
+
+			/*
+			 * color: hr zone
+			 */
+			_colorSelector[zoneIndex] = new ColorSelector(parent);
 
 			/*
 			 * text: hr zone name
@@ -412,22 +395,18 @@ public class DialogHRZones extends TitleAreaDialog {
 			spinnerMinPulse.setData(zoneIndex);
 
 			/*
-			 * label: <, >
+			 * label: ...
 			 */
-			Label label = _labelGtLt[zoneIndex] = new Label(parent, SWT.NONE);
+			Label label = new Label(parent, SWT.NONE);
 			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-			label.setText(UI.EMPTY_STRING);
+			label.setText(UI.SYMBOL_DASH);
 
 			/*
-			 * spinner: max pulse
+			 * label: max pulse
 			 */
-			final Spinner spinnerMaxPulse = _spinnerMaxPulse[zoneIndex] = new Spinner(parent, SWT.BORDER);
-			GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.FILL).applyTo(spinnerMaxPulse);
-			spinnerMaxPulse.setMinimum(0);
-			spinnerMaxPulse.setMaximum(120);
-			spinnerMaxPulse.addSelectionListener(maxSelectListener);
-			spinnerMaxPulse.addMouseWheelListener(maxMouseListener);
-			spinnerMaxPulse.setData(zoneIndex);
+			final Label labelMaxPulse = _labelMaxPulse[zoneIndex] = new Label(parent, SWT.NONE);
+			GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(labelMaxPulse);
+			labelMaxPulse.setData(zoneIndex);
 
 			/*
 			 * label: %
@@ -437,10 +416,10 @@ public class DialogHRZones extends TitleAreaDialog {
 			label.setText(UI.SYMBOL_PERCENTAGE);
 
 			/*
-			 * checkbox
+			 * checkbox: trash
 			 */
 			final Button checkbox = _btnTrash[zoneIndex] = new Button(parent, SWT.CHECK);
-			GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.FILL).applyTo(checkbox);
+			GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.FILL).indent(10, 0).applyTo(checkbox);
 			checkbox.setToolTipText(Messages.Dialog_HRZone_Label_Trash_Tooltip);
 			checkbox.addSelectionListener(trashSelectListener);
 		}
@@ -471,6 +450,7 @@ public class DialogHRZones extends TitleAreaDialog {
 			 */
 			_btnSortZones = new Button(container, SWT.NONE);
 			_btnSortZones.setText(Messages.Dialog_HRZone_Button_SortZone);
+			_btnSortZones.setToolTipText(Messages.Dialog_HRZone_Button_SortZone_Tooltip);
 			_btnSortZones.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
@@ -537,63 +517,74 @@ public class DialogHRZones extends TitleAreaDialog {
 		}
 	}
 
-	private void onSelectMaxPulse(final Widget widget) {
-
-		final Object data = widget.getData();
-		if (data instanceof Integer) {
-			final Integer zoneIndex = (Integer) data;
-
-			final Spinner spMinPulse = _spinnerMinPulse[zoneIndex];
-			final Spinner spMaxPulse = _spinnerMaxPulse[zoneIndex];
-
-			// ensure min <= max
-			if (spMinPulse.getSelection() > spMaxPulse.getSelection()) {
-				spMinPulse.setSelection(spMaxPulse.getSelection());
-			}
-		}
-	}
-
-	private void onSelectMinPulse(final Widget widget) {
-
-		final Object data = widget.getData();
-		if (data instanceof Integer) {
-			final Integer zoneIndex = (Integer) data;
-
-			final Spinner spMinPulse = _spinnerMinPulse[zoneIndex];
-			final Spinner spMaxPulse = _spinnerMaxPulse[zoneIndex];
-
-			// ensure max >= min
-			if (spMaxPulse.getSelection() < spMinPulse.getSelection()) {
-				spMaxPulse.setSelection(spMinPulse.getSelection());
-			}
-		}
-	}
+//	private void onSelectMinPulse(final Widget widget) {
+//
+//		final Object data = widget.getData();
+//		if (data instanceof Integer) {
+//			final Integer zoneIndex = (Integer) data;
+//
+//			final Spinner spMinPulse = _spinnerMinPulse[zoneIndex];
+//
+//			// ensure max >= min
+////			if (spMaxPulse.getSelection() < spMinPulse.getSelection()) {
+////				spMaxPulse.setSelection(spMinPulse.getSelection());
+////			}
+//		}
+//	}
 
 	private void updateModelFromUI() {
 
-		for (int hrZoneIndex = 0; hrZoneIndex < _txtZoneName.length; hrZoneIndex++) {
+		final int zoneLength = _txtZoneName.length;
 
-			final TourPersonHRZone hrZone = _hrZones.get(hrZoneIndex);
+		for (int zoneIndex = 0; zoneIndex < zoneLength; zoneIndex++) {
 
-			int minValue = _spinnerMinPulse[hrZoneIndex].getSelection();
-			int maxValue = _spinnerMaxPulse[hrZoneIndex].getSelection();
+			final TourPersonHRZone hrZone = _hrZones.get(zoneIndex);
 
-			// keep zone borders
-			if (hrZone.getZoneMinValue() == Integer.MIN_VALUE) {
-				minValue = Integer.MIN_VALUE;
-			}
-			if (hrZone.getZoneMaxValue() == Integer.MAX_VALUE) {
-				maxValue = Integer.MAX_VALUE;
-			}
+			hrZone.setZoneMinValue(_spinnerMinPulse[zoneIndex].getSelection());
 
-			hrZone.setZoneMinValue(minValue);
-			hrZone.setZoneMaxValue(maxValue);
+			hrZone.setZoneName(_txtZoneName[zoneIndex].getText());
+			hrZone.setNameShortcut(_txtNameShortcut[zoneIndex].getText());
 
-			hrZone.setZoneName(_txtZoneName[hrZoneIndex].getText());
-			hrZone.setNameShortcut(_txtNameShortcut[hrZoneIndex].getText());
+			hrZone.setColor(_colorSelector[zoneIndex].getColorValue());
 		}
 
 		Collections.sort(_hrZones);
+
+		updateModelMaxValues();
+	}
+
+	/**
+	 * set max value from the previous min value
+	 */
+	private void updateModelMaxValues() {
+
+		int maxValue = 0;
+		final int zoneLength = _hrZones.size();
+
+		for (int zoneIndex = 0; zoneIndex < zoneLength; zoneIndex++) {
+
+			final TourPersonHRZone hrZone = _hrZones.get(zoneIndex);
+
+			if (zoneIndex < zoneLength - 1) {
+
+				final int prevZoneMinValue = _hrZones.get(zoneIndex + 1).getZoneMinValue();
+
+				maxValue = prevZoneMinValue - 1;
+
+			} else if (zoneIndex == zoneLength - 1) {
+
+				// set last zone to infinity
+
+				maxValue = Integer.MAX_VALUE;
+			}
+
+			final int zoneMinValue = hrZone.getZoneMinValue();
+			if (maxValue < zoneMinValue) {
+				maxValue = zoneMinValue;
+			}
+
+			hrZone.setZoneMaxValue(maxValue);
+		}
 	}
 
 	private void updateUIFromModel() {
@@ -603,47 +594,44 @@ public class DialogHRZones extends TitleAreaDialog {
 			// create default zones
 
 			_hrZones.addAll(TrainingManager.createHrZones(_person, TrainingManager.HR_ZONE_TEMPLATE_01));
-			Collections.sort(_hrZones);
 		}
+
+		Collections.sort(_hrZones);
 
 		createUI20HrZoneScrolledContainer(_hrZoneOuterContainer);
 
-		for (int hrZoneIndex = 0; hrZoneIndex < _txtZoneName.length; hrZoneIndex++) {
+		final int zoneLength = _txtZoneName.length;
 
-			final TourPersonHRZone hrZone = _hrZones.get(hrZoneIndex);
+		for (int hrIndex = 0; hrIndex < zoneLength; hrIndex++) {
+
+			final TourPersonHRZone hrZone = _hrZones.get(hrIndex);
 
 			// update UI
 			final String zoneName = hrZone.getZoneName();
-			_txtZoneName[hrZoneIndex].setText(zoneName == null ? UI.EMPTY_STRING : zoneName);
+			_txtZoneName[hrIndex].setText(zoneName == null ? UI.EMPTY_STRING : zoneName);
 
 			final String nameShortcut = hrZone.getNameShortcut();
-			_txtNameShortcut[hrZoneIndex].setText(nameShortcut == null ? UI.EMPTY_STRING : nameShortcut);
+			_txtNameShortcut[hrIndex].setText(nameShortcut == null ? UI.EMPTY_STRING : nameShortcut);
 
-			if (hrZone.getZoneMinValue() == Integer.MIN_VALUE) {
+			_colorSelector[hrIndex].setColorValue(hrZone.getColor());
 
-				_spinnerMinPulse[hrZoneIndex].setVisible(false);
-				_spinnerMaxPulse[hrZoneIndex].setSelection(hrZone.getZoneMaxValue());
+			if (hrIndex == 0 || hrIndex == zoneLength - 1) {
 
-				_btnTrash[hrZoneIndex].setVisible(false);
-
-				continue;
+				_btnTrash[hrIndex].setVisible(false);
 			}
 
-			if (hrZone.getZoneMaxValue() == Integer.MAX_VALUE) {
+			final int zoneMinValue = hrZone.getZoneMinValue();
+			final int zoneMaxValue = hrZone.getZoneMaxValue();
 
-				_spinnerMinPulse[hrZoneIndex].setSelection(hrZone.getZoneMinValue());
-				_spinnerMaxPulse[hrZoneIndex].setVisible(false);
+			final String zoneMaxValueText = zoneMaxValue == Integer.MAX_VALUE ? //
+					UI.SYMBOL_INFINITY
+					: Integer.toString(zoneMaxValue);
 
-				_btnTrash[hrZoneIndex].setVisible(false);
-
-				continue;
-			}
-
-			_spinnerMinPulse[hrZoneIndex].setSelection(hrZone.getZoneMinValue());
-			_spinnerMaxPulse[hrZoneIndex].setSelection(hrZone.getZoneMaxValue());
-
-			_labelGtLt[hrZoneIndex].setText(UI.SYMBOL_DASH);
+			_spinnerMinPulse[hrIndex].setSelection(zoneMinValue);
+			_labelMaxPulse[hrIndex].setText(zoneMaxValueText);
 		}
+
+		_hrZoneOuterContainer.layout(true, true);
 
 		enableControls();
 	}

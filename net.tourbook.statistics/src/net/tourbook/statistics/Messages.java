@@ -64,6 +64,8 @@ public class Messages extends NLS {
 	public static String		tourtime_info_tour_type;
 	public static String		tourtime_info_week;
 
+	public static String	UI_Label_PersonIsNotSelected;
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 
 package net.tourbook.statistics;
@@ -60,18 +60,18 @@ public abstract class DataProvider {
 	 */
 	static String getYearList(final int finalYear, final int numberOfYears) {
 
-		final StringBuilder buffer = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 
 		for (int currentYear = finalYear; currentYear >= finalYear - numberOfYears + 1; currentYear--) {
 
 			if (currentYear != finalYear) {
-				buffer.append(',');
+				sb.append(',');
 			}
 
-			buffer.append(Integer.toString(currentYear));
+			sb.append(Integer.toString(currentYear));
 		}
 
-		return buffer.toString();
+		return sb.toString();
 	}
 
 	/**
@@ -99,11 +99,11 @@ public abstract class DataProvider {
 	}
 
 	/**
-	 * get numbers for each year <br>
+	 * Get different data for each year, data are set into <br>
 	 * <br>
-	 * all years into {@link #_years} <br>
-	 * number of day's into {@link #_yearDays} <br>
-	 * number of week's into {@link #_yearWeeks}
+	 * All years in {@link #years} <br>
+	 * Number of day's in {@link #daysInEachYear} <br>
+	 * Number of week's in {@link #_yearWeeks}
 	 */
 	void initYearNumbers() {
 

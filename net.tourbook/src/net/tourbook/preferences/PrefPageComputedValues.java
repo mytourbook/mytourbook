@@ -1089,6 +1089,11 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 	}
 
 	private void saveUIState() {
+
+		if (_tabFolder == null || _tabFolder.isDisposed()) {
+			return;
+		}
+
 		_prefStore.setValue(STATE_COMPUTED_VALUE_SELECTED_TAB, _tabFolder.getSelectionIndex());
 	}
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.statistics;
 
 import java.sql.Connection;
@@ -32,21 +31,21 @@ import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 import net.tourbook.util.ArrayListToArray;
 
-public class DataProviderTourTime extends DataProvider {
+public class DataProviderTourHrZones extends DataProvider {
 
-	private static DataProviderTourTime	_instance;
+	private static DataProviderTourHrZones	_instance;
 
-	private ArrayList<Long>				_tourIds;
+	private ArrayList<Long>					_tourIds;
 
-	private Long						_selectedTourId;
+	private Long							_selectedTourId;
 
-	private TourTimeData				_tourDataTime;
+	private TourHrZoneData					_tourHrZoneData;
 
-	private DataProviderTourTime() {}
+	private DataProviderTourHrZones() {}
 
-	public static DataProviderTourTime getInstance() {
+	public static DataProviderTourHrZones getInstance() {
 		if (_instance == null) {
-			_instance = new DataProviderTourTime();
+			_instance = new DataProviderTourHrZones();
 		}
 		return _instance;
 	}
@@ -64,19 +63,19 @@ public class DataProviderTourTime extends DataProvider {
 	 * @param numberOfYears
 	 * @return
 	 */
-	TourTimeData getTourTimeData(	final TourPerson person,
-									final TourTypeFilter tourTypeFilter,
-									final int lastYear,
-									final int numberOfYears,
-									final boolean refreshData) {
+	TourHrZoneData getTourHrZoneData(	final TourPerson person,
+										final TourTypeFilter tourTypeFilter,
+										final int lastYear,
+										final int numberOfYears,
+										final boolean refreshData) {
 
-		// dont reload data which are already here
+		// don't reload data which are already loaded
 		if (_activePerson == person
 				&& _activeTourTypeFilter == tourTypeFilter
 				&& _lastYear == lastYear
 				&& _numberOfYears == numberOfYears
 				&& refreshData == false) {
-			return _tourDataTime;
+			return _tourHrZoneData;
 		}
 
 		_activePerson = person;
@@ -97,6 +96,7 @@ public class DataProviderTourTime extends DataProvider {
 		final SQLFilter sqlFilter = new SQLFilter();
 
 		final String sqlString = "SELECT " //$NON-NLS-1$
+
 				+ "TourId," //					1 //$NON-NLS-1$
 				+ "StartYear," //				2 //$NON-NLS-1$
 				+ "StartMonth," //				3 //$NON-NLS-1$
@@ -112,17 +112,34 @@ public class DataProviderTourTime extends DataProvider {
 				+ "TourDescription," // 		13 //$NON-NLS-1$
 				+ "startWeek," //				14 //$NON-NLS-1$
 
-				+ "jTdataTtag.TourTag_tagId"//	15 //$NON-NLS-1$
+				+ "NumberOfHrZones," //			15 //$NON-NLS-1$
+				+ "hrZone0," //					16 //$NON-NLS-1$
+				+ "hrZone1," //					17 //$NON-NLS-1$
+				+ "hrZone2," //					18 //$NON-NLS-1$
+				+ "hrZone3," //					19 //$NON-NLS-1$
+				+ "hrZone4," //					20 //$NON-NLS-1$
+				+ "hrZone5," //					21 //$NON-NLS-1$
+				+ "hrZone6," //					22 //$NON-NLS-1$
+				+ "hrZone7," //					23 //$NON-NLS-1$
+				+ "hrZone8," //					24 //$NON-NLS-1$
+				+ "hrZone9," //					25 //$NON-NLS-1$
+
+				+ "jTdataTtag.TourTag_tagId"//	26 //$NON-NLS-1$
 
 				+ UI.NEW_LINE
 
 				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE) //$NON-NLS-1$
 
-				// get tag id's
+				// tag id's
 				+ (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag") //$NON-NLS-1$ //$NON-NLS-2$
 				+ (" ON tourID = jTdataTtag.TourData_tourId") //$NON-NLS-1$
 
-				+ (" WHERE StartYear IN (" + getYearList(lastYear, numberOfYears) + ")" + UI.NEW_LINE) //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" WHERE NumberOfHrZones > 0") //$NON-NLS-1$
+
+				// selected years
+				+ (" AND StartYear IN (" + getYearList(lastYear, numberOfYears) + ")" + UI.NEW_LINE) //$NON-NLS-1$ //$NON-NLS-2$
+
+				// person + tour type
 				+ sqlFilter.getWhereClause()
 
 				+ (" ORDER BY StartYear, StartMonth, StartDay, StartHour, StartMinute"); //$NON-NLS-1$
@@ -145,6 +162,9 @@ public class DataProviderTourTime extends DataProvider {
 			final ArrayList<Integer> dbTourRecordingTime = new ArrayList<Integer>();
 			final ArrayList<Integer> dbTourDrivingTime = new ArrayList<Integer>();
 
+			final ArrayList<int[]> dbHrZones = new ArrayList<int[]>();
+			int dbNumberOfHrZones = 0;
+
 			final ArrayList<Long> dbTypeIds = new ArrayList<Long>();
 			final ArrayList<Integer> dbTypeColorIndex = new ArrayList<Integer>();
 
@@ -164,7 +184,7 @@ public class DataProviderTourTime extends DataProvider {
 			while (result.next()) {
 
 				final long tourId = result.getLong(1);
-				final Object dbTagId = result.getObject(15);
+				final Object dbTagId = result.getObject(26);
 
 				if (tourId == lastTourId) {
 
@@ -218,6 +238,45 @@ public class DataProviderTourTime extends DataProvider {
 					}
 
 					/*
+					 * HR zones
+					 */
+					dbNumberOfHrZones = result.getInt(15);
+					final int[] hrZones = new int[dbNumberOfHrZones];
+
+					if (dbNumberOfHrZones > 0) {
+						hrZones[0] = result.getInt(16);
+					}
+					if (dbNumberOfHrZones > 1) {
+						hrZones[1] = result.getInt(17);
+					}
+					if (dbNumberOfHrZones > 2) {
+						hrZones[2] = result.getInt(18);
+					}
+					if (dbNumberOfHrZones > 3) {
+						hrZones[3] = result.getInt(19);
+					}
+					if (dbNumberOfHrZones > 4) {
+						hrZones[4] = result.getInt(20);
+					}
+					if (dbNumberOfHrZones > 5) {
+						hrZones[5] = result.getInt(21);
+					}
+					if (dbNumberOfHrZones > 6) {
+						hrZones[6] = result.getInt(22);
+					}
+					if (dbNumberOfHrZones > 7) {
+						hrZones[7] = result.getInt(23);
+					}
+					if (dbNumberOfHrZones > 8) {
+						hrZones[8] = result.getInt(24);
+					}
+					if (dbNumberOfHrZones > 9) {
+						hrZones[9] = result.getInt(25);
+					}
+
+					dbHrZones.add(hrZones);
+
+					/*
 					 * convert type id to the type index in the tour type array, this is also the
 					 * color index for the tour type
 					 */
@@ -243,49 +302,51 @@ public class DataProviderTourTime extends DataProvider {
 			conn.close();
 
 			// get number of days for all years
-			int yearDays = 0;
+			int allDaysInAllYear = 0;
 			for (final int doy : _yearDays) {
-				yearDays += doy;
+				allDaysInAllYear += doy;
 			}
 
 			/*
 			 * create data
 			 */
-			_tourDataTime = new TourTimeData();
+			_tourHrZoneData = new TourHrZoneData();
 
-			_tourDataTime.fTourIds = ArrayListToArray.toLong(_tourIds);
+			_tourHrZoneData.tourIds = ArrayListToArray.toLong(_tourIds);
 
-			_tourDataTime.fTypeIds = ArrayListToArray.toLong(dbTypeIds);
-			_tourDataTime.fTypeColorIndex = ArrayListToArray.toInt(dbTypeColorIndex);
+			_tourHrZoneData.typeIds = ArrayListToArray.toLong(dbTypeIds);
+			_tourHrZoneData.typeColorIndex = ArrayListToArray.toInt(dbTypeColorIndex);
 
-			_tourDataTime.fTagIds = dbTagIds;
+			_tourHrZoneData.tagIds = dbTagIds;
 
-			_tourDataTime.allDaysInAllYears = yearDays;
-			_tourDataTime.yearDays = _yearDays;
-			_tourDataTime.years = _years;
+			_tourHrZoneData.allDaysInAllYears = allDaysInAllYear;
+			_tourHrZoneData.daysInEachYear = _yearDays;
+			_tourHrZoneData.years = _years;
 
-			_tourDataTime.fTourYearValues = ArrayListToArray.toInt(dbTourYear);
-			_tourDataTime.fTourMonthValues = ArrayListToArray.toInt(dbTourMonths);
-			_tourDataTime.fTourDOYValues = ArrayListToArray.toInt(dbAllYearsDOY);
-			_tourDataTime.weekValues = ArrayListToArray.toInt(dbTourStartWeek);
+			_tourHrZoneData.tourYear = ArrayListToArray.toInt(dbTourYear);
+			_tourHrZoneData.tourMonth = ArrayListToArray.toInt(dbTourMonths);
+			_tourHrZoneData.tourDOY = ArrayListToArray.toInt(dbAllYearsDOY);
+			_tourHrZoneData.tourWeek = ArrayListToArray.toInt(dbTourStartWeek);
 
-			_tourDataTime.fTourTimeStartValues = ArrayListToArray.toInt(dbTourStartTime);
-			_tourDataTime.fTourTimeEndValues = ArrayListToArray.toInt(dbTourEndTime);
+			_tourHrZoneData.tourTimeStart = ArrayListToArray.toInt(dbTourStartTime);
+			_tourHrZoneData.tourTimeEnd = ArrayListToArray.toInt(dbTourEndTime);
+			_tourHrZoneData.tourDistance = ArrayListToArray.toInt(dbDistance);
+			_tourHrZoneData.tourAltitude = ArrayListToArray.toInt(dbAltitude);
 
-			_tourDataTime.fTourDistanceValues = ArrayListToArray.toInt(dbDistance);
-			_tourDataTime.fTourAltitudeValues = ArrayListToArray.toInt(dbAltitude);
+			_tourHrZoneData.tourRecordingTime = dbTourRecordingTime;
+			_tourHrZoneData.tourDrivingTime = dbTourDrivingTime;
 
-			_tourDataTime.fTourRecordingTimeValues = dbTourRecordingTime;
-			_tourDataTime.fTourDrivingTimeValues = dbTourDrivingTime;
+			_tourHrZoneData.tourTitle = dbTourTitle;
+			_tourHrZoneData.tourDescription = dbTourDescription;
 
-			_tourDataTime.fTourTitle = dbTourTitle;
-			_tourDataTime.tourDescription = dbTourDescription;
+			_tourHrZoneData.hrZones = dbHrZones;
+			_tourHrZoneData.numberOfHrZones = dbNumberOfHrZones;
 
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
 		}
 
-		return _tourDataTime;
+		return _tourHrZoneData;
 	}
 
 	void setSelectedTourId(final Long selectedTourId) {
