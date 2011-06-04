@@ -262,25 +262,27 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 				_txtFirstName.setFocus();
 			}
 
-		} else if (data.equals(PREF_DATA_SELECT_HR_ZONES)) {
+		} else if (data instanceof PrefPagePeopleData) {
 
-			// select hr zones for the active person
+			final PrefPagePeopleData prefPageData = (PrefPagePeopleData) data;
 
-			final TourPerson activePerson = TourbookPlugin.getActivePerson();
+			if (prefPageData.prefDataSelectHrZones.equals(PREF_DATA_SELECT_HR_ZONES)) {
 
-			if (activePerson != null) {
+				// select hr zones for the given person
 
-				_peopleViewer.setSelection(new StructuredSelection(activePerson));
+				if (prefPageData.person != null) {
 
-				final Table table = _peopleViewer.getTable();
+					_peopleViewer.setSelection(new StructuredSelection(prefPageData.person));
 
-				// set focus to selected person
-				table.setSelection(table.getSelectionIndex());
+					final Table table = _peopleViewer.getTable();
+
+					// set focus to selected person
+					table.setSelection(table.getSelectionIndex());
+				}
+
+				_tabFolderPerson.setSelection(1);
 			}
-
-			_tabFolderPerson.setSelection(1);
 		}
-
 	}
 
 	private Set<TourPersonHRZone> cloneHrZones(final Set<TourPersonHRZone> hrZones) {
