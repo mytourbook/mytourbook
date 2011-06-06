@@ -822,7 +822,7 @@ public class YearStatisticView extends ViewPart {
 		final ChartDataModel chartModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
 
 		final ChartDataXSerie xData = new ChartDataXSerie(ArrayListToArray.toInt(_DOYValues));
-		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_DAY);
+		xData.setAxisUnit(ChartDataXSerie.X_AXIS_UNIT_DAY);
 		xData.setChartSegments(createChartSegments());
 		chartModel.setXData(xData);
 

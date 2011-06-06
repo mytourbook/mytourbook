@@ -28,6 +28,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourPersonHRZone;
+import net.tourbook.data.ZoneMinMaxBpm;
 import net.tourbook.database.IComputeTourValues;
 import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
@@ -262,25 +263,27 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 				_txtFirstName.setFocus();
 			}
 
-		} else if (data.equals(PREF_DATA_SELECT_HR_ZONES)) {
+		} else if (data instanceof PrefPagePeopleData) {
 
-			// select hr zones for the active person
+			final PrefPagePeopleData prefPageData = (PrefPagePeopleData) data;
 
-			final TourPerson activePerson = TourbookPlugin.getActivePerson();
+			if (prefPageData.prefDataSelectHrZones.equals(PREF_DATA_SELECT_HR_ZONES)) {
 
-			if (activePerson != null) {
+				// select hr zones for the given person
 
-				_peopleViewer.setSelection(new StructuredSelection(activePerson));
+				if (prefPageData.person != null) {
 
-				final Table table = _peopleViewer.getTable();
+					_peopleViewer.setSelection(new StructuredSelection(prefPageData.person));
 
-				// set focus to selected person
-				table.setSelection(table.getSelectionIndex());
+					final Table table = _peopleViewer.getTable();
+
+					// set focus to selected person
+					table.setSelection(table.getSelectionIndex());
+				}
+
+				_tabFolderPerson.setSelection(1);
 			}
-
-			_tabFolderPerson.setSelection(1);
 		}
-
 	}
 
 	private Set<TourPersonHRZone> cloneHrZones(final Set<TourPersonHRZone> hrZones) {
@@ -1221,7 +1224,11 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		final int hrZoneSize = hrZones.size();
 		Collections.sort(hrZones);
 
-		final int[][] hrZoneMinMaxBpm = currentPerson.getHrZoneMinMaxBpm(hrMaxFormulaKey, hrMaxPulse, birthDay, _today);
+		final ZoneMinMaxBpm hrZoneMinMaxBpm = currentPerson.getHrZoneMinMaxBpm(
+				hrMaxFormulaKey,
+				hrMaxPulse,
+				birthDay,
+				_today);
 
 		// init hr zone colors
 		final Display display = parent.getDisplay();
@@ -1301,7 +1308,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).indent(15, 0).applyTo(label);
 			label.setText(zoneMinValue == Integer.MIN_VALUE ? //
 					UI.EMPTY_STRING
-					: Integer.toString(hrZoneMinMaxBpm[0][zoneIndex]));
+					: Integer.toString(hrZoneMinMaxBpm.zoneMinValues[zoneIndex]));
 			label.addMouseListener(_hrZoneMouseListener);
 
 			/*
@@ -1323,7 +1330,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 					.applyTo(label);
 			label.setText(zoneMaxValue == Integer.MAX_VALUE ? //
 					UI.SYMBOL_INFINITY
-					: Integer.toString(hrZoneMinMaxBpm[1][zoneIndex]));
+					: Integer.toString(hrZoneMinMaxBpm.zoneMaxValues[zoneIndex]));
 			label.addMouseListener(_hrZoneMouseListener);
 
 			/*

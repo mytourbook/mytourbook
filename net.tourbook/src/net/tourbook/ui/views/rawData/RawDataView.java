@@ -411,9 +411,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 						// get reimported tour
 						final TourData mapTourData = importedTours.get(tourId);
-						if (mapTourData == null) {
-							System.err.println("reimported tour was not found in map");//$NON-NLS-1$
-						} else {
+						if (mapTourData != null) {
 
 							mapTourData.setTourPerson(tourPerson);
 							final TourData savedTourData = TourManager.saveModifiedTour(mapTourData);

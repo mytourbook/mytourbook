@@ -223,10 +223,6 @@ public class ChartDataYSerie extends ChartDataSerie {
 	 * @param colorIndex
 	 *            set's the color index for each value
 	 */
-	public void setColorIndex(final int[] colorIndex) {
-		_colorIndex = new int[][] { colorIndex };
-	}
-
 	public void setColorIndex(final int[][] colorIndex) {
 		_colorIndex = colorIndex;
 	}

@@ -184,7 +184,7 @@ public abstract class StatisticYear extends YearStatistic {
 	void createXDataYear(final ChartDataModel chartDataModel) {
 		// set the x-axis
 		final ChartDataXSerie xData = new ChartDataXSerie(createYearData(_tourYearData));
-		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_YEAR);
+		xData.setAxisUnit(ChartDataXSerie.X_AXIS_UNIT_YEAR);
 		xData.setChartSegments(createChartSegments(_tourYearData));
 		chartDataModel.setXData(xData);
 	}

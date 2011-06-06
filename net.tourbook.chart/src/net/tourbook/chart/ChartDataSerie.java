@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,11 +27,13 @@ public abstract class ChartDataSerie {
 	public static final int			AXIS_UNIT_HOUR_MINUTE_SECOND			= 22;
 	public static final int			AXIS_UNIT_MINUTE_SECOND					= 23;
 	public static final int			AXIS_UNIT_HOUR_MINUTE_OPTIONAL_SECOND	= 24;
-	public static final int			AXIS_UNIT_MONTH							= 30;
-	public static final int			AXIS_UNIT_DAY							= 40;
-	public static final int			AXIS_UNIT_YEAR							= 50;
 
+	public static final int			X_AXIS_UNIT_MONTH						= 30;
+	public static final int			X_AXIS_UNIT_DAY							= 40;
+	public static final int			X_AXIS_UNIT_YEAR						= 50;
 	public static final int			X_AXIS_UNIT_WEEK						= 100;
+
+	public static final int			X_AXIS_UNIT_NUMBER_CENTER				= 101;
 
 	/**
 	 * Default color, when default color is not set

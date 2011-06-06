@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -250,7 +250,7 @@ public class ChartComponents extends Composite {
 	}
 
 	/**
-	 * Compute the units for the x-axis and save it in the drawingData object
+	 * Compute units for the x-axis and keep it in the drawingData object
 	 */
 	private void computeXValues(final ChartDrawingData drawingData) {
 
@@ -277,48 +277,55 @@ public class ChartComponents extends Composite {
 		// unitRawValue is the number in data values for one unit
 		final int unitRawValue = xMaxValue / Math.max(1, unitRawNumbers);
 
-		// axis unit
-		float unitValue = 0;
-
 		// get the unit list from the configuration
 		final ArrayList<ChartUnit> units = drawingData.getXUnits();
 
 		switch (xAxisUnit) {
-		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_SECOND:
-		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_OPTIONAL_SECOND:
-		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE:
-			unitValue = Util.roundTimeValue(unitRawValue);
-			break;
 
-		case ChartDataSerie.AXIS_UNIT_NUMBER:
-			unitValue = Util.roundDecimalValue(unitRawValue);
-			break;
+		case ChartDataSerie.X_AXIS_UNIT_DAY:
 
-		case ChartDataSerie.X_AXIS_UNIT_WEEK:
-			createXValuesWeek(drawingData, units, devVirtualGraphWidth);
-			break;
-
-		case ChartDataSerie.AXIS_UNIT_MONTH:
-			createXValuesMonth(drawingData, units, devVirtualGraphWidth);
-			break;
-
-		case ChartDataSerie.AXIS_UNIT_YEAR:
-			createXValuesYear(drawingData, units, devVirtualGraphWidth);
-			break;
-
-		case ChartDataSerie.AXIS_UNIT_DAY:
 			createXValuesDay(drawingData, units, devVirtualGraphWidth);
 			break;
 
-		default:
-			break;
-		}
+		case ChartDataSerie.X_AXIS_UNIT_WEEK:
 
-		// create the units for the x-axis
-		if (xAxisUnit != ChartDataSerie.AXIS_UNIT_DAY
-				&& xAxisUnit != ChartDataSerie.AXIS_UNIT_MONTH
-				&& xAxisUnit != ChartDataSerie.AXIS_UNIT_YEAR
-				&& xAxisUnit != ChartDataSerie.X_AXIS_UNIT_WEEK) {
+			createXValuesWeek(drawingData, units, devVirtualGraphWidth);
+			break;
+
+		case ChartDataSerie.X_AXIS_UNIT_MONTH:
+
+			createXValuesMonth(drawingData, units, devVirtualGraphWidth);
+			break;
+
+		case ChartDataSerie.X_AXIS_UNIT_YEAR:
+
+			createXValuesYear(drawingData, units, devVirtualGraphWidth);
+			break;
+
+		default:
+
+			// axis unit
+			float unitValue = 1; // this default value should be overwritten
+
+			switch (xAxisUnit) {
+			case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_SECOND:
+			case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_OPTIONAL_SECOND:
+			case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE:
+				unitValue = Util.roundTimeValue(unitRawValue);
+				break;
+
+			case ChartDataSerie.AXIS_UNIT_NUMBER:
+			case ChartDataSerie.X_AXIS_UNIT_NUMBER_CENTER:
+				unitValue = Util.roundDecimalValue(unitRawValue);
+				break;
+
+			default:
+				break;
+			}
+
+			/*
+			 * create units for the x-axis
+			 */
 
 			// get the unitOffset when a startValue is set
 			int unitOffset = 0;
@@ -358,18 +365,28 @@ public class ChartComponents extends Composite {
 					break;
 				}
 			}
-
+			break;
 		}
 
-		// configure the bar in the bar charts
-		if (_chartDataModel.getChartType() == ChartDataModel.CHART_TYPE_BAR && //
-				(xAxisUnit == ChartDataSerie.AXIS_UNIT_NUMBER //
-				|| xAxisUnit == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE)) {
+		/*
+		 * configure bars in the bar charts
+		 */
+		if (_chartDataModel.getChartType() == ChartDataModel.CHART_TYPE_BAR) {
 
-			final int barWidth = (devVirtualGraphWidth / xData.getHighValues()[0].length) / 2;
+			if (xAxisUnit == ChartDataSerie.AXIS_UNIT_NUMBER || xAxisUnit == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE) {
 
-			drawingData.setBarRectangleWidth(Math.max(0, barWidth));
-			drawingData.setBarPosition(ChartDrawingData.BAR_POS_CENTER);
+				final int barWidth = (devVirtualGraphWidth / xData.getHighValues()[0].length) / 2;
+
+				drawingData.setBarRectangleWidth(Math.max(0, barWidth));
+				drawingData.setBarPosition(ChartDrawingData.BAR_POS_CENTER);
+
+			} else if (xAxisUnit == ChartDataSerie.X_AXIS_UNIT_NUMBER_CENTER) {
+
+				final int barWidth = (devVirtualGraphWidth / xData.getHighValues()[0].length);
+
+				drawingData.setBarRectangleWidth((int) (Math.max(1, barWidth) * 0.9));
+				drawingData.setBarPosition(ChartDrawingData.BAR_POS_CENTER);
+			}
 		}
 	}
 
@@ -731,7 +748,7 @@ public class ChartComponents extends Composite {
 		// compute the width of the rectangles
 		final int allDaysInAllYears = chartSegments.allValues;
 		drawingData.setBarRectangleWidth(Math.max(0, (devGraphWidth / allDaysInAllYears)));
-		drawingData.setXUnitTextPos(ChartDrawingData.XUNIT_TEXT_POS_CENTER);
+		drawingData.setXUnitTextPos(ChartDrawingData.X_UNIT_TEXT_POS_CENTER);
 
 		drawingData.setScaleX((float) devGraphWidth / allDaysInAllYears);
 	}
@@ -789,7 +806,7 @@ public class ChartComponents extends Composite {
 			break;
 		}
 
-		drawingData.setXUnitTextPos(ChartDrawingData.XUNIT_TEXT_POS_CENTER);
+		drawingData.setXUnitTextPos(ChartDrawingData.X_UNIT_TEXT_POS_CENTER);
 	}
 
 	private void createXValuesWeek(	final ChartDrawingData drawingData,
@@ -849,7 +866,7 @@ public class ChartComponents extends Composite {
 
 		drawingData.setScaleX((float) devGraphWidth / allWeeks);
 		drawingData.setScaleUnitX((float) devGraphWidth / allDaysInAllYears);
-		drawingData.setXUnitTextPos(ChartDrawingData.XUNIT_TEXT_POS_CENTER);
+		drawingData.setXUnitTextPos(ChartDrawingData.X_UNIT_TEXT_POS_CENTER);
 	}
 
 	private void createXValuesYear(	final ChartDrawingData drawingData,
@@ -910,7 +927,7 @@ public class ChartComponents extends Composite {
 			break;
 		}
 
-		drawingData.setXUnitTextPos(ChartDrawingData.XUNIT_TEXT_POS_CENTER);
+		drawingData.setXUnitTextPos(ChartDrawingData.X_UNIT_TEXT_POS_CENTER);
 	}
 
 	ChartComponentAxis getAxisLeft() {

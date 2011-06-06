@@ -1913,7 +1913,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			return;
 		}
 
-		final int[][] zoneMinMaxBpm = tourPerson.getHrZoneMinMaxBpm(
+		final ZoneMinMaxBpm zoneMinMaxBpm = tourPerson.getHrZoneMinMaxBpm(
 				tourPerson.getHrMaxFormula(),
 				tourPerson.getMaxPulse(),
 				tourPerson.getBirthDayWithDefault(),
@@ -1928,7 +1928,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			getBreakTime();
 		}
 
-		final int zoneSize = zoneMinMaxBpm[0].length;
+		final int zoneSize = zoneMinMaxBpm.zoneMinValues.length;
 		final int[] hrZones = new int[zoneSize];
 		int prevTime = 0;
 
@@ -1956,8 +1956,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 			for (int zoneIndex = 0; zoneIndex < zoneSize; zoneIndex++) {
 
-				final int minValue = zoneMinMaxBpm[0][zoneIndex];
-				final int maxValue = zoneMinMaxBpm[1][zoneIndex];
+				final int minValue = zoneMinMaxBpm.zoneMinValues[zoneIndex];
+				final int maxValue = zoneMinMaxBpm.zoneMaxValues[zoneIndex];
 
 				if (pulse >= minValue && pulse < maxValue) {
 					hrZones[zoneIndex] += timeDiff;

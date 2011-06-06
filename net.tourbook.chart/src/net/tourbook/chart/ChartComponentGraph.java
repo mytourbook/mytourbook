@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1745,7 +1745,7 @@ public class ChartComponentGraph extends Canvas {
 
 		final ChartDataXSerie xData = drawingData.getXData();
 		final int devYBottom = drawingData.getDevYBottom();
-		final int unitPos = drawingData.getXUnitTextPos();
+		final int xUnitTextPos = drawingData.getXUnitTextPos();
 		float scaleX = drawingData.getScaleX();
 
 		final double devGraphWidth = drawingData.devVirtualGraphWidth;
@@ -1853,7 +1853,7 @@ public class ChartComponentGraph extends Canvas {
 					 * draw unit value
 					 */
 					final int unitValueExtendX = gc.textExtent(unit.valueLabel).x;
-					if (devUnitWidth != 0 && unitPos == ChartDrawingData.XUNIT_TEXT_POS_CENTER) {
+					if (devUnitWidth != 0 && xUnitTextPos == ChartDrawingData.X_UNIT_TEXT_POS_CENTER) {
 
 						// draw the unit value BETWEEN two units
 
@@ -2541,9 +2541,11 @@ public class ChartComponentGraph extends Canvas {
 
 		final int devBarWidthOriginal = drawingData.getBarRectangleWidth();
 		final int devBarWidth = Math.max(1, devBarWidthOriginal);
+		final int devBarWidth2 = devBarWidth / 2;
 
 		final int serieLayout = yData.getChartLayout();
 		final int devBarRectangleStartXPos = drawingData.getDevBarRectangleXPos();
+		final int barPosition = drawingData.getBarPosition();
 
 		// loop: all data series
 		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
@@ -2567,17 +2569,12 @@ public class ChartComponentGraph extends Canvas {
 			for (int valueIndex = 0; valueIndex < valueLength; valueIndex++) {
 
 				// get the x position
-				final int devXPos = (int) ((xValues[valueIndex] - graphValueOffset) * scaleX) + devBarXPos;
+				int devXPos = (int) ((xValues[valueIndex] - graphValueOffset) * scaleX) + devBarXPos;
 
-//				final int devBarWidthSelected = devBarWidth;
-//				final int devBarWidth2 = devBarWidthSelected / 2;
-//
-//				int devXPosSelected = devXPos;
-//
-//				// center the bar
-//				if (devBarWidthSelected > 1 && barPosition == ChartDrawingData.BAR_POS_CENTER) {
-//					devXPosSelected -= devBarWidth2;
-//				}
+				// center the bar
+				if (devBarWidth > 1 && barPosition == ChartDrawingData.BAR_POS_CENTER) {
+					devXPos -= devBarWidth2;
+				}
 
 				int valueYLow;
 				if (yLowValues == null) {
@@ -2689,7 +2686,7 @@ public class ChartComponentGraph extends Canvas {
 		final float scaleY = drawingData.getScaleY();
 		final int graphYBottom = drawingData.getGraphYBottom();
 		final boolean axisDirection = yData.isYAxisDirection();
-		final int barPosition = drawingData.getBarPosition();
+//		final int barPosition = drawingData.getBarPosition();
 
 		// get the horizontal offset for the graph
 		int graphValueOffset;
@@ -2737,15 +2734,15 @@ public class ChartComponentGraph extends Canvas {
 				// get the x position
 				final int devXPos = (int) ((xValues[valueIndex] - graphValueOffset) * scaleX) + devBarXPos;
 
-				final int devBarWidthSelected = devBarWidth;
-				final int devBarWidth2 = devBarWidthSelected / 2;
+//				final int devBarWidthSelected = devBarWidth;
+//				final int devBarWidth2 = devBarWidthSelected / 2;
 
-				int devXPosSelected = devXPos;
-
-				// center the bar
-				if (devBarWidthSelected > 1 && barPosition == ChartDrawingData.BAR_POS_CENTER) {
-					devXPosSelected -= devBarWidth2;
-				}
+//				int devXPosSelected = devXPos;
+//
+//				// center the bar
+//				if (devBarWidthSelected > 1 && barPosition == ChartDrawingData.BAR_POS_CENTER) {
+//					devXPosSelected -= devBarWidth2;
+//				}
 
 				// get the bar height
 				final int graphYLow = graphYBottom;

@@ -165,6 +165,7 @@ public class Util {
 		// format the unit label
 		switch (unitType) {
 		case ChartDataSerie.AXIS_UNIT_NUMBER:
+		case ChartDataSerie.X_AXIS_UNIT_NUMBER_CENTER:
 			final float divValue = value / divisor;
 			if (divValue % 1 == 0) {
 				_nf.setMinimumFractionDigits(0);
@@ -216,7 +217,7 @@ public class Util {
 			}
 			break;
 
-		case ChartDataSerie.AXIS_UNIT_DAY:
+		case ChartDataSerie.X_AXIS_UNIT_DAY:
 			_nf.setMinimumFractionDigits(1);
 			valueText = _nf.format(value);
 			break;
