@@ -2421,7 +2421,29 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			isCadence = true;
 		}
 
-		if (firstTimeDataItem.temperature != Integer.MIN_VALUE) {
+		/*
+		 * temperature
+		 */
+		if (firstTimeDataItem.temperature == Integer.MIN_VALUE) {
+
+			// search for first temperature value
+
+			for (final TimeData timeData : timeDataList) {
+				if (timeData.temperature != Integer.MIN_VALUE) {
+
+					// temperature was found
+
+					temperatureSerie = new int[serieLength];
+					isTemperature = true;
+
+					break;
+				}
+			}
+
+		} else {
+
+			// temperature is available
+
 			temperatureSerie = new int[serieLength];
 			isTemperature = true;
 		}
@@ -2658,9 +2680,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 				 */
 				if (isTemperature) {
 					final int tdTemperature = timeData.temperature;
-//					if (tdTemperature == Integer.MIN_VALUE) {
-//						System.out.println("tourId:" + tourId + " - tdTemperature is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
-//					}
 					temperatureSerie[timeIndex] = tdTemperature == Integer.MIN_VALUE ? 0 : tdTemperature;
 				}
 
