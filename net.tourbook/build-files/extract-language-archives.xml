@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="create-translation-file" default="unzip-all-archives" basedir="..">
+<project name="extract-language-archives" default="unzip-all-archives" basedir="..">
 
 	<!--
 		extract language files from the archive into the trunk projects
 	-->
-
-	<property name="path-mt-trunk" value=".." />
+	<property name="path-mt-trunk" value="../../mytourbook" />
+	<property name="dat-ROOT" value="../../.." />
 
 	<!-- PRODUCTION TARGET
 	-->
 	<property name="path-language-target" value="${path-mt-trunk}" />
 	
 	<!-- DEBUG TARGET
-	<property name="path-language-target" value="../../mytourbook-LANGUAGE-TEMP-trunk" />
+	<property name="path-language-target" value="${dat-ROOT}/mytourbook-LANGUAGE-TEMP-debug-trunk" />
 	-->
 
-	<property name="path-language-target-temp" value="../../mytourbook-LANGUAGE-TEMP" />
-	<property name="path-language-archive" value="${path-mt-trunk}/../mytourbook-LANGUAGE-archives" />
+	<property name="path-language-target-temp" value="${dat-ROOT}/mytourbook-LANGUAGE-TEMP" />
+	<property name="path-language-archive" value="${dat-ROOT}/mytourbook-LANGUAGE-archives" />
 
 	<!--
 		DEFAULT target
@@ -31,25 +31,32 @@
 		</delete>
 
 		<!-- 
-			unzip archive: mt-de.zip 
+			German: unzip archive: mt-de.zip 
 		<antcall target="unzip-archive-for-one-language">
 			<param name="archive-language" value="de" />
 		</antcall>
 		-->
 
 		<!-- 
-			unzip archive: mt-fr.zip 
+			French: unzip archive: mt-fr.zip 
 		<antcall target="unzip-archive-for-one-language">
 			<param name="archive-language" value="fr" />
 		</antcall>
 		-->
  
 		<!-- 
-			unzip archive: mt-nl.zip 
+			Italian: unzip archive: mt-it.zip 
 		-->
+		<antcall target="unzip-archive-for-one-language">
+			<param name="archive-language" value="it" />
+		</antcall>
+
+		<!-- 
+			Dutch: unzip archive: mt-nl.zip 
 		<antcall target="unzip-archive-for-one-language">
 			<param name="archive-language" value="nl" />
 		</antcall>
+		-->
  
 		<!-- delete temp dir -->
 		<echo message="delete temp dir: ${path-language-target-temp}" />

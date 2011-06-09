@@ -2501,6 +2501,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		boolean isTemperature = false;
 		boolean isSpeed = false;
 		boolean isPower = false;
+		int firstValidTemperatureIndex = 0;
 
 		final boolean isAbsoluteData = firstTimeDataItem.absoluteTime != Long.MIN_VALUE;
 
@@ -2618,7 +2619,43 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			isCadence = true;
 		}
 
-		if (firstTimeDataItem.temperature != Integer.MIN_VALUE) {
+		/*
+		 * temperature
+		 */
+		if (firstTimeDataItem.temperature == Integer.MIN_VALUE) {
+
+			/*
+			 * first slice do not contain a valid temperature value, search for the first valid
+			 * temperature value
+			 */
+
+			for (final TimeData timeData : timeDataList) {
+
+				final int firstValidTemperature = timeData.temperature;
+
+				if (firstValidTemperature != Integer.MIN_VALUE) {
+
+					// temperature was found
+
+					temperatureSerie = new int[serieLength];
+					isTemperature = true;
+
+					// set temperature to the first valid temperature value
+
+					for (int serieIndex = 0; serieIndex < firstValidTemperatureIndex; serieIndex++) {
+						temperatureSerie[serieIndex] = firstValidTemperature;
+					}
+
+					break;
+				}
+
+				firstValidTemperatureIndex++;
+			}
+
+		} else {
+
+			// temperature is available
+
 			temperatureSerie = new int[serieLength];
 			isTemperature = true;
 		}
@@ -2657,7 +2694,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			longitudeSerie = new double[serieLength];
 		}
 
-		int timeIndex = 0;
+		int serieIndex = 0;
 
 		long recordingTime = 0; // time in seconds relative to the tour start
 
@@ -2714,20 +2751,20 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			for (final TimeData timeData : timeDataList) {
 
 				if ((altitudeStartIndex == -1) && isAltitude) {
-					altitudeStartIndex = timeIndex;
+					altitudeStartIndex = serieIndex;
 					altitudeAbsolute = (int) (timeData.absoluteAltitude + 0.5);
 				}
 
 				final long absoluteTime = timeData.absoluteTime;
 
-				if (timeIndex == 0) {
+				if (serieIndex == 0) {
 
 					// first trackpoint
 
 					/*
 					 * time
 					 */
-					timeSerie[timeIndex] = 0;
+					timeSerie[serieIndex] = 0;
 					if (absoluteTime == Long.MIN_VALUE) {
 						firstTime = 0;
 					} else {
@@ -2746,13 +2783,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 					} else {
 						distanceDiff = (int) tdDistance;
 					}
-					distanceSerie[timeIndex] = distanceAbsolute += distanceDiff < 0 ? 0 : distanceDiff;
+					distanceSerie[serieIndex] = distanceAbsolute += distanceDiff < 0 ? 0 : distanceDiff;
 
 					/*
 					 * altitude
 					 */
 					if (isAltitude) {
-						altitudeSerie[timeIndex] = altitudeAbsolute;
+						altitudeSerie[serieIndex] = altitudeAbsolute;
 					}
 
 				} else {
@@ -2767,7 +2804,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 					} else {
 						recordingTime = (absoluteTime - firstTime) / 1000;
 					}
-					timeSerie[timeIndex] = (int) (lastValidTime = recordingTime);
+					timeSerie[serieIndex] = (int) (lastValidTime = recordingTime);
 
 					/*
 					 * distance
@@ -2783,7 +2820,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 						 */
 						distanceDiff = (int) tdDistance - distanceAbsolute;
 					}
-					distanceSerie[timeIndex] = distanceAbsolute += distanceDiff < 0 ? 0 : distanceDiff;
+					distanceSerie[serieIndex] = distanceAbsolute += distanceDiff < 0 ? 0 : distanceDiff;
 
 					/*
 					 * altitude
@@ -2800,7 +2837,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 								altitudeDiff = (int) (tdAltitude - altitudeAbsolute);
 							}
 						}
-						altitudeSerie[timeIndex] = altitudeAbsolute += altitudeDiff;
+						altitudeSerie[serieIndex] = altitudeAbsolute += altitudeDiff;
 					}
 				}
 
@@ -2813,12 +2850,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 				if ((latitudeSerie != null) && (longitudeSerie != null)) {
 
 					if ((latitude == Double.MIN_VALUE) || (longitude == Double.MIN_VALUE)) {
-						latitudeSerie[timeIndex] = lastValidLatitude;
-						longitudeSerie[timeIndex] = lastValidLongitude;
+						latitudeSerie[serieIndex] = lastValidLatitude;
+						longitudeSerie[serieIndex] = lastValidLongitude;
 					} else {
 
-						latitudeSerie[timeIndex] = lastValidLatitude = latitude;
-						longitudeSerie[timeIndex] = lastValidLongitude = longitude;
+						latitudeSerie[serieIndex] = lastValidLatitude = latitude;
+						longitudeSerie[serieIndex] = lastValidLongitude = longitude;
 					}
 
 					final double lastValidLatitude90 = lastValidLatitude + 90;
@@ -2835,7 +2872,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 				 */
 				if (isPulse) {
 					final int tdPulse = timeData.pulse;
-					pulseSerie[timeIndex] = (tdPulse == Integer.MIN_VALUE) || (tdPulse == Integer.MAX_VALUE)
+					pulseSerie[serieIndex] = (tdPulse == Integer.MIN_VALUE) || (tdPulse == Integer.MAX_VALUE)
 							? 0
 							: tdPulse;
 				}
@@ -2845,7 +2882,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 				 */
 				if (isCadence) {
 					final int tdCadence = timeData.cadence;
-					cadenceSerie[timeIndex] = (tdCadence == Integer.MIN_VALUE) || (tdCadence == Integer.MAX_VALUE)
+					cadenceSerie[serieIndex] = (tdCadence == Integer.MIN_VALUE) || (tdCadence == Integer.MAX_VALUE)
 							? 0
 							: tdCadence;
 				}
@@ -2853,28 +2890,25 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 				/*
 				 * temperature
 				 */
-				if (isTemperature) {
+				if (isTemperature && serieIndex >= firstValidTemperatureIndex) {
 					final int tdTemperature = timeData.temperature;
-//					if (tdTemperature == Integer.MIN_VALUE) {
-//						System.out.println("tourId:" + tourId + " - tdTemperature is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
-//					}
-					temperatureSerie[timeIndex] = tdTemperature == Integer.MIN_VALUE ? 0 : tdTemperature;
+					temperatureSerie[serieIndex] = tdTemperature == Integer.MIN_VALUE ? 0 : tdTemperature;
 				}
 
 				/*
 				 * marker
 				 */
 				if (isCreateMarker && (timeData.marker != 0)) {
-					createTourMarker(timeData, timeIndex, recordingTime, distanceAbsolute);
+					createTourMarker(timeData, serieIndex, recordingTime, distanceAbsolute);
 				}
 
 				// speed
 				if (isSpeed) {
 					final int tdSpeed = timeData.speed;
-					speedSerie[timeIndex] = tdSpeed == Integer.MIN_VALUE ? 0 : tdSpeed;
+					speedSerie[serieIndex] = tdSpeed == Integer.MIN_VALUE ? 0 : tdSpeed;
 				}
 
-				timeIndex++;
+				serieIndex++;
 			}
 
 			mapMinLatitude -= 90;
@@ -2892,14 +2926,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			for (final TimeData timeData : timeDataList) {
 
 				final int tdTime = timeData.time;
-				timeSerie[timeIndex] = (int) (recordingTime += tdTime == Integer.MIN_VALUE ? 0 : tdTime);
+				timeSerie[serieIndex] = (int) (recordingTime += tdTime == Integer.MIN_VALUE ? 0 : tdTime);
 
 				if (isDistance) {
 					final int tdDistance = timeData.distance;
 //					if (tdDistance == Integer.MIN_VALUE) {
 //						System.out.println("tourId:" + tourId + " - tdDistance is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
 //					}
-					distanceSerie[timeIndex] = distanceAbsolute += tdDistance == Integer.MIN_VALUE ? 0 : tdDistance;
+					distanceSerie[serieIndex] = distanceAbsolute += tdDistance == Integer.MIN_VALUE ? 0 : tdDistance;
 				}
 
 				if (isAltitude) {
@@ -2907,7 +2941,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 //					if (tdAltitude == Integer.MIN_VALUE) {
 //						System.out.println("tourId:" + tourId + " - tdAltitude is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
 //					}
-					altitudeSerie[timeIndex] = altitudeAbsolute += tdAltitude == Integer.MIN_VALUE ? 0 : tdAltitude;
+					altitudeSerie[serieIndex] = altitudeAbsolute += tdAltitude == Integer.MIN_VALUE ? 0 : tdAltitude;
 				}
 
 				if (isPulse) {
@@ -2915,7 +2949,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 //					if (tdPulse == Integer.MIN_VALUE) {
 //						System.out.println("tourId:" + tourId + " - tdPulse is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
 //					}
-					pulseSerie[timeIndex] = tdPulse == Integer.MIN_VALUE ? 0 : tdPulse;
+					pulseSerie[serieIndex] = tdPulse == Integer.MIN_VALUE ? 0 : tdPulse;
 				}
 
 				if (isTemperature) {
@@ -2923,7 +2957,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 //					if (tdTemperature == Integer.MIN_VALUE) {
 //						System.out.println("tourId:" + tourId + " - tdTemperature is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
 //					}
-					temperatureSerie[timeIndex] = tdTemperature == Integer.MIN_VALUE ? 0 : tdTemperature;
+					temperatureSerie[serieIndex] = tdTemperature == Integer.MIN_VALUE ? 0 : tdTemperature;
 				}
 
 				if (isCadence) {
@@ -2931,7 +2965,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 //					if (tdCadence == Integer.MIN_VALUE) {
 //						System.out.println("tourId:" + tourId + " - tdCadence is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
 //					}
-					cadenceSerie[timeIndex] = tdCadence == Integer.MIN_VALUE ? 0 : tdCadence;
+					cadenceSerie[serieIndex] = tdCadence == Integer.MIN_VALUE ? 0 : tdCadence;
 				}
 
 				if (isPower) {
@@ -2939,19 +2973,19 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 //					if (tdPower == Integer.MIN_VALUE) {
 //						System.out.println("tourId:" + tourId + " - tdPower is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
 //					}
-					powerSerie[timeIndex] = tdPower == Integer.MIN_VALUE ? 0 : tdPower;
+					powerSerie[serieIndex] = tdPower == Integer.MIN_VALUE ? 0 : tdPower;
 				}
 
 				if (isSpeed) {
 					final int tdSpeed = timeData.speed;
-					speedSerie[timeIndex] = tdSpeed == Integer.MIN_VALUE ? 0 : tdSpeed;
+					speedSerie[serieIndex] = tdSpeed == Integer.MIN_VALUE ? 0 : tdSpeed;
 				}
 
 				if (isCreateMarker && (timeData.marker != 0)) {
-					createTourMarker(timeData, timeIndex, recordingTime, distanceAbsolute);
+					createTourMarker(timeData, serieIndex, recordingTime, distanceAbsolute);
 				}
 
-				timeIndex++;
+				serieIndex++;
 			}
 		}
 

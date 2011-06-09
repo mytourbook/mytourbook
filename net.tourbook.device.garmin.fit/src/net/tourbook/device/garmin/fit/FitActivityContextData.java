@@ -31,13 +31,20 @@ public class FitActivityContextData {
 
 	private ContextTourMarker									currentContextTourMarker;
 
-	public void initializeTourData() {
-		if (currentContextTourData == null) {
-			currentContextTourData = new ContextTourData();
-			currentContextTourData.data = new TourData();
+	private class ContextTimeData {
+		private TimeData	data;
+	}
 
-			contextTourDataList.add(currentContextTourData);
-		}
+	private class ContextTourData {
+		private TourData	data;
+	}
+
+	private class ContextTourMarker {
+		private TourMarker	data;
+	}
+
+	public void finalizeTimeData() {
+		currentContextTimeData = null;
 	}
 
 	public void finalizeTourData() {
@@ -45,7 +52,37 @@ public class FitActivityContextData {
 		currentContextTourData = null;
 	}
 
+	public void finalizeTourMarker() {
+		currentContextTourMarker = null;
+	}
+
+	public TimeData getCurrentTimeData() {
+		if (currentContextTimeData == null) {
+			throw new IllegalArgumentException("Time data is not initialized"); //$NON-NLS-1$
+		}
+
+		return currentContextTimeData.data;
+
+	}
+
+	public TourData getCurrentTourData() {
+		if (currentContextTourData == null) {
+			throw new IllegalArgumentException("Tour data is not initialized"); //$NON-NLS-1$
+		}
+
+		return currentContextTourData.data;
+	}
+
+	public TourMarker getCurrentTourMarker() {
+		if (currentContextTourMarker == null) {
+			throw new IllegalArgumentException("Tour marker is not initialized"); //$NON-NLS-1$
+		}
+
+		return currentContextTourMarker.data;
+	}
+
 	public void initializeTimeData() {
+		
 		initializeTourData();
 
 		List<ContextTimeData> currentContextTimeDataList = contextTimeDataMap.get(currentContextTourData);
@@ -60,11 +97,18 @@ public class FitActivityContextData {
 		currentContextTimeDataList.add(currentContextTimeData);
 	}
 
-	public void finalizeTimeData() {
-		currentContextTimeData = null;
+	public void initializeTourData() {
+		
+		if (currentContextTourData == null) {
+			currentContextTourData = new ContextTourData();
+			currentContextTourData.data = new TourData();
+
+			contextTourDataList.add(currentContextTourData);
+		}
 	}
 
 	public void initializeTourMarker() {
+		
 		initializeTourData();
 
 		List<ContextTourMarker> currentContextTourMarkerList = contextTourMarkerMap.get(currentContextTourData);
@@ -79,64 +123,23 @@ public class FitActivityContextData {
 		currentContextTourMarkerList.add(currentContextTourMarker);
 	}
 
-	public void finalizeTourMarker() {
-		currentContextTourMarker = null;
-	}
+	public void processData(final FitActivityContextDataHandler handler) {
+		for (final ContextTourData contextTourData : contextTourDataList) {
+			final List<ContextTimeData> contextTimeDataList = contextTimeDataMap.get(contextTourData);
 
-	public TourData getCurrentTourData() {
-		if (currentContextTourData == null) {
-			throw new IllegalArgumentException("Tour data is not initialized"); //$NON-NLS-1$
-		}
-
-		return currentContextTourData.data;
-	}
-
-	public TimeData getCurrentTimeData() {
-		if (currentContextTimeData == null) {
-			throw new IllegalArgumentException("Time data is not initialized"); //$NON-NLS-1$
-		}
-
-		return currentContextTimeData.data;
-
-	}
-
-	public TourMarker getCurrentTourMarker() {
-		if (currentContextTourMarker == null) {
-			throw new IllegalArgumentException("Tour marker is not initialized"); //$NON-NLS-1$
-		}
-
-		return currentContextTourMarker.data;
-	}
-
-	public void processData(FitActivityContextDataHandler handler) {
-		for (ContextTourData contextTourData : contextTourDataList) {
-			List<ContextTimeData> contextTimeDataList = contextTimeDataMap.get(contextTourData);
-
-			ArrayList<TimeData> timeDataList = new ArrayList<TimeData>(contextTimeDataList.size());
-			for (ContextTimeData contextTimeData : contextTimeDataList) {
+			final ArrayList<TimeData> timeDataList = new ArrayList<TimeData>(contextTimeDataList.size());
+			for (final ContextTimeData contextTimeData : contextTimeDataList) {
 				timeDataList.add(contextTimeData.data);
 			}
 
-			List<ContextTourMarker> contextTourMarkerList = contextTourMarkerMap.get(contextTourData);
-			Set<TourMarker> tourMarkerSet = new HashSet<TourMarker>(contextTourMarkerList.size());
-			for (ContextTourMarker contextTourMarker : contextTourMarkerList) {
+			final List<ContextTourMarker> contextTourMarkerList = contextTourMarkerMap.get(contextTourData);
+			final Set<TourMarker> tourMarkerSet = new HashSet<TourMarker>(contextTourMarkerList.size());
+			for (final ContextTourMarker contextTourMarker : contextTourMarkerList) {
 				tourMarkerSet.add(contextTourMarker.data);
 			}
 
 			handler.handleTour(contextTourData.data, timeDataList, tourMarkerSet);
 		}
-	}
-
-	private class ContextTourData {
-		private TourData	data;
-	}
-
-	private class ContextTimeData {
-		private TimeData	data;
-	}
-
-	private class ContextTourMarker {
-		private TourMarker	data;
 	}
 
 }
