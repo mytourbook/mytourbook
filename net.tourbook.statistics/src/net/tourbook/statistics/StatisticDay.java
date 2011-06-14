@@ -690,7 +690,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		return isSelected;
 	}
 
-	void setChartProviders(final Chart chartWidget, final ChartDataModel chartModel) {
+	private void setChartProviders(final Chart chartWidget, final ChartDataModel chartModel) {
 
 		// set tool tip info
 		chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {

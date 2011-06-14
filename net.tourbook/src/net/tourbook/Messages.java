@@ -56,6 +56,10 @@ public class Messages extends NLS {
 	public static String		dialog_export_txt_filePath_tooltip;
 
 	public static String		Dialog_HRZone_Button_AddZone;
+
+	public static String	Dialog_HRZone_Button_Apply;
+
+	public static String	Dialog_HRZone_Button_Apply_Tooltip;
 	public static String		Dialog_HRZone_Button_ComputeAllTours;
 	public static String		Dialog_HRZone_Button_ComputeAllTours_Tooltip;
 	public static String		Dialog_HRZone_Button_EditHrZones;
@@ -232,6 +236,8 @@ public class Messages extends NLS {
 
 	public static String		App_Label_ISO8601;
 
+	public static String	App_Label_max;
+
 	public static String		App_Title;
 
 	public static String		App_Tour_type_item_all_types;
@@ -280,15 +286,23 @@ public class Messages extends NLS {
 	public static String		Compute_BreakTime_Label_MinimumDistance;
 	public static String		Compute_BreakTime_Label_MinimumSliceSpeed;
 	public static String		Compute_BreakTime_Label_MinimumTime;
+	public static String	Compute_BreakTime_Label_Title;
+
 	public static String		Compute_BreakTime_Label_TourBreakTime;
 	public static String		Compute_BreakTime_Method_SpeedByAverage;
 	public static String		Compute_BreakTime_Method_SpeedBySlice;
 	public static String		Compute_BreakTime_Method_TimeDistance;
 
+	public static String	Compute_HrZone_Group;
+
+	public static String	Compute_HrZone_Link;
+
 	public static String		Compute_HrZones_Dialog_ComputeAllTours_Title;
 	public static String		Compute_HrZones_Dialog_ComputeAllTours_Title_Message;
 	public static String		Compute_HrZones_Job_ComputeAllTours_Result;
 	public static String		Compute_HrZones_Job_ComputeAllTours_SubTask;
+
+	public static String	Compute_TourValueSpeed_Title;
 
 	public static String		Compute_Values_Label_Info;
 
@@ -480,6 +494,8 @@ public class Messages extends NLS {
 	public static String		HR_Zone_Template_01_Moderate60Max100;
 	public static String		HR_Zone_Template_02_GA1GA2;
 	public static String		HR_Zone_Template_Select;
+
+	public static String	HRMax_Label;
 
 	public static String		HRMaxFormula_Name_HRmax_191_5;
 	public static String		HRMaxFormula_Name_HRmax_205_8;
@@ -975,6 +991,8 @@ public class Messages extends NLS {
 	public static String		Tour_Database_TourSaveError;
 	public static String		Tour_Database_update_tour;
 	public static String		Tour_Database_Update;
+
+	public static String	Tour_Database_Update_Subtask;
 	public static String		Tour_Database_Update_TourWeek;
 	public static String		Tour_Database_Update_TourWeek_Info;
 	public static String		Tour_Database_UpdateDone;

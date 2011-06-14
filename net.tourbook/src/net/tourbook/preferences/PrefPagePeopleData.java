@@ -22,6 +22,11 @@ public class PrefPagePeopleData {
 	public String		prefDataSelectHrZones;
 	public TourPerson	person;
 
+	/**
+	 * @param prefDataSelectHrZones
+	 * @param person
+	 *            Person can be <code>null</code> then only the HR zone tab is selected.
+	 */
 	public PrefPagePeopleData(final String prefDataSelectHrZones, final TourPerson person) {
 
 		this.prefDataSelectHrZones = prefDataSelectHrZones;

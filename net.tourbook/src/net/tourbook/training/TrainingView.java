@@ -28,6 +28,7 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
+import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourPersonHRZone;
@@ -40,6 +41,7 @@ import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
+import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
@@ -63,18 +65,25 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
@@ -97,29 +106,10 @@ public class TrainingView extends ViewPart {
 	private static final int			HR_LEFT_MIN_BORDER						= 0;
 	private static final int			HR_RIGHT_MAX_BORDER						= 230;
 
-	private static final String			HEADER_HR_MAX_100						= "100% = ";							//$NON-NLS-1$
-
-	private static final String			STATE_SELECTED_CHART					= "SelectedChart";						//$NON-NLS-1$
 	private static final String			STATE_HR_CHART_LEFT_BORDER				= "HrLeftChartBorder";					//$NON-NLS-1$
 	private static final String			STATE_HR_CHART_RIGHT_BORDER				= "HrRightChartBorder";				//$NON-NLS-1$
 	private static final String			STATE_IS_SHOW_ALL_PULSE_VALUES			= "IsShowAllPulseValues";				//$NON-NLS-1$
 	private static final String			STATE_IS_SYNC_VERTICAL_CHART_SCALING	= "IsSyncVerticalChartScaling";		//$NON-NLS-1$
-
-	private static final int			CHART_ID_HR_TIME						= 0;
-	private static final int			CHART_ID_HR_ZONES_WITH_TEXT				= 1;
-
-	/**
-	 * {@link #_chartId} must be in sync with {@link #_chartNames}
-	 */
-	private static final int[]			_chartId								= { //
-																				CHART_ID_HR_TIME, //
-			CHART_ID_HR_ZONES_WITH_TEXT, //
-											//
-																				};
-
-	private static final String[]		_chartNames								= {
-			Messages.Training_Chart_Name_HrTime,
-			Messages.Training_Chart_Name_HrZonesText							};
 
 	private final IPreferenceStore		_prefStore								= TourbookPlugin.getDefault()//
 																						.getPreferenceStore();
@@ -147,7 +137,10 @@ public class TrainingView extends ViewPart {
 	private ActionShowAllPulseValues	_actionShowAllPulseValues;
 	private ActionSynchChartScale		_actionSynchVerticalChartScaling;
 
-	private ArrayList<TourPersonHRZone>	_personHrZones;
+	private int							_pulseStart;
+	private int[]						_xSeriePulse;
+
+	private ArrayList<TourPersonHRZone>	_personHrZones							= new ArrayList<TourPersonHRZone>();
 	private final BarChartMinMaxKeeper	_minMaxKeeper							= new BarChartMinMaxKeeper();
 
 	private final NumberFormat			_nf1									= NumberFormat.getNumberInstance();
@@ -157,16 +150,20 @@ public class TrainingView extends ViewPart {
 	}
 
 	/*
-	 * UI controls
+	 * UI controls/resources
 	 */
 	private PixelConverter				_pc;
 	private Font						_fontItalic;
 	private FormToolkit					_tk;
 
-	/**
+	private Color[]						_hrZoneColors;
+	private Image						_hrZoneImage;
+
+	/*
 	 * Pagebook for the training view
 	 */
-	private PageBook					_pageBookChart;
+	private PageBook					_pageBookHrZones;
+	private Composite					_pageHrZones;
 	private Composite					_pageNoTour;
 	private Composite					_pageNoPerson;
 	private Composite					_pageNoHrZones;
@@ -174,26 +171,30 @@ public class TrainingView extends ViewPart {
 
 	private Label						_lblNoHrZone;
 
-	private Combo						_comboTrainingChart;
+	private Chart						_chartHrTime;
+
 	private Spinner						_spinnerHrLeft;
 	private Spinner						_spinnerHrRight;
+	private Label						_lblHrMin;
+	private Label						_lblHrMax;
 
-	/**
-	 * Pagebook pages for the HR charts
-	 */
-	private Composite[]					_pageHrCharts							= new Composite[_chartId.length];
+	private Composite					_hrZoneDataContainer;
+	private Composite					_hrZoneDataContainerContent;
 
-	private Composite					_hrZoneContainer;
-	private ScrolledComposite			_hrZoneTextContainerContent;
-
+	private Canvas						_canvasHrZoneImage;
 	private Label[]						_lblTourMinMaxPercent;
 	private Label[]						_lblTourMinMaxHours;
-
-	private Chart						_chartHrTime;
+	private Label[]						_lblHRZoneName;
 
 	/*
 	 * none UI
 	 */
+	private int							_imageCounter							= 0;
+
+	/**
+	 * Percentage for current tour and for each HR zone
+	 */
+	private double[]					_tourHrZonePercent;
 
 	public TrainingView() {}
 
@@ -202,7 +203,7 @@ public class TrainingView extends ViewPart {
 		final TourPerson person = _currentPerson != null ? _currentPerson : TourbookPlugin.getActivePerson();
 
 		PreferencesUtil.createPreferenceDialogOn(
-				_pageBookChart.getShell(),
+				_pageBookHrZones.getShell(),
 				PrefPagePeople.ID,
 				null,
 				new PrefPagePeopleData(PrefPagePeople.PREF_DATA_SELECT_HR_ZONES, person)//
@@ -214,7 +215,7 @@ public class TrainingView extends ViewPart {
 
 		_isShowAllPulseValues = _actionShowAllPulseValues.isChecked();
 
-		updateUI30ValidateData(true);
+		updateUI30HrZonesFromModel();
 	}
 
 	void actionSynchChartScale() {
@@ -225,7 +226,7 @@ public class TrainingView extends ViewPart {
 			_minMaxKeeper.resetMinMax();
 		}
 
-		updateUI30ValidateData(true);
+		updateUI30HrZonesFromModel();
 	}
 
 	private void addPartListener() {
@@ -276,7 +277,19 @@ public class TrainingView extends ViewPart {
 						|| property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
 
 					onModifyPerson();
+
+				} else if (property.equals(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE)
+						|| property.equals(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE)) {
+
+					// set grid size
+					_chartHrTime.setGridDistance(
+							_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
+							_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
+
+					// grid has changed, update chart
+					updateUI30HrZonesFromModel();
 				}
+
 			}
 		};
 
@@ -313,6 +326,14 @@ public class TrainingView extends ViewPart {
 
 				if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
 					clearView();
+
+				} else if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+
+					final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+
+					if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
+						updateUI20(modifiedTours.get(0));
+					}
 				}
 			}
 		};
@@ -323,9 +344,11 @@ public class TrainingView extends ViewPart {
 	private void clearView() {
 
 		_tourData = null;
+		_currentPerson = null;
+
 //		_tourChart.updateChart(null, false);
 
-		_pageBookChart.showPage(_pageNoTour);
+		_pageBookHrZones.showPage(_pageNoTour);
 		enableControls();
 	}
 
@@ -339,14 +362,11 @@ public class TrainingView extends ViewPart {
 	@Override
 	public void createPartControl(final Composite parent) {
 
-		_currentPerson = TourbookPlugin.getActivePerson();
-
 		createUI(parent);
 		createActions();
 
 		// show default page
-		_pageBookChart.showPage(_pageNoTour);
-		enableControls();
+		_pageBookHrZones.showPage(_pageNoTour);
 
 		addSelectionListener();
 		addPrefListener();
@@ -355,12 +375,17 @@ public class TrainingView extends ViewPart {
 
 		restoreState();
 
-		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
-
-		if (_tourData == null) {
-			showTourFromTourProvider();
-		}
+		showTour();
 	}
+
+//	private ChartToolTipInfo createToolTipInfo(final int valueIndex) {
+//
+//		final ChartToolTipInfo toolTipInfo = new ChartToolTipInfo();
+//		toolTipInfo.setTitle(tourTitle);
+//		toolTipInfo.setLabel(toolTipLabel);
+//
+//		return toolTipInfo;
+//	}
 
 	private void createUI(final Composite parent) {
 
@@ -372,43 +397,30 @@ public class TrainingView extends ViewPart {
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 		{
 			createUI10HeaderToolbar(container);
-			createUI15Charts(container);
+			createUI12PageBook(container);
 		}
 	}
 
 	private void createUI10HeaderToolbar(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridDataFactory.fillDefaults()//
+				.grab(true, false)
+				.align(SWT.END, SWT.FILL)
+				.applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(6).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
 			/*
-			 * combo: hr chart
-			 */
-			_comboTrainingChart = new Combo(container, SWT.READ_ONLY);
-			_comboTrainingChart.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					updateUI30ValidateData(true);
-				}
-			});
-
-			// fill combo
-			for (final String chartName : _chartNames) {
-				_comboTrainingChart.add(chartName);
-			}
-
-			/*
 			 * label: hr min
 			 */
-			Label label = new Label(container, SWT.NONE);
+			_lblHrMin = new Label(container, SWT.NONE);
 			GridDataFactory.fillDefaults()//
 					.indent(10, 0)
 					.align(SWT.BEGINNING, SWT.CENTER)
-					.applyTo(label);
-			label.setText(Messages.Training_View_Label_LeftChartBorder);
-			label.setToolTipText(Messages.Training_View_Label_LeftChartBorder_Tooltip);
+					.applyTo(_lblHrMin);
+			_lblHrMin.setText(Messages.Training_View_Label_LeftChartBorder);
+			_lblHrMin.setToolTipText(Messages.Training_View_Label_LeftChartBorder_Tooltip);
 
 			/*
 			 * spinner: hr min
@@ -421,15 +433,14 @@ public class TrainingView extends ViewPart {
 			_spinnerHrLeft.addMouseWheelListener(_defaultSpinnerMouseWheelListener);
 
 			/*
-			 * label: hr min
+			 * label: hr max
 			 */
-			label = new Label(container, SWT.NONE);
+			_lblHrMax = new Label(container, SWT.NONE);
 			GridDataFactory.fillDefaults()//
-//					.indent(10, 0)
 					.align(SWT.BEGINNING, SWT.CENTER)
-					.applyTo(label);
-			label.setText(Messages.Training_View_Label_RightChartBorder);
-			label.setToolTipText(Messages.Training_View_Label_RightChartBorder_Tooltip);
+					.applyTo(_lblHrMax);
+			_lblHrMax.setText(Messages.Training_View_Label_RightChartBorder);
+			_lblHrMax.setToolTipText(Messages.Training_View_Label_RightChartBorder_Tooltip);
 
 			/*
 			 * spinner: hr max
@@ -446,7 +457,6 @@ public class TrainingView extends ViewPart {
 			 */
 			final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
 			GridDataFactory.fillDefaults()//
-//					.indent(10, 0)
 					.align(SWT.BEGINNING, SWT.CENTER)
 					.applyTo(toolbar);
 			final ToolBarManager tbm = new ToolBarManager(toolbar);
@@ -454,8 +464,8 @@ public class TrainingView extends ViewPart {
 			_actionShowAllPulseValues = new ActionShowAllPulseValues(this);
 			_actionSynchVerticalChartScaling = new ActionSynchChartScale(this);
 
-			tbm.add(_actionShowAllPulseValues);
 			tbm.add(_actionSynchVerticalChartScaling);
+			tbm.add(_actionShowAllPulseValues);
 
 			tbm.update(true);
 		}
@@ -469,18 +479,20 @@ public class TrainingView extends ViewPart {
 		label.setText(UI.EMPTY_STRING);
 	}
 
-	private void createUI15Charts(final Composite parent) {
+	private void createUI12PageBook(final Composite parent) {
 
-		_pageBookChart = new PageBook(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBookChart);
+		_pageBookHrZones = new PageBook(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBookHrZones);
 
-		_pageNoHrZones = createUI19PageNoHrZones(_pageBookChart);
-		_pageNoPerson = UI.createLabel(_tk, _pageBookChart, Messages.UI_Label_PersonIsRequired);
-		_pageNoTour = UI.createLabel(_tk, _pageBookChart, Messages.UI_Label_no_chart_is_selected);
-		_pageNoPulse = UI.createLabel(_tk, _pageBookChart, Messages.Training_View_Label_NoPulseData);
+		_pageHrZones = createUI20PageHrZones(_pageBookHrZones);
+		_pageNoHrZones = createUI14PageNoHrZones(_pageBookHrZones);
+
+		_pageNoPerson = UI.createLabel(_tk, _pageBookHrZones, Messages.UI_Label_PersonIsRequired);
+		_pageNoTour = UI.createLabel(_tk, _pageBookHrZones, Messages.UI_Label_no_chart_is_selected);
+		_pageNoPulse = UI.createLabel(_tk, _pageBookHrZones, Messages.Training_View_Label_NoPulseData);
 	}
 
-	private Composite createUI19PageNoHrZones(final Composite parent) {
+	private Composite createUI14PageNoHrZones(final Composite parent) {
 
 		final Composite container = _tk.createComposite(parent);
 		GridDataFactory.fillDefaults().grab(true, true).align(SWT.BEGINNING, SWT.CENTER).applyTo(container);
@@ -511,108 +523,86 @@ public class TrainingView extends ViewPart {
 		return container;
 	}
 
-	private Composite createUI26HrChart(final int chartId) {
+	private Composite createUI20PageHrZones(final Composite parent) {
 
-		switch (chartId) {
-		case CHART_ID_HR_TIME:
-			return createUI30PageHrTime(_pageBookChart);
-
-		case CHART_ID_HR_ZONES_WITH_TEXT:
-			return createUI40PageHrZone(_pageBookChart);
-
-		}
-
-		return null;
-	}
-
-	private Composite createUI30PageHrTime(final Composite parent) {
-
-		_chartHrTime = new Chart(parent, SWT.FLAT);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(_chartHrTime);
-
-		return _chartHrTime;
-	}
-
-	private Composite createUI40PageHrZone(final Composite parent) {
-
-		final Composite container = _tk.createComposite(parent);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+//				.grab(true, true)
+				.applyTo(container);
+		GridLayoutFactory.fillDefaults()//
+				.numColumns(3)
+				.spacing(0, 0)
+				.applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
-			_hrZoneContainer = _tk.createComposite(container);
-			GridDataFactory.fillDefaults().grab(true, true).applyTo(_hrZoneContainer);
-			GridLayoutFactory.fillDefaults().numColumns(1).applyTo(_hrZoneContainer);
+			createUI30HrZoneDataContainer(container);
+			createUI40HrZoneImage(container);
+			createUI50HrZoneChart(container);
 		}
 
 		return container;
 	}
 
-	private void createUI42HrZoneContent() {
+	private void createUI30HrZoneDataContainer(final Composite parent) {
+
+		_hrZoneDataContainer = _tk.createComposite(parent);
+		GridDataFactory.fillDefaults()//
+//				.grab(false, true)
+//				.minSize(SWT.DEFAULT, 1)
+				.applyTo(_hrZoneDataContainer);
+		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(_hrZoneDataContainer);
+	}
+
+	private void createUI32HrZoneDataContainerContent() {
 
 		// person and zones are already checked
 
-		_personHrZones = new ArrayList<TourPersonHRZone>(_currentPerson.getHrZones());
+		_personHrZones.clear();
+		_personHrZones.addAll(_currentPerson.getHrZones());
 		Collections.sort(_personHrZones);
 
-		if (_hrZoneTextContainerContent != null) {
-			_hrZoneTextContainerContent.dispose();
+		if (_hrZoneDataContainerContent != null) {
+			_hrZoneDataContainerContent.dispose();
 		}
 
-		final Composite scrolledContent;
-
-		_hrZoneTextContainerContent = new ScrolledComposite(_hrZoneContainer, SWT.V_SCROLL | SWT.H_SCROLL);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(_hrZoneTextContainerContent);
+		_hrZoneDataContainerContent = new Composite(_hrZoneDataContainer, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+//				.grab(true, true)
+				.applyTo(_hrZoneDataContainerContent);
+		GridLayoutFactory.fillDefaults().applyTo(_hrZoneDataContainerContent);
+//		_hrZoneDataContainerContent.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_CYAN));
 		{
-			scrolledContent = createUI44HrZone(_hrZoneTextContainerContent);
+			createUI34HrZoneDataContent(_hrZoneDataContainerContent);
 		}
-
-		_hrZoneTextContainerContent.setContent(scrolledContent);
-		_hrZoneTextContainerContent.setExpandVertical(true);
-		_hrZoneTextContainerContent.setExpandHorizontal(true);
-		_hrZoneTextContainerContent.addControlListener(new ControlAdapter() {
-			@Override
-			public void controlResized(final ControlEvent e) {
-				_hrZoneTextContainerContent.setMinSize(scrolledContent.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-			}
-		});
 
 		// layout is necessary, dependent which other view is previously opened
-		_pageBookChart.layout(true, true);
+		_pageBookHrZones.layout(true, true);
 	}
 
-	private Composite createUI44HrZone(final Composite parent) {
+	private Composite createUI34HrZoneDataContent(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-		GridLayoutFactory.swtDefaults().numColumns(5).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+		GridDataFactory.fillDefaults()//
+//				.grab(true, true)
+				.applyTo(container);
+		GridLayoutFactory.swtDefaults().numColumns(4).applyTo(container);
+		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 		{
-			createUI46HrZoneHeader(container);
-			createUI48HrZoneFields(container);
+			createUI36HrZoneHeader(container);
+			createUI38HrZoneFields(container);
 		}
 		_tk.adapt(container);
 
 		return container;
 	}
 
-	private void createUI46HrZoneHeader(final Composite parent) {
+	private void createUI36HrZoneHeader(final Composite parent) {
 
 		/*
-		 * label: zone name
+		 * label: color/zone name
 		 */
 		Label label = _tk.createLabel(parent, Messages.Training_HRZone_Label_Header_Zone);
-		label.setFont(_fontItalic);
-
-		/*
-		 * label: min/max pulse
-		 */
-		label = _tk.createLabel(parent, //
-				HEADER_HR_MAX_100 + UI.SPACE
-//						+ Integer.toString((int) _hrMax)
-						+ UI.SPACE
-						+ Messages.Graph_Label_Heartbeat_unit);
-		GridDataFactory.fillDefaults().span(2, 1).align(SWT.END, SWT.FILL).applyTo(label);
+		GridDataFactory.fillDefaults().span(2, 1).applyTo(label);
 		label.setFont(_fontItalic);
 
 		// label: %
@@ -628,7 +618,7 @@ public class TrainingView extends ViewPart {
 				.applyTo(label);
 	}
 
-	private void createUI48HrZoneFields(final Composite parent) {
+	private void createUI38HrZoneFields(final Composite parent) {
 
 		final int hrZoneSize = _personHrZones.size();
 
@@ -637,37 +627,38 @@ public class TrainingView extends ViewPart {
 		 */
 		_lblTourMinMaxPercent = new Label[hrZoneSize];
 		_lblTourMinMaxHours = new Label[hrZoneSize];
+		_lblHRZoneName = new Label[hrZoneSize];
+
+		// set hr zone colors
+		disposeHrZoneResources();
+		_hrZoneColors = new Color[hrZoneSize];
+
+		final Display display = parent.getDisplay();
 
 		for (int zoneIndex = 0; zoneIndex < hrZoneSize; zoneIndex++) {
 
 			final TourPersonHRZone hrZone = _personHrZones.get(zoneIndex);
 
+			final Color hrZoneColor = _hrZoneColors[zoneIndex] = new Color(display, hrZone.getColor());
+
+			/*
+			 * label: color
+			 */
+			final Label label = new Label(parent, SWT.NONE);
+			GridDataFactory.fillDefaults().hint(16, 16).applyTo(label);
+//			label.setText(UI.EMPTY_STRING);
+			label.setBackground(hrZoneColor);
+
 			/*
 			 * label: hr zone name
 			 */
-			final Label lblHRZoneName = _tk.createLabel(//
+			final Label lblHRZoneName = _lblHRZoneName[zoneIndex] = _tk.createLabel(//
 					parent,
-					hrZone.getName(),
+					hrZone.getNameShort(),
 					SWT.LEAD);
 			GridDataFactory.fillDefaults()//
 //					.grab(true, false)
 					.applyTo(lblHRZoneName);
-
-			/*
-			 * label: hr zone min/max % values
-			 */
-			final Label lblHRZoneMinMax = _tk.createLabel(parent, getUIMinMaxPercent(hrZone), SWT.TRAIL);
-			GridDataFactory.fillDefaults() //
-					.indent(10, 0)
-					.applyTo(lblHRZoneMinMax);
-
-			/*
-			 * label: hr zone min/max bpm values
-			 */
-			final Label lblHRZoneMinMaxBpm = _tk.createLabel(parent, getUIMinMaxBpm(hrZone), SWT.TRAIL);
-			GridDataFactory.fillDefaults() //
-					.indent(10, 0)
-					.applyTo(lblHRZoneMinMaxBpm);
 
 			/*
 			 * label: tour hr min/max %
@@ -690,8 +681,86 @@ public class TrainingView extends ViewPart {
 		}
 	}
 
+	private void createUI40HrZoneImage(final Composite parent) {
+
+		final Composite container = _tk.createComposite(parent);
+		GridDataFactory.fillDefaults().applyTo(container);
+		GridLayoutFactory.fillDefaults()//
+				.numColumns(1)
+				.extendedMargins(5, 0, 5, 5)
+				.applyTo(container);
+		{
+			_canvasHrZoneImage = new Canvas(container, SWT.DOUBLE_BUFFERED);
+			GridDataFactory.fillDefaults()//
+					.grab(false, true)
+					.hint(20, SWT.DEFAULT)
+					.applyTo(_canvasHrZoneImage);
+
+			_canvasHrZoneImage.addPaintListener(new PaintListener() {
+				public void paintControl(final PaintEvent e) {
+
+					if (_hrZoneImage == null || _hrZoneImage.isDisposed()) {
+						return;
+					}
+
+					final GC gc = e.gc;
+
+					/*
+					 * fill background because when the part is resized, a gray background would
+					 * appear
+					 */
+					gc.setBackground(_tk.getColors().getBackground());
+					gc.fillRectangle(e.x, e.y, e.width, e.height);
+
+					gc.drawImage(_hrZoneImage, 0, 0);
+				}
+			});
+
+			_canvasHrZoneImage.addControlListener(new ControlAdapter() {
+				@Override
+				public void controlResized(final ControlEvent e) {
+					updateUI44HrZoneImage();
+				}
+			});
+
+			_canvasHrZoneImage.addDisposeListener(new DisposeListener() {
+				public void widgetDisposed(final DisposeEvent e) {
+					if (_hrZoneImage != null) {
+						_hrZoneImage.dispose();
+					}
+				}
+			});
+		}
+	}
+
+	private void createUI50HrZoneChart(final Composite parent) {
+
+		/*
+		 * chart
+		 */
+		_chartHrTime = new Chart(parent, SWT.FLAT);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_chartHrTime);
+
+		// set grid size
+		_chartHrTime.setGridDistance(
+				_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
+				_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
+
+		_chartHrTime.addBarSelectionListener(new IBarSelectionListener() {
+			public void selectionChanged(final int serieIndex, final int valueIndex) {
+
+//					System.out.println(serieIndex + "\t" + valueIndex);
+//					// TODO remove SYSTEM.OUT.PRINTLN
+
+//					_postSelectionProvider.setSelection(selection);
+			}
+		});
+	}
+
 	@Override
 	public void dispose() {
+
+		disposeHrZoneResources();
 
 		if (_tk != null) {
 			_tk.dispose();
@@ -707,39 +776,33 @@ public class TrainingView extends ViewPart {
 		super.dispose();
 	}
 
+	private void disposeHrZoneResources() {
+
+		if (_hrZoneColors != null) {
+
+			for (final Color hrZoneColor : _hrZoneColors) {
+				hrZoneColor.dispose();
+			}
+
+			_hrZoneColors = null;
+		}
+	}
+
 	private void enableControls() {
 
-		boolean isHrZoneAvailable = false;
+		final boolean isHrZoneAvailable = isHrZoneDataAvailable();
 
-		// check tour
-		final boolean isTourData = _tourData != null;
-		if (isTourData) {
+		final boolean isCustomScaling = isHrZoneAvailable && _isShowAllPulseValues == false;
 
-			// check pulse
-			final int[] pulseSerie = _tourData.pulseSerie;
-			final boolean isPulse = pulseSerie != null && pulseSerie.length > 0;
-			if (isPulse) {
+//		_comboTrainingChart.setEnabled(isHrZoneAvailable);
 
-				// check person
-				final boolean isPerson = _currentPerson != null;
-				if (isPerson) {
+		_spinnerHrLeft.setEnabled(isCustomScaling);
+		_spinnerHrRight.setEnabled(isCustomScaling);
+		_lblHrMin.setEnabled(isCustomScaling);
+		_lblHrMax.setEnabled(isCustomScaling);
 
-					// check hr zones
-					final Set<TourPersonHRZone> personHrZones = _currentPerson.getHrZones();
-					final boolean isHrZones = personHrZones != null && personHrZones.size() > 0;
-
-					isHrZoneAvailable = isHrZones;
-				}
-			}
-		}
-
-		_comboTrainingChart.setEnabled(isHrZoneAvailable);
-
-		_spinnerHrLeft.setEnabled(isHrZoneAvailable && _isShowAllPulseValues == false);
-		_spinnerHrRight.setEnabled(isHrZoneAvailable && _isShowAllPulseValues == false);
-
+		_actionSynchVerticalChartScaling.setEnabled(isCustomScaling);
 		_actionShowAllPulseValues.setEnabled(isHrZoneAvailable);
-		_actionSynchVerticalChartScaling.setEnabled(isHrZoneAvailable);
 	}
 
 	private void fillActionBars() {
@@ -749,94 +812,6 @@ public class TrainingView extends ViewPart {
 		 */
 		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 		menuMgr.add(_actionEditHrZones);
-	}
-
-	private int getChartIndex(final int requestedChartId) {
-
-		for (final int chartId : _chartId) {
-			if (chartId == requestedChartId) {
-				return chartId;
-			}
-		}
-
-		// return default, this case should not happen
-		return CHART_ID_HR_TIME;
-	}
-
-	/**
-	 * @return Returns the id of the selected chart
-	 */
-	private int getSelectedChartId() {
-
-		final int selectedIndex = _comboTrainingChart.getSelectionIndex();
-
-		if (selectedIndex == -1) {
-			return _chartId[0];
-		}
-
-		return _chartId[selectedIndex];
-	}
-
-	private String getUIMinMaxBpm(final TourPersonHRZone hrZone) {
-
-		final String minMaxBpmText = UI.EMPTY_STRING;
-		final double minValue = hrZone.getZoneMinValue();
-		final double maxValue = hrZone.getZoneMaxValue();
-
-//		if (minValue == Integer.MIN_VALUE) {
-//
-//			minMaxBpmText = UI.SYMBOL_LESS_THAN //
-//					+ UI.SPACE
-//					+ Integer.toString((int) (maxValue * _hrMax / 100));
-//
-//		} else if (maxValue == Integer.MAX_VALUE) {
-//
-//			minMaxBpmText = UI.SYMBOL_GREATER_THAN //
-//					+ UI.SPACE
-//					+ Integer.toString((int) (minValue * _hrMax / 100));
-//
-//		} else {
-//
-//			minMaxBpmText = Integer.toString((int) (minValue * _hrMax / 100))
-//					+ UI.SYMBOL_DASH
-//					+ Integer.toString((int) (maxValue * _hrMax / 100));
-//		}
-
-		return minMaxBpmText;
-	}
-
-	private String getUIMinMaxPercent(final TourPersonHRZone hrZone) {
-
-		String minMaxText;
-		final int minValue = hrZone.getZoneMinValue();
-		final int maxValue = hrZone.getZoneMaxValue();
-
-		if (minValue == Integer.MIN_VALUE) {
-
-			minMaxText = UI.SYMBOL_LESS_THAN //
-					+ UI.SPACE
-					+ Integer.toString(maxValue)
-					+ UI.SPACE
-					+ UI.SYMBOL_PERCENTAGE;
-
-		} else if (maxValue == Integer.MAX_VALUE) {
-
-			minMaxText = UI.SYMBOL_GREATER_THAN //
-					+ UI.SPACE
-					+ Integer.toString(minValue)
-					+ UI.SPACE
-					+ UI.SYMBOL_PERCENTAGE;
-
-		} else {
-
-			minMaxText = Integer.toString(minValue)
-					+ UI.SYMBOL_DASH
-					+ Integer.toString(maxValue)
-					+ UI.SPACE
-					+ UI.SYMBOL_PERCENTAGE;
-		}
-
-		return minMaxText;
 	}
 
 	private void initUI(final Composite parent) {
@@ -875,7 +850,128 @@ public class TrainingView extends ViewPart {
 				onModifyHrBorder();
 			}
 		};
+
+//		_chartToolTipProvider = new IChartInfoProvider() {
+//			public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
+//				return createToolTipInfo(valueIndex);
+//			}
+//		};
 	}
+
+	private boolean isHrZoneDataAvailable() {
+
+		// check tour
+		final boolean isTourData = _tourData != null;
+		if (isTourData) {
+
+			// check pulse
+			final int[] pulseSerie = _tourData.pulseSerie;
+			final boolean isPulse = pulseSerie != null && pulseSerie.length > 0;
+			if (isPulse) {
+
+				// check person
+				final boolean isPerson = _currentPerson != null;
+				if (isPerson) {
+
+					// check hr zones
+					final Set<TourPersonHRZone> personHrZones = _currentPerson.getHrZones();
+					final boolean isHrZones = personHrZones != null && personHrZones.size() > 0;
+
+					return isHrZones;
+				}
+			}
+		}
+
+		return false;
+	}
+
+//	private int getChartIndex(final int requestedChartId) {
+//
+//		for (final int chartId : _chartId) {
+//			if (chartId == requestedChartId) {
+//				return chartId;
+//			}
+//		}
+//
+//		// return default, this case should not happen
+//		return CHART_ID_HR_TIME;
+//	}
+
+//	/**
+//	 * @return Returns the id of the selected chart
+//	 */
+//	private int getSelectedChartId() {
+//
+//		final int selectedIndex = _comboTrainingChart.getSelectionIndex();
+//
+//		if (selectedIndex == -1) {
+//			return _chartId[0];
+//		}
+//
+//		return _chartId[selectedIndex];
+//	}
+
+//	private String getUIMinMaxBpm(final TourPersonHRZone hrZone) {
+//
+//		final String minMaxBpmText = UI.EMPTY_STRING;
+//		final double minValue = hrZone.getZoneMinValue();
+//		final double maxValue = hrZone.getZoneMaxValue();
+//
+////		if (minValue == Integer.MIN_VALUE) {
+////
+////			minMaxBpmText = UI.SYMBOL_LESS_THAN //
+////					+ UI.SPACE
+////					+ Integer.toString((int) (maxValue * _hrMax / 100));
+////
+////		} else if (maxValue == Integer.MAX_VALUE) {
+////
+////			minMaxBpmText = UI.SYMBOL_GREATER_THAN //
+////					+ UI.SPACE
+////					+ Integer.toString((int) (minValue * _hrMax / 100));
+////
+////		} else {
+////
+////			minMaxBpmText = Integer.toString((int) (minValue * _hrMax / 100))
+////					+ UI.SYMBOL_DASH
+////					+ Integer.toString((int) (maxValue * _hrMax / 100));
+////		}
+//
+//		return minMaxBpmText;
+//	}
+
+//	private String getUIMinMaxPercent(final TourPersonHRZone hrZone) {
+//
+//		String minMaxText;
+//		final int minValue = hrZone.getZoneMinValue();
+//		final int maxValue = hrZone.getZoneMaxValue();
+//
+//		if (minValue == Integer.MIN_VALUE) {
+//
+//			minMaxText = UI.SYMBOL_LESS_THAN //
+//					+ UI.SPACE
+//					+ Integer.toString(maxValue)
+//					+ UI.SPACE
+//					+ UI.SYMBOL_PERCENTAGE;
+//
+//		} else if (maxValue == Integer.MAX_VALUE) {
+//
+//			minMaxText = UI.SYMBOL_GREATER_THAN //
+//					+ UI.SPACE
+//					+ Integer.toString(minValue)
+//					+ UI.SPACE
+//					+ UI.SYMBOL_PERCENTAGE;
+//
+//		} else {
+//
+//			minMaxText = Integer.toString(minValue)
+//					+ UI.SYMBOL_DASH
+//					+ Integer.toString(maxValue)
+//					+ UI.SPACE
+//					+ UI.SYMBOL_PERCENTAGE;
+//		}
+//
+//		return minMaxText;
+//	}
 
 	private void onModifyHrBorder() {
 
@@ -902,7 +998,7 @@ public class TrainingView extends ViewPart {
 		}
 		_isUpdateUI = false;
 
-		updateUI30ValidateData(true);
+		updateUI30HrZonesFromModel();
 	}
 
 	/**
@@ -910,13 +1006,8 @@ public class TrainingView extends ViewPart {
 	 */
 	private void onModifyPerson() {
 
-		// hr zones could be changed
-		if (_hrZoneTextContainerContent != null) {
-			_hrZoneTextContainerContent.dispose();
-		}
-
-		// tour is modified MUST be set to true that disposed resources are recreated
-		updateUI30ValidateData(true);
+		clearView();
+		showTour();
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
@@ -981,14 +1072,14 @@ public class TrainingView extends ViewPart {
 
 	private void restoreState() {
 
-		final int stateSelectedChart = Util.getStateInt(_state, STATE_SELECTED_CHART, CHART_ID_HR_TIME);
-		_comboTrainingChart.select(getChartIndex(stateSelectedChart));
+//		final int stateSelectedChart = Util.getStateInt(_state, STATE_SELECTED_CHART, CHART_ID_HR_TIME);
+//		_comboTrainingChart.select(getChartIndex(stateSelectedChart));
 
 		_isShowAllPulseValues = Util.getStateBoolean(_state, STATE_IS_SHOW_ALL_PULSE_VALUES, false);
 		_actionShowAllPulseValues.setChecked(_isShowAllPulseValues);
 
 		_isSynchChartVerticalValues = Util.getStateBoolean(_state, STATE_IS_SYNC_VERTICAL_CHART_SCALING, false);
-		_actionShowAllPulseValues.setChecked(_isSynchChartVerticalValues);
+		_actionSynchVerticalChartScaling.setChecked(_isSynchChartVerticalValues);
 
 		_isUpdateUI = true;
 		{
@@ -1000,7 +1091,7 @@ public class TrainingView extends ViewPart {
 
 	private void saveState() {
 
-		_state.put(STATE_SELECTED_CHART, getSelectedChartId());
+//		_state.put(STATE_SELECTED_CHART, getSelectedChartId());
 
 		_state.put(STATE_HR_CHART_LEFT_BORDER, _spinnerHrLeft.getSelection());
 		_state.put(STATE_HR_CHART_RIGHT_BORDER, _spinnerHrRight.getSelection());
@@ -1014,6 +1105,17 @@ public class TrainingView extends ViewPart {
 
 	}
 
+	private void showTour() {
+
+		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
+
+		if (_tourData == null) {
+			showTourFromTourProvider();
+		}
+
+		enableControls();
+	}
+
 	private void showTourFromTourProvider() {
 
 		// a tour is not displayed, find a tour provider which provides a tour
@@ -1021,7 +1123,7 @@ public class TrainingView extends ViewPart {
 			public void run() {
 
 				// validate widget
-				if (_pageBookChart.isDisposed()) {
+				if (_pageBookHrZones.isDisposed()) {
 					return;
 				}
 
@@ -1062,55 +1164,64 @@ public class TrainingView extends ViewPart {
 		final TourPerson tourPerson = tourData.getTourPerson();
 		if (tourPerson != _currentPerson) {
 
-			// another person is contained in the tour
-
 			/*
-			 * dispose resources which depends on the current person
+			 * another person is contained in the tour, dispose resources which depends on the
+			 * current person
 			 */
-			// hr zones could be changed
-			if (_hrZoneTextContainerContent != null) {
-				_hrZoneTextContainerContent.dispose();
+			if (_hrZoneDataContainerContent != null) {
+				_hrZoneDataContainerContent.dispose();
 			}
 
 			_currentPerson = tourPerson;
 		}
 
-		updateUI30ValidateData(true);
+		updateUI30HrZonesFromModel();
 	}
 
 	/**
 	 * Displays training data when a tour is available
 	 */
-	private void updateUI30ValidateData(final boolean isTourModified) {
+	private void updateUI30HrZonesFromModel() {
 
 		enableControls();
 
+		/*
+		 * check tour data
+		 */
 		if (_tourData == null) {
 
 			// a tour is not selected
-			_pageBookChart.showPage(_pageNoTour);
+			_pageBookHrZones.showPage(_pageNoTour);
 
 			return;
 		}
 
+		/*
+		 * check pulse
+		 */
 		final int[] pulseSerie = _tourData.pulseSerie;
 		if (pulseSerie == null || pulseSerie.length == 0) {
 
 			// pulse data are not available
-			_pageBookChart.showPage(_pageNoPulse);
+			_pageBookHrZones.showPage(_pageNoPulse);
 
 			return;
 		}
 
+		/*
+		 * check person
+		 */
 		if (_currentPerson == null) {
 
 			// selected tour do not contain a person
-			_pageBookChart.showPage(_pageNoPerson);
+			_pageBookHrZones.showPage(_pageNoPerson);
 
 			return;
 		}
 
-		// check HR zones
+		/*
+		 * check HR zones
+		 */
 		final Set<TourPersonHRZone> personHrZones = _currentPerson.getHrZones();
 		if (personHrZones == null || personHrZones.size() == 0) {
 
@@ -1119,7 +1230,7 @@ public class TrainingView extends ViewPart {
 			_lblNoHrZone.setText(NLS.bind(Messages.Training_View_Label_NoHrZones, _currentPerson.getName()));
 			_lblNoHrZone.getParent().layout(true, true);
 
-			_pageBookChart.showPage(_pageNoHrZones);
+			_pageBookHrZones.showPage(_pageNoHrZones);
 
 			return;
 		}
@@ -1127,53 +1238,27 @@ public class TrainingView extends ViewPart {
 		/*
 		 * required data are available
 		 */
-		_comboTrainingChart.setEnabled(true);
 
 		// set tooltip for the part title
 		setTitleToolTip(TourManager.getTourDateShort(_tourData));
 
-		// get selected chart id
-		int selectedIndex = _comboTrainingChart.getSelectionIndex();
-		if (selectedIndex == -1) {
-			selectedIndex = 0;
-		}
-
-		final int chartId = _chartId[selectedIndex];
-
-		Composite hrChart = _pageHrCharts[selectedIndex];
-		if (hrChart == null) {
-
-			// create UI for the selected chart
-
-			hrChart = createUI26HrChart(chartId);
-
-			_pageHrCharts[selectedIndex] = hrChart;
-		}
-
-		if (hrChart == null) {
-			// chart should never be null
-			return;
-		}
-
 		// display page for the selected chart
-		_pageBookChart.showPage(hrChart);
+		_pageBookHrZones.showPage(_pageHrZones);
 
-		if (isTourModified) {
-			switch (chartId) {
-			case CHART_ID_HR_TIME:
-				updateUI40HrTime();
-				break;
+		final ZoneMinMaxBpm zoneMinMaxBpm = _currentPerson.getHrZoneMinMaxBpm(
+				_currentPerson.getHrMaxFormula(),
+				_currentPerson.getMaxPulse(),
+				_currentPerson.getBirthDayWithDefault(),
+				_tourData.getStartDateTime());
 
-			case CHART_ID_HR_ZONES_WITH_TEXT:
-				updateUI41HrZoneText();
-				break;
+		updateUI40HrZoneChart(zoneMinMaxBpm);
+		updateUI42HrZoneData(zoneMinMaxBpm);
 
-			}
-
-		}
+		// update hr zone image
+		updateUI44HrZoneImage();
 	}
 
-	private void updateUI40HrTime() {
+	private void updateUI40HrZoneChart(final ZoneMinMaxBpm zoneMinMaxBpm) {
 
 		final int[] pulseSerie = _tourData.pulseSerie;
 		final int[] timeSerie = _tourData.timeSerie;
@@ -1187,12 +1272,14 @@ public class TrainingView extends ViewPart {
 		final RGB[] rgbDark = new RGB[zoneSize];
 		final RGB[] rgbLine = new RGB[zoneSize];
 
+		final RGB rgbWhite = new RGB(0xff, 0xff, 0xff);
+
 		int zoneIndex = 0;
 		for (final TourPersonHRZone hrZone : hrSortedZones) {
 
-			rgbBright[zoneIndex] = hrZone.getColor();
 			rgbDark[zoneIndex] = hrZone.getColor();
-			rgbLine[zoneIndex] = hrZone.getColor();
+			rgbBright[zoneIndex] = rgbWhite;
+			rgbLine[zoneIndex] = hrZone.getDarkColor();
 
 			zoneIndex++;
 		}
@@ -1200,46 +1287,41 @@ public class TrainingView extends ViewPart {
 		/*
 		 * minPulse will be the first x-data point with the x-value = 0
 		 */
-		int minPulse;
 		int maxPulse;
 
 		if (_isShowAllPulseValues) {
 
-			minPulse = maxPulse = pulseSerie[0];
+			_pulseStart = maxPulse = pulseSerie[0];
 
 			for (final int pulse : pulseSerie) {
-				if (pulse < minPulse) {
-					minPulse = pulse;
+				if (pulse < _pulseStart) {
+					_pulseStart = pulse;
 				} else if (pulse > maxPulse) {
 					maxPulse = pulse;
 				}
 			}
 
 		} else {
-			minPulse = _spinnerHrLeft.getSelection();
+			_pulseStart = _spinnerHrLeft.getSelection();
 			maxPulse = _spinnerHrRight.getSelection();
 		}
 
 		/*
 		 * create x-data series
 		 */
-		final int pulseRange = maxPulse - minPulse + 1;
+		final int pulseRange = maxPulse - _pulseStart + 1;
 
-		final int[] xSeriePulse = new int[pulseRange];
+		_xSeriePulse = new int[pulseRange];
 		final int[] ySeriePulseTime = new int[pulseRange];
 
 		final int[] colorIndex = new int[serieSize];
-		final ZoneMinMaxBpm zoneMinMaxBpm = _currentPerson.getHrZoneMinMaxBpm(
-				_currentPerson.getHrMaxFormula(),
-				_currentPerson.getMaxPulse(),
-				_currentPerson.getBirthDayWithDefault(),
-				_tourData.getStartDateTime());
-		final int[] zoneMinBpm = zoneMinMaxBpm.zoneMinValues;
-		final int[] zoneMaxBpm = zoneMinMaxBpm.zoneMaxValues;
+
+		final int[] zoneMinBpm = zoneMinMaxBpm.zoneMinBmp;
+		final int[] zoneMaxBpm = zoneMinMaxBpm.zoneMaxBmp;
 
 		for (int pulseIndex = 0; pulseIndex < pulseRange; pulseIndex++) {
 
-			xSeriePulse[pulseIndex] = pulseIndex;
+			_xSeriePulse[pulseIndex] = pulseIndex;
 
 			// set color index for each pulse value
 			zoneIndex = 0;
@@ -1248,7 +1330,7 @@ public class TrainingView extends ViewPart {
 				final int minValue = zoneMinBpm[zoneIndex];
 				final int maxValue = zoneMaxBpm[zoneIndex];
 
-				final int pulse = minPulse + pulseIndex;
+				final int pulse = _pulseStart + pulseIndex;
 
 				if (pulse >= minValue && pulse <= maxValue) {
 					colorIndex[pulseIndex] = zoneIndex;
@@ -1256,12 +1338,6 @@ public class TrainingView extends ViewPart {
 				}
 			}
 		}
-
-//		for (int debugIndex = 0; debugIndex < zoneMaxBpm.length; debugIndex++) {
-//			System.out.println(zoneMinBpm[debugIndex] + " - " + zoneMaxBpm[debugIndex]);
-//		}
-//		System.out.println("\t");
-//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		int prevTime = 0;
 
@@ -1290,7 +1366,7 @@ public class TrainingView extends ViewPart {
 			}
 
 			final int pulse = pulseSerie[serieIndex];
-			final int pulseIndex = pulse - minPulse;
+			final int pulseIndex = pulse - _pulseStart;
 
 			// check array bounds
 			if (pulseIndex >= 0 && pulseIndex < pulseRange) {
@@ -1300,13 +1376,19 @@ public class TrainingView extends ViewPart {
 
 		final ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
 
+//		chartDataModel.setTitle(TourManager.getTourDateTimeFull(_tourData));
+		chartDataModel.setTitle(TourManager.getTourDateTimeShort(_tourData));
+
+		// set tool tip info provider
+//		chartDataModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, _chartToolTipProvider);
+
 		/*
 		 * x-axis: pulse
 		 */
-		final ChartDataXSerie xData = new ChartDataXSerie(xSeriePulse);
+		final ChartDataXSerie xData = new ChartDataXSerie(_xSeriePulse);
 		xData.setAxisUnit(ChartDataXSerie.X_AXIS_UNIT_NUMBER_CENTER);
 		xData.setUnitLabel(Messages.Graph_Label_Heartbeat_unit);
-		xData.setStartValue(minPulse);
+		xData.setStartValue(_pulseStart);
 
 		chartDataModel.setXData(xData);
 
@@ -1318,47 +1400,47 @@ public class TrainingView extends ViewPart {
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				new int[][] { new int[pulseRange] },
 				new int[][] { ySeriePulseTime });
-		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
-		yData.setUnitLabel(UI.UNIT_LABEL_TIME);
-		//		yData.setAllValueColors(0);
-		//		yData.setYTitle(title);
-		//		yData.setVisibleMinValue(0);
+
+		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
+//		yData.setUnitLabel(UI.UNIT_LABEL_TIME);
+//		yData.setYTitle(Messages.App_Label_H_MM);
 
 		yData.setColorIndex(new int[][] { colorIndex });
 		yData.setRgbLine(rgbLine);
 		yData.setRgbBright(rgbBright);
 		yData.setRgbDark(rgbDark);
+		yData.setDefaultRGB(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY).getRGB());
 
 		chartDataModel.addYData(yData);
 
-		if (_isSynchChartVerticalValues) {
+		if (_isSynchChartVerticalValues && _isShowAllPulseValues == false) {
 			_minMaxKeeper.setMinMaxValues(chartDataModel);
 		}
-//		// set grid size
-//		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-//		_chartHrTime.setGridDistance(
-//				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
-//				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
 
 		// show the new data data model in the chart
 		_chartHrTime.updateChart(chartDataModel, false);
 	}
 
-	private void updateUI41HrZoneText() {
+	/**
+	 * @param zoneMinMaxBpm
+	 *            Contains age and HR max values.
+	 */
+	private void updateUI42HrZoneData(final ZoneMinMaxBpm zoneMinMaxBpm) {
 
 		// create hr zones when not yet done or disposed
-		if (_hrZoneTextContainerContent == null || _hrZoneTextContainerContent.isDisposed()) {
-			createUI42HrZoneContent();
+		if (_hrZoneDataContainerContent == null || _hrZoneDataContainerContent.isDisposed()) {
+			createUI32HrZoneDataContainerContent();
 		}
 
 		final int personZoneSize = _personHrZones.size();
 		final int[] tourHrZoneTimes = _tourData.getHrZones();
-		final int[] timeSerie = _tourData.timeSerie;
+		final int drivingTime = _tourData.getTourDrivingTime();
 
-		// display zone values
-		final int time100 = timeSerie[timeSerie.length - 1];
+		_tourHrZonePercent = new double[personZoneSize];
 
-		for (int tourZoneIndex = 0; tourZoneIndex < tourHrZoneTimes.length; tourZoneIndex++) {
+		final int tourHrZoneSize = tourHrZoneTimes.length;
+
+		for (int tourZoneIndex = 0; tourZoneIndex < tourHrZoneSize; tourZoneIndex++) {
 
 			if (tourZoneIndex >= personZoneSize) {
 
@@ -1370,10 +1452,135 @@ public class TrainingView extends ViewPart {
 			}
 
 			final double zoneTime = tourHrZoneTimes[tourZoneIndex];
-			final double zoneTimePercent = zoneTime * 100.0 / time100;
+			final double zoneTimePercent = drivingTime == 0 //
+					? 0
+					: zoneTime * 100.0 / drivingTime;
+
+			if (zoneTime == -1) {
+				// this zone and following zones are not available
+				break;
+			}
+
+			_tourHrZonePercent[tourZoneIndex] = zoneTimePercent;
+
+			final TourPersonHRZone hrZone = _personHrZones.get(tourZoneIndex);
+
+			final int zoneMaxValue = hrZone.getZoneMaxValue();
+			final String zoneMaxValueText = zoneMaxValue == Integer.MAX_VALUE //
+					? Messages.App_Label_max
+					: Integer.toString(zoneMaxValue);
+
+			final int zoneMaxBmp = zoneMinMaxBpm.zoneMaxBmp[tourZoneIndex];
+			final String zoneMaxBmpText = zoneMaxBmp == Integer.MAX_VALUE //
+					? Messages.App_Label_max
+					: Integer.toString(zoneMaxBmp);
+
+			final int ageYears = zoneMinMaxBpm.age;
+			final String ageText = UI.SPACE + ageYears + UI.SPACE2 + Messages.Pref_People_Label_Years;
+
+			final String hrZoneTooltip =
+//
+			hrZone.getNameLongShortcutFirst()
+//
+					+ UI.NEW_LINE
+					+ UI.NEW_LINE
+//
+					+ hrZone.getZoneMinValue()
+					+ UI.DASH
+					+ zoneMaxValueText
+					+ UI.SPACE
+					+ UI.SYMBOL_PERCENTAGE
+//
+					+ UI.SPACE
+					+ UI.SYMBOL_EQUAL
+					+ UI.SPACE
+//
+					+ zoneMinMaxBpm.zoneMinBmp[tourZoneIndex]
+					+ UI.DASH
+					+ zoneMaxBmpText
+					+ UI.SPACE
+					+ Messages.Graph_Label_Heartbeat_unit
+//
+					+ UI.NEW_LINE
+					+ UI.NEW_LINE
+//
+					+ Messages.Pref_People_Label_Age
+					+ ageText
+//
+					+ UI.DASH_WITH_DOUBLE_SPACE
+//
+					+ Messages.HRMax_Label
+					+ UI.SPACE
+					+ zoneMinMaxBpm.hrMax
+					+ Messages.Graph_Label_Heartbeat_unit
+//
+			;
 
 			_lblTourMinMaxPercent[tourZoneIndex].setText(_nf1.format(zoneTimePercent));
+			_lblTourMinMaxPercent[tourZoneIndex].setToolTipText(hrZoneTooltip);
+
 			_lblTourMinMaxHours[tourZoneIndex].setText(UI.format_hh_mm((long) (zoneTime + 30)).toString());
+			_lblTourMinMaxHours[tourZoneIndex].setToolTipText(hrZoneTooltip);
+
+			_lblHRZoneName[tourZoneIndex].setToolTipText(hrZoneTooltip);
 		}
+	}
+
+	private void updateUI44HrZoneImage() {
+
+		final Display display = Display.getDefault();
+
+		display.asyncExec(new Runnable() {
+
+			final int	__counter	= ++_imageCounter;
+
+			public void run() {
+
+				// check if this is the newest request to create an image
+				if (__counter < _imageCounter) {
+					return;
+				}
+
+				final boolean isHrZoneDataAvailable = isHrZoneDataAvailable();
+
+				final Point imageSize = _canvasHrZoneImage.getSize();
+				final int devImageWidth = imageSize.x;
+				final int devImageHeight = imageSize.y;
+
+				if (_hrZoneImage != null) {
+					_hrZoneImage.dispose();
+				}
+
+				final Image image = _hrZoneImage = new Image(Display.getDefault(), devImageWidth, devImageHeight);
+
+				final int hrZoneSize = _personHrZones.size();
+
+				final GC gc = new GC(image);
+				{
+					int devYPos = 0;
+
+					if (isHrZoneDataAvailable) {
+
+						for (int zoneIndex = 0; zoneIndex < hrZoneSize; zoneIndex++) {
+
+							final double hrZonePercent = _tourHrZonePercent[zoneIndex];
+							final int devZoneHeight = (int) (hrZonePercent / 100.0 * devImageHeight);
+
+							gc.setBackground(_hrZoneColors[zoneIndex]);
+							gc.fillRectangle(0, devYPos, devImageWidth - 1, devZoneHeight);
+
+							devYPos += devZoneHeight;
+						}
+
+					} else {
+						gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+						gc.fillRectangle(image.getBounds());
+					}
+				}
+				gc.dispose();
+
+				_canvasHrZoneImage.redraw();
+			}
+		});
 	}
 }

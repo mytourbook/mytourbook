@@ -25,6 +25,11 @@ public interface ITourbookPreferences {
 	public static final String	DUMMY_FIELD									= UI.EMPTY_STRING;
 
 	/*
+	 * notifications
+	 */
+	public static final String	HR_ZONES_ARE_MODIFIED						= "HrZonesAreModified";									//$NON-NLS-1$
+
+	/*
 	 * statistic provider
 	 */
 	public static final String	STATISTICS_STATISTIC_PROVIDER_IDS			= "statistics.provider.ids";								//$NON-NLS-1$

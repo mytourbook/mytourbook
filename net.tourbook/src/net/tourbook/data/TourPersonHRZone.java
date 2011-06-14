@@ -91,6 +91,8 @@ public class TourPersonHRZone implements Cloneable, Comparable<TourPersonHRZone>
 	 */
 	@Transient
 	private RGB					_color;
+	@Transient
+	private RGB					_colorDark;
 
 	/**
 	 * manually created marker or imported marker create a unique id to identify them, saved marker
@@ -107,24 +109,10 @@ public class TourPersonHRZone implements Cloneable, Comparable<TourPersonHRZone>
 		_createId = ++_createCounter;
 	}
 
-	@Override
-	public TourPersonHRZone clone() {
-
-		try {
-
-			// create clones for shallow copied fields so that they can be modified
-
-			final TourPersonHRZone newHrZone = (TourPersonHRZone) super.clone();
-
-			newHrZone.zoneName = zoneName == null ? null : new String(zoneName);
-			newHrZone.nameShortcut = nameShortcut == null ? null : new String(nameShortcut);
-			newHrZone.description = description == null ? null : new String(description);
-
-			return newHrZone;
-
-		} catch (final CloneNotSupportedException e) {
-			StatusUtil.log(e);
-			return null;
+	private void checkColors() {
+		if (_color == null) {
+			_color = new RGB(colorRed, colorGreen, colorBlue);
+			_colorDark = getDarkColor(_color);
 		}
 	}
 
@@ -151,6 +139,27 @@ public class TourPersonHRZone implements Cloneable, Comparable<TourPersonHRZone>
 //			return null;
 //		}
 //	}
+
+	@Override
+	public TourPersonHRZone clone() {
+
+		try {
+
+			// create clones for shallow copied fields so that they can be modified
+
+			final TourPersonHRZone newHrZone = (TourPersonHRZone) super.clone();
+
+			newHrZone.zoneName = zoneName == null ? null : new String(zoneName);
+			newHrZone.nameShortcut = nameShortcut == null ? null : new String(nameShortcut);
+			newHrZone.description = description == null ? null : new String(description);
+
+			return newHrZone;
+
+		} catch (final CloneNotSupportedException e) {
+			StatusUtil.log(e);
+			return null;
+		}
+	}
 
 	@Override
 	public int compareTo(final TourPersonHRZone otherHrZone) {
@@ -195,12 +204,24 @@ public class TourPersonHRZone implements Cloneable, Comparable<TourPersonHRZone>
 	}
 
 	public RGB getColor() {
-
-		if (_color == null) {
-			_color = new RGB(colorRed, colorGreen, colorBlue);
-		}
-
+		checkColors();
 		return _color;
+	}
+
+	public RGB getDarkColor() {
+		checkColors();
+		return _colorDark;
+	}
+
+	private RGB getDarkColor(final RGB rgb) {
+
+		final double darkFactor = 0.9;
+
+		final int red = (int) Math.max(0, rgb.red * darkFactor);
+		final int green = (int) Math.max(0, rgb.green * darkFactor);
+		final int blue = (int) Math.max(0, rgb.blue * darkFactor);
+
+		return new RGB(red, green, blue);
 	}
 
 	public String getDescription() {
@@ -210,7 +231,7 @@ public class TourPersonHRZone implements Cloneable, Comparable<TourPersonHRZone>
 	/**
 	 * @return Returns the name of the zone combined with the zone name shortcut
 	 */
-	public String getName() {
+	public String getNameLong() {
 
 		if ((zoneName == null || zoneName.length() == 0) && (nameShortcut == null || nameShortcut.length() == 0)) {
 			// nothing is defined
@@ -226,6 +247,43 @@ public class TourPersonHRZone implements Cloneable, Comparable<TourPersonHRZone>
 		}
 
 		return zoneName + NAME_SHORTCUT_PREFIX + nameShortcut + NAME_SHORTCUT_POSTFIX;
+	}
+
+	/**
+	 * @return Returns the name of the zone combined with the zone name shortcut
+	 */
+	public String getNameLongShortcutFirst() {
+
+		if ((zoneName == null || zoneName.length() == 0) && (nameShortcut == null || nameShortcut.length() == 0)) {
+			// nothing is defined
+			return UI.EMPTY_STRING;
+		}
+
+		if (zoneName == null || zoneName.length() == 0) {
+			return nameShortcut;
+		}
+
+		if (nameShortcut == null || nameShortcut.length() == 0) {
+			return zoneName;
+		}
+
+		return nameShortcut + UI.SYMBOL_COLON + UI.SPACE + zoneName;
+	}
+
+	/**
+	 * @return Returns the short name or the name when the short name is not available.
+	 */
+	public String getNameShort() {
+
+		if (nameShortcut != null && nameShortcut.length() > 0) {
+			return nameShortcut;
+		}
+
+		if (zoneName != null && zoneName.length() > 0) {
+			return zoneName;
+		}
+
+		return UI.EMPTY_STRING;
 	}
 
 	public String getNameShortcut() {
@@ -267,6 +325,7 @@ public class TourPersonHRZone implements Cloneable, Comparable<TourPersonHRZone>
 
 		// cache rgb values
 		_color = rgb;
+		_colorDark = getDarkColor(rgb);
 
 		colorRed = rgb.red;
 		colorGreen = rgb.green;

@@ -370,16 +370,16 @@ public class TourPerson implements Comparable<Object> {
 
 		final ZoneMinMaxBpm hrZoneMinMax = _hrZoneMinMaxBpm.get(age);
 
-//		if (hrZoneMinMax != null) {
-//			// hr zones for the age is already available
-//			return hrZoneMinMax;
-//		}
+		if (hrZoneMinMax != null) {
+			// hr zones for the age is already available
+			return hrZoneMinMax;
+		}
 
 		final int hrMax = getHrMax(hrMaxFormulaKey, hrMaxPulse, age);
 		final int zoneSize = hrZones.size();
 
-		final int[] zoneMinValues = new int[zoneSize];
-		final int[] zoneMaxValues = new int[zoneSize];
+		final int[] zoneMinBmps = new int[zoneSize];
+		final int[] zoneMaxBmps = new int[zoneSize];
 
 		final ArrayList<TourPersonHRZone> hrZonesList = new ArrayList<TourPersonHRZone>(hrZones);
 		Collections.sort(hrZonesList);
@@ -393,24 +393,24 @@ public class TourPerson implements Comparable<Object> {
 
 			final int zoneMaxValue = hrZone.getZoneMaxValue();
 
-			int zoneMinBpm = hrZone.getZoneMinValue() * hrMax / 100;
+			int minBpm = hrZone.getZoneMinValue() * hrMax / 100;
 
-			final int zoneMaxBpm = zoneMaxValue == Integer.MAX_VALUE //
+			final int maxBpm = zoneMaxValue == Integer.MAX_VALUE //
 					? Integer.MAX_VALUE
 					: (zoneMaxValue * hrMax / 100);
 
 			if (prevMaxBpm != -1) {
 				// make sure that "min" is last "max + 1"
-				zoneMinBpm = prevMaxBpm + 1;
+				minBpm = prevMaxBpm + 1;
 			}
 
-			zoneMinValues[zoneIndex] = zoneMinBpm;
-			zoneMaxValues[zoneIndex] = zoneMaxBpm;
+			zoneMinBmps[zoneIndex] = minBpm;
+			zoneMaxBmps[zoneIndex] = maxBpm;
 
-			prevMaxBpm = zoneMaxBpm;
+			prevMaxBpm = maxBpm;
 		}
 
-		final ZoneMinMaxBpm hrZoneMinMax1 = new ZoneMinMaxBpm(zoneMinValues, zoneMaxValues);
+		final ZoneMinMaxBpm hrZoneMinMax1 = new ZoneMinMaxBpm(zoneMinBmps, zoneMaxBmps, age, hrMax);
 
 		_hrZoneMinMaxBpm.put(age, hrZoneMinMax1);
 
@@ -520,7 +520,6 @@ public class TourPerson implements Comparable<Object> {
 	}
 
 	public void resetHrZones() {
-
 		_hrZoneMinMaxBpm.clear();
 	}
 

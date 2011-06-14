@@ -3526,10 +3526,6 @@ public class TourDatabase {
 
 		logDbUpdateStart(newDbVersion);
 
-		if (monitor != null) {
-			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, newDbVersion));
-		}
-
 		String sql;
 		final Statement stmt = conn.createStatement();
 		{
@@ -3549,33 +3545,63 @@ public class TourDatabase {
 //
 //			TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA
 
+			if (monitor != null) {
+				monitor.subTask(NLS.bind(Messages.Tour_Database_Update_Subtask, newDbVersion, 0));
+			}
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN HrZone0		INTEGER DEFAULT -1"; //$NON-NLS-1$ //$NON-NLS-2$
 			exec(stmt, sql);
 
+			if (monitor != null) {
+				monitor.subTask(NLS.bind(Messages.Tour_Database_Update_Subtask, newDbVersion, 1));
+			}
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN HrZone1		INTEGER DEFAULT -1"; //$NON-NLS-1$ //$NON-NLS-2$
 			exec(stmt, sql);
 
+			if (monitor != null) {
+				monitor.subTask(NLS.bind(Messages.Tour_Database_Update_Subtask, newDbVersion, 2));
+			}
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN HrZone2		INTEGER DEFAULT -1"; //$NON-NLS-1$ //$NON-NLS-2$
 			exec(stmt, sql);
 
+			if (monitor != null) {
+				monitor.subTask(NLS.bind(Messages.Tour_Database_Update_Subtask, newDbVersion, 3));
+			}
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN HrZone3		INTEGER DEFAULT -1"; //$NON-NLS-1$ //$NON-NLS-2$
 			exec(stmt, sql);
 
+			if (monitor != null) {
+				monitor.subTask(NLS.bind(Messages.Tour_Database_Update_Subtask, newDbVersion, 4));
+			}
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN HrZone4		INTEGER DEFAULT -1"; //$NON-NLS-1$ //$NON-NLS-2$
 			exec(stmt, sql);
 
+			if (monitor != null) {
+				monitor.subTask(NLS.bind(Messages.Tour_Database_Update_Subtask, newDbVersion, 5));
+			}
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN HrZone5		INTEGER DEFAULT -1"; //$NON-NLS-1$ //$NON-NLS-2$
 			exec(stmt, sql);
 
+			if (monitor != null) {
+				monitor.subTask(NLS.bind(Messages.Tour_Database_Update_Subtask, newDbVersion, 6));
+			}
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN HrZone6		INTEGER DEFAULT -1"; //$NON-NLS-1$ //$NON-NLS-2$
 			exec(stmt, sql);
 
+			if (monitor != null) {
+				monitor.subTask(NLS.bind(Messages.Tour_Database_Update_Subtask, newDbVersion, 7));
+			}
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN HrZone7		INTEGER DEFAULT -1"; //$NON-NLS-1$ //$NON-NLS-2$
 			exec(stmt, sql);
 
+			if (monitor != null) {
+				monitor.subTask(NLS.bind(Messages.Tour_Database_Update_Subtask, newDbVersion, 8));
+			}
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN HrZone8		INTEGER DEFAULT -1"; //$NON-NLS-1$ //$NON-NLS-2$
 			exec(stmt, sql);
 
+			if (monitor != null) {
+				monitor.subTask(NLS.bind(Messages.Tour_Database_Update_Subtask, newDbVersion, 9));
+			}
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN HrZone9		INTEGER DEFAULT -1"; //$NON-NLS-1$ //$NON-NLS-2$
 			exec(stmt, sql);
 		}

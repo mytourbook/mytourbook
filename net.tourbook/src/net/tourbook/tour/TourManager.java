@@ -498,14 +498,30 @@ public class TourManager {
 	 */
 	public static DateTime getTourDateTime(final TourData tourData) {
 
-		return new DateTime(//
-				tourData.getStartYear(),
-				tourData.getStartMonth(),
-				tourData.getStartDay(),
-				tourData.getStartHour(),
-				tourData.getStartMinute(),
-				tourData.getStartSecond(),
-				0);
+		return tourData.getStartDateTime();
+//
+//		return new DateTime(//
+//				tourData.getStartYear(),
+//				tourData.getStartMonth(),
+//				tourData.getStartDay(),
+//				tourData.getStartHour(),
+//				tourData.getStartMinute(),
+//				tourData.getStartSecond(),
+//				0);
+	}
+
+	/**
+	 * @return Returns a tour title which contains: full date + full time
+	 */
+	public static String getTourDateTimeFull(final TourData tourData) {
+
+		return getTourDateFull(tourData) //
+				+ UI.DASH_WITH_SPACE
+				+ getTourTimeShort(tourData);
+	}
+
+	public static String getTourDateTimeShort(final TourData tourData) {
+		return UI.DTFormatterShort.print(tourData.getStartDateTime());
 	}
 
 	private static String getTourTimeShort(final Date date) {
@@ -536,15 +552,6 @@ public class TourManager {
 				+ getTourTimeShort(date);
 	}
 
-	/**
-	 * @return returns the title of this tour
-	 */
-	public static String getTourTitle(final TourData tourData) {
-		return getTourDateLong(getTourDateTime(tourData).toDate())//
-				+ UI.DASH_WITH_SPACE
-				+ getTourTimeShort(tourData);
-	}
-
 //	/**
 //	 * Check if a person is selected in the app toolbar. An error message will be displayed when a
 //	 * person is not selected.
@@ -566,6 +573,15 @@ public class TourManager {
 //
 //		return true;
 //	}
+
+	/**
+	 * @return returns the title of this tour
+	 */
+	public static String getTourTitle(final TourData tourData) {
+		return getTourDateLong(getTourDateTime(tourData).toDate())//
+				+ UI.DASH_WITH_SPACE
+				+ getTourTimeShort(tourData);
+	}
 
 	/**
 	 * @return returns the detailed title of this tour which contains:<br>

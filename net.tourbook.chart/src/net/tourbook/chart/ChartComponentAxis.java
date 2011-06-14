@@ -180,6 +180,7 @@ public class ChartComponentAxis extends Canvas {
 		final GC gc = new GC(_axisImage);
 
 		gc.setBackground(_chart.getBackgroundColor());
+//		gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 		gc.fillRectangle(_axisImage.getBounds());
 
 		drawYUnits(gc, axisRect);

@@ -17,13 +17,30 @@ package net.tourbook.data;
 
 public class ZoneMinMaxBpm {
 
-	public int[]	zoneMinValues;
-	public int[]	zoneMaxValues;
+	/**
+	 * Age in years
+	 */
+	public int		age;
+	public int		hrMax;
 
-	public ZoneMinMaxBpm(final int[] zoneMinValues, final int[] zoneMaxValues) {
+	public int[]	zoneMinBmp;
+	public int[]	zoneMaxBmp;
 
-		this.zoneMinValues = zoneMinValues;
-		this.zoneMaxValues = zoneMaxValues;
+	/**
+	 * Set HR zones, age and max HR
+	 * 
+	 * @param zoneMinBmp
+	 * @param zoneMaxBmp
+	 * @param age
+	 * @param hrMax
+	 */
+	public ZoneMinMaxBpm(final int[] zoneMinBmp, final int[] zoneMaxBmp, final int age, final int hrMax) {
+
+		this.zoneMinBmp = zoneMinBmp;
+		this.zoneMaxBmp = zoneMaxBmp;
+
+		this.age = age;
+		this.hrMax = hrMax;
 	}
 
 }

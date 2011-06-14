@@ -1542,9 +1542,9 @@ public class ChartComponentGraph extends Canvas {
 
 						if (graphIndex == _drawingData.size() - 1) {
 							// draw the unit label and unit tick for the last graph
-							draw132XUnitsAndGrid(gc, drawingData, true, true);
+							draw132XUnitsAndGrid(gc, drawingData, true);
 						} else {
-							draw132XUnitsAndGrid(gc, drawingData, false, true);
+							draw132XUnitsAndGrid(gc, drawingData, false);
 						}
 
 						draw140HorizontalGridlines(gc, drawingData);
@@ -1671,9 +1671,12 @@ public class ChartComponentGraph extends Canvas {
 				return;
 			}
 
+			final int titleWidth = gc.textExtent(title).x;
+			final int devXTitle = (devGraphWidth / 2) - (titleWidth / 2);
+
 			gc.drawText(title, //
-					(devGraphWidth / 2) - (gc.textExtent(title).x / 2),
-					(devYTitle),
+					devXTitle < 0 ? 0 : devXTitle,
+					devYTitle,
 					true);
 
 		} else {
@@ -1731,13 +1734,8 @@ public class ChartComponentGraph extends Canvas {
 	 * @param isDrawUnit
 	 *            <code>true</code> indicate to draws the unit tick and unit label additional to the
 	 *            unit grid line
-	 * @param isDraw0Unit
-	 *            <code>true</code> indicate to draw the unit at the 0 position
 	 */
-	private void draw132XUnitsAndGrid(	final GC gc,
-										final ChartDrawingData drawingData,
-										final boolean isDrawUnit,
-										final boolean isDraw0Unit) {
+	private void draw132XUnitsAndGrid(final GC gc, final ChartDrawingData drawingData, final boolean isDrawUnit) {
 
 		final Display display = getDisplay();
 
@@ -1761,8 +1759,8 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		// compute distance between two units
-		final float devUnitWidth = units.size() > 1 ? //
-				((units.get(1).value * scaleX) - (units.get(0).value * scaleX))
+		final float devUnitWidth = units.size() > 1 //
+				? ((units.get(1).value * scaleX) - (units.get(0).value * scaleX))
 				: 0;
 
 		float devXOffset = 0;
@@ -1788,13 +1786,13 @@ public class ChartComponentGraph extends Canvas {
 			isUnitVisibilityChecked = true;
 		}
 
-		boolean isUnitLabelPrinted = false;
-		int devXLastUnitRightPos = 0;
-		int devXFirstUnitRightPos = 0;
-		int devXChartUnitEnd = -1;
+		boolean isFirstUnit = true;
+//		int devXLastUnitRightPos = 0;
+//		int devXFirstUnitRightPos = 0;
+		int devXLastUnitRightPosition = -1;
 
 		final String unitLabel = drawingData.getXData().getUnitLabel();
-		final int unitLabelExtendX = gc.textExtent(unitLabel).x;
+		final int devUnitLabelWidth = gc.textExtent(unitLabel).x;
 
 		for (final ChartUnit unit : units) {
 
@@ -1808,7 +1806,6 @@ public class ChartComponentGraph extends Canvas {
 					devXOffset -= devUnitWidth;
 
 					unitCounter++;
-
 					continue;
 				}
 
@@ -1817,7 +1814,7 @@ public class ChartComponentGraph extends Canvas {
 				}
 			}
 
-			// dev x-position for the unit tick
+			// get dev x-position for the unit tick
 			int devXUnitTick;
 			if (isExtendedScaling) {
 
@@ -1832,145 +1829,126 @@ public class ChartComponentGraph extends Canvas {
 			}
 
 			/*
-			 * the first unit is not painted because it would clip at the left border of the chart
-			 * canvas
+			 * skip units which are outside of the visible area
 			 */
-			if ((unitCounter == 0 && isDraw0Unit) || unitCounter > 0) {
+			if (devXUnitTick < 0) {
+				continue;
+			}
+			if (devXUnitTick > devVisibleChartWidth) {
+				break;
+			}
 
-				if (isDrawUnit) {
+			if (isDrawUnit) {
 
+				/*
+				 * draw unit tick and vertical gridline, don't draw it on the vertical 0 line
+				 */
+				if (devXUnitTick > 0) {
 					gc.setForeground(display.getSystemColor(SWT.COLOR_DARK_GRAY));
+					gc.setLineStyle(SWT.LINE_SOLID);
+					gc.drawLine(devXUnitTick, devYBottom, devXUnitTick, devYBottom + 5);
+
+					// draw vertical gridline
+					gc.setForeground(_gridColor);
+					gc.drawLine(devXUnitTick, devYBottom, devXUnitTick, devYBottom - drawingData.devGraphHeight);
+				}
+
+				gc.setForeground(display.getSystemColor(SWT.COLOR_DARK_GRAY));
+
+				/*
+				 * draw unit value
+				 */
+				final int devUnitValueWidth = gc.textExtent(unit.valueLabel).x;
+
+				if (devUnitWidth != 0 && xUnitTextPos == ChartDrawingData.X_UNIT_TEXT_POS_CENTER) {
 
 					/*
-					 * draw unit tick
+					 * draw unit value BETWEEN two units
 					 */
-					if (unitCounter > 0) {
-						gc.setLineStyle(SWT.LINE_SOLID);
-						gc.drawLine(devXUnitTick, devYBottom, devXUnitTick, devYBottom + 5);
+
+					final int devXUnitCenter = Math.max(0, (((int) devUnitWidth - devUnitValueWidth) / 2));
+					final int devX = devXUnitTick + devXUnitCenter;
+
+					if (devX <= devXLastUnitRightPosition) {
+
+						/**
+						 * !!! skipping is not implemented correctly because it's a bigger task to
+						 * implement it !!!
+						 */
+
+						// skip unit when it overlaps the previous unit
+
+						continue;
 					}
 
+					gc.drawText(unit.valueLabel, devX, devYBottom + 7, true);
+
+					devXLastUnitRightPosition = devX + devUnitValueWidth + 0;
+
+				} else {
+
 					/*
-					 * draw unit value
+					 * draw unit value in the MIDDLE of the unit tick
 					 */
-					final int unitValueExtendX = gc.textExtent(unit.valueLabel).x;
-					if (devUnitWidth != 0 && xUnitTextPos == ChartDrawingData.X_UNIT_TEXT_POS_CENTER) {
 
-						// draw the unit value BETWEEN two units
+					final int devUnitValueWidth2 = devUnitValueWidth / 2;
+					int devXUnitValueDefaultPosition = devXUnitTick - devUnitValueWidth2;
 
-						final int devXUnitCenter = Math.max(0, (((int) devUnitWidth - unitValueExtendX) / 2));
-						final int devX = devXUnitTick + devXUnitCenter;
+					if (isFirstUnit) {
 
-						if (devX <= devXChartUnitEnd) {
+						isFirstUnit = false;
 
-							/**
-							 * !!! skipping is not implemented correctly because it's a bigger task
-							 * to implement it !!!
-							 */
-
-							// skip unit when it overlaps the previous unit
-
-							continue;
+						/*
+						 * this is the first unit, do not center it on the unit tick, because it
+						 * would be clipped on the left border
+						 */
+						int devXUnit = devXUnitValueDefaultPosition;
+						if (devXUnit < 0) {
+							devXUnit = 0;
 						}
 
-						gc.drawText(unit.valueLabel, devX, devYBottom + 7, true);
+						gc.drawText(unit.valueLabel, devXUnit, devYBottom + 7, true);
 
-						devXChartUnitEnd = devX + unitValueExtendX + 0;
+						// draw unit label (km, mi, h)
+
+						final int devXUnitLabel = devXUnit + devUnitValueWidth + 2;
+
+						gc.drawText(unitLabel,//
+								devXUnitLabel,
+								devYBottom + 7,
+								true);
+
+						devXLastUnitRightPosition = devXUnitLabel + devUnitLabelWidth + 2;
 
 					} else {
 
-						// draw the unit value in the MIDDLE of the unit tick
+						// subsequent units
 
-						/*
-						 * when the chart is zoomed and not scrolled, prevent to clip the text at
-						 * the left border
-						 */
-						final int unitValueExtend2 = unitValueExtendX / 2;
-						if (unitCounter == 0 || devXUnitTick >= 0) {
+						if (devXUnitValueDefaultPosition >= 0) {
 
-							if (unitCounter == 0) {
+							/*
+							 * check if the unit value would be clipped at the right border, move it
+							 * to the left to make it fully visible
+							 */
+							if ((devXUnitTick + devUnitValueWidth2) > devVisibleChartWidth) {
 
-								/*
-								 * this is the first unit, do not center it otherwise it would be
-								 * clipped on the left border
-								 */
+								devXUnitValueDefaultPosition = devVisibleChartWidth - devUnitValueWidth;
 
-								if (devXUnitTick == 0) {
-
-									gc.drawText(unit.valueLabel, devXUnitTick, devYBottom + 7, true);
-
-									// draw unit label (km, mi, h)
-									if (isUnitLabelPrinted == false) {
-										isUnitLabelPrinted = true;
-										gc.drawText(unitLabel,//
-												devXUnitTick + unitValueExtendX + 2,
-												devYBottom + 7,
-												true);
-									}
-
-									devXFirstUnitRightPos = devXUnitTick + unitValueExtendX + 2 + unitLabelExtendX + 2;
-								}
-
-							} else {
-
-								// center the unit text
-
-								int devXUnitValue = devXUnitTick - unitValueExtend2;
-								if (devXUnitValue >= 0) {
-
-									if ((devXUnitTick + unitValueExtend2) > devVisibleChartWidth) {
-
-										/*
-										 * unit value would be clipped at the chart border, move it
-										 * to the left to make it fully visible
-										 */
-
-										devXUnitValue = devVisibleChartWidth - unitValueExtendX;
-
-										// check if the unit value is overlapping the previous unit value
-										if (devXUnitValue <= devXLastUnitRightPos + -1) {
-											break;
-										}
-									}
-
-									// check if the unit value will overlap the first unit value
-									if (devXUnitValue <= devXFirstUnitRightPos) {
-										continue;
-									}
-
-									gc.drawText(unit.valueLabel, devXUnitValue, devYBottom + 7, true);
-
-//									gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-//									gc.fillRectangle(devXUnitValue, devYBottom + 7, unitValueExtendX, 10);
-
-									// draw unit label (km, mi, h) for the first unit
-									if (isUnitLabelPrinted == false) {
-
-										isUnitLabelPrinted = true;
-
-										gc.drawText(unitLabel,//
-												devXUnitTick + unitValueExtend2 + 2,
-												devYBottom + 7,
-												true);
-
-										devXFirstUnitRightPos = devXUnitTick
-												+ unitValueExtendX
-												+ 2
-												+ unitLabelExtendX
-												+ 2;
-									}
-
-									devXLastUnitRightPos = devXUnitValue + unitValueExtendX;
+								// check if the unit value is overlapping the previous unit value
+								if (devXUnitValueDefaultPosition <= devXLastUnitRightPosition + 2) {
+									break;
 								}
 							}
+
+							if (devXUnitValueDefaultPosition <= devXLastUnitRightPosition) {
+								continue;
+							}
+
+							gc.drawText(unit.valueLabel, devXUnitValueDefaultPosition, devYBottom + 7, true);
+
+							devXLastUnitRightPosition = devXUnitValueDefaultPosition + devUnitValueWidth + 2;
 						}
 					}
-				}
-
-				// draw the vertical gridline
-				if (unitCounter > 0) {
-
-					gc.setForeground(_gridColor);
-					gc.drawLine(devXUnitTick, devYBottom, devXUnitTick, devYBottom - drawingData.devGraphHeight);
 				}
 			}
 
@@ -2565,6 +2543,8 @@ public class ChartComponentGraph extends Canvas {
 				devBarWidthPositioned = devBarWidth - 1;
 			}
 
+			int devXPosNextBar = 0;
+
 			// loop: all values in the current serie
 			for (int valueIndex = 0; valueIndex < valueLength; valueIndex++) {
 
@@ -2614,7 +2594,26 @@ public class ChartComponentGraph extends Canvas {
 					devYPos = devYTop + ((int) ((valueYLow - graphYBottom) * scaleY) + devYPreviousHeight);
 				}
 
-				final Rectangle barShape = new Rectangle(devXPos, devYPos, devBarWidthPositioned, devBarHeight);
+				int devXPosShape = devXPos;
+				int devBarWidthShape = devBarWidthPositioned;
+
+				/*
+				 * make sure the bars do not overlap
+				 */
+				if (devXPosNextBar > 0) {
+					if (devXPos < devXPosNextBar) {
+
+						// bars do overlap
+
+						final int devDiff = devXPosNextBar - devXPos;
+
+						devXPosShape = devXPos + devDiff;
+						devBarWidthShape = devBarWidthPositioned - devDiff;
+					}
+				}
+				devXPosNextBar = devXPos + devBarWidthPositioned;
+
+				final Rectangle barShape = new Rectangle(devXPosShape, devYPos, devBarWidthShape, devBarHeight);
 
 				final int colorIndex = colorsIndex[serieIndex][valueIndex];
 				final RGB rgbBrightDef = rgbBright[colorIndex];
@@ -2646,9 +2645,9 @@ public class ChartComponentGraph extends Canvas {
 
 				barRecangles[serieIndex][valueIndex] = barShape;
 				barFocusRecangles[serieIndex][valueIndex] = new Rectangle(//
-						devXPos - 2,
+						devXPosShape - 2,
 						(devYPos - 2),
-						devBarWidthPositioned + 4,
+						devBarWidthShape + 4,
 						(devBarHeight + 7));
 
 				// keep the height for the bar
@@ -3723,7 +3722,7 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private Color getColor(final RGB rgb) {
 
-// this is a performance bottleneck
+// !!! this is a performance bottleneck !!!
 //		final String colorKey = rgb.toString();
 
 		final String colorKey = Integer.toString(rgb.hashCode());
@@ -4833,9 +4832,9 @@ public class ChartComponentGraph extends Canvas {
 			// mouse mode: move slider
 
 			if (event.count < 0) {
-				event.keyCode = SWT.ARROW_RIGHT;
-			} else {
 				event.keyCode = SWT.ARROW_LEFT;
+			} else {
+				event.keyCode = SWT.ARROW_RIGHT;
 			}
 
 			/*

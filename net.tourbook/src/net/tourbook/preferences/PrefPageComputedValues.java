@@ -52,7 +52,9 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.ui.dialogs.PreferenceLinkArea;
 import org.eclipse.ui.part.PageBook;
+import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
 public class PrefPageComputedValues extends PreferencePage implements IWorkbenchPreferencePage {
 
@@ -219,6 +221,10 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 				tabBreakTime.setControl(createUI50BreakTime(_tabFolder));
 				tabBreakTime.setText(Messages.Compute_BreakTime_Group_BreakTime);
 
+				final TabItem tabHrZone = new TabItem(_tabFolder, SWT.NONE);
+				tabHrZone.setControl(createUI60HrZone(_tabFolder));
+				tabHrZone.setText(Messages.Compute_HrZone_Group);
+
 				/**
 				 * 4.8.2009 week no/year is currently disabled because a new field in the db is
 				 * required which holds the year of the week<br>
@@ -296,6 +302,17 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.swtDefaults().extendedMargins(5, 5, 10, 5).numColumns(3).applyTo(container);
 		{
+			final Composite containerTitle = new Composite(container, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(containerTitle);
+			GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 0, 10).numColumns(1).applyTo(containerTitle);
+			{
+				/*
+				 * label: compute break time by
+				 */
+				final Label label = new Label(containerTitle, SWT.NONE);
+				label.setText(Messages.Compute_TourValueSpeed_Title);
+			}
+
 			// label: min alti diff
 			Label label = new Label(container, SWT.NONE);
 			label.setText(Messages.compute_tourValueSpeed_label_speedTimeSlice);
@@ -370,6 +387,17 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 		{
+			final Composite containerTitle = new Composite(container, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(containerTitle);
+			GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 0, 10).numColumns(1).applyTo(containerTitle);
+			{
+				/*
+				 * label: compute break time by
+				 */
+				final Label label = new Label(containerTitle, SWT.NONE);
+				label.setText(Messages.Compute_BreakTime_Label_Title);
+			}
+
 			/*
 			 * label: compute break time by
 			 */
@@ -658,6 +686,29 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 					.grab(true, false)
 					.applyTo(label);
 			label.setText(Messages.Compute_BreakTime_Label_Description_ComputeByAvgSpeed);
+		}
+
+		return container;
+	}
+
+	private Control createUI60HrZone(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.swtDefaults().extendedMargins(5, 5, 10, 5).numColumns(1).applyTo(container);
+		{
+			final PreferenceLinkArea prefLink = new PreferenceLinkArea(
+					container,
+					SWT.NONE,
+					PrefPagePeople.ID,
+					Messages.Compute_HrZone_Link,
+					(IWorkbenchPreferenceContainer) getContainer(),
+					new PrefPagePeopleData(PrefPagePeople.PREF_DATA_SELECT_HR_ZONES, null));
+
+			GridDataFactory.fillDefaults()//
+					.grab(true, false)
+					.hint(350, SWT.DEFAULT)
+					.applyTo(prefLink.getControl());
 		}
 
 		return container;

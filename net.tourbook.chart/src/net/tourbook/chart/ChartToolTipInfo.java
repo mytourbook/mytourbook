@@ -1,58 +1,58 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.chart;
 
 public class ChartToolTipInfo {
 
-	private String	title;
-	private String	label;
+	private String	_title;
+	private String	_label;
 
-	private boolean	fIsDisplayed	= false;
-	private boolean	fIsReposition	= false;
+	private boolean	_isDisplayed	= false;
+	private boolean	_isReposition	= false;
 
 	public String getLabel() {
-		return label;
+		return _label;
 	}
 
 	public String getTitle() {
-		return title;
+		return _title;
 	}
 
 	boolean isDisplayed() {
-		return fIsDisplayed;
+		return _isDisplayed;
 	}
 
 	boolean isReposition() {
-		return fIsReposition;
+		return _isReposition;
 	}
 
-	public void setIsDisplayed(boolean isDisplayed) {
-		fIsDisplayed = isDisplayed;
+	public void setIsDisplayed(final boolean isDisplayed) {
+		_isDisplayed = isDisplayed;
 	}
 
-	public void setLabel(String label) {
-		this.label = label;
+	public void setLabel(final String label) {
+		this._label = label;
 	}
 
-	public void setTitle(String title) {
-		this.title = title;
+	public void setReposition(final boolean isReposition) {
+		_isReposition = isReposition;
 	}
 
-	public void setReposition(boolean isReposition) {
-		fIsReposition = isReposition;
+	public void setTitle(final String title) {
+		this._title = title;
 	}
 
 }

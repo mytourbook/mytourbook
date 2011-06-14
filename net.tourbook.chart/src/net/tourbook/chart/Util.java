@@ -177,6 +177,7 @@ public class Util {
 
 		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE:
 		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H:
+
 			valueText = new Formatter().format(
 					Messages.Format_time_hhmm,
 					(long) (value / 3600),

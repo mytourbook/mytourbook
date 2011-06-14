@@ -1928,7 +1928,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			getBreakTime();
 		}
 
-		final int zoneSize = zoneMinMaxBpm.zoneMinValues.length;
+		final int zoneSize = zoneMinMaxBpm.zoneMinBmp.length;
 		final int[] hrZones = new int[zoneSize];
 		int prevTime = 0;
 
@@ -1941,6 +1941,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			final int timeDiff = time - prevTime;
 			prevTime = time;
 
+			// check if a break occured, break time is ignored
 			if (breakTimeSerie != null) {
 
 				/*
@@ -1956,10 +1957,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 			for (int zoneIndex = 0; zoneIndex < zoneSize; zoneIndex++) {
 
-				final int minValue = zoneMinMaxBpm.zoneMinValues[zoneIndex];
-				final int maxValue = zoneMinMaxBpm.zoneMaxValues[zoneIndex];
+				final int minValue = zoneMinMaxBpm.zoneMinBmp[zoneIndex];
+				final int maxValue = zoneMinMaxBpm.zoneMaxBmp[zoneIndex];
 
-				if (pulse >= minValue && pulse < maxValue) {
+				if (pulse >= minValue && pulse <= maxValue) {
 					hrZones[zoneIndex] += timeDiff;
 					break;
 				}

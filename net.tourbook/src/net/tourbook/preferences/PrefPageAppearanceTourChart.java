@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -43,6 +43,8 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -53,6 +55,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
@@ -64,9 +67,12 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 	private static final int		DEFAULT_FIELD_WIDTH	= 40;
 
-	private HashMap<Integer, Graph>	fGraphMap;
-	private ArrayList<Graph>		fGraphList;
-	private ArrayList<Graph>		fViewerGraphs;
+	private final IPreferenceStore	_prefStore			= TourbookPlugin.getDefault()//
+																.getPreferenceStore();
+
+	private HashMap<Integer, Graph>	_graphMap;
+	private ArrayList<Graph>		_graphList;
+	private ArrayList<Graph>		_viewerGraphs;
 
 	/*
 	 * UI controls
@@ -91,8 +97,8 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	private BooleanFieldEditor		_editGradientMinCheckbox;
 	private IntegerFieldEditor		_editGradientMinEditor;
 
-	private IntegerFieldEditor		_editGridVerticalDistance;
-	private IntegerFieldEditor		_editGridHorizontalDistance;
+	private Spinner					_spinnerVerticalDistance;
+	private Spinner					_spinnerHorizontalDistance;
 
 	private Button					_rdoZoomFeatures;
 	private Button					_rdoSliderFeatures;
@@ -114,20 +120,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 		initializeGraphs();
 
-		final TabFolder tabFolder = new TabFolder(parent, SWT.NONE);
-		tabFolder.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-
-		final TabItem tabVisibleGraphs = new TabItem(tabFolder, SWT.NONE);
-		tabVisibleGraphs.setText(Messages.Pref_Graphs_Tab_graph_defaults);
-		tabVisibleGraphs.setControl(createUITabGraphs(tabFolder));
-
-		final TabItem tabMinimumValues = new TabItem(tabFolder, SWT.NONE);
-		tabMinimumValues.setText(Messages.Pref_Graphs_Tab_default_values);
-		tabMinimumValues.setControl(createUITabMinMaxValues(tabFolder));
-
-		final TabItem tabZoom = new TabItem(tabFolder, SWT.NONE);
-		tabZoom.setText(Messages.Pref_Graphs_Tab_zoom_options);
-		tabZoom.setControl(createUITabOptions(tabFolder));
+		final TabFolder tabFolder = createUI(parent);
 
 		enableActions();
 
@@ -144,7 +137,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 			public void dispose() {}
 
 			public Object[] getElements(final Object inputElement) {
-				return fViewerGraphs.toArray();
+				return _viewerGraphs.toArray();
 			}
 
 			public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
@@ -187,7 +180,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 		// check all graphs which are defined in the prefs
 		final ArrayList<Graph> checkedGraphs = new ArrayList<Graph>();
-		for (final Graph graph : fViewerGraphs) {
+		for (final Graph graph : _viewerGraphs) {
 			final int graphId = graph.__graphId;
 			for (final String prefId : prefVisibleIds) {
 				if (graphId == Integer.parseInt(prefId)) {
@@ -210,26 +203,59 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		final String[] allGraphIds = StringToArrayConverter.convertStringToArray(//
 				getPreferenceStore().getString(ITourbookPreferences.GRAPH_ALL));
 
-		fViewerGraphs = new ArrayList<Graph>();
+		_viewerGraphs = new ArrayList<Graph>();
 
 		// put all graphs in the viewer which are defined in the prefs
 		for (final String allGraphId : allGraphIds) {
 			final int graphId = Integer.parseInt(allGraphId);
-			if (fGraphMap.containsKey(graphId)) {
-				fViewerGraphs.add(fGraphMap.get(graphId));
+			if (_graphMap.containsKey(graphId)) {
+				_viewerGraphs.add(_graphMap.get(graphId));
 			}
 		}
 
 		// make sure that all available graphs are in the viewer
-		for (final Graph graph : fGraphList) {
-			if (!fViewerGraphs.contains(graph)) {
-				fViewerGraphs.add(graph);
+		for (final Graph graph : _graphList) {
+			if (!_viewerGraphs.contains(graph)) {
+				_viewerGraphs.add(graph);
 			}
 		}
 
 	}
 
-	private void createUIGraphs(final Composite parent) {
+	private TabFolder createUI(final Composite parent) {
+
+		final TabFolder tabFolder = new TabFolder(parent, SWT.NONE);
+		tabFolder.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		{
+			final TabItem tabVisibleGraphs = new TabItem(tabFolder, SWT.NONE);
+			tabVisibleGraphs.setText(Messages.Pref_Graphs_Tab_graph_defaults);
+			tabVisibleGraphs.setControl(createUI10TabGraphs(tabFolder));
+
+			final TabItem tabMinimumValues = new TabItem(tabFolder, SWT.NONE);
+			tabMinimumValues.setText(Messages.Pref_Graphs_Tab_default_values);
+			tabMinimumValues.setControl(createUI50TabMinMaxValues(tabFolder));
+
+			final TabItem tabZoom = new TabItem(tabFolder, SWT.NONE);
+			tabZoom.setText(Messages.Pref_Graphs_Tab_zoom_options);
+			tabZoom.setControl(createUI80TabOptions(tabFolder));
+		}
+
+		return tabFolder;
+	}
+
+	private Control createUI10TabGraphs(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridLayoutFactory.swtDefaults().applyTo(container);
+
+		createUI12Graphs(container);
+		createUI14XAxisUnits(container);
+		createUI16Grid(container);
+
+		return container;
+	}
+
+	private void createUI12Graphs(final Composite parent) {
 
 		// group: units for the x-axis
 		final Group group = new Group(parent, SWT.NONE);
@@ -295,48 +321,114 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		enableUpDownButtons();
 	}
 
+	private void createUI14XAxisUnits(final Composite container) {
+
+		GridData gd;
+
+		// group: units for the x-axis
+		final Group group = new Group(container, SWT.NONE);
+		group.setText(Messages.Pref_Graphs_Group_units_for_xaxis);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
+		GridLayoutFactory.swtDefaults().applyTo(group);
+
+		// radio: distance
+		_rdoShowDistance = new Button(group, SWT.RADIO);
+		_rdoShowDistance.setText(Messages.Pref_Graphs_Radio_show_distance);
+		_rdoShowDistance.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent event) {
+				enableActions();
+			}
+		});
+
+		// radio: time
+		_rdoShowTime = new Button(group, SWT.RADIO);
+		_rdoShowTime.setText(Messages.Pref_Graphs_Radio_show_time);
+
+		_chkShowStartTime = new Button(group, SWT.CHECK);
+		_chkShowStartTime.setText(Messages.Pref_Graphs_Check_show_start_time);
+		gd = new GridData();
+		gd.horizontalIndent = UI.FORM_FIRST_COLUMN_INDENT;
+		_chkShowStartTime.setLayoutData(gd);
+
+		// initialize the radio button
+		if (getPreferenceStore().getString(ITourbookPreferences.GRAPH_X_AXIS).equals(TourManager.X_AXIS_TIME)) {
+			_rdoShowTime.setSelection(true);
+		} else {
+			_rdoShowDistance.setSelection(true);
+		}
+
+		// checkbox: starttime
+		_chkShowStartTime.setSelection(getPreferenceStore().getBoolean(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME));
+	}
+
 	/**
 	 * group: grid
 	 */
-	private void createUIGrid(final Composite container) {
+	private void createUI16Grid(final Composite container) {
 
-		final Group groupGrid = new Group(container, SWT.NONE);
-		groupGrid.setText(Messages.Pref_Graphs_grid_distance);
-		GridDataFactory.fillDefaults().indent(0, 0).applyTo(groupGrid);
+		final MouseWheelListener mouseWheelListener = new MouseWheelListener() {
+			public void mouseScrolled(final MouseEvent event) {
+				UI.adjustSpinnerValueOnMouseScroll(event);
+			}
+		};
 
-		/*
-		 * editor: grid vertical distance
-		 */
-		_editGridVerticalDistance = new IntegerFieldEditor(
-				ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE,
-				Messages.Pref_Graphs_grid_vertical_distance,
-				groupGrid);
-		_editGridVerticalDistance.setPreferenceStore(getPreferenceStore());
-		_editGridVerticalDistance.setPage(this);
-		_editGridVerticalDistance.setValidRange(10, 100);
-		_editGridVerticalDistance.load();
-		UI.setFieldWidth(groupGrid, _editGridVerticalDistance, DEFAULT_FIELD_WIDTH);
+		final Group group = new Group(container, SWT.NONE);
+		group.setText(Messages.Pref_Graphs_grid_distance);
+		GridDataFactory.fillDefaults()//
+//				.indent(0, 0)
+				.applyTo(group);
+		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
+		{
+			/*
+			 * label: vertical
+			 */
+			Label label = new Label(group, SWT.NONE);
+			GridDataFactory.fillDefaults().applyTo(label);
+			label.setText(Messages.Pref_Graphs_grid_vertical_distance);
 
-		/*
-		 * editor: grid horizontal distance
-		 */
-		_editGridHorizontalDistance = new IntegerFieldEditor(
-				ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE,
-				Messages.Pref_Graphs_grid_horizontal_distance,
-				groupGrid);
-		_editGridHorizontalDistance.setPreferenceStore(getPreferenceStore());
-		_editGridHorizontalDistance.setPage(this);
-		_editGridHorizontalDistance.setValidRange(20, 200);
-		_editGridHorizontalDistance.load();
-		UI.setFieldWidth(groupGrid, _editGridHorizontalDistance, DEFAULT_FIELD_WIDTH);
+			/*
+			 * spinner: vertical
+			 */
+			_spinnerVerticalDistance = new Spinner(group, SWT.BORDER);
+			GridDataFactory.fillDefaults() //
+					.align(SWT.BEGINNING, SWT.FILL)
+					.applyTo(_spinnerVerticalDistance);
+			_spinnerVerticalDistance.setMinimum(10);
+			_spinnerVerticalDistance.setMaximum(200);
+			_spinnerVerticalDistance.addMouseWheelListener(mouseWheelListener);
 
-		GridLayoutFactory.swtDefaults()//
-				.margins(5, 5)
-				.numColumns(2)
-				.applyTo(groupGrid);
+			/*
+			 * label: vertical
+			 */
+			label = new Label(group, SWT.NONE);
+			GridDataFactory.fillDefaults().applyTo(label);
+			label.setText(Messages.Pref_Graphs_grid_horizontal_distance);
+
+			/*
+			 * spinner: horizontal
+			 */
+			_spinnerHorizontalDistance = new Spinner(group, SWT.BORDER);
+			GridDataFactory.fillDefaults() //
+					.align(SWT.BEGINNING, SWT.FILL)
+					.applyTo(_spinnerHorizontalDistance);
+			_spinnerHorizontalDistance.setMinimum(10);
+			_spinnerHorizontalDistance.setMaximum(200);
+			_spinnerHorizontalDistance.addMouseWheelListener(mouseWheelListener);
+		}
 	}
 
-	private void createUIMinMaxValue(final Composite container) {
+	private Control createUI50TabMinMaxValues(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridLayoutFactory.swtDefaults().applyTo(container);
+
+		createUI52MinMaxValue(container);
+
+		return container;
+	}
+
+	private void createUI52MinMaxValue(final Composite container) {
 
 		final IPreferenceStore prefStore = getPreferenceStore();
 		GridData gd;
@@ -504,113 +596,52 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		GridLayoutFactory.swtDefaults().margins(5, 5).numColumns(3).applyTo(groupMinValue);
 	}
 
-	private void createUIMouseMode(final Composite container) {
+	private Control createUI80TabOptions(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridLayoutFactory.swtDefaults().applyTo(container);
+		{
+			createUI82MouseMode(container);
+			createUI84ZoomOptions(container);
+		}
+
+		return container;
+	}
+
+	private void createUI82MouseMode(final Composite container) {
 
 		final Group group = new Group(container, SWT.NONE);
 		group.setText(Messages.Pref_Graphs_Group_mouse_mode);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
 		GridLayoutFactory.swtDefaults().applyTo(group);
+		{
+			// radio: zoom features
+			_rdoZoomFeatures = new Button(group, SWT.RADIO);
+			_rdoZoomFeatures.setText(Messages.Pref_Graphs_Radio_mouse_mode_zoom);
+			_rdoZoomFeatures.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent event) {
+					enableActions();
+				}
+			});
 
-		// radio: zoom features
-		_rdoZoomFeatures = new Button(group, SWT.RADIO);
-		_rdoZoomFeatures.setText(Messages.Pref_Graphs_Radio_mouse_mode_zoom);
-		_rdoZoomFeatures.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent event) {
-				enableActions();
+			// radio: slider features
+			_rdoSliderFeatures = new Button(group, SWT.RADIO);
+			_rdoSliderFeatures.setText(Messages.Pref_Graphs_Radio_mouse_mode_slider);
+
+			// initialize the radio button
+			if (getPreferenceStore().getString(ITourbookPreferences.GRAPH_MOUSE_MODE).equals(Chart.MOUSE_MODE_SLIDER)) {
+				_rdoSliderFeatures.setSelection(true);
+			} else {
+				_rdoZoomFeatures.setSelection(true);
 			}
-		});
-
-		// radio: slider features
-		_rdoSliderFeatures = new Button(group, SWT.RADIO);
-		_rdoSliderFeatures.setText(Messages.Pref_Graphs_Radio_mouse_mode_slider);
-
-		// initialize the radio button
-		if (getPreferenceStore().getString(ITourbookPreferences.GRAPH_MOUSE_MODE).equals(Chart.MOUSE_MODE_SLIDER)) {
-			_rdoSliderFeatures.setSelection(true);
-		} else {
-			_rdoZoomFeatures.setSelection(true);
 		}
-	}
-
-	private Control createUITabGraphs(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.swtDefaults().applyTo(container);
-
-		createUIGraphs(container);
-		createUIXAxisUnits(container);
-		createUIGrid(container);
-
-		return container;
-	}
-
-	private Control createUITabMinMaxValues(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.swtDefaults().applyTo(container);
-
-		createUIMinMaxValue(container);
-
-		return container;
-	}
-
-	private Control createUITabOptions(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.swtDefaults().applyTo(container);
-
-		createUIMouseMode(container);
-		createUIZoomOptions(container);
-
-		return container;
-	}
-
-	private void createUIXAxisUnits(final Composite container) {
-
-		GridData gd;
-
-		// group: units for the x-axis
-		final Group group = new Group(container, SWT.NONE);
-		group.setText(Messages.Pref_Graphs_Group_units_for_xaxis);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
-		GridLayoutFactory.swtDefaults().applyTo(group);
-
-		// radio: distance
-		_rdoShowDistance = new Button(group, SWT.RADIO);
-		_rdoShowDistance.setText(Messages.Pref_Graphs_Radio_show_distance);
-		_rdoShowDistance.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent event) {
-				enableActions();
-			}
-		});
-
-		// radio: time
-		_rdoShowTime = new Button(group, SWT.RADIO);
-		_rdoShowTime.setText(Messages.Pref_Graphs_Radio_show_time);
-
-		_chkShowStartTime = new Button(group, SWT.CHECK);
-		_chkShowStartTime.setText(Messages.Pref_Graphs_Check_show_start_time);
-		gd = new GridData();
-		gd.horizontalIndent = UI.FORM_FIRST_COLUMN_INDENT;
-		_chkShowStartTime.setLayoutData(gd);
-
-		// initialize the radio button
-		if (getPreferenceStore().getString(ITourbookPreferences.GRAPH_X_AXIS).equals(TourManager.X_AXIS_TIME)) {
-			_rdoShowTime.setSelection(true);
-		} else {
-			_rdoShowDistance.setSelection(true);
-		}
-
-		// checkbox: starttime
-		_chkShowStartTime.setSelection(getPreferenceStore().getBoolean(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME));
 	}
 
 	/**
 	 * group: zoom options
 	 */
-	private void createUIZoomOptions(final Composite container) {
+	private void createUI84ZoomOptions(final Composite container) {
 
 		final IPreferenceStore prefStore = getPreferenceStore();
 
@@ -618,17 +649,18 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		groupZoomOptions.setText(Messages.Pref_Graphs_Group_zoom_options);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(groupZoomOptions);
 		GridLayoutFactory.swtDefaults().applyTo(groupZoomOptions);
+		{
+			// checkbox: auto zoom to moved slider
+			_chkZoomToSlider = new Button(groupZoomOptions, SWT.CHECK);
+			_chkZoomToSlider.setText(Messages.Pref_Graphs_Check_autozoom);
+			_chkZoomToSlider.setSelection(prefStore.getBoolean(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER));
 
-		// checkbox: auto zoom to moved slider
-		_chkZoomToSlider = new Button(groupZoomOptions, SWT.CHECK);
-		_chkZoomToSlider.setText(Messages.Pref_Graphs_Check_autozoom);
-		_chkZoomToSlider.setSelection(prefStore.getBoolean(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER));
-
-		// checkbox: move sliders to border when zoomed
-		_chkMoveSlidersWhenZoomed = new Button(groupZoomOptions, SWT.CHECK);
-		_chkMoveSlidersWhenZoomed.setText(Messages.Pref_Graphs_move_sliders_when_zoomed);
-		_chkMoveSlidersWhenZoomed.setSelection(prefStore
-				.getBoolean(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED));
+			// checkbox: move sliders to border when zoomed
+			_chkMoveSlidersWhenZoomed = new Button(groupZoomOptions, SWT.CHECK);
+			_chkMoveSlidersWhenZoomed.setText(Messages.Pref_Graphs_move_sliders_when_zoomed);
+			_chkMoveSlidersWhenZoomed.setSelection(prefStore
+					.getBoolean(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED));
+		}
 	}
 
 	private void enableActions() {
@@ -660,41 +692,42 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
 	 */
 	public void init(final IWorkbench workbench) {
-		setPreferenceStore(TourbookPlugin.getDefault().getPreferenceStore());
+		setPreferenceStore(_prefStore);
 	}
 
 	private void initializeGraphs() {
-		// create a map with all available graphs
-		fGraphMap = new HashMap<Integer, Graph>();
-		fGraphMap.put(TourManager.GRAPH_ALTITUDE, new Graph(TourManager.GRAPH_ALTITUDE, Messages.Graph_Label_Altitude));
-		fGraphMap.put(TourManager.GRAPH_SPEED, new Graph(TourManager.GRAPH_SPEED, Messages.Graph_Label_Speed));
-		fGraphMap.put(TourManager.GRAPH_PACE, new Graph(TourManager.GRAPH_PACE, Messages.Graph_Label_Pace));
-		fGraphMap.put(TourManager.GRAPH_POWER, new Graph(TourManager.GRAPH_POWER, Messages.Graph_Label_Power));
-		fGraphMap.put(TourManager.GRAPH_PULSE, new Graph(TourManager.GRAPH_PULSE, Messages.Graph_Label_Heartbeat));
 
-		fGraphMap.put(TourManager.GRAPH_TEMPERATURE, //
+		// create a map with all available graphs
+		_graphMap = new HashMap<Integer, Graph>();
+		_graphMap.put(TourManager.GRAPH_ALTITUDE, new Graph(TourManager.GRAPH_ALTITUDE, Messages.Graph_Label_Altitude));
+		_graphMap.put(TourManager.GRAPH_SPEED, new Graph(TourManager.GRAPH_SPEED, Messages.Graph_Label_Speed));
+		_graphMap.put(TourManager.GRAPH_PACE, new Graph(TourManager.GRAPH_PACE, Messages.Graph_Label_Pace));
+		_graphMap.put(TourManager.GRAPH_POWER, new Graph(TourManager.GRAPH_POWER, Messages.Graph_Label_Power));
+		_graphMap.put(TourManager.GRAPH_PULSE, new Graph(TourManager.GRAPH_PULSE, Messages.Graph_Label_Heartbeat));
+
+		_graphMap.put(TourManager.GRAPH_TEMPERATURE, //
 				new Graph(TourManager.GRAPH_TEMPERATURE, Messages.Graph_Label_Temperature));
 
-		fGraphMap.put(TourManager.GRAPH_CADENCE, //
+		_graphMap.put(TourManager.GRAPH_CADENCE, //
 				new Graph(TourManager.GRAPH_CADENCE, Messages.Graph_Label_Cadence));
 
-		fGraphMap.put(TourManager.GRAPH_ALTIMETER, //
+		_graphMap.put(TourManager.GRAPH_ALTIMETER, //
 				new Graph(TourManager.GRAPH_ALTIMETER, Messages.Graph_Label_Altimeter));
 
-		fGraphMap.put(TourManager.GRAPH_GRADIENT, //
+		_graphMap.put(TourManager.GRAPH_GRADIENT, //
 				new Graph(TourManager.GRAPH_GRADIENT, Messages.Graph_Label_Gradient));
 
 		// create a list with all available graphs
-		fGraphList = new ArrayList<Graph>();
-		fGraphList.add(fGraphMap.get(TourManager.GRAPH_ALTITUDE));
-		fGraphList.add(fGraphMap.get(TourManager.GRAPH_SPEED));
-		fGraphList.add(fGraphMap.get(TourManager.GRAPH_PACE));
-		fGraphList.add(fGraphMap.get(TourManager.GRAPH_POWER));
-		fGraphList.add(fGraphMap.get(TourManager.GRAPH_PULSE));
-		fGraphList.add(fGraphMap.get(TourManager.GRAPH_TEMPERATURE));
-		fGraphList.add(fGraphMap.get(TourManager.GRAPH_CADENCE));
-		fGraphList.add(fGraphMap.get(TourManager.GRAPH_ALTIMETER));
-		fGraphList.add(fGraphMap.get(TourManager.GRAPH_GRADIENT));
+		_graphList = new ArrayList<Graph>();
+		_graphList.add(_graphMap.get(TourManager.GRAPH_ALTITUDE));
+		_graphList.add(_graphMap.get(TourManager.GRAPH_SPEED));
+		_graphList.add(_graphMap.get(TourManager.GRAPH_PACE));
+		_graphList.add(_graphMap.get(TourManager.GRAPH_POWER));
+		_graphList.add(_graphMap.get(TourManager.GRAPH_PULSE));
+		_graphList.add(_graphMap.get(TourManager.GRAPH_TEMPERATURE));
+		_graphList.add(_graphMap.get(TourManager.GRAPH_CADENCE));
+		_graphList.add(_graphMap.get(TourManager.GRAPH_ALTIMETER));
+		_graphList.add(_graphMap.get(TourManager.GRAPH_GRADIENT));
 	}
 
 	/**
@@ -749,8 +782,10 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	@Override
 	protected void performDefaults() {
 
-		_editGridHorizontalDistance.loadDefault();
-		_editGridVerticalDistance.loadDefault();
+		_spinnerHorizontalDistance.setSelection(//
+				_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE));
+		_spinnerVerticalDistance.setSelection(//
+				_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
 
 		super.performDefaults();
 	}
@@ -763,29 +798,31 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 		saveGraphs();
 
-		final IPreferenceStore prefStore = getPreferenceStore();
-
 		if (_rdoShowTime.getSelection()) {
-			prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS, TourManager.X_AXIS_TIME);
+			_prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS, TourManager.X_AXIS_TIME);
 		} else {
-			prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS, TourManager.X_AXIS_DISTANCE);
+			_prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS, TourManager.X_AXIS_DISTANCE);
 		}
 
 		if (_rdoSliderFeatures.getSelection()) {
-			prefStore.setValue(ITourbookPreferences.GRAPH_MOUSE_MODE, Chart.MOUSE_MODE_SLIDER);
+			_prefStore.setValue(ITourbookPreferences.GRAPH_MOUSE_MODE, Chart.MOUSE_MODE_SLIDER);
 		} else {
-			prefStore.setValue(ITourbookPreferences.GRAPH_MOUSE_MODE, Chart.MOUSE_MODE_ZOOM);
+			_prefStore.setValue(ITourbookPreferences.GRAPH_MOUSE_MODE, Chart.MOUSE_MODE_ZOOM);
 		}
 
-		prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME, //
+		_prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME, //
 				_chkShowStartTime.getSelection());
 
-		prefStore.setValue(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER, //
+		_prefStore.setValue(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER, //
 				_chkZoomToSlider.getSelection());
 
-		prefStore.setValue(
-				ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED,
+		_prefStore.setValue(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED, //
 				_chkMoveSlidersWhenZoomed.getSelection());
+
+		_prefStore.setValue(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE, //
+				_spinnerHorizontalDistance.getSelection());
+		_prefStore.setValue(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE, //
+				_spinnerVerticalDistance.getSelection());
 
 		_editPaceMinMaxCheckbox.store();
 		_editPaceMin.store();
@@ -794,9 +831,6 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		_editAltimeterMinEditor.store();
 		_editGradientMinCheckbox.store();
 		_editGradientMinEditor.store();
-
-		_editGridHorizontalDistance.store();
-		_editGridVerticalDistance.store();
 
 		return super.performOk();
 	}

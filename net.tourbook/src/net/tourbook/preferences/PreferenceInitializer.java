@@ -135,7 +135,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
 		// graph grid distance
 		store.setDefault(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE, 30);
-		store.setDefault(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE, 80);
+		store.setDefault(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE, 65);
 
 		/*
 		 * view colors

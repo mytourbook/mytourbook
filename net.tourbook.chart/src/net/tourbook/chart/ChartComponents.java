@@ -171,7 +171,7 @@ public class ChartComponents extends Composite {
 	 * @param parent
 	 * @param style
 	 */
-	public ChartComponents(final Chart parent, final int style) {
+	ChartComponents(final Chart parent, final int style) {
 
 		super(parent, style);
 
@@ -180,10 +180,7 @@ public class ChartComponents extends Composite {
 
 		// set layout for the components
 		gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-//		gd.widthHint = CHART_MIN_WIDTH;
-//		gd.heightHint = CHART_MIN_HEIGHT;
 		setLayoutData(gd);
-//		GridDataFactory.fillDefaults().grab(true, true).applyTo(this);
 
 		// set layout for this chart
 		final GridLayout gl = new GridLayout(3, false);
@@ -192,7 +189,6 @@ public class ChartComponents extends Composite {
 		gl.marginWidth = 0;
 		gl.marginHeight = 0;
 		setLayout(gl);
-//		GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(this);
 
 		// left: create left axis canvas
 		_componentAxisLeft = new ChartComponentAxis(parent, this, SWT.NONE);
@@ -203,7 +199,6 @@ public class ChartComponents extends Composite {
 		// center: create chart canvas
 		_componentGraph = new ChartComponentGraph(parent, this, SWT.NONE);
 		gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-//		gd.widthHint = CHART_MIN_WIDTH;
 		_componentGraph.setLayoutData(gd);
 
 		// right: create right axis canvas
@@ -337,7 +332,13 @@ public class ChartComponents extends Composite {
 			int graphValue = 0;
 			int infinityLoopIndex = 0;
 
-			while (graphValue <= xMaxValue) {
+			/*
+			 * increase by one unit that the right side of the chart is drawing a unit, in some
+			 * cases this didn't occured
+			 */
+			final float maxUnitValue = xMaxValue + unitValue;
+
+			while (graphValue <= maxUnitValue) {
 
 				// create unit value/label
 				final int unitPos = graphValue - unitOffset;
@@ -373,18 +374,25 @@ public class ChartComponents extends Composite {
 		 */
 		if (_chartDataModel.getChartType() == ChartDataModel.CHART_TYPE_BAR) {
 
+			final int[] highValues = xData.getHighValues()[0];
+
 			if (xAxisUnit == ChartDataSerie.AXIS_UNIT_NUMBER || xAxisUnit == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE) {
 
-				final int barWidth = (devVirtualGraphWidth / xData.getHighValues()[0].length) / 2;
+				final int barWidth = (devVirtualGraphWidth / highValues.length) / 2;
 
 				drawingData.setBarRectangleWidth(Math.max(0, barWidth));
 				drawingData.setBarPosition(ChartDrawingData.BAR_POS_CENTER);
 
 			} else if (xAxisUnit == ChartDataSerie.X_AXIS_UNIT_NUMBER_CENTER) {
 
-				final int barWidth = (devVirtualGraphWidth / xData.getHighValues()[0].length);
+				/*
+				 * set bar width that it is wide enouth to overlap the next right bar, the
+				 * overlapped part will be removed in ChartComponentGraph.draw210BarGraph()
+				 */
+				final float barWidth = ((float) devVirtualGraphWidth / (highValues.length - 1));
+				final int barWidth2 = (int) (Math.max(1, barWidth) * 1.10);
 
-				drawingData.setBarRectangleWidth((int) (Math.max(1, barWidth) * 0.9));
+				drawingData.setBarRectangleWidth(barWidth2);
 				drawingData.setBarPosition(ChartDrawingData.BAR_POS_CENTER);
 			}
 		}
