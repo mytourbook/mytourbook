@@ -2595,25 +2595,27 @@ public class ChartComponentGraph extends Canvas {
 				}
 
 				int devXPosShape = devXPos;
-				int devBarWidthShape = devBarWidthPositioned;
+				int devShapeBarWidth = devBarWidthPositioned;
 
 				/*
 				 * make sure the bars do not overlap
 				 */
-				if (devXPosNextBar > 0) {
-					if (devXPos < devXPosNextBar) {
+				if (serieLayout != ChartDataYSerie.BAR_LAYOUT_SINGLE_SERIE) {
+					if (devXPosNextBar > 0) {
+						if (devXPos < devXPosNextBar) {
 
-						// bars do overlap
+							// bars do overlap
 
-						final int devDiff = devXPosNextBar - devXPos;
+							final int devDiff = devXPosNextBar - devXPos;
 
-						devXPosShape = devXPos + devDiff;
-						devBarWidthShape = devBarWidthPositioned - devDiff;
+							devXPosShape = devXPos + devDiff;
+							devShapeBarWidth = devBarWidthPositioned - devDiff;
+						}
 					}
 				}
 				devXPosNextBar = devXPos + devBarWidthPositioned;
 
-				final Rectangle barShape = new Rectangle(devXPosShape, devYPos, devBarWidthShape, devBarHeight);
+				final Rectangle barShape = new Rectangle(devXPosShape, devYPos, devShapeBarWidth, devBarHeight);
 
 				final int colorIndex = colorsIndex[serieIndex][valueIndex];
 				final RGB rgbBrightDef = rgbBright[colorIndex];
@@ -2647,7 +2649,7 @@ public class ChartComponentGraph extends Canvas {
 				barFocusRecangles[serieIndex][valueIndex] = new Rectangle(//
 						devXPosShape - 2,
 						(devYPos - 2),
-						devBarWidthShape + 4,
+						devShapeBarWidth + 4,
 						(devBarHeight + 7));
 
 				// keep the height for the bar

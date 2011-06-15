@@ -185,6 +185,7 @@ public class TrainingView extends ViewPart {
 	private Label[]						_lblTourMinMaxPercent;
 	private Label[]						_lblTourMinMaxHours;
 	private Label[]						_lblHRZoneName;
+	private Label[]						_lblHRZoneColor;
 
 	/*
 	 * none UI
@@ -282,9 +283,10 @@ public class TrainingView extends ViewPart {
 						|| property.equals(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE)) {
 
 					// set grid size
-					_chartHrTime.setGridDistance(
-							_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
-							_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
+					final int horizPixel = _prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE);
+					final int verticalPixel = _prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE);
+
+					_chartHrTime.setGridDistance(horizPixel, verticalPixel);
 
 					// grid has changed, update chart
 					updateUI30HrZonesFromModel();
@@ -535,9 +537,9 @@ public class TrainingView extends ViewPart {
 				.applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
-			createUI30HrZoneDataContainer(container);
 			createUI40HrZoneImage(container);
 			createUI50HrZoneChart(container);
+			createUI30HrZoneDataContainer(container);
 		}
 
 		return container;
@@ -566,9 +568,7 @@ public class TrainingView extends ViewPart {
 		}
 
 		_hrZoneDataContainerContent = new Composite(_hrZoneDataContainer, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-//				.grab(true, true)
-				.applyTo(_hrZoneDataContainerContent);
+		GridDataFactory.fillDefaults().applyTo(_hrZoneDataContainerContent);
 		GridLayoutFactory.fillDefaults().applyTo(_hrZoneDataContainerContent);
 //		_hrZoneDataContainerContent.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_CYAN));
 		{
@@ -605,13 +605,17 @@ public class TrainingView extends ViewPart {
 		GridDataFactory.fillDefaults().span(2, 1).applyTo(label);
 		label.setFont(_fontItalic);
 
-		// label: %
+		/*
+		 * label: %
+		 */
 		label = _tk.createLabel(parent, UI.SYMBOL_PERCENTAGE);
 		GridDataFactory.fillDefaults()//
 				.align(SWT.END, SWT.FILL)
 				.applyTo(label);
 
-		// label: h:mm
+		/*
+		 * label: h:mm
+		 */
 		label = _tk.createLabel(parent, Messages.App_Label_H_MM);
 		GridDataFactory.fillDefaults()//
 				.align(SWT.END, SWT.FILL)
@@ -628,6 +632,7 @@ public class TrainingView extends ViewPart {
 		_lblTourMinMaxPercent = new Label[hrZoneSize];
 		_lblTourMinMaxHours = new Label[hrZoneSize];
 		_lblHRZoneName = new Label[hrZoneSize];
+		_lblHRZoneColor = new Label[hrZoneSize];
 
 		// set hr zone colors
 		disposeHrZoneResources();
@@ -635,18 +640,17 @@ public class TrainingView extends ViewPart {
 
 		final Display display = parent.getDisplay();
 
-		for (int zoneIndex = 0; zoneIndex < hrZoneSize; zoneIndex++) {
+		// the sequence of the zones are inverted
+		for (int zoneIndex = hrZoneSize - 1; zoneIndex >= 0; zoneIndex--) {
 
 			final TourPersonHRZone hrZone = _personHrZones.get(zoneIndex);
-
 			final Color hrZoneColor = _hrZoneColors[zoneIndex] = new Color(display, hrZone.getColor());
 
 			/*
 			 * label: color
 			 */
-			final Label label = new Label(parent, SWT.NONE);
+			final Label label = _lblHRZoneColor[zoneIndex] = new Label(parent, SWT.NONE);
 			GridDataFactory.fillDefaults().hint(16, 16).applyTo(label);
-//			label.setText(UI.EMPTY_STRING);
 			label.setBackground(hrZoneColor);
 
 			/*
@@ -656,9 +660,7 @@ public class TrainingView extends ViewPart {
 					parent,
 					hrZone.getNameShort(),
 					SWT.LEAD);
-			GridDataFactory.fillDefaults()//
-//					.grab(true, false)
-					.applyTo(lblHRZoneName);
+			GridDataFactory.fillDefaults().applyTo(lblHRZoneName);
 
 			/*
 			 * label: tour hr min/max %
@@ -668,7 +670,7 @@ public class TrainingView extends ViewPart {
 					null,
 					SWT.TRAIL);
 			GridDataFactory.fillDefaults() //
-					.hint(_pc.convertWidthInCharsToPixels(6), SWT.DEFAULT)
+					.hint(_pc.convertWidthInCharsToPixels(5), SWT.DEFAULT)
 					.applyTo(lblTourMinMaxPercent);
 
 			/*
@@ -693,6 +695,7 @@ public class TrainingView extends ViewPart {
 			_canvasHrZoneImage = new Canvas(container, SWT.DOUBLE_BUFFERED);
 			GridDataFactory.fillDefaults()//
 					.grab(false, true)
+					// force image width
 					.hint(20, SWT.DEFAULT)
 					.applyTo(_canvasHrZoneImage);
 
@@ -1402,8 +1405,7 @@ public class TrainingView extends ViewPart {
 				new int[][] { ySeriePulseTime });
 
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
-//		yData.setUnitLabel(UI.UNIT_LABEL_TIME);
-//		yData.setYTitle(Messages.App_Label_H_MM);
+		yData.setYTitle(Messages.App_Label_H_MM);
 
 		yData.setColorIndex(new int[][] { colorIndex });
 		yData.setRgbLine(rgbLine);
@@ -1523,6 +1525,7 @@ public class TrainingView extends ViewPart {
 			_lblTourMinMaxHours[tourZoneIndex].setToolTipText(hrZoneTooltip);
 
 			_lblHRZoneName[tourZoneIndex].setToolTipText(hrZoneTooltip);
+			_lblHRZoneColor[tourZoneIndex].setToolTipText(hrZoneTooltip);
 		}
 	}
 
@@ -1557,7 +1560,7 @@ public class TrainingView extends ViewPart {
 
 				final GC gc = new GC(image);
 				{
-					int devYPos = 0;
+					int devYPos = devImageHeight;
 
 					if (isHrZoneDataAvailable) {
 
@@ -1567,9 +1570,9 @@ public class TrainingView extends ViewPart {
 							final int devZoneHeight = (int) (hrZonePercent / 100.0 * devImageHeight);
 
 							gc.setBackground(_hrZoneColors[zoneIndex]);
-							gc.fillRectangle(0, devYPos, devImageWidth - 1, devZoneHeight);
+							gc.fillRectangle(0, devYPos - devZoneHeight, devImageWidth - 1, devZoneHeight);
 
-							devYPos += devZoneHeight;
+							devYPos -= devZoneHeight;
 						}
 
 					} else {
