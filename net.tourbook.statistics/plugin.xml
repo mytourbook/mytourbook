@@ -31,6 +31,10 @@
             class="net.tourbook.statistics.StatisticTourHrZone"
             id="net.tourbook.statistics.StatisticTourHrZone"
             name="%Hr_Zone_Tour"/>
+      <statistic
+            class="net.tourbook.statistics.StatisticMonthHrZone"
+            id="net.tourbook.statistics.StatisticMonthHrZone"
+            name="%Hr_Zone_Month"/>
 
       <statistic
             class="net.tourbook.statistics.StatisticDayTourTime"

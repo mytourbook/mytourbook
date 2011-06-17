@@ -93,6 +93,8 @@ public class TourPersonHRZone implements Cloneable, Comparable<TourPersonHRZone>
 	private RGB					_color;
 	@Transient
 	private RGB					_colorDark;
+	@Transient
+	private RGB					_colorBright;
 
 	/**
 	 * manually created marker or imported marker create a unique id to identify them, saved marker
@@ -112,7 +114,8 @@ public class TourPersonHRZone implements Cloneable, Comparable<TourPersonHRZone>
 	private void checkColors() {
 		if (_color == null) {
 			_color = new RGB(colorRed, colorGreen, colorBlue);
-			_colorDark = getDarkColor(_color);
+			_colorDark = getColorDark(_color);
+			_colorBright = getColorBright(_color);
 		}
 	}
 
@@ -208,14 +211,30 @@ public class TourPersonHRZone implements Cloneable, Comparable<TourPersonHRZone>
 		return _color;
 	}
 
-	public RGB getDarkColor() {
+	public RGB getColorBright() {
+		checkColors();
+		return _colorBright;
+	}
+
+	private RGB getColorBright(final RGB rgb) {
+
+		final double brightFactor = 1.1f;
+
+		final int red = (int) Math.min(0xff, rgb.red * brightFactor);
+		final int green = (int) Math.min(0xff, rgb.green * brightFactor);
+		final int blue = (int) Math.min(0xff, rgb.blue * brightFactor);
+
+		return new RGB(red, green, blue);
+	}
+
+	public RGB getColorDark() {
 		checkColors();
 		return _colorDark;
 	}
 
-	private RGB getDarkColor(final RGB rgb) {
+	private RGB getColorDark(final RGB rgb) {
 
-		final double darkFactor = 0.9;
+		final double darkFactor = 0.90;
 
 		final int red = (int) Math.max(0, rgb.red * darkFactor);
 		final int green = (int) Math.max(0, rgb.green * darkFactor);
@@ -325,7 +344,8 @@ public class TourPersonHRZone implements Cloneable, Comparable<TourPersonHRZone>
 
 		// cache rgb values
 		_color = rgb;
-		_colorDark = getDarkColor(rgb);
+		_colorDark = getColorDark(rgb);
+		_colorBright = getColorBright(rgb);
 
 		colorRed = rgb.red;
 		colorGreen = rgb.green;

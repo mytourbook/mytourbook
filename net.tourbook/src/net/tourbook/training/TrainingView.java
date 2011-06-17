@@ -1282,7 +1282,7 @@ public class TrainingView extends ViewPart {
 
 			rgbDark[zoneIndex] = hrZone.getColor();
 			rgbBright[zoneIndex] = rgbWhite;
-			rgbLine[zoneIndex] = hrZone.getDarkColor();
+			rgbLine[zoneIndex] = hrZone.getColorDark();
 
 			zoneIndex++;
 		}
