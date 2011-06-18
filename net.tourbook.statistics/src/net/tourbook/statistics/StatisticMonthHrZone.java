@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.statistics;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -23,12 +22,14 @@ import java.util.GregorianCalendar;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.BarChartMinMaxKeeper;
+import net.tourbook.chart.BarTooltipProvider;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartSegments;
+import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourPersonHRZone;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -43,22 +44,33 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPartSite;
 
-public class StatisticMonthHrZone extends YearStatistic {
+public abstract class StatisticMonthHrZone extends YearStatistic {
 
 	private TourPerson					_currentPerson;
 
 	private int							_currentYear;
+
 	private int							_numberOfYears;
-
 	private Chart						_chart;
-	private final BarChartMinMaxKeeper	_minMaxKeeper	= new BarChartMinMaxKeeper();
 
+	private IChartInfoProvider			_tooltipProvider;
+
+	private final BarChartMinMaxKeeper	_minMaxKeeper	= new BarChartMinMaxKeeper();
 	private boolean						_isSynchScaleEnabled;
 
 	private final Calendar				_calendar		= GregorianCalendar.getInstance();
-	private DateFormat					_dateFormatter	= DateFormat.getDateInstance(DateFormat.FULL);
+//	private DateFormat					_dateFormatter	= DateFormat.getDateInstance(DateFormat.FULL);
 
 	private TourDataMonthHrZones		_tourMonthData;
+
+	public class BarTooltipProviderImpl implements BarTooltipProvider {
+ 
+	}
+
+
+	public StatisticMonthHrZone() {
+		super();
+	}
 
 	@Override
 	public void activateActions(final IWorkbenchPartSite partSite) {
@@ -108,16 +120,26 @@ public class StatisticMonthHrZone extends YearStatistic {
 								final IViewSite viewSite,
 								final IPostSelectionProvider postSelectionProvider) {
 
-		super.createControl(parent);
+		this.createControl(parent);
 
 		// create chart
 		_chart = new Chart(parent, SWT.BORDER | SWT.FLAT);
 		_chart.setShowZoomActions(true);
 		_chart.setCanScrollZoomedChart(true);
 		_chart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
+
+		final BarTooltipProvider barTooltipProvider = new BarTooltipProviderImpl();
+		_chart.setBarTooltipProvider(barTooltipProvider);
+
+//		_tooltipProvider = new IChartInfoProvider() {
+//			public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
+//				return createToolTipInfo(serieIndex, valueIndex);
+//			}
+//		};
+
 	}
 
-	int[] createMonthData(final TourDataMonthHrZones monthData) {
+	private int[] createMonthData(final TourDataMonthHrZones monthData) {
 
 		/*
 		 * create segments for each year
@@ -135,7 +157,7 @@ public class StatisticMonthHrZone extends YearStatistic {
 
 //	private ChartToolTipInfo createToolTipInfo(final int serieIndex, final int valueIndex) {
 //
-//		final int oldestYear = _currentYear - _numberOfYears + 1;
+//		final int oldestYear = fCurrentYear - fNumberOfYears + 1;
 //
 //		final Calendar calendar = GregorianCalendar.getInstance();
 //
@@ -148,10 +170,10 @@ public class StatisticMonthHrZone extends YearStatistic {
 //
 //		final Date date = new Date();
 //		date.setTime(calendar.getTimeInMillis());
-//		_dateFormatter.format(date, monthStringBuffer, monthPosition);
+//		fDateFormatter.format(date, monthStringBuffer, monthPosition);
 //
-//		final Integer recordingTime = _tourMonthData.fRecordingTime[serieIndex][valueIndex];
-//		final Integer drivingTime = _tourMonthData.fDrivingTime[serieIndex][valueIndex];
+//		final Integer recordingTime = fTourMonthData.fRecordingTime[serieIndex][valueIndex];
+//		final Integer drivingTime = fTourMonthData.fDrivingTime[serieIndex][valueIndex];
 //		final int breakTime = recordingTime - drivingTime;
 //
 //		/*
@@ -159,7 +181,7 @@ public class StatisticMonthHrZone extends YearStatistic {
 //		 */
 //		final StringBuilder titleString = new StringBuilder();
 //
-//		final String tourTypeName = getTourTypeName(serieIndex, _activeTourTypeFilter);
+//		final String tourTypeName = getTourTypeName(serieIndex, fActiveTourTypeFilter);
 //		if (tourTypeName != null && tourTypeName.length() > 0) {
 //			titleString.append(tourTypeName);
 //		}
@@ -169,7 +191,7 @@ public class StatisticMonthHrZone extends YearStatistic {
 //				monthStringBuffer.substring(monthPosition.getBeginIndex(), monthPosition.getEndIndex()),
 //				calendar.get(Calendar.YEAR)
 //		//
-//				)
+//		)
 //				.toString();
 //
 //		/*
@@ -189,10 +211,10 @@ public class StatisticMonthHrZone extends YearStatistic {
 //
 //		final String toolTipLabel = new Formatter().format(toolTipFormat.toString(), //
 //				//
-//				(float) _tourMonthData.fDistanceHigh[serieIndex][valueIndex] / 1000,
+//				(float) fTourMonthData.fDistanceHigh[serieIndex][valueIndex] / 1000,
 //				UI.UNIT_LABEL_DISTANCE,
 //				//
-//				_tourMonthData.fAltitudeHigh[serieIndex][valueIndex],
+//				fTourMonthData.fAltitudeHigh[serieIndex][valueIndex],
 //				UI.UNIT_LABEL_ALTITUDE,
 //				//
 //				recordingTime / 3600,
@@ -204,7 +226,7 @@ public class StatisticMonthHrZone extends YearStatistic {
 //				breakTime / 3600,
 //				(breakTime % 3600) / 60
 //		//
-//				)
+//		)
 //				.toString();
 //
 //		/*
@@ -220,7 +242,9 @@ public class StatisticMonthHrZone extends YearStatistic {
 //	}
 
 	void createXDataMonths(final ChartDataModel chartDataModel) {
-		// set the x-axis
+
+		// set x-axis
+
 		final ChartDataXSerie xData = new ChartDataXSerie(createMonthData(_tourMonthData));
 		xData.setAxisUnit(ChartDataXSerie.X_AXIS_UNIT_MONTH);
 		xData.setChartSegments(createChartSegments(_tourMonthData));
@@ -237,7 +261,7 @@ public class StatisticMonthHrZone extends YearStatistic {
 		final int zoneSize = personHrZones.size();
 
 		final int[][] tourHrZones = _tourMonthData.hrZones;
-//		final int serieLength = hrZones.length;
+		//		final int serieLength = hrZones.length;
 		final int serieValueLength = tourHrZones[0].length;
 
 		final int[][] hrZones0 = new int[zoneSize][serieValueLength];
@@ -264,10 +288,8 @@ public class StatisticMonthHrZone extends YearStatistic {
 			zoneIndex++;
 		}
 
-		final ChartDataYSerie yData = new ChartDataYSerie(
-				ChartDataModel.CHART_TYPE_BAR,
-				ChartDataYSerie.BAR_LAYOUT_STACKED,
-//				ChartDataYSerie.BAR_LAYOUT_BESIDE,
+		final ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR, getBarLayout(),
+		//				ChartDataYSerie.BAR_LAYOUT_BESIDE,
 				hrZones0,
 				hrZoneValues);
 		yData.setYTitle(Messages.LABEL_GRAPH_TIME);
@@ -285,6 +307,8 @@ public class StatisticMonthHrZone extends YearStatistic {
 
 	@Override
 	public void deactivateActions(final IWorkbenchPartSite partSite) {}
+
+	abstract int getBarLayout();
 
 	public void prefColorChanged() {
 		refreshStatistic(_currentPerson, null, _currentYear, _numberOfYears, false);
@@ -318,7 +342,8 @@ public class StatisticMonthHrZone extends YearStatistic {
 
 		final ChartDataModel chartDataModel = updateChart();
 
-//		setChartProviders(chartDataModel);
+		// set tool tip info
+		chartDataModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, _tooltipProvider);
 
 		if (_isSynchScaleEnabled) {
 			_minMaxKeeper.setMinMaxValues(chartDataModel);
@@ -353,16 +378,6 @@ public class StatisticMonthHrZone extends YearStatistic {
 		return true;
 	}
 
-//	private void setChartProviders(final ChartDataModel chartModel) {
-//
-//		// set tool tip info
-//		chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
-//			public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
-//				return createToolTipInfo(serieIndex, valueIndex);
-//			}
-//		});
-//	}
-
 	@Override
 	public void setSynchScale(final boolean isSynchScaleEnabled) {
 		_isSynchScaleEnabled = isSynchScaleEnabled;
@@ -382,4 +397,5 @@ public class StatisticMonthHrZone extends YearStatistic {
 	public void updateToolBar(final boolean refreshToolbar) {
 		_chart.fillToolbar(refreshToolbar);
 	}
+
 }

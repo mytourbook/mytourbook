@@ -1057,7 +1057,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			);
 			GridDataFactory.fillDefaults()//
 					.grab(true, true)
-					.hint(SWT.DEFAULT, convertHeightInCharsToPixels(8))
+					.hint(SWT.DEFAULT, convertHeightInCharsToPixels(10))
 					.applyTo(_hrZoneScrolledContainer);
 //			_hrZoneScrolledContainer.setAlwaysShowScrollBars(true);
 			_hrZoneScrolledContainer.setExpandVertical(true);
