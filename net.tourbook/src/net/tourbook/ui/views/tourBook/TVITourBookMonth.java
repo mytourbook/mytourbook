@@ -28,15 +28,11 @@ import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TreeViewerItem;
 import net.tourbook.ui.UI;
 
-public class TVITourBookYearSub extends TVITourBookItem {
+public class TVITourBookMonth extends TVITourBookItem {
 
-	private int	_category;
-
-	public TVITourBookYearSub(final TourBookView view, final TVITourBookItem parentItem, final int itemType) {
+	public TVITourBookMonth(final TourBookView view, final TVITourBookItem parentItem) {
 
 		super(view);
-
-		_category = itemType;
 
 		setParentItem(parentItem);
 	}
@@ -45,21 +41,12 @@ public class TVITourBookYearSub extends TVITourBookItem {
 	protected void fetchChildren() {
 
 		/*
-		 * set the children for the yearSub (month,week,...) item, these are tour items
+		 * set the children for the month item, these are tour items
 		 */
-		String sumYear = "";
-		String sumYearSub = "";
-		if (_category == ITEM_TYPE_WEEK) {
-			sumYear = "startWeekYear";
-			sumYearSub = "startWeek";
-		} else { // default to month
-			sumYear = "startYear";
-			sumYearSub = "startMonth";
-		}
-
 		final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
 		setChildren(children);
 
+		final TVITourBookYear yearItem = (TVITourBookYear) (getParentItem());
 		final SQLFilter sqlFilter = new SQLFilter();
 
 		final String sqlString = UI.EMPTY_STRING + //
@@ -113,11 +100,11 @@ public class TVITourBookYearSub extends TVITourBookItem {
 				+ (" LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_MARKER + " Tmarker") //$NON-NLS-1$ //$NON-NLS-2$
 				+ (" ON TourData.tourId = Tmarker.TourData_tourId") //$NON-NLS-1$
 
-				+ (" WHERE " + sumYear + " = ?")//				//$NON-NLS-1$
-				+ (" AND " + sumYearSub + " = ?")//					//$NON-NLS-1$
+				+ (" WHERE STARTYEAR = ?")//				//$NON-NLS-1$
+				+ (" AND STARTMONTH = ?")//					//$NON-NLS-1$
 				+ sqlFilter.getWhereClause()
 
-				+ " ORDER BY startYear, startMonth, startDay, startHour, startMinute"; //$NON-NLS-1$
+				+ " ORDER BY StartDay, StartHour, StartMinute"; //$NON-NLS-1$
 
 		try {
 
@@ -126,8 +113,8 @@ public class TVITourBookYearSub extends TVITourBookItem {
 //			TourDatabase.enableRuntimeStatistics(conn);
 
 			final PreparedStatement statement = conn.prepareStatement(sqlString);
-			statement.setInt(1, tourYear);
-			statement.setInt(2, tourYearSub);
+			statement.setInt(1, yearItem.tourYear);
+			statement.setInt(2, tourMonth);
 			sqlFilter.setParameters(statement, 3);
 
 			long prevTourId = -1;
@@ -168,14 +155,12 @@ public class TVITourBookYearSub extends TVITourBookItem {
 					final int dbYear = result.getInt(1);
 					final int dbMonth = result.getInt(2);
 					final int dbDay = result.getInt(3);
-					final int dbWeek = result.getInt(24);
 
 					tourItem.treeColumn = Integer.toString(dbDay);
+
 					tourItem.tourYear = dbYear;
-					tourItem.tourYearSub = tourYearSub;
 					tourItem.tourMonth = dbMonth;
 					tourItem.tourDay = dbDay;
-					tourItem.tourWeek = dbWeek;
 
 					final long dbDistance = tourItem.colDistance = result.getLong(4);
 					tourItem.colRecordingTime = result.getLong(5);
