@@ -145,6 +145,10 @@ public class Messages extends NLS {
 	public static String		action_tour_editor_delete_time_slices_remove_time;
 	public static String		action_tour_editor_delete_tour_marker;
 	public static String		action_tourbook_select_year_month_tours;
+	public static String		action_tourbook_year_sub;
+	public static String		action_tourbook_year_sub_month;
+	public static String		action_tourbook_year_sub_week;
+	public static String		action_tourbook_year_sub_day;
 	public static String		action_tourCatalog_open_compare_wizard;
 	public static String		action_tourType_modify_tourTypes;
 
