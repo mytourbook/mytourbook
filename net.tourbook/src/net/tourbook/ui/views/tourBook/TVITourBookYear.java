@@ -19,7 +19,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.SQLFilter;
@@ -28,9 +30,13 @@ import net.tourbook.ui.UI;
 
 public class TVITourBookYear extends TVITourBookItem {
 
+	private int	_subCategory;
+
 	public TVITourBookYear(final TourBookView view, final TVITourBookItem parentItem) {
 
 		super(view);
+
+		_subCategory = view.getYearSub();
 
 		setParentItem(parentItem);
 	}
@@ -44,19 +50,30 @@ public class TVITourBookYear extends TVITourBookItem {
 		final SQLFilter sqlFilter = new SQLFilter();
 
 		final StringBuilder sb = new StringBuilder();
-		sb.append("SELECT"); //$NON-NLS-1$
 
-		sb.append(" startYear, "); //$NON-NLS-1$
-		sb.append(" startMonth, "); //$NON-NLS-1$
+		String sumYear = "";
+		String sumYearSub = "";
+		if (_subCategory == ITEM_TYPE_WEEK) {
+			sumYear = "startWeekYear";
+			sumYearSub = "startWeek";
+		} else { // default to month
+			sumYear = "startYear";
+			sumYearSub = "startMonth";
+		}
+
+		sb.append("SELECT "); //$NON-NLS-1$
+
+		sb.append(sumYear + ", "); //$NON-NLS-1$
+		sb.append(sumYearSub + ","); //$NON-NLS-1$
 		sb.append(SQL_SUM_COLUMNS);
 
 		sb.append(" FROM " + TourDatabase.TABLE_TOUR_DATA); //$NON-NLS-1$
 
-		sb.append(" WHERE startYear=?"); //$NON-NLS-1$
+		sb.append(" WHERE " + sumYear + "=?"); //$NON-NLS-1$
 		sb.append(sqlFilter.getWhereClause());
 
-		sb.append(" GROUP BY startYear, startMonth"); //$NON-NLS-1$
-		sb.append(" ORDER BY startMonth"); //$NON-NLS-1$
+		sb.append(" GROUP BY " + sumYear + ", " + sumYearSub); //$NON-NLS-1$
+		sb.append(" ORDER BY " + sumYearSub); //$NON-NLS-1$
 
 		try {
 
@@ -69,19 +86,18 @@ public class TVITourBookYear extends TVITourBookItem {
 			final ResultSet result = statement.executeQuery();
 			while (result.next()) {
 
-				final TVITourBookItem tourItem = new TVITourBookMonth(tourBookView, this);
+				final TVITourBookItem tourItem = new TVITourBookYearSub(tourBookView, this, _subCategory);
+				;
 				children.add(tourItem);
 
 				final int dbYear = result.getInt(1);
-				final int dbMonth = result.getInt(2);
+				final int dbYearSub = result.getInt(2);
 
 //				final DateTime tourDate = new DateTime(dbYear, dbMonth, 1, 0, 0, 0, 0);
-				calendar.set(dbYear, dbMonth - 1, 1);
-
-				tourItem.treeColumn = UI.MonthFormatter.format(calendar.getTime());
+				tourItem.treeColumn = formatItemString(dbYear, dbYearSub);
 
 				tourItem.tourYear = dbYear;
-				tourItem.tourMonth = dbMonth;
+				tourItem.tourYearSub = dbYearSub;
 //				tourItem.colTourDate = tourDate;
 				tourItem.colTourDate = calendar.getTimeInMillis();
 
@@ -92,6 +108,22 @@ public class TVITourBookYear extends TVITourBookItem {
 
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
+		}
+	}
+
+	private String formatItemString(final int year, final int yearSub) {
+		if (_subCategory == ITEM_TYPE_WEEK) {
+			calendar.set(Calendar.YEAR, year);
+			calendar.set(Calendar.WEEK_OF_YEAR, yearSub);
+			calendar.set(Calendar.DAY_OF_WEEK, calendar.getFirstDayOfWeek());
+			// the number_of_week is broken in Java.text.SimpleDateFormat :-(
+			return "["
+					+ String.format("%02d", yearSub)
+					+ "] "
+					+ (new SimpleDateFormat(" dd MMM")).format(calendar.getTime());
+		} else { // default to month
+			calendar.set(year, yearSub - 1, 1);
+			return UI.MonthFormatter.format(calendar.getTime());
 		}
 	}
 

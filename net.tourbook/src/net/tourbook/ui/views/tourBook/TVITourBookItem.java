@@ -20,13 +20,25 @@ import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourItem;
 import net.tourbook.ui.TreeViewerItem;
 import net.tourbook.ui.UI;
 
+import org.eclipse.jface.preference.IPreferenceStore;
+
 public abstract class TVITourBookItem extends TreeViewerItem implements ITourItem {
 
+	static final int		ITEM_TYPE_ROOT	= 0;
+	static final int		ITEM_TYPE_YEAR	= 20;
+	static final int		ITEM_TYPE_MONTH	= 30;
+	static final int		ITEM_TYPE_WEEK	= 40;
+	static final int		ITEM_TYPE_DAY	= 50;
+	static final int		ITEM_TYPE_TOUR	= 60;
+
 	static final Calendar	calendar		= GregorianCalendar.getInstance();
+	private final IPreferenceStore	prefStore		= TourbookPlugin.getDefault().getPreferenceStore();
 
 	static final String		SQL_SUM_COLUMNS	= UI.EMPTY_STRING
 											//
@@ -62,7 +74,9 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 	/**
 	 * month starts with 1 for january
 	 */
-	int						tourMonth;
+	int								tourMonth;
+	int								tourWeek;
+	int						tourYearSub;
 	int						tourDay;
 
 	long					colTourDate;
@@ -101,6 +115,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
 	TVITourBookItem(final TourBookView view) {
 		tourBookView = view;
+		calendar.setFirstDayOfWeek(prefStore.getInt(ITourbookPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK));
+		calendar.setMinimalDaysInFirstWeek(prefStore.getInt(ITourbookPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK));
 	}
 
 	public void addSumColumns(final ResultSet result, final int startIndex) throws SQLException {

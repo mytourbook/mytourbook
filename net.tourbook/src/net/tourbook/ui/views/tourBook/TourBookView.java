@@ -70,6 +70,7 @@ import net.tourbook.util.ColumnManager;
 import net.tourbook.util.ITourViewer;
 import net.tourbook.util.PostSelectionProvider;
 import net.tourbook.util.TreeColumnDefinition;
+import net.tourbook.util.Util;
 
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -125,6 +126,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private static final String							STATE_SELECTED_MONTH				= "SelectedMonth";							//$NON-NLS-1$
 	private static final String							STATE_SELECTED_TOURS				= "SelectedTours";							//$NON-NLS-1$
 	private static final String							STATE_IS_SELECT_YEAR_MONTH_TOURS	= "IsSelectYearMonthTours";				//$NON-NLS-1$
+	private static final String							STATE_YEAR_SUB_CATEGORY				= "YearSubCategory";						//$NON-NLS-1$
+
+	private static int									_yearSubCategory					= TourItem.ITEM_TYPE_MONTH;
 
 	private final IPreferenceStore						_prefStore							= TourbookPlugin
 																									.getDefault()
@@ -164,7 +168,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 	private int											_selectedYear						= -1;
 
-	private int											_selectedMonth						= -1;
+	private int											_selectedYearSub					= -1;
 	private final ArrayList<Long>						_selectedTourIds					= new ArrayList<Long>();
 	private boolean										_isRecTimeFormat_hhmmss;
 
@@ -205,6 +209,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private ActionSetTourTypeMenu						_actionSetTourType;
 
 	private ActionSelectAllTours						_actionSelectAllTours;
+	private ActionYearSubCategorySelect					_actionYearSubCategorySelect;
 
 	private ActionModifyColumns							_actionModifyColumns;
 	private ActionRefreshView							_actionRefreshView;
@@ -231,11 +236,11 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				return item1.tourYear == item2.tourYear;
 			}
 
-			if (a instanceof TVITourBookMonth && b instanceof TVITourBookMonth) {
+			if (a instanceof TVITourBookYearSub && b instanceof TVITourBookYearSub) {
 
-				final TVITourBookMonth item1 = (TVITourBookMonth) a;
-				final TVITourBookMonth item2 = (TVITourBookMonth) b;
-				return item1.tourYear == item2.tourYear && item1.tourMonth == item2.tourMonth;
+				final TVITourBookYearSub item1 = (TVITourBookYearSub) a;
+				final TVITourBookYearSub item2 = (TVITourBookYearSub) b;
+				return item1.tourYear == item2.tourYear && item1.tourYearSub == item2.tourYearSub;
 			}
 
 			if (a instanceof TVITourBookTour && b instanceof TVITourBookTour) {
@@ -446,6 +451,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		_actionModifyColumns = new ActionModifyColumns(this);
 		_actionSelectAllTours = new ActionSelectAllTours(this);
+		_actionYearSubCategorySelect = new ActionYearSubCategorySelect(this);
 		_actionRefreshView = new ActionRefreshView(this);
 
 		_actionExpandSelection = new ActionExpandSelection(this);
@@ -883,7 +889,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 					styledString.append(tourItem.treeColumn);
 					styledString.append("   " + tourItem.colCounter, StyledString.QUALIFIER_STYLER); //$NON-NLS-1$
 
-					if (tourItem instanceof TVITourBookMonth) {
+					if (tourItem instanceof TVITourBookYearSub) {
 						cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_SUB_SUB));
 					} else {
 						cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_SUB));
@@ -1655,6 +1661,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		 */
 		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 		menuMgr.add(_actionSelectAllTours);
+		menuMgr.add(_actionYearSubCategorySelect);
 		menuMgr.add(new Separator());
 
 		menuMgr.add(_actionModifyColumns);
@@ -1714,23 +1721,6 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		return _columnManager;
 	}
 
-	/**
-	 * @param monthItem
-	 * @param tourIds
-	 * @return Return all tours for one month
-	 */
-	private void getMonthTourIds(final TVITourBookMonth monthItem, final HashMap<Long, Long> tourIds) {
-
-		// get all tours for the month item
-		for (final TreeViewerItem viewerItem : monthItem.getFetchedChildren()) {
-			if (viewerItem instanceof TVITourBookTour) {
-
-				final TVITourBookTour tourItem = (TVITourBookTour) viewerItem;
-				tourIds.put(tourItem.getTourId(), null);
-			}
-		}
-	}
-
 	PostSelectionProvider getPostSelectionProvider() {
 		return _postSelectionProvider;
 	}
@@ -1763,18 +1753,18 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 					// loop: all months
 					for (final TreeViewerItem viewerItem : ((TVITourBookYear) selectedItem).getFetchedChildren()) {
-						if (viewerItem instanceof TVITourBookMonth) {
-							getMonthTourIds((TVITourBookMonth) viewerItem, tourIds);
+						if (viewerItem instanceof TVITourBookYearSub) {
+							getYearSubTourIDs((TVITourBookYearSub) viewerItem, tourIds);
 						}
 					}
 				}
 
-			} else if (selectedItem instanceof TVITourBookMonth) {
+			} else if (selectedItem instanceof TVITourBookYearSub) {
 
-				// one month is selected
+				// one month/week is selected
 
 				if (_actionSelectAllTours.isChecked()) {
-					getMonthTourIds((TVITourBookMonth) selectedItem, tourIds);
+					getYearSubTourIDs((TVITourBookYearSub) selectedItem, tourIds);
 				}
 
 			} else if (selectedItem instanceof TVITourBookTour) {
@@ -1820,6 +1810,27 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		return _tourViewer;
 	}
 
+	public int getYearSub() {
+		return _yearSubCategory;
+	}
+
+	/**
+	 * @param yearSubItem
+	 * @param tourIds
+	 * @return Return all tours for one yearSubItem
+	 */
+	private void getYearSubTourIDs(final TVITourBookYearSub yearSubItem, final HashMap<Long, Long> tourIds) {
+
+		// get all tours for the month item
+		for (final TreeViewerItem viewerItem : yearSubItem.getFetchedChildren()) {
+			if (viewerItem instanceof TVITourBookTour) {
+
+				final TVITourBookTour tourItem = (TVITourBookTour) viewerItem;
+				tourIds.put(tourItem.getTourId(), null);
+			}
+		}
+	}
+
 	private void onSelectTreeItem(final SelectionChangedEvent event) {
 
 		final boolean isSelectAllChildren = _actionSelectAllTours.isChecked();
@@ -1827,7 +1838,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		final HashMap<Long, Long> tourIds = new HashMap<Long, Long>();
 
 		boolean isFirstYear = true;
-		boolean isFirstMonth = true;
+		boolean isFirstYearSub = true;
 		boolean isFirstTour = true;
 
 		final IStructuredSelection selectedTours = (IStructuredSelection) (event.getSelection());
@@ -1853,25 +1864,25 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 					// get all tours for the selected year
 					for (final TreeViewerItem viewerItem : yearItem.getFetchedChildren()) {
-						if (viewerItem instanceof TVITourBookMonth) {
-							getMonthTourIds((TVITourBookMonth) viewerItem, tourIds);
+						if (viewerItem instanceof TVITourBookYearSub) {
+							getYearSubTourIDs((TVITourBookYearSub) viewerItem, tourIds);
 						}
 					}
 
-				} else if (treeItem instanceof TVITourBookMonth) {
+				} else if (treeItem instanceof TVITourBookYearSub) {
 
-					// month is selected
+					// month/week/day is selected
 
-					final TVITourBookMonth monthItem = (TVITourBookMonth) treeItem;
-					if (isFirstMonth) {
-						// keep selected year/month
-						isFirstMonth = false;
-						_selectedYear = monthItem.tourYear;
-						_selectedMonth = monthItem.tourMonth;
+					final TVITourBookYearSub yearSubItem = (TVITourBookYearSub) treeItem;
+					if (isFirstYearSub) {
+						// keep selected year/month/week/day
+						isFirstYearSub = false;
+						_selectedYear = yearSubItem.tourYear;
+						_selectedYearSub = yearSubItem.tourYearSub;
 					}
 
 					// get all tours for the selected month
-					getMonthTourIds(monthItem, tourIds);
+					getYearSubTourIDs(yearSubItem, tourIds);
 
 				} else if (treeItem instanceof TVITourBookTour) {
 
@@ -1882,7 +1893,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 						// keep selected tour
 						isFirstTour = false;
 						_selectedYear = tourItem.tourYear;
-						_selectedMonth = tourItem.tourMonth;
+						_selectedYearSub = tourItem.tourYearSub;
 					}
 
 					tourIds.put(tourItem.getTourId(), null);
@@ -1900,7 +1911,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 						// keep selected tour
 						isFirstTour = false;
 						_selectedYear = tourItem.tourYear;
-						_selectedMonth = tourItem.tourMonth;
+						_selectedYearSub = tourItem.tourYearSub;
 					}
 
 					tourIds.put(tourItem.getTourId(), null);
@@ -1973,11 +1984,39 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		tree.setRedraw(true);
 	}
 
+	public void reopenFirstSelectedTour() {
+
+		Object selection = ((IStructuredSelection) _tourViewer.getSelection()).getFirstElement();
+		_selectedYear = -1;
+		_selectedYearSub = -1;
+		TVITourBookTour item = null;
+		if (selection instanceof TVITourBookTour) {
+			item = (TVITourBookTour) selection;
+			_selectedYear = item.tourYear;
+			if (getYearSub() == TVITourBookItem.ITEM_TYPE_WEEK) {
+				_selectedYearSub = item.tourWeek;
+			} else {
+				_selectedYearSub = item.tourMonth;
+			}
+		}
+
+		reloadViewer();
+		reselectTourViewer();
+
+		selection = ((IStructuredSelection) _tourViewer.getSelection()).getFirstElement();
+		if (selection instanceof TVITourBookTour) {
+			item = (TVITourBookTour) selection;
+			_tourViewer.collapseAll();
+			_tourViewer.expandToLevel(item, 0);
+			_tourViewer.setSelection(new StructuredSelection(item), false);
+		}
+	}
+
 	private void reselectTourViewer() {
 
-		// find the old selected year/month in the new tour items
+		// find the old selected year/[month/week] in the new tour items
 		TreeViewerItem reselectYearItem = null;
-		TreeViewerItem reselectMonthItem = null;
+		TreeViewerItem reselectYearSubItem = null;
 		final ArrayList<TreeViewerItem> reselectTourItems = new ArrayList<TreeViewerItem>();
 
 		/*
@@ -1991,15 +2030,15 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 				reselectYearItem = yearItem;
 
-				final Object[] monthItems = tourBookYear.getFetchedChildrenAsArray();
-				for (final Object monthItem : monthItems) {
+				final Object[] yearSubItems = tourBookYear.getFetchedChildrenAsArray();
+				for (final Object yearSub : yearSubItems) {
 
-					final TVITourBookMonth tourBookMonth = ((TVITourBookMonth) monthItem);
-					if (tourBookMonth.tourMonth == _selectedMonth) {
+					final TVITourBookYearSub tourBookYearSub = ((TVITourBookYearSub) yearSub);
+					if (tourBookYearSub.tourYearSub == _selectedYearSub) {
 
-						reselectMonthItem = tourBookMonth;
+						reselectYearSubItem = tourBookYearSub;
 
-						final Object[] tourItems = tourBookMonth.getFetchedChildrenAsArray();
+						final Object[] tourItems = tourBookYearSub.getFetchedChildrenAsArray();
 						for (final Object tourItem : tourItems) {
 
 							final TVITourBookTour tourBookTour = ((TVITourBookTour) tourItem);
@@ -2024,9 +2063,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 			_tourViewer.setSelection(new StructuredSelection(reselectTourItems) {}, false);
 
-		} else if (reselectMonthItem != null) {
+		} else if (reselectYearSubItem != null) {
 
-			_tourViewer.setSelection(new StructuredSelection(reselectMonthItem) {}, false);
+			_tourViewer.setSelection(new StructuredSelection(reselectYearSubItem) {}, false);
 
 		} else if (reselectYearItem != null) {
 
@@ -2058,9 +2097,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		}
 
 		try {
-			_selectedMonth = _state.getInt(STATE_SELECTED_MONTH);
+			_selectedYearSub = _state.getInt(STATE_SELECTED_MONTH);
 		} catch (final NumberFormatException e) {
-			_selectedMonth = -1;
+			_selectedYearSub = -1;
 		}
 
 		final String[] selectedTourIds = _state.getArray(STATE_SELECTED_TOURS);
@@ -2078,6 +2117,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		_actionSelectAllTours.setChecked(_state.getBoolean(STATE_IS_SELECT_YEAR_MONTH_TOURS));
 
+		_yearSubCategory = Util.getStateInt(_state, STATE_YEAR_SUB_CATEGORY, TourItem.ITEM_TYPE_MONTH);
+		_actionYearSubCategorySelect.setSubCategoryChecked(_yearSubCategory);
+
 		updateToolTipState();
 	}
 
@@ -2085,7 +2127,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		// save selection in the tour viewer
 		_state.put(STATE_SELECTED_YEAR, _selectedYear);
-		_state.put(STATE_SELECTED_MONTH, _selectedMonth);
+		_state.put(STATE_SELECTED_MONTH, _selectedYearSub);
 
 		// convert tour id's into string
 		final ArrayList<String> selectedTourIds = new ArrayList<String>();
@@ -2094,8 +2136,10 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		}
 		_state.put(STATE_SELECTED_TOURS, selectedTourIds.toArray(new String[selectedTourIds.size()]));
 
-		// action: select tours for year/month
+		// action: select tours for year/yearSub
 		_state.put(STATE_IS_SELECT_YEAR_MONTH_TOURS, _actionSelectAllTours.isChecked());
+
+		_state.put(STATE_YEAR_SUB_CATEGORY, _yearSubCategory);
 
 		_columnManager.saveState(_state);
 	}
@@ -2108,7 +2152,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		if (element instanceof TVITourBookYear) {
 			cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_SUB));
-		} else if (element instanceof TVITourBookMonth) {
+		} else if (element instanceof TVITourBookYearSub) {
 			cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_SUB_SUB));
 //		} else if (element instanceof TVITourBookTour) {
 //			cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_TOUR));
@@ -2118,6 +2162,10 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	@Override
 	public void setFocus() {
 		_tourViewer.getControl().setFocus();
+	}
+
+	public void setYearSub(final int tourItemType) {
+		_yearSubCategory = tourItemType;
 	}
 
 	private void updateToolTipState() {
