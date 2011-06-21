@@ -83,6 +83,15 @@ public class ChartDataYSerie extends ChartDataSerie {
 	private final int				_chartType;
 
 	/**
+	 * When this value is > 0 a line chart will not draw a line to the next value point when the
+	 * distance in x-data values is greater than this value.
+	 * <p>
+	 * With this feature lines are not drawn to the next value which looks ugly (a triangle is
+	 * painted) when a tour is paused.
+	 */
+	private int						_disabledLineToNext;
+
+	/**
 	 * 2nd y-data serie is currently used to display the slider label and the pace y-units
 	 */
 //	private int[]					fYData2ndSerie;
@@ -143,6 +152,10 @@ public class ChartDataYSerie extends ChartDataSerie {
 		return _customLayers;
 	}
 
+	public int getDisabledLineToNext() {
+		return _disabledLineToNext;
+	}
+
 	/**
 	 * @return returns true if the graph is filled
 	 */
@@ -152,7 +165,8 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 	/**
 	 * @return Returns the format how the slider label will be formatted, which can be <br>
-	 *         {@link #SLIDER_LABEL_FORMAT_DEFAULT}<br> {@link #SLIDER_LABEL_FORMAT_MM_SS}
+	 *         {@link #SLIDER_LABEL_FORMAT_DEFAULT}<br>
+	 *         {@link #SLIDER_LABEL_FORMAT_MM_SS}
 	 */
 	public int getSliderLabelFormat() {
 		return _sliderLabelFormat;
@@ -229,6 +243,10 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 	public void setCustomLayers(final ArrayList<IChartLayer> customLayers) {
 		_customLayers = customLayers;
+	}
+
+	public void setDisableLineToNext(final int disabledLineToNext) {
+		_disabledLineToNext = disabledLineToNext;
 	}
 
 	/**
@@ -430,4 +448,5 @@ public class ChartDataYSerie extends ChartDataSerie {
 	public String toString() {
 		return "[ChartDataYSerie]";//$NON-NLS-1$
 	}
+
 }

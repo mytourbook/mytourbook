@@ -2089,6 +2089,7 @@ public class ChartComponentGraph extends Canvas {
 
 		final ChartDataXSerie xData = drawingData.getXData();
 		final ChartDataYSerie yData = drawingData.getYData();
+
 		final int graphFillMethod = yData.getGraphFillMethod();
 		final int graphValueOffset2 = _canScrollZoomedChart ? 0 : graphValueOffset;
 
@@ -2102,11 +2103,16 @@ public class ChartComponentGraph extends Canvas {
 			return;
 		}
 
+		/*
+		 * 2nd path is currently used to draw the srtm altitude line
+		 */
 		final boolean isPath2 = highValues.length > 1;
 		int[] yValues2 = null;
 		if (isPath2) {
 			yValues2 = highValues[1];
 		}
+
+		final int graphDiffNoLineToNext = yData.getDisabledLineToNext();
 
 		final int graphYBottom = drawingData.getGraphYBottom();
 		final int graphYTop = drawingData.getGraphYTop();
@@ -2125,16 +2131,31 @@ public class ChartComponentGraph extends Canvas {
 		// virtual 0 line for the y-axis of the chart in dev units
 		final float devY0 = devYBottom + (scaleY * graphYBottom);
 
+		/*
+		 * y-axis 0 line
+		 */
+		int graphXAxisLine = 0;
+		if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_BOTTOM) {
+			graphXAxisLine = graphYBottom > 0 ? graphYBottom : graphYTop < 0 ? graphYTop : graphYBottom;
+		} else if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_ZERO) {
+			graphXAxisLine = graphYBottom > 0 ? graphYBottom : graphYTop < 0 ? graphYTop : 0;
+		}
+		final float devYAxis0Line = scaleY * graphXAxisLine;
+
+		System.out.println(devY0 + "\t" + devYAxis0Line);
+		// TODO remove SYSTEM.OUT.PRINTLN
+
 		final int graphXStart = xValues[startIndex] - graphValueOffset2;
+		int graphXPrev = graphXStart;
 		float devXPrev = graphXStart * scaleX;
-		int yValuePrev = yValues[startIndex];
+		int graphYPrev = yValues[startIndex];
 
 		// force the bottom and top value not to drawn over the border
-		if (yValuePrev < graphYBottom) {
-			yValuePrev = graphYBottom;
+		if (graphYPrev < graphYBottom) {
+			graphYPrev = graphYBottom;
 		}
-		if (yValuePrev > graphYTop) {
-			yValuePrev = graphYTop;
+		if (graphYPrev > graphYTop) {
+			graphYPrev = graphYTop;
 		}
 
 		final Rectangle chartRectangle = gc.getClipping();
@@ -2154,30 +2175,29 @@ public class ChartComponentGraph extends Canvas {
 			}
 
 			final int graphX = xValues[xValueIndex] - graphValueOffset2;
-
 			final float devX = graphX * scaleX;
 
-			int yValue = yValues[xValueIndex];
-			int yValue2 = 0;
+			int graphY = yValues[xValueIndex];
+			int graphY2 = 0;
 
 			// force the bottom and top value not to drawn over the border
-			if (yValue < graphYBottom) {
-				yValue = graphYBottom;
+			if (graphY < graphYBottom) {
+				graphY = graphYBottom;
 			}
-			if (yValue > graphYTop) {
-				yValue = graphYTop;
+			if (graphY > graphYTop) {
+				graphY = graphYTop;
 			}
 
 			if (path2 != null) {
 
-				yValue2 = yValues2[xValueIndex];
+				graphY2 = yValues2[xValueIndex];
 
 				// force the bottom and top value not to drawn over the border
-				if (yValue2 < graphYBottom) {
-					yValue2 = graphYBottom;
+				if (graphY2 < graphYBottom) {
+					graphY2 = graphYBottom;
 				}
-				if (yValue2 > graphYTop) {
-					yValue2 = graphYTop;
+				if (graphY2 > graphYTop) {
+					graphY2 = graphYTop;
 				}
 			}
 
@@ -2185,8 +2205,9 @@ public class ChartComponentGraph extends Canvas {
 			if (devX < 0) {
 
 				// keep current position which is used as the painting starting point
+				graphXPrev = graphX;
+				graphYPrev = graphY;
 				devXPrev = devX;
-				yValuePrev = yValue;
 
 				continue;
 			}
@@ -2216,73 +2237,98 @@ public class ChartComponentGraph extends Canvas {
 
 					// start from the x-axis
 
-					final int graphXAxisLine = graphYBottom > 0 ? graphYBottom : graphYTop < 0 ? graphYTop : 0;
-
-					path.moveTo(devXFirstPoint, devY0 - (graphXAxisLine * scaleY));
+					path.moveTo(devXFirstPoint, devY0 - devYAxis0Line);
 				}
 
-				path.lineTo(devXFirstPoint, devY0 - (yValuePrev * scaleY));
+				path.lineTo(devXFirstPoint, devY0 - (graphYPrev * scaleY));
 
 				if (path2 != null) {
-					path2.moveTo(devXFirstPoint, devY0 - (yValue2 * scaleY));
-					path2.lineTo(devXFirstPoint, devY0 - (yValue2 * scaleY));
+					path2.moveTo(devXFirstPoint, devY0 - (graphY2 * scaleY));
+					path2.lineTo(devXFirstPoint, devY0 - (graphY2 * scaleY));
 				}
 
 				isDrawFirstPoint = false;
 			}
 
+			/*
+			 * draw line to current point
+			 */
 			// optimization: draw only ONE line for the current x-position
 			// but draw to the 0 line otherwise it's possible that a triangle is painted
-			if ((int) devX != (int) devXPrev || yValue == 0 || yValue2 == 0) {
+			if ((int) devX != (int) devXPrev || graphY == 0 || graphY2 == 0) {
 
-				// draw line to the next point
-				path.lineTo(devX, devY0 - (yValue * scaleY));
+				final float graphXDiff = graphX - graphXPrev;
 
-				if (path2 != null) {
-					path2.lineTo(devX, devY0 - (yValue2 * scaleY));
+				if (graphXDiff >= 20) {
+
+//					System.out.println(("idx:" + xValueIndex) + " " + graphDiffNoLineToNext + " " + graphXDiff);
+//				// TODO remove SYSTEM.OUT.PRINTLN
+				}
+
+				if (graphDiffNoLineToNext > 0 && graphXDiff >= graphDiffNoLineToNext) {
+
+					path.lineTo(devXPrev, devY0);
+//					path.lineTo(devXPrev, devY0 - devYAxis0Line);
+//					path.moveTo(devXPrev, devY0 - devYAxis0Line);
+
+//					System.out.println(("idx:" + xValueIndex)
+//							+ ("\tdiff:" + graphXDiff)
+//							+ ("\ty0:" + (devY0 - devYAxis0Line)))
+//					//
+//					;
+//					// TODO remove SYSTEM.OUT.PRINTLN
+
+					if (path2 != null) {
+						path.lineTo(devXPrev, devY0 - (graphY2 * scaleY));
+//						path.moveTo(devXPrev, devY0 - (yValue2 * scaleY));
+					}
+
+				} else {
+
+					// draw line to the next point
+					path.lineTo(devX, devY0 - (graphY * scaleY));
+
+					if (path2 != null) {
+						path2.lineTo(devX, devY0 - (graphY2 * scaleY));
+					}
 				}
 			}
 
 			/*
 			 * draw last point
 			 */
-			if ((xValueIndex == endIndex - 1 || isDrawLastPoint) && //
-					(graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_BOTTOM //
+			if ((xValueIndex == endIndex - 1 || isDrawLastPoint) //
+					&& (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_BOTTOM //
 					|| graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_ZERO)) {
 
 				/*
 				 * this is the last point for a filled graph, draw the line to the x-axis
 				 */
 
-				int graphXAxisLine = 0;
-
-				if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_BOTTOM) {
-
-					graphXAxisLine = graphYBottom > 0 ? graphYBottom : graphYTop < 0 ? graphYTop : graphYBottom;
-
-				} else if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_ZERO) {
-
-					graphXAxisLine = graphYBottom > 0 ? graphYBottom : graphYTop < 0 ? graphYTop : 0;
-				}
-				final float devYAxisLine = graphXAxisLine * scaleY;
-
 				// set the point after the visible area that the last line is not visible
 				final float devXLastPoint = devX;// + 1;
 
-				path.lineTo(devXLastPoint, devY0 - (yValue * scaleY));
-				path.lineTo(devXLastPoint, devY0 - devYAxisLine);
-				path.moveTo(devXLastPoint, devY0 - devYAxisLine);
+				path.lineTo(devXLastPoint, devY0 - (graphY * scaleY));
+				path.lineTo(devXLastPoint, devY0 - devYAxis0Line);
+				path.moveTo(devXLastPoint, devY0 - devYAxis0Line);
 
 				if (path2 != null) {
-					path.lineTo(devXLastPoint, devY0 - (yValue2 * scaleY));
-					path.moveTo(devXLastPoint, devY0 - (yValue2 * scaleY));
+					path.lineTo(devXLastPoint, devY0 - (graphY2 * scaleY));
+					path.moveTo(devXLastPoint, devY0 - (graphY2 * scaleY));
 				}
 
 				break;
 			}
 
 			devXPrev = devX;
+			graphXPrev = graphX;
 		}
+
+		System.out.println("\t");
+		System.out.println("\t");
+		System.out.println("\t");
+		System.out.println("\t");
+		// TODO remove SYSTEM.OUT.PRINTLN
 
 		final Color colorFg = new Color(display, rgbFg);
 		final Color colorBg1 = new Color(display, rgbBg1);

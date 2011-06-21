@@ -1702,7 +1702,9 @@ public class TourManager {
 					if (srtmDataSerie != null) {
 
 						// create altitude dataserie and adjust min/max values with with the srtm values
-						yDataAltitude = createChartDataSerie(new int[][] { altitudeSerie, srtmDataSerie }, chartType);
+						yDataAltitude = createChartDataSerie(//
+								new int[][] { altitudeSerie, srtmDataSerie },
+								chartType);
 					}
 				}
 
@@ -1744,6 +1746,8 @@ public class TourManager {
 			yDataPulse.setShowYSlider(true);
 			yDataPulse.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_PULSE);
 			yDataPulse.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true));
+
+			yDataPulse.setDisableLineToNext(showTimeOnXAxis ? 20 : 0);
 
 			setGraphColor(_prefStore, yDataPulse, GraphColorProvider.PREF_GRAPH_HEARTBEAT);
 			chartDataModel.addXyData(yDataPulse);
