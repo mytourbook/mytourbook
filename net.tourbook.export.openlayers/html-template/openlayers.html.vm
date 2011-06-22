@@ -194,10 +194,10 @@
                );
                map.addLayer(losmhill2);
 
-               // OSM Lonvias Wanderwege Layer (http://osm.lonvia.de/world_hiking.html)
+               // OSM Lonvias Wanderwege Layer
                var lwander = new OpenLayers.Layer.OSM("Lonvia's Hiking Paths", 
-                  "http://osm.lonvia.de/hiking/${z}/${x}/${y}.png",
-                  { attribution: "Hiking Paths by <a href='http://osm.lonvia.de/world_hiking.html'>Lonvia's Hiking Map</a>",
+                  "http://tile.lonvia.de/hiking/${z}/${x}/${y}.png",
+                  { attribution: "Hiking Paths by <a href='http://hiking.lonvia.de'>Lonvia's Hiking Map</a>",
                   	type: 'png', displayOutsideMaxExtent: true, 
                     isBaseLayer: false, visibility: false, numZoomLevels: 17, transparent: true } 
                );
