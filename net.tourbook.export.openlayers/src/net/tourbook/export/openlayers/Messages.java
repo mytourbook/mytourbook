@@ -21,6 +21,8 @@ public class Messages extends NLS {
 	private static final String	BUNDLE_NAME	= "net.tourbook.export.openlayers.messages";	//$NON-NLS-1$
 
 	public static String		view_name_browser_map;
+	public static String		dialog_export_html_dialog_message;
+	public static String		dialog_export_html_dialog_title;
 
 	static {
 		// initialize resource bundle

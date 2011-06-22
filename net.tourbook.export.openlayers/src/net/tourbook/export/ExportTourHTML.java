@@ -15,15 +15,11 @@
  *******************************************************************************/
 package net.tourbook.export;
 
-import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import net.tourbook.data.TourData;
-import net.tourbook.export.openlayers.ExportOpenLayers;
 import net.tourbook.extension.export.ExportTourExtension;
 import net.tourbook.util.StatusUtil;
 
@@ -38,9 +34,8 @@ public class ExportTourHTML extends ExportTourExtension {
 	// Delegates the actual tour export to another file format exporter, as defined by GPX_EXTENSION.
 	// The HTML file only references this/these separate tour file(s).
 	// 
-	
+
 	public static final String	GPX_EXTENSION	= "gpx";	//$NON-NLS-1$
-	public static final String	HTML_EXTENSION	= "html";	//$NON-NLS-1$
 
 	/**
 	 * plugin extension constructor
@@ -53,54 +48,25 @@ public class ExportTourHTML extends ExportTourExtension {
 		// The tour export format the actual tour export is delegated to. Obtained by searching all registered export
 		// extensions for the given file extension.
 		final ExportTourExtension exportTour = OpenLayersExportUtil.getExportTour(GPX_EXTENSION);
-		
+
 		if (exportTour instanceof AbstractExportTourFormat) {
-			final AbstractExportTourFormat delegate = (AbstractExportTourFormat)exportTour;
-	
-			// open the export dialog with the delegate export format to do the tour export
-			DialogExportTour dialogExportTour = new DialogExportTour(
+			final AbstractExportTourFormat delegate = (AbstractExportTourFormat) exportTour;
+
+			// open the extended export dialog with the delegate export format
+			DialogExportTourHTML dialogExportTour = new DialogExportTourHTML(
 					Display.getCurrent().getActiveShell(),
 					delegate,
 					tourDataList,
 					tourStartIndex,
 					tourEndIndex,
-					delegate.getFormatTemplate());
-	
+					delegate.getFormatTemplate(),
+					this);
+
 			dialogExportTour.open();
-	
-			final String completeFilePath = dialogExportTour.getCompleteFilePath();
-			final String path = new File(completeFilePath).getParent();
-			String htmlName = null;
-
-			// write the OpenLayers HTML file, with references to the previously exported tour files 
-			try {
-				final ExportOpenLayers exportOpenLayers = new ExportOpenLayers(delegate.getFileExtension());
-
-				if (dialogExportTour.isMultipleTourAndMultipleFile()) {
-					// multiple tours in separate files
-
-					// TODO NR: enable and use file name field in dialog
-					SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss"); //$NON-NLS-1$
-					htmlName = "MyTourbook_" + formatter.format(new Date()) + '.' + HTML_EXTENSION ; //$NON-NLS-1$
-					exportOpenLayers.doExportHTML(tourDataList, path, htmlName);
-
-				} else {
-					// single tour or multiple tours merged into one single file
-					
-					final String tourFileName = new File(completeFilePath).getName();
-					final int index = tourFileName.lastIndexOf('.');
-					final String nameOnly =	index > 0 ? tourFileName.substring(0, index) : tourFileName;
-					htmlName = nameOnly + '.' + HTML_EXTENSION;
-	
-					exportOpenLayers.doExportHTML(tourFileName, path, htmlName);
-				}
-			} catch (IOException e) {
-				StatusUtil.log("Error exporting HTML '" + path + File.pathSeparator + htmlName + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
-			}
 
 		} else {
-			
-			StatusUtil.log("exportTour is not a AbstractExportTourFormat: '" + exportTour  + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+
+			StatusUtil.log("exportTour is not a AbstractExportTourFormat: '" + exportTour + "'"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 

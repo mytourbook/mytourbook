@@ -142,8 +142,6 @@ public class DialogExportTour extends TitleAreaDialog {
 	 */
 	private boolean									_isMultipleTourAndMultipleFile;
 
-	private String									_completeFilePath;
-
 	public DialogExportTour(final Shell parentShell,
 							final ExportTourExtension exportExtensionPoint,
 							final ArrayList<TourData> tourDataList,
@@ -581,6 +579,8 @@ public class DialogExportTour extends TitleAreaDialog {
 			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).span(3, 1).applyTo(_chkOverwriteFiles);
 			_chkOverwriteFiles.setText(Messages.dialog_export_chk_overwriteFiles);
 			_chkOverwriteFiles.setToolTipText(Messages.dialog_export_chk_overwriteFiles_tooltip);
+			
+			customizeUI20Destination(group);
 		}
 
 	}
@@ -613,13 +613,23 @@ public class DialogExportTour extends TitleAreaDialog {
 		}
 	}
 
-	private void doExport() throws IOException {
+	/**
+	 * Override in subclass to add fields to the filename group of the dialog.
+	 * 
+	 * @param group Fields group 
+	 * 
+	 * @see #createUI20Destination(Composite)
+	 */
+	protected void customizeUI20Destination(Group group) {
+	}
+
+	protected void doExport() throws IOException {
 
 		// disable button's
 		getButton(IDialogConstants.OK_ID).setEnabled(false);
 		getButton(IDialogConstants.CANCEL_ID).setEnabled(false);
 
-		_completeFilePath = _txtFilePath.getText();
+		String completeFilePath = _txtFilePath.getText();
 
 		final boolean isOverwriteFiles = _chkOverwriteFiles.getSelection();
 		final boolean isCamouflageSpeed = _chkCamouflageSpeed.getSelection();
@@ -660,7 +670,7 @@ public class DialogExportTour extends TitleAreaDialog {
 				converter.getWaypoints(wayPointList, tourData);
 			}
 
-			doExportTour(tourLap, trackList, wayPointList, _completeFilePath, fileCollisionBehaviour, isOverwriteFiles);
+			doExportTour(tourLap, trackList, wayPointList, completeFilePath, fileCollisionBehaviour, isOverwriteFiles);
 
 		} else {
 
@@ -700,7 +710,7 @@ public class DialogExportTour extends TitleAreaDialog {
 						tourLap,
 						trackList,
 						wayPointList,
-						_completeFilePath,
+						completeFilePath,
 						fileCollisionBehaviour,
 						isOverwriteFiles);
 
@@ -862,20 +872,20 @@ public class DialogExportTour extends TitleAreaDialog {
 		return _state;
 	}
 
-	/**
-	 * @return the complete path of the exported file. Will only be set after the dialog has been
-	 *         completed with OK.
-	 */
-	public String getCompleteFilePath() {
-		return _completeFilePath;
+	protected ExportTourExtension getExportExtensionPoint() {
+		return _exportExtensionPoint;
 	}
 
-	private String getExportFileName() {
+	protected String getExportFileName() {
 		return _comboFile.getText().trim();
 	}
 
-	private String getExportPathName() {
+	protected String getExportPathName() {
 		return _comboPath.getText().trim();
+	}
+
+	protected ArrayList<TourData> getTourDataList() {
+		return _tourDataList;
 	}
 
 	private GarminLap getLap(final TourData tourData, final boolean addNotes) {
@@ -1069,6 +1079,10 @@ public class DialogExportTour extends TitleAreaDialog {
 		_state.put(STATE_IS_EXPORT_NOTES, _chkExportNotes.getSelection());
 	}
 
+	protected void setDlgDefaultMessage(String message) {
+		_dlgDefaultMessage = message;
+	}
+
 	private void setError(final String message) {
 		setErrorMessage(message);
 		enableExportButton(false);
@@ -1164,7 +1178,11 @@ public class DialogExportTour extends TitleAreaDialog {
 		enableExportButton(true);
 	}
 
-	private boolean validateFilePath() {
+	protected boolean validateFilePath() {
+		return validateFilePath(_txtFilePath, _exportExtensionPoint.getFileExtension());
+	}
+
+	protected boolean validateFilePath(Text fieldFilePath, String fileExtension) {
 
 		// check path
 		IPath filePath = new Path(getExportPathName());
@@ -1187,7 +1205,7 @@ public class DialogExportTour extends TitleAreaDialog {
 			filePath = filePath
 					.addTrailingSeparator()
 					.append(Messages.dialog_export_label_DefaultFileName)
-					.addFileExtension(_exportExtensionPoint.getFileExtension());
+					.addFileExtension(fileExtension);
 
 			returnValue = true;
 
@@ -1205,7 +1223,7 @@ public class DialogExportTour extends TitleAreaDialog {
 			filePath = filePath
 					.addTrailingSeparator()
 					.append(fileName)
-					.addFileExtension(_exportExtensionPoint.getFileExtension());
+					.addFileExtension(fileExtension);
 
 			final File newFile = new File(filePath.toOSString());
 
@@ -1246,7 +1264,7 @@ public class DialogExportTour extends TitleAreaDialog {
 			}
 		}
 
-		_txtFilePath.setText(filePath.toOSString());
+		fieldFilePath.setText(filePath.toOSString());
 
 		return returnValue;
 	}
