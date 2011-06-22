@@ -30,77 +30,93 @@
         <script src="http://maps.google.com/maps/api/js?v=3.2&amp;sensor=false"></script> 
 #end
 #if ( $yahoo || $slider )
-        <script src="http://api.maps.yahoo.com/ajaxymap?v=3.0&appid=euzuro-openlayers"></script>
+        <script src="http://api.maps.yahoo.com/ajaxymap?v=3.0&amp;appid=euzuro-openlayers"></script>
 #end
 #if ( $bing )
         <script src="http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6.2&mkt=en-us"></script>
 #end
         <script src="http://www.openlayers.org/dev/OpenLayers.js"></script>
         <script type="text/javascript">
-            OpenLayers.Layer.MyGPX = OpenLayers.Class(OpenLayers.Layer.GML, {
-               projection: new OpenLayers.Projection("EPSG:4326"),
-               format: OpenLayers.Format.GPX,
-               style: {strokeColor: "red", strokeWidth: 5, strokeOpacity: 1, 
-                       externalGraphic: "http://www.openlayers.org/dev/img/marker.png", graphicWidth:21, graphicHeight:25},
-               CLASS_NAME: "Layer.MyGPX"
-            });
-        </script>
-        <script type="text/javascript">
 
-            var lgpx = [
-#foreach( $track in $tracks )
-                new OpenLayers.Layer.MyGPX("$!track.trackName", "$!track.fileName")#if($velocityCount < $tracks.size()),
-#else
+            var dataExtent;
+            var layersToLoad = 0;
+            var zoomToExtent = function()
+            {
+               if(dataExtent) {
+                  dataExtent.extend(this.getDataExtent());
+               } else {
+                  dataExtent = this.getDataExtent();
+               }
+               layersToLoad--;
+               if (layersToLoad <= 0) {
+                  map.zoomToExtent(dataExtent);
+               }
+            }; 
 
-#end
-#end
-            ];
+            function createGpxLayer(name, url, zoomLayers) {
+               var layer = new OpenLayers.Layer.Vector(name, {
+                  projection: new OpenLayers.Projection("EPSG:4326"),
+                  protocol: new OpenLayers.Protocol.HTTP({
+                     url: url,
+                     format: new OpenLayers.Format.GPX()
+                  }),
+                  strategies: [new OpenLayers.Strategy.Fixed()],
+                  style: {strokeColor: "red", strokeWidth: 5, strokeOpacity: 1, 
+                          externalGraphic: "http://www.openlayers.org/dev/img/marker.png", graphicWidth:21, graphicHeight:25}
+               });
 
-			/** 
-			 * Add zoom level to MousePosition display
-			 * Parameters:
-			 * lonLat - OpenLayers.LonLat - Location to display
-			 * see OpenLayers.Control.MousePosition.formatOutput
-			 */
-			function myMousePositionFormat(lonLat) {
-			        var digits = parseInt(this.numDigits);
-			        var newHtml =
-			            this.prefix +
-			            lonLat.lon.toFixed(digits) +
-			            this.separator + 
-			            lonLat.lat.toFixed(digits) +
-			            this.separator +
-			            this.map.getZoom() +
-			            this.suffix;
-			        return newHtml;
-			};
+               if (zoomLayers) {
+                  layer.events.register("loadend", layer, zoomToExtent);
+                  layersToLoad++;
+               }
 
-			/** 
-			 * "zoomend" event callback to update zoom level display. The context object this refers to 
-			 * OpenLayers.Control.MousePosition.
-			 * Parameters:
-			 * evt - OpenLayers.Event - event object
-			 */
-			function myZoomend(evt) {
-			   if (this.lastXy != null) {
-			      var lonLat = map.getLonLatFromPixel(this.lastXy);
-			      if (this.displayProjection) {
-			          lonLat.transform(this.map.getProjectionObject(), 
-			                           this.displayProjection );
-			      }
-			
-			      var newHtml = this.formatOutput(lonLat);
-			      if (newHtml != this.element.innerHTML) {
-			         this.element.innerHTML = newHtml;
-			      }
-			   }
-			};
-			
-    
+               return layer;
+            }
+
+            /** 
+             * Add zoom level to MousePosition display
+             * Parameters:
+             * lonLat - OpenLayers.LonLat - Location to display
+             * see OpenLayers.Control.MousePosition.formatOutput
+             */
+            function myMousePositionFormat(lonLat) {
+               var digits = parseInt(this.numDigits);
+               var newHtml =
+                  this.prefix +
+                  lonLat.lon.toFixed(digits) +
+                  this.separator + 
+                  lonLat.lat.toFixed(digits) +
+                  this.separator +
+                  this.map.getZoom() +
+                  this.suffix;
+               return newHtml;
+            };
+
+            /** 
+             * "zoomend" event callback to update zoom level display. The context object this refers to 
+             * OpenLayers.Control.MousePosition.
+             * Parameters:
+             * evt - OpenLayers.Event - event object
+             */
+            function myZoomend(evt) {
+               if (this.lastXy != null) {
+                  var lonLat = map.getLonLatFromPixel(this.lastXy);
+                  if (this.displayProjection) {
+                     lonLat.transform(this.map.getProjectionObject(), 
+                                      this.displayProjection );
+                  }
+                  
+                  var newHtml = this.formatOutput(lonLat);
+                  if (newHtml != this.element.innerHTML) {
+                     this.element.innerHTML = newHtml;
+                  }
+               }
+            };
+
             // Zoom Level 18 and above slows down Internet Explorer when track is shown.
             var isIE = navigator.userAgent.toLowerCase().indexOf("msie") != -1;
             var maxZoomLevel;
-            if (isIE && lgpx.length > 0) {
+            if (isIE && $tracks.size() > 0) {
                maxZoomLevel = 17;
             } else {
                maxZoomLevel = 18;
@@ -124,7 +140,6 @@
                    maxExtent: new OpenLayers.Bounds(-20037508, -20037508, 20037508, 20037508.34)
                };
 
-               //map = new OpenLayers.Map('map', { controls: [] });
                map = new OpenLayers.Map('map', options);
 
                map.addControl(new OpenLayers.Control.ArgParser());
@@ -134,7 +149,6 @@
                map.addControl(mousePositionControl);
                map.addControl(new OpenLayers.Control.Navigation());
                map.addControl(new OpenLayers.Control.PanZoomBar());
-               map.addControl(new OpenLayers.Control.Permalink());
 
                map.events.register("zoomend", mousePositionControl, myZoomend);
                
@@ -165,12 +179,14 @@
 #end
                // OSM
                var osm = new OpenLayers.Layer.OSM("OpenStreetMap (Mapnik)", 
-                  "http://tile.openstreetmap.org/${z}/${x}/${y}.png"
+                  "http://tile.openstreetmap.org/${z}/${x}/${y}.png",
+                  { numZoomLevels: maxZoomLevel + 1 }
                );
                map.addLayer(osm);
 
                var losmCycle = new OpenLayers.Layer.OSM("OSM Cycle Map",
-                  "http://b.andy.sandbox.cloudmade.com/tiles/cycle/${z}/${x}/${y}.png"
+                  "http://b.andy.sandbox.cloudmade.com/tiles/cycle/${z}/${x}/${y}.png",
+                  { numZoomLevels: maxZoomLevel + 1 }
                );
                map.addLayer(losmCycle);
 
@@ -203,9 +219,7 @@
                );
                map.addLayer(lwander);
 
-               // GPX
-               map.addLayers(lgpx);
-
+## wenn called from map view use its lat/lon/zoom position 
 #if ( $map )
                // Start position for the map
                var lat=$map.lat;
@@ -217,20 +231,17 @@
                  new OpenLayers.Projection("EPSG:4326"),
                  map.getProjectionObject()
                ), zoom);
+               var zoomLayers = false;
+## when map position not applicable (export) zoom to extent of all tours
 #else
                map.zoomToMaxExtent();
-
-               // fit map view to gpx layer bounds
-               lgpx[0].events.register("loadend", lgpx[0],
-                  function() {
-                     var bounds = this.getDataExtent();
-                     lonLat = bounds.getCenterLonLat();
-                     map.setCenter(lonLat);
-                     map.zoomToExtent(bounds);
-                  }
-               );
+               var zoomLayers = true;
 #end
                
+               // GPX
+#foreach( $track in $tracks )
+               map.addLayer(createGpxLayer("$!track.trackName", "$!track.fileName", zoomLayers));
+#end
             }
             
          </script>
