@@ -81,6 +81,8 @@ import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 public class UI {
 
@@ -170,11 +172,15 @@ public class UI {
 	public static final String								SYMBOL_DOUBLE_HORIZONTAL		= "\u2550";								//$NON-NLS-1$
 	public static final String								SYMBOL_DOUBLE_VERTICAL			= "\u2551";								//$NON-NLS-1$
 	public static final String								SYMBOL_DASH						= "\u2212";								//$NON-NLS-1$
+	public static final String								SYMBOL_ELLIPSIS					= "\u2026";								//$NON-NLS-1$
+	public static final String								SYMBOL_INFINITY					= "\u221E";								//$NON-NLS-1$
 
-	public static final String								SYMBOL_WIND_WITH_SPACE			= "W ";									//$NON-NLS-1$
-	public static final String								SYMBOL_PERCENTAGE				= "%";										//$NON-NLS-1$
-	public static final String								SYMBOL_LESS_THAN				= "<";										//$NON-NLS-1$
+	public static final String								SYMBOL_COLON					= ":";										//$NON-NLS-1$
+	public static final String								SYMBOL_EQUAL					= "=";										//$NON-NLS-1$
 	public static final String								SYMBOL_GREATER_THAN				= ">";										//$NON-NLS-1$
+	public static final String								SYMBOL_LESS_THAN				= "<";										//$NON-NLS-1$
+	public static final String								SYMBOL_PERCENTAGE				= "%";										//$NON-NLS-1$
+	public static final String								SYMBOL_WIND_WITH_SPACE			= "W ";									//$NON-NLS-1$
 
 	/**
 	 * Imperial system for distance
@@ -263,6 +269,9 @@ public class UI {
 																									"MMM");							//$NON-NLS-1$
 	public static final SimpleDateFormat					WeekDayFormatter				= new SimpleDateFormat(
 																									"EEEE");							//$NON-NLS-1$
+
+	public static final DateTimeFormatter					DTFormatterShort				= DateTimeFormat
+																									.shortDateTime();
 
 	private static DateFormat								_dateFormatterShort;
 	private static DateFormat								_timeFormatterShort;

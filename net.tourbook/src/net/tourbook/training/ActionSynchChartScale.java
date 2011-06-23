@@ -13,46 +13,32 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.chart;
+package net.tourbook.training;
 
-public class ChartToolTipInfo {
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.ui.UI;
 
-	private String	_title;
-	private String	_label;
+import org.eclipse.jface.action.Action;
 
-	private boolean	_isDisplayed	= false;
-	private boolean	_isReposition	= false;
+public class ActionSynchChartScale extends Action {
 
-	public String getLabel() {
-		return _label;
+	private TrainingView	_trainingView;
+
+	public ActionSynchChartScale(final TrainingView trainingView) {
+
+		super(UI.EMPTY_STRING, AS_CHECK_BOX);
+
+		_trainingView = trainingView;
+
+		setToolTipText(Messages.Training_View_Action_SynchChartScale);
+
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__synch_statistics));
+		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__synch_statistics_Disabled));
 	}
 
-	public String getTitle() {
-		return _title;
+	@Override
+	public void run() {
+		_trainingView.actionSynchChartScale();
 	}
-
-	boolean isDisplayed() {
-		return _isDisplayed;
-	}
-
-	boolean isReposition() {
-		return _isReposition;
-	}
-
-	public void setIsDisplayed(final boolean isDisplayed) {
-		_isDisplayed = isDisplayed;
-	}
-
-	public void setLabel(final String label) {
-		this._label = label;
-	}
-
-	public void setReposition(final boolean isReposition) {
-		_isReposition = isReposition;
-	}
-
-	public void setTitle(final String title) {
-		this._title = title;
-	}
-
 }

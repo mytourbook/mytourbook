@@ -25,6 +25,11 @@ public interface ITourbookPreferences {
 	public static final String	DUMMY_FIELD									= UI.EMPTY_STRING;
 
 	/*
+	 * notifications
+	 */
+	public static final String	HR_ZONES_ARE_MODIFIED						= "HrZonesAreModified";									//$NON-NLS-1$
+
+	/*
 	 * statistic provider
 	 */
 	public static final String	STATISTICS_STATISTIC_PROVIDER_IDS			= "statistics.provider.ids";								//$NON-NLS-1$
@@ -107,6 +112,11 @@ public interface ITourbookPreferences {
 
 	public static final String	GRAPH_PROPERTY_IS_PACE_CLIPPING				= "graph.property.is.pace_clipping";						//$NON-NLS-1$
 	public static final String	GRAPH_PROPERTY_PACE_CLIPPING_VALUE			= "graph.property.is.pace_clipping.value";					//$NON-NLS-1$
+
+	/*
+	 * system
+	 */
+	public static final String	TOUR_CACHE_SIZE								= "TourCacheSize";											//$NON-NLS-1$
 
 	/*
 	 * measurement system

@@ -13,46 +13,13 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.chart;
+package net.tourbook.statistics;
 
-public class ChartToolTipInfo {
+class TourDataMonthHrZones {
 
-	private String	_title;
-	private String	_label;
-
-	private boolean	_isDisplayed	= false;
-	private boolean	_isReposition	= false;
-
-	public String getLabel() {
-		return _label;
-	}
-
-	public String getTitle() {
-		return _title;
-	}
-
-	boolean isDisplayed() {
-		return _isDisplayed;
-	}
-
-	boolean isReposition() {
-		return _isReposition;
-	}
-
-	public void setIsDisplayed(final boolean isDisplayed) {
-		_isDisplayed = isDisplayed;
-	}
-
-	public void setLabel(final String label) {
-		this._label = label;
-	}
-
-	public void setReposition(final boolean isReposition) {
-		_isReposition = isReposition;
-	}
-
-	public void setTitle(final String title) {
-		this._title = title;
-	}
+	/**
+	 * HR zones values in seconds.
+	 */
+	public int[][]	hrZones;
 
 }

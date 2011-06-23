@@ -167,9 +167,10 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 		/*
 		 * show tour type context menu on mouse over
 		 */
-		_chkTourTypeContextMenu = new Button(parent, SWT.CHECK);
+		_chkTourTypeContextMenu = new Button(parent, SWT.CHECK | SWT.WRAP);
 		GridDataFactory.fillDefaults().indent(0, 10).applyTo(_chkTourTypeContextMenu);
 		_chkTourTypeContextMenu.setText(Messages.Pref_Appearance_ShowTourTypeContextMenu);
+		_chkTourTypeContextMenu.setToolTipText(Messages.Pref_Appearance_ShowTourTypeContextMenu_Tooltip);
 		_chkTourTypeContextMenu.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {

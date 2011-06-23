@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -100,7 +100,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 	/**
 	 * create segments for the chart
 	 */
-	ChartSegments createChartSegments(final TourTimeData tourDataTime) {
+	private ChartSegments createChartSegments(final TourTimeData tourDataTime) {
 
 		final int segmentStart[] = new int[_numberOfYears];
 		final int segmentEnd[] = new int[_numberOfYears];
@@ -423,7 +423,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 		if (selection instanceof SelectionBarChart) {
 			final SelectionBarChart barChartSelection = (SelectionBarChart) selection;
 
-			if (barChartSelection.serieIndex != -1) {
+			if (barChartSelection.serieIndex != -1 && _tourTimeData != null) {
 
 				int selectedValueIndex = barChartSelection.valueIndex;
 				final long[] tourIds = _tourTimeData.fTourIds;
@@ -583,7 +583,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 
 		// set the x-axis
 		final ChartDataXSerie xData = new ChartDataXSerie(_tourTimeData.fTourDOYValues);
-		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_DAY);
+		xData.setAxisUnit(ChartDataXSerie.X_AXIS_UNIT_DAY);
 		xData.setVisibleMaxValue(_currentYear);
 		xData.setChartSegments(createChartSegments(_tourTimeData));
 		chartModel.setXData(xData);

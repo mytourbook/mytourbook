@@ -30,6 +30,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
+import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.util.PostSelectionProvider;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -49,6 +50,11 @@ import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 
+/**
+ * Editorpart for a tour, each tour has it's own editor part.
+ * <p>
+ * Tours can be edited <b>only</b> in the {@link TourDataEditorView}.
+ */
 public class TourEditor extends EditorPart implements IPersistableEditor {
 
 	public static final String		ID				= "net.tourbook.tour.TourEditor";	//$NON-NLS-1$

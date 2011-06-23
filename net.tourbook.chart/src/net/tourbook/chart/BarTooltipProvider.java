@@ -15,44 +15,6 @@
  *******************************************************************************/
 package net.tourbook.chart;
 
-public class ChartToolTipInfo {
-
-	private String	_title;
-	private String	_label;
-
-	private boolean	_isDisplayed	= false;
-	private boolean	_isReposition	= false;
-
-	public String getLabel() {
-		return _label;
-	}
-
-	public String getTitle() {
-		return _title;
-	}
-
-	boolean isDisplayed() {
-		return _isDisplayed;
-	}
-
-	boolean isReposition() {
-		return _isReposition;
-	}
-
-	public void setIsDisplayed(final boolean isDisplayed) {
-		_isDisplayed = isDisplayed;
-	}
-
-	public void setLabel(final String label) {
-		this._label = label;
-	}
-
-	public void setReposition(final boolean isReposition) {
-		_isReposition = isReposition;
-	}
-
-	public void setTitle(final String title) {
-		this._title = title;
-	}
+public interface BarTooltipProvider {
 
 }

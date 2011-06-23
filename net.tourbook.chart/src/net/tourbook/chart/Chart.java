@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -110,6 +110,7 @@ public class Chart extends ViewForm {
 	private boolean						_isFillToolbar						= true;
 	private boolean						_isToolbarCreated;
 
+	BarTooltipProvider					_barTooltipProvider;
 	private int							_barSelectionSerieIndex;
 	private int							_barSelectionValueIndex;
 
@@ -129,7 +130,8 @@ public class Chart extends ViewForm {
 	protected int						_gridHorizontalDistance				= 70;
 	/**
 	 * mouse behaviour:<br>
-	 * <br>{@link #MOUSE_MODE_SLIDER} or {@link #MOUSE_MODE_ZOOM}
+	 * <br>
+	 * {@link #MOUSE_MODE_SLIDER} or {@link #MOUSE_MODE_ZOOM}
 	 */
 	private String						_mouseMode							= MOUSE_MODE_SLIDER;
 
@@ -858,7 +860,7 @@ public class Chart extends ViewForm {
 	}
 
 	void onHideContextMenu(final MenuEvent e, final Control menuParentControl) {
-		
+
 		if (_chartContextProvider != null) {
 			_chartContextProvider.onHideContextMenu(e, menuParentControl);
 		}
@@ -925,6 +927,10 @@ public class Chart extends ViewForm {
 //		fUseInternalActionBar = useInternalActionBar;
 //	}
 
+	public void setBarTooltipProvider(final BarTooltipProvider barTooltipProvider) {
+		_barTooltipProvider = barTooltipProvider;
+	}
+
 	/**
 	 * Set the option to move the sliders to the border when the chart is zoomed
 	 * 
@@ -984,6 +990,10 @@ public class Chart extends ViewForm {
 		_chartDataModel = chartDataModel;
 	}
 
+//	public void setShowPartNavigation(final boolean showPartNavigation) {
+//		fShowPartNavigation = showPartNavigation;
+//	}
+
 	/**
 	 * Set <code>false</code> to not draw the bars at the bottom of the chart
 	 * 
@@ -992,10 +1002,6 @@ public class Chart extends ViewForm {
 	public void setDrawBarChartAtBottom(final boolean fDrawBarCharttAtBottom) {
 		this._isDrawBarChartAtBottom = fDrawBarCharttAtBottom;
 	}
-
-//	public void setShowPartNavigation(final boolean showPartNavigation) {
-//		fShowPartNavigation = showPartNavigation;
-//	}
 
 	@Override
 	public boolean setFocus() {

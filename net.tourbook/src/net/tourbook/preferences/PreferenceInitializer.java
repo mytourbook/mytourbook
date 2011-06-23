@@ -134,7 +134,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED, false);
 
 		// graph grid distance
-		store.setDefault(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE, 30);
+		store.setDefault(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE, 50);
 		store.setDefault(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE, 80);
 
 		/*
@@ -232,6 +232,11 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
 		store.setDefault(ITourbookPreferences.MERGE_TOUR_SET_TOUR_TYPE, false);
 		store.setDefault(ITourbookPreferences.MERGE_TOUR_SET_TOUR_TYPE_ID, TourDatabase.ENTITY_IS_NOT_SAVED);
+
+		/*
+		 * system
+		 */
+		store.setDefault(ITourbookPreferences.TOUR_CACHE_SIZE, 500);
 
 		/*
 		 * computed values

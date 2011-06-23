@@ -22,11 +22,12 @@ import org.eclipse.swt.graphics.Rectangle;
 public class ChartDrawingData {
 
 	// position for the x-axis unit text
-	protected static final int		XUNIT_TEXT_POS_LEFT		= 0;
-	protected static final int		XUNIT_TEXT_POS_CENTER	= 1;
+	protected static final int		X_UNIT_TEXT_POS_LEFT	= 0;
+	protected static final int		X_UNIT_TEXT_POS_CENTER	= 1;
 
 	public static final int			BAR_POS_LEFT			= 0;
 	public static final int			BAR_POS_CENTER			= 1;
+//	public static final int			BAR_POS_CENTER_UNIT_TICK	= 2;							// center bar in the unit tick
 
 	private ChartDataXSerie			_xData;
 	private ChartDataXSerie			_xData2nd;
@@ -49,7 +50,7 @@ public class ChartDrawingData {
 	 * Contains all unit labels and their positions for the x axis
 	 */
 	private ArrayList<ChartUnit>	_xUnits					= new ArrayList<ChartUnit>();
-	private int						_xUnitTextPos			= XUNIT_TEXT_POS_LEFT;
+	private int						_xUnitTextPos			= X_UNIT_TEXT_POS_LEFT;
 
 	/**
 	 * List with all unit labels and positions for the y axis
@@ -80,7 +81,7 @@ public class ChartDrawingData {
 	public int						devVirtualGraphWidth;
 
 	/**
-	 * graph height in dev (pixel) units
+	 * graph height in dev (pixel) units, each graph has the same height
 	 */
 	public int						devGraphHeight;
 
@@ -98,6 +99,11 @@ public class ChartDrawingData {
 
 	private String					_errorMessage;
 
+	private boolean					_isXUnitOverlapChecked	= false;
+
+	private boolean					_isDrawVerticalGrid		= true;
+	private boolean[]				_isDrawUnits			= null;
+
 	public ChartDrawingData(final int chartType) {
 		_chartType = chartType;
 	}
@@ -110,7 +116,8 @@ public class ChartDrawingData {
 	}
 
 	/**
-	 * @return Returns the barPosition, this can be set to BAR_POS_LEFT, BAR_POS_CENTER
+	 * @return Returns the barPosition,<br>
+	 *         this can be set to BAR_POS_LEFT, BAR_POS_CENTER
 	 */
 	public int getBarPosition() {
 		return _barPosition;
@@ -289,12 +296,42 @@ public class ChartDrawingData {
 	}
 
 	/**
+	 * @return Returns an array for each unit tick. Unit tick is drawn when set to <code>true</code>
+	 *         .
+	 *         <p>
+	 *         When <code>null</code> is returned all units are drawn.
+	 */
+	public boolean[] isDrawUnits() {
+		return _isDrawUnits;
+	}
+
+	public boolean isDrawVerticalGrid() {
+		return _isDrawVerticalGrid;
+	}
+
+	/**
+	 * @return Returns <code>true</code> when the x-axis unit visibility is checked that it do not
+	 *         overlap the previous unit label.
+	 */
+	public boolean isXUnitOverlapChecked() {
+		return _isXUnitOverlapChecked;
+	}
+
+	/**
 	 * @param barFocusRectangles
 	 *            The barFocusRectangles to set.
 	 */
 	public void setBarFocusRectangles(final Rectangle[][] barFocusRectangles) {
 		this._barFocusRectangles = barFocusRectangles;
 	}
+
+//	public void setDevGraphHeight(final int heightDev) {
+//		this.devGraphHeight = heightDev;
+//	}
+//
+//	public void setDevGraphWidth(final int devGraphWidth) {
+//		this.devGraphWidth = devGraphWidth;
+//	}
 
 	/**
 	 * @param barPosition
@@ -319,14 +356,6 @@ public class ChartDrawingData {
 	public void setBarRectangleWidth(final int barRectangleWidth) {
 		this._barRectangleWidth = barRectangleWidth;
 	}
-
-//	public void setDevGraphHeight(final int heightDev) {
-//		this.devGraphHeight = heightDev;
-//	}
-//
-//	public void setDevGraphWidth(final int devGraphWidth) {
-//		this.devGraphWidth = devGraphWidth;
-//	}
 
 	/**
 	 * @param barRectanglePos
@@ -400,6 +429,18 @@ public class ChartDrawingData {
 		this._graphYTop = graphYTop;
 	}
 
+	public void setIsDrawUnit(final boolean[] isDrawUnits) {
+		_isDrawUnits = isDrawUnits;
+	}
+
+	public void setIsDrawVerticalGrid(final boolean isDrawVerticalGrid) {
+		_isDrawVerticalGrid = isDrawVerticalGrid;
+	}
+
+	public void setIsXUnitOverlapChecked(final boolean isXUnitOverlapChecked) {
+		_isXUnitOverlapChecked = isXUnitOverlapChecked;
+	}
+
 	/**
 	 * Set scaling for the x-axis unit
 	 * 
@@ -443,7 +484,7 @@ public class ChartDrawingData {
 	}
 
 	/**
-	 * set the position of the unit text, this can be XUNIT_TEXT_POS_LEFT or XUNIT_TEXT_POS_CENTER
+	 * set the position of the unit text, this can be X_UNIT_TEXT_POS_LEFT or X_UNIT_TEXT_POS_CENTER
 	 * 
 	 * @param unitTextPos
 	 *            The xUnitTextPos to set.
@@ -467,4 +508,5 @@ public class ChartDrawingData {
 	public void setYSliderHitRect(final Rectangle[] sliderHitRect) {
 		_ySliderHitRect = sliderHitRect;
 	}
+
 }

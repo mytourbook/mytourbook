@@ -28,6 +28,19 @@
             name="%Pref_Year_Summary"/>
 
       <statistic
+            class="net.tourbook.statistics.StatisticTourHrZone"
+            id="net.tourbook.statistics.StatisticTourHrZone"
+            name="%Hr_Zone_Tour"/>
+      <statistic
+            class="net.tourbook.statistics.StatisticMonthHrZoneBeside"
+            id="net.tourbook.statistics.StatisticMonthHrZoneBeside"
+            name="%Hr_Zone_Month"/>
+      <statistic
+            class="net.tourbook.statistics.StatisticMonthHrZoneStacked"
+            id="net.tourbook.statistics.StatisticMonthHrZoneStacked"
+            name="%Hr_Zone_Month_Stacked"/>
+
+      <statistic
             class="net.tourbook.statistics.StatisticDayTourTime"
             id="net.tourbook.statistics.StatisticSummaryDayTourTime"
             name="%Pref_Day_Summary_Duration"/>

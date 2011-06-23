@@ -5107,7 +5107,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_serieLatitude = _tourData.latitudeSerie;
 		_serieLongitude = _tourData.longitudeSerie;
 
-		_serieBreakTime = _tourData.breakTimeSerie;
+		_serieBreakTime = _tourData.getBreakTimeSerie();
 
 		_serieGradient = _tourData.getGradientSerie();
 		_serieSpeed = _tourData.getSpeedSerie();

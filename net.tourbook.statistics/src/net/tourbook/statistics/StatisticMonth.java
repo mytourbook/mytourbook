@@ -230,7 +230,7 @@ public abstract class StatisticMonth extends YearStatistic {
 	void createXDataMonths(final ChartDataModel chartDataModel) {
 		// set the x-axis
 		final ChartDataXSerie xData = new ChartDataXSerie(createMonthData(fTourMonthData));
-		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_MONTH);
+		xData.setAxisUnit(ChartDataXSerie.X_AXIS_UNIT_MONTH);
 		xData.setChartSegments(createChartSegments(fTourMonthData));
 
 		chartDataModel.setXData(xData);

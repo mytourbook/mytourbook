@@ -1000,7 +1000,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		}
 
 		_tourData.segmentSerieIndex = ArrayListToArray.toInt(segmentSerieIndex);
-		_tourData.breakTimeSerie = breakTimeSerie;
+		_tourData.setBreakTimeSerie(breakTimeSerie);
 
 	}
 
@@ -2586,7 +2586,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 				if (_tourData != null) {
 					// it's possible that the break time serie was overwritten
-					_tourData.breakTimeSerie = null;
+					_tourData.setBreakTimeSerie(null);
 				}
 
 				/*
@@ -2860,7 +2860,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		if (_tourData != null) {
 			// it's possible that the break time serie was overwritten
-			_tourData.breakTimeSerie = null;
+			_tourData.setBreakTimeSerie(null);
 		}
 
 		if (_isTourDirty == false || _tourData == null || _savedDpTolerance == -1) {

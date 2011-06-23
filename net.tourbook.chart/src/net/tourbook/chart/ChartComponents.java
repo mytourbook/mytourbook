@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,8 @@ package net.tourbook.chart;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+
+import net.tourbook.util.UI;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
@@ -57,74 +59,74 @@ import org.eclipse.swt.widgets.Event;
  */
 public class ChartComponents extends Composite {
 
-	public static final int				BAR_SELECTION_DELAY_TIME	= 100;
+	public static final int				BAR_SELECTION_DELAY_TIME		= 100;
 
 	/**
 	 * min/max pixel widthDev/heightDev of the chart
 	 */
-	static final int					CHART_MIN_WIDTH				= 5;
-	static final int					CHART_MIN_HEIGHT			= 5;
-	static final int					CHART_MAX_WIDTH				= 100000;
-	static final int					CHART_MAX_HEIGHT			= 10000;
+	static final int					CHART_MIN_WIDTH					= 5;
+	static final int					CHART_MIN_HEIGHT				= 5;
+	static final int					CHART_MAX_WIDTH					= 100000;
+	static final int					CHART_MAX_HEIGHT				= 10000;
 
-	static final int					SLIDER_BAR_HEIGHT			= 10;
-	static final int					MARKER_BAR_HEIGHT			= 50;
-	static final int					TITLE_BAR_HEIGHT			= 18;								//15;
-	static final int					MARGIN_TOP_WITH_TITLE		= 5;
-	static final int					MARGIN_TOP_WITHOUT_TITLE	= 10;
+	static final int					SLIDER_BAR_HEIGHT				= 10;
+	static final int					MARKER_BAR_HEIGHT				= 50;
+	static final int					TITLE_BAR_HEIGHT				= 18;								//15;
+	static final int					MARGIN_TOP_WITH_TITLE			= 5;
+	static final int					MARGIN_TOP_WITHOUT_TITLE		= 10;
 
-	private static final int			DAY_IN_SECONDS				= 24 * 60 * 60;
+	private static final int			DAY_IN_SECONDS					= 24 * 60 * 60;
 
 	private final Chart					_chart;
 
 	/**
 	 * top margin of the chart (and all it's components)
 	 */
-	private int							_devMarginTop				= MARGIN_TOP_WITHOUT_TITLE;
+	private int							_devMarginTop					= MARGIN_TOP_WITHOUT_TITLE;
 
 	/**
 	 * height of the marker bar, 0 indicates that the marker bar is not visible
 	 */
-	private int							_devMarkerBarHeight			= 0;
+	private int							_devMarkerBarHeight				= 0;
 
 	/**
 	 * height of the slider bar, 0 indicates that the slider is not visible
 	 */
-	int									_devSliderBarHeight			= 0;
+	int									_devSliderBarHeight				= 0;
 
 	/**
 	 * height of the title bar, 0 indicates that the title is not visible
 	 */
-	private int							_devXTitleBarHeight			= 0;
+	private int							_devXTitleBarHeight				= 0;
 
 	/**
 	 * height of the horizontal axis
 	 */
-	private final int					_xAxisHeight				= 25;
+	private final int					_xAxisHeight					= 25;
 
 	/**
 	 * width of the vertical axis
 	 */
-	private final int					_yAxisWidthLeft				= 50;
-	private int							_yAxisWidthLeftWithTitle	= _yAxisWidthLeft;
-	private final int					_yAxisWidthRight			= 50;
+	private final int					_yAxisWidthLeft					= 50;
+	private int							_yAxisWidthLeftWithTitle		= _yAxisWidthLeft;
+	private final int					_yAxisWidthRight				= 50;
 
 	/**
 	 * vertical distance between two graphs
 	 */
-	private final int					_chartsVerticalDistance		= 15;
+	private final int					_chartsVerticalDistance			= 15;
 
 	/**
 	 * contains the {@link SynchConfiguration} for the current chart and will be used from the chart
 	 * which is synchronized
 	 */
-	SynchConfiguration					_synchConfigOut				= null;
+	SynchConfiguration					_synchConfigOut					= null;
 
 	/**
 	 * when a {@link SynchConfiguration} is set, this chart will be synchronized with the chart
 	 * which set's the synch config
 	 */
-	SynchConfiguration					_synchConfigSrc				= null;
+	SynchConfiguration					_synchConfigSrc					= null;
 
 	/**
 	 * visible chart rectangle
@@ -135,13 +137,13 @@ public class ChartComponents extends Composite {
 	private final ChartComponentAxis	_componentAxisLeft;
 	private final ChartComponentAxis	_componentAxisRight;
 
-	private ChartDataModel				_chartDataModel				= null;
+	private ChartDataModel				_chartDataModel					= null;
 
 	private ArrayList<ChartDrawingData>	_chartDrawingData;
 
-	public boolean						_useAdvancedGraphics		= true;
+	public boolean						_useAdvancedGraphics			= true;
 
-	private final String				_monthLabels[]				= {
+	private static final String			_monthLabels[]					= {
 			Messages.Month_jan,
 			Messages.Month_feb,
 			Messages.Month_mar,
@@ -153,12 +155,32 @@ public class ChartComponents extends Composite {
 			Messages.Month_sep,
 			Messages.Month_oct,
 			Messages.Month_nov,
-			Messages.Month_dec										};
+			Messages.Month_dec											};
 
-	private final int[]					_keyDownCounter				= new int[1];
-	private final int[]					_lastKeyDownCounter			= new int[1];
+	private static final String			_monthShortLabels[]				= {
+			Integer.toString(1),
+			Integer.toString(2),
+			Integer.toString(3),
+			Integer.toString(4),
+			Integer.toString(5),
+			Integer.toString(6),
+			Integer.toString(7),
+			Integer.toString(8),
+			Integer.toString(9),
+			Integer.toString(10),
+			Integer.toString(11),
+			Integer.toString(12)										};
 
-	private final Calendar				_calendar					= GregorianCalendar.getInstance();
+	/**
+	 * Width in pixel for all months in one year
+	 */
+	private int							_devYearEqualMonthsWidth		= -1;
+	private int							_devYearEqualMonthsShortWidth	= -1;
+
+	private final int[]					_keyDownCounter					= new int[1];
+	private final int[]					_lastKeyDownCounter				= new int[1];
+
+	private final Calendar				_calendar						= GregorianCalendar.getInstance();
 
 	/**
 	 * this error message is displayed instead of the chart when it's not <code>null</code>
@@ -171,7 +193,7 @@ public class ChartComponents extends Composite {
 	 * @param parent
 	 * @param style
 	 */
-	public ChartComponents(final Chart parent, final int style) {
+	ChartComponents(final Chart parent, final int style) {
 
 		super(parent, style);
 
@@ -180,10 +202,7 @@ public class ChartComponents extends Composite {
 
 		// set layout for the components
 		gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-//		gd.widthHint = CHART_MIN_WIDTH;
-//		gd.heightHint = CHART_MIN_HEIGHT;
 		setLayoutData(gd);
-//		GridDataFactory.fillDefaults().grab(true, true).applyTo(this);
 
 		// set layout for this chart
 		final GridLayout gl = new GridLayout(3, false);
@@ -192,7 +211,6 @@ public class ChartComponents extends Composite {
 		gl.marginWidth = 0;
 		gl.marginHeight = 0;
 		setLayout(gl);
-//		GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(this);
 
 		// left: create left axis canvas
 		_componentAxisLeft = new ChartComponentAxis(parent, this, SWT.NONE);
@@ -203,7 +221,6 @@ public class ChartComponents extends Composite {
 		// center: create chart canvas
 		_componentGraph = new ChartComponentGraph(parent, this, SWT.NONE);
 		gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-//		gd.widthHint = CHART_MIN_WIDTH;
 		_componentGraph.setLayoutData(gd);
 
 		// right: create right axis canvas
@@ -250,7 +267,7 @@ public class ChartComponents extends Composite {
 	}
 
 	/**
-	 * Compute the units for the x-axis and save it in the drawingData object
+	 * Compute units for the x-axis and keep it in the drawingData object
 	 */
 	private void computeXValues(final ChartDrawingData drawingData) {
 
@@ -277,48 +294,55 @@ public class ChartComponents extends Composite {
 		// unitRawValue is the number in data values for one unit
 		final int unitRawValue = xMaxValue / Math.max(1, unitRawNumbers);
 
-		// axis unit
-		float unitValue = 0;
-
 		// get the unit list from the configuration
 		final ArrayList<ChartUnit> units = drawingData.getXUnits();
 
 		switch (xAxisUnit) {
-		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_SECOND:
-		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_OPTIONAL_SECOND:
-		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE:
-			unitValue = Util.roundTimeValue(unitRawValue);
-			break;
 
-		case ChartDataSerie.AXIS_UNIT_NUMBER:
-			unitValue = Util.roundDecimalValue(unitRawValue);
-			break;
+		case ChartDataSerie.X_AXIS_UNIT_DAY:
 
-		case ChartDataSerie.X_AXIS_UNIT_WEEK:
-			createXValuesWeek(drawingData, units, devVirtualGraphWidth);
-			break;
-
-		case ChartDataSerie.AXIS_UNIT_MONTH:
-			createXValuesMonth(drawingData, units, devVirtualGraphWidth);
-			break;
-
-		case ChartDataSerie.AXIS_UNIT_YEAR:
-			createXValuesYear(drawingData, units, devVirtualGraphWidth);
-			break;
-
-		case ChartDataSerie.AXIS_UNIT_DAY:
 			createXValuesDay(drawingData, units, devVirtualGraphWidth);
 			break;
 
-		default:
-			break;
-		}
+		case ChartDataSerie.X_AXIS_UNIT_WEEK:
 
-		// create the units for the x-axis
-		if (xAxisUnit != ChartDataSerie.AXIS_UNIT_DAY
-				&& xAxisUnit != ChartDataSerie.AXIS_UNIT_MONTH
-				&& xAxisUnit != ChartDataSerie.AXIS_UNIT_YEAR
-				&& xAxisUnit != ChartDataSerie.X_AXIS_UNIT_WEEK) {
+			createXValuesWeek(drawingData, units, devVirtualGraphWidth);
+			break;
+
+		case ChartDataSerie.X_AXIS_UNIT_MONTH:
+
+			createXValuesMonth(drawingData, units, devVirtualGraphWidth);
+			break;
+
+		case ChartDataSerie.X_AXIS_UNIT_YEAR:
+
+			createXValuesYear(drawingData, units, devVirtualGraphWidth);
+			break;
+
+		default:
+
+			// axis unit
+			float unitValue = 1; // this default value should be overwritten
+
+			switch (xAxisUnit) {
+			case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_SECOND:
+			case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_OPTIONAL_SECOND:
+			case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE:
+				unitValue = Util.roundTimeValue(unitRawValue);
+				break;
+
+			case ChartDataSerie.AXIS_UNIT_NUMBER:
+			case ChartDataSerie.X_AXIS_UNIT_NUMBER_CENTER:
+				unitValue = Util.roundDecimalValue(unitRawValue);
+				break;
+
+			default:
+				break;
+			}
+
+			/*
+			 * create units for the x-axis
+			 */
 
 			// get the unitOffset when a startValue is set
 			int unitOffset = 0;
@@ -330,7 +354,13 @@ public class ChartComponents extends Composite {
 			int graphValue = 0;
 			int infinityLoopIndex = 0;
 
-			while (graphValue <= xMaxValue) {
+			/*
+			 * increase by one unit that the right side of the chart is drawing a unit, in some
+			 * cases this didn't occured
+			 */
+			final float maxUnitValue = xMaxValue + unitValue;
+
+			while (graphValue <= maxUnitValue) {
 
 				// create unit value/label
 				final int unitPos = graphValue - unitOffset;
@@ -358,18 +388,35 @@ public class ChartComponents extends Composite {
 					break;
 				}
 			}
-
+			break;
 		}
 
-		// configure the bar in the bar charts
-		if (_chartDataModel.getChartType() == ChartDataModel.CHART_TYPE_BAR && //
-				(xAxisUnit == ChartDataSerie.AXIS_UNIT_NUMBER //
-				|| xAxisUnit == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE)) {
+		/*
+		 * configure bars in the bar charts
+		 */
+		if (_chartDataModel.getChartType() == ChartDataModel.CHART_TYPE_BAR) {
 
-			final int barWidth = (devVirtualGraphWidth / xData.getHighValues()[0].length) / 2;
+			final int[] highValues = xData.getHighValues()[0];
 
-			drawingData.setBarRectangleWidth(Math.max(0, barWidth));
-			drawingData.setBarPosition(ChartDrawingData.BAR_POS_CENTER);
+			if (xAxisUnit == ChartDataSerie.AXIS_UNIT_NUMBER || xAxisUnit == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE) {
+
+				final int barWidth = (devVirtualGraphWidth / highValues.length) / 2;
+
+				drawingData.setBarRectangleWidth(Math.max(0, barWidth));
+				drawingData.setBarPosition(ChartDrawingData.BAR_POS_CENTER);
+
+			} else if (xAxisUnit == ChartDataSerie.X_AXIS_UNIT_NUMBER_CENTER) {
+
+				/*
+				 * set bar width that it is wide enouth to overlap the next right bar, the
+				 * overlapped part will be removed in ChartComponentGraph.draw210BarGraph()
+				 */
+				final float barWidth = ((float) devVirtualGraphWidth / (highValues.length - 1));
+				final int barWidth2 = (int) (Math.max(1, barWidth) * 1.10);
+
+				drawingData.setBarRectangleWidth(barWidth2);
+				drawingData.setBarPosition(ChartDrawingData.BAR_POS_CENTER);
+			}
 		}
 	}
 
@@ -621,49 +668,248 @@ public class ChartComponents extends Composite {
 		return chartDrawingData;
 	}
 
+	private void createMonthEqualUnits(	final ChartDrawingData drawingData,
+										final ArrayList<ChartUnit> units,
+										final int devGraphWidth,
+										final int allUnitsSize,
+										final int numberOfYears) {
+
+		final boolean isDrawUnits[] = new boolean[allUnitsSize];
+
+		// check if month label width is set
+		if (_devYearEqualMonthsWidth == -1) {
+			getMonthLabelWidth();
+		}
+
+		/*
+		 * create month labels depending on the available width for a unit
+		 */
+		final int devYearWidth = devGraphWidth / numberOfYears;
+		if (devYearWidth >= _devYearEqualMonthsWidth) {
+
+			// all month labels can be displayed
+
+			for (int monthIndex = 0; monthIndex < allUnitsSize; monthIndex++) {
+				units.add(new ChartUnit(monthIndex, _monthLabels[monthIndex % 12]));
+				isDrawUnits[monthIndex] = true;
+			}
+
+		} else if (devYearWidth >= _devYearEqualMonthsWidth / 3) {
+
+			// every second month label can be displayed
+
+			for (int monthIndex = 0; monthIndex < allUnitsSize; monthIndex++) {
+
+				final String monthLabel = monthIndex % 3 == 0 //
+						? _monthLabels[monthIndex % 12]
+						: UI.EMPTY_STRING;
+
+				units.add(new ChartUnit(monthIndex, monthLabel));
+				isDrawUnits[monthIndex] = monthIndex % 3 == 0;
+			}
+
+		} else if (devYearWidth >= _devYearEqualMonthsShortWidth / 3) {
+
+			// every second month short label can be displayed
+
+			for (int monthIndex = 0; monthIndex < allUnitsSize; monthIndex++) {
+
+				final String monthLabel = monthIndex % 3 == 0 //
+						? _monthShortLabels[monthIndex % 12]
+						: UI.EMPTY_STRING;
+
+				units.add(new ChartUnit(monthIndex, monthLabel));
+				isDrawUnits[monthIndex] = monthIndex % 3 == 0;
+			}
+
+		} else if (devYearWidth >= _devYearEqualMonthsShortWidth / 6) {
+
+			// every second month short label can be displayed
+
+			for (int monthIndex = 0; monthIndex < allUnitsSize; monthIndex++) {
+
+				final String monthLabel = monthIndex % 6 == 0 //
+						? _monthShortLabels[monthIndex % 12]
+						: UI.EMPTY_STRING;
+
+				units.add(new ChartUnit(monthIndex, monthLabel));
+				isDrawUnits[monthIndex] = monthIndex % 3 == 0;
+			}
+
+		} else {
+
+			// width is too small to display month labels, display nothing
+
+			for (int monthIndex = 0; monthIndex < allUnitsSize; monthIndex++) {
+				units.add(new ChartUnit(monthIndex, UI.EMPTY_STRING));
+			}
+		}
+
+		// set state that the overlap is not checked again
+		drawingData.setIsXUnitOverlapChecked(true);
+
+		drawingData.setIsDrawVerticalGrid(false);
+		drawingData.setIsDrawUnit(isDrawUnits);
+	}
+
 	/**
 	 * Create the labels for the months by using the days to scale the x-axis
 	 * 
+	 * @param drawingData
 	 * @param units
 	 * @param devGraphWidth
 	 * @param years
 	 * @param yearDays
+	 *            Number of days in one year
 	 */
-	private void createMonthLabels(	final ArrayList<ChartUnit> units,
-									final int devGraphWidth,
-									final int[] years,
-									final int[] yearDays) {
-
-		// shorten the unit when there is not enough space to draw the full unit name
-		final GC gc = new GC(this);
-		final int monthLength = gc.stringExtent(_monthLabels[0]).x;
-		final boolean useShortUnitLabel = monthLength > (devGraphWidth / (years.length * 12)) * 0.9;
-		gc.dispose();
-
-		int yearIndex = 0;
-		int allDays = 0;
+	private void createMonthUnequalUnits(	final ChartDrawingData drawingData,
+											final ArrayList<ChartUnit> units,
+											final int devGraphWidth,
+											final int[] years,
+											final int[] yearDays) {
 
 		/*
-		 * create month units for all years
+		 * multiple years can have different number of days but we assume that each year has the
+		 * same number of days to make it simpler
 		 */
-		for (final int year : years) {
+
+		final int numberOfYears = years.length;
+		final int numberOfMonths = numberOfYears * 12; // number of units
+
+		final boolean isDrawUnits[] = new boolean[numberOfMonths];
+
+		// check if month label width is set
+		if (_devYearEqualMonthsWidth == -1) {
+			getMonthLabelWidth();
+		}
+
+		/*
+		 * create list with the day number for all years and months
+		 */
+		final int[] daysForAllUnits = new int[numberOfMonths];
+		int allDays = 0;
+		for (int yearIndex = 0; yearIndex < numberOfYears; yearIndex++) {
 
 			// create month units
-			for (int month = 0; month < 12; month++) {
+			for (int monthIndex = 0; monthIndex < 12; monthIndex++) {
 
-				_calendar.set(year, month, 1);
+				_calendar.set(years[yearIndex], monthIndex, 1);
 				final int firstDayInMonth = _calendar.get(Calendar.DAY_OF_YEAR) - 1;
 
-				String monthLabel = _monthLabels[month];
-				if (useShortUnitLabel) {
-					monthLabel = monthLabel.substring(0, 1);
-				}
-
-				units.add(new ChartUnit(allDays + firstDayInMonth, monthLabel));
+				final int unitIndex = yearIndex * 12 + monthIndex;
+				daysForAllUnits[unitIndex] = allDays + firstDayInMonth;
 			}
 
-			allDays += yearDays[yearIndex++];
+			allDays += yearDays[yearIndex];
 		}
+
+		/*
+		 * create month labels depending on the available width for a unit
+		 */
+		final int devYearWidth = devGraphWidth / numberOfYears;
+		if (devYearWidth >= _devYearEqualMonthsWidth) {
+
+			// all month labels can be displayed
+
+			for (int monthIndex = 0; monthIndex < numberOfMonths; monthIndex++) {
+
+				final int unitValue = daysForAllUnits[monthIndex];
+
+				units.add(new ChartUnit(unitValue, _monthLabels[monthIndex % 12]));
+
+				isDrawUnits[monthIndex] = true;
+			}
+
+		} else if (devYearWidth >= _devYearEqualMonthsWidth / 3) {
+
+			// every second month label can be displayed
+
+			for (int monthIndex = 0; monthIndex < numberOfMonths; monthIndex++) {
+
+				final String monthLabel = monthIndex % 3 == 0 //
+						? _monthLabels[monthIndex % 12]
+						: UI.EMPTY_STRING;
+
+				final int unitValue = daysForAllUnits[monthIndex];
+
+				units.add(new ChartUnit(unitValue, monthLabel));
+
+//				isDrawUnits[monthIndex] = monthIndex % 3 == 0;
+				isDrawUnits[monthIndex] = true;
+			}
+
+		} else if (devYearWidth >= _devYearEqualMonthsShortWidth / 3) {
+
+			// every second month short label can be displayed
+
+			for (int monthIndex = 0; monthIndex < numberOfMonths; monthIndex++) {
+
+				final String monthLabel = monthIndex % 3 == 0 //
+						? _monthShortLabels[monthIndex % 12]
+						: UI.EMPTY_STRING;
+
+				units.add(new ChartUnit(daysForAllUnits[monthIndex], monthLabel));
+				isDrawUnits[monthIndex] = monthIndex % 3 == 0;
+			}
+
+		} else if (devYearWidth >= _devYearEqualMonthsShortWidth / 6) {
+
+			// every second month short label can be displayed
+
+			for (int monthIndex = 0; monthIndex < numberOfMonths; monthIndex++) {
+
+				final String monthLabel = monthIndex % 6 == 0 //
+						? _monthShortLabels[monthIndex % 12]
+						: UI.EMPTY_STRING;
+
+				units.add(new ChartUnit(daysForAllUnits[monthIndex], monthLabel));
+				isDrawUnits[monthIndex] = monthIndex % 3 == 0;
+			}
+
+		} else {
+
+			// width is too small to display month labels, display nothing
+
+			for (int monthIndex = 0; monthIndex < numberOfMonths; monthIndex++) {
+				units.add(new ChartUnit(daysForAllUnits[monthIndex], UI.EMPTY_STRING));
+			}
+		}
+
+		// set state that the overlap is not checked again
+		drawingData.setIsXUnitOverlapChecked(true);
+
+		drawingData.setIsDrawVerticalGrid(false);
+		drawingData.setIsDrawUnit(isDrawUnits);
+
+//		// shorten the unit when there is not enough space to draw the full unit name
+//		final GC gc = new GC(this);
+//		final int monthLength = gc.stringExtent(_monthLabels[0]).x;
+//		final boolean useShortUnitLabel = monthLength > (devGraphWidth / allUnitsSize) * 0.9;
+//		gc.dispose();
+//
+//		/*
+//		 * create month units for all years
+//		 */
+//		for (int yearIndex = 0; yearIndex < years.length; yearIndex++) {
+//
+//			final int year = years[yearIndex];
+//
+//			// create month units
+//			for (int month = 0; month < 12; month++) {
+//
+//				_calendar.set(year, month, 1);
+//				final int firstDayInMonth = _calendar.get(Calendar.DAY_OF_YEAR) - 1;
+//
+//				String monthLabel = _monthLabels[month];
+//				if (useShortUnitLabel) {
+//					monthLabel = monthLabel.substring(0, 1);
+//				}
+//
+//				units.add(new ChartUnit(allDays + firstDayInMonth, monthLabel));
+//			}
+//
+//			allDays += yearDays[yearIndex];
+//		}
 	}
 
 	/**
@@ -726,12 +972,12 @@ public class ChartComponents extends Composite {
 
 		final ChartSegments chartSegments = drawingData.getXData().getChartSegments();
 
-		createMonthLabels(units, devGraphWidth, chartSegments.years, chartSegments.yearDays);
+		createMonthUnequalUnits(drawingData, units, devGraphWidth, chartSegments.years, chartSegments.yearDays);
 
 		// compute the width of the rectangles
 		final int allDaysInAllYears = chartSegments.allValues;
 		drawingData.setBarRectangleWidth(Math.max(0, (devGraphWidth / allDaysInAllYears)));
-		drawingData.setXUnitTextPos(ChartDrawingData.XUNIT_TEXT_POS_CENTER);
+		drawingData.setXUnitTextPos(ChartDrawingData.X_UNIT_TEXT_POS_CENTER);
 
 		drawingData.setScaleX((float) devGraphWidth / allDaysInAllYears);
 	}
@@ -743,27 +989,13 @@ public class ChartComponents extends Composite {
 		final ChartDataXSerie xData = drawingData.getXData();
 		final ChartDataYSerie yData = drawingData.getYData();
 
-		final int months = xData._highValues[0].length;
-		final float scaleX = (float) devGraphWidth / months;
+		final int allUnitsSize = xData._highValues[0].length;
+		final float scaleX = (float) devGraphWidth / allUnitsSize;
 		drawingData.setScaleX(scaleX);
 
-		// shorten the unit when there is not enough space to draw the full unit name
-		final GC gc = new GC(this);
-		final int monthLength = gc.stringExtent(_monthLabels[0]).x + 2;
-		final boolean isShortUnitLabel = monthLength > (devGraphWidth / months);
-		gc.dispose();
+		final int numberOfYears = xData.getChartSegments().segmentTitle.length;
 
-		// create the month labels
-		for (int month = 0; month < months; month++) {
-
-			String monthLabel = _monthLabels[month % 12];
-			if (isShortUnitLabel) {
-				monthLabel = monthLabel.substring(0, 1);
-			}
-
-			final ChartUnit chartUnit = new ChartUnit(month, monthLabel);
-			units.add(chartUnit);
-		}
+		createMonthEqualUnits(drawingData, units, devGraphWidth, allUnitsSize, numberOfYears);
 
 		// compute the width and position of the rectangles
 		int barWidth;
@@ -779,17 +1011,18 @@ public class ChartComponents extends Composite {
 			break;
 
 		case ChartDataYSerie.BAR_LAYOUT_BESIDE:
-			final int serieCount = yData.getHighValues()[0].length;
+			final int serieCount = yData.getHighValues().length; // since 2011-06-16
+//			final int serieCount = yData.getHighValues()[0].length;
 
 			// the bar's width is 75% of the width for a month
-			barWidth = Math.max(0, monthWidth / 4 * 3);
+			barWidth = (int) Math.max(0, monthWidth * 0.95f);
 			drawingData.setBarRectangleWidth(Math.max(1, barWidth / serieCount));
 			drawingData.setDevBarRectangleXPos((Math.max(0, (monthWidth - barWidth) / 2) + 2));
 		default:
 			break;
 		}
 
-		drawingData.setXUnitTextPos(ChartDrawingData.XUNIT_TEXT_POS_CENTER);
+		drawingData.setXUnitTextPos(ChartDrawingData.X_UNIT_TEXT_POS_CENTER);
 	}
 
 	private void createXValuesWeek(	final ChartDrawingData drawingData,
@@ -801,37 +1034,6 @@ public class ChartComponents extends Composite {
 		final int allWeeks = xValues.length;
 
 		final ChartSegments chartSegments = drawingData.getXData().getChartSegments();
-//
-//		// get number of days for all years
-//		final int[] years = chartSegments.years;
-//		final int[] yearWeeks = chartSegments.yearWeeks;
-//
-//		// get number of weeks
-////		int allWeeks2 = 0;
-////		for (int weeks : yearWeeks) {
-////			allWeeks2 += weeks;
-////		}
-//
-//		final int allWeeks = xValues.length;
-//		final int allMonths = years.length * 12;
-//
-//		// shorten the unit when there is not enough space to draw the full unit name
-//		final GC gc = new GC(this);
-//		final int monthLabelLength = gc.stringExtent(monthLabels[0]).x + 2;
-//		final boolean isShortUnitLabel = monthLabelLength > (devGraphWidth / allMonths);
-//		gc.dispose();
-//
-//		// create the month labels
-//		for (int month = 0; month < allMonths; month++) {
-//
-//			String monthLabel = monthLabels[month % 12];
-//			if (isShortUnitLabel) {
-//				monthLabel = monthLabel.substring(0, 1);
-//			}
-//
-//			final ChartUnit chartUnit = new ChartUnit(month, monthLabel);
-//			units.add(chartUnit);
-//		}
 
 		final int[] yearDays = chartSegments.yearDays;
 
@@ -840,7 +1042,7 @@ public class ChartComponents extends Composite {
 			allDaysInAllYears += days;
 		}
 
-		createMonthLabels(units, devGraphWidth, chartSegments.years, yearDays);
+		createMonthUnequalUnits(drawingData, units, devGraphWidth, chartSegments.years, yearDays);
 
 		// compute the width and position of the rectangles
 		final int barWidth = (devGraphWidth / xValues.length) / 2;
@@ -849,7 +1051,7 @@ public class ChartComponents extends Composite {
 
 		drawingData.setScaleX((float) devGraphWidth / allWeeks);
 		drawingData.setScaleUnitX((float) devGraphWidth / allDaysInAllYears);
-		drawingData.setXUnitTextPos(ChartDrawingData.XUNIT_TEXT_POS_CENTER);
+		drawingData.setXUnitTextPos(ChartDrawingData.X_UNIT_TEXT_POS_CENTER);
 	}
 
 	private void createXValuesYear(	final ChartDrawingData drawingData,
@@ -910,7 +1112,7 @@ public class ChartComponents extends Composite {
 			break;
 		}
 
-		drawingData.setXUnitTextPos(ChartDrawingData.XUNIT_TEXT_POS_CENTER);
+		drawingData.setXUnitTextPos(ChartDrawingData.X_UNIT_TEXT_POS_CENTER);
 	}
 
 	ChartComponentAxis getAxisLeft() {
@@ -959,6 +1161,24 @@ public class ChartComponents extends Composite {
 		}
 
 		return _visibleGraphRect.width;
+	}
+
+	/**
+	 * Get size in pixel for the month labels and shortcuts
+	 */
+	private void getMonthLabelWidth() {
+
+		final GC gc = new GC(this);
+		{
+			_devYearEqualMonthsWidth = 0;
+			_devYearEqualMonthsShortWidth = 0;
+
+			for (int monthIndex = 0; monthIndex < _monthLabels.length; monthIndex++) {
+				_devYearEqualMonthsWidth += gc.stringExtent(_monthLabels[monthIndex]).x + 6;
+				_devYearEqualMonthsShortWidth += gc.stringExtent(_monthShortLabels[monthIndex]).x + 12;
+			}
+		}
+		gc.dispose();
 	}
 
 	/**

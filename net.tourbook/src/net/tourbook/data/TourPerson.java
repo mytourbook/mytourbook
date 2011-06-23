@@ -17,6 +17,9 @@ package net.tourbook.data;
 
 import static javax.persistence.CascadeType.ALL;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -75,7 +78,7 @@ public class TourPerson implements Comparable<Object> {
 	private float								height;
 
 	/**
-	 * Date/Time when tour data was modified, default value is 0
+	 * Birthday of this person, default value is 0 when birthday is not set.
 	 * <p>
 	 * since: db version 15
 	 */
@@ -147,6 +150,21 @@ public class TourPerson implements Comparable<Object> {
 	 */
 	@Transient
 	private long								_createId					= 0;
+
+	@Transient
+	private DateTime							_birthDay;
+
+	/**
+	 * Key is the age of the person
+	 */
+	@Transient
+	private HashMap<Integer, ZoneMinMaxBpm>		_hrZoneMinMaxBpm			= new HashMap<Integer, ZoneMinMaxBpm>();
+
+	/**
+	 * Sorted HR zones
+	 */
+	@Transient
+	private ArrayList<TourPersonHRZone>			_sortedHrZones;
 
 	/**
 	 * default constructor used in ejb
@@ -274,18 +292,31 @@ public class TourPerson implements Comparable<Object> {
 		return true;
 	}
 
-	private int getAge() {
+	/**
+	 * @param dateTime
+	 * @return Returns age for this person at a specific day
+	 */
+	private int getAge(final DateTime birthDay, final DateTime dateTime) {
 
-		final DateTime _today = new DateTime().withTime(0, 0, 0, 0);
-		final DateTime personBirthDay = birthDay == 0 ? DEFAULT_BIRTHDAY : new DateTime(birthDay);
-
-		final Period age = new Period(personBirthDay.getMillis(), _today.getMillis());
+		final Period age = new Period(birthDay.getMillis(), dateTime.getMillis());
 
 		return age.getYears();
 	}
 
+	/**
+	 * @return Returns birthday of this person, is 0 when birthday is not set.
+	 */
 	public long getBirthDay() {
 		return birthDay;
+	}
+
+	public DateTime getBirthDayWithDefault() {
+
+		if (_birthDay == null) {
+			_birthDay = birthDay == 0 ? DEFAULT_BIRTHDAY : new DateTime(birthDay);
+		}
+
+		return _birthDay;
 	}
 
 	public String getDeviceReaderId() {
@@ -304,19 +335,102 @@ public class TourPerson implements Comparable<Object> {
 		return height;
 	}
 
-	/**
-	 * @return Returns HR max depending on the HR max formula
-	 */
-	public int getHrMax() {
-		return getHrMax(hrMaxFormula, maxPulse, getAge());
-	}
+//	/**
+//	 * @param dateTime
+//	 *            Date when HR max should be computed.
+//	 * @return Returns HR max depending on the HR max formula and the age of the person at a
+//	 *         specific date.
+//	 */
+//	private int getHrMax(final int age) {
+//		return getHrMax(hrMaxFormula, maxPulse, age);
+//	}
 
 	public int getHrMaxFormula() {
 		return hrMaxFormula;
 	}
 
+	/**
+	 * @param hrMaxFormulaKey
+	 * @param hrMaxPulse
+	 * @param dateTime
+	 *            Date when the HR zones should be computed, this is the tour date.
+	 * @return Returns HR zone min/max bpm values or <code>null</code> when hr zones are not
+	 *         defined.
+	 */
+	public ZoneMinMaxBpm getHrZoneMinMaxBpm(final int hrMaxFormulaKey,
+											final int hrMaxPulse,
+											final DateTime birthDay,
+											final DateTime dateTime) {
+
+		if (hrZones == null || hrZones.size() == 0) {
+			return null;
+		}
+
+		final int age = getAge(birthDay, dateTime);
+
+		final ZoneMinMaxBpm hrZoneMinMax = _hrZoneMinMaxBpm.get(age);
+
+		if (hrZoneMinMax != null) {
+			// hr zones for the age is already available
+			return hrZoneMinMax;
+		}
+
+		final int hrMax = getHrMax(hrMaxFormulaKey, hrMaxPulse, age);
+		final int zoneSize = hrZones.size();
+
+		final int[] zoneMinBmps = new int[zoneSize];
+		final int[] zoneMaxBmps = new int[zoneSize];
+
+		final ArrayList<TourPersonHRZone> hrZonesList = new ArrayList<TourPersonHRZone>(hrZones);
+		Collections.sort(hrZonesList);
+
+		int prevMaxBpm = -1;
+
+		// fill zone min/max values
+		for (int zoneIndex = 0; zoneIndex < hrZones.size(); zoneIndex++) {
+
+			final TourPersonHRZone hrZone = hrZonesList.get(zoneIndex);
+
+			final int zoneMaxValue = hrZone.getZoneMaxValue();
+
+			int minBpm = hrZone.getZoneMinValue() * hrMax / 100;
+
+			final int maxBpm = zoneMaxValue == Integer.MAX_VALUE //
+					? Integer.MAX_VALUE
+					: (zoneMaxValue * hrMax / 100);
+
+			if (prevMaxBpm != -1) {
+				// make sure that "min" is last "max + 1"
+				minBpm = prevMaxBpm + 1;
+			}
+
+			zoneMinBmps[zoneIndex] = minBpm;
+			zoneMaxBmps[zoneIndex] = maxBpm;
+
+			prevMaxBpm = maxBpm;
+		}
+
+		final ZoneMinMaxBpm hrZoneMinMax1 = new ZoneMinMaxBpm(zoneMinBmps, zoneMaxBmps, age, hrMax);
+
+		_hrZoneMinMaxBpm.put(age, hrZoneMinMax1);
+
+		return hrZoneMinMax1;
+	}
+
 	public Set<TourPersonHRZone> getHrZones() {
 		return hrZones;
+	}
+
+	public ArrayList<TourPersonHRZone> getHrZonesSorted() {
+
+		if (_sortedHrZones == null) {
+
+			_sortedHrZones = new ArrayList<TourPersonHRZone>();
+			_sortedHrZones.addAll(hrZones);
+			Collections.sort(_sortedHrZones);
+		}
+
+		return _sortedHrZones;
 	}
 
 	public String getLastName() {
@@ -405,6 +519,10 @@ public class TourPerson implements Comparable<Object> {
 		return isSaved;
 	}
 
+	public void resetHrZones() {
+		_hrZoneMinMaxBpm.clear();
+	}
+
 	public void setBirthDay(final long birthDay) {
 		this.birthDay = birthDay;
 	}
@@ -430,7 +548,15 @@ public class TourPerson implements Comparable<Object> {
 	}
 
 	public void setHrZones(final Set<TourPersonHRZone> hrZones) {
+
 		this.hrZones = hrZones;
+
+		_hrZoneMinMaxBpm.clear();
+
+		if (_sortedHrZones != null) {
+			_sortedHrZones.clear();
+			_sortedHrZones = null;
+		}
 	}
 
 	public void setLastName(final String lastName) {

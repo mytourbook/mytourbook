@@ -13,46 +13,34 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.chart;
+package net.tourbook.data;
 
-public class ChartToolTipInfo {
+public class ZoneMinMaxBpm {
 
-	private String	_title;
-	private String	_label;
+	/**
+	 * Age in years
+	 */
+	public int		age;
+	public int		hrMax;
 
-	private boolean	_isDisplayed	= false;
-	private boolean	_isReposition	= false;
+	public int[]	zoneMinBmp;
+	public int[]	zoneMaxBmp;
 
-	public String getLabel() {
-		return _label;
-	}
+	/**
+	 * Set HR zones, age and max HR
+	 * 
+	 * @param zoneMinBmp
+	 * @param zoneMaxBmp
+	 * @param age
+	 * @param hrMax
+	 */
+	public ZoneMinMaxBpm(final int[] zoneMinBmp, final int[] zoneMaxBmp, final int age, final int hrMax) {
 
-	public String getTitle() {
-		return _title;
-	}
+		this.zoneMinBmp = zoneMinBmp;
+		this.zoneMaxBmp = zoneMaxBmp;
 
-	boolean isDisplayed() {
-		return _isDisplayed;
-	}
-
-	boolean isReposition() {
-		return _isReposition;
-	}
-
-	public void setIsDisplayed(final boolean isDisplayed) {
-		_isDisplayed = isDisplayed;
-	}
-
-	public void setLabel(final String label) {
-		this._label = label;
-	}
-
-	public void setReposition(final boolean isReposition) {
-		_isReposition = isReposition;
-	}
-
-	public void setTitle(final String title) {
-		this._title = title;
+		this.age = age;
+		this.hrMax = hrMax;
 	}
 
 }

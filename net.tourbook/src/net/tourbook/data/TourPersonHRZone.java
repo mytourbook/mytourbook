@@ -24,9 +24,12 @@ import javax.persistence.Transient;
 
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.UI;
+import net.tourbook.util.StatusUtil;
+
+import org.eclipse.swt.graphics.RGB;
 
 @Entity
-public class TourPersonHRZone implements Comparable<TourPersonHRZone> {
+public class TourPersonHRZone implements Cloneable, Comparable<TourPersonHRZone> {
 
 	private static final String	NAME_SHORTCUT_PREFIX	= " (";							//$NON-NLS-1$
 	private static final String	NAME_SHORTCUT_POSTFIX	= ")";								//$NON-NLS-1$
@@ -60,14 +63,21 @@ public class TourPersonHRZone implements Comparable<TourPersonHRZone> {
 	private String				description;
 
 	/**
-	 * Minimum value of the hr zone
+	 * Minimum value of the hr zone in % of hr max
 	 */
 	private int					zoneMinValue;
 
 	/**
-	 * Maximum value of the hr zone
+	 * Maximum value of the hr zone in % of hr max
 	 */
 	private int					zoneMaxValue;
+
+	/**
+	 * HR zone color
+	 */
+	private int					colorRed;
+	private int					colorGreen;
+	private int					colorBlue;
 
 	/**
 	 * unique id for manually created markers because the {@link #hrZoneId} is 0 when the marker is
@@ -75,6 +85,16 @@ public class TourPersonHRZone implements Comparable<TourPersonHRZone> {
 	 */
 	@Transient
 	private long				_createId				= 0;
+
+	/**
+	 * cached color
+	 */
+	@Transient
+	private RGB					_color;
+	@Transient
+	private RGB					_colorDark;
+	@Transient
+	private RGB					_colorBright;
 
 	/**
 	 * manually created marker or imported marker create a unique id to identify them, saved marker
@@ -91,33 +111,67 @@ public class TourPersonHRZone implements Comparable<TourPersonHRZone> {
 		_createId = ++_createCounter;
 	}
 
-//    public int compareTo(Integer anotherInteger) {
-//	int thisVal = this.value;
-//	int anotherVal = anotherInteger.value;
-//	return (thisVal<anotherVal ? -1 : (thisVal==anotherVal ? 0 : 1));
-//    }
+	private void checkColors() {
+		if (_color == null) {
+			_color = new RGB(colorRed, colorGreen, colorBlue);
+			_colorDark = getColorDark(_color);
+			_colorBright = getColorBright(_color);
+		}
+	}
+
+//	/**
+//	 * @return Returns a deep clone of {@link TourPersonHRZone}
+//	 */
+//	public TourPersonHRZone deepClone() {
+//
+//		try {
+//
+//			final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//			final ObjectOutputStream oos = new ObjectOutputStream(baos);
+//			oos.writeObject(this);
+//
+//			final ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+//			final ObjectInputStream ois = new ObjectInputStream(bais);
+//
+//			final TourPersonHRZone newObject = (TourPersonHRZone) ois.readObject();
+//
+//			return newObject;
+//
+//		} catch (final Exception e) {
+//			StatusUtil.log(e);
+//			return null;
+//		}
+//	}
+
+	@Override
+	public TourPersonHRZone clone() {
+
+		try {
+
+			// create clones for shallow copied fields so that they can be modified
+
+			final TourPersonHRZone newHrZone = (TourPersonHRZone) super.clone();
+
+			newHrZone.zoneName = zoneName == null ? null : new String(zoneName);
+			newHrZone.nameShortcut = nameShortcut == null ? null : new String(nameShortcut);
+			newHrZone.description = description == null ? null : new String(description);
+
+			return newHrZone;
+
+		} catch (final CloneNotSupportedException e) {
+			StatusUtil.log(e);
+			return null;
+		}
+	}
 
 	@Override
 	public int compareTo(final TourPersonHRZone otherHrZone) {
 
-		/*
-		 * check if first or last entry is sorted
-		 */
-//		if (zoneMinValue == Integer.MIN_VALUE || zoneMinValue == Integer.MIN_VALUE) {
-//			return Integer.MIN_VALUE;
-////			return -1;
-//		}
-//
-//		if (zoneMaxValue == Integer.MAX_VALUE) {
-//			return Integer.MAX_VALUE;
-////			return 1;
-//		}
-
-//		final int minDiff = zoneMinValue - otherHrZone.zoneMinValue;
-//		final int maxDiff = zoneMaxValue - otherHrZone.zoneMaxValue;
-
-//		return zoneMinValue < otherHrZone.zoneMinValue ? -1 : zoneMinValue == otherHrZone.zoneMinValue ? 0 : 1;
-		return zoneMaxValue < otherHrZone.zoneMaxValue ? -1 : zoneMaxValue == otherHrZone.zoneMaxValue ? 0 : 1;
+		return zoneMinValue < otherHrZone.zoneMinValue ? //
+				-1
+				: zoneMinValue == otherHrZone.zoneMinValue ? //
+						0
+						: 1;
 	}
 
 	@Override
@@ -152,6 +206,43 @@ public class TourPersonHRZone implements Comparable<TourPersonHRZone> {
 		return true;
 	}
 
+	public RGB getColor() {
+		checkColors();
+		return _color;
+	}
+
+	public RGB getColorBright() {
+		checkColors();
+		return _colorBright;
+	}
+
+	private RGB getColorBright(final RGB rgb) {
+
+		final double brightFactor = 1.1f;
+
+		final int red = (int) Math.min(0xff, rgb.red * brightFactor);
+		final int green = (int) Math.min(0xff, rgb.green * brightFactor);
+		final int blue = (int) Math.min(0xff, rgb.blue * brightFactor);
+
+		return new RGB(red, green, blue);
+	}
+
+	public RGB getColorDark() {
+		checkColors();
+		return _colorDark;
+	}
+
+	private RGB getColorDark(final RGB rgb) {
+
+		final double darkFactor = 0.90;
+
+		final int red = (int) Math.max(0, rgb.red * darkFactor);
+		final int green = (int) Math.max(0, rgb.green * darkFactor);
+		final int blue = (int) Math.max(0, rgb.blue * darkFactor);
+
+		return new RGB(red, green, blue);
+	}
+
 	public String getDescription() {
 		return description;
 	}
@@ -159,7 +250,7 @@ public class TourPersonHRZone implements Comparable<TourPersonHRZone> {
 	/**
 	 * @return Returns the name of the zone combined with the zone name shortcut
 	 */
-	public String getName() {
+	public String getNameLong() {
 
 		if ((zoneName == null || zoneName.length() == 0) && (nameShortcut == null || nameShortcut.length() == 0)) {
 			// nothing is defined
@@ -177,6 +268,43 @@ public class TourPersonHRZone implements Comparable<TourPersonHRZone> {
 		return zoneName + NAME_SHORTCUT_PREFIX + nameShortcut + NAME_SHORTCUT_POSTFIX;
 	}
 
+	/**
+	 * @return Returns the name of the zone combined with the zone name shortcut
+	 */
+	public String getNameLongShortcutFirst() {
+
+		if ((zoneName == null || zoneName.length() == 0) && (nameShortcut == null || nameShortcut.length() == 0)) {
+			// nothing is defined
+			return UI.EMPTY_STRING;
+		}
+
+		if (zoneName == null || zoneName.length() == 0) {
+			return nameShortcut;
+		}
+
+		if (nameShortcut == null || nameShortcut.length() == 0) {
+			return zoneName;
+		}
+
+		return nameShortcut + UI.SYMBOL_COLON + UI.SPACE + zoneName;
+	}
+
+	/**
+	 * @return Returns the short name or the name when the short name is not available.
+	 */
+	public String getNameShort() {
+
+		if (nameShortcut != null && nameShortcut.length() > 0) {
+			return nameShortcut;
+		}
+
+		if (zoneName != null && zoneName.length() > 0) {
+			return zoneName;
+		}
+
+		return UI.EMPTY_STRING;
+	}
+
 	public String getNameShortcut() {
 		return nameShortcut;
 	}
@@ -185,10 +313,16 @@ public class TourPersonHRZone implements Comparable<TourPersonHRZone> {
 		return tourPerson;
 	}
 
+	/**
+	 * @return Returns maximum value of the hr zone in % of hr max
+	 */
 	public int getZoneMaxValue() {
 		return zoneMaxValue;
 	}
 
+	/**
+	 * @return Returns minimum value of the hr zone in % of hr max
+	 */
 	public int getZoneMinValue() {
 		return zoneMinValue;
 	}
@@ -204,6 +338,18 @@ public class TourPersonHRZone implements Comparable<TourPersonHRZone> {
 		result = prime * result + (int) (_createId ^ (_createId >>> 32));
 		result = prime * result + (int) (hrZoneId ^ (hrZoneId >>> 32));
 		return result;
+	}
+
+	public void setColor(final RGB rgb) {
+
+		// cache rgb values
+		_color = rgb;
+		_colorDark = getColorDark(rgb);
+		_colorBright = getColorBright(rgb);
+
+		colorRed = rgb.red;
+		colorGreen = rgb.green;
+		colorBlue = rgb.blue;
 	}
 
 	public void setDescription(final String description) {

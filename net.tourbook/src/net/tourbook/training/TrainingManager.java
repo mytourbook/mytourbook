@@ -22,13 +22,21 @@ import net.tourbook.Messages;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourPersonHRZone;
 
+import org.eclipse.swt.graphics.RGB;
+
 public class TrainingManager {
 
+	private static final RGB		RGB_ZONE_1				= new RGB(0x4B, 0xF2, 0x74);
+	private static final RGB		RGB_ZONE_2				= new RGB(0xD3, 0xFF, 0x95);
+	private static final RGB		RGB_ZONE_3				= new RGB(0xF0, 0xE8, 0x34);
+	private static final RGB		RGB_ZONE_4				= new RGB(0xFF, 0x79, 0x0F);
+	private static final RGB		RGB_ZONE_5				= new RGB(0xD8, 0x3B, 0x1C);
+
 	// keys to identify the hr max formula
-	public static final int			HR_MAX_FORMULA_220_AGE	= 0;	//	HRmax = 220 - age              // this is the default formula
-	public static final int			HR_MAX_FORMULA_205_8	= 1;	//	HRmax = 205.8 - (0.685 x age)
-	public static final int			HR_MAX_FORMULA_206_9	= 2;	//  HRmax = 206.9 - (0.67 x age)
-	public static final int			HR_MAX_FORMULA_191_5	= 3;	//  HRmax = 191.5 - (0.007 x age2)
+	public static final int			HR_MAX_FORMULA_220_AGE	= 0;							//	HRmax = 220 - age              // this is the default formula
+	public static final int			HR_MAX_FORMULA_205_8	= 1;							//	HRmax = 205.8 - (0.685 x age)
+	public static final int			HR_MAX_FORMULA_206_9	= 2;							//  HRmax = 206.9 - (0.67 x age)
+	public static final int			HR_MAX_FORMULA_191_5	= 3;							//  HRmax = 191.5 - (0.007 x age2)
 	public static final int			HR_MAX_NOT_COMPUTED		= 999;
 
 	/**
@@ -76,7 +84,8 @@ public class TrainingManager {
 										final int minValue,
 										final int maxValue,
 										final String zoneName,
-										final String nameShortcut) {
+										final String nameShortcut,
+										final RGB rgb) {
 
 		final TourPersonHRZone hrZone = new TourPersonHRZone(person);
 
@@ -84,13 +93,12 @@ public class TrainingManager {
 		hrZone.setZoneMaxValue(maxValue);
 		hrZone.setZoneName(zoneName);
 		hrZone.setNameShortcut(nameShortcut);
+		hrZone.setColor(rgb);
 
 		hrZones.add(hrZone);
 	}
 
 	/**
-	 * {@link Integer#MIN_VALUE} occures once in a set for the lowest value<br>
-	 * {@link Integer#MAX_VALUE} occures once in a set for the highest value.<br>
 	 * These two values in a set cannot be deleted, they will occure always.
 	 * 
 	 * @param person
@@ -103,103 +111,60 @@ public class TrainingManager {
 
 		if (selectedTemplate == HR_ZONE_TEMPLATE_01) {
 
-			createHrZone(person, hrZones, Integer.MIN_VALUE, 60, //
+			createHrZone(person, hrZones, 0, 59, //
 					Messages.HR_Zone_01_060_Moderate,
-					Messages.HR_Zone_01_060_Moderate_Shortcut);
+					Messages.HR_Zone_01_060_Moderate_Shortcut,
+					RGB_ZONE_1);
 
-			createHrZone(person, hrZones, 60, 70, //
+			createHrZone(person, hrZones, 60, 69, //
 					Messages.HR_Zone_01_070_FatBurning,
-					Messages.HR_Zone_01_070_FatBurning_Shortcut);
+					Messages.HR_Zone_01_070_FatBurning_Shortcut,
+					RGB_ZONE_2);
 
-			createHrZone(person, hrZones, 70, 80, //
+			createHrZone(person, hrZones, 70, 79, //
 					Messages.HR_Zone_01_080_Aerobic,
-					Messages.HR_Zone_01_080_Aerobic_Shortcut);
+					Messages.HR_Zone_01_080_Aerobic_Shortcut,
+					RGB_ZONE_3);
 
-			createHrZone(person, hrZones, 80, 90, //
+			createHrZone(person, hrZones, 80, 89, //
 					Messages.HR_Zone_01_090_Anaerobic,
-					Messages.HR_Zone_01_090_Anaerobic_Shortcut);
+					Messages.HR_Zone_01_090_Anaerobic_Shortcut,
+					RGB_ZONE_4);
 
 			createHrZone(person, hrZones, 90, Integer.MAX_VALUE, //
 					Messages.HR_Zone_01_100_Maximum,
-					Messages.HR_Zone_01_100_Maximum_Shortcut);
+					Messages.HR_Zone_01_100_Maximum_Shortcut,
+					RGB_ZONE_5);
 
 		} else if (selectedTemplate == HR_ZONE_TEMPLATE_02) {
 
-			createHrZone(person, hrZones, Integer.MIN_VALUE, 65, //
+			createHrZone(person, hrZones, 0, 64, //
 					Messages.HR_Zone_02_065_KB,
-					Messages.HR_Zone_02_065_KB_Shortcut);
+					Messages.HR_Zone_02_065_KB_Shortcut,
+					RGB_ZONE_1);
 
-			createHrZone(person, hrZones, 65, 75, //
+			createHrZone(person, hrZones, 65, 74, //
 					Messages.HR_Zone_02_075_GA1,
-					Messages.HR_Zone_02_075_GA1_Shortcut);
+					Messages.HR_Zone_02_075_GA1_Shortcut,
+					RGB_ZONE_2);
 
-			createHrZone(person, hrZones, 75, 85, //
+			createHrZone(person, hrZones, 75, 84, //
 					Messages.HR_Zone_02_085_GA2,
-					Messages.HR_Zone_02_085_GA2_Shortcut);
+					Messages.HR_Zone_02_085_GA2_Shortcut,
+					RGB_ZONE_3);
 
-			createHrZone(person, hrZones, 85, 95, //
+			createHrZone(person, hrZones, 85, 94, //
 					Messages.HR_Zone_02_095_EB,
-					Messages.HR_Zone_02_095_EB_Shortcut);
+					Messages.HR_Zone_02_095_EB_Shortcut,
+					RGB_ZONE_4);
 
 			createHrZone(person, hrZones, 95, Integer.MAX_VALUE, //
 					Messages.HR_Zone_02_095_SB,
-					Messages.HR_Zone_02_095_SB_Shortcut);
+					Messages.HR_Zone_02_095_SB_Shortcut,
+					RGB_ZONE_5);
 
 		}
 
-// #######################################################################################################
-//
-//		a) Kompensationsbereich (KB): weniger als 65% der Maximal-Leistung
-//		- Zur Erholung nach anstrengendem Rennen/Training
-//		- ausschließlich Fettverbrennung
-//		- Dauer 1-2 Stunden
-//
-//		b) Grundlagen-Ausdauer 1 (GA1): 65–75% der Maximalleistung
-//		- Zum Aufbau der Grundlagenausdauer (besonders wichtig im Winter und Frühjahr)
-//		- fast ausschließlich Fettverbrennung
-//		- Dauer 5 Stunden und länger
-//
-//		c) Grundlagen-Ausdauer 2 (GA2): 75–85% der Maximalleistung
-//		– Zur Stabilisierung und zum Ausbau der Grundlagenausdauer
-//		- Fett- und Kohlehydrate
-//		- Dauer 1-2 Stunden
-//
-//		d) Entwicklungs-Bereich (EB): 85–95% der Maximalleistung
-//		– Zur Erhöhung der IANS
-//		- Wichtig z.B. für längere Ausreißversuche oder am Berg
-//		- Vorwiegend Kohlehydrate
-//		- Dauer 5-20 min, aber mehrmals hintereinander
-//
-//		e) Spitzenbereich (SB): mehr als 95% der Maximalleistung
-//		- Sprints, kurze Ausreißversuche. Nur für Leistungssportler!
-//		- Fast ausschließlich Kohlehydrate
-//		- Dauer: wenige Sekunden bis maximal 5 min
-
-//
-// #######################################################################################################
-//
-//	    Gesundheitszone: 50 bis 60 % der maximalen Herzfrequenz (HFmax) (Faktor 0,5 bis 0,6)
-//	    Fettverbrennungszone: 60 bis 70 % der HFmax (Faktor 0,6 bis 0,7)
-//	    Aerobe Zone: 70 bis 80 % der HFmax (Faktor 0,7 bis 0,8)
-//	    Anaerobe Zone: 80 bis 90 % der HFmax (Faktor 0,8 bis 0,9)
-//	    Warnzone: 90 bis 100 % der HFmax (Faktor 0,9 bis 1,0)
-//
-//
-// #######################################################################################################
-//
-//		Folgende Trainingsbereiche sind die gebräuchlichsten:
-//			REKOM 	Regenerations- u. Kompensationsbereich 	< 70% HFmax
-//			GA1 	Grundlagenausdauerbereich 1 	70 – 85% HFmax
-//			GA2 	Grundlagenausdauerbereich 2 	85 – 95% HFmax
-//			WSA 	Wettkampfspezifische Ausdauer 	95 – 100% HFmax
-//
-//			Weitere Trainingsbereiche:
-//			GA1/2 	Zwischenbereich von GA1 und GA2
-//			KA 	Kraftausdauerbereich (überschneidet sich mit GA2, anderer Fokus)
-//			SA 	Schnelligkeitsausdauerbereich (überschneidet sich mit WSA, anderer Fokus)
-//			EB 	Entwicklungsbereich (v.a. Radsport, Inlineskating)
-//			SB 	Spitzenbereich (v.a. Radsport)
-//			GB 	Grenzbereich (v.a. Skilanglauf)
 		return hrZones;
 	}
 }
