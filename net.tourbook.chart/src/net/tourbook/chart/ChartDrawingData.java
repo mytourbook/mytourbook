@@ -81,7 +81,7 @@ public class ChartDrawingData {
 	public int						devVirtualGraphWidth;
 
 	/**
-	 * graph height in dev (pixel) units
+	 * graph height in dev (pixel) units, each graph has the same height
 	 */
 	public int						devGraphHeight;
 

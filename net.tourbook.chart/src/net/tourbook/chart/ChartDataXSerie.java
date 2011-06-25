@@ -71,20 +71,20 @@ public class ChartDataXSerie extends ChartDataSerie {
 		return _chartSegments;
 	}
 
-	/**
-	 * @return Returns scaling for the x-axis which is computed with Math.pow(double, double). This
-	 *         scaling is disabled when <code>1</code> is returned.
-	 */
-	public double getScalingFactor() {
-		return _scalingFactor;
-	}
-
 	public int[] getRangeMarkerEndIndex() {
 		return _rangeMarkerEndIndex;
 	}
 
 	public int[] getRangeMarkerStartIndex() {
 		return _rangeMarkerStartIndex;
+	}
+
+	/**
+	 * @return Returns scaling for the x-axis which is computed with Math.pow(double, double). This
+	 *         scaling is disabled when <code>1</code> is returned.
+	 */
+	public double getScalingFactor() {
+		return _scalingFactor;
 	}
 
 	public double getScalingMaxValue() {
@@ -120,7 +120,8 @@ public class ChartDataXSerie extends ChartDataSerie {
 	void setMinMaxValues(final int[][] lowValues, final int[][] highValues) {}
 
 	/**
-	 * Range markers are an area in the graph which will be displayed in a different color
+	 * Range markers are an area in the graph which will be displayed in a different color. This
+	 * feature is use when tours are compared.
 	 * 
 	 * @param rangeMarkerStartIndex
 	 * @param rangeMarkerEndIndex

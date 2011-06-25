@@ -39,7 +39,6 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 	public static final String		YDATA_INFO					= "yDataInfo";					//$NON-NLS-1$
 
-	public static final int			FILL_METHOD_NOFILL			= 0;
 	public static final int			FILL_METHOD_FILL_BOTTOM		= 1;
 	public static final int			FILL_METHOD_FILL_ZERO		= 2;
 
@@ -61,7 +60,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 	 */
 	private int[][]					_colorIndex;
 
-	private int						_graphFillMethod			= FILL_METHOD_NOFILL;
+	private int						_graphFillMethod			= FILL_METHOD_FILL_BOTTOM;
 
 	private boolean					_showYSlider				= false;
 

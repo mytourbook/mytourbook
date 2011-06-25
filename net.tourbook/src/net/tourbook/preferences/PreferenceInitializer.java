@@ -254,9 +254,9 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		 */
 		store.setDefault(ITourbookPreferences.BREAK_TIME_METHOD, BreakTimeTool.BREAK_TIME_METHOD_BY_TIME_DISTANCE);
 
-		// break time, default is 1.8 km/h (10m in 20 sec)
+		// break time, default is 3.6 km/h (20 m in 20 sec)
 		store.setDefault(ITourbookPreferences.BREAK_TIME_SHORTEST_TIME, 20);
-		store.setDefault(ITourbookPreferences.BREAK_TIME_MAX_DISTANCE, 10.0f);
+		store.setDefault(ITourbookPreferences.BREAK_TIME_MAX_DISTANCE, 20.0f);
 
 		// minimum speed for a break, default is 2.0 km/h
 		store.setDefault(ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED, 2.0f);

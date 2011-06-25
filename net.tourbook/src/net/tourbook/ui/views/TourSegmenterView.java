@@ -1562,6 +1562,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			 */
 			final Button btnRestore = new Button(container, SWT.NONE);
 			GridDataFactory.fillDefaults()//
+					.align(SWT.FILL, SWT.END)
+					.grab(false, true)
 					.applyTo(btnRestore);
 			btnRestore.setText(Messages.Compute_BreakTime_Button_RestoreDefaultValues);
 			btnRestore.setToolTipText(Messages.Compute_BreakTime_Button_RestoreDefaultValues_Tooltip);
