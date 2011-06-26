@@ -5,6 +5,14 @@
          point="net.tourbook.deviceDataReader">
 
       <device
+            class="net.tourbook.device.polar.hrm.PolarPPDDataReader"
+            extensionSortPriority="1"
+            fileextension="ppd"
+            id="net.tourbook.device.PolarPPDDataReader"
+            name="Polar PPD (Polar Person Data)"
+            />
+
+      <device
             class="net.tourbook.device.polar.hrm.PolarPDDDataReader"
             extensionSortPriority="1"
             fileextension="pdd"

@@ -61,5 +61,7 @@ class TourHrZoneData {
 	 * hashmap contains the tags for the tour where the key is the tour ID
 	 */
 	HashMap<Long, ArrayList<Long>>	tagIds;
+	public int[][]					timeLow;
+	public int[][]					timeHigh;
 
 }

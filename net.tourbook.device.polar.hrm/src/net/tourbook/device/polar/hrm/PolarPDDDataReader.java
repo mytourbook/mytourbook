@@ -65,6 +65,7 @@ public class PolarPDDDataReader extends TourbookDevice {
 
 	private ArrayList<String>		_exerciseFiles				= new ArrayList<String>();
 	private ArrayList<String>		_additionalImportedFiles	= new ArrayList<String>();
+	private HashMap<Long, Integer>	_tourSportMap				= new HashMap<Long, Integer>();
 
 	private class Exercise {
 
@@ -74,6 +75,7 @@ public class PolarPDDDataReader extends TourbookDevice {
 		private String	description;
 
 		private int		calories;
+		private int		sport;
 	}
 
 	// plugin constructor
@@ -162,6 +164,11 @@ public class PolarPDDDataReader extends TourbookDevice {
 
 			// add new tour to other tours
 			_tourDataMap.put(tourId, hrmTourData);
+		}
+
+		// save the sport type for this excercise
+		if (_tourSportMap.containsKey(tourId) == false) {
+			_tourSportMap.put(tourId, _currentExercise.sport);
 		}
 
 		if (_exerciseFiles.size() > 0) {
@@ -379,6 +386,14 @@ public class PolarPDDDataReader extends TourbookDevice {
 	@Override
 	public int getStartSequenceSize() {
 		return -1;
+	}
+
+	public int getTourSport(final Long tourId) {
+		if (_tourSportMap.containsKey(tourId)) {
+			return _tourSportMap.get(tourId);
+		} else {
+			return -1;
+		}
 	}
 
 	public int getTransferDataSize() {
@@ -667,7 +682,7 @@ public class PolarPDDDataReader extends TourbookDevice {
 			tokenLine = new StringTokenizer(line, DATA_DELIMITER);
 
 			// column 1
-			tokenLine.nextToken();
+			_currentExercise.sport = Integer.parseInt(tokenLine.nextToken());
 
 			// column 2
 			tokenLine.nextToken();
