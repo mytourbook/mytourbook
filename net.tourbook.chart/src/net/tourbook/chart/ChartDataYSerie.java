@@ -83,10 +83,10 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 	/**
 	 * When this value is > 0 a line chart will not draw a line to the next value point when the
-	 * distance in x-data values is greater than this value.
+	 * difference in the x-data values is greater than this value.
 	 * <p>
-	 * With this feature lines are not drawn to the next value which looks ugly (a triangle is
-	 * painted) when a tour is paused.
+	 * Lines are not drawn to the next value with this feature because these lines (and filling)
+	 * looks ugly (a triangle is painted) when a tour is paused.
 	 */
 	private int						_disabledLineToNext;
 

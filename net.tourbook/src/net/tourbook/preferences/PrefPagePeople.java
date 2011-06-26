@@ -28,7 +28,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourPersonHRZone;
-import net.tourbook.data.ZoneMinMaxBpm;
+import net.tourbook.data.ZoneContext;
 import net.tourbook.database.IComputeTourValues;
 import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
@@ -1260,7 +1260,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		final int hrZoneSize = hrZones.size();
 		Collections.sort(hrZones);
 
-		final ZoneMinMaxBpm hrZoneMinMaxBpm = currentPerson.getHrZoneMinMaxBpm(
+		final ZoneContext hrZoneMinMaxBpm = currentPerson.getHrZoneContext(
 				hrMaxFormulaKey,
 				hrMaxPulse,
 				birthDay,

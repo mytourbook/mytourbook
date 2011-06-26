@@ -340,7 +340,7 @@ public class Chart extends ViewForm {
 		final SelectionChartInfo chartInfo = new SelectionChartInfo(this);
 
 		chartInfo.chartDataModel = _chartDataModel;
-		chartInfo.chartDrawingData = _chartComponents.getChartDrawingData();
+		chartInfo.graphDrawingData = _chartComponents.getGraphDrawingData();
 
 		final ChartComponentGraph chartGraph = _chartComponents.getChartComponentGraph();
 		chartInfo.leftSliderValuesIndex = chartGraph.getLeftSlider().getValuesIndex();
@@ -629,10 +629,6 @@ public class Chart extends ViewForm {
 		return _chartDataModel;
 	}
 
-	public ArrayList<ChartDrawingData> getChartDrawingData() {
-		return _chartComponents.getChartDrawingData();
-	}
-
 	/**
 	 * Return information about the chart
 	 * 
@@ -648,6 +644,10 @@ public class Chart extends ViewForm {
 
 	public int getDevGraphImageXOffset() {
 		return _chartComponents.getChartComponentGraph().getDevGraphImageXOffset();
+	}
+
+	public ArrayList<GraphDrawingData> getGraphDrawingData() {
+		return _chartComponents.getGraphDrawingData();
 	}
 
 	/**
@@ -1284,10 +1284,10 @@ public class Chart extends ViewForm {
 	}
 
 	/**
-	 * Updates only chart layers not the chart itself
+	 * Updates only the custom layers which performce much faster than a chart update.
 	 */
 	public void updateCustomLayers() {
-		_chartComponents.updateChartLayers();
+		_chartComponents.updateCustomLayers();
 	}
 
 	private void updateMouseModeUIState() {

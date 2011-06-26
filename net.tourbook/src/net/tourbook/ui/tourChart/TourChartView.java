@@ -177,7 +177,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 				if (eventId == TourEventId.SEGMENT_LAYER_CHANGED) {
 
-					_tourChart.updateSegmentLayer((Boolean) eventData);
+					_tourChart.updateLayerSegment((Boolean) eventData);
 
 				} else if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
 

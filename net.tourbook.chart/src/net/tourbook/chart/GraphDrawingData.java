@@ -19,7 +19,10 @@ import java.util.ArrayList;
 
 import org.eclipse.swt.graphics.Rectangle;
 
-public class ChartDrawingData {
+/**
+ * Contains data to draw ONE graph in a chart
+ */
+public class GraphDrawingData {
 
 	// position for the x-axis unit text
 	protected static final int		X_UNIT_TEXT_POS_LEFT	= 0;
@@ -104,7 +107,7 @@ public class ChartDrawingData {
 	private boolean					_isDrawVerticalGrid		= true;
 	private boolean[]				_isDrawUnits			= null;
 
-	public ChartDrawingData(final int chartType) {
+	public GraphDrawingData(final int chartType) {
 		_chartType = chartType;
 	}
 

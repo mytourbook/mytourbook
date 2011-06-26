@@ -34,9 +34,9 @@ public class TourChartConfiguration {
 	 * <p>
 	 * false: show distance on the x-axis
 	 */
-	public boolean					showTimeOnXAxis			= false;
+	public boolean					isShowTimeOnXAxis		= false;
 
-	public boolean					showTimeOnXAxisBackup	= false;
+	public boolean					isShowTimeOnXAxisBackup	= false;
 
 	/**
 	 * is <code>true</code> when the distance is not available and the time must be displayed on the
@@ -49,7 +49,7 @@ public class TourChartConfiguration {
 	 * <p>
 	 * false: show the tour time which starts at 0
 	 */
-	public boolean					isStartTime				= false;
+	public boolean					isShowStartTime			= false;
 
 	/**
 	 * contains a list for all graphs which are displayed, the sequence of the list is the sequence
@@ -92,6 +92,17 @@ public class TourChartConfiguration {
 	 * when <code>true</code> the SRTM data are visible in the altitude graph
 	 */
 	public boolean					canShowSRTMData;
+
+	/**
+	 * Is <code>true</code> when HR zones are currently displayed in the chart
+	 */
+	public boolean					isHrZoneDisplayed		= false;
+
+	/**
+	 * Is <code>true</code> when HR zones can be displayed, which requires that pulse values are
+	 * available and the person has defined HR zones.
+	 */
+	public boolean					canShowHrZones		= false;
 
 	/**
 	 * @param keepMinMaxValues
@@ -137,7 +148,7 @@ public class TourChartConfiguration {
 	}
 
 	public void setIsShowTimeOnXAxis(final boolean isShowTimeOnXAxis) {
-		showTimeOnXAxis = showTimeOnXAxisBackup = isShowTimeOnXAxis;
+		this.isShowTimeOnXAxis = isShowTimeOnXAxisBackup = isShowTimeOnXAxis;
 	}
 
 	/**

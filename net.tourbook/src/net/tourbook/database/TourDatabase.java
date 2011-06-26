@@ -242,7 +242,7 @@ public class TourDatabase {
 			if (tourData != null) {
 
 				tourData.computeComputedValues();
-				saveTour(tourData);
+				saveTour(tourData, false);
 			}
 		}
 	}
@@ -270,7 +270,7 @@ public class TourDatabase {
 				final ArrayList<Long> tourList = getAllTourIds();
 				tourListSize[0] = tourList.size();
 
-				monitor.subTask(Messages.tour_database_computeComputeValues_mainTask);
+				monitor.beginTask(Messages.tour_database_computeComputeValues_mainTask, tourList.size());
 
 				// loop over all tours and compute values
 				for (final Long tourId : tourList) {
@@ -284,7 +284,7 @@ public class TourDatabase {
 							// ensure that all computed values are set
 							dbTourData.computeComputedValues();
 
-							savedTourData = saveTour(dbTourData);
+							savedTourData = saveTour(dbTourData, false);
 						}
 					}
 
@@ -293,13 +293,18 @@ public class TourDatabase {
 					sb.append(NLS.bind(Messages.tour_database_computeComputeValues_subTask,//
 							new Object[] { tourCounter[0]++, tourListSize[0], }));
 
+					sb.append(UI.DASH_WITH_DOUBLE_SPACE);
+					sb.append(tourCounter[0] * 100 / tourListSize[0]);
+					sb.append(UI.SYMBOL_PERCENTAGE);
+
 					final String runnerSubTaskText = runner.getSubTaskText(savedTourData);
 					if (runnerSubTaskText != null) {
-						sb.append(UI.DASH_WITH_SPACE);
+						sb.append(UI.DASH_WITH_DOUBLE_SPACE);
 						sb.append(runnerSubTaskText);
 					}
 
 					monitor.subTask(sb.toString());
+					monitor.worked(1);
 
 					// check if canceled
 					if (monitor.isCanceled()) {
@@ -1153,9 +1158,12 @@ public class TourDatabase {
 	 * tour can be saved
 	 * 
 	 * @param tourData
+	 * @param isUpdateModifiedDate
+	 *            When <code>true</code> the modified date is updated. For updating computed field
+	 *            it does not make sence to set the modified date.
 	 * @return persisted {@link TourData} or <code>null</code> when saving fails
 	 */
-	public static TourData saveTour(final TourData tourData) {
+	public static TourData saveTour(final TourData tourData, final boolean isUpdateModifiedDate) {
 
 		/*
 		 * prevent saving a tour which was deleted before
@@ -1185,6 +1193,7 @@ public class TourDatabase {
 		final long dtSaved = (dtNow.getYear() * 10000000000L)
 				+ (dtNow.getMonthOfYear() * 100000000L)
 				+ (dtNow.getDayOfMonth() * 1000000L)
+				//
 				+ (dtNow.getHourOfDay() * 10000L)
 				+ (dtNow.getMinuteOfHour() * 100L)
 				+ dtNow.getSecondOfMinute();
@@ -1216,7 +1225,9 @@ public class TourDatabase {
 
 					} else {
 
-						tourData.setDateTimeModified(dtSaved);
+						if (isUpdateModifiedDate) {
+							tourData.setDateTimeModified(dtSaved);
+						}
 
 						persistedEntity = em.merge(tourData);
 					}
@@ -3029,7 +3040,7 @@ public class TourDatabase {
 			tourData.setTourBike(person.getTourBike());
 			tourData.setBikerWeight(person.getWeight());
 
-			saveTour(tourData);
+			saveTour(tourData, false);
 		}
 
 		// cleanup everything as if nothing has happened

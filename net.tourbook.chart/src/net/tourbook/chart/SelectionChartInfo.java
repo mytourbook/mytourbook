@@ -24,7 +24,7 @@ public class SelectionChartInfo implements ISelection {
 	private Chart						fChart;
 
 	public ChartDataModel				chartDataModel;
-	public ArrayList<ChartDrawingData>	chartDrawingData;
+	public ArrayList<GraphDrawingData>	graphDrawingData;
 
 	public int							leftSliderValuesIndex;
 	public int							rightSliderValuesIndex;

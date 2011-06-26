@@ -13,29 +13,22 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.tourChart.action;
+package net.tourbook.ui.tourChart;
 
-import net.tourbook.ui.HandlerUtil;
-import net.tourbook.ui.tourChart.TourChart;
+import net.tourbook.chart.Chart;
+import net.tourbook.chart.GraphDrawingData;
+import net.tourbook.chart.IChartLayer;
 
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.swt.graphics.GC;
 
-public class ActionHandlerXAxisDistance extends TCActionHandler {
+public class ChartLayerHrZone implements IChartLayer {
 
-	public ActionHandlerXAxisDistance() {
-		commandId = TourChart.COMMAND_ID_SHOW_HR_ZONES;
+	@Override
+	public void draw(final GC gcLayer, final GraphDrawingData drawingData, final Chart chart) {
+
+
+//		drawingData.getData()
 	}
 
-	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {
-
-		final Boolean isItemChecked = HandlerUtil.isItemChecked(execEvent);
-
-		if (isItemChecked != null) {
-			tourChart.actionShowHrZones(isItemChecked);
-		}
-
-		return null;
-	}
 
 }

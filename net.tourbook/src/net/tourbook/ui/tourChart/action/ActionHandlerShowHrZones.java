@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,10 +21,10 @@ import net.tourbook.ui.tourChart.TourChart;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
-public class ActionHandlerXAxisDistance extends TCActionHandler {
+public class ActionHandlerShowHrZones extends TCActionHandler {
 
-	public ActionHandlerXAxisDistance() {
-		commandId = TourChart.COMMAND_ID_SHOW_HR_ZONES;
+	public ActionHandlerShowHrZones() {
+		commandId = TourChart.COMMAND_ID_X_AXIS_DISTANCE;
 	}
 
 	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {
@@ -32,7 +32,7 @@ public class ActionHandlerXAxisDistance extends TCActionHandler {
 		final Boolean isItemChecked = HandlerUtil.isItemChecked(execEvent);
 
 		if (isItemChecked != null) {
-			tourChart.actionShowHrZones(isItemChecked);
+			tourChart.actionXAxisDistance(isItemChecked);
 		}
 
 		return null;

@@ -47,7 +47,7 @@ public class ChartComponentAxis extends Canvas {
 
 	private Image						_axisImage;
 
-	private ArrayList<ChartDrawingData>	_chartDrawingData;
+	private ArrayList<GraphDrawingData>	_graphDrawingData;
 
 	private boolean						_isAxisModified;
 
@@ -202,7 +202,7 @@ public class ChartComponentAxis extends Canvas {
 	 */
 	private void drawYUnits(final GC gc, final Rectangle axisRect) {
 
-		if (_chartDrawingData == null) {
+		if (_graphDrawingData == null) {
 			return;
 		}
 
@@ -211,7 +211,7 @@ public class ChartComponentAxis extends Canvas {
 		final int devX = _isLeft ? axisRect.width - 1 : 0;
 
 		// loop: all graphs
-		for (final ChartDrawingData drawingData : _chartDrawingData) {
+		for (final GraphDrawingData drawingData : _graphDrawingData) {
 
 			final ArrayList<ChartUnit> yUnits = drawingData.getYUnits();
 
@@ -339,9 +339,9 @@ public class ChartComponentAxis extends Canvas {
 	 * @param isLeft
 	 *            true if the axis is on the left side
 	 */
-	protected void setDrawingData(final ArrayList<ChartDrawingData> list, final boolean isLeft) {
+	protected void setDrawingData(final ArrayList<GraphDrawingData> list, final boolean isLeft) {
 
-		_chartDrawingData = list;
+		_graphDrawingData = list;
 		_isLeft = isLeft;
 
 		onResize();

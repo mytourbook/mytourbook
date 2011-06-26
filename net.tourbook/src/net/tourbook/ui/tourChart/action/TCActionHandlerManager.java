@@ -93,6 +93,8 @@ public class TCActionHandlerManager {
 		_actionHandlers.put(TourChart.COMMAND_ID_GRAPH_ALTIMETER, new ActionHandlerGraphAltimeter());
 		_actionHandlers.put(TourChart.COMMAND_ID_GRAPH_GRADIENT, new ActionHandlerGraphGradient());
 
+		_actionHandlers.put(TourChart.COMMAND_ID_SHOW_HR_ZONES, new ActionHandlerShowHrZones());
+
 		_actionHandlers.put(TourChart.COMMAND_ID_X_AXIS_TIME, new ActionHandlerXAxisTime());
 		_actionHandlers.put(TourChart.COMMAND_ID_X_AXIS_DISTANCE, new ActionHandlerXAxisDistance());
 

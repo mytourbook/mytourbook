@@ -23,7 +23,7 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
-import net.tourbook.chart.ChartDrawingData;
+import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.ColorCache;
 import net.tourbook.chart.ComputeChartValue;
 import net.tourbook.chart.SelectionChartInfo;
@@ -75,7 +75,7 @@ public class TourChartAnalyzerView extends ViewPart {
 
 	private ChartDataModel				_chartDataModel;
 
-	private ArrayList<ChartDrawingData>	_drawingData;
+	private ArrayList<GraphDrawingData>	_drawingData;
 	private final ArrayList<GraphInfo>	_graphInfos		= new ArrayList<GraphInfo>();
 
 	private final ColorCache			_colorCache		= new ColorCache();
@@ -638,7 +638,7 @@ public class TourChartAnalyzerView extends ViewPart {
 
 		// init vars which are used in createLayout()
 		_chartDataModel = chartInfo.chartDataModel;
-		_drawingData = chartInfo.chartDrawingData;
+		_drawingData = chartInfo.graphDrawingData;
 
 		if ((_drawingData == null) || (_drawingData.size() == 0) || (_drawingData.get(0) == null)) {
 			// this happened
@@ -680,7 +680,7 @@ public class TourChartAnalyzerView extends ViewPart {
 		final SelectionChartInfo chartInfo = new SelectionChartInfo(chart);
 
 		chartInfo.chartDataModel = chart.getChartDataModel();
-		chartInfo.chartDrawingData = chart.getChartDrawingData();
+		chartInfo.graphDrawingData = chart.getGraphDrawingData();
 
 		chartInfo.leftSliderValuesIndex = sliderPosition.getLeftSliderValueIndex();
 		chartInfo.rightSliderValuesIndex = sliderPosition.getRightSliderValueIndex();

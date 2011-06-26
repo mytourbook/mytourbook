@@ -32,7 +32,7 @@ import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourPersonHRZone;
-import net.tourbook.data.ZoneMinMaxBpm;
+import net.tourbook.data.ZoneContext;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPagePeople;
 import net.tourbook.preferences.PrefPagePeopleData;
@@ -182,7 +182,7 @@ public class TrainingView extends ViewPart {
 	private Composite					_hrZoneDataContainerContent;
 
 	private Canvas						_canvasHrZoneImage;
-	private Label[]						_lblTourMinMaxPercent;
+	private Label[]						_lblTourMinMaxValue;
 	private Label[]						_lblTourMinMaxHours;
 	private Label[]						_lblHRZoneName;
 	private Label[]						_lblHRZoneColor;
@@ -586,12 +586,12 @@ public class TrainingView extends ViewPart {
 //				.grab(true, true)
 				.applyTo(container);
 		GridLayoutFactory.swtDefaults().numColumns(4).applyTo(container);
-		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 		{
 			createUI36HrZoneHeader(container);
 			createUI38HrZoneFields(container);
 		}
 		_tk.adapt(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 
 		return container;
 	}
@@ -602,15 +602,19 @@ public class TrainingView extends ViewPart {
 		 * label: color/zone name
 		 */
 		Label label = _tk.createLabel(parent, Messages.Training_HRZone_Label_Header_Zone);
-		GridDataFactory.fillDefaults().span(2, 1).applyTo(label);
+		GridDataFactory.fillDefaults()//
+				.span(2, 1)
+				.align(SWT.CENTER, SWT.FILL)
+				.applyTo(label);
 		label.setFont(_fontItalic);
 
 		/*
-		 * label: %
+		 * label: bpm
 		 */
-		label = _tk.createLabel(parent, UI.SYMBOL_PERCENTAGE);
+		label = _tk.createLabel(parent, Messages.Graph_Label_Heartbeat_unit);
 		GridDataFactory.fillDefaults()//
 				.align(SWT.END, SWT.FILL)
+//				.align(SWT.CENTER, SWT.FILL)
 				.applyTo(label);
 
 		/*
@@ -629,7 +633,7 @@ public class TrainingView extends ViewPart {
 		/*
 		 * fields
 		 */
-		_lblTourMinMaxPercent = new Label[hrZoneSize];
+		_lblTourMinMaxValue = new Label[hrZoneSize];
 		_lblTourMinMaxHours = new Label[hrZoneSize];
 		_lblHRZoneName = new Label[hrZoneSize];
 		_lblHRZoneColor = new Label[hrZoneSize];
@@ -665,12 +669,12 @@ public class TrainingView extends ViewPart {
 			/*
 			 * label: tour hr min/max %
 			 */
-			final Label lblTourMinMaxPercent = _lblTourMinMaxPercent[zoneIndex] = _tk.createLabel(
+			final Label lblTourMinMaxPercent = _lblTourMinMaxValue[zoneIndex] = _tk.createLabel(//
 					parent,
 					null,
 					SWT.TRAIL);
 			GridDataFactory.fillDefaults() //
-					.hint(_pc.convertWidthInCharsToPixels(5), SWT.DEFAULT)
+					.hint(_pc.convertWidthInCharsToPixels(8), SWT.DEFAULT)
 					.applyTo(lblTourMinMaxPercent);
 
 			/*
@@ -797,7 +801,7 @@ public class TrainingView extends ViewPart {
 
 		final boolean isCustomScaling = isHrZoneAvailable && _isShowAllPulseValues == false;
 
-//		_comboTrainingChart.setEnabled(isHrZoneAvailable);
+//		_comboTrainingChart.setEnabled(canShowHrZones);
 
 		_spinnerHrLeft.setEnabled(isCustomScaling);
 		_spinnerHrRight.setEnabled(isCustomScaling);
@@ -887,94 +891,6 @@ public class TrainingView extends ViewPart {
 
 		return false;
 	}
-
-//	private int getChartIndex(final int requestedChartId) {
-//
-//		for (final int chartId : _chartId) {
-//			if (chartId == requestedChartId) {
-//				return chartId;
-//			}
-//		}
-//
-//		// return default, this case should not happen
-//		return CHART_ID_HR_TIME;
-//	}
-
-//	/**
-//	 * @return Returns the id of the selected chart
-//	 */
-//	private int getSelectedChartId() {
-//
-//		final int selectedIndex = _comboTrainingChart.getSelectionIndex();
-//
-//		if (selectedIndex == -1) {
-//			return _chartId[0];
-//		}
-//
-//		return _chartId[selectedIndex];
-//	}
-
-//	private String getUIMinMaxBpm(final TourPersonHRZone hrZone) {
-//
-//		final String minMaxBpmText = UI.EMPTY_STRING;
-//		final double minValue = hrZone.getZoneMinValue();
-//		final double maxValue = hrZone.getZoneMaxValue();
-//
-////		if (minValue == Integer.MIN_VALUE) {
-////
-////			minMaxBpmText = UI.SYMBOL_LESS_THAN //
-////					+ UI.SPACE
-////					+ Integer.toString((int) (maxValue * _hrMax / 100));
-////
-////		} else if (maxValue == Integer.MAX_VALUE) {
-////
-////			minMaxBpmText = UI.SYMBOL_GREATER_THAN //
-////					+ UI.SPACE
-////					+ Integer.toString((int) (minValue * _hrMax / 100));
-////
-////		} else {
-////
-////			minMaxBpmText = Integer.toString((int) (minValue * _hrMax / 100))
-////					+ UI.SYMBOL_DASH
-////					+ Integer.toString((int) (maxValue * _hrMax / 100));
-////		}
-//
-//		return minMaxBpmText;
-//	}
-
-//	private String getUIMinMaxPercent(final TourPersonHRZone hrZone) {
-//
-//		String minMaxText;
-//		final int minValue = hrZone.getZoneMinValue();
-//		final int maxValue = hrZone.getZoneMaxValue();
-//
-//		if (minValue == Integer.MIN_VALUE) {
-//
-//			minMaxText = UI.SYMBOL_LESS_THAN //
-//					+ UI.SPACE
-//					+ Integer.toString(maxValue)
-//					+ UI.SPACE
-//					+ UI.SYMBOL_PERCENTAGE;
-//
-//		} else if (maxValue == Integer.MAX_VALUE) {
-//
-//			minMaxText = UI.SYMBOL_GREATER_THAN //
-//					+ UI.SPACE
-//					+ Integer.toString(minValue)
-//					+ UI.SPACE
-//					+ UI.SYMBOL_PERCENTAGE;
-//
-//		} else {
-//
-//			minMaxText = Integer.toString(minValue)
-//					+ UI.SYMBOL_DASH
-//					+ Integer.toString(maxValue)
-//					+ UI.SPACE
-//					+ UI.SYMBOL_PERCENTAGE;
-//		}
-//
-//		return minMaxText;
-//	}
 
 	private void onModifyHrBorder() {
 
@@ -1248,7 +1164,7 @@ public class TrainingView extends ViewPart {
 		// display page for the selected chart
 		_pageBookHrZones.showPage(_pageHrZones);
 
-		final ZoneMinMaxBpm zoneMinMaxBpm = _currentPerson.getHrZoneMinMaxBpm(
+		final ZoneContext zoneMinMaxBpm = _currentPerson.getHrZoneContext(
 				_currentPerson.getHrMaxFormula(),
 				_currentPerson.getMaxPulse(),
 				_currentPerson.getBirthDayWithDefault(),
@@ -1261,7 +1177,7 @@ public class TrainingView extends ViewPart {
 		updateUI44HrZoneImage();
 	}
 
-	private void updateUI40HrZoneChart(final ZoneMinMaxBpm zoneMinMaxBpm) {
+	private void updateUI40HrZoneChart(final ZoneContext zoneMinMaxBpm) {
 
 		final int[] pulseSerie = _tourData.pulseSerie;
 		final int[] timeSerie = _tourData.timeSerie;
@@ -1424,10 +1340,10 @@ public class TrainingView extends ViewPart {
 	}
 
 	/**
-	 * @param zoneMinMaxBpm
+	 * @param zoneContext
 	 *            Contains age and HR max values.
 	 */
-	private void updateUI42HrZoneData(final ZoneMinMaxBpm zoneMinMaxBpm) {
+	private void updateUI42HrZoneData(final ZoneContext zoneContext) {
 
 		// create hr zones when not yet done or disposed
 		if (_hrZoneDataContainerContent == null || _hrZoneDataContainerContent.isDisposed()) {
@@ -1472,12 +1388,13 @@ public class TrainingView extends ViewPart {
 					? Messages.App_Label_max
 					: Integer.toString(zoneMaxValue);
 
-			final int zoneMaxBmp = zoneMinMaxBpm.zoneMaxBmp[tourZoneIndex];
-			final String zoneMaxBmpText = zoneMaxBmp == Integer.MAX_VALUE //
+			final int zoneMinBpm = zoneContext.zoneMinBmp[tourZoneIndex];
+			final int zoneMaxBmp = zoneContext.zoneMaxBmp[tourZoneIndex];
+			final String zoneMaxBpmText = zoneMaxBmp == Integer.MAX_VALUE //
 					? Messages.App_Label_max
 					: Integer.toString(zoneMaxBmp);
 
-			final int ageYears = zoneMinMaxBpm.age;
+			final int ageYears = zoneContext.age;
 			final String ageText = UI.SPACE + ageYears + UI.SPACE2 + Messages.Pref_People_Label_Years;
 
 			final String hrZoneTooltip =
@@ -1497,9 +1414,9 @@ public class TrainingView extends ViewPart {
 					+ UI.SYMBOL_EQUAL
 					+ UI.SPACE
 //
-					+ zoneMinMaxBpm.zoneMinBmp[tourZoneIndex]
+					+ zoneMinBpm
 					+ UI.DASH
-					+ zoneMaxBmpText
+					+ zoneMaxBpmText
 					+ UI.SPACE
 					+ Messages.Graph_Label_Heartbeat_unit
 //
@@ -1513,13 +1430,17 @@ public class TrainingView extends ViewPart {
 //
 					+ Messages.HRMax_Label
 					+ UI.SPACE
-					+ zoneMinMaxBpm.hrMax
+					+ zoneContext.hrMax
 					+ Messages.Graph_Label_Heartbeat_unit
 //
 			;
 
-			_lblTourMinMaxPercent[tourZoneIndex].setText(_nf1.format(zoneTimePercent));
-			_lblTourMinMaxPercent[tourZoneIndex].setToolTipText(hrZoneTooltip);
+			// % values
+//			_lblTourMinMaxValue[tourZoneIndex].setText(_nf1.format(zoneTimePercent));
+
+			// bpm values
+			_lblTourMinMaxValue[tourZoneIndex].setText(zoneMinBpm + UI.DASH + zoneMaxBpmText);
+			_lblTourMinMaxValue[tourZoneIndex].setToolTipText(hrZoneTooltip);
 
 			_lblTourMinMaxHours[tourZoneIndex].setText(UI.format_hh_mm((long) (zoneTime + 30)).toString());
 			_lblTourMinMaxHours[tourZoneIndex].setToolTipText(hrZoneTooltip);

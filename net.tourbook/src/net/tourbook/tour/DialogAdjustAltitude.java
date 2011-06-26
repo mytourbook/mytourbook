@@ -424,7 +424,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		final int[] diffTo2ndAlti = _tourData.dataSerieDiffTo2ndAlti = new int[serieLength];
 		final float[] splineDataSerie = _tourData.dataSerieSpline = new float[serieLength];
 
-		final int[] xDataSerie = _tourChartConfig.showTimeOnXAxis ? _tourData.timeSerie : _tourData.getDistanceSerie();
+		final int[] xDataSerie = _tourChartConfig.isShowTimeOnXAxis ? _tourData.timeSerie : _tourData.getDistanceSerie();
 		final int[] yDataSerie = _tourData.getAltitudeSerie();
 
 		_sliderXAxisValue = xDataSerie[sliderIndex];
@@ -829,7 +829,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 	@Override
 	public ChartLayer2ndAltiSerie create2ndAltiLayer() {
 
-		final int[] xDataSerie = _tourChartConfig.showTimeOnXAxis ? _tourData.timeSerie : _tourData.getDistanceSerie();
+		final int[] xDataSerie = _tourChartConfig.isShowTimeOnXAxis ? _tourData.timeSerie : _tourData.getDistanceSerie();
 
 		_chartLayer2ndAltiSerie = new ChartLayer2ndAltiSerie(_tourData, xDataSerie, _tourChartConfig, _splineData);
 
@@ -2038,7 +2038,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		_prefStore.setValue(PREF_ADJUST_TYPE, getSelectedAdjustmentType().__id);
 
-		_prefStore.setValue(ITourbookPreferences.ADJUST_ALTITUDE_CHART_X_AXIS_UNIT, _tourChartConfig.showTimeOnXAxis
+		_prefStore.setValue(ITourbookPreferences.ADJUST_ALTITUDE_CHART_X_AXIS_UNIT, _tourChartConfig.isShowTimeOnXAxis
 				? TourManager.X_AXIS_TIME
 				: TourManager.X_AXIS_DISTANCE);
 
@@ -2180,7 +2180,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 	private void updateUI2ndLayer() {
 		enableFieldsWithSRTM();
-		_tourChart.update2ndAltiLayer(this, true);
+		_tourChart.updateLayer2ndAlti(this, true);
 	}
 
 	/**

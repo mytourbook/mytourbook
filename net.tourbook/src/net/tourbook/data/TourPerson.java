@@ -158,7 +158,7 @@ public class TourPerson implements Comparable<Object> {
 	 * Key is the age of the person
 	 */
 	@Transient
-	private HashMap<Integer, ZoneMinMaxBpm>		_hrZoneMinMaxBpm			= new HashMap<Integer, ZoneMinMaxBpm>();
+	private HashMap<Integer, ZoneContext>		_hrZoneMinMaxBpm			= new HashMap<Integer, ZoneContext>();
 
 	/**
 	 * Sorted HR zones
@@ -357,7 +357,7 @@ public class TourPerson implements Comparable<Object> {
 	 * @return Returns HR zone min/max bpm values or <code>null</code> when hr zones are not
 	 *         defined.
 	 */
-	public ZoneMinMaxBpm getHrZoneMinMaxBpm(final int hrMaxFormulaKey,
+	public ZoneContext getHrZoneContext(final int hrMaxFormulaKey,
 											final int hrMaxPulse,
 											final DateTime birthDay,
 											final DateTime dateTime) {
@@ -368,7 +368,7 @@ public class TourPerson implements Comparable<Object> {
 
 		final int age = getAge(birthDay, dateTime);
 
-		final ZoneMinMaxBpm hrZoneMinMax = _hrZoneMinMaxBpm.get(age);
+		final ZoneContext hrZoneMinMax = _hrZoneMinMaxBpm.get(age);
 
 		if (hrZoneMinMax != null) {
 			// hr zones for the age is already available
@@ -410,7 +410,7 @@ public class TourPerson implements Comparable<Object> {
 			prevMaxBpm = maxBpm;
 		}
 
-		final ZoneMinMaxBpm hrZoneMinMax1 = new ZoneMinMaxBpm(zoneMinBmps, zoneMaxBmps, age, hrMax);
+		final ZoneContext hrZoneMinMax1 = new ZoneContext(zoneMinBmps, zoneMaxBmps, age, hrMax);
 
 		_hrZoneMinMaxBpm.put(age, hrZoneMinMax1);
 

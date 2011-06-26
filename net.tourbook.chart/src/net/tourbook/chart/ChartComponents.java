@@ -139,7 +139,7 @@ public class ChartComponents extends Composite {
 
 	private ChartDataModel				_chartDataModel					= null;
 
-	private ArrayList<ChartDrawingData>	_chartDrawingData;
+	private ArrayList<GraphDrawingData>	_graphDrawingData;
 
 	public boolean						_useAdvancedGraphics			= true;
 
@@ -269,7 +269,7 @@ public class ChartComponents extends Composite {
 	/**
 	 * Compute units for the x-axis and keep it in the drawingData object
 	 */
-	private void computeXValues(final ChartDrawingData drawingData) {
+	private void computeXValues(final GraphDrawingData drawingData) {
 
 		final ChartDataXSerie xData = drawingData.getXData();
 
@@ -403,7 +403,7 @@ public class ChartComponents extends Composite {
 				final int barWidth = (devVirtualGraphWidth / highValues.length) / 2;
 
 				drawingData.setBarRectangleWidth(Math.max(0, barWidth));
-				drawingData.setBarPosition(ChartDrawingData.BAR_POS_CENTER);
+				drawingData.setBarPosition(GraphDrawingData.BAR_POS_CENTER);
 
 			} else if (xAxisUnit == ChartDataSerie.X_AXIS_UNIT_NUMBER_CENTER) {
 
@@ -415,7 +415,7 @@ public class ChartComponents extends Composite {
 				final int barWidth2 = (int) (Math.max(1, barWidth) * 1.10);
 
 				drawingData.setBarRectangleWidth(barWidth2);
-				drawingData.setBarPosition(ChartDrawingData.BAR_POS_CENTER);
+				drawingData.setBarPosition(GraphDrawingData.BAR_POS_CENTER);
 			}
 		}
 	}
@@ -427,7 +427,7 @@ public class ChartComponents extends Composite {
 	 * @param graphCount
 	 * @param currentGraph
 	 */
-	private void computeYValues(final ChartDrawingData drawingData, final int graphCount, final int currentGraph) {
+	private void computeYValues(final GraphDrawingData drawingData, final int graphCount, final int currentGraph) {
 
 		final ChartDataYSerie yData = drawingData.getYData();
 
@@ -602,10 +602,10 @@ public class ChartComponents extends Composite {
 	 * 
 	 * @return chart drawing data
 	 */
-	private ArrayList<ChartDrawingData> createChartDrawingData() {
+	private ArrayList<GraphDrawingData> createGraphDrawingData() {
 
 		// compute the graphs and axis
-		final ArrayList<ChartDrawingData> chartDrawingData = new ArrayList<ChartDrawingData>();
+		final ArrayList<GraphDrawingData> graphDrawingData = new ArrayList<GraphDrawingData>();
 
 		final ArrayList<ChartDataYSerie> yDataList = _chartDataModel.getYData();
 		final ChartDataXSerie xData = _chartDataModel.getXData();
@@ -617,9 +617,9 @@ public class ChartComponents extends Composite {
 		// loop all graphs
 		for (final ChartDataYSerie yData : yDataList) {
 
-			final ChartDrawingData drawingData = new ChartDrawingData(yData.getChartType());
+			final GraphDrawingData drawingData = new GraphDrawingData(yData.getChartType());
 
-			chartDrawingData.add(drawingData);
+			graphDrawingData.add(drawingData);
 
 			// set chart title
 			if (graphIndex == 1) {
@@ -656,19 +656,10 @@ public class ChartComponents extends Composite {
 			graphIndex++;
 		}
 
-//		if (chartDrawingData.isEmpty()) {
-//
-//			final ChartDrawingData drawingData = new ChartDrawingData(ChartDataModel.CHART_TYPE_ERROR_MESSAGE);
-//
-//			drawingData.setErrorMessage(_chartDataModel.getErrorMessage());
-//
-//			chartDrawingData.add(drawingData);
-//		}
-
-		return chartDrawingData;
+		return graphDrawingData;
 	}
 
-	private void createMonthEqualUnits(	final ChartDrawingData drawingData,
+	private void createMonthEqualUnits(	final GraphDrawingData drawingData,
 										final ArrayList<ChartUnit> units,
 										final int devGraphWidth,
 										final int allUnitsSize,
@@ -762,7 +753,7 @@ public class ChartComponents extends Composite {
 	 * @param yearDays
 	 *            Number of days in one year
 	 */
-	private void createMonthUnequalUnits(	final ChartDrawingData drawingData,
+	private void createMonthUnequalUnits(	final GraphDrawingData drawingData,
 											final ArrayList<ChartUnit> units,
 											final int devGraphWidth,
 											final int[] years,
@@ -966,7 +957,7 @@ public class ChartComponents extends Composite {
 		return synchConfig;
 	}
 
-	private void createXValuesDay(	final ChartDrawingData drawingData,
+	private void createXValuesDay(	final GraphDrawingData drawingData,
 									final ArrayList<ChartUnit> units,
 									final int devGraphWidth) {
 
@@ -977,12 +968,12 @@ public class ChartComponents extends Composite {
 		// compute the width of the rectangles
 		final int allDaysInAllYears = chartSegments.allValues;
 		drawingData.setBarRectangleWidth(Math.max(0, (devGraphWidth / allDaysInAllYears)));
-		drawingData.setXUnitTextPos(ChartDrawingData.X_UNIT_TEXT_POS_CENTER);
+		drawingData.setXUnitTextPos(GraphDrawingData.X_UNIT_TEXT_POS_CENTER);
 
 		drawingData.setScaleX((float) devGraphWidth / allDaysInAllYears);
 	}
 
-	private void createXValuesMonth(final ChartDrawingData drawingData,
+	private void createXValuesMonth(final GraphDrawingData drawingData,
 									final ArrayList<ChartUnit> units,
 									final int devGraphWidth) {
 
@@ -1022,10 +1013,10 @@ public class ChartComponents extends Composite {
 			break;
 		}
 
-		drawingData.setXUnitTextPos(ChartDrawingData.X_UNIT_TEXT_POS_CENTER);
+		drawingData.setXUnitTextPos(GraphDrawingData.X_UNIT_TEXT_POS_CENTER);
 	}
 
-	private void createXValuesWeek(	final ChartDrawingData drawingData,
+	private void createXValuesWeek(	final GraphDrawingData drawingData,
 									final ArrayList<ChartUnit> units,
 									final int devGraphWidth) {
 
@@ -1047,14 +1038,14 @@ public class ChartComponents extends Composite {
 		// compute the width and position of the rectangles
 		final int barWidth = (devGraphWidth / xValues.length) / 2;
 		drawingData.setBarRectangleWidth(Math.max(0, barWidth));
-		drawingData.setBarPosition(ChartDrawingData.BAR_POS_CENTER);
+		drawingData.setBarPosition(GraphDrawingData.BAR_POS_CENTER);
 
 		drawingData.setScaleX((float) devGraphWidth / allWeeks);
 		drawingData.setScaleUnitX((float) devGraphWidth / allDaysInAllYears);
-		drawingData.setXUnitTextPos(ChartDrawingData.X_UNIT_TEXT_POS_CENTER);
+		drawingData.setXUnitTextPos(GraphDrawingData.X_UNIT_TEXT_POS_CENTER);
 	}
 
-	private void createXValuesYear(	final ChartDrawingData drawingData,
+	private void createXValuesYear(	final GraphDrawingData drawingData,
 									final ArrayList<ChartUnit> units,
 									final int devGraphWidth) {
 
@@ -1112,7 +1103,7 @@ public class ChartComponents extends Composite {
 			break;
 		}
 
-		drawingData.setXUnitTextPos(ChartDrawingData.X_UNIT_TEXT_POS_CENTER);
+		drawingData.setXUnitTextPos(GraphDrawingData.X_UNIT_TEXT_POS_CENTER);
 	}
 
 	ChartComponentAxis getAxisLeft() {
@@ -1129,10 +1120,6 @@ public class ChartComponents extends Composite {
 
 	ChartDataModel getChartDataModel() {
 		return _chartDataModel;
-	}
-
-	ArrayList<ChartDrawingData> getChartDrawingData() {
-		return _chartDrawingData;
 	}
 
 	ChartProperties getChartProperties() {
@@ -1161,6 +1148,10 @@ public class ChartComponents extends Composite {
 		}
 
 		return _visibleGraphRect.width;
+	}
+
+	ArrayList<GraphDrawingData> getGraphDrawingData() {
+		return _graphDrawingData;
 	}
 
 	/**
@@ -1201,18 +1192,18 @@ public class ChartComponents extends Composite {
 		}
 
 		// compute the chart data
-		_chartDrawingData = createChartDrawingData();
+		_graphDrawingData = createGraphDrawingData();
 
 		// notify components about the new configuration
-		_componentGraph.setDrawingData(_chartDrawingData);
+		_componentGraph.setDrawingData(_graphDrawingData);
 
 		// resize the sliders after the drawing data have changed and the new
 		// chart size is saved
 		_componentGraph.updateSlidersOnResize();
 
 		// resize the axis
-		_componentAxisLeft.setDrawingData(_chartDrawingData, true);
-		_componentAxisRight.setDrawingData(_chartDrawingData, false);
+		_componentAxisLeft.setDrawingData(_graphDrawingData, true);
+		_componentAxisRight.setDrawingData(_graphDrawingData, false);
 
 		// synchronize chart
 		final SynchConfiguration synchConfig = createSynchConfig();
@@ -1527,22 +1518,22 @@ public class ChartComponents extends Composite {
 		}
 	}
 
-	void updateChartLayers() {
+	void updateCustomLayers() {
 
-		if (_chartDrawingData == null) {
+		if (_graphDrawingData == null) {
 			return;
 		}
 
-		final ArrayList<ChartDataYSerie> yDataList = _chartDataModel.getYData();
-
 		int graphIndex = 0;
 
-		// set custom layers in the drawing data
-		for (final ChartDataYSerie yData : yDataList) {
-			_chartDrawingData.get(graphIndex++).getYData().setCustomLayers(yData.getCustomLayers());
+		/*
+		 * set custom layers from the data model into the drawing data
+		 */
+		for (final ChartDataYSerie yData : _chartDataModel.getYData()) {
+			_graphDrawingData.get(graphIndex++).getYData().setCustomLayers(yData.getCustomLayers());
 		}
 
-		_componentGraph.updateChartLayers();
+		_componentGraph.updateCustomLayers();
 	}
 
 }

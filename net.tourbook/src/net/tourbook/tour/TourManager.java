@@ -358,15 +358,17 @@ public class TourManager {
 			chartConfig.addVisibleGraph(Integer.parseInt(prefGraphId));
 		}
 
+		chartConfig.isHrZoneDisplayed = true;
+
 		// set the unit which is shown on the x-axis
 		if (_prefStore.getString(ITourbookPreferences.GRAPH_X_AXIS).equals(X_AXIS_TIME)) {
-			chartConfig.showTimeOnXAxis = true;
+			chartConfig.isShowTimeOnXAxis = true;
 		} else {
-			chartConfig.showTimeOnXAxis = false;
+			chartConfig.isShowTimeOnXAxis = false;
 		}
-		chartConfig.showTimeOnXAxisBackup = chartConfig.showTimeOnXAxis;
+		chartConfig.isShowTimeOnXAxisBackup = chartConfig.isShowTimeOnXAxis;
 
-		chartConfig.isStartTime = _prefStore.getBoolean(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME);
+		chartConfig.isShowStartTime = _prefStore.getBoolean(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME);
 		chartConfig.isSRTMDataVisible = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SRTM_VISIBLE);
 
 		updateZoomOptionsInChartConfig(chartConfig, _prefStore);
@@ -1078,7 +1080,7 @@ public class TourManager {
 					 * tour in the editor is not dirty, save tour and update editor ui
 					 */
 
-					savedTour = TourDatabase.saveTour(tourData);
+					savedTour = TourDatabase.saveTour(tourData, true);
 
 					/*
 					 * set flag for the tour data editor that the tour is saved and the ui is
@@ -1110,7 +1112,7 @@ public class TourManager {
 		if (doSaveTour) {
 
 			// save the tour
-			savedTour = TourDatabase.saveTour(tourData);
+			savedTour = TourDatabase.saveTour(tourData, true);
 
 			doFireChangeEvent[0] = true;
 		}
@@ -1639,17 +1641,17 @@ public class TourManager {
 		 * show the distance on the x-axis when a distance is available, otherwise the time is
 		 * displayed
 		 */
-		boolean showTimeOnXAxis;
+		boolean isShowTimeOnXAxis;
 		if (xDataDistance == null) {
-			showTimeOnXAxis = true;
+			isShowTimeOnXAxis = true;
 			chartConfig.isForceTimeOnXAxis = true;
 		} else {
-			showTimeOnXAxis = chartConfig.showTimeOnXAxisBackup;
+			isShowTimeOnXAxis = chartConfig.isShowTimeOnXAxisBackup;
 			chartConfig.isForceTimeOnXAxis = false;
 		}
-		chartConfig.showTimeOnXAxis = showTimeOnXAxis;
+		chartConfig.isShowTimeOnXAxis = isShowTimeOnXAxis;
 
-		if (showTimeOnXAxis) {
+		if (isShowTimeOnXAxis) {
 
 			// time is displayed on the X axis
 
@@ -1665,7 +1667,7 @@ public class TourManager {
 			 * when time is displayed, the x-axis can show the start time starting from 0 or from
 			 * the current time of the day
 			 */
-			final int startTime = chartConfig.isStartTime ? //
+			final int startTime = chartConfig.isShowStartTime ? //
 					(tourData.getStartHour() * 3600) + (tourData.getStartMinute() * 60)
 					: 0;
 
@@ -1747,11 +1749,14 @@ public class TourManager {
 			yDataPulse.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_PULSE);
 			yDataPulse.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true));
 
-			yDataPulse.setDisableLineToNext(showTimeOnXAxis ? 20 : 0);
+			yDataPulse.setDisableLineToNext(isShowTimeOnXAxis ? 20 : 0);
 
 			setGraphColor(_prefStore, yDataPulse, GraphColorProvider.PREF_GRAPH_HEARTBEAT);
 			chartDataModel.addXyData(yDataPulse);
 		}
+
+		// HR zones can be displayed when they are available
+		chartConfig.canShowHrZones = tourData.getNumberOfHrZones() > 0;
 
 		/*
 		 * speed

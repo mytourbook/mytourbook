@@ -13,29 +13,34 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.tourChart.action;
+package net.tourbook.data;
 
-import net.tourbook.ui.HandlerUtil;
-import net.tourbook.ui.tourChart.TourChart;
+public class ZoneContext {
 
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
+	/**
+	 * Age in years
+	 */
+	public int		age;
+	public int		hrMax;
 
-public class ActionHandlerXAxisDistance extends TCActionHandler {
+	public int[]	zoneMinBmp;
+	public int[]	zoneMaxBmp;
 
-	public ActionHandlerXAxisDistance() {
-		commandId = TourChart.COMMAND_ID_SHOW_HR_ZONES;
-	}
+	/**
+	 * Set HR zones, age and max HR
+	 * 
+	 * @param zoneMinBmp
+	 * @param zoneMaxBmp
+	 * @param age
+	 * @param hrMax
+	 */
+	public ZoneContext(final int[] zoneMinBmp, final int[] zoneMaxBmp, final int age, final int hrMax) {
 
-	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {
+		this.zoneMinBmp = zoneMinBmp;
+		this.zoneMaxBmp = zoneMaxBmp;
 
-		final Boolean isItemChecked = HandlerUtil.isItemChecked(execEvent);
-
-		if (isItemChecked != null) {
-			tourChart.actionShowHrZones(isItemChecked);
-		}
-
-		return null;
+		this.age = age;
+		this.hrMax = hrMax;
 	}
 
 }
