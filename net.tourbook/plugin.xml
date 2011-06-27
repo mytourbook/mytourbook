@@ -1051,6 +1051,13 @@
 	            id="net.tourbook.views.StatisticView"
 	            name="%view_name_Statistics">
 	      </view>
+	      <view
+	            category="net.tourbook.category.tourList"
+	            class="net.tourbook.ui.views.calendar.CalendarView"
+	            icon="icons/tour-tag.gif"
+	            id="net.tourbook.views.calendar.CalendarView"
+	            name="Tour Calendar">
+	      </view>
 
       <category
             id="net.tourbook.category.tour"
