@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -75,7 +75,8 @@ import org.joda.time.DateTime;
 
 public class TourManager {
 
-	public static final String				CUSTOM_DATA_TOUR_ID			= "tourdata";								//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_TOUR_ID			= "tourId";								//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_TOUR_DATA		= "tourData";								//$NON-NLS-1$
 
 	public static final String				CUSTOM_DATA_TIME			= "time";									//$NON-NLS-1$
 	public static final String				CUSTOM_DATA_DISTANCE		= "distance";								//$NON-NLS-1$
@@ -2033,6 +2034,7 @@ public class TourManager {
 		chartDataModel.setCustomData(CUSTOM_DATA_TIME, xDataTime);
 		chartDataModel.setCustomData(CUSTOM_DATA_DISTANCE, xDataDistance);
 
+		chartDataModel.setCustomData(CUSTOM_DATA_TOUR_DATA, tourData);
 		chartDataModel.setCustomData(CUSTOM_DATA_TOUR_ID, tourData.getTourId());
 
 		return chartDataModel;

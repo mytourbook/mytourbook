@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.chart;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import net.tourbook.util.ITourToolTipProvider;
@@ -340,7 +339,7 @@ public class Chart extends ViewForm {
 		final SelectionChartInfo chartInfo = new SelectionChartInfo(this);
 
 		chartInfo.chartDataModel = _chartDataModel;
-		chartInfo.graphDrawingData = _chartComponents.getGraphDrawingData();
+		chartInfo.chartDrawingData = _chartComponents.getChartDrawingData();
 
 		final ChartComponentGraph chartGraph = _chartComponents.getChartComponentGraph();
 		chartInfo.leftSliderValuesIndex = chartGraph.getLeftSlider().getValuesIndex();
@@ -646,8 +645,8 @@ public class Chart extends ViewForm {
 		return _chartComponents.getChartComponentGraph().getDevGraphImageXOffset();
 	}
 
-	public ArrayList<GraphDrawingData> getGraphDrawingData() {
-		return _chartComponents.getGraphDrawingData();
+	public ChartDrawingData getChartDrawingData() {
+		return _chartComponents.getChartDrawingData();
 	}
 
 	/**

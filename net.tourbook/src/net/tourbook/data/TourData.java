@@ -301,7 +301,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private int												maxPulse;																				// db-version 4
 
 	/**
-	 * Number of HR zones which are available for this tour
+	 * Number of HR zones which are available for this tour, is 0 when HR zones are not defined.
 	 */
 	private int												numberOfHrZones						= 0;												// db-version 18
 
@@ -915,6 +915,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	@Transient
 	private int[]											_hrZones;
 
+	@Transient
+	private HrZoneContext									_hrZoneContext;
+
 	public TourData() {}
 
 	/**
@@ -1098,6 +1101,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		srtmSerieImperial = null;
 
 		_hrZones = null;
+		_hrZoneContext = null;
 	}
 
 	/**
@@ -1922,13 +1926,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			return;
 		}
 
-		final ZoneContext zoneContext = tourPerson.getHrZoneContext(
+		_hrZoneContext = tourPerson.getHrZoneContext(
 				tourPerson.getHrMaxFormula(),
 				tourPerson.getMaxPulse(),
 				tourPerson.getBirthDayWithDefault(),
 				getStartDateTime());
 
-		if (zoneContext == null) {
+		if (_hrZoneContext == null) {
 			// hr zones are not defined
 			return;
 		}
@@ -1937,7 +1941,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			getBreakTime();
 		}
 
-		final int zoneSize = zoneContext.zoneMinBmp.length;
+		final int zoneSize = _hrZoneContext.zoneMinBpm.length;
 		final int[] hrZones = new int[zoneSize];
 		int prevTime = 0;
 
@@ -1966,8 +1970,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 			for (int zoneIndex = 0; zoneIndex < zoneSize; zoneIndex++) {
 
-				final int minValue = zoneContext.zoneMinBmp[zoneIndex];
-				final int maxValue = zoneContext.zoneMaxBmp[zoneIndex];
+				final int minValue = _hrZoneContext.zoneMinBpm[zoneIndex];
+				final int maxValue = _hrZoneContext.zoneMaxBpm[zoneIndex];
 
 				if (pulse >= minValue && pulse <= maxValue) {
 					hrZones[zoneIndex] += timeDiff;
@@ -3734,6 +3738,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 //		return deviceTotalUp;
 //	}
 
+	public HrZoneContext getHrZoneContext() {
+
+		if (_hrZoneContext == null) {
+			computeHrZones();
+		}
+
+		return _hrZoneContext;
+	}
+
 	/**
 	 * @return Returns all available HR zones. How many zones are really used, depends on the
 	 *         {@link TourPerson} and how many zones are defined for the person.
@@ -3819,6 +3832,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return distanceSerie;
 	}
 
+	/**
+	 * @return Returns number of HR zones which are available for this tour. Will be 0 when HR zones
+	 *         are not defined.
+	 */
 	public int getNumberOfHrZones() {
 
 		if (_hrZones == null) {

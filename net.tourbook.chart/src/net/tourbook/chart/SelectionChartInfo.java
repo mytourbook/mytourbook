@@ -1,48 +1,46 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 201  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.chart;
-
-import java.util.ArrayList;
 
 import org.eclipse.jface.viewers.ISelection;
 
 public class SelectionChartInfo implements ISelection {
 
-	private Chart						fChart;
+	private Chart			_chart;
 
-	public ChartDataModel				chartDataModel;
-	public ArrayList<GraphDrawingData>	graphDrawingData;
+	public ChartDataModel	chartDataModel;
+	public ChartDrawingData	chartDrawingData;
 
-	public int							leftSliderValuesIndex;
-	public int							rightSliderValuesIndex;
-	
+	public int				leftSliderValuesIndex;
+	public int				rightSliderValuesIndex;
+
 	/**
 	 * contains the value index for the slider which is selected
 	 */
-	public int							selectedSliderValuesIndex;
+	public int				selectedSliderValuesIndex;
 
-	@SuppressWarnings("unused")//$NON-NLS-1$
+	@SuppressWarnings("unused")
 	private SelectionChartInfo() {}
 
 	public SelectionChartInfo(final Chart chart) {
-		fChart = chart;
+		_chart = chart;
 	}
 
 	public Chart getChart() {
-		return fChart;
+		return _chart;
 	}
 
 	public boolean isEmpty() {
@@ -61,7 +59,7 @@ public class SelectionChartInfo implements ISelection {
 		sb.append(rightSliderValuesIndex);
 
 		sb.append("\n\t");//$NON-NLS-1$
-		sb.append(fChart.getChartDataModel());
+		sb.append(_chart.getChartDataModel());
 
 		return sb.toString();
 	}

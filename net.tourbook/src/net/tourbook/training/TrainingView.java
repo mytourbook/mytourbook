@@ -32,7 +32,7 @@ import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourPersonHRZone;
-import net.tourbook.data.ZoneContext;
+import net.tourbook.data.HrZoneContext;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPagePeople;
 import net.tourbook.preferences.PrefPagePeopleData;
@@ -1164,7 +1164,7 @@ public class TrainingView extends ViewPart {
 		// display page for the selected chart
 		_pageBookHrZones.showPage(_pageHrZones);
 
-		final ZoneContext zoneMinMaxBpm = _currentPerson.getHrZoneContext(
+		final HrZoneContext zoneMinMaxBpm = _currentPerson.getHrZoneContext(
 				_currentPerson.getHrMaxFormula(),
 				_currentPerson.getMaxPulse(),
 				_currentPerson.getBirthDayWithDefault(),
@@ -1177,7 +1177,7 @@ public class TrainingView extends ViewPart {
 		updateUI44HrZoneImage();
 	}
 
-	private void updateUI40HrZoneChart(final ZoneContext zoneMinMaxBpm) {
+	private void updateUI40HrZoneChart(final HrZoneContext zoneMinMaxBpm) {
 
 		final int[] pulseSerie = _tourData.pulseSerie;
 		final int[] timeSerie = _tourData.timeSerie;
@@ -1235,8 +1235,8 @@ public class TrainingView extends ViewPart {
 
 		final int[] colorIndex = new int[serieSize];
 
-		final int[] zoneMinBpm = zoneMinMaxBpm.zoneMinBmp;
-		final int[] zoneMaxBpm = zoneMinMaxBpm.zoneMaxBmp;
+		final int[] zoneMinBpm = zoneMinMaxBpm.zoneMinBpm;
+		final int[] zoneMaxBpm = zoneMinMaxBpm.zoneMaxBpm;
 
 		for (int pulseIndex = 0; pulseIndex < pulseRange; pulseIndex++) {
 
@@ -1343,7 +1343,7 @@ public class TrainingView extends ViewPart {
 	 * @param zoneContext
 	 *            Contains age and HR max values.
 	 */
-	private void updateUI42HrZoneData(final ZoneContext zoneContext) {
+	private void updateUI42HrZoneData(final HrZoneContext zoneContext) {
 
 		// create hr zones when not yet done or disposed
 		if (_hrZoneDataContainerContent == null || _hrZoneDataContainerContent.isDisposed()) {
@@ -1388,8 +1388,8 @@ public class TrainingView extends ViewPart {
 					? Messages.App_Label_max
 					: Integer.toString(zoneMaxValue);
 
-			final int zoneMinBpm = zoneContext.zoneMinBmp[tourZoneIndex];
-			final int zoneMaxBmp = zoneContext.zoneMaxBmp[tourZoneIndex];
+			final int zoneMinBpm = zoneContext.zoneMinBpm[tourZoneIndex];
+			final int zoneMaxBmp = zoneContext.zoneMaxBpm[tourZoneIndex];
 			final String zoneMaxBpmText = zoneMaxBmp == Integer.MAX_VALUE //
 					? Messages.App_Label_max
 					: Integer.toString(zoneMaxBmp);
