@@ -1861,7 +1861,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			breakTimeResult = BreakTimeTool.computeBreakTimeByTimeDistance(
 					this,
 					btConfig.breakShortestTime,
-					btConfig.breakMaxDistance);
+					btConfig.breakMaxDistance,
+					btConfig.breakSliceDiff);
 
 			breakTimeSerie = breakTimeResult.breakTimeSerie;
 
