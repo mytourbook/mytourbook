@@ -47,4 +47,8 @@ public class CalendarComponents extends Composite {
 
 	}
 
+	public CalendarGraph getGraph() {
+		return _calGraph;
+	}
+
 }

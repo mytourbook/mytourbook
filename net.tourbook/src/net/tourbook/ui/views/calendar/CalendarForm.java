@@ -6,6 +6,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.joda.time.DateTime;
 
 public class CalendarForm extends ViewForm {
 
@@ -20,9 +21,9 @@ public class CalendarForm extends ViewForm {
 		setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 
 		final GridLayout gl = new GridLayout(1, false);
-		gl.marginWidth = 0;
-		gl.marginHeight = 0;
-		gl.verticalSpacing = 0;
+		gl.marginWidth = 10;
+		gl.marginHeight = 10;
+		gl.verticalSpacing = 10;
 		setLayout(gl);
 
 		// set the layout for the calendar
@@ -31,6 +32,18 @@ public class CalendarForm extends ViewForm {
 		_calendarComponents = new CalendarComponents(this, style);
 		setContent(_calendarComponents);
 
+	}
+
+	public void back() {
+		_calendarComponents.getGraph().back();
+	}
+
+	public void forward() {
+		_calendarComponents.getGraph().forward();
+	}
+
+	public void setDate(final DateTime date) {
+		_calendarComponents.getGraph().setDate(date);
 	}
 
 }
