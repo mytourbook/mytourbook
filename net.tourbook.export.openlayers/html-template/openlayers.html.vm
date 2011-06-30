@@ -1,7 +1,6 @@
 ## Velocity Config:
 #set( $google = true )
 #set( $bing = false )
-#set( $yahoo = false )
 #set( $slider = true )
 ##
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -28,9 +27,6 @@
         </style>
 #if ( $google )
         <script src="http://maps.google.com/maps/api/js?v=3.2&amp;sensor=false"></script> 
-#end
-#if ( $yahoo || $slider )
-        <script src="http://api.maps.yahoo.com/ajaxymap?v=3.0&amp;appid=euzuro-openlayers"></script>
 #end
 #if ( $bing )
         <script src="http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6.2&mkt=en-us"></script>
@@ -169,14 +165,6 @@
                map.addLayers([baerial, bhybrid, bshaded]);
 
 #end
-#if ( $yahoo )
-               // Yahoo
-               var yahoosat = new OpenLayers.Layer.Yahoo("Yahoo Satellite", {'type': YAHOO_MAP_SAT, 'sphericalMercator': true});
-               var yahoohyb = new OpenLayers.Layer.Yahoo("Yahoo Hybrid", {'type': YAHOO_MAP_HYB, 'sphericalMercator': true});
-               var yahoomap = new OpenLayers.Layer.Yahoo("Yahoo Street", {'sphericalMercator': true});
-               map.addLayers([yahoohyb, yahoosat, yahoomap]);
-
-#end
                // OSM
                var osm = new OpenLayers.Layer.OSM("OpenStreetMap (Mapnik)", 
                   "http://tile.openstreetmap.org/${z}/${x}/${y}.png",
@@ -248,9 +236,7 @@
 
 #if ( $slider )
          <!-- Overlay Opacity Slider (source: http://sautter.com/map/) -->
-         <script src="http://yui.yahooapis.com/2.8.2r1/build/yahoo-dom-event/yahoo-dom-event.js"></script>
-         <script src="http://yui.yahooapis.com/2.8.2r1/build/dragdrop/dragdrop-min.js"></script>
-         <script src="http://yui.yahooapis.com/2.8.2r1/build/slider/slider-min.js"></script>
+         <script src="http://yui.yahooapis.com/combo?2.9.0/build/yahoo-dom-event/yahoo-dom-event.js&2.9.0/build/dragdrop/dragdrop-min.js&2.9.0/build/slider/slider-min.js"></script>
          <script type="text/javascript">
             function sliderInit() {
               var slider = YAHOO.widget.Slider.getHorizSlider("sliderbg", "sliderthumb", -16, 220+16-4-1);
