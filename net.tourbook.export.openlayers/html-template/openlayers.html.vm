@@ -19,11 +19,6 @@
                 width: 100%;
                 height: 100%;
             }
-            
-            /* avoid pink error tiles (see onImageLoadErrorColor) */ 
-               .olImageLoadError { 
-               background-color: transparent !important; 
-            } 
         </style>
 #if ( $google )
         <script src="http://maps.google.com/maps/api/js?v=3.2&amp;sensor=false"></script> 
@@ -109,6 +104,11 @@
                }
             };
 
+            // avoid pink error tiles with Lonvia's overlay
+			OpenLayers.Util.onImageLoadError = function() {
+			  this.src = "http://hiking.lonvia.de/media/static/img/empty.png";
+			};
+
             // Zoom Level 18 and above slows down Internet Explorer when track is shown.
             var isIE = navigator.userAgent.toLowerCase().indexOf("msie") != -1;
             var maxZoomLevel;
@@ -119,10 +119,6 @@
             }
 
             var map;
-
-            // avoid pink error tiles (see CSS style olImageLoadError)
-            // TODO do not show error tiles at all (see http://osm.cdauth.eu/map ?)
-            OpenLayers.Util.onImageLoadErrorColor = "transparent"; 
 
             function init() {
 
