@@ -73,6 +73,7 @@ import net.tourbook.tour.BreakTimeTool;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.ChartLayer2ndAltiSerie;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
+import net.tourbook.util.StatusUtil;
 import net.tourbook.util.Util;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -3048,16 +3049,24 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			/*
 			 * the distance is shorted that the maximum of a Long datatype is not exceeded
 			 */
+			try {
 
-			tourIdKey = Short.toString(getStartYear())
-					+ Short.toString(getStartMonth())
-					+ Short.toString(getStartDay())
-					+ Short.toString(getStartHour())
-					+ Short.toString(getStartMinute())
-					//
-					+ uniqueKeySuffix.substring(0, Math.min(5, uniqueKeySuffix.length()));
+				tourIdKey = Short.toString(getStartYear())
+						+ Short.toString(getStartMonth())
+						+ Short.toString(getStartDay())
+						+ Short.toString(getStartHour())
+						+ Short.toString(getStartMinute())
+						//
+						+ uniqueKeySuffix.substring(0, Math.min(5, uniqueKeySuffix.length()));
 
-			tourId = Long.valueOf(tourIdKey);
+				tourId = Long.valueOf(tourIdKey);
+
+			} catch (final NumberFormatException e2) {
+
+				// this case happened when getStartMonth() had a wrong value
+
+				tourId = Long.valueOf(new DateTime().getMillis());
+			}
 		}
 
 		return tourId;
@@ -4957,7 +4966,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	public void setStartMonth(final short startMonth) {
 		_dateTimeStart = null;
-		this.startMonth = startMonth;
+
+		if (startMonth < 1 || startMonth > 12) {
+			StatusUtil.log(new Exception("Month is invalid: " + startMonth)); //$NON-NLS-1$
+			this.startMonth = 1;
+		} else {
+			this.startMonth = startMonth;
+		}
 	}
 
 	public void setStartPulse(final short startPulse) {
