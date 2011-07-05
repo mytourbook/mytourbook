@@ -643,7 +643,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 //	private boolean	_isBreakTimeComputed;
 
 	/**
-	 * contains the temperature in the metric measurement system
+	 * Contains the temperature in the metric measurement system, the values are multiplied with
+	 * {@link #temperatureScale}.
 	 */
 	@Transient
 	public int[]											temperatureSerie;
