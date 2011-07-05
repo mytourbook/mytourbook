@@ -36,6 +36,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
@@ -418,7 +419,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
 		/*
 		 * set tour start date/time
 		 */
-		final DateTime dtTourStart = new DateTime(firstTimeData.absoluteTime);
+		// final DateTime dtTourStart = new DateTime(firstTimeData.absoluteTime);
+		final DateTime dtTourStart = new DateTime(firstTimeData.absoluteTime, DateTimeZone.UTC);
 
 		tourData.setStartYear((short) dtTourStart.getYear());
 		tourData.setStartMonth((short) dtTourStart.getMonthOfYear());

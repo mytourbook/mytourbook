@@ -61,11 +61,18 @@ public class PolarPDDDataReader extends TourbookDevice {
 	private boolean					_isDebug					= false;
 	private int						_fileVersionDayInfo			= -1;
 
+	private Day						_currentDay;
 	private Exercise				_currentExercise;
 
 	private ArrayList<String>		_exerciseFiles				= new ArrayList<String>();
 	private ArrayList<String>		_additionalImportedFiles	= new ArrayList<String>();
 	private HashMap<Long, Integer>	_tourSportMap				= new HashMap<Long, Integer>();
+
+	private class Day {
+		
+		private DateTime date;
+		
+	}
 
 	private class Exercise {
 
@@ -73,6 +80,10 @@ public class PolarPDDDataReader extends TourbookDevice {
 
 		private String	title;
 		private String	description;
+
+		private DateTime	startTime;
+		private int			distance;
+		private int			duration;
 
 		private int		calories;
 		private int		sport;
@@ -89,6 +100,65 @@ public class PolarPDDDataReader extends TourbookDevice {
 	@Override
 	public boolean checkStartSequence(final int byteIndex, final int newByte) {
 		return false;
+	}
+
+	private boolean createExercise() throws Exception {
+
+		final TourData exerciseData = new TourData();
+
+		/*
+		 * set tour start date/time
+		 */
+		exerciseData.setStartHour((short) _currentExercise.startTime.getHourOfDay());
+		exerciseData.setStartMinute((short) _currentExercise.startTime.getMinuteOfHour());
+		exerciseData.setStartSecond((short) _currentExercise.startTime.getSecondOfMinute());
+
+		exerciseData.setStartYear((short) _currentExercise.startTime.getYear());
+		exerciseData.setStartMonth((short) _currentExercise.startTime.getMonthOfYear());
+		exerciseData.setStartDay((short) _currentExercise.startTime.getDayOfMonth());
+
+		exerciseData.setWeek(_currentExercise.startTime);
+
+		exerciseData.importRawDataFile = _importFilePath;
+		exerciseData.setTourImportFilePath(_importFilePath);
+
+		// set title
+		final String title = _currentExercise.title;
+		if (title != null) {
+			exerciseData.setTourTitle(title);
+		} else {
+			exerciseData.setTourTitle("");
+		}
+		// set description
+		final String description = _currentExercise.description;
+		if (description != null) {
+			exerciseData.setTourDescription(description);
+		} else {
+			exerciseData.setTourDescription("");
+		}
+		
+		exerciseData.setTourDistance(_currentExercise.distance);
+		exerciseData.setTourDrivingTime(_currentExercise.duration);
+
+		// set other fields
+		exerciseData.setCalories(_currentExercise.calories);
+
+		// after all data are added, the tour id can be created
+		final Long tourId = exerciseData.createTourId(createUniqueId(exerciseData, Util.UNIQUE_ID_SUFFIX_POLAR_PDD));
+
+		// check if the tour is already imported
+		if (_tourDataMap.containsKey(tourId) == false) {
+
+			// add new tour to other tours
+			_tourDataMap.put(tourId, exerciseData);
+		}
+
+		// save the sport type for this exercise
+		if (_tourSportMap.containsKey(tourId) == false) {
+			_tourSportMap.put(tourId, _currentExercise.sport);
+		}
+
+		return true;
 	}
 
 	private boolean createExercise(final String hrmFileName, final String gpxFileName) throws Exception {
@@ -166,7 +236,7 @@ public class PolarPDDDataReader extends TourbookDevice {
 			_tourDataMap.put(tourId, hrmTourData);
 		}
 
-		// save the sport type for this excercise
+		// save the sport type for this exercise
 		if (_tourSportMap.containsKey(tourId) == false) {
 			_tourSportMap.put(tourId, _currentExercise.sport);
 		}
@@ -420,6 +490,8 @@ public class PolarPDDDataReader extends TourbookDevice {
 
 				if (line.startsWith(SECTION_DAY_INFO)) {
 
+					_currentDay = new Day();
+
 					isValid = parseSection10DayInfo(fileReader);
 
 					// check version
@@ -487,29 +559,31 @@ public class PolarPDDDataReader extends TourbookDevice {
 	 */
 	private boolean parseSection10DayInfo(final BufferedReader fileReader) throws IOException {
 
-		/**
-		 * <pre>
-		 * Row 0
-		 * 
-		 * Data  					Example
-		 * 
-		 * FileVersion 				100
-		 * Nbr Of Info Rows  		1
-		 * Nbr Of Num Rows  		4
-		 * Nbr Of Num Columns  		6
-		 * Nbr Of Text Rows  		1
-		 * Max Char Per Text Row  512
-		 * 
-		 * </pre>
-		 */
-		try {
+		String line;
+		StringTokenizer tokenLine;
 
-			final String line = fileReader.readLine();
+		try {
+			/**
+			 * <pre>
+			 * Row 0
+			 * 
+			 * Data  					Example
+			 * 
+			 * FileVersion 				100
+			 * Nbr Of Info Rows  		1
+			 * Nbr Of Num Rows  		4
+			 * Nbr Of Num Columns  		6
+			 * Nbr Of Text Rows  		1
+			 * Max Char Per Text Row  512
+			 * 
+			 * </pre>
+			 */
+			line = fileReader.readLine();
 			if (line == null) {
 				return false;
 			}
 
-			final StringTokenizer tokenLine = new StringTokenizer(line, DATA_DELIMITER);
+			tokenLine = new StringTokenizer(line, DATA_DELIMITER);
 
 			// 1
 			_fileVersionDayInfo = Integer.parseInt(tokenLine.nextToken());
@@ -527,12 +601,57 @@ public class PolarPDDDataReader extends TourbookDevice {
 			// 5
 			final int numOfTextRows = Integer.parseInt(tokenLine.nextToken());
 
+			int numOfNumberRowsAnalyzed = 0;
+
+			/**
+			 * <pre>
+			 * Row 1
+			 * 
+			 * Data  					Example
+			 * 
+			 * Date	 					20110705
+			 * ?
+			 * ?
+			 * ?
+			 * ?
+			 * ?
+			 * 
+			 * </pre>
+			 */
+			line = fileReader.readLine();
+			if (line == null) {
+				return false;
+			}
+
+			tokenLine = new StringTokenizer(line, DATA_DELIMITER);
+
+			// 1
+			final String date = tokenLine.nextToken();
+			final int year = Integer.parseInt(date.substring(0, 4));
+			final int month = Integer.parseInt(date.substring(4, 6));
+			final int day = Integer.parseInt(date.substring(6, 8));
+			_currentDay.date = new DateTime(year, month, day, 0, 0, 0, 0);
+
+			// 2
+			tokenLine.nextToken();
+
+			// 3
+			tokenLine.nextToken();
+
+			// 4
+			tokenLine.nextToken();
+
+			// 5
+			tokenLine.nextToken();
+
+			numOfNumberRowsAnalyzed++;
+
 			// skip additional info rows (which are not available in version 100)
 			if (numOfInfoRows > 1) {
 				skipRows(fileReader, numOfInfoRows - 1);
 			}
 
-			if (skipRows(fileReader, numOfNumberRows + numOfTextRows) == null) {
+			if (skipRows(fileReader, numOfNumberRows + numOfTextRows - numOfNumberRowsAnalyzed) == null) {
 				return false;
 			}
 
@@ -654,7 +773,12 @@ public class PolarPDDDataReader extends TourbookDevice {
 			tokenLine.nextToken();
 
 			// column 5
-//			_currentExercise.startTime = Integer.parseInt(tokenLine.nextToken());
+			if (null != _currentDay.date) {
+				_currentExercise.startTime = _currentDay.date.plusSeconds(Integer.parseInt(tokenLine.nextToken()));
+			}
+
+			// column 6
+			_currentExercise.duration = Integer.parseInt(tokenLine.nextToken());
 
 			/**
 			 * <pre>
@@ -683,6 +807,49 @@ public class PolarPDDDataReader extends TourbookDevice {
 
 			// column 1
 			_currentExercise.sport = Integer.parseInt(tokenLine.nextToken());
+
+			// column 2
+			tokenLine.nextToken();
+
+			// column 3
+			tokenLine.nextToken();
+
+			// column 4
+			tokenLine.nextToken();
+
+			// column 5
+			tokenLine.nextToken();
+
+			// column 6
+			_currentExercise.calories = Integer.parseInt(tokenLine.nextToken());
+
+			/**
+			 * <pre>
+			 * 
+			 * Number Row 3
+			 * 
+			 * Data							Example		Format
+			 * 
+			 * 1:   Distance                12000       m
+			 * 2:	?
+			 * 3:	?
+			 * 4:	?
+			 * 5:	?
+			 * 6:	?
+			 * 
+			 * </pre>
+			 */
+
+			line = fileReader.readLine();
+			if (line == null) {
+				return false;
+			}
+			numOfNumberRowsAnalyzed++;
+
+			tokenLine = new StringTokenizer(line, DATA_DELIMITER);
+
+			// column 1
+			_currentExercise.distance = Integer.parseInt(tokenLine.nextToken());
 
 			// column 2
 			tokenLine.nextToken();
@@ -772,7 +939,12 @@ public class PolarPDDDataReader extends TourbookDevice {
 				gpxFileName = line;
 			}
 
-			return createExercise(hrmFileName, gpxFileName);
+			// hrmFile and GpxFile might both be empty, Polar allows creation of an exercise without recorded data
+			if (null != hrmFileName) {
+				return createExercise(hrmFileName, gpxFileName);
+			} else {
+				return createExercise();
+			}
 
 		} catch (final Exception e) {
 			StatusUtil.showStatus(e);
