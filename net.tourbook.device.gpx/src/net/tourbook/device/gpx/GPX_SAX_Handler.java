@@ -70,6 +70,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	private static final String				TAG_EXT_CAD				= "gpxtpx:cad";									//$NON-NLS-1$
 	private static final String				TAG_EXT_HR				= "gpxtpx:hr";										//$NON-NLS-1$
 	private static final String				TAG_EXT_TEMP			= "gpxtpx:atemp";									//$NON-NLS-1$
+	private static final String				TAG_EXT_DISTANCE		= "gpxdata:distance";								//$NON-NLS-1$
 
 	private static final String				ATTR_LATITUDE			= "lat";											//$NON-NLS-1$
 	private static final String				ATTR_LONGITUDE			= "lon";											//$NON-NLS-1$
@@ -108,6 +109,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	private boolean							_isInCadence			= false;
 	private boolean							_isInHr					= false;
 	private boolean							_isInTemp				= false;
+	private boolean							_isInDistance			= false;
 
 	/*
 	 * wap points
@@ -169,6 +171,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 				|| _isInCadence
 				|| _isInHr
 				|| _isInTemp
+				|| _isInDistance
 				//
 				|| _isInWptCmt
 				|| _isInWptDesc
@@ -264,6 +267,13 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 						_isInTemp = false;
 						_timeSlice.temperature = Math.round(getFloatValue(charData) * TourbookDevice.TEMPERATURE_SCALE);
+
+					} else if (name.equals(TAG_EXT_DISTANCE)) {
+
+						// </gpxdata:distance>
+
+						_isInDistance = false;
+						_timeSlice.gpxDistance = getFloatValue(charData);
 					}
 
 				} else if (name.equals(TAG_TRK_NAME)) {
@@ -513,17 +523,31 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 		_timeDataList.add(_timeSlice);
 
-		// calculate distance
+		/*
+		 * calculate distance
+		 */
 		if (_prevTimeSlice == null) {
 			// first time data
 			_timeSlice.absoluteDistance = 0;
 		} else {
 			if (_timeSlice.absoluteDistance == Float.MIN_VALUE) {
-				_timeSlice.absoluteDistance = _absoluteDistance += DeviceReaderTools.computeDistance(
-						_prevTimeSlice.latitude,
-						_prevTimeSlice.longitude,
-						_timeSlice.latitude,
-						_timeSlice.longitude);
+
+				if (_timeSlice.gpxDistance != Float.NaN) {
+
+					// get distance from gpx tag: <gpxdata:distance>
+
+					_timeSlice.absoluteDistance = _absoluteDistance += _timeSlice.gpxDistance;
+
+				} else {
+
+					// compute distance from lat/lon
+
+					_timeSlice.absoluteDistance = _absoluteDistance += DeviceReaderTools.computeDistance(
+							_prevTimeSlice.latitude,
+							_prevTimeSlice.longitude,
+							_timeSlice.latitude,
+							_timeSlice.longitude);
+				}
 			}
 		}
 
@@ -717,6 +741,11 @@ public class GPX_SAX_Handler extends DefaultHandler {
 					} else if (name.equals(TAG_EXT_TEMP)) {
 
 						_isInTemp = true;
+						_characters.delete(0, _characters.length());
+
+					} else if (name.equals(TAG_EXT_DISTANCE)) {
+
+						_isInDistance = true;
 						_characters.delete(0, _characters.length());
 					}
 

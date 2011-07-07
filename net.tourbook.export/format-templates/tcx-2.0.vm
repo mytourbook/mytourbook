@@ -43,7 +43,7 @@
 #end
 #if($point.hasValidHeartrate())
 						<HeartRateBpm xsi:type="HeartRateInBeatsPerMinute_t">
-						  <Value>$point.Heartrate</Value>
+							<Value>$point.Heartrate</Value>
 						</HeartRateBpm>
 #if($point.hasValidCadence())
 						<Cadence type="CadenceValue_t">$point.Cadence</Cadence>

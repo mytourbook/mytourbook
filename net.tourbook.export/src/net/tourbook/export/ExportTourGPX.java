@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -35,16 +35,14 @@ public class ExportTourGPX extends ExportTourExtension {
 	@Override
 	public void exportTours(final ArrayList<TourData> tourDataList, final int tourStartIndex, final int tourEndIndex) {
 
-		DialogExportTour dialogExportTour = new DialogExportTour(
+		new DialogExportTour(
 				Display.getCurrent().getActiveShell(),
 				this,
 				tourDataList,
 				tourStartIndex,
 				tourEndIndex,
-				"/format-templates/gpx-1.0.vm" //$NON-NLS-1$
-		);
-
-		dialogExportTour.open();
+				"/format-templates/gpx-1.0.vm", //$NON-NLS-1$
+				false).open();
 	}
 
 }
