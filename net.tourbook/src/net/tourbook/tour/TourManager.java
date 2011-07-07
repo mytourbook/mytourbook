@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -75,7 +75,8 @@ import org.joda.time.DateTime;
 
 public class TourManager {
 
-	public static final String				CUSTOM_DATA_TOUR_ID			= "tourdata";								//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_TOUR_ID			= "tourId";								//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_TOUR_DATA		= "tourData";								//$NON-NLS-1$
 
 	public static final String				CUSTOM_DATA_TIME			= "time";									//$NON-NLS-1$
 	public static final String				CUSTOM_DATA_DISTANCE		= "distance";								//$NON-NLS-1$
@@ -352,13 +353,14 @@ public class TourManager {
 		 * convert graph ids from the preferences into visible graphs in the chart panel
 		 * configuration
 		 */
-		final String[] prefGraphIds = StringToArrayConverter.convertStringToArray(_prefStore
-				.getString(ITourbookPreferences.GRAPH_VISIBLE));
+		final String[] prefGraphIds = StringToArrayConverter.convertStringToArray(//
+				_prefStore.getString(ITourbookPreferences.GRAPH_VISIBLE));
+
 		for (final String prefGraphId : prefGraphIds) {
 			chartConfig.addVisibleGraph(Integer.parseInt(prefGraphId));
 		}
 
-		chartConfig.isHrZoneDisplayed = true;
+		chartConfig.isHrZoneDisplayed = _prefStore.getBoolean(ITourbookPreferences.GRAPH_HR_ZONE_IS_VISIBLE);
 
 		// set the unit which is shown on the x-axis
 		if (_prefStore.getString(ITourbookPreferences.GRAPH_X_AXIS).equals(X_AXIS_TIME)) {
@@ -1684,7 +1686,17 @@ public class TourManager {
 			chartDataModel.addXyData(xDataTime);
 		}
 
+		/*
+		 * Don't draw a (visible) line when a break occures, break time can be minutes, hours or
+		 * days. This feature prevents to draw triangles between 2 value points
+		 */
+		xDataTime.setNoLine(tourData.getBreakTimeSerie());
+
 		final int chartType = _prefStore.getInt(ITourbookPreferences.GRAPH_PROPERTY_CHARTTYPE);
+
+		// HR zones can be displayed when they are available
+		chartConfig.canShowHrZones = tourData.getNumberOfHrZones() > 0;
+		final boolean isHrZoneDisplayed = chartConfig.canShowHrZones && chartConfig.isHrZoneDisplayed;
 
 		/*
 		 * altitude
@@ -1722,10 +1734,15 @@ public class TourManager {
 
 			yDataAltitude.setYTitle(Messages.Graph_Label_Altitude);
 			yDataAltitude.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
-			yDataAltitude.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
 			yDataAltitude.setShowYSlider(true);
 			yDataAltitude.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_ALTITUDE);
 			yDataAltitude.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true));
+
+			if (isHrZoneDisplayed) {
+				yDataAltitude.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
+			} else {
+				yDataAltitude.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
+			}
 
 			setGraphColor(_prefStore, yDataAltitude, GraphColorProvider.PREF_GRAPH_ALTITUDE);
 			adjustMinMax(yDataAltitude);
@@ -1744,19 +1761,19 @@ public class TourManager {
 
 			yDataPulse.setYTitle(Messages.Graph_Label_Heartbeat);
 			yDataPulse.setUnitLabel(Messages.Graph_Label_Heartbeat_unit);
-			yDataPulse.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
 			yDataPulse.setShowYSlider(true);
 			yDataPulse.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_PULSE);
 			yDataPulse.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true));
 
-			yDataPulse.setDisableLineToNext(isShowTimeOnXAxis ? 20 : 0);
+			if (isHrZoneDisplayed) {
+				yDataPulse.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
+			} else {
+				yDataPulse.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
+			}
 
 			setGraphColor(_prefStore, yDataPulse, GraphColorProvider.PREF_GRAPH_HEARTBEAT);
 			chartDataModel.addXyData(yDataPulse);
 		}
-
-		// HR zones can be displayed when they are available
-		chartConfig.canShowHrZones = tourData.getNumberOfHrZones() > 0;
 
 		/*
 		 * speed
@@ -2033,6 +2050,7 @@ public class TourManager {
 		chartDataModel.setCustomData(CUSTOM_DATA_TIME, xDataTime);
 		chartDataModel.setCustomData(CUSTOM_DATA_DISTANCE, xDataDistance);
 
+		chartDataModel.setCustomData(CUSTOM_DATA_TOUR_DATA, tourData);
 		chartDataModel.setCustomData(CUSTOM_DATA_TOUR_ID, tourData.getTourId());
 
 		return chartDataModel;

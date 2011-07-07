@@ -32,6 +32,7 @@ public class BreakTimeTool {
 	private static int				_prefBreakTimeMethod;
 	private static int				_prefShortestTime;
 	private static float			_prefMaxDistance;
+	private static int				_prefSliceDiff;
 	private static float			_prefMinSliceSpeed;
 	private static float			_prefMinAvgSpeed;
 
@@ -69,6 +70,11 @@ public class BreakTimeTool {
 	public float					breakMaxDistance;
 
 	/**
+	 * time between 2 time slices in minutes
+	 */
+	public int						breakSliceDiff;
+
+	/**
 	 * slice speed in km/h
 	 */
 	public float					breakMinSliceSpeed;
@@ -85,13 +91,15 @@ public class BreakTimeTool {
 							final int breakShortestTime,
 							final float breakMaxDistance,
 							final float breakMinSliceSpeed,
-							final float breakMinAvgSpeed) {
+							final float breakMinAvgSpeed,
+							final int breakSliceDiff) {
 
 		this.breakTimeMethod = breakTimeMethod;
 
 		// 0
 		this.breakShortestTime = breakShortestTime;
 		this.breakMaxDistance = breakMaxDistance;
+		this.breakSliceDiff = breakSliceDiff;
 
 		// 1
 		this.breakMinSliceSpeed = breakMinSliceSpeed;
@@ -192,15 +200,21 @@ public class BreakTimeTool {
 
 	public static BreakTimeResult computeBreakTimeByTimeDistance(	final TourData tourData,
 																	final int shortestBreakTime,
-																	final float maxDistance) {
+																	final float maxDistance,
+																	final int sliceDiff) {
 
 		final int[] timeSerie = tourData.timeSerie;
 		final int[] distanceSerie = tourData.getMetricDistanceSerie();
 
+		// slice diff is ignored when it's set to 0
+		final boolean isSliceDiff = sliceDiff > 0;
+		final int sliceDiffSeconds = sliceDiff * 60;
+
 		final boolean[] breakTimeSerie = new boolean[timeSerie.length];
 
-		int lastTime = 0;
-		int lastDistance = 0;
+		int prevTime = 0;
+		int prevDistance = 0;
+
 		int tourBreakTime = 0;
 
 		for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
@@ -208,10 +222,10 @@ public class BreakTimeTool {
 			final int currentTime = timeSerie[serieIndex];
 			final int currentDistance = distanceSerie[serieIndex];
 
-			final int timeDiffSlice = currentTime - lastTime;
-			final int distDiffSlice = currentDistance - lastDistance;
+			final int sliceTimeDiff = currentTime - prevTime;
+			final int sliceDistDiff = currentDistance - prevDistance;
 
-			if (timeDiffSlice > shortestBreakTime && distDiffSlice < maxDistance) {
+			if (sliceTimeDiff > shortestBreakTime && sliceDistDiff < maxDistance) {
 
 				/*
 				 * this is the simplest case for a break, a slice is larger than the shortest break
@@ -219,7 +233,16 @@ public class BreakTimeTool {
 				 */
 
 				breakTimeSerie[serieIndex] = true;
-				tourBreakTime += timeDiffSlice;
+				tourBreakTime += sliceTimeDiff;
+
+			} else if (isSliceDiff && sliceTimeDiff > sliceDiffSeconds) {
+
+				/*
+				 * distance is ignored
+				 */
+
+				breakTimeSerie[serieIndex] = true;
+				tourBreakTime += sliceTimeDiff;
 
 			} else {
 
@@ -249,11 +272,8 @@ public class BreakTimeTool {
 //						break;
 //					}
 
-					final int prevTime = timeSerie[prevIndex];
-					final int prevDist = distanceSerie[prevIndex];
-
-					timeDiffPrevSlices = currentTime - prevTime;
-					distDiffPrevSlices = currentDistance - prevDist;
+					timeDiffPrevSlices = currentTime - timeSerie[prevIndex];
+					distDiffPrevSlices = currentDistance - distanceSerie[prevIndex];
 				}
 
 				if (timeDiffPrevSlices > shortestBreakTime && distDiffPrevSlices < maxDistance) {
@@ -261,12 +281,12 @@ public class BreakTimeTool {
 					// current time slice is also a break
 
 					breakTimeSerie[serieIndex] = true;
-					tourBreakTime += timeDiffSlice;
+					tourBreakTime += sliceTimeDiff;
 				}
 			}
 
-			lastTime = currentTime;
-			lastDistance = currentDistance;
+			prevTime = currentTime;
+			prevDistance = currentDistance;
 		}
 
 		return new BreakTimeResult(breakTimeSerie, tourBreakTime);
@@ -284,7 +304,8 @@ public class BreakTimeTool {
 				_prefShortestTime,
 				_prefMaxDistance,
 				_prefMinSliceSpeed,
-				_prefMinAvgSpeed);
+				_prefMinAvgSpeed,
+				_prefSliceDiff);
 	}
 
 	private static void updatePrefValues() {
@@ -293,6 +314,7 @@ public class BreakTimeTool {
 
 		_prefShortestTime = _prefStore.getInt(ITourbookPreferences.BREAK_TIME_SHORTEST_TIME);
 		_prefMaxDistance = _prefStore.getFloat(ITourbookPreferences.BREAK_TIME_MAX_DISTANCE);
+		_prefSliceDiff = _prefStore.getInt(ITourbookPreferences.BREAK_TIME_SLICE_DIFF);
 
 		_prefMinSliceSpeed = _prefStore.getFloat(ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED);
 		_prefMinAvgSpeed = _prefStore.getFloat(ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED);

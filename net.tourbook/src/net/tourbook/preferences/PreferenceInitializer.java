@@ -124,6 +124,9 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 				+ (Integer.toString(TourManager.GRAPH_GRADIENT) + separator)
 				+ Integer.toString(TourManager.GRAPH_POWER));
 
+		// is HR zone visible
+		store.setDefault(ITourbookPreferences.GRAPH_HR_ZONE_IS_VISIBLE, true);
+
 		// define which unit is shown on the x-axis
 		store.setDefault(ITourbookPreferences.GRAPH_X_AXIS, TourManager.X_AXIS_DISTANCE);
 
@@ -257,6 +260,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		// break time, default is 3.6 km/h (20 m in 20 sec)
 		store.setDefault(ITourbookPreferences.BREAK_TIME_SHORTEST_TIME, 20);
 		store.setDefault(ITourbookPreferences.BREAK_TIME_MAX_DISTANCE, 20.0f);
+		store.setDefault(ITourbookPreferences.BREAK_TIME_SLICE_DIFF, 5); // 5 minutes
 
 		// minimum speed for a break, default is 2.0 km/h
 		store.setDefault(ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED, 2.0f);

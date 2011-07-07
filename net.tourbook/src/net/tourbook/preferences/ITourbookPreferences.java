@@ -60,6 +60,7 @@ public interface ITourbookPreferences {
 	 */
 	public static final String	GRAPH_ALL									= "graphs.all";											//$NON-NLS-1$
 	public static final String	GRAPH_VISIBLE								= "graphs.visible";										//$NON-NLS-1$
+	public static final String	GRAPH_HR_ZONE_IS_VISIBLE					= "Graph_HrZone_IsVisible";								//$NON-NLS-1$
 	public static final String	GRAPH_X_AXIS								= "graphs.x-axis";											//$NON-NLS-1$
 	public static final String	GRAPH_X_AXIS_STARTTIME						= "graphs.x-axis.starttime";								//$NON-NLS-1$
 
@@ -102,6 +103,7 @@ public interface ITourbookPreferences {
 	public static final String	BREAK_TIME_IS_MODIFIED						= "BreakTime_IsModified";									//$NON-NLS-1$
 	public static final String	BREAK_TIME_SHORTEST_TIME					= "BreakTime_ShortestTime";								//$NON-NLS-1$
 	public static final String	BREAK_TIME_MAX_DISTANCE						= "BreakTime_MaxDistance";									//$NON-NLS-1$
+	public static final String	BREAK_TIME_SLICE_DIFF						= "BreakTime_SliceDiff";									//$NON-NLS-1$
 	public static final String	BREAK_TIME_MIN_SLICE_SPEED					= "BreakTime_MinSliceSpeed";								//$NON-NLS-1$
 	public static final String	BREAK_TIME_MIN_AVG_SPEED					= "BreakTime_MinAvgSpeed";									//$NON-NLS-1$
 

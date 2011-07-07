@@ -59,6 +59,12 @@ public class ChartDataXSerie extends ChartDataSerie {
 	private double			_scalingFactor			= 1;
 	private double			_scalingMaxValue		= 1;
 
+	/**
+	 * Defines <code>true</code> or <code>false</code> if a line should be drawn for a value point,
+	 * can be <code>null</code> to disable this feature.
+	 */
+	public boolean[]		_noLine;
+
 	public ChartDataXSerie(final int values[]) {
 		setMinMaxValues(new int[][] { values });
 	}
@@ -69,6 +75,10 @@ public class ChartDataXSerie extends ChartDataSerie {
 
 	public ChartSegments getChartSegments() {
 		return _chartSegments;
+	}
+
+	public boolean[] getNoLine() {
+		return _noLine;
 	}
 
 	public int[] getRangeMarkerEndIndex() {
@@ -118,6 +128,10 @@ public class ChartDataXSerie extends ChartDataSerie {
 
 	@Override
 	void setMinMaxValues(final int[][] lowValues, final int[][] highValues) {}
+
+	public void setNoLine(final boolean[] noLineSerie) {
+		_noLine = noLineSerie;
+	}
 
 	/**
 	 * Range markers are an area in the graph which will be displayed in a different color. This

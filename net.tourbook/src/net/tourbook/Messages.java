@@ -247,6 +247,8 @@ public class Messages extends NLS {
 	public static String		App_TourType_ToolTip;
 	public static String		App_TourType_ToolTipTitle;
 
+	public static String		App_Unit_Minute;
+
 	public static String		App_Unit_Seconds_Small;
 
 	public static String		App_Window_Title;
@@ -288,6 +290,10 @@ public class Messages extends NLS {
 	public static String		Compute_BreakTime_Label_MinimumDistance;
 	public static String		Compute_BreakTime_Label_MinimumSliceSpeed;
 	public static String		Compute_BreakTime_Label_MinimumTime;
+
+	public static String		Compute_BreakTime_Label_SliceDiffBreak;
+
+	public static String		Compute_BreakTime_Label_SliceDiffBreak_Tooltip;
 	public static String		Compute_BreakTime_Label_Title;
 	public static String		Compute_BreakTime_Label_TourBreakTime;
 	public static String		Compute_BreakTime_Method_SpeedByAverage;
@@ -453,6 +459,8 @@ public class Messages extends NLS {
 	public static String		Graph_Label_Gradient;
 	public static String		Graph_Label_Heartbeat;
 	public static String		Graph_Label_Heartbeat_unit;
+	public static String		Graph_Label_HrZone;
+	public static String		Graph_Label_HrZone_Tooltip;
 	public static String		Graph_Label_Pace;
 	public static String		Graph_Label_Power;
 	public static String		Graph_Label_Power_unit;
@@ -551,7 +559,7 @@ public class Messages extends NLS {
 	public static String		Image__options;
 	public static String		Image__PulseZones;
 
-	public static String	Image__PulseZones_Disabled;
+	public static String		Image__PulseZones_Disabled;
 	public static String		Image__quick_edit;
 	public static String		Image__RawData_Import;
 	public static String		Image__RawData_Transfer;
@@ -679,7 +687,6 @@ public class Messages extends NLS {
 	public static String		Pref_Appearance_NumberOfRecent_TourTypes;
 	public static String		Pref_Appearance_NumberOfRecent_TourTypes_Tooltip;
 	public static String		Pref_Appearance_ShowTourTypeContextMenu;
-
 	public static String		Pref_Appearance_ShowTourTypeContextMenu_Tooltip;
 
 	public static String		Pref_ChartColors_btn_legend;

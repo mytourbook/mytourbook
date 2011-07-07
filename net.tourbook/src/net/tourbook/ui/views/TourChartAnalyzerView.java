@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,9 +23,10 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
-import net.tourbook.chart.GraphDrawingData;
+import net.tourbook.chart.ChartDrawingData;
 import net.tourbook.chart.ColorCache;
 import net.tourbook.chart.ComputeChartValue;
+import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.chart.Util;
@@ -75,7 +76,9 @@ public class TourChartAnalyzerView extends ViewPart {
 
 	private ChartDataModel				_chartDataModel;
 
-	private ArrayList<GraphDrawingData>	_drawingData;
+	private ChartDrawingData			_chartDrawingData;
+	private ArrayList<GraphDrawingData>	_graphDrawingData;
+
 	private final ArrayList<GraphInfo>	_graphInfos		= new ArrayList<GraphInfo>();
 
 	private final ColorCache			_colorCache		= new ColorCache();
@@ -638,9 +641,10 @@ public class TourChartAnalyzerView extends ViewPart {
 
 		// init vars which are used in createLayout()
 		_chartDataModel = chartInfo.chartDataModel;
-		_drawingData = chartInfo.graphDrawingData;
+		_chartDrawingData = chartInfo.chartDrawingData;
+		_graphDrawingData = _chartDrawingData.graphDrawingData;
 
-		if ((_drawingData == null) || (_drawingData.size() == 0) || (_drawingData.get(0) == null)) {
+		if ((_graphDrawingData == null) || (_graphDrawingData.size() == 0) || (_graphDrawingData.get(0) == null)) {
 			// this happened
 			return;
 		}
@@ -680,7 +684,7 @@ public class TourChartAnalyzerView extends ViewPart {
 		final SelectionChartInfo chartInfo = new SelectionChartInfo(chart);
 
 		chartInfo.chartDataModel = chart.getChartDataModel();
-		chartInfo.graphDrawingData = chart.getGraphDrawingData();
+		chartInfo.chartDrawingData = chart.getChartDrawingData();
 
 		chartInfo.leftSliderValuesIndex = sliderPosition.getLeftSliderValueIndex();
 		chartInfo.rightSliderValuesIndex = sliderPosition.getRightSliderValueIndex();
@@ -692,7 +696,7 @@ public class TourChartAnalyzerView extends ViewPart {
 
 //		long startTime = System.currentTimeMillis();
 
-		final ChartDataXSerie xData = _drawingData.get(0).getXData();
+		final ChartDataXSerie xData = _graphDrawingData.get(0).getXData();
 
 		int valuesIndexLeft = chartInfo.leftSliderValuesIndex;
 		int valuesIndexRight = chartInfo.rightSliderValuesIndex;

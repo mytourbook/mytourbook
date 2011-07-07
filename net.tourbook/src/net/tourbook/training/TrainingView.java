@@ -29,10 +29,10 @@ import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.IBarSelectionListener;
+import net.tourbook.data.HrZoneContext;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourPersonHRZone;
-import net.tourbook.data.ZoneContext;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPagePeople;
 import net.tourbook.preferences.PrefPagePeopleData;
@@ -186,6 +186,7 @@ public class TrainingView extends ViewPart {
 	private Label[]						_lblTourMinMaxHours;
 	private Label[]						_lblHRZoneName;
 	private Label[]						_lblHRZoneColor;
+	private Label[]						_lblHrZonePercent;
 
 	/*
 	 * none UI
@@ -585,7 +586,7 @@ public class TrainingView extends ViewPart {
 		GridDataFactory.fillDefaults()//
 //				.grab(true, true)
 				.applyTo(container);
-		GridLayoutFactory.swtDefaults().numColumns(4).applyTo(container);
+		GridLayoutFactory.swtDefaults().numColumns(5).applyTo(container);
 		{
 			createUI36HrZoneHeader(container);
 			createUI38HrZoneFields(container);
@@ -609,9 +610,9 @@ public class TrainingView extends ViewPart {
 		label.setFont(_fontItalic);
 
 		/*
-		 * label: bpm
+		 * label: hr zone %
 		 */
-		label = _tk.createLabel(parent, Messages.Graph_Label_Heartbeat_unit);
+		label = _tk.createLabel(parent, UI.SYMBOL_PERCENTAGE);
 		GridDataFactory.fillDefaults()//
 				.align(SWT.END, SWT.FILL)
 //				.align(SWT.CENTER, SWT.FILL)
@@ -623,6 +624,15 @@ public class TrainingView extends ViewPart {
 		label = _tk.createLabel(parent, Messages.App_Label_H_MM);
 		GridDataFactory.fillDefaults()//
 				.align(SWT.END, SWT.FILL)
+				.applyTo(label);
+
+		/*
+		 * label: bpm
+		 */
+		label = _tk.createLabel(parent, Messages.Graph_Label_Heartbeat_unit);
+		GridDataFactory.fillDefaults()//
+				.align(SWT.END, SWT.FILL)
+//				.align(SWT.CENTER, SWT.FILL)
 				.applyTo(label);
 	}
 
@@ -637,6 +647,7 @@ public class TrainingView extends ViewPart {
 		_lblTourMinMaxHours = new Label[hrZoneSize];
 		_lblHRZoneName = new Label[hrZoneSize];
 		_lblHRZoneColor = new Label[hrZoneSize];
+		_lblHrZonePercent = new Label[hrZoneSize];
 
 		// set hr zone colors
 		disposeHrZoneResources();
@@ -667,15 +678,15 @@ public class TrainingView extends ViewPart {
 			GridDataFactory.fillDefaults().applyTo(lblHRZoneName);
 
 			/*
-			 * label: tour hr min/max %
+			 * label: hr zone %
 			 */
-			final Label lblTourMinMaxPercent = _lblTourMinMaxValue[zoneIndex] = _tk.createLabel(//
+			final Label lblHrZonePercent = _lblHrZonePercent[zoneIndex] = _tk.createLabel(//
 					parent,
 					null,
 					SWT.TRAIL);
 			GridDataFactory.fillDefaults() //
-					.hint(_pc.convertWidthInCharsToPixels(8), SWT.DEFAULT)
-					.applyTo(lblTourMinMaxPercent);
+					.hint(_pc.convertWidthInCharsToPixels(4), SWT.DEFAULT)
+					.applyTo(lblHrZonePercent);
 
 			/*
 			 * label: tour hr min/max h:mm
@@ -684,6 +695,17 @@ public class TrainingView extends ViewPart {
 			GridDataFactory.fillDefaults() //
 					.hint(_pc.convertWidthInCharsToPixels(6), SWT.DEFAULT)
 					.applyTo(lblTourMinMaxHours);
+
+			/*
+			 * label: tour hr min/max %
+			 */
+			final Label lblTourMinMaxBpm = _lblTourMinMaxValue[zoneIndex] = _tk.createLabel(//
+					parent,
+					null,
+					SWT.TRAIL);
+			GridDataFactory.fillDefaults() //
+					.hint(_pc.convertWidthInCharsToPixels(8), SWT.DEFAULT)
+					.applyTo(lblTourMinMaxBpm);
 		}
 	}
 
@@ -1164,7 +1186,7 @@ public class TrainingView extends ViewPart {
 		// display page for the selected chart
 		_pageBookHrZones.showPage(_pageHrZones);
 
-		final ZoneContext zoneMinMaxBpm = _currentPerson.getHrZoneContext(
+		final HrZoneContext zoneMinMaxBpm = _currentPerson.getHrZoneContext(
 				_currentPerson.getHrMaxFormula(),
 				_currentPerson.getMaxPulse(),
 				_currentPerson.getBirthDayWithDefault(),
@@ -1177,7 +1199,7 @@ public class TrainingView extends ViewPart {
 		updateUI44HrZoneImage();
 	}
 
-	private void updateUI40HrZoneChart(final ZoneContext zoneMinMaxBpm) {
+	private void updateUI40HrZoneChart(final HrZoneContext zoneMinMaxBpm) {
 
 		final int[] pulseSerie = _tourData.pulseSerie;
 		final int[] timeSerie = _tourData.timeSerie;
@@ -1235,8 +1257,8 @@ public class TrainingView extends ViewPart {
 
 		final int[] colorIndex = new int[serieSize];
 
-		final int[] zoneMinBpm = zoneMinMaxBpm.zoneMinBmp;
-		final int[] zoneMaxBpm = zoneMinMaxBpm.zoneMaxBmp;
+		final int[] zoneMinBpm = zoneMinMaxBpm.zoneMinBpm;
+		final int[] zoneMaxBpm = zoneMinMaxBpm.zoneMaxBpm;
 
 		for (int pulseIndex = 0; pulseIndex < pulseRange; pulseIndex++) {
 
@@ -1343,7 +1365,7 @@ public class TrainingView extends ViewPart {
 	 * @param zoneContext
 	 *            Contains age and HR max values.
 	 */
-	private void updateUI42HrZoneData(final ZoneContext zoneContext) {
+	private void updateUI42HrZoneData(final HrZoneContext zoneContext) {
 
 		// create hr zones when not yet done or disposed
 		if (_hrZoneDataContainerContent == null || _hrZoneDataContainerContent.isDisposed()) {
@@ -1388,8 +1410,8 @@ public class TrainingView extends ViewPart {
 					? Messages.App_Label_max
 					: Integer.toString(zoneMaxValue);
 
-			final int zoneMinBpm = zoneContext.zoneMinBmp[tourZoneIndex];
-			final int zoneMaxBmp = zoneContext.zoneMaxBmp[tourZoneIndex];
+			final int zoneMinBpm = zoneContext.zoneMinBpm[tourZoneIndex];
+			final int zoneMaxBmp = zoneContext.zoneMaxBpm[tourZoneIndex];
 			final String zoneMaxBpmText = zoneMaxBmp == Integer.MAX_VALUE //
 					? Messages.App_Label_max
 					: Integer.toString(zoneMaxBmp);
@@ -1398,45 +1420,45 @@ public class TrainingView extends ViewPart {
 			final String ageText = UI.SPACE + ageYears + UI.SPACE2 + Messages.Pref_People_Label_Years;
 
 			final String hrZoneTooltip =
-//
+			//
 			hrZone.getNameLongShortcutFirst()
-//
+			//
 					+ UI.NEW_LINE
 					+ UI.NEW_LINE
-//
+					//
 					+ hrZone.getZoneMinValue()
 					+ UI.DASH
 					+ zoneMaxValueText
 					+ UI.SPACE
 					+ UI.SYMBOL_PERCENTAGE
-//
+					//
 					+ UI.SPACE
 					+ UI.SYMBOL_EQUAL
 					+ UI.SPACE
-//
+					//
 					+ zoneMinBpm
 					+ UI.DASH
 					+ zoneMaxBpmText
 					+ UI.SPACE
 					+ Messages.Graph_Label_Heartbeat_unit
-//
+					//
 					+ UI.NEW_LINE
 					+ UI.NEW_LINE
-//
+					//
 					+ Messages.Pref_People_Label_Age
 					+ ageText
-//
+					//
 					+ UI.DASH_WITH_DOUBLE_SPACE
-//
+					//
 					+ Messages.HRMax_Label
 					+ UI.SPACE
 					+ zoneContext.hrMax
 					+ Messages.Graph_Label_Heartbeat_unit
-//
+			//
 			;
 
 			// % values
-//			_lblTourMinMaxValue[tourZoneIndex].setText(_nf1.format(zoneTimePercent));
+			_lblHrZonePercent[tourZoneIndex].setText(_nf1.format(zoneTimePercent));
 
 			// bpm values
 			_lblTourMinMaxValue[tourZoneIndex].setText(zoneMinBpm + UI.DASH + zoneMaxBpmText);

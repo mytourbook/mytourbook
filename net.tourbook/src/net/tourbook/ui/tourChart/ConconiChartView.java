@@ -422,7 +422,7 @@ public class ConconiChartView extends ViewPart {
 		final ArrayList<IChartLayer> chartCustomLayers = new ArrayList<IChartLayer>();
 		chartCustomLayers.add(_conconiLayer);
 
-		_yDataPulse.setCustomLayers(chartCustomLayers);
+		_yDataPulse.setCustomForegroundLayers(chartCustomLayers);
 		_yDataPulse.setCustomData(TourManager.CUSTOM_DATA_CONCONI_TEST, _conconiDataForSelectedTour);
 
 		return chartDataModel;

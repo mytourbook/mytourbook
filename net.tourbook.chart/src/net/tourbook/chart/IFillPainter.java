@@ -13,34 +13,17 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.data;
+package net.tourbook.chart;
 
-public class ZoneContext {
+import org.eclipse.swt.graphics.GC;
 
-	/**
-	 * Age in years
-	 */
-	public int		age;
-	public int		hrMax;
+public interface IFillPainter {
 
-	public int[]	zoneMinBmp;
-	public int[]	zoneMaxBmp;
-
-	/**
-	 * Set HR zones, age and max HR
-	 * 
-	 * @param zoneMinBmp
-	 * @param zoneMaxBmp
-	 * @param age
-	 * @param hrMax
-	 */
-	public ZoneContext(final int[] zoneMinBmp, final int[] zoneMaxBmp, final int age, final int hrMax) {
-
-		this.zoneMinBmp = zoneMinBmp;
-		this.zoneMaxBmp = zoneMaxBmp;
-
-		this.age = age;
-		this.hrMax = hrMax;
-	}
+	public void draw(	GC gcGraph,
+						GraphDrawingData graphDrawingData,
+						Chart chart,
+						int[] devXPositions,
+						int valueIndexFirstPoint,
+						int valueIndexLastPoint);
 
 }

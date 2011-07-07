@@ -31,6 +31,7 @@ import net.tourbook.chart.ChartMarker;
 import net.tourbook.chart.ChartMarkerLayer;
 import net.tourbook.chart.ChartYDataMinMaxKeeper;
 import net.tourbook.chart.IChartLayer;
+import net.tourbook.chart.IFillPainter;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -122,7 +123,8 @@ public class TourChart extends Chart {
 
 	private boolean							_isSegmentLayerVisible					= false;
 	private boolean							_is2ndAltiLayerVisible					= false;
-	private boolean							_isHrZoneLayerVisible					= false;
+//	private boolean							_isHrZonevisible						= false;
+
 	private boolean							_isMouseModeSet;
 
 	/*
@@ -132,8 +134,8 @@ public class TourChart extends Chart {
 	private ChartSegmentLayer				_layerSegment;
 	private ChartSegmentValueLayer			_layerSegmentValue;
 	private ChartLayer2ndAltiSerie			_layer2ndAltiSerie;
-	private ChartLayerHrZone				_layerHrZone;
 	private I2ndAltiLayer					_layer2ndAlti;
+	private IFillPainter					_hrZonePainter;
 
 	private ActionChartOptions				_actionOptions;
 
@@ -242,14 +244,14 @@ public class TourChart extends Chart {
 		updateZoomOptionActionHandlers();
 	}
 
-	public void actionShowHrZones(final Boolean isItemChecked) {
+	public void actionShowHrZones(final Boolean isHrZonevisible) {
 
-		_tourChartConfig.isHrZoneDisplayed = isItemChecked;
+		_prefStore.setValue(ITourbookPreferences.GRAPH_HR_ZONE_IS_VISIBLE, isHrZonevisible);
+		_tourChartConfig.isHrZoneDisplayed = isHrZonevisible;
 
-		// layer update is much faster than the chart update
-		updateLayerHrZone(isItemChecked);
+		updateTourChart(true);
 
-		setCommandChecked(COMMAND_ID_SHOW_HR_ZONES, isItemChecked);
+		setCommandChecked(COMMAND_ID_SHOW_HR_ZONES, isHrZonevisible);
 	}
 
 	public void actionShowSRTMData(final boolean isItemChecked) {
@@ -571,21 +573,21 @@ public class TourChart extends Chart {
 		_actionProxies.put(getProxyId(graphId), actionProxy);
 	}
 
+	private void createHrZonePainter() {
+
+		if (_tourChartConfig.isHrZoneDisplayed) {
+			_hrZonePainter = new HrZonePainter();
+		} else {
+			_hrZonePainter = null;
+		}
+	}
+
 	private void createLayer2ndAlti() {
 
 		if (_is2ndAltiLayerVisible && (_layer2ndAlti != null)) {
 			_layer2ndAltiSerie = _layer2ndAlti.create2ndAltiLayer();
 		} else {
 			_layer2ndAltiSerie = null;
-		}
-	}
-
-	private void createLayerHrZone() {
-
-		if (_isHrZoneLayerVisible) {
-			_layerHrZone = new ChartLayerHrZone();
-		} else {
-			_layerHrZone = null;
 		}
 	}
 
@@ -1066,14 +1068,14 @@ public class TourChart extends Chart {
 			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_TEMPERATURE);
 		}
 
-		setGraphData10(TourManager.CUSTOM_DATA_ALTITUDE, _tourData.segmentSerieAltitudeDiff, yDataWithLabels);
-		setGraphData10(TourManager.CUSTOM_DATA_PULSE, _tourData.segmentSeriePulse, yDataWithLabels);
-		setGraphData10(TourManager.CUSTOM_DATA_SPEED, _tourData.segmentSerieSpeed, yDataWithLabels);
-		setGraphData10(TourManager.CUSTOM_DATA_PACE, _tourData.segmentSeriePace, yDataWithLabels);
-		setGraphData10(TourManager.CUSTOM_DATA_POWER, _tourData.segmentSeriePower, yDataWithLabels);
-		setGraphData10(TourManager.CUSTOM_DATA_GRADIENT, _tourData.segmentSerieGradient, yDataWithLabels);
-		setGraphData10(TourManager.CUSTOM_DATA_ALTIMETER, _tourData.segmentSerieAltitudeUpH, yDataWithLabels);
-		setGraphData10(TourManager.CUSTOM_DATA_TEMPERATURE, null, yDataWithLabels);
+		setGraphDataLayers(TourManager.CUSTOM_DATA_ALTITUDE, _tourData.segmentSerieAltitudeDiff, yDataWithLabels);
+		setGraphDataLayers(TourManager.CUSTOM_DATA_PULSE, _tourData.segmentSeriePulse, yDataWithLabels);
+		setGraphDataLayers(TourManager.CUSTOM_DATA_SPEED, _tourData.segmentSerieSpeed, yDataWithLabels);
+		setGraphDataLayers(TourManager.CUSTOM_DATA_PACE, _tourData.segmentSeriePace, yDataWithLabels);
+		setGraphDataLayers(TourManager.CUSTOM_DATA_POWER, _tourData.segmentSeriePower, yDataWithLabels);
+		setGraphDataLayers(TourManager.CUSTOM_DATA_GRADIENT, _tourData.segmentSerieGradient, yDataWithLabels);
+		setGraphDataLayers(TourManager.CUSTOM_DATA_ALTIMETER, _tourData.segmentSerieAltitudeUpH, yDataWithLabels);
+		setGraphDataLayers(TourManager.CUSTOM_DATA_TEMPERATURE, null, yDataWithLabels);
 	}
 
 	/**
@@ -1083,9 +1085,9 @@ public class TourChart extends Chart {
 	 * @param segmentDataSerie
 	 * @param yDataWithLabels
 	 */
-	private void setGraphData10(final String customDataKey,
-								final Object segmentDataSerie,
-								final ChartDataYSerie yDataWithLabels) {
+	private void setGraphDataLayers(final String customDataKey,
+									final Object segmentDataSerie,
+									final ChartDataYSerie yDataWithLabels) {
 
 		final ChartDataModel dataModel = getChartDataModel();
 		final ChartDataYSerie yData = (ChartDataYSerie) dataModel.getCustomData(customDataKey);
@@ -1094,14 +1096,14 @@ public class TourChart extends Chart {
 			return;
 		}
 
-		final ArrayList<IChartLayer> customLayers = new ArrayList<IChartLayer>();
+		final ArrayList<IChartLayer> customFgLayers = new ArrayList<IChartLayer>();
 
 		/*
 		 * marker layer
 		 */
 		// show label layer only for ONE visible graph
 		if ((_layerMarker != null) && (yData == yDataWithLabels)) {
-			customLayers.add(_layerMarker);
+			customFgLayers.add(_layerMarker);
 		}
 
 		/*
@@ -1111,11 +1113,11 @@ public class TourChart extends Chart {
 				.getCustomData(TourManager.CUSTOM_DATA_ALTITUDE);
 		if (yData == yDataAltitude) {
 			if (_layerSegment != null) {
-				customLayers.add(_layerSegment);
+				customFgLayers.add(_layerSegment);
 			}
 		} else {
 			if (_layerSegmentValue != null) {
-				customLayers.add(_layerSegmentValue);
+				customFgLayers.add(_layerSegmentValue);
 			}
 		}
 
@@ -1123,18 +1125,21 @@ public class TourChart extends Chart {
 		 * display merge layer only together with the altitude graph
 		 */
 		if ((_layer2ndAltiSerie != null) && customDataKey.equals(TourManager.CUSTOM_DATA_ALTITUDE)) {
-			customLayers.add(_layer2ndAltiSerie);
+			customFgLayers.add(_layer2ndAltiSerie);
 		}
 
 		/*
-		 * HR zone layer
+		 * HR zone painter
 		 */
-		if (_layerHrZone != null) {
-			customLayers.add(_layerHrZone);
+		final ChartDataYSerie yDataPulse = (ChartDataYSerie) dataModel.getCustomData(//
+				TourManager.CUSTOM_DATA_PULSE);
+
+		if ((yData == yDataPulse || yData == yDataAltitude) && _hrZonePainter != null) {
+			yData.setCustomFillPainter(_hrZonePainter);
 		}
 
 		// set custom layers, no layers are set when layer list is empty
-		yData.setCustomLayers(customLayers);
+		yData.setCustomForegroundLayers(customFgLayers);
 
 		// set segment data series
 		if (segmentDataSerie != null) {
@@ -1370,25 +1375,6 @@ public class TourChart extends Chart {
 	 * 
 	 * @param isLayerVisible
 	 */
-	private void updateLayerHrZone(final boolean isLayerVisible) {
-
-		_isHrZoneLayerVisible = isLayerVisible;
-
-		if (isLayerVisible) {
-			createLayerHrZone();
-		} else {
-			_layerHrZone = null;
-		}
-
-		setGraphData();
-		updateCustomLayers();
-	}
-
-	/**
-	 * Updates the marker layer in the chart
-	 * 
-	 * @param isLayerVisible
-	 */
 	public void updateLayerMarker(final boolean isLayerVisible) {
 
 		if (isLayerVisible) {
@@ -1528,8 +1514,8 @@ public class TourChart extends Chart {
 
 		createLayerSegment();
 		createLayerMarker();
-		createLayerHrZone();
 		createLayer2ndAlti();
+		createHrZonePainter();
 
 		setGraphData();
 

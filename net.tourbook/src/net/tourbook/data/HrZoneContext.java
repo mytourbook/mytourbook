@@ -13,22 +13,34 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.tourChart;
+package net.tourbook.data;
 
-import net.tourbook.chart.Chart;
-import net.tourbook.chart.GraphDrawingData;
-import net.tourbook.chart.IChartLayer;
+public class HrZoneContext {
 
-import org.eclipse.swt.graphics.GC;
+	/**
+	 * Age in years
+	 */
+	public int		age;
+	public int		hrMax;
 
-public class ChartLayerHrZone implements IChartLayer {
+	public int[]	zoneMinBpm;
+	public int[]	zoneMaxBpm;
 
-	@Override
-	public void draw(final GC gcLayer, final GraphDrawingData drawingData, final Chart chart) {
+	/**
+	 * Set HR zones, age and max HR
+	 * 
+	 * @param zoneMinBpm
+	 * @param zoneMaxBpm
+	 * @param age
+	 * @param hrMax
+	 */
+	public HrZoneContext(final int[] zoneMinBpm, final int[] zoneMaxBpm, final int age, final int hrMax) {
 
+		this.zoneMinBpm = zoneMinBpm;
+		this.zoneMaxBpm = zoneMaxBpm;
 
-//		drawingData.getData()
+		this.age = age;
+		this.hrMax = hrMax;
 	}
-
 
 }

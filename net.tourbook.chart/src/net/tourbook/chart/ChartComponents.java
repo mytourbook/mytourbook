@@ -139,7 +139,7 @@ public class ChartComponents extends Composite {
 
 	private ChartDataModel				_chartDataModel					= null;
 
-	private ArrayList<GraphDrawingData>	_graphDrawingData;
+	private ChartDrawingData			_chartDrawingData;
 
 	public boolean						_useAdvancedGraphics			= true;
 
@@ -602,10 +602,14 @@ public class ChartComponents extends Composite {
 	 * 
 	 * @return chart drawing data
 	 */
-	private ArrayList<GraphDrawingData> createGraphDrawingData() {
+	private ChartDrawingData createChartDrawingData() {
 
 		// compute the graphs and axis
 		final ArrayList<GraphDrawingData> graphDrawingData = new ArrayList<GraphDrawingData>();
+
+		final ChartDrawingData chartDrawingData = new ChartDrawingData(graphDrawingData);
+
+		chartDrawingData.chartDataModel = _chartDataModel;
 
 		final ArrayList<ChartDataYSerie> yDataList = _chartDataModel.getYData();
 		final ChartDataXSerie xData = _chartDataModel.getXData();
@@ -656,7 +660,7 @@ public class ChartComponents extends Composite {
 			graphIndex++;
 		}
 
-		return graphDrawingData;
+		return chartDrawingData;
 	}
 
 	private void createMonthEqualUnits(	final GraphDrawingData drawingData,
@@ -1122,6 +1126,10 @@ public class ChartComponents extends Composite {
 		return _chartDataModel;
 	}
 
+	ChartDrawingData getChartDrawingData() {
+		return _chartDrawingData;
+	}
+
 	ChartProperties getChartProperties() {
 		return new ChartProperties();
 	}
@@ -1148,10 +1156,6 @@ public class ChartComponents extends Composite {
 		}
 
 		return _visibleGraphRect.width;
-	}
-
-	ArrayList<GraphDrawingData> getGraphDrawingData() {
-		return _graphDrawingData;
 	}
 
 	/**
@@ -1192,18 +1196,18 @@ public class ChartComponents extends Composite {
 		}
 
 		// compute the chart data
-		_graphDrawingData = createGraphDrawingData();
+		_chartDrawingData = createChartDrawingData();
 
 		// notify components about the new configuration
-		_componentGraph.setDrawingData(_graphDrawingData);
+		_componentGraph.setDrawingData(_chartDrawingData);
 
 		// resize the sliders after the drawing data have changed and the new
 		// chart size is saved
 		_componentGraph.updateSlidersOnResize();
 
 		// resize the axis
-		_componentAxisLeft.setDrawingData(_graphDrawingData, true);
-		_componentAxisRight.setDrawingData(_graphDrawingData, false);
+		_componentAxisLeft.setDrawingData(_chartDrawingData, true);
+		_componentAxisRight.setDrawingData(_chartDrawingData, false);
 
 		// synchronize chart
 		final SynchConfiguration synchConfig = createSynchConfig();
@@ -1520,17 +1524,19 @@ public class ChartComponents extends Composite {
 
 	void updateCustomLayers() {
 
-		if (_graphDrawingData == null) {
+		if (_chartDrawingData == null) {
 			return;
 		}
 
 		int graphIndex = 0;
+		final ArrayList<GraphDrawingData> graphDrawingData = _chartDrawingData.graphDrawingData;
 
 		/*
 		 * set custom layers from the data model into the drawing data
 		 */
+
 		for (final ChartDataYSerie yData : _chartDataModel.getYData()) {
-			_graphDrawingData.get(graphIndex++).getYData().setCustomLayers(yData.getCustomLayers());
+			graphDrawingData.get(graphIndex++).getYData().setCustomForegroundLayers(yData.getCustomForegroundLayers());
 		}
 
 		_componentGraph.updateCustomLayers();
