@@ -31,12 +31,18 @@ public class TrainingManager {
 //	private static final RGB		RGB_ZONE_3				= new RGB(0xff, 0xfa, 0x95);
 //	private static final RGB		RGB_ZONE_4				= new RGB(0xFF, 0xc9, 0x95);
 //	private static final RGB		RGB_ZONE_5				= new RGB(0xff, 0x95, 0x95);
+//
+//	private static final RGB		RGB_ZONE_1				= new RGB(0x3e, 0xb9, 0xff);
+//	private static final RGB		RGB_ZONE_2				= new RGB(0x96, 0xe0, 0x26);
+//	private static final RGB		RGB_ZONE_3				= new RGB(0xff, 0xe2, 0x00);
+//	private static final RGB		RGB_ZONE_4				= new RGB(0xff, 0x9e, 0x20);
+//	private static final RGB		RGB_ZONE_5				= new RGB(0xff, 0x40, 0x20);
 
-	private static final RGB		RGB_ZONE_1				= new RGB(0x6c, 0x90, 0xff);
-	private static final RGB		RGB_ZONE_2				= new RGB(0xa5, 0xFF, 0x21);
-	private static final RGB		RGB_ZONE_3				= new RGB(0xff, 0xf7, 0x36);
-	private static final RGB		RGB_ZONE_4				= new RGB(0xFF, 0x4b, 0x00);
-	private static final RGB		RGB_ZONE_5				= new RGB(0xff, 0x16, 0x16);
+	private static final RGB		RGB_ZONE_1				= new RGB(0xd4, 0xff, 0x91);
+	private static final RGB		RGB_ZONE_2				= new RGB(0x96, 0xe0, 0x26);
+	private static final RGB		RGB_ZONE_3				= new RGB(0xff, 0xcd, 0x66);
+	private static final RGB		RGB_ZONE_4				= new RGB(0xff, 0x90, 0x01);
+	private static final RGB		RGB_ZONE_5				= new RGB(0xff, 0x40, 0x20);
 
 	// keys to identify the hr max formula
 	public static final int			HR_MAX_FORMULA_220_AGE	= 0;							//	HRmax = 220 - age              // this is the default formula

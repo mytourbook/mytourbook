@@ -124,9 +124,13 @@ public class Chart extends ViewForm {
 	 * minimum width in pixel for one unit, this is only an approximate value because the pixel is
 	 * rounded up or down to fit a rounded unit
 	 */
-	protected int						_gridVerticalDistance				= 30;
+	protected int						gridVerticalDistance				= 30;
 
-	protected int						_gridHorizontalDistance				= 70;
+	protected int						gridHorizontalDistance				= 70;
+
+	protected boolean					isShowHorizontalGridLines			= false;
+	protected boolean					isShowVerticalGridLines				= false;
+
 	/**
 	 * mouse behaviour:<br>
 	 * <br>
@@ -628,6 +632,10 @@ public class Chart extends ViewForm {
 		return _chartDataModel;
 	}
 
+	public ChartDrawingData getChartDrawingData() {
+		return _chartComponents.getChartDrawingData();
+	}
+
 	/**
 	 * Return information about the chart
 	 * 
@@ -643,10 +651,6 @@ public class Chart extends ViewForm {
 
 	public int getDevGraphImageXOffset() {
 		return _chartComponents.getChartComponentGraph().getDevGraphImageXOffset();
-	}
-
-	public ChartDrawingData getChartDrawingData() {
-		return _chartComponents.getChartDrawingData();
 	}
 
 	/**
@@ -1022,8 +1026,8 @@ public class Chart extends ViewForm {
 
 	public void setGridDistance(final int horizontalGrid, final int verticalGrid) {
 
-		_gridVerticalDistance = verticalGrid;
-		_gridHorizontalDistance = horizontalGrid;
+		gridVerticalDistance = verticalGrid;
+		gridHorizontalDistance = horizontalGrid;
 
 		_chartComponents.onResize();
 	}

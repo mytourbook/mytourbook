@@ -1459,6 +1459,7 @@ public class TrainingView extends ViewPart {
 
 			// % values
 			_lblHrZonePercent[tourZoneIndex].setText(_nf1.format(zoneTimePercent));
+			_lblHrZonePercent[tourZoneIndex].setToolTipText(hrZoneTooltip);
 
 			// bpm values
 			_lblTourMinMaxValue[tourZoneIndex].setText(zoneMinBpm + UI.DASH + zoneMaxBpmText);

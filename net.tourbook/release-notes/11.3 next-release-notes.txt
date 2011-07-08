@@ -15,10 +15,10 @@ new
 - display hr zones
   - break time is ignored when hr zones are computed
 
-modifications
-  - break time is ignored when computing avg hr
-  - default breaktime is 20 seconds and 20 m
-  
+modifications compared with previous versions
+- break time is ignored when avg hr is computed
+- default breaktime is set to 20 seconds and 20 m
+- chart gridlines are hidden by default (to have a clearer view on the graphs) but they can be activated in the preferences  
   
 improvements
 - simplified first startup of the application

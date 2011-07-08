@@ -80,6 +80,8 @@ public interface ITourbookPreferences {
 
 	public static final String	GRAPH_GRID_VERTICAL_DISTANCE				= "graphs.grid.vertical-distance";							//$NON-NLS-1$
 	public static final String	GRAPH_GRID_HORIZONTAL_DISTANCE				= "graphs.grid.horizontal-distance";						//$NON-NLS-1$
+	public static final String	GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES		= "GraphGrid_IsShowHorizontalGridlines";					//$NON-NLS-1$
+	public static final String	GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES		= "GraphGrid_IsShowVerticalGridlines";						//$NON-NLS-1$
 
 	public static final String	DEFAULT_IMPORT_TOUR_TYPE_ID					= "tourtype.import.default";								//$NON-NLS-1$
 

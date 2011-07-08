@@ -1789,7 +1789,7 @@ public class ChartComponentGraph extends Canvas {
 		final int xUnitTextPos = drawingData.getXUnitTextPos();
 		float scaleX = drawingData.getScaleX();
 		final boolean isXUnitOverlapChecked = drawingData.isXUnitOverlapChecked();
-		final boolean isDrawVerticalGrid = drawingData.isDrawVerticalGrid();
+		final boolean isDrawVerticalGrid = _chart.isShowVerticalGridLines;
 		final boolean[] isDrawUnits = drawingData.isDrawUnits();
 
 		final double devGraphWidth = drawingData.devVirtualGraphWidth;
@@ -2045,6 +2045,8 @@ public class ChartComponentGraph extends Canvas {
 
 		final int devYTop = devGraphHeight;
 
+		final boolean isDrawHorizontalGrid = _chart.isShowHorizontalGridLines;
+
 		gcGraph.setLineStyle(SWT.LINE_SOLID);
 
 		int devY;
@@ -2083,7 +2085,7 @@ public class ChartComponentGraph extends Canvas {
 
 			} else {
 
-				if (isXAxis == false) {
+				if (isXAxis == false && isDrawHorizontalGrid) {
 
 					// draw gridlines
 
@@ -2278,7 +2280,7 @@ public class ChartComponentGraph extends Canvas {
 		final int graphXStart = xValues[startIndex] - graphValueOffsetAdjusted;
 		final int graphYStart = yValues[startIndex];
 
-		int graphXPrev = graphXStart;
+//		int graphXPrev = graphXStart;
 		int graphY1Prev = graphYStart;
 
 		float devXPrev = graphXStart * scaleX;
@@ -2329,7 +2331,7 @@ public class ChartComponentGraph extends Canvas {
 
 				// keep current position which is used as the painting starting point
 
-				graphXPrev = graphX;
+//				graphXPrev = graphX;
 				graphY1Prev = graphY1;
 
 				devXPrev = devX;
@@ -2474,7 +2476,7 @@ public class ChartComponentGraph extends Canvas {
 				break;
 			}
 
-			graphXPrev = graphX;
+//			graphXPrev = graphX;
 			devXPrev = devX;
 
 			devY1Prev = devY1;

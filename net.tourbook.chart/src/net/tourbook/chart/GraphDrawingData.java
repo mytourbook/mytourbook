@@ -104,7 +104,6 @@ public class GraphDrawingData {
 
 	private boolean					_isXUnitOverlapChecked	= false;
 
-	private boolean					_isDrawVerticalGrid		= true;
 	private boolean[]				_isDrawUnits			= null;
 
 	public GraphDrawingData(final int chartType) {
@@ -308,10 +307,6 @@ public class GraphDrawingData {
 		return _isDrawUnits;
 	}
 
-	public boolean isDrawVerticalGrid() {
-		return _isDrawVerticalGrid;
-	}
-
 	/**
 	 * @return Returns <code>true</code> when the x-axis unit visibility is checked that it do not
 	 *         overlap the previous unit label.
@@ -434,10 +429,6 @@ public class GraphDrawingData {
 
 	public void setIsDrawUnit(final boolean[] isDrawUnits) {
 		_isDrawUnits = isDrawUnits;
-	}
-
-	public void setIsDrawVerticalGrid(final boolean isDrawVerticalGrid) {
-		_isDrawVerticalGrid = isDrawVerticalGrid;
 	}
 
 	public void setIsXUnitOverlapChecked(final boolean isXUnitOverlapChecked) {

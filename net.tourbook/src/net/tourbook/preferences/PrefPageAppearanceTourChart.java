@@ -52,7 +52,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
@@ -98,8 +97,10 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	private BooleanFieldEditor		_editGradientMinCheckbox;
 	private IntegerFieldEditor		_editGradientMinEditor;
 
-	private Spinner					_spinnerVerticalDistance;
-	private Spinner					_spinnerHorizontalDistance;
+	private Spinner					_spinnerGridVerticalDistance;
+	private Spinner					_spinnerGridHorizontalDistance;
+	private Button					_chkShowVerticalGridLines;
+	private Button					_chkShowHorizontalGridLines;
 
 	private Button					_rdoZoomFeatures;
 	private Button					_rdoSliderFeatures;
@@ -248,8 +249,8 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 			}
 		});
 
-		final Table table = _graphCheckboxList.getTable();
-		table.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+//		final Table table = _graphCheckboxList.getTable();
+//		table.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 	}
 
 	private void createUI18GraphActions(final Composite parent) {
@@ -336,27 +337,16 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		};
 
 		final Group group = new Group(container, SWT.NONE);
-		group.setText(Messages.Pref_Graphs_grid_distance);
+		group.setText(Messages.Pref_Graphs_Group_Grid);
 		GridDataFactory.fillDefaults().applyTo(group);
-		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
+		GridLayoutFactory.swtDefaults().numColumns(4).applyTo(group);
 		{
 			/*
-			 * label: vertical grid
+			 * label: grid distance
 			 */
 			Label label = new Label(group, SWT.NONE);
-			GridDataFactory.fillDefaults().applyTo(label);
-			label.setText(Messages.Pref_Graphs_grid_vertical_distance);
-
-			/*
-			 * spinner: vertical grid
-			 */
-			_spinnerVerticalDistance = new Spinner(group, SWT.BORDER);
-			GridDataFactory.fillDefaults() //
-					.align(SWT.BEGINNING, SWT.FILL)
-					.applyTo(_spinnerVerticalDistance);
-			_spinnerVerticalDistance.setMinimum(10);
-			_spinnerVerticalDistance.setMaximum(200);
-			_spinnerVerticalDistance.addMouseWheelListener(mouseWheelListener);
+			GridDataFactory.fillDefaults().span(4, 1).applyTo(label);
+			label.setText(Messages.Pref_Graphs_grid_distance);
 
 			/*
 			 * label: horizontal grid
@@ -368,13 +358,46 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 			/*
 			 * spinner: horizontal grid
 			 */
-			_spinnerHorizontalDistance = new Spinner(group, SWT.BORDER);
+			_spinnerGridHorizontalDistance = new Spinner(group, SWT.BORDER);
 			GridDataFactory.fillDefaults() //
 					.align(SWT.BEGINNING, SWT.FILL)
-					.applyTo(_spinnerHorizontalDistance);
-			_spinnerHorizontalDistance.setMinimum(10);
-			_spinnerHorizontalDistance.setMaximum(200);
-			_spinnerHorizontalDistance.addMouseWheelListener(mouseWheelListener);
+					.applyTo(_spinnerGridHorizontalDistance);
+			_spinnerGridHorizontalDistance.setMinimum(10);
+			_spinnerGridHorizontalDistance.setMaximum(200);
+			_spinnerGridHorizontalDistance.addMouseWheelListener(mouseWheelListener);
+
+			/*
+			 * label: vertical grid
+			 */
+			label = new Label(group, SWT.NONE);
+			GridDataFactory.fillDefaults().applyTo(label);
+			label.setText(Messages.Pref_Graphs_grid_vertical_distance);
+
+			/*
+			 * spinner: vertical grid
+			 */
+			_spinnerGridVerticalDistance = new Spinner(group, SWT.BORDER);
+			GridDataFactory.fillDefaults() //
+					.align(SWT.BEGINNING, SWT.FILL)
+					.applyTo(_spinnerGridVerticalDistance);
+			_spinnerGridVerticalDistance.setMinimum(10);
+			_spinnerGridVerticalDistance.setMaximum(200);
+			_spinnerGridVerticalDistance.addMouseWheelListener(mouseWheelListener);
+
+			/*
+			 * checkbox: show horizontal grid
+			 */
+			_chkShowHorizontalGridLines = new Button(group, SWT.CHECK);
+			GridDataFactory.fillDefaults().span(4, 1).applyTo(_chkShowHorizontalGridLines);
+			_chkShowHorizontalGridLines.setText(Messages.Pref_Graphs_Checkbox_ShowHorizontalGrid);
+
+			/*
+			 * checkbox: show vertical grid
+			 */
+			_chkShowVerticalGridLines = new Button(group, SWT.CHECK);
+			GridDataFactory.fillDefaults().span(4, 1).applyTo(_chkShowVerticalGridLines);
+			_chkShowVerticalGridLines.setText(Messages.Pref_Graphs_Checkbox_ShowVerticalGrid);
+
 		}
 	}
 
@@ -744,10 +767,15 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	@Override
 	protected void performDefaults() {
 
-		_spinnerHorizontalDistance.setSelection(//
+		_spinnerGridHorizontalDistance.setSelection(//
 				_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE));
-		_spinnerVerticalDistance.setSelection(//
+		_spinnerGridVerticalDistance.setSelection(//
 				_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
+
+		_chkShowHorizontalGridLines.setSelection(//
+				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES));
+		_chkShowVerticalGridLines.setSelection(//
+				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
 
 		_chkGraphHrZone.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_HR_ZONE_IS_VISIBLE));
 
@@ -816,11 +844,16 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 	private void restoreState() {
 
-		_spinnerHorizontalDistance.setSelection(//
+		_spinnerGridHorizontalDistance.setSelection(//
 				_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE));
 
-		_spinnerVerticalDistance.setSelection(//
+		_spinnerGridVerticalDistance.setSelection(//
 				_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
+
+		_chkShowHorizontalGridLines.setSelection(//
+				_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES));
+		_chkShowVerticalGridLines.setSelection(//
+				_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
 
 		_chkZoomToSlider.setSelection(//
 				_prefStore.getBoolean(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER));
@@ -899,9 +932,14 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 				_chkMoveSlidersWhenZoomed.getSelection());
 
 		_prefStore.setValue(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE, //
-				_spinnerHorizontalDistance.getSelection());
+				_spinnerGridHorizontalDistance.getSelection());
 		_prefStore.setValue(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE, //
-				_spinnerVerticalDistance.getSelection());
+				_spinnerGridVerticalDistance.getSelection());
+
+		_prefStore.setValue(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES, //
+				_chkShowHorizontalGridLines.getSelection());
+		_prefStore.setValue(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES, //
+				_chkShowVerticalGridLines.getSelection());
 
 		_editPaceMinMaxCheckbox.store();
 		_editPaceMin.store();
