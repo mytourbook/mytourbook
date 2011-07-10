@@ -16,19 +16,7 @@
 
 package net.tourbook.mapping;
 
-public interface ILegendProvider {
 
-	/**
-	 * @param graphValue
-	 * @param device
-	 *            Device for which the color is created
-	 * @return Returns the RGB value for a graph value.
-	 */
-	public abstract int getColorValue(int graphValue);
-
-	/**
-	 * @return Returns an id to identify the {@link ILegendProvider}
-	 */
-	public abstract int getTourColorId();
+public interface ILegendProviderDiscreteColors extends ILegendProvider {
 
 }

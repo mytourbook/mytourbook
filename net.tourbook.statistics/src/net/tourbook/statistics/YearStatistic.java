@@ -57,7 +57,9 @@ public abstract class YearStatistic extends TourbookStatistic implements IYearSt
 				// test if the color or statistic data have changed
 				if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)
 						|| property.equals(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE)
-						|| property.equals(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE)) {
+						|| property.equals(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE)
+						|| property.equals(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
+						|| property.equals(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES)) {
 
 					// update chart
 					prefColorChanged();
@@ -110,11 +112,11 @@ public abstract class YearStatistic extends TourbookStatistic implements IYearSt
 
 	@Override
 	public void restoreState(final IDialogSettings viewState) {
-	// do nothing
+		// do nothing
 	}
 
 	@Override
 	public void saveState(final IDialogSettings viewState) {
-	// do nothing
+		// do nothing
 	}
 }

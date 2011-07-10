@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,6 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
+
 package net.tourbook.mapping;
 
 import java.util.ArrayList;
@@ -22,14 +23,17 @@ import net.tourbook.chart.Util;
 
 import org.eclipse.swt.graphics.Rectangle;
 
-public class LegendProvider implements ILegendProvider {
+/**
+ * Contains all data to draw the legend image.
+ */
+public class LegendProviderMinMax implements ILegendProviderGradientColors {
 
 	private LegendConfig	_legendConfig;
 	private LegendColor		_legendColor;
 
 	private int				_colorId;
 
-	public LegendProvider(final LegendConfig legendConfig, final LegendColor legendColor, final int colorId) {
+	public LegendProviderMinMax(final LegendConfig legendConfig, final LegendColor legendColor, final int colorId) {
 		_legendConfig = legendConfig;
 		_legendColor = legendColor;
 		_colorId = colorId;

@@ -25,10 +25,10 @@ import net.tourbook.colors.ColorDefinition;
 import net.tourbook.colors.GraphColorItem;
 import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.mapping.DialogMappingColor;
-import net.tourbook.mapping.ILegendProvider;
+import net.tourbook.mapping.ILegendProviderGradientColors;
 import net.tourbook.mapping.LegendColor;
 import net.tourbook.mapping.LegendConfig;
-import net.tourbook.mapping.LegendProvider;
+import net.tourbook.mapping.LegendProviderMinMax;
 import net.tourbook.mapping.ValueColor;
 import net.tourbook.ui.UI;
 
@@ -98,7 +98,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 
 	private ColorDefinition				_expandedItem;
 
-	private LegendProvider				_legendProvider;
+	private LegendProviderMinMax				_legendProvider;
 	private DialogMappingColor			_dialogMappingColor;
 	private GraphColorPainter			_graphColorPainter;
 
@@ -428,7 +428,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 		treeLayout.setColumnData(tc, new ColumnPixelData(colorWidth, true));
 	}
 
-	public ILegendProvider getLegendProvider() {
+	public ILegendProviderGradientColors getLegendProvider() {
 		return _legendProvider;
 	}
 
@@ -455,7 +455,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 		final LegendColor legendColor = new LegendColor();
 		legendColor.valueColors = _valueColors;
 
-		_legendProvider = new LegendProvider(legendConfig, legendColor, 0);
+		_legendProvider = new LegendProviderMinMax(legendConfig, legendColor, 0);
 		_dialogMappingColor = new DialogMappingColor(Display.getCurrent().getActiveShell(), _legendProvider, this);
 	}
 

@@ -13,22 +13,24 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.mapping;
 
-public interface ILegendProvider {
+import org.eclipse.swt.graphics.Rectangle;
+
+public interface ILegendProviderGradientColors extends ILegendProvider {
+
+	abstract LegendColor getLegendColor();
+
+	abstract LegendConfig getLegendConfig();
 
 	/**
-	 * @param graphValue
-	 * @param device
-	 *            Device for which the color is created
-	 * @return Returns the RGB value for a graph value.
+	 * Set the colors for the legend, the values will not be changed
+	 * 
+	 * @param newLegendColor
 	 */
-	public abstract int getColorValue(int graphValue);
+	abstract void setLegendColorColors(LegendColor newLegendColor);
 
-	/**
-	 * @return Returns an id to identify the {@link ILegendProvider}
-	 */
-	public abstract int getTourColorId();
+	abstract void setLegendColorValues(Rectangle legendBounds, int minValue, int maxValue, String unit_label_altitude);
 
+	abstract void setLegendColorValues(Rectangle legendBounds, int[] dataSerie, String unitLabel);
 }

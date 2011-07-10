@@ -32,6 +32,9 @@ import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
 
+/**
+ * Draws HR zone as background color into the graph.
+ */
 public class HrZonePainter implements IFillPainter {
 
 	private Color[]	_hrZoneColors;
@@ -89,19 +92,6 @@ public class HrZonePainter implements IFillPainter {
 			return;
 		}
 
-		final boolean[] breakTimeSerie = tourData.getBreakTimeSerie();
-
-//		final ChartDataYSerie yData;
-//		final Object customData = dataModel.getCustomData(TourManager.CUSTOM_DATA_PULSE);
-//		if (customData instanceof ChartDataYSerie) {
-//			yData = (ChartDataYSerie) customData;
-//		} else {
-//			return;
-//		}
-//
-//		final int[][] yHighValues = yData.getHighValues();
-//		final int pulseSerie[] = yHighValues[0];
-
 		createHrZoneColors(gcGraph, tourPerson);
 		final int devCanvasHeight = graphDrawingData.devGraphHeight;
 
@@ -113,8 +103,6 @@ public class HrZonePainter implements IFillPainter {
 		final int[] zoneMaxBpm = hrZoneContext.zoneMaxBpm;
 
 		int prevZoneIndex = getZoneIndex(zoneMinBpm, zoneMaxBpm, pulseSerie[valueIndexFirstPoint]);
-		final boolean isBreak = false;
-		final boolean isSliceAfterBreak = true;
 
 		for (int valueIndex = valueIndexFirstPoint + 1; valueIndex <= valueIndexLastPoint; valueIndex++) {
 
@@ -125,48 +113,6 @@ public class HrZonePainter implements IFillPainter {
 			if (devXCurrent == devXPrev && isLastIndex == false) {
 				continue;
 			}
-
-//			if (breakTimeSerie != null) {
-//
-//				if (breakTimeSerie[valueIndex] == true) {
-//
-//					// break occured
-//
-//					if (isBreak == false) {
-//
-//						/*
-//						 * this is the first slice with a break, draw hr zone before the break
-//						 */
-//
-//						final int devWidth = devXCurrent - devXHrStart;
-//
-//						gcGraph.setBackground(_hrZoneColors[prevZoneIndex]);
-//						gcGraph.fillRectangle(devXHrStart, 0, devWidth, devCanvasHeight);
-//					}
-//
-//					isBreak = true;
-//					isSliceAfterBreak = true;
-//
-//					continue;
-//
-//				} else {
-//
-//					// break has ended
-//
-//					isBreak = false;
-//
-//					if (isSliceAfterBreak) {
-//
-//						// set start for the next HR zone
-//						devXHrStart = devXCurrent;
-//						prevZoneIndex = getZoneIndex(zoneMinBpm, zoneMaxBpm, pulseSerie[valueIndex]);
-//
-//						isSliceAfterBreak = false;
-//
-//						continue;
-//					}
-//				}
-//			}
 
 			// check if zone has changed
 			final int zoneIndex = getZoneIndex(zoneMinBpm, zoneMaxBpm, pulseSerie[valueIndex]);

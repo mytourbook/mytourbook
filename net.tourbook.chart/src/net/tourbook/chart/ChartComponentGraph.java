@@ -375,7 +375,7 @@ public class ChartComponentGraph extends Canvas {
 	/**
 	 * Client area for this canvas
 	 */
-	private Rectangle					_clientArea;
+	Rectangle							_clientArea;
 
 	/**
 	 * is <code>true</code> when the chart is panned
@@ -1456,7 +1456,8 @@ public class ChartComponentGraph extends Canvas {
 
 			public void run() {
 
-				final long startTime = System.currentTimeMillis();
+//				final long startTime = System.currentTimeMillis();
+//				// TODO remove SYSTEM.OUT.PRINTLN
 
 				/*
 				 * create the chart image only when a new onPaint event has not occured
@@ -1559,8 +1560,9 @@ public class ChartComponentGraph extends Canvas {
 
 				redraw();
 
-				final long endTime = System.currentTimeMillis();
-				System.out.println("Execution time : " + (endTime - startTime) + " ms   #:" + _drawCounter[0]);
+//				final long endTime = System.currentTimeMillis();
+//				System.out.println("Execution time : " + (endTime - startTime) + " ms   #:" + _drawCounter[0]);
+//				// TODO remove SYSTEM.OUT.PRINTLN
 			}
 		};
 

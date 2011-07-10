@@ -16,19 +16,23 @@
 
 package net.tourbook.mapping;
 
-public interface ILegendProvider {
+/**
+ * Contains all data to draw the legend image for single colors.
+ */
+public class LegendProviderHrZones implements ILegendProviderDiscreteColors {
 
-	/**
-	 * @param graphValue
-	 * @param device
-	 *            Device for which the color is created
-	 * @return Returns the RGB value for a graph value.
-	 */
-	public abstract int getColorValue(int graphValue);
+	private int	_colorId;
 
-	/**
-	 * @return Returns an id to identify the {@link ILegendProvider}
-	 */
-	public abstract int getTourColorId();
+	public LegendProviderHrZones(final int colorId) {
+		_colorId = colorId;
+	}
+
+	public int getColorValue(final int legendValue) {
+		return 0x00ff00;
+	}
+
+	public int getTourColorId() {
+		return _colorId;
+	}
 
 }

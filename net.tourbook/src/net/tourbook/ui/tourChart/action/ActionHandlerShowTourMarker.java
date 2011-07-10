@@ -13,22 +13,29 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
+package net.tourbook.ui.tourChart.action;
 
-package net.tourbook.mapping;
+import net.tourbook.ui.HandlerUtil;
+import net.tourbook.ui.tourChart.TourChart;
 
-public interface ILegendProvider {
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
 
-	/**
-	 * @param graphValue
-	 * @param device
-	 *            Device for which the color is created
-	 * @return Returns the RGB value for a graph value.
-	 */
-	public abstract int getColorValue(int graphValue);
+public class ActionHandlerShowTourMarker extends TCActionHandler {
 
-	/**
-	 * @return Returns an id to identify the {@link ILegendProvider}
-	 */
-	public abstract int getTourColorId();
+	public ActionHandlerShowTourMarker() {
+		commandId = TourChart.COMMAND_ID_SHOW_TOUR_MARKER;
+	}
+
+	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {
+
+		final Boolean isItemChecked = HandlerUtil.isItemChecked(execEvent);
+
+		if (isItemChecked != null) {
+			tourChart.actionShowTourMarker(isItemChecked);
+		}
+
+		return null;
+	}
 
 }

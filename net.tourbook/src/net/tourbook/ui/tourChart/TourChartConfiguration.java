@@ -102,7 +102,12 @@ public class TourChartConfiguration {
 	 * Is <code>true</code> when HR zones can be displayed, which requires that pulse values are
 	 * available and the person has defined HR zones.
 	 */
-	public boolean					canShowHrZones		= false;
+	public boolean					canShowHrZones			= false;
+
+	/**
+	 * Is <code>true</code> when tour markers are displayed.
+	 */
+	public Boolean					isShowTourMarker		= true;
 
 	/**
 	 * @param keepMinMaxValues

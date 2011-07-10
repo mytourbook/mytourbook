@@ -732,14 +732,6 @@ public class Chart extends ViewForm {
 		return _toolbarMgr;
 	}
 
-	/**
-	 * @return
-	 * @return Returns control for which the tool tip is created
-	 */
-	public ChartComponentAxis getToolTipControl() {
-		return getChartComponents().getAxisLeft();
-	}
-
 //	boolean isMouseDownExternalPost(final int devXMouse, final int devYMouse, final int devXGraph) {
 //
 //		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseDownPost);
@@ -752,6 +744,14 @@ public class Chart extends ViewForm {
 //
 //		return event.isWorked;
 //	}
+
+	/**
+	 * @return
+	 * @return Returns control for which the tool tip is created
+	 */
+	public ChartComponentAxis getToolTipControl() {
+		return getChartComponents().getAxisLeft();
+	}
 
 	/**
 	 * returns the value index for the x-sliders
@@ -910,16 +910,6 @@ public class Chart extends ViewForm {
 		_chartComponents.onResize();
 	}
 
-	/**
-	 * Set the background color for the chart, the default is SWT.COLOR_WHITE
-	 * 
-	 * @param backgroundColor
-	 *            The backgroundColor to set.
-	 */
-	public void setBackgroundColor(final Color backgroundColor) {
-		this._backgroundColor = backgroundColor;
-	}
-
 //	/**
 //	 * Set <code>true</code> when the internal action bar should be used, set <code>false</code>
 //	 * when the workbench action should be used.
@@ -929,6 +919,16 @@ public class Chart extends ViewForm {
 //	public void setUseInternalActionBar(boolean useInternalActionBar) {
 //		fUseInternalActionBar = useInternalActionBar;
 //	}
+
+	/**
+	 * Set the background color for the chart, the default is SWT.COLOR_WHITE
+	 * 
+	 * @param backgroundColor
+	 *            The backgroundColor to set.
+	 */
+	public void setBackgroundColor(final Color backgroundColor) {
+		this._backgroundColor = backgroundColor;
+	}
 
 	public void setBarTooltipProvider(final BarTooltipProvider barTooltipProvider) {
 		_barTooltipProvider = barTooltipProvider;
@@ -989,13 +989,13 @@ public class Chart extends ViewForm {
 		_isFirstContextMenu = isFirstContextMenu;
 	}
 
-	protected void setDataModel(final ChartDataModel chartDataModel) {
-		_chartDataModel = chartDataModel;
-	}
-
 //	public void setShowPartNavigation(final boolean showPartNavigation) {
 //		fShowPartNavigation = showPartNavigation;
 //	}
+
+	protected void setDataModel(final ChartDataModel chartDataModel) {
+		_chartDataModel = chartDataModel;
+	}
 
 	/**
 	 * Set <code>false</code> to not draw the bars at the bottom of the chart
@@ -1024,10 +1024,16 @@ public class Chart extends ViewForm {
 		_chartComponents.getChartComponentGraph()._graphAlpha = alphaValue;
 	}
 
-	public void setGridDistance(final int horizontalGrid, final int verticalGrid) {
+	public void setGrid(final int horizontalGrid,
+						final int verticalGrid,
+						final boolean isHGridVisible,
+						final boolean isVGridVisible) {
 
-		gridVerticalDistance = verticalGrid;
 		gridHorizontalDistance = horizontalGrid;
+		gridVerticalDistance = verticalGrid;
+
+		isShowHorizontalGridLines = isHGridVisible;
+		isShowVerticalGridLines = isVGridVisible;
 
 		_chartComponents.onResize();
 	}

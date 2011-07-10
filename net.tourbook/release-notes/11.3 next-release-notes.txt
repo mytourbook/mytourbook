@@ -34,6 +34,11 @@ improvements
 - straight vertical lines instead of traiangles in the heartbeat graph when the value is not set within 20 seconds
 - export gpx with heartrate, temperature and cadence
 - break time is displayed as a gap when time is displayed on the x-axis
+- tour chart:
+  - tour marker can be displayed/hidden
+  
+limitations
+- HR zones in the map can be displayed correctly for one single tour, all other possibilities (multiple tours, multiple persons) can display the wrong HR zones
 
 fixed bugs
 - fixed bug to auto open tag menu in OSX, eclipse 3.7 is required

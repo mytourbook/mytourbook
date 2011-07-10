@@ -66,7 +66,8 @@ public interface ITourbookPreferences {
 
 	public static final String	GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER				= "graphs.zoom.autozoom-to-slider";						//$NON-NLS-1$
 	public static final String	GRAPH_MOVE_SLIDERS_WHEN_ZOOMED				= "graphs.move-sliders-when-zoomed";						//$NON-NLS-1$
-	public static final String	GRAPH_IS_SRTM_VISIBLE						= "graphs.is-srtm-visible";								//$NON-NLS-1$
+	public static final String	GRAPH_IS_SRTM_VISIBLE						= "Graph_IsSRTMVisible";									//$NON-NLS-1$
+	public static final String	GRAPH_IS_MARKER_VISIBLE						= "Graph_IsMarkerVisible";									//$NON-NLS-1$
 
 	public static final String	GRAPH_MOUSE_MODE							= "graph.toggle-mouse";									//$NON-NLS-1$
 

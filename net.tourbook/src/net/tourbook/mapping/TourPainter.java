@@ -89,9 +89,13 @@ public class TourPainter extends MapPainter {
 	private static Image					_twpImage;
 	private static Rectangle				_twpImageBounds;
 
+	private static TourPaintManager			_tourPaintManager;
+
 	private final static ColorCacheInt		_colorCache			= new ColorCacheInt();
 
 	static {
+
+		_tourPaintManager = TourPaintManager.getInstance();
 
 		/**
 		 * this code optimizes the performance by reading from the pref store which is not very
@@ -140,23 +144,29 @@ public class TourPainter extends MapPainter {
 
 	/**
 	 * Draw legend colors into the legend bounds
-	 *
+	 * 
 	 * @param gc
 	 * @param legendBounds
-	 * @param isVertical
+	 * @param isDrawVertical
 	 *            when <code>true</code> the legend is drawn vertical, when false the legend is
 	 *            drawn horizontal
 	 * @param colorId
 	 * @return
 	 */
-	public static void drawLegendColors(final GC gc,
-										final Rectangle legendBounds,
-			 							final ILegendProvider legendProvider,
-										final boolean isVertical) {
+	public static void drawLegend(	final GC gc,
+									final Rectangle legendBounds,
+									final ILegendProvider legendProvider,
+									final boolean isDrawVertical) {
 
-		if (legendProvider == null) {
-			return;
+		if (legendProvider instanceof ILegendProviderGradientColors) {
+			drawLegendMinMax(gc, legendBounds, (ILegendProviderGradientColors) legendProvider, isDrawVertical);
 		}
+	}
+
+	private static void drawLegendMinMax(	final GC gc,
+											final Rectangle legendBounds,
+											final ILegendProviderGradientColors legendProvider,
+											final boolean isDrawVertical) {
 
 		final Device display = gc.getDevice();
 		final LegendConfig config = legendProvider.getLegendConfig();
@@ -183,7 +193,7 @@ public class TourPainter extends MapPainter {
 		int legendHeight;
 		int availableLegendPixels;
 
-		if (isVertical) {
+		if (isDrawVertical) {
 
 			// vertical legend
 
@@ -235,7 +245,7 @@ public class TourPainter extends MapPainter {
 			legendValue = (int) (legendMinValue + pixelValue * pixelIndex);
 
 			int valuePosition;
-			if (isVertical) {
+			if (isDrawVertical) {
 				valuePosition = legendPositionY + availableLegendPixels - pixelIndex;
 			} else {
 				valuePosition = legendPositionX + availableLegendPixels - pixelIndex;
@@ -245,7 +255,7 @@ public class TourPainter extends MapPainter {
 			 * draw legend unit
 			 */
 
-			if (isVertical) {
+			if (isDrawVertical) {
 
 				// find a unit which corresponds to the current legend value
 
@@ -314,7 +324,7 @@ public class TourPainter extends MapPainter {
 
 			gc.setForeground(lineColor);
 
-			if (isVertical) {
+			if (isDrawVertical) {
 
 				// vertial legend
 
@@ -331,6 +341,7 @@ public class TourPainter extends MapPainter {
 
 		_colorCache.dispose();
 		textBorderColor.dispose();
+
 	}
 
 	/**
@@ -510,9 +521,8 @@ public class TourPainter extends MapPainter {
 	@Override
 	protected boolean doPaint(final GC gc, final Map map, final Tile tile, final int parts) {
 
-		final PaintManager paintManager = PaintManager.getInstance();
 
-		final ArrayList<TourData> tourDataList = paintManager.getTourData();
+		final ArrayList<TourData> tourDataList = _tourPaintManager.getTourData();
 		if (tourDataList == null) {
 			return false;
 		}
@@ -563,7 +573,7 @@ public class TourPainter extends MapPainter {
 			boolean isMarkerInTile = false;
 
 			// draw start/end marker
-			if (paintManager.isShowStartEndInMap()) {
+			if (_tourPaintManager.isShowStartEndInMap()) {
 
 				// draw end marker first
 				isMarkerInTile = drawStaticMarker(
@@ -591,7 +601,7 @@ public class TourPainter extends MapPainter {
 			isTourInTile = isTourInTile || isMarkerInTile;
 		}
 
-		if (paintManager._isShowTourMarker || paintManager._isShowWayPoints) {
+		if (_tourPaintManager._isShowTourMarker || _tourPaintManager._isShowWayPoints) {
 
 			// draw marker above the tour
 
@@ -610,7 +620,7 @@ public class TourPainter extends MapPainter {
 
 				setDataSerie(tourData);
 
-				if (paintManager._isShowTourMarker) {
+				if (_tourPaintManager._isShowTourMarker) {
 
 					// ckeck if markers are available
 					final ArrayList<TourMarker> sortedMarkers = tourData.getTourMarkersSorted();
@@ -647,7 +657,7 @@ public class TourPainter extends MapPainter {
 					}
 				}
 
-				if (paintManager._isShowWayPoints) {
+				if (_tourPaintManager._isShowWayPoints) {
 
 					// ckeck if way points are available
 					final Set<TourWayPoint> wayPoints = tourData.getTourWayPoints();
@@ -1053,7 +1063,7 @@ public class TourPainter extends MapPainter {
 
 	/**
 	 * create an image for the tour marker
-	 *
+	 * 
 	 * @param device
 	 * @param markerBounds
 	 * @param tourMarker
@@ -1195,7 +1205,10 @@ public class TourPainter extends MapPainter {
 	 */
 	public int getLegendValuePosition(final Rectangle legendBounds, final int valueIndex) {
 
-		if (_dataSerie == null || valueIndex >= _dataSerie.length) {
+		if (_dataSerie == null || valueIndex >= _dataSerie.length || //
+				// check legend provider type
+				_legendProvider instanceof ILegendProviderGradientColors == false//
+		) {
 			return Integer.MIN_VALUE;
 		}
 
@@ -1207,7 +1220,7 @@ public class TourPainter extends MapPainter {
 
 		int valuePosition = 0;
 
-		final LegendConfig config = _legendProvider.getLegendConfig();
+		final LegendConfig config = ((ILegendProviderGradientColors) _legendProvider).getLegendConfig();
 
 //		final Integer unitFactor = config.unitFactor;
 //		dataValue /= unitFactor;
@@ -1274,7 +1287,7 @@ public class TourPainter extends MapPainter {
 
 	/**
 	 * world pixels are not yet cached, create them now
-	 *
+	 * 
 	 * @param tourData
 	 * @param mp
 	 * @param mapZoomLevel
@@ -1331,7 +1344,7 @@ public class TourPainter extends MapPainter {
 	/**
 	 * Checks if an image bounds is within the tile. The image is above the image position and one
 	 * half to the left and right side
-	 *
+	 * 
 	 * @param imageBounds
 	 *            bounds of the image
 	 * @param devImagePosX
@@ -1369,9 +1382,8 @@ public class TourPainter extends MapPainter {
 	@Override
 	protected boolean isPaintingNeeded(final Map map, final Tile tile) {
 
-		final PaintManager paintManager = PaintManager.getInstance();
 
-		final ArrayList<TourData> tourDataList = paintManager.getTourData();
+		final ArrayList<TourData> tourDataList = _tourPaintManager.getTourData();
 		if (tourDataList == null) {
 			return false;
 		}
@@ -1498,13 +1510,13 @@ public class TourPainter extends MapPainter {
 	}
 
 	/**
-	 * Sets data serie which is painted
-	 *
+	 * Set the data serie which is painted
+	 * 
 	 * @param tourData
 	 */
 	private void setDataSerie(final TourData tourData) {
 
-		final ILegendProvider legendProvider = PaintManager.getInstance().getLegendProvider();
+		final ILegendProvider legendProvider = _tourPaintManager.getLegendProvider();
 		if (legendProvider == null) {
 			_dataSerie = null;
 			return;
@@ -1514,53 +1526,27 @@ public class TourPainter extends MapPainter {
 
 		switch (_legendProvider.getTourColorId()) {
 		case TourMapView.TOUR_COLOR_ALTITUDE:
-
-			final int[] altitudeSerie = tourData.getAltitudeSerie();
-			if (altitudeSerie == null) {
-				_dataSerie = null;
-			} else {
-				_dataSerie = altitudeSerie;
-			}
+			_dataSerie = tourData.getAltitudeSerie();
 			break;
 
 		case TourMapView.TOUR_COLOR_GRADIENT:
-
-			final int[] gradientSerie = tourData.getGradientSerie();
-			if (gradientSerie == null) {
-				_dataSerie = null;
-			} else {
-				_dataSerie = gradientSerie;
-			}
+			_dataSerie = tourData.getGradientSerie();
 			break;
 
 		case TourMapView.TOUR_COLOR_PULSE:
-
-			final int[] pulseSerie = tourData.pulseSerie;
-			if (pulseSerie == null) {
-				_dataSerie = null;
-			} else {
-				_dataSerie = pulseSerie;
-			}
+			_dataSerie = tourData.pulseSerie;
 			break;
 
 		case TourMapView.TOUR_COLOR_SPEED:
-
-			final int[] speedSerie = tourData.getSpeedSerie();
-			if (speedSerie == null) {
-				_dataSerie = null;
-			} else {
-				_dataSerie = speedSerie;
-			}
+			_dataSerie = tourData.getSpeedSerie();
 			break;
 
 		case TourMapView.TOUR_COLOR_PACE:
+			_dataSerie = tourData.getPaceSerie();
+			break;
 
-			final int[] paceSerie = tourData.getPaceSerie();
-			if (paceSerie == null) {
-				_dataSerie = null;
-			} else {
-				_dataSerie = paceSerie;
-			}
+		case TourMapView.TOUR_COLOR_HR_ZONE:
+			_dataSerie = tourData.pulseSerie;
 			break;
 
 		default:

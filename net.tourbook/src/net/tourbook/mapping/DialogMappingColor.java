@@ -100,7 +100,7 @@ public class DialogMappingColor extends TitleAreaDialog {
 
 	private PrefPageAppearanceColors	_prefPage;
 
-	private final ILegendProvider		_legendProvider;
+	private final ILegendProviderGradientColors		_legendProvider;
 	private ValueColor[]				_colorValueModel;
 
 	private LegendColor					_legendColorWorkingCopy;
@@ -129,7 +129,7 @@ public class DialogMappingColor extends TitleAreaDialog {
 	}
 
 	public DialogMappingColor(	final Shell parentShell,
-								final LegendProvider legendProvider,
+								final LegendProviderMinMax legendProvider,
 								final PrefPageAppearanceColors prefPageAppearanceColors) {
 
 		super(parentShell);
@@ -231,7 +231,7 @@ public class DialogMappingColor extends TitleAreaDialog {
 			gc.setBackground(transparentColor);
 			gc.fillRectangle(imageBounds);
 
-			TourPainter.drawLegendColors(gc, imageBounds, _legendProvider, true);
+			TourPainter.drawLegend(gc, imageBounds, _legendProvider, true);
 		}
 		gc.dispose();
 		transparentColor.dispose();

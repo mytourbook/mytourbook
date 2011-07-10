@@ -35,12 +35,14 @@ import net.tourbook.chart.IFillPainter;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPageAppearanceTourChart;
 import net.tourbook.tour.IDataModelListener;
 import net.tourbook.tour.ITourChartSelectionListener;
 import net.tourbook.tour.SelectionTourChart;
 import net.tourbook.tour.TourInfoToolTipProvider;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
+import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.tourChart.action.ActionCanAutoZoomToSlider;
 import net.tourbook.ui.tourChart.action.ActionCanMoveSlidersWhenZoomed;
 import net.tourbook.ui.tourChart.action.ActionChartOptions;
@@ -48,6 +50,7 @@ import net.tourbook.ui.tourChart.action.ActionGraph;
 import net.tourbook.ui.tourChart.action.ActionShowHrZones;
 import net.tourbook.ui.tourChart.action.ActionShowSRTMData;
 import net.tourbook.ui.tourChart.action.ActionShowStartTime;
+import net.tourbook.ui.tourChart.action.ActionShowTourMarker;
 import net.tourbook.ui.tourChart.action.ActionXAxisDistance;
 import net.tourbook.ui.tourChart.action.ActionXAxisTime;
 import net.tourbook.ui.tourChart.action.TCActionHandler;
@@ -79,10 +82,12 @@ public class TourChart extends Chart {
 
 	public static final String				COMMAND_ID_CHART_OPTIONS				= "net.tourbook.command.tourChart.options";					//$NON-NLS-1$
 
-	public static final String				COMMAND_ID_SHOW_START_TIME				= "net.tourbook.command.tourChart.showStartTime";				//$NON-NLS-1$
+	public static final String				COMMAND_ID_SHOW_START_TIME				= "net.tourbook.command.tourChart.isShowStartTime";			//$NON-NLS-1$
+	public static final String				COMMAND_ID_SHOW_SRTM_DATA				= "net.tourbook.command.tourChart.isShowSRTMData";				//$NON-NLS-1$
+	public static final String				COMMAND_ID_SHOW_TOUR_MARKER				= "net.tourbook.command_TourChart_IsShowTourMarker";			//$NON-NLS-1$
 	public static final String				COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER		= "net.tourbook.command.tourChart.canAutoZoomToSlider";		//$NON-NLS-1$
 	public static final String				COMMAND_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED	= "net.tourbook.command.tourChart.canMoveSlidersWhenZoomed";	//$NON-NLS-1$
-	public static final String				COMMAND_ID_SHOW_SRTM_DATA				= "net.tourbook.command.option.showSRTMData";					//$NON-NLS-1$
+	public static final String				COMMAND_ID_EDIT_CHART_PREFERENCES		= "net.tourbook.command_EditChartPreferences";					//$NON-NLS-1$
 
 	public static final String				COMMAND_ID_X_AXIS_DISTANCE				= "net.tourbook.command.tourChart.xAxisDistance";				//$NON-NLS-1$
 	public static final String				COMMAND_ID_X_AXIS_TIME					= "net.tourbook.command.tourChart.xAxisTime";					//$NON-NLS-1$
@@ -273,6 +278,17 @@ public class TourChart extends Chart {
 		updateTourChart(true);
 
 		setCommandChecked(COMMAND_ID_SHOW_START_TIME, isItemChecked);
+	}
+
+	public void actionShowTourMarker(final Boolean isItemChecked) {
+
+		_prefStore.setValue(ITourbookPreferences.GRAPH_IS_MARKER_VISIBLE, isItemChecked);
+
+		_tourChartConfig.isShowTourMarker = isItemChecked;
+
+		updateLayerMarker(isItemChecked);
+
+		setCommandChecked(COMMAND_ID_SHOW_TOUR_MARKER, isItemChecked);
 	}
 
 	/**
@@ -469,11 +485,93 @@ public class TourChart extends Chart {
 	}
 
 	/**
+	 * Create the action proxies for all tour actions
+	 */
+	private void createAction10TourActionProxies() {
+
+		// check if action proxies are created
+		if (_actionProxies != null) {
+			return;
+		}
+
+		_actionProxies = new HashMap<String, TCActionProxy>();
+
+		/*
+		 * Action: chart graphs
+		 */
+		createAction20GraphActionProxies();
+
+		final boolean useInternalActionBar = useInternalActionBar();
+
+		/*
+		 * Action: HR zones
+		 */
+		_actionProxies.put(COMMAND_ID_SHOW_HR_ZONES, //
+				new TCActionProxy(COMMAND_ID_SHOW_HR_ZONES, //
+						useInternalActionBar ? new ActionShowHrZones(this) : null));
+
+		/*
+		 * Action: x-axis time
+		 */
+		_actionProxies.put(COMMAND_ID_X_AXIS_TIME, //
+				new TCActionProxy(COMMAND_ID_X_AXIS_TIME, //
+						useInternalActionBar ? new ActionXAxisTime(this) : null));
+
+		/*
+		 * Action: x-axis distance
+		 */
+		_actionProxies.put(COMMAND_ID_X_AXIS_DISTANCE, //
+				new TCActionProxy(COMMAND_ID_X_AXIS_DISTANCE, //
+						useInternalActionBar ? new ActionXAxisDistance(this) : null));
+
+		/*
+		 * Action: chart options
+		 */
+		_actionProxies.put(COMMAND_ID_CHART_OPTIONS, new TCActionProxy(COMMAND_ID_CHART_OPTIONS, null));
+
+		/*
+		 * Action: show start time
+		 */
+		_actionProxies.put(COMMAND_ID_SHOW_START_TIME, //
+				new TCActionProxy(COMMAND_ID_SHOW_START_TIME,//
+						useInternalActionBar ? new ActionShowStartTime(this) : null));
+
+		/*
+		 * Action: auto zoom to slider
+		 */
+		_actionProxies.put(COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER, //
+				new TCActionProxy(COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER, //
+						useInternalActionBar ? new ActionCanAutoZoomToSlider(this) : null));
+
+		// action: move sliders when zoomed
+		_actionProxies.put(COMMAND_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED, //
+				new TCActionProxy(COMMAND_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED, //
+						useInternalActionBar ? new ActionCanMoveSlidersWhenZoomed(this) : null));
+
+		// action: show SRTM data
+		_actionProxies.put(COMMAND_ID_SHOW_SRTM_DATA, //
+				new TCActionProxy(COMMAND_ID_SHOW_SRTM_DATA, //
+						useInternalActionBar ? new ActionShowSRTMData(this) : null));
+
+		// action: show/hide tour marker
+		_actionProxies.put(COMMAND_ID_SHOW_TOUR_MARKER, //
+				new TCActionProxy(COMMAND_ID_SHOW_TOUR_MARKER, //
+						useInternalActionBar ? new ActionShowTourMarker(this) : null));
+
+		// action: edit chart prefs
+		_actionProxies.put(COMMAND_ID_EDIT_CHART_PREFERENCES, //
+				new TCActionProxy(COMMAND_ID_EDIT_CHART_PREFERENCES, //
+						useInternalActionBar ? new ActionOpenPrefDialog(
+								Messages.Action_TourChart_EditChartPreferences,
+								PrefPageAppearanceTourChart.ID) : null));
+	}
+
+	/**
 	 * Create action proxies for all chart graphs
 	 */
-	private void createGraphActionProxies() {
+	private void createAction20GraphActionProxies() {
 
-		createGraphActionProxy(
+		createAction30GraphActionProxy(
 				TourManager.GRAPH_ALTITUDE,
 				COMMAND_ID_GRAPH_ALTITUDE,
 				Messages.Graph_Label_Altitude,
@@ -481,7 +579,7 @@ public class TourChart extends Chart {
 				Messages.Image__graph_altitude,
 				Messages.Image__graph_altitude_disabled);
 
-		createGraphActionProxy(
+		createAction30GraphActionProxy(
 				TourManager.GRAPH_SPEED,
 				COMMAND_ID_GRAPH_SPEED,
 				Messages.Graph_Label_Speed,
@@ -489,7 +587,7 @@ public class TourChart extends Chart {
 				Messages.Image__graph_speed,
 				Messages.Image__graph_speed_disabled);
 
-		createGraphActionProxy(
+		createAction30GraphActionProxy(
 				TourManager.GRAPH_PACE,
 				COMMAND_ID_GRAPH_PACE,
 				Messages.Graph_Label_Pace,
@@ -497,7 +595,7 @@ public class TourChart extends Chart {
 				Messages.Image__graph_pace,
 				Messages.Image__graph_pace_disabled);
 
-		createGraphActionProxy(
+		createAction30GraphActionProxy(
 				TourManager.GRAPH_POWER,
 				COMMAND_ID_GRAPH_POWER,
 				Messages.Graph_Label_Power,
@@ -505,7 +603,7 @@ public class TourChart extends Chart {
 				Messages.Image__graph_power,
 				Messages.Image__graph_power_disabled);
 
-		createGraphActionProxy(
+		createAction30GraphActionProxy(
 				TourManager.GRAPH_ALTIMETER,
 				COMMAND_ID_GRAPH_ALTIMETER,
 				Messages.Graph_Label_Altimeter,
@@ -513,7 +611,7 @@ public class TourChart extends Chart {
 				Messages.Image__graph_altimeter,
 				Messages.Image__graph_altimeter_disabled);
 
-		createGraphActionProxy(
+		createAction30GraphActionProxy(
 				TourManager.GRAPH_PULSE,
 				COMMAND_ID_GRAPH_PULSE,
 				Messages.Graph_Label_Heartbeat,
@@ -521,7 +619,7 @@ public class TourChart extends Chart {
 				Messages.Image__graph_heartbeat,
 				Messages.Image__graph_heartbeat_disabled);
 
-		createGraphActionProxy(
+		createAction30GraphActionProxy(
 				TourManager.GRAPH_TEMPERATURE,
 				COMMAND_ID_GRAPH_TEMPERATURE,
 				Messages.Graph_Label_Temperature,
@@ -529,7 +627,7 @@ public class TourChart extends Chart {
 				Messages.Image__graph_temperature,
 				Messages.Image__graph_temperature_disabled);
 
-		createGraphActionProxy(
+		createAction30GraphActionProxy(
 				TourManager.GRAPH_CADENCE,
 				COMMAND_ID_GRAPH_CADENCE,
 				Messages.Graph_Label_Cadence,
@@ -537,7 +635,7 @@ public class TourChart extends Chart {
 				Messages.Image__graph_cadence,
 				Messages.Image__graph_cadence_disabled);
 
-		createGraphActionProxy(
+		createAction30GraphActionProxy(
 				TourManager.GRAPH_GRADIENT,
 				COMMAND_ID_GRAPH_GRADIENT,
 				Messages.Graph_Label_Gradient,
@@ -545,7 +643,7 @@ public class TourChart extends Chart {
 				Messages.Image__graph_gradient,
 				Messages.Image__graph_gradient_disabled);
 
-		createGraphActionProxy(
+		createAction30GraphActionProxy(
 				TourManager.GRAPH_TOUR_COMPARE,
 				COMMAND_ID_GRAPH_TOUR_COMPARE,
 				Messages.Graph_Label_Tour_Compare,
@@ -566,12 +664,12 @@ public class TourChart extends Chart {
 	 * @param isChecked
 	 * @return
 	 */
-	private void createGraphActionProxy(final int graphId,
-										final String commandId,
-										final String label,
-										final String toolTip,
-										final String imageEnabled,
-										final String imageDisabled) {
+	private void createAction30GraphActionProxy(final int graphId,
+												final String commandId,
+												final String label,
+												final String toolTip,
+												final String imageEnabled,
+												final String imageDisabled) {
 
 		Action action = null;
 
@@ -604,8 +702,17 @@ public class TourChart extends Chart {
 
 	/**
 	 * create the layer which displays the tour marker
+	 * 
+	 * @param isMarkerVisibleEnforced
+	 *            When <code>true</code> the marker must be drawn, otherwise
+	 *            {@link TourChartConfiguration#isShowTourMarker} determines if the markers are
+	 *            drawn or not.
 	 */
-	private void createLayerMarker() {
+	private void createLayerMarker(final boolean isMarkerVisibleEnforced) {
+
+		if (isMarkerVisibleEnforced == false && _tourChartConfig.isShowTourMarker == false) {
+			return;
+		}
 
 		// set data serie for the x-axis
 		final int[] xAxisSerie = _tourChartConfig.isShowTimeOnXAxis ? //
@@ -687,81 +794,6 @@ public class TourChart extends Chart {
 	}
 
 	/**
-	 * Create the action proxies for all tour actions
-	 */
-	private void createTourActionProxies() {
-
-		// check if action proxies are created
-		if (_actionProxies != null) {
-			return;
-		}
-
-		_actionProxies = new HashMap<String, TCActionProxy>();
-
-		/*
-		 * Action: chart graphs
-		 */
-		createGraphActionProxies();
-
-		final boolean useInternalActionBar = useInternalActionBar();
-
-		/*
-		 * Action: HR zones
-		 */
-		_actionProxies.put(COMMAND_ID_SHOW_HR_ZONES, //
-				new TCActionProxy(COMMAND_ID_SHOW_HR_ZONES, //
-						useInternalActionBar ? new ActionShowHrZones(this) : null));
-
-		/*
-		 * Action: x-axis time
-		 */
-		_actionProxies.put(COMMAND_ID_X_AXIS_TIME, //
-				new TCActionProxy(COMMAND_ID_X_AXIS_TIME, //
-						useInternalActionBar ? new ActionXAxisTime(this) : null));
-
-		/*
-		 * Action: x-axis distance
-		 */
-		_actionProxies.put(COMMAND_ID_X_AXIS_DISTANCE, //
-				new TCActionProxy(COMMAND_ID_X_AXIS_DISTANCE, //
-						useInternalActionBar ? new ActionXAxisDistance(this) : null));
-
-		/*
-		 * Action: chart options
-		 */
-		_actionProxies.put(COMMAND_ID_CHART_OPTIONS, new TCActionProxy(COMMAND_ID_CHART_OPTIONS, null));
-
-		/*
-		 * Action: show start time
-		 */
-		_actionProxies.put(COMMAND_ID_SHOW_START_TIME, //
-				new TCActionProxy(COMMAND_ID_SHOW_START_TIME,//
-						useInternalActionBar ? new ActionShowStartTime(this) : null));
-
-		/*
-		 * Action: auto zoom to slider
-		 */
-		_actionProxies.put(COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER, //
-				new TCActionProxy(COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER, //
-						useInternalActionBar ? new ActionCanAutoZoomToSlider(this) : null));
-
-		/*
-		 * Action: move sliders when zoomed
-		 */
-		_actionProxies.put(COMMAND_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED, //
-				new TCActionProxy(COMMAND_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED, //
-						useInternalActionBar ? new ActionCanMoveSlidersWhenZoomed(this) : null));
-
-		/*
-		 * Action: show SRTM data
-		 */
-		_actionProxies.put(COMMAND_ID_SHOW_SRTM_DATA, //
-				new TCActionProxy(COMMAND_ID_SHOW_SRTM_DATA, //
-						useInternalActionBar ? new ActionShowSRTMData(this) : null));
-
-	}
-
-	/**
 	 * Creates the handlers for the tour chart actions
 	 * 
 	 * @param workbenchWindow
@@ -772,7 +804,7 @@ public class TourChart extends Chart {
 		_tourChartConfig = tourChartConfig;
 
 		_tcActionHandlerManager.createActionHandlers();
-		createTourActionProxies();
+		createAction10TourActionProxies();
 		createChartActionHandlers();
 	}
 
@@ -799,7 +831,7 @@ public class TourChart extends Chart {
 		 * all graph actions
 		 */
 		final int[] allGraphIds = TourManager.getAllGraphIDs();
-		final ArrayList<Integer> checkedGraphIds = _tourChartConfig.getVisibleGraphs();
+		final ArrayList<Integer> visibleGraphIds = _tourChartConfig.getVisibleGraphs();
 		final ArrayList<Integer> enabledGraphIds = new ArrayList<Integer>();
 
 		// get all graph ids which can be displayed
@@ -812,40 +844,65 @@ public class TourChart extends Chart {
 			}
 		}
 
+		boolean isAltitudeVisible = false;
+		boolean isPulseVisible = false;
+
+		for (final int graphId : visibleGraphIds) {
+
+			if (graphId == TourManager.GRAPH_ALTITUDE) {
+				isAltitudeVisible = true;
+			}
+			if (graphId == TourManager.GRAPH_PULSE) {
+				isPulseVisible = true;
+			}
+		}
+
+		TCActionProxy proxy;
+
 		for (final int graphId : allGraphIds) {
 
-			final TCActionProxy actionProxy = _actionProxies.get(getProxyId(graphId));
-
-			actionProxy.setChecked(checkedGraphIds.contains(graphId));
-			actionProxy.setEnabled(enabledGraphIds.contains(graphId));
+			proxy = _actionProxies.get(getProxyId(graphId));
+			proxy.setChecked(visibleGraphIds.contains(graphId));
+			proxy.setEnabled(enabledGraphIds.contains(graphId));
 		}
 
 		/*
 		 * HR zones
 		 */
-		final boolean canShowHrZones = _tourChartConfig.canShowHrZones;
-		_actionProxies.get(COMMAND_ID_SHOW_HR_ZONES).setEnabled(canShowHrZones);
-		_actionProxies.get(COMMAND_ID_SHOW_HR_ZONES).setChecked(
-				canShowHrZones ? _tourChartConfig.isHrZoneDisplayed : false);
+		proxy = _actionProxies.get(COMMAND_ID_SHOW_HR_ZONES);
+		final boolean canShowHrZones = _tourChartConfig.canShowHrZones && (isAltitudeVisible || isPulseVisible);
+		proxy.setEnabled(canShowHrZones);
+		proxy.setChecked(canShowHrZones ? _tourChartConfig.isHrZoneDisplayed : false);
+
+		/*
+		 * Tour marker
+		 */
+		proxy = _actionProxies.get(COMMAND_ID_SHOW_TOUR_MARKER);
+		proxy.setEnabled(true);
+		proxy.setChecked(_tourChartConfig.isShowTourMarker);
 
 		/*
 		 * SRTM data
 		 */
+		proxy = _actionProxies.get(COMMAND_ID_SHOW_SRTM_DATA);
 		final boolean canShowSRTMData = _tourChartConfig.canShowSRTMData;
-		_actionProxies.get(COMMAND_ID_SHOW_SRTM_DATA).setEnabled(canShowSRTMData);
-		_actionProxies.get(COMMAND_ID_SHOW_SRTM_DATA).setChecked(
-				canShowSRTMData ? _tourChartConfig.isSRTMDataVisible : false);
+		proxy.setEnabled(canShowSRTMData);
+		proxy.setChecked(canShowSRTMData ? _tourChartConfig.isSRTMDataVisible : false);
 
 		/*
 		 * x-axis time/distance
 		 */
-		_actionProxies.get(COMMAND_ID_SHOW_START_TIME).setEnabled(_tourChartConfig.isShowTimeOnXAxis);
-		_actionProxies.get(COMMAND_ID_SHOW_START_TIME).setChecked(_tourChartConfig.isShowStartTime);
+		proxy = _actionProxies.get(COMMAND_ID_SHOW_START_TIME);
+		proxy.setEnabled(_tourChartConfig.isShowTimeOnXAxis);
+		proxy.setChecked(_tourChartConfig.isShowStartTime);
 
-		_actionProxies.get(COMMAND_ID_X_AXIS_TIME).setEnabled(true); // time data are always available
-		_actionProxies.get(COMMAND_ID_X_AXIS_TIME).setChecked(_tourChartConfig.isShowTimeOnXAxis);
-		_actionProxies.get(COMMAND_ID_X_AXIS_DISTANCE).setChecked(!_tourChartConfig.isShowTimeOnXAxis);
-		_actionProxies.get(COMMAND_ID_X_AXIS_DISTANCE).setEnabled(!_tourChartConfig.isForceTimeOnXAxis);
+		proxy = _actionProxies.get(COMMAND_ID_X_AXIS_TIME);
+		proxy.setEnabled(true); // time data are always available
+		proxy.setChecked(_tourChartConfig.isShowTimeOnXAxis);
+
+		proxy = _actionProxies.get(COMMAND_ID_X_AXIS_DISTANCE);
+		proxy.setChecked(!_tourChartConfig.isShowTimeOnXAxis);
+		proxy.setEnabled(!_tourChartConfig.isForceTimeOnXAxis);
 
 		// get options check status from the configuration
 		final boolean isMoveSlidersWhenZoomed = _tourChartConfig.moveSlidersWhenZoomed;
@@ -853,11 +910,13 @@ public class TourChart extends Chart {
 		final boolean canAutoZoom = getMouseMode().equals(Chart.MOUSE_MODE_ZOOM);
 
 		// update tour chart actions
-		_actionProxies.get(COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER).setEnabled(true);
-		_actionProxies.get(COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER).setChecked(isAutoZoomToSlider);
+		proxy = _actionProxies.get(COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER);
+		proxy.setEnabled(true);
+		proxy.setChecked(isAutoZoomToSlider);
 
-		_actionProxies.get(COMMAND_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED).setEnabled(canAutoZoom);
-		_actionProxies.get(COMMAND_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED).setChecked(isMoveSlidersWhenZoomed);
+		proxy = _actionProxies.get(COMMAND_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED);
+		proxy.setEnabled(canAutoZoom);
+		proxy.setChecked(isMoveSlidersWhenZoomed);
 
 		// update the chart actions
 		setCanAutoMoveSliders(isMoveSlidersWhenZoomed);
@@ -1389,7 +1448,7 @@ public class TourChart extends Chart {
 	public void updateLayerMarker(final boolean isLayerVisible) {
 
 		if (isLayerVisible) {
-			createLayerMarker();
+			createLayerMarker(true);
 		} else {
 			_layerMarker = null;
 		}
@@ -1507,7 +1566,7 @@ public class TourChart extends Chart {
 		setDataModel(newChartDataModel);
 
 		if (_isShowActions) {
-			createTourActionProxies();
+			createAction10TourActionProxies();
 			fillToolbar();
 			enableTourActions();
 		}
@@ -1524,7 +1583,7 @@ public class TourChart extends Chart {
 		}
 
 		createLayerSegment();
-		createLayerMarker();
+		createLayerMarker(false);
 		createLayer2ndAlti();
 		createHrZonePainter();
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,9 +21,12 @@ import java.util.Set;
 import net.tourbook.data.TourData;
 import de.byteholder.gpx.GeoPosition;
 
-public class PaintManager {
+/**
+ * Contains data which are needed to paint a tour into a map.
+ */
+public class TourPaintManager {
 
-	private static PaintManager			_instance;
+	private static TourPaintManager		_instance;
 
 	private final ArrayList<TourData>	_tourDataList	= new ArrayList<TourData>();
 
@@ -40,12 +43,12 @@ public class PaintManager {
 	boolean								_isShowTourMarker;
 	boolean								_isShowWayPoints;
 
-	private PaintManager() {}
+	private TourPaintManager() {}
 
-	public static PaintManager getInstance() {
+	public static TourPaintManager getInstance() {
 
 		if (_instance == null) {
-			_instance = new PaintManager();
+			_instance = new TourPaintManager();
 		}
 
 		return _instance;
@@ -77,9 +80,9 @@ public class PaintManager {
 		return _isShowStartEndInMap;
 	}
 
-	public void setLegendProvider(final ILegendProvider legendProvider) {
-		if (legendProvider != null) {
-			_legendProvider = legendProvider;
+	public void setLegendProvider(final ILegendProvider iLegendProvider) {
+		if (iLegendProvider != null) {
+			_legendProvider = iLegendProvider;
 		}
 	}
 

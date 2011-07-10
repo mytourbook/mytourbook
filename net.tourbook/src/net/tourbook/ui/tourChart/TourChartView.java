@@ -137,6 +137,16 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 						_tourChart.updateTourChart(_tourData, _tourChartConfig, false);
 					}
 
+				} else if (property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)) {
+
+					/*
+					 * HR zone colors can be modified and person hash code has changed by saving the
+					 * person entity -> tour chart must be recreated
+					 */
+
+					clearView();
+					showTour();
+
 				} else if (property.equals(ITourbookPreferences.GRAPH_MOUSE_MODE)) {
 
 					_tourChart.setMouseMode(event.getNewValue());
@@ -273,11 +283,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 		// set this view part as selection provider
 		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider());
 
-		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
-
-		if (_tourData == null) {
-			showTourFromTourProvider();
-		}
+		showTour();
 	}
 
 	private void createUI(final Composite parent) {
@@ -487,6 +493,14 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 		_postSelectionProvider.setSelection(new SelectionTourData(_tourChart, _tourData));
 
 		fireSliderPosition();
+	}
+
+	private void showTour() {
+		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
+
+		if (_tourData == null) {
+			showTourFromTourProvider();
+		}
 	}
 
 	private void showTourFromTourProvider() {

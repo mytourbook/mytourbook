@@ -101,6 +101,8 @@ public class TCActionHandlerManager {
 		_actionHandlers.put(TourChart.COMMAND_ID_CHART_OPTIONS, new ActionHandlerChartOptions());
 		_actionHandlers.put(TourChart.COMMAND_ID_SHOW_START_TIME, new ActionHandlerShowStartTime());
 		_actionHandlers.put(TourChart.COMMAND_ID_SHOW_SRTM_DATA, new ActionHandlerShowSRTMData());
+		_actionHandlers.put(TourChart.COMMAND_ID_SHOW_TOUR_MARKER, new ActionHandlerShowTourMarker());
+		_actionHandlers.put(TourChart.COMMAND_ID_EDIT_CHART_PREFERENCES, new ActionHandlerEditCharPreferences());
 		_actionHandlers.put(TourChart.COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER, new ActionHandlerCanAutoZoomToSlider());
 		_actionHandlers.put(
 				TourChart.COMMAND_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED,

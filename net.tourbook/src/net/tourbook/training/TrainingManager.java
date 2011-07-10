@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import net.tourbook.Messages;
+import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourPersonHRZone;
 
@@ -178,5 +179,37 @@ public class TrainingManager {
 		}
 
 		return hrZones;
+	}
+
+	/**
+	 * @param tourData
+	 * @param currentPerson
+	 * @return Returns <code>true</code> when HR zones are available for the
+	 */
+	public static boolean isHrZoneDataAvailable(final TourData tourData) {
+
+		// check tour
+		final boolean isTourData = tourData != null;
+		if (isTourData) {
+
+			// check pulse
+			final int[] pulseSerie = tourData.pulseSerie;
+			final boolean isPulse = pulseSerie != null && pulseSerie.length > 0;
+			if (isPulse) {
+
+				// check person
+				final TourPerson tourPerson = tourData.getTourPerson();
+				if (tourPerson != null) {
+
+					// check hr zones
+					final Set<TourPersonHRZone> personHrZones = tourPerson.getHrZones();
+					final boolean isHrZones = personHrZones != null && personHrZones.size() > 0;
+
+					return isHrZones;
+				}
+			}
+		}
+
+		return false;
 	}
 }

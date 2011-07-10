@@ -373,6 +373,8 @@ public class TourManager {
 		chartConfig.isShowStartTime = _prefStore.getBoolean(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME);
 		chartConfig.isSRTMDataVisible = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SRTM_VISIBLE);
 
+		chartConfig.isShowTourMarker = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_MARKER_VISIBLE);
+
 		updateZoomOptionsInChartConfig(chartConfig, _prefStore);
 
 		return chartConfig;

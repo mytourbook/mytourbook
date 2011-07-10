@@ -13,22 +13,31 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
+package net.tourbook.ui.tourChart.action;
 
-package net.tourbook.mapping;
+import net.tourbook.preferences.PrefPageAppearanceTourChart;
+import net.tourbook.ui.tourChart.TourChart;
 
-public interface ILegendProvider {
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 
-	/**
-	 * @param graphValue
-	 * @param device
-	 *            Device for which the color is created
-	 * @return Returns the RGB value for a graph value.
-	 */
-	public abstract int getColorValue(int graphValue);
+public class ActionHandlerEditCharPreferences extends TCActionHandler {
 
-	/**
-	 * @return Returns an id to identify the {@link ILegendProvider}
-	 */
-	public abstract int getTourColorId();
+	public ActionHandlerEditCharPreferences() {
+		commandId = TourChart.COMMAND_ID_EDIT_CHART_PREFERENCES;
+	}
+
+	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {
+
+		PreferencesUtil.createPreferenceDialogOn(//
+				Display.getCurrent().getActiveShell(),
+				PrefPageAppearanceTourChart.ID,
+				null,
+				null).open();
+
+		return null;
+	}
 
 }
