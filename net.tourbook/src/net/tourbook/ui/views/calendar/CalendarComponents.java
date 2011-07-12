@@ -41,7 +41,7 @@ public class CalendarComponents extends Composite {
 //		gd = new GridData(SWT.FILL, SWT.TOP, true, false);
 //		label.setLayoutData(gd);
 
-		_calGraph = new CalendarGraph(parent, this, SWT.NONE);
+		_calGraph = new CalendarGraph(parent, this, SWT.NO_BACKGROUND);
 		gd = new GridData(SWT.FILL, SWT.FILL, true, true);
 		_calGraph.setLayoutData(gd);
 

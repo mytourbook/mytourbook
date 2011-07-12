@@ -6,7 +6,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.joda.time.DateTime;
 
 public class CalendarForm extends ViewForm {
 
@@ -34,16 +33,8 @@ public class CalendarForm extends ViewForm {
 
 	}
 
-	public void back() {
-		_calendarComponents.getGraph().back();
-	}
-
-	public void forward() {
-		_calendarComponents.getGraph().forward();
-	}
-
-	public void setDate(final DateTime date) {
-		_calendarComponents.getGraph().setDate(date);
+	public CalendarComponents getComponents() {
+		return _calendarComponents;
 	}
 
 }

@@ -1,33 +1,34 @@
 package net.tourbook.ui.views.calendar;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+
 
 public class CalendarTourData {
 
-	long[]							tourIds;
-	long[]							typeIds;
+	long	tourId;
+	long	typeId;
 
-	int[]							typeColorIndex;
+	int		typeColorIndex;
 
-	int[]							tourYearValues;
-	int[]							tourMonthValues;
-	int[]							weekValues;
+	int				year;
+	int				month;
+	int				day;
+	int				week;
+	int				dayOfWeek;
 
-	int[]							tourTimeStartValues;
-	int[]							tourTimeEndValues;
+	int				startTime;
+	int				endTime;
 
-	int[]							tourAltitudeValues;
-	int[]							tourDistanceValues;
+	int				altitude;
+	int				distance;
 
-	ArrayList<Integer>				tourRecordingTimeValues;
-	ArrayList<Integer>				tourDrivingTimeValues;
+	int				recordingTime;
+	int				drivingTime;
 
-	ArrayList<String>				tourTitle;
-	ArrayList<String>				tourDescription;
+	String			tourTitle;
+	String			tourDescription;
 
-	/**
-	 * hashmap contains the tags for the tour where the key is the tour ID
-	 */
-	HashMap<Long, ArrayList<Long>>	tagIds;
+
+	ArrayList<Long>	tagIds;
+
 }
