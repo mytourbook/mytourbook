@@ -26,8 +26,8 @@ import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartToolTipInfo;
-import net.tourbook.chart.Util;
 import net.tourbook.chart.IChartInfoProvider;
+import net.tourbook.chart.Util;
 import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
@@ -702,9 +702,11 @@ public class StatisticTourNumbers extends YearStatistic {
 
 		// set grid size
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-		statAltitudeChart.setGridDistance(
+		statAltitudeChart.setGrid(
 				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
-				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
+				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE),
+				prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
+				prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
 
 		// show the new data in the chart
 		statAltitudeChart.updateChart(chartDataModel, true);
@@ -762,9 +764,11 @@ public class StatisticTourNumbers extends YearStatistic {
 
 		// set grid size
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-		statDistanceChart.setGridDistance(
+		statDistanceChart.setGrid(
 				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
-				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
+				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE),
+				prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
+				prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
 
 		// show the new data fDataModel in the chart
 		statDistanceChart.updateChart(chartDataModel, true);
@@ -873,9 +877,11 @@ public class StatisticTourNumbers extends YearStatistic {
 
 		// set grid size
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-		statDurationChart.setGridDistance(
+		statDurationChart.setGrid(
 				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
-				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
+				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE),
+				prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
+				prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
 
 		// show the new data data model in the chart
 		statDurationChart.updateChart(chartDataModel, true);

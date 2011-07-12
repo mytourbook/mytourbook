@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -98,6 +98,9 @@ public class Messages extends NLS {
 	public static String		Action_Tag_Add_RecentTags;
 	public static String		Action_Tag_AutoOpenCancel;
 	public static String		Action_Tag_AutoOpenOK;
+
+	public static String	Action_TourChart_EditChartPreferences;
+
 	public static String		Action_TourType_ModifyTourTypeFilter;
 
 	public static String		Adjust_Altitude_CreateDummyAltitudeData_Message;
@@ -455,15 +458,24 @@ public class Messages extends NLS {
 	public static String		Graph_Label_Altitude;
 	public static String		Graph_Label_Cadence;
 	public static String		Graph_Label_Cadence_unit;
+
+	public static String	Graph_Label_DrawSkippedValues_Tooltip;
 	public static String		Graph_Label_Gradiend_unit;
 	public static String		Graph_Label_Gradient;
 	public static String		Graph_Label_Heartbeat;
 	public static String		Graph_Label_Heartbeat_unit;
-	public static String		Graph_Label_HrZone;
 	public static String		Graph_Label_HrZone_Tooltip;
 	public static String		Graph_Label_Pace;
 	public static String		Graph_Label_Power;
 	public static String		Graph_Label_Power_unit;
+	public static String	Graph_Label_ShowBreaktimeValues;
+
+	public static String	Graph_Label_ShowBreaktimeValues_Tooltip;
+
+	public static String	Graph_Label_ShowHrZoneBackground;
+
+	public static String	Graph_Label_ShowHrZoneBackground_Tooltip;
+
 	public static String		Graph_Label_Speed;
 	public static String		Graph_Label_Temperature;
 	public static String		Graph_Label_Tour_Compare;
@@ -736,6 +748,8 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_grid_distance;
 	public static String		Pref_Graphs_grid_horizontal_distance;
 	public static String		Pref_Graphs_grid_vertical_distance;
+	public static String	Pref_Graphs_Group_GraphOptions;
+
 	public static String	Pref_Graphs_Group_Grid;
 
 	public static String		Pref_Graphs_Group_mouse_mode;
@@ -750,6 +764,8 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Radio_show_time;
 	public static String		Pref_Graphs_Tab_default_values;
 	public static String		Pref_Graphs_Tab_graph_defaults;
+
+	public static String	Pref_Graphs_Tab_Grid;
 	public static String		Pref_Graphs_Tab_zoom_options;
 	public static String		Pref_Graphs_Text_max_value;
 	public static String		Pref_Graphs_Text_min_value;
@@ -945,6 +961,8 @@ public class Messages extends NLS {
 	public static String		Tour_Action_auto_move_sliders_when_zoomed;
 	public static String		Tour_Action_auto_zoom_to_slider_position;
 	public static String		Tour_Action_chart_options_tooltip;
+
+	public static String	Tour_Action_EditChartPreferences;
 	public static String		Tour_Action_graph_altimeter_tooltip;
 	public static String		Tour_Action_graph_altitude_tooltip;
 	public static String		Tour_Action_graph_analyzer_tooltip;
@@ -964,6 +982,8 @@ public class Messages extends NLS {
 	public static String		Tour_Action_show_time_on_x_axis_tooltip;
 
 	public static String		Tour_Action_ShowHrZones_Tooltip;
+
+	public static String	Tour_Action_ShowTourMarker;
 
 	public static String		Tour_Book_Action_delete_selected_tours;
 	public static String		Tour_Book_Action_delete_selected_tours_dlg_message;

@@ -461,8 +461,11 @@ public abstract class StatisticWeek extends YearStatistic {
 
 		// set grid size
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-		_chart.setGridDistance(prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE), prefStore
-				.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
+		_chart.setGrid(
+				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
+				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE),
+				prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
+				prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
 
 		_chart.updateChart(chartDataModel, true);
 	}

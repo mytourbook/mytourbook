@@ -34,9 +34,9 @@ public class TourChartConfiguration {
 	 * <p>
 	 * false: show distance on the x-axis
 	 */
-	public boolean					isShowTimeOnXAxis		= false;
+	public boolean					isShowTimeOnXAxis			= false;
 
-	public boolean					isShowTimeOnXAxisBackup	= false;
+	public boolean					isShowTimeOnXAxisBackup		= false;
 
 	/**
 	 * is <code>true</code> when the distance is not available and the time must be displayed on the
@@ -49,13 +49,13 @@ public class TourChartConfiguration {
 	 * <p>
 	 * false: show the tour time which starts at 0
 	 */
-	public boolean					isShowStartTime			= false;
+	public boolean					isShowStartTime				= false;
 
 	/**
 	 * contains a list for all graphs which are displayed, the sequence of the list is the sequence
 	 * in which the graphs will be displayed
 	 */
-	private ArrayList<Integer>		_visibleGraphSequence	= new ArrayList<Integer>();
+	private ArrayList<Integer>		_visibleGraphSequence		= new ArrayList<Integer>();
 
 	/**
 	 * contains the min/max keeper or <code>null</code> when min/max is not kept
@@ -65,18 +65,18 @@ public class TourChartConfiguration {
 	/**
 	 * when <code>true</code> the sliders are moved when the chart is zoomed
 	 */
-	public boolean					moveSlidersWhenZoomed	= false;
+	public boolean					moveSlidersWhenZoomed		= false;
 
 	/**
 	 * the graph is automatically zoomed to the slider position when the slider is moved
 	 */
-	public boolean					autoZoomToSlider		= false;
+	public boolean					autoZoomToSlider			= false;
 
 	/**
 	 * when <code>true</code> the action button is displayed to show/hide the tour compare result
 	 * graph
 	 */
-	public boolean					canShowTourCompareGraph	= false;
+	public boolean					canShowTourCompareGraph		= false;
 
 	/**
 	 * is <code>true</code> when the altitude diff scaling in the merge layer is relative
@@ -86,7 +86,7 @@ public class TourChartConfiguration {
 	/**
 	 * when <code>true</code> the SRTM data are visible in the altitude graph
 	 */
-	public boolean					isSRTMDataVisible		= false;
+	public boolean					isSRTMDataVisible			= false;
 
 	/**
 	 * when <code>true</code> the SRTM data are visible in the altitude graph
@@ -96,13 +96,24 @@ public class TourChartConfiguration {
 	/**
 	 * Is <code>true</code> when HR zones are currently displayed in the chart
 	 */
-	public boolean					isHrZoneDisplayed		= false;
+	public boolean					isHrZoneDisplayed			= false;
 
 	/**
 	 * Is <code>true</code> when HR zones can be displayed, which requires that pulse values are
 	 * available and the person has defined HR zones.
 	 */
-	public boolean					canShowHrZones		= false;
+	public boolean					canShowHrZones				= false;
+
+	/**
+	 * Is <code>true</code> when tour markers are displayed.
+	 */
+	public Boolean					isShowTourMarker			= true;
+
+	/**
+	 * Is <code>true</code> when graph values are displayed when they are recorded when a break time
+	 * is detected.
+	 */
+	public boolean					isBreaktimeValuesDisplayed	= true;
 
 	/**
 	 * @param keepMinMaxValues

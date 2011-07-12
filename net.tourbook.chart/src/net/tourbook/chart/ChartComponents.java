@@ -280,6 +280,7 @@ public class ChartComponents extends Composite {
 
 		chartDrawingData.chartDataModel = _chartDataModel;
 
+
 		final ArrayList<ChartDataYSerie> yDataList = _chartDataModel.getYData();
 		final ChartDataXSerie xData = _chartDataModel.getXData();
 		final ChartDataXSerie xData2nd = _chartDataModel.getXData2nd();

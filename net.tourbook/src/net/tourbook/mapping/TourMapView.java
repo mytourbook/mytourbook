@@ -39,6 +39,7 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourInfoToolTipProvider;
 import net.tourbook.tour.TourManager;
+import net.tourbook.training.TrainingManager;
 import net.tourbook.ui.MTRectangle;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
@@ -101,7 +102,6 @@ import de.byteholder.gpx.PointOfInterest;
  */
 public class TourMapView extends ViewPart implements IMapContextProvider {
 
-
 	public static final String						ID									= "net.tourbook.mapping.mappingViewID";	//$NON-NLS-1$
 
 	private static final int						DEFAULT_LEGEND_WIDTH				= 150;
@@ -117,6 +117,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	public static final int							TOUR_COLOR_PULSE					= 30;
 	public static final int							TOUR_COLOR_SPEED					= 40;
 	public static final int							TOUR_COLOR_PACE						= 50;
+	public static final int							TOUR_COLOR_HR_ZONE					= 60;
 
 	private static final String						MEMENTO_SHOW_START_END_IN_MAP		= "action.show-start-end-in-map";			//$NON-NLS-1$
 	private static final String						MEMENTO_SHOW_TOUR_MARKER			= "action.show-tour-marker";				//$NON-NLS-1$
@@ -131,7 +132,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	private static final String						MEMENTO_SYNCH_WITH_TOURCHART_SLIDER	= "action.synch-with-tourchart-slider";	//$NON-NLS-1$
 	private static final String						MEMENTO_ZOOM_CENTERED				= "action.zoom-centered";					//$NON-NLS-1$
 	private static final String						MEMENTO_MAP_DIM_LEVEL				= "action.map-dim-level";					//$NON-NLS-1$
- 
+
 	private static final String						MEMENTO_SYNCH_TOUR_ZOOM_LEVEL		= "synch-tour-zoom-level";					//$NON-NLS-1$
 	private static final String						MEMENTO_SELECTED_MAP_PROVIDER_ID	= "selected.map-provider-id";				//$NON-NLS-1$
 
@@ -211,13 +212,21 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 	private int										_selectedProfileKey					= 0;
 
-	private final PaintManager						_paintMgr							= PaintManager.getInstance();
 	private final MapInfoManager					_mapInfoManager						= MapInfoManager.getInstance();
+	private final TourPainterConfiguration			_tourPainterConfig					= TourPainterConfiguration
+																								.getInstance();
 
 	/*
 	 * UI controls
 	 */
 	private Map										_map;
+
+	private ActionTourColor							_actionTourColorAltitude;
+	private ActionTourColor							_actionTourColorGradient;
+	private ActionTourColor							_actionTourColorPulse;
+	private ActionTourColor							_actionTourColorSpeed;
+	private ActionTourColor							_actionTourColorPace;
+	private ActionTourColor							_actionTourColorHrZone;
 
 	private ActionDimMap							_actionDimMap;
 	private ActionManageMapProviders				_actionManageProvider;
@@ -238,11 +247,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	private ActionSynchWithTour						_actionSynchWithTour;
 	private ActionSynchWithSlider					_actionSynchWithSlider;
 	private ActionSynchTourZoomLevel				_actionSynchTourZoomLevel;
-	private ActionTourColor							_actionTourColorAltitude;
-	private ActionTourColor							_actionTourColorGradient;
-	private ActionTourColor							_actionTourColorPulse;
-	private ActionTourColor							_actionTourColorSpeed;
-	private ActionTourColor							_actionTourColorPace;
+
 	private ActionZoomIn							_actionZoomIn;
 	private ActionZoomOut							_actionZoomOut;
 	private ActionZoomCentered						_actionZoomCentered;
@@ -345,7 +350,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 	void actionSetShowStartEndInMap() {
 
-		_paintMgr.setShowStartEnd(_actionShowStartEndInMap.isChecked());
+		_tourPainterConfig.isShowStartEndInMap = _actionShowStartEndInMap.isChecked();
 
 		_map.disposeOverlayImageCache();
 		_map.queueMapRedraw();
@@ -365,12 +370,12 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	}
 
 	void actionSetShowTourInMap() {
-		paintAllTours();
+		paintTours10All();
 	}
 
 	void actionSetShowTourMarkerInMap() {
 
-		_paintMgr._isShowTourMarker = _actionShowTourMarker.isChecked();
+		_tourPainterConfig.isShowTourMarker = _actionShowTourMarker.isChecked();
 
 		_map.disposeOverlayImageCache();
 		_map.queueMapRedraw();
@@ -385,7 +390,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 			_tourToolTip.removeToolTipProvider(_wayPointToolTipProvider);
 		}
 
-		_paintMgr._isShowWayPoints = isShowWayPoints;
+		_tourPainterConfig.isShowWayPoints = isShowWayPoints;
 
 		_map.disposeOverlayImageCache();
 		_map.queueMapRedraw();
@@ -395,7 +400,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 		final ILegendProvider legendProvider = getLegendProvider(colorId);
 
-		_paintMgr.setLegendProvider(legendProvider);
+		_tourPainterConfig.setLegendProvider(legendProvider);
 
 		_map.disposeOverlayImageCache();
 		_map.queueMapRedraw();
@@ -446,7 +451,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 			final TourData firstTourData = _tourDataList.get(0);
 
-			paintOneTour(firstTourData, false, true);
+			paintTours20One(firstTourData, false, true);
 			setMapToSliderBounds(firstTourData);
 		}
 	}
@@ -464,7 +469,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 			_actionShowTourInMap.setChecked(true);
 			_map.setShowOverlays(true);
 
-			paintOneTour(_tourDataList.get(0), true, true);
+			paintTours20One(_tourDataList.get(0), true, true);
 
 		} else {
 
@@ -658,7 +663,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 					// update tour and legend
 
-					createLegendImage(_paintMgr.getLegendProvider());
+					createLegendImage(_tourPainterConfig.getLegendProvider());
 
 					_map.disposeOverlayImageCache();
 					_map.queueMapRedraw();
@@ -697,7 +702,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 					UI.updateUnits();
 
-					createLegendImage(_paintMgr.getLegendProvider());
+					createLegendImage(_tourPainterConfig.getLegendProvider());
 
 					_map.queueMapRedraw();
 				}
@@ -757,7 +762,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 			Set<GeoPosition> positionBounds = null;
 			if (_isTour) {
-				positionBounds = _paintMgr.getTourBounds();
+				positionBounds = _tourPainterConfig.getTourBounds();
 				if (positionBounds == null) {
 					return;
 				}
@@ -787,7 +792,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		_tourDataList.clear();
 		_previousTourData = null;
 
-		_paintMgr.setTourData(new ArrayList<TourData>());
+		_tourPainterConfig.setTourData(new ArrayList<TourData>());
 
 		_tourInfoToolTipProvider.setTourData(null);
 
@@ -831,11 +836,12 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 				Messages.image_action_tour_color_pace,
 				Messages.image_action_tour_color_pace_disabled);
 
-//		_actionTourColorTourType = new ActionTourColor(this,
-//				TOUR_COLOR_TOURTYPE,
-//				Messages.map_action_tour_color_tourType_tooltip,
-//				Messages.image_action_tour_color_tourType,
-//				Messages.image_action_tour_color_tourType_disabled);
+		_actionTourColorHrZone = new ActionTourColor(
+				this,
+				TOUR_COLOR_HR_ZONE,
+				Messages.Tour_Action_ShowHrZones_Tooltip,
+				Messages.Image__PulseZones,
+				Messages.Image__PulseZones_Disabled);
 
 		_actionZoomIn = new ActionZoomIn(this);
 		_actionZoomOut = new ActionZoomOut(this);
@@ -872,6 +878,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		viewTbm.add(_actionTourColorSpeed);
 		viewTbm.add(_actionTourColorPace);
 		viewTbm.add(_actionTourColorGradient);
+		viewTbm.add(_actionTourColorHrZone);
 		viewTbm.add(new Separator());
 
 		viewTbm.add(_actionShowTourInMap);
@@ -898,7 +905,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	}
 
 	/**
-	 * Creates a new legend image and disposes the old image
+	 * Creates a new legend image and disposes the old image.
 	 * 
 	 * @param legendProvider
 	 */
@@ -924,7 +931,10 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 		final RGB rgbTransparent = new RGB(0xfe, 0xfe, 0xfe);
 
-		final ImageData overlayImageData = new ImageData(legendWidth, legendHeight, 24, //
+		final ImageData overlayImageData = new ImageData(//
+				legendWidth,
+				legendHeight,
+				24,
 				new PaletteData(0xff, 0xff00, 0xff0000));
 
 		overlayImageData.transparentPixel = overlayImageData.palette.getPixel(rgbTransparent);
@@ -933,7 +943,19 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		legendImage = new Image(display, overlayImageData);
 		final Rectangle legendImageBounds = legendImage.getBounds();
 
-		final boolean isDataAvailable = updateLegendValues(legendProvider, legendImageBounds);
+		boolean isDataAvailable = false;
+		if (legendProvider instanceof ILegendProviderGradientColors) {
+
+			isDataAvailable = createLegendImage10SetProviderValues(//
+					(ILegendProviderGradientColors) legendProvider,
+					legendImageBounds);
+
+		} else if (legendProvider instanceof ILegendProviderDiscreteColors) {
+
+			isDataAvailable = createLegendImage20SetProviderValues(
+					(ILegendProviderDiscreteColors) legendProvider,
+					legendImageBounds);
+		}
 
 		final Color transparentColor = new Color(display, rgbTransparent);
 		final GC gc = new GC(legendImage);
@@ -942,7 +964,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 			gc.fillRectangle(legendImageBounds);
 
 			if (isDataAvailable) {
-				TourPainter.drawLegendColors(gc, legendImageBounds, legendProvider, true);
+				TourPainter.drawLegend(gc, legendImageBounds, legendProvider, true);
 			}
 		}
 		gc.dispose();
@@ -951,1299 +973,17 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		_mapLegend.setImage(legendImage);
 	}
 
-	private void createLegendProviders() {
-
-		_legendProviders.put(//
-				TourMapView.TOUR_COLOR_PULSE, //
-				new LegendProvider(new LegendConfig(), new LegendColor(), TourMapView.TOUR_COLOR_PULSE));
-
-		_legendProviders.put(//
-				TourMapView.TOUR_COLOR_ALTITUDE, //
-				new LegendProvider(new LegendConfig(), new LegendColor(), TourMapView.TOUR_COLOR_ALTITUDE));
-
-		_legendProviders.put(//
-				TourMapView.TOUR_COLOR_SPEED, //
-				new LegendProvider(new LegendConfig(), new LegendColor(), TourMapView.TOUR_COLOR_SPEED));
-
-		_legendProviders.put(//
-				TourMapView.TOUR_COLOR_PACE, //
-				new LegendProvider(new LegendConfig(), new LegendColor(), TourMapView.TOUR_COLOR_PACE));
-
-		_legendProviders.put(//
-				TourMapView.TOUR_COLOR_GRADIENT, //
-				new LegendProvider(new LegendConfig(), new LegendColor(), TourMapView.TOUR_COLOR_GRADIENT));
-
-//		fLegendProviders.put(//
-//				TourMapView.TOUR_COLOR_TOURTYPE, //
-//				new LegendProvider(new LegendConfig(), new LegendColor(), TourMapView.TOUR_COLOR_TOURTYPE));
-	}
-
-	@Override
-	public void createPartControl(final Composite parent) {
-
-		_mapLegend = new MapLegend();
-
-		_map = new Map(parent, SWT.NONE);
-		_map.setQueueMapRedraw(false);
-
-		_map.setDirectPainter(_directMappingPainter);
-//		_map.setLiveView(true);
-
-		_map.setLegend(_mapLegend);
-		_map.setShowLegend(true);
-		_map.setMeasurementSystem(UI.UNIT_VALUE_DISTANCE, UI.UNIT_LABEL_DISTANCE);
-
-		final String tourPaintMethod = _prefStore.getString(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD);
-		_map.setTourPaintMethodEnhanced(tourPaintMethod.equals(PrefPageAppearanceMap.TOUR_PAINT_METHOD_COMPLEX));
-
-		// setup tool tip's
-		_map.setTourToolTip(_tourToolTip = new TourToolTip(_map));
-		_tourInfoToolTipProvider.setActionsEnabled(true);
-
-		_map.addControlListener(new ControlAdapter() {
-			@Override
-			public void controlResized(final ControlEvent e) {
-
-				/*
-				 * check if the legend size must be adjusted
-				 */
-				final Image legendImage = _mapLegend.getImage();
-				if ((legendImage == null) || legendImage.isDisposed()) {
-					return;
-				}
-
-				final boolean showTour = _actionShowTourInMap.isChecked();
-				final boolean showLegend = _actionShowLegendInMap.isChecked();
-				if ((_isTour == false) || (showTour == false) || (showLegend == false)) {
-					return;
-				}
-
-				/*
-				 * check height
-				 */
-				final Rectangle mapBounds = _map.getBounds();
-				final Rectangle legendBounds = legendImage.getBounds();
-
-				if ((mapBounds.height < DEFAULT_LEGEND_HEIGHT + LEGEND_TOP_MARGIN)
-						|| ((mapBounds.height > DEFAULT_LEGEND_HEIGHT + LEGEND_TOP_MARGIN) //
-						&& (legendBounds.height < DEFAULT_LEGEND_HEIGHT)) //
-				) {
-
-					createLegendImage(_paintMgr.getLegendProvider());
-				}
-			}
-		});
-
-		createActions();
-		createLegendProviders();
-
-		enableActions();
-
-		addPartListener();
-		addPrefListener();
-		addSelectionListener();
-		addTourEventListener();
-		addTourbookPrefListener();
-		addMapListener();
-
-		// register overlays which draw the tour
-		GeoclipseExtensions.registerOverlays(_map);
-
-		// initialize map when part is created and the map size is > 0
-		Display.getCurrent().asyncExec(new Runnable() {
-			@Override
-			public void run() {
-
-				restoreState();
-
-				if (_tourDataList.size() == 0) {
-					// a tour is not displayed, find a tour provider which provides a tour
-					showToursFromTourProvider();
-				} else {
-					_map.queueMapRedraw();
-				}
-
-				/*
-				 * enable map drawing, this is done very late to disable flickering which is caused
-				 * by setting up the map
-				 */
-				_map.setQueueMapRedraw(true);
-
-				if (_mapDimLevel < 30) {
-					showDimWarning();
-				}
-			}
-		});
-	}
-
-	@Override
-	public void dispose() {
-
-		_tourDataList.clear();
-
-		// dispose tilefactory resources
-
-		final ArrayList<MP> allMapProviders = MapProviderManager.getInstance().getAllMapProviders(true);
-		for (final MP mp : allMapProviders) {
-			mp.disposeAllImages();
-		}
-
-		_map.disposeOverlayImageCache();
-
-		getViewSite().getPage().removePostSelectionListener(_postSelectionListener);
-		getViewSite().getPage().removePartListener(_partListener);
-
-		TourManager.getInstance().removeTourEventListener(_tourEventListener);
-
-		_prefStore.removePropertyChangeListener(_prefChangeListener);
-		_prefStore.removePropertyChangeListener(_tourbookPrefChangeListener);
-		_prefStore.removePropertyChangeListener(_mapPrefChangeListener);
-
-		super.dispose();
-	}
-
-	private void enableActions() {
-		enableActions(false);
-	}
-
-	private void enableActions(final boolean isForceTourColor) {
-
-		final boolean isLegendVisible = _actionShowLegendInMap.isChecked();
-
-		_actionShowPOI.setEnabled(_poiPosition != null);
-
-		// update legend action
-		if (_isTour) {
-
-			_map.setShowLegend(isLegendVisible);
-
-			if (isLegendVisible == false) {
-				_actionShowSliderInLegend.setChecked(false);
-			}
-		}
-
-		final boolean isMultipleTours = _tourDataList.size() > 1;
-		final boolean isOneTour = _isTour && (isMultipleTours == false);
-
-		/*
-		 * enable/disable tour actions
-		 */
-		_actionZoomShowEntireTour.setEnabled(isOneTour);
-		_actionSynchTourZoomLevel.setEnabled(isOneTour);
-		_actionShowTourInMap.setEnabled(_isTour);
-		_actionSynchWithTour.setEnabled(isOneTour);
-		_actionSynchWithSlider.setEnabled(isOneTour);
-
-		_actionShowStartEndInMap.setEnabled(isOneTour);
-		_actionShowTourMarker.setEnabled(_isTour);
-		_actionShowWayPoints.setEnabled(_isTour);
-		_actionShowLegendInMap.setEnabled(_isTour);
-		_actionShowSliderInMap.setEnabled(_isTour);
-		_actionShowSliderInLegend.setEnabled(_isTour && isLegendVisible);
-		_actionShowTourInfoInMap.setEnabled(isOneTour);
-
-		if (_tourDataList.size() == 0) {
-
-			_actionTourColorAltitude.setEnabled(false);
-			_actionTourColorGradient.setEnabled(false);
-			_actionTourColorPulse.setEnabled(false);
-			_actionTourColorSpeed.setEnabled(false);
-			_actionTourColorPace.setEnabled(false);
-//			_actionTourColorTourType.setEnabled(false);
-
-		} else if (isForceTourColor) {
-
-			_actionTourColorAltitude.setEnabled(true);
-			_actionTourColorGradient.setEnabled(true);
-			_actionTourColorPulse.setEnabled(true);
-			_actionTourColorSpeed.setEnabled(true);
-			_actionTourColorPace.setEnabled(true);
-//			_actionTourColorTourType.setEnabled(true);
-
-		} else if (isOneTour) {
-
-			final TourData oneTourData = _tourDataList.get(0);
-			_actionTourColorAltitude.setEnabled(true);
-			_actionTourColorGradient.setEnabled(oneTourData.getGradientSerie() != null);
-			_actionTourColorPulse.setEnabled(oneTourData.pulseSerie != null);
-			_actionTourColorSpeed.setEnabled(oneTourData.getSpeedSerie() != null);
-			_actionTourColorPace.setEnabled(oneTourData.getPaceSerie() != null);
-//			_actionTourColorTourType.setEnabled(true);
-
-		} else {
-
-			_actionTourColorAltitude.setEnabled(false);
-			_actionTourColorGradient.setEnabled(false);
-			_actionTourColorPulse.setEnabled(false);
-			_actionTourColorSpeed.setEnabled(false);
-			_actionTourColorPace.setEnabled(false);
-//			_actionTourColorTourType.setEnabled(false);
-		}
-	}
-
-	@Override
-	public void fillContextMenu(final IMenuManager menuMgr) {
-		fillMapMenu(menuMgr);
-	}
-
-	private void fillMapMenu(final IMenuManager menuMgr) {
-
-		menuMgr.add(_actionShowLegendInMap);
-		menuMgr.add(_actionShowScaleInMap);
-		menuMgr.add(_actionShowSliderInMap);
-		menuMgr.add(_actionShowSliderInLegend);
-		menuMgr.add(new Separator());
-
-		menuMgr.add(_actionShowTourMarker);
-		menuMgr.add(_actionShowWayPoints);
-		menuMgr.add(_actionShowPOI);
-		menuMgr.add(_actionShowStartEndInMap);
-		menuMgr.add(_actionShowTourInfoInMap);
-		menuMgr.add(new Separator());
-
-		menuMgr.add(_actionSetDefaultPosition);
-		menuMgr.add(_actionSaveDefaultPosition);
-		menuMgr.add(new Separator());
-
-		menuMgr.add(_actionDimMap);
-		menuMgr.add(_actionSynchTourZoomLevel);
-		menuMgr.add(new Separator());
-
-		menuMgr.add(_actionManageProvider);
-		menuMgr.add(_actionReloadFailedMapImages);
-	}
-
-	private ILegendProvider getLegendProvider(final int colorId) {
-		return _legendProviders.get(colorId);
-	}
-
-	public Map getMap() {
-		return _map;
-	}
-
-	public int getMapDimLevel() {
-		return _mapDimLevel;
-	}
-
-	private Rectangle getPositionRect(final Set<GeoPosition> positions, final int zoom) {
-
-		final MP mp = _map.getMapProvider();
-		final Point point1 = mp.geoToPixel(positions.iterator().next(), zoom);
-		final MTRectangle mtRect = new MTRectangle(point1.x, point1.y, 0, 0);
-
-		for (final GeoPosition pos : positions) {
-			final Point point = mp.geoToPixel(pos, zoom);
-			mtRect.add(point.x, point.y);
-		}
-
-		return new Rectangle(mtRect.x, mtRect.y, mtRect.width, mtRect.height);
-	}
-
 	/**
-	 * Calculate the bounds for the tour in latitude and longitude values
-	 * 
-	 * @param tourData
-	 * @return
-	 */
-	private Set<GeoPosition> getTourBounds(final TourData tourData) {
-
-		final double[] latitudeSerie = tourData.latitudeSerie;
-		final double[] longitudeSerie = tourData.longitudeSerie;
-
-		if ((latitudeSerie == null) || (longitudeSerie == null)) {
-			return null;
-		}
-
-		/*
-		 * get min/max longitude/latitude
-		 */
-		double minLatitude = latitudeSerie[0];
-		double maxLatitude = latitudeSerie[0];
-		double minLongitude = longitudeSerie[0];
-		double maxLongitude = longitudeSerie[0];
-
-		for (int serieIndex = 0; serieIndex < latitudeSerie.length; serieIndex++) {
-			final double latitude = latitudeSerie[serieIndex];
-			final double longitude = longitudeSerie[serieIndex];
-
-//			minLatitude = Math.min(minLatitude, latitude);
-//			maxLatitude = Math.max(maxLatitude, latitude);
-//
-//			minLongitude = Math.min(minLongitude, longitude);
-//			maxLongitude = Math.max(maxLongitude, longitude);
-
-			minLatitude = latitude < minLatitude ? latitude : minLatitude;
-			maxLatitude = latitude > maxLatitude ? latitude : maxLatitude;
-
-			minLongitude = longitude < minLongitude ? longitude : minLongitude;
-			maxLongitude = longitude > maxLongitude ? longitude : maxLongitude;
-
-			if (minLatitude == 0) {
-				minLatitude = -180D;
-			}
-		}
-
-		final Set<GeoPosition> mapPositions = new HashSet<GeoPosition>();
-		mapPositions.add(new GeoPosition(minLatitude, minLongitude));
-		mapPositions.add(new GeoPosition(maxLatitude, maxLongitude));
-
-		return mapPositions;
-	}
-
-	/**
-	 * Checks if {@link TourData} can be painted
-	 * 
-	 * @param tourData
-	 * @return <code>true</code> when {@link TourData} contains a tour which can be painted in the
-	 *         map
-	 */
-	private boolean isPaintDataValid(final TourData tourData) {
-
-		if (tourData == null) {
-			return false;
-		}
-
-		// check if coordinates are available
-
-		final double[] longitudeSerie = tourData.longitudeSerie;
-		final double[] latitudeSerie = tourData.latitudeSerie;
-
-		if ((longitudeSerie == null)
-				|| (longitudeSerie.length == 0)
-				|| (latitudeSerie == null)
-				|| (latitudeSerie.length == 0)) {
-			return false;
-		}
-
-		return true;
-	}
-
-	private void onSelectionChanged(final ISelection selection) {
-
-		if (_isPartVisible == false) {
-
-			if (selection instanceof SelectionTourData
-					|| selection instanceof SelectionTourId
-					|| selection instanceof SelectionTourIds) {
-
-				// keep only selected tours
-				_selectionWhenHidden = selection;
-			}
-			return;
-		}
-
-		if (selection instanceof SelectionTourData) {
-
-			final SelectionTourData selectionTourData = (SelectionTourData) selection;
-			final TourData tourData = selectionTourData.getTourData();
-
-			paintOneTour(tourData, selectionTourData.isForceRedraw(), true);
-
-			enableActions();
-
-		} else if (selection instanceof SelectionTourId) {
-
-			final SelectionTourId tourIdSelection = (SelectionTourId) selection;
-			final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
-
-			paintOneTour(tourData, false, true);
-
-			enableActions();
-
-		} else if (selection instanceof SelectionTourIds) {
-
-			// paint all selected tours
-
-			final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
-			if (tourIds.size() == 0) {
-				return;
-			}
-
-			paintTours(tourIds);
-
-			enableActions(true);
-
-		} else if (selection instanceof SelectionChartInfo) {
-
-			final ChartDataModel chartDataModel = ((SelectionChartInfo) selection).chartDataModel;
-			if (chartDataModel != null) {
-
-				final Object tourId = chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
-				if (tourId instanceof Long) {
-
-					TourData tourData = TourManager.getInstance().getTourData((Long) tourId);
-					if (tourData == null) {
-
-						// tour is not in the database, try to get it from the raw data manager
-
-						final HashMap<Long, TourData> rawData = RawDataManager.getInstance().getImportedTours();
-						tourData = rawData.get(tourId);
-					}
-
-					if (tourData != null) {
-
-						final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
-
-						paintTourSliders(
-								tourData,
-								chartInfo.leftSliderValuesIndex,
-								chartInfo.rightSliderValuesIndex,
-								chartInfo.selectedSliderValuesIndex);
-
-						enableActions();
-					}
-				}
-			}
-
-		} else if (selection instanceof SelectionChartXSliderPosition) {
-
-			final SelectionChartXSliderPosition xSliderPos = (SelectionChartXSliderPosition) selection;
-			final Chart chart = xSliderPos.getChart();
-			if (chart == null) {
-				return;
-			}
-
-			final ChartDataModel chartDataModel = chart.getChartDataModel();
-
-			final Object tourId = chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
-			if (tourId instanceof Long) {
-
-				final TourData tourData = TourManager.getInstance().getTourData((Long) tourId);
-				if (tourData != null) {
-
-					final int leftSliderValueIndex = xSliderPos.getLeftSliderValueIndex();
-					int rightSliderValueIndex = xSliderPos.getRightSliderValueIndex();
-
-					rightSliderValueIndex = rightSliderValueIndex == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION
-							? leftSliderValueIndex
-							: rightSliderValueIndex;
-
-					paintTourSliders(tourData, leftSliderValueIndex, rightSliderValueIndex, leftSliderValueIndex);
-
-					enableActions();
-				}
-			}
-
-		} else if (selection instanceof SelectionMapPosition) {
-
-			final SelectionMapPosition mapPositionSelection = (SelectionMapPosition) selection;
-
-			final int valueIndex1 = mapPositionSelection.getSlider1ValueIndex();
-			int valueIndex2 = mapPositionSelection.getSlider2ValueIndex();
-
-			valueIndex2 = valueIndex2 == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION
-					? valueIndex1
-					: valueIndex2;
-
-			paintTourSliders(mapPositionSelection.getTourData(), valueIndex1, valueIndex2, valueIndex1);
-
-			enableActions();
-
-		} else if (selection instanceof PointOfInterest) {
-
-			_isTour = false;
-
-			clearView();
-
-			final PointOfInterest poi = (PointOfInterest) selection;
-
-			_poiPosition = poi.getPosition();
-			_poiName = poi.getName();
-
-			_poiZoomLevel = poi.getRecommendedZoom();
-			if (_poiZoomLevel == -1) {
-				_poiZoomLevel = _map.getZoom();
-			}
-
-			_map.setPoi(_poiPosition, _poiZoomLevel, _poiName);
-
-			_actionShowPOI.setChecked(true);
-
-			enableActions();
-
-		} else if (selection instanceof StructuredSelection) {
-
-			final Object firstElement = ((StructuredSelection) selection).getFirstElement();
-
-			if (firstElement instanceof TVICatalogComparedTour) {
-
-				final TVICatalogComparedTour comparedTour = (TVICatalogComparedTour) firstElement;
-				final long tourId = comparedTour.getTourId();
-
-				final TourData tourData = TourManager.getInstance().getTourData(tourId);
-				paintOneTour(tourData, false, true);
-
-			} else if (firstElement instanceof TVICompareResultComparedTour) {
-
-				final TVICompareResultComparedTour compareResultItem = (TVICompareResultComparedTour) firstElement;
-				final TourData tourData = TourManager.getInstance().getTourData(
-						compareResultItem.getComparedTourData().getTourId());
-				paintOneTour(tourData, false, true);
-
-			} else if (firstElement instanceof TourWayPoint) {
-
-				final TourWayPoint wp = (TourWayPoint) firstElement;
-
-				_map.setPOI(_wayPointToolTipProvider, wp);
-			}
-
-			enableActions();
-
-		} else if (selection instanceof SelectionTourCatalogView) {
-
-			// show reference tour
-
-			final SelectionTourCatalogView tourCatalogSelection = (SelectionTourCatalogView) selection;
-
-			final TVICatalogRefTourItem refItem = tourCatalogSelection.getRefItem();
-			if (refItem != null) {
-
-				final TourData tourData = TourManager.getInstance().getTourData(refItem.getTourId());
-
-				paintOneTour(tourData, false, true);
-
-				enableActions();
-			}
-		}
-
-	}
-
-	private void paintAllTours() {
-
-		if (_tourDataList.size() == 0) {
-			_tourInfoToolTipProvider.setTourData(null);
-			return;
-		}
-
-		// show/hide legend
-		_map.setShowLegend(_actionShowTourInMap.isChecked());
-
-		if (_tourDataList.size() > 1) {
-
-			// multiple tours are displayed
-
-			paintTours();
-			enableActions(true);
-
-		} else {
-			paintOneTour(_tourDataList.get(0), true, false);
-			enableActions();
-		}
-	}
-
-	private void paintEntireTour() {
-
-		if ((_tourDataList.size() == 0) || (isPaintDataValid(_tourDataList.get(0)) == false)) {
-			showDefaultMap();
-			return;
-		}
-
-		_paintMgr.setTourData(_tourDataList);
-		_tourInfoToolTipProvider.setTourDataList(_tourDataList);
-
-		final TourData firstTourData = _tourDataList.get(0);
-
-		// set slider position
-		_directMappingPainter.setPaintContext(
-				_map,
-				_actionShowTourInMap.isChecked(),
-				firstTourData,
-				_currentLeftSliderValueIndex,
-				_currentRightSliderValueIndex,
-				_actionShowSliderInMap.isChecked(),
-				_actionShowSliderInLegend.isChecked());
-
-		final Set<GeoPosition> tourBounds = getTourBounds(firstTourData);
-		_paintMgr.setTourBounds(tourBounds);
-
-		_map.setShowOverlays(_actionShowTourInMap.isChecked());
-
-		setTourZoomLevel(tourBounds, false);
-
-		_map.queueMapRedraw();
-	}
-
-	/**
-	 * Paint the currently selected tour in the map
-	 * 
-	 * @param tourData
-	 * @param forceRedraw
-	 * @param isSynchronized
-	 *            when <code>true</code>, map will be synchronized
-	 */
-	private void paintOneTour(final TourData tourData, final boolean forceRedraw, final boolean isSynchronized) {
-
-		if (isPaintDataValid(tourData) == false) {
-			showDefaultMap();
-			return;
-		}
-
-		_isTour = true;
-		final boolean isShowTour = _actionShowTourInMap.isChecked();
-
-		// prevent loading the same tour
-		if (forceRedraw == false) {
-
-			if ((_tourDataList.size() == 1) && (_tourDataList.get(0) == tourData)) {
-				return;
-			}
-		}
-
-		// force multiple tours to be repainted
-		_previousOverlayKey = -1;
-
-		// check if this is a new tour
-		boolean isNewTour = true;
-		if ((_previousTourData != null)
-				&& (_previousTourData.getTourId().longValue() == tourData.getTourId().longValue())) {
-			isNewTour = false;
-		}
-
-		_paintMgr.setTourData(tourData);
-
-		/*
-		 * set tour into tour data list, this is currently used to draw the legend, it's also used
-		 * to figure out if multiple tours are selected
-		 */
-		_tourDataList.clear();
-		_tourDataList.add(tourData);
-
-		_tourInfoToolTipProvider.setTourDataList(_tourDataList);
-
-		// set the paint context (slider position) for the direct mapping painter
-		_directMappingPainter.setPaintContext(
-				_map,
-				isShowTour,
-				tourData,
-				_currentLeftSliderValueIndex,
-				_currentRightSliderValueIndex,
-				_actionShowSliderInMap.isChecked(),
-				_actionShowSliderInLegend.isChecked());
-
-		// set the tour bounds
-		final Set<GeoPosition> tourBounds = getTourBounds(tourData);
-		_paintMgr.setTourBounds(tourBounds);
-
-		_map.setShowOverlays(isShowTour);
-		_map.setShowLegend(isShowTour && _actionShowLegendInMap.isChecked());
-
-		/*
-		 * set position and zoom level for the tour
-		 */
-		if (_isMapSynchedWithTour && isSynchronized) {
-
-			if (((forceRedraw == false) && (_previousTourData != null)) || (tourData == _previousTourData)) {
-
-				/*
-				 * keep map configuration for the previous tour
-				 */
-				_previousTourData.mapZoomLevel = _map.getZoom();
-
-				final GeoPosition centerPosition = _map.getGeoCenter();
-				_previousTourData.mapCenterPositionLatitude = centerPosition.latitude;
-				_previousTourData.mapCenterPositionLongitude = centerPosition.longitude;
-			}
-
-			if (tourData.mapCenterPositionLatitude == Double.MIN_VALUE) {
-
-				// use default position for the tour
-				setTourZoomLevel(tourBounds, true);
-
-			} else {
-
-				// position tour to the previous position
-				_map.setZoom(tourData.mapZoomLevel);
-				_map.setMapCenter(new GeoPosition(
-						tourData.mapCenterPositionLatitude,
-						tourData.mapCenterPositionLongitude));
-			}
-		}
-
-		// keep tour data
-		_previousTourData = tourData;
-
-		if (isNewTour || forceRedraw) {
-
-			// adjust legend values for the new or changed tour
-			createLegendImage(_paintMgr.getLegendProvider());
-
-			_map.setOverlayKey(tourData.getTourId().toString());
-			_map.disposeOverlayImageCache();
-
-		}
-
-		_map.queueMapRedraw();
-	}
-
-	/**
-	 * paints the tours which are set in {@link #_tourDataList}
-	 */
-	private void paintTours() {
-
-		_isTour = true;
-
-		// force single tour to be repainted
-		_previousTourData = null;
-
-		_paintMgr.setTourData(_tourDataList);
-		_tourInfoToolTipProvider.setTourDataList(_tourDataList);
-
-		_directMappingPainter.disablePaintContext();
-
-		final boolean isShowTour = _actionShowTourInMap.isChecked();
-		_map.setShowOverlays(isShowTour);
-		_map.setShowLegend(isShowTour && _actionShowLegendInMap.isChecked());
-
-		// get overlay key for all tours which have valid tour data
-		long newOverlayKey = -1;
-		for (final TourData tourData : _tourDataList) {
-
-			if (isPaintDataValid(tourData)) {
-				newOverlayKey += tourData.getTourId();
-			}
-		}
-
-		if (_previousOverlayKey != newOverlayKey) {
-
-			_previousOverlayKey = newOverlayKey;
-
-			_map.setOverlayKey(Long.toString(newOverlayKey));
-			_map.disposeOverlayImageCache();
-		}
-
-		createLegendImage(_paintMgr.getLegendProvider());
-		_map.queueMapRedraw();
-	}
-
-	private void paintTours(final ArrayList<Long> tourIdList) {
-
-		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-			@Override
-			public void run() {
-
-				_isTour = true;
-
-				// force single tour to be repainted
-				_previousTourData = null;
-
-				_directMappingPainter.disablePaintContext();
-
-				final boolean isShowTour = _actionShowTourInMap.isChecked();
-				_map.setShowOverlays(isShowTour);
-				_map.setShowLegend(isShowTour && _actionShowLegendInMap.isChecked());
-
-				/*
-				 * create a unique overlay key for the selected tours
-				 */
-				long newOverlayKey = 0;
-				_tourDataList.clear();
-				for (final Long tourId : tourIdList) {
-
-					final TourData tourData = TourManager.getInstance().getTourData(tourId);
-					if (isPaintDataValid(tourData)) {
-						// keep tour data for each tour id
-						_tourDataList.add(tourData);
-						newOverlayKey += tourData.getTourId();
-					}
-				}
-				_paintMgr.setTourData(_tourDataList);
-				_tourInfoToolTipProvider.setTourDataList(_tourDataList);
-
-				if (_previousOverlayKey != newOverlayKey) {
-
-					_previousOverlayKey = newOverlayKey;
-
-					_map.setOverlayKey(Long.toString(newOverlayKey));
-					_map.disposeOverlayImageCache();
-				}
-
-				createLegendImage(_paintMgr.getLegendProvider());
-				_map.queueMapRedraw();
-			}
-		});
-	}
-
-	private void paintTourSliders(	final TourData tourData,
-									final int leftSliderValuesIndex,
-									final int rightSliderValuesIndex,
-									final int selectedSliderIndex) {
-
-		if (isPaintDataValid(tourData) == false) {
-			showDefaultMap();
-			return;
-		}
-
-		_isTour = true;
-		_currentLeftSliderValueIndex = leftSliderValuesIndex;
-		_currentRightSliderValueIndex = rightSliderValuesIndex;
-		_currentSelectedSliderValueIndex = selectedSliderIndex;
-
-		_directMappingPainter.setPaintContext(
-				_map,
-				_actionShowTourInMap.isChecked(),
-				tourData,
-				leftSliderValuesIndex,
-				rightSliderValuesIndex,
-				_actionShowSliderInMap.isChecked(),
-				_actionShowSliderInLegend.isChecked());
-
-		if (_isMapSynchedWithSlider) {
-
-			setMapToSliderBounds(tourData);
-
-			_map.queueMapRedraw();
-
-		} else {
-
-			_map.redraw();
-		}
-	}
-
-	private void resetMap() {
-
-		if (_tourDataList.size() == 0) {
-			return;
-		}
-
-		_map.disposeOverlayImageCache();
-
-		paintAllTours();
-
-		_map.queueMapRedraw();
-	}
-
-	private void restoreState() {
-
-		final IDialogSettings settings = TourbookPlugin.getDefault().getDialogSettingsSection(ID);
-		String state = null;
-
-		// checkbox: is tour centered
-		final boolean isTourCentered = settings.getBoolean(MEMENTO_ZOOM_CENTERED);
-		_actionZoomCentered.setChecked(isTourCentered);
-		_isPositionCentered = isTourCentered;
-
-		// checkbox: synch map with tour
-		final boolean isSynchTour = Util.getStateBoolean(settings, MEMENTO_SYNCH_WITH_SELECTED_TOUR, true);
-		_actionSynchWithTour.setChecked(isSynchTour);
-		_isMapSynchedWithTour = isSynchTour;
-
-		// ckeckbox: synch with tour chart slider
-		final boolean isSynchSlider = settings.getBoolean(MEMENTO_SYNCH_WITH_TOURCHART_SLIDER);
-		_actionSynchWithSlider.setChecked(isSynchSlider);
-		_isMapSynchedWithSlider = isSynchSlider;
-
-		// checkbox: show tour in map
-		final boolean isShowTour = Util.getStateBoolean(settings, MEMENTO_SHOW_TOUR_IN_MAP, true);
-		_actionShowTourInMap.setChecked(isShowTour);
-		_map.setShowOverlays(isShowTour);
-		_map.setShowLegend(isShowTour);
-
-		//
-		_actionSynchTourZoomLevel.setZoomLevel(Util.getStateInt(settings, MEMENTO_SYNCH_TOUR_ZOOM_LEVEL, 0));
-		_mapDimLevel = Util.getStateInt(settings, MEMENTO_MAP_DIM_LEVEL, -1);
-
-		// checkbox: show start/end in map
-		_actionShowStartEndInMap.setChecked(settings.getBoolean(MEMENTO_SHOW_START_END_IN_MAP));
-		_paintMgr.setShowStartEnd(_actionShowStartEndInMap.isChecked());
-
-		// checkbox: show tour marker
-		state = settings.get(MEMENTO_SHOW_TOUR_MARKER);
-		_actionShowTourMarker.setChecked(state == null ? true : settings.getBoolean(MEMENTO_SHOW_TOUR_MARKER));
-		_paintMgr._isShowTourMarker = _actionShowTourMarker.isChecked();
-
-		// checkbox: show way points
-		state = settings.get(MEMENTO_SHOW_WAY_POINTS);
-		_actionShowWayPoints.setChecked(state == null ? true : settings.getBoolean(MEMENTO_SHOW_WAY_POINTS));
-		final boolean isShowWayPoints = _actionShowWayPoints.isChecked();
-		_paintMgr._isShowWayPoints = isShowWayPoints;
-		if (isShowWayPoints) {
-			_tourToolTip.addToolTipProvider(_wayPointToolTipProvider);
-		}
-
-		// checkbox: show legend in map
-		_actionShowLegendInMap.setChecked(Util.getStateBoolean(settings, MEMENTO_SHOW_LEGEND_IN_MAP, true));
-
-		// checkbox: show tour info in map
-		final boolean isShowTourInfo = Util.getStateBoolean(settings, MEMENTO_SHOW_TOUR_INFO_IN_MAP, true);
-		_actionShowTourInfoInMap.setChecked(isShowTourInfo);
-		if (isShowTourInfo) {
-			_tourToolTip.addToolTipProvider(_tourInfoToolTipProvider);
-		}
-
-		// checkbox: show scale
-		final boolean isScaleVisible = Util.getStateBoolean(settings, MEMENTO_SHOW_SCALE_IN_MAP, true);
-		_actionShowScaleInMap.setChecked(isScaleVisible);
-		_map.setShowScale(isScaleVisible);
-
-		// other actions
-		state = settings.get(MEMENTO_SHOW_SLIDER_IN_MAP);
-		_actionShowSliderInMap.setChecked(state == null ? true : settings.getBoolean(MEMENTO_SHOW_SLIDER_IN_MAP));
-
-		_actionShowSliderInLegend.setChecked(settings.getBoolean(MEMENTO_SHOW_SLIDER_IN_LEGEND));
-
-		// restore map provider by selecting the last used map factory
-		_actionSelectMapProvider.selectMapProvider(settings.get(MEMENTO_SELECTED_MAP_PROVIDER_ID));
-
-		// default position
-		_defaultZoom = Util.getStateInt(settings, MEMENTO_DEFAULT_POSITION_ZOOM, 10);
-		_defaultPosition = new GeoPosition(//
-				Util.getStateDouble(settings, MEMENTO_DEFAULT_POSITION_LATITUDE, 46.303074),
-				Util.getStateDouble(settings, MEMENTO_DEFAULT_POSITION_LONGITUDE, 7.526386));
-
-		// tour color
-		try {
-			final Integer colorId = settings.getInt(MEMENTO_TOUR_COLOR_ID);
-
-			switch (colorId) {
-			case TOUR_COLOR_ALTITUDE:
-				_actionTourColorAltitude.setChecked(true);
-				break;
-
-			case TOUR_COLOR_GRADIENT:
-				_actionTourColorGradient.setChecked(true);
-				break;
-
-			case TOUR_COLOR_PULSE:
-				_actionTourColorPulse.setChecked(true);
-				break;
-
-			case TOUR_COLOR_SPEED:
-				_actionTourColorSpeed.setChecked(true);
-				break;
-
-			case TOUR_COLOR_PACE:
-				_actionTourColorPace.setChecked(true);
-				break;
-
-//			case TOUR_COLOR_TOURTYPE:
-//				_actionTourColorTourType.setChecked(true);
-//				break;
-
-			default:
-				_actionTourColorAltitude.setChecked(true);
-				break;
-			}
-
-			_paintMgr.setLegendProvider(getLegendProvider(colorId));
-
-		} catch (final NumberFormatException e) {
-			_actionTourColorAltitude.setChecked(true);
-		}
-
-		// draw tour with default color
-
-		// check legend provider
-		final ILegendProvider legendProvider = _paintMgr.getLegendProvider();
-		if (legendProvider == null) {
-
-			// set default legend provider
-			_paintMgr.setLegendProvider(getLegendProvider(TOUR_COLOR_ALTITUDE));
-
-			// hide legend
-			_map.setShowLegend(false);
-		}
-
-		// debug info
-		final boolean isShowTileInfo = _prefStore.getBoolean(TourMapView.PREF_SHOW_TILE_INFO);
-		final boolean isShowTileBorder = _prefStore.getBoolean(PREF_SHOW_TILE_BORDER);
-
-		_map.setShowDebugInfo(isShowTileInfo, isShowTileBorder);
-
-		// set dim level/color after the map providers are set
-		if (_mapDimLevel == -1) {
-			_mapDimLevel = 0xff;
-		}
-		final RGB dimColor = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.MAP_LAYOUT_DIM_COLOR);
-		_map.setDimLevel(_mapDimLevel, dimColor);
-		_mapDimLevel = _actionDimMap.setDimLevel(_mapDimLevel);
-
-		// display the map with the default position
-		actionSetDefaultPosition();
-	}
-
-	private void saveState() {
-
-		final IDialogSettings settings = TourbookPlugin.getDefault().getDialogSettingsSection(ID);
-
-		// save checked actions
-		settings.put(MEMENTO_ZOOM_CENTERED, _actionZoomCentered.isChecked());
-		settings.put(MEMENTO_SHOW_TOUR_IN_MAP, _actionShowTourInMap.isChecked());
-		settings.put(MEMENTO_SYNCH_WITH_SELECTED_TOUR, _actionSynchWithTour.isChecked());
-		settings.put(MEMENTO_SYNCH_WITH_TOURCHART_SLIDER, _actionSynchWithSlider.isChecked());
-		settings.put(MEMENTO_SYNCH_TOUR_ZOOM_LEVEL, _actionSynchTourZoomLevel.getZoomLevel());
-
-		settings.put(MEMENTO_MAP_DIM_LEVEL, _mapDimLevel);
-
-		settings.put(MEMENTO_SHOW_LEGEND_IN_MAP, _actionShowLegendInMap.isChecked());
-		settings.put(MEMENTO_SHOW_START_END_IN_MAP, _actionShowStartEndInMap.isChecked());
-		settings.put(MEMENTO_SHOW_SCALE_IN_MAP, _actionShowScaleInMap.isChecked());
-		settings.put(MEMENTO_SHOW_SLIDER_IN_MAP, _actionShowSliderInMap.isChecked());
-		settings.put(MEMENTO_SHOW_SLIDER_IN_LEGEND, _actionShowSliderInLegend.isChecked());
-		settings.put(MEMENTO_SHOW_TOUR_MARKER, _actionShowTourMarker.isChecked());
-		settings.put(MEMENTO_SHOW_TOUR_INFO_IN_MAP, _actionShowTourInfoInMap.isChecked());
-		settings.put(MEMENTO_SHOW_WAY_POINTS, _actionShowWayPoints.isChecked());
-
-		settings.put(MEMENTO_SELECTED_MAP_PROVIDER_ID, _actionSelectMapProvider.getSelectedMapProvider().getId());
-
-		if (_defaultPosition == null) {
-			settings.put(MEMENTO_DEFAULT_POSITION_ZOOM, _map.getMapProvider().getMinimumZoomLevel());
-			settings.put(MEMENTO_DEFAULT_POSITION_LATITUDE, 0.0F);
-			settings.put(MEMENTO_DEFAULT_POSITION_LONGITUDE, 0.0F);
-		} else {
-			settings.put(MEMENTO_DEFAULT_POSITION_ZOOM, _defaultZoom);
-			settings.put(MEMENTO_DEFAULT_POSITION_LATITUDE, (float) _defaultPosition.latitude);
-			settings.put(MEMENTO_DEFAULT_POSITION_LONGITUDE, (float) _defaultPosition.longitude);
-		}
-
-		// tour color
-		int colorId;
-
-		if (_actionTourColorGradient.isChecked()) {
-			colorId = TOUR_COLOR_GRADIENT;
-		} else if (_actionTourColorPulse.isChecked()) {
-			colorId = TOUR_COLOR_PULSE;
-		} else if (_actionTourColorSpeed.isChecked()) {
-			colorId = TOUR_COLOR_SPEED;
-		} else if (_actionTourColorPace.isChecked()) {
-			colorId = TOUR_COLOR_PACE;
-//		} else if (_actionTourColorTourType.isChecked()) {
-//			colorId = TOUR_COLOR_TOURTYPE;
-		} else {
-			colorId = TOUR_COLOR_ALTITUDE;
-		}
-		settings.put(MEMENTO_TOUR_COLOR_ID, colorId);
-	}
-
-	@Override
-	public void setFocus() {
-		_map.setFocus();
-	}
-
-	/**
-	 * Calculate the bounds for the tour in latitude and longitude values
-	 * 
-	 * @param tourData
-	 * @return
-	 */
-	private void setMapToSliderBounds(final TourData tourData) {
-
-		if (tourData == null) {
-			return;
-		}
-
-		final double[] latitudeSerie = tourData.latitudeSerie;
-		final double[] longitudeSerie = tourData.longitudeSerie;
-
-//		final double leftSliderLat = latitudeSerie[fCurrentLeftSliderValueIndex];
-//		final double leftSliderLong = longitudeSerie[fCurrentLeftSliderValueIndex];
-//
-//		final double rightSliderLat = latitudeSerie[fCurrentRightSliderValueIndex];
-//		final double rightSliderLong = longitudeSerie[fCurrentRightSliderValueIndex];
-//
-//		final double minLatitude = Math.min(leftSliderLat + 0, rightSliderLat + 0);
-//		final double minLongitude = Math.min(leftSliderLong + 0, rightSliderLong + 0);
-//
-//		final double maxLatitude = Math.max(leftSliderLat + 0, rightSliderLat + 0);
-//		final double maxLongitude = Math.max(leftSliderLong + 0, rightSliderLong + 0);
-//
-//		final double latDiff2 = (maxLatitude - minLatitude) / 2;
-//		final double longDiff2 = (maxLongitude - minLongitude) / 2;
-//
-//		final double sliderLat = minLatitude + latDiff2 - 0;
-//		final double sliderLong = minLongitude + longDiff2 - 0;
-
-//		_map.setCenterPosition(new GeoPosition(sliderLat, sliderLong));
-//		_map.setCenterPosition(new GeoPosition(sliderLat, leftSliderLong));
-//		_map.setCenterPosition(new GeoPosition(leftSliderLat, leftSliderLong));
-
-		final int sliderIndex = Math.max(0, Math.min(_currentSelectedSliderValueIndex, latitudeSerie.length - 1));
-
-		_map.setMapCenter(new GeoPosition(latitudeSerie[sliderIndex], longitudeSerie[sliderIndex]));
-
-	}
-
-	/**
-	 * Calculates a zoom level so that all points in the specified set will be visible on screen.
-	 * This is useful if you have a bunch of points in an area like a city and you want to zoom out
-	 * so that the entire city and it's points are visible without panning.
-	 * 
-	 * @param positions
-	 *            A set of GeoPositions to calculate the new zoom from
-	 * @param adjustZoomLevel
-	 *            when <code>true</code> the zoom level will be adjusted to user settings
-	 */
-	private void setTourZoomLevel(final Set<GeoPosition> positions, final boolean isAdjustZoomLevel) {
-
-		if ((positions == null) || (positions.size() < 2)) {
-			return;
-		}
-
-		final MP mp = _map.getMapProvider();
-
-		final int maximumZoomLevel = mp.getMaximumZoomLevel();
-		int zoom = mp.getMinimumZoomLevel();
-
-		Rectangle positionRect = getPositionRect(positions, zoom);
-		Rectangle viewport = _map.getWorldPixelViewport();
-
-//		// zoom until the tour is visible in the map
-//		while (!viewport.contains(positionRect)) {
-//
-//			// center position in the map
-//			final Point center = new Point(//
-//					positionRect.x + positionRect.width / 2,
-//					positionRect.y + positionRect.height / 2);
-//
-//			_map.setGeoCenterPosition(mp.pixelToGeo(center, zoom));
-//
-//			zoom++;
-//
-//			// check zoom level
-//			if (zoom >= maximumZoomLevel) {
-//				break;
-//			}
-//			_map.setZoom(zoom);
-//
-//			positionRect = getPositionRect(positions, zoom);
-//			viewport = _map.getMapPixelViewport();
-//		}
-
-		// zoom in until the tour is larger than the viewport
-		while ((positionRect.width < viewport.width) && (positionRect.height < viewport.height)) {
-
-			// center position in the map
-			final Point center = new Point(//
-					positionRect.x + positionRect.width / 2,
-					positionRect.y + positionRect.height / 2);
-
-			_map.setMapCenter(mp.pixelToGeo(center, zoom));
-
-			zoom++;
-
-			// check zoom level
-			if (zoom >= maximumZoomLevel) {
-				break;
-			}
-			_map.setZoom(zoom);
-
-			positionRect = getPositionRect(positions, zoom);
-			viewport = _map.getWorldPixelViewport();
-		}
-
-		// the algorithm generated a larger zoom level as necessary
-		zoom--;
-
-		int adjustedZoomLevel = 0;
-		if (isAdjustZoomLevel) {
-			adjustedZoomLevel = _paintMgr.getSynchTourZoomLevel();
-		}
-
-		_map.setZoom(zoom + adjustedZoomLevel);
-	}
-
-	private void showDefaultMap() {
-
-		// disable tour actions in this view
-		_isTour = false;
-
-		// disable tour data
-		_tourDataList.clear();
-		_previousTourData = null;
-
-		// update direct painter to draw nothing
-		_directMappingPainter.setPaintContext(_map, false, null, 0, 0, false, false);
-
-		_map.setShowOverlays(false);
-		_map.setShowLegend(false);
-
-		_map.queueMapRedraw();
-	}
-
-	/**
-	 * show warning that map is dimmed and can be invisible
-	 */
-	private void showDimWarning() {
-
-		if (_prefStore.getBoolean(ITourbookPreferences.MAP_VIEW_CONFIRMATION_SHOW_DIM_WARNING) == false) {
-
-			Display.getCurrent().asyncExec(new Runnable() {
-				@Override
-				public void run() {
-
-					final MessageDialogWithToggle dialog = MessageDialogWithToggle.openInformation(Display
-							.getCurrent()
-							.getActiveShell(),//
-							Messages.map_dlg_dim_warning_title, // title
-							Messages.map_dlg_dim_warning_message, // message
-							Messages.map_dlg_dim_warning_toggle_message, // toggle message
-							false, // toggle default state
-							null,
-							null);
-
-					_prefStore.setValue(
-							ITourbookPreferences.MAP_VIEW_CONFIRMATION_SHOW_DIM_WARNING,
-							dialog.getToggleState());
-				}
-			});
-		}
-	}
-
-	private void showToursFromTourProvider() {
-
-		Display.getCurrent().asyncExec(new Runnable() {
-			@Override
-			public void run() {
-
-				// validate widget
-				if (_map.isDisposed()) {
-					return;
-				}
-
-				/*
-				 * check if tour is set from a selection provider
-				 */
-				if (_tourDataList.size() > 0) {
-					return;
-				}
-
-				final ArrayList<TourData> tourDataList = TourManager.getSelectedTours();
-				if (tourDataList != null) {
-
-//					final TourData tourData = TourManager.getInstance().getTourData(tourDataList);
-//					if (tourData != null) {
-
-					_tourDataList.clear();
-					_tourDataList.addAll(tourDataList);
-
-					paintAllTours();
-
-//						/*
-//						 * set position and zoomlevel to show the entire tour
-//						 */
-//						final PaintManager paintManager = _paintMgr;
-//						final Set<GeoPosition> tourBounds = getTourBounds(tourData);
-//
-//						paintManager.setTourBounds(tourBounds);
-//						setTourZoomLevel(tourBounds, true);
-//
-//						paintOneTour(tourData, true, false);
-//
-//						enableActions();
-//					}
-				}
-			}
-		});
-	}
-
-	/**
-	 * Update the min/max values in the {@link ILegendProvider} for the currently displayed legend
+	 * Update the min/max values in the {@link ILegendProviderGradientColors} for the currently
+	 * displayed legend
 	 * 
 	 * @param legendProvider
 	 * @param legendBounds
 	 * @return Return <code>true</code> when the legend value could be updated, <code>false</code>
 	 *         when data are not available
 	 */
-	private boolean updateLegendValues(final ILegendProvider legendProvider, final Rectangle legendBounds) {
+	private boolean createLegendImage10SetProviderValues(	final ILegendProviderGradientColors legendProvider,
+															final Rectangle legendBounds) {
 
 		if (_tourDataList.size() == 0) {
 			return false;
@@ -2455,13 +1195,1323 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 			break;
 
-//		case TOUR_COLOR_TOURTYPE:
-//			return false;
-
 		default:
 			break;
 		}
 
 		return true;
+	}
+
+	private boolean createLegendImage20SetProviderValues(	final ILegendProviderDiscreteColors legendProvider,
+															final Rectangle legendImageBounds) {
+
+		if (_tourDataList.size() == 0) {
+			return false;
+		}
+
+		// tell the legend provider how to draw the legend
+		switch (legendProvider.getTourColorId()) {
+
+		case TOUR_COLOR_HR_ZONE:
+
+			boolean isValidData = false;
+
+			for (final TourData tourData : _tourDataList) {
+
+				if (TrainingManager.isRequiredHrZoneDataAvailable(tourData) == false) {
+					continue;
+				}
+
+				isValidData = true;
+			}
+
+			return isValidData;
+
+		default:
+			break;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Create legend provider for all graphs which can be displayed.
+	 */
+	private void createLegendProviders() {
+
+		_legendProviders.put(//
+				TOUR_COLOR_PULSE, //
+				new LegendProviderGradientColors(new LegendConfig(), new LegendColor(), TOUR_COLOR_PULSE));
+
+		_legendProviders.put(//
+				TOUR_COLOR_ALTITUDE, //
+				new LegendProviderGradientColors(new LegendConfig(), new LegendColor(), TOUR_COLOR_ALTITUDE));
+
+		_legendProviders.put(//
+				TOUR_COLOR_SPEED, //
+				new LegendProviderGradientColors(new LegendConfig(), new LegendColor(), TOUR_COLOR_SPEED));
+
+		_legendProviders.put(//
+				TOUR_COLOR_PACE, //
+				new LegendProviderGradientColors(new LegendConfig(), new LegendColor(), TOUR_COLOR_PACE));
+
+		_legendProviders.put(//
+				TOUR_COLOR_GRADIENT, //
+				new LegendProviderGradientColors(new LegendConfig(), new LegendColor(), TOUR_COLOR_GRADIENT));
+
+		_legendProviders.put(//
+				TOUR_COLOR_HR_ZONE, //
+				new LegendProviderHrZones(TOUR_COLOR_HR_ZONE));
+	}
+
+	@Override
+	public void createPartControl(final Composite parent) {
+
+		_mapLegend = new MapLegend();
+
+		_map = new Map(parent, SWT.NONE);
+		_map.setQueueMapRedraw(false);
+
+		_map.setDirectPainter(_directMappingPainter);
+//		_map.setLiveView(true);
+
+		_map.setLegend(_mapLegend);
+		_map.setShowLegend(true);
+		_map.setMeasurementSystem(UI.UNIT_VALUE_DISTANCE, UI.UNIT_LABEL_DISTANCE);
+
+		final String tourPaintMethod = _prefStore.getString(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD);
+		_map.setTourPaintMethodEnhanced(tourPaintMethod.equals(PrefPageAppearanceMap.TOUR_PAINT_METHOD_COMPLEX));
+
+		// setup tool tip's
+		_map.setTourToolTip(_tourToolTip = new TourToolTip(_map));
+		_tourInfoToolTipProvider.setActionsEnabled(true);
+
+		_map.addControlListener(new ControlAdapter() {
+			@Override
+			public void controlResized(final ControlEvent e) {
+
+				/*
+				 * check if the legend size must be adjusted
+				 */
+				final Image legendImage = _mapLegend.getImage();
+				if ((legendImage == null) || legendImage.isDisposed()) {
+					return;
+				}
+
+				final boolean showTour = _actionShowTourInMap.isChecked();
+				final boolean showLegend = _actionShowLegendInMap.isChecked();
+				if ((_isTour == false) || (showTour == false) || (showLegend == false)) {
+					return;
+				}
+
+				/*
+				 * check height
+				 */
+				final Rectangle mapBounds = _map.getBounds();
+				final Rectangle legendBounds = legendImage.getBounds();
+
+				if ((mapBounds.height < DEFAULT_LEGEND_HEIGHT + LEGEND_TOP_MARGIN)
+						|| ((mapBounds.height > DEFAULT_LEGEND_HEIGHT + LEGEND_TOP_MARGIN) //
+						&& (legendBounds.height < DEFAULT_LEGEND_HEIGHT)) //
+				) {
+
+					createLegendImage(_tourPainterConfig.getLegendProvider());
+				}
+			}
+		});
+
+		createActions();
+		createLegendProviders();
+
+		enableActions();
+
+		addPartListener();
+		addPrefListener();
+		addSelectionListener();
+		addTourEventListener();
+		addTourbookPrefListener();
+		addMapListener();
+
+		// register overlays which draw the tour
+		GeoclipseExtensions.registerOverlays(_map);
+
+		// initialize map when part is created and the map size is > 0
+		Display.getCurrent().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+
+				restoreState();
+
+				if (_tourDataList.size() == 0) {
+					// a tour is not displayed, find a tour provider which provides a tour
+					showToursFromTourProvider();
+				} else {
+					_map.queueMapRedraw();
+				}
+
+				/*
+				 * enable map drawing, this is done very late to disable flickering which is caused
+				 * by setting up the map
+				 */
+				_map.setQueueMapRedraw(true);
+
+				if (_mapDimLevel < 30) {
+					showDimWarning();
+				}
+			}
+		});
+	}
+
+	@Override
+	public void dispose() {
+
+		_tourDataList.clear();
+
+		// dispose tilefactory resources
+
+		final ArrayList<MP> allMapProviders = MapProviderManager.getInstance().getAllMapProviders(true);
+		for (final MP mp : allMapProviders) {
+			mp.disposeAllImages();
+		}
+
+		_map.disposeOverlayImageCache();
+
+		getViewSite().getPage().removePostSelectionListener(_postSelectionListener);
+		getViewSite().getPage().removePartListener(_partListener);
+
+		TourManager.getInstance().removeTourEventListener(_tourEventListener);
+
+		_prefStore.removePropertyChangeListener(_prefChangeListener);
+		_prefStore.removePropertyChangeListener(_tourbookPrefChangeListener);
+		_prefStore.removePropertyChangeListener(_mapPrefChangeListener);
+
+		super.dispose();
+	}
+
+	private void enableActions() {
+		enableActions(false);
+	}
+
+	private void enableActions(final boolean isForceTourColor) {
+
+		final boolean isLegendVisible = _actionShowLegendInMap.isChecked();
+
+		_actionShowPOI.setEnabled(_poiPosition != null);
+
+		// update legend action
+		if (_isTour) {
+
+			_map.setShowLegend(isLegendVisible);
+
+			if (isLegendVisible == false) {
+				_actionShowSliderInLegend.setChecked(false);
+			}
+		}
+
+		final boolean isMultipleTours = _tourDataList.size() > 1;
+		final boolean isOneTour = _isTour && (isMultipleTours == false);
+
+		/*
+		 * enable/disable tour actions
+		 */
+		_actionZoomShowEntireTour.setEnabled(isOneTour);
+		_actionSynchTourZoomLevel.setEnabled(isOneTour);
+		_actionShowTourInMap.setEnabled(_isTour);
+		_actionSynchWithTour.setEnabled(isOneTour);
+		_actionSynchWithSlider.setEnabled(isOneTour);
+
+		_actionShowStartEndInMap.setEnabled(isOneTour);
+		_actionShowTourMarker.setEnabled(_isTour);
+		_actionShowWayPoints.setEnabled(_isTour);
+		_actionShowLegendInMap.setEnabled(_isTour);
+		_actionShowSliderInMap.setEnabled(_isTour);
+		_actionShowSliderInLegend.setEnabled(_isTour && isLegendVisible);
+		_actionShowTourInfoInMap.setEnabled(isOneTour);
+
+		if (_tourDataList.size() == 0) {
+
+			_actionTourColorAltitude.setEnabled(false);
+			_actionTourColorGradient.setEnabled(false);
+			_actionTourColorPulse.setEnabled(false);
+			_actionTourColorSpeed.setEnabled(false);
+			_actionTourColorPace.setEnabled(false);
+			_actionTourColorHrZone.setEnabled(false);
+//			_actionTourColorTourType.setEnabled(false);
+
+		} else if (isForceTourColor) {
+
+			_actionTourColorAltitude.setEnabled(true);
+			_actionTourColorGradient.setEnabled(true);
+			_actionTourColorPulse.setEnabled(true);
+			_actionTourColorSpeed.setEnabled(true);
+			_actionTourColorPace.setEnabled(true);
+			_actionTourColorHrZone.setEnabled(true);
+//			_actionTourColorTourType.setEnabled(true);
+
+		} else if (isOneTour) {
+
+			final TourData oneTourData = _tourDataList.get(0);
+			final boolean isPulse = oneTourData.pulseSerie != null;
+			final boolean canShowHrZones = oneTourData.getNumberOfHrZones() > 0 && isPulse;
+
+			_actionTourColorAltitude.setEnabled(true);
+			_actionTourColorGradient.setEnabled(oneTourData.getGradientSerie() != null);
+			_actionTourColorPulse.setEnabled(isPulse);
+			_actionTourColorSpeed.setEnabled(oneTourData.getSpeedSerie() != null);
+			_actionTourColorPace.setEnabled(oneTourData.getPaceSerie() != null);
+			_actionTourColorHrZone.setEnabled(canShowHrZones);
+//			_actionTourColorTourType.setEnabled(true);
+
+		} else {
+
+			_actionTourColorAltitude.setEnabled(false);
+			_actionTourColorGradient.setEnabled(false);
+			_actionTourColorPulse.setEnabled(false);
+			_actionTourColorSpeed.setEnabled(false);
+			_actionTourColorPace.setEnabled(false);
+			_actionTourColorHrZone.setEnabled(false);
+//			_actionTourColorTourType.setEnabled(false);
+		}
+	}
+
+	@Override
+	public void fillContextMenu(final IMenuManager menuMgr) {
+		fillMapMenu(menuMgr);
+	}
+
+	private void fillMapMenu(final IMenuManager menuMgr) {
+
+		menuMgr.add(_actionShowLegendInMap);
+		menuMgr.add(_actionShowScaleInMap);
+		menuMgr.add(_actionShowSliderInMap);
+		menuMgr.add(_actionShowSliderInLegend);
+		menuMgr.add(new Separator());
+
+		menuMgr.add(_actionShowTourMarker);
+		menuMgr.add(_actionShowWayPoints);
+		menuMgr.add(_actionShowPOI);
+		menuMgr.add(_actionShowStartEndInMap);
+		menuMgr.add(_actionShowTourInfoInMap);
+		menuMgr.add(new Separator());
+
+		menuMgr.add(_actionSetDefaultPosition);
+		menuMgr.add(_actionSaveDefaultPosition);
+		menuMgr.add(new Separator());
+
+		menuMgr.add(_actionDimMap);
+		menuMgr.add(_actionSynchTourZoomLevel);
+		menuMgr.add(new Separator());
+
+		menuMgr.add(_actionManageProvider);
+		menuMgr.add(_actionReloadFailedMapImages);
+	}
+
+	private ILegendProvider getLegendProvider(final int colorId) {
+		return _legendProviders.get(colorId);
+	}
+
+	public Map getMap() {
+		return _map;
+	}
+
+	public int getMapDimLevel() {
+		return _mapDimLevel;
+	}
+
+	private Rectangle getPositionRect(final Set<GeoPosition> positions, final int zoom) {
+
+		final MP mp = _map.getMapProvider();
+		final Point point1 = mp.geoToPixel(positions.iterator().next(), zoom);
+		final MTRectangle mtRect = new MTRectangle(point1.x, point1.y, 0, 0);
+
+		for (final GeoPosition pos : positions) {
+			final Point point = mp.geoToPixel(pos, zoom);
+			mtRect.add(point.x, point.y);
+		}
+
+		return new Rectangle(mtRect.x, mtRect.y, mtRect.width, mtRect.height);
+	}
+
+	/**
+	 * Calculate the bounds for the tour in latitude and longitude values
+	 * 
+	 * @param tourData
+	 * @return
+	 */
+	private Set<GeoPosition> getTourBounds(final TourData tourData) {
+
+		final double[] latitudeSerie = tourData.latitudeSerie;
+		final double[] longitudeSerie = tourData.longitudeSerie;
+
+		if ((latitudeSerie == null) || (longitudeSerie == null)) {
+			return null;
+		}
+
+		/*
+		 * get min/max longitude/latitude
+		 */
+		double minLatitude = latitudeSerie[0];
+		double maxLatitude = latitudeSerie[0];
+		double minLongitude = longitudeSerie[0];
+		double maxLongitude = longitudeSerie[0];
+
+		for (int serieIndex = 0; serieIndex < latitudeSerie.length; serieIndex++) {
+			final double latitude = latitudeSerie[serieIndex];
+			final double longitude = longitudeSerie[serieIndex];
+
+//			minLatitude = Math.min(minLatitude, latitude);
+//			maxLatitude = Math.max(maxLatitude, latitude);
+//
+//			minLongitude = Math.min(minLongitude, longitude);
+//			maxLongitude = Math.max(maxLongitude, longitude);
+
+			minLatitude = latitude < minLatitude ? latitude : minLatitude;
+			maxLatitude = latitude > maxLatitude ? latitude : maxLatitude;
+
+			minLongitude = longitude < minLongitude ? longitude : minLongitude;
+			maxLongitude = longitude > maxLongitude ? longitude : maxLongitude;
+
+			if (minLatitude == 0) {
+				minLatitude = -180D;
+			}
+		}
+
+		final Set<GeoPosition> mapPositions = new HashSet<GeoPosition>();
+		mapPositions.add(new GeoPosition(minLatitude, minLongitude));
+		mapPositions.add(new GeoPosition(maxLatitude, maxLongitude));
+
+		return mapPositions;
+	}
+
+	/**
+	 * Checks if {@link TourData} can be painted
+	 * 
+	 * @param tourData
+	 * @return <code>true</code> when {@link TourData} contains a tour which can be painted in the
+	 *         map
+	 */
+	private boolean isPaintDataValid(final TourData tourData) {
+
+		if (tourData == null) {
+			return false;
+		}
+
+		// check if coordinates are available
+
+		final double[] longitudeSerie = tourData.longitudeSerie;
+		final double[] latitudeSerie = tourData.latitudeSerie;
+
+		if ((longitudeSerie == null)
+				|| (longitudeSerie.length == 0)
+				|| (latitudeSerie == null)
+				|| (latitudeSerie.length == 0)) {
+			return false;
+		}
+
+		return true;
+	}
+
+	private void onSelectionChanged(final ISelection selection) {
+
+		if (_isPartVisible == false) {
+
+			if (selection instanceof SelectionTourData
+					|| selection instanceof SelectionTourId
+					|| selection instanceof SelectionTourIds) {
+
+				// keep only selected tours
+				_selectionWhenHidden = selection;
+			}
+			return;
+		}
+
+		if (selection instanceof SelectionTourData) {
+
+			final SelectionTourData selectionTourData = (SelectionTourData) selection;
+			final TourData tourData = selectionTourData.getTourData();
+
+			paintTours20One(tourData, selectionTourData.isForceRedraw(), true);
+
+			enableActions();
+
+		} else if (selection instanceof SelectionTourId) {
+
+			final SelectionTourId tourIdSelection = (SelectionTourId) selection;
+			final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
+
+			paintTours20One(tourData, false, true);
+
+			enableActions();
+
+		} else if (selection instanceof SelectionTourIds) {
+
+			// paint all selected tours
+
+			final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+			if (tourIds.size() == 0) {
+				return;
+			}
+
+			paintTours(tourIds);
+
+			enableActions(true);
+
+		} else if (selection instanceof SelectionChartInfo) {
+
+			final ChartDataModel chartDataModel = ((SelectionChartInfo) selection).chartDataModel;
+			if (chartDataModel != null) {
+
+				final Object tourId = chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
+				if (tourId instanceof Long) {
+
+					TourData tourData = TourManager.getInstance().getTourData((Long) tourId);
+					if (tourData == null) {
+
+						// tour is not in the database, try to get it from the raw data manager
+
+						final HashMap<Long, TourData> rawData = RawDataManager.getInstance().getImportedTours();
+						tourData = rawData.get(tourId);
+					}
+
+					if (tourData != null) {
+
+						final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
+
+						paintTourSliders(
+								tourData,
+								chartInfo.leftSliderValuesIndex,
+								chartInfo.rightSliderValuesIndex,
+								chartInfo.selectedSliderValuesIndex);
+
+						enableActions();
+					}
+				}
+			}
+
+		} else if (selection instanceof SelectionChartXSliderPosition) {
+
+			final SelectionChartXSliderPosition xSliderPos = (SelectionChartXSliderPosition) selection;
+			final Chart chart = xSliderPos.getChart();
+			if (chart == null) {
+				return;
+			}
+
+			final ChartDataModel chartDataModel = chart.getChartDataModel();
+
+			final Object tourId = chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
+			if (tourId instanceof Long) {
+
+				final TourData tourData = TourManager.getInstance().getTourData((Long) tourId);
+				if (tourData != null) {
+
+					final int leftSliderValueIndex = xSliderPos.getLeftSliderValueIndex();
+					int rightSliderValueIndex = xSliderPos.getRightSliderValueIndex();
+
+					rightSliderValueIndex = rightSliderValueIndex == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION
+							? leftSliderValueIndex
+							: rightSliderValueIndex;
+
+					paintTourSliders(tourData, leftSliderValueIndex, rightSliderValueIndex, leftSliderValueIndex);
+
+					enableActions();
+				}
+			}
+
+		} else if (selection instanceof SelectionMapPosition) {
+
+			final SelectionMapPosition mapPositionSelection = (SelectionMapPosition) selection;
+
+			final int valueIndex1 = mapPositionSelection.getSlider1ValueIndex();
+			int valueIndex2 = mapPositionSelection.getSlider2ValueIndex();
+
+			valueIndex2 = valueIndex2 == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION
+					? valueIndex1
+					: valueIndex2;
+
+			paintTourSliders(mapPositionSelection.getTourData(), valueIndex1, valueIndex2, valueIndex1);
+
+			enableActions();
+
+		} else if (selection instanceof PointOfInterest) {
+
+			_isTour = false;
+
+			clearView();
+
+			final PointOfInterest poi = (PointOfInterest) selection;
+
+			_poiPosition = poi.getPosition();
+			_poiName = poi.getName();
+
+			_poiZoomLevel = poi.getRecommendedZoom();
+			if (_poiZoomLevel == -1) {
+				_poiZoomLevel = _map.getZoom();
+			}
+
+			_map.setPoi(_poiPosition, _poiZoomLevel, _poiName);
+
+			_actionShowPOI.setChecked(true);
+
+			enableActions();
+
+		} else if (selection instanceof StructuredSelection) {
+
+			final Object firstElement = ((StructuredSelection) selection).getFirstElement();
+
+			if (firstElement instanceof TVICatalogComparedTour) {
+
+				final TVICatalogComparedTour comparedTour = (TVICatalogComparedTour) firstElement;
+				final long tourId = comparedTour.getTourId();
+
+				final TourData tourData = TourManager.getInstance().getTourData(tourId);
+				paintTours20One(tourData, false, true);
+
+			} else if (firstElement instanceof TVICompareResultComparedTour) {
+
+				final TVICompareResultComparedTour compareResultItem = (TVICompareResultComparedTour) firstElement;
+				final TourData tourData = TourManager.getInstance().getTourData(
+						compareResultItem.getComparedTourData().getTourId());
+				paintTours20One(tourData, false, true);
+
+			} else if (firstElement instanceof TourWayPoint) {
+
+				final TourWayPoint wp = (TourWayPoint) firstElement;
+
+				_map.setPOI(_wayPointToolTipProvider, wp);
+			}
+
+			enableActions();
+
+		} else if (selection instanceof SelectionTourCatalogView) {
+
+			// show reference tour
+
+			final SelectionTourCatalogView tourCatalogSelection = (SelectionTourCatalogView) selection;
+
+			final TVICatalogRefTourItem refItem = tourCatalogSelection.getRefItem();
+			if (refItem != null) {
+
+				final TourData tourData = TourManager.getInstance().getTourData(refItem.getTourId());
+
+				paintTours20One(tourData, false, true);
+
+				enableActions();
+			}
+		}
+
+	}
+
+	private void paintEntireTour() {
+
+		if ((_tourDataList.size() == 0) || (isPaintDataValid(_tourDataList.get(0)) == false)) {
+			showDefaultMap();
+			return;
+		}
+
+		_tourPainterConfig.setTourData(_tourDataList);
+		_tourInfoToolTipProvider.setTourDataList(_tourDataList);
+
+		final TourData firstTourData = _tourDataList.get(0);
+
+		// set slider position
+		_directMappingPainter.setPaintContext(
+				_map,
+				_actionShowTourInMap.isChecked(),
+				firstTourData,
+				_currentLeftSliderValueIndex,
+				_currentRightSliderValueIndex,
+				_actionShowSliderInMap.isChecked(),
+				_actionShowSliderInLegend.isChecked());
+
+		final Set<GeoPosition> tourBounds = getTourBounds(firstTourData);
+		_tourPainterConfig.setTourBounds(tourBounds);
+
+		_map.setShowOverlays(_actionShowTourInMap.isChecked());
+
+		setTourZoomLevel(tourBounds, false);
+
+		_map.queueMapRedraw();
+	}
+
+	private void paintTours(final ArrayList<Long> tourIdList) {
+
+		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+			@Override
+			public void run() {
+
+				_isTour = true;
+
+				// force single tour to be repainted
+				_previousTourData = null;
+
+				_directMappingPainter.disablePaintContext();
+
+				final boolean isShowTour = _actionShowTourInMap.isChecked();
+				_map.setShowOverlays(isShowTour);
+				_map.setShowLegend(isShowTour && _actionShowLegendInMap.isChecked());
+
+				/*
+				 * create a unique overlay key for the selected tours
+				 */
+				long newOverlayKey = 0;
+				_tourDataList.clear();
+				for (final Long tourId : tourIdList) {
+
+					final TourData tourData = TourManager.getInstance().getTourData(tourId);
+					if (isPaintDataValid(tourData)) {
+						// keep tour data for each tour id
+						_tourDataList.add(tourData);
+						newOverlayKey += tourData.getTourId();
+					}
+				}
+				_tourPainterConfig.setTourData(_tourDataList);
+				_tourInfoToolTipProvider.setTourDataList(_tourDataList);
+
+				if (_previousOverlayKey != newOverlayKey) {
+
+					_previousOverlayKey = newOverlayKey;
+
+					_map.setOverlayKey(Long.toString(newOverlayKey));
+					_map.disposeOverlayImageCache();
+				}
+
+				createLegendImage(_tourPainterConfig.getLegendProvider());
+				_map.queueMapRedraw();
+			}
+		});
+	}
+
+	private void paintTours10All() {
+
+		if (_tourDataList.size() == 0) {
+			_tourInfoToolTipProvider.setTourData(null);
+			return;
+		}
+
+		// show/hide legend
+		_map.setShowLegend(_actionShowTourInMap.isChecked());
+
+		if (_tourDataList.size() > 1) {
+
+			// multiple tours are displayed
+
+			paintTours30Multiple();
+			enableActions(true);
+
+		} else {
+			paintTours20One(_tourDataList.get(0), true, false);
+			enableActions();
+		}
+	}
+
+	/**
+	 * Paint the currently selected tour in the map
+	 * 
+	 * @param tourData
+	 * @param forceRedraw
+	 * @param isSynchronized
+	 *            when <code>true</code>, map will be synchronized
+	 */
+	private void paintTours20One(final TourData tourData, final boolean forceRedraw, final boolean isSynchronized) {
+
+		if (isPaintDataValid(tourData) == false) {
+			showDefaultMap();
+			return;
+		}
+
+		_isTour = true;
+		final boolean isShowTour = _actionShowTourInMap.isChecked();
+
+		// prevent loading the same tour
+		if (forceRedraw == false) {
+
+			if ((_tourDataList.size() == 1) && (_tourDataList.get(0) == tourData)) {
+				return;
+			}
+		}
+
+		// force multiple tours to be repainted
+		_previousOverlayKey = -1;
+
+		// check if this is a new tour
+		boolean isNewTour = true;
+		if ((_previousTourData != null)
+				&& (_previousTourData.getTourId().longValue() == tourData.getTourId().longValue())) {
+			isNewTour = false;
+		}
+
+		_tourPainterConfig.setTourData(tourData);
+
+		/*
+		 * set tour into tour data list, this is currently used to draw the legend, it's also used
+		 * to figure out if multiple tours are selected
+		 */
+		_tourDataList.clear();
+		_tourDataList.add(tourData);
+
+		_tourInfoToolTipProvider.setTourDataList(_tourDataList);
+
+		// set the paint context (slider position) for the direct mapping painter
+		_directMappingPainter.setPaintContext(
+				_map,
+				isShowTour,
+				tourData,
+				_currentLeftSliderValueIndex,
+				_currentRightSliderValueIndex,
+				_actionShowSliderInMap.isChecked(),
+				_actionShowSliderInLegend.isChecked());
+
+		// set the tour bounds
+		final Set<GeoPosition> tourBounds = getTourBounds(tourData);
+		_tourPainterConfig.setTourBounds(tourBounds);
+
+		_map.setShowOverlays(isShowTour);
+		_map.setShowLegend(isShowTour && _actionShowLegendInMap.isChecked());
+
+		/*
+		 * set position and zoom level for the tour
+		 */
+		if (_isMapSynchedWithTour && isSynchronized) {
+
+			if (((forceRedraw == false) && (_previousTourData != null)) || (tourData == _previousTourData)) {
+
+				/*
+				 * keep map configuration for the previous tour
+				 */
+				_previousTourData.mapZoomLevel = _map.getZoom();
+
+				final GeoPosition centerPosition = _map.getGeoCenter();
+				_previousTourData.mapCenterPositionLatitude = centerPosition.latitude;
+				_previousTourData.mapCenterPositionLongitude = centerPosition.longitude;
+			}
+
+			if (tourData.mapCenterPositionLatitude == Double.MIN_VALUE) {
+
+				// use default position for the tour
+				setTourZoomLevel(tourBounds, true);
+
+			} else {
+
+				// position tour to the previous position
+				_map.setZoom(tourData.mapZoomLevel);
+				_map.setMapCenter(new GeoPosition(
+						tourData.mapCenterPositionLatitude,
+						tourData.mapCenterPositionLongitude));
+			}
+		}
+
+		// keep tour data
+		_previousTourData = tourData;
+
+		if (isNewTour || forceRedraw) {
+
+			// adjust legend values for the new or changed tour
+			createLegendImage(_tourPainterConfig.getLegendProvider());
+
+			_map.setOverlayKey(tourData.getTourId().toString());
+			_map.disposeOverlayImageCache();
+
+		}
+
+		_map.queueMapRedraw();
+	}
+
+	/**
+	 * paints the tours which are set in {@link #_tourDataList}
+	 */
+	private void paintTours30Multiple() {
+
+		_isTour = true;
+
+		// force single tour to be repainted
+		_previousTourData = null;
+
+		_tourPainterConfig.setTourData(_tourDataList);
+		_tourInfoToolTipProvider.setTourDataList(_tourDataList);
+
+		_directMappingPainter.disablePaintContext();
+
+		final boolean isShowTour = _actionShowTourInMap.isChecked();
+		_map.setShowOverlays(isShowTour);
+		_map.setShowLegend(isShowTour && _actionShowLegendInMap.isChecked());
+
+		// get overlay key for all tours which have valid tour data
+		long newOverlayKey = -1;
+		for (final TourData tourData : _tourDataList) {
+
+			if (isPaintDataValid(tourData)) {
+				newOverlayKey += tourData.getTourId();
+			}
+		}
+
+		if (_previousOverlayKey != newOverlayKey) {
+
+			_previousOverlayKey = newOverlayKey;
+
+			_map.setOverlayKey(Long.toString(newOverlayKey));
+			_map.disposeOverlayImageCache();
+		}
+
+		createLegendImage(_tourPainterConfig.getLegendProvider());
+
+		_map.queueMapRedraw();
+	}
+
+	private void paintTourSliders(	final TourData tourData,
+									final int leftSliderValuesIndex,
+									final int rightSliderValuesIndex,
+									final int selectedSliderIndex) {
+
+		if (isPaintDataValid(tourData) == false) {
+			showDefaultMap();
+			return;
+		}
+
+		_isTour = true;
+		_currentLeftSliderValueIndex = leftSliderValuesIndex;
+		_currentRightSliderValueIndex = rightSliderValuesIndex;
+		_currentSelectedSliderValueIndex = selectedSliderIndex;
+
+		_directMappingPainter.setPaintContext(
+				_map,
+				_actionShowTourInMap.isChecked(),
+				tourData,
+				leftSliderValuesIndex,
+				rightSliderValuesIndex,
+				_actionShowSliderInMap.isChecked(),
+				_actionShowSliderInLegend.isChecked());
+
+		if (_isMapSynchedWithSlider) {
+
+			setMapToSliderBounds(tourData);
+
+			_map.queueMapRedraw();
+
+		} else {
+
+			_map.redraw();
+		}
+	}
+
+	private void resetMap() {
+
+		if (_tourDataList.size() == 0) {
+			return;
+		}
+
+		_map.disposeOverlayImageCache();
+
+		paintTours10All();
+
+		_map.queueMapRedraw();
+	}
+
+	private void restoreState() {
+
+		final IDialogSettings settings = TourbookPlugin.getDefault().getDialogSettingsSection(ID);
+		String state = null;
+
+		// checkbox: is tour centered
+		final boolean isTourCentered = settings.getBoolean(MEMENTO_ZOOM_CENTERED);
+		_actionZoomCentered.setChecked(isTourCentered);
+		_isPositionCentered = isTourCentered;
+
+		// checkbox: synch map with tour
+		final boolean isSynchTour = Util.getStateBoolean(settings, MEMENTO_SYNCH_WITH_SELECTED_TOUR, true);
+		_actionSynchWithTour.setChecked(isSynchTour);
+		_isMapSynchedWithTour = isSynchTour;
+
+		// ckeckbox: synch with tour chart slider
+		final boolean isSynchSlider = settings.getBoolean(MEMENTO_SYNCH_WITH_TOURCHART_SLIDER);
+		_actionSynchWithSlider.setChecked(isSynchSlider);
+		_isMapSynchedWithSlider = isSynchSlider;
+
+		// checkbox: show tour in map
+		final boolean isShowTour = Util.getStateBoolean(settings, MEMENTO_SHOW_TOUR_IN_MAP, true);
+		_actionShowTourInMap.setChecked(isShowTour);
+		_map.setShowOverlays(isShowTour);
+		_map.setShowLegend(isShowTour);
+
+		//
+		_actionSynchTourZoomLevel.setZoomLevel(Util.getStateInt(settings, MEMENTO_SYNCH_TOUR_ZOOM_LEVEL, 0));
+		_mapDimLevel = Util.getStateInt(settings, MEMENTO_MAP_DIM_LEVEL, -1);
+
+		// checkbox: show start/end in map
+		_actionShowStartEndInMap.setChecked(settings.getBoolean(MEMENTO_SHOW_START_END_IN_MAP));
+		_tourPainterConfig.isShowStartEndInMap = _actionShowStartEndInMap.isChecked();
+
+		// checkbox: show tour marker
+		state = settings.get(MEMENTO_SHOW_TOUR_MARKER);
+		_actionShowTourMarker.setChecked(state == null ? true : settings.getBoolean(MEMENTO_SHOW_TOUR_MARKER));
+		_tourPainterConfig.isShowTourMarker = _actionShowTourMarker.isChecked();
+
+		// checkbox: show way points
+		state = settings.get(MEMENTO_SHOW_WAY_POINTS);
+		_actionShowWayPoints.setChecked(state == null ? true : settings.getBoolean(MEMENTO_SHOW_WAY_POINTS));
+		final boolean isShowWayPoints = _actionShowWayPoints.isChecked();
+		_tourPainterConfig.isShowWayPoints = isShowWayPoints;
+		if (isShowWayPoints) {
+			_tourToolTip.addToolTipProvider(_wayPointToolTipProvider);
+		}
+
+		// checkbox: show legend in map
+		_actionShowLegendInMap.setChecked(Util.getStateBoolean(settings, MEMENTO_SHOW_LEGEND_IN_MAP, true));
+
+		// checkbox: show tour info in map
+		final boolean isShowTourInfo = Util.getStateBoolean(settings, MEMENTO_SHOW_TOUR_INFO_IN_MAP, true);
+		_actionShowTourInfoInMap.setChecked(isShowTourInfo);
+		if (isShowTourInfo) {
+			_tourToolTip.addToolTipProvider(_tourInfoToolTipProvider);
+		}
+
+		// checkbox: show scale
+		final boolean isScaleVisible = Util.getStateBoolean(settings, MEMENTO_SHOW_SCALE_IN_MAP, true);
+		_actionShowScaleInMap.setChecked(isScaleVisible);
+		_map.setShowScale(isScaleVisible);
+
+		// other actions
+		state = settings.get(MEMENTO_SHOW_SLIDER_IN_MAP);
+		_actionShowSliderInMap.setChecked(state == null ? true : settings.getBoolean(MEMENTO_SHOW_SLIDER_IN_MAP));
+
+		_actionShowSliderInLegend.setChecked(settings.getBoolean(MEMENTO_SHOW_SLIDER_IN_LEGEND));
+
+		// restore map provider by selecting the last used map factory
+		_actionSelectMapProvider.selectMapProvider(settings.get(MEMENTO_SELECTED_MAP_PROVIDER_ID));
+
+		// default position
+		_defaultZoom = Util.getStateInt(settings, MEMENTO_DEFAULT_POSITION_ZOOM, 10);
+		_defaultPosition = new GeoPosition(//
+				Util.getStateDouble(settings, MEMENTO_DEFAULT_POSITION_LATITUDE, 46.303074),
+				Util.getStateDouble(settings, MEMENTO_DEFAULT_POSITION_LONGITUDE, 7.526386));
+
+		// tour color
+		try {
+			final Integer colorId = settings.getInt(MEMENTO_TOUR_COLOR_ID);
+
+			switch (colorId) {
+			case TOUR_COLOR_ALTITUDE:
+				_actionTourColorAltitude.setChecked(true);
+				break;
+
+			case TOUR_COLOR_GRADIENT:
+				_actionTourColorGradient.setChecked(true);
+				break;
+
+			case TOUR_COLOR_PULSE:
+				_actionTourColorPulse.setChecked(true);
+				break;
+
+			case TOUR_COLOR_SPEED:
+				_actionTourColorSpeed.setChecked(true);
+				break;
+
+			case TOUR_COLOR_PACE:
+				_actionTourColorPace.setChecked(true);
+				break;
+
+			case TOUR_COLOR_HR_ZONE:
+				_actionTourColorHrZone.setChecked(true);
+				break;
+
+			default:
+				_actionTourColorAltitude.setChecked(true);
+				break;
+			}
+
+			_tourPainterConfig.setLegendProvider(getLegendProvider(colorId));
+
+		} catch (final NumberFormatException e) {
+			_actionTourColorAltitude.setChecked(true);
+		}
+
+		// draw tour with default color
+
+		// check legend provider
+		if (_tourPainterConfig.getLegendProvider() == null) {
+
+			// set default legend provider
+			_tourPainterConfig.setLegendProvider(getLegendProvider(TOUR_COLOR_ALTITUDE));
+
+			// hide legend
+			_map.setShowLegend(false);
+		}
+
+		// debug info
+		final boolean isShowTileInfo = _prefStore.getBoolean(TourMapView.PREF_SHOW_TILE_INFO);
+		final boolean isShowTileBorder = _prefStore.getBoolean(PREF_SHOW_TILE_BORDER);
+
+		_map.setShowDebugInfo(isShowTileInfo, isShowTileBorder);
+
+		// set dim level/color after the map providers are set
+		if (_mapDimLevel == -1) {
+			_mapDimLevel = 0xff;
+		}
+		final RGB dimColor = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.MAP_LAYOUT_DIM_COLOR);
+		_map.setDimLevel(_mapDimLevel, dimColor);
+		_mapDimLevel = _actionDimMap.setDimLevel(_mapDimLevel);
+
+		// display the map with the default position
+		actionSetDefaultPosition();
+	}
+
+	private void saveState() {
+
+		final IDialogSettings settings = TourbookPlugin.getDefault().getDialogSettingsSection(ID);
+
+		// save checked actions
+		settings.put(MEMENTO_ZOOM_CENTERED, _actionZoomCentered.isChecked());
+		settings.put(MEMENTO_SHOW_TOUR_IN_MAP, _actionShowTourInMap.isChecked());
+		settings.put(MEMENTO_SYNCH_WITH_SELECTED_TOUR, _actionSynchWithTour.isChecked());
+		settings.put(MEMENTO_SYNCH_WITH_TOURCHART_SLIDER, _actionSynchWithSlider.isChecked());
+		settings.put(MEMENTO_SYNCH_TOUR_ZOOM_LEVEL, _actionSynchTourZoomLevel.getZoomLevel());
+
+		settings.put(MEMENTO_MAP_DIM_LEVEL, _mapDimLevel);
+
+		settings.put(MEMENTO_SHOW_LEGEND_IN_MAP, _actionShowLegendInMap.isChecked());
+		settings.put(MEMENTO_SHOW_START_END_IN_MAP, _actionShowStartEndInMap.isChecked());
+		settings.put(MEMENTO_SHOW_SCALE_IN_MAP, _actionShowScaleInMap.isChecked());
+		settings.put(MEMENTO_SHOW_SLIDER_IN_MAP, _actionShowSliderInMap.isChecked());
+		settings.put(MEMENTO_SHOW_SLIDER_IN_LEGEND, _actionShowSliderInLegend.isChecked());
+		settings.put(MEMENTO_SHOW_TOUR_MARKER, _actionShowTourMarker.isChecked());
+		settings.put(MEMENTO_SHOW_TOUR_INFO_IN_MAP, _actionShowTourInfoInMap.isChecked());
+		settings.put(MEMENTO_SHOW_WAY_POINTS, _actionShowWayPoints.isChecked());
+
+		settings.put(MEMENTO_SELECTED_MAP_PROVIDER_ID, _actionSelectMapProvider.getSelectedMapProvider().getId());
+
+		if (_defaultPosition == null) {
+			settings.put(MEMENTO_DEFAULT_POSITION_ZOOM, _map.getMapProvider().getMinimumZoomLevel());
+			settings.put(MEMENTO_DEFAULT_POSITION_LATITUDE, 0.0F);
+			settings.put(MEMENTO_DEFAULT_POSITION_LONGITUDE, 0.0F);
+		} else {
+			settings.put(MEMENTO_DEFAULT_POSITION_ZOOM, _defaultZoom);
+			settings.put(MEMENTO_DEFAULT_POSITION_LATITUDE, (float) _defaultPosition.latitude);
+			settings.put(MEMENTO_DEFAULT_POSITION_LONGITUDE, (float) _defaultPosition.longitude);
+		}
+
+		// tour color
+		int colorId;
+
+		if (_actionTourColorGradient.isChecked()) {
+			colorId = TOUR_COLOR_GRADIENT;
+
+		} else if (_actionTourColorPulse.isChecked()) {
+			colorId = TOUR_COLOR_PULSE;
+
+		} else if (_actionTourColorSpeed.isChecked()) {
+			colorId = TOUR_COLOR_SPEED;
+
+		} else if (_actionTourColorPace.isChecked()) {
+			colorId = TOUR_COLOR_PACE;
+
+		} else if (_actionTourColorHrZone.isChecked()) {
+			colorId = TOUR_COLOR_HR_ZONE;
+		} else {
+			colorId = TOUR_COLOR_ALTITUDE;
+		}
+		settings.put(MEMENTO_TOUR_COLOR_ID, colorId);
+	}
+
+	@Override
+	public void setFocus() {
+		_map.setFocus();
+	}
+
+	/**
+	 * Calculate the bounds for the tour in latitude and longitude values
+	 * 
+	 * @param tourData
+	 * @return
+	 */
+	private void setMapToSliderBounds(final TourData tourData) {
+
+		if (tourData == null) {
+			return;
+		}
+
+		final double[] latitudeSerie = tourData.latitudeSerie;
+		final double[] longitudeSerie = tourData.longitudeSerie;
+
+//		final double leftSliderLat = latitudeSerie[fCurrentLeftSliderValueIndex];
+//		final double leftSliderLong = longitudeSerie[fCurrentLeftSliderValueIndex];
+//
+//		final double rightSliderLat = latitudeSerie[fCurrentRightSliderValueIndex];
+//		final double rightSliderLong = longitudeSerie[fCurrentRightSliderValueIndex];
+//
+//		final double minLatitude = Math.min(leftSliderLat + 0, rightSliderLat + 0);
+//		final double minLongitude = Math.min(leftSliderLong + 0, rightSliderLong + 0);
+//
+//		final double maxLatitude = Math.max(leftSliderLat + 0, rightSliderLat + 0);
+//		final double maxLongitude = Math.max(leftSliderLong + 0, rightSliderLong + 0);
+//
+//		final double latDiff2 = (maxLatitude - minLatitude) / 2;
+//		final double longDiff2 = (maxLongitude - minLongitude) / 2;
+//
+//		final double sliderLat = minLatitude + latDiff2 - 0;
+//		final double sliderLong = minLongitude + longDiff2 - 0;
+
+//		_map.setCenterPosition(new GeoPosition(sliderLat, sliderLong));
+//		_map.setCenterPosition(new GeoPosition(sliderLat, leftSliderLong));
+//		_map.setCenterPosition(new GeoPosition(leftSliderLat, leftSliderLong));
+
+		final int sliderIndex = Math.max(0, Math.min(_currentSelectedSliderValueIndex, latitudeSerie.length - 1));
+
+		_map.setMapCenter(new GeoPosition(latitudeSerie[sliderIndex], longitudeSerie[sliderIndex]));
+
+	}
+
+	/**
+	 * Calculates a zoom level so that all points in the specified set will be visible on screen.
+	 * This is useful if you have a bunch of points in an area like a city and you want to zoom out
+	 * so that the entire city and it's points are visible without panning.
+	 * 
+	 * @param positions
+	 *            A set of GeoPositions to calculate the new zoom from
+	 * @param adjustZoomLevel
+	 *            when <code>true</code> the zoom level will be adjusted to user settings
+	 */
+	private void setTourZoomLevel(final Set<GeoPosition> positions, final boolean isAdjustZoomLevel) {
+
+		if ((positions == null) || (positions.size() < 2)) {
+			return;
+		}
+
+		final MP mp = _map.getMapProvider();
+
+		final int maximumZoomLevel = mp.getMaximumZoomLevel();
+		int zoom = mp.getMinimumZoomLevel();
+
+		Rectangle positionRect = getPositionRect(positions, zoom);
+		Rectangle viewport = _map.getWorldPixelViewport();
+
+//		// zoom until the tour is visible in the map
+//		while (!viewport.contains(positionRect)) {
+//
+//			// center position in the map
+//			final Point center = new Point(//
+//					positionRect.x + positionRect.width / 2,
+//					positionRect.y + positionRect.height / 2);
+//
+//			_map.setGeoCenterPosition(mp.pixelToGeo(center, zoom));
+//
+//			zoom++;
+//
+//			// check zoom level
+//			if (zoom >= maximumZoomLevel) {
+//				break;
+//			}
+//			_map.setZoom(zoom);
+//
+//			positionRect = getPositionRect(positions, zoom);
+//			viewport = _map.getMapPixelViewport();
+//		}
+
+		// zoom in until the tour is larger than the viewport
+		while ((positionRect.width < viewport.width) && (positionRect.height < viewport.height)) {
+
+			// center position in the map
+			final Point center = new Point(//
+					positionRect.x + positionRect.width / 2,
+					positionRect.y + positionRect.height / 2);
+
+			_map.setMapCenter(mp.pixelToGeo(center, zoom));
+
+			zoom++;
+
+			// check zoom level
+			if (zoom >= maximumZoomLevel) {
+				break;
+			}
+			_map.setZoom(zoom);
+
+			positionRect = getPositionRect(positions, zoom);
+			viewport = _map.getWorldPixelViewport();
+		}
+
+		// the algorithm generated a larger zoom level as necessary
+		zoom--;
+
+		int adjustedZoomLevel = 0;
+		if (isAdjustZoomLevel) {
+			adjustedZoomLevel = _tourPainterConfig.getSynchTourZoomLevel();
+		}
+
+		_map.setZoom(zoom + adjustedZoomLevel);
+	}
+
+	private void showDefaultMap() {
+
+		// disable tour actions in this view
+		_isTour = false;
+
+		// disable tour data
+		_tourDataList.clear();
+		_previousTourData = null;
+
+		// update direct painter to draw nothing
+		_directMappingPainter.setPaintContext(_map, false, null, 0, 0, false, false);
+
+		_map.setShowOverlays(false);
+		_map.setShowLegend(false);
+
+		_map.queueMapRedraw();
+	}
+
+	/**
+	 * show warning that map is dimmed and can be invisible
+	 */
+	private void showDimWarning() {
+
+		if (_prefStore.getBoolean(ITourbookPreferences.MAP_VIEW_CONFIRMATION_SHOW_DIM_WARNING) == false) {
+
+			Display.getCurrent().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+
+					final MessageDialogWithToggle dialog = MessageDialogWithToggle.openInformation(Display
+							.getCurrent()
+							.getActiveShell(),//
+							Messages.map_dlg_dim_warning_title, // title
+							Messages.map_dlg_dim_warning_message, // message
+							Messages.map_dlg_dim_warning_toggle_message, // toggle message
+							false, // toggle default state
+							null,
+							null);
+
+					_prefStore.setValue(
+							ITourbookPreferences.MAP_VIEW_CONFIRMATION_SHOW_DIM_WARNING,
+							dialog.getToggleState());
+				}
+			});
+		}
+	}
+
+	private void showToursFromTourProvider() {
+
+		Display.getCurrent().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+
+				// validate widget
+				if (_map.isDisposed()) {
+					return;
+				}
+
+				/*
+				 * check if tour is set from a selection provider
+				 */
+				if (_tourDataList.size() > 0) {
+					return;
+				}
+
+				final ArrayList<TourData> tourDataList = TourManager.getSelectedTours();
+				if (tourDataList != null) {
+
+					_tourDataList.clear();
+					_tourDataList.addAll(tourDataList);
+
+					paintTours10All();
+				}
+			}
+		});
 	}
 }

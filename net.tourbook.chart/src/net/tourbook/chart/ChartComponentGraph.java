@@ -375,7 +375,7 @@ public class ChartComponentGraph extends Canvas {
 	/**
 	 * Client area for this canvas
 	 */
-	private Rectangle					_clientArea;
+	Rectangle							_clientArea;
 
 	/**
 	 * is <code>true</code> when the chart is panned
@@ -1456,7 +1456,8 @@ public class ChartComponentGraph extends Canvas {
 
 			public void run() {
 
-				final long startTime = System.currentTimeMillis();
+//				final long startTime = System.currentTimeMillis();
+//				// TODO remove SYSTEM.OUT.PRINTLN
 
 				/*
 				 * create the chart image only when a new onPaint event has not occured
@@ -1559,8 +1560,9 @@ public class ChartComponentGraph extends Canvas {
 
 				redraw();
 
-				final long endTime = System.currentTimeMillis();
-				System.out.println("Execution time : " + (endTime - startTime) + " ms   #:" + _drawCounter[0]);
+//				final long endTime = System.currentTimeMillis();
+//				System.out.println("Execution time : " + (endTime - startTime) + " ms   #:" + _drawCounter[0]);
+//				// TODO remove SYSTEM.OUT.PRINTLN
 			}
 		};
 
@@ -2098,13 +2100,13 @@ public class ChartComponentGraph extends Canvas {
 		}
 	}
 
-	private void draw200LineGraph(final GC gc, final GraphDrawingData drawingData) {
+	private void draw200LineGraph(final GC gc, final GraphDrawingData graphDrawingData) {
 
-		final ChartDataXSerie xData = drawingData.getXData();
-		final ChartDataYSerie yData = drawingData.getYData();
+		final ChartDataXSerie xData = graphDrawingData.getXData();
+		final ChartDataYSerie yData = graphDrawingData.getYData();
 
 		final int xValues[] = xData.getHighValues()[0];
-		final float scaleX = drawingData.getScaleX();
+		final float scaleX = graphDrawingData.getScaleX();
 
 		final RGB rgbFg = yData.getRgbLine()[0];
 		final RGB rgbBg1 = yData.getRgbDark()[0];
@@ -2126,7 +2128,7 @@ public class ChartComponentGraph extends Canvas {
 
 			draw202LineGraphSegment(
 					gc,
-					drawingData,
+					graphDrawingData,
 					0,
 					xValues.length,
 					rgbFg,
@@ -2145,7 +2147,7 @@ public class ChartComponentGraph extends Canvas {
 			// draw the x-marker
 			draw202LineGraphSegment(
 					gc,
-					drawingData,
+					graphDrawingData,
 					xData.getSynchMarkerStartIndex(),
 					xData.getSynchMarkerEndIndex() + 1,
 					rgbFg,
@@ -2157,7 +2159,7 @@ public class ChartComponentGraph extends Canvas {
 			// draw segment before the marker
 			draw202LineGraphSegment(
 					gc,
-					drawingData,
+					graphDrawingData,
 					0,
 					xData.getSynchMarkerStartIndex() + 1,
 					rgbFg,
@@ -2169,7 +2171,7 @@ public class ChartComponentGraph extends Canvas {
 			// draw segment after the marker
 			draw202LineGraphSegment(
 					gc,
-					drawingData,
+					graphDrawingData,
 					xData.getSynchMarkerEndIndex() - 0,
 					xValues.length,
 					rgbFg,
@@ -2241,11 +2243,14 @@ public class ChartComponentGraph extends Canvas {
 		final float scaleX = graphDrawingData.getScaleX();
 		final float scaleY = graphDrawingData.getScaleY();
 
+		final boolean isShowSkippedValues = _chartDrawingData.chartDataModel.isNoLinesValuesDisplayed();
 		final Display display = getDisplay();
 
 		// path is scaled in device pixel
 		final Path path = new Path(display);
 		final Path path2 = isPath2 ? new Path(display) : null;
+
+		final ArrayList<Point> skippedValues = new ArrayList<Point>();
 
 		final int devCanvasHeight = graphDrawingData.devGraphHeight;
 		final float devYGraphTop = scaleY * graphYBorderTop;
@@ -2331,7 +2336,6 @@ public class ChartComponentGraph extends Canvas {
 
 				// keep current position which is used as the painting starting point
 
-//				graphXPrev = graphX;
 				graphY1Prev = graphY1;
 
 				devXPrev = devX;
@@ -2387,7 +2391,9 @@ public class ChartComponentGraph extends Canvas {
 
 				if (noLine != null && noLine[valueIndex]) {
 
-					// draw NO line
+					/*
+					 * draw NO line, but draw a line at the bottom or the x-axis with y=0
+					 */
 
 					if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_BOTTOM
 							|| graphFillMethod == ChartDataYSerie.FILL_METHOD_CUSTOM) {
@@ -2403,6 +2409,18 @@ public class ChartComponentGraph extends Canvas {
 
 						path.lineTo(devXPrev, devY0);
 						path.lineTo(devX, devY0);
+					}
+
+					/*
+					 * keep positions, because skipped values will be painted as dot outside of the
+					 * path, but don't draw on the graph bottom or x-axis
+					 */
+					if (isShowSkippedValues) {
+
+						final int devY = (int) (devY0Inverse - devY1);
+						if (devY != devY0 && graphY1 != 0) {
+							skippedValues.add(new Point((int) devX, devY));
+						}
 					}
 
 					isNoLine = true;
@@ -2555,6 +2573,17 @@ public class ChartComponentGraph extends Canvas {
 
 		// reset clipping that the line is drawn everywere
 		gcGraph.setClipping((Rectangle) null);
+
+		gcGraph.setBackground(colorFg);
+
+		/*
+		 * paint skipped values
+		 */
+		if (isShowSkippedValues && skippedValues.size() > 0) {
+			for (final Point skippedPoint : skippedValues) {
+				gcGraph.fillRectangle(skippedPoint.x, skippedPoint.y, 2, 2);
+			}
+		}
 
 		/*
 		 * draw line along the path

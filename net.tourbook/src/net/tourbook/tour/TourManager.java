@@ -341,13 +341,13 @@ public class TourManager {
 	}
 
 	/**
-	 * create the tour chart configuration by reading the settings from the preferences
+	 * Create a tour chart configuration by reading the settings from the pref store.
 	 * 
-	 * @return
+	 * @return Returns a new tour chart configuration.
 	 */
 	public static TourChartConfiguration createTourChartConfiguration() {
 
-		final TourChartConfiguration chartConfig = new TourChartConfiguration(true);
+		final TourChartConfiguration tourChartConfig = new TourChartConfiguration(true);
 
 		/*
 		 * convert graph ids from the preferences into visible graphs in the chart panel
@@ -357,25 +357,31 @@ public class TourManager {
 				_prefStore.getString(ITourbookPreferences.GRAPH_VISIBLE));
 
 		for (final String prefGraphId : prefGraphIds) {
-			chartConfig.addVisibleGraph(Integer.parseInt(prefGraphId));
+			tourChartConfig.addVisibleGraph(Integer.parseInt(prefGraphId));
 		}
 
-		chartConfig.isHrZoneDisplayed = _prefStore.getBoolean(ITourbookPreferences.GRAPH_HR_ZONE_IS_VISIBLE);
+		tourChartConfig.isHrZoneDisplayed = _prefStore
+				.getBoolean(ITourbookPreferences.GRAPH_IS_HR_ZONE_BACKGROUND_VISIBLE);
+
+		tourChartConfig.isBreaktimeValuesDisplayed = _prefStore.getBoolean(//
+				ITourbookPreferences.GRAPH_IS_BREAKTIME_VALUES_VISIBLE);
 
 		// set the unit which is shown on the x-axis
 		if (_prefStore.getString(ITourbookPreferences.GRAPH_X_AXIS).equals(X_AXIS_TIME)) {
-			chartConfig.isShowTimeOnXAxis = true;
+			tourChartConfig.isShowTimeOnXAxis = true;
 		} else {
-			chartConfig.isShowTimeOnXAxis = false;
+			tourChartConfig.isShowTimeOnXAxis = false;
 		}
-		chartConfig.isShowTimeOnXAxisBackup = chartConfig.isShowTimeOnXAxis;
+		tourChartConfig.isShowTimeOnXAxisBackup = tourChartConfig.isShowTimeOnXAxis;
 
-		chartConfig.isShowStartTime = _prefStore.getBoolean(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME);
-		chartConfig.isSRTMDataVisible = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SRTM_VISIBLE);
+		tourChartConfig.isShowStartTime = _prefStore.getBoolean(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME);
+		tourChartConfig.isSRTMDataVisible = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SRTM_VISIBLE);
 
-		updateZoomOptionsInChartConfig(chartConfig, _prefStore);
+		tourChartConfig.isShowTourMarker = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_MARKER_VISIBLE);
 
-		return chartConfig;
+		updateZoomOptionsInChartConfig(tourChartConfig, _prefStore);
+
+		return tourChartConfig;
 	}
 
 	public static void fireEvent(final TourEventId tourEventId) {
@@ -1593,7 +1599,7 @@ public class TourManager {
 	}
 
 	private ChartDataModel createChartDataModelInternal(final TourData tourData,
-														final TourChartConfiguration chartConfig,
+														final TourChartConfiguration tourChartConfig,
 														final boolean hasPropertyChanged) {
 
 		// check if avg callbacks are created
@@ -1646,12 +1652,12 @@ public class TourManager {
 		boolean isShowTimeOnXAxis;
 		if (xDataDistance == null) {
 			isShowTimeOnXAxis = true;
-			chartConfig.isForceTimeOnXAxis = true;
+			tourChartConfig.isForceTimeOnXAxis = true;
 		} else {
-			isShowTimeOnXAxis = chartConfig.isShowTimeOnXAxisBackup;
-			chartConfig.isForceTimeOnXAxis = false;
+			isShowTimeOnXAxis = tourChartConfig.isShowTimeOnXAxisBackup;
+			tourChartConfig.isForceTimeOnXAxis = false;
 		}
-		chartConfig.isShowTimeOnXAxis = isShowTimeOnXAxis;
+		tourChartConfig.isShowTimeOnXAxis = isShowTimeOnXAxis;
 
 		if (isShowTimeOnXAxis) {
 
@@ -1669,7 +1675,7 @@ public class TourManager {
 			 * when time is displayed, the x-axis can show the start time starting from 0 or from
 			 * the current time of the day
 			 */
-			final int startTime = chartConfig.isShowStartTime ? //
+			final int startTime = tourChartConfig.isShowStartTime ? //
 					(tourData.getStartHour() * 3600) + (tourData.getStartMinute() * 60)
 					: 0;
 
@@ -1695,8 +1701,8 @@ public class TourManager {
 		final int chartType = _prefStore.getInt(ITourbookPreferences.GRAPH_PROPERTY_CHARTTYPE);
 
 		// HR zones can be displayed when they are available
-		chartConfig.canShowHrZones = tourData.getNumberOfHrZones() > 0;
-		final boolean isHrZoneDisplayed = chartConfig.canShowHrZones && chartConfig.isHrZoneDisplayed;
+		tourChartConfig.canShowHrZones = tourData.getNumberOfHrZones() > 0;
+		final boolean isHrZoneDisplayed = tourChartConfig.canShowHrZones && tourChartConfig.isHrZoneDisplayed;
 
 		/*
 		 * altitude
@@ -1708,9 +1714,9 @@ public class TourManager {
 
 			if (tourData.isSRTMAvailable()) {
 
-				chartConfig.canShowSRTMData = true;
+				tourChartConfig.canShowSRTMData = true;
 
-				if (chartConfig.isSRTMDataVisible) {
+				if (tourChartConfig.isSRTMDataVisible) {
 
 					final int[] srtmDataSerie = tourData.getSRTMSerie();
 					if (srtmDataSerie != null) {
@@ -1725,7 +1731,7 @@ public class TourManager {
 			} else {
 
 				// SRTM data are not available
-				chartConfig.canShowSRTMData = false;
+				tourChartConfig.canShowSRTMData = false;
 			}
 
 			if (yDataAltitude == null) {
@@ -1971,7 +1977,7 @@ public class TourManager {
 		 * all visible graphs are added as y-data to the chart data model in the sequence as they
 		 * were activated
 		 */
-		for (final int actionId : chartConfig.getVisibleGraphs()) {
+		for (final int actionId : tourChartConfig.getVisibleGraphs()) {
 
 			switch (actionId) {
 			case GRAPH_ALTITUDE:
@@ -2046,6 +2052,8 @@ public class TourManager {
 				break;
 			}
 		}
+
+		chartDataModel.setShowNoLineValues(tourChartConfig.isBreaktimeValuesDisplayed);
 
 		chartDataModel.setCustomData(CUSTOM_DATA_TIME, xDataTime);
 		chartDataModel.setCustomData(CUSTOM_DATA_DISTANCE, xDataDistance);

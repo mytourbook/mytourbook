@@ -19,6 +19,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import net.tourbook.Messages;
+import net.tourbook.data.HrZoneContext;
+import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourPersonHRZone;
 
@@ -178,5 +180,55 @@ public class TrainingManager {
 		}
 
 		return hrZones;
+	}
+
+	public static int getZoneIndex(final HrZoneContext hrZoneContext, final int pulse) {
+
+		final int[] zoneMinBpm = hrZoneContext.zoneMinBpm;
+		int zoneIndex = 0;
+
+		for (int checkedIndex = 0; checkedIndex < zoneMinBpm.length; checkedIndex++) {
+
+			if (zoneMinBpm[checkedIndex] > pulse) {
+				return zoneIndex;
+			}
+
+			zoneIndex = checkedIndex;
+		}
+
+		return zoneIndex;
+	}
+
+	/**
+	 * Checks if all necessary data are available which are needed to draw the HR zones.
+	 * 
+	 * @param tourData
+	 * @param currentPerson
+	 * @return Returns <code>true</code> when HR zones are available for the
+	 */
+	public static boolean isRequiredHrZoneDataAvailable(final TourData tourData) {
+
+		// check tour
+		if (tourData != null) {
+
+			// check pulse
+			final int[] pulseSerie = tourData.pulseSerie;
+			final boolean isPulse = pulseSerie != null && pulseSerie.length > 0;
+			if (isPulse) {
+
+				// check person
+				final TourPerson tourPerson = tourData.getTourPerson();
+				if (tourPerson != null) {
+
+					// check hr zones
+					final Set<TourPersonHRZone> personHrZones = tourPerson.getHrZones();
+					final boolean isHrZones = personHrZones != null && personHrZones.size() > 0;
+
+					return isHrZones;
+				}
+			}
+		}
+
+		return false;
 	}
 }

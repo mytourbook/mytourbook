@@ -125,17 +125,31 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 				final String property = event.getProperty();
 
 				/*
-				 * set a new chart configuration when the preferences has changed
+				 * create a new chart configuration when the preferences has changed
 				 */
 				if (property.equals(ITourbookPreferences.GRAPH_VISIBLE)
 						|| property.equals(ITourbookPreferences.GRAPH_X_AXIS)
-						|| property.equals(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME)) {
-
+						|| property.equals(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME)
+						//
+						|| property.equals(ITourbookPreferences.GRAPH_IS_HR_ZONE_BACKGROUND_VISIBLE)
+						|| property.equals(ITourbookPreferences.GRAPH_IS_BREAKTIME_VALUES_VISIBLE)
+				//
+				) {
 					_tourChartConfig = TourManager.createTourChartConfiguration();
 
 					if (_tourChart != null) {
 						_tourChart.updateTourChart(_tourData, _tourChartConfig, false);
 					}
+
+				} else if (property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)) {
+
+					/*
+					 * HR zone colors can be modified and person hash code has changed by saving the
+					 * person entity -> tour chart must be recreated
+					 */
+
+					clearView();
+					showTour();
 
 				} else if (property.equals(ITourbookPreferences.GRAPH_MOUSE_MODE)) {
 
@@ -273,11 +287,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 		// set this view part as selection provider
 		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider());
 
-		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
-
-		if (_tourData == null) {
-			showTourFromTourProvider();
-		}
+		showTour();
 	}
 
 	private void createUI(final Composite parent) {
@@ -487,6 +497,14 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 		_postSelectionProvider.setSelection(new SelectionTourData(_tourChart, _tourData));
 
 		fireSliderPosition();
+	}
+
+	private void showTour() {
+		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
+
+		if (_tourData == null) {
+			showTourFromTourProvider();
+		}
 	}
 
 	private void showTourFromTourProvider() {

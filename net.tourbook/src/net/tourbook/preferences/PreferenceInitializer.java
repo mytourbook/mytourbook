@@ -124,8 +124,12 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 				+ (Integer.toString(TourManager.GRAPH_GRADIENT) + separator)
 				+ Integer.toString(TourManager.GRAPH_POWER));
 
-		// is HR zone visible
-		store.setDefault(ITourbookPreferences.GRAPH_HR_ZONE_IS_VISIBLE, true);
+		// graph options
+		store.setDefault(ITourbookPreferences.GRAPH_IS_HR_ZONE_BACKGROUND_VISIBLE, true);
+		store.setDefault(ITourbookPreferences.GRAPH_IS_BREAKTIME_VALUES_VISIBLE, true);
+
+		// is marker visible
+		store.setDefault(ITourbookPreferences.GRAPH_IS_MARKER_VISIBLE, true);
 
 		// define which unit is shown on the x-axis
 		store.setDefault(ITourbookPreferences.GRAPH_X_AXIS, TourManager.X_AXIS_DISTANCE);

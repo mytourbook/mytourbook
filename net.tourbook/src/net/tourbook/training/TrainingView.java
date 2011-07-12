@@ -171,6 +171,7 @@ public class TrainingView extends ViewPart {
 
 	private Label						_lblNoHrZone;
 
+	private Composite					_headerToolbar;
 	private Chart						_chartHrTime;
 
 	private Spinner						_spinnerHrLeft;
@@ -281,13 +282,15 @@ public class TrainingView extends ViewPart {
 					onModifyPerson();
 
 				} else if (property.equals(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE)
-						|| property.equals(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE)) {
+						|| property.equals(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE)
+						|| property.equals(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
+						|| property.equals(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES)) {
 
-					// set grid size
-					final int horizPixel = _prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE);
-					final int verticalPixel = _prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE);
-
-					_chartHrTime.setGridDistance(horizPixel, verticalPixel);
+					_chartHrTime.setGrid(
+							_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
+							_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE),
+							_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
+							_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
 
 					// grid has changed, update chart
 					updateUI30HrZonesFromModel();
@@ -366,6 +369,7 @@ public class TrainingView extends ViewPart {
 	public void createPartControl(final Composite parent) {
 
 		createUI(parent);
+
 		createActions();
 
 		// show default page
@@ -406,18 +410,18 @@ public class TrainingView extends ViewPart {
 
 	private void createUI10HeaderToolbar(final Composite parent) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
+		_headerToolbar = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
 				.grab(true, false)
-				.align(SWT.END, SWT.FILL)
-				.applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(6).applyTo(container);
+				.align(SWT.BEGINNING, SWT.FILL)
+				.applyTo(_headerToolbar);
+		GridLayoutFactory.fillDefaults().numColumns(6).applyTo(_headerToolbar);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
 			/*
 			 * label: hr min
 			 */
-			_lblHrMin = new Label(container, SWT.NONE);
+			_lblHrMin = new Label(_headerToolbar, SWT.NONE);
 			GridDataFactory.fillDefaults()//
 					.indent(10, 0)
 					.align(SWT.BEGINNING, SWT.CENTER)
@@ -428,7 +432,7 @@ public class TrainingView extends ViewPart {
 			/*
 			 * spinner: hr min
 			 */
-			_spinnerHrLeft = new Spinner(container, SWT.BORDER);
+			_spinnerHrLeft = new Spinner(_headerToolbar, SWT.BORDER);
 			_spinnerHrLeft.setMinimum(HR_LEFT_MIN_BORDER);
 			_spinnerHrLeft.setMaximum(HR_RIGHT_MAX_BORDER);
 			_spinnerHrLeft.addModifyListener(_defaultSpinnerModifyListener);
@@ -438,7 +442,7 @@ public class TrainingView extends ViewPart {
 			/*
 			 * label: hr max
 			 */
-			_lblHrMax = new Label(container, SWT.NONE);
+			_lblHrMax = new Label(_headerToolbar, SWT.NONE);
 			GridDataFactory.fillDefaults()//
 					.align(SWT.BEGINNING, SWT.CENTER)
 					.applyTo(_lblHrMax);
@@ -448,7 +452,7 @@ public class TrainingView extends ViewPart {
 			/*
 			 * spinner: hr max
 			 */
-			_spinnerHrRight = new Spinner(container, SWT.BORDER);
+			_spinnerHrRight = new Spinner(_headerToolbar, SWT.BORDER);
 			_spinnerHrRight.setMinimum(HR_LEFT_MIN_BORDER);
 			_spinnerHrRight.setMaximum(HR_RIGHT_MAX_BORDER);
 			_spinnerHrRight.addModifyListener(_defaultSpinnerModifyListener);
@@ -458,7 +462,7 @@ public class TrainingView extends ViewPart {
 			/*
 			 * toolbar actions
 			 */
-			final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
+			final ToolBar toolbar = new ToolBar(_headerToolbar, SWT.FLAT);
 			GridDataFactory.fillDefaults()//
 					.align(SWT.BEGINNING, SWT.CENTER)
 					.applyTo(toolbar);
@@ -537,23 +541,40 @@ public class TrainingView extends ViewPart {
 				.spacing(0, 0)
 				.applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+		container.setBackground(_tk.getColors().getBackground());
 		{
+			createUI30HrZoneChart(container);
 			createUI40HrZoneImage(container);
-			createUI50HrZoneChart(container);
-			createUI30HrZoneDataContainer(container);
+			createUI50HrZoneDataContainer(container);
 		}
 
 		return container;
 	}
 
-	private void createUI30HrZoneDataContainer(final Composite parent) {
+	private void createUI30HrZoneChart(final Composite parent) {
 
-		_hrZoneDataContainer = _tk.createComposite(parent);
-		GridDataFactory.fillDefaults()//
-//				.grab(false, true)
-//				.minSize(SWT.DEFAULT, 1)
-				.applyTo(_hrZoneDataContainer);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(_hrZoneDataContainer);
+		/*
+		 * chart
+		 */
+		_chartHrTime = new Chart(parent, SWT.FLAT);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_chartHrTime);
+
+		// set grid size
+		_chartHrTime.setGrid(
+				_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
+				_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE),
+				_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
+				_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
+
+		_chartHrTime.addBarSelectionListener(new IBarSelectionListener() {
+			public void selectionChanged(final int serieIndex, final int valueIndex) {
+
+//					System.out.println(serieIndex + "\t" + valueIndex);
+//					// TODO remove SYSTEM.OUT.PRINTLN
+
+//					_postSelectionProvider.setSelection(selection);
+			}
+		});
 	}
 
 	private void createUI32HrZoneDataContainerContent() {
@@ -600,11 +621,11 @@ public class TrainingView extends ViewPart {
 	private void createUI36HrZoneHeader(final Composite parent) {
 
 		/*
-		 * label: color/zone name
+		 * label: zone name
 		 */
 		Label label = _tk.createLabel(parent, Messages.Training_HRZone_Label_Header_Zone);
 		GridDataFactory.fillDefaults()//
-				.span(2, 1)
+//				.span(2, 1)
 				.align(SWT.CENTER, SWT.FILL)
 				.applyTo(label);
 		label.setFont(_fontItalic);
@@ -634,6 +655,10 @@ public class TrainingView extends ViewPart {
 				.align(SWT.END, SWT.FILL)
 //				.align(SWT.CENTER, SWT.FILL)
 				.applyTo(label);
+		/*
+		 * color
+		 */
+		label = _tk.createLabel(parent, UI.EMPTY_STRING);
 	}
 
 	private void createUI38HrZoneFields(final Composite parent) {
@@ -660,13 +685,6 @@ public class TrainingView extends ViewPart {
 
 			final TourPersonHRZone hrZone = _personHrZones.get(zoneIndex);
 			final Color hrZoneColor = _hrZoneColors[zoneIndex] = new Color(display, hrZone.getColor());
-
-			/*
-			 * label: color
-			 */
-			final Label label = _lblHRZoneColor[zoneIndex] = new Label(parent, SWT.NONE);
-			GridDataFactory.fillDefaults().hint(16, 16).applyTo(label);
-			label.setBackground(hrZoneColor);
 
 			/*
 			 * label: hr zone name
@@ -706,6 +724,13 @@ public class TrainingView extends ViewPart {
 			GridDataFactory.fillDefaults() //
 					.hint(_pc.convertWidthInCharsToPixels(8), SWT.DEFAULT)
 					.applyTo(lblTourMinMaxBpm);
+
+			/*
+			 * label: color
+			 */
+			final Label label = _lblHRZoneColor[zoneIndex] = new Label(parent, SWT.NONE);
+			GridDataFactory.fillDefaults().hint(16, 16).applyTo(label);
+			label.setBackground(hrZoneColor);
 		}
 	}
 
@@ -762,28 +787,14 @@ public class TrainingView extends ViewPart {
 		}
 	}
 
-	private void createUI50HrZoneChart(final Composite parent) {
+	private void createUI50HrZoneDataContainer(final Composite parent) {
 
-		/*
-		 * chart
-		 */
-		_chartHrTime = new Chart(parent, SWT.FLAT);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(_chartHrTime);
-
-		// set grid size
-		_chartHrTime.setGridDistance(
-				_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
-				_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
-
-		_chartHrTime.addBarSelectionListener(new IBarSelectionListener() {
-			public void selectionChanged(final int serieIndex, final int valueIndex) {
-
-//					System.out.println(serieIndex + "\t" + valueIndex);
-//					// TODO remove SYSTEM.OUT.PRINTLN
-
-//					_postSelectionProvider.setSelection(selection);
-			}
-		});
+		_hrZoneDataContainer = _tk.createComposite(parent);
+		GridDataFactory.fillDefaults()//
+//				.grab(false, true)
+//				.minSize(SWT.DEFAULT, 1)
+				.applyTo(_hrZoneDataContainer);
+		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(_hrZoneDataContainer);
 	}
 
 	@Override
@@ -819,8 +830,7 @@ public class TrainingView extends ViewPart {
 
 	private void enableControls() {
 
-		final boolean isHrZoneAvailable = isHrZoneDataAvailable();
-
+		final boolean isHrZoneAvailable = TrainingManager.isRequiredHrZoneDataAvailable(_tourData);
 		final boolean isCustomScaling = isHrZoneAvailable && _isShowAllPulseValues == false;
 
 //		_comboTrainingChart.setEnabled(canShowHrZones);
@@ -885,33 +895,6 @@ public class TrainingView extends ViewPart {
 //				return createToolTipInfo(valueIndex);
 //			}
 //		};
-	}
-
-	private boolean isHrZoneDataAvailable() {
-
-		// check tour
-		final boolean isTourData = _tourData != null;
-		if (isTourData) {
-
-			// check pulse
-			final int[] pulseSerie = _tourData.pulseSerie;
-			final boolean isPulse = pulseSerie != null && pulseSerie.length > 0;
-			if (isPulse) {
-
-				// check person
-				final boolean isPerson = _currentPerson != null;
-				if (isPerson) {
-
-					// check hr zones
-					final Set<TourPersonHRZone> personHrZones = _currentPerson.getHrZones();
-					final boolean isHrZones = personHrZones != null && personHrZones.size() > 0;
-
-					return isHrZones;
-				}
-			}
-		}
-
-		return false;
 	}
 
 	private void onModifyHrBorder() {
@@ -1475,9 +1458,7 @@ public class TrainingView extends ViewPart {
 
 	private void updateUI44HrZoneImage() {
 
-		final Display display = Display.getDefault();
-
-		display.asyncExec(new Runnable() {
+		Display.getDefault().asyncExec(new Runnable() {
 
 			final int	__counter	= ++_imageCounter;
 
@@ -1488,7 +1469,7 @@ public class TrainingView extends ViewPart {
 					return;
 				}
 
-				final boolean isHrZoneDataAvailable = isHrZoneDataAvailable();
+				final boolean isHrZoneDataAvailable = TrainingManager.isRequiredHrZoneDataAvailable(_tourData);
 
 				final Point imageSize = _canvasHrZoneImage.getSize();
 				final int devImageWidth = imageSize.x;

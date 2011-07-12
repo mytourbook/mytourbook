@@ -619,9 +619,11 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 
 		// set grid size
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-		_chart.setGridDistance(
+		_chart.setGrid(
 				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
-				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
+				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE),
+				prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
+				prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
 
 		// show the data in the chart
 		_chart.updateChart(chartModel, false, true);

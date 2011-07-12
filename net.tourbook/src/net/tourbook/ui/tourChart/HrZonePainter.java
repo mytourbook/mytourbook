@@ -26,12 +26,16 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourPersonHRZone;
 import net.tourbook.tour.TourManager;
+import net.tourbook.training.TrainingManager;
 
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
 
+/**
+ * Draws HR zone as background color into the graph.
+ */
 public class HrZonePainter implements IFillPainter {
 
 	private Color[]	_hrZoneColors;
@@ -89,19 +93,6 @@ public class HrZonePainter implements IFillPainter {
 			return;
 		}
 
-		final boolean[] breakTimeSerie = tourData.getBreakTimeSerie();
-
-//		final ChartDataYSerie yData;
-//		final Object customData = dataModel.getCustomData(TourManager.CUSTOM_DATA_PULSE);
-//		if (customData instanceof ChartDataYSerie) {
-//			yData = (ChartDataYSerie) customData;
-//		} else {
-//			return;
-//		}
-//
-//		final int[][] yHighValues = yData.getHighValues();
-//		final int pulseSerie[] = yHighValues[0];
-
 		createHrZoneColors(gcGraph, tourPerson);
 		final int devCanvasHeight = graphDrawingData.devGraphHeight;
 
@@ -109,12 +100,7 @@ public class HrZonePainter implements IFillPainter {
 		int devXHrStart = devXPositions[valueIndexFirstPoint];
 
 		final HrZoneContext hrZoneContext = tourData.getHrZoneContext();
-		final int[] zoneMinBpm = hrZoneContext.zoneMinBpm;
-		final int[] zoneMaxBpm = hrZoneContext.zoneMaxBpm;
-
-		int prevZoneIndex = getZoneIndex(zoneMinBpm, zoneMaxBpm, pulseSerie[valueIndexFirstPoint]);
-		final boolean isBreak = false;
-		final boolean isSliceAfterBreak = true;
+		int prevZoneIndex = TrainingManager.getZoneIndex(hrZoneContext, pulseSerie[valueIndexFirstPoint]);
 
 		for (int valueIndex = valueIndexFirstPoint + 1; valueIndex <= valueIndexLastPoint; valueIndex++) {
 
@@ -126,50 +112,8 @@ public class HrZonePainter implements IFillPainter {
 				continue;
 			}
 
-//			if (breakTimeSerie != null) {
-//
-//				if (breakTimeSerie[valueIndex] == true) {
-//
-//					// break occured
-//
-//					if (isBreak == false) {
-//
-//						/*
-//						 * this is the first slice with a break, draw hr zone before the break
-//						 */
-//
-//						final int devWidth = devXCurrent - devXHrStart;
-//
-//						gcGraph.setBackground(_hrZoneColors[prevZoneIndex]);
-//						gcGraph.fillRectangle(devXHrStart, 0, devWidth, devCanvasHeight);
-//					}
-//
-//					isBreak = true;
-//					isSliceAfterBreak = true;
-//
-//					continue;
-//
-//				} else {
-//
-//					// break has ended
-//
-//					isBreak = false;
-//
-//					if (isSliceAfterBreak) {
-//
-//						// set start for the next HR zone
-//						devXHrStart = devXCurrent;
-//						prevZoneIndex = getZoneIndex(zoneMinBpm, zoneMaxBpm, pulseSerie[valueIndex]);
-//
-//						isSliceAfterBreak = false;
-//
-//						continue;
-//					}
-//				}
-//			}
-
 			// check if zone has changed
-			final int zoneIndex = getZoneIndex(zoneMinBpm, zoneMaxBpm, pulseSerie[valueIndex]);
+			final int zoneIndex = TrainingManager.getZoneIndex(hrZoneContext, pulseSerie[valueIndex]);
 			if (zoneIndex == prevZoneIndex && isLastIndex == false) {
 				continue;
 			}
@@ -306,21 +250,6 @@ public class HrZonePainter implements IFillPainter {
 
 		gcGraph.setAlpha(0xc0);
 
-	}
-
-	private int getZoneIndex(final int[] zoneMinBpm, final int[] zoneMaxBpm, final int pulse) {
-
-		int zoneIndex = 0;
-		for (int bpmIndex = 0; bpmIndex < zoneMinBpm.length; bpmIndex++) {
-
-			if (zoneMinBpm[bpmIndex] > pulse) {
-				break;
-			}
-
-			zoneIndex = bpmIndex;
-		}
-
-		return zoneIndex;
 	}
 
 }

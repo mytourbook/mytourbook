@@ -31,7 +31,7 @@ import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.mapping.ILegendProvider;
+import net.tourbook.mapping.ILegendProviderGradientColors;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
 
@@ -593,7 +593,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		}
 	}
 
-	public ILegendProvider getLegendProvider() {
+	public ILegendProviderGradientColors getLegendProvider() {
 		return null;
 	}
 
