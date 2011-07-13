@@ -110,6 +110,17 @@ public class TourChartConfiguration {
 	public Boolean					isShowTourMarker		= true;
 
 	/**
+	 * Is <code>true</code> when graph values are displayed when they are recorded when a break time
+	 * is detected.
+	 */
+	public boolean					isShowBreaktimeValues	= true;
+
+	/**
+	 * Graph type which is used to draw the HR zone background.
+	 */
+	public String					hrZoneStyle				= TourChart.COMMAND_ID_HR_ZONE_STYLE_GRAPH_TOP;
+
+	/**
 	 * @param keepMinMaxValues
 	 *            set <code>true</code> to keep min/max values when tour data will change
 	 */

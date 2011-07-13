@@ -99,8 +99,6 @@ public class Messages extends NLS {
 	public static String		Action_Tag_AutoOpenCancel;
 	public static String		Action_Tag_AutoOpenOK;
 
-	public static String	Action_TourChart_EditChartPreferences;
-
 	public static String		Action_TourType_ModifyTourTypeFilter;
 
 	public static String		Adjust_Altitude_CreateDummyAltitudeData_Message;
@@ -212,10 +210,8 @@ public class Messages extends NLS {
 
 	public static String		App_Action_set_tour_type;
 	public static String		App_Action_Save;
-
 	public static String		App_Action_SetPerson;
 	public static String		App_Action_SplitTour;
-
 	public static String		App_Action_Update;
 
 	public static String		App_measurement_imperial;
@@ -238,9 +234,7 @@ public class Messages extends NLS {
 	public static String		App_Dialog_FirstStartupTip_Title;
 
 	public static String		App_Label_H_MM;
-
 	public static String		App_Label_ISO8601;
-
 	public static String		App_Label_max;
 
 	public static String		App_Title;
@@ -251,7 +245,6 @@ public class Messages extends NLS {
 	public static String		App_TourType_ToolTipTitle;
 
 	public static String		App_Unit_Minute;
-
 	public static String		App_Unit_Seconds_Small;
 
 	public static String		App_Window_Title;
@@ -293,9 +286,7 @@ public class Messages extends NLS {
 	public static String		Compute_BreakTime_Label_MinimumDistance;
 	public static String		Compute_BreakTime_Label_MinimumSliceSpeed;
 	public static String		Compute_BreakTime_Label_MinimumTime;
-
 	public static String		Compute_BreakTime_Label_SliceDiffBreak;
-
 	public static String		Compute_BreakTime_Label_SliceDiffBreak_Tooltip;
 	public static String		Compute_BreakTime_Label_Title;
 	public static String		Compute_BreakTime_Label_TourBreakTime;
@@ -458,15 +449,19 @@ public class Messages extends NLS {
 	public static String		Graph_Label_Altitude;
 	public static String		Graph_Label_Cadence;
 	public static String		Graph_Label_Cadence_unit;
+	public static String		Graph_Label_DrawSkippedValues_Tooltip;
 	public static String		Graph_Label_Gradiend_unit;
 	public static String		Graph_Label_Gradient;
 	public static String		Graph_Label_Heartbeat;
 	public static String		Graph_Label_Heartbeat_unit;
-	public static String		Graph_Label_HrZone;
 	public static String		Graph_Label_HrZone_Tooltip;
 	public static String		Graph_Label_Pace;
 	public static String		Graph_Label_Power;
 	public static String		Graph_Label_Power_unit;
+	public static String		Graph_Label_ShowBreaktimeValues;
+	public static String		Graph_Label_ShowBreaktimeValues_Tooltip;
+	public static String		Graph_Label_ShowHrZoneBackground;
+	public static String		Graph_Label_ShowHrZoneBackground_Tooltip;
 	public static String		Graph_Label_Speed;
 	public static String		Graph_Label_Temperature;
 	public static String		Graph_Label_Tour_Compare;
@@ -561,7 +556,6 @@ public class Messages extends NLS {
 	public static String		Image__open_folder_add;
 	public static String		Image__options;
 	public static String		Image__PulseZones;
-
 	public static String		Image__PulseZones_Disabled;
 	public static String		Image__quick_edit;
 	public static String		Image__RawData_Import;
@@ -606,7 +600,6 @@ public class Messages extends NLS {
 	public static String		Image__weather_snow;
 	public static String		Image__Weather_ScatteredShowers;
 	public static String		Image__Weather_Severe;
-
 	public static String		Image__ZoomFitGraph;
 
 	public static String		image__merge_tours;
@@ -729,18 +722,16 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Check_force_minimum_for_gradient;
 	public static String		Pref_Graphs_Check_force_minmax_for_pace;
 	public static String		Pref_Graphs_Check_show_start_time;
-
-	public static String	Pref_Graphs_Checkbox_ShowHorizontalGrid;
-
-	public static String	Pref_Graphs_Checkbox_ShowVerticalGrid;
+	public static String		Pref_Graphs_Checkbox_ShowHorizontalGrid;
+	public static String		Pref_Graphs_Checkbox_ShowVerticalGrid;
 	public static String		Pref_Graphs_Error_one_graph_must_be_selected;
 	public static String		Pref_Graphs_Error_value_must_be_integer;
 	public static String		Pref_Graphs_force_minimum_value;
 	public static String		Pref_Graphs_grid_distance;
 	public static String		Pref_Graphs_grid_horizontal_distance;
 	public static String		Pref_Graphs_grid_vertical_distance;
-	public static String	Pref_Graphs_Group_Grid;
-
+	public static String		Pref_Graphs_Group_GraphOptions;
+	public static String		Pref_Graphs_Group_Grid;
 	public static String		Pref_Graphs_Group_mouse_mode;
 	public static String		Pref_Graphs_Group_units_for_xaxis;
 	public static String		Pref_Graphs_Group_zoom_options;
@@ -753,8 +744,7 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Radio_show_time;
 	public static String		Pref_Graphs_Tab_default_values;
 	public static String		Pref_Graphs_Tab_graph_defaults;
-
-	public static String	Pref_Graphs_Tab_Grid;
+	public static String		Pref_Graphs_Tab_Grid;
 	public static String		Pref_Graphs_Tab_zoom_options;
 	public static String		Pref_Graphs_Text_max_value;
 	public static String		Pref_Graphs_Text_min_value;
@@ -950,8 +940,7 @@ public class Messages extends NLS {
 	public static String		Tour_Action_auto_move_sliders_when_zoomed;
 	public static String		Tour_Action_auto_zoom_to_slider_position;
 	public static String		Tour_Action_chart_options_tooltip;
-
-	public static String	Tour_Action_EditChartPreferences;
+	public static String		Tour_Action_EditChartPreferences;
 	public static String		Tour_Action_graph_altimeter_tooltip;
 	public static String		Tour_Action_graph_altitude_tooltip;
 	public static String		Tour_Action_graph_analyzer_tooltip;
@@ -963,16 +952,24 @@ public class Messages extends NLS {
 	public static String		Tour_Action_graph_speed_tooltip;
 	public static String		Tour_Action_graph_temperature_tooltip;
 	public static String		Tour_Action_graph_tour_compare_tooltip;
+	public static String	Tour_Action_HrZone_Title;
+
+	public static String		Tour_Action_HrZoneGraphType_Default;
+	public static String		Tour_Action_HrZoneGraphType_NoGradient;
+	public static String	Tour_Action_HrZoneGraphType_WhiteBottom;
+
+	public static String	Tour_Action_HrZoneGraphType_WhiteTop;
+
 	public static String		Tour_Action_scroll_zoomed_chart;
 	public static String		Tour_Action_show_distance_on_x_axis;
 	public static String		Tour_Action_show_distance_on_x_axis_tooltip;
 	public static String		Tour_Action_show_start_time_on_x_axis;
 	public static String		Tour_Action_show_time_on_x_axis;
 	public static String		Tour_Action_show_time_on_x_axis_tooltip;
-
+	public static String		Tour_Action_ShowBreaktimeValues;
+	public static String		Tour_Action_ShowHrZones;
 	public static String		Tour_Action_ShowHrZones_Tooltip;
-
-	public static String	Tour_Action_ShowTourMarker;
+	public static String		Tour_Action_ShowTourMarker;
 
 	public static String		Tour_Book_Action_delete_selected_tours;
 	public static String		Tour_Book_Action_delete_selected_tours_dlg_message;
@@ -1020,7 +1017,6 @@ public class Messages extends NLS {
 	public static String		Tour_Editor_Label_Sensor_No;
 	public static String		Tour_Editor_Label_Sensor_Yes;
 	public static String		Tour_Editor_Label_Weather;
-
 	public static String		Tour_Editor_Label_WindDirection_Unit;
 
 	public static String		Tour_Marker_Column_horizontal_offset;

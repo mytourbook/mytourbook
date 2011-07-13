@@ -830,7 +830,7 @@ public class TrainingView extends ViewPart {
 
 	private void enableControls() {
 
-		final boolean isHrZoneAvailable = TrainingManager.isHrZoneDataAvailable(_tourData);
+		final boolean isHrZoneAvailable = TrainingManager.isRequiredHrZoneDataAvailable(_tourData);
 		final boolean isCustomScaling = isHrZoneAvailable && _isShowAllPulseValues == false;
 
 //		_comboTrainingChart.setEnabled(canShowHrZones);
@@ -1469,7 +1469,7 @@ public class TrainingView extends ViewPart {
 					return;
 				}
 
-				final boolean isHrZoneDataAvailable = TrainingManager.isHrZoneDataAvailable(_tourData);
+				final boolean isHrZoneDataAvailable = TrainingManager.isRequiredHrZoneDataAvailable(_tourData);
 
 				final Point imageSize = _canvasHrZoneImage.getSize();
 				final int devImageWidth = imageSize.x;

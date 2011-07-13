@@ -101,7 +101,7 @@ public abstract class TourChartViewPart extends ViewPart {
 						|| property.equals(ITourbookPreferences.GRAPH_X_AXIS)
 						|| property.equals(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME)) {
 
-					_tourChartConfig = TourManager.createTourChartConfiguration();
+					_tourChartConfig = TourManager.createDefaultTourChartConfig();
 
 					if (_tourChart != null) {
 						_tourChart.updateTourChart(_tourData, _tourChartConfig, false);

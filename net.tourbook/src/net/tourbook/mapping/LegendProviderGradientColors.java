@@ -26,14 +26,16 @@ import org.eclipse.swt.graphics.Rectangle;
 /**
  * Contains all data to draw the legend image.
  */
-public class LegendProviderMinMax implements ILegendProviderGradientColors {
+public class LegendProviderGradientColors implements ILegendProviderGradientColors {
 
 	private LegendConfig	_legendConfig;
 	private LegendColor		_legendColor;
 
 	private int				_colorId;
 
-	public LegendProviderMinMax(final LegendConfig legendConfig, final LegendColor legendColor, final int colorId) {
+	public LegendProviderGradientColors(final LegendConfig legendConfig,
+										final LegendColor legendColor,
+										final int colorId) {
 		_legendConfig = legendConfig;
 		_legendColor = legendColor;
 		_colorId = colorId;
@@ -100,6 +102,7 @@ public class LegendProviderMinMax implements ILegendProviderGradientColors {
 		return unitList;
 	}
 
+	@Override
 	public int getColorValue(final int legendValue) {
 		return TourPainter.getLegendColor(_legendConfig, _legendColor, legendValue);
 	}
@@ -264,7 +267,7 @@ public class LegendProviderMinMax implements ILegendProviderGradientColors {
 			final ValueColor[] valueColors = _legendColor.valueColors;
 
 			valueColors[0].value = legendMinValue + diffMinMax10;
-			valueColors[1].value = legendMinValue + diffMinMax2 / 2;
+ 			valueColors[1].value = legendMinValue + diffMinMax2 / 2;
 			valueColors[2].value = midValueAbsolute;
 			valueColors[3].value = legendMaxValue - diffMinMax2 / 2;
 			valueColors[4].value = legendMaxValue - diffMinMax10;

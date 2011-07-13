@@ -25,29 +25,35 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.swt.widgets.ToolItem;
-import org.eclipse.swt.widgets.Widget;
 
-public class ActionChartOptions extends Action implements IMenuCreator {
-
-	private Menu		_menu	= null;
+public class ActionHrZoneDropDownMenu extends Action implements IMenuCreator {
 
 	private TourChart	_tourChart;
+	private Menu		_menu;
 
-	public ActionChartOptions(final TourChart tourChart) {
+	private TitleAction	_actionTitle	= new TitleAction(Messages.Tour_Action_HrZone_Title);
+
+	private class TitleAction extends Action {
+
+		public TitleAction(final String text) {
+			super(text);
+			setEnabled(false);
+		}
+	}
+
+	public ActionHrZoneDropDownMenu(final TourChart tourChart) {
 
 		super(null, Action.AS_DROP_DOWN_MENU);
 
 		_tourChart = tourChart;
 
-		setToolTipText(Messages.Tour_Action_chart_options_tooltip);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__tour_options));
+		setToolTipText(Messages.Tour_Action_ShowHrZones_Tooltip);
+
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__PulseZones));
+		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__PulseZones_Disabled));
 
 		setMenuCreator(this);
 	}
@@ -70,17 +76,13 @@ public class ActionChartOptions extends Action implements IMenuCreator {
 
 		_menu = new Menu(parent);
 
-		addItem(actionProxies.get(TourChart.COMMAND_ID_IS_SHOW_TOUR_MARKER).getAction());
-		addItem(actionProxies.get(TourChart.COMMAND_ID_IS_SHOW_BREAKTIME_VALUES).getAction());
-		addItem(actionProxies.get(TourChart.COMMAND_ID_SHOW_START_TIME).getAction());
-		addItem(actionProxies.get(TourChart.COMMAND_ID_SHOW_SRTM_DATA).getAction());
+		addItem(_actionTitle);
 
 		(new Separator()).fill(_menu, -1);
-		addItem(actionProxies.get(TourChart.COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER).getAction());
-		addItem(actionProxies.get(TourChart.COMMAND_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED).getAction());
-
-		(new Separator()).fill(_menu, -1);
-		addItem(actionProxies.get(TourChart.COMMAND_ID_EDIT_CHART_PREFERENCES).getAction());
+		addItem(actionProxies.get(TourChart.COMMAND_ID_HR_ZONE_STYLE_NO_GRADIENT).getAction());
+		addItem(actionProxies.get(TourChart.COMMAND_ID_HR_ZONE_STYLE_WHITE_TOP).getAction());
+		addItem(actionProxies.get(TourChart.COMMAND_ID_HR_ZONE_STYLE_WHITE_BOTTOM).getAction());
+		addItem(actionProxies.get(TourChart.COMMAND_ID_HR_ZONE_STYLE_GRAPH_TOP).getAction());
 
 		return _menu;
 	}
@@ -91,31 +93,6 @@ public class ActionChartOptions extends Action implements IMenuCreator {
 
 	@Override
 	public void runWithEvent(final Event event) {
-
-		// open and position drop down menu below the action button
-		final Widget item = event.widget;
-		if (item instanceof ToolItem) {
-
-			final ToolItem toolItem = (ToolItem) item;
-
-			final IMenuCreator mc = getMenuCreator();
-			if (mc != null) {
-
-				final ToolBar toolBar = toolItem.getParent();
-
-				final Menu menu = mc.getMenu(toolBar);
-				if (menu != null) {
-
-					final Rectangle toolItemBounds = toolItem.getBounds();
-					Point topLeft = new Point(toolItemBounds.x, toolItemBounds.y + toolItemBounds.height);
-					topLeft = toolBar.toDisplay(topLeft);
-
-					menu.setLocation(topLeft.x, topLeft.y);
-					menu.setVisible(true);
-				}
-			}
-		}
-
+		_tourChart.actionShowHrZones();
 	}
-
 }

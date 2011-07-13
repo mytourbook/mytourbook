@@ -28,7 +28,7 @@ import net.tourbook.mapping.DialogMappingColor;
 import net.tourbook.mapping.ILegendProviderGradientColors;
 import net.tourbook.mapping.LegendColor;
 import net.tourbook.mapping.LegendConfig;
-import net.tourbook.mapping.LegendProviderMinMax;
+import net.tourbook.mapping.LegendProviderGradientColors;
 import net.tourbook.mapping.ValueColor;
 import net.tourbook.ui.UI;
 
@@ -98,7 +98,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 
 	private ColorDefinition				_expandedItem;
 
-	private LegendProviderMinMax				_legendProvider;
+	private LegendProviderGradientColors				_legendProvider;
 	private DialogMappingColor			_dialogMappingColor;
 	private GraphColorPainter			_graphColorPainter;
 
@@ -455,7 +455,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 		final LegendColor legendColor = new LegendColor();
 		legendColor.valueColors = _valueColors;
 
-		_legendProvider = new LegendProviderMinMax(legendConfig, legendColor, 0);
+		_legendProvider = new LegendProviderGradientColors(legendConfig, legendColor, 0);
 		_dialogMappingColor = new DialogMappingColor(Display.getCurrent().getActiveShell(), _legendProvider, this);
 	}
 

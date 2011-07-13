@@ -129,7 +129,7 @@ public class DialogMappingColor extends TitleAreaDialog {
 	}
 
 	public DialogMappingColor(	final Shell parentShell,
-								final LegendProviderMinMax legendProvider,
+								final LegendProviderGradientColors legendProvider,
 								final PrefPageAppearanceColors prefPageAppearanceColors) {
 
 		super(parentShell);

@@ -125,13 +125,15 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 				final String property = event.getProperty();
 
 				/*
-				 * set a new chart configuration when the preferences has changed
+				 * create a new chart configuration when the preferences has changed
 				 */
 				if (property.equals(ITourbookPreferences.GRAPH_VISIBLE)
 						|| property.equals(ITourbookPreferences.GRAPH_X_AXIS)
-						|| property.equals(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME)) {
-
-					_tourChartConfig = TourManager.createTourChartConfiguration();
+						|| property.equals(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME)
+						//
+				//
+				) {
+					_tourChartConfig = TourManager.createDefaultTourChartConfig();
 
 					if (_tourChart != null) {
 						_tourChart.updateTourChart(_tourData, _tourChartConfig, false);
@@ -308,7 +310,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 			}
 		});
 
-		_tourChartConfig = TourManager.createTourChartConfiguration();
+		_tourChartConfig = TourManager.createDefaultTourChartConfig();
 
 		// set chart title
 		_tourChart.addDataModelListener(new IDataModelListener() {

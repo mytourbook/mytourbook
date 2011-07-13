@@ -15,31 +15,26 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart.action;
 
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.ui.tourChart.TourChart;
+import net.tourbook.ui.HandlerUtil;
 
-import org.eclipse.jface.action.Action;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
 
-public class ActionShowHrZones extends Action {
+public class ActionHandlerHrZoneStyle extends TCActionHandler {
 
-	private TourChart	_tourChart;
-
-	public ActionShowHrZones(final TourChart tourChart) {
-
-		super(null, AS_CHECK_BOX);
-
-		_tourChart = tourChart;
-
-		setToolTipText(Messages.Tour_Action_ShowHrZones_Tooltip);
-
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__PulseZones));
-		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__PulseZones_Disabled));
+	public ActionHandlerHrZoneStyle(final String commandId) {
+		this.commandId = commandId;
 	}
 
-	@Override
-	public void run() {
-		_tourChart.actionShowHrZones(isChecked());
+	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {
+
+		final Boolean isItemChecked = HandlerUtil.isItemChecked(execEvent);
+
+		if (isItemChecked != null) {
+			tourChart.actionShowHrZoneStyle(isItemChecked, commandId);
+		}
+
+		return null;
 	}
 
 }

@@ -37,20 +37,20 @@ public class ActionSynchTourZoomLevel extends Action implements IMenuCreator {
 	private class ActionZoomLevel extends Action {
 
 		private static final String	OSX_SPACER_STRING	= " ";	//$NON-NLS-1$
-		private int					fActionZoomLevel;
+		private int					_actionZoomLevel;
 
 		public ActionZoomLevel(final int zoomLevel, final String label) {
 
 			// add space before the label otherwise OSX will not display the menu item,
 			super(OSX_SPACER_STRING + NLS.bind(label, Integer.toString(zoomLevel)), AS_RADIO_BUTTON);
 
-			fActionZoomLevel = zoomLevel;
+			_actionZoomLevel = zoomLevel;
 		}
 
 		@Override
 		public void run() {
-			_zoomLevel = fActionZoomLevel;
-			TourPaintManager.getInstance().setSynchTourZoomLevel(fActionZoomLevel);
+			_zoomLevel = _actionZoomLevel;
+			TourPainterConfiguration.getInstance().setSynchTourZoomLevel(_actionZoomLevel);
 		}
 	}
 
@@ -103,7 +103,7 @@ public class ActionSynchTourZoomLevel extends Action implements IMenuCreator {
 	public void setZoomLevel(final int zoomLevel) {
 
 		_zoomLevel = zoomLevel;
-		TourPaintManager.getInstance().setSynchTourZoomLevel(zoomLevel);
+		TourPainterConfiguration.getInstance().setSynchTourZoomLevel(zoomLevel);
 
 		_actionZoomLevel_0.setChecked(false);
 		_actionZoomLevel_1.setChecked(false);

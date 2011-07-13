@@ -16,7 +16,20 @@
 
 package net.tourbook.mapping;
 
+import net.tourbook.data.TourData;
 
 public interface ILegendProviderDiscreteColors extends ILegendProvider {
+
+	/**
+	 * @param tourData
+	 *            Tour which is currently painted, can be <code>null</code>.
+	 * @param valueIndex
+	 *            in the data serie
+	 * @param isDrawLine
+	 *            Is <code>true</code> when a line is painted. This requires that the painted color
+	 *            is adjusted.
+	 * @return Returns the RGB value for a graph value.
+	 */
+	abstract int getColorValue(TourData tourData, int valueIndex, boolean isDrawLine);
 
 }

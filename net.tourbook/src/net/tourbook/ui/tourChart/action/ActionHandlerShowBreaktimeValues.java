@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,27 +15,25 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart.action;
 
-
+import net.tourbook.ui.HandlerUtil;
 import net.tourbook.ui.tourChart.TourChart;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
-public class ActionHandlerChartOptions extends TCActionHandler {
+public class ActionHandlerShowBreaktimeValues extends TCActionHandler {
 
-	public ActionHandlerChartOptions() {
-		commandId = TourChart.COMMAND_ID_CHART_OPTIONS;
+	public ActionHandlerShowBreaktimeValues() {
+		commandId = TourChart.COMMAND_ID_IS_SHOW_BREAKTIME_VALUES;
 	}
 
 	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {
 
-		// show the drop-down menu, this only works in the runWithEvent not in the run method
-//		getMenuCreator().getMenu(fTBM.getControl()).setVisible(true);
+		final Boolean isItemChecked = HandlerUtil.isItemChecked(execEvent);
 
-//		IMenuService menuService = (IMenuService) PlatformUI.getWorkbench()
-//				.getService(IMenuService.class);
-
-//		menuService.addContributionFactory(factory)
+		if (isItemChecked != null) {
+			tourChart.actionShowBreaktimeValues(isItemChecked);
+		}
 
 		return null;
 	}

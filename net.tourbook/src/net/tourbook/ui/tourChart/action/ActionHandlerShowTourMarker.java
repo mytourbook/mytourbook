@@ -24,7 +24,7 @@ import org.eclipse.core.commands.ExecutionException;
 public class ActionHandlerShowTourMarker extends TCActionHandler {
 
 	public ActionHandlerShowTourMarker() {
-		commandId = TourChart.COMMAND_ID_SHOW_TOUR_MARKER;
+		commandId = TourChart.COMMAND_ID_IS_SHOW_TOUR_MARKER;
 	}
 
 	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {

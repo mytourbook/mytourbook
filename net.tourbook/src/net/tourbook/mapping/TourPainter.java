@@ -89,13 +89,13 @@ public class TourPainter extends MapPainter {
 	private static Image					_twpImage;
 	private static Rectangle				_twpImageBounds;
 
-	private static TourPaintManager			_tourPaintManager;
+	private static TourPainterConfiguration	_tourPaintConfig;
 
 	private final static ColorCacheInt		_colorCache			= new ColorCacheInt();
 
 	static {
 
-		_tourPaintManager = TourPaintManager.getInstance();
+		_tourPaintConfig = TourPainterConfiguration.getInstance();
 
 		/**
 		 * this code optimizes the performance by reading from the pref store which is not very
@@ -159,14 +159,14 @@ public class TourPainter extends MapPainter {
 									final boolean isDrawVertical) {
 
 		if (legendProvider instanceof ILegendProviderGradientColors) {
-			drawLegendMinMax(gc, legendBounds, (ILegendProviderGradientColors) legendProvider, isDrawVertical);
+			drawLegendGradientColors(gc, legendBounds, (ILegendProviderGradientColors) legendProvider, isDrawVertical);
 		}
 	}
 
-	private static void drawLegendMinMax(	final GC gc,
-											final Rectangle legendBounds,
-											final ILegendProviderGradientColors legendProvider,
-											final boolean isDrawVertical) {
+	private static void drawLegendGradientColors(	final GC gc,
+													final Rectangle legendBounds,
+													final ILegendProviderGradientColors legendProvider,
+													final boolean isDrawVertical) {
 
 		final Device display = gc.getDevice();
 		final LegendConfig config = legendProvider.getLegendConfig();
@@ -319,7 +319,6 @@ public class TourPainter extends MapPainter {
 			 */
 
 			final int lineColorValue = legendProvider.getColorValue(legendValue);
-
 			final Color lineColor = _colorCache.get(lineColorValue);
 
 			gc.setForeground(lineColor);
@@ -521,8 +520,7 @@ public class TourPainter extends MapPainter {
 	@Override
 	protected boolean doPaint(final GC gc, final Map map, final Tile tile, final int parts) {
 
-
-		final ArrayList<TourData> tourDataList = _tourPaintManager.getTourData();
+		final ArrayList<TourData> tourDataList = _tourPaintConfig.getTourData();
 		if (tourDataList == null) {
 			return false;
 		}
@@ -573,7 +571,7 @@ public class TourPainter extends MapPainter {
 			boolean isMarkerInTile = false;
 
 			// draw start/end marker
-			if (_tourPaintManager.isShowStartEndInMap()) {
+			if (_tourPaintConfig.isShowStartEndInMap) {
 
 				// draw end marker first
 				isMarkerInTile = drawStaticMarker(
@@ -601,7 +599,7 @@ public class TourPainter extends MapPainter {
 			isTourInTile = isTourInTile || isMarkerInTile;
 		}
 
-		if (_tourPaintManager._isShowTourMarker || _tourPaintManager._isShowWayPoints) {
+		if (_tourPaintConfig.isShowTourMarker || _tourPaintConfig.isShowWayPoints) {
 
 			// draw marker above the tour
 
@@ -620,7 +618,7 @@ public class TourPainter extends MapPainter {
 
 				setDataSerie(tourData);
 
-				if (_tourPaintManager._isShowTourMarker) {
+				if (_tourPaintConfig.isShowTourMarker) {
 
 					// ckeck if markers are available
 					final ArrayList<TourMarker> sortedMarkers = tourData.getTourMarkersSorted();
@@ -657,7 +655,7 @@ public class TourPainter extends MapPainter {
 					}
 				}
 
-				if (_tourPaintManager._isShowWayPoints) {
+				if (_tourPaintConfig.isShowWayPoints) {
 
 					// ckeck if way points are available
 					final Set<TourWayPoint> wayPoints = tourData.getTourWayPoints();
@@ -874,7 +872,7 @@ public class TourPainter extends MapPainter {
 
 							isTourInTile = true;
 
-							color = getTourColor(isBorder, serieIndex);
+							color = getTourColor(tourData, serieIndex, isBorder, true);
 
 							drawTour20Line(gc, //
 									devFromWithOffsetX,
@@ -930,7 +928,7 @@ public class TourPainter extends MapPainter {
 							devX += devPartOffset;
 							devY += devPartOffset;
 
-							final Color color = getTourColor(isBorder, serieIndex);
+							final Color color = getTourColor(tourData, serieIndex, isBorder, false);
 
 							if (_prefIsDrawSquare) {
 								drawTour30Square(gc, devX, devY, color);
@@ -1262,13 +1260,25 @@ public class TourPainter extends MapPainter {
 		return valuePosition;
 	}
 
-	private Color getTourColor(final boolean isBorder, final int serieIndex) {
+	private Color getTourColor(	final TourData tourData,
+								final int serieIndex,
+								final boolean isBorder,
+								final boolean isDrawLine) {
 
 		if (_dataSerie == null) {
 			return null;
 		}
 
-		int colorValue = _legendProvider.getColorValue(_dataSerie[serieIndex]);
+		int colorValue = 0;
+		if (_legendProvider instanceof ILegendProviderGradientColors) {
+			colorValue = ((ILegendProviderGradientColors) _legendProvider).getColorValue(_dataSerie[serieIndex]);
+		} else if (_legendProvider instanceof ILegendProviderDiscreteColors) {
+			colorValue = ((ILegendProviderDiscreteColors) _legendProvider).getColorValue(
+					tourData,
+					serieIndex,
+					isDrawLine);
+		}
+
 		if (isBorder) {
 
 			// paint the border in a darker color
@@ -1382,8 +1392,7 @@ public class TourPainter extends MapPainter {
 	@Override
 	protected boolean isPaintingNeeded(final Map map, final Tile tile) {
 
-
-		final ArrayList<TourData> tourDataList = _tourPaintManager.getTourData();
+		final ArrayList<TourData> tourDataList = _tourPaintConfig.getTourData();
 		if (tourDataList == null) {
 			return false;
 		}
@@ -1516,7 +1525,7 @@ public class TourPainter extends MapPainter {
 	 */
 	private void setDataSerie(final TourData tourData) {
 
-		final ILegendProvider legendProvider = _tourPaintManager.getLegendProvider();
+		final ILegendProvider legendProvider = _tourPaintConfig.getLegendProvider();
 		if (legendProvider == null) {
 			_dataSerie = null;
 			return;

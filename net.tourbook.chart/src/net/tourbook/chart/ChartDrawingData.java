@@ -20,6 +20,7 @@ import java.util.ArrayList;
 public class ChartDrawingData {
 
 	public ArrayList<GraphDrawingData>	graphDrawingData;
+
 	public ChartDataModel				chartDataModel;
 
 	public ChartDrawingData(final ArrayList<GraphDrawingData> graphDrawingData) {

@@ -26,11 +26,14 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourPersonHRZone;
 import net.tourbook.tour.TourManager;
+import net.tourbook.training.TrainingManager;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * Draws HR zone as background color into the graph.
@@ -75,7 +78,11 @@ public class HrZonePainter implements IFillPainter {
 								final int valueIndexLastPoint) {
 
 		final ChartDataModel dataModel = chart.getChartDataModel();
-		final TourData tourData = (TourData) dataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
+
+		final TourData tourData = (TourData) dataModel.getCustomData(//
+				TourManager.CUSTOM_DATA_TOUR_DATA);
+		final TourChartConfiguration tourChartConfig = (TourChartConfiguration) dataModel.getCustomData(//
+				TourManager.CUSTOM_DATA_TOUR_CHART_CONFIGURATION);
 
 		final TourPerson tourPerson = tourData.getTourPerson();
 		if (tourPerson == null) {
@@ -93,16 +100,41 @@ public class HrZonePainter implements IFillPainter {
 		}
 
 		createHrZoneColors(gcGraph, tourPerson);
+
+		boolean isGradient = false;
+		boolean isWhite = false;
+		boolean isBgColor = false;
+		final String hrZoneStyle = tourChartConfig.hrZoneStyle;
+
+		if (hrZoneStyle.equals(TourChart.COMMAND_ID_HR_ZONE_STYLE_GRAPH_TOP)) {
+			isGradient = true;
+			isWhite = false;
+			isBgColor = true;
+		} else if (hrZoneStyle.equals(TourChart.COMMAND_ID_HR_ZONE_STYLE_NO_GRADIENT)) {
+			isGradient = false;
+			isWhite = false;
+			isBgColor = true;
+		} else if (hrZoneStyle.equals(TourChart.COMMAND_ID_HR_ZONE_STYLE_WHITE_TOP)) {
+			isGradient = true;
+			isWhite = true;
+			isBgColor = true;
+		} else if (hrZoneStyle.equals(TourChart.COMMAND_ID_HR_ZONE_STYLE_WHITE_BOTTOM)) {
+			isGradient = true;
+			isWhite = true;
+			isBgColor = false;
+		}
+
+		if (isWhite) {
+			gcGraph.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+		}
+
 		final int devCanvasHeight = graphDrawingData.devGraphHeight;
 
 		final int devXPrev = devXPositions[valueIndexFirstPoint];
 		int devXHrStart = devXPositions[valueIndexFirstPoint];
 
 		final HrZoneContext hrZoneContext = tourData.getHrZoneContext();
-		final int[] zoneMinBpm = hrZoneContext.zoneMinBpm;
-		final int[] zoneMaxBpm = hrZoneContext.zoneMaxBpm;
-
-		int prevZoneIndex = getZoneIndex(zoneMinBpm, zoneMaxBpm, pulseSerie[valueIndexFirstPoint]);
+		int prevZoneIndex = TrainingManager.getZoneIndex(hrZoneContext, pulseSerie[valueIndexFirstPoint]);
 
 		for (int valueIndex = valueIndexFirstPoint + 1; valueIndex <= valueIndexLastPoint; valueIndex++) {
 
@@ -115,15 +147,24 @@ public class HrZonePainter implements IFillPainter {
 			}
 
 			// check if zone has changed
-			final int zoneIndex = getZoneIndex(zoneMinBpm, zoneMaxBpm, pulseSerie[valueIndex]);
+			final int zoneIndex = TrainingManager.getZoneIndex(hrZoneContext, pulseSerie[valueIndex]);
 			if (zoneIndex == prevZoneIndex && isLastIndex == false) {
 				continue;
 			}
 
 			final int devWidth = devXCurrent - devXHrStart;
 
-			gcGraph.setBackground(_hrZoneColors[prevZoneIndex]);
-			gcGraph.fillRectangle(devXHrStart, 0, devWidth, devCanvasHeight);
+			if (isBgColor) {
+				gcGraph.setBackground(_hrZoneColors[prevZoneIndex]);
+			} else {
+				gcGraph.setForeground(_hrZoneColors[prevZoneIndex]);
+			}
+
+			if (isGradient) {
+				gcGraph.fillGradientRectangle(devXHrStart, 0, devWidth, devCanvasHeight, true);
+			} else {
+				gcGraph.fillRectangle(devXHrStart, 0, devWidth, devCanvasHeight);
+			}
 
 			// set start for the next HR zone
 			devXHrStart = devXCurrent;
@@ -135,138 +176,122 @@ public class HrZonePainter implements IFillPainter {
 			color.dispose();
 		}
 	}
-
-	public void drawVertical(final GC gcGraph, final GraphDrawingData graphDrawingData, final Chart chart) {
-
-		final ChartDataModel dataModel = chart.getChartDataModel();
-		final TourData tourData = (TourData) dataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
-
-		final TourPerson tourPerson = tourData.getTourPerson();
-		if (tourPerson == null) {
-			return;
-		}
-
-		final int numberOfHrZones = tourData.getNumberOfHrZones();
-		if (numberOfHrZones == 0) {
-			return;
-		}
-
-		final HrZoneContext hrZoneContext = tourData.getHrZoneContext();
-		final ArrayList<TourPersonHRZone> personHrZones = tourPerson.getHrZonesSorted();
-//		final int zoneSize = personHrZones.size();
-
-		// get top/bottom border values of the graph
-		final int graphYTop = graphDrawingData.getGraphYTop();
-		final int graphYBottom = graphDrawingData.getGraphYBottom();
-
-//		System.out.println("graphYTop:" + graphYTop + "\tgraphYBottom:" + graphYBottom);
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
-		final float scaleY = graphDrawingData.getScaleY();
-
-		final int devCanvasHeight = graphDrawingData.devGraphHeight;
-		final int devCanvasWidth = graphDrawingData.devVirtualGraphWidth;
-
-//		final int devYTop = 0;
-		final int devYBottom = devCanvasHeight;
-
-		final int[] zoneMinBpm = hrZoneContext.zoneMinBpm;
-		final int[] zoneMaxBpm = hrZoneContext.zoneMaxBpm;
-
-		final Device display = gcGraph.getDevice();
-
-		// clip drawing at the graph border
-//		gcGraph.setClipping(0, devYTop, gcGraph.getClipping().width, devYBottom - devYTop);
-
-		gcGraph.setAlpha(0xff);
-
-		for (int zoneIndex = 0; zoneIndex < zoneMinBpm.length; zoneIndex++) {
-
-			final int minBpm = zoneMinBpm[zoneIndex];
-			int maxBpm = zoneMaxBpm[zoneIndex];
-
-			// skip zones below the bottom
-			maxBpm = maxBpm == Integer.MAX_VALUE ? 10000 : maxBpm;
-
-			// + 1 is added because max is always next min -1
-			if (maxBpm + 1 < graphYBottom) {
-
-//				System.out.println("maxBpm + 1 < graphYBottom:" + maxBpm + 1 + " / " + graphYBottom);
-//				// TODO remove SYSTEM.OUT.PRINTLN
-
-				continue;
-			}
-
-			// skip zones above the graph
-			if (minBpm > graphYTop) {
-//				System.out.println("minBpm > graphYTop:" + minBpm + " / " + graphYTop);
-//				// TODO remove SYSTEM.OUT.PRINTLN
-
-				break;
-			}
+//	private void drawVertical(final GC gcGraph, final GraphDrawingData graphDrawingData, final Chart chart) {
 //
-//			// check zone bounds
-//			if (zoneIndex >= zoneSize) {
+//		final ChartDataModel dataModel = chart.getChartDataModel();
+//		final TourData tourData = (TourData) dataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
+//
+//		final TourPerson tourPerson = tourData.getTourPerson();
+//		if (tourPerson == null) {
+//			return;
+//		}
+//
+//		final int numberOfHrZones = tourData.getNumberOfHrZones();
+//		if (numberOfHrZones == 0) {
+//			return;
+//		}
+//
+//		final HrZoneContext hrZoneContext = tourData.getHrZoneContext();
+//		final ArrayList<TourPersonHRZone> personHrZones = tourPerson.getHrZonesSorted();
+////		final int zoneSize = personHrZones.size();
+//
+//		// get top/bottom border values of the graph
+//		final int graphYTop = graphDrawingData.getGraphYTop();
+//		final int graphYBottom = graphDrawingData.getGraphYBottom();
+//
+////		System.out.println("graphYTop:" + graphYTop + "\tgraphYBottom:" + graphYBottom);
+////		// TODO remove SYSTEM.OUT.PRINTLN
+//
+//		final float scaleY = graphDrawingData.getScaleY();
+//
+//		final int devCanvasHeight = graphDrawingData.devGraphHeight;
+//		final int devCanvasWidth = graphDrawingData.devVirtualGraphWidth;
+//
+////		final int devYTop = 0;
+//		final int devYBottom = devCanvasHeight;
+//
+//		final int[] zoneMinBpm = hrZoneContext.zoneMinBpm;
+//		final int[] zoneMaxBpm = hrZoneContext.zoneMaxBpm;
+//
+//		final Device display = gcGraph.getDevice();
+//
+//		// clip drawing at the graph border
+////		gcGraph.setClipping(0, devYTop, gcGraph.getClipping().width, devYBottom - devYTop);
+//
+//		gcGraph.setAlpha(0xff);
+//
+//		for (int zoneIndex = 0; zoneIndex < zoneMinBpm.length; zoneIndex++) {
+//
+//			final int minBpm = zoneMinBpm[zoneIndex];
+//			int maxBpm = zoneMaxBpm[zoneIndex];
+//
+//			// skip zones below the bottom
+//			maxBpm = maxBpm == Integer.MAX_VALUE ? 10000 : maxBpm;
+//
+//			// + 1 is added because max is always next min -1
+//			if (maxBpm + 1 < graphYBottom) {
+//
+////				System.out.println("maxBpm + 1 < graphYBottom:" + maxBpm + 1 + " / " + graphYBottom);
+////				// TODO remove SYSTEM.OUT.PRINTLN
+//
+//				continue;
+//			}
+//
+//			// skip zones above the graph
+//			if (minBpm > graphYTop) {
+////				System.out.println("minBpm > graphYTop:" + minBpm + " / " + graphYTop);
+////				// TODO remove SYSTEM.OUT.PRINTLN
+//
 //				break;
 //			}
-
-			int devYMin = devYBottom - (int) ((minBpm - graphYBottom) * scaleY);
-			final int devYMax = devYBottom - (int) ((maxBpm + 1 - graphYBottom) * scaleY);
-
-			// ensure the dev values are within the graph otherwise they are not painted !!!
-			devYMin = devYMin > devCanvasHeight ? devCanvasHeight : devYMin;
-
-			final int devZoneHeight = devYMin - devYMax;
-
-			//
-
-			final TourPersonHRZone hrZone = personHrZones.get(zoneIndex);
-
-			final RGB rgb = hrZone.getColor();
-			final Color color = new Color(display, rgb);
-			{
-				gcGraph.setBackground(color);
-				gcGraph.fillRectangle(0, devYMin, devCanvasWidth, -devZoneHeight);
-			}
-			color.dispose();
-
-//			System.out.println();
-//			System.out.println(rgb);
-			// TODO remove SYSTEM.OUT.PRINTLN
-
-//			System.out.println("bpm:"
-//					+ minBpm
-//					+ "/"
-//					+ maxBpm
-//					+ "\tdevY:"
-//					+ devYMin
-//					+ " / "
-//					+ devYMax
-//					+ "\th:"
-//					+ devZoneHeight);
-//			// TODO remove SYSTEM.OUT.PRINTLN
-		}
+////
+////			// check zone bounds
+////			if (zoneIndex >= zoneSize) {
+////				break;
+////			}
 //
-//		System.out.println("\t");
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
-		gcGraph.setAlpha(0xc0);
-
-	}
-
-	private int getZoneIndex(final int[] zoneMinBpm, final int[] zoneMaxBpm, final int pulse) {
-
-		int zoneIndex = 0;
-		for (int bpmIndex = 0; bpmIndex < zoneMinBpm.length; bpmIndex++) {
-
-			if (zoneMinBpm[bpmIndex] > pulse) {
-				break;
-			}
-
-			zoneIndex = bpmIndex;
-		}
-
-		return zoneIndex;
-	}
+//			int devYMin = devYBottom - (int) ((minBpm - graphYBottom) * scaleY);
+//			final int devYMax = devYBottom - (int) ((maxBpm + 1 - graphYBottom) * scaleY);
+//
+//			// ensure the dev values are within the graph otherwise they are not painted !!!
+//			devYMin = devYMin > devCanvasHeight ? devCanvasHeight : devYMin;
+//
+//			final int devZoneHeight = devYMin - devYMax;
+//
+//			//
+//
+//			final TourPersonHRZone hrZone = personHrZones.get(zoneIndex);
+//
+//			final RGB rgb = hrZone.getColor();
+//			final Color color = new Color(display, rgb);
+//			{
+//				gcGraph.setBackground(color);
+//				gcGraph.fillRectangle(0, devYMin, devCanvasWidth, -devZoneHeight);
+//			}
+//			color.dispose();
+//
+////			System.out.println();
+////			System.out.println(rgb);
+//			// TODO remove SYSTEM.OUT.PRINTLN
+//
+////			System.out.println("bpm:"
+////					+ minBpm
+////					+ "/"
+////					+ maxBpm
+////					+ "\tdevY:"
+////					+ devYMin
+////					+ " / "
+////					+ devYMax
+////					+ "\th:"
+////					+ devZoneHeight);
+////			// TODO remove SYSTEM.OUT.PRINTLN
+//		}
+////
+////		System.out.println("\t");
+////		// TODO remove SYSTEM.OUT.PRINTLN
+//
+//		gcGraph.setAlpha(0xc0);
+//
+//	}
 
 }

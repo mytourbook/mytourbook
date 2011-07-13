@@ -19,6 +19,12 @@ import org.eclipse.swt.graphics.Rectangle;
 
 public interface ILegendProviderGradientColors extends ILegendProvider {
 
+	/**
+	 * @param graphValue
+	 * @return Returns the RGB value for a graph value.
+	 */
+	abstract int getColorValue(int graphValue);
+
 	abstract LegendColor getLegendColor();
 
 	abstract LegendConfig getLegendConfig();

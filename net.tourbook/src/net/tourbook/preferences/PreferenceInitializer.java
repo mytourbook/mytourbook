@@ -24,6 +24,7 @@ import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.BreakTimeTool;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.util.StringToArrayConverter;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
@@ -124,8 +125,12 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 				+ (Integer.toString(TourManager.GRAPH_GRADIENT) + separator)
 				+ Integer.toString(TourManager.GRAPH_POWER));
 
-		// is HR zone visible
-		store.setDefault(ITourbookPreferences.GRAPH_HR_ZONE_IS_VISIBLE, true);
+		// HR zone backbround
+		store.setDefault(ITourbookPreferences.GRAPH_IS_HR_ZONE_BACKGROUND_VISIBLE, true);
+		store.setDefault(ITourbookPreferences.GRAPH_HR_ZONE_STYLE, TourChart.COMMAND_ID_HR_ZONE_STYLE_GRAPH_TOP);
+
+		// show breaktime values
+		store.setDefault(ITourbookPreferences.GRAPH_IS_BREAKTIME_VALUES_VISIBLE, true);
 
 		// is marker visible
 		store.setDefault(ITourbookPreferences.GRAPH_IS_MARKER_VISIBLE, true);

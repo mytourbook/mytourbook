@@ -13,6 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
+
 package net.tourbook.mapping;
 
 import java.util.ArrayList;
@@ -24,31 +25,31 @@ import de.byteholder.gpx.GeoPosition;
 /**
  * Contains data which are needed to paint a tour into a map.
  */
-public class TourPaintManager {
+public class TourPainterConfiguration {
 
-	private static TourPaintManager		_instance;
+	private static TourPainterConfiguration	_instance;
 
-	private final ArrayList<TourData>	_tourDataList	= new ArrayList<TourData>();
+	private final ArrayList<TourData>		_tourDataList	= new ArrayList<TourData>();
 
 	/**
 	 * contains the upper left and lower right position for a tour
 	 */
-	private Set<GeoPosition>			_tourBounds;
+	private Set<GeoPosition>				_tourBounds;
 
-	private int							_synchTourZoomLevel;
+	private int								_synchTourZoomLevel;
 
-	private ILegendProvider				_legendProvider;
+	private ILegendProvider					_legendProvider;
 
-	private boolean						_isShowStartEndInMap;
-	boolean								_isShowTourMarker;
-	boolean								_isShowWayPoints;
+	boolean									isShowStartEndInMap;
+	boolean									isShowTourMarker;
+	boolean									isShowWayPoints;
 
-	private TourPaintManager() {}
+	private TourPainterConfiguration() {}
 
-	public static TourPaintManager getInstance() {
+	public static TourPainterConfiguration getInstance() {
 
 		if (_instance == null) {
-			_instance = new TourPaintManager();
+			_instance = new TourPainterConfiguration();
 		}
 
 		return _instance;
@@ -76,18 +77,10 @@ public class TourPaintManager {
 		return _tourDataList;
 	}
 
-	public boolean isShowStartEndInMap() {
-		return _isShowStartEndInMap;
-	}
-
 	public void setLegendProvider(final ILegendProvider iLegendProvider) {
 		if (iLegendProvider != null) {
 			_legendProvider = iLegendProvider;
 		}
-	}
-
-	public void setShowStartEnd(final boolean isVisible) {
-		_isShowStartEndInMap = isVisible;
 	}
 
 	public void setSynchTourZoomLevel(final int zoomLevel) {

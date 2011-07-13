@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,27 +15,27 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart.action;
 
-import net.tourbook.ui.HandlerUtil;
 import net.tourbook.ui.tourChart.TourChart;
 
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.jface.action.Action;
 
-public class ActionHandlerXAxisDistance extends TCActionHandler {
+public class ActionHrZoneGraphType extends Action {
 
-	public ActionHandlerXAxisDistance() {
-		commandId = TourChart.COMMAND_ID_X_AXIS_DISTANCE;
+	private TourChart	_tourChart;
+	private String		_commandId;
+
+	public ActionHrZoneGraphType(final TourChart tourChart, final String commandId, final String label) {
+
+		super(label, AS_RADIO_BUTTON);
+
+		_tourChart = tourChart;
+		_commandId = commandId;
+
 	}
 
-	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {
-
-		final Boolean isItemChecked = HandlerUtil.isItemChecked(execEvent);
-
-		if (isItemChecked != null) {
-			tourChart.actionXAxisDistance(isItemChecked);
-		}
-
-		return null;
+	@Override
+	public void run() {
+		_tourChart.actionShowHrZoneStyle(isChecked(), _commandId);
 	}
 
 }
