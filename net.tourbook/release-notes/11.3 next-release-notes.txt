@@ -34,6 +34,7 @@ improvements
 - straight vertical lines instead of traiangles in the heartbeat graph when the value is not set within 20 seconds
 - export gpx with heartrate, temperature and cadence
 - break time is displayed as a gap when time is displayed on the x-axis
+- sequence of the bars in a bar chart can be customized
 - tour chart:
   - tour marker can be displayed/hidden
   - tour values within a break can be displayed/hidden

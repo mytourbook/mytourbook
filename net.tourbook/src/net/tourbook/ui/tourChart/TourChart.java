@@ -547,21 +547,15 @@ public class TourChart extends Chart {
 
 		_actionProxies = new HashMap<String, TCActionProxy>();
 
-		/*
-		 * Action: chart graphs
-		 */
+		// graph actions
 		createAction20GraphActionProxies();
 
+		String cmdId;
 		final boolean useInternalActionBar = useInternalActionBar();
 
-		String cmdId;
-
-		/*
-		 * Action: HR zones
-		 */
-		_actionProxies.put(COMMAND_ID_HR_ZONE_DROPDOWN_MENU, new TCActionProxy(
-				COMMAND_ID_HR_ZONE_DROPDOWN_MENU,
-				useInternalActionBar ? new ActionHrZoneDropDownMenu(this) : null));
+		cmdId = COMMAND_ID_HR_ZONE_DROPDOWN_MENU;
+		_actionProxies.put(cmdId, //
+				new TCActionProxy(cmdId, useInternalActionBar ? new ActionHrZoneDropDownMenu(this) : null));
 
 		cmdId = COMMAND_ID_HR_ZONE_STYLE_GRAPH_TOP;
 		_actionProxies.put(cmdId, new TCActionProxy(cmdId, useInternalActionBar ? //
@@ -583,50 +577,41 @@ public class TourChart extends Chart {
 				new ActionHrZoneGraphType(this, cmdId, Messages.Tour_Action_HrZoneGraphType_WhiteBottom)
 				: null));
 
-		// action: x-axis time
-		_actionProxies.put(COMMAND_ID_X_AXIS_TIME, new TCActionProxy(//
-				COMMAND_ID_X_AXIS_TIME,
-				useInternalActionBar ? new ActionXAxisTime(this) : null));
+		cmdId = COMMAND_ID_X_AXIS_TIME;
+		_actionProxies.put(cmdId, //
+				new TCActionProxy(cmdId, useInternalActionBar ? new ActionXAxisTime(this) : null));
 
-		// action: x-axis distance
-		_actionProxies.put(COMMAND_ID_X_AXIS_DISTANCE, new TCActionProxy(
-				COMMAND_ID_X_AXIS_DISTANCE,
-				useInternalActionBar ? new ActionXAxisDistance(this) : null));
+		cmdId = COMMAND_ID_X_AXIS_DISTANCE;
+		_actionProxies.put(cmdId, //
+				new TCActionProxy(cmdId, useInternalActionBar ? new ActionXAxisDistance(this) : null));
 
-		// action: show start time
-		_actionProxies.put(COMMAND_ID_SHOW_START_TIME, new TCActionProxy(
-				COMMAND_ID_SHOW_START_TIME,
-				useInternalActionBar ? new ActionShowStartTime(this) : null));
+		cmdId = COMMAND_ID_SHOW_START_TIME;
+		_actionProxies.put(cmdId, //
+				new TCActionProxy(cmdId, useInternalActionBar ? new ActionShowStartTime(this) : null));
 
-		// action: auto zoom to slider
-		_actionProxies.put(COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER, new TCActionProxy(
-				COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER,
-				useInternalActionBar ? new ActionCanAutoZoomToSlider(this) : null));
+		cmdId = COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER;
+		_actionProxies.put(cmdId, //
+				new TCActionProxy(cmdId, useInternalActionBar ? new ActionCanAutoZoomToSlider(this) : null));
 
-		// action: move sliders when zoomed
-		_actionProxies.put(COMMAND_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED, new TCActionProxy(
-				COMMAND_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED,
-				useInternalActionBar ? new ActionCanMoveSlidersWhenZoomed(this) : null));
+		cmdId = COMMAND_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED;
+		_actionProxies.put(cmdId, //
+				new TCActionProxy(cmdId, useInternalActionBar ? new ActionCanMoveSlidersWhenZoomed(this) : null));
 
-		// action: show SRTM data
-		_actionProxies.put(COMMAND_ID_SHOW_SRTM_DATA, new TCActionProxy(//
-				COMMAND_ID_SHOW_SRTM_DATA,
-				useInternalActionBar ? new ActionShowSRTMData(this) : null));
+		cmdId = COMMAND_ID_SHOW_SRTM_DATA;
+		_actionProxies.put(cmdId, //
+				new TCActionProxy(cmdId, useInternalActionBar ? new ActionShowSRTMData(this) : null));
 
-		// action: show/hide tour marker
-		_actionProxies.put(COMMAND_ID_IS_SHOW_TOUR_MARKER, new TCActionProxy(
-				COMMAND_ID_IS_SHOW_TOUR_MARKER,
-				useInternalActionBar ? new ActionShowTourMarker(this) : null));
+		cmdId = COMMAND_ID_IS_SHOW_TOUR_MARKER;
+		_actionProxies.put(cmdId, //
+				new TCActionProxy(cmdId, useInternalActionBar ? new ActionShowTourMarker(this) : null));
 
-		// action: show/hide breaktime values
-		_actionProxies.put(COMMAND_ID_IS_SHOW_BREAKTIME_VALUES, new TCActionProxy(
-				COMMAND_ID_IS_SHOW_BREAKTIME_VALUES,
-				useInternalActionBar ? new ActionShowBreaktimeValues(this) : null));
+		cmdId = COMMAND_ID_IS_SHOW_BREAKTIME_VALUES;
+		_actionProxies.put(cmdId, //
+				new TCActionProxy(cmdId, useInternalActionBar ? new ActionShowBreaktimeValues(this) : null));
 
-		// action: edit chart prefs
-		_actionProxies.put(COMMAND_ID_EDIT_CHART_PREFERENCES, new TCActionProxy(
-				COMMAND_ID_EDIT_CHART_PREFERENCES,
-				useInternalActionBar ? new ActionOpenPrefDialog(
+		cmdId = COMMAND_ID_EDIT_CHART_PREFERENCES;
+		_actionProxies.put(cmdId, //
+				new TCActionProxy(cmdId, useInternalActionBar ? new ActionOpenPrefDialog(
 						Messages.Tour_Action_EditChartPreferences,
 						PrefPageAppearanceTourChart.ID) : null));
 	}
@@ -720,14 +705,12 @@ public class TourChart extends Chart {
 	/**
 	 * Create the action proxy for a graph action
 	 * 
+	 * @param graphId
+	 * @param commandId
 	 * @param label
 	 * @param toolTip
 	 * @param imageEnabled
 	 * @param imageDisabled
-	 * @param id
-	 * @param definitionId
-	 * @param isChecked
-	 * @return
 	 */
 	private void createAction30GraphActionProxy(final int graphId,
 												final String commandId,
@@ -742,9 +725,7 @@ public class TourChart extends Chart {
 			action = new ActionGraph(this, graphId, label, toolTip, imageEnabled, imageDisabled);
 		}
 
-		final TCActionProxy actionProxy = new TCActionProxy(commandId, action);
-
-		_actionProxies.put(getProxyId(graphId), actionProxy);
+		_actionProxies.put(getProxyId(graphId), new TCActionProxy(commandId, action));
 	}
 
 	private void createHrZonePainter() {

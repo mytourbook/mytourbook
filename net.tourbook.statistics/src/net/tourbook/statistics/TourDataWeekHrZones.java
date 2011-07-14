@@ -15,13 +15,18 @@
  *******************************************************************************/
 package net.tourbook.statistics;
 
-import net.tourbook.chart.ChartDataYSerie;
+class TourDataWeekHrZones {
 
-public class StatisticMonthHrZoneBeside extends StatisticMonthHrZone {
+	/**
+	 * HR zones values in seconds.
+	 */
+	int[][]	hrZones;
 
-	@Override
-	int getBarLayout() {
-		return ChartDataYSerie.BAR_LAYOUT_BESIDE;
-	}
+	int[][]	hrZonesOriginalSorting;
+
+	int[]	years;
+	int[]	yearWeeks;
+	int[]	yearDays;
+
 
 }

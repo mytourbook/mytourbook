@@ -118,6 +118,16 @@ public abstract class TourbookStatistic {
 		return null;
 	}
 
+	/**
+	 * When stacked charts are displayed, the stacked parts can be resorted.
+	 * 
+	 * @return Returns the stacked names which can be resorted in the chart or <code>null</code>
+	 *         when this feature is not used.
+	 */
+	public String[] getStackedNames() {
+		return null;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -202,6 +212,15 @@ public abstract class TourbookStatistic {
 	 */
 	public void setDataDirty() {
 		_isDataDirty = true;
+	}
+
+	/**
+	 * Stacked sequence is selected in the UI
+	 * 
+	 * @param selectedIndex
+	 */
+	public void setStackedSequence(final int selectedIndex) {
+		// do nothing
 	}
 
 	/**

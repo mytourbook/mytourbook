@@ -1,19 +1,18 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.statistics;
 
 import java.sql.Connection;
@@ -31,18 +30,18 @@ import net.tourbook.ui.UI;
 
 public class DataProviderTourMonth extends DataProvider {
 
-	private static DataProviderTourMonth	fInstance;
+	private static DataProviderTourMonth	_instance;
 
-	private TourDataMonth					fTourMonthData;
-
-	public static DataProviderTourMonth getInstance() {
-		if (fInstance == null) {
-			fInstance = new DataProviderTourMonth();
-		}
-		return fInstance;
-	}
+	private TourDataMonth					_tourMonthData;
 
 	private DataProviderTourMonth() {}
+
+	public static DataProviderTourMonth getInstance() {
+		if (_instance == null) {
+			_instance = new DataProviderTourMonth();
+		}
+		return _instance;
+	}
 
 	TourDataMonth getMonthData(	final TourPerson person,
 								final TourTypeFilter tourTypeFilter,
@@ -58,7 +57,7 @@ public class DataProviderTourMonth extends DataProvider {
 				&& lastYear == _lastYear
 				&& numberOfYears == _numberOfYears
 				&& refreshData == false) {
-			return fTourMonthData;
+			return _tourMonthData;
 		}
 
 		_activePerson = person;
@@ -70,7 +69,7 @@ public class DataProviderTourMonth extends DataProvider {
 		final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
 		final TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
 
-		fTourMonthData = new TourDataMonth();
+		_tourMonthData = new TourDataMonth();
 		final SQLFilter sqlFilter = new SQLFilter();
 
 		final String sqlString = "SELECT " // //$NON-NLS-1$
@@ -158,25 +157,25 @@ public class DataProviderTourMonth extends DataProvider {
 
 			conn.close();
 
-			fTourMonthData.fTypeIds = dbTypeIds;
+			_tourMonthData.fTypeIds = dbTypeIds;
 
-			fTourMonthData.fDistanceLow = new int[serieLength][valueLength];
-			fTourMonthData.fAltitudeLow = new int[serieLength][valueLength];
-			fTourMonthData.fTimeLow = new int[serieLength][valueLength];
+			_tourMonthData.fDistanceLow = new int[serieLength][valueLength];
+			_tourMonthData.fAltitudeLow = new int[serieLength][valueLength];
+			_tourMonthData.fTimeLow = new int[serieLength][valueLength];
 
-			fTourMonthData.fDistanceHigh = dbDistance;
-			fTourMonthData.fAltitudeHigh = dbAltitude;
-			fTourMonthData.fTimeHigh = dbDurationTime;
+			_tourMonthData.fDistanceHigh = dbDistance;
+			_tourMonthData.fAltitudeHigh = dbAltitude;
+			_tourMonthData.fTimeHigh = dbDurationTime;
 
-			fTourMonthData.fRecordingTime = dbRecordingTime;
-			fTourMonthData.fDrivingTime = dbDrivingTime;
-			fTourMonthData.fBreakTime = dbBreakTime;
+			_tourMonthData.fRecordingTime = dbRecordingTime;
+			_tourMonthData.fDrivingTime = dbDrivingTime;
+			_tourMonthData.fBreakTime = dbBreakTime;
 
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
 		}
 
-		return fTourMonthData;
+		return _tourMonthData;
 	}
 
 }

@@ -87,7 +87,7 @@ public class DataProviderHrZoneMonth extends DataProvider {
 				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
 
 				+ (" WHERE startYear IN (" + getYearList(lastYear, numberOfYears) + ") \n") //$NON-NLS-1$ //$NON-NLS-2$
-//				+ (" AND NumberOfHrZones > 0  \n") //$NON-NLS-1$
+				+ (" AND NumberOfHrZones > 0  \n") //$NON-NLS-1$
 				+ sqlFilter.getWhereClause()
 
 				+ (" GROUP BY startYear, startMonth \n") //$NON-NLS-1$

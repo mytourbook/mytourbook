@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -56,6 +56,7 @@ public abstract class YearStatistic extends TourbookStatistic implements IYearSt
 
 				// test if the color or statistic data have changed
 				if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)
+				//
 						|| property.equals(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE)
 						|| property.equals(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE)
 						|| property.equals(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES)

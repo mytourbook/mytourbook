@@ -280,7 +280,6 @@ public class ChartComponents extends Composite {
 
 		chartDrawingData.chartDataModel = _chartDataModel;
 
-
 		final ArrayList<ChartDataYSerie> yDataList = _chartDataModel.getYData();
 		final ChartDataXSerie xData = _chartDataModel.getXData();
 		final ChartDataXSerie xData2nd = _chartDataModel.getXData2nd();
@@ -983,7 +982,6 @@ public class ChartComponents extends Composite {
 									final int devGraphWidth) {
 
 		final ChartDataXSerie xData = drawingData.getXData();
-		final ChartDataYSerie yData = drawingData.getYData();
 
 		final int allUnitsSize = xData._highValues[0].length;
 		final float scaleX = (float) devGraphWidth / allUnitsSize;
@@ -994,29 +992,11 @@ public class ChartComponents extends Composite {
 		createMonthEqualUnits(drawingData, units, devGraphWidth, allUnitsSize, numberOfYears);
 
 		// compute the width and position of the rectangles
-		int barWidth;
-		final int monthWidth = (int) Math.max(0, (scaleX) - 1);
+		final float monthWidth = Math.max(0, (scaleX) - 1);
+		final float barWidth = Math.max(0, (monthWidth * 0.90f));
 
-		switch (yData.getChartLayout()) {
-		case ChartDataYSerie.BAR_LAYOUT_SINGLE_SERIE:
-		case ChartDataYSerie.BAR_LAYOUT_STACKED:
-			// the bar's width is 50% of the width for a month
-			barWidth = (int) Math.max(0, (monthWidth * 0.90f));
-			drawingData.setBarRectangleWidth(barWidth);
-			drawingData.setDevBarRectangleXPos((Math.max(0, (monthWidth - barWidth) / 2) + 1));
-			break;
-
-		case ChartDataYSerie.BAR_LAYOUT_BESIDE:
-			final int serieCount = yData.getHighValues().length; // since 2011-06-16
-//			final int serieCount = yData.getHighValues()[0].length;
-
-			// the bar's width is 75% of the width for a month
-			barWidth = (int) Math.max(0, monthWidth * 0.95f);
-			drawingData.setBarRectangleWidth(Math.max(1, barWidth / serieCount));
-			drawingData.setDevBarRectangleXPos((Math.max(0, (monthWidth - barWidth) / 2) + 2));
-		default:
-			break;
-		}
+		drawingData.setBarRectangleWidth((int) barWidth);
+		drawingData.setDevBarRectangleXPos((int) (Math.max(0, (monthWidth - barWidth) / 2) + 1));
 
 		drawingData.setXUnitTextPos(GraphDrawingData.X_UNIT_TEXT_POS_CENTER);
 	}
@@ -1026,8 +1006,10 @@ public class ChartComponents extends Composite {
 									final int devGraphWidth) {
 
 		final ChartDataXSerie xData = drawingData.getXData();
+
 		final int[] xValues = xData.getHighValues()[0];
 		final int allWeeks = xValues.length;
+		final float devWeekWidth = devGraphWidth / allWeeks;
 
 		final ChartSegments chartSegments = drawingData.getXData().getChartSegments();
 
@@ -1040,14 +1022,17 @@ public class ChartComponents extends Composite {
 
 		createMonthUnequalUnits(drawingData, units, devGraphWidth, chartSegments.years, yearDays);
 
-		// compute the width and position of the rectangles
-		final int barWidth = (devGraphWidth / xValues.length) / 2;
-		drawingData.setBarRectangleWidth(Math.max(0, barWidth));
+		final float barWidth = devWeekWidth * 0.7f;
+
+		drawingData.setBarRectangleWidth((int) barWidth);
+		drawingData.setDevBarRectangleXPos((int) (Math.max(0, (devWeekWidth - 2) / 2) + 1));
+
 		drawingData.setBarPosition(GraphDrawingData.BAR_POS_CENTER);
+		drawingData.setXUnitTextPos(GraphDrawingData.X_UNIT_TEXT_POS_CENTER);
 
 		drawingData.setScaleX((float) devGraphWidth / allWeeks);
 		drawingData.setScaleUnitX((float) devGraphWidth / allDaysInAllYears);
-		drawingData.setXUnitTextPos(GraphDrawingData.X_UNIT_TEXT_POS_CENTER);
+
 	}
 
 	private void createXValuesYear(	final GraphDrawingData drawingData,
