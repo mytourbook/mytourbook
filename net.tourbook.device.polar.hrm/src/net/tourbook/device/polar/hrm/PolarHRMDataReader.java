@@ -538,7 +538,7 @@ public class PolarHRMDataReader extends TourbookDevice {
 
 				// convert speed into distance, speed is computed internally and not saved
 
-				final float speed = (float) hrSlice.speed / SPEED_SCALING * 1000 / 3600;
+				final float speed = (isImperial ? UI.UNIT_MILE : 1) * hrSlice.speed / SPEED_SCALING * 1000 / 3600;
 
 				final float distanceDiff = speed * sliceTimeInterval;
 
