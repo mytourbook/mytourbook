@@ -33,8 +33,10 @@ import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourPersonHRZone;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.ui.TourTypeFilter;
+import net.tourbook.statistic.StatisticContext;
+import net.tourbook.util.Util;
 
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.swt.SWT;
@@ -46,7 +48,10 @@ import org.eclipse.ui.IWorkbenchPartSite;
 
 public class StatisticWeekHrZone extends YearStatistic {
 
-	private final IPreferenceStore		_prefStore		= TourbookPlugin.getDefault().getPreferenceStore();
+	private static final String			STATE_HR_ZONE_WEEK_BAR_ORDERING_START	= "STATE_HR_ZONE_WEEK_BAR_ORDERING_START";	////$NON-NLS-1$
+
+	private final IPreferenceStore		_prefStore								= TourbookPlugin.getDefault() //
+																						.getPreferenceStore();
 
 	private TourPerson					_currentPerson;
 	private int							_currentYear;
@@ -56,13 +61,21 @@ public class StatisticWeekHrZone extends YearStatistic {
 
 	private IChartInfoProvider			_tooltipProvider;
 
-	private final BarChartMinMaxKeeper	_minMaxKeeper	= new BarChartMinMaxKeeper();
+	private final BarChartMinMaxKeeper	_minMaxKeeper							= new BarChartMinMaxKeeper();
 	private boolean						_isSynchScaleEnabled;
 
-	private final Calendar				_calendar		= GregorianCalendar.getInstance();
-//	private DateFormat					_dateFormatter	= DateFormat.getDateInstance(DateFormat.FULL);
+	private final Calendar				_calendar								= GregorianCalendar.getInstance();
 
 	private TourDataWeekHrZones			_tourWeekData;
+
+	private int							_barOrderStart;
+
+	private TourPersonHRZone[]			_personHrZones;
+	private TourPersonHRZone[]			_resortedPersonHrZones;
+
+	private int[][]						_resortedHrZoneValues;
+
+	private String[]					_barNames;
 
 	public class BarTooltipProviderImpl implements BarTooltipProvider {
 
@@ -142,7 +155,7 @@ public class StatisticWeekHrZone extends YearStatistic {
 
 	private int[] createWeekData() {
 
-		final int weekCounter = _tourWeekData.hrZones[0].length;
+		final int weekCounter = _resortedHrZoneValues[0].length;
 		final int allWeeks[] = new int[weekCounter];
 
 		for (int weekIndex = 0; weekIndex < weekCounter; weekIndex++) {
@@ -253,10 +266,9 @@ public class StatisticWeekHrZone extends YearStatistic {
 		/*
 		 * number of person hr zones decides how many hr zones are displayed
 		 */
-		final ArrayList<TourPersonHRZone> personHrZones = _currentPerson.getHrZonesSorted();
-		final int zoneSize = personHrZones.size();
+		final int zoneSize = _resortedPersonHrZones.length;
 
-		final int[][] weekHrZones = _tourWeekData.hrZones;
+		final int[][] weekHrZones = _resortedHrZoneValues;
 		final int serieValueLength = weekHrZones[0].length;
 
 		final int[][] hrZones0 = new int[zoneSize][serieValueLength];
@@ -268,7 +280,7 @@ public class StatisticWeekHrZone extends YearStatistic {
 		final RGB[] rgbLine = new RGB[zoneSize];
 
 		int zoneIndex = 0;
-		for (final TourPersonHRZone hrZone : personHrZones) {
+		for (final TourPersonHRZone hrZone : _resortedPersonHrZones) {
 
 			rgbDark[zoneIndex] = hrZone.getColor();
 			rgbBright[zoneIndex] = hrZone.getColorBright();
@@ -305,64 +317,26 @@ public class StatisticWeekHrZone extends YearStatistic {
 	@Override
 	public void deactivateActions(final IWorkbenchPartSite partSite) {}
 
-	@Override
-	public String[] getStackedNames() {
-
-		final ArrayList<TourPersonHRZone> hrZones = _currentPerson.getHrZonesSorted();
-
-		if (hrZones == null || hrZones.size() == 0) {
-			return null;
-		}
-
-		final String[] stackedNames = new String[hrZones.size()];
-		int hrZoneIndex = 0;
-
-		for (final TourPersonHRZone tourPersonHRZone : hrZones) {
-			stackedNames[hrZoneIndex++] = tourPersonHRZone.getNameShort();
-		}
-
-		return stackedNames;
-	}
-
-	public void prefColorChanged() {
-		setGridProperties();
-		updateChart();
-	}
-
-	public void refreshStatistic(	final TourPerson person,
-									final TourTypeFilter tourTypeFilter,
-									final int currentYear,
-									final int numberOfYears,
-									final boolean refreshData) {
-
-		// a person is required to get the HR zones
-		if (person == null) {
-			return;
-		}
-
-		_currentPerson = person;
-		_currentYear = currentYear;
-		_numberOfYears = numberOfYears;
-
-		_tourWeekData = DataProviderHrZoneWeek.getInstance().getWeekData(
-				person,
-				tourTypeFilter,
-				currentYear,
-				numberOfYears,
-				isDataDirtyWithReset() || refreshData);
-
-		// reset min/max values
-		if (_isSynchScaleEnabled == false && refreshData) {
-			_minMaxKeeper.resetMinMax();
-		}
-
-		setGridProperties();
+	public void preferencesHasChanged() {
+		setPreferences();
 		updateChart();
 	}
 
 	@Override
 	public void resetSelection() {
 		_chart.setSelectedBars(null);
+	}
+
+	@Override
+	public void restoreState(final IDialogSettings state) {
+
+		_barOrderStart = Util.getStateInt(state, STATE_HR_ZONE_WEEK_BAR_ORDERING_START, 0);
+	}
+
+	@Override
+	public void saveState(final IDialogSettings state) {
+
+		state.put(STATE_HR_ZONE_WEEK_BAR_ORDERING_START, _barOrderStart);
 	}
 
 	@Override
@@ -379,7 +353,89 @@ public class StatisticWeekHrZone extends YearStatistic {
 		return true;
 	}
 
-	private void setGridProperties() {
+	/**
+	 * Set bar names into the statistic context. The names will be displayed in a combobox in the
+	 * statistics toolbar.
+	 * 
+	 * @param statContext
+	 * @param isNewPerson
+	 */
+	private void setBarNames(final StatisticContext statContext, final boolean isNewPerson) {
+
+		if (isNewPerson == false) {
+			return;
+		}
+
+		final ArrayList<TourPersonHRZone> hrZones = _currentPerson.getHrZonesSorted();
+
+		if (hrZones == null || hrZones.size() == 0) {
+			statContext.outBarNames = _barNames = null;
+			return;
+		}
+
+		int hrZoneIndex = 0;
+		_barNames = new String[hrZones.size()];
+
+		for (final TourPersonHRZone tourPersonHRZone : hrZones) {
+			_barNames[hrZoneIndex++] = tourPersonHRZone.getNameShort();
+		}
+
+		// set state what the statistic container should do
+		statContext.outIsUpdateBarNames = true;
+		statContext.outBarNames = _barNames;
+		statContext.outVerticalBarIndex = _barOrderStart;
+	}
+
+	@Override
+	public void setBarVerticalOrder(final int selectedIndex) {
+
+		_barOrderStart = selectedIndex;
+
+		final ArrayList<TourPersonHRZone> personHrZones = _currentPerson.getHrZonesSorted();
+		final int[][] weekHrZoneValues = _tourWeekData.hrZoneValues;
+
+		/*
+		 * ensure that only available person HR zones are displayed, _tourWeekData.hrZones contains
+		 * all 10 zones
+		 */
+		final int maxSerieSize = Math.min(personHrZones.size(), weekHrZoneValues.length);
+
+		if (maxSerieSize == 0) {
+			return;
+		}
+
+		/*
+		 * resort HR zones + values according to the sequence start
+		 */
+
+		_resortedHrZoneValues = new int[maxSerieSize][];
+		_resortedPersonHrZones = new TourPersonHRZone[maxSerieSize];
+
+		int resortedIndex = 0;
+
+		// set HR zones starting from the sequence start
+		for (int serieIndex = _barOrderStart; serieIndex < maxSerieSize; serieIndex++) {
+
+			_resortedHrZoneValues[resortedIndex] = weekHrZoneValues[serieIndex];
+			_resortedPersonHrZones[resortedIndex] = _personHrZones[serieIndex];
+
+			resortedIndex++;
+		}
+
+		// set HR zones starting from 0
+		for (int serieIndex = 0; resortedIndex < maxSerieSize; serieIndex++) {
+
+			_resortedHrZoneValues[resortedIndex] = weekHrZoneValues[serieIndex];
+			_resortedPersonHrZones[resortedIndex] = _personHrZones[serieIndex];
+
+			resortedIndex++;
+		}
+
+		updateChart();
+	}
+
+	private void setPreferences() {
+
 		// set grid properties
 		_chart.setGrid(
 				_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
@@ -389,58 +445,65 @@ public class StatisticWeekHrZone extends YearStatistic {
 	}
 
 	@Override
-	public void setStackedSequence(final int selectedIndex) {
+	public void setSynchScale(final boolean isSynchScaleEnabled) {
+		_isSynchScaleEnabled = isSynchScaleEnabled;
+	}
 
-		final int[][] hrZones = _tourWeekData.hrZones;
-		final int serieLength = hrZones.length;
+	private void setWeekData(final boolean hasPersonChanged) {
 
-		if (serieLength == 0 || hrZones[0].length == 0) {
-			return;
-		}
-
-		// keep a backup of the original sorting
-		if (_tourWeekData.hrZonesOriginalSorting == null) {
-
-			final int[][] hrZoneBackup = new int[serieLength][];
-
-			for (int serieIndex = 0; serieIndex < hrZones.length; serieIndex++) {
-				hrZoneBackup[serieIndex] = hrZones[serieIndex];
-			}
-
-			_tourWeekData.hrZonesOriginalSorting = hrZoneBackup;
-		}
-
-		final ArrayList<TourPersonHRZone> personHrZones = _currentPerson.getHrZonesSorted();
+		final ArrayList<TourPersonHRZone> originalPersonHrZones = _currentPerson.getHrZonesSorted();
+		final int[][] weekHrZoneValues = _tourWeekData.hrZoneValues;
 
 		/*
 		 * ensure that only available person HR zones are displayed, _tourWeekData.hrZones contains
 		 * all 10 zones
 		 */
-		final int maxLength = Math.min(personHrZones.size(), serieLength);
+		final int maxSerieSize = Math.min(originalPersonHrZones.size(), weekHrZoneValues.length);
 
-		final int[][] hrZonesOriginal = _tourWeekData.hrZonesOriginalSorting;
+		if (maxSerieSize == 0) {
+			return;
+		}
 
-		final int[][] resortedHrZones = new int[maxLength][];
+		if (hasPersonChanged) {
+
+			// setup HR zones with default sorting
+
+			_barOrderStart = 0;
+
+			_personHrZones = new TourPersonHRZone[maxSerieSize];
+
+			int zoneIndex = 0;
+			for (final TourPersonHRZone tourPersonHRZone : originalPersonHrZones) {
+				_personHrZones[zoneIndex++] = tourPersonHRZone;
+			}
+		}
+
+		/*
+		 * resort HR zones + values according to the sequence start
+		 */
+
+		_resortedHrZoneValues = new int[maxSerieSize][];
+		_resortedPersonHrZones = new TourPersonHRZone[maxSerieSize];
+
 		int resortedIndex = 0;
 
-		// set HR zones starting from the selectedIndex
-		for (int serieIndex = selectedIndex; serieIndex < maxLength; serieIndex++) {
-			resortedHrZones[resortedIndex++] = hrZonesOriginal[serieIndex];
+		// set HR zones starting from the sequence start
+		for (int serieIndex = _barOrderStart; serieIndex < maxSerieSize; serieIndex++) {
+
+			_resortedHrZoneValues[resortedIndex] = weekHrZoneValues[serieIndex];
+			_resortedPersonHrZones[resortedIndex] = _personHrZones[serieIndex];
+
+			resortedIndex++;
 		}
 
 		// set HR zones starting from 0
-		for (int serieIndex = 0; resortedIndex < maxLength; serieIndex++) {
-			resortedHrZones[resortedIndex++] = hrZonesOriginal[serieIndex];
+		for (int serieIndex = 0; resortedIndex < maxSerieSize; serieIndex++) {
+
+			_resortedHrZoneValues[resortedIndex] = weekHrZoneValues[serieIndex];
+			_resortedPersonHrZones[resortedIndex] = _personHrZones[serieIndex];
+
+			resortedIndex++;
 		}
-
-		_tourWeekData.hrZones = resortedHrZones;
-
-		updateChart();
-	}
-
-	@Override
-	public void setSynchScale(final boolean isSynchScaleEnabled) {
-		_isSynchScaleEnabled = isSynchScaleEnabled;
 	}
 
 	private void updateChart() {
@@ -462,6 +525,42 @@ public class StatisticWeekHrZone extends YearStatistic {
 
 		// show the data model in the chart
 		_chart.updateChart(chartDataModel, true);
+	}
+
+	@Override
+	public void updateStatistic(final StatisticContext statContext) {
+
+		// a person is required to get the HR zones
+		if (statContext.person == null) {
+			return;
+		}
+
+		//
+		statContext.outIsBarReorderingSupported = true;
+
+		final boolean isNewPerson = _currentPerson == null || statContext.person != _currentPerson;
+
+		_currentPerson = statContext.person;
+		_currentYear = statContext.currentYear;
+		_numberOfYears = statContext.numberOfYears;
+
+		_tourWeekData = DataProviderHrZoneWeek.getInstance().getWeekData(
+				statContext.person,
+				statContext.tourTypeFilter,
+				statContext.currentYear,
+				statContext.numberOfYears,
+				isDataDirtyWithReset() || statContext.isRefreshData);
+
+		setWeekData(isNewPerson);
+		setBarNames(statContext, isNewPerson);
+
+		// reset min/max values
+		if (_isSynchScaleEnabled == false && statContext.isRefreshData) {
+			_minMaxKeeper.resetMinMax();
+		}
+
+		setPreferences();
+		updateChart();
 	}
 
 	@Override

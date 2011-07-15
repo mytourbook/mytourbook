@@ -20,9 +20,9 @@ class TourDataWeekHrZones {
 	/**
 	 * HR zones values in seconds.
 	 */
-	int[][]	hrZones;
+	int[][]	hrZoneValues;
 
-	int[][]	hrZonesOriginalSorting;
+//	int[][]	hrZonesOriginalSorting;
 
 	int[]	years;
 	int[]	yearWeeks;

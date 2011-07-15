@@ -34,6 +34,7 @@ import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.data.TourPerson;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.statistic.StatisticContext;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 import net.tourbook.util.Util;
@@ -193,7 +194,7 @@ public abstract class StatisticWeek extends YearStatistic {
 		 */
 		final StringBuilder titleFormat = new StringBuilder();
 		titleFormat.append(Messages.tourtime_info_week);
-		titleFormat.append(NEW_LINE);
+		titleFormat.append(UI.NEW_LINE);
 
 		final String toolTipTitle = new Formatter().format(titleFormat.toString(),//
 				tourTypeName,
@@ -208,17 +209,17 @@ public abstract class StatisticWeek extends YearStatistic {
 		 */
 		final StringBuilder toolTipFormat = new StringBuilder();
 		toolTipFormat.append(Messages.tourtime_info_date_week);
-		toolTipFormat.append(NEW_LINE);
-		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(UI.NEW_LINE);
+		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_distance_tour);
-		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_altitude);
-		toolTipFormat.append(NEW_LINE);
-		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(UI.NEW_LINE);
+		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_recording_time);
-		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_driving_time);
-		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_break_time);
 
 		final String toolTipLabel = new Formatter().format(toolTipFormat.toString(), //
@@ -417,27 +418,23 @@ public abstract class StatisticWeek extends YearStatistic {
 	@Override
 	public void deactivateActions(final IWorkbenchPartSite partSite) {}
 
-	public void prefColorChanged() {
-		refreshStatistic(_activePerson, _activeTourTypeFilter, _currentYear, _numberOfYears, false);
+	public void preferencesHasChanged() {
+		updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFilter, _currentYear, _numberOfYears, false));
 	}
 
-	public void refreshStatistic(	final TourPerson person,
-									final TourTypeFilter typeId,
-									final int currentYear,
-									final int numberOfYears,
-									final boolean refreshData) {
+	public void updateStatistic(final StatisticContext statContext) {
 
-		_activePerson = person;
-		_activeTourTypeFilter = typeId;
-		_currentYear = currentYear;
-		_numberOfYears = numberOfYears;
+		_activePerson = statContext.person;
+		_activeTourTypeFilter = statContext.tourTypeFilter;
+		_currentYear = statContext.currentYear;
+		_numberOfYears = statContext.numberOfYears;
 
 		_tourWeekData = DataProviderTourWeek.getInstance().getWeekData(
-				person,
-				typeId,
-				currentYear,
-				numberOfYears,
-				isDataDirtyWithReset() || refreshData);
+				statContext.person,
+				statContext.tourTypeFilter,
+				statContext.currentYear,
+				statContext.numberOfYears,
+				isDataDirtyWithReset() || statContext.isRefreshData);
 
 		// set week start values
 		_firstDayOfWeek = _prefStore.getInt(ITourbookPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
@@ -447,7 +444,7 @@ public abstract class StatisticWeek extends YearStatistic {
 		_calendar.setMinimalDaysInFirstWeek(_minimalDaysInFirstWeek);
 
 		// reset min/max values
-		if (_isSynchScaleEnabled == false && refreshData) {
+		if (_isSynchScaleEnabled == false && statContext.isRefreshData) {
 			_minMaxKeeper.resetMinMax();
 		}
 

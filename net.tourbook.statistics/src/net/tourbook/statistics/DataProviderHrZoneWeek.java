@@ -106,7 +106,7 @@ public class DataProviderHrZoneWeek extends DataProvider {
 
 		try {
 
-			final int[][] dbHrZones = new int[serieLength][valueLength];
+			final int[][] dbHrZoneValues = new int[serieLength][valueLength];
 
 			final Connection conn = TourDatabase.getInstance().getConnection();
 			{
@@ -130,42 +130,25 @@ public class DataProviderHrZoneWeek extends DataProvider {
 
 					final int weekIndex = allWeeks + dbWeek - 1;
 
-					dbHrZones[0][weekIndex] = result.getInt(3);
-					dbHrZones[1][weekIndex] = result.getInt(4);
-					dbHrZones[2][weekIndex] = result.getInt(5);
-					dbHrZones[3][weekIndex] = result.getInt(6);
-					dbHrZones[4][weekIndex] = result.getInt(7);
-					dbHrZones[5][weekIndex] = result.getInt(8);
-					dbHrZones[6][weekIndex] = result.getInt(9);
-					dbHrZones[7][weekIndex] = result.getInt(10);
-					dbHrZones[8][weekIndex] = result.getInt(11);
-					dbHrZones[9][weekIndex] = result.getInt(12);
+					dbHrZoneValues[0][weekIndex] = result.getInt(3);
+					dbHrZoneValues[1][weekIndex] = result.getInt(4);
+					dbHrZoneValues[2][weekIndex] = result.getInt(5);
+					dbHrZoneValues[3][weekIndex] = result.getInt(6);
+					dbHrZoneValues[4][weekIndex] = result.getInt(7);
+					dbHrZoneValues[5][weekIndex] = result.getInt(8);
+					dbHrZoneValues[6][weekIndex] = result.getInt(9);
+					dbHrZoneValues[7][weekIndex] = result.getInt(10);
+					dbHrZoneValues[8][weekIndex] = result.getInt(11);
+					dbHrZoneValues[9][weekIndex] = result.getInt(12);
 				}
 			}
 			conn.close();
 
-			_weekData.hrZones = dbHrZones;
-			_weekData.hrZonesOriginalSorting = null; // force setting
+			_weekData.hrZoneValues = dbHrZoneValues;
 
 			_weekData.years = _years;
 			_weekData.yearWeeks = _yearWeeks;
 			_weekData.yearDays = _yearDays;
-
-//			for (int zoneIndex = 0; zoneIndex < 10; zoneIndex++) {
-//				for (int monthIndex = 0; monthIndex < 12; monthIndex++) {
-//					final int hrZone = dbHrZones[zoneIndex][monthIndex];
-//					if (hrZone > 0) {
-//						System.out.println("z:" + zoneIndex + "\tm:" + monthIndex + "\thr:" + hrZone);
-//						// TODO remove SYSTEM.OUT.PRINTLN
-//					}
-//				}
-//				System.out.println("\t");
-//				// TODO remove SYSTEM.OUT.PRINTLN
-//			}
-//
-//			System.out.println("\t");
-//			System.out.println("\t");
-//// TODO remove SYSTEM.OUT.PRINTLN
 
 		} catch (final SQLException e) {
 			UI.showSQLException(e);

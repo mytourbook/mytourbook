@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -54,7 +54,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -105,7 +104,7 @@ public class StatContainer extends Composite {
 	private Combo								_cboYear;
 	private Combo								_cboStatistics;
 	private Combo								_cboNumberOfYears;
-	private Combo								_cboStackedSequence;
+	private Combo								_cboBarVerticalOrder;
 
 	private PageBook							_pageBookStatistic;
 
@@ -113,6 +112,7 @@ public class StatContainer extends Composite {
 	private ToolBar								_toolBar;
 
 	private final IViewSite						_viewSite;
+	private boolean								_isVerticalOrderDisabled;
 
 	StatContainer(	final Composite parent,
 					final IViewSite viewSite,
@@ -234,12 +234,12 @@ public class StatContainer extends Composite {
 		_activeStatistic.setSynchScale(_isSynchScaleEnabled);
 
 		if (_activeStatistic instanceof IYearStatistic) {
-			((IYearStatistic) _activeStatistic).refreshStatistic(
+			((IYearStatistic) _activeStatistic).updateStatistic(new StatisticContext(
 					_activePerson,
 					_activeTourTypeFilter,
 					_selectedYear,
 					getNumberOfYears(),
-					false);
+					false));
 		}
 	}
 
@@ -349,20 +349,20 @@ public class StatContainer extends Composite {
 			 */
 
 			final GC gc = new GC(this);
-			final Point defaultTextSize = gc.textExtent(Messages.Tour_Statistic_Combo_StackedSequence_Default);
+			final Point defaultTextSize = gc.textExtent(Messages.Tour_Statistic_Combo_BarVOrder_InfoItem);
 			gc.dispose();
 
-			_cboStackedSequence = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+			_cboBarVerticalOrder = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
 			GridDataFactory.fillDefaults()//
 					.indent(15, 0)
 					.hint(defaultTextSize.x, SWT.DEFAULT)
-					.applyTo(_cboStackedSequence);
-			_cboStackedSequence.setToolTipText(Messages.Tour_Statistic_Combo_StackedSequence_Tooltip);
-			_cboStackedSequence.setVisibleItemCount(50);
-			_cboStackedSequence.addSelectionListener(new SelectionAdapter() {
+					.applyTo(_cboBarVerticalOrder);
+			_cboBarVerticalOrder.setToolTipText(Messages.Tour_Statistic_Combo_BarVOrder_Tooltip);
+			_cboBarVerticalOrder.setVisibleItemCount(50);
+			_cboBarVerticalOrder.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					onSelectStackedSequence();
+					onSelectBarVerticalOrder();
 				}
 			});
 
@@ -467,62 +467,65 @@ public class StatContainer extends Composite {
 	}
 
 	/**
-	 * @return Returns the selected statistic in the combo box, it creates the statistic when this
-	 *         is not done, returns <code>null</code> when a statistic is not available
+	 * @return Returns <code>true</code> when a statistic is selected and {@link #_activeStatistic}
+	 *         is valid.
 	 */
-	private void getStatistic() {
+	private boolean getStatistic() {
 
 		// get selected statistic
 		final int selectedIndex = _cboStatistics.getSelectionIndex();
 		if (selectedIndex == -1) {
 			_activeStatistic = null;
-			return;
+			return false;
 		}
 
-		final TourbookStatistic statistic = getComboStatistics().get(selectedIndex);
+		final ArrayList<TourbookStatistic> allAvailableStatistics = getComboStatistics();
+		if (allAvailableStatistics.size() == 0) {
+			return false;
+		}
+
+		final TourbookStatistic statistic = allAvailableStatistics.get(selectedIndex);
 
 		// get statistic control
-		Composite statControlContainer = statistic.getControl();
-		if (statControlContainer != null) {
+		Composite statContainer = statistic.getControl();
+		if (statContainer != null) {
 			_activeStatistic = statistic;
-			return;
+			return true;
 		}
 
-		// create statistic ui
-		statControlContainer = new Composite(_pageBookStatistic, SWT.NONE);
-		final GridLayout gl = new GridLayout();
-		gl.marginHeight = 0;
-		gl.marginWidth = 0;
-		statControlContainer.setLayout(gl);
-		statControlContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		// create statistic UI in the pagebook for the selected statistic
+		statContainer = new Composite(_pageBookStatistic, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(statContainer);
+		GridLayoutFactory.fillDefaults().applyTo(statContainer);
+		{
+			statistic.createControl(statContainer, _viewSite, _postSelectionProvider);
+			statistic.setContainer(statContainer);
 
-		statistic.createControl(statControlContainer, _viewSite, _postSelectionProvider);
-		statistic.setContainer(statControlContainer);
-
-		final Composite statControl = statistic.getControl();
-		statControl.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+			final Composite statControl = statistic.getControl();
+			GridDataFactory.fillDefaults().grab(true, true).applyTo(statControl);
+		}
 
 		_activeStatistic = statistic;
+
+		return true;
 	}
 
-	private void onSelectStackedSequence() {
+	private void onSelectBarVerticalOrder() {
 
 		if (_activeStatistic == null) {
 			return;
 		}
 
-		_activeStatistic.setStackedSequence(_cboStackedSequence.getSelectionIndex());
+		_activeStatistic.setBarVerticalOrder(_cboBarVerticalOrder.getSelectionIndex());
 	}
 
 	private void onSelectStatistic() {
 
-		getStatistic();
-
-		if (_activeStatistic == null) {
+		if (getStatistic() == false) {
 			return;
 		}
 
-		refreshStatistic(_activePerson, _activeTourTypeFilter, _selectedYear);
+		updateStatisticNoReload(_activePerson, _activeTourTypeFilter, _selectedYear);
 	}
 
 	private void onSelectYear() {
@@ -532,95 +535,15 @@ public class StatContainer extends Composite {
 
 			_selectedYear = Integer.parseInt(_cboYear.getItem(selectedItem));
 
-			refreshStatistic(_activePerson, _activeTourTypeFilter, _selectedYear);
+			updateStatisticNoReload(_activePerson, _activeTourTypeFilter, _selectedYear);
 		}
-	}
-
-	/**
-	 * update all statistics which have been created because person or tour type can be changed
-	 * 
-	 * @param person
-	 */
-	void refreshStatistic(final TourPerson person, final TourTypeFilter tourTypeFilter) {
-
-		getStatistic();
-
-		if (_activeStatistic == null) {
-			return;
-		}
-
-		_activePerson = person;
-		_activeTourTypeFilter = tourTypeFilter;
-
-		refreshYearCombobox();
-		selectYear(-1);
-
-		// tell all existing statistics the data have changed
-		for (final TourbookStatistic statistic : getComboStatistics()) {
-
-			if (statistic.getControl() != null) {
-				if (statistic instanceof IYearStatistic) {
-
-					statistic.setSynchScale(_isSynchScaleEnabled);
-					statistic.setDataDirty();
-				}
-			}
-		}
-
-		// refresh current statistic
-		((IYearStatistic) _activeStatistic).refreshStatistic(
-				_activePerson,
-				_activeTourTypeFilter,
-				_selectedYear,
-				getNumberOfYears(),
-				true);
-
-		updateStackedSequence();
-	}
-
-	private void refreshStatistic(	final TourPerson person,
-									final TourTypeFilter activeTourTypeFilter,
-									final int selectedYear) {
-
-		_activePerson = person;
-		_activeTourTypeFilter = activeTourTypeFilter;
-
-		// keep current year
-		if (selectedYear == -1) {
-			return;
-		}
-		_selectedYear = selectedYear;
-
-		getStatistic();
-
-		if (_activeStatistic == null || _activeStatistic.getControl().isDisposed()) {
-			return;
-		}
-
-		selectYear(-1);
-
-		_activeStatistic.setSynchScale(_isSynchScaleEnabled);
-
-		if (_activeStatistic instanceof IYearStatistic) {
-			((IYearStatistic) _activeStatistic).refreshStatistic(
-					_activePerson,
-					_activeTourTypeFilter,
-					selectedYear,
-					getNumberOfYears(),
-					false);
-		}
-
-		updateStackedSequence();
-		updateUIToolbar();
-
-		// display selected statistic
-		_pageBookStatistic.showPage(_activeStatistic.getControl());
 	}
 
 	void refreshStatisticProvider() {
 
-		// get selected stat
-		getStatistic();
+		if (getStatistic() == false) {
+			return;
+		}
 
 		_allStatisticProvider = getStatisticProviders();
 
@@ -718,12 +641,17 @@ public class StatContainer extends Composite {
 		_activePerson = activePerson;
 		_activeTourTypeFilter = activeTourTypeFilter;
 
+		final ArrayList<TourbookStatistic> allAvailableStatistics = getComboStatistics();
+		if (allAvailableStatistics.size() == 0) {
+			return;
+		}
+
 		// select statistic
 		int prevStatIndex = 0;
 		final String mementoStatisticId = viewState.get(MEMENTO_SELECTED_STATISTIC);
 		if (mementoStatisticId != null) {
 			int statIndex = 0;
-			for (final TourbookStatistic statistic : getComboStatistics()) {
+			for (final TourbookStatistic statistic : allAvailableStatistics) {
 				if (mementoStatisticId.equalsIgnoreCase(statistic.statisticId)) {
 					prevStatIndex = statIndex;
 					break;
@@ -757,7 +685,7 @@ public class StatContainer extends Composite {
 
 		// restore statistic state (e.g. reselect previous selection)
 		if (viewState != null) {
-			getComboStatistics().get(prevStatIndex).restoreState(viewState);
+			allAvailableStatistics.get(prevStatIndex).restoreState(viewState);
 		}
 	}
 
@@ -766,15 +694,18 @@ public class StatContainer extends Composite {
 	 */
 	void saveState(final IDialogSettings state) {
 
-		final ArrayList<TourbookStatistic> comboStatistics = getComboStatistics();
+		final ArrayList<TourbookStatistic> allAvailableStatistics = getComboStatistics();
+		if (allAvailableStatistics.size() == 0) {
+			return;
+		}
 
 		// keep statistic id for the selected statistic
 		final int selectionIndex = _cboStatistics.getSelectionIndex();
 		if (selectionIndex != -1) {
-			state.put(MEMENTO_SELECTED_STATISTIC, comboStatistics.get(selectionIndex).statisticId);
+			state.put(MEMENTO_SELECTED_STATISTIC, allAvailableStatistics.get(selectionIndex).statisticId);
 		}
 
-		for (final TourbookStatistic tourbookStatistic : comboStatistics) {
+		for (final TourbookStatistic tourbookStatistic : allAvailableStatistics) {
 			tourbookStatistic.saveState(state);
 		}
 
@@ -816,27 +747,127 @@ public class StatContainer extends Composite {
 		return super.setFocus();
 	}
 
-	private void updateStackedSequence() {
+	private void updatePostRefresh(final StatisticContext statContext) {
 
-		_cboStackedSequence.removeAll();
+		if (statContext.outIsBarReorderingSupported) {
 
-		final String[] stackedNames = _activeStatistic.getStackedNames();
+			updatePostRefresh10BarOrdering(statContext);
 
-		if (stackedNames == null || stackedNames.length == 0) {
+			// vertical order feature is used
+			_isVerticalOrderDisabled = false;
 
-			_cboStackedSequence.add(Messages.Tour_Statistic_Combo_StackedSequence_Default);
-			_cboStackedSequence.select(0);
-			_cboStackedSequence.setEnabled(false);
+		} else {
 
+			if (_isVerticalOrderDisabled == false) {
+
+				// disable vertical order feature
+
+				_cboBarVerticalOrder.removeAll();
+				_cboBarVerticalOrder.add(Messages.Tour_Statistic_Combo_BarVOrder_InfoItem);
+				_cboBarVerticalOrder.select(0);
+				_cboBarVerticalOrder.setEnabled(false);
+
+				_isVerticalOrderDisabled = true;
+			}
+		}
+
+	}
+
+	private void updatePostRefresh10BarOrdering(final StatisticContext statContext) {
+
+		if (statContext.outIsUpdateBarNames) {
+			updateUIBarVerticalOrder(statContext);
+		}
+
+	}
+
+	/**
+	 * Update all statistics which have been created because person or tour type could be changed
+	 * and reload data.
+	 * 
+	 * @param person
+	 * @param tourTypeFilter
+	 */
+	void updateStatistic(final TourPerson person, final TourTypeFilter tourTypeFilter) {
+
+		if (getStatistic() == false) {
 			return;
 		}
 
-		for (final String name : stackedNames) {
-			_cboStackedSequence.add(name);
+		_activePerson = person;
+		_activeTourTypeFilter = tourTypeFilter;
+
+		refreshYearCombobox();
+		selectYear(-1);
+
+		// tell all existing statistics the data have changed
+		for (final TourbookStatistic statistic : getComboStatistics()) {
+
+			if (statistic.getControl() != null) {
+				if (statistic instanceof IYearStatistic) {
+
+					statistic.setSynchScale(_isSynchScaleEnabled);
+					statistic.setDataDirty();
+				}
+			}
 		}
 
-		_cboStackedSequence.select(0);
-		_cboStackedSequence.setEnabled(true);
+		// refresh current statistic
+		final StatisticContext statContext = new StatisticContext(
+				_activePerson,
+				_activeTourTypeFilter,
+				_selectedYear,
+				getNumberOfYears(),
+				true);
+
+		statContext.inVerticalBarIndex = _cboBarVerticalOrder.getSelectionIndex();
+
+		((IYearStatistic) _activeStatistic).updateStatistic(statContext);
+
+		updatePostRefresh(statContext);
+	}
+
+	/**
+	 * @param person
+	 * @param activeTourTypeFilter
+	 * @param selectedYear
+	 */
+	private void updateStatisticNoReload(	final TourPerson person,
+											final TourTypeFilter activeTourTypeFilter,
+											final int selectedYear) {
+
+		_activePerson = person;
+		_activeTourTypeFilter = activeTourTypeFilter;
+
+		// keep current year
+		if (selectedYear == -1) {
+			return;
+		}
+		_selectedYear = selectedYear;
+
+		if (getStatistic() == false) {
+			return;
+		}
+
+		// display selected statistic
+		_pageBookStatistic.showPage(_activeStatistic.getControl());
+
+		selectYear(-1);
+
+		_activeStatistic.setSynchScale(_isSynchScaleEnabled);
+
+		final StatisticContext statContext = new StatisticContext(
+				_activePerson,
+				_activeTourTypeFilter,
+				selectedYear,
+				getNumberOfYears(),
+				false);
+
+		statContext.inVerticalBarIndex = _cboBarVerticalOrder.getSelectionIndex();
+
+		((IYearStatistic) _activeStatistic).updateStatistic(statContext);
+
+		updateUIToolbar();
 	}
 
 	private void updateUI() {
@@ -850,6 +881,23 @@ public class StatContainer extends Composite {
 		for (final TourbookStatistic statistic : getComboStatistics()) {
 			_cboStatistics.add(statistic.visibleName);
 		}
+	}
+
+	private void updateUIBarVerticalOrder(final StatisticContext statContext) {
+
+		_cboBarVerticalOrder.removeAll();
+
+		final String[] stackedNames = statContext.outBarNames;
+
+		for (final String name : stackedNames) {
+			_cboBarVerticalOrder.add(name);
+		}
+
+		final int selectedIndex = statContext.outVerticalBarIndex;
+
+		_cboBarVerticalOrder.select(selectedIndex >= _cboBarVerticalOrder.getItemCount() ? 0 : selectedIndex);
+
+		_cboBarVerticalOrder.setEnabled(true);
 	}
 
 	/**

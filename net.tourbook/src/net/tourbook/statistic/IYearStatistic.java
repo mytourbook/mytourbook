@@ -15,33 +15,18 @@
  *******************************************************************************/
 package net.tourbook.statistic;
 
-import net.tourbook.data.TourPerson;
-import net.tourbook.ui.TourTypeFilter;
-
 public interface IYearStatistic {
 
 	/**
-	 * color have changed for the graphs
+	 * Preferences for the statistics has changed.
 	 */
-	public abstract void prefColorChanged();
+	public abstract void preferencesHasChanged();
 
 	/**
-	 * @param person
-	 *            Active person or <code>null</code> when no person/all people are selected
-	 * @param activeTourTypeFilter
-	 *            Tour type filter
-	 * @param year
-	 *            Year for the statistic, when multiple years are displayed, this is the youngest
-	 *            year
-	 * @param numberOfYears
-	 *            Number of years which should be displayed in the statistic
-	 * @param refreshData
-	 *            When <code>true</code> the data should be updated from the database
+	 * Update statistic with the data in the context.
+	 * 
+	 * @param statContext
 	 */
-	public abstract void refreshStatistic(	TourPerson person,
-											TourTypeFilter activeTourTypeFilter,
-											int year,
-											int numberOfYears,
-											boolean refreshData);
+	public abstract void updateStatistic(StatisticContext statContext);
 
 }

@@ -63,7 +63,7 @@ public abstract class YearStatistic extends TourbookStatistic implements IYearSt
 						|| property.equals(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES)) {
 
 					// update chart
-					prefColorChanged();
+					preferencesHasChanged();
 				}
 			}
 		};
@@ -112,12 +112,12 @@ public abstract class YearStatistic extends TourbookStatistic implements IYearSt
 	}
 
 	@Override
-	public void restoreState(final IDialogSettings viewState) {
+	public void restoreState(final IDialogSettings state) {
 		// do nothing
 	}
 
 	@Override
-	public void saveState(final IDialogSettings viewState) {
+	public void saveState(final IDialogSettings state) {
 		// do nothing
 	}
 }

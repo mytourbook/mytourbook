@@ -1045,9 +1045,9 @@ public class Messages extends NLS {
 
 	public static String		Tour_Segmenter_Type_ByBreakTime;
 
-	public static String	Tour_Statistic_Combo_StackedSequence_Default;
+	public static String	Tour_Statistic_Combo_BarVOrder_InfoItem;
 
-	public static String	Tour_Statistic_Combo_StackedSequence_Tooltip;
+	public static String	Tour_Statistic_Combo_BarVOrder_Tooltip;
 
 	public static String		tag_view_action_refresh_view_tooltip;
 	public static String		tag_view_title_tag;

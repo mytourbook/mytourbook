@@ -33,6 +33,7 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.statistic.StatisticContext;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
@@ -149,7 +150,7 @@ public class StatisticTourNumbers extends YearStatistic {
 					resetMinMaxKeeper();
 
 					// update chart
-					refreshStatistic(_activePerson, _activeTourTypeFilter, _currentYear, 1, false);
+					updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFilter, _currentYear, 1, false));
 				}
 			}
 		};
@@ -321,7 +322,7 @@ public class StatisticTourNumbers extends YearStatistic {
 				if (valueIndex == 0) {
 
 					infoText.append(Messages.numbers_info_altitude_down);
-					infoText.append(NEW_LINE);
+					infoText.append(UI.NEW_LINE);
 					infoText.append(Messages.numbers_info_altitude_total);
 
 					toolTipLabel = new Formatter().format(
@@ -336,7 +337,7 @@ public class StatisticTourNumbers extends YearStatistic {
 				} else if (valueIndex == _statAltitudeUnits.length - 1) {
 
 					infoText.append(Messages.numbers_info_altitude_up);
-					infoText.append(NEW_LINE);
+					infoText.append(UI.NEW_LINE);
 					infoText.append(Messages.numbers_info_altitude_total);
 
 					toolTipLabel = new Formatter().format(
@@ -350,7 +351,7 @@ public class StatisticTourNumbers extends YearStatistic {
 				} else {
 
 					infoText.append(Messages.numbers_info_altitude_between);
-					infoText.append(NEW_LINE);
+					infoText.append(UI.NEW_LINE);
 					infoText.append(Messages.numbers_info_altitude_total);
 
 					toolTipLabel = new Formatter().format(
@@ -384,7 +385,7 @@ public class StatisticTourNumbers extends YearStatistic {
 				if (valueIndex == 0) {
 
 					sb.append(Messages.numbers_info_distance_down);
-					sb.append(NEW_LINE);
+					sb.append(UI.NEW_LINE);
 					sb.append(Messages.numbers_info_distance_total);
 
 					toolTipLabel = new Formatter().format(
@@ -398,7 +399,7 @@ public class StatisticTourNumbers extends YearStatistic {
 				} else if (valueIndex == _statDistanceUnits.length - 1) {
 
 					sb.append(Messages.numbers_info_distance_up);
-					sb.append(NEW_LINE);
+					sb.append(UI.NEW_LINE);
 					sb.append(Messages.numbers_info_distance_total);
 
 					toolTipLabel = new Formatter().format(
@@ -411,7 +412,7 @@ public class StatisticTourNumbers extends YearStatistic {
 				} else {
 
 					sb.append(Messages.numbers_info_distance_between);
-					sb.append(NEW_LINE);
+					sb.append(UI.NEW_LINE);
 					sb.append(Messages.numbers_info_distance_total);
 
 					toolTipLabel = new Formatter().format(
@@ -441,7 +442,7 @@ public class StatisticTourNumbers extends YearStatistic {
 				if (valueIndex == 0) {
 
 					toolTipFormat.append(Messages.numbers_info_time_down);
-					toolTipFormat.append(NEW_LINE);
+					toolTipFormat.append(UI.NEW_LINE);
 					toolTipFormat.append(Messages.numbers_info_time_total);
 
 					toolTipLabel = new Formatter().format(
@@ -455,38 +456,30 @@ public class StatisticTourNumbers extends YearStatistic {
 				} else if (valueIndex == _statTimeUnits.length - 1) {
 
 					toolTipFormat.append(Messages.numbers_info_time_up);
-					toolTipFormat.append(NEW_LINE);
+					toolTipFormat.append(UI.NEW_LINE);
 					toolTipFormat.append(Messages.numbers_info_time_total);
 
-					toolTipLabel = new Formatter()
-							.format(
-									toolTipFormat.toString(),
-									Util.formatValue(
-											_statTimeUnits[valueIndex - 1],
-											ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
-									_statTimeCounterHigh[serieIndex][valueIndex],
-									Util.formatValue(
-											_statTimeSumHigh[serieIndex][valueIndex],
-											ChartDataSerie.AXIS_UNIT_HOUR_MINUTE)).toString();
+					toolTipLabel = new Formatter().format(
+							toolTipFormat.toString(),
+							Util.formatValue(_statTimeUnits[valueIndex - 1], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
+							_statTimeCounterHigh[serieIndex][valueIndex],
+							Util.formatValue(
+									_statTimeSumHigh[serieIndex][valueIndex],
+									ChartDataSerie.AXIS_UNIT_HOUR_MINUTE)).toString();
 				} else {
 
 					toolTipFormat.append(Messages.numbers_info_time_between);
-					toolTipFormat.append(NEW_LINE);
+					toolTipFormat.append(UI.NEW_LINE);
 					toolTipFormat.append(Messages.numbers_info_time_total);
 
-					toolTipLabel = new Formatter()
-							.format(
-									toolTipFormat.toString(),
-									Util.formatValue(
-											_statTimeUnits[valueIndex - 1],
-											ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
-									Util.formatValue(
-											_statTimeUnits[valueIndex],
-											ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
-									_statTimeCounterHigh[serieIndex][valueIndex],
-									Util.formatValue(
-											_statTimeSumHigh[serieIndex][valueIndex],
-											ChartDataSerie.AXIS_UNIT_HOUR_MINUTE)).toString();
+					toolTipLabel = new Formatter().format(
+							toolTipFormat.toString(),
+							Util.formatValue(_statTimeUnits[valueIndex - 1], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
+							Util.formatValue(_statTimeUnits[valueIndex], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
+							_statTimeCounterHigh[serieIndex][valueIndex],
+							Util.formatValue(
+									_statTimeSumHigh[serieIndex][valueIndex],
+									ChartDataSerie.AXIS_UNIT_HOUR_MINUTE)).toString();
 				}
 
 				return createToolTipProvider(serieIndex, toolTipLabel);
@@ -606,29 +599,30 @@ public class StatisticTourNumbers extends YearStatistic {
 		return units;
 	}
 
-	public void prefColorChanged() {
-		refreshStatistic(_activePerson, _activeTourTypeFilter, _currentYear, 1, false);
+	public void preferencesHasChanged() {
+		updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFilter, _currentYear, 1, false));
 	}
 
-	public void refreshStatistic(	final TourPerson person,
-									final TourTypeFilter typeId,
-									final int year,
-									final int numberOfYears,
-									final boolean refreshData) {
+//	public void refreshStatistic(	final TourPerson person,
+//									final TourTypeFilter typeId,
+//									final int year,
+//									final int numberOfYears,
+//									final boolean refreshData) {
+	public void updateStatistic(final StatisticContext statContext) {
 
-		_activePerson = person;
-		_activeTourTypeFilter = typeId;
-		_currentYear = year;
+		_activePerson = statContext.person;
+		_activeTourTypeFilter = statContext.tourTypeFilter;
+		_currentYear = statContext.currentYear;
 
 		_tourDayData = DataProviderTourDay.getInstance().getDayData(
-				person,
-				typeId,
-				year,
-				numberOfYears,
-				isDataDirtyWithReset() || refreshData);
+				statContext.person,
+				statContext.tourTypeFilter,
+				statContext.currentYear,
+				statContext.numberOfYears,
+				isDataDirtyWithReset() || statContext.isRefreshData);
 
 		// reset min/max values
-		if (_isSynchScaleEnabled == false && refreshData) {
+		if (_isSynchScaleEnabled == false && statContext.isRefreshData) {
 			resetMinMaxKeeper();
 		}
 

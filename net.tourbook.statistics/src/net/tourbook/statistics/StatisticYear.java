@@ -31,6 +31,7 @@ import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.data.TourPerson;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.statistic.StatisticContext;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
@@ -129,7 +130,7 @@ public abstract class StatisticYear extends YearStatistic {
 			titleString.append(STRING_SEPARATOR);
 		}
 		titleString.append(Messages.tourtime_info_date_year);
-		titleString.append(NEW_LINE);
+		titleString.append(UI.NEW_LINE);
 
 		final String toolTipTitle = new Formatter().format(titleString.toString(), oldestYear + valueIndex).toString();
 
@@ -138,14 +139,14 @@ public abstract class StatisticYear extends YearStatistic {
 		 */
 		final StringBuilder toolTipFormat = new StringBuilder();
 		toolTipFormat.append(Messages.tourtime_info_distance);
-		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_altitude);
-		toolTipFormat.append(NEW_LINE);
-		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(UI.NEW_LINE);
+		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_recording_time);
-		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_driving_time);
-		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_break_time);
 
 		final String toolTipLabel = new Formatter().format(toolTipFormat.toString(), //
@@ -270,30 +271,26 @@ public abstract class StatisticYear extends YearStatistic {
 	@Override
 	public void deactivateActions(final IWorkbenchPartSite partSite) {}
 
-	public void prefColorChanged() {
-		refreshStatistic(_activePerson, _activeTourTypeFilter, _currentYear, _numberOfYears, false);
+	public void preferencesHasChanged() {
+		updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFilter, _currentYear, _numberOfYears, false));
 	}
 
-	public void refreshStatistic(	final TourPerson person,
-									final TourTypeFilter tourTypeFilter,
-									final int currentYear,
-									final int numberOfYears,
-									final boolean refreshData) {
+	public void updateStatistic(final StatisticContext statContext) {
 
-		_activePerson = person;
-		_activeTourTypeFilter = tourTypeFilter;
-		_currentYear = currentYear;
-		_numberOfYears = numberOfYears;
+		_activePerson = statContext.person;
+		_activeTourTypeFilter = statContext.tourTypeFilter;
+		_currentYear = statContext.currentYear;
+		_numberOfYears = statContext.numberOfYears;
 
 		_tourYearData = DataProviderTourYear.getInstance().getYearData(
-				person,
-				tourTypeFilter,
-				currentYear,
-				numberOfYears,
-				isDataDirtyWithReset() || refreshData);
+				statContext.person,
+				statContext.tourTypeFilter,
+				statContext.currentYear,
+				statContext.numberOfYears,
+				isDataDirtyWithReset() || statContext.isRefreshData);
 
 		// reset min/max values
-		if (_isSynchScaleEnabled == false && refreshData) {
+		if (_isSynchScaleEnabled == false && statContext.isRefreshData) {
 			_minMaxKeeper.resetMinMax();
 		}
 

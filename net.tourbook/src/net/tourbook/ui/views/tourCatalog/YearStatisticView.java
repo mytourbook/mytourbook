@@ -523,9 +523,9 @@ public class YearStatisticView extends ViewPart {
 	}
 
 	/**
-	 * @param selectedYear
+	 * @param currentYear
 	 * @param numberOfYears
-	 * @return Returns the number of days between {@link #fLastYear} and selectedYear
+	 * @return Returns the number of days between {@link #fLastYear} and currentYear
 	 */
 	int getYearDOYs(final int selectedYear) {
 

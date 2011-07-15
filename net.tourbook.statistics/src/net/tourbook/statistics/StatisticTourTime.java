@@ -37,6 +37,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.statistic.StatisticContext;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourInfoToolTipProvider;
 import net.tourbook.tour.TourManager;
@@ -271,36 +272,36 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 
 		final StringBuilder toolTipFormat = new StringBuilder();
 		toolTipFormat.append(Messages.TourTime_Info_DateDay); //			%s - CW %d
-		toolTipFormat.append(NEW_LINE);
-		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(UI.NEW_LINE);
+		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_distance_tour);
-		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_altitude);
-		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_time);
-		toolTipFormat.append(NEW_LINE);
-		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(UI.NEW_LINE);
+		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_recording_time_tour);
-		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_driving_time_tour);
-		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_break_time_tour);
-		toolTipFormat.append(NEW_LINE);
-		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(UI.NEW_LINE);
+		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_avg_speed);
-		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_avg_pace);
-		toolTipFormat.append(NEW_LINE);
-		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(UI.NEW_LINE);
+		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_tour_type);
-		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_tags);
 
 		if (tourDescription.length() > 0) {
-			toolTipFormat.append(NEW_LINE);
-			toolTipFormat.append(NEW_LINE);
+			toolTipFormat.append(UI.NEW_LINE);
+			toolTipFormat.append(UI.NEW_LINE);
 			toolTipFormat.append(Messages.tourtime_info_description);
-			toolTipFormat.append(NEW_LINE);
+			toolTipFormat.append(UI.NEW_LINE);
 			toolTipFormat.append(Messages.tourtime_info_description_text);
 		}
 
@@ -400,20 +401,16 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 		return selectedTours;
 	}
 
-	public void prefColorChanged() {
-		refreshStatistic(_activePerson, _activeTourTypeFiler, _currentYear, 1, false);
+	public void preferencesHasChanged() {
+		updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFiler, _currentYear, 1, false));
 	}
 
-	public void refreshStatistic(	final TourPerson person,
-									final TourTypeFilter tourTypeFilter,
-									final int year,
-									final int numberOfYears,
-									final boolean refreshData) {
+	public void updateStatistic(final StatisticContext statContext) {
 
-		_activePerson = person;
-		_activeTourTypeFiler = tourTypeFilter;
-		_currentYear = year;
-		_numberOfYears = numberOfYears;
+		_activePerson = statContext.person;
+		_activeTourTypeFiler = statContext.tourTypeFilter;
+		_currentYear = statContext.currentYear;
+		_numberOfYears = statContext.numberOfYears;
 
 		/*
 		 * get currently selected tour id
@@ -439,14 +436,14 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 		}
 
 		_tourTimeData = DataProviderTourTime.getInstance().getTourTimeData(
-				person,
-				tourTypeFilter,
-				year,
-				numberOfYears,
-				isDataDirtyWithReset() || refreshData);
+				statContext.person,
+				statContext.tourTypeFilter,
+				statContext.currentYear,
+				statContext.numberOfYears,
+				isDataDirtyWithReset() || statContext.isRefreshData);
 
 		// reset min/max values
-		if (_ifIsSynchScaleEnabled == false && refreshData) {
+		if (_ifIsSynchScaleEnabled == false && statContext.isRefreshData) {
 			_minMaxKeeper.resetMinMax();
 		}
 

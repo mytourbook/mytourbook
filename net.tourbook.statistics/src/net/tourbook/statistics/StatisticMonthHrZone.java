@@ -33,7 +33,7 @@ import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourPersonHRZone;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.ui.TourTypeFilter;
+import net.tourbook.statistic.StatisticContext;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.IPostSelectionProvider;
@@ -260,7 +260,7 @@ public class StatisticMonthHrZone extends YearStatistic {
 		final int zoneSize = personHrZones.size();
 
 		final int[][] tourHrZones = _tourMonthData.hrZones;
-		//		final int serieLength = hrZones.length;
+		//		final int serieLength = hrZoneValues.length;
 		final int serieValueLength = tourHrZones[0].length;
 
 		final int[][] hrZones0 = new int[zoneSize][serieValueLength];
@@ -309,33 +309,30 @@ public class StatisticMonthHrZone extends YearStatistic {
 	@Override
 	public void deactivateActions(final IWorkbenchPartSite partSite) {}
 
-	public void prefColorChanged() {
-		refreshStatistic(_currentPerson, null, _currentYear, _numberOfYears, false);
+	public void preferencesHasChanged() {
+		updateStatistic(new StatisticContext(_currentPerson, null, _currentYear, _numberOfYears, false));
 	}
 
-	public void refreshStatistic(	final TourPerson person,
-									final TourTypeFilter tourTypeFilter,
-									final int currentYear,
-									final int numberOfYears,
-									final boolean refreshData) {
+	@Override
+	public void updateStatistic(final StatisticContext statContext) {
 
-		if (person == null) {
+		if (statContext.person == null) {
 			return;
 		}
 
-		_currentPerson = person;
-		_currentYear = currentYear;
-		_numberOfYears = numberOfYears;
+		_currentPerson = statContext.person;
+		_currentYear = statContext.currentYear;
+		_numberOfYears = statContext.numberOfYears;
 
 		_tourMonthData = DataProviderHrZoneMonth.getInstance().getMonthData(
-				person,
-				tourTypeFilter,
-				currentYear,
-				numberOfYears,
-				isDataDirtyWithReset() || refreshData);
+				statContext.person,
+				statContext.tourTypeFilter,
+				statContext.currentYear,
+				statContext.numberOfYears,
+				isDataDirtyWithReset() || statContext.isRefreshData);
 
 		// reset min/max values
-		if (_isSynchScaleEnabled == false && refreshData) {
+		if (_isSynchScaleEnabled == false && statContext.isRefreshData) {
 			_minMaxKeeper.resetMinMax();
 		}
 
