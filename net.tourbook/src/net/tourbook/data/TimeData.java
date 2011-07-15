@@ -86,9 +86,9 @@ public class TimeData implements Serializable {
 
 	/**
 	 * Relative value for distance in meters, this is the difference for the distance with the
-	 * previous time slice. Contains {@link Float#NaN} when value is not set.
+	 * previous time slice. Contains {@link Float#MIN_VALUE} when value is not set.
 	 */
-	public float				gpxDistance			= Float.NaN;
+	public float				gpxDistance			= Float.MIN_VALUE; 
 
 	/**
 	 * contains the absolute distance in meters or {@link Float#MIN_VALUE} when distance is not set

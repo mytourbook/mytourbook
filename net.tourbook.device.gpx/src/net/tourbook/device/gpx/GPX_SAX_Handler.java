@@ -532,13 +532,13 @@ public class GPX_SAX_Handler extends DefaultHandler {
 		} else {
 			if (_timeSlice.absoluteDistance == Float.MIN_VALUE) {
 
-				if (_timeSlice.gpxDistance != Float.NaN) {
+				if (_timeSlice.gpxDistance != Float.MIN_VALUE) {
 
 					// get distance from gpx tag: <gpxdata:distance>
 
 					_timeSlice.absoluteDistance = _absoluteDistance += _timeSlice.gpxDistance;
 
-				} else {
+				} else { 
 
 					// compute distance from lat/lon
 
