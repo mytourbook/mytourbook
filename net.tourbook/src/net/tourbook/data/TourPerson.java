@@ -416,10 +416,10 @@ public class TourPerson implements Comparable<Object> {
 		return hrZoneMinMax1;
 	}
 
-	public Set<TourPersonHRZone> getHrZones() {
-		return hrZones;
-	}
-
+	/**
+	 * @return Returns a list with all HR zones for this person. When the person has no HR zones,
+	 *         the returned list is empty.
+	 */
 	public ArrayList<TourPersonHRZone> getHrZonesSorted() {
 
 		if (_sortedHrZones == null) {

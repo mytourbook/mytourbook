@@ -22,11 +22,7 @@ class TourDataWeekHrZones {
 	 */
 	int[][]	hrZoneValues;
 
-//	int[][]	hrZonesOriginalSorting;
-
 	int[]	years;
 	int[]	yearWeeks;
 	int[]	yearDays;
-
-
 }

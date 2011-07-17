@@ -314,6 +314,7 @@ public class StatisticTourNumbers extends YearStatistic {
 	private void createToolTipProviderAltitude(final ChartDataModel chartModel) {
 
 		chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
+			@Override
 			public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
 
 				String toolTipLabel;
@@ -373,7 +374,7 @@ public class StatisticTourNumbers extends YearStatistic {
 	private void createToolTipProviderDistance(final ChartDataModel chartModel) {
 
 		chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
-
+			@Override
 			public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
 
 				String toolTipLabel;
@@ -428,12 +429,14 @@ public class StatisticTourNumbers extends YearStatistic {
 				return createToolTipProvider(serieIndex, toolTipLabel);
 
 			}
+
 		});
 	}
 
 	private void createToolTipProviderDuration(final ChartDataModel chartModel) {
 
 		chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
+			@Override
 			public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
 
 				String toolTipLabel;
@@ -601,39 +604,6 @@ public class StatisticTourNumbers extends YearStatistic {
 
 	public void preferencesHasChanged() {
 		updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFilter, _currentYear, 1, false));
-	}
-
-//	public void refreshStatistic(	final TourPerson person,
-//									final TourTypeFilter typeId,
-//									final int year,
-//									final int numberOfYears,
-//									final boolean refreshData) {
-	public void updateStatistic(final StatisticContext statContext) {
-
-		_activePerson = statContext.person;
-		_activeTourTypeFilter = statContext.tourTypeFilter;
-		_currentYear = statContext.currentYear;
-
-		_tourDayData = DataProviderTourDay.getInstance().getDayData(
-				statContext.person,
-				statContext.tourTypeFilter,
-				statContext.currentYear,
-				statContext.numberOfYears,
-				isDataDirtyWithReset() || statContext.isRefreshData);
-
-		// reset min/max values
-		if (_isSynchScaleEnabled == false && statContext.isRefreshData) {
-			resetMinMaxKeeper();
-		}
-
-		// hide actions from other statistics
-		final IToolBarManager tbm = _viewSite.getActionBars().getToolBarManager();
-		tbm.removeAll();
-		tbm.update(true);
-
-		createStatisticData(_tourDayData);
-		updateCharts();
-
 	}
 
 	private void resetMinMaxKeeper() {
@@ -902,6 +872,39 @@ public class StatisticTourNumbers extends YearStatistic {
 				}
 			}
 		}
+	}
+
+	//	public void refreshStatistic(	final TourPerson person,
+//									final TourTypeFilter typeId,
+//									final int year,
+//									final int numberOfYears,
+//									final boolean refreshData) {
+	public void updateStatistic(final StatisticContext statContext) {
+
+		_activePerson = statContext.appPerson;
+		_activeTourTypeFilter = statContext.appTourTypeFilter;
+		_currentYear = statContext.statYoungestYear;
+
+		_tourDayData = DataProviderTourDay.getInstance().getDayData(
+				statContext.appPerson,
+				statContext.appTourTypeFilter,
+				statContext.statYoungestYear,
+				statContext.statNumberOfYears,
+				isDataDirtyWithReset() || statContext.isRefreshData);
+
+		// reset min/max values
+		if (_isSynchScaleEnabled == false && statContext.isRefreshData) {
+			resetMinMaxKeeper();
+		}
+
+		// hide actions from other statistics
+		final IToolBarManager tbm = _viewSite.getActionBars().getToolBarManager();
+		tbm.removeAll();
+		tbm.update(true);
+
+		createStatisticData(_tourDayData);
+		updateCharts();
+
 	}
 
 	@Override

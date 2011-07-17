@@ -610,6 +610,13 @@ public class ChartComponents extends Composite {
 
 		graphValueRange = graphMaxValue > 0 ? (graphMaxValue - graphMinValue) : -(graphMinValue - graphMaxValue);
 
+		// ensure the chart is drawn correctly with pseudo data
+		if (graphValueRange == 0) {
+			graphValueRange = 3600;
+			graphMaxValue = 3600;
+			graphUnit = 1800;
+		}
+
 		// calculate the vertical scaling between graph and device
 		final float graphScaleY = (float) (devGraphHeight) / graphValueRange;
 

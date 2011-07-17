@@ -31,7 +31,6 @@ import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.ColorSelector;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
@@ -59,9 +58,6 @@ import org.eclipse.swt.widgets.Text;
 
 public class DialogHRZones extends TitleAreaDialog {
 
-	private final IPreferenceStore		_prefStore	= TourbookPlugin.getDefault()//
-															.getPreferenceStore();
-
 	private final IDialogSettings		_state		= TourbookPlugin.getDefault() //
 															.getDialogSettingsSection(getClass().getName());
 	private TourPerson					_person;
@@ -71,7 +67,6 @@ public class DialogHRZones extends TitleAreaDialog {
 															.createImage();
 
 	private ArrayList<TourPersonHRZone>	_hrZones;
-	private boolean						_isPersonModified;
 	private boolean						_isUpdateUI;
 
 	/*
@@ -102,8 +97,7 @@ public class DialogHRZones extends TitleAreaDialog {
 
 		// clone hr zone's
 		_hrZones = new ArrayList<TourPersonHRZone>();
-		_hrZones.addAll(tourPerson.getHrZones());
-		Collections.sort(_hrZones);
+		_hrZones.addAll(tourPerson.getHrZonesSorted());
 
 		// make dialog resizable
 		setShellStyle(getShellStyle() | SWT.RESIZE);
@@ -310,7 +304,6 @@ public class DialogHRZones extends TitleAreaDialog {
 				if (_isUpdateUI) {
 					return;
 				}
-				_isPersonModified = true;
 				enableControls();
 			}
 		};
@@ -322,7 +315,6 @@ public class DialogHRZones extends TitleAreaDialog {
 				}
 				UI.adjustSpinnerValueOnMouseScroll(event);
 
-				_isPersonModified = true;
 				enableControls();
 			}
 		};
@@ -333,7 +325,6 @@ public class DialogHRZones extends TitleAreaDialog {
 				if (_isUpdateUI) {
 					return;
 				}
-				_isPersonModified = true;
 				enableControls();
 			}
 		};
@@ -344,7 +335,6 @@ public class DialogHRZones extends TitleAreaDialog {
 				if (_isUpdateUI) {
 					return;
 				}
-				_isPersonModified = true;
 				enableControls();
 			}
 		};
@@ -539,8 +529,6 @@ public class DialogHRZones extends TitleAreaDialog {
 
 	private void onAddZone() {
 
-		_isPersonModified = true;
-
 		updateModelFromUI();
 
 		final TourPersonHRZone hrZone = new TourPersonHRZone(_person);
@@ -566,8 +554,6 @@ public class DialogHRZones extends TitleAreaDialog {
 	}
 
 	private void onRemoveZone() {
-
-		_isPersonModified = true;
 
 		updateModelFromUI();
 

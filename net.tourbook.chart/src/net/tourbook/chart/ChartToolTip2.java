@@ -15,6 +15,25 @@
  *******************************************************************************/
 package net.tourbook.chart;
 
-public interface BarTooltipProvider {
+/**
+ * THIS IS NOT WORKING BECAUSE THE EXISTING TOOLTIP CANNOT USE SEPARATE UI'S
+ * <P>
+ * A new tooltip must be implemented for separates tool tips. HR zones do <b>NOT</b> contains
+ * tooltips in version 11.8 for this reason.
+ */
+public abstract class ChartToolTip2 {
+
+//	/**
+//	 * Creates the UI for the tooltip.
+//	 *
+//	 * @param parent
+//	 */
+//	public abstract void createUI(Composite parent);
+//
+//	/**
+//	 * @return Returns <code>true</code> when the UI was updated, <code>false</code> when the UI was
+//	 *         not modified (when data has not been changed).
+//	 */
+//	public abstract boolean updateUI();
 
 }

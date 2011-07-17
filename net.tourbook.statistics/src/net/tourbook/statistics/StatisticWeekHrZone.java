@@ -22,7 +22,6 @@ import java.util.GregorianCalendar;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.BarChartMinMaxKeeper;
-import net.tourbook.chart.BarTooltipProvider;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
@@ -34,11 +33,14 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourPersonHRZone;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.statistic.StatisticContext;
+import net.tourbook.ui.TourTypeFilter;
+import net.tourbook.ui.UI;
 import net.tourbook.util.Util;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.IPostSelectionProvider;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
@@ -53,10 +55,11 @@ public class StatisticWeekHrZone extends YearStatistic {
 	private final IPreferenceStore		_prefStore								= TourbookPlugin.getDefault() //
 																						.getPreferenceStore();
 
-	private TourPerson					_currentPerson;
-	private int							_currentYear;
+	private TourPerson					_appPerson;
+	private TourTypeFilter				_appTourTypeFilter;
+	private int							_statYoungestYear;
+	private int							_statNumberOfYears;
 
-	private int							_numberOfYears;
 	private Chart						_chart;
 
 	private IChartInfoProvider			_tooltipProvider;
@@ -77,10 +80,6 @@ public class StatisticWeekHrZone extends YearStatistic {
 
 	private String[]					_barNames;
 
-	public class BarTooltipProviderImpl implements BarTooltipProvider {
-
-	}
-
 	public StatisticWeekHrZone() {
 		super();
 	}
@@ -95,11 +94,11 @@ public class StatisticWeekHrZone extends YearStatistic {
 	 */
 	ChartSegments createChartSegments() {
 
-		final int segmentStart[] = new int[_numberOfYears];
-		final int segmentEnd[] = new int[_numberOfYears];
-		final String[] segmentTitle = new String[_numberOfYears];
+		final int segmentStart[] = new int[_statNumberOfYears];
+		final int segmentEnd[] = new int[_statNumberOfYears];
+		final String[] segmentTitle = new String[_statNumberOfYears];
 
-		final int oldestYear = _currentYear - _numberOfYears + 1;
+		final int oldestYear = _statYoungestYear - _statNumberOfYears + 1;
 		final int[] yearWeeks = _tourWeekData.yearWeeks;
 
 		int weekCounter = 0;
@@ -142,15 +141,20 @@ public class StatisticWeekHrZone extends YearStatistic {
 		_chart.setCanScrollZoomedChart(true);
 		_chart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
 
-		final BarTooltipProvider barTooltipProvider = new BarTooltipProviderImpl();
-		_chart.setBarTooltipProvider(barTooltipProvider);
-
 //		_tooltipProvider = new IChartInfoProvider() {
-//			public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
-//				return createToolTipInfo(serieIndex, valueIndex);
+//
+//			@Override
+//			public ChartToolTip getToolTipInfo(final int serieIndex, final int valueIndex) {
+//				// TODO Auto-generated method stub
+//				return null;
 //			}
 //		};
 
+//		_tooltipProvider = new IChartInfoProvider() {
+//			public ChartToolTip1 getToolTipInfo(final int serieIndex, final int valueIndex) {
+//				return createToolTipInfo(serieIndex, valueIndex);
+//			}
+//		};
 	}
 
 	private int[] createWeekData() {
@@ -165,7 +169,7 @@ public class StatisticWeekHrZone extends YearStatistic {
 		return allWeeks;
 	}
 
-//	private ChartToolTipInfo createToolTipInfo(final int serieIndex, final int valueIndex) {
+//	private ChartToolTip1 createToolTipInfo(final int serieIndex, final int valueIndex) {
 //
 //		final int oldestYear = fCurrentYear - fNumberOfYears + 1;
 //
@@ -243,7 +247,7 @@ public class StatisticWeekHrZone extends YearStatistic {
 //		 * create tool tip info
 //		 */
 //
-//		final ChartToolTipInfo toolTipInfo = new ChartToolTipInfo();
+//		final ChartToolTip1 toolTipInfo = new ChartToolTip1();
 //		toolTipInfo.setTitle(toolTipTitle);
 //		toolTipInfo.setLabel(toolTipLabel);
 ////		toolTipInfo.setLabel(toolTipFormat.toString());
@@ -280,6 +284,7 @@ public class StatisticWeekHrZone extends YearStatistic {
 		final RGB[] rgbLine = new RGB[zoneSize];
 
 		int zoneIndex = 0;
+
 		for (final TourPersonHRZone hrZone : _resortedPersonHrZones) {
 
 			rgbDark[zoneIndex] = hrZone.getColor();
@@ -317,9 +322,74 @@ public class StatisticWeekHrZone extends YearStatistic {
 	@Override
 	public void deactivateActions(final IWorkbenchPartSite partSite) {}
 
+	private void getPreferences() {
+
+		_chart.setGrid(
+				_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
+				_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE),
+				_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
+				_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
+	}
+
 	public void preferencesHasChanged() {
-		setPreferences();
-		updateChart();
+		updateStatistic();
+	}
+
+	/**
+	 * resort HR zones + values according to the sequence start
+	 */
+	private void reorderHrZones(final int maxBarLength) {
+
+		_resortedHrZoneValues = new int[maxBarLength][];
+		_resortedPersonHrZones = new TourPersonHRZone[maxBarLength];
+
+		int resortedIndex = 0;
+		final int[][] weekHrZoneValues = _tourWeekData.hrZoneValues;
+
+		if (_barOrderStart >= maxBarLength) {
+
+			final int barOrderStart = _barOrderStart % maxBarLength;
+
+			// set HR zones starting from the sequence start
+			for (int serieIndex = barOrderStart; serieIndex >= 0; serieIndex--) {
+
+				_resortedHrZoneValues[resortedIndex] = weekHrZoneValues[serieIndex];
+				_resortedPersonHrZones[resortedIndex] = _personHrZones[serieIndex];
+
+				resortedIndex++;
+			}
+
+			// set HR zones starting from the last
+			for (int serieIndex = maxBarLength - 1; resortedIndex < maxBarLength; serieIndex--) {
+
+				_resortedHrZoneValues[resortedIndex] = weekHrZoneValues[serieIndex];
+				_resortedPersonHrZones[resortedIndex] = _personHrZones[serieIndex];
+
+				resortedIndex++;
+			}
+
+		} else {
+
+			final int barOrderStart = _barOrderStart;
+
+			// set HR zones starting from the sequence start
+			for (int serieIndex = barOrderStart; serieIndex < maxBarLength; serieIndex++) {
+
+				_resortedHrZoneValues[resortedIndex] = weekHrZoneValues[serieIndex];
+				_resortedPersonHrZones[resortedIndex] = _personHrZones[serieIndex];
+
+				resortedIndex++;
+			}
+
+			// set HR zones starting from 0
+			for (int serieIndex = 0; resortedIndex < maxBarLength; serieIndex++) {
+
+				_resortedHrZoneValues[resortedIndex] = weekHrZoneValues[serieIndex];
+				_resortedPersonHrZones[resortedIndex] = _personHrZones[serieIndex];
+
+				resortedIndex++;
+			}
+		}
 	}
 
 	@Override
@@ -328,14 +398,12 @@ public class StatisticWeekHrZone extends YearStatistic {
 	}
 
 	@Override
-	public void restoreState(final IDialogSettings state) {
-
+	public void restoreStateEarly(final IDialogSettings state) {
 		_barOrderStart = Util.getStateInt(state, STATE_HR_ZONE_WEEK_BAR_ORDERING_START, 0);
 	}
 
 	@Override
 	public void saveState(final IDialogSettings state) {
-
 		state.put(STATE_HR_ZONE_WEEK_BAR_ORDERING_START, _barOrderStart);
 	}
 
@@ -353,31 +421,98 @@ public class StatisticWeekHrZone extends YearStatistic {
 		return true;
 	}
 
+	@Override
+	public void setBarVerticalOrder(final int selectedIndex) {
+
+		_barOrderStart = selectedIndex;
+
+		final ArrayList<TourPersonHRZone> personHrZones = _appPerson.getHrZonesSorted();
+		final int[][] weekHrZoneValues = _tourWeekData.hrZoneValues;
+
+		/*
+		 * ensure that only available person HR zones are displayed, _tourWeekData.hrZones contains
+		 * all 10 zones
+		 */
+		final int maxBarLength = Math.min(personHrZones.size(), weekHrZoneValues.length);
+
+		if (maxBarLength == 0) {
+			return;
+		}
+
+		reorderHrZones(maxBarLength);
+
+		updateStatistic();
+	}
+
+	@Override
+	public void setSynchScale(final boolean isSynchScaleEnabled) {
+		_isSynchScaleEnabled = isSynchScaleEnabled;
+	}
+
+	private void setupBars10HrZoneOrder(final boolean isNewPerson) {
+
+		final ArrayList<TourPersonHRZone> originalPersonHrZones = _appPerson.getHrZonesSorted();
+		final int[][] weekHrZoneValues = _tourWeekData.hrZoneValues;
+
+		/*
+		 * ensure that only available person HR zones are displayed, _tourWeekData.hrZones contains
+		 * all 10 zones
+		 */
+		final int maxBarLength = Math.min(originalPersonHrZones.size(), weekHrZoneValues.length);
+		if (maxBarLength == 0) {
+			return;
+		}
+
+		if (isNewPerson) {
+
+			// update HR zones
+
+			_personHrZones = new TourPersonHRZone[maxBarLength];
+
+			int zoneIndex = 0;
+			for (final TourPersonHRZone tourPersonHRZone : originalPersonHrZones) {
+				_personHrZones[zoneIndex++] = tourPersonHRZone;
+			}
+		}
+
+		reorderHrZones(maxBarLength);
+	}
+
 	/**
 	 * Set bar names into the statistic context. The names will be displayed in a combobox in the
 	 * statistics toolbar.
 	 * 
 	 * @param statContext
-	 * @param isNewPerson
 	 */
-	private void setBarNames(final StatisticContext statContext, final boolean isNewPerson) {
+	private void setupBars20BarNames(final StatisticContext statContext) {
 
-		if (isNewPerson == false) {
-			return;
-		}
+		final ArrayList<TourPersonHRZone> personHrZones = _appPerson.getHrZonesSorted();
+		final int maxSerieSize = Math.min(personHrZones.size(), _tourWeekData.hrZoneValues.length);
 
-		final ArrayList<TourPersonHRZone> hrZones = _currentPerson.getHrZonesSorted();
-
-		if (hrZones == null || hrZones.size() == 0) {
+		if (personHrZones == null || maxSerieSize == 0) {
+			statContext.outIsUpdateBarNames = true;
 			statContext.outBarNames = _barNames = null;
 			return;
 		}
 
 		int hrZoneIndex = 0;
-		_barNames = new String[hrZones.size()];
 
-		for (final TourPersonHRZone tourPersonHRZone : hrZones) {
-			_barNames[hrZoneIndex++] = tourPersonHRZone.getNameShort();
+		// create bar names 2 times
+		_barNames = new String[maxSerieSize * 2];
+
+		for (int inverseIndex = 0; inverseIndex < 2; inverseIndex++) {
+			for (final TourPersonHRZone tourPersonHRZone : personHrZones) {
+
+				String barName;
+
+				if (inverseIndex == 0) {
+					barName = tourPersonHRZone.getNameShort();
+				} else {
+					barName = tourPersonHRZone.getNameShort() + UI.SPACE + Messages.Statistic_Label_Invers;
+				}
+
+				_barNames[hrZoneIndex++] = barName;
+			}
 		}
 
 		// set state what the statistic container should do
@@ -386,131 +521,59 @@ public class StatisticWeekHrZone extends YearStatistic {
 		statContext.outVerticalBarIndex = _barOrderStart;
 	}
 
-	@Override
-	public void setBarVerticalOrder(final int selectedIndex) {
-
-		_barOrderStart = selectedIndex;
-
-		final ArrayList<TourPersonHRZone> personHrZones = _currentPerson.getHrZonesSorted();
-		final int[][] weekHrZoneValues = _tourWeekData.hrZoneValues;
-
-		/*
-		 * ensure that only available person HR zones are displayed, _tourWeekData.hrZones contains
-		 * all 10 zones
-		 */
-		final int maxSerieSize = Math.min(personHrZones.size(), weekHrZoneValues.length);
-
-		if (maxSerieSize == 0) {
-			return;
-		}
-
-		/*
-		 * resort HR zones + values according to the sequence start
-		 */
-
-		_resortedHrZoneValues = new int[maxSerieSize][];
-		_resortedPersonHrZones = new TourPersonHRZone[maxSerieSize];
-
-		int resortedIndex = 0;
-
-		// set HR zones starting from the sequence start
-		for (int serieIndex = _barOrderStart; serieIndex < maxSerieSize; serieIndex++) {
-
-			_resortedHrZoneValues[resortedIndex] = weekHrZoneValues[serieIndex];
-			_resortedPersonHrZones[resortedIndex] = _personHrZones[serieIndex];
-
-			resortedIndex++;
-		}
-
-		// set HR zones starting from 0
-		for (int serieIndex = 0; resortedIndex < maxSerieSize; serieIndex++) {
-
-			_resortedHrZoneValues[resortedIndex] = weekHrZoneValues[serieIndex];
-			_resortedPersonHrZones[resortedIndex] = _personHrZones[serieIndex];
-
-			resortedIndex++;
-		}
-
-		updateChart();
-	}
-
-	private void setPreferences() {
-
-		// set grid properties
-		_chart.setGrid(
-				_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
-				_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE),
-				_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
-				_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
+	private void updateStatistic() {
+		updateStatistic(new StatisticContext(
+				_appPerson,
+				_appTourTypeFilter,
+				_statYoungestYear,
+				_statNumberOfYears,
+				false));
 	}
 
 	@Override
-	public void setSynchScale(final boolean isSynchScaleEnabled) {
-		_isSynchScaleEnabled = isSynchScaleEnabled;
-	}
-
-	private void setWeekData(final boolean hasPersonChanged) {
-
-		final ArrayList<TourPersonHRZone> originalPersonHrZones = _currentPerson.getHrZonesSorted();
-		final int[][] weekHrZoneValues = _tourWeekData.hrZoneValues;
+	public void updateStatistic(final StatisticContext statContext) {
 
 		/*
-		 * ensure that only available person HR zones are displayed, _tourWeekData.hrZones contains
-		 * all 10 zones
+		 * check if required data are available
 		 */
-		final int maxSerieSize = Math.min(originalPersonHrZones.size(), weekHrZoneValues.length);
-
-		if (maxSerieSize == 0) {
+		if (statContext.appPerson == null) {
+			_chart.setErrorMessage(Messages.Statistic_HrZone_ErrorNoPerson);
 			return;
 		}
 
-		if (hasPersonChanged) {
-
-			// setup HR zones with default sorting
-
-			_barOrderStart = 0;
-
-			_personHrZones = new TourPersonHRZone[maxSerieSize];
-
-			int zoneIndex = 0;
-			for (final TourPersonHRZone tourPersonHRZone : originalPersonHrZones) {
-				_personHrZones[zoneIndex++] = tourPersonHRZone;
-			}
+		if (statContext.appPerson.getHrZonesSorted().size() == 0) {
+			_chart.setErrorMessage(NLS.bind(
+					Messages.Statistic_HrZone_Error_NoHrZoneInPerson,
+					statContext.appPerson.getName()));
+			return;
 		}
 
-		/*
-		 * resort HR zones + values according to the sequence start
-		 */
+		// this statistic supports bar reordering
+		statContext.outIsBarReorderingSupported = true;
 
-		_resortedHrZoneValues = new int[maxSerieSize][];
-		_resortedPersonHrZones = new TourPersonHRZone[maxSerieSize];
+		final boolean isNewPerson = _appPerson == null || statContext.appPerson != _appPerson;
 
-		int resortedIndex = 0;
+		_appPerson = statContext.appPerson;
+		_appTourTypeFilter = statContext.appTourTypeFilter;
+		_statYoungestYear = statContext.statYoungestYear;
+		_statNumberOfYears = statContext.statNumberOfYears;
 
-		// set HR zones starting from the sequence start
-		for (int serieIndex = _barOrderStart; serieIndex < maxSerieSize; serieIndex++) {
+		_tourWeekData = DataProviderHrZoneWeek.getInstance().getWeekData(
+				_appPerson,
+				_appTourTypeFilter,
+				_statYoungestYear,
+				_statNumberOfYears,
+				isDataDirtyWithReset() || statContext.isRefreshData);
 
-			_resortedHrZoneValues[resortedIndex] = weekHrZoneValues[serieIndex];
-			_resortedPersonHrZones[resortedIndex] = _personHrZones[serieIndex];
+		setupBars10HrZoneOrder(isNewPerson);
+		setupBars20BarNames(statContext);
 
-			resortedIndex++;
+		// reset min/max values
+		if (_isSynchScaleEnabled == false && statContext.isRefreshData) {
+			_minMaxKeeper.resetMinMax();
 		}
 
-		// set HR zones starting from 0
-		for (int serieIndex = 0; resortedIndex < maxSerieSize; serieIndex++) {
-
-			_resortedHrZoneValues[resortedIndex] = weekHrZoneValues[serieIndex];
-			_resortedPersonHrZones[resortedIndex] = _personHrZones[serieIndex];
-
-			resortedIndex++;
-		}
-	}
-
-	private void updateChart() {
-
-		/*
-		 * create data model
-		 */
+		// create data model
 		final ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
 
 		createXDataWeek(chartDataModel);
@@ -523,44 +586,10 @@ public class StatisticWeekHrZone extends YearStatistic {
 			_minMaxKeeper.setMinMaxValues(chartDataModel);
 		}
 
+		getPreferences();
+
 		// show the data model in the chart
 		_chart.updateChart(chartDataModel, true);
-	}
-
-	@Override
-	public void updateStatistic(final StatisticContext statContext) {
-
-		// a person is required to get the HR zones
-		if (statContext.person == null) {
-			return;
-		}
-
-		//
-		statContext.outIsBarReorderingSupported = true;
-
-		final boolean isNewPerson = _currentPerson == null || statContext.person != _currentPerson;
-
-		_currentPerson = statContext.person;
-		_currentYear = statContext.currentYear;
-		_numberOfYears = statContext.numberOfYears;
-
-		_tourWeekData = DataProviderHrZoneWeek.getInstance().getWeekData(
-				statContext.person,
-				statContext.tourTypeFilter,
-				statContext.currentYear,
-				statContext.numberOfYears,
-				isDataDirtyWithReset() || statContext.isRefreshData);
-
-		setWeekData(isNewPerson);
-		setBarNames(statContext, isNewPerson);
-
-		// reset min/max values
-		if (_isSynchScaleEnabled == false && statContext.isRefreshData) {
-			_minMaxKeeper.resetMinMax();
-		}
-
-		setPreferences();
-		updateChart();
 	}
 
 	@Override

@@ -130,7 +130,7 @@ public class DataProviderHrZoneMonth extends DataProvider {
 			}
 			conn.close();
 
-			_monthData.hrZones = dbHrZones;
+			_monthData.hrZoneValues = dbHrZones;
 
 //			for (int zoneIndex = 0; zoneIndex < 10; zoneIndex++) {
 //				for (int monthIndex = 0; monthIndex < 12; monthIndex++) {

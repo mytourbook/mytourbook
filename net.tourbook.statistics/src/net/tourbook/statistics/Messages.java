@@ -42,6 +42,12 @@ public class Messages extends NLS {
 
 	public static String		NUMBERS_UNIT;
 
+	public static String	Statistic_HrZone_Error_NoHrZoneInPerson;
+
+	public static String	Statistic_HrZone_ErrorNoPerson;
+
+	public static String	Statistic_Label_Invers;
+
 	public static String		tourtime_info_altitude;
 	public static String		tourtime_info_avg_pace;
 	public static String		tourtime_info_avg_speed;

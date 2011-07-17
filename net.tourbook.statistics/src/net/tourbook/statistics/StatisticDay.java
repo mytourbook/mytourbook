@@ -263,7 +263,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		addTourPropertyListener();
 	}
 
-	private ChartToolTipInfo createToolTipInfo(int valueIndex) {
+	private ChartToolTipInfo createToolTipData(int valueIndex) {
 
 		final int[] tourDOYValues = _tourDayData.doyValues;
 
@@ -394,11 +394,11 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 			tourTitle = tourTypeName;
 		}
 
-		final ChartToolTipInfo toolTipInfo = new ChartToolTipInfo();
-		toolTipInfo.setTitle(tourTitle);
-		toolTipInfo.setLabel(toolTipLabel);
+		final ChartToolTipInfo tt1 = new ChartToolTipInfo();
+		tt1.setTitle(tourTitle);
+		tt1.setLabel(toolTipLabel);
 
-		return toolTipInfo;
+		return tt1;
 	}
 
 	/**
@@ -525,78 +525,6 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFilter, _currentYear, 1, false));
 	}
 
-	public void updateStatistic(final StatisticContext statContext) {
-
-		_activePerson = statContext.person;
-		_activeTourTypeFilter = statContext.tourTypeFilter;
-		_currentYear = statContext.currentYear;
-		_numberOfYears = statContext.numberOfYears;
-
-		/*
-		 * get currently selected tour id
-		 */
-		long selectedTourId = -1;
-		final ISelection selection = _chart.getSelection();
-		if (selection instanceof SelectionBarChart) {
-			final SelectionBarChart barChartSelection = (SelectionBarChart) selection;
-
-			if (barChartSelection.serieIndex != -1) {
-
-				int selectedValueIndex = barChartSelection.valueIndex;
-				final long[] tourIds = _tourDayData.tourIds;
-
-				if (tourIds.length > 0) {
-
-					if (selectedValueIndex >= tourIds.length) {
-						selectedValueIndex = tourIds.length - 1;
-					}
-
-					selectedTourId = tourIds[selectedValueIndex];
-				}
-			}
-		}
-
-		_tourDayData = DataProviderTourDay.getInstance().getDayData(
-				statContext.person,
-				statContext.tourTypeFilter,
-				statContext.currentYear,
-				statContext.numberOfYears,
-				isDataDirtyWithReset() || statContext.isRefreshData);
-
-		// reset min/max values
-		if (_isSynchScaleEnabled == false && statContext.isRefreshData) {
-			_minMaxKeeper.resetMinMax();
-		}
-
-		final ChartDataModel chartModel = updateChart();
-
-		/*
-		 * set graph minimum width, these is the number of days in the year
-		 */
-		_calendar.set(_currentYear, 11, 31);
-		chartModel.setChartMinWidth(_calendar.get(Calendar.DAY_OF_YEAR));
-
-		setChartProviders(_chart, chartModel);
-
-		if (_isSynchScaleEnabled) {
-			_minMaxKeeper.setMinMaxValues(chartModel);
-		}
-
-		// set grid size
-		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-		_chart.setGrid(
-				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
-				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE),
-				prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
-				prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
-
-		// show the data in the chart
-		_chart.updateChart(chartModel, false, true);
-
-		// try to select the previous selected tour
-		selectTour(selectedTourId);
-	}
-
 	@Override
 	public void resetSelection() {
 		_chart.setSelectedBars(null);
@@ -693,8 +621,9 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 
 		// set tool tip info
 		chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
+			@Override
 			public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
-				return createToolTipInfo(valueIndex);
+				return createToolTipData(valueIndex);
 			}
 		});
 
@@ -710,6 +639,78 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 	/**
 	 */
 	abstract ChartDataModel updateChart();
+
+	public void updateStatistic(final StatisticContext statContext) {
+
+		_activePerson = statContext.appPerson;
+		_activeTourTypeFilter = statContext.appTourTypeFilter;
+		_currentYear = statContext.statYoungestYear;
+		_numberOfYears = statContext.statNumberOfYears;
+
+		/*
+		 * get currently selected tour id
+		 */
+		long selectedTourId = -1;
+		final ISelection selection = _chart.getSelection();
+		if (selection instanceof SelectionBarChart) {
+			final SelectionBarChart barChartSelection = (SelectionBarChart) selection;
+
+			if (barChartSelection.serieIndex != -1) {
+
+				int selectedValueIndex = barChartSelection.valueIndex;
+				final long[] tourIds = _tourDayData.tourIds;
+
+				if (tourIds.length > 0) {
+
+					if (selectedValueIndex >= tourIds.length) {
+						selectedValueIndex = tourIds.length - 1;
+					}
+
+					selectedTourId = tourIds[selectedValueIndex];
+				}
+			}
+		}
+
+		_tourDayData = DataProviderTourDay.getInstance().getDayData(
+				statContext.appPerson,
+				statContext.appTourTypeFilter,
+				statContext.statYoungestYear,
+				statContext.statNumberOfYears,
+				isDataDirtyWithReset() || statContext.isRefreshData);
+
+		// reset min/max values
+		if (_isSynchScaleEnabled == false && statContext.isRefreshData) {
+			_minMaxKeeper.resetMinMax();
+		}
+
+		final ChartDataModel chartModel = updateChart();
+
+		/*
+		 * set graph minimum width, these is the number of days in the year
+		 */
+		_calendar.set(_currentYear, 11, 31);
+		chartModel.setChartMinWidth(_calendar.get(Calendar.DAY_OF_YEAR));
+
+		setChartProviders(_chart, chartModel);
+
+		if (_isSynchScaleEnabled) {
+			_minMaxKeeper.setMinMaxValues(chartModel);
+		}
+
+		// set grid size
+		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+		_chart.setGrid(
+				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
+				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE),
+				prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
+				prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
+
+		// show the data in the chart
+		_chart.updateChart(chartModel, false, true);
+
+		// try to select the previous selected tour
+		selectTour(selectedTourId);
+	}
 
 	@Override
 	public void updateToolBar(final boolean refreshToolbar) {

@@ -147,9 +147,18 @@ public abstract class TourbookStatistic {
 	/**
 	 * Restores the state from a memento (e.g. select previous selection), default does nothing
 	 * 
-	 * @param viewState
+	 * @param state
 	 */
-	public abstract void restoreState(final IDialogSettings viewState);
+	public abstract void restoreState(final IDialogSettings state);
+
+	/**
+	 * Restore state after the controls is created.
+	 * 
+	 * @param state
+	 */
+	public void restoreStateEarly(final IDialogSettings state) {
+		// do nothing
+	}
 
 	/**
 	 * Saves the state of the statistic into the memento, default does nothing

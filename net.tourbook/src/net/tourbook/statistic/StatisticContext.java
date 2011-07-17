@@ -27,10 +27,26 @@ import net.tourbook.ui.TourTypeFilter;
  */
 public class StatisticContext {
 
-	public TourPerson		person;
-	public TourTypeFilter	tourTypeFilter;
-	public int				currentYear;
-	public int				numberOfYears;
+	/**
+	 * Person which is selected in the application.
+	 */
+	public TourPerson		appPerson;
+
+	/**
+	 * Tour type filter which is selected in the application.
+	 */
+	public TourTypeFilter	appTourTypeFilter;
+
+	/**
+	 * Younges year which is selected in the statistic container.
+	 */
+	public int				statYoungestYear;
+
+	/**
+	 * Number of years which should be displayed in the statistic
+	 */
+	public int				statNumberOfYears;
+
 	public boolean			isRefreshData;
 
 	/**
@@ -79,10 +95,10 @@ public class StatisticContext {
 							final int numberOfYears,
 							final boolean isRefreshData) {
 
-		this.person = activePerson;
-		this.tourTypeFilter = activeTourTypeFilter;
-		this.currentYear = selectedYear;
-		this.numberOfYears = numberOfYears;
+		this.appPerson = activePerson;
+		this.appTourTypeFilter = activeTourTypeFilter;
+		this.statYoungestYear = selectedYear;
+		this.statNumberOfYears = numberOfYears;
 		this.isRefreshData = isRefreshData;
 	}
 

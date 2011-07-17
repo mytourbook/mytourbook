@@ -109,7 +109,6 @@ public class Chart extends ViewForm {
 	private boolean						_isFillToolbar						= true;
 	private boolean						_isToolbarCreated;
 
-	BarTooltipProvider					_barTooltipProvider;
 	private int							_barSelectionSerieIndex;
 	private int							_barSelectionValueIndex;
 
@@ -351,6 +350,20 @@ public class Chart extends ViewForm {
 		chartInfo.selectedSliderValuesIndex = chartGraph.getSelectedSlider().getValuesIndex();
 
 		return chartInfo;
+	}
+
+	/**
+	 * disable all actions
+	 */
+	private void disableAllActions() {
+
+		if (_chartActionProxies != null) {
+
+			for (final ActionProxy actionProxy : _chartActionProxies.values()) {
+				actionProxy.setEnabled(false);
+			}
+			_actionHandlerManager.updateUIState();
+		}
 	}
 
 	void enableActions() {
@@ -698,6 +711,19 @@ public class Chart extends ViewForm {
 		return _isDrawBarChartAtBottom;
 	}
 
+//	boolean isMouseDownExternalPost(final int devXMouse, final int devYMouse, final int devXGraph) {
+//
+//		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseDownPost);
+//
+//		event.devXMouse = devXMouse;
+//		event.devYMouse = devYMouse;
+//		event.devMouseXInGraph = devXGraph;
+//
+//		fireChartMouseEvent(event);
+//
+//		return event.isWorked;
+//	}
+
 	/**
 	 * Returns the toolbar for the chart, if no toolbar manager is set with setToolbarManager, the
 	 * manager will be created and the toolbar is on top of the chart
@@ -731,19 +757,6 @@ public class Chart extends ViewForm {
 
 		return _toolbarMgr;
 	}
-
-//	boolean isMouseDownExternalPost(final int devXMouse, final int devYMouse, final int devXGraph) {
-//
-//		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseDownPost);
-//
-//		event.devXMouse = devXMouse;
-//		event.devYMouse = devYMouse;
-//		event.devMouseXInGraph = devXGraph;
-//
-//		fireChartMouseEvent(event);
-//
-//		return event.isWorked;
-//	}
 
 	/**
 	 * @return
@@ -903,13 +916,6 @@ public class Chart extends ViewForm {
 		_chartComponents.getChartComponentGraph()._graphAlpha = GRAPH_ALPHA;
 	}
 
-	/**
-	 * Do a resize for all chart components which creates new drawing data
-	 */
-	public void resizeChart() {
-		_chartComponents.onResize();
-	}
-
 //	/**
 //	 * Set <code>true</code> when the internal action bar should be used, set <code>false</code>
 //	 * when the workbench action should be used.
@@ -921,6 +927,13 @@ public class Chart extends ViewForm {
 //	}
 
 	/**
+	 * Do a resize for all chart components which creates new drawing data
+	 */
+	public void resizeChart() {
+		_chartComponents.onResize();
+	}
+
+	/**
 	 * Set the background color for the chart, the default is SWT.COLOR_WHITE
 	 * 
 	 * @param backgroundColor
@@ -928,10 +941,6 @@ public class Chart extends ViewForm {
 	 */
 	public void setBackgroundColor(final Color backgroundColor) {
 		this._backgroundColor = backgroundColor;
-	}
-
-	public void setBarTooltipProvider(final BarTooltipProvider barTooltipProvider) {
-		_barTooltipProvider = barTooltipProvider;
 	}
 
 	/**
@@ -977,6 +986,10 @@ public class Chart extends ViewForm {
 		_chartContextProvider = chartContextProvider;
 	}
 
+//	public void setShowPartNavigation(final boolean showPartNavigation) {
+//		fShowPartNavigation = showPartNavigation;
+//	}
+
 	/**
 	 * @param chartContextProvider
 	 * @param isFirstContextMenu
@@ -989,10 +1002,6 @@ public class Chart extends ViewForm {
 		_isFirstContextMenu = isFirstContextMenu;
 	}
 
-//	public void setShowPartNavigation(final boolean showPartNavigation) {
-//		fShowPartNavigation = showPartNavigation;
-//	}
-
 	protected void setDataModel(final ChartDataModel chartDataModel) {
 		_chartDataModel = chartDataModel;
 	}
@@ -1004,6 +1013,23 @@ public class Chart extends ViewForm {
 	 */
 	public void setDrawBarChartAtBottom(final boolean fDrawBarCharttAtBottom) {
 		this._isDrawBarChartAtBottom = fDrawBarCharttAtBottom;
+	}
+
+	/**
+	 * Display an error message instead of the chart.
+	 * 
+	 * @param errorMessage
+	 */
+	public void setErrorMessage(final String errorMessage) {
+
+		final ChartDataModel emptyModel = new ChartDataModel(ChartDataModel.CHART_TYPE_LINE);
+
+		_chartComponents.setErrorMessage(errorMessage);
+
+		_chartDataModel = emptyModel;
+		_chartComponents.setModel(emptyModel, false);
+
+		disableAllActions();
 	}
 
 	@Override
@@ -1254,15 +1280,7 @@ public class Chart extends ViewForm {
 			_chartDataModel = emptyModel;
 			_chartComponents.setModel(emptyModel, false);
 
-			if (_chartActionProxies != null) {
-
-				// disable all actions
-
-				for (final ActionProxy actionProxy : _chartActionProxies.values()) {
-					actionProxy.setEnabled(false);
-				}
-				_actionHandlerManager.updateUIState();
-			}
+			disableAllActions();
 
 			return;
 		}

@@ -296,18 +296,55 @@ public abstract class StatisticMonth extends YearStatistic {
 		updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFilter, _currentYear, _numberOfYears, false));
 	}
 
+	@Override
+	public void resetSelection() {
+		_chart.setSelectedBars(null);
+	}
+
+	@Override
+	public boolean selectMonth(final Long date) {
+
+		_calendar.setTimeInMillis(date);
+		final int selectedMonth = _calendar.get(Calendar.MONTH);
+
+		final boolean selectedItems[] = new boolean[12];
+		selectedItems[selectedMonth] = true;
+
+		_chart.setSelectedBars(selectedItems);
+
+		return true;
+	}
+
+	private void setChartProviders(final ChartDataModel chartModel) {
+
+		// set tool tip info
+		chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
+			@Override
+			public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
+				return createToolTipInfo(serieIndex, valueIndex);
+			}
+		});
+	}
+
+	@Override
+	public void setSynchScale(final boolean isSynchScaleEnabled) {
+		_isSynchScaleEnabled = isSynchScaleEnabled;
+	}
+
+	abstract ChartDataModel updateChart();
+
 	public void updateStatistic(final StatisticContext statContext) {
 
-		_activePerson = statContext.person;
-		_activeTourTypeFilter = statContext.tourTypeFilter;
-		_currentYear = statContext.currentYear;
-		_numberOfYears = statContext.numberOfYears;
+		_activePerson = statContext.appPerson;
+		_activeTourTypeFilter = statContext.appTourTypeFilter;
+		_currentYear = statContext.statYoungestYear;
+		_numberOfYears = statContext.statNumberOfYears;
 
 		_tourMonthData = DataProviderTourMonth.getInstance().getMonthData(
-				statContext.person,
-				statContext.tourTypeFilter,
-				statContext.currentYear,
-				statContext.numberOfYears,
+				statContext.appPerson,
+				statContext.appTourTypeFilter,
+				statContext.statYoungestYear,
+				statContext.statNumberOfYears,
 				isDataDirtyWithReset() || statContext.isRefreshData);
 
 		// reset min/max values
@@ -334,42 +371,6 @@ public abstract class StatisticMonth extends YearStatistic {
 		// show the fDataModel in the chart
 		_chart.updateChart(chartDataModel, true);
 	}
-
-	@Override
-	public void resetSelection() {
-		_chart.setSelectedBars(null);
-	}
-
-	@Override
-	public boolean selectMonth(final Long date) {
-
-		_calendar.setTimeInMillis(date);
-		final int selectedMonth = _calendar.get(Calendar.MONTH);
-
-		final boolean selectedItems[] = new boolean[12];
-		selectedItems[selectedMonth] = true;
-
-		_chart.setSelectedBars(selectedItems);
-
-		return true;
-	}
-
-	private void setChartProviders(final ChartDataModel chartModel) {
-
-		// set tool tip info
-		chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
-			public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
-				return createToolTipInfo(serieIndex, valueIndex);
-			}
-		});
-	}
-
-	@Override
-	public void setSynchScale(final boolean isSynchScaleEnabled) {
-		_isSynchScaleEnabled = isSynchScaleEnabled;
-	}
-
-	abstract ChartDataModel updateChart();
 
 	@Override
 	public void updateToolBar(final boolean refreshToolbar) {

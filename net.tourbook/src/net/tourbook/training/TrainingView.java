@@ -18,7 +18,6 @@ package net.tourbook.training;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -157,6 +156,8 @@ public class TrainingView extends ViewPart {
 	private FormToolkit					_tk;
 
 	private Color[]						_hrZoneColors;
+	private Color[]						_hrZoneColorsBright;
+	private Color[]						_hrZoneColorsDark;
 	private Image						_hrZoneImage;
 
 	/*
@@ -295,7 +296,6 @@ public class TrainingView extends ViewPart {
 					// grid has changed, update chart
 					updateUI30HrZonesFromModel();
 				}
-
 			}
 		};
 
@@ -385,9 +385,9 @@ public class TrainingView extends ViewPart {
 		showTour();
 	}
 
-//	private ChartToolTipInfo createToolTipInfo(final int valueIndex) {
+//	private ChartToolTip1 createToolTipInfo(final int valueIndex) {
 //
-//		final ChartToolTipInfo toolTipInfo = new ChartToolTipInfo();
+//		final ChartToolTip1 toolTipInfo = new ChartToolTip1();
 //		toolTipInfo.setTitle(tourTitle);
 //		toolTipInfo.setLabel(toolTipLabel);
 //
@@ -582,7 +582,7 @@ public class TrainingView extends ViewPart {
 		// person and zones are already checked
 
 		_personHrZones.clear();
-		_personHrZones.addAll(_currentPerson.getHrZones());
+		_personHrZones.addAll(_currentPerson.getHrZonesSorted());
 		Collections.sort(_personHrZones);
 
 		if (_hrZoneDataContainerContent != null) {
@@ -677,6 +677,8 @@ public class TrainingView extends ViewPart {
 		// set hr zone colors
 		disposeHrZoneResources();
 		_hrZoneColors = new Color[hrZoneSize];
+		_hrZoneColorsBright = new Color[hrZoneSize];
+		_hrZoneColorsDark = new Color[hrZoneSize];
 
 		final Display display = parent.getDisplay();
 
@@ -685,6 +687,8 @@ public class TrainingView extends ViewPart {
 
 			final TourPersonHRZone hrZone = _personHrZones.get(zoneIndex);
 			final Color hrZoneColor = _hrZoneColors[zoneIndex] = new Color(display, hrZone.getColor());
+			_hrZoneColorsBright[zoneIndex] = new Color(display, hrZone.getColorBright());
+			_hrZoneColorsDark[zoneIndex] = new Color(display, hrZone.getColorDark());
 
 			/*
 			 * label: hr zone name
@@ -824,7 +828,15 @@ public class TrainingView extends ViewPart {
 				hrZoneColor.dispose();
 			}
 
+			for (int zoneIndex = 0; zoneIndex < _hrZoneColors.length; zoneIndex++) {
+				_hrZoneColors[zoneIndex].dispose();
+				_hrZoneColorsBright[zoneIndex].dispose();
+				_hrZoneColorsDark[zoneIndex].dispose();
+			}
+
 			_hrZoneColors = null;
+			_hrZoneColorsBright = null;
+			_hrZoneColorsDark = null;
 		}
 	}
 
@@ -891,7 +903,7 @@ public class TrainingView extends ViewPart {
 		};
 
 //		_chartToolTipProvider = new IChartInfoProvider() {
-//			public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
+//			public ChartToolTip1 getToolTipInfo(final int serieIndex, final int valueIndex) {
 //				return createToolTipInfo(valueIndex);
 //			}
 //		};
@@ -1146,8 +1158,8 @@ public class TrainingView extends ViewPart {
 		/*
 		 * check HR zones
 		 */
-		final Set<TourPersonHRZone> personHrZones = _currentPerson.getHrZones();
-		if (personHrZones == null || personHrZones.size() == 0) {
+		final ArrayList<TourPersonHRZone> personHrZones = _currentPerson.getHrZonesSorted();
+		if (personHrZones.size() == 0) {
 
 			// hr zones are required
 
@@ -1196,13 +1208,12 @@ public class TrainingView extends ViewPart {
 		final RGB[] rgbDark = new RGB[zoneSize];
 		final RGB[] rgbLine = new RGB[zoneSize];
 
-		final RGB rgbWhite = new RGB(0xff, 0xff, 0xff);
-
 		int zoneIndex = 0;
+
 		for (final TourPersonHRZone hrZone : hrSortedZones) {
 
 			rgbDark[zoneIndex] = hrZone.getColor();
-			rgbBright[zoneIndex] = rgbWhite;
+			rgbBright[zoneIndex] = hrZone.getColorBright();
 			rgbLine[zoneIndex] = hrZone.getColorDark();
 
 			zoneIndex++;
@@ -1492,12 +1503,19 @@ public class TrainingView extends ViewPart {
 						for (int zoneIndex = 0; zoneIndex < hrZoneSize; zoneIndex++) {
 
 							final double hrZonePercent = _tourHrZonePercent[zoneIndex];
-							final int devZoneHeight = (int) (hrZonePercent / 100.0 * devImageHeight);
 
+							final int devWidth = devImageWidth - 1;
+							final int devHeight = (int) (hrZonePercent / 100.0 * devImageHeight - 0);
+							final int devY = devYPos - devHeight;
+
+							gc.setForeground(_hrZoneColorsBright[zoneIndex]);
 							gc.setBackground(_hrZoneColors[zoneIndex]);
-							gc.fillRectangle(0, devYPos - devZoneHeight, devImageWidth - 1, devZoneHeight);
+							gc.fillGradientRectangle(0, devY, devWidth, devHeight - 1, false);
 
-							devYPos -= devZoneHeight;
+							gc.setForeground(_hrZoneColorsDark[zoneIndex]);
+							gc.drawRectangle(0, devY, devWidth - 1, devHeight - 1);
+
+							devYPos -= devHeight;
 						}
 
 					} else {

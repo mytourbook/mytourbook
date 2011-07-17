@@ -42,6 +42,10 @@ improvements
 limitations
 (- HR zones in the map can be displayed correctly for one single tour, all other possibilities (multiple tours, multiple persons) can display the wrong HR zones)
 
+not implemented features when HR zones are displayed
+- legend in the map 
+- tooltip in the statistics view 
+
 fixed bugs
 - fixed bug to auto open tag menu in OSX, eclipse 3.7 is required
 - hide tour tooltip when "add tag" menu is displayed

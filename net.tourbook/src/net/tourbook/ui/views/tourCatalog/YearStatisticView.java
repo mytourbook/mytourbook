@@ -82,7 +82,7 @@ public class YearStatisticView extends ViewPart {
 	private final IPreferenceStore				_prefStore					= TourbookPlugin.getDefault() //
 																					.getPreferenceStore();
 	private final IDialogSettings				_state						= TourbookPlugin.getDefault() //
-		 																			.getDialogSettingsSection(
+																					.getDialogSettingsSection(
 																							"TourCatalogViewYearStatistic");		//$NON-NLS-1$
 
 	private IPropertyChangeListener				_prefChangeListener;
@@ -645,7 +645,7 @@ public class YearStatisticView extends ViewPart {
 
 	/**
 	 * Update statistic by setting number of years
-	 *
+	 * 
 	 * @param numberOfYears
 	 */
 	private void onSelectNumberOfYears(final int numberOfYears) {
@@ -698,7 +698,7 @@ public class YearStatisticView extends ViewPart {
 
 	/**
 	 * select the tour in the year map chart
-	 *
+	 * 
 	 * @param selectedTourId
 	 *            tour id which should be selected
 	 */
@@ -761,7 +761,7 @@ public class YearStatisticView extends ViewPart {
 
 	/**
 	 * show statistic for several years
-	 *
+	 * 
 	 * @param isShowLatestYear
 	 *            shows the latest year and the years before
 	 */

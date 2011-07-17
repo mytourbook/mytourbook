@@ -360,9 +360,9 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 		}
 
 		final ChartToolTipInfo toolTipInfo = new ChartToolTipInfo();
+
 		toolTipInfo.setTitle(tourTitle);
 		toolTipInfo.setLabel(toolTipLabel);
-//				toolTipInfo.setLabel(toolTipFormat.toString());
 
 		return toolTipInfo;
 	}
@@ -403,51 +403,6 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 
 	public void preferencesHasChanged() {
 		updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFiler, _currentYear, 1, false));
-	}
-
-	public void updateStatistic(final StatisticContext statContext) {
-
-		_activePerson = statContext.person;
-		_activeTourTypeFiler = statContext.tourTypeFilter;
-		_currentYear = statContext.currentYear;
-		_numberOfYears = statContext.numberOfYears;
-
-		/*
-		 * get currently selected tour id
-		 */
-		long selectedTourId = -1;
-		final ISelection selection = _chart.getSelection();
-		if (selection instanceof SelectionBarChart) {
-			final SelectionBarChart barChartSelection = (SelectionBarChart) selection;
-
-			if (barChartSelection.serieIndex != -1 && _tourTimeData != null) {
-
-				int selectedValueIndex = barChartSelection.valueIndex;
-				final long[] tourIds = _tourTimeData.fTourIds;
-
-				if (tourIds.length > 0) {
-					if (selectedValueIndex >= tourIds.length) {
-						selectedValueIndex = tourIds.length - 1;
-					}
-
-					selectedTourId = tourIds[selectedValueIndex];
-				}
-			}
-		}
-
-		_tourTimeData = DataProviderTourTime.getInstance().getTourTimeData(
-				statContext.person,
-				statContext.tourTypeFilter,
-				statContext.currentYear,
-				statContext.numberOfYears,
-				isDataDirtyWithReset() || statContext.isRefreshData);
-
-		// reset min/max values
-		if (_ifIsSynchScaleEnabled == false && statContext.isRefreshData) {
-			_minMaxKeeper.resetMinMax();
-		}
-
-		updateChart(selectedTourId);
 	}
 
 	@Override
@@ -558,6 +513,8 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 	private void setChartProviders(final Chart chartWidget, final ChartDataModel chartModel) {
 
 		final IChartInfoProvider chartInfoProvider = new IChartInfoProvider() {
+
+			@Override
 			public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
 				return createToolTipInfo(valueIndex);
 			}
@@ -627,6 +584,51 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 
 		// try to select the previous selected tour
 		selectTour(selectedTourId);
+	}
+
+	public void updateStatistic(final StatisticContext statContext) {
+
+		_activePerson = statContext.appPerson;
+		_activeTourTypeFiler = statContext.appTourTypeFilter;
+		_currentYear = statContext.statYoungestYear;
+		_numberOfYears = statContext.statNumberOfYears;
+
+		/*
+		 * get currently selected tour id
+		 */
+		long selectedTourId = -1;
+		final ISelection selection = _chart.getSelection();
+		if (selection instanceof SelectionBarChart) {
+			final SelectionBarChart barChartSelection = (SelectionBarChart) selection;
+
+			if (barChartSelection.serieIndex != -1 && _tourTimeData != null) {
+
+				int selectedValueIndex = barChartSelection.valueIndex;
+				final long[] tourIds = _tourTimeData.fTourIds;
+
+				if (tourIds.length > 0) {
+					if (selectedValueIndex >= tourIds.length) {
+						selectedValueIndex = tourIds.length - 1;
+					}
+
+					selectedTourId = tourIds[selectedValueIndex];
+				}
+			}
+		}
+
+		_tourTimeData = DataProviderTourTime.getInstance().getTourTimeData(
+				statContext.appPerson,
+				statContext.appTourTypeFilter,
+				statContext.statYoungestYear,
+				statContext.statNumberOfYears,
+				isDataDirtyWithReset() || statContext.isRefreshData);
+
+		// reset min/max values
+		if (_ifIsSynchScaleEnabled == false && statContext.isRefreshData) {
+			_minMaxKeeper.resetMinMax();
+		}
+
+		updateChart(selectedTourId);
 	}
 
 	@Override

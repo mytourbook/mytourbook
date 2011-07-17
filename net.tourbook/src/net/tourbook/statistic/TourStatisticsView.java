@@ -46,14 +46,14 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourStatisticsView extends ViewPart implements ITourProvider {
 
-	public static final String		ID			= "net.tourbook.views.StatisticView";				//$NON-NLS-1$
+	public static final String		ID			= "net.tourbook.views.StatisticView";						//$NON-NLS-1$
 
 	private final IPreferenceStore	_prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
 
-	private final IDialogSettings	_state		= TourbookPlugin.getDefault().getDialogSettingsSection(
-														"TourStatisticsView");						//$NON-NLS-1$
+	private final IDialogSettings	_state		= TourbookPlugin.getDefault()//
+														.getDialogSettingsSection("TourStatisticsView");	//$NON-NLS-1$
 
-	private StatContainer		_statContainer;
+	private StatContainer			_statContainer;
 
 	private PostSelectionProvider	_postSelectionProvider;
 	private IPartListener2			_partListener;
@@ -114,16 +114,13 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 				 * set a new chart configuration when the preferences has changed
 				 */
 
-				if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
+				if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)
+						|| property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)
+						|| property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)) {
 
 					_activePerson = TourbookPlugin.getActivePerson();
 					_activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
 
-					updateStatistics();
-
-				} else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
-
-					// update statistics
 					updateStatistics();
 
 				} else if (property.equals(ITourbookPreferences.STATISTICS_STATISTIC_PROVIDER_IDS)) {
