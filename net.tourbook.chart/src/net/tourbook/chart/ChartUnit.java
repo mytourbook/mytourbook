@@ -33,6 +33,6 @@ public class ChartUnit {
 
 	@Override
 	public String toString() {
-		return "ChartUnit [valueLabel=" + valueLabel + ", value=" + value + "]";
+		return "ChartUnit [valueLabel=" + valueLabel + ", value=" + value + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 }

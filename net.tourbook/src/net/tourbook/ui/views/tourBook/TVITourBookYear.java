@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -51,14 +51,14 @@ public class TVITourBookYear extends TVITourBookItem {
 
 		final StringBuilder sb = new StringBuilder();
 
-		String sumYear = "";
-		String sumYearSub = "";
+		String sumYear = UI.EMPTY_STRING;
+		String sumYearSub = UI.EMPTY_STRING;
 		if (_subCategory == ITEM_TYPE_WEEK) {
-			sumYear = "startWeekYear";
-			sumYearSub = "startWeek";
+			sumYear = "startWeekYear"; //$NON-NLS-1$
+			sumYearSub = "startWeek"; //$NON-NLS-1$
 		} else { // default to month
-			sumYear = "startYear";
-			sumYearSub = "startMonth";
+			sumYear = "startYear"; //$NON-NLS-1$
+			sumYearSub = "startMonth"; //$NON-NLS-1$
 		}
 
 		sb.append("SELECT "); //$NON-NLS-1$
@@ -69,10 +69,10 @@ public class TVITourBookYear extends TVITourBookItem {
 
 		sb.append(" FROM " + TourDatabase.TABLE_TOUR_DATA); //$NON-NLS-1$
 
-		sb.append(" WHERE " + sumYear + "=?"); //$NON-NLS-1$
+		sb.append(" WHERE " + sumYear + "=?"); //$NON-NLS-1$ //$NON-NLS-2$
 		sb.append(sqlFilter.getWhereClause());
 
-		sb.append(" GROUP BY " + sumYear + ", " + sumYearSub); //$NON-NLS-1$
+		sb.append(" GROUP BY " + sumYear + ", " + sumYearSub); //$NON-NLS-1$ //$NON-NLS-2$
 		sb.append(" ORDER BY " + sumYearSub); //$NON-NLS-1$
 
 		try {
@@ -117,10 +117,10 @@ public class TVITourBookYear extends TVITourBookItem {
 			calendar.set(Calendar.WEEK_OF_YEAR, yearSub);
 			calendar.set(Calendar.DAY_OF_WEEK, calendar.getFirstDayOfWeek());
 			// the number_of_week is broken in Java.text.SimpleDateFormat :-(
-			return "["
-					+ String.format("%02d", yearSub)
-					+ "] "
-					+ (new SimpleDateFormat(" dd MMM")).format(calendar.getTime());
+			return "[" //$NON-NLS-1$
+					+ String.format("%02d", yearSub) //$NON-NLS-1$
+					+ "] " //$NON-NLS-1$
+					+ (new SimpleDateFormat(" dd MMM")).format(calendar.getTime()); //$NON-NLS-1$
 		} else { // default to month
 			calendar.set(year, yearSub - 1, 1);
 			return UI.MonthFormatter.format(calendar.getTime());

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -47,14 +47,14 @@ public class TVITourBookYearSub extends TVITourBookItem {
 		/*
 		 * set the children for the yearSub (month,week,...) item, these are tour items
 		 */
-		String sumYear = "";
-		String sumYearSub = "";
+		String sumYear = UI.EMPTY_STRING;
+		String sumYearSub = UI.EMPTY_STRING;
 		if (_category == ITEM_TYPE_WEEK) {
-			sumYear = "startWeekYear";
-			sumYearSub = "startWeek";
+			sumYear = "startWeekYear"; //$NON-NLS-1$
+			sumYearSub = "startWeek"; //$NON-NLS-1$
 		} else { // default to month
-			sumYear = "startYear";
-			sumYearSub = "startMonth";
+			sumYear = "startYear"; //$NON-NLS-1$
+			sumYearSub = "startMonth"; //$NON-NLS-1$
 		}
 
 		final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
@@ -113,8 +113,8 @@ public class TVITourBookYearSub extends TVITourBookItem {
 				+ (" LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_MARKER + " Tmarker") //$NON-NLS-1$ //$NON-NLS-2$
 				+ (" ON TourData.tourId = Tmarker.TourData_tourId") //$NON-NLS-1$
 
-				+ (" WHERE " + sumYear + " = ?")//				//$NON-NLS-1$
-				+ (" AND " + sumYearSub + " = ?")//					//$NON-NLS-1$
+				+ (" WHERE " + sumYear + " = ?")//				//$NON-NLS-1$ //$NON-NLS-2$
+				+ (" AND " + sumYearSub + " = ?")//					//$NON-NLS-1$ //$NON-NLS-2$
 				+ sqlFilter.getWhereClause()
 
 				+ " ORDER BY startYear, startMonth, startDay, startHour, startMinute"; //$NON-NLS-1$
