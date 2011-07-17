@@ -6,6 +6,7 @@ import java.util.HashMap;
 import org.eclipse.jface.action.ControlContribution;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -49,6 +50,8 @@ public class CalendarYearMonthContributionItem extends ControlContribution {
 	@Override
 	protected Control createControl(final Composite parent) {
 		
+		final PixelConverter pc = new PixelConverter(parent);
+
 		Composite content;
 
 		content = new Composite(parent, SWT.NONE);
@@ -78,6 +81,9 @@ public class CalendarYearMonthContributionItem extends ControlContribution {
 		_cboYear = new Combo(content, SWT.DROP_DOWN);
 		_cboYear.setToolTipText("Got to year");
 		_cboYear.setVisibleItemCount(20);
+		GridDataFactory.fillDefaults()//
+				.hint(pc.convertWidthInCharsToPixels(_isOSX ? 12 : _isLinux ? 12 : 5), SWT.DEFAULT)
+				.applyTo(_cboYear);
 		_cboYear.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {

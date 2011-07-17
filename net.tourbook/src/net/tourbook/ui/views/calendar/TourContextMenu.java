@@ -24,6 +24,7 @@ import net.tourbook.ui.action.ActionSetPerson;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.views.rawData.ActionMergeTour;
 
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -36,7 +37,7 @@ import org.eclipse.swt.widgets.Menu;
 
 public class TourContextMenu {
 
-	private static TourContextMenu						_instance;
+//	private static TourContextMenu						_instance;
 	private TagMenuManager								_tagMenuMgr;
 
 	private ActionEditQuick								_actionEditQuick;
@@ -58,14 +59,14 @@ public class TourContextMenu {
 	private ActionExport								_actionExportTour;
 	private ActionPrint									_actionPrintTour;
 
-	private TourContextMenu() {}
+	public TourContextMenu() {}
 
-	public static TourContextMenu getInstance() {
-		if (_instance == null) {
-			_instance = new TourContextMenu();
-		}
-		return _instance;
-	}
+//	public static TourContextMenu getInstance() {
+//		if (_instance == null) {
+//			_instance = new TourContextMenu();
+//		}
+//		return _instance;
+//	}
 
 	private void createActions(final ITourProvider tourProvider) {
 
@@ -91,7 +92,14 @@ public class TourContextMenu {
 
 	}
 
+
 	public Menu createContextMenu(final ITourProvider tourProvider, final Control control) {
+		return createContextMenu(tourProvider, control, null);
+	}
+
+	public Menu createContextMenu(	final ITourProvider tourProvider,
+									final Control control,
+									final ArrayList<Action> localActions) {
 
 		createActions(tourProvider);
 
@@ -103,7 +111,7 @@ public class TourContextMenu {
 		menuMgr.addMenuListener(new IMenuListener() {
 			@Override
 			public void menuAboutToShow(final IMenuManager manager) {
-				fillContextMenu(manager, tourProvider);
+				fillContextMenu(manager, tourProvider, localActions);
 			}
 		});
 
@@ -207,24 +215,35 @@ public class TourContextMenu {
 		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
 		_actionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
 
+		Long tourTypeId = new Long(-1); // TODO -> NOTOUR
 		if (null != firstSavedTour) {
 			final ArrayList<Long> tagIds = new ArrayList<Long>();
 			for (final TourTag tag : firstSavedTour.getTourTags()) {
 				tagIds.add(tag.getTagId());
 			}
 			_tagMenuMgr.enableTagActions(isTourSelected, isOneTour, tagIds);
-			TourTypeMenuManager.enableRecentTourTypeActions(isTourSelected, isOneTour ? firstSavedTour
-					.getTourType()
-					.getTypeId() : TourDatabase.ENTITY_IS_NOT_SAVED);
+			if (isOneTour && null != firstSavedTour.getTourType()) {
+				tourTypeId = firstSavedTour.getTourType().getTypeId();
+			}
+			TourTypeMenuManager.enableRecentTourTypeActions(isTourSelected, tourTypeId);
 		} else {
 			_tagMenuMgr.enableTagActions(isTourSelected, isOneTour, new ArrayList<Long>());
-			TourTypeMenuManager.enableRecentTourTypeActions(isTourSelected, isOneTour
-					? new Long(-1)
-					: TourDatabase.ENTITY_IS_NOT_SAVED);
+			TourTypeMenuManager.enableRecentTourTypeActions(isTourSelected, tourTypeId);
 		}
 	}
 
-	private void fillContextMenu(final IMenuManager menuMgr, final ITourProvider tourProvider) {
+	private void fillContextMenu(	final IMenuManager menuMgr,
+									final ITourProvider tourProvider,
+									final ArrayList<Action> localActions) {
+
+		// if a local menu exists and no tour is selected show only the local menu
+		final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
+		if (null != localActions && selectedTours.size() < 1) {
+			for (final Action action : localActions) {
+				menuMgr.add(action);
+			}
+			return;
+		}
 
 		menuMgr.add(_actionEditQuick);
 		menuMgr.add(_actionEditTour);

@@ -23,6 +23,7 @@ public class CalendarTourDataProvider {
 	private CalendarTourData[]				_calendarTourData;
 
 	private HashMap<Integer, CalendarTourData[][][]>	_cache;
+	private DateTime									_firstDateTime;
 
 
 	private CalendarTourDataProvider() {
@@ -69,11 +70,8 @@ public class CalendarTourDataProvider {
 
 		final int colorOffset = 0;
 
-
 		final ArrayList<TourType> tourTypeList = TourDatabase.getAllTourTypes();
 		final TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
-
-		final DateTime dt = new DateTime();
 
 		final SQLFilter filter = new SQLFilter();
 
@@ -316,8 +314,48 @@ public class CalendarTourDataProvider {
 
 		return dt;
 	}
+
+	public DateTime getFirstDateTime() {
+
+		if (null != _firstDateTime) {
+			return _firstDateTime;
+		}
+
+		final String select = "SELECT " //$NON-NLS-1$
+				+ "StartYear," //			1 //$NON-NLS-1$
+				+ "StartMonth," //			2 //$NON-NLS-1$
+				+ "StartDay" //				3 //$NON-NLS-1$
+				+ UI.NEW_LINE
+				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE) //$NON-NLS-1$
+				+ (" ORDER BY StartYear, StartMonth"); //$NON-NLS-1$
+
+		try {
+
+			final Connection conn = TourDatabase.getInstance().getConnection();
+			final PreparedStatement statement = conn.prepareStatement(select);
+
+			final ResultSet result = statement.executeQuery();
+			result.next();
+			final int year = result.getShort(1);
+			final int month = result.getShort(2);
+			final int day = result.getShort(3);
+			_firstDateTime = new DateTime(year, month, day, 12, 0, 0, 0);
+			conn.close();
+		} catch (final SQLException e) {
+			UI.showSQLException(e);
+		}
+
+		if (null == _firstDateTime) {
+			_firstDateTime = (new DateTime()).minusYears(1);
+		}
+
+		return _firstDateTime;
+
+	}
+
 	public void invalidate() {
 		_cache = new HashMap<Integer, CalendarTourData[][][]>();
+		_firstDateTime = null;
 	}
 
 }

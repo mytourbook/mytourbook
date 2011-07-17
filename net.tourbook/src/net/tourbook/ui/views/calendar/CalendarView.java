@@ -4,23 +4,24 @@ import java.util.ArrayList;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Activator;
-import net.tourbook.chart.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.views.calendar.CalendarGraph.NavigationStyle;
 import net.tourbook.ui.views.calendar.CalendarGraph.Type;
 import net.tourbook.util.SelectionProvider;
+import net.tourbook.util.Util;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -32,39 +33,44 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
+import org.joda.time.DateTime;
 
 public class CalendarView extends ViewPart implements ITourProvider{
 
 	/**
 	 * The ID of the view as specified by the extension.
 	 */
-	public static final String	ID	= "net.tourbook.views.calendar.CalendarView";
-	private final IPreferenceStore	_prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
-	private final IDialogSettings	_state		= TourbookPlugin.getDefault().getDialogSettingsSection(
-														"TourCalendarView");						//$NON-NLS-1$
-	private Action					_back;
-	private Action					_forward;
-	private Action					_zoomOut;
-	private Action					_zoomIn;
-	private Action					_synced;
-	private Action					_today;
+	public static final String					ID					= "net.tourbook.views.calendar.CalendarView";
+	private final IPreferenceStore				_prefStore			= TourbookPlugin.getDefault().getPreferenceStore();
+	private final IDialogSettings				_state				= TourbookPlugin
+																			.getDefault()
+																			.getDialogSettingsSection(
+																					"TourCalendarView");				//$NON-NLS-1$
 
-	private PageBook				_pageBook;
-	private CalendarForm			_calendarForm;
+	private String								STATE_SELECTED_TOURS	= "SelectedTours";								// $NON-NLS-1$
+	private String								STATE_FIRST_DAY			= "FirstDayDisplayed";							// $NON-NLS-1$
+	private String								STATE_NUM_OF_WEEKS		= "NumberOfWeeksDisplayed";					// $NON-NLS-1$
+	private String								STATE_IS_LINKED			= "Linked";									// $NON-NLS-1$
+
+	private Action								_forward, _back;
+	private Action								_zoomIn, _zoomOut;
+	private Action								_linked;
+	private Action								_today;
+	private Action								_setNavigationStylePhysical, _setNavigationStyleLogical;
+
+	private PageBook							_pageBook;
+	private CalendarComponents					_calendarComponents;
 	private CalendarGraph						_calendarGraph;
 
 	private ISelectionProvider					_selectionProvider;
 	private ISelectionListener					_selectionListener;
-	private IPartListener2			_partListener;
-	private IPropertyChangeListener	_prefChangeListener;
-	private ITourEventListener		_tourEventListener;
-	private ITourEventListener		_tourPropertyListener;
+	private IPartListener2						_partListener;
+	private IPropertyChangeListener				_prefChangeListener;
+	private ITourEventListener					_tourPropertyListener;
 
 	private CalendarYearMonthContributionItem	_cymci;
 
@@ -81,11 +87,9 @@ public class CalendarView extends ViewPart implements ITourProvider{
 
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
-
-//				if (partRef.getPart(false) == YearStatisticView.this) {
-//					saveState();
-//				}
-				// TODO
+				if (partRef.getPart(false) == CalendarView.this) {
+					saveState();
+				}
 			}
 
 			@Override
@@ -198,7 +202,7 @@ public class CalendarView extends ViewPart implements ITourProvider{
 		};
 		TourManager.getInstance().addTourEventListener(_tourPropertyListener);
 	}
-
+	
 	private void contributeToActionBars() {
 		final IActionBars bars = getViewSite().getActionBars();
 		fillLocalPullDown(bars.getMenuManager());
@@ -220,23 +224,25 @@ public class CalendarView extends ViewPart implements ITourProvider{
 		addSelectionListener();
 		addSelectionProvider();
 
+		restoreState();
+
 		// restore selection
 		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
 
-		final Menu _contextMenu = TourContextMenu.getInstance().createContextMenu(this, _calendarGraph);
+		// final Menu contextMenu = TourContextMenu.getInstance().createContextMenu(this, _calendarGraph);
+		final Menu contextMenu = (new TourContextMenu()).createContextMenu(this, _calendarGraph, getLocalActions());
 
-		_calendarGraph.setMenu(_contextMenu);
+		_calendarGraph.setMenu(contextMenu);
 
 	}
 
 	private void createUI(final Composite parent) {
 		
 		_pageBook = new PageBook(parent, SWT.NONE);
-		_calendarForm = new CalendarForm(_pageBook, SWT.NORMAL);
-		_calendarGraph = _calendarForm.getComponents().getGraph();
-		_pageBook.showPage(_calendarForm);
+		_calendarComponents = new CalendarComponents(_pageBook, SWT.NORMAL);
+		_calendarGraph = _calendarComponents.getGraph();
+		_pageBook.showPage(_calendarComponents);
 	}
-	
 	@Override
 	public void dispose() {
 
@@ -248,26 +254,35 @@ public class CalendarView extends ViewPart implements ITourProvider{
 	}
 
 	private void fillLocalPullDown(final IMenuManager manager) {
-		manager.add(_back);
-		manager.add(new Separator());
-		manager.add(_forward);
+		manager.add(_setNavigationStylePhysical);
+		manager.add(_setNavigationStyleLogical);
+		// manager.add(new Separator());
+
 	}
+
 	private void fillLocalToolBar(final IToolBarManager manager) {
 		_cymci = new CalendarYearMonthContributionItem(_calendarGraph);
 		_calendarGraph.setYearMonthContributor(_cymci);
 		manager.add(_cymci);
 		manager.add(new Separator());
-		manager.add(_back);
-		manager.add(_forward);
+		// manager.add(_back);
+		// manager.add(_forward);
 		manager.add(_today);
 		manager.add(new Separator());
 		manager.add(_zoomIn);
 		manager.add(_zoomOut);
 		manager.add(new Separator());
-		manager.add(_synced);
+		manager.add(_linked);
 	}
 
-	@Override
+	private ArrayList<Action> getLocalActions () {
+		final ArrayList<Action> localActions = new ArrayList<Action>();
+		localActions.add(_back);
+		localActions.add(_today);
+		localActions.add(_forward);
+		return localActions;
+
+	}@Override
 	public ArrayList<TourData> getSelectedTours() {
 		
 		final ArrayList<TourData> selectedTourData = new ArrayList<TourData>();
@@ -280,8 +295,9 @@ public class CalendarView extends ViewPart implements ITourProvider{
 		}
 		return selectedTourData;
 	}
-
+			
 	private void makeActions() {
+
 		_back = new Action() {
 			@Override
 			public void run() {
@@ -291,8 +307,8 @@ public class CalendarView extends ViewPart implements ITourProvider{
 		_back.setId("net.tourbook.calendar.back");
 		_back.setText("Back");
 		_back.setToolTipText("Back one screen");
-		_back.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_BACK));
-		
+		_back.setImageDescriptor(Activator.imageDescriptorFromPlugin("net.tourbook", "icons/arrow-down.png"));
+
 		_forward = new Action() {
 			@Override
 			public void run() {
@@ -301,7 +317,7 @@ public class CalendarView extends ViewPart implements ITourProvider{
 		};
 		_forward.setText("Forward");
 		_forward.setToolTipText("Forward one screen");
-		_forward.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_FORWARD));
+		_forward.setImageDescriptor(Activator.imageDescriptorFromPlugin("net.tourbook", "icons/arrow-up.png"));
 
 		_zoomOut = new Action() {
 			@Override
@@ -311,8 +327,7 @@ public class CalendarView extends ViewPart implements ITourProvider{
 		};
 		_zoomOut.setText("Zoom out");
 		_zoomOut.setToolTipText("Show more weeks");
-		_zoomOut.setImageDescriptor(Activator.getImageDescriptor(Messages.Image_zoom_out));
-		// TODO: understand what I'm doing
+		_zoomOut.setImageDescriptor(Activator.imageDescriptorFromPlugin("net.tourbook", "icons/zoom-out.gif"));
 
 		_zoomIn = new Action() {
 			@Override
@@ -322,42 +337,120 @@ public class CalendarView extends ViewPart implements ITourProvider{
 		};
 		_zoomIn.setText("Zoom in");
 		_zoomIn.setToolTipText("Show less weeks");
-		_zoomIn.setImageDescriptor(Activator.getImageDescriptor(Messages.Image_zoom_in));
-		// TODO: understand what I'm doing
-		
-		_synced = new Action(null, org.eclipse.jface.action.Action.AS_CHECK_BOX) {
+		_zoomIn.setImageDescriptor(Activator.imageDescriptorFromPlugin("net.tourbook", "icons/zoom-in.gif"));
+
+		_linked = new Action(null, org.eclipse.jface.action.Action.AS_CHECK_BOX) {
 			@Override
 			public void run() {
-				_calendarGraph.setSynced(_synced.isChecked());
-			}};
-		_synced.setText("Link with other views");
-		_synced.setImageDescriptor(Activator.imageDescriptorFromPlugin("net.tourbook", "icons/synced.gif"));
-		_synced.setChecked(true);
-		
+				_calendarGraph.setLinked(_linked.isChecked());
+			}
+		};
+		_linked.setText("Link with other views");
+		_linked.setImageDescriptor(Activator.imageDescriptorFromPlugin("net.tourbook", "icons/synced.gif"));
+		_linked.setChecked(true);
+
 		_today = new Action() {
 			@Override
 			public void run() {
 				_calendarGraph.gotoToday();
-			}};
+			}
+		};
 		_today.setText("Go to today");
 		_today.setImageDescriptor(Activator.imageDescriptorFromPlugin("net.tourbook", "icons/zoom-centered.png"));
+
+		_setNavigationStylePhysical = new Action(null, org.eclipse.jface.action.Action.AS_RADIO_BUTTON) {
+			@Override
+			public void run() {
+				_setNavigationStyleLogical.setChecked(false);
+				_calendarGraph.setNavigationStyle(NavigationStyle.PHYSICAL);
+			}
+		};
+		_setNavigationStylePhysical.setText("Physical arrow key navigation");
+		_setNavigationStylePhysical.setChecked(true);
+
+		_setNavigationStyleLogical = new Action(null, org.eclipse.jface.action.Action.AS_RADIO_BUTTON) {
+			@Override
+			public void run() {
+				_setNavigationStylePhysical.setChecked(false);
+				_calendarGraph.setNavigationStyle(NavigationStyle.LOGICAL);
+			}
+		};
+		_setNavigationStyleLogical.setText("Logical arrow key navigation");
+		_setNavigationStyleLogical.setChecked(false);
+
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
-		
-		if (!_synced.isChecked()) {
-			return;
-		}
 
 		// show and select the selected tour
 		if (selection instanceof SelectionTourId) {
-			_calendarGraph.gotoTourId(((SelectionTourId) selection).getTourId());
+			final Long newTourId = ((SelectionTourId) selection).getTourId();
+			final Long oldTourId = _calendarGraph.getSelectionTourId();
+			if (newTourId != oldTourId) {
+				if (_linked.isChecked()) {
+					_calendarGraph.gotoTourId(newTourId);
+				} else {
+					_calendarGraph.removeSelection();
+				}
+			}
+		} else if (selection instanceof SelectionDeletedTours) {
+			_calendarGraph.refreshCalendar();
 		}
-		
+	}
+
+	private void refreshCalendar() {
+		if (null != _calendarGraph) {
+			_calendarGraph.refreshCalendar();
+		}
 	}
 	
-	private void refreshCalendar() {
-		_calendarGraph.refreshCalendar();
+	private void restoreState() {
+
+		final int numWeeksDisplayed = Util.getStateInt(_state, STATE_NUM_OF_WEEKS, 5);
+		_calendarGraph.setZoom(numWeeksDisplayed);
+
+		final Long dateTimeMillis = Util.getStateLong(_state, STATE_FIRST_DAY, (new DateTime()).getMillis());
+		final DateTime firstDate = new DateTime(dateTimeMillis);
+		_calendarGraph.setFirstDay(firstDate);
+		
+		final Long selectedTourId = Util.getStateLong(_state, STATE_SELECTED_TOURS, new Long(-1));
+		_calendarGraph.setSelectionTourId(selectedTourId);
+
+//		final String[] selectedTourIds = _state.getArray(STATE_SELECTED_TOURS);
+//		_selectedTourIds.clear();
+//
+//		if (selectedTourIds != null) {
+//			for (final String tourId : selectedTourIds) {
+//				try {
+//					_selectedTourIds.add(Long.valueOf(tourId));
+//				} catch (final NumberFormatException e) {
+//					// ignore
+//				}
+//			}
+//		}
+
+		_linked.setChecked(Util.getStateBoolean(_state, STATE_IS_LINKED, true));
+
+	}
+
+	private void saveState() {
+
+		// save current date displayed
+		_state.put(STATE_FIRST_DAY, _calendarGraph.getFirstDay().getMillis());
+
+		// save number of weeks displayed
+		_state.put(STATE_NUM_OF_WEEKS, _calendarGraph.getZoom());
+		
+		// convert tour id's into string
+		// final ArrayList<String> selectedTourIds = new ArrayList<String>();
+		// for (final Long tourId : _selectedTourIds) {
+		// 	selectedTourIds.add(tourId.toString());
+		// }
+		// until now we only implement single tour selection
+		_state.put(STATE_SELECTED_TOURS, _calendarGraph.getSelectionTourId());
+
+		_state.put(STATE_IS_LINKED, _linked.isChecked());
+
 	}
 
 	/**
@@ -365,11 +458,11 @@ public class CalendarView extends ViewPart implements ITourProvider{
 	 */
 	@Override
 	public void setFocus() {
-		_calendarForm.setFocus();
+		_calendarComponents.setFocus();
 	}
 
-	private void showMessage(final String message) {
-		MessageDialog.openInformation(_pageBook.getShell(), "%view_name_Calendar", message);
-	}
+//	private void showMessage(final String message) {
+//		MessageDialog.openInformation(_pageBook.getShell(), "%view_name_Calendar", message);
+//	}
 
 }
