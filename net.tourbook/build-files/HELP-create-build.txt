@@ -20,6 +20,9 @@ Create Translation Archive
 
 Create Build
 
+requirements:
+- buckminster is installed
+
 
 - switch to workspace "ws"
 - run script "create-build-files.xml" in plugin net.tourbook and folder ant-build-files
@@ -29,7 +32,8 @@ Create Build
 - run Project/clean... for all projects
 
 - update version number in build.feature.net.tourbook.product
-- set build target correctly
+- replace feature net.tourbook.product.feature with new version number
+- set build target correctly ???
 - delete old exported files when a reexport is done, export will add new files to an existing product archive
 - run product export wizard in the product file
 

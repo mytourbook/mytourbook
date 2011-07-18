@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="MyTourbook" uid="net.tourbook.product" id="net.tourbook.product" application="net.tourbook.application" version="11.3.0.qualifier" useFeatures="true" includeLaunchers="true">
+<product name="MyTourbook" uid="net.tourbook.product" id="net.tourbook.product" application="net.tourbook.application" version="11.8.0.qualifier" useFeatures="true" includeLaunchers="true">
 
    <aboutInfo>
       <image path="/net.tourbook/icons/application/tourbook-about.png"/>
@@ -46,6 +46,7 @@
             winLargeLow="/net.tourbook/icons/application/tourbook48-8.bmp"/>
       </win>
    </launcher>
+
 
    <vm>
    </vm>
@@ -340,7 +341,7 @@ END OF TERMS AND CONDITIONS
    </plugins>
 
    <features>
-      <feature id="net.tourbook.product.feature" version="11.3.0.qualifier"/>
+      <feature id="net.tourbook.product.feature" version="11.8.0.qualifier"/>
    </features>
 
 
