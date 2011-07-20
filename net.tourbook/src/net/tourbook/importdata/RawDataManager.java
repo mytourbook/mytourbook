@@ -142,10 +142,10 @@ public class RawDataManager {
 
 	public void actionImportFromDevice() {
 
-		final WizardImportDialog dialog = new WizardImportDialog(PlatformUI
-				.getWorkbench()
-				.getActiveWorkbenchWindow()
-				.getShell(), new WizardImportData(), Messages.Import_Wizard_Dlg_title);
+		final DataTransferWizardDialog dialog = new DataTransferWizardDialog(//
+				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+				new DataTransferWizard(),
+				Messages.Import_Wizard_Dlg_title);
 
 		if (dialog.open() == Window.OK) {
 			showRawDataView();
@@ -154,17 +154,17 @@ public class RawDataManager {
 
 	public void actionImportFromDeviceDirect() {
 
-		final WizardImportData importWizard = new WizardImportData();
+		final DataTransferWizard transferWizard = new DataTransferWizard();
 
-		final WizardDialog dialog = new WizardImportDialog(PlatformUI
-				.getWorkbench()
-				.getActiveWorkbenchWindow()
-				.getShell(), importWizard, Messages.Import_Wizard_Dlg_title);
+		final WizardDialog dialog = new DataTransferWizardDialog(//
+				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+				transferWizard,
+				Messages.Import_Wizard_Dlg_title);
 
 		// create the dialog and shell which is required in setAutoDownload()
 		dialog.create();
 
-		importWizard.setAutoDownload();
+		transferWizard.setAutoDownload();
 
 		if (dialog.open() == Window.OK) {
 			showRawDataView();

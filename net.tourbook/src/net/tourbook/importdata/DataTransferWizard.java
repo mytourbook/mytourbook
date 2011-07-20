@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,7 +24,6 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.util.Util;
 
-import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.events.ShellAdapter;
@@ -32,23 +31,23 @@ import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Display;
 
-public class WizardImportData extends Wizard {
+public class DataTransferWizard extends Wizard {
 
-	private static final String			DIALOG_SETTINGS_SECTION		= "WizardImportData";			//$NON-NLS-1$
+	private static final String		DIALOG_SETTINGS_SECTION		= "DataTransferWizard";		//$NON-NLS-1$
 
-	public static final String			SYSPROPERTY_IMPORT_PERSON	= "mytourbook.import.person";	//$NON-NLS-1$
+	public static final String		SYSPROPERTY_IMPORT_PERSON	= "mytourbook.import.person";	//$NON-NLS-1$
 
-	private WizardPageImportSettings	_wizardPageImportSettings;
-	private final List<File>			_receivedFiles				= new ArrayList<File>();
+	private DataTransferWizardPage	_dataTransferWizardPage;
+	private final List<File>		_receivedFiles				= new ArrayList<File>();
 
 	/**
 	 * contains the device which is used to read the data from it
 	 */
-	private ExternalDevice				_importDevice;
+	private ExternalDevice			_importDevice;
 
-	private IRunnableWithProgress		_runnableReceiveData;
+	private IRunnableWithProgress	_runnableReceiveData;
 
-	WizardImportData() {
+	DataTransferWizard() {
 
 		setDialogSettings();
 		setNeedsProgressMonitor(true);
@@ -57,21 +56,32 @@ public class WizardImportData extends Wizard {
 	@Override
 	public void addPages() {
 
-		_wizardPageImportSettings = new WizardPageImportSettings("import-settings"); //$NON-NLS-1$
-		addPage(_wizardPageImportSettings);
+		_dataTransferWizardPage = new DataTransferWizardPage("import-settings"); //$NON-NLS-1$
+		addPage(_dataTransferWizardPage);
 
+	}
+
+	@Override
+	public boolean performCancel() {
+
+		// save state when fields in the wizard are valid
+		if (_dataTransferWizardPage.isPageValid()) {
+			_dataTransferWizardPage.saveState();
+		}
+
+		return true;
 	}
 
 	@Override
 	public boolean performFinish() {
 
-		if (_wizardPageImportSettings.validatePage() == false) {
+		if (_dataTransferWizardPage.isPageValid() == false) {
 			return false;
 		}
 
 		receiveData();
 
-		_wizardPageImportSettings.persistDialogSettings();
+		_dataTransferWizardPage.saveState();
 
 		return true;
 	}
@@ -81,7 +91,7 @@ public class WizardImportData extends Wizard {
 	 */
 	private boolean receiveData() {
 
-		final Combo comboPorts = _wizardPageImportSettings._cboPorts;
+		final Combo comboPorts = _dataTransferWizardPage._cboPorts;
 
 		if (comboPorts.isDisposed()) {
 			return false;
@@ -107,7 +117,7 @@ public class WizardImportData extends Wizard {
 		/*
 		 * set the device which is used to read the data
 		 */
-		_importDevice = _wizardPageImportSettings.getSelectedDevice();
+		_importDevice = _dataTransferWizardPage.getSelectedDevice();
 		if (_importDevice == null) {
 			return false;
 		}
@@ -139,7 +149,7 @@ public class WizardImportData extends Wizard {
 		for (final File inFile : _receivedFiles) {
 			rawDataManager.importRawData(
 					inFile,
-					_wizardPageImportSettings._pathEditor.getStringValue(),
+					_dataTransferWizardPage._pathEditor.getStringValue(),
 					_importDevice.buildNewFileNames,
 					fileCollision);
 		}
@@ -168,7 +178,7 @@ public class WizardImportData extends Wizard {
 						// start downloading
 						final boolean importResult = receiveData();
 
-						_wizardPageImportSettings.persistDialogSettings();
+						_dataTransferWizardPage.saveState();
 
 						if (importResult) {
 							getContainer().getShell().close();
@@ -181,15 +191,7 @@ public class WizardImportData extends Wizard {
 	}
 
 	public void setDialogSettings() {
-
-		final IDialogSettings pluginSettings = TourbookPlugin.getDefault().getDialogSettings();
-		IDialogSettings wizardSettings = pluginSettings.getSection(DIALOG_SETTINGS_SECTION);
-
-		if (wizardSettings == null) {
-			wizardSettings = pluginSettings.addNewSection(DIALOG_SETTINGS_SECTION);
-		}
-
-		super.setDialogSettings(wizardSettings);
+		super.setDialogSettings(TourbookPlugin.getDefault().getDialogSettingsSection(DIALOG_SETTINGS_SECTION));
 	}
 
 }

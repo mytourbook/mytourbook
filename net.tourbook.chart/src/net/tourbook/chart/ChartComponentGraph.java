@@ -1472,6 +1472,11 @@ public class ChartComponentGraph extends Canvas {
 					return;
 				}
 
+				if (_graphDrawingData.size() == 0) {
+					// drawing data are not set
+					return;
+				}
+
 				final int devNonScrolledImageWidth = Math.max(
 						ChartComponents.CHART_MIN_WIDTH,
 						getDevVisibleChartWidth());
