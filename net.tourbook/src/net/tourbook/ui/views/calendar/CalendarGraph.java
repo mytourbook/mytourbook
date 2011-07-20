@@ -87,6 +87,8 @@ public class CalendarGraph extends Canvas {
 	private Long								_selectedTourId		= new Long(-1);
 
 	private int									_scrollBarShift;
+	private int									_scrollBarLastSelection;
+	private boolean								_scrollDebug = false;
 
 	private class Day {
 
@@ -885,67 +887,64 @@ public class CalendarGraph extends Canvas {
 		return;
 	}
 
-	/*
-	 * Not perfect but working more or less. We use the first tour and today to define the calendar
-	 * area we want to scroll. If a user is on one of both borders (first tour/today) he could still
-	 * use the up- and down buttons in the scroll bar to scroll further down/up. We achieve this but
-	 * adjusting the date associated with the min/max value of the scrollbar, thus we are shifting
-	 * the scrollbar while keeping the scrollbar range. Updating this shift value is currently not
-	 * done when a user selects a value in the year/month combo boxes....
-	 */
 	private void onScroll(final SelectionEvent event) {
 
 		final ScrollBar sb = _parent.getVerticalBar();
 
-		// if we've shifted the scrollbar keep shifting the scrollbar until the shift is 0
+		int selectableMax = sb.getMaximum() - sb.getThumb() - 1;
+		int selectableMin = 0 + 1;
+		int selection = sb.getSelection();
+		int change = selection - _scrollBarLastSelection;
+	
+		if (_scrollDebug) {
+			System.out.println("Last Selection: " + _scrollBarLastSelection + " - New Selection: " + selection);
+		}
+		
 		if (_scrollBarShift != 0) {
-			switch (event.detail) {
-			case SWT.ARROW_DOWN:
-				if (_scrollBarShift < 0) { // keep selection at minimum
-					sb.setSelection(sb.getMinimum());
-				}
-				_scrollBarShift++;
-				break;
-			case SWT.ARROW_UP:
-				if (_scrollBarShift > 0) { // keep selection at maximum
-					sb.setSelection(sb.getMaximum());
-				}
-				_scrollBarShift--;
-				break;
-			default:
-				_scrollBarShift = 0;
+			if (_scrollBarLastSelection == selectableMax) {
+				sb.setSelection(selectableMax);
+			} else if (_scrollBarLastSelection == selectableMin) {
+				sb.setSelection(selectableMin);
 			}
-		} else { // do we need start shifting the scrollbar ?
-			if (sb.getSelection() <= 0) { // we are at the upper border
-				if (event.detail == SWT.ARROW_UP) {
-					_scrollBarShift--;
-				}
+			if (change > 0 && _scrollBarShift < 0) {  // ensure we are not shifting over "0"
+				_scrollBarShift = Math.min(0, _scrollBarShift + change);
+			} else if (change < 0 && _scrollBarShift > 0) {
+				_scrollBarShift = Math.max(0, _scrollBarShift + change);
+			} else {
+				_scrollBarShift += change;
 			}
-			if (sb.getSelection() >= sb.getMaximum() - sb.getThumb()) { // we are at the lower border
-				if (event.detail == SWT.ARROW_DOWN) {
-					_scrollBarShift++;
-				}
+		} else { // do we need start shifting the scroll bar ?
+			if (selection < selectableMin) { // we are at the upper border
+				sb.setSelection(selectableMin);
+				_scrollBarShift += change;
+			}
+			if (selection > selectableMax ) { // we are at the lower border
+				sb.setSelection(selectableMax);
+				_scrollBarShift += change;
+			
 			}
 		}
 
-
-		final int selectedWeek = sb.getSelection();
-		final DateTime dt1 = scrollBarStart();
-		final DateTime dt2 = scrollBarEnd();
-		int weeks = (int) ((dt2.getMillis() - dt1.getMillis()) / (1000 * 60 * 60 * 24 * 7));
-		final int thumbSize = Math.max(_numWeeksDisplayed, weeks / 20); // ensure the thumb isn't getting to small
-		sb.setThumb(thumbSize);
-		weeks += thumbSize;
-		sb.setMinimum(0);
-		sb.setMaximum(weeks);
-		sb.setPageIncrement(_numWeeksDisplayed);
+		// selection = sb.getSelection();
+		// final DateTime dt1 = scrollBarStart();
+		// final DateTime dt2 = scrollBarEnd();
+		// int weeks = (int) ((dt2.getMillis() - dt1.getMillis()) / (1000 * 60 * 60 * 24 * 7));
+		// final int thumbSize = Math.max(_numWeeksDisplayed, weeks / 20); // ensure the thumb isn't getting to small
+		// sb.setThumb(thumbSize);
+		// weeks += thumbSize;
+		// sb.setMinimum(0);
+		// sb.setMaximum(weeks);
+		// sb.setPageIncrement(_numWeeksDisplayed);
+	
+		if (_scrollDebug) {
+			System.out.println("SbarShift: " + _scrollBarShift + " - Selected Week: " + selection);
+		}
 		
-		System.out.println("SbarShift: " + _scrollBarShift + " - Selected Week: " + selectedWeek + " : " + weeks);
+		_scrollBarLastSelection = sb.getSelection();
 		
 		// goto the selected week
-		_dt = dt1.plusDays(selectedWeek * 7);
-		_dt = _dt.withDayOfWeek(getFirstDayOfWeek()); // set first day to start of week
-
+		_dt = scrollBarStart().plusDays(selection * 7);
+		
 		_graphClean = false;
 		redraw();
 	}
@@ -998,29 +997,44 @@ public class CalendarGraph extends Canvas {
 		_selectionProvider.remove(listener);
 	}
 
-	private DateTime scrollBarEnd() {
-		return new DateTime().plusWeeks(_scrollBarShift);
+	private DateTime scrollBarEnd() { // ensure the date return is a "FirstDayOfTheWeek" !!!
+		DateTime dt = new DateTime().plusWeeks(_scrollBarShift);
+		return dt.plusWeeks(1).withDayOfWeek(getFirstDayOfWeek());
 	}
 
-	private DateTime scrollBarStart() {
-		return _dataProvider.getFirstDateTime().plusWeeks(_scrollBarShift);
+	private DateTime scrollBarStart() { // ensure the date return is a "FirstDayOfTheWeek" !!!
+		DateTime dt = _dataProvider.getFirstDateTime().plusWeeks(_scrollBarShift);
+		return dt.minusWeeks(1).withDayOfWeek(getFirstDayOfWeek());
 	}
 
 	private void scrollBarUpdate() {
+		_scrollBarShift = 0;
+		final long weekMillis = (1000 * 60 * 60 * 24 * 7);
 		final ScrollBar sb = _parent.getVerticalBar();
-		final DateTime dt1 = scrollBarStart();
-		final DateTime dt2 = _dt;
-		final DateTime dt3 = scrollBarEnd();
-		int maxWeeks = (int) ((dt3.getMillis() - dt1.getMillis()) / (1000 * 60 * 60 * 24 * 7));
-		final int thisWeek = (int) ((dt2.getMillis() - dt1.getMillis()) / (1000 * 60 * 60 * 24 * 7));
+		final long dt1 = scrollBarStart().getMillis();
+		final long dt2 = _dt.getMillis();
+		final long dt3 = scrollBarEnd().getMillis();
+		int maxWeeks = (int) ((dt3 - dt1) / weekMillis);
 		final int thumbSize = Math.max(_numWeeksDisplayed, maxWeeks / 20); // ensure the thumb isn't getting to small
 		sb.setThumb(thumbSize);
+		int thisWeek;
+		if (dt2 < dt1) {
+			// shift negative
+			_scrollBarShift = (int) ((dt2 - dt1) / weekMillis);
+			thisWeek = 1;
+		} else if (dt2 > dt3) {
+			// shift positive
+			_scrollBarShift = (int) ((dt2 - dt3) / weekMillis);
+			thisWeek = maxWeeks - 1;
+		} else  {
+			thisWeek = (int) ((dt2 - dt1) / weekMillis);
+		}
 		maxWeeks += thumbSize;
 		sb.setMinimum(0);
 		sb.setMaximum(maxWeeks);
 		sb.setPageIncrement(_numWeeksDisplayed);
 		sb.setSelection(thisWeek);
-		_scrollBarShift = 0;
+		_scrollBarLastSelection = thisWeek;
 	}
 
 	private void selectTour(final GC gc, final CalendarTourData data, final Rectangle rec) {
