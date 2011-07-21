@@ -91,6 +91,9 @@ public class CalendarGraph extends Canvas {
 	private int									_scrollBarLastSelection;
 	private boolean								_scrollDebug = false;
 
+	private int									_numberOfToursPerDay	= 3;
+	private boolean								_dynamicTourFieldSize	= true;
+
 	private class Day {
 
 		private long	dayId;
@@ -398,8 +401,6 @@ public class CalendarGraph extends Canvas {
 		gc.setForeground(_black);
 		gc.fillRectangle(area);
 
-		final int header = (YY / 4 / numRows); // header is 1/4 cell height - we display at most 3 workouts per day
-
 		final float dX = (float) XX / (float) numCols;
 		final float dY = (float) YY / (float) numRows;
 
@@ -428,14 +429,16 @@ public class CalendarGraph extends Canvas {
 
 		// Find a format for the day header which fits into the rectangle available;
 		int g = 0;
-		while (headerSizes[g].x > (dX - dayLabelXOffset) && g < headerSizes.length) {
+		while (g < headerSizes.length && headerSizes[g].x > (dX - dayLabelXOffset)) {
 			g++;
 		}
+		g = Math.min(g, headerSizes.length - 1); // if the cell is smaller than the shortest format (no index 'g' was found) we use the shortest format an relay on clipping
 		// if (headerSizes[g].y < dY) {
 		// 	headerFormat = headerFormats[g];
 		// }
 		headerFormat = headerFormats[g];
-		int headerHeight = headerSizes[g].y;
+		final int dayLabelWidht = headerSizes[g].x;
+		final int dayLabelHeight = headerSizes[g].y;
 
 		// Weeks
 		for (int i = 0; i < numRows; i++) {
@@ -463,7 +466,7 @@ public class CalendarGraph extends Canvas {
 
 				// Day header box
 				gc.setForeground(_gray);
-				gc.fillGradientRectangle(X1, Y1, dayRec.width + 1, headerHeight, true); // no clue why I've to add 1 to the width, looks like a bug on linux and does not hurt as we overwrite with the vertial line at the end anyway
+				gc.fillGradientRectangle(X1, Y1, dayRec.width + 1, dayLabelHeight, true); // no clue why I've to add 1 to the width, looks like a bug on linux and does not hurt as we overwrite with the vertial line at the end anyway
 
 				// Day header label
 				gc.setFont(boldFont);
@@ -474,15 +477,25 @@ public class CalendarGraph extends Canvas {
 				} else {
 					gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_GRAY));
 				}
-				gc.drawText(date.toString(headerFormat), X1 + dayLabelXOffset, Y1, true);
+				gc.setClipping(X1, Y1, dayRec.width, dayLabelHeight); // this clipping should only kick in if shortest label format is still longer than the cell width
+				gc.drawText(date.toString(headerFormat), X2 - dayLabelWidht - dayLabelXOffset, Y1, true);
 				data = _dataProvider.getCalendarDayData(date.getYear(), date.getMonthOfYear(), date.getDayOfMonth());
 				gc.setFont(normalFont);
+				gc.setClipping(_nullRec);
 
 				// Tours for this day
-				int _numberOfToursPerDay = 3;
-				final int dy = (dayRec.height - headerHeight) / _numberOfToursPerDay;
-				for (int k = data.length - 1; k >= 0; k--) { // morning top, evening button
-					final int ddy = (data.length <= 3 ? dy : (3 * dy) / data.length); // narrow the tour fields to fit if more than 3 tours (default size 1/3)
+				final int max = _numberOfToursPerDay == 0 ? data.length : _dynamicTourFieldSize ? data.length : Math
+						.min(_numberOfToursPerDay, data.length);
+				for (int k = max - 1; k >= 0; k--) { // morning top, evening button
+					int ddy;
+					if (_numberOfToursPerDay == 0) {
+						ddy = (dayRec.height - dayLabelHeight) / data.length;
+					} else {
+						final int dy = (dayRec.height - dayLabelHeight) / _numberOfToursPerDay;
+						ddy = _dynamicTourFieldSize ? (data.length <= _numberOfToursPerDay
+								? dy
+								: (_numberOfToursPerDay * dy) / data.length) : dy; // narrow the tour fields to fit if more than _numberOfTourPerDay tours
+					}
 					final Rectangle tour = new Rectangle(dayRec.x + 1, Y2 - (k + 1) * ddy, (dayRec.width - 2), ddy - 1);
 					final Rectangle focus = new Rectangle(tour.x - 1, tour.y - 1, tour.width + 2, tour.height + 2);
 					_tourFocus.add(new ObjectLocation(focus, data[k].tourId, data[k]));
@@ -1294,8 +1307,20 @@ public class CalendarGraph extends Canvas {
 		_navigationStyle = navigationStyle;
 	}
 
+	void setNumberOfToursPerDay(final int numberOfToursPerDay) {
+		_numberOfToursPerDay = numberOfToursPerDay;
+		_graphClean = false;
+		redraw();
+	}
+
 	public void setSelectionTourId(final Long selectedTourId) {
 		this._selectedTourId = selectedTourId;
+	}
+
+	void setTourFieldSizeDynamic(final boolean dynamicTourFieldSize) {
+		_graphClean = false;
+		_dynamicTourFieldSize = dynamicTourFieldSize;
+		redraw();
 	}
 
 	public void setYearMonthContributor(final CalendarYearMonthContributionItem calendarYearMonthContribuor) {

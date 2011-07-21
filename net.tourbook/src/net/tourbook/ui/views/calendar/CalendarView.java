@@ -61,6 +61,12 @@ public class CalendarView extends ViewPart implements ITourProvider{
 	private Action								_linked;
 	private Action								_today;
 	private Action								_setNavigationStylePhysical, _setNavigationStyleLogical;
+	private Action								_setNumberOfToursPerDay0;
+	private Action								_setNumberOfToursPerDay1;
+	private Action								_setNumberOfToursPerDay2;
+	private Action								_setNumberOfToursPerDay3;
+	private Action								_setNumberOfToursPerDay4;
+	private Action								_setTourSizeDynamic;
 
 	private PageBook							_pageBook;
 	private CalendarComponents					_calendarComponents;
@@ -256,7 +262,14 @@ public class CalendarView extends ViewPart implements ITourProvider{
 	private void fillLocalPullDown(final IMenuManager manager) {
 		manager.add(_setNavigationStylePhysical);
 		manager.add(_setNavigationStyleLogical);
-		// manager.add(new Separator());
+		manager.add(new Separator());
+		manager.add(_setNumberOfToursPerDay0);
+		manager.add(_setNumberOfToursPerDay1);
+		manager.add(_setNumberOfToursPerDay2);
+		manager.add(_setNumberOfToursPerDay3);
+		manager.add(_setNumberOfToursPerDay4);
+		manager.add(new Separator());
+		manager.add(_setTourSizeDynamic);
 
 	}
 
@@ -377,6 +390,70 @@ public class CalendarView extends ViewPart implements ITourProvider{
 		};
 		_setNavigationStyleLogical.setText("Logical arrow key navigation");
 		_setNavigationStyleLogical.setChecked(false);
+
+		_setNumberOfToursPerDay0 = new Action(null, org.eclipse.jface.action.Action.AS_RADIO_BUTTON) {
+			@Override
+			public void run() {
+				_calendarGraph.setNumberOfToursPerDay(0);
+				_setNumberOfToursPerDay1.setChecked(false);
+				_setNumberOfToursPerDay2.setChecked(false);
+				_setNumberOfToursPerDay3.setChecked(false);
+				_setNumberOfToursPerDay4.setChecked(false);
+			}
+		};
+		_setNumberOfToursPerDay0.setText("All exercises max. size");
+		_setNumberOfToursPerDay1 = new Action(null, org.eclipse.jface.action.Action.AS_RADIO_BUTTON) {
+			@Override
+			public void run() {
+				_calendarGraph.setNumberOfToursPerDay(1);
+				_setNumberOfToursPerDay0.setChecked(false);
+				_setNumberOfToursPerDay2.setChecked(false);
+				_setNumberOfToursPerDay3.setChecked(false);
+				_setNumberOfToursPerDay4.setChecked(false);
+			}
+		};
+		_setNumberOfToursPerDay1.setText("Default 1 exercise per day");
+		_setNumberOfToursPerDay2 = new Action(null, org.eclipse.jface.action.Action.AS_RADIO_BUTTON) {
+			@Override
+			public void run() {
+				_calendarGraph.setNumberOfToursPerDay(2);
+				_setNumberOfToursPerDay0.setChecked(false);
+				_setNumberOfToursPerDay1.setChecked(false);
+				_setNumberOfToursPerDay3.setChecked(false);
+				_setNumberOfToursPerDay4.setChecked(false);
+			}
+		};
+		_setNumberOfToursPerDay2.setText("Default 2 exercises per day");
+		_setNumberOfToursPerDay3 = new Action(null, org.eclipse.jface.action.Action.AS_RADIO_BUTTON) {
+			@Override
+			public void run() {
+				_calendarGraph.setNumberOfToursPerDay(3);
+				_setNumberOfToursPerDay0.setChecked(false);
+				_setNumberOfToursPerDay1.setChecked(false);
+				_setNumberOfToursPerDay2.setChecked(false);
+				_setNumberOfToursPerDay4.setChecked(false);
+			}
+		};
+		_setNumberOfToursPerDay3.setText("Default 3 exercises per day");
+		_setNumberOfToursPerDay4 = new Action(null, org.eclipse.jface.action.Action.AS_RADIO_BUTTON) {
+			@Override
+			public void run() {
+				_calendarGraph.setNumberOfToursPerDay(4);
+				_setNumberOfToursPerDay0.setChecked(false);
+				_setNumberOfToursPerDay1.setChecked(false);
+				_setNumberOfToursPerDay2.setChecked(false);
+				_setNumberOfToursPerDay3.setChecked(false);
+			}
+		};
+		_setNumberOfToursPerDay4.setText("Default 4 exercises per day");
+
+		_setTourSizeDynamic = new Action(null, org.eclipse.jface.action.Action.AS_CHECK_BOX) {
+			@Override
+			public void run() {
+				_calendarGraph.setTourFieldSizeDynamic(this.isChecked());
+			}
+		};
+		_setTourSizeDynamic.setText("Resize exersizes if more than default number");
 
 	}
 
