@@ -31,6 +31,7 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
@@ -325,6 +326,8 @@ public class CalendarGraph extends Canvas {
 
 	private void drawCalendar(GC gc) {
 
+		final int dayLabelXOffset = 4;
+
 		final int XX = getSize().x;
 		final int YY = getSize().y;
 
@@ -377,8 +380,216 @@ public class CalendarGraph extends Canvas {
 		final int numCols = 9; // one col left and right of the week + 7 week days
 		final int numRows = _numWeeksDisplayed; // number of weeks per moth displayed
 
-		// final Color alternate = new Color(gc.getDevice(), 0xf5, 0xf5, 0xf5); // efefef
-		final Color alternate = new Color(gc.getDevice(), 0xf0, 0xf0, 0xf0); // efefef
+		// final Color alternate = new Color(gc.getDevice(), 0xf5, 0xf5, 0xf5);
+		final Color alternate = new Color(gc.getDevice(), 0xf0, 0xf0, 0xf0);
+
+		_tourFocus = new ArrayList<ObjectLocation>();
+		_dayFocus = new ArrayList<ObjectLocation>();
+
+		CalendarTourData[] data;
+
+		final Font normalFont = gc.getFont();
+		final FontData fd[] = normalFont.getFontData();
+		fd[0].setStyle(SWT.BOLD);
+		final Font boldFont = new Font(_display, fd[0]);
+
+		final Rectangle area = getClientArea();
+		gc.setBackground(_white);
+		gc.setForeground(_black);
+		gc.fillRectangle(area);
+
+		final int header = (YY / 4 / numRows); // header is 1/4 cell height - we display at most 3 workouts per day
+
+		final float dX = (float) XX / (float) numCols;
+		final float dY = (float) YY / (float) numRows;
+
+		// first draw the horizontal lines
+		gc.setBackground(_white);
+		gc.setForeground(_gray);
+		for (int i = 0; i <= numRows; i++) {
+			gc.drawLine(0, (int) (i * dY), XX, (int) (i * dY));
+		}
+
+		Rectangle selectedRec = null;
+		CalendarTourData selectedTour = null;
+		boolean doSelection = false;
+
+		final long todayDayId = (new Day(new DateTime())).dayId + 1;
+
+		gc.setFont(boldFont);
+		final Point[] headerSizes = {
+				gc.stringExtent("22. Dec 99"),
+				gc.stringExtent("22. Dec"),
+				gc.stringExtent("22") };
+		gc.setFont(normalFont);
+
+		final String[] headerFormats = { "dd. MMM yy", "dd. MMM", "dd" };
+		String headerFormat = "";
+
+		// Find a format for the day header which fits into the rectangle available;
+		int g = 0;
+		while (headerSizes[g].x > (dX - dayLabelXOffset) && g < headerSizes.length) {
+			g++;
+		}
+		// if (headerSizes[g].y < dY) {
+		// 	headerFormat = headerFormats[g];
+		// }
+		headerFormat = headerFormats[g];
+		int headerHeight = headerSizes[g].y;
+
+		// Weeks
+		for (int i = 0; i < numRows; i++) {
+			final int Y1 = (int) (i * dY);
+			final int Y2 = (int) ((i + 1) * dY);
+
+			// Days per week
+			long nextDayId = (new Day(date)).dayId + 1; // simply incrementing days should be much faster...
+			for (int j = 1; j < 8; j++) { // col 0 is for weekinfo, the week itself starts at col 1
+				final int X1 = (int) (j * dX);
+				final int X2 = (int) ((j + 1) * dX);
+				final Rectangle dayRec = new Rectangle(X1, Y1, (X2 - X1), (Y2 - Y1));
+				final Day day = new Day(nextDayId);
+				_dayFocus.add(new ObjectLocation(dayRec, nextDayId, day));
+				nextDayId = day.dayId + 1;
+				final int weekDay = date.getDayOfWeek();
+				
+				gc.setBackground(_white);
+
+				// Day background rectangle
+				if ((date.getMonthOfYear() % 2) == 1) {
+					gc.setBackground(alternate);
+					gc.fillRectangle(dayRec);
+				}
+
+				// Day header box
+				gc.setForeground(_gray);
+				gc.fillGradientRectangle(X1, Y1, dayRec.width + 1, headerHeight, true); // no clue why I've to add 1 to the width, looks like a bug on linux and does not hurt as we overwrite with the vertial line at the end anyway
+
+				// Day header label
+				gc.setFont(boldFont);
+				if (day.dayId == todayDayId) {
+					gc.setForeground(_blue);
+				} else if (weekDay == DateTimeConstants.SATURDAY || weekDay == DateTimeConstants.SUNDAY) {
+					gc.setForeground(_red);
+				} else {
+					gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_GRAY));
+				}
+				gc.drawText(date.toString(headerFormat), X1 + dayLabelXOffset, Y1, true);
+				data = _dataProvider.getCalendarDayData(date.getYear(), date.getMonthOfYear(), date.getDayOfMonth());
+				gc.setFont(normalFont);
+
+				// Tours for this day
+				int _numberOfToursPerDay = 3;
+				final int dy = (dayRec.height - headerHeight) / _numberOfToursPerDay;
+				for (int k = data.length - 1; k >= 0; k--) { // morning top, evening button
+					final int ddy = (data.length <= 3 ? dy : (3 * dy) / data.length); // narrow the tour fields to fit if more than 3 tours (default size 1/3)
+					final Rectangle tour = new Rectangle(dayRec.x + 1, Y2 - (k + 1) * ddy, (dayRec.width - 2), ddy - 1);
+					final Rectangle focus = new Rectangle(tour.x - 1, tour.y - 1, tour.width + 2, tour.height + 2);
+					_tourFocus.add(new ObjectLocation(focus, data[k].tourId, data[k]));
+					// TODO create each color only once (private array( and dispose
+					gc.setBackground(new Color(_display, _rgbBright.get(data[k].typeColorIndex)));
+					gc.setForeground(new Color(_display, _rgbDark.get(data[k].typeColorIndex)));
+					gc.fillGradientRectangle(tour.x + 1, tour.y + 1, tour.width - 1, tour.height - 1, false);
+					final Color lineColor = new Color(_display, _rgbLine.get(data[k].typeColorIndex));
+					gc.setForeground(lineColor);
+					gc.drawRectangle(tour);
+					String title = data[k].tourTitle;
+					title = title == null ? "No Title" : title;
+					// gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_GRAY));
+					gc.setForeground(lineColor);
+					// gc.setForeground(_black);
+					gc.setClipping(focus.x + 2, focus.y, focus.width - 4, focus.height - 2);
+					gc.drawText(title, tour.x + 2, tour.y, true);
+					gc.setClipping(_nullRec);
+					if (data[k].tourId == _selectedTourId) {
+						selectedRec = focus;
+						selectedTour = data[k];
+						doSelection = true;
+					}
+				}
+				date = date.plusDays(1);
+			}
+		}
+		gc.setFont(normalFont);
+
+		// and finally the vertical lines
+		gc.setForeground(_display.getSystemColor(SWT.COLOR_GRAY));
+		for (int i = 0; i <= numCols; i++) {
+			gc.drawLine((int) (i * dX), 0, (int) (i * dX), YY);
+		}
+
+		if (doSelection && selectedTour != null && selectedRec != null) {
+			selectTour(gc, selectedTour, selectedRec);
+			fireSelectionEvent(Type.TOUR, _selectedTourId);
+		} else {
+			_selectedTourId = new Long(-1); // we probably scrolled the selected tour out of the screen, deselect it
+		}
+
+		boldFont.dispose();
+
+		gc.dispose();
+		oldGc.drawImage(_image, 0, 0);
+
+		_graphClean = true;
+
+	}
+
+	private void drawCalendar_(GC gc) { // WORKING VERSION
+
+		final int XX = getSize().x;
+		final int YY = getSize().y;
+
+//		System.out.println(_graphClean ? "clean!" : "NOT clean!");
+//		System.out.println(_highlightChanged ? "HL changed!" : "HL NOT changed");
+//		System.out.println(_highlightRemoved ? "HL removed!" : "HL NOT removed");
+//		System.out.println("-----------");
+
+		if (_graphClean && _highlightRemoved && _image != null) {
+			gc.drawImage(_image, 0, 0);
+			_highlightId = new Long(-1);
+			_highlightRemoved = false;
+			return;
+		}
+
+		if (_graphClean && _highlightChanged && _image != null) {
+			final GC oldGc = gc;
+			_highlight = new Image(getDisplay(), XX, YY);
+			gc = new GC(_highlight);
+			gc.drawImage(_image, 0, 0);
+			redrawHighLight(gc);
+			gc.dispose();
+			oldGc.drawImage(_highlight, 0, 0);
+			_highlightChanged = false;
+			return;
+		}
+
+		if (_image != null && !_image.isDisposed()) {
+			_image.dispose();
+		}
+
+		DateTime date = new DateTime(_dt);
+		_image = new Image(getDisplay(), XX, YY);
+
+		// update month/year dropdown box
+		// look at the 1st day of the week after the first day displayed because if we go to
+		// a specific month we ensure that the first day of the month is displayed in
+		// the first line, meaning the first day in calendar normally contains a day
+		// of the *previous* month
+		if (_calendarYearMonthContributor.getSelectedYear() != _dt.plusDays(7).getYear()) {
+			_calendarYearMonthContributor.selectYear(_dt.getYear());
+		}
+		if (_calendarYearMonthContributor.getSelectedMonth() != _dt.plusDays(7).getMonthOfYear()) {
+			_calendarYearMonthContributor.selectMonth(_dt.getMonthOfYear());
+		}
+
+		final GC oldGc = gc;
+		gc = new GC(_image);
+
+		final int numCols = 9; // one col left and right of the week + 7 week days
+		final int numRows = _numWeeksDisplayed; // number of weeks per moth displayed
+
+		// final Color alternate = new Color(gc.getDevice(), 0xf5, 0xf5, 0xf5);
+		final Color alternate = new Color(gc.getDevice(), 0xf0, 0xf0, 0xf0);
 
 		_tourFocus = new ArrayList<ObjectLocation>();
 		_dayFocus = new ArrayList<ObjectLocation>();
@@ -891,10 +1102,10 @@ public class CalendarGraph extends Canvas {
 
 		final ScrollBar sb = _parent.getVerticalBar();
 
-		int selectableMax = sb.getMaximum() - sb.getThumb() - 1;
-		int selectableMin = 0 + 1;
-		int selection = sb.getSelection();
-		int change = selection - _scrollBarLastSelection;
+		final int selectableMax = sb.getMaximum() - sb.getThumb() - 1;
+		final int selectableMin = 0 + 1;
+		final int selection = sb.getSelection();
+		final int change = selection - _scrollBarLastSelection;
 	
 		if (_scrollDebug) {
 			System.out.println("Last Selection: " + _scrollBarLastSelection + " - New Selection: " + selection);
@@ -998,12 +1209,12 @@ public class CalendarGraph extends Canvas {
 	}
 
 	private DateTime scrollBarEnd() { // ensure the date return is a "FirstDayOfTheWeek" !!!
-		DateTime dt = new DateTime().plusWeeks(_scrollBarShift);
+		final DateTime dt = new DateTime().plusWeeks(_scrollBarShift);
 		return dt.plusWeeks(1).withDayOfWeek(getFirstDayOfWeek());
 	}
 
 	private DateTime scrollBarStart() { // ensure the date return is a "FirstDayOfTheWeek" !!!
-		DateTime dt = _dataProvider.getFirstDateTime().plusWeeks(_scrollBarShift);
+		final DateTime dt = _dataProvider.getFirstDateTime().plusWeeks(_scrollBarShift);
 		return dt.minusWeeks(1).withDayOfWeek(getFirstDayOfWeek());
 	}
 
