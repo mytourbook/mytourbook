@@ -1,11 +1,8 @@
 webbsite:
 - update java formatting on website
 - translate installer
+- translation </ a> do not create an link, </a> is OK
 
-
-problems:
-- avg pulse for all statistics, it includes tours without pulse
-- datenübertraung hat keinen folder
 
 recommendation:
 - use KatMouse on windows

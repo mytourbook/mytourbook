@@ -16,8 +16,8 @@
 	<property name="path-language-target" value="${dat-ROOT}/mytourbook-LANGUAGE-TEMP-debug-trunk" />
 	-->
 
-	<property name="path-language-target-temp" value="${dat-ROOT}/mytourbook-LANGUAGE-TEMP" />
-	<property name="path-language-archive" value="${dat-ROOT}/mytourbook-LANGUAGE-archives" />
+	<property name="path-language-target-temp" value="${dat-ROOT}/mytourbook-TRANSLATIONS-temp" />
+	<property name="path-language-archive" value="${dat-ROOT}/mytourbook-TRANSLATIONS" />
 
 	<!--
 		DEFAULT target
@@ -39,17 +39,17 @@
 
 		<!-- 
 			French: unzip archive: mt-fr.zip 
+		-->
 		<antcall target="unzip-archive-for-one-language">
 			<param name="archive-language" value="fr" />
 		</antcall>
-		-->
  
 		<!-- 
 			Italian: unzip archive: mt-it.zip 
-		-->
 		<antcall target="unzip-archive-for-one-language">
 			<param name="archive-language" value="it" />
 		</antcall>
+		-->
 
 		<!-- 
 			Dutch: unzip archive: mt-nl.zip 

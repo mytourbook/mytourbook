@@ -244,16 +244,6 @@ public class DataTransferWizardPage extends WizardPage {
 			return false;
 		}
 
-		// validate path
-		if (isPathValid() == false) {
-
-			setPageComplete(false);
-			setErrorMessage(Messages.Import_Wizard_Error_path_is_invalid);
-
-			_pathEditor.getTextControl(_container).setFocus();
-			return false;
-		}
-
 		// validate ports
 		if (!_isPortListAvailable || _cboPorts.getSelectionIndex() == -1) {
 
@@ -261,6 +251,16 @@ public class DataTransferWizardPage extends WizardPage {
 			setErrorMessage(Messages.Import_Wizard_Error_com_port_is_required);
 
 			_cboPorts.setFocus();
+			return false;
+		}
+
+		// validate path
+		if (isPathValid() == false) {
+
+			setPageComplete(false);
+			setErrorMessage(Messages.Import_Wizard_Error_path_is_invalid);
+
+			_pathEditor.getTextControl(_container).setFocus();
 			return false;
 		}
 
