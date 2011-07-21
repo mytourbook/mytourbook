@@ -1,68 +1,69 @@
 webbsite:
-- update java formatting on website
+- update java code formatting on website
 - translate installer
-- translation </ a> do not create an link, </a> is OK
-
+- translation tip: </ a> do not create an link, </a> is OK
+- 40-50h translation
 
 recommendation:
 - use KatMouse on windows
 
-new
-- import polar PDD files (provided by Matthias Helmling)
-- categorize tours in the tourbook view by week (provided by Matthias Helmling)
-- italian translation (provided by Doriano Cometto)
-- display HR zones
-  - in the map
-  - in the tour chart
-  - new HR zone statistics (by month/week)
-  - new training view, displays HR zones for the selected tour
-  - break time is ignored when hr zones are computed
-- customize how breaktimes are recognized
-- added context menu into table/tree header to modify columns
+New Features
+    import polar PDD files (provided by Matthias Helmling)
+    categorize tours in the tourbook view by week
+    (provided by Matthias Helmling)
+    italian translation (provided by Doriano Cometto)
+    create HR zones
+    display HR zones
+        in the map
+        in the tour chart
+        in HR zone statistics (by month/week)
+        in training view for the selected tour
+    customize breaktime calculation
+    context menu in table/tree header to modify columns
 
-improvements
-- simplified first startup of the application
-  - 1st person is created automatically
-  - measurement system can be selected
-- show tour info (with hovered mouse) in the Tour Import view
-- app cleanup:
-  -measurement system combobox is hidden by default
-  -moved action "Other views..." into sub menu
-  -moved import for daum ergo into separate pref page
-- reorder table/tree columns with drag&drop in column dialog
-- enforce preference min/max values for painting a tour in the map
-- straight vertical lines instead of traiangles in the heartbeat graph when the value is not set within 20 seconds
-- export gpx with heartrate, temperature and cadence
-- break time is displayed as a gap when time is displayed on the x-axis
-- bars in a HR zone bar chart can be reordered
-- tour chart:
-  - tour marker can be displayed/hidden
-  - tour values within a break can be displayed/hidden
+Improvements 	
+    simplified first startup of the application
+        1st person is created automatically
+        measurement system can be selected
+    UI cleanup
+        measurement system combobox is hidden by default
+        moved action "Other views..." into sub menu
+        moved import for daum ergo into separate pref page
+    tour chart
+        tour markers can be displayed/hidden
+        gridlines can be displayed/hidden
+        tour values within a break can be displayed/hidden
+        break time is displayed as a gap when time is displayed on the x-axis
 
-modifications compared with previous versions
-- break time is ignored when avg hr is computed
-- default breaktime is set to 20 seconds and 20 m
-- chart gridlines are hidden by default (to have a clearer view on the graphs) but they can be activated in the preferences  
-  
+    show tour info tooltip in the Tour Import view (with hovered mouse)
+    reorder table/tree columns with drag&drop in the column dialog
+    enforce preference min/max values for painting a tour in the map
+    export gpx with heartrate, temperature and cadence
 
-features for HR zones which are not yet implemented
-- legend in the map 
-- tooltip in the statistics view 
-- tour tooltip in the training view
+Modifications
+    break time is ignored when avg hr is computed
+    default breaktime is set to 20 seconds and 20 m
+    chart gridlines are hidden by default (to have a clearer view on the graphs) but they can be activated in the preferences
 
-fixed bugs
-- fixed bug to auto open tag menu in OSX, eclipse 3.7 is required
-- hide tour tooltip when "Add Tag" context menu is displayed
-- Fitlog-Import fails for tracks without GPS data - ID: 3232030		http://sourceforge.net/tracker/?func=detail&atid=890601&aid=3232030&group_id=179799
-- Conconi test window broke workbench - ID: 3269916	http://sourceforge.net/tracker/?func=detail&atid=890601&aid=3269916&group_id=179799
-- moving-, paused- and reording-time, can't be greater than 9. This is only observed on Mac OSx, works fine on windows	https://sourceforge.net/tracker/index.php?func=detail&aid=3292465&group_id=179799&atid=890601
-- values for graphs in the chart has been clipped at the canvas border 
-  -> painting was wrong
-  -> this bug required a new painting strategy for all charts
+Fixed bugs 	
+    fixed bug to auto open tag menu in OSX, eclipse 3.7 is required
+    hide tour tooltip when "Add Tag" context menu is displayed
+    Fitlog-Import fails for tracks without GPS data - ID: 3232030
+    Conconi test window broke workbench - ID: 3269916
+    moving-, paused- and reording-time, can't be greater than 9.
+    Bug was only observed on Mac OSX, works fine on windows
+    values for graphs in the chart has been clipped at the canvas border
+        -> painting on the vertical border was wrong
+        -> bugfix required a new painting strategy for all charts
 
-internal
-- removed custom pixel converter
+Not yet implemented 	
+    HR zone features
+        legend in the map
+        tooltip in the statistics view
+        tour tooltip in the training view
 
+Development
+    removed custom pixel converter
 
-platform:
-- eclipse 3.7
+Platform 	
+    Eclipse 3.7.0
