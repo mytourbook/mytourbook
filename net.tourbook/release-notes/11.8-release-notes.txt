@@ -1,3 +1,5 @@
+translate: "Search for places and show them on the map"
+
 webbsite:
 - update java code formatting on website
 - translate installer

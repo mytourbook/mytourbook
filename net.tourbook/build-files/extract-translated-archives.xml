@@ -11,18 +11,20 @@
 	<!-- PRODUCTION TARGET
 	-->
 	<property name="path-language-target" value="${path-mt-trunk}" />
-	
+
 	<!-- DEBUG TARGET
 	<property name="path-language-target" value="${dat-ROOT}/mytourbook-LANGUAGE-TEMP-debug-trunk" />
 	-->
 
-	<property name="path-language-target-temp" value="${dat-ROOT}/mytourbook-TRANSLATIONS-temp" />
 	<property name="path-language-archive" value="${dat-ROOT}/mytourbook-TRANSLATIONS" />
+	<property name="path-language-target-temp" value="${dat-ROOT}/mytourbook-TRANSLATIONS-temp-unzip" />
 
 	<!--
 		DEFAULT target
 	-->
 	<target name="unzip-all-archives">
+
+		<echo message="ant.version: ${ant.version}" />
 
 		<!-- delete temp dir -->
 		<echo message="delete temp dir: ${path-language-target-temp}" />
@@ -32,10 +34,10 @@
 
 		<!-- 
 			German: unzip archive: mt-de.zip 
+		-->
 		<antcall target="unzip-archive-for-one-language">
 			<param name="archive-language" value="de" />
 		</antcall>
-		-->
 
 		<!-- 
 			French: unzip archive: mt-fr.zip 
@@ -43,22 +45,24 @@
 		<antcall target="unzip-archive-for-one-language">
 			<param name="archive-language" value="fr" />
 		</antcall>
- 
+
 		<!-- 
 			Italian: unzip archive: mt-it.zip 
+		-->
 		<antcall target="unzip-archive-for-one-language">
 			<param name="archive-language" value="it" />
 		</antcall>
-		-->
 
 		<!-- 
 			Dutch: unzip archive: mt-nl.zip 
+		-->
 		<antcall target="unzip-archive-for-one-language">
 			<param name="archive-language" value="nl" />
 		</antcall>
+
+		<!-- 
+			delete temp dir 
 		-->
- 
-		<!-- delete temp dir -->
 		<echo message="delete temp dir: ${path-language-target-temp}" />
 		<delete includeemptydirs="true" quiet="true">
 			<fileset dir="${path-language-target-temp}" includes="**/*" />
@@ -69,22 +73,40 @@
 
 	<target name="unzip-archive-for-one-language">
 
+		<property name="archive-file" value="${path-language-archive}/mt-${archive-language}.zip" />
+
+		<!-- check if archive file is available -->
+		<available file="${archive-file}" property="isArchiveAvailable" />
+
+		<antcall target="unzip-archive-for-one-language-filechecked">
+			<param name="archive-language" value="${archive-language}" />
+		</antcall>
+
+
+	</target>
+
+	<target name="unzip-archive-for-one-language-filechecked" if="${isArchiveAvailable}">
+
+		<echo message="Archive ${archive-file} exists" />
+
 		<!--
-		<echo message="expand archive into ${path-language-target}" />
+			<echo message="expand archive into ${path-language-target}" />
 		-->
-		<unzip src="${path-language-archive}/mt-${archive-language}.zip" dest="${path-language-target-temp}">
+
+		<unzip src="${archive-file}" dest="${path-language-target-temp}">
 
 			<patternset>
-				<include name="**/*${archive-language}.properties" /> 
-				<exclude name="**/bin/**/*" /> 
+				<include name="**/*${archive-language}.properties" />
+				<exclude name="**/bin/**/*" />
 			</patternset>
 
 		</unzip>
 
 
 		<!--
-		<echo message="copy language files into the TRUNK projects  />
+			<echo message="copy language files to ${path-language-target}"  />
 		-->
+
 		<copy todir="${path-language-target}" overwrite="true" verbose="true" includeemptydirs="false">
 
 			<fileset dir="${path-language-target-temp}" includes="**/*">
