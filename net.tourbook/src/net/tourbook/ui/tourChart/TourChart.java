@@ -375,13 +375,22 @@ public class TourChart extends Chart {
 
 	/**
 	 * @param isChecked
-	 * @return Returns <code>true</code> when the check state was changed
 	 */
-	public boolean actionXAxisTime(final boolean isChecked) {
+	public void actionXAxisTime(final boolean isChecked) {
 
-		// check if the time axis button was pressed
+		// check if the time axis button was already pressed
 		if (isChecked && _tourChartConfig.isShowTimeOnXAxis) {
-			return false;
+
+			// x-axis already shows time, toggle between tour start time and tour time
+
+			final boolean isShowStartTime = !_tourChartConfig.isShowStartTime;
+
+			_tourChartConfig.isShowStartTime = isShowStartTime;
+			updateTourChart(true);
+
+			setCommandChecked(COMMAND_ID_SHOW_START_TIME, isShowStartTime);
+
+			return;
 		}
 
 		if (isChecked) {
@@ -400,8 +409,6 @@ public class TourChart extends Chart {
 		setCommandChecked(TourChart.COMMAND_ID_X_AXIS_DISTANCE, !isChecked);
 
 		fireXAxisSelection(_tourChartConfig.isShowTimeOnXAxis);
-
-		return true;
 	}
 
 	/**
