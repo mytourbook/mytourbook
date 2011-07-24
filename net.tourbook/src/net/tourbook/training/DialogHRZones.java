@@ -367,7 +367,10 @@ public class DialogHRZones extends TitleAreaDialog {
 			 * text: hr zone name
 			 */
 			final Text txtHRZoneName = _txtZoneName[zoneIndex] = new Text(parent, SWT.SINGLE | SWT.LEAD | SWT.BORDER);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(txtHRZoneName);
+			GridDataFactory.fillDefaults()//
+					.grab(true, false)
+					.align(SWT.FILL, SWT.CENTER)
+					.applyTo(txtHRZoneName);
 			txtHRZoneName.addModifyListener(modifyListener);
 
 			/*
@@ -376,7 +379,10 @@ public class DialogHRZones extends TitleAreaDialog {
 			final Text txtNameShortcut = _txtNameShortcut[zoneIndex] = new Text(parent, SWT.SINGLE
 					| SWT.LEAD
 					| SWT.BORDER);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(txtNameShortcut);
+			GridDataFactory.fillDefaults()//
+					.grab(true, false)
+					.align(SWT.FILL, SWT.CENTER)
+					.applyTo(txtNameShortcut);
 			txtNameShortcut.addModifyListener(modifyListener);
 
 			/*

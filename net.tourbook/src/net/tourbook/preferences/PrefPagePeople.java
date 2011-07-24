@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -148,7 +148,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	}
 	private final boolean				_isOSX						= net.tourbook.util.UI.IS_OSX;
 
-	private int							_spinnerWidth;
+//	private int							_spinnerWidth;
 
 	private SelectionListener			_defaultSelectionListener;
 	private ModifyListener				_defaultModifyListener;
@@ -813,7 +813,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			_spinnerWeight = new Spinner(containerWeight, SWT.BORDER);
 			GridDataFactory.fillDefaults() //
 					.align(SWT.BEGINNING, SWT.FILL)
-					.hint(_spinnerWidth, SWT.DEFAULT)
+//					.hint(_spinnerWidth, SWT.DEFAULT)
 					.applyTo(_spinnerWeight);
 			_spinnerWeight.setDigits(1);
 			_spinnerWeight.setMinimum(0);
@@ -852,7 +852,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			_spinnerHeight = new Spinner(containerHeight, SWT.BORDER);
 			GridDataFactory.fillDefaults()//
 					.align(SWT.BEGINNING, SWT.FILL)
-					.hint(_spinnerWidth, SWT.DEFAULT)
+//					.hint(_spinnerWidth, SWT.DEFAULT)
 					.applyTo(_spinnerHeight);
 			_spinnerHeight.setDigits(2);
 			_spinnerHeight.setMinimum(0);
@@ -922,7 +922,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			_spinnerRestingHR = new Spinner(container, SWT.BORDER);
 			GridDataFactory.fillDefaults() //
 					.align(SWT.BEGINNING, SWT.FILL)
-					.hint(_spinnerWidth, SWT.DEFAULT)
+//					.hint(_spinnerWidth, SWT.DEFAULT)
 					.applyTo(_spinnerRestingHR);
 			_spinnerRestingHR.setMinimum(10);
 			_spinnerRestingHR.setMaximum(200);
@@ -990,7 +990,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			_spinnerMaxHR = new Spinner(container, SWT.BORDER);
 			GridDataFactory.fillDefaults() //
 					.align(SWT.BEGINNING, SWT.FILL)
-					.hint(_spinnerWidth, SWT.DEFAULT)
+//					.hint(_spinnerWidth, SWT.DEFAULT)
 					.applyTo(_spinnerMaxHR);
 			_spinnerMaxHR.setMinimum(10);
 			_spinnerMaxHR.setMaximum(300);
@@ -1085,6 +1085,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		final Point comboSize = label.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 		label.dispose();
 
+		final int comboWidth = (int) (_isOSX ? comboSize.x * 1.3 : comboSize.x);
+
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
 				.indent(0, 20)
@@ -1098,7 +1100,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			 */
 			_cboTemplate = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
 			GridDataFactory.fillDefaults() //
-					.hint(comboSize.x, SWT.DEFAULT)
+					.hint(comboWidth, SWT.DEFAULT)
 					.applyTo(_cboTemplate);
 			_cboTemplate.setToolTipText(Messages.Pref_People_Label_HrZoneTemplate_Tooltip);
 			_cboTemplate.setVisibleItemCount(20);
@@ -1682,7 +1684,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		initializeDialogUnits(parent);
 
 		_pc = new PixelConverter(parent);
-		_spinnerWidth = _pc.convertWidthInCharsToPixels(_isOSX ? 10 : 5);
+//		_spinnerWidth = _pc.convertWidthInCharsToPixels(_isOSX ? 10 : 5);
 
 		_fontItalic = JFaceResources.getFontRegistry().getItalic(JFaceResources.DIALOG_FONT);
 
@@ -2217,7 +2219,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 	/**
 	 * hr max formula
-	 * 
+	 *
 	 * @param hrMaxFormulaKey
 	 * @param maxPulse
 	 */
