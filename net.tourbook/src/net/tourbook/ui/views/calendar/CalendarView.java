@@ -1,6 +1,7 @@
 package net.tourbook.ui.views.calendar;
 
 import java.util.ArrayList;
+import java.util.Formatter;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Activator;
@@ -52,69 +53,6 @@ public class CalendarView extends ViewPart implements ITourProvider {
 																						.getDefault()
 																						.getDialogSettingsSection(
 																								"TourCalendarView");			//$NON-NLS-1$
-	private String								STATE_SELECTED_TOURS			= "SelectedTours";								// $NON-NLS-1$
-
-	private String								STATE_FIRST_DAY					= "FirstDayDisplayed";							// $NON-NLS-1$
-	private String								STATE_NUM_OF_WEEKS				= "NumberOfWeeksDisplayed";					// $NON-NLS-1$
-	private String								STATE_IS_LINKED					= "Linked";									// $NON-NLS-1$
-	private String								STATE_TOUR_SIZE_DYNAMIC			= "TourSizeDynamic";							// $NON-NLS-1$
-	private String								STATE_NUMBER_OF_TOURS_PER_DAY	= "NumberOfToursPerDay";						// $NON-NLS-1$
-	private String								STATE_TOUR_INFO_FORMATER_INDEX	= "TourInfoFormaterIndex";
-	private Action								_forward, _back;
-
-	private Action								_zoomIn, _zoomOut;
-	private Action								_linked;
-	private Action								_today;
-	private Action								_setNavigationStylePhysical, _setNavigationStyleLogical;
-	private Action[]							_setNumberOfToursPerDay;
-	private Action								_setTourSizeDynamic;
-	private Action[]							_setTourInfoFormat;
-
-	private TourInfoFormater[]					_tourInfoFormater = {
-
-		new TourInfoFormater() {
-			@Override
-			public String format(final CalendarTourData data) {
-				if (data.tourTitle != null && data.tourTitle.length() > 1) {
-					return data.tourTitle;
-				} else if (data.tourDescription != null && data.tourDescription.length() > 1) {
-					return data.tourDescription;
-				} else {
-					return "";
-				}
-			}
-			@Override
-			public String getText() {
-				return "Show Title/Description";
-			}
-			@Override
-																					public int index() {
-																						return 0;
-																					}
-		},
-
-		new TourInfoFormater() {
-			@Override
-			public String format(final CalendarTourData data) {
-				if (data.tourDescription != null && data.tourDescription.length() > 1) {
-					return data.tourDescription;
-				} else if (data.tourTitle != null && data.tourTitle.length() > 1) {
-					return data.tourTitle;
-				} else {
-					return "";
-				}
-			}
-			@Override
-			public String getText() {
-				return "Show Description/Title";
-			}
-			@Override
-				public int index() {
-					return 1;
-				}
-		}
-
-	};
 
 	private PageBook							_pageBook;
 
@@ -127,6 +65,166 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	private IPropertyChangeListener				_prefChangeListener;
 	private ITourEventListener					_tourPropertyListener;
 	private CalendarYearMonthContributionItem	_cymci;
+
+	private String								STATE_SELECTED_TOURS			= "SelectedTours";								// $NON-NLS-1$
+
+	private String								STATE_FIRST_DAY					= "FirstDayDisplayed";							// $NON-NLS-1$
+	private String								STATE_NUM_OF_WEEKS				= "NumberOfWeeksDisplayed";					// $NON-NLS-1$
+	private String								STATE_IS_LINKED					= "Linked";									// $NON-NLS-1$
+	private String								STATE_TOUR_SIZE_DYNAMIC			= "TourSizeDynamic";							// $NON-NLS-1$
+	private String								STATE_NUMBER_OF_TOURS_PER_DAY	= "NumberOfToursPerDay";						// $NON-NLS-1$
+	private String								STATE_TOUR_INFO_FORMATTER_INDEX	= "TourInfoFormatterIndex";
+
+	private Action								_forward, _back;
+	private Action								_zoomIn, _zoomOut;
+	private Action								_setLinked;
+	private Action								_gotoToday;
+	private Action								_setNavigationStylePhysical, _setNavigationStyleLogical;
+	private Action[]							_setNumberOfToursPerDay;
+	private Action								_setTourSizeDynamic;
+	private Action[]							_setTourInfoFormat;
+
+	private TourInfoFormatter[]					_tourInfoFormatter				= {
+
+																				// fool stupid autoformater
+
+			new TourInfoFormatter() {
+				@Override
+				public String format(final CalendarTourData data) {
+					if (data.tourTitle != null && data.tourTitle.length() > 1) {
+						return data.tourTitle;
+					} else if (data.tourDescription != null && data.tourDescription.length() > 1) {
+						return data.tourDescription;
+					} else {
+						return "";
+					}
+				}
+
+				@Override
+				public String getText() {
+					return "Show Title/Description";
+				}
+			},
+
+			new TourInfoFormatter() {
+				@Override
+				public String format(final CalendarTourData data) {
+					if (data.tourDescription != null && data.tourDescription.length() > 1) {
+						return data.tourDescription;
+					} else if (data.tourTitle != null && data.tourTitle.length() > 1) {
+						return data.tourTitle;
+					} else {
+						return "";
+					}
+				}
+
+				@Override
+				public String getText() {
+					return "Show Description/Title";
+				}
+			},
+
+			new TourInfoFormatter() {
+				@Override
+				public String format(final CalendarTourData data) {
+					final float distance = (float) (data.distance / 1000.0);
+					final int time = data.recordingTime;
+					return new Formatter()
+							.format("%5.2fkm - %d:%02dh", distance, time / 3600, (time % 3600) / 60)
+							.toString();
+				}
+
+				@Override
+				public String getText() {
+					return "Show distance and time";
+				}
+			},
+
+			new TourInfoFormatter() {
+				@Override
+				public String format(final CalendarTourData data) {
+					final float distance = data.distance;
+					final int time = data.recordingTime;
+					return new Formatter().format(
+							"%5.2fkm - %4.1fkm/h",
+							distance / 1000.0f,
+							distance == 0 ? 0 : distance / (time / 3.6f))
+							.toString();
+				}
+
+				@Override
+				public String getText() {
+					return "Show distance and speed";
+				}
+			},
+
+			new TourInfoFormatter() {
+				@Override
+				public String format(final CalendarTourData data) {
+					final int pace = (data.distance == 0 ? 0 : (1000 * data.recordingTime / data.distance));
+					final float distance = data.distance / 1000.0f;
+					return new Formatter().format("%5.2fkm - %d:%02dmin/km", distance, pace / 60, pace % 60)
+							.toString();
+				}
+
+				@Override
+				public String getText() {
+					return "Show distance and pace";
+				}
+			},
+
+			new TourInfoFormatter() {
+				@Override
+				public String format(final CalendarTourData data) {
+					final int time = data.recordingTime;
+					final float distance = data.distance / 1000.0f;
+					return new Formatter()
+							.format("%d:%02dh - %5.2fkm", time / 3600, (time % 3600) / 60, distance)
+							.toString();
+				}
+
+				@Override
+				public String getText() {
+					return "Show time and distace";
+				}
+			},
+
+			new TourInfoFormatter() {
+				@Override
+				public String format(final CalendarTourData data) {
+					final int time = data.recordingTime;
+					return new Formatter().format(
+							"%d:%02dh - %4.1fkm/h",
+							time / 3600,
+							(time % 3600) / 60,
+							data.distance == 0 ? 0 : data.distance / (time / 3.6f)).toString();
+				}
+
+				@Override
+				public String getText() {
+					return "Show time and speed";
+				}
+			},
+
+			new TourInfoFormatter() {
+				@Override
+				public String format(final CalendarTourData data) {
+					final int pace = (data.distance == 0 ? 0 : (1000 * data.recordingTime / data.distance));
+					return new Formatter().format(
+							"%d:%02dh - %d:%02dmin/km",
+							data.recordingTime / 3600,
+							(data.recordingTime % 3600) / 60,
+							pace / 60,
+							pace % 60).toString();
+				}
+
+				@Override
+				public String getText() {
+					return "Show time and pace";
+				}
+			}
+
+																				};
 
 	class NumberOfToursPerDayAction extends Action {
 
@@ -159,30 +257,32 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	}
 
 	class TourInfoFormatAction extends Action {
-		
-		TourInfoFormater formater;
-		
-		TourInfoFormatAction(final String text, final int style, final TourInfoFormater formater) {
 
-			super(text,style);
-			this.formater = formater;
+		TourInfoFormatter	formatter;
+
+		TourInfoFormatAction(final String text, final int style, final TourInfoFormatter formatter) {
+
+			super(text, style);
+			this.formatter = formatter;
 		}
-		
+
 		@Override
-		public  void run() {
-			_calendarGraph.setTourInfoFormater(formater);
-			for (int i = 0; i < _tourInfoFormater.length; i++) {
-				_setTourInfoFormat[i].setChecked(i == formater.index());
+		public void run() {
+			_calendarGraph.setTourInfoFormatter(formatter);
+			for (int i = 0; i < _tourInfoFormatter.length; i++) {
+				_setTourInfoFormat[i].setChecked(i == formatter.index);
 			}
 		}
 	}
 
-	abstract class TourInfoFormater {
+	abstract class TourInfoFormatter {
+		int	index;
+
 		abstract String format(CalendarTourData data);
+
 		abstract String getText();
-		abstract int index();
 	}
-	
+
 	public CalendarView() {}
 
 	private void addPartListener() {
@@ -386,18 +486,18 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		manager.add(new Separator());
 		// manager.add(_back);
 		// manager.add(_forward);
-		manager.add(_today);
+		manager.add(_gotoToday);
 		manager.add(new Separator());
 		manager.add(_zoomIn);
 		manager.add(_zoomOut);
 		manager.add(new Separator());
-		manager.add(_linked);
+		manager.add(_setLinked);
 	}
 
 	private ArrayList<Action> getLocalActions() {
 		final ArrayList<Action> localActions = new ArrayList<Action>();
 		localActions.add(_back);
-		localActions.add(_today);
+		localActions.add(_gotoToday);
 		localActions.add(_forward);
 		return localActions;
 
@@ -460,24 +560,24 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		_zoomIn.setToolTipText("Show less weeks");
 		_zoomIn.setImageDescriptor(Activator.imageDescriptorFromPlugin("net.tourbook", "icons/zoom-in.gif"));
 
-		_linked = new Action(null, org.eclipse.jface.action.Action.AS_CHECK_BOX) {
+		_setLinked = new Action(null, org.eclipse.jface.action.Action.AS_CHECK_BOX) {
 			@Override
 			public void run() {
-				_calendarGraph.setLinked(_linked.isChecked());
+				_calendarGraph.setLinked(_setLinked.isChecked());
 			}
 		};
-		_linked.setText("Link with other views");
-		_linked.setImageDescriptor(Activator.imageDescriptorFromPlugin("net.tourbook", "icons/synced.gif"));
-		_linked.setChecked(true);
+		_setLinked.setText("Link with other views");
+		_setLinked.setImageDescriptor(Activator.imageDescriptorFromPlugin("net.tourbook", "icons/synced.gif"));
+		_setLinked.setChecked(true);
 
-		_today = new Action() {
+		_gotoToday = new Action() {
 			@Override
 			public void run() {
 				_calendarGraph.gotoToday();
 			}
 		};
-		_today.setText("Go to today");
-		_today.setImageDescriptor(Activator.imageDescriptorFromPlugin("net.tourbook", "icons/zoom-centered.png"));
+		_gotoToday.setText("Go to today");
+		_gotoToday.setImageDescriptor(Activator.imageDescriptorFromPlugin("net.tourbook", "icons/zoom-centered.png"));
 
 		_setNavigationStylePhysical = new Action(null, org.eclipse.jface.action.Action.AS_RADIO_BUTTON) {
 			@Override
@@ -498,7 +598,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		};
 		_setNavigationStyleLogical.setText("Logical arrow key navigation");
 		_setNavigationStyleLogical.setChecked(false);
-		
+
 		_setNumberOfToursPerDay = new Action[5];
 		for (int i = 0; i < 5; i++) {
 			_setNumberOfToursPerDay[i] = new NumberOfToursPerDayAction(
@@ -506,7 +606,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 					org.eclipse.jface.action.Action.AS_RADIO_BUTTON,
 					i);
 		}
-		
+
 		_setTourSizeDynamic = new Action(null, org.eclipse.jface.action.Action.AS_CHECK_BOX) {
 			@Override
 			public void run() {
@@ -514,14 +614,15 @@ public class CalendarView extends ViewPart implements ITourProvider {
 			}
 		};
 		_setTourSizeDynamic.setText("Resize tours if more than default number");
-		
-		_setTourInfoFormat = new Action[_tourInfoFormater.length];
-		for (int i = 0; i < _tourInfoFormater.length; i++) {
-			if (null != _tourInfoFormater[i]) {
+
+		_setTourInfoFormat = new Action[_tourInfoFormatter.length];
+		for (int i = 0; i < _tourInfoFormatter.length; i++) {
+			_tourInfoFormatter[i].index = i;
+			if (null != _tourInfoFormatter[i]) {
 				_setTourInfoFormat[i] = new TourInfoFormatAction(
-						_tourInfoFormater[i].getText(),
+						_tourInfoFormatter[i].getText(),
 						org.eclipse.jface.action.Action.AS_CHECK_BOX,
-						_tourInfoFormater[i]);
+						_tourInfoFormatter[i]);
 			}
 		}
 	}
@@ -533,7 +634,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 			final Long newTourId = ((SelectionTourId) selection).getTourId();
 			final Long oldTourId = _calendarGraph.getSelectedTour();
 			if (newTourId != oldTourId) {
-				if (_linked.isChecked()) {
+				if (_setLinked.isChecked()) {
 					_calendarGraph.gotoTourId(newTourId);
 				} else {
 					_calendarGraph.removeSelection();
@@ -575,7 +676,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 //			}
 //		}
 
-		_linked.setChecked(Util.getStateBoolean(_state, STATE_IS_LINKED, true));
+		_setLinked.setChecked(Util.getStateBoolean(_state, STATE_IS_LINKED, true));
 
 		_setTourSizeDynamic.setChecked(Util.getStateBoolean(_state, STATE_TOUR_SIZE_DYNAMIC, true));
 
@@ -584,8 +685,8 @@ public class CalendarView extends ViewPart implements ITourProvider {
 			_setNumberOfToursPerDay[numberOfTours].run();
 		}
 
-		final int tourInfoFormaterIndex = Util.getStateInt(_state, STATE_TOUR_INFO_FORMATER_INDEX, 0);
-		_setTourInfoFormat[tourInfoFormaterIndex].run();
+		final int tourInfoFormatterIndex = Util.getStateInt(_state, STATE_TOUR_INFO_FORMATTER_INDEX, 0);
+		_setTourInfoFormat[tourInfoFormatterIndex].run();
 
 	}
 
@@ -605,12 +706,12 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		// until now we only implement single tour selection
 		_state.put(STATE_SELECTED_TOURS, _calendarGraph.getSelectedTour());
 
-		_state.put(STATE_IS_LINKED, _linked.isChecked());
+		_state.put(STATE_IS_LINKED, _setLinked.isChecked());
 		_state.put(STATE_TOUR_SIZE_DYNAMIC, _setTourSizeDynamic.isChecked());
 
 		_state.put(STATE_NUMBER_OF_TOURS_PER_DAY, _calendarGraph.getNumberOfToursPerDay());
 
-		_state.put(STATE_TOUR_INFO_FORMATER_INDEX, _calendarGraph.getTourInfoFormaterIndex());
+		_state.put(STATE_TOUR_INFO_FORMATTER_INDEX, _calendarGraph.getTourInfoFormatterIndex());
 	}
 
 	/**

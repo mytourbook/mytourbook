@@ -7,7 +7,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.ui.views.calendar.CalendarView.TourInfoFormater;
+import net.tourbook.ui.views.calendar.CalendarView.TourInfoFormatter;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -100,7 +100,7 @@ public class CalendarGraph extends Canvas {
 	final static private long					_WEEK_MILLIS			= (1000 * 60 * 60 * 24 * 7);
 	final static private int					_MIN_SCROLLABLE_WEEKS	= 12;
 
-	private TourInfoFormater					_tourInfoFormater;
+	private TourInfoFormatter					_tourInfoFormatter;
 
 	private class Day {
 
@@ -367,7 +367,7 @@ public class CalendarGraph extends Canvas {
 
 	private void drawCalendar(GC gc) {
 
-		final int dayLabelXOffset = 4;
+		final int dayLabelXOffset = 1;
 
 		final int XX = getSize().x;
 		final int YY = getSize().y;
@@ -639,11 +639,10 @@ public class CalendarGraph extends Canvas {
 		gc.setForeground(lineColor);
 		gc.drawRectangle(rec.x + 1, rec.y + 1, rec.width - 2, rec.height - 2);
 
-		String title = data.tourTitle;
+		final String info = _tourInfoFormatter.format(data);
 		gc.setForeground(_black);
-		title = title == null ? "No Title" : title;
 		gc.setClipping(rec.x + 2, rec.y, rec.width - 4, rec.height - 2);
-		gc.drawText(title, rec.x + 3, rec.y + 1, true);
+		gc.drawText(info, rec.x + 3, rec.y + 1, true);
 		gc.setClipping(_nullRec);
 	}
 
@@ -681,9 +680,7 @@ public class CalendarGraph extends Canvas {
 		gc.setForeground(new Color(_display, _rgbDark.get(data.typeColorIndex)));
 		gc.fillGradientRectangle(r.x + 1, r.y + 1, r.width - 1, r.height - 1, false);
 
-		// String title = data.tourTitle;
-		// title = title == null ? "No Title" : title;
-		final String info = _tourInfoFormater.format(data);
+		final String info = _tourInfoFormatter.format(data);
 		// gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_GRAY));
 		gc.setForeground(lineColor);
 		// gc.setForeground(_black);
@@ -745,8 +742,8 @@ public class CalendarGraph extends Canvas {
 		}
 	}
 
-	public int getTourInfoFormaterIndex() {
-		return _tourInfoFormater.index();
+	public int getTourInfoFormatterIndex() {
+		return _tourInfoFormatter.index;
 	}
 
 	public int getZoom() {
@@ -1000,11 +997,10 @@ public class CalendarGraph extends Canvas {
 		gc.fillGradientRectangle(rec.x - 4, rec.y - 4, rec.width + 9, rec.height + 9, false);
 		gc.setForeground(new Color(_display, _rgbLine.get(data.typeColorIndex)));
 		gc.drawRoundRectangle(rec.x - 5, rec.y - 5, rec.width + 10, rec.height + 10, 6, 6);
-		String title = data.tourTitle;
 		gc.setForeground(_black);
-		title = title == null ? "No Title" : title;
 		gc.setClipping(rec.x + 2, rec.y, rec.width - 4, rec.height - 2);
-		gc.drawText(title, rec.x + 3, rec.y + 1, true);
+		final String info = _tourInfoFormatter.format(data);
+		gc.drawText(info, rec.x + 3, rec.y + 1, true);
 		gc.setClipping(_nullRec);
 	}
 
@@ -1265,8 +1261,8 @@ public class CalendarGraph extends Canvas {
 		redraw();
 	}
 
-	public void setTourInfoFormater(final TourInfoFormater formater) {
-		_tourInfoFormater = formater;
+	public void setTourInfoFormatter(final TourInfoFormatter formatter) {
+		_tourInfoFormatter = formatter;
 		_graphClean = false;
 		redraw();
 	}
