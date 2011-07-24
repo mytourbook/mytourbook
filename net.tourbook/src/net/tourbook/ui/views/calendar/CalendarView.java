@@ -13,7 +13,6 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.views.calendar.CalendarGraph.NavigationStyle;
-import net.tourbook.ui.views.calendar.CalendarGraph.Type;
 import net.tourbook.util.SelectionProvider;
 import net.tourbook.util.Util;
 
@@ -39,46 +38,76 @@ import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 import org.joda.time.DateTime;
 
-public class CalendarView extends ViewPart implements ITourProvider{
+public class CalendarView extends ViewPart implements ITourProvider {
 
 	/**
 	 * The ID of the view as specified by the extension.
 	 */
-	public static final String					ID					= "net.tourbook.views.calendar.CalendarView";
-	private final IPreferenceStore				_prefStore			= TourbookPlugin.getDefault().getPreferenceStore();
-	private final IDialogSettings				_state				= TourbookPlugin
-																			.getDefault()
-																			.getDialogSettingsSection(
-																					"TourCalendarView");				//$NON-NLS-1$
+	public static final String					ID								= "net.tourbook.views.calendar.CalendarView";
 
-	private String								STATE_SELECTED_TOURS	= "SelectedTours";								// $NON-NLS-1$
-	private String								STATE_FIRST_DAY			= "FirstDayDisplayed";							// $NON-NLS-1$
-	private String								STATE_NUM_OF_WEEKS		= "NumberOfWeeksDisplayed";					// $NON-NLS-1$
-	private String								STATE_IS_LINKED			= "Linked";									// $NON-NLS-1$
+	private final IPreferenceStore				_prefStore						= TourbookPlugin
+																						.getDefault()
+																						.getPreferenceStore();
+	private final IDialogSettings				_state							= TourbookPlugin
+																						.getDefault()
+																						.getDialogSettingsSection(
+																								"TourCalendarView");			//$NON-NLS-1$
+	private String								STATE_SELECTED_TOURS			= "SelectedTours";								// $NON-NLS-1$
 
+	private String								STATE_FIRST_DAY					= "FirstDayDisplayed";							// $NON-NLS-1$
+	private String								STATE_NUM_OF_WEEKS				= "NumberOfWeeksDisplayed";					// $NON-NLS-1$
+	private String								STATE_IS_LINKED					= "Linked";									// $NON-NLS-1$
+	private String								STATE_TOUR_SIZE_DYNAMIC			= "TourSizeDynamic";							// $NON-NLS-1$
+	private String								STATE_NUMBER_OF_TOURS_PER_DAY	= "NumberOfToursPerDay";						// $NON-NLS-1$
 	private Action								_forward, _back;
+
 	private Action								_zoomIn, _zoomOut;
 	private Action								_linked;
 	private Action								_today;
 	private Action								_setNavigationStylePhysical, _setNavigationStyleLogical;
-	private Action								_setNumberOfToursPerDay0;
-	private Action								_setNumberOfToursPerDay1;
-	private Action								_setNumberOfToursPerDay2;
-	private Action								_setNumberOfToursPerDay3;
-	private Action								_setNumberOfToursPerDay4;
+	private Action[]							_setNumberOfToursPerDay;
 	private Action								_setTourSizeDynamic;
-
 	private PageBook							_pageBook;
+
 	private CalendarComponents					_calendarComponents;
 	private CalendarGraph						_calendarGraph;
-
 	private ISelectionProvider					_selectionProvider;
+
 	private ISelectionListener					_selectionListener;
 	private IPartListener2						_partListener;
 	private IPropertyChangeListener				_prefChangeListener;
 	private ITourEventListener					_tourPropertyListener;
-
 	private CalendarYearMonthContributionItem	_cymci;
+
+	class NumberOfToursPerDayAction extends Action {
+	
+		private int	numberOfTours;
+		
+		NumberOfToursPerDayAction(final String text, final int style, final int numberOfTours) {
+
+			super(text,style);
+
+			this.numberOfTours = numberOfTours;
+			if (0 == numberOfTours) {
+				setText("Display all tours max. size");
+			} else if (1 == numberOfTours) {
+				setText("Display 1 tour per day");
+			} else {
+				setText("Display " + numberOfTours + " tours per day");
+			}
+		}
+		
+		@Override
+		public void run() {
+			_calendarGraph.setNumberOfToursPerDay(numberOfTours);
+			for (int j = 0; j < 5; j++) {
+				_setNumberOfToursPerDay[j].setChecked((j == numberOfTours));
+			}
+			if (null != _setTourSizeDynamic) {
+				_setTourSizeDynamic.setEnabled(numberOfTours != 0);
+			}
+		};
+	}
 
 	public CalendarView() {}
 
@@ -177,9 +206,9 @@ public class CalendarView extends ViewPart implements ITourProvider{
 		_calendarGraph.addSelectionProvider(new ICalendarSelectionProvider() {
 
 			@Override
-			public void selectionChanged(final Type type, final long id) {
-				if (type == Type.TOUR) {
-					_selectionProvider.setSelection(new SelectionTourId(id));
+			public void selectionChanged(final CalendarGraph.Selection selection) {
+				if (selection.isTour()) {
+					_selectionProvider.setSelection(new SelectionTourId(selection.id));
 				}
 			}
 
@@ -208,7 +237,7 @@ public class CalendarView extends ViewPart implements ITourProvider{
 		};
 		TourManager.getInstance().addTourEventListener(_tourPropertyListener);
 	}
-	
+
 	private void contributeToActionBars() {
 		final IActionBars bars = getViewSite().getActionBars();
 		fillLocalPullDown(bars.getMenuManager());
@@ -217,7 +246,7 @@ public class CalendarView extends ViewPart implements ITourProvider{
 
 	@Override
 	public void createPartControl(final Composite parent) {
-		
+
 		addPartListener();
 		addPrefListener();
 		addTourEventListener();
@@ -243,12 +272,13 @@ public class CalendarView extends ViewPart implements ITourProvider{
 	}
 
 	private void createUI(final Composite parent) {
-		
+
 		_pageBook = new PageBook(parent, SWT.NONE);
 		_calendarComponents = new CalendarComponents(_pageBook, SWT.NORMAL);
 		_calendarGraph = _calendarComponents.getGraph();
 		_pageBook.showPage(_calendarComponents);
 	}
+
 	@Override
 	public void dispose() {
 
@@ -263,11 +293,9 @@ public class CalendarView extends ViewPart implements ITourProvider{
 		manager.add(_setNavigationStylePhysical);
 		manager.add(_setNavigationStyleLogical);
 		manager.add(new Separator());
-		manager.add(_setNumberOfToursPerDay0);
-		manager.add(_setNumberOfToursPerDay1);
-		manager.add(_setNumberOfToursPerDay2);
-		manager.add(_setNumberOfToursPerDay3);
-		manager.add(_setNumberOfToursPerDay4);
+		for (final Action element : _setNumberOfToursPerDay) {
+			manager.add(element);
+		}
 		manager.add(new Separator());
 		manager.add(_setTourSizeDynamic);
 
@@ -288,19 +316,21 @@ public class CalendarView extends ViewPart implements ITourProvider{
 		manager.add(_linked);
 	}
 
-	private ArrayList<Action> getLocalActions () {
+	private ArrayList<Action> getLocalActions() {
 		final ArrayList<Action> localActions = new ArrayList<Action>();
 		localActions.add(_back);
 		localActions.add(_today);
 		localActions.add(_forward);
 		return localActions;
 
-	}@Override
+	}
+
+	@Override
 	public ArrayList<TourData> getSelectedTours() {
-		
+
 		final ArrayList<TourData> selectedTourData = new ArrayList<TourData>();
 		final ArrayList<Long> tourIdSet = new ArrayList<Long>();
-		tourIdSet.add(_calendarGraph.getSelectionTourId());
+		tourIdSet.add(_calendarGraph.getSelectedTour());
 		for (final Long tourId : tourIdSet) {
 			if (tourId > 0) { // < 0 means not selected
 				selectedTourData.add(TourManager.getInstance().getTourData(tourId));
@@ -308,7 +338,7 @@ public class CalendarView extends ViewPart implements ITourProvider{
 		}
 		return selectedTourData;
 	}
-			
+
 	private void makeActions() {
 
 		_back = new Action() {
@@ -390,70 +420,22 @@ public class CalendarView extends ViewPart implements ITourProvider{
 		};
 		_setNavigationStyleLogical.setText("Logical arrow key navigation");
 		_setNavigationStyleLogical.setChecked(false);
-
-		_setNumberOfToursPerDay0 = new Action(null, org.eclipse.jface.action.Action.AS_RADIO_BUTTON) {
-			@Override
-			public void run() {
-				_calendarGraph.setNumberOfToursPerDay(0);
-				_setNumberOfToursPerDay1.setChecked(false);
-				_setNumberOfToursPerDay2.setChecked(false);
-				_setNumberOfToursPerDay3.setChecked(false);
-				_setNumberOfToursPerDay4.setChecked(false);
-			}
-		};
-		_setNumberOfToursPerDay0.setText("All exercises max. size");
-		_setNumberOfToursPerDay1 = new Action(null, org.eclipse.jface.action.Action.AS_RADIO_BUTTON) {
-			@Override
-			public void run() {
-				_calendarGraph.setNumberOfToursPerDay(1);
-				_setNumberOfToursPerDay0.setChecked(false);
-				_setNumberOfToursPerDay2.setChecked(false);
-				_setNumberOfToursPerDay3.setChecked(false);
-				_setNumberOfToursPerDay4.setChecked(false);
-			}
-		};
-		_setNumberOfToursPerDay1.setText("Default 1 exercise per day");
-		_setNumberOfToursPerDay2 = new Action(null, org.eclipse.jface.action.Action.AS_RADIO_BUTTON) {
-			@Override
-			public void run() {
-				_calendarGraph.setNumberOfToursPerDay(2);
-				_setNumberOfToursPerDay0.setChecked(false);
-				_setNumberOfToursPerDay1.setChecked(false);
-				_setNumberOfToursPerDay3.setChecked(false);
-				_setNumberOfToursPerDay4.setChecked(false);
-			}
-		};
-		_setNumberOfToursPerDay2.setText("Default 2 exercises per day");
-		_setNumberOfToursPerDay3 = new Action(null, org.eclipse.jface.action.Action.AS_RADIO_BUTTON) {
-			@Override
-			public void run() {
-				_calendarGraph.setNumberOfToursPerDay(3);
-				_setNumberOfToursPerDay0.setChecked(false);
-				_setNumberOfToursPerDay1.setChecked(false);
-				_setNumberOfToursPerDay2.setChecked(false);
-				_setNumberOfToursPerDay4.setChecked(false);
-			}
-		};
-		_setNumberOfToursPerDay3.setText("Default 3 exercises per day");
-		_setNumberOfToursPerDay4 = new Action(null, org.eclipse.jface.action.Action.AS_RADIO_BUTTON) {
-			@Override
-			public void run() {
-				_calendarGraph.setNumberOfToursPerDay(4);
-				_setNumberOfToursPerDay0.setChecked(false);
-				_setNumberOfToursPerDay1.setChecked(false);
-				_setNumberOfToursPerDay2.setChecked(false);
-				_setNumberOfToursPerDay3.setChecked(false);
-			}
-		};
-		_setNumberOfToursPerDay4.setText("Default 4 exercises per day");
-
+		
+		_setNumberOfToursPerDay = new Action[5];
+		for (int i = 0; i < 5; i++) {
+			_setNumberOfToursPerDay[i] = new NumberOfToursPerDayAction(
+					null,
+					org.eclipse.jface.action.Action.AS_RADIO_BUTTON,
+					i);
+		}
+		
 		_setTourSizeDynamic = new Action(null, org.eclipse.jface.action.Action.AS_CHECK_BOX) {
 			@Override
 			public void run() {
 				_calendarGraph.setTourFieldSizeDynamic(this.isChecked());
 			}
 		};
-		_setTourSizeDynamic.setText("Resize exersizes if more than default number");
+		_setTourSizeDynamic.setText("Resize tours if more than default number");
 
 	}
 
@@ -462,7 +444,7 @@ public class CalendarView extends ViewPart implements ITourProvider{
 		// show and select the selected tour
 		if (selection instanceof SelectionTourId) {
 			final Long newTourId = ((SelectionTourId) selection).getTourId();
-			final Long oldTourId = _calendarGraph.getSelectionTourId();
+			final Long oldTourId = _calendarGraph.getSelectedTour();
 			if (newTourId != oldTourId) {
 				if (_linked.isChecked()) {
 					_calendarGraph.gotoTourId(newTourId);
@@ -480,7 +462,7 @@ public class CalendarView extends ViewPart implements ITourProvider{
 			_calendarGraph.refreshCalendar();
 		}
 	}
-	
+
 	private void restoreState() {
 
 		final int numWeeksDisplayed = Util.getStateInt(_state, STATE_NUM_OF_WEEKS, 5);
@@ -489,7 +471,7 @@ public class CalendarView extends ViewPart implements ITourProvider{
 		final Long dateTimeMillis = Util.getStateLong(_state, STATE_FIRST_DAY, (new DateTime()).getMillis());
 		final DateTime firstDate = new DateTime(dateTimeMillis);
 		_calendarGraph.setFirstDay(firstDate);
-		
+
 		final Long selectedTourId = Util.getStateLong(_state, STATE_SELECTED_TOURS, new Long(-1));
 		_calendarGraph.setSelectionTourId(selectedTourId);
 
@@ -508,6 +490,13 @@ public class CalendarView extends ViewPart implements ITourProvider{
 
 		_linked.setChecked(Util.getStateBoolean(_state, STATE_IS_LINKED, true));
 
+		_setTourSizeDynamic.setChecked(Util.getStateBoolean(_state, STATE_TOUR_SIZE_DYNAMIC, true));
+
+		final int numberOfTours = Util.getStateInt(_state, STATE_NUMBER_OF_TOURS_PER_DAY, 3);
+		if (numberOfTours < _setNumberOfToursPerDay.length) {
+			_setNumberOfToursPerDay[numberOfTours].run();
+		}
+
 	}
 
 	private void saveState() {
@@ -517,16 +506,19 @@ public class CalendarView extends ViewPart implements ITourProvider{
 
 		// save number of weeks displayed
 		_state.put(STATE_NUM_OF_WEEKS, _calendarGraph.getZoom());
-		
+
 		// convert tour id's into string
 		// final ArrayList<String> selectedTourIds = new ArrayList<String>();
 		// for (final Long tourId : _selectedTourIds) {
 		// 	selectedTourIds.add(tourId.toString());
 		// }
 		// until now we only implement single tour selection
-		_state.put(STATE_SELECTED_TOURS, _calendarGraph.getSelectionTourId());
+		_state.put(STATE_SELECTED_TOURS, _calendarGraph.getSelectedTour());
 
 		_state.put(STATE_IS_LINKED, _linked.isChecked());
+		_state.put(STATE_TOUR_SIZE_DYNAMIC, _setTourSizeDynamic.isChecked());
+
+		_state.put(STATE_NUMBER_OF_TOURS_PER_DAY, _calendarGraph.getNumberOfToursPerDay());
 
 	}
 
