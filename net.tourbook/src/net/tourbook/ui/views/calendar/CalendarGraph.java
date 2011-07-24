@@ -7,6 +7,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.ui.views.calendar.CalendarView.TourInfoFormater;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -98,6 +99,8 @@ public class CalendarGraph extends Canvas {
 
 	final static private long					_WEEK_MILLIS			= (1000 * 60 * 60 * 24 * 7);
 	final static private int					_MIN_SCROLLABLE_WEEKS	= 12;
+
+	private TourInfoFormater					_tourInfoFormater;
 
 	private class Day {
 
@@ -565,22 +568,11 @@ public class CalendarGraph extends Canvas {
 			}
 			final Rectangle tour = new Rectangle(rec.x + 1, rec.y + rec.height - (i + 1) * ddy, (rec.width - 2), ddy - 1);
 			final Rectangle focus = new Rectangle(tour.x - 1, tour.y - 1, tour.width + 2, tour.height + 2);
+
 			_tourFocus.add(new ObjectLocation(focus, data[i].tourId, data[i]));
-			// TODO create each color only once (private array) and dispose
-			gc.setBackground(new Color(_display, _rgbBright.get(data[i].typeColorIndex)));
-			gc.setForeground(new Color(_display, _rgbDark.get(data[i].typeColorIndex)));
-			gc.fillGradientRectangle(tour.x + 1, tour.y + 1, tour.width - 1, tour.height - 1, false);
-			final Color lineColor = new Color(_display, _rgbLine.get(data[i].typeColorIndex));
-			gc.setForeground(lineColor);
-			gc.drawRectangle(tour);
-			String title = data[i].tourTitle;
-			title = title == null ? "No Title" : title;
-			// gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_GRAY));
-			gc.setForeground(lineColor);
-			// gc.setForeground(_black);
-			gc.setClipping(focus.x + 2, focus.y, focus.width - 4, focus.height - 2);
-			gc.drawText(title, tour.x + 2, tour.y, true);
-			gc.setClipping(_nullRec);
+
+			drawTourInfo(gc, tour, data[i]);
+
 		}
 
 	}
@@ -614,6 +606,7 @@ public class CalendarGraph extends Canvas {
 	}
 
 	private void drawSelectedDay (final GC gc, final Rectangle r) {
+
 		// gc.setAlpha(0xd0); // like statistics
 		//	gc.setAlpha(0xa0);
 		gc.setBackground(_blue);
@@ -624,6 +617,7 @@ public class CalendarGraph extends Canvas {
 		gc.setLineWidth(4);
 		gc.drawRoundRectangle(r.x - 2, r.y - 2, r.width + 5, r.height + 5, 6, 6);
 		gc.setLineWidth(oldLw);
+
 	}
 
 	// TODO review
@@ -674,6 +668,28 @@ public class CalendarGraph extends Canvas {
 				return;
 			}
 		}
+	}
+
+	private void drawTourInfo(final GC gc, final Rectangle r, final CalendarTourData data) {
+		
+		// TODO create each color only once (private array) and dispose
+		final Color lineColor = new Color(_display, _rgbLine.get(data.typeColorIndex));
+		gc.setForeground(lineColor);
+
+		gc.drawRectangle(r);
+		gc.setBackground(new Color(_display, _rgbBright.get(data.typeColorIndex)));
+		gc.setForeground(new Color(_display, _rgbDark.get(data.typeColorIndex)));
+		gc.fillGradientRectangle(r.x + 1, r.y + 1, r.width - 1, r.height - 1, false);
+
+		// String title = data.tourTitle;
+		// title = title == null ? "No Title" : title;
+		final String info = _tourInfoFormater.format(data);
+		// gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_GRAY));
+		gc.setForeground(lineColor);
+		// gc.setForeground(_black);
+		gc.setClipping(r.x + 1, r.y, r.width - 2, r.height);
+		gc.drawText(info, r.x + 2, r.y, true);
+		gc.setClipping(_nullRec);
 	}
 
 	void fireSelectionEvent(final Selection selection) {
@@ -727,6 +743,10 @@ public class CalendarGraph extends Canvas {
 		} else {
 			return _noItem.id;
 		}
+	}
+
+	public int getTourInfoFormaterIndex() {
+		return _tourInfoFormater.index();
 	}
 
 	public int getZoom() {
@@ -884,17 +904,19 @@ public class CalendarGraph extends Canvas {
 			}
 			index++;
 		}
-		if (null == ctd) {
-			return;
-		}
-		index += direction;
-		for (int i = index; i >= 0 && i < _tourFocus.size(); i += direction) {
-			final ObjectLocation ol = _tourFocus.get(i);
-			if (ctd.dayOfWeek != ((CalendarTourData) (ol.o)).dayOfWeek) {
-				_selectedItem.id = ol.id;
-				redraw();
-				return;
+		if (null != ctd) {
+			index += direction;
+			for (int i = index; i >= 0 && i < _tourFocus.size(); i += direction) {
+				final ObjectLocation ol = _tourFocus.get(i);
+				if (ctd.dayOfWeek != ((CalendarTourData) (ol.o)).dayOfWeek) {
+					_selectedItem.id = ol.id;
+					redraw();
+					return;
+				}
 			}
+		} else {
+			// selected Item is not on the screen any more
+			_selectedItem = _noItem;
 		}
 
 		if (direction < 0) {
@@ -905,6 +927,8 @@ public class CalendarGraph extends Canvas {
 
 	}
 
+	// TODO: remember last weekday and start selecting this weekday and not the first with a tour
+	// as its currently done if selection disappeared from screen
 	private void gotoTourSameWeekday(final int direction) {
 
 		if (_tourFocus.size() < 1) {
@@ -935,17 +959,19 @@ public class CalendarGraph extends Canvas {
 			}
 			index++;
 		}
-		if (null == ctd) {
-			return;
-		}
-		index += direction;
-		for (int i = index; i >= 0 && i < _tourFocus.size(); i += direction) {
-			final ObjectLocation ol = _tourFocus.get(i);
-			if (ctd.dayOfWeek == ((CalendarTourData) (ol.o)).dayOfWeek) {
-				_selectedItem = new Selection(ol.id, SelectionType.TOUR);
-				redraw();
-				return;
+		if (null != ctd) {
+			index += direction;
+			for (int i = index; i >= 0 && i < _tourFocus.size(); i += direction) {
+				final ObjectLocation ol = _tourFocus.get(i);
+				if (ctd.dayOfWeek == ((CalendarTourData) (ol.o)).dayOfWeek) {
+					_selectedItem = new Selection(ol.id, SelectionType.TOUR);
+					redraw();
+					return;
+				}
 			}
+		} else {
+			// selected Item is not on the screen any more
+			_selectedItem = _noItem;
 		}
 
 		if (direction < 0) {
@@ -1236,6 +1262,12 @@ public class CalendarGraph extends Canvas {
 	void setTourFieldSizeDynamic(final boolean dynamicTourFieldSize) {
 		_graphClean = false;
 		_dynamicTourFieldSize = dynamicTourFieldSize;
+		redraw();
+	}
+
+	public void setTourInfoFormater(final TourInfoFormater formater) {
+		_tourInfoFormater = formater;
+		_graphClean = false;
 		redraw();
 	}
 
