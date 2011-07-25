@@ -7,6 +7,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.ui.UI;
 import net.tourbook.ui.views.calendar.CalendarView.TourInfoFormatter;
 
 import org.eclipse.core.runtime.ListenerList;
@@ -457,13 +458,13 @@ public class CalendarGraph extends Canvas {
 
 		gc.setFont(boldFont);
 		final Point[] headerSizes = {
-				gc.stringExtent("22. Dec 99"),
-				gc.stringExtent("22. Dec"),
-				gc.stringExtent("22") };
+				gc.stringExtent("22. Dec 99"), //$NON-NLS-1$
+				gc.stringExtent("22. Dec"), //$NON-NLS-1$
+				gc.stringExtent("22") }; //$NON-NLS-1$
 		gc.setFont(normalFont);
 
-		final String[] headerFormats = { "dd. MMM yy", "dd. MMM", "dd" };
-		String headerFormat = "";
+		final String[] headerFormats = { "dd. MMM yy", "dd. MMM", "dd" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		String headerFormat = UI.EMPTY_STRING;
 
 		// Find a format for the day header which fits into the rectangle available;
 		int g = 0;
@@ -1105,7 +1106,7 @@ public class CalendarGraph extends Canvas {
 		final int change = selection - _scrollBarLastSelection;
 
 		if (_scrollDebug) {
-			System.out.println("Last Selection: " + _scrollBarLastSelection + " - New Selection: " + selection);
+			System.out.println("Last Selection: " + _scrollBarLastSelection + " - New Selection: " + selection); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		if (_scrollBarShift != 0) {
@@ -1145,7 +1146,7 @@ public class CalendarGraph extends Canvas {
 		// sb.setPageIncrement(_numWeeksDisplayed);
 
 		if (_scrollDebug) {
-			System.out.println("SbarShift: " + _scrollBarShift + " - Selected Week: " + selection);
+			System.out.println("SbarShift: " + _scrollBarShift + " - Selected Week: " + selection); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		_scrollBarLastSelection = sb.getSelection();

@@ -3,6 +3,9 @@ package net.tourbook.ui.views.calendar;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import net.tourbook.Messages;
+import net.tourbook.ui.UI;
+
 import org.eclipse.jface.action.ControlContribution;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -69,7 +72,7 @@ public class CalendarYearMonthContributionItem extends ControlContribution {
 
 		// month combo
 		_cboMonth = new Combo(content, SWT.DROP_DOWN | SWT.READ_ONLY);
-		_cboMonth.setToolTipText("Go to month");
+		_cboMonth.setToolTipText(Messages.Calendar_View_Combo_Month_Tooltip);
 		_cboMonth.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
@@ -79,7 +82,7 @@ public class CalendarYearMonthContributionItem extends ControlContribution {
 
 		// year combo
 		_cboYear = new Combo(content, SWT.DROP_DOWN);
-		_cboYear.setToolTipText("Got to year");
+		_cboYear.setToolTipText(Messages.Calendar_View_Combo_Year_Tooltip);
 		_cboYear.setVisibleItemCount(20);
 		GridDataFactory.fillDefaults()//
 				.hint(pc.convertWidthInCharsToPixels(_isOSX ? 12 : _isLinux ? 12 : 5), SWT.DEFAULT)
@@ -125,7 +128,7 @@ public class CalendarYearMonthContributionItem extends ControlContribution {
 
 		for (int i = 0; i < 12; i++) {
 			// _cboMonth.add(dt.toString("MMMM"));
-			_cboMonth.add(dt.toString("MMM")); // make the toolbar fit more likely into one line
+			_cboMonth.add(dt.toString("MMM")); // make the toolbar fit more likely into one line //$NON-NLS-1$
 			_cboMonthValues.add(dt.getMonthOfYear());
 			_cboMonthKeys.put(dt.getMonthOfYear(), i);
 			dt = dt.plusMonths(1);
@@ -143,7 +146,7 @@ public class CalendarYearMonthContributionItem extends ControlContribution {
 		_cboYearKeys = new HashMap<Integer, Integer>();
 
 		for (int i = thisYear, j = 0; j < 20; i--, j++) {
-			_cboYear.add("" + i);
+			_cboYear.add(UI.EMPTY_STRING + i);
 			_cboYearValues.add(i);
 			_cboYearKeys.put(i, j);
 		}
@@ -219,7 +222,7 @@ public class CalendarYearMonthContributionItem extends ControlContribution {
 			}
 		}
 		if (!foundInList) {
-			_cboYear.setText("" + year);
+			_cboYear.setText(UI.EMPTY_STRING + year);
 		}
 	}
 

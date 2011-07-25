@@ -21,6 +21,48 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.messages";							//$NON-NLS-1$
 
+	public static String		Image__ArrowDown;
+	public static String		Image__ArrowUp;
+	public static String		Image__ZoomOut;
+	public static String		Image__ZoomIn;
+	public static String		Image__ZoomCentered;
+	public static String		Image__Synced;
+
+	public static String		Calendar_View_Action_Back;
+	public static String		Calendar_View_Action_Back_Tooltip;
+	public static String		Calendar_View_Action_DisplayTours_1ByDay;
+	public static String		Calendar_View_Action_DisplayTours_All;
+	public static String		Calendar_View_Action_DisplayTours_ByDay;
+	public static String		Calendar_View_Action_DistancePace;
+	public static String		Calendar_View_Action_Forward;
+	public static String		Calendar_View_Action_Forward_Tooltip;
+	public static String		Calendar_View_Action_GotoToday;
+	public static String		Calendar_View_Action_LinkWithOtherViews;
+	public static String		Calendar_View_Action_LogicalNavigation;
+	public static String		Calendar_View_Action_PhysicalNavigation;
+	public static String		Calendar_View_Action_ResizeTours;
+	public static String		Calendar_View_Action_ShowDescriptionTitle;
+	public static String		Calendar_View_Action_ShowDistanceSpeed;
+	public static String		Calendar_View_Action_ShowDistanceTime;
+	public static String		Calendar_View_Action_ShowTitleDescription;
+	public static String		Calendar_View_Action_TimeDistance;
+	public static String		Calendar_View_Action_TimePace;
+	public static String		Calendar_View_Action_TimeSpeed;
+	public static String		Calendar_View_Action_ZoomIn;
+	public static String		Calendar_View_Action_ZoomIn_Tooltip;
+	public static String		Calendar_View_Action_ZoomOut;
+	public static String		Calendar_View_Action_ZoomOut_Tooltip;
+
+	public static String		Calendar_View_Combo_Month_Tooltip;
+	public static String		Calendar_View_Combo_Year_Tooltip;
+
+	public static String		Calendar_View_Format_DistancePace;
+	public static String		Calendar_View_Format_DistanceSpeed;
+	public static String		Calendar_View_Format_DistanceTime;
+	public static String		Calendar_View_Format_TimeDistance;
+	public static String		Calendar_View_Format_TimePace;
+	public static String		Calendar_View_Format_TimeSpeed;
+
 	public static String		dialog_export_btn_export;
 	public static String		dialog_export_chk_camouflageSpeed;
 	public static String		dialog_export_chk_camouflageSpeed_tooltip;
