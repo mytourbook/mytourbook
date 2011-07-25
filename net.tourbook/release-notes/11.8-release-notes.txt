@@ -1,4 +1,7 @@
 translate: "Search for places and show them on the map"
+messages editor bug: you can switch between the Messages Editor UI with multiple languages (1st tab) at once or the language tabs (2nd ...) 
+don't edit at both places -> you will loose your modifications
+switching the displayed languages, close the editor otherwise is raises an dispose error
 
 webbsite:
 - update java code formatting on website
