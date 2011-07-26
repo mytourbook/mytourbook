@@ -45,6 +45,7 @@ public class Messages extends NLS {
 	public static String		Calendar_View_Action_ShowDistanceSpeed;
 	public static String		Calendar_View_Action_ShowDistanceTime;
 	public static String		Calendar_View_Action_ShowTitleDescription;
+	public static String		Calendar_View_Action_Text_Info_Color_Line_Color;
 	public static String		Calendar_View_Action_TimeDistance;
 	public static String		Calendar_View_Action_TimePace;
 	public static String		Calendar_View_Action_TimeSpeed;
@@ -62,6 +63,10 @@ public class Messages extends NLS {
 	public static String		Calendar_View_Format_TimeDistance;
 	public static String		Calendar_View_Format_TimePace;
 	public static String		Calendar_View_Format_TimeSpeed;
+	public static String		Calendar_View_Format_Distance;
+	public static String		Calendar_View_Format_Time;
+	public static String		Calendar_View_Format_Speed;
+	public static String		Calendar_View_Format_Pace;
 
 	public static String		dialog_export_btn_export;
 	public static String		dialog_export_chk_camouflageSpeed;

@@ -1,8 +1,10 @@
 package net.tourbook.ui.views.calendar;
 
 import java.util.ArrayList;
+import java.util.Formatter;
 import java.util.List;
 
+import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
@@ -14,6 +16,7 @@ import net.tourbook.ui.views.calendar.CalendarView.TourInfoFormatter;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.SafeRunnable;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -53,12 +56,18 @@ public class CalendarGraph extends Canvas {
 	private static IPreferenceStore				_prefStore			= TourbookPlugin.getDefault().getPreferenceStore();
 	private Display								_display			= Display.getCurrent();
 
+	private ColorCacheInt						_colorCache				= new ColorCacheInt();
+
 	private Color								_black				= _display.getSystemColor(SWT.COLOR_BLACK);
 	private Color								_gray				= _display.getSystemColor(SWT.COLOR_GRAY);
 	private Color								_white				= _display.getSystemColor(SWT.COLOR_WHITE);
 	private Color								_red				= _display.getSystemColor(SWT.COLOR_RED);
 	private Color								_green				= _display.getSystemColor(SWT.COLOR_GREEN);
 	private Color								_blue				= _display.getSystemColor(SWT.COLOR_BLUE);
+	private Color								_magenta				= _display.getSystemColor(SWT.COLOR_MAGENTA);
+	private Color								_cyan					= _display.getSystemColor(SWT.COLOR_CYAN);
+	//private Color								_darkGray				= _display.getSystemColor(SWT.COLOR_DARK_GRAY);
+	private Color								_darkGray				= _colorCache.get(0x707070);
 
 	private NavigationStyle						_navigationStyle	= NavigationStyle.PHYSICAL;
 
@@ -66,7 +75,6 @@ public class CalendarGraph extends Canvas {
 	private ArrayList<RGB>						_rgbDark;
 	private ArrayList<RGB>						_rgbLine;
 
-	private ColorCacheInt						_colorCache				= new ColorCacheInt();
 
 	private DateTime							_dt					= new DateTime();
 	private int									_numWeeksDisplayed	= 5;
@@ -105,6 +113,8 @@ public class CalendarGraph extends Canvas {
 	final static private int					_MIN_SCROLLABLE_WEEKS	= 12;
 
 	private TourInfoFormatter					_tourInfoFormatter;
+
+	private boolean								_useLineColorForTourInfoText;
 
 	private class Day {
 
@@ -459,9 +469,9 @@ public class CalendarGraph extends Canvas {
 		final long todayDayId = (new Day(new DateTime())).dayId;
 
 		gc.setFont(boldFont);
-		final Point[] headerSizes = {
-				gc.stringExtent("22. Dec 99"), //$NON-NLS-1$
-				gc.stringExtent("22. Dec"), //$NON-NLS-1$
+		// a rough guess about the max size of the label
+		final Point[] headerSizes = { gc.stringExtent("22. May 99"), //$NON-NLS-1$
+				gc.stringExtent("22. May"), //$NON-NLS-1$
 				gc.stringExtent("22") }; //$NON-NLS-1$
 		gc.setFont(normalFont);
 
@@ -482,6 +492,7 @@ public class CalendarGraph extends Canvas {
 		final int dayLabelHeight = headerSizes[g].y;
 		
 		DateTime weekDate;
+		long dayId = (new Day(date)).dayId; // we use simple ids
 
 		// Weeks
 		for (int i = 0; i < numRows; i++) {
@@ -491,9 +502,11 @@ public class CalendarGraph extends Canvas {
 
 			// Days per week
 			Rectangle dayRec = null;
-			long dayId = (new Day(date)).dayId; // we use simple ids
 			weekDate = date; // save the first day of this week as a pointer to this week
 			
+			final Rectangle infoRec = new Rectangle(0, Y1, (int) dX, (Y2 - Y1));
+			drawWeekInfo(gc, date, infoRec);
+
 			for (int j = 1; j < 8; j++) { // col 0 is for weekinfo, the week itself starts at col 1
 				final int X1 = (int) (j * dX);
 				final int X2 = (int) ((j + 1) * dX);
@@ -523,7 +536,7 @@ public class CalendarGraph extends Canvas {
 				} else if (weekDay == DateTimeConstants.SATURDAY || weekDay == DateTimeConstants.SUNDAY) {
 					gc.setForeground(_red);
 				} else {
-					gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_GRAY));
+					gc.setForeground(_darkGray);
 				}
 				gc.setClipping(X1, Y1, dayRec.width, dayLabelHeight); // this clipping should only kick in if shortest label format is still longer than the cell width
 				gc.drawText(date.toString(headerFormat), X2 - dayLabelWidht - dayLabelXOffset, Y1, true);
@@ -543,7 +556,7 @@ public class CalendarGraph extends Canvas {
 			final CalendarTourData weekSummary = _dataProvider.getCalendarWeekData(
 					weekDate.getYear(),
 					weekDate.getWeekOfWeekyear());
-			//drawWeekSummary(gc, weekSummary, weekRec);
+			drawWeekSummary(gc, weekSummary, weekRec);
 			
 		}
 		gc.setFont(normalFont);
@@ -688,9 +701,14 @@ public class CalendarGraph extends Canvas {
 	}
 
 	private void drawTourInfo(final GC gc, final Rectangle r, final CalendarTourData data) {
-		
-		final Color lineColor = _colorCache.get(_rgbLine.get(data.typeColorIndex).hashCode());
-		gc.setForeground(lineColor);
+
+		Color fg;
+		if (_useLineColorForTourInfoText) {
+			fg = _colorCache.get(_rgbLine.get(data.typeColorIndex).hashCode());
+		} else {
+			fg = _darkGray;
+		}
+		gc.setForeground(fg);
 
 		gc.drawRectangle(r);
 		gc.setBackground(_colorCache.get(_rgbBright.get(data.typeColorIndex).hashCode()));
@@ -698,29 +716,90 @@ public class CalendarGraph extends Canvas {
 		gc.fillGradientRectangle(r.x + 1, r.y + 1, r.width - 1, r.height - 1, false);
 
 		final String info = _tourInfoFormatter.format(data);
-		// gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_GRAY));
-		gc.setForeground(lineColor);
-		// gc.setForeground(_black);
+		gc.setForeground(fg);
 		gc.setClipping(r.x + 1, r.y, r.width - 2, r.height);
 		gc.drawText(info, r.x + 2, r.y, true);
 		gc.setClipping(_nullRec);
 	}
 
+	private void drawWeekInfo(final GC gc, final DateTime dt, final Rectangle rec) {
+
+		final Font normalFont = gc.getFont();
+		final FontData fd[] = normalFont.getFontData();
+		fd[0].setStyle(SWT.BOLD);
+		// fd[0].setHeight(((rec.height) * 72 / _display.getDPI().y) / 4);
+		final Font boldFont = new Font(_display, fd[0]);
+
+		gc.setForeground(_darkGray);
+
+		gc.setFont(boldFont);
+		gc.drawText("" + dt.getWeekOfWeekyear(), rec.x + 4, rec.y + 2);
+		gc.setFont(normalFont);
+
+		boldFont.dispose();
+
+	}
+
 	private void drawWeekSummary(final GC gc, final CalendarTourData data, final Rectangle rec) {
 		
 		gc.setClipping(rec);
-		gc.setForeground(_black);
 		gc.setBackground(_white);
-		final int x = rec.x + 4;
+		final int x = rec.x + rec.width - 1;
 		int y = rec.y + 1;
-		if (data.distance > 0) {
-			gc.drawText("Dist: " + (data.distance / 1000), x, y);
-			y += gc.getFontMetrics().getHeight();
-		}
+		String text;
+
+		// time
+		gc.setForeground(_darkGray);
 		if (data.recordingTime > 0) {
-			gc.drawText("Time: " + (data.recordingTime / 3600f), x, y);
-			y += gc.getFontMetrics().getHeight();
+			text = new Formatter().format(
+					Messages.Calendar_View_Format_Time,
+					data.recordingTime / 3600,
+					(data.recordingTime % 3600) / 60).toString();
+			gc.drawText(text, x - gc.stringExtent(text).x, y);
 		}
+		y += gc.getFontMetrics().getHeight();
+		if (y > rec.y + rec.height) {
+			return;
+		}
+
+		// distance
+		gc.setForeground(_black);
+		if (data.distance > 0 && y < rec.y + rec.height) {
+			final float distance = (float) (data.distance / 1000.0 / UI.UNIT_VALUE_DISTANCE);
+			text = new Formatter().format(
+					NLS.bind(Messages.Calendar_View_Format_Distance, UI.UNIT_LABEL_DISTANCE),
+					distance).toString();
+			gc.drawText(text, x - gc.stringExtent(text).x, y);
+		}
+		y += gc.getFontMetrics().getHeight();
+		if (y > rec.y + rec.height) {
+			return;
+		}
+
+		// speed
+		gc.setForeground(_blue);
+		if (data.distance > 0 && y < rec.y + rec.height) {
+			text = new Formatter().format(
+					NLS.bind(Messages.Calendar_View_Format_Speed, UI.UNIT_LABEL_SPEED),
+					data.distance == 0 ? 0 : data.distance / (data.recordingTime / 3.6f)).toString();
+
+			gc.drawText(text, x - gc.stringExtent(text).x, y);
+		}
+		y += gc.getFontMetrics().getHeight();
+
+		// pace
+		gc.setForeground(_magenta);
+		if (data.recordingTime > 0 && data.distance > 0 && y < rec.y + rec.height) {
+			final int pace = (int) (data.distance == 0
+					? 0
+					: (1000 * data.recordingTime / data.distance * UI.UNIT_VALUE_DISTANCE));
+			text = new Formatter().format(
+					NLS.bind(Messages.Calendar_View_Format_Pace, UI.UNIT_LABEL_PACE),
+					pace / 60,
+					pace % 60).toString();
+			gc.drawText(text, x - gc.stringExtent(text).x, y);
+		}
+		y += gc.getFontMetrics().getHeight();
 		gc.setClipping(_nullRec);
 	}
 
@@ -779,6 +858,10 @@ public class CalendarGraph extends Canvas {
 
 	public int getTourInfoFormatterIndex() {
 		return _tourInfoFormatter.index;
+	}
+
+	public boolean  getTourInfoUseLineLineColor() {
+		return _useLineColorForTourInfoText;
 	}
 
 	public int getZoom() {
@@ -1298,6 +1381,12 @@ public class CalendarGraph extends Canvas {
 
 	public void setTourInfoFormatter(final TourInfoFormatter formatter) {
 		_tourInfoFormatter = formatter;
+		_graphClean = false;
+		redraw();
+	}
+
+	public void setTourInfoUseLineColor(final boolean checked) {
+		_useLineColorForTourInfoText = checked;
 		_graphClean = false;
 		redraw();
 	}

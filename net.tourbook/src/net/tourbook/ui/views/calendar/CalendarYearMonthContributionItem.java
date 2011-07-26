@@ -145,13 +145,18 @@ public class CalendarYearMonthContributionItem extends ControlContribution {
 		_cboYearValues = new ArrayList<Integer>();
 		_cboYearKeys = new HashMap<Integer, Integer>();
 
-		for (int i = thisYear, j = 0; j < 20; i--, j++) {
+		// for (int i = thisYear, j = 0; j < 21; i--, j++) {
+		// changed to be consistent with the statistic charts
+		final DateTime firstTourDateTime = CalendarTourDataProvider.getInstance().getFirstDateTime();
+		final int firstYear = firstTourDateTime.getYear();
+		final int years = Math.max(thisYear - firstYear, 1);
+		for (int i = thisYear - years, j = 0; j <= years; i++, j++) {
 			_cboYear.add(UI.EMPTY_STRING + i);
 			_cboYearValues.add(i);
 			_cboYearKeys.put(i, j);
 		}
 
-		_cboYear.select(0);
+		_cboYear.select(years - 1);
 
 	}
 

@@ -75,6 +75,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	private String								STATE_TOUR_SIZE_DYNAMIC			= "TourSizeDynamic";							// $NON-NLS-1$ //$NON-NLS-1$
 	private String								STATE_NUMBER_OF_TOURS_PER_DAY	= "NumberOfToursPerDay";						// $NON-NLS-1$ //$NON-NLS-1$
 	private String								STATE_TOUR_INFO_FORMATTER_INDEX	= "TourInfoFormatterIndex"; //$NON-NLS-1$
+	private String								STATE_TOUR_INFO_TEXT_COLOR_LINE_COLOR	= "TourInfoTextColorUserLineColor";			//$NON-NLS-1$
 
 	private Action								_forward, _back;
 	private Action								_zoomIn, _zoomOut;
@@ -84,6 +85,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	private Action[]							_setNumberOfToursPerDay;
 	private Action								_setTourSizeDynamic;
 	private Action[]							_setTourInfoFormat;
+	private Action								_setTourInfoColorLineColor;
 
 	private TourInfoFormatter[]					_tourInfoFormatter				= {
 
@@ -368,17 +370,12 @@ public class CalendarView extends ViewPart implements ITourProvider {
 
 				final String property = event.getProperty();
 
-				/*
-				 * set a new chart configuration when the preferences has changed
-				 */
-
 				if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
 
 					refreshCalendar();
 
 				} else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
 
-					// update statistics
 					refreshCalendar();
 
 				}
@@ -517,6 +514,8 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		manager.add(new Separator());
 		manager.add(_setNavigationStylePhysical);
 		manager.add(_setNavigationStyleLogical);
+		manager.add(new Separator());
+		manager.add(_setTourInfoColorLineColor);
 
 	}
 
@@ -662,10 +661,19 @@ public class CalendarView extends ViewPart implements ITourProvider {
 			if (null != _tourInfoFormatter[i]) {
 				_setTourInfoFormat[i] = new TourInfoFormatAction(
 						_tourInfoFormatter[i].getText(),
-						org.eclipse.jface.action.Action.AS_CHECK_BOX,
+						org.eclipse.jface.action.Action.AS_RADIO_BUTTON,
 						_tourInfoFormatter[i]);
 			}
 		}
+
+		_setTourInfoColorLineColor = new Action(null, org.eclipse.jface.action.Action.AS_CHECK_BOX) {
+			@Override
+			public void run() {
+				_calendarGraph.setTourInfoUseLineColor(this.isChecked());
+			}
+		};
+		_setTourInfoColorLineColor.setText(Messages.Calendar_View_Action_Text_Info_Color_Line_Color);
+
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
@@ -729,6 +737,13 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		final int tourInfoFormatterIndex = Util.getStateInt(_state, STATE_TOUR_INFO_FORMATTER_INDEX, 0);
 		_setTourInfoFormat[tourInfoFormatterIndex].run();
 
+		final boolean useLineColorForTourInfo = Util.getStateBoolean(
+				_state,
+				STATE_TOUR_INFO_TEXT_COLOR_LINE_COLOR,
+				false);
+		_setTourInfoColorLineColor.setChecked(useLineColorForTourInfo);
+		_setTourInfoColorLineColor.run();
+
 	}
 
 	private void saveState() {
@@ -753,6 +768,8 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		_state.put(STATE_NUMBER_OF_TOURS_PER_DAY, _calendarGraph.getNumberOfToursPerDay());
 
 		_state.put(STATE_TOUR_INFO_FORMATTER_INDEX, _calendarGraph.getTourInfoFormatterIndex());
+
+		_state.put(STATE_TOUR_INFO_TEXT_COLOR_LINE_COLOR, _calendarGraph.getTourInfoUseLineLineColor());
 	}
 
 	/**
