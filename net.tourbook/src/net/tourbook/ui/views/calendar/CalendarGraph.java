@@ -7,6 +7,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.ui.ColorCacheInt;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.calendar.CalendarView.TourInfoFormatter;
 
@@ -64,6 +65,8 @@ public class CalendarGraph extends Canvas {
 	private ArrayList<RGB>						_rgbBright;
 	private ArrayList<RGB>						_rgbDark;
 	private ArrayList<RGB>						_rgbLine;
+
+	private ColorCacheInt						_colorCache				= new ColorCacheInt();
 
 	private DateTime							_dt					= new DateTime();
 	private int									_numWeeksDisplayed	= 5;
@@ -315,7 +318,7 @@ public class CalendarGraph extends Canvas {
 
 		addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(final DisposeEvent e) {
-				// TODO
+				_colorCache.dispose();
 			}
 		});
 
@@ -422,8 +425,7 @@ public class CalendarGraph extends Canvas {
 		final int numCols = 9; // one col left and right of the week + 7 week days
 		final int numRows = _numWeeksDisplayed; // number of weeks per moth displayed
 
-		// final Color alternate = new Color(gc.getDevice(), 0xf5, 0xf5, 0xf5);
-		final Color alternate = new Color(gc.getDevice(), 0xf0, 0xf0, 0xf0);
+		final Color alternate = _colorCache.get(0xf0f0f0);
 
 		_tourFocus = new ArrayList<ObjectLocation>();
 		_dayFocus = new ArrayList<ObjectLocation>();
@@ -478,18 +480,25 @@ public class CalendarGraph extends Canvas {
 		headerFormat = headerFormats[g];
 		final int dayLabelWidht = headerSizes[g].x;
 		final int dayLabelHeight = headerSizes[g].y;
+		
+		DateTime weekDate;
 
 		// Weeks
 		for (int i = 0; i < numRows; i++) {
+			
 			final int Y1 = (int) (i * dY);
 			final int Y2 = (int) ((i + 1) * dY);
 
 			// Days per week
+			Rectangle dayRec = null;
 			long dayId = (new Day(date)).dayId; // we use simple ids
+			weekDate = date; // save the first day of this week as a pointer to this week
+			
 			for (int j = 1; j < 8; j++) { // col 0 is for weekinfo, the week itself starts at col 1
 				final int X1 = (int) (j * dX);
 				final int X2 = (int) ((j + 1) * dX);
-				final Rectangle dayRec = new Rectangle(X1, Y1, (X2 - X1), (Y2 - Y1));
+//				final Rectangle dayRec = new Rectangle(X1, Y1, (X2 - X1), (Y2 - Y1));
+				dayRec = new Rectangle(X1, Y1, (X2 - X1), (Y2 - Y1));
 				final Day day = new Day(dayId);
 				_dayFocus.add(new ObjectLocation(dayRec, dayId, day));
 				dayId = day.dayId + 1;
@@ -527,6 +536,15 @@ public class CalendarGraph extends Canvas {
 
 				date = date.plusDays(1);
 			}
+
+			final int X1 = (int) (8 * dX);
+			final int X2 = (int) ((8 + 1) * dX);
+			final Rectangle weekRec = new Rectangle(X1, Y1, (X2 - X1), (Y2 - Y1));
+			final CalendarTourData weekSummary = _dataProvider.getCalendarWeekData(
+					weekDate.getYear(),
+					weekDate.getWeekOfWeekyear());
+			//drawWeekSummary(gc, weekSummary, weekRec);
+			
 		}
 		gc.setFont(normalFont);
 
@@ -542,11 +560,10 @@ public class CalendarGraph extends Canvas {
 			_lastSelection = _selectedItem;
 		}
 
-		boldFont.dispose();
 
+		boldFont.dispose();
 		gc.dispose();
 		oldGc.drawImage(_image, 0, 0);
-
 
 		_graphClean = true;
 
@@ -624,7 +641,7 @@ public class CalendarGraph extends Canvas {
 	// TODO review
 	private void drawSelectedTour(final GC gc, final CalendarTourData data, final Rectangle rec) {
 
-		final Color lineColor = new Color(_display, _rgbLine.get(data.typeColorIndex));
+		final Color lineColor = _colorCache.get(_rgbLine.get(data.typeColorIndex).hashCode());
 
 		gc.fillGradientRectangle(rec.x - 4, rec.y - 4, rec.width + 9, rec.height + 9, false);
 		gc.setBackground(_red);
@@ -633,8 +650,8 @@ public class CalendarGraph extends Canvas {
 		gc.fillRectangle(rec.x - 4, rec.y - 4, rec.width + 9, rec.height + 9);
 		gc.drawRoundRectangle(rec.x - 5, rec.y - 5, rec.width + 10, rec.height + 10, 6, 6);
 
-		gc.setBackground(new Color(_display, _rgbBright.get(data.typeColorIndex)));
-		gc.setForeground(new Color(_display, _rgbDark.get(data.typeColorIndex)));
+		gc.setBackground(_colorCache.get(_rgbBright.get(data.typeColorIndex).hashCode()));
+		gc.setForeground(_colorCache.get(_rgbDark.get(data.typeColorIndex).hashCode()));
 
 		gc.fillGradientRectangle(rec.x + 1, rec.y + 1, rec.width - 2, rec.height - 2, false);
 		gc.setForeground(lineColor);
@@ -672,13 +689,12 @@ public class CalendarGraph extends Canvas {
 
 	private void drawTourInfo(final GC gc, final Rectangle r, final CalendarTourData data) {
 		
-		// TODO create each color only once (private array) and dispose
-		final Color lineColor = new Color(_display, _rgbLine.get(data.typeColorIndex));
+		final Color lineColor = _colorCache.get(_rgbLine.get(data.typeColorIndex).hashCode());
 		gc.setForeground(lineColor);
 
 		gc.drawRectangle(r);
-		gc.setBackground(new Color(_display, _rgbBright.get(data.typeColorIndex)));
-		gc.setForeground(new Color(_display, _rgbDark.get(data.typeColorIndex)));
+		gc.setBackground(_colorCache.get(_rgbBright.get(data.typeColorIndex).hashCode()));
+		gc.setForeground(_colorCache.get(_rgbDark.get(data.typeColorIndex).hashCode()));
 		gc.fillGradientRectangle(r.x + 1, r.y + 1, r.width - 1, r.height - 1, false);
 
 		final String info = _tourInfoFormatter.format(data);
@@ -687,6 +703,24 @@ public class CalendarGraph extends Canvas {
 		// gc.setForeground(_black);
 		gc.setClipping(r.x + 1, r.y, r.width - 2, r.height);
 		gc.drawText(info, r.x + 2, r.y, true);
+		gc.setClipping(_nullRec);
+	}
+
+	private void drawWeekSummary(final GC gc, final CalendarTourData data, final Rectangle rec) {
+		
+		gc.setClipping(rec);
+		gc.setForeground(_black);
+		gc.setBackground(_white);
+		final int x = rec.x + 4;
+		int y = rec.y + 1;
+		if (data.distance > 0) {
+			gc.drawText("Dist: " + (data.distance / 1000), x, y);
+			y += gc.getFontMetrics().getHeight();
+		}
+		if (data.recordingTime > 0) {
+			gc.drawText("Time: " + (data.recordingTime / 3600f), x, y);
+			y += gc.getFontMetrics().getHeight();
+		}
 		gc.setClipping(_nullRec);
 	}
 
@@ -993,10 +1027,10 @@ public class CalendarGraph extends Canvas {
 
 	private void highlightTour(final GC gc, final CalendarTourData data, final Rectangle rec) {
 		gc.setAlpha(0xd0);
-		gc.setBackground(new Color(_display, _rgbBright.get(data.typeColorIndex)));
-		gc.setForeground(new Color(_display, _rgbDark.get(data.typeColorIndex)));
+		gc.setBackground(_colorCache.get(_rgbBright.get(data.typeColorIndex).hashCode()));
+		gc.setForeground(_colorCache.get(_rgbDark.get(data.typeColorIndex).hashCode()));
 		gc.fillGradientRectangle(rec.x - 4, rec.y - 4, rec.width + 9, rec.height + 9, false);
-		gc.setForeground(new Color(_display, _rgbLine.get(data.typeColorIndex)));
+		gc.setForeground(_colorCache.get(_rgbLine.get(data.typeColorIndex).hashCode()));
 		gc.drawRoundRectangle(rec.x - 5, rec.y - 5, rec.width + 10, rec.height + 10, 6, 6);
 		gc.setForeground(_black);
 		gc.setClipping(rec.x + 2, rec.y, rec.width - 4, rec.height - 2);

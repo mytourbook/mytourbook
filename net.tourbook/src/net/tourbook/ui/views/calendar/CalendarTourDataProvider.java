@@ -20,9 +20,8 @@ public class CalendarTourDataProvider {
 
 	private ArrayList<Long>					_tourIds;
 
-	private CalendarTourData[]				_calendarTourData;
-
-	private HashMap<Integer, CalendarTourData[][][]>	_cache;
+	private HashMap<Integer, CalendarTourData[][][]>	_dayCache;
+	private HashMap<Integer, CalendarTourData[]>		_weekCache;
 	private DateTime									_firstDateTime;
 
 
@@ -41,23 +40,23 @@ public class CalendarTourDataProvider {
 		
 		CalendarTourData[]				data;
 
-		if (!_cache.containsKey(year)) {
-			_cache.put(year, new CalendarTourData[12][31][]);
+		if (!_dayCache.containsKey(year)) {
+			_dayCache.put(year, new CalendarTourData[12][31][]);
 		}
 	
-		if (_cache.get(year)[month - 1][day - 1] != null) {
-			data = _cache.get(year)[month - 1][day - 1];
+		if (_dayCache.get(year)[month - 1][day - 1] != null) {
+			data = _dayCache.get(year)[month - 1][day - 1];
 			// System.out.println("Cache Hit");
 		} else {
 			data = getCalendarDayDataFromDb(year, month, day);
-			_cache.get(year)[month - 1][day - 1] = data;
+			_dayCache.get(year)[month - 1][day - 1] = data;
 			// System.out.println("Cache miss");
 		}
 		
 		return data;
 
 	}
-
+	
 	/**
 	 * Retrieve data from the database
 	 * 
@@ -69,6 +68,8 @@ public class CalendarTourDataProvider {
 	CalendarTourData[] getCalendarDayDataFromDb(final int year, final int month, final int day) {
 
 		final int colorOffset = 0;
+		
+		CalendarTourData[] calendarTourData = null;
 
 		final ArrayList<TourType> tourTypeList = TourDatabase.getAllTourTypes();
 		final TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
@@ -230,7 +231,8 @@ public class CalendarTourDataProvider {
 			 * create data
 			 */
 			final int size = _tourIds.size();
-			_calendarTourData = new CalendarTourData[size];
+			
+			calendarTourData = new CalendarTourData[size];
 			
 			final int dayOfWeek = (new DateTime(year, month, day, 12, 0, 0, 0)).getDayOfWeek();
 
@@ -266,7 +268,7 @@ public class CalendarTourDataProvider {
 
 				data.dayOfWeek = dayOfWeek;
 
-				_calendarTourData[i] = data;
+				calendarTourData[i] = data;
 
 			}
 
@@ -274,7 +276,7 @@ public class CalendarTourDataProvider {
 			UI.showSQLException(e);
 		}
 
-		return _calendarTourData;
+		return calendarTourData;
 	}
 
 	public DateTime getCalendarTourDateTime(final Long tourId) {
@@ -313,6 +315,78 @@ public class CalendarTourDataProvider {
 		}
 
 		return dt;
+	}
+	
+	CalendarTourData getCalendarWeekData(final int year, final int week) {
+		
+		CalendarTourData				data;
+
+		if (!_weekCache.containsKey(year)) {
+			_weekCache.put(year, new CalendarTourData[54]); // weeks are from 1..53; we simply leave array index 0 unused (yes, a year can have more than 52 weeks)
+		}
+		
+		if (_weekCache.get(year)[week] != null) {
+			data = _weekCache.get(year)[week];
+		} else {
+			data = getCalendarWeekDataFromDb(year, week);
+			_weekCache.get(year)[week] = data;
+		}
+		
+		return data;
+			
+	}
+
+	CalendarTourData getCalendarWeekDataFromDb(final int year, final int week) {
+		
+		final CalendarTourData data = new CalendarTourData();
+		final SQLFilter filter = new SQLFilter();
+		
+		final String select = "SELECT " //$NON-NLS-1$
+				+ "SUM(TourDistance)," //			1 //$NON-NLS-1$
+				+ "SUM(TourAltUp)," //				2 //$NON-NLS-1$
+				+ "SUM(TourRecordingTime)," //		3 //$NON-NLS-1$
+				+ "SUM(TourDrivingTime)"//			4 //$NON-NLS-1$
+
+				+ UI.NEW_LINE
+
+				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE) //$NON-NLS-1$
+
+				// get tag id's
+				+ (" WHERE startYear=?" + UI.NEW_LINE) //$NON-NLS-1$
+				+ (" AND   startWeek=?" + UI.NEW_LINE) //$NON-NLS-1$
+				+ filter.getWhereClause();
+
+
+		try {
+
+			final Connection conn = TourDatabase.getInstance().getConnection();
+			final PreparedStatement statement = conn.prepareStatement(select);
+			
+			statement.setInt(1, year);
+			statement.setInt(2, week);
+			filter.setParameters(statement, 3);
+
+			final ResultSet result = statement.executeQuery();
+			while (result.next()) {
+
+				data.year = year;
+				data.week = week;
+				data.distance = result.getInt(1);
+				data.altitude = result.getInt(2);
+
+				data.recordingTime = result.getInt(3);
+				data.drivingTime = result.getInt(4);
+
+			}
+
+			conn.close();
+
+		} catch (final SQLException e) {
+			UI.showSQLException(e);
+		}
+
+		return data;
+
 	}
 
 	public DateTime getFirstDateTime() {
@@ -354,7 +428,8 @@ public class CalendarTourDataProvider {
 	}
 
 	public void invalidate() {
-		_cache = new HashMap<Integer, CalendarTourData[][][]>();
+		_dayCache = new HashMap<Integer, CalendarTourData[][][]>();
+		_weekCache = new HashMap<Integer, CalendarTourData[]>();
 		_firstDateTime = null;
 	}
 
