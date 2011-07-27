@@ -297,12 +297,9 @@
 
 	pref page for bikes is disabled since version 11.07 because bikes 
 	are currently not used and is confusing the user
+	
+	I set a comment around the page tag but OSX still displayed the page, this must be a bug in OSX
       
-      <page
-            class="net.tourbook.preferences.PrefPageBikes"
-            id="net.tourbook.preferences.PrefPageBikes"
-            name="%preference_page_Bikes">
-      </page>
 -->
 
       <page
@@ -1050,6 +1047,13 @@
 	            icon="icons/statistics.gif"
 	            id="net.tourbook.views.StatisticView"
 	            name="%view_name_Statistics">
+	      </view>
+	      <view
+	            category="net.tourbook.category.tourList"
+	            class="net.tourbook.ui.views.calendar.CalendarView"
+	            icon="icons/tour-tag.gif"
+	            id="net.tourbook.views.calendar.CalendarView"
+	            name="Tour Calendar">
 	      </view>
 
       <category

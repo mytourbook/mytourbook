@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -406,7 +406,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		/**
 		 * Does the sort. If it's a different column from the previous sort, do an ascending sort.
 		 * If it's the same column as the last sort, toggle the sort direction.
-		 * 
+		 *
 		 * @param column
 		 */
 		public void setSortColumn(final int column) {
@@ -1129,7 +1129,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(3).extendedMargins(3, 3, 3, 2).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(3).extendedMargins(3, 3, 3, 5).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
 			// tour title
@@ -1345,7 +1345,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		GridLayoutFactory.fillDefaults()//
+				.numColumns(2)
+				.applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 		{
 			/*
@@ -2352,7 +2354,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	/**
 	 * try to get the tour chart and/or editor from the active part
-	 * 
+	 *
 	 * @param tourData
 	 * @return Returns the {@link TourChart} for the requested {@link TourData}
 	 */
@@ -2542,13 +2544,19 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		// method
 		_comboBreakMethod.select(btConfig.breakTimeMethod);
 
-		// break time by time/distance
+		/*
+		 * break time by time/distance
+		 */
 		_spinnerBreakShortestTime.setSelection(btConfig.breakShortestTime);
 
 		final float prefBreakDistance = btConfig.breakMaxDistance / UI.UNIT_VALUE_DISTANCE_SMALL;
 		_spinnerBreakMaxDistance.setSelection((int) (prefBreakDistance + 0.5));
 
-		// break time by speed
+		_spinnerBreakSliceDiff.setSelection(btConfig.breakSliceDiff);
+
+		/*
+		 * break time by speed
+		 */
 		_spinnerBreakMinSliceSpeed.setSelection(//
 				(int) (btConfig.breakMinSliceSpeed * SPEED_DIGIT_VALUE * UI.UNIT_VALUE_DISTANCE));
 		_spinnerBreakMinAvgSpeed.setSelection(//
@@ -2601,7 +2609,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	/**
 	 * handle a tour selection event
-	 * 
+	 *
 	 * @param selection
 	 */
 	private void onSelectionChanged(final ISelection selection) {
@@ -3016,7 +3024,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	/**
 	 * Sets the tour for the segmenter
-	 * 
+	 *
 	 * @param tourData
 	 * @param forceUpdate
 	 */
