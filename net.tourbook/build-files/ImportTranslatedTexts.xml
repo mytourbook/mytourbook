@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="extract-language-archives" default="unzip-all-archives" basedir="..">
+<project name="extract-language-archives" default="unzip-all-archives">
 
 	<!--
 		extract language files from the archive into the trunk projects
 	-->
-	<property name="path-mt-trunk" value="../../mytourbook" />
-	<property name="dat-ROOT" value="../../.." />
+	<property name="path-mt-trunk" value="../../../mytourbook" />
+	<property name="dat-ROOT" value="../../../.." />
 
 	<!-- PRODUCTION TARGET
 	-->
@@ -17,7 +17,7 @@
 	-->
 
 	<property name="path-language-archive" value="${dat-ROOT}/mytourbook-TRANSLATIONS" />
-	<property name="path-language-target-temp" value="${dat-ROOT}/mytourbook-TRANSLATIONS-temp-unzip" />
+	<property name="path-language-target-temp" value="${path-language-archive}/temp/unzip" />
 
 	<!--
 		DEFAULT target
@@ -67,6 +67,13 @@
 		<delete includeemptydirs="true" quiet="true">
 			<fileset dir="${path-language-target-temp}" includes="**/*" />
 		</delete>
+
+		<!--
+			create language archive with the new translated text
+			
+			C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\build-files\create-translation-archive.xml
+		-->
+		<ant antfile="CreateTranslationArchive.xml" />
 
 	</target>
 
