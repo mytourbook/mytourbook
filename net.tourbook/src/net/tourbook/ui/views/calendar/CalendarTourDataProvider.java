@@ -352,7 +352,7 @@ public class CalendarTourDataProvider {
 				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE) //$NON-NLS-1$
 
 				// get tag id's
-				+ (" WHERE startYear=?" + UI.NEW_LINE) //$NON-NLS-1$
+				+ (" WHERE startWeekYear=?" + UI.NEW_LINE) //$NON-NLS-1$
 				+ (" AND   startWeek=?" + UI.NEW_LINE) //$NON-NLS-1$
 				+ filter.getWhereClause();
 
