@@ -69,7 +69,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	private IPropertyChangeListener				_prefChangeListener;
 	private ITourEventListener					_tourPropertyListener;
 	private CalendarYearMonthContributionItem	_cymci;
-
+	
 	private String								STATE_SELECTED_TOURS			= "SelectedTours";								// $NON-NLS-1$ //$NON-NLS-1$
 
 	private String								STATE_FIRST_DAY					= "FirstDayDisplayed";							// $NON-NLS-1$ //$NON-NLS-1$
@@ -603,7 +603,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 
 		final ArrayList<TourData> selectedTourData = new ArrayList<TourData>();
 		final ArrayList<Long> tourIdSet = new ArrayList<Long>();
-		tourIdSet.add(_calendarGraph.getSelectedTour());
+		tourIdSet.add(_calendarGraph.getSelectedTourId());
 		for (final Long tourId : tourIdSet) {
 			if (tourId > 0) { // < 0 means not selected
 				selectedTourData.add(TourManager.getInstance().getTourData(tourId));
@@ -744,7 +744,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		// show and select the selected tour
 		if (selection instanceof SelectionTourId) {
 			final Long newTourId = ((SelectionTourId) selection).getTourId();
-			final Long oldTourId = _calendarGraph.getSelectedTour();
+			final Long oldTourId = _calendarGraph.getSelectedTourId();
 			if (newTourId != oldTourId) {
 				if (_setLinked.isChecked()) {
 					_calendarGraph.gotoTourId(newTourId);
@@ -825,7 +825,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		// 	selectedTourIds.add(tourId.toString());
 		// }
 		// until now we only implement single tour selection
-		_state.put(STATE_SELECTED_TOURS, _calendarGraph.getSelectedTour());
+		_state.put(STATE_SELECTED_TOURS, _calendarGraph.getSelectedTourId());
 
 		_state.put(STATE_IS_LINKED, _setLinked.isChecked());
 		_state.put(STATE_TOUR_SIZE_DYNAMIC, _setTourSizeDynamic.isChecked());

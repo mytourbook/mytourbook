@@ -6,12 +6,20 @@ import java.util.List;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.TourDoubleClickState;
+import net.tourbook.tour.TourManager;
+import net.tourbook.tour.TourTypeFilterManager;
 import net.tourbook.ui.ColorCacheInt;
+import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.ITourProviderAll;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.calendar.CalendarView.TourInfoFormatter;
+import net.tourbook.ui.views.tourBook.TVITourBookTour;
+import net.tourbook.ui.views.tourBook.TourBookView;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -28,6 +36,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackListener;
+import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -49,12 +58,14 @@ import org.eclipse.swt.widgets.ScrollBar;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
 
-public class CalendarGraph extends Canvas {
+public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	private Composite							_parent;
 
 	private static IPreferenceStore				_prefStore			= TourbookPlugin.getDefault().getPreferenceStore();
 	private Display								_display			= Display.getCurrent();
+
+	private final TourDoubleClickState			_tourDoubleClickState				= new TourDoubleClickState();
 
 	private ColorCacheInt						_colorCache				= new ColorCacheInt();
 
@@ -115,6 +126,10 @@ public class CalendarGraph extends Canvas {
 	private TourInfoFormatter[]					_tourInfoFormatter		= new TourInfoFormatter[3];
 
 	private boolean								_useLineColorForTourInfoText;
+
+	private Rectangle _calendarAllDaysRectangle;
+	private Rectangle _calendarFirstWeekRectangle;
+	private Rectangle _calendarLastWeekRectangle;
 
 	private class Day {
 
@@ -218,7 +233,15 @@ public class CalendarGraph extends Canvas {
 		addMouseListener(new MouseListener() {
 			@Override
 			public void mouseDoubleClick(final MouseEvent e) {
-				// TODO Auto-generated method stub
+				if (_selectedItem.isTour()) {
+					_tourDoubleClickState.canEditTour = true;
+					_tourDoubleClickState.canOpenTour = true;
+					_tourDoubleClickState.canQuickEditTour = true;
+					_tourDoubleClickState.canEditMarker = true;
+					_tourDoubleClickState.canAdjustAltitude = true;
+					TourManager.getInstance().tourDoubleClickAction(CalendarGraph.this, _tourDoubleClickState);
+
+				}
 
 			}
 
@@ -238,7 +261,7 @@ public class CalendarGraph extends Canvas {
 				onMouseMove(e);
 			}
 		});
-
+		
 		addFocusListener(new FocusListener() {
 
 			public void focusGained(final FocusEvent e) {
@@ -325,7 +348,49 @@ public class CalendarGraph extends Canvas {
 				}
 			}
 		});
+		
+//		addMouseWheelListener(new MouseWheelListener() {
+//			@Override
+//			public void mouseScrolled(final MouseEvent event) {
+//				Point p = new Point(event.x, event.y);
+//				if (_calendarDaysRectangle.contains(p)) {
+//					gotoNextTour();
+//				} else {
+//					gotoNextWeek();
+//				}
+//			}
+//		});
 
+		
+		addListener(SWT.MouseWheel, new Listener() {
+			public void handleEvent(final Event event) {
+				Point p = new Point(event.x, event.y);
+				if (_calendarAllDaysRectangle.contains(p)) {
+					if (event.count > 0) {
+						if (_calendarFirstWeekRectangle.contains(p) || _calendarLastWeekRectangle.contains(p)) {
+							gotoTourSameWeekday(-1);
+						} else {
+							gotoPrevTour();
+						}
+					} else {
+						if (_calendarFirstWeekRectangle.contains(p) || _calendarLastWeekRectangle.contains(p)) {
+							gotoTourSameWeekday(1);
+						} else {
+							gotoNextTour();
+						}
+					}
+					event.doit = false;
+				} else {
+					if (event.count > 0) {
+						gotoPrevWeek();
+					} else {
+						gotoNextWeek();
+					}
+					event.doit = false;
+				}
+			}
+		});
+		
 		addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(final DisposeEvent e) {
 				_colorCache.dispose();
@@ -454,6 +519,10 @@ public class CalendarGraph extends Canvas {
 
 		final float dX = (float) XX / (float) numCols;
 		final float dY = (float) YY / (float) numRows;
+		
+		_calendarAllDaysRectangle = new Rectangle((int)dX,0, (int) (7 * dX), YY);
+		_calendarFirstWeekRectangle = new Rectangle((int)dX,0, (int) (7 * dX), (int)dY);
+		_calendarLastWeekRectangle = new Rectangle((int)dX, (int) ((_numWeeksDisplayed -1 ) * dY), (int) (7 * dX), (int)dY);
 
 		// first draw the horizontal lines
 		gc.setBackground(_white);
@@ -856,7 +925,7 @@ public class CalendarGraph extends Canvas {
 		return _numberOfToursPerDay;
 	}
 
-	public Long getSelectedTour() {
+	public Long getSelectedTourId() {
 		if (_selectedItem.isTour()) {
 			return _selectedItem.id;
 		} else {
@@ -976,12 +1045,19 @@ public class CalendarGraph extends Canvas {
 			}
 		}
 
+		boolean visible = false;
 		int index = 0;
 		for (final ObjectLocation ol : _tourFocus) {
 			if (_selectedItem.id == ol.id) {
+				visible = true; // the selection is visible
 				break;
 			}
 			index++;
+		}
+		if (! visible) { // if we are scrolling tours forward and the selection got invisible start at the first tour again
+			if (offset > 0) {
+				index = -1;
+			}
 		}
 		final int newIndex = index + offset;
 		if (newIndex < 0) {
@@ -1174,11 +1250,12 @@ public class CalendarGraph extends Canvas {
 			if (ol.r.contains(event.x, event.y)) {
 				id = ol.id;
 				if (1 == event.button) {
-					if (oldSelection.id == ol.id) {
-						_selectedItem = _noItem; // deselect if already selected
-					} else {
-						_selectedItem = new Selection(id, SelectionType.TOUR);
-					}
+//					if (oldSelection.id == ol.id) {
+//						 _selectedItem = _noItem; // deselect if already selected
+//					} else {
+//						_selectedItem = new Selection(id, SelectionType.TOUR);
+//					}
+					_selectedItem = new Selection(id, SelectionType.TOUR);
 					_graphClean = false;
 				} else if (3 == event.button) {
 					_graphClean = false;
@@ -1196,11 +1273,12 @@ public class CalendarGraph extends Canvas {
 				if (ol.r.contains(event.x, event.y)) {
 					id = ol.id;
 					if (1 == event.button) {
-						if (oldSelection.id == ol.id) {
-							_selectedItem = _noItem; // deselect if already selected
-						} else {
-							_selectedItem = new Selection(id, SelectionType.DAY);
-						}
+//						if (oldSelection.id == ol.id) {
+//							 _selectedItem = _noItem; // deselect if already selected
+//						} else {
+//							_selectedItem = new Selection(id, SelectionType.DAY);
+//						}
+						_selectedItem = new Selection(id, SelectionType.DAY);
 						_graphClean = false;
 					} else if (3 == event.button) {
 						_graphClean = false;
@@ -1427,6 +1505,21 @@ public class CalendarGraph extends Canvas {
 	void zoomOut() {
 		_numWeeksDisplayed++;
 		redraw();
+	}
+
+	@Override
+	public ArrayList<TourData> getSelectedTours() {
+
+		final ArrayList<TourData> selectedTourData = new ArrayList<TourData>();
+		if (_selectedItem.isTour()) {
+			selectedTourData.add(TourManager.getInstance().getTourData(_selectedItem.id));
+		}
+		return selectedTourData;
+	}
+
+	@Override
+	public ArrayList<TourData> getAllSelectedTours() {
+		return getSelectedTours();
 	}
 
 }
