@@ -39,14 +39,15 @@ public class BreakTimeTool {
 	/**
 	 * break time method which is an index for a combo box
 	 */
-	public static final int			BREAK_TIME_METHOD_BY_TIME_DISTANCE	= 0;
-	public static final int			BREAK_TIME_METHOD_BY_SLICE_SPEED	= 1;
-	public static final int			BREAK_TIME_METHOD_BY_AVG_SPEED		= 2;
+	public static final int			BREAK_TIME_METHOD_BY_SLICE_SPEED	= 0;
+	public static final int			BREAK_TIME_METHOD_BY_AVG_SPEED		= 1;
+	public static final int			BREAK_TIME_METHOD_BY_TIME_DISTANCE	= 2;
 
-	public static final String[]	BREAK_TIME_METHODS					= { //
-																		Messages.Compute_BreakTime_Method_TimeDistance, // 0
-			Messages.Compute_BreakTime_Method_SpeedBySlice, // 1
-			Messages.Compute_BreakTime_Method_SpeedByAverage			// 2
+	public static final String[]	BREAK_TIME_METHODS					= //
+																		{
+			Messages.Compute_BreakTime_Method_SpeedBySlice, // 0
+			Messages.Compute_BreakTime_Method_SpeedByAverage, // 1
+			Messages.Compute_BreakTime_Method_TimeDistance				// 2
 																		};
 
 	private static IPreferenceStore	_prefStore							= TourbookPlugin
@@ -215,8 +216,6 @@ public class BreakTimeTool {
 		int prevTime = 0;
 		int prevDistance = 0;
 
-		int tourBreakTime = 0;
-
 		for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
 
 			final int currentTime = timeSerie[serieIndex];
@@ -224,6 +223,10 @@ public class BreakTimeTool {
 
 			final int sliceTimeDiff = currentTime - prevTime;
 			final int sliceDistDiff = currentDistance - prevDistance;
+
+//			if (serieIndex == 736) {
+//				final int a = 0;
+//			}
 
 			if (sliceTimeDiff > shortestBreakTime && sliceDistDiff < maxDistance) {
 
@@ -233,7 +236,6 @@ public class BreakTimeTool {
 				 */
 
 				breakTimeSerie[serieIndex] = true;
-				tourBreakTime += sliceTimeDiff;
 
 			} else if (isSliceDiff && sliceTimeDiff > sliceDiffSeconds) {
 
@@ -242,7 +244,6 @@ public class BreakTimeTool {
 				 */
 
 				breakTimeSerie[serieIndex] = true;
-				tourBreakTime += sliceTimeDiff;
 
 			} else {
 
@@ -263,30 +264,39 @@ public class BreakTimeTool {
 						break;
 					}
 
-					/*
-					 * ignore previous time slices when the first previous time slice was a longer
-					 * break, because the start after the break is always slowly
-					 */
-//					if (prevIndex == serieIndex - 1
-//							&& (timeDiffSlice > _breakUIShortestBreakTime && distDiffSlice < _breakUIMaxDistance)) {
-//						break;
-//					}
-
 					timeDiffPrevSlices = currentTime - timeSerie[prevIndex];
 					distDiffPrevSlices = currentDistance - distanceSerie[prevIndex];
 				}
 
 				if (timeDiffPrevSlices > shortestBreakTime && distDiffPrevSlices < maxDistance) {
 
-					// current time slice is also a break
+					// current time slice is a break, set break also in previous break time slices
 
-					breakTimeSerie[serieIndex] = true;
-					tourBreakTime += sliceTimeDiff;
+					for (int breakIndex = prevIndex; breakIndex <= serieIndex; breakIndex++) {
+						breakTimeSerie[breakIndex] = true;
+					}
 				}
 			}
 
 			prevTime = currentTime;
 			prevDistance = currentDistance;
+		}
+
+		/*
+		 * get breaktime for the whole tour
+		 */
+		int tourBreakTime = 0;
+		prevTime = 0;
+
+		for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
+
+			final int currentTime = timeSerie[serieIndex];
+
+			if (breakTimeSerie[serieIndex]) {
+				tourBreakTime += currentTime - prevTime;
+			}
+
+			prevTime = currentTime;
 		}
 
 		return new BreakTimeResult(breakTimeSerie, tourBreakTime);

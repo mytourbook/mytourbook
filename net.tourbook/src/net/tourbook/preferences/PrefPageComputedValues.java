@@ -31,7 +31,6 @@ import net.tourbook.ui.UI;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.osgi.util.NLS;
@@ -147,8 +146,6 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 	private Combo						_comboMinAltitude;
 	private Spinner						_spinnerSpeedMinTime;
 
-	private PixelConverter				_pc;
-
 	private Combo						_comboBreakMethod;
 
 	private PageBook					_pagebookBreakTime;
@@ -188,7 +185,6 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 	private Composite createUI(final Composite parent) {
 
-		_pc = new PixelConverter(parent);
 		_minHintWidth = 400;
 
 		final Composite container = new Composite(parent, SWT.NONE);
