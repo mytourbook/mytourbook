@@ -20,6 +20,7 @@ import net.tourbook.statistic.TourStatisticsView;
 import net.tourbook.ui.tourChart.TourChartView;
 import net.tourbook.ui.views.TourMarkerView;
 import net.tourbook.ui.views.TourWaypointView;
+import net.tourbook.ui.views.calendar.CalendarView;
 import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.ui.views.tourBook.TourBookView;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
@@ -76,6 +77,7 @@ public class PerspectiveFactoryTourBook implements IPerspectiveFactory {
 
 		listFolder.addView(RawDataView.ID);
 		listFolder.addView(TourBookView.ID);
+		listFolder.addView(CalendarView.ID);
 
 		//--------------------------------------------------------------------------------
 

@@ -1,3 +1,19 @@
+/*******************************************************************************
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation version 2 of the License.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+ *******************************************************************************/
+
 package net.tourbook.ui.views.calendar;
 
 import java.util.ArrayList;
@@ -12,14 +28,10 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourDoubleClickState;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.TourTypeFilterManager;
 import net.tourbook.ui.ColorCacheInt;
-import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourProviderAll;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.calendar.CalendarView.TourInfoFormatter;
-import net.tourbook.ui.views.tourBook.TVITourBookTour;
-import net.tourbook.ui.views.tourBook.TourBookView;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -36,7 +48,6 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackListener;
-import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -364,7 +375,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		
 		addListener(SWT.MouseWheel, new Listener() {
 			public void handleEvent(final Event event) {
-				Point p = new Point(event.x, event.y);
+				final Point p = new Point(event.x, event.y);
 				if (_calendarAllDaysRectangle.contains(p)) {
 					if (event.count > 0) {
 						if (_calendarFirstWeekRectangle.contains(p) || _calendarLastWeekRectangle.contains(p)) {
@@ -720,25 +731,28 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	}
 
-	// TODO review
 	private void drawSelectedTour(final GC gc, final CalendarTourData data, final Rectangle rec) {
 
 		final Color lineColor = _colorCache.get(_rgbLine.get(data.typeColorIndex).hashCode());
 
-		gc.fillGradientRectangle(rec.x - 4, rec.y - 4, rec.width + 9, rec.height + 9, false);
+		// - red box -
 		gc.setBackground(_red);
 		// gc.setBackground(lineColor);
-		gc.setForeground(lineColor);
 		gc.fillRectangle(rec.x - 4, rec.y - 4, rec.width + 9, rec.height + 9);
+		// gc.setForeground(_red);
+		gc.setForeground(lineColor);
 		gc.drawRoundRectangle(rec.x - 5, rec.y - 5, rec.width + 10, rec.height + 10, 6, 6);
 
+		// - tour box -
 		gc.setBackground(_colorCache.get(_rgbBright.get(data.typeColorIndex).hashCode()));
 		gc.setForeground(_colorCache.get(_rgbDark.get(data.typeColorIndex).hashCode()));
-
 		gc.fillGradientRectangle(rec.x + 1, rec.y + 1, rec.width - 2, rec.height - 2, false);
+
+		// - tour box border -
 		gc.setForeground(lineColor);
 		gc.drawRectangle(rec.x + 1, rec.y + 1, rec.width - 2, rec.height - 2);
 
+		// - text within box -
 		gc.setForeground(_black);
 		gc.setClipping(rec.x + 2, rec.y, rec.width - 4, rec.height - 2);
 		int y = rec.y + 1;
@@ -906,6 +920,11 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 	}
 
+	@Override
+	public ArrayList<TourData> getAllSelectedTours() {
+		return getSelectedTours();
+	}
+
 	public DateTime getFirstDay() {
 		return _dt;
 	}
@@ -931,6 +950,16 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		} else {
 			return _noItem.id;
 		}
+	}
+
+	@Override
+	public ArrayList<TourData> getSelectedTours() {
+
+		final ArrayList<TourData> selectedTourData = new ArrayList<TourData>();
+		if (_selectedItem.isTour()) {
+			selectedTourData.add(TourManager.getInstance().getTourData(_selectedItem.id));
+		}
+		return selectedTourData;
 	}
 
 	public int getTourInfoFormatterIndex(final int line) {
@@ -1505,21 +1534,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	void zoomOut() {
 		_numWeeksDisplayed++;
 		redraw();
-	}
-
-	@Override
-	public ArrayList<TourData> getSelectedTours() {
-
-		final ArrayList<TourData> selectedTourData = new ArrayList<TourData>();
-		if (_selectedItem.isTour()) {
-			selectedTourData.add(TourManager.getInstance().getTourData(_selectedItem.id));
-		}
-		return selectedTourData;
-	}
-
-	@Override
-	public ArrayList<TourData> getAllSelectedTours() {
-		return getSelectedTours();
 	}
 
 }

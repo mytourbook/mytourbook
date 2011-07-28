@@ -468,6 +468,12 @@
             label="%view_name_Book"
             mnemonic="%view_name_Book_Mnemonic"/>
          <command
+               commandId="command.net.tourbook.views.calendar.CalendarView"
+               icon="icons/calendar.png"
+               label="%view_name_Calendar"
+               mnemonic="%view_name_Calendar_Mnemonic">
+         </command>
+         <command
             commandId="command.net.tourbook.views.tourCatalog.TourCatalogView"
             icon="icons/tour-map.gif"
             label="%view_name_tourCatalog"
@@ -773,6 +779,11 @@
             defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTagging"
             />
       <command
+            id="command.net.tourbook.views.calendar.CalendarView"
+            name="%view_name_Calendar"
+            defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewCalendar"
+            />
+      <command
             id="command.net.tourbook.views.tourCatalog.TourCatalogView"
             name="%view_name_tourCatalog"
             defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourCatalog"
@@ -1034,6 +1045,13 @@
 	      </view>
 	      <view
 	            category="net.tourbook.category.tourList"
+	            class="net.tourbook.ui.views.calendar.CalendarView"
+	            icon="icons/calendar.png"
+	            id="net.tourbook.views.calendar.CalendarView"
+	            name="%view_name_Calendar">
+	      </view>
+	      <view
+	            category="net.tourbook.category.tourList"
 	            class="net.tourbook.ui.views.tagging.TaggingView"
 	            icon="icons/tour-tag.gif"
 	            id="net.tourbook.views.tagViewID"
@@ -1052,13 +1070,6 @@
 	            icon="icons/statistics.gif"
 	            id="net.tourbook.views.StatisticView"
 	            name="%view_name_Statistics">
-	      </view>
-	      <view
-	            category="net.tourbook.category.tourList"
-	            class="net.tourbook.ui.views.calendar.CalendarView"
-	            icon="icons/tour-tag.gif"
-	            id="net.tourbook.views.calendar.CalendarView"
-	            name="Tour Calendar">
 	      </view>
 
       <category

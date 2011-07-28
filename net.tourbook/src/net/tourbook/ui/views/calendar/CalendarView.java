@@ -1,3 +1,19 @@
+/*******************************************************************************
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation version 2 of the License.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+ *******************************************************************************/
+
 package net.tourbook.ui.views.calendar;
 
 import java.util.ArrayList;
@@ -66,7 +82,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 
 	private ISelectionListener					_selectionListener;
 	private IPartListener2						_partListener;
-	private IPropertyChangeListener				_prefChangeListener;
+	private IPropertyChangeListener				_propChangeListener;
 	private ITourEventListener					_tourPropertyListener;
 	private CalendarYearMonthContributionItem	_cymci;
 	
@@ -415,29 +431,29 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		getViewSite().getPage().addPartListener(_partListener);
 	}
 
-	private void addPrefListener() {
+	private void addPropListener() {
 
-		_prefChangeListener = new IPropertyChangeListener() {
+		_propChangeListener = new IPropertyChangeListener() {
 
 			public void propertyChange(final PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
 
 				if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
-
 					refreshCalendar();
-
+				} else if (property.equals(ITourbookPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK)) {
+					refreshCalendar();
+				} else if (property.equals(ITourbookPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK)) {
+					refreshCalendar();
 				} else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
-
 					refreshCalendar();
-
 				}
 			}
 
 		};
 
-		// add pref listener
-		_prefStore.addPropertyChangeListener(_prefChangeListener);
+		// add prop listener
+		_prefStore.addPropertyChangeListener(_propChangeListener);
 
 	}
 
@@ -513,7 +529,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	public void createPartControl(final Composite parent) {
 
 		addPartListener();
-		addPrefListener();
+		addPropListener();
 		addTourEventListener();
 
 		createUI(parent);
@@ -549,7 +565,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 
 		TourManager.getInstance().removeTourEventListener(_tourPropertyListener);
 		getSite().getPage().removePostSelectionListener(_selectionListener);
-		_prefStore.removePropertyChangeListener(_prefChangeListener);
+		_prefStore.removePropertyChangeListener(_propChangeListener);
 
 		super.dispose();
 	}
