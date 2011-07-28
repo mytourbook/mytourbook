@@ -37,6 +37,7 @@ public class Messages extends NLS {
 	public static String		Calendar_View_Action_Forward;
 	public static String		Calendar_View_Action_Forward_Tooltip;
 	public static String		Calendar_View_Action_GotoToday;
+	public static String		Calendar_View_Action_LineInfo;
 	public static String		Calendar_View_Action_LinkWithOtherViews;
 	public static String		Calendar_View_Action_LogicalNavigation;
 	public static String		Calendar_View_Action_PhysicalNavigation;

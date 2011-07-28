@@ -62,11 +62,11 @@ public class CalendarGraph extends Canvas {
 	private Color								_gray				= _display.getSystemColor(SWT.COLOR_GRAY);
 	private Color								_white				= _display.getSystemColor(SWT.COLOR_WHITE);
 	private Color								_red				= _display.getSystemColor(SWT.COLOR_RED);
-	private Color								_green				= _display.getSystemColor(SWT.COLOR_GREEN);
+//	private Color								_green				= _display.getSystemColor(SWT.COLOR_GREEN);
 	private Color								_blue				= _display.getSystemColor(SWT.COLOR_BLUE);
 	private Color								_magenta				= _display.getSystemColor(SWT.COLOR_MAGENTA);
-	private Color								_cyan					= _display.getSystemColor(SWT.COLOR_CYAN);
-	//private Color								_darkGray				= _display.getSystemColor(SWT.COLOR_DARK_GRAY);
+//	private Color								_cyan					= _display.getSystemColor(SWT.COLOR_CYAN);
+//	private Color								_darkGray				= _display.getSystemColor(SWT.COLOR_DARK_GRAY);
 	private Color								_darkGray				= _colorCache.get(0x707070);
 
 	private NavigationStyle						_navigationStyle	= NavigationStyle.PHYSICAL;
@@ -75,9 +75,9 @@ public class CalendarGraph extends Canvas {
 	private ArrayList<RGB>						_rgbDark;
 	private ArrayList<RGB>						_rgbLine;
 
-
 	private DateTime							_dt					= new DateTime();
 	private int									_numWeeksDisplayed	= 5;
+	private int									_lastDayOfWeekToGoTo	= -1;
 
 	private List<ObjectLocation>				_tourFocus;
 	private List<ObjectLocation>				_dayFocus;
@@ -112,7 +112,7 @@ public class CalendarGraph extends Canvas {
 	final static private long					_WEEK_MILLIS			= (1000 * 60 * 60 * 24 * 7);
 	final static private int					_MIN_SCROLLABLE_WEEKS	= 12;
 
-	private TourInfoFormatter					_tourInfoFormatter;
+	private TourInfoFormatter[]					_tourInfoFormatter		= new TourInfoFormatter[3];
 
 	private boolean								_useLineColorForTourInfoText;
 
@@ -670,10 +670,14 @@ public class CalendarGraph extends Canvas {
 		gc.setForeground(lineColor);
 		gc.drawRectangle(rec.x + 1, rec.y + 1, rec.width - 2, rec.height - 2);
 
-		final String info = _tourInfoFormatter.format(data);
 		gc.setForeground(_black);
 		gc.setClipping(rec.x + 2, rec.y, rec.width - 4, rec.height - 2);
-		gc.drawText(info, rec.x + 3, rec.y + 1, true);
+		int y = rec.y + 1;
+		for (int i = 0; i < _tourInfoFormatter.length && y < rec.y + rec.height; i++) {
+			final String info = _tourInfoFormatter[i].format(data);
+			gc.drawText(info, rec.x + 3, y, true);
+			y += gc.stringExtent(info).y;
+		}
 		gc.setClipping(_nullRec);
 	}
 
@@ -715,10 +719,14 @@ public class CalendarGraph extends Canvas {
 		gc.setForeground(_colorCache.get(_rgbDark.get(data.typeColorIndex).hashCode()));
 		gc.fillGradientRectangle(r.x + 1, r.y + 1, r.width - 1, r.height - 1, false);
 
-		final String info = _tourInfoFormatter.format(data);
 		gc.setForeground(fg);
 		gc.setClipping(r.x + 1, r.y, r.width - 2, r.height);
-		gc.drawText(info, r.x + 2, r.y, true);
+		int y = r.y + 1;
+		for (int i = 0; i < _tourInfoFormatter.length && y < r.y + r.height; i++) {
+			final String info = _tourInfoFormatter[i].format(data);
+			gc.drawText(info, r.x + 2, y, true);
+			y += gc.stringExtent(info).y;
+		}
 		gc.setClipping(_nullRec);
 	}
 
@@ -856,8 +864,8 @@ public class CalendarGraph extends Canvas {
 		}
 	}
 
-	public int getTourInfoFormatterIndex() {
-		return _tourInfoFormatter.index;
+	public int getTourInfoFormatterIndex(final int line) {
+		return _tourInfoFormatter[line].index;
 	}
 
 	public boolean  getTourInfoUseLineLineColor() {
@@ -1024,7 +1032,7 @@ public class CalendarGraph extends Canvas {
 			for (int i = index; i >= 0 && i < _tourFocus.size(); i += direction) {
 				final ObjectLocation ol = _tourFocus.get(i);
 				if (ctd.dayOfWeek != ((CalendarTourData) (ol.o)).dayOfWeek) {
-					_selectedItem.id = ol.id;
+					_selectedItem = new Selection(ol.id, SelectionType.TOUR);
 					redraw();
 					return;
 				}
@@ -1042,8 +1050,6 @@ public class CalendarGraph extends Canvas {
 
 	}
 
-	// TODO: remember last weekday and start selecting this weekday and not the first with a tour
-	// as its currently done if selection disappeared from screen
 	private void gotoTourSameWeekday(final int direction) {
 
 		if (_tourFocus.size() < 1) {
@@ -1074,12 +1080,22 @@ public class CalendarGraph extends Canvas {
 			}
 			index++;
 		}
+
+		int dayOfWeekToGoTo = -1;
 		if (null != ctd) {
+			dayOfWeekToGoTo = ctd.dayOfWeek;
+		} else if (_lastDayOfWeekToGoTo >= 0) { // selection scrolled out of view
+			dayOfWeekToGoTo = _lastDayOfWeekToGoTo;
+			index = direction > 0 ? 0 : _tourFocus.size();
+		}
+
+		if (dayOfWeekToGoTo >= 0) {
 			index += direction;
 			for (int i = index; i >= 0 && i < _tourFocus.size(); i += direction) {
 				final ObjectLocation ol = _tourFocus.get(i);
-				if (ctd.dayOfWeek == ((CalendarTourData) (ol.o)).dayOfWeek) {
+				if (dayOfWeekToGoTo == ((CalendarTourData) (ol.o)).dayOfWeek) {
 					_selectedItem = new Selection(ol.id, SelectionType.TOUR);
+					_lastDayOfWeekToGoTo = dayOfWeekToGoTo;
 					redraw();
 					return;
 				}
@@ -1117,8 +1133,12 @@ public class CalendarGraph extends Canvas {
 		gc.drawRoundRectangle(rec.x - 5, rec.y - 5, rec.width + 10, rec.height + 10, 6, 6);
 		gc.setForeground(_black);
 		gc.setClipping(rec.x + 2, rec.y, rec.width - 4, rec.height - 2);
-		final String info = _tourInfoFormatter.format(data);
-		gc.drawText(info, rec.x + 3, rec.y + 1, true);
+		int y = rec.y + 1;
+		for (int i = 0; i < _tourInfoFormatter.length && y < rec.y + rec.height; i++) {
+			final String info = _tourInfoFormatter[i].format(data);
+			gc.drawText(info, rec.x + 3, y, true);
+			y += gc.stringExtent(info).y;
+		}
 		gc.setClipping(_nullRec);
 	}
 
@@ -1287,8 +1307,6 @@ public class CalendarGraph extends Canvas {
 			_graphClean = false;
 			redraw();
 		}
-		// TODO Auto-generated method stub
-		
 	}
 
 	void removeSelectionListener(final ICalendarSelectionProvider listener) {
@@ -1379,8 +1397,8 @@ public class CalendarGraph extends Canvas {
 		redraw();
 	}
 
-	public void setTourInfoFormatter(final TourInfoFormatter formatter) {
-		_tourInfoFormatter = formatter;
+	public void setTourInfoFormatter(final int line, final TourInfoFormatter formatter) {
+		_tourInfoFormatter[line] = formatter;
 		_graphClean = false;
 		redraw();
 	}
