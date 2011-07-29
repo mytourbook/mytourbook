@@ -146,9 +146,9 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		_nf2.setMinimumFractionDigits(2);
 		_nf2.setMaximumFractionDigits(2);
 	}
-	private final boolean				_isOSX						= net.tourbook.util.UI.IS_OSX;
 
-//	private int							_spinnerWidth;
+	private final boolean				_isOSX						= net.tourbook.util.UI.IS_OSX;
+	private final boolean				_isLinux					= net.tourbook.util.UI.IS_LINUX;
 
 	private SelectionListener			_defaultSelectionListener;
 	private ModifyListener				_defaultModifyListener;
@@ -951,7 +951,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			 * label: age
 			 */
 			label = new Label(containerAge, SWT.NONE);
-			GridDataFactory.fillDefaults()//¨
+			GridDataFactory.fillDefaults()//ï¿½
 					.grab(true, true)
 					.align(SWT.END, SWT.CENTER)
 					.applyTo(label);
@@ -1085,7 +1085,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		final Point comboSize = label.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 		label.dispose();
 
-		final int comboWidth = (int) (_isOSX ? comboSize.x * 1.3 : comboSize.x);
+		final int comboWidth = (int) (_isOSX || _isLinux ? comboSize.x * 1.3 : comboSize.x);
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
@@ -2219,7 +2219,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 	/**
 	 * hr max formula
-	 *
+	 * 
 	 * @param hrMaxFormulaKey
 	 * @param maxPulse
 	 */

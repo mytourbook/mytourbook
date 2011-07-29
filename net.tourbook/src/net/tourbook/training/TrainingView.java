@@ -1268,6 +1268,12 @@ public class TrainingView extends ViewPart {
 				final int pulse = _pulseStart + pulseIndex;
 
 				if (pulse >= minValue && pulse <= maxValue) {
+
+					// check array bounds
+					if (pulseIndex >= colorIndex.length) {
+						pulseIndex = colorIndex.length - 1;
+					}
+
 					colorIndex[pulseIndex] = zoneIndex;
 					break;
 				}
