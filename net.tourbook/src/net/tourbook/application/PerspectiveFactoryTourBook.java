@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -78,6 +78,7 @@ public class PerspectiveFactoryTourBook implements IPerspectiveFactory {
 		listFolder.addView(RawDataView.ID);
 		listFolder.addView(TourBookView.ID);
 		listFolder.addView(CalendarView.ID);
+		listFolder.addView(TourStatisticsView.ID);
 
 		//--------------------------------------------------------------------------------
 
@@ -87,7 +88,6 @@ public class PerspectiveFactoryTourBook implements IPerspectiveFactory {
 				0.6f,
 				FOLDER_ID_LIST);
 
-		markerFolder.addView(TourStatisticsView.ID);
 		markerFolder.addView(TourMarkerView.ID);
 		markerFolder.addView(TourWaypointView.ID);
 	}

@@ -2287,7 +2287,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		tourData.setBikerWeight(person.getWeight());
 		tourData.setTourBike(person.getTourBike());
 
-		final TourData savedTour = TourDatabase.saveTour(tourData);
+		final TourData savedTour = TourDatabase.saveTour(tourData, true);
 		if (savedTour != null) {
 			savedTours.add(savedTour);
 		}

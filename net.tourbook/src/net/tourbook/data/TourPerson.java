@@ -158,7 +158,7 @@ public class TourPerson implements Comparable<Object> {
 	 * Key is the age of the person
 	 */
 	@Transient
-	private HashMap<Integer, ZoneMinMaxBpm>		_hrZoneMinMaxBpm			= new HashMap<Integer, ZoneMinMaxBpm>();
+	private HashMap<Integer, HrZoneContext>		_hrZoneMinMaxBpm			= new HashMap<Integer, HrZoneContext>();
 
 	/**
 	 * Sorted HR zones
@@ -357,7 +357,7 @@ public class TourPerson implements Comparable<Object> {
 	 * @return Returns HR zone min/max bpm values or <code>null</code> when hr zones are not
 	 *         defined.
 	 */
-	public ZoneMinMaxBpm getHrZoneMinMaxBpm(final int hrMaxFormulaKey,
+	public HrZoneContext getHrZoneContext(	final int hrMaxFormulaKey,
 											final int hrMaxPulse,
 											final DateTime birthDay,
 											final DateTime dateTime) {
@@ -367,8 +367,7 @@ public class TourPerson implements Comparable<Object> {
 		}
 
 		final int age = getAge(birthDay, dateTime);
-
-		final ZoneMinMaxBpm hrZoneMinMax = _hrZoneMinMaxBpm.get(age);
+		final HrZoneContext hrZoneMinMax = _hrZoneMinMaxBpm.get(age);
 
 		if (hrZoneMinMax != null) {
 			// hr zones for the age is already available
@@ -395,8 +394,8 @@ public class TourPerson implements Comparable<Object> {
 
 			int minBpm = hrZone.getZoneMinValue() * hrMax / 100;
 
-			final int maxBpm = zoneMaxValue == Integer.MAX_VALUE //
-					? Integer.MAX_VALUE
+			final int maxBpm = zoneMaxValue == Integer.MAX_VALUE ? //
+					Integer.MAX_VALUE
 					: (zoneMaxValue * hrMax / 100);
 
 			if (prevMaxBpm != -1) {
@@ -410,17 +409,17 @@ public class TourPerson implements Comparable<Object> {
 			prevMaxBpm = maxBpm;
 		}
 
-		final ZoneMinMaxBpm hrZoneMinMax1 = new ZoneMinMaxBpm(zoneMinBmps, zoneMaxBmps, age, hrMax);
+		final HrZoneContext hrZoneMinMax1 = new HrZoneContext(zoneMinBmps, zoneMaxBmps, age, hrMax);
 
 		_hrZoneMinMaxBpm.put(age, hrZoneMinMax1);
 
 		return hrZoneMinMax1;
 	}
 
-	public Set<TourPersonHRZone> getHrZones() {
-		return hrZones;
-	}
-
+	/**
+	 * @return Returns a list with all HR zones for this person. When the person has no HR zones,
+	 *         the returned list is empty.
+	 */
 	public ArrayList<TourPersonHRZone> getHrZonesSorted() {
 
 		if (_sortedHrZones == null) {

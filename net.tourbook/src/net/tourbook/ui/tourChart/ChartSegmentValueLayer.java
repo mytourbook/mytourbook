@@ -21,7 +21,7 @@ package net.tourbook.ui.tourChart;
 
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataYSerie;
-import net.tourbook.chart.ChartDrawingData;
+import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IChartLayer;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourManager;
@@ -48,7 +48,7 @@ public class ChartSegmentValueLayer implements IChartLayer {
 	 * @param drawingData
 	 * @param chartComponents
 	 */
-	public void draw(final GC gc, final ChartDrawingData drawingData, final Chart chart) {
+	public void draw(final GC gc, final GraphDrawingData drawingData, final Chart chart) {
 
 		final int[] segmentSerie = fTourData.segmentSerieIndex;
 

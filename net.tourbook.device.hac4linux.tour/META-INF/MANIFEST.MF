@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Import HAC4Linux .TOUR files
 Bundle-SymbolicName: net.tourbook.device.hac4linux.tour;singleton:=true
-Bundle-Version: 10.11.0.qualifier
+Bundle-Version: 11.8.0.qualifier
 Bundle-Activator: net.tourbook.device.hac4linux.tour.Activator
 Require-Bundle: org.eclipse.core.runtime,
  net.tourbook,

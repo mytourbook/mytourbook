@@ -74,9 +74,9 @@ public abstract class DataProvider {
 	}
 
 	/**
-	 * @param selectedYear
+	 * @param currentYear
 	 * @param numberOfYears
-	 * @return Returns the number of days between {@link #_lastYear} and selectedYear
+	 * @return Returns the number of days between {@link #_lastYear} and currentYear
 	 */
 	int getYearDOYs(final int selectedYear) {
 

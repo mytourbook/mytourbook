@@ -264,7 +264,7 @@ public class DialogMarker extends TitleAreaDialog {
 		_txtMarkerName.setFocus();
 
 		// update chart
-		_tourChart.updateMarkerLayer(true);
+		_tourChart.updateLayerMarker(true);
 	}
 
 	@Override
@@ -585,7 +585,7 @@ public class DialogMarker extends TitleAreaDialog {
 //		TourChartConfiguration chartConfig = new TourChartConfiguration(false);
 //		chartConfig.addVisibleGraph(TourManager.GRAPH_ALTITUDE);
 
-		final TourChartConfiguration chartConfig = TourManager.createTourChartConfiguration();
+		final TourChartConfiguration chartConfig = TourManager.createDefaultTourChartConfig();
 		_tourChart.updateTourChart(_tourData, chartConfig, false);
 	}
 
@@ -758,7 +758,7 @@ public class DialogMarker extends TitleAreaDialog {
 		_lblXValue.setText(Integer.toString(_scaleX.getSelection() - OFFSET_0));
 		_lblYValue.setText(Integer.toString(_scaleY.getSelection() - OFFSET_0));
 
-		_tourChart.updateMarkerLayer(true);
+		_tourChart.updateLayerMarker(true);
 
 		_markerViewer.update(_selectedTourMarker, null);
 
@@ -790,7 +790,7 @@ public class DialogMarker extends TitleAreaDialog {
 			_markerViewer.remove(selectedMarker);
 
 			// update chart
-			_tourChart.updateMarkerLayer(true);
+			_tourChart.updateLayerMarker(true);
 
 			// select next marker
 			TourMarker nextMarker = (TourMarker) _markerViewer.getElementAt(lastMarkerIndex);

@@ -6299,7 +6299,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		 */
 		_isTourDirty = false;
 
-		_tourData = TourDatabase.saveTour(_tourData);
+		_tourData = TourDatabase.saveTour(_tourData, true);
 
 		updateMarkerMap();
 

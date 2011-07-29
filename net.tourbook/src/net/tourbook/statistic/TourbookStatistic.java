@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,15 +26,13 @@ import org.eclipse.ui.IWorkbenchPartSite;
  */
 public abstract class TourbookStatistic {
 
-	protected static final String	NEW_LINE	= "\n"; //$NON-NLS-1$
+	public String		statisticId;
 
-	public String					statisticId;
+	public String		visibleName;
 
-	public String					visibleName;
+	private Composite	_container;
 
-	private Composite				_container;
-
-	private boolean					_isDataDirty;
+	private boolean		_isDataDirty;
 
 	/**
 	 * Activates the actions in the statistic
@@ -79,7 +77,10 @@ public abstract class TourbookStatistic {
 	 */
 	public void dispose() {
 		if (_container != null && _container.isDisposed() == false) {
+
 			_container.dispose();
+
+			// null is checked outside of this class
 			_container = null;
 		}
 	}
@@ -127,12 +128,14 @@ public abstract class TourbookStatistic {
 	}
 
 	/**
-	 * @return returns the status if the tour data for the statistic is dirty and resets the status
+	 * @return Returns the status if the tour data for the statistic is dirty and resets the status
 	 *         to <code>false</code>
 	 */
 	protected boolean isDataDirtyWithReset() {
+
 		final boolean isDataDirty = _isDataDirty;
 		_isDataDirty = false;
+
 		return isDataDirty;
 	}
 
@@ -144,9 +147,18 @@ public abstract class TourbookStatistic {
 	/**
 	 * Restores the state from a memento (e.g. select previous selection), default does nothing
 	 * 
-	 * @param viewState
+	 * @param state
 	 */
-	public abstract void restoreState(final IDialogSettings viewState);
+	public abstract void restoreState(final IDialogSettings state);
+
+	/**
+	 * Restore state after the controls is created.
+	 * 
+	 * @param state
+	 */
+	public void restoreStateEarly(final IDialogSettings state) {
+		// do nothing
+	}
 
 	/**
 	 * Saves the state of the statistic into the memento, default does nothing
@@ -192,13 +204,23 @@ public abstract class TourbookStatistic {
 		return false;
 	}
 
+	/**
+	 * Bar vertical order was in the UI.
+	 * 
+	 * @param selectedIndex
+	 *            Combobox selection index
+	 */
+	public void setBarVerticalOrder(final int selectedIndex) {
+		// do nothing
+	}
+
 	public void setContainer(final Composite container) {
 		_container = container;
 	}
 
 	/**
-	 * sets the statistic data dirty, they must be refreshed when the chart is displayed the next
-	 * time
+	 * Set statistic data dirty that they must be reloaded when the chart is displayed the next
+	 * time.
 	 */
 	public void setDataDirty() {
 		_isDataDirty = true;

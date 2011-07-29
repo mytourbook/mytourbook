@@ -191,6 +191,11 @@ public class TourTypeFilterManager {
 		_prefStore.addPropertyChangeListener(_prefChangeListener);
 	}
 
+	/**
+	 * Fills the tour type filter context menu.
+	 * 
+	 * @param menuMgr
+	 */
 	public static void fillMenu(final IMenuManager menuMgr) {
 
 		final TourTypeFilter activeTTFilter = TourbookPlugin.getActiveTourTypeFilter();

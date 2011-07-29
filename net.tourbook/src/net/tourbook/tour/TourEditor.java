@@ -135,7 +135,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 
 				if (eventId == TourEventId.SEGMENT_LAYER_CHANGED) {
 
-					_tourChart.updateSegmentLayer((Boolean) eventData);
+					_tourChart.updateLayerSegment((Boolean) eventData);
 
 				} else if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
 
@@ -221,7 +221,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 			}
 		});
 
-		_tourChartConfig = TourManager.createTourChartConfiguration();
+		_tourChartConfig = TourManager.createDefaultTourChartConfig();
 		_tourChart.createTourEditorActionHandlers(_tourChartConfig);
 
 		updateTourChart();

@@ -20,6 +20,6 @@ class TourDataMonthHrZones {
 	/**
 	 * HR zones values in seconds.
 	 */
-	public int[][]	hrZones;
+	public int[][]	hrZoneValues;
 
 }
