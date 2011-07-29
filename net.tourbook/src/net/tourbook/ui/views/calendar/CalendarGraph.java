@@ -756,7 +756,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		gc.setForeground(_black);
 		gc.setClipping(rec.x + 2, rec.y, rec.width - 4, rec.height - 2);
 		int y = rec.y + 1;
-		for (int i = 0; i < _tourInfoFormatter.length && y < rec.y + rec.height; i++) {
+		int minToShow = gc.getFontMetrics().getHeight()/2;
+		for (int i = 0; i < _tourInfoFormatter.length && y < rec.y + rec.height - minToShow; i++) {
 			final String info = _tourInfoFormatter[i].format(data);
 			gc.drawText(info, rec.x + 3, y, true);
 			y += gc.stringExtent(info).y;
@@ -805,7 +806,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		gc.setForeground(fg);
 		gc.setClipping(r.x + 1, r.y, r.width - 2, r.height);
 		int y = r.y + 1;
-		for (int i = 0; i < _tourInfoFormatter.length && y < r.y + r.height; i++) {
+		int minToShow = gc.getFontMetrics().getHeight()/2;
+		for (int i = 0; i < _tourInfoFormatter.length && y < r.y + r.height - minToShow; i++) {
 			final String info = _tourInfoFormatter[i].format(data);
 			gc.drawText(info, r.x + 2, y, true);
 			y += gc.stringExtent(info).y;
@@ -838,6 +840,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		final int x = rec.x + rec.width - 1;
 		int y = rec.y + 1;
 		String text;
+		
+		int fontHeight = gc.getFontMetrics().getHeight();
+		int minToShow = fontHeight/2;
 
 		// time
 		gc.setForeground(_darkGray);
@@ -848,8 +853,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					(data.recordingTime % 3600) / 60).toString();
 			gc.drawText(text, x - gc.stringExtent(text).x, y);
 		}
-		y += gc.getFontMetrics().getHeight();
-		if (y > rec.y + rec.height) {
+		y += fontHeight;
+		if (y > rec.y + rec.height - minToShow) {
 			return;
 		}
 
@@ -862,8 +867,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					distance).toString();
 			gc.drawText(text, x - gc.stringExtent(text).x, y);
 		}
-		y += gc.getFontMetrics().getHeight();
-		if (y > rec.y + rec.height) {
+		y += fontHeight;
+		if (y > rec.y + rec.height - minToShow) {
 			return;
 		}
 
@@ -876,7 +881,11 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 			gc.drawText(text, x - gc.stringExtent(text).x, y);
 		}
-		y += gc.getFontMetrics().getHeight();
+		y += fontHeight;
+		if (y > rec.y + rec.height - minToShow) {
+			return;
+		}
+
 
 		// pace
 		gc.setForeground(_magenta);
@@ -890,7 +899,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					pace % 60).toString();
 			gc.drawText(text, x - gc.stringExtent(text).x, y);
 		}
-		y += gc.getFontMetrics().getHeight();
+		y += fontHeight;
 		gc.setClipping(_nullRec);
 	}
 
@@ -1239,7 +1248,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		gc.setForeground(_black);
 		gc.setClipping(rec.x + 2, rec.y, rec.width - 4, rec.height - 2);
 		int y = rec.y + 1;
-		for (int i = 0; i < _tourInfoFormatter.length && y < rec.y + rec.height; i++) {
+		int minToShow = gc.getFontMetrics().getHeight()/2;
+		for (int i = 0; i < _tourInfoFormatter.length && y < rec.y + rec.height - minToShow; i++) {
 			final String info = _tourInfoFormatter[i].format(data);
 			gc.drawText(info, rec.x + 3, y, true);
 			y += gc.stringExtent(info).y;
