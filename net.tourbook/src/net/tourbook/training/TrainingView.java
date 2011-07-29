@@ -569,9 +569,6 @@ public class TrainingView extends ViewPart {
 		_chartHrTime.addBarSelectionListener(new IBarSelectionListener() {
 			public void selectionChanged(final int serieIndex, final int valueIndex) {
 
-//					System.out.println(serieIndex + "\t" + valueIndex);
-//					// TODO remove SYSTEM.OUT.PRINTLN
-
 //					_postSelectionProvider.setSelection(selection);
 			}
 		});
@@ -1008,9 +1005,6 @@ public class TrainingView extends ViewPart {
 
 	private void restoreState() {
 
-//		final int stateSelectedChart = Util.getStateInt(_state, STATE_SELECTED_CHART, CHART_ID_HR_TIME);
-//		_comboTrainingChart.select(getChartIndex(stateSelectedChart));
-
 		_isShowAllPulseValues = Util.getStateBoolean(_state, STATE_IS_SHOW_ALL_PULSE_VALUES, false);
 		_actionShowAllPulseValues.setChecked(_isShowAllPulseValues);
 
@@ -1026,8 +1020,6 @@ public class TrainingView extends ViewPart {
 	}
 
 	private void saveState() {
-
-//		_state.put(STATE_SELECTED_CHART, getSelectedChartId());
 
 		_state.put(STATE_HR_CHART_LEFT_BORDER, _spinnerHrLeft.getSelection());
 		_state.put(STATE_HR_CHART_RIGHT_BORDER, _spinnerHrRight.getSelection());

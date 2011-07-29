@@ -45,7 +45,6 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.preference.DirectoryFieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -169,7 +168,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	private org.joda.time.DateTime		_today						= new org.joda.time.DateTime()//
 																			.withTime(0, 0, 0, 0);
 
-	private PixelConverter				_pc;
 	private Font						_fontItalic;
 	private Color[]						_hrZoneColors;
 
@@ -951,7 +949,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			 * label: age
 			 */
 			label = new Label(containerAge, SWT.NONE);
-			GridDataFactory.fillDefaults()//�
+			GridDataFactory.fillDefaults()//
 					.grab(true, true)
 					.align(SWT.END, SWT.CENTER)
 					.applyTo(label);
@@ -1682,9 +1680,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	private void initUI(final Composite parent) {
 
 		initializeDialogUnits(parent);
-
-		_pc = new PixelConverter(parent);
-//		_spinnerWidth = _pc.convertWidthInCharsToPixels(_isOSX ? 10 : 5);
 
 		_fontItalic = JFaceResources.getFontRegistry().getItalic(JFaceResources.DIALOG_FONT);
 
