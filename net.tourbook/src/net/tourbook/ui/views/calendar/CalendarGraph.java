@@ -482,6 +482,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			drawHighLight(gc);
 			gc.dispose();
 			oldGc.drawImage(_highlight, 0, 0);
+			_highlight.dispose();
 			_highlightChanged = false;
 			return;
 		}
@@ -682,7 +683,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 			_tourFocus.add(new ObjectLocation(focus, data[i].tourId, data[i]));
 
-			drawTourInfo(gc, tour, data[i]);
+			drawTourInfo(gc, tour, data[i], false);
 
 		}
 
@@ -702,7 +703,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		for (final ObjectLocation ol : objects) {
 			if (ol.id == _highlightedItem.id) {
 				if (ol.o instanceof CalendarTourData) {
-					highlightTour(gc, (CalendarTourData) (ol.o), ol.r);
+					drawHighlightedTour(gc, (CalendarTourData) (ol.o), ol.r);
 				} else if (ol.o instanceof Day) {
 					// gc.setAlpha(0xd0); // like statistics
 					gc.setAlpha(0xa0);
@@ -710,10 +711,27 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					gc.setForeground(_gray);
 					gc.fillGradientRectangle(ol.r.x - 4, ol.r.y - 4, ol.r.width + 9, ol.r.height + 9, false);
 					gc.drawRoundRectangle(ol.r.x - 5, ol.r.y - 5, ol.r.width + 10, ol.r.height + 10, 6, 6);
+					gc.setAlpha(0xFF);
 				}
 				return;
 			}
 		}
+	}
+
+	private void drawHighlightedTour(final GC gc, final CalendarTourData data, final Rectangle rec) {
+
+		gc.setAlpha(0xd0);
+		gc.setBackground(_colorCache.get(_rgbBright.get(data.typeColorIndex).hashCode()));
+		gc.setForeground(_colorCache.get(_rgbDark.get(data.typeColorIndex).hashCode()));
+		gc.fillGradientRectangle(rec.x - 4, rec.y - 4, rec.width + 9, rec.height + 9, false);
+		gc.setForeground(_colorCache.get(_rgbLine.get(data.typeColorIndex).hashCode()));
+		gc.drawRoundRectangle(rec.x - 5, rec.y - 5, rec.width + 10, rec.height + 10, 6, 6);
+		gc.setAlpha(0xFF);
+
+		// focus is 1 pixel larger than tour rectangle
+		final Rectangle r = new Rectangle(rec.x + 1, rec.y + 1, rec.width - 2, rec.height - 2);
+		drawTourInfoText(gc, r, data, _black);
+
 	}
 
 	private void drawSelectedDay (final GC gc, final Rectangle r) {
@@ -743,26 +761,11 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		gc.setForeground(lineColor);
 		gc.drawRoundRectangle(rec.x - 5, rec.y - 5, rec.width + 10, rec.height + 10, 6, 6);
 
-		// - tour box -
-		gc.setBackground(_colorCache.get(_rgbBright.get(data.typeColorIndex).hashCode()));
-		gc.setForeground(_colorCache.get(_rgbDark.get(data.typeColorIndex).hashCode()));
-		gc.fillGradientRectangle(rec.x + 1, rec.y + 1, rec.width - 2, rec.height - 2, false);
+		// focus is 1 pixel larger than tour rectangle
+		final Rectangle r = new Rectangle(rec.x + 1, rec.y + 1, rec.width - 2, rec.height - 2);
+		drawTourInfo(gc, r, data, true);
+		return;
 
-		// - tour box border -
-		gc.setForeground(lineColor);
-		gc.drawRectangle(rec.x + 1, rec.y + 1, rec.width - 2, rec.height - 2);
-
-		// - text within box -
-		gc.setForeground(_black);
-		gc.setClipping(rec.x + 2, rec.y, rec.width - 4, rec.height - 2);
-		int y = rec.y + 1;
-		int minToShow = gc.getFontMetrics().getHeight()/2;
-		for (int i = 0; i < _tourInfoFormatter.length && y < rec.y + rec.height - minToShow; i++) {
-			final String info = _tourInfoFormatter[i].format(data);
-			gc.drawText(info, rec.x + 3, y, true);
-			y += gc.stringExtent(info).y;
-		}
-		gc.setClipping(_nullRec);
 	}
 
 	private void drawSelection(final GC gc) {
@@ -788,29 +791,43 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 	}
 
-	private void drawTourInfo(final GC gc, final Rectangle r, final CalendarTourData data) {
+	private void drawTourInfo(final GC gc, final Rectangle r, final CalendarTourData data, final boolean highlight) {
 
-		Color fg;
-		if (_useLineColorForTourInfoText) {
-			fg = _colorCache.get(_rgbLine.get(data.typeColorIndex).hashCode());
-		} else {
-			fg = _darkGray;
-		}
-		gc.setForeground(fg);
+		final Color line = _colorCache.get(_rgbLine.get(data.typeColorIndex).hashCode());
 
+		gc.setForeground(line);
 		gc.drawRectangle(r);
+
 		gc.setBackground(_colorCache.get(_rgbBright.get(data.typeColorIndex).hashCode()));
 		gc.setForeground(_colorCache.get(_rgbDark.get(data.typeColorIndex).hashCode()));
 		gc.fillGradientRectangle(r.x + 1, r.y + 1, r.width - 1, r.height - 1, false);
 
+		Color fg;
+		if (highlight) {
+			fg = _black;
+		} else if (_useLineColorForTourInfoText) {
+			fg = line;
+		} else {
+			fg = _darkGray;
+		}
+
+		drawTourInfoText(gc, r, data, fg);
+
+	}
+
+	private void drawTourInfoText(final GC gc, final Rectangle r, final CalendarTourData data, final Color fg) {
+
 		gc.setForeground(fg);
 		gc.setClipping(r.x + 1, r.y, r.width - 2, r.height);
 		int y = r.y + 1;
-		int minToShow = gc.getFontMetrics().getHeight()/2;
+		final int fontHeight = gc.getFontMetrics().getHeight();
+		// final int minToShow = (2 * gc.stringExtent("Hello").y / 3);
+		final int minToShow = (2 * fontHeight / 3);
 		for (int i = 0; i < _tourInfoFormatter.length && y < r.y + r.height - minToShow; i++) {
 			final String info = _tourInfoFormatter[i].format(data);
 			gc.drawText(info, r.x + 2, y, true);
-			y += gc.stringExtent(info).y;
+			// y += gc.stringExtent(info).y;
+			y += fontHeight;
 		}
 		gc.setClipping(_nullRec);
 	}
@@ -841,12 +858,12 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		int y = rec.y + 1;
 		String text;
 		
-		int fontHeight = gc.getFontMetrics().getHeight();
-		int minToShow = fontHeight/2;
+		final int fontHeight = gc.getFontMetrics().getHeight();
+		final int minToShow = (2 * fontHeight / 3);
 
 		// time
-		gc.setForeground(_darkGray);
 		if (data.recordingTime > 0) {
+			gc.setForeground(_darkGray);
 			text = new Formatter().format(
 					Messages.Calendar_View_Format_Time,
 					data.recordingTime / 3600,
@@ -854,13 +871,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			gc.drawText(text, x - gc.stringExtent(text).x, y);
 		}
 		y += fontHeight;
-		if (y > rec.y + rec.height - minToShow) {
-			return;
-		}
 
 		// distance
-		gc.setForeground(_black);
-		if (data.distance > 0 && y < rec.y + rec.height) {
+		if (data.distance > 0 && y < rec.y + rec.height - minToShow) {
+			gc.setForeground(_black);
 			final float distance = (float) (data.distance / 1000.0 / UI.UNIT_VALUE_DISTANCE);
 			text = new Formatter().format(
 					NLS.bind(Messages.Calendar_View_Format_Distance, UI.UNIT_LABEL_DISTANCE),
@@ -868,13 +882,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			gc.drawText(text, x - gc.stringExtent(text).x, y);
 		}
 		y += fontHeight;
-		if (y > rec.y + rec.height - minToShow) {
-			return;
-		}
 
 		// speed
-		gc.setForeground(_blue);
-		if (data.distance > 0 && y < rec.y + rec.height) {
+		if (data.distance > 0 && y < rec.y + rec.height - minToShow) {
+			gc.setForeground(_blue);
 			text = new Formatter().format(
 					NLS.bind(Messages.Calendar_View_Format_Speed, UI.UNIT_LABEL_SPEED),
 					data.distance == 0 ? 0 : data.distance / (data.recordingTime / 3.6f)).toString();
@@ -882,14 +893,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			gc.drawText(text, x - gc.stringExtent(text).x, y);
 		}
 		y += fontHeight;
-		if (y > rec.y + rec.height - minToShow) {
-			return;
-		}
-
 
 		// pace
-		gc.setForeground(_magenta);
-		if (data.recordingTime > 0 && data.distance > 0 && y < rec.y + rec.height) {
+		if (data.recordingTime > 0 && data.distance > 0 && y < rec.y + rec.height - minToShow) {
+			gc.setForeground(_magenta);
 			final int pace = (int) (data.distance == 0
 					? 0
 					: (1000 * data.recordingTime / data.distance * UI.UNIT_VALUE_DISTANCE));
@@ -900,6 +907,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			gc.drawText(text, x - gc.stringExtent(text).x, y);
 		}
 		y += fontHeight;
+
 		gc.setClipping(_nullRec);
 	}
 
@@ -1141,11 +1149,29 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			}
 			index++;
 		}
+
+		if (null == ctd) { // selected tour scrolled out of the window, select first/last tour
+			if (_tourFocus.size() > 0) {
+				ObjectLocation ol;
+				if (direction > 0) {
+					ol = _tourFocus.get(0);
+				} else {
+					ol = _tourFocus.get(_tourFocus.size() - 1);
+				}
+				_selectedItem = new Selection(ol.id, SelectionType.TOUR);
+				redraw();
+				return;
+			}
+
+		}
+
 		if (null != ctd) {
 			index += direction;
 			for (int i = index; i >= 0 && i < _tourFocus.size(); i += direction) {
 				final ObjectLocation ol = _tourFocus.get(i);
-				if (ctd.dayOfWeek != ((CalendarTourData) (ol.o)).dayOfWeek) {
+				// if (ctd.dayOfWeek != ((CalendarTourData) (ol.o)).dayOfWeek) {
+				final CalendarTourData ctdNext = (CalendarTourData) (ol.o);
+				if (ctd.day != ctdNext.day || ctd.week != ctdNext.week || ctd.year != ctdNext.year) {
 					_selectedItem = new Selection(ol.id, SelectionType.TOUR);
 					redraw();
 					return;
@@ -1153,7 +1179,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			}
 		} else {
 			// selected Item is not on the screen any more
-			_selectedItem = _noItem;
+			// _selectedItem = _noItem; keep selection
 		}
 
 		if (direction < 0) {
@@ -1236,25 +1262,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		_graphClean = false;
 		redraw();
 		scrollBarUpdate();
-	}
-
-	private void highlightTour(final GC gc, final CalendarTourData data, final Rectangle rec) {
-		gc.setAlpha(0xd0);
-		gc.setBackground(_colorCache.get(_rgbBright.get(data.typeColorIndex).hashCode()));
-		gc.setForeground(_colorCache.get(_rgbDark.get(data.typeColorIndex).hashCode()));
-		gc.fillGradientRectangle(rec.x - 4, rec.y - 4, rec.width + 9, rec.height + 9, false);
-		gc.setForeground(_colorCache.get(_rgbLine.get(data.typeColorIndex).hashCode()));
-		gc.drawRoundRectangle(rec.x - 5, rec.y - 5, rec.width + 10, rec.height + 10, 6, 6);
-		gc.setForeground(_black);
-		gc.setClipping(rec.x + 2, rec.y, rec.width - 4, rec.height - 2);
-		int y = rec.y + 1;
-		int minToShow = gc.getFontMetrics().getHeight()/2;
-		for (int i = 0; i < _tourInfoFormatter.length && y < rec.y + rec.height - minToShow; i++) {
-			final String info = _tourInfoFormatter[i].format(data);
-			gc.drawText(info, rec.x + 3, y, true);
-			y += gc.stringExtent(info).y;
-		}
-		gc.setClipping(_nullRec);
 	}
 
 	/**
