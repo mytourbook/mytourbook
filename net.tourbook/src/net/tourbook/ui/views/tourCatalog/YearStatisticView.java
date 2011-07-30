@@ -82,7 +82,7 @@ public class YearStatisticView extends ViewPart {
 	private final IPreferenceStore				_prefStore					= TourbookPlugin.getDefault() //
 																					.getPreferenceStore();
 	private final IDialogSettings				_state						= TourbookPlugin.getDefault() //
-		 																			.getDialogSettingsSection(
+																					.getDialogSettingsSection(
 																							"TourCatalogViewYearStatistic");		//$NON-NLS-1$
 
 	private IPropertyChangeListener				_prefChangeListener;
@@ -523,9 +523,9 @@ public class YearStatisticView extends ViewPart {
 	}
 
 	/**
-	 * @param selectedYear
+	 * @param currentYear
 	 * @param numberOfYears
-	 * @return Returns the number of days between {@link #fLastYear} and selectedYear
+	 * @return Returns the number of days between {@link #fLastYear} and currentYear
 	 */
 	int getYearDOYs(final int selectedYear) {
 
@@ -645,7 +645,7 @@ public class YearStatisticView extends ViewPart {
 
 	/**
 	 * Update statistic by setting number of years
-	 *
+	 * 
 	 * @param numberOfYears
 	 */
 	private void onSelectNumberOfYears(final int numberOfYears) {
@@ -698,7 +698,7 @@ public class YearStatisticView extends ViewPart {
 
 	/**
 	 * select the tour in the year map chart
-	 *
+	 * 
 	 * @param selectedTourId
 	 *            tour id which should be selected
 	 */
@@ -761,7 +761,7 @@ public class YearStatisticView extends ViewPart {
 
 	/**
 	 * show statistic for several years
-	 *
+	 * 
 	 * @param isShowLatestYear
 	 *            shows the latest year and the years before
 	 */
@@ -892,9 +892,11 @@ public class YearStatisticView extends ViewPart {
 		});
 
 		// set grid size
-		_yearChart.setGridDistance(
+		_yearChart.setGrid(
 				_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
-				_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
+				_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE),
+				_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
+				_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
 
 		// show the data in the chart
 		_yearChart.updateChart(chartModel, false, true);

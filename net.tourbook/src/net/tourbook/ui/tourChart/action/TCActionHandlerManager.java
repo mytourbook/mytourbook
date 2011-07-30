@@ -93,14 +93,28 @@ public class TCActionHandlerManager {
 		_actionHandlers.put(TourChart.COMMAND_ID_GRAPH_ALTIMETER, new ActionHandlerGraphAltimeter());
 		_actionHandlers.put(TourChart.COMMAND_ID_GRAPH_GRADIENT, new ActionHandlerGraphGradient());
 
-		_actionHandlers.put(TourChart.COMMAND_ID_SHOW_HR_ZONES, new ActionHandlerShowHrZones());
+		_actionHandlers.put(TourChart.COMMAND_ID_HR_ZONE_DROPDOWN_MENU, new ActionHandlerHrZoneDropDownMenu());
+
+		String cmdId = TourChart.COMMAND_ID_HR_ZONE_STYLE_GRAPH_TOP;
+		_actionHandlers.put(cmdId, new ActionHandlerHrZoneStyle(cmdId));
+
+		cmdId = TourChart.COMMAND_ID_HR_ZONE_STYLE_NO_GRADIENT;
+		_actionHandlers.put(cmdId, new ActionHandlerHrZoneStyle(cmdId));
+
+		cmdId = TourChart.COMMAND_ID_HR_ZONE_STYLE_WHITE_TOP;
+		_actionHandlers.put(cmdId, new ActionHandlerHrZoneStyle(cmdId));
+
+		cmdId = TourChart.COMMAND_ID_HR_ZONE_STYLE_WHITE_BOTTOM;
+		_actionHandlers.put(cmdId, new ActionHandlerHrZoneStyle(cmdId));
 
 		_actionHandlers.put(TourChart.COMMAND_ID_X_AXIS_TIME, new ActionHandlerXAxisTime());
 		_actionHandlers.put(TourChart.COMMAND_ID_X_AXIS_DISTANCE, new ActionHandlerXAxisDistance());
 
-		_actionHandlers.put(TourChart.COMMAND_ID_CHART_OPTIONS, new ActionHandlerChartOptions());
 		_actionHandlers.put(TourChart.COMMAND_ID_SHOW_START_TIME, new ActionHandlerShowStartTime());
 		_actionHandlers.put(TourChart.COMMAND_ID_SHOW_SRTM_DATA, new ActionHandlerShowSRTMData());
+		_actionHandlers.put(TourChart.COMMAND_ID_IS_SHOW_TOUR_MARKER, new ActionHandlerShowTourMarker());
+		_actionHandlers.put(TourChart.COMMAND_ID_IS_SHOW_BREAKTIME_VALUES, new ActionHandlerShowBreaktimeValues());
+		_actionHandlers.put(TourChart.COMMAND_ID_EDIT_CHART_PREFERENCES, new ActionHandlerEditCharPreferences());
 		_actionHandlers.put(TourChart.COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER, new ActionHandlerCanAutoZoomToSlider());
 		_actionHandlers.put(
 				TourChart.COMMAND_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED,

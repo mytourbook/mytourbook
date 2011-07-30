@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,33 +27,33 @@ import org.eclipse.swt.widgets.Menu;
 
 public class ActionYearSubCategorySelect extends Action implements IMenuCreator {
 
-	private TourBookView						tourViewer;
-	private ArrayList<ActionYearSubCategorySet>	yearSubCategoryActions;
-	private Menu								yearSubCategoryMenu;
+	private TourBookView						_tourViewer;
+	private ArrayList<ActionYearSubCategorySet>	_yearSubCategoryActions;
+	private Menu								_yearSubCategoryMenu;
 	
 	private class ActionYearSubCategorySet extends Action {
 
 		private static final String	OSX_SPACER_STRING	= " ";	//$NON-NLS-1$
 
-		private int					subCategory;
+		private int					_subCategory;
 
 		public ActionYearSubCategorySet(final int tourItemType, final String tourItemTypeName) {
 
 			super(OSX_SPACER_STRING + tourItemTypeName, AS_RADIO_BUTTON);
 			
-			subCategory = tourItemType;
+			_subCategory = tourItemType;
 		
 		}
 		
 		public int getSubCategory() {
-			return subCategory;
+			return _subCategory;
 		}
 
 		@Override
 		public void run() {
-			if (tourViewer.getYearSub() != subCategory) {
-				tourViewer.setYearSub(subCategory);
-				tourViewer.reopenFirstSelectedTour();
+			if (_tourViewer.getYearSub() != _subCategory) {
+				_tourViewer.setYearSub(_subCategory);
+				_tourViewer.reopenFirstSelectedTour();
 			}
 		}
 
@@ -61,37 +61,35 @@ public class ActionYearSubCategorySelect extends Action implements IMenuCreator 
 
 	public ActionYearSubCategorySelect(final TourBookView tourViewer) {
 
-		super("Year Sub Categories", AS_DROP_DOWN_MENU);
+		super(Messages.action_tourbook_year_sub, AS_DROP_DOWN_MENU);
 
 		setMenuCreator(this);
 
-		yearSubCategoryActions = new ArrayList<ActionYearSubCategorySet>();
+		_tourViewer = tourViewer;
 
-		this.tourViewer = tourViewer;
+		_yearSubCategoryActions = new ArrayList<ActionYearSubCategorySet>();
 
 		final ActionYearSubCategorySet setToMonth = new ActionYearSubCategorySet(
 				TourItem.ITEM_TYPE_MONTH,
 				Messages.action_tourbook_year_sub_month);
-		yearSubCategoryActions.add(setToMonth);
+		_yearSubCategoryActions.add(setToMonth);
 
 		final ActionYearSubCategorySet setToWeek = new ActionYearSubCategorySet(
 				TVITourBookItem.ITEM_TYPE_WEEK,
 				Messages.action_tourbook_year_sub_week);
-		yearSubCategoryActions.add(setToWeek);
-
-		setText(Messages.action_tourbook_year_sub);
+		_yearSubCategoryActions.add(setToWeek);
 	}
 
 	private void addActionToMenu(final Action action) {
 		final ActionContributionItem item = new ActionContributionItem(action);
-		item.fill(yearSubCategoryMenu, -1);
+		item.fill(_yearSubCategoryMenu, -1);
 	}
 
 	@Override
 	public void dispose() {
-		if (yearSubCategoryMenu != null) {
-			yearSubCategoryMenu.dispose();
-			yearSubCategoryMenu = null;
+		if (_yearSubCategoryMenu != null) {
+			_yearSubCategoryMenu.dispose();
+			_yearSubCategoryMenu = null;
 		}
 	}
 
@@ -102,13 +100,13 @@ public class ActionYearSubCategorySelect extends Action implements IMenuCreator 
 
 	@Override
 	public Menu getMenu(final Menu parent) {
-		yearSubCategoryMenu = new Menu(parent);
+		_yearSubCategoryMenu = new Menu(parent);
 
-		for (final ActionYearSubCategorySet setSub : yearSubCategoryActions) {
+		for (final ActionYearSubCategorySet setSub : _yearSubCategoryActions) {
 			addActionToMenu(setSub);
 		}
 
-		return yearSubCategoryMenu;
+		return _yearSubCategoryMenu;
 	}
 
 	@Override
@@ -118,7 +116,7 @@ public class ActionYearSubCategorySelect extends Action implements IMenuCreator 
 
 	public void setSubCategoryChecked(final int tourItemType) {
 		
-		for (final ActionYearSubCategorySet setTo : yearSubCategoryActions) {
+		for (final ActionYearSubCategorySet setTo : _yearSubCategoryActions) {
 			if (setTo.getSubCategory() == tourItemType) {
 				setTo.setChecked(true);
 			} else {

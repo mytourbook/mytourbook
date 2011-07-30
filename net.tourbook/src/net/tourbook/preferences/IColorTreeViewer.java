@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
-import net.tourbook.mapping.ILegendProvider;
+import net.tourbook.mapping.ILegendProviderGradientColors;
 
 import org.eclipse.jface.viewers.TreeViewer;
 
@@ -23,6 +23,6 @@ public interface IColorTreeViewer {
 
 	TreeViewer getTreeViewer();
 
-	ILegendProvider getLegendProvider();
+	ILegendProviderGradientColors getLegendProvider();
 
 }

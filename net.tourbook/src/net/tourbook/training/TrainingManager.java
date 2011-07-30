@@ -19,6 +19,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import net.tourbook.Messages;
+import net.tourbook.data.HrZoneContext;
+import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourPersonHRZone;
 
@@ -26,11 +28,26 @@ import org.eclipse.swt.graphics.RGB;
 
 public class TrainingManager {
 
-	private static final RGB		RGB_ZONE_1				= new RGB(0x4B, 0xF2, 0x74);
-	private static final RGB		RGB_ZONE_2				= new RGB(0xD3, 0xFF, 0x95);
-	private static final RGB		RGB_ZONE_3				= new RGB(0xF0, 0xE8, 0x34);
-	private static final RGB		RGB_ZONE_4				= new RGB(0xFF, 0x79, 0x0F);
-	private static final RGB		RGB_ZONE_5				= new RGB(0xD8, 0x3B, 0x1C);
+//	private static final RGB		RGB_ZONE_1				= new RGB(0x95, 0xe0, 0xff);
+//	private static final RGB		RGB_ZONE_2				= new RGB(0xD3, 0xFF, 0x95);
+//	private static final RGB		RGB_ZONE_3				= new RGB(0xff, 0xfa, 0x95);
+//	private static final RGB		RGB_ZONE_4				= new RGB(0xFF, 0xc9, 0x95);
+//	private static final RGB		RGB_ZONE_5				= new RGB(0xff, 0x95, 0x95);
+//
+//	private static final RGB		RGB_ZONE_1				= new RGB(0x3e, 0xb9, 0xff);
+//	private static final RGB		RGB_ZONE_2				= new RGB(0x96, 0xe0, 0x26);
+//	private static final RGB		RGB_ZONE_3				= new RGB(0xff, 0xe2, 0x00);
+//	private static final RGB		RGB_ZONE_4				= new RGB(0xff, 0x9e, 0x20);
+//	private static final RGB		RGB_ZONE_5				= new RGB(0xff, 0x40, 0x20);
+
+//	private static final RGB		RGB_ZONE_1				= new RGB(0xa5, 0xf5, 0x29);
+	private static final RGB		RGB_ZONE_1				= new RGB(0xb9, 0xff, 0x50);
+	private static final RGB		RGB_ZONE_2				= new RGB(0x96, 0xe0, 0x26);
+//	private static final RGB		RGB_ZONE_3				= new RGB(0xff, 0xb7, 0x24);
+	private static final RGB		RGB_ZONE_3				= new RGB(0xff, 0xcd, 0x66);
+//	private static final RGB		RGB_ZONE_4				= new RGB(0xff, 0xa7, 0x46);
+	private static final RGB		RGB_ZONE_4				= new RGB(0xff, 0x90, 0x01);
+	private static final RGB		RGB_ZONE_5				= new RGB(0xff, 0x40, 0x20);
 
 	// keys to identify the hr max formula
 	public static final int			HR_MAX_FORMULA_220_AGE	= 0;							//	HRmax = 220 - age              // this is the default formula
@@ -166,5 +183,54 @@ public class TrainingManager {
 		}
 
 		return hrZones;
+	}
+
+	public static int getZoneIndex(final HrZoneContext hrZoneContext, final int pulse) {
+
+		final int[] zoneMinBpm = hrZoneContext.zoneMinBpm;
+		int zoneIndex = 0;
+
+		for (int checkedIndex = 0; checkedIndex < zoneMinBpm.length; checkedIndex++) {
+
+			if (zoneMinBpm[checkedIndex] > pulse) {
+				return zoneIndex;
+			}
+
+			zoneIndex = checkedIndex;
+		}
+
+		return zoneIndex;
+	}
+
+	/**
+	 * Checks if all necessary data are available which are needed to draw the HR zones.
+	 * 
+	 * @param tourData
+	 * @param currentPerson
+	 * @return Returns <code>true</code> when HR zones are available for the
+	 */
+	public static boolean isRequiredHrZoneDataAvailable(final TourData tourData) {
+
+		// check tour
+		if (tourData != null) {
+
+			// check pulse
+			final int[] pulseSerie = tourData.pulseSerie;
+			final boolean isPulse = pulseSerie != null && pulseSerie.length > 0;
+			if (isPulse) {
+
+				// check person
+				final TourPerson tourPerson = tourData.getTourPerson();
+				if (tourPerson != null) {
+
+					// check hr zones
+					final boolean isHrZones = tourPerson.getHrZonesSorted().size() > 0;
+
+					return isHrZones;
+				}
+			}
+		}
+
+		return false;
 	}
 }

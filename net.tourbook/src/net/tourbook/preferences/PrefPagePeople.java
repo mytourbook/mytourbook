@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -25,10 +25,10 @@ import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.data.HrZoneContext;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourPersonHRZone;
-import net.tourbook.data.ZoneContext;
 import net.tourbook.database.IComputeTourValues;
 import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
@@ -45,7 +45,6 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.preference.DirectoryFieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -146,9 +145,9 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		_nf2.setMinimumFractionDigits(2);
 		_nf2.setMaximumFractionDigits(2);
 	}
-	private final boolean				_isOSX						= net.tourbook.util.UI.IS_OSX;
 
-	private int							_spinnerWidth;
+	private final boolean				_isOSX						= net.tourbook.util.UI.IS_OSX;
+	private final boolean				_isLinux					= net.tourbook.util.UI.IS_LINUX;
 
 	private SelectionListener			_defaultSelectionListener;
 	private ModifyListener				_defaultModifyListener;
@@ -169,7 +168,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	private org.joda.time.DateTime		_today						= new org.joda.time.DateTime()//
 																			.withTime(0, 0, 0, 0);
 
-	private PixelConverter				_pc;
 	private Font						_fontItalic;
 	private Color[]						_hrZoneColors;
 
@@ -321,7 +319,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		}
 	}
 
-	private Set<TourPersonHRZone> cloneHrZones(final Set<TourPersonHRZone> hrZones) {
+	private Set<TourPersonHRZone> cloneHrZones(final ArrayList<TourPersonHRZone> hrZones) {
 
 		final HashSet<TourPersonHRZone> hrZonesClone = new HashSet<TourPersonHRZone>();
 
@@ -392,6 +390,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			}
 		});
 
+		boolean returnValue = true;
+
 		if (isCheckPeople && isCanceled) {
 
 			setErrorMessage(Messages.Pref_People_Error_ComputeHrZonesForAllTours);
@@ -401,7 +401,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 					Messages.Compute_HrZones_Dialog_ComputeAllTours_Title,
 					Messages.Pref_People_Dialog_ComputeHrZonesForAllToursIsCanceled_Message);
 
-			return false;
+			returnValue = false;
 		}
 
 		TourManager.getInstance().removeAllToursFromCache();
@@ -415,7 +415,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 		_peopleWithModifiedHrZones.clear();
 
-		return true;
+		return returnValue;
 	}
 
 	@Override
@@ -811,7 +811,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			_spinnerWeight = new Spinner(containerWeight, SWT.BORDER);
 			GridDataFactory.fillDefaults() //
 					.align(SWT.BEGINNING, SWT.FILL)
-					.hint(_spinnerWidth, SWT.DEFAULT)
+//					.hint(_spinnerWidth, SWT.DEFAULT)
 					.applyTo(_spinnerWeight);
 			_spinnerWeight.setDigits(1);
 			_spinnerWeight.setMinimum(0);
@@ -850,7 +850,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			_spinnerHeight = new Spinner(containerHeight, SWT.BORDER);
 			GridDataFactory.fillDefaults()//
 					.align(SWT.BEGINNING, SWT.FILL)
-					.hint(_spinnerWidth, SWT.DEFAULT)
+//					.hint(_spinnerWidth, SWT.DEFAULT)
 					.applyTo(_spinnerHeight);
 			_spinnerHeight.setDigits(2);
 			_spinnerHeight.setMinimum(0);
@@ -920,7 +920,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			_spinnerRestingHR = new Spinner(container, SWT.BORDER);
 			GridDataFactory.fillDefaults() //
 					.align(SWT.BEGINNING, SWT.FILL)
-					.hint(_spinnerWidth, SWT.DEFAULT)
+//					.hint(_spinnerWidth, SWT.DEFAULT)
 					.applyTo(_spinnerRestingHR);
 			_spinnerRestingHR.setMinimum(10);
 			_spinnerRestingHR.setMaximum(200);
@@ -949,7 +949,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			 * label: age
 			 */
 			label = new Label(containerAge, SWT.NONE);
-			GridDataFactory.fillDefaults()//¨
+			GridDataFactory.fillDefaults()//
 					.grab(true, true)
 					.align(SWT.END, SWT.CENTER)
 					.applyTo(label);
@@ -988,7 +988,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			_spinnerMaxHR = new Spinner(container, SWT.BORDER);
 			GridDataFactory.fillDefaults() //
 					.align(SWT.BEGINNING, SWT.FILL)
-					.hint(_spinnerWidth, SWT.DEFAULT)
+//					.hint(_spinnerWidth, SWT.DEFAULT)
 					.applyTo(_spinnerMaxHR);
 			_spinnerMaxHR.setMinimum(10);
 			_spinnerMaxHR.setMaximum(300);
@@ -1083,6 +1083,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		final Point comboSize = label.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 		label.dispose();
 
+		final int comboWidth = (int) (_isOSX || _isLinux ? comboSize.x * 1.3 : comboSize.x);
+
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
 				.indent(0, 20)
@@ -1096,7 +1098,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			 */
 			_cboTemplate = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
 			GridDataFactory.fillDefaults() //
-					.hint(comboSize.x, SWT.DEFAULT)
+					.hint(comboWidth, SWT.DEFAULT)
 					.applyTo(_cboTemplate);
 			_cboTemplate.setToolTipText(Messages.Pref_People_Label_HrZoneTemplate_Tooltip);
 			_cboTemplate.setVisibleItemCount(20);
@@ -1176,9 +1178,9 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		innerContainer.addMouseListener(_hrZoneMouseListener);
 //		innerContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
-			final Set<TourPersonHRZone> hrZones = getCurrentPerson().getHrZones();
+			final ArrayList<TourPersonHRZone> hrZones = getCurrentPerson().getHrZonesSorted();
 
-			if (hrZones == null || hrZones.size() == 0) {
+			if (hrZones.size() == 0) {
 				// hr zones are not available, show info
 				createUI81HrZoneInfo(innerContainer);
 			} else {
@@ -1256,11 +1258,11 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		}
 
 		// get sorted hr zones
-		final ArrayList<TourPersonHRZone> hrZones = new ArrayList<TourPersonHRZone>(currentPerson.getHrZones());
+		final ArrayList<TourPersonHRZone> hrZones = new ArrayList<TourPersonHRZone>(currentPerson.getHrZonesSorted());
 		final int hrZoneSize = hrZones.size();
 		Collections.sort(hrZones);
 
-		final ZoneContext hrZoneMinMaxBpm = currentPerson.getHrZoneContext(
+		final HrZoneContext hrZoneMinMaxBpm = currentPerson.getHrZoneContext(
 				hrMaxFormulaKey,
 				hrMaxPulse,
 				birthDay,
@@ -1344,7 +1346,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).indent(15, 0).applyTo(label);
 			label.setText(zoneMinValue == Integer.MIN_VALUE //
 					? UI.EMPTY_STRING
-					: Integer.toString(hrZoneMinMaxBpm.zoneMinBmp[zoneIndex]));
+					: Integer.toString(hrZoneMinMaxBpm.zoneMinBpm[zoneIndex]));
 			label.addMouseListener(_hrZoneMouseListener);
 
 			/*
@@ -1365,7 +1367,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 					.applyTo(label);
 			label.setText(zoneMaxValue == Integer.MAX_VALUE //
 					? Messages.App_Label_max
-					: Integer.toString(hrZoneMinMaxBpm.zoneMaxBmp[zoneIndex]));
+					: Integer.toString(hrZoneMinMaxBpm.zoneMaxBpm[zoneIndex]));
 			label.addMouseListener(_hrZoneMouseListener);
 
 			/*
@@ -1601,10 +1603,9 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 		boolean isHrZoneAvailable = false;
 		final TourPerson currentPerson = getCurrentPerson();
-		if (currentPerson != null) {
 
-			final Set<TourPersonHRZone> hrZones = currentPerson.getHrZones();
-			isHrZoneAvailable = hrZones != null && hrZones.size() > 0;
+		if (currentPerson != null) {
+			isHrZoneAvailable = currentPerson.getHrZonesSorted().size() > 0;
 		}
 
 		_btnAddPerson.setEnabled(!_isPersonModified && isValid);
@@ -1679,9 +1680,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	private void initUI(final Composite parent) {
 
 		initializeDialogUnits(parent);
-
-		_pc = new PixelConverter(parent);
-		_spinnerWidth = _pc.convertWidthInCharsToPixels(_isOSX ? 10 : 5);
 
 		_fontItalic = JFaceResources.getFontRegistry().getItalic(JFaceResources.DIALOG_FONT);
 
@@ -1814,7 +1812,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		}
 
 		final TourPerson person = getCurrentPerson();
-		final Set<TourPersonHRZone> hrZones = person.getHrZones();
+		final ArrayList<TourPersonHRZone> hrZones = person.getHrZonesSorted();
 
 		// check if hr zones are already available
 //		if (hrZones != null && hrZones.size() > 0) {
@@ -1850,7 +1848,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		final TourPerson person = getCurrentPerson();
 
 		if (_backupSelectedPersonHrZones == null) {
-			_backupSelectedPersonHrZones = cloneHrZones(person.getHrZones());
+			_backupSelectedPersonHrZones = cloneHrZones(person.getHrZonesSorted());
 		}
 
 		if (new DialogHRZones(getShell(), person).open() == Window.OK) {

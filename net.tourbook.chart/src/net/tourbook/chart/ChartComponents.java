@@ -139,7 +139,7 @@ public class ChartComponents extends Composite {
 
 	private ChartDataModel				_chartDataModel					= null;
 
-	private ArrayList<GraphDrawingData>	_graphDrawingData;
+	private ChartDrawingData			_chartDrawingData;
 
 	public boolean						_useAdvancedGraphics			= true;
 
@@ -267,9 +267,75 @@ public class ChartComponents extends Composite {
 	}
 
 	/**
+	 * Computes all the data for the chart
+	 * 
+	 * @return chart drawing data
+	 */
+	private ChartDrawingData createDrawingData() {
+
+		// compute the graphs and axis
+		final ArrayList<GraphDrawingData> graphDrawingData = new ArrayList<GraphDrawingData>();
+
+		final ChartDrawingData chartDrawingData = new ChartDrawingData(graphDrawingData);
+
+		chartDrawingData.chartDataModel = _chartDataModel;
+
+		final ArrayList<ChartDataYSerie> yDataList = _chartDataModel.getYData();
+		final ChartDataXSerie xData = _chartDataModel.getXData();
+		final ChartDataXSerie xData2nd = _chartDataModel.getXData2nd();
+
+		final int graphCount = yDataList.size();
+		int graphIndex = 1;
+
+		// loop all graphs
+		for (final ChartDataYSerie yData : yDataList) {
+
+			final GraphDrawingData drawingData = new GraphDrawingData(yData.getChartType());
+
+			graphDrawingData.add(drawingData);
+
+			// set chart title
+			if (graphIndex == 1) {
+
+				drawingData.setXTitle(_chartDataModel.getTitle());
+
+				// set the chart title height and margin
+				final String title = drawingData.getXTitle();
+				final ChartSegments chartSegments = xData.getChartSegments();
+
+				if (title != null && title.length() > 0 || //
+						(chartSegments != null && chartSegments.segmentTitle != null)) {
+
+					_devXTitleBarHeight = TITLE_BAR_HEIGHT;
+					_devMarginTop = MARGIN_TOP_WITH_TITLE;
+				}
+			}
+
+			// set x/y data
+			drawingData.setXData(xData);
+			drawingData.setXData2nd(xData2nd);
+			drawingData.setYData(yData);
+
+			// compute x/y values
+			createDrawingDataXValues(drawingData);
+			createDrawingDataYValues(drawingData, graphCount, graphIndex);
+
+			// set values after they have been computed
+			drawingData.setDevMarginTop(_devMarginTop);
+			drawingData.setDevXTitelBarHeight(_devXTitleBarHeight);
+			drawingData.setDevSliderBarHeight(_devSliderBarHeight);
+			drawingData.setDevMarkerBarHeight(_devMarkerBarHeight);
+
+			graphIndex++;
+		}
+
+		return chartDrawingData;
+	}
+
+	/**
 	 * Compute units for the x-axis and keep it in the drawingData object
 	 */
-	private void computeXValues(final GraphDrawingData drawingData) {
+	private void createDrawingDataXValues(final GraphDrawingData drawingData) {
 
 		final ChartDataXSerie xData = drawingData.getXData();
 
@@ -289,7 +355,7 @@ public class ChartComponents extends Composite {
 		 * calculate the number of units which will be visible by dividing the visible length by the
 		 * minimum size which one unit should have in pixels
 		 */
-		final int unitRawNumbers = devVirtualGraphWidth / _chart._gridHorizontalDistance;
+		final int unitRawNumbers = devVirtualGraphWidth / _chart.gridHorizontalDistance;
 
 		// unitRawValue is the number in data values for one unit
 		final int unitRawValue = xMaxValue / Math.max(1, unitRawNumbers);
@@ -427,7 +493,9 @@ public class ChartComponents extends Composite {
 	 * @param graphCount
 	 * @param currentGraph
 	 */
-	private void computeYValues(final GraphDrawingData drawingData, final int graphCount, final int currentGraph) {
+	private void createDrawingDataYValues(	final GraphDrawingData drawingData,
+											final int graphCount,
+											final int currentGraph) {
 
 		final ChartDataYSerie yData = drawingData.getYData();
 
@@ -473,7 +541,7 @@ public class ChartComponents extends Composite {
 		 * calculate the number of units which will be visible by dividing the available height by
 		 * the minimum size which one unit should have in pixels
 		 */
-		final int unitCount = devGraphHeight / _chart._gridVerticalDistance;
+		final int unitCount = devGraphHeight / _chart.gridVerticalDistance;
 
 		// unitValue is the number in data values for one unit
 		final int graphUnitValue = graphValueRange / Math.max(1, unitCount);
@@ -542,6 +610,13 @@ public class ChartComponents extends Composite {
 
 		graphValueRange = graphMaxValue > 0 ? (graphMaxValue - graphMinValue) : -(graphMinValue - graphMaxValue);
 
+		// ensure the chart is drawn correctly with pseudo data
+		if (graphValueRange == 0) {
+			graphValueRange = 3600;
+			graphMaxValue = 3600;
+			graphUnit = 1800;
+		}
+
 		// calculate the vertical scaling between graph and device
 		final float graphScaleY = (float) (devGraphHeight) / graphValueRange;
 
@@ -595,68 +670,6 @@ public class ChartComponents extends Composite {
 
 			unitList.add(new ChartUnit(graphMaxValue, Util.EMPTY_STRING));
 		}
-	}
-
-	/**
-	 * Computes all the data for the chart
-	 * 
-	 * @return chart drawing data
-	 */
-	private ArrayList<GraphDrawingData> createGraphDrawingData() {
-
-		// compute the graphs and axis
-		final ArrayList<GraphDrawingData> graphDrawingData = new ArrayList<GraphDrawingData>();
-
-		final ArrayList<ChartDataYSerie> yDataList = _chartDataModel.getYData();
-		final ChartDataXSerie xData = _chartDataModel.getXData();
-		final ChartDataXSerie xData2nd = _chartDataModel.getXData2nd();
-
-		final int graphCount = yDataList.size();
-		int graphIndex = 1;
-
-		// loop all graphs
-		for (final ChartDataYSerie yData : yDataList) {
-
-			final GraphDrawingData drawingData = new GraphDrawingData(yData.getChartType());
-
-			graphDrawingData.add(drawingData);
-
-			// set chart title
-			if (graphIndex == 1) {
-
-				drawingData.setXTitle(_chartDataModel.getTitle());
-
-				// set the chart title height and margin
-				final String title = drawingData.getXTitle();
-				final ChartSegments chartSegments = xData.getChartSegments();
-
-				if (title != null && title.length() > 0 || //
-						(chartSegments != null && chartSegments.segmentTitle != null)) {
-
-					_devXTitleBarHeight = TITLE_BAR_HEIGHT;
-					_devMarginTop = MARGIN_TOP_WITH_TITLE;
-				}
-			}
-
-			// set x/y data
-			drawingData.setXData(xData);
-			drawingData.setXData2nd(xData2nd);
-			drawingData.setYData(yData);
-
-			// compute x/y values
-			computeXValues(drawingData);
-			computeYValues(drawingData, graphCount, graphIndex);
-
-			// set values after they have been computed
-			drawingData.setDevMarginTop(_devMarginTop);
-			drawingData.setDevXTitelBarHeight(_devXTitleBarHeight);
-			drawingData.setDevSliderBarHeight(_devSliderBarHeight);
-			drawingData.setDevMarkerBarHeight(_devMarkerBarHeight);
-
-			graphIndex++;
-		}
-
-		return graphDrawingData;
 	}
 
 	private void createMonthEqualUnits(	final GraphDrawingData drawingData,
@@ -739,7 +752,6 @@ public class ChartComponents extends Composite {
 		// set state that the overlap is not checked again
 		drawingData.setIsXUnitOverlapChecked(true);
 
-		drawingData.setIsDrawVerticalGrid(false);
 		drawingData.setIsDrawUnit(isDrawUnits);
 	}
 
@@ -869,7 +881,6 @@ public class ChartComponents extends Composite {
 		// set state that the overlap is not checked again
 		drawingData.setIsXUnitOverlapChecked(true);
 
-		drawingData.setIsDrawVerticalGrid(false);
 		drawingData.setIsDrawUnit(isDrawUnits);
 
 //		// shorten the unit when there is not enough space to draw the full unit name
@@ -978,7 +989,6 @@ public class ChartComponents extends Composite {
 									final int devGraphWidth) {
 
 		final ChartDataXSerie xData = drawingData.getXData();
-		final ChartDataYSerie yData = drawingData.getYData();
 
 		final int allUnitsSize = xData._highValues[0].length;
 		final float scaleX = (float) devGraphWidth / allUnitsSize;
@@ -989,29 +999,11 @@ public class ChartComponents extends Composite {
 		createMonthEqualUnits(drawingData, units, devGraphWidth, allUnitsSize, numberOfYears);
 
 		// compute the width and position of the rectangles
-		int barWidth;
-		final int monthWidth = (int) Math.max(0, (scaleX) - 1);
+		final float monthWidth = Math.max(0, (scaleX) - 1);
+		final float barWidth = Math.max(0, (monthWidth * 0.90f));
 
-		switch (yData.getChartLayout()) {
-		case ChartDataYSerie.BAR_LAYOUT_SINGLE_SERIE:
-		case ChartDataYSerie.BAR_LAYOUT_STACKED:
-			// the bar's width is 50% of the width for a month
-			barWidth = (int) Math.max(0, (monthWidth * 0.90f));
-			drawingData.setBarRectangleWidth(barWidth);
-			drawingData.setDevBarRectangleXPos((Math.max(0, (monthWidth - barWidth) / 2) + 1));
-			break;
-
-		case ChartDataYSerie.BAR_LAYOUT_BESIDE:
-			final int serieCount = yData.getHighValues().length; // since 2011-06-16
-//			final int serieCount = yData.getHighValues()[0].length;
-
-			// the bar's width is 75% of the width for a month
-			barWidth = (int) Math.max(0, monthWidth * 0.95f);
-			drawingData.setBarRectangleWidth(Math.max(1, barWidth / serieCount));
-			drawingData.setDevBarRectangleXPos((Math.max(0, (monthWidth - barWidth) / 2) + 2));
-		default:
-			break;
-		}
+		drawingData.setBarRectangleWidth((int) barWidth);
+		drawingData.setDevBarRectangleXPos((int) (Math.max(0, (monthWidth - barWidth) / 2) + 1));
 
 		drawingData.setXUnitTextPos(GraphDrawingData.X_UNIT_TEXT_POS_CENTER);
 	}
@@ -1021,8 +1013,10 @@ public class ChartComponents extends Composite {
 									final int devGraphWidth) {
 
 		final ChartDataXSerie xData = drawingData.getXData();
+
 		final int[] xValues = xData.getHighValues()[0];
 		final int allWeeks = xValues.length;
+		final float devWeekWidth = devGraphWidth / allWeeks;
 
 		final ChartSegments chartSegments = drawingData.getXData().getChartSegments();
 
@@ -1035,14 +1029,17 @@ public class ChartComponents extends Composite {
 
 		createMonthUnequalUnits(drawingData, units, devGraphWidth, chartSegments.years, yearDays);
 
-		// compute the width and position of the rectangles
-		final int barWidth = (devGraphWidth / xValues.length) / 2;
-		drawingData.setBarRectangleWidth(Math.max(0, barWidth));
+		final float barWidth = devWeekWidth * 0.7f;
+
+		drawingData.setBarRectangleWidth((int) barWidth);
+		drawingData.setDevBarRectangleXPos((int) (Math.max(0, (devWeekWidth - 2) / 2) + 1));
+
 		drawingData.setBarPosition(GraphDrawingData.BAR_POS_CENTER);
+		drawingData.setXUnitTextPos(GraphDrawingData.X_UNIT_TEXT_POS_CENTER);
 
 		drawingData.setScaleX((float) devGraphWidth / allWeeks);
 		drawingData.setScaleUnitX((float) devGraphWidth / allDaysInAllYears);
-		drawingData.setXUnitTextPos(GraphDrawingData.X_UNIT_TEXT_POS_CENTER);
+
 	}
 
 	private void createXValuesYear(	final GraphDrawingData drawingData,
@@ -1122,6 +1119,10 @@ public class ChartComponents extends Composite {
 		return _chartDataModel;
 	}
 
+	ChartDrawingData getChartDrawingData() {
+		return _chartDrawingData;
+	}
+
 	ChartProperties getChartProperties() {
 		return new ChartProperties();
 	}
@@ -1148,10 +1149,6 @@ public class ChartComponents extends Composite {
 		}
 
 		return _visibleGraphRect.width;
-	}
-
-	ArrayList<GraphDrawingData> getGraphDrawingData() {
-		return _graphDrawingData;
 	}
 
 	/**
@@ -1192,18 +1189,18 @@ public class ChartComponents extends Composite {
 		}
 
 		// compute the chart data
-		_graphDrawingData = createGraphDrawingData();
+		_chartDrawingData = createDrawingData();
 
 		// notify components about the new configuration
-		_componentGraph.setDrawingData(_graphDrawingData);
+		_componentGraph.setDrawingData(_chartDrawingData);
 
 		// resize the sliders after the drawing data have changed and the new
 		// chart size is saved
 		_componentGraph.updateSlidersOnResize();
 
 		// resize the axis
-		_componentAxisLeft.setDrawingData(_graphDrawingData, true);
-		_componentAxisRight.setDrawingData(_graphDrawingData, false);
+		_componentAxisLeft.setDrawingData(_chartDrawingData, true);
+		_componentAxisRight.setDrawingData(_chartDrawingData, false);
 
 		// synchronize chart
 		final SynchConfiguration synchConfig = createSynchConfig();
@@ -1520,17 +1517,19 @@ public class ChartComponents extends Composite {
 
 	void updateCustomLayers() {
 
-		if (_graphDrawingData == null) {
+		if (_chartDrawingData == null) {
 			return;
 		}
 
 		int graphIndex = 0;
+		final ArrayList<GraphDrawingData> graphDrawingData = _chartDrawingData.graphDrawingData;
 
 		/*
 		 * set custom layers from the data model into the drawing data
 		 */
+
 		for (final ChartDataYSerie yData : _chartDataModel.getYData()) {
-			_graphDrawingData.get(graphIndex++).getYData().setCustomLayers(yData.getCustomLayers());
+			graphDrawingData.get(graphIndex++).getYData().setCustomForegroundLayers(yData.getCustomForegroundLayers());
 		}
 
 		_componentGraph.updateCustomLayers();

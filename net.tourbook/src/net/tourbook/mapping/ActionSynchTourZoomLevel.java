@@ -1,18 +1,19 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
+
 package net.tourbook.mapping;
 
 import org.eclipse.jface.action.Action;
@@ -31,25 +32,25 @@ public class ActionSynchTourZoomLevel extends Action implements IMenuCreator {
 	private ActionZoomLevel	_actionZoomLevel_2;
 	private ActionZoomLevel	_actionZoomLevel_3;
 
-	private int				fZoomLevel	= 0;
+	private int				_zoomLevel	= 0;
 
 	private class ActionZoomLevel extends Action {
 
 		private static final String	OSX_SPACER_STRING	= " ";	//$NON-NLS-1$
-		private int					fActionZoomLevel;
+		private int					_actionZoomLevel;
 
 		public ActionZoomLevel(final int zoomLevel, final String label) {
 
 			// add space before the label otherwise OSX will not display the menu item,
 			super(OSX_SPACER_STRING + NLS.bind(label, Integer.toString(zoomLevel)), AS_RADIO_BUTTON);
 
-			fActionZoomLevel = zoomLevel;
+			_actionZoomLevel = zoomLevel;
 		}
 
 		@Override
 		public void run() {
-			fZoomLevel = fActionZoomLevel;
-			PaintManager.getInstance().setSynchTourZoomLevel(fActionZoomLevel);
+			_zoomLevel = _actionZoomLevel;
+			TourPainterConfiguration.getInstance().setSynchTourZoomLevel(_actionZoomLevel);
 		}
 	}
 
@@ -96,13 +97,13 @@ public class ActionSynchTourZoomLevel extends Action implements IMenuCreator {
 	}
 
 	public int getZoomLevel() {
-		return fZoomLevel;
+		return _zoomLevel;
 	}
 
 	public void setZoomLevel(final int zoomLevel) {
 
-		fZoomLevel = zoomLevel;
-		PaintManager.getInstance().setSynchTourZoomLevel(zoomLevel);
+		_zoomLevel = zoomLevel;
+		TourPainterConfiguration.getInstance().setSynchTourZoomLevel(zoomLevel);
 
 		_actionZoomLevel_0.setChecked(false);
 		_actionZoomLevel_1.setChecked(false);

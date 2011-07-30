@@ -57,7 +57,8 @@ public class TCActionProxy {
 
 	/**
 	 * Set check state in the proxy and action/handler,this does not update the UÎ when the handler
-	 * is used. To update the UI {@link ICommandService#refreshElements(*)} method must be called
+	 * is used. To update the UI, the method {@link ICommandService#refreshElements(*)} must be
+	 * called.
 	 * 
 	 * @param isChecked
 	 */

@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -165,12 +165,12 @@ public class DialogModifyColumns extends TrayDialog {
 		 * create columns
 		 */
 		TableViewerColumn tvc;
-		TableColumn tvcColumn;
+		TableColumn tc;
 
 		// column: label
 		tvc = new TableViewerColumn(_columnViewer, SWT.LEAD);
-		tvcColumn = tvc.getColumn();
-		tvcColumn.setText(Messages.ColumnModifyDialog_column_column);
+		tc = tvc.getColumn();
+		tc.setText(Messages.ColumnModifyDialog_column_column);
 		tvc.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -183,12 +183,12 @@ public class DialogModifyColumns extends TrayDialog {
 				}
 			}
 		});
-		tableLayout.setColumnData(tvcColumn, new ColumnWeightData(1, true));
+		tableLayout.setColumnData(tc, new ColumnWeightData(1, true));
 
 		// column: unit
 		tvc = new TableViewerColumn(_columnViewer, SWT.LEAD);
-		tvcColumn = tvc.getColumn();
-		tvcColumn.setText(Messages.ColumnModifyDialog_column_unit);
+		tc = tvc.getColumn();
+		tc.setText(Messages.ColumnModifyDialog_column_unit);
 		tvc.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -201,12 +201,12 @@ public class DialogModifyColumns extends TrayDialog {
 				}
 			}
 		});
-		tableLayout.setColumnData(tvcColumn, new ColumnPixelData(_pc.convertWidthInCharsToPixels(13), true));
+		tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(13), true));
 
 		// column: width
-		tvc = new TableViewerColumn(_columnViewer, SWT.TRAIL);
-		tvcColumn = tvc.getColumn();
-		tvcColumn.setText(Messages.ColumnModifyDialog_column_width);
+		tvc = new TableViewerColumn(_columnViewer, SWT.LEAD);
+		tc = tvc.getColumn();
+		tc.setText(Messages.ColumnModifyDialog_column_width);
 		tvc.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -219,7 +219,7 @@ public class DialogModifyColumns extends TrayDialog {
 				}
 			}
 		});
-		tableLayout.setColumnData(tvcColumn, new ColumnPixelData(_pc.convertWidthInCharsToPixels(10), true));
+		tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(10), true));
 
 		_columnViewer.setContentProvider(new IStructuredContentProvider() {
 

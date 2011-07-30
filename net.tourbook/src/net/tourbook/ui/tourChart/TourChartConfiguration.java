@@ -102,7 +102,23 @@ public class TourChartConfiguration {
 	 * Is <code>true</code> when HR zones can be displayed, which requires that pulse values are
 	 * available and the person has defined HR zones.
 	 */
-	public boolean					canShowHrZones		= false;
+	public boolean					canShowHrZones			= false;
+
+	/**
+	 * Is <code>true</code> when tour markers are displayed.
+	 */
+	public Boolean					isShowTourMarker		= true;
+
+	/**
+	 * Is <code>true</code> when graph values are displayed when they are recorded when a break time
+	 * is detected.
+	 */
+	public boolean					isShowBreaktimeValues	= true;
+
+	/**
+	 * Graph type which is used to draw the HR zone background.
+	 */
+	public String					hrZoneStyle				= TourChart.COMMAND_ID_HR_ZONE_STYLE_GRAPH_TOP;
 
 	/**
 	 * @param keepMinMaxValues

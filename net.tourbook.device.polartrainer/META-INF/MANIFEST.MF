@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Import Polar Personaltrainer .xml files
 Bundle-SymbolicName: net.tourbook.device.polartrainer;singleton:=true
-Bundle-Version: 10.11.0.qualifier
+Bundle-Version: 11.8.0.qualifier
 Bundle-Activator: net.tourbook.device.polartrainer.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,

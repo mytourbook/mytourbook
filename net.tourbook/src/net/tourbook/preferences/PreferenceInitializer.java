@@ -24,6 +24,7 @@ import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.BreakTimeTool;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.util.StringToArrayConverter;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
@@ -124,6 +125,16 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 				+ (Integer.toString(TourManager.GRAPH_GRADIENT) + separator)
 				+ Integer.toString(TourManager.GRAPH_POWER));
 
+		// HR zone backbround
+		store.setDefault(ITourbookPreferences.GRAPH_IS_HR_ZONE_BACKGROUND_VISIBLE, true);
+		store.setDefault(ITourbookPreferences.GRAPH_HR_ZONE_STYLE, TourChart.COMMAND_ID_HR_ZONE_STYLE_GRAPH_TOP);
+
+		// show breaktime values
+		store.setDefault(ITourbookPreferences.GRAPH_IS_BREAKTIME_VALUES_VISIBLE, true);
+
+		// is marker visible
+		store.setDefault(ITourbookPreferences.GRAPH_IS_MARKER_VISIBLE, true);
+
 		// define which unit is shown on the x-axis
 		store.setDefault(ITourbookPreferences.GRAPH_X_AXIS, TourManager.X_AXIS_DISTANCE);
 
@@ -133,9 +144,11 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		// move sliders to border when zoomed
 		store.setDefault(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED, false);
 
-		// graph grid distance
+		// graph grid
 		store.setDefault(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE, 50);
 		store.setDefault(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE, 80);
+		store.setDefault(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES, false);
+		store.setDefault(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES, false);
 
 		/*
 		 * view colors
@@ -252,15 +265,16 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		/*
 		 * break time, which contains metric values
 		 */
-		store.setDefault(ITourbookPreferences.BREAK_TIME_METHOD, BreakTimeTool.BREAK_TIME_METHOD_BY_TIME_DISTANCE);
+		store.setDefault(ITourbookPreferences.BREAK_TIME_METHOD, BreakTimeTool.BREAK_TIME_METHOD_BY_SLICE_SPEED);
 
 		// break time, default is 3.6 km/h (20 m in 20 sec)
 		store.setDefault(ITourbookPreferences.BREAK_TIME_SHORTEST_TIME, 20);
 		store.setDefault(ITourbookPreferences.BREAK_TIME_MAX_DISTANCE, 20.0f);
+		store.setDefault(ITourbookPreferences.BREAK_TIME_SLICE_DIFF, 5); // 5 minutes
 
-		// minimum speed for a break, default is 2.0 km/h
-		store.setDefault(ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED, 2.0f);
-		store.setDefault(ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED, 2.0f);
+		// minimum speed for a break, default is 3.0 km/h
+		store.setDefault(ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED, 3.0f);
+		store.setDefault(ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED, 3.0f);
 
 		/*
 		 * calendar week

@@ -335,13 +335,13 @@ public class ChartComponentAxis extends Canvas {
 	/**
 	 * set a new configuration for the axis, this causes a recreation of the axis
 	 * 
-	 * @param list
+	 * @param _chartDrawingData
 	 * @param isLeft
 	 *            true if the axis is on the left side
 	 */
-	protected void setDrawingData(final ArrayList<GraphDrawingData> list, final boolean isLeft) {
+	protected void setDrawingData(final ChartDrawingData _chartDrawingData, final boolean isLeft) {
 
-		_graphDrawingData = list;
+		_graphDrawingData = _chartDrawingData.graphDrawingData;
 		_isLeft = isLeft;
 
 		onResize();

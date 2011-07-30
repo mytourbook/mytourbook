@@ -585,7 +585,7 @@ public class DialogMarker extends TitleAreaDialog {
 //		TourChartConfiguration chartConfig = new TourChartConfiguration(false);
 //		chartConfig.addVisibleGraph(TourManager.GRAPH_ALTITUDE);
 
-		final TourChartConfiguration chartConfig = TourManager.createTourChartConfiguration();
+		final TourChartConfiguration chartConfig = TourManager.createDefaultTourChartConfig();
 		_tourChart.updateTourChart(_tourData, chartConfig, false);
 	}
 

@@ -1,0 +1,74 @@
+translate: "Search for places and show them on the map"
+messages editor bug: you can switch between the Messages Editor UI with multiple languages (1st tab) at once or the language tabs (2nd ...) 
+don't edit at both places -> you will loose your modifications
+switching the displayed languages, close the editor otherwise is raises an dispose error
+
+webbsite:
+- update java code formatting on website
+- translate installer
+- translation tip: </ a> do not create an link, </a> is OK
+- 40-50h translation
+
+recommendation:
+- use KatMouse on windows
+
+New Features
+    import polar PDD files (provided by Matthias Helmling)
+    categorize tours in the tourbook view by week
+    (provided by Matthias Helmling)
+    italian translation (provided by Doriano Cometto)
+    create HR zones
+    display HR zones
+        in the map
+        in the tour chart
+        in HR zone statistics (by month/week)
+        in training view for the selected tour
+    customize breaktime calculation
+    context menu in table/tree header to modify columns
+
+Improvements 	
+    simplified first startup of the application
+        1st person is created automatically
+        measurement system can be selected
+    UI cleanup
+        measurement system combobox is hidden by default
+        moved action "Other views..." into sub menu
+        moved import for daum ergo into separate pref page
+    tour chart
+        tour markers can be displayed/hidden
+        gridlines can be displayed/hidden
+        tour values within a break can be displayed/hidden
+        break time is displayed as a gap when time is displayed on the x-axis
+
+    show tour info tooltip in the Tour Import view (with hovered mouse)
+    reorder table/tree columns with drag&drop in the column dialog
+    enforce preference min/max values for painting a tour in the map
+    export gpx with heartrate, temperature and cadence
+
+Modifications
+    break time is ignored when avg hr is computed
+    default breaktime is set to 20 seconds and 20 m
+    chart gridlines are hidden by default (to have a clearer view on the graphs) but they can be activated in the preferences
+
+Fixed bugs 	
+    fixed bug to auto open tag menu in OSX, eclipse 3.7 is required
+    hide tour tooltip when "Add Tag" context menu is displayed
+    Fitlog-Import fails for tracks without GPS data - ID: 3232030
+    Conconi test window broke workbench - ID: 3269916
+    moving-, paused- and reording-time, can't be greater than 9.
+    Bug was only observed on Mac OSX, works fine on windows
+    values for graphs in the chart has been clipped at the canvas border
+        -> painting on the vertical border was wrong
+        -> bugfix required a new painting strategy for all charts
+
+Not yet implemented 	
+    HR zone features
+        legend in the map
+        tooltip in the statistics view
+        tour tooltip in the training view
+
+Development
+    removed custom pixel converter
+
+Platform 	
+    Eclipse 3.7.0

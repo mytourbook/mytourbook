@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: External jar's
 Bundle-SymbolicName: net.tourbook.ext.jars;singleton:=true
-Bundle-Version: 10.11.0.qualifier
+Bundle-Version: 11.8.0.qualifier
 Eclipse-BuddyPolicy: registered
 Bundle-ClassPath: joda-time-1.5.2.jar,
  c3p0-0.9.1.2.jar,

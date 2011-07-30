@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,6 +20,7 @@ import net.tourbook.statistic.TourStatisticsView;
 import net.tourbook.ui.tourChart.TourChartView;
 import net.tourbook.ui.views.TourMarkerView;
 import net.tourbook.ui.views.TourWaypointView;
+import net.tourbook.ui.views.calendar.CalendarView;
 import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.ui.views.tourBook.TourBookView;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
@@ -76,6 +77,8 @@ public class PerspectiveFactoryTourBook implements IPerspectiveFactory {
 
 		listFolder.addView(RawDataView.ID);
 		listFolder.addView(TourBookView.ID);
+		listFolder.addView(CalendarView.ID);
+		listFolder.addView(TourStatisticsView.ID);
 
 		//--------------------------------------------------------------------------------
 
@@ -85,7 +88,6 @@ public class PerspectiveFactoryTourBook implements IPerspectiveFactory {
 				0.6f,
 				FOLDER_ID_LIST);
 
-		markerFolder.addView(TourStatisticsView.ID);
 		markerFolder.addView(TourMarkerView.ID);
 		markerFolder.addView(TourWaypointView.ID);
 	}

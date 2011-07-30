@@ -104,7 +104,6 @@ public class GraphDrawingData {
 
 	private boolean					_isXUnitOverlapChecked	= false;
 
-	private boolean					_isDrawVerticalGrid		= true;
 	private boolean[]				_isDrawUnits			= null;
 
 	public GraphDrawingData(final int chartType) {
@@ -308,10 +307,6 @@ public class GraphDrawingData {
 		return _isDrawUnits;
 	}
 
-	public boolean isDrawVerticalGrid() {
-		return _isDrawVerticalGrid;
-	}
-
 	/**
 	 * @return Returns <code>true</code> when the x-axis unit visibility is checked that it do not
 	 *         overlap the previous unit label.
@@ -325,15 +320,15 @@ public class GraphDrawingData {
 	 *            The barFocusRectangles to set.
 	 */
 	public void setBarFocusRectangles(final Rectangle[][] barFocusRectangles) {
-		this._barFocusRectangles = barFocusRectangles;
+		_barFocusRectangles = barFocusRectangles;
 	}
 
 //	public void setDevGraphHeight(final int heightDev) {
-//		this.devGraphHeight = heightDev;
+//		devGraphHeight = heightDev;
 //	}
 //
 //	public void setDevGraphWidth(final int devGraphWidth) {
-//		this.devGraphWidth = devGraphWidth;
+//		devGraphWidth = devGraphWidth;
 //	}
 
 	/**
@@ -341,7 +336,7 @@ public class GraphDrawingData {
 	 *            The barPosition to set.
 	 */
 	public void setBarPosition(final int barPosition) {
-		this._barPosition = barPosition;
+		_barPosition = barPosition;
 	}
 
 	/**
@@ -349,7 +344,7 @@ public class GraphDrawingData {
 	 *            The barRectangles to set.
 	 */
 	public void setBarRectangles(final Rectangle[][] barRectList) {
-		this._barRectangles = barRectList;
+		_barRectangles = barRectList;
 	}
 
 	/**
@@ -357,7 +352,7 @@ public class GraphDrawingData {
 	 *            The barRectangleWidth to set.
 	 */
 	public void setBarRectangleWidth(final int barRectangleWidth) {
-		this._barRectangleWidth = barRectangleWidth;
+		_barRectangleWidth = barRectangleWidth;
 	}
 
 	/**
@@ -373,7 +368,7 @@ public class GraphDrawingData {
 	 *            The devMarginTop to set.
 	 */
 	public void setDevMarginTop(final int devMarginTop) {
-		this._devMarginTop = devMarginTop;
+		_devMarginTop = devMarginTop;
 	}
 
 	/**
@@ -381,7 +376,7 @@ public class GraphDrawingData {
 	 *            The devMarkerBarHeight to set.
 	 */
 	public void setDevMarkerBarHeight(final int devMarkerBarHeight) {
-		this._devMarkerBarHeight = devMarkerBarHeight;
+		_devMarkerBarHeight = devMarkerBarHeight;
 	}
 
 	/**
@@ -389,11 +384,11 @@ public class GraphDrawingData {
 	 *            The devSliderBarHeight to set.
 	 */
 	public void setDevSliderBarHeight(final int devSliderBarHeight) {
-		this._devSliderBarHeight = devSliderBarHeight;
+		_devSliderBarHeight = devSliderBarHeight;
 	}
 
 	public void setDevSliderHeight(final int devSliderHeight) {
-		this._devSliderHeight = devSliderHeight;
+		_devSliderHeight = devSliderHeight;
 	}
 
 	/**
@@ -401,11 +396,11 @@ public class GraphDrawingData {
 	 *            The devTitelBarHeight to set.
 	 */
 	void setDevXTitelBarHeight(final int devTitelBarHeight) {
-		this._devXTitelBarHeight = devTitelBarHeight;
+		_devXTitelBarHeight = devTitelBarHeight;
 	}
 
 	public void setDevYBottom(final int devY) {
-		this._devYBottom = devY;
+		_devYBottom = devY;
 	}
 
 	/**
@@ -413,7 +408,7 @@ public class GraphDrawingData {
 	 *            The devYTop to set.
 	 */
 	protected void setDevYTop(final int devYTop) {
-		this._devYTop = devYTop;
+		_devYTop = devYTop;
 	}
 
 	public void setErrorMessage(final String errorMessage) {
@@ -421,7 +416,7 @@ public class GraphDrawingData {
 	}
 
 	public void setGraphYBottom(final int yGraphMin) {
-		this._graphYBottom = yGraphMin;
+		_graphYBottom = yGraphMin;
 	}
 
 	/**
@@ -429,15 +424,11 @@ public class GraphDrawingData {
 	 *            The graphYTop to set.
 	 */
 	protected void setGraphYTop(final int graphYTop) {
-		this._graphYTop = graphYTop;
+		_graphYTop = graphYTop;
 	}
 
 	public void setIsDrawUnit(final boolean[] isDrawUnits) {
 		_isDrawUnits = isDrawUnits;
-	}
-
-	public void setIsDrawVerticalGrid(final boolean isDrawVerticalGrid) {
-		_isDrawVerticalGrid = isDrawVerticalGrid;
 	}
 
 	public void setIsXUnitOverlapChecked(final boolean isXUnitOverlapChecked) {
@@ -450,7 +441,7 @@ public class GraphDrawingData {
 	 * @param scaleXUnit
 	 */
 	public void setScaleUnitX(final float scaleXUnit) {
-		this._scaleUnitX = scaleXUnit;
+		_scaleUnitX = scaleXUnit;
 	}
 
 	/**
@@ -459,11 +450,11 @@ public class GraphDrawingData {
 	 * @param scaleX
 	 */
 	public void setScaleX(final float scaleX) {
-		this._scaleX = scaleX;
+		_scaleX = scaleX;
 	}
 
 	public void setScaleY(final float scaleY) {
-		this._scaleY = scaleY;
+		_scaleY = scaleY;
 	}
 
 	/**
@@ -471,7 +462,7 @@ public class GraphDrawingData {
 	 *            The xData to set.
 	 */
 	public void setXData(final ChartDataXSerie xData) {
-		this._xData = xData;
+		_xData = xData;
 	}
 
 	/**
@@ -501,7 +492,7 @@ public class GraphDrawingData {
 	 *            The yData to set.
 	 */
 	public void setYData(final ChartDataYSerie data) {
-		this._yData = data;
+		_yData = data;
 	}
 
 	/**

@@ -73,6 +73,7 @@ import net.tourbook.tour.BreakTimeTool;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.ChartLayer2ndAltiSerie;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
+import net.tourbook.util.StatusUtil;
 import net.tourbook.util.Util;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -301,7 +302,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private int												maxPulse;																				// db-version 4
 
 	/**
-	 * Number of HR zones which are available for this tour
+	 * Number of HR zones which are available for this tour, is 0 when HR zones are not defined.
 	 */
 	private int												numberOfHrZones						= 0;												// db-version 18
 
@@ -642,7 +643,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 //	private boolean	_isBreakTimeComputed;
 
 	/**
-	 * contains the temperature in the metric measurement system
+	 * Contains the temperature in the metric measurement system, the values are multiplied with
+	 * {@link #temperatureScale}.
 	 */
 	@Transient
 	public int[]											temperatureSerie;
@@ -915,6 +917,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	@Transient
 	private int[]											_hrZones;
 
+	@Transient
+	private HrZoneContext									_hrZoneContext;
+
 	public TourData() {}
 
 	/**
@@ -1098,6 +1103,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		srtmSerieImperial = null;
 
 		_hrZones = null;
+		_hrZoneContext = null;
 	}
 
 	/**
@@ -1861,7 +1867,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			breakTimeResult = BreakTimeTool.computeBreakTimeByTimeDistance(
 					this,
 					btConfig.breakShortestTime,
-					btConfig.breakMaxDistance);
+					btConfig.breakMaxDistance,
+					btConfig.breakSliceDiff);
 
 			breakTimeSerie = breakTimeResult.breakTimeSerie;
 
@@ -1921,13 +1928,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			return;
 		}
 
-		final ZoneContext zoneContext = tourPerson.getHrZoneContext(
+		_hrZoneContext = tourPerson.getHrZoneContext(
 				tourPerson.getHrMaxFormula(),
 				tourPerson.getMaxPulse(),
 				tourPerson.getBirthDayWithDefault(),
 				getStartDateTime());
 
-		if (zoneContext == null) {
+		if (_hrZoneContext == null) {
 			// hr zones are not defined
 			return;
 		}
@@ -1936,7 +1943,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			getBreakTime();
 		}
 
-		final int zoneSize = zoneContext.zoneMinBmp.length;
+		final int zoneSize = _hrZoneContext.zoneMinBpm.length;
 		final int[] hrZones = new int[zoneSize];
 		int prevTime = 0;
 
@@ -1965,8 +1972,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 			for (int zoneIndex = 0; zoneIndex < zoneSize; zoneIndex++) {
 
-				final int minValue = zoneContext.zoneMinBmp[zoneIndex];
-				final int maxValue = zoneContext.zoneMaxBmp[zoneIndex];
+				final int minValue = _hrZoneContext.zoneMinBpm[zoneIndex];
+				final int maxValue = _hrZoneContext.zoneMaxBpm[zoneIndex];
 
 				if (pulse >= minValue && pulse <= maxValue) {
 					hrZones[zoneIndex] += timeDiff;
@@ -3048,16 +3055,24 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			/*
 			 * the distance is shorted that the maximum of a Long datatype is not exceeded
 			 */
+			try {
 
-			tourIdKey = Short.toString(getStartYear())
-					+ Short.toString(getStartMonth())
-					+ Short.toString(getStartDay())
-					+ Short.toString(getStartHour())
-					+ Short.toString(getStartMinute())
-					//
-					+ uniqueKeySuffix.substring(0, Math.min(5, uniqueKeySuffix.length()));
+				tourIdKey = Short.toString(getStartYear())
+						+ Short.toString(getStartMonth())
+						+ Short.toString(getStartDay())
+						+ Short.toString(getStartHour())
+						+ Short.toString(getStartMinute())
+						//
+						+ uniqueKeySuffix.substring(0, Math.min(5, uniqueKeySuffix.length()));
 
-			tourId = Long.valueOf(tourIdKey);
+				tourId = Long.valueOf(tourIdKey);
+
+			} catch (final NumberFormatException e2) {
+
+				// this case happened when getStartMonth() had a wrong value
+
+				tourId = Long.valueOf(new DateTime().getMillis());
+			}
 		}
 
 		return tourId;
@@ -3733,6 +3748,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 //		return deviceTotalUp;
 //	}
 
+	public HrZoneContext getHrZoneContext() {
+
+		if (_hrZoneContext == null) {
+			computeHrZones();
+		}
+
+		return _hrZoneContext;
+	}
+
 	/**
 	 * @return Returns all available HR zones. How many zones are really used, depends on the
 	 *         {@link TourPerson} and how many zones are defined for the person.
@@ -3818,6 +3842,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return distanceSerie;
 	}
 
+	/**
+	 * @return Returns number of HR zones which are available for this tour. Will be 0 when HR zones
+	 *         are not defined.
+	 */
 	public int getNumberOfHrZones() {
 
 		if (_hrZones == null) {
@@ -4957,7 +4985,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	public void setStartMonth(final short startMonth) {
 		_dateTimeStart = null;
-		this.startMonth = startMonth;
+
+		if (startMonth < 1 || startMonth > 12) {
+			StatusUtil.log(new Exception("Month is invalid: " + startMonth)); //$NON-NLS-1$
+			this.startMonth = 1;
+		} else {
+			this.startMonth = startMonth;
+		}
 	}
 
 	public void setStartPulse(final short startPulse) {

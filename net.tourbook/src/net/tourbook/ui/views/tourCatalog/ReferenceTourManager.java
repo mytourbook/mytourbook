@@ -98,8 +98,8 @@ public class ReferenceTourManager {
 
 			final TourData refTourData = refTour.getTourData();
 
-			final TourChartConfiguration refTourChartConfig = TourManager.createTourChartConfiguration();
-			final TourChartConfiguration compTourchartConfig = TourManager.createTourChartConfiguration();
+			final TourChartConfiguration refTourChartConfig = TourManager.createDefaultTourChartConfig();
+			final TourChartConfiguration compTourchartConfig = TourManager.createDefaultTourChartConfig();
 
 			final ChartDataModel chartDataModel = TourManager.getInstance().createChartDataModel(
 					refTourData,
