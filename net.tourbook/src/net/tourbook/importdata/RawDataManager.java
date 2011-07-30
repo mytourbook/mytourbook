@@ -457,8 +457,31 @@ public class RawDataManager {
 
 					if (deviceFileExtension.equals("*") || deviceFileExtension.equalsIgnoreCase(fileExtension)) { //$NON-NLS-1$
 
-						// device file extension was found in the filename extension
+						// Check if the file we want to import requires confirmation and if yes, ask user
+						if (device.userConfirmationRequired()) {
+							Display.getDefault().syncExec(new Runnable() {
+								public void run() {
+									final Shell activeShell = Display.getDefault().getActiveShell();
+									if (activeShell != null) {
+										if (MessageDialog.openConfirm(
+												Display.getCurrent().getActiveShell(),
+												device.visibleName + " Import",
+												device.userConfirmationMessage())) {
+											_isImportCanceled = false;
+										} else {
+											_isImportCanceled = true;
+										}
+									}
+								}
+							});
+						}
 
+						if (_isImportCanceled) {
+							_isImported = true; // don't display an error to the user
+							return;
+						}
+
+						// device file extension was found in the filename extension
 						if (importWithDevice(device, filePathName, destinationPath, buildNewFileNames, fileCollision)) {
 
 							isDataImported = true;

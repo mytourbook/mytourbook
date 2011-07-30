@@ -48,6 +48,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 	private static final String				NAME_SPACE_GPX_1_0		= "http://www.topografix.com/GPX/1/0";				//$NON-NLS-1$
 	private static final String				NAME_SPACE_GPX_1_1		= "http://www.topografix.com/GPX/1/1";				//$NON-NLS-1$
+	private static final String				POLAR_WEBSYNC_CREATOR_2_3	= "Polar WebSync 2.3 - www.polar.fi";				//$NON_NLS-1$
 
 	// namespace for extensions used by Garmin
 //	private static final String				NAME_SPACE_TPEXT		= "http://www.garmin.com/xmlschemas/TrackPointExtension/v1";	//$NON-NLS-1$
@@ -97,6 +98,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	private static final SimpleDateFormat	GPX_TIME_FORMAT_RFC822	= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");	//$NON-NLS-1$
 
 	private int								_gpxVersion				= -1;
+	private boolean							_gpxHasLocalTime			= false;											// To work around a Polar Websync export bug...
 
 	private boolean							_isInTrk				= false;
 	private boolean							_isInTrkName			= false;
@@ -160,6 +162,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 		_deviceDataReader = deviceDataReader;
 		_importFilePath = importFileName;
 		_tourDataMap = tourDataMap;
+		_gpxHasLocalTime = false; // Polar exports local time :-(
 	}
 
 	@Override
@@ -429,8 +432,14 @@ public class GPX_SAX_Handler extends DefaultHandler {
 		/*
 		 * set tour start date/time
 		 */
-		// final DateTime dtTourStart = new DateTime(firstTimeData.absoluteTime);
-		final DateTime dtTourStart = new DateTime(firstTimeData.absoluteTime, DateTimeZone.UTC);
+		DateTime dtTourStart;
+		if (_gpxHasLocalTime) {
+			// Polar WebSync create GPX files with local time :-(
+			// workaround: create DateTime object with UTC TimeZone => time is NOT converted to localtime
+			dtTourStart = new DateTime(firstTimeData.absoluteTime, DateTimeZone.UTC);
+		} else {
+			dtTourStart = new DateTime(firstTimeData.absoluteTime);
+		}
 
 		tourData.setStartYear((short) dtTourStart.getYear());
 		tourData.setStartMonth((short) dtTourStart.getMonthOfYear());
@@ -540,7 +549,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 					_timeSlice.absoluteDistance = _absoluteDistance += _timeSlice.gpxDistance;
 
-				} else { 
+				} else {
 
 					// compute distance from lat/lon
 
@@ -697,7 +706,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 							initNewTrack();
 						}
 
-						break;
+//						break;
 
 					} else if (value.contains(NAME_SPACE_GPX_1_1)) {
 
@@ -707,7 +716,13 @@ public class GPX_SAX_Handler extends DefaultHandler {
 							initNewTrack();
 						}
 
-						break;
+//						break;
+
+					} else if (value.contains(POLAR_WEBSYNC_CREATOR_2_3)) {
+
+						_gpxHasLocalTime = true;
+
+//						break;
 					}
 				}
 			}

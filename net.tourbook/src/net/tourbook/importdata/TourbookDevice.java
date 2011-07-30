@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import net.tourbook.data.TourData;
 
 public abstract class TourbookDevice implements IRawDataReader {
-
+	
 	/**
 	 * Temperature scale when a device supports scaled temperature values. A value greater than 10
 	 * does not make sense for a tour program.
@@ -202,5 +202,13 @@ public abstract class TourbookDevice implements IRawDataReader {
 				+ extensionSortPriority
 				+ "]"; //$NON-NLS-1$
 	}
+	
+	public String userConfirmationMessage() {
+		return "";
+	}
 
+	public boolean userConfirmationRequired() {
+		return false;
+	}
+	
 }

@@ -30,6 +30,7 @@ import java.util.StringTokenizer;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.device.gpx.GPXDeviceDataReader;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
@@ -69,6 +70,33 @@ public class PolarPPDDataReader extends TourbookDevice {
 		private String	dataPath;
 	}
 
+	class SilentGPXDeviceDataReader extends GPXDeviceDataReader {
+
+	}
+
+	class SilentPolarHRMDateReader extends PolarHRMDataReader {
+		
+		@Override
+		protected void showError(final String error) {
+
+		}
+
+	}
+
+	class SilentPolarPDDDataReader extends PolarPDDDataReader {
+		
+		@Override
+		protected TourbookDevice getGPXDeviceDataReader() {
+			return new SilentGPXDeviceDataReader();
+		}
+
+		@Override
+		protected TourbookDevice getPolarHRMDataReader() {
+			return new SilentPolarHRMDateReader();
+		}
+
+	}
+
 	@SuppressWarnings("unused")
 	private class Sport {
 
@@ -87,7 +115,7 @@ public class PolarPPDDataReader extends TourbookDevice {
 	// plugin constructor
 	public PolarPPDDataReader() {
 
-		_polarPDDDataReader = new PolarPDDDataReader();
+		_polarPDDDataReader = new SilentPolarPDDDataReader();
 
 	}
 
@@ -493,6 +521,16 @@ public class PolarPPDDataReader extends TourbookDevice {
 		}
 
 		return line;
+	}
+
+	@Override
+	public String userConfirmationMessage() {
+		return "Really import the PPD file?\n Your know what your are doing?";
+	}
+
+	@Override
+	public boolean userConfirmationRequired() {
+		return true;
 	}
 
 	@Override

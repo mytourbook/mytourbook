@@ -1620,7 +1620,7 @@ public class PolarHRMDataReader extends TourbookDevice {
 		return parseSection(importFileName, deviceData, tourDataMap);
 	}
 
-	private void showError(final String message) {
+	protected void showError(final String message) {
 
 		if (_lastUsedImportId == _deviceData.importId) {
 

@@ -178,7 +178,7 @@ public class PolarPDDDataReader extends TourbookDevice {
 
 		// get .hrm data
 		final IPath hrmFilePath = importPath.append(hrmFileName);
-		final TourData hrmTourData = createExercise10ImportSeparatedFile(hrmFilePath, new PolarHRMDataReader());
+		final TourData hrmTourData = createExercise10ImportSeparatedFile(hrmFilePath, getPolarHRMDataReader());
 
 		if (hrmTourData == null) {
 			return false;
@@ -189,7 +189,7 @@ public class PolarPDDDataReader extends TourbookDevice {
 		if (gpxFileName != null) {
 
 			final IPath gpxFilePath = importPath.append(gpxFileName);
-			final TourData gpxTourData = createExercise10ImportSeparatedFile(gpxFilePath, new GPXDeviceDataReader());
+			final TourData gpxTourData = createExercise10ImportSeparatedFile(gpxFilePath, getGPXDeviceDataReader());
 
 			if (gpxTourData != null && gpxTourData.latitudeSerie != null) {
 				createExercise20SyncHrmGpx(hrmTourData, gpxTourData);
@@ -446,6 +446,14 @@ public class PolarPDDDataReader extends TourbookDevice {
 
 	public String getDeviceModeName(final int profileId) {
 		return null;
+	}
+
+	protected TourbookDevice getGPXDeviceDataReader() {
+		return new GPXDeviceDataReader();
+	}
+
+	protected TourbookDevice getPolarHRMDataReader() {
+		return new PolarHRMDataReader();
 	}
 
 	@Override
@@ -1024,5 +1032,4 @@ public class PolarPDDDataReader extends TourbookDevice {
 
 		return true;
 	}
-
 }
