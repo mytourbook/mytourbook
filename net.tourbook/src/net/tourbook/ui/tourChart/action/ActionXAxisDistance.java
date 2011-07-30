@@ -35,7 +35,7 @@ public class ActionXAxisDistance extends Action {
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__show_distance_on_x_axis));
 		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__show_distance_on_x_axis_disabled));
 
-		setChecked(!tourChart.getTourChartConfig().showTimeOnXAxis);
+		setChecked(!tourChart.getTourChartConfig().isShowTimeOnXAxis);
 	}
 
 	@Override

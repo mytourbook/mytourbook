@@ -22,7 +22,7 @@ package net.tourbook.ui.tourChart;
 import java.util.ArrayList;
 
 import net.tourbook.chart.Chart;
-import net.tourbook.chart.ChartDrawingData;
+import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.ChartMarker;
 import net.tourbook.chart.IChartLayer;
 
@@ -58,7 +58,7 @@ public class ChartSegmentLayer implements IChartLayer {
 	 * @param drawingData
 	 * @param fChartComponents
 	 */
-	public void draw(final GC gc, final ChartDrawingData drawingData, final Chart chart) {
+	public void draw(final GC gc, final GraphDrawingData drawingData, final Chart chart) {
 
 		final Display display = Display.getCurrent();
 
@@ -95,7 +95,7 @@ public class ChartSegmentLayer implements IChartLayer {
 
 			gc.setForeground(colorLine);
 
-			// connect the two segments with a line
+			// connect two segments with a line
 			if (lastPoint == null) {
 				lastPoint = new Point(devXOffset, devYSegment);
 			} else {

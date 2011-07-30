@@ -40,7 +40,7 @@ import net.tourbook.device.DeviceReaderTools;
 import net.tourbook.ext.velocity.VelocityService;
 import net.tourbook.importdata.ExternalDevice;
 import net.tourbook.importdata.RawDataManager;
-import net.tourbook.importdata.WizardImportData;
+import net.tourbook.importdata.DataTransferWizard;
 
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
@@ -360,7 +360,7 @@ public class GarminExternalDevice extends ExternalDevice {
 				context.put("creation_date", creationDate); //$NON-NLS-1$
 
 				// author
-				context.put("author", System.getProperty(WizardImportData.SYSPROPERTY_IMPORT_PERSON, "MyTourbook")); //$NON-NLS-1$ //$NON-NLS-2$
+				context.put("author", System.getProperty(DataTransferWizard.SYSPROPERTY_IMPORT_PERSON, "MyTourbook")); //$NON-NLS-1$ //$NON-NLS-2$
 
 				// device infos
 				String productName = productInfo.getProductName();

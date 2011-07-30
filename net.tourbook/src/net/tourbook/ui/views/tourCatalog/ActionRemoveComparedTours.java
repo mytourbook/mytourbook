@@ -151,7 +151,7 @@ public class ActionRemoveComparedTours extends Action {
 					final TourData tourData = refTour.getTourData();
 
 					if (tourData.getTourReferences().remove(refTour)) {
-						TourDatabase.saveTour(tourData);
+						TourDatabase.saveTour(tourData, false);
 
 						modifiedRefTours.add(tourData.getTourId());
 					}

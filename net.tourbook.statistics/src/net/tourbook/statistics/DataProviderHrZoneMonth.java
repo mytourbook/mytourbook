@@ -87,7 +87,7 @@ public class DataProviderHrZoneMonth extends DataProvider {
 				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
 
 				+ (" WHERE startYear IN (" + getYearList(lastYear, numberOfYears) + ") \n") //$NON-NLS-1$ //$NON-NLS-2$
-//				+ (" AND NumberOfHrZones > 0  \n") //$NON-NLS-1$
+				+ (" AND NumberOfHrZones > 0  \n") //$NON-NLS-1$
 				+ sqlFilter.getWhereClause()
 
 				+ (" GROUP BY startYear, startMonth \n") //$NON-NLS-1$
@@ -130,7 +130,7 @@ public class DataProviderHrZoneMonth extends DataProvider {
 			}
 			conn.close();
 
-			_monthData.hrZones = dbHrZones;
+			_monthData.hrZoneValues = dbHrZones;
 
 //			for (int zoneIndex = 0; zoneIndex < 10; zoneIndex++) {
 //				for (int monthIndex = 0; monthIndex < 12; monthIndex++) {

@@ -39,9 +39,9 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 	public static final String		YDATA_INFO					= "yDataInfo";					//$NON-NLS-1$
 
-	public static final int			FILL_METHOD_NOFILL			= 0;
 	public static final int			FILL_METHOD_FILL_BOTTOM		= 1;
 	public static final int			FILL_METHOD_FILL_ZERO		= 2;
+	public static final int			FILL_METHOD_CUSTOM			= 100;
 
 	/**
 	 * Slider label format: n.1
@@ -61,7 +61,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 	 */
 	private int[][]					_colorIndex;
 
-	private int						_graphFillMethod			= FILL_METHOD_NOFILL;
+	private int						_graphFillMethod			= FILL_METHOD_FILL_BOTTOM;
 
 	private boolean					_showYSlider				= false;
 
@@ -73,23 +73,34 @@ public class ChartDataYSerie extends ChartDataSerie {
 	private boolean					_yAxisDirection				= true;
 
 	/**
-	 * Contains a list with all layers which are drawn on top of the graph
+	 * Contains all layers which are drawn on top of the graph before the slider
 	 */
-	private ArrayList<IChartLayer>	_customLayers				= new ArrayList<IChartLayer>();
+	private ArrayList<IChartLayer>	_customFgLayers				= new ArrayList<IChartLayer>();
+
+	/**
+	 * Contains all layers which are drawn in the background of the graph
+	 */
+	private ArrayList<IChartLayer>	_customBgLayers				= new ArrayList<IChartLayer>();
+
+	/**
+	 * Contains a painter which fills the graph
+	 */
+	private IFillPainter			_customFillPainter;
 
 	private ChartYSlider			_ySliderTop;
 
 	private ChartYSlider			_ySliderBottom;
+
 	private final int				_chartType;
 
 	/**
 	 * When this value is > 0 a line chart will not draw a line to the next value point when the
-	 * distance in x-data values is greater than this value.
+	 * difference in the x-data values is greater than this value.
 	 * <p>
-	 * With this feature lines are not drawn to the next value which looks ugly (a triangle is
-	 * painted) when a tour is paused.
+	 * Lines are not drawn to the next value with this feature because these lines (and filling)
+	 * looks ugly (a triangle is painted) when a tour is paused.
 	 */
-	private int						_disabledLineToNext;
+//	private int						_disabledLineToNext;
 
 	/**
 	 * 2nd y-data serie is currently used to display the slider label and the pace y-units
@@ -148,13 +159,21 @@ public class ChartDataYSerie extends ChartDataSerie {
 		return _colorIndex;
 	}
 
-	public ArrayList<IChartLayer> getCustomLayers() {
-		return _customLayers;
+	public ArrayList<IChartLayer> getCustomBackgroundLayers() {
+		return _customBgLayers;
 	}
 
-	public int getDisabledLineToNext() {
-		return _disabledLineToNext;
+	public IFillPainter getCustomFillPainter() {
+		return _customFillPainter;
 	}
+
+	public ArrayList<IChartLayer> getCustomForegroundLayers() {
+		return _customFgLayers;
+	}
+
+//	public int getDisabledLineToNext() {
+//		return _disabledLineToNext;
+//	}
 
 	/**
 	 * @return returns true if the graph is filled
@@ -241,13 +260,21 @@ public class ChartDataYSerie extends ChartDataSerie {
 		_colorIndex = colorIndex;
 	}
 
-	public void setCustomLayers(final ArrayList<IChartLayer> customLayers) {
-		_customLayers = customLayers;
+	public void setCustomBackgroundLayers(final ArrayList<IChartLayer> customBackgroundLayers) {
+		_customBgLayers = customBackgroundLayers;
 	}
 
-	public void setDisableLineToNext(final int disabledLineToNext) {
-		_disabledLineToNext = disabledLineToNext;
+	public void setCustomFillPainter(final IFillPainter fillPainter) {
+		_customFillPainter = fillPainter;
 	}
+
+	public void setCustomForegroundLayers(final ArrayList<IChartLayer> customLayers) {
+		_customFgLayers = customLayers;
+	}
+
+//	public void setDisableLineToNext(final int disabledLineToNext) {
+//		_disabledLineToNext = disabledLineToNext;
+//	}
 
 	/**
 	 * @param fillMethod

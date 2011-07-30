@@ -20,7 +20,7 @@ import java.util.Arrays;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
-import net.tourbook.chart.ChartDrawingData;
+import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IChartLayer;
 import net.tourbook.math.LinearRegression;
 import net.tourbook.tour.TourManager;
@@ -42,7 +42,7 @@ public class ChartLayerConconiTest implements IChartLayer {
 	private double	_scaleXextended;
 	private boolean	_isExtendedScaling;
 
-	public void draw(final GC gc, final ChartDrawingData drawingData, final Chart chart) {
+	public void draw(final GC gc, final GraphDrawingData drawingData, final Chart chart) {
 
 		final ChartDataYSerie yData = drawingData.getYData();
 

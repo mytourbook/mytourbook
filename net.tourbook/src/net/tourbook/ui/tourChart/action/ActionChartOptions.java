@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.tourChart.action;
 
@@ -70,12 +70,17 @@ public class ActionChartOptions extends Action implements IMenuCreator {
 
 		_menu = new Menu(parent);
 
+		addItem(actionProxies.get(TourChart.COMMAND_ID_IS_SHOW_TOUR_MARKER).getAction());
+		addItem(actionProxies.get(TourChart.COMMAND_ID_IS_SHOW_BREAKTIME_VALUES).getAction());
 		addItem(actionProxies.get(TourChart.COMMAND_ID_SHOW_START_TIME).getAction());
 		addItem(actionProxies.get(TourChart.COMMAND_ID_SHOW_SRTM_DATA).getAction());
-		(new Separator()).fill(_menu, -1);
 
+		(new Separator()).fill(_menu, -1);
 		addItem(actionProxies.get(TourChart.COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER).getAction());
 		addItem(actionProxies.get(TourChart.COMMAND_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED).getAction());
+
+		(new Separator()).fill(_menu, -1);
+		addItem(actionProxies.get(TourChart.COMMAND_ID_EDIT_CHART_PREFERENCES).getAction());
 
 		return _menu;
 	}

@@ -24,6 +24,7 @@ import javax.persistence.Transient;
 
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.UI;
+import net.tourbook.util.HSLColor;
 import net.tourbook.util.StatusUtil;
 
 import org.eclipse.swt.graphics.RGB;
@@ -96,6 +97,9 @@ public class TourPersonHRZone implements Cloneable, Comparable<TourPersonHRZone>
 	@Transient
 	private RGB					_colorBright;
 
+	@Transient
+	private HSLColor			_hslColor				= new HSLColor();
+
 	/**
 	 * manually created marker or imported marker create a unique id to identify them, saved marker
 	 * are compared with the marker id
@@ -116,6 +120,27 @@ public class TourPersonHRZone implements Cloneable, Comparable<TourPersonHRZone>
 			_color = new RGB(colorRed, colorGreen, colorBlue);
 			_colorDark = getColorDark(_color);
 			_colorBright = getColorBright(_color);
+		}
+	}
+
+	@Override
+	public TourPersonHRZone clone() {
+
+		try {
+
+			// create clones for shallow copied fields so that they can be modified
+
+			final TourPersonHRZone newHrZone = (TourPersonHRZone) super.clone();
+
+			newHrZone.zoneName = zoneName == null ? null : new String(zoneName);
+			newHrZone.nameShortcut = nameShortcut == null ? null : new String(nameShortcut);
+			newHrZone.description = description == null ? null : new String(description);
+
+			return newHrZone;
+
+		} catch (final CloneNotSupportedException e) {
+			StatusUtil.log(e);
+			return null;
 		}
 	}
 
@@ -142,27 +167,6 @@ public class TourPersonHRZone implements Cloneable, Comparable<TourPersonHRZone>
 //			return null;
 //		}
 //	}
-
-	@Override
-	public TourPersonHRZone clone() {
-
-		try {
-
-			// create clones for shallow copied fields so that they can be modified
-
-			final TourPersonHRZone newHrZone = (TourPersonHRZone) super.clone();
-
-			newHrZone.zoneName = zoneName == null ? null : new String(zoneName);
-			newHrZone.nameShortcut = nameShortcut == null ? null : new String(nameShortcut);
-			newHrZone.description = description == null ? null : new String(description);
-
-			return newHrZone;
-
-		} catch (final CloneNotSupportedException e) {
-			StatusUtil.log(e);
-			return null;
-		}
-	}
 
 	@Override
 	public int compareTo(final TourPersonHRZone otherHrZone) {
@@ -218,13 +222,10 @@ public class TourPersonHRZone implements Cloneable, Comparable<TourPersonHRZone>
 
 	private RGB getColorBright(final RGB rgb) {
 
-		final double brightFactor = 1.1f;
+		_hslColor.initHSLbyRGB(rgb);
+		_hslColor.brighten(1.2f);
 
-		final int red = (int) Math.min(0xff, rgb.red * brightFactor);
-		final int green = (int) Math.min(0xff, rgb.green * brightFactor);
-		final int blue = (int) Math.min(0xff, rgb.blue * brightFactor);
-
-		return new RGB(red, green, blue);
+		return _hslColor.getRGB();
 	}
 
 	public RGB getColorDark() {
@@ -232,15 +233,13 @@ public class TourPersonHRZone implements Cloneable, Comparable<TourPersonHRZone>
 		return _colorDark;
 	}
 
+
 	private RGB getColorDark(final RGB rgb) {
 
-		final double darkFactor = 0.90;
+		_hslColor.initHSLbyRGB(rgb);
+		_hslColor.brighten(0.9f);
 
-		final int red = (int) Math.max(0, rgb.red * darkFactor);
-		final int green = (int) Math.max(0, rgb.green * darkFactor);
-		final int blue = (int) Math.max(0, rgb.blue * darkFactor);
-
-		return new RGB(red, green, blue);
+		return _hslColor.getRGB();
 	}
 
 	public String getDescription() {

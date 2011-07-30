@@ -77,6 +77,11 @@ public class ChartDataModel {
 	 */
 	private String						_errorMessage;
 
+	/**
+	 * Is <code>true</code> when skipped values are displayed as dots.
+	 */
+	private boolean						_isNoLinesValuesDisplayed;
+
 	public ChartDataModel(final int chartType) {
 		_chartType = chartType;
 	}
@@ -153,6 +158,10 @@ public class ChartDataModel {
 		return _yData;
 	}
 
+	public boolean isNoLinesValuesDisplayed() {
+		return _isNoLinesValuesDisplayed;
+	}
+
 	public boolean isStackedChart() {
 		return _isStackedChart;
 	}
@@ -181,7 +190,11 @@ public class ChartDataModel {
 	}
 
 	public void setErrorMessage(final String errorMessage) {
-		_errorMessage=errorMessage;
+		_errorMessage = errorMessage;
+	}
+
+	public void setShowNoLineValues(final boolean isNoLinesValuesDisplayed) {
+		_isNoLinesValuesDisplayed = isNoLinesValuesDisplayed;
 	}
 
 	public void setStackedChart(final boolean isStackedChart) {

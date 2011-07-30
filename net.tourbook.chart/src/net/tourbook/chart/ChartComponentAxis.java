@@ -47,7 +47,7 @@ public class ChartComponentAxis extends Canvas {
 
 	private Image						_axisImage;
 
-	private ArrayList<ChartDrawingData>	_chartDrawingData;
+	private ArrayList<GraphDrawingData>	_graphDrawingData;
 
 	private boolean						_isAxisModified;
 
@@ -202,7 +202,7 @@ public class ChartComponentAxis extends Canvas {
 	 */
 	private void drawYUnits(final GC gc, final Rectangle axisRect) {
 
-		if (_chartDrawingData == null) {
+		if (_graphDrawingData == null) {
 			return;
 		}
 
@@ -211,7 +211,7 @@ public class ChartComponentAxis extends Canvas {
 		final int devX = _isLeft ? axisRect.width - 1 : 0;
 
 		// loop: all graphs
-		for (final ChartDrawingData drawingData : _chartDrawingData) {
+		for (final GraphDrawingData drawingData : _graphDrawingData) {
 
 			final ArrayList<ChartUnit> yUnits = drawingData.getYUnits();
 
@@ -220,7 +220,7 @@ public class ChartComponentAxis extends Canvas {
 
 			final String title = yData.getYTitle();
 			final String unitLabel = yData.getUnitLabel();
-			final boolean yAxisDirection = yData.isYAxisDirection();
+			final boolean isBottomUp = yData.isYAxisDirection();
 
 			final int graphYBottom = drawingData.getGraphYBottom();
 			final int devGraphHeight = drawingData.devGraphHeight;
@@ -272,18 +272,20 @@ public class ChartComponentAxis extends Canvas {
 			int devY;
 
 			// loop: all units
-			int unitCount = 0;
-			for (final ChartUnit yUnit : yUnits) {
+			for (final ChartUnit unit : yUnits) {
 
-				if (yAxisDirection) {
-					devY = devYBottom - (int) ((yUnit.value - graphYBottom) * scaleY);
+				final int unitValue = unit.value;
+				final double devYUnit = ((unitValue - graphYBottom) * scaleY) + 0.5;
+
+				if (isBottomUp) {
+					devY = devYBottom - (int) devYUnit;
 				} else {
-					devY = devYTop + (int) ((yUnit.value - graphYBottom) * scaleY);
+					devY = devYTop + (int) devYUnit;
 				}
 
 				gc.setForeground(display.getSystemColor(SWT.COLOR_DARK_GRAY));
 
-				final String valueLabel = yUnit.valueLabel;
+				final String valueLabel = unit.valueLabel;
 
 				/*
 				 * hide unit tick when label is not set
@@ -301,16 +303,14 @@ public class ChartComponentAxis extends Canvas {
 				}
 
 				final Point unitExtend = gc.textExtent(valueLabel);
-				final int devYUnit = devY - unitExtend.y / 2;
+				final int devYUnitLabel = devY - unitExtend.y / 2;
 
 				// draw the unit label centered at the unit tick
 				if (_isLeft) {
-					gc.drawText(valueLabel, (devX - (unitExtend.x + UNIT_OFFSET)), devYUnit, true);
+					gc.drawText(valueLabel, (devX - (unitExtend.x + UNIT_OFFSET)), devYUnitLabel, true);
 				} else {
-					gc.drawText(valueLabel, (devX + UNIT_OFFSET), devYUnit, true);
+					gc.drawText(valueLabel, (devX + UNIT_OFFSET), devYUnitLabel, true);
 				}
-
-				unitCount++;
 			}
 
 			// draw the unit line
@@ -335,13 +335,13 @@ public class ChartComponentAxis extends Canvas {
 	/**
 	 * set a new configuration for the axis, this causes a recreation of the axis
 	 * 
-	 * @param list
+	 * @param _chartDrawingData
 	 * @param isLeft
 	 *            true if the axis is on the left side
 	 */
-	protected void setDrawingData(final ArrayList<ChartDrawingData> list, final boolean isLeft) {
+	protected void setDrawingData(final ChartDrawingData _chartDrawingData, final boolean isLeft) {
 
-		_chartDrawingData = list;
+		_graphDrawingData = _chartDrawingData.graphDrawingData;
 		_isLeft = isLeft;
 
 		onResize();

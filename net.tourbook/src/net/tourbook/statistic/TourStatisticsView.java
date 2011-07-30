@@ -46,14 +46,14 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourStatisticsView extends ViewPart implements ITourProvider {
 
-	public static final String		ID			= "net.tourbook.views.StatisticView";				//$NON-NLS-1$
+	public static final String		ID			= "net.tourbook.views.StatisticView";						//$NON-NLS-1$
 
 	private final IPreferenceStore	_prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
 
-	private final IDialogSettings	_state		= TourbookPlugin.getDefault().getDialogSettingsSection(
-														"TourStatisticsView");						//$NON-NLS-1$
+	private final IDialogSettings	_state		= TourbookPlugin.getDefault()//
+														.getDialogSettingsSection("TourStatisticsView");	//$NON-NLS-1$
 
-	private StatContainer		_statContainer;
+	private StatContainer			_statContainer;
 
 	private PostSelectionProvider	_postSelectionProvider;
 	private IPartListener2			_partListener;
@@ -114,17 +114,14 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 				 * set a new chart configuration when the preferences has changed
 				 */
 
-				if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
+				if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)
+						|| property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)
+						|| property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)) {
 
 					_activePerson = TourbookPlugin.getActivePerson();
 					_activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
 
-					refreshStatistics();
-
-				} else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
-
-					// update statistics
-					refreshStatistics();
+					updateStatistics();
 
 				} else if (property.equals(ITourbookPreferences.STATISTICS_STATISTIC_PROVIDER_IDS)) {
 
@@ -136,7 +133,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 
 					UI.updateUnits();
 
-					refreshStatistics();
+					updateStatistics();
 				}
 			}
 		};
@@ -153,7 +150,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
 				if (selection instanceof SelectionDeletedTours) {
-					refreshStatistics();
+					updateStatistics();
 				}
 			}
 		};
@@ -181,11 +178,11 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 					}
 
 					// update statistics
-					refreshStatistics();
+					updateStatistics();
 
 				} else if (eventId == TourEventId.UPDATE_UI || //
 						eventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
-					refreshStatistics();
+					updateStatistics();
 				}
 			}
 		};
@@ -245,15 +242,15 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 		}
 	}
 
-	private void refreshStatistics() {
-		_statContainer.refreshStatistic(_activePerson, _activeTourTypeFilter);
-	}
-
 	public void saveState() {
 		_statContainer.saveState(_state);
 	}
 
 	@Override
 	public void setFocus() {}
+
+	private void updateStatistics() {
+		_statContainer.updateStatistic(_activePerson, _activeTourTypeFilter);
+	}
 
 }
