@@ -361,9 +361,11 @@ public class WizardPageReferenceTour extends WizardPage {
 
 			// set grid size
 			final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-			_refTourChart.setGridDistance(
+			_refTourChart.setGrid(
 					prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
-					prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
+					prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE),
+					prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
+					prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
 
 			_refTourChart.updateChart(chartDataModel, false);
 

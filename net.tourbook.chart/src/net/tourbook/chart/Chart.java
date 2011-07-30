@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.chart;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import net.tourbook.util.ITourToolTipProvider;
@@ -110,7 +109,6 @@ public class Chart extends ViewForm {
 	private boolean						_isFillToolbar						= true;
 	private boolean						_isToolbarCreated;
 
-	BarTooltipProvider					_barTooltipProvider;
 	private int							_barSelectionSerieIndex;
 	private int							_barSelectionValueIndex;
 
@@ -125,9 +123,13 @@ public class Chart extends ViewForm {
 	 * minimum width in pixel for one unit, this is only an approximate value because the pixel is
 	 * rounded up or down to fit a rounded unit
 	 */
-	protected int						_gridVerticalDistance				= 30;
+	protected int						gridVerticalDistance				= 30;
 
-	protected int						_gridHorizontalDistance				= 70;
+	protected int						gridHorizontalDistance				= 70;
+
+	protected boolean					isShowHorizontalGridLines			= false;
+	protected boolean					isShowVerticalGridLines				= false;
+
 	/**
 	 * mouse behaviour:<br>
 	 * <br>
@@ -348,6 +350,20 @@ public class Chart extends ViewForm {
 		chartInfo.selectedSliderValuesIndex = chartGraph.getSelectedSlider().getValuesIndex();
 
 		return chartInfo;
+	}
+
+	/**
+	 * disable all actions
+	 */
+	private void disableAllActions() {
+
+		if (_chartActionProxies != null) {
+
+			for (final ActionProxy actionProxy : _chartActionProxies.values()) {
+				actionProxy.setEnabled(false);
+			}
+			_actionHandlerManager.updateUIState();
+		}
 	}
 
 	void enableActions() {
@@ -629,7 +645,7 @@ public class Chart extends ViewForm {
 		return _chartDataModel;
 	}
 
-	public ArrayList<ChartDrawingData> getChartDrawingData() {
+	public ChartDrawingData getChartDrawingData() {
 		return _chartComponents.getChartDrawingData();
 	}
 
@@ -695,6 +711,19 @@ public class Chart extends ViewForm {
 		return _isDrawBarChartAtBottom;
 	}
 
+//	boolean isMouseDownExternalPost(final int devXMouse, final int devYMouse, final int devXGraph) {
+//
+//		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseDownPost);
+//
+//		event.devXMouse = devXMouse;
+//		event.devYMouse = devYMouse;
+//		event.devMouseXInGraph = devXGraph;
+//
+//		fireChartMouseEvent(event);
+//
+//		return event.isWorked;
+//	}
+
 	/**
 	 * Returns the toolbar for the chart, if no toolbar manager is set with setToolbarManager, the
 	 * manager will be created and the toolbar is on top of the chart
@@ -736,19 +765,6 @@ public class Chart extends ViewForm {
 	public ChartComponentAxis getToolTipControl() {
 		return getChartComponents().getAxisLeft();
 	}
-
-//	boolean isMouseDownExternalPost(final int devXMouse, final int devYMouse, final int devXGraph) {
-//
-//		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseDownPost);
-//
-//		event.devXMouse = devXMouse;
-//		event.devYMouse = devYMouse;
-//		event.devMouseXInGraph = devXGraph;
-//
-//		fireChartMouseEvent(event);
-//
-//		return event.isWorked;
-//	}
 
 	/**
 	 * returns the value index for the x-sliders
@@ -900,6 +916,16 @@ public class Chart extends ViewForm {
 		_chartComponents.getChartComponentGraph()._graphAlpha = GRAPH_ALPHA;
 	}
 
+//	/**
+//	 * Set <code>true</code> when the internal action bar should be used, set <code>false</code>
+//	 * when the workbench action should be used.
+//	 *
+//	 * @param useInternalActionBar
+//	 */
+//	public void setUseInternalActionBar(boolean useInternalActionBar) {
+//		fUseInternalActionBar = useInternalActionBar;
+//	}
+
 	/**
 	 * Do a resize for all chart components which creates new drawing data
 	 */
@@ -915,20 +941,6 @@ public class Chart extends ViewForm {
 	 */
 	public void setBackgroundColor(final Color backgroundColor) {
 		this._backgroundColor = backgroundColor;
-	}
-
-//	/**
-//	 * Set <code>true</code> when the internal action bar should be used, set <code>false</code>
-//	 * when the workbench action should be used.
-//	 *
-//	 * @param useInternalActionBar
-//	 */
-//	public void setUseInternalActionBar(boolean useInternalActionBar) {
-//		fUseInternalActionBar = useInternalActionBar;
-//	}
-
-	public void setBarTooltipProvider(final BarTooltipProvider barTooltipProvider) {
-		_barTooltipProvider = barTooltipProvider;
 	}
 
 	/**
@@ -974,6 +986,10 @@ public class Chart extends ViewForm {
 		_chartContextProvider = chartContextProvider;
 	}
 
+//	public void setShowPartNavigation(final boolean showPartNavigation) {
+//		fShowPartNavigation = showPartNavigation;
+//	}
+
 	/**
 	 * @param chartContextProvider
 	 * @param isFirstContextMenu
@@ -990,10 +1006,6 @@ public class Chart extends ViewForm {
 		_chartDataModel = chartDataModel;
 	}
 
-//	public void setShowPartNavigation(final boolean showPartNavigation) {
-//		fShowPartNavigation = showPartNavigation;
-//	}
-
 	/**
 	 * Set <code>false</code> to not draw the bars at the bottom of the chart
 	 * 
@@ -1001,6 +1013,23 @@ public class Chart extends ViewForm {
 	 */
 	public void setDrawBarChartAtBottom(final boolean fDrawBarCharttAtBottom) {
 		this._isDrawBarChartAtBottom = fDrawBarCharttAtBottom;
+	}
+
+	/**
+	 * Display an error message instead of the chart.
+	 * 
+	 * @param errorMessage
+	 */
+	public void setErrorMessage(final String errorMessage) {
+
+		final ChartDataModel emptyModel = new ChartDataModel(ChartDataModel.CHART_TYPE_LINE);
+
+		_chartComponents.setErrorMessage(errorMessage);
+
+		_chartDataModel = emptyModel;
+		_chartComponents.setModel(emptyModel, false);
+
+		disableAllActions();
 	}
 
 	@Override
@@ -1021,10 +1050,16 @@ public class Chart extends ViewForm {
 		_chartComponents.getChartComponentGraph()._graphAlpha = alphaValue;
 	}
 
-	public void setGridDistance(final int horizontalGrid, final int verticalGrid) {
+	public void setGrid(final int horizontalGrid,
+						final int verticalGrid,
+						final boolean isHGridVisible,
+						final boolean isVGridVisible) {
 
-		_gridVerticalDistance = verticalGrid;
-		_gridHorizontalDistance = horizontalGrid;
+		gridHorizontalDistance = horizontalGrid;
+		gridVerticalDistance = verticalGrid;
+
+		isShowHorizontalGridLines = isHGridVisible;
+		isShowVerticalGridLines = isVGridVisible;
 
 		_chartComponents.onResize();
 	}
@@ -1245,15 +1280,7 @@ public class Chart extends ViewForm {
 			_chartDataModel = emptyModel;
 			_chartComponents.setModel(emptyModel, false);
 
-			if (_chartActionProxies != null) {
-
-				// disable all actions
-
-				for (final ActionProxy actionProxy : _chartActionProxies.values()) {
-					actionProxy.setEnabled(false);
-				}
-				_actionHandlerManager.updateUIState();
-			}
+			disableAllActions();
 
 			return;
 		}
@@ -1284,10 +1311,10 @@ public class Chart extends ViewForm {
 	}
 
 	/**
-	 * Updates only chart layers not the chart itself
+	 * Updates only the custom layers which performce much faster than a chart update.
 	 */
 	public void updateCustomLayers() {
-		_chartComponents.updateChartLayers();
+		_chartComponents.updateCustomLayers();
 	}
 
 	private void updateMouseModeUIState() {

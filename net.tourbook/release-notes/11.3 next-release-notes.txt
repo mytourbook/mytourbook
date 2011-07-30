@@ -1,0 +1,64 @@
+webbsite:
+- update java formatting on website
+
+problems:
+- avg pulse for all statistics, it includes tours without pulse
+- datenübertraung hat keinen folder
+
+recommendation:
+- use KatMouse on windows
+
+new
+- polar PDD import
+- italian translation
+- added context menu into table/tree header to modify columns
+- display hr zones
+  - break time is ignored when hr zones are computed
+
+modifications compared with previous versions
+- break time is ignored when avg hr is computed
+- default breaktime is set to 20 seconds and 20 m
+- chart gridlines are hidden by default (to have a clearer view on the graphs) but they can be activated in the preferences  
+  
+improvements
+- simplified first startup of the application
+  - 1st person is created automatically
+  - measurement system can be selected
+- show tour info (with hovered mouse) in the Tour Import view
+- app cleanup:
+  -measurement system combobox is hidden by default
+  -moved action "Other views..." into sub menu
+  -moved import for daum ergo into separate pref page
+- reorder table/tree columns with drag&drop in column dialog
+- enforce preference min/max values for painting a tour in the map
+- straight vertical lines instead of traiangles in the heartbeat graph when the value is not set within 20 seconds
+- export gpx with heartrate, temperature and cadence
+- break time is displayed as a gap when time is displayed on the x-axis
+- sequence of the bars in a bar chart can be customized
+- tour chart:
+  - tour marker can be displayed/hidden
+  - tour values within a break can be displayed/hidden
+  
+limitations
+(- HR zones in the map can be displayed correctly for one single tour, all other possibilities (multiple tours, multiple persons) can display the wrong HR zones)
+
+not implemented features when HR zones are displayed
+- legend in the map 
+- tooltip in the statistics view 
+
+fixed bugs
+- fixed bug to auto open tag menu in OSX, eclipse 3.7 is required
+- hide tour tooltip when "add tag" menu is displayed
+- Fitlog-Import fails for tracks without GPS data - ID: 3232030		http://sourceforge.net/tracker/?func=detail&atid=890601&aid=3232030&group_id=179799
+- Conconi test window broke workbench - ID: 3269916	http://sourceforge.net/tracker/?func=detail&atid=890601&aid=3269916&group_id=179799
+- Moving, paused, and reording time, cant be greater than 9. This is only observed on Mac OSx, works fine on windows	https://sourceforge.net/tracker/index.php?func=detail&aid=3292465&group_id=179799&atid=890601
+- values for graphs in the chart has been clipped at the canvas border 
+  -> painting was wrong
+  -> this bug required a new painting strategy for all charts
+
+internal
+- removed custom pixel converter
+
+
+platform:
+- eclipse 3.7

@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.chart;
 
@@ -23,42 +23,47 @@ public class BarChartMinMaxKeeper {
 	/**
 	 * min/max values for the y-axis data
 	 */
-	private HashMap<Integer, Object>	fMinValues	= new HashMap<Integer, Object>();
-	private HashMap<Integer, Object>	fMaxValues	= new HashMap<Integer, Object>();
+	private HashMap<Integer, Object>	_minValues	= new HashMap<Integer, Object>();
+	private HashMap<Integer, Object>	_maxValues	= new HashMap<Integer, Object>();
+
+	public void resetMinMax() {
+		_minValues.clear();
+		_maxValues.clear();
+	}
 
 	/**
 	 * save the min/max values from the chart data model
 	 * 
 	 * @param chartDataModel
 	 */
-	public void setMinMaxValues(ChartDataModel chartDataModel) {
+	public void setMinMaxValues(final ChartDataModel chartDataModel) {
 
+		// check required data
 		if (chartDataModel == null) {
-			// data fDataModel is not available
 			return;
 		}
 
-		ArrayList<ChartDataYSerie> yDataSerie = chartDataModel.getYData();
+		final ArrayList<ChartDataYSerie> yDataSerie = chartDataModel.getYData();
 
 		// loop: save min/max values for all data series
 		Integer yDataId = 0;
-		for (ChartDataSerie yData : yDataSerie) {
+		for (final ChartDataSerie yData : yDataSerie) {
 			if (yData instanceof ChartDataYSerie) {
 				setYDataMinMaxValues((ChartDataYSerie) yData, yDataId++);
 			}
 		}
 	}
 
-	private void setYDataMinMaxValues(ChartDataYSerie yData, Integer yDataId) {
+	private void setYDataMinMaxValues(final ChartDataYSerie yData, final Integer yDataId) {
 
 		/*
 		 * set/restore min/max values
 		 */
-		int minValue = yData.getOriginalMinValue();
-		int maxValue = yData.getOriginalMaxValue();
+		final int minValue = yData.getOriginalMinValue();
+		final int maxValue = yData.getOriginalMaxValue();
 
-		Integer keeperMinValue = (Integer) fMinValues.get(yDataId);
-		Integer keeperMaxValue = (Integer) fMaxValues.get(yDataId);
+		Integer keeperMinValue = (Integer) _minValues.get(yDataId);
+		Integer keeperMaxValue = (Integer) _maxValues.get(yDataId);
 
 		if (keeperMinValue == null) {
 
@@ -82,17 +87,11 @@ public class BarChartMinMaxKeeper {
 		}
 
 		// keep new min/max values
-		fMinValues.put(yDataId, keeperMinValue);
-		fMaxValues.put(yDataId, keeperMaxValue);
+		_minValues.put(yDataId, keeperMinValue);
+		_maxValues.put(yDataId, keeperMaxValue);
 
 		yData.setVisibleMinValue(keeperMinValue);
 		yData.setVisibleMaxValue(keeperMaxValue);
-	}
-
-	public void resetMinMax() {
-		fMinValues = new HashMap<Integer, Object>();
-		fMaxValues = new HashMap<Integer, Object>();
-
 	}
 
 }

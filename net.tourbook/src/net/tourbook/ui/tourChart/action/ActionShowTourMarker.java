@@ -13,34 +13,28 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.data;
+package net.tourbook.ui.tourChart.action;
 
-public class ZoneMinMaxBpm {
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.ui.tourChart.TourChart;
 
-	/**
-	 * Age in years
-	 */
-	public int		age;
-	public int		hrMax;
+import org.eclipse.jface.action.Action;
 
-	public int[]	zoneMinBmp;
-	public int[]	zoneMaxBmp;
+public class ActionShowTourMarker extends Action {
 
-	/**
-	 * Set HR zones, age and max HR
-	 * 
-	 * @param zoneMinBmp
-	 * @param zoneMaxBmp
-	 * @param age
-	 * @param hrMax
-	 */
-	public ZoneMinMaxBpm(final int[] zoneMinBmp, final int[] zoneMaxBmp, final int age, final int hrMax) {
+	private TourChart	_tourChart;
 
-		this.zoneMinBmp = zoneMinBmp;
-		this.zoneMaxBmp = zoneMaxBmp;
+	public ActionShowTourMarker(final TourChart tourChart) {
 
-		this.age = age;
-		this.hrMax = hrMax;
+		super(Messages.Tour_Action_ShowTourMarker, AS_CHECK_BOX);
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_marker));
+
+		_tourChart = tourChart;
 	}
 
+	@Override
+	public void run() {
+		_tourChart.actionShowTourMarker(isChecked());
+	}
 }

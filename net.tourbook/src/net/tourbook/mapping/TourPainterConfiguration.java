@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,31 +21,34 @@ import java.util.Set;
 import net.tourbook.data.TourData;
 import de.byteholder.gpx.GeoPosition;
 
-public class PaintManager {
+/**
+ * Contains data which are needed to paint a tour into a map.
+ */
+public class TourPainterConfiguration {
 
-	private static PaintManager			_instance;
+	private static TourPainterConfiguration	_instance;
 
-	private final ArrayList<TourData>	_tourDataList	= new ArrayList<TourData>();
+	private final ArrayList<TourData>		_tourDataList	= new ArrayList<TourData>();
 
 	/**
 	 * contains the upper left and lower right position for a tour
 	 */
-	private Set<GeoPosition>			_tourBounds;
+	private Set<GeoPosition>				_tourBounds;
 
-	private int							_synchTourZoomLevel;
+	private int								_synchTourZoomLevel;
 
-	private ILegendProvider				_legendProvider;
+	private ILegendProvider					_legendProvider;
 
-	private boolean						_isShowStartEndInMap;
-	boolean								_isShowTourMarker;
-	boolean								_isShowWayPoints;
+	boolean									isShowStartEndInMap;
+	boolean									isShowTourMarker;
+	boolean									isShowWayPoints;
 
-	private PaintManager() {}
+	private TourPainterConfiguration() {}
 
-	public static PaintManager getInstance() {
+	public static TourPainterConfiguration getInstance() {
 
 		if (_instance == null) {
-			_instance = new PaintManager();
+			_instance = new TourPainterConfiguration();
 		}
 
 		return _instance;
@@ -73,18 +76,10 @@ public class PaintManager {
 		return _tourDataList;
 	}
 
-	public boolean isShowStartEndInMap() {
-		return _isShowStartEndInMap;
-	}
-
-	public void setLegendProvider(final ILegendProvider legendProvider) {
-		if (legendProvider != null) {
-			_legendProvider = legendProvider;
+	public void setLegendProvider(final ILegendProvider iLegendProvider) {
+		if (iLegendProvider != null) {
+			_legendProvider = iLegendProvider;
 		}
-	}
-
-	public void setShowStartEnd(final boolean isVisible) {
-		_isShowStartEndInMap = isVisible;
 	}
 
 	public void setSynchTourZoomLevel(final int zoomLevel) {

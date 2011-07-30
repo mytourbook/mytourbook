@@ -624,7 +624,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
 		// set alti diff scaling
 		_tourChartConfig.isRelativeValueDiffScaling = _chkValueDiffScaling.getSelection();
-		_tourChart.update2ndAltiLayer(this, true);
+		_tourChart.updateLayer2ndAlti(this, true);
 
 		updateUIFromTourData();
 
@@ -664,7 +664,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 			return null;
 		}
 
-		final int[] xDataSerie = _tourChartConfig.showTimeOnXAxis ? _targetTour.timeSerie : _targetTour
+		final int[] xDataSerie = _tourChartConfig.isShowTimeOnXAxis ? _targetTour.timeSerie : _targetTour
 				.getDistanceSerie();
 
 		return new ChartLayer2ndAltiSerie(layerTourData, xDataSerie, _tourChartConfig, null);
@@ -1567,7 +1567,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 			updateTourChart();
 		} else {
 			// update only the merge layer, this is much faster
-			_tourChart.update2ndAltiLayer(this, true);
+			_tourChart.updateLayer2ndAlti(this, true);
 		}
 
 		enableActions();
@@ -1722,7 +1722,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
-		prefStore.setValue(ITourbookPreferences.MERGE_TOUR_GRAPH_X_AXIS, _tourChartConfig.showTimeOnXAxis
+		prefStore.setValue(ITourbookPreferences.MERGE_TOUR_GRAPH_X_AXIS, _tourChartConfig.isShowTimeOnXAxis
 				? TourManager.X_AXIS_TIME
 				: TourManager.X_AXIS_DISTANCE);
 

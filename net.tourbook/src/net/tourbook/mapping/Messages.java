@@ -26,6 +26,10 @@ public class Messages extends NLS {
 	public static String		graph_label_gradient_unit;
 	public static String		graph_label_heartbeat_unit;
 
+	public static String	Image__PulseZones;
+
+	public static String	Image__PulseZones_Disabled;
+
 	public static String		Image_Action_POI;
 	public static String		Image_Action_POI_Disabled;
 	public static String		Image_Action_ShowSliderInMap;
@@ -150,6 +154,8 @@ public class Messages extends NLS {
 	public static String		statusLine_mapInfo_defaultText;
 	public static String		statusLine_mapInfo_pattern;
 	public static String		statusLine_mapInfo_tooltip;
+
+	public static String	Tour_Action_ShowHrZones_Tooltip;
 
 	static {
 		// initialize resource bundle

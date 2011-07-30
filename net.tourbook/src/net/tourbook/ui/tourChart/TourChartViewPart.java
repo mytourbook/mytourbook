@@ -101,7 +101,7 @@ public abstract class TourChartViewPart extends ViewPart {
 						|| property.equals(ITourbookPreferences.GRAPH_X_AXIS)
 						|| property.equals(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME)) {
 
-					_tourChartConfig = TourManager.createTourChartConfiguration();
+					_tourChartConfig = TourManager.createDefaultTourChartConfig();
 
 					if (_tourChart != null) {
 						_tourChart.updateTourChart(_tourData, _tourChartConfig, false);
@@ -140,7 +140,7 @@ public abstract class TourChartViewPart extends ViewPart {
 				}
 
 				if (eventId == TourEventId.SEGMENT_LAYER_CHANGED) {
-					_tourChart.updateSegmentLayer((Boolean) eventData);
+					_tourChart.updateLayerSegment((Boolean) eventData);
 
 				} else if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
 					_tourChart.updateTourChart(true, true);

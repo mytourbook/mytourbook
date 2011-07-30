@@ -31,7 +31,7 @@ import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.mapping.ILegendProvider;
+import net.tourbook.mapping.ILegendProviderGradientColors;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
 
@@ -42,6 +42,7 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.TreeColumnLayout;
 import org.eclipse.jface.preference.ColorSelector;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -85,6 +86,9 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 	private static final String[]				SORT_PROPERTY	= new String[] { "this property is needed for sorting !!!" };	//$NON-NLS-1$
 
+	private final IPreferenceStore				_prefStore		= TourbookPlugin.getDefault()//
+																		.getPreferenceStore();
+
 	private GraphColorPainter					_graphColorPainter;
 
 	private ColorDefinition						_expandedItem;
@@ -101,9 +105,10 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 	private TreeViewer							_tourTypeViewer;
 
 	private ColorSelector						_colorSelector;
-	private Button								_btnTourTypeImage;
 
+	private Button								_btnTourTypeImage;
 	private Button								_btnAdd;
+
 	private Button								_btnDelete;
 	private Button								_btnRename;
 
@@ -265,7 +270,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 				| SWT.FULL_SELECTION);
 
 		tree.setHeaderVisible(false);
-		tree.setLinesVisible(getPreferenceStore().getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+		tree.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 		_tourTypeViewer = new TreeViewer(tree);
 		defineAllColumns(treeLayout, tree);
@@ -554,6 +559,14 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		return returnResult;
 	}
 
+	@Override
+	public void dispose() {
+
+		_graphColorPainter.disposeAllResources();
+
+		super.dispose();
+	}
+
 	private void enableButtons() {
 
 		final ITreeSelection selection = (ITreeSelection) _tourTypeViewer.getSelection();
@@ -576,11 +589,11 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 			TourManager.getInstance().clearTourDataCache();
 
 			// fire modify event
-			getPreferenceStore().setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random());
+			_prefStore.setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random());
 		}
 	}
 
-	public ILegendProvider getLegendProvider() {
+	public ILegendProviderGradientColors getLegendProvider() {
 		return null;
 	}
 
@@ -607,8 +620,8 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 	}
 
 	public void init(final IWorkbench workbench) {
-		setPreferenceStore(TourbookPlugin.getDefault().getPreferenceStore());
-//		noDefaultAndApplyButton();
+		setPreferenceStore(_prefStore);
+		noDefaultAndApplyButton();
 	}
 
 	@Override
@@ -855,7 +868,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 	@Override
 	public boolean performCancel() {
 
-		_graphColorPainter.disposeAllResources();
+		fireModifyEvent();
 
 		return super.performCancel();
 	}
@@ -864,7 +877,6 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 	public boolean performOk() {
 
 		fireModifyEvent();
-		_graphColorPainter.disposeAllResources();
 
 		return super.performOk();
 	}

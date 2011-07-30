@@ -19,7 +19,7 @@
 package net.tourbook.ui.tourChart;
 
 import net.tourbook.chart.Chart;
-import net.tourbook.chart.ChartDrawingData;
+import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IChartLayer;
 import net.tourbook.data.SplineData;
 import net.tourbook.data.TourData;
@@ -64,7 +64,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		_xDataSerie = xDataSerie;
 	}
 
-	public void draw(final GC gc, final ChartDrawingData drawingData, final Chart chart) {
+	public void draw(final GC gc, final GraphDrawingData drawingData, final Chart chart) {
 
 		final int[] xValues = _xDataSerie;
 

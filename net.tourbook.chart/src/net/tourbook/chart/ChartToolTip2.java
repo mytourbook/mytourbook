@@ -13,15 +13,27 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.statistics;
+package net.tourbook.chart;
 
-import net.tourbook.chart.ChartDataYSerie;
+/**
+ * THIS IS NOT WORKING BECAUSE THE EXISTING TOOLTIP CANNOT USE SEPARATE UI'S
+ * <P>
+ * A new tooltip must be implemented for separates tool tips. HR zones do <b>NOT</b> contains
+ * tooltips in version 11.8 for this reason.
+ */
+public abstract class ChartToolTip2 {
 
-public class StatisticMonthHrZoneBeside extends StatisticMonthHrZone {
-
-	@Override
-	int getBarLayout() {
-		return ChartDataYSerie.BAR_LAYOUT_BESIDE;
-	}
+//	/**
+//	 * Creates the UI for the tooltip.
+//	 *
+//	 * @param parent
+//	 */
+//	public abstract void createUI(Composite parent);
+//
+//	/**
+//	 * @return Returns <code>true</code> when the UI was updated, <code>false</code> when the UI was
+//	 *         not modified (when data has not been changed).
+//	 */
+//	public abstract boolean updateUI();
 
 }

@@ -34,6 +34,7 @@ import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.data.TourPerson;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.statistic.StatisticContext;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 import net.tourbook.util.Util;
@@ -47,26 +48,28 @@ import org.eclipse.ui.IWorkbenchPartSite;
 
 public abstract class StatisticWeek extends YearStatistic {
 
+	private static IPreferenceStore		_prefStore			= TourbookPlugin.getDefault().getPreferenceStore();
+
 	private Chart						_chart;
-	private final BarChartMinMaxKeeper	_minMaxKeeper	= new BarChartMinMaxKeeper();
+	private final BarChartMinMaxKeeper	_minMaxKeeper		= new BarChartMinMaxKeeper();
 
-	private TourPerson					_activePerson;
-	private TourTypeFilter				_activeTourTypeFilter;
+	private TourPerson					_appPerson;
+	private TourTypeFilter				_appTourTypeFilter;
 
-	private int							_currentYear;
-	private int							_numberOfYears;
+	private int							_statYoungestYear;
+	private int							_statNumberOfYears;
 
 	private boolean						_isSynchScaleEnabled;
 
-	private final DateFormat			_dateFormatter	= DateFormat.getDateInstance(DateFormat.FULL);
+	private final DateFormat			_dateFormatter		= DateFormat.getDateInstance(DateFormat.FULL);
 
 	private TourDataWeek				_tourWeekData;
 
-	private Calendar					_calendar		= GregorianCalendar.getInstance();
+	private Calendar					_tooltipCalendar	= GregorianCalendar.getInstance();
 	private int							_firstDayOfWeek;
 	private int							_minimalDaysInFirstWeek;
 
-	private static IPreferenceStore		_prefStore		= TourbookPlugin.getDefault().getPreferenceStore();
+	private IChartInfoProvider			_chartInfoProvider;
 
 	@Override
 	public void activateActions(final IWorkbenchPartSite partSite) {
@@ -84,11 +87,11 @@ public abstract class StatisticWeek extends YearStatistic {
 	 */
 	ChartSegments createChartSegments() {
 
-		final int segmentStart[] = new int[_numberOfYears];
-		final int segmentEnd[] = new int[_numberOfYears];
-		final String[] segmentTitle = new String[_numberOfYears];
+		final int segmentStart[] = new int[_statNumberOfYears];
+		final int segmentEnd[] = new int[_statNumberOfYears];
+		final String[] segmentTitle = new String[_statNumberOfYears];
 
-		final int oldestYear = _currentYear - _numberOfYears + 1;
+		final int oldestYear = _statYoungestYear - _statNumberOfYears + 1;
 		final int[] yearWeeks = _tourWeekData.yearWeeks;
 
 		int weekCounter = 0;
@@ -130,19 +133,26 @@ public abstract class StatisticWeek extends YearStatistic {
 		_chart.setShowZoomActions(true);
 		_chart.setCanScrollZoomedChart(true);
 		_chart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
+
+		_chartInfoProvider = new IChartInfoProvider() {
+			@Override
+			public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
+				return createToolTipInfo(serieIndex, valueIndex);
+			}
+		};
 	}
 
 	private ChartToolTipInfo createToolTipInfo(final int serieIndex, final int valueIndex) {
 
-		final int oldestYear = _currentYear - _numberOfYears + 1;
+		final int oldestYear = _statYoungestYear - _statNumberOfYears + 1;
 
-		_calendar.set(oldestYear, 0, 1);
+		_tooltipCalendar.set(oldestYear, 0, 1);
 
 		/*
 		 * adjust calendar to the first day in the first week, it took a while to figure this out
 		 */
-		int weekOfYear = (short) _calendar.get(Calendar.WEEK_OF_YEAR);
-		final int dayOfWeek = _calendar.get(Calendar.DAY_OF_WEEK);
+		int weekOfYear = (short) _tooltipCalendar.get(Calendar.WEEK_OF_YEAR);
+		final int dayOfWeek = _tooltipCalendar.get(Calendar.DAY_OF_WEEK);
 		int dayOffset;
 		if (weekOfYear == 1) {
 
@@ -160,10 +170,10 @@ public abstract class StatisticWeek extends YearStatistic {
 			}
 		}
 		final int dayOffsetAll = (valueIndex * 7) + dayOffset;
-		_calendar.add(Calendar.DAY_OF_YEAR, dayOffsetAll);
+		_tooltipCalendar.add(Calendar.DAY_OF_YEAR, dayOffsetAll);
 
 		// validate calendar week
-		final int checkDayOfWeek = _calendar.get(Calendar.DAY_OF_WEEK);
+		final int checkDayOfWeek = _tooltipCalendar.get(Calendar.DAY_OF_WEEK);
 		if (_firstDayOfWeek != checkDayOfWeek) {
 			System.out.println("first day in first week is incorrect\t_firstDayOfWeek=" //$NON-NLS-1$
 					+ _firstDayOfWeek
@@ -171,13 +181,13 @@ public abstract class StatisticWeek extends YearStatistic {
 					+ checkDayOfWeek);
 		}
 
-		weekOfYear = (short) _calendar.get(Calendar.WEEK_OF_YEAR);
-		final short weekYear = (short) Util.getYearForWeek(_calendar);
+		weekOfYear = (short) _tooltipCalendar.get(Calendar.WEEK_OF_YEAR);
+		final short weekYear = (short) Util.getYearForWeek(_tooltipCalendar);
 
-		final Date dateStart = _calendar.getTime();
+		final Date dateStart = _tooltipCalendar.getTime();
 
-		_calendar.add(Calendar.DAY_OF_YEAR, 6);
-		final Date dateEnd = _calendar.getTime();
+		_tooltipCalendar.add(Calendar.DAY_OF_YEAR, 6);
+		final Date dateEnd = _tooltipCalendar.getTime();
 
 		final String beginDate = _dateFormatter.format(dateStart);
 		final String endDate = _dateFormatter.format(dateEnd);
@@ -186,14 +196,14 @@ public abstract class StatisticWeek extends YearStatistic {
 		final Integer drivingTime = _tourWeekData.drivingTime[serieIndex][valueIndex];
 		final int breakTime = recordingTime - drivingTime;
 
-		final String tourTypeName = getTourTypeName(serieIndex, _activeTourTypeFilter);
+		final String tourTypeName = getTourTypeName(serieIndex, _appTourTypeFilter);
 
 		/*
 		 * tool tip: title
 		 */
 		final StringBuilder titleFormat = new StringBuilder();
 		titleFormat.append(Messages.tourtime_info_week);
-		titleFormat.append(NEW_LINE);
+		titleFormat.append(UI.NEW_LINE);
 
 		final String toolTipTitle = new Formatter().format(titleFormat.toString(),//
 				tourTypeName,
@@ -208,17 +218,17 @@ public abstract class StatisticWeek extends YearStatistic {
 		 */
 		final StringBuilder toolTipFormat = new StringBuilder();
 		toolTipFormat.append(Messages.tourtime_info_date_week);
-		toolTipFormat.append(NEW_LINE);
-		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(UI.NEW_LINE);
+		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_distance_tour);
-		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_altitude);
-		toolTipFormat.append(NEW_LINE);
-		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(UI.NEW_LINE);
+		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_recording_time);
-		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_driving_time);
-		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_break_time);
 
 		final String toolTipLabel = new Formatter().format(toolTipFormat.toString(), //
@@ -253,6 +263,20 @@ public abstract class StatisticWeek extends YearStatistic {
 		toolTipInfo.setLabel(toolTipLabel);
 
 		return toolTipInfo;
+	}
+
+	private int[] createWeekData() {
+
+		final int weekCounter = _tourWeekData.altitudeHigh[0].length;
+		final int allWeeks[] = new int[weekCounter];
+
+		for (int weekIndex = 0; weekIndex < weekCounter; weekIndex++) {
+			allWeeks[weekIndex] = weekIndex;
+		}
+
+//		debugWeekNumber();
+
+		return allWeeks;
 	}
 
 //		System.out.println(UI.EMPTY_STRING//
@@ -329,20 +353,6 @@ public abstract class StatisticWeek extends YearStatistic {
 //		);
 //	}
 
-	private int[] createWeekData() {
-
-		final int weekCounter = _tourWeekData.altitudeHigh[0].length;
-		final int allWeeks[] = new int[weekCounter];
-
-		for (int weekIndex = 0; weekIndex < weekCounter; weekIndex++) {
-			allWeeks[weekIndex] = weekIndex;
-		}
-
-//		debugWeekNumber();
-
-		return allWeeks;
-	}
-
 	void createXDataWeek(final ChartDataModel chartDataModel) {
 
 		// set the x-axis
@@ -361,13 +371,15 @@ public abstract class StatisticWeek extends YearStatistic {
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				_tourWeekData.altitudeLow,
 				_tourWeekData.altitudeHigh);
+
 		yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
 		yData.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
 		yData.setAllValueColors(0);
 		yData.setVisibleMinValue(0);
-		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_ALTITUDE, _activeTourTypeFilter);
-		StatisticServices.setTourTypeColorIndex(yData, _tourWeekData.typeIds, _activeTourTypeFilter);
+
+		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_ALTITUDE, _appTourTypeFilter);
+		StatisticServices.setTourTypeColorIndex(yData, _tourWeekData.typeIds, _appTourTypeFilter);
 		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_ALTITUDE);
 
 		chartDataModel.addYData(yData);
@@ -381,14 +393,16 @@ public abstract class StatisticWeek extends YearStatistic {
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				_tourWeekData.distanceLow,
 				_tourWeekData.distanceHigh);
+
 		yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
 		yData.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
 		yData.setAllValueColors(0);
 		yData.setValueDivisor(1000);
 		yData.setVisibleMinValue(0);
-		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE, _activeTourTypeFilter);
-		StatisticServices.setTourTypeColorIndex(yData, _tourWeekData.typeIds, _activeTourTypeFilter);
+
+		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE, _appTourTypeFilter);
+		StatisticServices.setTourTypeColorIndex(yData, _tourWeekData.typeIds, _appTourTypeFilter);
 		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE);
 
 		chartDataModel.addYData(yData);
@@ -402,13 +416,15 @@ public abstract class StatisticWeek extends YearStatistic {
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				_tourWeekData.timeLow,
 				_tourWeekData.timeHigh);
+
 		yData.setYTitle(Messages.LABEL_GRAPH_TIME);
 		yData.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
 		yData.setAllValueColors(0);
 		yData.setVisibleMinValue(0);
-		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_TIME, _activeTourTypeFilter);
-		StatisticServices.setTourTypeColorIndex(yData, _tourWeekData.typeIds, _activeTourTypeFilter);
+
+		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_TIME, _appTourTypeFilter);
+		StatisticServices.setTourTypeColorIndex(yData, _tourWeekData.typeIds, _appTourTypeFilter);
 		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_TIME);
 
 		chartDataModel.addYData(yData);
@@ -417,54 +433,25 @@ public abstract class StatisticWeek extends YearStatistic {
 	@Override
 	public void deactivateActions(final IWorkbenchPartSite partSite) {}
 
-	public void prefColorChanged() {
-		refreshStatistic(_activePerson, _activeTourTypeFilter, _currentYear, _numberOfYears, false);
-	}
+	private void getPreferences() {
 
-	public void refreshStatistic(	final TourPerson person,
-									final TourTypeFilter typeId,
-									final int currentYear,
-									final int numberOfYears,
-									final boolean refreshData) {
-
-		_activePerson = person;
-		_activeTourTypeFilter = typeId;
-		_currentYear = currentYear;
-		_numberOfYears = numberOfYears;
-
-		_tourWeekData = DataProviderTourWeek.getInstance().getWeekData(
-				person,
-				typeId,
-				currentYear,
-				numberOfYears,
-				isDataDirtyWithReset() || refreshData);
+		// set grid properties
+		_chart.setGrid(
+				_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
+				_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE),
+				_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
+				_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
 
 		// set week start values
 		_firstDayOfWeek = _prefStore.getInt(ITourbookPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
 		_minimalDaysInFirstWeek = _prefStore.getInt(ITourbookPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK);
 
-		_calendar.setFirstDayOfWeek(_firstDayOfWeek);
-		_calendar.setMinimalDaysInFirstWeek(_minimalDaysInFirstWeek);
+		_tooltipCalendar.setFirstDayOfWeek(_firstDayOfWeek);
+		_tooltipCalendar.setMinimalDaysInFirstWeek(_minimalDaysInFirstWeek);
+	}
 
-		// reset min/max values
-		if (_isSynchScaleEnabled == false && refreshData) {
-			_minMaxKeeper.resetMinMax();
-		}
-
-		final ChartDataModel chartDataModel = createChartDataModel();
-
-		setChartProviders(chartDataModel);
-
-		if (_isSynchScaleEnabled) {
-			_minMaxKeeper.setMinMaxValues(chartDataModel);
-		}
-
-		// set grid size
-		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-		_chart.setGridDistance(prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE), prefStore
-				.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
-
-		_chart.updateChart(chartDataModel, true);
+	public void preferencesHasChanged() {
+		updateStatistic();
 	}
 
 	@Override
@@ -472,19 +459,51 @@ public abstract class StatisticWeek extends YearStatistic {
 		_chart.setSelectedBars(null);
 	}
 
-	private void setChartProviders(final ChartDataModel chartModel) {
-
-		// set tool tip info
-		chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
-			public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
-				return createToolTipInfo(serieIndex, valueIndex);
-			}
-		});
-	}
-
 	@Override
 	public void setSynchScale(final boolean isSynchScaleEnabled) {
 		_isSynchScaleEnabled = isSynchScaleEnabled;
+	}
+
+	private void updateStatistic() {
+		updateStatistic(new StatisticContext(
+				_appPerson,
+				_appTourTypeFilter,
+				_statYoungestYear,
+				_statNumberOfYears,
+				false));
+	}
+
+	public void updateStatistic(final StatisticContext statContext) {
+
+		_appPerson = statContext.appPerson;
+		_appTourTypeFilter = statContext.appTourTypeFilter;
+		_statYoungestYear = statContext.statYoungestYear;
+		_statNumberOfYears = statContext.statNumberOfYears;
+
+		_tourWeekData = DataProviderTourWeek.getInstance().getWeekData(
+				_appPerson,
+				_appTourTypeFilter,
+				_statYoungestYear,
+				_statNumberOfYears,
+				isDataDirtyWithReset() || statContext.isRefreshData);
+
+		// reset min/max values
+		if (_isSynchScaleEnabled == false && statContext.isRefreshData) {
+			_minMaxKeeper.resetMinMax();
+		}
+
+		final ChartDataModel chartDataModel = createChartDataModel();
+
+		if (_isSynchScaleEnabled) {
+			_minMaxKeeper.setMinMaxValues(chartDataModel);
+		}
+
+		// set tool tip info
+		chartDataModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, _chartInfoProvider);
+
+		getPreferences();
+
+		_chart.updateChart(chartDataModel, true);
 	}
 
 	@Override

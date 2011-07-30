@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,7 +16,6 @@
 /**
  * @author Wolfgang Schramm Created: 06.07.2005
  */
-
 package net.tourbook.chart;
 
 import java.util.ArrayList;
@@ -30,17 +29,17 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.widgets.Display;
 
-public class ChartLabelLayer implements IChartLayer {
+public class ChartMarkerLayer implements IChartLayer {
 
 	private static final int			LABEL_HEIGHT	= 4;
 	private static final int			LABEL_WIDTH		= 4;
 	private static final int			LABEL_OFFSET	= 3;
 
-	private final int					fLabelOffset	= LABEL_OFFSET;
+	private final int					_labelOffset	= LABEL_OFFSET;
 
-	private final ArrayList<ChartLabel>	fChartLabels	= new ArrayList<ChartLabel>();
+	private final ArrayList<ChartLabel>	_chartLabels	= new ArrayList<ChartLabel>();
 
-	private RGB							fLineColor		= new RGB(189, 0, 255);
+	private RGB							_lineColor		= new RGB(189, 0, 255);
 
 	/**
 	 * Adds a new marker to the internal marker list, the list can be retrieved with getMarkerList()
@@ -51,7 +50,7 @@ public class ChartLabelLayer implements IChartLayer {
 	 * @param label
 	 */
 	public void addLabel(final ChartLabel label) {
-		fChartLabels.add(label);
+		_chartLabels.add(label);
 	}
 
 	/**
@@ -61,7 +60,7 @@ public class ChartLabelLayer implements IChartLayer {
 	 * @param drawingData
 	 * @param fChartComponents
 	 */
-	public void draw(final GC gc, final ChartDrawingData drawingData, final Chart chart) {
+	public void draw(final GC gc, final GraphDrawingData drawingData, final Chart chart) {
 
 		final Display display = Display.getCurrent();
 
@@ -80,7 +79,7 @@ public class ChartLabelLayer implements IChartLayer {
 
 		gc.setClipping(0, devYTop, devGraphWidth, devGraphHeight);
 
-		for (final ChartLabel chartMarker : fChartLabels) {
+		for (final ChartLabel chartMarker : _chartLabels) {
 
 			final int yValue = yValues[chartMarker.serieIndex];
 			final int devYGraph = (int) ((yValue - graphYBottom) * scaleY) - 0;
@@ -114,17 +113,15 @@ public class ChartLabelLayer implements IChartLayer {
 			final int labelHeight2 = labelExtend.y / 2;
 			final int labelWidth = labelExtend.x;
 
-//			fMarkerOffset = 0;
-
 			switch (visualPosition) {
 			case ChartLabel.VISUAL_VERTICAL_ABOVE_GRAPH:
 				devXMarker += labelHeight2 - markerWidth2;
-				devYMarker -= fLabelOffset;
+				devYMarker -= _labelOffset;
 				break;
 
 			case ChartLabel.VISUAL_VERTICAL_BELOW_GRAPH:
 				devXMarker += labelHeight2 - markerWidth2;
-				devYMarker += labelWidth + fLabelOffset + markerWidth2;
+				devYMarker += labelWidth + _labelOffset + markerWidth2;
 				break;
 
 			case ChartLabel.VISUAL_VERTICAL_TOP_CHART:
@@ -134,53 +131,53 @@ public class ChartLabelLayer implements IChartLayer {
 
 			case ChartLabel.VISUAL_VERTICAL_BOTTOM_CHART:
 				devXMarker += labelHeight2 - markerWidth2;
-				devYMarker = devYBottom - fLabelOffset;
+				devYMarker = devYBottom - _labelOffset;
 				break;
 
 			case ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_LEFT:
-				devXMarker -= labelWidth + fLabelOffset;
-				devYMarker -= labelHeight + fLabelOffset;
+				devXMarker -= labelWidth + _labelOffset;
+				devYMarker -= labelHeight + _labelOffset;
 				isVertical = false;
 				break;
 
 			case ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED:
 				devXMarker -= labelWidth / 2;
-				devYMarker -= labelHeight + fLabelOffset;
+				devYMarker -= labelHeight + _labelOffset;
 				isVertical = false;
 				break;
 
 			case ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_RIGHT:
-				devXMarker += fLabelOffset + markerWidth2;
-				devYMarker -= labelHeight + fLabelOffset;
+				devXMarker += _labelOffset + markerWidth2;
+				devYMarker -= labelHeight + _labelOffset;
 				isVertical = false;
 				break;
 
 			case ChartLabel.VISUAL_HORIZONTAL_BELOW_GRAPH_LEFT:
-				devXMarker -= labelWidth + fLabelOffset;
-				devYMarker += fLabelOffset + markerWidth2;
+				devXMarker -= labelWidth + _labelOffset;
+				devYMarker += _labelOffset + markerWidth2;
 				isVertical = false;
 				break;
 
 			case ChartLabel.VISUAL_HORIZONTAL_BELOW_GRAPH_CENTERED:
 				devXMarker -= labelWidth / 2;
-				devYMarker += fLabelOffset + markerWidth2;
+				devYMarker += _labelOffset + markerWidth2;
 				isVertical = false;
 				break;
 
 			case ChartLabel.VISUAL_HORIZONTAL_BELOW_GRAPH_RIGHT:
-				devXMarker += fLabelOffset + markerWidth2;
-				devYMarker += fLabelOffset + markerWidth2;
+				devXMarker += _labelOffset + markerWidth2;
+				devYMarker += _labelOffset + markerWidth2;
 				isVertical = false;
 				break;
 
 			case ChartLabel.VISUAL_HORIZONTAL_GRAPH_LEFT:
-				devXMarker -= labelWidth + fLabelOffset;
+				devXMarker -= labelWidth + _labelOffset;
 				devYMarker -= labelHeight / 2;
 				isVertical = false;
 				break;
 
 			case ChartLabel.VISUAL_HORIZONTAL_GRAPH_RIGHT:
-				devXMarker += fLabelOffset + markerWidth2;
+				devXMarker += _labelOffset + markerWidth2;
 				devYMarker -= labelHeight / 2;
 				isVertical = false;
 				break;
@@ -278,10 +275,10 @@ public class ChartLabelLayer implements IChartLayer {
 	}
 
 	public RGB getLineColor() {
-		return fLineColor;
+		return _lineColor;
 	}
 
 	public void setLineColor(final RGB lineColor) {
-		fLineColor = lineColor;
+		_lineColor = lineColor;
 	}
 }

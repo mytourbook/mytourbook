@@ -13,8 +13,28 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.chart;
+package net.tourbook.ui.tourChart.action;
 
-public interface BarTooltipProvider {
+import net.tourbook.ui.HandlerUtil;
+
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
+
+public class ActionHandlerHrZoneStyle extends TCActionHandler {
+
+	public ActionHandlerHrZoneStyle(final String commandId) {
+		this.commandId = commandId;
+	}
+
+	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {
+
+		final Boolean isItemChecked = HandlerUtil.isItemChecked(execEvent);
+
+		if (isItemChecked != null) {
+			tourChart.actionShowHrZoneStyle(isItemChecked, commandId);
+		}
+
+		return null;
+	}
 
 }

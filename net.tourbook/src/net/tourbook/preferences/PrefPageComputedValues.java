@@ -163,6 +163,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 	private Spinner						_spinnerBreakMaxDistance;
 	private Spinner						_spinnerBreakMinSliceSpeed;
 	private Spinner						_spinnerBreakMinAvgSpeed;
+	private Spinner						_spinnerBreakSliceDiff;
 
 	@Override
 	public void applyData(final Object data) {
@@ -563,6 +564,39 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 //						.span(2, 1)
 						.align(SWT.FILL, SWT.CENTER)
 						.applyTo(_lblBreakDistanceUnit);
+			}
+
+			/*
+			 * slice diff break
+			 */
+			{
+				// label: break slice diff
+				Label label = new Label(container, SWT.NONE);
+				label.setText(Messages.Compute_BreakTime_Label_SliceDiffBreak);
+				label.setToolTipText(Messages.Compute_BreakTime_Label_SliceDiffBreak_Tooltip);
+				_firstColBreakTime.add(label);
+
+				// spinner: slice diff break time
+				_spinnerBreakSliceDiff = new Spinner(container, SWT.BORDER);
+				GridDataFactory.fillDefaults().hint(_spinnerWidth, SWT.DEFAULT).applyTo(_spinnerBreakSliceDiff);
+				_spinnerBreakSliceDiff.setMinimum(0);
+				_spinnerBreakSliceDiff.setMaximum(60); // minutes
+				_spinnerBreakSliceDiff.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						onChangeBreakTime();
+					}
+				});
+				_spinnerBreakSliceDiff.addMouseWheelListener(new MouseWheelListener() {
+					public void mouseScrolled(final MouseEvent event) {
+						UI.adjustSpinnerValueOnMouseScroll(event);
+						onChangeBreakTime();
+					}
+				});
+
+				// label: unit
+				label = new Label(container, SWT.NONE);
+				label.setText(Messages.App_Unit_Minute);
 			}
 
 			/*
@@ -1006,6 +1040,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 		final int prefShortestTime = _prefStore.getDefaultInt(ITourbookPreferences.BREAK_TIME_SHORTEST_TIME);
 		final float prefMaxDistance = _prefStore.getDefaultFloat(ITourbookPreferences.BREAK_TIME_MAX_DISTANCE);
+		final int prefSliceDiff = _prefStore.getDefaultInt(ITourbookPreferences.BREAK_TIME_SLICE_DIFF);
 
 		final float prefMinSliceSpeed = _prefStore.getDefaultFloat(ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED);
 		final float prefMinAvgSpeed = _prefStore.getDefaultFloat(ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED);
@@ -1017,6 +1052,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 		_spinnerBreakShortestTime.setSelection(prefShortestTime);
 		final float breakDistance = prefMaxDistance / UI.UNIT_VALUE_DISTANCE_SMALL;
 		_spinnerBreakMaxDistance.setSelection((int) (breakDistance + 0.5));
+		_spinnerBreakSliceDiff.setSelection(prefSliceDiff);
 
 		// break by speed
 		_spinnerBreakMinSliceSpeed.setSelection((int) (prefMinSliceSpeed * SPEED_DIGIT_VALUE * UI.UNIT_VALUE_DISTANCE));
@@ -1073,6 +1109,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 		final int prefShortestTime = _prefStore.getInt(ITourbookPreferences.BREAK_TIME_SHORTEST_TIME);
 		final float prefMaxDistance = _prefStore.getFloat(ITourbookPreferences.BREAK_TIME_MAX_DISTANCE);
+		final int prefSliceDiff = _prefStore.getInt(ITourbookPreferences.BREAK_TIME_SLICE_DIFF);
 
 		final float prefMinSliceSpeed = _prefStore.getFloat(ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED);
 		final float prefMinAvgSpeed = _prefStore.getFloat(ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED);
@@ -1084,6 +1121,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 		_spinnerBreakShortestTime.setSelection(prefShortestTime);
 		final float breakDistance = prefMaxDistance / UI.UNIT_VALUE_DISTANCE_SMALL;
 		_spinnerBreakMaxDistance.setSelection((int) (breakDistance + 0.5));
+		_spinnerBreakSliceDiff.setSelection(prefSliceDiff);
 
 		// break by speed
 		_spinnerBreakMinSliceSpeed.setSelection((int) (prefMinSliceSpeed * SPEED_DIGIT_VALUE * UI.UNIT_VALUE_DISTANCE));
@@ -1120,6 +1158,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 		final float breakDistance = _spinnerBreakMaxDistance.getSelection() * UI.UNIT_VALUE_DISTANCE_SMALL;
 		_prefStore.setValue(ITourbookPreferences.BREAK_TIME_MAX_DISTANCE, breakDistance);
+
+		_prefStore.setValue(ITourbookPreferences.BREAK_TIME_SLICE_DIFF, _spinnerBreakSliceDiff.getSelection());
 
 		// by slice speed
 		final float breakMinSliceSpeed = _spinnerBreakMinSliceSpeed.getSelection()

@@ -57,7 +57,7 @@ public class ChartYSlider {
 	 */
 	private int					devYClickOffset;
 
-	private ChartDrawingData	drawingData;
+	private GraphDrawingData	drawingData;
 
 	/**
 	 * y-position of the mouse on the slider line
@@ -88,7 +88,7 @@ public class ChartYSlider {
 	/**
 	 * @return Returns the drawingData.
 	 */
-	public ChartDrawingData getDrawingData() {
+	public GraphDrawingData getDrawingData() {
 		return drawingData;
 	}
 
@@ -117,7 +117,7 @@ public class ChartYSlider {
 	 * 
 	 * @param drawingData
 	 */
-	public void handleChartResize(final ChartDrawingData drawingData, final int sliderType) {
+	public void handleChartResize(final GraphDrawingData drawingData, final int sliderType) {
 
 		this.drawingData = drawingData;
 		final int devGraphHeight = drawingData.devGraphHeight;

@@ -31,6 +31,7 @@ import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.data.TourPerson;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.statistic.StatisticContext;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
@@ -129,7 +130,7 @@ public abstract class StatisticYear extends YearStatistic {
 			titleString.append(STRING_SEPARATOR);
 		}
 		titleString.append(Messages.tourtime_info_date_year);
-		titleString.append(NEW_LINE);
+		titleString.append(UI.NEW_LINE);
 
 		final String toolTipTitle = new Formatter().format(titleString.toString(), oldestYear + valueIndex).toString();
 
@@ -138,14 +139,14 @@ public abstract class StatisticYear extends YearStatistic {
 		 */
 		final StringBuilder toolTipFormat = new StringBuilder();
 		toolTipFormat.append(Messages.tourtime_info_distance);
-		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_altitude);
-		toolTipFormat.append(NEW_LINE);
-		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(UI.NEW_LINE);
+		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_recording_time);
-		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_driving_time);
-		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_break_time);
 
 		final String toolTipLabel = new Formatter().format(toolTipFormat.toString(), //
@@ -270,30 +271,49 @@ public abstract class StatisticYear extends YearStatistic {
 	@Override
 	public void deactivateActions(final IWorkbenchPartSite partSite) {}
 
-	public void prefColorChanged() {
-		refreshStatistic(_activePerson, _activeTourTypeFilter, _currentYear, _numberOfYears, false);
+	public void preferencesHasChanged() {
+		updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFilter, _currentYear, _numberOfYears, false));
 	}
 
-	public void refreshStatistic(	final TourPerson person,
-									final TourTypeFilter tourTypeFilter,
-									final int currentYear,
-									final int numberOfYears,
-									final boolean refreshData) {
+	@Override
+	public void resetSelection() {
+		_chart.setSelectedBars(null);
+	}
 
-		_activePerson = person;
-		_activeTourTypeFilter = tourTypeFilter;
-		_currentYear = currentYear;
-		_numberOfYears = numberOfYears;
+	private void setChartProviders(final ChartDataModel chartModel) {
+
+		// set tool tip info
+		chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
+			@Override
+			public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
+				return createToolTipInfo(serieIndex, valueIndex);
+			}
+		});
+	}
+
+	@Override
+	public void setSynchScale(final boolean isSynchScaleEnabled) {
+		_isSynchScaleEnabled = isSynchScaleEnabled;
+	}
+
+	abstract ChartDataModel updateChart();
+
+	public void updateStatistic(final StatisticContext statContext) {
+
+		_activePerson = statContext.appPerson;
+		_activeTourTypeFilter = statContext.appTourTypeFilter;
+		_currentYear = statContext.statYoungestYear;
+		_numberOfYears = statContext.statNumberOfYears;
 
 		_tourYearData = DataProviderTourYear.getInstance().getYearData(
-				person,
-				tourTypeFilter,
-				currentYear,
-				numberOfYears,
-				isDataDirtyWithReset() || refreshData);
+				statContext.appPerson,
+				statContext.appTourTypeFilter,
+				statContext.statYoungestYear,
+				statContext.statNumberOfYears,
+				isDataDirtyWithReset() || statContext.isRefreshData);
 
 		// reset min/max values
-		if (_isSynchScaleEnabled == false && refreshData) {
+		if (_isSynchScaleEnabled == false && statContext.isRefreshData) {
 			_minMaxKeeper.resetMinMax();
 		}
 
@@ -307,36 +327,16 @@ public abstract class StatisticYear extends YearStatistic {
 
 		// set grid size
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-		_chart.setGridDistance(
+		_chart.setGrid(
 				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
-				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
+				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE),
+				prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
+				prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
 
 		// show the fDataModel in the chart
 		_chart.updateChart(chartDataModel, true);
 
 	}
-
-	@Override
-	public void resetSelection() {
-		_chart.setSelectedBars(null);
-	}
-
-	private void setChartProviders(final ChartDataModel chartModel) {
-
-		// set tool tip info
-		chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
-			public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
-				return createToolTipInfo(serieIndex, valueIndex);
-			}
-		});
-	}
-
-	@Override
-	public void setSynchScale(final boolean isSynchScaleEnabled) {
-		_isSynchScaleEnabled = isSynchScaleEnabled;
-	}
-
-	abstract ChartDataModel updateChart();
 
 	@Override
 	public void updateToolBar(final boolean refreshToolbar) {

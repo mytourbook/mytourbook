@@ -62,10 +62,14 @@ public interface ITourbookPreferences {
 	public static final String	GRAPH_VISIBLE								= "graphs.visible";										//$NON-NLS-1$
 	public static final String	GRAPH_X_AXIS								= "graphs.x-axis";											//$NON-NLS-1$
 	public static final String	GRAPH_X_AXIS_STARTTIME						= "graphs.x-axis.starttime";								//$NON-NLS-1$
+	public static final String	GRAPH_IS_HR_ZONE_BACKGROUND_VISIBLE			= "Graph_HrZone_IsVisible";								//$NON-NLS-1$
+	public static final String	GRAPH_HR_ZONE_STYLE					= "Graph_HrZone_GraphType";								//$NON-NLS-1$
 
 	public static final String	GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER				= "graphs.zoom.autozoom-to-slider";						//$NON-NLS-1$
 	public static final String	GRAPH_MOVE_SLIDERS_WHEN_ZOOMED				= "graphs.move-sliders-when-zoomed";						//$NON-NLS-1$
-	public static final String	GRAPH_IS_SRTM_VISIBLE						= "graphs.is-srtm-visible";								//$NON-NLS-1$
+	public static final String	GRAPH_IS_SRTM_VISIBLE						= "Graph_IsSRTMVisible";									//$NON-NLS-1$
+	public static final String	GRAPH_IS_MARKER_VISIBLE						= "Graph_IsMarkerVisible";									//$NON-NLS-1$
+	public static final String	GRAPH_IS_BREAKTIME_VALUES_VISIBLE			= "Graph_IsBreaktimeVisible";								//$NON-NLS-1$
 
 	public static final String	GRAPH_MOUSE_MODE							= "graph.toggle-mouse";									//$NON-NLS-1$
 
@@ -79,6 +83,8 @@ public interface ITourbookPreferences {
 
 	public static final String	GRAPH_GRID_VERTICAL_DISTANCE				= "graphs.grid.vertical-distance";							//$NON-NLS-1$
 	public static final String	GRAPH_GRID_HORIZONTAL_DISTANCE				= "graphs.grid.horizontal-distance";						//$NON-NLS-1$
+	public static final String	GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES		= "GraphGrid_IsShowHorizontalGridlines";					//$NON-NLS-1$
+	public static final String	GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES		= "GraphGrid_IsShowVerticalGridlines";						//$NON-NLS-1$
 
 	public static final String	DEFAULT_IMPORT_TOUR_TYPE_ID					= "tourtype.import.default";								//$NON-NLS-1$
 
@@ -102,6 +108,7 @@ public interface ITourbookPreferences {
 	public static final String	BREAK_TIME_IS_MODIFIED						= "BreakTime_IsModified";									//$NON-NLS-1$
 	public static final String	BREAK_TIME_SHORTEST_TIME					= "BreakTime_ShortestTime";								//$NON-NLS-1$
 	public static final String	BREAK_TIME_MAX_DISTANCE						= "BreakTime_MaxDistance";									//$NON-NLS-1$
+	public static final String	BREAK_TIME_SLICE_DIFF						= "BreakTime_SliceDiff";									//$NON-NLS-1$
 	public static final String	BREAK_TIME_MIN_SLICE_SPEED					= "BreakTime_MinSliceSpeed";								//$NON-NLS-1$
 	public static final String	BREAK_TIME_MIN_AVG_SPEED					= "BreakTime_MinAvgSpeed";									//$NON-NLS-1$
 

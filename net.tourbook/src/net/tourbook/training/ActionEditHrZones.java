@@ -16,6 +16,7 @@
 package net.tourbook.training;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
 
@@ -26,6 +27,7 @@ public class ActionEditHrZones extends Action {
 	public ActionEditHrZones(final TrainingView trainingView) {
 
 		super(Messages.Training_Action_EditHrZones, AS_PUSH_BUTTON);
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__options));
 
 		_trainingView = trainingView;
 	}

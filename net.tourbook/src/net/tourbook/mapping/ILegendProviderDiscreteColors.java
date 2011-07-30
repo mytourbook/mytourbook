@@ -13,15 +13,23 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.statistics;
 
-import net.tourbook.chart.ChartDataYSerie;
+package net.tourbook.mapping;
 
-public class StatisticMonthHrZoneStacked extends StatisticMonthHrZone {
+import net.tourbook.data.TourData;
 
-	@Override
-	int getBarLayout() {
-		return ChartDataYSerie.BAR_LAYOUT_STACKED;
-	}
+public interface ILegendProviderDiscreteColors extends ILegendProvider {
+
+	/**
+	 * @param tourData
+	 *            Tour which is currently painted, can be <code>null</code>.
+	 * @param valueIndex
+	 *            in the data serie
+	 * @param isDrawLine
+	 *            Is <code>true</code> when a line is painted. This requires that the painted color
+	 *            is adjusted.
+	 * @return Returns the RGB value for a graph value.
+	 */
+	abstract int getColorValue(TourData tourData, int valueIndex, boolean isDrawLine);
 
 }

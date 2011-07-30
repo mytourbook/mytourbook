@@ -59,6 +59,12 @@ public class ChartDataXSerie extends ChartDataSerie {
 	private double			_scalingFactor			= 1;
 	private double			_scalingMaxValue		= 1;
 
+	/**
+	 * Defines <code>true</code> or <code>false</code> if a line should be drawn for a value point,
+	 * can be <code>null</code> to disable this feature.
+	 */
+	public boolean[]		_noLine;
+
 	public ChartDataXSerie(final int values[]) {
 		setMinMaxValues(new int[][] { values });
 	}
@@ -71,12 +77,8 @@ public class ChartDataXSerie extends ChartDataSerie {
 		return _chartSegments;
 	}
 
-	/**
-	 * @return Returns scaling for the x-axis which is computed with Math.pow(double, double). This
-	 *         scaling is disabled when <code>1</code> is returned.
-	 */
-	public double getScalingFactor() {
-		return _scalingFactor;
+	public boolean[] getNoLine() {
+		return _noLine;
 	}
 
 	public int[] getRangeMarkerEndIndex() {
@@ -85,6 +87,14 @@ public class ChartDataXSerie extends ChartDataSerie {
 
 	public int[] getRangeMarkerStartIndex() {
 		return _rangeMarkerStartIndex;
+	}
+
+	/**
+	 * @return Returns scaling for the x-axis which is computed with Math.pow(double, double). This
+	 *         scaling is disabled when <code>1</code> is returned.
+	 */
+	public double getScalingFactor() {
+		return _scalingFactor;
 	}
 
 	public double getScalingMaxValue() {
@@ -119,8 +129,13 @@ public class ChartDataXSerie extends ChartDataSerie {
 	@Override
 	void setMinMaxValues(final int[][] lowValues, final int[][] highValues) {}
 
+	public void setNoLine(final boolean[] noLineSerie) {
+		_noLine = noLineSerie;
+	}
+
 	/**
-	 * Range markers are an area in the graph which will be displayed in a different color
+	 * Range markers are an area in the graph which will be displayed in a different color. This
+	 * feature is use when tours are compared.
 	 * 
 	 * @param rangeMarkerStartIndex
 	 * @param rangeMarkerEndIndex

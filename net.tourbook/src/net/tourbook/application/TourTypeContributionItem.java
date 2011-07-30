@@ -315,7 +315,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 			}
 		});
 
-		// set context menu and adjust it to the filter icon
+		// set context menu and set the parent to the tour type filter icon
 		_contextMenu = menuMgr.createContextMenu(_lblFilterIcon);
 
 		_contextMenu.addMenuListener(new MenuListener() {
