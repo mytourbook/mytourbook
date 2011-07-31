@@ -465,7 +465,7 @@ public class RawDataManager {
 									if (activeShell != null) {
 										if (MessageDialog.openConfirm(
 												Display.getCurrent().getActiveShell(),
-												device.visibleName + " Import",
+												NLS.bind(Messages.DataImport_ConfirmImport_title, device.visibleName),
 												device.userConfirmationMessage())) {
 											_isImportCanceled = false;
 										} else {

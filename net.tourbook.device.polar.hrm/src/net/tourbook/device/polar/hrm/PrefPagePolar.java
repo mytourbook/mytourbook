@@ -39,6 +39,7 @@ public class PrefPagePolar extends FieldEditorPreferencePage implements IWorkben
 
 	private Group					_groupTitleDescription;
 	private Group					_groupSliceAdjustment;
+	private Group					_ppdImportInfo;
 	private Spinner					_spinnerSliceAdjustment;
 
 	@Override
@@ -56,6 +57,7 @@ public class PrefPagePolar extends FieldEditorPreferencePage implements IWorkben
 
 		createUI10TitleDescription(parent);
 		createUI20HorizontalAdjustment(parent);
+		createUI30PPDImportInfo(parent);
 	}
 
 	private void createUI10TitleDescription(final Composite parent) {
@@ -138,6 +140,21 @@ public class PrefPagePolar extends FieldEditorPreferencePage implements IWorkben
 					.applyTo(label);
 			label.setText(Messages.PrefPage_Polar_Label_AdjustmentInfo);
 		}
+	}
+
+	private void createUI30PPDImportInfo(final Composite parent) {
+
+		_ppdImportInfo = new Group(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(_ppdImportInfo);
+		_ppdImportInfo.setText(Messages.PrefPage_Polar_Group_PPDImportInfo);
+		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(_ppdImportInfo);
+		
+		/*
+		 * label: info
+		 */
+		final Label label = new Label(_ppdImportInfo, SWT.WRAP);
+		GridDataFactory.fillDefaults().grab(true, false).hint(400, SWT.DEFAULT).applyTo(label);
+		label.setText(Messages.PrefPage_Polar_Label_PPDImportInfo);
 	}
 
 	public void init(final IWorkbench workbench) {

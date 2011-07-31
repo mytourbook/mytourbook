@@ -525,7 +525,7 @@ public class PolarPPDDataReader extends TourbookDevice {
 
 	@Override
 	public String userConfirmationMessage() {
-		return "Really import the PPD file?\n Your know what your are doing?";
+		return Messages.Import_Confirm_PPD;
 	}
 
 	@Override
