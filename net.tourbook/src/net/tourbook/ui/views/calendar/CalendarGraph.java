@@ -396,9 +396,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					} else {
 						gotoNextWeek();
 					}
-					event.doit = false;
 				}
-				event.doit = false;
 				event.doit = false;
 			}
 		});
