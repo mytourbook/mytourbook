@@ -89,7 +89,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	private Color								_magenta				= _display.getSystemColor(SWT.COLOR_MAGENTA);
 //	private Color								_cyan					= _display.getSystemColor(SWT.COLOR_CYAN);
 //	private Color								_darkGray				= _display.getSystemColor(SWT.COLOR_DARK_GRAY);
-	private Color								_darkGray				= _colorCache.get(0x707070);
+	private Color								_darkGray				= _colorCache.get(0x404040);
 
 	private NavigationStyle						_navigationStyle	= NavigationStyle.PHYSICAL;
 
@@ -390,15 +390,14 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 							gotoNextTour();
 						}
 					}
-					event.doit = false;
 				} else {
 					if (event.count > 0) {
 						gotoPrevWeek();
 					} else {
 						gotoNextWeek();
 					}
-					event.doit = false;
 				}
+				event.doit = false;
 			}
 		});
 		
