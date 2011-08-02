@@ -1191,7 +1191,7 @@ public class TrainingView extends ViewPart {
 		final int[] pulseSerie = _tourData.pulseSerie;
 		final int[] timeSerie = _tourData.timeSerie;
 		final boolean[] breakTimeSerie = _tourData.getBreakTimeSerie();
-		final int serieSize = timeSerie.length;
+		final int timeSerieSize = timeSerie.length;
 
 		final ArrayList<TourPersonHRZone> hrSortedZones = _currentPerson.getHrZonesSorted();
 		final int zoneSize = hrSortedZones.size();
@@ -1241,7 +1241,7 @@ public class TrainingView extends ViewPart {
 		_xSeriePulse = new int[pulseRange];
 		final int[] ySeriePulseTime = new int[pulseRange];
 
-		final int[] colorIndex = new int[serieSize];
+		final int[] colorIndex = new int[timeSerieSize];
 
 		final int[] zoneMinBpm = zoneMinMaxBpm.zoneMinBpm;
 		final int[] zoneMaxBpm = zoneMinMaxBpm.zoneMaxBpm;
@@ -1261,12 +1261,14 @@ public class TrainingView extends ViewPart {
 
 				if (pulse >= minValue && pulse <= maxValue) {
 
+					int colorPulseIndex = pulseIndex;
+
 					// check array bounds
-					if (pulseIndex >= colorIndex.length) {
-						pulseIndex = colorIndex.length - 1;
+					if (colorPulseIndex >= timeSerieSize) {
+						colorPulseIndex = timeSerieSize - 1;
 					}
 
-					colorIndex[pulseIndex] = zoneIndex;
+					colorIndex[colorPulseIndex] = zoneIndex;
 					break;
 				}
 			}
@@ -1277,7 +1279,7 @@ public class TrainingView extends ViewPart {
 		/*
 		 * create y-data serie: get time/color for each pulse value
 		 */
-		for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
+		for (int serieIndex = 0; serieIndex < timeSerieSize; serieIndex++) {
 
 			// get time for each pulse value
 			final int currentTime = timeSerie[serieIndex];
