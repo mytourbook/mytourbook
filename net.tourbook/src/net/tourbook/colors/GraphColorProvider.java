@@ -63,6 +63,7 @@ public class GraphColorProvider {
 	public static final String				PREF_COLOR_BRIGHT			= "bright";			//$NON-NLS-1$
 	public static final String				PREF_COLOR_DARK				= "dark";				//$NON-NLS-1$
 	public static final String				PREF_COLOR_LINE				= "line";				//$NON-NLS-1$
+	public static final String				PREF_COLOR_TEXT				= "text";				//$NON-NLS-1$
 	public static final String				PREF_COLOR_MAPPING			= "mapping";			//$NON-NLS-1$
 
 	private static final String				MEMENTO_LEGEND_COLOR_FILE	= "legendcolor.xml";	//$NON-NLS-1$
@@ -93,6 +94,7 @@ public class GraphColorProvider {
 			{ PREF_COLOR_BRIGHT, Messages.Graph_Pref_color_gradient_bright },
 			{ PREF_COLOR_DARK, Messages.Graph_Pref_color_gradient_dark },
 			{ PREF_COLOR_LINE, Messages.Graph_Pref_color_line },
+			{ PREF_COLOR_TEXT, Messages.Graph_Pref_ColorText },
 			{ PREF_COLOR_MAPPING, Messages.Graph_Pref_color_mapping }	};
 
 	private static final LegendColor		LEGEND_COLOR_ALTITUDE		= new LegendColor(
@@ -171,6 +173,7 @@ public class GraphColorProvider {
 					new RGB(255, 255, 255),
 					new RGB(0, 255, 0),
 					new RGB(45, 188, 45),
+					new RGB(44, 134, 33),
 					LEGEND_COLOR_ALTITUDE),
 
 			new ColorDefinition(PREF_GRAPH_HEARTBEAT, //
@@ -178,6 +181,7 @@ public class GraphColorProvider {
 					new RGB(255, 255, 255),
 					new RGB(253, 0, 0),
 					new RGB(253, 0, 0),
+					new RGB(183, 0, 0),
 					LEGEND_COLOR_PULSE),
 
 			new ColorDefinition(PREF_GRAPH_SPEED,//
@@ -185,6 +189,7 @@ public class GraphColorProvider {
 					new RGB(255, 255, 255),
 					new RGB(0, 135, 211),
 					new RGB(0, 132, 210),
+					new RGB(0, 106, 167),
 					LEGEND_COLOR_SPEED),
 
 			new ColorDefinition(PREF_GRAPH_PACE,//
@@ -192,6 +197,7 @@ public class GraphColorProvider {
 					new RGB(255, 255, 255),
 					new RGB(0x9C, 0x2F, 0xFF),
 					new RGB(0x9C, 0x2F, 0xFF),
+					new RGB(88, 26, 142),
 					LEGEND_COLOR_PACE),
 
 			new ColorDefinition(PREF_GRAPH_POWER,//
@@ -199,6 +205,7 @@ public class GraphColorProvider {
 					new RGB(255, 255, 255),
 					new RGB(240, 0, 150),
 					new RGB(240, 0, 150),
+					new RGB(106, 0, 67),
 					null),
 
 			new ColorDefinition(PREF_GRAPH_TEMPTERATURE, //
@@ -206,6 +213,7 @@ public class GraphColorProvider {
 					new RGB(255, 255, 255),
 					new RGB(0, 217, 240),
 					new RGB(0, 216, 240),
+					new RGB(0, 134, 147),
 					null),
 
 			new ColorDefinition(PREF_GRAPH_GRADIENT, //
@@ -213,6 +221,7 @@ public class GraphColorProvider {
 					new RGB(255, 255, 255),
 					new RGB(249, 231, 0),
 					new RGB(236, 206, 0),
+					new RGB(111, 98, 0),
 					LEGEND_COLOR_GRADIENT),
 
 			new ColorDefinition(PREF_GRAPH_ALTIMETER, //
@@ -220,6 +229,7 @@ public class GraphColorProvider {
 					new RGB(255, 255, 255),
 					new RGB(255, 180, 0),
 					new RGB(249, 174, 0),
+					new RGB(144, 103, 0),
 					null),
 
 			new ColorDefinition(PREF_GRAPH_CADENCE,//
@@ -227,6 +237,7 @@ public class GraphColorProvider {
 					new RGB(255, 255, 255),
 					new RGB(228, 106, 16),
 					new RGB(228, 106, 16),
+					new RGB(139, 64, 10),
 					null),
 
 			new ColorDefinition(PREF_GRAPH_TOUR_COMPARE, //
@@ -234,6 +245,7 @@ public class GraphColorProvider {
 					new RGB(255, 255, 255),
 					new RGB(255, 140, 26),
 					new RGB(242, 135, 22),
+					new RGB(139, 77, 15),
 					null),
 
 			new ColorDefinition(PREF_GRAPH_DISTANCE,//
@@ -241,6 +253,7 @@ public class GraphColorProvider {
 					new RGB(255, 255, 255),
 					new RGB(239, 167, 16),
 					new RGB(203, 141, 14),
+					new RGB(139, 98, 10),
 					null),
 
 			new ColorDefinition(PREF_GRAPH_TIME,//
@@ -248,19 +261,20 @@ public class GraphColorProvider {
 					new RGB(255, 255, 255),
 					new RGB(187, 187, 140),
 					new RGB(170, 170, 127),
+					new RGB(88, 88, 67),
 					null)												};
 
-	private static GraphColorProvider		instance;
+	private static GraphColorProvider		_instance;
 
-	private ColorDefinition[]				fGraphColorDefinitions;
+	private ColorDefinition[]				_graphColorDefinitions;
 
 	public GraphColorProvider() {}
 
 	public static GraphColorProvider getInstance() {
-		if (instance == null) {
-			instance = new GraphColorProvider();
+		if (_instance == null) {
+			_instance = new GraphColorProvider();
 		}
-		return instance;
+		return _instance;
 	}
 
 	private static XMLMemento getXMLMementoRoot() {
@@ -363,8 +377,8 @@ public class GraphColorProvider {
 
 	public ColorDefinition[] getGraphColorDefinitions() {
 
-		if (fGraphColorDefinitions != null) {
-			return fGraphColorDefinitions;
+		if (_graphColorDefinitions != null) {
+			return _graphColorDefinitions;
 		}
 
 		final List<ColorDefinition> list = new ArrayList<ColorDefinition>();
@@ -378,12 +392,12 @@ public class GraphColorProvider {
 //			}
 //		});
 
-		fGraphColorDefinitions = list.toArray(new ColorDefinition[list.size()]);
+		_graphColorDefinitions = list.toArray(new ColorDefinition[list.size()]);
 
 		readLegendColors();
 		setLegendColors();
 
-		return fGraphColorDefinitions;
+		return _graphColorDefinitions;
 	}
 
 	/**
@@ -499,7 +513,7 @@ public class GraphColorProvider {
 				/*
 				 * update color definition with the read data
 				 */
-				for (final ColorDefinition colorDefinition : fGraphColorDefinitions) {
+				for (final ColorDefinition colorDefinition : _graphColorDefinitions) {
 
 					if (colorDefinition.getPrefName().equals(prefName)) {
 
@@ -535,7 +549,7 @@ public class GraphColorProvider {
 	 */
 	private void setLegendColors() {
 
-		for (final ColorDefinition colorDefinition : fGraphColorDefinitions) {
+		for (final ColorDefinition colorDefinition : _graphColorDefinitions) {
 
 			// set legend color
 			if (colorDefinition.getLegendColor() == null) {

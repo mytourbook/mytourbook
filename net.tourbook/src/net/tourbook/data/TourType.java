@@ -54,6 +54,10 @@ public class TourType implements Comparable<Object> {
 	private short			colorLineGreen;
 	private short			colorLineBlue;
 
+	private short			colorTextRed;
+	private short			colorTextGreen;
+	private short			colorTextBlue;
+
 	/**
 	 * unique id for manually created tour types because the {@link #typeId} is -1 when it's not
 	 * persisted
@@ -146,6 +150,10 @@ public class TourType implements Comparable<Object> {
 		return new RGB(colorLineRed, colorLineGreen, colorLineBlue);
 	}
 
+	public RGB getRGBText() {
+		return new RGB(colorTextRed, colorTextGreen, colorTextBlue);
+	}
+
 	/**
 	 * @return Returns the type id, this can be the saved type id or
 	 *         {@link TourDatabase#ENTITY_IS_NOT_SAVED}
@@ -179,6 +187,12 @@ public class TourType implements Comparable<Object> {
 		colorLineRed = (short) rgbLine.red;
 		colorLineGreen = (short) rgbLine.green;
 		colorLineBlue = (short) rgbLine.blue;
+	}
+
+	public void setColorText(final RGB rgbText) {
+		colorTextRed = (short) rgbText.red;
+		colorTextGreen = (short) rgbText.green;
+		colorTextBlue = (short) rgbText.blue;
 	}
 
 	public void setName(final String name) {

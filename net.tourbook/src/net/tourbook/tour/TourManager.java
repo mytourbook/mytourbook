@@ -1180,6 +1180,10 @@ public class TourManager {
 				prefStore,
 				prefGraphName + GraphColorProvider.PREF_COLOR_LINE);
 
+		final RGB prefTextColor = PreferenceConverter.getColor(//
+				prefStore,
+				prefGraphName + GraphColorProvider.PREF_COLOR_TEXT);
+
 		final RGB prefDarkColor = PreferenceConverter.getColor(//
 				prefStore,
 				prefGraphName + GraphColorProvider.PREF_COLOR_DARK);
@@ -1188,9 +1192,14 @@ public class TourManager {
 				prefStore,
 				prefGraphName + GraphColorProvider.PREF_COLOR_BRIGHT);
 
+		/*
+		 * default color is used to draw the y-axis text, using the prefTextColor can cause problems
+		 * when the color is white for a dark gradient color
+		 */
 		yData.setDefaultRGB(prefLineColor);
 
 		yData.setRgbLine(new RGB[] { prefLineColor });
+		yData.setRgbText(new RGB[] { prefTextColor });
 		yData.setRgbDark(new RGB[] { prefDarkColor });
 		yData.setRgbBright(new RGB[] { prefBrightColor });
 	}

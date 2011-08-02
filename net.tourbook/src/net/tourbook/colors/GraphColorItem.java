@@ -21,51 +21,59 @@ import org.eclipse.swt.graphics.RGB;
 
 public class GraphColorItem {
 
-	private ColorDefinition	fColorDefinition;
+	private ColorDefinition	_colorDefinition;
 
-	private String			fColorPrefName;
-	private String			fVisibleName;
+	private String			_colorPrefName;
+	private String			_visibleName;
 
 	/**
 	 * <code>true</code> when this {@link GraphColorItem} is used as for a legend
 	 */
-	private boolean			fIsLegend;
+	private boolean			_isLegend;
 
 	public GraphColorItem(	final ColorDefinition parent,
 							final String colorPrefName,
 							final String visibleName,
 							final boolean isLegend) {
 
-		fColorDefinition = parent;
+		_colorDefinition = parent;
 
-		fColorPrefName = colorPrefName;
-		fVisibleName = visibleName;
+		_colorPrefName = colorPrefName;
+		_visibleName = visibleName;
 
-		fIsLegend = isLegend;
+		_isLegend = isLegend;
 	}
 
 	public ColorDefinition getColorDefinition() {
-		return fColorDefinition;
+		return _colorDefinition;
 	}
 
 	public String getColorId() {
-		return fColorDefinition.getPrefName() + "." + fColorPrefName; //$NON-NLS-1$
+		return _colorDefinition.getPrefName() + "." + _colorPrefName; //$NON-NLS-1$
 	}
 
 	public String getName() {
-		return fVisibleName;
+		return _visibleName;
 	}
 
 	public RGB getNewRGB() {
-		return fColorPrefName.compareTo(GraphColorProvider.PREF_COLOR_LINE) == 0
-				? fColorDefinition.getNewLineColor()
-				: fColorPrefName.compareTo(GraphColorProvider.PREF_COLOR_DARK) == 0
-						? fColorDefinition.getNewGradientDark()
-						: fColorDefinition.getNewGradientBright();
+
+		if (_colorPrefName.compareTo(GraphColorProvider.PREF_COLOR_LINE) == 0) {
+			return _colorDefinition.getNewLineColor();
+
+		} else if (_colorPrefName.compareTo(GraphColorProvider.PREF_COLOR_TEXT) == 0) {
+			return _colorDefinition.getNewTextColor();
+
+		} else if (_colorPrefName.compareTo(GraphColorProvider.PREF_COLOR_BRIGHT) == 0) {
+			return _colorDefinition.getNewGradientBright();
+
+		} else {
+			return _colorDefinition.getNewGradientDark();
+		}
 	}
 
 	String getPrefName() {
-		return fColorPrefName;
+		return _colorPrefName;
 	}
 
 	/**
@@ -73,24 +81,30 @@ public class GraphColorItem {
 	 *         {@link LegendColor}
 	 */
 	public boolean isLegend() {
-		return fIsLegend;
+		return _isLegend;
 	}
 
 	public void setName(final String fName) {
-		this.fVisibleName = fName;
+		this._visibleName = fName;
 	}
 
 	public void setNewRGB(final RGB rgb) {
-		if (fColorPrefName.compareTo(GraphColorProvider.PREF_COLOR_LINE) == 0) {
-			fColorDefinition.setNewLineColor(rgb);
-		} else if (fColorPrefName.compareTo(GraphColorProvider.PREF_COLOR_DARK) == 0) {
-			fColorDefinition.setNewGradientDark(rgb);
+
+		if (_colorPrefName.compareTo(GraphColorProvider.PREF_COLOR_LINE) == 0) {
+			_colorDefinition.setNewLineColor(rgb);
+
+		} else if (_colorPrefName.compareTo(GraphColorProvider.PREF_COLOR_TEXT) == 0) {
+			_colorDefinition.setNewTextColor(rgb);
+
+		} else if (_colorPrefName.compareTo(GraphColorProvider.PREF_COLOR_BRIGHT) == 0) {
+			_colorDefinition.setNewGradientBright(rgb);
+
 		} else {
-			fColorDefinition.setNewGradientBright(rgb);
+			_colorDefinition.setNewGradientDark(rgb);
 		}
 	}
 
 	void setPrefName(final String fPrefName) {
-		this.fColorPrefName = fPrefName;
+		this._colorPrefName = fPrefName;
 	}
 }

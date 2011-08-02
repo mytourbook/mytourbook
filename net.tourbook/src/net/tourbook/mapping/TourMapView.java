@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011 Wolfgang Schramm and Contributors
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
@@ -2245,7 +2245,13 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		settings.put(MEMENTO_SELECTED_MAP_PROVIDER_ID, _actionSelectMapProvider.getSelectedMapProvider().getId());
 
 		if (_defaultPosition == null) {
-			settings.put(MEMENTO_DEFAULT_POSITION_ZOOM, _map.getMapProvider().getMinimumZoomLevel());
+
+			final MP mapProvider = _map.getMapProvider();
+
+			settings.put(MEMENTO_DEFAULT_POSITION_ZOOM, mapProvider == null ? //
+					_defaultZoom
+					: mapProvider.getMinimumZoomLevel());
+
 			settings.put(MEMENTO_DEFAULT_POSITION_LATITUDE, 0.0F);
 			settings.put(MEMENTO_DEFAULT_POSITION_LONGITUDE, 0.0F);
 		} else {

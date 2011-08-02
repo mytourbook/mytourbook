@@ -643,6 +643,7 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
 			newTourType.setColorBright(newColorDefinition.getDefaultGradientBright());
 			newTourType.setColorDark(newColorDefinition.getDefaultGradientDark());
 			newTourType.setColorLine(newColorDefinition.getDefaultLineColor());
+			newTourType.setColorText(newColorDefinition.getDefaultTextColor());
 
 			// save new entity
 			newSavedTourType = TourDatabase.saveEntity(newTourType, newTourType.getTypeId(), TourType.class);
