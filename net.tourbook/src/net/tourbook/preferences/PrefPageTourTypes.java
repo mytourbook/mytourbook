@@ -169,7 +169,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 	 */
 	private void createColorNames(final ColorDefinition colorDefinition) {
 
-		// use the first 3 color, the mapping color is not used in tour types
+		// use the first 4 color, the mapping color is not used in tour types
 		final int graphNamesLength = GraphColorProvider.colorNames.length - 1;
 
 		final GraphColorItem[] graphColors = new GraphColorItem[graphNamesLength];
@@ -213,7 +213,8 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 						tourType.getName(),
 						tourType.getRGBBright(),
 						tourType.getRGBDark(),
-						tourType.getRGBLine());
+						tourType.getRGBLine(),
+						tourType.getRGBText());
 
 				_colorDefinitions.add(colorDefinition);
 
@@ -422,7 +423,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 		TreeViewerColumn tvc;
 		TreeColumn tc;
-		final int colorWidth = (tree.getItemHeight() + 0) * 4 + 10;
+		final int colorWidth = (tree.getItemHeight() + 0) * 5 + 10;
 
 		// 1. column: color item/color definition
 		tvc = new TreeViewerColumn(_tourTypeViewer, SWT.TRAIL);
@@ -621,7 +622,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 	public void init(final IWorkbench workbench) {
 		setPreferenceStore(_prefStore);
-		noDefaultAndApplyButton();
+//		noDefaultAndApplyButton();
 	}
 
 	@Override
@@ -658,6 +659,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		newTourType.setColorBright(newColorDefinition.getDefaultGradientBright());
 		newTourType.setColorDark(newColorDefinition.getDefaultGradientDark());
 		newTourType.setColorLine(newColorDefinition.getDefaultLineColor());
+		newTourType.setColorText(newColorDefinition.getDefaultTextColor());
 
 		// add new entity to db
 		final TourType saveTourType = TourDatabase.saveEntity(newTourType, newTourType.getTypeId(), TourType.class);
@@ -727,6 +729,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 			oldTourType.setColorBright(colorDefinition.getNewGradientBright());
 			oldTourType.setColorDark(colorDefinition.getNewGradientDark());
 			oldTourType.setColorLine(colorDefinition.getNewLineColor());
+			oldTourType.setColorText(colorDefinition.getNewTextColor());
 
 			final TourType savedTourType = TourDatabase
 					.saveEntity(oldTourType, oldTourType.getTypeId(), TourType.class);

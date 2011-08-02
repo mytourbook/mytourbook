@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -25,6 +25,7 @@ public class TourTypeColorDefinition extends ColorDefinition implements Comparab
 	private static final RGB	DEFAULT_GRADIENT_BRIGHT	= new RGB(255, 255, 255);
 	private static final RGB	DEFAULT_GRADIENT_DARK	= new RGB(255, 167, 199);
 	private static final RGB	DEFAULT_LINE_COLOR		= new RGB(232, 152, 180);
+	private static final RGB	DEFAULT_TEXT_COLOR		= new RGB(98, 23, 49);
 
 	private TourType			_tourType;
 
@@ -42,6 +43,7 @@ public class TourTypeColorDefinition extends ColorDefinition implements Comparab
 				new RGB(DEFAULT_GRADIENT_BRIGHT.red, DEFAULT_GRADIENT_BRIGHT.green, DEFAULT_GRADIENT_BRIGHT.blue), //
 				new RGB(DEFAULT_GRADIENT_DARK.red, DEFAULT_GRADIENT_DARK.green, DEFAULT_GRADIENT_DARK.blue),
 				new RGB(DEFAULT_LINE_COLOR.red, DEFAULT_LINE_COLOR.green, DEFAULT_LINE_COLOR.blue),
+				new RGB(DEFAULT_TEXT_COLOR.red, DEFAULT_TEXT_COLOR.green, DEFAULT_TEXT_COLOR.blue),
 				null);
 
 		_tourType = tourType;
@@ -52,9 +54,15 @@ public class TourTypeColorDefinition extends ColorDefinition implements Comparab
 									final String visibleName,
 									final RGB defaultGradientBright,
 									final RGB defaultGradientDark,
-									final RGB defaultLineColor) {
+									final RGB defaultLineColor,
+									final RGB defaultTextColor) {
 
-		super(prefName, visibleName, defaultGradientBright, defaultGradientDark, defaultLineColor, null);
+		super(prefName, visibleName, //
+				defaultGradientBright,
+				defaultGradientDark,
+				defaultLineColor,
+				defaultTextColor,
+				null);
 
 		_tourType = tourType;
 	}

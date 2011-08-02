@@ -512,6 +512,8 @@ public class Messages extends NLS {
 	public static String		Graph_Pref_color_statistic_distance;
 	public static String		Graph_Pref_color_statistic_time;
 
+	public static String	Graph_Pref_ColorText;
+
 	public static String		HR_Zone_01_060_Moderate;
 	public static String		HR_Zone_01_060_Moderate_Shortcut;
 	public static String		HR_Zone_01_070_FatBurning;

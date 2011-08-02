@@ -90,7 +90,7 @@ public class GraphColorPainter {
 		if (image == null || image.isDisposed()) {
 
 			final int imageHeight = _treeItemHeight;
-			final int imageWidth = imageHeight * 4;
+			final int imageWidth = imageHeight * 5;
 
 //			final Rectangle borderRect = new Rectangle(0, 1, imageWidth - 1, imageHeight - 2);
 			final Rectangle borderRect = new Rectangle(10, 1, imageWidth - 11, imageHeight - 3);
@@ -141,7 +141,7 @@ public class GraphColorPainter {
 		if (definitionImage == null || definitionImage.isDisposed()) {
 
 			final int imageHeight = _treeItemHeight;
-			final int imageWidth = 4 * imageHeight;
+			final int imageWidth = 5 * imageHeight;
 
 			final int colorHeight = imageHeight - 2;
 			final int colorWidth = imageHeight - 2;
@@ -175,7 +175,10 @@ public class GraphColorPainter {
 					} else {
 
 						gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
-						gc.setBackground(getGraphColor(display, graphColorItem));
+
+						final Color graphColor = getGraphColor(display, graphColorItem);
+
+						gc.setBackground(graphColor);
 
 						gc.fillRectangle(xPosition + 1, //
 								yPosition + 1,

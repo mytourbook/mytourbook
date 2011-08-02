@@ -31,16 +31,20 @@ public class ColorDefinition {
 	private GraphColorItem[]	_colorParts;
 
 	private RGB					_lineColor;
-	private RGB					_defaultLineColor;
-	private RGB					_newLineColor;
+	private RGB					_lineColorDefault;
+	private RGB					_lineColorNew;
 
 	private RGB					_gradientBright;
-	private RGB					_defaultGradientBright;
-	private RGB					_newGradientBright;
+	private RGB					_gradientBrightDefault;
+	private RGB					_gradientBrightNew;
 
 	private RGB					_gradientDark;
-	private RGB					_defaultGradientDark;
-	private RGB					_newGradientDark;
+	private RGB					_gradientDarkDefault;
+	private RGB					_gradientDarkNew;
+
+	private RGB					_textColor;
+	private RGB					_textColorDefault;
+	private RGB					_textColorNew;
 
 	private LegendColor			_legendColor;
 	private LegendColor			_defaultLegendColor;
@@ -59,6 +63,8 @@ public class ColorDefinition {
 	 *            default dark gradient color
 	 * @param defaultLineColor
 	 *            default line color
+	 * @param defaultTextColor
+	 *            default text color
 	 * @param defaultLegendColor
 	 *            legend color configuration or <code>null</code> when legend is not available
 	 */
@@ -67,14 +73,16 @@ public class ColorDefinition {
 								final RGB defaultGradientBright,
 								final RGB defaultGradientDark,
 								final RGB defaultLineColor,
+								final RGB defaultTextColor,
 								final LegendColor defaultLegendColor) {
 
 		_prefName = prefName;
 		_visibleName = visibleName;
 
-		_defaultGradientBright = defaultGradientBright;
-		_defaultGradientDark = defaultGradientDark;
-		_defaultLineColor = defaultLineColor;
+		_gradientBrightDefault = defaultGradientBright;
+		_gradientDarkDefault = defaultGradientDark;
+		_lineColorDefault = defaultLineColor;
+		_textColorDefault = defaultTextColor;
 
 		_defaultLegendColor = defaultLegendColor;
 
@@ -88,9 +96,9 @@ public class ColorDefinition {
 		if (prefStore.contains(prefColorGradientBright)) {
 			_gradientBright = PreferenceConverter.getColor(prefStore, prefColorGradientBright);
 		} else {
-			_gradientBright = _defaultGradientBright;
+			_gradientBright = _gradientBrightDefault;
 		}
-		_newGradientBright = _gradientBright;
+		_gradientBrightNew = _gradientBright;
 
 		/*
 		 * gradient dark
@@ -99,9 +107,9 @@ public class ColorDefinition {
 		if (prefStore.contains(prefColorGradientDark)) {
 			_gradientDark = PreferenceConverter.getColor(prefStore, prefColorGradientDark);
 		} else {
-			_gradientDark = _defaultGradientDark;
+			_gradientDark = _gradientDarkDefault;
 		}
-		_newGradientDark = _gradientDark;
+		_gradientDarkNew = _gradientDark;
 
 		/*
 		 * line color
@@ -110,9 +118,20 @@ public class ColorDefinition {
 		if (prefStore.contains(prefColorLine)) {
 			_lineColor = PreferenceConverter.getColor(prefStore, prefColorLine);
 		} else {
-			_lineColor = _defaultLineColor;
+			_lineColor = _lineColorDefault;
 		}
-		_newLineColor = _lineColor;
+		_lineColorNew = _lineColor;
+
+		/*
+		 * text color
+		 */
+		final String prefColorText = graphPrefName + GraphColorProvider.PREF_COLOR_TEXT;
+		if (prefStore.contains(prefColorText)) {
+			_textColor = PreferenceConverter.getColor(prefStore, prefColorText);
+		} else {
+			_textColor = _textColorDefault;
+		}
+		_textColorNew = _textColor;
 	}
 
 	@Override
@@ -138,11 +157,11 @@ public class ColorDefinition {
 	}
 
 	public RGB getDefaultGradientBright() {
-		return _defaultGradientBright;
+		return _gradientBrightDefault;
 	}
 
 	public RGB getDefaultGradientDark() {
-		return _defaultGradientDark;
+		return _gradientDarkDefault;
 	}
 
 	public LegendColor getDefaultLegendColor() {
@@ -150,7 +169,11 @@ public class ColorDefinition {
 	}
 
 	public RGB getDefaultLineColor() {
-		return _defaultLineColor;
+		return _lineColorDefault;
+	}
+
+	public RGB getDefaultTextColor() {
+		return _textColorDefault;
 	}
 
 	public RGB getGradientBright() {
@@ -182,11 +205,11 @@ public class ColorDefinition {
 	}
 
 	public RGB getNewGradientBright() {
-		return _newGradientBright;
+		return _gradientBrightNew;
 	}
 
 	public RGB getNewGradientDark() {
-		return _newGradientDark;
+		return _gradientDarkNew;
 	}
 
 	public LegendColor getNewLegendColor() {
@@ -194,11 +217,15 @@ public class ColorDefinition {
 	}
 
 	public RGB getNewLineColor() {
-		return _newLineColor;
+		return _lineColorNew;
 	}
 
 	public String getPrefName() {
 		return _prefName;
+	}
+
+	public RGB getTextColor() {
+		return _textColor;
 	}
 
 	public String getVisibleName() {
@@ -239,11 +266,11 @@ public class ColorDefinition {
 	}
 
 	public void setNewGradientBright(final RGB newGradientBright) {
-		_newGradientBright = newGradientBright;
+		_gradientBrightNew = newGradientBright;
 	}
 
 	public void setNewGradientDark(final RGB newGradientDark) {
-		_newGradientDark = newGradientDark;
+		_gradientDarkNew = newGradientDark;
 	}
 
 	public void setNewLegendColor(final LegendColor newLegendColor) {
@@ -251,14 +278,27 @@ public class ColorDefinition {
 	}
 
 	public void setNewLineColor(final RGB newLineColor) {
-		_newLineColor = newLineColor;
+		_lineColorNew = newLineColor;
 	}
 
 	public void setPrefName(final String prefName) {
 		_prefName = prefName;
 	}
 
+	public void setTextColor(final RGB textColor) {
+		_textColor = textColor;
+	}
+
 	public void setVisibleName(final String visibleName) {
 		_visibleName = visibleName;
 	}
+
+	public RGB getNewTextColor() {
+		return _textColorNew;
+	}
+
+	public void setNewTextColor(RGB _textColorNew) {
+		this._textColorNew = _textColorNew;
+	}
+
 }

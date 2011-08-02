@@ -28,24 +28,9 @@ import org.eclipse.swt.graphics.RGB;
 
 public class TrainingManager {
 
-//	private static final RGB		RGB_ZONE_1				= new RGB(0x95, 0xe0, 0xff);
-//	private static final RGB		RGB_ZONE_2				= new RGB(0xD3, 0xFF, 0x95);
-//	private static final RGB		RGB_ZONE_3				= new RGB(0xff, 0xfa, 0x95);
-//	private static final RGB		RGB_ZONE_4				= new RGB(0xFF, 0xc9, 0x95);
-//	private static final RGB		RGB_ZONE_5				= new RGB(0xff, 0x95, 0x95);
-//
-//	private static final RGB		RGB_ZONE_1				= new RGB(0x3e, 0xb9, 0xff);
-//	private static final RGB		RGB_ZONE_2				= new RGB(0x96, 0xe0, 0x26);
-//	private static final RGB		RGB_ZONE_3				= new RGB(0xff, 0xe2, 0x00);
-//	private static final RGB		RGB_ZONE_4				= new RGB(0xff, 0x9e, 0x20);
-//	private static final RGB		RGB_ZONE_5				= new RGB(0xff, 0x40, 0x20);
-
-//	private static final RGB		RGB_ZONE_1				= new RGB(0xa5, 0xf5, 0x29);
 	private static final RGB		RGB_ZONE_1				= new RGB(0xb9, 0xff, 0x50);
 	private static final RGB		RGB_ZONE_2				= new RGB(0x96, 0xe0, 0x26);
-//	private static final RGB		RGB_ZONE_3				= new RGB(0xff, 0xb7, 0x24);
 	private static final RGB		RGB_ZONE_3				= new RGB(0xff, 0xcd, 0x66);
-//	private static final RGB		RGB_ZONE_4				= new RGB(0xff, 0xa7, 0x46);
 	private static final RGB		RGB_ZONE_4				= new RGB(0xff, 0x90, 0x01);
 	private static final RGB		RGB_ZONE_5				= new RGB(0xff, 0x40, 0x20);
 

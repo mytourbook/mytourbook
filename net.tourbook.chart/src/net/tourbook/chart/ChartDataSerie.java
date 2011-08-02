@@ -82,6 +82,7 @@ public abstract class ChartDataSerie {
 	private RGB						_rgbBright[]							= new RGB[] { new RGB(255, 0, 0) };
 	private RGB						_rgbDark[]								= new RGB[] { new RGB(0, 0, 255) };
 	private RGB						_rgbLine[]								= new RGB[] { new RGB(0, 255, 0) };
+	private RGB						_rgbText[]								= new RGB[] { new RGB(0, 0, 0) };
 
 	/**
 	 * minimum value found in the provided values
@@ -169,6 +170,10 @@ public abstract class ChartDataSerie {
 
 	public RGB[] getRgbLine() {
 		return _rgbLine;
+	}
+
+	public RGB[] getRgbText() {
+		return _rgbText;
 	}
 
 	/**
@@ -286,6 +291,10 @@ public abstract class ChartDataSerie {
 
 	public void setRgbLine(final RGB[] rgbLine) {
 		_rgbLine = rgbLine;
+	}
+
+	public void setRgbText(final RGB _rgbText[]) {
+		this._rgbText = _rgbText;
 	}
 
 	/**

@@ -86,12 +86,13 @@ public class TourDatabase {
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int						TOURBOOK_DB_VERSION							= 18;
+	private static final int						TOURBOOK_DB_VERSION							= 19;
 
-//	private static final int						TOURBOOK_DB_VERSION							= 18;	// 11.???
-//	private static final int						TOURBOOK_DB_VERSION							= 17;	// 11.???
-//	private static final int						TOURBOOK_DB_VERSION							= 16;	// 11.???
-//	private static final int						TOURBOOK_DB_VERSION							= 15;	// 11.???
+//	private static final int						TOURBOOK_DB_VERSION							= 19;	// 11.8
+//	private static final int						TOURBOOK_DB_VERSION							= 18;	// 11.8
+//	private static final int						TOURBOOK_DB_VERSION							= 17;	// 11.8
+//	private static final int						TOURBOOK_DB_VERSION							= 16;	// 11.8
+//	private static final int						TOURBOOK_DB_VERSION							= 15;	// 11.8
 //	private static final int						TOURBOOK_DB_VERSION							= 14;	// 11.3
 //	private static final int						TOURBOOK_DB_VERSION							= 13;	// 10.11
 //	private static final int						TOURBOOK_DB_VERSION							= 12;	// 10.9.1
@@ -2522,7 +2523,15 @@ public class TourDatabase {
 				+ "	colorDarkBlue 		SMALLINT NOT NULL,						\n" //$NON-NLS-1$
 				+ "	colorLineRed 		SMALLINT NOT NULL,						\n" //$NON-NLS-1$
 				+ "	colorLineGreen 		SMALLINT NOT NULL,						\n" //$NON-NLS-1$
-				+ "	colorLineBlue 		SMALLINT NOT NULL						\n" //$NON-NLS-1$
+				+ "	colorLineBlue 		SMALLINT NOT NULL,						\n" //$NON-NLS-1$
+
+				// version 19 start
+				//
+				+ "	colorTextRed 		SMALLINT DEFAULT 0,						\n" //$NON-NLS-1$
+				+ "	colorTextGreen 		SMALLINT DEFAULT 0,						\n" //$NON-NLS-1$
+				+ "	colorTextBlue 		SMALLINT DEFAULT 0						\n" //$NON-NLS-1$
+				//
+				// version 19 end ---------
 				//
 				+ ")"; //															//$NON-NLS-1$
 
@@ -2868,6 +2877,10 @@ public class TourDatabase {
 
 			if (currentDbVersion == 17) {
 				currentDbVersion = newVersion = updateDbDesign_017_to_018(conn, monitor);
+			}
+
+			if (currentDbVersion == 18) {
+				currentDbVersion = newVersion = updateDbDesign_018_to_019(conn, monitor);
 			}
 
 			/*
@@ -3677,6 +3690,48 @@ public class TourDatabase {
 //			TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA
 
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN NumberOfHrZones	INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+			exec(stmt, sql);
+
+		}
+		stmt.close();
+
+		logDbUpdateEnd(newDbVersion);
+
+		return newDbVersion;
+	}
+
+	private int updateDbDesign_018_to_019(final Connection conn, final IProgressMonitor monitor) throws SQLException {
+
+		final int newDbVersion = 19;
+
+		logDbUpdateStart(newDbVersion);
+
+		if (monitor != null) {
+			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, newDbVersion));
+		}
+
+		String sql;
+		final Statement stmt = conn.createStatement();
+		{
+//			TOUR_TYPE	TOUR_TYPE	TOUR_TYPE	TOUR_TYPE	TOUR_TYPE	TOUR_TYPE	TOUR_TYPE	TOUR_TYPE
+//			//
+//			// version 19 start
+//			//
+//			+ "	colorTextRed 		SMALLINT DEFAULT 0,						\n" //$NON-NLS-1$
+//			+ "	colorTextGreen 		SMALLINT DEFAULT 0,						\n" //$NON-NLS-1$
+//			+ "	colorTextBlue 		SMALLINT DEFAULT 0						\n" //$NON-NLS-1$
+//			//
+//			// version 19 end ---------
+//			//
+//			TOUR_TYPE	TOUR_TYPE	TOUR_TYPE	TOUR_TYPE	TOUR_TYPE	TOUR_TYPE	TOUR_TYPE	TOUR_TYPE
+
+			sql = "ALTER TABLE " + TABLE_TOUR_TYPE + " ADD COLUMN colorTextRed		SMALLINT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+			exec(stmt, sql);
+
+			sql = "ALTER TABLE " + TABLE_TOUR_TYPE + " ADD COLUMN colorTextGreen	SMALLINT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+			exec(stmt, sql);
+
+			sql = "ALTER TABLE " + TABLE_TOUR_TYPE + " ADD COLUMN colorTextBlue		SMALLINT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
 			exec(stmt, sql);
 
 		}

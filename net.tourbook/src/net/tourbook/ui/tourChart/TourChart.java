@@ -999,6 +999,9 @@ public class TourChart extends Chart {
 		setCanAutoMoveSliders(isMoveSlidersWhenZoomed);
 		setCanAutoZoomToSlider(isAutoZoomToSlider);
 
+		proxy = _actionProxies.get(COMMAND_ID_EDIT_CHART_PREFERENCES);
+		proxy.setEnabled(true);
+
 		// update UI state for the action handlers
 		if (useActionHandlers()) {
 			_tcActionHandlerManager.updateUIState();

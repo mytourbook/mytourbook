@@ -73,34 +73,34 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageAppearanceColors extends PreferencePage implements IWorkbenchPreferencePage, IColorTreeViewer {
 
-	private static final List<Integer>	_unitValues		= Arrays.asList(10, 50, 100, 150, 190);
-	private static final List<String>	_unitLabels		= Arrays.asList(
-																Messages.Pref_ChartColors_unit_min,
-																Messages.Pref_ChartColors_unit_low,
-																Messages.Pref_ChartColors_unit_mid,
-																Messages.Pref_ChartColors_unit_high,
-																Messages.Pref_ChartColors_unit_max);
+	private static final List<Integer>		_unitValues		= Arrays.asList(10, 50, 100, 150, 190);
+	private static final List<String>		_unitLabels		= Arrays.asList(
+																	Messages.Pref_ChartColors_unit_min,
+																	Messages.Pref_ChartColors_unit_low,
+																	Messages.Pref_ChartColors_unit_mid,
+																	Messages.Pref_ChartColors_unit_high,
+																	Messages.Pref_ChartColors_unit_max);
 
-	private ValueColor[]				_valueColors	= new ValueColor[] {
+	private ValueColor[]					_valueColors	= new ValueColor[] {
 			new ValueColor(10, 255, 0, 0),
 			new ValueColor(50, 100, 100, 0),
 			new ValueColor(100, 0, 255, 0),
 			new ValueColor(150, 0, 100, 100),
-			new ValueColor(190, 0, 0, 255)				};
+			new ValueColor(190, 0, 0, 255)					};
 
-	TreeViewer							_colorViewer;
+	TreeViewer								_colorViewer;
 
-	private ColorSelector				_colorSelector;
-	private Button						_btnLegend;
+	private ColorSelector					_colorSelector;
+	private Button							_btnLegend;
 
-	private GraphColorItem				_selectedColor;
-	private boolean						_isColorChanged;
+	private GraphColorItem					_selectedColor;
+	private boolean							_isColorChanged;
 
-	private ColorDefinition				_expandedItem;
+	private ColorDefinition					_expandedItem;
 
-	private LegendProviderGradientColors				_legendProvider;
-	private DialogMappingColor			_dialogMappingColor;
-	private GraphColorPainter			_graphColorPainter;
+	private LegendProviderGradientColors	_legendProvider;
+	private DialogMappingColor				_dialogMappingColor;
+	private GraphColorPainter				_graphColorPainter;
 
 	/**
 	 * the color content provider has the following structure<br>
@@ -166,6 +166,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 	 */
 	private void createColorDefinitions() {
 
+		final String[][] colorNames = GraphColorProvider.colorNames;
 		final ColorDefinition[] graphColorDefinitions = GraphColorProvider.getInstance().getGraphColorDefinitions();
 
 		for (final ColorDefinition colorDefinition : graphColorDefinitions) {
@@ -174,23 +175,15 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 
 			final boolean isLegendColorAvailable = colorDefinition.getLegendColor() != null;
 
-			for (int nameIndex = 0; nameIndex < GraphColorProvider.colorNames.length; nameIndex++) {
+			for (final String[] colorName : colorNames) {
 
-				if (nameIndex == 3) {
+				if (colorName[0] == GraphColorProvider.PREF_COLOR_MAPPING) {
 					if (isLegendColorAvailable) {
 						// create legend color
-						graphColors.add(new GraphColorItem(
-								colorDefinition,
-								GraphColorProvider.colorNames[nameIndex][0],
-								GraphColorProvider.colorNames[nameIndex][1],
-								true));
+						graphColors.add(new GraphColorItem(colorDefinition, colorName[0], colorName[1], true));
 					}
 				} else {
-					graphColors.add(new GraphColorItem(
-							colorDefinition,
-							GraphColorProvider.colorNames[nameIndex][0],
-							GraphColorProvider.colorNames[nameIndex][1],
-							false));
+					graphColors.add(new GraphColorItem(colorDefinition, colorName[0], colorName[1], false));
 				}
 			}
 
@@ -377,7 +370,6 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 		}
 	}
 
-
 	/**
 	 * create columns
 	 */
@@ -385,7 +377,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 
 		TreeViewerColumn tvc;
 		TreeColumn tc;
-		final int colorWidth = (tree.getItemHeight() + 0) * 4 + 10;
+		final int colorWidth = (tree.getItemHeight() + 0) * 5 + 10;
 
 		// 1. column: color item/color definition
 		tvc = new TreeViewerColumn(_colorViewer, SWT.TRAIL);
@@ -554,6 +546,14 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 	}
 
 	@Override
+	protected void performApply() {
+
+		if (_isColorChanged) {
+			updateAndSaveColors();
+		}
+	}
+
+	@Override
 	public boolean performCancel() {
 
 		resetColors();
@@ -573,6 +573,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 			graphDefinition.setNewGradientBright(graphDefinition.getDefaultGradientBright());
 			graphDefinition.setNewGradientDark(graphDefinition.getDefaultGradientDark());
 			graphDefinition.setNewLineColor(graphDefinition.getDefaultLineColor());
+			graphDefinition.setNewTextColor(graphDefinition.getDefaultTextColor());
 
 			final LegendColor defaultLegendColor = graphDefinition.getDefaultLegendColor();
 			if (defaultLegendColor != null) {
@@ -607,6 +608,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 			graphDefinition.setNewGradientBright(graphDefinition.getGradientBright());
 			graphDefinition.setNewGradientDark(graphDefinition.getGradientDark());
 			graphDefinition.setNewLineColor(graphDefinition.getLineColor());
+			graphDefinition.setNewTextColor(graphDefinition.getTextColor());
 
 			graphDefinition.setNewLegendColor(graphDefinition.getLegendColor());
 		}
@@ -637,6 +639,11 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 					prefStore,
 					prefGraphName + GraphColorProvider.PREF_COLOR_LINE,
 					graphDefinition.getNewLineColor());
+
+			PreferenceConverter.setValue(
+					prefStore,
+					prefGraphName + GraphColorProvider.PREF_COLOR_TEXT,
+					graphDefinition.getNewTextColor());
 		}
 
 		GraphColorProvider.saveLegendData();
@@ -652,6 +659,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 			graphDefinition.setGradientBright(graphDefinition.getNewGradientBright());
 			graphDefinition.setGradientDark(graphDefinition.getNewGradientDark());
 			graphDefinition.setLineColor(graphDefinition.getNewLineColor());
+			graphDefinition.setTextColor(graphDefinition.getNewTextColor());
 
 			graphDefinition.setLegendColor(graphDefinition.getNewLegendColor());
 		}
