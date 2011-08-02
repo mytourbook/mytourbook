@@ -137,11 +137,14 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	private TourInfoFormatter[]					_tourInfoFormatter		= new TourInfoFormatter[3];
 
-	private boolean								_useLineColorForTourInfoText;
+	private boolean								_useTextColorForTourInfoText;
+	private boolean								_useBlackForHighlightTourInfoText;
 
 	private Rectangle _calendarAllDaysRectangle;
 	private Rectangle _calendarFirstWeekRectangle;
 	private Rectangle _calendarLastWeekRectangle;
+
+	private String								_refText				= "Tour12";
 
 	private class Day {
 
@@ -658,6 +661,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	private void drawDayTours(final GC gc, final CalendarTourData[] data, final Rectangle rec) {
 
+
 		final int max = _numberOfToursPerDay == 0 ? data.length : _dynamicTourFieldSize ? data.length : Math.min(
 				_numberOfToursPerDay,
 				data.length);
@@ -723,7 +727,13 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		// focus is 1 pixel larger than tour rectangle
 		final Rectangle r = new Rectangle(rec.x + 1, rec.y + 1, rec.width - 2, rec.height - 2);
-		drawTourInfoText(gc, r, data, _black);
+		Color color;
+		if (_useBlackForHighlightTourInfoText) {
+			color = _black;
+		} else {
+			color = _colorCache.get(_rgbText.get(data.typeColorIndex).hashCode());
+		}
+		drawTourInfoText(gc, r, data, color);
 
 	}
 
@@ -787,6 +797,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	private void drawTourInfo(final GC gc, final Rectangle r, final CalendarTourData data, final boolean highlight) {
 
 		final Color line = _colorCache.get(_rgbLine.get(data.typeColorIndex).hashCode());
+		final Point refTextExtent = gc.stringExtent(_refText);
 
 		gc.setForeground(line);
 		gc.drawRectangle(r);
@@ -795,16 +806,18 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		gc.setForeground(_colorCache.get(_rgbDark.get(data.typeColorIndex).hashCode()));
 		gc.fillGradientRectangle(r.x + 1, r.y + 1, r.width - 1, r.height - 1, false);
 
-		Color fg;
-		if (highlight) {
-			fg = _black;
-		} else if (_useLineColorForTourInfoText) {
-			fg = _colorCache.get(_rgbText.get(data.typeColorIndex).hashCode());
-		} else {
-			fg = _darkGray;
+		// only fill in text if the tour rectangle has a reasonable size
+		if (r.width > refTextExtent.x) {
+			Color fg;
+			if (highlight && _useBlackForHighlightTourInfoText) {
+				fg = _black;
+			} else if (_useTextColorForTourInfoText) {
+				fg = _colorCache.get(_rgbText.get(data.typeColorIndex).hashCode());
+			} else {
+				fg = _darkGray;
+			}
+			drawTourInfoText(gc, r, data, fg);
 		}
-
-		drawTourInfoText(gc, r, data, fg);
 
 	}
 
@@ -847,13 +860,18 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		
 		gc.setClipping(rec);
 		gc.setBackground(_white);
-		final int x = rec.x + rec.width - 1;
+		final int xr = rec.x + rec.width - 1;
+		final int xl = rec.x + 2;
+		int xx;
 		int y = rec.y + 1;
 		String text;
+		final boolean doClip = true;
 		
 		final int fontHeight = gc.getFontMetrics().getHeight();
 		final int minToShow = (2 * fontHeight / 3);
 
+		Point extent;
+		final int maxLength = rec.width - 2;
 		// time
 		if (data.recordingTime > 0) {
 			gc.setForeground(_darkGray);
@@ -861,7 +879,17 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					Messages.Calendar_View_Format_Time,
 					data.recordingTime / 3600,
 					(data.recordingTime % 3600) / 60).toString();
-			gc.drawText(text, x - gc.stringExtent(text).x, y);
+			extent = gc.stringExtent(text);
+			xx = xr - extent.x;
+			if (extent.x > maxLength) {
+				if (doClip) {
+					text = text.substring(0, text.lastIndexOf(" "));
+					xx = xr - gc.stringExtent(text).x;
+				} else {
+					xx = xl;
+				}
+			}
+			gc.drawText(text, xx, y);
 		}
 		y += fontHeight;
 
@@ -872,7 +900,17 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			text = new Formatter().format(
 					NLS.bind(Messages.Calendar_View_Format_Distance, UI.UNIT_LABEL_DISTANCE),
 					distance).toString();
-			gc.drawText(text, x - gc.stringExtent(text).x, y);
+			extent = gc.stringExtent(text);
+			xx = xr - extent.x;
+			if (extent.x > maxLength) {
+				if (doClip) {
+					text = text.substring(0, text.lastIndexOf(" "));
+					xx = xr - gc.stringExtent(text).x;
+				} else {
+					xx = xl;
+				}
+			}
+			gc.drawText(text, xx, y);
 		}
 		y += fontHeight;
 
@@ -882,8 +920,17 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			text = new Formatter().format(
 					NLS.bind(Messages.Calendar_View_Format_Speed, UI.UNIT_LABEL_SPEED),
 					data.distance == 0 ? 0 : data.distance / (data.recordingTime / 3.6f)).toString();
-
-			gc.drawText(text, x - gc.stringExtent(text).x, y);
+			extent = gc.stringExtent(text);
+			xx = xr - extent.x;
+			if (extent.x > maxLength) { // if text is not fitting remove units
+				if (doClip) {
+					text = text.substring(0, text.lastIndexOf(" "));
+					xx = xr - gc.stringExtent(text).x;
+				} else {
+					xx = xl;
+				}
+			}
+			gc.drawText(text, xx, y);
 		}
 		y += fontHeight;
 
@@ -897,7 +944,17 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					NLS.bind(Messages.Calendar_View_Format_Pace, UI.UNIT_LABEL_PACE),
 					pace / 60,
 					pace % 60).toString();
-			gc.drawText(text, x - gc.stringExtent(text).x, y);
+			extent = gc.stringExtent(text);
+			xx = xr - extent.x;
+			if (extent.x > maxLength) { // if text is not fitting remove units
+				if (doClip) {
+					text = text.substring(0, text.lastIndexOf(" "));
+					xx = xr - gc.stringExtent(text).x;
+				} else {
+					xx = xl;
+				}
+			}
+			gc.drawText(text, xx, y);
 		}
 		y += fontHeight;
 
@@ -976,8 +1033,12 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		return _tourInfoFormatter[line].index;
 	}
 
-	public boolean  getTourInfoUseLineLineColor() {
-		return _useLineColorForTourInfoText;
+	public boolean getTourInfoUseHighlightTextBlack() {
+		return _useBlackForHighlightTourInfoText;
+	}
+
+	public boolean  getTourInfoUseTextColor() {
+		return _useTextColorForTourInfoText;
 	}
 
 	public int getZoom() {
@@ -1520,8 +1581,15 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		redraw();
 	}
 
+	public void setTourInfoUseHighlightTextBlack(final boolean checked) {
+		_useBlackForHighlightTourInfoText = checked;
+		// as this is only affecting the highlightning no redraw should be necessary
+		// _graphClean = false;
+		// redraw();
+	}
+
 	public void setTourInfoUseLineColor(final boolean checked) {
-		_useLineColorForTourInfoText = checked;
+		_useTextColorForTourInfoText = checked;
 		_graphClean = false;
 		redraw();
 	}

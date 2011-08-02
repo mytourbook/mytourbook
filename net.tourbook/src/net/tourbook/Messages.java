@@ -21,6 +21,7 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.messages";							//$NON-NLS-1$
 
+
 	public static String		Image__ArrowDown;
 	public static String		Image__ArrowUp;
 	public static String		Image__ZoomOut;
@@ -30,6 +31,7 @@ public class Messages extends NLS {
 
 	public static String		Calendar_View_Action_Back;
 	public static String		Calendar_View_Action_Back_Tooltip;
+	public static String		Calendar_View_Action_BlackHighlightText;
 	public static String		Calendar_View_Action_DisplayTours_1ByDay;
 	public static String		Calendar_View_Action_DisplayTours_All;
 	public static String		Calendar_View_Action_DisplayTours_ByDay;
@@ -45,8 +47,9 @@ public class Messages extends NLS {
 	public static String		Calendar_View_Action_ShowDescriptionTitle;
 	public static String		Calendar_View_Action_ShowDistanceSpeed;
 	public static String		Calendar_View_Action_ShowDistanceTime;
+	public static String		Calendar_View_Action_ShowNothing;
 	public static String		Calendar_View_Action_ShowTitleDescription;
-	public static String		Calendar_View_Action_Text_Info_Color_Line_Color;
+	public static String		Calendar_View_Action_TextColor;
 	public static String		Calendar_View_Action_TimeDistance;
 	public static String		Calendar_View_Action_TimePace;
 	public static String		Calendar_View_Action_TimeSpeed;

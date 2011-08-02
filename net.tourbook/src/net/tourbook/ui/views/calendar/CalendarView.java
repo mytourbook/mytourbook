@@ -94,7 +94,8 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	private String								STATE_TOUR_SIZE_DYNAMIC			= "TourSizeDynamic";							// $NON-NLS-1$ //$NON-NLS-1$
 	private String								STATE_NUMBER_OF_TOURS_PER_DAY	= "NumberOfToursPerDay";						// $NON-NLS-1$ //$NON-NLS-1$
 	private String								STATE_TOUR_INFO_FORMATTER_INDEX_		= "TourInfoFormatterIndex";					//$NON-NLS-1$
-	private String								STATE_TOUR_INFO_TEXT_COLOR_LINE_COLOR	= "TourInfoTextColorUserLineColor";			//$NON-NLS-1$
+	private String								STATE_TOUR_INFO_TEXT_COLOR			= "TourInfoUseTextColor";						//$NON-NLS-1$
+	private String								STATE_TOUR_INFO_BLACK_TEXT_HIGHLIGHT	= "TourInfoUseBlackTextHightlight";			//$NON-NLS-1$
 
 	private Action								_forward, _back;
 	private Action								_zoomIn, _zoomOut;
@@ -105,7 +106,8 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	private Action								_setTourSizeDynamic;
 	private Action[]							_setTourInfoFormatLine;
 	private Action[][]							_setTourInfoFormat;
-	private Action								_setTourInfoColorLineColor;
+	private Action								_setTourInfoTextColor;
+	private Action								_setTourInfoBlackTextHighlight;
 
 	private int									_numberOfInfoLines						= 3;
 
@@ -119,10 +121,26 @@ public class CalendarView extends ViewPart implements ITourProvider {
 			new TourInfoFormatter() {
 				@Override
 				public String format(final CalendarTourData data) {
+					return UI.EMPTY_STRING;
+				}
+
+				@Override
+				public String getText() {
+					return Messages.Calendar_View_Action_ShowNothing;
+				}
+			},
+
+			/*
+			 * title - description
+			 */
+			new TourInfoFormatter() {
+				@Override
+				public String format(final CalendarTourData data) {
 					if (data.tourTitle != null && data.tourTitle.length() > 1) {
 						return data.tourTitle;
 					} else if (data.tourDescription != null && data.tourDescription.length() > 1) {
-						return data.tourDescription;
+						// for now we are only supporting one line descriptions
+						return data.tourDescription.replace("\r\n", " ").replace("\n", " ");
 					} else {
 						return UI.EMPTY_STRING;
 					}
@@ -141,7 +159,8 @@ public class CalendarView extends ViewPart implements ITourProvider {
 				@Override
 				public String format(final CalendarTourData data) {
 					if (data.tourDescription != null && data.tourDescription.length() > 1) {
-						return data.tourDescription;
+						// for now we are only supporting one line descriptions
+						return data.tourDescription.replace("\r\n", " ").replace("\n", " ");
 					} else if (data.tourTitle != null && data.tourTitle.length() > 1) {
 						return data.tourTitle;
 					} else {
@@ -589,7 +608,8 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		manager.add(_setNavigationStylePhysical);
 		manager.add(_setNavigationStyleLogical);
 		manager.add(new Separator());
-		manager.add(_setTourInfoColorLineColor);
+		manager.add(_setTourInfoTextColor);
+		manager.add(_setTourInfoBlackTextHighlight);
 
 	}
 
@@ -748,13 +768,21 @@ public class CalendarView extends ViewPart implements ITourProvider {
 			}
 		}
 
-		_setTourInfoColorLineColor = new Action(null, org.eclipse.jface.action.Action.AS_CHECK_BOX) {
+		_setTourInfoTextColor = new Action(null, org.eclipse.jface.action.Action.AS_CHECK_BOX) {
 			@Override
 			public void run() {
 				_calendarGraph.setTourInfoUseLineColor(this.isChecked());
 			}
 		};
-		_setTourInfoColorLineColor.setText(Messages.Calendar_View_Action_Text_Info_Color_Line_Color);
+		_setTourInfoTextColor.setText(Messages.Calendar_View_Action_TextColor);
+
+		_setTourInfoBlackTextHighlight = new Action(null, org.eclipse.jface.action.Action.AS_CHECK_BOX) {
+			@Override
+			public void run() {
+				_calendarGraph.setTourInfoUseHighlightTextBlack(this.isChecked());
+			}
+		};
+		_setTourInfoBlackTextHighlight.setText(Messages.Calendar_View_Action_BlackHighlightText);
 
 	}
 
@@ -817,16 +845,20 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		}
 
 		for (int i = 0; i < _numberOfInfoLines; i++) {
-			final int tourInfoFormatterIndex = Util.getStateInt(_state, STATE_TOUR_INFO_FORMATTER_INDEX_ + i, i);
+			final int tourInfoFormatterIndex = Util.getStateInt(_state, STATE_TOUR_INFO_FORMATTER_INDEX_ + i, i + 1);
 			_setTourInfoFormat[i][tourInfoFormatterIndex].run();
 		}
 
-		final boolean useLineColorForTourInfo = Util.getStateBoolean(
+		final boolean useTextColorForTourInfo = Util.getStateBoolean(_state, STATE_TOUR_INFO_TEXT_COLOR, false);
+		_setTourInfoTextColor.setChecked(useTextColorForTourInfo);
+		_setTourInfoTextColor.run();
+
+		final boolean useBlackForTextHightlight = Util.getStateBoolean(
 				_state,
-				STATE_TOUR_INFO_TEXT_COLOR_LINE_COLOR,
+				STATE_TOUR_INFO_BLACK_TEXT_HIGHLIGHT,
 				false);
-		_setTourInfoColorLineColor.setChecked(useLineColorForTourInfo);
-		_setTourInfoColorLineColor.run();
+		_setTourInfoBlackTextHighlight.setChecked(useBlackForTextHightlight);
+		_setTourInfoBlackTextHighlight.run();
 
 	}
 
@@ -855,7 +887,8 @@ public class CalendarView extends ViewPart implements ITourProvider {
 			_state.put(STATE_TOUR_INFO_FORMATTER_INDEX_ + i, _calendarGraph.getTourInfoFormatterIndex(i));
 		}
 
-		_state.put(STATE_TOUR_INFO_TEXT_COLOR_LINE_COLOR, _calendarGraph.getTourInfoUseLineLineColor());
+		_state.put(STATE_TOUR_INFO_TEXT_COLOR, _calendarGraph.getTourInfoUseTextColor());
+		_state.put(STATE_TOUR_INFO_BLACK_TEXT_HIGHLIGHT, _calendarGraph.getTourInfoUseHighlightTextBlack());
 	}
 
 	/**
