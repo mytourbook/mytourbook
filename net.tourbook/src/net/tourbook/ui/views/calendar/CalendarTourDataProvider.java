@@ -425,11 +425,18 @@ public class CalendarTourDataProvider {
 			final PreparedStatement statement = conn.prepareStatement(select);
 
 			final ResultSet result = statement.executeQuery();
-			result.next();
-			final int year = result.getShort(1);
-			final int month = result.getShort(2);
-			final int day = result.getShort(3);
-			_firstDateTime = new DateTime(year, month, day, 12, 0, 0, 0);
+			if (result.next()) {
+
+				final int year = result.getShort(1);
+				final int month = result.getShort(2);
+				final int day = result.getShort(3);
+
+				_firstDateTime = new DateTime(year, month, day, 12, 0, 0, 0);
+
+			} else {
+
+				_firstDateTime = new DateTime();
+			}
 			conn.close();
 		} catch (final SQLException e) {
 			UI.showSQLException(e);

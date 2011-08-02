@@ -96,6 +96,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	private ArrayList<RGB>						_rgbBright;
 	private ArrayList<RGB>						_rgbDark;
 	private ArrayList<RGB>						_rgbLine;
+	private ArrayList<RGB>						_rgbText;
 
 	private DateTime							_dt					= new DateTime();
 	private int									_numWeeksDisplayed	= 5;
@@ -213,16 +214,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		_rgbBright = new ArrayList<RGB>();
 		_rgbDark = new ArrayList<RGB>();
 		_rgbLine = new ArrayList<RGB>();
+		_rgbText = new ArrayList<RGB>();
 
-		/*
-		 * color index 1...n+1: tour type colors
-		 */
-		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
-		for (final TourType tourType : tourTypes) {
-			_rgbBright.add(tourType.getRGBBright());
-			_rgbDark.add(tourType.getRGBDark());
-			_rgbLine.add(tourType.getRGBLine());
-		}
+		updateTourTypeColors();
 
 //		final DateTime dt = new DateTime();
 //
@@ -805,7 +799,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		if (highlight) {
 			fg = _black;
 		} else if (_useLineColorForTourInfoText) {
-			fg = line;
+			fg = _colorCache.get(_rgbText.get(data.typeColorIndex).hashCode());
 		} else {
 			fg = _darkGray;
 		}
@@ -1540,6 +1534,25 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	void setZoom(final int numWeeksDisplayed) {
 		_numWeeksDisplayed = numWeeksDisplayed;
 		redraw();
+	}
+
+	void updateTourTypeColors() {
+		
+		_rgbBright.clear();
+		_rgbDark.clear();
+		_rgbLine.clear();
+		_rgbText.clear();
+		
+		/*
+		 * color index 1...n+1: tour type colors
+		 */
+		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
+		for (final TourType tourType : tourTypes) {
+			_rgbBright.add(tourType.getRGBBright());
+			_rgbDark.add(tourType.getRGBDark());
+			_rgbLine.add(tourType.getRGBLine());
+			_rgbText.add(tourType.getRGBText());
+		}
 	}
 
 	void zoomIn() {

@@ -446,6 +446,9 @@ public class CalendarView extends ViewPart implements ITourProvider {
 				} else if (property.equals(ITourbookPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK)) {
 					refreshCalendar();
 				} else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
+
+					_calendarGraph.updateTourTypeColors();
+
 					refreshCalendar();
 				}
 			}
