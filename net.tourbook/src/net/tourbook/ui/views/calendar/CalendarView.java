@@ -96,6 +96,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	private String								STATE_TOUR_INFO_FORMATTER_INDEX_		= "TourInfoFormatterIndex";					//$NON-NLS-1$
 	private String								STATE_TOUR_INFO_TEXT_COLOR			= "TourInfoUseTextColor";						//$NON-NLS-1$
 	private String								STATE_TOUR_INFO_BLACK_TEXT_HIGHLIGHT	= "TourInfoUseBlackTextHightlight";			//$NON-NLS-1$
+	private String								STATE_SHOW_DAY_NUMBER_IN_TINY_VIEW		= "ShowDayNumberInTinyView";
 
 	private Action								_forward, _back;
 	private Action								_zoomIn, _zoomOut;
@@ -108,6 +109,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	private Action[][]							_setTourInfoFormat;
 	private Action								_setTourInfoTextColor;
 	private Action								_setTourInfoBlackTextHighlight;
+	private Action								_setShowDayNumberInTinyView;
 
 	private int									_numberOfInfoLines						= 3;
 
@@ -610,6 +612,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		manager.add(new Separator());
 		manager.add(_setTourInfoTextColor);
 		manager.add(_setTourInfoBlackTextHighlight);
+		manager.add(_setShowDayNumberInTinyView);
 
 	}
 
@@ -784,6 +787,14 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		};
 		_setTourInfoBlackTextHighlight.setText(Messages.Calendar_View_Action_BlackHighlightText);
 
+		_setShowDayNumberInTinyView = new Action(null, org.eclipse.jface.action.Action.AS_CHECK_BOX) {
+			@Override
+			public void run() {
+				_calendarGraph.setShowDayNumberInTinyView(this.isChecked());
+			}
+		};
+		_setShowDayNumberInTinyView.setText(Messages.Calendar_View_Action_ShowDayNumberInTinyView);
+
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
@@ -860,6 +871,10 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		_setTourInfoBlackTextHighlight.setChecked(useBlackForTextHightlight);
 		_setTourInfoBlackTextHighlight.run();
 
+		final boolean showDayNumberInTinyView = Util.getStateBoolean(_state, STATE_SHOW_DAY_NUMBER_IN_TINY_VIEW, false);
+		_setShowDayNumberInTinyView.setChecked(showDayNumberInTinyView);
+		_setShowDayNumberInTinyView.run();
+
 	}
 
 	private void saveState() {
@@ -889,6 +904,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 
 		_state.put(STATE_TOUR_INFO_TEXT_COLOR, _calendarGraph.getTourInfoUseTextColor());
 		_state.put(STATE_TOUR_INFO_BLACK_TEXT_HIGHLIGHT, _calendarGraph.getTourInfoUseHighlightTextBlack());
+		_state.put(STATE_SHOW_DAY_NUMBER_IN_TINY_VIEW, _calendarGraph.getShowDayNumberInTinyView());
 	}
 
 	/**

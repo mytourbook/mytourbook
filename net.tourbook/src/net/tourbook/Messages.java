@@ -45,6 +45,7 @@ public class Messages extends NLS {
 	public static String		Calendar_View_Action_PhysicalNavigation;
 	public static String		Calendar_View_Action_ResizeTours;
 	public static String		Calendar_View_Action_ShowDescriptionTitle;
+	public static String		Calendar_View_Action_ShowDayNumberInTinyView;
 	public static String		Calendar_View_Action_ShowDistanceSpeed;
 	public static String		Calendar_View_Action_ShowDistanceTime;
 	public static String		Calendar_View_Action_ShowNothing;
@@ -1368,6 +1369,7 @@ public class Messages extends NLS {
 	public static String		Year_Statistic_Combo_LastYears_Tooltip;
 	public static String		Year_Statistic_Combo_NumberOfYears_Tooltip;
 	public static String		Year_Statistic_Label_NumberOfYears;
+
 
 	static {
 		// initialize resource bundle
