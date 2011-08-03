@@ -52,6 +52,8 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
@@ -199,7 +201,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 
 		boolean isTour() {
-			return (id != 0 && type == SelectionType.TOUR);
+			return (id > 0 && type == SelectionType.TOUR);
 		}
 
 	}
@@ -250,7 +252,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					_tourDoubleClickState.canEditMarker = true;
 					_tourDoubleClickState.canAdjustAltitude = true;
 					TourManager.getInstance().tourDoubleClickAction(CalendarGraph.this, _tourDoubleClickState);
-
 				}
 
 			}
@@ -285,16 +286,31 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			}
 		});
 
-		addListener(SWT.Traverse, new Listener() {
-			public void handleEvent(final Event event) {
-				switch (event.detail) {
+		addTraverseListener(new TraverseListener() {
+			@Override
+			public void keyTraversed(final TraverseEvent e) {
+				switch (e.detail) {
+				case SWT.TRAVERSE_RETURN:
+					if (_selectedItem.isTour()) {
+						_tourDoubleClickState.canEditTour = true;
+						_tourDoubleClickState.canOpenTour = true;
+						_tourDoubleClickState.canQuickEditTour = true;
+						_tourDoubleClickState.canEditMarker = true;
+						_tourDoubleClickState.canAdjustAltitude = true;
+						TourManager.getInstance().tourDoubleClickAction(CalendarGraph.this, _tourDoubleClickState);
+					} else {
+						gotoNextTour();
+					}
+					break;
+				case SWT.TRAVERSE_ESCAPE:
+					_selectedItem = _noItem;
+					redraw();
+					break;
 				case SWT.TRAVERSE_PAGE_NEXT:
 				case SWT.TRAVERSE_PAGE_PREVIOUS:
-					// case SWT.TRAVERSE_RETURN:
-				case SWT.TRAVERSE_ESCAPE:
 				case SWT.TRAVERSE_TAB_NEXT:
 				case SWT.TRAVERSE_TAB_PREVIOUS:
-					event.doit = true;
+					e.doit = true;
 					break;
 				}
 			}
@@ -304,44 +320,56 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			public void handleEvent(final Event event) {
 				switch (event.keyCode) {
 				case SWT.ARROW_LEFT:
-					switch (_navigationStyle) {
-					case PHYSICAL:
-						gotoTourOtherWeekday(-1);
-						break;
-					case LOGICAL:
-						gotoPrevTour();
-						break;
-					}
+					gotoPrevTour();
+//					switch (_navigationStyle) {
+//					case PHYSICAL:
+//						gotoTourOtherWeekday(-1);
+//						break;
+//					case LOGICAL:
+//						gotoPrevTour();
+//						break;
+//					}
 					break;
 				case SWT.ARROW_RIGHT:
-					switch (_navigationStyle) {
-					case PHYSICAL:
-						gotoTourOtherWeekday(+1);
-						break;
-					case LOGICAL:
-						gotoNextTour();
-						break;
-					}
+					gotoNextTour();
+//					switch (_navigationStyle) {
+//					case PHYSICAL:
+//						gotoTourOtherWeekday(+1);
+//						break;
+//					case LOGICAL:
+//						gotoNextTour();
+//						break;
+//					}
 					break;
 				case SWT.ARROW_UP:
-					switch (_navigationStyle) {
-					case PHYSICAL:
+					if (_selectedItem.isTour()) {
 						gotoTourSameWeekday(-1);
-						break;
-					case LOGICAL:
+					} else {
 						gotoPrevWeek();
-						break;
 					}
+//					switch (_navigationStyle) {
+//					case PHYSICAL:
+//						gotoTourSameWeekday(-1);
+//						break;
+//					case LOGICAL:
+//						gotoPrevWeek();
+//						break;
+//					}
 					break;
 				case SWT.ARROW_DOWN:
-					switch (_navigationStyle) {
-					case PHYSICAL:
+					if (_selectedItem.isTour()) {
 						gotoTourSameWeekday(+1);
-						break;
-					case LOGICAL:
+					} else {
 						gotoNextWeek();
-						break;
 					}
+//					switch (_navigationStyle) {
+//					case PHYSICAL:
+//						gotoTourSameWeekday(+1);
+//						break;
+//					case LOGICAL:
+//						gotoNextWeek();
+//						break;
+//					}
 					break;
 				case SWT.PAGE_DOWN:
 					gotoNextScreen();
@@ -377,23 +405,33 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				final Point p = new Point(event.x, event.y);
 				if (_calendarAllDaysRectangle.contains(p)) {
 					if (event.count > 0) {
-						if (_calendarFirstWeekRectangle.contains(p) || _calendarLastWeekRectangle.contains(p)) {
-							gotoTourSameWeekday(-1);
-						} else {
+//						if (_calendarFirstWeekRectangle.contains(p) || _calendarLastWeekRectangle.contains(p)) {
+//							gotoTourSameWeekday(-1);
+//						} else {
+//							gotoPrevTour();
+//						}
+						if (_selectedItem.isTour()) {
 							gotoPrevTour();
+						} else {
+							gotoPrevWeek();
 						}
 					} else {
-						if (_calendarFirstWeekRectangle.contains(p) || _calendarLastWeekRectangle.contains(p)) {
-							gotoTourSameWeekday(1);
-						} else {
+//						if (_calendarFirstWeekRectangle.contains(p) || _calendarLastWeekRectangle.contains(p)) {
+//							gotoTourSameWeekday(1);
+//						} else {
+//							gotoNextTour();
+//						}
+						if (_selectedItem.isTour()) {
 							gotoNextTour();
+						} else {
+							gotoNextWeek();
 						}
 					}
-				} else {
+				} else { // left or right column, scroll by pages
 					if (event.count > 0) {
-						gotoPrevWeek();
+						gotoPrevScreen();
 					} else {
-						gotoNextWeek();
+						gotoNextScreen();
 					}
 				}
 				event.doit = false;

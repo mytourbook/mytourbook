@@ -607,9 +607,9 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		manager.add(new Separator());
 		manager.add(_setTourSizeDynamic);
 		manager.add(new Separator());
-		manager.add(_setNavigationStylePhysical);
-		manager.add(_setNavigationStyleLogical);
-		manager.add(new Separator());
+//		manager.add(_setNavigationStylePhysical);
+//		manager.add(_setNavigationStyleLogical);
+//		manager.add(new Separator());
 		manager.add(_setTourInfoTextColor);
 		manager.add(_setTourInfoBlackTextHighlight);
 		manager.add(_setShowDayNumberInTinyView);
