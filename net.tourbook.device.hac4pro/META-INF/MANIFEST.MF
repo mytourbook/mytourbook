@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Device Reader for HAC4pro
 Bundle-SymbolicName: net.tourbook.device.hac4pro;singleton:=true
-Bundle-Version: 11.8.0.qualifier
+Bundle-Version: 11.8.1.qualifier
 Bundle-Activator: net.tourbook.device.hac4pro.Activator
 Bundle-Vendor: MyTourbook
 Require-Bundle: org.eclipse.core.runtime,
