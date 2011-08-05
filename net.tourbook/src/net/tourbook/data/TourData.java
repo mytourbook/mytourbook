@@ -793,8 +793,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	@Transient
 	public float[]											segmentSeriePulse;
 
-	@Transient
-	public float[]											segmentSerieCadence;
+//	@Transient
+//	public float[]											segmentSerieCadence;
 
 	/**
 	 * contains the filename from which the data are imported, when set to <code>null</code> the
@@ -3190,10 +3190,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		segmentSerieSpeed = new float[segmentSerieLength];
 		segmentSeriePace = new float[segmentSerieLength];
 
+		segmentSeriePulse = new float[segmentSerieLength];
 		segmentSeriePower = new float[segmentSerieLength];
 		segmentSerieGradient = new float[segmentSerieLength];
-		segmentSerieCadence = new float[segmentSerieLength];
-		segmentSeriePulse = new float[segmentSerieLength];
+//		segmentSerieCadence = new float[segmentSerieLength];
 
 		// compute values between start and end
 		for (int segmentIndex = 1; segmentIndex < segmentSerieLength; segmentIndex++) {

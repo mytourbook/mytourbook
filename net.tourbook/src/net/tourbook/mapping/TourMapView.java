@@ -1023,6 +1023,11 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 				 */
 				for (final int dataValue : dataSerie) {
 
+					// patch from Kenny Moens / 2011-08-04
+					if (dataValue == 0) {
+						continue;
+					}
+					
 					if (setInitialValue) {
 						setInitialValue = false;
 						minValue = maxValue = dataValue;
