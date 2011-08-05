@@ -44,11 +44,14 @@ import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 import net.tourbook.util.PostSelectionProvider;
+import net.tourbook.util.Util;
 
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
@@ -72,10 +75,13 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.jface.viewers.ViewerRow;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -95,6 +101,7 @@ import org.eclipse.ui.part.ViewPart;
 public class TourMarkerView extends ViewPart implements ITourProvider {
 
 	public static final String		ID						= "net.tourbook.views.TourMarkerView";				//$NON-NLS-1$
+	private final String			STATE_SHOW_DELTA		= "showDelta";
 
 	public static final int			COLUMN_TIME				= 0;
 	public static final int			COLUMN_DISTANCE			= 1;
@@ -104,6 +111,8 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 	public static final int			COLUMN_Y_OFFSET			= 5;
 
 	private final IPreferenceStore	_prefStore				= TourbookPlugin.getDefault().getPreferenceStore();
+	private final IDialogSettings	_state					= TourbookPlugin.getDefault().getDialogSettingsSection(
+																	"TourMarkerView");							//$NON-NLS-1$
 
 	private TourData				_tourData;
 
@@ -114,6 +123,10 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 	private IPartListener2			_partListener;
 
 	private PixelConverter			_pc;
+
+	private Action					_showDeltaAction;
+	private boolean					_showDelta				= false;
+	private Font					_boldFont				= null;
 
 	private final NumberFormat		_nf_3_3					= NumberFormat.getNumberInstance();
 	{
@@ -174,6 +187,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourMarkerView.this) {
 //					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourMarkerView.this);
+					saveState();
 				}
 			}
 
@@ -309,6 +323,8 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 	@Override
 	public void createPartControl(final Composite parent) {
 
+		restoreState();
+
 		createUI(parent);
 
 		_actionEditTourMarkers = new ActionOpenMarkerDialog(this, true);
@@ -317,6 +333,10 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 		addTourEventListener();
 		addPrefListener();
 		addPartListener();
+
+		makeActions();
+
+		getViewSite().getActionBars().getToolBarManager().add(_showDeltaAction);
 
 		// this part is a selection provider
 		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider());
@@ -416,7 +436,6 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 		tvcColumn = tvc.getColumn();
 		tvcColumn.setText(UI.UNIT_LABEL_DISTANCE);
 		tvcColumn.setToolTipText(Messages.Tour_Marker_Column_km_tooltip);
-
 		tvc.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -436,6 +455,66 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 			}
 		});
 		tableLayout.setColumnData(tvcColumn, new ColumnPixelData(_pc.convertWidthInCharsToPixels(11), false));
+
+		if (_showDelta) {
+			// column: delta distance km/mi
+			tvc = new TableViewerColumn(_markerViewer, SWT.TRAIL);
+			tvcColumn = tvc.getColumn();
+			tvcColumn.setText("\u0394 " + UI.UNIT_LABEL_DISTANCE);
+			tvc.setLabelProvider(new CellLabelProvider() {
+				@Override
+				public void update(final ViewerCell cell) {
+
+					final TourMarker tourMarker = (TourMarker) cell.getElement();
+
+					final int markerDistance = tourMarker.getDistance();
+					if (markerDistance == -1) {
+						cell.setText(UI.EMPTY_STRING);
+					} else {
+						int prevDistance = 0;
+						final ViewerRow lastRow = cell.getViewerRow().getNeighbor(ViewerRow.ABOVE, false);
+						if (null != lastRow) {
+							prevDistance = ((TourMarker) lastRow.getElement()).getDistance();
+							prevDistance = prevDistance < 0 ? 0 : prevDistance;
+						}
+						cell.setText(_nf_3_3.format(((float) (markerDistance - prevDistance))
+								/ 1000
+								/ UI.UNIT_VALUE_DISTANCE));
+					}
+				}
+			});
+			tableLayout.setColumnData(tvcColumn, new ColumnPixelData(_pc.convertWidthInCharsToPixels(11), false));
+
+			// column: delta-time
+			tvc = new TableViewerColumn(_markerViewer, SWT.TRAIL);
+			tvcColumn = tvc.getColumn();
+			tvcColumn.setText("\u0394 " + Messages.Tour_Marker_Column_time);
+			tvc.setLabelProvider(new CellLabelProvider() {
+				@Override
+				public void update(final ViewerCell cell) {
+					final ViewerRow lastRow = cell.getViewerRow().getNeighbor(ViewerRow.ABOVE, false);
+					int lastTime = 0;
+					if (null != lastRow) {
+						lastTime = ((TourMarker) lastRow.getElement()).getTime();
+					}
+					cell.setText(UI.format_hh_mm_ss(((TourMarker) cell.getElement()).getTime() - lastTime));
+					final String text = ((TourMarker) cell.getElement()).getLabel();
+					if (text.endsWith("!")) {
+						final Display display = Display.getCurrent();
+						if (null != display) {
+							cell.setForeground(display.getSystemColor(SWT.COLOR_RED));
+						}
+						if (null == _boldFont) {
+							final FontData fd = (cell.getFont().getFontData())[0];
+							fd.setStyle(SWT.BOLD);
+							_boldFont = new Font(Display.getCurrent(), fd);
+						}
+						cell.setFont(_boldFont);
+					}
+				}
+			});
+			tableLayout.setColumnData(tvcColumn, new ColumnPixelData(_pc.convertWidthInCharsToPixels(12), false));
+		}
 
 		// column: remark
 		tvc = new TableViewerColumn(_markerViewer, SWT.LEAD);
@@ -514,6 +593,9 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 		getViewSite().getPage().removePartListener(_partListener);
 
 		_prefStore.removePropertyChangeListener(_prefChangeListener);
+		if (null != _boldFont) {
+			_boldFont.dispose();
+		}
 
 		super.dispose();
 	}
@@ -600,6 +682,26 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 		return false;
 	}
 
+	private void makeActions() {
+		_showDeltaAction = new Action(null, org.eclipse.jface.action.Action.AS_CHECK_BOX) {
+			@Override
+			public void run() {
+				_showDelta = this.isChecked();
+				final Control[] children = _viewerContainer.getChildren();
+				for (final Control element : children) {
+					element.dispose();
+				}
+				createUI10TableViewer(_viewerContainer);
+				_viewerContainer.layout();
+				// update the viewer
+				_markerViewer.setInput(this);
+			}
+		};
+		_showDeltaAction.setText("\u0394");
+		_showDeltaAction.setChecked(_showDelta);
+		
+	}
+
 	private void onSelectionChanged(final ISelection selection) {
 
 		long tourId = TourDatabase.ENTITY_IS_NOT_SAVED;
@@ -672,6 +774,18 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 		}
 
 		_actionEditTourMarkers.setEnabled(isTour);
+	}
+
+	private void restoreState() {
+		
+		_showDelta = Util.getStateBoolean(_state, STATE_SHOW_DELTA, false);
+		
+	}
+
+	private void saveState() {
+
+		_state.put(STATE_SHOW_DELTA, _showDelta);
+
 	}
 
 	@Override
