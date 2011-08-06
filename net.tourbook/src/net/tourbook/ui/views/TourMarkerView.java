@@ -100,8 +100,9 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourMarkerView extends ViewPart implements ITourProvider {
 
-	public static final String		ID						= "net.tourbook.views.TourMarkerView";				//$NON-NLS-1$
-	private final String			STATE_SHOW_DELTA		= "showDelta";
+	public static final String		ID						= "net.tourbook.views.TourMarkerView";					//$NON-NLS-1$
+
+	private final String			STATE_SHOW_DELTA		= "showDelta";											//$NON-NLS-1$
 
 	public static final int			COLUMN_TIME				= 0;
 	public static final int			COLUMN_DISTANCE			= 1;
@@ -111,8 +112,8 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 	public static final int			COLUMN_Y_OFFSET			= 5;
 
 	private final IPreferenceStore	_prefStore				= TourbookPlugin.getDefault().getPreferenceStore();
-	private final IDialogSettings	_state					= TourbookPlugin.getDefault().getDialogSettingsSection(
-																	"TourMarkerView");							//$NON-NLS-1$
+	private final IDialogSettings	_state					= TourbookPlugin.getDefault()//
+																	.getDialogSettingsSection("TourMarkerView");	//$NON-NLS-1$
 
 	private TourData				_tourData;
 
@@ -122,10 +123,12 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 	private ITourEventListener		_tourPropertyListener;
 	private IPartListener2			_partListener;
 
+	private ActionOpenMarkerDialog	_actionEditTourMarkers;
+	private Action					_actionShowDelta;
+
 	private PixelConverter			_pc;
 
-	private Action					_showDeltaAction;
-	private boolean					_showDelta				= false;
+	private boolean					_isShowDelta			= false;
 	private Font					_boldFont				= null;
 
 	private final NumberFormat		_nf_3_3					= NumberFormat.getNumberInstance();
@@ -133,6 +136,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 		_nf_3_3.setMinimumFractionDigits(3);
 		_nf_3_3.setMaximumFractionDigits(3);
 	}
+
 	/*
 	 * UI controls
 	 */
@@ -142,8 +146,6 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 
 	private TableViewer				_markerViewer;
 	private Chart					_tourChart;
-
-	private ActionOpenMarkerDialog	_actionEditTourMarkers;
 
 	class MarkerViewerContentProvicer implements IStructuredContentProvider {
 
@@ -320,23 +322,46 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 		_pageBook.showPage(_pageNoChart);
 	}
 
+	private void createActions() {
+
+		_actionEditTourMarkers = new ActionOpenMarkerDialog(this, true);
+
+		_actionShowDelta = new Action(null, Action.AS_CHECK_BOX) {
+			@Override
+			public void run() {
+				_isShowDelta = this.isChecked();
+				final Control[] children = _viewerContainer.getChildren();
+				for (final Control element : children) {
+					element.dispose();
+				}
+				createUI10TableViewer(_viewerContainer);
+				_viewerContainer.layout();
+				// update the viewer
+				_markerViewer.setInput(this);
+			}
+		};
+		_actionShowDelta.setText(UI.SYMBOL_DIFFERENCE);
+		_actionShowDelta.setChecked(_isShowDelta);
+
+		/*
+		 * fill view toolbar
+		 */
+		getViewSite().getActionBars().getToolBarManager().add(_actionShowDelta);
+	}
+
 	@Override
 	public void createPartControl(final Composite parent) {
 
-		restoreState();
+		restoreStateBeforeUI();
 
 		createUI(parent);
-
-		_actionEditTourMarkers = new ActionOpenMarkerDialog(this, true);
 
 		addSelectionListener();
 		addTourEventListener();
 		addPrefListener();
 		addPartListener();
 
-		makeActions();
-
-		getViewSite().getActionBars().getToolBarManager().add(_showDeltaAction);
+		createActions();
 
 		// this part is a selection provider
 		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider());
@@ -382,7 +407,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 		/*
 		 * create table
 		 */
-		final Table table = new Table(layoutContainer, SWT.FULL_SELECTION | SWT.MULTI | SWT.BORDER);
+		final Table table = new Table(layoutContainer, SWT.FULL_SELECTION | SWT.MULTI /* | SWT.BORDER */);
 
 		table.setLayout(new TableLayout());
 		table.setHeaderVisible(true);
@@ -456,11 +481,12 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 		});
 		tableLayout.setColumnData(tvcColumn, new ColumnPixelData(_pc.convertWidthInCharsToPixels(11), false));
 
-		if (_showDelta) {
+		if (_isShowDelta) {
+
 			// column: delta distance km/mi
 			tvc = new TableViewerColumn(_markerViewer, SWT.TRAIL);
 			tvcColumn = tvc.getColumn();
-			tvcColumn.setText("\u0394 " + UI.UNIT_LABEL_DISTANCE);
+			tvcColumn.setText(UI.SYMBOL_DIFFERENCE + UI.UNIT_LABEL_DISTANCE);
 			tvc.setLabelProvider(new CellLabelProvider() {
 				@Override
 				public void update(final ViewerCell cell) {
@@ -488,7 +514,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 			// column: delta-time
 			tvc = new TableViewerColumn(_markerViewer, SWT.TRAIL);
 			tvcColumn = tvc.getColumn();
-			tvcColumn.setText("\u0394 " + Messages.Tour_Marker_Column_time);
+			tvcColumn.setText(UI.SYMBOL_DIFFERENCE + Messages.Tour_Marker_Column_time);
 			tvc.setLabelProvider(new CellLabelProvider() {
 				@Override
 				public void update(final ViewerCell cell) {
@@ -499,7 +525,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 					}
 					cell.setText(UI.format_hh_mm_ss(((TourMarker) cell.getElement()).getTime() - lastTime));
 					final String text = ((TourMarker) cell.getElement()).getLabel();
-					if (text.endsWith("!")) {
+					if (text.endsWith(UI.SYMBOL_EXCLAMATION_POINT)) {
 						final Display display = Display.getCurrent();
 						if (null != display) {
 							cell.setForeground(display.getSystemColor(SWT.COLOR_RED));
@@ -682,26 +708,6 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 		return false;
 	}
 
-	private void makeActions() {
-		_showDeltaAction = new Action(null, org.eclipse.jface.action.Action.AS_CHECK_BOX) {
-			@Override
-			public void run() {
-				_showDelta = this.isChecked();
-				final Control[] children = _viewerContainer.getChildren();
-				for (final Control element : children) {
-					element.dispose();
-				}
-				createUI10TableViewer(_viewerContainer);
-				_viewerContainer.layout();
-				// update the viewer
-				_markerViewer.setInput(this);
-			}
-		};
-		_showDeltaAction.setText("\u0394");
-		_showDeltaAction.setChecked(_showDelta);
-		
-	}
-
 	private void onSelectionChanged(final ISelection selection) {
 
 		long tourId = TourDatabase.ENTITY_IS_NOT_SAVED;
@@ -776,15 +782,15 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 		_actionEditTourMarkers.setEnabled(isTour);
 	}
 
-	private void restoreState() {
-		
-		_showDelta = Util.getStateBoolean(_state, STATE_SHOW_DELTA, false);
-		
+	private void restoreStateBeforeUI() {
+
+		_isShowDelta = Util.getStateBoolean(_state, STATE_SHOW_DELTA, false);
+
 	}
 
 	private void saveState() {
 
-		_state.put(STATE_SHOW_DELTA, _showDelta);
+		_state.put(STATE_SHOW_DELTA, _isShowDelta);
 
 	}
 
