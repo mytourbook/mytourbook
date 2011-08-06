@@ -897,18 +897,18 @@ public class TourChart extends Chart {
 			}
 		}
 
-		boolean isAltitudeVisible = false;
-		boolean isPulseVisible = false;
-
-		for (final int graphId : visibleGraphIds) {
-
-			if (graphId == TourManager.GRAPH_ALTITUDE) {
-				isAltitudeVisible = true;
-			}
-			if (graphId == TourManager.GRAPH_PULSE) {
-				isPulseVisible = true;
-			}
-		}
+//		boolean isAltitudeVisible = false;
+//		boolean isPulseVisible = false;
+//
+//		for (final int graphId : visibleGraphIds) {
+//
+//			if (graphId == TourManager.GRAPH_ALTITUDE) {
+//				isAltitudeVisible = true;
+//			}
+//			if (graphId == TourManager.GRAPH_PULSE) {
+//				isPulseVisible = true;
+//			}
+//		}
 
 		TCActionProxy proxy;
 
@@ -922,7 +922,7 @@ public class TourChart extends Chart {
 		/*
 		 * HR zones
 		 */
-		final boolean canShowHrZones = _tourChartConfig.canShowHrZones && (isAltitudeVisible || isPulseVisible);
+		final boolean canShowHrZones = _tourChartConfig.canShowHrZones;// && (isAltitudeVisible || isPulseVisible);
 		final String currentHrZoneStyle = _tourChartConfig.hrZoneStyle;
 
 		proxy = _actionProxies.get(COMMAND_ID_HR_ZONE_DROPDOWN_MENU);
@@ -1217,6 +1217,9 @@ public class TourChart extends Chart {
 		if (yDataWithLabels == null) {
 			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_TEMPERATURE);
 		}
+		if (yDataWithLabels == null) {
+			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_CADENCE);
+		}
 
 		setGraphDataLayers(TourManager.CUSTOM_DATA_ALTITUDE, _tourData.segmentSerieAltitudeDiff, yDataWithLabels);
 		setGraphDataLayers(TourManager.CUSTOM_DATA_PULSE, _tourData.segmentSeriePulse, yDataWithLabels);
@@ -1226,6 +1229,7 @@ public class TourChart extends Chart {
 		setGraphDataLayers(TourManager.CUSTOM_DATA_GRADIENT, _tourData.segmentSerieGradient, yDataWithLabels);
 		setGraphDataLayers(TourManager.CUSTOM_DATA_ALTIMETER, _tourData.segmentSerieAltitudeUpH, yDataWithLabels);
 		setGraphDataLayers(TourManager.CUSTOM_DATA_TEMPERATURE, null, yDataWithLabels);
+		setGraphDataLayers(TourManager.CUSTOM_DATA_CADENCE, null, yDataWithLabels);
 	}
 
 	/**
@@ -1281,10 +1285,14 @@ public class TourChart extends Chart {
 		/*
 		 * HR zone painter
 		 */
-		final ChartDataYSerie yDataPulse = (ChartDataYSerie) dataModel.getCustomData(//
-				TourManager.CUSTOM_DATA_PULSE);
-
-		if ((yData == yDataPulse || yData == yDataAltitude) && _hrZonePainter != null) {
+//		final ChartDataYSerie yDataPulse = (ChartDataYSerie) dataModel.getCustomData(//
+//				TourManager.CUSTOM_DATA_PULSE);
+//
+//		if ((yData == yDataPulse || yData == yDataAltitude) && _hrZonePainter != null) {
+//			yData.setCustomFillPainter(_hrZonePainter);
+//		}
+		
+		if (_hrZonePainter != null) {
 			yData.setCustomFillPainter(_hrZonePainter);
 		}
 

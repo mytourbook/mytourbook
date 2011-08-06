@@ -1,0 +1,5 @@
+Improvements
+Tour chart
+  -show HR zone background color in all graphs
+
+-irnore 0 pulse values in the map (patch from Kenny Moens)

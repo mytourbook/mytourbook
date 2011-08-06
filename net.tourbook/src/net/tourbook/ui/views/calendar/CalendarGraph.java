@@ -128,7 +128,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	private int									_scrollBarShift;
 	private int									_scrollBarLastSelection;
-	private boolean								_scrollDebug = false;
+	private boolean								_scrollDebug				= false;
 
 	private int									_numberOfToursPerDay	= 3;
 	private boolean								_dynamicTourFieldSize	= true;
@@ -518,6 +518,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			oldGc.drawImage(_highlight, 0, 0);
 			_highlight.dispose();
 			return;
+		}
+
+		if (_scrollDebug) {
+			System.out.println("Drawing year: " + _dt.getYear() + " week: " + _dt.getWeekOfWeekyear());
 		}
 
 		if (_image != null && !_image.isDisposed()) {
@@ -1203,8 +1207,13 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		final DateTime dt = _dataProvider.getCalendarTourDateTime(tourId);
 
 		_selectedItem = new Selection(tourId, SelectionType.TOUR);
-		_graphClean = false;
-		gotoDate(dt);
+
+		if (dt.isBefore(_dt) || dt.isAfter(_dt.plusWeeks(_numWeeksDisplayed))) {
+			_graphClean = false;
+			gotoDate(dt);
+		} else {
+			redraw();
+		}
 	}
 
 	private void gotoTourOffset(int offset) {
@@ -1539,6 +1548,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		// sb.setPageIncrement(_numWeeksDisplayed);
 
 		if (_scrollDebug) {
+			System.out.println("SbarStart: " + scrollBarStart().getWeekOfWeekyear());
 			System.out.println("SbarShift: " + _scrollBarShift + " - Selected Week: " + selection); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
@@ -1577,13 +1587,14 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	}
 
 	private DateTime scrollBarStart() {
-		DateTime dt = _dataProvider.getFirstDateTime().plusWeeks(_scrollBarShift);
+		// DateTime dt = _dataProvider.getFirstDateTime().plusWeeks(_scrollBarShift);
+		DateTime dt = _dataProvider.getFirstDateTime();
 		final DateTime now = new DateTime();
 		final int weeks = (int) ((now.getMillis() - dt.getMillis()) / _WEEK_MILLIS);
 		if (weeks < _MIN_SCROLLABLE_WEEKS) { // ensure the scrollable area has a reasonable size
 			dt = now.minusWeeks(_MIN_SCROLLABLE_WEEKS);
 		}
-
+		dt = dt.plusWeeks(_scrollBarShift);
 		// ensure the date return is a "FirstDayOfTheWeek" !!!
 		return dt.minusWeeks(1).withDayOfWeek(getFirstDayOfWeek());
 	}
@@ -1712,12 +1723,14 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		_numWeeksDisplayed = _numWeeksDisplayed > 1 ? --_numWeeksDisplayed : _numWeeksDisplayed;
 		_graphClean = false;
 		redraw();
+		scrollBarUpdate();
 	}
 
 	void zoomOut() {
 		_numWeeksDisplayed++;
 		_graphClean = false;
 		redraw();
+		scrollBarUpdate();
 	}
 
 }

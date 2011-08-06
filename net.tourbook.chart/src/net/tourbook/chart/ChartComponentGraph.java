@@ -2510,7 +2510,7 @@ public class ChartComponentGraph extends Canvas {
 		final Color colorBgBright = new Color(display, rgbBgBright);
 
 		gcGraph.setAntialias(SWT.OFF);
-//		gcGraph.setAlpha(alphaValue);
+		gcGraph.setAlpha(alphaValue);
 
 		final int graphWidth = xValues[Math.min(xValueLength - 1, endIndex)] - graphValueOffsetAdjusted;
 

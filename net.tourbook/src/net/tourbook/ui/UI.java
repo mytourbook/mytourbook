@@ -167,6 +167,7 @@ public class UI {
 
 	public static final String								SYMBOL_AVERAGE					= "\u00f8";								//$NON-NLS-1$
 	public static final String								SYMBOL_AVERAGE_WITH_SPACE		= "\u00f8 ";								//$NON-NLS-1$
+	public static final String								SYMBOL_DIFFERENCE				= "\u0394";								//$NON-NLS-1$
 	public static final String								SYMBOL_DIFFERENCE_WITH_SPACE	= "\u0394 ";								//$NON-NLS-1$
 	public static final String								SYMBOL_SUM_WITH_SPACE			= "\u2211 ";								//$NON-NLS-1$
 	public static final String								SYMBOL_DOUBLE_HORIZONTAL		= "\u2550";								//$NON-NLS-1$
@@ -181,6 +182,7 @@ public class UI {
 	public static final String								SYMBOL_LESS_THAN				= "<";										//$NON-NLS-1$
 	public static final String								SYMBOL_PERCENTAGE				= "%";										//$NON-NLS-1$
 	public static final String								SYMBOL_WIND_WITH_SPACE			= "W ";									//$NON-NLS-1$
+	public static final String								SYMBOL_EXCLAMATION_POINT		= "!";										//$NON-NLS-1$
 
 	/**
 	 * Imperial system for distance
@@ -356,7 +358,7 @@ public class UI {
 
 	/**
 	 * Change the title for the application
-	 *
+	 * 
 	 * @param newTitle
 	 *            new title for the application or <code>null</code> to set the original title
 	 */
@@ -481,7 +483,7 @@ public class UI {
 
 	/**
 	 * Checks if tour id is contained in the property data
-	 *
+	 * 
 	 * @param propertyData
 	 * @param checkedTourId
 	 * @return Returns the tour id when it is contained in the property data, otherwise it returns
@@ -565,7 +567,7 @@ public class UI {
 
 	/**
 	 * Display text as a bulleted list
-	 *
+	 * 
 	 * @param parent
 	 * @param bulletText
 	 * @param startLine
@@ -621,7 +623,7 @@ public class UI {
 
 	/**
 	 * Creates a label which is wrapped and grabs the width.
-	 *
+	 * 
 	 * @param formToolkit
 	 * @param parent
 	 * @param labelText
@@ -675,7 +677,7 @@ public class UI {
 
 	/**
 	 * Hours are ignored when they are 0. An empty string is returned when time = <code>-1</code>
-	 *
+	 * 
 	 * @param time
 	 * @return
 	 */
@@ -710,7 +712,7 @@ public class UI {
 
 	/**
 	 * force hours to be displayed
-	 *
+	 * 
 	 * @param time
 	 * @return
 	 */
@@ -784,7 +786,7 @@ public class UI {
 
 	/******************************************************************************
 	 * this method is copied from the following source and was adjusted
-	 *
+	 * 
 	 * <pre>
 	 * Product: Compiere ERP &amp; CRM Smart Business Solution                    *
 	 * Copyright (C) 1999-2006 ComPiere, Inc. All Rights Reserved.                *
@@ -801,7 +803,7 @@ public class UI {
 	 * ComPiere, Inc., 2620 Augustine Dr. #245, Santa Clara, CA 95054, USA        *
 	 * or via info@compiere.org or http://www.compiere.org/license.html           *
 	 * </pre>
-	 *
+	 * 
 	 * @return date formatter with leading zeros for month and day and 4-digit year
 	 */
 	public static DateFormat getFormatterDateShort() {
@@ -873,7 +875,7 @@ public class UI {
 
 	/******************************************************************************
 	 * this method is copied from the following source and was adjusted
-	 *
+	 * 
 	 * <pre>
 	 * Product: Compiere ERP &amp; CRM Smart Business Solution                    *
 	 * Copyright (C) 1999-2006 ComPiere, Inc. All Rights Reserved.                *
@@ -890,7 +892,7 @@ public class UI {
 	 * ComPiere, Inc., 2620 Augustine Dr. #245, Santa Clara, CA 95054, USA        *
 	 * or via info@compiere.org or http://www.compiere.org/license.html           *
 	 * </pre>
-	 *
+	 * 
 	 * @return date formatter with leading zeros for month and day and 4-digit year
 	 */
 	public static DateFormat getFormatterTimeShort() {
@@ -938,7 +940,7 @@ public class UI {
 
 	/**
 	 * Checks if propertyData has the same tour as the oldTourData
-	 *
+	 * 
 	 * @param propertyData
 	 * @param oldTourData
 	 * @return Returns {@link TourData} from the propertyData or <code>null</code> when it's another
@@ -980,7 +982,7 @@ public class UI {
 
 	/**
 	 * Restore the sash weight from a memento
-	 *
+	 * 
 	 * @param sash
 	 * @param fMemento
 	 * @param weightKey
@@ -1015,7 +1017,7 @@ public class UI {
 
 	/**
 	 * Store the weights for the sash in a memento
-	 *
+	 * 
 	 * @param sash
 	 * @param memento
 	 * @param weightKey
@@ -1031,7 +1033,7 @@ public class UI {
 
 	/**
 	 * Set grid layout with no margins for a composite
-	 *
+	 * 
 	 * @param composite
 	 */
 	public static void set0GridLayout(final Composite composite) {
@@ -1098,7 +1100,7 @@ public class UI {
 
 	/**
 	 * set the tag colors in the JFace color registry from the pref store
-	 *
+	 * 
 	 * @param prefs
 	 */
 	public static void setViewColorsFromPrefStore() {
@@ -1197,7 +1199,7 @@ public class UI {
 
 	/**
 	 * Sets the tour type image and text into a {@link CLabel}
-	 *
+	 * 
 	 * @param tourData
 	 * @param lblTourType
 	 * @param isTextDisplayed
@@ -1459,7 +1461,7 @@ public class UI {
 	/**
 	 * The image descriptor is cached because the creation takes system resources and it's called
 	 * very often
-	 *
+	 * 
 	 * @param tourTypeId
 	 *            Tour type id
 	 * @return Returns image descriptor for the tour type id
@@ -1510,7 +1512,7 @@ public class UI {
 
 	/**
 	 * updates an existing tour type image
-	 *
+	 * 
 	 * @param existingImage
 	 */
 	private Image updateTourTypeImage(final Image existingImage, final long typeId, final String keyColorId) {
