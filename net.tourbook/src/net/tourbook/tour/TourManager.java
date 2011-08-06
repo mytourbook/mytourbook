@@ -89,6 +89,7 @@ public class TourManager {
 	public static final String				CUSTOM_DATA_ALTIMETER					= "altimeter";					//$NON-NLS-1$
 	public static final String				CUSTOM_DATA_PULSE						= "pulse";						//$NON-NLS-1$
 	public static final String				CUSTOM_DATA_TEMPERATURE					= "temperature";				//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_CADENCE						= "cadence";					//$NON-NLS-1$
 
 	public static final String				CUSTOM_DATA_SEGMENT_VALUES				= "segmentValues";				//$NON-NLS-1$
 	public static final String				CUSTOM_DATA_ANALYZER_INFO				= "analyzerInfo";				//$NON-NLS-1$
@@ -1804,11 +1805,16 @@ public class TourManager {
 			yDataSpeed.setYTitle(Messages.Graph_Label_Speed);
 			yDataSpeed.setUnitLabel(UI.UNIT_LABEL_SPEED);
 			yDataSpeed.setValueDivisor(SPEED_DIVISOR);
-			yDataSpeed.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
 			yDataSpeed.setShowYSlider(true);
 			yDataSpeed.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_SPEED);
 			yDataSpeed.setCustomData(CUSTOM_DATA_ANALYZER_INFO, //
 					new TourChartAnalyzerInfo(true, true, _computeSpeedAvg, 2));
+
+			if (isHrZoneDisplayed) {
+				yDataSpeed.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
+			} else {
+				yDataSpeed.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
+			}
 
 			setGraphColor(_prefStore, yDataSpeed, GraphColorProvider.PREF_GRAPH_SPEED);
 			chartDataModel.addXyData(yDataSpeed);
@@ -1825,13 +1831,18 @@ public class TourManager {
 
 			yDataPace.setYTitle(Messages.Graph_Label_Pace);
 			yDataPace.setUnitLabel(UI.UNIT_LABEL_PACE);
-			yDataPace.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
 			yDataPace.setShowYSlider(true);
 			yDataPace.setAxisUnit(ChartDataSerie.AXIS_UNIT_MINUTE_SECOND);
 			yDataPace.setSliderLabelFormat(ChartDataYSerie.SLIDER_LABEL_FORMAT_MM_SS);
 			yDataPace.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_PACE);
 			yDataPace.setCustomData(CUSTOM_DATA_ANALYZER_INFO, //
 					new TourChartAnalyzerInfo(true, false, _computePaceAvg, 1));
+
+			if (isHrZoneDisplayed) {
+				yDataPace.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
+			} else {
+				yDataPace.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
+			}
 
 			setGraphColor(_prefStore, yDataPace, GraphColorProvider.PREF_GRAPH_PACE);
 			chartDataModel.addXyData(yDataPace);
@@ -1857,11 +1868,16 @@ public class TourManager {
 
 			yDataPower.setYTitle(Messages.Graph_Label_Power);
 			yDataPower.setUnitLabel(Messages.Graph_Label_Power_unit);
-			yDataPower.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
 			yDataPower.setShowYSlider(true);
 			yDataPower.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_POWER);
 			yDataPower.setCustomData(CUSTOM_DATA_ANALYZER_INFO, //
 					new TourChartAnalyzerInfo(true, false, _computePowerAvg, 0));
+
+			if (isHrZoneDisplayed) {
+				yDataPower.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
+			} else {
+				yDataPower.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
+			}
 
 			setGraphColor(_prefStore, yDataPower, GraphColorProvider.PREF_GRAPH_POWER);
 			chartDataModel.addXyData(yDataPower);
@@ -1878,11 +1894,16 @@ public class TourManager {
 
 			yDataAltimeter.setYTitle(Messages.Graph_Label_Altimeter);
 			yDataAltimeter.setUnitLabel(UI.UNIT_LABEL_ALTIMETER);
-			yDataAltimeter.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_ZERO);
 			yDataAltimeter.setShowYSlider(true);
 			yDataAltimeter.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_ALTIMETER);
 			yDataAltimeter.setCustomData(CUSTOM_DATA_ANALYZER_INFO, //
 					new TourChartAnalyzerInfo(true, _computeAltimeterAvg));
+
+			if (isHrZoneDisplayed) {
+				yDataAltimeter.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
+			} else {
+				yDataAltimeter.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_ZERO);
+			}
 
 			setGraphColor(_prefStore, yDataAltimeter, GraphColorProvider.PREF_GRAPH_ALTIMETER);
 			chartDataModel.addXyData(yDataAltimeter);
@@ -1907,11 +1928,16 @@ public class TourManager {
 			yDataGradient.setYTitle(Messages.Graph_Label_Gradient);
 			yDataGradient.setUnitLabel(Messages.Graph_Label_Gradiend_unit);
 			yDataGradient.setValueDivisor(GRADIENT_DIVISOR);
-			yDataGradient.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_ZERO);
 			yDataGradient.setShowYSlider(true);
 			yDataGradient.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_GRADIENT);
 			yDataGradient.setCustomData(CUSTOM_DATA_ANALYZER_INFO, //
 					new TourChartAnalyzerInfo(true, true, _computeGradientAvg, 1));
+
+			if (isHrZoneDisplayed) {
+				yDataGradient.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
+			} else {
+				yDataGradient.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_ZERO);
+			}
 
 			setGraphColor(_prefStore, yDataGradient, GraphColorProvider.PREF_GRAPH_GRADIENT);
 			chartDataModel.addXyData(yDataGradient);
@@ -1935,9 +1961,14 @@ public class TourManager {
 			yDataCadence.setYTitle(Messages.Graph_Label_Cadence);
 			yDataCadence.setUnitLabel(Messages.Graph_Label_Cadence_unit);
 			yDataCadence.setShowYSlider(true);
-			yDataCadence.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
 			yDataCadence.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_CADENCE);
 			yDataCadence.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true));
+
+			if (isHrZoneDisplayed) {
+				yDataCadence.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
+			} else {
+				yDataCadence.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
+			}
 
 			setGraphColor(_prefStore, yDataCadence, GraphColorProvider.PREF_GRAPH_CADENCE);
 			chartDataModel.addXyData(yDataCadence);
@@ -1956,9 +1987,14 @@ public class TourManager {
 			yDataTemperature.setUnitLabel(UI.UNIT_LABEL_TEMPERATURE);
 			yDataTemperature.setValueDivisor(tourData.getTemperatureScale());
 			yDataTemperature.setShowYSlider(true);
-			yDataTemperature.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
 			yDataTemperature.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_TEMPERATURE);
 			yDataTemperature.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, true));
+
+			if (isHrZoneDisplayed) {
+				yDataTemperature.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
+			} else {
+				yDataTemperature.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
+			}
 
 			setGraphColor(_prefStore, yDataTemperature, GraphColorProvider.PREF_GRAPH_TEMPTERATURE);
 			adjustMinMax(yDataTemperature);
@@ -2043,6 +2079,7 @@ public class TourManager {
 			case GRAPH_CADENCE:
 				if (yDataCadence != null) {
 					chartDataModel.addYData(yDataCadence);
+					chartDataModel.setCustomData(CUSTOM_DATA_CADENCE, yDataCadence);
 				}
 				break;
 
