@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -42,9 +42,10 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.VerifyListener;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -58,54 +59,65 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Widget;
 
 public class DialogSelectSRTMColors extends TitleAreaDialog {
 
-	private final IDialogSettings	fDialogSettings;
+	private final IDialogSettings	_state;
 
-	private Text					fTxtProfileName;
-	private Text					fTxtTilePath;
+	private ColorChooser			_colorChooser;
+	private SRTMProfile				_dialogProfile;
 
-	private ImageCanvas				fProfileImageCanvas;
-	private ColorChooser			fColorChooser;
-	private Composite				fVertexOuterContainer;
-	private ScrolledComposite		fVertexScrolledContainer;
+	private ArrayList<RGBVertex>	_vertexes;
+	private ArrayList<SRTMProfile>	_profiles;
 
-	// vertex fields
-	private Text[]					elevFields;
-	private Label[]					colorLabel;
-	private Button[]				checkButtons;
+	private PrefPageSRTMColors		_prefPageSRTMColors;
+	private SRTMProfile				_selectedProfile;
+	private boolean					_isNewProfile;
 
-	private Button					fBtnApply;
-	private Button					fBtnOK;
-	private Button					fBtnRemove;
+	private boolean					_isUpdateUI;
 
-	private SRTMProfile				fDialogProfile;
-	private ArrayList<RGBVertex>	fVertexList;
-	private ArrayList<SRTMProfile>	fProfileList;
-
+	/*
+	 * UI resources
+	 */
 	/**
 	 * keep colors which must be disposed when the dialog gets disposed
 	 */
-	private ArrayList<Color>		fColorList	= new ArrayList<Color>();
+	private ArrayList<Color>		_colors	= new ArrayList<Color>();
 
-	private Button					fRdoResolutionVeryFine;
-	private Button					fRdoResolutionFine;
-	private Button					fRdoResolutionRough;
-	private Button					fRdoResolutionVeryRough;
+	/*
+	 * UI controls
+	 */
+	private Text					_txtProfileName;
+	private Text					_txtTilePath;
 
-	private Button					fChkShadow;
-	private Text					fTxtShadowValue;
-	private Label					fLblShadowValue;
+	private ImageCanvas				_canvasProfileImage;
+	private Composite				_containerVertexOuter;
+	private ScrolledComposite		_containerVertexScrolled;
 
-	private Shell					fShell;
+	// vertex fields
+	private Spinner[]				_spinnerElevation;
+	private Label[]					_lblColor;
+	private Button[]				_chkDelete;
 
-	private PrefPageSRTMColors		fPrefPageSRTMColors;
-	private boolean					fIsNewProfile;
-	private SRTMProfile				fSelectedProfile;
+	private Button					_btnApply;
+	private Button					_btnOK;
+	private Button					_btnRemove;
 
-	private Image					fProfileImage;
+	private Button					_rdoResolutionVeryFine;
+	private Button					_rdoResolutionFine;
+	private Button					_rdoResolutionRough;
+	private Button					_rdoResolutionVeryRough;
+
+	private Button					_chkShadow;
+	private Text					_txtShadowValue;
+	private Label					_lblShadowValue;
+
+	private Shell					_shell;
+
+	private Image					_profileImage;
 
 	/**
 	 * @param parentShell
@@ -124,18 +136,18 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 
 		super(parentShell);
 
-		fDialogProfile = dialogProfile;
-		fVertexList = dialogProfile.getVertexList();
-		fProfileList = profileList;
+		_dialogProfile = dialogProfile;
+		_vertexes = dialogProfile.getVertexList();
+		_profiles = profileList;
 
-		fPrefPageSRTMColors = prefPageSRTMColors;
-		fIsNewProfile = isNewProfile;
-		fSelectedProfile = originalProfile;
+		_prefPageSRTMColors = prefPageSRTMColors;
+		_isNewProfile = isNewProfile;
+		_selectedProfile = originalProfile;
 
 		// make dialog resizable
 		setShellStyle(getShellStyle() | SWT.RESIZE);
 
-		fDialogSettings = TourbookPlugin.getDefault().getDialogSettingsSection(getClass().getName());
+		_state = TourbookPlugin.getDefault().getDialogSettingsSection(getClass().getName());
 	}
 
 	@Override
@@ -143,7 +155,7 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 
 		super.configureShell(shell);
 
-		fShell = shell;
+		_shell = shell;
 
 		shell.setText(Messages.dialog_adjust_srtm_colors_dialog_title);
 
@@ -192,7 +204,8 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 		/*
 		 * button: add vertex
 		 */
-		button = createButton(parent,
+		button = createButton(
+				parent,
 				IDialogConstants.CLIENT_ID + 1,
 				Messages.dialog_adjust_srtm_colors_button_add,
 				false);
@@ -205,12 +218,12 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 				sortVertexsAndUpdateProfile();
 
 				// create new vertex at the end of the list
-				fVertexList.add(new RGBVertex(fColorChooser.getRGB()));
+				_vertexes.add(new RGBVertex(_colorChooser.getRGB()));
 
-				createUIVertexFieds(fVertexOuterContainer);
+				createUI32VertexFieds(_containerVertexOuter);
 
 				// set focus to the new vertex
-				elevFields[elevFields.length - 1].setFocus();
+				_spinnerElevation[_spinnerElevation.length - 1].setFocus();
 
 				enableActions();
 
@@ -224,7 +237,8 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 		/*
 		 * button: add multiple vertexes
 		 */
-		button = createButton(parent,
+		button = createButton(
+				parent,
 				IDialogConstants.CLIENT_ID + 2,
 				Messages.dialog_adjust_srtm_colors_button_add_multiple,
 				false);
@@ -236,7 +250,8 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 				// ensure the field list is updated and not unsorted
 				sortVertexsAndUpdateProfile();
 
-				final DialogCreateMultipleVertexes dialog = new DialogCreateMultipleVertexes(Display.getCurrent()
+				final DialogCreateMultipleVertexes dialog = new DialogCreateMultipleVertexes(Display
+						.getCurrent()
 						.getActiveShell());
 				if (dialog.open() == Window.OK) {
 
@@ -251,7 +266,7 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 						/*
 						 * check if elevation is already available, they will be ignored
 						 */
-						for (final RGBVertex vertex : fVertexList) {
+						for (final RGBVertex vertex : _vertexes) {
 							if (vertex.elev == elevation) {
 								isNewEle = false;
 								break;
@@ -260,19 +275,19 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 
 						if (isNewEle) {
 							// create new vertex
-							final RGBVertex vertex = new RGBVertex(fColorChooser.getRGB());
-							fVertexList.add(vertex);
+							final RGBVertex vertex = new RGBVertex(_colorChooser.getRGB());
+							_vertexes.add(vertex);
 							vertex.elev = elevation;
 						}
 					}
 
-					createUIVertexFieds(fVertexOuterContainer);
+					createUI32VertexFieds(_containerVertexOuter);
 
 					// set focus to the new vertex
 //					elevFields[elevFields.length - 1].setFocus();
 
 					enableActions();
-					
+
 					sortVertexsAndUpdateProfile();
 				}
 			}
@@ -281,23 +296,24 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 		/*
 		 * button: remove vertex
 		 */
-		fBtnRemove = createButton(parent,
+		_btnRemove = createButton(
+				parent,
 				IDialogConstants.CLIENT_ID + 4,
 				Messages.dialog_adjust_srtm_colors_button_remove,
 				false);
-		fBtnRemove.addSelectionListener(new SelectionAdapter() {
+		_btnRemove.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 
-				final int rgbVertexListSize = fVertexList.size();
+				final int rgbVertexListSize = _vertexes.size();
 
 				for (int ix = rgbVertexListSize - 1; ix >= 0; ix--) {
-					if (checkButtons[ix].getSelection()) {
-						fVertexList.remove(ix);
+					if (_chkDelete[ix].getSelection()) {
+						_vertexes.remove(ix);
 					}
 				}
 
-				createUIVertexFieds(fVertexOuterContainer);
+				createUI32VertexFieds(_containerVertexOuter);
 				paintProfileImage();
 				enableActions();
 			}
@@ -306,7 +322,8 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 		/*
 		 * button: sort vertexes
 		 */
-		button = createButton(parent,
+		button = createButton(
+				parent,
 				IDialogConstants.CLIENT_ID + 5,
 				Messages.dialog_adjust_srtm_colors_button_sort,
 				false);
@@ -320,11 +337,12 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 		/*
 		 * button: apply
 		 */
-		fBtnApply = createButton(parent,
+		_btnApply = createButton(
+				parent,
 				IDialogConstants.CLIENT_ID + 6,
 				Messages.dialog_adjust_srtm_colors_button_apply,
 				false);
-		fBtnApply.addSelectionListener(new SelectionAdapter() {
+		_btnApply.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				onApply();
@@ -334,8 +352,8 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 		super.createButtonsForButtonBar(parent);
 
 		// set text for the OK button
-		fBtnOK = getButton(IDialogConstants.OK_ID);
-		fBtnOK.setText(Messages.dialog_adjust_srtm_colors_button_update);
+		_btnOK = getButton(IDialogConstants.OK_ID);
+		_btnOK.setText(Messages.dialog_adjust_srtm_colors_button_update);
 	}
 
 	@Override
@@ -354,52 +372,14 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
 		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(container);
 		{
-			createUINames(container);
-			createUIResolution(container);
-			createUIColorList(container);
-			createUIColorChooser(container);
-		}
-
-	}
-
-	/**
-	 * color chooser
-	 */
-	private void createUIColorChooser(final Composite parent) {
-		fColorChooser = new ColorChooser(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().applyTo(fColorChooser);
-	}
-
-	private void createUIColorList(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(false, true).indent(0, 0).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).spacing(10, 0).applyTo(container);
-		{
-			/*
-			 * profile image
-			 */
-			fProfileImageCanvas = new ImageCanvas(container, SWT.NO_BACKGROUND);
-			GridDataFactory.fillDefaults().grab(false, true).hint(100, SWT.DEFAULT).applyTo(fProfileImageCanvas);
-			fProfileImageCanvas.addControlListener(new ControlAdapter() {
-				@Override
-				public void controlResized(final ControlEvent e) {
-					paintProfileImage();
-				}
-			});
-
-			/*
-			 * vertex fields
-			 */
-			fVertexOuterContainer = new Composite(container, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(false, true).applyTo(fVertexOuterContainer);
-			GridLayoutFactory.fillDefaults().applyTo(fVertexOuterContainer);
-
-			createUIVertexFieds(fVertexOuterContainer);
+			createUI10Names(container);
+			createUI20Resolution(container);
+			createUI30ColorList(container);
+			createUI40ColorChooser(container);
 		}
 	}
 
-	private void createUINames(final Composite parent) {
+	private void createUI10Names(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -418,8 +398,8 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 				/*
 				 * text: profile name
 				 */
-				fTxtProfileName = new Text(nameContainer, SWT.BORDER);
-				GridDataFactory.fillDefaults().grab(true, false).applyTo(fTxtProfileName);
+				_txtProfileName = new Text(nameContainer, SWT.BORDER);
+				GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtProfileName);
 
 				/*
 				 * lable: tile path
@@ -430,10 +410,10 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 				/*
 				 * text: tile path
 				 */
-				fTxtTilePath = new Text(nameContainer, SWT.BORDER);
-				GridDataFactory.fillDefaults().grab(true, false).applyTo(fTxtTilePath);
-				fTxtTilePath.addVerifyListener(net.tourbook.util.UI.verifyFilenameInput());
-				fTxtTilePath.addModifyListener(new ModifyListener() {
+				_txtTilePath = new Text(nameContainer, SWT.BORDER);
+				GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtTilePath);
+				_txtTilePath.addVerifyListener(net.tourbook.util.UI.verifyFilenameInput());
+				_txtTilePath.addModifyListener(new ModifyListener() {
 					public void modifyText(final ModifyEvent e) {
 						validateFields();
 					}
@@ -443,7 +423,7 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 		}
 	}
 
-	private void createUIResolution(final Composite parent) {
+	private void createUI20Resolution(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -456,28 +436,28 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 			groupResolution.setText(Messages.prefPage_srtm_resolution_title);
 			{
 				// radio: very fine
-				fRdoResolutionVeryFine = new Button(groupResolution, SWT.RADIO);
-				fRdoResolutionVeryFine.setText(Messages.prefPage_srtm_resolution_very_fine);
+				_rdoResolutionVeryFine = new Button(groupResolution, SWT.RADIO);
+				_rdoResolutionVeryFine.setText(Messages.prefPage_srtm_resolution_very_fine);
 
 				// radio: fine
-				fRdoResolutionFine = new Button(groupResolution, SWT.RADIO);
-				fRdoResolutionFine.setText(Messages.prefPage_srtm_resolution_fine);
+				_rdoResolutionFine = new Button(groupResolution, SWT.RADIO);
+				_rdoResolutionFine.setText(Messages.prefPage_srtm_resolution_fine);
 
 				// radio: rough
-				fRdoResolutionRough = new Button(groupResolution, SWT.RADIO);
-				fRdoResolutionRough.setText(Messages.prefPage_srtm_resolution_rough);
+				_rdoResolutionRough = new Button(groupResolution, SWT.RADIO);
+				_rdoResolutionRough.setText(Messages.prefPage_srtm_resolution_rough);
 
 				// radio: very rough
-				fRdoResolutionVeryRough = new Button(groupResolution, SWT.RADIO);
-				fRdoResolutionVeryRough.setText(Messages.prefPage_srtm_resolution_very_rough);
+				_rdoResolutionVeryRough = new Button(groupResolution, SWT.RADIO);
+				_rdoResolutionVeryRough.setText(Messages.prefPage_srtm_resolution_very_rough);
 			}
 
 			/*
 			 * checkbox: shadow
 			 */
-			fChkShadow = new Button(container, SWT.CHECK);
-			fChkShadow.setText(Messages.prefPage_srtm_shadow_text);
-			fChkShadow.addSelectionListener(new SelectionAdapter() {
+			_chkShadow = new Button(container, SWT.CHECK);
+			_chkShadow.setText(Messages.prefPage_srtm_shadow_text);
+			_chkShadow.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					enableActions();
@@ -491,15 +471,15 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 				/*
 				 * lable: shadow info
 				 */
-				fLblShadowValue = new Label(shadowContainer, SWT.NONE);
-				GridDataFactory.swtDefaults().indent(20, 0).applyTo(fLblShadowValue);
-				fLblShadowValue.setText(Messages.prefPage_srtm_shadow_value_text);
+				_lblShadowValue = new Label(shadowContainer, SWT.NONE);
+				GridDataFactory.swtDefaults().indent(20, 0).applyTo(_lblShadowValue);
+				_lblShadowValue.setText(Messages.prefPage_srtm_shadow_value_text);
 
 				/*
 				 * input: shadow value
 				 */
-				fTxtShadowValue = new Text(shadowContainer, SWT.BORDER);
-				fTxtShadowValue.addModifyListener(new ModifyListener() {
+				_txtShadowValue = new Text(shadowContainer, SWT.BORDER);
+				_txtShadowValue.addModifyListener(new ModifyListener() {
 					public void modifyText(final ModifyEvent e) {
 						validateFields();
 					}
@@ -508,14 +488,43 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 		}
 	}
 
+	private void createUI30ColorList(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(false, true).indent(0, 0).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).spacing(10, 0).applyTo(container);
+		{
+			/*
+			 * profile image
+			 */
+			_canvasProfileImage = new ImageCanvas(container, SWT.NO_BACKGROUND);
+			GridDataFactory.fillDefaults().grab(false, true).hint(100, SWT.DEFAULT).applyTo(_canvasProfileImage);
+			_canvasProfileImage.addControlListener(new ControlAdapter() {
+				@Override
+				public void controlResized(final ControlEvent e) {
+					paintProfileImage();
+				}
+			});
+
+			/*
+			 * vertex fields
+			 */
+			_containerVertexOuter = new Composite(container, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(false, true).applyTo(_containerVertexOuter);
+			GridLayoutFactory.fillDefaults().applyTo(_containerVertexOuter);
+
+			createUI32VertexFieds(_containerVertexOuter);
+		}
+	}
+
 	/**
 	 * Create the vertex fields from the vertex list
 	 * 
 	 * @param parent
 	 */
-	private void createUIVertexFieds(final Composite parent) {
+	private void createUI32VertexFieds(final Composite parent) {
 
-		final int vertexSize = fVertexList.size();
+		final int vertexSize = _vertexes.size();
 		if (vertexSize == 0) {
 			return;
 		}
@@ -524,29 +533,29 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 		Point scrollOrigin = null;
 
 		// dispose previous content
-		if (fVertexScrolledContainer != null) {
+		if (_containerVertexScrolled != null) {
 
 			// get current scroll position
-			scrollOrigin = fVertexScrolledContainer.getOrigin();
+			scrollOrigin = _containerVertexScrolled.getOrigin();
 
-			fVertexScrolledContainer.dispose();
+			_containerVertexScrolled.dispose();
 		}
 
 		// scrolled container
-		fVertexScrolledContainer = new ScrolledComposite(parent, SWT.V_SCROLL);
-		GridDataFactory.fillDefaults().grab(false, true).applyTo(fVertexScrolledContainer);
-		fVertexScrolledContainer.setExpandVertical(true);
-		fVertexScrolledContainer.setExpandHorizontal(true);
+		_containerVertexScrolled = new ScrolledComposite(parent, SWT.V_SCROLL);
+		GridDataFactory.fillDefaults().grab(false, true).applyTo(_containerVertexScrolled);
+		_containerVertexScrolled.setExpandVertical(true);
+		_containerVertexScrolled.setExpandHorizontal(true);
 
 		// vertex container
-		final Composite vertexContainer = new Composite(fVertexScrolledContainer, SWT.NONE);
+		final Composite vertexContainer = new Composite(_containerVertexScrolled, SWT.NONE);
 		GridLayoutFactory.fillDefaults().numColumns(4).applyTo(vertexContainer);
 
-		fVertexScrolledContainer.setContent(vertexContainer);
-		fVertexScrolledContainer.addControlListener(new ControlAdapter() {
+		_containerVertexScrolled.setContent(vertexContainer);
+		_containerVertexScrolled.addControlListener(new ControlAdapter() {
 			@Override
 			public void controlResized(final ControlEvent e) {
-				fVertexScrolledContainer.setMinSize(vertexContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+				_containerVertexScrolled.setMinSize(vertexContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 			}
 		});
 
@@ -558,20 +567,20 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 			public void widgetSelected(final SelectionEvent e) {
 				int checked = 0;
 				for (int ix = 0; ix < vertexSize; ix++) {
-					if (checkButtons[ix].getSelection()) {
+					if (_chkDelete[ix].getSelection()) {
 						checked++;
 					}
 				}
 
 				if (checked == vertexSize - 2) {
 					for (int ix = 0; ix < vertexSize; ix++) {
-						if (!checkButtons[ix].getSelection()) {
-							checkButtons[ix].setEnabled(false);
+						if (!_chkDelete[ix].getSelection()) {
+							_chkDelete[ix].setEnabled(false);
 						}
 					}
 				} else {
 					for (int ix = 0; ix < vertexSize; ix++) {
-						checkButtons[ix].setEnabled(true);
+						_chkDelete[ix].setEnabled(true);
 					}
 				}
 
@@ -579,24 +588,10 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 			}
 		};
 
-		final ModifyListener eleModifyListener = new ModifyListener() {
-			public void modifyText(final ModifyEvent event) {
-
-				final Text widget = (Text) event.widget;
-				final String vertexText = widget.getText();
-
-				if (vertexText.trim().length() == 0) {
-					widget.setText(UI.STRING_0);
-					return;
-				}
-
-				final RGBVertex vertex = (RGBVertex) widget.getData();
-
-				try {
-					vertex.elev = Long.parseLong(vertexText);
-				} catch (final NumberFormatException e) {
-					widget.setText(UI.STRING_0);
-				}
+		final SelectionListener eleSelectionListener = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent event) {
+				onSelectElevation(event.widget);
 			}
 		};
 
@@ -611,15 +606,15 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 
 					// right button: update color chooser from vertex color
 
-					fColorChooser.setRGB(vertex.getRGB());
+					_colorChooser.setRGB(vertex.getRGB());
 
 				} else {
 
 					// other buttons: update vertex color from color chooser
 
-					final RGB rgb = fColorChooser.getRGB();
+					final RGB rgb = _colorChooser.getRGB();
 					final Color labelColor = new Color(display, rgb);
-					fColorList.add(labelColor);
+					_colors.add(labelColor);
 
 					label.setBackground(labelColor);
 
@@ -630,14 +625,11 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 			}
 		};
 
-		final VerifyListener eleVerifyListener = UI.verifyListenerInteger(true);
+		_isUpdateUI = true;
 
 		/*
 		 * grid data
 		 */
-		final GridData gdEle = new GridData(SWT.CENTER, SWT.CENTER, false, false);
-		gdEle.widthHint = 50;
-
 		final GridData gdColor = new GridData(SWT.CENTER, SWT.CENTER, false, false);
 		gdColor.widthHint = 70;
 		gdColor.heightHint = 20;
@@ -647,48 +639,53 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 		/*
 		 * fields
 		 */
-		colorLabel = new Label[vertexSize];
-		elevFields = new Text[vertexSize];
-		checkButtons = new Button[vertexSize];
+		_lblColor = new Label[vertexSize];
+		_spinnerElevation = new Spinner[vertexSize];
+		_chkDelete = new Button[vertexSize];
 
 		for (int vertexIndex = vertexSize - 1; vertexIndex >= 0; vertexIndex--) {
 
-			final RGBVertex vertex = fVertexList.get(vertexIndex);
+			final RGBVertex vertex = _vertexes.get(vertexIndex);
 			final RGB vertexRGB = vertex.getRGB();
 
 			final String toolTipRGB = UI.EMPTY_STRING + vertexRGB.red + "/" + vertexRGB.green + "/" + vertexRGB.blue; //$NON-NLS-1$ //$NON-NLS-2$
 			final String toolTipText = NLS.bind(Messages.dialog_adjust_srtm_colors_color_tooltip, toolTipRGB);
 
 			/*
-			 * text: elevation
+			 * spinner: elevation
 			 */
-			final Text txtElevation = elevFields[vertexIndex] = new Text(vertexContainer, SWT.SINGLE
-					| SWT.TRAIL
-					| SWT.BORDER);
-			txtElevation.setLayoutData(gdEle);
-			txtElevation.setText(UI.EMPTY_STRING + vertex.getElevation());
-			txtElevation.addModifyListener(eleModifyListener);
-			txtElevation.addVerifyListener(eleVerifyListener);
-			txtElevation.setData(vertex);
+			final Spinner spinnerElevation = _spinnerElevation[vertexIndex] = new Spinner(vertexContainer, SWT.BORDER);
+			GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.CENTER).applyTo(spinnerElevation);
+			spinnerElevation.setMinimum(Integer.MIN_VALUE);
+			spinnerElevation.setMaximum(Integer.MAX_VALUE);
+			spinnerElevation.addSelectionListener(eleSelectionListener);
+			spinnerElevation.addMouseWheelListener(new MouseWheelListener() {
+				public void mouseScrolled(final MouseEvent event) {
+					net.tourbook.ui.UI.adjustSpinnerValueOnMouseScroll(event);
+					onSelectElevation(event.widget);
+				}
+			});
+			spinnerElevation.setData(vertex);
+			spinnerElevation.setSelection((int) vertex.elev);
 
 			/*
 			 * color label
 			 */
-			final Label lblColor = colorLabel[vertexIndex] = new Label(vertexContainer, SWT.CENTER
+			final Label lblColor = _lblColor[vertexIndex] = new Label(vertexContainer, SWT.CENTER
 					| SWT.BORDER
 					| SWT.SHADOW_NONE);
 			lblColor.setLayoutData(gdColor);
 			lblColor.setToolTipText(toolTipText);
 			final Color bgColor = new Color(display, vertexRGB);
-			fColorList.add(bgColor);
+			_colors.add(bgColor);
 			lblColor.setBackground(bgColor);
 			lblColor.addMouseListener(colorMouseListener);
 			lblColor.setData(vertex);
 
 			/*
-			 * checkbox
+			 * checkbox: delete
 			 */
-			final Button checkbox = checkButtons[vertexIndex] = new Button(vertexContainer, SWT.CHECK);
+			final Button checkbox = _chkDelete[vertexIndex] = new Button(vertexContainer, SWT.CHECK);
 			checkbox.setLayoutData(gdCheckbox);
 			checkbox.setToolTipText(Messages.dialog_adjust_srtm_colors_checkbutton_ttt);
 			checkbox.addSelectionListener(checkboxListener);
@@ -699,28 +696,37 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 			final Label label = new Label(vertexContainer, SWT.NONE);
 			GridDataFactory.fillDefaults().minSize(10, 1).applyTo(label);
 		}
+		_isUpdateUI = false;
 
 		/*
 		 * disable checkboxes when only 2 colors are available
 		 */
 		if (vertexSize <= 2) {
 			for (int ix = 0; ix < vertexSize; ix++) {
-				checkButtons[ix].setEnabled(false);
+				_chkDelete[ix].setEnabled(false);
 			}
 		}
 
-		fVertexOuterContainer.layout(true);
+		_containerVertexOuter.layout(true);
 
 		// set scroll position to previous position
 		if (scrollOrigin != null) {
-			fVertexScrolledContainer.setOrigin(scrollOrigin);
+			_containerVertexScrolled.setOrigin(scrollOrigin);
 		}
 
 	}
 
+	/**
+	 * color chooser
+	 */
+	private void createUI40ColorChooser(final Composite parent) {
+		_colorChooser = new ColorChooser(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().applyTo(_colorChooser);
+	}
+
 	private void disposeProfileImage() {
-		if (fProfileImage != null && fProfileImage.isDisposed() == false) {
-			fProfileImage.dispose();
+		if (_profileImage != null && _profileImage.isDisposed() == false) {
+			_profileImage.dispose();
 		}
 	}
 
@@ -731,36 +737,36 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 		}
 
 		// shadow value
-		final boolean isShadow = fChkShadow.getSelection();
-		fTxtShadowValue.setEnabled(isShadow);
-		fLblShadowValue.setEnabled(isShadow);
+		final boolean isShadow = _chkShadow.getSelection();
+		_txtShadowValue.setEnabled(isShadow);
+		_lblShadowValue.setEnabled(isShadow);
 
 		// remove button
-		final int vertexSize = fVertexList.size();
+		final int vertexSize = _vertexes.size();
 		int checked = 0;
 		for (int ix = 0; ix < vertexSize; ix++) {
-			final Button button = checkButtons[ix];
+			final Button button = _chkDelete[ix];
 			if (button != null) {
 				if (button.getSelection()) {
 					checked++;
 				}
 			}
 		}
-		fBtnRemove.setEnabled(checked > 0 && vertexSize > 2);
+		_btnRemove.setEnabled(checked > 0 && vertexSize > 2);
 	}
 
 	@Override
 	protected IDialogSettings getDialogBoundsSettings() {
 
 		// keep window size and position
-		return fDialogSettings;
+		return _state;
 	}
 
 	@Override
 	protected Point getInitialSize() {
 
 		final Point initialSize = super.getInitialSize();
-		final Point defaultSize = fShell.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+		final Point defaultSize = _shell.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
 
 		// enforce dialog is opened and all controls are visible
 		if (initialSize.y < defaultSize.y) {
@@ -772,13 +778,13 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 
 	private String getResolutionFromUI() {
 
-		if (fRdoResolutionVeryFine.getSelection()) {
+		if (_rdoResolutionVeryFine.getSelection()) {
 			return IPreferences.SRTM_RESOLUTION_VERY_FINE;
-		} else if (fRdoResolutionFine.getSelection()) {
+		} else if (_rdoResolutionFine.getSelection()) {
 			return IPreferences.SRTM_RESOLUTION_FINE;
-		} else if (fRdoResolutionRough.getSelection()) {
+		} else if (_rdoResolutionRough.getSelection()) {
 			return IPreferences.SRTM_RESOLUTION_ROUGH;
-		} else if (fRdoResolutionVeryRough.getSelection()) {
+		} else if (_rdoResolutionVeryRough.getSelection()) {
 			return IPreferences.SRTM_RESOLUTION_VERY_ROUGH;
 		} else {
 			return IPreferences.SRTM_RESOLUTION_VERY_FINE;
@@ -795,24 +801,36 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 
 	private void onApply() {
 		updateProfileFromUI();
-		fPrefPageSRTMColors.saveProfile(fSelectedProfile, fDialogProfile, fIsNewProfile);
+		_prefPageSRTMColors.saveProfile(_selectedProfile, _dialogProfile, _isNewProfile);
 	}
 
 	private void onDispose() {
-		for (final Color color : fColorList) {
+		for (final Color color : _colors) {
 			color.dispose();
 		}
 
 		disposeProfileImage();
 	}
 
+	private void onSelectElevation(final Widget widget) {
+
+		if (_isUpdateUI) {
+			return;
+		}
+
+		final Spinner spinner = (Spinner) widget;
+		final RGBVertex vertex = (RGBVertex) spinner.getData();
+
+		vertex.elev = spinner.getSelection();
+	}
+
 	private void paintProfileImage() {
 
 		disposeProfileImage();
 
-		final Rectangle imageBounds = fProfileImageCanvas.getBounds();
-		fProfileImage = fDialogProfile.createImage(imageBounds.width, imageBounds.height, false);
-		fProfileImageCanvas.setImage(fProfileImage);
+		final Rectangle imageBounds = _canvasProfileImage.getBounds();
+		_profileImage = _dialogProfile.createImage(imageBounds.width, imageBounds.height, false);
+		_canvasProfileImage.setImage(_profileImage);
 	}
 
 	private void setResolutionIntoUI(final String resolution) {
@@ -822,14 +840,14 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 		final boolean isRough = IPreferences.SRTM_RESOLUTION_ROUGH.equals(resolution);
 		final boolean isVeryRough = IPreferences.SRTM_RESOLUTION_VERY_ROUGH.equals(resolution);
 
-		fRdoResolutionVeryFine.setSelection(isVeryFine);
-		fRdoResolutionFine.setSelection(isFine);
-		fRdoResolutionRough.setSelection(isRough);
-		fRdoResolutionVeryRough.setSelection(isVeryRough);
+		_rdoResolutionVeryFine.setSelection(isVeryFine);
+		_rdoResolutionFine.setSelection(isFine);
+		_rdoResolutionRough.setSelection(isRough);
+		_rdoResolutionVeryRough.setSelection(isVeryRough);
 
 		// ensure one is selected
 		if ((isVeryFine || isFine || isRough || isVeryRough) == false) {
-			fRdoResolutionVeryFine.setSelection(true);
+			_rdoResolutionVeryFine.setSelection(true);
 		}
 	}
 
@@ -838,28 +856,23 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 	 */
 	private void sortVertexsAndUpdateProfile() {
 
-		final int rgbVertexListSize = fVertexList.size();
-		fVertexList.clear();
+		final int rgbVertexListSize = _vertexes.size();
+		_vertexes.clear();
 
 		for (int ix = 0; ix < rgbVertexListSize; ix++) {
 
-			final String elevation = elevFields[ix].getText();
-			if (elevation.equals(UI.EMPTY_STRING)) {
-				continue; // remove empty fields
-			}
+			final int elevation = _spinnerElevation[ix].getSelection();
+			final RGB rgb = _lblColor[ix].getBackground().getRGB();
 
-			final Long elev = new Long(elevation);
-			final RGB rgb = colorLabel[ix].getBackground().getRGB();
-			
 			final RGBVertex rgbVertex = new RGBVertex();
-			rgbVertex.setElev(elev.longValue());
+			rgbVertex.setElev(elevation);
 			rgbVertex.setRGB(rgb);
 
-			fVertexList.add(rgbVertex);
+			_vertexes.add(rgbVertex);
 		}
-		Collections.sort(fVertexList);
+		Collections.sort(_vertexes);
 
-		createUIVertexFieds(fVertexOuterContainer);
+		createUI32VertexFieds(_containerVertexOuter);
 		paintProfileImage();
 	}
 
@@ -867,20 +880,20 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 
 		sortVertexsAndUpdateProfile();
 
-		fDialogProfile.setProfileName(fTxtProfileName.getText());
-		fDialogProfile.setTilePath(fTxtTilePath.getText());
-		fDialogProfile.setShadowState(fChkShadow.getSelection());
-		fDialogProfile.setResolution(getResolutionFromUI());
-		fDialogProfile.setShadowValue(Float.parseFloat(fTxtShadowValue.getText()));
+		_dialogProfile.setProfileName(_txtProfileName.getText());
+		_dialogProfile.setTilePath(_txtTilePath.getText());
+		_dialogProfile.setShadowState(_chkShadow.getSelection());
+		_dialogProfile.setResolution(getResolutionFromUI());
+		_dialogProfile.setShadowValue(Float.parseFloat(_txtShadowValue.getText()));
 	}
 
 	private void updateUI() {
 
-		fTxtProfileName.setText(fDialogProfile.getProfileName());
-		fTxtTilePath.setText(fDialogProfile.getTilePath());
-		fChkShadow.setSelection(fDialogProfile.isShadowState());
-		setResolutionIntoUI(fDialogProfile.getResolution());
-		fTxtShadowValue.setText(Float.toString(fDialogProfile.getShadowValue()));
+		_txtProfileName.setText(_dialogProfile.getProfileName());
+		_txtTilePath.setText(_dialogProfile.getTilePath());
+		_chkShadow.setSelection(_dialogProfile.isShadowState());
+		setResolutionIntoUI(_dialogProfile.getResolution());
+		_txtShadowValue.setText(Float.toString(_dialogProfile.getShadowValue()));
 	}
 
 	private boolean validateFields() {
@@ -890,10 +903,10 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 		/*
 		 * check if the tile path is already used
 		 */
-		final int dialogProfileId = fDialogProfile.getProfileId();
-		final String dialogTilePath = fTxtTilePath.getText().trim();
+		final int dialogProfileId = _dialogProfile.getProfileId();
+		final String dialogTilePath = _txtTilePath.getText().trim();
 
-		for (final SRTMProfile profile : fProfileList) {
+		for (final SRTMProfile profile : _profiles) {
 
 			// ignore the same profile
 			if (profile.getProfileId() == dialogProfileId) {
@@ -914,7 +927,7 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 		 * check shadow value
 		 */
 		try {
-			final float shadowValue = Float.parseFloat(fTxtShadowValue.getText());
+			final float shadowValue = Float.parseFloat(_txtShadowValue.getText());
 			if (shadowValue > 1 || shadowValue < 0) {
 				isValid = false;
 				setErrorMessage(Messages.dialog_adjust_srtm_colors_error_invalid_shadow_value);
@@ -924,8 +937,8 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 			setErrorMessage(Messages.dialog_adjust_srtm_colors_error_invalid_shadow_value);
 		}
 
-		fBtnOK.setEnabled(isValid);
-		fBtnApply.setEnabled(isValid);
+		_btnOK.setEnabled(isValid);
+		_btnApply.setEnabled(isValid);
 
 		if (isValid) {
 			setErrorMessage(null);
