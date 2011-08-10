@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Device Reader for HAC5
 Bundle-SymbolicName: net.tourbook.device.hac5;singleton:=true
-Bundle-Version: 11.8.1.qualifier
+Bundle-Version: 11.8.2.qualifier
 Bundle-Activator: net.tourbook.device.hac5.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,

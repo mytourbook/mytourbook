@@ -2,7 +2,7 @@
 <feature
       id="feature.net.tourbook.app"
       label="MyTourbook Application"
-      version="11.8.1.qualifier"
+      version="11.8.2.qualifier"
       provider-name="MyTourbook"
       plugin="net.tourbook.branding">
 
@@ -42,168 +42,168 @@
          id="net.tourbook"
          download-size="0"
          install-size="0"
-         version="11.8.1.qualifier"
+         version="11.8.2.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.branding"
          download-size="0"
          install-size="0"
-         version="11.8.1.qualifier"
+         version="11.8.2.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.chart"
          download-size="0"
          install-size="0"
-         version="11.8.1.qualifier"
+         version="11.8.2.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device"
          download-size="0"
          install-size="0"
-         version="11.8.1.qualifier"
+         version="11.8.2.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.ciclotour.text"
          download-size="0"
          install-size="0"
-         version="11.8.1.qualifier"
+         version="11.8.2.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.cm4xxm"
          download-size="0"
          install-size="0"
-         version="11.8.1.qualifier"
+         version="11.8.2.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.crp"
          download-size="0"
          install-size="0"
-         version="11.8.1.qualifier"
+         version="11.8.2.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.csv.tours"
          download-size="0"
          install-size="0"
-         version="11.8.1.qualifier"
+         version="11.8.2.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.garmin"
          download-size="0"
          install-size="0"
-         version="11.8.1.qualifier"
+         version="11.8.2.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.gpx"
          download-size="0"
          install-size="0"
-         version="11.8.1.qualifier"
+         version="11.8.2.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.hac4"
          download-size="0"
          install-size="0"
-         version="11.8.1.qualifier"
+         version="11.8.2.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.hac4pro"
          download-size="0"
          install-size="0"
-         version="11.8.1.qualifier"
+         version="11.8.2.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.hac5"
          download-size="0"
          install-size="0"
-         version="11.8.1.qualifier"
+         version="11.8.2.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.tur"
          download-size="0"
          install-size="0"
-         version="11.8.1.qualifier"
+         version="11.8.2.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.statistics"
          download-size="0"
          install-size="0"
-         version="11.8.1.qualifier"
+         version="11.8.2.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.nmea"
          download-size="0"
          install-size="0"
-         version="11.8.1.qualifier"
+         version="11.8.2.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.util"
          download-size="0"
          install-size="0"
-         version="11.8.1.qualifier"
+         version="11.8.2.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.garmin.fit"
          download-size="0"
          install-size="0"
-         version="11.8.1.qualifier"
+         version="11.8.2.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.hac4linux.tour"
          download-size="0"
          install-size="0"
-         version="11.8.1.qualifier"
+         version="11.8.2.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.printing"
          download-size="0"
          install-size="0"
-         version="11.8.1.qualifier"
+         version="11.8.2.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.export"
          download-size="0"
          install-size="0"
-         version="11.8.1.qualifier"
+         version="11.8.2.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.polar.hrm"
          download-size="0"
          install-size="0"
-         version="11.8.1.qualifier"
+         version="11.8.2.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.polartrainer"
          download-size="0"
          install-size="0"
-         version="11.8.1.qualifier"
+         version="11.8.2.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.daum.ergobike"
          download-size="0"
          install-size="0"
-         version="11.8.1.qualifier"
+         version="11.8.2.qualifier"
          unpack="false"/>
 
 </feature>
