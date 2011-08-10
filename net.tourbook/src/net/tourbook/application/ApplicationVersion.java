@@ -2,8 +2,9 @@ package net.tourbook.application;
 
 public interface ApplicationVersion {
 
-	public static final String	APP_VERSION	= "11.8.1"; //$NON-NLS-1$
+	public static final String	APP_VERSION	= "11.8.1 NEXT";	//$NON-NLS-1$
 
+//	public static final String	APP_VERSION	= "11.8.1"; //$NON-NLS-1$
 //	public static final String	APP_VERSION	= "11.8.1";	//$NON-NLS-1$
 //	public static final String	APP_VERSION	= "11.8";
 //	public static final String	APP_VERSION	= "11.3";

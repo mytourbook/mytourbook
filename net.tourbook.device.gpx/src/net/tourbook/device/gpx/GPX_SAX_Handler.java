@@ -26,10 +26,10 @@ import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourWayPoint;
-import net.tourbook.device.DeviceReaderTools;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.ui.UI;
+import net.tourbook.util.MtMath;
 import net.tourbook.util.Util;
 
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -553,7 +553,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 					// compute distance from lat/lon
 
-					_timeSlice.absoluteDistance = _absoluteDistance += DeviceReaderTools.computeDistance(
+					_timeSlice.absoluteDistance = _absoluteDistance += MtMath.distanceVincenty(
 							_prevTimeSlice.latitude,
 							_prevTimeSlice.longitude,
 							_timeSlice.latitude,

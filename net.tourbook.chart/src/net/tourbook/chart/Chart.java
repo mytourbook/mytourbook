@@ -658,10 +658,6 @@ public class Chart extends ViewForm {
 		return createChartInfo();
 	}
 
-	public ChartProperties getChartProperties() {
-		return _chartComponents.getChartProperties();
-	}
-
 	public int getDevGraphImageXOffset() {
 		return _chartComponents.getChartComponentGraph().getDevGraphImageXOffset();
 	}

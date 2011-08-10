@@ -63,7 +63,7 @@ public interface ITourbookPreferences {
 	public static final String	GRAPH_X_AXIS								= "graphs.x-axis";											//$NON-NLS-1$
 	public static final String	GRAPH_X_AXIS_STARTTIME						= "graphs.x-axis.starttime";								//$NON-NLS-1$
 	public static final String	GRAPH_IS_HR_ZONE_BACKGROUND_VISIBLE			= "Graph_HrZone_IsVisible";								//$NON-NLS-1$
-	public static final String	GRAPH_HR_ZONE_STYLE					= "Graph_HrZone_GraphType";								//$NON-NLS-1$
+	public static final String	GRAPH_HR_ZONE_STYLE							= "Graph_HrZone_GraphType";								//$NON-NLS-1$
 
 	public static final String	GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER				= "graphs.zoom.autozoom-to-slider";						//$NON-NLS-1$
 	public static final String	GRAPH_MOVE_SLIDERS_WHEN_ZOOMED				= "graphs.move-sliders-when-zoomed";						//$NON-NLS-1$
@@ -113,6 +113,9 @@ public interface ITourbookPreferences {
 	public static final String	BREAK_TIME_MIN_AVG_SPEED					= "BreakTime_MinAvgSpeed";									//$NON-NLS-1$
 
 	public static final String	GRAPH_PROPERTY_CHARTTYPE					= "graph.property.chartType";								//$NON-NLS-1$
+
+	public static final String	GRAPH_PROPERTY_IS_CUSTOM_SMOOTHING			= "GraphProperty_IsCustomSmoothing";						//$NON-NLS-1$
+	public static final String	GRAPH_PROPERTY_SMOOTHING_TAU				= "GraphProperty_Smoothing_Tau";							//$NON-NLS-1$
 
 	public static final String	GRAPH_PROPERTY_IS_VALUE_CLIPPING			= "graph.property.is.value_clipping";						//$NON-NLS-1$
 	public static final String	GRAPH_PROPERTY_VALUE_CLIPPING_TIMESLICE		= "graph.property.timeslice.value_clipping";				//$NON-NLS-1$
@@ -275,5 +278,4 @@ public interface ITourbookPreferences {
 	 * view actions
 	 */
 	public static final String	VIEW_DOUBLE_CLICK_ACTIONS					= "ViewDoubleClickActions";								//$NON-NLS-1$
-
 }

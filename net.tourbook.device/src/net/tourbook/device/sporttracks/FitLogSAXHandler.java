@@ -33,6 +33,7 @@ import net.tourbook.device.InvalidDeviceSAXException;
 import net.tourbook.device.Messages;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.preferences.TourTypeColorDefinition;
+import net.tourbook.util.MtMath;
 import net.tourbook.util.Util;
 
 import org.eclipse.osgi.util.NLS;
@@ -725,7 +726,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 					&& _prevLongitude != Double.MIN_VALUE) {
 
 				// get distance from lat/lon when it's not set
-				_distanceAbsolute += Util.distanceVincenty(_prevLatitude, _prevLongitude, latitude, longitude);
+				_distanceAbsolute += MtMath.distanceVincenty(_prevLatitude, _prevLongitude, latitude, longitude);
 			}
 
 			if (latitude != Double.MIN_VALUE && longitude != Double.MIN_VALUE) {

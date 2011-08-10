@@ -47,9 +47,9 @@ import net.tourbook.ui.tourChart.TourChartConfiguration;
 import net.tourbook.ui.views.TourChartAnalyzerInfo;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.util.IExternalTourEvents;
+import net.tourbook.util.MtMath;
 import net.tourbook.util.StatusUtil;
 import net.tourbook.util.StringToArrayConverter;
-import net.tourbook.util.Util;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
@@ -294,7 +294,7 @@ public class TourManager {
 						 * vincenty algorithm is much more accurate compared with haversine
 						 */
 //						final double distDiff = Util.distanceHaversine(latStart, lonStart, latEnd, lonEnd);
-						final double distDiff = Util.distanceVincenty(latStart, lonStart, latEnd, lonEnd);
+						final double distDiff = MtMath.distanceVincenty(latStart, lonStart, latEnd, lonEnd);
 
 						distance += distDiff;
 						distanceSerie[serieIndex] = (int) distance;

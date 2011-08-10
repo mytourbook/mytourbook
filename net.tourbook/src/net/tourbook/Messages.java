@@ -21,7 +21,6 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.messages";							//$NON-NLS-1$
 
-
 	public static String		Image__ArrowDown;
 	public static String		Image__ArrowUp;
 	public static String		Image__ZoomOut;
@@ -516,7 +515,7 @@ public class Messages extends NLS {
 	public static String		Graph_Pref_color_statistic_distance;
 	public static String		Graph_Pref_color_statistic_time;
 
-	public static String	Graph_Pref_ColorText;
+	public static String		Graph_Pref_ColorText;
 
 	public static String		HR_Zone_01_060_Moderate;
 	public static String		HR_Zone_01_060_Moderate_Shortcut;
@@ -1279,8 +1278,10 @@ public class Messages extends NLS {
 	public static String		TourChart_Property_chart_type_line;
 	public static String		TourChart_Property_check_customize_pace_clipping;
 	public static String		TourChart_Property_check_customize_value_clipping;
+	public static String		TourChart_Property_Checkbox_IsCustomSmoothing;
 	public static String		TourChart_Property_label_chart_type;
 	public static String		TourChart_Property_label_pace_speed;
+	public static String		TourChart_Property_Label_Smoothing_Tau;
 	public static String		TourChart_Property_label_time_slices;
 
 	public static String		TourData_Label_new_marker;
@@ -1369,7 +1370,6 @@ public class Messages extends NLS {
 	public static String		Year_Statistic_Combo_LastYears_Tooltip;
 	public static String		Year_Statistic_Combo_NumberOfYears_Tooltip;
 	public static String		Year_Statistic_Label_NumberOfYears;
-
 
 	static {
 		// initialize resource bundle

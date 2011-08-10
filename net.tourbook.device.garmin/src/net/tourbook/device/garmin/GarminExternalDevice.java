@@ -41,6 +41,7 @@ import net.tourbook.ext.velocity.VelocityService;
 import net.tourbook.importdata.ExternalDevice;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.DataTransferWizard;
+import net.tourbook.util.MtMath;
 
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
@@ -193,7 +194,7 @@ public class GarminExternalDevice extends ExternalDevice {
 									if (!gta.hasValidDistance()) {
 										if (prevGta != null) {
 											gta.setDistance(prevGta.getDistance()
-													+ DeviceReaderTools.computeDistance(prevGta.getLatitude(),
+													+ MtMath.distanceVincenty(prevGta.getLatitude(),
 															prevGta.getLongitude(),
 															gta.getLatitude(),
 															gta.getLongitude()));

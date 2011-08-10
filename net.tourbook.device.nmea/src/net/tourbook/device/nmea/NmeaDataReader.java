@@ -26,10 +26,10 @@ import java.util.HashMap;
 
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
-import net.tourbook.device.DeviceReaderTools;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
+import net.tourbook.util.MtMath;
 import net.tourbook.util.Util;
 
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -120,7 +120,7 @@ public class NmeaDataReader extends TourbookDevice {
 			// first time data
 			timeData.absoluteDistance = 0;
 		} else {
-			fAbsoluteDistance += DeviceReaderTools.computeDistance(
+			fAbsoluteDistance += MtMath.distanceVincenty(
 					fPrevTimeData.latitude,
 					fPrevTimeData.longitude,
 					latitude,

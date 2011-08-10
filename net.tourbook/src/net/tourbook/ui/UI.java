@@ -169,6 +169,7 @@ public class UI {
 	public static final String								SYMBOL_AVERAGE_WITH_SPACE		= "\u00f8 ";								//$NON-NLS-1$
 	public static final String								SYMBOL_DIFFERENCE				= "\u0394";								//$NON-NLS-1$
 	public static final String								SYMBOL_DIFFERENCE_WITH_SPACE	= "\u0394 ";								//$NON-NLS-1$
+	public static final String								SYMBOL_TAU						= "\u03c4";								//$NON-NLS-1$
 	public static final String								SYMBOL_SUM_WITH_SPACE			= "\u2211 ";								//$NON-NLS-1$
 	public static final String								SYMBOL_DOUBLE_HORIZONTAL		= "\u2550";								//$NON-NLS-1$
 	public static final String								SYMBOL_DOUBLE_VERTICAL			= "\u2551";								//$NON-NLS-1$

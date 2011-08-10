@@ -1123,10 +1123,6 @@ public class ChartComponents extends Composite {
 		return _chartDrawingData;
 	}
 
-	ChartProperties getChartProperties() {
-		return new ChartProperties();
-	}
-
 	/**
 	 * @return Returns the visible chart graph height
 	 */

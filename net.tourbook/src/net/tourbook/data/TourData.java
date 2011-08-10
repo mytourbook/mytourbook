@@ -62,6 +62,7 @@ import net.tourbook.chart.ChartLabel;
 import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.TourbookDevice;
+import net.tourbook.math.Smooth;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageComputedValues;
 import net.tourbook.srtm.ElevationSRTM3;
@@ -236,10 +237,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private int												tourDistance;
 
 	/**
-	 * A flag indicating that the distance of this series is defined by a distance sensor and not
-	 * from the GPS device.<br>
+	 * Are the distance values measured with a distance sensor or with lat/lon values.<br>
 	 * <br>
-	 * 0 == false <i>(default)</i> <br>
+	 * 0 == false <i>(default, no distance sensor)</i> <br>
 	 * 1 == true
 	 */
 	private short											isDistanceFromSensor				= 0;												// db-version 8
@@ -1155,7 +1155,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 
 		if (deviceTimeInterval == -1) {
-			computeAltimeterGradientSerieWithVariableInterval();
+//			computeAltimeterGradientSerieWithVariableInterval();
+
+			if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_CUSTOM_SMOOTHING) == false) {
+				computeAltimeterGradientSerieWithVariableInterval();
+			}
+
 		} else {
 			computeAltimeterGradientSerieWithFixedInterval();
 		}
@@ -1899,6 +1904,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 		// this case should not occure !!!
 
+//		breakTimeSerie = new boolean[timeSerie.length];
+
 		return 0;
 	}
 
@@ -2038,6 +2045,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	public void computeSpeedSerie() {
 
+//		final long start = System.nanoTime();
+
 		if ((speedSerie != null)
 				&& (speedSerieImperial != null)
 				&& (paceSerieMinute != null)
@@ -2056,11 +2065,21 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			// speed is computed from distance and time
 
 			if (deviceTimeInterval == -1) {
-				computeSpeedSerieInternalWithVariableInterval();
+
+				if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_CUSTOM_SMOOTHING)) {
+					computeSpeedSerieInternalWithVariableInterval_SmoothDidier();
+				} else {
+					computeSpeedSerieInternalWithVariableInterval_SmoothWolfgang();
+				}
+
 			} else {
 				computeSpeedSerieInternalWithFixedInterval();
 			}
 		}
+
+//		final long end = System.nanoTime();
+//
+//		System.out.println("computeSpeedSerie():\t" + ((end - start) / 1000000.0) + "ms");
 	}
 
 	/**
@@ -2228,9 +2247,62 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	}
 
 	/**
-	 * compute the speed when the time serie has unequal time intervalls
+	 * compute the speed when the time serie has unequal time intervalls, with Didier Jamet
+	 * algorithm
 	 */
-	private void computeSpeedSerieInternalWithVariableInterval() {
+	private void computeSpeedSerieInternalWithVariableInterval_SmoothDidier() {
+
+		if (distanceSerie == null) {
+			return;
+		}
+
+		final int serieLength = timeSerie.length;
+
+		speedSerie = new int[serieLength];
+		speedSerieImperial = new int[serieLength];
+
+		paceSerieMinute = new int[serieLength];
+		paceSerieMinuteImperial = new int[serieLength];
+		paceSerieSeconds = new int[serieLength];
+		paceSerieSecondsImperial = new int[serieLength];
+
+		gradientSerie = new int[serieLength];
+
+		altimeterSerie = new int[serieLength];
+		altimeterSerieImperial = new int[serieLength];
+
+		final boolean isUseLatLon = (latitudeSerie != null) && //
+				(longitudeSerie != null)
+				&& (isDistanceFromSensor == 0); // --> distance is measured with lat/lon and not from a sensor
+
+		Smooth.smoothDataSeries(
+				timeSerie,
+				distanceSerie,
+				altitudeSerie,
+				altitudeSerieImperial,
+				speedSerie,
+				speedSerieImperial,
+				paceSerieMinute,
+				paceSerieMinuteImperial,
+				paceSerieSeconds,
+				paceSerieSecondsImperial,
+				gradientSerie,
+				altimeterSerie,
+				altimeterSerieImperial,
+				isUseLatLon,
+				latitudeSerie,
+				longitudeSerie);
+
+		/*
+		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		 */
+		maxSpeed /= 10;
+	}
+
+	/**
+	 * compute the speed when the time serie has unequal time intervalls, with Wolfgangs algorithm
+	 */
+	private void computeSpeedSerieInternalWithVariableInterval_SmoothWolfgang() {
 
 		if (distanceSerie == null) {
 			return;
@@ -2249,7 +2321,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		paceSerieMinuteImperial = new int[serieLength];
 		paceSerieSecondsImperial = new int[serieLength];
 
-		final boolean isCheckPosition = (latitudeSerie != null) && //
+		final boolean isUseLatLon = (latitudeSerie != null) && //
 				(longitudeSerie != null)
 				&& (isDistanceFromSensor == 0); // --> distance is measured with the gps device and not from a sensor
 
@@ -2268,7 +2340,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			int distDiff = distanceSerie[highIndex] - distanceSerie[lowIndex];
 
 			// check if a lat and long diff is available
-			if (isCheckPosition && (serieIndex > 0) && (serieIndex < lastSerieIndex - 1)) {
+			if (isUseLatLon && (serieIndex > 0) && (serieIndex < lastSerieIndex - 1)) {
 
 				if ((latitudeSerie[serieIndex] == latitudeSerie[prevSerieIndex])
 						&& (longitudeSerie[serieIndex] == longitudeSerie[prevSerieIndex])) {
@@ -2380,7 +2452,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			if (isTimeValid && (serieIndex > 0) && (timeDiff != 0)) {
 
 				// check if a lat and long diff is available
-				if (isCheckPosition && (lowIndex > 0) && (highIndex < lastSerieIndex - 1)) {
+				if (isUseLatLon && (lowIndex > 0) && (highIndex < lastSerieIndex - 1)) {
 
 					if ((latitudeSerie[lowIndex] == latitudeSerie[lowIndex - 1])
 							&& (longitudeSerie[lowIndex] == longitudeSerie[lowIndex - 1])) {
