@@ -300,7 +300,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 					.applyTo(_comboTitle);
 	
 			// fill combobox
-			String[] strings = PrefHistory.getHistory(ITourbookPreferences.TOUR_EDITOR_TITLE_HISTORY);
+			final String[] strings = PrefHistory.getHistory(ITourbookPreferences.TOUR_EDITOR_TITLE_HISTORY);
 			_comboTitle.setItems(strings);
 			
 			_comboTitle.addModifyListener(new ModifyListener() {
@@ -803,8 +803,9 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			// data are not valid to be saved which is done in the action which opened this dialog
 			return;
 		}
-		if (_isTitleModified)
+		if (_isTitleModified) {
 			PrefHistory.saveHistory(ITourbookPreferences.TOUR_EDITOR_TITLE_HISTORY, _comboTitle.getText());
+		}
 
 		super.okPressed();
 	}

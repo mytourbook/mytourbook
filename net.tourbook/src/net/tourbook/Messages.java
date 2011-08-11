@@ -588,6 +588,8 @@ public class Messages extends NLS {
 	public static String		Image__graph_pace_disabled;
 	public static String		Image__graph_power_disabled;
 	public static String		Image__graph_speed_disabled;
+
+	public static String	Image__graph_speed_png;
 	public static String		Image__graph_temperature_disabled;
 	public static String		Image__graph_tour_compare;
 	public static String		Image__graph_tour_compare_disabled;
@@ -1283,6 +1285,16 @@ public class Messages extends NLS {
 	public static String		TourChart_Property_label_pace_speed;
 	public static String		TourChart_Property_Label_Smoothing_Tau;
 	public static String		TourChart_Property_label_time_slices;
+
+	public static String	TourChart_Smoothing_Button_Default;
+
+	public static String	TourChart_Smoothing_Button_Default_Tooltip;
+
+	public static String	TourChart_Smoothing_Checkbox_IsAltitudeSmoothing;
+
+	public static String	TourChart_Smoothing_Checkbox_IsPulseSmoothing;
+
+	public static String	TourChart_Smoothing_Checkbox_IsSpeedSmoothing;
 
 	public static String		TourData_Label_new_marker;
 

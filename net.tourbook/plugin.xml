@@ -588,6 +588,12 @@
                label="%command_tourCompare_wizard"
                mnemonic="%command_tourCompare_wizard_mnemonic">
          </command>
+         <command
+               commandId="command.net.tourbook.ui.views.TourChartSmoothingView"
+               icon="icons/smooth.png"
+               label="%View_Name_TourChartSmoothing"
+               mnemonic="%View_Name_TourChartSmoothing_Mnemonic">
+         </command>
 
       </menuContribution>
 
@@ -808,7 +814,11 @@
             name="%View_Name_Training"
             defaultHandler="net.tourbook.training.ActionHandlerOpenViewTraining"
 	  		/>
-
+      <command
+            id="command.net.tourbook.ui.views.TourChartSmoothingView"
+            name="%View_Name_TourChartSmoothing"
+            defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewChartSmoothing"
+	  		/>
 
       <command
             id="net.tourbook.command.graph.altitude"
@@ -1107,6 +1117,7 @@
 	            name="%View_Name_Waypoint">
 	      </view>
 
+
       <category
             id="net.tourbook.category.Tools"
             name="%View_Category_Tools">
@@ -1138,6 +1149,13 @@
 	            icon="icons/pulse-zones.png"
 	            id="net.tourbook.training.TrainingView"
 	            name="%View_Name_Training">
+	      </view>
+	      <view
+	            category="net.tourbook.category.Tools"
+	            class="net.tourbook.ui.views.TourChartSmoothingView"
+	            icon="icons/smooth.png"
+	            id="net.tourbook.ui.views.TourChartSmoothingView"
+	            name="%View_Name_TourChartSmoothing">
 	      </view>
 	      <view
 	            allowMultiple="false"

@@ -20,6 +20,17 @@
   <defs
      id="defs4">
     <linearGradient
+       id="linearGradient3808">
+      <stop
+         style="stop-color:#31a5ff;stop-opacity:1;"
+         offset="0"
+         id="stop3810" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:0;"
+         offset="1"
+         id="stop3812" />
+    </linearGradient>
+    <linearGradient
        id="linearGradient3782"
        osb:paint="solid">
       <stop
@@ -27,6 +38,16 @@
          offset="0"
          id="stop3784" />
     </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3808"
+       id="linearGradient3814"
+       x1="108"
+       y1="598.56219"
+       x2="108"
+       y2="611.36218"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1,0,0,0.62500016,0,226.26072)" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -35,17 +56,17 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="18.97442"
-     inkscape:cx="137.61318"
-     inkscape:cy="443.05531"
+     inkscape:zoom="28.231641"
+     inkscape:cx="111.39903"
+     inkscape:cy="452.31296"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
-     inkscape:window-width="1114"
-     inkscape:window-height="930"
-     inkscape:window-x="378"
-     inkscape:window-y="7"
-     inkscape:window-maximized="0">
+     inkscape:window-width="1522"
+     inkscape:window-height="1182"
+     inkscape:window-x="-32000"
+     inkscape:window-y="-32000"
+     inkscape:window-maximized="1">
     <inkscape:grid
        type="xygrid"
        id="grid2996" />
@@ -65,7 +86,8 @@
   <g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
-     id="layer1">
+     id="layer1"
+     style="display:inline">
     <image
        y="622.36218"
        x="120"
@@ -74,7 +96,7 @@
        height="15"
        width="45" />
     <rect
-       style="fill:none;fill-opacity:1;stroke:#000000;stroke-opacity:1;stroke-width:0.10000000000000001;stroke-miterlimit:4;stroke-dasharray:none;opacity:0.494"
+       style="opacity:0.494;fill:none;stroke:#000000;stroke-width:0.1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="rect2998"
        width="22"
        height="22"
@@ -86,7 +108,7 @@
        id="path3772"
        inkscape:connector-curvature="0" />
     <path
-       style="fill:#a6ff2d;fill-opacity:1;stroke:#82bf1f;stroke-width:1.10468780999999990px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="fill:#a6ff2d;fill-opacity:1;stroke:#82bf1f;stroke-width:1.10468781px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 130.82405,616.90071 18.3519,0 -2.80577,-5.56474 -12.7209,-0.0524 z"
        id="path3774"
        inkscape:connector-curvature="0"
@@ -95,7 +117,7 @@
        inkscape:export-xdpi="71.552795"
        inkscape:export-ydpi="71.552795" />
     <path
-       style="fill:#ffd87d;fill-opacity:1;stroke:#f48a00;stroke-width:0.89608425000000003px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="fill:#ffd87d;fill-opacity:1;stroke:#f48a00;stroke-width:0.89608425px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 134,610.36218 12,0 -3.06592,-6.00486 -5.93408,0.005 z"
        id="path3778"
        inkscape:connector-curvature="0"
@@ -112,5 +134,32 @@
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\pulse-zones.png"
        inkscape:export-xdpi="71.552795"
        inkscape:export-ydpi="71.552795" />
+    <image
+       y="601.36218"
+       x="100"
+       id="image3007"
+       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAO9JREFU OI3tkLFKA0EURc+DgVhIhDQSCAFTB4SA5AOEVDGVn2AZsLNNCr/ExlosYm9jkUrQVkgh7FoGsiCE azMz7mw0HxDyioG5cM9978J+dmCsKiyWOkJMBS3AAUh8A/cyHk/qtv4XMM90BjwBDQTyugz8/wUx 6jftawMw+9AA40HioGwKo19gBgwuOvYaAXfvagveBIdlAyWI/OPBC0H3qmtLB5AVTPBmlVODqdKT RBvjGri1m2c1gE9BLQFYCgvAAPWntFxeMAZqW9IizFLIsYxLlxcMY9IfgKDFUtPNzl2+olc1xjUt aX/jHOD0BzJhcBrej53MAAAAAElFTkSuQmCC "
+       height="16"
+       width="16" />
+    <path
+       style="fill:url(#linearGradient3814);fill-opacity:1;stroke:none"
+       d="m 100,594.36218 c 0,0 4.09488,7.08009 8,7 3.90512,-0.0801 8,-7 8,-7 l 0,9 -16,0 0,-5 z"
+       id="path3014"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="czccccc"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\smooth.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       style="opacity:0;fill:#31a5ff;fill-opacity:1;stroke:none"
+       id="rect3816"
+       width="16"
+       height="9"
+       x="100"
+       y="587.36218"
+       ry="2.25"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\smooth.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
   </g>
 </svg>
