@@ -17,6 +17,9 @@ package net.tourbook.ui.views;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
 import net.tourbook.util.Util;
 
@@ -67,7 +70,7 @@ public class TourChartSmoothingView extends ViewPart {
 	private Button					_chkIsAltitudeSmoothing;
 	private Button					_chkIsPulseSmoothing;
 	private Spinner					_spinnerSpeedTau;
-	private Spinner					_spinnerAtitudeTau;
+	private Spinner					_spinnerAltitudeTau;
 	private Spinner					_spinnerPulseTau;
 
 	private Button					_btnDefault;
@@ -85,6 +88,9 @@ public class TourChartSmoothingView extends ViewPart {
 	public void createPartControl(final Composite parent) {
 
 		createUI(parent);
+
+		restoreStore();
+		enableControls();
 	}
 
 	private void createUI(final Composite parent) {
@@ -99,7 +105,7 @@ public class TourChartSmoothingView extends ViewPart {
 			createUI10SmoothAltitude(container);
 			createUI20SmoothPulse(container);
 			createUI30SmoothSpeed(container);
-			createUI40Actions(container);
+//			createUI40Actions(container);
 		}
 	}
 
@@ -127,16 +133,16 @@ public class TourChartSmoothingView extends ViewPart {
 		/*
 		 * spinner: tau
 		 */
-		_spinnerAtitudeTau = new Spinner(parent, SWT.BORDER);
+		_spinnerAltitudeTau = new Spinner(parent, SWT.BORDER);
 		GridDataFactory.fillDefaults()//
 				.align(SWT.BEGINNING, SWT.FILL)
-				.applyTo(_spinnerAtitudeTau);
-		_spinnerAtitudeTau.setDigits(1);
-		_spinnerAtitudeTau.setMinimum(1);
-		_spinnerAtitudeTau.setMaximum(MAX_TAU);
-		_spinnerAtitudeTau.addSelectionListener(_defaultSelectionListener);
-		_spinnerAtitudeTau.addMouseWheelListener(_defaultSpinnerMouseWheelListener);
-		_spinnerAtitudeTau.addModifyListener(_defaultModifyListener);
+				.applyTo(_spinnerAltitudeTau);
+		_spinnerAltitudeTau.setDigits(1);
+		_spinnerAltitudeTau.setMinimum(1);
+		_spinnerAltitudeTau.setMaximum(MAX_TAU);
+		_spinnerAltitudeTau.addSelectionListener(_defaultSelectionListener);
+		_spinnerAltitudeTau.addMouseWheelListener(_defaultSpinnerMouseWheelListener);
+		_spinnerAltitudeTau.addModifyListener(_defaultModifyListener);
 	}
 
 	private void createUI20SmoothPulse(final Composite parent) {
@@ -261,9 +267,14 @@ public class TourChartSmoothingView extends ViewPart {
 
 	private void enableControls() {
 
-		_spinnerSpeedTau.setEnabled(_chkIsSpeedSmoothing.getSelection());
-		_spinnerAtitudeTau.setEnabled(_chkIsAltitudeSmoothing.getSelection());
-		_spinnerPulseTau.setEnabled(_chkIsPulseSmoothing.getSelection());
+		final boolean isSpeed = _chkIsSpeedSmoothing.getSelection();
+
+		_spinnerSpeedTau.setEnabled(isSpeed);
+		_spinnerAltitudeTau.setEnabled(isSpeed);
+		_spinnerPulseTau.setEnabled(false);
+
+		_chkIsAltitudeSmoothing.setEnabled(false);
+		_chkIsPulseSmoothing.setEnabled(false);
 	}
 
 	private void initUI(final Composite parent) {
@@ -307,15 +318,55 @@ public class TourChartSmoothingView extends ViewPart {
 
 	}
 
-//	private void onActionSaveSettings() {
-//		// TODO Auto-generated method stub
-//
-//	}
-
 	private void onModifySmoothing() {
 
 		enableControls();
 
+		saveStore();
+
+		TourManager.getInstance().removeAllToursFromCache();
+//		TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourChartPropertyView.this);
+
+		// fire unique event for all changes
+		TourManager.fireEvent(TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED, null);
+	}
+
+	private void restoreStore() {
+
+		// altitude
+		_chkIsAltitudeSmoothing.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_SMOOTHING_IS_ALTITUDE));
+		_spinnerAltitudeTau.setSelection(//
+				(int) (_prefStore.getDouble(ITourbookPreferences.GRAPH_SMOOTHING_ALTITUDE_TAU) * 10));
+
+		// pulse
+		_chkIsPulseSmoothing.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_SMOOTHING_IS_PULSE));
+		_spinnerPulseTau.setSelection(//
+				(int) (_prefStore.getDouble(ITourbookPreferences.GRAPH_SMOOTHING_PULSE_TAU) * 10));
+
+		// speed
+		_chkIsSpeedSmoothing.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_SMOOTHING_IS_SPEED));
+		_spinnerSpeedTau.setSelection(//
+				(int) (_prefStore.getDouble(ITourbookPreferences.GRAPH_SMOOTHING_SPEED_TAU) * 10));
+	}
+
+	/**
+	 * Update new values in the pref store
+	 */
+	private void saveStore() {
+
+		// altitude
+		_prefStore.setValue(ITourbookPreferences.GRAPH_SMOOTHING_IS_ALTITUDE, _chkIsAltitudeSmoothing.getSelection());
+		_prefStore.setValue(
+				ITourbookPreferences.GRAPH_SMOOTHING_ALTITUDE_TAU,
+				_spinnerAltitudeTau.getSelection() / 10.0);
+
+		// pulse
+		_prefStore.setValue(ITourbookPreferences.GRAPH_SMOOTHING_IS_PULSE, _chkIsPulseSmoothing.getSelection());
+		_prefStore.setValue(ITourbookPreferences.GRAPH_SMOOTHING_PULSE_TAU, _spinnerPulseTau.getSelection() / 10.0);
+
+		// speed smoothing
+		_prefStore.setValue(ITourbookPreferences.GRAPH_SMOOTHING_IS_SPEED, _chkIsSpeedSmoothing.getSelection());
+		_prefStore.setValue(ITourbookPreferences.GRAPH_SMOOTHING_SPEED_TAU, _spinnerSpeedTau.getSelection() / 10.0);
 	}
 
 	@Override

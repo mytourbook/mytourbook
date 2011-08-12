@@ -40,7 +40,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.part.ViewPart;
 
-public class TourChartPropertyView extends ViewPart /* implements IComputeTourValues */{
+public class TourChartPropertyView extends ViewPart {
 
 	public static final String		ID			= "net.tourbook.views.TourChartPropertyView";	//$NON-NLS-1$
 
@@ -49,9 +49,6 @@ public class TourChartPropertyView extends ViewPart /* implements IComputeTourVa
 
 	private Button					_rdoLineChartType;
 	private Button					_rdoBarChartType;
-
-	private Button					_chkIsCustomSmoothing;
-	private Spinner					_spinnerSmoothingTau;
 
 	private Button					_chkIsCustomClipSettings;
 	private Spinner					_spinnerClipValues;
@@ -83,7 +80,6 @@ public class TourChartPropertyView extends ViewPart /* implements IComputeTourVa
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
 			createUI10ChartType(container);
-			createUI20Smoothing(container);
 			createUI30Clipping(container);
 		}
 
@@ -124,47 +120,6 @@ public class TourChartPropertyView extends ViewPart /* implements IComputeTourVa
 				_rdoBarChartType.setText(Messages.TourChart_Property_chart_type_bar);
 				_rdoBarChartType.addSelectionListener(_defaultSelectionListener);
 			}
-		}
-	}
-
-	private void createUI20Smoothing(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.swtDefaults()//
-				.numColumns(2)
-				.margins(5, 0)
-				.spacing(5, 0)
-				.applyTo(container);
-		{
-			/*
-			 * is value clipping
-			 */
-			_chkIsCustomSmoothing = new Button(container, SWT.CHECK);
-			GridDataFactory.fillDefaults() //
-					.span(2, 1)
-					.align(SWT.FILL, SWT.CENTER)
-					.applyTo(_chkIsCustomSmoothing);
-			_chkIsCustomSmoothing.setText(Messages.TourChart_Property_Checkbox_IsCustomSmoothing);
-			_chkIsCustomSmoothing.addSelectionListener(_defaultSelectionListener);
-
-			/*
-			 * tau smoothing
-			 */
-			final Label label = new Label(container, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.indent(16, 0)
-					.align(SWT.FILL, SWT.CENTER)
-					.applyTo(label);
-			label.setText(Messages.TourChart_Property_Label_Smoothing_Tau);
-
-			_spinnerSmoothingTau = new Spinner(container, SWT.BORDER);
-			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_spinnerSmoothingTau);
-			_spinnerSmoothingTau.setDigits(1);
-			_spinnerSmoothingTau.setMinimum(1);
-			_spinnerSmoothingTau.setMaximum(5000);
-			_spinnerSmoothingTau.addSelectionListener(_defaultSelectionListener);
-			_spinnerSmoothingTau.addMouseWheelListener(_defaultMouseWheelListener);
 		}
 	}
 
@@ -274,14 +229,6 @@ public class TourChartPropertyView extends ViewPart /* implements IComputeTourVa
 		}
 
 		/*
-		 * smoothing
-		 */
-		_chkIsCustomSmoothing.setSelection(_prefStore.getBoolean(//
-				ITourbookPreferences.GRAPH_PROPERTY_IS_CUSTOM_SMOOTHING));
-		_spinnerSmoothingTau.setSelection(//
-				(int) (_prefStore.getDouble(ITourbookPreferences.GRAPH_PROPERTY_SMOOTHING_TAU) * 10));
-
-		/*
 		 * clipping
 		 */
 		_chkIsCustomClipSettings.setSelection(_prefStore.getBoolean(//
@@ -309,16 +256,6 @@ public class TourChartPropertyView extends ViewPart /* implements IComputeTourVa
 				? ChartDataModel.CHART_TYPE_LINE
 				: ChartDataModel.CHART_TYPE_BAR;
 		_prefStore.setValue(ITourbookPreferences.GRAPH_PROPERTY_CHARTTYPE, speedChartType);
-
-		/*
-		 * tau smoothing
-		 */
-		_prefStore.setValue(
-				ITourbookPreferences.GRAPH_PROPERTY_IS_CUSTOM_SMOOTHING,
-				_chkIsCustomSmoothing.getSelection());
-		_prefStore.setValue(
-				ITourbookPreferences.GRAPH_PROPERTY_SMOOTHING_TAU,
-				_spinnerSmoothingTau.getSelection() / 10.0);
 
 		/*
 		 * clip time slices

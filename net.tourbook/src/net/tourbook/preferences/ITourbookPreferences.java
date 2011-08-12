@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -86,6 +86,24 @@ public interface ITourbookPreferences {
 	public static final String	GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES		= "GraphGrid_IsShowHorizontalGridlines";					//$NON-NLS-1$
 	public static final String	GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES		= "GraphGrid_IsShowVerticalGridlines";						//$NON-NLS-1$
 
+	public static final String	GRAPH_SMOOTHING_IS_ALTITUDE					= "Graph_IsAltitudeSmoothing";								//$NON-NLS-1$
+	public static final String	GRAPH_SMOOTHING_IS_PULSE					= "Graph_IsPulseSmoothing";								//$NON-NLS-1$
+	public static final String	GRAPH_SMOOTHING_IS_SPEED					= "Graph_IsSpeedSmoothing";								//$NON-NLS-1$
+	public static final String	GRAPH_SMOOTHING_ALTITUDE_TAU				= "Graph_AltitudeSmoothingTau";							//$NON-NLS-1$
+	public static final String	GRAPH_SMOOTHING_PULSE_TAU					= "Graph_PulseSmoothingTau";								//$NON-NLS-1$
+	public static final String	GRAPH_SMOOTHING_SPEED_TAU					= "Graph_SpeedSmoothingTau";								//$NON-NLS-1$
+
+	/*
+	 * 
+	 */
+	public static final String	GRAPH_PROPERTY_CHARTTYPE					= "graph.property.chartType";								//$NON-NLS-1$
+
+	public static final String	GRAPH_PROPERTY_IS_VALUE_CLIPPING			= "graph.property.is.value_clipping";						//$NON-NLS-1$
+	public static final String	GRAPH_PROPERTY_VALUE_CLIPPING_TIMESLICE		= "graph.property.timeslice.value_clipping";				//$NON-NLS-1$
+
+	public static final String	GRAPH_PROPERTY_IS_PACE_CLIPPING				= "graph.property.is.pace_clipping";						//$NON-NLS-1$
+	public static final String	GRAPH_PROPERTY_PACE_CLIPPING_VALUE			= "graph.property.is.pace_clipping.value";					//$NON-NLS-1$
+
 	public static final String	DEFAULT_IMPORT_TOUR_TYPE_ID					= "tourtype.import.default";								//$NON-NLS-1$
 
 	public static final String	TOUR_TYPE_LIST_IS_MODIFIED					= "tourtype.list.is-modified";								//$NON-NLS-1$
@@ -111,17 +129,6 @@ public interface ITourbookPreferences {
 	public static final String	BREAK_TIME_SLICE_DIFF						= "BreakTime_SliceDiff";									//$NON-NLS-1$
 	public static final String	BREAK_TIME_MIN_SLICE_SPEED					= "BreakTime_MinSliceSpeed";								//$NON-NLS-1$
 	public static final String	BREAK_TIME_MIN_AVG_SPEED					= "BreakTime_MinAvgSpeed";									//$NON-NLS-1$
-
-	public static final String	GRAPH_PROPERTY_CHARTTYPE					= "graph.property.chartType";								//$NON-NLS-1$
-
-	public static final String	GRAPH_PROPERTY_IS_CUSTOM_SMOOTHING			= "GraphProperty_IsCustomSmoothing";						//$NON-NLS-1$
-	public static final String	GRAPH_PROPERTY_SMOOTHING_TAU				= "GraphProperty_Smoothing_Tau";							//$NON-NLS-1$
-
-	public static final String	GRAPH_PROPERTY_IS_VALUE_CLIPPING			= "graph.property.is.value_clipping";						//$NON-NLS-1$
-	public static final String	GRAPH_PROPERTY_VALUE_CLIPPING_TIMESLICE		= "graph.property.timeslice.value_clipping";				//$NON-NLS-1$
-
-	public static final String	GRAPH_PROPERTY_IS_PACE_CLIPPING				= "graph.property.is.pace_clipping";						//$NON-NLS-1$
-	public static final String	GRAPH_PROPERTY_PACE_CLIPPING_VALUE			= "graph.property.is.pace_clipping.value";					//$NON-NLS-1$
 
 	/*
 	 * system
@@ -278,4 +285,5 @@ public interface ITourbookPreferences {
 	 * view actions
 	 */
 	public static final String	VIEW_DOUBLE_CLICK_ACTIONS					= "ViewDoubleClickActions";								//$NON-NLS-1$
+
 }

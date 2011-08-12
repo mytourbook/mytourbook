@@ -1157,7 +1157,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		if (deviceTimeInterval == -1) {
 //			computeAltimeterGradientSerieWithVariableInterval();
 
-			if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_CUSTOM_SMOOTHING) == false) {
+			if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_SMOOTHING_IS_SPEED) == false) {
 				computeAltimeterGradientSerieWithVariableInterval();
 			}
 
@@ -2066,7 +2066,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 			if (deviceTimeInterval == -1) {
 
-				if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_CUSTOM_SMOOTHING)) {
+				if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_SMOOTHING_IS_SPEED)) {
 					computeSpeedSerieInternalWithVariableInterval_SmoothDidier();
 				} else {
 					computeSpeedSerieInternalWithVariableInterval_SmoothWolfgang();

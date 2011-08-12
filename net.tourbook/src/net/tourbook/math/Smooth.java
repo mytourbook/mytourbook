@@ -582,7 +582,9 @@ public class Smooth {
 		final double Vv[] = new double[size];
 		final double Vv_sc[] = new double[size];
 
-		final double tau = _prefStore.getDouble(ITourbookPreferences.GRAPH_PROPERTY_SMOOTHING_TAU);
+		final double tauAltitude = _prefStore.getDouble(ITourbookPreferences.GRAPH_SMOOTHING_ALTITUDE_TAU);
+//		final double tauPulse = _prefStore.getDouble(ITourbookPreferences.GRAPH_SMOOTHING_PULSE_TAU);
+		final double tauSpeed = _prefStore.getDouble(ITourbookPreferences.GRAPH_SMOOTHING_SPEED_TAU);
 
 		// Compute the distance from latitude and longitude data
 		//======================================================
@@ -637,8 +639,8 @@ public class Smooth {
 
 		// Smooth out the time variations of the distance, the altitude and the heart rate
 		//================================================================================
-		smoothing(timeSerie, distance, distance_sc, tau, 0);
-		smoothing(timeSerie, altitude, altitude_sc, tau, 0);
+		smoothing(timeSerie, distance, distance_sc, tauSpeed, 0);
+		smoothing(timeSerie, altitude, altitude_sc, tauAltitude, 0);
 //		smoothing(timeSerie, heart_rate, heart_rate_sc, tau, 0);
 
 		// Compute the horizontal and vertical speeds from the smoothed distance and altitude
@@ -664,14 +666,14 @@ public class Smooth {
 
 		// Smooth out the time variations of the horizontal and vertical speeds
 		//=====================================================================
-		smoothing(timeSerie, Vh, Vh_sc, tau, 0);
-		smoothing(timeSerie, Vv, Vv_sc, tau, 0);
+		smoothing(timeSerie, Vh, Vh_sc, tauSpeed, 0);
+		smoothing(timeSerie, Vv, Vv_sc, tauAltitude, 0);
 
 		// Compute the terrain slope
 		//==========================
 		for (int serieIndex = 0; serieIndex < size; serieIndex++) {
 			gradientSerie[serieIndex] = (int) (Vv_sc[serieIndex] / Vh_sc[serieIndex] * 1000.);
-			altimeterSerie[serieIndex] = (int) (Vv_sc[serieIndex] * 3600);
+			altimeterSerie[serieIndex] = (int) (Vv_sc[serieIndex] * 3600.);
 		}
 
 		for (int serieIndex = 0; serieIndex < Vh.length; serieIndex++) {
@@ -681,29 +683,12 @@ public class Smooth {
 			speedSerie[serieIndex] = (int) speedMetric;
 			speedSerieImperial[serieIndex] = (int) (speedMetric / UI.UNIT_MILE);
 		}
-
-//		// compute altimeter
-//		if (timeDiff > 0) {
-//			final int altimeter = (int) (3600f * altitudeDiff / timeDiff / UI.UNIT_VALUE_ALTITUDE);
-//			dataSerieAltimeter[serieIndex] = altimeter;
-//		} else {
-////			dataSerieAltimeter[serieIndex] = -100;
-//		}
-//
-//		// compute gradient
-//		if (distanceDiff > 0) {
-//			final int gradient = altitudeDiff * 1000 / distanceDiff;
-//			dataSerieGradient[serieIndex] = gradient;
-//		} else {
-////			dataSerieAltimeter[serieIndex] = -200;
-//		}
-
 	}
 
 	/**
 	 * Filters twice: <br>
-	 * 1. a first time with relaxation time tau <br>
-	 * 2. a second time with relaxation time tau/4
+	 * 1. first time with relaxation time tau <br>
+	 * 2. second time with relaxation time tau/4
 	 * 
 	 * @param time
 	 * @param field
@@ -783,12 +768,4 @@ public class Smooth {
 		}
 
 	}
-
-//		speedMetric = (int) ((distDiff * 36f) / timeDiff);
-//		speedMetric = speedMetric < 0 ? 0 : speedMetric;
-//
-//		speedImperial = (int) ((distDiff * 36f) / (timeDiff * UI.UNIT_MILE));
-//		speedImperial = speedImperial < 0 ? 0 : speedImperial;
-//
-//		setSpeed(serieIndex, speedMetric, speedImperial, timeDiff, distDiff);
 }
