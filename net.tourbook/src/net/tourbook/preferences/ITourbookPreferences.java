@@ -86,10 +86,10 @@ public interface ITourbookPreferences {
 	public static final String	GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES		= "GraphGrid_IsShowHorizontalGridlines";					//$NON-NLS-1$
 	public static final String	GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES		= "GraphGrid_IsShowVerticalGridlines";						//$NON-NLS-1$
 
+	public static final String	GRAPH_SMOOTHING_SMOOTHING_ALGORITHM			= "Graph_SmoothingAlgorithm";								//$NON-NLS-1$
 	public static final String	GRAPH_SMOOTHING_IS_ALTITUDE					= "Graph_IsAltitudeSmoothing";								//$NON-NLS-1$
 	public static final String	GRAPH_SMOOTHING_IS_PULSE					= "Graph_IsPulseSmoothing";								//$NON-NLS-1$
-	public static final String	GRAPH_SMOOTHING_IS_SPEED					= "Graph_IsSpeedSmoothing";								//$NON-NLS-1$
-	public static final String	GRAPH_SMOOTHING_ALTITUDE_TAU				= "Graph_AltitudeSmoothingTau";							//$NON-NLS-1$
+	public static final String	GRAPH_SMOOTHING_GRADIENT_TAU				= "Graph_GradientSmoothingTau";							//$NON-NLS-1$
 	public static final String	GRAPH_SMOOTHING_PULSE_TAU					= "Graph_PulseSmoothingTau";								//$NON-NLS-1$
 	public static final String	GRAPH_SMOOTHING_SPEED_TAU					= "Graph_SpeedSmoothingTau";								//$NON-NLS-1$
 
