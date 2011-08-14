@@ -1772,7 +1772,7 @@ public class TourManager {
 		 */
 		ChartDataYSerie yDataPulse = null;
 
-		final int[] pulseSerie = tourData.pulseSerie;
+		final int[] pulseSerie = tourData.getPulseSmoothedSerie();
 		if (pulseSerie != null) {
 
 			yDataPulse = createChartDataSerie(pulseSerie, chartType);

@@ -342,34 +342,46 @@ public class Smooth {
 	 * @param field_sc
 	 * @param tau
 	 * @param keep_start_end
+	 * @param smoothingIterations
+	 * @param repeatedTau
 	 */
 	public static void smoothing(	final int time[],
 									final double field[],
 									final double field_sc[],
 									final double tau,
-									final int keep_start_end) {
-		int i;
-		final int size = field.length;
+									final boolean keep_start_end,
+									final int smoothingIterations,
+									final double repeatedTau) {
 
-		final double field_sc1[] = new double[size];
+		final int size = field.length;
 		double Delta_start, Delta_end;
 
-		// First smoothing with tau
-		//-------------------------
-		smoothing1(time, field, field_sc1, tau);
+		// first smoothing with tau
+		smoothing1(time, field, field_sc, tau);
 
-		// Second smoothing with tau/4
-		//----------------------------
-		smoothing1(time, field_sc1, field_sc, tau / 4);
+		if (smoothingIterations > 0) {
 
-		// Keep start and end values
-		//--------------------------
-		if (keep_start_end == 1) {
+			// repeated smoothing with repeated tau
+
+			final double field_sc1[] = new double[size];
+
+			for (int iteration = 0; iteration < smoothingIterations; iteration++) {
+
+				for (int i = 0; i < size; i++) {
+					field_sc1[i] = field_sc[i];
+				}
+
+				smoothing1(time, field_sc1, field_sc, tau * repeatedTau);
+			}
+		}
+
+		// keep start and end values
+		if (keep_start_end) {
 
 			Delta_start = field[0] - field_sc[0];
 			Delta_end = field[size - 1] - field_sc[size - 1];
 
-			for (i = 0; i < size; i++) {
+			for (int i = 0; i < size; i++) {
 				field_sc[i] = field_sc[i] + Delta_start + (Delta_end - Delta_start) / (size - 1) * (i);
 			}
 		}

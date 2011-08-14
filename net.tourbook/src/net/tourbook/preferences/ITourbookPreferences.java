@@ -86,12 +86,14 @@ public interface ITourbookPreferences {
 	public static final String	GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES		= "GraphGrid_IsShowHorizontalGridlines";					//$NON-NLS-1$
 	public static final String	GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES		= "GraphGrid_IsShowVerticalGridlines";						//$NON-NLS-1$
 
-	public static final String	GRAPH_SMOOTHING_SMOOTHING_ALGORITHM			= "Graph_SmoothingAlgorithm";								//$NON-NLS-1$
-	public static final String	GRAPH_SMOOTHING_IS_ALTITUDE					= "Graph_IsAltitudeSmoothing";								//$NON-NLS-1$
-	public static final String	GRAPH_SMOOTHING_IS_PULSE					= "Graph_IsPulseSmoothing";								//$NON-NLS-1$
-	public static final String	GRAPH_SMOOTHING_GRADIENT_TAU				= "Graph_GradientSmoothingTau";							//$NON-NLS-1$
-	public static final String	GRAPH_SMOOTHING_PULSE_TAU					= "Graph_PulseSmoothingTau";								//$NON-NLS-1$
-	public static final String	GRAPH_SMOOTHING_SPEED_TAU					= "Graph_SpeedSmoothingTau";								//$NON-NLS-1$
+	public static final String	GRAPH_SMOOTHING_SMOOTHING_ALGORITHM			= "GraphSmoothing_SmoothingAlgorithm";						//$NON-NLS-1$
+	public static final String	GRAPH_SMOOTHING_IS_ALTITUDE					= "GraphSmoothing_IsAltitudeSmoothing";					//$NON-NLS-1$
+	public static final String	GRAPH_SMOOTHING_IS_PULSE					= "GraphSmoothing_IsPulseSmoothing";						//$NON-NLS-1$
+	public static final String	GRAPH_SMOOTHING_GRADIENT_TAU				= "GraphSmoothing_GradientSmoothingTau";					//$NON-NLS-1$
+	public static final String	GRAPH_SMOOTHING_PULSE_TAU					= "GraphSmoothing_PulseSmoothingTau";						//$NON-NLS-1$
+	public static final String	GRAPH_SMOOTHING_SPEED_TAU					= "GraphSmoothing_SpeedSmoothingTau";						//$NON-NLS-1$
+	public static final String	GRAPH_SMOOTHING_REPEATED_SMOOTHING			= "GraphSmoothing_RepeatedSmoothing";						//$NON-NLS-1$
+	public static final String	GRAPH_SMOOTHING_REPEATED_TAU				= "GraphSmoothing_RepeatedTau";							//$NON-NLS-1$
 
 	/*
 	 * 

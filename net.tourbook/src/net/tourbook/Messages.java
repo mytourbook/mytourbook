@@ -1286,34 +1286,32 @@ public class Messages extends NLS {
 	public static String		TourChart_Property_Label_Smoothing_Tau;
 	public static String		TourChart_Property_label_time_slices;
 
-	public static String	TourChart_Smoothing_Algorithm_BuiltIn;
+	public static String	TourChart_Smoothing_Algorithm_Initial;
 
-	public static String	TourChart_Smoothing_Algorithm_Jamet;
-
+	public static String		TourChart_Smoothing_Algorithm_Jamet;
 	public static String		TourChart_Smoothing_Button_Default;
 	public static String		TourChart_Smoothing_Button_Default_Tooltip;
 	public static String		TourChart_Smoothing_Checkbox_IsAltitudeSmoothing;
-
-	public static String	TourChart_Smoothing_Checkbox_IsAltitudeSmoothing_Tooltip;
+	public static String		TourChart_Smoothing_Checkbox_IsAltitudeSmoothing_Tooltip;
 	public static String		TourChart_Smoothing_Checkbox_IsGradientSmoothing;
+	public static String		TourChart_Smoothing_Checkbox_IsGradientSmoothing_Tooltip;
 	public static String		TourChart_Smoothing_Checkbox_IsPulseSmoothing;
+	public static String		TourChart_Smoothing_Checkbox_IsPulseSmoothing_Tooltip;
 	public static String		TourChart_Smoothing_Checkbox_IsSpeedSmoothing;
+	public static String		TourChart_Smoothing_Checkbox_IsSyncSmoothing;
+	public static String		TourChart_Smoothing_Checkbox_IsSyncSmoothing_Tooltip;
+	public static String		TourChart_Smoothing_Checkbox_UseJametSmoothing;
+	public static String	TourChart_Smoothing_Label_RepeatedSmoothing;
 
-	public static String	TourChart_Smoothing_Checkbox_IsSyncSmoothing;
+	public static String	TourChart_Smoothing_Label_RepeatedSmoothing_Tooltip;
 
-	public static String	TourChart_Smoothing_Checkbox_IsSyncSmoothing_Tooltip;
+	public static String	TourChart_Smoothing_Label_RepeatedTau;
 
-	public static String	TourChart_Smoothing_Checkbox_UseJametSmoothing;
+	public static String	TourChart_Smoothing_Label_RepeatedTau_Tooltip;
 
-	public static String	TourChart_Smoothing_Label_SmoothingAlgorithm;
-
-	public static String	TourChart_Smoothing_Label_SpeedSmoothing;
-
-	public static String	TourChart_Smoothing_Spinner_GradientSmoothingParameter_Tooltip;
-
-	public static String	TourChart_Smoothing_Spinner_PulseSmoothingParameter_Tooltip;
-
-	public static String	TourChart_Smoothing_Spinner_SpeedSmoothingParameter_Tooltip;
+	public static String		TourChart_Smoothing_Label_SmoothingAlgorithm;
+	public static String		TourChart_Smoothing_Label_SpeedSmoothing;
+	public static String		TourChart_Smoothing_Label_SpeedSmoothing_Tooltip;
 
 	public static String		TourData_Label_new_marker;
 

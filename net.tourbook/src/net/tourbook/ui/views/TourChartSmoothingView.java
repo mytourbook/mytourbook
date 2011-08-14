@@ -22,12 +22,15 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.util.Util;
 
-import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -45,15 +48,18 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourChartSmoothingView extends ViewPart {
 
-	private static final int		MAX_TAU							= 5000;
+	private static final int		MAX_TAU						= 5000;
 
-	public static final String		ID								= "net.tourbook.ui.views.TourChartSmoothingView";	//$NON-NLS-1$
+	public static final String		ID							= "net.tourbook.ui.views.TourChartSmoothingView";		//$NON-NLS-1$
 
-	private final IPreferenceStore	_prefStore						= TourbookPlugin.getDefault()//
-																			.getPreferenceStore();
+	private final IPreferenceStore	_prefStore					= TourbookPlugin.getDefault()//
+																		.getPreferenceStore();
 
-	private final IDialogSettings	_state							= TourbookPlugin.getDefault()//
-																			.getDialogSettingsSection(ID);
+	private final boolean			_isOSX						= net.tourbook.util.UI.IS_OSX;
+	private final boolean			_isLinux					= net.tourbook.util.UI.IS_LINUX;
+
+	private PixelConverter			_pc;
+	private int						_hintDefaultSpinnerWidth;
 
 	private SelectionAdapter		_defaultSelectionListener;
 	private MouseWheelListener		_defaultSpinnerMouseWheelListener;
@@ -61,7 +67,35 @@ public class TourChartSmoothingView extends ViewPart {
 	private boolean					_isUpdateUI;
 
 	/*
-	 * UI controls/resources
+	 * UI resources
+	 */
+	private Image					_imageAltitude				= TourbookPlugin.getImageDescriptor(
+																		Messages.Image__graph_altitude).createImage();
+	private Image					_imageAltitudeDisabled		= TourbookPlugin
+																		.getImageDescriptor(
+																				Messages.Image__graph_altitude_disabled)
+																		.createImage();
+	private Image					_imageGradient				= TourbookPlugin.getImageDescriptor(
+																		Messages.Image__graph_gradient).createImage();
+	private Image					_imageGradientDisabled		= TourbookPlugin
+																		.getImageDescriptor(
+																				Messages.Image__graph_gradient_disabled)
+																		.createImage();
+	private Image					_imagePulse					= TourbookPlugin.getImageDescriptor(
+																		Messages.Image__graph_heartbeat).createImage();
+	private Image					_imagePulseDisabled			= TourbookPlugin
+																		.getImageDescriptor(
+																				Messages.Image__graph_heartbeat_disabled)
+																		.createImage();
+	private Image					_imageSpeed					= TourbookPlugin.getImageDescriptor(
+																		Messages.Image__graph_speed).createImage();
+	private Image					_imageSpeedDisabled			= TourbookPlugin
+																		.getImageDescriptor(
+																				Messages.Image__graph_speed_disabled)
+																		.createImage();
+
+	/*
+	 * UI controls
 	 */
 	private FormToolkit				_tk;
 
@@ -72,58 +106,31 @@ public class TourChartSmoothingView extends ViewPart {
 	private Spinner					_spinnerGradientTau;
 	private Spinner					_spinnerPulseTau;
 	private Spinner					_spinnerSpeedTau;
+	private Spinner					_spinnerRepeatedSmoothing;
+	private Spinner					_spinnerRepeatedTau;
 	private Spinner					_spinnerLastUsed;
 
 	private Label					_lblSpeedSmoothing;
 	private Label					_lblGradientSmoothing;
+	private Label					_lblRepeatedSmoothing;
+	private Label					_lblRepeatedTau;
 
 	private CLabel					_iconSpeed;
 	private CLabel					_iconPulse;
 	private CLabel					_iconGradient;
 	private CLabel					_iconAltitude;
 
-	private Image					_imageAltitude					= TourbookPlugin
-																			.getImageDescriptor(
-																					Messages.Image__graph_altitude)
-																			.createImage();
-	private Image					_imageAltitudeDisabled			= TourbookPlugin
-																			.getImageDescriptor(
-																					Messages.Image__graph_altitude_disabled)
-																			.createImage();
-	private Image					_imageGradient					= TourbookPlugin
-																			.getImageDescriptor(
-																					Messages.Image__graph_gradient)
-																			.createImage();
-	private Image					_imageGradientDisabled			= TourbookPlugin
-																			.getImageDescriptor(
-																					Messages.Image__graph_gradient_disabled)
-																			.createImage();
-	private Image					_imagePulse						= TourbookPlugin
-																			.getImageDescriptor(
-																					Messages.Image__graph_heartbeat)
-																			.createImage();
-	private Image					_imagePulseDisabled				= TourbookPlugin
-																			.getImageDescriptor(
-																					Messages.Image__graph_heartbeat_disabled)
-																			.createImage();
-	private Image					_imageSpeed						= TourbookPlugin.getImageDescriptor(
-																			Messages.Image__graph_speed).createImage();
-	private Image					_imageSpeedDisabled				= TourbookPlugin
-																			.getImageDescriptor(
-																					Messages.Image__graph_speed_disabled)
-																			.createImage();
-
 	/*
 	 * non UI
 	 */
-	public static final String		SMOOTHING_ALGORITHM_JAMET		= "jamet";											//$NON-NLS-1$
-	public static final String		SMOOTHING_ALGORITHM_BUILT_IN	= "builtIn";										//$NON-NLS-1$
+	public static final String		SMOOTHING_ALGORITHM_JAMET	= "jamet";												//$NON-NLS-1$
+	public static final String		SMOOTHING_ALGORITHM_INITIAL	= "initial";											//$NON-NLS-1$
 
-	private static String[][]		SMOOTHING_ALGORITHM				= {
-			{ SMOOTHING_ALGORITHM_BUILT_IN, Messages.TourChart_Smoothing_Algorithm_BuiltIn },
+	private static String[][]		SMOOTHING_ALGORITHM			= {
+			{ SMOOTHING_ALGORITHM_INITIAL, Messages.TourChart_Smoothing_Algorithm_Initial },
 			{ SMOOTHING_ALGORITHM_JAMET, Messages.TourChart_Smoothing_Algorithm_Jamet },
-																	//
-																	};
+																//
+																};
 
 	public TourChartSmoothingView() {}
 
@@ -141,18 +148,31 @@ public class TourChartSmoothingView extends ViewPart {
 
 		initUI(parent);
 
-		final Composite container = _tk.createComposite(parent);
-		GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
-		GridLayoutFactory.swtDefaults().numColumns(3).applyTo(container);
-		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+		final ScrolledComposite scrolledContainer = new ScrolledComposite(parent, SWT.V_SCROLL);
 		{
-			createUI10SmoothingAlgorithm(container);
-			createUI20SmoothSpeed(container);
-			createUI30SmoothGradient(container);
-			createUI40SmoothAltitude(container);
-			createUI50SmoothPulse(container);
-			createUI60SyncSmoothing(container);
-//			createUI40Actions(container);
+			final Composite container = _tk.createComposite(scrolledContainer);
+			GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
+			GridLayoutFactory.swtDefaults().numColumns(3).applyTo(container);
+			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+			{
+				createUI10SmoothingAlgorithm(container);
+				createUI20SmoothSpeed(container);
+				createUI30SmoothGradient(container);
+				createUI40SmoothAltitude(container);
+				createUI50SmoothPulse(container);
+			}
+
+			// setup scrolled container
+			scrolledContainer.setExpandVertical(true);
+			scrolledContainer.setExpandHorizontal(true);
+			scrolledContainer.addControlListener(new ControlAdapter() {
+				@Override
+				public void controlResized(final ControlEvent e) {
+					scrolledContainer.setMinSize(container.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+				}
+			});
+
+			scrolledContainer.setContent(container);
 		}
 	}
 
@@ -177,9 +197,68 @@ public class TourChartSmoothingView extends ViewPart {
 			GridDataFactory.fillDefaults()//
 					.align(SWT.BEGINNING, SWT.FILL)
 					.applyTo(_comboAlgorithm);
-			_tk.adapt(_comboAlgorithm, true, false);
+			_tk.adapt(_comboAlgorithm, true, true);
 			_comboAlgorithm.setVisibleItemCount(10);
 			_comboAlgorithm.addSelectionListener(_defaultSelectionListener);
+
+			/*
+			 * label: repeated smoothing
+			 */
+			_lblRepeatedSmoothing = _tk.createLabel(container, Messages.TourChart_Smoothing_Label_RepeatedSmoothing);
+			GridDataFactory.fillDefaults() //
+					.align(SWT.FILL, SWT.CENTER)
+					.applyTo(_lblRepeatedSmoothing);
+			_lblRepeatedSmoothing.setToolTipText(Messages.TourChart_Smoothing_Label_RepeatedSmoothing_Tooltip);
+
+			/*
+			 * spinner: repeated smoothing
+			 */
+			_spinnerRepeatedSmoothing = new Spinner(container, SWT.BORDER);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.BEGINNING, SWT.FILL)
+					.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+					.applyTo(_spinnerRepeatedSmoothing);
+			_spinnerRepeatedSmoothing.setMinimum(0);
+			_spinnerRepeatedSmoothing.setMaximum(5);
+			_spinnerRepeatedSmoothing.addSelectionListener(_defaultSelectionListener);
+			_spinnerRepeatedSmoothing.addMouseWheelListener(_defaultSpinnerMouseWheelListener);
+
+			/*
+			 * label: repeated tau
+			 */
+			_lblRepeatedTau = _tk.createLabel(container, Messages.TourChart_Smoothing_Label_RepeatedTau);
+			GridDataFactory.fillDefaults() //
+					.align(SWT.FILL, SWT.CENTER)
+					.applyTo(_lblRepeatedTau);
+			_lblRepeatedTau.setToolTipText(Messages.TourChart_Smoothing_Label_RepeatedTau_Tooltip);
+
+			/*
+			 * spinner: repeated tau
+			 */
+			_spinnerRepeatedTau = new Spinner(container, SWT.BORDER);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.BEGINNING, SWT.FILL)
+					.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+					.applyTo(_spinnerRepeatedTau);
+			_spinnerRepeatedTau.setDigits(1);
+			_spinnerRepeatedTau.setMinimum(1);
+			_spinnerRepeatedTau.setMaximum(10);
+			_spinnerRepeatedTau.addSelectionListener(_defaultSelectionListener);
+			_spinnerRepeatedTau.addMouseWheelListener(_defaultSpinnerMouseWheelListener);
+
+			/*
+			 * checkbox: sync smoothing
+			 */
+			_chkIsSynchSmoothing = _tk.createButton(
+					container,
+					Messages.TourChart_Smoothing_Checkbox_IsSyncSmoothing,
+					SWT.CHECK);
+			GridDataFactory.fillDefaults() //
+					.align(SWT.FILL, SWT.CENTER)
+					.span(2, 1)
+					.applyTo(_chkIsSynchSmoothing);
+			_chkIsSynchSmoothing.setToolTipText(Messages.TourChart_Smoothing_Checkbox_IsSyncSmoothing_Tooltip);
+			_chkIsSynchSmoothing.addSelectionListener(_defaultSelectionListener);
 		}
 	}
 
@@ -199,6 +278,7 @@ public class TourChartSmoothingView extends ViewPart {
 		GridDataFactory.fillDefaults() //
 				.align(SWT.FILL, SWT.CENTER)
 				.applyTo(_lblSpeedSmoothing);
+		_lblSpeedSmoothing.setToolTipText(Messages.TourChart_Smoothing_Label_SpeedSmoothing_Tooltip);
 
 		/*
 		 * spinner: tau
@@ -207,7 +287,6 @@ public class TourChartSmoothingView extends ViewPart {
 		GridDataFactory.fillDefaults()//
 				.align(SWT.BEGINNING, SWT.FILL)
 				.applyTo(_spinnerSpeedTau);
-		_spinnerSpeedTau.setToolTipText(Messages.TourChart_Smoothing_Spinner_SpeedSmoothingParameter_Tooltip);
 		_spinnerSpeedTau.setDigits(1);
 		_spinnerSpeedTau.setMinimum(1);
 		_spinnerSpeedTau.setMaximum(MAX_TAU);
@@ -225,7 +304,7 @@ public class TourChartSmoothingView extends ViewPart {
 		_iconGradient.setImage(_imageGradient);
 
 		/*
-		 * checkbox: smooth gradient
+		 * label: smooth gradient
 		 */
 		_lblGradientSmoothing = _tk.createLabel(
 				parent,
@@ -234,6 +313,7 @@ public class TourChartSmoothingView extends ViewPart {
 		GridDataFactory.fillDefaults() //
 				.align(SWT.FILL, SWT.CENTER)
 				.applyTo(_lblGradientSmoothing);
+		_lblGradientSmoothing.setToolTipText(Messages.TourChart_Smoothing_Checkbox_IsGradientSmoothing_Tooltip);
 
 		/*
 		 * spinner: gradient tau
@@ -242,7 +322,6 @@ public class TourChartSmoothingView extends ViewPart {
 		GridDataFactory.fillDefaults()//
 				.align(SWT.BEGINNING, SWT.FILL)
 				.applyTo(_spinnerGradientTau);
-		_spinnerGradientTau.setToolTipText(Messages.TourChart_Smoothing_Spinner_GradientSmoothingParameter_Tooltip);
 		_spinnerGradientTau.setDigits(1);
 		_spinnerGradientTau.setMinimum(1);
 		_spinnerGradientTau.setMaximum(MAX_TAU);
@@ -294,6 +373,7 @@ public class TourChartSmoothingView extends ViewPart {
 				.align(SWT.FILL, SWT.CENTER)
 				.applyTo(_chkIsPulseSmoothing);
 		_chkIsPulseSmoothing.addSelectionListener(_defaultSelectionListener);
+		_chkIsPulseSmoothing.setToolTipText(Messages.TourChart_Smoothing_Checkbox_IsPulseSmoothing_Tooltip);
 
 		/*
 		 * spinner: speed tau
@@ -302,30 +382,11 @@ public class TourChartSmoothingView extends ViewPart {
 		GridDataFactory.fillDefaults()//
 				.align(SWT.BEGINNING, SWT.FILL)
 				.applyTo(_spinnerPulseTau);
-		_spinnerPulseTau.setToolTipText(Messages.TourChart_Smoothing_Spinner_PulseSmoothingParameter_Tooltip);
 		_spinnerPulseTau.setDigits(1);
 		_spinnerPulseTau.setMinimum(1);
 		_spinnerPulseTau.setMaximum(MAX_TAU);
 		_spinnerPulseTau.addSelectionListener(_defaultSelectionListener);
 		_spinnerPulseTau.addMouseWheelListener(_defaultSpinnerMouseWheelListener);
-	}
-
-	private void createUI60SyncSmoothing(final Composite parent) {
-
-		/*
-		 * checkbox: sync smoothing
-		 */
-		_chkIsSynchSmoothing = _tk.createButton(
-				parent,
-				Messages.TourChart_Smoothing_Checkbox_IsSyncSmoothing,
-				SWT.CHECK);
-		GridDataFactory.fillDefaults() //
-				.align(SWT.FILL, SWT.CENTER)
-				.indent(0, 10)
-				.span(3, 1)
-				.applyTo(_chkIsSynchSmoothing);
-		_chkIsSynchSmoothing.setToolTipText(Messages.TourChart_Smoothing_Checkbox_IsSyncSmoothing_Tooltip);
-		_chkIsSynchSmoothing.addSelectionListener(_defaultSelectionListener);
 	}
 
 	@Override
@@ -347,9 +408,12 @@ public class TourChartSmoothingView extends ViewPart {
 
 		final String selectedAlgo = getSelectedAlgorithm();
 		final boolean isJamet = selectedAlgo.equals(SMOOTHING_ALGORITHM_JAMET);
+		final boolean isRepeated = _spinnerRepeatedSmoothing.getSelection() != 0;
 
 		_lblSpeedSmoothing.setEnabled(isJamet);
 		_lblGradientSmoothing.setEnabled(isJamet);
+		_lblRepeatedSmoothing.setEnabled(isJamet);
+		_lblRepeatedTau.setEnabled(isJamet && isRepeated);
 
 		_chkIsAltitudeSmoothing.setEnabled(isJamet);
 		_chkIsPulseSmoothing.setEnabled(isJamet);
@@ -358,6 +422,8 @@ public class TourChartSmoothingView extends ViewPart {
 		_spinnerSpeedTau.setEnabled(isJamet);
 		_spinnerGradientTau.setEnabled(isJamet);
 		_spinnerPulseTau.setEnabled(isJamet && _chkIsPulseSmoothing.getSelection());
+		_spinnerRepeatedSmoothing.setEnabled(isJamet);
+		_spinnerRepeatedTau.setEnabled(isJamet && isRepeated);
 
 		_iconAltitude.setImage(isJamet ? _imageAltitude : _imageAltitudeDisabled);
 		_iconGradient.setImage(isJamet ? _imageGradient : _imageGradientDisabled);
@@ -371,6 +437,9 @@ public class TourChartSmoothingView extends ViewPart {
 	}
 
 	private void initUI(final Composite parent) {
+
+		_pc = new PixelConverter(parent);
+		_hintDefaultSpinnerWidth = _isLinux ? SWT.DEFAULT : _pc.convertWidthInCharsToPixels(_isOSX ? 10 : 5);
 
 		_tk = new FormToolkit(parent.getDisplay());
 
@@ -429,6 +498,12 @@ public class TourChartSmoothingView extends ViewPart {
 		}
 		_comboAlgorithm.select(prefAlgoIndex);
 
+		// repeated smoothing
+		_spinnerRepeatedSmoothing.setSelection(//
+				_prefStore.getInt(ITourbookPreferences.GRAPH_SMOOTHING_REPEATED_SMOOTHING));
+		_spinnerRepeatedTau.setSelection(//
+				(int) (_prefStore.getDouble(ITourbookPreferences.GRAPH_SMOOTHING_REPEATED_TAU) * 10));
+
 		// altitude
 		_chkIsAltitudeSmoothing.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_SMOOTHING_IS_ALTITUDE));
 
@@ -455,13 +530,16 @@ public class TourChartSmoothingView extends ViewPart {
 
 		// smoothing algorithm
 		_prefStore.setValue(ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM, getSelectedAlgorithm());
+		_prefStore.setValue(ITourbookPreferences.GRAPH_SMOOTHING_REPEATED_SMOOTHING,//
+				_spinnerRepeatedSmoothing.getSelection());
+		_prefStore.setValue(ITourbookPreferences.GRAPH_SMOOTHING_REPEATED_TAU,//
+				_spinnerRepeatedTau.getSelection() / 10.0);
 
 		// altitude
 		_prefStore.setValue(ITourbookPreferences.GRAPH_SMOOTHING_IS_ALTITUDE, _chkIsAltitudeSmoothing.getSelection());
 
 		// gradient
-		_prefStore.setValue(
-				ITourbookPreferences.GRAPH_SMOOTHING_GRADIENT_TAU,
+		_prefStore.setValue(ITourbookPreferences.GRAPH_SMOOTHING_GRADIENT_TAU,//
 				_spinnerGradientTau.getSelection() / 10.0);
 
 		// pulse
@@ -524,8 +602,12 @@ public class TourChartSmoothingView extends ViewPart {
 	}
 
 	private void updateUI() {
+
 		_isUpdateUI = true;
 		{
+			/*
+			 * fillup algorithm combo
+			 */
 			for (final String[] algo : SMOOTHING_ALGORITHM) {
 				_comboAlgorithm.add(algo[1]);
 			}

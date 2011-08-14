@@ -646,6 +646,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	@Transient
 	public int[]											pulseSerie;
 
+	@Transient
+	public int[]											pulseSerieSmoothed;
+
 	/**
 	 * Contains <code>true</code> or <code>false</code> for each time slice of the whole tour.
 	 * <code>true</code> is set when a time slice is a break.
@@ -1112,6 +1115,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		altitudeSerieSmoothed = null;
 		altitudeSerieImperial = null;
 		altitudeSerieImperialSmoothed = null;
+
+		pulseSerieSmoothed = null;
 
 		srtmSerie = null;
 		srtmSerieImperial = null;
@@ -1991,7 +1996,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 		final double tauGradient = _prefStore.getDouble(ITourbookPreferences.GRAPH_SMOOTHING_GRADIENT_TAU);
 		final double tauSpeed = _prefStore.getDouble(ITourbookPreferences.GRAPH_SMOOTHING_SPEED_TAU);
+
 		final boolean isAltitudeSmoothing = _prefStore.getBoolean(ITourbookPreferences.GRAPH_SMOOTHING_IS_ALTITUDE);
+
+		final int repeatedSmoothing = _prefStore.getInt(ITourbookPreferences.GRAPH_SMOOTHING_REPEATED_SMOOTHING);
+		final double repeatedTau = _prefStore.getDouble(ITourbookPreferences.GRAPH_SMOOTHING_REPEATED_TAU);
 
 		/*
 		 * get distance
@@ -2056,10 +2065,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		/*
 		 * Smooth out the time variations of the distance and the altitude
 		 */
-		Smooth.smoothing(timeSerie, distance, distance_sc, tauSpeed, 0);
+		Smooth.smoothing(timeSerie, distance, distance_sc, tauSpeed, false, repeatedSmoothing, repeatedTau);
 
 		if (isAltitudeAvailable) {
-			Smooth.smoothing(timeSerie, altitude, altitude_sc, tauGradient, 0);
+
+			Smooth.smoothing(timeSerie, altitude, altitude_sc, tauGradient, false, repeatedSmoothing, repeatedTau);
 
 			if (isAltitudeSmoothing) {
 
@@ -2107,9 +2117,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		/*
 		 * Smooth out the time variations of the horizontal and vertical speeds
 		 */
-		Smooth.smoothing(timeSerie, Vh, Vh_sc, tauSpeed, 0);
+		Smooth.smoothing(timeSerie, Vh, Vh_sc, tauSpeed, false, repeatedSmoothing, repeatedTau);
 		if (isAltitudeAvailable) {
-			Smooth.smoothing(timeSerie, Vv, Vv_sc, tauGradient, 0);
+			Smooth.smoothing(timeSerie, Vv, Vv_sc, tauGradient, false, repeatedSmoothing, repeatedTau);
 		}
 
 		/*
@@ -2139,25 +2149,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			speedSerieImperial[serieIndex] = (int) (speedMetric / UI.UNIT_MILE);
 		}
 		maxSpeed /= 10;
-
-		/*
-		 * pulse smoothing
-		 */
-		final boolean isPulseSmoothed = pulseSerie != null
-				&& _prefStore.getBoolean(ITourbookPreferences.GRAPH_SMOOTHING_IS_PULSE);
-		final double tauPulse = _prefStore.getDouble(ITourbookPreferences.GRAPH_SMOOTHING_PULSE_TAU);
-
-		final double[] heart_rate = new double[size];
-		final double[] heart_rate_sc = new double[size];
-
-		if (isPulseSmoothed) {
-			// convert pulse into double
-			for (int serieIndex = 0; serieIndex < size; serieIndex++) {
-				heart_rate[serieIndex] = pulseSerie[serieIndex];
-			}
-
-			Smooth.smoothing(timeSerie, heart_rate, heart_rate_sc, tauPulse, 0);
-		}
 	}
 
 	/**
@@ -2303,6 +2294,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 					.equals(TourChartSmoothingView.SMOOTHING_ALGORITHM_JAMET)) {
 
 				computeDistanceSmoothedDataSeries();
+
 			} else {
 
 				if (deviceTimeInterval == -1) {
@@ -4220,9 +4212,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		final float bsa = (float) (0.007184f * Math.pow(weightBody, 0.425) * Math.pow(bodyHeight, 0.725));
 		final float aP = bsa * 0.185f;
 
-		final float fRoll = weightTotal * 9.81f * cR;
-		final float fSlope = weightTotal * 9.81f; // * gradient/100
-		final float fAir = 0.5f * p * cD * aP;// * v2;
+		final float roll = weightTotal * 9.81f * cR;
+		final float slope = weightTotal * 9.81f; // * gradient/100
+		final float air = 0.5f * p * cD * aP;// * v2;
 
 //		int joule = 0;
 //		int prefTime = 0;
@@ -4246,12 +4238,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 				}
 			}
 
-			final float fSlopeTotal = fSlope * gradient;
-			final float fAirTotal = fAir * speed * speed;
+			final float slopeTotal = slope * gradient;
+			final float airTotal = air * speed * speed;
 
-			final float fTotal = fRoll + fAirTotal + fSlopeTotal;
+			final float total = roll + airTotal + slopeTotal;
 
-			int pTotal = (int) (fTotal * speed);
+			int pTotal = (int) (total * speed);
 
 //			if (pTotal > 600) {
 //				pTotal = pTotal * 1;
@@ -4267,6 +4259,57 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 
 		return powerSerie;
+	}
+
+	public int[] getPulseSmoothedSerie() {
+
+		if (pulseSerie == null) {
+			return null;
+		}
+
+		final boolean isInitialAlgorithm = _prefStore.getString(
+				ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM).equals(
+				TourChartSmoothingView.SMOOTHING_ALGORITHM_INITIAL);
+
+		if (isInitialAlgorithm) {
+			// pulse values are not smoothed
+			return pulseSerie;
+		}
+
+		if (pulseSerieSmoothed != null) {
+			return pulseSerieSmoothed;
+		}
+
+		final boolean isPulseSmoothed = _prefStore.getBoolean(ITourbookPreferences.GRAPH_SMOOTHING_IS_PULSE);
+
+		if (isPulseSmoothed == false) {
+			// pulse is not smoothed
+			return pulseSerie;
+		}
+
+		final int repeatedSmoothing = _prefStore.getInt(ITourbookPreferences.GRAPH_SMOOTHING_REPEATED_SMOOTHING);
+		final double repeatedTau = _prefStore.getDouble(ITourbookPreferences.GRAPH_SMOOTHING_REPEATED_TAU);
+		final double tauPulse = _prefStore.getDouble(ITourbookPreferences.GRAPH_SMOOTHING_PULSE_TAU);
+
+		final int size = timeSerie.length;
+		final double[] heart_rate = new double[size];
+		final double[] heart_rate_sc = new double[size];
+
+		// convert int into double
+		for (int serieIndex = 0; serieIndex < size; serieIndex++) {
+			heart_rate[serieIndex] = pulseSerie[serieIndex];
+		}
+
+		Smooth.smoothing(timeSerie, heart_rate, heart_rate_sc, tauPulse, false, repeatedSmoothing, repeatedTau);
+
+		pulseSerieSmoothed = new int[size];
+
+		// convert double into int
+		for (int serieIndex = 0; serieIndex < size; serieIndex++) {
+			pulseSerieSmoothed[serieIndex] = (int) (heart_rate_sc[serieIndex] + 0.5);
+		}
+
+		return pulseSerieSmoothed;
 	}
 
 	public int getRestPulse() {

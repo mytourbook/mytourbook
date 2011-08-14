@@ -1213,7 +1213,7 @@
 	      </view>
 	      <view
 	            category="net.tourbook.category.system"
-	            class="net.tourbook.ui.tourChart.TourChartPropertyView"
+	            class="net.tourbook.ui.views.TourChartPropertyView"
 	            icon="icons/tourchart-properties.gif"
 	            id="net.tourbook.views.TourChartPropertyView"
 	            name="%view_name_ChartProperty">
