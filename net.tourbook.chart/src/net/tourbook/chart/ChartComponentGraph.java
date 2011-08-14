@@ -4681,6 +4681,8 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private void onMouseExit(final MouseEvent event) {
 
+		_toolTipV1.toolTip20Hide();
+
 		if (_isGraphScrolled) {
 
 			_isGraphScrolled = false;
