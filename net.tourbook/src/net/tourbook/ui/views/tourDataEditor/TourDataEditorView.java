@@ -67,7 +67,7 @@ import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.ImageComboLabel;
 import net.tourbook.ui.MessageManager;
 import net.tourbook.ui.TableColumnFactory;
@@ -198,7 +198,7 @@ import org.joda.time.format.DateTimeFormatter;
 /**
  * This editor can edit (when all is implemented) all data for a tour
  */
-public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITourViewer, ITourProvider {
+public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITourViewer, ITourProvider2 {
 
 	public static final String					ID								= "net.tourbook.views.TourDataEditorView";	//$NON-NLS-1$
 
@@ -1999,6 +1999,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					clearEditorContent();
 
 				} else if (eventId == TourEventId.SEGMENT_LAYER_CHANGED) {
+
+					updateUIFromModel(_tourData, true, true);
+
+				} else if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
 
 					updateUIFromModel(_tourData, true, true);
 
@@ -6535,6 +6539,20 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_isInfoInTitle = false;
 	}
 
+	@Override
+	public void toursAreModified(final ArrayList<TourData> modifiedTours) {
+
+		if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
+
+			// check if it's the correct tour
+			if (_tourData == modifiedTours.get(0)) {
+
+				// tour type or tags can have been changed within this dialog
+				updateUITourTypeTags();
+			}
+		}
+	}
+
 	private void updateInternalUnitValues() {
 
 		_unitValueDistance = UI.UNIT_VALUE_DISTANCE;
@@ -7296,6 +7314,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		});
 	}
 
+	private void updateUITourTypeTags() {
+
+		// tour type/tags
+		UI.updateUITourType(_tourData, _lblTourType, true);
+		UI.updateUITags(_tourData, _lblTourTags);
+
+		// reflow layout that the tags are aligned correctly
+		_tourContainer.layout(true);
+	}
+
 	private void writeCSVHeader(final Writer exportWriter, final StringBuilder sb) throws IOException {
 
 		// no.
@@ -7366,5 +7394,4 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		sb.append(UI.SYSTEM_NEW_LINE);
 		exportWriter.write(sb.toString());
 	}
-
 }
