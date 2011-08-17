@@ -64,7 +64,7 @@ public class TourChartPropertyView extends ViewPart {
 
 		initUI();
 		createUI(parent);
-		restoreStore();
+		restoreState();
 	}
 
 	private void createUI(final Composite parent) {
@@ -207,7 +207,7 @@ public class TourChartPropertyView extends ViewPart {
 
 		enableControls();
 
-		saveStore();
+		saveState();
 
 		TourManager.getInstance().removeAllToursFromCache();
 //		TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourChartPropertyView.this);
@@ -216,7 +216,7 @@ public class TourChartPropertyView extends ViewPart {
 		TourManager.fireEvent(TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED, null);
 	}
 
-	private void restoreStore() {
+	private void restoreState() {
 
 		/*
 		 * chart type
@@ -247,7 +247,7 @@ public class TourChartPropertyView extends ViewPart {
 	/**
 	 * Update new values in the pref store
 	 */
-	private void saveStore() {
+	private void saveState() {
 
 		/*
 		 * chart type

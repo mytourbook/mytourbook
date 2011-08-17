@@ -138,7 +138,7 @@ public class UI {
 	/**
 	 * layout hint for a description field
 	 */
-	public static final int									DEFAULT_DESCRIPTION_WIDTH		= 300;
+	public static final int									DEFAULT_DESCRIPTION_WIDTH		= 350;
 
 	public static final String								UTF_8							= "UTF-8";									//$NON-NLS-1$
 
@@ -590,29 +590,38 @@ public class UI {
 
 		try {
 
-			final StyleRange style = new StyleRange();
-			style.metrics = new GlyphMetrics(0, 0, 10);
-
-			final Bullet bullet = new Bullet(style);
-			final int lineCount = Util.countCharacter(bulletText, '\n');
-
-			styledText = new StyledText(parent, SWT.READ_ONLY | SWT.WRAP | SWT.MULTI);
-			GridDataFactory
-					.fillDefaults()
+			final Composite container = new Composite(parent, SWT.NONE);
+			GridDataFactory.fillDefaults()//
 					.grab(true, false)
 					.span(spanHorizontal, 1)
 					.hint(horizontalHint, SWT.DEFAULT)
-					.applyTo(styledText);
-			styledText.setText(bulletText);
+					.applyTo(container);
+			GridLayoutFactory.fillDefaults()//
+					.numColumns(1)
+					.margins(5, 5)
+					.applyTo(container);
 
-			if (backgroundColor == null) {
-				styledText.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-			} else {
-				styledText.setBackground(backgroundColor);
+			container.setBackground(backgroundColor == null ? //
+					container.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND)
+					: backgroundColor);
+			{
+				final StyleRange style = new StyleRange();
+				style.metrics = new GlyphMetrics(0, 0, 10);
+
+				final Bullet bullet = new Bullet(style);
+				final int lineCount = Util.countCharacter(bulletText, '\n');
+
+				styledText = new StyledText(container, SWT.READ_ONLY | SWT.WRAP | SWT.MULTI);
+				GridDataFactory.fillDefaults().grab(true, false).applyTo(styledText);
+				styledText.setText(bulletText);
+
+				styledText.setLineBullet(startLine, lineCount, bullet);
+				styledText.setLineWrapIndent(startLine, lineCount, 10);
+
+				styledText.setBackground(backgroundColor == null ? //
+						container.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND)
+						: backgroundColor);
 			}
-
-			styledText.setLineBullet(startLine, lineCount, bullet);
-			styledText.setLineWrapIndent(startLine, lineCount, 10);
 
 		} catch (final Exception e) {
 			// ignore exception when there are less lines as required

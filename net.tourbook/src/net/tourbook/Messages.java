@@ -345,7 +345,13 @@ public class Messages extends NLS {
 	public static String		Compute_HrZones_Job_ComputeAllTours_Result;
 	public static String		Compute_HrZones_Job_ComputeAllTours_SubTask;
 
+	public static String		Compute_Smoothing_Button_ForAllTours;
+
+	public static String		Compute_Smoothing_Button_ForAllTours_Tooltip;
+
 	public static String		Compute_TourValueSpeed_Title;
+
+	public static String		Compute_Values_Group_Smoothing;
 
 	public static String		Compute_Values_Label_Info;
 
@@ -1286,8 +1292,7 @@ public class Messages extends NLS {
 	public static String		TourChart_Property_Label_Smoothing_Tau;
 	public static String		TourChart_Property_label_time_slices;
 
-	public static String	TourChart_Smoothing_Algorithm_Initial;
-
+	public static String		TourChart_Smoothing_Algorithm_Initial;
 	public static String		TourChart_Smoothing_Algorithm_Jamet;
 	public static String		TourChart_Smoothing_Button_Default;
 	public static String		TourChart_Smoothing_Button_Default_Tooltip;
@@ -1301,17 +1306,16 @@ public class Messages extends NLS {
 	public static String		TourChart_Smoothing_Checkbox_IsSyncSmoothing;
 	public static String		TourChart_Smoothing_Checkbox_IsSyncSmoothing_Tooltip;
 	public static String		TourChart_Smoothing_Checkbox_UseJametSmoothing;
-	public static String	TourChart_Smoothing_Label_RepeatedSmoothing;
-
-	public static String	TourChart_Smoothing_Label_RepeatedSmoothing_Tooltip;
-
-	public static String	TourChart_Smoothing_Label_RepeatedTau;
-
-	public static String	TourChart_Smoothing_Label_RepeatedTau_Tooltip;
-
+	public static String		TourChart_Smoothing_Dialog_SmoothAllTours_Message;
+	public static String		TourChart_Smoothing_Dialog_SmoothAllTours_Title;
+	public static String		TourChart_Smoothing_Label_RepeatedSmoothing;
+	public static String		TourChart_Smoothing_Label_RepeatedSmoothing_Tooltip;
+	public static String		TourChart_Smoothing_Label_RepeatedTau;
+	public static String		TourChart_Smoothing_Label_RepeatedTau_Tooltip;
 	public static String		TourChart_Smoothing_Label_SmoothingAlgorithm;
 	public static String		TourChart_Smoothing_Label_SpeedSmoothing;
 	public static String		TourChart_Smoothing_Label_SpeedSmoothing_Tooltip;
+	public static String		TourChart_Smoothing_Link_UpdateAllTours;
 
 	public static String		TourData_Label_new_marker;
 

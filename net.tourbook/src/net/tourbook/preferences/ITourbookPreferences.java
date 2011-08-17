@@ -87,13 +87,14 @@ public interface ITourbookPreferences {
 	public static final String	GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES		= "GraphGrid_IsShowVerticalGridlines";						//$NON-NLS-1$
 
 	public static final String	GRAPH_SMOOTHING_SMOOTHING_ALGORITHM			= "GraphSmoothing_SmoothingAlgorithm";						//$NON-NLS-1$
-	public static final String	GRAPH_SMOOTHING_IS_ALTITUDE					= "GraphSmoothing_IsAltitudeSmoothing";					//$NON-NLS-1$
-	public static final String	GRAPH_SMOOTHING_IS_PULSE					= "GraphSmoothing_IsPulseSmoothing";						//$NON-NLS-1$
-	public static final String	GRAPH_SMOOTHING_GRADIENT_TAU				= "GraphSmoothing_GradientSmoothingTau";					//$NON-NLS-1$
-	public static final String	GRAPH_SMOOTHING_PULSE_TAU					= "GraphSmoothing_PulseSmoothingTau";						//$NON-NLS-1$
-	public static final String	GRAPH_SMOOTHING_SPEED_TAU					= "GraphSmoothing_SpeedSmoothingTau";						//$NON-NLS-1$
-	public static final String	GRAPH_SMOOTHING_REPEATED_SMOOTHING			= "GraphSmoothing_RepeatedSmoothing";						//$NON-NLS-1$
-	public static final String	GRAPH_SMOOTHING_REPEATED_TAU				= "GraphSmoothing_RepeatedTau";							//$NON-NLS-1$
+	public static final String	GRAPH_JAMET_SMOOTHING_IS_SYNCH_SMOOTHING	= "GraphJametSmoothing_IsSynchSmoothing";					//$NON-NLS-1$
+	public static final String	GRAPH_JAMET_SMOOTHING_IS_ALTITUDE			= "GraphJametSmoothing_IsAltitudeSmoothing";				//$NON-NLS-1$
+	public static final String	GRAPH_JAMET_SMOOTHING_IS_PULSE				= "GraphJametSmoothing_IsPulseSmoothing";					//$NON-NLS-1$
+	public static final String	GRAPH_JAMET_SMOOTHING_GRADIENT_TAU			= "GraphJametSmoothing_GradientSmoothingTau";				//$NON-NLS-1$
+	public static final String	GRAPH_JAMET_SMOOTHING_PULSE_TAU				= "GraphJametSmoothing_PulseSmoothingTau";					//$NON-NLS-1$
+	public static final String	GRAPH_JAMET_SMOOTHING_SPEED_TAU				= "GraphJametSmoothing_SpeedSmoothingTau";					//$NON-NLS-1$
+	public static final String	GRAPH_JAMET_SMOOTHING_REPEATED_SMOOTHING	= "GraphJametSmoothing_RepeatedSmoothing";					//$NON-NLS-1$
+	public static final String	GRAPH_JAMET_SMOOTHING_REPEATED_TAU			= "GraphJametSmoothing_RepeatedTau";						//$NON-NLS-1$
 
 	/*
 	 * 

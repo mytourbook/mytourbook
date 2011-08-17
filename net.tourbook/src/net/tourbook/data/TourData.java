@@ -71,9 +71,10 @@ import net.tourbook.srtm.GeoLon;
 import net.tourbook.srtm.NumberForm;
 import net.tourbook.tour.BreakTimeResult;
 import net.tourbook.tour.BreakTimeTool;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.ChartLayer2ndAltiSerie;
-import net.tourbook.ui.views.TourChartSmoothingView;
+import net.tourbook.ui.views.ISmoothingAlgorithm;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.util.MtMath;
 import net.tourbook.util.StatusUtil;
@@ -202,8 +203,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	/**
 	 * THIS IS NOT UNUSED !!!<br>
-	 * <br>
-	 * this field can be read with sql statements <br>
+	 * this field can be read with sql statements
+	 * <p>
 	 * year for startWeek
 	 */
 	@SuppressWarnings("unused")
@@ -670,7 +671,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private int[]											temperatureSerieImperial;
 
 	/**
-	 * contains speed in km/h multiplied by 10
+	 * contains speed in km/h multiplied by {@link TourManager#SPEED_DIVISOR}
 	 * <p>
 	 * the metric speed serie is required when computing the power even if the current measurement
 	 * system is imperial
@@ -1174,9 +1175,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 
 		if (_prefStore.getString(ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM)//
-				.equals(TourChartSmoothingView.SMOOTHING_ALGORITHM_JAMET)) {
+				.equals(ISmoothingAlgorithm.SMOOTHING_ALGORITHM_JAMET)) {
 
-			computeDistanceSmoothedDataSeries();
+			computeSmoothedDataSeries();
 
 		} else {
 			if (deviceTimeInterval == -1) {
@@ -1704,14 +1705,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			return 0;
 		}
 
+		if (pulseSerieSmoothed == null) {
+			computePulseSmoothed();
+		}
+
 		// check for 1 point
 		if (firstIndex == lastIndex) {
-			return pulseSerie[firstIndex];
+			return pulseSerieSmoothed[firstIndex];
 		}
 
 		// check for 2 points
 		if (lastIndex - firstIndex == 1) {
-			return (int) (((float) pulseSerie[firstIndex] + pulseSerie[lastIndex]) / 2 + 0.5f);
+			return (int) (((float) pulseSerieSmoothed[firstIndex] + pulseSerieSmoothed[lastIndex]) / 2 + 0.5f);
 		}
 
 		// get break time when not yet set
@@ -1760,7 +1765,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 				}
 			}
 
-			final float pulse = pulseSerie[serieIndex];
+			final float pulse = pulseSerieSmoothed[serieIndex];
 
 			float timeDiffPrev = 0;
 			float timeDiffNext = 0;
@@ -1935,6 +1940,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	public void computeComputedValues() {
 
+		computePulseSmoothed();
+		computeSmoothedDataSeries();
+
 		computeMaxAltitude();
 		computeMaxPulse();
 		computeMaxSpeed();
@@ -1947,20 +1955,208 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	}
 
 	/**
-	 * Compute data series which are dependend on distance, this is speed, pace, gradient and
-	 * altimeter.
-	 * <p>
-	 * Smoothing is based on the algorithm from Didier Jamet.
+	 * Computes seconds for each hr zone and sets the number of available HR zones in
+	 * {@link #numberOfHrZones}.
 	 */
-	private void computeDistanceSmoothedDataSeries() {
+	private void computeHrZones() {
 
-		// check if data are already computed
-		if (speedSerie != null) {
+		if (timeSerie == null || pulseSerie == null || tourPerson == null) {
 			return;
 		}
 
-		// check if required data are available
-		if (distanceSerie == null && (latitudeSerie == null || longitudeSerie == null)) {
+		if (pulseSerieSmoothed == null) {
+			computePulseSmoothed();
+
+		}
+		_hrZoneContext = tourPerson.getHrZoneContext(
+				tourPerson.getHrMaxFormula(),
+				tourPerson.getMaxPulse(),
+				tourPerson.getBirthDayWithDefault(),
+				getStartDateTime());
+
+		if (_hrZoneContext == null) {
+			// hr zones are not defined
+			return;
+		}
+
+		if (breakTimeSerie == null) {
+			getBreakTime();
+		}
+
+		final int zoneSize = _hrZoneContext.zoneMinBpm.length;
+		final int[] hrZones = new int[zoneSize];
+		int prevTime = 0;
+
+		// compute zone values
+		for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
+
+			final int pulse = pulseSerieSmoothed[serieIndex];
+			final int time = timeSerie[serieIndex];
+
+			final int timeDiff = time - prevTime;
+			prevTime = time;
+
+			// check if a break occured, break time is ignored
+			if (breakTimeSerie != null) {
+
+				/*
+				 * break time requires distance data, so it's possible that break time data are not
+				 * available
+				 */
+
+				if (breakTimeSerie[serieIndex] == true) {
+					// hr zones are not set for break time
+					continue;
+				}
+			}
+
+			for (int zoneIndex = 0; zoneIndex < zoneSize; zoneIndex++) {
+
+				final int minValue = _hrZoneContext.zoneMinBpm[zoneIndex];
+				final int maxValue = _hrZoneContext.zoneMaxBpm[zoneIndex];
+
+				if (pulse >= minValue && pulse <= maxValue) {
+					hrZones[zoneIndex] += timeDiff;
+					break;
+				}
+			}
+		}
+
+		numberOfHrZones = zoneSize;
+
+		hrZone0 = zoneSize > 0 ? hrZones[0] : -1;
+		hrZone1 = zoneSize > 1 ? hrZones[1] : -1;
+		hrZone2 = zoneSize > 2 ? hrZones[2] : -1;
+		hrZone3 = zoneSize > 3 ? hrZones[3] : -1;
+		hrZone4 = zoneSize > 4 ? hrZones[4] : -1;
+		hrZone5 = zoneSize > 5 ? hrZones[5] : -1;
+		hrZone6 = zoneSize > 6 ? hrZones[6] : -1;
+		hrZone7 = zoneSize > 7 ? hrZones[7] : -1;
+		hrZone8 = zoneSize > 8 ? hrZones[8] : -1;
+		hrZone9 = zoneSize > 9 ? hrZones[9] : -1;
+	}
+
+	private void computeMaxAltitude() {
+
+		if (altitudeSerie == null) {
+			return;
+		}
+
+		if (altitudeSerieSmoothed == null) {
+			computeSmoothedDataSeries();
+		}
+
+		// double check was necessary because this case occured but it should not
+		if (altitudeSerieSmoothed == null) {
+			return;
+		}
+
+		int maxAltitude = 0;
+		for (final int altitude : altitudeSerieSmoothed) {
+			if (altitude > maxAltitude) {
+				maxAltitude = altitude;
+			}
+		}
+		this.maxAltitude = maxAltitude;
+	}
+
+	private void computeMaxPulse() {
+
+		if (pulseSerie == null) {
+			return;
+		}
+
+		if (pulseSerieSmoothed == null) {
+			computePulseSmoothed();
+		}
+
+		int maxPulse = 0;
+
+		for (final int pulse : pulseSerieSmoothed) {
+			if (pulse > maxPulse) {
+				maxPulse = pulse;
+			}
+		}
+		this.maxPulse = maxPulse;
+	}
+
+	private void computeMaxSpeed() {
+		if (distanceSerie != null) {
+			computeSmoothedDataSeries();
+		}
+	}
+
+	private void computePulseSmoothed() {
+
+		if (pulseSerie == null || timeSerie == null) {
+			return;
+		}
+
+		if (pulseSerieSmoothed != null) {
+			return;
+		}
+
+		final boolean isInitialAlgorithm = _prefStore.getString(
+				ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM).equals(
+				ISmoothingAlgorithm.SMOOTHING_ALGORITHM_INITIAL);
+
+		if (isInitialAlgorithm) {
+
+			// smoothing is disabled for pulse values
+			pulseSerieSmoothed = Arrays.copyOf(pulseSerie, pulseSerie.length);
+
+			return;
+		}
+
+		final boolean isPulseSmoothed = _prefStore.getBoolean(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_IS_PULSE);
+
+		if (isPulseSmoothed == false) {
+
+			// pulse is not smoothed
+			pulseSerieSmoothed = Arrays.copyOf(pulseSerie, pulseSerie.length);
+
+			return;
+		}
+
+		final int repeatedSmoothing = _prefStore.getInt(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_REPEATED_SMOOTHING);
+		final double repeatedTau = _prefStore.getDouble(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_REPEATED_TAU);
+		final double tauPulse = _prefStore.getDouble(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_PULSE_TAU);
+
+		final int size = timeSerie.length;
+		final double[] heart_rate = new double[size];
+		final double[] heart_rate_sc = new double[size];
+
+		// convert int into double
+		for (int serieIndex = 0; serieIndex < size; serieIndex++) {
+			heart_rate[serieIndex] = pulseSerie[serieIndex];
+		}
+
+		Smooth.smoothing(timeSerie, heart_rate, heart_rate_sc, tauPulse, false, repeatedSmoothing, repeatedTau);
+
+		pulseSerieSmoothed = new int[size];
+
+		// convert double into int
+		for (int serieIndex = 0; serieIndex < size; serieIndex++) {
+			pulseSerieSmoothed[serieIndex] = (int) (heart_rate_sc[serieIndex] + 0.5);
+		}
+	}
+
+	/**
+	 * Compute smoothed data series which depend on the distance, this is speed, pace, gradient and
+	 * altimeter.<br>
+	 * Additionally the altitude smoothed data series is computed.
+	 * <p>
+	 * This smoothing is based on the algorithm from Didier Jamet.
+	 */
+	private void computeSmoothedDataSeries() {
+
+		// check if the tour was created manually
+		if (timeSerie == null) {
+			return;
+		}
+
+		// check if smoothed data are already computed
+		if (speedSerie != null) {
 			return;
 		}
 
@@ -1992,15 +2188,55 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		final double Vv[] = new double[size];
 		final double Vv_sc[] = new double[size];
 
+		final double tauGradient = _prefStore.getDouble(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_GRADIENT_TAU);
+		final double tauSpeed = _prefStore.getDouble(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_SPEED_TAU);
+
+		final int repeatedSmoothing = _prefStore.getInt(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_REPEATED_SMOOTHING);
+		final double repeatedTau = _prefStore.getDouble(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_REPEATED_TAU);
+
+		/*
+		 * smooth altitude
+		 */
 		final boolean isAltitudeAvailable = altitudeSerie != null;
 
-		final double tauGradient = _prefStore.getDouble(ITourbookPreferences.GRAPH_SMOOTHING_GRADIENT_TAU);
-		final double tauSpeed = _prefStore.getDouble(ITourbookPreferences.GRAPH_SMOOTHING_SPEED_TAU);
+		if (isAltitudeAvailable) {
 
-		final boolean isAltitudeSmoothing = _prefStore.getBoolean(ITourbookPreferences.GRAPH_SMOOTHING_IS_ALTITUDE);
+			final boolean isAltitudeSmoothed = _prefStore.getBoolean(//
+					ITourbookPreferences.GRAPH_JAMET_SMOOTHING_IS_ALTITUDE);
 
-		final int repeatedSmoothing = _prefStore.getInt(ITourbookPreferences.GRAPH_SMOOTHING_REPEATED_SMOOTHING);
-		final double repeatedTau = _prefStore.getDouble(ITourbookPreferences.GRAPH_SMOOTHING_REPEATED_TAU);
+			// convert altitude into double
+			for (int serieIndex = 0; serieIndex < size; serieIndex++) {
+				altitude[serieIndex] = altitudeSerie[serieIndex];
+			}
+
+			// altitude MUST be smoothed because the values are used in the vertical speed
+			Smooth.smoothing(timeSerie, altitude, altitude_sc, tauGradient, false, repeatedSmoothing, repeatedTau);
+
+			altitudeSerieSmoothed = new int[size];
+			altitudeSerieImperialSmoothed = new int[size];
+
+			if (isAltitudeSmoothed) {
+
+				for (int serieIndex = 0; serieIndex < size; serieIndex++) {
+					altitudeSerieSmoothed[serieIndex] = (int) (altitude_sc[serieIndex] + 0.5);
+					altitudeSerieImperialSmoothed[serieIndex] = (int) (altitude_sc[serieIndex] / UI.UNIT_VALUE_ALTITUDE + 0.5);
+				}
+			} else {
+
+				// altitude is NOT smoothed, copy original values
+
+				for (int serieIndex = 0; serieIndex < size; serieIndex++) {
+					altitudeSerieSmoothed[serieIndex] = altitudeSerie[serieIndex];
+					altitudeSerieImperialSmoothed[serieIndex] = (int) (altitudeSerie[serieIndex]
+							/ UI.UNIT_VALUE_ALTITUDE + 0.5);
+				}
+			}
+		}
+
+		// check if required data for speed, gradient... are available
+		if (distanceSerie == null && (latitudeSerie == null || longitudeSerie == null)) {
+			return;
+		}
 
 		/*
 		 * get distance
@@ -2023,13 +2259,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			// convert distance into double
 			for (int serieIndex = 0; serieIndex < size; serieIndex++) {
 				distance[serieIndex] = distanceSerie[serieIndex];
-			}
-		}
-
-		// convert altitude into double
-		if (isAltitudeAvailable) {
-			for (int serieIndex = 0; serieIndex < size; serieIndex++) {
-				altitude[serieIndex] = altitudeSerie[serieIndex];
 			}
 		}
 
@@ -2063,25 +2292,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		Vv_ini[size - 1] = Vv_ini[size - 2];
 
 		/*
-		 * Smooth out the time variations of the distance and the altitude
+		 * Smooth out the time variations of the distance
 		 */
 		Smooth.smoothing(timeSerie, distance, distance_sc, tauSpeed, false, repeatedSmoothing, repeatedTau);
-
-		if (isAltitudeAvailable) {
-
-			Smooth.smoothing(timeSerie, altitude, altitude_sc, tauGradient, false, repeatedSmoothing, repeatedTau);
-
-			if (isAltitudeSmoothing) {
-
-				altitudeSerieSmoothed = new int[size];
-				altitudeSerieImperialSmoothed = new int[size];
-
-				for (int serieIndex = 0; serieIndex < size; serieIndex++) {
-					altitudeSerieSmoothed[serieIndex] = (int) (altitude_sc[serieIndex] + 0.5);
-					altitudeSerieImperialSmoothed[serieIndex] = (int) (altitude_sc[serieIndex] / UI.UNIT_VALUE_ALTITUDE + 0.5);
-				}
-			}
-		}
 
 		/*
 		 * Compute the horizontal and vertical speeds from the smoothed distance and altitude
@@ -2140,130 +2353,19 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		for (int serieIndex = 0; serieIndex < Vh.length; serieIndex++) {
 
 			final double speedMetric = Vh[serieIndex] * 36;
+			final double speedImperial = speedMetric / UI.UNIT_MILE;
 
 			if (speedMetric > maxSpeed) {
 				maxSpeed = (float) speedMetric;
 			}
 
 			speedSerie[serieIndex] = (int) speedMetric;
-			speedSerieImperial[serieIndex] = (int) (speedMetric / UI.UNIT_MILE);
+			speedSerieImperial[serieIndex] = (int) speedImperial;
+			
+			paceSerieSeconds[serieIndex] = speedMetric < 10 ? 0 : (int) (36000.0 / speedMetric);
+			paceSerieSecondsImperial[serieIndex] = speedMetric < 6 ? 0 : (int) (36000.0 / speedImperial);
 		}
 		maxSpeed /= 10;
-	}
-
-	/**
-	 * Computes seconds for each hr zone and sets the number of available HR zones in
-	 * {@link #numberOfHrZones}.
-	 */
-	private void computeHrZones() {
-
-		if (timeSerie == null || pulseSerie == null || tourPerson == null) {
-			return;
-		}
-
-		_hrZoneContext = tourPerson.getHrZoneContext(
-				tourPerson.getHrMaxFormula(),
-				tourPerson.getMaxPulse(),
-				tourPerson.getBirthDayWithDefault(),
-				getStartDateTime());
-
-		if (_hrZoneContext == null) {
-			// hr zones are not defined
-			return;
-		}
-
-		if (breakTimeSerie == null) {
-			getBreakTime();
-		}
-
-		final int zoneSize = _hrZoneContext.zoneMinBpm.length;
-		final int[] hrZones = new int[zoneSize];
-		int prevTime = 0;
-
-		// compute zone values
-		for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
-
-			final int pulse = pulseSerie[serieIndex];
-			final int time = timeSerie[serieIndex];
-
-			final int timeDiff = time - prevTime;
-			prevTime = time;
-
-			// check if a break occured, break time is ignored
-			if (breakTimeSerie != null) {
-
-				/*
-				 * break time requires distance data, so it's possible that break time data are not
-				 * available
-				 */
-
-				if (breakTimeSerie[serieIndex] == true) {
-					// hr zones are not set for break time
-					continue;
-				}
-			}
-
-			for (int zoneIndex = 0; zoneIndex < zoneSize; zoneIndex++) {
-
-				final int minValue = _hrZoneContext.zoneMinBpm[zoneIndex];
-				final int maxValue = _hrZoneContext.zoneMaxBpm[zoneIndex];
-
-				if (pulse >= minValue && pulse <= maxValue) {
-					hrZones[zoneIndex] += timeDiff;
-					break;
-				}
-			}
-		}
-
-		numberOfHrZones = zoneSize;
-
-		hrZone0 = zoneSize > 0 ? hrZones[0] : -1;
-		hrZone1 = zoneSize > 1 ? hrZones[1] : -1;
-		hrZone2 = zoneSize > 2 ? hrZones[2] : -1;
-		hrZone3 = zoneSize > 3 ? hrZones[3] : -1;
-		hrZone4 = zoneSize > 4 ? hrZones[4] : -1;
-		hrZone5 = zoneSize > 5 ? hrZones[5] : -1;
-		hrZone6 = zoneSize > 6 ? hrZones[6] : -1;
-		hrZone7 = zoneSize > 7 ? hrZones[7] : -1;
-		hrZone8 = zoneSize > 8 ? hrZones[8] : -1;
-		hrZone9 = zoneSize > 9 ? hrZones[9] : -1;
-	}
-
-	private void computeMaxAltitude() {
-
-		if (altitudeSerie == null) {
-			return;
-		}
-
-		int maxAltitude = 0;
-		for (final int altitude : altitudeSerie) {
-			if (altitude > maxAltitude) {
-				maxAltitude = altitude;
-			}
-		}
-		this.maxAltitude = maxAltitude;
-	}
-
-	private void computeMaxPulse() {
-
-		if (pulseSerie == null) {
-			return;
-		}
-
-		int maxPulse = 0;
-
-		for (final int pulse : pulseSerie) {
-			if (pulse > maxPulse) {
-				maxPulse = pulse;
-			}
-		}
-		this.maxPulse = maxPulse;
-	}
-
-	private void computeMaxSpeed() {
-		if (distanceSerie != null) {
-			computeDistanceSmoothedDataSeries();
-		}
 	}
 
 	/**
@@ -2291,9 +2393,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			// speed is computed from distance and time
 
 			if (_prefStore.getString(ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM)//
-					.equals(TourChartSmoothingView.SMOOTHING_ALGORITHM_JAMET)) {
+					.equals(ISmoothingAlgorithm.SMOOTHING_ALGORITHM_JAMET)) {
 
-				computeDistanceSmoothedDataSeries();
+				computeSmoothedDataSeries();
 
 			} else {
 
@@ -3735,7 +3837,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 
 		// smooth altitude
-		computeDistanceSmoothedDataSeries();
+		computeSmoothedDataSeries();
 
 		if (altitudeSerieSmoothed == null) {
 			// smoothed altitude values are not available
@@ -3910,15 +4012,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return deviceMode;
 	}
 
-	/**
-	 * This info is only displayed in viewer columns
-	 * 
-	 * @return
-	 */
-	public String getDeviceModeName() {
-		return deviceModeName;
-	}
-
 // NOT USED 18.8.2010
 //	public long getDeviceTravelTime() {
 //		return deviceTravelTime;
@@ -3936,6 +4029,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 //	public int getDeviceDistance() {
 //		return deviceDistance;
 //	}
+
+	/**
+	 * This info is only displayed in viewer columns
+	 * 
+	 * @return
+	 */
+	public String getDeviceModeName() {
+		return deviceModeName;
+	}
 
 	/**
 	 * @return Returns device name which is displayed in the tour editor info tab
@@ -4002,10 +4104,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return serie;
 	}
 
-	public short getDpTolerance() {
-		return dpTolerance;
-	}
-
 // not used 5.10.2008
 //	public int getDeviceTotalDown() {
 //		return deviceTotalDown;
@@ -4014,6 +4112,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 //	public int getDeviceTotalUp() {
 //		return deviceTotalUp;
 //	}
+
+	public short getDpTolerance() {
+		return dpTolerance;
+	}
 
 	/**
 	 * @return Returns the metric or imperial altimeter serie depending on the active measurement
@@ -4189,7 +4291,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 
 		if (speedSerie == null || gradientSerie == null) {
-			computeDistanceSmoothedDataSeries();
+			computeSmoothedDataSeries();
 		}
 
 		// check if required data series are available
@@ -4267,47 +4369,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			return null;
 		}
 
-		final boolean isInitialAlgorithm = _prefStore.getString(
-				ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM).equals(
-				TourChartSmoothingView.SMOOTHING_ALGORITHM_INITIAL);
-
-		if (isInitialAlgorithm) {
-			// pulse values are not smoothed
-			return pulseSerie;
-		}
-
 		if (pulseSerieSmoothed != null) {
 			return pulseSerieSmoothed;
 		}
 
-		final boolean isPulseSmoothed = _prefStore.getBoolean(ITourbookPreferences.GRAPH_SMOOTHING_IS_PULSE);
-
-		if (isPulseSmoothed == false) {
-			// pulse is not smoothed
-			return pulseSerie;
-		}
-
-		final int repeatedSmoothing = _prefStore.getInt(ITourbookPreferences.GRAPH_SMOOTHING_REPEATED_SMOOTHING);
-		final double repeatedTau = _prefStore.getDouble(ITourbookPreferences.GRAPH_SMOOTHING_REPEATED_TAU);
-		final double tauPulse = _prefStore.getDouble(ITourbookPreferences.GRAPH_SMOOTHING_PULSE_TAU);
-
-		final int size = timeSerie.length;
-		final double[] heart_rate = new double[size];
-		final double[] heart_rate_sc = new double[size];
-
-		// convert int into double
-		for (int serieIndex = 0; serieIndex < size; serieIndex++) {
-			heart_rate[serieIndex] = pulseSerie[serieIndex];
-		}
-
-		Smooth.smoothing(timeSerie, heart_rate, heart_rate_sc, tauPulse, false, repeatedSmoothing, repeatedTau);
-
-		pulseSerieSmoothed = new int[size];
-
-		// convert double into int
-		for (int serieIndex = 0; serieIndex < size; serieIndex++) {
-			pulseSerieSmoothed[serieIndex] = (int) (heart_rate_sc[serieIndex] + 0.5);
-		}
+		computePulseSmoothed();
 
 		return pulseSerieSmoothed;
 	}

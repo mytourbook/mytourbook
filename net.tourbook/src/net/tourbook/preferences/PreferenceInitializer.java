@@ -25,7 +25,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.BreakTimeTool;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.tourChart.TourChart;
-import net.tourbook.ui.views.TourChartSmoothingView;
+import net.tourbook.ui.views.ISmoothingAlgorithm;
 import net.tourbook.util.StringToArrayConverter;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
@@ -158,23 +158,24 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		// algorithm
 		store.setDefault(
 				ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM,
-				TourChartSmoothingView.SMOOTHING_ALGORITHM_JAMET);
+				ISmoothingAlgorithm.SMOOTHING_ALGORITHM_JAMET);
 
-		store.setDefault(ITourbookPreferences.GRAPH_SMOOTHING_REPEATED_SMOOTHING, 1);
-		store.setDefault(ITourbookPreferences.GRAPH_SMOOTHING_REPEATED_TAU, 0.3);
+		store.setDefault(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_REPEATED_SMOOTHING, 1);
+		store.setDefault(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_REPEATED_TAU, 0.3);
+		store.setDefault(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_IS_SYNCH_SMOOTHING, true);
 
 		// altitude
-		store.setDefault(ITourbookPreferences.GRAPH_SMOOTHING_IS_ALTITUDE, false);
+		store.setDefault(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_IS_ALTITUDE, false);
 
 		// gradient
-		store.setDefault(ITourbookPreferences.GRAPH_SMOOTHING_GRADIENT_TAU, 5.0);
+		store.setDefault(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_GRADIENT_TAU, 5.0);
 
 		// pulse
-		store.setDefault(ITourbookPreferences.GRAPH_SMOOTHING_IS_PULSE, false);
-		store.setDefault(ITourbookPreferences.GRAPH_SMOOTHING_PULSE_TAU, 5.0);
+		store.setDefault(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_IS_PULSE, false);
+		store.setDefault(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_PULSE_TAU, 5.0);
 
 		// speed
-		store.setDefault(ITourbookPreferences.GRAPH_SMOOTHING_SPEED_TAU, 5.0);
+		store.setDefault(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_SPEED_TAU, 5.0);
 
 		/*
 		 * view colors
