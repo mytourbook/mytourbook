@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,7 +26,10 @@ import java.sql.Date;
 import net.tourbook.ui.UI;
 
 /**
- * Contains data for one time slice, when MIN_VALUE is finally set, these data are not available
+ * Contains data for one time slice.
+ * <p>
+ * Data are not available when a value is set to {@link Long#MIN_VALUE}, {@link Integer#MIN_VALUE}.
+ * {@link Float#MIN_VALUE} or {@link Double#MIN_VALUE}.
  */
 public class TimeData implements Serializable {
 
@@ -73,8 +76,7 @@ public class TimeData implements Serializable {
 	public int					altitude			= Integer.MIN_VALUE;
 
 	/**
-	 * contains the absolute altitude in meters or {@link Float#MIN_VALUE} when altitude is not set.
-	 * Contains {@link Integer#MIN_VALUE} when value is not set.
+	 * Contains the absolute altitude in meters or {@link Float#MIN_VALUE} when altitude is not set.
 	 */
 	public float				absoluteAltitude	= Float.MIN_VALUE;
 
@@ -88,7 +90,7 @@ public class TimeData implements Serializable {
 	 * Relative value for distance in meters, this is the difference for the distance with the
 	 * previous time slice. Contains {@link Float#MIN_VALUE} when value is not set.
 	 */
-	public float				gpxDistance			= Float.MIN_VALUE; 
+	public float				gpxDistance			= Float.MIN_VALUE;
 
 	/**
 	 * contains the absolute distance in meters or {@link Float#MIN_VALUE} when distance is not set
