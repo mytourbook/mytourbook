@@ -23,8 +23,6 @@ package net.tourbook.data;
 import java.io.Serializable;
 import java.sql.Date;
 
-import net.tourbook.ui.UI;
-
 /**
  * Contains data for one time slice.
  * <p>
@@ -129,17 +127,25 @@ public class TimeData implements Serializable {
 
 	@Override
 	public String toString() {
-
-		final StringBuilder sb = new StringBuilder()//
-				.append("absoluteTime:") //				//$NON-NLS-1$
-				.append(absoluteTime)
-				.append(UI.DASH_WITH_SPACE)
-				.append("marker:") //		//$NON-NLS-1$
-				.append(marker)
-				.append(UI.DASH_WITH_SPACE)
-				.append("markerLabel:") //		//$NON-NLS-1$
-				.append(markerLabel);
-
-		return sb.toString();
+		return "TimeData ["
+				+ ("id=" + id)
+				+ (", time=" + time)
+				+ (", absoluteTime=" + absoluteTime)
+				+ (", relativeTime=" + relativeTime)
+				+ (", pulse=" + pulse)
+//				+ (", temperature=" + temperature)
+//				+ (", cadence=" + cadence)
+				+ (", altitude=" + altitude)
+				+ (", absoluteAltitude=" + absoluteAltitude)
+//				+ (", distance=" + distance)
+//				+ (", gpxDistance=" + gpxDistance)
+//				+ (", absoluteDistance=" + absoluteDistance)
+//				+ (", power=" + power)
+//				+ (", speed=" + speed)
+//				+ (", latitude=" + latitude)
+//				+ (", longitude=" + longitude)
+//				+ (", marker=" + marker)
+//				+ (", markerLabel=" + markerLabel)
+				+ "]\n";
 	}
 }

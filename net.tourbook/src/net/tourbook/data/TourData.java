@@ -951,12 +951,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		int sumSpeed = 0;
 
 		// get first valid latitude/longitude
+		boolean isGPS = false;
 		if ((latitudeSerie != null) && (longitudeSerie != null)) {
 
 			for (int timeIndex = 0; timeIndex < timeSerie.length; timeIndex++) {
 				if ((latitudeSerie[timeIndex] != Double.MIN_VALUE) && (longitudeSerie[timeIndex] != Double.MIN_VALUE)) {
+
 					mapMinLatitude = mapMaxLatitude = latitudeSerie[timeIndex] + 90;
 					mapMinLongitude = mapMaxLongitude = longitudeSerie[timeIndex] + 180;
+
+					isGPS = true;
+
 					break;
 				}
 			}
@@ -998,7 +1003,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 				sumSpeed += speedSerie[serieIndex];
 			}
 
-			if ((latitudeSerie != null) && (longitudeSerie != null)) {
+			if (isGPS) {
 
 				final double latitude = latitudeSerie[serieIndex];
 				final double longitude = longitudeSerie[serieIndex];
@@ -2162,31 +2167,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 		final int size = timeSerie.length;
 
-		speedSerie = new int[size];
-		speedSerieImperial = new int[size];
-
-		paceSerieMinute = new int[size];
-		paceSerieMinuteImperial = new int[size];
-		paceSerieSeconds = new int[size];
-		paceSerieSecondsImperial = new int[size];
-
-		gradientSerie = new int[size];
-
-		altimeterSerie = new int[size];
-		altimeterSerieImperial = new int[size];
-
-		final double[] distance = new double[size];
-		final double[] distance_sc = new double[size];
 		final double altitude[] = new double[size];
 		final double altitude_sc[] = new double[size];
-
-		final double Vh_ini[] = new double[size];
-		final double Vh[] = new double[size];
-		final double Vh_sc[] = new double[size];
-
-		final double Vv_ini[] = new double[size];
-		final double Vv[] = new double[size];
-		final double Vv_sc[] = new double[size];
 
 		final double tauGradient = _prefStore.getDouble(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_GRADIENT_TAU);
 		final double tauSpeed = _prefStore.getDouble(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_SPEED_TAU);
@@ -2234,9 +2216,33 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 
 		// check if required data for speed, gradient... are available
-		if (distanceSerie == null && (latitudeSerie == null || longitudeSerie == null)) {
+		if (size < 2 || distanceSerie == null && (latitudeSerie == null || longitudeSerie == null)) {
 			return;
 		}
+
+		speedSerie = new int[size];
+		speedSerieImperial = new int[size];
+
+		paceSerieMinute = new int[size];
+		paceSerieMinuteImperial = new int[size];
+		paceSerieSeconds = new int[size];
+		paceSerieSecondsImperial = new int[size];
+
+		gradientSerie = new int[size];
+
+		altimeterSerie = new int[size];
+		altimeterSerieImperial = new int[size];
+
+		final double[] distance = new double[size];
+		final double[] distance_sc = new double[size];
+
+		final double Vh_ini[] = new double[size];
+		final double Vh[] = new double[size];
+		final double Vh_sc[] = new double[size];
+
+		final double Vv_ini[] = new double[size];
+		final double Vv[] = new double[size];
+		final double Vv_sc[] = new double[size];
 
 		/*
 		 * get distance
@@ -2869,12 +2875,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		final boolean isAbsoluteData = firstTimeDataItem.absoluteTime != Long.MIN_VALUE;
 
 		/*
-		 * time serie, is always available, except when tours are created manually
+		 * time serie is always available, except when tours are created manually
 		 */
 		timeSerie = new int[serieSize];
 
-		final boolean isDistance = setupDistanceStartingValues(isAbsoluteData, timeDataSerie);
-		final boolean isAltitude = setupAltitudeStartingValues(isAbsoluteData, timeDataSerie);
+		final boolean isDistance = setupDistanceStartingValues(timeDataSerie, isAbsoluteData);
+		final boolean isAltitude = setupAltitudeStartingValues(timeDataSerie, isAbsoluteData);
 		final boolean isPulse = setupPulseStartingValues(timeDataSerie);
 		final boolean isCadence = setupCadenceStartingValues(timeDataSerie);
 		final boolean isTemperature = setupTemperatureStartingValues(timeDataSerie);
@@ -2905,30 +2911,19 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		// time in seconds relative to the tour start
 		long recordingTime = 0;
 
-		int altitudeAbsolute = 0;
-		int distanceAbsolute = 0;
-
 		if (isAbsoluteData) {
 
 			/*
 			 * absolute data are available when data are from GPS devices
 			 */
 
-			long firstTime = 0;
-
-			int distanceDiff;
-			int altitudeDiff;
-
+			long tourStartTime = 0;
 			long lastValidTime = 0;
 
-			int serieIndex = 0;
-
 			// convert data from the tour format into interger[] arrays
-			for (final TimeData timeData : timeDataList) {
+			for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
 
-				if (isAltitude) {
-					altitudeAbsolute = (int) (timeData.absoluteAltitude + 0.5);
-				}
+				final TimeData timeData = timeDataSerie[serieIndex];
 
 				final long absoluteTime = timeData.absoluteTime;
 
@@ -2941,30 +2936,25 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 					 */
 					timeSerie[serieIndex] = 0;
 					if (absoluteTime == Long.MIN_VALUE) {
-						firstTime = 0;
+						tourStartTime = 0;
 					} else {
-						firstTime = absoluteTime;
+						tourStartTime = absoluteTime;
 					}
 
 					recordingTime = 0;
-					lastValidTime = (int) firstTime;
+					lastValidTime = (int) tourStartTime;
 
 					/*
 					 * distance
 					 */
-					final float tdDistance = timeData.absoluteDistance;
-					if ((tdDistance == Float.MIN_VALUE) || (tdDistance >= Integer.MAX_VALUE)) {
-						distanceDiff = 0;
-					} else {
-						distanceDiff = (int) tdDistance;
-					}
-					distanceSerie[serieIndex] = distanceAbsolute += distanceDiff < 0 ? 0 : distanceDiff;
+					if (isDistance) {
 
-					/*
-					 * altitude
-					 */
-					if (isAltitude) {
-						altitudeSerie[serieIndex] = altitudeAbsolute;
+						final float absoluteDistance = timeData.absoluteDistance;
+						if ((absoluteDistance == Float.MIN_VALUE) || (absoluteDistance >= Integer.MAX_VALUE)) {
+							distanceSerie[serieIndex] = 0;
+						} else {
+							distanceSerie[serieIndex] = (int) (absoluteDistance + 0.5);
+						}
 					}
 
 				} else {
@@ -2977,53 +2967,40 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 					if (absoluteTime == Long.MIN_VALUE) {
 						recordingTime = lastValidTime;
 					} else {
-						recordingTime = (absoluteTime - firstTime) / 1000;
+						recordingTime = (absoluteTime - tourStartTime) / 1000;
 					}
 					timeSerie[serieIndex] = (int) (lastValidTime = recordingTime);
 
 					/*
 					 * distance
 					 */
-					final float tdDistance = timeData.absoluteDistance;
-					if ((tdDistance == Float.MIN_VALUE) || (tdDistance >= Integer.MAX_VALUE)) {
-						// ensure to have correct data
-						distanceDiff = 0;
-					} else {
-						/*
-						 * Math.round() cannot be used because the tour id contains the last
-						 * distance serie value, Math.round() creates another tour id
-						 */
-						distanceDiff = (int) tdDistance - distanceAbsolute;
-					}
-					distanceSerie[serieIndex] = distanceAbsolute += distanceDiff < 0 ? 0 : distanceDiff;
+					if (isDistance) {
 
-					/*
-					 * altitude
-					 */
-					if (isAltitude) {
-
-//						if (altitudeStartIndex == -1) {
-//							altitudeDiff = 0;
-//						} else {}
-						final float tdAltitude = timeData.absoluteAltitude;
-						if ((tdAltitude == Float.MIN_VALUE) || (tdAltitude >= Integer.MAX_VALUE)) {
-							altitudeDiff = 0;
+						final float absoluteDistance = timeData.absoluteDistance;
+						if ((absoluteDistance == Float.MIN_VALUE) || (absoluteDistance >= Integer.MAX_VALUE)) {
+							distanceSerie[serieIndex] = Integer.MIN_VALUE;
 						} else {
-							altitudeDiff = (int) (tdAltitude - altitudeAbsolute);
+							distanceSerie[serieIndex] = (int) (absoluteDistance + 0.5);
 						}
-						altitudeSerie[serieIndex] = altitudeAbsolute += altitudeDiff;
 					}
+				}
+
+				/*
+				 * altitude
+				 */
+				if (isAltitude) {
+					final float absoluteAltitude = timeData.absoluteAltitude;
+					altitudeSerie[serieIndex] = (absoluteAltitude == Float.MIN_VALUE || (absoluteAltitude >= Integer.MAX_VALUE))
+							? Integer.MIN_VALUE
+							: (int) (absoluteAltitude + 0.5);
 				}
 
 				/*
 				 * latitude & longitude
 				 */
-
 				if (isGPS) {
-
 					latitudeSerie[serieIndex] = timeData.latitude;
 					longitudeSerie[serieIndex] = timeData.longitude;
-
 				}
 
 				/*
@@ -3032,7 +3009,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 				if (isPulse) {
 					final int tdPulse = timeData.pulse;
 					pulseSerie[serieIndex] = (tdPulse == Integer.MIN_VALUE) || (tdPulse == Integer.MAX_VALUE)
-							? 0
+							? Integer.MIN_VALUE
 							: tdPulse;
 				}
 
@@ -3049,48 +3026,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 				/*
 				 * temperature
 				 */
-				if (isTemperature && serieIndex >= firstValidTemperatureIndex) {
-					final int tdTemperature = timeData.temperature;
-					temperatureSerie[serieIndex] = tdTemperature == Integer.MIN_VALUE ? 0 : tdTemperature;
+				if (isTemperature) {
+					temperatureSerie[serieIndex] = timeData.temperature;
 				}
 
 				/*
-				 * marker
+				 * speed
 				 */
-				if (isCreateMarker && (timeData.marker != 0)) {
-					createTourMarker(timeData, serieIndex, recordingTime, distanceAbsolute);
-				}
-
-				// speed
 				if (isSpeed) {
 					final int tdSpeed = timeData.speed;
 					speedSerie[serieIndex] = tdSpeed == Integer.MIN_VALUE ? 0 : tdSpeed;
 				}
-
-				serieIndex++;
 			}
-
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//			final double lastValidLatitude90 = lastValidLatitude + 90;
-//			mapMinLatitude = Math.min(mapMinLatitude, lastValidLatitude90);
-//			mapMaxLatitude = Math.max(mapMaxLatitude, lastValidLatitude90);
-//
-//			final double lastValidLongitude180 = lastValidLongitude + 180;
-//			mapMinLongitude = Math.min(mapMinLongitude, lastValidLongitude180);
-//			mapMaxLongitude = Math.max(mapMaxLongitude, lastValidLongitude180);
-//
-//			mapMinLatitude -= 90;
-//			mapMaxLatitude -= 90;
-//			mapMinLongitude -= 180;
-//			mapMaxLongitude -= 180;
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 		} else {
 
@@ -3098,59 +3045,52 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			 * relativ data is available, these data are NOT from GPS devices
 			 */
 
-			int serieIndex = 0;
+			int distanceAbsolute = 0;
+			int altitudeAbsolute = 0;
 
 			// convert data from the tour format into an interger[]
-			for (final TimeData timeData : timeDataList) {
+			for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
+
+				final TimeData timeData = timeDataSerie[serieIndex];
 
 				final int tdTime = timeData.time;
+
+				// set time
 				timeSerie[serieIndex] = (int) (recordingTime += tdTime == Integer.MIN_VALUE ? 0 : tdTime);
 
 				if (isDistance) {
 					final int tdDistance = timeData.distance;
-//					if (tdDistance == Integer.MIN_VALUE) {
-//						System.out.println("tourId:" + tourId + " - tdDistance is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
-//					}
-					distanceSerie[serieIndex] = distanceAbsolute += tdDistance == Integer.MIN_VALUE ? 0 : tdDistance;
+					if (tdDistance == Integer.MIN_VALUE) {
+						distanceSerie[serieIndex] = Integer.MIN_VALUE;
+					} else {
+						distanceSerie[serieIndex] = distanceAbsolute += tdDistance;
+					}
 				}
 
 				if (isAltitude) {
 					final int tdAltitude = timeData.altitude;
-//					if (tdAltitude == Integer.MIN_VALUE) {
-//						System.out.println("tourId:" + tourId + " - tdAltitude is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
-//					}
-					altitudeSerie[serieIndex] = altitudeAbsolute += tdAltitude == Integer.MIN_VALUE ? 0 : tdAltitude;
+					if (tdAltitude == Integer.MIN_VALUE) {
+						altitudeSerie[serieIndex] = Integer.MIN_VALUE;
+					} else {
+						altitudeSerie[serieIndex] = altitudeAbsolute += tdAltitude;
+					}
 				}
 
 				if (isPulse) {
-					final int tdPulse = timeData.pulse;
-//					if (tdPulse == Integer.MIN_VALUE) {
-//						System.out.println("tourId:" + tourId + " - tdPulse is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
-//					}
-					pulseSerie[serieIndex] = tdPulse == Integer.MIN_VALUE ? 0 : tdPulse;
+					pulseSerie[serieIndex] = timeData.pulse;
 				}
 
 				if (isTemperature) {
-					final int tdTemperature = timeData.temperature;
-//					if (tdTemperature == Integer.MIN_VALUE) {
-//						System.out.println("tourId:" + tourId + " - tdTemperature is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
-//					}
-					temperatureSerie[serieIndex] = tdTemperature == Integer.MIN_VALUE ? 0 : tdTemperature;
+					temperatureSerie[serieIndex] = timeData.temperature;
 				}
 
 				if (isCadence) {
 					final int tdCadence = timeData.cadence;
-//					if (tdCadence == Integer.MIN_VALUE) {
-//						System.out.println("tourId:" + tourId + " - tdCadence is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
-//					}
 					cadenceSerie[serieIndex] = tdCadence == Integer.MIN_VALUE ? 0 : tdCadence;
 				}
 
 				if (isPower) {
 					final int tdPower = timeData.power;
-//					if (tdPower == Integer.MIN_VALUE) {
-//						System.out.println("tourId:" + tourId + " - tdPower is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
-//					}
 					powerSerie[serieIndex] = tdPower == Integer.MIN_VALUE ? 0 : tdPower;
 				}
 
@@ -3158,93 +3098,175 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 					final int tdSpeed = timeData.speed;
 					speedSerie[serieIndex] = tdSpeed == Integer.MIN_VALUE ? 0 : tdSpeed;
 				}
-
-				if (isCreateMarker && (timeData.marker != 0)) {
-					createTourMarker(timeData, serieIndex, recordingTime, distanceAbsolute);
-				}
-
-				serieIndex++;
 			}
 		}
 
-		tourDistance = distanceAbsolute;
+		createTimeSeries10DataCompleting();
+
+		tourDistance = isDistance ? distanceSerie[serieSize - 1] : 0;
 		tourRecordingTime = (int) recordingTime;
 
-		createTimeSeries10DataCompleting();
+		/*
+		 * create marker after all other data are setup
+		 */
+		if (isCreateMarker) {
+			for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
+
+				final TimeData timeData = timeDataSerie[serieIndex];
+
+				if (timeData.marker != 0) {
+					int time = 0;
+					int distanceValue = 0;
+
+					if (timeSerie != null) {
+						time = timeSerie[serieIndex];
+					}
+					if (distanceSerie != null) {
+						distanceValue = distanceSerie[serieIndex];
+					}
+
+					createTourMarker(timeData, serieIndex, time, distanceValue);
+				}
+			}
+		}
 
 		cleanupDataSeries();
 		resetSortedMarkers();
 	}
 
+	/**
+	 * Interpolations of missing data
+	 */
 	private void createTimeSeries10DataCompleting() {
 
-		// Interpolations of missing data
-		//===============================
-		// Latitude and longitude are interpolated linearly in time
-		//---------------------------------------------------------
-		createTimeSeries20data_completing(latitudeSerie, timeSerie, latitudeSerie);
-		createTimeSeries20data_completing(longitudeSerie, timeSerie, longitudeSerie);
+		// latitude and longitude
+		createTimeSeries20data_completing(latitudeSerie, timeSerie);
+		createTimeSeries20data_completing(longitudeSerie, timeSerie);
 
-//		// Altitude is interpolated linearly in time
-//		//------------------------------------------
-//		  createTimeSeries20data_completing(altitude, time, -999., altitude_c);
-//
-//		// Speed is interpolated linearly in time
-//		//---------------------------------------
-//		  createTimeSeries20data_completing(speed, time, -999., speed_c);
-//
-//		// Distance is interpolated linearly in time
-//		//------------------------------------------
-//		  createTimeSeries20data_completing(distance, time, -999., distance_ct);
+		// altitude
+		createTimeSeries30data_completing(altitudeSerie, timeSerie);
+
+		// distance
+		createTimeSeries30data_completing(distanceSerie, timeSerie);
+
+		// temperature
+		createTimeSeries30data_completing(temperatureSerie, timeSerie);
+
+		// pulse
+		createTimeSeries30data_completing(pulseSerie, timeSerie);
 	}
 
-	private void createTimeSeries20data_completing(final double[] field, final int[] time, final double[] field_c) {
+	private void createTimeSeries20data_completing(final double[] field, final int[] time) {
 
-		int serieIndex, linearIndex;
-		int validIndex;
+		if (field == null) {
+			return;
+		}
+
 		final int size = time.length;
 
-		for (serieIndex = 0; serieIndex < size; serieIndex++) {
+		for (int serieIndex = 0; serieIndex < size; serieIndex++) {
 
 			if (field[serieIndex] == Double.MIN_VALUE) {
 
-				// check for the next valid data
-
+				// search forward to the next valid data
 				int invalidIndex = serieIndex;
 				while (field[invalidIndex] == Double.MIN_VALUE && invalidIndex < size - 1) {
 					invalidIndex++;
 				}
 
-				validIndex = invalidIndex;
+				final int nextValidIndex = invalidIndex;
 
-				if (field[validIndex] == Double.MIN_VALUE) {
+				if (field[nextValidIndex] == Double.MIN_VALUE) {
 
+					double lastValidValue;
 					if (serieIndex - 1 < 0) {
 						// ??????????????????
+						lastValidValue = 0;
+					} else {
+						lastValidValue = field[serieIndex - 1];
 					}
 
-					field[validIndex] = field[serieIndex - 1];
+					field[nextValidIndex] = lastValidValue;
 				}
 
-				for (linearIndex = serieIndex; linearIndex < validIndex; linearIndex++) {
+				final int time1 = time[serieIndex - 1];
+				final int time2 = time[nextValidIndex];
+				final double val1 = field[serieIndex - 1];
+				final double val2 = field[nextValidIndex];
 
-					field_c[linearIndex] = createTimeSeries24linear_interpolation(
-							time[serieIndex - 1],
-							time[validIndex],
-							field[serieIndex - 1],
-							field[validIndex],
-							time[linearIndex]);
+				for (int interpolationIndex = serieIndex; interpolationIndex < nextValidIndex; interpolationIndex++) {
+
+					field[interpolationIndex] = createTimeSeries50linear_interpolation(
+							time1,
+							time2,
+							val1,
+							val2,
+							time[interpolationIndex]);
 				}
 
-				serieIndex = validIndex - 1;
-
-			} else {
-				field_c[serieIndex] = field[serieIndex];
+				serieIndex = nextValidIndex - 1;
 			}
 		}
 	}
 
-	private double createTimeSeries24linear_interpolation(	final double time1,
+	private void createTimeSeries30data_completing(final int[] field, final int[] time) {
+
+		if (field == null) {
+			return;
+		}
+
+		final int size = time.length;
+
+		for (int serieIndex = 0; serieIndex < size; serieIndex++) {
+
+			if (field[serieIndex] == Integer.MIN_VALUE) {
+
+				// search forward to the next valid data
+				int invalidIndex = serieIndex;
+				while (field[invalidIndex] == Integer.MIN_VALUE && invalidIndex < size - 1) {
+					invalidIndex++;
+				}
+
+				final int nextValidIndex = invalidIndex;
+
+				if (field[nextValidIndex] == Integer.MIN_VALUE) {
+
+					int lastValidValue;
+					if (serieIndex - 1 < 0) {
+						// ??????????????????
+						lastValidValue = 0;
+					} else {
+						lastValidValue = field[serieIndex - 1];
+					}
+
+					field[nextValidIndex] = lastValidValue;
+				}
+
+				final int validValueIndex = serieIndex == 0 ? 0 : serieIndex - 1;
+
+				final int time1 = time[validValueIndex];
+				final int time2 = time[nextValidIndex];
+				final double val1 = field[validValueIndex];
+				final double val2 = field[nextValidIndex];
+
+				for (int interpolationIndex = serieIndex; interpolationIndex < nextValidIndex; interpolationIndex++) {
+
+					final double linearInterpolation = createTimeSeries50linear_interpolation(
+							time1,
+							time2,
+							val1,
+							val2,
+							time[interpolationIndex]);
+
+					field[interpolationIndex] = (int) (linearInterpolation + 0.5);
+				}
+
+				serieIndex = nextValidIndex - 1;
+			}
+		}
+	}
+
+	private double createTimeSeries50linear_interpolation(	final double time1,
 															final double time2,
 															final double val1,
 															final double val2,
@@ -5165,7 +5187,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	}
 
 	/**
-	 * Reset sorted markers that they are resorted.
+	 * Reset sorted markers that they are sorted again.
 	 */
 	private void resetSortedMarkers() {
 
@@ -5563,12 +5585,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * reached.
 	 * <p>
 	 * 
-	 * @param isAbsoluteData
 	 * @param timeDataSerie
+	 * @param isAbsoluteData
 	 * @return Returns <code>true</code> when values are available in the data serie and
 	 *         {@link #altitudeSerie} has valid start values.
 	 */
-	private boolean setupAltitudeStartingValues(final boolean isAbsoluteData, final TimeData[] timeDataSerie) {
+	private boolean setupAltitudeStartingValues(final TimeData[] timeDataSerie, final boolean isAbsoluteData) {
 
 		final TimeData firstTimeData = timeDataSerie[0];
 		final int serieSize = timeDataSerie.length;
@@ -5654,7 +5676,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return isAvailable;
 	}
 
-	private boolean setupDistanceStartingValues(final boolean isAbsoluteData, final TimeData[] timeDataSerie) {
+	private boolean setupDistanceStartingValues(final TimeData[] timeDataSerie, final boolean isAbsoluteData) {
 
 		final TimeData firstTimeData = timeDataSerie[0];
 		final int serieSize = timeDataSerie.length;
@@ -5672,7 +5694,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private boolean setupLatLonStartingValues(final TimeData[] timeDataSerie) {
 
 		final int serieSize = timeDataSerie.length;
-		boolean isAvailable = false;
+		boolean isGPS = false;
 
 		for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
 
@@ -5680,7 +5702,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 			if (timeData.latitude != Double.MIN_VALUE) {
 
-				isAvailable = true;
+				isGPS = true;
 
 				final double firstValidLatitude = timeData.latitude;
 				final double firstValidLongitude = timeData.longitude;
@@ -5699,7 +5721,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			}
 		}
 
-		return isAvailable;
+		return isGPS;
 	}
 
 	private boolean setupPulseStartingValues(final TimeData[] timeDataSerie) {

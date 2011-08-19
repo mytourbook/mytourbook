@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -732,8 +732,8 @@ public class GarminSAXHandler extends DefaultHandler {
 			_isInHeartRateValue = false;
 
 			if (_dataVersion == 2) {
-				short pulse = getShortValue(_characters.toString());
-				pulse = pulse == Integer.MIN_VALUE ? 0 : pulse;
+				final short pulse = getShortValue(_characters.toString());
+//				pulse = pulse == Integer.MIN_VALUE ? 0 : pulse;
 				_timeData.pulse = pulse;
 			}
 
@@ -742,8 +742,8 @@ public class GarminSAXHandler extends DefaultHandler {
 			_isInHeartRate = false;
 
 			if (_dataVersion == 1) {
-				short pulse = getShortValue(_characters.toString());
-				pulse = pulse == Integer.MIN_VALUE ? 0 : pulse;
+				final short pulse = getShortValue(_characters.toString());
+//				pulse = pulse == Integer.MIN_VALUE ? 0 : pulse;
 				_timeData.pulse = pulse;
 			}
 
