@@ -29,6 +29,7 @@ import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.graphics.Point;
@@ -148,7 +149,7 @@ public class ColumnManager {
 
 		final Menu headerContextMenu = createHeaderContextMenuInternal(table, tableContextMenu);
 
-		// add the context menu to the table viewer
+		// add the context menu to the table
 		table.addListener(SWT.MenuDetect, new Listener() {
 			public void handleEvent(final Event event) {
 
@@ -203,7 +204,21 @@ public class ColumnManager {
 		final Decorations shell = composite.getShell();
 		final Menu headerContextMenu = new Menu(shell, SWT.POP_UP);
 
-		final MenuItem itemName = new MenuItem(headerContextMenu, SWT.PUSH);
+		/*
+		 * Size All Columns to Fit
+		 */
+		MenuItem itemName = new MenuItem(headerContextMenu, SWT.PUSH);
+		itemName.setText(Messages.Action_App_SizeAllColumnsToFit);
+		itemName.addListener(SWT.Selection, new Listener() {
+			public void handleEvent(final Event event) {
+				onFitAllColumnSize();
+			}
+		});
+
+		/*
+		 * Customize &Columns...
+		 */
+		itemName = new MenuItem(headerContextMenu, SWT.PUSH);
 		itemName.setText(Messages.Action_App_ConfigureColumns);
 //		itemName.setImage(image)
 		itemName.addListener(SWT.Selection, new Listener() {
@@ -213,8 +228,8 @@ public class ColumnManager {
 		});
 
 		/*
-		 * IMPORTANT: Dispose the menus (only the current menu, set with setMenu(), will be
-		 * automatically disposed)
+		 * IMPORTANT: Dispose the menus (only the current menu, when menu is set with setMenu() it
+		 * will be disposed automatically)
 		 */
 		composite.addListener(SWT.Dispose, new Listener() {
 			public void handleEvent(final Event event) {
@@ -224,6 +239,7 @@ public class ColumnManager {
 				}
 			}
 		});
+
 		return headerContextMenu;
 	}
 
@@ -599,6 +615,66 @@ public class ColumnManager {
 		}
 
 		return allDialogColumns;
+	}
+
+	private void onFitAllColumnSize() {
+
+		// larger tables/trees needs more time to resize
+
+		BusyIndicator.showWhile(_columnViewer.getControl().getDisplay(), new Runnable() {
+			public void run() {
+
+				boolean isColumn0Visible = true;
+
+				if (_tourViewer instanceof ITourViewer2) {
+					isColumn0Visible = ((ITourViewer2) _tourViewer).isColumn0Visible(_columnViewer);
+				}
+
+				if (_columnViewer instanceof TableViewer) {
+
+					final Table table = ((TableViewer) _columnViewer).getTable();
+					if (table.isDisposed()) {
+						return;
+					}
+
+					table.setRedraw(false);
+					{
+						final TableColumn[] allColumns = table.getColumns();
+
+						for (int columnIndex = 0; columnIndex < allColumns.length; columnIndex++) {
+							final TableColumn tableColumn = allColumns[columnIndex];
+							if (columnIndex == 0) {
+
+								if (isColumn0Visible) {
+									tableColumn.pack();
+								} else {
+									tableColumn.setWidth(0);
+								}
+							} else {
+								tableColumn.pack();
+							}
+						}
+					}
+					table.setRedraw(true);
+
+				} else if (_columnViewer instanceof TreeViewer) {
+
+					final Tree tree = ((TreeViewer) _columnViewer).getTree();
+					if (tree.isDisposed()) {
+						return;
+					}
+
+					tree.setRedraw(false);
+					{
+						final TreeColumn[] allColumns = tree.getColumns();
+						for (final TreeColumn tableColumn : allColumns) {
+							tableColumn.pack();
+						}
+					}
+					tree.setRedraw(true);
+				}
+			}
+		});
 	}
 
 	public void openColumnDialog() {

@@ -290,18 +290,18 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.APP_DATA_SPEED_MIN_TIMESLICE_VALUE, 10);
 
 		/*
-		 * break time, which contains metric values
+		 * break time using metric values
 		 */
-		store.setDefault(ITourbookPreferences.BREAK_TIME_METHOD, BreakTimeTool.BREAK_TIME_METHOD_BY_SLICE_SPEED);
+		store.setDefault(ITourbookPreferences.BREAK_TIME_METHOD, BreakTimeTool.BREAK_TIME_METHOD_BY_AVG_SPEED);
 
 		// break time, default is 3.6 km/h (20 m in 20 sec)
 		store.setDefault(ITourbookPreferences.BREAK_TIME_SHORTEST_TIME, 20);
 		store.setDefault(ITourbookPreferences.BREAK_TIME_MAX_DISTANCE, 20.0f);
 		store.setDefault(ITourbookPreferences.BREAK_TIME_SLICE_DIFF, 5); // 5 minutes
 
-		// minimum speed for a break, default is 3.0 km/h
-		store.setDefault(ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED, 3.0f);
-		store.setDefault(ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED, 3.0f);
+		// minimum speed for a break, default is 1.0 km/h to respect walking in the mountains
+		store.setDefault(ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED, 1.0f);
+		store.setDefault(ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED, 1.0f);
 
 		/*
 		 * calendar week

@@ -2348,6 +2348,15 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	 */
 	private void fireSegmentLayerChanged() {
 
+//		TourManager.fireEvent(TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED, null);
+//		TourManager.fireEvent(TourEventId.UPDATE_UI);
+//
+//		TourManager.getInstance().removeAllToursFromCache();
+//
+//		// fire unique event for all changes
+//		TourManager.fireEvent(TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED, null);
+
+
 		// show/hide the segments in the chart
 		TourManager.fireEvent(TourEventId.SEGMENT_LAYER_CHANGED, _isShowSegmentsInChart, TourSegmenterView.this);
 	}
@@ -2865,7 +2874,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		_comboBreakMethod.select(Util.getStateInt(
 				_state,
 				STATE_SELECTED_BREAK_METHOD,
-				BreakTimeTool.BREAK_TIME_METHOD_BY_TIME_DISTANCE));
+				BreakTimeTool.BREAK_TIME_METHOD_BY_AVG_SPEED));
 
 		// break time by time/distance
 		_spinnerBreakShortestTime.setSelection(Util.getStateInt(

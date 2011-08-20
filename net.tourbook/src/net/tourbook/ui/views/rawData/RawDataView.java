@@ -1053,6 +1053,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		defineColumnDate();
 		defineColumnTime();
 		defineColumnTourType();
+		defineColumnTourTypeText();
 		defineColumnRecordingTime();
 		defineColumnDrivingTime();
 		defineColumnCalories();
@@ -1519,7 +1520,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	}
 
 	/**
-	 * column: tour type
+	 * column: tour type image
 	 */
 	private void defineColumnTourType() {
 
@@ -1544,6 +1545,27 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					 * displayed compared with the tourBookView which displays the correct image
 					 */
 					cell.setImage(tourTypeImage);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: tour type text
+	 */
+	private void defineColumnTourTypeText() {
+
+		final ColumnDefinition colDef = TableColumnFactory.TOUR_TYPE_TEXT.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourType tourType = ((TourData) cell.getElement()).getTourType();
+				if (tourType == null) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					final long tourTypeId = tourType.getTypeId();
+					cell.setText(UI.getInstance().getTourTypeLabel(tourTypeId));
 				}
 			}
 		});

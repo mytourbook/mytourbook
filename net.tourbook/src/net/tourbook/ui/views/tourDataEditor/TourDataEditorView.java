@@ -84,7 +84,7 @@ import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 import net.tourbook.util.ColumnDefinition;
 import net.tourbook.util.ColumnManager;
-import net.tourbook.util.ITourViewer;
+import net.tourbook.util.ITourViewer2;
 import net.tourbook.util.PostSelectionProvider;
 import net.tourbook.util.StatusUtil;
 import net.tourbook.util.Util;
@@ -198,7 +198,7 @@ import org.joda.time.format.DateTimeFormatter;
 /**
  * This editor can edit (when all is implemented) all data for a tour
  */
-public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITourViewer, ITourProvider2 {
+public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITourViewer2, ITourProvider2 {
 
 	public static final String					ID								= "net.tourbook.views.TourDataEditorView";	//$NON-NLS-1$
 
@@ -5350,6 +5350,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 
 		return speedValueIndex;
+	}
+
+	@Override
+	public boolean isColumn0Visible(final ColumnViewer columnViewer) {
+
+		if (columnViewer == _sliceViewer) {
+			// first column is hidden, this is a super hack that the second column can be right aligned
+			return false;
+		}
+
+		return true;
 	}
 
 	/**

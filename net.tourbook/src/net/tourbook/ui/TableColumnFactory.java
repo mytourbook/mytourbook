@@ -21,6 +21,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.util.ColumnDefinition;
 import net.tourbook.util.ColumnManager;
 import net.tourbook.util.TableColumnDefinition;
+import net.tourbook.util.TreeColumnDefinition;
 
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.viewers.CellLabelProvider;
@@ -973,12 +974,26 @@ public abstract class TableColumnFactory {
 			
 			colDef.setColumnLabel(Messages.ColumnFactory_tour_type_label);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_tour_type_tooltip);
-			colDef.setDefaultColumnWidth(18);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
 			
 			return colDef;
 		};
 	};
 	
+	public static final TableColumnFactory TOUR_TYPE_TEXT = new TableColumnFactory() {
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "tourTypeText", SWT.LEAD); //$NON-NLS-1$
+			
+			colDef.setColumnHeader(Messages.ColumnFactory_TourTypeText_Header);
+			colDef.setColumnLabel(Messages.ColumnFactory_TourTypeText_Label);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(18));
+			
+			return colDef;
+		};
+	};
+
 	public static final TableColumnFactory SERIE_START_END_INDEX = new TableColumnFactory() {
 		
 		@Override

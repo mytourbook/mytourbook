@@ -117,8 +117,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 	 * contains the tab folder index
 	 */
 	public static final int				TAB_FOLDER_SMOOTHING				= 0;
-	public static final int				TAB_FOLDER_ELEVATION				= 1;
-	public static final int				TAB_FOLDER_BREAK_TIME				= 2;
+	public static final int				TAB_FOLDER_BREAK_TIME				= 1;
+	public static final int				TAB_FOLDER_ELEVATION				= 2;
 
 	private static final float			SPEED_DIGIT_VALUE					= 10.0f;
 
@@ -215,13 +215,13 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 				tabSmoothing.setControl(createUI10Smoothing(_tabFolder));
 				tabSmoothing.setText(Messages.Compute_Values_Group_Smoothing);
 
-				final TabItem tabElevation = new TabItem(_tabFolder, SWT.NONE);
-				tabElevation.setControl(createUI20ElevationGain(_tabFolder));
-				tabElevation.setText(Messages.compute_tourValueElevation_group_computeTourAltitude);
-
 				final TabItem tabBreakTime = new TabItem(_tabFolder, SWT.NONE);
 				tabBreakTime.setControl(createUI50BreakTime(_tabFolder));
 				tabBreakTime.setText(Messages.Compute_BreakTime_Group_BreakTime);
+
+				final TabItem tabElevation = new TabItem(_tabFolder, SWT.NONE);
+				tabElevation.setControl(createUI20ElevationGain(_tabFolder));
+				tabElevation.setText(Messages.compute_tourValueElevation_group_computeTourAltitude);
 
 				final TabItem tabHrZone = new TabItem(_tabFolder, SWT.NONE);
 				tabHrZone.setControl(createUI60HrZone(_tabFolder));

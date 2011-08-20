@@ -2919,6 +2919,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 			long tourStartTime = 0;
 			long lastValidTime = 0;
+			long lastValidAbsoluteTime = 0;
 
 			// convert data from the tour format into interger[] arrays
 			for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
@@ -2942,7 +2943,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 					}
 
 					recordingTime = 0;
-					lastValidTime = (int) tourStartTime;
+					lastValidTime = tourStartTime;
+					lastValidAbsoluteTime = tourStartTime;
 
 					/*
 					 * distance
@@ -2953,7 +2955,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 						if ((absoluteDistance == Float.MIN_VALUE) || (absoluteDistance >= Integer.MAX_VALUE)) {
 							distanceSerie[serieIndex] = 0;
 						} else {
-							distanceSerie[serieIndex] = (int) (absoluteDistance + 0.5);
+							/**
+							 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+							 * <p>
+							 * rounding cannot be used because the tour id contains the last value
+							 * from the distance serie so rounding creates another tour id
+							 * <p>
+							 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+							 */
+							distanceSerie[serieIndex] = (int) (absoluteDistance);
 						}
 					}
 
@@ -2962,12 +2972,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 					// 1..n trackpoint
 
 					/*
-					 * time
+					 * time: absolute time is checked againt last valid time because this case
+					 * happened and time can NOT be in the past.
 					 */
-					if (absoluteTime == Long.MIN_VALUE) {
+					if (absoluteTime == Long.MIN_VALUE || absoluteTime < lastValidAbsoluteTime) {
 						recordingTime = lastValidTime;
 					} else {
 						recordingTime = (absoluteTime - tourStartTime) / 1000;
+						lastValidAbsoluteTime = absoluteTime;
 					}
 					timeSerie[serieIndex] = (int) (lastValidTime = recordingTime);
 
@@ -2980,7 +2992,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 						if ((absoluteDistance == Float.MIN_VALUE) || (absoluteDistance >= Integer.MAX_VALUE)) {
 							distanceSerie[serieIndex] = Integer.MIN_VALUE;
 						} else {
-							distanceSerie[serieIndex] = (int) (absoluteDistance + 0.5);
+							/**
+							 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+							 * <p>
+							 * rounding cannot be used because the tour id contains the last value
+							 * from the distance serie so rounding creates another tour id
+							 * <p>
+							 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+							 */
+							distanceSerie[serieIndex] = (int) (absoluteDistance);
 						}
 					}
 				}
@@ -3008,7 +3028,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 				 */
 				if (isPulse) {
 					final int tdPulse = timeData.pulse;
-					pulseSerie[serieIndex] = (tdPulse == Integer.MIN_VALUE) || (tdPulse == Integer.MAX_VALUE)
+					pulseSerie[serieIndex] = (tdPulse == Integer.MIN_VALUE) || (tdPulse >= Integer.MAX_VALUE)
 							? Integer.MIN_VALUE
 							: tdPulse;
 				}
@@ -3018,7 +3038,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 				 */
 				if (isCadence) {
 					final int tdCadence = timeData.cadence;
-					cadenceSerie[serieIndex] = (tdCadence == Integer.MIN_VALUE) || (tdCadence == Integer.MAX_VALUE)
+					cadenceSerie[serieIndex] = (tdCadence == Integer.MIN_VALUE) || (tdCadence >= Integer.MAX_VALUE)
 							? 0
 							: tdCadence;
 				}

@@ -609,7 +609,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		defineColumnDate();
 		defineColumnWeekDay();
 		defineColumnTime();
-		defineColumnTourType();
+		defineColumnTourTypeImage();
+		defineColumnTourTypeText();
 
 		defineColumnDistance();
 		defineColumnAltitudeUp();
@@ -1360,9 +1361,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	}
 
 	/**
-	 * column: tour type
+	 * column: tour type image
 	 */
-	private void defineColumnTourType() {
+	private void defineColumnTourTypeImage() {
 
 		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TYPE.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
@@ -1381,6 +1382,24 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 					 * displayed compared with the tourBookView which displays the correct image
 					 */
 					cell.setImage(tourTypeImage);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: tour type text
+	 */
+	private void defineColumnTourTypeText() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TYPE_TEXT.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final Object element = cell.getElement();
+				if (element instanceof TVITourBookTour) {
+
+					final long tourTypeId = ((TVITourBookTour) element).getTourTypeId();
 					cell.setText(UI.getInstance().getTourTypeLabel(tourTypeId));
 				}
 			}

@@ -560,8 +560,22 @@ public abstract class TreeColumnFactory {
 
 			colDef.setColumnLabel(Messages.ColumnFactory_tour_type_label);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_tour_type_tooltip);
-			colDef.setDefaultColumnWidth(18);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
 
+			return colDef;
+		};
+	};
+
+	public static final TreeColumnFactory TOUR_TYPE_TEXT = new TreeColumnFactory() {
+		@Override
+		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "tourTypeText", SWT.LEAD); //$NON-NLS-1$
+			
+			colDef.setColumnHeader(Messages.ColumnFactory_TourTypeText_Header);
+			colDef.setColumnLabel(Messages.ColumnFactory_TourTypeText_Label);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(18));
+			
 			return colDef;
 		};
 	};
