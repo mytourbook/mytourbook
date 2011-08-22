@@ -34,6 +34,7 @@ import net.tourbook.data.TourSegment;
 import net.tourbook.database.MyTourbookException;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageComputedValues;
+import net.tourbook.tour.BreakTimeMethod;
 import net.tourbook.tour.BreakTimeResult;
 import net.tourbook.tour.BreakTimeTool;
 import net.tourbook.tour.ITourEventListener;
@@ -129,12 +130,21 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private static final String								STATE_SELECTED_MIN_ALTITUDE_INDEX	= "selectedMinAltitude";				//$NON-NLS-1$
 	private static final String								STATE_SELECTED_DISTANCE				= "selectedDistance";					//$NON-NLS-1$
 
-	private static final String								STATE_SELECTED_BREAK_METHOD			= "selectedBreakMethod";				//$NON-NLS-1$
+	/**
+	 * initially this was an int value, with 2 it's a string
+	 */
+	private static final String								STATE_SELECTED_BREAK_METHOD2		= "selectedBreakMethod2";				//$NON-NLS-1$
+
+	private static final String								STATE_BREAK_TIME_MIN_AVG_SPEED_AS	= "selectedBreakTimeMinAvgSpeedAS";	//$NON-NLS-1$
+	private static final String								STATE_BREAK_TIME_MIN_SLICE_SPEED_AS	= "selectedBreakTimeMinSliceSpeedAS";	//$NON-NLS-1$
+	private static final String								STATE_BREAK_TIME_MIN_SLICE_TIME_AS	= "selectedBreakTimeMinSliceTimeAS";	//$NON-NLS-1$
+
+	private static final String								STATE_BREAK_TIME_MIN_AVG_SPEED		= "selectedBreakTimeMinAvgSpeed";		//$NON-NLS-1$
+	private static final String								STATE_BREAK_TIME_MIN_SLICE_SPEED	= "selectedBreakTimeMinSliceSpeed";	//$NON-NLS-1$
+
 	private static final String								STATE_BREAK_TIME_MIN_DISTANCE_VALUE	= "selectedBreakTimeMinDistance";		//$NON-NLS-1$
 	private static final String								STATE_BREAK_TIME_MIN_TIME_VALUE		= "selectedBreakTimeMinTime";			//$NON-NLS-1$
 	private static final String								STATE_BREAK_TIME_SLICE_DIFF			= "selectedBreakTimeSliceDiff";		//$NON-NLS-1$
-	private static final String								STATE_BREAK_TIME_MIN_SLICE_SPEED	= "selectedBreakTimeMinSliceSpeed";	//$NON-NLS-1$
-	private static final String								STATE_BREAK_TIME_MIN_AVG_SPEED		= "selectedBreakTimeMinAvgSpeed";		//$NON-NLS-1$
 
 	private static final int								COLUMN_DEFAULT						= 0;									// sort by time
 	private static final int								COLUMN_SPEED						= 10;
@@ -219,11 +229,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private SegmenterType									_userSelectedSegmenterType;
 
 	private long											_tourBreakTime;
+	private double											_breakUIMinAvgSpeedAS;
+	private double											_breakUIMinSliceSpeedAS;
+	private int												_breakUIMinSliceTimeAS;
+	private float											_breakUIMinAvgSpeed;
+	private float											_breakUIMinSliceSpeed;
 	private int												_breakUIShortestBreakTime;
 	private int												_breakUISliceDiff;
 	private float											_breakUIMaxDistance;
-	private float											_breakUIMinSliceSpeed;
-	private float											_breakUIMinAvgSpeed;
 
 	private PixelConverter									_pc;
 	private int												_spinnerWidth;
@@ -280,13 +293,17 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	 */
 	private Composite										_containerBreakTime;
 	private PageBook										_pagebookBreakTime;
-	private Composite										_pageBreakByTimeDistance;
-	private Composite										_pageBreakBySliceSpeed;
+	private Composite										_pageBreakByAvgSliceSpeed;
 	private Composite										_pageBreakByAvgSpeed;
+	private Composite										_pageBreakBySliceSpeed;
+	private Composite										_pageBreakByTimeDistance;
 
 	private Combo											_comboBreakMethod;
-	private Spinner											_spinnerBreakMinSliceSpeed;
+	private Spinner											_spinnerBreakMinAvgSpeedAS;
+	private Spinner											_spinnerBreakMinSliceSpeedAS;
+	private Spinner											_spinnerBreakMinSliceTimeAS;
 	private Spinner											_spinnerBreakMinAvgSpeed;
+	private Spinner											_spinnerBreakMinSliceSpeed;
 	private Spinner											_spinnerBreakShortestTime;
 	private Spinner											_spinnerBreakMaxDistance;
 	private Spinner											_spinnerBreakSliceDiff;
@@ -406,7 +423,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		/**
 		 * Does the sort. If it's a different column from the previous sort, do an ascending sort.
 		 * If it's the same column as the last sort, toggle the sort direction.
-		 *
+		 * 
 		 * @param column
 		 */
 		public void setSortColumn(final int column) {
@@ -787,7 +804,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				}
 			});
 		}
-
 	}
 
 	private Object[] createSegmenterContent() {
@@ -807,12 +823,15 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			// use segmenter values
 
 			btConfig = new BreakTimeTool(
-					_comboBreakMethod.getSelectionIndex(),
+					getSelectedBreakMethod().methodId,
 					_breakUIShortestBreakTime,
 					_breakUIMaxDistance,
 					_breakUIMinSliceSpeed,
 					_breakUIMinAvgSpeed,
-					_breakUISliceDiff);
+					_breakUISliceDiff,
+					_breakUIMinAvgSpeedAS,
+					_breakUIMinSliceSpeedAS,
+					_breakUIMinSliceTimeAS);
 
 		} else {
 
@@ -930,11 +949,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private void createSegmentsByBreakTime() {
 
 		boolean[] breakTimeSerie = null;
-		BreakTimeResult breakTimeResult;
+		BreakTimeResult breakTimeResult = null;
 
-		final int breakMethod = _comboBreakMethod.getSelectionIndex();
+		final String breakMethodId = getSelectedBreakMethod().methodId;
 
-		if (breakMethod == BreakTimeTool.BREAK_TIME_METHOD_BY_TIME_DISTANCE) {
+		if (breakMethodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_TIME_DISTANCE)) {
 
 			_breakUIShortestBreakTime = _spinnerBreakShortestTime.getSelection();
 			_breakUIMaxDistance = _spinnerBreakMaxDistance.getSelection() * UI.UNIT_VALUE_DISTANCE_SMALL;
@@ -945,29 +964,44 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 					_breakUIShortestBreakTime,
 					_breakUIMaxDistance,
 					_breakUISliceDiff);
-			breakTimeSerie = breakTimeResult.breakTimeSerie;
-			_tourBreakTime = breakTimeResult.tourBreakTime;
 
-		} else if (breakMethod == BreakTimeTool.BREAK_TIME_METHOD_BY_SLICE_SPEED) {
+		} else if (breakMethodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_SLICE_SPEED)) {
 
 			_breakUIMinSliceSpeed = _spinnerBreakMinSliceSpeed.getSelection()
 					/ SPEED_DIGIT_VALUE
 					/ UI.UNIT_VALUE_DISTANCE;
 
-			breakTimeResult = BreakTimeTool.computeBreakTimeBySpeed(_tourData, breakMethod, _breakUIMinSliceSpeed);
-			breakTimeSerie = breakTimeResult.breakTimeSerie;
-			_tourBreakTime = breakTimeResult.tourBreakTime;
+			breakTimeResult = BreakTimeTool.computeBreakTimeBySpeed(_tourData, breakMethodId, _breakUIMinSliceSpeed);
 
-		} else if (breakMethod == BreakTimeTool.BREAK_TIME_METHOD_BY_AVG_SPEED) {
+		} else if (breakMethodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_AVG_SPEED)) {
 
 			_breakUIMinAvgSpeed = _spinnerBreakMinAvgSpeed.getSelection()//
 					/ SPEED_DIGIT_VALUE
 					/ UI.UNIT_VALUE_DISTANCE;
 
-			breakTimeResult = BreakTimeTool.computeBreakTimeBySpeed(_tourData, breakMethod, _breakUIMinAvgSpeed);
-			breakTimeSerie = breakTimeResult.breakTimeSerie;
-			_tourBreakTime = breakTimeResult.tourBreakTime;
+			breakTimeResult = BreakTimeTool.computeBreakTimeBySpeed(_tourData, breakMethodId, _breakUIMinAvgSpeed);
+
+		} else if (breakMethodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_AVG_SLICE_SPEED)) {
+
+			_breakUIMinAvgSpeedAS = _spinnerBreakMinAvgSpeedAS.getSelection()//
+					/ SPEED_DIGIT_VALUE
+					/ UI.UNIT_VALUE_DISTANCE;
+
+			_breakUIMinSliceSpeedAS = _spinnerBreakMinSliceSpeedAS.getSelection()
+					/ SPEED_DIGIT_VALUE
+					/ UI.UNIT_VALUE_DISTANCE;
+
+			_breakUIMinSliceTimeAS = _spinnerBreakMinSliceTimeAS.getSelection();
+
+			breakTimeResult = BreakTimeTool.computeBreakTimeByAvgSliceSpeed(
+					_tourData,
+					_breakUIMinAvgSpeedAS,
+					_breakUIMinSliceSpeedAS,
+					_breakUIMinSliceTimeAS);
 		}
+
+		breakTimeSerie = breakTimeResult.breakTimeSerie;
+		_tourBreakTime = breakTimeResult.tourBreakTime;
 
 		/*
 		 * convert recognized breaks into segments
@@ -1328,8 +1362,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 			GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 			{
-				createUI58TourBreakTime(container);
-				createUI51BreakTime(container);
+				createUI51TourBreakTime(container);
+				createUI52BreakTimePageBook(container);
 			}
 
 			createUI56BreakActions(_containerBreakTime);
@@ -1341,7 +1375,38 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		return _containerBreakTime;
 	}
 
-	private void createUI51BreakTime(final Composite parent) {
+	private void createUI51TourBreakTime(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+//				.span(2, 1)
+				.grab(true, false)
+				.applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+		{
+			/*
+			 * tour break time
+			 */
+			// label: break time
+			final Label label = new Label(container, SWT.NONE);
+			label.setText(Messages.Compute_BreakTime_Label_TourBreakTime);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.FILL, SWT.CENTER)
+					.applyTo(label);
+			_firstColBreakTime.add(label);
+
+			// label: value + unit
+			_lblTourBreakTime = new Label(container, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.FILL, SWT.CENTER)
+					.grab(true, false)
+//					.span(2, 1)
+					.applyTo(_lblTourBreakTime);
+		}
+	}
+
+	private void createUI52BreakTimePageBook(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -1367,8 +1432,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			});
 
 			// fill combo
-			for (final String breakMethod : BreakTimeTool.BREAK_TIME_METHODS) {
-				_comboBreakMethod.add(breakMethod);
+			for (final BreakTimeMethod breakMethod : BreakTimeTool.BREAK_TIME_METHODS) {
+				_comboBreakMethod.add(breakMethod.uiText);
 			}
 
 			/*
@@ -1377,9 +1442,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			_pagebookBreakTime = new PageBook(container, SWT.NONE);
 			GridDataFactory.fillDefaults().span(2, 1).grab(true, false).applyTo(_pagebookBreakTime);
 			{
-				_pageBreakByTimeDistance = createUI52BreakByTimeDistance(_pagebookBreakTime);
-				_pageBreakBySliceSpeed = createUI53BreakBySliceSpeed(_pagebookBreakTime);
+				_pageBreakByAvgSliceSpeed = createUI53BreakByAvgSliceSpeed(_pagebookBreakTime);
 				_pageBreakByAvgSpeed = createUI54BreakByAvgSpeed(_pagebookBreakTime);
+				_pageBreakBySliceSpeed = createUI55BreakBySliceSpeed(_pagebookBreakTime);
+				_pageBreakByTimeDistance = createUI56BreakByTimeDistance(_pagebookBreakTime);
 			}
 
 			/*
@@ -1394,7 +1460,228 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		}
 	}
 
-	private Composite createUI52BreakByTimeDistance(final Composite parent) {
+	private Composite createUI53BreakByAvgSliceSpeed(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+		{
+			/*
+			 * minimum average speed
+			 */
+			{
+				// label: minimum speed
+				Label label = new Label(container, SWT.NONE);
+				label.setText(Messages.Compute_BreakTime_Label_MinimumAvgSpeed);
+				_firstColBreakTime.add(label);
+
+				// spinner: minimum speed
+				_spinnerBreakMinAvgSpeedAS = new Spinner(container, SWT.BORDER);
+				GridDataFactory.fillDefaults()//
+						.applyTo(_spinnerBreakMinAvgSpeedAS);
+				_spinnerBreakMinAvgSpeedAS.setMinimum(0); // 0.0 km/h
+				_spinnerBreakMinAvgSpeedAS.setMaximum(100); // 10.0 km/h
+				_spinnerBreakMinAvgSpeedAS.setDigits(1);
+				_spinnerBreakMinAvgSpeedAS.addMouseWheelListener(new MouseWheelListener() {
+					public void mouseScrolled(final MouseEvent event) {
+						UI.adjustSpinnerValueOnMouseScroll(event);
+						onChangeBreakTime();
+					}
+				});
+
+				// label: km/h
+				label = new Label(container, SWT.NONE);
+				label.setText(UI.UNIT_LABEL_SPEED);
+			}
+
+			/*
+			 * minimum slice speed
+			 */
+			{
+				// label: minimum speed
+				Label label = new Label(container, SWT.NONE);
+				label.setText(Messages.Compute_BreakTime_Label_MinimumSliceSpeed);
+				_firstColBreakTime.add(label);
+
+				// spinner: minimum speed
+				_spinnerBreakMinSliceSpeedAS = new Spinner(container, SWT.BORDER);
+				GridDataFactory.fillDefaults()//
+						.applyTo(_spinnerBreakMinSliceSpeedAS);
+				_spinnerBreakMinSliceSpeedAS.setMinimum(0); // 0.0 km/h
+				_spinnerBreakMinSliceSpeedAS.setMaximum(100); // 10.0 km/h
+				_spinnerBreakMinSliceSpeedAS.setDigits(1);
+				_spinnerBreakMinSliceSpeedAS.addMouseWheelListener(new MouseWheelListener() {
+					public void mouseScrolled(final MouseEvent event) {
+						UI.adjustSpinnerValueOnMouseScroll(event);
+						onChangeBreakTime();
+					}
+				});
+
+				// label: km/h
+				label = new Label(container, SWT.NONE);
+				label.setText(UI.UNIT_LABEL_SPEED);
+			}
+
+			/*
+			 * minimum slice time
+			 */
+			{
+				// label: minimum slice time
+				Label label = new Label(container, SWT.NONE);
+				label.setText(Messages.Compute_BreakTime_Label_MinimumSliceTime);
+				_firstColBreakTime.add(label);
+
+				// spinner: minimum slice time
+				_spinnerBreakMinSliceTimeAS = new Spinner(container, SWT.BORDER);
+				GridDataFactory.fillDefaults()//
+						.applyTo(_spinnerBreakMinSliceTimeAS);
+				_spinnerBreakMinSliceTimeAS.setMinimum(0); // 0 sec
+				_spinnerBreakMinSliceTimeAS.setMaximum(10); // 10 sec
+				_spinnerBreakMinSliceTimeAS.addMouseWheelListener(new MouseWheelListener() {
+					public void mouseScrolled(final MouseEvent event) {
+						UI.adjustSpinnerValueOnMouseScroll(event);
+						onChangeBreakTime();
+					}
+				});
+
+				// label: seconds
+				label = new Label(container, SWT.NONE);
+				label.setText(Messages.app_unit_seconds);
+			}
+		}
+
+		return container;
+	}
+
+	private Composite createUI54BreakByAvgSpeed(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+		{
+			/*
+			 * minimum average speed
+			 */
+
+			// label: minimum speed
+			Label label = new Label(container, SWT.NONE);
+			label.setText(Messages.Compute_BreakTime_Label_MinimumAvgSpeed);
+			_firstColBreakTime.add(label);
+
+			// spinner: minimum speed
+			_spinnerBreakMinAvgSpeed = new Spinner(container, SWT.BORDER);
+			GridDataFactory.fillDefaults().hint(_spinnerWidth, SWT.DEFAULT).applyTo(_spinnerBreakMinAvgSpeed);
+			_spinnerBreakMinAvgSpeed.setMinimum(0); // 0.0 km/h
+			_spinnerBreakMinAvgSpeed.setMaximum(100); // 10.0 km/h
+			_spinnerBreakMinAvgSpeed.setDigits(1);
+			_spinnerBreakMinAvgSpeed.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onChangeBreakTime();
+				}
+			});
+			_spinnerBreakMinAvgSpeed.addMouseWheelListener(new MouseWheelListener() {
+				public void mouseScrolled(final MouseEvent event) {
+					UI.adjustSpinnerValueOnMouseScroll(event);
+					onChangeBreakTime();
+				}
+			});
+
+			// label: km/h
+			label = new Label(container, SWT.NONE);
+			label.setText(UI.UNIT_LABEL_SPEED);
+		}
+
+		return container;
+	}
+
+	private Composite createUI55BreakBySliceSpeed(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+		{
+			/*
+			 * minimum speed
+			 */
+
+			// label: minimum speed
+			Label label = new Label(container, SWT.NONE);
+			label.setText(Messages.Compute_BreakTime_Label_MinimumSliceSpeed);
+			_firstColBreakTime.add(label);
+
+			// spinner: minimum speed
+			_spinnerBreakMinSliceSpeed = new Spinner(container, SWT.BORDER);
+			GridDataFactory.fillDefaults().hint(_spinnerWidth, SWT.DEFAULT).applyTo(_spinnerBreakMinSliceSpeed);
+			_spinnerBreakMinSliceSpeed.setMinimum(0); // 0.0 km/h
+			_spinnerBreakMinSliceSpeed.setMaximum(100); // 10.0 km/h
+			_spinnerBreakMinSliceSpeed.setDigits(1);
+			_spinnerBreakMinSliceSpeed.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onChangeBreakTime();
+				}
+			});
+			_spinnerBreakMinSliceSpeed.addMouseWheelListener(new MouseWheelListener() {
+				public void mouseScrolled(final MouseEvent event) {
+					UI.adjustSpinnerValueOnMouseScroll(event);
+					onChangeBreakTime();
+				}
+			});
+
+			// label: km/h
+			label = new Label(container, SWT.NONE);
+			label.setText(UI.UNIT_LABEL_SPEED);
+		}
+
+		return container;
+	}
+
+	private void createUI56BreakActions(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(false, true).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+		{
+			/*
+			 * button: restore from defaults
+			 */
+			final Button btnRestore = new Button(container, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.FILL, SWT.END)
+					.grab(false, true)
+					.applyTo(btnRestore);
+			btnRestore.setText(Messages.Compute_BreakTime_Button_RestoreDefaultValues);
+			btnRestore.setToolTipText(Messages.Compute_BreakTime_Button_RestoreDefaultValues_Tooltip);
+			btnRestore.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					restorePrefValues();
+				}
+			});
+
+			/*
+			 * button: set as default values
+			 */
+			final Button btnSetDefault = new Button(container, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.applyTo(btnSetDefault);
+			btnSetDefault.setText(Messages.Compute_BreakTime_Button_SetDefaultValues);
+			btnSetDefault.setToolTipText(Messages.Compute_BreakTime_Button_SetDefaultValues_Tooltip);
+			btnSetDefault.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onSetDefaults(parent);
+				}
+			});
+		}
+	}
+
+	private Composite createUI56BreakByTimeDistance(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -1503,164 +1790,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		}
 
 		return container;
-	}
-
-	private Composite createUI53BreakBySliceSpeed(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-		{
-			/*
-			 * minimum speed
-			 */
-
-			// label: minimum speed
-			Label label = new Label(container, SWT.NONE);
-			label.setText(Messages.Compute_BreakTime_Label_MinimumSliceSpeed);
-			_firstColBreakTime.add(label);
-
-			// spinner: minimum speed
-			_spinnerBreakMinSliceSpeed = new Spinner(container, SWT.BORDER);
-			GridDataFactory.fillDefaults().hint(_spinnerWidth, SWT.DEFAULT).applyTo(_spinnerBreakMinSliceSpeed);
-			_spinnerBreakMinSliceSpeed.setMinimum(0); // 0.0 km/h
-			_spinnerBreakMinSliceSpeed.setMaximum(100); // 10.0 km/h
-			_spinnerBreakMinSliceSpeed.setDigits(1);
-			_spinnerBreakMinSliceSpeed.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onChangeBreakTime();
-				}
-			});
-			_spinnerBreakMinSliceSpeed.addMouseWheelListener(new MouseWheelListener() {
-				public void mouseScrolled(final MouseEvent event) {
-					UI.adjustSpinnerValueOnMouseScroll(event);
-					onChangeBreakTime();
-				}
-			});
-
-			// label: km/h
-			label = new Label(container, SWT.NONE);
-			label.setText(UI.UNIT_LABEL_SPEED);
-		}
-
-		return container;
-	}
-
-	private Composite createUI54BreakByAvgSpeed(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-		{
-			/*
-			 * minimum average speed
-			 */
-
-			// label: minimum speed
-			Label label = new Label(container, SWT.NONE);
-			label.setText(Messages.Compute_BreakTime_Label_MinimumAvgSpeed);
-			_firstColBreakTime.add(label);
-
-			// spinner: minimum speed
-			_spinnerBreakMinAvgSpeed = new Spinner(container, SWT.BORDER);
-			GridDataFactory.fillDefaults().hint(_spinnerWidth, SWT.DEFAULT).applyTo(_spinnerBreakMinAvgSpeed);
-			_spinnerBreakMinAvgSpeed.setMinimum(0); // 0.0 km/h
-			_spinnerBreakMinAvgSpeed.setMaximum(100); // 10.0 km/h
-			_spinnerBreakMinAvgSpeed.setDigits(1);
-			_spinnerBreakMinAvgSpeed.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onChangeBreakTime();
-				}
-			});
-			_spinnerBreakMinAvgSpeed.addMouseWheelListener(new MouseWheelListener() {
-				public void mouseScrolled(final MouseEvent event) {
-					UI.adjustSpinnerValueOnMouseScroll(event);
-					onChangeBreakTime();
-				}
-			});
-
-			// label: km/h
-			label = new Label(container, SWT.NONE);
-			label.setText(UI.UNIT_LABEL_SPEED);
-		}
-
-		return container;
-	}
-
-	private void createUI56BreakActions(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(false, true).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-		{
-			/*
-			 * button: restore from defaults
-			 */
-			final Button btnRestore = new Button(container, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.align(SWT.FILL, SWT.END)
-					.grab(false, true)
-					.applyTo(btnRestore);
-			btnRestore.setText(Messages.Compute_BreakTime_Button_RestoreDefaultValues);
-			btnRestore.setToolTipText(Messages.Compute_BreakTime_Button_RestoreDefaultValues_Tooltip);
-			btnRestore.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onGetBreakTimePrefValues();
-				}
-			});
-
-			/*
-			 * button: set as default values
-			 */
-			final Button btnSetDefault = new Button(container, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.applyTo(btnSetDefault);
-			btnSetDefault.setText(Messages.Compute_BreakTime_Button_SetDefaultValues);
-			btnSetDefault.setToolTipText(Messages.Compute_BreakTime_Button_SetDefaultValues_Tooltip);
-			btnSetDefault.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onSetDefaults(parent);
-				}
-			});
-		}
-	}
-
-	private void createUI58TourBreakTime(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-//				.span(2, 1)
-				.grab(true, false)
-				.applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
-		{
-			/*
-			 * tour break time
-			 */
-			// label: break time
-			final Label label = new Label(container, SWT.NONE);
-			label.setText(Messages.Compute_BreakTime_Label_TourBreakTime);
-			GridDataFactory.fillDefaults()//
-					.align(SWT.FILL, SWT.CENTER)
-					.applyTo(label);
-			_firstColBreakTime.add(label);
-
-			// label: value + unit
-			_lblTourBreakTime = new Label(container, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.align(SWT.FILL, SWT.CENTER)
-					.grab(true, false)
-//					.span(2, 1)
-					.applyTo(_lblTourBreakTime);
-		}
 	}
 
 	private void createUI70Viewer(final Composite parent) {
@@ -2356,14 +2485,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 //		// fire unique event for all changes
 //		TourManager.fireEvent(TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED, null);
 
-
 		// show/hide the segments in the chart
 		TourManager.fireEvent(TourEventId.SEGMENT_LAYER_CHANGED, _isShowSegmentsInChart, TourSegmenterView.this);
 	}
 
 	/**
 	 * try to get the tour chart and/or editor from the active part
-	 *
+	 * 
 	 * @param tourData
 	 * @return Returns the {@link TourChart} for the requested {@link TourData}
 	 */
@@ -2482,6 +2610,17 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		return (int) ((Math.pow(_scaleTolerance.getSelection(), 2.05)) / 50.0);
 	}
 
+	private BreakTimeMethod getSelectedBreakMethod() {
+
+		int selectedIndex = _comboBreakMethod.getSelectionIndex();
+
+		if (selectedIndex == -1) {
+			selectedIndex = 0;
+		}
+
+		return BreakTimeTool.BREAK_TIME_METHODS[selectedIndex];
+	}
+
 	private TourSegmenter getSelectedSegmenter() {
 
 		if (_availableSegmenter.size() == 0) {
@@ -2542,38 +2681,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		createSegments();
 	}
 
-	/**
-	 * defaults are the values which are stored in the pref store not the default-default which can
-	 * be set in the pref page
-	 */
-	private void onGetBreakTimePrefValues() {
-
-		final BreakTimeTool btConfig = BreakTimeTool.getPrefValues();
-
-		// method
-		_comboBreakMethod.select(btConfig.breakTimeMethod);
-
-		/*
-		 * break time by time/distance
-		 */
-		_spinnerBreakShortestTime.setSelection(btConfig.breakShortestTime);
-
-		final float prefBreakDistance = btConfig.breakMaxDistance / UI.UNIT_VALUE_DISTANCE_SMALL;
-		_spinnerBreakMaxDistance.setSelection((int) (prefBreakDistance + 0.5));
-
-		_spinnerBreakSliceDiff.setSelection(btConfig.breakSliceDiff);
-
-		/*
-		 * break time by speed
-		 */
-		_spinnerBreakMinSliceSpeed.setSelection(//
-				(int) (btConfig.breakMinSliceSpeed * SPEED_DIGIT_VALUE * UI.UNIT_VALUE_DISTANCE));
-		_spinnerBreakMinAvgSpeed.setSelection(//
-				(int) (btConfig.breakMinAvgSpeed * SPEED_DIGIT_VALUE * UI.UNIT_VALUE_DISTANCE));
-
-		onSelectBreakTimeMethod();
-	}
-
 	private void onSaveTourAltitude() {
 
 		_tourData.setTourAltUp(_altitudeUp);
@@ -2586,28 +2693,27 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	private void onSelectBreakTimeMethod() {
 
-		switch (_comboBreakMethod.getSelectionIndex()) {
-		case BreakTimeTool.BREAK_TIME_METHOD_BY_TIME_DISTANCE:
-			_pagebookBreakTime.showPage(_pageBreakByTimeDistance);
-			_comboBreakMethod.setToolTipText(Messages.Compute_BreakTime_Label_Description_ComputeByTime);
-			break;
+		final BreakTimeMethod selectedBreakMethod = getSelectedBreakMethod();
 
-		case BreakTimeTool.BREAK_TIME_METHOD_BY_SLICE_SPEED:
-			_pagebookBreakTime.showPage(_pageBreakBySliceSpeed);
-			_comboBreakMethod.setToolTipText(Messages.Compute_BreakTime_Label_Description_ComputeBySliceSpeed);
-			break;
+		if (selectedBreakMethod.methodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_AVG_SPEED)) {
 
-		case BreakTimeTool.BREAK_TIME_METHOD_BY_AVG_SPEED:
 			_pagebookBreakTime.showPage(_pageBreakByAvgSpeed);
 			_comboBreakMethod.setToolTipText(Messages.Compute_BreakTime_Label_Description_ComputeByAvgSpeed);
-			break;
 
-		default:
-			// this case should not happen
-			_comboBreakMethod.select(BreakTimeTool.BREAK_TIME_METHOD_BY_TIME_DISTANCE);
+		} else if (selectedBreakMethod.methodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_SLICE_SPEED)) {
+
+			_pagebookBreakTime.showPage(_pageBreakBySliceSpeed);
+			_comboBreakMethod.setToolTipText(Messages.Compute_BreakTime_Label_Description_ComputeBySliceSpeed);
+
+		} else if (selectedBreakMethod.methodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_AVG_SLICE_SPEED)) {
+
+			_pagebookBreakTime.showPage(_pageBreakByAvgSliceSpeed);
+			_comboBreakMethod.setToolTipText(Messages.Compute_BreakTime_Label_Description_ComputeByAvgSliceSpeed);
+
+		} else if (selectedBreakMethod.methodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_TIME_DISTANCE)) {
+
 			_pagebookBreakTime.showPage(_pageBreakByTimeDistance);
 			_comboBreakMethod.setToolTipText(Messages.Compute_BreakTime_Label_Description_ComputeByTime);
-			break;
 		}
 
 		// break method pages have different heights, enforce layout of the whole view part
@@ -2618,7 +2724,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	/**
 	 * handle a tour selection event
-	 *
+	 * 
 	 * @param selection
 	 */
 	private void onSelectionChanged(final ISelection selection) {
@@ -2827,6 +2933,50 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		_segmentViewer.setInput(new Object[0]);
 	}
 
+	/**
+	 * defaults are the values which are stored in the pref store not the default-default which can
+	 * be set in the pref page
+	 */
+	private void restorePrefValues() {
+
+		final BreakTimeTool btConfig = BreakTimeTool.getPrefValues();
+
+		/*
+		 * break method
+		 */
+		selectBreakMethod(btConfig.breakTimeMethodId);
+
+		/*
+		 * break by avg + slice speed
+		 */
+		//
+		_spinnerBreakMinAvgSpeedAS.setSelection(//
+				(int) (btConfig.breakMinAvgSpeedAS * SPEED_DIGIT_VALUE * UI.UNIT_VALUE_DISTANCE));
+		_spinnerBreakMinSliceSpeedAS.setSelection(//
+				(int) (btConfig.breakMinSliceSpeedAS * SPEED_DIGIT_VALUE * UI.UNIT_VALUE_DISTANCE));
+		_spinnerBreakMinSliceTimeAS.setSelection(btConfig.breakMinSliceTimeAS);
+
+		/*
+		 * break time by time/distance
+		 */
+		_spinnerBreakShortestTime.setSelection(btConfig.breakShortestTime);
+
+		final float prefBreakDistance = btConfig.breakMaxDistance / UI.UNIT_VALUE_DISTANCE_SMALL;
+		_spinnerBreakMaxDistance.setSelection((int) (prefBreakDistance + 0.5));
+
+		_spinnerBreakSliceDiff.setSelection(btConfig.breakSliceDiff);
+
+		/*
+		 * break time by speed
+		 */
+		_spinnerBreakMinSliceSpeed.setSelection(//
+				(int) (btConfig.breakMinSliceSpeed * SPEED_DIGIT_VALUE * UI.UNIT_VALUE_DISTANCE));
+		_spinnerBreakMinAvgSpeed.setSelection(//
+				(int) (btConfig.breakMinAvgSpeed * SPEED_DIGIT_VALUE * UI.UNIT_VALUE_DISTANCE));
+
+		onSelectBreakTimeMethod();
+	}
+
 	private void restoreState() {
 
 		/*
@@ -2870,13 +3020,56 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		 */
 		final BreakTimeTool btConfig = BreakTimeTool.getPrefValues();
 
-		// method
-		_comboBreakMethod.select(Util.getStateInt(
+		/*
+		 * break method
+		 */
+		selectBreakMethod(Util.getStateString(
 				_state,
-				STATE_SELECTED_BREAK_METHOD,
-				BreakTimeTool.BREAK_TIME_METHOD_BY_AVG_SPEED));
+				STATE_SELECTED_BREAK_METHOD2,
+				BreakTimeTool.BREAK_TIME_METHOD_BY_AVG_SLICE_SPEED));
 
-		// break time by time/distance
+		/*
+		 * break by avg + slice speed
+		 */
+		final double stateAvgSpeedAS = Util.getStateDouble(_state, //
+				STATE_BREAK_TIME_MIN_AVG_SPEED_AS,
+				btConfig.breakMinAvgSpeedAS);
+		final double stateSliceSpeedAS = Util.getStateDouble(_state, //
+				STATE_BREAK_TIME_MIN_SLICE_SPEED_AS,
+				btConfig.breakMinSliceSpeedAS);
+		final int stateSliceTimeAS = Util.getStateInt(_state, //
+				STATE_BREAK_TIME_MIN_SLICE_TIME_AS,
+				btConfig.breakMinSliceTimeAS);
+
+		_spinnerBreakMinAvgSpeedAS.setSelection(//
+				(int) (stateAvgSpeedAS * SPEED_DIGIT_VALUE * UI.UNIT_VALUE_DISTANCE));
+		_spinnerBreakMinSliceSpeedAS.setSelection(//
+				(int) (stateSliceSpeedAS * SPEED_DIGIT_VALUE * UI.UNIT_VALUE_DISTANCE));
+		_spinnerBreakMinSliceTimeAS.setSelection(stateSliceTimeAS);
+
+		/*
+		 * break by slice speed
+		 */
+		final float stateSliceSpeed = Util.getStateFloat(
+				_state,
+				STATE_BREAK_TIME_MIN_SLICE_SPEED,
+				btConfig.breakMinSliceSpeed);
+
+		_spinnerBreakMinSliceSpeed.setSelection((int) (stateSliceSpeed * SPEED_DIGIT_VALUE * UI.UNIT_VALUE_DISTANCE));
+
+		/*
+		 * break by avg speed
+		 */
+		final float stateAvgSpeed = Util.getStateFloat(
+				_state,
+				STATE_BREAK_TIME_MIN_AVG_SPEED,
+				btConfig.breakMinAvgSpeed);
+
+		_spinnerBreakMinAvgSpeed.setSelection((int) (stateAvgSpeed * SPEED_DIGIT_VALUE * UI.UNIT_VALUE_DISTANCE));
+
+		/*
+		 * break time by time/distance
+		 */
 		_spinnerBreakShortestTime.setSelection(Util.getStateInt(
 				_state,
 				STATE_BREAK_TIME_MIN_TIME_VALUE,
@@ -2892,22 +3085,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				_state,
 				STATE_BREAK_TIME_SLICE_DIFF,
 				btConfig.breakSliceDiff));
-
-		// break by slice speed
-		final float stateSliceSpeed = Util.getStateFloat(
-				_state,
-				STATE_BREAK_TIME_MIN_SLICE_SPEED,
-				btConfig.breakMinSliceSpeed);
-
-		_spinnerBreakMinSliceSpeed.setSelection((int) (stateSliceSpeed * SPEED_DIGIT_VALUE * UI.UNIT_VALUE_DISTANCE));
-
-		// break by avg speed
-		final float stateAvgSpeed = Util.getStateFloat(
-				_state,
-				STATE_BREAK_TIME_MIN_AVG_SPEED,
-				btConfig.breakMinAvgSpeed);
-
-		_spinnerBreakMinAvgSpeed.setSelection((int) (stateAvgSpeed * SPEED_DIGIT_VALUE * UI.UNIT_VALUE_DISTANCE));
 	}
 
 	/**
@@ -2915,25 +3092,38 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	 */
 	private void saveBreakTimeValuesInPrefStore() {
 
-		_prefStore.setValue(ITourbookPreferences.BREAK_TIME_METHOD, _comboBreakMethod.getSelectionIndex());
+		// break method
+		_prefStore.setValue(ITourbookPreferences.BREAK_TIME_METHOD2, getSelectedBreakMethod().methodId);
 
-		// by time/distance
-		_prefStore.setValue(ITourbookPreferences.BREAK_TIME_SHORTEST_TIME, _spinnerBreakShortestTime.getSelection());
-		final float breakDistance = _spinnerBreakMaxDistance.getSelection() * UI.UNIT_VALUE_DISTANCE_SMALL;
-		_prefStore.setValue(ITourbookPreferences.BREAK_TIME_MAX_DISTANCE, breakDistance);
-		_prefStore.setValue(ITourbookPreferences.BREAK_TIME_SLICE_DIFF, _spinnerBreakSliceDiff.getSelection());
+		// break by avg+slice speed
+		final double breakMinAvgSpeedAS = _spinnerBreakMinAvgSpeedAS.getSelection()
+				/ SPEED_DIGIT_VALUE
+				/ UI.UNIT_VALUE_DISTANCE;
+		final double breakMinSliceSpeedAS = _spinnerBreakMinSliceSpeedAS.getSelection()
+				/ SPEED_DIGIT_VALUE
+				/ UI.UNIT_VALUE_DISTANCE;
+		final int breakMinSliceTimeAS = _spinnerBreakMinSliceTimeAS.getSelection();
+		_prefStore.setValue(ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED_AS, breakMinAvgSpeedAS);
+		_prefStore.setValue(ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED_AS, breakMinSliceSpeedAS);
+		_prefStore.setValue(ITourbookPreferences.BREAK_TIME_MIN_SLICE_TIME_AS, breakMinSliceTimeAS);
 
-		// by slice speed
+		// break by slice speed
 		final float breakMinSliceSpeed = _spinnerBreakMinSliceSpeed.getSelection()
 				/ SPEED_DIGIT_VALUE
 				/ UI.UNIT_VALUE_DISTANCE;
 		_prefStore.setValue(ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED, breakMinSliceSpeed);
 
-		// by avg speed
+		// break by avg speed
 		final float breakMinAvgSpeed = _spinnerBreakMinAvgSpeed.getSelection()
 				/ SPEED_DIGIT_VALUE
 				/ UI.UNIT_VALUE_DISTANCE;
 		_prefStore.setValue(ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED, breakMinAvgSpeed);
+
+		// break by time/distance
+		_prefStore.setValue(ITourbookPreferences.BREAK_TIME_SHORTEST_TIME, _spinnerBreakShortestTime.getSelection());
+		final float breakDistance = _spinnerBreakMaxDistance.getSelection() * UI.UNIT_VALUE_DISTANCE_SMALL;
+		_prefStore.setValue(ITourbookPreferences.BREAK_TIME_MAX_DISTANCE, breakDistance);
+		_prefStore.setValue(ITourbookPreferences.BREAK_TIME_SLICE_DIFF, _spinnerBreakSliceDiff.getSelection());
 	}
 
 	/**
@@ -2941,25 +3131,39 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	 */
 	private void saveBreakTimeValuesInState() {
 
-		_state.put(STATE_SELECTED_BREAK_METHOD, _comboBreakMethod.getSelectionIndex());
+		// break method
+		_state.put(STATE_SELECTED_BREAK_METHOD2, getSelectedBreakMethod().methodId);
 
-		// by time/distance
-		final float breakDistance = _spinnerBreakMaxDistance.getSelection() * UI.UNIT_VALUE_DISTANCE_SMALL;
-		_state.put(STATE_BREAK_TIME_MIN_DISTANCE_VALUE, breakDistance);
-		_state.put(STATE_BREAK_TIME_MIN_TIME_VALUE, _spinnerBreakShortestTime.getSelection());
-		_state.put(STATE_BREAK_TIME_SLICE_DIFF, _spinnerBreakSliceDiff.getSelection());
+		// break by avg+slice speed
+		final double breakMinAvgSpeedAS = _spinnerBreakMinAvgSpeedAS.getSelection()
+				/ SPEED_DIGIT_VALUE
+				/ UI.UNIT_VALUE_DISTANCE;
+		final double breakMinSliceSpeedAS = _spinnerBreakMinSliceSpeedAS.getSelection()
+				/ SPEED_DIGIT_VALUE
+				/ UI.UNIT_VALUE_DISTANCE;
+		final int breakMinSliceTimeAS = _spinnerBreakMinSliceTimeAS.getSelection();
 
-		// by slice speed
+		_state.put(STATE_BREAK_TIME_MIN_AVG_SPEED_AS, breakMinAvgSpeedAS);
+		_state.put(STATE_BREAK_TIME_MIN_SLICE_SPEED_AS, breakMinSliceSpeedAS);
+		_state.put(STATE_BREAK_TIME_MIN_SLICE_TIME_AS, breakMinSliceTimeAS);
+
+		// break by slice speed
 		final float breakMinSliceSpeed = _spinnerBreakMinSliceSpeed.getSelection()
 				/ SPEED_DIGIT_VALUE
 				/ UI.UNIT_VALUE_DISTANCE;
 		_state.put(STATE_BREAK_TIME_MIN_SLICE_SPEED, breakMinSliceSpeed);
 
-		// by avg speed
+		// break by avg speed
 		final float breakMinAvgSpeed = _spinnerBreakMinAvgSpeed.getSelection()
 				/ SPEED_DIGIT_VALUE
 				/ UI.UNIT_VALUE_DISTANCE;
 		_state.put(STATE_BREAK_TIME_MIN_AVG_SPEED, breakMinAvgSpeed);
+
+		// break by time/distance
+		final float breakDistance = _spinnerBreakMaxDistance.getSelection() * UI.UNIT_VALUE_DISTANCE_SMALL;
+		_state.put(STATE_BREAK_TIME_MIN_DISTANCE_VALUE, breakDistance);
+		_state.put(STATE_BREAK_TIME_MIN_TIME_VALUE, _spinnerBreakShortestTime.getSelection());
+		_state.put(STATE_BREAK_TIME_SLICE_DIFF, _spinnerBreakSliceDiff.getSelection());
 	}
 
 	private void saveState() {
@@ -2995,6 +3199,26 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		_isTourDirty = false;
 
 		return savedTour;
+	}
+
+	private void selectBreakMethod(final String methodId) {
+
+		final BreakTimeMethod[] breakMethods = BreakTimeTool.BREAK_TIME_METHODS;
+
+		int selectionIndex = -1;
+
+		for (int methodIndex = 0; methodIndex < breakMethods.length; methodIndex++) {
+			if (breakMethods[methodIndex].methodId.equals(methodId)) {
+				selectionIndex = methodIndex;
+				break;
+			}
+		}
+
+		if (selectionIndex == -1) {
+			selectionIndex = 0;
+		}
+
+		_comboBreakMethod.select(selectionIndex);
 	}
 
 	private void setCellColor(final ViewerCell cell, final int altiDiff) {
@@ -3033,7 +3257,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	/**
 	 * Sets the tour for the segmenter
-	 *
+	 * 
 	 * @param tourData
 	 * @param forceUpdate
 	 */

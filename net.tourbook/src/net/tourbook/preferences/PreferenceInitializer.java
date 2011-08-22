@@ -292,16 +292,21 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		/*
 		 * break time using metric values
 		 */
-		store.setDefault(ITourbookPreferences.BREAK_TIME_METHOD, BreakTimeTool.BREAK_TIME_METHOD_BY_AVG_SPEED);
+		store.setDefault(ITourbookPreferences.BREAK_TIME_METHOD2, BreakTimeTool.BREAK_TIME_METHOD_BY_AVG_SLICE_SPEED);
+
+		// minimum speed for a break, default is 1.0 km/h to respect walking in the mountains
+		store.setDefault(ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED_AS, 1.0);
+		store.setDefault(ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED_AS, 1.0);
+		store.setDefault(ITourbookPreferences.BREAK_TIME_MIN_SLICE_TIME_AS, 2);
+
+		// minimum speed for a break, default is 1.0 km/h to respect walking in the mountains
+		store.setDefault(ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED, 1.0f);
+		store.setDefault(ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED, 1.0f);
 
 		// break time, default is 3.6 km/h (20 m in 20 sec)
 		store.setDefault(ITourbookPreferences.BREAK_TIME_SHORTEST_TIME, 20);
 		store.setDefault(ITourbookPreferences.BREAK_TIME_MAX_DISTANCE, 20.0f);
 		store.setDefault(ITourbookPreferences.BREAK_TIME_SLICE_DIFF, 5); // 5 minutes
-
-		// minimum speed for a break, default is 1.0 km/h to respect walking in the mountains
-		store.setDefault(ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED, 1.0f);
-		store.setDefault(ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED, 1.0f);
 
 		/*
 		 * calendar week

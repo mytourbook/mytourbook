@@ -1,9 +1,13 @@
-Hints
-!!! change method how breaktime is computed to average value !!!
+11.8.2 release notes:
 
 New Feature
--much better smoothing algorithm for the graphs in the tour chart
--convenient feature for resizing all columns and to display the whole content (feature is available in the table/tree context menu, this feature was relatively easy to implement but nobody requested it)
+-new smoothing algorithm for graphs in the tour chart, provided by Didier Jamet
+-convenient feature for resizing all columns to the optimal width (this feature is available in the table/tree header context menu)
+
+Modifications
+-!!! previous break time method (which is calculating the tour break time) was discarded and a new default method is set !!!
+ (graph smoothing depends on the break time calculation)
+-tour map position is reset for all tours and not only for the currently displayed tour
 
 Bugfixes
 - tour editor bug http://sourceforge.net/tracker/?func=detail&aid=3391406&group_id=179799&atid=890601

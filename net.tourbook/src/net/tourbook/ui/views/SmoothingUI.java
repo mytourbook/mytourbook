@@ -26,6 +26,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
+import net.tourbook.util.UI;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -33,7 +34,6 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Combo;
@@ -46,38 +46,43 @@ import org.eclipse.ui.part.PageBook;
 
 public class SmoothingUI {
 
-	private final IPreferenceStore	_prefStore			= TourbookPlugin.getDefault().getPreferenceStore();
+	private final IPreferenceStore		_prefStore			= TourbookPlugin.getDefault().getPreferenceStore();
 
-	private ITourEventListener		_tourEventListener;
+	private ITourEventListener			_tourEventListener;
 
-	private boolean					_isUpdateUI;
+	private boolean						_isUpdateUI;
 
-	private ISmoothingAlgorithm		_smoothingInitial	= new SmoothingAlgorithmInitial();
-	private ISmoothingAlgorithm		_smoothingJamet		= new SmoothingAlgorithmJamet();
+	private ISmoothingAlgorithm			_smoothingInitial	= new SmoothingAlgorithmInitial();
+	private ISmoothingAlgorithm			_smoothingJamet		= new SmoothingAlgorithmJamet();
 
-	private NumberFormat			_nf0				= NumberFormat.getNumberInstance();
+	private NumberFormat				_nf0				= NumberFormat.getNumberInstance();
 	{
 		_nf0.setMinimumFractionDigits(0);
 		_nf0.setMaximumFractionDigits(0);
 	}
 
-	private static String[][]		SMOOTHING_ALGORITHM	= {
-			{ ISmoothingAlgorithm.SMOOTHING_ALGORITHM_INITIAL, Messages.TourChart_Smoothing_Algorithm_Initial },
-			{ ISmoothingAlgorithm.SMOOTHING_ALGORITHM_JAMET, Messages.TourChart_Smoothing_Algorithm_Jamet },
-														//
-														};
+	private static SmoothingAlgorithm[]	SMOOTHING_ALGORITHM	= {
+			//
+			new SmoothingAlgorithm(
+					ISmoothingAlgorithm.SMOOTHING_ALGORITHM_INITIAL,
+					Messages.TourChart_Smoothing_Algorithm_Initial),
+			new SmoothingAlgorithm(
+					ISmoothingAlgorithm.SMOOTHING_ALGORITHM_JAMET,
+					Messages.TourChart_Smoothing_Algorithm_Jamet),
+															//
+															};
 
 	/*
 	 * UI controls
 	 */
-	private FormToolkit				_tk;
+	private FormToolkit					_tk;
 
-	private Composite				_uiContainer;
-	private Combo					_comboAlgorithm;
+	private Composite					_uiContainer;
+	private Combo						_comboAlgorithm;
 
-	private PageBook				_pagebookSmoothingAlgo;
-	private Composite				_pageJamet;
-	private Composite				_pageInitial;
+	private PageBook					_pagebookSmoothingAlgo;
+	private Composite					_pageJamet;
+	private Composite					_pageInitial;
 
 	private void addTourEventListener() {
 
@@ -104,7 +109,7 @@ public class SmoothingUI {
 		final String prefAlgoId = _prefStore.getString(ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM);
 		int prefAlgoIndex = -1;
 		for (int algoIndex = 0; algoIndex < SMOOTHING_ALGORITHM.length; algoIndex++) {
-			if (SMOOTHING_ALGORITHM[algoIndex][0].equals(prefAlgoId)) {
+			if (SMOOTHING_ALGORITHM[algoIndex].algorithmId.equals(prefAlgoId)) {
 				prefAlgoIndex = algoIndex;
 				break;
 			}
@@ -119,8 +124,7 @@ public class SmoothingUI {
 				Messages.TourChart_Smoothing_Dialog_SmoothAllTours_Title,
 				NLS.bind(
 						Messages.TourChart_Smoothing_Dialog_SmoothAllTours_Message,
-						SMOOTHING_ALGORITHM[prefAlgoIndex][1]//
-						)) == false) {
+						SMOOTHING_ALGORITHM[prefAlgoIndex].uiText)) == false) {
 			return;
 		}
 
@@ -151,7 +155,7 @@ public class SmoothingUI {
 		setupUI();
 
 		restoreState();
-		onSelectSmoothingAlgo(false);
+		updateUI();
 
 		addTourEventListener();
 	}
@@ -209,7 +213,7 @@ public class SmoothingUI {
 					if (_isUpdateUI) {
 						return;
 					}
-					onSelectSmoothingAlgo(false);
+					onSelectSmoothingAlgo();
 				}
 			});
 		}
@@ -234,8 +238,8 @@ public class SmoothingUI {
 		TourManager.fireEvent(TourEventId.ALL_TOURS_ARE_MODIFIED);
 	}
 
-	private String getSelectedAlgorithm() {
-		return SMOOTHING_ALGORITHM[_comboAlgorithm.getSelectionIndex()][0];
+	private SmoothingAlgorithm getSelectedAlgorithm() {
+		return SMOOTHING_ALGORITHM[_comboAlgorithm.getSelectionIndex()];
 	}
 
 	private void initUI(final Composite parent) {
@@ -243,62 +247,38 @@ public class SmoothingUI {
 		_tk = new FormToolkit(parent.getDisplay());
 	}
 
-	private void onSelectSmoothingAlgo(final boolean isUpdateFromPrefStore) {
+	private void onSelectSmoothingAlgo() {
 
-		// select smoothing page
-		final String smoothingAlgo = getSelectedAlgorithm();
+		updateUI();
 
-		if (smoothingAlgo.equals(ISmoothingAlgorithm.SMOOTHING_ALGORITHM_INITIAL)) {
+		// update pref store
+		saveState();
 
-			_pagebookSmoothingAlgo.showPage(_pageInitial);
+		// force tours to be recomputed
+		TourManager.getInstance().removeAllToursFromCache();
 
-		} else if (smoothingAlgo.equals(ISmoothingAlgorithm.SMOOTHING_ALGORITHM_JAMET)) {
-
-			_pagebookSmoothingAlgo.showPage(_pageJamet);
-		}
-		/*
-		 * update layout: both methods must be called because the size can be modified and a layout
-		 * with resized controls MUST be done !!!!
-		 */
-		Composite child = _uiContainer;
-		Composite parent = _uiContainer.getParent();
-
-		while (parent != null) {
-
-			// go up until the first scrolled container
-
-			if (parent instanceof ScrolledComposite) {
-
-				final ScrolledComposite scrolledContainer = (ScrolledComposite) parent;
-
-				scrolledContainer.setMinSize(child.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-				scrolledContainer.layout(true, true);
-
-				break;
-			}
-
-			child = parent;
-			parent = parent.getParent();
-		}
-
-		// update ui but prevent to fire again -> this would be an endless recursive method call !!!!!
-		if (isUpdateFromPrefStore == false) {
-
-			// update selected smoothing
-			saveState();
-
-			// force tours to be recomputed
-			TourManager.getInstance().removeAllToursFromCache();
-
-			// fire unique event for all changes
-			TourManager.fireEvent(TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED, null);
-		}
+		// fire unique event for all changes
+		TourManager.fireEvent(TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED, null);
 	}
 
 	public void performDefaults() {
 
-		_smoothingInitial.performDefaults();
-		_smoothingJamet.performDefaults();
+		final String defaultSmoothingId = _prefStore.getDefaultString(//
+				ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM);
+
+		_prefStore.setValue(ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM, defaultSmoothingId);
+
+		selectSmoothingAlgo(defaultSmoothingId);
+
+		updateUI();
+
+		final SmoothingAlgorithm selectedSmoothingAlgo = getSelectedAlgorithm();
+
+		_smoothingInitial.performDefaults(//
+				selectedSmoothingAlgo.algorithmId.equals(ISmoothingAlgorithm.SMOOTHING_ALGORITHM_INITIAL));
+
+		_smoothingJamet.performDefaults(//
+				selectedSmoothingAlgo.algorithmId.equals(ISmoothingAlgorithm.SMOOTHING_ALGORITHM_JAMET));
 	}
 
 	private void restoreState() {
@@ -306,18 +286,7 @@ public class SmoothingUI {
 		_isUpdateUI = true;
 		{
 			// smoothing algorithm
-			final String prefAlgoId = _prefStore.getString(ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM);
-			int prefAlgoIndex = -1;
-			for (int algoIndex = 0; algoIndex < SMOOTHING_ALGORITHM.length; algoIndex++) {
-				if (SMOOTHING_ALGORITHM[algoIndex][0].equals(prefAlgoId)) {
-					prefAlgoIndex = algoIndex;
-					break;
-				}
-			}
-			if (prefAlgoIndex == -1) {
-				prefAlgoIndex = 0;
-			}
-			_comboAlgorithm.select(prefAlgoIndex);
+			selectSmoothingAlgo(_prefStore.getString(ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM));
 		}
 		_isUpdateUI = false;
 	}
@@ -328,7 +297,24 @@ public class SmoothingUI {
 	private void saveState() {
 
 		// smoothing algorithm
-		_prefStore.setValue(ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM, getSelectedAlgorithm());
+		_prefStore.setValue(
+				ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM,
+				getSelectedAlgorithm().algorithmId);
+	}
+
+	private void selectSmoothingAlgo(final String prefAlgoId) {
+
+		int prefAlgoIndex = -1;
+		for (int algoIndex = 0; algoIndex < SMOOTHING_ALGORITHM.length; algoIndex++) {
+			if (SMOOTHING_ALGORITHM[algoIndex].algorithmId.equals(prefAlgoId)) {
+				prefAlgoIndex = algoIndex;
+				break;
+			}
+		}
+		if (prefAlgoIndex == -1) {
+			prefAlgoIndex = 0;
+		}
+		_comboAlgorithm.select(prefAlgoIndex);
 	}
 
 	private void setupUI() {
@@ -338,12 +324,29 @@ public class SmoothingUI {
 			/*
 			 * fillup algorithm combo
 			 */
-			for (final String[] algo : SMOOTHING_ALGORITHM) {
-				_comboAlgorithm.add(algo[1]);
+			for (final SmoothingAlgorithm algo : SMOOTHING_ALGORITHM) {
+				_comboAlgorithm.add(algo.uiText);
 			}
 			_comboAlgorithm.select(0);
 		}
 		_isUpdateUI = false;
+	}
+
+	private void updateUI() {
+
+		final String selectedSmoothingAlgo = getSelectedAlgorithm().algorithmId;
+
+		// select smoothing page
+		if (selectedSmoothingAlgo.equals(ISmoothingAlgorithm.SMOOTHING_ALGORITHM_INITIAL)) {
+
+			_pagebookSmoothingAlgo.showPage(_pageInitial);
+
+		} else if (selectedSmoothingAlgo.equals(ISmoothingAlgorithm.SMOOTHING_ALGORITHM_JAMET)) {
+
+			_pagebookSmoothingAlgo.showPage(_pageJamet);
+		}
+
+		UI.updateScrolledContent(_uiContainer);
 	}
 
 	private void updateUIFromPropertyEvent() {
@@ -353,8 +356,7 @@ public class SmoothingUI {
 
 		restoreState();
 
-		// update ui but prevent to fire again -> this would be an endless recursive method call !!!!!
-		onSelectSmoothingAlgo(true);
+		updateUI();
 	}
 
 }

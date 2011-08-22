@@ -1896,9 +1896,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		/*
 		 * compute break time according to the selected method
 		 */
-		BreakTimeResult breakTimeResult;
+		BreakTimeResult breakTimeResult = null;
 
-		if (btConfig.breakTimeMethod == BreakTimeTool.BREAK_TIME_METHOD_BY_TIME_DISTANCE) {
+		if (btConfig.breakTimeMethodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_TIME_DISTANCE)) {
 
 			breakTimeResult = BreakTimeTool.computeBreakTimeByTimeDistance(
 					this,
@@ -1906,38 +1906,32 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 					btConfig.breakMaxDistance,
 					btConfig.breakSliceDiff);
 
-			breakTimeSerie = breakTimeResult.breakTimeSerie;
-
-			return breakTimeResult.tourBreakTime;
-
-		} else if (btConfig.breakTimeMethod == BreakTimeTool.BREAK_TIME_METHOD_BY_SLICE_SPEED) {
+		} else if (btConfig.breakTimeMethodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_SLICE_SPEED)) {
 
 			breakTimeResult = BreakTimeTool.computeBreakTimeBySpeed(
 					this,
-					btConfig.breakTimeMethod,
+					btConfig.breakTimeMethodId,
 					btConfig.breakMinSliceSpeed);
 
-			breakTimeSerie = breakTimeResult.breakTimeSerie;
-
-			return breakTimeResult.tourBreakTime;
-
-		} else if (btConfig.breakTimeMethod == BreakTimeTool.BREAK_TIME_METHOD_BY_AVG_SPEED) {
+		} else if (btConfig.breakTimeMethodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_AVG_SPEED)) {
 
 			breakTimeResult = BreakTimeTool.computeBreakTimeBySpeed(
 					this,
-					btConfig.breakTimeMethod,
+					btConfig.breakTimeMethodId,
 					btConfig.breakMinAvgSpeed);
 
-			breakTimeSerie = breakTimeResult.breakTimeSerie;
+		} else if (btConfig.breakTimeMethodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_AVG_SLICE_SPEED)) {
 
-			return breakTimeResult.tourBreakTime;
+			breakTimeResult = BreakTimeTool.computeBreakTimeByAvgSliceSpeed(
+					this,
+					btConfig.breakMinAvgSpeedAS,
+					btConfig.breakMinSliceSpeedAS,
+					btConfig.breakMinSliceTimeAS);
 		}
 
-		// this case should not occure !!!
+		breakTimeSerie = breakTimeResult.breakTimeSerie;
 
-//		breakTimeSerie = new boolean[timeSerie.length];
-
-		return 0;
+		return breakTimeResult.tourBreakTime;
 	}
 
 	/**

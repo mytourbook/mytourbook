@@ -17,6 +17,7 @@ package net.tourbook.util;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -27,6 +28,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.TextLayout;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -219,6 +221,34 @@ public class UI {
 		gc.dispose();
 
 		return shortText;
+	}
+
+	public static void updateScrolledContent(final Composite composite) {
+
+		Composite child = composite;
+		Composite parent = composite.getParent();
+
+		while (parent != null) {
+
+			// go up until the first scrolled container
+
+			if (parent instanceof ScrolledComposite) {
+
+				final ScrolledComposite scrolledContainer = (ScrolledComposite) parent;
+
+				/*
+				 * update layout: both methods must be called because the size can be modified and a layout
+				 * with resized controls MUST be done !!!!
+				 */
+				scrolledContainer.setMinSize(child.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+				scrolledContainer.layout(true, true);
+
+				break;
+			}
+
+			child = parent;
+			parent = parent.getParent();
+		}
 	}
 
 	public static VerifyListener verifyFilenameInput() {

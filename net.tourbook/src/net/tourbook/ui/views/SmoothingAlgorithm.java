@@ -15,24 +15,14 @@
  *******************************************************************************/
 package net.tourbook.ui.views;
 
-import org.eclipse.swt.widgets.Composite;
+public class SmoothingAlgorithm {
 
-public interface ISmoothingAlgorithm {
+	public String	algorithmId;
+	public String	uiText;
 
-	public static final String	SMOOTHING_ALGORITHM_JAMET	= "jamet";		//$NON-NLS-1$
-	public static final String	SMOOTHING_ALGORITHM_INITIAL	= "initial";	//$NON-NLS-1$
-
-	/**
-	 * @param parent
-	 * @param isShowDescription
-	 * @return
-	 */
-	Composite createUI(Composite parent, boolean isShowDescription);
-
-	void dispose();
-
-	void performDefaults(boolean isFireModifications);
-
-	void updateUIFromPrefStore();
+	public SmoothingAlgorithm(final String algorithmId, final String uiText) {
+		this.algorithmId = algorithmId;
+		this.uiText = uiText;
+	}
 
 }

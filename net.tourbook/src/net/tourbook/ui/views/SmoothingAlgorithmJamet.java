@@ -353,7 +353,7 @@ public class SmoothingAlgorithmJamet implements ISmoothingAlgorithm {
 				if (_isUpdateUI) {
 					return;
 				}
-				onModifySmoothing(e.widget);
+				onModifySmoothing(e.widget, true);
 			}
 		};
 
@@ -364,12 +364,12 @@ public class SmoothingAlgorithmJamet implements ISmoothingAlgorithm {
 				if (_isUpdateUI) {
 					return;
 				}
-				onModifySmoothing(event.widget);
+				onModifySmoothing(event.widget, true);
 			}
 		};
 	}
 
-	private void onModifySmoothing(final Widget widget) {
+	private void onModifySmoothing(final Widget widget, final boolean isFireModifications) {
 
 		updateSyncedSlider(widget);
 
@@ -377,14 +377,18 @@ public class SmoothingAlgorithmJamet implements ISmoothingAlgorithm {
 
 		saveState();
 
-		TourManager.getInstance().removeAllToursFromCache();
+		if (isFireModifications) {
 
-		// fire unique event for all changes
-		TourManager.fireEvent(TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED, null);
+			// delete cached data that the smoothed data series are recreated when displayed
+			TourManager.getInstance().removeAllToursFromCache();
+
+			// fire unique event for all changes
+			TourManager.fireEvent(TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED, null);
+		}
 	}
 
 	@Override
-	public void performDefaults() {
+	public void performDefaults(final boolean isFireModifications) {
 
 		_isUpdateUI = true;
 		{
@@ -417,7 +421,7 @@ public class SmoothingAlgorithmJamet implements ISmoothingAlgorithm {
 		}
 		_isUpdateUI = false;
 
-		onModifySmoothing(null);
+		onModifySmoothing(null, isFireModifications);
 	}
 
 	private void restoreState() {
@@ -537,7 +541,6 @@ public class SmoothingAlgorithmJamet implements ISmoothingAlgorithm {
 
 	@Override
 	public void updateUIFromPrefStore() {
-
 		restoreState();
 		enableControls();
 	}

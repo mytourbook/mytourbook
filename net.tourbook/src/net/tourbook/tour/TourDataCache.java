@@ -61,6 +61,10 @@ class TourDataCache {
 		return _tourCache.get(tourId);
 	}
 
+	public ConcurrentHashMap<Long, TourData> getCache() {
+		return _tourCache;
+	}
+
 	public void put(final Long tourId, final TourData tourData) {
 
 		CACHE_LOCK.lock();

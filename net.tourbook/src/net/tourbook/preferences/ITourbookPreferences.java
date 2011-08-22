@@ -125,13 +125,20 @@ public interface ITourbookPreferences {
 
 	public static final String	APP_DATA_SPEED_MIN_TIMESLICE_VALUE			= "application.data-speed-min-timeslice-value";			//$NON-NLS-1$
 
-	public static final String	BREAK_TIME_METHOD							= "BreakTime_Method";										//$NON-NLS-1$
+	/**
+	 * initially this was an int value, with 2 it's a string
+	 */
+	public static final String	BREAK_TIME_METHOD2							= "BreakTime_Method2";										//$NON-NLS-1$
+
 	public static final String	BREAK_TIME_IS_MODIFIED						= "BreakTime_IsModified";									//$NON-NLS-1$
+	public static final String	BREAK_TIME_MIN_AVG_SPEED_AS					= "BreakTime_MinAvgSpeedAS";								//$NON-NLS-1$
+	public static final String	BREAK_TIME_MIN_SLICE_SPEED_AS				= "BreakTime_MinSliceSpeedAS";								//$NON-NLS-1$
+	public static final String	BREAK_TIME_MIN_SLICE_TIME_AS				= "BreakTime_MinSliceTimeAS";								//$NON-NLS-1$
+	public static final String	BREAK_TIME_MIN_AVG_SPEED					= "BreakTime_MinAvgSpeed";									//$NON-NLS-1$
+	public static final String	BREAK_TIME_MIN_SLICE_SPEED					= "BreakTime_MinSliceSpeed";								//$NON-NLS-1$
 	public static final String	BREAK_TIME_SHORTEST_TIME					= "BreakTime_ShortestTime";								//$NON-NLS-1$
 	public static final String	BREAK_TIME_MAX_DISTANCE						= "BreakTime_MaxDistance";									//$NON-NLS-1$
 	public static final String	BREAK_TIME_SLICE_DIFF						= "BreakTime_SliceDiff";									//$NON-NLS-1$
-	public static final String	BREAK_TIME_MIN_SLICE_SPEED					= "BreakTime_MinSliceSpeed";								//$NON-NLS-1$
-	public static final String	BREAK_TIME_MIN_AVG_SPEED					= "BreakTime_MinAvgSpeed";									//$NON-NLS-1$
 
 	/*
 	 * system

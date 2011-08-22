@@ -87,13 +87,13 @@ class SmoothingAlgorithmInitial implements ISmoothingAlgorithm {
 					if (_isUpdateUI) {
 						return;
 					}
-					onModifySpeed();
+					onModifySpeed(true);
 				}
 			});
 			_spinnerSpeedMinTime.addMouseWheelListener(new MouseWheelListener() {
 				public void mouseScrolled(final MouseEvent event) {
 					UI.adjustSpinnerValueOnMouseScroll(event);
-					onModifySpeed();
+					onModifySpeed(true);
 				}
 			});
 
@@ -103,10 +103,7 @@ class SmoothingAlgorithmInitial implements ISmoothingAlgorithm {
 			if (isShowDescription) {
 
 				// label: description
-				label = _tk.createLabel(
-						container,
-						Messages.compute_tourValueSpeed_label_description,
-						SWT.WRAP);
+				label = _tk.createLabel(container, Messages.compute_tourValueSpeed_label_description, SWT.WRAP);
 				GridDataFactory.fillDefaults()//
 						.span(3, 1)
 						.indent(0, 10)
@@ -140,21 +137,26 @@ class SmoothingAlgorithmInitial implements ISmoothingAlgorithm {
 
 	/**
 	 * Property has changed, fire an change event
+	 * 
+	 * @param isFireModifications
 	 */
-	private void onModifySpeed() {
+	private void onModifySpeed(final boolean isFireModifications) {
 
 		// set new values in the pref store
 		saveState();
 
-		// force all tours to recompute the speed
-		TourManager.getInstance().clearTourDataCache();
+		if (isFireModifications) {
 
-		// fire unique event for all changes
-		TourManager.fireEvent(TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED, null);
+			// force all tours to recompute the speed
+			TourManager.getInstance().clearTourDataCache();
+
+			// fire unique event for all changes
+			TourManager.fireEvent(TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED, null);
+		}
 	}
 
 	@Override
-	public void performDefaults() {
+	public void performDefaults(final boolean isFireModifications) {
 
 		_isUpdateUI = true;
 		{
@@ -163,7 +165,7 @@ class SmoothingAlgorithmInitial implements ISmoothingAlgorithm {
 		}
 		_isUpdateUI = false;
 
-		onModifySpeed();
+		onModifySpeed(isFireModifications);
 	}
 
 	private void restoreState() {
@@ -186,7 +188,6 @@ class SmoothingAlgorithmInitial implements ISmoothingAlgorithm {
 
 	@Override
 	public void updateUIFromPrefStore() {
-
 		restoreState();
 	}
 

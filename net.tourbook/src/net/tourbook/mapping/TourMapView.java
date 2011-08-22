@@ -499,6 +499,12 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 	void actionZoomShowEntireTour() {
 
+		/*
+		 * reset position for all tours, it was really annoying that previous selected tours moved
+		 * to their previous positions, implemented in 11.8.2
+		 */
+		TourManager.getInstance().resetMapPositions();
+
 		_actionShowTourInMap.setChecked(true);
 		_map.setShowOverlays(true);
 
@@ -817,22 +823,27 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		_actionZoomCentered = new ActionZoomCentered(this);
 		_actionZoomShowAll = new ActionZoomShowEntireEarth(this);
 		_actionZoomShowEntireTour = new ActionZoomShowEntireTour(this);
+
 		_actionSynchWithTour = new ActionSynchWithTour(this);
 		_actionSynchWithSlider = new ActionSynchWithSlider(this);
-		_actionShowPOI = new ActionShowPOI(this);
-		_actionShowTourInMap = new ActionShowTourInMap(this);
 		_actionSynchTourZoomLevel = new ActionSynchTourZoomLevel(this);
+
 		_actionSelectMapProvider = new ActionSelectMapProvider(this);
 		_actionSetDefaultPosition = new ActionSetDefaultPosition(this);
 		_actionSaveDefaultPosition = new ActionSaveDefaultPosition(this);
+
 		_actionShowSliderInMap = new ActionShowSliderInMap(this);
 		_actionShowSliderInLegend = new ActionShowSliderInLegend(this);
 		_actionShowLegendInMap = new ActionShowLegendInMap(this);
 		_actionShowScaleInMap = new ActionShowScaleInMap(this);
 		_actionShowStartEndInMap = new ActionShowStartEndInMap(this);
+
+		_actionShowPOI = new ActionShowPOI(this);
+		_actionShowTourInMap = new ActionShowTourInMap(this);
 		_actionShowTourInfoInMap = new ActionShowTourInfoInMap(this);
 		_actionShowTourMarker = new ActionShowTourMarker(this);
 		_actionShowWayPoints = new ActionShowWayPoints(this);
+
 		_actionReloadFailedMapImages = new ActionReloadFailedMapImages(this);
 		_actionDimMap = new ActionDimMap(this);
 		_actionManageProvider = new ActionManageMapProviders(this);
@@ -1027,7 +1038,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 					if (dataValue == 0) {
 						continue;
 					}
-					
+
 					if (setInitialValue) {
 						setInitialValue = false;
 						minValue = maxValue = dataValue;

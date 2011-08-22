@@ -29,84 +29,112 @@ import org.eclipse.jface.util.PropertyChangeEvent;
  */
 public class BreakTimeTool {
 
-	private static int				_prefBreakTimeMethod;
-	private static int				_prefShortestTime;
-	private static float			_prefMaxDistance;
-	private static int				_prefSliceDiff;
-	private static float			_prefMinSliceSpeed;
-	private static float			_prefMinAvgSpeed;
+	private static String					_prefBreakTimeMethodId;
+	private static double					_prefMinAvgSpeedAS;
+	private static double					_prefMinSliceSpeedAS;
+	private static int						_prefMinSliceTimeAS;
+	private static float					_prefMinSliceSpeed;
+	private static float					_prefMinAvgSpeed;
+	private static int						_prefShortestTime;
+	private static float					_prefMaxDistance;
+	private static int						_prefSliceDiff;
 
-	/**
-	 * break time method which is an index for a combo box
-	 */
-	public static final int			BREAK_TIME_METHOD_BY_SLICE_SPEED	= 0;
-	public static final int			BREAK_TIME_METHOD_BY_AVG_SPEED		= 1;
-	public static final int			BREAK_TIME_METHOD_BY_TIME_DISTANCE	= 2;
+	public static final String				BREAK_TIME_METHOD_BY_AVG_SLICE_SPEED	= "AvgSliceSpeed";				//$NON-NLS-1$
+	public static final String				BREAK_TIME_METHOD_BY_AVG_SPEED			= "AvgSpeed";					//$NON-NLS-1$
+	public static final String				BREAK_TIME_METHOD_BY_SLICE_SPEED		= "SliceSpeed";				//$NON-NLS-1$
+	public static final String				BREAK_TIME_METHOD_BY_TIME_DISTANCE		= "TimeDistance";				//$NON-NLS-1$
 
-	public static final String[]	BREAK_TIME_METHODS					= //
-																		{
-			Messages.Compute_BreakTime_Method_SpeedBySlice, // 0
-			Messages.Compute_BreakTime_Method_SpeedByAverage, // 1
-			Messages.Compute_BreakTime_Method_TimeDistance				// 2
-																		};
+	// sequence is used for the combo selection box
+	public static final BreakTimeMethod[]	BREAK_TIME_METHODS						= {
+																					//
+			new BreakTimeMethod(BREAK_TIME_METHOD_BY_AVG_SLICE_SPEED,//
+					Messages.Compute_BreakTime_Method_SpeedByAverageAndSlice),
+			//
+			new BreakTimeMethod(BREAK_TIME_METHOD_BY_AVG_SPEED, //
+					Messages.Compute_BreakTime_Method_SpeedByAverage),
+			//
+			new BreakTimeMethod(BREAK_TIME_METHOD_BY_SLICE_SPEED, //
+					Messages.Compute_BreakTime_Method_SpeedBySlice),
+			//
+			new BreakTimeMethod(BREAK_TIME_METHOD_BY_TIME_DISTANCE, //
+					Messages.Compute_BreakTime_Method_TimeDistance)
+																					//
+																					};
 
-	private static IPreferenceStore	_prefStore							= TourbookPlugin
-																				.getDefault()
-																				.getPreferenceStore();
-	private static boolean			_isPrefSet;
+	private static IPreferenceStore			_prefStore								= TourbookPlugin.getDefault()//
+																							.getPreferenceStore();
+	private static boolean					_isPrefSet;
 
 	/**
 	 * method how break time is computed
 	 */
-	public int						breakTimeMethod;
+	public String							breakTimeMethodId;
 
 	/**
 	 * shortes tims in seconds
 	 */
-	public int						breakShortestTime;
+	public int								breakShortestTime;
 
 	/**
 	 * max distance in meter
 	 */
-	public float					breakMaxDistance;
+	public float							breakMaxDistance;
 
 	/**
 	 * time between 2 time slices in minutes
 	 */
-	public int						breakSliceDiff;
+	public int								breakSliceDiff;
 
 	/**
 	 * slice speed in km/h
 	 */
-	public float					breakMinSliceSpeed;
+	public float							breakMinSliceSpeed;
 
 	/**
 	 * average speed in km/h
 	 */
-	public float					breakMinAvgSpeed;
+	public float							breakMinAvgSpeed;
+
+	/**
+	 * average speed in km/h
+	 */
+	public double							breakMinAvgSpeedAS;
+
+	/**
+	 * slice speed in km/h
+	 */
+	public double							breakMinSliceSpeedAS;
+
+	/**
+	 * Minimum time in seconds for the slice speed
+	 */
+	public int								breakMinSliceTimeAS;
 
 	@SuppressWarnings("unused")
 	private BreakTimeTool() {}
 
-	public BreakTimeTool(	final int breakTimeMethod,
+	public BreakTimeTool(	final String breakTimeMethodId,
 							final int breakShortestTime,
 							final float breakMaxDistance,
 							final float breakMinSliceSpeed,
 							final float breakMinAvgSpeed,
-							final int breakSliceDiff) {
+							final int breakSliceDiff,
+							final double breakMinAvgSpeedAS,
+							final double breakMinSliceSpeedAS,
+							final int breakMinSliceTimeAS) {
 
-		this.breakTimeMethod = breakTimeMethod;
+		this.breakTimeMethodId = breakTimeMethodId;
 
-		// 0
+		this.breakMinAvgSpeedAS = breakMinAvgSpeedAS;
+		this.breakMinSliceSpeedAS = breakMinSliceSpeedAS;
+		this.breakMinSliceTimeAS = breakMinSliceTimeAS;
+
+		this.breakMinSliceSpeed = breakMinSliceSpeed;
+		this.breakMinAvgSpeed = breakMinAvgSpeed;
+
 		this.breakShortestTime = breakShortestTime;
 		this.breakMaxDistance = breakMaxDistance;
 		this.breakSliceDiff = breakSliceDiff;
-
-		// 1
-		this.breakMinSliceSpeed = breakMinSliceSpeed;
-
-		// 2
-		this.breakMinAvgSpeed = breakMinAvgSpeed;
 	}
 
 	private static void checkPrefValues() {
@@ -136,8 +164,50 @@ public class BreakTimeTool {
 		});
 	}
 
+	public static BreakTimeResult computeBreakTimeByAvgSliceSpeed(	final TourData tourData,
+																	final double minAvgSpeed,
+																	final double minSliceSpeed,
+																	final int minSliceTime) {
+
+		final int[] timeSerie = tourData.timeSerie;
+		final int[] distanceSerie = tourData.getMetricDistanceSerie();
+
+		final boolean[] breakTimeSerie = new boolean[timeSerie.length];
+
+		final int[] speedSerie = tourData.getSpeedSerieMetric();
+
+		int lastTime = 0;
+		int lastDistance = 0;
+		int tourBreakTime = 0;
+
+		for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
+
+			final int currentTime = timeSerie[serieIndex];
+			final int currentDistance = distanceSerie[serieIndex];
+
+			final int timeDiffSlice = currentTime - lastTime;
+			final int distDiffSlice = currentDistance - lastDistance;
+
+			final double sliceSpeed = timeDiffSlice == 0 ? 0 : distDiffSlice * 3.6 / timeDiffSlice;
+			final double avgSpeed = speedSerie[serieIndex] / 10.0;
+
+			if (avgSpeed < minAvgSpeed || (sliceSpeed < minSliceSpeed && timeDiffSlice >= minSliceTime)) {
+
+				// current time slice is also a break
+
+				breakTimeSerie[serieIndex] = true;
+				tourBreakTime += timeDiffSlice;
+			}
+
+			lastTime = currentTime;
+			lastDistance = currentDistance;
+		}
+
+		return new BreakTimeResult(breakTimeSerie, tourBreakTime);
+	}
+
 	public static BreakTimeResult computeBreakTimeBySpeed(	final TourData tourData,
-															final int breakMethod,
+															final String breakMethodId,
 															final float minSpeed) {
 
 		final int[] timeSerie = tourData.timeSerie;
@@ -148,7 +218,7 @@ public class BreakTimeTool {
 		boolean isSliceSpeed;
 		int[] speedSerie = null;
 
-		if (breakMethod == BreakTimeTool.BREAK_TIME_METHOD_BY_SLICE_SPEED) {
+		if (breakMethodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_SLICE_SPEED)) {
 
 			// slice speed
 
@@ -303,31 +373,38 @@ public class BreakTimeTool {
 	}
 
 	/**
-	 * @return Returns values from the prer store for computing the break time.
+	 * @return Returns values from the pref store for computing the break time.
 	 */
 	public static BreakTimeTool getPrefValues() {
 
 		checkPrefValues();
 
 		return new BreakTimeTool(
-				_prefBreakTimeMethod,
+				_prefBreakTimeMethodId,
 				_prefShortestTime,
 				_prefMaxDistance,
 				_prefMinSliceSpeed,
 				_prefMinAvgSpeed,
-				_prefSliceDiff);
+				_prefSliceDiff,
+				_prefMinAvgSpeedAS,
+				_prefMinSliceSpeedAS,
+				_prefMinSliceTimeAS);
 	}
 
 	private static void updatePrefValues() {
 
-		_prefBreakTimeMethod = _prefStore.getInt(ITourbookPreferences.BREAK_TIME_METHOD);
+		_prefBreakTimeMethodId = _prefStore.getString(ITourbookPreferences.BREAK_TIME_METHOD2);
+
+		_prefMinAvgSpeedAS = _prefStore.getDouble(ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED_AS);
+		_prefMinSliceSpeedAS = _prefStore.getDouble(ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED_AS);
+		_prefMinSliceTimeAS = _prefStore.getInt(ITourbookPreferences.BREAK_TIME_MIN_SLICE_TIME_AS);
+
+		_prefMinAvgSpeed = _prefStore.getFloat(ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED);
+		_prefMinSliceSpeed = _prefStore.getFloat(ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED);
 
 		_prefShortestTime = _prefStore.getInt(ITourbookPreferences.BREAK_TIME_SHORTEST_TIME);
 		_prefMaxDistance = _prefStore.getFloat(ITourbookPreferences.BREAK_TIME_MAX_DISTANCE);
 		_prefSliceDiff = _prefStore.getInt(ITourbookPreferences.BREAK_TIME_SLICE_DIFF);
-
-		_prefMinSliceSpeed = _prefStore.getFloat(ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED);
-		_prefMinAvgSpeed = _prefStore.getFloat(ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED);
 	}
 
 }

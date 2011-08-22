@@ -2385,6 +2385,18 @@ public class TourManager {
 		}
 	}
 
+	public void resetMapPositions() {
+
+		if (_tourDataCache == null) {
+			return;
+		}
+
+		for (final TourData tourData : _tourDataCache.getCache().values()) {
+			tourData.mapCenterPositionLatitude = Double.MIN_VALUE;
+			tourData.mapCenterPositionLongitude = Double.MIN_VALUE;
+		}
+	}
+
 	/**
 	 * Before the application is shut down, the tour save listeners are called to save unsaved data.
 	 * 

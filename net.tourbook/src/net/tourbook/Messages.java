@@ -322,6 +322,8 @@ public class Messages extends NLS {
 	public static String		Compute_BreakTime_Group_BreakTime;
 	public static String		Compute_BreakTime_Label_ComputeBreakTimeBy;
 	public static String		Compute_BreakTime_Label_Description;
+	public static String	Compute_BreakTime_Label_Description_ComputeByAvgSliceSpeed;
+
 	public static String		Compute_BreakTime_Label_Description_ComputeByAvgSpeed;
 	public static String		Compute_BreakTime_Label_Description_ComputeBySliceSpeed;
 	public static String		Compute_BreakTime_Label_Description_ComputeByTime;
@@ -329,12 +331,16 @@ public class Messages extends NLS {
 	public static String		Compute_BreakTime_Label_MinimumAvgSpeed;
 	public static String		Compute_BreakTime_Label_MinimumDistance;
 	public static String		Compute_BreakTime_Label_MinimumSliceSpeed;
+
+	public static String	Compute_BreakTime_Label_MinimumSliceTime;
 	public static String		Compute_BreakTime_Label_MinimumTime;
 	public static String		Compute_BreakTime_Label_SliceDiffBreak;
 	public static String		Compute_BreakTime_Label_SliceDiffBreak_Tooltip;
 	public static String		Compute_BreakTime_Label_Title;
 	public static String		Compute_BreakTime_Label_TourBreakTime;
 	public static String		Compute_BreakTime_Method_SpeedByAverage;
+
+	public static String	Compute_BreakTime_Method_SpeedByAverageAndSlice;
 	public static String		Compute_BreakTime_Method_SpeedBySlice;
 	public static String		Compute_BreakTime_Method_TimeDistance;
 
