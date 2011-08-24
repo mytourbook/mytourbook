@@ -3021,20 +3021,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 				 * pulse
 				 */
 				if (isPulse) {
-					final int tdPulse = timeData.pulse;
-					pulseSerie[serieIndex] = (tdPulse == Integer.MIN_VALUE) || (tdPulse >= Integer.MAX_VALUE)
-							? Integer.MIN_VALUE
-							: tdPulse;
+					pulseSerie[serieIndex] = timeData.pulse;
 				}
 
 				/*
 				 * cadence
 				 */
 				if (isCadence) {
-					final int tdCadence = timeData.cadence;
-					cadenceSerie[serieIndex] = (tdCadence == Integer.MIN_VALUE) || (tdCadence >= Integer.MAX_VALUE)
-							? 0
-							: tdCadence;
+					cadenceSerie[serieIndex] = timeData.cadence;
 				}
 
 				/*
@@ -5667,7 +5661,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 			// search for first cadence value
 
-			for (final TimeData timeData : timeDataSerie) {
+			for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
+
+				final TimeData timeData = timeDataSerie[timeDataIndex];
 				if (timeData.cadence != Integer.MIN_VALUE) {
 
 					// cadence is available, starting values are set to 0
@@ -5675,6 +5671,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 					cadenceSerie = new int[serieSize];
 					isAvailable = true;
 
+					for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
+						timeDataSerie[invalidIndex].cadence = 0;
+					}
 					break;
 				}
 			}
@@ -5754,10 +5753,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 				if (pulse > 0) {
 
-					// pulse values are available, starting values are set to 0
+					// pulse values are available, starting values are set to the first valid value
 
 					pulseSerie = new int[serieSize];
 					isAvailable = true;
+
+					for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
+						timeDataSerie[invalidIndex].pulse = pulse;
+					}
 
 					break;
 				}
@@ -5790,7 +5793,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 				if (temperature != Integer.MIN_VALUE) {
 
-					// temperature values are available
+					// temperature values are available, starting values are set to the first valid value
 
 					temperatureSerie = new int[serieSize];
 					isAvailable = true;

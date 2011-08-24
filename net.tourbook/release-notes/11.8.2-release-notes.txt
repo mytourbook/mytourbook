@@ -2,6 +2,12 @@
 
 New Feature
 -new smoothing algorithm for graphs in the tour chart, provided by Didier Jamet
+
+For me the best values are :
+\tau = 15
+Number of additional iterations = 1
+Iteration \tau multiplier = 1
+
 -convenient feature for resizing all columns to the optimal width (this feature is available in the table/tree header context menu)
 
 Modifications

@@ -191,7 +191,7 @@ public class BreakTimeTool {
 			final double sliceSpeed = timeDiffSlice == 0 ? 0 : distDiffSlice * 3.6 / timeDiffSlice;
 			final double avgSpeed = speedSerie[serieIndex] / 10.0;
 
-			if (avgSpeed < minAvgSpeed || (sliceSpeed < minSliceSpeed && timeDiffSlice >= minSliceTime)) {
+			if ((avgSpeed < minAvgSpeed || sliceSpeed < minSliceSpeed) && timeDiffSlice >= minSliceTime) {
 
 				// current time slice is also a break
 
