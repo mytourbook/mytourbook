@@ -34,9 +34,7 @@ import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.util.StatusUtil;
 
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
@@ -77,6 +75,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 	private IWorkbenchPart						_lastActivePart;
 	private String								_lastPartTitle	= UI.EMPTY_STRING;
+	private String								_appTitle;
 
 	private final ApplicationWorkbenchAdvisor	_wbAdvisor;
 
@@ -84,11 +83,16 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 	private IPreferenceStore					_prefStore		= TourbookPlugin.getDefault().getPreferenceStore();
 
+
 	public ApplicationWorkbenchWindowAdvisor(	final ApplicationWorkbenchAdvisor wbAdvisor,
 												final IWorkbenchWindowConfigurer configurer) {
 		super(configurer);
 
 		_wbAdvisor = wbAdvisor;
+
+		_appTitle = Messages.App_Title + " - " //$NON-NLS-1$
+				+ ApplicationVersion.getVersionSimple()
+				+ ApplicationVersion.getDevelopmentId();
 	}
 
 	private String computeTitle() {
@@ -101,14 +105,16 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 			activePart = currentPage.getActivePart();
 		}
 
-		String title = null;
-		final IProduct product = Platform.getProduct();
-		if (product != null) {
-			title = product.getName() + " - " + ApplicationVersion.APP_VERSION; //$NON-NLS-1$
-		}
-		if (title == null) {
-			title = UI.EMPTY_STRING;
-		}
+//		String title = null;
+//		final IProduct product = Platform.getProduct();
+//		if (product != null) {
+//			title = product.getName() + " - " + ApplicationVersion.APP_VERSION; //$NON-NLS-1$
+//		}
+//		if (title == null) {
+//			title = UI.EMPTY_STRING;
+//		}
+
+		String title = _appTitle;
 
 		if (currentPage != null) {
 
@@ -335,7 +341,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 		final IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
 
-		configurer.setTitle(Messages.App_Title + " - " + ApplicationVersion.APP_VERSION); //$NON-NLS-1$
+		configurer.setTitle(_appTitle);
 	}
 
 	@Override
@@ -367,7 +373,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		configurer.setShowProgressIndicator(true);
 		configurer.setShowStatusLine(false);
 
-		configurer.setTitle(Messages.App_Title + " - " + ApplicationVersion.APP_VERSION); //$NON-NLS-1$
+		configurer.setTitle(_appTitle);
 
 		final IPreferenceStore uiPrefStore = PlatformUI.getPreferenceStore();
 

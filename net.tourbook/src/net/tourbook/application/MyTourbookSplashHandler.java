@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.application;
 
-import net.tourbook.ui.UI;
-
 import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.swt.events.PaintEvent;
@@ -28,14 +26,12 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.branding.IProductConstants;
 import org.eclipse.ui.splash.BasicSplashHandler;
-import org.joda.time.DateTime;
-import org.osgi.framework.Version;
 
 /**
  * This was a copy of EclipseSplashHandler Parses the well known product constants and constructs a
  * splash handler accordingly.
  */
-public class MyTourbookSplashHandler extends BasicSplashHandler implements ApplicationVersion {
+public class MyTourbookSplashHandler extends BasicSplashHandler {
 
 	@Override
 	public void init(final Shell splash) {
@@ -89,33 +85,19 @@ public class MyTourbookSplashHandler extends BasicSplashHandler implements Appli
 
 			public void paintControl(final PaintEvent e) {
 
-//				final String version = "Version " + APP_VERSION; //$NON-NLS-1$
-
-				final Version version = TourbookPlugin.getDefault().getVersion();
-				final String qualifier = version.getQualifier();
-				String qualifierText = UI.EMPTY_STRING;
-
-				qualifierText = qualifier.contains("qualifier") ? // //$NON-NLS-1$
-						new DateTime().toString()
-						: qualifierText.substring(0, 8) + UI.DASH + qualifierText.substring(8);
-
-				final String versionText = UI.EMPTY_STRING
-						+ version.getMajor()
-						+ UI.DOT
-						+ version.getMinor()
-						+ UI.DOT
-						+ version.getMicro()
-						+ UI.DOT
-						+ qualifierText
-				//
-				;
-
 				final GC gc = e.gc;
-				final String versionFullText = "Version " + versionText; //$NON-NLS-1$
-				final Point extend = gc.textExtent(versionFullText);
+
+				final String version = "Version " + ApplicationVersion.getVersionSimple(); //$NON-NLS-1$
+				final Point extendVersion = gc.textExtent(version);
 
 				gc.setForeground(getForeground());
-				gc.drawText(versionFullText, 383 - extend.x, 57, true);
+				gc.drawText(version, 383 - extendVersion.x, 57, true);
+
+				final String qualifier = ApplicationVersion.getVersionQualifier();
+				final Point extendQualifier = gc.textExtent(qualifier);
+
+				gc.setForeground(getForeground());
+				gc.drawText(qualifier, 383 - extendQualifier.x, 57 + extendVersion.y + 2, true);
 			}
 		});
 	}

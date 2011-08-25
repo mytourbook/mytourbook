@@ -1,11 +1,14 @@
 package net.tourbook.application;
 
-public interface ApplicationVersion {
+import net.tourbook.ui.UI;
+
+import org.osgi.framework.Version;
+
+public class ApplicationVersion {
 
 // this is disabled because it contains redundant information and too much numbers which nobody needs
 //	public static final String	APP_VERSION	= TourbookPlugin.getDefault().getVersion().toString();
-
-	public static final String	APP_VERSION	= "11.8.2"; //$NON-NLS-1$
+//	public static final String	APP_VERSION	= "11.8.2"; //$NON-NLS-1$
 
 //	public static final String	APP_VERSION	= "11.8.2";
 //	public static final String	APP_VERSION	= "11.8.1";
@@ -46,4 +49,67 @@ public interface ApplicationVersion {
 //	public static final String	APP_BUILD_ID			= "1.2.0.v20071231";
 //	public static final String	APP_BUILD_ID			= "1.1.0.v20071107";
 
+	private static String	_versionFull;
+	private static String	_versionSimple;
+	private static String	_qualifierText;
+	private static boolean	_isDev;
+
+	private static void createVersionText() {
+
+		final Version version = TourbookPlugin.getDefault().getVersion();
+		final String qualifier = version.getQualifier();
+
+		_isDev = qualifier.contains("qualifier"); //$NON-NLS-1$
+		_qualifierText = _isDev ? //
+				// this text is used to identify development versions
+				"DEVELOPMENT" //$NON-NLS-1$
+				//
+				: qualifier.substring(0, 8) + UI.DASH + qualifier.substring(8);
+
+		_versionSimple = UI.EMPTY_STRING
+				+ version.getMajor()
+				+ UI.DOT
+				+ version.getMinor()
+				+ UI.DOT
+				+ version.getMicro();
+
+		_versionFull = _versionSimple + UI.DOT + _qualifierText;
+	}
+
+	public static String getDevelopmentId() {
+		return _isDev ? " - DEVELOPMENT" : UI.EMPTY_STRING; //$NON-NLS-1$
+	}
+
+	public static String getVersionFull() {
+
+		if (_versionFull != null) {
+			return _versionFull;
+		}
+
+		createVersionText();
+
+		return _versionFull;
+	}
+
+	public static String getVersionQualifier() {
+
+		if (_qualifierText != null) {
+			return _qualifierText;
+		}
+
+		createVersionText();
+
+		return _qualifierText;
+	}
+
+	public static String getVersionSimple() {
+
+		if (_versionSimple != null) {
+			return _versionSimple;
+		}
+
+		createVersionText();
+
+		return _versionSimple;
+	}
 }
