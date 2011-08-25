@@ -29,6 +29,7 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.SmoothingUI;
+import net.tourbook.util.Util;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -135,6 +136,10 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 		_nf1.setMaximumFractionDigits(1);
 	}
 
+	private boolean						_isUpdateUI;
+	private SelectionAdapter			_selectionListener;
+	private MouseWheelListener			_spinnerMouseWheelListener;
+
 	/**
 	 * contains the controls which are displayed in the first column, these controls are used to get
 	 * the maximum width and set the first column within the differenct section to the same width
@@ -186,6 +191,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 	@Override
 	protected Control createContents(final Composite parent) {
 
+		initUI(parent);
 		final Composite container = createUI(parent);
 
 		restoreState();
@@ -297,6 +303,30 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 		}
 
 		return _smoothingScrolledContainer;
+	}
+
+	private void initUI(final Composite parent) {
+
+		_selectionListener = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				if (_isUpdateUI) {
+					return;
+				}
+				onModifyBreakTime();
+			}
+		};
+
+		_spinnerMouseWheelListener = new MouseWheelListener() {
+			@Override
+			public void mouseScrolled(final MouseEvent event) {
+				if (_isUpdateUI) {
+					return;
+				}
+				Util.adjustSpinnerValueOnMouseScroll(event);
+				onModifyBreakTime();
+			}
+		};
 	}
 
 	private Control createUI20ElevationGain(final Composite parent) {
@@ -490,12 +520,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 				_spinnerBreakMinAvgSpeedAS.setMinimum(0); // 0.0 km/h
 				_spinnerBreakMinAvgSpeedAS.setMaximum(100); // 10.0 km/h
 				_spinnerBreakMinAvgSpeedAS.setDigits(1);
-				_spinnerBreakMinAvgSpeedAS.addMouseWheelListener(new MouseWheelListener() {
-					public void mouseScrolled(final MouseEvent event) {
-						UI.adjustSpinnerValueOnMouseScroll(event);
-						onModifyBreakTime();
-					}
-				});
+				_spinnerBreakMinAvgSpeedAS.addSelectionListener(_selectionListener);
+				_spinnerBreakMinAvgSpeedAS.addMouseWheelListener(_spinnerMouseWheelListener);
 
 				// label: km/h
 				label = new Label(container, SWT.NONE);
@@ -518,12 +544,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 				_spinnerBreakMinSliceSpeedAS.setMinimum(0); // 0.0 km/h
 				_spinnerBreakMinSliceSpeedAS.setMaximum(100); // 10.0 km/h
 				_spinnerBreakMinSliceSpeedAS.setDigits(1);
-				_spinnerBreakMinSliceSpeedAS.addMouseWheelListener(new MouseWheelListener() {
-					public void mouseScrolled(final MouseEvent event) {
-						UI.adjustSpinnerValueOnMouseScroll(event);
-						onModifyBreakTime();
-					}
-				});
+				_spinnerBreakMinSliceSpeedAS.addSelectionListener(_selectionListener);
+				_spinnerBreakMinSliceSpeedAS.addMouseWheelListener(_spinnerMouseWheelListener);
 
 				// label: km/h
 				label = new Label(container, SWT.NONE);
@@ -545,12 +567,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 						.applyTo(_spinnerBreakMinSliceTimeAS);
 				_spinnerBreakMinSliceTimeAS.setMinimum(0); // 0 sec
 				_spinnerBreakMinSliceTimeAS.setMaximum(10); // 10 sec
-				_spinnerBreakMinSliceTimeAS.addMouseWheelListener(new MouseWheelListener() {
-					public void mouseScrolled(final MouseEvent event) {
-						UI.adjustSpinnerValueOnMouseScroll(event);
-						onModifyBreakTime();
-					}
-				});
+				_spinnerBreakMinSliceTimeAS.addSelectionListener(_selectionListener);
+				_spinnerBreakMinSliceTimeAS.addMouseWheelListener(_spinnerMouseWheelListener);
 
 				// label: seconds
 				label = new Label(container, SWT.NONE);
@@ -596,12 +614,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			_spinnerBreakMinAvgSpeed.setMinimum(0); // 0.0 km/h
 			_spinnerBreakMinAvgSpeed.setMaximum(100); // 10.0 km/h
 			_spinnerBreakMinAvgSpeed.setDigits(1);
-			_spinnerBreakMinAvgSpeed.addMouseWheelListener(new MouseWheelListener() {
-				public void mouseScrolled(final MouseEvent event) {
-					UI.adjustSpinnerValueOnMouseScroll(event);
-					onModifyBreakTime();
-				}
-			});
+			_spinnerBreakMinAvgSpeed.addSelectionListener(_selectionListener);
+			_spinnerBreakMinAvgSpeed.addMouseWheelListener(_spinnerMouseWheelListener);
 
 			// label: km/h
 			label = new Label(container, SWT.NONE);
@@ -646,12 +660,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			_spinnerBreakMinSliceSpeed.setMinimum(0); // 0.0 km/h
 			_spinnerBreakMinSliceSpeed.setMaximum(100); // 10.0 km/h
 			_spinnerBreakMinSliceSpeed.setDigits(1);
-			_spinnerBreakMinSliceSpeed.addMouseWheelListener(new MouseWheelListener() {
-				public void mouseScrolled(final MouseEvent event) {
-					UI.adjustSpinnerValueOnMouseScroll(event);
-					onModifyBreakTime();
-				}
-			});
+			_spinnerBreakMinSliceSpeed.addSelectionListener(_selectionListener);
+			_spinnerBreakMinSliceSpeed.addMouseWheelListener(_spinnerMouseWheelListener);
 
 			// label: km/h
 			label = new Label(container, SWT.NONE);
@@ -694,12 +704,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 						.applyTo(_spinnerBreakShortestTime);
 				_spinnerBreakShortestTime.setMinimum(1);
 				_spinnerBreakShortestTime.setMaximum(120); // 120 seconds
-				_spinnerBreakShortestTime.addMouseWheelListener(new MouseWheelListener() {
-					public void mouseScrolled(final MouseEvent event) {
-						UI.adjustSpinnerValueOnMouseScroll(event);
-						onModifyBreakTime();
-					}
-				});
+				_spinnerBreakShortestTime.addSelectionListener(_selectionListener);
+				_spinnerBreakShortestTime.addMouseWheelListener(_spinnerMouseWheelListener);
 
 				// label: unit
 				label = new Label(container, SWT.NONE);
@@ -721,12 +727,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 						.applyTo(_spinnerBreakMaxDistance);
 				_spinnerBreakMaxDistance.setMinimum(1);
 				_spinnerBreakMaxDistance.setMaximum(1000); // 1000 m/yards
-				_spinnerBreakMaxDistance.addMouseWheelListener(new MouseWheelListener() {
-					public void mouseScrolled(final MouseEvent event) {
-						UI.adjustSpinnerValueOnMouseScroll(event);
-						onModifyBreakTime();
-					}
-				});
+				_spinnerBreakMaxDistance.addSelectionListener(_selectionListener);
+				_spinnerBreakMaxDistance.addMouseWheelListener(_spinnerMouseWheelListener);
 
 				// label: unit
 				_lblBreakDistanceUnit = new Label(container, SWT.NONE);
@@ -753,12 +755,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 						.applyTo(_spinnerBreakSliceDiff);
 				_spinnerBreakSliceDiff.setMinimum(0);
 				_spinnerBreakSliceDiff.setMaximum(60); // minutes
-				_spinnerBreakSliceDiff.addMouseWheelListener(new MouseWheelListener() {
-					public void mouseScrolled(final MouseEvent event) {
-						UI.adjustSpinnerValueOnMouseScroll(event);
-						onModifyBreakTime();
-					}
-				});
+				_spinnerBreakSliceDiff.addSelectionListener(_selectionListener);
+				_spinnerBreakSliceDiff.addMouseWheelListener(_spinnerMouseWheelListener);
 
 				// label: unit
 				label = new Label(container, SWT.NONE);
