@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.application;
 
+import net.tourbook.ui.UI;
 
 import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.Platform;
@@ -27,6 +28,8 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.branding.IProductConstants;
 import org.eclipse.ui.splash.BasicSplashHandler;
+import org.joda.time.DateTime;
+import org.osgi.framework.Version;
 
 /**
  * This was a copy of EclipseSplashHandler Parses the well known product constants and constructs a
@@ -75,7 +78,8 @@ public class MyTourbookSplashHandler extends BasicSplashHandler implements Appli
 			foregroundColorInteger = 0xD2D7FF; // off white
 		}
 
-		setForeground(new RGB((foregroundColorInteger & 0xFF0000) >> 16,
+		setForeground(new RGB(
+				(foregroundColorInteger & 0xFF0000) >> 16,
 				(foregroundColorInteger & 0xFF00) >> 8,
 				foregroundColorInteger & 0xFF));
 
@@ -85,12 +89,33 @@ public class MyTourbookSplashHandler extends BasicSplashHandler implements Appli
 
 			public void paintControl(final PaintEvent e) {
 
+//				final String version = "Version " + APP_VERSION; //$NON-NLS-1$
+
+				final Version version = TourbookPlugin.getDefault().getVersion();
+				final String qualifier = version.getQualifier();
+				String qualifierText = UI.EMPTY_STRING;
+
+				qualifierText = qualifier.contains("qualifier") ? // //$NON-NLS-1$
+						new DateTime().toString()
+						: qualifierText.substring(0, 8) + UI.DASH + qualifierText.substring(8);
+
+				final String versionText = UI.EMPTY_STRING
+						+ version.getMajor()
+						+ UI.DOT
+						+ version.getMinor()
+						+ UI.DOT
+						+ version.getMicro()
+						+ UI.DOT
+						+ qualifierText
+				//
+				;
+
 				final GC gc = e.gc;
-				final String version = "Version " + APP_VERSION; //$NON-NLS-1$
-				final Point extend = gc.textExtent(version);
+				final String versionFullText = "Version " + versionText; //$NON-NLS-1$
+				final Point extend = gc.textExtent(versionFullText);
 
 				gc.setForeground(getForeground());
-				gc.drawText(version, 383 - extend.x, 57, true);
+				gc.drawText(versionFullText, 383 - extend.x, 57, true);
 			}
 		});
 	}

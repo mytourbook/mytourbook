@@ -2,6 +2,9 @@ package net.tourbook.application;
 
 public interface ApplicationVersion {
 
+// this is disabled because it contains redundant information and too much numbers which nobody needs
+//	public static final String	APP_VERSION	= TourbookPlugin.getDefault().getVersion().toString();
+
 	public static final String	APP_VERSION	= "11.8.2"; //$NON-NLS-1$
 
 //	public static final String	APP_VERSION	= "11.8.2";

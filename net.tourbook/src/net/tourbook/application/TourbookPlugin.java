@@ -26,8 +26,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.osgi.framework.internal.core.AbstractBundle;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Version;
 
 /**
  * The main plugin class to be used in the desktop.
@@ -58,6 +61,8 @@ public class TourbookPlugin extends AbstractUIPlugin {
 	private static MyTourbookSplashHandler	_splashHandler;
 
 	private static BundleContext			_bundleContext;
+
+	private Version							_version;
 
 	/**
 	 * The constructor.
@@ -162,10 +167,15 @@ public class TourbookPlugin extends AbstractUIPlugin {
 		return section;
 	}
 
+	public Version getVersion() {
+		return _version;
+	}
+
 	public void log(final String message, final Throwable exception) {
 		getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, 0, message, exception));
 	}
 
+	@SuppressWarnings("restriction")
 	@Override
 	public void start(final BundleContext context) throws Exception {
 
@@ -173,6 +183,12 @@ public class TourbookPlugin extends AbstractUIPlugin {
 
 		_instance = this;
 		_bundleContext = context;
+
+		final Bundle bundle = context.getBundle();
+		if (bundle instanceof AbstractBundle) {
+			final AbstractBundle abstractBundle = (AbstractBundle) bundle;
+			_version = abstractBundle.getVersion();
+		}
 	}
 
 	@Override
