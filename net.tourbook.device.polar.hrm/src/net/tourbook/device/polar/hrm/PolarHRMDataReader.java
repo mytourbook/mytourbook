@@ -1188,8 +1188,8 @@ public class PolarHRMDataReader extends TourbookDevice {
 				// HRM Files exported by polarpersonaltrainer.com can contain lap times with
 				// one digit hours and/or minutes: e.g. 9:5:45.0 (9 hours, 5 min, 45.0 sec)
 
-				final String timeString = token.substring(0, token.indexOf("."));
-				final StringTokenizer timeTokens = new StringTokenizer(timeString, ":");
+				final String timeString = token.substring(0, token.indexOf(".")); //$NON-NLS-1$
+				final StringTokenizer timeTokens = new StringTokenizer(timeString, ":"); //$NON-NLS-1$
 
 				final int timeHour = Integer.parseInt(timeTokens.nextToken());
 				final int timeMin = Integer.parseInt(timeTokens.nextToken());

@@ -48,7 +48,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 	private static final String				NAME_SPACE_GPX_1_0		= "http://www.topografix.com/GPX/1/0";				//$NON-NLS-1$
 	private static final String				NAME_SPACE_GPX_1_1		= "http://www.topografix.com/GPX/1/1";				//$NON-NLS-1$
-	private static final String				POLAR_WEBSYNC_CREATOR_2_3	= "Polar WebSync 2.3 - www.polar.fi";				//$NON_NLS-1$
+	private static final String				POLAR_WEBSYNC_CREATOR_2_3	= "Polar WebSync 2.3 - www.polar.fi";				//$NON_NLS-1$ //$NON-NLS-1$
 
 	// namespace for extensions used by Garmin
 //	private static final String				NAME_SPACE_TPEXT		= "http://www.garmin.com/xmlschemas/TrackPointExtension/v1";	//$NON-NLS-1$

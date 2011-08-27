@@ -127,16 +127,16 @@ public class TimeData implements Serializable {
 
 	@Override
 	public String toString() {
-		return "TimeData ["
-				+ ("id=" + id)
-				+ (", time=" + time)
-				+ (", absoluteTime=" + absoluteTime)
-				+ (", relativeTime=" + relativeTime)
-				+ (", pulse=" + pulse)
+		return "TimeData [" //$NON-NLS-1$
+				+ ("id=" + id) //$NON-NLS-1$
+				+ (", time=" + time) //$NON-NLS-1$
+				+ (", absoluteTime=" + absoluteTime) //$NON-NLS-1$
+				+ (", relativeTime=" + relativeTime) //$NON-NLS-1$
+				+ (", pulse=" + pulse) //$NON-NLS-1$
 //				+ (", temperature=" + temperature)
 //				+ (", cadence=" + cadence)
-				+ (", altitude=" + altitude)
-				+ (", absoluteAltitude=" + absoluteAltitude)
+				+ (", altitude=" + altitude) //$NON-NLS-1$
+				+ (", absoluteAltitude=" + absoluteAltitude) //$NON-NLS-1$
 //				+ (", distance=" + distance)
 //				+ (", gpxDistance=" + gpxDistance)
 //				+ (", absoluteDistance=" + absoluteDistance)
@@ -146,6 +146,6 @@ public class TimeData implements Serializable {
 //				+ (", longitude=" + longitude)
 //				+ (", marker=" + marker)
 //				+ (", markerLabel=" + markerLabel)
-				+ "]\n";
+				+ "]\n"; //$NON-NLS-1$
 	}
 }

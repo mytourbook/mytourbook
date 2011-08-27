@@ -473,7 +473,7 @@ public class PolarPPDDataReader extends TourbookDevice {
 		final File[] directoriesToProcess = dataDir.listFiles(new FilenameFilter() {
 			@Override
 			public boolean accept(final File dir, final String name) {
-				return name.matches("\\d\\d\\d\\d"); // 4-digit year
+				return name.matches("\\d\\d\\d\\d"); // 4-digit year //$NON-NLS-1$
 			}
 		});
 
@@ -483,7 +483,7 @@ public class PolarPPDDataReader extends TourbookDevice {
 				final File[] pddFiles = dir.listFiles(new FilenameFilter() {
 					@Override
 					public boolean accept(final File dir, final String name) {
-						return name.matches(".*\\.pdd$"); // 4-digit year
+						return name.matches(".*\\.pdd$"); // 4-digit year //$NON-NLS-1$
 					}
 				});
 				// load all exercises from that pdd file

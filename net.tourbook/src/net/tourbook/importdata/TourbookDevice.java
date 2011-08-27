@@ -204,7 +204,7 @@ public abstract class TourbookDevice implements IRawDataReader {
 	}
 	
 	public String userConfirmationMessage() {
-		return "";
+		return ""; //$NON-NLS-1$
 	}
 
 	public boolean userConfirmationRequired() {

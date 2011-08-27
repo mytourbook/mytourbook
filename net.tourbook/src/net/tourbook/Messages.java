@@ -377,16 +377,9 @@ public class Messages extends NLS {
 	public static String		compute_tourValueElevation_resultText;
 	public static String		compute_tourValueElevation_subTaskText;
 
-	public static String		compute_tourValueSpeed_button_computeValues;
-	public static String		compute_tourValueSpeed_button_computeValues_tooltip;
-	public static String		compute_tourValueSpeed_dlg_computeValues_message;
-	public static String		compute_tourValueSpeed_dlg_computeValues_title;
-	public static String		compute_tourValueSpeed_group_speed;
 	public static String		compute_tourValueSpeed_label_description;
 	public static String		compute_tourValueSpeed_label_description_Hints;
 	public static String		compute_tourValueSpeed_label_speedTimeSlice;
-	public static String		compute_tourValueSpeed_resultText;
-	public static String		compute_tourValueSpeed_subTaskText;
 
 	public static String		Database_Confirm_update;
 	public static String		Database_Confirm_update_title;
@@ -599,7 +592,6 @@ public class Messages extends NLS {
 	public static String		Image__graph_pace_disabled;
 	public static String		Image__graph_power_disabled;
 	public static String		Image__graph_speed_disabled;
-	public static String		Image__graph_speed_png;
 	public static String		Image__graph_temperature_disabled;
 	public static String		Image__graph_tour_compare;
 	public static String		Image__graph_tour_compare_disabled;
@@ -1289,24 +1281,18 @@ public class Messages extends NLS {
 	public static String		TourChart_Property_chart_type_line;
 	public static String		TourChart_Property_check_customize_pace_clipping;
 	public static String		TourChart_Property_check_customize_value_clipping;
-	public static String		TourChart_Property_Checkbox_IsCustomSmoothing;
 	public static String		TourChart_Property_label_chart_type;
 	public static String		TourChart_Property_label_pace_speed;
-	public static String		TourChart_Property_Label_Smoothing_Tau;
 	public static String		TourChart_Property_label_time_slices;
 
 	public static String		TourChart_Smoothing_Algorithm_Initial;
 	public static String		TourChart_Smoothing_Algorithm_Jamet;
-	public static String		TourChart_Smoothing_Button_Default;
-	public static String		TourChart_Smoothing_Button_Default_Tooltip;
 	public static String		TourChart_Smoothing_Checkbox_IsAltitudeSmoothing;
 	public static String		TourChart_Smoothing_Checkbox_IsAltitudeSmoothing_Tooltip;
 	public static String		TourChart_Smoothing_Checkbox_IsPulseSmoothing;
 	public static String		TourChart_Smoothing_Checkbox_IsPulseSmoothing_Tooltip;
-	public static String		TourChart_Smoothing_Checkbox_IsSpeedSmoothing;
 	public static String		TourChart_Smoothing_Checkbox_IsSyncSmoothing;
 	public static String		TourChart_Smoothing_Checkbox_IsSyncSmoothing_Tooltip;
-	public static String		TourChart_Smoothing_Checkbox_UseJametSmoothing;
 	public static String		TourChart_Smoothing_Dialog_SmoothAllTours_Message;
 	public static String		TourChart_Smoothing_Dialog_SmoothAllTours_Title;
 	public static String		TourChart_Smoothing_Label_GradientSmoothing;
@@ -1321,7 +1307,6 @@ public class Messages extends NLS {
 	public static String		TourChart_Smoothing_Label_TauParameter;
 	public static String		TourChart_Smoothing_Link_PrefBreakTime;
 	public static String		TourChart_Smoothing_Link_SmoothingOnlineDocumentation;
-	public static String		TourChart_Smoothing_Link_UpdateAllTours;
 
 	public static String		TourData_Label_new_marker;
 

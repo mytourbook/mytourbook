@@ -127,14 +127,14 @@ public class PolarPDDDataReader extends TourbookDevice {
 		if (title != null) {
 			exerciseData.setTourTitle(title);
 		} else {
-			exerciseData.setTourTitle("");
+			exerciseData.setTourTitle(""); //$NON-NLS-1$
 		}
 		// set description
 		final String description = _currentExercise.description;
 		if (description != null) {
 			exerciseData.setTourDescription(description);
 		} else {
-			exerciseData.setTourDescription("");
+			exerciseData.setTourDescription(""); //$NON-NLS-1$
 		}
 		
 		exerciseData.setTourDistance(_currentExercise.distance);
