@@ -21,6 +21,8 @@ import java.util.Formatter;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.colors.ColorDefinition;
+import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
@@ -37,6 +39,7 @@ import net.tourbook.util.Util;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
+import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
@@ -48,6 +51,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
@@ -89,14 +93,17 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	private String								STATE_SELECTED_TOURS			= "SelectedTours";								// $NON-NLS-1$ //$NON-NLS-1$
 
 	private String								STATE_FIRST_DAY					= "FirstDayDisplayed";							// $NON-NLS-1$ //$NON-NLS-1$
-	private String								STATE_NUM_OF_WEEKS				= "NumberOfWeeksDisplayed";					// $NON-NLS-1$ //$NON-NLS-1$
+	private String								STATE_NUM_OF_WEEKS_NORMAL				= "NumberOfWeeksDisplayed";					// $NON-NLS-1$ //$NON-NLS-1$
+	private String								STATE_NUM_OF_WEEKS_TINY					= "NumberOfWeeksDisplayedTinyView";			// $NON-NLS-1$ //$NON-NLS-1$
 	private String								STATE_IS_LINKED					= "Linked";									// $NON-NLS-1$ //$NON-NLS-1$
 	private String								STATE_TOUR_SIZE_DYNAMIC			= "TourSizeDynamic";							// $NON-NLS-1$ //$NON-NLS-1$
 	private String								STATE_NUMBER_OF_TOURS_PER_DAY	= "NumberOfToursPerDay";						// $NON-NLS-1$ //$NON-NLS-1$
 	private String								STATE_TOUR_INFO_FORMATTER_INDEX_		= "TourInfoFormatterIndex";					//$NON-NLS-1$
+	private String								STATE_WEEK_SUMMARY_FORMATTER_INDEX_		= "WeekSummaryFormatterIndex";					//$NON-NLS-1$
 	private String								STATE_TOUR_INFO_TEXT_COLOR			= "TourInfoUseTextColor";						//$NON-NLS-1$
 	private String								STATE_TOUR_INFO_BLACK_TEXT_HIGHLIGHT	= "TourInfoUseBlackTextHightlight";			//$NON-NLS-1$
-	private String								STATE_SHOW_DAY_NUMBER_IN_TINY_VIEW		= "ShowDayNumberInTinyView";
+	private String								STATE_SHOW_DAY_NUMBER_IN_TINY_LAYOUT	= "ShowDayNumberInTinyView";
+	private String								STATE_USE_LINE_COLOR_FOR_WEEK_SUMMARY	= "UseLineColorForWeekSummary";
 
 	private Action								_forward, _back;
 	private Action								_zoomIn, _zoomOut;
@@ -104,19 +111,118 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	private Action								_gotoToday;
 	private Action								_setNavigationStylePhysical, _setNavigationStyleLogical;
 	private Action[]							_setNumberOfToursPerDay;
-	private Action								_setTourSizeDynamic;
+	// private Action								_setTourSizeDynamic;
 	private Action[]							_setTourInfoFormatLine;
+	private Action[]							_setSummaryFormatLine;
 	private Action[][]							_setTourInfoFormat;
+	private Action[][]							_setWeekSummaryFormat;
 	private Action								_setTourInfoTextColor;
 	private Action								_setTourInfoBlackTextHighlight;
-	private Action								_setShowDayNumberInTinyView;
+	private Action								_setShowDayNumberInTinyLayout;
 
-	private int									_numberOfInfoLines						= 3;
+	private Action								_setUseLineColorForWeekSummary;
+	private boolean								_useLineColorForWeekSummary				= false;
+
+	static final int							numberOfInfoLines						= 3;
+	static final int							numberOfSummaryLines					= 5;
+
+	ColorDefinition[]							_colorDefinitiosn						= GraphColorProvider
+																								.getInstance()
+																								.getGraphColorDefinitions();
+
+	private WeekSummaryFormatter[]			_tourWeekSummaryFormatter				= {
+																						// fool stupid auto formatter
+			// - Nothing -
+			new WeekSummaryFormatter(GraphColorProvider.PREF_GRAPH_TIME) {
+				@Override
+				public String format(final CalendarTourData data) {
+					return UI.EMPTY_STRING;
+				}
+
+				@Override
+				public String getText() {
+					return Messages.Calendar_View_Action_ShowNothing;
+				}
+			},
+			// - Distance -
+			new WeekSummaryFormatter(GraphColorProvider.PREF_GRAPH_DISTANCE) {
+
+				@Override
+				String format(final CalendarTourData data) {
+					if (data.distance > 0) {
+						final float distance = (float) (data.distance / 1000.0 / UI.UNIT_VALUE_DISTANCE);
+						return new Formatter().format(
+								NLS.bind(Messages.Calendar_View_Format_Distance, UI.UNIT_LABEL_DISTANCE),
+								distance).toString();
+					} else {
+						return "-";
+					}
+				}
+			},
+			// - Time -
+			new WeekSummaryFormatter(GraphColorProvider.PREF_GRAPH_TIME) {
+
+				@Override
+				String format(final CalendarTourData data) {
+					if (data.recordingTime > 0) {
+						return new Formatter().format(
+								Messages.Calendar_View_Format_Time,
+								data.recordingTime / 3600,
+								(data.recordingTime % 3600) / 60).toString();
+					} else {
+						return "-";
+					}
+				}
+			},
+			// - Altitude -
+			new WeekSummaryFormatter(GraphColorProvider.PREF_GRAPH_ALTITUDE) {
+
+				@Override
+				String format(final CalendarTourData data) {
+					if (data.altitude > 0) {
+						final long alt = (long) (data.altitude / UI.UNIT_VALUE_ALTITUDE);
+						return alt + " " + UI.UNIT_LABEL_ALTITUDE;
+					} else {
+						return "-";
+					}
+				}
+			},
+			// - Speed -
+			new WeekSummaryFormatter(GraphColorProvider.PREF_GRAPH_SPEED) {
+
+				@Override
+				String format(final CalendarTourData data) {
+					if (data.distance > 0) {
+						return new Formatter().format(
+								NLS.bind(Messages.Calendar_View_Format_Speed, UI.UNIT_LABEL_SPEED),
+								data.distance == 0 ? 0 : data.distance / (data.recordingTime / 3.6f)).toString();
+					} else {
+						return "-";
+					}
+				}
+			},
+			// - Pace -
+			new WeekSummaryFormatter(GraphColorProvider.PREF_GRAPH_PACE) {
+
+				@Override
+				String format(final CalendarTourData data) {
+					if (data.recordingTime > 0 && data.distance > 0) {
+						final int pace = (int) (data.distance == 0
+								? 0
+								: (1000 * data.recordingTime / data.distance * UI.UNIT_VALUE_DISTANCE));
+						return new Formatter().format(
+								NLS.bind(Messages.Calendar_View_Format_Pace, UI.UNIT_LABEL_PACE),
+								pace / 60,
+								pace % 60).toString();
+					} else {
+						return "-";
+					}
+				}
+			}
+																						};
 
 	private TourInfoFormatter[]					_tourInfoFormatter				= {
-
-																				// fool stupid autoformater
-
+																						// fool stupid auto formatter
 			/*
 			 * title - description
 			 */
@@ -336,9 +442,9 @@ public class CalendarView extends ViewPart implements ITourProvider {
 			for (int j = 0; j < 5; j++) {
 				_setNumberOfToursPerDay[j].setChecked((j == numberOfTours));
 			}
-			if (null != _setTourSizeDynamic) {
-				_setTourSizeDynamic.setEnabled(numberOfTours != 0);
-			}
+//			if (null != _setTourSizeDynamic) {
+//				_setTourSizeDynamic.setEnabled(numberOfTours != 0);
+//			}
 		};
 	}
 
@@ -364,10 +470,10 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	}
 
 	class TourInfoFormatLineAction extends Action implements IMenuCreator {
-		
-		int line;
+
+		int		line;
 		Menu	formatMenu;
-		
+
 		TourInfoFormatLineAction(final String text, final int line) {
 
 			super(text, AS_DROP_DOWN_MENU);
@@ -414,6 +520,97 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		abstract String format(CalendarTourData data);
 
 		abstract String getText();
+	}
+
+	class WeekSummaryFormatAction extends Action {
+
+		WeekSummaryFormatter	formatter;
+		int					forLine;
+
+		WeekSummaryFormatAction(final String text, final WeekSummaryFormatter formatter, final int forLine) {
+
+			super(text, AS_RADIO_BUTTON);
+			this.formatter = formatter;
+			this.forLine = forLine;
+		}
+
+		@Override
+		public void run() {
+			_calendarGraph.setWeekSummaryFormatter(forLine, formatter);
+			for (int i = 0; i < _tourWeekSummaryFormatter.length; i++) {
+				_setWeekSummaryFormat[forLine][i].setChecked(i == formatter.index);
+			}
+		}
+	}
+
+	class WeekSummaryFormatLineAction extends Action implements IMenuCreator {
+
+		int		line;
+		Menu	summaryMenu;
+
+		WeekSummaryFormatLineAction(final String text, final int line) {
+
+			super(text, AS_DROP_DOWN_MENU);
+			this.line = line;
+
+			setMenuCreator(this);
+		}
+
+		@Override
+		public void dispose() {
+			if (summaryMenu != null) {
+				summaryMenu.dispose();
+				summaryMenu = null;
+			}
+		}
+
+		@Override
+		public Menu getMenu(final Control parent) {
+			return null;
+		}
+
+		@Override
+		public Menu getMenu(final Menu parent) {
+			summaryMenu = new Menu(parent);
+
+			for (int i = 0; i < _tourWeekSummaryFormatter.length; i++) {
+				final ActionContributionItem item = new ActionContributionItem(_setWeekSummaryFormat[line][i]);
+				item.fill(summaryMenu, -1);
+			}
+
+			return summaryMenu;
+		}
+
+		@Override
+		public void run() {
+			//
+		}
+
+	}
+
+	abstract class WeekSummaryFormatter {
+
+		int	index;
+		ColorDefinition	cd;
+
+		WeekSummaryFormatter(final String colorName) {
+			cd = new GraphColorProvider().getGraphColorDefinition(colorName);
+		}
+
+		abstract String format(CalendarTourData data);
+
+		RGB getColor() {
+			if (_useLineColorForWeekSummary) {
+				return cd.getLineColor();
+			} else {
+				return cd.getTextColor();
+				// return new RGB(64, 64, 64); // 0x404040
+			}
+		}
+
+		String getText() {
+			return cd.getVisibleName();
+		}
 	}
 
 	public CalendarView() {}
@@ -545,7 +742,14 @@ public class CalendarView extends ViewPart implements ITourProvider {
 
 	private void contributeToActionBars() {
 		final IActionBars bars = getViewSite().getActionBars();
-		fillLocalPullDown(bars.getMenuManager());
+		final IMenuManager menuManager = bars.getMenuManager();
+		menuManager.addMenuListener(new IMenuListener() {
+			public void menuAboutToShow(final IMenuManager manager) {
+				fillLocalPullDown(manager);
+			}
+		});
+		fillLocalPullDown(menuManager);
+		menuManager.setRemoveAllWhenShown(true);
 		fillLocalToolBar(bars.getToolBarManager());
 	}
 
@@ -596,23 +800,37 @@ public class CalendarView extends ViewPart implements ITourProvider {
 
 	private void fillLocalPullDown(final IMenuManager manager) {
 
-		for (final Action element : _setTourInfoFormatLine) {
+		for (final Action element : _setSummaryFormatLine) {
 			manager.add(element);
 		}
+		manager.add(new Separator());
+		manager.add(_setUseLineColorForWeekSummary);
+		manager.add(new Separator());
 
-		manager.add(new Separator());
-		for (final Action element : _setNumberOfToursPerDay) {
-			manager.add(element);
+		if (_calendarGraph.isTinyLayout()) {
+
+			manager.add(_setShowDayNumberInTinyLayout);
+
+		} else {
+
+			for (final Action element : _setTourInfoFormatLine) {
+				manager.add(element);
+			}
+
+			manager.add(new Separator());
+			for (final Action element : _setNumberOfToursPerDay) {
+				manager.add(element);
+			}
+//			manager.add(new Separator());
+//			manager.add(_setTourSizeDynamic);
+//			manager.add(new Separator());
+//			manager.add(_setNavigationStylePhysical);
+//			manager.add(_setNavigationStyleLogical);
+//			manager.add(new Separator());
+			manager.add(_setTourInfoTextColor);
+			manager.add(_setTourInfoBlackTextHighlight);
+
 		}
-		manager.add(new Separator());
-		manager.add(_setTourSizeDynamic);
-		manager.add(new Separator());
-//		manager.add(_setNavigationStylePhysical);
-//		manager.add(_setNavigationStyleLogical);
-//		manager.add(new Separator());
-		manager.add(_setTourInfoTextColor);
-		manager.add(_setTourInfoBlackTextHighlight);
-		manager.add(_setShowDayNumberInTinyView);
 
 	}
 
@@ -741,31 +959,53 @@ public class CalendarView extends ViewPart implements ITourProvider {
 			_setNumberOfToursPerDay[i] = new NumberOfToursPerDayAction(i);
 		}
 
-		_setTourSizeDynamic = new Action(null, org.eclipse.jface.action.Action.AS_CHECK_BOX) {
-			@Override
-			public void run() {
-				_calendarGraph.setTourFieldSizeDynamic(this.isChecked());
-			}
-		};
-		_setTourSizeDynamic.setText(Messages.Calendar_View_Action_ResizeTours);
+//		_setTourSizeDynamic = new Action(null, org.eclipse.jface.action.Action.AS_CHECK_BOX) {
+//			@Override
+//			public void run() {
+//				_calendarGraph.setTourFieldSizeDynamic(this.isChecked());
+//			}
+//		};
+//		_setTourSizeDynamic.setText(Messages.Calendar_View_Action_ResizeTours);
 
-		// the popup menu opener
-		_setTourInfoFormatLine = new Action[_numberOfInfoLines];
-		for (int i = 0; i < _numberOfInfoLines; i++) {
-			_setTourInfoFormatLine[i] = new TourInfoFormatLineAction(
-					NLS.bind(Messages.Calendar_View_Action_LineInfo, i),
-					i);
+		// the tour info line popup menu opener
+		_setTourInfoFormatLine = new Action[numberOfInfoLines];
+		for (int i = 0; i < numberOfInfoLines; i++) {
+			_setTourInfoFormatLine[i] = new TourInfoFormatLineAction(NLS.bind(
+					Messages.Calendar_View_Action_LineInfo,
+					i + 1), i);
 		}
 		
-		// the formatter actions used for all lines
-		_setTourInfoFormat = new Action[_numberOfInfoLines][_tourInfoFormatter.length];
-		for (int i = 0; i < _numberOfInfoLines; i++) {
+		// the formatter actions used for all tour info lines
+		_setTourInfoFormat = new Action[numberOfInfoLines][_tourInfoFormatter.length];
+		for (int i = 0; i < numberOfInfoLines; i++) {
 			for (int j = 0; j < _tourInfoFormatter.length; j++) {
 				_tourInfoFormatter[j].index = j;
 				if (null != _tourInfoFormatter[j]) {
 					_setTourInfoFormat[i][j] = new TourInfoFormatAction(
 							_tourInfoFormatter[j].getText(),
 							_tourInfoFormatter[j],
+							i);
+				}
+			}
+		}
+
+		// the week info line popup menu opener
+		_setSummaryFormatLine = new Action[numberOfSummaryLines];
+		for (int i = 0; i < numberOfSummaryLines; i++) {
+			_setSummaryFormatLine[i] = new WeekSummaryFormatLineAction(NLS.bind(
+					Messages.Calendar_View_Action_SummaryInfo,
+					i + 1), i);
+		}
+
+		// the formatter actions used for the week summaries
+		_setWeekSummaryFormat = new Action[numberOfSummaryLines][_tourWeekSummaryFormatter.length];
+		for (int i = 0; i < numberOfSummaryLines; i++) {
+			for (int j = 0; j < _tourWeekSummaryFormatter.length; j++) {
+				_tourWeekSummaryFormatter[j].index = j;
+				if (null != _tourWeekSummaryFormatter[j]) {
+					_setWeekSummaryFormat[i][j] = new WeekSummaryFormatAction(
+							_tourWeekSummaryFormatter[j].getText(),
+							_tourWeekSummaryFormatter[j],
 							i);
 				}
 			}
@@ -787,14 +1027,22 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		};
 		_setTourInfoBlackTextHighlight.setText(Messages.Calendar_View_Action_BlackHighlightText);
 
-		_setShowDayNumberInTinyView = new Action(null, org.eclipse.jface.action.Action.AS_CHECK_BOX) {
+		_setShowDayNumberInTinyLayout = new Action(null, org.eclipse.jface.action.Action.AS_CHECK_BOX) {
 			@Override
 			public void run() {
 				_calendarGraph.setShowDayNumberInTinyView(this.isChecked());
 			}
 		};
-		_setShowDayNumberInTinyView.setText(Messages.Calendar_View_Action_ShowDayNumberInTinyView);
+		_setShowDayNumberInTinyLayout.setText(Messages.Calendar_View_Action_ShowDayNumberInTinyView);
 
+		_setUseLineColorForWeekSummary = new Action(null, org.eclipse.jface.action.Action.AS_CHECK_BOX) {
+			@Override
+			public void run() {
+				_useLineColorForWeekSummary = this.isChecked();
+				_calendarGraph.draw();
+			}
+		};
+		_setUseLineColorForWeekSummary.setText(Messages.Calendar_View_Action_UseLineColorForSummary);
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
@@ -823,8 +1071,9 @@ public class CalendarView extends ViewPart implements ITourProvider {
 
 	private void restoreState() {
 
-		final int numWeeksDisplayed = Util.getStateInt(_state, STATE_NUM_OF_WEEKS, 5);
-		_calendarGraph.setZoom(numWeeksDisplayed);
+		_calendarGraph.setNumWeeksNormalLayout(Util.getStateInt(_state, STATE_NUM_OF_WEEKS_NORMAL, 5));
+
+		_calendarGraph.setNumWeeksTinyLayout(Util.getStateInt(_state, STATE_NUM_OF_WEEKS_TINY, 15));
 
 		final Long dateTimeMillis = Util.getStateLong(_state, STATE_FIRST_DAY, (new DateTime()).getMillis());
 		final DateTime firstDate = new DateTime(dateTimeMillis);
@@ -848,16 +1097,24 @@ public class CalendarView extends ViewPart implements ITourProvider {
 
 		_setLinked.setChecked(Util.getStateBoolean(_state, STATE_IS_LINKED, false));
 
-		_setTourSizeDynamic.setChecked(Util.getStateBoolean(_state, STATE_TOUR_SIZE_DYNAMIC, true));
+		// _setTourSizeDynamic.setChecked(Util.getStateBoolean(_state, STATE_TOUR_SIZE_DYNAMIC, true));
 
 		final int numberOfTours = Util.getStateInt(_state, STATE_NUMBER_OF_TOURS_PER_DAY, 3);
 		if (numberOfTours < _setNumberOfToursPerDay.length) {
 			_setNumberOfToursPerDay[numberOfTours].run();
 		}
 
-		for (int i = 0; i < _numberOfInfoLines; i++) {
-			final int tourInfoFormatterIndex = Util.getStateInt(_state, STATE_TOUR_INFO_FORMATTER_INDEX_ + i, i + 1);
+		for (int i = 0; i < numberOfInfoLines; i++) {
+			final int tourInfoFormatterIndex = Util.getStateInt(_state, STATE_TOUR_INFO_FORMATTER_INDEX_ + i, i + 1); // the 0. line has the 1. entry selected, the 1. line the 2. ...
 			_setTourInfoFormat[i][tourInfoFormatterIndex].run();
+		}
+
+		for (int i = 0; i < numberOfSummaryLines; i++) {
+			final int weekSummaryFormatterIndex = Util.getStateInt(
+					_state,
+					STATE_WEEK_SUMMARY_FORMATTER_INDEX_ + i,
+					i + 1);
+			_setWeekSummaryFormat[i][weekSummaryFormatterIndex].run();
 		}
 
 		final boolean useTextColorForTourInfo = Util.getStateBoolean(_state, STATE_TOUR_INFO_TEXT_COLOR, false);
@@ -871,9 +1128,15 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		_setTourInfoBlackTextHighlight.setChecked(useBlackForTextHightlight);
 		_setTourInfoBlackTextHighlight.run();
 
-		final boolean showDayNumberInTinyView = Util.getStateBoolean(_state, STATE_SHOW_DAY_NUMBER_IN_TINY_VIEW, false);
-		_setShowDayNumberInTinyView.setChecked(showDayNumberInTinyView);
-		_setShowDayNumberInTinyView.run();
+		final boolean showDayNumberInTinyView = Util.getStateBoolean(
+				_state,
+				STATE_SHOW_DAY_NUMBER_IN_TINY_LAYOUT,
+				false);
+		_setShowDayNumberInTinyLayout.setChecked(showDayNumberInTinyView);
+		_setShowDayNumberInTinyLayout.run();
+
+		_useLineColorForWeekSummary = Util.getStateBoolean(_state, STATE_USE_LINE_COLOR_FOR_WEEK_SUMMARY, false);
+		_setUseLineColorForWeekSummary.setChecked(_useLineColorForWeekSummary);
 
 	}
 
@@ -883,7 +1146,8 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		_state.put(STATE_FIRST_DAY, _calendarGraph.getFirstDay().getMillis());
 
 		// save number of weeks displayed
-		_state.put(STATE_NUM_OF_WEEKS, _calendarGraph.getZoom());
+		_state.put(STATE_NUM_OF_WEEKS_NORMAL, _calendarGraph.getNumWeeksNormalLayout());
+		_state.put(STATE_NUM_OF_WEEKS_TINY, _calendarGraph.getNumWeeksTinyLayout());
 
 		// convert tour id's into string
 		// final ArrayList<String> selectedTourIds = new ArrayList<String>();
@@ -894,17 +1158,23 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		_state.put(STATE_SELECTED_TOURS, _calendarGraph.getSelectedTourId());
 
 		_state.put(STATE_IS_LINKED, _setLinked.isChecked());
-		_state.put(STATE_TOUR_SIZE_DYNAMIC, _setTourSizeDynamic.isChecked());
+		// _state.put(STATE_TOUR_SIZE_DYNAMIC, _setTourSizeDynamic.isChecked());
 
 		_state.put(STATE_NUMBER_OF_TOURS_PER_DAY, _calendarGraph.getNumberOfToursPerDay());
 
-		for (int i = 0; i < _numberOfInfoLines; i++) {
+		for (int i = 0; i < numberOfInfoLines; i++) {
 			_state.put(STATE_TOUR_INFO_FORMATTER_INDEX_ + i, _calendarGraph.getTourInfoFormatterIndex(i));
+		}
+
+		for (int i = 0; i < numberOfSummaryLines; i++) {
+			_state.put(STATE_WEEK_SUMMARY_FORMATTER_INDEX_ + i, _calendarGraph.getWeekSummaryFormatter(i));
 		}
 
 		_state.put(STATE_TOUR_INFO_TEXT_COLOR, _calendarGraph.getTourInfoUseTextColor());
 		_state.put(STATE_TOUR_INFO_BLACK_TEXT_HIGHLIGHT, _calendarGraph.getTourInfoUseHighlightTextBlack());
-		_state.put(STATE_SHOW_DAY_NUMBER_IN_TINY_VIEW, _calendarGraph.getShowDayNumberInTinyView());
+		_state.put(STATE_SHOW_DAY_NUMBER_IN_TINY_LAYOUT, _calendarGraph.getShowDayNumberInTinyView());
+
+		_state.put(STATE_USE_LINE_COLOR_FOR_WEEK_SUMMARY, _useLineColorForWeekSummary);
 	}
 
 	/**

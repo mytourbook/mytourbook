@@ -44,6 +44,8 @@ public class CalendarTourData {
 	String			tourTitle;
 	String			tourDescription;
 
+	int				numTours;
+
 
 	ArrayList<Long>	tagIds;
 
