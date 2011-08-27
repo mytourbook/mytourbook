@@ -49,10 +49,12 @@ public class Messages extends NLS {
 	public static String		Calendar_View_Action_ShowDistanceTime;
 	public static String		Calendar_View_Action_ShowNothing;
 	public static String		Calendar_View_Action_ShowTitleDescription;
+	public static String		Calendar_View_Action_SummaryInfo;
 	public static String		Calendar_View_Action_TextColor;
 	public static String		Calendar_View_Action_TimeDistance;
 	public static String		Calendar_View_Action_TimePace;
 	public static String		Calendar_View_Action_TimeSpeed;
+	public static String		Calendar_View_Action_UseLineColorForSummary;
 	public static String		Calendar_View_Action_ZoomIn;
 	public static String		Calendar_View_Action_ZoomIn_Tooltip;
 	public static String		Calendar_View_Action_ZoomOut;
