@@ -4015,6 +4015,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 				computeBreakTimeFixed(minBreakTime / deviceTimeInterval);
 			}
+			
+			computeTourDrivingTime();
 		}
 
 		return computeBreakTime(startIndex, endIndex);

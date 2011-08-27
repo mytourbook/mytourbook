@@ -124,6 +124,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 	private static final float			SPEED_DIGIT_VALUE					= 10.0f;
 
+	private static final int			DEFAULT_DESCRIPTION_WIDTH			= 450;
+
 	private IPreferenceStore			_prefStore							= TourbookPlugin
 																					.getDefault()
 																					.getPreferenceStore();
@@ -202,14 +204,16 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 	private Composite createUI(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+		GridDataFactory.fillDefaults()//
+				.grab(true, true)
+				.applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, 15).applyTo(container);
 		{
 			/*
 			 * label: info
 			 */
 			final Label label = new Label(container, SWT.WRAP);
-			GridDataFactory.fillDefaults().hint(UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT).applyTo(label);
+			GridDataFactory.fillDefaults().hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT).applyTo(label);
 			label.setText(Messages.Compute_Values_Label_Info);
 
 			/*
@@ -262,30 +266,15 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			_smoothingScrolledContent = _tk.createComposite(_smoothingScrolledContainer);
 			GridDataFactory.fillDefaults()//
 					.grab(true, true)
-					.hint(UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
+					.hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
 					.applyTo(_smoothingScrolledContent);
 			GridLayoutFactory.swtDefaults() //
 					.extendedMargins(5, 5, 10, 5)
 					.numColumns(1)
 					.applyTo(_smoothingScrolledContent);
-//			_smoothingScrolledContent.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+//			_smoothingScrolledContent.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 			{
 				_smoothingUI.createUI(_smoothingScrolledContent, true);
-
-				/*
-				 * compute smoothing values for all tours
-				 */
-				// button: compute computed values
-				final Button btnComputValues = new Button(_smoothingScrolledContent, SWT.NONE);
-				GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).indent(0, 10).applyTo(btnComputValues);
-				btnComputValues.setText(Messages.Compute_Smoothing_Button_ForAllTours);
-				btnComputValues.setToolTipText(Messages.Compute_Smoothing_Button_ForAllTours_Tooltip);
-				btnComputValues.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent e) {
-						_smoothingUI.computeSmoothingForAllTours();
-					}
-				});
 			}
 
 			// setup scrolled container
@@ -332,7 +321,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			GridDataFactory.fillDefaults()//
 					.span(3, 1)
 					.indent(0, 10)
-					.hint(UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
+					.hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
 					.grab(true, false)
 					.applyTo(label);
 			label.setText(Messages.compute_tourValueElevation_label_description);
@@ -341,7 +330,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 					Messages.compute_tourValueElevation_label_description_Hints,
 					1,
 					3,
-					UI.DEFAULT_DESCRIPTION_WIDTH,
+					DEFAULT_DESCRIPTION_WIDTH,
 					null);
 
 			final Composite btnContainer = new Composite(container, SWT.NONE);
@@ -425,7 +414,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			GridDataFactory.fillDefaults()//
 					.span(2, 1)
 					.indent(0, 10)
-					.hint(UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
+					.hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
 					.grab(true, false)
 					.applyTo(label);
 			label.setText(Messages.Compute_BreakTime_Label_Description);
@@ -437,7 +426,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 					Messages.Compute_BreakTime_Label_Hints,
 					1,
 					2,
-					UI.DEFAULT_DESCRIPTION_WIDTH,
+					DEFAULT_DESCRIPTION_WIDTH,
 					null);
 
 			/*
@@ -558,7 +547,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			GridDataFactory.fillDefaults()//
 					.span(3, 1)
 					.indent(0, 10)
-					.hint(UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
+					.hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
 					.grab(true, false)
 					.applyTo(label);
 			label.setText(Messages.Compute_BreakTime_Label_Description_ComputeByAvgSliceSpeed);
@@ -604,7 +593,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			GridDataFactory.fillDefaults()//
 					.span(3, 1)
 					.indent(0, 10)
-					.hint(UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
+					.hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
 					.grab(true, false)
 					.applyTo(label);
 			label.setText(Messages.Compute_BreakTime_Label_Description_ComputeByAvgSpeed);
@@ -650,7 +639,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			GridDataFactory.fillDefaults()//
 					.span(3, 1)
 					.indent(0, 10)
-					.hint(UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
+					.hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
 					.grab(true, false)
 					.applyTo(label);
 			label.setText(Messages.Compute_BreakTime_Label_Description_ComputeBySliceSpeed);
@@ -746,7 +735,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			GridDataFactory.fillDefaults()//
 					.span(3, 1)
 					.indent(0, 10)
-					.hint(UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
+					.hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
 					.grab(true, false)
 					.applyTo(label);
 			label.setText(Messages.Compute_BreakTime_Label_Description_ComputeByTime);
@@ -771,7 +760,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 			GridDataFactory.fillDefaults()//
 					.grab(true, false)
-					.hint(UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
+					.hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
 					.applyTo(prefLink.getControl());
 		}
 

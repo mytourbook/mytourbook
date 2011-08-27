@@ -23,11 +23,12 @@ public interface ISmoothingAlgorithm {
 	public static final String	SMOOTHING_ALGORITHM_INITIAL	= "initial";	//$NON-NLS-1$
 
 	/**
+	 * @param smoothingUI
 	 * @param parent
 	 * @param isShowDescription
 	 * @return
 	 */
-	Composite createUI(Composite parent, boolean isShowDescription);
+	Composite createUI(SmoothingUI smoothingUI, Composite parent, boolean isShowDescription);
 
 	void dispose();
 

@@ -50,7 +50,7 @@ class SmoothingAlgorithmInitial implements ISmoothingAlgorithm {
 	SmoothingAlgorithmInitial() {}
 
 	@Override
-	public Composite createUI(final Composite parent, final boolean isShowDescription) {
+	public Composite createUI(final SmoothingUI smoothingUI, final Composite parent, final boolean isShowDescription) {
 
 		initUI(parent);
 

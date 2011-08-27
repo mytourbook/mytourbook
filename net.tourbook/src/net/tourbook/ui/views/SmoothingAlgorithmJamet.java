@@ -18,6 +18,7 @@ package net.tourbook.ui.views;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPageComputedValues;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.util.Util;
@@ -35,9 +36,12 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Widget;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 public class SmoothingAlgorithmJamet implements ISmoothingAlgorithm {
@@ -50,6 +54,8 @@ public class SmoothingAlgorithmJamet implements ISmoothingAlgorithm {
 	private final boolean			_isLinux		= net.tourbook.util.UI.IS_LINUX;
 
 	private int						_hintDefaultSpinnerWidth;
+
+	private SmoothingUI				_smoothingUI;
 
 	private SelectionAdapter		_selectionListener;
 	private MouseWheelListener		_spinnerMouseWheelListener;
@@ -85,8 +91,6 @@ public class SmoothingAlgorithmJamet implements ISmoothingAlgorithm {
 	private Spinner					_spinnerRepeatedTau;
 	private Spinner					_spinnerLastUsed;
 
-	private Label					_lblSpeedSmoothing;
-	private Label					_lblGradientSmoothing;
 	private Label					_lblRepeatedSmoothing;
 	private Label					_lblRepeatedTau;
 
@@ -98,20 +102,25 @@ public class SmoothingAlgorithmJamet implements ISmoothingAlgorithm {
 	public SmoothingAlgorithmJamet() {}
 
 	@Override
-	public Composite createUI(final Composite parent, final boolean isShowDescription) {
+	public Composite createUI(final SmoothingUI smoothingUI, final Composite parent, final boolean isShowDescription) {
+
+		_smoothingUI = smoothingUI;
 
 		initUI(parent);
 
 		final Composite container = _tk.createComposite(parent);
-		GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
 		GridLayoutFactory.fillDefaults().spacing(5, 5).numColumns(3).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
-			createUI12JametAlgorithm(container);
-			createUI13SmoothSpeed(container);
-			createUI14SmoothGradient(container);
-			createUI16SmoothAltitude(container);
-			createUI18SmoothPulse(container);
+			createUI10Tau(container);
+			createUI20SmoothSpeed(container);
+			createUI22SmoothGradient(container);
+			createUI24SmoothPulse(container);
+			createUI26SmoothAltitude(container);
+			createUI30Iterations(container);
+
+			createUI50Actions(container);
 		}
 
 		restoreState();
@@ -120,95 +129,30 @@ public class SmoothingAlgorithmJamet implements ISmoothingAlgorithm {
 		return container;
 	}
 
-	private void createUI12JametAlgorithm(final Composite parent) {
+	private void createUI10Tau(final Composite parent) {
 
-		final Composite container = _tk.createComposite(parent);
-		GridDataFactory.fillDefaults().span(3, 1).grab(false, false).applyTo(container);
-		GridLayoutFactory.fillDefaults()//
-				.numColumns(2)
-				.spacing(5, 5)
-				.extendedMargins(0, 0, 0, 0)
-				.applyTo(container);
-		{
-
-			/*
-			 * label: repeated smoothing
-			 */
-			_lblRepeatedSmoothing = _tk.createLabel(container, Messages.TourChart_Smoothing_Label_RepeatedSmoothing);
-			GridDataFactory.fillDefaults() //
-					.align(SWT.FILL, SWT.CENTER)
-					.applyTo(_lblRepeatedSmoothing);
-			_lblRepeatedSmoothing.setToolTipText(Messages.TourChart_Smoothing_Label_RepeatedSmoothing_Tooltip);
-
-			/*
-			 * spinner: repeated smoothing
-			 */
-			_spinnerRepeatedSmoothing = new Spinner(container, SWT.BORDER);
-			GridDataFactory.fillDefaults()//
-					.align(SWT.BEGINNING, SWT.FILL)
-					.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
-					.applyTo(_spinnerRepeatedSmoothing);
-			_spinnerRepeatedSmoothing.setMinimum(0);
-			_spinnerRepeatedSmoothing.setMaximum(10);
-			_spinnerRepeatedSmoothing.addSelectionListener(_selectionListener);
-			_spinnerRepeatedSmoothing.addMouseWheelListener(_spinnerMouseWheelListener);
-
-			/*
-			 * label: repeated tau
-			 */
-			_lblRepeatedTau = _tk.createLabel(container, Messages.TourChart_Smoothing_Label_RepeatedTau);
-			GridDataFactory.fillDefaults() //
-					.align(SWT.FILL, SWT.CENTER)
-					.applyTo(_lblRepeatedTau);
-			_lblRepeatedTau.setToolTipText(Messages.TourChart_Smoothing_Label_RepeatedTau_Tooltip);
-
-			/*
-			 * spinner: repeated tau
-			 */
-			_spinnerRepeatedTau = new Spinner(container, SWT.BORDER);
-			GridDataFactory.fillDefaults()//
-					.align(SWT.BEGINNING, SWT.FILL)
-					.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
-					.applyTo(_spinnerRepeatedTau);
-			_spinnerRepeatedTau.setDigits(1);
-			_spinnerRepeatedTau.setMinimum(1);
-			_spinnerRepeatedTau.setMaximum(10);
-			_spinnerRepeatedTau.addSelectionListener(_selectionListener);
-			_spinnerRepeatedTau.addMouseWheelListener(_spinnerMouseWheelListener);
-
-			/*
-			 * checkbox: sync smoothing
-			 */
-			_chkIsSynchSmoothing = _tk.createButton(
-					container,
-					Messages.TourChart_Smoothing_Checkbox_IsSyncSmoothing,
-					SWT.CHECK);
-			GridDataFactory.fillDefaults() //
-					.align(SWT.FILL, SWT.CENTER)
-					.span(2, 1)
-					.applyTo(_chkIsSynchSmoothing);
-			_chkIsSynchSmoothing.setToolTipText(Messages.TourChart_Smoothing_Checkbox_IsSyncSmoothing_Tooltip);
-			_chkIsSynchSmoothing.addSelectionListener(_selectionListener);
-		}
+		final Label label = _tk.createLabel(parent, Messages.TourChart_Smoothing_Label_TauParameter);
+		GridDataFactory.fillDefaults().span(3, 1).grab(false, false).applyTo(label);
 	}
 
-	private void createUI13SmoothSpeed(final Composite parent) {
+	private void createUI20SmoothSpeed(final Composite parent) {
 
 		/*
 		 * image: speed
 		 */
 		_iconSpeed = new CLabel(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().indent(16, 0).applyTo(_iconSpeed);
 		_iconSpeed.setBackground(_tk.getColors().getBackground());
 		_iconSpeed.setImage(_imageSpeed);
 
 		/*
 		 * label: smooth speed
 		 */
-		_lblSpeedSmoothing = _tk.createLabel(parent, Messages.TourChart_Smoothing_Label_SpeedSmoothing);
+		final Label label = _tk.createLabel(parent, Messages.TourChart_Smoothing_Label_SpeedSmoothing);
 		GridDataFactory.fillDefaults() //
 				.align(SWT.FILL, SWT.CENTER)
-				.applyTo(_lblSpeedSmoothing);
-		_lblSpeedSmoothing.setToolTipText(Messages.TourChart_Smoothing_Label_SpeedSmoothing_Tooltip);
+				.applyTo(label);
+		label.setToolTipText(Messages.TourChart_Smoothing_Label_SpeedSmoothing_Tooltip);
 
 		/*
 		 * spinner: tau
@@ -224,26 +168,27 @@ public class SmoothingAlgorithmJamet implements ISmoothingAlgorithm {
 		_spinnerSpeedTau.addMouseWheelListener(_spinnerMouseWheelListener);
 	}
 
-	private void createUI14SmoothGradient(final Composite parent) {
+	private void createUI22SmoothGradient(final Composite parent) {
 
 		/*
 		 * image: gradient
 		 */
 		_iconGradient = new CLabel(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().indent(16, 0).applyTo(_iconGradient);
 		_iconGradient.setBackground(_tk.getColors().getBackground());
 		_iconGradient.setImage(_imageGradient);
 
 		/*
 		 * label: smooth gradient
 		 */
-		_lblGradientSmoothing = _tk.createLabel(
+		final Label label = _tk.createLabel(
 				parent,
-				Messages.TourChart_Smoothing_Checkbox_IsGradientSmoothing,
+				Messages.TourChart_Smoothing_Label_GradientSmoothing,
 				SWT.CHECK);
 		GridDataFactory.fillDefaults() //
 				.align(SWT.FILL, SWT.CENTER)
-				.applyTo(_lblGradientSmoothing);
-		_lblGradientSmoothing.setToolTipText(Messages.TourChart_Smoothing_Checkbox_IsGradientSmoothing_Tooltip);
+				.applyTo(label);
+		label.setToolTipText(Messages.TourChart_Smoothing_Label_GradientSmoothing_Tooltip);
 
 		/*
 		 * spinner: gradient tau
@@ -259,36 +204,13 @@ public class SmoothingAlgorithmJamet implements ISmoothingAlgorithm {
 		_spinnerGradientTau.addMouseWheelListener(_spinnerMouseWheelListener);
 	}
 
-	private void createUI16SmoothAltitude(final Composite parent) {
-
-		/*
-		 * image: altitude
-		 */
-		_iconAltitude = new CLabel(parent, SWT.NONE);
-		_iconAltitude.setBackground(_tk.getColors().getBackground());
-		_iconAltitude.setImage(_imageAltitude);
-
-		/*
-		 * checkbox: smooth altitude
-		 */
-		_chkIsAltitudeSmoothing = _tk.createButton(
-				parent,
-				Messages.TourChart_Smoothing_Checkbox_IsAltitudeSmoothing,
-				SWT.CHECK);
-		GridDataFactory.fillDefaults() //
-				.align(SWT.FILL, SWT.CENTER)
-				.span(2, 1)
-				.applyTo(_chkIsAltitudeSmoothing);
-		_chkIsAltitudeSmoothing.setToolTipText(Messages.TourChart_Smoothing_Checkbox_IsAltitudeSmoothing_Tooltip);
-		_chkIsAltitudeSmoothing.addSelectionListener(_selectionListener);
-	}
-
-	private void createUI18SmoothPulse(final Composite parent) {
+	private void createUI24SmoothPulse(final Composite parent) {
 
 		/*
 		 * image: pulse
 		 */
 		_iconPulse = new CLabel(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().indent(16, 0).applyTo(_iconPulse);
 		_iconPulse.setBackground(_tk.getColors().getBackground());
 		_iconPulse.setImage(_imagePulse);
 
@@ -317,6 +239,185 @@ public class SmoothingAlgorithmJamet implements ISmoothingAlgorithm {
 		_spinnerPulseTau.setMaximum(MAX_TAU);
 		_spinnerPulseTau.addSelectionListener(_selectionListener);
 		_spinnerPulseTau.addMouseWheelListener(_spinnerMouseWheelListener);
+	}
+
+	private void createUI26SmoothAltitude(final Composite parent) {
+
+		/*
+		 * image: altitude
+		 */
+		_iconAltitude = new CLabel(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().indent(16, 0).applyTo(_iconAltitude);
+		_iconAltitude.setBackground(_tk.getColors().getBackground());
+		_iconAltitude.setImage(_imageAltitude);
+
+		/*
+		 * checkbox: smooth altitude
+		 */
+		_chkIsAltitudeSmoothing = _tk.createButton(
+				parent,
+				Messages.TourChart_Smoothing_Checkbox_IsAltitudeSmoothing,
+				SWT.CHECK);
+		GridDataFactory.fillDefaults() //
+				.align(SWT.FILL, SWT.CENTER)
+				.span(2, 1)
+				.applyTo(_chkIsAltitudeSmoothing);
+		_chkIsAltitudeSmoothing.setToolTipText(Messages.TourChart_Smoothing_Checkbox_IsAltitudeSmoothing_Tooltip);
+		_chkIsAltitudeSmoothing.addSelectionListener(_selectionListener);
+	}
+
+	private void createUI30Iterations(final Composite parent) {
+
+		/*
+		 * sync smoothing
+		 */
+		{
+			_chkIsSynchSmoothing = _tk.createButton(
+					parent,
+					Messages.TourChart_Smoothing_Checkbox_IsSyncSmoothing,
+					SWT.CHECK);
+			GridDataFactory.fillDefaults() //
+					.align(SWT.FILL, SWT.CENTER)
+					.span(3, 1)
+					.indent(0, 10)
+					.applyTo(_chkIsSynchSmoothing);
+			_chkIsSynchSmoothing.setToolTipText(Messages.TourChart_Smoothing_Checkbox_IsSyncSmoothing_Tooltip);
+			_chkIsSynchSmoothing.addSelectionListener(_selectionListener);
+		}
+
+		/*
+		 * repeated smoothing
+		 */
+		{
+			_lblRepeatedSmoothing = _tk.createLabel(parent, Messages.TourChart_Smoothing_Label_RepeatedSmoothing);
+			GridDataFactory.fillDefaults() //
+					.align(SWT.FILL, SWT.CENTER)
+					.span(2, 1)
+					.indent(0, 10)
+					.applyTo(_lblRepeatedSmoothing);
+			_lblRepeatedSmoothing.setToolTipText(Messages.TourChart_Smoothing_Label_RepeatedSmoothing_Tooltip);
+
+			/*
+			 * spinner: repeated smoothing
+			 */
+			_spinnerRepeatedSmoothing = new Spinner(parent, SWT.BORDER);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.BEGINNING, SWT.FILL)
+					.indent(0, 10)
+					.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+					.applyTo(_spinnerRepeatedSmoothing);
+			_spinnerRepeatedSmoothing.setMinimum(0);
+			_spinnerRepeatedSmoothing.setMaximum(10);
+			_spinnerRepeatedSmoothing.addSelectionListener(_selectionListener);
+			_spinnerRepeatedSmoothing.addMouseWheelListener(_spinnerMouseWheelListener);
+		}
+
+		/*
+		 * repeated tau
+		 */
+		{
+			_lblRepeatedTau = _tk.createLabel(parent, Messages.TourChart_Smoothing_Label_RepeatedTau);
+			GridDataFactory.fillDefaults() //
+					.align(SWT.FILL, SWT.CENTER)
+					.span(2, 1)
+					.applyTo(_lblRepeatedTau);
+			_lblRepeatedTau.setToolTipText(Messages.TourChart_Smoothing_Label_RepeatedTau_Tooltip);
+
+			/*
+			 * spinner: repeated tau
+			 */
+			_spinnerRepeatedTau = new Spinner(parent, SWT.BORDER);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.BEGINNING, SWT.FILL)
+					.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+					.applyTo(_spinnerRepeatedTau);
+			_spinnerRepeatedTau.setDigits(1);
+			_spinnerRepeatedTau.setMinimum(1);
+			_spinnerRepeatedTau.setMaximum(10);
+			_spinnerRepeatedTau.addSelectionListener(_selectionListener);
+			_spinnerRepeatedTau.addMouseWheelListener(_spinnerMouseWheelListener);
+		}
+	}
+
+	private void createUI50Actions(final Composite parent) {
+
+		final Composite container = _tk.createComposite(parent);
+		GridDataFactory.fillDefaults().grab(true, true).span(3, 1).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+		{
+			/*
+			 * button: compute smoothing values for all tours
+			 */
+			final Button btnComputValues = _tk.createButton(
+					container,
+					Messages.Compute_Smoothing_Button_ForAllTours,
+					SWT.NONE);
+			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).indent(0, 10).applyTo(btnComputValues);
+			btnComputValues.setToolTipText(Messages.Compute_Smoothing_Button_ForAllTours_Tooltip);
+			btnComputValues.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					_smoothingUI.computeSmoothingForAllTours();
+				}
+			});
+
+			/*
+			 * link: restore defaults
+			 */
+			Link link = new Link(container, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.FILL, SWT.END)
+					.grab(false, true)
+					.applyTo(link);
+			link.setText(Messages.App_Link_RestoreDefaultValues);
+			link.setEnabled(true);
+			link.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					performDefaults(true);
+				}
+			});
+			_tk.adapt(link, true, true);
+
+			/*
+			 * link: break time
+			 */
+			link = new Link(container, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.FILL, SWT.END)
+					.applyTo(link);
+			link.setText(Messages.TourChart_Smoothing_Link_PrefBreakTime);
+			link.setEnabled(true);
+			link.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					PreferencesUtil.createPreferenceDialogOn(
+							parent.getShell(),
+							PrefPageComputedValues.ID,
+							null,
+							PrefPageComputedValues.TAB_FOLDER_BREAK_TIME).open();
+				}
+			});
+			_tk.adapt(link, true, true);
+
+			/*
+			 * link: smoothing online documentation
+			 */
+			link = new Link(container, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.FILL, SWT.END)
+					.applyTo(link);
+			link.setText(Messages.TourChart_Smoothing_Link_SmoothingOnlineDocumentation);
+			link.setEnabled(true);
+			link.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					Util.openLink(Display.getCurrent().getActiveShell(), Messages.External_Link_TourChartSmoothing);
+				}
+			});
+			_tk.adapt(link, true, true);
+		}
 	}
 
 	@Override

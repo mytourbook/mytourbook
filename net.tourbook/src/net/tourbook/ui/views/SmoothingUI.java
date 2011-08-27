@@ -166,7 +166,7 @@ public class SmoothingUI {
 
 		_uiContainer = _tk.createComposite(parent);
 		GridDataFactory.fillDefaults()//
-				.grab(true, false)
+				.grab(true, true)
 				.applyTo(_uiContainer);
 		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(_uiContainer);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
@@ -178,12 +178,12 @@ public class SmoothingUI {
 			 */
 			_pagebookSmoothingAlgo = new PageBook(_uiContainer, SWT.NONE);
 			GridDataFactory.fillDefaults()//
-					.grab(true, false)
+					.grab(true, true)
 					.span(2, 1)
 					.applyTo(_pagebookSmoothingAlgo);
 			{
-				_pageInitial = _smoothingInitial.createUI(_pagebookSmoothingAlgo, isShowDescription);
-				_pageJamet = _smoothingJamet.createUI(_pagebookSmoothingAlgo, isShowDescription);
+				_pageInitial = _smoothingInitial.createUI(this, _pagebookSmoothingAlgo, isShowDescription);
+				_pageJamet = _smoothingJamet.createUI(this, _pagebookSmoothingAlgo, isShowDescription);
 			}
 		}
 	}

@@ -20,6 +20,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Calendar;
@@ -32,6 +34,7 @@ import org.eclipse.swt.graphics.Resource;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Scale;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
@@ -39,6 +42,8 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.browser.IWebBrowser;
+import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.joda.time.DateTime;
 import org.xml.sax.Attributes;
 
@@ -371,6 +376,35 @@ public class Util {
 	}
 
 	/**
+	 * Open link in the browser
+	 */
+	public static void openLink(final Shell shell, String href) {
+
+		// format the href for an html file (file:///<filename.html>
+		// required for Mac only.
+		if (href.startsWith("file:")) { //$NON-NLS-1$
+			href = href.substring(5);
+			while (href.startsWith("/")) { //$NON-NLS-1$
+				href = href.substring(1);
+			}
+			href = "file:///" + href; //$NON-NLS-1$
+		}
+
+		final IWorkbenchBrowserSupport support = PlatformUI.getWorkbench().getBrowserSupport();
+
+		try {
+
+			final IWebBrowser browser = support.getExternalBrowser();
+			browser.openURL(new URL(urlEncodeForSpaces(href.toCharArray())));
+
+		} catch (final MalformedURLException e) {
+			StatusUtil.showStatus(e);
+		} catch (final PartInitException e) {
+			StatusUtil.showStatus(e);
+		}
+	}
+
+	/**
 	 * Parses SAX attribute
 	 * 
 	 * @param attributes
@@ -607,5 +641,23 @@ public class Util {
 				showSQLException(e);
 			}
 		}
+	}
+
+	/**
+	 * This method encodes the url, removes the spaces from the url and replaces the same with
+	 * <code>"%20"</code>. This method is required to fix Bug 77840.
+	 * 
+	 * @since 3.0.2
+	 */
+	private static String urlEncodeForSpaces(final char[] input) {
+		final StringBuffer retu = new StringBuffer(input.length);
+		for (final char element : input) {
+			if (element == ' ') {
+				retu.append("%20"); //$NON-NLS-1$
+			} else {
+				retu.append(element);
+			}
+		}
+		return retu.toString();
 	}
 }

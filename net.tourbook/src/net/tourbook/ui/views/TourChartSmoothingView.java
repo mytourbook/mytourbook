@@ -15,18 +15,13 @@
  *******************************************************************************/
 package net.tourbook.ui.views;
 
-import net.tourbook.Messages;
-
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.part.ViewPart;
 
@@ -62,22 +57,6 @@ public class TourChartSmoothingView extends ViewPart {
 			GridLayoutFactory.swtDefaults().numColumns(1).applyTo(_scrolledContent);
 			{
 				_smoothingUI.createUI(_scrolledContent, false);
-
-				/*
-				 * Link: update all tours
-				 */
-				final Link link = new Link(_scrolledContent, SWT.NONE);
-				GridDataFactory.fillDefaults().indent(0, 5).grab(true, false).applyTo(link);
-				link.setText(Messages.TourChart_Smoothing_Link_UpdateAllTours);
-				link.setToolTipText(Messages.Compute_Smoothing_Button_ForAllTours_Tooltip);
-				link.setEnabled(true);
-				link.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent e) {
-						_smoothingUI.computeSmoothingForAllTours();
-					}
-				});
-				_tk.adapt(link, true, true);
 			}
 
 			// setup scrolled container
