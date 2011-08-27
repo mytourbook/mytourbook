@@ -32,7 +32,6 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.UI;
-import net.tourbook.ui.views.calendar.CalendarGraph.NavigationStyle;
 import net.tourbook.util.SelectionProvider;
 import net.tourbook.util.Util;
 
@@ -96,7 +95,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	private String								STATE_NUM_OF_WEEKS_NORMAL				= "NumberOfWeeksDisplayed";					// $NON-NLS-1$ //$NON-NLS-1$
 	private String								STATE_NUM_OF_WEEKS_TINY					= "NumberOfWeeksDisplayedTinyView";			// $NON-NLS-1$ //$NON-NLS-1$
 	private String								STATE_IS_LINKED					= "Linked";									// $NON-NLS-1$ //$NON-NLS-1$
-	private String								STATE_TOUR_SIZE_DYNAMIC			= "TourSizeDynamic";							// $NON-NLS-1$ //$NON-NLS-1$
+//	private String								STATE_TOUR_SIZE_DYNAMIC			= "TourSizeDynamic";							// $NON-NLS-1$ //$NON-NLS-1$
 	private String								STATE_NUMBER_OF_TOURS_PER_DAY	= "NumberOfToursPerDay";						// $NON-NLS-1$ //$NON-NLS-1$
 	private String								STATE_TOUR_INFO_FORMATTER_INDEX_		= "TourInfoFormatterIndex";					//$NON-NLS-1$
 	private String								STATE_WEEK_SUMMARY_FORMATTER_INDEX_		= "WeekSummaryFormatterIndex";					//$NON-NLS-1$
@@ -109,7 +108,6 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	private Action								_zoomIn, _zoomOut;
 	private Action								_setLinked;
 	private Action								_gotoToday;
-	private Action								_setNavigationStylePhysical, _setNavigationStyleLogical;
 	private Action[]							_setNumberOfToursPerDay;
 	// private Action								_setTourSizeDynamic;
 	private Action[]							_setTourInfoFormatLine;
@@ -824,9 +822,6 @@ public class CalendarView extends ViewPart implements ITourProvider {
 //			manager.add(new Separator());
 //			manager.add(_setTourSizeDynamic);
 //			manager.add(new Separator());
-//			manager.add(_setNavigationStylePhysical);
-//			manager.add(_setNavigationStyleLogical);
-//			manager.add(new Separator());
 			manager.add(_setTourInfoTextColor);
 			manager.add(_setTourInfoBlackTextHighlight);
 
@@ -934,26 +929,6 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		};
 		_gotoToday.setText(Messages.Calendar_View_Action_GotoToday);
 		_gotoToday.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ZoomCentered));
-
-		_setNavigationStylePhysical = new Action(null, org.eclipse.jface.action.Action.AS_RADIO_BUTTON) {
-			@Override
-			public void run() {
-				_setNavigationStyleLogical.setChecked(false);
-				_calendarGraph.setNavigationStyle(NavigationStyle.PHYSICAL);
-			}
-		};
-		_setNavigationStylePhysical.setText(Messages.Calendar_View_Action_PhysicalNavigation);
-		_setNavigationStylePhysical.setChecked(true);
-
-		_setNavigationStyleLogical = new Action(null, org.eclipse.jface.action.Action.AS_RADIO_BUTTON) {
-			@Override
-			public void run() {
-				_setNavigationStylePhysical.setChecked(false);
-				_calendarGraph.setNavigationStyle(NavigationStyle.LOGICAL);
-			}
-		};
-		_setNavigationStyleLogical.setText(Messages.Calendar_View_Action_LogicalNavigation);
-		_setNavigationStyleLogical.setChecked(false);
 
 		_setNumberOfToursPerDay = new Action[5];
 		for (int i = 0; i < 5; i++) {

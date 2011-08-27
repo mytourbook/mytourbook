@@ -87,12 +87,12 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	private Color								_red				= _display.getSystemColor(SWT.COLOR_RED);
 //	private Color								_green				= _display.getSystemColor(SWT.COLOR_GREEN);
 	private Color								_blue				= _display.getSystemColor(SWT.COLOR_BLUE);
-	private Color								_magenta				= _display.getSystemColor(SWT.COLOR_MAGENTA);
+//	private Color								_magenta				= _display.getSystemColor(SWT.COLOR_MAGENTA);
 //	private Color								_cyan					= _display.getSystemColor(SWT.COLOR_CYAN);
 //	private Color								_darkGray				= _display.getSystemColor(SWT.COLOR_DARK_GRAY);
 	private Color								_darkGray				= _colorCache.get(0x404040);
 
-	private NavigationStyle						_navigationStyle	= NavigationStyle.PHYSICAL;
+//	private NavigationStyle						_navigationStyle	= NavigationStyle.PHYSICAL;
 
 	private ArrayList<RGB>						_rgbBright;
 	private ArrayList<RGB>						_rgbDark;
@@ -145,8 +145,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	private boolean								_useBlackForHighlightTourInfoText;
 
 	private Rectangle _calendarAllDaysRectangle;
-	private Rectangle _calendarFirstWeekRectangle;
-	private Rectangle _calendarLastWeekRectangle;
+//	private Rectangle _calendarFirstWeekRectangle;
+//	private Rectangle _calendarLastWeekRectangle;
 
 	private String								_refText				= "Tour12";
 	private boolean								_tinyLayout				= false;
@@ -169,10 +169,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 
 	};
-
-	enum NavigationStyle {
-		LOGICAL, PHYSICAL
-	}
 
 	private class ObjectLocation {
 
@@ -653,12 +649,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		dX = (float) (XX - summaryWidth - infoWidth) / (numCols - 2);
 
 		_calendarAllDaysRectangle = new Rectangle(infoWidth, 0, (int) (7 * dX), YY);
-		_calendarFirstWeekRectangle = new Rectangle(infoWidth, 0, (int) (7 * dX), (int) dY);
-		_calendarLastWeekRectangle = new Rectangle(
-				infoWidth,
-				(int) ((getNumOfWeeks() - 1) * dY),
-				(int) (7 * dX),
-				(int) dY);
+//		_calendarFirstWeekRectangle = new Rectangle(infoWidth, 0, (int) (7 * dX), (int) dY);
+//		_calendarLastWeekRectangle = new Rectangle( infoWidth, (int) ((getNumOfWeeks() - 1) * dY), (int) (7 * dX), (int) dY);
 
 		// first draw the horizontal lines
 		gc.setBackground(_white);
@@ -1053,7 +1045,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		final boolean doClip = true;
 		
 		final int fontHeight = gc.getFontMetrics().getHeight();
-		final int minToShow = (2 * fontHeight / 3);
+//		final int minToShow = (2 * fontHeight / 3);
 
 		Point extent;
 		final int maxLength = rec.width - 2;
@@ -1332,76 +1324,27 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	}
 
-	private void gotoTourOtherWeekday(final int direction) {
-
-		if (_tourFocus.size() < 1) {
-			if (direction < 0) {
-				gotoPrevWeek();
-			} else {
-				gotoNextWeek();
-			}
-			return;
-		}
-
-		if (!_selectedItem.isTour()) { // if no tour is selected, count from first/last tour and select this tour
-			if (direction > 0) {
-				_selectedItem = new Selection(_tourFocus.get(0).id, SelectionType.TOUR);
-			} else {
-				_selectedItem = new Selection(new Long(_tourFocus.get(_tourFocus.size() - 1).id), SelectionType.TOUR);
-			}
-			redraw();
-			return;
-		}
-
-		int index = 0;
-		CalendarTourData ctd = null;
-		for (final ObjectLocation ol : _tourFocus) {
-			if (_selectedItem.id == ol.id) {
-				ctd = (CalendarTourData) (ol.o);
-				break;
-			}
-			index++;
-		}
-
-		if (null == ctd) { // selected tour scrolled out of the window, select first/last tour
-			if (_tourFocus.size() > 0) {
-				ObjectLocation ol;
-				if (direction > 0) {
-					ol = _tourFocus.get(0);
-				} else {
-					ol = _tourFocus.get(_tourFocus.size() - 1);
-				}
-				_selectedItem = new Selection(ol.id, SelectionType.TOUR);
-				redraw();
-				return;
-			}
-
-		}
-
-		if (null != ctd) {
-			index += direction;
-			for (int i = index; i >= 0 && i < _tourFocus.size(); i += direction) {
-				final ObjectLocation ol = _tourFocus.get(i);
-				// if (ctd.dayOfWeek != ((CalendarTourData) (ol.o)).dayOfWeek) {
-				final CalendarTourData ctdNext = (CalendarTourData) (ol.o);
-				if (ctd.day != ctdNext.day || ctd.week != ctdNext.week || ctd.year != ctdNext.year) {
-					_selectedItem = new Selection(ol.id, SelectionType.TOUR);
-					redraw();
-					return;
-				}
-			}
-		} else {
-			// selected Item is not on the screen any more
-			// _selectedItem = _noItem; keep selection
-		}
-
-		if (direction < 0) {
-			gotoPrevWeek();
-		} else {
-			gotoNextWeek();
-		}
-
-	}
+	/*
+	 * private void gotoTourOtherWeekday(final int direction) { if (_tourFocus.size() < 1) { if
+	 * (direction < 0) { gotoPrevWeek(); } else { gotoNextWeek(); } return; } if
+	 * (!_selectedItem.isTour()) { // if no tour is selected, count from first/last tour and select
+	 * this tour if (direction > 0) { _selectedItem = new Selection(_tourFocus.get(0).id,
+	 * SelectionType.TOUR); } else { _selectedItem = new Selection(new
+	 * Long(_tourFocus.get(_tourFocus.size() - 1).id), SelectionType.TOUR); } redraw(); return; }
+	 * int index = 0; CalendarTourData ctd = null; for (final ObjectLocation ol : _tourFocus) { if
+	 * (_selectedItem.id == ol.id) { ctd = (CalendarTourData) (ol.o); break; } index++; } if (null
+	 * == ctd) { // selected tour scrolled out of the window, select first/last tour if
+	 * (_tourFocus.size() > 0) { ObjectLocation ol; if (direction > 0) { ol = _tourFocus.get(0); }
+	 * else { ol = _tourFocus.get(_tourFocus.size() - 1); } _selectedItem = new Selection(ol.id,
+	 * SelectionType.TOUR); redraw(); return; } } if (null != ctd) { index += direction; for (int i
+	 * = index; i >= 0 && i < _tourFocus.size(); i += direction) { final ObjectLocation ol =
+	 * _tourFocus.get(i); // if (ctd.dayOfWeek != ((CalendarTourData) (ol.o)).dayOfWeek) { final
+	 * CalendarTourData ctdNext = (CalendarTourData) (ol.o); if (ctd.day != ctdNext.day || ctd.week
+	 * != ctdNext.week || ctd.year != ctdNext.year) { _selectedItem = new Selection(ol.id,
+	 * SelectionType.TOUR); redraw(); return; } } } else { // selected Item is not on the screen any
+	 * more // _selectedItem = _noItem; keep selection } if (direction < 0) { gotoPrevWeek(); } else
+	 * { gotoNextWeek(); } }
+	 */
 
 	private void gotoTourSameWeekday(final int direction) {
 
@@ -1716,9 +1659,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 	}
 
-	void setNavigationStyle(final NavigationStyle navigationStyle) {
-		_navigationStyle = navigationStyle;
-	}
+//	void setNavigationStyle(final NavigationStyle navigationStyle) {
+//		_navigationStyle = navigationStyle;
+//	}
 
 	void setNumberOfToursPerDay(final int numberOfToursPerDay) {
 		_numberOfToursPerDay = numberOfToursPerDay;
