@@ -152,6 +152,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	private boolean								_tinyLayout				= false;
 
 	private boolean								_showDayNumberInTinyView	= false;
+	Point										_refTextExtent;
 
 	private class Day {
 
@@ -381,16 +382,34 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 //					}
 					break;
 				case SWT.PAGE_DOWN:
+				case 'n':
 					gotoNextScreen();
 					break;
 				case SWT.PAGE_UP:
+				case 'p':
 					gotoPrevScreen();
 					break;
 				case SWT.HOME:
+				case '.':
 					gotoToday();
 					break;
 				case SWT.END:
+				case ',':
 					gotoFirstTour();
+					break;
+				case 'i':
+					zoomIn();
+					break;
+				case 'o':
+					zoomOut();
+					break;
+				case ' ':
+					if (_selectedItem.isTour()) {
+						_selectedItem = _noItem;
+						redraw();
+					} else {
+						gotoPrevTour();
+					}
 					break;
 				}
 			}
@@ -560,9 +579,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		final GC oldGc = gc;
 		gc = new GC(_image);
 
-		final Point refTextExtent = gc.stringExtent(_refText);
+		_refTextExtent = gc.stringExtent(_refText);
 		final boolean oldLayout = _tinyLayout;
-		_tinyLayout = (refTextExtent.x > XX / 9); // getNumOfWeeks needs the _tinuLayout set
+		_tinyLayout = (_refTextExtent.x > XX / 9); // getNumOfWeeks needs the _tinuLayout set
 
 		if (oldLayout != _tinyLayout) { // the layout style changed, try to restore weeks and make selection visible
 			if (_tinyLayout) {
@@ -573,12 +592,12 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				_dt = _dt_normal;
 			}
 			scrollBarUpdate();
-			switch (_selectedItem.type) {
-			case DAY:
-//				gotoDate((DateTime)(_selectedItem.))
-				break;
-			case TOUR:
-				if (_selectedItem.id > 0) {
+			if (_selectedItem.id > 0) {
+				switch (_selectedItem.type) {
+				case DAY:
+					gotoDate(new DateTime(0).plusDays(_selectedItem.id.intValue()));
+					return;
+				case TOUR:
 					gotoTourId(_selectedItem.id);
 					return;
 				}
@@ -605,13 +624,38 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		gc.setForeground(_black);
 		gc.fillRectangle(area);
 
-		final float dX = (float) XX / (float) numCols;
 		final float dY = (float) YY / (float) numRows;
+		float dX = (float) XX / (float) numCols;
+
+		// keep the summary column at a minimal width and hide it completely if height goes blow usable value
+		final int minSummaryWidth = _refTextExtent.x;
+		final int minSummaryHeigth = (_refTextExtent.y * 2) / 3;
+		int summaryWidth = 0;
+		if (dY > minSummaryHeigth) {
+			if (dX < minSummaryWidth) {
+				summaryWidth = minSummaryWidth;
+			} else {
+				summaryWidth = (int) dX;
+			}
+		}
 		
-		_calendarAllDaysRectangle = new Rectangle((int) dX, 0, (int) (7 * dX), YY);
-		_calendarFirstWeekRectangle = new Rectangle((int) dX, 0, (int) (7 * dX), (int) dY);
+		final int minInfoWidth = _refTextExtent.x / 2;
+		final int minInfoHeigth = (_refTextExtent.y / 3);
+		int infoWidth = 0;
+		if (dY > minInfoHeigth) {
+			if (dX < minInfoWidth) {
+				infoWidth = minInfoWidth;
+			} else {
+				infoWidth = (int) dX;
+			}
+		}
+
+		dX = (float) (XX - summaryWidth - infoWidth) / (numCols - 2);
+
+		_calendarAllDaysRectangle = new Rectangle(infoWidth, 0, (int) (7 * dX), YY);
+		_calendarFirstWeekRectangle = new Rectangle(infoWidth, 0, (int) (7 * dX), (int) dY);
 		_calendarLastWeekRectangle = new Rectangle(
-				(int) dX,
+				infoWidth,
 				(int) ((getNumOfWeeks() - 1) * dY),
 				(int) (7 * dX),
 				(int) dY);
@@ -666,13 +710,15 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			// Days per week
 			Rectangle dayRec = null;
 			weekDate = date; // save the first day of this week as a pointer to this week
-			
-			final Rectangle infoRec = new Rectangle(0, Y1, (int) dX, (Y2 - Y1));
-			drawWeekInfo(gc, date, infoRec);
 
-			for (int j = 1; j < 8; j++) { // col 0 is for weekinfo, the week itself starts at col 1
-				final int X1 = (int) (j * dX);
-				final int X2 = (int) ((j + 1) * dX);
+			if (infoWidth > 0) {
+				final Rectangle infoRec = new Rectangle(0, Y1, infoWidth, (Y2 - Y1));
+				drawWeekInfo(gc, date, infoRec);
+			}
+
+			for (int j = 0; j < 7; j++) {
+				final int X1 = infoWidth + (int) (j * dX);
+				final int X2 = infoWidth + (int) ((j + 1) * dX);
 //				final Rectangle dayRec = new Rectangle(X1, Y1, (X2 - X1), (Y2 - Y1));
 				dayRec = new Rectangle(X1, Y1, (X2 - X1), (Y2 - Y1));
 				final Day day = new Day(dayId);
@@ -736,23 +782,25 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				date = date.plusDays(1);
 			}
 
-			final int X1 = (int) (8 * dX);
-			final int X2 = (int) ((8 + 1) * dX);
-			final Rectangle weekRec = new Rectangle(X1, Y1, (X2 - X1), (Y2 - Y1));
-			final CalendarTourData weekSummary = _dataProvider.getCalendarWeekSummaryData(
-					weekDate.getYear(),
-					weekDate.getWeekOfWeekyear());
-			if (weekSummary.numTours > 0) {
-				drawWeekSummary(gc, weekSummary, weekRec);
+			if (summaryWidth > 0) {
+				final int X1 = infoWidth + (int) (7 * dX);
+				final int X2 = X1 + summaryWidth;
+				final Rectangle weekRec = new Rectangle(X1, Y1, (X2 - X1), (Y2 - Y1));
+				final CalendarTourData weekSummary = _dataProvider.getCalendarWeekSummaryData(
+						weekDate.getYear(),
+						weekDate.getWeekOfWeekyear());
+				if (weekSummary.numTours > 0) {
+					drawWeekSummary(gc, weekSummary, weekRec);
+				}
 			}
-			
+
 		}
 		gc.setFont(normalFont);
 
 		// and finally the vertical lines
 		gc.setForeground(_display.getSystemColor(SWT.COLOR_GRAY));
-		for (int i = 0; i <= numCols; i++) {
-			gc.drawLine((int) (i * dX), 0, (int) (i * dX), YY);
+		for (int i = 0; i <= 7; i++) {
+			gc.drawLine(infoWidth + (int) (i * dX), 0, infoWidth + (int) (i * dX), YY);
 		}
 
 		// draw the selection on top of our calendar graph image so we can reuse that image
@@ -779,7 +827,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		} else {
 			max = _dynamicTourFieldSize ? data.length : Math.min(_numberOfToursPerDay, data.length);
 		}
-		for (int i = max - 1; i >= 0; i--) { // morning top, evening button
+		for (int i = 0; i < max; i++) {
 			int ddy;
 			if ((0 == _numberOfToursPerDay) || _tinyLayout) {
 				ddy = rec.height / data.length;
@@ -789,7 +837,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				ddy = _dynamicTourFieldSize ? (data.length <= _numberOfToursPerDay ? dy : (_numberOfToursPerDay * dy)
 						/ data.length) : dy;
 			}
-			final Rectangle tour = new Rectangle(rec.x + 1, rec.y + rec.height - (i + 1) * ddy, (rec.width - 2), ddy - 1);
+			// final Rectangle tour = new Rectangle(rec.x + 1, rec.y + rec.height - (i + 1) * ddy, (rec.width - 2), ddy - 1);
+			final int k = max - i; // morning top, evening button
+			final Rectangle tour = new Rectangle(rec.x + 1, rec.y + rec.height - k * ddy, (rec.width - 2), ddy - 1);
 			final Rectangle focus = new Rectangle(tour.x - 1, tour.y - 1, tour.width + 2, tour.height + 2);
 
 			_tourFocus.add(new ObjectLocation(focus, data[i].tourId, data[i]));
@@ -968,12 +1018,18 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		final Font boldFont = new Font(_display, fd[0]);
 
 		gc.setForeground(_darkGray);
+		gc.setBackground(_white);
 
 		gc.setFont(boldFont);
+		String text;
 		if (_tinyLayout) {
 			if (dt.minusDays(1).getMonthOfYear() != dt.plusDays(6).getMonthOfYear()) { // a new month started on this week
 				gc.setClipping(new Rectangle(rec.x, rec.y, rec.width, 4 * rec.height)); // clipp to the room left of this month
-				gc.drawText(dt.plusDays(6).toString("MMM"), rec.x + 2, rec.y + 2);
+				text = dt.plusDays(6).toString("MMM");
+				if (rec.width < (2 * _refTextExtent.x / 3)) {
+					text = text.substring(0, 1);
+				}
+				gc.drawText(text, rec.x + 2, rec.y + 2);
 				gc.setClipping(_nullRec);
 			}
 		} else {
@@ -1012,7 +1068,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		for (final WeekSummaryFormatter formatter : _weekSummaryFormatter) {
 			gc.setForeground(_colorCache.get(formatter.getColor().hashCode()));
 			text = formatter.format(data);
-			if (text.length() > 0 && y < rec.y + rec.height - minToShow) {
+			// if (text.length() > 0 && y < rec.y + rec.height - minToShow) {
+			if (text.length() > 0 && y < (rec.y + rec.height)) {
 				extent = gc.stringExtent(text);
 				xx = xr - extent.x;
 				if (extent.x > maxLength) {

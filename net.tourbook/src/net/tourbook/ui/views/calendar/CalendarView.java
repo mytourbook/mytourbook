@@ -192,7 +192,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 
 				@Override
 				String format(final CalendarTourData data) {
-					if (data.distance > 0) {
+					if (data.distance > 0 && data.recordingTime > 0) {
 						return new Formatter().format(
 								NLS.bind(Messages.Calendar_View_Format_Speed, UI.UNIT_LABEL_SPEED),
 								data.distance == 0 ? 0 : data.distance / (data.recordingTime / 3.6f)).toString();
@@ -838,11 +838,12 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		_cymci = new CalendarYearMonthContributionItem(_calendarGraph);
 		_calendarGraph.setYearMonthContributor(_cymci);
 		manager.add(_cymci);
-		manager.add(new Separator());
+		// don't repeat context menu...
+		// manager.add(new Separator());
 		// manager.add(_back);
 		// manager.add(_forward);
-		manager.add(_gotoToday);
-		manager.add(new Separator());
+		// manager.add(_gotoToday);
+		// manager.add(new Separator());
 		manager.add(_zoomIn);
 		manager.add(_zoomOut);
 		manager.add(new Separator());
@@ -1075,9 +1076,12 @@ public class CalendarView extends ViewPart implements ITourProvider {
 
 		_calendarGraph.setNumWeeksTinyLayout(Util.getStateInt(_state, STATE_NUM_OF_WEEKS_TINY, 15));
 
-		final Long dateTimeMillis = Util.getStateLong(_state, STATE_FIRST_DAY, (new DateTime()).getMillis());
-		final DateTime firstDate = new DateTime(dateTimeMillis);
-		_calendarGraph.setFirstDay(firstDate);
+		final Long dateTimeMillis = Util.getStateLong(_state, STATE_FIRST_DAY, 0);
+		if (dateTimeMillis > 0) {
+			_calendarGraph.setFirstDay(new DateTime(dateTimeMillis));
+		} else {
+			_calendarGraph.gotoDate(new DateTime());
+		}
 
 		final Long selectedTourId = Util.getStateLong(_state, STATE_SELECTED_TOURS, new Long(-1));
 		_calendarGraph.setSelectionTourId(selectedTourId);
