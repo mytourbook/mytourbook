@@ -181,10 +181,7 @@ public class SmoothingAlgorithmJamet implements ISmoothingAlgorithm {
 		/*
 		 * label: smooth gradient
 		 */
-		final Label label = _tk.createLabel(
-				parent,
-				Messages.TourChart_Smoothing_Label_GradientSmoothing,
-				SWT.CHECK);
+		final Label label = _tk.createLabel(parent, Messages.TourChart_Smoothing_Label_GradientSmoothing, SWT.CHECK);
 		GridDataFactory.fillDefaults() //
 				.align(SWT.FILL, SWT.CENTER)
 				.applyTo(label);
@@ -413,7 +410,12 @@ public class SmoothingAlgorithmJamet implements ISmoothingAlgorithm {
 			link.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					Util.openLink(Display.getCurrent().getActiveShell(), Messages.External_Link_TourChartSmoothing);
+					Util.openLink(//
+							Display.getCurrent().getActiveShell(),
+							//
+							// the url MUST be splitted otherwise the messages editor will truncate the url
+							//
+							Messages.External_Link_MyTourbook + Messages.External_Link_MyTourbook_TourChartSmoothing);
 				}
 			});
 			_tk.adapt(link, true, true);

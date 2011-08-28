@@ -487,7 +487,8 @@ public class Messages extends NLS {
 	public static String		Dlg_TourMarker_MsgBox_delete_marker_message;
 	public static String		Dlg_TourMarker_MsgBox_delete_marker_title;
 
-	public static String		External_Link_TourChartSmoothing;
+	public static String		External_Link_MyTourbook;
+	public static String		External_Link_MyTourbook_TourChartSmoothing;
 
 	public static String		Format_hhmm;
 	public static String		Format_hhmmss;
@@ -1321,7 +1322,6 @@ public class Messages extends NLS {
 	public static String		TourEditor_Dialog_ComputeDistanceValues_Title;
 	public static String		TourEditor_Dialog_DeleteDistanceValues_Message;
 	public static String		TourEditor_Dialog_DeleteDistanceValues_Title;
-
 	public static String		TourEditor_Dialog_SetAltitudeFromSRTM_Message;
 	public static String		TourEditor_Dialog_SetAltitudeFromSRTM_Title;
 
