@@ -3147,6 +3147,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	private void createTimeSeries10DataCompleting() {
 
+		createTimeSeries12RemoveInvalidDistanceValues();
+
 		// latitude and longitude
 		createTimeSeries20data_completing(latitudeSerie, timeSerie);
 		createTimeSeries20data_completing(longitudeSerie, timeSerie);
@@ -3162,6 +3164,27 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 		// pulse
 		createTimeSeries30data_completing(pulseSerie, timeSerie);
+	}
+
+	private void createTimeSeries12RemoveInvalidDistanceValues() {
+
+		if (isDistanceFromSensor == 1 || latitudeSerie == null || distanceSerie == null) {
+			return;
+		}
+
+		/*
+		 * Distance is measured with the gps device and not with a sensor. Remove all distance
+		 * values which are set but lat/lon is not available, this case can happen when a device is
+		 * in a tunnel. Distance values will be interpolited later.
+		 */
+
+		final int size = timeSerie.length;
+
+		for (int serieIndex = 0; serieIndex < size; serieIndex++) {
+			if (latitudeSerie[serieIndex] == Double.MIN_VALUE) {
+				distanceSerie[serieIndex] = Integer.MIN_VALUE;
+			}
+		}
 	}
 
 	private void createTimeSeries20data_completing(final double[] field, final int[] time) {
@@ -3204,7 +3227,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 				for (int interpolationIndex = serieIndex; interpolationIndex < nextValidIndex; interpolationIndex++) {
 
-					field[interpolationIndex] = createTimeSeries50linear_interpolation(
+					field[interpolationIndex] = createTimeSeries40linear_interpolation(
 							time1,
 							time2,
 							val1,
@@ -3259,7 +3282,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 				for (int interpolationIndex = serieIndex; interpolationIndex < nextValidIndex; interpolationIndex++) {
 
-					final double linearInterpolation = createTimeSeries50linear_interpolation(
+					final double linearInterpolation = createTimeSeries40linear_interpolation(
 							time1,
 							time2,
 							val1,
@@ -3274,7 +3297,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 	}
 
-	private double createTimeSeries50linear_interpolation(	final double time1,
+	private double createTimeSeries40linear_interpolation(	final double time1,
 															final double time2,
 															final double val1,
 															final double val2,
@@ -4015,7 +4038,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 				computeBreakTimeFixed(minBreakTime / deviceTimeInterval);
 			}
-			
+
 			computeTourDrivingTime();
 		}
 
