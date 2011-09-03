@@ -3703,6 +3703,10 @@ public class Map extends Canvas {
 		boolean refresh = false;
 
 		if (_mp != null) {
+
+			// stop downloading images for the old map provider
+			_mp.resetAll(true);
+
 			center = getGeoCenter();
 			zoom = _mapZoomLevel;
 			refresh = true;
@@ -3963,6 +3967,9 @@ public class Map extends Canvas {
 		if (_mp == null) {
 			return;
 		}
+
+		// stop downloading images for the old zoom level
+		_mp.resetAll(true);
 
 		/*
 		 * check if the requested zoom level is within the bounds of the map provider
