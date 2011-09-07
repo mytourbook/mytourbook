@@ -2966,8 +2966,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 					// 1..n trackpoint
 
 					/*
-					 * time: absolute time is checked againt last valid time because this case
-					 * happened and time can NOT be in the past.
+					 * time: absolute time is checked against last valid time because this case
+					 * happened but time can NOT be in the past.
 					 */
 					if (absoluteTime == Long.MIN_VALUE || absoluteTime < lastValidAbsoluteTime) {
 						recordingTime = lastValidTime;
@@ -3025,13 +3025,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 				}
 
 				/*
-				 * cadence
-				 */
-				if (isCadence) {
-					cadenceSerie[serieIndex] = timeData.cadence;
-				}
-
-				/*
 				 * temperature
 				 */
 				if (isTemperature) {
@@ -3039,9 +3032,19 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 				}
 
 				/*
+				 * cadence
+				 */
+				if (isCadence) {
+					// cadence is not interpolated, ensure to set valid values
+					final int tdCadence = timeData.cadence;
+					cadenceSerie[serieIndex] = tdCadence == Integer.MIN_VALUE ? 0 : tdCadence;
+				}
+
+				/*
 				 * speed
 				 */
 				if (isSpeed) {
+					// speed is not interpolated, ensure to set valid values
 					final int tdSpeed = timeData.speed;
 					speedSerie[serieIndex] = tdSpeed == Integer.MIN_VALUE ? 0 : tdSpeed;
 				}
@@ -3149,20 +3152,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 		createTimeSeries12RemoveInvalidDistanceValues();
 
-		// latitude and longitude
 		createTimeSeries20data_completing(latitudeSerie, timeSerie);
 		createTimeSeries20data_completing(longitudeSerie, timeSerie);
 
-		// altitude
 		createTimeSeries30data_completing(altitudeSerie, timeSerie);
-
-		// distance
 		createTimeSeries30data_completing(distanceSerie, timeSerie);
-
-		// temperature
 		createTimeSeries30data_completing(temperatureSerie, timeSerie);
-
-		// pulse
 		createTimeSeries30data_completing(pulseSerie, timeSerie);
 	}
 

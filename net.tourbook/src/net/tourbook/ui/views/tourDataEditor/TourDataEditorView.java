@@ -4394,7 +4394,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 								/ _unitValueDistance;
 
 						final float distDiff = distance - distancePrevious;
-						final float speed = distDiff * 3600f / timeDiff;
+						final float speed = timeDiff == 0 ? 0 : distDiff * 3600f / timeDiff;
 
 						cell.setText(_nf1.format(speed));
 					}
