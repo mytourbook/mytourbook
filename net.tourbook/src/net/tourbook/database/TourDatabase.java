@@ -86,7 +86,7 @@ public class TourDatabase {
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int						TOURBOOK_DB_VERSION							= 19;
+	private static final int						TOURBOOK_DB_VERSION							= 20;													// 11.after8
 
 //	private static final int						TOURBOOK_DB_VERSION							= 19;	// 11.8
 //	private static final int						TOURBOOK_DB_VERSION							= 18;	// 11.8
@@ -2883,6 +2883,10 @@ public class TourDatabase {
 				currentDbVersion = newVersion = updateDbDesign_018_to_019(conn, monitor);
 			}
 
+			if (currentDbVersion == 19) {
+				currentDbVersion = newVersion = updateDbDesign_019_to_020(conn, monitor);
+			}
+
 			/*
 			 * update version number
 			 */
@@ -3736,6 +3740,52 @@ public class TourDatabase {
 
 		}
 		stmt.close();
+
+		logDbUpdateEnd(newDbVersion);
+
+		return newDbVersion;
+	}
+
+	private int updateDbDesign_019_to_020(final Connection conn, final IProgressMonitor monitor) throws SQLException {
+
+		final int newDbVersion = 20;
+
+		logDbUpdateStart(newDbVersion);
+
+		if (monitor != null) {
+			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, newDbVersion));
+		}
+
+		{
+			ResultSet rsColumns = null;
+			final DatabaseMetaData meta = conn.getMetaData();
+			rsColumns = meta.getColumns(null, TABLE_SCHEMA, TABLE_TOUR_DATA, "SERIEDATA"); //$NON-NLS-1$
+
+			while (rsColumns.next()) {
+
+				final int size = rsColumns.getInt("COLUMN_SIZE"); //$NON-NLS-1$
+				if (size == 1048576) {
+
+					/*
+					 * database is from a derby version before 10.5 which creates BLOB's with a
+					 * default size of 1M, increase size to 2G because a tour with 53000 can not be
+					 * saves and causes an exception
+					 */
+
+					String sql;
+					final Statement stmt = conn.createStatement();
+					{
+						// ALTER TABLE TourData ALTER COLUMN SerieData SET DATA TYPE BLOB(2G)
+
+						sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ALTER COLUMN SerieData SET DATA TYPE BLOB(2G)"; //$NON-NLS-1$ //$NON-NLS-2$
+						exec(stmt, sql);
+					}
+					stmt.close();
+				}
+
+				break;
+			}
+		}
 
 		logDbUpdateEnd(newDbVersion);
 
