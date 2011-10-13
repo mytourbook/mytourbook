@@ -81,13 +81,12 @@ import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 public class TourDatabase {
 
-	private static final int						MAX_TRIES_TO_PING_SERVER					= 10;
-
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int						TOURBOOK_DB_VERSION							= 20;													// 11.after8
+	private static final int						TOURBOOK_DB_VERSION							= 20;
 
+//	private static final int						TOURBOOK_DB_VERSION							= 20;	// 11.?????
 //	private static final int						TOURBOOK_DB_VERSION							= 19;	// 11.8
 //	private static final int						TOURBOOK_DB_VERSION							= 18;	// 11.8
 //	private static final int						TOURBOOK_DB_VERSION							= 17;	// 11.8
@@ -108,6 +107,8 @@ public class TourDatabase {
 
 	private static final String						DERBY_CLIENT_DRIVER							= "org.apache.derby.jdbc.ClientDriver";				//$NON-NLS-1$
 	private static final String						DERBY_URL									= "jdbc:derby://localhost:1527/tourbook;create=true";	//$NON-NLS-1$
+
+	private static final int						MAX_TRIES_TO_PING_SERVER					= 10;
 
 	/*
 	 * !!! database tables, names are set to uppercase otherwise conn.getMetaData().getColumns()
@@ -1903,6 +1904,7 @@ public class TourDatabase {
 				+ "	tourDrivingTime 		INTEGER NOT NULL,						\n" //$NON-NLS-1$
 				+ "	tourAltUp 				INTEGER NOT NULL,						\n" //$NON-NLS-1$
 				+ "	tourAltDown 			INTEGER NOT NULL,						\n" //$NON-NLS-1$
+
 				+ ("	deviceTourType 		" + varCharKomma(TourData.DB_LENGTH_DEVICE_TOUR_TYPE)) //$NON-NLS-1$
 				+ "	deviceTravelTime 		BIGINT NOT NULL,						\n" //$NON-NLS-1$
 				+ "	deviceDistance 			INTEGER NOT NULL,						\n" //$NON-NLS-1$
@@ -2771,17 +2773,18 @@ public class TourDatabase {
 				TOURBOOK_DB_VERSION,
 				_databasePath });
 
-		final MessageDialog dialog = new MessageDialog(
+		if ((new MessageDialog(
 				Display.getDefault().getActiveShell(),
 				Messages.Database_Confirm_update_title,
 				null,
 				message,
 				MessageDialog.QUESTION,
 				buttons,
-				1);
+				1).open()) != Window.OK) {
 
-		if ((dialog.open()) != Window.OK) {
+			// no update -> close application
 			PlatformUI.getWorkbench().close();
+
 			return false;
 		}
 
@@ -3757,40 +3760,89 @@ public class TourDatabase {
 		}
 
 		{
-			ResultSet rsColumns = null;
-			final DatabaseMetaData meta = conn.getMetaData();
-			rsColumns = meta.getColumns(null, TABLE_SCHEMA, TABLE_TOUR_DATA, "SERIEDATA"); //$NON-NLS-1$
+			updateDbDesign_020_10DataSerieBlobSize(conn);
+//			updateDbDesign_020_20DropColumns(conn);
 
-			while (rsColumns.next()) {
-
-				final int size = rsColumns.getInt("COLUMN_SIZE"); //$NON-NLS-1$
-				if (size == 1048576) {
-
-					/*
-					 * database is from a derby version before 10.5 which creates BLOB's with a
-					 * default size of 1M, increase size to 2G because a tour with 53000 can not be
-					 * saves and causes an exception
-					 */
-
-					String sql;
-					final Statement stmt = conn.createStatement();
-					{
-						// ALTER TABLE TourData ALTER COLUMN SerieData SET DATA TYPE BLOB(2G)
-
-						sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ALTER COLUMN SerieData SET DATA TYPE BLOB(2G)"; //$NON-NLS-1$ //$NON-NLS-2$
-						exec(stmt, sql);
-					}
-					stmt.close();
-				}
-
-				break;
-			}
 		}
 
 		logDbUpdateEnd(newDbVersion);
 
 		return newDbVersion;
 	}
+
+	private void updateDbDesign_020_10DataSerieBlobSize(final Connection conn) throws SQLException {
+
+		final DatabaseMetaData meta = conn.getMetaData();
+
+		final ResultSet rsColumns = meta.getColumns(null, TABLE_SCHEMA, TABLE_TOUR_DATA, "SERIEDATA"); //$NON-NLS-1$
+
+		while (rsColumns.next()) {
+
+			final int size = rsColumns.getInt("COLUMN_SIZE"); //$NON-NLS-1$
+			if (size == 1048576) {
+
+				/*
+				 * database is from a derby version before 10.5 which creates BLOB's with a default
+				 * size of 1M, increase size to 2G because a tour with 53000 can not be saves and
+				 * causes an exception
+				 */
+
+				String sql;
+				final Statement stmt = conn.createStatement();
+				{
+					// ALTER TABLE TourData ALTER COLUMN SerieData SET DATA TYPE BLOB(2G)
+
+					sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ALTER COLUMN SerieData SET DATA TYPE BLOB(2G)"; //$NON-NLS-1$ //$NON-NLS-2$
+					exec(stmt, sql);
+				}
+				stmt.close();
+			}
+
+			break;
+		}
+	}
+
+//	private void updateDbDesign_020_20DropColumns(final Connection conn) throws SQLException {
+//
+//		String sql;
+//		final Statement stmt = conn.createStatement();
+//		{
+////				TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA
+////
+////				+ "	distance 				INTEGER NOT NULL,						\n" //$NON-NLS-1$
+////				+ "	deviceDistance 			INTEGER NOT NULL,						\n" //$NON-NLS-1$
+////				+ "	deviceTravelTime 		BIGINT NOT NULL,						\n" //$NON-NLS-1$
+////				+ "	deviceWheel 			INTEGER NOT NULL,						\n" //$NON-NLS-1$
+////				+ "	deviceWeight 			INTEGER NOT NULL,						\n" //$NON-NLS-1$
+////				+ "	deviceTotalUp 			INTEGER NOT NULL,						\n" //$NON-NLS-1$
+////				+ "	deviceTotalDown 		INTEGER NOT NULL,						\n" //$NON-NLS-1$
+////
+////				TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA
+//
+//			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " DROP distance";//$NON-NLS-1$ //$NON-NLS-2$
+//			exec(stmt, sql);
+//
+//			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " DROP deviceDistance";//$NON-NLS-1$ //$NON-NLS-2$
+//			exec(stmt, sql);
+//
+//			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " DROP deviceTravelTime";//$NON-NLS-1$ //$NON-NLS-2$
+//			exec(stmt, sql);
+//
+//			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " DROP deviceWheel";//$NON-NLS-1$ //$NON-NLS-2$
+//			exec(stmt, sql);
+//
+//			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " DROP deviceWeight";//$NON-NLS-1$ //$NON-NLS-2$
+//			exec(stmt, sql);
+//
+//			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " DROP deviceTotalUp";//$NON-NLS-1$ //$NON-NLS-2$
+//			exec(stmt, sql);
+//
+//			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " DROP deviceTotalDown";//$NON-NLS-1$ //$NON-NLS-2$
+//			exec(stmt, sql);
+//
+//		}
+//		stmt.close();
+//	}
 
 	private void updateDbVersionNumber(final Connection conn, final int newVersion) throws SQLException {
 

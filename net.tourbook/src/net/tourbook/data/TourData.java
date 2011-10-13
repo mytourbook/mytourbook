@@ -599,56 +599,56 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * contains the absolute distance in m (metric system)
 	 */
 	@Transient
-	public int[]											distanceSerie;
+	public float[]											distanceSerie;
 
 	/**
 	 * contains the absolute distance in miles/1000 (imperial system)
 	 */
 	@Transient
-	private int[]											distanceSerieImperial;
+	private float[]											distanceSerieImperial;
 
 	/**
 	 * contains the absolute altitude in m (metric system)
 	 */
 	@Transient
-	public int[]											altitudeSerie;
+	public float[]											altitudeSerie;
 
 	/**
 	 * smoothed altitude serie is used to display the tour chart when not <code>null</code>
 	 */
 	@Transient
-	private int[]											altitudeSerieSmoothed;
+	private float[]											altitudeSerieSmoothed;
 
 	/**
 	 * contains the absolute altitude in feet (imperial system)
 	 */
 	@Transient
-	private int[]											altitudeSerieImperial;
+	private float[]											altitudeSerieImperial;
 
 	/**
 	 * smoothed altitude serie is used to display the tour chart when not <code>null</code>
 	 */
 	@Transient
-	private int[]											altitudeSerieImperialSmoothed;
+	private float[]											altitudeSerieImperialSmoothed;
 
 	/**
 	 * SRTM altitude values, when <code>null</code> srtm data have not yet been attached, when
 	 * <code>length()==0</code> data are invalid.
 	 */
 	@Transient
-	private int[]											srtmSerie;
+	private float[]											srtmSerie;
 
 	@Transient
-	private int[]											srtmSerieImperial;
+	private float[]											srtmSerieImperial;
 
 	@Transient
-	public int[]											cadenceSerie;
+	public float[]											cadenceSerie;
 
 	@Transient
-	public int[]											pulseSerie;
+	public float[]											pulseSerie;
 
 	@Transient
-	public int[]											pulseSerieSmoothed;
+	public float[]											pulseSerieSmoothed;
 
 	/**
 	 * Contains <code>true</code> or <code>false</code> for each time slice of the whole tour.
@@ -662,13 +662,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * {@link #temperatureScale}.
 	 */
 	@Transient
-	public int[]											temperatureSerie;
+	public float[]											temperatureSerie;
 
 	/**
 	 * contains the temperature in the imperial measurement system
 	 */
 	@Transient
-	private int[]											temperatureSerieImperial;
+	private float[]											temperatureSerieImperial;
 
 	/**
 	 * contains speed in km/h multiplied by {@link TourManager#SPEED_DIVISOR}
@@ -677,10 +677,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * system is imperial
 	 */
 	@Transient
-	private int[]											speedSerie;
+	private float[]											speedSerie;
 
 	@Transient
-	private int[]											speedSerieImperial;
+	private float[]											speedSerieImperial;
 
 	/**
 	 * Is <code>true</code> when the data in {@link #speedSerie} are from the device and not
@@ -693,28 +693,28 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * pace in min/km
 	 */
 	@Transient
-	private int[]											paceSerieMinute;
+	private float[]											paceSerieMinute;
 
 	/**
 	 * pace in sec/km
 	 */
 	@Transient
-	private int[]											paceSerieSeconds;
+	private float[]											paceSerieSeconds;
 
 	/**
 	 * pace in min/mile
 	 */
 	@Transient
-	private int[]											paceSerieMinuteImperial;
+	private float[]											paceSerieMinuteImperial;
 
 	/**
 	 * pace in sec/mile
 	 */
 	@Transient
-	private int[]											paceSerieSecondsImperial;
+	private float[]											paceSerieSecondsImperial;
 
 	@Transient
-	private int[]											powerSerie;
+	private float[]											powerSerie;
 
 	/**
 	 * Is <code>true</code> when the data in {@link #powerSerie} are from the device and not
@@ -724,16 +724,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private boolean											isPowerSerieFromDevice				= false;
 
 	@Transient
-	private int[]											altimeterSerie;
+	private float[]											altimeterSerie;
 
 	@Transient
-	private int[]											altimeterSerieImperial;
+	private float[]											altimeterSerieImperial;
 
 	@Transient
-	public int[]											gradientSerie;
+	public float[]											gradientSerie;
 
 	@Transient
-	public int[]											tourCompareSerie;
+	public float[]											tourCompareSerie;
 
 	/*
 	 * computed data series
@@ -778,38 +778,32 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public int[]											segmentSerieDrivingTime;
 	@Transient
 	public int[]											segmentSerieBreakTime;
-	@Transient
-	public int[]											segmentSerieDistanceDiff;
 
 	@Transient
-	public int[]											segmentSerieDistanceTotal;
+	public float[]											segmentSerieDistanceDiff;
 	@Transient
-	public int[]											segmentSerieAltitudeDiff;
-
+	public float[]											segmentSerieDistanceTotal;
 	@Transient
-	public int[]											segmentSerieComputedAltitudeDiff;
+	public float[]											segmentSerieAltitudeDiff;
+	@Transient
+	public float[]											segmentSerieComputedAltitudeDiff;
 	@Transient
 	public float[]											segmentSerieAltitudeUpH;
-
 	@Transient
-	public int[]											segmentSerieAltitudeDownH;
+	public float[]											segmentSerieAltitudeDownH;
+
 	@Transient
 	public float[]											segmentSerieSpeed;
-
 	@Transient
 	public float[]											segmentSeriePace;
 	@Transient
 	public float[]											segmentSeriePaceDiff;
 	@Transient
 	public float[]											segmentSeriePower;
-
 	@Transient
 	public float[]											segmentSerieGradient;
 	@Transient
 	public float[]											segmentSeriePulse;
-
-//	@Transient
-//	public float[]											segmentSerieCadence;
 
 	/**
 	 * contains the filename from which the data are imported, when set to <code>null</code> the
@@ -875,19 +869,19 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * or the adjusted altitude
 	 */
 	@Transient
-	public int[]											dataSerie2ndAlti;
+	public float[]											dataSerie2ndAlti;
 
 	/**
 	 * altitude difference between this tour and the merge tour with metric measurement
 	 */
 	@Transient
-	public int[]											dataSerieDiffTo2ndAlti;
+	public float[]											dataSerieDiffTo2ndAlti;
 
 	/**
 	 * contains the altitude serie which is adjusted
 	 */
 	@Transient
-	public int[]											dataSerieAdjustedAlti;
+	public float[]											dataSerieAdjustedAlti;
 
 	/**
 	 * contains special data points
