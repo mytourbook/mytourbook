@@ -26,8 +26,8 @@ import java.sql.Date;
 /**
  * Contains data for one time slice.
  * <p>
- * Data are not available when a value is set to {@link Long#MIN_VALUE}, {@link Integer#MIN_VALUE}.
- * {@link Float#MIN_VALUE} or {@link Double#MIN_VALUE}.
+ * Data are not available when a value is set to {@link Long#MIN_VALUE}, {@link Float#MIN_VALUE} or
+ * {@link Double#MIN_VALUE}.
  */
 public class TimeData implements Serializable {
 
@@ -52,26 +52,26 @@ public class TimeData implements Serializable {
 	public int					relativeTime;
 
 	/**
-	 * Absolute value for temperature in metric measurement system or {@link Integer#MIN_VALUE} when
+	 * Absolute value for temperature in metric measurement system or {@link Float#MIN_VALUE} when
 	 * value is not set
 	 */
-	public int					temperature			= Integer.MIN_VALUE;
+	public float				temperature			= Float.MIN_VALUE;
 
 	/**
-	 * absolute value for cadence or {@link Integer#MIN_VALUE} when cadence is not set
+	 * absolute value for cadence or {@link Float#MIN_VALUE} when cadence is not set
 	 */
-	public int					cadence				= Integer.MIN_VALUE;
+	public float				cadence				= Float.MIN_VALUE;
 
 	/**
-	 * absolute value for pulse or {@link Integer#MIN_VALUE} when value is not set
+	 * absolute value for pulse or {@link Float#MIN_VALUE} when value is not set
 	 */
-	public int					pulse				= Integer.MIN_VALUE;
+	public float				pulse				= Float.MIN_VALUE;
 
 	/**
 	 * relative value for altitude, this is the difference for the altitude with the previous time
-	 * slice. Contains {@link Integer#MIN_VALUE} when value is not set.
+	 * slice. Contains {@link Float#MIN_VALUE} when value is not set.
 	 */
-	public int					altitude			= Integer.MIN_VALUE;
+	public float				altitude			= Float.MIN_VALUE;
 
 	/**
 	 * Contains the absolute altitude in meters or {@link Float#MIN_VALUE} when altitude is not set.
@@ -80,9 +80,9 @@ public class TimeData implements Serializable {
 
 	/**
 	 * relative value for distance in meters, this is the difference for the distance with the
-	 * previous time slice. Contains {@link Integer#MIN_VALUE} when value is not set.
+	 * previous time slice. Contains {@link Float#MIN_VALUE} when value is not set.
 	 */
-	public int					distance			= Integer.MIN_VALUE;
+	public float				distance			= Float.MIN_VALUE;
 
 	/**
 	 * Relative value for distance in meters, this is the difference for the distance with the
@@ -97,16 +97,16 @@ public class TimeData implements Serializable {
 
 	/**
 	 * absolute value for power, power is typically provided by an ergo trainer. Contains
-	 * {@link Integer#MIN_VALUE} when value is not set.
+	 * {@link Float#MIN_VALUE} when value is not set.
 	 */
-	public int					power				= Integer.MIN_VALUE;
+	public float				power				= Float.MIN_VALUE;
 
 	/**
 	 * speed in km/h multiplied by 10, speed is typically provided by an ergo trainer not from a
-	 * bike computer, Polar provides speed but is ignored. Contains {@link Integer#MIN_VALUE} when
+	 * bike computer, Polar provides speed but is ignored. Contains {@link Float#MIN_VALUE} when
 	 * value is not set.
 	 */
-	public int					speed				= Integer.MIN_VALUE;
+	public float				speed				= Float.MIN_VALUE;
 
 	/**
 	 * Absolute value for latitude. Contains {@link Double#MIN_VALUE} when value is not set.

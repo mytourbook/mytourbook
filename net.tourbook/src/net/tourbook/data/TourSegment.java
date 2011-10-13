@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -25,27 +25,27 @@ public class TourSegment {
 	public int		breakTime;
 	public int		timeTotal;
 
-	public int		distanceDiff;
-	public int		distanceTotal;
+	public float	distanceDiff;
+	public float	distanceTotal;
 
-	public int		altitudeUpHour;
-	public int		altitudeUpSummarizedBorder;
-	public int		altitudeUpSummarizedComputed;
+	public float	altitudeUpHour;
+	public float	altitudeUpSummarizedBorder;
+	public float	altitudeUpSummarizedComputed;
 
-	public int		altitudeDownHour;
-	public int		altitudeDownSummarizedBorder;
-	public int		altitudeDownSummarizedComputed;
+	public float	altitudeDownHour;
+	public float	altitudeDownSummarizedBorder;
+	public float	altitudeDownSummarizedComputed;
 
-	public int		altitudeDiffSegmentBorder;
-	public int		altitudeDiffSegmentComputed;
+	public float	altitudeDiffSegmentBorder;
+	public float	altitudeDiffSegmentComputed;
 
 	public float	speed;
 	public float	gradient;
-	public int		power;
+	public float	power;
 
-	public int		pace;
-	public int		paceDiff;
-	public int		pulse;
-	public int		pulseDiff;
+	public float	pace;
+	public float	paceDiff;
+	public float	pulse;
+	public float	pulseDiff;
 
 }

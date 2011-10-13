@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,14 +17,13 @@ package net.tourbook.data;
 
 public class AltitudeUpDownSegment {
 
-	public int	serieIndex;
-
-	public int	computedAltitudeDiff;
+	public int		serieIndex;
+	public float	computedAltitudeDiff;
 
 	@SuppressWarnings("unused")
 	private AltitudeUpDownSegment() {}
 
-	public AltitudeUpDownSegment(final int segmentSerieIndex, final int altitudeDiff) {
+	public AltitudeUpDownSegment(final int segmentSerieIndex, final float altitudeDiff) {
 		serieIndex = segmentSerieIndex;
 		computedAltitudeDiff = altitudeDiff;
 	}

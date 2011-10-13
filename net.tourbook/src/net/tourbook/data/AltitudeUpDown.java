@@ -17,10 +17,10 @@ package net.tourbook.data;
 
 public class AltitudeUpDown {
 
-	int	altitudeUp;
-	int	altitudeDown;
+	float	altitudeUp;
+	float	altitudeDown;
 
-	public AltitudeUpDown(final int altiUp, final int altiDown) {
+	public AltitudeUpDown(final float altiUp, final float altiDown) {
 		altitudeUp = altiUp;
 		altitudeDown = altiDown;
 	}

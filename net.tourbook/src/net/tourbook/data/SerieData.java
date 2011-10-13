@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,15 +29,15 @@ public class SerieData implements Serializable {
 	private static final long	serialVersionUID	= 1L;
 
 	public int					timeSerie[];
-	public int					distanceSerie[];
 
-	public int					altitudeSerie[];
-	public int					cadenceSerie[];
-	public int					pulseSerie[];
-	public int					temperatureSerie[];
+	public float				distanceSerie[];
+	public float				altitudeSerie[];
+	public float				cadenceSerie[];
+	public float				pulseSerie[];
+	public float				temperatureSerie[];
 
-	public int					speedSerie[];
-	public int					powerSerie[];
+	public float				speedSerie[];
+	public float				powerSerie[];
 
 	public int					deviceMarker[];
 

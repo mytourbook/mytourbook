@@ -556,7 +556,7 @@ public class GarminSAXHandler extends DefaultHandler {
 		tourData.setCalories(_tourCalories);
 
 		// after all data are added, the tour id can be created
-		final int[] distanceSerie = tourData.getMetricDistanceSerie();
+		final float[] distanceSerie = tourData.getMetricDistanceSerie();
 		String uniqueKey;
 
 		if (_deviceDataReader.isCreateTourIdWithRecordingTime) {
@@ -572,7 +572,7 @@ public class GarminSAXHandler extends DefaultHandler {
 				uniqueKey = Integer.toString(tourRecordingTime);
 			} else {
 
-				final long tourDistance = distanceSerie[(distanceSerie.length - 1)];
+				final long tourDistance = (long) distanceSerie[(distanceSerie.length - 1)];
 
 				uniqueKey = Long.toString(tourDistance + tourRecordingTime);
 			}
@@ -585,7 +585,7 @@ public class GarminSAXHandler extends DefaultHandler {
 			if (distanceSerie == null) {
 				uniqueKey = Util.UNIQUE_ID_SUFFIX_GARMIN_TCX;
 			} else {
-				uniqueKey = Integer.toString(distanceSerie[distanceSerie.length - 1]);
+				uniqueKey = Integer.toString((int) distanceSerie[distanceSerie.length - 1]);
 			}
 		}
 
@@ -732,9 +732,7 @@ public class GarminSAXHandler extends DefaultHandler {
 			_isInHeartRateValue = false;
 
 			if (_dataVersion == 2) {
-				final short pulse = getShortValue(_characters.toString());
-//				pulse = pulse == Integer.MIN_VALUE ? 0 : pulse;
-				_timeData.pulse = pulse;
+				_timeData.pulse = getShortValue(_characters.toString());
 			}
 
 		} else if (name.equals(TAG_HEART_RATE_BPM)) {
@@ -742,9 +740,7 @@ public class GarminSAXHandler extends DefaultHandler {
 			_isInHeartRate = false;
 
 			if (_dataVersion == 1) {
-				final short pulse = getShortValue(_characters.toString());
-//				pulse = pulse == Integer.MIN_VALUE ? 0 : pulse;
-				_timeData.pulse = pulse;
+				_timeData.pulse = getShortValue(_characters.toString());
 			}
 
 		} else if (name.equals(TAG_ALTITUDE_METERS)) {
@@ -762,8 +758,7 @@ public class GarminSAXHandler extends DefaultHandler {
 
 			_isInCadence = false;
 			short cadence = getShortValue(_characters.toString());
-			cadence = cadence == Integer.MIN_VALUE ? 0 : cadence;
-			_timeData.cadence = cadence;
+			_timeData.cadence = cadence = cadence == Integer.MIN_VALUE ? 0 : cadence;
 
 		} else if (name.equals(TAG_SENSOR_STATE)) {
 
