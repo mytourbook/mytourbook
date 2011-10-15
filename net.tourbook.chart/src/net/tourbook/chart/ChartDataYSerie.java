@@ -102,6 +102,26 @@ public class ChartDataYSerie extends ChartDataSerie {
 	 */
 //	private int						_disabledLineToNext;
 
+	public ChartDataYSerie(final int chartType, final float[] valueSerie) {
+		_chartType = chartType;
+		setMinMaxValues(new float[][] { valueSerie });
+	}
+
+	public ChartDataYSerie(final int chartType, final float[] lowValueSerie, final float[] highValueSerie) {
+		_chartType = chartType;
+		setMinMaxValues(new float[][] { lowValueSerie }, new float[][] { highValueSerie });
+	}
+
+	public ChartDataYSerie(final int chartType, final float[][] valueSeries) {
+		_chartType = chartType;
+		setMinMaxValues(valueSeries);
+	}
+
+	public ChartDataYSerie(final int chartType, final float[][] lowValueSeries, final float[][] highValueSeries) {
+		_chartType = chartType;
+		setMinMaxValues(lowValueSeries, highValueSeries);
+	}
+
 	/**
 	 * 2nd y-data serie is currently used to display the slider label and the pace y-units
 	 */
@@ -109,32 +129,12 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 	public ChartDataYSerie(	final int chartType,
 							final int chartLayout,
-							final int[][] lowValueSeries,
-							final int[][] highValueSeries) {
+							final float[][] lowValueSeries,
+							final float[][] highValueSeries) {
 
 		_chartType = chartType;
 		_chartLayout = chartLayout;
 
-		setMinMaxValues(lowValueSeries, highValueSeries);
-	}
-
-	public ChartDataYSerie(final int chartType, final int[] valueSerie) {
-		_chartType = chartType;
-		setMinMaxValues(new int[][] { valueSerie });
-	}
-
-	public ChartDataYSerie(final int chartType, final int[] lowValueSerie, final int[] highValueSerie) {
-		_chartType = chartType;
-		setMinMaxValues(new int[][] { lowValueSerie }, new int[][] { highValueSerie });
-	}
-
-	public ChartDataYSerie(final int chartType, final int[][] valueSeries) {
-		_chartType = chartType;
-		setMinMaxValues(valueSeries);
-	}
-
-	public ChartDataYSerie(final int chartType, final int[][] lowValueSeries, final int[][] highValueSeries) {
-		_chartType = chartType;
 		setMinMaxValues(lowValueSeries, highValueSeries);
 	}
 
@@ -285,10 +285,10 @@ public class ChartDataYSerie extends ChartDataSerie {
 	}
 
 	@Override
-	void setMinMaxValues(final int[][] valueSeries) {
+	void setMinMaxValues(final float[][] valueSeries) {
 
 		if (valueSeries == null || valueSeries.length == 0 || valueSeries[0] == null || valueSeries[0].length == 0) {
-			_highValues = new int[0][0];
+			_highValues = new float[0][0];
 			_visibleMaxValue = _visibleMinValue = 0;
 			_originalMaxValue = _originalMinValue = 0;
 
@@ -312,8 +312,8 @@ public class ChartDataYSerie extends ChartDataSerie {
 				case ChartDataYSerie.BAR_LAYOUT_BESIDE:
 
 					// get the min/max highValues for all data
-					for (final int[] valuesOuter : valueSeries) {
-						for (final int valuesInner : valuesOuter) {
+					for (final float[] valuesOuter : valueSeries) {
+						for (final float valuesInner : valuesOuter) {
 							_visibleMaxValue = (_visibleMaxValue >= valuesInner) ? _visibleMaxValue : valuesInner;
 							_visibleMinValue = (_visibleMinValue <= valuesInner) ? _visibleMinValue : valuesInner;
 						}
@@ -322,15 +322,15 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 				case ChartDataYSerie.BAR_LAYOUT_STACKED:
 
-					final int serieMax[] = new int[valueSeries[0].length];
+					final float serieMax[] = new float[valueSeries[0].length];
 
 					// get the max value for the data which are stacked on each
 					// other
-					for (final int[] valuesOuter : valueSeries) {
+					for (final float[] valuesOuter : valueSeries) {
 						for (int valueIndex = 0; valueIndex < valuesOuter.length; valueIndex++) {
 
-							final int outerValue = valuesOuter[valueIndex];
-							final int outerValueWithMax = serieMax[valueIndex] + outerValue;
+							final float outerValue = valuesOuter[valueIndex];
+							final float outerValueWithMax = serieMax[valueIndex] + outerValue;
 
 							serieMax[valueIndex] = (_visibleMaxValue >= outerValueWithMax)
 									? _visibleMaxValue
@@ -342,7 +342,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 					// get max for all series
 					_visibleMaxValue = 0;
-					for (final int serieValue : serieMax) {
+					for (final float serieValue : serieMax) {
 						_visibleMaxValue = (_visibleMaxValue >= serieValue) ? _visibleMaxValue : serieValue;
 					}
 
@@ -356,7 +356,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 	}
 
 	@Override
-	void setMinMaxValues(final int[][] lowValues, final int[][] highValues) {
+	void setMinMaxValues(final float[][] lowValues, final float[][] highValues) {
 
 		if (lowValues == null || lowValues.length == 0 || lowValues[0] == null || lowValues[0].length == 0
 
@@ -365,8 +365,8 @@ public class ChartDataYSerie extends ChartDataSerie {
 			_visibleMaxValue = _visibleMinValue = 0;
 			_originalMaxValue = _originalMinValue = 0;
 
-			_lowValues = new int[1][2];
-			_highValues = new int[1][2];
+			_lowValues = new float[1][2];
+			_highValues = new float[1][2];
 
 		} else {
 
@@ -383,14 +383,14 @@ public class ChartDataYSerie extends ChartDataSerie {
 					|| (_chartType == ChartDataModel.CHART_TYPE_BAR && _chartLayout == ChartDataYSerie.BAR_LAYOUT_BESIDE)) {
 
 				// get the min/max values for all data
-				for (final int[] valueSerie : highValues) {
-					for (final int value : valueSerie) {
+				for (final float[] valueSerie : highValues) {
+					for (final float value : valueSerie) {
 						_visibleMaxValue = (_visibleMaxValue >= value) ? _visibleMaxValue : value;
 					}
 				}
 
-				for (final int[] valueSerie : lowValues) {
-					for (final int value : valueSerie) {
+				for (final float[] valueSerie : lowValues) {
+					for (final float value : valueSerie) {
 						_visibleMinValue = (_visibleMinValue <= value) ? _visibleMinValue : value;
 					}
 				}
@@ -403,23 +403,23 @@ public class ChartDataYSerie extends ChartDataSerie {
 				 */
 
 				// summarize the data
-				final int[] summarizedMaxValues = new int[highValues[0].length];
-				for (final int[] valueSerie : highValues) {
+				final float[] summarizedMaxValues = new float[highValues[0].length];
+				for (final float[] valueSerie : highValues) {
 					for (int valueIndex = 0; valueIndex < valueSerie.length; valueIndex++) {
 						summarizedMaxValues[valueIndex] += valueSerie[valueIndex];
 					}
 				}
 
 				// get max value for the summarized values
-				for (final int value : summarizedMaxValues) {
+				for (final float value : summarizedMaxValues) {
 					_visibleMaxValue = (_visibleMaxValue >= value) ? _visibleMaxValue : value;
 				}
 
 				/*
 				 * calculate the min value
 				 */
-				for (final int[] serieData : lowValues) {
-					for (final int value : serieData) {
+				for (final float[] serieData : lowValues) {
+					for (final float value : serieData) {
 						_visibleMinValue = (_visibleMinValue <= value) ? _visibleMinValue : value;
 					}
 				}

@@ -27,7 +27,10 @@ public abstract class TourbookDevice implements IRawDataReader {
 	 * <p>
 	 * since version 10.11
 	 */
-	public static final int	TEMPERATURE_SCALE		= 10;
+	/*
+	 * disabled when float was introduces in 11.after8
+	 */
+//	public static final int	TEMPERATURE_SCALE		= 10;
 
 	/**
 	 * Unique id for each device reader
@@ -116,7 +119,7 @@ public abstract class TourbookDevice implements IRawDataReader {
 	public String createUniqueId(final TourData tourData, final String dummyKey) {
 
 		String uniqueKey;
-		final int[] distanceSerie = tourData.getMetricDistanceSerie();
+		final float[] distanceSerie = tourData.getMetricDistanceSerie();
 
 		if (isCreateTourIdWithRecordingTime) {
 
@@ -131,7 +134,7 @@ public abstract class TourbookDevice implements IRawDataReader {
 				uniqueKey = Integer.toString(tourRecordingTime);
 			} else {
 
-				final long tourDistance = distanceSerie[(distanceSerie.length - 1)];
+				final long tourDistance = (long) distanceSerie[(distanceSerie.length - 1)];
 
 				uniqueKey = Long.toString(tourDistance + tourRecordingTime);
 			}
@@ -144,7 +147,7 @@ public abstract class TourbookDevice implements IRawDataReader {
 			if (distanceSerie == null) {
 				uniqueKey = dummyKey;
 			} else {
-				uniqueKey = Integer.toString(distanceSerie[distanceSerie.length - 1]);
+				uniqueKey = Integer.toString((int) distanceSerie[distanceSerie.length - 1]);
 			}
 		}
 

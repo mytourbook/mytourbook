@@ -28,7 +28,7 @@ public class ChartDataXSerie extends ChartDataSerie {
 	 * start value for the serie data, this is use to set the start point for time data to the
 	 * starting time
 	 */
-	private int				_startValue				= 0;
+	private float			_startValue				= 0;
 
 	/**
 	 * index in the x-data at which the graph is painted in the marker color, <code>-1</code>
@@ -65,11 +65,11 @@ public class ChartDataXSerie extends ChartDataSerie {
 	 */
 	public boolean[]		_noLine;
 
-	public ChartDataXSerie(final int values[]) {
-		setMinMaxValues(new int[][] { values });
+	public ChartDataXSerie(final float[] values) {
+		setMinMaxValues(new float[][] { values });
 	}
 
-	public ChartDataXSerie(final int values[][]) {
+	public ChartDataXSerie(final float[][] values) {
 		setMinMaxValues(values);
 	}
 
@@ -104,7 +104,7 @@ public class ChartDataXSerie extends ChartDataSerie {
 	/**
 	 * @return Returns the startValue.
 	 */
-	public int getStartValue() {
+	public float getStartValue() {
 		return _startValue;
 	}
 
@@ -127,7 +127,7 @@ public class ChartDataXSerie extends ChartDataSerie {
 	}
 
 	@Override
-	void setMinMaxValues(final int[][] lowValues, final int[][] highValues) {}
+	void setMinMaxValues(final float[][] lowValues, final float[][] highValues) {}
 
 	public void setNoLine(final boolean[] noLineSerie) {
 		_noLine = noLineSerie;
@@ -154,8 +154,8 @@ public class ChartDataXSerie extends ChartDataSerie {
 	 * @param startValue
 	 *            The startValue to set.
 	 */
-	public void setStartValue(final int startValue) {
-		this._startValue = startValue;
+	public void setStartValue(final float startValue) {
+		_startValue = startValue;
 	}
 
 	/**

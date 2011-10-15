@@ -39,7 +39,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 	 * contains tour which is displayed in the chart
 	 */
 	private TourData				_tourData;
-	private int[]					_xDataSerie;
+	private float[]					_xDataSerie;
 	private TourChartConfiguration	_tourChartConfig;
 	private SplineData				_splineData;
 
@@ -52,7 +52,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 	private float					_scaleY;
 
 	public ChartLayer2ndAltiSerie(	final TourData tourData,
-									final int[] xDataSerie,
+									final float[] xDataSerie,
 									final TourChartConfiguration tourChartConfig,
 									final SplineData splineData) {
 
@@ -66,11 +66,11 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 
 	public void draw(final GC gc, final GraphDrawingData drawingData, final Chart chart) {
 
-		final int[] xValues = _xDataSerie;
+		final float[] xValues = _xDataSerie;
 
-		final int[] yValues2ndSerie = _tourData.dataSerie2ndAlti;
-		final int[] yDiffTo2ndSerie = _tourData.dataSerieDiffTo2ndAlti;
-		final int[] yAdjustedSerie = _tourData.dataSerieAdjustedAlti;
+		final float[] yValues2ndSerie = _tourData.dataSerie2ndAlti;
+		final float[] yDiffTo2ndSerie = _tourData.dataSerieDiffTo2ndAlti;
+		final float[] yAdjustedSerie = _tourData.dataSerieAdjustedAlti;
 
 		final boolean is2ndYValues = yValues2ndSerie != null;
 		final boolean isDiffValues = yDiffTo2ndSerie != null;
@@ -96,9 +96,8 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		final Path path2ndSerie = new Path(display);
 		final Path pathValueDiff = new Path(display);
 		final Path pathAdjustValue = new Path(display);
-//
-//		final int graphYTop = drawingData.getGraphYTop();
-		final int graphYBottom = drawingData.getGraphYBottom();
+
+		final float graphYBottom = drawingData.getGraphYBottom();
 
 		final int devGraphHeight = drawingData.devGraphHeight;
 		final int devYBottom = drawingData.getDevYBottom();
@@ -110,15 +109,15 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		/*
 		 * convert all diff values into positive values
 		 */
-		int diffValues[] = null;
+		float diffValues[] = null;
 		float scaleValueDiff = _scaleY;
 		if (isDiffValues) {
 
 			int valueIndex = 0;
-			int maxValueDiff = 0;
+			float maxValueDiff = 0;
 
-			diffValues = new int[yDiffTo2ndSerie.length];
-			for (int valueDiff : yDiffTo2ndSerie) {
+			diffValues = new float[yDiffTo2ndSerie.length];
+			for (float valueDiff : yDiffTo2ndSerie) {
 				diffValues[valueIndex++] = valueDiff = (valueDiff < 0) ? -valueDiff : valueDiff;
 				maxValueDiff = (maxValueDiff >= valueDiff) ? maxValueDiff : valueDiff;
 			}
@@ -139,10 +138,10 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		final Rectangle graphRect = new Rectangle(0, devYTop, graphClippingWidth, devGraphHeight);
 
 		// get initial dev X
-		int graphXValue = xValues[startIndex] - _graphXValueOffset;
+		float graphXValue = xValues[startIndex] - _graphXValueOffset;
 		int devPrevXInt = (int) (graphXValue * _scaleX);
 
-		int graphYValue2nd;
+		float graphYValue2nd;
 		if (is2ndYValues) {
 			graphYValue2nd = yValues2ndSerie[startIndex];
 		}
@@ -218,7 +217,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 			 */
 			if (isDiffValues) {
 
-				final int graphValueDiff = (diffValues[xValueIndex]);
+				final float graphValueDiff = (diffValues[xValueIndex]);
 				final float devLayerValueDiff = graphValueDiff * scaleValueDiff;
 				final float devYDiff = devYBottom - devLayerValueDiff;
 
@@ -402,8 +401,8 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 
 			for (final int serieIndex : graphSerieIndex) {
 
-				final int graphX = xValues[serieIndex] - _graphXValueOffset;
-				final int graphY = yAdjustedSerie[serieIndex];
+				final float graphX = xValues[serieIndex] - _graphXValueOffset;
+				final float graphY = yAdjustedSerie[serieIndex];
 
 				final int devX = (int) (graphX * _scaleX);
 				final int devY = (int) (devY0 - (graphY * _scaleY));
@@ -413,7 +412,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 				/*
 				 * draw altitude
 				 */
-				final String altiText = Integer.toString(graphY);
+				final String altiText = Float.toString(graphY);
 				final Point textExtent = gc.textExtent(altiText);
 				final int textWidth = textExtent.x;
 

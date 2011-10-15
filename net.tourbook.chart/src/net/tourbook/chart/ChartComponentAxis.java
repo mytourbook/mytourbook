@@ -222,7 +222,7 @@ public class ChartComponentAxis extends Canvas {
 			final String unitLabel = yData.getUnitLabel();
 			final boolean isBottomUp = yData.isYAxisDirection();
 
-			final int graphYBottom = drawingData.getGraphYBottom();
+			final float graphYBottom = drawingData.getGraphYBottom();
 			final int devGraphHeight = drawingData.devGraphHeight;
 
 			final int devYBottom = drawingData.getDevYBottom();
@@ -274,8 +274,8 @@ public class ChartComponentAxis extends Canvas {
 			// loop: all units
 			for (final ChartUnit unit : yUnits) {
 
-				final int unitValue = unit.value;
-				final double devYUnit = ((unitValue - graphYBottom) * scaleY) + 0.5;
+				final float unitValue = unit.value;
+				final float devYUnit = ((unitValue - graphYBottom) * scaleY) + .5f;
 
 				if (isBottomUp) {
 					devY = devYBottom - (int) devYUnit;

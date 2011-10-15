@@ -339,17 +339,17 @@ public class ChartComponents extends Composite {
 
 		final ChartDataXSerie xData = drawingData.getXData();
 
-		final int xMaxValue = xData.getVisibleMaxValue();
+		final float xMaxValue = xData.getVisibleMaxValue();
 		final int xAxisUnit = xData.getAxisUnit();
-		final int xStartValue = xData.getStartValue();
+		final float xStartValue = xData.getStartValue();
 
-		final int devVirtualGraphWidth = _componentGraph.getDevVirtualGraphImageWidth() - 0;
+		final int devVirtualGraphWidth = _componentGraph.getDevVirtualGraphImageWidth();
 
 		// enforce minimum chart width
 //		devGraphWidth = Math.max(devGraphWidth, CHART_MIN_WIDTH);
 
 		drawingData.devVirtualGraphWidth = devVirtualGraphWidth;
-		drawingData.setScaleX((float) (devVirtualGraphWidth - 1) / xMaxValue);
+		drawingData.setScaleX(((float) devVirtualGraphWidth - 1) / xMaxValue);
 
 		/*
 		 * calculate the number of units which will be visible by dividing the visible length by the
@@ -358,7 +358,7 @@ public class ChartComponents extends Composite {
 		final int unitRawNumbers = devVirtualGraphWidth / _chart.gridHorizontalDistance;
 
 		// unitRawValue is the number in data values for one unit
-		final int unitRawValue = xMaxValue / Math.max(1, unitRawNumbers);
+		final float unitRawValue = xMaxValue / Math.max(1, unitRawNumbers);
 
 		// get the unit list from the configuration
 		final ArrayList<ChartUnit> units = drawingData.getXUnits();
@@ -411,9 +411,9 @@ public class ChartComponents extends Composite {
 			 */
 
 			// get the unitOffset when a startValue is set
-			int unitOffset = 0;
+			float unitOffset = 0;
 			if (xStartValue != 0) {
-				unitOffset = (int) (xStartValue % unitValue);
+				unitOffset = xStartValue % unitValue;
 			}
 
 			final int valueDivisor = xData.getValueDivisor();
@@ -429,8 +429,8 @@ public class ChartComponents extends Composite {
 			while (graphValue <= maxUnitValue) {
 
 				// create unit value/label
-				final int unitPos = graphValue - unitOffset;
-				int unitLabelValue = unitPos + xStartValue;
+				final float unitPos = graphValue - unitOffset;
+				float unitLabelValue = unitPos + xStartValue;
 
 				if ((xAxisUnit == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_SECOND //
 						|| xAxisUnit == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_OPTIONAL_SECOND)
@@ -462,7 +462,7 @@ public class ChartComponents extends Composite {
 		 */
 		if (_chartDataModel.getChartType() == ChartDataModel.CHART_TYPE_BAR) {
 
-			final int[] highValues = xData.getHighValues()[0];
+			final float[] highValues = xData.getHighValues()[0];
 
 			if (xAxisUnit == ChartDataSerie.AXIS_UNIT_NUMBER || xAxisUnit == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE) {
 
@@ -525,8 +525,8 @@ public class ChartComponents extends Composite {
 		 */
 
 		final int unitType = yData.getAxisUnit();
-		int graphMinValue = yData.getVisibleMinValue();
-		int graphMaxValue = yData.getVisibleMaxValue();
+		float graphMinValue = yData.getVisibleMinValue();
+		float graphMaxValue = yData.getVisibleMaxValue();
 
 		// clip max value
 		boolean adjustGraphUnit = false;
@@ -535,7 +535,7 @@ public class ChartComponents extends Composite {
 			adjustGraphUnit = true;
 		}
 
-		int graphValueRange = graphMaxValue > 0 ? (graphMaxValue - graphMinValue) : -(graphMinValue - graphMaxValue);
+		float graphValueRange = graphMaxValue > 0 ? (graphMaxValue - graphMinValue) : -(graphMinValue - graphMaxValue);
 
 		/*
 		 * calculate the number of units which will be visible by dividing the available height by
@@ -544,7 +544,7 @@ public class ChartComponents extends Composite {
 		final int unitCount = devGraphHeight / _chart.gridVerticalDistance;
 
 		// unitValue is the number in data values for one unit
-		final int graphUnitValue = graphValueRange / Math.max(1, unitCount);
+		final float graphUnitValue = graphValueRange / Math.max(1, unitCount);
 
 		// round the unit
 		float graphUnit = 0;
@@ -566,7 +566,7 @@ public class ChartComponents extends Composite {
 		if ((graphMinValue % graphUnit) != 0 && graphMinValue < 0) {
 			adjustMinValue = graphUnit;
 		}
-		graphMinValue = (int) ((int) ((graphMinValue - adjustMinValue) / graphUnit) * graphUnit);
+		graphMinValue = (graphMinValue - adjustMinValue) / graphUnit * graphUnit;
 
 		// adjust the min value so that bar graphs start at the bottom of the chart
 		if (_chartDataModel.getChartType() == ChartDataModel.CHART_TYPE_BAR && _chart.getStartAtChartBottom()) {
@@ -586,7 +586,7 @@ public class ChartComponents extends Composite {
 
 			// count number of units
 			int unitCounter = 0;
-			int graphValue = graphMinValue;
+			float graphValue = graphMinValue;
 			while (graphValue <= graphMaxValue) {
 
 				// prevent endless loops when the unit is 0
@@ -618,7 +618,7 @@ public class ChartComponents extends Composite {
 		}
 
 		// calculate the vertical scaling between graph and device
-		final float graphScaleY = (float) (devGraphHeight) / graphValueRange;
+		final float graphScaleY = (devGraphHeight) / graphValueRange;
 
 		// calculate the vertical device offset
 		int devYTop = _devMarginTop + _devMarkerBarHeight + _devXTitleBarHeight;
@@ -646,7 +646,7 @@ public class ChartComponents extends Composite {
 		drawingData.setDevSliderHeight(_devSliderBarHeight);
 
 		final ArrayList<ChartUnit> unitList = drawingData.getYUnits();
-		int graphValue = graphMinValue;
+		float graphValue = graphMinValue;
 		int maxUnits = 0;
 		final int valueDivisor = yData.getValueDivisor();
 
@@ -935,7 +935,7 @@ public class ChartComponents extends Composite {
 		 * create synch configuration data
 		 */
 
-		final int[] xValues = xData.getHighValues()[0];
+		final float[] xValues = xData.getHighValues()[0];
 		final float markerStartValue = xValues[Math.min(markerValueIndexStart, xValues.length - 1)];
 		final float markerEndValue = xValues[Math.min(markerValueIndexEnd, xValues.length - 1)];
 
@@ -1014,7 +1014,7 @@ public class ChartComponents extends Composite {
 
 		final ChartDataXSerie xData = drawingData.getXData();
 
-		final int[] xValues = xData.getHighValues()[0];
+		final float[] xValues = xData.getHighValues()[0];
 		final int allWeeks = xValues.length;
 		final float devWeekWidth = devGraphWidth / allWeeks;
 
@@ -1063,7 +1063,7 @@ public class ChartComponents extends Composite {
 
 		// compute the width and position of the rectangles
 		int barWidth;
-		final int yearWidth = (int) Math.max(0, (scaleX) - 1);
+		final int yearWidth = (int) Math.max(0, scaleX - 1);
 
 		switch (yData.getChartLayout()) {
 		case ChartDataYSerie.BAR_LAYOUT_SINGLE_SERIE:
@@ -1372,7 +1372,7 @@ public class ChartComponents extends Composite {
 		// set min/max values from the source synched chart into this chart
 		_synchConfigSrc.getYDataMinMaxKeeper().setMinMaxValues(_chartDataModel);
 
-		final int[] xValues = xData.getHighValues()[0];
+		final float[] xValues = xData.getHighValues()[0];
 		final float markerValueStart = xValues[markerStartIndex];
 
 		final float valueDiff = xValues[markerEndIndex] - markerValueStart;
@@ -1461,7 +1461,7 @@ public class ChartComponents extends Composite {
 		final int slider1ValueIndex = sliderPosition.getLeftSliderValueIndex();
 		final int slider2ValueIndex = sliderPosition.getRightSliderValueIndex();
 
-		final int[] xValues = _chartDataModel.getXData()._highValues[0];
+		final float[] xValues = _chartDataModel.getXData()._highValues[0];
 		final boolean centerSliderPosition = sliderPosition.isCenterSliderPosition();
 
 		// move left slider

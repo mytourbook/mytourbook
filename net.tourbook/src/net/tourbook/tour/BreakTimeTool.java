@@ -95,6 +95,10 @@ public class BreakTimeTool {
 	 */
 	public float							breakMinAvgSpeed;
 
+	/*
+	 * AS ... Average + Slice
+	 */
+
 	/**
 	 * average speed in km/h
 	 */
@@ -170,23 +174,23 @@ public class BreakTimeTool {
 																	final int minSliceTime) {
 
 		final int[] timeSerie = tourData.timeSerie;
-		final int[] distanceSerie = tourData.getMetricDistanceSerie();
+		final float[] distanceSerie = tourData.getMetricDistanceSerie();
 
 		final boolean[] breakTimeSerie = new boolean[timeSerie.length];
 
-		final int[] speedSerie = tourData.getSpeedSerieMetric();
+		final float[] speedSerie = tourData.getSpeedSerieMetric();
 
 		int lastTime = 0;
-		int lastDistance = 0;
+		float lastDistance = 0;
 		int tourBreakTime = 0;
 
 		for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
 
 			final int currentTime = timeSerie[serieIndex];
-			final int currentDistance = distanceSerie[serieIndex];
+			final float currentDistance = distanceSerie[serieIndex];
 
 			final int timeDiffSlice = currentTime - lastTime;
-			final int distDiffSlice = currentDistance - lastDistance;
+			final float distDiffSlice = currentDistance - lastDistance;
 
 			final double sliceSpeed = timeDiffSlice == 0 ? 0 : distDiffSlice * 3.6 / timeDiffSlice;
 			final double avgSpeed = speedSerie[serieIndex] / 10.0;
@@ -211,12 +215,12 @@ public class BreakTimeTool {
 															final float minSpeed) {
 
 		final int[] timeSerie = tourData.timeSerie;
-		final int[] distanceSerie = tourData.getMetricDistanceSerie();
+		final float[] distanceSerie = tourData.getMetricDistanceSerie();
 
 		final boolean[] breakTimeSerie = new boolean[timeSerie.length];
 
 		boolean isSliceSpeed;
-		int[] speedSerie = null;
+		float[] speedSerie = null;
 
 		if (breakMethodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_SLICE_SPEED)) {
 
@@ -234,24 +238,24 @@ public class BreakTimeTool {
 		}
 
 		int lastTime = 0;
-		int lastDistance = 0;
+		float lastDistance = 0;
 		int tourBreakTime = 0;
 
 		for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
 
 			final int currentTime = timeSerie[serieIndex];
-			final int currentDistance = distanceSerie[serieIndex];
+			final float currentDistance = distanceSerie[serieIndex];
 
 			final int timeDiffSlice = currentTime - lastTime;
-			final int distDiffSlice = currentDistance - lastDistance;
+			final float distDiffSlice = currentDistance - lastDistance;
 
 			float speedToCheck;
 			if (isSliceSpeed) {
 				speedToCheck = timeDiffSlice == 0 ? //
 						0
-						: (float) (distDiffSlice * 3.6 / timeDiffSlice);
+						: distDiffSlice * 3.6f / timeDiffSlice;
 			} else {
-				speedToCheck = (float) (speedSerie[serieIndex] / 10.0);
+				speedToCheck = speedSerie[serieIndex] / 10.0f;
 			}
 
 			if (speedToCheck <= minSpeed) {
@@ -275,7 +279,7 @@ public class BreakTimeTool {
 																	final int sliceDiff) {
 
 		final int[] timeSerie = tourData.timeSerie;
-		final int[] distanceSerie = tourData.getMetricDistanceSerie();
+		final float[] distanceSerie = tourData.getMetricDistanceSerie();
 
 		// slice diff is ignored when it's set to 0
 		final boolean isSliceDiff = sliceDiff > 0;
@@ -284,15 +288,15 @@ public class BreakTimeTool {
 		final boolean[] breakTimeSerie = new boolean[timeSerie.length];
 
 		int prevTime = 0;
-		int prevDistance = 0;
+		float prevDistance = 0;
 
 		for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
 
 			final int currentTime = timeSerie[serieIndex];
-			final int currentDistance = distanceSerie[serieIndex];
+			final float currentDistance = distanceSerie[serieIndex];
 
 			final int sliceTimeDiff = currentTime - prevTime;
-			final int sliceDistDiff = currentDistance - prevDistance;
+			final float sliceDistDiff = currentDistance - prevDistance;
 
 //			if (serieIndex == 736) {
 //				final int a = 0;
@@ -323,7 +327,7 @@ public class BreakTimeTool {
 				 */
 				int prevIndex = serieIndex;
 				int timeDiffPrevSlices = 0;
-				int distDiffPrevSlices = 0;
+				float distDiffPrevSlices = 0;
 
 				while (timeDiffPrevSlices <= shortestBreakTime) {
 

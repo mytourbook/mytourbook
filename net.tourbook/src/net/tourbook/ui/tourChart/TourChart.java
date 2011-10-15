@@ -768,8 +768,8 @@ public class TourChart extends Chart {
 		}
 
 		// set data serie for the x-axis
-		final int[] xAxisSerie = _tourChartConfig.isShowTimeOnXAxis ? //
-				_tourData.timeSerie
+		final float[] xAxisSerie = _tourChartConfig.isShowTimeOnXAxis ? //
+				_tourData.getTimeSerieFloat()
 				: _tourData.getDistanceSerie();
 
 		_layerMarker = new ChartMarkerLayer();
@@ -814,8 +814,8 @@ public class TourChart extends Chart {
 			return;
 		}
 
-		final int[] xDataSerie = _tourChartConfig.isShowTimeOnXAxis ? //
-				_tourData.timeSerie
+		final float[] xDataSerie = _tourChartConfig.isShowTimeOnXAxis ? //
+				_tourData.getTimeSerieFloat()
 				: _tourData.getDistanceSerie();
 
 		/*
@@ -1291,7 +1291,7 @@ public class TourChart extends Chart {
 //		if ((yData == yDataPulse || yData == yDataAltitude) && _hrZonePainter != null) {
 //			yData.setCustomFillPainter(_hrZonePainter);
 //		}
-		
+
 		if (_hrZonePainter != null) {
 			yData.setCustomFillPainter(_hrZonePainter);
 		}

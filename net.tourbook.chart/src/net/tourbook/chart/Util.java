@@ -147,18 +147,7 @@ public class Util {
 		return new Formatter().format(format, divValue).toString();
 	}
 
-	/**
-	 * Formats a value according to the defined unit
-	 * 
-	 * @param value
-	 * @param data
-	 * @return
-	 */
-	public static String formatValue(final int value, final int unitType) {
-		return formatValue(value, unitType, 1, false);
-	}
-
-	public static String formatValue(final int value, final int unitType, final float divisor, boolean isShowSeconds) {
+	public static String formatValue(final float value, final int unitType, final float divisor, boolean isShowSeconds) {
 
 		String valueText = EMPTY_STRING;
 
@@ -185,14 +174,14 @@ public class Util {
 			break;
 
 		case ChartDataSerie.AXIS_UNIT_MINUTE_SECOND:
-			valueText = format_mm_ss(value);
+			valueText = format_mm_ss((long) value);
 			break;
 
 		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_OPTIONAL_SECOND:
 
 			// seconds are displayed when they are not 0
 
-			final int seconds = (value % 3600) % 60;
+			final int seconds = (int) ((value % 3600) % 60);
 			if (isShowSeconds && seconds == 0) {
 				isShowSeconds = false;
 			}
@@ -231,10 +220,21 @@ public class Util {
 	}
 
 	/**
+	 * Formats a value according to the defined unit
+	 * 
+	 * @param value
+	 * @param data
+	 * @return
+	 */
+	public static String formatValue(final int value, final int unitType) {
+		return formatValue(value, unitType, 1, false);
+	}
+
+	/**
 	 * @param unitValue
 	 * @return Returns minUnitValue rounded to the number of 50/20/10/5/2/1
 	 */
-	public static float roundDecimalValue(final int unitValue) {
+	public static float roundDecimalValue(final float unitValue) {
 
 		float unit = unitValue;
 		int multiplier = 1;
@@ -244,7 +244,7 @@ public class Util {
 			unit /= 10;
 		}
 
-		unit = (float) unitValue / multiplier;
+		unit = unitValue / multiplier;
 		unit = unit > 50 ? 50 : unit > 20 ? 20 : unit > 10 ? 10 : unit > 5 ? 5 : unit > 2 ? 2 : 1;
 		unit *= multiplier;
 
@@ -255,7 +255,7 @@ public class Util {
 	 * @param unitValue
 	 * @return Returns minUnitValue rounded to the number 60/30/20/10/5/2/1
 	 */
-	public static float roundTimeValue(final int unitValue) {
+	public static float roundTimeValue(final float unitValue) {
 
 		float unit = unitValue;
 		int multiplier = 1;
