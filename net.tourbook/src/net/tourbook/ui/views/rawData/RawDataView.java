@@ -1127,12 +1127,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 				final TourData tourData = (TourData) cell.getElement();
 
-				final int tourDistance = tourData.getTourDistance();
+				final float tourDistance = tourData.getTourDistance();
 				final int drivingTime = tourData.getTourDrivingTime();
 
 				final float pace = tourDistance == 0 ? //
 						0
-						: (float) drivingTime * 1000 / tourDistance * UI.UNIT_VALUE_DISTANCE;
+						: drivingTime * 1000 / tourDistance * UI.UNIT_VALUE_DISTANCE;
 
 				cell.setText(UI.format_mm_ss((long) pace));
 			}
@@ -1150,11 +1150,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			@Override
 			public void update(final ViewerCell cell) {
 				final TourData tourData = ((TourData) cell.getElement());
-				final int tourDistance = tourData.getTourDistance();
+				final float tourDistance = tourData.getTourDistance();
 				final int drivingTime = tourData.getTourDrivingTime();
 				if (drivingTime != 0) {
 
-					cell.setText(_nf1.format(((float) tourDistance) / drivingTime * 3.6 / UI.UNIT_VALUE_DISTANCE));
+					cell.setText(_nf1.format(tourDistance / drivingTime * 3.6 / UI.UNIT_VALUE_DISTANCE));
 				}
 			}
 		});
@@ -1270,11 +1270,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
-				final int tourDistance = ((TourData) cell.getElement()).getTourDistance();
+				final float tourDistance = ((TourData) cell.getElement()).getTourDistance();
 				if (tourDistance == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(_nf3.format(((float) tourDistance) / 1000 / UI.UNIT_VALUE_DISTANCE));
+					cell.setText(_nf3.format(tourDistance / 1000 / UI.UNIT_VALUE_DISTANCE));
 				}
 			}
 		});

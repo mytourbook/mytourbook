@@ -70,8 +70,8 @@ public class ChartMarkerLayer implements IChartLayer {
 		final int devGraphHeight = drawingData.devGraphHeight;
 		final int devGraphWidth = drawingData.devVirtualGraphWidth;
 
-		final int graphYBottom = drawingData.getGraphYBottom();
-		final int[] yValues = drawingData.getYData().getHighValues()[0];
+		final float graphYBottom = drawingData.getGraphYBottom();
+		final float[] yValues = drawingData.getYData().getHighValues()[0];
 		final float scaleX = drawingData.getScaleX();
 		final float scaleY = drawingData.getScaleY();
 
@@ -81,7 +81,7 @@ public class ChartMarkerLayer implements IChartLayer {
 
 		for (final ChartLabel chartMarker : _chartLabels) {
 
-			final int yValue = yValues[chartMarker.serieIndex];
+			final float yValue = yValues[chartMarker.serieIndex];
 			final int devYGraph = (int) ((yValue - graphYBottom) * scaleY) - 0;
 
 			int devXMarker = (int) (chartMarker.graphX * scaleX) - devGraphImageOffset;

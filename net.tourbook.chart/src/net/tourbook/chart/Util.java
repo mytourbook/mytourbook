@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -33,7 +33,12 @@ public class Util {
 	private static final String			FORMAT_0F		= "0f";							//$NON-NLS-1$
 	private static final String			FORMAT_MM_SS	= "%d:%02d";						//$NON-NLS-1$
 
-	private final static NumberFormat	_nf				= NumberFormat.getNumberInstance();
+	private final static NumberFormat	_nf0			= NumberFormat.getNumberInstance();
+	private final static NumberFormat	_nf1			= NumberFormat.getNumberInstance();
+	{
+		_nf0.setMinimumFractionDigits(0);
+		_nf1.setMinimumFractionDigits(1);
+	}
 
 	private static StringBuilder		_sbFormatter	= new StringBuilder();
 	private static Formatter			_formatter		= new Formatter(_sbFormatter);
@@ -147,18 +152,7 @@ public class Util {
 		return new Formatter().format(format, divValue).toString();
 	}
 
-	/**
-	 * Formats a value according to the defined unit
-	 * 
-	 * @param value
-	 * @param data
-	 * @return
-	 */
-	public static String formatValue(final int value, final int unitType) {
-		return formatValue(value, unitType, 1, false);
-	}
-
-	public static String formatValue(final int value, final int unitType, final float divisor, boolean isShowSeconds) {
+	public static String formatValue(final float value, final int unitType, final float divisor, boolean isShowSeconds) {
 
 		String valueText = EMPTY_STRING;
 
@@ -168,11 +162,10 @@ public class Util {
 		case ChartDataSerie.X_AXIS_UNIT_NUMBER_CENTER:
 			final float divValue = value / divisor;
 			if (divValue % 1 == 0) {
-				_nf.setMinimumFractionDigits(0);
+				valueText = _nf0.format(divValue);
 			} else {
-				_nf.setMinimumFractionDigits(1);
+				valueText = _nf1.format(divValue);
 			}
-			valueText = _nf.format(divValue);
 			break;
 
 		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE:
@@ -185,14 +178,14 @@ public class Util {
 			break;
 
 		case ChartDataSerie.AXIS_UNIT_MINUTE_SECOND:
-			valueText = format_mm_ss(value);
+			valueText = format_mm_ss((long) value);
 			break;
 
 		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_OPTIONAL_SECOND:
 
 			// seconds are displayed when they are not 0
 
-			final int seconds = (value % 3600) % 60;
+			final int seconds = (int) ((value % 3600) % 60);
 			if (isShowSeconds && seconds == 0) {
 				isShowSeconds = false;
 			}
@@ -219,8 +212,7 @@ public class Util {
 			break;
 
 		case ChartDataSerie.X_AXIS_UNIT_DAY:
-			_nf.setMinimumFractionDigits(1);
-			valueText = _nf.format(value);
+			valueText = _nf1.format(value);
 			break;
 
 		default:
@@ -231,10 +223,21 @@ public class Util {
 	}
 
 	/**
+	 * Formats a value according to the defined unit
+	 * 
+	 * @param value
+	 * @param data
+	 * @return
+	 */
+	public static String formatValue(final int value, final int unitType) {
+		return formatValue(value, unitType, 1, false);
+	}
+
+	/**
 	 * @param unitValue
 	 * @return Returns minUnitValue rounded to the number of 50/20/10/5/2/1
 	 */
-	public static float roundDecimalValue(final int unitValue) {
+	public static float roundDecimalValue(final float unitValue) {
 
 		float unit = unitValue;
 		int multiplier = 1;
@@ -244,18 +247,36 @@ public class Util {
 			unit /= 10;
 		}
 
-		unit = (float) unitValue / multiplier;
-		unit = unit > 50 ? 50 : unit > 20 ? 20 : unit > 10 ? 10 : unit > 5 ? 5 : unit > 2 ? 2 : 1;
+		unit = unitValue / multiplier;
+		unit = unit > 50 ? 50 : unit > 20 ? 20 : //
+				unit > 10 ? 10 : unit > 5 ? 5 : unit > 2 ? 2 : //
+						unit > 1 ? 1 : unit > 0.5f ? 0.5f : unit > 0.2f ? 0.2f : //
+								unit > 0.1f ? 0.1f : unit > 0.05f ? 0.05f : unit > 0.02f ? 0.02f : 0.01f;
 		unit *= multiplier;
 
 		return unit;
+	}
+
+	public static float roundFloatToUnit(final float graphValue, final float graphUnit) {
+
+		if (graphUnit < 1) {
+
+			final float gvDiv1 = graphValue / graphUnit;
+			final int gvDiv2 = (int) (gvDiv1 + 0.5f);
+
+			return gvDiv2 * graphUnit;
+
+		} else {
+
+			return ((int) (graphValue * graphUnit)) / graphUnit;
+		}
 	}
 
 	/**
 	 * @param unitValue
 	 * @return Returns minUnitValue rounded to the number 60/30/20/10/5/2/1
 	 */
-	public static float roundTimeValue(final int unitValue) {
+	public static float roundTimeValue(final float unitValue) {
 
 		float unit = unitValue;
 		int multiplier = 1;

@@ -256,21 +256,21 @@ public class GPX_SAX_Handler extends DefaultHandler {
 						// </gpxtpx:cad>
 
 						_isInCadence = false;
-						_timeSlice.cadence = getIntValue(charData);
+						_timeSlice.cadence = getFloatValue(charData);
 
 					} else if (name.equals(TAG_EXT_HR)) {
 
 						// </gpxtpx:hr>
 
 						_isInHr = false;
-						_timeSlice.pulse = getIntValue(charData);
+						_timeSlice.pulse = getFloatValue(charData);
 
 					} else if (name.equals(TAG_EXT_TEMP)) {
 
 						// </gpxtpx:atemp>
 
 						_isInTemp = false;
-						_timeSlice.temperature = Math.round(getFloatValue(charData) * TourbookDevice.TEMPERATURE_SCALE);
+						_timeSlice.temperature = getFloatValue(charData);
 
 					} else if (name.equals(TAG_EXT_DISTANCE)) {
 
@@ -452,7 +452,6 @@ public class GPX_SAX_Handler extends DefaultHandler {
 		tourData.setWeek(tourData.getStartYear(), tourData.getStartMonth(), tourData.getStartDay());
 
 		tourData.setDeviceTimeInterval((short) -1);
-		tourData.setTemperatureScale(TourbookDevice.TEMPERATURE_SCALE);
 
 		tourData.importRawDataFile = _importFilePath;
 		tourData.setTourImportFilePath(_importFilePath);
@@ -475,7 +474,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 		}
 
 		// after all data are added, the tour id can be created
-		final int[] distanceSerie = tourData.getMetricDistanceSerie();
+		final float[] distanceSerie = tourData.getMetricDistanceSerie();
 		String uniqueKey;
 
 		if (_deviceDataReader.isCreateTourIdWithRecordingTime) {
@@ -491,7 +490,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 				uniqueKey = Integer.toString(tourRecordingTime);
 			} else {
 
-				final long tourDistance = distanceSerie[(distanceSerie.length - 1)];
+				final long tourDistance = (long) distanceSerie[(distanceSerie.length - 1)];
 
 				uniqueKey = Long.toString(tourDistance + tourRecordingTime);
 			}
@@ -504,7 +503,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 			if (distanceSerie == null) {
 				uniqueKey = Util.UNIQUE_ID_SUFFIX_GPX;
 			} else {
-				uniqueKey = Integer.toString(distanceSerie[distanceSerie.length - 1]);
+				uniqueKey = Integer.toString((int) distanceSerie[distanceSerie.length - 1]);
 			}
 		}
 
@@ -627,32 +626,6 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 		} catch (final NumberFormatException e) {
 			return Float.MIN_VALUE;
-		}
-	}
-
-//	private short getShortValue(String textValue) {
-//
-//		try {
-//			if (textValue != null) {
-//				return Short.parseShort(textValue);
-//			} else {
-//				return Short.MIN_VALUE;
-//			}
-//		} catch (NumberFormatException e) {
-//			return Short.MIN_VALUE;
-//		}
-//	}
-
-	private int getIntValue(final String textValue) {
-		try {
-			if (textValue != null) {
-				return Integer.parseInt(textValue);
-			} else {
-				return Integer.MIN_VALUE;
-			}
-
-		} catch (final NumberFormatException e) {
-			return Integer.MIN_VALUE;
 		}
 	}
 

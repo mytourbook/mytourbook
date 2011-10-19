@@ -93,8 +93,8 @@ public class GraphDrawingData {
 	/**
 	 * graph value for the bottom of the graph
 	 */
-	private int						_graphYBottom;
-	private int						_graphYTop;
+	private float					_graphYBottom;
+	private float					_graphYTop;
 
 	private int						_barPosition			= BAR_POS_LEFT;
 
@@ -221,14 +221,14 @@ public class GraphDrawingData {
 	/**
 	 * @return Returns the bottom of the chart in graph units
 	 */
-	public int getGraphYBottom() {
+	public float getGraphYBottom() {
 		return _graphYBottom;
 	}
 
 	/**
 	 * @return Returns the top of the chart in graph units
 	 */
-	public int getGraphYTop() {
+	public float getGraphYTop() {
 		return _graphYTop;
 	}
 
@@ -415,7 +415,7 @@ public class GraphDrawingData {
 		_errorMessage = errorMessage;
 	}
 
-	public void setGraphYBottom(final int yGraphMin) {
+	public void setGraphYBottom(final float yGraphMin) {
 		_graphYBottom = yGraphMin;
 	}
 
@@ -423,7 +423,7 @@ public class GraphDrawingData {
 	 * @param graphYTop
 	 *            The graphYTop to set.
 	 */
-	protected void setGraphYTop(final int graphYTop) {
+	protected void setGraphYTop(final float graphYTop) {
 		_graphYTop = graphYTop;
 	}
 

@@ -910,9 +910,9 @@ public class DialogQuickEdit extends TitleAreaDialog {
 		_tourData.setWeather(_txtWeather.getText().trim());
 
 		if (_isTemperatureManuallyModified) {
-			int temperature = _spinTemperature.getSelection();
+			float temperature = _spinTemperature.getSelection();
 			if (_unitValueTemperature != 1) {
-				temperature = (int) ((temperature - UI.UNIT_FAHRENHEIT_ADD) / UI.UNIT_FAHRENHEIT_MULTI);
+				temperature = ((temperature - UI.UNIT_FAHRENHEIT_ADD) / UI.UNIT_FAHRENHEIT_MULTI);
 			}
 			_tourData.setAvgTemperature(temperature);
 		}
@@ -961,12 +961,11 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			/*
 			 * avg temperature
 			 */
-			final int temperatureScale = _tourData.getTemperatureScale();
-			int avgTemperature = _tourData.getAvgTemperature();
+			float avgTemperature = _tourData.getAvgTemperature();
 
 			if (_unitValueTemperature != 1) {
-				final float metricTemperature = (float) avgTemperature / temperatureScale;
-				avgTemperature = (int) ((metricTemperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD) * temperatureScale);
+				final float metricTemperature = avgTemperature;
+				avgTemperature = metricTemperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD;
 			}
 
 			_spinTemperature.setDigits(Util.getNumberOfDigits(temperatureScale) - 1);

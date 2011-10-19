@@ -947,7 +947,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 		int joinedTourStartDistance = 0;
 		int joinedRecordingTime = 0;
 		int joinedDrivingTime = 0;
-		int joinedDistance = 0;
+		float joinedDistance = 0;
 		int joinedCalories = 0;
 		boolean isJoinedDistanceFromSensor = false;
 		short joinedDeviceTimeInterval = -1;

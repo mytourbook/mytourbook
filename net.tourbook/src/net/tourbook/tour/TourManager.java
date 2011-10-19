@@ -277,7 +277,7 @@ public class TourManager {
 						continue;
 					}
 
-					final int[] distanceSerie = new int[latSerie.length];
+					final float[] distanceSerie = new float[latSerie.length];
 					tourData.distanceSerie = distanceSerie;
 
 					double distance = 0;
@@ -297,7 +297,7 @@ public class TourManager {
 						final double distDiff = MtMath.distanceVincenty(latStart, lonStart, latEnd, lonEnd);
 
 						distance += distDiff;
-						distanceSerie[serieIndex] = (int) distance;
+						distanceSerie[serieIndex] = (float) distance;
 
 						latStart = latEnd;
 						lonStart = lonEnd;
@@ -311,8 +311,8 @@ public class TourManager {
 					if (allTourMarker != null) {
 
 						for (final TourMarker tourMarker : allTourMarker) {
-							final int markerDistance = distanceSerie[tourMarker.getSerieIndex()];
-							tourMarker.setDistance(markerDistance);
+							final float markerDistance = distanceSerie[tourMarker.getSerieIndex()];
+							tourMarker.setDistance((int) markerDistance);
 						}
 					}
 
@@ -326,7 +326,7 @@ public class TourManager {
 
 	public static float computeTourSpeed(final TourData tourData, final int startIndex, final int endIndex) {
 
-		final int[] distanceSerie = tourData.getMetricDistanceSerie();
+		final float[] distanceSerie = tourData.getMetricDistanceSerie();
 		final int[] timeSerie = tourData.timeSerie;
 
 		if (timeSerie == null
@@ -336,12 +336,12 @@ public class TourManager {
 			return 0;
 		}
 
-		final int distance = distanceSerie[endIndex] - distanceSerie[startIndex];
+		final float distance = distanceSerie[endIndex] - distanceSerie[startIndex];
 		final int time = Math.max(
 				0,
 				timeSerie[endIndex] - timeSerie[startIndex] - tourData.getBreakTime(startIndex, endIndex));
 
-		return (float) ((float) distance / time * 3.6);
+		return distance / time * 3.6f;
 	}
 
 	/**
@@ -699,29 +699,38 @@ public class TourManager {
 			removeTimeSlicesTimeAndDistance(tourData, firstIndex, lastIndex);
 		}
 
-		int[] intSerie = tourData.altitudeSerie;
-		if (intSerie != null) {
-			tourData.altitudeSerie = removeTimeSlicesInteger(intSerie, firstIndex, lastIndex);
+		float[] floatSerie = tourData.altitudeSerie;
+		if (floatSerie != null) {
+			tourData.altitudeSerie = removeTimeSlicesFloat(floatSerie, firstIndex, lastIndex);
 		}
-		intSerie = tourData.cadenceSerie;
-		if (intSerie != null) {
-			tourData.cadenceSerie = removeTimeSlicesInteger(intSerie, firstIndex, lastIndex);
+
+		floatSerie = tourData.cadenceSerie;
+		if (floatSerie != null) {
+			tourData.cadenceSerie = removeTimeSlicesFloat(floatSerie, firstIndex, lastIndex);
 		}
-		intSerie = tourData.distanceSerie;
-		if (intSerie != null) {
-			tourData.distanceSerie = removeTimeSlicesInteger(intSerie, firstIndex, lastIndex);
+
+		floatSerie = tourData.distanceSerie;
+		if (floatSerie != null) {
+			tourData.distanceSerie = removeTimeSlicesFloat(floatSerie, firstIndex, lastIndex);
 		}
-		intSerie = tourData.pulseSerie;
-		if (intSerie != null) {
-			tourData.pulseSerie = removeTimeSlicesInteger(intSerie, firstIndex, lastIndex);
+
+		floatSerie = tourData.pulseSerie;
+		if (floatSerie != null) {
+			tourData.pulseSerie = removeTimeSlicesFloat(floatSerie, firstIndex, lastIndex);
 		}
-		intSerie = tourData.temperatureSerie;
-		if (intSerie != null) {
-			tourData.temperatureSerie = removeTimeSlicesInteger(intSerie, firstIndex, lastIndex);
+
+		floatSerie = tourData.temperatureSerie;
+		if (floatSerie != null) {
+			tourData.temperatureSerie = removeTimeSlicesFloat(floatSerie, firstIndex, lastIndex);
 		}
-		intSerie = tourData.timeSerie;
+
+		final int[] intSerie = tourData.timeSerie;
 		if (intSerie != null) {
+
 			tourData.timeSerie = removeTimeSlicesInteger(intSerie, firstIndex, lastIndex);
+
+			floatSerie = tourData.getTimeSerieFloat();
+			tourData.setTimeSerieFloat(removeTimeSlicesFloat(floatSerie, firstIndex, lastIndex));
 		}
 
 		double[] doubleSerie = tourData.latitudeSerie;
@@ -739,15 +748,15 @@ public class TourManager {
 		final boolean isTourPower = tourData.isPowerSerieFromDevice();
 		final boolean isTourSpeed = tourData.isSpeedSerieFromDevice();
 		if (isTourPower) {
-			intSerie = tourData.getPowerSerie();
-			if (intSerie != null) {
-				tourData.setPowerSerie(removeTimeSlicesInteger(intSerie, firstIndex, lastIndex));
+			floatSerie = tourData.getPowerSerie();
+			if (floatSerie != null) {
+				tourData.setPowerSerie(removeTimeSlicesFloat(floatSerie, firstIndex, lastIndex));
 			}
 		}
 		if (isTourSpeed) {
-			intSerie = tourData.getSpeedSerieFromDevice();
-			if (intSerie != null) {
-				tourData.setSpeedSerie(removeTimeSlicesInteger(intSerie, firstIndex, lastIndex));
+			floatSerie = tourData.getSpeedSerieFromDevice();
+			if (floatSerie != null) {
+				tourData.setSpeedSerie(removeTimeSlicesFloat(floatSerie, firstIndex, lastIndex));
 			}
 		}
 
@@ -767,6 +776,38 @@ public class TourManager {
 		final int newSerieLength = oldSerieLength - (lastIndex - firstIndex + 1);
 
 		final double[] newDataSerie = new double[newSerieLength];
+
+		if (firstIndex == 0) {
+
+			// delete from start, copy data by skipping removed slices
+			System.arraycopy(dataSerie, lastIndex + 1, newDataSerie, 0, newSerieLength);
+
+		} else if (lastIndex == oldSerieLength - 1) {
+
+			// delete until the end
+			System.arraycopy(dataSerie, 0, newDataSerie, 0, newSerieLength);
+
+		} else {
+
+			// delete somewhere in the middle
+
+			// copy start segment
+			System.arraycopy(dataSerie, 0, newDataSerie, 0, firstIndex);
+
+			// copy end segment
+			final int copyLength = oldSerieLength - (lastIndex + 1);
+			System.arraycopy(dataSerie, lastIndex + 1, newDataSerie, firstIndex, copyLength);
+		}
+
+		return newDataSerie;
+	}
+
+	private static float[] removeTimeSlicesFloat(final float[] dataSerie, final int firstIndex, final int lastIndex) {
+
+		final int oldSerieLength = dataSerie.length;
+		final int newSerieLength = oldSerieLength - (lastIndex - firstIndex + 1);
+
+		final float[] newDataSerie = new float[newSerieLength];
 
 		if (firstIndex == 0) {
 
@@ -830,7 +871,7 @@ public class TourManager {
 														final int lastIndex) {
 
 		final int[] timeSerie = _tourData.timeSerie;
-		final int[] distSerie = _tourData.distanceSerie;
+		final float[] distSerie = _tourData.distanceSerie;
 
 		if ((timeSerie == null) || (timeSerie.length == 0)) {
 			return;
@@ -844,7 +885,7 @@ public class TourManager {
 		}
 
 		final int timeDiff = timeSerie[lastIndex + 1] - timeSerie[firstIndex];
-		int distDiff = -1;
+		float distDiff = -1;
 
 		if (distSerie != null) {
 			distDiff = distSerie[lastIndex + 1] - distSerie[firstIndex];
@@ -899,7 +940,7 @@ public class TourManager {
 		 */
 		final int diffSerieIndex = lastSerieIndex - firstSerieIndex + 1;
 		final int[] timeSerie = tourData.timeSerie;
-		final int[] distSerie = tourData.distanceSerie;
+		final float[] distSerie = tourData.distanceSerie;
 
 		for (final TourMarker tourMarker : allTourMarkers) {
 
@@ -918,7 +959,7 @@ public class TourManager {
 					}
 
 					if (distSerie != null) {
-						tourMarker.setDistance(distSerie[serieIndex]);
+						tourMarker.setDistance((int) distSerie[serieIndex]);
 					}
 				}
 			}
@@ -1235,19 +1276,19 @@ public class TourManager {
 		_tourSaveListeners.add(listener);
 	}
 
-	/**
-	 * adjust the min/max values to make them more visible and not at the same vertical position as
-	 * the x-axis or the top of the chart
-	 */
-	private void adjustMinMax(final ChartDataYSerie yData) {
-
-		yData.setVisibleMaxValue(yData.getVisibleMaxValue() + 1);
-
-		final int visibleMinValue = yData.getVisibleMinValue();
-		if (visibleMinValue > 0) {
-			yData.setVisibleMinValue(visibleMinValue - 1);
-		}
-	}
+//	/**
+//	 * adjust the min/max values to make them more visible and not at the same vertical position as
+//	 * the x-axis or the top of the chart
+//	 */
+//	private void adjustMinMax(final ChartDataYSerie yData) {
+//
+//		yData.setVisibleMaxValue(yData.getVisibleMaxValue() + 1);
+//
+//		final float visibleMinValue = yData.getVisibleMinValue();
+//		if (visibleMinValue > 0) {
+//			yData.setVisibleMinValue(visibleMinValue - 1);
+//		}
+//	}
 
 	/**
 	 * Remove all {@link TourData} from the cache so they need to be reloaded the next time with
@@ -1283,12 +1324,12 @@ public class TourManager {
 	private void computeValueClipping(final TourData tourData) {
 
 		final int[] timeSerie = tourData.timeSerie;
-		final int[] gradientSerie = tourData.gradientSerie;
 
-		final int[] speedSerie = tourData.getSpeedSerie();
-		final int[] paceSerie = tourData.getPaceSerie();
-		final int[] altimeterSerie = tourData.getAltimeterSerie();
-		final int[] distanceSerie = tourData.getDistanceSerie();
+		final float[] gradientSerie = tourData.gradientSerie;
+		final float[] speedSerie = tourData.getSpeedSerie();
+		final float[] paceSerie = tourData.getPaceSerie();
+		final float[] altimeterSerie = tourData.getAltimeterSerie();
+		final float[] distanceSerie = tourData.getDistanceSerie();
 
 		if ((timeSerie == null || timeSerie.length == 0)
 				|| speedSerie == null
@@ -1336,7 +1377,7 @@ public class TourManager {
 				final int sliceIndexMax = ((0 >= sliceIndex) ? 0 : sliceIndex);
 				sliceIndex = (sliceIndexMax <= serieLengthLast) ? sliceIndexMax : serieLengthLast;
 
-				final int distance = distanceSerie[sliceIndex] - distanceSerie[serieIndex];
+				final float distance = distanceSerie[sliceIndex] - distanceSerie[serieIndex];
 
 				if (distance == 0) {
 					altimeterSerie[serieIndex] = 0;
@@ -1363,7 +1404,7 @@ public class TourManager {
 				int lowIndex = ((0 >= serieIndexPrev) ? 0 : serieIndexPrev);
 
 				int timeDiff = timeSerie[serieIndex] - timeSerie[lowIndex];
-				int distDiff = 0;
+				float distDiff = 0;
 
 				while (timeDiff < clippingTime) {
 
@@ -1411,9 +1452,9 @@ public class TourManager {
 					return 0;
 				}
 
-				final int[] timeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_TIME)))
+				final float[] timeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_TIME)))
 						.getHighValues()[0];
-				final int[] distanceValues = ((ChartDataSerie) (customDataDistance)).getHighValues()[0];
+				final float[] distanceValues = ((ChartDataSerie) (customDataDistance)).getHighValues()[0];
 				if (timeValues == null) {
 					return 0;
 				}
@@ -1427,10 +1468,10 @@ public class TourManager {
 					}
 				}
 
-				final int leftDistance = distanceValues[valueIndexLeft];
-				final int rightDistance = distanceValues[valueIndexRight];
-				final int leftTime = timeValues[valueIndexLeft];
-				final int rightTime = timeValues[valueIndexRight];
+				final float leftDistance = distanceValues[valueIndexLeft];
+				final float rightDistance = distanceValues[valueIndexRight];
+				final int leftTime = (int) timeValues[valueIndexLeft];
+				final int rightTime = (int) timeValues[valueIndexRight];
 
 				if (leftTime == rightTime) {
 
@@ -1465,9 +1506,9 @@ public class TourManager {
 					return 0;
 				}
 
-				final int[] timeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_TIME)))
+				final float[] timeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_TIME)))
 						.getHighValues()[0];
-				final int[] distanceValues = ((ChartDataSerie) (customDataDistance)).getHighValues()[0];
+				final float[] distanceValues = ((ChartDataSerie) (customDataDistance)).getHighValues()[0];
 				if (timeValues == null) {
 					return 0;
 				}
@@ -1481,10 +1522,10 @@ public class TourManager {
 					}
 				}
 
-				final int leftDistance = distanceValues[valueIndexLeft];
-				final int rightDistance = distanceValues[valueIndexRight];
-				final int leftTime = timeValues[valueIndexLeft];
-				final int rightTime = timeValues[valueIndexRight];
+				final float leftDistance = distanceValues[valueIndexLeft];
+				final float rightDistance = distanceValues[valueIndexRight];
+				final int leftTime = (int) timeValues[valueIndexLeft];
+				final int rightTime = (int) timeValues[valueIndexRight];
 
 				if (leftTime == rightTime) {
 
@@ -1520,8 +1561,8 @@ public class TourManager {
 					return 0;
 				}
 
-				final int[] altitudeValues = ((ChartDataSerie) (customDataAltitude)).getHighValues()[0];
-				final int[] timeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_TIME)))
+				final float[] altitudeValues = ((ChartDataSerie) (customDataAltitude)).getHighValues()[0];
+				final float[] timeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_TIME)))
 						.getHighValues()[0];
 				if (timeValues == null) {
 					return 0;
@@ -1536,10 +1577,10 @@ public class TourManager {
 					}
 				}
 
-				final int leftAltitude = altitudeValues[valueIndexLeft];
-				final int rightAltitude = altitudeValues[valueIndexRight];
-				final int leftTime = timeValues[valueIndexLeft];
-				final int rightTime = timeValues[valueIndexRight];
+				final float leftAltitude = altitudeValues[valueIndexLeft];
+				final float rightAltitude = altitudeValues[valueIndexRight];
+				final int leftTime = (int) timeValues[valueIndexLeft];
+				final int rightTime = (int) timeValues[valueIndexRight];
 
 				if (leftTime == rightTime) {
 
@@ -1571,19 +1612,19 @@ public class TourManager {
 					return 0;
 				}
 
-				final int[] altitudeValues = ((ChartDataSerie) (customDataAltitude)).getHighValues()[0];
-				final int[] distanceValues = ((ChartDataSerie) (customDataDistance)).getHighValues()[0];
+				final float[] altitudeValues = ((ChartDataSerie) (customDataAltitude)).getHighValues()[0];
+				final float[] distanceValues = ((ChartDataSerie) (customDataDistance)).getHighValues()[0];
 
-				final int leftAltitude = altitudeValues[valueIndexLeft];
-				final int rightAltitude = altitudeValues[valueIndexRight];
-				final int leftDistance = distanceValues[valueIndexLeft];
-				final int rightDistance = distanceValues[valueIndexRight];
+				final float leftAltitude = altitudeValues[valueIndexLeft];
+				final float rightAltitude = altitudeValues[valueIndexRight];
+				final float leftDistance = distanceValues[valueIndexLeft];
+				final float rightDistance = distanceValues[valueIndexRight];
 
 				if (leftDistance == rightDistance) {
 					// left and right slider are at the same position
 					return 0;
 				} else {
-					return (float) ((rightAltitude - leftAltitude)) / (rightDistance - leftDistance) * 100;
+					return ((rightAltitude - leftAltitude)) / (rightDistance - leftDistance) * 100;
 				}
 			}
 		};
@@ -1638,7 +1679,7 @@ public class TourManager {
 		 * distance
 		 */
 
-		final int[] distanceSerie = tourData.getDistanceSerie();
+		final float[] distanceSerie = tourData.getDistanceSerie();
 		ChartDataXSerie xDataDistance = null;
 		if (distanceSerie != null) {
 			xDataDistance = new ChartDataXSerie(distanceSerie);
@@ -1651,7 +1692,7 @@ public class TourManager {
 		/*
 		 * time
 		 */
-		final ChartDataXSerie xDataTime = new ChartDataXSerie(tourData.timeSerie);
+		final ChartDataXSerie xDataTime = new ChartDataXSerie(tourData.getTimeSerieFloat());
 		xDataTime.setLabel(Messages.tour_editor_label_time);
 		xDataTime.setUnitLabel(Messages.tour_editor_label_time_unit);
 		xDataTime.setDefaultRGB(new RGB(0, 0, 0));
@@ -1721,7 +1762,7 @@ public class TourManager {
 		 */
 		ChartDataYSerie yDataAltitude = null;
 
-		final int[] altitudeSerie = tourData.getAltitudeSmoothedSerie();
+		final float[] altitudeSerie = tourData.getAltitudeSmoothedSerie();
 		if (altitudeSerie != null) {
 
 			if (tourData.isSRTMAvailable()) {
@@ -1730,12 +1771,12 @@ public class TourManager {
 
 				if (tourChartConfig.isSRTMDataVisible) {
 
-					final int[] srtmDataSerie = tourData.getSRTMSerie();
+					final float[] srtmDataSerie = tourData.getSRTMSerie();
 					if (srtmDataSerie != null) {
 
 						// create altitude dataserie and adjust min/max values with with the srtm values
 						yDataAltitude = createChartDataSerie(//
-								new int[][] { altitudeSerie, srtmDataSerie },
+								new float[][] { altitudeSerie, srtmDataSerie },
 								chartType);
 					}
 				}
@@ -1763,7 +1804,7 @@ public class TourManager {
 			}
 
 			setGraphColor(_prefStore, yDataAltitude, GraphColorProvider.PREF_GRAPH_ALTITUDE);
-			adjustMinMax(yDataAltitude);
+//			adjustMinMax(yDataAltitude);
 			chartDataModel.addXyData(yDataAltitude);
 		}
 
@@ -1772,7 +1813,7 @@ public class TourManager {
 		 */
 		ChartDataYSerie yDataPulse = null;
 
-		final int[] pulseSerie = tourData.getPulseSmoothedSerie();
+		final float[] pulseSerie = tourData.getPulseSmoothedSerie();
 		if (pulseSerie != null) {
 
 			yDataPulse = createChartDataSerie(pulseSerie, chartType);
@@ -1796,7 +1837,7 @@ public class TourManager {
 		/*
 		 * speed
 		 */
-		final int[] speedSerie = tourData.getSpeedSerie();
+		final float[] speedSerie = tourData.getSpeedSerie();
 		ChartDataYSerie yDataSpeed = null;
 		if (speedSerie != null) {
 
@@ -1804,7 +1845,6 @@ public class TourManager {
 
 			yDataSpeed.setYTitle(Messages.Graph_Label_Speed);
 			yDataSpeed.setUnitLabel(UI.UNIT_LABEL_SPEED);
-			yDataSpeed.setValueDivisor(SPEED_DIVISOR);
 			yDataSpeed.setShowYSlider(true);
 			yDataSpeed.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_SPEED);
 			yDataSpeed.setCustomData(CUSTOM_DATA_ANALYZER_INFO, //
@@ -1823,7 +1863,7 @@ public class TourManager {
 		/*
 		 * pace
 		 */
-		final int[] paceSerie = tourData.getPaceSerieSeconds();
+		final float[] paceSerie = tourData.getPaceSerieSeconds();
 		ChartDataYSerie yDataPace = null;
 		if (paceSerie != null) {
 
@@ -1860,7 +1900,7 @@ public class TourManager {
 		/*
 		 * power
 		 */
-		final int[] powerSerie = tourData.getPowerSerie();
+		final float[] powerSerie = tourData.getPowerSerie();
 		ChartDataYSerie yDataPower = null;
 		if (powerSerie != null) {
 
@@ -1886,7 +1926,7 @@ public class TourManager {
 		/*
 		 * altimeter
 		 */
-		final int[] altimeterSerie = tourData.getAltimeterSerie();
+		final float[] altimeterSerie = tourData.getAltimeterSerie();
 		ChartDataYSerie yDataAltimeter = null;
 		if (altimeterSerie != null) {
 
@@ -1919,7 +1959,7 @@ public class TourManager {
 		/*
 		 * gradient
 		 */
-		final int[] gradientSerie = tourData.gradientSerie;
+		final float[] gradientSerie = tourData.gradientSerie;
 		ChartDataYSerie yDataGradient = null;
 		if (gradientSerie != null) {
 
@@ -1927,7 +1967,6 @@ public class TourManager {
 
 			yDataGradient.setYTitle(Messages.Graph_Label_Gradient);
 			yDataGradient.setUnitLabel(Messages.Graph_Label_Gradiend_unit);
-			yDataGradient.setValueDivisor(GRADIENT_DIVISOR);
 			yDataGradient.setShowYSlider(true);
 			yDataGradient.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_GRADIENT);
 			yDataGradient.setCustomData(CUSTOM_DATA_ANALYZER_INFO, //
@@ -1952,7 +1991,7 @@ public class TourManager {
 		/*
 		 * cadence
 		 */
-		final int[] cadenceSerie = tourData.cadenceSerie;
+		final float[] cadenceSerie = tourData.cadenceSerie;
 		ChartDataYSerie yDataCadence = null;
 		if (cadenceSerie != null) {
 
@@ -1977,7 +2016,7 @@ public class TourManager {
 		/*
 		 * temperature
 		 */
-		final int[] temperatureSerie = tourData.getTemperatureSerie();
+		final float[] temperatureSerie = tourData.getTemperatureSerie();
 		ChartDataYSerie yDataTemperature = null;
 		if (temperatureSerie != null) {
 
@@ -1985,7 +2024,6 @@ public class TourManager {
 
 			yDataTemperature.setYTitle(Messages.Graph_Label_Temperature);
 			yDataTemperature.setUnitLabel(UI.UNIT_LABEL_TEMPERATURE);
-			yDataTemperature.setValueDivisor(tourData.getTemperatureScale());
 			yDataTemperature.setShowYSlider(true);
 			yDataTemperature.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_TEMPERATURE);
 			yDataTemperature.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, true));
@@ -1997,14 +2035,14 @@ public class TourManager {
 			}
 
 			setGraphColor(_prefStore, yDataTemperature, GraphColorProvider.PREF_GRAPH_TEMPTERATURE);
-			adjustMinMax(yDataTemperature);
+//			adjustMinMax(yDataTemperature);
 			chartDataModel.addXyData(yDataTemperature);
 		}
 
 		/*
 		 * tour compare altitude difference
 		 */
-		final int[] tourCompareSerie = tourData.tourCompareSerie;
+		final float[] tourCompareSerie = tourData.tourCompareSerie;
 		ChartDataYSerie yDataTourCompare = null;
 		if (tourCompareSerie != null && tourCompareSerie.length > 0) {
 
@@ -2114,7 +2152,7 @@ public class TourManager {
 		return chartDataModel;
 	}
 
-	private ChartDataYSerie createChartDataSerie(final int[] dataSerie, final int chartType) {
+	private ChartDataYSerie createChartDataSerie(final float[] dataSerie, final int chartType) {
 
 		if (chartType == 0 || chartType == ChartDataModel.CHART_TYPE_LINE) {
 			return new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE, dataSerie);
@@ -2124,7 +2162,7 @@ public class TourManager {
 		}
 	}
 
-	private ChartDataYSerie createChartDataSerie(final int[][] dataSerie, final int chartType) {
+	private ChartDataYSerie createChartDataSerie(final float[][] dataSerie, final int chartType) {
 
 		if (chartType == 0 || chartType == ChartDataModel.CHART_TYPE_LINE) {
 			return new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE, dataSerie);

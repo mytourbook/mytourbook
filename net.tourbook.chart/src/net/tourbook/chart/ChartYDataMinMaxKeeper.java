@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.chart;
 
@@ -23,50 +23,58 @@ public class ChartYDataMinMaxKeeper {
 	/**
 	 * min/max values for the y-axis data
 	 */
-	private HashMap<Integer, Integer>	fMinValues	= null;
-	private HashMap<Integer, Integer>	fMaxValues	= null;
-
-	public boolean hasMinMaxChanged() {
-		boolean isEqual = fMinValues.equals(fMaxValues);
-		return !isEqual;
-	}
+	private HashMap<Integer, Float>	_minValues	= null;
+	private HashMap<Integer, Float>	_maxValues	= null;
 
 	public ChartYDataMinMaxKeeper() {}
+
+	HashMap<Integer, Float> getMaxValues() {
+		return _maxValues;
+	}
+
+	HashMap<Integer, Float> getMinValues() {
+		return _minValues;
+	}
+
+	public boolean hasMinMaxChanged() {
+		final boolean isEqual = _minValues.equals(_maxValues);
+		return !isEqual;
+	}
 
 	/**
 	 * keep the min/max values for all data series from the data model
 	 * 
 	 * @param chartDataModel
 	 */
-	public void saveMinMaxValues(ChartDataModel chartDataModel) {
+	public void saveMinMaxValues(final ChartDataModel chartDataModel) {
 
 		if (chartDataModel == null) {
 			return;
 		}
 
-		ArrayList<ChartDataSerie> xyData = chartDataModel.getXyData();
+		final ArrayList<ChartDataSerie> xyData = chartDataModel.getXyData();
 
-		fMinValues = new HashMap<Integer, Integer>();
-		fMaxValues = new HashMap<Integer, Integer>();
+		_minValues = new HashMap<Integer, Float>();
+		_maxValues = new HashMap<Integer, Float>();
 
 		// loop: save min/max values for all data series
-		for (ChartDataSerie chartData : xyData) {
+		for (final ChartDataSerie chartData : xyData) {
 			if (chartData instanceof ChartDataYSerie) {
-				ChartDataYSerie yData = (ChartDataYSerie) chartData;
+				final ChartDataYSerie yData = (ChartDataYSerie) chartData;
 
-				Integer yDataInfo = (Integer) yData.getCustomData(ChartDataYSerie.YDATA_INFO);
+				final Integer yDataInfo = (Integer) yData.getCustomData(ChartDataYSerie.YDATA_INFO);
 
 				if (yDataInfo != null) {
-					final int visibleMinValue = yData.getVisibleMinValue();
-					int visibleMaxValue = yData.getVisibleMaxValue();
+					final float visibleMinValue = yData.getVisibleMinValue();
+					float visibleMaxValue = yData.getVisibleMaxValue();
 
 					// prevent setting to the same value,
 					if (visibleMinValue == visibleMaxValue) {
 						visibleMaxValue++;
 					}
 
-					fMinValues.put(yDataInfo, visibleMinValue);
-					fMaxValues.put(yDataInfo, visibleMaxValue);
+					_minValues.put(yDataInfo, visibleMinValue);
+					_maxValues.put(yDataInfo, visibleMaxValue);
 				}
 			}
 		}
@@ -78,44 +86,36 @@ public class ChartYDataMinMaxKeeper {
 	 * @param chartDataModelOut
 	 *        data model which min/max data will be set from this min/max keeper
 	 */
-	public void setMinMaxValues(ChartDataModel chartDataModelOut) {
+	public void setMinMaxValues(final ChartDataModel chartDataModelOut) {
 
-		if (fMinValues == null) {
+		if (_minValues == null) {
 			// min/max values have not yet been saved, so nothing can be restored
 			return;
 		}
 //		System.out.println("restoreMinMaxValues" + chartDataModel);
-		ArrayList<ChartDataSerie> xyData = chartDataModelOut.getXyData();
+		final ArrayList<ChartDataSerie> xyData = chartDataModelOut.getXyData();
 
 		// loop: restore min/max values for all data series
-		for (ChartDataSerie chartData : xyData) {
+		for (final ChartDataSerie chartData : xyData) {
 			if (chartData instanceof ChartDataYSerie) {
-				ChartDataYSerie yData = (ChartDataYSerie) chartData;
+				final ChartDataYSerie yData = (ChartDataYSerie) chartData;
 
-				Integer yDataInfo = (Integer) yData.getCustomData(ChartDataYSerie.YDATA_INFO);
+				final Integer yDataInfo = (Integer) yData.getCustomData(ChartDataYSerie.YDATA_INFO);
 
 				if (yDataInfo != null) {
 
-					Integer minValue = fMinValues.get(yDataInfo);
+					final Float minValue = _minValues.get(yDataInfo);
 					if (minValue != null) {
 						yData.setVisibleMinValue(minValue);
 					}
 
-					Integer maxValue = fMaxValues.get(yDataInfo);
+					final Float maxValue = _maxValues.get(yDataInfo);
 					if (maxValue != null) {
 						yData.setVisibleMaxValue(maxValue);
 					}
 				}
 			}
 		}
-	}
-
-	HashMap<Integer, Integer> getMaxValues() {
-		return fMaxValues;
-	}
-
-	HashMap<Integer, Integer> getMinValues() {
-		return fMinValues;
 	}
 
 }

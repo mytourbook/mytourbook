@@ -732,7 +732,7 @@ public class GarminSAXHandler extends DefaultHandler {
 			_isInHeartRateValue = false;
 
 			if (_dataVersion == 2) {
-				_timeData.pulse = getShortValue(_characters.toString());
+				_timeData.pulse = getFloatValue(_characters.toString());
 			}
 
 		} else if (name.equals(TAG_HEART_RATE_BPM)) {
@@ -740,7 +740,7 @@ public class GarminSAXHandler extends DefaultHandler {
 			_isInHeartRate = false;
 
 			if (_dataVersion == 1) {
-				_timeData.pulse = getShortValue(_characters.toString());
+				_timeData.pulse = getFloatValue(_characters.toString());
 			}
 
 		} else if (name.equals(TAG_ALTITUDE_METERS)) {
@@ -757,8 +757,8 @@ public class GarminSAXHandler extends DefaultHandler {
 		} else if (name.equals(TAG_CADENCE)) {
 
 			_isInCadence = false;
-			short cadence = getShortValue(_characters.toString());
-			_timeData.cadence = cadence = cadence == Integer.MIN_VALUE ? 0 : cadence;
+			float cadence = getFloatValue(_characters.toString());
+			_timeData.cadence = cadence = cadence == Float.MIN_VALUE ? 0 : cadence;
 
 		} else if (name.equals(TAG_SENSOR_STATE)) {
 
@@ -841,18 +841,18 @@ public class GarminSAXHandler extends DefaultHandler {
 		}
 	}
 
-	private short getShortValue(final String textValue) {
-
-		try {
-			if (textValue != null) {
-				return Short.parseShort(textValue);
-			} else {
-				return Short.MIN_VALUE;
-			}
-		} catch (final NumberFormatException e) {
-			return Short.MIN_VALUE;
-		}
-	}
+//	private short getShortValue(final String textValue) {
+//
+//		try {
+//			if (textValue != null) {
+//				return Short.parseShort(textValue);
+//			} else {
+//				return Short.MIN_VALUE;
+//			}
+//		} catch (final NumberFormatException e) {
+//			return Short.MIN_VALUE;
+//		}
+//	}
 
 	private void initializeNewLap() {
 

@@ -94,7 +94,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	 * Distance in meters in the metric system or <code>-1</code> when the distance is not available
 	 */
 	@XmlElement
-	private int						distance				= -1;
+	private float					distance				= -1;
 
 	private int						visualPosition;
 
@@ -294,7 +294,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	 * @return Returns distance in meters in the metric system or -1 when the distance is not
 	 *         available
 	 */
-	public int getDistance() {
+	public float getDistance() {
 		return distance;
 	}
 
@@ -401,7 +401,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	 * @param distance
 	 *            Distance in meter or <code>-1</code> when the distance is not available
 	 */
-	public void setDistance(final int distance) {
+	public void setDistance(final float distance) {
 		this.distance = distance;
 	}
 
