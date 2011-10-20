@@ -248,10 +248,12 @@ public class Util {
 		}
 
 		unit = unitValue / multiplier;
+
 		unit = unit > 50 ? 50 : unit > 20 ? 20 : //
-				unit > 10 ? 10 : unit > 5 ? 5 : unit > 2 ? 2 : //
+				unit > 10 ? 10 : unit > 5 ? 5 : unit > 2f ? 2f : //
 						unit > 1 ? 1 : unit > 0.5f ? 0.5f : unit > 0.2f ? 0.2f : //
 								unit > 0.1f ? 0.1f : unit > 0.05f ? 0.05f : unit > 0.02f ? 0.02f : 0.01f;
+
 		unit *= multiplier;
 
 		return unit;
@@ -261,10 +263,22 @@ public class Util {
 
 		if (graphUnit < 1) {
 
-			final float gvDiv1 = graphValue / graphUnit;
-			final int gvDiv2 = (int) (gvDiv1 + 0.5f);
+			if (graphValue < 0) {
 
-			return gvDiv2 * graphUnit;
+				final float gvDiv1 = graphValue / graphUnit;
+				final int gvDiv2 = (int) (gvDiv1 - 0.05f);
+				final float gvDiv3 = gvDiv2 * graphUnit;
+
+				return gvDiv3;
+
+			} else {
+
+				final float gvDiv1 = graphValue / graphUnit;
+				final int gvDiv2 = (int) (gvDiv1 + 0.05f);
+				final float gvDiv3 = gvDiv2 * graphUnit;
+
+				return gvDiv3;
+			}
 
 		} else {
 

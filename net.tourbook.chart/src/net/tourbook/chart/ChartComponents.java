@@ -545,7 +545,7 @@ public class ChartComponents extends Composite {
 		final int defaultUnitCount = devGraphHeight / _chart.gridVerticalDistance;
 
 		// unitValue is the number in data values for one unit
-		final float graphUnitValue = graphValueRange / Math.max(1, defaultUnitCount);
+		final float defaultUnitValue = graphValueRange / Math.max(1, defaultUnitCount);
 
 		// round the unit
 		float graphUnit = 0;
@@ -554,12 +554,12 @@ public class ChartComponents extends Composite {
 		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H:
 		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_SECOND:
 		case ChartDataSerie.AXIS_UNIT_MINUTE_SECOND:
-			graphUnit = Util.roundTimeValue(graphUnitValue);
+			graphUnit = Util.roundTimeValue(defaultUnitValue);
 			break;
 
 		case ChartDataSerie.AXIS_UNIT_NUMBER:
 			// unit is a decimal number
-			graphUnit = Util.roundDecimalValue(graphUnitValue);
+			graphUnit = Util.roundDecimalValue(defaultUnitValue);
 			break;
 		}
 
@@ -567,7 +567,8 @@ public class ChartComponents extends Composite {
 		if (graphMinValue < 0) {
 
 			final float graphMinRemainder = graphMinValue % graphUnit;
-			graphMinValue = graphMinValue + graphMinRemainder - graphUnit;
+			final float min1 = graphMinValue - graphMinRemainder;
+			graphMinValue = min1 - graphUnit;
 
 		} else {
 
@@ -581,8 +582,13 @@ public class ChartComponents extends Composite {
 		}
 
 		// increase the max value when it does not fit to unit borders
-		final float graphMaxRemainder = graphMaxValue % graphUnit;
-		graphMaxValue = graphMaxValue - graphMaxRemainder + graphUnit;
+		if (graphMaxValue < 0) {
+			final float graphMaxRemainder = graphMaxValue % graphUnit;
+			graphMaxValue = graphMaxValue - graphMaxRemainder;
+		} else {
+			final float graphMaxRemainder = graphMaxValue % graphUnit;
+			graphMaxValue = graphMaxValue - graphMaxRemainder + graphUnit;
+		}
 
 		if (adjustGraphUnit || unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H && (graphMaxValue / 3600 > 24)) {
 
