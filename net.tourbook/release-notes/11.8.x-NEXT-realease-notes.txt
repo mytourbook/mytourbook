@@ -1,4 +1,9 @@
-hide log in the UI for these errors
+TODO's
+- double -> float
+  - ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED_AS 
+  - ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED_AS
+
+-hide log in the UI for these errors
 
 C:\offline-srtm\srtm3\N56W020.hgt (The system cannot find the file specified)
 load http://dds.cr.usgs.gov/srtm/version2_1/SRTM3/Islands/N56W020.hgt.zip

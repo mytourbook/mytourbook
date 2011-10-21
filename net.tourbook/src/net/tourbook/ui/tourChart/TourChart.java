@@ -365,7 +365,7 @@ public class TourChart extends Chart {
 			_tourChartConfig.isShowTimeOnXAxisBackup = _tourChartConfig.isShowTimeOnXAxis;
 
 			switchSlidersTo2ndXData();
-			updateTourChart(true);
+			updateTourChart(false);
 		}
 
 		// toggle time and distance buttons
@@ -401,7 +401,7 @@ public class TourChart extends Chart {
 			_tourChartConfig.isShowTimeOnXAxisBackup = _tourChartConfig.isShowTimeOnXAxis;
 
 			switchSlidersTo2ndXData();
-			updateTourChart(true);
+			updateTourChart(false);
 		}
 
 		// toggle time and distance buttons

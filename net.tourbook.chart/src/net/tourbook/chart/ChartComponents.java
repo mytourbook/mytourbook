@@ -339,67 +339,65 @@ public class ChartComponents extends Composite {
 
 		final ChartDataXSerie xData = drawingData.getXData();
 
-		final float xMaxValue = xData.getVisibleMaxValue();
+		final float graphMaxValue = xData.getOriginalMaxValue();
 		final int xAxisUnit = xData.getAxisUnit();
 		final float xStartValue = xData.getStartValue();
 
 		final int devVirtualGraphWidth = _componentGraph.getDevVirtualGraphImageWidth();
-
-		// enforce minimum chart width
-//		devGraphWidth = Math.max(devGraphWidth, CHART_MIN_WIDTH);
+		final float scaleX = ((float) devVirtualGraphWidth - 1) / graphMaxValue;
 
 		drawingData.devVirtualGraphWidth = devVirtualGraphWidth;
-		drawingData.setScaleX(((float) devVirtualGraphWidth - 1) / xMaxValue);
+		drawingData.setScaleX(scaleX);
 
 		/*
 		 * calculate the number of units which will be visible by dividing the visible length by the
 		 * minimum size which one unit should have in pixels
 		 */
-		final int unitRawNumbers = devVirtualGraphWidth / _chart.gridHorizontalDistance;
+		final int defaultUnitCount = devVirtualGraphWidth / _chart.gridHorizontalDistance;
 
 		// unitRawValue is the number in data values for one unit
-		final float unitRawValue = xMaxValue / Math.max(1, unitRawNumbers);
+		final float defaultUnitValue = graphMaxValue / Math.max(1, defaultUnitCount);
 
 		// get the unit list from the configuration
-		final ArrayList<ChartUnit> units = drawingData.getXUnits();
+		final ArrayList<ChartUnit> unitList = drawingData.getXUnits();
 
 		switch (xAxisUnit) {
 
 		case ChartDataSerie.X_AXIS_UNIT_DAY:
 
-			createXValuesDay(drawingData, units, devVirtualGraphWidth);
+			createXValuesDay(drawingData, unitList, devVirtualGraphWidth);
 			break;
 
 		case ChartDataSerie.X_AXIS_UNIT_WEEK:
 
-			createXValuesWeek(drawingData, units, devVirtualGraphWidth);
+			createXValuesWeek(drawingData, unitList, devVirtualGraphWidth);
 			break;
 
 		case ChartDataSerie.X_AXIS_UNIT_MONTH:
 
-			createXValuesMonth(drawingData, units, devVirtualGraphWidth);
+			createXValuesMonth(drawingData, unitList, devVirtualGraphWidth);
 			break;
 
 		case ChartDataSerie.X_AXIS_UNIT_YEAR:
 
-			createXValuesYear(drawingData, units, devVirtualGraphWidth);
+			createXValuesYear(drawingData, unitList, devVirtualGraphWidth);
 			break;
 
 		default:
 
 			// axis unit
-			float unitValue = 1; // this default value should be overwritten
+			float graphUnit = 1; // this default value should be overwritten
 
 			switch (xAxisUnit) {
 			case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_SECOND:
 			case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_OPTIONAL_SECOND:
 			case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE:
-				unitValue = Util.roundTimeValue(unitRawValue);
+				graphUnit = Util.roundTimeValue(defaultUnitValue);
 				break;
 
 			case ChartDataSerie.AXIS_UNIT_NUMBER:
 			case ChartDataSerie.X_AXIS_UNIT_NUMBER_CENTER:
-				unitValue = Util.roundDecimalValue(unitRawValue);
+				graphUnit = Util.roundDecimalValue(defaultUnitValue);
 				break;
 
 			default:
@@ -413,20 +411,29 @@ public class ChartComponents extends Composite {
 			// get the unitOffset when a startValue is set
 			float unitOffset = 0;
 			if (xStartValue != 0) {
-				unitOffset = xStartValue % unitValue;
+				unitOffset = xStartValue % graphUnit;
 			}
 
 			final int valueDivisor = xData.getValueDivisor();
-			int graphValue = 0;
-			int infinityLoopIndex = 0;
+			int loopCounter = 0;
 
 			/*
 			 * increase by one unit that the right side of the chart is drawing a unit, in some
 			 * cases this didn't occured
 			 */
-			final float maxUnitValue = xMaxValue + unitValue;
+			float graphMinVisibleValue = xData.getVisibleMinValue();
+			float graphMaxVisibleValue = xData.getVisibleMaxValue();
 
-			while (graphValue <= maxUnitValue) {
+			// decrease min value when it does not fit to unit borders
+			final float graphMinRemainder = graphMinVisibleValue % graphUnit;
+			graphMinVisibleValue = graphMinVisibleValue - graphMinRemainder;
+
+			graphMinVisibleValue = Util.roundFloatToUnit(graphMinVisibleValue, graphUnit);
+			graphMaxVisibleValue = Util.roundFloatToUnit(graphMaxVisibleValue, graphUnit);
+
+			float graphValue = graphMinVisibleValue;
+
+			while (graphValue <= graphMaxVisibleValue) {
 
 				// create unit value/label
 				final float unitPos = graphValue - unitOffset;
@@ -445,15 +452,17 @@ public class ChartComponents extends Composite {
 
 				final String unitLabel = Util.formatValue(unitLabelValue, xAxisUnit, valueDivisor, true);
 
-				units.add(new ChartUnit(unitPos, unitLabel));
-
-				graphValue += unitValue;
+				unitList.add(new ChartUnit(graphValue, unitLabel));
 
 				// check for an infinity loop
-				if (infinityLoopIndex++ > 10000) {
+				if (graphValue == graphMaxValue || loopCounter++ > 10000) {
 					break;
 				}
+
+				graphValue += graphUnit;
+				graphValue = Util.roundFloatToUnit(graphValue, graphUnit);
 			}
+
 			break;
 		}
 
@@ -526,17 +535,19 @@ public class ChartComponents extends Composite {
 		 */
 
 		final int unitType = yData.getAxisUnit();
-		float graphMinValue = yData.getVisibleMinValue();
-		float graphMaxValue = yData.getVisibleMaxValue();
+		float graphMinVisibleValue = yData.getVisibleMinValue();
+		float graphMaxVisibleValue = yData.getVisibleMaxValue();
 
 		// clip max value
 		boolean adjustGraphUnit = false;
-		if (unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H && (graphMaxValue / 3600 > 24)) {
-			graphMaxValue = 24 * 3600;
+		if (unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H && (graphMaxVisibleValue / 3600 > 24)) {
+			graphMaxVisibleValue = 24 * 3600;
 			adjustGraphUnit = true;
 		}
 
-		float graphValueRange = graphMaxValue > 0 ? (graphMaxValue - graphMinValue) : -(graphMinValue - graphMaxValue);
+		float graphValueRange = graphMaxVisibleValue > 0
+				? (graphMaxVisibleValue - graphMinVisibleValue)
+				: -(graphMinVisibleValue - graphMaxVisibleValue);
 
 		/*
 		 * calculate the number of units which will be visible by dividing the available height by
@@ -564,43 +575,45 @@ public class ChartComponents extends Composite {
 		}
 
 		// decrease min value when it does not fit to unit borders
-		if (graphMinValue < 0) {
+		if (graphMinVisibleValue < 0) {
 
-			final float graphMinRemainder = graphMinValue % graphUnit;
-			final float min1 = graphMinValue - graphMinRemainder;
-			graphMinValue = min1 - graphUnit;
+			final float graphMinRemainder = graphMinVisibleValue % graphUnit;
+			final float min1 = graphMinVisibleValue - graphMinRemainder;
+			graphMinVisibleValue = min1 - graphUnit;
 
 		} else {
 
-			final float graphMinRemainder = graphMinValue % graphUnit;
-			graphMinValue = graphMinValue - graphMinRemainder;
+			final float graphMinRemainder = graphMinVisibleValue % graphUnit;
+			graphMinVisibleValue = graphMinVisibleValue - graphMinRemainder;
 		}
 
 		// adjust the min value so that bar graphs start at the bottom of the chart
 		if (_chartDataModel.getChartType() == ChartDataModel.CHART_TYPE_BAR && _chart.getStartAtChartBottom()) {
-			yData.setVisibleMinValue(graphMinValue);
+			yData.setVisibleMinValue(graphMinVisibleValue);
 		}
 
 		// increase the max value when it does not fit to unit borders
-		if (graphMaxValue < 0) {
-			final float graphMaxRemainder = graphMaxValue % graphUnit;
-			graphMaxValue = graphMaxValue - graphMaxRemainder;
+		if (graphMaxVisibleValue < 0) {
+			final float graphMaxRemainder = graphMaxVisibleValue % graphUnit;
+			graphMaxVisibleValue = graphMaxVisibleValue - graphMaxRemainder;
 		} else {
-			final float graphMaxRemainder = graphMaxValue % graphUnit;
-			graphMaxValue = graphMaxValue - graphMaxRemainder + graphUnit;
+			final float graphMaxRemainder = graphMaxVisibleValue % graphUnit;
+			graphMaxVisibleValue = graphMaxVisibleValue - graphMaxRemainder + graphUnit;
 		}
 
-		if (adjustGraphUnit || unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H && (graphMaxValue / 3600 > 24)) {
+		if (adjustGraphUnit
+				|| unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H
+				&& (graphMaxVisibleValue / 3600 > 24)) {
 
 			// max value exeeds 24h
 
 			// count number of units
 			int unitCounter = 0;
-			float graphValue = graphMinValue;
-			while (graphValue <= graphMaxValue) {
+			float graphValue = graphMinVisibleValue;
+			while (graphValue <= graphMaxVisibleValue) {
 
 				// prevent endless loops when the unit is 0
-				if (graphValue == graphMaxValue) {
+				if (graphValue == graphMaxVisibleValue) {
 					break;
 				}
 				unitCounter++;
@@ -608,22 +621,24 @@ public class ChartComponents extends Composite {
 			}
 
 			// adjust to 24h
-			graphMaxValue = 24 * 3600;
-			graphMaxValue = Math.min(24 * 3600, ((((int) yData.getVisibleMaxValue()) / 3600) * 3600) + 3600);
+			graphMaxVisibleValue = 24 * 3600;
+			graphMaxVisibleValue = Math.min(24 * 3600, ((((int) yData.getVisibleMaxValue()) / 3600) * 3600) + 3600);
 
 			// adjust to the whole hour
-			graphMinValue = Math.max(0, ((((int) yData.getVisibleMinValue() / 3600) * 3600)));
+			graphMinVisibleValue = Math.max(0, ((((int) yData.getVisibleMinValue() / 3600) * 3600)));
 
-			graphUnit = (graphMaxValue - graphMinValue) / unitCounter;
+			graphUnit = (graphMaxVisibleValue - graphMinVisibleValue) / unitCounter;
 			graphUnit = Util.roundTimeValue((int) graphUnit);
 		}
 
-		graphValueRange = graphMaxValue > 0 ? (graphMaxValue - graphMinValue) : -(graphMinValue - graphMaxValue);
+		graphValueRange = graphMaxVisibleValue > 0
+				? (graphMaxVisibleValue - graphMinVisibleValue)
+				: -(graphMinVisibleValue - graphMaxVisibleValue);
 
 		// ensure the chart is drawn correctly with pseudo data
 		if (graphValueRange == 0) {
 			graphValueRange = 3600;
-			graphMaxValue = 3600;
+			graphMaxVisibleValue = 3600;
 			graphUnit = 1800;
 		}
 
@@ -649,42 +664,40 @@ public class ChartComponents extends Composite {
 		drawingData.setDevYBottom(devYTop);
 		drawingData.setDevYTop(devYTop - devGraphHeight);
 
-		drawingData.setGraphYBottom(graphMinValue);
-		drawingData.setGraphYTop(graphMaxValue);
+		drawingData.setGraphYBottom(graphMinVisibleValue);
+		drawingData.setGraphYTop(graphMaxVisibleValue);
 
 		drawingData.devGraphHeight = devGraphHeight;
 		drawingData.setDevSliderHeight(_devSliderBarHeight);
 
 		final ArrayList<ChartUnit> unitList = drawingData.getYUnits();
 		final int valueDivisor = yData.getValueDivisor();
-		int maxUnits = 0;
+		int loopCounter = 0;
 
-		graphMinValue = Util.roundFloatToUnit(graphMinValue, graphUnit);
-		graphMaxValue = Util.roundFloatToUnit(graphMaxValue, graphUnit);
+		graphMinVisibleValue = Util.roundFloatToUnit(graphMinVisibleValue, graphUnit);
+		graphMaxVisibleValue = Util.roundFloatToUnit(graphMaxVisibleValue, graphUnit);
 
-		float graphValue = graphMinValue;
+		float graphValue = graphMinVisibleValue;
 
 		// loop: create unit label for all units
-		while (graphValue <= graphMaxValue) {
+		while (graphValue <= graphMaxVisibleValue) {
 
 			final String unitLabel = Util.formatValue(graphValue, unitType, valueDivisor, false);
 
 			unitList.add(new ChartUnit(graphValue, unitLabel));
 
 			// prevent endless loops when the unit is 0
-			if (graphValue == graphMaxValue || maxUnits > 1000) {
+			if (graphValue == graphMaxVisibleValue || loopCounter++ > 1000) {
 				break;
 			}
 
 			graphValue += graphUnit;
 			graphValue = Util.roundFloatToUnit(graphValue, graphUnit);
-
-			maxUnits++;
 		}
 
-		if (unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H && graphValue > graphMaxValue) {
+		if (unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H && graphValue > graphMaxVisibleValue) {
 
-			unitList.add(new ChartUnit(graphMaxValue, Util.EMPTY_STRING));
+			unitList.add(new ChartUnit(graphMaxVisibleValue, Util.EMPTY_STRING));
 		}
 	}
 
@@ -1299,7 +1312,7 @@ public class ChartComponents extends Composite {
 		if ((chartType == ChartDataModel.CHART_TYPE_LINE || chartType == ChartDataModel.CHART_TYPE_LINE_WITH_BARS)
 				&& isShowAllData) {
 
-			_componentGraph.updateYDataMinMaxValues();
+			_componentGraph.updateVisibleMinMaxValues();
 		}
 
 		if (onResize()) {

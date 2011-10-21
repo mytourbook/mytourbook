@@ -2878,7 +2878,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		 * time serie is always available, except when tours are created manually
 		 */
 		timeSerie = new int[serieSize];
-		timeSerieFloat = new float[serieSize];
 
 		final boolean isDistance = setupDistanceStartingValues(timeDataSerie, isAbsoluteData);
 		final boolean isAltitude = setupAltitudeStartingValues(timeDataSerie, isAbsoluteData);

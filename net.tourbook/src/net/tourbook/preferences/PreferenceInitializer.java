@@ -295,8 +295,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.BREAK_TIME_METHOD2, BreakTimeTool.BREAK_TIME_METHOD_BY_AVG_SLICE_SPEED);
 
 		// minimum speed for a break, default is 1.0 km/h to respect walking in the mountains
-		store.setDefault(ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED_AS, 1.0);
-		store.setDefault(ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED_AS, 1.0);
+		store.setDefault(ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED_AS, 1.0f);
+		store.setDefault(ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED_AS, 1.0f);
 		store.setDefault(ITourbookPreferences.BREAK_TIME_MIN_SLICE_TIME_AS, 2);
 
 		// minimum speed for a break, default is 1.0 km/h to respect walking in the mountains

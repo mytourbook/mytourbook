@@ -1816,32 +1816,10 @@ public class ChartComponentGraph extends Canvas {
 				? ((xUnits.get(1).value * scaleX) - (xUnits.get(0).value * scaleX))
 				: 0;
 
-		float devXOffset = 0;
-		int unitCounterInvisibleLeft = 0;
-		int unitCounterInvisibleRight = 0;
 		int unitCounter = 0;
-		boolean isUnitVisibilityChecked = false;
-
 		final int devVisibleChartWidth = getDevVisibleChartWidth();
-		final boolean isLineChart = _chartComponents.getChartDataModel().getChartType() != ChartDataModel.CHART_TYPE_BAR;
-
-		/*
-		 * check if units are outside of the visible chart
-		 */
-		if (isLineChart && _canScrollZoomedChart == false && _devGraphImageXOffset > 0) {
-
-			// calculate the unit offset
-			unitCounterInvisibleLeft = (int) (_devGraphImageXOffset / devUnitWidth);
-			unitCounterInvisibleRight = (int) ((_devGraphImageXOffset + devVisibleChartWidth) / devUnitWidth);
-
-			devXOffset -= _devGraphImageXOffset % devUnitWidth;
-
-			isUnitVisibilityChecked = true;
-		}
 
 		boolean isFirstUnit = true;
-//		int devXLastUnitRightPos = 0;
-//		int devXFirstUnitRightPos = 0;
 		int devXLastUnitRightPosition = -1;
 
 		final String unitLabel = drawingData.getXData().getUnitLabel();
@@ -1852,34 +1830,17 @@ public class ChartComponentGraph extends Canvas {
 
 		for (final ChartUnit unit : xUnits) {
 
-			if (isUnitVisibilityChecked) {
-
-				/*
-				 * skip units which are outside of the chart and not displayed
-				 */
-				if (unitCounter < unitCounterInvisibleLeft) {
-
-					devXOffset -= devUnitWidth;
-
-					unitCounter++;
-					continue;
-				}
-
-				if (unitCounter > unitCounterInvisibleRight) {
-					break;
-				}
-			}
-
 			// get dev x-position for the unit tick
 			int devXUnitTick;
 			if (isExtendedScaling) {
 
+				// extended scaling
 				final double scaledUnitValue = ((Math.pow(unit.value, scalingFactor)) * extScaleX);
-
-				// scale with devXOffset
 				devXUnitTick = (int) (scaledUnitValue);
+
 			} else {
-				devXUnitTick = (int) (devXOffset + (unit.value * scaleX));
+				// scale with devXOffset
+				devXUnitTick = (int) (unit.value * scaleX) - _devGraphImageXOffset;
 			}
 
 			/*
@@ -5402,7 +5363,7 @@ public class ChartComponentGraph extends Canvas {
 			final float xOffsetMouse = _devGraphImageXOffset + devVisibleChartWidth / 2;
 			_xOffsetMouseZoomInRatio = xOffsetMouse / _devVirtualGraphImageWidth;
 
-			updateYDataMinMaxValues();
+			updateVisibleMinMaxValues();
 
 			/*
 			 * prevent to display the old chart image
@@ -5813,7 +5774,7 @@ public class ChartComponentGraph extends Canvas {
 		xOffsetMouse = xOffsetMouse - devXDiff;
 		_xOffsetMouseZoomInRatio = xOffsetMouse / _devVirtualGraphImageWidth;
 
-		updateYDataMinMaxValues();
+		updateVisibleMinMaxValues();
 
 		/*
 		 * draw the dragged image until the graph image is recomuted
@@ -6004,6 +5965,125 @@ public class ChartComponentGraph extends Canvas {
 	}
 
 	/**
+	 * sets the min/max values for the y-axis that the visible area will be filled with the chart
+	 */
+	void updateVisibleMinMaxValues() {
+
+		final ChartDataModel chartDataModel = _chartComponents.getChartDataModel();
+		final ChartDataXSerie xData = chartDataModel.getXData();
+		final ArrayList<ChartDataYSerie> yDataList = chartDataModel.getYData();
+
+		if (xData == null) {
+			return;
+		}
+
+		final float[][] xValueSerie = xData.getHighValues();
+
+		if (xValueSerie.length == 0) {
+			// data are not available
+			return;
+		}
+
+		final float[] xValues = xValueSerie[0];
+		final float lastXValue = xValues[xValues.length - 1];
+		final float valueVisibleArea = lastXValue / _graphZoomRatio;
+
+		final float valueLeftBorder = lastXValue * _xOffsetZoomRatio;
+		float valueRightBorder = valueLeftBorder + valueVisibleArea;
+
+		// make sure right is higher than left
+		if (valueLeftBorder >= valueRightBorder) {
+			valueRightBorder = valueLeftBorder + 1;
+		}
+
+		/*
+		 * get value index for the left and right border of the visible area
+		 */
+		int xValueIndexLeft = 0;
+		for (int serieIndex = 0; serieIndex < xValues.length; serieIndex++) {
+			final float xValue = xValues[serieIndex];
+			if (xValue == valueLeftBorder) {
+				xValueIndexLeft = serieIndex;
+				break;
+			}
+			if (xValue > valueLeftBorder) {
+				xValueIndexLeft = serieIndex == 0 ? //
+						0
+						// get index from last invisible value
+						: serieIndex - 1;
+				break;
+			}
+		}
+
+		int xValueIndexRight = xValueIndexLeft;
+		for (; xValueIndexRight < xValues.length; xValueIndexRight++) {
+			if (xValues[xValueIndexRight] > valueRightBorder) {
+				break;
+			}
+		}
+
+// x-data visible min/max is more complicated than just setting the visibleMin/Max values
+		/*
+		 * get min/max value the x-data serie to fill the visible area with the chart
+		 */
+		// ensure array bounds
+		final int xValuesLastIndex = xValues.length - 1;
+		xValueIndexLeft = Math.min(xValueIndexLeft, xValuesLastIndex);
+		xValueIndexLeft = Math.max(xValueIndexLeft, 0);
+		xValueIndexRight = Math.min(xValueIndexRight, xValuesLastIndex);
+		xValueIndexRight = Math.max(xValueIndexRight, 0);
+
+		xData.setVisibleMinValue(xValues[xValueIndexLeft]);
+		xData.setVisibleMaxValue(xValues[xValueIndexRight]);
+
+		/*
+		 * get min/max value for each y-data serie to fill the visible area with the chart
+		 */
+		for (final ChartDataYSerie yData : yDataList) {
+
+			final float[][] yValueSeries = yData.getHighValues();
+			final float yValues[] = yValueSeries[0];
+
+			// ensure array bounds
+			final int yValuesLastIndex = yValues.length - 1;
+			xValueIndexLeft = Math.min(xValueIndexLeft, yValuesLastIndex);
+			xValueIndexLeft = Math.max(xValueIndexLeft, 0);
+			xValueIndexRight = Math.min(xValueIndexRight, yValuesLastIndex);
+			xValueIndexRight = Math.max(xValueIndexRight, 0);
+
+			float minValue = yValues[xValueIndexLeft];
+			float maxValue = yValues[xValueIndexLeft];
+
+			for (final float[] yValueSerie : yValueSeries) {
+
+				if (yValueSerie == null) {
+					continue;
+				}
+
+				for (int valueIndex = xValueIndexLeft; valueIndex <= xValueIndexRight; valueIndex++) {
+
+					final float yValue = yValueSerie[valueIndex];
+
+					if (yValue < minValue) {
+						minValue = yValue;
+					}
+					if (yValue > maxValue) {
+						maxValue = yValue;
+					}
+				}
+			}
+
+			if (yData.isForceMinValue() == false && minValue != 0) {
+				yData.setVisibleMinValue(minValue);
+			}
+
+			if (yData.isForceMaxValue() == false && maxValue != 0) {
+				yData.setVisibleMaxValue(maxValue);
+			}
+		}
+	}
+
+	/**
 	 * adjust the y-position for the bottom label when the top label is drawn over it
 	 */
 	private void updateXSliderYPosition() {
@@ -6025,113 +6105,6 @@ public class ChartComponentGraph extends Canvas {
 				onBotLabel.y = onBotLabel.y + onBotLabel.height + 5;
 			}
 			labelIndex++;
-		}
-	}
-
-	/**
-	 * sets the min/max values for the y-axis that the visible area will be filled with the chart
-	 */
-	void updateYDataMinMaxValues() {
-
-		final ChartDataModel chartDataModel = _chartComponents.getChartDataModel();
-		final ChartDataXSerie xData = chartDataModel.getXData();
-		final ArrayList<ChartDataYSerie> yDataList = chartDataModel.getYData();
-
-		if (xData == null) {
-			return;
-		}
-
-		final float[][] xValueSerie = xData.getHighValues();
-
-		if (xValueSerie.length == 0) {
-			// data are not available
-			return;
-		}
-
-		final float[] xValues = xValueSerie[0];
-		final int serieLength = xValues.length;
-
-		final float lastXValue = xValues[serieLength - 1];
-		final float valueVisibleArea = lastXValue / _graphZoomRatio;
-
-		final float valueLeftBorder = lastXValue * _xOffsetZoomRatio;
-		float valueRightBorder = valueLeftBorder + valueVisibleArea;
-
-		// make sure right is higher than left
-		if (valueLeftBorder >= valueRightBorder) {
-			valueRightBorder = valueLeftBorder + 1;
-		}
-
-		/*
-		 * get value index for the left and right border of the visible area
-		 */
-		int valueIndexLeft = 0;
-		for (int serieIndex = 0; serieIndex < xValues.length; serieIndex++) {
-			final float xValue = xValues[serieIndex];
-			if (xValue == valueLeftBorder) {
-				valueIndexLeft = serieIndex;
-				break;
-			}
-			if (xValue > valueLeftBorder) {
-				valueIndexLeft = serieIndex == 0 ? //
-						0
-						// get index from last invisible value
-						: serieIndex - 1;
-				break;
-			}
-		}
-
-		int valueIndexRight = valueIndexLeft;
-		for (; valueIndexRight < xValues.length; valueIndexRight++) {
-			if (xValues[valueIndexRight] > valueRightBorder) {
-				break;
-			}
-		}
-
-		/*
-		 * get min/max value for each dataserie to fill the visible area with the chart
-		 */
-		for (final ChartDataYSerie yData : yDataList) {
-
-			final float[][] yValueSeries = yData.getHighValues();
-			final float yValues[] = yValueSeries[0];
-
-			// ensure array bounds
-			final int maxYValueIndex = yValues.length - 1;
-			valueIndexLeft = Math.min(valueIndexLeft, maxYValueIndex);
-			valueIndexLeft = Math.max(valueIndexLeft, 0);
-			valueIndexRight = Math.min(valueIndexRight, maxYValueIndex);
-			valueIndexRight = Math.max(valueIndexRight, 0);
-
-			float minValue = yValues[valueIndexLeft];
-			float maxValue = yValues[valueIndexLeft];
-
-			for (final float[] yValueSerie : yValueSeries) {
-
-				if (yValueSerie == null) {
-					continue;
-				}
-
-				for (int valueIndex = valueIndexLeft; valueIndex <= valueIndexRight; valueIndex++) {
-
-					final float yValue = yValueSerie[valueIndex];
-
-					if (yValue < minValue) {
-						minValue = yValue;
-					}
-					if (yValue > maxValue) {
-						maxValue = yValue;
-					}
-				}
-			}
-
-			if (yData.isForceMinValue() == false && minValue != 0) {
-				yData.setVisibleMinValue(minValue /*- 1*/);
-			}
-
-			if (yData.isForceMaxValue() == false && maxValue != 0) {
-				yData.setVisibleMaxValue(maxValue /* + 1 */);
-			}
 		}
 	}
 
@@ -6170,7 +6143,7 @@ public class ChartComponentGraph extends Canvas {
 				setXOffsetZoomRatio();
 				handleChartResizeForSliders();
 
-				updateYDataMinMaxValues();
+				updateVisibleMinMaxValues();
 				moveSlidersToBorder();
 
 				_chartComponents.onResize();
@@ -6282,7 +6255,7 @@ public class ChartComponentGraph extends Canvas {
 
 		handleChartResizeForSliders();
 
-		updateYDataMinMaxValues();
+		updateVisibleMinMaxValues();
 
 		_chart.enableActions();
 	}
@@ -6363,7 +6336,7 @@ public class ChartComponentGraph extends Canvas {
 				setXOffsetZoomRatio();
 
 				handleChartResizeForSliders();
-				updateYDataMinMaxValues();
+				updateVisibleMinMaxValues();
 
 				if (updateChart) {
 					_chartComponents.onResize();
@@ -6379,7 +6352,7 @@ public class ChartComponentGraph extends Canvas {
 					setXOffsetZoomRatio();
 
 					handleChartResizeForSliders();
-					updateYDataMinMaxValues();
+					updateVisibleMinMaxValues();
 
 					if (updateChart) {
 						_chartComponents.onResize();

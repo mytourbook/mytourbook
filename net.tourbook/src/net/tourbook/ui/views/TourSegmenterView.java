@@ -229,8 +229,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private SegmenterType									_userSelectedSegmenterType;
 
 	private long											_tourBreakTime;
-	private double											_breakUIMinAvgSpeedAS;
-	private double											_breakUIMinSliceSpeedAS;
+	private float											_breakUIMinAvgSpeedAS;
+	private float											_breakUIMinSliceSpeedAS;
 	private int												_breakUIMinSliceTimeAS;
 	private float											_breakUIMinAvgSpeed;
 	private float											_breakUIMinSliceSpeed;
@@ -3031,10 +3031,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		/*
 		 * break by avg + slice speed
 		 */
-		final double stateAvgSpeedAS = Util.getStateDouble(_state, //
+		final float stateAvgSpeedAS = Util.getStateFloat(_state, //
 				STATE_BREAK_TIME_MIN_AVG_SPEED_AS,
 				btConfig.breakMinAvgSpeedAS);
-		final double stateSliceSpeedAS = Util.getStateDouble(_state, //
+		final float stateSliceSpeedAS = Util.getStateFloat(_state, //
 				STATE_BREAK_TIME_MIN_SLICE_SPEED_AS,
 				btConfig.breakMinSliceSpeedAS);
 		final int stateSliceTimeAS = Util.getStateInt(_state, //
@@ -3096,10 +3096,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		_prefStore.setValue(ITourbookPreferences.BREAK_TIME_METHOD2, getSelectedBreakMethod().methodId);
 
 		// break by avg+slice speed
-		final double breakMinAvgSpeedAS = _spinnerBreakMinAvgSpeedAS.getSelection()
+		final float breakMinAvgSpeedAS = _spinnerBreakMinAvgSpeedAS.getSelection()
 				/ SPEED_DIGIT_VALUE
 				/ UI.UNIT_VALUE_DISTANCE;
-		final double breakMinSliceSpeedAS = _spinnerBreakMinSliceSpeedAS.getSelection()
+		final float breakMinSliceSpeedAS = _spinnerBreakMinSliceSpeedAS.getSelection()
 				/ SPEED_DIGIT_VALUE
 				/ UI.UNIT_VALUE_DISTANCE;
 		final int breakMinSliceTimeAS = _spinnerBreakMinSliceTimeAS.getSelection();
@@ -3135,10 +3135,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		_state.put(STATE_SELECTED_BREAK_METHOD2, getSelectedBreakMethod().methodId);
 
 		// break by avg+slice speed
-		final double breakMinAvgSpeedAS = _spinnerBreakMinAvgSpeedAS.getSelection()
+		final float breakMinAvgSpeedAS = _spinnerBreakMinAvgSpeedAS.getSelection()
 				/ SPEED_DIGIT_VALUE
 				/ UI.UNIT_VALUE_DISTANCE;
-		final double breakMinSliceSpeedAS = _spinnerBreakMinSliceSpeedAS.getSelection()
+		final float breakMinSliceSpeedAS = _spinnerBreakMinSliceSpeedAS.getSelection()
 				/ SPEED_DIGIT_VALUE
 				/ UI.UNIT_VALUE_DISTANCE;
 		final int breakMinSliceTimeAS = _spinnerBreakMinSliceTimeAS.getSelection();
