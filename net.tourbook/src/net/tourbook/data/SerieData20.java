@@ -13,42 +13,31 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.mapping;
+/**
+ * 
+ */
+package net.tourbook.data;
 
-public class ValueColor {
+import java.io.Serializable;
 
-	public float	value;
+/**
+ * All time serie data from a device are stored in the database with this class, when data are not
+ * available the value is set to <code>null</code>
+ */
+public class SerieData20 implements Serializable {
 
-	public int		red;
-	public int		green;
-	public int		blue;
+	private static final long	serialVersionUID	= 1L;
 
-	public ValueColor(final float value, final int red, final int green, final int blue) {
+	public int					timeSerie[];
 
-		this.value = value;
+	public float				distanceSerie[];
+	public float				altitudeSerie[];
+	public float				cadenceSerie[];
+	public float				pulseSerie[];
+	public float				temperatureSerie[];
+	public float				speedSerie[];
+	public float				powerSerie[];
 
-		this.red = red;
-		this.green = green;
-		this.blue = blue;
-	}
-
-	/**
-	 * Create a copy
-	 * 
-	 * @param valueColor
-	 */
-	public ValueColor(final ValueColor valueColor) {
-
-		value = valueColor.value;
-
-		red = valueColor.red;
-		green = valueColor.green;
-		blue = valueColor.blue;
-	}
-
-	@Override
-	public String toString() {
-		return "new ValueColor(" + value + ", " + red + ", " + green + ", " + blue + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-	}
-
+	public double				longitude[];
+	public double				latitude[];
 }

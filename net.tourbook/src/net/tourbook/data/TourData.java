@@ -90,6 +90,9 @@ import org.joda.time.DateTime;
 /**
  * Tour data contains all data for a tour (except markers), an entity will be saved in the database
  */
+/**
+ * @author 081647
+ */
 @Entity
 @XmlType(name = "TourData")
 @XmlRootElement(name = "TourData")
@@ -494,6 +497,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	// ############################################# CONCONI TEST #############################################
 
+	// ############################################# UNUSED FIELDS #############################################
 	/**
 	 * ssss distance msw
 	 * <p>
@@ -501,8 +505,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	@SuppressWarnings("unused")
 	private int												distance;
-
-	// ############################################# UNUSED FIELDS #############################################
 
 	@SuppressWarnings("unused")
 	private int												deviceDistance;
@@ -522,11 +524,19 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	@SuppressWarnings("unused")
 	private int												deviceWeight;
 
+	// ############################################# UNUSED FIELDS #############################################
+
 	/**
-	 * data series for time, altitude,...
+	 * data series for time, altitude,..., this field can be removed after db version 20
 	 */
 	@Basic(optional = false)
 	private SerieData										serieData;
+
+	/**
+	 * Serie data for time, altitude, ... with floating point values since db version 20
+	 */
+	@Basic(optional = false)
+	private SerieData20										serieData20;
 
 	/**
 	 * Tour marker
@@ -2792,6 +2802,74 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 	}
 
+	/**
+	 * Converts data series from db version 19 to 20
+	 */
+	public void convertDataSeries() {
+
+		serieData20 = new SerieData20();
+
+		serieData20.timeSerie = serieData.timeSerie;
+
+		serieData20.altitudeSerie = convertDataSeries10(serieData.altitudeSerie, 0);
+		serieData20.cadenceSerie = convertDataSeries10(serieData.cadenceSerie, 0);
+		serieData20.distanceSerie = convertDataSeries10(serieData.distanceSerie, 0);
+		serieData20.pulseSerie = convertDataSeries10(serieData.pulseSerie, 0);
+		serieData20.temperatureSerie = convertDataSeries10(serieData.temperatureSerie, temperatureScale);
+
+		/*
+		 * don't convert computed data series
+		 */
+		if (isSpeedSerieFromDevice) {
+			serieData20.speedSerie = convertDataSeries10(serieData.speedSerie, 10);
+		}
+
+		if (isPowerSerieFromDevice) {
+			serieData20.powerSerie = convertDataSeries10(serieData.powerSerie, 0);
+		}
+
+		serieData20.latitude = serieData.latitude;
+		serieData20.longitude = serieData.longitude;
+
+		onPostLoadConvertDataSeries();
+
+		/*
+		 * remove old data series, the "serieData" column/object must be removed in a db update
+		 * after version 20
+		 */
+		serieData.timeSerie = null;
+		serieData.altitudeSerie = null;
+		serieData.cadenceSerie = null;
+		serieData.distanceSerie = null;
+		serieData.pulseSerie = null;
+		serieData.temperatureSerie = null;
+		serieData.speedSerie = null;
+		serieData.powerSerie = null;
+		serieData.latitude = null;
+		serieData.longitude = null;
+		serieData.deviceMarker = null;
+	}
+
+	private float[] convertDataSeries10(final int[] intDataSerie, final int scale) {
+
+		if (intDataSerie == null) {
+			return null;
+		}
+
+		final float[] floatDataSerie = new float[intDataSerie.length];
+
+		for (int serieIndex = 0; serieIndex < intDataSerie.length; serieIndex++) {
+
+			final int intValue = intDataSerie[serieIndex];
+
+			floatDataSerie[serieIndex] = scale > 0 ? //
+					(float) intValue / scale
+					: (float) intValue;
+		}
+
+		return floatDataSerie;
+	}
+
 	private void createSRTMDataSerie() {
 
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
@@ -3414,6 +3492,160 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		tourMarkers.add(tourMarker);
 	}
 
+//	#include <stdio.h>
+//	#include <stdlib.h>
+//	#include <math.h>
+//
+//	#define SIZE 1528
+//	#define pi 3.1415926535897932384626433832795
+//
+//	int index_next_valid_data(double* field, double invalid_data, int i_start)
+//	{
+//	  int i, i_valid;
+//
+//	  i = i_start;
+//
+//	  while ( field[i] == invalid_data )
+//	    {
+//	      i++;
+//	    }
+//
+//	  return(i);
+//	}
+//
+//	double linear_interpolation(double time1, double time2, double val1, double val2, double time)
+//	{
+//	  if (time2 == time1)
+//	    return( (val1+val2)/2. );
+//	  else
+//	    return( val1 + (val2 - val1) / (time2 - time1) * (time - time1) );
+//	}
+//
+//	double distance_ellipsoid_gps(double lat1, double lat2, double lon1, double lon2)
+//	{
+//	  double earth_radius = 6371000.;
+//	// This value is not important for the interpolation
+//	// Any constant value can be chosen
+//
+//	  double lat1_rad = lat1*pi/180.;
+//	  double lat2_rad = lat2*pi/180.;
+//	  double lon1_rad = lon1*pi/180.;
+//	  double lon2_rad = lon2*pi/180.;
+//
+//	  return( earth_radius * 2. * asin( sqrt( (sin((lat1_rad-lat2_rad)/2.)) * (sin((lat1_rad-lat2_rad)/2.)) + cos(lat1_rad) * cos(lat2_rad) * (sin((lon1_rad-lon2_rad)/2.)) * (sin((lon1_rad-lon2_rad)/2.)) ) ) );
+//	}
+//
+//	void data_completing(double* field, double* var, double invalid_data, double* field_c)
+//	{
+//	  int i, j;
+//	  int i_valid;
+//
+//	  for (i=0; i<SIZE; i++)
+//	    {
+//	      if (field[i] == invalid_data)
+//	        {
+//	          i_valid = index_next_valid_data(field, invalid_data, i);
+//	          if (field[i_valid] == invalid_data)
+//	            printf("ERROR: the field should be a valid data)");
+//
+//	          for (j=i; j<i_valid; j++)
+//	            {
+//	              field_c[j] = linear_interpolation(var[i-1], var[i_valid], field[i-1], field[i_valid], var[j]);
+//	            }
+//	          i=i_valid-1;
+//	        }
+//	      else
+//	        {
+//	          field_c[i] = field[i];
+//	        }
+//	    }
+//	}
+//
+//
+//	main()
+//	{
+//	  int i;
+//	  double time[SIZE];
+//	  double latitude[SIZE], longitude[SIZE];
+//	  double latitude_c[SIZE], longitude_c[SIZE];
+//	  double altitude[SIZE], altitude_c[SIZE];
+//	  double distance_gps[SIZE];
+//	  double distance[SIZE], distance_ct[SIZE], distance_cd[SIZE];
+//	  double speed[SIZE], speed_c[SIZE];
+//	  double heart_rate[SIZE];
+//
+//	  FILE *file;
+//
+//	// Initialization
+//	//===============
+//	  for(i=0; i<SIZE; i++)
+//	    {
+//	      time[i] = -1.;
+//	      latitude[i] = -1.;
+//	      longitude[i] = -1.;
+//	      altitude[i] = -1.;
+//	      distance[i] = -1.;
+//	      speed[i] = -1.;
+//	      heart_rate[i] = -1.;
+//	    }
+//
+//	// Reading the data in a text file
+//	//================================
+//	// In the initial file, all the missing data are set to -999.
+//	//-----------------------------------------------------------
+//	  file = fopen("example_complete.txt", "r");
+//	  for(i=0; i<SIZE; i++)
+//	    {
+//	      fscanf(file, "%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", &time[i], &latitude[i], &longitude[i], &altitude[i], &distance[i], &speed[i], &heart_rate[i]);
+//	    }
+//	  fclose(file);
+//
+//	// Interpolations of missing data
+//	//===============================
+//	// Latitude and longitude are interpolated linearly in time
+//	//---------------------------------------------------------
+//	  data_completing(latitude, time, -999., latitude_c);
+//	  data_completing(longitude, time, -999., longitude_c);
+//
+//	// Altitude is interpolated linearly in time
+//	//------------------------------------------
+//	  data_completing(altitude, time, -999., altitude_c);
+//
+//	// Speed is interpolated linearly in time
+//	//---------------------------------------
+//	  data_completing(speed, time, -999., speed_c);
+//
+//	// Distance is interpolated linearly in time
+//	//------------------------------------------
+//	  data_completing(distance, time, -999., distance_ct);
+//
+//	// Results
+//	//========
+//	  file = fopen("result_time.txt", "w");
+//	  for (i=0; i<SIZE; i++)
+//	    fprintf(file, "%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\n", time[i], latitude[i], latitude_c[i], longitude[i], longitude_c[i], altitude[i], altitude_c[i], distance[i], distance_ct[i], distance_gps[i], speed[i], speed_c[i]);
+//	  fclose(file);
+//
+//	// Compute an approximate distance from latitude and longitude data
+//	//-----------------------------------------------------------------
+//	  distance_gps[0] = 0.;
+//	  for (i=1; i<SIZE; i++)
+//	    {
+//	      distance_gps[i] = distance_gps[i-1] + distance_ellipsoid_gps(latitude_c[i-1], latitude_c[i], longitude_c[i-1], longitude_c[i]);
+//	    }
+//	// Distance is interpolated linearly in distance_gps
+//	//--------------------------------------------------
+//	  data_completing(distance, distance_gps, -999., distance_cd);
+//
+//	// Results
+//	//========
+//	  file = fopen("result_ellipsoid.txt", "w");
+//	  for (i=0; i<SIZE; i++)
+//	    fprintf(file, "%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\n", time[i], latitude[i], latitude_c[i], longitude[i], longitude_c[i], altitude[i], altitude_c[i], distance[i], distance_cd[i], distance_gps[i], speed[i], speed_c[i]);
+//	  fclose(file);
+//
+//	}
+
 	/**
 	 * Create the tour segment list from the segment index array
 	 * 
@@ -3647,160 +3879,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 		return tourSegments.toArray();
 	}
-
-//	#include <stdio.h>
-//	#include <stdlib.h>
-//	#include <math.h>
-//
-//	#define SIZE 1528
-//	#define pi 3.1415926535897932384626433832795
-//
-//	int index_next_valid_data(double* field, double invalid_data, int i_start)
-//	{
-//	  int i, i_valid;
-//
-//	  i = i_start;
-//
-//	  while ( field[i] == invalid_data )
-//	    {
-//	      i++;
-//	    }
-//
-//	  return(i);
-//	}
-//
-//	double linear_interpolation(double time1, double time2, double val1, double val2, double time)
-//	{
-//	  if (time2 == time1)
-//	    return( (val1+val2)/2. );
-//	  else
-//	    return( val1 + (val2 - val1) / (time2 - time1) * (time - time1) );
-//	}
-//
-//	double distance_ellipsoid_gps(double lat1, double lat2, double lon1, double lon2)
-//	{
-//	  double earth_radius = 6371000.;
-//	// This value is not important for the interpolation
-//	// Any constant value can be chosen
-//
-//	  double lat1_rad = lat1*pi/180.;
-//	  double lat2_rad = lat2*pi/180.;
-//	  double lon1_rad = lon1*pi/180.;
-//	  double lon2_rad = lon2*pi/180.;
-//
-//	  return( earth_radius * 2. * asin( sqrt( (sin((lat1_rad-lat2_rad)/2.)) * (sin((lat1_rad-lat2_rad)/2.)) + cos(lat1_rad) * cos(lat2_rad) * (sin((lon1_rad-lon2_rad)/2.)) * (sin((lon1_rad-lon2_rad)/2.)) ) ) );
-//	}
-//
-//	void data_completing(double* field, double* var, double invalid_data, double* field_c)
-//	{
-//	  int i, j;
-//	  int i_valid;
-//
-//	  for (i=0; i<SIZE; i++)
-//	    {
-//	      if (field[i] == invalid_data)
-//	        {
-//	          i_valid = index_next_valid_data(field, invalid_data, i);
-//	          if (field[i_valid] == invalid_data)
-//	            printf("ERROR: the field should be a valid data)");
-//
-//	          for (j=i; j<i_valid; j++)
-//	            {
-//	              field_c[j] = linear_interpolation(var[i-1], var[i_valid], field[i-1], field[i_valid], var[j]);
-//	            }
-//	          i=i_valid-1;
-//	        }
-//	      else
-//	        {
-//	          field_c[i] = field[i];
-//	        }
-//	    }
-//	}
-//
-//
-//	main()
-//	{
-//	  int i;
-//	  double time[SIZE];
-//	  double latitude[SIZE], longitude[SIZE];
-//	  double latitude_c[SIZE], longitude_c[SIZE];
-//	  double altitude[SIZE], altitude_c[SIZE];
-//	  double distance_gps[SIZE];
-//	  double distance[SIZE], distance_ct[SIZE], distance_cd[SIZE];
-//	  double speed[SIZE], speed_c[SIZE];
-//	  double heart_rate[SIZE];
-//
-//	  FILE *file;
-//
-//	// Initialization
-//	//===============
-//	  for(i=0; i<SIZE; i++)
-//	    {
-//	      time[i] = -1.;
-//	      latitude[i] = -1.;
-//	      longitude[i] = -1.;
-//	      altitude[i] = -1.;
-//	      distance[i] = -1.;
-//	      speed[i] = -1.;
-//	      heart_rate[i] = -1.;
-//	    }
-//
-//	// Reading the data in a text file
-//	//================================
-//	// In the initial file, all the missing data are set to -999.
-//	//-----------------------------------------------------------
-//	  file = fopen("example_complete.txt", "r");
-//	  for(i=0; i<SIZE; i++)
-//	    {
-//	      fscanf(file, "%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", &time[i], &latitude[i], &longitude[i], &altitude[i], &distance[i], &speed[i], &heart_rate[i]);
-//	    }
-//	  fclose(file);
-//
-//	// Interpolations of missing data
-//	//===============================
-//	// Latitude and longitude are interpolated linearly in time
-//	//---------------------------------------------------------
-//	  data_completing(latitude, time, -999., latitude_c);
-//	  data_completing(longitude, time, -999., longitude_c);
-//
-//	// Altitude is interpolated linearly in time
-//	//------------------------------------------
-//	  data_completing(altitude, time, -999., altitude_c);
-//
-//	// Speed is interpolated linearly in time
-//	//---------------------------------------
-//	  data_completing(speed, time, -999., speed_c);
-//
-//	// Distance is interpolated linearly in time
-//	//------------------------------------------
-//	  data_completing(distance, time, -999., distance_ct);
-//
-//	// Results
-//	//========
-//	  file = fopen("result_time.txt", "w");
-//	  for (i=0; i<SIZE; i++)
-//	    fprintf(file, "%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\n", time[i], latitude[i], latitude_c[i], longitude[i], longitude_c[i], altitude[i], altitude_c[i], distance[i], distance_ct[i], distance_gps[i], speed[i], speed_c[i]);
-//	  fclose(file);
-//
-//	// Compute an approximate distance from latitude and longitude data
-//	//-----------------------------------------------------------------
-//	  distance_gps[0] = 0.;
-//	  for (i=1; i<SIZE; i++)
-//	    {
-//	      distance_gps[i] = distance_gps[i-1] + distance_ellipsoid_gps(latitude_c[i-1], latitude_c[i], longitude_c[i-1], longitude_c[i]);
-//	    }
-//	// Distance is interpolated linearly in distance_gps
-//	//--------------------------------------------------
-//	  data_completing(distance, distance_gps, -999., distance_cd);
-//
-//	// Results
-//	//========
-//	  file = fopen("result_ellipsoid.txt", "w");
-//	  for (i=0; i<SIZE; i++)
-//	    fprintf(file, "%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\n", time[i], latitude[i], latitude_c[i], longitude[i], longitude_c[i], altitude[i], altitude_c[i], distance[i], distance_cd[i], distance_gps[i], speed[i], speed_c[i]);
-//	  fclose(file);
-//
-//	}
 
 	public void dumpData() {
 
@@ -4145,10 +4223,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return deviceTimeInterval;
 	}
 
-	public String getDeviceTourType() {
-		return deviceTourType;
-	}
-
 // NOT USED 18.8.2010
 //	public long getDeviceTravelTime() {
 //		return deviceTravelTime;
@@ -4166,6 +4240,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 //	public int getDeviceDistance() {
 //		return deviceDistance;
 //	}
+
+	public String getDeviceTourType() {
+		return deviceTourType;
+	}
 
 	/**
 	 * @return Returns the distance data serie for the current measurement system, this can be
@@ -4232,6 +4310,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return _hrZoneContext;
 	}
 
+// not used 5.10.2008
+//	public int getDeviceTotalDown() {
+//		return deviceTotalDown;
+//	}
+
+//	public int getDeviceTotalUp() {
+//		return deviceTotalUp;
+//	}
+
 	/**
 	 * @return Returns all available HR zones. How many zones are really used, depends on the
 	 *         {@link TourPerson} and how many zones are defined for the person.
@@ -4260,15 +4347,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 		return _hrZones;
 	}
-
-// not used 5.10.2008
-//	public int getDeviceTotalDown() {
-//		return deviceTotalDown;
-//	}
-
-//	public int getDeviceTotalUp() {
-//		return deviceTotalUp;
-//	}
 
 	/**
 	 * @return the maxAltitude
@@ -4483,10 +4561,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	public int getRestPulse() {
 		return restPulse;
-	}
-
-	public SerieData getSerieData() {
-		return serieData;
 	}
 
 	/**
@@ -5157,23 +5231,32 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	@PostUpdate
 	public void onPostLoad() {
 
-		timeSerie = serieData.timeSerie;
+		if (TourDatabase.IS_POST_UPDATE_019_to_020) {
+			return;
+		}
+
+		onPostLoadConvertDataSeries();
+	}
+
+	private void onPostLoadConvertDataSeries() {
+
+		timeSerie = serieData20.timeSerie;
 
 		// manually created tours have currently no time series
 		if (timeSerie == null) {
 			return;
 		}
 
-		altitudeSerie = serieData.altitudeSerie;
-		cadenceSerie = serieData.cadenceSerie;
-		distanceSerie = serieData.distanceSerie;
-		pulseSerie = serieData.pulseSerie;
-		temperatureSerie = serieData.temperatureSerie;
-		powerSerie = serieData.powerSerie;
-		speedSerie = serieData.speedSerie;
+		altitudeSerie = serieData20.altitudeSerie;
+		cadenceSerie = serieData20.cadenceSerie;
+		distanceSerie = serieData20.distanceSerie;
+		pulseSerie = serieData20.pulseSerie;
+		temperatureSerie = serieData20.temperatureSerie;
+		powerSerie = serieData20.powerSerie;
+		speedSerie = serieData20.speedSerie;
 
-		latitudeSerie = serieData.latitude;
-		longitudeSerie = serieData.longitude;
+		latitudeSerie = serieData20.latitude;
+		longitudeSerie = serieData20.longitude;
 
 		/*
 		 * cleanup dataseries because dataseries has been saved before version 1.3.0 even when no
@@ -5181,6 +5264,36 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		 */
 		cleanupDataSeries();
 	}
+
+//	/**
+//	 * Called after the object was loaded from the persistence store
+//	 */
+//	private void onPostLoad_before_20() {
+//
+//		timeSerie = serieData.timeSerie;
+//
+//		// manually created tours have currently no time series
+//		if (timeSerie == null) {
+//			return;
+//		}
+//
+//		altitudeSerie = serieData.altitudeSerie;
+//		cadenceSerie = serieData.cadenceSerie;
+//		distanceSerie = serieData.distanceSerie;
+//		pulseSerie = serieData.pulseSerie;
+//		temperatureSerie = serieData.temperatureSerie;
+//		powerSerie = serieData.powerSerie;
+//		speedSerie = serieData.speedSerie;
+//
+//		latitudeSerie = serieData.latitude;
+//		longitudeSerie = serieData.longitude;
+//
+//		/*
+//		 * cleanup dataseries because dataseries has been saved before version 1.3.0 even when no
+//		 * data are available
+//		 */
+//		cleanupDataSeries();
+//	}
 
 	/**
 	 * Called before this object gets persisted, copy data from the tourdata object into the object
@@ -5192,28 +5305,28 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	public void onPrePersist() {
 
-		serieData = new SerieData();
+		serieData20 = new SerieData20();
 
-		serieData.altitudeSerie = altitudeSerie;
-		serieData.cadenceSerie = cadenceSerie;
-		serieData.distanceSerie = distanceSerie;
-		serieData.pulseSerie = pulseSerie;
-		serieData.temperatureSerie = temperatureSerie;
-		serieData.timeSerie = timeSerie;
+		serieData20.timeSerie = timeSerie;
+		serieData20.altitudeSerie = altitudeSerie;
+		serieData20.cadenceSerie = cadenceSerie;
+		serieData20.distanceSerie = distanceSerie;
+		serieData20.pulseSerie = pulseSerie;
+		serieData20.temperatureSerie = temperatureSerie;
 
 		/*
 		 * don't save computed data series
 		 */
 		if (isSpeedSerieFromDevice) {
-			serieData.speedSerie = speedSerie;
+			serieData20.speedSerie = speedSerie;
 		}
 
 		if (isPowerSerieFromDevice) {
-			serieData.powerSerie = powerSerie;
+			serieData20.powerSerie = powerSerie;
 		}
 
-		serieData.latitude = latitudeSerie;
-		serieData.longitude = longitudeSerie;
+		serieData20.latitude = latitudeSerie;
+		serieData20.longitude = longitudeSerie;
 	}
 
 	public boolean replaceAltitudeWithSRTM() {
@@ -5326,6 +5439,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		devicePluginName = deviceName;
 	}
 
+//	public void setDeviceTotalDown(final int deviceTotalDown) {
+//		this.deviceTotalDown = deviceTotalDown;
+//	}
+//
+//	public void setDeviceTotalUp(final int deviceTotalUp) {
+//		this.deviceTotalUp = deviceTotalUp;
+//	}
+
 	/**
 	 * Time difference in seconds between 2 time slices when the interval is constant for the whole
 	 * tour or <code>-1</code> for GPS devices or ergometer when the time slice duration are not
@@ -5335,14 +5456,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	public void setDeviceTimeInterval(final short deviceTimeInterval) {
 		this.deviceTimeInterval = deviceTimeInterval;
-	}
-
-	public void setDeviceTotalDown(final int deviceTotalDown) {
-		this.deviceTotalDown = deviceTotalDown;
-	}
-
-	public void setDeviceTotalUp(final int deviceTotalUp) {
-		this.deviceTotalUp = deviceTotalUp;
 	}
 
 	public void setDeviceTourType(final String tourType) {

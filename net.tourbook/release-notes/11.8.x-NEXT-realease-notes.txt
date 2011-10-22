@@ -1,3 +1,5 @@
+conversion time: 1727 tours / 149 seconds = 11.6 tours/second
+
 TODO's
 - double -> float
   - ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED_AS 

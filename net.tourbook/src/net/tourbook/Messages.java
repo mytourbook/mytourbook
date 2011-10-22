@@ -1028,10 +1028,15 @@ public class Messages extends NLS {
 	public static String		Tour_Database_Dialog_ValidateFields_Title;
 	public static String		Tour_Database_load_all_tours;
 	public static String		Tour_Database_PostUpdate011_SetTourCreateTime;
+
+	public static String	Tour_Database_PostUpdate020_ConvertIntToFloat;
+
 	public static String		Tour_Database_TourSaveError;
 	public static String		Tour_Database_update_tour;
 	public static String		Tour_Database_Update;
 	public static String		Tour_Database_Update_Subtask;
+
+	public static String	Tour_Database_Update_Subtask_LongOperation;
 	public static String		Tour_Database_Update_TourWeek;
 	public static String		Tour_Database_Update_TourWeek_Info;
 	public static String		Tour_Database_UpdateDone;

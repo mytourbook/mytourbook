@@ -191,7 +191,7 @@ public class FitActivityContext {
 
 	private void resetSpeedAtFirstPosition(final ArrayList<TimeData> timeDataList) {
 		if (!timeDataList.isEmpty()) {
-			timeDataList.get(0).speed = Integer.MIN_VALUE;
+			timeDataList.get(0).speed = Float.MIN_VALUE;
 		}
 	}
 

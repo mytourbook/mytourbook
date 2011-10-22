@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.mapping;
 
 import java.util.ArrayList;
@@ -42,7 +41,7 @@ public class LegendProviderHrZones implements ILegendProviderDiscreteColors {
 	private ArrayList<TourPersonHRZone>	_personHrZones;
 
 	private HrZoneContext				_hrZoneContext;
-	private int[]						_pulseData;
+	private float[]						_pulseData;
 
 	public LegendProviderHrZones(final int colorId) {
 		_colorId = colorId;
@@ -80,7 +79,7 @@ public class LegendProviderHrZones implements ILegendProviderDiscreteColors {
 				valueIndex - 1
 				: valueIndex;
 
-		final int pulse = _pulseData[adjustedValueIndex];
+		final float pulse = _pulseData[adjustedValueIndex];
 
 		final int zoneIndex = TrainingManager.getZoneIndex(_hrZoneContext, pulse);
 

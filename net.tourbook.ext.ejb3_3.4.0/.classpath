@@ -10,7 +10,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-entitymanager-3.4.0/lib/ejb3-persistence.jar" sourcepath="C:/E/java-resources/ejb3-persistence"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-entitymanager-3.4.0/lib/hibernate-annotations.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-entitymanager-3.4.0/lib/hibernate-commons-annotations.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/hibernate-core-3.3.2/hibernate3.jar" sourcepath="L:/java-resources/hibernate-3.4.0/hibernate-core-3.3.2.GA/project/core/src"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-core-3.3.2/hibernate3.jar" sourcepath="C:/E/java-resources/hibernate-3.4.0/hibernate-core-3.3.2.GA/src"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-core-3.3.2/lib/required/antlr-2.7.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-core-3.3.2/lib/required/commons-collections-3.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-core-3.3.2/lib/required/dom4j-1.6.1.jar"/>

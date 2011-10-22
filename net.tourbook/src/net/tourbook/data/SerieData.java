@@ -29,15 +29,15 @@ public class SerieData implements Serializable {
 	private static final long	serialVersionUID	= 1L;
 
 	public int					timeSerie[];
+	public int					distanceSerie[];
 
-	public float				distanceSerie[];
-	public float				altitudeSerie[];
-	public float				cadenceSerie[];
-	public float				pulseSerie[];
-	public float				temperatureSerie[];
+	public int					altitudeSerie[];
+	public int					cadenceSerie[];
+	public int					pulseSerie[];
+	public int					temperatureSerie[];
 
-	public float				speedSerie[];
-	public float				powerSerie[];
+	public int					speedSerie[];
+	public int					powerSerie[];
 
 	public int					deviceMarker[];
 

@@ -259,6 +259,14 @@ public class Util {
 		return unit;
 	}
 
+	/**
+	 * Round floating value by removing the trailing part, which causes problem when creating units.
+	 * For the value 200.00004 the .00004 part will be removed
+	 * 
+	 * @param graphValue
+	 * @param graphUnit
+	 * @return
+	 */
 	public static float roundFloatToUnit(final float graphValue, final float graphUnit) {
 
 		if (graphUnit < 1) {

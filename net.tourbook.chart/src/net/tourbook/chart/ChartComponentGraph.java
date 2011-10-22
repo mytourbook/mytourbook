@@ -876,8 +876,8 @@ public class ChartComponentGraph extends Canvas {
 			 * position
 			 */
 
-			final float minValue = xData.getVisibleMinValue();
-			final float maxValue = xData.getVisibleMaxValue();
+			final float minValue = xData.getOriginalMinValue();
+			final float maxValue = xData.getOriginalMaxValue();
 			final float valueRange = maxValue > 0 ? (maxValue - minValue) : -(minValue - maxValue);
 
 			final float positionRatio = (float) devXSliderLinePosition / _devVirtualGraphImageWidth;
@@ -4752,9 +4752,11 @@ public class ChartComponentGraph extends Canvas {
 
 				// the graph can't be scrolled
 
-				moveXSlider(_xSliderDragged, devXGraph
+				final int devSliderLinePos = devXGraph
 						- _xSliderDragged.getDevXClickOffset()
-						+ ChartXSlider.halfSliderHitLineHeight);
+						+ ChartXSlider.halfSliderHitLineHeight;
+
+				moveXSlider(_xSliderDragged, devSliderLinePos);
 
 				_isSliderDirty = true;
 				isChartDirty = true;
@@ -6022,9 +6024,8 @@ public class ChartComponentGraph extends Canvas {
 			}
 		}
 
-// x-data visible min/max is more complicated than just setting the visibleMin/Max values
 		/*
-		 * get min/max value the x-data serie to fill the visible area with the chart
+		 * get visible min/max value for the x-data serie which fills the visible area in the chart
 		 */
 		// ensure array bounds
 		final int xValuesLastIndex = xValues.length - 1;

@@ -103,6 +103,8 @@ public class TourDatabase {
 //	private static final int						TOURBOOK_DB_VERSION							= 6;	// 8.12
 //	private static final int						TOURBOOK_DB_VERSION							= 5;	// 8.11
 
+	public static boolean							IS_POST_UPDATE_019_to_020;
+
 	private static final String						PERSISTENCE_UNIT_NAME						= "tourdatabase";										//$NON-NLS-1$
 
 	private static final String						DERBY_CLIENT_DRIVER							= "org.apache.derby.jdbc.ClientDriver";				//$NON-NLS-1$
@@ -750,23 +752,6 @@ public class TourDatabase {
 		return bikeList;
 	}
 
-	/**
-	 * Get a tour from the database
-	 * 
-	 * @param tourId
-	 * @return Returns the tour data or <code>null</code> if the tour is not in the database
-	 */
-	public static TourData getTourFromDb(final Long tourId) {
-
-		final EntityManager em = TourDatabase.getInstance().getEntityManager();
-
-		final TourData tourData = em.find(TourData.class, tourId);
-
-		em.close();
-
-		return tourData;
-	}
-
 //	/**
 //	 * @return Returns all tour people in the db sorted by last/first name
 //	 */
@@ -792,6 +777,23 @@ public class TourDatabase {
 //
 //		return tourPeople;
 //	}
+
+	/**
+	 * Get a tour from the database
+	 * 
+	 * @param tourId
+	 * @return Returns the tour data or <code>null</code> if the tour is not in the database
+	 */
+	public static TourData getTourFromDb(final Long tourId) {
+
+		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+
+		final TourData tourData = em.find(TourData.class, tourId);
+
+		em.close();
+
+		return tourData;
+	}
 
 	/**
 	 * Get tour type from id
@@ -1045,7 +1047,11 @@ public class TourDatabase {
 	}
 
 	/**
-	 * Persists an entity
+	 * Persists an entity *
+	 * <p>
+	 * This method is <b>much faster</b> than using this
+	 * {@link #saveEntity(Object, long, Class, EntityManager)}
+	 * <p>
 	 * 
 	 * @param entity
 	 * @param id
@@ -1100,7 +1106,10 @@ public class TourDatabase {
 	}
 
 	/**
-	 * Persists an entity
+	 * Persists an entity, an error is logged when saving fails.
+	 * <p>
+	 * This method is <b>much slower</b> than using this {@link #saveEntity(Object, long, Class)}
+	 * method without using the same EntityManater.
 	 * 
 	 * @param entity
 	 * @param id
@@ -1767,44 +1776,6 @@ public class TourDatabase {
 		exec(stmt, sql);
 	}
 
-	/**
-	 * create table {@link #TABLE_TOUR_BIKE}
-	 * 
-	 * @param stmt
-	 * @throws SQLException
-	 */
-	private void createTableTourBike(final Statement stmt) throws SQLException {
-
-		String sql;
-
-		/*
-		 * CREATE TABLE TourBike
-		 */
-		sql = "CREATE TABLE " + TABLE_TOUR_BIKE //									//$NON-NLS-1$
-				+ "(															\n" //$NON-NLS-1$
-				//
-				+ "	bikeId	 		BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1), \n" //$NON-NLS-1$
-				+ "	name			" + varCharKomma(TourBike.DB_LENGTH_NAME) //	//$NON-NLS-1$
-				+ "	weight 			FLOAT,										\n" //$NON-NLS-1$ // kg
-				+ "	typeId 			INTEGER,									\n" //$NON-NLS-1$
-				+ "	frontTyreId	 	INTEGER,									\n" //$NON-NLS-1$
-				+ "	rearTyreId 		INTEGER										\n" //$NON-NLS-1$
-				//
-				+ ")"; //															//$NON-NLS-1$
-
-		exec(stmt, sql);
-
-		/*
-		 * ALTER TABLE TourBike
-		 */
-		sql = "ALTER TABLE " + TABLE_TOUR_BIKE + "								\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "	ADD CONSTRAINT " + TABLE_TOUR_BIKE + "_pk					\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "	PRIMARY KEY (bikeId)"; //										//$NON-NLS-1$
-
-		exec(stmt, sql);
-
-	}
-
 //	/**
 //	 * create table {@link #TABLE_TOUR_CATEGORY}
 //	 *
@@ -1842,6 +1813,44 @@ public class TourDatabase {
 //				+ (" ADD CONSTRAINT " + JOINTABLE_TOURCATEGORY__TOURDATA + "_pk") //$NON-NLS-1$ //$NON-NLS-2$
 //				+ (" PRIMARY KEY (" + TABLE_TOUR_CATEGORY + "_categoryId)")); //$NON-NLS-1$ //$NON-NLS-2$
 //	}
+
+	/**
+	 * create table {@link #TABLE_TOUR_BIKE}
+	 * 
+	 * @param stmt
+	 * @throws SQLException
+	 */
+	private void createTableTourBike(final Statement stmt) throws SQLException {
+
+		String sql;
+
+		/*
+		 * CREATE TABLE TourBike
+		 */
+		sql = "CREATE TABLE " + TABLE_TOUR_BIKE //									//$NON-NLS-1$
+				+ "(															\n" //$NON-NLS-1$
+				//
+				+ "	bikeId	 		BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1), \n" //$NON-NLS-1$
+				+ "	name			" + varCharKomma(TourBike.DB_LENGTH_NAME) //	//$NON-NLS-1$
+				+ "	weight 			FLOAT,										\n" //$NON-NLS-1$ // kg
+				+ "	typeId 			INTEGER,									\n" //$NON-NLS-1$
+				+ "	frontTyreId	 	INTEGER,									\n" //$NON-NLS-1$
+				+ "	rearTyreId 		INTEGER										\n" //$NON-NLS-1$
+				//
+				+ ")"; //															//$NON-NLS-1$
+
+		exec(stmt, sql);
+
+		/*
+		 * ALTER TABLE TourBike
+		 */
+		sql = "ALTER TABLE " + TABLE_TOUR_BIKE + "								\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	ADD CONSTRAINT " + TABLE_TOUR_BIKE + "_pk					\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	PRIMARY KEY (bikeId)"; //										//$NON-NLS-1$
+
+		exec(stmt, sql);
+
+	}
 
 	/**
 	 * create table {@link #TABLE_TOUR_COMPARED}
@@ -1906,13 +1915,14 @@ public class TourDatabase {
 				+ "	tourAltDown 			INTEGER NOT NULL,						\n" //$NON-NLS-1$
 
 				+ ("	deviceTourType 		" + varCharKomma(TourData.DB_LENGTH_DEVICE_TOUR_TYPE)) //$NON-NLS-1$
-				+ "	deviceTravelTime 		BIGINT NOT NULL,						\n" //$NON-NLS-1$
-				+ "	deviceDistance 			INTEGER NOT NULL,						\n" //$NON-NLS-1$
-				+ "	deviceWheel 			INTEGER NOT NULL,						\n" //$NON-NLS-1$
-				+ "	deviceWeight 			INTEGER NOT NULL,						\n" //$NON-NLS-1$
-				+ "	deviceTotalUp 			INTEGER NOT NULL,						\n" //$NON-NLS-1$
-				+ "	deviceTotalDown 		INTEGER NOT NULL,						\n" //$NON-NLS-1$
 				+ ("	devicePluginId		" + varCharKomma(TourData.DB_LENGTH_DEVICE_PLUGIN_ID)) //$NON-NLS-1$
+
+//				+ "	deviceTravelTime 		BIGINT NOT NULL,						\n" //$NON-NLS-1$
+//				+ "	deviceDistance 			INTEGER NOT NULL,						\n" //$NON-NLS-1$
+//				+ "	deviceWheel 			INTEGER NOT NULL,						\n" //$NON-NLS-1$
+//				+ "	deviceWeight 			INTEGER NOT NULL,						\n" //$NON-NLS-1$
+//				+ "	deviceTotalUp 			INTEGER NOT NULL,						\n" //$NON-NLS-1$
+//				+ "	deviceTotalDown 		INTEGER NOT NULL,						\n" //$NON-NLS-1$
 
 				// version 3 start
 				+ "	deviceMode 				SMALLINT,								\n" //$NON-NLS-1$
@@ -2048,8 +2058,12 @@ public class TourDatabase {
 				//
 				// version 18 end ---------
 
-				+ "	serieData 					BLOB NOT NULL					\n" //$NON-NLS-1$
+				// version 20 start -------- converted "serieData" to "serieData20" which contains floating data series
+
+				+ "	serieData20					BLOB 							\n" //$NON-NLS-1$
 				//
+				// version 20 end ---------
+
 				+ ")"; //														//$NON-NLS-1$
 
 		exec(stmt, sql);
@@ -2759,6 +2773,12 @@ public class TourDatabase {
 		_propertyListeners.remove(listener);
 	}
 
+	private void showSubTask(final IProgressMonitor monitor, final Object subTask) {
+		if (monitor != null) {
+			monitor.subTask(NLS.bind(Messages.Tour_Database_Update_Subtask_LongOperation, subTask));
+		}
+	}
+
 	private boolean updateDbDesign(final Connection conn, int currentDbVersion, final IProgressMonitor monitor) {
 
 		/*
@@ -2792,6 +2812,7 @@ public class TourDatabase {
 		boolean isPostUpdate9 = false;
 		boolean isPostUpdate11 = false;
 		boolean isPostUpdate13 = false;
+		boolean isPostUpdate20 = false;
 
 		int newVersion = currentDbVersion;
 		final int oldVersion = currentDbVersion;
@@ -2888,6 +2909,7 @@ public class TourDatabase {
 
 			if (currentDbVersion == 19) {
 				currentDbVersion = newVersion = updateDbDesign_019_to_020(conn, monitor);
+				isPostUpdate20 = true;
 			}
 
 			/*
@@ -2897,7 +2919,7 @@ public class TourDatabase {
 
 			/*
 			 * do the post update after the version number is updated because the post update uses
-			 * connections and this will check the version number
+			 * connections which is checking the version number
 			 */
 			if (isPostUpdate5) {
 				TourDatabase.computeComputedValuesForAllTours(monitor);
@@ -2911,6 +2933,9 @@ public class TourDatabase {
 			}
 			if (isPostUpdate13) {
 				updateDbDesign_012_013_PostUpdate(conn, monitor);
+			}
+			if (isPostUpdate20) {
+				updateDbDesign_019_to_020_PostUpdate(conn, monitor);
 			}
 
 		} catch (final SQLException e) {
@@ -3760,8 +3785,9 @@ public class TourDatabase {
 		}
 
 		{
-			updateDbDesign_020_10DataSerieBlobSize(conn);
-//			updateDbDesign_020_20DropColumns(conn);
+//			updateDbDesign_020_10DataSerieBlobSize(conn);
+//			updateDbDesign_020_20DropColumns(conn, monitor, newDbVersion);
+			updateDbDesign_020_30AlterColumns(conn);
 
 		}
 
@@ -3770,79 +3796,192 @@ public class TourDatabase {
 		return newDbVersion;
 	}
 
-	private void updateDbDesign_020_10DataSerieBlobSize(final Connection conn) throws SQLException {
+	/**
+	 * Set create date/time from the tour date
+	 * 
+	 * @param conn
+	 * @param monitor
+	 * @throws SQLException
+	 */
+	private void updateDbDesign_019_to_020_PostUpdate(final Connection conn, final IProgressMonitor monitor)
+			throws SQLException {
 
-		final DatabaseMetaData meta = conn.getMetaData();
+		IS_POST_UPDATE_019_to_020 = true;
 
-		final ResultSet rsColumns = meta.getColumns(null, TABLE_SCHEMA, TABLE_TOUR_DATA, "SERIEDATA"); //$NON-NLS-1$
+		final long startTime = System.currentTimeMillis();
 
-		while (rsColumns.next()) {
+		int tourIdx = 1;
+		final ArrayList<Long> tourList = getAllTourIds();
 
-			final int size = rsColumns.getInt("COLUMN_SIZE"); //$NON-NLS-1$
-			if (size == 1048576) {
+		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+		try {
 
-				/*
-				 * database is from a derby version before 10.5 which creates BLOB's with a default
-				 * size of 1M, increase size to 2G because a tour with 53000 can not be saves and
-				 * causes an exception
-				 */
+			// loop: all tours
+			for (final Long tourId : tourList) {
 
-				String sql;
-				final Statement stmt = conn.createStatement();
-				{
-					// ALTER TABLE TourData ALTER COLUMN SerieData SET DATA TYPE BLOB(2G)
+				final long currentTime = System.currentTimeMillis();
 
-					sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ALTER COLUMN SerieData SET DATA TYPE BLOB(2G)"; //$NON-NLS-1$ //$NON-NLS-2$
-					exec(stmt, sql);
+				if (monitor != null) {
+
+					final float durationInSeconds = (currentTime - startTime) / 1000;
+
+					monitor.subTask(NLS.bind(//
+							Messages.Tour_Database_PostUpdate020_ConvertIntToFloat,
+							new Object[] { tourIdx, tourList.size(), (int) durationInSeconds }));
+
+					tourIdx++;
 				}
-				stmt.close();
+
+//				final long currentTime1 = System.currentTimeMillis();
+
+				final TourData tourData = em.find(TourData.class, tourId);
+				if (tourData != null) {
+
+//					final long currentTime2 = System.currentTimeMillis();
+
+					tourData.convertDataSeries();
+
+//					final long currentTime3 = System.currentTimeMillis();
+
+					TourDatabase.saveEntity(tourData, tourId, TourData.class);
+
+//					final long currentTime4 = System.currentTimeMillis();
+//					final int size = tourData.timeSerie == null ? 0 : tourData.timeSerie.length;
+
+//					System.out.println(tourIdx
+//							+ "\t"
+//							+ size
+//							+ "\t"
+//							+ (currentTime2 - currentTime1)
+//							+ "\t"
+//							+ (currentTime3 - currentTime2)
+//							+ "\t"
+//							+ (currentTime4 - currentTime3)
+//							+ "\t");
+					// TODO remove SYSTEM.OUT.PRINTLN
+				}
+
 			}
 
-			break;
+		} catch (final Exception e) {
+			e.printStackTrace();
+		} finally {
+
+			IS_POST_UPDATE_019_to_020 = false;
+
+			em.close();
 		}
 	}
 
-//	private void updateDbDesign_020_20DropColumns(final Connection conn) throws SQLException {
+//	/**
+//	 * Increase {@link TourData#serieData} blob size.
+//	 *
+//	 * @param conn
+//	 * @throws SQLException
+//	 */
+//	private void updateDbDesign_020_10DataSerieBlobSize(final Connection conn) throws SQLException {
 //
-//		String sql;
-//		final Statement stmt = conn.createStatement();
-//		{
-////				TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA
-////
-////				+ "	distance 				INTEGER NOT NULL,						\n" //$NON-NLS-1$
-////				+ "	deviceDistance 			INTEGER NOT NULL,						\n" //$NON-NLS-1$
-////				+ "	deviceTravelTime 		BIGINT NOT NULL,						\n" //$NON-NLS-1$
-////				+ "	deviceWheel 			INTEGER NOT NULL,						\n" //$NON-NLS-1$
-////				+ "	deviceWeight 			INTEGER NOT NULL,						\n" //$NON-NLS-1$
-////				+ "	deviceTotalUp 			INTEGER NOT NULL,						\n" //$NON-NLS-1$
-////				+ "	deviceTotalDown 		INTEGER NOT NULL,						\n" //$NON-NLS-1$
-////
-////				TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA
+//		final DatabaseMetaData meta = conn.getMetaData();
 //
-//			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " DROP distance";//$NON-NLS-1$ //$NON-NLS-2$
-//			exec(stmt, sql);
+//		final ResultSet rsColumns = meta.getColumns(null, TABLE_SCHEMA, TABLE_TOUR_DATA, "SERIEDATA"); //$NON-NLS-1$
 //
-//			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " DROP deviceDistance";//$NON-NLS-1$ //$NON-NLS-2$
-//			exec(stmt, sql);
+//		while (rsColumns.next()) {
 //
-//			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " DROP deviceTravelTime";//$NON-NLS-1$ //$NON-NLS-2$
-//			exec(stmt, sql);
+//			final int size = rsColumns.getInt("COLUMN_SIZE"); //$NON-NLS-1$
+//			if (size == 1048576) {
 //
-//			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " DROP deviceWheel";//$NON-NLS-1$ //$NON-NLS-2$
-//			exec(stmt, sql);
+//				/*
+//				 * database is from a derby version before 10.5 which creates BLOB's with a default
+//				 * size of 1M, increase size to 2G because a tour with 53000 can not be saves and
+//				 * causes an exception
+//				 */
 //
-//			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " DROP deviceWeight";//$NON-NLS-1$ //$NON-NLS-2$
-//			exec(stmt, sql);
+//				String sql;
+//				final Statement stmt = conn.createStatement();
+//				{
+//					// ALTER TABLE TourData ALTER COLUMN SerieData SET DATA TYPE BLOB(2G)
 //
-//			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " DROP deviceTotalUp";//$NON-NLS-1$ //$NON-NLS-2$
-//			exec(stmt, sql);
+//					sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ALTER COLUMN SerieData SET DATA TYPE BLOB(2G)"; //$NON-NLS-1$ //$NON-NLS-2$
+//					exec(stmt, sql);
+//				}
+//				stmt.close();
+//			}
 //
-//			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " DROP deviceTotalDown";//$NON-NLS-1$ //$NON-NLS-2$
-//			exec(stmt, sql);
-//
+//			break;
 //		}
-//		stmt.close();
 //	}
+
+	private void updateDbDesign_020_20DropColumns(	final Connection conn,
+													final IProgressMonitor monitor,
+													final int newDbVersion) throws SQLException {
+
+		String sql;
+		final Statement stmt = conn.createStatement();
+		{
+//				TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA
+//
+//				+ "	distance 				INTEGER NOT NULL,						\n" //$NON-NLS-1$
+//				+ "	deviceDistance 			INTEGER NOT NULL,						\n" //$NON-NLS-1$
+//				+ "	deviceTravelTime 		BIGINT NOT NULL,						\n" //$NON-NLS-1$
+//				+ "	deviceWheel 			INTEGER NOT NULL,						\n" //$NON-NLS-1$
+//				+ "	deviceWeight 			INTEGER NOT NULL,						\n" //$NON-NLS-1$
+//				+ "	deviceTotalUp 			INTEGER NOT NULL,						\n" //$NON-NLS-1$
+//				+ "	deviceTotalDown 		INTEGER NOT NULL,						\n" //$NON-NLS-1$
+//
+//				TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA
+
+			showSubTask(monitor, "1/7"); //$NON-NLS-1$
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " DROP distance";//$NON-NLS-1$ //$NON-NLS-2$
+			exec(stmt, sql);
+
+			showSubTask(monitor, "2/7"); //$NON-NLS-1$
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " DROP deviceDistance";//$NON-NLS-1$ //$NON-NLS-2$
+			exec(stmt, sql);
+
+			showSubTask(monitor, "3/7"); //$NON-NLS-1$
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " DROP deviceTravelTime";//$NON-NLS-1$ //$NON-NLS-2$
+			exec(stmt, sql);
+
+			showSubTask(monitor, "4/7"); //$NON-NLS-1$
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " DROP deviceWheel";//$NON-NLS-1$ //$NON-NLS-2$
+			exec(stmt, sql);
+
+			showSubTask(monitor, "5/7"); //$NON-NLS-1$
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " DROP deviceWeight";//$NON-NLS-1$ //$NON-NLS-2$
+			exec(stmt, sql);
+
+			showSubTask(monitor, "6/7"); //$NON-NLS-1$
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " DROP deviceTotalUp";//$NON-NLS-1$ //$NON-NLS-2$
+			exec(stmt, sql);
+
+			showSubTask(monitor, "7/7"); //$NON-NLS-1$
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " DROP deviceTotalDown";//$NON-NLS-1$ //$NON-NLS-2$
+			exec(stmt, sql);
+
+		}
+		stmt.close();
+	}
+
+	private void updateDbDesign_020_30AlterColumns(final Connection conn) throws SQLException {
+
+		String sql;
+		final Statement stmt = conn.createStatement();
+		{
+//			TOUR_DATA	TOUR_DATA	TOUR_DATA	TOUR_DATA	TOUR_DATA	TOUR_DATA	TOUR_DATA
+//			//
+//			// version 20 start -------- converted "serieData" to "serieData20" which contains floating data series
+//
+//			+ "	serieData20					BLOB NOT NULL					\n" //$NON-NLS-1$
+//			//
+//			// version 20 end ---------
+//			//
+//			TOUR_DATA	TOUR_DATA	TOUR_DATA	TOUR_DATA	TOUR_DATA	TOUR_DATA	TOUR_DATA
+
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN serieData20		BLOB"; //$NON-NLS-1$ //$NON-NLS-2$
+			exec(stmt, sql);
+		}
+		stmt.close();
+	}
 
 	private void updateDbVersionNumber(final Connection conn, final int newVersion) throws SQLException {
 

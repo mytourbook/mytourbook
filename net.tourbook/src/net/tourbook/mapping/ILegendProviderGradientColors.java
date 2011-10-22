@@ -23,7 +23,7 @@ public interface ILegendProviderGradientColors extends ILegendProvider {
 	 * @param graphValue
 	 * @return Returns the RGB value for a graph value.
 	 */
-	abstract int getColorValue(int graphValue);
+	abstract int getColorValue(float graphValue);
 
 	abstract LegendColor getLegendColor();
 
@@ -36,7 +36,10 @@ public interface ILegendProviderGradientColors extends ILegendProvider {
 	 */
 	abstract void setLegendColorColors(LegendColor newLegendColor);
 
-	abstract void setLegendColorValues(Rectangle legendBounds, int minValue, int maxValue, String unit_label_altitude);
+	abstract void setLegendColorValues(	Rectangle legendBounds,
+										float minValue,
+										float maxValue,
+										String unit_label_altitude);
 
-	abstract void setLegendColorValues(Rectangle legendBounds, int[] dataSerie, String unitLabel);
+	abstract void setLegendColorValues(Rectangle legendBounds, float[] dataSerie, String unitLabel);
 }
