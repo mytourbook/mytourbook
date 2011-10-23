@@ -172,7 +172,7 @@ public final class ElevationGlobe extends ElevationBase {
 	}
 
 	@Override
-	public short getElevation(final GeoLat lat, final GeoLon lon) {
+	public float getElevation(final GeoLat lat, final GeoLon lon) {
 		int i = 0;
 
 		if (lat.tertias != 0)

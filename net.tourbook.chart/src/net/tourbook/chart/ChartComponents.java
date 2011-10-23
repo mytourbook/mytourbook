@@ -340,7 +340,7 @@ public class ChartComponents extends Composite {
 		final ChartDataXSerie xData = drawingData.getXData();
 
 		final float graphMaxValue = xData.getOriginalMaxValue();
-		final int xAxisUnit = xData.getAxisUnit();
+		final int unitType = xData.getAxisUnit();
 		final float xStartValue = xData.getStartValue();
 
 		final int devVirtualGraphWidth = _componentGraph.getDevVirtualGraphImageWidth();
@@ -361,7 +361,7 @@ public class ChartComponents extends Composite {
 		// get the unit list from the configuration
 		final ArrayList<ChartUnit> unitList = drawingData.getXUnits();
 
-		switch (xAxisUnit) {
+		switch (unitType) {
 
 		case ChartDataSerie.X_AXIS_UNIT_DAY:
 
@@ -387,17 +387,21 @@ public class ChartComponents extends Composite {
 
 			// axis unit
 			float graphUnit = 1; // this default value should be overwritten
+			float majorValue = 0;
 
-			switch (xAxisUnit) {
+			switch (unitType) {
 			case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_SECOND:
 			case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_OPTIONAL_SECOND:
 			case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE:
 				graphUnit = Util.roundTimeValue(defaultUnitValue);
+				majorValue = Util.getMajorTimeValue(graphUnit);
 				break;
 
 			case ChartDataSerie.AXIS_UNIT_NUMBER:
 			case ChartDataSerie.X_AXIS_UNIT_NUMBER_CENTER:
+				// unit is a decimal number
 				graphUnit = Util.roundDecimalValue(defaultUnitValue);
+				majorValue = Util.getMajorDecimalValue(graphUnit);
 				break;
 
 			default:
@@ -439,8 +443,8 @@ public class ChartComponents extends Composite {
 				final float unitPos = graphValue - unitOffset;
 				float unitLabelValue = unitPos + xStartValue;
 
-				if ((xAxisUnit == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_SECOND //
-						|| xAxisUnit == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_OPTIONAL_SECOND)
+				if ((unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_SECOND //
+						|| unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_OPTIONAL_SECOND)
 						&& xStartValue > 0) {
 
 					/*
@@ -450,9 +454,11 @@ public class ChartComponents extends Composite {
 					unitLabelValue = unitLabelValue % DAY_IN_SECONDS;
 				}
 
-				final String unitLabel = Util.formatValue(unitLabelValue, xAxisUnit, valueDivisor, true);
+				final String unitLabel = Util.formatValue(unitLabelValue, unitType, valueDivisor, true);
 
-				unitList.add(new ChartUnit(graphValue, unitLabel));
+				final boolean isMajorValue = graphValue % majorValue == 0;
+
+				unitList.add(new ChartUnit(graphValue, unitLabel, isMajorValue));
 
 				// check for an infinity loop
 				if (graphValue == graphMaxValue || loopCounter++ > 10000) {
@@ -473,14 +479,14 @@ public class ChartComponents extends Composite {
 
 			final float[] highValues = xData.getHighValues()[0];
 
-			if (xAxisUnit == ChartDataSerie.AXIS_UNIT_NUMBER || xAxisUnit == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE) {
+			if (unitType == ChartDataSerie.AXIS_UNIT_NUMBER || unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE) {
 
 				final int barWidth = (devVirtualGraphWidth / highValues.length) / 2;
 
 				drawingData.setBarRectangleWidth(Math.max(0, barWidth));
 				drawingData.setBarPosition(GraphDrawingData.BAR_POS_CENTER);
 
-			} else if (xAxisUnit == ChartDataSerie.X_AXIS_UNIT_NUMBER_CENTER) {
+			} else if (unitType == ChartDataSerie.X_AXIS_UNIT_NUMBER_CENTER) {
 
 				/*
 				 * set bar width that it is wide enouth to overlap the next right bar, the
@@ -555,7 +561,7 @@ public class ChartComponents extends Composite {
 		 */
 		final int defaultUnitCount = devGraphHeight / _chart.gridVerticalDistance;
 
-		// unitValue is the number in data values for one unit
+		// defaultUnitValue is the number in data values for one unit
 		final float defaultUnitValue = graphValueRange / Math.max(1, defaultUnitCount);
 
 		// round the unit
@@ -575,30 +581,24 @@ public class ChartComponents extends Composite {
 		}
 
 		// decrease min value when it does not fit to unit borders
+		final float graphMinRemainder = graphMinVisibleValue % graphUnit;
 		if (graphMinVisibleValue < 0) {
-
-			final float graphMinRemainder = graphMinVisibleValue % graphUnit;
-			final float min1 = graphMinVisibleValue - graphMinRemainder;
-			graphMinVisibleValue = min1 - graphUnit;
-
+			graphMinVisibleValue = graphMinVisibleValue - graphMinRemainder - graphUnit;
 		} else {
-
-			final float graphMinRemainder = graphMinVisibleValue % graphUnit;
 			graphMinVisibleValue = graphMinVisibleValue - graphMinRemainder;
+		}
+
+		// increase the max value when it does not fit to unit borders
+		final float graphMaxRemainder = graphMaxVisibleValue % graphUnit;
+		if (graphMaxVisibleValue < 0) {
+			graphMaxVisibleValue = graphMaxVisibleValue - graphMaxRemainder;
+		} else {
+			graphMaxVisibleValue = graphMaxVisibleValue - graphMaxRemainder + graphUnit;
 		}
 
 		// adjust the min value so that bar graphs start at the bottom of the chart
 		if (_chartDataModel.getChartType() == ChartDataModel.CHART_TYPE_BAR && _chart.getStartAtChartBottom()) {
 			yData.setVisibleMinValue(graphMinVisibleValue);
-		}
-
-		// increase the max value when it does not fit to unit borders
-		if (graphMaxVisibleValue < 0) {
-			final float graphMaxRemainder = graphMaxVisibleValue % graphUnit;
-			graphMaxVisibleValue = graphMaxVisibleValue - graphMaxRemainder;
-		} else {
-			final float graphMaxRemainder = graphMaxVisibleValue % graphUnit;
-			graphMaxVisibleValue = graphMaxVisibleValue - graphMaxRemainder + graphUnit;
 		}
 
 		if (adjustGraphUnit
@@ -642,6 +642,25 @@ public class ChartComponents extends Composite {
 			graphUnit = 1800;
 		}
 
+		// get major values according to the unit
+		float majorValue = 0;
+		switch (unitType) {
+		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE:
+		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H:
+		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_SECOND:
+		case ChartDataSerie.AXIS_UNIT_MINUTE_SECOND:
+			majorValue = Util.getMajorTimeValue(graphUnit);
+			break;
+
+		case ChartDataSerie.AXIS_UNIT_NUMBER:
+			// unit is a decimal number
+			majorValue = Util.getMajorDecimalValue(graphUnit);
+			break;
+		}
+
+		graphMinVisibleValue = Util.roundFloatToUnit(graphMinVisibleValue, graphUnit);
+		graphMaxVisibleValue = Util.roundFloatToUnit(graphMaxVisibleValue, graphUnit);
+
 		// calculate the vertical scaling between graph and device
 		final float graphScaleY = (devGraphHeight) / graphValueRange;
 
@@ -674,9 +693,6 @@ public class ChartComponents extends Composite {
 		final int valueDivisor = yData.getValueDivisor();
 		int loopCounter = 0;
 
-		graphMinVisibleValue = Util.roundFloatToUnit(graphMinVisibleValue, graphUnit);
-		graphMaxVisibleValue = Util.roundFloatToUnit(graphMaxVisibleValue, graphUnit);
-
 		float graphValue = graphMinVisibleValue;
 
 		// loop: create unit label for all units
@@ -684,7 +700,9 @@ public class ChartComponents extends Composite {
 
 			final String unitLabel = Util.formatValue(graphValue, unitType, valueDivisor, false);
 
-			unitList.add(new ChartUnit(graphValue, unitLabel));
+			final boolean isMajorValue = graphValue % majorValue == 0;
+
+			unitList.add(new ChartUnit(graphValue, unitLabel, isMajorValue));
 
 			// prevent endless loops when the unit is 0
 			if (graphValue == graphMaxVisibleValue || loopCounter++ > 1000) {
@@ -696,7 +714,6 @@ public class ChartComponents extends Composite {
 		}
 
 		if (unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H && graphValue > graphMaxVisibleValue) {
-
 			unitList.add(new ChartUnit(graphMaxVisibleValue, Util.EMPTY_STRING));
 		}
 	}

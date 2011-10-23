@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,8 @@
  * @author Wolfgang Schramm Created: 06.07.2005
  */
 package net.tourbook.ui.tourChart;
+
+import java.text.NumberFormat;
 
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.GraphDrawingData;
@@ -50,6 +52,12 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 	private int						_devY0Spline;
 	private float					_scaleX;
 	private float					_scaleY;
+
+	private final NumberFormat		_nf3	= NumberFormat.getNumberInstance();
+	{
+		_nf3.setMinimumFractionDigits(3);
+		_nf3.setMaximumFractionDigits(3);
+	}
 
 	public ChartLayer2ndAltiSerie(	final TourData tourData,
 									final float[] xDataSerie,
@@ -412,7 +420,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 				/*
 				 * draw altitude
 				 */
-				final String altiText = Float.toString(graphY);
+				final String altiText = _nf3.format(graphY);
 				final Point textExtent = gc.textExtent(altiText);
 				final int textWidth = textExtent.x;
 

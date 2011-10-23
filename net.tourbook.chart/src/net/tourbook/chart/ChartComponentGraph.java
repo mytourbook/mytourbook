@@ -76,6 +76,7 @@ public class ChartComponentGraph extends Canvas {
 	private static final NumberFormat	_nf						= NumberFormat.getNumberInstance();
 
 	private static final RGB			_gridRGB				= new RGB(241, 239, 226);
+	private static final RGB			_gridRGBMajor			= new RGB(222, 220, 208);
 
 	Chart								_chart;
 	private final ChartComponents		_chartComponents;
@@ -273,6 +274,7 @@ public class ChartComponentGraph extends Canvas {
 	private Cursor						_cursorModeZoomMove;
 
 	private Color						_gridColor;
+	private Color						_gridColorMajor;
 
 	/**
 	 * is set true when the graph is being moved with the mouse
@@ -411,6 +413,7 @@ public class ChartComponentGraph extends Canvas {
 		_cursorModeZoomMove = createCursorFromImage(Messages.Image_cursor_mode_zoom_move);
 
 		_gridColor = new Color(getDisplay(), _gridRGB);
+		_gridColorMajor = new Color(getDisplay(), _gridRGBMajor);
 
 		_chartComponents = (ChartComponents) parent;
 
@@ -1828,19 +1831,19 @@ public class ChartComponentGraph extends Canvas {
 		gcChart.setForeground(display.getSystemColor(SWT.COLOR_DARK_GRAY));
 		gcGraph.setForeground(_gridColor);
 
-		for (final ChartUnit unit : xUnits) {
+		for (final ChartUnit xUnit : xUnits) {
 
 			// get dev x-position for the unit tick
 			int devXUnitTick;
 			if (isExtendedScaling) {
 
 				// extended scaling
-				final double scaledUnitValue = ((Math.pow(unit.value, scalingFactor)) * extScaleX);
+				final double scaledUnitValue = ((Math.pow(xUnit.value, scalingFactor)) * extScaleX);
 				devXUnitTick = (int) (scaledUnitValue);
 
 			} else {
 				// scale with devXOffset
-				devXUnitTick = (int) (unit.value * scaleX) - _devGraphImageXOffset;
+				devXUnitTick = (int) (xUnit.value * scaleX) - _devGraphImageXOffset;
 			}
 
 			/*
@@ -1873,7 +1876,7 @@ public class ChartComponentGraph extends Canvas {
 					/*
 					 * draw unit value
 					 */
-					final int devUnitValueWidth = gcChart.textExtent(unit.valueLabel).x;
+					final int devUnitValueWidth = gcChart.textExtent(xUnit.valueLabel).x;
 
 					if (devUnitWidth != 0 && xUnitTextPos == GraphDrawingData.X_UNIT_TEXT_POS_CENTER) {
 
@@ -1895,7 +1898,7 @@ public class ChartComponentGraph extends Canvas {
 
 						} else {
 
-							gcChart.drawText(unit.valueLabel, devXUnitLabelPosition, devYBottom + 7, true);
+							gcChart.drawText(xUnit.valueLabel, devXUnitLabelPosition, devYBottom + 7, true);
 
 							devXLastUnitRightPosition = devXUnitLabelPosition + devUnitValueWidth + 0;
 						}
@@ -1924,7 +1927,7 @@ public class ChartComponentGraph extends Canvas {
 								devXUnit = 0;
 							}
 
-							gcChart.drawText(unit.valueLabel, devXUnit, devYBottom + 7, true);
+							gcChart.drawText(xUnit.valueLabel, devXUnit, devYBottom + 7, true);
 
 							// draw unit label (km, mi, h)
 
@@ -1961,7 +1964,7 @@ public class ChartComponentGraph extends Canvas {
 								if (devXUnitValueDefaultPosition > devXLastUnitRightPosition) {
 
 									gcChart.drawText(
-											unit.valueLabel,
+											xUnit.valueLabel,
 											devXUnitValueDefaultPosition,
 											devYBottom + 7,
 											true);
@@ -1979,9 +1982,16 @@ public class ChartComponentGraph extends Canvas {
 				}
 			}
 
+			// draw vertical gridline but not on the vertical 0 line
 			if (devXUnitTick > 0 && isDrawVerticalGrid) {
 
-				// draw vertical gridline, don't draw it on the vertical 0 line
+				if (xUnit.isMajorValue) {
+					gcGraph.setLineStyle(SWT.LINE_SOLID);
+					gcGraph.setForeground(_gridColorMajor);
+				} else {
+					gcGraph.setLineStyle(SWT.LINE_DOT);
+					gcGraph.setForeground(_gridColor);
+				}
 
 				gcGraph.drawLine(devXUnitTick, 0, devXUnitTick, drawingData.devGraphHeight);
 			}
@@ -2016,8 +2026,6 @@ public class ChartComponentGraph extends Canvas {
 
 		final boolean isDrawHorizontalGrid = _chart.isShowHorizontalGridLines;
 
-		gcGraph.setLineStyle(SWT.LINE_SOLID);
-
 		int devY;
 		int unitIndex = 0;
 
@@ -2043,6 +2051,7 @@ public class ChartComponentGraph extends Canvas {
 
 				if (isXAxis) {
 
+					gcGraph.setLineStyle(SWT.LINE_SOLID);
 					gcGraph.setForeground(display.getSystemColor(SWT.COLOR_DARK_GRAY));
 					gcGraph.drawLine(0, devY, _devVirtualGraphImageWidth, devY);
 
@@ -2056,7 +2065,14 @@ public class ChartComponentGraph extends Canvas {
 
 					// draw gridlines
 
-					gcGraph.setForeground(_gridColor);
+					if (yUnit.isMajorValue) {
+						gcGraph.setLineStyle(SWT.LINE_SOLID);
+						gcGraph.setForeground(_gridColorMajor);
+					} else {
+						gcGraph.setLineStyle(SWT.LINE_DOT);
+						gcGraph.setForeground(_gridColor);
+					}
+
 					gcGraph.drawLine(0, devY, _devVirtualGraphImageWidth, devY);
 				}
 			}
@@ -4427,6 +4443,7 @@ public class ChartComponentGraph extends Canvas {
 		_customFgLayerImage = Util.disposeResource(_customFgLayerImage);
 
 		_gridColor = Util.disposeResource(_gridColor);
+		_gridColorMajor = Util.disposeResource(_gridColorMajor);
 
 		_toolTipV1.dispose();
 

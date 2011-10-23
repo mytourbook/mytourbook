@@ -2878,7 +2878,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			public void run() {
 
 				int serieIndex = 0;
-				short lastValidSRTM = 0;
+				float lastValidSRTM = 0;
 				boolean isSRTMValid = false;
 
 				final int serieLength = timeSerie.length;
@@ -2888,13 +2888,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 				for (final double latitude : latitudeSerie) {
 
-					short srtmValue = elevationSRTM3.getElevation(new GeoLat(latitude), new GeoLon(
+					float srtmValue = elevationSRTM3.getElevation(new GeoLat(latitude), new GeoLon(
 							longitudeSerie[serieIndex]));
 
 					/*
 					 * set invalid values to the previous valid value
 					 */
-					if (srtmValue == Short.MIN_VALUE) {
+					if (srtmValue == Float.MIN_VALUE) {
 						// invalid data
 						srtmValue = lastValidSRTM;
 					} else {

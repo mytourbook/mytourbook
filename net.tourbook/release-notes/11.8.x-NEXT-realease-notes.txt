@@ -1,9 +1,16 @@
-conversion time: 1727 tours / 149 seconds = 11.6 tours/second
+New features:
+- major/minor grid lines in the tour chart
+
+Infos:
+-conversion time: 1727 tours / 149 seconds = 11.6 tours/second
+
 
 TODO's
 - double -> float
   - ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED_AS 
   - ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED_AS
+
+- reload time slices REMOVES merged tour data
 
 -hide log in the UI for these errors
 

@@ -66,7 +66,7 @@ public class ActionOpenAdjustAltitudeDialog extends Action {
 		}
 
 		boolean isCreateDummyAltitude = false;
-		final int[] altitudeSerie = tourData.altitudeSerie;
+		final float[] altitudeSerie = tourData.altitudeSerie;
 
 		// check if altitude values are available
 		if (altitudeSerie == null || altitudeSerie.length == 0) {

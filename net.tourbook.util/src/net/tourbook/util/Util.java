@@ -174,6 +174,26 @@ public class Util {
 	}
 
 	/**
+	 * creates a float array backup
+	 * 
+	 * @param original
+	 * @return Returns a copy of a <code>float[]</code> or <code>null</code> when the original data
+	 *         is <code>null</code>.
+	 */
+	public static float[] createFloatCopy(final float[] original) {
+
+		float[] backup = null;
+
+		if (original != null) {
+			final int serieLength = original.length;
+			backup = new float[serieLength];
+			System.arraycopy(original, 0, backup, 0, serieLength);
+		}
+
+		return backup;
+	}
+
+	/**
 	 * creates a int array backup
 	 * 
 	 * @param original

@@ -77,7 +77,7 @@ public final class ElevationEtopo extends ElevationBase {
 	}
 
 	@Override
-	public short getElevation(final GeoLat lat, final GeoLon lon) {
+	public float getElevation(final GeoLat lat, final GeoLon lon) {
 
 		if (lat.tertias != 0)
 			return getElevationGrid(lat, lon);

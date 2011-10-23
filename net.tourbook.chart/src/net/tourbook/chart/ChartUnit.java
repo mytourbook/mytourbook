@@ -18,7 +18,6 @@
  * 
  * 06.07.2005
  */
-
 package net.tourbook.chart;
 
 public class ChartUnit {
@@ -26,13 +25,21 @@ public class ChartUnit {
 	String	valueLabel;
 	float	value;
 
+	boolean	isMajorValue	= false;
+
 	public ChartUnit(final float value, final String valueLabel) {
 		this.value = value;
 		this.valueLabel = valueLabel;
 	}
 
+	public ChartUnit(final float value, final String valueLabel, final boolean isMajorValue) {
+		this.value = value;
+		this.valueLabel = valueLabel;
+		this.isMajorValue = isMajorValue;
+	}
+
 	@Override
 	public String toString() {
-		return "ChartUnit [valueLabel=" + valueLabel + ", value=" + value + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		return "ChartUnit [valueLabel=" + valueLabel + ", value=" + value + ", isMajorValue=" + isMajorValue + "]";
 	}
 }

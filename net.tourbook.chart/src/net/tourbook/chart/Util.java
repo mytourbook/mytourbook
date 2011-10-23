@@ -233,6 +233,56 @@ public class Util {
 		return formatValue(value, unitType, 1, false);
 	}
 
+	public static float getMajorDecimalValue(final float unitValue) {
+
+		float unit = unitValue;
+		int multiplier = 1;
+
+		while (unit > 1000) {
+			multiplier *= 10;
+			unit /= 10;
+		}
+
+		unit = unitValue / multiplier;
+
+		unit = unit == 1000 ? 5000 : unit == 500 ? 1000 : unit == 200 ? 1000 : //
+				unit == 100 ? 500 : unit == 50 ? 200 : unit == 20 ? 100 : //
+						unit == 10 ? 50 : unit == 5 ? 20 : unit == 2f ? 10f : //
+								unit == 1 ? 5 : unit == 0.5f ? 2.0f : unit == 0.2f ? 1 : //
+										unit == 0.1f ? 0.5f : unit == 0.05f ? 0.2f : unit == 0.02f ? 0.1f : 0.05f;
+
+		unit *= multiplier;
+
+		return unit;
+	}
+
+	/**
+	 * @param unitValue
+	 * @return Returns minUnitValue rounded to the number 60/30/20/10/5/2/1
+	 */
+	public static float getMajorTimeValue(final float unitValue) {
+
+		float unit = unitValue;
+		int multiplier = 1;
+
+		while (unit > 120) {
+			multiplier *= 60;
+			unit /= 60;
+		}
+
+		unit = unit == 120 ? 600 : //
+				unit == 60 ? 300 : //
+						unit == 30 ? 60 : //
+								unit == 20 ? 60 : //
+										unit == 10 ? 30 : //
+												unit == 5 ? 30 : //
+														unit == 2 ? 10 : 5;
+
+		unit *= multiplier;
+
+		return unit;
+	}
+
 	/**
 	 * @param unitValue
 	 * @return Returns minUnitValue rounded to the number of 50/20/10/5/2/1
