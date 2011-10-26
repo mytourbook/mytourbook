@@ -630,10 +630,6 @@ public class Chart extends ViewForm {
 		return _chartComponents.getChartComponentGraph()._canAutoZoomToSlider;
 	}
 
-	public boolean getCanScrollZoomedChart() {
-		return _chartComponents.getChartComponentGraph()._canScrollZoomedChart;
-	}
-
 	protected ChartComponents getChartComponents() {
 		return _chartComponents;
 	}

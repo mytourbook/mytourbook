@@ -66,7 +66,7 @@ public class ChartComponents extends Composite {
 	 */
 	static final int					CHART_MIN_WIDTH					= 5;
 	static final int					CHART_MIN_HEIGHT				= 5;
-	static final int					CHART_MAX_WIDTH					= 100000;
+	static final int					CHART_MAX_WIDTH					= 10000000;						// 10'000'000
 	static final int					CHART_MAX_HEIGHT				= 10000;
 
 	static final int					SLIDER_BAR_HEIGHT				= 10;

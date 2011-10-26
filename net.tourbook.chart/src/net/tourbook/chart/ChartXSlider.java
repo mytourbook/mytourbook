@@ -185,15 +185,23 @@ public class ChartXSlider {
 	 * @param newDevVirtualSliderLinePos
 	 */
 	void moveToDevPosition(	int newDevVirtualSliderLinePos,
-							final boolean adjustToImageWidth,
-							final boolean adjustPositionRatio) {
+							final boolean isAdjustToImageWidth,
+							final boolean isAdjustPositionRatio) {
+
+//		System.out.println("moveToDevPosition\t");
+		// TODO remove SYSTEM.OUT.PRINTLN
 
 		final int devVirtualGraphImageWidth = _chartGraph.getDevVirtualGraphImageWidth();
+
+		if (devVirtualGraphImageWidth == 0) {
+			return;
+		}
+
 		/*
 		 * the slider line can be out of bounds for the graph image, this can happen when the graph
 		 * is auto-zoomed to the slider position in the mouse up event
 		 */
-		if (adjustToImageWidth) {
+		if (isAdjustToImageWidth) {
 			newDevVirtualSliderLinePos = Math.min(devVirtualGraphImageWidth, Math.max(0, newDevVirtualSliderLinePos));
 		}
 
@@ -205,16 +213,13 @@ public class ChartXSlider {
 		final int oldPos = _devVirtualSliderLinePos;
 		_devVirtualSliderLinePos = newDevVirtualSliderLinePos;
 
-		if (adjustPositionRatio) {
+		if (isAdjustPositionRatio) {
 
 			_positionRatio = (float) newDevVirtualSliderLinePos / (devVirtualGraphImageWidth - 0);
 
 			// enforce max value
 			_positionRatio = Math.min(_positionRatio, 1);
 		}
-
-		// System.out.println(("slider:newDevVirtualSliderLinePos " + newDevVirtualSliderLinePos)
-		// + ("\tpositionRatio:" + positionRatio));
 
 		// fire change event when the position has changed
 		if (newDevVirtualSliderLinePos != oldPos) {

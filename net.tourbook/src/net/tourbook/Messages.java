@@ -149,6 +149,10 @@ public class Messages extends NLS {
 
 	public static String		Action_TourType_ModifyTourTypeFilter;
 
+	public static String	Adjust_Altitude_Checkbox_SRTM_SelectWholeTour;
+
+	public static String	Adjust_Altitude_Checkbox_SRTM_SelectWholeTour_Tooltip;
+
 	public static String		Adjust_Altitude_CreateDummyAltitudeData_Message;
 	public static String		Adjust_Altitude_CreateDummyAltitudeData_Title;
 	public static String		Adjust_Altitude_Group_GeoPosition;

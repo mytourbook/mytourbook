@@ -1,5 +1,7 @@
-New features:
+Improvements:
 - major/minor grid lines in the tour chart
+- scroll tour chart when vertical sliders are dragged outside of the visible area (for a zoomed chart)
+- improved performance for drawing the tour chart
 
 Infos:
 -conversion time: 1727 tours / 149 seconds = 11.6 tours/second

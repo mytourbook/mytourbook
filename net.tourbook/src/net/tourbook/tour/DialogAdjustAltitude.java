@@ -25,6 +25,7 @@ import net.tourbook.chart.ChartMouseEvent;
 import net.tourbook.chart.IMouseListener;
 import net.tourbook.chart.ISliderMoveListener;
 import net.tourbook.chart.SelectionChartInfo;
+import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.SplineData;
 import net.tourbook.data.TourData;
 import net.tourbook.math.CubicSpline;
@@ -62,6 +63,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
@@ -111,9 +113,13 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 	private static final String				PREF_KEEP_START						= "adjust.altitude.keep_start";			//$NON-NLS-1$
 	private static final String				PREF_SCALE_GEO_POSITION				= "Dialog_AdjustAltitude_GeoPositionScale"; //$NON-NLS-1$
 
-	private final IPreferenceStore			_prefStore							= TourbookPlugin
-																						.getDefault()
+	private static final String				STATE_IS_SRTM_SELECT_WHOLE_TOUR		= "State_IsSRTMSelectWholeTour";			//$NON-NLS-1$
+
+	private final IPreferenceStore			_prefStore							= TourbookPlugin.getDefault() //
 																						.getPreferenceStore();
+	private final IDialogSettings			_state								= TourbookPlugin.getDefault().//
+																						getDialogSettingsSection(
+																								"Dialog_AdjustAltitude");	//$NON-NLS-1$
 
 	/*
 	 * data
@@ -178,6 +184,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 	private Button							_btnSRTMRemoveAllPoints;
 	private Button							_btnResetAltitude;
 	private Button							_btnUpdateAltitude;
+	private Button							_chkSRTMSelectWholeTour;
 
 	private Spinner							_spinnerNewStartAlti;
 	private Spinner							_spinnerNewMaxAlti;
@@ -416,18 +423,19 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		// srtm values are available, otherwise this option is not available in the combo box
 
+		final int leftSliderIndex = _tourChart.getXSliderPosition().getLeftSliderValueIndex();
 		final int serieLength = _tourData.timeSerie.length;
-		final int sliderIndex = _tourChart.getXSliderPosition().getLeftSliderValueIndex();
 
 		final float[] adjustedAltiSerie = _tourData.dataSerieAdjustedAlti = new float[serieLength];
 		final float[] diffTo2ndAlti = _tourData.dataSerieDiffTo2ndAlti = new float[serieLength];
 		final float[] splineDataSerie = _tourData.dataSerieSpline = new float[serieLength];
 
-		final float[] xDataSerie = _tourChartConfig.isShowTimeOnXAxis ? _tourData.getTimeSerieFloat() : _tourData
-				.getDistanceSerie();
+		final float[] xDataSerie = _tourChartConfig.isShowTimeOnXAxis ? //
+				_tourData.getTimeSerieFloat()
+				: _tourData.getDistanceSerie();
 		final float[] yDataSerie = _tourData.getAltitudeSerie();
 
-		_sliderXAxisValue = xDataSerie[sliderIndex];
+		_sliderXAxisValue = xDataSerie[leftSliderIndex];
 		_altiDiff = _backupSrtmSerie[0] - yDataSerie[0];
 
 		// ensure that a point can be moved with the mouse
@@ -443,7 +451,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 			final float yValue = yDataSerie[serieIndex];
 			final float srtmValue = _backupSrtmSerie[serieIndex];
 
-			if (serieIndex <= sliderIndex && sliderIndex != 0) {
+			if (serieIndex <= leftSliderIndex && leftSliderIndex != 0) {
 
 				// add adjusted altitude
 
@@ -832,6 +840,8 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		setMessage(NLS.bind(Messages.adjust_altitude_dlg_dialog_message, TourManager.getTourTitle(_tourData)));
 
 		updateTourChart();
+
+		restoreStatePost();
 	}
 
 	@Override
@@ -1122,7 +1132,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		_tourChart.addXAxisSelectionListener(new IXAxisSelectionListener() {
 			@Override
 			public void selectionChanged(final boolean showTimeOnXAxis) {
-				if (getSelectedAdjustmentType().__id == ADJUST_TYPE_SRTM_SPLINE) {
+				if (isAdjustmentTypeSRTMSPline()) {
 					computeAltitudeSRTMSpline();
 				}
 			}
@@ -1201,7 +1211,41 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 	private Composite createUI50OptionWithSRTMSpline(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.fillDefaults().numColumns(5).equalWidth(false).applyTo(container);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+			createUI52SRTMOptions(container);
+			createUI54SRTMActions(container);
+		}
+
+		return container;
+	}
+
+	private void createUI52SRTMOptions(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+		{
+			/*
+			 * checkbox: initial area
+			 */
+			_chkSRTMSelectWholeTour = new Button(container, SWT.CHECK);
+			GridDataFactory.swtDefaults().applyTo(_chkSRTMSelectWholeTour);
+			_chkSRTMSelectWholeTour.setText(Messages.Adjust_Altitude_Checkbox_SRTM_SelectWholeTour);
+			_chkSRTMSelectWholeTour.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onModifySRTM();
+				}
+			});
+		}
+	}
+
+	private Composite createUI54SRTMActions(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridLayoutFactory.fillDefaults().numColumns(3).equalWidth(false).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
 			/*
@@ -1247,12 +1291,11 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 				}
 			});
 			setButtonLayoutData(_btnSRTMRemoveAllPoints);
-
-			// spacer
-			final Label label = new Label(container, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
+//
+//			// spacer
+//			final Label label = new Label(container, SWT.NONE);
+//			GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
 		}
-
 		return container;
 	}
 
@@ -1656,6 +1699,10 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		}
 	}
 
+	private boolean isAdjustmentTypeSRTMSPline() {
+		return getSelectedAdjustmentType().__id == ADJUST_TYPE_SRTM_SPLINE;
+	}
+
 	@Override
 	protected void okPressed() {
 
@@ -1685,6 +1732,29 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		scale.setSelection(max / 2);
 
 		onSelectSlicePosition();
+	}
+
+	private void onModifySRTM() {
+
+		final int maxIndex = _tourData.getTimeSerieFloat().length - 1;
+		final boolean isSelectWholeTour = _chkSRTMSelectWholeTour.getSelection();
+
+		if (isSelectWholeTour) {
+
+			/*
+			 * set slider position, BOTH sliders must be set to the right side otherwise the left
+			 * slider is not moved because of slider optimization
+			 */
+
+			_tourChart.setXSliderPosition(new SelectionChartXSliderPosition(_tourChart, //
+					maxIndex,
+					maxIndex));
+		} else {
+
+			_tourChart.setXSliderPosition(new SelectionChartXSliderPosition(_tourChart, //
+					maxIndex / 2,
+					maxIndex));
+		}
 	}
 
 	private void onMouseDown(final ChartMouseEvent mouseEvent) {
@@ -1774,25 +1844,6 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		_pointHitIndex = -1;
 	}
 
-	/**
-	 * display altitude with the original altitude data
-	 */
-	private void onResetAltitude() {
-
-		_altiMaxDiff = 0;
-		_altiStartDiff = 0;
-		_prevAltiStart = 0;
-		_prevAltiMax = 0;
-
-		_tourData.altitudeSerie = Util.createFloatCopy(_backupMetricAltitudeSerie);
-		_tourData.clearAltitudeSeries();
-
-		initializeAltitude(_backupMetricAltitudeSerie);
-		onChangeAltitude();
-
-		updateTourChart();
-	}
-
 //	/**
 //	 * set adjustments to the initial values
 //	 */
@@ -1811,6 +1862,25 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 //
 //		updateTourChart();
 //	}
+
+	/**
+	 * display altitude with the original altitude data
+	 */
+	private void onResetAltitude() {
+
+		_altiMaxDiff = 0;
+		_altiStartDiff = 0;
+		_prevAltiStart = 0;
+		_prevAltiMax = 0;
+
+		_tourData.altitudeSerie = Util.createFloatCopy(_backupMetricAltitudeSerie);
+		_tourData.clearAltitudeSeries();
+
+		initializeAltitude(_backupMetricAltitudeSerie);
+		onChangeAltitude();
+
+		updateTourChart();
+	}
 
 	private void onResetAltitudeSRTM() {
 
@@ -2036,6 +2106,29 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		_scaleSlicePos.setSelection(scaleGeoPos);
 	}
 
+	private void restoreStatePost() {
+
+		/*
+		 * checkbox: select whole tour
+		 */
+		final boolean isChecked = Util.getStateBoolean(_state, STATE_IS_SRTM_SELECT_WHOLE_TOUR, true);
+		_chkSRTMSelectWholeTour.setSelection(isChecked);
+
+		if (isAdjustmentTypeSRTMSPline()) {
+
+			/*
+			 * MUST be run async because both sliders are positioned on the right side instead of
+			 * the correct position
+			 */
+
+			Display.getCurrent().asyncExec(new Runnable() {
+				public void run() {
+					onModifySRTM();
+				}
+			});
+		}
+	}
+
 	private void saveState() {
 
 		_prefStore.setValue(PREF_ADJUST_TYPE, getSelectedAdjustmentType().__id);
@@ -2047,6 +2140,11 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		_prefStore.setValue(PREF_KEEP_START, _rdoKeepStart.getSelection());
 
 		_prefStore.setValue(PREF_SCALE_GEO_POSITION, _scaleSlicePos.getSelection());
+
+		/*
+		 * checkbox: select whole tour
+		 */
+		_state.put(STATE_IS_SRTM_SELECT_WHOLE_TOUR, _chkSRTMSelectWholeTour.getSelection());
 	}
 
 	/**

@@ -241,7 +241,7 @@ public class TourPainter extends MapPainter {
 		final Color legendTextColor = display.getSystemColor(SWT.COLOR_BLACK);
 		final Color legendTextBackgroundColor = display.getSystemColor(SWT.COLOR_WHITE);
 
-		int legendValue = 0;
+		float legendValue = 0;
 
 		int unitLabelIndex = 0;
 
@@ -249,7 +249,7 @@ public class TourPainter extends MapPainter {
 
 		for (int pixelIndex = 0; pixelIndex <= availableLegendPixels; pixelIndex++) {
 
-			legendValue = (int) (legendMinValue + pixelValue * pixelIndex);
+			legendValue = legendMinValue + pixelValue * pixelIndex;
 
 			int valuePosition;
 			if (isDrawVertical) {
