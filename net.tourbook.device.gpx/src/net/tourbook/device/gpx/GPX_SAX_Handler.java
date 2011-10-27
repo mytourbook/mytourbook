@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -46,112 +46,136 @@ import org.xml.sax.helpers.DefaultHandler;
 
 public class GPX_SAX_Handler extends DefaultHandler {
 
-	private static final String				NAME_SPACE_GPX_1_0		= "http://www.topografix.com/GPX/1/0";				//$NON-NLS-1$
-	private static final String				NAME_SPACE_GPX_1_1		= "http://www.topografix.com/GPX/1/1";				//$NON-NLS-1$
+	private static final String				NAME_SPACE_GPX_1_0			= "http://www.topografix.com/GPX/1/0";				//$NON-NLS-1$
+
+	private static final String				NAME_SPACE_GPX_1_1			= "http://www.topografix.com/GPX/1/1";				//$NON-NLS-1$
 	private static final String				POLAR_WEBSYNC_CREATOR_2_3	= "Polar WebSync 2.3 - www.polar.fi";				//$NON_NLS-1$ //$NON-NLS-1$
 
 	// namespace for extensions used by Garmin
 //	private static final String				NAME_SPACE_TPEXT		= "http://www.garmin.com/xmlschemas/TrackPointExtension/v1";	//$NON-NLS-1$
 
-	private static final int				GPX_VERSION_1_0			= 10;
-	private static final int				GPX_VERSION_1_1			= 11;
-
+	private static final int				GPX_VERSION_1_0				= 10;
+	private static final int				GPX_VERSION_1_1				= 11;
 	/*
 	 * gpx tags, attributes
 	 */
-	private static final String				TAG_GPX					= "gpx";											//$NON-NLS-1$
+	private static final String				TAG_GPX						= "gpx";											//$NON-NLS-1$
 
-	private static final String				TAG_TRK					= "trk";											//$NON-NLS-1$
-	private static final String				TAG_TRK_NAME			= "name";											//$NON-NLS-1$
-	private static final String				TAG_TRKPT				= "trkpt";											//$NON-NLS-1$
+	private static final String				TAG_TRK						= "trk";											//$NON-NLS-1$
 
-	private static final String				TAG_TIME				= "time";											//$NON-NLS-1$
-	private static final String				TAG_ELE					= "ele";											//$NON-NLS-1$
+	private static final String				TAG_TRK_NAME				= "name";											//$NON-NLS-1$
+	private static final String				TAG_TRKPT					= "trkpt";											//$NON-NLS-1$
+
+	private static final String				TAG_TIME					= "time";											//$NON-NLS-1$
+	private static final String				TAG_ELE						= "ele";											//$NON-NLS-1$
+
+	// http://www.cluetrust.com/XML/GPXDATA/1/0
+	// http://www.cluetrust.com/Schemas/gpxdata10.xsd
+	private static final String				TAG_GPX_DATA_EXTENSIONS		= "extensions";									//$NON-NLS-1$
+	private static final String				TAG_GPX_DATA_LAP			= "gpxdata:lap";									//$NON-NLS-1$
+	private static final String				TAG_GPX_DATA_INDEX			= "gpxdata:index";									//$NON-NLS-1$
+	private static final String				TAG_GPX_DATA_START_TIME		= "gpxdata:startTime";								//$NON-NLS-1$
 
 	// Extension element for temperature, heart rate, cadence
-	private static final String				TAG_EXT_CAD				= "gpxtpx:cad";									//$NON-NLS-1$
-	private static final String				TAG_EXT_HR				= "gpxtpx:hr";										//$NON-NLS-1$
-	private static final String				TAG_EXT_TEMP			= "gpxtpx:atemp";									//$NON-NLS-1$
-	private static final String				TAG_EXT_DISTANCE		= "gpxdata:distance";								//$NON-NLS-1$
+	private static final String				TAG_EXT_CAD					= "gpxtpx:cad";									//$NON-NLS-1$
 
-	private static final String				ATTR_LATITUDE			= "lat";											//$NON-NLS-1$
-	private static final String				ATTR_LONGITUDE			= "lon";											//$NON-NLS-1$
+	private static final String				TAG_EXT_HR					= "gpxtpx:hr";										//$NON-NLS-1$
+	private static final String				TAG_EXT_TEMP				= "gpxtpx:atemp";									//$NON-NLS-1$
+	private static final String				TAG_EXT_DISTANCE			= "gpxdata:distance";								//$NON-NLS-1$
+	private static final String				ATTR_LATITUDE				= "lat";											//$NON-NLS-1$
+	private static final String				ATTR_LONGITUDE				= "lon";											//$NON-NLS-1$
 
-	private static final String				TAG_WPT					= "wpt";											//$NON-NLS-1$
-	private static final Object				TAG_WPT_ELE				= "ele";											//$NON-NLS-1$
-	private static final Object				TAG_WPT_TIME			= "time";											//$NON-NLS-1$
-	private static final Object				TAG_WPT_NAME			= "name";											//$NON-NLS-1$
-	private static final Object				TAG_WPT_CMT				= "cmt";											//$NON-NLS-1$
-	private static final Object				TAG_WPT_DESC			= "desc";											//$NON-NLS-1$
-	private static final Object				TAG_WPT_SYM				= "sym";											//$NON-NLS-1$
-	private static final Object				TAG_WPT_TYPE			= "type";											//$NON-NLS-1$
+	private static final String				TAG_WPT						= "wpt";											//$NON-NLS-1$
+	private static final Object				TAG_WPT_ELE					= "ele";											//$NON-NLS-1$
+	private static final Object				TAG_WPT_TIME				= "time";											//$NON-NLS-1$
+	private static final Object				TAG_WPT_NAME				= "name";											//$NON-NLS-1$
+	private static final Object				TAG_WPT_CMT					= "cmt";											//$NON-NLS-1$
+	private static final Object				TAG_WPT_DESC				= "desc";											//$NON-NLS-1$
+	private static final Object				TAG_WPT_SYM					= "sym";											//$NON-NLS-1$
+	private static final Object				TAG_WPT_TYPE				= "type";											//$NON-NLS-1$
 	////////////////////////
 
 //	private static final Calendar			_calendar				= GregorianCalendar.getInstance();
 
-	private static final DateTimeFormatter	_dtIsoParser			= ISODateTimeFormat.dateTimeParser();
-	private static final DateTimeFormatter	_dtFormatterShort		= DateTimeFormat.mediumDateTime();
+	private static final DateTimeFormatter	_dtIsoParser				= ISODateTimeFormat.dateTimeParser();
+	private static final DateTimeFormatter	_dtFormatterShort			= DateTimeFormat.mediumDateTime();
 
-	private static final SimpleDateFormat	GPX_TIME_FORMAT			= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"); //$NON-NLS-1$
-	private static final SimpleDateFormat	GPX_TIME_FORMAT_SSSZ	= new SimpleDateFormat(
-																			"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");			//$NON-NLS-1$
-	private static final SimpleDateFormat	GPX_TIME_FORMAT_RFC822	= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");	//$NON-NLS-1$
-
-	private int								_gpxVersion				= -1;
+	private static final SimpleDateFormat	GPX_TIME_FORMAT				= new SimpleDateFormat(
+																				"yyyy-MM-dd'T'HH:mm:ss'Z'");				//$NON-NLS-1$
+	private static final SimpleDateFormat	GPX_TIME_FORMAT_SSSZ		= new SimpleDateFormat(
+																				"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");			//$NON-NLS-1$
+	private static final SimpleDateFormat	GPX_TIME_FORMAT_RFC822		= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");	//$NON-NLS-1$
+	private int								_gpxVersion					= -1;
 	private boolean							_gpxHasLocalTime			= false;											// To work around a Polar Websync export bug...
 
-	private boolean							_isInTrk				= false;
-	private boolean							_isInTrkName			= false;
-	private boolean							_isInTrkPt				= false;
+	private boolean							_isInTrk					= false;
 
-	private boolean							_isInTime				= false;
-	private boolean							_isInEle				= false;
-	private final boolean					_isInName				= false;
+	private boolean							_isInTrkName				= false;
+	private boolean							_isInTrkPt					= false;
+	private boolean							_isInTime					= false;
 
+	private boolean							_isInEle					= false;
+	private final boolean					_isInName					= false;
 	// gpx extensions
-	private boolean							_isInCadence			= false;
-	private boolean							_isInHr					= false;
-	private boolean							_isInTemp				= false;
-	private boolean							_isInDistance			= false;
+	private boolean							_isInCadence				= false;
 
+	private boolean							_isInHr						= false;
+	private boolean							_isInTemp					= false;
+	private boolean							_isInDistance				= false;
+	// www.cluetrust.com extensions
+	private boolean							_isInGpxDataExtension		= false;
+
+	private boolean							_isInGpxDataIndex			= false;
+	private boolean							_isInGpxDataLap				= false;
+	private boolean							_isInGpxDataStartTime		= false;
 	/*
 	 * wap points
 	 */
-	private boolean							_isInWpt				= false;
-	private boolean							_isInWptEle				= false;
-	private boolean							_isInWptTime			= false;
-	private boolean							_isInWptName			= false;
-	private boolean							_isInWptCmt				= false;
-	private boolean							_isInWptDesc			= false;
-	private boolean							_isInWptSym				= false;
-	private boolean							_isInWptType			= false;
+	private boolean							_isInWpt					= false;
 
-	private final ArrayList<TimeData>		_timeDataList			= new ArrayList<TimeData>();
+	private boolean							_isInWptEle					= false;
+	private boolean							_isInWptTime				= false;
+	private boolean							_isInWptName				= false;
+	private boolean							_isInWptCmt					= false;
+	private boolean							_isInWptDesc				= false;
+	private boolean							_isInWptSym					= false;
+	private boolean							_isInWptType				= false;
+	private final ArrayList<TimeData>		_timeDataList				= new ArrayList<TimeData>();
+
 	private TimeData						_timeSlice;
 	private TimeData						_prevTimeSlice;
 	private String							_trkName;
-
 	private final TourbookDevice			_deviceDataReader;
+
 	private final String					_importFilePath;
 	private final HashMap<Long, TourData>	_tourDataMap;
 	private int								_trackCounter;
 
-	private final ArrayList<TourWayPoint>	_wptList				= new ArrayList<TourWayPoint>();
+	private final ArrayList<TourWayPoint>	_wptList					= new ArrayList<TourWayPoint>();
 	private TourWayPoint					_wpt;
 
-	private boolean							_isSetTrackMarker		= false;
+	private final ArrayList<GPXDataLap>		_gpxDataList				= new ArrayList<GPXDataLap>();
+	private GPXDataLap						_gpxDataLap;
+
+	private boolean							_isSetTrackMarker			= false;
 
 	private float							_absoluteDistance;
 
 	private boolean							_isImported;
-	private boolean							_isError				= false;
+	private boolean							_isError					= false;
 
-	private final StringBuilder				_characters				= new StringBuilder();
+	private final StringBuilder				_characters					= new StringBuilder();
 
 	{
 		GPX_TIME_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
 		GPX_TIME_FORMAT_SSSZ.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
 		GPX_TIME_FORMAT_RFC822.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
+	}
+
+	private class GPXDataLap {
+
+		public String	index;
+
 	}
 
 	public GPX_SAX_Handler(	final TourbookDevice deviceDataReader,
@@ -183,7 +207,11 @@ public class GPX_SAX_Handler extends DefaultHandler {
 				|| _isInWptName
 				|| _isInWptSym
 				|| _isInWptTime
-				|| _isInWptType) {
+				|| _isInWptType
+				//
+				|| _isInGpxDataIndex
+		//
+		) {
 
 			_characters.append(chars, startIndex, length);
 		}
@@ -363,6 +391,16 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 					_isInWptType = true;
 					_wpt.setCategory(charData);
+				}
+
+			} else if (_isInGpxDataLap) {
+
+				final String charData = _characters.toString();
+
+				if (name.equals(TAG_GPX_DATA_INDEX)) {
+
+					_isInGpxDataIndex = false;
+					_gpxDataLap.index = charData;
 				}
 			}
 
@@ -826,6 +864,29 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 				}
 
+			} else if (_isInGpxDataExtension) {
+
+				if (_isInGpxDataLap) {
+
+					if (name.equals(TAG_GPX_DATA_INDEX)) {
+
+						_isInGpxDataIndex = true;
+						_characters.delete(0, _characters.length());
+
+					} else if (name.equals(TAG_GPX_DATA_START_TIME)) {
+
+						_isInGpxDataStartTime = true;
+						_characters.delete(0, _characters.length());
+
+					}
+
+				} else if (name.equals(TAG_GPX_DATA_LAP)) {
+
+					_isInGpxDataLap = true;
+
+					_gpxDataLap = new GPXDataLap();
+				}
+
 			} else if (name.equals(TAG_TRK)) {
 
 				/*
@@ -858,6 +919,14 @@ public class GPX_SAX_Handler extends DefaultHandler {
 				// get attributes
 				_wpt.setLatitude(getDoubleValue(attributes.getValue(ATTR_LATITUDE)));
 				_wpt.setLongitude(getDoubleValue(attributes.getValue(ATTR_LONGITUDE)));
+
+			} else if (name.equals(TAG_GPX_DATA_EXTENSIONS)) {
+
+				/*
+				 * new extension
+				 */
+
+				_isInGpxDataExtension = true;
 			}
 		}
 	}
