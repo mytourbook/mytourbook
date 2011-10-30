@@ -283,6 +283,37 @@ public class Util {
 		return unit;
 	}
 
+	public static long getScaledValue(final float graphUnit) {
+
+		if (graphUnit > 1 || graphUnit < 1) {
+
+			float scaledValue = 1;
+
+			if (graphUnit < 1) {
+				scaledValue = 1 / graphUnit;
+			} else {
+				scaledValue = graphUnit;
+			}
+
+			long valueScale = 1;
+
+			while (scaledValue > 1) {
+				valueScale *= 10;
+				scaledValue /= 10;
+			}
+
+			// add an additional factor to prevent rounding problems
+			valueScale *= 1000;
+
+			return valueScale;
+
+		} else {
+
+			// add an additional factor to prevent rounding problems
+			return 1000;
+		}
+	}
+
 	/**
 	 * @param unitValue
 	 * @return Returns minUnitValue rounded to the number of 50/20/10/5/2/1
@@ -317,14 +348,14 @@ public class Util {
 	 * @param graphUnit
 	 * @return
 	 */
-	public static float roundFloatToUnit(final float graphValue, final float graphUnit) {
+	public static float roundFloatToUnit(final float graphValue, final float graphUnit, final boolean isMinValue) {
 
 		if (graphUnit < 1) {
 
 			if (graphValue < 0) {
 
 				final float gvDiv1 = graphValue / graphUnit;
-				final int gvDiv2 = (int) (gvDiv1 - 0.05f);
+				final int gvDiv2 = (int) (gvDiv1 - 0.5f);
 				final float gvDiv3 = gvDiv2 * graphUnit;
 
 				return gvDiv3;
@@ -332,7 +363,7 @@ public class Util {
 			} else {
 
 				final float gvDiv1 = graphValue / graphUnit;
-				final int gvDiv2 = (int) (gvDiv1 + 0.05f);
+				final int gvDiv2 = (int) (gvDiv1 + (isMinValue ? -0.5f : 0.5f));
 				final float gvDiv3 = gvDiv2 * graphUnit;
 
 				return gvDiv3;
@@ -340,7 +371,62 @@ public class Util {
 
 		} else {
 
-			return ((int) (graphValue * graphUnit)) / graphUnit;
+			// graphUnit >= 1
+
+			if (graphValue < 0) {
+
+				final float gvDiv1 = graphValue * graphUnit;
+				final long gvDiv2 = (long) (gvDiv1 + (isMinValue ? -0.5f : 0.5f));
+				final float gvDiv3 = gvDiv2 / graphUnit;
+
+				return gvDiv3;
+
+			} else {
+
+				// graphValue >= 0
+
+				final float gvDiv1 = graphValue * graphUnit;
+				final long gvDiv2 = (long) (gvDiv1 + 0.5f);
+				final float gvDiv3 = gvDiv2 / graphUnit;
+
+				return gvDiv3;
+			}
+		}
+	}
+
+	/**
+	 * Round floating value to an inverse long value.
+	 * 
+	 * @param graphValue
+	 * @param graphUnit
+	 * @return
+	 */
+	public static long roundFloatToUnitInverse(final float graphValue, final float graphUnit) {
+
+		if (graphUnit < 1) {
+
+			if (graphValue < 0) {
+
+				final float value1 = graphValue / graphUnit;
+				final float value2 = value1 - 0.5f;
+				final long value3 = (long) (value2);
+
+				return value3;
+
+			} else {
+
+				final float value1 = graphValue / graphUnit;
+				final float value2 = value1 + 0.5f;
+				final long value3 = (long) (value2);
+
+				return value3;
+			}
+
+		} else {
+
+			// graphUnit > 1
+
+			return (long) (graphValue * graphUnit);
 		}
 	}
 
@@ -368,6 +454,36 @@ public class Util {
 		unit *= multiplier;
 
 		return unit;
+	}
+
+	/**
+	 * Round floating value by removing the trailing part, which causes problem when creating units.
+	 * For the value 200.00004 the .00004 part will be removed
+	 * 
+	 * @param graphValue
+	 * @param graphUnit
+	 * @return
+	 */
+	public static float truncateFloatToUnit(final float graphValue, final float graphUnit) {
+
+		if (graphUnit < 1) {
+
+			final float gvDiv1 = graphValue / graphUnit;
+			final long gvDiv2 = (long) (gvDiv1);
+			final float gvDiv3 = gvDiv2 * graphUnit;
+
+			return gvDiv3;
+
+		} else {
+
+			// graphUnit >= 1
+
+			final float gvDiv1 = graphValue * graphUnit;
+			final long gvDiv2 = (long) (gvDiv1);
+			final float gvDiv3 = gvDiv2 / graphUnit;
+
+			return gvDiv3;
+		}
 	}
 
 }

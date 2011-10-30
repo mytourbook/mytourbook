@@ -66,8 +66,9 @@ import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
 import net.tourbook.ui.views.TourInfoToolTipStyledCellLabelProvider;
 import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
 import net.tourbook.ui.views.rawData.ActionMergeTour;
+import net.tourbook.ui.views.rawData.ActionReimportSubMenu;
 import net.tourbook.util.ColumnManager;
-import net.tourbook.util.ITourViewer;
+import net.tourbook.util.ITourViewer3;
 import net.tourbook.util.PostSelectionProvider;
 import net.tourbook.util.TreeColumnDefinition;
 import net.tourbook.util.Util;
@@ -117,7 +118,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 
-public class TourBookView extends ViewPart implements ITourProvider, ITourViewer {
+public class TourBookView extends ViewPart implements ITourProvider, ITourViewer3 {
 
 	static public final String							ID									= "net.tourbook.views.tourListView";		//$NON-NLS-1$
 
@@ -216,6 +217,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private ActionSetPerson								_actionSetOtherPerson;
 
 	private ActionExport								_actionExportTour;
+	private ActionReimportSubMenu						_actionReimportSubMenu;
 	private ActionPrint									_actionPrintTour;
 
 	private PixelConverter								_pc;
@@ -459,6 +461,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		_actionCollapseOthers = new ActionCollapseOthers(this);
 
 		_actionExportTour = new ActionExport(this);
+		_actionReimportSubMenu = new ActionReimportSubMenu(this);
 		_actionPrintTour = new ActionPrint(this);
 
 		_tagMenuMgr = new TagMenuManager(this, true);
@@ -1653,6 +1656,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		_actionSetOtherPerson.setEnabled(isTourSelected);
 
 		_actionExportTour.setEnabled(isTourSelected);
+		_actionReimportSubMenu.setEnabled(isTourSelected);
 		_actionPrintTour.setEnabled(isTourSelected);
 
 		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
@@ -1722,6 +1726,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionExportTour);
+		menuMgr.add(_actionReimportSubMenu);
 		menuMgr.add(_actionPrintTour);
 
 		menuMgr.add(new Separator());
@@ -1740,7 +1745,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		return _columnManager;
 	}
 
-	PostSelectionProvider getPostSelectionProvider() {
+	public PostSelectionProvider getPostSelectionProvider() {
 		return _postSelectionProvider;
 	}
 

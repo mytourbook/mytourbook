@@ -682,9 +682,15 @@ public class Messages extends NLS {
 	public static String		import_data_updateDataFromDatabase_subTask;
 	public static String		import_data_updateDataFromDatabase_task;
 
+	public static String	Import_Data_Action_ReimportTour;
+
 	public static String		Import_Data_Action_RemoveTour;
 	public static String		Import_Data_Dialog_ConfirmReimport_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportTimeSlices_Message;
+
+	public static String	Import_Data_Dialog_Directory_Message;
+
+	public static String	Import_Data_Dialog_GetAlternativePath_Message;
 	public static String		Import_Data_Dialog_ReimportIsInvalid_WrongSliceNumbers_Message;
 	public static String		Import_Data_Label_Hint;
 	public static String		Import_Data_Label_Info;

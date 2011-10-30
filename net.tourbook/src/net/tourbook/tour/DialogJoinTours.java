@@ -929,7 +929,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
 		final int[] joinedAltitudeSerie = new int[joinedSliceCounter];
 		final int[] joinedCadenceSerie = new int[joinedSliceCounter];
-		final int[] joinedDistanceSerie = new int[joinedSliceCounter];
+		final float[] joinedDistanceSerie = new int[joinedSliceCounter];
 		final double[] joinedLatitudeSerie = new double[joinedSliceCounter];
 		final double[] joinedLongitudeSerie = new double[joinedSliceCounter];
 		final int[] joinedPowerSerie = new int[joinedSliceCounter];

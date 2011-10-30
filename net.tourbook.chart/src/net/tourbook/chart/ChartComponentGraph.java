@@ -63,7 +63,7 @@ import org.eclipse.swt.widgets.ScrollBar;
  */
 public class ChartComponentGraph extends Canvas {
 
-	private static final float			ZOOM_RATIO_FACTOR		= 1.3f;
+	private static final double			ZOOM_RATIO_FACTOR		= 1.3;
 
 	private static final int			BAR_MARKER_WIDTH		= 16;
 
@@ -121,7 +121,7 @@ public class ChartComponentGraph extends Canvas {
 	/**
 	 * zoom ratio between the visible and the virtual chart width
 	 */
-	private float						_graphZoomRatio			= 1;
+	private double						_graphZoomRatio			= 1;
 
 	/**
 	 * when the graph is zoomed and and can be scrolled, <code>canScrollZoomedChart</code> is
@@ -139,13 +139,13 @@ public class ChartComponentGraph extends Canvas {
 	/**
 	 * ratio for the position where the chart starts on the left side within the virtual graph width
 	 */
-	private float						_xOffsetZoomRatio;
+	private double						_xOffsetZoomRatio;
 
 	/**
 	 * ratio where the mouse was double clicked, this position is used to zoom the chart with the
 	 * mouse
 	 */
-	private float						_xOffsetMouseZoomInRatio;
+	private double						_xOffsetMouseZoomInRatio;
 
 	/**
 	 * the zoomed chart can be scrolled when set to <code>true</code>, for a zoomed chart, the chart
@@ -613,11 +613,15 @@ public class ChartComponentGraph extends Canvas {
 
 		final int devYBottom = drawingData.getDevYBottom();
 		final int devYTop = devYBottom - drawingData.devGraphHeight;
+
 		final float graphYBottom = drawingData.getGraphYBottom();
 		final float scaleY = drawingData.getScaleY();
 
-		final float graphValue1 = (devYBottom - slider1.getDevYSliderLine()) / scaleY + graphYBottom;
-		final float graphValue2 = (devYBottom - slider2.getDevYSliderLine()) / scaleY + graphYBottom;
+		final int devYSliderLine1 = slider1.getDevYSliderLine();
+		final int devYSliderLine2 = slider2.getDevYSliderLine();
+
+		final float graphValue1 = ((float) devYBottom - devYSliderLine1) / scaleY + graphYBottom;
+		final float graphValue2 = ((float) devYBottom - devYSliderLine2) / scaleY + graphYBottom;
 
 		float minValue;
 		float maxValue;
@@ -644,6 +648,7 @@ public class ChartComponentGraph extends Canvas {
 		}
 		yData.setVisibleMinValue(minValue);
 		yData.setVisibleMaxValue(maxValue);
+		yData.setIsAdjustYSlider(true);
 
 		_ySliderDragged = null;
 
@@ -4107,7 +4112,7 @@ public class ChartComponentGraph extends Canvas {
 		return _chartComponents.getDevVisibleChartHeight();
 	}
 
-	public float getGraphZoomRatio() {
+	public double getGraphZoomRatio() {
 		return _graphZoomRatio;
 	}
 
@@ -4511,11 +4516,11 @@ public class ChartComponentGraph extends Canvas {
 		setDefaultCursor();
 	}
 
-	private void moveYSlider(final ChartYSlider ySlider, final int graphX, final int devYMouse) {
+	private void moveYSlider(final ChartYSlider ySlider, final int devXGraph, final int devYMouse) {
 
 		final int devYSliderLine = devYMouse - ySlider.getDevYClickOffset() + ChartYSlider.halfSliderHitLineHeight;
 
-		ySlider.setDevYSliderLine(graphX, devYSliderLine);
+		ySlider.setDevYSliderLine(devXGraph, devYSliderLine);
 	}
 
 	/**
@@ -5801,7 +5806,7 @@ public class ChartComponentGraph extends Canvas {
 
 		final int devVisibleChartWidth = getDevVisibleChartWidth();
 
-		float devXOffset = _xOffsetMouseZoomInRatio * _devVirtualGraphImageWidth;
+		double devXOffset = _xOffsetMouseZoomInRatio * _devVirtualGraphImageWidth;
 		devXOffset -= devVisibleChartWidth / 2;
 
 		// adjust left border
@@ -5938,7 +5943,7 @@ public class ChartComponentGraph extends Canvas {
 
 		final int devVisibleChartWidth = getDevVisibleChartWidth();
 
-		float devXOffset = _devGraphImageXOffset - devXDiff;
+		double devXOffset = _devGraphImageXOffset - devXDiff;
 
 		// adjust left border
 		devXOffset = Math.max(devXOffset, 0);
@@ -5951,7 +5956,7 @@ public class ChartComponentGraph extends Canvas {
 		/*
 		 * reposition the mouse zoom position
 		 */
-		float xOffsetMouse = _xOffsetMouseZoomInRatio * _devVirtualGraphImageWidth;
+		double xOffsetMouse = _xOffsetMouseZoomInRatio * _devVirtualGraphImageWidth;
 		xOffsetMouse = xOffsetMouse - devXDiff;
 		_xOffsetMouseZoomInRatio = xOffsetMouse / _devVirtualGraphImageWidth;
 
@@ -6167,10 +6172,10 @@ public class ChartComponentGraph extends Canvas {
 
 		final float[] xValues = xValueSerie[0];
 		final float lastXValue = xValues[xValues.length - 1];
-		final float valueVisibleArea = lastXValue / _graphZoomRatio;
+		final double valueVisibleArea = lastXValue / _graphZoomRatio;
 
-		final float valueLeftBorder = lastXValue * _xOffsetZoomRatio;
-		float valueRightBorder = valueLeftBorder + valueVisibleArea;
+		final double valueLeftBorder = lastXValue * _xOffsetZoomRatio;
+		double valueRightBorder = valueLeftBorder + valueVisibleArea;
 
 		// make sure right is higher than left
 		if (valueLeftBorder >= valueRightBorder) {
@@ -6305,13 +6310,13 @@ public class ChartComponentGraph extends Canvas {
 
 				// chart is within the range which can be zoomed in
 
-				final float zoomedInRatio = _graphZoomRatio * ZOOM_RATIO_FACTOR;
+				final double zoomedInRatio = _graphZoomRatio * ZOOM_RATIO_FACTOR;
 				final int devZoomedInWidth = (int) (devVisibleChartWidth * zoomedInRatio);
 
 				if (devZoomedInWidth > devMaxChartWidth) {
 
 					// the zoomed graph would be wider than the max width, reduce it to the max width
-					_graphZoomRatio = (float) devMaxChartWidth / devVisibleChartWidth;
+					_graphZoomRatio = (double) devMaxChartWidth / devVisibleChartWidth;
 					_devVirtualGraphImageWidth = devMaxChartWidth;
 
 				} else {
@@ -6426,8 +6431,8 @@ public class ChartComponentGraph extends Canvas {
 				_xOffsetZoomRatio = getLeftSlider().getPositionRatio();
 
 				// set the center of the chart for the position when zooming with the mouse
-				final float devVirtualWidth = _graphZoomRatio * devVisibleChartWidth;
-				final float devXOffset = _xOffsetZoomRatio * devVirtualWidth;
+				final double devVirtualWidth = _graphZoomRatio * devVisibleChartWidth;
+				final double devXOffset = _xOffsetZoomRatio * devVirtualWidth;
 				final int devCenterPos = (int) (devXOffset + devVisibleChartWidth / 2);
 				_xOffsetMouseZoomInRatio = devCenterPos / devVirtualWidth;
 			}

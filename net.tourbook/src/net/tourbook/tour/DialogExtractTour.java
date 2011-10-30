@@ -804,7 +804,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
 		final int[] extractAltitudeSerie = new int[extractSerieLength];
 		final int[] extractCadenceSerie = new int[extractSerieLength];
-		final int[] extractDistanceSerie = new int[extractSerieLength];
+		final float[] extractDistanceSerie = new int[extractSerieLength];
 		final double[] extractLatitudeSerie = new double[extractSerieLength];
 		final double[] extractLongitudeSerie = new double[extractSerieLength];
 		final int[] extractPowerSerie = new int[extractSerieLength];

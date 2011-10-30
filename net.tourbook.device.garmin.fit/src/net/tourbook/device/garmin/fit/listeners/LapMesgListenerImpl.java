@@ -29,7 +29,7 @@ public class LapMesgListenerImpl extends AbstractMesgListener implements LapMesg
 
 		Float totalDistance = mesg.getTotalDistance();
 		if (totalDistance != null) {
-			int lapDistance = context.getLapDistance();
+			float lapDistance = context.getLapDistance();
 			lapDistance += DataConverters.convertDistance(totalDistance);
 			context.setLapDistance(lapDistance);
 			getTourMarker().setDistance(lapDistance);

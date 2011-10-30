@@ -93,6 +93,8 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 	private final int				_chartType;
 
+	private boolean					_isAdjustedYSlider;
+
 	/**
 	 * When this value is > 0 a line chart will not draw a line to the next value point when the
 	 * difference in the x-data values is greater than this value.
@@ -216,6 +218,14 @@ public class ChartDataYSerie extends ChartDataSerie {
 		return _yTitle;
 	}
 
+	public boolean isAdjustedYSliderAndReset() {
+
+		final boolean isAdjustedYSlider = _isAdjustedYSlider;
+		_isAdjustedYSlider = false;
+
+		return isAdjustedYSlider;
+	}
+
 	/**
 	 * @return Returns the showYSlider.
 	 */
@@ -268,13 +278,13 @@ public class ChartDataYSerie extends ChartDataSerie {
 		_customFillPainter = fillPainter;
 	}
 
-	public void setCustomForegroundLayers(final ArrayList<IChartLayer> customLayers) {
-		_customFgLayers = customLayers;
-	}
-
 //	public void setDisableLineToNext(final int disabledLineToNext) {
 //		_disabledLineToNext = disabledLineToNext;
 //	}
+
+	public void setCustomForegroundLayers(final ArrayList<IChartLayer> customLayers) {
+		_customFgLayers = customLayers;
+	}
 
 	/**
 	 * @param fillMethod
@@ -282,6 +292,10 @@ public class ChartDataYSerie extends ChartDataSerie {
 	 */
 	public void setGraphFillMethod(final int fillMethod) {
 		_graphFillMethod = fillMethod;
+	}
+
+	public void setIsAdjustYSlider(final boolean isAdjusted) {
+		_isAdjustedYSlider = isAdjusted;
 	}
 
 	@Override
@@ -474,6 +488,10 @@ public class ChartDataYSerie extends ChartDataSerie {
 	@Override
 	public String toString() {
 		return "[ChartDataYSerie]";//$NON-NLS-1$
+	}
+
+	public void xxxset_isAdjustedYSlider(final boolean _isAdjustedYSlider) {
+		this._isAdjustedYSlider = _isAdjustedYSlider;
 	}
 
 }

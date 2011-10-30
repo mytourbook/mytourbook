@@ -40,11 +40,7 @@ public class ChartYSlider {
 	/**
 	 * rectangle where the slider can be hit
 	 */
-	private Rectangle			hitRectangle			= new Rectangle(
-																0,
-																0,
-																0,
-																sliderHitLineHeight);
+	private Rectangle			hitRectangle			= new Rectangle(0, 0, 0, sliderHitLineHeight);
 
 	/**
 	 * y position for the slider line
@@ -52,8 +48,7 @@ public class ChartYSlider {
 	private int					devYSliderLine			= 0;
 
 	/**
-	 * offset between the top of the slider hit rectangle and the mouse hit
-	 * within it
+	 * offset between the top of the slider hit rectangle and the mouse hit within it
 	 */
 	private int					devYClickOffset;
 
@@ -62,7 +57,7 @@ public class ChartYSlider {
 	/**
 	 * y-position of the mouse on the slider line
 	 */
-	private int					graphY;
+	private int					devXGraph;
 
 	/**
 	 * Constructor
@@ -96,7 +91,7 @@ public class ChartYSlider {
 	 * @return Returns the graphX.
 	 */
 	public int getGraphX() {
-		return graphY;
+		return devXGraph;
 	}
 
 	/**
@@ -112,6 +107,7 @@ public class ChartYSlider {
 	public ChartDataYSerie getYData() {
 		return yData;
 	}
+
 	/**
 	 * Resize the slider after the chart was resizes
 	 * 
@@ -138,33 +134,49 @@ public class ChartYSlider {
 
 	/**
 	 * @param devYClickOffset
-	 *        The devYClickOffset to set.
+	 *            The devYClickOffset to set.
 	 */
 	public void setDevYClickOffset(final int devYClickOffset) {
 		this.devYClickOffset = devYClickOffset;
 	}
 
 	/**
-	 * set the y value for the slider line with the same graphX value as the
-	 * current one
+	 * set the y value for the slider line with the same graphX value as the current one
 	 * 
 	 * @param devYSliderLine
 	 */
 	public void setDevYSliderLine(final int devYSliderLine) {
-		setDevYSliderLine(graphY, devYSliderLine);
+		setDevYSliderLine(devXGraph, devYSliderLine);
 	}
 
 	/**
 	 * set y value for the slider line, this is done when the mouse was moved
 	 * 
 	 * @param devYSliderLine
-	 *        The devYSliderLine to set.
+	 *            The devYSliderLine to set.
 	 */
-	public void setDevYSliderLine(final int graphY, final int devYSliderLine) {
+	public void setDevYSliderLine(final int devXGraph, final int devYSliderLine) {
 
 		this.devYSliderLine = devYSliderLine;
-		this.graphY = graphY;
+		this.devXGraph = devXGraph;
 
 		hitRectangle.y = devYSliderLine - ChartYSlider.halfSliderHitLineHeight;
+	}
+
+	@Override
+	public String toString() {
+		return "ChartYSlider ["
+				+ "devXGraph="
+				+ devXGraph
+				+ ", "
+				+ "devYSliderLine="
+				+ devYSliderLine
+				+ ", "
+				+ "devYClickOffset="
+				+ devYClickOffset
+				+ ", "
+				+ "hitRectangle="
+				+ hitRectangle
+				+ "]";
 	}
 }

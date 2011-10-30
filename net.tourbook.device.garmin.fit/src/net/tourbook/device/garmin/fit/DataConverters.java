@@ -18,11 +18,11 @@ public class DataConverters {
 	}
 
 	public static int convertSpeed(float speed) {
-		return Math.round(3.6f * speed * 10.0f);
+		return ???Math.round(3.6f * speed * 10.0f);
 	}
 
-	public static int convertDistance(float distance) {
-		return Math.round(distance);
+	public static float convertDistance(float distance) {
+		return ???Math.round(distance);
 	}
 
 	public static long convertTimestamp(DateTime timestamp) {

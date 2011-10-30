@@ -548,7 +548,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 					final int markerIndex = Integer.parseInt(fields[1]);
 					tourMarker.setSerieIndex(markerIndex);
 					tourMarker.setLabel(fields[0].substring(1, fields[0].length()));
-					tourMarker.setDistance((int) timeDataList.get(markerIndex).absoluteDistance);
+					tourMarker.setDistance(timeDataList.get(markerIndex).absoluteDistance);
 					int timeRelative = Integer.parseInt(fields[2].substring(6, 8));
 					timeRelative += Integer.parseInt(fields[2].substring(3, 5)) * 60;
 					timeRelative += Integer.parseInt(fields[2].substring(0, 2)) * 3600;

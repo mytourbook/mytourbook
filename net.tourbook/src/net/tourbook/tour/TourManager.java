@@ -312,7 +312,7 @@ public class TourManager {
 
 						for (final TourMarker tourMarker : allTourMarker) {
 							final float markerDistance = distanceSerie[tourMarker.getSerieIndex()];
-							tourMarker.setDistance((int) markerDistance);
+							tourMarker.setDistance(markerDistance);
 						}
 					}
 
@@ -959,7 +959,7 @@ public class TourManager {
 					}
 
 					if (distSerie != null) {
-						tourMarker.setDistance((int) distSerie[serieIndex]);
+						tourMarker.setDistance(distSerie[serieIndex]);
 					}
 				}
 			}

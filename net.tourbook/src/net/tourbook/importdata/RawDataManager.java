@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,17 +26,20 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 
 import net.tourbook.Messages;
 import net.tourbook.application.PerspectiveFactoryRawData;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourPerson;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
+import net.tourbook.util.ITourViewer3;
 import net.tourbook.util.StatusUtil;
 import net.tourbook.util.Util;
 
@@ -48,6 +51,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.osgi.util.NLS;
@@ -67,6 +71,9 @@ public class RawDataManager {
 
 	private static final String				RAW_DATA_LAST_SELECTED_PATH			= "raw-data-view.last-selected-import-path";	//$NON-NLS-1$
 	private static final String				TEMP_IMPORTED_FILE					= "received-device-data.txt";					//$NON-NLS-1$
+
+	public static final int					REIMPORT_TOUR						= 10;
+	public static final int					REIMPORT_TIME_SLICES				= 20;
 
 	private static RawDataManager			_instance							= null;
 
@@ -334,6 +341,242 @@ public class RawDataManager {
 		} catch (final InterruptedException e) {
 			StatusUtil.log(e);
 		}
+	}
+
+	public void actionReimportTour(final int reimportTour, final ITourViewer3 tourViewer) {
+
+		// check if the tour editor contains a modified tour
+		if (TourManager.isTourEditorModified()) {
+			return;
+		}
+
+		if (reimportTour == REIMPORT_TIME_SLICES) {
+
+			if (MessageDialog.openConfirm(
+					Display.getCurrent().getActiveShell(),
+					Messages.import_data_dlg_reimport_title,
+					Messages.Import_Data_Dialog_ConfirmReimportTimeSlices_Message) == false) {
+				return;
+			}
+		} else if (reimportTour == REIMPORT_TIME_SLICES) {
+
+			if (MessageDialog.openConfirm(
+					Display.getCurrent().getActiveShell(),
+					Messages.import_data_dlg_reimport_title,
+					Messages.Import_Data_Dialog_ConfirmReimport_Message) == false) {
+				return;
+			}
+		}
+
+		boolean isTourImported = false;
+
+		// prevent async error in the save tour method, cleanup environment
+		TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, null);
+		tourViewer.getPostSelectionProvider().clearSelection();
+
+		// get selected tours
+		final IStructuredSelection selection = ((IStructuredSelection) tourViewer.getViewer().getSelection());
+
+		final ArrayList<String> notImportedFiles = new ArrayList<String>();
+
+		final RawDataManager rawDataMgr = RawDataManager.getInstance();
+		rawDataMgr.setImportId();
+
+		final HashMap<Long, TourData> importedTours = rawDataMgr.getImportedTours();
+		final TourData[] firstTourData = new TourData[1];
+
+		for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
+
+			final Object element = iterator.next();
+			if (element instanceof TourData) {
+
+				TourData tourData = (TourData) element;
+
+				// get import file name
+				String importFilePathName = tourData.importRawDataFile;
+				if (importFilePathName == null) {
+
+					if (tourData.isTourImportFilePathAvailable()) {
+
+						importFilePathName = tourData.getTourImportFilePath();
+
+					} else {
+
+						if (getAlternativePath(importFilePathName)) {
+
+						} else {
+
+//							MessageDialog.openInformation(
+//									Display.getCurrent().getActiveShell(),
+//									Messages.import_data_dlg_reimport_title,
+//									Messages.import_data_dlg_reimport_message);
+
+							continue;
+						}
+					}
+				}
+
+				// check import file
+				final File importFile = new File(importFilePathName);
+				if (importFile.exists() == false) {
+
+					if (getAlternativePath(importFilePathName)) {
+
+					} else {
+
+//						MessageDialog.openInformation(
+//								Display.getCurrent().getActiveShell(),
+//								Messages.import_data_dlg_reimport_title,
+//								NLS.bind(Messages.import_data_dlg_reimport_invalid_file_message, importFilePathName));
+						continue;
+					}
+				}
+
+				final Long tourId = tourData.getTourId();
+
+				// remove old tour data
+				final TourData oldTourData = importedTours.remove(tourId);
+
+				if (rawDataMgr.importRawData(importFile, null, false, null)) {
+
+					isTourImported = true;
+
+					if (reimportTour == REIMPORT_TIME_SLICES) {
+						adjustReimportedTour(importFile, importedTours, oldTourData);
+					}
+
+					final TourPerson tourPerson = tourData.getTourPerson();
+					if (tourPerson != null) {
+
+						// resave tour when the reimported tour was saved before
+
+						// get reimported tour
+						final TourData mapTourData = importedTours.get(tourId);
+						if (mapTourData != null) {
+
+							mapTourData.setTourPerson(tourPerson);
+							final TourData savedTourData = TourManager.saveModifiedTour(mapTourData);
+
+							// replace tour in map
+							importedTours.put(savedTourData.getTourId(), savedTourData);
+
+							tourData = savedTourData;
+						}
+					}
+
+					// keep first tour
+					if (firstTourData[0] == null) {
+						firstTourData[0] = tourData;
+					}
+
+				} else {
+
+					// tour could not be imported
+					notImportedFiles.add(importFilePathName);
+				}
+			}
+		}
+
+		if (notImportedFiles.size() > 0) {
+			RawDataManager.showMsgBoxInvalidFormat(notImportedFiles);
+		}
+
+		if (isTourImported) {
+
+			//
+			rawDataMgr.updateTourDataFromDb(null);
+
+			tourViewer.reloadViewer();
+
+			if (firstTourData != null) {
+
+				// reselect tours
+				Display.getDefault().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						tourViewer.getViewer().setSelection(selection, true);
+					}
+				});
+			}
+		}
+	}
+
+	/**
+	 * Only time slices will be reimported.
+	 * 
+	 * @param importFile
+	 * @param importedTours
+	 * @param oldTourData
+	 */
+	private void adjustReimportedTour(	final File importFile,
+										final HashMap<Long, TourData> importedTours,
+										final TourData oldTourData) {
+
+		final long oldTourId = oldTourData.getTourId();
+		final TourData reimportedTour = importedTours.get(oldTourId);
+
+		/*
+		 * data series must have the same number of time slices, otherwise the markers can be off
+		 * the array bounds, this problem could be solved but takes time to do it.
+		 */
+		if (oldTourData.timeSerie.length != reimportedTour.timeSerie.length) {
+
+			MessageDialog.openInformation(
+					Display.getCurrent().getActiveShell(),
+					Messages.import_data_dlg_reimport_title,
+					NLS.bind(
+							Messages.Import_Data_Dialog_ReimportIsInvalid_WrongSliceNumbers_Message,
+							importFile.toString()));
+
+			// replace tour in map with old tour
+			importedTours.put(oldTourData.getTourId(), oldTourData);
+
+			return;
+		}
+
+		oldTourData.altitudeSerie = reimportedTour.altitudeSerie;
+		oldTourData.cadenceSerie = reimportedTour.cadenceSerie;
+		oldTourData.distanceSerie = reimportedTour.distanceSerie;
+		oldTourData.latitudeSerie = reimportedTour.latitudeSerie;
+		oldTourData.longitudeSerie = reimportedTour.longitudeSerie;
+		oldTourData.pulseSerie = reimportedTour.pulseSerie;
+		oldTourData.temperatureSerie = reimportedTour.temperatureSerie;
+		oldTourData.timeSerie = reimportedTour.timeSerie;
+
+		oldTourData.setCalories(reimportedTour.getCalories());
+
+		oldTourData.clearComputedSeries();
+
+		oldTourData.computeAltitudeUpDown();
+		oldTourData.computeTourDrivingTime();
+		oldTourData.computeComputedValues();
+
+		// replace tour in map with imported tour
+		importedTours.put(oldTourData.getTourId(), oldTourData);
+	}
+
+	private boolean getAlternativePath(final String importFilePathName) {
+
+		MessageDialog.openInformation(
+				Display.getCurrent().getActiveShell(),
+				Messages.import_data_dlg_reimport_title,
+				NLS.bind(Messages.Import_Data_Dialog_GetAlternativePath_Message, importFilePathName));
+
+		final FileDialog dialog = new FileDialog(Display.getDefault().getActiveShell(), SWT.SAVE);
+		dialog.setText(Messages.import_data_dlg_reimport_title);
+
+		dialog.setFilterPath(importFilePathName);
+
+		final String selectedDirectoryName = dialog.open();
+
+		if (selectedDirectoryName != null) {
+//			setErrorMessage(null);
+//			_comboPath.setText(selectedDirectoryName);
+		}
+
+		final IPath importFilePath = new Path(importFilePathName);
+
+		return false;
 	}
 
 	public DeviceData getDeviceData() {

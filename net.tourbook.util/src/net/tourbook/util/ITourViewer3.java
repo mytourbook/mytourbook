@@ -13,31 +13,16 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-/**
- * 
- */
-package net.tourbook.data;
+package net.tourbook.util;
 
-import java.io.Serializable;
 
 /**
- * All time serie data from a device are stored in the database with this class, when data are not
- * available the value is set to <code>null</code>
+ * @since version 11.12
  */
-public class SerieData20 implements Serializable {
+public interface ITourViewer3 extends ITourViewer {
 
-	private static final long	serialVersionUID	= 1L;
+	/**
+	 */
+	public PostSelectionProvider getPostSelectionProvider();
 
-	public int					timeSerie[];
-
-	public float				distanceSerie[];
-	public float				altitudeSerie[];
-	public float				cadenceSerie[];
-	public float				pulseSerie[];
-	public float				temperatureSerie[];
-	public float				speedSerie[];
-	public float				powerSerie[];
-
-	public double				longitude[];
-	public double				latitude[];
 }
