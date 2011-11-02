@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -33,7 +33,7 @@ import net.tourbook.util.StatusUtil;
 
 public class GarminDeviceDataReader extends TourbookDevice {
 
-	private static final String	XML_START_ID	= "<?xml";	//$NON-NLS-1$
+	private static final String	XML_START_ID	= "<?xml";						//$NON-NLS-1$
 	private static final String	XML_GARMIN_TAG	= "<TrainingCenterDatabase";	//$NON-NLS-1$
 
 	// plugin constructor
@@ -79,7 +79,7 @@ public class GarminDeviceDataReader extends TourbookDevice {
 			final String fileHeader = fileReader.readLine();
 			if (fileHeader == null
 					|| (fileHeader.startsWith(XML_START_ID) || fileHeader.startsWith(XML_GARMIN_TAG)) == false) {
-				
+
 				fileReader.close();
 				return false;
 			}
@@ -101,15 +101,22 @@ public class GarminDeviceDataReader extends TourbookDevice {
 		return true;
 	}
 
+	@Override
 	public boolean processDeviceData(	final String importFilePath,
 										final DeviceData deviceData,
-										final HashMap<Long, TourData> tourDataMap) {
+										final HashMap<Long, TourData> alreadyImportedTours,
+										final HashMap<Long, TourData> newlyImportedTours) {
 
 		if (isXMLFile(importFilePath) == false) {
 			return false;
 		}
 
-		final GarminSAXHandler saxHandler = new GarminSAXHandler(this, importFilePath, deviceData, tourDataMap);
+		final GarminSAXHandler saxHandler = new GarminSAXHandler(
+				this,
+				importFilePath,
+				deviceData,
+				alreadyImportedTours,
+				newlyImportedTours);
 
 		try {
 

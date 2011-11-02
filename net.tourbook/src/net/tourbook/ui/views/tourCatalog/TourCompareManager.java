@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -226,7 +226,7 @@ public class TourCompareManager {
 		 * normalize the compare tour
 		 */
 		final TourDataNormalizer compareTourNormalizer = new TourDataNormalizer();
-		final int[] compareTourDataDistance = compareTourData.getMetricDistanceSerie();
+		final float[] compareTourDataDistance = compareTourData.getMetricDistanceSerie();
 		final int[] compareTourDataTime = compareTourData.timeSerie;
 
 		if (compareTourDataDistance == null || compareTourDataTime == null) {
@@ -235,14 +235,14 @@ public class TourCompareManager {
 		// normalize the tour which will be compared
 		compareTourNormalizer.normalizeAltitude(compareTourData, 0, compareTourDataDistance.length - 1);
 
-		final int[] normCompDistances = compareTourNormalizer.getNormalizedDistance();
-		final int[] normCompAltitudes = compareTourNormalizer.getNormalizedAltitude();
+		final float[] normCompDistances = compareTourNormalizer.getNormalizedDistance();
+		final float[] normCompAltitudes = compareTourNormalizer.getNormalizedAltitude();
 
 		if (normCompAltitudes == null || normCompDistances == null) {
 			return compareResultItem;
 		}
 
-		final int[] normCompAltiDiff = new int[normCompAltitudes.length];
+		final float[] normCompAltiDiff = new float[normCompAltitudes.length];
 
 		/*
 		 * reference tour
@@ -261,12 +261,12 @@ public class TourCompareManager {
 		final TourDataNormalizer refTourNormalizer = new TourDataNormalizer();
 		refTourNormalizer.normalizeAltitude(refTourData, refMeasureStartIndex, refMeasureEndIndex);
 
-		final int[] normRefAltitudes = refTourNormalizer.getNormalizedAltitude();
+		final float[] normRefAltitudes = refTourNormalizer.getNormalizedAltitude();
 		if (normRefAltitudes == null) {
 			return compareResultItem;
 		}
 
-		int minAltiDiff = Integer.MAX_VALUE;
+		float minAltiDiff = Float.MAX_VALUE;
 
 		// start index of the reference tour in the compare tour
 		int normCompareIndexStart = -1;
@@ -275,7 +275,7 @@ public class TourCompareManager {
 
 		for (int normCompareIndex = 0; normCompareIndex < normCompAltitudes.length; normCompareIndex++) {
 
-			int altitudeDiff = -1;
+			float altitudeDiff = -1;
 
 			// loop: all data in the reference tour
 			for (int normRefIndex = 0; normRefIndex < normRefAltitudes.length; normRefIndex++) {
@@ -314,12 +314,12 @@ public class TourCompareManager {
 		}
 
 		// get distance for the reference tour
-		final int[] distanceSerie = refTourData.getMetricDistanceSerie();
-		final int refDistance = distanceSerie[refMeasureEndIndex] - distanceSerie[refMeasureStartIndex];
+		final float[] distanceSerie = refTourData.getMetricDistanceSerie();
+		final float refDistance = distanceSerie[refMeasureEndIndex] - distanceSerie[refMeasureStartIndex];
 
 		// get the start/end point in the compared tour
-		final int compDistanceStart = normCompDistances[normCompareIndexStart];
-		final int compDistanceEnd = compDistanceStart + refDistance;
+		final float compDistanceStart = normCompDistances[normCompareIndexStart];
+		final float compDistanceEnd = compDistanceStart + refDistance;
 
 		/*
 		 * get the start point in the compare tour
@@ -335,13 +335,13 @@ public class TourCompareManager {
 		 * get the end point in the compare tour
 		 */
 		int compareEndIndex = compareStartIndex;
-		int oldDistance = compareTourDataDistance[compareEndIndex];
+		float oldDistance = compareTourDataDistance[compareEndIndex];
 		for (; compareEndIndex < compareTourDataDistance.length; compareEndIndex++) {
 			if (compareTourDataDistance[compareEndIndex] >= compDistanceEnd) {
 				break;
 			}
 
-			final int newDistance = compareTourDataDistance[compareEndIndex];
+			final float newDistance = compareTourDataDistance[compareEndIndex];
 
 			if (oldDistance == newDistance) {} else {
 				oldDistance = newDistance;
@@ -352,16 +352,16 @@ public class TourCompareManager {
 		/*
 		 * create data serie for altitude difference
 		 */
-		final int[] normDistanceSerie = compareTourNormalizer.getNormalizedDistance();
-		final int[] compAltiDif = new int[compareTourDataDistance.length];
+		final float[] normDistanceSerie = compareTourNormalizer.getNormalizedDistance();
+		final float[] compAltiDif = new float[compareTourDataDistance.length];
 
 		final int maxNormIndex = normDistanceSerie.length - 1;
 		int normIndex = 0;
 
 		for (int compIndex = 0; compIndex < compareTourDataDistance.length; compIndex++) {
 
-			final int compDistance = compareTourDataDistance[compIndex];
-			int normDistance = normDistanceSerie[normIndex];
+			final float compDistance = compareTourDataDistance[compIndex];
+			float normDistance = normDistanceSerie[normIndex];
 
 			while (compDistance > normDistance && normIndex < maxNormIndex) {
 				normDistance = normDistanceSerie[++normIndex];
@@ -377,11 +377,11 @@ public class TourCompareManager {
 		compareResultItem.computedStartIndex = compareStartIndex;
 		compareResultItem.computedEndIndex = compareEndIndex;
 
-		final int normIndexDiff = refDistance / TourDataNormalizer.NORMALIZED_DISTANCE;
+		final int normIndexDiff = (int) (refDistance / TourDataNormalizer.NORMALIZED_DISTANCE);
 		compareResultItem.normalizedStartIndex = normCompareIndexStart;
 		compareResultItem.normalizedEndIndex = normCompareIndexStart + normIndexDiff;
 
-		final int compareDistance = compareTourDataDistance[compareEndIndex]
+		final float compareDistance = compareTourDataDistance[compareEndIndex]
 				- compareTourDataDistance[compareStartIndex];
 		final int recordingTime = compareTourDataTime[compareEndIndex] - compareTourDataTime[compareStartIndex];
 		final int drivingTime = Math.max(
@@ -391,7 +391,7 @@ public class TourCompareManager {
 		compareResultItem.compareDrivingTime = drivingTime;
 		compareResultItem.compareRecordingTime = recordingTime;
 		compareResultItem.compareDistance = compareDistance;
-		compareResultItem.compareSpeed = ((float) compareDistance) / drivingTime * 3.6f;
+		compareResultItem.compareSpeed = compareDistance / drivingTime * 3.6f;
 
 		compareResultItem.timeIntervall = compareTourData.getDeviceTimeInterval();
 

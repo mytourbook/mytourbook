@@ -122,12 +122,19 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 	private boolean								_isToolbarCreated;
 
-	private final NumberFormat					_nf					= NumberFormat.getNumberInstance();
-
 	private ColumnManager						_columnManager;
 	private TagMenuManager						_tagMenuMgr;
 
 	private SelectionRemovedComparedTours		_oldRemoveSelection	= null;
+
+	private final NumberFormat					_nf1				= NumberFormat.getNumberInstance();
+	private final NumberFormat					_nf2				= NumberFormat.getNumberInstance();
+	{
+		_nf1.setMinimumFractionDigits(2);
+		_nf2.setMaximumFractionDigits(2);
+		_nf2.setMinimumFractionDigits(2);
+		_nf2.setMaximumFractionDigits(2);
+	}
 
 	/*
 	 * resources
@@ -497,8 +504,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 			public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
 
 				if (obj1 instanceof TVICompareResultComparedTour) {
-					return ((TVICompareResultComparedTour) obj1).minAltitudeDiff
-							- ((TVICompareResultComparedTour) obj2).minAltitudeDiff;
+					return (int) (((TVICompareResultComparedTour) obj1).minAltitudeDiff - ((TVICompareResultComparedTour) obj2).minAltitudeDiff);
 				}
 
 				return 0;
@@ -691,8 +697,10 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 					final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
 
-					cell.setText(Integer.toString((compareItem.minAltitudeDiff * 100)
-							/ (compareItem.normalizedEndIndex - compareItem.normalizedStartIndex)));
+					final float value = (compareItem.minAltitudeDiff * 100)
+							/ (compareItem.normalizedEndIndex - compareItem.normalizedStartIndex);
+
+					cell.setText(Integer.toString((int) value));
 
 					setCellColor(cell, element);
 				}
@@ -714,9 +722,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 					final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
 
-					_nf.setMinimumFractionDigits(2);
-					_nf.setMaximumFractionDigits(2);
-					cell.setText(_nf.format(compareItem.compareDistance / (1000 * UI.UNIT_VALUE_DISTANCE)));
+					cell.setText(_nf2.format(compareItem.compareDistance / (1000 * UI.UNIT_VALUE_DISTANCE)));
 					setCellColor(cell, element);
 				}
 			}
@@ -744,9 +750,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 					final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
 
-					_nf.setMinimumFractionDigits(1);
-					_nf.setMaximumFractionDigits(1);
-					cell.setText(_nf.format(compareItem.compareSpeed / UI.UNIT_VALUE_DISTANCE));
+					cell.setText(_nf1.format(compareItem.compareSpeed / UI.UNIT_VALUE_DISTANCE));
 					setCellColor(cell, element);
 				}
 			}
@@ -773,9 +777,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 					final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
 
-					_nf.setMinimumFractionDigits(1);
-					_nf.setMaximumFractionDigits(1);
-					cell.setText(_nf.format(compareItem.movedSpeed / UI.UNIT_VALUE_DISTANCE));
+					cell.setText(_nf1.format(compareItem.movedSpeed / UI.UNIT_VALUE_DISTANCE));
 					setCellColor(cell, element);
 				}
 			}
@@ -802,9 +804,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 					final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
 
-					_nf.setMinimumFractionDigits(1);
-					_nf.setMaximumFractionDigits(1);
-					cell.setText(_nf.format(compareItem.dbSpeed / UI.UNIT_VALUE_DISTANCE));
+					cell.setText(_nf1.format(compareItem.dbSpeed / UI.UNIT_VALUE_DISTANCE));
 					setCellColor(cell, element);
 				}
 			}

@@ -283,7 +283,7 @@ public class Util {
 		return unit;
 	}
 
-	public static long getScaledValue(final float graphUnit) {
+	public static long getValueScaling(final float graphUnit) {
 
 		if (graphUnit > 1 || graphUnit < 1) {
 

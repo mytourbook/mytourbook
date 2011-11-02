@@ -13,22 +13,28 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.chart;
+package net.tourbook.ui.views.rawData;
 
-public interface IChartListener {
+import net.tourbook.Messages;
+import net.tourbook.importdata.RawDataManager;
+import net.tourbook.util.ITourViewer3;
 
-	/**
-	 * @return Returns the value difference between the left and right border of the x-marker
-	 */
-	float getXMarkerValueDiff();
+import org.eclipse.jface.action.Action;
 
-	/**
-	 * this method is called when the x-marker was move, the parameter contain the new value index
-	 * 
-	 * @param movedXMarkerStartValueIndex
-	 *        start index
-	 * @param movedXMarkerEndValueIndex
-	 *        end index
-	 */
-	void xMarkerMoved(int movedXMarkerStartValueIndex, int movedXMarkerEndValueIndex);
+public class ActionReimportAltitudeValues extends Action {
+
+	private ITourViewer3	_tourViewer;
+
+	public ActionReimportAltitudeValues(final ITourViewer3 tourViewer) {
+
+		_tourViewer = tourViewer;
+
+		setText(Messages.Import_Data_Action_ReimportAltitudeValues);
+	}
+
+	@Override
+	public void run() {
+		RawDataManager.getInstance().actionReimportTour(RawDataManager.REIMPORT_ALTITUDE_VALUES, _tourViewer);
+	}
+
 }

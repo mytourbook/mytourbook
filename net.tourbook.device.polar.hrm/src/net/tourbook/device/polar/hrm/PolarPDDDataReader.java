@@ -56,7 +56,8 @@ public class PolarPDDDataReader extends TourbookDevice {
 
 	private DeviceData				_deviceData;
 	private String					_importFilePath;
-	private HashMap<Long, TourData>	_tourDataMap;
+	private HashMap<Long, TourData>	_alreadyImportedTours;
+	private HashMap<Long, TourData>	_newlyImportedTours;
 	//
 	private boolean					_isDebug					= false;
 	private int						_fileVersionDayInfo			= -1;
@@ -69,24 +70,24 @@ public class PolarPDDDataReader extends TourbookDevice {
 	private HashMap<Long, Integer>	_tourSportMap				= new HashMap<Long, Integer>();
 
 	private class Day {
-		
-		private DateTime date;
-		
+
+		private DateTime	date;
+
 	}
 
 	private class Exercise {
 
-		private int		fileVersion;
+		private int			fileVersion;
 
-		private String	title;
-		private String	description;
+		private String		title;
+		private String		description;
 
 		private DateTime	startTime;
 		private int			distance;
 		private int			duration;
 
-		private int		calories;
-		private int		sport;
+		private int			calories;
+		private int			sport;
 	}
 
 	// plugin constructor
@@ -136,7 +137,7 @@ public class PolarPDDDataReader extends TourbookDevice {
 		} else {
 			exerciseData.setTourDescription(""); //$NON-NLS-1$
 		}
-		
+
 		exerciseData.setTourDistance(_currentExercise.distance);
 		exerciseData.setTourDrivingTime(_currentExercise.duration);
 
@@ -147,10 +148,10 @@ public class PolarPDDDataReader extends TourbookDevice {
 		final Long tourId = exerciseData.createTourId(createUniqueId(exerciseData, Util.UNIQUE_ID_SUFFIX_POLAR_PDD));
 
 		// check if the tour is already imported
-		if (_tourDataMap.containsKey(tourId) == false) {
+		if (_alreadyImportedTours.containsKey(tourId) == false) {
 
 			// add new tour to other tours
-			_tourDataMap.put(tourId, exerciseData);
+			_newlyImportedTours.put(tourId, exerciseData);
 		}
 
 		// save the sport type for this exercise
@@ -230,10 +231,10 @@ public class PolarPDDDataReader extends TourbookDevice {
 		final Long tourId = hrmTourData.createTourId(createUniqueId(hrmTourData, Util.UNIQUE_ID_SUFFIX_POLAR_PDD));
 
 		// check if the tour is already imported
-		if (_tourDataMap.containsKey(tourId) == false) {
+		if (_alreadyImportedTours.containsKey(tourId) == false) {
 
 			// add new tour to other tours
-			_tourDataMap.put(tourId, hrmTourData);
+			_newlyImportedTours.put(tourId, hrmTourData);
 		}
 
 		// save the sport type for this exercise
@@ -265,12 +266,18 @@ public class PolarPDDDataReader extends TourbookDevice {
 					_importFilePath));
 		}
 
-		final HashMap<Long, TourData> importDataMap = new HashMap<Long, TourData>();
-		if (deviceDataReader.processDeviceData(importFilePath.toOSString(), _deviceData, importDataMap) == false) {
+		final HashMap<Long, TourData> alreadyImportedTours = new HashMap<Long, TourData>();
+		final HashMap<Long, TourData> newlyImportedTours = new HashMap<Long, TourData>();
+		if (deviceDataReader.processDeviceData(
+				importFilePath.toOSString(),
+				_deviceData,
+				alreadyImportedTours,
+				newlyImportedTours) == false) {
 			return null;
 		}
 
-		final TourData[] importTourData = importDataMap.values().toArray(new TourData[importDataMap.values().size()]);
+		final TourData[] importTourData = newlyImportedTours.values().toArray(
+				new TourData[newlyImportedTours.values().size()]);
 
 		// check bounds
 		if (importTourData.length == 0) {
@@ -963,11 +970,13 @@ public class PolarPDDDataReader extends TourbookDevice {
 	@Override
 	public boolean processDeviceData(	final String importFilePath,
 										final DeviceData deviceData,
-										final HashMap<Long, TourData> tourDataMap) {
+										final HashMap<Long, TourData> alreadyImportedTours,
+										final HashMap<Long, TourData> newlyImportedTours) {
 
 		_importFilePath = importFilePath;
 		_deviceData = deviceData;
-		_tourDataMap = tourDataMap;
+		_alreadyImportedTours = alreadyImportedTours;
+		_newlyImportedTours = newlyImportedTours;
 
 		_additionalImportedFiles.clear();
 		_exerciseFiles.clear();

@@ -438,9 +438,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * is multiplied by 10, default scaling is <code>1</code>
 	 */
 	/*
-	 * disabled when float was introduces in 11.after8, preserved in database but can be removed
+	 * disabled when float was introduces in 11.after8, preserved in database that older ejb objects
+	 * can be loaded
 	 */
-	@SuppressWarnings("unused")
 	private int												temperatureScale					= 1;												// db-version 13
 
 	/**
@@ -495,34 +495,34 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	private int												conconiDeflection;
 
-//	// ############################################# UNUSED FIELDS #############################################
-//	/**
-//	 * ssss distance msw
-//	 * <p>
-//	 * is not used any more since 6.12.2006 but it's necessary then it's a field in the database
-//	 */
-//	@SuppressWarnings("unused")
-//	private int												distance;
-//
-//	@SuppressWarnings("unused")
-//	private int												deviceDistance;
-//
-//	@SuppressWarnings("unused")
-//	private int												deviceTotalUp;
-//
-//	@SuppressWarnings("unused")
-//	private int												deviceTotalDown;
-//
-//	@SuppressWarnings("unused")
-//	private long											deviceTravelTime;
-//
-//	@SuppressWarnings("unused")
-//	private int												deviceWheel;
-//
-//	@SuppressWarnings("unused")
-//	private int												deviceWeight;
-//
-//	// ############################################# UNUSED FIELDS #############################################
+	// ############################################# UNUSED FIELDS #############################################
+	/**
+	 * ssss distance msw
+	 * <p>
+	 * is not used any more since 6.12.2006 but it's necessary then it's a field in the database
+	 */
+	@SuppressWarnings("unused")
+	private int												distance;
+
+	@SuppressWarnings("unused")
+	private int												deviceDistance;
+
+	@SuppressWarnings("unused")
+	private int												deviceTotalUp;
+
+	@SuppressWarnings("unused")
+	private int												deviceTotalDown;
+
+	@SuppressWarnings("unused")
+	private long											deviceTravelTime;
+
+	@SuppressWarnings("unused")
+	private int												deviceWheel;
+
+	@SuppressWarnings("unused")
+	private int												deviceWeight;
+
+	// ############################################# UNUSED FIELDS #############################################
 
 	/**
 	 * data series for time, altitude,...
@@ -813,7 +813,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public float[]											segmentSeriePulse;
 
 	/**
-	 * contains the filename from which the data are imported, when set to <code>null</code> the
+	 * Contains the filename from which the data are imported, when set to <code>null</code> the
 	 * data it not imported they are from the database
 	 */
 	@Transient
@@ -4801,8 +4801,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 	}
 
+	/**
+	 * @return Returns the import file path or <code>null</code> when not available.
+	 */
 	public String getTourImportFilePathRaw() {
-		return tourImportFilePath;
+
+		if ((tourImportFilePath == null) || (tourImportFilePath.length() == 0)) {
+			return null;
+		} else {
+			return tourImportFilePath;
+		}
 	}
 
 	/**

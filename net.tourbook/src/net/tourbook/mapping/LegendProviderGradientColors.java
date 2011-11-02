@@ -40,7 +40,9 @@ public class LegendProviderGradientColors implements ILegendProviderGradientColo
 		_colorId = colorId;
 	}
 
-	private static List<Float> getLegendUnits(final Rectangle legendBounds, float graphMinValue, float graphMaxValue) {
+	private static List<Float> getLegendUnits(	final Rectangle legendBounds,
+												final float graphMinValue,
+												final float graphMaxValue) {
 
 		final int legendHeight = legendBounds.height - 2 * TourMapView.LEGEND_MARGIN_TOP_BOTTOM;
 
@@ -57,70 +59,68 @@ public class LegendProviderGradientColors implements ILegendProviderGradientColo
 		// round the unit
 		final float graphUnit = Util.roundDecimalValue(graphUnitValue);
 
-//		/*
-//		 * adjust min value
-//		 */
-//		float adjustMinValue = 0;
-//		if ((graphMinValue % graphUnit) != 0 && graphMinValue < 0) {
-//			adjustMinValue = graphUnit;
-//		}
-//		graphMinValue = (int) ((int) ((graphMinValue - adjustMinValue) / graphUnit) * graphUnit);
-//
-//		/*
-//		 * adjust max value
-//		 */
-//		// increase the max value when it does not fit to unit borders
-//		float adjustMaxValue = 0;
-//		if ((graphMaxValue % graphUnit) != 0) {
-//			adjustMaxValue = graphUnit;
-//		}
-//		graphMaxValue = (int) ((int) ((graphMaxValue + adjustMaxValue) / graphUnit) * graphUnit);
+		/*
+		 * the scaled unit with long min/max values is used because arithmetic with floating point
+		 * values fails, BigDecimal could propably solve this problem but I don't have it used yet
+		 */
+		final long valueScaling = Util.getValueScaling(graphUnit);
+		final long scaledUnit = (long) (graphUnit * valueScaling);
 
-		// decrease min value when it does not fit to unit borders
-		if (graphMinValue < 0) {
+//		System.out.println();
+//		System.out.println(valueScaling + "\t" + graphUnit + "\t" + scaledUnit);
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
-			final float graphMinRemainder = graphMinValue % graphUnit;
-			graphMinValue = graphMinValue - graphMinRemainder - graphUnit;
-
-		} else {
-
-			final float graphMinRemainder = graphMinValue % graphUnit;
-			graphMinValue = graphMinValue - graphMinRemainder;
-		}
-
-		// increase the max value when it does not fit to unit borders
-		if (graphMaxValue < 0) {
-			final float graphMaxRemainder = graphMaxValue % graphUnit;
-			graphMaxValue = graphMaxValue - graphMaxRemainder;
-		} else {
-			final float graphMaxRemainder = graphMaxValue % graphUnit;
-			graphMaxValue = graphMaxValue - graphMaxRemainder + graphUnit;
-		}
+		long scaledMinValue = (long) (graphMinValue * valueScaling);
+		long scaledMaxValue = (long) ((graphMaxValue * valueScaling));
 
 		/*
-		 * create a list with all units
+		 * adjust min value, decrease min value when it does not fit to unit borders
 		 */
+		float adjustMinValue = 0;
+		final long minRemainder = scaledMinValue % scaledUnit;
+		if (minRemainder != 0 && scaledMinValue < 0) {
+			adjustMinValue = scaledUnit;
+		}
+		scaledMinValue = (long) ((scaledMinValue - adjustMinValue) / scaledUnit) * scaledUnit;
+
+		/*
+		 * adjust max value, increase the max value when it does not fit to unit borders
+		 */
+		float adjustMaxValue = 0;
+		final long maxRemainder = scaledMaxValue % scaledUnit;
+		if (maxRemainder != 0) {
+			adjustMaxValue = scaledUnit;
+		}
+		scaledMaxValue = ((long) ((scaledMaxValue + adjustMaxValue) / scaledUnit) * scaledUnit);
+
+		/*
+		 * check that max is larger than min
+		 */
+		if (scaledMinValue >= scaledMaxValue) {
+			/*
+			 * this case can happen when the min value is set in the pref dialog, this is more a
+			 * hack than a good solution
+			 */
+			scaledMinValue = scaledMaxValue - (3 * scaledUnit);
+		}
+
 		final List<Float> unitList = new ArrayList<Float>();
-
-		float graphValue = graphMinValue;
-		int unitCounter = 0;
-		graphMinValue = Util.roundFloatToUnit(graphMinValue, graphUnit);
-		graphMaxValue = Util.roundFloatToUnit(graphMaxValue, graphUnit);
-
-		graphValue = graphMinValue;
+		int loopCounter = 0;
+		float scaledValue = scaledMinValue;
 
 		// loop: create unit label for all units
-		while (graphValue <= graphMaxValue) {
+		while (scaledValue <= scaledMaxValue) {
 
-			unitList.add(graphValue);
+			final float descaledValue = scaledValue / valueScaling;
 
-			// prevent endless loops
-			if (graphValue >= graphMaxValue || unitCounter++ > 100) {
+			unitList.add(descaledValue);
+
+			// prevent endless loops when the unit is 0
+			if (scaledValue == scaledMaxValue || loopCounter++ > 1000) {
 				break;
 			}
 
-			graphValue += graphUnit;
-			graphValue = Util.roundFloatToUnit(graphValue, graphUnit);
+			scaledValue += scaledUnit;
 		}
 
 		return unitList;

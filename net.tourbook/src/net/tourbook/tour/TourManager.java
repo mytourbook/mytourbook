@@ -988,7 +988,7 @@ public class TourManager {
 	 *            When <code>true</code>, a notification is fired when the data are saved
 	 * @return Returns the saved {@link TourData} or <code>null</code> when saving fails
 	 */
-	private static TourData saveModifiedTour(final TourData tourData, final boolean canFireNotification) {
+	public static TourData saveModifiedTour(final TourData tourData, final boolean canFireNotification) {
 
 		final ArrayList<TourData> modifiedTours = new ArrayList<TourData>();
 		modifiedTours.add(tourData);

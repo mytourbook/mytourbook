@@ -156,6 +156,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private final IDialogSettings			_state								= TourbookPlugin.getDefault()//
 																						.getDialogSettingsSection(ID);
 
+	private RawDataManager					_rawDataMgr							= RawDataManager.getInstance();
+
 	private PostSelectionProvider			_postSelectionProvider;
 	private IPartListener2					_partListener;
 	private ISelectionListener				_postSelectionListener;
@@ -268,7 +270,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	void actionClearView() {
 
 		// remove all tours
-		RawDataManager.getInstance().removeAllTours();
+		_rawDataMgr.removeAllTours();
 
 		reloadViewer();
 
@@ -327,7 +329,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			selectedTours[i] = (TourData) selectedItems[i];
 		}
 
-		RawDataManager.getInstance().removeTours(selectedTours);
+		_rawDataMgr.removeTours(selectedTours);
 
 		TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, RawDataView.this);
 
@@ -393,7 +395,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					saveState();
 
 					// remove all tours
-					RawDataManager.getInstance().removeAllTours();
+					_rawDataMgr.removeAllTours();
 
 					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, RawDataView.this);
 				}
@@ -454,7 +456,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				} else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
 
 					// update tour type in the raw data
-					RawDataManager.getInstance().updateTourDataFromDb(null);
+					_rawDataMgr.updateTourDataFromDb(null);
 
 					_tourViewer.refresh();
 
@@ -526,7 +528,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					if (modifiedTours != null) {
 
 						// update model
-						RawDataManager.getInstance().updateTourDataModel(modifiedTours);
+						_rawDataMgr.updateTourDataModel(modifiedTours);
 
 						// update viewer
 						_tourViewer.update(modifiedTours.toArray(), null);
@@ -538,14 +540,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				} else if (eventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
 
 					// save imported file names
-					final HashSet<String> importedFiles = RawDataManager.getInstance().getImportedFiles();
+					final HashSet<String> importedFiles = _rawDataMgr.getImportedFiles();
 					_state.put(STATE_IMPORTED_FILENAMES, importedFiles.toArray(new String[importedFiles.size()]));
 
 					reimportAllImportFiles();
 
 				} else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED) {
 
-					RawDataManager.getInstance().updateTourDataFromDb(null);
+					_rawDataMgr.updateTourDataFromDb(null);
 
 					reloadViewer();
 				}
@@ -692,7 +694,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			linkImport.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					RawDataManager.getInstance().actionImportFromFile();
+					_rawDataMgr.actionImportFromFile();
 				}
 			});
 
@@ -714,7 +716,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			linkTransfer.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					RawDataManager.getInstance().actionImportFromDevice();
+					_rawDataMgr.actionImportFromDevice();
 				}
 			});
 
@@ -736,7 +738,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			linkTransferDirect.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					RawDataManager.getInstance().actionImportFromDeviceDirect();
+					_rawDataMgr.actionImportFromDeviceDirect();
 				}
 			});
 
@@ -1440,7 +1442,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final ArrayList<Long> savedToursIds = new ArrayList<Long>();
 
 		// update raw data map with the saved tour data
-		final HashMap<Long, TourData> rawDataMap = RawDataManager.getInstance().getImportedTours();
+		final HashMap<Long, TourData> rawDataMap = _rawDataMgr.getImportedTours();
 		for (final TourData tourData : savedTours) {
 
 			final Long tourId = tourData.getTourId();
@@ -1676,7 +1678,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		tbm.add(new Separator());
 
 		tbm.add(_actionClearView);
-//		tbm.add(fActionRefreshView);
 
 		/*
 		 * fill view menu
@@ -1832,7 +1833,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			if (_isPartVisible) {
 
-				RawDataManager.getInstance().updateTourDataFromDb(null);
+				_rawDataMgr.updateTourDataFromDb(null);
 
 				// update the table viewer
 				reloadViewer();
@@ -1911,9 +1912,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final ArrayList<String> notImportedFiles = new ArrayList<String>();
 
-		final RawDataManager rawDataMgr = RawDataManager.getInstance();
-		rawDataMgr.getImportedTours().clear();
-		rawDataMgr.setImportId();
+		_rawDataMgr.getImportedTours().clear();
+		_rawDataMgr.setImportId();
 
 		int importedFileCounter = 0;
 
@@ -1928,7 +1928,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			final File file = new File(fileName);
 			if (file.exists()) {
-				if (rawDataMgr.importRawData(file, null, false, null)) {
+				if (_rawDataMgr.importRawData(file, null, false, null, true)) {
 					importedFileCounter++;
 				} else {
 					notImportedFiles.add(fileName);
@@ -1938,7 +1938,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		if (importedFileCounter > 0) {
 
-			rawDataMgr.updateTourDataFromDb(monitor);
+			_rawDataMgr.updateTourDataFromDb(monitor);
 
 			Display.getDefault().asyncExec(new Runnable() {
 				@Override
@@ -1987,7 +1987,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	@Override
 	public void reloadViewer() {
 
-		final Object[] rawData = RawDataManager.getInstance().getImportedTours().values().toArray();
+		final Object[] rawData = _rawDataMgr.getImportedTours().values().toArray();
 
 		_pageBook.showPage(rawData.length > 0 ? _pageViewerContainer : _pageTips);
 
@@ -1997,7 +1997,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private void removeTours(final ArrayList<ITourItem> removedTours) {
 
-		final HashMap<Long, TourData> tourMap = RawDataManager.getInstance().getImportedTours();
+		final HashMap<Long, TourData> tourMap = _rawDataMgr.getImportedTours();
 
 		for (final ITourItem tourItem : removedTours) {
 
@@ -2025,21 +2025,19 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private void restoreState() {
 
-		final RawDataManager rawDataManager = RawDataManager.getInstance();
-
 		// restore: set merge tracks status before the tours are imported
 		final boolean isMergeTracks = _state.getBoolean(STATE_IS_MERGE_TRACKS);
 		_actionMergeGPXTours.setChecked(isMergeTracks);
-		rawDataManager.setMergeTracks(isMergeTracks);
+		_rawDataMgr.setMergeTracks(isMergeTracks);
 
 		// restore: set merge tracks status before the tours are imported
 		final boolean isCreateTourIdWithTime = _state.getBoolean(STATE_IS_CREATE_TOUR_ID_WITH_TIME);
 		_actionCreateTourIdWithTime.setChecked(isCreateTourIdWithTime);
-		rawDataManager.setCreateTourIdWithTime(isCreateTourIdWithTime);
+		_rawDataMgr.setCreateTourIdWithTime(isCreateTourIdWithTime);
 
 		// restore: is checksum validation
 		_actionDisableChecksumValidation.setChecked(_state.getBoolean(STATE_IS_CHECKSUM_VALIDATION));
-		rawDataManager.setIsChecksumValidation(_actionDisableChecksumValidation.isChecked() == false);
+		_rawDataMgr.setIsChecksumValidation(_actionDisableChecksumValidation.isChecked() == false);
 
 		updateToolTipState();
 
@@ -2059,10 +2057,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			return;
 		}
 
-		final RawDataManager rawDataManager = RawDataManager.getInstance();
-
 		// save imported file names
-		final HashSet<String> importedFiles = rawDataManager.getImportedFiles();
+		final HashSet<String> importedFiles = _rawDataMgr.getImportedFiles();
 		_state.put(STATE_IMPORTED_FILENAMES, importedFiles.toArray(new String[importedFiles.size()]));
 
 		// keep selected tours
@@ -2124,7 +2120,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	void selectLastTour() {
 
-		final Collection<TourData> tourDataCollection = RawDataManager.getInstance().getImportedTours().values();
+		final Collection<TourData> tourDataCollection = _rawDataMgr.getImportedTours().values();
 
 		final TourData[] tourList = tourDataCollection.toArray(new TourData[tourDataCollection.size()]);
 
@@ -2174,7 +2170,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		enableActions();
 
 		// update person in the raw data
-		RawDataManager.getInstance().updateTourDataFromDb(null);
+		_rawDataMgr.updateTourDataFromDb(null);
 
 		_tourViewer.refresh();
 	}

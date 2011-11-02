@@ -21,53 +21,53 @@ public class TourDataNormalizer {
 
 	public static final int	NORMALIZED_DISTANCE	= 100;
 
-	private int[]			normalizedDistance	= null;
-	private int[]			normalizedAltitude	= null;
+	private float[]			normalizedDistance	= null;
+	private float[]			normalizedAltitude	= null;
 
 	/**
 	 * @return Returns the normalizedAltitude.
 	 */
-	public int[] getNormalizedAltitude() {
+	public float[] getNormalizedAltitude() {
 		return normalizedAltitude;
 	}
 
 	/**
 	 * @return Returns the normalizedDistance.
 	 */
-	public int[] getNormalizedDistance() {
+	public float[] getNormalizedDistance() {
 		return normalizedDistance;
 	}
 
 	public void normalizeAltitude(final TourData tourData, final int measureStartIndex, final int measureEndIndex) {
 
-		final int[] measureAltitudes = tourData.altitudeSerie;
-		final int[] measureDistances = tourData.getMetricDistanceSerie();
+		final float[] measureAltitudes = tourData.altitudeSerie;
+		final float[] measureDistances = tourData.getMetricDistanceSerie();
 
 		if (measureAltitudes == null || measureDistances == null) {
 			return;
 		}
 
 		// create normalized data, the distance will be normalized to 100m
-		final int normStartDistance = measureDistances[measureStartIndex] / NORMALIZED_DISTANCE;
-		final int normEndDistance = measureDistances[measureEndIndex] / NORMALIZED_DISTANCE;
-		final int normSize = normEndDistance - normStartDistance + 1;
+		final float normStartDistance = measureDistances[measureStartIndex] / NORMALIZED_DISTANCE;
+		final float normEndDistance = measureDistances[measureEndIndex] / NORMALIZED_DISTANCE;
+		final int normSize = (int) (normEndDistance - normStartDistance + 1);
 
-		normalizedDistance = new int[normSize];
-		normalizedAltitude = new int[normSize];
+		normalizedDistance = new float[normSize];
+		normalizedAltitude = new float[normSize];
 
-		int normDistance = normStartDistance * NORMALIZED_DISTANCE;
-		int normAltitude = 0;
+		float normDistance = normStartDistance * NORMALIZED_DISTANCE;
+		float normAltitude = 0;
 
 		int measureIndex = measureStartIndex;
-		int measureLastDistance = measureDistances[measureIndex];
-		int measureLastAltitude = measureAltitudes[measureStartIndex];
+		float measureLastDistance = measureDistances[measureIndex];
+		float measureLastAltitude = measureAltitudes[measureStartIndex];
 
-		int measureNextDistance = 0;
-		int measureNextAltitude = 0;
+		float measureNextDistance = 0;
+		float measureNextAltitude = 0;
 
-		int measureDistanceDiff;
-		int measureAltitudeDiff;
-		int distanceDiff = 0;
+		float measureDistanceDiff;
+		float measureAltitudeDiff;
+		float distanceDiff = 0;
 
 		for (int normIndex = 0; normIndex < normSize; normIndex++) {
 
@@ -105,7 +105,7 @@ public class TourDataNormalizer {
 				if (measureDistanceDiff == 0 || distanceDiff == 0) {
 					normAltitude = 0;
 				} else {
-					normAltitude = (int) ((float) measureAltitudeDiff / (float) measureDistanceDiff * distanceDiff);
+					normAltitude = measureAltitudeDiff / measureDistanceDiff * distanceDiff;
 				}
 			}
 

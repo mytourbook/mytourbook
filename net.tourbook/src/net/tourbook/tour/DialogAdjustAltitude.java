@@ -114,6 +114,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 	private static final String				PREF_SCALE_GEO_POSITION				= "Dialog_AdjustAltitude_GeoPositionScale"; //$NON-NLS-1$
 
 	private static final String				STATE_IS_SRTM_SELECT_WHOLE_TOUR		= "State_IsSRTMSelectWholeTour";			//$NON-NLS-1$
+//	private static final String				STATE_IS_SRTM_SELECT_SYNC_START_END	= "State_IsSRTMSyncStartEnd";				//$NON-NLS-1$
 
 	private final IPreferenceStore			_prefStore							= TourbookPlugin.getDefault() //
 																						.getPreferenceStore();
@@ -185,6 +186,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 	private Button							_btnResetAltitude;
 	private Button							_btnUpdateAltitude;
 	private Button							_chkSRTMSelectWholeTour;
+//	private Button							_chkSRTMSyncStartEnd;
 
 	private Spinner							_spinnerNewStartAlti;
 	private Spinner							_spinnerNewMaxAlti;
@@ -814,8 +816,27 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 			// horizontal move is allowed
 			_splineData.relativePositionX[_pointHitIndex] = devX / dev1X;
 		}
+
 		// set vertical position
-		_splineData.relativePositionY[_pointHitIndex] = devY / dev1Y;
+		final float devYRelativ = devY / dev1Y;
+		_splineData.relativePositionY[_pointHitIndex] = devYRelativ;
+
+// this is not easy to implement, current solution do NOT work
+//
+//		/*
+//		 * sync start & end
+//		 */
+//		final int lastIndex = _splineData.graphXMaxValues.length - 1;
+//		final boolean isSync = (_pointHitIndex == 0 || _pointHitIndex == lastIndex)
+//				&& _chkSRTMSyncStartEnd.getSelection();
+//
+//		if (isSync) {
+//			if (_pointHitIndex == 0) {
+//				_splineData.relativePositionY[lastIndex] = devYRelativ;
+//			} else {
+//				_splineData.relativePositionY[0] = devYRelativ;
+//			}
+//		}
 	}
 
 	@Override
@@ -1236,9 +1257,22 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 			_chkSRTMSelectWholeTour.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					onModifySRTM();
+					onModifySRTMSelection();
 				}
 			});
+
+//			/*
+//			 * checkbox: synchronize start & end
+//			 */
+//			_chkSRTMSyncStartEnd = new Button(container, SWT.CHECK);
+//			GridDataFactory.swtDefaults().applyTo(_chkSRTMSyncStartEnd);
+//			_chkSRTMSyncStartEnd.setText(Messages.Adjust_Altitude_Checkbox_SRTM_SyncStartEnd);
+//			_chkSRTMSyncStartEnd.addSelectionListener(new SelectionAdapter() {
+//				@Override
+//				public void widgetSelected(final SelectionEvent e) {
+//					onModifySRTMSync();
+//				}
+//			});
 		}
 	}
 
@@ -1734,7 +1768,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		onSelectSlicePosition();
 	}
 
-	private void onModifySRTM() {
+	private void onModifySRTMSelection() {
 
 		final int maxIndex = _tourData.getTimeSerieFloat().length - 1;
 		final boolean isSelectWholeTour = _chkSRTMSelectWholeTour.getSelection();
@@ -1751,11 +1785,17 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 					maxIndex));
 		} else {
 
+			// position the right slider in the horizontal center
+
 			_tourChart.setXSliderPosition(new SelectionChartXSliderPosition(_tourChart, //
 					maxIndex / 2,
 					maxIndex));
 		}
 	}
+
+//	private void onModifySRTMSync() {
+//
+//	}
 
 	private void onMouseDown(final ChartMouseEvent mouseEvent) {
 
@@ -2111,8 +2151,8 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		/*
 		 * checkbox: select whole tour
 		 */
-		final boolean isChecked = Util.getStateBoolean(_state, STATE_IS_SRTM_SELECT_WHOLE_TOUR, true);
-		_chkSRTMSelectWholeTour.setSelection(isChecked);
+		_chkSRTMSelectWholeTour.setSelection(Util.getStateBoolean(_state, STATE_IS_SRTM_SELECT_WHOLE_TOUR, true));
+//		_chkSRTMSyncStartEnd.setSelection(Util.getStateBoolean(_state, STATE_IS_SRTM_SELECT_SYNC_START_END, true));
 
 		if (isAdjustmentTypeSRTMSPline()) {
 
@@ -2123,7 +2163,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 			Display.getCurrent().asyncExec(new Runnable() {
 				public void run() {
-					onModifySRTM();
+					onModifySRTMSelection();
 				}
 			});
 		}
@@ -2145,6 +2185,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		 * checkbox: select whole tour
 		 */
 		_state.put(STATE_IS_SRTM_SELECT_WHOLE_TOUR, _chkSRTMSelectWholeTour.getSelection());
+//		_state.put(STATE_IS_SRTM_SELECT_SYNC_START_END, _chkSRTMSyncStartEnd.getSelection());
 	}
 
 	/**

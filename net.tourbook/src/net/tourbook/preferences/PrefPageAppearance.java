@@ -66,6 +66,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 	private Spinner					_spinnerRecentTourTypes;
 	private Spinner					_spinnerRecentTags;
 	private Button					_chkMemMonitor;
+	private Button					_btnResetAllToggleDialogs;
 
 	private Button					_chkAutoOpenTagging;
 	private Spinner					_spinnerAutoOpenDelay;
@@ -100,6 +101,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 			createUI10Tagging(container);
 			createUI20RecentEntries(container);
 			createUI30MemoryMonitor(container);
+			createUI40ResetAllToggleDialogs(container);
 		}
 
 		return container;
@@ -219,6 +221,23 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 		_chkMemMonitor.setText(Messages.pref_appearance_showMemoryMonitor);
 	}
 
+	private void createUI40ResetAllToggleDialogs(final Composite parent) {
+
+		_btnResetAllToggleDialogs = new Button(parent, SWT.PUSH);
+		GridDataFactory.fillDefaults()//
+				.indent(0, 10)
+				.align(SWT.BEGINNING, SWT.FILL)
+				.applyTo(_btnResetAllToggleDialogs);
+		_btnResetAllToggleDialogs.setText(Messages.Pref_Appearance_Button_ResetAllToggleDialogs);
+		_btnResetAllToggleDialogs.setToolTipText(Messages.Pref_Appearance_Button_ResetAllToggleDialogs_Tooltip);
+		_btnResetAllToggleDialogs.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				onResetAllToggleDialogs();
+			}
+		});
+	}
+
 	private void enableControls() {
 
 		final boolean isTagAutoOpen = _chkAutoOpenTagging.getSelection();
@@ -263,6 +282,16 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 	 */
 	private void onChangeProperty() {
 		_isModified = true;
+	}
+
+	private void onResetAllToggleDialogs() {
+
+		_prefStore.setValue(ITourbookPreferences.TOURDATA_EDITOR_CONFIRMATION_REVERT_TOUR, false);
+		_prefStore.setValue(ITourbookPreferences.MAP_VIEW_CONFIRMATION_SHOW_DIM_WARNING, false);
+
+		_prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_TOUR, false);
+		_prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_ALL_TIME_SLICES, false);
+		_prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_ALTITUDE_VALUES, false);
 	}
 
 	@Override

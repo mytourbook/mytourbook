@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.ui.views.tourCatalog;
 
 import java.text.DateFormat;
@@ -92,10 +91,10 @@ public class YearStatisticView extends ViewPart {
 
 	private final DateFormat					_dtFormatter				= DateFormat
 																					.getDateInstance(DateFormat.FULL);
-	private NumberFormat						_nf							= NumberFormat.getNumberInstance();
+	private NumberFormat						_nf1						= NumberFormat.getNumberInstance();
 	{
-		_nf.setMinimumFractionDigits(1);
-		_nf.setMaximumFractionDigits(1);
+		_nf1.setMinimumFractionDigits(1);
+		_nf1.setMaximumFractionDigits(1);
 	}
 
 	private int[]								_displayedYears;
@@ -121,7 +120,7 @@ public class YearStatisticView extends ViewPart {
 	/**
 	 * Tour speed for all years
 	 */
-	private ArrayList<Integer>					_tourSpeed					= new ArrayList<Integer>();
+	private ArrayList<Float>					_tourSpeed					= new ArrayList<Float>();
 
 	/**
 	 * this is the last year (on the right side) which is displayed in the statistics
@@ -363,7 +362,7 @@ public class YearStatisticView extends ViewPart {
 
 		final String toolTipLabel = new Formatter().format(
 				toolTipFormat.toString(),
-				_nf.format((float) _tourSpeed.get(valueIndex) / 10)).toString();
+				_nf1.format(_tourSpeed.get(valueIndex))).toString();
 
 		final ChartToolTipInfo toolTipInfo = new ChartToolTipInfo();
 		toolTipInfo.setTitle(_dtFormatter.format(tourDate.toDate()));
@@ -811,7 +810,7 @@ public class YearStatisticView extends ViewPart {
 							final DateTime dt = new DateTime(tourItem.getTourDate());
 
 							_DOYValues.add(getYearDOYs(dt.getYear()) + dt.getDayOfYear() - 1);
-							_tourSpeed.add((int) (tourItem.getTourSpeed() * 10 / UI.UNIT_VALUE_DISTANCE));
+							_tourSpeed.add(tourItem.getTourSpeed() / UI.UNIT_VALUE_DISTANCE);
 							_allTours.add(tourItem);
 						}
 					}
@@ -821,7 +820,7 @@ public class YearStatisticView extends ViewPart {
 
 		final ChartDataModel chartModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
 
-		final ChartDataXSerie xData = new ChartDataXSerie(ArrayListToArray.toInt(_DOYValues));
+		final ChartDataXSerie xData = new ChartDataXSerie(ArrayListToArray.integerToFloat(_DOYValues));
 		xData.setAxisUnit(ChartDataXSerie.X_AXIS_UNIT_DAY);
 		xData.setChartSegments(createChartSegments());
 		chartModel.setXData(xData);
@@ -829,7 +828,7 @@ public class YearStatisticView extends ViewPart {
 		// set the bar low/high data
 		final ChartDataYSerie yData = new ChartDataYSerie(
 				ChartDataModel.CHART_TYPE_BAR,
-				ArrayListToArray.toInt(_tourSpeed));
+				ArrayListToArray.toFloat(_tourSpeed));
 		yData.setValueDivisor(10);
 		TourManager.setGraphColor(_prefStore, yData, GraphColorProvider.PREF_GRAPH_SPEED);
 
@@ -837,15 +836,15 @@ public class YearStatisticView extends ViewPart {
 		 * set/restore min/max values
 		 */
 		final TVICatalogRefTourItem refItem = _currentRefItem;
-		final int minValue = yData.getVisibleMinValue();
-		final int maxValue = yData.getVisibleMaxValue();
+		final float minValue = yData.getVisibleMinValue();
+		final float maxValue = yData.getVisibleMaxValue();
 
-		final int dataMinValue = minValue - (minValue / 10);
-		final int dataMaxValue = maxValue + (maxValue / 20);
+		final float dataMinValue = minValue - (minValue / 10);
+		final float dataMaxValue = maxValue + (maxValue / 20);
 
 		if (_isSynchMaxValue) {
 
-			if (refItem.yearMapMinValue == Integer.MIN_VALUE) {
+			if (refItem.yearMapMinValue == Float.MIN_VALUE) {
 
 				// min/max values have not yet been saved
 

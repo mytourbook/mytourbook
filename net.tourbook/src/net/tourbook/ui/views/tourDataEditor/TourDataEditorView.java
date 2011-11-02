@@ -205,20 +205,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private static final String					CSV_FILE_EXTENSION				= "csv";									//$NON-NLS-1$
 
-	private final IPreferenceStore				_prefStore						= TourbookPlugin
-																						.getDefault()
+	private final IPreferenceStore				_prefStore						= TourbookPlugin.getDefault() //
 																						.getPreferenceStore();
 
-	private final IDialogSettings				_viewState						= TourbookPlugin
-																						.getDefault()
+	private final IDialogSettings				_viewState						= TourbookPlugin.getDefault() //
 																						.getDialogSettingsSection(ID);
 
-	private final IDialogSettings				_viewStateSlice					= TourbookPlugin
-																						.getDefault()
+	private final IDialogSettings				_viewStateSlice					= TourbookPlugin.getDefault() //
 																						.getDialogSettingsSection(//
 																								ID + ".slice");			//$NON-NLS-1$
-	private final IDialogSettings				_viewStateMarker				= TourbookPlugin
-																						.getDefault()
+
+	private final IDialogSettings				_viewStateMarker				= TourbookPlugin.getDefault() //
 																						.getDialogSettingsSection(//
 																								ID + ".marker");			//$NON-NLS-1$
 
@@ -2019,18 +2016,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private boolean confirmUndoChanges() {
 
-		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-
 		// check if confirmation is disabled
-		if (prefStore.getBoolean(ITourbookPreferences.TOURDATA_EDITOR_CONFIRMATION_REVERT_TOUR)) {
+		if (_prefStore.getBoolean(ITourbookPreferences.TOURDATA_EDITOR_CONFIRMATION_REVERT_TOUR)) {
 
 			return true;
 
 		} else {
 
-			final MessageDialogWithToggle dialog = MessageDialogWithToggle.openOkCancelConfirm(Display
-					.getCurrent()
-					.getActiveShell(),//
+			final MessageDialogWithToggle dialog = MessageDialogWithToggle.openOkCancelConfirm(//
+					Display.getCurrent().getActiveShell(),//
 					Messages.tour_editor_dlg_revert_tour_title, // title
 					Messages.tour_editor_dlg_revert_tour_message, // message
 					Messages.tour_editor_dlg_revert_tour_toggle_message, // toggle message
@@ -2038,7 +2032,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					null,
 					null);
 
-			prefStore.setValue(ITourbookPreferences.TOURDATA_EDITOR_CONFIRMATION_REVERT_TOUR, dialog.getToggleState());
+			_prefStore.setValue(ITourbookPreferences.TOURDATA_EDITOR_CONFIRMATION_REVERT_TOUR, dialog.getToggleState());
 
 			return dialog.getReturnCode() == Window.OK;
 		}
@@ -2739,9 +2733,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					| SWT.H_SCROLL//
 			);
 
-			final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
-
-			int descLines = store.getInt(ITourbookPreferences.TOUR_EDITOR_DESCRIPTION_HEIGHT);
+			int descLines = _prefStore.getInt(ITourbookPreferences.TOUR_EDITOR_DESCRIPTION_HEIGHT);
 			descLines = descLines == 0 ? 5 : descLines;
 
 			// description will grab all vertical space in the tour tab

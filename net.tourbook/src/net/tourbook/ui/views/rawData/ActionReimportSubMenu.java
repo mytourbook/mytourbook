@@ -36,6 +36,7 @@ public class ActionReimportSubMenu extends Action implements IMenuCreator {
 
 	private ActionReimportTour					_actionReimportTour;
 	private ActionReimportTourOnlyTimeSlices	_actionReimportTourOnlyTimeSlices;
+	private ActionReimportAltitudeValues		_actionReimportAltitudeValues;
 
 	public ActionReimportSubMenu(final ITourViewer3 tourViewer) {
 
@@ -45,6 +46,7 @@ public class ActionReimportSubMenu extends Action implements IMenuCreator {
 
 		_actionReimportTour = new ActionReimportTour(tourViewer);
 		_actionReimportTourOnlyTimeSlices = new ActionReimportTourOnlyTimeSlices(tourViewer);
+		_actionReimportAltitudeValues = new ActionReimportAltitudeValues(tourViewer);
 	}
 
 	public void dispose() {
@@ -56,8 +58,9 @@ public class ActionReimportSubMenu extends Action implements IMenuCreator {
 
 	private void fillMenu(final Menu menu) {
 
-		new ActionContributionItem(_actionReimportTour).fill(menu, -1);
+		new ActionContributionItem(_actionReimportAltitudeValues).fill(menu, -1);
 		new ActionContributionItem(_actionReimportTourOnlyTimeSlices).fill(menu, -1);
+		new ActionContributionItem(_actionReimportTour).fill(menu, -1);
 	}
 
 	public Menu getMenu(final Control parent) {

@@ -46,7 +46,7 @@ import org.joda.time.DateTime;
  */
 public class PolarHRMDataReader extends TourbookDevice {
 
-	private static final int	SPEED_SCALING	= 10;
+	private static final int		SPEED_SCALING			= 10;
 
 	private static final String		DATA_DELIMITER			= "\t";											//$NON-NLS-1$
 
@@ -442,7 +442,8 @@ public class PolarHRMDataReader extends TourbookDevice {
 		}
 	}
 
-	private void createTourData(final HashMap<Long, TourData> tourDataMap) {
+	private void createTourData(final HashMap<Long, TourData> alreadyImportedTours,
+								final HashMap<Long, TourData> newlyImportedTours) {
 
 		// create data object for each tour
 		final TourData tourData = new TourData();
@@ -493,7 +494,7 @@ public class PolarHRMDataReader extends TourbookDevice {
 		final Long tourId = tourData.createTourId(createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_POLAR_HRM));
 
 		// check if the tour is already imported
-		if (tourDataMap.containsKey(tourId) == false) {
+		if (alreadyImportedTours.containsKey(tourId) == false) {
 
 			tourData.computeTourDrivingTime();
 			tourData.computeComputedValues();
@@ -503,7 +504,7 @@ public class PolarHRMDataReader extends TourbookDevice {
 			tourData.setDeviceFirmwareVersion(Integer.toString(_hrmVersion));
 
 			// add new tour to other tours
-			tourDataMap.put(tourId, tourData);
+			newlyImportedTours.put(tourId, tourData);
 		}
 	}
 
@@ -587,20 +588,16 @@ public class PolarHRMDataReader extends TourbookDevice {
 					break;
 				}
 
-				int metricTemperature = lapData.temperature;
+				// temperature is scaled by 10 in the raw data
+				float metricTemperature = (float) lapData.temperature / 10;
 
 				if (isImperial) {
-
-					final float metricScaledTemperature = (float) metricTemperature / 10;
-					metricTemperature = (int) ((metricScaledTemperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD) * 10);
+					metricTemperature = metricTemperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD;
 				}
 
 				currentTimeSlice.temperature = metricTemperature;
 			}
 		}
-
-		// temperature scale is 10 for the polar data
-		tourData.setTemperatureScale(10);
 	}
 
 	/**
@@ -620,10 +617,10 @@ public class PolarHRMDataReader extends TourbookDevice {
 		}
 
 		final Set<TourMarker> tourMarkers = tourData.getTourMarkers();
-		final int[] distanceSerie = tourData.distanceSerie;
+		final float[] distanceSerie = tourData.distanceSerie;
 
 		int lapCounter = 1;
- 
+
 		for (final LapData lapData : _sectionLapData) {
 
 			final int lapRelativeTime = lapData.time;
@@ -842,7 +839,9 @@ public class PolarHRMDataReader extends TourbookDevice {
 
 	private boolean parseSection(	final String importFileName,
 									final DeviceData deviceData,
-									final HashMap<Long, TourData> tourDataMap) {
+									final HashMap<Long, TourData> alreadyImportedTours,
+									final HashMap<Long, TourData> newlyImportedTours) {
+
 		boolean returnValue = false;
 
 		BufferedReader fileReader = null;
@@ -918,7 +917,7 @@ public class PolarHRMDataReader extends TourbookDevice {
 				return false;
 			}
 
-			createTourData(tourDataMap);
+			createTourData(alreadyImportedTours, newlyImportedTours);
 
 			returnValue = true;
 
@@ -1605,19 +1604,23 @@ public class PolarHRMDataReader extends TourbookDevice {
 		return true;
 	}
 
+//	public boolean processDeviceData(	final String importFileName,
+//										final DeviceData deviceData,
+//										final HashMap<Long, TourData> tourDataMap) {
 	@Override
-	public boolean processDeviceData(	final String importFileName,
+	public boolean processDeviceData(	final String importFilePath,
 										final DeviceData deviceData,
-										final HashMap<Long, TourData> tourDataMap) {
+										final HashMap<Long, TourData> alreadyImportedTours,
+										final HashMap<Long, TourData> newlyImportedTours) {
 
-		_importFilePath = importFileName;
+		_importFilePath = importFilePath;
 		_deviceData = deviceData;
 
 		if (_isDebug) {
-			System.out.println(importFileName);
+			System.out.println(importFilePath);
 		}
 
-		return parseSection(importFileName, deviceData, tourDataMap);
+		return parseSection(importFilePath, deviceData, alreadyImportedTours, newlyImportedTours);
 	}
 
 	protected void showError(final String message) {

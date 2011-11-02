@@ -327,9 +327,9 @@ public class ChartComponentGraph extends Canvas {
 	private int							_devXMarkerDraggedPos;
 
 	private int							_movedXMarkerStartValueIndex;
-
 	private int							_movedXMarkerEndValueIndex;
-	private int							_xMarkerValueDiff;
+
+	private float						_xMarkerValueDiff;
 
 	/**
 	 * <code>true</code> when the chart is dragged with the mouse
@@ -353,7 +353,12 @@ public class ChartComponentGraph extends Canvas {
 
 	private boolean						_isSelectionVisible;
 
+	/**
+	 * Is <code>true</code> when this chart gained the focus, <code>false</code> when the focus is
+	 * lost.
+	 */
 	private boolean						_isFocusActive;
+
 	private boolean						_scrollSmoothly;
 	private int							_smoothScrollEndPosition;
 	private boolean						_isSmoothScrollingActive;
@@ -648,7 +653,6 @@ public class ChartComponentGraph extends Canvas {
 		}
 		yData.setVisibleMinValue(minValue);
 		yData.setVisibleMaxValue(maxValue);
-		yData.setIsAdjustYSlider(true);
 
 		_ySliderDragged = null;
 
@@ -1184,11 +1188,17 @@ public class ChartComponentGraph extends Canvas {
 
 		_autoScrollCounter[0]++;
 
+//		System.out.println("doAutoScroll:\t");
+//// TODO remove SYSTEM.OUT.PRINTLN
+
 		getDisplay().timerExec(AUTO_SCROLL_INTERVAL, new Runnable() {
 
 			final int	__runnableScrollCounter	= _autoScrollCounter[0];
 
 			public void run() {
+
+//				System.out.println(__runnableScrollCounter + "   " + _autoScrollCounter[0]);
+// TODO remove SYSTEM.OUT.PRINTLN
 
 				if (__runnableScrollCounter != _autoScrollCounter[0]) {
 					return;
@@ -1211,7 +1221,9 @@ public class ChartComponentGraph extends Canvas {
 					_devXScrollSliderLine < -45 ? -200 : //
 							_devXScrollSliderLine < -30 ? -50 : //
 									_devXScrollSliderLine < -15 ? -10 : //
-											-1;
+											_devXScrollSliderLine < -8 ? -5 : //
+											// !!! move 2 instead of 1, with 1 it would sometimes not move, needs more investigation
+											-2;
 				} else {
 
 					// move to the right
@@ -1219,7 +1231,8 @@ public class ChartComponentGraph extends Canvas {
 					final int devXSliderLineRelative = _devXScrollSliderLine - getDevVisibleChartWidth();
 
 					devMouseOffset = //
-					devXSliderLineRelative < 15 ? 1 : //
+					devXSliderLineRelative < 8 ? 2 : //
+							devXSliderLineRelative < 15 ? 5 : //
 							devXSliderLineRelative < 30 ? 10 : //
 									devXSliderLineRelative < 45 ? 50 : //
 											200;
@@ -1238,6 +1251,9 @@ public class ChartComponentGraph extends Canvas {
 
 		final int devNewVirtualSliderLinePos = devOldVirtualSliderLinePos + devMouseOffset;
 		final int devNewGraphSliderLinePos = devNewVirtualSliderLinePos - _devGraphImageXOffset;
+
+//		System.out.println(devMouseOffset + "  " + devNewGraphSliderLinePos + "  " + devOldVirtualSliderLinePos);
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		// move the slider
 		moveXSlider(_xSliderDragged, devNewGraphSliderLinePos);

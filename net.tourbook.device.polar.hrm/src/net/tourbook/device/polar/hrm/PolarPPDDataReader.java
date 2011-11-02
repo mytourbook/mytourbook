@@ -449,7 +449,8 @@ public class PolarPPDDataReader extends TourbookDevice {
 	@Override
 	public boolean processDeviceData(	final String importFilePath,
 										final DeviceData deviceData,
-										final HashMap<Long, TourData> tourDataMap) {
+										final HashMap<Long, TourData> alreadyImportedTours,
+										final HashMap<Long, TourData> newlyImportedTours) {
 
 		if (_isDebug) {
 			System.out.println(importFilePath);
@@ -488,14 +489,19 @@ public class PolarPPDDataReader extends TourbookDevice {
 				});
 				// load all exercises from that pdd file
 				for (final File pddFile : pddFiles) {
-					_polarPDDDataReader.processDeviceData(pddFile.getAbsolutePath(), deviceData, tourDataMap);
+					_polarPDDDataReader.processDeviceData(
+							pddFile.getAbsolutePath(),
+							deviceData,
+							alreadyImportedTours,
+							newlyImportedTours);
 				}
-				for (final Long tourId : tourDataMap.keySet()) {
+
+				for (final Long tourId : newlyImportedTours.keySet()) {
 					final int sportId = _polarPDDDataReader.getTourSport(tourId);
 					if (sportId > 0) {
 						final TourType type = tourTypeForSport.get(sportId);
 						if (null != type) {
-							tourDataMap.get(tourId).setTourType(type);
+							newlyImportedTours.get(tourId).setTourType(type);
 						}
 					}
 				}

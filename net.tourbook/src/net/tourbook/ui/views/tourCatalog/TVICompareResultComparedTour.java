@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -40,15 +40,14 @@ public class TVICompareResultComparedTour extends TVICompareResultItem {
 	/**
 	 * contains the minimum value for the altitude differenz
 	 */
-	int				minAltitudeDiff			= 0;
+	float			minAltitudeDiff			= 0;
 
 	/**
 	 * contains the minimum data serie for each compared value
 	 */
-	int[]			altitudeDiffSerie;
+	float[]			altitudeDiffSerie;
 
 	int				computedStartIndex		= -1;
-
 	int				computedEndIndex		= -1;
 
 	int				normalizedStartIndex	= -1;
@@ -57,7 +56,7 @@ public class TVICompareResultComparedTour extends TVICompareResultItem {
 	int				compareDrivingTime;
 	int				compareRecordingTime;
 
-	int				compareDistance;
+	float			compareDistance;
 	float			compareSpeed;
 	int				timeIntervall;
 

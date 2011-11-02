@@ -296,4 +296,11 @@ public interface ITourbookPreferences {
 	 */
 	public static final String	VIEW_DOUBLE_CLICK_ACTIONS					= "ViewDoubleClickActions";								//$NON-NLS-1$
 
+	/*
+	 * Dialog toggle states
+	 */
+	public static final String	TOGGLE_STATE_REIMPORT_TOUR				= "TOGGLE_STATE_REIMPORT_TOUR";						//$NON-NLS-1$
+	public static final String	TOGGLE_STATE_REIMPORT_ALL_TIME_SLICES	= "TOGGLE_STATE_REIMPORT_ALL_TIME_SLICES";			//$NON-NLS-1$
+	public static final String	TOGGLE_STATE_REIMPORT_ALTITUDE_VALUES	= "TOGGLE_STATE_REIMPORT_ALTITUDE_VALUES";			//$NON-NLS-1$
+
 }

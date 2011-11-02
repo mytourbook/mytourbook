@@ -108,7 +108,8 @@ public class GarminSAXHandler extends DefaultHandler {
 	private boolean							_isInCreatorVersionMajor;
 	private boolean							_isInCreatorVersionMinor;
 	//
-	private HashMap<Long, TourData>			_tourDataMap;
+	private HashMap<Long, TourData>			_alreadyImportedTours;
+	private HashMap<Long, TourData>			_newlyImportedTours;
 	private TourbookDevice					_deviceDataReader;
 	private String							_importFilePath;
 	//
@@ -155,11 +156,13 @@ public class GarminSAXHandler extends DefaultHandler {
 	public GarminSAXHandler(final TourbookDevice deviceDataReader,
 							final String importFileName,
 							final DeviceData deviceData,
-							final HashMap<Long, TourData> tourDataMap) {
+							final HashMap<Long, TourData> alreadyImportedTours,
+							final HashMap<Long, TourData> newlyImportedTours) {
 
 		_deviceDataReader = deviceDataReader;
 		_importFilePath = importFileName;
-		_tourDataMap = tourDataMap;
+		_alreadyImportedTours = alreadyImportedTours;
+		_newlyImportedTours = newlyImportedTours;
 	}
 
 	private static void formatDT(	final DateTimeFormatter jodaFormatter,
@@ -592,7 +595,7 @@ public class GarminSAXHandler extends DefaultHandler {
 		final Long tourId = tourData.createTourId(uniqueKey);
 
 		// check if the tour is already imported
-		if (_tourDataMap.containsKey(tourId) == false) {
+		if (_alreadyImportedTours.containsKey(tourId) == false) {
 
 			tourData.computeAltitudeUpDown();
 			tourData.computeTourDrivingTime();
@@ -614,7 +617,7 @@ public class GarminSAXHandler extends DefaultHandler {
 							: UI.DOT + minorVersion));
 
 			// add new tour to other tours
-			_tourDataMap.put(tourId, tourData);
+			_newlyImportedTours.put(tourId, tourData);
 		}
 
 		_isImported = true;
