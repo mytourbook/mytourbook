@@ -1,0 +1,5 @@
+#Thu Nov 03 21:40:23 CET 2011
+eclipse.preferences.version=1
+encoding//src/net/tourbook/device/crp/messages.properties=8859_1
+encoding//src/net/tourbook/device/hac5/messages.properties=8859_1
+encoding//src/net/tourbook/device/polar/hrm/messages.properties=8859_1

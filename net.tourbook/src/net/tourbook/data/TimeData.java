@@ -102,9 +102,8 @@ public class TimeData implements Serializable {
 	public float				power				= Float.MIN_VALUE;
 
 	/**
-	 * speed in km/h multiplied by 10, speed is typically provided by an ergo trainer not from a
-	 * bike computer, Polar provides speed but is ignored. Contains {@link Float#MIN_VALUE} when
-	 * value is not set.
+	 * Speed in km/h, speed is typically provided by an ergo trainer not from a bike computer, Polar
+	 * provides speed but is ignored. Contains {@link Float#MIN_VALUE} when value is not set.
 	 */
 	public float				speed				= Float.MIN_VALUE;
 

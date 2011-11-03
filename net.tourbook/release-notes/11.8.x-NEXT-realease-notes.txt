@@ -9,6 +9,8 @@ Improvements:
 Infos:
 -conversion time: 1727 tours / 149 seconds = 11.6 tours/second
 
+System:
+-decreased number of plugins, moved most of the device plugins into net.tourbook.device
 
 TODO's
 - double -> float

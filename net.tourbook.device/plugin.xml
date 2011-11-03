@@ -1,8 +1,87 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+
+
+   <!-- Ciclo Tour -->
    <extension
          point="net.tourbook.deviceDataReader">
+      <device
+            class="net.tourbook.device.ciclotour.text.CiclotourTextDataReader"
+            fileextension="txt"
+            id="net.tourbook.device.TxtDataReader"
+            name="Ciclotour Text Export"/>
+   </extension>
+
+
+   <!-- CM4xxm -->
+   <extension
+         point="net.tourbook.deviceDataReader">
+         <device
+            class="net.tourbook.device.cm4xxm.CM4XXMDeviceReader"
+            fileextension="dat"
+            id="net.tourbook.device.CM4XXMDeviceReader"
+            name="CM4xxM"/>
+   </extension>
+   <extension
+         point="net.tourbook.externalDeviceDataReader">
+      <device
+            class="net.tourbook.device.cm4xxm.CM4xxmExternalDevice"
+            id="net.tourbook.device.cm4xxmExternalDeviceReader"
+            name="CM4xxM"
+            type="serial">
+      </device>
+   </extension>
+
+
+   <!-- CRP -->
+   <extension
+         point="net.tourbook.deviceDataReader">
+      <device
+            class="net.tourbook.device.crp.CRPDataReader"
+            fileextension="crp"
+            id="net.tourbook.device.CRPDataReader"
+            name="CRP"/>
+   </extension>
+
+
+   <!-- CSV Tours -->
+   <extension
+         point="net.tourbook.deviceDataReader">
+      <device
+            class="net.tourbook.device.csv.tours.CSVTourDataReader"
+            fileextension="csv"
+            id="net.tourbook.device.CSVTourDataReader"
+            name="CSV Tour Import"/>
+   </extension>
+
+
+   <!-- Daum Ergo Bike -->
+   <extension
+         point="net.tourbook.deviceDataReader">
+
+      <device
+            class="net.tourbook.device.daum.ergobike.DaumErgoBikeDataReader"
+            fileextension="csv"
+            id="net.tourbook.device.CSVDaumErgoBikeDataReader"
+            name="Daum Ergometer"/>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="net.tourbook.preferences.PrefPageDataImport"
+            class="net.tourbook.device.daum.ergobike.PrefPageDaumErgoBike"
+            id="net.tourbook.device.daum.ergobike.id"
+            name="Daum Ergometer">
+      </page>
+   </extension>
+
+
+   <!-- FitLog -->
+   <extension
+         point="net.tourbook.deviceDataReader">
+
       <device
             class="net.tourbook.device.sporttracks.FitLogDeviceDataReader"
             fileextension="fitlog"
@@ -10,5 +89,159 @@
             name="SportTracks (.fitlog)">
       </device>
    </extension>
+
+
+   <!-- GPX -->
+   <extension
+         point="net.tourbook.deviceDataReader">
+      <device
+            class="net.tourbook.device.gpx.GPXDeviceDataReader"
+            fileextension="gpx"
+            id="net.tourbook.device.GPXDataReader"
+            name="GPX"/>
+   </extension>
+
+
+   <!-- HAC 4 -->
+   <extension
+         point="net.tourbook.deviceDataReader">
+      <device
+            class="net.tourbook.device.hac4.HAC4DeviceReader"
+            fileextension="dat"
+            id="net.tourbook.device.HAC4DeviceReader"
+            name="HAC4"/>
+   </extension>
+   <extension
+         point="net.tourbook.externalDeviceDataReader">
+      <device
+            class="net.tourbook.device.hac4.HAC4ExternalDevice"
+            id="net.tourbook.device.HAC4ExternalDeviceReader"
+            name="HAC4"
+            type="serial">
+      </device>
+   </extension>
+
+
+   <!-- HAC 4 Linux -->
+   <extension
+         point="net.tourbook.deviceDataReader">
+         <device
+            class="net.tourbook.device.hac4linux.tour.HAC4LinuxDeviceReader"
+            fileextension="tour"
+            id="net.tourbook.device.Hac4LinuxDeviceReader"
+            name="H4L"/>
+   </extension>
+
+
+   <!-- HAC 4 Pro -->
+   <extension
+         point="net.tourbook.deviceDataReader">
+               <device
+            class="net.tourbook.device.hac4pro.HAC4ProDeviceDataReader"
+            fileextension="dat"
+            id="net.tourbook.device.HAC4ProDeviceReader"
+            name="HAC4Pro"/>
+   </extension>
+   <extension
+         point="net.tourbook.externalDeviceDataReader">
+      <device
+            class="net.tourbook.device.hac4pro.HAC4ProExternalDevice"
+            id="net.tourbook.device.HAC4ProExternalDeviceReader"
+            name="HAC4Pro"
+            type="serial">
+      </device>
+   </extension>
+   
+
+   <!-- HAC 5 -->
+   <extension
+         point="net.tourbook.deviceDataReader">
+      <device
+            class="net.tourbook.device.hac5.HAC5DeviceDataReader"
+            fileextension="dat"
+            id="net.tourbook.device.HAC5DeviceReader"
+            name="HAC5"/>
+   </extension>
+   <extension
+         point="net.tourbook.externalDeviceDataReader">
+      <device
+            class="net.tourbook.device.hac5.HAC5ExternalDevice"
+            id="net.tourbook.device.HAC5ExternalDeviceReader"
+            name="HAC5"
+            type="serial">
+      </device>
+   </extension>
+   
+   
+   <!-- Polar HRM  -->
+   <extension
+         point="net.tourbook.deviceDataReader">
+
+      <device
+            class="net.tourbook.device.polar.hrm.PolarPPDDataReader"
+            extensionSortPriority="1"
+            fileextension="ppd"
+            id="net.tourbook.device.PolarPPDDataReader"
+            name="Polar PPD (Polar Person Data)"
+            />
+
+      <device
+            class="net.tourbook.device.polar.hrm.PolarPDDDataReader"
+            extensionSortPriority="1"
+            fileextension="pdd"
+            id="net.tourbook.device.PolarPDDDataReader"
+            name="Polar PDD (Polar Diary Data)"
+            />
+
+      <device
+            class="net.tourbook.device.polar.hrm.PolarHRMDataReader"
+            fileextension="hrm"
+            id="net.tourbook.device.PolarHRMDataReader"
+            name="Polar HRM (Heart Rate Monitor)"/>
+
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="net.tourbook.preferences.PrefPageDataImport"
+            class="net.tourbook.device.polar.hrm.PrefPagePolar"
+            id="net.tourbook.device.polar.hrm.prefPagePolar"
+            name="Polar">
+      </page>
+   </extension>
+   
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="net.tourbook.device.polar.hrm.PreferenceInitializer">
+      </initializer>
+   </extension>
+   
+
+   <!-- PolarTrainer -->
+   <extension
+         point="net.tourbook.deviceDataReader">
+      <device
+            class="net.tourbook.device.polartrainer.PolarTrainerDataReader"
+            fileextension="xml"
+            id="net.tourbook.device.PolarTrainerDataReader"
+            name="Polar Personaltrainer"/>
+   </extension>
+   
+   
+   <!-- TUR -->
+   <extension
+         point="net.tourbook.deviceDataReader">
+         <device
+            class="net.tourbook.device.tur.TurDeviceReader"
+            fileextension="tur"
+            id="net.tourbook.device.TurDeviceReader"
+            name="TUR"/>
+   </extension>
+   
+   
+   <!--  -->
+
 
 </plugin>

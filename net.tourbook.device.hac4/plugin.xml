@@ -1,22 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
-   <extension
-         point="net.tourbook.deviceDataReader">
-      <device
-            class="net.tourbook.device.hac4.HAC4DeviceReader"
-            fileextension="dat"
-            id="net.tourbook.device.HAC4DeviceReader"
-            name="HAC4"/>
-   </extension>
-   <extension
-         point="net.tourbook.externalDeviceDataReader">
-      <device
-            class="net.tourbook.device.hac4.HAC4ExternalDevice"
-            id="net.tourbook.device.HAC4ExternalDeviceReader"
-            name="HAC4"
-            type="serial">
-      </device>
-   </extension>
 
 </plugin>

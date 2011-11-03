@@ -44,7 +44,7 @@ public class FitActivityContext {
 
 	private int							serieIndex;
 
-	private int							lapDistance;
+	private float						lapDistance;
 
 	private int							lapTime;
 
@@ -110,7 +110,7 @@ public class FitActivityContext {
 		return garminProduct;
 	}
 
-	public int getLapDistance() {
+	public float getLapDistance() {
 		return lapDistance;
 	}
 
@@ -207,8 +207,8 @@ public class FitActivityContext {
 		this.heartRateSensorPresent = heartRateSensorPresent;
 	}
 
-	public void setLapDistance(final int lapDistance) {
-		this.lapDistance = lapDistance;
+	public void setLapDistance(final float lapDistance2) {
+		this.lapDistance = lapDistance2;
 	}
 
 	public void setLapTime(final int lapTime) {

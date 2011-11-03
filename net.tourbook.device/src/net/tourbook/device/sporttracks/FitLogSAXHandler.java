@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,7 +31,6 @@ import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.device.InvalidDeviceSAXException;
 import net.tourbook.device.Messages;
-import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.preferences.TourTypeColorDefinition;
 import net.tourbook.util.MtMath;
 import net.tourbook.util.Util;
@@ -88,8 +87,9 @@ public class FitLogSAXHandler extends DefaultHandler {
 	private static final String						TAG_LAP						= "Lap";								//$NON-NLS-1$
 	//
 	private String									_importFilePath;
-	private HashMap<Long, TourData>					_tourDataMap;
 	private FitLogDeviceDataReader					_device;
+	private HashMap<Long, TourData>					_alreadyImportedTours;
+	private HashMap<Long, TourData>					_newlyImportedTours;
 	private Activity								_currentActivity;
 
 	private double									_prevLatitude;
@@ -110,6 +110,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 
 	private boolean									_isInLaps;
 	private ArrayList<TourType>						_allTourTypes;
+
 	private static final DateTimeFormatter			_dtParser					= ISODateTimeFormat.dateTimeParser();
 
 	private static final HashMap<String, String>	_weatherId					= new HashMap<String, String>();
@@ -172,11 +173,13 @@ public class FitLogSAXHandler extends DefaultHandler {
 
 	public FitLogSAXHandler(final FitLogDeviceDataReader device,
 							final String importFilePath,
-							final HashMap<Long, TourData> tourDataMap) {
+							final HashMap<Long, TourData> alreadyImportedTours,
+							final HashMap<Long, TourData> newlyImportedTours) {
 
-		_importFilePath = importFilePath;
-		_tourDataMap = tourDataMap;
 		_device = device;
+		_importFilePath = importFilePath;
+		_alreadyImportedTours = alreadyImportedTours;
+		_newlyImportedTours = newlyImportedTours;
 
 		_allTourTypes = TourDatabase.getAllTourTypes();
 	}
@@ -269,8 +272,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 
 		final float weatherTemperature = _currentActivity.weatherTemperature;
 		if (weatherTemperature != Float.MIN_VALUE) {
-			tourData.setTemperatureScale(TourbookDevice.TEMPERATURE_SCALE);
-			tourData.setAvgTemperature((int) (weatherTemperature * TourbookDevice.TEMPERATURE_SCALE));
+			tourData.setAvgTemperature(weatherTemperature);
 		}
 
 		tourData.importRawDataFile = _importFilePath;
@@ -301,7 +303,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 				Util.UNIQUE_ID_SUFFIX_SPORT_TRACKS_FITLOG));
 
 		// check if the tour is already imported
-		if (_tourDataMap.containsKey(tourId) == false) {
+		if (_alreadyImportedTours.containsKey(tourId) == false) {
 
 			if (isComputeDrivingTime) {
 				tourData.computeTourDrivingTime();
@@ -326,7 +328,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 			finalizeTour30CreateMarkers(tourData);
 
 			// add new tour to other tours
-			_tourDataMap.put(tourId, tourData);
+			_newlyImportedTours.put(tourId, tourData);
 		}
 
 		// cleanup
@@ -476,7 +478,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 		}
 
 		final Set<TourMarker> tourMarkers = tourData.getTourMarkers();
-		final int[] distanceSerie = tourData.distanceSerie;
+		final float[] distanceSerie = tourData.distanceSerie;
 
 		/*
 		 * tour and track can have different start times
