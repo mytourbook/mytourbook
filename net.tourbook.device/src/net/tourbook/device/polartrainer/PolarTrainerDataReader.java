@@ -13,12 +13,11 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.device.sporttracks;
+package net.tourbook.device.polartrainer;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.HashMap;
 
 import javax.xml.parsers.SAXParser;
@@ -32,24 +31,24 @@ import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
-import net.tourbook.util.FileUtils;
 import net.tourbook.util.StatusUtil;
-import net.tourbook.util.UI;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Display;
 
-public class FitLogDeviceDataReader extends TourbookDevice {
+/**
+ * This device reader is importing data from Polar Personaltrainer files.
+ */
+public class PolarTrainerDataReader extends TourbookDevice {
 
 	private static final String				XML_START_ID	= "<?xml";											//$NON-NLS-1$
-	private static final String				XML_FIT_LOG_TAG	= "<FitnessWorkbook ";								//$NON-NLS-1$
+	private static final String				XML_POLAR_TAG	= "<<polar-exercise-data";							//$NON-NLS-1$
 
 	private static final IPreferenceStore	_prefStore		= TourbookPlugin.getDefault().getPreferenceStore();
 
 	// plugin constructor
-	public FitLogDeviceDataReader() {}
+	public PolarTrainerDataReader() {}
 
 	@Override
 	public String buildFileNameFromRawData(final String rawDataFileName) {
@@ -80,33 +79,19 @@ public class FitLogDeviceDataReader extends TourbookDevice {
 	}
 
 	/**
-	 * check if the file is a valid fit log file
+	 * check if the file is a xml file
 	 */
 	private boolean isValidXMLFile(final String importFilePath) {
 
 		BufferedReader fileReader = null;
 		try {
+			fileReader = new BufferedReader(new FileReader(importFilePath));
+			final String fileHeader = fileReader.readLine();
 
-			final FileInputStream inputStream = new FileInputStream(importFilePath);
+			if (fileHeader == null
+					|| (fileHeader.startsWith(XML_START_ID) || fileHeader.startsWith(XML_POLAR_TAG)) == false) {
 
-			/*
-			 * .fitlog files contain BOM's (Byte Order Mark)
-			 */
-			try {
-				FileUtils.consumeBOM(inputStream, UI.UTF_8);
-			} catch (final IOException e) {
-				// just ignore it
-			}
-
-			fileReader = new BufferedReader(new InputStreamReader(inputStream, UI.UTF_8));
-
-			String line = fileReader.readLine();
-			if (line == null || line.startsWith(XML_START_ID) == false) {
-				return false;
-			}
-
-			line = fileReader.readLine();
-			if (line == null || line.startsWith(XML_FIT_LOG_TAG) == false) {
+				fileReader.close();
 				return false;
 			}
 
@@ -135,9 +120,10 @@ public class FitLogDeviceDataReader extends TourbookDevice {
 			return false;
 		}
 
-		final FitLogSAXHandler saxHandler = new FitLogSAXHandler(
+		final PolarTrainerSAXHandler saxHandler = new PolarTrainerSAXHandler(
 				this,
 				importFilePath,
+				deviceData,
 				alreadyImportedTours,
 				newlyImportedTours);
 
@@ -155,28 +141,19 @@ public class FitLogDeviceDataReader extends TourbookDevice {
 			return false;
 		} finally {
 
-			final Display display = Display.getDefault();
-
-			if (saxHandler.isNewTag()) {
-				display.syncExec(new Runnable() {
-					public void run() {
-						TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED, null);
-					}
-				});
-			}
+			saxHandler.dispose();
 
 			if (saxHandler.isNewTourType()) {
 
 				TourDatabase.clearTourTypes();
 				TourManager.getInstance().clearTourDataCache();
 
-				display.syncExec(new Runnable() {
+				Display.getDefault().syncExec(new Runnable() {
 					public void run() {
 						// fire modify event
 						_prefStore.setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random());
 					}
 				});
-
 			}
 		}
 
@@ -186,4 +163,5 @@ public class FitLogDeviceDataReader extends TourbookDevice {
 	public boolean validateRawData(final String fileName) {
 		return isValidXMLFile(fileName);
 	}
+
 }

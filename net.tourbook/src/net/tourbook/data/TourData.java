@@ -3347,10 +3347,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	}
 
 	/**
-	 * Creates the unique tour id from the tour date/time and the unique key
+	 * Creates the unique tour id from the tour date/time and the unique key.
 	 * 
 	 * @param uniqueKeySuffix
-	 *            unique key to identify a tour
+	 *            Unique key to identify a tour, this <b>MUST</b> be an {@link Integer} value.
 	 * @return
 	 */
 	public Long createTourId(final String uniqueKeySuffix) {

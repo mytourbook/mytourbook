@@ -13,45 +13,25 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.device;
+package net.tourbook.device.polar.hrm;
 
-import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.osgi.framework.BundleContext;
+import net.tourbook.device.Activator;
 
-/**
- * The activator class controls the plug-in life cycle
- */
-public class Activator extends AbstractUIPlugin {
+import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
+import org.eclipse.jface.preference.IPreferenceStore;
 
-	// The plug-in ID
-	public static final String	PLUGIN_ID	= "net.tourbook.device";	//$NON-NLS-1$
+public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
-	// The shared instance
-	private static Activator	plugin;
-
-	/**
-	 * The constructor
-	 */
-	public Activator() {}
-
-	/**
-	 * Returns the shared instance
-	 * 
-	 * @return the shared instance
-	 */
-	public static Activator getDefault() {
-		return plugin;
-	}
+	public PreferenceInitializer() {}
 
 	@Override
-	public void start(final BundleContext context) throws Exception {
-		super.start(context);
-		plugin = this;
+	public void initializeDefaultPreferences() {
+
+		final IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+
+		store.setDefault(IPreferences.TITLE_DESCRIPTION, IPreferences.TITLE_DESCRIPTION_TITLE_FROM_TITLE);
+		store.setDefault(IPreferences.SLICE_ADJUSTMENT_VALUE, 0);
+
 	}
 
-	@Override
-	public void stop(final BundleContext context) throws Exception {
-		plugin = null;
-		super.stop(context);
-	}
 }
