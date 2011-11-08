@@ -121,9 +121,6 @@ public class TourManager {
 			GRAPH_PACE,
 			GRAPH_TOUR_COMPARE														};
 
-	private static final int				SPEED_DIVISOR							= 10;
-	public static final int					GRADIENT_DIVISOR						= 10;
-
 	private static TourManager				_instance;
 
 	private final static IPreferenceStore	_prefStore								= TourbookPlugin.getDefault() //
@@ -1983,8 +1980,9 @@ public class TourManager {
 
 			// adjust min value when defined in the pref store
 			if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRADIENT_MIN_IS_ENABLED)) {
-				yDataGradient.setVisibleMinValue(_prefStore.getInt(ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE)
-						* GRADIENT_DIVISOR, true);
+				yDataGradient.setVisibleMinValue(//
+						_prefStore.getInt(ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE),
+						true);
 			}
 		}
 

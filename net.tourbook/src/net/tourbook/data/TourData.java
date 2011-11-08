@@ -71,7 +71,6 @@ import net.tourbook.srtm.GeoLon;
 import net.tourbook.srtm.NumberForm;
 import net.tourbook.tour.BreakTimeResult;
 import net.tourbook.tour.BreakTimeTool;
-import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.ChartLayer2ndAltiSerie;
 import net.tourbook.ui.views.ISmoothingAlgorithm;
@@ -678,7 +677,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private float[]											temperatureSerieImperial;
 
 	/**
-	 * contains speed in km/h multiplied by {@link TourManager#SPEED_DIVISOR}
+	 * Contains speed in km/h
 	 * <p>
 	 * the metric speed serie is required when computing the power even if the current measurement
 	 * system is imperial
@@ -4452,8 +4451,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 		for (int timeIndex = 0; timeIndex < timeSerie.length; timeIndex++) {
 
-			final float speed = speedSerie[timeIndex] / 36; // speed (m/s) /10
-			float gradient = gradientSerie[timeIndex] / 1000; // gradient (%) /10 /100
+			final float speed = speedSerie[timeIndex] / 3.6f; // speed km/h -> m/s
+			float gradient = gradientSerie[timeIndex] / 100; // gradient (%) /100
 
 			// adjust computed errors
 //			if (gradient < 0.04 && gradient > 0) {
@@ -4726,6 +4725,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return "jokl"; //$NON-NLS-1$
 	}
 
+	/**
+	 * @return Returns time data serie in floating points which is used for drawing charts.
+	 */
 	public float[] getTimeSerieFloat() {
 
 		if (timeSerie == null) {

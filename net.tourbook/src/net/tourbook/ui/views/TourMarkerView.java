@@ -467,11 +467,11 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 
 				final TourMarker tourMarker = (TourMarker) cell.getElement();
 
-				final int markerDistance = tourMarker.getDistance();
+				final float markerDistance = tourMarker.getDistance();
 				if (markerDistance == -1) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(_nf_3_3.format(((float) markerDistance) / 1000 / UI.UNIT_VALUE_DISTANCE));
+					cell.setText(_nf_3_3.format(markerDistance / 1000 / UI.UNIT_VALUE_DISTANCE));
 				}
 
 				if (tourMarker.getType() == ChartLabel.MARKER_TYPE_DEVICE) {
@@ -493,17 +493,17 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 
 					final TourMarker tourMarker = (TourMarker) cell.getElement();
 
-					final int markerDistance = tourMarker.getDistance();
+					final float markerDistance = tourMarker.getDistance();
 					if (markerDistance == -1) {
 						cell.setText(UI.EMPTY_STRING);
 					} else {
-						int prevDistance = 0;
+						float prevDistance = 0;
 						final ViewerRow lastRow = cell.getViewerRow().getNeighbor(ViewerRow.ABOVE, false);
 						if (null != lastRow) {
 							prevDistance = ((TourMarker) lastRow.getElement()).getDistance();
 							prevDistance = prevDistance < 0 ? 0 : prevDistance;
 						}
-						cell.setText(_nf_3_3.format(((float) (markerDistance - prevDistance))
+						cell.setText(_nf_3_3.format((markerDistance - prevDistance)
 								/ 1000
 								/ UI.UNIT_VALUE_DISTANCE));
 					}

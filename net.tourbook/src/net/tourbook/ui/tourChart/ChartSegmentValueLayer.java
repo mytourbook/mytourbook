@@ -16,7 +16,6 @@
 /**
  * @author Wolfgang Schramm Created: 06.07.2005
  */
-
 package net.tourbook.ui.tourChart;
 
 import net.tourbook.chart.Chart;
@@ -61,9 +60,8 @@ public class ChartSegmentValueLayer implements IChartLayer {
 		final int devYTop = drawingData.getDevYTop();
 		final int devYBottom = drawingData.getDevYBottom();
 		final int devGraphImageXOffset = chart.getDevGraphImageXOffset();
-//		final int devGraphHeight = drawingData.getDevGraphHeight();
 
-		final int graphYBottom = drawingData.getGraphYBottom();
+		final float graphYBottom = drawingData.getGraphYBottom();
 
 		final ChartDataYSerie yData = drawingData.getYData();
 

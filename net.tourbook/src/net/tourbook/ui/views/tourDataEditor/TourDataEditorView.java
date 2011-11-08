@@ -3507,10 +3507,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		// keep border style
 		final int defaultBorderStyle = _tk.getBorderStyle();
 		_tk.setBorderStyle(SWT.NULL);
-
 		_sectionInfo = createSection(parent, _tk, Messages.tour_editor_section_info, false, false);
 		final Composite container = (Composite) _sectionInfo.getClient();
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+//		LayoutConstants.getSpacing();
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+		GridLayoutFactory.fillDefaults()//
+				.numColumns(2)
+				.spacing(10, 2)
+				.applyTo(container);
 		{
 			/*
 			 * date/time created
@@ -3600,7 +3604,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					// adjust to the label controls
 					.indent(2, 0)
 					//
-					.align(SWT.BEGINNING, SWT.FILL)
+					.align(SWT.FILL, SWT.FILL)
 					.applyTo(_txtImportFilePath);
 
 			/*

@@ -338,13 +338,13 @@ public class DialogExportTour extends TitleAreaDialog {
 		final GarminTrack track = new GarminTrack();
 
 		final int[] timeSerie = tourData.timeSerie;
-		final int[] altitudeSerie = tourData.altitudeSerie;
-		final int[] distanceSerie = tourData.distanceSerie;
-		final int[] cadenceSerie = tourData.cadenceSerie;
-		final int[] pulseSerie = tourData.pulseSerie;
+		final float[] altitudeSerie = tourData.altitudeSerie;
+		final float[] distanceSerie = tourData.distanceSerie;
+		final float[] cadenceSerie = tourData.cadenceSerie;
+		final float[] pulseSerie = tourData.pulseSerie;
 		final double[] latitudeSerie = tourData.latitudeSerie;
 		final double[] longitudeSerie = tourData.longitudeSerie;
-		final int[] temperatureSerie = tourData.temperatureSerie;
+		final float[] temperatureSerie = tourData.temperatureSerie;
 
 		// check if all dataseries are available
 		if ((timeSerie == null) /* || (latitudeSerie == null) || (longitudeSerie == null) */) {
@@ -399,7 +399,7 @@ public class DialogExportTour extends TitleAreaDialog {
 				tpExt.setLongitude(longitudeSerie[serieIndex]);
 			}
 
-			int distance = 0;
+			float distance = 0;
 			if (_isAbsoluteDistance) {
 
 				distance = distanceSerie[serieIndex];
@@ -439,7 +439,7 @@ public class DialogExportTour extends TitleAreaDialog {
 			}
 
 			if (isTemperature) {
-				tpExt.setTemperature((double) temperatureSerie[serieIndex] / tourData.getTemperatureScale());
+				tpExt.setTemperature(temperatureSerie[serieIndex]);
 			}
 
 			// ignore trackpoints which have the same time
@@ -463,7 +463,7 @@ public class DialogExportTour extends TitleAreaDialog {
 	private void createExportWaypoints(final ArrayList<GarminWaypoint> wayPointList, final TourData tourData) {
 
 		final int[] timeSerie = tourData.timeSerie;
-		final int[] altitudeSerie = tourData.altitudeSerie;
+		final float[] altitudeSerie = tourData.altitudeSerie;
 		final double[] latitudeSerie = tourData.latitudeSerie;
 		final double[] longitudeSerie = tourData.longitudeSerie;
 		final Set<TourMarker> tourMarkers = tourData.getTourMarkers();
@@ -677,7 +677,7 @@ public class DialogExportTour extends TitleAreaDialog {
 			final int[] timeSerie = tourData.timeSerie;
 			if (timeSerie != null) {
 
-				final int[] distanceSerie = tourData.distanceSerie;
+				final float[] distanceSerie = tourData.distanceSerie;
 				final boolean isDistance = distanceSerie != null;
 
 				final int startTime = timeSerie[_tourStartIndex];
@@ -706,11 +706,11 @@ public class DialogExportTour extends TitleAreaDialog {
 									uiStartTime,
 									uiEndTime,
 
-									_numberFormatter.format(((float) distanceSerie[_tourStartIndex])
+									_numberFormatter.format(distanceSerie[_tourStartIndex]
 											/ 1000
 											/ UI.UNIT_VALUE_DISTANCE),
 
-									_numberFormatter.format(((float) distanceSerie[_tourEndIndex])
+									_numberFormatter.format(distanceSerie[_tourEndIndex]
 											/ 1000
 											/ UI.UNIT_VALUE_DISTANCE),
 

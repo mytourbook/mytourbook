@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -285,24 +285,24 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			/*
 			 * title
 			 */
-			
+
 			label = _tk.createLabel(section, Messages.tour_editor_label_tour_title);
 			_firstColumnControls.add(label);
-			
+
 			// combo: tour title with history
 			_comboTitle = new Combo(section, SWT.BORDER | SWT.FLAT);
 			_comboTitle.setText(UI.EMPTY_STRING);
-			
+
 			_tk.adapt(_comboTitle, true, false);
-		
+
 			GridDataFactory.fillDefaults()//
 					.grab(true, false)
 					.applyTo(_comboTitle);
-	
+
 			// fill combobox
 			final String[] strings = PrefHistory.getHistory(ITourbookPreferences.TOUR_EDITOR_TITLE_HISTORY);
 			_comboTitle.setItems(strings);
-			
+
 			_comboTitle.addModifyListener(new ModifyListener() {
 				@Override
 				public void modifyText(final ModifyEvent e) {
@@ -968,8 +968,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
 				avgTemperature = metricTemperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD;
 			}
 
-			_spinTemperature.setDigits(Util.getNumberOfDigits(temperatureScale) - 1);
-			_spinTemperature.setSelection(avgTemperature);
+			_spinTemperature.setDigits(1);
+			_spinTemperature.setSelection(Math.round(avgTemperature * 10));
 		}
 		_isUpdateUI = false;
 	}

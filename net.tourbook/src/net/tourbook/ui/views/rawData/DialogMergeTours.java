@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -169,14 +169,14 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 	 * backup data
 	 */
 	private int[]											_backupSourceTimeSerie;
-	private int[]											_backupSourceDistanceSerie;
-	private int[]											_backupSourceAltitudeSerie;
+	private float[]											_backupSourceDistanceSerie;
+	private float[]											_backupSourceAltitudeSerie;
 
 	private TourType										_backupSourceTourType;
 
-	private int[]											_backupTargetPulseSerie;
-	private int[]											_backupTargetTemperatureSerie;
-	private int[]											_backupTargetCadenceSerie;
+	private float[]											_backupTargetPulseSerie;
+	private float[]											_backupTargetTemperatureSerie;
+	private float[]											_backupTargetCadenceSerie;
 
 	private int												_backupTargetTimeOffset;
 	private int												_backupTargetAltitudeOffset;
@@ -193,7 +193,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
 	private boolean											_isAdjustAltiFromSourceBackup;
 	private boolean											_isAdjustAltiFromStartBackup;
-//	private IPropertyChangeListener			_prefChangeListener;
+
 	private org.eclipse.jface.util.IPropertyChangeListener	_prefChangeListener;
 
 	/**
@@ -332,14 +332,14 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 		final int yMergeOffset = _targetTour.getMergedAltitudeOffset();
 
 		final int[] targetTimeSerie = _targetTour.timeSerie;
-		final int[] targetDistanceSerie = _targetTour.distanceSerie;
-		final int[] targetAltitudeSerie = _targetTour.altitudeSerie;
+		final float[] targetDistanceSerie = _targetTour.distanceSerie;
+		final float[] targetAltitudeSerie = _targetTour.altitudeSerie;
 
 		final int[] sourceTimeSerie = _sourceTour.timeSerie;
-		final int[] sourceAltitudeSerie = _sourceTour.altitudeSerie;
-		final int[] sourcePulseSerie = _sourceTour.pulseSerie;
-		final int[] sourceTemperatureSerie = _sourceTour.temperatureSerie;
-		final int[] sourceCadenceSerie = _sourceTour.cadenceSerie;
+		final float[] sourceAltitudeSerie = _sourceTour.altitudeSerie;
+		final float[] sourcePulseSerie = _sourceTour.pulseSerie;
+		final float[] sourceTemperatureSerie = _sourceTour.temperatureSerie;
+		final float[] sourceCadenceSerie = _sourceTour.cadenceSerie;
 
 		if (_chkSynchStartTime.getSelection()) {
 
@@ -360,21 +360,21 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 		final int lastSourceIndex = sourceTimeSerie.length - 1;
 		final int serieLength = targetTimeSerie.length;
 
-		final int[] newSourceAltitudeSerie = new int[serieLength];
-		final int[] newSourceAltiDiffSerie = new int[serieLength];
+		final float[] newSourceAltitudeSerie = new float[serieLength];
+		final float[] newSourceAltiDiffSerie = new float[serieLength];
 
-		final int[] newTargetPulseSerie = new int[serieLength];
-		final int[] newTargetTemperatureSerie = new int[serieLength];
-		final int[] newTargetCadenceSerie = new int[serieLength];
+		final float[] newTargetPulseSerie = new float[serieLength];
+		final float[] newTargetTemperatureSerie = new float[serieLength];
+		final float[] newTargetCadenceSerie = new float[serieLength];
 
 		int sourceIndex = 0;
 		int sourceTime = sourceTimeSerie[0] + xMergeOffset;
 		int sourceTimePrev = 0;
-		int sourceAlti = 0;
-		int sourceAltiPrev = 0;
+		float sourceAlti = 0;
+		float sourceAltiPrev = 0;
 
 		int targetTime = targetTimeSerie[0];
-		int newSourceAltitude;
+		float newSourceAltitude;
 
 		if (isSourceAltitude) {
 			sourceAlti = sourceAltitudeSerie[0] + yMergeOffset;
@@ -430,8 +430,8 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 					final int x1 = sourceTimePrev;
 					final int x2 = targetTime;
 					final int x3 = sourceTime;
-					final int y1 = sourceAltiPrev;
-					final int y3 = sourceAlti;
+					final float y1 = sourceAltiPrev;
+					final float y3 = sourceAlti;
 
 					final int xDiff = x3 - x1;
 
@@ -490,7 +490,6 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 		} else {
 			_targetTour.temperatureSerie = _backupTargetTemperatureSerie;
 		}
-		_targetTour.setTemperatureScale(_sourceTour.getTemperatureScale());
 
 		if (_chkMergeCadence.getSelection()) {
 			_targetTour.cadenceSerie = newTargetCadenceSerie;
@@ -513,13 +512,13 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 				 * adjust start altitude until left slider
 				 */
 
-				final int[] adjustedTargetAltitudeSerie = new int[serieLength];
+				final float[] adjustedTargetAltitudeSerie = new float[serieLength];
 
 				float startAltiDiff = newSourceAltiDiffSerie[0];
 				final int endIndex = _tourChart.getXSliderPosition().getLeftSliderValueIndex();
 				final float distanceDiff = targetDistanceSerie[endIndex];
 
-				final int[] altitudeSerie = _targetTour.altitudeSerie;
+				final float[] altitudeSerie = _targetTour.altitudeSerie;
 
 				for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 
@@ -530,8 +529,8 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 						final float targetDistance = targetDistanceSerie[serieIndex];
 						final float distanceScale = 1 - targetDistance / distanceDiff;
 
-						final int adjustedAltiDiff = (int) (startAltiDiff * distanceScale);
-						final int newAltitude = altitudeSerie[serieIndex] + adjustedAltiDiff;
+						final float adjustedAltiDiff = startAltiDiff * distanceScale;
+						final float newAltitude = altitudeSerie[serieIndex] + adjustedAltiDiff;
 
 						adjustedTargetAltitudeSerie[serieIndex] = newAltitude;
 						newSourceAltiDiffSerie[serieIndex] = newSourceAltitudeSerie[serieIndex] - newAltitude;
@@ -549,7 +548,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 				startAltiDiff /= UI.UNIT_VALUE_ALTITUDE;
 
 				final int targetEndTime = targetTimeSerie[endIndex];
-				final int targetEndDistance = targetDistanceSerie[endIndex];
+				final float targetEndDistance = targetDistanceSerie[endIndex];
 
 				// meter/min
 				altiDiffTime = targetEndTime == 0 ? //
@@ -566,7 +565,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 				/*
 				 * adjust target altitude from source altitude
 				 */
-				final int[] newTargetAltitudeSerie = new int[serieLength];
+				final float[] newTargetAltitudeSerie = new float[serieLength];
 
 				for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 					newTargetAltitudeSerie[serieIndex] = newSourceAltitudeSerie[serieIndex];
@@ -664,8 +663,9 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 			return null;
 		}
 
-		final int[] xDataSerie = _tourChartConfig.isShowTimeOnXAxis ? _targetTour.timeSerie : _targetTour
-				.getDistanceSerie();
+		final float[] xDataSerie = _tourChartConfig.isShowTimeOnXAxis ? //
+				_targetTour.getTimeSerieFloat()
+				: _targetTour.getDistanceSerie();
 
 		return new ChartLayer2ndAltiSerie(layerTourData, xDataSerie, _tourChartConfig, null);
 	}
@@ -695,13 +695,13 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 		 * keep a backup of the altitude data because these data will be changed in this dialog
 		 */
 		_backupSourceTimeSerie = Util.createIntegerCopy(_sourceTour.timeSerie);
-		_backupSourceDistanceSerie = Util.createIntegerCopy(_sourceTour.distanceSerie);
-		_backupSourceAltitudeSerie = Util.createIntegerCopy(_sourceTour.altitudeSerie);
+		_backupSourceDistanceSerie = Util.createFloatCopy(_sourceTour.distanceSerie);
+		_backupSourceAltitudeSerie = Util.createFloatCopy(_sourceTour.altitudeSerie);
 		_backupSourceTourType = _sourceTour.getTourType();
 
-		_backupTargetPulseSerie = Util.createIntegerCopy(_targetTour.pulseSerie);
-		_backupTargetTemperatureSerie = Util.createIntegerCopy(_targetTour.temperatureSerie);
-		_backupTargetCadenceSerie = Util.createIntegerCopy(_targetTour.cadenceSerie);
+		_backupTargetPulseSerie = Util.createFloatCopy(_targetTour.pulseSerie);
+		_backupTargetTemperatureSerie = Util.createFloatCopy(_targetTour.temperatureSerie);
+		_backupTargetCadenceSerie = Util.createFloatCopy(_targetTour.cadenceSerie);
 
 		_backupTargetTimeOffset = _targetTour.getMergedTourTimeOffset();
 		_backupTargetAltitudeOffset = _targetTour.getMergedAltitudeOffset();
@@ -1640,12 +1640,12 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 		 * get original data from the backuped data
 		 */
 		_sourceTour.timeSerie = Util.createIntegerCopy(_backupSourceTimeSerie);
-		_sourceTour.distanceSerie = Util.createIntegerCopy(_backupSourceDistanceSerie);
-		_sourceTour.altitudeSerie = Util.createIntegerCopy(_backupSourceAltitudeSerie);
+		_sourceTour.distanceSerie = Util.createFloatCopy(_backupSourceDistanceSerie);
+		_sourceTour.altitudeSerie = Util.createFloatCopy(_backupSourceAltitudeSerie);
 
-		_targetTour.pulseSerie = Util.createIntegerCopy(_backupTargetPulseSerie);
-		_targetTour.temperatureSerie = Util.createIntegerCopy(_backupTargetTemperatureSerie);
-		_targetTour.cadenceSerie = Util.createIntegerCopy(_backupTargetCadenceSerie);
+		_targetTour.pulseSerie = Util.createFloatCopy(_backupTargetPulseSerie);
+		_targetTour.temperatureSerie = Util.createFloatCopy(_backupTargetTemperatureSerie);
+		_targetTour.cadenceSerie = Util.createFloatCopy(_backupTargetCadenceSerie);
 
 		_targetTour.setMergedTourTimeOffset(_backupTargetTimeOffset);
 		_targetTour.setMergedAltitudeOffset(_backupTargetAltitudeOffset);

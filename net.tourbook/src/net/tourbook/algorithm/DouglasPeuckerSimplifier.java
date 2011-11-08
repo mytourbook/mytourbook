@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.algorithm;
 
 import java.util.ArrayList;
@@ -23,40 +22,40 @@ public class DouglasPeuckerSimplifier {
 	/**
 	 * Approximation tolerance
 	 */
-	private long		tolerance;
+	private long		_tolerance;
 
-	private DPPoint[]		graphPoints;
+	private DPPoint[]	_graphPoints;
 
 	/**
 	 * Contains true for each point in graphPoints which remains for the simplifyed graph
 	 */
-	private boolean[]	usedPoints;
+	private boolean[]	_usedPoints;
 
 	public DouglasPeuckerSimplifier(final int tolerance, final DPPoint[] graphPoints) {
-		this.tolerance = tolerance;
-		this.graphPoints = graphPoints;
+		_tolerance = tolerance;
+		_graphPoints = graphPoints;
 	}
 
 	public Object[] simplify() {
 
 		// set all used points to false
-		usedPoints = new boolean[graphPoints.length];
-		for (int iPoint = 0; iPoint < graphPoints.length; iPoint++) {
-			usedPoints[iPoint] = false;
+		_usedPoints = new boolean[_graphPoints.length];
+		for (int iPoint = 0; iPoint < _graphPoints.length; iPoint++) {
+			_usedPoints[iPoint] = false;
 		}
 
 		// start and end points are used
-		usedPoints[0] = true;
-		usedPoints[usedPoints.length - 1] = true;
+		_usedPoints[0] = true;
+		_usedPoints[_usedPoints.length - 1] = true;
 
 		// simplify between start and end
-		simplifySection(0, graphPoints.length - 1);
+		simplifySection(0, _graphPoints.length - 1);
 
 		// create a point list with all simplified points
 		final ArrayList<DPPoint> simplifiedPoints = new ArrayList<DPPoint>();
-		for (int iPoint = 0; iPoint < graphPoints.length; iPoint++) {
-			if (usedPoints[iPoint]) {
-				final DPPoint graphPoint = graphPoints[iPoint];
+		for (int iPoint = 0; iPoint < _graphPoints.length; iPoint++) {
+			if (_usedPoints[iPoint]) {
+				final DPPoint graphPoint = _graphPoints[iPoint];
 				simplifiedPoints.add(new DPPoint(graphPoint.x, graphPoint.y, iPoint));
 			}
 		}
@@ -76,32 +75,32 @@ public class DouglasPeuckerSimplifier {
 		int maxi = startIndex;
 
 		// tolerance squared of farthest vertex
-		long maxd2 = 0;
+		double maxd2 = 0;
 
 		// tolerance squared
-		final long tol2 = tolerance * tolerance;
+		final double tol2 = _tolerance * _tolerance;
 
 		// Segment S = { v[j], v[k] }; // segment from v[j] to v[k]
-		final DPPoint startPoint = graphPoints[startIndex];
-		final DPPoint endPoint = graphPoints[endIndex];
+		final DPPoint startPoint = _graphPoints[startIndex];
+		final DPPoint endPoint = _graphPoints[endIndex];
 
 		// Vector u = S.P1 - S.P0; // segment direction vector
 		final Vector u = endPoint.diff(startPoint);
 
 		// double cu = dot(u, u); // segment length squared
-		final long cu = u.dot(u);
+		final double cu = u.dot(u);
 
 		// test each vertex v[i] for max distance from S
 		// compute using the Feb 2001 Algorithm's dist_Point_to_Segment()
 		// Note: this works in any dimension (2D, 3D, ...)
 		Vector w;
 		DPPoint Pb; // base of perpendicular from v[i] to S
-		long cw, dv2; // dv2 = distance v[i] to S squared
-		float b;
+		double cw, dv2; // dv2 = distance v[i] to S squared
+		double b;
 
 		for (int i = startIndex + 1; i < endIndex; i++) {
 
-			final DPPoint currentPoint = graphPoints[i];
+			final DPPoint currentPoint = _graphPoints[i];
 
 			// compute distance squared dv2
 
@@ -122,7 +121,7 @@ public class DouglasPeuckerSimplifier {
 
 			} else {
 
-				b = (float) cw / cu;
+				b = cw / cu;
 				// Pb = S.P0 + b * u;
 				Pb = startPoint.add(u.dot(b));
 
@@ -145,7 +144,7 @@ public class DouglasPeuckerSimplifier {
 
 			// split the polyline at the farthest vertex from S
 			// mk[maxi] = 1; // mark v[maxi] for the simplified polyline
-			usedPoints[maxi] = true;
+			_usedPoints[maxi] = true;
 
 			// recursively simplify the two subpolylines at v[maxi]
 

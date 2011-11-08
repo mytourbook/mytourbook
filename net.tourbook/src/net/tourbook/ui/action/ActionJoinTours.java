@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -58,12 +58,11 @@ public class ActionJoinTours extends Action {
 		boolean isLat = false;
 		boolean isPowerFromDevice = false;
 		boolean isSpeedFromDevice = false;
-		int firstTourTemperatureScale = 1;
 
 		for (final TourData tourData : _tourProvider.getSelectedTours()) {
 
 			final int[] tourTimeSerie = tourData.timeSerie;
-			final int[] tourDistanceSerie = tourData.distanceSerie;
+			final float[] tourDistanceSerie = tourData.distanceSerie;
 			final double[] tourLatitudeSerie = tourData.latitudeSerie;
 
 			final boolean isTourTime = (tourTimeSerie != null) && (tourTimeSerie.length > 0);
@@ -79,7 +78,6 @@ public class ActionJoinTours extends Action {
 				isLat = isTourLat;
 				isPowerFromDevice = tourData.isPowerSerieFromDevice();
 				isSpeedFromDevice = tourData.isSpeedSerieFromDevice();
-				firstTourTemperatureScale = tourData.getTemperatureScale();
 
 			} else {
 
@@ -116,11 +114,6 @@ public class ActionJoinTours extends Action {
 				// check speed
 				if (isSpeedFromDevice != tourData.isSpeedSerieFromDevice()) {
 					return Messages.Dialog_JoinTours_InvalidData_Speed;
-				}
-
-				// check temperature scale
-				if (firstTourTemperatureScale != tourData.getTemperatureScale()) {
-					return Messages.Dialog_JoinTours_InvalidData_Temperature;
 				}
 			}
 

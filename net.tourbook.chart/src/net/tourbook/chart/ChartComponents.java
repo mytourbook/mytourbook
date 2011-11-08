@@ -469,6 +469,9 @@ public class ChartComponents extends Composite {
 				graphValue = Util.roundFloatToUnit(graphValue, graphUnit, false);
 			}
 
+//			System.out.println(graphMinVisibleValue + "\t" + graphMaxVisibleValue + "\t" + loopCounter + "\t");
+//			// TODO remove SYSTEM.OUT.PRINTLN
+
 			break;
 		}
 
@@ -604,8 +607,10 @@ public class ChartComponents extends Composite {
 		}
 		final long adjustedScaledMinValue = (long) ((scaledMinValue - adjustMinValue) / scaledUnit) * scaledUnit;
 
-		// ensure that min value is not at the bottom of the graph
-		if (scaledMinValue == adjustedScaledMinValue) {
+		/*
+		 * ensure that min value is not at the bottom of the graph, except values which start at 0
+		 */
+		if (scaledMinValue == adjustedScaledMinValue && scaledMinValue != 0) {
 			scaledMinValue = adjustedScaledMinValue - scaledUnit;
 		} else {
 			scaledMinValue = adjustedScaledMinValue;

@@ -97,7 +97,10 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	private int						distance				= -1;
 
 	/**
-	 * Distance in meters in the metric system or <code>-1</code> when the distance is not available
+	 * Distance in meters in the metric system or <code>-1</code> when the distance is not
+	 * available.
+	 * <p>
+	 * 20 == db version 20
 	 */
 	@XmlElement
 	private float					distance20				= -1;

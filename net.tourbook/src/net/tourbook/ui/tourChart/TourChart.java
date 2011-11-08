@@ -523,7 +523,7 @@ public class TourChart extends Chart {
 						ITourbookPreferences.GRAPH_GRADIENT_MIN_IS_ENABLED,
 						ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE,
 						TourManager.GRAPH_GRADIENT,
-						TourManager.GRADIENT_DIVISOR);
+						0);
 
 				if (isChartModified) {
 					updateTourChart(keepMinMax);

@@ -31,9 +31,33 @@ import com.garmin.fit.MesgBroadcaster;
 public class FitActivityReader extends TourbookDevice {
 
 	@Override
-	public String getDeviceModeName(int modeId) {
+	public String buildFileNameFromRawData(final String rawDataFileName) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public boolean checkStartSequence(final int byteIndex, final int newByte) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public String getDeviceModeName(final int modeId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SerialParameters getPortParameters(final String portName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int getStartSequenceSize() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 	@Override
@@ -43,38 +67,45 @@ public class FitActivityReader extends TourbookDevice {
 	}
 
 	@Override
-	public boolean processDeviceData(String fileName, DeviceData deviceData, HashMap<Long, TourData> tourDataMap) {
+	public boolean processDeviceData(	final String importFilePath,
+										final DeviceData deviceData,
+										final HashMap<Long, TourData> alreadyImportedTours,
+										final HashMap<Long, TourData> newlyImportedTours) {
+
 		boolean returnValue = false;
 
 		FileInputStream fis = null;
 
 		try {
-			fis = new FileInputStream(fileName);
+			fis = new FileInputStream(importFilePath);
 
-			Decode decode = new Decode();
-			MesgBroadcaster broadcaster = new MesgBroadcaster(decode);
+			final Decode decode = new Decode();
+			final MesgBroadcaster broadcaster = new MesgBroadcaster(decode);
 
-			FitActivityContext context = new FitActivityContext(fileName, tourDataMap);
+			final FitActivityContext context = new FitActivityContext(
+					importFilePath,
+					alreadyImportedTours,
+					newlyImportedTours);
 
-			FileIdMesgListenerImpl fileIdMesgListener = new FileIdMesgListenerImpl(context);
+			final FileIdMesgListenerImpl fileIdMesgListener = new FileIdMesgListenerImpl(context);
 			broadcaster.addListener(fileIdMesgListener);
 
-			FileCreatorMesgListenerImpl fileCreatorMesgListener = new FileCreatorMesgListenerImpl(context);
+			final FileCreatorMesgListenerImpl fileCreatorMesgListener = new FileCreatorMesgListenerImpl(context);
 			broadcaster.addListener(fileCreatorMesgListener);
 
-			DeviceInfoMesgListenerImpl deviceInfoMesgListener = new DeviceInfoMesgListenerImpl(context);
+			final DeviceInfoMesgListenerImpl deviceInfoMesgListener = new DeviceInfoMesgListenerImpl(context);
 			broadcaster.addListener(deviceInfoMesgListener);
 
-			ActivityMesgListenerImpl activityMesgListener = new ActivityMesgListenerImpl(context);
+			final ActivityMesgListenerImpl activityMesgListener = new ActivityMesgListenerImpl(context);
 			broadcaster.addListener(activityMesgListener);
 
-			SessionMesgListenerImpl sessionMesgListener = new SessionMesgListenerImpl(context);
+			final SessionMesgListenerImpl sessionMesgListener = new SessionMesgListenerImpl(context);
 			broadcaster.addListener(sessionMesgListener);
 
-			LapMesgListenerImpl lapMesgListener = new LapMesgListenerImpl(context);
+			final LapMesgListenerImpl lapMesgListener = new LapMesgListenerImpl(context);
 			broadcaster.addListener(lapMesgListener);
 
-			RecordMesgListenerImpl recordMesgListener = new RecordMesgListenerImpl(context);
+			final RecordMesgListenerImpl recordMesgListener = new RecordMesgListenerImpl(context);
 			broadcaster.addListener(recordMesgListener);
 
 			broadcaster.run(fis);
@@ -82,8 +113,8 @@ public class FitActivityReader extends TourbookDevice {
 			context.processData();
 
 			returnValue = true;
-		} catch (FileNotFoundException e) {
-			StatusUtil.log("Could not read data file '" + fileName + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
+		} catch (final FileNotFoundException e) {
+			StatusUtil.log("Could not read data file '" + importFilePath + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
 		} finally {
 			IOUtils.closeQuietly(fis);
 		}
@@ -92,46 +123,22 @@ public class FitActivityReader extends TourbookDevice {
 	}
 
 	@Override
-	public boolean validateRawData(String fileName) {
+	public boolean validateRawData(final String fileName) {
 		boolean returnValue = false;
 		FileInputStream fis = null;
 
 		try {
 			fis = new FileInputStream(fileName);
 			returnValue = Decode.checkIntegrity(fis);
-		} catch (FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			StatusUtil.log("Could not read data file '" + fileName + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
-		} catch (FitRuntimeException e) {
+		} catch (final FitRuntimeException e) {
 			StatusUtil.log("Invalid data file '" + fileName + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
 		} finally {
 			IOUtils.closeQuietly(fis);
 		}
 
 		return returnValue;
-	}
-
-	@Override
-	public String buildFileNameFromRawData(String rawDataFileName) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public boolean checkStartSequence(int byteIndex, int newByte) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public SerialParameters getPortParameters(String portName) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int getStartSequenceSize() {
-		// TODO Auto-generated method stub
-		return 0;
 	}
 
 }

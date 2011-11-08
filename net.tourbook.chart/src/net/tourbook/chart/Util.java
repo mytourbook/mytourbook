@@ -26,15 +26,17 @@ import org.eclipse.swt.widgets.Display;
 
 public class Util {
 
-	public static final String			EMPTY_STRING	= "";								//$NON-NLS-1$
-	private static final String			SYMBOL_DASH		= "-";								//$NON-NLS-1$
-	public static final String			DASH_WITH_SPACE	= " - ";							//$NON-NLS-1$
+	public static final String			EMPTY_STRING		= "";									//$NON-NLS-1$
+	private static final String			SYMBOL_DASH			= "-";									//$NON-NLS-1$
+	public static final String			DASH_WITH_SPACE		= " - ";								//$NON-NLS-1$
 
-	private static final String			FORMAT_0F		= "0f";							//$NON-NLS-1$
-	private static final String			FORMAT_MM_SS	= "%d:%02d";						//$NON-NLS-1$
+	private static final String			FORMAT_0F			= "0f";								//$NON-NLS-1$
+	private static final String			FORMAT_MM_SS		= "%d:%02d";							//$NON-NLS-1$
+	private static final String			FORMAT_HH_MM		= "%d:%02d";							//$NON-NLS-1$
+	private static final String			FORMAT_HH_MM_SS		= "%d:%02d:%02d";						//$NON-NLS-1$
 
-	private final static NumberFormat	_nf0			= NumberFormat.getNumberInstance();
-	private final static NumberFormat	_nf1			= NumberFormat.getNumberInstance();
+	private final static NumberFormat	_nf0				= NumberFormat.getNumberInstance();
+	private final static NumberFormat	_nf1				= NumberFormat.getNumberInstance();
 	{
 		_nf0.setMinimumFractionDigits(0);
 		_nf1.setMinimumFractionDigits(1);
@@ -112,6 +114,37 @@ public class Util {
 		return null;
 	}
 
+	public static String format_hh_mm(final long time) {
+
+		_sbFormatter.setLength(0);
+
+		if (time < 0) {
+			_sbFormatter.append(SYMBOL_DASH);
+		}
+
+		final long timeAbsolute = time < 0 ? 0 - time : time;
+
+		return _formatter.format(FORMAT_HH_MM, //
+				(timeAbsolute / 3600),
+				(timeAbsolute % 3600) / 60).toString();
+	}
+
+	public static String format_hh_mm_ss(final long time) {
+
+		_sbFormatter.setLength(0);
+
+		if (time < 0) {
+			_sbFormatter.append(SYMBOL_DASH);
+		}
+
+		final long timeAbsolute = time < 0 ? 0 - time : time;
+
+		return _formatter.format(FORMAT_HH_MM_SS, //
+				(timeAbsolute / 3600),
+				(timeAbsolute % 3600) / 60,
+				(timeAbsolute % 3600) % 60).toString();
+	}
+
 	public static String format_mm_ss(final long time) {
 
 		_sbFormatter.setLength(0);
@@ -120,9 +153,11 @@ public class Util {
 			_sbFormatter.append(SYMBOL_DASH);
 		}
 
-		final long timeAbs = time < 0 ? 0 - time : time;
+		final long timeAbsolute = time < 0 ? 0 - time : time;
 
-		return _formatter.format(FORMAT_MM_SS, (timeAbs / 60), (timeAbs % 60)).toString();
+		return _formatter.format(FORMAT_MM_SS, //
+				(timeAbsolute / 60),
+				(timeAbsolute % 60)).toString();
 	}
 
 	/**
@@ -171,10 +206,8 @@ public class Util {
 		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE:
 		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H:
 
-			valueText = new Formatter().format(
-					Messages.Format_time_hhmm,
-					(long) (value / 3600),
-					(long) ((value % 3600) / 60)).toString();
+			valueText = format_hh_mm((long) value);
+
 			break;
 
 		case ChartDataSerie.AXIS_UNIT_MINUTE_SECOND:
@@ -198,16 +231,9 @@ public class Util {
 
 				// show seconds only when they are available
 
-				valueText = new Formatter().format(
-						Messages.Format_time_hhmmss,
-						(long) (value / 3600),
-						(long) ((value % 3600) / 60),
-						(long) ((value % 3600) % 60)).toString();
+				valueText = format_hh_mm_ss((long) value);
 			} else {
-				valueText = new Formatter().format(
-						Messages.Format_time_hhmm,
-						(long) (value / 3600),
-						(long) ((value % 3600) / 60)).toString();
+				valueText = format_hh_mm((long) value);
 			}
 			break;
 

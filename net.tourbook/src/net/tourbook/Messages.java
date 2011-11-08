@@ -149,11 +149,11 @@ public class Messages extends NLS {
 
 	public static String		Action_TourType_ModifyTourTypeFilter;
 
-	public static String	Adjust_Altitude_Checkbox_SRTM_SelectWholeTour;
+	public static String		Adjust_Altitude_Checkbox_SRTM_SelectWholeTour;
 
-	public static String	Adjust_Altitude_Checkbox_SRTM_SelectWholeTour_Tooltip;
+	public static String		Adjust_Altitude_Checkbox_SRTM_SelectWholeTour_Tooltip;
 
-	public static String	Adjust_Altitude_Checkbox_SRTM_SyncStartEnd;
+	public static String		Adjust_Altitude_Checkbox_SRTM_SyncStartEnd;
 
 	public static String		Adjust_Altitude_CreateDummyAltitudeData_Message;
 	public static String		Adjust_Altitude_CreateDummyAltitudeData_Title;
@@ -293,7 +293,7 @@ public class Messages extends NLS {
 
 	public static String		App_Title;
 
-	public static String	App_ToggleState_DoNotShowAgain;
+	public static String		App_ToggleState_DoNotShowAgain;
 
 	public static String		App_Tour_type_item_all_types;
 	public static String		App_Tour_type_item_not_defined;
@@ -686,28 +686,22 @@ public class Messages extends NLS {
 	public static String		import_data_updateDataFromDatabase_subTask;
 	public static String		import_data_updateDataFromDatabase_task;
 
-	public static String	Import_Data_Action_ReimportAltitudeValues;
-
-	public static String	Import_Data_Action_ReimportTour;
-
+	public static String		Import_Data_Action_ReimportAltitudeValues;
+	public static String		Import_Data_Action_ReimportTour;
 	public static String		Import_Data_Action_RemoveTour;
 	public static String		Import_Data_Dialog_ConfirmReimport_Message;
-
-	public static String	Import_Data_Dialog_ConfirmReimportAltitudeValues_Message;
+	public static String		Import_Data_Dialog_ConfirmReimportAltitudeValues_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportTimeSlices_Message;
+	public static String		Import_Data_Dialog_Directory_Message;
+	public static String		Import_Data_Dialog_GetAlternativePath_Message;
+	public static String		Import_Data_Dialog_GetReimportedFilePath_Message;
+	public static String		Import_Data_Dialog_Reimport_Title;
+	public static String	Import_Data_Dialog_ReimportIsInvalid_CommonError_Message;
 
-	public static String	Import_Data_Dialog_Directory_Message;
-
-	public static String	Import_Data_Dialog_GetAlternativePath_Message;
-
-	public static String	Import_Data_Dialog_GetReimportedFilePath_Message;
-	public static String	Import_Data_Dialog_ReimportIsInvalid_DifferentTourId_Message;
-
+	public static String		Import_Data_Dialog_ReimportIsInvalid_DifferentTourId_Message;
 	public static String		Import_Data_Dialog_ReimportIsInvalid_WrongSliceNumbers_Message;
-	public static String	Import_Data_Error_CreatingFileName_Message;
-
-	public static String	Import_Data_Error_CreatingFileName_Title;
-
+	public static String		Import_Data_Error_CreatingFileName_Message;
+	public static String		Import_Data_Error_CreatingFileName_Title;
 	public static String		Import_Data_Label_Hint;
 	public static String		Import_Data_Label_Info;
 	public static String		Import_Data_Link_Import;
@@ -750,10 +744,8 @@ public class Messages extends NLS {
 
 	public static String		Pref_App_Label_TourEditorIsModified;
 
-	public static String	Pref_Appearance_Button_ResetAllToggleDialogs;
-
-	public static String	Pref_Appearance_Button_ResetAllToggleDialogs_Tooltip;
-
+	public static String		Pref_Appearance_Button_ResetAllToggleDialogs;
+	public static String		Pref_Appearance_Button_ResetAllToggleDialogs_Tooltip;
 	public static String		Pref_Appearance_Check_AutoOpenTagging;
 	public static String		Pref_Appearance_Check_TaggingAnimation;
 	public static String		Pref_Appearance_Group_Tagging;
@@ -1058,15 +1050,12 @@ public class Messages extends NLS {
 	public static String		Tour_Database_Dialog_ValidateFields_Title;
 	public static String		Tour_Database_load_all_tours;
 	public static String		Tour_Database_PostUpdate011_SetTourCreateTime;
-
-	public static String	Tour_Database_PostUpdate020_ConvertIntToFloat;
-
+	public static String		Tour_Database_PostUpdate020_ConvertIntToFloat;
 	public static String		Tour_Database_TourSaveError;
 	public static String		Tour_Database_update_tour;
 	public static String		Tour_Database_Update;
 	public static String		Tour_Database_Update_Subtask;
-
-	public static String	Tour_Database_Update_Subtask_LongOperation;
+	public static String		Tour_Database_Update_Subtask_LongOperation;
 	public static String		Tour_Database_Update_TourWeek;
 	public static String		Tour_Database_Update_TourWeek_Info;
 	public static String		Tour_Database_UpdateDone;

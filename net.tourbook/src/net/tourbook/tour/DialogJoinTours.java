@@ -900,7 +900,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 		for (final TourData tourData : _selectedTours) {
 
 			final int[] tourTimeSerie = tourData.timeSerie;
-			final int[] tourDistanceSerie = tourData.distanceSerie;
+			final float[] tourDistanceSerie = tourData.distanceSerie;
 			final double[] tourLatitudeSerie = tourData.latitudeSerie;
 
 			final boolean isTourTime = (tourTimeSerie != null) && (tourTimeSerie.length > 0);
@@ -927,15 +927,15 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 //		boolean isJoinTemperature = false;
 		boolean isJoinTime = false;
 
-		final int[] joinedAltitudeSerie = new int[joinedSliceCounter];
-		final int[] joinedCadenceSerie = new int[joinedSliceCounter];
-		final float[] joinedDistanceSerie = new int[joinedSliceCounter];
+		final float[] joinedAltitudeSerie = new float[joinedSliceCounter];
+		final float[] joinedCadenceSerie = new float[joinedSliceCounter];
+		final float[] joinedDistanceSerie = new float[joinedSliceCounter];
 		final double[] joinedLatitudeSerie = new double[joinedSliceCounter];
 		final double[] joinedLongitudeSerie = new double[joinedSliceCounter];
-		final int[] joinedPowerSerie = new int[joinedSliceCounter];
-		final int[] joinedPulseSerie = new int[joinedSliceCounter];
-		final int[] joinedSpeedSerie = new int[joinedSliceCounter];
-		final int[] joinedTemperatureSerie = new int[joinedSliceCounter];
+		final float[] joinedPowerSerie = new float[joinedSliceCounter];
+		final float[] joinedPulseSerie = new float[joinedSliceCounter];
+		final float[] joinedSpeedSerie = new float[joinedSliceCounter];
+		final float[] joinedTemperatureSerie = new float[joinedSliceCounter];
 		final int[] joinedTimeSerie = new int[joinedSliceCounter];
 
 		final StringBuilder joinedDescription = new StringBuilder();
@@ -956,7 +956,6 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 		int joinedWeatherWindDir = 0;
 		int joinedWeatherWindSpeed = 0;
 		int joinedRestPulse = 0;
-		int joinedTemperatureScale = 1;
 
 		int relTourTime = 0;
 		long relTourTimeOffset = 0;
@@ -971,13 +970,13 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 		 */
 		for (final TourData tourTourData : _selectedTours) {
 
-			final int[] tourAltitudeSerie = tourTourData.altitudeSerie;
-			final int[] tourCadenceSerie = tourTourData.cadenceSerie;
-			final int[] tourDistanceSerie = tourTourData.distanceSerie;
+			final float[] tourAltitudeSerie = tourTourData.altitudeSerie;
+			final float[] tourCadenceSerie = tourTourData.cadenceSerie;
+			final float[] tourDistanceSerie = tourTourData.distanceSerie;
 			final double[] tourLatitudeSerie = tourTourData.latitudeSerie;
 			final double[] tourLongitudeSerie = tourTourData.longitudeSerie;
-			final int[] tourPulseSerie = tourTourData.pulseSerie;
-			final int[] tourTemperatureSerie = tourTourData.temperatureSerie;
+			final float[] tourPulseSerie = tourTourData.pulseSerie;
+			final float[] tourTemperatureSerie = tourTourData.temperatureSerie;
 			final int[] tourTimeSerie = tourTourData.timeSerie;
 
 			final boolean isTourAltitude = (tourAltitudeSerie != null) && (tourAltitudeSerie.length > 0);
@@ -992,8 +991,8 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 			/*
 			 * get speed/power data when it's from the device
 			 */
-			int[] tourPowerSerie = null;
-			int[] tourSpeedSerie = null;
+			float[] tourPowerSerie = null;
+			float[] tourSpeedSerie = null;
 			final boolean isTourPower = tourTourData.isPowerSerieFromDevice();
 			final boolean isTourSpeed = tourTourData.isSpeedSerieFromDevice();
 			if (isTourPower) {
@@ -1074,7 +1073,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 				tourSliceCounter = tourLatitudeSerie.length;
 			}
 
-			int relTourDistance = 0;
+			float relTourDistance = 0;
 
 			/*
 			 * copy data series
@@ -1124,7 +1123,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 					joinedTemperatureSerie[joinedSerieIndex] = tourTemperatureSerie[tourSerieIndex];
 				} else {
 					// set temperature to temporarily value
-					joinedTemperatureSerie[joinedSerieIndex] = Integer.MIN_VALUE;
+					joinedTemperatureSerie[joinedSerieIndex] = Float.MIN_VALUE;
 				}
 
 				if (isTourPower) {
@@ -1271,7 +1270,6 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 				joinedWeatherWindSpeed = tourTourData.getWeatherWindSpeed();
 
 				joinedRestPulse = tourTourData.getRestPulse();
-				joinedTemperatureScale = tourTourData.getTemperatureScale();
 
 			} else {
 				if (isJoinedDistanceFromSensor && tourTourData.isDistanceSensorPresent()) {
@@ -1370,7 +1368,6 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 		}
 
 		_joinedTourData.temperatureSerie = joinedTemperatureSerie;
-		_joinedTourData.setTemperatureScale(joinedTemperatureScale);
 
 		if (isJoinTime) {
 			_joinedTourData.timeSerie = joinedTimeSerie;
