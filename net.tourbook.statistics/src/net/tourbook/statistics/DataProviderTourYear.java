@@ -1,19 +1,18 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.statistics;
 
 import java.sql.Connection;
@@ -31,18 +30,18 @@ import net.tourbook.ui.UI;
 
 public class DataProviderTourYear extends DataProvider {
 
-	private static DataProviderTourYear	fInstance;
+	private static DataProviderTourYear	_instance;
 
-	private TourDataYear				fTourDataYear;
-
-	public static DataProviderTourYear getInstance() {
-		if (fInstance == null) {
-			fInstance = new DataProviderTourYear();
-		}
-		return fInstance;
-	}
+	private TourDataYear				_tourDataYear;
 
 	private DataProviderTourYear() {}
+
+	public static DataProviderTourYear getInstance() {
+		if (_instance == null) {
+			_instance = new DataProviderTourYear();
+		}
+		return _instance;
+	}
 
 	TourDataYear getYearData(	final TourPerson person,
 								final TourTypeFilter tourTypeFilter,
@@ -59,7 +58,7 @@ public class DataProviderTourYear extends DataProvider {
 				&& numberOfYears == _numberOfYears
 				&& refreshData == false) {
 
-			return fTourDataYear;
+			return _tourDataYear;
 		}
 
 		_activePerson = person;
@@ -71,7 +70,7 @@ public class DataProviderTourYear extends DataProvider {
 		final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
 		final TourType[] allTourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
 
-		fTourDataYear = new TourDataYear();
+		_tourDataYear = new TourDataYear();
 		final SQLFilter sqlFilter = new SQLFilter();
 
 		final String sqlString = //
@@ -103,8 +102,8 @@ public class DataProviderTourYear extends DataProvider {
 
 		try {
 
-			final int[][] dbDistance = new int[serieLength][valueLength];
-			final int[][] dbAltitude = new int[serieLength][valueLength];
+			final float[][] dbDistance = new float[serieLength][valueLength];
+			final float[][] dbAltitude = new float[serieLength][valueLength];
 			final int[][] dbTime = new int[serieLength][valueLength];
 
 			final int[][] dbRecordingTime = new int[serieLength][valueLength];
@@ -165,25 +164,25 @@ public class DataProviderTourYear extends DataProvider {
 				years[yearIndex++] = currentYear;
 			}
 
-			fTourDataYear.fTypeIds = dbTourTypeIds;
-			fTourDataYear.years = years;
+			_tourDataYear.typeIds = dbTourTypeIds;
+			_tourDataYear.years = years;
 
-			fTourDataYear.fDistanceLow = new int[serieLength][valueLength];
-			fTourDataYear.fAltitudeLow = new int[serieLength][valueLength];
-			fTourDataYear.fTimeLow = new int[serieLength][valueLength];
+			_tourDataYear.distanceLow = new float[serieLength][valueLength];
+			_tourDataYear.altitudeLow = new float[serieLength][valueLength];
+			_tourDataYear.setTimeLow(new int[serieLength][valueLength]);
 
-			fTourDataYear.fDistanceHigh = dbDistance;
-			fTourDataYear.fAltitudeHigh = dbAltitude;
-			fTourDataYear.fTimeHigh = dbTime;
+			_tourDataYear.distanceHigh = dbDistance;
+			_tourDataYear.altitudeHigh = dbAltitude;
+			_tourDataYear.setTimeHigh(dbTime);
 
-			fTourDataYear.fRecordingTime = dbRecordingTime;
-			fTourDataYear.fDrivingTime = dbDrivingTime;
-			fTourDataYear.fBreakTime = dbBreakTime;
+			_tourDataYear.recordingTime = dbRecordingTime;
+			_tourDataYear.drivingTime = dbDrivingTime;
+			_tourDataYear.breakTime = dbBreakTime;
 
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
 		}
 
-		return fTourDataYear;
+		return _tourDataYear;
 	}
 }

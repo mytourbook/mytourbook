@@ -94,6 +94,11 @@ public class ChartDataYSerie extends ChartDataSerie {
 	private final int				_chartType;
 
 	/**
+	 * 2nd y-data serie is currently used to display the slider label and the pace y-units
+	 */
+//	private int[]					fYData2ndSerie;
+
+	/**
 	 * When this value is > 0 a line chart will not draw a line to the next value point when the
 	 * difference in the x-data values is greater than this value.
 	 * <p>
@@ -121,11 +126,6 @@ public class ChartDataYSerie extends ChartDataSerie {
 		_chartType = chartType;
 		setMinMaxValues(lowValueSeries, highValueSeries);
 	}
-
-	/**
-	 * 2nd y-data serie is currently used to display the slider label and the pace y-units
-	 */
-//	private int[]					fYData2ndSerie;
 
 	public ChartDataYSerie(	final int chartType,
 							final int chartLayout,

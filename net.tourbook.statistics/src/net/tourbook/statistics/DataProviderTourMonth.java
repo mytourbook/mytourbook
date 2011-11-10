@@ -101,10 +101,10 @@ public class DataProviderTourMonth extends DataProvider {
 
 		try {
 
-			final int[][] dbDistance = new int[serieLength][valueLength];
-			final int[][] dbAltitude = new int[serieLength][valueLength];
-			final int[][] dbDurationTime = new int[serieLength][valueLength];
+			final float[][] dbDistance = new float[serieLength][valueLength];
+			final float[][] dbAltitude = new float[serieLength][valueLength];
 
+			final int[][] dbDurationTime = new int[serieLength][valueLength];
 			final int[][] dbRecordingTime = new int[serieLength][valueLength];
 			final int[][] dbDrivingTime = new int[serieLength][valueLength];
 			final int[][] dbBreakTime = new int[serieLength][valueLength];
@@ -157,19 +157,19 @@ public class DataProviderTourMonth extends DataProvider {
 
 			conn.close();
 
-			_tourMonthData.fTypeIds = dbTypeIds;
+			_tourMonthData.typeIds = dbTypeIds;
 
-			_tourMonthData.fDistanceLow = new int[serieLength][valueLength];
-			_tourMonthData.fAltitudeLow = new int[serieLength][valueLength];
-			_tourMonthData.fTimeLow = new int[serieLength][valueLength];
+			_tourMonthData.distanceLow = new float[serieLength][valueLength];
+			_tourMonthData.altitudeLow = new float[serieLength][valueLength];
+			_tourMonthData.setTimeLow(new int[serieLength][valueLength]);
 
-			_tourMonthData.fDistanceHigh = dbDistance;
-			_tourMonthData.fAltitudeHigh = dbAltitude;
-			_tourMonthData.fTimeHigh = dbDurationTime;
+			_tourMonthData.distanceHigh = dbDistance;
+			_tourMonthData.altitudeHigh = dbAltitude;
+			_tourMonthData.setTimeHigh(dbDurationTime);
 
-			_tourMonthData.fRecordingTime = dbRecordingTime;
-			_tourMonthData.fDrivingTime = dbDrivingTime;
-			_tourMonthData.fBreakTime = dbBreakTime;
+			_tourMonthData.recordingTime = dbRecordingTime;
+			_tourMonthData.drivingTime = dbDrivingTime;
+			_tourMonthData.breakTime = dbBreakTime;
 
 		} catch (final SQLException e) {
 			UI.showSQLException(e);

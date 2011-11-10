@@ -85,6 +85,50 @@ public class Util {
 		spinner.setSelection(spinner.getSelection() + newValue);
 	}
 
+	public static float[] convertIntToFloat(final int[] intValues) {
+
+		if (intValues == null) {
+			return null;
+		}
+
+		if (intValues.length == 0) {
+			return new float[0];
+		}
+
+		final float[] floatValues = new float[intValues.length];
+
+		for (int valueIndex = 0; valueIndex < intValues.length; valueIndex++) {
+			floatValues[valueIndex] = intValues[valueIndex];
+		}
+
+		return floatValues;
+	}
+
+	public static float[][] convertIntToFloat(final int[][] intValues) {
+
+		if (intValues == null) {
+			return null;
+		}
+
+		if (intValues.length == 0 || intValues[0].length == 0) {
+			return new float[0][0];
+		}
+
+		final float[][] floatValues = new float[intValues.length][intValues[0].length];
+
+		for (int outerIndex = 0; outerIndex < intValues.length; outerIndex++) {
+
+			final int[] intOuterValues = intValues[outerIndex];
+			final float[] floutOuterValues = floatValues[outerIndex];
+
+			for (int innerIndex = 0; innerIndex < intOuterValues.length; innerIndex++) {
+				floutOuterValues[innerIndex] = intOuterValues[innerIndex];
+			}
+		}
+
+		return floatValues;
+	}
+
 	/**
 	 * To convert the InputStream to String we use the BufferedReader.readLine() method. We iterate
 	 * until the BufferedReader return null which means there's no more data to read. Each line will

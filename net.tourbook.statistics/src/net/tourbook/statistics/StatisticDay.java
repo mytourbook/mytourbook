@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -87,7 +87,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 	private Chart						_chart;
 	private final BarChartMinMaxKeeper	_minMaxKeeper				= new BarChartMinMaxKeeper();
 
-	private TourDayData					_tourDayData;
+	private TourDataDay					_tourDayData;
 
 	private boolean						_isSynchScaleEnabled;
 	private ITourEventListener			_tourPropertyListener;
@@ -149,7 +149,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 	/**
 	 * create segments for the chart
 	 */
-	ChartSegments createChartSegments(final TourDayData tourTimeData) {
+	ChartSegments createChartSegments(final TourDataDay tourTimeData) {
 
 		final int segmentStart[] = new int[_numberOfYears];
 		final int segmentEnd[] = new int[_numberOfYears];
@@ -265,7 +265,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 
 	private ChartToolTipInfo createToolTipData(int valueIndex) {
 
-		final int[] tourDOYValues = _tourDayData.doyValues;
+		final int[] tourDOYValues = _tourDayData.getDoyValues();
 
 		if (valueIndex >= tourDOYValues.length) {
 			valueIndex -= tourDOYValues.length;
@@ -297,13 +297,13 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		final int[] startValue = _tourDayData.tourStartValues;
 		final int[] endValue = _tourDayData.tourEndValues;
 
-		final Integer recordingTime = _tourDayData.tourRecordingTimeValues.get(valueIndex);
-		final Integer drivingTime = _tourDayData.tourDrivingTimeValues.get(valueIndex);
+		final int recordingTime = _tourDayData.recordingTime[valueIndex];
+		final int drivingTime = _tourDayData.drivingTime[valueIndex];
 		final int breakTime = recordingTime - drivingTime;
 
 		final float distance = _tourDayData.tourDistanceValues[valueIndex];
 		final float speed = drivingTime == 0 ? 0 : distance / (drivingTime / 3.6f);
-		final int pace = (int) (distance == 0 ? 0 : (drivingTime * 1000 / distance));
+		final float pace = distance == 0 ? 0 : drivingTime * 1000 / distance;
 
 		final StringBuilder toolTipFormat = new StringBuilder();
 		toolTipFormat.append(Messages.TourTime_Info_DateDay); //			%s - CW %d
@@ -340,6 +340,10 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 			toolTipFormat.append(Messages.tourtime_info_description_text);
 		}
 
+//		System.out.println("\t");
+//		System.out.println(toolTipFormat.toString());
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
 		final String toolTipLabel = new Formatter().format(toolTipFormat.toString(),
 		//
 				beginDate,
@@ -350,7 +354,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 				UI.UNIT_LABEL_DISTANCE,
 				//
 				// altitude
-				_tourDayData.tourAltitudeValues[valueIndex],
+				(int) _tourDayData.tourAltitudeValues[valueIndex],
 				UI.UNIT_LABEL_ALTITUDE,
 				//
 				// start time
@@ -376,8 +380,8 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 				speed,
 				UI.UNIT_LABEL_SPEED,
 				//
-				pace / 60,
-				pace % 60,
+				(int) (pace / 60),
+				(int) (pace % 60),
 				UI.UNIT_LABEL_PACE,
 				//
 				tourTypeName,
@@ -406,7 +410,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 	 */
 	void createXDataDay(final ChartDataModel chartModel) {
 
-		final ChartDataXSerie xData = new ChartDataXSerie(_tourDayData.doyValues);
+		final ChartDataXSerie xData = new ChartDataXSerie(_tourDayData.getDoyValuesFloat());
 		xData.setAxisUnit(ChartDataXSerie.X_AXIS_UNIT_DAY);
 //		xData.setVisibleMaxValue(fCurrentYear);
 		xData.setChartSegments(createChartSegments(_tourDayData));
@@ -467,8 +471,8 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 	void createYDataDuration(final ChartDataModel chartModel) {
 		final ChartDataYSerie yData = new ChartDataYSerie(
 				ChartDataModel.CHART_TYPE_BAR,
-				_tourDayData.timeLow,
-				_tourDayData.timeHigh);
+				_tourDayData.getTimeLowFloat(),
+				_tourDayData.getTimeHighFloat());
 		yData.setYTitle(Messages.LABEL_GRAPH_TIME);
 		yData.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);

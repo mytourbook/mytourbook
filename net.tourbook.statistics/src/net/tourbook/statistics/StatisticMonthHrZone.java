@@ -148,13 +148,13 @@ public class StatisticMonthHrZone extends YearStatistic {
 //		};
 	}
 
-	private int[] createMonthData(final TourDataMonthHrZones monthData) {
+	private float[] createMonthData(final TourDataMonthHrZones monthData) {
 
 		/*
 		 * create segments for each year
 		 */
 		final int monthCounter = monthData.hrZoneValues[0].length;
-		final int allMonths[] = new int[monthCounter];
+		final float allMonths[] = new float[monthCounter];
 
 		// get start/end and title for each segment
 		for (int monthIndex = 0; monthIndex < monthCounter; monthIndex++) {
@@ -213,8 +213,8 @@ public class StatisticMonthHrZone extends YearStatistic {
 		final ChartDataYSerie yData = new ChartDataYSerie(//
 				ChartDataModel.CHART_TYPE_BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
-				hrZones0,
-				hrZoneValues);
+				Util.convertIntToFloat(hrZones0),
+				Util.convertIntToFloat(hrZoneValues));
 
 		yData.setYTitle(Messages.LABEL_GRAPH_TIME);
 		yData.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);

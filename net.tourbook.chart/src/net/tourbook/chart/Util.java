@@ -26,17 +26,17 @@ import org.eclipse.swt.widgets.Display;
 
 public class Util {
 
-	public static final String			EMPTY_STRING		= "";									//$NON-NLS-1$
-	private static final String			SYMBOL_DASH			= "-";									//$NON-NLS-1$
-	public static final String			DASH_WITH_SPACE		= " - ";								//$NON-NLS-1$
+	public static final String			EMPTY_STRING	= "";								//$NON-NLS-1$
+	private static final String			SYMBOL_DASH		= "-";								//$NON-NLS-1$
+	public static final String			DASH_WITH_SPACE	= " - ";							//$NON-NLS-1$
 
-	private static final String			FORMAT_0F			= "0f";								//$NON-NLS-1$
-	private static final String			FORMAT_MM_SS		= "%d:%02d";							//$NON-NLS-1$
-	private static final String			FORMAT_HH_MM		= "%d:%02d";							//$NON-NLS-1$
-	private static final String			FORMAT_HH_MM_SS		= "%d:%02d:%02d";						//$NON-NLS-1$
+	private static final String			FORMAT_0F		= "0f";							//$NON-NLS-1$
+	private static final String			FORMAT_MM_SS	= "%d:%02d";						//$NON-NLS-1$
+	private static final String			FORMAT_HH_MM	= "%d:%02d";						//$NON-NLS-1$
+	private static final String			FORMAT_HH_MM_SS	= "%d:%02d:%02d";					//$NON-NLS-1$
 
-	private final static NumberFormat	_nf0				= NumberFormat.getNumberInstance();
-	private final static NumberFormat	_nf1				= NumberFormat.getNumberInstance();
+	private final static NumberFormat	_nf0			= NumberFormat.getNumberInstance();
+	private final static NumberFormat	_nf1			= NumberFormat.getNumberInstance();
 	{
 		_nf0.setMinimumFractionDigits(0);
 		_nf1.setMinimumFractionDigits(1);
@@ -271,7 +271,8 @@ public class Util {
 
 		unit = unitValue / multiplier;
 
-		unit = unit == 1000 ? 5000 : unit == 500 ? 1000 : unit == 200 ? 1000 : //
+		unit = //
+		unit == 1000 ? 5000 : unit == 500 ? 1000 : unit == 200 ? 1000 : //
 				unit == 100 ? 500 : unit == 50 ? 200 : unit == 20 ? 100 : //
 						unit == 10 ? 50 : unit == 5 ? 20 : unit == 2f ? 10f : //
 								unit == 1 ? 5 : unit == 0.5f ? 2.0f : unit == 0.2f ? 1 : //
@@ -284,27 +285,96 @@ public class Util {
 
 	/**
 	 * @param unitValue
+	 * @param is24HourFormatting
 	 * @return Returns minUnitValue rounded to the number 60/30/20/10/5/2/1
 	 */
-	public static float getMajorTimeValue(final float unitValue) {
+	public static long getMajorTimeValue(final long unitValue, final boolean is24HourFormatting) {
 
-		float unit = unitValue;
+		long unit = unitValue;
 		int multiplier = 1;
 
-		while (unit > 120) {
+//		System.out.println();
+//		System.out.println("getMajorTimeValue");
+//		System.out.println(unit + "\ttime: " + System.currentTimeMillis());
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
+		while (unit > 240) {
 			multiplier *= 60;
 			unit /= 60;
 		}
 
-		unit = unit == 120 ? 600 : //
-				unit == 60 ? 300 : //
-						unit == 30 ? 60 : //
-								unit == 20 ? 60 : //
-										unit == 10 ? 30 : //
-												unit == 5 ? 30 : //
-														unit == 2 ? 10 : 5;
+//		System.out.println(unit + "\t");
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
+		if (is24HourFormatting) {
+
+			if (multiplier >= 3600) {
+
+				unit = //
+						//
+//				unit >= 120 ? 360 : //
+						unit >= 60 ? 360 : //
+//								unit >= 30 ? 60 : //
+										unit >= 15 ? 60 : //
+//												unit >= 12 ? 12 : //
+														12;
+
+			} else {
+
+				unit = //
+						//
+				unit >= 120 ? 720 : //
+//						unit >= 60 ? 360 : //
+								unit >= 30 ? 360 : //
+										unit >= 15 ? 120 : //
+												unit >= 10 ? 60 : //
+														unit >= 5 ? 30 : //
+																unit >= 2 ? 10 : //
+																		5;
+			}
+
+		} else {
+
+			if (multiplier >= 3600) {
+
+				unit = //
+						//
+				unit >= 120 ? 600 : //
+						unit >= 60 ? 300 : //
+//							unit >= 30 ? 60 : //
+//									unit >= 20 ? 60 : //
+								unit >= 10 ? 60 : //
+										unit >= 5 ? 20 : //
+												unit >= 2 ? 10 : //
+														10;
+			} else {
+
+//				unit > 120 ? 120 : //
+//					unit > 60 ? 60 : //
+//							unit > 30 ? 30 : //
+//									unit > 15 ? 15 : //
+//											unit > 10 ? 10 : //
+//													5;
+
+				unit = //
+						//
+				unit >= 120 ? 600 : //
+						unit >= 60 ? 300 : //
+								unit >= 30 ? 120 : //
+										unit >= 15 ? 60 : //
+												unit >= 10 ? 60 : //
+														unit >= 5 ? 20 : //
+																10;
+			}
+		}
+
+//		System.out.println(unit + "\tmultiplier: " + multiplier);
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		unit *= multiplier;
+
+//		System.out.println(unit + "\t");
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		return unit;
 	}
@@ -342,7 +412,7 @@ public class Util {
 
 	/**
 	 * @param unitValue
-	 * @return Returns minUnitValue rounded to the number of 50/20/10/5/2/1
+	 * @return Returns unit value rounded to the number of 50/20/10/5/2/1
 	 */
 	public static float roundDecimalValue(final float unitValue) {
 
@@ -354,12 +424,20 @@ public class Util {
 			unit /= 10;
 		}
 
-		unit = unitValue / multiplier;
+//		unit = unitValue / multiplier;
 
-		unit = unit > 50 ? 50 : unit > 20 ? 20 : //
-				unit > 10 ? 10 : unit > 5 ? 5 : unit > 2f ? 2f : //
-						unit > 1 ? 1 : unit > 0.5f ? 0.5f : unit > 0.2f ? 0.2f : //
-								unit > 0.1f ? 0.1f : unit > 0.05f ? 0.05f : unit > 0.02f ? 0.02f : 0.01f;
+		unit = unit > 50 ? 50 : //
+				unit > 20 ? 20 : //
+						unit > 10 ? 10 : //
+								unit > 5 ? 5 : //
+										unit > 2f ? 2f : //
+												unit > 1 ? 1 : //
+														unit > 0.5f ? 0.5f : //
+																unit > 0.2f ? 0.2f : //
+																		unit > 0.1f ? 0.1f : //
+																				unit > 0.05f ? 0.05f : //
+																						unit > 0.02f ? 0.02f : //
+																								0.01f;
 
 		unit *= multiplier;
 
@@ -457,10 +535,135 @@ public class Util {
 	}
 
 	/**
-	 * @param unitValue
+	 * @param defaultUnitValue
+	 * @param is24HourFormatting
 	 * @return Returns minUnitValue rounded to the number 60/30/20/10/5/2/1
 	 */
-	public static float roundTimeValue(final float unitValue) {
+	public static float roundTimeValue(final float defaultUnitValue, final boolean is24HourFormatting) {
+
+		float unit = defaultUnitValue;
+		int multiplier = 1;
+
+//		System.out.println();
+//		System.out.println("roundTimeValue");
+//		System.out.println(unit);
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
+		if (is24HourFormatting) {
+
+			while (unit > 120) {
+				multiplier *= 60;
+				unit /= 60;
+			}
+
+//			System.out.println();
+//			System.out.println();
+//			System.out.println(unit + "\t" + (System.nanoTime() / 1000000));
+//			 TODO remove SYSTEM.OUT.PRINTLN
+
+//			unit = unit > 120 ? 120 : //
+//					unit > 60 ? 60 : //
+//							unit > 30 ? 30 : //
+//									unit > 20 ? 20 : //
+//											unit > 10 ? 10 : //
+//													unit > 5 ? 5 : //
+//															unit > 2 ? 2 : 1;
+
+			if (multiplier >= 3600) {
+
+				unit = //
+						//
+				unit >= 120 ? 120 : //
+						unit >= 60 ? 60 : //
+								unit >= 30 ? 30 : //
+										unit >= 15 ? 15 : //
+												unit >= 12 ? 12 : //
+														unit > 6 ? 6 : //
+																unit > 5 ? 5 : //
+																		unit > 2 ? 2 : //
+																				1;
+
+			} else {
+
+				unit = //
+						//
+				unit >= 120 ? 120 : //
+						unit >= 60 ? 60 : //
+								unit >= 30 ? 30 : //
+										unit >= 15 ? 15 : //
+												unit >= 10 ? 10 : //
+														5;
+			}
+
+		} else {
+
+			if (unit > 3600) {
+
+				// unit > 1 hour (>3600 sec)
+
+				while (unit > 3600) {
+					multiplier *= 60;
+					unit /= 60;
+				}
+
+				if (multiplier >= 3600) {
+
+					// multiplier >= 1 hour
+
+					unit = //
+							//
+					unit > 1000 ? 1000 : //
+							unit > 500 ? 500 : //
+									unit > 100 ? 100 : //
+											unit > 50 ? 50 : //
+													10;
+				} else {
+
+					// multiplier < 1 hour (3600 sec)
+
+					unit = //
+							//
+					unit > 3000 ? 3000 : //
+							unit > 2400 ? 2400 : //
+									unit > 600 ? 600 : //
+											unit > 300 ? 300 : //
+													60;
+				}
+
+			} else {
+
+				// unit < 1 hour (< 3600 sec)
+
+				while (unit > 120) {
+					multiplier *= 60;
+					unit /= 60;
+				}
+
+				unit = //
+						//
+				unit > 120 ? 120 : //
+						unit > 60 ? 60 : //
+								unit > 30 ? 30 : //
+										unit > 15 ? 15 : //
+												unit > 10 ? 10 : //
+														unit > 5 ? 5 : //
+																unit > 2 ? 2 : //
+																		1;
+			}
+		}
+
+//		System.out.println(unit + "\tmultiplier: " + multiplier);
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
+		unit *= multiplier;
+
+//		System.out.println(unit + "\t");
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
+		return (long) unit;
+	}
+
+	public static float roundTimeValue__OLD(final float unitValue, final boolean is24HourFormatting) {
 
 		float unit = unitValue;
 		int multiplier = 1;
@@ -476,7 +679,8 @@ public class Util {
 								unit > 20 ? 20 : //
 										unit > 10 ? 10 : //
 												unit > 5 ? 5 : //
-														unit > 2 ? 2 : 1;
+														unit > 2 ? 2 : //
+																1;
 		unit *= multiplier;
 
 		return unit;

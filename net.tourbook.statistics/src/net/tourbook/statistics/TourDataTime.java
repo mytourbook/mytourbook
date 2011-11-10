@@ -15,8 +15,43 @@
  *******************************************************************************/
 package net.tourbook.statistics;
 
-public class TourDataYear extends TourDataCommon {
+import java.util.ArrayList;
+import java.util.HashMap;
 
-	int[]	years;
+public class TourDataTime {
 
+	long[]							tourIds;
+	long[]							typeIds;
+
+	int[]							typeColorIndex;
+
+	/**
+	 * number for all days in each year
+	 */
+	int[]							yearDays;
+
+	int[]							years;
+	int								allDaysInAllYears;
+
+	int[]							tourYearValues;
+	int[]							tourMonthValues;
+	int[]							tourDOYValues;
+	int[]							weekValues;
+
+	int[]							tourTimeStartValues;
+	int[]							tourTimeEndValues;
+
+	int[]							tourAltitudeValues;
+	int[]							tourDistanceValues;
+
+	ArrayList<Integer>				tourRecordingTimeValues;
+	ArrayList<Integer>				tourDrivingTimeValues;
+
+	ArrayList<String>				tourTitle;
+	ArrayList<String>				tourDescription;
+
+	/**
+	 * Contains the tags for the tour, key is the tour ID
+	 */
+	HashMap<Long, ArrayList<Long>>	tagIds;
 }

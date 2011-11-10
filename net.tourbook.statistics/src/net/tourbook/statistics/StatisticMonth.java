@@ -79,7 +79,7 @@ public abstract class StatisticMonth extends YearStatistic {
 		/*
 		 * create segments for each year
 		 */
-		final int monthCounter = tourMonthData.fAltitudeHigh[0].length;
+		final int monthCounter = tourMonthData.altitudeHigh[0].length;
 		final int segmentStart[] = new int[_numberOfYears];
 		final int segmentEnd[] = new int[_numberOfYears];
 		final String[] segmentTitle = new String[_numberOfYears];
@@ -126,13 +126,13 @@ public abstract class StatisticMonth extends YearStatistic {
 		_chart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
 	}
 
-	int[] createMonthData(final TourDataMonth tourMonthData) {
+	float[] createMonthData(final TourDataMonth tourMonthData) {
 
 		/*
 		 * create segments for each year
 		 */
-		final int monthCounter = tourMonthData.fAltitudeHigh[0].length;
-		final int allMonths[] = new int[monthCounter];
+		final int monthCounter = tourMonthData.altitudeHigh[0].length;
+		final float[] allMonths = new float[monthCounter];
 
 		// get start/end and title for each segment
 		for (int monthIndex = 0; monthIndex < monthCounter; monthIndex++) {
@@ -159,8 +159,8 @@ public abstract class StatisticMonth extends YearStatistic {
 		date.setTime(calendar.getTimeInMillis());
 		_dateFormatter.format(date, monthStringBuffer, monthPosition);
 
-		final Integer recordingTime = _tourMonthData.fRecordingTime[serieIndex][valueIndex];
-		final Integer drivingTime = _tourMonthData.fDrivingTime[serieIndex][valueIndex];
+		final Integer recordingTime = _tourMonthData.recordingTime[serieIndex][valueIndex];
+		final Integer drivingTime = _tourMonthData.drivingTime[serieIndex][valueIndex];
 		final int breakTime = recordingTime - drivingTime;
 
 		/*
@@ -198,10 +198,10 @@ public abstract class StatisticMonth extends YearStatistic {
 
 		final String toolTipLabel = new Formatter().format(toolTipFormat.toString(), //
 				//
-				(float) _tourMonthData.fDistanceHigh[serieIndex][valueIndex] / 1000,
+				_tourMonthData.distanceHigh[serieIndex][valueIndex] / 1000,
 				UI.UNIT_LABEL_DISTANCE,
 				//
-				_tourMonthData.fAltitudeHigh[serieIndex][valueIndex],
+				(int) _tourMonthData.altitudeHigh[serieIndex][valueIndex],
 				UI.UNIT_LABEL_ALTITUDE,
 				//
 				recordingTime / 3600,
@@ -242,14 +242,14 @@ public abstract class StatisticMonth extends YearStatistic {
 		final ChartDataYSerie yData = new ChartDataYSerie(
 				ChartDataModel.CHART_TYPE_BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
-				_tourMonthData.fAltitudeLow,
-				_tourMonthData.fAltitudeHigh);
+				_tourMonthData.altitudeLow,
+				_tourMonthData.altitudeHigh);
 		yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
 		yData.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
 		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_ALTITUDE);
 		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_ALTITUDE, _activeTourTypeFilter);
-		StatisticServices.setTourTypeColorIndex(yData, _tourMonthData.fTypeIds, _activeTourTypeFilter);
+		StatisticServices.setTourTypeColorIndex(yData, _tourMonthData.typeIds, _activeTourTypeFilter);
 
 		chartDataModel.addYData(yData);
 	}
@@ -259,15 +259,15 @@ public abstract class StatisticMonth extends YearStatistic {
 		final ChartDataYSerie yData = new ChartDataYSerie(
 				ChartDataModel.CHART_TYPE_BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
-				_tourMonthData.fDistanceLow,
-				_tourMonthData.fDistanceHigh);
+				_tourMonthData.distanceLow,
+				_tourMonthData.distanceHigh);
 		yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
 		yData.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
 		yData.setValueDivisor(1000);
 		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE);
 		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE, _activeTourTypeFilter);
-		StatisticServices.setTourTypeColorIndex(yData, _tourMonthData.fTypeIds, _activeTourTypeFilter);
+		StatisticServices.setTourTypeColorIndex(yData, _tourMonthData.typeIds, _activeTourTypeFilter);
 
 		chartDataModel.addYData(yData);
 	}
@@ -277,14 +277,14 @@ public abstract class StatisticMonth extends YearStatistic {
 		final ChartDataYSerie yData = new ChartDataYSerie(
 				ChartDataModel.CHART_TYPE_BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
-				_tourMonthData.fTimeLow,
-				_tourMonthData.fTimeHigh);
+				_tourMonthData.getTimeLowFloat(),
+				_tourMonthData.getTimeHighFloat());
 		yData.setYTitle(Messages.LABEL_GRAPH_TIME);
 		yData.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
 		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_TIME);
 		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_TIME, _activeTourTypeFilter);
-		StatisticServices.setTourTypeColorIndex(yData, _tourMonthData.fTypeIds, _activeTourTypeFilter);
+		StatisticServices.setTourTypeColorIndex(yData, _tourMonthData.typeIds, _activeTourTypeFilter);
 
 		chartDataModel.addYData(yData);
 	}

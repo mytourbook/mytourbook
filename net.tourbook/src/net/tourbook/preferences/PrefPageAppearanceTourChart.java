@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.preferences;
 
 import java.util.ArrayList;
@@ -65,12 +64,14 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageAppearanceTourChart extends PreferencePage implements IWorkbenchPreferencePage {
 
-	public static final String		ID					= "net.tourbook.preferences.PrefPageChartGraphs";	//$NON-NLS-1$
+	public static final String		ID											= "net.tourbook.preferences.PrefPageChartGraphs";	//$NON-NLS-1$
 
-	private static final int		DEFAULT_FIELD_WIDTH	= 40;
+	private static final int		DEFAULT_FIELD_WIDTH							= 40;
 
-	private final IPreferenceStore	_prefStore			= TourbookPlugin.getDefault()//
-																.getPreferenceStore();
+	private static final String		STATE_PREF_PAGE_CHART_GRAPHS_SELECTED_TAB	= "PrefPage.ChartGraphs.SelectedTab";				//$NON-NLS-1$
+
+	private final IPreferenceStore	_prefStore									= TourbookPlugin.getDefault()//
+																						.getPreferenceStore();
 
 	private HashMap<Integer, Graph>	_graphMap;
 	private ArrayList<Graph>		_graphList;
@@ -803,6 +804,18 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	}
 
 	@Override
+	public boolean okToLeave() {
+		saveUIState();
+		return super.okToLeave();
+	}
+
+	@Override
+	public boolean performCancel() {
+		saveUIState();
+		return super.performCancel();
+	}
+
+	@Override
 	protected void performDefaults() {
 
 		final int selectedTabIndex = _tabFolder.getSelectionIndex();
@@ -931,6 +944,11 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		// checkbox: starttime
 		_chkShowStartTime.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME));
 
+		/*
+		 * folder
+		 */
+		_tabFolder.setSelection(_prefStore.getInt(STATE_PREF_PAGE_CHART_GRAPHS_SELECTED_TAB));
+
 		restoreGraphs();
 	}
 
@@ -1008,6 +1026,15 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		_editGradientMinEditor.store();
 
 		saveGraphs();
+	}
+
+	private void saveUIState() {
+
+		if (_tabFolder == null || _tabFolder.isDisposed()) {
+			return;
+		}
+
+		_prefStore.setValue(STATE_PREF_PAGE_CHART_GRAPHS_SELECTED_TAB, _tabFolder.getSelectionIndex());
 	}
 
 	/**

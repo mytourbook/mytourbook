@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 
 package net.tourbook.statistics;
@@ -36,7 +36,9 @@ public class DataProviderTourDay extends DataProvider {
 
 	private static DataProviderTourDay	_instance;
 
-	private TourDayData					_tourDayData;
+	private TourDataDay					_tourDayData;
+
+	private DataProviderTourDay() {}
 
 	public static DataProviderTourDay getInstance() {
 		if (_instance == null) {
@@ -45,9 +47,7 @@ public class DataProviderTourDay extends DataProvider {
 		return _instance;
 	}
 
-	private DataProviderTourDay() {}
-
-	TourDayData getDayData(	final TourPerson person,
+	TourDataDay getDayData(	final TourPerson person,
 							final TourTypeFilter tourTypeFilter,
 							final int lastYear,
 							final int numberOfYears,
@@ -79,39 +79,39 @@ public class DataProviderTourDay extends DataProvider {
 		final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
 		final TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
 
-		_tourDayData = new TourDayData();
+		_tourDayData = new TourDataDay();
 		final SQLFilter sqlFilter = new SQLFilter();
 
 		final String sqlString = "SELECT " // //$NON-NLS-1$
-				+ "TourId, " //					// 1 //$NON-NLS-1$
-				+ "StartYear, " // 				// 2 //$NON-NLS-1$
-				+ "StartMonth, " // 			// 3 //$NON-NLS-1$
-				+ "StartDay, " // 				// 4 //$NON-NLS-1$
-				+ "StartHour, " // 				// 5 //$NON-NLS-1$
-				+ "StartMinute, " // 			// 6 //$NON-NLS-1$
-				+ "TourDistance, " // 			// 7 //$NON-NLS-1$
-				+ "TourAltUp, " // 				// 8 //$NON-NLS-1$
-				+ "TourDrivingTime, " // 		// 9 //$NON-NLS-1$
-				+ "TourRecordingTime, " // 		// 10 //$NON-NLS-1$
-				+ "TourTitle, " //				// 11 //$NON-NLS-1$
-				+ "TourType_typeId, " // 		// 12 //$NON-NLS-1$
-				+ "TourDescription, " // 		// 13 //$NON-NLS-1$
-				+ "startWeek," //				// 14 //$NON-NLS-1$ 
-
-				+ "jTdataTtag.TourTag_tagId"//	// 15 //$NON-NLS-1$ 
-
-
+				//
+				+ "TourId, " //					// 1 	//$NON-NLS-1$
+				+ "StartYear, " // 				// 2	//$NON-NLS-1$
+				+ "StartMonth, " // 			// 3	//$NON-NLS-1$
+				+ "StartDay, " // 				// 4	//$NON-NLS-1$
+				+ "StartHour, " // 				// 5	//$NON-NLS-1$
+				+ "StartMinute, " // 			// 6	//$NON-NLS-1$
+				+ "TourDistance, " // 			// 7	//$NON-NLS-1$
+				+ "TourAltUp, " // 				// 8	//$NON-NLS-1$
+				+ "TourDrivingTime, " // 		// 9	//$NON-NLS-1$
+				+ "TourRecordingTime, " // 		// 10	//$NON-NLS-1$
+				+ "TourTitle, " //				// 11	//$NON-NLS-1$
+				+ "TourType_typeId, " // 		// 12	//$NON-NLS-1$
+				+ "TourDescription, " // 		// 13	//$NON-NLS-1$
+				+ "startWeek," //				// 14	//$NON-NLS-1$
+				//
+				+ "jTdataTtag.TourTag_tagId"//	// 15	//$NON-NLS-1$
+				//
 				+ UI.NEW_LINE
-
-				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE) //$NON-NLS-1$ //$NON-NLS-2$
-
+				//
+				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE) //$NON-NLS-1$
+				//
 				// get tag id's
 				+ (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag") //$NON-NLS-1$ //$NON-NLS-2$
 				+ (" ON tourID = jTdataTtag.TourData_tourId") //$NON-NLS-1$
-
+				//
 				+ (" WHERE StartYear IN (" + getYearList(lastYear, numberOfYears) + ")" + UI.NEW_LINE) //$NON-NLS-1$ //$NON-NLS-2$
 				+ sqlFilter.getWhereClause()
-
+				//
 				+ (" ORDER BY StartYear, StartMonth, StartDay, StartHour, StartMinute "); //$NON-NLS-1$
 
 		try {
@@ -126,8 +126,8 @@ public class DataProviderTourDay extends DataProvider {
 			final ArrayList<Integer> dbTourEndTime = new ArrayList<Integer>();
 			final ArrayList<Integer> dbTourStartWeek = new ArrayList<Integer>();
 
-			final ArrayList<Integer> dbDistance = new ArrayList<Integer>();
-			final ArrayList<Integer> dbAltitude = new ArrayList<Integer>();
+			final ArrayList<Float> dbDistance = new ArrayList<Float>();
+			final ArrayList<Float> dbAltitude = new ArrayList<Float>();
 			final ArrayList<Integer> dbTourDuration = new ArrayList<Integer>();
 			final ArrayList<Integer> dbTourRecordingTime = new ArrayList<Integer>();
 			final ArrayList<Integer> dbTourDrivingTime = new ArrayList<Integer>();
@@ -186,8 +186,8 @@ public class DataProviderTourDay extends DataProvider {
 
 					// round distance
 					final int distance = result.getInt(7);
-					dbDistance.add((int) (distance / UI.UNIT_VALUE_DISTANCE));
-					dbAltitude.add((int) (result.getInt(8) / UI.UNIT_VALUE_ALTITUDE));
+					dbDistance.add(distance / UI.UNIT_VALUE_DISTANCE);
+					dbAltitude.add(result.getInt(8) / UI.UNIT_VALUE_ALTITUDE);
 
 					dbTourStartTime.add(startTime);
 					dbTourEndTime.add((startTime + recordingTime));
@@ -237,13 +237,13 @@ public class DataProviderTourDay extends DataProvider {
 			final int[] tourAllYearsDOY = ArrayListToArray.toInt(dbAllYearsDOY);
 
 			final int[] timeHigh = ArrayListToArray.toInt(dbTourDuration);
-			final int[] distanceHigh = ArrayListToArray.toInt(dbDistance);
-			final int[] altitudeHigh = ArrayListToArray.toInt(dbAltitude);
+			final float[] distanceHigh = ArrayListToArray.toFloat(dbDistance);
+			final float[] altitudeHigh = ArrayListToArray.toFloat(dbAltitude);
 
 			final int serieLength = timeHigh.length;
 			final int[] timeLow = new int[serieLength];
-			final int[] distanceLow = new int[serieLength];
-			final int[] altitudeLow = new int[serieLength];
+			final float[] distanceLow = new float[serieLength];
+			final float[] altitudeLow = new float[serieLength];
 
 			/*
 			 * adjust low/high values when a day has multiple tours
@@ -279,7 +279,7 @@ public class DataProviderTourDay extends DataProvider {
 
 			_tourDayData.yearValues = tourYear;
 			_tourDayData.monthValues = ArrayListToArray.toInt(dbMonths);
-			_tourDayData.doyValues = tourAllYearsDOY;
+			_tourDayData.setDoyValues(tourAllYearsDOY);
 			_tourDayData.weekValues = ArrayListToArray.toInt(dbTourStartWeek);
 
 			_tourDayData.allDaysInAllYears = yearDays;
@@ -291,8 +291,8 @@ public class DataProviderTourDay extends DataProvider {
 
 			_tourDayData.tagIds = dbTagIds;
 
-			_tourDayData.timeLow = timeLow;
-			_tourDayData.timeHigh = timeHigh;
+			_tourDayData.setTimeLow(timeLow);
+			_tourDayData.setTimeHigh(timeHigh);
 
 			_tourDayData.distanceLow = distanceLow;
 			_tourDayData.distanceHigh = distanceHigh;
@@ -303,11 +303,11 @@ public class DataProviderTourDay extends DataProvider {
 			_tourDayData.tourStartValues = ArrayListToArray.toInt(dbTourStartTime);
 			_tourDayData.tourEndValues = ArrayListToArray.toInt(dbTourEndTime);
 
-			_tourDayData.tourDistanceValues = ArrayListToArray.toInt(dbDistance);
-			_tourDayData.tourAltitudeValues = ArrayListToArray.toInt(dbAltitude);
+			_tourDayData.tourDistanceValues = ArrayListToArray.toFloat(dbDistance);
+			_tourDayData.tourAltitudeValues = ArrayListToArray.toFloat(dbAltitude);
 
-			_tourDayData.tourRecordingTimeValues = dbTourRecordingTime;
-			_tourDayData.tourDrivingTimeValues = dbTourDrivingTime;
+			_tourDayData.recordingTime = ArrayListToArray.toInt(dbTourRecordingTime);
+			_tourDayData.drivingTime = ArrayListToArray.toInt(dbTourDrivingTime);
 
 			_tourDayData.tourTitle = dbTourTitle;
 			_tourDayData.tourDescription = dbTourDescription;

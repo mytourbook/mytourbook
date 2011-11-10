@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -101,7 +101,7 @@ public class StatisticTourNumbers extends YearStatistic {
 
 	private boolean						_isSynchScaleEnabled;
 
-	private TourDayData					_tourDayData;
+	private TourDataDay					_tourDayData;
 
 	private IViewSite					_viewSite;
 
@@ -213,7 +213,7 @@ public class StatisticTourNumbers extends YearStatistic {
 	 * 
 	 * @param tourDayData
 	 */
-	private void createStatisticData(final TourDayData tourDayData) {
+	private void createStatisticData(final TourDataDay tourDayData) {
 
 		int colorOffset = 0;
 		if (_activeTourTypeFilter.showUndefinedTourTypes()) {
@@ -257,9 +257,9 @@ public class StatisticTourNumbers extends YearStatistic {
 			final int typeColorIndex = tourDayData.typeColorIndex[tourIndex];
 			int unitIndex;
 
-			final int diffDistance = (tourDayData.distanceHigh[tourIndex] - tourDayData.distanceLow[tourIndex] + 500) / 1000;
-			final int diffAltitude = tourDayData.altitudeHigh[tourIndex] - tourDayData.altitudeLow[tourIndex];
-			final int diffTime = tourDayData.timeHigh[tourIndex] - tourDayData.timeLow[tourIndex];
+			final int diffDistance = (int) ((tourDayData.distanceHigh[tourIndex] - tourDayData.distanceLow[tourIndex] + 500) / 1000);
+			final int diffAltitude = (int) (tourDayData.altitudeHigh[tourIndex] - tourDayData.altitudeLow[tourIndex]);
+			final int diffTime = (int) (tourDayData.getTimeHighFloat()[tourIndex] - tourDayData.getTimeLowFloat()[tourIndex]);
 
 			unitIndex = createTourStatData(
 					diffDistance,
@@ -636,7 +636,7 @@ public class StatisticTourNumbers extends YearStatistic {
 		final ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
 
 		// set the x-axis
-		final ChartDataXSerie xData = new ChartDataXSerie(_statAltitudeUnits);
+		final ChartDataXSerie xData = new ChartDataXSerie(net.tourbook.util.Util.convertIntToFloat(_statAltitudeUnits));
 		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_NUMBER);
 		xData.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
 		chartDataModel.setXData(xData);
@@ -645,8 +645,8 @@ public class StatisticTourNumbers extends YearStatistic {
 		final ChartDataYSerie yData = new ChartDataYSerie(
 				ChartDataModel.CHART_TYPE_BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
-				lowValues,
-				highValues);
+				net.tourbook.util.Util.convertIntToFloat(lowValues),
+				net.tourbook.util.Util.convertIntToFloat(highValues));
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
 		yData.setUnitLabel(unit);
 		yData.setAllValueColors(0);
@@ -698,7 +698,7 @@ public class StatisticTourNumbers extends YearStatistic {
 		final ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
 
 		// set the x-axis
-		final ChartDataXSerie xData = new ChartDataXSerie(_statDistanceUnits);
+		final ChartDataXSerie xData = new ChartDataXSerie(net.tourbook.util.Util.convertIntToFloat(_statDistanceUnits));
 		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_NUMBER);
 		xData.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
 		chartDataModel.setXData(xData);
@@ -707,8 +707,8 @@ public class StatisticTourNumbers extends YearStatistic {
 		final ChartDataYSerie yData = new ChartDataYSerie(
 				ChartDataModel.CHART_TYPE_BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
-				lowValues,
-				highValues);
+				net.tourbook.util.Util.convertIntToFloat(lowValues),
+				net.tourbook.util.Util.convertIntToFloat(highValues));
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
 		yData.setUnitLabel(unit);
 		yData.setAllValueColors(0);
@@ -811,7 +811,7 @@ public class StatisticTourNumbers extends YearStatistic {
 		final ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
 
 		// set the x-axis
-		final ChartDataXSerie xData = new ChartDataXSerie(_statTimeUnits);
+		final ChartDataXSerie xData = new ChartDataXSerie(net.tourbook.util.Util.convertIntToFloat(_statTimeUnits));
 		xData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
 		xData.setUnitLabel(UI.UNIT_LABEL_TIME);
 		chartDataModel.setXData(xData);
@@ -820,8 +820,8 @@ public class StatisticTourNumbers extends YearStatistic {
 		final ChartDataYSerie yData = new ChartDataYSerie(
 				ChartDataModel.CHART_TYPE_BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
-				lowValues,
-				highValues);
+				net.tourbook.util.Util.convertIntToFloat(lowValues),
+				net.tourbook.util.Util.convertIntToFloat(highValues));
 		yData.setAxisUnit(yUnit);
 		yData.setUnitLabel(unit);
 		yData.setAllValueColors(0);

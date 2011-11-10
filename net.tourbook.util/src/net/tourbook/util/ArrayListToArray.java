@@ -30,8 +30,8 @@ public class ArrayListToArray {
 		final float[] returnArray = new float[list.size()];
 		int valueIndex = 0;
 
-		for (final Object value : list.toArray()) {
-			returnArray[valueIndex++] = (Float) value;
+		for (final Integer value : list) {
+			returnArray[valueIndex++] = value;
 		}
 
 		return returnArray;
@@ -44,14 +44,14 @@ public class ArrayListToArray {
 	 * @return
 	 */
 	final public static float[] toFloat(final ArrayList<Float> list) {
-		
+
 		final float[] returnArray = new float[list.size()];
 		int valueIndex = 0;
-		
-		for (final Object value : list.toArray()) {
-			returnArray[valueIndex++] = (Float) value;
+
+		for (final Float value : list) {
+			returnArray[valueIndex++] = value;
 		}
-		
+
 		return returnArray;
 	}
 
@@ -66,8 +66,8 @@ public class ArrayListToArray {
 		final int[] returnInt = new int[list.size()];
 		int valueIndex = 0;
 
-		for (final Object value : list.toArray()) {
-			returnInt[valueIndex++] = (Integer) value;
+		for (final Integer value : list) {
+			returnInt[valueIndex++] = value;
 		}
 
 		return returnInt;
@@ -84,11 +84,11 @@ public class ArrayListToArray {
 		final long[] returnLong = new long[list.size()];
 		int iValue = 0;
 
-		for (final Object value : list.toArray()) {
+		for (final Long value : list) {
 			if (value == null) {
 				returnLong[iValue++] = -1;
 			} else {
-				returnLong[iValue++] = (Long) value;
+				returnLong[iValue++] = value;
 			}
 		}
 
