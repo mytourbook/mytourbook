@@ -375,7 +375,7 @@ public class Chart extends ViewForm {
 		final ChartComponentGraph chartComponentGraph = _chartComponents.getChartComponentGraph();
 
 		final boolean canZoomOut = chartComponentGraph.getGraphZoomRatio() > 1;
-		final boolean canZoomIn = chartComponentGraph.getDevVirtualGraphImageWidth() < ChartComponents.CHART_MAX_WIDTH;
+		final boolean canZoomIn = chartComponentGraph.getXXDevGraphWidth() < ChartComponents.CHART_MAX_WIDTH;
 
 		_chartActionProxies.get(COMMAND_ID_ZOOM_IN).setEnabled(canZoomIn);
 		_chartActionProxies.get(COMMAND_ID_ZOOM_OUT).setEnabled(canZoomOut);
@@ -655,7 +655,7 @@ public class Chart extends ViewForm {
 	}
 
 	public int getDevGraphImageXOffset() {
-		return _chartComponents.getChartComponentGraph().getDevGraphImageXOffset();
+		return _chartComponents.getChartComponentGraph().getXXDevViewPortOffset();
 	}
 
 	/**
@@ -770,39 +770,36 @@ public class Chart extends ViewForm {
 				.getValuesIndex());
 	}
 
-	boolean isMouseDownExternalPre(final int devXMouse, final int devYMouse, final int devXGraph) {
+	boolean isMouseDownExternalPre(final int devXMouse, final int devYMouse) {
 
 		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseDownPre);
 
 		event.devXMouse = devXMouse;
 		event.devYMouse = devYMouse;
-		event.devMouseXInGraph = devXGraph;
 
 		fireChartMouseEvent(event);
 
 		return event.isWorked;
 	}
 
-	boolean isMouseMoveExternal(final int devXMouse, final int devYMouse, final int devXGraph) {
+	boolean isMouseMoveExternal(final int devXMouse, final int devYMouse) {
 
 		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseMove);
 
 		event.devXMouse = devXMouse;
 		event.devYMouse = devYMouse;
-		event.devMouseXInGraph = devXGraph;
 
 		fireChartMouseEvent(event);
 
 		return event.isWorked;
 	}
 
-	boolean isMouseUpExternal(final int devXMouse, final int devYMouse, final int devXGraph) {
+	boolean isMouseUpExternal(final int devXMouse, final int devYMouse) {
 
 		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseUp);
 
 		event.devXMouse = devXMouse;
 		event.devYMouse = devYMouse;
-		event.devMouseXInGraph = devXGraph;
 
 		fireChartMouseEvent(event);
 
@@ -954,15 +951,6 @@ public class Chart extends ViewForm {
 	}
 
 	/**
-	 * set the option to scroll/not scroll the zoomed chart
-	 * 
-	 * @param canScrollabelZoomedGraph
-	 */
-	public void setCanScrollZoomedChart(final boolean canScrollabelZoomedGraph) {
-		_chartComponents.getChartComponentGraph().setCanScrollZoomedChart(canScrollabelZoomedGraph);
-	}
-
-	/**
 	 * Set the enable state for a command and update the UI
 	 */
 	public void setChartCommandEnabled(final String commandId, final boolean isEnabled) {
@@ -977,10 +965,6 @@ public class Chart extends ViewForm {
 	public void setContextProvider(final IChartContextProvider chartContextProvider) {
 		_chartContextProvider = chartContextProvider;
 	}
-
-//	public void setShowPartNavigation(final boolean showPartNavigation) {
-//		fShowPartNavigation = showPartNavigation;
-//	}
 
 	/**
 	 * @param chartContextProvider
@@ -1068,7 +1052,7 @@ public class Chart extends ViewForm {
 
 		updateMouseModeUIState();
 
-		_chartComponents.getChartComponentGraph().setDefaultCursor();
+		_chartComponents.getChartComponentGraph().setCursorStyle();
 
 	}
 

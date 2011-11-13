@@ -195,7 +195,6 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		// create statistic chart
 		_chart = new Chart(parent, SWT.BORDER | SWT.FLAT);
 		_chart.setShowZoomActions(true);
-		_chart.setCanScrollZoomedChart(true);
 		_chart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
 
 		// set tour info icon into the left axis

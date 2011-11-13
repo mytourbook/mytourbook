@@ -149,7 +149,6 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 		_chart = new Chart(parent, SWT.BORDER | SWT.FLAT);
 //		fChart.setShowPartNavigation(true);
 		_chart.setShowZoomActions(true);
-		_chart.setCanScrollZoomedChart(true);
 		_chart.setDrawBarChartAtBottom(false);
 		_chart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
 

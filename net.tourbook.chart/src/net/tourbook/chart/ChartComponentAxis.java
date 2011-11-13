@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,11 +20,14 @@ import java.util.ArrayList;
 import net.tourbook.util.ITourToolTipProvider;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
+import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
@@ -68,6 +71,13 @@ public class ChartComponentAxis extends Canvas {
 	 */
 	private int							_hoverState	= -1;
 
+	/**
+	 * Client area of this axis canvas
+	 */
+	private Rectangle					_clientArea;
+
+	private ChartComponentGraph			_componentGraph;
+
 	ChartComponentAxis(final Chart chart, final Composite parent, final int style) {
 
 		super(parent, SWT.NO_BACKGROUND | SWT.DOUBLE_BUFFERED);
@@ -89,12 +99,12 @@ public class ChartComponentAxis extends Canvas {
 		addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseDoubleClick(final MouseEvent e) {
-				_chart._chartComponents.getChartComponentGraph().onMouseDoubleClick(e);
+				_componentGraph.onMouseDoubleClick(e);
 			}
 
 			@Override
 			public void mouseDown(final MouseEvent e) {
-				_chart._chartComponents.getChartComponentGraph().setFocus();
+				onMouseDown(e);
 			}
 
 		});
@@ -102,24 +112,35 @@ public class ChartComponentAxis extends Canvas {
 		addMouseMoveListener(new MouseMoveListener() {
 			@Override
 			public void mouseMove(final MouseEvent e) {
-				checkHoveredArea(e.x, e.y);
+				onMouseMove(e);
+			}
+		});
+
+		addMouseTrackListener(new MouseTrackListener() {
+
+			public void mouseEnter(final MouseEvent e) {}
+
+			public void mouseExit(final MouseEvent e) {
+				onMouseExit(e);
+			}
+
+			public void mouseHover(final MouseEvent e) {}
+		});
+
+		addControlListener(new ControlListener() {
+
+			@Override
+			public void controlMoved(final ControlEvent e) {}
+
+			@Override
+			public void controlResized(final ControlEvent e) {
+				_clientArea = getClientArea();
 			}
 		});
 
 		addListener(SWT.MouseWheel, new Listener() {
 			public void handleEvent(final Event event) {
-
-				_chart._chartComponents.getChartComponentGraph().onMouseWheel(event);
-
-				/*
-				 * display tour tool tip when mouse is hovered over the tour info icon in the
-				 * statistics and the mouse wheel selects another tour
-				 */
-				checkHoveredArea(event.x, event.y);
-
-				if (_tourToolTipProvider != null && _hoverState == 1) {
-					_tourToolTipProvider.show(new Point(event.x, event.y));
-				}
+				onMouseWheel(event);
 			}
 		});
 	}
@@ -320,6 +341,47 @@ public class ChartComponentAxis extends Canvas {
 		}
 	}
 
+	public Rectangle getAxisClientArea() {
+		return _clientArea;
+	}
+
+	private void onMouseDown(final MouseEvent event) {
+
+		_componentGraph.setFocus();
+
+		_componentGraph.onMouseDownAxis(event);
+	}
+
+	private void onMouseExit(final MouseEvent event) {
+
+		_componentGraph.onMouseExitAxis(event);
+
+	}
+
+	private void onMouseMove(final MouseEvent event) {
+
+		if (_componentGraph.onMouseMoveAxis(event)) {
+			return;
+		}
+
+		checkHoveredArea(event.x, event.y);
+	}
+
+	private void onMouseWheel(final Event event) {
+
+		_componentGraph.onMouseWheel(event);
+
+		/*
+		 * display tour tool tip when mouse is hovered over the tour info icon in the statistics and
+		 * the mouse wheel selects another tour
+		 */
+		checkHoveredArea(event.x, event.y);
+
+		if (_tourToolTipProvider != null && _hoverState == 1) {
+			_tourToolTipProvider.show(new Point(event.x, event.y));
+		}
+	}
+
 	private void onPaint(final GC gc) {
 
 		drawAxisImage();
@@ -330,6 +392,10 @@ public class ChartComponentAxis extends Canvas {
 	void onResize() {
 		_isAxisModified = true;
 		redraw();
+	}
+
+	void setComponentGraph(final ChartComponentGraph componentGraph) {
+		_componentGraph = componentGraph;
 	}
 
 	/**
