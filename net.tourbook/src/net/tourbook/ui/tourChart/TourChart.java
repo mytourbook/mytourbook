@@ -244,8 +244,6 @@ public class TourChart extends Chart {
 
 	public void actionCanScrollChart(final Boolean isItemChecked) {
 
-		setCanScrollZoomedChart(isItemChecked);
-
 		// apply setting to the chart
 		if (isItemChecked) {
 			onExecuteZoomInWithSlider();
@@ -1448,7 +1446,6 @@ public class TourChart extends Chart {
 			synchedChart.updateZoomOptions(false);
 
 			// set the synched chart to auto-zoom
-			synchedChart.setCanScrollZoomedChart(false);
 			synchedChart.setCanAutoZoomToSlider(true);
 
 			// hide the x-sliders

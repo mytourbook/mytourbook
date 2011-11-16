@@ -131,7 +131,6 @@ public abstract class StatisticWeek extends YearStatistic {
 		// create statistic chart
 		_chart = new Chart(parent, SWT.BORDER | SWT.FLAT);
 		_chart.setShowZoomActions(true);
-		_chart.setCanScrollZoomedChart(true);
 		_chart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
 
 		_chartInfoProvider = new IChartInfoProvider() {

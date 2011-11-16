@@ -5,6 +5,13 @@ Improvements:
 - adjust altitude dialog: approach altitude with SRTM keeps whole tour selection with a checkbox
 - reimport only altitude data
 - reimport can also be done in the tourbook view
+- renovated tour chart
+
+new Tour Chart behaviour
+- when x-slider is dragged with the mouse, the mouse wheel can zoom in/out and keeps the position
+- when the chart is zoomed in and the mouse is moved within the x-axis area, the graph is scrolled left/right
+- Ctrl+Shift moves the x-slider to the exact value position (Ctrl MUST be pressed FIRST!!!)
+
 
 Infos:
 -conversion time: 1727 tours / 149 seconds = 11.6 tours/second

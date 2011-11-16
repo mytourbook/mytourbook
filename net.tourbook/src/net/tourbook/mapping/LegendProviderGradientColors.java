@@ -57,7 +57,7 @@ public class LegendProviderGradientColors implements ILegendProviderGradientColo
 		final float graphUnitValue = graphRange / Math.max(1, unitCount);
 
 		// round the unit
-		final float graphUnit = Util.roundDecimalValue(graphUnitValue);
+		final double graphUnit = Util.roundDecimalValue(graphUnitValue);
 
 		/*
 		 * the scaled unit with long min/max values is used because arithmetic with floating point

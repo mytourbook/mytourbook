@@ -17,6 +17,7 @@ package net.tourbook.chart;
 
 import java.util.ArrayList;
 
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
 /**
@@ -46,7 +47,11 @@ public class GraphDrawingData {
 	private Rectangle[][]			_barRectangles;
 	private Rectangle[][]			_barFocusRectangles;
 
+	Rectangle[]						lineFocusRectangles;
+	Point[]							lineDevPositions;
+
 	private int						_barRectangleWidth;
+
 	private int						_devBarRectangleXPos;
 
 	/**
@@ -59,21 +64,21 @@ public class GraphDrawingData {
 	 * List with all unit labels and positions for the y axis
 	 */
 	private ArrayList<ChartUnit>	_yUnits					= new ArrayList<ChartUnit>();
-
 	// scaling from graph value to device value
 	private float					_scaleX;
+
 	private float					_scaleY;
 
 	/**
 	 * scaling the the x unit
 	 */
 	private float					_scaleUnitX				= Float.MIN_VALUE;
-
 	private int						_devMarginTop;
+
 	private int						_devXTitelBarHeight;
+
 	private int						_devMarkerBarHeight;
 	private int						_devSliderBarHeight;
-
 	// graph position
 	private int						_devYTop;
 	private int						_devYBottom;
@@ -82,7 +87,6 @@ public class GraphDrawingData {
 	 * virtual graph width in dev (pixel) units
 	 */
 	public int						devVirtualGraphWidth;
-
 	/**
 	 * graph height in dev (pixel) units, each graph has the same height
 	 */
@@ -94,10 +98,10 @@ public class GraphDrawingData {
 	 * graph value for the bottom of the graph
 	 */
 	private float					_graphYBottom;
+
 	private float					_graphYTop;
 
 	private int						_barPosition			= BAR_POS_LEFT;
-
 	private int						_chartType;
 
 	private String					_errorMessage;
@@ -150,17 +154,6 @@ public class GraphDrawingData {
 		return _devBarRectangleXPos;
 	}
 
-//	public int getDevGraphHeight() {
-//		return devGraphHeight;
-//	}
-//
-//	/**
-//	 * virtual graph width in dev (pixel) units
-//	 */
-//	int getDevGraphWidth() {
-//		return devGraphWidth;
-//	}
-
 	/**
 	 * @return Returns the devMarginTop.
 	 */
@@ -174,6 +167,17 @@ public class GraphDrawingData {
 	public int getDevMarkerBarHeight() {
 		return _devMarkerBarHeight;
 	}
+
+//	public int getDevGraphHeight() {
+//		return devGraphHeight;
+//	}
+//
+//	/**
+//	 * virtual graph width in dev (pixel) units
+//	 */
+//	int getDevGraphWidth() {
+//		return devGraphWidth;
+//	}
 
 	/**
 	 * @return Returns the devSliderBarHeight.
@@ -319,17 +323,9 @@ public class GraphDrawingData {
 	 * @param barFocusRectangles
 	 *            The barFocusRectangles to set.
 	 */
-	public void setBarFocusRectangles(final Rectangle[][] barFocusRectangles) {
+	void setBarFocusRectangles(final Rectangle[][] barFocusRectangles) {
 		_barFocusRectangles = barFocusRectangles;
 	}
-
-//	public void setDevGraphHeight(final int heightDev) {
-//		devGraphHeight = heightDev;
-//	}
-//
-//	public void setDevGraphWidth(final int devGraphWidth) {
-//		devGraphWidth = devGraphWidth;
-//	}
 
 	/**
 	 * @param barPosition

@@ -259,9 +259,9 @@ public class Util {
 		return formatValue(value, unitType, 1, false);
 	}
 
-	public static float getMajorDecimalValue(final float unitValue) {
+	public static double getMajorDecimalValue(final double graphUnit) {
 
-		float unit = unitValue;
+		double unit = graphUnit;
 		int multiplier = 1;
 
 		while (unit > 1000) {
@@ -269,14 +269,17 @@ public class Util {
 			unit /= 10;
 		}
 
-		unit = unitValue / multiplier;
+		unit = graphUnit / multiplier;
 
 		unit = //
 		unit == 1000 ? 5000 : unit == 500 ? 1000 : unit == 200 ? 1000 : //
 				unit == 100 ? 500 : unit == 50 ? 200 : unit == 20 ? 100 : //
-						unit == 10 ? 50 : unit == 5 ? 20 : unit == 2f ? 10f : //
-								unit == 1 ? 5 : unit == 0.5f ? 2.0f : unit == 0.2f ? 1 : //
-										unit == 0.1f ? 0.5f : unit == 0.05f ? 0.2f : unit == 0.02f ? 0.1f : 0.05f;
+						unit == 10 ? 50 : unit == 5 ? 20 : unit == 2 ? 10 : //
+								unit == 1 ? 5 : unit == 0.5 ? 2.0 : unit == 0.2 ? 1 : //
+										unit == 0.1 ? 0.5 : unit == 0.05 ? 0.2 : unit == 0.02 ? 0.1 : //
+												unit == 0.01 ? 0.05 : unit == 0.005 ? 0.02 : unit == 0.002
+														? 0.01
+														: 0.005;
 
 		unit *= multiplier;
 
@@ -313,11 +316,11 @@ public class Util {
 				unit = //
 						//
 //				unit >= 120 ? 360 : //
-						unit >= 60 ? 360 : //
+				unit >= 60 ? 360 : //
 //								unit >= 30 ? 60 : //
-										unit >= 15 ? 60 : //
+						unit >= 15 ? 60 : //
 //												unit >= 12 ? 12 : //
-														12;
+								12;
 
 			} else {
 
@@ -325,12 +328,12 @@ public class Util {
 						//
 				unit >= 120 ? 720 : //
 //						unit >= 60 ? 360 : //
-								unit >= 30 ? 360 : //
-										unit >= 15 ? 120 : //
-												unit >= 10 ? 60 : //
-														unit >= 5 ? 30 : //
-																unit >= 2 ? 10 : //
-																		5;
+						unit >= 30 ? 360 : //
+								unit >= 15 ? 120 : //
+										unit >= 10 ? 60 : //
+												unit >= 5 ? 30 : //
+														unit >= 2 ? 10 : //
+																5;
 			}
 
 		} else {
@@ -379,11 +382,11 @@ public class Util {
 		return unit;
 	}
 
-	public static long getValueScaling(final float graphUnit) {
+	public static long getValueScaling(final double graphUnit) {
 
 		if (graphUnit > 1 || graphUnit < 1) {
 
-			float scaledValue = 1;
+			double scaledValue = 1;
 
 			if (graphUnit < 1) {
 				scaledValue = 1 / graphUnit;
@@ -414,9 +417,9 @@ public class Util {
 	 * @param unitValue
 	 * @return Returns unit value rounded to the number of 50/20/10/5/2/1
 	 */
-	public static float roundDecimalValue(final float unitValue) {
+	public static double roundDecimalValue(final float unitValue) {
 
-		float unit = unitValue;
+		double unit = unitValue;
 		int multiplier = 1;
 
 		while (unit > 100) {
@@ -430,14 +433,14 @@ public class Util {
 				unit > 20 ? 20 : //
 						unit > 10 ? 10 : //
 								unit > 5 ? 5 : //
-										unit > 2f ? 2f : //
+										unit > 2 ? 2 : //
 												unit > 1 ? 1 : //
-														unit > 0.5f ? 0.5f : //
-																unit > 0.2f ? 0.2f : //
-																		unit > 0.1f ? 0.1f : //
-																				unit > 0.05f ? 0.05f : //
-																						unit > 0.02f ? 0.02f : //
-																								0.01f;
+														unit > 0.5 ? 0.5 : //
+																unit > 0.2 ? 0.2 : //
+																		unit > 0.1 ? 0.1 : //
+																				unit > 0.05 ? 0.05 : //
+																						unit > 0.02 ? 0.02 : //
+																								0.01;
 
 		unit *= multiplier;
 
@@ -448,27 +451,29 @@ public class Util {
 	 * Round floating value by removing the trailing part, which causes problem when creating units.
 	 * For the value 200.00004 the .00004 part will be removed
 	 * 
-	 * @param graphValue
+	 * @param graphMinVisibleValue
 	 * @param graphUnit
 	 * @return
 	 */
-	public static float roundFloatToUnit(final float graphValue, final float graphUnit, final boolean isMinValue) {
+	public static double roundFloatToUnit(	final double graphMinVisibleValue,
+											final double graphUnit,
+											final boolean isMinValue) {
 
 		if (graphUnit < 1) {
 
-			if (graphValue < 0) {
+			if (graphMinVisibleValue < 0) {
 
-				final float gvDiv1 = graphValue / graphUnit;
+				final double gvDiv1 = graphMinVisibleValue / graphUnit;
 				final int gvDiv2 = (int) (gvDiv1 - 0.5f);
-				final float gvDiv3 = gvDiv2 * graphUnit;
+				final double gvDiv3 = gvDiv2 * graphUnit;
 
 				return gvDiv3;
 
 			} else {
 
-				final float gvDiv1 = graphValue / graphUnit;
+				final double gvDiv1 = graphMinVisibleValue / graphUnit;
 				final int gvDiv2 = (int) (gvDiv1 + (isMinValue ? -0.5f : 0.5f));
-				final float gvDiv3 = gvDiv2 * graphUnit;
+				final double gvDiv3 = gvDiv2 * graphUnit;
 
 				return gvDiv3;
 			}
@@ -477,11 +482,11 @@ public class Util {
 
 			// graphUnit >= 1
 
-			if (graphValue < 0) {
+			if (graphMinVisibleValue < 0) {
 
-				final float gvDiv1 = graphValue * graphUnit;
+				final double gvDiv1 = graphMinVisibleValue * graphUnit;
 				final long gvDiv2 = (long) (gvDiv1 + (isMinValue ? -0.5f : 0.5f));
-				final float gvDiv3 = gvDiv2 / graphUnit;
+				final double gvDiv3 = gvDiv2 / graphUnit;
 
 				return gvDiv3;
 
@@ -489,9 +494,9 @@ public class Util {
 
 				// graphValue >= 0
 
-				final float gvDiv1 = graphValue * graphUnit;
+				final double gvDiv1 = graphMinVisibleValue * graphUnit;
 				final long gvDiv2 = (long) (gvDiv1 + 0.5f);
-				final float gvDiv3 = gvDiv2 / graphUnit;
+				final double gvDiv3 = gvDiv2 / graphUnit;
 
 				return gvDiv3;
 			}
