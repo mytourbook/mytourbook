@@ -69,6 +69,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.util.SafeRunnable;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.RGB;
@@ -159,6 +160,13 @@ public class TourChart extends Chart {
 
 		addPrefListeners();
 
+		/*
+		 * set values from pref store
+		 */
+		graphTransparencyLine = _prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE);
+		graphTransparencyFilling = _prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING);
+		graphAntialiasing = _prefStore.getBoolean(ITourbookPreferences.GRAPH_ANTIALIASING) ? SWT.ON : SWT.OFF;
+
 		gridVerticalDistance = _prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE);
 		gridHorizontalDistance = _prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE);
 
@@ -198,22 +206,6 @@ public class TourChart extends Chart {
 
 		setTourToolTipProvider(_tourInfoToolTipProvider);
 	}
-
-//	@Override
-//	public void activateActions(IWorkbenchPartSite partSite) {
-//
-////		IContextService contextService = (IContextService) partSite.getService(IContextService.class);
-////		fContextBarChart = contextService.activateContext(Chart.CONTEXT_ID_BAR_CHART);
-////		net.tourbook.chart.context.isTourChart
-////		fChart.updateChartActionHandlers();
-//	}
-//
-//	@Override
-//	public void deactivateActions(IWorkbenchPartSite partSite) {
-//
-////		IContextService contextService = (IContextService) partSite.getService(IContextService.class);
-////		contextService.deactivateContext(fContextBarChart);
-//	}
 
 	public void actionCanAutoMoveSliders(final boolean isItemChecked) {
 
@@ -463,6 +455,17 @@ public class TourChart extends Chart {
 					/*
 					 * when the chart is computed, the modified colors are read from the preferences
 					 */
+
+					isChartModified = true;
+
+				} else if (property.equals(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE)
+						|| property.equals(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING)
+						|| property.equals(ITourbookPreferences.GRAPH_ANTIALIASING)) {
+
+					graphTransparencyLine = _prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE);
+					graphTransparencyFilling = _prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING);
+					graphAntialiasing = _prefStore.getBoolean(//
+							ITourbookPreferences.GRAPH_ANTIALIASING) ? SWT.ON : SWT.OFF;
 
 					isChartModified = true;
 
@@ -841,7 +844,7 @@ public class TourChart extends Chart {
 		_layerSegmentValue.setXDataSerie(xDataSerie);
 
 		// draw the graph lighter that the segments are more visible
-		setGraphAlpha(0x60);
+		setGraphAlpha(0.5);
 	}
 
 	/**
@@ -1283,13 +1286,6 @@ public class TourChart extends Chart {
 		/*
 		 * HR zone painter
 		 */
-//		final ChartDataYSerie yDataPulse = (ChartDataYSerie) dataModel.getCustomData(//
-//				TourManager.CUSTOM_DATA_PULSE);
-//
-//		if ((yData == yDataPulse || yData == yDataAltitude) && _hrZonePainter != null) {
-//			yData.setCustomFillPainter(_hrZonePainter);
-//		}
-
 		if (_hrZonePainter != null) {
 			yData.setCustomFillPainter(_hrZonePainter);
 		}

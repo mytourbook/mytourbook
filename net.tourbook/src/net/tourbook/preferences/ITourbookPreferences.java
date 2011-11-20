@@ -64,6 +64,9 @@ public interface ITourbookPreferences {
 	public static final String	GRAPH_X_AXIS_STARTTIME						= "graphs.x-axis.starttime";								//$NON-NLS-1$
 	public static final String	GRAPH_IS_HR_ZONE_BACKGROUND_VISIBLE			= "Graph_HrZone_IsVisible";								//$NON-NLS-1$
 	public static final String	GRAPH_HR_ZONE_STYLE							= "Graph_HrZone_GraphType";								//$NON-NLS-1$
+	public static final String	GRAPH_TRANSPARENCY_LINE						= "Graph_Transparency_Line";								//$NON-NLS-1$
+	public static final String	GRAPH_TRANSPARENCY_FILLING					= "Graph_Transparency_Filling";							//$NON-NLS-1$
+	public static final String	GRAPH_ANTIALIASING							= "Graph_Antialiasing";									//$NON-NLS-1$
 
 	public static final String	GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER				= "graphs.zoom.autozoom-to-slider";						//$NON-NLS-1$
 	public static final String	GRAPH_MOVE_SLIDERS_WHEN_ZOOMED				= "graphs.move-sliders-when-zoomed";						//$NON-NLS-1$
@@ -299,8 +302,8 @@ public interface ITourbookPreferences {
 	/*
 	 * Dialog toggle states
 	 */
-	public static final String	TOGGLE_STATE_REIMPORT_TOUR				= "TOGGLE_STATE_REIMPORT_TOUR";						//$NON-NLS-1$
-	public static final String	TOGGLE_STATE_REIMPORT_ALL_TIME_SLICES	= "TOGGLE_STATE_REIMPORT_ALL_TIME_SLICES";			//$NON-NLS-1$
-	public static final String	TOGGLE_STATE_REIMPORT_ALTITUDE_VALUES	= "TOGGLE_STATE_REIMPORT_ALTITUDE_VALUES";			//$NON-NLS-1$
+	public static final String	TOGGLE_STATE_REIMPORT_TOUR					= "TOGGLE_STATE_REIMPORT_TOUR";							//$NON-NLS-1$
+	public static final String	TOGGLE_STATE_REIMPORT_ALL_TIME_SLICES		= "TOGGLE_STATE_REIMPORT_ALL_TIME_SLICES";					//$NON-NLS-1$
+	public static final String	TOGGLE_STATE_REIMPORT_ALTITUDE_VALUES		= "TOGGLE_STATE_REIMPORT_ALTITUDE_VALUES";					//$NON-NLS-1$
 
 }

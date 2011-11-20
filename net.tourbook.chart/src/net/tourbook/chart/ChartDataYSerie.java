@@ -268,10 +268,6 @@ public class ChartDataYSerie extends ChartDataSerie {
 		_customFillPainter = fillPainter;
 	}
 
-//	public void setDisableLineToNext(final int disabledLineToNext) {
-//		_disabledLineToNext = disabledLineToNext;
-//	}
-
 	public void setCustomForegroundLayers(final ArrayList<IChartLayer> customLayers) {
 		_customFgLayers = customLayers;
 	}

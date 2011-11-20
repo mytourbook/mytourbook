@@ -127,8 +127,12 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 				+ Integer.toString(TourManager.GRAPH_POWER));
 
 		// HR zone backbround
-		store.setDefault(ITourbookPreferences.GRAPH_IS_HR_ZONE_BACKGROUND_VISIBLE, true);
+		store.setDefault(ITourbookPreferences.GRAPH_IS_HR_ZONE_BACKGROUND_VISIBLE, false);
 		store.setDefault(ITourbookPreferences.GRAPH_HR_ZONE_STYLE, TourChart.COMMAND_ID_HR_ZONE_STYLE_GRAPH_TOP);
+
+		store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE, 0xFF);
+		store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING, 0xAA);
+		store.setDefault(ITourbookPreferences.GRAPH_ANTIALIASING, true);
 
 		// show breaktime values
 		store.setDefault(ITourbookPreferences.GRAPH_IS_BREAKTIME_VALUES_VISIBLE, true);
@@ -148,8 +152,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		// graph grid
 		store.setDefault(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE, 80);
 		store.setDefault(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE, 80);
-		store.setDefault(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES, false);
-		store.setDefault(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES, false);
+		store.setDefault(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES, true);
+		store.setDefault(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES, true);
 
 		/*
 		 * graph smoothing

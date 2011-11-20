@@ -44,7 +44,7 @@ public class Messages extends NLS {
 	public static String		Action_zoom_out_tooltip;
 	public static String		Action_zoom_to_slider;
 
-	public static String	Error_Message_001_Default;
+	public static String		Error_Message_001_Default;
 
 	public static String		Format_number_float;
 
@@ -63,16 +63,15 @@ public class Messages extends NLS {
 	public static String		Image_cursor_mode_slider;
 	public static String		Image_cursor_mode_zoom;
 	public static String		Image_cursor_mode_zoom_move;
-
-	public static String	Image_Cursor_Move1x;
-
-	public static String	Image_Cursor_Move2x;
-
-	public static String	Image_Cursor_Move3x;
-
-	public static String	Image_Cursor_Move4x;
-
-	public static String	Image_Cursor_Move5x;
+	public static String		Image_Cursor_Move_XSlider_Move;
+	public static String		Image_Cursor_Move_XSlider_Zoom;
+	public static String		Image_Cursor_Move1x;
+	public static String		Image_Cursor_Move2x;
+	public static String		Image_Cursor_Move3x;
+	public static String		Image_Cursor_Move4x;
+	public static String		Image_Cursor_Move5x;
+	public static String		Image_Cursor_X_Slider_Left;
+	public static String		Image_Cursor_X_Slider_Right;
 
 	public static String		Image_mouse_mode;
 

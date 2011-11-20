@@ -696,8 +696,7 @@ public class Messages extends NLS {
 	public static String		Import_Data_Dialog_GetAlternativePath_Message;
 	public static String		Import_Data_Dialog_GetReimportedFilePath_Message;
 	public static String		Import_Data_Dialog_Reimport_Title;
-	public static String	Import_Data_Dialog_ReimportIsInvalid_CommonError_Message;
-
+	public static String		Import_Data_Dialog_ReimportIsInvalid_CommonError_Message;
 	public static String		Import_Data_Dialog_ReimportIsInvalid_DifferentTourId_Message;
 	public static String		Import_Data_Dialog_ReimportIsInvalid_WrongSliceNumbers_Message;
 	public static String		Import_Data_Error_CreatingFileName_Message;
@@ -793,6 +792,8 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Check_force_minimum_for_gradient;
 	public static String		Pref_Graphs_Check_force_minmax_for_pace;
 	public static String		Pref_Graphs_Check_show_start_time;
+	public static String		Pref_Graphs_Checkbox_GraphAntialiasing;
+	public static String		Pref_Graphs_Checkbox_GraphAntialiasing_Tooltip;
 	public static String		Pref_Graphs_Checkbox_ShowHorizontalGrid;
 	public static String		Pref_Graphs_Checkbox_ShowVerticalGrid;
 	public static String		Pref_Graphs_Error_one_graph_must_be_selected;
@@ -805,6 +806,10 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Group_mouse_mode;
 	public static String		Pref_Graphs_Group_units_for_xaxis;
 	public static String		Pref_Graphs_Group_zoom_options;
+	public static String		Pref_Graphs_Label_GraphTransparency;
+	public static String		Pref_Graphs_Label_GraphTransparency_Tooltip;
+	public static String		Pref_Graphs_Label_GraphTransparencyLine;
+	public static String		Pref_Graphs_Label_GraphTransparencyLine_Tooltip;
 	public static String		Pref_Graphs_Label_select_graph;
 	public static String		Pref_Graphs_Label_select_graph_tooltip;
 	public static String		Pref_Graphs_move_sliders_when_zoomed;

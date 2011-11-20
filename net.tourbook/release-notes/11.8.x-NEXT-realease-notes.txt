@@ -6,6 +6,7 @@ Improvements:
 - reimport only altitude data
 - reimport can also be done in the tourbook view
 - renovated tour chart
+	- set transparency and antialiasing for the line graphs
 
 new Tour Chart behaviour
 - when x-slider is dragged with the mouse, the mouse wheel can zoom in/out and keeps the position

@@ -36,26 +36,29 @@ import org.eclipse.swt.widgets.Event;
 /**
  * Chart widget which represents the chart ui The chart consists of these components
  * <p>
- * The chart widget consists has the following heights: <code>
- *  devMarginTop
- *  devTitleBarHeight
- *  devMarkerBarHeight
+ * The chart widget consists has the following heights:
+ * 
+ * <pre>
+ *  {@link #_devMarginTop}
+ *  {@link #_devXTitleBarHeight}
  * 
  *  |devSliderBarHeight
  *  |#graph#
- *  |verticalDistance
+ * 
+ *   verticalDistance
  * 
  *  |devSliderBarHeight
  *  |#graph#
- *  |verticalDistance
+ * 
+ *   verticalDistance
  * 
  *     ...
  * 
  *   |devSliderBarHeight
  *   |#graph#
  * 
- *   xAxisHeight
- * </code>
+ *   {@link #_devXAxisHeight}
+ * </pre>
  */
 public class ChartComponents extends Composite {
 
@@ -70,7 +73,6 @@ public class ChartComponents extends Composite {
 	static final int					CHART_MAX_HEIGHT				= 10000;
 
 	static final int					SLIDER_BAR_HEIGHT				= 10;
-	static final int					MARKER_BAR_HEIGHT				= 50;
 	static final int					TITLE_BAR_HEIGHT				= 18;								//15;
 	static final int					MARGIN_TOP_WITH_TITLE			= 5;
 	static final int					MARGIN_TOP_WITHOUT_TITLE		= 10;
@@ -85,11 +87,6 @@ public class ChartComponents extends Composite {
 	private int							_devMarginTop					= MARGIN_TOP_WITHOUT_TITLE;
 
 	/**
-	 * height of the marker bar, 0 indicates that the marker bar is not visible
-	 */
-	private int							_devMarkerBarHeight				= 0;
-
-	/**
 	 * height of the slider bar, 0 indicates that the slider is not visible
 	 */
 	int									_devSliderBarHeight				= 0;
@@ -102,7 +99,7 @@ public class ChartComponents extends Composite {
 	/**
 	 * height of the horizontal axis
 	 */
-	private final int					_xAxisHeight					= 25;
+	private final int					_devXAxisHeight					= 25;
 
 	/**
 	 * width of the vertical axis
@@ -293,7 +290,7 @@ public class ChartComponents extends Composite {
 		// loop all graphs
 		for (final ChartDataYSerie yData : yDataList) {
 
-			final GraphDrawingData drawingData = new GraphDrawingData(yData.getChartType());
+			final GraphDrawingData drawingData = new GraphDrawingData(chartDrawingData, yData.getChartType());
 
 			graphDrawingData.add(drawingData);
 
@@ -323,14 +320,14 @@ public class ChartComponents extends Composite {
 			createDrawingDataXValues(drawingData);
 			createDrawingDataYValues(drawingData, graphCount, graphIndex);
 
-			// set values after they have been computed
-			drawingData.setDevMarginTop(_devMarginTop);
-			drawingData.setDevXTitelBarHeight(_devXTitleBarHeight);
-			drawingData.setDevSliderBarHeight(_devSliderBarHeight);
-			drawingData.setDevMarkerBarHeight(_devMarkerBarHeight);
-
 			graphIndex++;
 		}
+
+		// set values after they have been computed
+		chartDrawingData.devMarginTop = _devMarginTop;
+		chartDrawingData.devXTitelBarHeight = _devXTitleBarHeight;
+		chartDrawingData.devSliderBarHeight = _devSliderBarHeight;
+		chartDrawingData.devXAxisHeight = _devXAxisHeight;
 
 		return chartDrawingData;
 	}
@@ -541,11 +538,9 @@ public class ChartComponents extends Composite {
 		final int unitType = yData.getAxisUnit();
 
 		// height of one chart graph including the slider bar
-		int devGraphHeight = _visibleGraphRect.height
-				- _devMarginTop
-				- _devMarkerBarHeight
-				- _devXTitleBarHeight
-				- _xAxisHeight;
+		final int devChartHeight = getChartHeightWithoutTrim();
+
+		int devGraphHeight = devChartHeight;
 
 		/*
 		 * adjust graph device height for stacked graphs, a gap is between two graphs
@@ -666,7 +661,7 @@ public class ChartComponents extends Composite {
 		final float graphScaleY = devGraphHeight / value1;
 
 		// calculate the vertical device offset
-		int devYTop = _devMarginTop + _devMarkerBarHeight + _devXTitleBarHeight;
+		int devYTop = _devMarginTop + _devXTitleBarHeight;
 
 		if (_chartDataModel.isStackedChart()) {
 			// each chart has its own drawing rectangle which are stacked on
@@ -726,11 +721,9 @@ public class ChartComponents extends Composite {
 		final ChartDataYSerie yData = drawingData.getYData();
 
 		// height of one chart graph including the slider bar
-		int devGraphHeight = _visibleGraphRect.height
-				- _devMarginTop
-				- _devMarkerBarHeight
-				- _devXTitleBarHeight
-				- _xAxisHeight;
+		final int devChartHeight = getChartHeightWithoutTrim();
+
+		int devGraphHeight = devChartHeight;
 
 		// adjust graph device height for stacked graphs, a gap is between two
 		// graphs
@@ -841,7 +834,7 @@ public class ChartComponents extends Composite {
 		final float graphScaleY = (float) (devGraphHeight) / graphValueRange;
 
 		// calculate the vertical device offset
-		int devYTop = _devMarginTop + _devMarkerBarHeight + _devXTitleBarHeight;
+		int devYTop = _devMarginTop + _devXTitleBarHeight;
 
 		if (_chartDataModel.isStackedChart()) {
 			// each chart has its own drawing rectangle which are stacked on
@@ -1343,6 +1336,14 @@ public class ChartComponents extends Composite {
 		return _chartDrawingData;
 	}
 
+	int getChartHeightWithoutTrim() {
+
+		return _visibleGraphRect.height //
+				- _devMarginTop
+				- _devXTitleBarHeight
+				- _devXAxisHeight;
+	}
+
 	/**
 	 * @return Returns the visible chart graph height
 	 */
@@ -1479,13 +1480,6 @@ public class ChartComponents extends Composite {
 	}
 
 	/**
-	 * @param isMarkerVisible
-	 */
-	void setMarkerVisible(final boolean isMarkerVisible) {
-		_devMarkerBarHeight = isMarkerVisible ? MARKER_BAR_HEIGHT : 0;
-	}
-
-	/**
 	 * set the chart data model and redraw the chart
 	 * 
 	 * @param chartModel
@@ -1513,7 +1507,6 @@ public class ChartComponents extends Composite {
 			 */
 			if (_devSliderBarHeight > 0) {
 				_componentGraph.resetSliders();
-
 			}
 		}
 	}

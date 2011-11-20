@@ -61,8 +61,6 @@ public class Chart extends ViewForm {
 	public static final int				SYNCH_MODE_BY_SCALE					= 1;
 	public static final int				SYNCH_MODE_BY_SIZE					= 2;
 
-	static final int					GRAPH_ALPHA							= 0xd0;
-
 	public static final String			MOUSE_MODE_SLIDER					= "slider";										//$NON-NLS-1$
 	public static final String			MOUSE_MODE_ZOOM						= "zoom";											//$NON-NLS-1$
 
@@ -129,6 +127,27 @@ public class Chart extends ViewForm {
 
 	protected boolean					isShowHorizontalGridLines			= false;
 	protected boolean					isShowVerticalGridLines				= false;
+
+	/**
+	 * Transparency of the graph lines
+	 */
+	protected int						graphTransparencyLine				= 0xFF;
+
+	/**
+	 * Transparency of the graph fillings
+	 */
+	protected int						graphTransparencyFilling			= 0xE0;
+
+	/**
+	 * The graph transparency can be adjusted with this value. This value is multiplied with the
+	 * {@link #graphTransparencyFilling} and {@link #graphTransparencyLine}.
+	 */
+	double								graphTransparencyAdjustment			= 1.0;
+
+	/**
+	 * Antialiasing for the graph, can be {@link SWT#ON} or {@link SWT#OFF}.
+	 */
+	protected int						graphAntialiasing					= SWT.OFF;
 
 	/**
 	 * mouse behaviour:<br>
@@ -902,18 +921,8 @@ public class Chart extends ViewForm {
 	}
 
 	public void resetGraphAlpha() {
-		_chartComponents.getChartComponentGraph()._graphAlpha = GRAPH_ALPHA;
+		graphTransparencyAdjustment = 1;
 	}
-
-//	/**
-//	 * Set <code>true</code> when the internal action bar should be used, set <code>false</code>
-//	 * when the workbench action should be used.
-//	 *
-//	 * @param useInternalActionBar
-//	 */
-//	public void setUseInternalActionBar(boolean useInternalActionBar) {
-//		fUseInternalActionBar = useInternalActionBar;
-//	}
 
 	/**
 	 * Do a resize for all chart components which creates new drawing data
@@ -1018,12 +1027,14 @@ public class Chart extends ViewForm {
 	}
 
 	/**
-	 * Sets the alpha value for the filling operation
+	 * Adjust the alpha value for the filling operation, this value is multiplied with
+	 * {@link #graphTransparencyFilling} and {@link #graphTransparencyLine} which is set in the tour
+	 * chart preference page.
 	 * 
-	 * @param alphaValue
+	 * @param adjustment
 	 */
-	public void setGraphAlpha(final int alphaValue) {
-		_chartComponents.getChartComponentGraph()._graphAlpha = alphaValue;
+	public void setGraphAlpha(final double adjustment) {
+		graphTransparencyAdjustment = adjustment;
 	}
 
 	public void setGrid(final int horizontalGrid,
@@ -1093,14 +1104,6 @@ public class Chart extends ViewForm {
 		_chartComponents.getChartComponentGraph().setSelectedBars(selectedItems);
 
 		fireBarSelectionEvent(0, _barSelectionValueIndex);
-	}
-
-	/**
-	 * @param isMarkerVisible
-	 *            <code>true</code> shows the marker area
-	 */
-	public void setShowMarker(final boolean isMarkerVisible) {
-		_chartComponents.setMarkerVisible(isMarkerVisible);
 	}
 
 	/**

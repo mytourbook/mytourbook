@@ -17,7 +17,6 @@ package net.tourbook.chart;
 
 import java.util.ArrayList;
 
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
 /**
@@ -47,9 +46,6 @@ public class GraphDrawingData {
 	private Rectangle[][]			_barRectangles;
 	private Rectangle[][]			_barFocusRectangles;
 
-	Rectangle[]						lineFocusRectangles;
-	Point[]							lineDevPositions;
-
 	private int						_barRectangleWidth;
 
 	private int						_devBarRectangleXPos;
@@ -73,12 +69,7 @@ public class GraphDrawingData {
 	 * scaling the the x unit
 	 */
 	private float					_scaleUnitX				= Float.MIN_VALUE;
-	private int						_devMarginTop;
 
-	private int						_devXTitelBarHeight;
-
-	private int						_devMarkerBarHeight;
-	private int						_devSliderBarHeight;
 	// graph position
 	private int						_devYTop;
 	private int						_devYBottom;
@@ -110,7 +101,10 @@ public class GraphDrawingData {
 
 	private boolean[]				_isDrawUnits			= null;
 
-	public GraphDrawingData(final int chartType) {
+	private ChartDrawingData		_chartDrawingData;
+
+	public GraphDrawingData(final ChartDrawingData chartDrawingData, final int chartType) {
+		_chartDrawingData = chartDrawingData;
 		_chartType = chartType;
 	}
 
@@ -154,47 +148,8 @@ public class GraphDrawingData {
 		return _devBarRectangleXPos;
 	}
 
-	/**
-	 * @return Returns the devMarginTop.
-	 */
-	public int getDevMarginTop() {
-		return _devMarginTop;
-	}
-
-	/**
-	 * @return Returns the devMarkerBarHeight.
-	 */
-	public int getDevMarkerBarHeight() {
-		return _devMarkerBarHeight;
-	}
-
-//	public int getDevGraphHeight() {
-//		return devGraphHeight;
-//	}
-//
-//	/**
-//	 * virtual graph width in dev (pixel) units
-//	 */
-//	int getDevGraphWidth() {
-//		return devGraphWidth;
-//	}
-
-	/**
-	 * @return Returns the devSliderBarHeight.
-	 */
-	public int getDevSliderBarHeight() {
-		return _devSliderBarHeight;
-	}
-
 	public int getDevSliderHeight() {
 		return _devSliderHeight;
-	}
-
-	/**
-	 * @return Returns the devTitelBarHeight.
-	 */
-	public int getDevXTitelBarHeight() {
-		return _devXTitelBarHeight;
 	}
 
 	/**
@@ -208,7 +163,11 @@ public class GraphDrawingData {
 	 * @return Returns the y position for the title
 	 */
 	public int getDevYTitle() {
-		return getDevYBottom() - devGraphHeight - getDevSliderBarHeight() - getDevXTitelBarHeight();
+
+		return getDevYBottom() //
+				- devGraphHeight
+				- _chartDrawingData.devSliderBarHeight
+				- _chartDrawingData.devXTitelBarHeight;
 	}
 
 	/**
@@ -359,40 +318,8 @@ public class GraphDrawingData {
 		_devBarRectangleXPos = barRectanglePos;
 	}
 
-	/**
-	 * @param devMarginTop
-	 *            The devMarginTop to set.
-	 */
-	public void setDevMarginTop(final int devMarginTop) {
-		_devMarginTop = devMarginTop;
-	}
-
-	/**
-	 * @param devMarkerBarHeight
-	 *            The devMarkerBarHeight to set.
-	 */
-	public void setDevMarkerBarHeight(final int devMarkerBarHeight) {
-		_devMarkerBarHeight = devMarkerBarHeight;
-	}
-
-	/**
-	 * @param devSliderBarHeight
-	 *            The devSliderBarHeight to set.
-	 */
-	public void setDevSliderBarHeight(final int devSliderBarHeight) {
-		_devSliderBarHeight = devSliderBarHeight;
-	}
-
 	public void setDevSliderHeight(final int devSliderHeight) {
 		_devSliderHeight = devSliderHeight;
-	}
-
-	/**
-	 * @param devTitelBarHeight
-	 *            The devTitelBarHeight to set.
-	 */
-	void setDevXTitelBarHeight(final int devTitelBarHeight) {
-		_devXTitelBarHeight = devTitelBarHeight;
 	}
 
 	public void setDevYBottom(final int devY) {
