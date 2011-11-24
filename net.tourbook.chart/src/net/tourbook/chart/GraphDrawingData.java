@@ -101,10 +101,10 @@ public class GraphDrawingData {
 
 	private boolean[]				_isDrawUnits			= null;
 
-	private ChartDrawingData		_chartDrawingData;
+	ChartDrawingData				chartDrawingData;
 
 	public GraphDrawingData(final ChartDrawingData chartDrawingData, final int chartType) {
-		_chartDrawingData = chartDrawingData;
+		this.chartDrawingData = chartDrawingData;
 		_chartType = chartType;
 	}
 
@@ -166,8 +166,8 @@ public class GraphDrawingData {
 
 		return getDevYBottom() //
 				- devGraphHeight
-				- _chartDrawingData.devSliderBarHeight
-				- _chartDrawingData.devXTitelBarHeight;
+				- chartDrawingData.devSliderBarHeight
+				- chartDrawingData.devXTitelBarHeight;
 	}
 
 	/**

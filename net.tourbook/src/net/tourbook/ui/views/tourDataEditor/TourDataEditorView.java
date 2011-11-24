@@ -298,7 +298,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private final DateTimeFormatter				_dtFormatter					= DateTimeFormat.mediumDateTime();
 
 	private final NumberFormat					_nf1							= NumberFormat.getNumberInstance();
-
 	private final NumberFormat					_nf1NoGroup						= NumberFormat.getNumberInstance();
 	private final NumberFormat					_nf3							= NumberFormat.getNumberInstance();
 	private final NumberFormat					_nf6							= NumberFormat.getNumberInstance();

@@ -118,7 +118,9 @@ public class ChartComponentAxis extends Canvas {
 
 		addMouseTrackListener(new MouseTrackListener() {
 
-			public void mouseEnter(final MouseEvent e) {}
+			public void mouseEnter(final MouseEvent e) {
+				onMouseEnter(e);
+			}
 
 			public void mouseExit(final MouseEvent e) {
 				onMouseExit(e);
@@ -352,10 +354,12 @@ public class ChartComponentAxis extends Canvas {
 		_componentGraph.onMouseDownAxis(event);
 	}
 
+	private void onMouseEnter(final MouseEvent event) {
+		_componentGraph.onMouseEnterAxis(event);
+	}
+
 	private void onMouseExit(final MouseEvent event) {
-
 		_componentGraph.onMouseExitAxis(event);
-
 	}
 
 	private void onMouseMove(final MouseEvent event) {

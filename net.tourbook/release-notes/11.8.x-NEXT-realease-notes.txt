@@ -12,6 +12,7 @@ new Tour Chart behaviour
 - when x-slider is dragged with the mouse, the mouse wheel can zoom in/out and keeps the position
 - when the chart is zoomed in and the mouse is moved within the x-axis area, the graph is scrolled left/right
 - Ctrl+Shift moves the x-slider to the exact value position (Ctrl MUST be pressed FIRST!!!)
+- increased chart virtual size to 10'000'000 pixel: you can zoom 100 times more into the chart than before
 
 
 Infos:

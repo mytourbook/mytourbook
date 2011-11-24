@@ -115,7 +115,6 @@ public class TourChart extends Chart {
 																							.getPreferenceStore();
 
 	private TourData						_tourData;
-
 	private TourChartConfiguration			_tourChartConfig;
 
 	private final boolean					_isShowActions;
@@ -455,8 +454,10 @@ public class TourChart extends Chart {
 					/*
 					 * when the chart is computed, the modified colors are read from the preferences
 					 */
-
 					isChartModified = true;
+
+					// dispose old colors
+					disposeColors();
 
 				} else if (property.equals(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE)
 						|| property.equals(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING)
@@ -534,6 +535,7 @@ public class TourChart extends Chart {
 
 		_prefStore.addPropertyChangeListener(_prefChangeListener);
 	}
+
 
 	public void addTourChartListener(final ITourChartSelectionListener listener) {
 		_selectionListeners.add(listener);
@@ -1124,7 +1126,6 @@ public class TourChart extends Chart {
 	}
 
 	private void onDispose() {
-
 		_prefStore.removePropertyChangeListener(_prefChangeListener);
 	}
 

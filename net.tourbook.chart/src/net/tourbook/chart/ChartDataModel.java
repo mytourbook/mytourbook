@@ -82,6 +82,8 @@ public class ChartDataModel {
 	 */
 	private boolean						_isNoLinesValuesDisplayed;
 
+	private IChartInfoPainter			_chartInfoPainter;
+
 	public ChartDataModel(final int chartType) {
 		_chartType = chartType;
 	}
@@ -95,6 +97,13 @@ public class ChartDataModel {
 	 */
 	public void addYData(final ChartDataYSerie data) {
 		_yData.add(data);
+	}
+
+	/**
+	 * @return the _chartInfoPainter
+	 */
+	public IChartInfoPainter getChartInfoPainter() {
+		return _chartInfoPainter;
 	}
 
 	public int getChartMinWidth() {
@@ -175,6 +184,14 @@ public class ChartDataModel {
 			ySerie._visibleMinValue = ySerie.getOriginalMinValue();
 			ySerie._visibleMaxValue = ySerie.getOriginalMaxValue();
 		}
+	}
+
+	/**
+	 * @param chartInfoPainter
+	 *            the _chartInfoPainter to set
+	 */
+	public void setChartInfoPainter(final IChartInfoPainter chartInfoPainter) {
+		_chartInfoPainter = chartInfoPainter;
 	}
 
 	public void setChartMinWidth(final int chartMinWidth) {

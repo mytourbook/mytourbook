@@ -133,12 +133,10 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 	private final IPreferenceStore						_prefStore							= TourbookPlugin
 																									.getDefault()
-																									//
 																									.getPreferenceStore();
 
 	private final IDialogSettings						_state								= TourbookPlugin
 																									.getDefault()
-																									//
 																									.getDialogSettingsSection(
 																											ID);
 	private ColumnManager								_columnManager;
@@ -153,11 +151,11 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 	private final NumberFormat							_nf1								= NumberFormat
 																									.getNumberInstance();
-
 	{
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
 	}
+
 	private final Calendar								_calendar							= GregorianCalendar
 																									.getInstance();
 

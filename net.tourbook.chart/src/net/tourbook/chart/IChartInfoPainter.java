@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,20 +13,22 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.tour;
+package net.tourbook.chart;
 
-import net.tourbook.data.TourType;
+import org.eclipse.swt.graphics.GC;
 
 /**
- * Enable or disable recently used tour types
+ * Draw chart info into the chart.
  */
-public interface IRecentTourTypeEnabler_DISABLED {
+public interface IChartInfoPainter {
 
 	/**
-	 * @param tourType
-	 * @return Return <code>true</code> when the tour type should be enabled, <code>false</code>
-	 *         will disable the recent tour type
+	 * @param gc
+	 * @param devXMouse
+	 * @param devYMouse
+	 * @param valueIndex
+	 *            Value index in the data serie
+	 * @param _colorCache
 	 */
-	public boolean isTourTypeEnabled(TourType tourType);
-
+	void drawChartInfo(GC gc, int devXMouse, int devYMouse, int valueIndex, ColorCache colorCache);
 }

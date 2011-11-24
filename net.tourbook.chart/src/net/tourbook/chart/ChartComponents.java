@@ -320,6 +320,9 @@ public class ChartComponents extends Composite {
 			createDrawingDataXValues(drawingData);
 			createDrawingDataYValues(drawingData, graphCount, graphIndex);
 
+			// reset adjusted y-slider value
+			yData.adjustedYValue = Float.MIN_VALUE;
+
 			graphIndex++;
 		}
 
@@ -469,9 +472,6 @@ public class ChartComponents extends Composite {
 				graphValue = Util.roundFloatToUnit(graphValue, graphUnit, false);
 			}
 
-//			System.out.println(graphMinVisibleValue + "\t" + graphMaxVisibleValue + "\t" + loopCounter + "\t");
-//			// TODO remove SYSTEM.OUT.PRINTLN
-
 			break;
 		}
 
@@ -581,12 +581,12 @@ public class ChartComponents extends Composite {
 		final double graphUnit = Util.roundDecimalValue(defaultUnitValue);
 
 		/*
-		 * the scaled unit with long min/max values is used because arithmetic with floating point
-		 * values fails, BigDecimal could propably solve this problem but I don't have it used yet
+		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		 * The scaled unit with long min/max values is used because arithmetic with floating point
+		 * values fails. BigDecimal is necessary otherwis the scaledUnit can be wrong !!!
+		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		 */
 		final long valueScaling = Util.getValueScaling(graphUnit);
-
-//		final BigDecimal bigGraphUnit = BigDecimal.valueOf(graphUnit);
 
 		final BigDecimal bigGraphUnit = new BigDecimal(Double.valueOf(graphUnit));
 		final BigDecimal bigValueScaling = new BigDecimal(valueScaling);
@@ -596,6 +596,22 @@ public class ChartComponents extends Composite {
 
 		long scaledMinValue = (long) (graphMinValue * valueScaling);
 		long scaledMaxValue = (long) (graphMaxValue * valueScaling);
+
+		/*
+		 * adjustedYValue is set when the y-slider has been moved
+		 */
+		boolean isMinAdjusted = false;
+		boolean isMaxAdjusted = false;
+		final float adjustedYValue = yData.adjustedYValue;
+		final boolean isMinMaxAdjusted = adjustedYValue != Float.MIN_VALUE;
+
+		if (isMinMaxAdjusted) {
+
+			final long scaledAdjustedYValue = (long) (adjustedYValue * valueScaling);
+
+			isMinAdjusted = scaledAdjustedYValue == scaledMinValue;
+			isMaxAdjusted = scaledAdjustedYValue == scaledMaxValue;
+		}
 
 		/*
 		 * adjust min value, decrease min value when it does not fit to unit borders
@@ -610,8 +626,10 @@ public class ChartComponents extends Composite {
 		/*
 		 * ensure that min value is not at the bottom of the graph, except values which start at 0
 		 */
-		if (scaledMinValue == adjustedScaledMinValue && scaledMinValue != 0) {
+		if (isMinMaxAdjusted == false && scaledMinValue == adjustedScaledMinValue && scaledMinValue != 0) {
 			scaledMinValue = adjustedScaledMinValue - scaledUnit;
+		} else if (isMinMaxAdjusted && isMinAdjusted) {
+			scaledMinValue = adjustedScaledMinValue;// - scaledUnit;
 		} else {
 			scaledMinValue = adjustedScaledMinValue;
 		}
@@ -627,8 +645,10 @@ public class ChartComponents extends Composite {
 		final long adjustedScaledMaxValue = ((long) ((scaledMaxValue + adjustMaxValue) / scaledUnit) * scaledUnit);
 
 		// ensure that max value is not at the top of the graph
-		if (scaledMaxValue == adjustedScaledMaxValue) {
+		if (isMinMaxAdjusted == false && scaledMaxValue == adjustedScaledMaxValue) {
 			scaledMaxValue = adjustedScaledMaxValue + scaledUnit;
+		} else if (isMinMaxAdjusted && isMaxAdjusted) {
+			scaledMaxValue = adjustedScaledMaxValue;// + scaledUnit;
 		} else {
 			scaledMaxValue = adjustedScaledMaxValue;
 		}

@@ -1,22 +1,21 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.chart;
 
 import java.util.HashMap;
-import java.util.Iterator;
 
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
@@ -33,13 +32,13 @@ public class ColorCache {
 	}
 
 	/**
-	 * Creates a color in the color cache
+	 * Creates a color in the color cache when the color is not yet created.
 	 * 
 	 * @param colorKey
 	 * @param rgb
 	 * @return Returns the created color
 	 */
-	public Color createColor(final String colorKey, final RGB rgb) {
+	public Color getColor(final String colorKey, final RGB rgb) {
 
 		// check if key already exists
 		if (_colors.containsKey(colorKey)) {
@@ -57,8 +56,8 @@ public class ColorCache {
 	 * Dispose all colors in the color cache
 	 */
 	public void dispose() {
-		for (final Iterator<Color> i = _colors.values().iterator(); i.hasNext();) {
-			(i.next()).dispose();
+		for (final Color color : _colors.values()) {
+			(color).dispose();
 		}
 		_colors.clear();
 	}

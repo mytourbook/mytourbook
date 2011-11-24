@@ -75,9 +75,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="16"
-     inkscape:cx="153.54204"
-     inkscape:cy="383.25944"
+     inkscape:zoom="22.627417"
+     inkscape:cx="137.73382"
+     inkscape:cy="355.70394"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -223,16 +223,16 @@
     <rect
        style="opacity:0.494;fill:none;stroke:none;display:inline"
        id="rect2998-1"
-       width="19"
-       height="22.000244"
+       width="16"
+       height="18"
        x="70"
-       y="627.36194"
+       y="627.36218"
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.chart\icons\cursor-x-slider-right.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
        style="fill:#7484d0;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:2, 2;stroke-dashoffset:0"
-       d="m 72,647.36218 0,-18"
+       d="m 71,645.36218 0,-18"
        id="path3039"
        inkscape:connector-curvature="0"
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.chart\icons\cursor-x-slider-right.png"
@@ -240,7 +240,7 @@
        inkscape:export-ydpi="90" />
     <path
        style="fill:#000000;fill-opacity:1;stroke:#7484d0;stroke-width:4;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       d="m 85,638.36218 -2,0.001"
+       d="m 84,636.36218 -2,0.001"
        id="path3043"
        inkscape:connector-curvature="0"
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.chart\icons\cursor-x-slider-right.png"
@@ -249,46 +249,46 @@
        sodipodi:nodetypes="cc" />
     <path
        style="fill:#7484d0;fill-opacity:1;stroke:none"
-       d="m 82,631.36218 -6,7 6,7 z"
+       d="m 81,629.36218 -6,7 6,7 z"
        id="path3829"
        inkscape:connector-curvature="0"
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.chart\icons\cursor-x-slider-right.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
-       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
-       d="m 126.5,629.59178 0.0482,14.85442 3.83124,-3.63838 4.25267,8.53036 2.12054,-1.24107 -4.07233,-8.02411 4.73482,-0.0482 z"
+       style="fill:#ffffff;fill-opacity:1;stroke:#515151;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
+       d="m 125.5,628.59178 0.0482,14.85442 3.83124,-3.63838 4.25267,8.53036 2.12054,-1.24107 -4.07233,-8.02411 4.73482,-0.0482 z"
        id="path3016-6"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cccccccc"
-       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.chart\icons\cursor-move-x-slider-zoom.png"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.chart\icons\cursor-mode-zoom-move-x-slider.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <rect
        style="fill:none;stroke:none;display:inline"
        id="rect3842-2"
        width="25"
-       height="23"
+       height="22"
        x="125"
        y="627.36218"
        ry="0"
-       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.chart\icons\cursor-move-x-slider-zoom.png"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.chart\icons\cursor-mode-zoom-move-x-slider.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <rect
        style="opacity:0.494;fill:none;stroke:none;display:inline"
        id="rect2998-1-9"
-       width="19"
-       height="22.000244"
+       width="16"
+       height="18"
        x="-115"
-       y="627.36194"
+       y="627.36218"
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.chart\icons\cursor-x-slider-left.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90"
        transform="scale(-1,1)" />
     <path
        style="fill:#7484d0;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:2, 2;stroke-dashoffset:0;display:inline"
-       d="m 113,647.36218 0,-18"
+       d="m 114,645.36218 0,-18"
        id="path3039-1"
        inkscape:connector-curvature="0"
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.chart\icons\cursor-x-slider-left.png"
@@ -296,7 +296,7 @@
        inkscape:export-ydpi="90" />
     <path
        style="fill:#000000;fill-opacity:1;stroke:#7484d0;stroke-width:4;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
-       d="m 100,638.36218 2,0.001"
+       d="m 101,636.36218 2,0.001"
        id="path3043-5"
        inkscape:connector-curvature="0"
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.chart\icons\cursor-x-slider-left.png"
@@ -305,7 +305,7 @@
        sodipodi:nodetypes="cc" />
     <path
        style="fill:#7484d0;fill-opacity:1;stroke:none;display:inline"
-       d="m 103,631.36218 6,7 -6,7 z"
+       d="m 104,629.36218 6,7 -6,7 z"
        id="path3829-0"
        inkscape:connector-curvature="0"
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.chart\icons\cursor-x-slider-left.png"
@@ -314,7 +314,7 @@
     <g
        id="g4060"
        transform="translate(-1,0)"
-       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.chart\icons\cursor-move-x-slider-zoom.png"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.chart\icons\cursor-mode-zoom-move-x-slider.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90">
       <path
@@ -345,50 +345,53 @@
        sodipodi:rx="5"
        sodipodi:ry="5"
        d="m 149,643.36218 a 5,5 0 1 1 -10,0 5,5 0 1 1 10,0 z"
-       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.chart\icons\cursor-move-x-slider-zoom.png"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.chart\icons\cursor-mode-zoom-move-x-slider.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
-    <path
-       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 141,643.36218 6,0 0,0 0,0 0,0"
-       id="path4069"
-       inkscape:connector-curvature="0"
-       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.chart\icons\cursor-move-x-slider-zoom.png"
+    <g
+       id="g3821"
+       style="stroke:#515151;stroke-opacity:1"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.chart\icons\cursor-mode-zoom-move-x-slider.png"
        inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90" />
+       inkscape:export-ydpi="90">
+      <path
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.chart\icons\cursor-move-x-slider-zoom.png"
+         inkscape:connector-curvature="0"
+         id="path4069"
+         d="m 141,643.36218 6,0 0,0 0,0 0,0"
+         style="fill:none;stroke:#515151;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.chart\icons\cursor-move-x-slider-zoom.png"
+         inkscape:connector-curvature="0"
+         id="path4071"
+         d="m 144,640.36218 0,6"
+         style="fill:none;stroke:#515151;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
     <path
-       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 144,640.36218 0,6"
-       id="path4071"
-       inkscape:connector-curvature="0"
-       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.chart\icons\cursor-move-x-slider-zoom.png"
-       inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90" />
-    <path
-       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
-       d="m 156.5,629.59177 0.0482,14.85442 3.83124,-3.63838 4.25267,8.53036 2.12054,-1.24107 -4.07233,-8.02411 4.73482,-0.0482 z"
+       style="fill:#ffffff;fill-opacity:1;stroke:#515151;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
+       d="m 155.5,628.59177 0.0482,14.85442 3.83124,-3.63838 4.25267,8.53036 2.12054,-1.24107 -4.07233,-8.02411 4.73482,-0.0482 z"
        id="path3016-6-6"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cccccccc"
-       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.chart\icons\cursor-move-x-slider-move.png"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.chart\icons\cursor-mode-slider-move-x-slider.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
-    <rect
+    <path
        style="fill:none;stroke:none;display:inline"
+       d="M 155 627.375 L 155 649.375 L 180 649.375 L 180 627.375 L 155 627.375 z "
        id="rect3842-2-4"
-       width="25"
-       height="23"
-       x="155"
-       y="627.36218"
-       ry="0"
-       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.chart\icons\cursor-move-x-slider-move.png"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.chart\icons\cursor-mode-slider-move-x-slider.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <g
        style="display:inline"
        id="g4060-9"
        transform="translate(29,0)"
-       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.chart\icons\cursor-move-x-slider-move.png"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.chart\icons\cursor-mode-slider-move-x-slider.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90">
       <path
@@ -415,7 +418,7 @@
        d="m 172.5,638.36218 0,11"
        id="path4071-0"
        inkscape:connector-curvature="0"
-       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.chart\icons\cursor-move-x-slider-move.png"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.chart\icons\cursor-mode-slider-move-x-slider.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
@@ -423,7 +426,7 @@
        d="m 175.5,638.36218 0,11"
        id="path4071-0-5"
        inkscape:connector-curvature="0"
-       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.chart\icons\cursor-move-x-slider-move.png"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.chart\icons\cursor-mode-slider-move-x-slider.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
@@ -525,5 +528,54 @@
          d="m 175.5001,654.86248 0,18.9996"
          style="fill:#7484d0;fill-opacity:1;stroke:#7484d0;stroke-width:1.0001955;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline" />
     </g>
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:none;stroke:none;display:inline"
+       d="m 124.99999,677.3622 0,23.99998 20.00001,0 0,-23.99998 -20.00001,0 z"
+       id="rect3842-2-4-5"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.chart\icons\cursor-move-x-slider-5x.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:#7484d0;fill-opacity:1;stroke:none"
+       d="m 130,690.36218 -5,-6.48336 5,-6.57204 0,5.0554 10,0 0,-5.05539 5,6.0665 -5,6.98889 0,-4.96672 -10,0 z"
+       id="path3794-6-2-1"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccccccccc"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.chart\icons\cursor-move-x-slider-5x.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:11.14373302px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#404040;fill-opacity:1;stroke:none;display:inline;font-family:Sans"
+       x="128.19138"
+       y="701.19891"
+       id="text3838-6"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.chart\icons\cursor-move-x-slider-5x.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       transform="scale(1.0011947,0.99880672)"><tspan
+         sodipodi:role="line"
+         id="tspan3840-0"
+         x="128.19138"
+         y="701.19891"
+         style="font-weight:bold;fill:#404040;fill-opacity:1;-inkscape-font-specification:Sans Bold">5x</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1.75351214;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
+       d="m 165.87676,680.29636 0,10.1108 0,0 0,0 0,0"
+       id="path3949"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.chart\icons\Cursor-Hover-XSlider.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1.75351214;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
+       d="m 184.12336,680.29636 0,10.1108 0,0 0,0 0,0"
+       id="path3949-6"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.chart\icons\Cursor-Hover-XSlider.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
   </g>
 </svg>

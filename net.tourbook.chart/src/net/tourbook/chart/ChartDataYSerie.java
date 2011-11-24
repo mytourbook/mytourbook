@@ -63,7 +63,12 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 	private int						_graphFillMethod			= FILL_METHOD_FILL_BOTTOM;
 
-	private boolean					_showYSlider				= false;
+	private boolean					_isShowYSlider				= false;
+
+	/**
+	 * This value is set when a y-slider is dragged
+	 */
+	float							adjustedYValue				= Float.MIN_VALUE;
 
 	/**
 	 * <p>
@@ -87,16 +92,11 @@ public class ChartDataYSerie extends ChartDataSerie {
 	 */
 	private IFillPainter			_customFillPainter;
 
-	private ChartYSlider			_ySliderTop;
+	private ChartYSlider			_ySlider1;
 
-	private ChartYSlider			_ySliderBottom;
+	private ChartYSlider			_ySlider2;
 
 	private final int				_chartType;
-
-	/**
-	 * 2nd y-data serie is currently used to display the slider label and the pace y-units
-	 */
-//	private int[]					fYData2ndSerie;
 
 	/**
 	 * When this value is > 0 a line chart will not draw a line to the next value point when the
@@ -171,16 +171,16 @@ public class ChartDataYSerie extends ChartDataSerie {
 		return _customFgLayers;
 	}
 
-//	public int getDisabledLineToNext() {
-//		return _disabledLineToNext;
-//	}
-
 	/**
 	 * @return returns true if the graph is filled
 	 */
 	public int getGraphFillMethod() {
 		return _graphFillMethod;
 	}
+
+//	public int getDisabledLineToNext() {
+//		return _disabledLineToNext;
+//	}
 
 	/**
 	 * @return Returns the format how the slider label will be formatted, which can be <br>
@@ -196,17 +196,17 @@ public class ChartDataYSerie extends ChartDataSerie {
 	}
 
 	/**
-	 * @return Returns the ySliderBottom.
+	 * @return Returns the ySliderTop.
 	 */
-	public ChartYSlider getYSliderBottom() {
-		return _ySliderBottom;
+	public ChartYSlider getYSlider1() {
+		return _ySlider1;
 	}
 
 	/**
-	 * @return Returns the ySliderTop.
+	 * @return Returns the ySliderBottom.
 	 */
-	public ChartYSlider getYSliderTop() {
-		return _ySliderTop;
+	public ChartYSlider getYSlider2() {
+		return _ySlider2;
 	}
 
 	/**
@@ -220,7 +220,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 	 * @return Returns the showYSlider.
 	 */
 	public boolean isShowYSlider() {
-		return _showYSlider;
+		return _isShowYSlider;
 	}
 
 	/**
@@ -434,10 +434,10 @@ public class ChartDataYSerie extends ChartDataSerie {
 	 */
 	public void setShowYSlider(final boolean showYSlider) {
 
-		this._showYSlider = showYSlider;
+		_isShowYSlider = showYSlider;
 
-		_ySliderTop = new ChartYSlider(this);
-		_ySliderBottom = new ChartYSlider(this);
+		_ySlider1 = new ChartYSlider(this);
+		_ySlider2 = new ChartYSlider(this);
 	}
 
 	/**

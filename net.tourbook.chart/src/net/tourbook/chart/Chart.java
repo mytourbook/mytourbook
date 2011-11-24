@@ -31,6 +31,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ViewForm;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -122,7 +123,6 @@ public class Chart extends ViewForm {
 	 * rounded up or down to fit a rounded unit
 	 */
 	protected int						gridVerticalDistance				= 30;
-
 	protected int						gridHorizontalDistance				= 70;
 
 	protected boolean					isShowHorizontalGridLines			= false;
@@ -358,15 +358,22 @@ public class Chart extends ViewForm {
 			return null;
 		}
 
+		final ChartComponentGraph componentGraph = _chartComponents.getChartComponentGraph();
+		final int hoveredLineValueIndex = componentGraph.getHoveredLineValueIndex();
+		if (hoveredLineValueIndex == -1) {
+			// hovered line is not yet recognized
+			return null;
+		}
+
 		final SelectionChartInfo chartInfo = new SelectionChartInfo(this);
 
 		chartInfo.chartDataModel = _chartDataModel;
 		chartInfo.chartDrawingData = _chartComponents.getChartDrawingData();
 
-		final ChartComponentGraph chartGraph = _chartComponents.getChartComponentGraph();
-		chartInfo.leftSliderValuesIndex = chartGraph.getLeftSlider().getValuesIndex();
-		chartInfo.rightSliderValuesIndex = chartGraph.getRightSlider().getValuesIndex();
-		chartInfo.selectedSliderValuesIndex = chartGraph.getSelectedSlider().getValuesIndex();
+		chartInfo.leftSliderValuesIndex = componentGraph.getLeftSlider().getValuesIndex();
+		chartInfo.rightSliderValuesIndex = componentGraph.getRightSlider().getValuesIndex();
+
+		chartInfo.selectedSliderValuesIndex = hoveredLineValueIndex;
 
 		return chartInfo;
 	}
@@ -383,6 +390,14 @@ public class Chart extends ViewForm {
 			}
 			_actionHandlerManager.updateUIState();
 		}
+	}
+
+	/**
+	 * Dispose colors which are used to paint the graphs.
+	 */
+	public void disposeColors() {
+
+		_chartComponents.getChartComponentGraph().disposeColors();
 	}
 
 	void enableActions() {
@@ -1063,7 +1078,8 @@ public class Chart extends ViewForm {
 
 		updateMouseModeUIState();
 
-		_chartComponents.getChartComponentGraph().setCursorStyle();
+		final Point devMouse = this.toControl(getDisplay().getCursorLocation());
+		_chartComponents.getChartComponentGraph().setCursorStyle(devMouse.y);
 
 	}
 

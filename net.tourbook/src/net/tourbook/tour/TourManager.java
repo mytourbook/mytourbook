@@ -138,10 +138,6 @@ public class TourManager {
 	private ComputeChartValue				_computePowerAvg;
 	private ComputeChartValue				_computeSpeedAvg;
 
-//	private final LinkedHashMap<Long, TourData>	_tourDataCache				= new LinkedHashMap<Long, TourData>();
-//
-//	TourDataCache is disabled because it's much slower when tours are compared a 2nd or more times
-
 	private final TourDataCache				_tourDataCache;
 
 	private static final ListenerList		_tourEventListeners						= new ListenerList(
@@ -153,6 +149,8 @@ public class TourManager {
 	 * tour chart which shows the selected tour
 	 */
 	private TourChart						_activeTourChart;
+
+	private ChartInfoPainter				_chartInfoPainter						= new ChartInfoPainter();
 
 	private TourManager() {
 
@@ -2146,6 +2144,9 @@ public class TourManager {
 		chartDataModel.setCustomData(CUSTOM_DATA_TOUR_ID, tourData.getTourId());
 
 		chartDataModel.setCustomData(CUSTOM_DATA_TOUR_CHART_CONFIGURATION, tourChartConfig);
+
+		_chartInfoPainter.setTourData(tourData);
+		chartDataModel.setChartInfoPainter(_chartInfoPainter);
 
 		return chartDataModel;
 	}
