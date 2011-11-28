@@ -737,19 +737,6 @@ public class Chart extends ViewForm {
 		return _isDrawBarChartAtBottom;
 	}
 
-//	boolean isMouseDownExternalPost(final int devXMouse, final int devYMouse, final int devXGraph) {
-//
-//		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseDownPost);
-//
-//		event.devXMouse = devXMouse;
-//		event.devYMouse = devYMouse;
-//		event.devMouseXInGraph = devXGraph;
-//
-//		fireChartMouseEvent(event);
-//
-//		return event.isWorked;
-//	}
-
 	/**
 	 * Returns the toolbar for the chart, if no toolbar manager is set with setToolbarManager, the
 	 * manager will be created and the toolbar is on top of the chart
@@ -790,6 +777,10 @@ public class Chart extends ViewForm {
 	 */
 	public ChartComponentAxis getToolTipControl() {
 		return getChartComponents().getAxisLeft();
+	}
+
+	protected Control getValuePointControl() {
+		return _chartComponents.getChartComponentGraph();
 	}
 
 	/**
@@ -1183,6 +1174,9 @@ public class Chart extends ViewForm {
 		getToolTipControl().setTourToolTipProvider(tourToolTip);
 	}
 
+	public void setValuePointToolTipProvider(final IValuePointToolTip valuePointToolTip) {
+		_chartComponents.componentGraph.hoveredLineToolTip = valuePointToolTip;
+	}
 	/**
 	 * sets the position of the x-sliders
 	 * 

@@ -149,7 +149,8 @@ public class TourChart extends Chart {
 	private ActionChartOptions				_actionOptions;
 
 	private TourToolTip						_tourToolTip;
-	private TourInfoToolTipProvider			_tourInfoToolTipProvider				= new TourInfoToolTipProvider();
+	private TourInfoToolTipProvider			_tourInfoToolTipProvider;
+	private ValuePointToolTip				_valuePointToolTip;
 
 	public TourChart(final Composite parent, final int style, final boolean isShowActions) {
 
@@ -190,7 +191,10 @@ public class TourChart extends Chart {
 			}
 		});
 
-		// set tour info icon into the left axis
+		/*
+		 * setup tour info icon into the left axis
+		 */
+		_tourInfoToolTipProvider = new TourInfoToolTipProvider();
 		_tourToolTip = new TourToolTip(getToolTipControl());
 		_tourToolTip.addToolTipProvider(_tourInfoToolTipProvider);
 
@@ -202,8 +206,13 @@ public class TourChart extends Chart {
 				getToolTipControl().afterHideToolTip(event);
 			}
 		});
-
 		setTourToolTipProvider(_tourInfoToolTipProvider);
+
+		/*
+		 * setup value point tool tip
+		 */
+		_valuePointToolTip = new ValuePointToolTip(getValuePointControl());
+		setValuePointToolTipProvider(_valuePointToolTip);
 	}
 
 	public void actionCanAutoMoveSliders(final boolean isItemChecked) {
@@ -535,7 +544,6 @@ public class TourChart extends Chart {
 
 		_prefStore.addPropertyChangeListener(_prefChangeListener);
 	}
-
 
 	public void addTourChartListener(final ITourChartSelectionListener listener) {
 		_selectionListeners.add(listener);
@@ -1126,7 +1134,10 @@ public class TourChart extends Chart {
 	}
 
 	private void onDispose() {
+
 		_prefStore.removePropertyChangeListener(_prefChangeListener);
+
+		_valuePointToolTip.hide();
 	}
 
 	public void removeTourChartListener(final ITourChartSelectionListener listener) {
@@ -1624,6 +1635,9 @@ public class TourChart extends Chart {
 														final boolean isPropertyChanged) {
 
 		if ((newTourData == null) || (newChartConfig == null)) {
+
+			_valuePointToolTip.setTourData(null);
+
 			return;
 		}
 
@@ -1685,6 +1699,7 @@ public class TourChart extends Chart {
 		}
 
 		_tourInfoToolTipProvider.setTourData(_tourData);
+		_valuePointToolTip.setTourData(_tourData);
 	}
 
 	/**

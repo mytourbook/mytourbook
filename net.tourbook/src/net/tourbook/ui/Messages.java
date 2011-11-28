@@ -229,6 +229,12 @@ public class Messages extends NLS {
 	public static String		message_manager_sMessageSummary;
 	public static String		message_manager_sWarningSummary;
 
+	public static String	Tooltip_Label_Altitude;
+
+	public static String	Tooltip_Label_Distance;
+
+	public static String	Tooltip_Label_Time;
+
 	public static String		Tooltip_WayPoint_Label_Altitude;
 	public static String		Tooltip_WayPoint_Label_Category;
 	public static String		Tooltip_WayPoint_Label_Comment;

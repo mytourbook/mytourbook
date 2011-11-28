@@ -15,20 +15,24 @@
  *******************************************************************************/
 package net.tourbook.chart;
 
-import org.eclipse.swt.graphics.GC;
-
 /**
- * Draw chart info into the chart.
+ * This tooltip is displayed when the mouse is hovered over a value point in a line graph and
+ * displays value point information.
  */
-public interface IChartInfoPainter {
+public interface IValuePointToolTip {
 
 	/**
-	 * @param gc
-	 * @param devXMouse
-	 * @param devYMouse
-	 * @param valueIndex
-	 *            Value index in the data serie
-	 * @param _colorCache
+	 * Hide the tooltip.
 	 */
-	void drawChartInfo(GC gc, int devXMouse, int devYMouse, int valueIndex, ColorCache colorCache);
+	void hide();
+
+	/**
+	 * Mouse has been moved to a new or still the old value index.
+	 * 
+	 * @param valueIndex
+	 * @param devXMouseMove
+	 * @param devYMouseMove
+	 */
+	void setValueIndex(int valueIndex, int devXMouseMove, int devYMouseMove);
+
 }

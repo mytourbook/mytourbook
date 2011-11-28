@@ -292,10 +292,17 @@ public class ChartComponentGraph extends Canvas {
 	private int							_hoveredBarValueIndex;
 	private boolean						_isHoveredBarDirty;
 
+	private ToolTipV1					_hoveredBarToolTip;
+
 	private boolean						_isHoveredLineVisible			= false;
 	private int							_hoveredLineValueIndex			= -1;
 	private ArrayList<Rectangle[]>		_lineFocusRectangles			= new ArrayList<Rectangle[]>();
 	private ArrayList<Point[]>			_lineDevPositions				= new ArrayList<Point[]>();
+
+	/**
+	 * Tooltip for value points, can be <code>null</code> when not set.
+	 */
+	IValuePointToolTip					hoveredLineToolTip;
 
 	private ChartYSlider				_hitYSlider;
 	private ChartYSlider				_ySliderDragged;
@@ -372,8 +379,6 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private boolean						_isGraphVisible					= false;
 
-	private ToolTipV1					_toolTipV1;
-
 	/**
 	 * Client area for this canvas
 	 */
@@ -429,7 +434,7 @@ public class ChartComponentGraph extends Canvas {
 		_xSliderOnTop = _xSliderB;
 		_xSliderOnBottom = _xSliderA;
 
-		_toolTipV1 = new ToolTipV1(_chart);
+		_hoveredBarToolTip = new ToolTipV1(_chart);
 
 		addListener();
 		createContextMenu();
@@ -980,7 +985,7 @@ public class ChartComponentGraph extends Canvas {
 
 				actionSelectBars();
 
-				_toolTipV1.toolTip20Hide();
+				_hoveredBarToolTip.toolTip20Hide();
 
 				_chart.fillContextMenu(
 						menuMgr,
@@ -1522,7 +1527,6 @@ public class ChartComponentGraph extends Canvas {
 		// reset line positions, they are set when a line graph is painted
 		_lineDevPositions.clear();
 		_lineFocusRectangles.clear();
-//		_hoveredLineValueIndex = -1;
 
 		final Color chartBackgroundColor = _chart.getBackgroundColor();
 		final Rectangle graphBounds = _chartImage10Graphs.getBounds();
@@ -1584,6 +1588,12 @@ public class ChartComponentGraph extends Canvas {
 			gcChart.drawImage(_chartImage10Graphs, 0, drawingData.getDevYTop());
 
 			graphIndex++;
+		}
+
+		if (hoveredLineToolTip != null && _hoveredLineValueIndex != -1) {
+			hoveredLineToolTip.setValueIndex(_hoveredLineValueIndex, _devXMouseMove, _devYMouseMove);
+		} else {
+			hoveredLineToolTip.hide();
 		}
 	}
 
@@ -2198,7 +2208,6 @@ public class ChartComponentGraph extends Canvas {
 		final Rectangle[] lineFocusRectangles = _lineFocusRectangles.get(_lineFocusRectangles.size() - 1);
 		final Point[] lineDevPositions = _lineDevPositions.get(_lineDevPositions.size() - 1);
 		Rectangle prevLineRect = null;
-		Point prevPoint = null;
 
 		/*
 		 * 
@@ -2345,7 +2354,6 @@ public class ChartComponentGraph extends Canvas {
 				lineFocusRectangles[valueIndexFirstPoint] = currentRect;
 
 				prevLineRect = currentRect;
-				prevPoint = currentPoint;
 			}
 
 			/*
@@ -2443,7 +2451,6 @@ public class ChartComponentGraph extends Canvas {
 				lineDevPositions[valueIndex] = currentPoint;
 				lineFocusRectangles[valueIndex] = currentRect;
 
-				prevPoint = currentPoint;
 				prevLineRect = currentRect;
 			}
 
@@ -2654,7 +2661,7 @@ public class ChartComponentGraph extends Canvas {
 		path.dispose();
 
 		/*
-		 * draw path2 above the other graph
+		 * draw path2 above the other graph, this is currently used to draw the srtm graph
 		 */
 		if (path2 != null) {
 
@@ -3470,17 +3477,6 @@ public class ChartComponentGraph extends Canvas {
 
 				// hovered lines are set -> draw it
 				drawSync460HoveredLine(gcOverlay);
-
-				// show tour info for the hovered point
-				final IChartInfoPainter chartInfoPainter = _chartDrawingData.chartDataModel.getChartInfoPainter();
-				if (chartInfoPainter != null) {
-					chartInfoPainter.drawChartInfo(
-							gcOverlay,
-							_devXMouseMove,
-							_devYMouseMove,
-							_hoveredLineValueIndex,
-							_colorCache);
-				}
 			}
 
 		}
@@ -4391,7 +4387,7 @@ public class ChartComponentGraph extends Canvas {
 						_hoveredBarSerieIndex = serieIndex;
 						_hoveredBarValueIndex = valueIndex;
 
-						_toolTipV1.toolTip10Show(devX, 100, serieIndex, valueIndex);
+						_hoveredBarToolTip.toolTip10Show(devX, 100, serieIndex, valueIndex);
 
 						isBarHit = true;
 						break;
@@ -4409,7 +4405,7 @@ public class ChartComponentGraph extends Canvas {
 
 		if (isBarHit == false) {
 
-			_toolTipV1.toolTip20Hide();
+			_hoveredBarToolTip.toolTip20Hide();
 
 			if (_hoveredBarSerieIndex != -1) {
 
@@ -4711,7 +4707,7 @@ public class ChartComponentGraph extends Canvas {
 		_gridColor = Util.disposeResource(_gridColor);
 		_gridColorMajor = Util.disposeResource(_gridColorMajor);
 
-		_toolTipV1.dispose();
+		_hoveredBarToolTip.dispose();
 
 		_colorCache.dispose();
 	}
@@ -5147,7 +5143,7 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private void onMouseExit(final MouseEvent event) {
 
-		_toolTipV1.toolTip20Hide();
+		_hoveredBarToolTip.toolTip20Hide();
 
 		if (_isAutoScroll) {
 			// stop autoscrolling
@@ -5356,7 +5352,16 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		if (_isHoveredLineVisible && isLineHovered()) {
+
+			if (hoveredLineToolTip != null) {
+				hoveredLineToolTip.setValueIndex(_hoveredLineValueIndex, _devXMouseMove, _devYMouseMove);
+			}
+
 			isRedraw = true;
+
+		} else {
+
+			hoveredLineToolTip.hide();
 		}
 
 		if (isRedraw) {
@@ -6055,7 +6060,7 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		// hide previous tooltip
-		_toolTipV1.toolTip20Hide();
+		_hoveredBarToolTip.toolTip20Hide();
 
 		// force the graph to be repainted
 		redraw();
