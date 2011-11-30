@@ -32,6 +32,7 @@ import net.tourbook.chart.ChartMarkerLayer;
 import net.tourbook.chart.ChartYDataMinMaxKeeper;
 import net.tourbook.chart.IChartLayer;
 import net.tourbook.chart.IFillPainter;
+import net.tourbook.chart.ITooltipOwner;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -72,8 +73,10 @@ import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IWorkbenchPartSite;
@@ -149,7 +152,8 @@ public class TourChart extends Chart {
 	private ActionChartOptions				_actionOptions;
 
 	private TourToolTip						_tourToolTip;
-	private TourInfoToolTipProvider			_tourInfoToolTipProvider				= new TourInfoToolTipProvider();
+	private TourInfoToolTipProvider			_tourInfoToolTipProvider;
+	private ValuePointToolTip				_valuePointToolTip;
 
 	public TourChart(final Composite parent, final int style, final boolean isShowActions) {
 
@@ -190,7 +194,10 @@ public class TourChart extends Chart {
 			}
 		});
 
-		// set tour info icon into the left axis
+		/*
+		 * setup tour info icon into the left axis
+		 */
+		_tourInfoToolTipProvider = new TourInfoToolTipProvider();
 		_tourToolTip = new TourToolTip(getToolTipControl());
 		_tourToolTip.addToolTipProvider(_tourInfoToolTipProvider);
 
@@ -202,8 +209,24 @@ public class TourChart extends Chart {
 				getToolTipControl().afterHideToolTip(event);
 			}
 		});
-
 		setTourToolTipProvider(_tourInfoToolTipProvider);
+
+		/*
+		 * setup value point tooltip
+		 */
+		_valuePointToolTip = new ValuePointToolTip(new ITooltipOwner() {
+
+			@Override
+			public Control getControl() {
+				return getValuePointControl();
+			}
+
+			@Override
+			public void handleEventMouseMove(final Point mouseDisplayRelativePosition) {
+				handleTooltipEventMouseMove(mouseDisplayRelativePosition);
+			}
+		});
+		setValuePointToolTipProvider(_valuePointToolTip);
 	}
 
 	public void actionCanAutoMoveSliders(final boolean isItemChecked) {
@@ -535,7 +558,6 @@ public class TourChart extends Chart {
 
 		_prefStore.addPropertyChangeListener(_prefChangeListener);
 	}
-
 
 	public void addTourChartListener(final ITourChartSelectionListener listener) {
 		_selectionListeners.add(listener);
@@ -1126,7 +1148,10 @@ public class TourChart extends Chart {
 	}
 
 	private void onDispose() {
+
 		_prefStore.removePropertyChangeListener(_prefChangeListener);
+
+		_valuePointToolTip.hide();
 	}
 
 	public void removeTourChartListener(final ITourChartSelectionListener listener) {
@@ -1624,6 +1649,9 @@ public class TourChart extends Chart {
 														final boolean isPropertyChanged) {
 
 		if ((newTourData == null) || (newChartConfig == null)) {
+
+			_valuePointToolTip.setTourData(null);
+
 			return;
 		}
 
@@ -1685,6 +1713,7 @@ public class TourChart extends Chart {
 		}
 
 		_tourInfoToolTipProvider.setTourData(_tourData);
+		_valuePointToolTip.setTourData(_tourData);
 	}
 
 	/**

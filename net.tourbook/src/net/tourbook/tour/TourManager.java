@@ -150,7 +150,7 @@ public class TourManager {
 	 */
 	private TourChart						_activeTourChart;
 
-	private ChartInfoPainter				_chartInfoPainter						= new ChartInfoPainter();
+//	private ChartInfoPainter				_chartInfoPainter						= new ChartInfoPainter();
 
 	private TourManager() {
 
@@ -1344,7 +1344,7 @@ public class TourManager {
 			clippingTime = 15;
 		}
 
-		int paceClipping;
+		float paceClipping;
 		if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_PACE_CLIPPING)) {
 			// use custom clipping
 			paceClipping = _prefStore.getInt(ITourbookPreferences.GRAPH_PROPERTY_PACE_CLIPPING_VALUE);
@@ -1352,6 +1352,8 @@ public class TourManager {
 			// use internal clipping, value was evaluated with experiments
 			paceClipping = 15;
 		}
+
+		paceClipping /= 10;
 
 		final int serieLength = timeSerie.length;
 		final int serieLengthLast = serieLength - 1;
@@ -2144,9 +2146,6 @@ public class TourManager {
 		chartDataModel.setCustomData(CUSTOM_DATA_TOUR_ID, tourData.getTourId());
 
 		chartDataModel.setCustomData(CUSTOM_DATA_TOUR_CHART_CONFIGURATION, tourChartConfig);
-
-		_chartInfoPainter.setTourData(tourData);
-		chartDataModel.setChartInfoPainter(_chartInfoPainter);
 
 		return chartDataModel;
 	}

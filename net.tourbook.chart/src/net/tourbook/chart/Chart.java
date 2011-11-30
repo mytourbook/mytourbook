@@ -737,19 +737,6 @@ public class Chart extends ViewForm {
 		return _isDrawBarChartAtBottom;
 	}
 
-//	boolean isMouseDownExternalPost(final int devXMouse, final int devYMouse, final int devXGraph) {
-//
-//		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseDownPost);
-//
-//		event.devXMouse = devXMouse;
-//		event.devYMouse = devYMouse;
-//		event.devMouseXInGraph = devXGraph;
-//
-//		fireChartMouseEvent(event);
-//
-//		return event.isWorked;
-//	}
-
 	/**
 	 * Returns the toolbar for the chart, if no toolbar manager is set with setToolbarManager, the
 	 * manager will be created and the toolbar is on top of the chart
@@ -792,6 +779,10 @@ public class Chart extends ViewForm {
 		return getChartComponents().getAxisLeft();
 	}
 
+	protected Control getValuePointControl() {
+		return _chartComponents.getChartComponentGraph();
+	}
+
 	/**
 	 * returns the value index for the x-sliders
 	 */
@@ -802,6 +793,10 @@ public class Chart extends ViewForm {
 		return new SelectionChartXSliderPosition(this, chartGraph.getLeftSlider().getValuesIndex(), chartGraph
 				.getRightSlider()
 				.getValuesIndex());
+	}
+
+	protected void handleTooltipEventMouseMove(final Point mouseDisplayRelativePosition) {
+		_chartComponents.getChartComponentGraph().onMouseMove(mouseDisplayRelativePosition);
 	}
 
 	boolean isMouseDownExternalPre(final int devXMouse, final int devYMouse) {
@@ -1181,6 +1176,10 @@ public class Chart extends ViewForm {
 
 		// set tour info icon into the left axis
 		getToolTipControl().setTourToolTipProvider(tourToolTip);
+	}
+
+	public void setValuePointToolTipProvider(final IValuePointToolTip valuePointToolTip) {
+		_chartComponents.componentGraph.hoveredLineToolTip = valuePointToolTip;
 	}
 
 	/**

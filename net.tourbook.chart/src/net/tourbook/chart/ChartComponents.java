@@ -62,85 +62,85 @@ import org.eclipse.swt.widgets.Event;
  */
 public class ChartComponents extends Composite {
 
-	public static final int				BAR_SELECTION_DELAY_TIME		= 100;
+	public static final int		BAR_SELECTION_DELAY_TIME		= 100;
 
 	/**
 	 * min/max pixel widthDev/heightDev of the chart
 	 */
-	static final int					CHART_MIN_WIDTH					= 5;
-	static final int					CHART_MIN_HEIGHT				= 5;
-	static final int					CHART_MAX_WIDTH					= 10000000;						// 10'000'000
-	static final int					CHART_MAX_HEIGHT				= 10000;
+	static final int			CHART_MIN_WIDTH					= 5;
+	static final int			CHART_MIN_HEIGHT				= 5;
+	static final int			CHART_MAX_WIDTH					= 10000000;						// 10'000'000
+	static final int			CHART_MAX_HEIGHT				= 10000;
 
-	static final int					SLIDER_BAR_HEIGHT				= 10;
-	static final int					TITLE_BAR_HEIGHT				= 18;								//15;
-	static final int					MARGIN_TOP_WITH_TITLE			= 5;
-	static final int					MARGIN_TOP_WITHOUT_TITLE		= 10;
+	static final int			SLIDER_BAR_HEIGHT				= 10;
+	static final int			TITLE_BAR_HEIGHT				= 18;								//15;
+	static final int			MARGIN_TOP_WITH_TITLE			= 5;
+	static final int			MARGIN_TOP_WITHOUT_TITLE		= 10;
 
-	private static final int			DAY_IN_SECONDS					= 24 * 60 * 60;
+	private static final int	DAY_IN_SECONDS					= 24 * 60 * 60;
 
-	private final Chart					_chart;
+	private final Chart			_chart;
 
 	/**
 	 * top margin of the chart (and all it's components)
 	 */
-	private int							_devMarginTop					= MARGIN_TOP_WITHOUT_TITLE;
+	private int					_devMarginTop					= MARGIN_TOP_WITHOUT_TITLE;
 
 	/**
 	 * height of the slider bar, 0 indicates that the slider is not visible
 	 */
-	int									_devSliderBarHeight				= 0;
+	int							_devSliderBarHeight				= 0;
 
 	/**
 	 * height of the title bar, 0 indicates that the title is not visible
 	 */
-	private int							_devXTitleBarHeight				= 0;
+	private int					_devXTitleBarHeight				= 0;
 
 	/**
 	 * height of the horizontal axis
 	 */
-	private final int					_devXAxisHeight					= 25;
+	private final int			_devXAxisHeight					= 25;
 
 	/**
 	 * width of the vertical axis
 	 */
-	private final int					_yAxisWidthLeft					= 50;
-	private int							_yAxisWidthLeftWithTitle		= _yAxisWidthLeft;
-	private final int					_yAxisWidthRight				= 50;
+	private final int			_yAxisWidthLeft					= 50;
+	private int					_yAxisWidthLeftWithTitle		= _yAxisWidthLeft;
+	private final int			_yAxisWidthRight				= 50;
 
 	/**
 	 * vertical distance between two graphs
 	 */
-	private final int					_chartsVerticalDistance			= 15;
+	private final int			_chartsVerticalDistance			= 15;
 
 	/**
 	 * contains the {@link SynchConfiguration} for the current chart and will be used from the chart
 	 * which is synchronized
 	 */
-	SynchConfiguration					_synchConfigOut					= null;
+	SynchConfiguration			_synchConfigOut					= null;
 
 	/**
 	 * when a {@link SynchConfiguration} is set, this chart will be synchronized with the chart
 	 * which set's the synch config
 	 */
-	SynchConfiguration					_synchConfigSrc					= null;
+	SynchConfiguration			_synchConfigSrc					= null;
 
 	/**
 	 * visible chart rectangle
 	 */
-	private Rectangle					_visibleGraphRect;
+	private Rectangle			_visibleGraphRect;
 
-	private final ChartComponentGraph	_componentGraph;
-	private final ChartComponentAxis	_componentAxisLeft;
-	private final ChartComponentAxis	_componentAxisRight;
+	final ChartComponentGraph	componentGraph;
+	final ChartComponentAxis	componentAxisLeft;
+	final ChartComponentAxis	componentAxisRight;
 
-	private ChartDataModel				_chartDataModel					= null;
+	private ChartDataModel		_chartDataModel					= null;
 
-	private ChartDrawingData			_chartDrawingData;
+	private ChartDrawingData	_chartDrawingData;
 
-	public boolean						_useAdvancedGraphics			= true;
+	public boolean				_useAdvancedGraphics			= true;
 
-	private static final String			_monthLabels[]					= {
+	private static final String	_monthLabels[]					= {
 			Messages.Month_jan,
 			Messages.Month_feb,
 			Messages.Month_mar,
@@ -152,9 +152,9 @@ public class ChartComponents extends Composite {
 			Messages.Month_sep,
 			Messages.Month_oct,
 			Messages.Month_nov,
-			Messages.Month_dec											};
+			Messages.Month_dec									};
 
-	private static final String			_monthShortLabels[]				= {
+	private static final String	_monthShortLabels[]				= {
 			Integer.toString(1),
 			Integer.toString(2),
 			Integer.toString(3),
@@ -166,23 +166,23 @@ public class ChartComponents extends Composite {
 			Integer.toString(9),
 			Integer.toString(10),
 			Integer.toString(11),
-			Integer.toString(12)										};
+			Integer.toString(12)								};
 
 	/**
 	 * Width in pixel for all months in one year
 	 */
-	private int							_devYearEqualMonthsWidth		= -1;
-	private int							_devYearEqualMonthsShortWidth	= -1;
+	private int					_devYearEqualMonthsWidth		= -1;
+	private int					_devYearEqualMonthsShortWidth	= -1;
 
-	private final int[]					_keyDownCounter					= new int[1];
-	private final int[]					_lastKeyDownCounter				= new int[1];
+	private final int[]			_keyDownCounter					= new int[1];
+	private final int[]			_lastKeyDownCounter				= new int[1];
 
-	private final Calendar				_calendar						= GregorianCalendar.getInstance();
+	private final Calendar		_calendar						= GregorianCalendar.getInstance();
 
 	/**
 	 * this error message is displayed instead of the chart when it's not <code>null</code>
 	 */
-	String								errorMessage;
+	String						errorMessage;
 
 	/**
 	 * Create and layout the components of the chart
@@ -210,24 +210,24 @@ public class ChartComponents extends Composite {
 		setLayout(gl);
 
 		// left: create left axis canvas
-		_componentAxisLeft = new ChartComponentAxis(parent, this, SWT.NONE);
+		componentAxisLeft = new ChartComponentAxis(parent, this, SWT.NONE);
 		gd = new GridData(SWT.NONE, SWT.FILL, false, true);
 		gd.widthHint = _yAxisWidthLeft;
-		_componentAxisLeft.setLayoutData(gd);
+		componentAxisLeft.setLayoutData(gd);
 
 		// center: create chart canvas
-		_componentGraph = new ChartComponentGraph(parent, this, SWT.NONE);
+		componentGraph = new ChartComponentGraph(parent, this, SWT.NONE);
 		gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-		_componentGraph.setLayoutData(gd);
+		componentGraph.setLayoutData(gd);
 
 		// right: create right axis canvas
-		_componentAxisRight = new ChartComponentAxis(parent, this, SWT.NONE);
+		componentAxisRight = new ChartComponentAxis(parent, this, SWT.NONE);
 		gd = new GridData(SWT.NONE, SWT.FILL, false, true);
 		gd.widthHint = _yAxisWidthRight;
-		_componentAxisRight.setLayoutData(gd);
+		componentAxisRight.setLayoutData(gd);
 
-		_componentAxisLeft.setComponentGraph(_componentGraph);
-		_componentAxisRight.setComponentGraph(_componentGraph);
+		componentAxisLeft.setComponentGraph(componentGraph);
+		componentAxisRight.setComponentGraph(componentGraph);
 
 		addListener();
 	}
@@ -346,7 +346,7 @@ public class ChartComponents extends Composite {
 		final int unitType = xData.getAxisUnit();
 		final float xStartValue = xData.getStartValue();
 
-		final int devVirtualGraphWidth = _componentGraph.getXXDevGraphWidth();
+		final int devVirtualGraphWidth = componentGraph.getXXDevGraphWidth();
 		final float scaleX = ((float) devVirtualGraphWidth - 1) / graphMaxValue;
 
 		drawingData.devVirtualGraphWidth = devVirtualGraphWidth;
@@ -1175,8 +1175,8 @@ public class ChartComponents extends Composite {
 		final float valueDiff = markerEndValue - markerStartValue;
 		final float lastValue = xValues[xValues.length - 1];
 
-		final float devVirtualGraphImageWidth = _componentGraph.getXXDevGraphWidth();
-		final float devGraphImageXOffset = _componentGraph.getXXDevViewPortOffset();
+		final float devVirtualGraphImageWidth = componentGraph.getXXDevGraphWidth();
+		final float devGraphImageXOffset = componentGraph.getXXDevViewPortOffset();
 
 		final float devOneValueSlice = devVirtualGraphImageWidth / lastValue;
 
@@ -1337,15 +1337,15 @@ public class ChartComponents extends Composite {
 	}
 
 	ChartComponentAxis getAxisLeft() {
-		return _componentAxisLeft;
+		return componentAxisLeft;
 	}
 
 	ChartComponentAxis getAxisRight() {
-		return _componentAxisRight;
+		return componentAxisRight;
 	}
 
 	ChartComponentGraph getChartComponentGraph() {
-		return _componentGraph;
+		return componentGraph;
 	}
 
 	ChartDataModel getChartDataModel() {
@@ -1422,22 +1422,22 @@ public class ChartComponents extends Composite {
 		if (setWidthToSynchedChart() == false) {
 
 			// chart is not synchronized, compute the 'normal' graph width
-			_componentGraph.updateGraphSize();
+			componentGraph.updateGraphSize();
 		}
 
 		// compute the chart data
 		_chartDrawingData = createDrawingData();
 
 		// notify components about the new configuration
-		_componentGraph.setDrawingData(_chartDrawingData);
+		componentGraph.setDrawingData(_chartDrawingData);
 
 		// resize the sliders after the drawing data have changed and the new
 		// chart size is saved
-		_componentGraph.updateSlidersOnResize();
+		componentGraph.updateSlidersOnResize();
 
 		// resize the axis
-		_componentAxisLeft.setDrawingData(_chartDrawingData, true);
-		_componentAxisRight.setDrawingData(_chartDrawingData, false);
+		componentAxisLeft.setDrawingData(_chartDrawingData, true);
+		componentAxisRight.setDrawingData(_chartDrawingData, false);
 
 		// synchronize chart
 		final SynchConfiguration synchConfig = createSynchConfig();
@@ -1456,10 +1456,10 @@ public class ChartComponents extends Composite {
 
 		switch (event.keyCode) {
 		case SWT.ARROW_RIGHT:
-			selectedIndex[0] = _componentGraph.selectBarItemNext();
+			selectedIndex[0] = componentGraph.selectBarItemNext();
 			break;
 		case SWT.ARROW_LEFT:
-			selectedIndex[0] = _componentGraph.selectBarItemPrevious();
+			selectedIndex[0] = componentGraph.selectBarItemPrevious();
 			break;
 		}
 
@@ -1517,7 +1517,7 @@ public class ChartComponents extends Composite {
 		if ((chartType == ChartDataModel.CHART_TYPE_LINE || chartType == ChartDataModel.CHART_TYPE_LINE_WITH_BARS)
 				&& isShowAllData) {
 
-			_componentGraph.updateVisibleMinMaxValues();
+			componentGraph.updateVisibleMinMaxValues();
 		}
 
 		if (onResize()) {
@@ -1526,7 +1526,7 @@ public class ChartComponents extends Composite {
 			 * onResize method
 			 */
 			if (_devSliderBarHeight > 0) {
-				_componentGraph.resetSliders();
+				componentGraph.resetSliders();
 			}
 		}
 	}
@@ -1538,7 +1538,7 @@ public class ChartComponents extends Composite {
 
 		_devSliderBarHeight = isSliderVisible ? SLIDER_BAR_HEIGHT : 0;
 
-		_componentGraph.setXSliderVisible(isSliderVisible);
+		componentGraph.setXSliderVisible(isSliderVisible);
 	}
 
 	/**
@@ -1572,7 +1572,7 @@ public class ChartComponents extends Composite {
 
 			_yAxisWidthLeftWithTitle = _yAxisWidthLeft + TITLE_BAR_HEIGHT;
 
-			final GridData gl = (GridData) _componentAxisLeft.getLayoutData();
+			final GridData gl = (GridData) componentAxisLeft.getLayoutData();
 			gl.widthHint = _yAxisWidthLeftWithTitle;
 
 			// relayout after the layout size has been changed
@@ -1637,7 +1637,7 @@ public class ChartComponents extends Composite {
 			// zoom ratio
 			graphZoomRatio = xxDevGraphWidth / devVisibleChartWidth;
 
-			_componentGraph.setGraphSize((int) xxDevGraphWidth, xxDevViewPortOffset, graphZoomRatio);
+			componentGraph.setGraphSize((int) xxDevGraphWidth, xxDevViewPortOffset, graphZoomRatio);
 
 			return true;
 
@@ -1657,7 +1657,7 @@ public class ChartComponents extends Composite {
 			// zoom ratio
 			graphZoomRatio = xxDevGraphWidth / devVisibleChartWidth;
 
-			_componentGraph.setGraphSize((int) xxDevGraphWidth, xxDevViewPortOffset, graphZoomRatio);
+			componentGraph.setGraphSize((int) xxDevGraphWidth, xxDevViewPortOffset, graphZoomRatio);
 
 			return true;
 
@@ -1687,8 +1687,8 @@ public class ChartComponents extends Composite {
 			return;
 		}
 
-		final ChartXSlider leftSlider = _componentGraph.getLeftSlider();
-		final ChartXSlider rightSlider = _componentGraph.getRightSlider();
+		final ChartXSlider leftSlider = componentGraph.getLeftSlider();
+		final ChartXSlider rightSlider = componentGraph.getRightSlider();
 
 		final int slider0ValueIndex = sliderPosition.getBeforeLeftSliderIndex();
 		final int slider1ValueIndex = sliderPosition.getLeftSliderValueIndex();
@@ -1700,14 +1700,14 @@ public class ChartComponents extends Composite {
 		// move left slider
 		if (slider1ValueIndex == SelectionChartXSliderPosition.SLIDER_POSITION_AT_CHART_BORDER) {
 
-			_componentGraph.setXSliderValueIndex(//
+			componentGraph.setXSliderValueIndex(//
 					leftSlider,
 					0,
 					isCenterSliderPosition);
 
 		} else if (slider1ValueIndex != SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
 
-			_componentGraph.setXSliderValueIndex(//
+			componentGraph.setXSliderValueIndex(//
 					leftSlider,
 					slider1ValueIndex,
 					isCenterSliderPosition);
@@ -1717,28 +1717,28 @@ public class ChartComponents extends Composite {
 
 			// move second slider before the first slider
 
-			_componentGraph.setXSliderValueIndex(rightSlider, slider0ValueIndex, isCenterSliderPosition);
+			componentGraph.setXSliderValueIndex(rightSlider, slider0ValueIndex, isCenterSliderPosition);
 
 		} else {
 
 			// move right slider
 			if (slider2ValueIndex == SelectionChartXSliderPosition.SLIDER_POSITION_AT_CHART_BORDER) {
 
-				_componentGraph.setXSliderValueIndex(//
+				componentGraph.setXSliderValueIndex(//
 						rightSlider,
 						xValues.length - 1,
 						isCenterSliderPosition);
 
 			} else if (slider2ValueIndex != SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
 
-				_componentGraph.setXSliderValueIndex(//
+				componentGraph.setXSliderValueIndex(//
 						rightSlider,
 						slider2ValueIndex,
 						isCenterSliderPosition);
 			}
 		}
 
-		_componentGraph.redraw();
+		componentGraph.redraw();
 	}
 
 	private void synchronizeChart(final SynchConfiguration newSynchConfigOut) {
@@ -1779,7 +1779,7 @@ public class ChartComponents extends Composite {
 			graphDrawingData.get(graphIndex++).getYData().setCustomForegroundLayers(yData.getCustomForegroundLayers());
 		}
 
-		_componentGraph.updateCustomLayers();
+		componentGraph.updateCustomLayers();
 	}
 
 }

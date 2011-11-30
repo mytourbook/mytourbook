@@ -200,8 +200,6 @@ public class TourInfoUI {
 		updateUI();
 		enableControls();
 
-//		container.layout(true, true);
-
 		// compute width for all controls and equalize column width for the different sections
 		_ttContainer.layout(true, true);
 		UI.setEqualizeColumWidths(_firstColumnControls, 5);

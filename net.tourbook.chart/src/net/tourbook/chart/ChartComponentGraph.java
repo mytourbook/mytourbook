@@ -292,10 +292,17 @@ public class ChartComponentGraph extends Canvas {
 	private int							_hoveredBarValueIndex;
 	private boolean						_isHoveredBarDirty;
 
+	private ToolTipV1					_hoveredBarToolTip;
+
 	private boolean						_isHoveredLineVisible			= false;
 	private int							_hoveredLineValueIndex			= -1;
 	private ArrayList<Rectangle[]>		_lineFocusRectangles			= new ArrayList<Rectangle[]>();
 	private ArrayList<Point[]>			_lineDevPositions				= new ArrayList<Point[]>();
+
+	/**
+	 * Tooltip for value points, can be <code>null</code> when not set.
+	 */
+	IValuePointToolTip					hoveredLineToolTip;
 
 	private ChartYSlider				_hitYSlider;
 	private ChartYSlider				_ySliderDragged;
@@ -372,8 +379,6 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private boolean						_isGraphVisible					= false;
 
-	private ToolTipV1					_toolTipV1;
-
 	/**
 	 * Client area for this canvas
 	 */
@@ -429,7 +434,7 @@ public class ChartComponentGraph extends Canvas {
 		_xSliderOnTop = _xSliderB;
 		_xSliderOnBottom = _xSliderA;
 
-		_toolTipV1 = new ToolTipV1(_chart);
+		_hoveredBarToolTip = new ToolTipV1(_chart);
 
 		addListener();
 		createContextMenu();
@@ -501,7 +506,7 @@ public class ChartComponentGraph extends Canvas {
 		addMouseMoveListener(new MouseMoveListener() {
 			public void mouseMove(final MouseEvent e) {
 				if (_isGraphVisible) {
-					onMouseMove(e);
+					onMouseMove(e.x, e.y);
 				}
 			}
 		});
@@ -980,7 +985,7 @@ public class ChartComponentGraph extends Canvas {
 
 				actionSelectBars();
 
-				_toolTipV1.toolTip20Hide();
+				_hoveredBarToolTip.toolTip20Hide();
 
 				_chart.fillContextMenu(
 						menuMgr,
@@ -1522,7 +1527,6 @@ public class ChartComponentGraph extends Canvas {
 		// reset line positions, they are set when a line graph is painted
 		_lineDevPositions.clear();
 		_lineFocusRectangles.clear();
-//		_hoveredLineValueIndex = -1;
 
 		final Color chartBackgroundColor = _chart.getBackgroundColor();
 		final Rectangle graphBounds = _chartImage10Graphs.getBounds();
@@ -1584,6 +1588,15 @@ public class ChartComponentGraph extends Canvas {
 			gcChart.drawImage(_chartImage10Graphs, 0, drawingData.getDevYTop());
 
 			graphIndex++;
+		}
+
+		if (hoveredLineToolTip != null) {
+
+			if (_hoveredLineValueIndex == -1) {
+				hoveredLineToolTip.hide();
+			} else {
+				hoveredLineToolTip.setValueIndex(_hoveredLineValueIndex, _devXMouseMove, _devYMouseMove);
+			}
 		}
 	}
 
@@ -2198,7 +2211,6 @@ public class ChartComponentGraph extends Canvas {
 		final Rectangle[] lineFocusRectangles = _lineFocusRectangles.get(_lineFocusRectangles.size() - 1);
 		final Point[] lineDevPositions = _lineDevPositions.get(_lineDevPositions.size() - 1);
 		Rectangle prevLineRect = null;
-		Point prevPoint = null;
 
 		/*
 		 * 
@@ -2345,7 +2357,6 @@ public class ChartComponentGraph extends Canvas {
 				lineFocusRectangles[valueIndexFirstPoint] = currentRect;
 
 				prevLineRect = currentRect;
-				prevPoint = currentPoint;
 			}
 
 			/*
@@ -2443,7 +2454,6 @@ public class ChartComponentGraph extends Canvas {
 				lineDevPositions[valueIndex] = currentPoint;
 				lineFocusRectangles[valueIndex] = currentRect;
 
-				prevPoint = currentPoint;
 				prevLineRect = currentRect;
 			}
 
@@ -2654,7 +2664,7 @@ public class ChartComponentGraph extends Canvas {
 		path.dispose();
 
 		/*
-		 * draw path2 above the other graph
+		 * draw path2 above the other graph, this is currently used to draw the srtm graph
 		 */
 		if (path2 != null) {
 
@@ -3470,17 +3480,6 @@ public class ChartComponentGraph extends Canvas {
 
 				// hovered lines are set -> draw it
 				drawSync460HoveredLine(gcOverlay);
-
-				// show tour info for the hovered point
-				final IChartInfoPainter chartInfoPainter = _chartDrawingData.chartDataModel.getChartInfoPainter();
-				if (chartInfoPainter != null) {
-					chartInfoPainter.drawChartInfo(
-							gcOverlay,
-							_devXMouseMove,
-							_devYMouseMove,
-							_hoveredLineValueIndex,
-							_colorCache);
-				}
 			}
 
 		}
@@ -4391,7 +4390,7 @@ public class ChartComponentGraph extends Canvas {
 						_hoveredBarSerieIndex = serieIndex;
 						_hoveredBarValueIndex = valueIndex;
 
-						_toolTipV1.toolTip10Show(devX, 100, serieIndex, valueIndex);
+						_hoveredBarToolTip.toolTip10Show(devX, 100, serieIndex, valueIndex);
 
 						isBarHit = true;
 						break;
@@ -4409,7 +4408,7 @@ public class ChartComponentGraph extends Canvas {
 
 		if (isBarHit == false) {
 
-			_toolTipV1.toolTip20Hide();
+			_hoveredBarToolTip.toolTip20Hide();
 
 			if (_hoveredBarSerieIndex != -1) {
 
@@ -4711,7 +4710,7 @@ public class ChartComponentGraph extends Canvas {
 		_gridColor = Util.disposeResource(_gridColor);
 		_gridColorMajor = Util.disposeResource(_gridColorMajor);
 
-		_toolTipV1.dispose();
+		_hoveredBarToolTip.dispose();
 
 		_colorCache.dispose();
 	}
@@ -4998,7 +4997,7 @@ public class ChartComponentGraph extends Canvas {
 				_xSliderOnBottom = _xSliderOnTop == _xSliderA ? _xSliderB : _xSliderA;
 
 				// set the hit offset for the mouse click
-				_xSliderDragged.setDevXClickOffset(devXMouse - _xxDevViewPortLeftBorder); //_xSliderDragged.getHitRectangle().x);
+				_xSliderDragged.setDevXClickOffset(devXMouse - _xxDevViewPortLeftBorder);
 
 				// the hit x-slider is now the selected x-slider
 				_selectedXSlider = _xSliderDragged;
@@ -5147,7 +5146,7 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private void onMouseExit(final MouseEvent event) {
 
-		_toolTipV1.toolTip20Hide();
+		_hoveredBarToolTip.toolTip20Hide();
 
 		if (_isAutoScroll) {
 			// stop autoscrolling
@@ -5208,10 +5207,7 @@ public class ChartComponentGraph extends Canvas {
 	 * 
 	 * @param event
 	 */
-	private void onMouseMove(final MouseEvent event) {
-
-		final int devXMouse = event.x;
-		final int devYMouse = event.y;
+	private void onMouseMove(final int devXMouse, final int devYMouse) {
 
 		_devXMouseMove = devXMouse;
 		_devYMouseMove = devYMouse;
@@ -5260,7 +5256,7 @@ public class ChartComponentGraph extends Canvas {
 			_isChartDraggedStarted = false;
 			_isChartDragged = true;
 
-			_draggedChartDraggedPos = new Point(event.x, event.y);
+			_draggedChartDraggedPos = new Point(devXMouse, devYMouse);
 
 			isRedraw = true;
 
@@ -5356,11 +5352,37 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		if (_isHoveredLineVisible && isLineHovered()) {
+
+			if (hoveredLineToolTip != null) {
+				hoveredLineToolTip.setValueIndex(_hoveredLineValueIndex, _devXMouseMove, _devYMouseMove);
+			}
+
 			isRedraw = true;
+
+		} else {
+
+			if (hoveredLineToolTip != null) {
+				hoveredLineToolTip.hide();
+			}
 		}
 
 		if (isRedraw) {
 			redraw();
+		}
+	}
+
+	/**
+	 * Mouse has been moved in the value point tooltip, move the slider and/or hovered line (value
+	 * point) accordingly.
+	 * 
+	 * @param mouseDisplayRelativePosition
+	 */
+	protected void onMouseMove(final Point mouseDisplayRelativePosition) {
+
+		final Point devPos = toControl(mouseDisplayRelativePosition);
+
+		if (getBounds().contains(devPos)) {
+			onMouseMove(devPos.x, devPos.y);
 		}
 	}
 
@@ -5876,6 +5898,44 @@ public class ChartComponentGraph extends Canvas {
 		_zoomRatioCenter = (double) xxDevSliderLinePos / _xxDevGraphWidth;
 	}
 
+//	/**
+//	 * Set the scrolling cursor according to the vertical position of the mouse
+//	 *
+//	 * @param devX
+//	 * @param devY
+//	 *            vertical coordinat of the mouse in the graph
+//	 */
+//	private void setupScrollCursor(final int devX, final int devY) {
+//
+//		final int height = getDevVisibleGraphHeight();
+//		final int height4 = height / 4;
+//		final int height2 = height / 2;
+//
+//		final float oldValue = _scrollAcceleration;
+//
+//		_scrollAcceleration = devY < height4 ? 0.25f : devY < height2 ? 1 : devY > height - height4 ? 10 : 2;
+//
+//		// set cursor according to the position
+//		if (_scrollAcceleration == 0.25) {
+//			setCursor(_cursorHand05x);
+//		} else if (_scrollAcceleration == 1) {
+//			setCursor(_cursorHand);
+//		} else if (_scrollAcceleration == 2) {
+//			setCursor(_cursorHand2x);
+//		} else {
+//			setCursor(_cursorHand5x);
+//		}
+//
+//		/*
+//		 * when the acceleration has changed, the start positions for scrolling the graph must be
+//		 * set to the current location
+//		 */
+//		if (oldValue != _scrollAcceleration) {
+//			_startPosScrollbar = getHorizontalBar().getSelection();
+//			_startPosDev = devX;
+//		}
+//	}
+
 	/**
 	 * Move a zoomed chart to a new position
 	 * 
@@ -5927,44 +5987,6 @@ public class ChartComponentGraph extends Canvas {
 		 */
 		_zoomRatioCenter = (double) xxDevNewPosition / _xxDevGraphWidth;
 	}
-
-//	/**
-//	 * Set the scrolling cursor according to the vertical position of the mouse
-//	 *
-//	 * @param devX
-//	 * @param devY
-//	 *            vertical coordinat of the mouse in the graph
-//	 */
-//	private void setupScrollCursor(final int devX, final int devY) {
-//
-//		final int height = getDevVisibleGraphHeight();
-//		final int height4 = height / 4;
-//		final int height2 = height / 2;
-//
-//		final float oldValue = _scrollAcceleration;
-//
-//		_scrollAcceleration = devY < height4 ? 0.25f : devY < height2 ? 1 : devY > height - height4 ? 10 : 2;
-//
-//		// set cursor according to the position
-//		if (_scrollAcceleration == 0.25) {
-//			setCursor(_cursorHand05x);
-//		} else if (_scrollAcceleration == 1) {
-//			setCursor(_cursorHand);
-//		} else if (_scrollAcceleration == 2) {
-//			setCursor(_cursorHand2x);
-//		} else {
-//			setCursor(_cursorHand5x);
-//		}
-//
-//		/*
-//		 * when the acceleration has changed, the start positions for scrolling the graph must be
-//		 * set to the current location
-//		 */
-//		if (oldValue != _scrollAcceleration) {
-//			_startPosScrollbar = getHorizontalBar().getSelection();
-//			_startPosDev = devX;
-//		}
-//	}
 
 	void setCursorStyle(final int devYMouse) {
 
@@ -6055,7 +6077,7 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		// hide previous tooltip
-		_toolTipV1.toolTip20Hide();
+		_hoveredBarToolTip.toolTip20Hide();
 
 		// force the graph to be repainted
 		redraw();

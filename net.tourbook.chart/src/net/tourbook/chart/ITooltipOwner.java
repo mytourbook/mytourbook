@@ -15,20 +15,12 @@
  *******************************************************************************/
 package net.tourbook.chart;
 
-import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Control;
 
-/**
- * Draw chart info into the chart.
- */
-public interface IChartInfoPainter {
+public interface ITooltipOwner {
 
-	/**
-	 * @param gc
-	 * @param devXMouse
-	 * @param devYMouse
-	 * @param valueIndex
-	 *            Value index in the data serie
-	 * @param _colorCache
-	 */
-	void drawChartInfo(GC gc, int devXMouse, int devYMouse, int valueIndex, ColorCache colorCache);
+	public Control getControl();
+
+	public void handleEventMouseMove(Point mouseDisplayRelativePosition);
 }
