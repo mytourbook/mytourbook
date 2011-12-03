@@ -795,6 +795,10 @@ public class Chart extends ViewForm {
 				.getValuesIndex());
 	}
 
+	protected void handleTooltipEventMouseMove(final Point mouseDisplayRelativePosition) {
+		_chartComponents.getChartComponentGraph().onMouseMove(mouseDisplayRelativePosition);
+	}
+
 	boolean isMouseDownExternalPre(final int devXMouse, final int devYMouse) {
 
 		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseDownPre);
@@ -1177,6 +1181,7 @@ public class Chart extends ViewForm {
 	public void setValuePointToolTipProvider(final IValuePointToolTip valuePointToolTip) {
 		_chartComponents.componentGraph.hoveredLineToolTip = valuePointToolTip;
 	}
+
 	/**
 	 * sets the position of the x-sliders
 	 * 

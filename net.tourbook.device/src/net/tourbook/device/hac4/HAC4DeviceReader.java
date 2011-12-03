@@ -255,16 +255,16 @@ public class HAC4DeviceReader extends TourbookDevice {
 				if (isLastTour) {
 					isLastTour = false;
 
-					final int deviceTravelTimeHours = ((hac4DeviceData.totalTravelTimeHourHigh * 100) + hac4DeviceData.totalTravelTimeHourLow);
-
-					tourData.setDeviceTravelTime((deviceTravelTimeHours * 3600)
-							+ (hac4DeviceData.totalTravelTimeMin * 60)
-							+ hac4DeviceData.totalTravelTimeSec);
-
-					// tourData.deviceDistance = ((deviceData.totalDistanceHigh
-					// * (2 ^ 16)) + deviceData.totalDistanceLow);
-					tourData.setDeviceWheel(hac4DeviceData.wheelPerimeter);
-					tourData.setDeviceWeight(hac4DeviceData.personWeight);
+//					final int deviceTravelTimeHours = ((hac4DeviceData.totalTravelTimeHourHigh * 100) + hac4DeviceData.totalTravelTimeHourLow);
+//
+//					tourData.setDeviceTravelTime((deviceTravelTimeHours * 3600)
+//							+ (hac4DeviceData.totalTravelTimeMin * 60)
+//							+ hac4DeviceData.totalTravelTimeSec);
+//
+//					// tourData.deviceDistance = ((deviceData.totalDistanceHigh
+//					// * (2 ^ 16)) + deviceData.totalDistanceLow);
+//					tourData.setDeviceWheel(hac4DeviceData.wheelPerimeter);
+//					tourData.setDeviceWeight(hac4DeviceData.personWeight);
 				}
 
 				/*

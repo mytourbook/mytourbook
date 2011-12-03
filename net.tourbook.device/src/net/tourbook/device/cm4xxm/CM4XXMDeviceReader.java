@@ -250,16 +250,16 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 				if (isLastTour) {
 					isLastTour = false;
 
-					final int deviceTravelTimeHours = (cm4xxmDeviceData.totalTravelTimeHour1);
-
-					tourData.setDeviceTravelTime((deviceTravelTimeHours * 3600)
-							+ (cm4xxmDeviceData.totalTravelTimeMin1 * 60)
-							+ cm4xxmDeviceData.totalTravelTimeSec1);
-
-					// tourData.deviceDistance = ((deviceData.totalDistanceHigh
-					// * (2 ^ 16)) + deviceData.totalDistanceLow);
-					tourData.setDeviceWheel(cm4xxmDeviceData.wheelPerimeter1);
-					tourData.setDeviceWeight(cm4xxmDeviceData.personWeight);
+//					final int deviceTravelTimeHours = (cm4xxmDeviceData.totalTravelTimeHour1);
+//
+//					tourData.setDeviceTravelTime((deviceTravelTimeHours * 3600)
+//							+ (cm4xxmDeviceData.totalTravelTimeMin1 * 60)
+//							+ cm4xxmDeviceData.totalTravelTimeSec1);
+//
+//					// tourData.deviceDistance = ((deviceData.totalDistanceHigh
+//					// * (2 ^ 16)) + deviceData.totalDistanceLow);
+//					tourData.setDeviceWheel(cm4xxmDeviceData.wheelPerimeter1);
+//					tourData.setDeviceWeight(cm4xxmDeviceData.personWeight);
 				}
 
 				/*

@@ -372,10 +372,10 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 		/*
 		 * tag menu
 		 */
-		final MenuManager menuMgr = new MenuManager();
+		final MenuManager tagMenuMgr = new MenuManager();
 
-		menuMgr.setRemoveAllWhenShown(true);
-		menuMgr.addMenuListener(new IMenuListener() {
+		tagMenuMgr.setRemoveAllWhenShown(true);
+		tagMenuMgr.addMenuListener(new IMenuListener() {
 			@Override
 			public void menuAboutToShow(final IMenuManager menuMgr) {
 
@@ -389,7 +389,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
 		// set menu for the tag item
 
-		final Menu tagContextMenu = menuMgr.createContextMenu(_linkTag);
+		final Menu tagContextMenu = tagMenuMgr.createContextMenu(_linkTag);
 		tagContextMenu.addMenuListener(new MenuListener() {
 
 			@Override

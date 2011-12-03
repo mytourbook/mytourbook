@@ -506,7 +506,7 @@ public class ChartComponentGraph extends Canvas {
 		addMouseMoveListener(new MouseMoveListener() {
 			public void mouseMove(final MouseEvent e) {
 				if (_isGraphVisible) {
-					onMouseMove(e);
+					onMouseMove(e.x, e.y);
 				}
 			}
 		});
@@ -1590,10 +1590,13 @@ public class ChartComponentGraph extends Canvas {
 			graphIndex++;
 		}
 
-		if (hoveredLineToolTip != null && _hoveredLineValueIndex != -1) {
-			hoveredLineToolTip.setValueIndex(_hoveredLineValueIndex, _devXMouseMove, _devYMouseMove);
-		} else {
-			hoveredLineToolTip.hide();
+		if (hoveredLineToolTip != null) {
+
+			if (_hoveredLineValueIndex == -1) {
+				hoveredLineToolTip.hide();
+			} else {
+				hoveredLineToolTip.setValueIndex(_hoveredLineValueIndex, _devXMouseMove, _devYMouseMove);
+			}
 		}
 	}
 
@@ -4994,7 +4997,7 @@ public class ChartComponentGraph extends Canvas {
 				_xSliderOnBottom = _xSliderOnTop == _xSliderA ? _xSliderB : _xSliderA;
 
 				// set the hit offset for the mouse click
-				_xSliderDragged.setDevXClickOffset(devXMouse - _xxDevViewPortLeftBorder); //_xSliderDragged.getHitRectangle().x);
+				_xSliderDragged.setDevXClickOffset(devXMouse - _xxDevViewPortLeftBorder);
 
 				// the hit x-slider is now the selected x-slider
 				_selectedXSlider = _xSliderDragged;
@@ -5204,10 +5207,7 @@ public class ChartComponentGraph extends Canvas {
 	 * 
 	 * @param event
 	 */
-	private void onMouseMove(final MouseEvent event) {
-
-		final int devXMouse = event.x;
-		final int devYMouse = event.y;
+	private void onMouseMove(final int devXMouse, final int devYMouse) {
 
 		_devXMouseMove = devXMouse;
 		_devYMouseMove = devYMouse;
@@ -5256,7 +5256,7 @@ public class ChartComponentGraph extends Canvas {
 			_isChartDraggedStarted = false;
 			_isChartDragged = true;
 
-			_draggedChartDraggedPos = new Point(event.x, event.y);
+			_draggedChartDraggedPos = new Point(devXMouse, devYMouse);
 
 			isRedraw = true;
 
@@ -5361,11 +5361,28 @@ public class ChartComponentGraph extends Canvas {
 
 		} else {
 
-			hoveredLineToolTip.hide();
+			if (hoveredLineToolTip != null) {
+				hoveredLineToolTip.hide();
+			}
 		}
 
 		if (isRedraw) {
 			redraw();
+		}
+	}
+
+	/**
+	 * Mouse has been moved in the value point tooltip, move the slider and/or hovered line (value
+	 * point) accordingly.
+	 * 
+	 * @param mouseDisplayRelativePosition
+	 */
+	protected void onMouseMove(final Point mouseDisplayRelativePosition) {
+
+		final Point devPos = toControl(mouseDisplayRelativePosition);
+
+		if (getBounds().contains(devPos)) {
+			onMouseMove(devPos.x, devPos.y);
 		}
 	}
 
@@ -5881,6 +5898,44 @@ public class ChartComponentGraph extends Canvas {
 		_zoomRatioCenter = (double) xxDevSliderLinePos / _xxDevGraphWidth;
 	}
 
+//	/**
+//	 * Set the scrolling cursor according to the vertical position of the mouse
+//	 *
+//	 * @param devX
+//	 * @param devY
+//	 *            vertical coordinat of the mouse in the graph
+//	 */
+//	private void setupScrollCursor(final int devX, final int devY) {
+//
+//		final int height = getDevVisibleGraphHeight();
+//		final int height4 = height / 4;
+//		final int height2 = height / 2;
+//
+//		final float oldValue = _scrollAcceleration;
+//
+//		_scrollAcceleration = devY < height4 ? 0.25f : devY < height2 ? 1 : devY > height - height4 ? 10 : 2;
+//
+//		// set cursor according to the position
+//		if (_scrollAcceleration == 0.25) {
+//			setCursor(_cursorHand05x);
+//		} else if (_scrollAcceleration == 1) {
+//			setCursor(_cursorHand);
+//		} else if (_scrollAcceleration == 2) {
+//			setCursor(_cursorHand2x);
+//		} else {
+//			setCursor(_cursorHand5x);
+//		}
+//
+//		/*
+//		 * when the acceleration has changed, the start positions for scrolling the graph must be
+//		 * set to the current location
+//		 */
+//		if (oldValue != _scrollAcceleration) {
+//			_startPosScrollbar = getHorizontalBar().getSelection();
+//			_startPosDev = devX;
+//		}
+//	}
+
 	/**
 	 * Move a zoomed chart to a new position
 	 * 
@@ -5932,44 +5987,6 @@ public class ChartComponentGraph extends Canvas {
 		 */
 		_zoomRatioCenter = (double) xxDevNewPosition / _xxDevGraphWidth;
 	}
-
-//	/**
-//	 * Set the scrolling cursor according to the vertical position of the mouse
-//	 *
-//	 * @param devX
-//	 * @param devY
-//	 *            vertical coordinat of the mouse in the graph
-//	 */
-//	private void setupScrollCursor(final int devX, final int devY) {
-//
-//		final int height = getDevVisibleGraphHeight();
-//		final int height4 = height / 4;
-//		final int height2 = height / 2;
-//
-//		final float oldValue = _scrollAcceleration;
-//
-//		_scrollAcceleration = devY < height4 ? 0.25f : devY < height2 ? 1 : devY > height - height4 ? 10 : 2;
-//
-//		// set cursor according to the position
-//		if (_scrollAcceleration == 0.25) {
-//			setCursor(_cursorHand05x);
-//		} else if (_scrollAcceleration == 1) {
-//			setCursor(_cursorHand);
-//		} else if (_scrollAcceleration == 2) {
-//			setCursor(_cursorHand2x);
-//		} else {
-//			setCursor(_cursorHand5x);
-//		}
-//
-//		/*
-//		 * when the acceleration has changed, the start positions for scrolling the graph must be
-//		 * set to the current location
-//		 */
-//		if (oldValue != _scrollAcceleration) {
-//			_startPosScrollbar = getHorizontalBar().getSelection();
-//			_startPosDev = devX;
-//		}
-//	}
 
 	void setCursorStyle(final int devYMouse) {
 

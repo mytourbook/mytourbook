@@ -72,9 +72,14 @@ public class ActionHrZoneDropDownMenu extends Action implements IMenuCreator {
 
 	public Menu getMenu(final Control parent) {
 
-		final Map<String, TCActionProxy> actionProxies = _tourChart.getActionProxies();
+		// recreate menu each time
+		if (_menu != null) {
+			_menu.dispose();
+		}
 
 		_menu = new Menu(parent);
+
+		final Map<String, TCActionProxy> actionProxies = _tourChart.getActionProxies();
 
 		addItem(_actionTitle);
 

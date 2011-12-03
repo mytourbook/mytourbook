@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,6 +23,18 @@ public class Messages extends NLS {
 
 	public static String		Action_configure_columns;
 	public static String		Action_configure_columns_tooltip;
+
+	public static String		Action_Tooltip_Altimeter;
+	public static String		Action_Tooltip_Altitude;
+	public static String		Action_Tooltip_Cadence;
+	public static String		Action_Tooltip_Distance;
+	public static String		Action_Tooltip_Gradient;
+	public static String		Action_Tooltip_Pace;
+	public static String		Action_Tooltip_Power;
+	public static String		Action_Tooltip_Pulse;
+	public static String		Action_Tooltip_Speed;
+	public static String		Action_Tooltip_Temperature;
+	public static String		Action_Tooltip_Time;
 
 	public static String		ColumnFactory_altitude_computed_difference_tooltip;
 	public static String		ColumnFactory_altitude_difference_label;
@@ -229,11 +241,9 @@ public class Messages extends NLS {
 	public static String		message_manager_sMessageSummary;
 	public static String		message_manager_sWarningSummary;
 
-	public static String	Tooltip_Label_Altitude;
-
-	public static String	Tooltip_Label_Distance;
-
-	public static String	Tooltip_Label_Time;
+	public static String		Tooltip_Label_Altitude;
+	public static String		Tooltip_Label_Distance;
+	public static String		Tooltip_Label_Time;
 
 	public static String		Tooltip_WayPoint_Label_Altitude;
 	public static String		Tooltip_WayPoint_Label_Category;

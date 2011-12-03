@@ -66,9 +66,14 @@ public class ActionChartOptions extends Action implements IMenuCreator {
 
 	public Menu getMenu(final Control parent) {
 
-		final Map<String, TCActionProxy> actionProxies = _tourChart.getActionProxies();
+		// recreate menu each time
+		if (_menu != null) {
+			_menu.dispose();
+		}
 
 		_menu = new Menu(parent);
+
+		final Map<String, TCActionProxy> actionProxies = _tourChart.getActionProxies();
 
 		addItem(actionProxies.get(TourChart.COMMAND_ID_IS_SHOW_TOUR_MARKER).getAction());
 		addItem(actionProxies.get(TourChart.COMMAND_ID_IS_SHOW_BREAKTIME_VALUES).getAction());

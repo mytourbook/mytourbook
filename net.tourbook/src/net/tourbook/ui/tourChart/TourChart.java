@@ -32,6 +32,7 @@ import net.tourbook.chart.ChartMarkerLayer;
 import net.tourbook.chart.ChartYDataMinMaxKeeper;
 import net.tourbook.chart.IChartLayer;
 import net.tourbook.chart.IFillPainter;
+import net.tourbook.chart.ITooltipOwner;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -72,8 +73,10 @@ import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IWorkbenchPartSite;
@@ -150,7 +153,7 @@ public class TourChart extends Chart {
 
 	private TourToolTip						_tourToolTip;
 	private TourInfoToolTipProvider			_tourInfoToolTipProvider;
-	private ValuePointToolTip				_valuePointToolTip;
+	private ToolTipValuePointUI						_valuePointToolTip;
 
 	public TourChart(final Composite parent, final int style, final boolean isShowActions) {
 
@@ -209,9 +212,20 @@ public class TourChart extends Chart {
 		setTourToolTipProvider(_tourInfoToolTipProvider);
 
 		/*
-		 * setup value point tool tip
+		 * setup value point tooltip
 		 */
-		_valuePointToolTip = new ValuePointToolTip(getValuePointControl());
+		_valuePointToolTip = new ToolTipValuePointUI(new ITooltipOwner() {
+
+			@Override
+			public Control getControl() {
+				return getValuePointControl();
+			}
+
+			@Override
+			public void handleEventMouseMove(final Point mouseDisplayRelativePosition) {
+				handleTooltipEventMouseMove(mouseDisplayRelativePosition);
+			}
+		});
 		setValuePointToolTipProvider(_valuePointToolTip);
 	}
 

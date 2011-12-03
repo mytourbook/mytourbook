@@ -174,7 +174,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 				// TODO welches Format?!
 				//if(fields[0].equals("TotalTime")) tourData.setDeviceTravelTime(Long.parseLong(fields[1]));
 				if (fields[0].equals("WheelPerimeter")) { //$NON-NLS-1$
-					tourData.setDeviceWheel(Integer.parseInt(fields[1]));
+//					tourData.setDeviceWheel(Integer.parseInt(fields[1]));
 				}
 			}
 		}

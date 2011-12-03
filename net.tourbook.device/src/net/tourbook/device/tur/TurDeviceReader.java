@@ -179,8 +179,8 @@ public class TurDeviceReader extends TourbookDevice {
 			tourData.setDeviceMode(Short.parseShort(turDeviceData.deviceMode));
 //			tourData.setDeviceTotalDown(Integer.parseInt(turDeviceData.deviceAltDown));
 //			tourData.setDeviceTotalUp(Integer.parseInt(turDeviceData.deviceAltUp));
-			tourData.setDeviceTravelTime(Long.parseLong(turDeviceData.deviceTime));
-			tourData.setDeviceWeight(Integer.parseInt(turDeviceData.bikeWeight));
+//			tourData.setDeviceTravelTime(Long.parseLong(turDeviceData.deviceTime));
+//			tourData.setDeviceWeight(Integer.parseInt(turDeviceData.bikeWeight));
 
 			tourData.setStartHour(Short.parseShort(turDeviceData.tourStartTime.substring(0, 2)));
 			tourData.setStartMinute(Short.parseShort(turDeviceData.tourStartTime.substring(3, 5)));

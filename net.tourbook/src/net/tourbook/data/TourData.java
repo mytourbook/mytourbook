@@ -696,28 +696,28 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private boolean											isSpeedSerieFromDevice				= false;
 
 	/**
-	 * pace in min/km
-	 */
-	@Transient
-	private float[]											paceSerieMinute;
-
-	/**
 	 * pace in sec/km
 	 */
 	@Transient
 	private float[]											paceSerieSeconds;
 
 	/**
-	 * pace in min/mile
-	 */
-	@Transient
-	private float[]											paceSerieMinuteImperial;
-
-	/**
 	 * pace in sec/mile
 	 */
 	@Transient
 	private float[]											paceSerieSecondsImperial;
+
+	/**
+	 * pace in min/km
+	 */
+	@Transient
+	private float[]											paceSerieMinute;
+
+	/**
+	 * pace in min/mile
+	 */
+	@Transient
+	private float[]											paceSerieMinuteImperial;
 
 	@Transient
 	private float[]											powerSerie;
@@ -1110,31 +1110,29 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		if (isSpeedSerieFromDevice == false) {
 			speedSerie = null;
 		}
+		speedSerieImperial = null;
+
 		if (isPowerSerieFromDevice == false) {
 			powerSerie = null;
 		}
 
 		timeSerieFloat = null;
-
-		paceSerieMinute = null;
-		paceSerieSeconds = null;
-		paceSerieMinuteImperial = null;
-		paceSerieSecondsImperial = null;
-
-		altimeterSerie = null;
-		gradientSerie = null;
-
 		breakTimeSerie = null;
 
-		speedSerieImperial = null;
+		pulseSerieSmoothed = null;
+		gradientSerie = null;
+
+		paceSerieSeconds = null;
+		paceSerieSecondsImperial = null;
+		paceSerieMinute = null;
 		paceSerieMinuteImperial = null;
+
+		altimeterSerie = null;
 		altimeterSerieImperial = null;
 
 		altitudeSerieSmoothed = null;
 		altitudeSerieImperial = null;
 		altitudeSerieImperialSmoothed = null;
-
-		pulseSerieSmoothed = null;
 
 		srtmSerie = null;
 		srtmSerieImperial = null;
@@ -2230,10 +2228,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		speedSerie = new float[size];
 		speedSerieImperial = new float[size];
 
-		paceSerieMinute = new float[size];
-		paceSerieMinuteImperial = new float[size];
 		paceSerieSeconds = new float[size];
 		paceSerieSecondsImperial = new float[size];
+		paceSerieMinute = new float[size];
+		paceSerieMinuteImperial = new float[size];
 
 		gradientSerie = new float[size];
 
@@ -2375,8 +2373,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			speedSerie[serieIndex] = (float) speedMetric;
 			speedSerieImperial[serieIndex] = (float) speedImperial;
 
-			paceSerieSeconds[serieIndex] = speedMetric < 1.0 ? 0 : (float) (3600.0 / speedMetric);
-			paceSerieSecondsImperial[serieIndex] = speedMetric < 0.6 ? 0 : (float) (3600.0 / speedImperial);
+			final float paceMetricSeconds = speedMetric < 1.0 ? 0 : (float) (3600.0 / speedMetric);
+			final float paceImperialSeconds = speedMetric < 0.6 ? 0 : (float) (3600.0 / speedImperial);
+
+			paceSerieSeconds[serieIndex] = paceMetricSeconds;
+			paceSerieSecondsImperial[serieIndex] = paceImperialSeconds;
+
+			paceSerieMinute[serieIndex] = paceMetricSeconds / 60;
+			paceSerieMinuteImperial[serieIndex] = paceImperialSeconds / 60;
 		}
 	}
 
@@ -2389,6 +2393,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 		if ((speedSerie != null)
 				&& (speedSerieImperial != null)
+				&& (paceSerieSeconds != null)
+				&& (paceSerieSecondsImperial != null)
 				&& (paceSerieMinute != null)
 				&& (paceSerieMinuteImperial != null)) {
 			return;
@@ -2438,6 +2444,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		final int serieLength = speedSerie.length;
 
 		speedSerieImperial = new float[serieLength];
+		maxSpeed = 0;
 
 		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 
@@ -2450,8 +2457,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			speedSerieImperial[serieIndex] = speedMetric / UI.UNIT_MILE;
 			maxSpeed = Math.max(maxSpeed, speedMetric);
 		}
-
-		maxSpeed /= 10;
 	}
 
 	/**
@@ -2468,13 +2473,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 		final int serieLength = timeSerie.length;
 
+		maxSpeed = 0;
+
 		speedSerie = new float[serieLength];
 		speedSerieImperial = new float[serieLength];
 
-		paceSerieMinute = new float[serieLength];
 		paceSerieSeconds = new float[serieLength];
-		paceSerieMinuteImperial = new float[serieLength];
 		paceSerieSecondsImperial = new float[serieLength];
+		paceSerieMinute = new float[serieLength];
+		paceSerieMinuteImperial = new float[serieLength];
 
 		int lowIndexAdjustmentDefault = 0;
 		int highIndexAdjustmentDefault = 0;
@@ -2557,9 +2564,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 			maxSpeed = Math.max(maxSpeed, speedMetric);
 
-			/*
-			 * pace (computed with divisor 10)
-			 */
 			float paceMetricSeconds = 0;
 			float paceImperialSeconds = 0;
 			float paceMetricMinute = 0;
@@ -2567,10 +2571,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 			if ((speedMetric != 0) && (distDiff != 0)) {
 
-//				final float pace = timeDiff * 166.66f / distDiff;
-//				final float pace = 10 * (((float) timeDiff / 60) / ((float) distDiff / 1000));
-
-//				paceMetricSeconds = 10* timeDiff * 1000 / (float) distDiff;
 				paceMetricSeconds = timeDiff * 10000 / distDiff;
 				paceImperialSeconds = paceMetricSeconds * UI.UNIT_MILE;
 
@@ -2581,11 +2581,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			paceSerieMinute[serieIndex] = paceMetricMinute;
 			paceSerieMinuteImperial[serieIndex] = paceImperialMinute;
 
-			paceSerieSeconds[serieIndex] = (int) paceMetricSeconds / 10;
-			paceSerieSecondsImperial[serieIndex] = (int) paceImperialSeconds / 10;
+			paceSerieSeconds[serieIndex] = paceMetricSeconds;
+			paceSerieSecondsImperial[serieIndex] = paceImperialSeconds;
 		}
-
-		maxSpeed /= 10;
 	}
 
 	/**
@@ -2603,13 +2601,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		final int serieLength = timeSerie.length;
 		final int lastSerieIndex = serieLength - 1;
 
+		maxSpeed = 0;
+
 		speedSerie = new float[serieLength];
 		speedSerieImperial = new float[serieLength];
 
-		paceSerieMinute = new float[serieLength];
 		paceSerieSeconds = new float[serieLength];
-		paceSerieMinuteImperial = new float[serieLength];
 		paceSerieSecondsImperial = new float[serieLength];
+		paceSerieMinute = new float[serieLength];
+		paceSerieMinuteImperial = new float[serieLength];
 
 		final boolean isUseLatLon = (latitudeSerie != null) && //
 				(longitudeSerie != null)
@@ -2774,8 +2774,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 			setSpeed(serieIndex, speedMetric, speedImperial, timeDiff, distDiff);
 		}
-
-		maxSpeed /= 10;
 	}
 
 	/**
@@ -3570,7 +3568,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 					// pace
 					final float segmentPace = drivingTime * 1000 / (segmentDistance / UI.UNIT_VALUE_DISTANCE);
-					segment.pace = (int) segmentPace;
+					segment.pace = segmentPace;
 					segment.paceDiff = segment.pace - tourPace;
 					segmentSeriePace[segmentIndex] = segmentPace;
 				}
@@ -3689,160 +3687,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		out.println("Pulse:			" + getStartPulse()); //$NON-NLS-1$
 		out.println("Offset DD record:	" + offsetDDRecord); //$NON-NLS-1$
 	}
-
-//	#include <stdio.h>
-//	#include <stdlib.h>
-//	#include <math.h>
-//
-//	#define SIZE 1528
-//	#define pi 3.1415926535897932384626433832795
-//
-//	int index_next_valid_data(double* field, double invalid_data, int i_start)
-//	{
-//	  int i, i_valid;
-//
-//	  i = i_start;
-//
-//	  while ( field[i] == invalid_data )
-//	    {
-//	      i++;
-//	    }
-//
-//	  return(i);
-//	}
-//
-//	double linear_interpolation(double time1, double time2, double val1, double val2, double time)
-//	{
-//	  if (time2 == time1)
-//	    return( (val1+val2)/2. );
-//	  else
-//	    return( val1 + (val2 - val1) / (time2 - time1) * (time - time1) );
-//	}
-//
-//	double distance_ellipsoid_gps(double lat1, double lat2, double lon1, double lon2)
-//	{
-//	  double earth_radius = 6371000.;
-//	// This value is not important for the interpolation
-//	// Any constant value can be chosen
-//
-//	  double lat1_rad = lat1*pi/180.;
-//	  double lat2_rad = lat2*pi/180.;
-//	  double lon1_rad = lon1*pi/180.;
-//	  double lon2_rad = lon2*pi/180.;
-//
-//	  return( earth_radius * 2. * asin( sqrt( (sin((lat1_rad-lat2_rad)/2.)) * (sin((lat1_rad-lat2_rad)/2.)) + cos(lat1_rad) * cos(lat2_rad) * (sin((lon1_rad-lon2_rad)/2.)) * (sin((lon1_rad-lon2_rad)/2.)) ) ) );
-//	}
-//
-//	void data_completing(double* field, double* var, double invalid_data, double* field_c)
-//	{
-//	  int i, j;
-//	  int i_valid;
-//
-//	  for (i=0; i<SIZE; i++)
-//	    {
-//	      if (field[i] == invalid_data)
-//	        {
-//	          i_valid = index_next_valid_data(field, invalid_data, i);
-//	          if (field[i_valid] == invalid_data)
-//	            printf("ERROR: the field should be a valid data)");
-//
-//	          for (j=i; j<i_valid; j++)
-//	            {
-//	              field_c[j] = linear_interpolation(var[i-1], var[i_valid], field[i-1], field[i_valid], var[j]);
-//	            }
-//	          i=i_valid-1;
-//	        }
-//	      else
-//	        {
-//	          field_c[i] = field[i];
-//	        }
-//	    }
-//	}
-//
-//
-//	main()
-//	{
-//	  int i;
-//	  double time[SIZE];
-//	  double latitude[SIZE], longitude[SIZE];
-//	  double latitude_c[SIZE], longitude_c[SIZE];
-//	  double altitude[SIZE], altitude_c[SIZE];
-//	  double distance_gps[SIZE];
-//	  double distance[SIZE], distance_ct[SIZE], distance_cd[SIZE];
-//	  double speed[SIZE], speed_c[SIZE];
-//	  double heart_rate[SIZE];
-//
-//	  FILE *file;
-//
-//	// Initialization
-//	//===============
-//	  for(i=0; i<SIZE; i++)
-//	    {
-//	      time[i] = -1.;
-//	      latitude[i] = -1.;
-//	      longitude[i] = -1.;
-//	      altitude[i] = -1.;
-//	      distance[i] = -1.;
-//	      speed[i] = -1.;
-//	      heart_rate[i] = -1.;
-//	    }
-//
-//	// Reading the data in a text file
-//	//================================
-//	// In the initial file, all the missing data are set to -999.
-//	//-----------------------------------------------------------
-//	  file = fopen("example_complete.txt", "r");
-//	  for(i=0; i<SIZE; i++)
-//	    {
-//	      fscanf(file, "%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", &time[i], &latitude[i], &longitude[i], &altitude[i], &distance[i], &speed[i], &heart_rate[i]);
-//	    }
-//	  fclose(file);
-//
-//	// Interpolations of missing data
-//	//===============================
-//	// Latitude and longitude are interpolated linearly in time
-//	//---------------------------------------------------------
-//	  data_completing(latitude, time, -999., latitude_c);
-//	  data_completing(longitude, time, -999., longitude_c);
-//
-//	// Altitude is interpolated linearly in time
-//	//------------------------------------------
-//	  data_completing(altitude, time, -999., altitude_c);
-//
-//	// Speed is interpolated linearly in time
-//	//---------------------------------------
-//	  data_completing(speed, time, -999., speed_c);
-//
-//	// Distance is interpolated linearly in time
-//	//------------------------------------------
-//	  data_completing(distance, time, -999., distance_ct);
-//
-//	// Results
-//	//========
-//	  file = fopen("result_time.txt", "w");
-//	  for (i=0; i<SIZE; i++)
-//	    fprintf(file, "%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\n", time[i], latitude[i], latitude_c[i], longitude[i], longitude_c[i], altitude[i], altitude_c[i], distance[i], distance_ct[i], distance_gps[i], speed[i], speed_c[i]);
-//	  fclose(file);
-//
-//	// Compute an approximate distance from latitude and longitude data
-//	//-----------------------------------------------------------------
-//	  distance_gps[0] = 0.;
-//	  for (i=1; i<SIZE; i++)
-//	    {
-//	      distance_gps[i] = distance_gps[i-1] + distance_ellipsoid_gps(latitude_c[i-1], latitude_c[i], longitude_c[i-1], longitude_c[i]);
-//	    }
-//	// Distance is interpolated linearly in distance_gps
-//	//--------------------------------------------------
-//	  data_completing(distance, distance_gps, -999., distance_cd);
-//
-//	// Results
-//	//========
-//	  file = fopen("result_ellipsoid.txt", "w");
-//	  for (i=0; i<SIZE; i++)
-//	    fprintf(file, "%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\n", time[i], latitude[i], latitude_c[i], longitude[i], longitude_c[i], altitude[i], altitude_c[i], distance[i], distance_cd[i], distance_gps[i], speed[i], speed_c[i]);
-//	  fclose(file);
-//
-//	}
 
 	public void dumpTime() {
 		final PrintStream out = System.out;
@@ -4214,24 +4058,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return serie;
 	}
 
-// NOT USED 18.8.2010
-//	public long getDeviceTravelTime() {
-//		return deviceTravelTime;
-//	}
-//
-//	public int getDeviceWeight() {
-//		return deviceWeight;
-//	}
-//
-//	public int getDeviceWheel() {
-//		return deviceWheel;
-//	}
-
-// not used 5.10.2008
-//	public int getDeviceDistance() {
-//		return deviceDistance;
-//	}
-
 	public short getDpTolerance() {
 		return dpTolerance;
 	}
@@ -4292,15 +4118,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public int getMaxAltitude() {
 		return maxAltitude;
 	}
-
-// not used 5.10.2008
-//	public int getDeviceTotalDown() {
-//		return deviceTotalDown;
-//	}
-
-//	public int getDeviceTotalUp() {
-//		return deviceTotalUp;
-//	}
 
 	/**
 	 * @return the maxPulse
@@ -4394,7 +4211,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 			// use metric system
 
-			if (paceSerieMinute == null) {
+			if (paceSerieSeconds == null) {
 				computeSpeedSerie();
 			}
 
@@ -4404,7 +4221,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 			// use imperial system
 
-			if (paceSerieMinuteImperial == null) {
+			if (paceSerieSecondsImperial == null) {
 				computeSpeedSerie();
 			}
 
@@ -5379,29 +5196,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		this.deviceTourType = tourType;
 	}
 
-//	public void setDeviceTotalDown(final int deviceTotalDown) {
-//		this.deviceTotalDown = deviceTotalDown;
-//	}
-//
-//	public void setDeviceTotalUp(final int deviceTotalUp) {
-//		this.deviceTotalUp = deviceTotalUp;
-//	}
-
-	public void setDeviceTravelTime(final long deviceTravelTime) {
-// NOT USED 18.8.2010
-//		this.deviceTravelTime = deviceTravelTime;
-	}
-
-	public void setDeviceWeight(final int deviceWeight) {
-// NOT USED 18.8.2010
-//		this.deviceWeight = deviceWeight;
-	}
-
-	public void setDeviceWheel(final int deviceWheel) {
-// NOT USED 18.8.2010
-//		this.deviceWheel = deviceWheel;
-	}
-
 	public void setDpTolerance(final short dpTolerance) {
 		this.dpTolerance = dpTolerance;
 	}
@@ -5464,9 +5258,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 		maxSpeed = Math.max(maxSpeed, speedMetric);
 
-		/*
-		 * pace (computed with divisor 10)
-		 */
 		float paceMetricSeconds = 0;
 		float paceImperialSeconds = 0;
 		float paceMetricMinute = 0;
@@ -5477,15 +5268,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			paceMetricSeconds = timeDiff * 10000 / distDiff;
 			paceImperialSeconds = paceMetricSeconds * UI.UNIT_MILE;
 
-			paceMetricMinute = ((paceMetricSeconds / 60));
-			paceImperialMinute = (int) ((paceImperialSeconds / 60));
+			paceMetricMinute = paceMetricSeconds / 60;
+			paceImperialMinute = paceImperialSeconds / 60;
 		}
+
+		paceSerieSeconds[serieIndex] = paceMetricSeconds;
+		paceSerieSecondsImperial[serieIndex] = paceImperialSeconds;
 
 		paceSerieMinute[serieIndex] = paceMetricMinute;
 		paceSerieMinuteImperial[serieIndex] = paceImperialMinute;
-
-		paceSerieSeconds[serieIndex] = paceMetricSeconds / 10;
-		paceSerieSecondsImperial[serieIndex] = paceImperialSeconds / 10;
 	}
 
 	/**
