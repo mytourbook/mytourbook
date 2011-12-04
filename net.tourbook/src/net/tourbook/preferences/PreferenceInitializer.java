@@ -155,10 +155,12 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES, true);
 		store.setDefault(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES, true);
 
+		// value point tool tip
+		store.setDefault(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE, true);
+
 		/*
 		 * graph smoothing
 		 */
-
 		// algorithm
 		store.setDefault(
 				ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM,

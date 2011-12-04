@@ -294,7 +294,7 @@ public class ChartComponents extends Composite {
 
 			graphDrawingData.add(drawingData);
 
-			// set chart title
+			// set chart title above the first graph
 			if (graphIndex == 1) {
 
 				drawingData.setXTitle(_chartDataModel.getTitle());
@@ -538,7 +538,7 @@ public class ChartComponents extends Composite {
 		final int unitType = yData.getAxisUnit();
 
 		// height of one chart graph including the slider bar
-		final int devChartHeight = getChartHeightWithoutTrim();
+		final int devChartHeight = getDevChartHeightWithoutTrim();
 
 		int devGraphHeight = devChartHeight;
 
@@ -741,7 +741,7 @@ public class ChartComponents extends Composite {
 		final ChartDataYSerie yData = drawingData.getYData();
 
 		// height of one chart graph including the slider bar
-		final int devChartHeight = getChartHeightWithoutTrim();
+		final int devChartHeight = getDevChartHeightWithoutTrim();
 
 		int devGraphHeight = devChartHeight;
 
@@ -1356,12 +1356,20 @@ public class ChartComponents extends Composite {
 		return _chartDrawingData;
 	}
 
-	int getChartHeightWithoutTrim() {
+	private int getDevChartHeightWithoutTrim() {
 
 		return _visibleGraphRect.height //
 				- _devMarginTop
 				- _devXTitleBarHeight
 				- _devXAxisHeight;
+	}
+
+	int getDevChartMarginBottom() {
+		return _devXAxisHeight;
+	}
+
+	int getDevChartMarginTop() {
+		return _devMarginTop + _devXTitleBarHeight + _devSliderBarHeight;
 	}
 
 	/**
@@ -1438,6 +1446,8 @@ public class ChartComponents extends Composite {
 		// resize the axis
 		componentAxisLeft.setDrawingData(_chartDrawingData, true);
 		componentAxisRight.setDrawingData(_chartDrawingData, false);
+
+		componentGraph.updateChartSize();
 
 		// synchronize chart
 		final SynchConfiguration synchConfig = createSynchConfig();

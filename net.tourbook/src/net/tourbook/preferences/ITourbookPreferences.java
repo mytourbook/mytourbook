@@ -306,4 +306,9 @@ public interface ITourbookPreferences {
 	public static final String	TOGGLE_STATE_REIMPORT_ALL_TIME_SLICES		= "TOGGLE_STATE_REIMPORT_ALL_TIME_SLICES";					//$NON-NLS-1$
 	public static final String	TOGGLE_STATE_REIMPORT_ALTITUDE_VALUES		= "TOGGLE_STATE_REIMPORT_ALTITUDE_VALUES";					//$NON-NLS-1$
 
+	/*
+	 * Value point tool tip
+	 */
+	public static final String	VALUE_POINT_TOOL_TIP_IS_VISIBLE				= "VALUE_POINT_TOOL_TIP_IS_VISIBLE";						//$NON-NLS-1$
+
 }

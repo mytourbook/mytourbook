@@ -77,8 +77,9 @@ public class ActionChartOptions extends Action implements IMenuCreator {
 
 		addItem(actionProxies.get(TourChart.COMMAND_ID_IS_SHOW_TOUR_MARKER).getAction());
 		addItem(actionProxies.get(TourChart.COMMAND_ID_IS_SHOW_BREAKTIME_VALUES).getAction());
-		addItem(actionProxies.get(TourChart.COMMAND_ID_SHOW_START_TIME).getAction());
-		addItem(actionProxies.get(TourChart.COMMAND_ID_SHOW_SRTM_DATA).getAction());
+		addItem(actionProxies.get(TourChart.COMMAND_ID_IS_SHOW_START_TIME).getAction());
+		addItem(actionProxies.get(TourChart.COMMAND_ID_IS_SHOW_SRTM_DATA).getAction());
+		addItem(actionProxies.get(TourChart.COMMAND_ID_IS_SHOW_VALUEPOINT_TOOLTIP).getAction());
 
 		(new Separator()).fill(_menu, -1);
 		addItem(actionProxies.get(TourChart.COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER).getAction());

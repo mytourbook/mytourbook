@@ -27,6 +27,15 @@ public interface IValuePointToolTip {
 	void hide();
 
 	/**
+	 * Set chart margins, this is used to position the value point tool tip correctly at the chart
+	 * border.
+	 * 
+	 * @param marginTop
+	 * @param marginBottom
+	 */
+	void setChartMargins(int marginTop, int marginBottom);
+
+	/**
 	 * Mouse has been moved to a new or still the old value index.
 	 * 
 	 * @param valueIndex

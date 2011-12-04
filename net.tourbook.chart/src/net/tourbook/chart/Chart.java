@@ -1179,7 +1179,7 @@ public class Chart extends ViewForm {
 	}
 
 	public void setValuePointToolTipProvider(final IValuePointToolTip valuePointToolTip) {
-		_chartComponents.componentGraph.hoveredLineToolTip = valuePointToolTip;
+		_chartComponents.componentGraph.valuePointToolTip = valuePointToolTip;
 	}
 
 	/**

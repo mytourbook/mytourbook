@@ -21,6 +21,32 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.messages";							//$NON-NLS-1$
 
+	public static String		Action_ToolTip_Graph_Altimeter;
+	public static String		Action_ToolTip_Graph_Altitude;
+	public static String		Action_ToolTip_Graph_Cadence;
+	public static String		Action_ToolTip_Graph_Distance;
+	public static String		Action_ToolTip_Graph_Gradient;
+	public static String		Action_ToolTip_Graph_Pace;
+	public static String		Action_ToolTip_Graph_Power;
+	public static String		Action_ToolTip_Graph_Pulse;
+	public static String		Action_ToolTip_Graph_Speed;
+	public static String		Action_ToolTip_Graph_Temperature;
+	public static String		Action_ToolTip_Graph_Time;
+
+	public static String	Action_ToolTip_Hide;
+
+	public static String	Action_ToolTip_PinLocation_BottomLeft;
+
+	public static String	Action_ToolTip_PinLocation_BottomRight;
+
+	public static String	Action_ToolTip_PinLocation_Disabled;
+
+	public static String	Action_ToolTip_PinLocation_Header;
+
+	public static String	Action_ToolTip_PinLocation_TopLeft;
+
+	public static String	Action_ToolTip_PinLocation_TopRight;
+
 	public static String		Image__ArrowDown;
 	public static String		Image__ArrowUp;
 	public static String		Image__ZoomOut;
@@ -1033,6 +1059,8 @@ public class Messages extends NLS {
 	public static String		Tour_Action_ShowBreaktimeValues;
 	public static String		Tour_Action_ShowHrZones_Tooltip;
 	public static String		Tour_Action_ShowTourMarker;
+
+	public static String	Tour_Action_ValuePointToolTip_IsVisible;
 
 	public static String		Tour_Book_Action_delete_selected_tours;
 	public static String		Tour_Book_Action_delete_selected_tours_dlg_message;

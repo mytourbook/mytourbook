@@ -24,17 +24,6 @@ public class Messages extends NLS {
 	public static String		Action_configure_columns;
 	public static String		Action_configure_columns_tooltip;
 
-	public static String		Action_Tooltip_Altimeter;
-	public static String		Action_Tooltip_Altitude;
-	public static String		Action_Tooltip_Cadence;
-	public static String		Action_Tooltip_Distance;
-	public static String		Action_Tooltip_Gradient;
-	public static String		Action_Tooltip_Pace;
-	public static String		Action_Tooltip_Power;
-	public static String		Action_Tooltip_Pulse;
-	public static String		Action_Tooltip_Speed;
-	public static String		Action_Tooltip_Temperature;
-	public static String		Action_Tooltip_Time;
 
 	public static String		ColumnFactory_altitude_computed_difference_tooltip;
 	public static String		ColumnFactory_altitude_difference_label;

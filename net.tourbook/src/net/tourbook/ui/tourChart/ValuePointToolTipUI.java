@@ -21,6 +21,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ITooltipOwner;
 import net.tourbook.chart.IValuePointToolTip;
 import net.tourbook.data.TourData;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.Messages;
 import net.tourbook.ui.UI;
 
@@ -29,7 +30,10 @@ import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -46,9 +50,13 @@ import org.joda.time.format.DateTimeFormatter;
  * This tooltip is displayed when the mouse is hovered over a value point in a line graph and
  * displays value point information.
  */
-public class ToolTipValuePointUI extends ToolTipValuePoint implements IValuePointToolTip {
+public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValuePointToolTip {
 
 	private static final int				SHELL_MARGIN	= 3;
+
+	private final IPreferenceStore			_prefStore		= TourbookPlugin.getDefault().getPreferenceStore();
+
+	private boolean							_isToolTipVisible;
 
 	private TourData						_tourData;
 
@@ -84,9 +92,13 @@ public class ToolTipValuePointUI extends ToolTipValuePoint implements IValuePoin
 		_nf3NoGroup.setGroupingUsed(false);
 	}
 
-	private ToolTipValuePointMenuManager	_ttMenuMgr;
+	private ValuePointToolTipMenuManager	_ttMenuMgr;
 	private ActionOpenTooltipMenu			_actionOpenTooltipMenu;
-	private ActionCloseTooltip				_actionCloseTooltip;
+
+	private int								_devXMouse;
+	private int								_devYMouse;
+
+	private IPropertyChangeListener			_prefChangeListener;
 
 	/*
 	 * UI resources
@@ -111,22 +123,9 @@ public class ToolTipValuePointUI extends ToolTipValuePoint implements IValuePoin
 	private Label							_lblDistance;
 	private Label							_lblDistanceUnit;
 
-	private class ActionCloseTooltip extends Action {
-
-		public ActionCloseTooltip() {
-			super(null, Action.AS_PUSH_BUTTON);
-			setImageDescriptor(TourbookPlugin.getImageDescriptor(net.tourbook.Messages.Image__TooltipClose));
-		}
-
-		@Override
-		public void runWithEvent(final Event event) {
-			actionCloseToolTip(event);
-		}
-	}
-
 	private class ActionOpenTooltipMenu extends Action {
 
-		public ActionOpenTooltipMenu(final ToolTipValuePointMenuManager tooltipMenuManager) {
+		public ActionOpenTooltipMenu(final ValuePointToolTipMenuManager tooltipMenuManager) {
 			super(null, Action.AS_PUSH_BUTTON);
 			setImageDescriptor(TourbookPlugin.getImageDescriptor(net.tourbook.Messages.Image__tour_options));
 		}
@@ -137,8 +136,56 @@ public class ToolTipValuePointUI extends ToolTipValuePoint implements IValuePoin
 		}
 	}
 
-	public ToolTipValuePointUI(final ITooltipOwner tooltipOwner) {
+	public ValuePointToolTipUI(final ITooltipOwner tooltipOwner) {
+
 		super(tooltipOwner);
+
+		_isToolTipVisible = _prefStore.getBoolean(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE);
+
+		addPrefListener();
+	}
+
+	void actionHideToolTip() {
+
+		_prefStore.setValue(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE, false);
+
+		_isToolTipVisible = false;
+
+		hide();
+	}
+
+	private void addPrefListener() {
+
+		_prefChangeListener = new IPropertyChangeListener() {
+			public void propertyChange(final PropertyChangeEvent event) {
+
+				final String property = event.getProperty();
+
+				/*
+				 * create a new chart configuration when the preferences has changed
+				 */
+				if (property.equals(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE)
+				//
+				) {
+					_isToolTipVisible = (Boolean) event.getNewValue();
+
+					if (_isToolTipVisible) {
+						show(new Point(_devXMouse, _devYMouse));
+					} else {
+						hide();
+					}
+				}
+			}
+		};
+
+		_prefStore.addPropertyChangeListener(_prefChangeListener);
+	}
+
+	private void createActions() {
+
+		_ttMenuMgr = new ValuePointToolTipMenuManager(this);
+
+		_actionOpenTooltipMenu = new ActionOpenTooltipMenu(_ttMenuMgr);
 	}
 
 	@Override
@@ -156,7 +203,7 @@ public class ToolTipValuePointUI extends ToolTipValuePoint implements IValuePoin
 
 			// tour data is available
 
-			setupValuePointActions();
+			createActions();
 
 			shell = createUI(parent);
 			_shell = shell;
@@ -308,7 +355,6 @@ public class ToolTipValuePointUI extends ToolTipValuePoint implements IValuePoin
 		final ToolBarManager tbm = new ToolBarManager(toolbarControl);
 
 		tbm.add(_actionOpenTooltipMenu);
-		tbm.add(_actionCloseTooltip);
 
 		tbm.update(true);
 	}
@@ -436,6 +482,25 @@ public class ToolTipValuePointUI extends ToolTipValuePoint implements IValuePoin
 		return label;
 	}
 
+	public boolean isVisible() {
+		return _isToolTipVisible;
+	}
+
+	@Override
+	void onDispose() {
+
+		_prefStore.removePropertyChangeListener(_prefChangeListener);
+
+		super.onDispose();
+	}
+
+	@Override
+	public void setChartMargins(final int marginTop, final int marginBottom) {
+
+		this.marginTop = marginTop;
+		this.marginBottom = marginBottom;
+	}
+
 	/**
 	 * @param tourData
 	 *            When <code>null</code> the tooltip will be hidden.
@@ -459,56 +524,17 @@ public class ToolTipValuePointUI extends ToolTipValuePoint implements IValuePoin
 		_isPulse = _tourData.pulseSerie != null;
 		_isTemperature = _tourData.temperatureSerie != null;
 
-//		if (_pc != null
-//				&& _tourData.timeSerie != null
-//				&& _lblDataSerieCurrent != null
-//				&& !_lblDataSerieCurrent.isDisposed()) {
-//
-//			/*
-//			 * adjust number of decimal places for the data serie values
-//			 */
-//
-//			// get number of decimal places
-//			int dataLength = _tourData.timeSerie.length;
-//			int decimalPlaces = 0;
-//
-//			while (dataLength > 0) {
-//				dataLength /= 10;
-//				decimalPlaces++;
-//			}
-//
-//			final int numberWidth = _pc.convertWidthInCharsToPixels(decimalPlaces + 0);
-//
-//			GridData gd = (GridData) _lblDataSerieCurrent.getLayoutData();
-//			gd.widthHint = numberWidth;
-//
-//			gd = (GridData) _lblDataSerieMax.getLayoutData();
-//			gd.widthHint = numberWidth;
-//
-////			_lblDataSerieCurrent.getParent().getParent().getParent().pack(true);
-//
-////			_lblDataSerieCurrent.getParent().getParent().pack(true);
-////			_lblDataSerieCurrent.getParent().pack(true);
-////			_shell.pack(true);
-//			final Point defaultSize = _shell.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
-//			_shell.setSize(defaultSize);
-//		}
-	}
-
-	private void setupValuePointActions() {
-
-		_ttMenuMgr = new ToolTipValuePointMenuManager(this);
-
-		_actionOpenTooltipMenu = new ActionOpenTooltipMenu(_ttMenuMgr);
-		_actionCloseTooltip = new ActionCloseTooltip();
 	}
 
 	@Override
 	public void setValueIndex(final int valueIndex, final int devXMouseMove, final int devYMouseMove) {
 
-		if (_tourData == null) {
+		if (_tourData == null || _isToolTipVisible == false) {
 			return;
 		}
+
+		_devXMouse = devXMouseMove;
+		_devYMouse = devYMouseMove;
 
 		if (_ttContainer == null || _ttContainer.isDisposed()) {
 
@@ -529,6 +555,16 @@ public class ToolTipValuePointUI extends ToolTipValuePoint implements IValuePoin
 		}
 
 		return super.shouldCreateToolTip(event);
+	}
+
+	@Override
+	public void show(final Point location) {
+
+		if (_isToolTipVisible == false) {
+			return;
+		}
+
+		super.show(location);
 	}
 
 	private void updateUI(int valueIndex, boolean isForceUpdate) {

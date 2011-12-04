@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,10 +21,10 @@ import net.tourbook.ui.tourChart.TourChart;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
-public class ActionHandlerShowStartTime extends TCActionHandler {
+public class ActionHandlerShowValuePointToolTip extends TCActionHandler {
 
-	public ActionHandlerShowStartTime() {
-		commandId = TourChart.COMMAND_ID_IS_SHOW_START_TIME;
+	public ActionHandlerShowValuePointToolTip() {
+		commandId = TourChart.COMMAND_ID_IS_SHOW_VALUEPOINT_TOOLTIP;
 	}
 
 	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {
@@ -32,9 +32,10 @@ public class ActionHandlerShowStartTime extends TCActionHandler {
 		final Boolean isItemChecked = HandlerUtil.isItemChecked(execEvent);
 
 		if (isItemChecked != null) {
-			tourChart.actionShowStartTime(isItemChecked);
+			tourChart.actionShowValuePointToolTip(isItemChecked);
 		}
 
 		return null;
 	}
+
 }

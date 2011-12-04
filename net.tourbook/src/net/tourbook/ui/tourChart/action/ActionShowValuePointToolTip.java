@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,26 +15,22 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart.action;
 
-import net.tourbook.ui.HandlerUtil;
+import net.tourbook.Messages;
 import net.tourbook.ui.tourChart.TourChart;
 
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.jface.action.Action;
 
-public class ActionHandlerShowStartTime extends TCActionHandler {
+public class ActionShowValuePointToolTip extends Action {
 
-	public ActionHandlerShowStartTime() {
-		commandId = TourChart.COMMAND_ID_IS_SHOW_START_TIME;
+	private TourChart	_tourChart;
+
+	public ActionShowValuePointToolTip(final TourChart tourChart) {
+		super(Messages.Tour_Action_ValuePointToolTip_IsVisible, AS_CHECK_BOX);
+		_tourChart = tourChart;
 	}
 
-	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {
-
-		final Boolean isItemChecked = HandlerUtil.isItemChecked(execEvent);
-
-		if (isItemChecked != null) {
-			tourChart.actionShowStartTime(isItemChecked);
-		}
-
-		return null;
+	@Override
+	public void run() {
+		_tourChart.actionShowValuePointToolTip(isChecked());
 	}
 }

@@ -302,7 +302,7 @@ public class ChartComponentGraph extends Canvas {
 	/**
 	 * Tooltip for value points, can be <code>null</code> when not set.
 	 */
-	IValuePointToolTip					hoveredLineToolTip;
+	IValuePointToolTip					valuePointToolTip;
 
 	private ChartYSlider				_hitYSlider;
 	private ChartYSlider				_ySliderDragged;
@@ -349,7 +349,7 @@ public class ChartComponentGraph extends Canvas {
 	private final int[]					_drawAsyncCounter				= new int[1];
 
 	private boolean						_isAutoScroll;
-	private boolean						_isAutoScrollSuperHack;
+	private boolean						_isDisableHoveredLineValueIndex;
 	private int[]						_autoScrollCounter				= new int[1];
 
 	private final ColorCache			_colorCache						= new ColorCache();
@@ -594,7 +594,10 @@ public class ChartComponentGraph extends Canvas {
 
 			@Override
 			public void controlResized(final ControlEvent e) {
+
 				_clientArea = getClientArea();
+
+				_isDisableHoveredLineValueIndex = true;
 			}
 		});
 
@@ -1244,7 +1247,7 @@ public class ChartComponentGraph extends Canvas {
 					return;
 				}
 
-				_isAutoScrollSuperHack = true;
+				_isDisableHoveredLineValueIndex = true;
 
 				/*
 				 * the offset values are determined experimentally and depends on the mouse position
@@ -1590,12 +1593,12 @@ public class ChartComponentGraph extends Canvas {
 			graphIndex++;
 		}
 
-		if (hoveredLineToolTip != null) {
+		if (valuePointToolTip != null) {
 
 			if (_hoveredLineValueIndex == -1) {
-				hoveredLineToolTip.hide();
+				valuePointToolTip.hide();
 			} else {
-				hoveredLineToolTip.setValueIndex(_hoveredLineValueIndex, _devXMouseMove, _devYMouseMove);
+				valuePointToolTip.setValueIndex(_hoveredLineValueIndex, _devXMouseMove, _devYMouseMove);
 			}
 		}
 	}
@@ -2514,12 +2517,12 @@ public class ChartComponentGraph extends Canvas {
 					isSetHoveredIndex = true;
 				}
 
-				/*
-				 * advance to the next point and check array bounds
-				 */
-				if (++valueIndex >= yValueLength) {
-					break;
-				}
+//				/*
+//				 * advance to the next point and check array bounds
+//				 */
+//				if (++valueIndex >= yValueLength) {
+//					break;
+//				}
 
 				final Rectangle lastRect = new Rectangle(
 						(int) (devX - devXDiffWidth),
@@ -4475,12 +4478,14 @@ public class ChartComponentGraph extends Canvas {
 			return false;
 		}
 
+		Rectangle lineRect = null;
+
 		for (final Rectangle[] lineFocusRectangles : _lineFocusRectangles) {
 
 			// find the line rectangle which is hovered by the mouse
 			for (int valueIndex = 0; valueIndex < lineFocusRectangles.length; valueIndex++) {
 
-				final Rectangle lineRect = lineFocusRectangles[valueIndex];
+				lineRect = lineFocusRectangles[valueIndex];
 
 				// test if the mouse is within a bar focus rectangle
 				if (lineRect != null) {
@@ -5353,16 +5358,16 @@ public class ChartComponentGraph extends Canvas {
 
 		if (_isHoveredLineVisible && isLineHovered()) {
 
-			if (hoveredLineToolTip != null) {
-				hoveredLineToolTip.setValueIndex(_hoveredLineValueIndex, _devXMouseMove, _devYMouseMove);
+			if (valuePointToolTip != null) {
+				valuePointToolTip.setValueIndex(_hoveredLineValueIndex, _devXMouseMove, _devYMouseMove);
 			}
 
 			isRedraw = true;
 
 		} else {
 
-			if (hoveredLineToolTip != null) {
-				hoveredLineToolTip.hide();
+			if (valuePointToolTip != null) {
+				valuePointToolTip.hide();
 			}
 		}
 
@@ -6041,7 +6046,9 @@ public class ChartComponentGraph extends Canvas {
 	}
 
 	/**
-	 * sets a new configuration for the graph, the whole graph will be recreated
+	 * Set a new configuration for the graph, the whole graph will be recreated. This method is
+	 * called when the chart canvas is resized, chart is zoomed or scrolled which requires that the
+	 * chart is recreated.
 	 */
 	void setDrawingData(final ChartDrawingData chartDrawingData) {
 
@@ -6059,15 +6066,15 @@ public class ChartComponentGraph extends Canvas {
 		_isCustomLayerImageDirty = true;
 		_isSelectionDirty = true;
 
-		if (_isAutoScrollSuperHack) {
+		if (_isDisableHoveredLineValueIndex) {
 			/*
 			 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-			 * SUPER HACK: prevent setting new positions until the chart is redrawn otherwise the
-			 * slider has the value index -1, the chart is flickering with autoscrolling and the map
-			 * is WRONGLY positioned
+			 * prevent setting new positions until the chart is redrawn otherwise the slider has the
+			 * value index -1, the chart is flickering when autoscrolling and the map is WRONGLY /
+			 * UGLY positioned
 			 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 			 */
-			_isAutoScrollSuperHack = false;
+			_isDisableHoveredLineValueIndex = false;
 		} else {
 
 			// prevent using old value index which can cause bound exceptions
@@ -6355,6 +6362,18 @@ public class ChartComponentGraph extends Canvas {
 		} catch (final ArrayIndexOutOfBoundsException e) {
 			// ignore
 		}
+	}
+
+	void updateChartSize() {
+
+		if (valuePointToolTip == null) {
+			return;
+		}
+
+		final int marginTop = _chartComponents.getDevChartMarginTop();
+		final int marginBottom = _chartComponents.getDevChartMarginBottom();
+
+		valuePointToolTip.setChartMargins(marginTop, marginBottom);
 	}
 
 	void updateCustomLayers() {
