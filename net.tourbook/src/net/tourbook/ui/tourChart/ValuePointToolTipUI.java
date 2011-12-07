@@ -16,33 +16,39 @@
 package net.tourbook.ui.tourChart;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
 
+import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.chart.ColorCache;
 import net.tourbook.chart.ITooltipOwner;
 import net.tourbook.chart.IValuePointToolTip;
+import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.ui.Messages;
 import net.tourbook.ui.UI;
+import net.tourbook.util.Util;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -52,31 +58,31 @@ import org.joda.time.format.DateTimeFormatter;
  */
 public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValuePointToolTip {
 
-	private static final int				SHELL_MARGIN	= 3;
+	private final IPreferenceStore			_prefStore						= TourbookPlugin
+																					.getDefault()
+																					.getPreferenceStore();
 
-	private final IPreferenceStore			_prefStore		= TourbookPlugin.getDefault().getPreferenceStore();
-
-	private boolean							_isToolTipVisible;
+	private IPropertyChangeListener			_prefChangeListener;
 
 	private TourData						_tourData;
 
-	private boolean							_isAltitude;
-	private boolean							_isCadence;
-	private boolean							_isDistance;
-	private boolean							_isGradient;
-	private boolean							_isPace;
-	private boolean							_isPower;
-	private boolean							_isPulse;
-	private boolean							_isTemperature;
+	private ValuePointToolTipMenuManager	_ttMenuMgr;
+	private ActionOpenTooltipMenu			_actionOpenTooltipMenu;
 
+	private int								_devXMouse;
+	private int								_devYMouse;
+
+	private boolean							_isToolTipVisible;
 	private int								_currentValueIndex;
+	private int								_valueUnitDistance;
 
-	private final DateTimeFormatter			_dtFormatter	= DateTimeFormat.mediumDateTime();
+	private boolean							_isHorizontal;
 
-	private final NumberFormat				_nf1			= NumberFormat.getNumberInstance();
-	private final NumberFormat				_nf1NoGroup		= NumberFormat.getNumberInstance();
-	private final NumberFormat				_nf3			= NumberFormat.getNumberInstance();
-	private final NumberFormat				_nf3NoGroup		= NumberFormat.getNumberInstance();
+	private final DateTimeFormatter			_dtFormatter					= DateTimeFormat.mediumDateTime();
+	private final NumberFormat				_nf1							= NumberFormat.getNumberInstance();
+	private final NumberFormat				_nf1NoGroup						= NumberFormat.getNumberInstance();
+	private final NumberFormat				_nf3							= NumberFormat.getNumberInstance();
+	private final NumberFormat				_nf3NoGroup						= NumberFormat.getNumberInstance();
 	{
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
@@ -92,36 +98,66 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 		_nf3NoGroup.setGroupingUsed(false);
 	}
 
-	private ValuePointToolTipMenuManager	_ttMenuMgr;
-	private ActionOpenTooltipMenu			_actionOpenTooltipMenu;
+	/**
+	 * Contains all visible graph id's
+	 */
+	private int								_visibleGraphs;
+	private int								_visibleGraphsCount;
 
-	private int								_devXMouse;
-	private int								_devYMouse;
+	private int								_visibleAltimeterId;
+	private int								_visibleAltitudeId;
+	private int								_visibleCadenceId;
+	private int								_visibleDistanceId;
+	private int								_visibleGradientId;
+	private int								_visiblePaceId;
+	private int								_visiblePowerId;
+	private int								_visiblePulseId;
+	private int								_visibleSpeedId;
+	private int								_visibleTemperatureId;
+	private int								_visibleTimeId;
 
-	private IPropertyChangeListener			_prefChangeListener;
+	private int								_visibleTimeSliceId;
 
 	/*
 	 * UI resources
 	 */
-	private Color							_bgColor;
 	private Color							_fgColor;
-	private Font							_boldFont;
+	private Color							_bgColor;
+//	private Font							_boldFont;
 	private PixelConverter					_pc;
+	private final ColorCache				_colorCache						= new ColorCache();
+	private final GraphColorProvider		_colorProvider					= GraphColorProvider.getInstance();
+
+	private final ArrayList<Control>		_firstColumnControls			= new ArrayList<Control>();
+	private final ArrayList<Control>		_firstColumnContainerControls	= new ArrayList<Control>();
 
 	/*
 	 * UI controls
 	 */
-	private Composite						_shell;
-	private Composite						_ttContainer;
+	private Composite						_shellContainer;
+	private ToolBar							_toolbarControl;
 
 	private Label							_lblDataSerieCurrent;
 	private Label							_lblDataSerieMax;
 
 	private Label							_lblTime;
 	private Label							_lblAltitude;
-	private Label							_lblAltitudeUnit;
 	private Label							_lblDistance;
+	private Label							_lblPulse;
+	private Label							_lblSpeed;
+	private Label							_lblPace;
+	private Label							_lblPower;
+	private Label							_lblTemperature;
+	private Label							_lblGradient;
+	private Label							_lblAltimeter;
+	private Label							_lblCadence;
+
+	private Label							_lblAltitudeUnit;
 	private Label							_lblDistanceUnit;
+	private Label							_lblSpeedUnit;
+	private Label							_lblPaceUnit;
+	private Label							_lblTemperatureUnit;
+	private Label							_lblAltimeterUnit;
 
 	private class ActionOpenTooltipMenu extends Action {
 
@@ -132,13 +168,13 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 
 		@Override
 		public void runWithEvent(final Event event) {
-			_ttMenuMgr.openToolTipMenu(event);
+			_ttMenuMgr.openToolTipMenu(event, _tourData);
 		}
 	}
 
-	public ValuePointToolTipUI(final ITooltipOwner tooltipOwner) {
+	public ValuePointToolTipUI(final ITooltipOwner tooltipOwner, final IDialogSettings state) {
 
-		super(tooltipOwner);
+		super(tooltipOwner, state);
 
 		_isToolTipVisible = _prefStore.getBoolean(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE);
 
@@ -152,6 +188,13 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 		_isToolTipVisible = false;
 
 		hide();
+	}
+
+	void actionOrientation(final ValuePointToolTipOrientation orientation) {
+
+		_isHorizontal = orientation == ValuePointToolTipOrientation.Horizontal;
+
+		reopenTT();
 	}
 
 	private void addPrefListener() {
@@ -174,6 +217,13 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 					} else {
 						hide();
 					}
+
+				} else if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
+
+					// dispose old colors
+					_colorCache.dispose();
+
+					reopenTT();
 				}
 			}
 		};
@@ -183,7 +233,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 
 	private void createActions() {
 
-		_ttMenuMgr = new ValuePointToolTipMenuManager(this);
+		_ttMenuMgr = new ValuePointToolTipMenuManager(this, state);
 
 		_actionOpenTooltipMenu = new ActionOpenTooltipMenu(_ttMenuMgr);
 	}
@@ -197,7 +247,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 
 			// there are no data available
 
-			shell = createUI99NoData(parent);
+			shell = createUI999NoData(parent);
 
 		} else {
 
@@ -206,7 +256,6 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 			createActions();
 
 			shell = createUI(parent);
-			_shell = shell;
 		}
 
 		return shell;
@@ -216,208 +265,447 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 
 		final Display display = parent.getDisplay();
 
-		_bgColor = display.getSystemColor(SWT.COLOR_INFO_BACKGROUND);
+		_bgColor = _colorCache.getColor(new RGB(0xff, 0xff, 0xf0));
 		_fgColor = display.getSystemColor(SWT.COLOR_INFO_FOREGROUND);
-		_boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
+//		_boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
 		_pc = new PixelConverter(parent);
 
-		final Composite shell = createUI10Shell(parent);
+		_valueUnitDistance = _isHorizontal ? 2 : 5;
+
+		_firstColumnControls.clear();
+		_firstColumnContainerControls.clear();
+
+		final Composite shell = createUI010Shell(parent);
 
 		updateUI(_currentValueIndex, true);
 
-		// compute width for all controls and equalize column width for the different sections
-		_ttContainer.layout(true, true);
-//		UI.setEqualizeColumWidths(_firstColumnControls, 5);
-//		UI.setEqualizeColumWidths(_secondColumnControls);
+		if (_isHorizontal == false) {
+
+			// compute width for all controls and equalize column width for the different sections
+			_shellContainer.layout(true, true);
+			UI.setEqualizeColumWidths(_firstColumnControls);
+
+			_shellContainer.layout(true, true);
+			UI.setEqualizeColumWidths(_firstColumnContainerControls);
+		}
 
 		return shell;
 
 	}
 
-	private Composite createUI10Shell(final Composite parent) {
+	private Composite createUI010Shell(final Composite parent) {
 
 		/*
 		 * shell container is necessary because the margins of the inner container will hide the
 		 * tooltip when the mouse is hovered, which is not as it should be.
 		 */
-		final Composite shellContainer = new Composite(parent, SWT.NONE);
-//		GridDataFactory.fillDefaults().grab(true, false).applyTo(shellContainer);
-		GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(shellContainer);
-		shellContainer.setForeground(_fgColor);
-		shellContainer.setBackground(_bgColor);
-//		shellContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+		_shellContainer = new Composite(parent, SWT.NONE);
+		GridLayoutFactory.fillDefaults()//
+				.spacing(0, 0)
+				.numColumns(2)
+				.applyTo(_shellContainer);
+		_shellContainer.setForeground(_fgColor);
+		_shellContainer.setBackground(_bgColor);
+//		_shellContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 		{
+
+			if (_visibleGraphs != 0) {
+
+//				final Composite ttContainer = new Composite(_shellContainer, SWT.NONE);
+//				ttContainer.setForeground(_fgColor);
+//				ttContainer.setBackground(_bgColor);
+//				GridLayoutFactory.fillDefaults() //
+////						.margins(SHELL_MARGIN, SHELL_MARGIN)
+//						.applyTo(ttContainer);
+////				ttContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+//				{
+//					// at least one graph is visible
+//				}
+				createUI020AllValues(_shellContainer);
+			}
+
 			/*
 			 * action toolbar in the top right corner
 			 */
-			createUI20Header(shellContainer);
-
-			_ttContainer = new Composite(shellContainer, SWT.NONE);
-			_ttContainer.setForeground(_fgColor);
-			_ttContainer.setBackground(_bgColor);
-			GridLayoutFactory.fillDefaults() //
-					.margins(SHELL_MARGIN, SHELL_MARGIN)
-					.applyTo(_ttContainer);
-//			_ttContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-			{
-
-				createUI30(_ttContainer);
-			}
+			createUI030Actions(_shellContainer);
 		}
 
-		return shellContainer;
+		return _shellContainer;
 	}
 
-	private void createUI20Header(final Composite parent) {
+	private void createUI020AllValues(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
+				.align(SWT.FILL, SWT.CENTER)
 				.grab(true, false)
-//				.hint(SWT.DEFAULT, 55)
 				.applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-		container.setForeground(_fgColor);
+
+		if (_isHorizontal) {
+			GridLayoutFactory.fillDefaults()//
+					.numColumns(_visibleGraphsCount)
+					.spacing(5, 0)
+					.applyTo(container);
+		} else {
+			GridLayoutFactory.fillDefaults()//
+					.spacing(5, 0)
+					.applyTo(container);
+		}
+
 		container.setBackground(_bgColor);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 		{
-			createUI22DataSerie(container);
-			createUI24Actions(container);
+			createUI250TimeSlices(container);
+			createUI200Time(container);
+			createUI201Distance(container);
+			createUI202Altitude(container);
+			createUI203Pulse(container);
+			createUI204Speed(container);
+			createUI205Pace(container);
+			createUI206Power(container);
+			createUI207Temperature(container);
+			createUI208Gradient(container);
+			createUI209Altimeter(container);
+			createUI210Cadence(container);
 		}
 	}
 
-	private void createUI22DataSerie(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults()//
-				.numColumns(4)
-				.extendedMargins(SHELL_MARGIN, 0, 0, 2)
-				.applyTo(container);
-		container.setForeground(_fgColor);
-		container.setBackground(_bgColor);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-		{
-			/*
-			 * label: #
-			 */
-			Label label = createUILabel(container, "# ");
-			GridDataFactory.fillDefaults() //
-					.align(SWT.FILL, SWT.END)
-					.applyTo(label);
-
-			/*
-			 * label: current value
-			 */
-			_lblDataSerieCurrent = createUILabelValue(container, SWT.TRAIL);
-			GridDataFactory.fillDefaults() //
-					// set default width
-					.hint(_pc.convertWidthInCharsToPixels(6), SWT.DEFAULT)
-					.grab(false, true)
-					.align(SWT.FILL, SWT.END)
-					.applyTo(_lblDataSerieCurrent);
-
-			/*
-			 * label: separator
-			 */
-			label = createUILabel(container, ":");
-			GridDataFactory.fillDefaults() //
-					.align(SWT.FILL, SWT.END)
-					.applyTo(label);
-
-			/*
-			 * label: max value
-			 */
-			_lblDataSerieMax = createUILabelValue(container, SWT.LEAD);
-			GridDataFactory.fillDefaults() //
-					// set default width
-					.hint(_pc.convertWidthInCharsToPixels(6), SWT.DEFAULT)
-					.grab(false, true)
-					.align(SWT.FILL, SWT.END)
-					.applyTo(_lblDataSerieMax);
-		}
-	}
-
-	private void createUI24Actions(final Composite parent) {
+	private void createUI030Actions(final Composite parent) {
 
 		/*
 		 * create toolbar
 		 */
-		final ToolBar toolbarControl = new ToolBar(parent, SWT.FLAT);
+		_toolbarControl = new ToolBar(parent, SWT.FLAT);
 		GridDataFactory.fillDefaults()//
 //				.grab(true, false)
 				.align(SWT.END, SWT.FILL)
-				.applyTo(toolbarControl);
-		toolbarControl.setForeground(_fgColor);
-		toolbarControl.setBackground(_bgColor);
+				.applyTo(_toolbarControl);
+		_toolbarControl.setForeground(_fgColor);
+		_toolbarControl.setBackground(_bgColor);
 //			toolbar.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
-		final ToolBarManager tbm = new ToolBarManager(toolbarControl);
+		final ToolBarManager tbm = new ToolBarManager(_toolbarControl);
 
 		tbm.add(_actionOpenTooltipMenu);
 
 		tbm.update(true);
 	}
 
-	private void createUI30(final Composite parent) {
+	private void createUI200Time(final Composite parent) {
 
-//		final GraphColorProvider colorProvider = GraphColorProvider.getInstance();
+		if (_visibleTimeId == 0) {
+			return;
+		}
+
+		final Composite container = createUIValueContainer(parent);
+		{
+			_lblTime = createUILabelValue(
+					container,
+					SWT.TRAIL,
+					8,
+					Messages.Graph_Label_Time,
+					GraphColorProvider.PREF_GRAPH_TIME);
+
+			createUILabel(container, UI.UNIT_LABEL_TIME, Messages.Graph_Label_Time, GraphColorProvider.PREF_GRAPH_TIME);
+		}
+
+		_firstColumnControls.add(_lblTime);
+		_firstColumnContainerControls.add(container);
+	}
+
+	private void createUI201Distance(final Composite parent) {
+
+		if (_visibleDistanceId == 0) {
+			return;
+		}
+
+		final Composite container = createUIValueContainer(parent);
+		{
+			_lblDistance = createUILabelValue(
+					container,
+					SWT.TRAIL,
+					8,
+					Messages.Graph_Label_Distance,
+					GraphColorProvider.PREF_GRAPH_DISTANCE);
+
+			_lblDistanceUnit = createUILabelValue(
+					container,
+					SWT.LEAD,
+					Messages.Graph_Label_Distance,
+					GraphColorProvider.PREF_GRAPH_DISTANCE);
+		}
+		_firstColumnControls.add(_lblDistance);
+		_firstColumnContainerControls.add(container);
+	}
+
+	private void createUI202Altitude(final Composite parent) {
+
+		if (_visibleAltitudeId == 0) {
+			return;
+		}
+
+		final Composite container = createUIValueContainer(parent);
+		{
+			_lblAltitude = createUILabelValue(
+					container,
+					SWT.TRAIL,
+					8,
+					Messages.Graph_Label_Altitude,
+					GraphColorProvider.PREF_GRAPH_ALTITUDE);
+
+			_lblAltitudeUnit = createUILabelValue(
+					container,
+					SWT.LEAD,
+					Messages.Graph_Label_Altitude,
+					GraphColorProvider.PREF_GRAPH_ALTITUDE);
+		}
+		_firstColumnControls.add(_lblAltitude);
+		_firstColumnContainerControls.add(container);
+	}
+
+	private void createUI203Pulse(final Composite parent) {
+
+		if (_visiblePulseId == 0) {
+			return;
+		}
+
+		final Composite container = createUIValueContainer(parent);
+		{
+			_lblPulse = createUILabelValue(
+					container,
+					SWT.TRAIL,
+					4,
+					Messages.Graph_Label_Heartbeat,
+					GraphColorProvider.PREF_GRAPH_HEARTBEAT);
+
+			createUILabel(
+					container,
+					Messages.Graph_Label_Heartbeat_unit,
+					Messages.Graph_Label_Heartbeat,
+					GraphColorProvider.PREF_GRAPH_HEARTBEAT);
+		}
+		_firstColumnControls.add(_lblPulse);
+		_firstColumnContainerControls.add(container);
+	}
+
+	private void createUI204Speed(final Composite parent) {
+
+		if (_visibleSpeedId == 0) {
+			return;
+		}
+
+		final Composite container = createUIValueContainer(parent);
+		{
+			_lblSpeed = createUILabelValue(
+					container,
+					SWT.TRAIL,
+					5,
+					Messages.Graph_Label_Speed,
+					GraphColorProvider.PREF_GRAPH_SPEED);
+
+			_lblSpeedUnit = createUILabelValue(
+					container,
+					SWT.LEAD,
+					Messages.Graph_Label_Speed,
+					GraphColorProvider.PREF_GRAPH_SPEED);
+		}
+		_firstColumnControls.add(_lblSpeed);
+		_firstColumnContainerControls.add(container);
+	}
+
+	private void createUI205Pace(final Composite parent) {
+
+		if (_visiblePaceId == 0) {
+			return;
+		}
+
+		final Composite container = createUIValueContainer(parent);
+		{
+			_lblPace = createUILabelValue(
+					container,
+					SWT.TRAIL,
+					4,
+					Messages.Graph_Label_Pace,
+					GraphColorProvider.PREF_GRAPH_PACE);
+
+			_lblPaceUnit = createUILabelValue(
+					container,
+					SWT.LEAD,
+					Messages.Graph_Label_Pace,
+					GraphColorProvider.PREF_GRAPH_PACE);
+		}
+		_firstColumnControls.add(_lblPace);
+		_firstColumnContainerControls.add(container);
+	}
+
+	private void createUI206Power(final Composite parent) {
+
+		if (_visiblePowerId == 0) {
+			return;
+		}
+
+		final Composite container = createUIValueContainer(parent);
+		{
+			_lblPower = createUILabelValue(
+					container,
+					SWT.TRAIL,
+					4,
+					Messages.Graph_Label_Power,
+					GraphColorProvider.PREF_GRAPH_POWER);
+
+			createUILabel(
+					container,
+					Messages.Graph_Label_Power_unit,
+					Messages.Graph_Label_Power,
+					GraphColorProvider.PREF_GRAPH_POWER);
+		}
+		_firstColumnControls.add(_lblPower);
+		_firstColumnContainerControls.add(container);
+	}
+
+	private void createUI207Temperature(final Composite parent) {
+
+		if (_visibleTemperatureId == 0) {
+			return;
+		}
+
+		final Composite container = createUIValueContainer(parent);
+		{
+			_lblTemperature = createUILabelValue(
+					container,
+					SWT.TRAIL,
+					5,
+					Messages.Graph_Label_Temperature,
+					GraphColorProvider.PREF_GRAPH_TEMPTERATURE);
+
+			_lblTemperatureUnit = createUILabelValue(
+					container,
+					SWT.LEAD,
+					Messages.Graph_Label_Temperature,
+					GraphColorProvider.PREF_GRAPH_TEMPTERATURE);
+		}
+		_firstColumnControls.add(_lblTemperature);
+		_firstColumnContainerControls.add(container);
+	}
+
+	private void createUI208Gradient(final Composite parent) {
+
+		if (_visibleGradientId == 0) {
+			return;
+		}
+
+		final Composite container = createUIValueContainer(parent);
+		{
+			_lblGradient = createUILabelValue(
+					container,
+					SWT.TRAIL,
+					5,
+					Messages.Graph_Label_Gradient,
+					GraphColorProvider.PREF_GRAPH_GRADIENT);
+
+			createUILabel(
+					container,
+					Messages.Graph_Label_Gradiend_unit,
+					Messages.Graph_Label_Gradient,
+					GraphColorProvider.PREF_GRAPH_GRADIENT);
+		}
+		_firstColumnControls.add(_lblGradient);
+		_firstColumnContainerControls.add(container);
+	}
+
+	private void createUI209Altimeter(final Composite parent) {
+
+		if (_visibleAltimeterId == 0) {
+			return;
+		}
+
+		final Composite container = createUIValueContainer(parent);
+		{
+			_lblAltimeter = createUILabelValue(
+					container,
+					SWT.TRAIL,
+					6,
+					Messages.Graph_Label_Altimeter,
+					GraphColorProvider.PREF_GRAPH_ALTIMETER);
+
+			_lblAltimeterUnit = createUILabelValue(
+					container,
+					SWT.LEAD,
+					Messages.Graph_Label_Altimeter,
+					GraphColorProvider.PREF_GRAPH_ALTIMETER);
+		}
+		_firstColumnControls.add(_lblAltimeter);
+		_firstColumnContainerControls.add(container);
+	}
+
+	private void createUI210Cadence(final Composite parent) {
+
+		if (_visibleCadenceId == 0) {
+			return;
+		}
+
+		final Composite container = createUIValueContainer(parent);
+		{
+			_lblCadence = createUILabelValue(
+					container,
+					SWT.TRAIL,
+					3,
+					Messages.Graph_Label_Cadence,
+					GraphColorProvider.PREF_GRAPH_CADENCE);
+
+			createUILabel(
+					container,
+					Messages.Graph_Label_Cadence_unit,
+					Messages.Graph_Label_Cadence,
+					GraphColorProvider.PREF_GRAPH_CADENCE);
+		}
+		_firstColumnControls.add(_lblCadence);
+		_firstColumnContainerControls.add(container);
+	}
+
+	private void createUI250TimeSlices(final Composite parent) {
+
+		if (_visibleTimeSliceId == 0) {
+			return;
+		}
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults()//
-//				.margins(0, 0)
-				.extendedMargins(2, 0, 0, 0)
-				.spacing(5, 0)
-				.numColumns(3)
+		GridDataFactory.fillDefaults()//
+				.align(SWT.CENTER, SWT.FILL)
+				.grab(true, false)
 				.applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(3).spacing(5, 0).applyTo(container);
-
+		GridLayoutFactory.fillDefaults()//
+				.numColumns(3)
+				.spacing(2, 0)
+				.applyTo(container);
+		container.setForeground(_fgColor);
 		container.setBackground(_bgColor);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
-			/*
-			 * time
-			 */
-			Label label = createUILabel(container, Messages.Tooltip_Label_Time);
-//			_firstColumnControls.add(label);
 
-			_lblTime = createUILabelValue(container, SWT.TRAIL, 10);
-//			_secondColumnControls.add(_lblRecordingTime);
+			// label: current value
+			_lblDataSerieCurrent = createUILabelValue(
+					container,
+					SWT.TRAIL,
+					5,
+					Messages.Tooltip_ValuePoint_Label_SlicesCurrent_Tooltip,
+					null);
 
-			label = createUILabel(container, UI.UNIT_LABEL_TIME);
+			// label: separator
+			createUILabel(container, ":", null, null); //$NON-NLS-1$
 
-			// force this column to take the rest of the space
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
-
-//			final Color fgColor = colorCache.getColor(//
-//					GraphColorProvider.PREF_GRAPH_TIME, //
-//					colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_TIME).getTextColor());
-
-			/*
-			 * distance
-			 */
-			label = createUILabel(container, Messages.Tooltip_Label_Distance);
-//			_firstColumnControls.add(label);
-
-			_lblDistance = createUILabelValue(container, SWT.TRAIL, 10);
-//			_secondColumnControls.add(_lblDistance);
-
-			_lblDistanceUnit = createUILabelValue(container, SWT.LEAD);
-
-			/*
-			 * altitude up
-			 */
-			label = createUILabel(container, Messages.Tooltip_Label_Altitude);
-//			_firstColumnControls.add(label);
-
-			_lblAltitude = createUILabelValue(container, SWT.TRAIL, 8);
-//			_secondColumnControls.add(_lblAltitudeUp);
-
-			_lblAltitudeUnit = createUILabelValue(container, SWT.LEAD);
+			// label: max value
+			_lblDataSerieMax = createUILabelValue(
+					container,
+					SWT.LEAD,
+					5,
+					Messages.Tooltip_ValuePoint_Label_SlicesMax_Tooltip,
+					null);
 		}
 	}
 
-	private Composite createUI99NoData(final Composite parent) {
+	private Composite createUI999NoData(final Composite parent) {
 
 		/*
 		 * shell container is necessary because the margins of the inner container will hide the
@@ -437,7 +725,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 					.applyTo(container);
 			{
 				final Label label = new Label(container, SWT.NONE);
-				label.setText(Messages.Tour_Tooltip_Label_NoTour);
+				label.setText(Messages.Tooltip_ValuePoint_Label_NoTour);
 				label.setForeground(_fgColor);
 				label.setBackground(_bgColor);
 			}
@@ -446,7 +734,10 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 		return shellContainer;
 	}
 
-	private Label createUILabel(final Composite parent, final String labelText) {
+	private Label createUILabel(final Composite parent,
+								final String labelText,
+								final String tooltip,
+								final String colorId) {
 
 		final Label label = new Label(parent, SWT.NONE);
 		label.setForeground(_fgColor);
@@ -456,11 +747,20 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 			label.setText(labelText);
 		}
 
-		return label;
-	}
+		if (tooltip != null) {
+			label.setToolTipText(tooltip);
+		}
 
-	private Label createUILabelValue(final Composite parent, final int style) {
-		return createUILabelValue(parent, style, SWT.DEFAULT);
+		if (colorId != null) {
+
+			final Color fgColor = _colorCache.getColor(//
+					colorId, //
+					_colorProvider.getGraphColorDefinition(colorId).getTextColor());
+
+			label.setForeground(fgColor);
+		}
+
+		return label;
 	}
 
 	/**
@@ -468,18 +768,55 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 	 * @param style
 	 * @param chars
 	 *            Hint for the width in characters.
+	 * @param tooltip
+	 * @param colorId
 	 * @return
 	 */
-	private Label createUILabelValue(final Composite parent, final int style, final int chars) {
+	private Label createUILabelValue(	final Composite parent,
+										final int style,
+										final int chars,
+										final String tooltip,
+										final String colorId) {
 
 		final int charsWidth = chars == SWT.DEFAULT ? SWT.DEFAULT : _pc.convertWidthInCharsToPixels(chars);
 
 		final Label label = new Label(parent, style);
-		GridDataFactory.fillDefaults().hint(charsWidth, SWT.DEFAULT).applyTo(label);
+		GridDataFactory.fillDefaults()//
+				.hint(charsWidth, SWT.DEFAULT)
+				.applyTo(label);
 		label.setForeground(_fgColor);
 		label.setBackground(_bgColor);
 
+		if (tooltip != null) {
+			label.setToolTipText(tooltip);
+		}
+
+		if (colorId != null) {
+
+			final Color fgColor = _colorCache.getColor(//
+					colorId, //
+					_colorProvider.getGraphColorDefinition(colorId).getTextColor());
+
+			label.setForeground(fgColor);
+		}
+
 		return label;
+	}
+
+	private Label createUILabelValue(final Composite parent, final int style, final String tooltip, final String colorId) {
+		return createUILabelValue(parent, style, SWT.DEFAULT, tooltip, colorId);
+	}
+
+	private Composite createUIValueContainer(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).spacing(_valueUnitDistance, 0).applyTo(container);
+		container.setForeground(_fgColor);
+		container.setBackground(_bgColor);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+
+		return container;
 	}
 
 	public boolean isVisible() {
@@ -491,7 +828,20 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 
 		_prefStore.removePropertyChangeListener(_prefChangeListener);
 
+		_colorCache.dispose();
+		_ttMenuMgr.dispose();
+
+		_firstColumnControls.clear();
+		_firstColumnContainerControls.clear();
+
 		super.onDispose();
+	}
+
+	private void reopenTT() {
+
+		// hide and recreate it
+		hide();
+		show(new Point(_devXMouse, _devXMouse));
 	}
 
 	@Override
@@ -515,15 +865,24 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 			return;
 		}
 
-		_isAltitude = _tourData.altitudeSerie != null;
-		_isCadence = _tourData.cadenceSerie != null;
-		_isDistance = _tourData.distanceSerie != null;
-		_isGradient = _tourData.gradientSerie != null;
-		_isPace = _tourData.getPaceSerie() != null;
-		_isPower = _tourData.getPowerSerie() != null;
-		_isPulse = _tourData.pulseSerie != null;
-		_isTemperature = _tourData.temperatureSerie != null;
+		/*
+		 * hide tool tip context menu because new tour data can change the available graphs which
+		 * can be selected in the context menu
+		 */
+		if (_ttMenuMgr != null) {
+			_ttMenuMgr.hideContextMenu();
+		}
 
+		final int visibleGraphsBackup = _visibleGraphs;
+
+		updateUIStates();
+
+		// prevent flickering when reopen
+		if (visibleGraphsBackup != _visibleGraphs) {
+
+			// reopen when other tour data are set which has other graphs
+			reopenTT();
+		}
 	}
 
 	@Override
@@ -536,7 +895,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 		_devXMouse = devXMouseMove;
 		_devYMouse = devYMouseMove;
 
-		if (_ttContainer == null || _ttContainer.isDisposed()) {
+		if (_shellContainer == null || _shellContainer.isDisposed()) {
 
 			/*
 			 * tool tip is disposed, this happens on a mouse exit, display the tooltip again
@@ -544,7 +903,10 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 			show(new Point(devXMouseMove, devYMouseMove));
 		}
 
-		updateUI(valueIndex, false);
+		// check again
+		if (_shellContainer != null && !_shellContainer.isDisposed()) {
+			updateUI(valueIndex, false);
+		}
 	}
 
 	@Override
@@ -567,6 +929,26 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 		super.show(location);
 	}
 
+	ToolItem updateUI() {
+
+		// update graph state
+		updateUIStates();
+
+		reopenTT();
+
+		/**
+		 * Get item which is opening the value point tooltip
+		 * <p>
+		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
+		 * This is a hack because the toolbar contains only one item, hopefully this will not
+		 * change. <br>
+		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		 */
+		final ToolItem toolItem = _toolbarControl.getItem(0);
+
+		return toolItem;
+	}
+
 	private void updateUI(int valueIndex, boolean isForceUpdate) {
 
 		final int[] timeSerie = _tourData.timeSerie;
@@ -584,25 +966,159 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 		isForceUpdate = false;
 		_currentValueIndex = valueIndex;
 
-		_lblDataSerieCurrent.setText(Integer.toString(_currentValueIndex));
-		_lblDataSerieMax.setText(Integer.toString(timeSerie.length - 1));
-
-		// time is always available when a chart is painted
-		final float time = timeSerie[valueIndex];
-		_lblTime.setText(UI.format_hhh_mm_ss((long) time));
-
-		if (_isAltitude) {
-			_lblAltitude.setText(_nf3NoGroup.format(_tourData.altitudeSerie[valueIndex] / UI.UNIT_VALUE_ALTITUDE));
-			_lblAltitudeUnit.setText(UI.UNIT_LABEL_ALTITUDE);
+		if (_visibleTimeSliceId != 0) {
+			_lblDataSerieCurrent.setText(Integer.toString(_currentValueIndex));
+			_lblDataSerieMax.setText(Integer.toString(timeSerie.length - 1));
 		}
 
-		if (_isDistance) {
+		if (_visibleTimeId != 0) {
+			_lblTime.setText(UI.format_hhh_mm_ss(timeSerie[valueIndex]));
+		}
+
+		if (_visibleDistanceId != 0) {
 
 			final float distance = _tourData.distanceSerie[valueIndex] / 1000 / UI.UNIT_VALUE_DISTANCE;
 
 			_lblDistance.setText(_nf3NoGroup.format(distance));
 			_lblDistanceUnit.setText(UI.UNIT_LABEL_DISTANCE);
 		}
+
+		if (_visibleAltitudeId != 0) {
+			_lblAltitude.setText(_nf3NoGroup.format(_tourData.altitudeSerie[valueIndex] / UI.UNIT_VALUE_ALTITUDE));
+			_lblAltitudeUnit.setText(UI.UNIT_LABEL_ALTITUDE);
+		}
+
+		if (_visiblePulseId != 0) {
+			_lblPulse.setText(Integer.toString((int) _tourData.pulseSerie[valueIndex]));
+		}
+
+		if (_visibleSpeedId != 0) {
+			_lblSpeed.setText(_nf1.format(_tourData.getSpeedSerie()[valueIndex]));
+			_lblSpeedUnit.setText(UI.UNIT_LABEL_SPEED);
+		}
+
+		if (_visiblePaceId != 0) {
+			_lblPace.setText(_nf1.format(_tourData.getPaceSerie()[valueIndex]));
+			_lblPaceUnit.setText(UI.UNIT_LABEL_PACE);
+		}
+
+		if (_visiblePowerId != 0) {
+			_lblPower.setText(Integer.toString((int) _tourData.getPowerSerie()[valueIndex]));
+		}
+
+		if (_visibleTemperatureId != 0) {
+
+			float temperature = _tourData.temperatureSerie[valueIndex];
+
+			if (UI.UNIT_VALUE_TEMPERATURE != 1) {
+				// get imperial temperature
+				temperature = temperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD;
+			}
+
+			_lblTemperature.setText(_nf1.format(temperature));
+			_lblTemperatureUnit.setText(UI.UNIT_LABEL_TEMPERATURE);
+		}
+
+		if (_visibleGradientId != 0) {
+			_lblGradient.setText(_nf1.format(_tourData.getGradientSerie()[valueIndex]));
+		}
+
+		if (_visibleAltimeterId != 0) {
+			_lblAltimeter.setText(Integer.toString((int) _tourData.getAltimeterSerie()[valueIndex]));
+			_lblAltimeterUnit.setText(UI.UNIT_LABEL_ALTIMETER);
+		}
+
+		if (_visibleCadenceId != 0) {
+			_lblCadence.setText(Integer.toString((int) _tourData.cadenceSerie[valueIndex]));
+		}
+
+	}
+
+	/**
+	 * Sets state which graphs can be displayed.
+	 */
+	private void updateUIStates() {
+
+		/*
+		 * orientation
+		 */
+		final String stateOrientation = Util.getStateString(
+				state,
+				ValuePointToolTipMenuManager.STATE_VALUE_POINT_TOOLTIP_ORIENTATION,
+				ValuePointToolTipMenuManager.DEFAULT_ORIENTATION.name());
+
+		_isHorizontal = ValuePointToolTipOrientation.valueOf(stateOrientation) == ValuePointToolTipOrientation.Horizontal;
+
+		/*
+		 * visible graphs
+		 */
+		final int ttVisibleValues = Util.getStateInt(
+				state,
+				ValuePointToolTipMenuManager.STATE_VALUE_POINT_TOOLTIP_VISIBLE_GRAPHS,
+				ValuePointToolTipMenuManager.DEFAULT_GRAPHS);
+
+		_visibleAltimeterId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_ALTIMETER) > 0
+				&& _tourData.getAltimeterSerie() != null ? ValuePointToolTipMenuManager.VALUE_ID_ALTIMETER : 0;
+
+		_visibleAltitudeId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_ALTITUDE) > 0
+				&& _tourData.getAltitudeSerie() != null ? ValuePointToolTipMenuManager.VALUE_ID_ALTITUDE : 0;
+
+		_visibleCadenceId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_CADENCE) > 0
+				&& _tourData.cadenceSerie != null ? ValuePointToolTipMenuManager.VALUE_ID_CADENCE : 0;
+
+		_visibleDistanceId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_DISTANCE) > 0
+				&& _tourData.distanceSerie != null ? ValuePointToolTipMenuManager.VALUE_ID_DISTANCE : 0;
+
+		_visibleGradientId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_GRADIENT) > 0
+				&& _tourData.getGradientSerie() != null ? ValuePointToolTipMenuManager.VALUE_ID_GRADIENT : 0;
+
+		_visiblePaceId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_PACE) > 0
+				&& _tourData.getPaceSerie() != null ? ValuePointToolTipMenuManager.VALUE_ID_PACE : 0;
+
+		_visiblePowerId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_POWER) > 0
+				&& _tourData.getPowerSerie() != null ? ValuePointToolTipMenuManager.VALUE_ID_POWER : 0;
+
+		_visiblePulseId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_PULSE) > 0 //
+				&& _tourData.pulseSerie != null ? ValuePointToolTipMenuManager.VALUE_ID_PULSE : 0;
+
+		_visibleSpeedId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_SPEED) > 0
+				&& _tourData.getSpeedSerie() != null ? ValuePointToolTipMenuManager.VALUE_ID_SPEED : 0;
+
+		_visibleTemperatureId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_TEMPERATURE) > 0
+				&& _tourData.temperatureSerie != null ? ValuePointToolTipMenuManager.VALUE_ID_TEMPERATURE : 0;
+
+		_visibleTimeId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_TIME) > 0 //
+				&& _tourData.timeSerie != null ? ValuePointToolTipMenuManager.VALUE_ID_TIME : 0;
+
+		_visibleTimeSliceId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_TIME_SLICES) > 0 //
+				? ValuePointToolTipMenuManager.VALUE_ID_TIME_SLICES
+				: 0;
+
+		_visibleGraphsCount = (_visibleAltimeterId > 0 ? 1 : 0)
+				+ (_visibleAltitudeId > 0 ? 1 : 0)
+				+ (_visibleCadenceId > 0 ? 1 : 0)
+				+ (_visibleDistanceId > 0 ? 1 : 0)
+				+ (_visibleGradientId > 0 ? 1 : 0)
+				+ (_visiblePaceId > 0 ? 1 : 0)
+				+ (_visiblePowerId > 0 ? 1 : 0)
+				+ (_visiblePulseId > 0 ? 1 : 0)
+				+ (_visibleSpeedId > 0 ? 1 : 0)
+				+ (_visibleTemperatureId > 0 ? 1 : 0)
+				+ (_visibleTimeId > 0 ? 1 : 0)
+				+ (_visibleTimeSliceId > 0 ? 1 : 0);
+
+		_visibleGraphs = _visibleAltimeterId
+				+ _visibleAltitudeId
+				+ _visibleCadenceId
+				+ _visibleDistanceId
+				+ _visibleGradientId
+				+ _visiblePaceId
+				+ _visiblePowerId
+				+ _visiblePulseId
+				+ _visibleSpeedId
+				+ _visibleTemperatureId
+				+ _visibleTimeId
+				+ _visibleTimeSliceId;
 	}
 
 }

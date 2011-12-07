@@ -62,7 +62,6 @@ import net.tourbook.ui.tourChart.action.TCActionHandlerManager;
 import net.tourbook.ui.tourChart.action.TCActionProxy;
 import net.tourbook.util.IToolTipHideListener;
 import net.tourbook.util.TourToolTip;
-import net.tourbook.util.Util;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.action.Action;
@@ -89,7 +88,7 @@ import org.eclipse.ui.IWorkbenchPartSite;
  */
 public class TourChart extends Chart {
 
-//	private static final String				ID										= "net.tourbook.ui.tourChart";									//$NON-NLS-1$
+	private static final String				ID										= "net.tourbook.ui.tourChart";									//$NON-NLS-1$
 
 	public static final String				COMMAND_ID_IS_SHOW_START_TIME			= "net.tourbook.command.tourChart.isShowStartTime";			//$NON-NLS-1$
 	public static final String				COMMAND_ID_IS_SHOW_SRTM_DATA			= "net.tourbook.command.tourChart.isShowSRTMData";				//$NON-NLS-1$
@@ -120,11 +119,11 @@ public class TourChart extends Chart {
 	public static final String				COMMAND_ID_HR_ZONE_STYLE_WHITE_TOP		= "net.tourbook.command_HrZone_Style_WhiteTop";				//$NON-NLS-1$
 	public static final String				COMMAND_ID_HR_ZONE_STYLE_WHITE_BOTTOM	= "net.tourbook.command_HrZone_Style_WhiteBottom";				//$NON-NLS-1$
 
-	private static final String				STATE_VALUE_POINT_TOOLTIP_X				= "ValuePointToolTipPositionX";								//$NON-NLS-1$
-	private static final String				STATE_VALUE_POINT_TOOLTIP_Y				= "ValuePointToolTipPositionY";								//$NON-NLS-1$
-
 	private final IPreferenceStore			_prefStore								= TourbookPlugin.getDefault() //
 																							.getPreferenceStore();
+	private final IDialogSettings			_state									= TourbookPlugin.getDefault()//
+																							.getDialogSettingsSection(
+																									ID);
 
 	private TourData						_tourData;
 	private TourChartConfiguration			_tourChartConfig;
@@ -236,7 +235,7 @@ public class TourChart extends Chart {
 				handleTooltipEventMouseMove(mouseDisplayRelativePosition);
 			}
 		};
-		setValuePointToolTipProvider(_valuePointToolTip = new ValuePointToolTipUI(tooltipOwner));
+		setValuePointToolTipProvider(_valuePointToolTip = new ValuePointToolTipUI(tooltipOwner, _state));
 	}
 
 	public void actionCanAutoMoveSliders(final boolean isItemChecked) {
@@ -1230,36 +1229,12 @@ public class TourChart extends Chart {
 		_xAxisSelectionListener.remove(listener);
 	}
 
-	void restoreState(final IDialogSettings state) {
-
-		/*
-		 * restore value point tooltip location, when location is not set, don't set it to 0,0
-		 * instead use tooltip default location which is positioning the tooltip into the center of
-		 * the chart
-		 */
-		if (state.get(STATE_VALUE_POINT_TOOLTIP_X) != null) {
-
-			final Point ttLocation = new Point(0, 0);
-
-			ttLocation.x = Util.getStateInt(state, STATE_VALUE_POINT_TOOLTIP_X, 0);
-			ttLocation.y = Util.getStateInt(state, STATE_VALUE_POINT_TOOLTIP_Y, 0);
-
-			_valuePointToolTip.setShellLocation(ttLocation);
-		}
-
+	void restoreState() {
+		_valuePointToolTip.restoreState();
 	}
 
-	void saveState(final IDialogSettings state) {
-
-		/*
-		 * keep value point tooltip location
-		 */
-		final Point ttLocation = _valuePointToolTip.getShellLocation();
-
-		if (ttLocation != null) {
-			state.put(STATE_VALUE_POINT_TOOLTIP_X, ttLocation.x);
-			state.put(STATE_VALUE_POINT_TOOLTIP_Y, ttLocation.y);
-		}
+	void saveState() {
+		_valuePointToolTip.saveState();
 	}
 
 	/**

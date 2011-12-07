@@ -5385,8 +5385,9 @@ public class ChartComponentGraph extends Canvas {
 	protected void onMouseMove(final Point mouseDisplayRelativePosition) {
 
 		final Point devPos = toControl(mouseDisplayRelativePosition);
+		final Rectangle clientRect = getClientArea();
 
-		if (getBounds().contains(devPos)) {
+		if (clientRect.contains(devPos)) {
 			onMouseMove(devPos.x, devPos.y);
 		}
 	}

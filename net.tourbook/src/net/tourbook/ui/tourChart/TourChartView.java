@@ -44,7 +44,6 @@ import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 import net.tourbook.util.PostSelectionProvider;
 
-import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -75,8 +74,6 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 	private final IPreferenceStore	_prefStore	= TourbookPlugin.getDefault()//
 														.getPreferenceStore();
-	private final IDialogSettings	_state		= TourbookPlugin.getDefault()//
-														.getDialogSettingsSection(ID);
 
 	private TourChartConfiguration	_tourChartConfig;
 	private TourData				_tourData;
@@ -511,12 +508,12 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 	private void restoreState() {
 
-		_tourChart.restoreState(_state);
+		_tourChart.restoreState();
 	}
 
 	private void saveState() {
 
-		_tourChart.saveState(_state);
+		_tourChart.saveState();
 	}
 
 	@Override

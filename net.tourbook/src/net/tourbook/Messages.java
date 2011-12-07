@@ -21,31 +21,30 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.messages";							//$NON-NLS-1$
 
-	public static String		Action_ToolTip_Graph_Altimeter;
-	public static String		Action_ToolTip_Graph_Altitude;
-	public static String		Action_ToolTip_Graph_Cadence;
-	public static String		Action_ToolTip_Graph_Distance;
-	public static String		Action_ToolTip_Graph_Gradient;
-	public static String		Action_ToolTip_Graph_Pace;
-	public static String		Action_ToolTip_Graph_Power;
-	public static String		Action_ToolTip_Graph_Pulse;
-	public static String		Action_ToolTip_Graph_Speed;
-	public static String		Action_ToolTip_Graph_Temperature;
-	public static String		Action_ToolTip_Graph_Time;
+	public static String		Action_ToolTip_CloseContextMenu;
+	public static String		Action_ToolTip_Hide;
 
-	public static String	Action_ToolTip_Hide;
-
-	public static String	Action_ToolTip_PinLocation_BottomLeft;
-
-	public static String	Action_ToolTip_PinLocation_BottomRight;
-
-	public static String	Action_ToolTip_PinLocation_Disabled;
-
-	public static String	Action_ToolTip_PinLocation_Header;
-
-	public static String	Action_ToolTip_PinLocation_TopLeft;
-
-	public static String	Action_ToolTip_PinLocation_TopRight;
+	public static String		Action_ToolTip_Orientation_Horizontal;
+	public static String		Action_ToolTip_Orientation_Vertical;
+	public static String		Action_ToolTip_PinLocation_BottomLeft;
+	public static String		Action_ToolTip_PinLocation_BottomRight;
+	public static String		Action_ToolTip_PinLocation_Disabled;
+	public static String		Action_ToolTip_PinLocation_Header;
+	public static String		Action_ToolTip_PinLocation_TopLeft;
+	public static String		Action_ToolTip_PinLocation_TopRight;
+	public static String		Action_ToolTip_Value_Altimeter;
+	public static String		Action_ToolTip_Value_Altitude;
+	public static String		Action_ToolTip_Value_Cadence;
+	public static String		Action_ToolTip_Value_Distance;
+	public static String		Action_ToolTip_Value_Gradient;
+	public static String		Action_ToolTip_Value_Header;
+	public static String		Action_ToolTip_Value_Pace;
+	public static String		Action_ToolTip_Value_Power;
+	public static String		Action_ToolTip_Value_Pulse;
+	public static String		Action_ToolTip_Value_Speed;
+	public static String		Action_ToolTip_Value_Temperature;
+	public static String		Action_ToolTip_Value_Time;
+	public static String		Action_ToolTip_Value_TimeSlices;
 
 	public static String		Image__ArrowDown;
 	public static String		Image__ArrowUp;
@@ -176,11 +175,8 @@ public class Messages extends NLS {
 	public static String		Action_TourType_ModifyTourTypeFilter;
 
 	public static String		Adjust_Altitude_Checkbox_SRTM_SelectWholeTour;
-
 	public static String		Adjust_Altitude_Checkbox_SRTM_SelectWholeTour_Tooltip;
-
 	public static String		Adjust_Altitude_Checkbox_SRTM_SyncStartEnd;
-
 	public static String		Adjust_Altitude_CreateDummyAltitudeData_Message;
 	public static String		Adjust_Altitude_CreateDummyAltitudeData_Title;
 	public static String		Adjust_Altitude_Group_GeoPosition;
@@ -535,6 +531,8 @@ public class Messages extends NLS {
 	public static String		Graph_Label_Altitude;
 	public static String		Graph_Label_Cadence;
 	public static String		Graph_Label_Cadence_unit;
+
+	public static String		Graph_Label_Distance;
 	public static String		Graph_Label_Gradiend_unit;
 	public static String		Graph_Label_Gradient;
 	public static String		Graph_Label_Heartbeat;
@@ -546,6 +544,8 @@ public class Messages extends NLS {
 	public static String		Graph_Label_ShowHrZoneBackground_Tooltip;
 	public static String		Graph_Label_Speed;
 	public static String		Graph_Label_Temperature;
+
+	public static String		Graph_Label_Time;
 	public static String		Graph_Label_Tour_Compare;
 	public static String		Graph_Label_Tour_Compare_unit;
 
@@ -1030,6 +1030,22 @@ public class Messages extends NLS {
 	public static String		PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_down;
 	public static String		PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_up;
 
+	public static String		Tooltip_Label_Altimeter_Tooltip;
+	public static String		Tooltip_Label_Altitude_Tooltip;
+	public static String		Tooltip_Label_Cadence_Tooltip;
+	public static String		Tooltip_Label_Distance_Tooltip;
+	public static String		Tooltip_Label_Gradient_Tooltip;
+	public static String		Tooltip_Label_Pace_Tooltip;
+	public static String		Tooltip_Label_Power_Tooltip;
+	public static String		Tooltip_Label_Pulse_Tooltip;
+	public static String		Tooltip_Label_Speed_Tooltip;
+	public static String		Tooltip_Label_Temperature_Tooltip;
+	public static String		Tooltip_Label_Time_Tooltip;
+
+	public static String		Tooltip_ValuePoint_Label_NoTour;
+	public static String		Tooltip_ValuePoint_Label_SlicesCurrent_Tooltip;
+	public static String		Tooltip_ValuePoint_Label_SlicesMax_Tooltip;
+
 	public static String		Tour_Action_auto_move_sliders_when_zoomed;
 	public static String		Tour_Action_auto_zoom_to_slider_position;
 	public static String		Tour_Action_chart_options_tooltip;
@@ -1060,7 +1076,7 @@ public class Messages extends NLS {
 	public static String		Tour_Action_ShowHrZones_Tooltip;
 	public static String		Tour_Action_ShowTourMarker;
 
-	public static String	Tour_Action_ValuePointToolTip_IsVisible;
+	public static String		Tour_Action_ValuePointToolTip_IsVisible;
 
 	public static String		Tour_Book_Action_delete_selected_tours;
 	public static String		Tour_Book_Action_delete_selected_tours_dlg_message;

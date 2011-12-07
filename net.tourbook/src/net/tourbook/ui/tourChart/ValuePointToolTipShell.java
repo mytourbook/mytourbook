@@ -16,8 +16,9 @@
 package net.tourbook.ui.tourChart;
 
 import net.tourbook.chart.ITooltipOwner;
-import net.tourbook.chart.Util;
+import net.tourbook.util.Util;
 
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.window.ToolTip;
@@ -42,50 +43,49 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public abstract class ValuePointToolTipShell {
 
-	static final int				PIN_LOCATION_DISABLED		= 0;
-	static final int				PIN_LOCATION_TOP_LEFT		= 10;
-	static final int				PIN_LOCATION_TOP_RIGHT		= 20;
-	static final int				PIN_LOCATION_BOTTOM_LEFT	= 30;
-	static final int				PIN_LOCATION_BOTTOM_RIGHT	= 40;
+	private static final int				TOOL_TIP_SHELL_LOCATION_OFFSET	= 0;									//10;
 
-	private ITooltipOwner			_tooltipOwner;
+	private static final String				STATE_VALUE_POINT_TOOLTIP_X		= "ValuePoint_ToolTip_DiffPositionX";	//$NON-NLS-1$
+	private static final String				STATE_VALUE_POINT_TOOLTIP_Y		= "ValuePoint_ToolTip_DiffPositionY";	//$NON-NLS-1$
+	private static final String				STATE_VALUE_POINT_PIN_LOCATION	= "ValuePoint_ToolTip_PinnedLocation";	//$NON-NLS-1$
+
+	IDialogSettings							state;
+
+	private ITooltipOwner					_tooltipOwner;
 
 	// Ensure that only one tooltip is active in time
-	private static Shell			_ttShell;
-	private Object					_currentArea;
-	private Control					_ownerControl;
+	private static Shell					_ttShell;
+	private Object							_currentArea;
+	private Control							_ownerControl;
 
-	private OwnerShellListener		_ownerShellListener;
-	private OwnerControlListener	_ownerControlListener;
-	private TooltipListener			_ttListener					= new TooltipListener();
-	private TooltipShellListener	_ttShellListener			= new TooltipShellListener();
+	private OwnerShellListener				_ownerShellListener;
+	private OwnerControlListener			_ownerControlListener;
+	private TooltipListener					_ttListener						= new TooltipListener();
+	private TooltipShellListener			_ttShellListener				= new TooltipShellListener();
 
-	private boolean					_isTTMouseDown;
+	private boolean							_isTTMouseDown;
 
-	private int						_devXMouseDown;
-	private int						_devYMouseDown;
+	private int								_devXMouseDown;
+	private int								_devYMouseDown;
 
-	int								marginTop;
-	int								marginBottom;
-
-	/**
-	 * Location where the tooltip shell is positioned and displayed.
-	 */
-	private Point					_ttShellLocation;
+	int										marginTop;
+	int										marginBottom;
 
 	/**
-	 * Location for the owner control when the tooltip location is set.
+	 * Relative location for the tooltip shell to the pinned location when it's moved with the
+	 * mouse.
 	 */
-	private Point					_ownerControlLocation;
-	private Point					_ownerControlSize;
+	private Point							_ttShellDiff					= new Point(0, 0);
 
-	private int						_pinnedLocation;
+	private Point							_ttShellLocation;
+	private ValuePointToolTipPinLocation	_pinnedLocation;
 
 	/*
 	 * UI resources
 	 */
-	private Cursor					_cursorDragged;
-	private Cursor					_cursorHand;
+	private Cursor							_cursorDragged;
+	private Cursor							_cursorHand;
+	private boolean							_isDefaultLocationSet;
 
 	private class OwnerControlListener implements Listener {
 		public void handleEvent(final Event event) {
@@ -96,7 +96,7 @@ public abstract class ValuePointToolTipShell {
 				break;
 
 			case SWT.Resize:
-				onOwnerControlResize(event);
+				onResizeOwner(event);
 			}
 		}
 	}
@@ -125,7 +125,7 @@ public abstract class ValuePointToolTipShell {
 				break;
 
 			case SWT.Move:
-				onOwnerShellMove(event);
+				onMoveOwner(event);
 				break;
 			}
 		}
@@ -162,7 +162,7 @@ public abstract class ValuePointToolTipShell {
 					case SWT.MouseMove:
 
 						if (_isTTMouseDown) {
-							setTTLocationHasMoved(event);
+							onMoveTT(event);
 						} else {
 
 							/*
@@ -217,6 +217,7 @@ public abstract class ValuePointToolTipShell {
 						_ttShell.setCursor(null);
 					}
 				}
+
 			}
 		}
 	}
@@ -259,13 +260,16 @@ public abstract class ValuePointToolTipShell {
 	/**
 	 * Create new instance which add TooltipSupport to the widget
 	 * 
+	 * @param state
 	 * @param control
 	 *            the control on whose action the tooltip is shown
 	 */
-	public ValuePointToolTipShell(final ITooltipOwner tooltipOwner) {
+	public ValuePointToolTipShell(final ITooltipOwner tooltipOwner, final IDialogSettings state) {
 
 		_tooltipOwner = tooltipOwner;
 		_ownerControl = tooltipOwner.getControl();
+
+		this.state = state;
 
 		_ownerControl.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(final DisposeEvent e) {
@@ -287,7 +291,7 @@ public abstract class ValuePointToolTipShell {
 	 * 
 	 * @param locationId
 	 */
-	void actionPinLocation(final int locationId) {
+	void actionPinLocation(final ValuePointToolTipPinLocation locationId) {
 
 		// set new location
 		_pinnedLocation = locationId;
@@ -296,62 +300,14 @@ public abstract class ValuePointToolTipShell {
 			return;
 		}
 
-		final Point ownerControlLocation = _ownerControl.toDisplay(0, 0);
-		final Point ownerSize = _ownerControl.getSize();
-
-		if (_pinnedLocation == PIN_LOCATION_DISABLED) {
-			_ownerControlLocation = ownerControlLocation;
-			_ownerControlSize = ownerSize;
+		if (_pinnedLocation == ValuePointToolTipPinLocation.Disabled) {
 			return;
 		}
 
-		/*
-		 * set tooltip location into the requested corner
-		 */
-		final int LOCATION_OFFSET = 3;
+		// display at pinned location without offset
+		_ttShellDiff = new Point(0, 0);
 
-		final Rectangle ttBounds = _ttShell.getBounds();
-		final Point ttSize = new Point(ttBounds.width, ttBounds.height);
-
-		final int devXLeft = _ownerControlLocation.x + LOCATION_OFFSET;
-		final int devXRight = _ownerControlLocation.x + ownerSize.x - ttSize.x - LOCATION_OFFSET;
-		final int devYTop = _ownerControlLocation.y + LOCATION_OFFSET + marginTop;
-		final int devYBottom = ownerControlLocation.y + ownerSize.y - ttSize.y - LOCATION_OFFSET - marginBottom
-//				- (ownerSize.y - _bottomLocation)
-//
-		;
-
-		final Point resizedTTShellLocation = new Point(0, 0);
-
-		switch (_pinnedLocation) {
-		case PIN_LOCATION_TOP_LEFT:
-			resizedTTShellLocation.x = devXLeft;
-			resizedTTShellLocation.y = devYTop;
-			break;
-
-		case PIN_LOCATION_BOTTOM_LEFT:
-			resizedTTShellLocation.x = devXLeft;
-			resizedTTShellLocation.y = devYBottom;
-			break;
-
-		case PIN_LOCATION_BOTTOM_RIGHT:
-			resizedTTShellLocation.x = devXRight;
-			resizedTTShellLocation.y = devYBottom;
-			break;
-
-		case PIN_LOCATION_TOP_RIGHT:
-			resizedTTShellLocation.x = devXRight;
-			resizedTTShellLocation.y = devYTop;
-			break;
-		}
-
-		final Point newTTShellLocation = fixupDisplayBounds(ttSize, resizedTTShellLocation);
-
-		_ownerControlLocation = ownerControlLocation;
-		_ownerControlSize = ownerSize;
-
-		_ttShellLocation = newTTShellLocation;
-		_ttShell.setLocation(newTTShellLocation);
+		setTTShellLocation(false);
 	}
 
 	/**
@@ -388,20 +344,6 @@ public abstract class ValuePointToolTipShell {
 	}
 
 	/**
-	 * This method is called after a tooltip is hidden.
-	 * <p>
-	 * <b>Subclasses may override to clean up requested system resources</b>
-	 * </p>
-	 * 
-	 * @param event
-	 *            event triggered the hiding action (may be <code>null</code> if event wasn't
-	 *            triggered by user actions directly)
-	 */
-	protected void afterHideToolTip(final Event event) {
-
-	}
-
-	/**
 	 * Creates the content area of the the tooltip.
 	 * 
 	 * @param event
@@ -412,7 +354,10 @@ public abstract class ValuePointToolTipShell {
 	 */
 	protected abstract Composite createToolTipContentArea(Event event, Composite parent);
 
-	private Point fixupDisplayBounds(final Point tipSize, final Point location) {
+	private Point fixupDisplayBounds(final Point tipSize, final Point originalLocation) {
+
+		// create a copy that the original value is not modified
+		final Point location = new Point(originalLocation.x, originalLocation.y);
 
 		Rectangle bounds;
 		final Point rightBounds = new Point(tipSize.x + location.x, tipSize.y + location.y);
@@ -459,12 +404,8 @@ public abstract class ValuePointToolTipShell {
 		return location;
 	}
 
-	/**
-	 * @return Returns the tooltip shell location or <code>null</code> when tooltip is not yet
-	 *         displayed.
-	 */
-	Point getShellLocation() {
-		return _ttShellLocation;
+	ValuePointToolTipPinLocation getPinnedLocation() {
+		return _pinnedLocation;
 	}
 
 	/**
@@ -493,10 +434,45 @@ public abstract class ValuePointToolTipShell {
 
 	void onDispose() {
 
-		_cursorDragged = Util.disposeResource(_cursorDragged);
-		_cursorHand = Util.disposeResource(_cursorHand);
+		_cursorDragged = (Cursor) Util.disposeResource(_cursorDragged);
+		_cursorHand = (Cursor) Util.disposeResource(_cursorHand);
 
 		removeOwnerControlListener();
+	}
+
+	/**
+	 * The wwner shell has been moved, adjust tooltip shell that it moves also with the owner
+	 * control but preserves the display border.
+	 */
+	private void onMoveOwner(final Event event) {
+
+		if (_ttShell == null || _ttShell.isDisposed()) {
+			return;
+		}
+
+		setTTShellLocation(false);
+	}
+
+	/**
+	 * Tooltip location has been moved with the mouse.
+	 * 
+	 * @param event
+	 */
+	private void onMoveTT(final Event event) {
+
+		final int xDiff = event.x - _devXMouseDown;
+		final int yDiff = event.y - _devYMouseDown;
+
+		if (_pinnedLocation == ValuePointToolTipPinLocation.Disabled) {
+			_ttShellDiff.x = xDiff;
+			_ttShellDiff.y = yDiff;
+		} else {
+
+			_ttShellDiff.x += xDiff;
+			_ttShellDiff.y += yDiff;
+		}
+
+		setTTShellLocation(true);
 	}
 
 	/**
@@ -504,96 +480,13 @@ public abstract class ValuePointToolTipShell {
 	 * 
 	 * @param event
 	 */
-	private void onOwnerControlResize(final Event event) {
+	private void onResizeOwner(final Event event) {
 
 		if (_ttShell == null || _ttShell.isDisposed()) {
 			return;
 		}
 
-		final Point newOwnerControlLocation = _ownerControl.toDisplay(0, 0);
-		final Point newOwnerSize = _ownerControl.getSize();
-
-		if (_pinnedLocation == PIN_LOCATION_DISABLED) {
-			// tooltip is not pinned and must not be repositioned
-
-			// update new owner control position
-			_ownerControlLocation = newOwnerControlLocation;
-			_ownerControlSize = newOwnerSize;
-
-			return;
-		}
-
-		final int oldXDiffLeft = _ownerControlLocation.x - _ttShellLocation.x;
-		final int devXLeft = newOwnerControlLocation.x - oldXDiffLeft;
-
-		final int oldXDiffRight = (_ownerControlLocation.x + _ownerControlSize.x) - _ttShellLocation.x;
-		final int devXRight = (newOwnerControlLocation.x + newOwnerSize.x) - oldXDiffRight;
-
-		final int oldYDiffTop = _ownerControlLocation.y - _ttShellLocation.y;
-		final int devYTop = newOwnerControlLocation.y - oldYDiffTop;
-
-		final int oldYDiffBottom = (_ownerControlLocation.y + _ownerControlSize.y) - _ttShellLocation.y;
-		final int devYBottom = (newOwnerControlLocation.y + newOwnerSize.y) - oldYDiffBottom;
-
-		final Point resizedTTShellLocation = new Point(0, 0);
-
-		switch (_pinnedLocation) {
-		case PIN_LOCATION_TOP_LEFT:
-			resizedTTShellLocation.x = devXLeft;
-			resizedTTShellLocation.y = devYTop;
-			break;
-
-		case PIN_LOCATION_BOTTOM_LEFT:
-			resizedTTShellLocation.x = devXLeft;
-			resizedTTShellLocation.y = devYBottom;
-			break;
-
-		case PIN_LOCATION_BOTTOM_RIGHT:
-			resizedTTShellLocation.x = devXRight;
-			resizedTTShellLocation.y = devYBottom;
-			break;
-
-		case PIN_LOCATION_TOP_RIGHT:
-			resizedTTShellLocation.x = devXRight;
-			resizedTTShellLocation.y = devYTop;
-			break;
-		}
-
-		// update new owner control position
-		_ownerControlLocation = newOwnerControlLocation;
-		_ownerControlSize = newOwnerSize;
-
-		final Point newTTShellLocation = fixupDisplayBounds(_ttShell.getSize(), resizedTTShellLocation);
-
-		_ttShellLocation = newTTShellLocation;
-		_ttShell.setLocation(newTTShellLocation);
-	}
-
-	/**
-	 * The wwner shell has been moved, adjust tooltip shell that it moves also with the owner
-	 * control but preserves the display border.
-	 */
-	private void onOwnerShellMove(final Event event) {
-
-		if (_ttShell == null || _ttShell.isDisposed()) {
-			return;
-		}
-
-		final Rectangle newTTBounds = _ttShell.getBounds();
-		final Point newOwnerControlLocation = _ownerControl.toDisplay(0, 0);
-
-		// get difference before and after move/resize
-		final int ownerXDiff = _ownerControlLocation.x - newOwnerControlLocation.x;
-		final int ownerYDiff = _ownerControlLocation.y - newOwnerControlLocation.y;
-
-		final Point movedTTShellLocation = new Point(newTTBounds.x - ownerXDiff, newTTBounds.y - ownerYDiff);
-
-		_ttShellLocation = fixupDisplayBounds(new Point(newTTBounds.width, newTTBounds.height), movedTTShellLocation);
-
-		_ownerControlLocation = newOwnerControlLocation;
-		_ownerControlSize = _ownerControl.getSize();
-
-		_ttShell.setLocation(_ttShellLocation);
+		setTTShellLocation(false);
 	}
 
 	private void passOnEvent(final Shell tip, final Event event) {
@@ -616,61 +509,40 @@ public abstract class ValuePointToolTipShell {
 		_ownerControl.removeListener(SWT.Resize, _ownerControlListener);
 	}
 
-	private void setLocation() {
+	void restoreState() {
 
-		final Point shellSize = _ttShell.getSize();
-		final Point ownerDisplayLocation = _ownerControl.toDisplay(0, 0);
-		final Point ownerSize = _ownerControl.getSize();
+		/*
+		 * restore value point tooltip location, when location is not set, don't set it to 0,0
+		 * instead use tooltip default location which is positioning the tooltip into the center of
+		 * the chart
+		 */
+		if (state.get(STATE_VALUE_POINT_TOOLTIP_X) != null) {
 
-		Point locationBeforeFixup;
+			final Point ttShellDiff = new Point(0, 0);
 
-		if (_ttShellLocation != null) {
+			ttShellDiff.x = Util.getStateInt(state, STATE_VALUE_POINT_TOOLTIP_X, 0);
+			ttShellDiff.y = Util.getStateInt(state, STATE_VALUE_POINT_TOOLTIP_Y, 0);
 
-			// position tooltip at the previous
-			locationBeforeFixup = _ttShellLocation;
-
-		} else {
-
-			// use default location, center the tooltip in the center of the owner
-
-			final Point defaultLocation = new Point(
-					ownerDisplayLocation.x + ownerSize.x / 2 - shellSize.x / 2,
-					ownerDisplayLocation.y + ownerSize.y / 2 - shellSize.y / 2);
-
-			locationBeforeFixup = defaultLocation;
+			_ttShellDiff = ttShellDiff;
 		}
 
-		final Point fixupLocation = fixupDisplayBounds(shellSize, locationBeforeFixup);
+		// tooltip orientation
+		final String statePinnedLocation = Util.getStateString(
+				state,
+				STATE_VALUE_POINT_PIN_LOCATION,
+				ValuePointToolTipPinLocation.TopRight.name());
 
-		// Need to adjust a bit more if the mouse cursor.y == tip.y and
-		// the cursor.x is inside the tip
-		final Point cursorLocation = _ttShell.getDisplay().getCursorLocation();
+		_pinnedLocation = ValuePointToolTipPinLocation.valueOf(statePinnedLocation);
 
-		if (cursorLocation.y == fixupLocation.y //
-				&& fixupLocation.x < cursorLocation.x
-				&& fixupLocation.x + shellSize.x > cursorLocation.x) {
-			fixupLocation.y -= 2;
-		}
-
-		_ttShellLocation = fixupLocation;
-
-		_ownerControlLocation = ownerDisplayLocation;
-		_ownerControlSize = ownerSize;
-
-		_ttShell.setLocation(fixupLocation);
 	}
 
-	/**
-	 * Set location for the tooltip shell.
-	 * 
-	 * @param ttLocation
-	 */
-	void setShellLocation(final Point ttLocation) {
+	void saveState() {
 
-		_ttShellLocation = ttLocation;
+		// keep value point tooltip location
+		state.put(STATE_VALUE_POINT_TOOLTIP_X, _ttShellDiff.x);
+		state.put(STATE_VALUE_POINT_TOOLTIP_Y, _ttShellDiff.y);
 
-		_ownerControlLocation = _ownerControl.toDisplay(0, 0);
-		_ownerControlSize = _ownerControl.getSize();
+		state.put(STATE_VALUE_POINT_PIN_LOCATION, _pinnedLocation.name());
 	}
 
 	void setShellVisible(final boolean isVisible) {
@@ -682,22 +554,89 @@ public abstract class ValuePointToolTipShell {
 		_ttShell.setVisible(isVisible);
 	}
 
-	private void setTTLocationHasMoved(final Event event) {
+	/**
+	 * set tooltip location into the requested corner
+	 * 
+	 * @param isTTMoved
+	 */
+	private void setTTShellLocation(final boolean isTTMoved) {
 
-		final Point ttSize = _ttShell.getSize();
-		final Point ttShellLocation = _ttShell.getLocation();
+		final Point ownerControlLocation = _ownerControl.toDisplay(0, 0);
+		final Point ownerSize = _ownerControl.getSize();
 
-		final int xDiff = event.x - _devXMouseDown;
-		final int yDiff = event.y - _devYMouseDown;
+		final Rectangle ttBounds = _ttShell.getBounds();
+		final Point ttSize = new Point(ttBounds.width, ttBounds.height);
 
-		final Point movedShellLocation = new Point(ttShellLocation.x + xDiff, ttShellLocation.y + yDiff);
+		final int devXLeft = ownerControlLocation.x + TOOL_TIP_SHELL_LOCATION_OFFSET;
+		final int devXRight = ownerControlLocation.x + ownerSize.x - ttSize.x - TOOL_TIP_SHELL_LOCATION_OFFSET;
+		final int devYTop = ownerControlLocation.y + TOOL_TIP_SHELL_LOCATION_OFFSET + marginTop;
+		final int devYBottom = ownerControlLocation.y
+				+ ownerSize.y
+				- ttSize.y
+				- TOOL_TIP_SHELL_LOCATION_OFFSET
+				- marginBottom;
 
-		_ttShellLocation = fixupDisplayBounds(ttSize, movedShellLocation);
+		boolean isAdjustShell = true;
+		Point ttShellLocation = new Point(0, 0);
 
-		_ownerControlLocation = _ownerControl.toDisplay(0, 0);
-		_ownerControlSize = _ownerControl.getSize();
+		switch (_pinnedLocation) {
+		case Disabled:
 
-		_ttShell.setLocation(_ttShellLocation);
+			// tooltip is not pinned and must not be repositioned
+
+			if (isTTMoved == false && _ttShell.isVisible()) {
+				// tooltip is not moved and already visible -> nothing to do
+				return;
+			}
+
+			// use default location when location was not yet set, center the tooltip in the center of the owner
+			if (_isDefaultLocationSet == false) {
+
+				_isDefaultLocationSet = true;
+
+				ttShellLocation.x = ownerControlLocation.x + ownerSize.x / 2 - ttSize.x / 2;
+				ttShellLocation.y = ownerControlLocation.y + ownerSize.y / 2 - ttSize.y / 2;
+
+			} else {
+				ttShellLocation = _ttShellLocation;
+			}
+
+			isAdjustShell = false;
+
+			break;
+
+		case TopLeft:
+			ttShellLocation.x = devXLeft;
+			ttShellLocation.y = devYTop;
+			break;
+
+		case BottomLeft:
+			ttShellLocation.x = devXLeft;
+			ttShellLocation.y = devYBottom;
+			break;
+
+		case BottomRight:
+			ttShellLocation.x = devXRight;
+			ttShellLocation.y = devYBottom;
+			break;
+
+		case TopRight:
+		default:
+			ttShellLocation.x = devXRight;
+			ttShellLocation.y = devYTop;
+			break;
+		}
+
+		if (isAdjustShell || isTTMoved) {
+
+			// adjust to manually moved location
+			ttShellLocation.x += _ttShellDiff.x;
+			ttShellLocation.y += _ttShellDiff.y;
+		}
+
+		_ttShellLocation = ttShellLocation;
+
+		_ttShell.setLocation(fixupDisplayBounds(ttSize, ttShellLocation));
 	}
 
 	/**
@@ -770,7 +709,13 @@ public abstract class ValuePointToolTipShell {
 
 		if (shouldCreateToolTip(event)) {
 
-			final Shell shell = new Shell(_ownerControl.getShell(), SWT.ON_TOP | SWT.TOOL | SWT.NO_FOCUS);
+			final Shell shell = new Shell(_ownerControl.getShell(), //
+					SWT.ON_TOP //
+//							| SWT.TOOL
+							| SWT.NO_FOCUS
+//							| SWT.NO_TRIM
+			//
+			);
 
 			shell.setLayout(new FillLayout());
 
@@ -797,7 +742,6 @@ public abstract class ValuePointToolTipShell {
 			ttShell.dispose();
 			_ttShell = null;
 
-			afterHideToolTip(event);
 			return;
 		}
 	}
@@ -833,7 +777,7 @@ public abstract class ValuePointToolTipShell {
 
 			_ttShell.pack();
 
-			setLocation();
+			setTTShellLocation(false);
 
 			_ttShell.setVisible(true);
 		}
