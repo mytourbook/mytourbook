@@ -364,8 +364,8 @@ public class ChartComponentGraph extends Canvas {
 
 	private boolean						_isOverlayDirty;
 
-	/*
-	 * position of the mouse in the mouse down event
+	/**
+	 * widget relative position of the mouse in the mouse down event
 	 */
 	private int							_devXMouseDown;
 	private int							_devYMouseDown;
@@ -1598,7 +1598,11 @@ public class ChartComponentGraph extends Canvas {
 			if (_hoveredLineValueIndex == -1) {
 				valuePointToolTip.hide();
 			} else {
-				valuePointToolTip.setValueIndex(_hoveredLineValueIndex, _devXMouseMove, _devYMouseMove);
+				valuePointToolTip.setValueIndex(
+						_hoveredLineValueIndex,
+						_devXMouseMove,
+						_devYMouseMove,
+						_lineDevPositions.get(0)[_hoveredLineValueIndex]);
 			}
 		}
 	}
@@ -4358,6 +4362,36 @@ public class ChartComponentGraph extends Canvas {
 	}
 
 	/**
+	 * Mouse event occured in the value point tooltip, move the slider and/or hovered line (value
+	 * point) accordingly.
+	 * 
+	 * @param event
+	 * @param mouseDisplayPosition
+	 */
+	void handleTooltipMouseEvent(final Event event, final Point mouseDisplayPosition) {
+
+		switch (event.type) {
+		case SWT.MouseMove:
+
+			final Point controlPos = toControl(mouseDisplayPosition);
+			final Rectangle clientRect = getClientArea();
+
+			if (clientRect.contains(controlPos)) {
+				onMouseMove(controlPos.x, controlPos.y);
+			}
+			
+			break;
+
+		case SWT.MouseVerticalWheel:
+			onMouseWheel(event);
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	/**
 	 * check if mouse has moved over a bar
 	 * 
 	 * @param devX
@@ -5359,7 +5393,11 @@ public class ChartComponentGraph extends Canvas {
 		if (_isHoveredLineVisible && isLineHovered()) {
 
 			if (valuePointToolTip != null) {
-				valuePointToolTip.setValueIndex(_hoveredLineValueIndex, _devXMouseMove, _devYMouseMove);
+				valuePointToolTip.setValueIndex(
+						_hoveredLineValueIndex,
+						_devXMouseMove,
+						_devYMouseMove,
+						_lineDevPositions.get(0)[_hoveredLineValueIndex]);
 			}
 
 			isRedraw = true;
@@ -5373,22 +5411,6 @@ public class ChartComponentGraph extends Canvas {
 
 		if (isRedraw) {
 			redraw();
-		}
-	}
-
-	/**
-	 * Mouse has been moved in the value point tooltip, move the slider and/or hovered line (value
-	 * point) accordingly.
-	 * 
-	 * @param mouseDisplayRelativePosition
-	 */
-	protected void onMouseMove(final Point mouseDisplayRelativePosition) {
-
-		final Point devPos = toControl(mouseDisplayRelativePosition);
-		final Rectangle clientRect = getClientArea();
-
-		if (clientRect.contains(devPos)) {
-			onMouseMove(devPos.x, devPos.y);
 		}
 	}
 
@@ -5830,6 +5852,44 @@ public class ChartComponentGraph extends Canvas {
 		_canAutoZoomToSlider = canAutoZoomToSlider;
 	}
 
+//	/**
+//	 * Set the scrolling cursor according to the vertical position of the mouse
+//	 *
+//	 * @param devX
+//	 * @param devY
+//	 *            vertical coordinat of the mouse in the graph
+//	 */
+//	private void setupScrollCursor(final int devX, final int devY) {
+//
+//		final int height = getDevVisibleGraphHeight();
+//		final int height4 = height / 4;
+//		final int height2 = height / 2;
+//
+//		final float oldValue = _scrollAcceleration;
+//
+//		_scrollAcceleration = devY < height4 ? 0.25f : devY < height2 ? 1 : devY > height - height4 ? 10 : 2;
+//
+//		// set cursor according to the position
+//		if (_scrollAcceleration == 0.25) {
+//			setCursor(_cursorHand05x);
+//		} else if (_scrollAcceleration == 1) {
+//			setCursor(_cursorHand);
+//		} else if (_scrollAcceleration == 2) {
+//			setCursor(_cursorHand2x);
+//		} else {
+//			setCursor(_cursorHand5x);
+//		}
+//
+//		/*
+//		 * when the acceleration has changed, the start positions for scrolling the graph must be
+//		 * set to the current location
+//		 */
+//		if (oldValue != _scrollAcceleration) {
+//			_startPosScrollbar = getHorizontalBar().getSelection();
+//			_startPosDev = devX;
+//		}
+//	}
+
 	/**
 	 * Move a zoomed chart so that the slider is visible.
 	 * 
@@ -5903,44 +5963,6 @@ public class ChartComponentGraph extends Canvas {
 		 */
 		_zoomRatioCenter = (double) xxDevSliderLinePos / _xxDevGraphWidth;
 	}
-
-//	/**
-//	 * Set the scrolling cursor according to the vertical position of the mouse
-//	 *
-//	 * @param devX
-//	 * @param devY
-//	 *            vertical coordinat of the mouse in the graph
-//	 */
-//	private void setupScrollCursor(final int devX, final int devY) {
-//
-//		final int height = getDevVisibleGraphHeight();
-//		final int height4 = height / 4;
-//		final int height2 = height / 2;
-//
-//		final float oldValue = _scrollAcceleration;
-//
-//		_scrollAcceleration = devY < height4 ? 0.25f : devY < height2 ? 1 : devY > height - height4 ? 10 : 2;
-//
-//		// set cursor according to the position
-//		if (_scrollAcceleration == 0.25) {
-//			setCursor(_cursorHand05x);
-//		} else if (_scrollAcceleration == 1) {
-//			setCursor(_cursorHand);
-//		} else if (_scrollAcceleration == 2) {
-//			setCursor(_cursorHand2x);
-//		} else {
-//			setCursor(_cursorHand5x);
-//		}
-//
-//		/*
-//		 * when the acceleration has changed, the start positions for scrolling the graph must be
-//		 * set to the current location
-//		 */
-//		if (oldValue != _scrollAcceleration) {
-//			_startPosScrollbar = getHorizontalBar().getSelection();
-//			_startPosDev = devX;
-//		}
-//	}
 
 	/**
 	 * Move a zoomed chart to a new position

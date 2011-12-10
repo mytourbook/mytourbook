@@ -17,10 +17,15 @@ package net.tourbook.chart;
 
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 
 public interface ITooltipOwner {
 
 	public Control getControl();
 
-	public void handleEventMouseMove(Point mouseDisplayRelativePosition);
+	/**
+	 * @param event
+	 * @param mouseDisplayPosition
+	 */
+	public void handleMouseEvent(Event event, Point mouseDisplayPosition);
 }

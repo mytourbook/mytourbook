@@ -795,8 +795,8 @@ public class Chart extends ViewForm {
 				.getValuesIndex());
 	}
 
-	protected void handleTooltipEventMouseMove(final Point mouseDisplayRelativePosition) {
-		_chartComponents.getChartComponentGraph().onMouseMove(mouseDisplayRelativePosition);
+	protected void handleTooltipMouseEvent(final Event event, final Point mouseDisplayPosition) {
+		_chartComponents.getChartComponentGraph().handleTooltipMouseEvent(event, mouseDisplayPosition);
 	}
 
 	boolean isMouseDownExternalPre(final int devXMouse, final int devYMouse) {

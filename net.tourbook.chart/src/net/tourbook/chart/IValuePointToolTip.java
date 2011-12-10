@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.chart;
 
+import org.eclipse.swt.graphics.Point;
+
 /**
  * This tooltip is displayed when the mouse is hovered over a value point in a line graph and
  * displays value point information.
@@ -41,7 +43,9 @@ public interface IValuePointToolTip {
 	 * @param valueIndex
 	 * @param devXMouseMove
 	 * @param devYMouseMove
+	 * @param valueDevPosition
+	 *            Position where the value is painted in the chart
 	 */
-	void setValueIndex(int valueIndex, int devXMouseMove, int devYMouseMove);
+	void setValueIndex(int valueIndex, int devXMouseMove, int devYMouseMove, Point valueDevPosition);
 
 }

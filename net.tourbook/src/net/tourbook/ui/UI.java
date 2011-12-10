@@ -729,7 +729,6 @@ public class UI {
 	public static String format_hhh_mm_ss(final long time) {
 
 		_formatterSB.setLength(0);
-		// display hours
 
 		return _formatter.format(//
 				Messages.Format_hhmmss,

@@ -231,8 +231,8 @@ public class TourChart extends Chart {
 			}
 
 			@Override
-			public void handleEventMouseMove(final Point mouseDisplayRelativePosition) {
-				handleTooltipEventMouseMove(mouseDisplayRelativePosition);
+			public void handleMouseEvent(final Event event, final Point mouseDisplayPosition) {
+				handleTooltipMouseEvent(event, mouseDisplayPosition);
 			}
 		};
 		setValuePointToolTipProvider(_valuePointToolTip = new ValuePointToolTipUI(tooltipOwner, _state));

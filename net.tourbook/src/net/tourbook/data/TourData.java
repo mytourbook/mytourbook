@@ -4488,6 +4488,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return startSecond;
 	}
 
+	/**
+	 * @return Returns the tour start date time in seconds.
+	 */
+	public int getStartTimeOfDay() {
+		return (startHour * 3600) + (startMinute * 60) + startSecond;
+
+	}
+
 	public short getStartYear() {
 		return startYear;
 	}

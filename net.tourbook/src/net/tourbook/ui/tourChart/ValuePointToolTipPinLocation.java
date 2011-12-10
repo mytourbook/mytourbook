@@ -21,9 +21,9 @@ package net.tourbook.ui.tourChart;
 enum ValuePointToolTipPinLocation {
 
 	/**
-	 * Tooltip is not pinned
+	 * Tooltip is pinned to the screen which means it is not pinned.
 	 */
-	Disabled,
+	Screen,
 
 	TopLeft,
 
@@ -31,5 +31,10 @@ enum ValuePointToolTipPinLocation {
 
 	BottomLeft,
 
-	BottomRight
+	BottomRight,
+
+	/**
+	 * Tooltip is pinned to the mouse x position.
+	 */
+	MouseXPosition
 }
