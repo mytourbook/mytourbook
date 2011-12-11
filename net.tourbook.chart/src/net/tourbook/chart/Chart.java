@@ -688,8 +688,8 @@ public class Chart extends ViewForm {
 		return createChartInfo();
 	}
 
-	public int getDevGraphImageXOffset() {
-		return _chartComponents.getChartComponentGraph().getXXDevViewPortOffset();
+	public int getXXDevViewPortLeftBorder() {
+		return _chartComponents.getChartComponentGraph().getXXDevViewPortLeftBorder();
 	}
 
 	/**

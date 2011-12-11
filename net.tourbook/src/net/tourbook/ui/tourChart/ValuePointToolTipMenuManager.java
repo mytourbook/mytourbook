@@ -56,8 +56,8 @@ public class ValuePointToolTipMenuManager {
 	static final int						DEFAULT_GRAPHS								= VALUE_ID_TIME_SLICES
 																								| VALUE_ID_TIME_DURATION
 																								| VALUE_ID_DISTANCE
-																								| VALUE_ID_ALTITUDE
-																								| VALUE_ID_PULSE
+//																								| VALUE_ID_ALTITUDE
+//																								| VALUE_ID_PULSE
 																						//
 																						;
 	static ValuePointToolTipOrientation		DEFAULT_ORIENTATION							= ValuePointToolTipOrientation.Horizontal;

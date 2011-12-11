@@ -295,7 +295,6 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 	public void createPartControl(final Composite parent) {
 
 		createUI(parent);
-		restoreState();
 
 		addSelectionListener();
 		addPrefListener();
@@ -506,10 +505,6 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 		}
 	}
 
-	private void restoreState() {
-
-		_tourChart.restoreState();
-	}
 
 	private void saveState() {
 

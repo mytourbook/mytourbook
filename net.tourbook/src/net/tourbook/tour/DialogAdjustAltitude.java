@@ -113,7 +113,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 	private static final String				PREF_KEEP_START						= "adjust.altitude.keep_start";			//$NON-NLS-1$
 	private static final String				PREF_SCALE_GEO_POSITION				= "Dialog_AdjustAltitude_GeoPositionScale"; //$NON-NLS-1$
 
-	private static final String				STATE_IS_SRTM_SELECT_WHOLE_TOUR		= "State_IsSRTMSelectWholeTour";			//$NON-NLS-1$
+//	private static final String				STATE_IS_SRTM_SELECT_WHOLE_TOUR		= "State_IsSRTMSelectWholeTour";			//$NON-NLS-1$
 //	private static final String				STATE_IS_SRTM_SELECT_SYNC_START_END	= "State_IsSRTMSyncStartEnd";				//$NON-NLS-1$
 
 	private final IPreferenceStore			_prefStore							= TourbookPlugin.getDefault() //
@@ -1684,6 +1684,9 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		_splineData = new SplineData();
 
+		final float borderValueLeft = -0.0000000000001f;
+		final float borderValueRight = 1.0000000000001f;
+
 		final int pointLength = 3;
 
 		final boolean[] isMovable = _splineData.isPointMovable = new boolean[pointLength];
@@ -1693,21 +1696,21 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		final float[] posX = _splineData.relativePositionX = new float[pointLength];
 		final float[] posY = _splineData.relativePositionY = new float[pointLength];
-		posX[0] = -0.00001f;
+		posX[0] = borderValueLeft;
 		posX[1] = 0.5f;
-		posX[2] = 1.00001f;
+		posX[2] = borderValueRight;
 		posY[0] = 0;
 		posY[1] = 0;
 		posY[2] = 0;
 
 		final double[] splineMinX = _splineData.graphXMinValues = new double[pointLength];
 		final double[] splineMaxX = _splineData.graphXMaxValues = new double[pointLength];
-		splineMinX[0] = -0.00001f;
-		splineMaxX[0] = -0.00001f;
+		splineMinX[0] = borderValueLeft;
+		splineMaxX[0] = borderValueLeft;
 		splineMinX[1] = 0;
 		splineMaxX[1] = 0;
-		splineMinX[2] = 1.00001f;
-		splineMaxX[2] = 1.00001f;
+		splineMinX[2] = borderValueRight;
+		splineMaxX[2] = borderValueRight;
 
 		_splineData.graphXValues = new double[pointLength];
 		_splineData.graphYValues = new double[pointLength];
@@ -1791,6 +1794,12 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 					maxIndex / 2,
 					maxIndex));
 		}
+
+		_tourChart.getDisplay().timerExec(100, new Runnable() {
+			public void run() {
+				updateTourChart();
+			}
+		});
 	}
 
 //	private void onModifySRTMSync() {
@@ -2148,18 +2157,17 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 	private void restoreStatePost() {
 
+		/**
+		 * this is disabled because starting with the checked box do not display the blue spline
+		 * marker, this needs more investigation
+		 */
 		/*
 		 * checkbox: select whole tour
 		 */
-		_chkSRTMSelectWholeTour.setSelection(Util.getStateBoolean(_state, STATE_IS_SRTM_SELECT_WHOLE_TOUR, true));
+//		_chkSRTMSelectWholeTour.setSelection(Util.getStateBoolean(_state, STATE_IS_SRTM_SELECT_WHOLE_TOUR, true));
 //		_chkSRTMSyncStartEnd.setSelection(Util.getStateBoolean(_state, STATE_IS_SRTM_SELECT_SYNC_START_END, true));
 
 		if (isAdjustmentTypeSRTMSPline()) {
-
-			/*
-			 * MUST be run async because both sliders are positioned on the right side instead of
-			 * the correct position
-			 */
 
 			Display.getCurrent().asyncExec(new Runnable() {
 				public void run() {
@@ -2184,7 +2192,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		/*
 		 * checkbox: select whole tour
 		 */
-		_state.put(STATE_IS_SRTM_SELECT_WHOLE_TOUR, _chkSRTMSelectWholeTour.getSelection());
+//		_state.put(STATE_IS_SRTM_SELECT_WHOLE_TOUR, _chkSRTMSelectWholeTour.getSelection());
 //		_state.put(STATE_IS_SRTM_SELECT_SYNC_START_END, _chkSRTMSyncStartEnd.getSelection());
 	}
 

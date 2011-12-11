@@ -63,7 +63,7 @@ public class ChartSegmentLayer implements IChartLayer {
 
 		final int devYTop = drawingData.getDevYTop();
 		final int devYBottom = drawingData.getDevYBottom();
-		final int devGraphImageOffset = chart.getDevGraphImageXOffset();
+		final int devGraphImageOffset = chart.getXXDevViewPortLeftBorder();
 		final int devGraphHeight = drawingData.devGraphHeight;
 
 		final float graphYBottom = drawingData.getGraphYBottom();

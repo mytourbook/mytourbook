@@ -1229,10 +1229,6 @@ public class TourChart extends Chart {
 		_xAxisSelectionListener.remove(listener);
 	}
 
-	void restoreState() {
-		_valuePointToolTip.restoreState();
-	}
-
 	void saveState() {
 		_valuePointToolTip.saveState();
 	}

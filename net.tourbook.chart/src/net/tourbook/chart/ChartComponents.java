@@ -1176,7 +1176,7 @@ public class ChartComponents extends Composite {
 		final float lastValue = xValues[xValues.length - 1];
 
 		final float devVirtualGraphImageWidth = componentGraph.getXXDevGraphWidth();
-		final float devGraphImageXOffset = componentGraph.getXXDevViewPortOffset();
+		final float devGraphImageXOffset = componentGraph.getXXDevViewPortLeftBorder();
 
 		final float devOneValueSlice = devVirtualGraphImageWidth / lastValue;
 

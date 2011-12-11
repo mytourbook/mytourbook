@@ -16,12 +16,18 @@
 package net.tourbook.chart;
 
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Shell;
 
 /**
  * This tooltip is displayed when the mouse is hovered over a value point in a line graph and
  * displays value point information.
  */
 public interface IValuePointToolTip {
+
+	/**
+	 * @return Returns the tool tip shell or <code>null</code> when the tool tip is not visible
+	 */
+	Shell getToolTipShell();
 
 	/**
 	 * Hide the tooltip.

@@ -50,6 +50,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.joda.time.format.DateTimeFormat;
@@ -858,6 +859,11 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 
 		return container;
+	}
+
+	@Override
+	public Shell getToolTipShell() {
+		return super.getToolTipShell();
 	}
 
 	public boolean isVisible() {

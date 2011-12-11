@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
-import java.util.Formatter;
-
 import net.tourbook.chart.ITooltipOwner;
 import net.tourbook.util.Util;
 
@@ -54,14 +52,15 @@ public abstract class ValuePointToolTipShell {
 	private static final String		STATE_MOUSE_X_POSITION_RELATIVE		= "ValuePoint_ToolTip_MouseXPositionRelative";		//$NON-NLS-1$
 	private static final String		STATE_IS_TOOLTIP_ABOVE_VALUE_POINT	= "ValuePoint_ToolTip_IsToolTipAboveValuePoint";	//$NON-NLS-1$
 
-	private static final int		MAX_ANIMATION_COUNTER				= 8;
+	private static final int		MAX_ANIMATION_COUNTER				= 10;
 
 	IDialogSettings					state;
 
 	private ITooltipOwner			_tooltipOwner;
 
 	// Ensure that only one tooltip is active in time
-	private static Shell			_ttShell;
+//	private static Shell			_ttShell;
+	private Shell					_ttShell;
 
 	private Object					_currentArea;
 	private Control					_ownerControl;
@@ -341,6 +340,8 @@ public abstract class ValuePointToolTipShell {
 				setTTShellLocation20Run();
 			}
 		};
+
+		restoreState();
 	}
 
 	/**
@@ -493,6 +494,10 @@ public abstract class ValuePointToolTipShell {
 		return _ownerControl;
 	}
 
+	Shell getToolTipShell() {
+		return _ttShell;
+	}
+
 	/**
 	 * Hide the currently active tool tip
 	 */
@@ -616,7 +621,7 @@ public abstract class ValuePointToolTipShell {
 		_ownerControl.removeListener(SWT.Resize, _ownerControlListener);
 	}
 
-	void restoreState() {
+	private void restoreState() {
 
 		/*
 		 * restore value point tooltip location, when location is not set, don't set it to 0,0
@@ -863,7 +868,12 @@ public abstract class ValuePointToolTipShell {
 
 		_devXOwnerMouseMove = devXMouseMove;
 		_devYOwnerMouseMove = devYMouseMove;
-		_ownerValueDevPosition = valueDevPosition;
+
+		if (valueDevPosition == null) {
+			_ownerValueDevPosition = new Point(0, 0);
+		} else {
+			_ownerValueDevPosition = valueDevPosition;
+		}
 
 		setTTShellLocation(false, true);
 	}
@@ -872,35 +882,14 @@ public abstract class ValuePointToolTipShell {
 
 		final int oldCounter = _animationCounter;
 
-		_animationCounter = MAX_ANIMATION_COUNTER;
+//		_animationCounter = MAX_ANIMATION_COUNTER;
+
+		_animationCounter = 6;
+
 		_fixedTTShellLocation = newLocation;
 
 		// check if animation is already running
 		if (oldCounter == 0) {
-
-			System.out.println();
-			System.out.println(_animationCounter + "\t" + newLocation);
-			System.out.println("anim"//
-					+ "\t"
-					+ "step"
-					+ "\t"
-					+ "diffY"
-					+ "\t"
-					+ "\t"
-					+ "stepY"
-					+ "\t"
-					+ "* "
-					+ "\t"
-					+ "currentLocation"
-					+ "\t"
-					+ "\t"
-					+ "nextLocation"
-					+ "\t"
-					+ "\t"
-					+ "_fixedTTShellLocation"
-			//
-					);
-			// TODO remove SYSTEM.OUT.PRINTLN
 
 			// animation is not running, start a new animantion
 			_display.asyncExec(_ttShellPositioningRunnable);
@@ -914,6 +903,7 @@ public abstract class ValuePointToolTipShell {
 		}
 
 		Point nextLocation = null;
+		final Point currentLocation = _ttShell.getLocation();
 
 		if (_animationCounter == 1) {
 
@@ -923,7 +913,8 @@ public abstract class ValuePointToolTipShell {
 
 		} else {
 
-			final Point currentLocation = _ttShell.getLocation();
+			// animate movement
+
 			final Point newLocation = _fixedTTShellLocation;
 
 			final float diffX = currentLocation.x - newLocation.x;
@@ -932,35 +923,13 @@ public abstract class ValuePointToolTipShell {
 			final float stepX = diffX / _animationCounter;
 			final float stepY = diffY / _animationCounter;
 
-			final float stepCounter = MAX_ANIMATION_COUNTER - _animationCounter + 1;
+			final float devXRemainder = stepX * (_animationCounter - 1);
+			final float devYRemainder = stepY * (_animationCounter - 1);
 
-			final float smoothing = 0.7f;
-
-			final float devX = currentLocation.x - (stepX * stepCounter * smoothing);
-			final float devY = currentLocation.y - (stepY * stepCounter * smoothing);
-//			final float devX = currentLocation.x - (diffX / 2);
-//			final float devY = currentLocation.y - (diffY / 2);
+			final float devX = newLocation.x + devXRemainder;
+			final float devY = newLocation.y + devYRemainder;
 
 			nextLocation = new Point((int) devX, (int) devY);
-
-			System.out.println(_animationCounter
-					+ "\t"
-					+ stepCounter
-					+ "\t"
-					+ new Formatter().format("%04f", diffY)
-					+ "\t"
-					+ new Formatter().format("%04.3f", stepY)
-					+ "\t"
-					+ new Formatter().format("%04.3f", stepY * stepCounter)
-					+ "\t"
-					+ currentLocation
-					+ "\t"
-					+ nextLocation
-					+ "\t"
-					+ _fixedTTShellLocation
-			//
-					);
-			// TODO remove SYSTEM.OUT.PRINTLN
 		}
 
 		_ttShell.setLocation(nextLocation);
@@ -968,7 +937,8 @@ public abstract class ValuePointToolTipShell {
 		_animationCounter--;
 
 		if (_animationCounter > 0) {
-			_display.timerExec(20, _ttShellPositioningRunnable);
+			// start new animation
+			_display.timerExec(10, _ttShellPositioningRunnable);
 		}
 	}
 
@@ -1058,6 +1028,7 @@ public abstract class ValuePointToolTipShell {
 
 	private void toolTipHide(final Shell ttShell, final Event event) {
 
+		// initialize next animation, otherwise tooltip would never be displayed again
 		_animationCounter = 0;
 
 		if (ttShell == null || ttShell.isDisposed()) {
@@ -1079,7 +1050,7 @@ public abstract class ValuePointToolTipShell {
 
 			return;
 		}
-	}
+	};
 
 	private void toolTipOpen(final Shell shell, final Event event) {
 
@@ -1114,7 +1085,14 @@ public abstract class ValuePointToolTipShell {
 
 			setTTShellLocation(false, false);
 
-			_ttShell.setVisible(true);
+//			// prevent to open tool tips when the owner is not the active shell
+//			final boolean isFocusControl = _ownerControl.getDisplay().getActiveShell() == _ownerControl.getShell();
+//			System.out.println("isFocusControl\t" + isFocusControl);
+//			// TODO remove SYSTEM.OUT.PRINTLN
+//
+//			if (isFocusControl) {
+				_ttShell.setVisible(true);
+//			}
 		}
 	}
 }

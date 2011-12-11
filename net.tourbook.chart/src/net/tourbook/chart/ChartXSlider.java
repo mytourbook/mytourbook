@@ -112,7 +112,7 @@ public class ChartXSlider {
 				_hitRectangle.width,
 				_hitRectangle.height);
 
-		rect.x -= _chartGraph.getXXDevViewPortOffset();
+		rect.x -= _chartGraph.getXXDevViewPortLeftBorder();
 
 		return rect;
 	}

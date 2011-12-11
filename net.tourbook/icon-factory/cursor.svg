@@ -75,14 +75,14 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="11.313708"
-     inkscape:cx="134.62004"
-     inkscape:cy="349.36457"
+     inkscape:zoom="22.627416"
+     inkscape:cx="92.120751"
+     inkscape:cy="412.3185"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
-     inkscape:window-width="1362"
-     inkscape:window-height="882"
+     inkscape:window-width="1522"
+     inkscape:window-height="1182"
      inkscape:window-x="70"
      inkscape:window-y="-8"
      inkscape:window-maximized="1">
@@ -223,7 +223,7 @@
     <rect
        style="opacity:0.494;fill:none;stroke:none;display:inline"
        id="rect2998-1"
-       width="16"
+       width="21"
        height="18"
        x="70"
        y="627.36218"
@@ -278,7 +278,7 @@
     <rect
        style="opacity:0.494;fill:none;stroke:none;display:inline"
        id="rect2998-1-9"
-       width="16"
+       width="21"
        height="18"
        x="-115"
        y="627.36218"
@@ -577,5 +577,15 @@
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.chart\icons\Cursor-Hover-XSlider.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:2,2;stroke-dashoffset:0"
+       d="m 90.037871,631.32397 c 0,10.01728 0,10.01728 0,10.01728 l 0,0"
+       id="path3078"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:2, 2;stroke-dashoffset:0;display:inline"
+       d="m 95,631.36218 c 0,10.01728 0,10.01728 0,10.01728 l 0,0"
+       id="path3078-4"
+       inkscape:connector-curvature="0" />
   </g>
 </svg>

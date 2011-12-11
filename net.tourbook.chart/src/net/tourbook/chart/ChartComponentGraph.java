@@ -50,11 +50,14 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ScrollBar;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Widget;
 
 /**
  * Draws the graph and axis into the canvas
@@ -63,7 +66,7 @@ import org.eclipse.swt.widgets.ScrollBar;
  */
 public class ChartComponentGraph extends Canvas {
 
-	private static final int			TOUR_INFO_ICON_KEEP_OUT_AREA	= 50;
+	private static final int			TOUR_INFO_ICON_KEEP_OUT_AREA	= 25;
 
 	private static final double			ZOOM_RATIO_FACTOR				= 1.3;
 
@@ -384,7 +387,10 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	Rectangle							_clientArea;
 
-	private long						_mouseTimeExit;
+	/**
+	 * Time when the mouse has existed the graph component
+	 */
+	private long						_graphMouseExitTime;
 	private boolean						_isMouseMovedFromGraph;
 
 	/**
@@ -4348,7 +4354,7 @@ public class ChartComponentGraph extends Canvas {
 	 * @return When the graph is zoomed, the chart shows only a part of the whole graph in the
 	 *         viewport. Returns the left border of the viewport.
 	 */
-	int getXXDevViewPortOffset() {
+	int getXXDevViewPortLeftBorder() {
 		return _xxDevViewPortLeftBorder;
 	}
 
@@ -4377,9 +4383,15 @@ public class ChartComponentGraph extends Canvas {
 			final Rectangle clientRect = getClientArea();
 
 			if (clientRect.contains(controlPos)) {
+
+				_isAutoScroll = false;
+
 				onMouseMove(controlPos.x, controlPos.y);
+
+			} else {
+				onMouseMoveAxis(new MouseEvent(event));
 			}
-			
+
 			break;
 
 		case SWT.MouseVerticalWheel:
@@ -5175,7 +5187,7 @@ public class ChartComponentGraph extends Canvas {
 	void onMouseEnterAxis(final MouseEvent event) {
 
 		// set true when mouse was moved from graph
-		_isMouseMovedFromGraph = _mouseTimeExit == (event.time & 0xFFFFFFFFL);
+		_isMouseMovedFromGraph = _graphMouseExitTime == (event.time & 0xFFFFFFFFL);
 	}
 
 	/**
@@ -5209,8 +5221,8 @@ public class ChartComponentGraph extends Canvas {
 			redraw();
 		}
 
-		// set mouse exit time
-		_mouseTimeExit = (event.time & 0xFFFFFFFFL);
+		// keep time when mouse has exited the graph
+		_graphMouseExitTime = (event.time & 0xFFFFFFFFL);
 		_isMouseMovedFromGraph = false;
 
 		setCursorStyle(event.y);
@@ -5416,54 +5428,136 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * @param mouseEvent
-	 * @return Returns <code>true</code> when the mouse event was handled.
+	 * @return Returns <code>true</code> when the mouse event was been handled.
 	 */
 	boolean onMouseMoveAxis(final MouseEvent mouseEvent) {
 
-		Rectangle clientArea = null;
 		ChartComponentAxis axisComponent = null;
-		final Cursor cursor;
+		int axisWidth = 0;
 
-		if (mouseEvent.widget instanceof ChartComponentAxis) {
+		int devXMouse = mouseEvent.x;
+		int devYMouse = mouseEvent.y;
+		final Widget mouseWidget = mouseEvent.widget;
 
-			axisComponent = (ChartComponentAxis) mouseEvent.widget;
-			clientArea = axisComponent.getAxisClientArea();
+		final ChartComponentAxis axisLeft = _chartComponents.getAxisLeft();
+		final ChartComponentAxis axisRight = _chartComponents.getAxisRight();
 
-			if (clientArea == null) {
-				return false;
+		boolean isMouseFromRightToolTip = false;
+		boolean isMouseFromLeftToolTip = false;
+
+		if (mouseWidget instanceof ChartComponentAxis) {
+
+			axisComponent = (ChartComponentAxis) mouseWidget;
+			axisWidth = axisComponent.getAxisClientArea().width;
+
+		} else if (valuePointToolTip != null) {
+
+			// check if the event widget is from the tooltip
+
+			// get tooltip shell
+			final Shell ttShell = valuePointToolTip.getToolTipShell();
+			if (ttShell != null) {
+
+				if (mouseWidget instanceof Control) {
+					final Control control = (Control) mouseWidget;
+
+					if (control.getShell() == ttShell) {
+
+						/*
+						 * this event is from the value point tooltip, the control is the tooltip
+						 */
+
+						final Point screenTTMouse = control.toDisplay(devXMouse, devYMouse);
+
+						final Point leftAxisScreen = axisLeft.toDisplay(0, 0);
+						final Point leftAxisSize = axisLeft.getSize();
+
+						final Rectangle leftAxisRect = new Rectangle(
+								leftAxisScreen.x,
+								leftAxisScreen.y,
+								leftAxisSize.x,
+								leftAxisSize.y);
+
+						if (leftAxisRect.contains(screenTTMouse)) {
+
+							// mouse is moved above the left axis
+
+							final Point devLeftAxis = axisLeft.toControl(screenTTMouse);
+							devXMouse = devLeftAxis.x;
+							devYMouse = devLeftAxis.y;
+							axisComponent = axisLeft;
+							axisWidth = leftAxisSize.x;
+
+							isMouseFromLeftToolTip = true;
+
+						} else {
+
+							final Point rightAxisScreen = axisRight.toDisplay(0, 0);
+							final Point rightAxisSize = axisRight.getSize();
+
+							final Rectangle rightAxisRect = new Rectangle(
+									rightAxisScreen.x,
+									rightAxisScreen.y,
+									rightAxisSize.x,
+									rightAxisSize.y);
+
+							if (rightAxisRect.contains(screenTTMouse)) {
+
+								// mouse is moved above the right axis
+
+								final Point devRightAxis = axisRight.toControl(screenTTMouse);
+								devXMouse = devRightAxis.x;
+								devYMouse = devRightAxis.y;
+								axisComponent = axisRight;
+								axisWidth = rightAxisSize.x;
+
+								isMouseFromRightToolTip = true;
+							}
+						}
+					}
+				}
 			}
 		}
 
-		// ensure that the upper part of the chart is reserved for the tour info icon
-		if (mouseEvent.y < TOUR_INFO_ICON_KEEP_OUT_AREA ||
-		// chart is not zoomed
-				_graphZoomRatio == 1) {
+		final boolean isLeftAxis = axisComponent == axisLeft;
+
+		if (axisWidth == 0 || axisComponent == null //
+
+				// chart is not zoomed
+				|| _graphZoomRatio == 1
+
+				// ensure that mouse is moved from the graph or over the tooltip which is above the y-axis
+				|| _isMouseMovedFromGraph == false
+				&& isMouseFromLeftToolTip == false
+				&& isMouseFromRightToolTip == false
+
+				// ensure that the upper part of the chart is reserved for the tour info icon
+				|| isLeftAxis
+				&& devYMouse < TOUR_INFO_ICON_KEEP_OUT_AREA
+		//
+		) {
 
 			// disable autoscroll
 			_isAutoScroll = false;
 
-			axisComponent.setCursor(null);
+			if (axisComponent != null) {
+				axisComponent.setCursor(null);
+			}
 
 			return false;
 		}
 
-		// ensure that mouse is moved from the graph
-		if (_isMouseMovedFromGraph == false) {
-			return false;
-		}
+		final Cursor cursor;
 
 		if (_isXSliderVisible && _xSliderDragged != null) {
 
 			// x-slider is dragged, do autoscroll the graph with the mouse
 
-			// set dragged x-slider position
-			final int devXMouse = mouseEvent.x;
-
-			if (axisComponent == _chartComponents.getAxisLeft()) {
+			if (isLeftAxis) {
 
 				// left x-axis
 
-				_devXDraggedXSliderLine = -clientArea.width + devXMouse;
+				_devXDraggedXSliderLine = -axisWidth + devXMouse;
 
 				cursor = //
 				_devXDraggedXSliderLine < _leftAccelerator[0][0] ? _cursorMove5x : //
@@ -5492,13 +5586,11 @@ public class ChartComponentGraph extends Canvas {
 
 			// set mouse position and do autoscrolling
 
-			final int devXMouse = mouseEvent.x;
-
-			if (axisComponent == _chartComponents.getAxisLeft()) {
+			if (isLeftAxis) {
 
 				// left x-axis
 
-				_devXAutoScrollMousePosition = -clientArea.width + devXMouse;
+				_devXAutoScrollMousePosition = -axisWidth + devXMouse;
 
 				cursor = //
 				_devXAutoScrollMousePosition < _leftAccelerator[0][0] ? _cursorMove5x : //
