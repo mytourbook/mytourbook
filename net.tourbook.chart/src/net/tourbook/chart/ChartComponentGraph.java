@@ -391,7 +391,9 @@ public class ChartComponentGraph extends Canvas {
 	 * Time when the mouse has existed the graph component
 	 */
 	private long						_graphMouseExitTime;
+	private long						_toolTipMouseExitTime;
 	private boolean						_isMouseMovedFromGraph;
+	private boolean						_isMouseMovedFromToolTip;
 
 	/**
 	 * Constructor
@@ -1225,7 +1227,7 @@ public class ChartComponentGraph extends Canvas {
 //			return;
 //		}
 
-		final int AUTO_SCROLL_INTERVAL = 20; // 20ms == 25fps
+		final int AUTO_SCROLL_INTERVAL = 50; // 20ms == 50fps
 
 		_isAutoScroll = true;
 
@@ -4394,6 +4396,20 @@ public class ChartComponentGraph extends Canvas {
 
 			break;
 
+		case SWT.MouseEnter:
+			
+			// simulate a mouse move to do autoscrolling
+			onMouseMoveAxis(new MouseEvent(event));
+			
+			break;
+			
+		case SWT.MouseExit:
+			// keep time when mouse has exited the tooltip
+			_toolTipMouseExitTime = (event.time & 0xFFFFFFFFL);
+			_isMouseMovedFromToolTip = false;
+			
+			break;
+
 		case SWT.MouseVerticalWheel:
 			onMouseWheel(event);
 			break;
@@ -5188,6 +5204,9 @@ public class ChartComponentGraph extends Canvas {
 
 		// set true when mouse was moved from graph
 		_isMouseMovedFromGraph = _graphMouseExitTime == (event.time & 0xFFFFFFFFL);
+
+		// set true when mouse was moved from the tooltip
+		_isMouseMovedFromToolTip = _toolTipMouseExitTime == (event.time & 0xFFFFFFFFL);
 	}
 
 	/**
@@ -5526,8 +5545,12 @@ public class ChartComponentGraph extends Canvas {
 				// chart is not zoomed
 				|| _graphZoomRatio == 1
 
-				// ensure that mouse is moved from the graph or over the tooltip which is above the y-axis
+				/*
+				 * ensure the mouse is moved from the graph from the tooltip or is moved over the
+				 * tooltip when it's above the y-axis
+				 */
 				|| _isMouseMovedFromGraph == false
+				&& _isMouseMovedFromToolTip == false
 				&& isMouseFromLeftToolTip == false
 				&& isMouseFromRightToolTip == false
 

@@ -415,7 +415,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 			_lblAltimeter = createUILabelValue(
 					container,
 					SWT.TRAIL,
-					6,
+					7,
 					Messages.Graph_Label_Altimeter,
 					GraphColorProvider.PREF_GRAPH_ALTIMETER);
 
@@ -440,7 +440,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 			_lblAltitude = createUILabelValue(
 					container,
 					SWT.TRAIL,
-					8,
+					9,
 					Messages.Graph_Label_Altitude,
 					GraphColorProvider.PREF_GRAPH_ALTITUDE);
 
@@ -465,7 +465,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 			_lblCadence = createUILabelValue(
 					container,
 					SWT.TRAIL,
-					3,
+					4,
 					Messages.Graph_Label_Cadence,
 					GraphColorProvider.PREF_GRAPH_CADENCE);
 
@@ -490,7 +490,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 			_lblDistance = createUILabelValue(
 					container,
 					SWT.TRAIL,
-					8,
+					9,
 					Messages.Graph_Label_Distance,
 					GraphColorProvider.PREF_GRAPH_DISTANCE);
 
@@ -515,7 +515,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 			_lblGradient = createUILabelValue(
 					container,
 					SWT.TRAIL,
-					5,
+					6,
 					Messages.Graph_Label_Gradient,
 					GraphColorProvider.PREF_GRAPH_GRADIENT);
 
@@ -540,7 +540,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 			_lblPace = createUILabelValue(
 					container,
 					SWT.TRAIL,
-					4,
+					5,
 					Messages.Graph_Label_Pace,
 					GraphColorProvider.PREF_GRAPH_PACE);
 
@@ -565,7 +565,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 			_lblPower = createUILabelValue(
 					container,
 					SWT.TRAIL,
-					4,
+					5,
 					Messages.Graph_Label_Power,
 					GraphColorProvider.PREF_GRAPH_POWER);
 
@@ -590,7 +590,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 			_lblPulse = createUILabelValue(
 					container,
 					SWT.TRAIL,
-					4,
+					5,
 					Messages.Graph_Label_Heartbeat,
 					GraphColorProvider.PREF_GRAPH_HEARTBEAT);
 
@@ -615,7 +615,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 			_lblSpeed = createUILabelValue(
 					container,
 					SWT.TRAIL,
-					5,
+					6,
 					Messages.Graph_Label_Speed,
 					GraphColorProvider.PREF_GRAPH_SPEED);
 
@@ -640,7 +640,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 			_lblTemperature = createUILabelValue(
 					container,
 					SWT.TRAIL,
-					5,
+					6,
 					Messages.Graph_Label_Temperature,
 					GraphColorProvider.PREF_GRAPH_TEMPTERATURE);
 
@@ -665,7 +665,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 			_lblTimeDuration = createUILabelValue(
 					container,
 					SWT.TRAIL,
-					8,
+					9,
 					Messages.Graph_Label_TimeDuration,
 					GraphColorProvider.PREF_GRAPH_TIME);
 
@@ -691,7 +691,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 			_lblTimeOfDay = createUILabelValue(
 					container,
 					SWT.TRAIL,
-					8,
+					9,
 					Messages.Graph_Label_TimeOfDay,
 					GraphColorProvider.PREF_GRAPH_TIME);
 
@@ -730,7 +730,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 			_lblDataSerieCurrent = createUILabelValue(
 					container,
 					SWT.TRAIL,
-					5,
+					6,
 					Messages.Tooltip_ValuePoint_Label_SlicesCurrent_Tooltip,
 					null);
 
@@ -741,7 +741,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 			_lblDataSerieMax = createUILabelValue(
 					container,
 					SWT.LEAD,
-					5,
+					6,
 					Messages.Tooltip_ValuePoint_Label_SlicesMax_Tooltip,
 					null);
 		}
@@ -833,12 +833,12 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 			label.setToolTipText(tooltip);
 		}
 
-		if (colorId != null) {
-
+		if (colorId == null) {
+			label.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+		}else {
 			final Color fgColor = _colorCache.getColor(//
 					colorId, //
 					_colorProvider.getGraphColorDefinition(colorId).getTextColor());
-
 			label.setForeground(fgColor);
 		}
 

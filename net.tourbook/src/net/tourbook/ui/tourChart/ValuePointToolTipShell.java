@@ -188,6 +188,8 @@ public abstract class ValuePointToolTipShell {
 
 				} else {
 
+					boolean isForwardEvent = false;
+
 					switch (event.type) {
 					case SWT.MouseMove:
 
@@ -199,7 +201,7 @@ public abstract class ValuePointToolTipShell {
 							 * move value point in the chart when tooltip is hovered and the mouse
 							 * position is within the chart
 							 */
-							_tooltipOwner.handleMouseEvent(event, control.toDisplay(event.x, event.y));
+							isForwardEvent = true;
 
 							cursor = _cursorHand;
 						}
@@ -233,15 +235,26 @@ public abstract class ValuePointToolTipShell {
 					case SWT.MouseVerticalWheel:
 
 						// pass to tt owner for zooming in/out
-						_tooltipOwner.handleMouseEvent(event, control.toDisplay(event.x, event.y));
+						isForwardEvent = true;
+
+						break;
+
+					case SWT.MouseEnter:
+
+						isForwardEvent = true;
 
 						break;
 
 					case SWT.MouseExit:
 
+						isForwardEvent = true;
 						_isTTDragged = false;
 
 						break;
+					}
+
+					if (isForwardEvent) {
+						_tooltipOwner.handleMouseEvent(event, control.toDisplay(event.x, event.y));
 					}
 				}
 
@@ -396,6 +409,7 @@ public abstract class ValuePointToolTipShell {
 		control.addListener(SWT.MouseMove, _ttListener);
 		control.addListener(SWT.MouseDown, _ttListener);
 		control.addListener(SWT.MouseUp, _ttListener);
+		control.addListener(SWT.MouseEnter, _ttListener);
 		control.addListener(SWT.MouseExit, _ttListener);
 		control.addListener(SWT.MouseVerticalWheel, _ttListener);
 
@@ -938,7 +952,7 @@ public abstract class ValuePointToolTipShell {
 
 		if (_animationCounter > 0) {
 			// start new animation
-			_display.timerExec(10, _ttShellPositioningRunnable);
+			_display.timerExec(20, _ttShellPositioningRunnable);
 		}
 	}
 
@@ -1091,7 +1105,7 @@ public abstract class ValuePointToolTipShell {
 //			// TODO remove SYSTEM.OUT.PRINTLN
 //
 //			if (isFocusControl) {
-				_ttShell.setVisible(true);
+			_ttShell.setVisible(true);
 //			}
 		}
 	}
