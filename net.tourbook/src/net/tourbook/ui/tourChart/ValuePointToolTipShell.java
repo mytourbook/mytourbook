@@ -737,7 +737,8 @@ public abstract class ValuePointToolTipShell {
 				screenTTShellLocation = _screenNotFixedTTShellLocation;
 			}
 
-//			isAdjustShell = isTTDragged;
+			screenTTShellLocation.x = screenTTShellLocation.x + _ttShellDiff.x;
+			screenTTShellLocation.y = screenTTShellLocation.y + _ttShellDiff.y;
 
 			break;
 
@@ -784,9 +785,6 @@ public abstract class ValuePointToolTipShell {
 			}
 
 			screenTTShellLocation.x = screenOwnerLeft - (ttWidth / 2) + _devXOwnerMouseMove;
-
-			// disable adjustment, this is done already here
-//			isAdjustShell = false;
 
 			break;
 
@@ -895,7 +893,7 @@ public abstract class ValuePointToolTipShell {
 
 		final int oldCounter = _animationCounter;
 
-		_animationCounter = 6;
+		_animationCounter = 8;
 		_repeatTime = 30;
 
 		_fixedTTShellLocation = newLocation;
@@ -903,8 +901,14 @@ public abstract class ValuePointToolTipShell {
 		// check if animation is already running
 		if (oldCounter == 0) {
 
+
 			// animation is not running, start a new animantion
 			_display.syncExec(_ttShellPositioningRunnable);
+
+		} else {
+
+			// do the first movement
+			setTTShellLocation20Run();
 		}
 	}
 

@@ -49,6 +49,7 @@ public class ValuePointToolTipMenuManager {
 	static final int						VALUE_ID_TIME_DURATION						= 1 << 11;
 	static final int						VALUE_ID_TIME_OF_DAY						= 1 << 12;
 	static final int						VALUE_ID_TIME_SLICES						= 1 << 13;
+	static final int						VALUE_ID_CHART_ZOOM_FACTOR					= 1 << 14;
 
 	static final String						STATE_VALUE_POINT_TOOLTIP_VISIBLE_GRAPHS	= "ValuePoint_ToolTip_VisibleGraphs";		//$NON-NLS-1$
 	static final String						STATE_VALUE_POINT_TOOLTIP_ORIENTATION		= "ValuePoint_ToolTip_Orientation";		//$NON-NLS-1$
@@ -87,6 +88,7 @@ public class ValuePointToolTipMenuManager {
 	private ActionValueItem					_actionValueAltimeter;
 	private ActionValueItem					_actionValueAltitude;
 	private ActionValueItem					_actionValueCadence;
+	private ActionValueItem					_actionValueChartZoomFactor;
 	private ActionValueItem					_actionValueDistance;
 	private ActionValueItem					_actionValueGradient;
 	private ActionValueItem					_actionValueHeader;
@@ -262,6 +264,12 @@ public class ValuePointToolTipMenuManager {
 				null,
 				null);
 
+		_actionValueChartZoomFactor = new ActionValueItem(//
+				VALUE_ID_CHART_ZOOM_FACTOR,
+				Messages.Tooltip_ValuePoint_Action_Value_ChartZoomFactor,
+				null,
+				null);
+
 		_actionValueTimeDuration = new ActionValueItem(//
 				VALUE_ID_TIME_DURATION,
 				Messages.Tooltip_ValuePoint_Action_Value_TimeDuration,
@@ -398,6 +406,10 @@ public class ValuePointToolTipMenuManager {
 				(_ttVisibleGraphs & VALUE_ID_CADENCE) > 0,
 				_tourData.cadenceSerie != null);
 
+		_actionValueChartZoomFactor.setState( //
+				(_ttVisibleGraphs & VALUE_ID_CHART_ZOOM_FACTOR) > 0,
+				true);
+
 		_actionValueDistance.setState( //
 				(_ttVisibleGraphs & VALUE_ID_DISTANCE) > 0,
 				_tourData.distanceSerie != null);
@@ -467,6 +479,7 @@ public class ValuePointToolTipMenuManager {
 		addItem(_actionValueGradient);
 		addItem(_actionValueAltimeter);
 		addItem(_actionValueCadence);
+		addItem(_actionValueChartZoomFactor);
 		addItem(_actionCloseTTContextMenu);
 
 		(new Separator()).fill(_menu, -1);

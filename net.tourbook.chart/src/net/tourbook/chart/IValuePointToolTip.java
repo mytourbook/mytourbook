@@ -51,7 +51,12 @@ public interface IValuePointToolTip {
 	 * @param devYMouseMove
 	 * @param valueDevPosition
 	 *            Position where the value is painted in the chart
+	 * @param chartZoomFactor
 	 */
-	void setValueIndex(int valueIndex, int devXMouseMove, int devYMouseMove, Point valueDevPosition);
+	void setValueIndex(	int valueIndex,
+						int devXMouseMove,
+						int devYMouseMove,
+						Point valueDevPosition,
+						double chartZoomFactor);
 
 }

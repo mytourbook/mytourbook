@@ -131,7 +131,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.GRAPH_HR_ZONE_STYLE, TourChart.COMMAND_ID_HR_ZONE_STYLE_GRAPH_TOP);
 
 		store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE, 0xFF);
-		store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING, 0xAA);
+		store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING, 0x80);
 		store.setDefault(ITourbookPreferences.GRAPH_ANTIALIASING, true);
 
 		// show breaktime values

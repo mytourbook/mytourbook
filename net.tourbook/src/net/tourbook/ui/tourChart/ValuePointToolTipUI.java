@@ -79,17 +79,22 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 	private boolean							_isToolTipVisible;
 	private int								_currentValueIndex;
 	private int								_valueUnitDistance;
+	private double							_chartZoomFactor;
 
+	private int[]							_updateCounter					= new int[] { 0 };
+	private long							_lastUpdateUITime;
 	private boolean							_isHorizontal;
 
 	private final DateTimeFormatter			_dtFormatter					= DateTimeFormat.mediumDateTime();
 	private final NumberFormat				_nf1							= NumberFormat.getNumberInstance();
+	private final NumberFormat				_nf1min							= NumberFormat.getNumberInstance();
 	private final NumberFormat				_nf1NoGroup						= NumberFormat.getNumberInstance();
 	private final NumberFormat				_nf3							= NumberFormat.getNumberInstance();
 	private final NumberFormat				_nf3NoGroup						= NumberFormat.getNumberInstance();
 	{
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
+		_nf1min.setMinimumFractionDigits(1);
 		_nf3.setMinimumFractionDigits(3);
 		_nf3.setMaximumFractionDigits(3);
 
@@ -111,6 +116,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 	private int								_visibleAltimeterId;
 	private int								_visibleAltitudeId;
 	private int								_visibleCadenceId;
+	private int								_visibleChartZoomFactorId;
 	private int								_visibleDistanceId;
 	private int								_visibleGradientId;
 	private int								_visiblePaceId;
@@ -144,12 +150,12 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 	private Composite						_shellContainer;
 	private ToolBar							_toolbarControl;
 
-	private Label							_lblDataSerieCurrent;
-	private Label							_lblDataSerieMax;
-
 	private Label							_lblAltimeter;
 	private Label							_lblAltitude;
 	private Label							_lblCadence;
+	private Label							_lblChartZoomFactor;
+	private Label							_lblDataSerieCurrent;
+	private Label							_lblDataSerieMax;
 	private Label							_lblDistance;
 	private Label							_lblGradient;
 	private Label							_lblPace;
@@ -290,7 +296,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 
 		final Composite shell = createUI010Shell(parent);
 
-		updateUI(_currentValueIndex, true);
+		updateUI(_currentValueIndex);
 
 		if (_isHorizontal == false) {
 
@@ -379,6 +385,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 			createUI220Gradient(container);
 			createUI200Altimeter(container);
 			createUI210Cadence(container);
+			createUI211ChartZoomFactor(container);
 		}
 	}
 
@@ -415,7 +422,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 			_lblAltimeter = createUILabelValue(
 					container,
 					SWT.TRAIL,
-					7,
+					6,
 					Messages.Graph_Label_Altimeter,
 					GraphColorProvider.PREF_GRAPH_ALTIMETER);
 
@@ -424,6 +431,8 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 					SWT.LEAD,
 					Messages.Graph_Label_Altimeter,
 					GraphColorProvider.PREF_GRAPH_ALTIMETER);
+
+			_lblAltimeterUnit.setText(UI.UNIT_LABEL_ALTIMETER);
 		}
 		_firstColumnControls.add(_lblAltimeter);
 		_firstColumnContainerControls.add(container);
@@ -440,7 +449,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 			_lblAltitude = createUILabelValue(
 					container,
 					SWT.TRAIL,
-					9,
+					8,
 					Messages.Graph_Label_Altitude,
 					GraphColorProvider.PREF_GRAPH_ALTITUDE);
 
@@ -449,6 +458,8 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 					SWT.LEAD,
 					Messages.Graph_Label_Altitude,
 					GraphColorProvider.PREF_GRAPH_ALTITUDE);
+
+			_lblAltitudeUnit.setText(UI.UNIT_LABEL_ALTITUDE);
 		}
 		_firstColumnControls.add(_lblAltitude);
 		_firstColumnContainerControls.add(container);
@@ -465,7 +476,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 			_lblCadence = createUILabelValue(
 					container,
 					SWT.TRAIL,
-					4,
+					3,
 					Messages.Graph_Label_Cadence,
 					GraphColorProvider.PREF_GRAPH_CADENCE);
 
@@ -477,6 +488,29 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 		}
 		_firstColumnControls.add(_lblCadence);
 		_firstColumnContainerControls.add(container);
+	}
+
+	private void createUI211ChartZoomFactor(final Composite parent) {
+
+		if (_visibleChartZoomFactorId == 0) {
+			return;
+		}
+
+		final Composite container = createUIValueContainer(parent);
+		{
+
+			_lblChartZoomFactor = createUILabelValue(
+					container,
+					SWT.TRAIL,
+					8,
+					Messages.Tooltip_ValuePoint_Label_ChartZoomFactor_Tooltip,
+					null);
+
+			// spacer
+			new Label(container, SWT.NONE);
+		}
+
+		_firstColumnControls.add(_lblChartZoomFactor);
 	}
 
 	private void createUI215Distance(final Composite parent) {
@@ -499,6 +533,8 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 					SWT.LEAD,
 					Messages.Graph_Label_Distance,
 					GraphColorProvider.PREF_GRAPH_DISTANCE);
+
+			_lblDistanceUnit.setText(UI.UNIT_LABEL_DISTANCE);
 		}
 		_firstColumnControls.add(_lblDistance);
 		_firstColumnContainerControls.add(container);
@@ -515,7 +551,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 			_lblGradient = createUILabelValue(
 					container,
 					SWT.TRAIL,
-					6,
+					4,
 					Messages.Graph_Label_Gradient,
 					GraphColorProvider.PREF_GRAPH_GRADIENT);
 
@@ -540,7 +576,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 			_lblPace = createUILabelValue(
 					container,
 					SWT.TRAIL,
-					5,
+					4,
 					Messages.Graph_Label_Pace,
 					GraphColorProvider.PREF_GRAPH_PACE);
 
@@ -549,6 +585,8 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 					SWT.LEAD,
 					Messages.Graph_Label_Pace,
 					GraphColorProvider.PREF_GRAPH_PACE);
+
+			_lblPaceUnit.setText(UI.UNIT_LABEL_PACE);
 		}
 		_firstColumnControls.add(_lblPace);
 		_firstColumnContainerControls.add(container);
@@ -565,7 +603,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 			_lblPower = createUILabelValue(
 					container,
 					SWT.TRAIL,
-					5,
+					4,
 					Messages.Graph_Label_Power,
 					GraphColorProvider.PREF_GRAPH_POWER);
 
@@ -590,7 +628,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 			_lblPulse = createUILabelValue(
 					container,
 					SWT.TRAIL,
-					5,
+					3,
 					Messages.Graph_Label_Heartbeat,
 					GraphColorProvider.PREF_GRAPH_HEARTBEAT);
 
@@ -615,7 +653,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 			_lblSpeed = createUILabelValue(
 					container,
 					SWT.TRAIL,
-					6,
+					4,
 					Messages.Graph_Label_Speed,
 					GraphColorProvider.PREF_GRAPH_SPEED);
 
@@ -624,6 +662,8 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 					SWT.LEAD,
 					Messages.Graph_Label_Speed,
 					GraphColorProvider.PREF_GRAPH_SPEED);
+
+			_lblSpeedUnit.setText(UI.UNIT_LABEL_SPEED);
 		}
 		_firstColumnControls.add(_lblSpeed);
 		_firstColumnContainerControls.add(container);
@@ -640,7 +680,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 			_lblTemperature = createUILabelValue(
 					container,
 					SWT.TRAIL,
-					6,
+					4,
 					Messages.Graph_Label_Temperature,
 					GraphColorProvider.PREF_GRAPH_TEMPTERATURE);
 
@@ -649,6 +689,8 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 					SWT.LEAD,
 					Messages.Graph_Label_Temperature,
 					GraphColorProvider.PREF_GRAPH_TEMPTERATURE);
+
+			_lblTemperatureUnit.setText(UI.UNIT_LABEL_TEMPERATURE);
 		}
 		_firstColumnControls.add(_lblTemperature);
 		_firstColumnContainerControls.add(container);
@@ -665,7 +707,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 			_lblTimeDuration = createUILabelValue(
 					container,
 					SWT.TRAIL,
-					9,
+					8,
 					Messages.Graph_Label_TimeDuration,
 					GraphColorProvider.PREF_GRAPH_TIME);
 
@@ -691,7 +733,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 			_lblTimeOfDay = createUILabelValue(
 					container,
 					SWT.TRAIL,
-					9,
+					8,
 					Messages.Graph_Label_TimeOfDay,
 					GraphColorProvider.PREF_GRAPH_TIME);
 
@@ -820,7 +862,23 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 										final String tooltip,
 										final String colorId) {
 
-		final int charsWidth = chars == SWT.DEFAULT ? SWT.DEFAULT : _pc.convertWidthInCharsToPixels(chars);
+		final int charsWidth;
+		if (chars == SWT.DEFAULT) {
+
+			charsWidth = SWT.DEFAULT;
+
+		} else {
+
+			final StringBuilder sb = new StringBuilder();
+			sb.append('.');
+			for (int charIndex = 0; charIndex < chars; charIndex++) {
+				sb.append('8');
+			}
+
+			final GC gc = new GC(parent);
+			charsWidth = gc.textExtent(sb.toString()).x;
+			gc.dispose();
+		}
 
 		final Label label = new Label(parent, style);
 		GridDataFactory.fillDefaults()//
@@ -966,7 +1024,8 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 	public void setValueIndex(	final int valueIndex,
 								final int devXMouseMove,
 								final int devYMouseMove,
-								final Point valueDevPosition) {
+								final Point valueDevPosition,
+								final double chartZoomFactor) {
 
 		if (_tourData == null || _isToolTipVisible == false) {
 			return;
@@ -974,6 +1033,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 
 		_devXMouse = devXMouseMove;
 		_devYMouse = devYMouseMove;
+		_chartZoomFactor = chartZoomFactor;
 
 		if (_shellContainer == null || _shellContainer.isDisposed()) {
 
@@ -988,7 +1048,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 
 			setTTShellLocation(devXMouseMove, devYMouseMove, valueDevPosition);
 
-			updateUI(valueIndex, false);
+			updateUI(valueIndex);
 		}
 	}
 
@@ -1032,7 +1092,44 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 		return toolItem;
 	}
 
-	private void updateUI(int valueIndex, boolean isForceUpdate) {
+	private void updateUI(final int valueIndex) {
+
+		// get time when the redraw of the may is requested
+		final long requestedRedrawTime = System.currentTimeMillis();
+
+		if (requestedRedrawTime > _lastUpdateUITime + 100) {
+
+			// force a redraw
+
+			System.out.println("updateUI is forced\t");
+			// TODO remove SYSTEM.OUT.PRINTLN
+
+			updateUIRunnable(valueIndex);
+
+		} else {
+
+			_updateCounter[0]++;
+
+			_shellContainer.getDisplay().asyncExec(new Runnable() {
+
+				final int	__runnableCounter	= _updateCounter[0];
+
+				public void run() {
+
+					// update UI delayed
+					if (__runnableCounter != _updateCounter[0]) {
+						// a new update UI occured
+						return;
+					}
+
+					updateUIRunnable(valueIndex);
+				}
+			});
+		}
+
+	}
+
+	private void updateUIRunnable(int valueIndex) {
 
 		final int[] timeSerie = _tourData.timeSerie;
 
@@ -1041,25 +1138,23 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 			valueIndex = timeSerie.length;
 		}
 
-		// optimize update
-		if (isForceUpdate == false && valueIndex == _currentValueIndex) {
-			return;
-		}
-
-		isForceUpdate = false;
 		_currentValueIndex = valueIndex;
 
-		if (_visibleTimeSliceId != 0) {
-			_lblDataSerieCurrent.setText(Integer.toString(_currentValueIndex));
-			_lblDataSerieMax.setText(Integer.toString(timeSerie.length - 1));
+		if (_visibleAltimeterId != 0) {
+			_lblAltimeter.setText(Integer.toString((int) _tourData.getAltimeterSerie()[valueIndex]));
 		}
 
-		if (_visibleTimeDurationId != 0) {
-			_lblTimeDuration.setText(UI.format_hhh_mm_ss(timeSerie[valueIndex]));
+		if (_visibleAltitudeId != 0) {
+			_lblAltitude.setText(_nf3NoGroup.format(//
+					_tourData.getAltitudeSmoothedSerie()[valueIndex] / UI.UNIT_VALUE_ALTITUDE));
 		}
 
-		if (_visibleTimeOfDayId != 0) {
-			_lblTimeOfDay.setText(UI.format_hhh_mm_ss(_tourData.getStartTimeOfDay() + timeSerie[valueIndex]));
+		if (_visibleCadenceId != 0) {
+			_lblCadence.setText(Integer.toString((int) _tourData.cadenceSerie[valueIndex]));
+		}
+
+		if (_visibleChartZoomFactorId != 0) {
+			_lblChartZoomFactor.setText(_nf1.format(_chartZoomFactor));
 		}
 
 		if (_visibleDistanceId != 0) {
@@ -1067,27 +1162,18 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 			final float distance = _tourData.distanceSerie[valueIndex] / 1000 / UI.UNIT_VALUE_DISTANCE;
 
 			_lblDistance.setText(_nf3NoGroup.format(distance));
-			_lblDistanceUnit.setText(UI.UNIT_LABEL_DISTANCE);
 		}
 
-		if (_visibleAltitudeId != 0) {
-			_lblAltitude.setText(_nf3NoGroup.format(//
-					_tourData.getAltitudeSmoothedSerie()[valueIndex] / UI.UNIT_VALUE_ALTITUDE));
-			_lblAltitudeUnit.setText(UI.UNIT_LABEL_ALTITUDE);
-		}
-
-		if (_visiblePulseId != 0) {
-			_lblPulse.setText(Integer.toString((int) _tourData.pulseSerie[valueIndex]));
-		}
-
-		if (_visibleSpeedId != 0) {
-			_lblSpeed.setText(_nf1.format(_tourData.getSpeedSerie()[valueIndex]));
-			_lblSpeedUnit.setText(UI.UNIT_LABEL_SPEED);
+		if (_visibleGradientId != 0) {
+			_lblGradient.setText(_nf1.format(_tourData.getGradientSerie()[valueIndex]));
 		}
 
 		if (_visiblePaceId != 0) {
 			_lblPace.setText(_nf1.format(_tourData.getPaceSerie()[valueIndex]));
-			_lblPaceUnit.setText(UI.UNIT_LABEL_PACE);
+		}
+
+		if (_visiblePulseId != 0) {
+			_lblPulse.setText(Integer.toString((int) _tourData.pulseSerie[valueIndex]));
 		}
 
 		if (_visiblePowerId != 0) {
@@ -1104,22 +1190,26 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 			}
 
 			_lblTemperature.setText(_nf1.format(temperature));
-			_lblTemperatureUnit.setText(UI.UNIT_LABEL_TEMPERATURE);
 		}
 
-		if (_visibleGradientId != 0) {
-			_lblGradient.setText(_nf1.format(_tourData.getGradientSerie()[valueIndex]));
+		if (_visibleTimeSliceId != 0) {
+			_lblDataSerieCurrent.setText(Integer.toString(_currentValueIndex));
+			_lblDataSerieMax.setText(Integer.toString(timeSerie.length - 1));
 		}
 
-		if (_visibleAltimeterId != 0) {
-			_lblAltimeter.setText(Integer.toString((int) _tourData.getAltimeterSerie()[valueIndex]));
-			_lblAltimeterUnit.setText(UI.UNIT_LABEL_ALTIMETER);
+		if (_visibleTimeDurationId != 0) {
+			_lblTimeDuration.setText(UI.format_hhh_mm_ss(timeSerie[valueIndex]));
 		}
 
-		if (_visibleCadenceId != 0) {
-			_lblCadence.setText(Integer.toString((int) _tourData.cadenceSerie[valueIndex]));
+		if (_visibleTimeOfDayId != 0) {
+			_lblTimeOfDay.setText(UI.format_hhh_mm_ss(_tourData.getStartTimeOfDay() + timeSerie[valueIndex]));
 		}
 
+		if (_visibleSpeedId != 0) {
+			_lblSpeed.setText(_nf1.format(_tourData.getSpeedSerie()[valueIndex]));
+		}
+
+		_lastUpdateUITime = System.currentTimeMillis();
 	}
 
 	/**
@@ -1153,6 +1243,10 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 
 		_visibleCadenceId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_CADENCE) > 0
 				&& _tourData.cadenceSerie != null ? ValuePointToolTipMenuManager.VALUE_ID_CADENCE : 0;
+
+		_visibleChartZoomFactorId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_CHART_ZOOM_FACTOR) > 0
+				? ValuePointToolTipMenuManager.VALUE_ID_CHART_ZOOM_FACTOR
+				: 0;
 
 		_visibleDistanceId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_DISTANCE) > 0
 				&& _tourData.distanceSerie != null ? ValuePointToolTipMenuManager.VALUE_ID_DISTANCE : 0;
@@ -1188,6 +1282,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 		_visibleGraphsCount = (_visibleAltimeterId > 0 ? 1 : 0)
 				+ (_visibleAltitudeId > 0 ? 1 : 0)
 				+ (_visibleCadenceId > 0 ? 1 : 0)
+				+ (_visibleChartZoomFactorId > 0 ? 1 : 0)
 				+ (_visibleDistanceId > 0 ? 1 : 0)
 				+ (_visibleGradientId > 0 ? 1 : 0)
 				+ (_visiblePaceId > 0 ? 1 : 0)
@@ -1202,6 +1297,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 		_visibleGraphs = _visibleAltimeterId
 				+ _visibleAltitudeId
 				+ _visibleCadenceId
+				+ _visibleChartZoomFactorId
 				+ _visibleDistanceId
 				+ _visibleGradientId
 				+ _visiblePaceId

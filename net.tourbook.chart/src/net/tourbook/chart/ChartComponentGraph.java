@@ -388,14 +388,6 @@ public class ChartComponentGraph extends Canvas {
 	Rectangle							_clientArea;
 
 	/**
-	 * Time when the mouse has existed the graph component
-	 */
-	private long						_graphMouseExitTime;
-	private long						_toolTipMouseExitTime;
-	private boolean						_isMouseMovedFromGraph;
-	private boolean						_isMouseMovedFromToolTip;
-
-	/**
 	 * Time when the chart was painted the last time
 	 */
 	private long						_lastChartDrawingTime;
@@ -495,12 +487,12 @@ public class ChartComponentGraph extends Canvas {
 					drawSync020DraggedChart(event.gc);
 				} else {
 
-//					final long start = System.nanoTime();
+					final long start = System.nanoTime();
 
 					drawSync000onPaint(event.gc);
 
-//					System.out.println("onPaint\t" + (((double) System.nanoTime() - start) / 1000000) + "ms");
-//					// TODO remove SYSTEM.OUT.PRINTLN
+					System.out.println("onPaint\t" + (((double) System.nanoTime() - start) / 1000000) + "ms");
+					// TODO remove SYSTEM.OUT.PRINTLN
 				}
 			}
 		});
@@ -1635,7 +1627,8 @@ public class ChartComponentGraph extends Canvas {
 						_hoveredLineValueIndex,
 						_devXMouseMove,
 						_devYMouseMove,
-						_lineDevPositions.get(0)[_hoveredLineValueIndex]);
+						_lineDevPositions.get(0)[_hoveredLineValueIndex],
+						_graphZoomRatio);
 			}
 		}
 	}
@@ -4413,10 +4406,6 @@ public class ChartComponentGraph extends Canvas {
 
 		case SWT.MouseExit:
 
-			// keep time when mouse has exited the tooltip
-			_toolTipMouseExitTime = (event.time & 0xFFFFFFFFL);
-			_isMouseMovedFromToolTip = false;
-
 			break;
 
 		case SWT.MouseVerticalWheel:
@@ -4561,7 +4550,11 @@ public class ChartComponentGraph extends Canvas {
 				// test if the mouse is within a bar focus rectangle
 				if (lineRect != null) {
 
-					if (lineRect.contains(_devXMouseMove, _devYMouseMove)) {
+					// inline for lineRect.contains
+					if ((_devXMouseMove >= lineRect.x)
+							&& (_devYMouseMove >= lineRect.y)
+							&& _devXMouseMove < (lineRect.x + lineRect.width)
+							&& _devYMouseMove < (lineRect.y + lineRect.height)) {
 
 						// keep the hovered line index
 						_hoveredLineValueIndex = valueIndex;
@@ -5211,12 +5204,6 @@ public class ChartComponentGraph extends Canvas {
 
 	void onMouseEnterAxis(final MouseEvent event) {
 
-		// set true when mouse was moved from graph
-		_isMouseMovedFromGraph = _graphMouseExitTime == (event.time & 0xFFFFFFFFL);
-
-		// set true when mouse was moved from the tooltip
-		_isMouseMovedFromToolTip = _toolTipMouseExitTime == (event.time & 0xFFFFFFFFL);
-
 		// simulate a mouse move to do autoscrolling
 		onMouseMoveAxis(event);
 	}
@@ -5251,10 +5238,6 @@ public class ChartComponentGraph extends Canvas {
 			_isSliderDirty = true;
 			redraw();
 		}
-
-		// keep time when mouse has exited the graph
-		_graphMouseExitTime = (event.time & 0xFFFFFFFFL);
-		_isMouseMovedFromGraph = false;
 
 		setCursorStyle(event.y);
 	}
@@ -5440,7 +5423,8 @@ public class ChartComponentGraph extends Canvas {
 						_hoveredLineValueIndex,
 						_devXMouseMove,
 						_devYMouseMove,
-						_lineDevPositions.get(0)[_hoveredLineValueIndex]);
+						_lineDevPositions.get(0)[_hoveredLineValueIndex],
+						_graphZoomRatio);
 			}
 
 			isRedraw = true;
