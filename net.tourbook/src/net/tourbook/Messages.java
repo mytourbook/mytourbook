@@ -791,6 +791,10 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Checkbox_GraphAntialiasing_Tooltip;
 	public static String		Pref_Graphs_Checkbox_ShowHorizontalGrid;
 	public static String		Pref_Graphs_Checkbox_ShowVerticalGrid;
+	public static String	Pref_Graphs_Dialog_GridLine_Warning_Message;
+
+	public static String	Pref_Graphs_Dialog_GridLine_Warning_Title;
+
 	public static String		Pref_Graphs_Error_one_graph_must_be_selected;
 	public static String		Pref_Graphs_Error_value_must_be_integer;
 	public static String		Pref_Graphs_force_minimum_value;

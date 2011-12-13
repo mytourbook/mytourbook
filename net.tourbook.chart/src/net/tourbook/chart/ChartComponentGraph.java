@@ -396,6 +396,11 @@ public class ChartComponentGraph extends Canvas {
 	private boolean						_isMouseMovedFromToolTip;
 
 	/**
+	 * Time when the chart was painted the last time
+	 */
+	private long						_lastChartDrawingTime;
+
+	/**
 	 * Constructor
 	 * 
 	 * @param parent
@@ -1401,126 +1406,146 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private void drawAsync100StartPainting() {
 
-		_drawAsyncCounter[0]++;
+		// get time when the redraw of the may is requested
+		final long requestedRedrawTime = System.currentTimeMillis();
 
-		getDisplay().asyncExec(new Runnable() {
+		if (requestedRedrawTime > _lastChartDrawingTime + 100) {
 
-			final int	__runnableBgCounter	= _drawAsyncCounter[0];
+			// force a redraw
 
-			public void run() {
+			System.out.println("is forced\t");
+			// TODO remove SYSTEM.OUT.PRINTLN
 
-//				final long startTime = System.nanoTime();
-//				// TODO remove SYSTEM.OUT.PRINTLN
+			drawAsync101DoPainting();
 
-				/*
-				 * create the chart image only when a new onPaint event has not occured
-				 */
-				if (__runnableBgCounter != _drawAsyncCounter[0]) {
-					// a new onPaint event occured
-					return;
-				}
+		} else {
 
-				if (isDisposed()) {
-					// this widget is disposed
-					return;
-				}
+			_drawAsyncCounter[0]++;
 
-				if (_graphDrawingData.size() == 0) {
-					// drawing data are not set
-					return;
-				}
+			getDisplay().asyncExec(new Runnable() {
 
-				// ensure minimum size
-				final int devNewImageWidth = Math.max(ChartComponents.CHART_MIN_WIDTH, getDevVisibleChartWidth());
+				final int	__runnableBgCounter	= _drawAsyncCounter[0];
 
-				/*
-				 * the image size is adjusted to the client size but it must be within the min/max
-				 * ranges
-				 */
-				final int devNewImageHeight = Math.max(
-						ChartComponents.CHART_MIN_HEIGHT,
-						Math.min(getDevVisibleGraphHeight(), ChartComponents.CHART_MAX_HEIGHT));
+				public void run() {
 
-				/*
-				 * when the image is the same size as the new we will redraw it only if it is set to
-				 * dirty
-				 */
-				if (_isChartDirty == false && _chartImage20Chart != null) {
-
-					final Rectangle oldBounds = _chartImage20Chart.getBounds();
-
-					if (oldBounds.width == devNewImageWidth && oldBounds.height == devNewImageHeight) {
+					/*
+					 * create the chart image only when a new onPaint event has not occured
+					 */
+					if (__runnableBgCounter != _drawAsyncCounter[0]) {
+						// a new onPaint event occured
 						return;
 					}
+
+					drawAsync101DoPainting();
 				}
+			});
+		}
+	}
 
-				final Rectangle chartImageRect = new Rectangle(0, 0, devNewImageWidth, devNewImageHeight);
+	private void drawAsync101DoPainting() {
 
-				// ensure correct image size
-				if (chartImageRect.width <= 0 || chartImageRect.height <= 0) {
-					return;
-				}
+		final long startTime = System.nanoTime();
+		// TODO remove SYSTEM.OUT.PRINTLN
 
-				// create image on which the graph is drawn
-				if (Util.canReuseImage(_chartImage20Chart, chartImageRect) == false) {
-					_chartImage20Chart = Util.createImage(getDisplay(), _chartImage20Chart, chartImageRect);
-				}
+		if (isDisposed()) {
+			// this widget is disposed
+			return;
+		}
 
-				/*
-				 * The graph image is only a part where ONE single graph is painted without any
-				 * title or unit tick/values
-				 */
-				final int devGraphHeight = _graphDrawingData.get(0).devGraphHeight;
-				final Rectangle graphImageRect = new Rectangle(0, 0, //
-						devNewImageWidth,
-						devGraphHeight < 1 ? 1 : devGraphHeight + 1); // ensure valid height
+		if (_graphDrawingData.size() == 0) {
+			// drawing data are not set
+			return;
+		}
 
-				if (Util.canReuseImage(_chartImage10Graphs, graphImageRect) == false) {
-					_chartImage10Graphs = Util.createImage(getDisplay(), _chartImage10Graphs, graphImageRect);
-				}
+		// ensure minimum size
+		final int devNewImageWidth = Math.max(ChartComponents.CHART_MIN_WIDTH, getDevVisibleChartWidth());
 
-				// create chart context
-				final GC gcChart = new GC(_chartImage20Chart);
-				final GC gcGraph = new GC(_chartImage10Graphs);
-				{
-					gcChart.setFont(_chart.getFont());
+		/*
+		 * the image size is adjusted to the client size but it must be within the min/max ranges
+		 */
+		final int devNewImageHeight = Math.max(
+				ChartComponents.CHART_MIN_HEIGHT,
+				Math.min(getDevVisibleGraphHeight(), ChartComponents.CHART_MAX_HEIGHT));
 
-					// fill background
-					gcChart.setBackground(_chart.getBackgroundColor());
-					gcChart.fillRectangle(_chartImage20Chart.getBounds());
+		/*
+		 * when the image is the same size as the new we will redraw it only if it is set to dirty
+		 */
+		if (_isChartDirty == false && _chartImage20Chart != null) {
 
-					if (_chartComponents.errorMessage == null) {
+			final Rectangle oldBounds = _chartImage20Chart.getBounds();
 
-						drawAsync110GraphImage(gcChart, gcGraph);
-
-					} else {
-
-						// an error was set in the chart data model
-						drawSyncBg999ErrorMessage(gcChart);
-					}
-				}
-				gcChart.dispose();
-				gcGraph.dispose();
-
-				// remove dirty status
-				_isChartDirty = false;
-
-				// dragged image will be painted until the graph image is recomputed
-				_isPaintDraggedImage = false;
-
-				// force the overlay image to be redrawn
-				_isOverlayDirty = true;
-
-				redraw();
-
-//				final long endTime = System.nanoTime();
-//				System.out.println("draw100ChartImage: "
-//						+ (((double) endTime - startTime) / 1000000)
-//						+ " ms   #:"
-//						+ _drawCounter[0]);
-//				// TODO remove SYSTEM.OUT.PRINTLN
+			if (oldBounds.width == devNewImageWidth && oldBounds.height == devNewImageHeight) {
+				return;
 			}
-		});
+		}
+
+		final Rectangle chartImageRect = new Rectangle(0, 0, devNewImageWidth, devNewImageHeight);
+
+		// ensure correct image size
+		if (chartImageRect.width <= 0 || chartImageRect.height <= 0) {
+			return;
+		}
+
+		// create image on which the graph is drawn
+		if (Util.canReuseImage(_chartImage20Chart, chartImageRect) == false) {
+			_chartImage20Chart = Util.createImage(getDisplay(), _chartImage20Chart, chartImageRect);
+		}
+
+		/*
+		 * The graph image is only a part where ONE single graph is painted without any title or
+		 * unit tick/values
+		 */
+		final int devGraphHeight = _graphDrawingData.get(0).devGraphHeight;
+		final Rectangle graphImageRect = new Rectangle(0, 0, //
+				devNewImageWidth,
+				devGraphHeight < 1 ? 1 : devGraphHeight + 1); // ensure valid height
+
+		if (Util.canReuseImage(_chartImage10Graphs, graphImageRect) == false) {
+			_chartImage10Graphs = Util.createImage(getDisplay(), _chartImage10Graphs, graphImageRect);
+		}
+
+		// create chart context
+		final GC gcChart = new GC(_chartImage20Chart);
+		final GC gcGraph = new GC(_chartImage10Graphs);
+		{
+			gcChart.setFont(_chart.getFont());
+
+			// fill background
+			gcChart.setBackground(_chart.getBackgroundColor());
+			gcChart.fillRectangle(_chartImage20Chart.getBounds());
+
+			if (_chartComponents.errorMessage == null) {
+
+				drawAsync110GraphImage(gcChart, gcGraph);
+
+			} else {
+
+				// an error was set in the chart data model
+				drawSyncBg999ErrorMessage(gcChart);
+			}
+		}
+		gcChart.dispose();
+		gcGraph.dispose();
+
+		// remove dirty status
+		_isChartDirty = false;
+
+		// dragged image will be painted until the graph image is recomputed
+		_isPaintDraggedImage = false;
+
+		// force the overlay image to be redrawn
+		_isOverlayDirty = true;
+
+		redraw();
+
+		_lastChartDrawingTime = System.currentTimeMillis();
+
+		final long endTime = System.nanoTime();
+		System.out.println("drawAsync100: "
+				+ (((double) endTime - startTime) / 1000000)
+				+ " ms   #:"
+				+ _drawAsyncCounter[0]);
+		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 	/**
@@ -4246,23 +4271,6 @@ public class ChartComponentGraph extends Canvas {
 		}
 	}
 
-//	/**
-//	 * Fills the surrounding area of an rectangle with background color
-//	 *
-//	 * @param gc
-//	 * @param imageRect
-//	 */
-//	private void fillImagePadding(final GC gc, final Rectangle imageRect) {
-//
-//		final int clientHeight = getDevVisibleGraphHeight();
-//		final int visibleGraphWidth = getDevVisibleChartWidth();
-//
-//		gc.setBackground(_chart.getBackgroundColor());
-//
-//		gc.fillRectangle(imageRect.width, 0, visibleGraphWidth, clientHeight);
-//		gc.fillRectangle(0, imageRect.height, visibleGraphWidth, clientHeight);
-//	}
-
 	/**
 	 * @param rgb
 	 * @return Returns the color from the color cache, the color must not be disposed this is done
@@ -5970,44 +5978,6 @@ public class ChartComponentGraph extends Canvas {
 
 		_canAutoZoomToSlider = canAutoZoomToSlider;
 	}
-
-//	/**
-//	 * Set the scrolling cursor according to the vertical position of the mouse
-//	 *
-//	 * @param devX
-//	 * @param devY
-//	 *            vertical coordinat of the mouse in the graph
-//	 */
-//	private void setupScrollCursor(final int devX, final int devY) {
-//
-//		final int height = getDevVisibleGraphHeight();
-//		final int height4 = height / 4;
-//		final int height2 = height / 2;
-//
-//		final float oldValue = _scrollAcceleration;
-//
-//		_scrollAcceleration = devY < height4 ? 0.25f : devY < height2 ? 1 : devY > height - height4 ? 10 : 2;
-//
-//		// set cursor according to the position
-//		if (_scrollAcceleration == 0.25) {
-//			setCursor(_cursorHand05x);
-//		} else if (_scrollAcceleration == 1) {
-//			setCursor(_cursorHand);
-//		} else if (_scrollAcceleration == 2) {
-//			setCursor(_cursorHand2x);
-//		} else {
-//			setCursor(_cursorHand5x);
-//		}
-//
-//		/*
-//		 * when the acceleration has changed, the start positions for scrolling the graph must be
-//		 * set to the current location
-//		 */
-//		if (oldValue != _scrollAcceleration) {
-//			_startPosScrollbar = getHorizontalBar().getSelection();
-//			_startPosDev = devX;
-//		}
-//	}
 
 	/**
 	 * Move a zoomed chart so that the slider is visible.

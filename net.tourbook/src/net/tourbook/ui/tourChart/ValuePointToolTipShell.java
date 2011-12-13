@@ -52,8 +52,6 @@ public abstract class ValuePointToolTipShell {
 	private static final String		STATE_MOUSE_X_POSITION_RELATIVE		= "ValuePoint_ToolTip_MouseXPositionRelative";		//$NON-NLS-1$
 	private static final String		STATE_IS_TOOLTIP_ABOVE_VALUE_POINT	= "ValuePoint_ToolTip_IsToolTipAboveValuePoint";	//$NON-NLS-1$
 
-	private static final int		MAX_ANIMATION_COUNTER				= 10;
-
 	IDialogSettings					state;
 
 	private ITooltipOwner			_tooltipOwner;
@@ -119,6 +117,7 @@ public abstract class ValuePointToolTipShell {
 	private Display					_display;
 	private Runnable				_ttShellPositioningRunnable;
 	private int						_animationCounter;
+	private int						_repeatTime;
 
 	private class OwnerControlListener implements Listener {
 		public void handleEvent(final Event event) {
@@ -896,9 +895,8 @@ public abstract class ValuePointToolTipShell {
 
 		final int oldCounter = _animationCounter;
 
-//		_animationCounter = MAX_ANIMATION_COUNTER;
-
 		_animationCounter = 6;
+		_repeatTime = 30;
 
 		_fixedTTShellLocation = newLocation;
 
@@ -906,7 +904,7 @@ public abstract class ValuePointToolTipShell {
 		if (oldCounter == 0) {
 
 			// animation is not running, start a new animantion
-			_display.asyncExec(_ttShellPositioningRunnable);
+			_display.syncExec(_ttShellPositioningRunnable);
 		}
 	}
 
@@ -952,7 +950,7 @@ public abstract class ValuePointToolTipShell {
 
 		if (_animationCounter > 0) {
 			// start new animation
-			_display.timerExec(20, _ttShellPositioningRunnable);
+			_display.timerExec(_repeatTime, _ttShellPositioningRunnable);
 		}
 	}
 

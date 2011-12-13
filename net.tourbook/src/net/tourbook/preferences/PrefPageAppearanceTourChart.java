@@ -25,6 +25,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
 import net.tourbook.util.StringToArrayConverter;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
@@ -119,6 +120,8 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 	private Button					_rdoZoomFeatures;
 	private Button					_rdoSliderFeatures;
+
+	private boolean					_isGridLineWarningDisplayed					= false;
 
 	private static class Graph {
 
@@ -391,6 +394,13 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 	private void createUI32Grid(final Composite parent) {
 
+		final SelectionAdapter gridLineListener = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				onSelectGridLine();
+			}
+		};
+
 		final Group group = new Group(parent, SWT.NONE);
 		group.setText(Messages.Pref_Graphs_Group_Grid);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
@@ -457,6 +467,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 					.span(2, 1)
 					.applyTo(_chkShowHorizontalGridLines);
 			_chkShowHorizontalGridLines.setText(Messages.Pref_Graphs_Checkbox_ShowHorizontalGrid);
+			_chkShowHorizontalGridLines.addSelectionListener(gridLineListener);
 
 			/*
 			 * checkbox: show vertical grid
@@ -464,6 +475,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 			_chkShowVerticalGridLines = new Button(group, SWT.CHECK);
 			GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkShowVerticalGridLines);
 			_chkShowVerticalGridLines.setText(Messages.Pref_Graphs_Checkbox_ShowVerticalGrid);
+			_chkShowVerticalGridLines.addSelectionListener(gridLineListener);
 
 		}
 	}
@@ -873,6 +885,27 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	public boolean okToLeave() {
 		saveUIState();
 		return super.okToLeave();
+	}
+
+	private void onSelectGridLine() {
+
+		// show performance warning
+
+		if (_isGridLineWarningDisplayed) {
+			return;
+		}
+
+		// don't show warning when both are hidden
+		if (!_chkShowHorizontalGridLines.getSelection() && !_chkShowVerticalGridLines.getSelection()) {
+			return;
+		}
+
+		_isGridLineWarningDisplayed = true;
+
+		MessageDialog.openWarning(
+				getShell(),
+				Messages.Pref_Graphs_Dialog_GridLine_Warning_Title,
+				Messages.Pref_Graphs_Dialog_GridLine_Warning_Message);
 	}
 
 	@Override

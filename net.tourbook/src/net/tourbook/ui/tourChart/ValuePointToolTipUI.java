@@ -835,7 +835,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 
 		if (colorId == null) {
 			label.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
-		}else {
+		} else {
 			final Color fgColor = _colorCache.getColor(//
 					colorId, //
 					_colorProvider.getGraphColorDefinition(colorId).getTextColor());
@@ -876,7 +876,10 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 		_prefStore.removePropertyChangeListener(_prefChangeListener);
 
 		_colorCache.dispose();
-		_ttMenuMgr.dispose();
+
+		if (_ttMenuMgr != null) {
+			_ttMenuMgr.dispose();
+		}
 
 		_firstColumnControls.clear();
 		_firstColumnContainerControls.clear();
