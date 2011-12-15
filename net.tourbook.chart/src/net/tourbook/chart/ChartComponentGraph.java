@@ -487,16 +487,16 @@ public class ChartComponentGraph extends Canvas {
 					drawSync020DraggedChart(event.gc);
 				} else {
 
-					final long start = System.nanoTime();
-					System.out.println();
-					System.out.println("onPaint\tstart\t");
-					// TODO remove SYSTEM.OUT.PRINTLN
+//					final long start = System.nanoTime();
+//					System.out.println();
+//					System.out.println("onPaint\tstart\t");
+//					// TODO remove SYSTEM.OUT.PRINTLN
 
 					drawSync000onPaint(event.gc);
 
-					System.out.println("onPaint\tend\t" + (((double) System.nanoTime() - start) / 1000000) + "ms");
-					System.out.println();
-					// TODO remove SYSTEM.OUT.PRINTLN
+//					System.out.println("onPaint\tend\t" + (((double) System.nanoTime() - start) / 1000000) + "ms");
+//					System.out.println();
+//					// TODO remove SYSTEM.OUT.PRINTLN
 				}
 			}
 		});
@@ -1409,34 +1409,34 @@ public class ChartComponentGraph extends Canvas {
 
 		_drawAsyncCounter[0]++;
 
-		if (requestedRedrawTime > _lastChartDrawingTime + 100) {
+//		if (requestedRedrawTime > _lastChartDrawingTime + 100) {
+//
+//			// force a redraw
+//
+//			drawAsync101DoPainting();
+//
+//			return true;
+//
+//		} else {
+//
+		getDisplay().asyncExec(new Runnable() {
 
-			// force a redraw
+			final int	__runnableBgCounter	= _drawAsyncCounter[0];
 
-			drawAsync101DoPainting();
+			public void run() {
 
-			return true;
-
-		} else {
-
-			getDisplay().asyncExec(new Runnable() {
-
-				final int	__runnableBgCounter	= _drawAsyncCounter[0];
-
-				public void run() {
-
-					/*
-					 * create the chart image only when a new onPaint event has not occured
-					 */
-					if (__runnableBgCounter != _drawAsyncCounter[0]) {
-						// a new onPaint event occured
-						return;
-					}
-
-					drawAsync101DoPainting();
+				/*
+				 * create the chart image only when a new onPaint event has not occured
+				 */
+				if (__runnableBgCounter != _drawAsyncCounter[0]) {
+					// a new onPaint event occured
+					return;
 				}
-			});
-		}
+
+				drawAsync101DoPainting();
+			}
+		});
+//		}
 
 		return false;
 	}
@@ -1622,8 +1622,8 @@ public class ChartComponentGraph extends Canvas {
 			// draw graph image into the chart image
 			gcChart.drawImage(_chartImage10Graphs, 0, drawingData.getDevYTop());
 
-			System.out.println("20 <- 10\tdrawAsync110GraphImage");
-			// TODO remove SYSTEM.OUT.PRINTLN
+//			System.out.println("20 <- 10\tdrawAsync110GraphImage");
+//			// TODO remove SYSTEM.OUT.PRINTLN
 
 			graphIndex++;
 		}
@@ -2405,7 +2405,11 @@ public class ChartComponentGraph extends Canvas {
 			/*
 			 * draw line to current point
 			 */
-			if ((int) devX != (int) devXPrev || graphY1 == 0 || graphY2 == 0) {
+			if ((int) devX != (int) devXPrev || graphY1 == 0 || (isPath2 && graphY2 == 0)) {
+
+//				System.out.println(valueIndex + "\t" + graphY1 + "\t" + graphY2);
+//				// TODO remove SYSTEM.OUT.PRINTLN
+
 
 				// optimization: draw only ONE line for the current x-position
 				// but draw to the 0 line otherwise it's possible that a triangle is painted
@@ -3360,8 +3364,8 @@ public class ChartComponentGraph extends Canvas {
 			drawSync400OverlayImage();
 
 			if (_chartImage40Overlay != null) {
-				System.out.println("gc <- 40\tdrawSync010ImageChart");
-				// TODO remove SYSTEM.OUT.PRINTLN
+//				System.out.println("gc <- 40\tdrawSync010ImageChart");
+//				// TODO remove SYSTEM.OUT.PRINTLN
 
 				gc.drawImage(_chartImage40Overlay, 0, 0);
 			}
@@ -3370,8 +3374,8 @@ public class ChartComponentGraph extends Canvas {
 		} else {
 
 			if (_chartImage20Chart != null) {
-				System.out.println("gc <- 20");
-				// TODO remove SYSTEM.OUT.PRINTLN
+//				System.out.println("gc <- 20");
+//				// TODO remove SYSTEM.OUT.PRINTLN
 
 				gc.drawImage(_chartImage20Chart, 0, 0);
 			}
@@ -3453,8 +3457,8 @@ public class ChartComponentGraph extends Canvas {
 			 */
 			gcCustom.drawImage(_chartImage20Chart, 0, 0);
 
-			System.out.println("30 <- 20\tdrawSync300Image30Custom");
-			// TODO remove SYSTEM.OUT.PRINTLN
+//			System.out.println("30 <- 20\tdrawSync300Image30Custom");
+//			// TODO remove SYSTEM.OUT.PRINTLN
 
 			for (final GraphDrawingData graphDrawingData : _graphDrawingData) {
 
@@ -3519,8 +3523,8 @@ public class ChartComponentGraph extends Canvas {
 			gcOverlay.fillRectangle(graphImageRect);
 			gcOverlay.drawImage(_chartImage30Custom, 0, 0);
 
-			System.out.println("40 <- 30\tdrawSync400OverlayImage");
-			// TODO remove SYSTEM.OUT.PRINTLN
+//			System.out.println("40 <- 30\tdrawSync400OverlayImage");
+//			// TODO remove SYSTEM.OUT.PRINTLN
 
 			/*
 			 * draw x/y-sliders
