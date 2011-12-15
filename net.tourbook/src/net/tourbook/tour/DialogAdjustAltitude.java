@@ -118,9 +118,9 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 	private final IPreferenceStore			_prefStore							= TourbookPlugin.getDefault() //
 																						.getPreferenceStore();
-	private final IDialogSettings			_state								= TourbookPlugin.getDefault().//
-																						getDialogSettingsSection(
-																								"Dialog_AdjustAltitude");	//$NON-NLS-1$
+//	private final IDialogSettings			_state								= TourbookPlugin.getDefault().//
+//																						getDialogSettingsSection(
+//																								"Dialog_AdjustAltitude");	//$NON-NLS-1$
 
 	/*
 	 * data
@@ -414,7 +414,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 			final float srtmAltitude = _backupSrtmSerie[serieIndex];
 
 			diffTo2ndAlti[serieIndex] = 0;
-			adjustedAltiSerie[serieIndex] = srtmAltitude;
+			adjustedAltiSerie[serieIndex] = srtmAltitude / UI.UNIT_VALUE_ALTITUDE;
 		}
 	}
 
@@ -435,7 +435,8 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		final float[] xDataSerie = _tourChartConfig.isShowTimeOnXAxis ? //
 				_tourData.getTimeSerieFloat()
 				: _tourData.getDistanceSerie();
-		final float[] yDataSerie = _tourData.getAltitudeSerie();
+//		final float[] yDataSerie = _tourData.getAltitudeSerie();
+		final float[] yDataSerie = _tourData.altitudeSerie;
 
 		_sliderXAxisValue = xDataSerie[leftSliderIndex];
 		_altiDiff = _backupSrtmSerie[0] - yDataSerie[0];
@@ -471,27 +472,20 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 				} catch (final IllegalArgumentException e) {
 
 					System.out.println(e.getMessage());
-
-//					final double[] xValues = fTourData.splineDataPoints.xValues;
-//					System.out.println((xValues[0] + " ") // //$NON-NLS-1$
-//							+ (xValues[1] + " ") //$NON-NLS-1$
-//							+ (xValues[2] + " ")); //$NON-NLS-1$
-//
-//					e.printStackTrace();
-//					return;
 				}
 
 				final float adjustedAlti = newAltitude + splineAlti;
 
 				splineDataSerie[serieIndex] = splineAlti;
-				adjustedAltiSerie[serieIndex] = adjustedAlti;
+
+				adjustedAltiSerie[serieIndex] = adjustedAlti / UI.UNIT_VALUE_ALTITUDE;
 				diffTo2ndAlti[serieIndex] = srtmValue - adjustedAlti;
 
 			} else {
 
 				// set altitude which is not adjusted
 
-				adjustedAltiSerie[serieIndex] = yValue;
+				adjustedAltiSerie[serieIndex] = yValue / UI.UNIT_VALUE_ALTITUDE;
 				diffTo2ndAlti[serieIndex] = srtmValue - yValue;
 			}
 		}

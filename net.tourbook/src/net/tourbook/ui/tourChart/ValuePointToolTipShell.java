@@ -56,8 +56,6 @@ public abstract class ValuePointToolTipShell {
 
 	private ITooltipOwner			_tooltipOwner;
 
-	// Ensure that only one tooltip is active in time
-//	private static Shell			_ttShell;
 	private Shell					_ttShell;
 
 	private Object					_currentArea;
@@ -73,7 +71,6 @@ public abstract class ValuePointToolTipShell {
 	private int						_devXTTMouseDown;
 	private int						_devYTTMouseDown;
 	private int						_devXOwnerMouseMove;
-	private int						_devYOwnerMouseMove;
 
 	/**
 	 * Relative y position for the pinned location
@@ -105,19 +102,19 @@ public abstract class ValuePointToolTipShell {
 	private Point					_fixedTTShellLocation				= new Point(0, 0);
 
 	ValuePointToolTipPinLocation	pinnedLocation;
-
-	/*
-	 * UI resources
-	 */
-	private Cursor					_cursorDragged;
-
-	private Cursor					_cursorHand;
 	private boolean					_isSetDefaultLocation				= true;
 	private int						_edgeCoverOffset;
 	private Display					_display;
 	private Runnable				_ttShellPositioningRunnable;
 	private int						_animationCounter;
 	private int						_repeatTime;
+
+	/*
+	 * UI resources
+	 */
+	private Cursor					_cursorDragged;
+	private Cursor					_cursorHand;
+
 
 	private class OwnerControlListener implements Listener {
 		public void handleEvent(final Event event) {
@@ -143,13 +140,13 @@ public abstract class ValuePointToolTipShell {
 			switch (event.type) {
 			case SWT.Deactivate:
 
-				_ownerControl.getDisplay().asyncExec(new Runnable() {
+				_display.asyncExec(new Runnable() {
 
 					public void run() {
 
 						// hide tooltip when another shell is activated
 
-						if (_ownerControl.getDisplay().getActiveShell() != _ttShell) {
+						if (_display.getActiveShell() != _ttShell) {
 							toolTipHide(_ttShell, event);
 						}
 					}
@@ -282,7 +279,7 @@ public abstract class ValuePointToolTipShell {
 
 			if (_ttShell != null && !_ttShell.isDisposed() && _ownerControl != null && !_ownerControl.isDisposed()) {
 
-				_ownerControl.getDisplay().asyncExec(new Runnable() {
+				_display.asyncExec(new Runnable() {
 
 					public void run() {
 
@@ -296,10 +293,7 @@ public abstract class ValuePointToolTipShell {
 							return;
 						}
 
-						final Shell ownerControlShell = _ownerControl.getShell();
-						final Display ttShellDisplay = _ttShell.getDisplay();
-
-						if (ownerControlShell == ttShellDisplay.getActiveShell()) {
+						if (_ownerControl.getShell() == _ttShell.getDisplay().getActiveShell()) {
 
 							// don't hide when main window is active
 							return;
@@ -338,14 +332,8 @@ public abstract class ValuePointToolTipShell {
 
 		addOwnerControlListener();
 
-		_cursorDragged = new Cursor(_ownerControl.getDisplay(), SWT.CURSOR_SIZEALL);
-		_cursorHand = new Cursor(_ownerControl.getDisplay(), SWT.CURSOR_HAND);
-
-		_ownerControl.getDisplay().timerExec(100, new Runnable() {
-			public void run() {
-
-			}
-		});
+		_cursorDragged = new Cursor(_display, SWT.CURSOR_SIZEALL);
+		_cursorHand = new Cursor(_display, SWT.CURSOR_HAND);
 
 		_ttShellPositioningRunnable = new Runnable() {
 			public void run() {
@@ -444,7 +432,7 @@ public abstract class ValuePointToolTipShell {
 		Rectangle bounds;
 		final Point rightBounds = new Point(tipSize.x + location.x, tipSize.y + location.y);
 
-		final Monitor[] monitors = _ownerControl.getDisplay().getMonitors();
+		final Monitor[] monitors = _display.getMonitors();
 
 		if (monitors.length > 1) {
 			// By default present in the monitor of the control
@@ -462,7 +450,7 @@ public abstract class ValuePointToolTipShell {
 			}
 
 		} else {
-			bounds = _ownerControl.getDisplay().getBounds();
+			bounds = _display.getBounds();
 		}
 
 		if (!(bounds.contains(location) && bounds.contains(rightBounds))) {
@@ -699,7 +687,7 @@ public abstract class ValuePointToolTipShell {
 		final int screenOwnerTop = screenOwnerControlLocation.y;
 		final int screenOwnerBotton = screenOwnerTop + ownerHeight;
 
-		final Point screenTTLocation = _fixedTTShellLocation;//_ttShell.getBounds();
+		final Point screenTTLocation = _fixedTTShellLocation;
 		final Point ttSize = _ttShell.getSize();
 		final int ttWidth = ttSize.x;
 		final int ttHeight = ttSize.y;
@@ -878,7 +866,6 @@ public abstract class ValuePointToolTipShell {
 	void setTTShellLocation(final int devXMouseMove, final int devYMouseMove, final Point valueDevPosition) {
 
 		_devXOwnerMouseMove = devXMouseMove;
-		_devYOwnerMouseMove = devYMouseMove;
 
 		if (valueDevPosition == null) {
 			_ownerValueDevPosition = new Point(0, 0);
@@ -900,7 +887,6 @@ public abstract class ValuePointToolTipShell {
 
 		// check if animation is already running
 		if (oldCounter == 0) {
-
 
 			// animation is not running, start a new animantion
 			_display.syncExec(_ttShellPositioningRunnable);
@@ -1016,6 +1002,15 @@ public abstract class ValuePointToolTipShell {
 	 */
 	public void show(final Point location) {
 
+		/*
+		 * show tooltip only when this is the active shell, this check is necessary that when a tour
+		 * chart is opened in a dialog (e.g. adjust altitude) that a hidden tour chart tooltip in
+		 * the tour chart view is also displayed
+		 */
+		if (_display.getActiveShell() != _ownerControl.getShell()) {
+			return;
+		}
+
 		final Event event = new Event();
 		event.x = location.x;
 		event.y = location.y;
@@ -1101,14 +1096,7 @@ public abstract class ValuePointToolTipShell {
 
 			setTTShellLocation(false, false);
 
-//			// prevent to open tool tips when the owner is not the active shell
-//			final boolean isFocusControl = _ownerControl.getDisplay().getActiveShell() == _ownerControl.getShell();
-//			System.out.println("isFocusControl\t" + isFocusControl);
-//			// TODO remove SYSTEM.OUT.PRINTLN
-//
-//			if (isFocusControl) {
 			_ttShell.setVisible(true);
-//			}
 		}
 	}
 }

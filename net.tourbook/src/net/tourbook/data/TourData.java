@@ -3797,17 +3797,39 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	}
 
 	/**
-	 * @return Returns altitude smoothed values when they are set to be smoothed otherwise it
-	 *         returns normal altitude values or <code>null</code> when altitude is not available.
+	 * @param isForceSmoothing
+	 * @return Returns smoothed altitude values (according to the measurement system) when they are
+	 *         set to be smoothed otherwise it returns normal altitude values or <code>null</code>
+	 *         when altitude is not available.
 	 */
-	public float[] getAltitudeSmoothedSerie() {
+	public float[] getAltitudeSmoothedSerie(final boolean isForceSmoothing) {
 
 		if (altitudeSerie == null) {
 			return null;
 		}
 
-		// smooth altitude
-		computeSmoothedDataSeries();
+		if (isForceSmoothing) {
+
+			// smooth altitude
+			computeSmoothedDataSeries();
+
+		} else {
+
+			if (altitudeSerieSmoothed != null) {
+
+				// return already smoothed altitude values
+
+				if (UI.UNIT_VALUE_ALTITUDE != 1) {
+
+					// imperial system is used
+
+					return altitudeSerieImperialSmoothed;
+
+				} else {
+					return altitudeSerieSmoothed;
+				}
+			}
+		}
 
 		if (altitudeSerieSmoothed == null) {
 			// smoothed altitude values are not available

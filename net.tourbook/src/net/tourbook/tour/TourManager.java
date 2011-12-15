@@ -1759,7 +1759,7 @@ public class TourManager {
 		 */
 		ChartDataYSerie yDataAltitude = null;
 
-		final float[] altitudeSerie = tourData.getAltitudeSmoothedSerie();
+		final float[] altitudeSerie = tourData.getAltitudeSmoothedSerie(true);
 		if (altitudeSerie != null) {
 
 			if (tourData.isSRTMAvailable()) {

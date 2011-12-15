@@ -829,7 +829,7 @@ public class YearStatisticView extends ViewPart {
 		final ChartDataYSerie yData = new ChartDataYSerie(
 				ChartDataModel.CHART_TYPE_BAR,
 				ArrayListToArray.toFloat(_tourSpeed));
-		yData.setValueDivisor(10);
+
 		TourManager.setGraphColor(_prefStore, yData, GraphColorProvider.PREF_GRAPH_SPEED);
 
 		/*
@@ -839,8 +839,8 @@ public class YearStatisticView extends ViewPart {
 		final float minValue = yData.getVisibleMinValue();
 		final float maxValue = yData.getVisibleMaxValue();
 
-		final float dataMinValue = minValue - (minValue / 10);
-		final float dataMaxValue = maxValue + (maxValue / 20);
+		final float dataMinValue = minValue;// - (minValue / 100);
+		final float dataMaxValue = maxValue;// + (maxValue / 100);
 
 		if (_isSynchMaxValue) {
 
@@ -879,6 +879,12 @@ public class YearStatisticView extends ViewPart {
 
 		yData.setYTitle(Messages.tourCatalog_view_label_year_chart_title);
 		yData.setUnitLabel(UI.UNIT_LABEL_SPEED);
+
+		/*
+		 * ensure that painting of the bar is started at the bottom and not at the visible min which
+		 * is above the bottom !!!
+		 */
+		yData.setGraphFillMethod(ChartDataYSerie.BAR_DRAW_METHOD_BOTTOM);
 
 		chartModel.addYData(yData);
 

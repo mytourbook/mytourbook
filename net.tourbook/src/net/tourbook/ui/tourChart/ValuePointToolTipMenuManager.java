@@ -18,7 +18,6 @@ package net.tourbook.ui.tourChart;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
-import net.tourbook.util.Util;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -36,78 +35,77 @@ import org.eclipse.swt.widgets.Widget;
 
 public class ValuePointToolTipMenuManager {
 
-	static final int						VALUE_ID_ALTIMETER							= 1 << 1;
-	static final int						VALUE_ID_ALTITUDE							= 1 << 2;
-	static final int						VALUE_ID_CADENCE							= 1 << 3;
-	static final int						VALUE_ID_DISTANCE							= 1 << 4;
-	static final int						VALUE_ID_GRADIENT							= 1 << 5;
-	static final int						VALUE_ID_PACE								= 1 << 6;
-	static final int						VALUE_ID_POWER								= 1 << 7;
-	static final int						VALUE_ID_PULSE								= 1 << 8;
-	static final int						VALUE_ID_SPEED								= 1 << 9;
-	static final int						VALUE_ID_TEMPERATURE						= 1 << 10;
-	static final int						VALUE_ID_TIME_DURATION						= 1 << 11;
-	static final int						VALUE_ID_TIME_OF_DAY						= 1 << 12;
-	static final int						VALUE_ID_TIME_SLICES						= 1 << 13;
-	static final int						VALUE_ID_CHART_ZOOM_FACTOR					= 1 << 14;
+	static final int					VALUE_ID_ALTIMETER							= 1 << 1;
+	static final int					VALUE_ID_ALTITUDE							= 1 << 2;
+	static final int					VALUE_ID_CADENCE							= 1 << 3;
+	static final int					VALUE_ID_DISTANCE							= 1 << 4;
+	static final int					VALUE_ID_GRADIENT							= 1 << 5;
+	static final int					VALUE_ID_PACE								= 1 << 6;
+	static final int					VALUE_ID_POWER								= 1 << 7;
+	static final int					VALUE_ID_PULSE								= 1 << 8;
+	static final int					VALUE_ID_SPEED								= 1 << 9;
+	static final int					VALUE_ID_TEMPERATURE						= 1 << 10;
+	static final int					VALUE_ID_TIME_DURATION						= 1 << 11;
+	static final int					VALUE_ID_TIME_OF_DAY						= 1 << 12;
+	static final int					VALUE_ID_TIME_SLICES						= 1 << 13;
+	static final int					VALUE_ID_CHART_ZOOM_FACTOR					= 1 << 14;
 
-	static final String						STATE_VALUE_POINT_TOOLTIP_VISIBLE_GRAPHS	= "ValuePoint_ToolTip_VisibleGraphs";		//$NON-NLS-1$
-	static final String						STATE_VALUE_POINT_TOOLTIP_ORIENTATION		= "ValuePoint_ToolTip_Orientation";		//$NON-NLS-1$
+	static final String					STATE_VALUE_POINT_TOOLTIP_VISIBLE_GRAPHS	= "ValuePoint_ToolTip_VisibleGraphs";		//$NON-NLS-1$
+	static final String					STATE_VALUE_POINT_TOOLTIP_ORIENTATION		= "ValuePoint_ToolTip_Orientation";		//$NON-NLS-1$
 
-	static final int						DEFAULT_GRAPHS								= VALUE_ID_TIME_SLICES
-																								| VALUE_ID_TIME_DURATION
-																								| VALUE_ID_DISTANCE
+	static final int					DEFAULT_GRAPHS								= VALUE_ID_TIME_SLICES
+																							| VALUE_ID_TIME_DURATION
+																							| VALUE_ID_DISTANCE
 //																								| VALUE_ID_ALTITUDE
 //																								| VALUE_ID_PULSE
-																						//
-																						;
-	static ValuePointToolTipOrientation		DEFAULT_ORIENTATION							= ValuePointToolTipOrientation.Horizontal;
+																					//
+																					;
+	static ValuePointToolTipOrientation	DEFAULT_ORIENTATION							= ValuePointToolTipOrientation.Horizontal;
 
-	private IDialogSettings					_state;
-	private TourData						_tourData;
+	private IDialogSettings				_state;
+	private TourData					_tourData;
 
-	private ValuePointToolTipUI				_valuePointToolTipUI;
+	private ValuePointToolTipUI			_valuePointToolTipUI;
 
-	private Menu							_menu										= null;
+	private Menu						_menu										= null;
 
-	private int								_ttVisibleGraphs;
-
-	private ValuePointToolTipOrientation	_selectedOrientation;
+	private int							_allVisibleValues;
+	private boolean						_isHorizontal;
 
 	/**
 	 * Parent of this tool item is the parent for the tooltip menu.
 	 */
-	private ToolItem						_menuParentItem;
+	private ToolItem					_menuParentItem;
 
-	private ActionHideToolTip				_actionHideToolTip;
-	private ActionCloseTTContextMenu		_actionCloseTTContextMenu;
+	private ActionHideToolTip			_actionHideToolTip;
+	private ActionCloseTTContextMenu	_actionCloseTTContextMenu;
 
-	private ActionOrientation				_actionHorizontalOrientation;
-	private ActionOrientation				_actionVerticalOrientation;
+	private ActionOrientation			_actionHorizontalOrientation;
+	private ActionOrientation			_actionVerticalOrientation;
 
-	private ActionValueItem					_actionValueAltimeter;
-	private ActionValueItem					_actionValueAltitude;
-	private ActionValueItem					_actionValueCadence;
-	private ActionValueItem					_actionValueChartZoomFactor;
-	private ActionValueItem					_actionValueDistance;
-	private ActionValueItem					_actionValueGradient;
-	private ActionValueItem					_actionValueHeader;
-	private ActionValueItem					_actionValuePace;
-	private ActionValueItem					_actionValuePower;
-	private ActionValueItem					_actionValuePulse;
-	private ActionValueItem					_actionValueSpeed;
-	private ActionValueItem					_actionValueTemperature;
-	private ActionValueItem					_actionValueTimeDuration;
-	private ActionValueItem					_actionValueTimeOfDay;
-	private ActionValueItem					_actionValueTimeSlices;
+	private ActionValueItem				_actionValueAltimeter;
+	private ActionValueItem				_actionValueAltitude;
+	private ActionValueItem				_actionValueCadence;
+	private ActionValueItem				_actionValueChartZoomFactor;
+	private ActionValueItem				_actionValueDistance;
+	private ActionValueItem				_actionValueGradient;
+	private ActionValueItem				_actionValueHeader;
+	private ActionValueItem				_actionValuePace;
+	private ActionValueItem				_actionValuePower;
+	private ActionValueItem				_actionValuePulse;
+	private ActionValueItem				_actionValueSpeed;
+	private ActionValueItem				_actionValueTemperature;
+	private ActionValueItem				_actionValueTimeDuration;
+	private ActionValueItem				_actionValueTimeOfDay;
+	private ActionValueItem				_actionValueTimeSlices;
 
-	private Action							_actionPinLocationHeader;
-	private ActionPinLocation				_actionPinLocationScreen;
-	private ActionPinLocation				_actionPinLocationTopRight;
-	private ActionPinLocation				_actionPinLocationTopLeft;
-	private ActionPinLocation				_actionPinLocationBottomLeft;
-	private ActionPinLocation				_actionPinLocationBottomRight;
-	private ActionPinLocation				_actionPinLocationMouseXPosition;
+	private Action						_actionPinLocationHeader;
+	private ActionPinLocation			_actionPinLocationScreen;
+	private ActionPinLocation			_actionPinLocationTopRight;
+	private ActionPinLocation			_actionPinLocationTopLeft;
+	private ActionPinLocation			_actionPinLocationBottomLeft;
+	private ActionPinLocation			_actionPinLocationBottomRight;
+	private ActionPinLocation			_actionPinLocationMouseXPosition;
 
 	private final class ActionCloseTTContextMenu extends Action {
 
@@ -212,7 +210,7 @@ public class ValuePointToolTipMenuManager {
 
 		@Override
 		public void run() {
-			reopenToolTip(_graphId, isChecked());
+			actionValueItem(_graphId, isChecked());
 		}
 
 		private void setState(final boolean isChecked, final boolean isEnabled) {
@@ -232,6 +230,50 @@ public class ValuePointToolTipMenuManager {
 		_state = state;
 
 		createActions();
+	}
+
+	/**
+	 * Show/hide value and reopen the tool tip with the new or hidden value.
+	 * 
+	 * @param graphId
+	 *            Graph id which should be displayed/hidden.
+	 * @param isChecked
+	 */
+	private void actionValueItem(final int graphId, final boolean isChecked) {
+
+		final int currentVisibleValues = _allVisibleValues;
+
+		if (isChecked) {
+
+			// display additional graph
+
+			_allVisibleValues = currentVisibleValues | graphId;
+
+		} else {
+
+			// remove graph
+
+			/**
+			 * <pre>
+			 * a = 0011
+			 * b = 0110
+			 * a|b = 0111
+			 * a&b = 0010
+			 * a^b = 0101
+			 * ~a&b|a&~b = 0101
+			 * ~a = 1100
+			 * </pre>
+			 */
+			_allVisibleValues = (~currentVisibleValues & graphId) | (currentVisibleValues & ~graphId);
+		}
+
+		_state.put(STATE_VALUE_POINT_TOOLTIP_VISIBLE_GRAPHS, _allVisibleValues);
+
+		// update tooltip with new/removed graphs
+		final ToolItem toolItem = _valuePointToolTipUI.updateUIVisibleValues(_allVisibleValues);
+
+		// reopen context menu
+		openToolTipMenu10Reopen(toolItem);
 	}
 
 	private void addItem(final Action action) {
@@ -395,59 +437,59 @@ public class ValuePointToolTipMenuManager {
 		_actionValueHeader.setEnabled(false);
 
 		_actionValueAltimeter.setState(
-				(_ttVisibleGraphs & VALUE_ID_ALTIMETER) > 0,
+				(_allVisibleValues & VALUE_ID_ALTIMETER) > 0,
 				_tourData.getAltimeterSerie() != null);
 
 		_actionValueAltitude.setState( //
-				(_ttVisibleGraphs & VALUE_ID_ALTITUDE) > 0,
+				(_allVisibleValues & VALUE_ID_ALTITUDE) > 0,
 				_tourData.getAltitudeSerie() != null);
 
 		_actionValueCadence.setState( //
-				(_ttVisibleGraphs & VALUE_ID_CADENCE) > 0,
+				(_allVisibleValues & VALUE_ID_CADENCE) > 0,
 				_tourData.cadenceSerie != null);
 
 		_actionValueChartZoomFactor.setState( //
-				(_ttVisibleGraphs & VALUE_ID_CHART_ZOOM_FACTOR) > 0,
+				(_allVisibleValues & VALUE_ID_CHART_ZOOM_FACTOR) > 0,
 				true);
 
 		_actionValueDistance.setState( //
-				(_ttVisibleGraphs & VALUE_ID_DISTANCE) > 0,
+				(_allVisibleValues & VALUE_ID_DISTANCE) > 0,
 				_tourData.distanceSerie != null);
 
 		_actionValueGradient.setState( //
-				(_ttVisibleGraphs & VALUE_ID_GRADIENT) > 0,
+				(_allVisibleValues & VALUE_ID_GRADIENT) > 0,
 				_tourData.getGradientSerie() != null);
 
 		_actionValuePace.setState( //
-				(_ttVisibleGraphs & VALUE_ID_PACE) > 0,
+				(_allVisibleValues & VALUE_ID_PACE) > 0,
 				_tourData.getPaceSerie() != null);
 
 		_actionValuePower.setState( //
-				(_ttVisibleGraphs & VALUE_ID_POWER) > 0,
+				(_allVisibleValues & VALUE_ID_POWER) > 0,
 				_tourData.getPowerSerie() != null);
 
 		_actionValuePulse.setState( //
-				(_ttVisibleGraphs & VALUE_ID_PULSE) > 0,
+				(_allVisibleValues & VALUE_ID_PULSE) > 0,
 				_tourData.pulseSerie != null);
 
 		_actionValueSpeed.setState( //
-				(_ttVisibleGraphs & VALUE_ID_SPEED) > 0,
+				(_allVisibleValues & VALUE_ID_SPEED) > 0,
 				_tourData.getSpeedSerie() != null);
 
 		_actionValueTemperature.setState( //
-				(_ttVisibleGraphs & VALUE_ID_TEMPERATURE) > 0,
+				(_allVisibleValues & VALUE_ID_TEMPERATURE) > 0,
 				_tourData.temperatureSerie != null);
 
 		_actionValueTimeDuration.setState( //
-				(_ttVisibleGraphs & VALUE_ID_TIME_DURATION) > 0,
+				(_allVisibleValues & VALUE_ID_TIME_DURATION) > 0,
 				_tourData.timeSerie != null);
 
 		_actionValueTimeOfDay.setState( //
-				(_ttVisibleGraphs & VALUE_ID_TIME_OF_DAY) > 0,
+				(_allVisibleValues & VALUE_ID_TIME_OF_DAY) > 0,
 				_tourData.timeSerie != null);
 
 		_actionValueTimeSlices.setState( //
-				(_ttVisibleGraphs & VALUE_ID_TIME_SLICES) > 0,
+				(_allVisibleValues & VALUE_ID_TIME_SLICES) > 0,
 				true);
 	}
 
@@ -494,7 +536,7 @@ public class ValuePointToolTipMenuManager {
 		(new Separator()).fill(_menu, -1);
 
 		// show the other orientation
-		if (_selectedOrientation == ValuePointToolTipOrientation.Horizontal) {
+		if (_isHorizontal) {
 			addItem(_actionVerticalOrientation);
 		} else {
 			addItem(_actionHorizontalOrientation);
@@ -516,22 +558,19 @@ public class ValuePointToolTipMenuManager {
 	 * 
 	 * @param event
 	 * @param tourData
+	 * @param isHorizontal
+	 * @param allVisibleValues
 	 * @param state
 	 */
-	void openToolTipMenu(final Event event, final TourData tourData) {
+	void openToolTipMenu(	final Event event,
+							final TourData tourData,
+							final int allVisibleValues,
+							final boolean isHorizontal) {
 
 		_tourData = tourData;
 
-		// get visible graphs
-		_ttVisibleGraphs = Util.getStateInt(_state, STATE_VALUE_POINT_TOOLTIP_VISIBLE_GRAPHS, DEFAULT_GRAPHS);
-
-		// tooltip orientation
-		final String stateOrientation = Util.getStateString(
-				_state,
-				STATE_VALUE_POINT_TOOLTIP_ORIENTATION,
-				DEFAULT_ORIENTATION.name());
-
-		_selectedOrientation = ValuePointToolTipOrientation.valueOf(stateOrientation);
+		_allVisibleValues = allVisibleValues;
+		_isHorizontal = isHorizontal;
 
 		// open and position drop down menu below the action button
 		final Widget item = event.widget;
@@ -554,49 +593,5 @@ public class ValuePointToolTipMenuManager {
 
 		menu.setLocation(topLeft.x, topLeft.y);
 		menu.setVisible(true);
-	}
-
-	/**
-	 * Reopens the tool tip with different graphs.
-	 * 
-	 * @param graphId
-	 *            Graph id which should be displayed/hidden.
-	 * @param isChecked
-	 */
-	private void reopenToolTip(final int graphId, final boolean isChecked) {
-
-		final int currentVisibleGraphs = _ttVisibleGraphs;
-
-		if (isChecked) {
-
-			// display additional graph
-
-			_ttVisibleGraphs = currentVisibleGraphs | graphId;
-
-		} else {
-
-			// remove graph
-
-			/**
-			 * <pre>
-			 * a = 0011
-			 * b = 0110
-			 * a|b = 0111
-			 * a&b = 0010
-			 * a^b = 0101
-			 * ~a&b|a&~b = 0101
-			 * ~a = 1100
-			 * </pre>
-			 */
-			_ttVisibleGraphs = (~currentVisibleGraphs & graphId) | (currentVisibleGraphs & ~graphId);
-		}
-
-		_state.put(STATE_VALUE_POINT_TOOLTIP_VISIBLE_GRAPHS, _ttVisibleGraphs);
-
-		// update tooltip with new/removed graphs
-		final ToolItem toolItem = _valuePointToolTipUI.updateUI();
-
-		// reopen context menu
-		openToolTipMenu10Reopen(toolItem);
 	}
 }

@@ -488,10 +488,14 @@ public class ChartComponentGraph extends Canvas {
 				} else {
 
 					final long start = System.nanoTime();
+					System.out.println();
+					System.out.println("onPaint\tstart\t");
+					// TODO remove SYSTEM.OUT.PRINTLN
 
 					drawSync000onPaint(event.gc);
 
-					System.out.println("onPaint\t" + (((double) System.nanoTime() - start) / 1000000) + "ms");
+					System.out.println("onPaint\tend\t" + (((double) System.nanoTime() - start) / 1000000) + "ms");
+					System.out.println();
 					// TODO remove SYSTEM.OUT.PRINTLN
 				}
 			}
@@ -1395,24 +1399,25 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Draw the graphs into the chart+graph image
+	 * 
+	 * @return Return <code>true</code> when the graph was painted directly and not in async mode
 	 */
-	private void drawAsync100StartPainting() {
+	private boolean drawAsync100StartPainting() {
 
 		// get time when the redraw of the may is requested
 		final long requestedRedrawTime = System.currentTimeMillis();
+
+		_drawAsyncCounter[0]++;
 
 		if (requestedRedrawTime > _lastChartDrawingTime + 100) {
 
 			// force a redraw
 
-			System.out.println("is forced\t");
-			// TODO remove SYSTEM.OUT.PRINTLN
-
 			drawAsync101DoPainting();
 
-		} else {
+			return true;
 
-			_drawAsyncCounter[0]++;
+		} else {
 
 			getDisplay().asyncExec(new Runnable() {
 
@@ -1432,6 +1437,8 @@ public class ChartComponentGraph extends Canvas {
 				}
 			});
 		}
+
+		return false;
 	}
 
 	private void drawAsync101DoPainting() {
@@ -1532,12 +1539,12 @@ public class ChartComponentGraph extends Canvas {
 
 		_lastChartDrawingTime = System.currentTimeMillis();
 
-		final long endTime = System.nanoTime();
-		System.out.println("drawAsync100: "
-				+ (((double) endTime - startTime) / 1000000)
-				+ " ms   #:"
-				+ _drawAsyncCounter[0]);
-		// TODO remove SYSTEM.OUT.PRINTLN
+//		final long endTime = System.nanoTime();
+//		System.out.println("drawAsync100: "
+//				+ (((double) endTime - startTime) / 1000000)
+//				+ " ms   #:"
+//				+ _drawAsyncCounter[0]);
+//		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 	/**
@@ -1614,6 +1621,9 @@ public class ChartComponentGraph extends Canvas {
 
 			// draw graph image into the chart image
 			gcChart.drawImage(_chartImage10Graphs, 0, drawingData.getDevYTop());
+
+			System.out.println("20 <- 10\tdrawAsync110GraphImage");
+			// TODO remove SYSTEM.OUT.PRINTLN
 
 			graphIndex++;
 		}
@@ -2777,6 +2787,7 @@ public class ChartComponentGraph extends Canvas {
 		final ChartDataXSerie xData = drawingData.getXData();
 		final ChartDataYSerie yData = drawingData.getYData();
 		final int[][] colorsIndex = yData.getColorsIndex();
+		final int graphFillMethod = yData.getGraphFillMethod();
 
 		gcGraph.setLineStyle(SWT.LINE_SOLID);
 
@@ -2789,7 +2800,7 @@ public class ChartComponentGraph extends Canvas {
 		final float scaleX = drawingData.getScaleX();
 		final float scaleY = drawingData.getScaleY();
 		final float graphYBorderBottom = drawingData.getGraphYBottom();
-		final boolean axisDirection = yData.isYAxisDirection();
+		final boolean isBottomTop = yData.isYAxisDirection();
 
 		// get the horizontal offset for the graph
 		float graphValueOffset;
@@ -2868,15 +2879,24 @@ public class ChartComponentGraph extends Canvas {
 					devXPos -= devBarWidth2;
 				}
 
-				float valueYLow;
-				if (yLowValues == null) {
-					valueYLow = yData.getVisibleMinValue();
+				float valueYLow = 0;
+
+				if (graphFillMethod == ChartDataYSerie.BAR_DRAW_METHOD_BOTTOM) {
+
+					// draw at the bottom
+					valueYLow = graphYBorderBottom;
+
 				} else {
-					// check array bounds
-					if (valueIndex >= yLowValues.length) {
-						break;
+
+					if (yLowValues == null) {
+						valueYLow = yData.getVisibleMinValue();
+					} else {
+						// check array bounds
+						if (valueIndex >= yLowValues.length) {
+							break;
+						}
+						valueYLow = yLowValues[valueIndex];
 					}
-					valueYLow = yLowValues[valueIndex];
 				}
 
 				// check array bounds
@@ -2903,7 +2923,7 @@ public class ChartComponentGraph extends Canvas {
 				 */
 				int devYPosChart;
 				int devYPosCanvas;
-				if (axisDirection) {
+				if (isBottomTop) {
 
 					final int devYBar = (int) ((valueYHigh - graphYBorderBottom) * scaleY) + devYPreviousHeight;
 
@@ -3255,50 +3275,53 @@ public class ChartComponentGraph extends Canvas {
 			return;
 		}
 
+		boolean isPaintedDirectly = false;
+
 		if (_isChartDirty) {
 
-			// paint chart
+			// draw chart
 
-			drawAsync100StartPainting();
+			isPaintedDirectly = drawAsync100StartPainting();
 
-			if (_isPaintDraggedImage) {
+			if (isPaintedDirectly == false) {
 
 				/*
 				 * paint dragged chart until the chart is recomputed
 				 */
-				drawSync020DraggedChart(gc);
-				return;
-			}
-
-			// prevent flickering the graph
-
-			/*
-			 * mac osx is still flickering, added the drawChartImage in version 1.0
-			 */
-			if (_chartImage20Chart != null) {
-
-				final Image image = drawSync010ImageChart(gc);
-				if (image == null) {
+				if (_isPaintDraggedImage) {
+					drawSync020DraggedChart(gc);
 					return;
 				}
 
-				final int gcHeight = _clientArea.height;
-				final int imageHeight = image.getBounds().height;
+				/*
+				 * mac osx is still flickering, added the drawChartImage in version 1.0
+				 */
+				if (_chartImage20Chart != null) {
 
-				if (gcHeight > imageHeight) {
+					final Image image = drawSync010ImageChart(gc);
+					if (image == null) {
+						return;
+					}
 
-					// fill the gap between the image and the drawable area
-					gc.setBackground(_chart.getBackgroundColor());
-					gc.fillRectangle(0, imageHeight, _clientArea.width, _clientArea.height - imageHeight);
+					final int gcHeight = _clientArea.height;
+					final int imageHeight = image.getBounds().height;
 
+					if (gcHeight > imageHeight) {
+
+						// fill the gap between the image and the drawable area
+						gc.setBackground(_chart.getBackgroundColor());
+						gc.fillRectangle(0, imageHeight, _clientArea.width, _clientArea.height - imageHeight);
+
+					} else {
+						gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+					}
 				} else {
-					gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+					gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 				}
-			} else {
-				gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 			}
+		}
 
-		} else {
+		if (_isChartDirty == false || isPaintedDirectly) {
 
 			/*
 			 * if the graph is not yet drawn (because this is done in another thread) there is
@@ -3310,6 +3333,13 @@ public class ChartComponentGraph extends Canvas {
 				gc.fillRectangle(_clientArea);
 				gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 				return;
+			}
+
+			// redraw() is done in async painting but NOT after images are painted
+			if (isPaintedDirectly) {
+
+//				System.out.println("isPaintedDirectly\t");
+//				// TODO remove SYSTEM.OUT.PRINTLN
 			}
 
 			drawSync300Image30Custom();
@@ -3330,6 +3360,9 @@ public class ChartComponentGraph extends Canvas {
 			drawSync400OverlayImage();
 
 			if (_chartImage40Overlay != null) {
+				System.out.println("gc <- 40\tdrawSync010ImageChart");
+				// TODO remove SYSTEM.OUT.PRINTLN
+
 				gc.drawImage(_chartImage40Overlay, 0, 0);
 			}
 			return _chartImage40Overlay;
@@ -3337,6 +3370,9 @@ public class ChartComponentGraph extends Canvas {
 		} else {
 
 			if (_chartImage20Chart != null) {
+				System.out.println("gc <- 20");
+				// TODO remove SYSTEM.OUT.PRINTLN
+
 				gc.drawImage(_chartImage20Chart, 0, 0);
 			}
 			return _chartImage20Chart;
@@ -3417,6 +3453,9 @@ public class ChartComponentGraph extends Canvas {
 			 */
 			gcCustom.drawImage(_chartImage20Chart, 0, 0);
 
+			System.out.println("30 <- 20\tdrawSync300Image30Custom");
+			// TODO remove SYSTEM.OUT.PRINTLN
+
 			for (final GraphDrawingData graphDrawingData : _graphDrawingData) {
 
 				final ArrayList<IChartLayer> customFgLayers = graphDrawingData.getYData().getCustomForegroundLayers();
@@ -3479,6 +3518,9 @@ public class ChartComponentGraph extends Canvas {
 			 */
 			gcOverlay.fillRectangle(graphImageRect);
 			gcOverlay.drawImage(_chartImage30Custom, 0, 0);
+
+			System.out.println("40 <- 30\tdrawSync400OverlayImage");
+			// TODO remove SYSTEM.OUT.PRINTLN
 
 			/*
 			 * draw x/y-sliders

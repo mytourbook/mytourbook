@@ -34,7 +34,6 @@ import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -53,8 +52,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 /**
  * This tooltip is displayed when the mouse is hovered over a value point in a line graph and
@@ -62,8 +59,7 @@ import org.joda.time.format.DateTimeFormatter;
  */
 public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValuePointToolTip {
 
-	private final IPreferenceStore			_prefStore						= TourbookPlugin
-																					.getDefault()
+	private final IPreferenceStore			_prefStore						= TourbookPlugin.getDefault() //
 																					.getPreferenceStore();
 
 	private IPropertyChangeListener			_prefChangeListener;
@@ -76,6 +72,9 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 	private int								_devXMouse;
 	private int								_devYMouse;
 
+	/**
+	 * Global state if the tooltip is visible.
+	 */
 	private boolean							_isToolTipVisible;
 	private int								_currentValueIndex;
 	private int								_valueUnitDistance;
@@ -85,7 +84,6 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 	private long							_lastUpdateUITime;
 	private boolean							_isHorizontal;
 
-	private final DateTimeFormatter			_dtFormatter					= DateTimeFormat.mediumDateTime();
 	private final NumberFormat				_nf1							= NumberFormat.getNumberInstance();
 	private final NumberFormat				_nf1min							= NumberFormat.getNumberInstance();
 	private final NumberFormat				_nf1NoGroup						= NumberFormat.getNumberInstance();
@@ -110,8 +108,8 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 	/**
 	 * Contains all visible graph id's
 	 */
-	private int								_visibleGraphs;
-	private int								_visibleGraphsCount;
+	private int								_allVisibleValues;
+	private int								_allVisibleValuesCount;
 
 	private int								_visibleAltimeterId;
 	private int								_visibleAltitudeId;
@@ -126,7 +124,6 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 	private int								_visibleTemperatureId;
 	private int								_visibleTimeDurationId;
 	private int								_visibleTimeOfDayId;
-
 	private int								_visibleTimeSliceId;
 
 	/*
@@ -134,10 +131,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 	 */
 	private Color							_fgColor;
 	private Color							_bgColor;
-	private Color							_fgToolbar;
 	private Color							_fgBorder;
-//	private Font							_boldFont;
-	private PixelConverter					_pc;
 	private final ColorCache				_colorCache						= new ColorCache();
 	private final GraphColorProvider		_colorProvider					= GraphColorProvider.getInstance();
 
@@ -184,7 +178,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 
 		@Override
 		public void runWithEvent(final Event event) {
-			_ttMenuMgr.openToolTipMenu(event, _tourData);
+			_ttMenuMgr.openToolTipMenu(event, _tourData, _allVisibleValues, _isHorizontal);
 		}
 	}
 
@@ -192,7 +186,23 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 
 		super(tooltipOwner, state);
 
+		// get state if the tooltip is visible or hidden
 		_isToolTipVisible = _prefStore.getBoolean(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE);
+
+		_allVisibleValues = Util.getStateInt(
+				state,
+				ValuePointToolTipMenuManager.STATE_VALUE_POINT_TOOLTIP_VISIBLE_GRAPHS,
+				ValuePointToolTipMenuManager.DEFAULT_GRAPHS);
+
+		/*
+		 * orientation
+		 */
+		final String stateOrientation = Util.getStateString(
+				state,
+				ValuePointToolTipMenuManager.STATE_VALUE_POINT_TOOLTIP_ORIENTATION,
+				ValuePointToolTipMenuManager.DEFAULT_ORIENTATION.name());
+
+		_isHorizontal = ValuePointToolTipOrientation.valueOf(stateOrientation) == ValuePointToolTipOrientation.Horizontal;
 
 		addPrefListener();
 	}
@@ -283,11 +293,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 
 		_bgColor = _colorCache.getColor(new RGB(0xff, 0xff, 0xf0));
 		_fgBorder = _colorCache.getColor(new RGB(0xe5, 0xe5, 0xcb));
-		_fgToolbar = _colorCache.getColor(new RGB(0xf7, 0xf7, 0xe5));
-		_fgColor = display.getSystemColor(SWT.COLOR_INFO_FOREGROUND);
-//		_boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
-
-		_pc = new PixelConverter(parent);
+		_fgColor = display.getSystemColor(SWT.COLOR_DARK_GRAY);
 
 		_valueUnitDistance = _isHorizontal ? 2 : 5;
 
@@ -336,7 +342,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 //		_shellContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 		{
 
-			if (_visibleGraphs != 0) {
+			if (_allVisibleValues != 0) {
 				createUI020AllValues(_shellContainer);
 			}
 
@@ -359,7 +365,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 
 		if (_isHorizontal) {
 			GridLayoutFactory.fillDefaults()//
-					.numColumns(_visibleGraphsCount)
+					.numColumns(_allVisibleValuesCount)
 					.spacing(5, 0)
 					.extendedMargins(3, 2, 0, 0)
 					.applyTo(container);
@@ -1008,12 +1014,12 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 			_ttMenuMgr.hideContextMenu();
 		}
 
-		final int visibleGraphsBackup = _visibleGraphs;
+		final int visibleValuesBackup = _allVisibleValues;
 
-		updateUIStates();
+		updateStateVisibleValues(visibleValuesBackup);
 
 		// prevent flickering when reopen
-		if (visibleGraphsBackup != _visibleGraphs) {
+		if (visibleValuesBackup != _allVisibleValues) {
 
 			// reopen when other tour data are set which has other graphs
 			reopenTT();
@@ -1065,44 +1071,101 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 	@Override
 	public void show(final Point location) {
 
-		if (_isToolTipVisible == false) {
-			return;
+		if (_isToolTipVisible) {
+			super.show(location);
 		}
-
-		super.show(location);
 	}
 
-	ToolItem updateUI() {
+	/**
+	 * Sets state which graphs can be displayed.
+	 * 
+	 * @param ttVisibleValues
+	 */
+	private void updateStateVisibleValues(final int ttVisibleValues) {
 
-		// update graph state
-		updateUIStates();
+		_visibleAltimeterId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_ALTIMETER) > 0
+				&& _tourData.getAltimeterSerie() != null ? ValuePointToolTipMenuManager.VALUE_ID_ALTIMETER : 0;
 
-		reopenTT();
+		_visibleAltitudeId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_ALTITUDE) > 0
+				&& _tourData.getAltitudeSerie() != null ? ValuePointToolTipMenuManager.VALUE_ID_ALTITUDE : 0;
 
-		/**
-		 * Get item which is opening the value point tooltip
-		 * <p>
-		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
-		 * This is a hack because the toolbar contains only one item, hopefully this will not
-		 * change. <br>
-		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		 */
-		final ToolItem toolItem = _toolbarControl.getItem(0);
+		_visibleCadenceId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_CADENCE) > 0
+				&& _tourData.cadenceSerie != null ? ValuePointToolTipMenuManager.VALUE_ID_CADENCE : 0;
 
-		return toolItem;
+		_visibleChartZoomFactorId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_CHART_ZOOM_FACTOR) > 0
+				? ValuePointToolTipMenuManager.VALUE_ID_CHART_ZOOM_FACTOR
+				: 0;
+
+		_visibleDistanceId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_DISTANCE) > 0
+				&& _tourData.distanceSerie != null ? ValuePointToolTipMenuManager.VALUE_ID_DISTANCE : 0;
+
+		_visibleGradientId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_GRADIENT) > 0
+				&& _tourData.getGradientSerie() != null ? ValuePointToolTipMenuManager.VALUE_ID_GRADIENT : 0;
+
+		_visiblePaceId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_PACE) > 0
+				&& _tourData.getPaceSerie() != null ? ValuePointToolTipMenuManager.VALUE_ID_PACE : 0;
+
+		_visiblePowerId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_POWER) > 0
+				&& _tourData.getPowerSerie() != null ? ValuePointToolTipMenuManager.VALUE_ID_POWER : 0;
+
+		_visiblePulseId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_PULSE) > 0 //
+				&& _tourData.pulseSerie != null ? ValuePointToolTipMenuManager.VALUE_ID_PULSE : 0;
+
+		_visibleSpeedId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_SPEED) > 0
+				&& _tourData.getSpeedSerie() != null ? ValuePointToolTipMenuManager.VALUE_ID_SPEED : 0;
+
+		_visibleTemperatureId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_TEMPERATURE) > 0
+				&& _tourData.temperatureSerie != null ? ValuePointToolTipMenuManager.VALUE_ID_TEMPERATURE : 0;
+
+		_visibleTimeDurationId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_TIME_DURATION) > 0 //
+				&& _tourData.timeSerie != null ? ValuePointToolTipMenuManager.VALUE_ID_TIME_DURATION : 0;
+
+		_visibleTimeOfDayId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_TIME_OF_DAY) > 0 //
+				&& _tourData.timeSerie != null ? ValuePointToolTipMenuManager.VALUE_ID_TIME_OF_DAY : 0;
+
+		_visibleTimeSliceId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_TIME_SLICES) > 0 //
+				? ValuePointToolTipMenuManager.VALUE_ID_TIME_SLICES
+				: 0;
+
+		_allVisibleValuesCount = (_visibleAltimeterId > 0 ? 1 : 0)
+				+ (_visibleAltitudeId > 0 ? 1 : 0)
+				+ (_visibleCadenceId > 0 ? 1 : 0)
+				+ (_visibleChartZoomFactorId > 0 ? 1 : 0)
+				+ (_visibleDistanceId > 0 ? 1 : 0)
+				+ (_visibleGradientId > 0 ? 1 : 0)
+				+ (_visiblePaceId > 0 ? 1 : 0)
+				+ (_visiblePowerId > 0 ? 1 : 0)
+				+ (_visiblePulseId > 0 ? 1 : 0)
+				+ (_visibleSpeedId > 0 ? 1 : 0)
+				+ (_visibleTemperatureId > 0 ? 1 : 0)
+				+ (_visibleTimeDurationId > 0 ? 1 : 0)
+				+ (_visibleTimeOfDayId > 0 ? 1 : 0)
+				+ (_visibleTimeSliceId > 0 ? 1 : 0);
+
+		_allVisibleValues = _visibleAltimeterId
+				+ _visibleAltitudeId
+				+ _visibleCadenceId
+				+ _visibleChartZoomFactorId
+				+ _visibleDistanceId
+				+ _visibleGradientId
+				+ _visiblePaceId
+				+ _visiblePowerId
+				+ _visiblePulseId
+				+ _visibleSpeedId
+				+ _visibleTemperatureId
+				+ _visibleTimeDurationId
+				+ _visibleTimeOfDayId
+				+ _visibleTimeSliceId;
 	}
 
 	private void updateUI(final int valueIndex) {
 
-		// get time when the redraw of the may is requested
+		// get time when the redraw is requested
 		final long requestedRedrawTime = System.currentTimeMillis();
 
 		if (requestedRedrawTime > _lastUpdateUITime + 100) {
 
 			// force a redraw
-
-			System.out.println("updateUI is forced\t");
-			// TODO remove SYSTEM.OUT.PRINTLN
 
 			updateUIRunnable(valueIndex);
 
@@ -1146,7 +1209,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 
 		if (_visibleAltitudeId != 0) {
 			_lblAltitude.setText(_nf3NoGroup.format(//
-					_tourData.getAltitudeSmoothedSerie()[valueIndex] / UI.UNIT_VALUE_ALTITUDE));
+					_tourData.getAltitudeSmoothedSerie(false)[valueIndex]));
 		}
 
 		if (_visibleCadenceId != 0) {
@@ -1212,102 +1275,24 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 		_lastUpdateUITime = System.currentTimeMillis();
 	}
 
-	/**
-	 * Sets state which graphs can be displayed.
-	 */
-	private void updateUIStates() {
+	ToolItem updateUIVisibleValues(final int visibleValues) {
 
-		/*
-		 * orientation
+		// update graph state
+		updateStateVisibleValues(visibleValues);
+
+		reopenTT();
+
+		/**
+		 * Get item which is opening the value point tooltip
+		 * <p>
+		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
+		 * This is a hack because the toolbar contains only one item, hopefully this will not
+		 * change. <br>
+		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		 */
-		final String stateOrientation = Util.getStateString(
-				state,
-				ValuePointToolTipMenuManager.STATE_VALUE_POINT_TOOLTIP_ORIENTATION,
-				ValuePointToolTipMenuManager.DEFAULT_ORIENTATION.name());
+		final ToolItem toolItem = _toolbarControl.getItem(0);
 
-		_isHorizontal = ValuePointToolTipOrientation.valueOf(stateOrientation) == ValuePointToolTipOrientation.Horizontal;
-
-		/*
-		 * visible graphs
-		 */
-		final int ttVisibleValues = Util.getStateInt(
-				state,
-				ValuePointToolTipMenuManager.STATE_VALUE_POINT_TOOLTIP_VISIBLE_GRAPHS,
-				ValuePointToolTipMenuManager.DEFAULT_GRAPHS);
-
-		_visibleAltimeterId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_ALTIMETER) > 0
-				&& _tourData.getAltimeterSerie() != null ? ValuePointToolTipMenuManager.VALUE_ID_ALTIMETER : 0;
-
-		_visibleAltitudeId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_ALTITUDE) > 0
-				&& _tourData.getAltitudeSerie() != null ? ValuePointToolTipMenuManager.VALUE_ID_ALTITUDE : 0;
-
-		_visibleCadenceId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_CADENCE) > 0
-				&& _tourData.cadenceSerie != null ? ValuePointToolTipMenuManager.VALUE_ID_CADENCE : 0;
-
-		_visibleChartZoomFactorId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_CHART_ZOOM_FACTOR) > 0
-				? ValuePointToolTipMenuManager.VALUE_ID_CHART_ZOOM_FACTOR
-				: 0;
-
-		_visibleDistanceId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_DISTANCE) > 0
-				&& _tourData.distanceSerie != null ? ValuePointToolTipMenuManager.VALUE_ID_DISTANCE : 0;
-
-		_visibleGradientId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_GRADIENT) > 0
-				&& _tourData.getGradientSerie() != null ? ValuePointToolTipMenuManager.VALUE_ID_GRADIENT : 0;
-
-		_visiblePaceId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_PACE) > 0
-				&& _tourData.getPaceSerie() != null ? ValuePointToolTipMenuManager.VALUE_ID_PACE : 0;
-
-		_visiblePowerId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_POWER) > 0
-				&& _tourData.getPowerSerie() != null ? ValuePointToolTipMenuManager.VALUE_ID_POWER : 0;
-
-		_visiblePulseId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_PULSE) > 0 //
-				&& _tourData.pulseSerie != null ? ValuePointToolTipMenuManager.VALUE_ID_PULSE : 0;
-
-		_visibleSpeedId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_SPEED) > 0
-				&& _tourData.getSpeedSerie() != null ? ValuePointToolTipMenuManager.VALUE_ID_SPEED : 0;
-
-		_visibleTemperatureId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_TEMPERATURE) > 0
-				&& _tourData.temperatureSerie != null ? ValuePointToolTipMenuManager.VALUE_ID_TEMPERATURE : 0;
-
-		_visibleTimeDurationId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_TIME_DURATION) > 0 //
-				&& _tourData.timeSerie != null ? ValuePointToolTipMenuManager.VALUE_ID_TIME_DURATION : 0;
-
-		_visibleTimeOfDayId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_TIME_OF_DAY) > 0 //
-				&& _tourData.timeSerie != null ? ValuePointToolTipMenuManager.VALUE_ID_TIME_OF_DAY : 0;
-
-		_visibleTimeSliceId = (ttVisibleValues & ValuePointToolTipMenuManager.VALUE_ID_TIME_SLICES) > 0 //
-				? ValuePointToolTipMenuManager.VALUE_ID_TIME_SLICES
-				: 0;
-
-		_visibleGraphsCount = (_visibleAltimeterId > 0 ? 1 : 0)
-				+ (_visibleAltitudeId > 0 ? 1 : 0)
-				+ (_visibleCadenceId > 0 ? 1 : 0)
-				+ (_visibleChartZoomFactorId > 0 ? 1 : 0)
-				+ (_visibleDistanceId > 0 ? 1 : 0)
-				+ (_visibleGradientId > 0 ? 1 : 0)
-				+ (_visiblePaceId > 0 ? 1 : 0)
-				+ (_visiblePowerId > 0 ? 1 : 0)
-				+ (_visiblePulseId > 0 ? 1 : 0)
-				+ (_visibleSpeedId > 0 ? 1 : 0)
-				+ (_visibleTemperatureId > 0 ? 1 : 0)
-				+ (_visibleTimeDurationId > 0 ? 1 : 0)
-				+ (_visibleTimeOfDayId > 0 ? 1 : 0)
-				+ (_visibleTimeSliceId > 0 ? 1 : 0);
-
-		_visibleGraphs = _visibleAltimeterId
-				+ _visibleAltitudeId
-				+ _visibleCadenceId
-				+ _visibleChartZoomFactorId
-				+ _visibleDistanceId
-				+ _visibleGradientId
-				+ _visiblePaceId
-				+ _visiblePowerId
-				+ _visiblePulseId
-				+ _visibleSpeedId
-				+ _visibleTemperatureId
-				+ _visibleTimeDurationId
-				+ _visibleTimeOfDayId
-				+ _visibleTimeSliceId;
+		return toolItem;
 	}
 
 }

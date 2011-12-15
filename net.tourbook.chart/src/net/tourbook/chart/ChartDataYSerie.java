@@ -42,6 +42,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 	public static final int			FILL_METHOD_FILL_BOTTOM		= 1;
 	public static final int			FILL_METHOD_FILL_ZERO		= 2;
 	public static final int			FILL_METHOD_CUSTOM			= 100;
+	public static final int			BAR_DRAW_METHOD_BOTTOM		= 200;
 
 	/**
 	 * Slider label format: n.1
