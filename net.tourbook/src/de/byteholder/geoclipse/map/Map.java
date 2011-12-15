@@ -3390,7 +3390,7 @@ public class Map extends Canvas {
 		// get time when the redraw of the may is requested
 		final long requestedRedrawTime = System.currentTimeMillis();
 
-		if (requestedRedrawTime > _lastMapDrawTime + 40) {
+		if (requestedRedrawTime > _lastMapDrawTime + 100) {
 
 			// update display even when this is not the last created runnable
 

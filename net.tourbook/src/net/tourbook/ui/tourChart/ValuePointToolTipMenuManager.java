@@ -270,7 +270,7 @@ public class ValuePointToolTipMenuManager {
 		_state.put(STATE_VALUE_POINT_TOOLTIP_VISIBLE_GRAPHS, _allVisibleValues);
 
 		// update tooltip with new/removed graphs
-		final ToolItem toolItem = _valuePointToolTipUI.updateUIVisibleValues(_allVisibleValues);
+		final ToolItem toolItem = _valuePointToolTipUI.updateVisibleValues(_allVisibleValues);
 
 		// reopen context menu
 		openToolTipMenu10Reopen(toolItem);

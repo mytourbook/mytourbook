@@ -130,8 +130,8 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 	 * UI resources
 	 */
 	private Color							_fgColor;
-	private Color							_bgColor;
 	private Color							_fgBorder;
+	private Color							_bgColor;
 	private final ColorCache				_colorCache						= new ColorCache();
 	private final GraphColorProvider		_colorProvider					= GraphColorProvider.getInstance();
 
@@ -291,8 +291,9 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 
 		final Display display = parent.getDisplay();
 
-		_bgColor = _colorCache.getColor(new RGB(0xff, 0xff, 0xf0));
 		_fgBorder = _colorCache.getColor(new RGB(0xe5, 0xe5, 0xcb));
+//		_bgColor = _colorCache.getColor(new RGB(0xff, 0xff, 0xf0));
+		_bgColor = _colorCache.getColor(new RGB(0xff, 0xff, 0xff));
 		_fgColor = display.getSystemColor(SWT.COLOR_DARK_GRAY);
 
 		_valueUnitDistance = _isHorizontal ? 2 : 5;
@@ -1194,6 +1195,10 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 
 	private void updateUIRunnable(int valueIndex) {
 
+		if (_shellContainer == null || _shellContainer.isDisposed()) {
+			return;
+		}
+
 		final int[] timeSerie = _tourData.timeSerie;
 
 		// check bounds
@@ -1275,7 +1280,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 		_lastUpdateUITime = System.currentTimeMillis();
 	}
 
-	ToolItem updateUIVisibleValues(final int visibleValues) {
+	ToolItem updateVisibleValues(final int visibleValues) {
 
 		// update graph state
 		updateStateVisibleValues(visibleValues);

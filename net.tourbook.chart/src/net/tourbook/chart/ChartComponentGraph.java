@@ -1633,11 +1633,14 @@ public class ChartComponentGraph extends Canvas {
 			if (_hoveredLineValueIndex == -1) {
 				valuePointToolTip.hide();
 			} else {
+
+				final Point hoveredLinePosition = getAndCheckHoveredLinePosition();
+
 				valuePointToolTip.setValueIndex(
 						_hoveredLineValueIndex,
 						_devXMouseMove,
 						_devYMouseMove,
-						_lineDevPositions.get(0)[_hoveredLineValueIndex],
+						hoveredLinePosition,
 						_graphZoomRatio);
 			}
 		}
@@ -2410,7 +2413,6 @@ public class ChartComponentGraph extends Canvas {
 //				System.out.println(valueIndex + "\t" + graphY1 + "\t" + graphY2);
 //				// TODO remove SYSTEM.OUT.PRINTLN
 
-
 				// optimization: draw only ONE line for the current x-position
 				// but draw to the 0 line otherwise it's possible that a triangle is painted
 
@@ -2560,13 +2562,6 @@ public class ChartComponentGraph extends Canvas {
 					_hoveredLineValueIndex = valueIndex;
 					isSetHoveredIndex = true;
 				}
-
-//				/*
-//				 * advance to the next point and check array bounds
-//				 */
-//				if (++valueIndex >= yValueLength) {
-//					break;
-//				}
 
 				final Rectangle lastRect = new Rectangle(
 						(int) (devX - devXDiffWidth),
@@ -4310,6 +4305,58 @@ public class ChartComponentGraph extends Canvas {
 		}
 	}
 
+	private Point getAndCheckHoveredLinePosition() {
+
+		final Point[] lineDevPositions = _lineDevPositions.get(0);
+		Point lineDevPos = lineDevPositions[_hoveredLineValueIndex];
+
+		boolean isAdjusted = false;
+
+		/*
+		 * it happened, that lineDevPos was null
+		 */
+		if (lineDevPos == null) {
+
+			int lineDevIndex = _hoveredLineValueIndex;
+
+			// check forward
+			while (lineDevIndex < lineDevPositions.length - 1) {
+
+				lineDevPos = lineDevPositions[++lineDevIndex];
+
+				if (lineDevPos != null) {
+					_hoveredLineValueIndex = lineDevIndex;
+					isAdjusted = true;
+					break;
+				}
+			}
+
+			if (lineDevPos == null) {
+
+				lineDevIndex = _hoveredLineValueIndex;
+
+				// check backward
+				while (lineDevIndex > 0) {
+
+					lineDevPos = lineDevPositions[--lineDevIndex];
+
+					if (lineDevPos != null) {
+						_hoveredLineValueIndex = lineDevIndex;
+						isAdjusted = true;
+						break;
+					}
+				}
+			}
+		}
+
+		if (isAdjusted) {
+			// force repaining
+			_isOverlayDirty = false;
+		}
+
+		return lineDevPos;
+	}
+
 	/**
 	 * @param rgb
 	 * @return Returns the color from the color cache, the color must not be disposed this is done
@@ -5465,11 +5512,14 @@ public class ChartComponentGraph extends Canvas {
 		if (_isHoveredLineVisible && isLineHovered()) {
 
 			if (valuePointToolTip != null) {
+
+				final Point hoveredLinePosition = getAndCheckHoveredLinePosition();
+
 				valuePointToolTip.setValueIndex(
 						_hoveredLineValueIndex,
 						_devXMouseMove,
 						_devYMouseMove,
-						_lineDevPositions.get(0)[_hoveredLineValueIndex],
+						hoveredLinePosition,
 						_graphZoomRatio);
 			}
 
