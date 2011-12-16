@@ -2286,7 +2286,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			}
 		});
 
-		// set menu for the tag item
+		// set menu for the tour type link
 		_linkTourType.setMenu(menuMgr.createContextMenu(_linkTourType));
 
 		/*
@@ -6438,6 +6438,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 				// tour type or tags can have been changed within this dialog
 				updateUITourTypeTags();
+
+				setTourDirty();
 			}
 		}
 	}
