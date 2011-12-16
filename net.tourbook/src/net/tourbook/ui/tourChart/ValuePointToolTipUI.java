@@ -216,11 +216,43 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 		hide();
 	}
 
-	void actionOrientation(final ValuePointToolTipOrientation orientation) {
+	void actionOrientation(final ValuePointToolTipOrientation orientation, final boolean isReopenToolTip) {
 
 		_isHorizontal = orientation == ValuePointToolTipOrientation.Horizontal;
 
+		if (isReopenToolTip) {
+			reopenTT();
+		}
+	}
+
+	void actionSetDefaults(final int allVisibleValues, final ValuePointToolTipOrientation orientation) {
+
+		actionOrientation(orientation, false);
+		actionVisibleValues(allVisibleValues);
+
+		state.put(STATE_VALUE_POINT_PIN_LOCATION, DEFAULT_PIN_LOCATION.name());
+
+		actionPinLocation(DEFAULT_PIN_LOCATION);
+	}
+
+	ToolItem actionVisibleValues(final int visibleValues) {
+
+		// update value states
+		updateStateVisibleValues(visibleValues);
+
 		reopenTT();
+
+		/**
+		 * Get item which is opening the value point tooltip
+		 * <p>
+		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
+		 * This is a hack because the toolbar contains only one item, hopefully this will not
+		 * change. <br>
+		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		 */
+		final ToolItem toolItem = _toolbarControl.getItem(0);
+
+		return toolItem;
 	}
 
 	private void addPrefListener() {
@@ -979,6 +1011,9 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 //		}
 	}
 
+	/**
+	 * Reopens the tooltip.
+	 */
 	private void reopenTT() {
 
 		// hide and recreate it
@@ -1278,26 +1313,6 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 		}
 
 		_lastUpdateUITime = System.currentTimeMillis();
-	}
-
-	ToolItem updateVisibleValues(final int visibleValues) {
-
-		// update graph state
-		updateStateVisibleValues(visibleValues);
-
-		reopenTT();
-
-		/**
-		 * Get item which is opening the value point tooltip
-		 * <p>
-		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
-		 * This is a hack because the toolbar contains only one item, hopefully this will not
-		 * change. <br>
-		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		 */
-		final ToolItem toolItem = _toolbarControl.getItem(0);
-
-		return toolItem;
 	}
 
 }

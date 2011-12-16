@@ -43,76 +43,85 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public abstract class ValuePointToolTipShell {
 
-	private static final int		VALUE_POINT_OFFSET					= 20;
-	private static final int		TOOL_TIP_SHELL_LOCATION_OFFSET		= 0;
+	private static final int					VALUE_POINT_OFFSET					= 20;
+	private static final int					TOOL_TIP_SHELL_LOCATION_OFFSET		= 0;
 
-	private static final String		STATE_VALUE_POINT_TOOLTIP_X			= "ValuePoint_ToolTip_DiffPositionX";				//$NON-NLS-1$
-	private static final String		STATE_VALUE_POINT_TOOLTIP_Y			= "ValuePoint_ToolTip_DiffPositionY";				//$NON-NLS-1$
-	private static final String		STATE_VALUE_POINT_PIN_LOCATION		= "ValuePoint_ToolTip_PinnedLocation";				//$NON-NLS-1$
-	private static final String		STATE_MOUSE_X_POSITION_RELATIVE		= "ValuePoint_ToolTip_MouseXPositionRelative";		//$NON-NLS-1$
-	private static final String		STATE_IS_TOOLTIP_ABOVE_VALUE_POINT	= "ValuePoint_ToolTip_IsToolTipAboveValuePoint";	//$NON-NLS-1$
+	private static final String					STATE_VALUE_POINT_TOOLTIP_X			= "ValuePoint_ToolTip_DiffPositionX";				//$NON-NLS-1$
+	private static final String					STATE_VALUE_POINT_TOOLTIP_Y			= "ValuePoint_ToolTip_DiffPositionY";				//$NON-NLS-1$
+	private static final String					STATE_MOUSE_X_POSITION_RELATIVE		= "ValuePoint_ToolTip_MouseXPositionRelative";		//$NON-NLS-1$
+	private static final String					STATE_IS_TOOLTIP_ABOVE_VALUE_POINT	= "ValuePoint_ToolTip_IsToolTipAboveValuePoint";	//$NON-NLS-1$
+	static final String							STATE_VALUE_POINT_PIN_LOCATION		= "ValuePoint_ToolTip_PinnedLocation";				//$NON-NLS-1$
+	static final ValuePointToolTipPinLocation	DEFAULT_PIN_LOCATION				= ValuePointToolTipPinLocation.TopRight;
 
-	IDialogSettings					state;
+	IDialogSettings								state;
 
-	private ITooltipOwner			_tooltipOwner;
+	private ITooltipOwner						_tooltipOwner;
 
-	private Shell					_ttShell;
+	private Shell								_ttShell;
 
-	private Object					_currentArea;
-	private Control					_ownerControl;
-	private OwnerShellListener		_ownerShellListener;
+	private Object								_currentArea;
+	private Control								_ownerControl;
+	private OwnerShellListener					_ownerShellListener;
 
-	private OwnerControlListener	_ownerControlListener;
-	private TooltipListener			_ttListener							= new TooltipListener();
-	private TooltipShellListener	_ttShellListener					= new TooltipShellListener();
+	private OwnerControlListener				_ownerControlListener;
+	private TooltipListener						_ttListener							= new TooltipListener();
+	private TooltipShellListener				_ttShellListener					= new TooltipShellListener();
 
-	private boolean					_isTTDragged;
+	private boolean								_isTTDragged;
 
-	private int						_devXTTMouseDown;
-	private int						_devYTTMouseDown;
-	private int						_devXOwnerMouseMove;
+	private int									_devXTTMouseDown;
+	private int									_devYTTMouseDown;
+	private int									_devXOwnerMouseMove;
 
 	/**
 	 * Relative y position for the pinned location
 	 * {@link ValuePointToolTipPinLocation#MouseXPosition}
 	 */
-	private int						_devPinnedMouseXPositionRelative;
+	private int									_devPinnedMouseXPositionRelative;
 
 	/**
 	 * Is <code>true</code> when the tool tip location is above the value point in the chart.
 	 */
-	private boolean					_isTTAboveValuePoint				= true;
+	private boolean								_isTTAboveValuePoint				= true;
 
 	/**
 	 * Position where the hovered value is painted in the chart, the position is relative to the
 	 * client.
 	 */
-	private Point					_ownerValueDevPosition				= new Point(0, 0);
+	private Point								_ownerValueDevPosition				= new Point(0, 0);
 
-	int								chartMarginTop;
-	int								chartMarginBottom;
+	int											chartMarginTop;
+	int											chartMarginBottom;
 
 	/**
 	 * Relative location for the tooltip shell to the pinned location when it's moved with the
 	 * mouse.
 	 */
-	private Point					_ttShellDiff						= new Point(0, 0);
+	private Point								_ttShellDiff						= new Point(0, 0);
 
-	private Point					_screenDefaultTTShellLocation;
-	private Point					_fixedTTShellLocation				= new Point(0, 0);
+	/**
+	 * Contains position where the tt shell should be positioned
+	 */
+	private Point								_screenDefaultTTShellLocation;
 
-	ValuePointToolTipPinLocation	pinnedLocation;
-	private int						_defaultOffset;
-	private Display					_display;
-	private Runnable				_ttShellPositioningRunnable;
-	private int						_animationCounter;
-	private int						_repeatTime;
+	private Point								_screenRequestedAnimationLocation	= new Point(0, 0);
+
+	ValuePointToolTipPinLocation				pinnedLocation;
+
+	/**
+	 * This value is > 0 when tooltip could not be set at the default location
+	 */
+	private int									_defaultOffsetY;
+	private Display								_display;
+	private Runnable							_ttShellPositioningRunnable;
+	private int									_animationCounter;
+	private int									_repeatTime;
 
 	/*
 	 * UI resources
 	 */
-	private Cursor					_cursorDragged;
-	private Cursor					_cursorHand;
+	private Cursor								_cursorDragged;
+	private Cursor								_cursorHand;
 
 	private class OwnerControlListener implements Listener {
 		public void handleEvent(final Event event) {
@@ -356,14 +365,14 @@ public abstract class ValuePointToolTipShell {
 			return;
 		}
 
-		if (pinnedLocation == ValuePointToolTipPinLocation.Screen) {
-			return;
-		}
+//		if (pinnedLocation == ValuePointToolTipPinLocation.Screen) {
+//			return;
+//		}
 
 		// display at default location without offset
 		_ttShellDiff = new Point(0, 0);
 
-		setTTShellLocation(false, true, true);
+		setTTShellLocation(false, true, true, true);
 	}
 
 	/**
@@ -415,15 +424,19 @@ public abstract class ValuePointToolTipShell {
 	/**
 	 * @param tipSize
 	 * @param originalLocation
+	 * @param screenValuePoint
 	 * @return
 	 */
-	private Point fixupDisplayBounds(final Point tipSize, final Point originalLocation) {
+	private Point fixupDisplayBounds(final Point tipSize, final Point originalLocation, final Point screenValuePoint) {
 
 		// create a copy that the original value is not modified
 		final Point location = new Point(originalLocation.x, originalLocation.y);
 
+		final int tipWidth = tipSize.x;
+		final int tipHeight = tipSize.y;
+
 		Rectangle bounds;
-		final Point rightBounds = new Point(tipSize.x + location.x, tipSize.y + location.y);
+		final Point rightBounds = new Point(tipWidth + location.x, tipHeight + location.y);
 
 		final Monitor[] monitors = _display.getMonitors();
 
@@ -447,12 +460,22 @@ public abstract class ValuePointToolTipShell {
 		}
 
 		if (!(bounds.contains(location) && bounds.contains(rightBounds))) {
+
 			if (rightBounds.x > bounds.x + bounds.width) {
+
 				location.x -= rightBounds.x - (bounds.x + bounds.width);
 			}
 
 			if (rightBounds.y > bounds.y + bounds.height) {
+
+				// move to the bottom
 				location.y -= rightBounds.y - (bounds.y + bounds.height);
+
+				if (location.y < screenValuePoint.y + VALUE_POINT_OFFSET) {
+
+					// this implementation do NOT respect multiple monitors
+					location.y = screenValuePoint.y - tipHeight - VALUE_POINT_OFFSET;
+				}
 			}
 
 			if (location.x < bounds.x) {
@@ -460,7 +483,14 @@ public abstract class ValuePointToolTipShell {
 			}
 
 			if (location.y < bounds.y) {
+
 				location.y = bounds.y;
+
+				if (location.y + tipHeight - 0 > screenValuePoint.y - VALUE_POINT_OFFSET) {
+
+					// this implementation do NOT respect multiple monitors
+					location.y = screenValuePoint.y + VALUE_POINT_OFFSET;
+				}
 			}
 		}
 
@@ -536,7 +566,7 @@ public abstract class ValuePointToolTipShell {
 			_devPinnedMouseXPositionRelative = srcOwnerBottom - srcTTTop;
 		}
 
-		setTTShellLocation(false, true, false);
+		setTTShellLocation(false, true, false, true);
 	}
 
 	/**
@@ -549,7 +579,7 @@ public abstract class ValuePointToolTipShell {
 			return;
 		}
 
-		setTTShellLocation(false, false, false);
+		setTTShellLocation(false, false, false, false);
 	}
 
 	/**
@@ -578,7 +608,7 @@ public abstract class ValuePointToolTipShell {
 			_ttShellDiff.y += yDiff;
 		}
 
-		setTTShellLocation(true, false, false);
+		setTTShellLocation(true, false, false, true);
 	}
 
 	/**
@@ -592,7 +622,7 @@ public abstract class ValuePointToolTipShell {
 			return;
 		}
 
-		setTTShellLocation(false, false, false);
+		setTTShellLocation(false, false, false, false);
 	}
 
 	private void passOnEvent(final Shell tip, final Event event) {
@@ -636,7 +666,7 @@ public abstract class ValuePointToolTipShell {
 		final String statePinnedLocation = Util.getStateString(
 				state,
 				STATE_VALUE_POINT_PIN_LOCATION,
-				ValuePointToolTipPinLocation.TopRight.name());
+				DEFAULT_PIN_LOCATION.name());
 
 		pinnedLocation = ValuePointToolTipPinLocation.valueOf(statePinnedLocation);
 
@@ -670,10 +700,12 @@ public abstract class ValuePointToolTipShell {
 	 *            is <code>true</code> when the tooltip is dragged
 	 * @param isAnimation
 	 * @param isSetDefaultLocation
+	 *            When <code>true</code> set tooltip to a default location
 	 */
 	private void setTTShellLocation(final boolean isTTDragged,
 									final boolean isAnimation,
-									final boolean isSetDefaultLocation) {
+									final boolean isSetDefaultLocation,
+									final boolean isCheckVPCovered) {
 
 		final Point screenOwnerControlLocation = _ownerControl.toDisplay(0, 0);
 		final Point ownerSize = _ownerControl.getSize();
@@ -683,7 +715,6 @@ public abstract class ValuePointToolTipShell {
 		final int screenOwnerTop = screenOwnerControlLocation.y;
 		final int screenOwnerBotton = screenOwnerTop + ownerHeight;
 
-		final Point screenTTLocation = _fixedTTShellLocation;
 		final Point ttSize = _ttShell.getSize();
 		final int ttWidth = ttSize.x;
 		final int ttHeight = ttSize.y;
@@ -697,32 +728,29 @@ public abstract class ValuePointToolTipShell {
 		final Point screenValuePoint = _ownerControl.toDisplay(_ownerValueDevPosition.x, _ownerValueDevPosition.y);
 		final int screenValuePointTop = screenValuePoint.y;
 
-		boolean isSetLocation = false;
-		boolean isEdge = false;
-		Point screenDefaultTTShellLocation = new Point(0, 0);
+		boolean isSetLocation = isSetDefaultLocation;
+		boolean isCheckDefaultOffset = false;
+		Point screenDefaultLocation = new Point(0, 0);
 
 		switch (pinnedLocation) {
 		case Screen:
 
-			// tooltip is not pinned and must not be repositioned
-
-			if (isTTDragged == false && _ttShell.isVisible()) {
-				// tooltip is not moved and already visible -> nothing to do
-				return;
-			}
-
 			// use default location when location was not yet set, center the tooltip in the center of the owner
-			if (_screenDefaultTTShellLocation == null) {
+			if (_screenDefaultTTShellLocation == null || isSetDefaultLocation) {
 
-				screenDefaultTTShellLocation.x = screenOwnerLeft + (ownerWidth / 2) - (ttWidth / 2);
-				screenDefaultTTShellLocation.y = screenOwnerTop + (ownerHeight / 2) - (ttHeight / 2);
+				screenDefaultLocation.x = screenOwnerLeft + (ownerWidth / 2) - (ttWidth / 2);
+				screenDefaultLocation.y = screenOwnerTop + (ownerHeight / 2) - (ttHeight / 2);
 
 			} else {
-				screenDefaultTTShellLocation = _screenDefaultTTShellLocation;
+				screenDefaultLocation = _screenDefaultTTShellLocation;
 			}
 
-			screenDefaultTTShellLocation.x = screenDefaultTTShellLocation.x + _ttShellDiff.x;
-			screenDefaultTTShellLocation.y = screenDefaultTTShellLocation.y + _ttShellDiff.y;
+			if (_isTTDragged) {
+				screenDefaultLocation.x = screenDefaultLocation.x + _ttShellDiff.x;
+				screenDefaultLocation.y = screenDefaultLocation.y + _ttShellDiff.y;
+			}
+
+			isCheckDefaultOffset = true;
 
 			break;
 
@@ -732,7 +760,7 @@ public abstract class ValuePointToolTipShell {
 
 				// tooltip is currently dragged
 
-				screenDefaultTTShellLocation.y = _screenDefaultTTShellLocation.y + _ttShellDiff.y;
+				screenDefaultLocation.y = _screenDefaultTTShellLocation.y + _ttShellDiff.y;
 
 			} else {
 
@@ -765,114 +793,117 @@ public abstract class ValuePointToolTipShell {
 					}
 				}
 
+				screenDefaultLocation.y = devY;
+
 				isSetLocation = true;
-				screenDefaultTTShellLocation.y = devY;
 			}
 
-			screenDefaultTTShellLocation.x = screenOwnerLeft - (ttWidth / 2) + _devXOwnerMouseMove;
+			screenDefaultLocation.x = screenOwnerLeft - (ttWidth / 2) + _devXOwnerMouseMove;
 
 			break;
 
 		case TopLeft:
-			screenDefaultTTShellLocation.x = screenEdgeLeft + _ttShellDiff.x;
-			screenDefaultTTShellLocation.y = screenEdgeTop + _ttShellDiff.y;
-			isEdge = true;
+			screenDefaultLocation.x = screenEdgeLeft + _ttShellDiff.x;
+			screenDefaultLocation.y = screenEdgeTop + _ttShellDiff.y;
+			isCheckDefaultOffset = true;
 			break;
 
 		case BottomLeft:
-			screenDefaultTTShellLocation.x = screenEdgeLeft + _ttShellDiff.x;
-			screenDefaultTTShellLocation.y = screenEdgeBottom + _ttShellDiff.y;
-			isEdge = true;
+			screenDefaultLocation.x = screenEdgeLeft + _ttShellDiff.x;
+			screenDefaultLocation.y = screenEdgeBottom + _ttShellDiff.y;
+			isCheckDefaultOffset = true;
 			break;
 
 		case BottomRight:
-			screenDefaultTTShellLocation.x = screenEdgeRight + _ttShellDiff.x;
-			screenDefaultTTShellLocation.y = screenEdgeBottom + _ttShellDiff.y;
-			isEdge = true;
+			screenDefaultLocation.x = screenEdgeRight + _ttShellDiff.x;
+			screenDefaultLocation.y = screenEdgeBottom + _ttShellDiff.y;
+			isCheckDefaultOffset = true;
 			break;
 
 		case TopRight:
 		default:
-			screenDefaultTTShellLocation.x = screenEdgeRight + _ttShellDiff.x;
-			screenDefaultTTShellLocation.y = screenEdgeTop + _ttShellDiff.y;
-			isEdge = true;
+			screenDefaultLocation.x = screenEdgeRight + _ttShellDiff.x;
+			screenDefaultLocation.y = screenEdgeTop + _ttShellDiff.y;
+			isCheckDefaultOffset = true;
 			break;
 		}
 
-		final int defaultY = screenDefaultTTShellLocation.y;
+		final int defaultY = screenDefaultLocation.y;
 
-		if (isTTDragged == false && isEdge) {
-
-			// check if the new location is covered by the tooltip
+		// check if the new tooltip location is covering the value point
+		if (isCheckVPCovered && isCheckDefaultOffset) {
 
 			// increase tooltip size
-			Rectangle increasedTTShell;
+			Rectangle increasedShellArea;
 			if (isSetDefaultLocation) {
 
-				increasedTTShell = new Rectangle(//
-						screenDefaultTTShellLocation.x - VALUE_POINT_OFFSET,
-						screenDefaultTTShellLocation.y - VALUE_POINT_OFFSET,
+				increasedShellArea = new Rectangle(//
+						screenDefaultLocation.x - VALUE_POINT_OFFSET,
+						screenDefaultLocation.y - VALUE_POINT_OFFSET,
 						ttSize.x + 2 * VALUE_POINT_OFFSET,
 						ttSize.y + 2 * VALUE_POINT_OFFSET);
 
 			} else {
 
-				increasedTTShell = new Rectangle(//
-						screenTTLocation.x - VALUE_POINT_OFFSET,
-						screenTTLocation.y - VALUE_POINT_OFFSET + _defaultOffset,
+				increasedShellArea = new Rectangle(//
+						_screenRequestedAnimationLocation.x - VALUE_POINT_OFFSET,
+						_screenRequestedAnimationLocation.y - VALUE_POINT_OFFSET + _defaultOffsetY,
 						ttSize.x + 2 * VALUE_POINT_OFFSET,
 						ttSize.y + 2 * VALUE_POINT_OFFSET);
 			}
 
 			// check if value point is hidden by the tooltip
-			if (increasedTTShell.contains(screenValuePoint)) {
+			if (increasedShellArea.contains(screenValuePoint)) {
 
-				int screenUncoveredPos;
+				int screenUncoveredPosY;
 
 				switch (pinnedLocation) {
 				case BottomLeft:
 				case BottomRight:
 
 					// show tooltip below the value point
-					screenUncoveredPos = screenValuePointTop + VALUE_POINT_OFFSET;
+					screenUncoveredPosY = screenValuePointTop + VALUE_POINT_OFFSET;
 					break;
 
+				case Screen:
 				case TopLeft:
 				case TopRight:
 				default:
 					// show tooltip above the value point
-					screenUncoveredPos = screenValuePointTop - VALUE_POINT_OFFSET - ttHeight;
+					screenUncoveredPosY = screenValuePointTop - VALUE_POINT_OFFSET - ttHeight;
 					break;
 				}
 
-				_defaultOffset = screenDefaultTTShellLocation.y - screenUncoveredPos;
+				_defaultOffsetY = screenDefaultLocation.y - screenUncoveredPosY;
 
-				screenDefaultTTShellLocation.y = screenUncoveredPos;
+				screenDefaultLocation.y = screenUncoveredPosY;
 
 			} else {
 
 				// reset, very important !!!
-				_defaultOffset = 0;
+				_defaultOffsetY = 0;
 			}
 		}
 
-		/*
-		 * set position where the tt shell should be positioned
-		 */
-		_screenDefaultTTShellLocation = screenDefaultTTShellLocation;
+		_screenDefaultTTShellLocation = screenDefaultLocation;
 
-		final Point screenFixedTTShellLocation = fixupDisplayBounds(ttSize, screenDefaultTTShellLocation);
+		final Point screenNewLocation = fixupDisplayBounds(ttSize, screenDefaultLocation, screenValuePoint);
 
 		if (isTTDragged || isAnimation == false) {
-			// no animation
-			_ttShell.setLocation(screenFixedTTShellLocation);
+
+			// no animation, set location directly
+
+			_ttShell.setLocation(screenNewLocation);
+
 		} else {
 
-			if (_defaultOffset != 0 || screenTTLocation.y != defaultY || isSetLocation) {
+			if (_defaultOffsetY != 0 || _screenRequestedAnimationLocation.y != defaultY || isSetLocation) {
 
 				// move when default location is not yet reached
 
-				setTTShellLocation10Start(screenFixedTTShellLocation);
+				_screenRequestedAnimationLocation = screenNewLocation;
+
+				setTTShellLocation10Start();
 			}
 		}
 	}
@@ -894,17 +925,15 @@ public abstract class ValuePointToolTipShell {
 			_ownerValueDevPosition = valueDevPosition;
 		}
 
-		setTTShellLocation(false, true, false);
+		setTTShellLocation(false, true, false, true);
 	}
 
-	private synchronized void setTTShellLocation10Start(final Point newLocation) {
+	private synchronized void setTTShellLocation10Start() {
 
 		final int oldCounter = _animationCounter;
 
 		_animationCounter = 8;
-		_repeatTime = 20;
-
-		_fixedTTShellLocation = newLocation;
+		_repeatTime = 30;
 
 		// check if animation is already running
 		if (oldCounter == 0) {
@@ -932,25 +961,27 @@ public abstract class ValuePointToolTipShell {
 
 			// this is the last movement, move to the desired location
 
-			nextLocation = _fixedTTShellLocation;
+			nextLocation = _screenRequestedAnimationLocation;
 
 		} else {
 
 			// animate movement
 
-			final Point newLocation = _fixedTTShellLocation;
+			final Point requestedLocation = _screenRequestedAnimationLocation;
 
-			final float diffX = currentLocation.x - newLocation.x;
-			final float diffY = currentLocation.y - newLocation.y;
+			final float diffX = currentLocation.x - requestedLocation.x;
+			final float diffY = currentLocation.y - requestedLocation.y;
 
 			final float stepX = diffX / _animationCounter;
 			final float stepY = diffY / _animationCounter;
 
-			final float devXRemainder = stepX * (_animationCounter - 1);
-			final float devYRemainder = stepY * (_animationCounter - 1);
+			final float stepCounter = (_animationCounter - 1) * 1f;
 
-			final float devX = newLocation.x + devXRemainder;
-			final float devY = newLocation.y + devYRemainder;
+			final float devXRemainder = stepX * stepCounter;
+			final float devYRemainder = stepY * stepCounter;
+
+			final float devX = requestedLocation.x + devXRemainder;
+			final float devY = requestedLocation.y + devYRemainder;
 
 			nextLocation = new Point((int) devX, (int) devY);
 		}
@@ -1115,7 +1146,7 @@ public abstract class ValuePointToolTipShell {
 
 			_ttShell.pack();
 
-			setTTShellLocation(false, false, false);
+			setTTShellLocation(false, false, false, true);
 
 			_ttShell.setVisible(true);
 		}

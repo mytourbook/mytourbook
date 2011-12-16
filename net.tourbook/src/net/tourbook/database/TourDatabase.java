@@ -86,7 +86,7 @@ public class TourDatabase {
 	 */
 	private static final int						TOURBOOK_DB_VERSION							= 20;
 
-//	private static final int						TOURBOOK_DB_VERSION							= 20;	// 11.?????
+//	private static final int						TOURBOOK_DB_VERSION							= 20;	// 12.1
 //	private static final int						TOURBOOK_DB_VERSION							= 19;	// 11.8
 //	private static final int						TOURBOOK_DB_VERSION							= 18;	// 11.8
 //	private static final int						TOURBOOK_DB_VERSION							= 17;	// 11.8
@@ -103,7 +103,7 @@ public class TourDatabase {
 //	private static final int						TOURBOOK_DB_VERSION							= 6;	// 8.12
 //	private static final int						TOURBOOK_DB_VERSION							= 5;	// 8.11
 
-	public static boolean							IS_POST_UPDATE_019_to_020;
+	public static boolean							IS_POST_UPDATE_019_to_020					= false;
 
 	private static final String						PERSISTENCE_UNIT_NAME						= "tourdatabase";										//$NON-NLS-1$
 
@@ -2779,31 +2779,27 @@ public class TourDatabase {
 		_propertyListeners.remove(listener);
 	}
 
-//	private void showSubTask(final IProgressMonitor monitor, final Object subTask) {
-//		if (monitor != null) {
-//			monitor.subTask(NLS.bind(Messages.Tour_Database_Update_Subtask_LongOperation, subTask));
-//		}
-//	}
-
+	/**
+	 * this must be implemented or updated when the database version must be updated
+	 */
 	private boolean updateDbDesign(final Connection conn, int currentDbVersion, final IProgressMonitor monitor) {
 
-		/*
-		 * this must be implemented or updated when the database version must be updated
+
+				/*
+		 * confirm update
 		 */
 
-		// confirm update
+		// define buttons with default to NO
 		final String[] buttons = new String[] { IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL };
-
-		final String message = NLS.bind(Messages.Database_Confirm_update, new Object[] {
-				currentDbVersion,
-				TOURBOOK_DB_VERSION,
-				_databasePath });
 
 		if ((new MessageDialog(
 				Display.getDefault().getActiveShell(),
 				Messages.Database_Confirm_update_title,
 				null,
-				message,
+				NLS.bind(Messages.Database_Confirm_update, new Object[] {
+						currentDbVersion,
+						TOURBOOK_DB_VERSION,
+						_databasePath }),
 				MessageDialog.QUESTION,
 				buttons,
 				1).open()) != Window.OK) {
@@ -2812,6 +2808,27 @@ public class TourDatabase {
 			PlatformUI.getWorkbench().close();
 
 			return false;
+		}
+
+		/*
+		 * do an additional check because version 20 is restructuring the data series
+		 */
+		if (currentDbVersion < 20) {
+
+			if ((new MessageDialog(
+					Display.getDefault().getActiveShell(),
+					Messages.Database_Confirm_update_title,
+					null,
+					NLS.bind(Messages.Database_Confirm_Update20, _databasePath),
+					MessageDialog.QUESTION,
+					buttons,
+					1).open()) != Window.OK) {
+
+				// no update -> close application
+				PlatformUI.getWorkbench().close();
+
+				return false;
+			}
 		}
 
 		boolean isPostUpdate5 = false;

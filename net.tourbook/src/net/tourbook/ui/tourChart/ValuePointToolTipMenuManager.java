@@ -56,8 +56,6 @@ public class ValuePointToolTipMenuManager {
 	static final int					DEFAULT_GRAPHS								= VALUE_ID_TIME_SLICES
 																							| VALUE_ID_TIME_DURATION
 																							| VALUE_ID_DISTANCE
-//																								| VALUE_ID_ALTITUDE
-//																								| VALUE_ID_PULSE
 																					//
 																					;
 	static ValuePointToolTipOrientation	DEFAULT_ORIENTATION							= ValuePointToolTipOrientation.Horizontal;
@@ -78,6 +76,7 @@ public class ValuePointToolTipMenuManager {
 	private ToolItem					_menuParentItem;
 
 	private ActionHideToolTip			_actionHideToolTip;
+	private ActionSetDefaults			_actionSetDefaults;
 	private ActionCloseTTContextMenu	_actionCloseTTContextMenu;
 
 	private ActionOrientation			_actionHorizontalOrientation;
@@ -153,7 +152,7 @@ public class ValuePointToolTipMenuManager {
 
 			_state.put(STATE_VALUE_POINT_TOOLTIP_ORIENTATION, _orientation.name());
 
-			_valuePointToolTipUI.actionOrientation(_orientation);
+			_valuePointToolTipUI.actionOrientation(_orientation, true);
 		}
 	}
 
@@ -181,6 +180,30 @@ public class ValuePointToolTipMenuManager {
 // this is very annoying
 //				openToolTipMenu10Reopen();
 			}
+		}
+	}
+
+	private class ActionSetDefaults extends Action {
+
+		public ActionSetDefaults() {
+			setText(Messages.Action_ToolTip_SetDefaults);
+			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__undo_edit));
+		}
+
+		@Override
+		public void run() {
+
+			/*
+			 * set defaults into the state
+			 */
+			final ValuePointToolTipOrientation orientation = ValuePointToolTipMenuManager.DEFAULT_ORIENTATION;
+			_state.put(STATE_VALUE_POINT_TOOLTIP_ORIENTATION, orientation.name());
+
+			_allVisibleValues = DEFAULT_GRAPHS;
+			_state.put(STATE_VALUE_POINT_TOOLTIP_VISIBLE_GRAPHS, _allVisibleValues);
+
+			// update tooltip with default values
+			_valuePointToolTipUI.actionSetDefaults(_allVisibleValues, orientation);
 		}
 	}
 
@@ -270,7 +293,7 @@ public class ValuePointToolTipMenuManager {
 		_state.put(STATE_VALUE_POINT_TOOLTIP_VISIBLE_GRAPHS, _allVisibleValues);
 
 		// update tooltip with new/removed graphs
-		final ToolItem toolItem = _valuePointToolTipUI.updateVisibleValues(_allVisibleValues);
+		final ToolItem toolItem = _valuePointToolTipUI.actionVisibleValues(_allVisibleValues);
 
 		// reopen context menu
 		openToolTipMenu10Reopen(toolItem);
@@ -284,6 +307,7 @@ public class ValuePointToolTipMenuManager {
 	private void createActions() {
 
 		_actionHideToolTip = new ActionHideToolTip();
+		_actionSetDefaults = new ActionSetDefaults();
 		_actionCloseTTContextMenu = new ActionCloseTTContextMenu();
 		_actionHorizontalOrientation = new ActionOrientation(ValuePointToolTipOrientation.Horizontal);
 		_actionVerticalOrientation = new ActionOrientation(ValuePointToolTipOrientation.Vertical);
@@ -526,11 +550,11 @@ public class ValuePointToolTipMenuManager {
 
 		(new Separator()).fill(_menu, -1);
 		addItem(_actionPinLocationHeader);
+		addItem(_actionPinLocationMouseXPosition);
 		addItem(_actionPinLocationTopLeft);
 		addItem(_actionPinLocationTopRight);
 		addItem(_actionPinLocationBottomLeft);
 		addItem(_actionPinLocationBottomRight);
-		addItem(_actionPinLocationMouseXPosition);
 		addItem(_actionPinLocationScreen);
 
 		(new Separator()).fill(_menu, -1);
@@ -541,6 +565,7 @@ public class ValuePointToolTipMenuManager {
 		} else {
 			addItem(_actionHorizontalOrientation);
 		}
+		addItem(_actionSetDefaults);
 		addItem(_actionHideToolTip);
 
 		return _menu;
