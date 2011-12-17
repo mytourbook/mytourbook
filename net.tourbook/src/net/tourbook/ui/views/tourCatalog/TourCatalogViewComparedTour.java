@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -71,7 +71,8 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 	 */
 	private long								_refTourRefId	= -1;
 	private TourChart							_refTourTourChart;
-	private int									_refTourXMarkerValueDifference;
+
+	private float								_refTourXMarkerValueDifference;
 
 	/*
 	 * CT ... (c)ompared (t)our which is displayed in this view
@@ -288,7 +289,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 		_tourChart.addXMarkerDraggingListener(new IChartListener() {
 
-			public int getXMarkerValueDiff() {
+			public float getXMarkerValueDiff() {
 				return _refTourXMarkerValueDifference;
 			}
 
@@ -743,7 +744,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 		 * remove tour compare data (when there are any), but set dummy object to display the action
 		 * button
 		 */
-		_tourData.tourCompareSerie = new int[0];
+		_tourData.tourCompareSerie = new float[0];
 
 		_defaultStartIndex = _movedStartIndex = _computedStartIndex = itemComparedTour.getStartIndex();
 		_defaultEndIndex = _movedEndIndex = _computedEndIndex = itemComparedTour.getEndIndex();

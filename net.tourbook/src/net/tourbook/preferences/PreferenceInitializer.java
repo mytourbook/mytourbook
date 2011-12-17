@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -127,8 +127,12 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 				+ Integer.toString(TourManager.GRAPH_POWER));
 
 		// HR zone backbround
-		store.setDefault(ITourbookPreferences.GRAPH_IS_HR_ZONE_BACKGROUND_VISIBLE, true);
+		store.setDefault(ITourbookPreferences.GRAPH_IS_HR_ZONE_BACKGROUND_VISIBLE, false);
 		store.setDefault(ITourbookPreferences.GRAPH_HR_ZONE_STYLE, TourChart.COMMAND_ID_HR_ZONE_STYLE_GRAPH_TOP);
+
+		store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE, 0xFF);
+		store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING, 0x80);
+		store.setDefault(ITourbookPreferences.GRAPH_ANTIALIASING, true);
 
 		// show breaktime values
 		store.setDefault(ITourbookPreferences.GRAPH_IS_BREAKTIME_VALUES_VISIBLE, true);
@@ -146,15 +150,17 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED, false);
 
 		// graph grid
-		store.setDefault(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE, 50);
+		store.setDefault(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE, 80);
 		store.setDefault(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE, 80);
 		store.setDefault(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES, false);
 		store.setDefault(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES, false);
 
+		// value point tool tip
+		store.setDefault(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE, true);
+
 		/*
 		 * graph smoothing
 		 */
-
 		// algorithm
 		store.setDefault(
 				ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM,
@@ -295,8 +301,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.BREAK_TIME_METHOD2, BreakTimeTool.BREAK_TIME_METHOD_BY_AVG_SLICE_SPEED);
 
 		// minimum speed for a break, default is 1.0 km/h to respect walking in the mountains
-		store.setDefault(ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED_AS, 1.0);
-		store.setDefault(ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED_AS, 1.0);
+		store.setDefault(ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED_AS, 1.0f);
+		store.setDefault(ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED_AS, 1.0f);
 		store.setDefault(ITourbookPreferences.BREAK_TIME_MIN_SLICE_TIME_AS, 2);
 
 		// minimum speed for a break, default is 1.0 km/h to respect walking in the mountains

@@ -30,8 +30,8 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 public class BreakTimeTool {
 
 	private static String					_prefBreakTimeMethodId;
-	private static double					_prefMinAvgSpeedAS;
-	private static double					_prefMinSliceSpeedAS;
+	private static float					_prefMinAvgSpeedAS;
+	private static float					_prefMinSliceSpeedAS;
 	private static int						_prefMinSliceTimeAS;
 	private static float					_prefMinSliceSpeed;
 	private static float					_prefMinAvgSpeed;
@@ -95,15 +95,19 @@ public class BreakTimeTool {
 	 */
 	public float							breakMinAvgSpeed;
 
+	/*
+	 * AS ... Average + Slice
+	 */
+
 	/**
 	 * average speed in km/h
 	 */
-	public double							breakMinAvgSpeedAS;
+	public float							breakMinAvgSpeedAS;
 
 	/**
 	 * slice speed in km/h
 	 */
-	public double							breakMinSliceSpeedAS;
+	public float							breakMinSliceSpeedAS;
 
 	/**
 	 * Minimum time in seconds for the slice speed
@@ -119,8 +123,8 @@ public class BreakTimeTool {
 							final float breakMinSliceSpeed,
 							final float breakMinAvgSpeed,
 							final int breakSliceDiff,
-							final double breakMinAvgSpeedAS,
-							final double breakMinSliceSpeedAS,
+							final float breakMinAvgSpeedAS,
+							final float breakMinSliceSpeedAS,
 							final int breakMinSliceTimeAS) {
 
 		this.breakTimeMethodId = breakTimeMethodId;
@@ -165,31 +169,31 @@ public class BreakTimeTool {
 	}
 
 	public static BreakTimeResult computeBreakTimeByAvgSliceSpeed(	final TourData tourData,
-																	final double minAvgSpeed,
-																	final double minSliceSpeed,
+																	final float minAvgSpeed,
+																	final float minSliceSpeed,
 																	final int minSliceTime) {
 
 		final int[] timeSerie = tourData.timeSerie;
-		final int[] distanceSerie = tourData.getMetricDistanceSerie();
+		final float[] distanceSerie = tourData.getMetricDistanceSerie();
 
 		final boolean[] breakTimeSerie = new boolean[timeSerie.length];
 
-		final int[] speedSerie = tourData.getSpeedSerieMetric();
+		final float[] speedSerie = tourData.getSpeedSerieMetric();
 
 		int lastTime = 0;
-		int lastDistance = 0;
+		float lastDistance = 0;
 		int tourBreakTime = 0;
 
 		for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
 
 			final int currentTime = timeSerie[serieIndex];
-			final int currentDistance = distanceSerie[serieIndex];
+			final float currentDistance = distanceSerie[serieIndex];
 
 			final int timeDiffSlice = currentTime - lastTime;
-			final int distDiffSlice = currentDistance - lastDistance;
+			final float distDiffSlice = currentDistance - lastDistance;
 
-			final double sliceSpeed = timeDiffSlice == 0 ? 0 : distDiffSlice * 3.6 / timeDiffSlice;
-			final double avgSpeed = speedSerie[serieIndex] / 10.0;
+			final float sliceSpeed = timeDiffSlice == 0 ? 0 : distDiffSlice * 3.6f / timeDiffSlice;
+			final float avgSpeed = speedSerie[serieIndex];
 
 			if ((avgSpeed < minAvgSpeed || sliceSpeed < minSliceSpeed) && timeDiffSlice >= minSliceTime) {
 
@@ -211,12 +215,12 @@ public class BreakTimeTool {
 															final float minSpeed) {
 
 		final int[] timeSerie = tourData.timeSerie;
-		final int[] distanceSerie = tourData.getMetricDistanceSerie();
+		final float[] distanceSerie = tourData.getMetricDistanceSerie();
 
 		final boolean[] breakTimeSerie = new boolean[timeSerie.length];
 
 		boolean isSliceSpeed;
-		int[] speedSerie = null;
+		float[] speedSerie = null;
 
 		if (breakMethodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_SLICE_SPEED)) {
 
@@ -234,24 +238,24 @@ public class BreakTimeTool {
 		}
 
 		int lastTime = 0;
-		int lastDistance = 0;
+		float lastDistance = 0;
 		int tourBreakTime = 0;
 
 		for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
 
 			final int currentTime = timeSerie[serieIndex];
-			final int currentDistance = distanceSerie[serieIndex];
+			final float currentDistance = distanceSerie[serieIndex];
 
 			final int timeDiffSlice = currentTime - lastTime;
-			final int distDiffSlice = currentDistance - lastDistance;
+			final float distDiffSlice = currentDistance - lastDistance;
 
 			float speedToCheck;
 			if (isSliceSpeed) {
 				speedToCheck = timeDiffSlice == 0 ? //
 						0
-						: (float) (distDiffSlice * 3.6 / timeDiffSlice);
+						: distDiffSlice * 3.6f / timeDiffSlice;
 			} else {
-				speedToCheck = (float) (speedSerie[serieIndex] / 10.0);
+				speedToCheck = speedSerie[serieIndex];
 			}
 
 			if (speedToCheck <= minSpeed) {
@@ -275,7 +279,7 @@ public class BreakTimeTool {
 																	final int sliceDiff) {
 
 		final int[] timeSerie = tourData.timeSerie;
-		final int[] distanceSerie = tourData.getMetricDistanceSerie();
+		final float[] distanceSerie = tourData.getMetricDistanceSerie();
 
 		// slice diff is ignored when it's set to 0
 		final boolean isSliceDiff = sliceDiff > 0;
@@ -284,15 +288,15 @@ public class BreakTimeTool {
 		final boolean[] breakTimeSerie = new boolean[timeSerie.length];
 
 		int prevTime = 0;
-		int prevDistance = 0;
+		float prevDistance = 0;
 
 		for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
 
 			final int currentTime = timeSerie[serieIndex];
-			final int currentDistance = distanceSerie[serieIndex];
+			final float currentDistance = distanceSerie[serieIndex];
 
 			final int sliceTimeDiff = currentTime - prevTime;
-			final int sliceDistDiff = currentDistance - prevDistance;
+			final float sliceDistDiff = currentDistance - prevDistance;
 
 //			if (serieIndex == 736) {
 //				final int a = 0;
@@ -323,7 +327,7 @@ public class BreakTimeTool {
 				 */
 				int prevIndex = serieIndex;
 				int timeDiffPrevSlices = 0;
-				int distDiffPrevSlices = 0;
+				float distDiffPrevSlices = 0;
 
 				while (timeDiffPrevSlices <= shortestBreakTime) {
 
@@ -395,8 +399,8 @@ public class BreakTimeTool {
 
 		_prefBreakTimeMethodId = _prefStore.getString(ITourbookPreferences.BREAK_TIME_METHOD2);
 
-		_prefMinAvgSpeedAS = _prefStore.getDouble(ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED_AS);
-		_prefMinSliceSpeedAS = _prefStore.getDouble(ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED_AS);
+		_prefMinAvgSpeedAS = _prefStore.getFloat(ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED_AS);
+		_prefMinSliceSpeedAS = _prefStore.getFloat(ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED_AS);
 		_prefMinSliceTimeAS = _prefStore.getInt(ITourbookPreferences.BREAK_TIME_MIN_SLICE_TIME_AS);
 
 		_prefMinAvgSpeed = _prefStore.getFloat(ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED);

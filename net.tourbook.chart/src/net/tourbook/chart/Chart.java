@@ -31,6 +31,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ViewForm;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -60,8 +61,6 @@ public class Chart extends ViewForm {
 	public static final int				SYNCH_MODE_NO						= 0;
 	public static final int				SYNCH_MODE_BY_SCALE					= 1;
 	public static final int				SYNCH_MODE_BY_SIZE					= 2;
-
-	static final int					GRAPH_ALPHA							= 0xd0;
 
 	public static final String			MOUSE_MODE_SLIDER					= "slider";										//$NON-NLS-1$
 	public static final String			MOUSE_MODE_ZOOM						= "zoom";											//$NON-NLS-1$
@@ -124,11 +123,31 @@ public class Chart extends ViewForm {
 	 * rounded up or down to fit a rounded unit
 	 */
 	protected int						gridVerticalDistance				= 30;
-
 	protected int						gridHorizontalDistance				= 70;
 
 	protected boolean					isShowHorizontalGridLines			= false;
 	protected boolean					isShowVerticalGridLines				= false;
+
+	/**
+	 * Transparency of the graph lines
+	 */
+	protected int						graphTransparencyLine				= 0xFF;
+
+	/**
+	 * Transparency of the graph fillings
+	 */
+	protected int						graphTransparencyFilling			= 0xE0;
+
+	/**
+	 * The graph transparency can be adjusted with this value. This value is multiplied with the
+	 * {@link #graphTransparencyFilling} and {@link #graphTransparencyLine}.
+	 */
+	double								graphTransparencyAdjustment			= 1.0;
+
+	/**
+	 * Antialiasing for the graph, can be {@link SWT#ON} or {@link SWT#OFF}.
+	 */
+	protected int						graphAntialiasing					= SWT.OFF;
 
 	/**
 	 * mouse behaviour:<br>
@@ -339,15 +358,22 @@ public class Chart extends ViewForm {
 			return null;
 		}
 
+		final ChartComponentGraph componentGraph = _chartComponents.getChartComponentGraph();
+		final int hoveredLineValueIndex = componentGraph.getHoveredLineValueIndex();
+		if (hoveredLineValueIndex == -1) {
+			// hovered line is not yet recognized
+			return null;
+		}
+
 		final SelectionChartInfo chartInfo = new SelectionChartInfo(this);
 
 		chartInfo.chartDataModel = _chartDataModel;
 		chartInfo.chartDrawingData = _chartComponents.getChartDrawingData();
 
-		final ChartComponentGraph chartGraph = _chartComponents.getChartComponentGraph();
-		chartInfo.leftSliderValuesIndex = chartGraph.getLeftSlider().getValuesIndex();
-		chartInfo.rightSliderValuesIndex = chartGraph.getRightSlider().getValuesIndex();
-		chartInfo.selectedSliderValuesIndex = chartGraph.getSelectedSlider().getValuesIndex();
+		chartInfo.leftSliderValuesIndex = componentGraph.getLeftSlider().getValuesIndex();
+		chartInfo.rightSliderValuesIndex = componentGraph.getRightSlider().getValuesIndex();
+
+		chartInfo.selectedSliderValuesIndex = hoveredLineValueIndex;
 
 		return chartInfo;
 	}
@@ -366,6 +392,14 @@ public class Chart extends ViewForm {
 		}
 	}
 
+	/**
+	 * Dispose colors which are used to paint the graphs.
+	 */
+	public void disposeColors() {
+
+		_chartComponents.getChartComponentGraph().disposeColors();
+	}
+
 	void enableActions() {
 
 		if (_chartActionProxies == null) {
@@ -375,7 +409,7 @@ public class Chart extends ViewForm {
 		final ChartComponentGraph chartComponentGraph = _chartComponents.getChartComponentGraph();
 
 		final boolean canZoomOut = chartComponentGraph.getGraphZoomRatio() > 1;
-		final boolean canZoomIn = chartComponentGraph.getDevVirtualGraphImageWidth() < ChartComponents.CHART_MAX_WIDTH;
+		final boolean canZoomIn = chartComponentGraph.getXXDevGraphWidth() < ChartComponents.CHART_MAX_WIDTH;
 
 		_chartActionProxies.get(COMMAND_ID_ZOOM_IN).setEnabled(canZoomIn);
 		_chartActionProxies.get(COMMAND_ID_ZOOM_OUT).setEnabled(canZoomOut);
@@ -630,10 +664,6 @@ public class Chart extends ViewForm {
 		return _chartComponents.getChartComponentGraph()._canAutoZoomToSlider;
 	}
 
-	public boolean getCanScrollZoomedChart() {
-		return _chartComponents.getChartComponentGraph()._canScrollZoomedChart;
-	}
-
 	protected ChartComponents getChartComponents() {
 		return _chartComponents;
 	}
@@ -658,8 +688,8 @@ public class Chart extends ViewForm {
 		return createChartInfo();
 	}
 
-	public int getDevGraphImageXOffset() {
-		return _chartComponents.getChartComponentGraph().getDevGraphImageXOffset();
+	public int getXXDevViewPortLeftBorder() {
+		return _chartComponents.getChartComponentGraph().getXXDevViewPortLeftBorder();
 	}
 
 	/**
@@ -707,19 +737,6 @@ public class Chart extends ViewForm {
 		return _isDrawBarChartAtBottom;
 	}
 
-//	boolean isMouseDownExternalPost(final int devXMouse, final int devYMouse, final int devXGraph) {
-//
-//		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseDownPost);
-//
-//		event.devXMouse = devXMouse;
-//		event.devYMouse = devYMouse;
-//		event.devMouseXInGraph = devXGraph;
-//
-//		fireChartMouseEvent(event);
-//
-//		return event.isWorked;
-//	}
-
 	/**
 	 * Returns the toolbar for the chart, if no toolbar manager is set with setToolbarManager, the
 	 * manager will be created and the toolbar is on top of the chart
@@ -762,6 +779,10 @@ public class Chart extends ViewForm {
 		return getChartComponents().getAxisLeft();
 	}
 
+	protected Control getValuePointControl() {
+		return _chartComponents.getChartComponentGraph();
+	}
+
 	/**
 	 * returns the value index for the x-sliders
 	 */
@@ -774,39 +795,40 @@ public class Chart extends ViewForm {
 				.getValuesIndex());
 	}
 
-	boolean isMouseDownExternalPre(final int devXMouse, final int devYMouse, final int devXGraph) {
+	protected void handleTooltipMouseEvent(final Event event, final Point mouseDisplayPosition) {
+		_chartComponents.getChartComponentGraph().handleTooltipMouseEvent(event, mouseDisplayPosition);
+	}
+
+	boolean isMouseDownExternalPre(final int devXMouse, final int devYMouse) {
 
 		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseDownPre);
 
 		event.devXMouse = devXMouse;
 		event.devYMouse = devYMouse;
-		event.devMouseXInGraph = devXGraph;
 
 		fireChartMouseEvent(event);
 
 		return event.isWorked;
 	}
 
-	boolean isMouseMoveExternal(final int devXMouse, final int devYMouse, final int devXGraph) {
+	boolean isMouseMoveExternal(final int devXMouse, final int devYMouse) {
 
 		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseMove);
 
 		event.devXMouse = devXMouse;
 		event.devYMouse = devYMouse;
-		event.devMouseXInGraph = devXGraph;
 
 		fireChartMouseEvent(event);
 
 		return event.isWorked;
 	}
 
-	boolean isMouseUpExternal(final int devXMouse, final int devYMouse, final int devXGraph) {
+	boolean isMouseUpExternal(final int devXMouse, final int devYMouse) {
 
 		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseUp);
 
 		event.devXMouse = devXMouse;
 		event.devYMouse = devYMouse;
-		event.devMouseXInGraph = devXGraph;
 
 		fireChartMouseEvent(event);
 
@@ -849,7 +871,7 @@ public class Chart extends ViewForm {
 			_chartComponents.getChartComponentGraph().zoomInWithoutSlider();
 			_chartComponents.onResize();
 		} else {
-			_chartComponents.getChartComponentGraph().zoomInWithMouse();
+			_chartComponents.getChartComponentGraph().zoomInWithMouse(Integer.MIN_VALUE);
 		}
 	}
 
@@ -868,7 +890,7 @@ public class Chart extends ViewForm {
 			return;
 		}
 
-		_chartComponents.getChartComponentGraph().zoomOutWithMouse(updateChart);
+		_chartComponents.getChartComponentGraph().zoomOutWithMouse(updateChart, Integer.MIN_VALUE);
 	}
 
 	void onHideContextMenu(final MenuEvent e, final Control menuParentControl) {
@@ -909,18 +931,8 @@ public class Chart extends ViewForm {
 	}
 
 	public void resetGraphAlpha() {
-		_chartComponents.getChartComponentGraph()._graphAlpha = GRAPH_ALPHA;
+		graphTransparencyAdjustment = 1;
 	}
-
-//	/**
-//	 * Set <code>true</code> when the internal action bar should be used, set <code>false</code>
-//	 * when the workbench action should be used.
-//	 *
-//	 * @param useInternalActionBar
-//	 */
-//	public void setUseInternalActionBar(boolean useInternalActionBar) {
-//		fUseInternalActionBar = useInternalActionBar;
-//	}
 
 	/**
 	 * Do a resize for all chart components which creates new drawing data
@@ -958,15 +970,6 @@ public class Chart extends ViewForm {
 	}
 
 	/**
-	 * set the option to scroll/not scroll the zoomed chart
-	 * 
-	 * @param canScrollabelZoomedGraph
-	 */
-	public void setCanScrollZoomedChart(final boolean canScrollabelZoomedGraph) {
-		_chartComponents.getChartComponentGraph().setCanScrollZoomedChart(canScrollabelZoomedGraph);
-	}
-
-	/**
 	 * Set the enable state for a command and update the UI
 	 */
 	public void setChartCommandEnabled(final String commandId, final boolean isEnabled) {
@@ -981,10 +984,6 @@ public class Chart extends ViewForm {
 	public void setContextProvider(final IChartContextProvider chartContextProvider) {
 		_chartContextProvider = chartContextProvider;
 	}
-
-//	public void setShowPartNavigation(final boolean showPartNavigation) {
-//		fShowPartNavigation = showPartNavigation;
-//	}
 
 	/**
 	 * @param chartContextProvider
@@ -1038,12 +1037,14 @@ public class Chart extends ViewForm {
 	}
 
 	/**
-	 * Sets the alpha value for the filling operation
+	 * Adjust the alpha value for the filling operation, this value is multiplied with
+	 * {@link #graphTransparencyFilling} and {@link #graphTransparencyLine} which is set in the tour
+	 * chart preference page.
 	 * 
-	 * @param alphaValue
+	 * @param adjustment
 	 */
-	public void setGraphAlpha(final int alphaValue) {
-		_chartComponents.getChartComponentGraph()._graphAlpha = alphaValue;
+	public void setGraphAlpha(final double adjustment) {
+		graphTransparencyAdjustment = adjustment;
 	}
 
 	public void setGrid(final int horizontalGrid,
@@ -1072,7 +1073,8 @@ public class Chart extends ViewForm {
 
 		updateMouseModeUIState();
 
-		_chartComponents.getChartComponentGraph().setDefaultCursor();
+		final Point devMouse = this.toControl(getDisplay().getCursorLocation());
+		_chartComponents.getChartComponentGraph().setCursorStyle(devMouse.y);
 
 	}
 
@@ -1113,14 +1115,6 @@ public class Chart extends ViewForm {
 		_chartComponents.getChartComponentGraph().setSelectedBars(selectedItems);
 
 		fireBarSelectionEvent(0, _barSelectionValueIndex);
-	}
-
-	/**
-	 * @param isMarkerVisible
-	 *            <code>true</code> shows the marker area
-	 */
-	public void setShowMarker(final boolean isMarkerVisible) {
-		_chartComponents.setMarkerVisible(isMarkerVisible);
 	}
 
 	/**
@@ -1182,6 +1176,10 @@ public class Chart extends ViewForm {
 
 		// set tour info icon into the left axis
 		getToolTipControl().setTourToolTipProvider(tourToolTip);
+	}
+
+	public void setValuePointToolTipProvider(final IValuePointToolTip valuePointToolTip) {
+		_chartComponents.componentGraph.valuePointToolTip = valuePointToolTip;
 	}
 
 	/**

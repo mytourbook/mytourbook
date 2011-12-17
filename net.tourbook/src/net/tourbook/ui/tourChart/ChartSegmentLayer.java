@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,14 +16,13 @@
 /**
  * @author Wolfgang Schramm Created: 06.07.2005
  */
-
 package net.tourbook.ui.tourChart;
 
 import java.util.ArrayList;
 
 import net.tourbook.chart.Chart;
-import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.ChartMarker;
+import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IChartLayer;
 
 import org.eclipse.swt.SWT;
@@ -35,9 +34,9 @@ import org.eclipse.swt.widgets.Display;
 
 public class ChartSegmentLayer implements IChartLayer {
 
-	private ArrayList<ChartMarker>	fChartMarkers	= new ArrayList<ChartMarker>();
+	private ArrayList<ChartMarker>	_chartMarkers	= new ArrayList<ChartMarker>();
 
-	private RGB						lineColor		= new RGB(189, 0, 255);
+	private RGB						_lineColor		= new RGB(189, 0, 255);
 
 	/**
 	 * Adds a new marker to the internal marker list, the list can be retrieved with getMarkerList()
@@ -48,7 +47,7 @@ public class ChartSegmentLayer implements IChartLayer {
 	 * @param label
 	 */
 	public void addMarker(final ChartMarker chartMarker) {
-		fChartMarkers.add(chartMarker);
+		_chartMarkers.add(chartMarker);
 	}
 
 	/**
@@ -64,25 +63,25 @@ public class ChartSegmentLayer implements IChartLayer {
 
 		final int devYTop = drawingData.getDevYTop();
 		final int devYBottom = drawingData.getDevYBottom();
-		final int devGraphImageOffset = chart.getDevGraphImageXOffset();
+		final int devGraphImageOffset = chart.getXXDevViewPortLeftBorder();
 		final int devGraphHeight = drawingData.devGraphHeight;
 
-		final int graphYBottom = drawingData.getGraphYBottom();
-		final int[] yValues = drawingData.getYData().getHighValues()[0];
+		final float graphYBottom = drawingData.getGraphYBottom();
+		final float[] yValues = drawingData.getYData().getHighValues()[0];
 		final float scaleX = drawingData.getScaleX();
 		final float scaleY = drawingData.getScaleY();
 
 		final Color colorLine = new Color(display, getLineColor());
 		Point lastPoint = null;
 
-		for (final ChartMarker chartMarker : fChartMarkers) {
+		for (final ChartMarker chartMarker : _chartMarkers) {
 
 			final int devXOffset = (int) (chartMarker.graphX * scaleX) - devGraphImageOffset;
 
 			final int yValueIndex = Math.min(yValues.length - 1, chartMarker.serieIndex);
-			final int yValue = yValues[yValueIndex];
+			final float yValue = yValues[yValueIndex];
 
-			final int devYGraph = (int) ((yValue - graphYBottom) * scaleY) - 0;
+			final int devYGraph = (int) ((yValue - graphYBottom) * scaleY);
 			int devYSegment = devYBottom - devYGraph;
 
 			// don't draw over the graph borders
@@ -116,10 +115,10 @@ public class ChartSegmentLayer implements IChartLayer {
 	}
 
 	public RGB getLineColor() {
-		return lineColor;
+		return _lineColor;
 	}
 
 	public void setLineColor(final RGB lineColor) {
-		this.lineColor = lineColor;
+		this._lineColor = lineColor;
 	}
 }

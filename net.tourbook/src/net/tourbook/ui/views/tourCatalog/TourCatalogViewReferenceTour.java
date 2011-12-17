@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -193,8 +193,8 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart implements I
 				xData.setSynchMarkerValueIndex(refTour.getStartValueIndex(), refTour.getEndValueIndex());
 
 				// set the value difference of the synch marker
-				final int[] xValues = xData.getHighValues()[0];
-				final int refTourXMarkerValue = xValues[refTour.getEndValueIndex()]
+				final float[] xValues = xData.getHighValues()[0];
+				final float refTourXMarkerValue = xValues[refTour.getEndValueIndex()]
 						- xValues[refTour.getStartValueIndex()];
 
 				TourManager.fireEvent(TourEventId.REFERENCE_TOUR_CHANGED, new TourPropertyRefTourChanged(

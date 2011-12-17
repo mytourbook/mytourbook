@@ -108,7 +108,8 @@ public class GarminSAXHandler extends DefaultHandler {
 	private boolean							_isInCreatorVersionMajor;
 	private boolean							_isInCreatorVersionMinor;
 	//
-	private HashMap<Long, TourData>			_tourDataMap;
+	private HashMap<Long, TourData>			_alreadyImportedTours;
+	private HashMap<Long, TourData>			_newlyImportedTours;
 	private TourbookDevice					_deviceDataReader;
 	private String							_importFilePath;
 	//
@@ -155,11 +156,13 @@ public class GarminSAXHandler extends DefaultHandler {
 	public GarminSAXHandler(final TourbookDevice deviceDataReader,
 							final String importFileName,
 							final DeviceData deviceData,
-							final HashMap<Long, TourData> tourDataMap) {
+							final HashMap<Long, TourData> alreadyImportedTours,
+							final HashMap<Long, TourData> newlyImportedTours) {
 
 		_deviceDataReader = deviceDataReader;
 		_importFilePath = importFileName;
-		_tourDataMap = tourDataMap;
+		_alreadyImportedTours = alreadyImportedTours;
+		_newlyImportedTours = newlyImportedTours;
 	}
 
 	private static void formatDT(	final DateTimeFormatter jodaFormatter,
@@ -556,7 +559,7 @@ public class GarminSAXHandler extends DefaultHandler {
 		tourData.setCalories(_tourCalories);
 
 		// after all data are added, the tour id can be created
-		final int[] distanceSerie = tourData.getMetricDistanceSerie();
+		final float[] distanceSerie = tourData.getMetricDistanceSerie();
 		String uniqueKey;
 
 		if (_deviceDataReader.isCreateTourIdWithRecordingTime) {
@@ -572,7 +575,7 @@ public class GarminSAXHandler extends DefaultHandler {
 				uniqueKey = Integer.toString(tourRecordingTime);
 			} else {
 
-				final long tourDistance = distanceSerie[(distanceSerie.length - 1)];
+				final long tourDistance = (long) distanceSerie[(distanceSerie.length - 1)];
 
 				uniqueKey = Long.toString(tourDistance + tourRecordingTime);
 			}
@@ -585,14 +588,14 @@ public class GarminSAXHandler extends DefaultHandler {
 			if (distanceSerie == null) {
 				uniqueKey = Util.UNIQUE_ID_SUFFIX_GARMIN_TCX;
 			} else {
-				uniqueKey = Integer.toString(distanceSerie[distanceSerie.length - 1]);
+				uniqueKey = Integer.toString((int) distanceSerie[distanceSerie.length - 1]);
 			}
 		}
 
 		final Long tourId = tourData.createTourId(uniqueKey);
 
 		// check if the tour is already imported
-		if (_tourDataMap.containsKey(tourId) == false) {
+		if (_alreadyImportedTours.containsKey(tourId) == false) {
 
 			tourData.computeAltitudeUpDown();
 			tourData.computeTourDrivingTime();
@@ -614,7 +617,7 @@ public class GarminSAXHandler extends DefaultHandler {
 							: UI.DOT + minorVersion));
 
 			// add new tour to other tours
-			_tourDataMap.put(tourId, tourData);
+			_newlyImportedTours.put(tourId, tourData);
 		}
 
 		_isImported = true;
@@ -732,9 +735,7 @@ public class GarminSAXHandler extends DefaultHandler {
 			_isInHeartRateValue = false;
 
 			if (_dataVersion == 2) {
-				final short pulse = getShortValue(_characters.toString());
-//				pulse = pulse == Integer.MIN_VALUE ? 0 : pulse;
-				_timeData.pulse = pulse;
+				_timeData.pulse = getFloatValue(_characters.toString());
 			}
 
 		} else if (name.equals(TAG_HEART_RATE_BPM)) {
@@ -742,9 +743,7 @@ public class GarminSAXHandler extends DefaultHandler {
 			_isInHeartRate = false;
 
 			if (_dataVersion == 1) {
-				final short pulse = getShortValue(_characters.toString());
-//				pulse = pulse == Integer.MIN_VALUE ? 0 : pulse;
-				_timeData.pulse = pulse;
+				_timeData.pulse = getFloatValue(_characters.toString());
 			}
 
 		} else if (name.equals(TAG_ALTITUDE_METERS)) {
@@ -761,9 +760,8 @@ public class GarminSAXHandler extends DefaultHandler {
 		} else if (name.equals(TAG_CADENCE)) {
 
 			_isInCadence = false;
-			short cadence = getShortValue(_characters.toString());
-			cadence = cadence == Integer.MIN_VALUE ? 0 : cadence;
-			_timeData.cadence = cadence;
+			float cadence = getFloatValue(_characters.toString());
+			_timeData.cadence = cadence = cadence == Float.MIN_VALUE ? 0 : cadence;
 
 		} else if (name.equals(TAG_SENSOR_STATE)) {
 
@@ -846,18 +844,18 @@ public class GarminSAXHandler extends DefaultHandler {
 		}
 	}
 
-	private short getShortValue(final String textValue) {
-
-		try {
-			if (textValue != null) {
-				return Short.parseShort(textValue);
-			} else {
-				return Short.MIN_VALUE;
-			}
-		} catch (final NumberFormatException e) {
-			return Short.MIN_VALUE;
-		}
-	}
+//	private short getShortValue(final String textValue) {
+//
+//		try {
+//			if (textValue != null) {
+//				return Short.parseShort(textValue);
+//			} else {
+//				return Short.MIN_VALUE;
+//			}
+//		} catch (final NumberFormatException e) {
+//			return Short.MIN_VALUE;
+//		}
+//	}
 
 	private void initializeNewLap() {
 

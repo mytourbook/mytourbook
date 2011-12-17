@@ -372,10 +372,10 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 		/*
 		 * tag menu
 		 */
-		final MenuManager menuMgr = new MenuManager();
+		final MenuManager tagMenuMgr = new MenuManager();
 
-		menuMgr.setRemoveAllWhenShown(true);
-		menuMgr.addMenuListener(new IMenuListener() {
+		tagMenuMgr.setRemoveAllWhenShown(true);
+		tagMenuMgr.addMenuListener(new IMenuListener() {
 			@Override
 			public void menuAboutToShow(final IMenuManager menuMgr) {
 
@@ -389,7 +389,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
 		// set menu for the tag item
 
-		final Menu tagContextMenu = menuMgr.createContextMenu(_linkTag);
+		final Menu tagContextMenu = tagMenuMgr.createContextMenu(_linkTag);
 		tagContextMenu.addMenuListener(new MenuListener() {
 
 			@Override
@@ -734,13 +734,13 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 		/*
 		 * get data series
 		 */
-		final int[] tourAltitudeSerie = _tourDataSource.altitudeSerie;
-		final int[] tourCadenceSerie = _tourDataSource.cadenceSerie;
-		final int[] tourDistanceSerie = _tourDataSource.distanceSerie;
+		final float[] tourAltitudeSerie = _tourDataSource.altitudeSerie;
+		final float[] tourCadenceSerie = _tourDataSource.cadenceSerie;
+		final float[] tourDistanceSerie = _tourDataSource.distanceSerie;
 		final double[] tourLatitudeSerie = _tourDataSource.latitudeSerie;
 		final double[] tourLongitudeSerie = _tourDataSource.longitudeSerie;
-		final int[] tourPulseSerie = _tourDataSource.pulseSerie;
-		final int[] tourTemperatureSerie = _tourDataSource.temperatureSerie;
+		final float[] tourPulseSerie = _tourDataSource.pulseSerie;
+		final float[] tourTemperatureSerie = _tourDataSource.temperatureSerie;
 		final int[] tourTimeSerie = _tourDataSource.timeSerie;
 
 		final boolean isTourAltitude = (tourAltitudeSerie != null) && (tourAltitudeSerie.length > 0);
@@ -755,8 +755,8 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 		/*
 		 * get speed/power data when data are created by the device
 		 */
-		int[] tourPowerSerie = null;
-		int[] tourSpeedSerie = null;
+		float[] tourPowerSerie = null;
+		float[] tourSpeedSerie = null;
 		final boolean isTourPower = _tourDataSource.isPowerSerieFromDevice();
 		final boolean isTourSpeed = _tourDataSource.isSpeedSerieFromDevice();
 		if (isTourPower) {
@@ -802,15 +802,15 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
 		final int extractSerieLength = _extractEndIndex - _extractStartIndex + 1;
 
-		final int[] extractAltitudeSerie = new int[extractSerieLength];
-		final int[] extractCadenceSerie = new int[extractSerieLength];
-		final int[] extractDistanceSerie = new int[extractSerieLength];
+		final float[] extractAltitudeSerie = new float[extractSerieLength];
+		final float[] extractCadenceSerie = new float[extractSerieLength];
+		final float[] extractDistanceSerie = new float[extractSerieLength];
 		final double[] extractLatitudeSerie = new double[extractSerieLength];
 		final double[] extractLongitudeSerie = new double[extractSerieLength];
-		final int[] extractPowerSerie = new int[extractSerieLength];
-		final int[] extractPulseSerie = new int[extractSerieLength];
-		final int[] extractSpeedSerie = new int[extractSerieLength];
-		final int[] extractTemperatureSerie = new int[extractSerieLength];
+		final float[] extractPowerSerie = new float[extractSerieLength];
+		final float[] extractPulseSerie = new float[extractSerieLength];
+		final float[] extractSpeedSerie = new float[extractSerieLength];
+		final float[] extractTemperatureSerie = new float[extractSerieLength];
 		final int[] extractTimeSerie = new int[extractSerieLength];
 
 		final HashSet<TourMarker> extractedTourMarker = new HashSet<TourMarker>();
@@ -842,8 +842,8 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 		}
 
 		// get distance
-		int extractedDistance = 0;
-		int relTourStartDistance = 0;
+		float extractedDistance = 0;
+		float relTourStartDistance = 0;
 		if (isTourDistance) {
 			relTourStartDistance = tourDistanceSerie[_extractStartIndex];
 			extractedDistance = tourDistanceSerie[_extractEndIndex] - relTourStartDistance;
@@ -1021,8 +1021,6 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 		if (isTourTime) {
 			_tourDataTarget.timeSerie = extractTimeSerie;
 		}
-
-		_tourDataTarget.setTemperatureScale(_tourDataSource.getTemperatureScale());
 
 		_tourDataTarget.computeAltitudeUpDown();
 		_tourDataTarget.computeTourDrivingTime();

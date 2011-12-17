@@ -42,6 +42,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 	public static final int			FILL_METHOD_FILL_BOTTOM		= 1;
 	public static final int			FILL_METHOD_FILL_ZERO		= 2;
 	public static final int			FILL_METHOD_CUSTOM			= 100;
+	public static final int			BAR_DRAW_METHOD_BOTTOM		= 200;
 
 	/**
 	 * Slider label format: n.1
@@ -63,7 +64,12 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 	private int						_graphFillMethod			= FILL_METHOD_FILL_BOTTOM;
 
-	private boolean					_showYSlider				= false;
+	private boolean					_isShowYSlider				= false;
+
+	/**
+	 * This value is set when a y-slider is dragged
+	 */
+	float							adjustedYValue				= Float.MIN_VALUE;
 
 	/**
 	 * <p>
@@ -87,9 +93,9 @@ public class ChartDataYSerie extends ChartDataSerie {
 	 */
 	private IFillPainter			_customFillPainter;
 
-	private ChartYSlider			_ySliderTop;
+	private ChartYSlider			_ySlider1;
 
-	private ChartYSlider			_ySliderBottom;
+	private ChartYSlider			_ySlider2;
 
 	private final int				_chartType;
 
@@ -102,39 +108,34 @@ public class ChartDataYSerie extends ChartDataSerie {
 	 */
 //	private int						_disabledLineToNext;
 
-	/**
-	 * 2nd y-data serie is currently used to display the slider label and the pace y-units
-	 */
-//	private int[]					fYData2ndSerie;
-
-	public ChartDataYSerie(	final int chartType,
-							final int chartLayout,
-							final int[][] lowValueSeries,
-							final int[][] highValueSeries) {
-
+	public ChartDataYSerie(final int chartType, final float[] valueSerie) {
 		_chartType = chartType;
-		_chartLayout = chartLayout;
-
-		setMinMaxValues(lowValueSeries, highValueSeries);
+		setMinMaxValues(new float[][] { valueSerie });
 	}
 
-	public ChartDataYSerie(final int chartType, final int[] valueSerie) {
+	public ChartDataYSerie(final int chartType, final float[] lowValueSerie, final float[] highValueSerie) {
 		_chartType = chartType;
-		setMinMaxValues(new int[][] { valueSerie });
+		setMinMaxValues(new float[][] { lowValueSerie }, new float[][] { highValueSerie });
 	}
 
-	public ChartDataYSerie(final int chartType, final int[] lowValueSerie, final int[] highValueSerie) {
-		_chartType = chartType;
-		setMinMaxValues(new int[][] { lowValueSerie }, new int[][] { highValueSerie });
-	}
-
-	public ChartDataYSerie(final int chartType, final int[][] valueSeries) {
+	public ChartDataYSerie(final int chartType, final float[][] valueSeries) {
 		_chartType = chartType;
 		setMinMaxValues(valueSeries);
 	}
 
-	public ChartDataYSerie(final int chartType, final int[][] lowValueSeries, final int[][] highValueSeries) {
+	public ChartDataYSerie(final int chartType, final float[][] lowValueSeries, final float[][] highValueSeries) {
 		_chartType = chartType;
+		setMinMaxValues(lowValueSeries, highValueSeries);
+	}
+
+	public ChartDataYSerie(	final int chartType,
+							final int chartLayout,
+							final float[][] lowValueSeries,
+							final float[][] highValueSeries) {
+
+		_chartType = chartType;
+		_chartLayout = chartLayout;
+
 		setMinMaxValues(lowValueSeries, highValueSeries);
 	}
 
@@ -171,16 +172,16 @@ public class ChartDataYSerie extends ChartDataSerie {
 		return _customFgLayers;
 	}
 
-//	public int getDisabledLineToNext() {
-//		return _disabledLineToNext;
-//	}
-
 	/**
 	 * @return returns true if the graph is filled
 	 */
 	public int getGraphFillMethod() {
 		return _graphFillMethod;
 	}
+
+//	public int getDisabledLineToNext() {
+//		return _disabledLineToNext;
+//	}
 
 	/**
 	 * @return Returns the format how the slider label will be formatted, which can be <br>
@@ -196,17 +197,17 @@ public class ChartDataYSerie extends ChartDataSerie {
 	}
 
 	/**
-	 * @return Returns the ySliderBottom.
+	 * @return Returns the ySliderTop.
 	 */
-	public ChartYSlider getYSliderBottom() {
-		return _ySliderBottom;
+	public ChartYSlider getYSlider1() {
+		return _ySlider1;
 	}
 
 	/**
-	 * @return Returns the ySliderTop.
+	 * @return Returns the ySliderBottom.
 	 */
-	public ChartYSlider getYSliderTop() {
-		return _ySliderTop;
+	public ChartYSlider getYSlider2() {
+		return _ySlider2;
 	}
 
 	/**
@@ -220,7 +221,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 	 * @return Returns the showYSlider.
 	 */
 	public boolean isShowYSlider() {
-		return _showYSlider;
+		return _isShowYSlider;
 	}
 
 	/**
@@ -272,10 +273,6 @@ public class ChartDataYSerie extends ChartDataSerie {
 		_customFgLayers = customLayers;
 	}
 
-//	public void setDisableLineToNext(final int disabledLineToNext) {
-//		_disabledLineToNext = disabledLineToNext;
-//	}
-
 	/**
 	 * @param fillMethod
 	 *            when set to <tt>true</tt> graph is filled, default is <tt>false</tt>
@@ -285,10 +282,10 @@ public class ChartDataYSerie extends ChartDataSerie {
 	}
 
 	@Override
-	void setMinMaxValues(final int[][] valueSeries) {
+	void setMinMaxValues(final float[][] valueSeries) {
 
 		if (valueSeries == null || valueSeries.length == 0 || valueSeries[0] == null || valueSeries[0].length == 0) {
-			_highValues = new int[0][0];
+			_highValues = new float[0][0];
 			_visibleMaxValue = _visibleMinValue = 0;
 			_originalMaxValue = _originalMinValue = 0;
 
@@ -312,8 +309,8 @@ public class ChartDataYSerie extends ChartDataSerie {
 				case ChartDataYSerie.BAR_LAYOUT_BESIDE:
 
 					// get the min/max highValues for all data
-					for (final int[] valuesOuter : valueSeries) {
-						for (final int valuesInner : valuesOuter) {
+					for (final float[] valuesOuter : valueSeries) {
+						for (final float valuesInner : valuesOuter) {
 							_visibleMaxValue = (_visibleMaxValue >= valuesInner) ? _visibleMaxValue : valuesInner;
 							_visibleMinValue = (_visibleMinValue <= valuesInner) ? _visibleMinValue : valuesInner;
 						}
@@ -322,15 +319,15 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 				case ChartDataYSerie.BAR_LAYOUT_STACKED:
 
-					final int serieMax[] = new int[valueSeries[0].length];
+					final float serieMax[] = new float[valueSeries[0].length];
 
 					// get the max value for the data which are stacked on each
 					// other
-					for (final int[] valuesOuter : valueSeries) {
+					for (final float[] valuesOuter : valueSeries) {
 						for (int valueIndex = 0; valueIndex < valuesOuter.length; valueIndex++) {
 
-							final int outerValue = valuesOuter[valueIndex];
-							final int outerValueWithMax = serieMax[valueIndex] + outerValue;
+							final float outerValue = valuesOuter[valueIndex];
+							final float outerValueWithMax = serieMax[valueIndex] + outerValue;
 
 							serieMax[valueIndex] = (_visibleMaxValue >= outerValueWithMax)
 									? _visibleMaxValue
@@ -342,7 +339,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 					// get max for all series
 					_visibleMaxValue = 0;
-					for (final int serieValue : serieMax) {
+					for (final float serieValue : serieMax) {
 						_visibleMaxValue = (_visibleMaxValue >= serieValue) ? _visibleMaxValue : serieValue;
 					}
 
@@ -356,7 +353,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 	}
 
 	@Override
-	void setMinMaxValues(final int[][] lowValues, final int[][] highValues) {
+	void setMinMaxValues(final float[][] lowValues, final float[][] highValues) {
 
 		if (lowValues == null || lowValues.length == 0 || lowValues[0] == null || lowValues[0].length == 0
 
@@ -365,8 +362,8 @@ public class ChartDataYSerie extends ChartDataSerie {
 			_visibleMaxValue = _visibleMinValue = 0;
 			_originalMaxValue = _originalMinValue = 0;
 
-			_lowValues = new int[1][2];
-			_highValues = new int[1][2];
+			_lowValues = new float[1][2];
+			_highValues = new float[1][2];
 
 		} else {
 
@@ -383,14 +380,14 @@ public class ChartDataYSerie extends ChartDataSerie {
 					|| (_chartType == ChartDataModel.CHART_TYPE_BAR && _chartLayout == ChartDataYSerie.BAR_LAYOUT_BESIDE)) {
 
 				// get the min/max values for all data
-				for (final int[] valueSerie : highValues) {
-					for (final int value : valueSerie) {
+				for (final float[] valueSerie : highValues) {
+					for (final float value : valueSerie) {
 						_visibleMaxValue = (_visibleMaxValue >= value) ? _visibleMaxValue : value;
 					}
 				}
 
-				for (final int[] valueSerie : lowValues) {
-					for (final int value : valueSerie) {
+				for (final float[] valueSerie : lowValues) {
+					for (final float value : valueSerie) {
 						_visibleMinValue = (_visibleMinValue <= value) ? _visibleMinValue : value;
 					}
 				}
@@ -403,23 +400,23 @@ public class ChartDataYSerie extends ChartDataSerie {
 				 */
 
 				// summarize the data
-				final int[] summarizedMaxValues = new int[highValues[0].length];
-				for (final int[] valueSerie : highValues) {
+				final float[] summarizedMaxValues = new float[highValues[0].length];
+				for (final float[] valueSerie : highValues) {
 					for (int valueIndex = 0; valueIndex < valueSerie.length; valueIndex++) {
 						summarizedMaxValues[valueIndex] += valueSerie[valueIndex];
 					}
 				}
 
 				// get max value for the summarized values
-				for (final int value : summarizedMaxValues) {
+				for (final float value : summarizedMaxValues) {
 					_visibleMaxValue = (_visibleMaxValue >= value) ? _visibleMaxValue : value;
 				}
 
 				/*
 				 * calculate the min value
 				 */
-				for (final int[] serieData : lowValues) {
-					for (final int value : serieData) {
+				for (final float[] serieData : lowValues) {
+					for (final float value : serieData) {
 						_visibleMinValue = (_visibleMinValue <= value) ? _visibleMinValue : value;
 					}
 				}
@@ -438,10 +435,10 @@ public class ChartDataYSerie extends ChartDataSerie {
 	 */
 	public void setShowYSlider(final boolean showYSlider) {
 
-		this._showYSlider = showYSlider;
+		_isShowYSlider = showYSlider;
 
-		_ySliderTop = new ChartYSlider(this);
-		_ySliderBottom = new ChartYSlider(this);
+		_ySlider1 = new ChartYSlider(this);
+		_ySlider2 = new ChartYSlider(this);
 	}
 
 	/**
@@ -475,5 +472,4 @@ public class ChartDataYSerie extends ChartDataSerie {
 	public String toString() {
 		return "[ChartDataYSerie]";//$NON-NLS-1$
 	}
-
 }

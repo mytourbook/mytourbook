@@ -94,7 +94,7 @@ public class HrZonePainter implements IFillPainter {
 			return;
 		}
 
-		final int[] pulseSerie = tourData.pulseSerie;
+		final float[] pulseSerie = tourData.pulseSerie;
 		if (pulseSerie == null) {
 			return;
 		}

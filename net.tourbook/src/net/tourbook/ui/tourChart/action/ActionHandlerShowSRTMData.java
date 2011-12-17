@@ -24,7 +24,7 @@ import org.eclipse.core.commands.ExecutionException;
 public class ActionHandlerShowSRTMData extends TCActionHandler {
 
 	public ActionHandlerShowSRTMData() {
-		commandId = TourChart.COMMAND_ID_SHOW_SRTM_DATA;
+		commandId = TourChart.COMMAND_ID_IS_SHOW_SRTM_DATA;
 	}
 
 	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {

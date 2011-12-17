@@ -53,7 +53,7 @@ public class RecordMesgListenerImpl extends AbstractMesgListener implements Reco
 
 		final Float distance = mesg.getDistance();
 		if (distance != null) {
-			timeData.absoluteDistance = DataConverters.convertDistance(distance);
+			timeData.absoluteDistance = distance;
 		}
 
 		final Float speed = mesg.getSpeed();

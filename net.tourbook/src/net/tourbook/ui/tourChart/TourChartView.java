@@ -70,9 +70,10 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class TourChartView extends ViewPart implements ITourChartViewer {
 
-	public static final String		ID			= "net.tourbook.views.TourChartView";				//$NON-NLS-1$
+	public static final String		ID			= "net.tourbook.views.TourChartView";	//$NON-NLS-1$
 
-	private final IPreferenceStore	_prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
+	private final IPreferenceStore	_prefStore	= TourbookPlugin.getDefault()//
+														.getPreferenceStore();
 
 	private TourChartConfiguration	_tourChartConfig;
 	private TourData				_tourData;
@@ -100,19 +101,37 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourChartView.this) {
-//					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourChartView.this);
+//					System.out.println("partClosed\t");
+//					// TODO remove SYSTEM.OUT.PRINTLN
 				}
 			}
 
-			public void partDeactivated(final IWorkbenchPartReference partRef) {}
+			public void partDeactivated(final IWorkbenchPartReference partRef) {
+				if (partRef.getPart(false) == TourChartView.this) {
+//					System.out.println("partDeactivated\t");
+//					// TODO remove SYSTEM.OUT.PRINTLN
+				}
+			}
 
-			public void partHidden(final IWorkbenchPartReference partRef) {}
+			public void partHidden(final IWorkbenchPartReference partRef) {
+				if (partRef.getPart(false) == TourChartView.this) {
+//					System.out.println("partHidden\t");
+//					// TODO remove SYSTEM.OUT.PRINTLN$
+					_tourChart.partIsHidden();
+				}
+			}
 
 			public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
 			public void partOpened(final IWorkbenchPartReference partRef) {}
 
-			public void partVisible(final IWorkbenchPartReference partRef) {}
+			public void partVisible(final IWorkbenchPartReference partRef) {
+				if (partRef.getPart(false) == TourChartView.this) {
+//					System.out.println("partVisible\t");
+//					// TODO remove SYSTEM.OUT.PRINTLN
+					_tourChart.partIsVisible();
+				}
+			}
 		};
 		getViewSite().getPage().addPartListener(_partListener);
 	}
@@ -130,7 +149,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 				if (property.equals(ITourbookPreferences.GRAPH_VISIBLE)
 						|| property.equals(ITourbookPreferences.GRAPH_X_AXIS)
 						|| property.equals(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME)
-						//
+				//
 				//
 				) {
 					_tourChartConfig = TourManager.createDefaultTourChartConfig();
@@ -330,6 +349,8 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 	@Override
 	public void dispose() {
 
+		saveState();
+
 		getSite().getPage().removePostSelectionListener(_postSelectionListener);
 		getViewSite().getPage().removePartListener(_partListener);
 
@@ -484,6 +505,12 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 		}
 	}
 
+
+	private void saveState() {
+
+		_tourChart.saveState();
+	}
+
 	@Override
 	public void setFocus() {
 
@@ -498,6 +525,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 	}
 
 	private void showTour() {
+
 		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
 
 		if (_tourData == null) {
@@ -542,11 +570,12 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 		TourManager.getInstance().setActiveTourChart(_tourChart);
 
-		_tourChart.updateTourChart(_tourData, _tourChartConfig, false);
-
 		_pageBook.showPage(_tourChart);
 
-		// set application window title
+		_tourChart.updateTourChart(_tourData, _tourChartConfig, false);
+
+
+		// set application window title tool tip
 		setTitleToolTip(TourManager.getTourDateShort(_tourData));
 	}
 

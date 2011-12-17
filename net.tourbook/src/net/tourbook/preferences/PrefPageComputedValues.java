@@ -1002,9 +1002,9 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 				/*
 				 * break by avg+slice speed
 				 */
-				final double prefMinAvgSpeedAS = _prefStore.getDefaultDouble(//
+				final float prefMinAvgSpeedAS = _prefStore.getDefaultFloat(//
 						ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED_AS);
-				final double prefMinSliceSpeedAS = _prefStore.getDefaultDouble(//
+				final float prefMinSliceSpeedAS = _prefStore.getDefaultFloat(//
 						ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED_AS);
 				final int prefMinSliceTimeAS = _prefStore.getDefaultInt(//
 						ITourbookPreferences.BREAK_TIME_MIN_SLICE_TIME_AS);
@@ -1093,8 +1093,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			/*
 			 * break by avg+slice speed
 			 */
-			final double prefMinAvgSpeedAS = _prefStore.getDouble(ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED_AS);
-			final double prefMinSliceSpeedAS = _prefStore.getDouble(ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED_AS);
+			final float prefMinAvgSpeedAS = _prefStore.getFloat(ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED_AS);
+			final float prefMinSliceSpeedAS = _prefStore.getFloat(ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED_AS);
 			final int prefMinSliceTimeAS = _prefStore.getInt(ITourbookPreferences.BREAK_TIME_MIN_SLICE_TIME_AS);
 			_spinnerBreakMinAvgSpeedAS.setSelection(//
 					(int) (prefMinAvgSpeedAS * SPEED_DIGIT_VALUE * UI.UNIT_VALUE_DISTANCE));
@@ -1148,10 +1148,10 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 		/*
 		 * break by average+slice speed
 		 */
-		final double breakMinAvgSpeedAS = _spinnerBreakMinAvgSpeedAS.getSelection()
+		final float breakMinAvgSpeedAS = _spinnerBreakMinAvgSpeedAS.getSelection()
 				/ SPEED_DIGIT_VALUE
 				/ UI.UNIT_VALUE_DISTANCE;
-		final double breakMinSliceSpeedAS = _spinnerBreakMinSliceSpeedAS.getSelection()
+		final float breakMinSliceSpeedAS = _spinnerBreakMinSliceSpeedAS.getSelection()
 				/ SPEED_DIGIT_VALUE
 				/ UI.UNIT_VALUE_DISTANCE;
 		final int breakMinSliceTimeAS = _spinnerBreakMinSliceTimeAS.getSelection();

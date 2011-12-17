@@ -108,16 +108,18 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	private static final String			MEMENTO_TOUR_CATALOG_ACTIVE_REF_ID	= "tour.catalog.active.ref.id";					//$NON-NLS-1$
 	private static final String			MEMENTO_TOUR_CATALOG_LINK_TOUR		= "tour.catalog.link.tour";						//$NON-NLS-1$
 
-	private final IPreferenceStore		_prefStore							= TourbookPlugin
-																					.getDefault()
+	private final IPreferenceStore		_prefStore							= TourbookPlugin.getDefault() //
 																					.getPreferenceStore();
-	private final IDialogSettings		_state								= TourbookPlugin
-																					.getDefault()
+	private final IDialogSettings		_state								= TourbookPlugin.getDefault() //
 																					.getDialogSettingsSection(ID);
 
 	private TVICatalogRootItem			_rootItem;
 
-	private final NumberFormat			_nf									= NumberFormat.getNumberInstance();
+	private final NumberFormat			_nf1								= NumberFormat.getNumberInstance();
+	{
+		_nf1.setMinimumFractionDigits(1);
+		_nf1.setMaximumFractionDigits(1);
+	}
 
 	private PostSelectionProvider		_postSelectionProvider;
 
@@ -174,7 +176,6 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 	private ActionTourCompareWizard		_actionTourCompareWizard;
 	private ActionOpenTour				_actionOpenTour;
-
 
 	class TourContentProvider implements ITreeContentProvider {
 
@@ -735,12 +736,9 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 				final Object element = cell.getElement();
 				if (element instanceof TVICatalogComparedTour) {
 
-					_nf.setMinimumFractionDigits(1);
-					_nf.setMaximumFractionDigits(1);
-
 					final float speed = ((TVICatalogComparedTour) element).getTourSpeed();
 					if (speed > 0) {
-						cell.setText(_nf.format(speed / UI.UNIT_VALUE_DISTANCE));
+						cell.setText(_nf1.format(speed / UI.UNIT_VALUE_DISTANCE));
 					}
 				}
 			}

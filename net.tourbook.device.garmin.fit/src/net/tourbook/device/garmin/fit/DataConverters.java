@@ -13,24 +13,26 @@ public class DataConverters {
 
 	private DataConverters() {}
 
-	public static double convertSemicirclesToDegrees(int value) {
+	public static double convertSemicirclesToDegrees(final int value) {
 		return 180.0d * value / 2147483647;
 	}
 
-	public static int convertSpeed(float speed) {
-		return Math.round(3.6f * speed * 10.0f);
-	}
-
-	public static int convertDistance(float distance) {
-		return Math.round(distance);
-	}
-
-	public static long convertTimestamp(DateTime timestamp) {
-		return timestamp.getTimestamp() * 1000L;
-	}
-
-	public static String convertSoftwareVersion(int softwareVersion) {
+	public static String convertSoftwareVersion(final int softwareVersion) {
 		return BigDecimal.valueOf(softwareVersion, 2).toPlainString();
+	}
+
+	/**
+	 * Convert m/s -> km/h
+	 * 
+	 * @param speed
+	 * @return
+	 */
+	public static float convertSpeed(final float speed) {
+		return 3.6f * speed;
+	}
+
+	public static long convertTimestamp(final DateTime timestamp) {
+		return timestamp.getTimestamp() * 1000L;
 	}
 
 }

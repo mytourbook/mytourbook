@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,7 @@
 package net.tourbook.mapping;
 
 import java.awt.Point;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -62,7 +63,7 @@ public class TourPainter extends MapPainter {
 
 	private static IPropertyChangeListener	_prefChangeListener;
 
-	private int[]							_dataSerie;
+	private float[]							_dataSerie;
 	private ILegendProvider					_legendProvider;
 
 	// painting parameter
@@ -92,6 +93,12 @@ public class TourPainter extends MapPainter {
 	private static TourPainterConfiguration	_tourPaintConfig;
 
 	private final static ColorCacheInt		_colorCache			= new ColorCacheInt();
+
+	private final static NumberFormat		_nf1				= NumberFormat.getNumberInstance();
+	{
+		_nf1.setMinimumFractionDigits(1);
+		_nf1.setMaximumFractionDigits(1);
+	}
 
 	static {
 
@@ -169,21 +176,21 @@ public class TourPainter extends MapPainter {
 													final boolean isDrawVertical) {
 
 		final Device display = gc.getDevice();
-		final LegendConfig config = legendProvider.getLegendConfig();
+		final LegendConfig legendConfig = legendProvider.getLegendConfig();
 
 		// ensure units are available
-		if (config.units == null /* || config.unitLabels == null */) {
+		if (legendConfig.units == null /* || config.unitLabels == null */) {
 			return;
 		}
 
 		// get configuration for the legend
-		final ArrayList<Integer> legendUnits = new ArrayList<Integer>(config.units);
-		final Integer unitFactor = config.unitFactor;
-		final int legendMaxValue = config.legendMaxValue;
-		final int legendMinValue = config.legendMinValue;
-		final int legendDiffValue = legendMaxValue - legendMinValue;
-		final String unitText = config.unitText;
-		final List<String> unitLabels = config.unitLabels;
+		final ArrayList<Float> legendUnits = new ArrayList<Float>(legendConfig.units);
+		final float legendMaxValue = legendConfig.legendMaxValue;
+		final float legendMinValue = legendConfig.legendMinValue;
+		final float legendDiffValue = legendMaxValue - legendMinValue;
+		final String unitText = legendConfig.unitText;
+		final List<String> unitLabels = legendConfig.unitLabels;
+		final int legendFormatDigits = legendConfig.numberFormatDigits;
 
 		Rectangle legendBorder;
 
@@ -224,7 +231,7 @@ public class TourPainter extends MapPainter {
 		}
 
 		// pixelValue contains the value for ONE pixel
-		final float pixelValue = (float) legendDiffValue / availableLegendPixels;
+		final float pixelValue = legendDiffValue / availableLegendPixels;
 
 		// draw border around the colors
 		final Color borderColor = display.getSystemColor(SWT.COLOR_GRAY);
@@ -234,7 +241,7 @@ public class TourPainter extends MapPainter {
 		final Color legendTextColor = display.getSystemColor(SWT.COLOR_BLACK);
 		final Color legendTextBackgroundColor = display.getSystemColor(SWT.COLOR_WHITE);
 
-		int legendValue = 0;
+		float legendValue = 0;
 
 		int unitLabelIndex = 0;
 
@@ -242,7 +249,7 @@ public class TourPainter extends MapPainter {
 
 		for (int pixelIndex = 0; pixelIndex <= availableLegendPixels; pixelIndex++) {
 
-			legendValue = (int) (legendMinValue + pixelValue * pixelIndex);
+			legendValue = legendMinValue + pixelValue * pixelIndex;
 
 			int valuePosition;
 			if (isDrawVertical) {
@@ -259,7 +266,7 @@ public class TourPainter extends MapPainter {
 
 				// find a unit which corresponds to the current legend value
 
-				for (final Integer unitValue : legendUnits) {
+				for (final Float unitValue : legendUnits) {
 					if (legendValue >= unitValue) {
 
 						/*
@@ -267,9 +274,16 @@ public class TourPainter extends MapPainter {
 						 */
 						String valueText;
 						if (unitLabels == null) {
+
 							// set default unit label
-							final int unit = unitValue / unitFactor;
-							valueText = Integer.toString(unit) + UI.SPACE + unitText;
+
+							if (legendFormatDigits == 0) {
+								valueText = Integer.toString(unitValue.intValue()) + UI.SPACE + unitText;
+							} else {
+								// currently only 1 digit is supported
+								valueText = _nf1.format(unitValue) + UI.SPACE + unitText;
+							}
+
 						} else {
 							// when unitLabels are available, they will overwrite the default labeling
 							valueText = unitLabels.get(unitLabelIndex++);
@@ -279,25 +293,12 @@ public class TourPainter extends MapPainter {
 						gc.setForeground(legendTextColor);
 						gc.setBackground(legendTextBackgroundColor);
 
-						gc.drawLine(legendWidth, //
-								valuePosition, //
-								legendWidth + 5,
-								valuePosition);
+						gc.drawLine(legendWidth, valuePosition, legendWidth + 5, valuePosition);
 
-						// draw unit value and text
-//						if (unitLabels == null) {
-//							gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_CYAN));
-//							gc.fillRectangle(legendWidth + 5,
-//									valuePosition - valueTextExtent.y / 2,
-//									valueTextExtent.x,
-//									valueTextExtent.y);
-//						}
-
-						final int devXText = legendWidth + 5;
+						final int devXText = legendWidth + 10;
 						final int devYText = valuePosition - valueTextExtent.y / 2;
 
 						gc.setForeground(textBorderColor);
-//						gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 						gc.drawText(valueText, devXText - 1, devYText, true);
 						gc.drawText(valueText, devXText + 1, devYText, true);
 						gc.drawText(valueText, devXText, devYText - 1, true);
@@ -350,15 +351,15 @@ public class TourPainter extends MapPainter {
 	 * @param device
 	 * @return Returns a {@link Color} which corresponst to the legend value
 	 */
-	static int getLegendColor(final LegendConfig legendConfig, final LegendColor legendColor, final int legendValue) {
+	static int getLegendColor(final LegendConfig legendConfig, final LegendColor legendColor, final float legendValue) {
 
 		int red = 0;
 		int green = 0;
 		int blue = 0;
 
 		final ValueColor[] valueColors = legendColor.valueColors;
-		final float minBrightnessFactor = legendColor.minBrightnessFactor / (float) 100;
-		final float maxBrightnessFactor = legendColor.maxBrightnessFactor / (float) 100;
+		final float minBrightnessFactor = legendColor.minBrightnessFactor / 100.0f;
+		final float maxBrightnessFactor = legendColor.maxBrightnessFactor / 100.0f;
 
 		/*
 		 * find the valueColor for the current value
@@ -391,10 +392,10 @@ public class TourPainter extends MapPainter {
 			green = valueColor.green;
 			blue = valueColor.blue;
 
-			final int minValue = valueColor.value;
-			final int minDiff = legendConfig.legendMinValue - minValue;
+			final float minValue = valueColor.value;
+			final float minDiff = legendConfig.legendMinValue - minValue;
 
-			final float ratio = minDiff == 0 ? 1 : (legendValue - minValue) / (float) minDiff;
+			final float ratio = minDiff == 0 ? 1 : (legendValue - minValue) / minDiff;
 			final float dimmRatio = minBrightnessFactor * ratio;
 
 			if (legendColor.minBrightness == LegendColor.BRIGHTNESS_DIMMING) {
@@ -419,10 +420,10 @@ public class TourPainter extends MapPainter {
 			green = valueColor.green;
 			blue = valueColor.blue;
 
-			final int maxValue = valueColor.value;
-			final int maxDiff = legendConfig.legendMaxValue - maxValue;
+			final float maxValue = valueColor.value;
+			final float maxDiff = legendConfig.legendMaxValue - maxValue;
 
-			final float ratio = maxDiff == 0 ? 1 : (legendValue - maxValue) / (float) maxDiff;
+			final float ratio = maxDiff == 0 ? 1 : (legendValue - maxValue) / maxDiff;
 			final float dimmRatio = maxBrightnessFactor * ratio;
 
 			if (legendColor.maxBrightness == LegendColor.BRIGHTNESS_DIMMING) {
@@ -442,8 +443,8 @@ public class TourPainter extends MapPainter {
 
 			// legend value is in the min/max range
 
-			final int maxValue = maxValueColor.value;
-			final int minValue = minValueColor.value;
+			final float maxValue = maxValueColor.value;
+			final float minValue = minValueColor.value;
 			final int minRed = minValueColor.red;
 			final int minGreen = minValueColor.green;
 			final int minBlue = minValueColor.blue;
@@ -452,8 +453,8 @@ public class TourPainter extends MapPainter {
 			final int greenDiff = maxValueColor.green - minGreen;
 			final int blueDiff = maxValueColor.blue - minBlue;
 
-			final int ratioDiff = maxValue - minValue;
-			final float ratio = ratioDiff == 0 ? 1 : (legendValue - minValue) / (float) (ratioDiff);
+			final float ratioDiff = maxValue - minValue;
+			final float ratio = ratioDiff == 0 ? 1 : (legendValue - minValue) / (ratioDiff);
 
 			red = (int) (minRed + redDiff * ratio);
 			green = (int) (minGreen + greenDiff * ratio);
@@ -1214,7 +1215,7 @@ public class TourPainter extends MapPainter {
 		 * ONLY VERTICAL LEGENDS ARE SUPPORTED
 		 */
 
-		final int dataValue = _dataSerie[valueIndex];
+		final float dataValue = _dataSerie[valueIndex];
 
 		int valuePosition = 0;
 
@@ -1223,9 +1224,9 @@ public class TourPainter extends MapPainter {
 //		final Integer unitFactor = config.unitFactor;
 //		dataValue /= unitFactor;
 
-		final int legendMaxValue = config.legendMaxValue;
-		final int legendMinValue = config.legendMinValue;
-		final int legendDiffValue = legendMaxValue - legendMinValue;
+		final float legendMaxValue = config.legendMaxValue;
+		final float legendMinValue = config.legendMinValue;
+		final float legendDiffValue = legendMaxValue - legendMinValue;
 
 		if (dataValue >= legendMaxValue) {
 
@@ -1239,20 +1240,13 @@ public class TourPainter extends MapPainter {
 
 			// min < value < max
 
-//			int legendPositionX = legendBounds.x + 1;
 			final int legendPositionY = legendBounds.y + TourMapView.LEGEND_MARGIN_TOP_BOTTOM;
-//			int legendWidth = 20;
 			final int legendHeight = legendBounds.height - 2 * TourMapView.LEGEND_MARGIN_TOP_BOTTOM;
 
 			final int pixelDiff = legendHeight - 1;
 
-			// pixelValue contains the value for ONE pixel
-//			final float pixelValue = (float) legendDiffValue / availableLegendPixels;
-
-//			valuePosition = legendPositionY + availableLegendPixels - pixelIndex;
-
-			final int dataValue0 = dataValue - legendMinValue;
-			final float ratio = pixelDiff / (float) legendDiffValue;
+			final float dataValue0 = dataValue - legendMinValue;
+			final float ratio = pixelDiff / legendDiffValue;
 
 			valuePosition = legendPositionY + (int) (dataValue0 * ratio);
 		}

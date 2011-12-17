@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -41,18 +41,19 @@ public class NmeaDataReader extends TourbookDevice {
 
 	private static final String		FILE_HEADER		= "$GP";							//$NON-NLS-1$
 
-	private static final Calendar	fCalendar		= GregorianCalendar.getInstance();
+	private static final Calendar	_calendar		= GregorianCalendar.getInstance();
 
-	private ArrayList<TimeData>		fTimeDataList	= new ArrayList<TimeData>();
-	private TimeData				fPrevTimeData;
+	private ArrayList<TimeData>		_timeDataList	= new ArrayList<TimeData>();
+	private TimeData				_prevTimeData;
 
-	private float					fAbsoluteDistance;
+	private float					_absoluteDistance;
 
-	private String					fImportFilePath;
+	private String					_importFilePath;
 
-	private HashMap<Long, TourData>	fTourDataMap;
+	private boolean					_isNullCoordinates;
 
-	private boolean					fNullCoordinates;
+	private HashMap<Long, TourData>	_alreadyImportedTours;
+	private HashMap<Long, TourData>	_newlyImportedTours;
 
 	public NmeaDataReader() {}
 
@@ -100,14 +101,14 @@ public class NmeaDataReader extends TourbookDevice {
 		// ignore 0 coordinates, it's very unlikely that they are valid
 //	Begin of O. Budischewski, 2008.03.19
 		if (latitude == 0 || longitude == 0) {
-			fNullCoordinates = true;
+			_isNullCoordinates = true;
 			return;
 		}
 //	End	  of O. Budischewski, 2008.03.19
 
 		// create new time item
 		final TimeData timeData = new TimeData();
-		fTimeDataList.add(timeData);
+		_timeDataList.add(timeData);
 
 		timeData.latitude = latitude == 90.0 ? Double.MIN_VALUE : latitude;
 		timeData.longitude = longitude == 180.0 ? Double.MIN_VALUE : longitude;
@@ -116,49 +117,53 @@ public class NmeaDataReader extends TourbookDevice {
 		timeData.absoluteAltitude = (int) nmea.getAltitudeMeters();
 
 		// calculate distance
-		if (fPrevTimeData == null) {
+		if (_prevTimeData == null) {
 			// first time data
 			timeData.absoluteDistance = 0;
 		} else {
-			fAbsoluteDistance += MtMath.distanceVincenty(
-					fPrevTimeData.latitude,
-					fPrevTimeData.longitude,
+			_absoluteDistance += MtMath.distanceVincenty(
+					_prevTimeData.latitude,
+					_prevTimeData.longitude,
 					latitude,
 					longitude);
 
-			timeData.absoluteDistance = fAbsoluteDistance;
+			timeData.absoluteDistance = _absoluteDistance;
 		}
 
 		// set virtual time if time is not available
 		if (timeData.absoluteTime == Long.MIN_VALUE) {
-			fCalendar.set(2000, 0, 1, 0, 0, 0);
-			timeData.absoluteTime = fCalendar.getTimeInMillis();
+			_calendar.set(2000, 0, 1, 0, 0, 0);
+			timeData.absoluteTime = _calendar.getTimeInMillis();
 		}
 
-		fPrevTimeData = timeData;
+		_prevTimeData = timeData;
 	}
 
-	public boolean processDeviceData(	final String fileName,
+	@Override
+	public boolean processDeviceData(	final String importFilePath,
 										final DeviceData deviceData,
-										final HashMap<Long, TourData> tourDataMap) {
+										final HashMap<Long, TourData> alreadyImportedTours,
+										final HashMap<Long, TourData> newlyImportedTours) {
+
 		// immediately bail out if the file format is not correct.
-		if (!validateRawData(fileName)) {
+		if (!validateRawData(importFilePath)) {
 			return false;
 		}
 
 //	Begin of O. Budischewski, 2008.03.19
 //		Initialize new tour
-		fAbsoluteDistance = 0;
-		fImportFilePath = fileName;
-		fTourDataMap = tourDataMap;
-		fPrevTimeData = null;
-		fNullCoordinates = false;
-		fTimeDataList.clear();
+		_absoluteDistance = 0;
+		_importFilePath = importFilePath;
+		_alreadyImportedTours = alreadyImportedTours;
+		_newlyImportedTours = newlyImportedTours;
+		_prevTimeData = null;
+		_isNullCoordinates = false;
+		_timeDataList.clear();
 //	End	  of O. Budischewski, 2008.03.19
 
 		// if we are so far, we can assume that the file actually exists,
 		// because the validateRawData call must check for it.
-		final File file = new File(fileName);
+		final File file = new File(importFilePath);
 
 		String nmeaLine;
 		final ArrayList<String> nmeaStrings = new ArrayList<String>();
@@ -230,13 +235,13 @@ public class NmeaDataReader extends TourbookDevice {
 		}
 
 //	Begin of O. Budischewski, 2008.03.20
-		if (fNullCoordinates == true) {
+		if (_isNullCoordinates == true) {
 			Display.getDefault().syncExec(new Runnable() {
 				public void run() {
 					MessageDialog.openInformation(
 							Display.getCurrent().getActiveShell(),
 							Messages.NMEA_Null_Coords_title,
-							NLS.bind(Messages.NMEA_Null_Coords_message, fImportFilePath));
+							NLS.bind(Messages.NMEA_Null_Coords_message, _importFilePath));
 				}
 			});
 		}
@@ -247,7 +252,7 @@ public class NmeaDataReader extends TourbookDevice {
 
 	private boolean setTourData() {
 
-		if (fTimeDataList == null || fTimeDataList.size() == 0) {
+		if (_timeDataList == null || _timeDataList.size() == 0) {
 			return false;
 		}
 
@@ -257,39 +262,39 @@ public class NmeaDataReader extends TourbookDevice {
 		/*
 		 * set tour start date/time
 		 */
-		fCalendar.setTimeInMillis(fTimeDataList.get(0).absoluteTime);
+		_calendar.setTimeInMillis(_timeDataList.get(0).absoluteTime);
 
-		tourData.setStartHour((short) fCalendar.get(Calendar.HOUR_OF_DAY));
-		tourData.setStartMinute((short) fCalendar.get(Calendar.MINUTE));
-		tourData.setStartSecond((short) fCalendar.get(Calendar.SECOND));
+		tourData.setStartHour((short) _calendar.get(Calendar.HOUR_OF_DAY));
+		tourData.setStartMinute((short) _calendar.get(Calendar.MINUTE));
+		tourData.setStartSecond((short) _calendar.get(Calendar.SECOND));
 
-		tourData.setStartYear((short) fCalendar.get(Calendar.YEAR));
-		tourData.setStartMonth((short) (fCalendar.get(Calendar.MONTH) + 1));
-		tourData.setStartDay((short) fCalendar.get(Calendar.DAY_OF_MONTH));
+		tourData.setStartYear((short) _calendar.get(Calendar.YEAR));
+		tourData.setStartMonth((short) (_calendar.get(Calendar.MONTH) + 1));
+		tourData.setStartDay((short) _calendar.get(Calendar.DAY_OF_MONTH));
 		tourData.setWeek(tourData.getStartYear(), tourData.getStartMonth(), tourData.getStartDay());
 
 		tourData.setDeviceTimeInterval((short) -1);
-		tourData.importRawDataFile = fImportFilePath;
-		tourData.setTourImportFilePath(fImportFilePath);
+		tourData.importRawDataFile = _importFilePath;
+		tourData.setTourImportFilePath(_importFilePath);
 
-		tourData.createTimeSeries(fTimeDataList, true);
+		tourData.createTimeSeries(_timeDataList, true);
 		tourData.computeAltitudeUpDown();
 
 		// after all data are added, the tour id can be created
-		final int[] distanceSerie = tourData.getMetricDistanceSerie();
+		final float[] distanceSerie = tourData.getMetricDistanceSerie();
 		String uniqueKey;
 		if (distanceSerie == null) {
 			uniqueKey = Util.UNIQUE_ID_SUFFIX_NMEA;
 		} else {
-			uniqueKey = Integer.toString(distanceSerie[distanceSerie.length - 1]);
+			uniqueKey = Integer.toString((int) distanceSerie[distanceSerie.length - 1]);
 		}
 		final Long tourId = tourData.createTourId(uniqueKey);
 
 		// check if the tour is already imported
-		if (fTourDataMap.containsKey(tourId) == false) {
+		if (_alreadyImportedTours.containsKey(tourId) == false) {
 
 			// add new tour to other tours
-			fTourDataMap.put(tourId, tourData);
+			_newlyImportedTours.put(tourId, tourData);
 
 			tourData.computeTourDrivingTime();
 			tourData.computeComputedValues();

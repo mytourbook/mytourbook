@@ -24,7 +24,7 @@ import org.eclipse.core.commands.ExecutionException;
 public class ActionHandlerShowStartTime extends TCActionHandler {
 
 	public ActionHandlerShowStartTime() {
-		commandId = TourChart.COMMAND_ID_SHOW_START_TIME;
+		commandId = TourChart.COMMAND_ID_IS_SHOW_START_TIME;
 	}
 
 	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {

@@ -47,6 +47,7 @@ public class GraphDrawingData {
 	private Rectangle[][]			_barFocusRectangles;
 
 	private int						_barRectangleWidth;
+
 	private int						_devBarRectangleXPos;
 
 	/**
@@ -59,20 +60,15 @@ public class GraphDrawingData {
 	 * List with all unit labels and positions for the y axis
 	 */
 	private ArrayList<ChartUnit>	_yUnits					= new ArrayList<ChartUnit>();
-
 	// scaling from graph value to device value
 	private float					_scaleX;
+
 	private float					_scaleY;
 
 	/**
 	 * scaling the the x unit
 	 */
 	private float					_scaleUnitX				= Float.MIN_VALUE;
-
-	private int						_devMarginTop;
-	private int						_devXTitelBarHeight;
-	private int						_devMarkerBarHeight;
-	private int						_devSliderBarHeight;
 
 	// graph position
 	private int						_devYTop;
@@ -82,7 +78,6 @@ public class GraphDrawingData {
 	 * virtual graph width in dev (pixel) units
 	 */
 	public int						devVirtualGraphWidth;
-
 	/**
 	 * graph height in dev (pixel) units, each graph has the same height
 	 */
@@ -93,11 +88,11 @@ public class GraphDrawingData {
 	/**
 	 * graph value for the bottom of the graph
 	 */
-	private int						_graphYBottom;
-	private int						_graphYTop;
+	private float					_graphYBottom;
+
+	private float					_graphYTop;
 
 	private int						_barPosition			= BAR_POS_LEFT;
-
 	private int						_chartType;
 
 	private String					_errorMessage;
@@ -106,7 +101,10 @@ public class GraphDrawingData {
 
 	private boolean[]				_isDrawUnits			= null;
 
-	public GraphDrawingData(final int chartType) {
+	ChartDrawingData				chartDrawingData;
+
+	public GraphDrawingData(final ChartDrawingData chartDrawingData, final int chartType) {
+		this.chartDrawingData = chartDrawingData;
 		_chartType = chartType;
 	}
 
@@ -150,47 +148,8 @@ public class GraphDrawingData {
 		return _devBarRectangleXPos;
 	}
 
-//	public int getDevGraphHeight() {
-//		return devGraphHeight;
-//	}
-//
-//	/**
-//	 * virtual graph width in dev (pixel) units
-//	 */
-//	int getDevGraphWidth() {
-//		return devGraphWidth;
-//	}
-
-	/**
-	 * @return Returns the devMarginTop.
-	 */
-	public int getDevMarginTop() {
-		return _devMarginTop;
-	}
-
-	/**
-	 * @return Returns the devMarkerBarHeight.
-	 */
-	public int getDevMarkerBarHeight() {
-		return _devMarkerBarHeight;
-	}
-
-	/**
-	 * @return Returns the devSliderBarHeight.
-	 */
-	public int getDevSliderBarHeight() {
-		return _devSliderBarHeight;
-	}
-
 	public int getDevSliderHeight() {
 		return _devSliderHeight;
-	}
-
-	/**
-	 * @return Returns the devTitelBarHeight.
-	 */
-	public int getDevXTitelBarHeight() {
-		return _devXTitelBarHeight;
 	}
 
 	/**
@@ -204,7 +163,11 @@ public class GraphDrawingData {
 	 * @return Returns the y position for the title
 	 */
 	public int getDevYTitle() {
-		return getDevYBottom() - devGraphHeight - getDevSliderBarHeight() - getDevXTitelBarHeight();
+
+		return getDevYBottom() //
+				- devGraphHeight
+				- chartDrawingData.devSliderBarHeight
+				- chartDrawingData.devXTitelBarHeight;
 	}
 
 	/**
@@ -221,14 +184,14 @@ public class GraphDrawingData {
 	/**
 	 * @return Returns the bottom of the chart in graph units
 	 */
-	public int getGraphYBottom() {
+	public float getGraphYBottom() {
 		return _graphYBottom;
 	}
 
 	/**
 	 * @return Returns the top of the chart in graph units
 	 */
-	public int getGraphYTop() {
+	public float getGraphYTop() {
 		return _graphYTop;
 	}
 
@@ -319,17 +282,9 @@ public class GraphDrawingData {
 	 * @param barFocusRectangles
 	 *            The barFocusRectangles to set.
 	 */
-	public void setBarFocusRectangles(final Rectangle[][] barFocusRectangles) {
+	void setBarFocusRectangles(final Rectangle[][] barFocusRectangles) {
 		_barFocusRectangles = barFocusRectangles;
 	}
-
-//	public void setDevGraphHeight(final int heightDev) {
-//		devGraphHeight = heightDev;
-//	}
-//
-//	public void setDevGraphWidth(final int devGraphWidth) {
-//		devGraphWidth = devGraphWidth;
-//	}
 
 	/**
 	 * @param barPosition
@@ -363,40 +318,8 @@ public class GraphDrawingData {
 		_devBarRectangleXPos = barRectanglePos;
 	}
 
-	/**
-	 * @param devMarginTop
-	 *            The devMarginTop to set.
-	 */
-	public void setDevMarginTop(final int devMarginTop) {
-		_devMarginTop = devMarginTop;
-	}
-
-	/**
-	 * @param devMarkerBarHeight
-	 *            The devMarkerBarHeight to set.
-	 */
-	public void setDevMarkerBarHeight(final int devMarkerBarHeight) {
-		_devMarkerBarHeight = devMarkerBarHeight;
-	}
-
-	/**
-	 * @param devSliderBarHeight
-	 *            The devSliderBarHeight to set.
-	 */
-	public void setDevSliderBarHeight(final int devSliderBarHeight) {
-		_devSliderBarHeight = devSliderBarHeight;
-	}
-
 	public void setDevSliderHeight(final int devSliderHeight) {
 		_devSliderHeight = devSliderHeight;
-	}
-
-	/**
-	 * @param devTitelBarHeight
-	 *            The devTitelBarHeight to set.
-	 */
-	void setDevXTitelBarHeight(final int devTitelBarHeight) {
-		_devXTitelBarHeight = devTitelBarHeight;
 	}
 
 	public void setDevYBottom(final int devY) {
@@ -415,7 +338,7 @@ public class GraphDrawingData {
 		_errorMessage = errorMessage;
 	}
 
-	public void setGraphYBottom(final int yGraphMin) {
+	public void setGraphYBottom(final float yGraphMin) {
 		_graphYBottom = yGraphMin;
 	}
 
@@ -423,7 +346,7 @@ public class GraphDrawingData {
 	 * @param graphYTop
 	 *            The graphYTop to set.
 	 */
-	protected void setGraphYTop(final int graphYTop) {
+	protected void setGraphYTop(final float graphYTop) {
 		_graphYTop = graphYTop;
 	}
 

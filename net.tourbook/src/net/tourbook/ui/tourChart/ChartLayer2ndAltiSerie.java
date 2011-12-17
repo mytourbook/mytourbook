@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,8 @@
  * @author Wolfgang Schramm Created: 06.07.2005
  */
 package net.tourbook.ui.tourChart;
+
+import java.text.NumberFormat;
 
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.GraphDrawingData;
@@ -39,20 +41,26 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 	 * contains tour which is displayed in the chart
 	 */
 	private TourData				_tourData;
-	private int[]					_xDataSerie;
+	private float[]					_xDataSerie;
 	private TourChartConfiguration	_tourChartConfig;
 	private SplineData				_splineData;
 
 	private Rectangle[]				_spPointRects;
 
 	private int						_graphXValueOffset;
-	private int						_devGraphValueXOffset;
+	private int						_xxDevViewPortLeftBorder;
 	private int						_devY0Spline;
 	private float					_scaleX;
 	private float					_scaleY;
 
+	private final NumberFormat		_nf3	= NumberFormat.getNumberInstance();
+	{
+		_nf3.setMinimumFractionDigits(3);
+		_nf3.setMaximumFractionDigits(3);
+	}
+
 	public ChartLayer2ndAltiSerie(	final TourData tourData,
-									final int[] xDataSerie,
+									final float[] xDataSerie,
 									final TourChartConfiguration tourChartConfig,
 									final SplineData splineData) {
 
@@ -66,16 +74,18 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 
 	public void draw(final GC gc, final GraphDrawingData drawingData, final Chart chart) {
 
-		final int[] xValues = _xDataSerie;
+		final float[] xValues = _xDataSerie;
 
-		final int[] yValues2ndSerie = _tourData.dataSerie2ndAlti;
-		final int[] yDiffTo2ndSerie = _tourData.dataSerieDiffTo2ndAlti;
-		final int[] yAdjustedSerie = _tourData.dataSerieAdjustedAlti;
+		final float[] yValues2ndSerie = _tourData.dataSerie2ndAlti;
+		final float[] yDiffTo2ndSerie = _tourData.dataSerieDiffTo2ndAlti;
+		final float[] yAdjustedSerie = _tourData.dataSerieAdjustedAlti;
 
 		final boolean is2ndYValues = yValues2ndSerie != null;
 		final boolean isDiffValues = yDiffTo2ndSerie != null;
 		final boolean isAdjustedValues = yAdjustedSerie != null;
-		final boolean isPointInGraph = _splineData != null && _splineData.serieIndex != null;
+
+		final int[] graphSerieIndex = _splineData.serieIndex;
+		final boolean isPointInGraph = _splineData != null && graphSerieIndex != null;
 
 		if (xValues == null || xValues.length == 0 /*
 													 * || yValues2ndSerie == null ||
@@ -88,17 +98,16 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		_scaleY = drawingData.getScaleY();
 
 		// get the horizontal offset for the graph
-		_devGraphValueXOffset = chart.getDevGraphImageXOffset();
-		_graphXValueOffset = (int) (Math.max(0, _devGraphValueXOffset) / _scaleX);
+		_xxDevViewPortLeftBorder = chart.getXXDevViewPortLeftBorder();
+		_graphXValueOffset = (int) (Math.max(0, _xxDevViewPortLeftBorder) / _scaleX);
 
 		final Display display = Display.getCurrent();
 
 		final Path path2ndSerie = new Path(display);
 		final Path pathValueDiff = new Path(display);
 		final Path pathAdjustValue = new Path(display);
-//
-//		final int graphYTop = drawingData.getGraphYTop();
-		final int graphYBottom = drawingData.getGraphYBottom();
+
+		final float graphYBottom = drawingData.getGraphYBottom();
 
 		final int devGraphHeight = drawingData.devGraphHeight;
 		final int devYBottom = drawingData.getDevYBottom();
@@ -110,15 +119,15 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		/*
 		 * convert all diff values into positive values
 		 */
-		int diffValues[] = null;
+		float diffValues[] = null;
 		float scaleValueDiff = _scaleY;
 		if (isDiffValues) {
 
 			int valueIndex = 0;
-			int maxValueDiff = 0;
+			float maxValueDiff = 0;
 
-			diffValues = new int[yDiffTo2ndSerie.length];
-			for (int valueDiff : yDiffTo2ndSerie) {
+			diffValues = new float[yDiffTo2ndSerie.length];
+			for (float valueDiff : yDiffTo2ndSerie) {
 				diffValues[valueIndex++] = valueDiff = (valueDiff < 0) ? -valueDiff : valueDiff;
 				maxValueDiff = (maxValueDiff >= valueDiff) ? maxValueDiff : valueDiff;
 			}
@@ -135,14 +144,14 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		final int startIndex = 0;
 		final int endIndex = xValues.length;
 
-		final int graphClippingWidth = gc.getClipping().width;
-		final Rectangle graphRect = new Rectangle(0, devYTop, graphClippingWidth, devGraphHeight);
+		final int devChartWidth = gc.getClipping().width;
+		final Rectangle graphRect = new Rectangle(0, devYTop, devChartWidth, devGraphHeight);
 
 		// get initial dev X
-		int graphXValue = xValues[startIndex] - _graphXValueOffset;
+		float graphXValue = xValues[startIndex] - _graphXValueOffset;
 		int devPrevXInt = (int) (graphXValue * _scaleX);
 
-		int graphYValue2nd;
+		float graphYValue2nd;
 		if (is2ndYValues) {
 			graphYValue2nd = yValues2ndSerie[startIndex];
 		}
@@ -218,7 +227,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 			 */
 			if (isDiffValues) {
 
-				final int graphValueDiff = (diffValues[xValueIndex]);
+				final float graphValueDiff = (diffValues[xValueIndex]);
 				final float devLayerValueDiff = graphValueDiff * scaleValueDiff;
 				final float devYDiff = devYBottom - devLayerValueDiff;
 
@@ -258,7 +267,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 
 			// fill background
 			gc.setClipping(pathAdjustValue);
-			gc.fillGradientRectangle(0, devYTop, graphClippingWidth, devGraphHeight, true);
+			gc.fillGradientRectangle(0, devYTop, devChartWidth, devGraphHeight, true);
 			gc.setClipping(graphRect);
 
 			// draw graph
@@ -346,8 +355,19 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 				final double graphX = graphXSplineValues[pointIndex] - _graphXValueOffset;
 				final double graphY = graphYSplineValues[pointIndex];
 
-				final int devPointX = (int) (graphX * _scaleX);
+				int devPointX = (int) (graphX * _scaleX);
 				final int devPointY = (int) (graphY * scaleValueDiff);
+
+				/*
+				 * set the last point visible if it's hidden
+				 */
+				final boolean isPointHidden = devPointX > devChartWidth;
+				final boolean isLastSPlinePoint = pointIndex == splinePointLength - 1;
+				final boolean isLastSerieIndex = graphSerieIndex[pointIndex] == xValues.length - 1;
+				final boolean isRightBorder = _xxDevViewPortLeftBorder + devChartWidth == drawingData.devVirtualGraphWidth;
+				if (isPointHidden && isLastSPlinePoint && isLastSerieIndex && isRightBorder) {
+					devPointX = devChartWidth;
+				}
 
 				final int devX = devPointX - pointSize2;
 				final int devY = _devY0Spline - devPointY - pointSize2;
@@ -398,12 +418,11 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		if (isPointInGraph && isAdjustedValues) {
 
 			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
-			final int[] graphSerieIndex = _splineData.serieIndex;
 
 			for (final int serieIndex : graphSerieIndex) {
 
-				final int graphX = xValues[serieIndex] - _graphXValueOffset;
-				final int graphY = yAdjustedSerie[serieIndex];
+				final float graphX = xValues[serieIndex] - _graphXValueOffset;
+				final float graphY = yAdjustedSerie[serieIndex];
 
 				final int devX = (int) (graphX * _scaleX);
 				final int devY = (int) (devY0 - (graphY * _scaleY));
@@ -413,7 +432,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 				/*
 				 * draw altitude
 				 */
-				final String altiText = Integer.toString(graphY);
+				final String altiText = _nf3.format(graphY);
 				final Point textExtent = gc.textExtent(altiText);
 				final int textWidth = textExtent.x;
 
@@ -423,8 +442,8 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 				// ensure the text is visible
 				if (devXText < 0) {
 					devXText = 2;
-				} else if (devXText + textWidth > graphClippingWidth) {
-					devXText = graphClippingWidth - textWidth - 2;
+				} else if (devXText + textWidth > devChartWidth) {
+					devXText = devChartWidth - textWidth - 2;
 				}
 
 				gc.drawText(altiText, devXText, devYText, true);
@@ -447,7 +466,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		drawingData.devY0Spline = _devY0Spline;
 		drawingData.scaleX = _scaleX;
 		drawingData.scaleY = _scaleY;
-		drawingData.devGraphValueXOffset = _devGraphValueXOffset;
+		drawingData.devGraphValueXOffset = _xxDevViewPortLeftBorder;
 
 		return drawingData;
 	}

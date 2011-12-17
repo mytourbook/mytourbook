@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -91,7 +91,7 @@ public class ElevationSRTM1 extends ElevationBase {
    }
    
    @Override
-public short getElevation(final GeoLat lat, final GeoLon lon) {
+public float getElevation(final GeoLat lat, final GeoLon lon) {
 
       if (lat.tertias != 0) return getElevationGrid(lat, lon);
       if (lon.tertias != 0) return getElevationGrid(lat, lon);

@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.statistics;
 
 import java.util.Formatter;
@@ -70,7 +69,7 @@ public abstract class StatisticYear extends YearStatistic {
 
 	ChartSegments createChartSegments(final TourDataYear tourDataYear) {
 
-		final int yearCounter = tourDataYear.fAltitudeHigh[0].length;
+		final int yearCounter = tourDataYear.altitudeHigh[0].length;
 
 		final int segmentStart[] = new int[_numberOfYears];
 		final int segmentEnd[] = new int[_numberOfYears];
@@ -105,7 +104,6 @@ public abstract class StatisticYear extends YearStatistic {
 		// create chart
 		_chart = new Chart(parent, SWT.BORDER | SWT.FLAT);
 		_chart.setShowZoomActions(true);
-		_chart.setCanScrollZoomedChart(true);
 		_chart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
 	}
 
@@ -113,8 +111,8 @@ public abstract class StatisticYear extends YearStatistic {
 
 		final int oldestYear = _currentYear - _numberOfYears + 1;
 
-		final Integer recordingTime = _tourYearData.fRecordingTime[serieIndex][valueIndex];
-		final Integer drivingTime = _tourYearData.fDrivingTime[serieIndex][valueIndex];
+		final Integer recordingTime = _tourYearData.recordingTime[serieIndex][valueIndex];
+		final Integer drivingTime = _tourYearData.drivingTime[serieIndex][valueIndex];
 		final int breakTime = recordingTime - drivingTime;
 
 		/*
@@ -152,10 +150,10 @@ public abstract class StatisticYear extends YearStatistic {
 		final String toolTipLabel = new Formatter().format(toolTipFormat.toString(), //
 				//
 				//
-				_tourYearData.fDistanceHigh[serieIndex][valueIndex],
+				(int) _tourYearData.distanceHigh[serieIndex][valueIndex],
 				UI.UNIT_LABEL_DISTANCE,
 				//
-				_tourYearData.fAltitudeHigh[serieIndex][valueIndex],
+				(int) _tourYearData.altitudeHigh[serieIndex][valueIndex],
 				UI.UNIT_LABEL_ALTITUDE,
 				//
 				recordingTime / 3600,
@@ -200,13 +198,13 @@ public abstract class StatisticYear extends YearStatistic {
 		final ChartDataYSerie yData = new ChartDataYSerie(
 				ChartDataModel.CHART_TYPE_BAR,
 				ChartDataYSerie.BAR_LAYOUT_BESIDE,
-				_tourYearData.fAltitudeLow,
-				_tourYearData.fAltitudeHigh);
+				_tourYearData.altitudeLow,
+				_tourYearData.altitudeHigh);
 		yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
 		yData.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
 		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_ALTITUDE, _activeTourTypeFilter);
-		StatisticServices.setTourTypeColorIndex(yData, _tourYearData.fTypeIds, _activeTourTypeFilter);
+		StatisticServices.setTourTypeColorIndex(yData, _tourYearData.typeIds, _activeTourTypeFilter);
 		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_ALTITUDE);
 
 		chartDataModel.addYData(yData);
@@ -222,13 +220,13 @@ public abstract class StatisticYear extends YearStatistic {
 		final ChartDataYSerie yData = new ChartDataYSerie(
 				ChartDataModel.CHART_TYPE_BAR,
 				ChartDataYSerie.BAR_LAYOUT_BESIDE,
-				_tourYearData.fDistanceLow,
-				_tourYearData.fDistanceHigh);
+				_tourYearData.distanceLow,
+				_tourYearData.distanceHigh);
 		yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
 		yData.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
 		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE, _activeTourTypeFilter);
-		StatisticServices.setTourTypeColorIndex(yData, _tourYearData.fTypeIds, _activeTourTypeFilter);
+		StatisticServices.setTourTypeColorIndex(yData, _tourYearData.typeIds, _activeTourTypeFilter);
 		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE);
 
 		chartDataModel.addYData(yData);
@@ -244,22 +242,22 @@ public abstract class StatisticYear extends YearStatistic {
 		final ChartDataYSerie yData = new ChartDataYSerie(
 				ChartDataModel.CHART_TYPE_BAR,
 				ChartDataYSerie.BAR_LAYOUT_BESIDE,
-				_tourYearData.fTimeLow,
-				_tourYearData.fTimeHigh);
+				_tourYearData.getTimeLowFloat(),
+				_tourYearData.getTimeHighFloat());
 		yData.setYTitle(Messages.LABEL_GRAPH_TIME);
 		yData.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
 		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_TIME, _activeTourTypeFilter);
-		StatisticServices.setTourTypeColorIndex(yData, _tourYearData.fTypeIds, _activeTourTypeFilter);
+		StatisticServices.setTourTypeColorIndex(yData, _tourYearData.typeIds, _activeTourTypeFilter);
 		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_TIME);
 
 		chartDataModel.addYData(yData);
 	}
 
-	int[] createYearData(final TourDataYear tourDataYear) {
+	private float[] createYearData(final TourDataYear tourDataYear) {
 
-		final int yearCounter = tourDataYear.fAltitudeHigh[0].length;
-		final int allYears[] = new int[yearCounter];
+		final int yearCounter = tourDataYear.altitudeHigh[0].length;
+		final float allYears[] = new float[yearCounter];
 
 		for (int yearIndex = 0; yearIndex < yearCounter; yearIndex++) {
 			allYears[yearIndex] = yearIndex;

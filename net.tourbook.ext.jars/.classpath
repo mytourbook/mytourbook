@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="lib" path="trove-3.0.0rc1.jar" sourcepath="L:/java-resources/trove/trove-3.0.0rc1/all-source-code">
+	<classpathentry exported="true" kind="lib" path="trove-3.0.0rc1.jar" sourcepath="C:/E/java-resources/trove/trove-3.0.0rc1.zip">
 		<attributes>
 			<attribute name="javadoc_location" value="file:/L:/java-resources/trove/trove-3.0.0rc1/javadocs/"/>
 		</attributes>

@@ -200,8 +200,6 @@ public class TourInfoUI {
 		updateUI();
 		enableControls();
 
-//		container.layout(true, true);
-
 		// compute width for all controls and equalize column width for the different sections
 		_ttContainer.layout(true, true);
 		UI.setEqualizeColumWidths(_firstColumnControls, 5);
@@ -912,7 +910,7 @@ public class TourInfoUI {
 				IWeather.windDirectionText[getWindDirectionTextIndex(weatherWindDirDegree)]).toString());
 
 		// temperature
-		float temperature = (float) _tourData.getAvgTemperature() / _tourData.getTemperatureScale();
+		float temperature = _tourData.getAvgTemperature();
 		if (UI.UNIT_VALUE_TEMPERATURE != 1) {
 			temperature = temperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD;
 		}

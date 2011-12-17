@@ -36,7 +36,7 @@ public class ChartLayerConconiTest implements IChartLayer {
 	private float	_scaleX;
 	private float	_scaleY;
 	private int		_devYBottom;
-	private int		_graphYBottom;
+	private float	_graphYBottom;
 
 	private double	_scalingFactor;
 	private double	_scaleXextended;
@@ -168,8 +168,8 @@ public class ChartLayerConconiTest implements IChartLayer {
 			devXEnd = (int) (graphXEnd * _scaleX);
 		}
 
-		final int devYStart = _devYBottom - ((int) ((graphYStart - _graphYBottom) * _scaleY));
-		final int devYEnd = _devYBottom - ((int) ((graphYEnd - _graphYBottom) * _scaleY));
+		final int devYStart = _devYBottom - (int) ((graphYStart - _graphYBottom) * _scaleY);
+		final int devYEnd = _devYBottom - (int) ((graphYEnd - _graphYBottom) * _scaleY);
 
 		gc.setAlpha(0xb0);
 
@@ -189,7 +189,7 @@ public class ChartLayerConconiTest implements IChartLayer {
 			devX = (int) (graphX * _scaleX);
 		}
 
-		final int devY = _devYBottom - ((int) ((graphY - _graphYBottom) * _scaleY));
+		final int devY = _devYBottom - (int) ((graphY - _graphYBottom) * _scaleY);
 
 		gc.setAlpha(0x60);
 
@@ -213,7 +213,7 @@ public class ChartLayerConconiTest implements IChartLayer {
 		} else {
 			devX = (int) (graphX * _scaleX);
 		}
-		final int devY = _devYBottom - ((int) ((graphY - _graphYBottom) * _scaleY));
+		final int devY = _devYBottom - (int) ((graphY - _graphYBottom) * _scaleY);
 
 		gc.setAlpha(0x60);
 

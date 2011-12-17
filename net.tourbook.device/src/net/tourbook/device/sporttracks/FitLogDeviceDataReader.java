@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -128,13 +128,18 @@ public class FitLogDeviceDataReader extends TourbookDevice {
 	@Override
 	public boolean processDeviceData(	final String importFilePath,
 										final DeviceData deviceData,
-										final HashMap<Long, TourData> tourDataMap) {
+										final HashMap<Long, TourData> alreadyImportedTours,
+										final HashMap<Long, TourData> newlyImportedTours) {
 
 		if (isValidXMLFile(importFilePath) == false) {
 			return false;
 		}
 
-		final FitLogSAXHandler saxHandler = new FitLogSAXHandler(this, importFilePath, tourDataMap);
+		final FitLogSAXHandler saxHandler = new FitLogSAXHandler(
+				this,
+				importFilePath,
+				alreadyImportedTours,
+				newlyImportedTours);
 
 		try {
 

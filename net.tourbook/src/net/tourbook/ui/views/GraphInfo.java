@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -42,14 +42,14 @@ class GraphInfo {
 	Label								lblAvg;
 	Label								lblDiff;
 
-	int									leftValue	= Integer.MIN_VALUE;
-	int									rightValue	= Integer.MIN_VALUE;
+	float								leftValue	= Float.MIN_VALUE;
+	float								rightValue	= Float.MIN_VALUE;
 
-	int									minValue	= Integer.MIN_VALUE;
-	int									maxValue	= Integer.MIN_VALUE;
+	float								minValue	= Float.MIN_VALUE;
+	float								maxValue	= Float.MIN_VALUE;
 
-	int									avgValue	= Integer.MIN_VALUE;
-	int									diffValue	= Integer.MIN_VALUE;
+	float								avgValue	= Float.MIN_VALUE;
+	float								diffValue	= Float.MIN_VALUE;
 
 	ChartDataSerie						_chartData;
 

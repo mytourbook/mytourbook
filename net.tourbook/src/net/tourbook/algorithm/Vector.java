@@ -1,35 +1,24 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.algorithm;
 
 public class Vector extends DPPoint {
 
-	public Vector(final int x, final int y, final int serieIndex) {
+	public Vector(final double x, final double y, final int serieIndex) {
 		super(x, y, serieIndex);
-	}
-
-	/**
-	 * Vector product
-	 * 
-	 * @param vector
-	 * @return
-	 */
-	public long dot(final Vector vector) {
-		return (long) x * vector.x + (long) y * vector.y;
 	}
 
 	/**
@@ -38,8 +27,18 @@ public class Vector extends DPPoint {
 	 * @param scalar
 	 * @return
 	 */
-	public Vector dot(final float scalar) {
-		return new Vector((int) (scalar * x), (int) (scalar * y), serieIndex);
+	public Vector dot(final double scalar) {
+		return new Vector((scalar * x), (scalar * y), serieIndex);
+	}
+
+	/**
+	 * Vector product
+	 * 
+	 * @param vector
+	 * @return
+	 */
+	public double dot(final Vector vector) {
+		return (x * vector.x) + (y * vector.y);
 	}
 
 }

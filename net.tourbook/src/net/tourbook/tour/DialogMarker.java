@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -142,10 +142,10 @@ public class DialogMarker extends TitleAreaDialog {
 	private boolean					_isOkPressed					= false;
 	private PixelConverter			_pc;
 
-	private NumberFormat			_nf								= NumberFormat.getNumberInstance();
+	private NumberFormat			_nf3							= NumberFormat.getNumberInstance();
 	{
-		_nf.setMinimumFractionDigits(3);
-		_nf.setMaximumFractionDigits(3);
+		_nf3.setMinimumFractionDigits(3);
+		_nf3.setMaximumFractionDigits(3);
 	}
 
 	private class MarkerViewerContentProvicer implements IStructuredContentProvider {
@@ -174,12 +174,12 @@ public class DialogMarker extends TitleAreaDialog {
 
 			case COLUMN_DISTANCE:
 
-				final int markerDistance = tourMarker.getDistance();
+				final float markerDistance = tourMarker.getDistance();
 
 				if (markerDistance == -1) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(_nf.format(markerDistance / (1000 * UI.UNIT_VALUE_DISTANCE)));
+					cell.setText(_nf3.format(markerDistance / (1000 * UI.UNIT_VALUE_DISTANCE)));
 				}
 
 				if (tourMarker.getType() == ChartLabel.MARKER_TYPE_DEVICE) {

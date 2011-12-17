@@ -979,13 +979,13 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 		case TOUR_COLOR_ALTITUDE:
 
-			int minValue = Integer.MIN_VALUE;
-			int maxValue = Integer.MAX_VALUE;
+			float minValue = Float.MIN_VALUE;
+			float maxValue = Float.MAX_VALUE;
 			boolean setInitialValue = true;
 
 			for (final TourData tourData : _tourDataList) {
 
-				final int[] dataSerie = tourData.getAltitudeSerie();
+				final float[] dataSerie = tourData.getAltitudeSerie();
 				if ((dataSerie == null) || (dataSerie.length == 0)) {
 					continue;
 				}
@@ -993,7 +993,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 				/*
 				 * get min/max values
 				 */
-				for (final int dataValue : dataSerie) {
+				for (final float dataValue : dataSerie) {
 
 					if (setInitialValue) {
 						setInitialValue = false;
@@ -1005,7 +1005,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 				}
 			}
 
-			if ((minValue == Integer.MIN_VALUE) || (maxValue == Integer.MAX_VALUE)) {
+			if ((minValue == Float.MIN_VALUE) || (maxValue == Float.MAX_VALUE)) {
 				return false;
 			}
 
@@ -1018,13 +1018,13 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 		case TOUR_COLOR_PULSE:
 
-			minValue = Integer.MIN_VALUE;
-			maxValue = Integer.MAX_VALUE;
+			minValue = Float.MIN_VALUE;
+			maxValue = Float.MAX_VALUE;
 			setInitialValue = true;
 
 			for (final TourData tourData : _tourDataList) {
 
-				final int[] dataSerie = tourData.pulseSerie;
+				final float[] dataSerie = tourData.pulseSerie;
 				if ((dataSerie == null) || (dataSerie.length == 0)) {
 					continue;
 				}
@@ -1032,7 +1032,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 				/*
 				 * get min/max values
 				 */
-				for (final int dataValue : dataSerie) {
+				for (final float dataValue : dataSerie) {
 
 					// patch from Kenny Moens / 2011-08-04
 					if (dataValue == 0) {
@@ -1049,7 +1049,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 				}
 			}
 
-			if ((minValue == Integer.MIN_VALUE) || (maxValue == Integer.MAX_VALUE)) {
+			if ((minValue == Float.MIN_VALUE) || (maxValue == Float.MAX_VALUE)) {
 				return false;
 			}
 
@@ -1062,13 +1062,13 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 		case TOUR_COLOR_SPEED:
 
-			minValue = Integer.MIN_VALUE;
-			maxValue = Integer.MAX_VALUE;
+			minValue = Float.MIN_VALUE;
+			maxValue = Float.MAX_VALUE;
 			setInitialValue = true;
 
 			for (final TourData tourData : _tourDataList) {
 
-				final int[] dataSerie = tourData.getSpeedSerie();
+				final float[] dataSerie = tourData.getSpeedSerie();
 				if ((dataSerie == null) || (dataSerie.length == 0)) {
 					continue;
 				}
@@ -1076,7 +1076,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 				/*
 				 * get min/max values
 				 */
-				for (final int dataValue : dataSerie) {
+				for (final float dataValue : dataSerie) {
 
 					if (setInitialValue) {
 						setInitialValue = false;
@@ -1088,11 +1088,11 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 				}
 			}
 
-			if ((minValue == Integer.MIN_VALUE) || (maxValue == Integer.MAX_VALUE)) {
+			if ((minValue == Float.MIN_VALUE) || (maxValue == Float.MAX_VALUE)) {
 				return false;
 			}
 
-			legendConfig.unitFactor = 10;
+			legendConfig.numberFormatDigits = 1;
 			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_SPEED);
 
 			legendProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
@@ -1102,13 +1102,13 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 		case TOUR_COLOR_PACE:
 
-			minValue = Integer.MIN_VALUE;
-			maxValue = Integer.MAX_VALUE;
+			minValue = Float.MIN_VALUE;
+			maxValue = Float.MAX_VALUE;
 			setInitialValue = true;
 
 			for (final TourData tourData : _tourDataList) {
 
-				final int[] dataSerie = tourData.getPaceSerie();
+				final float[] dataSerie = tourData.getPaceSerie();
 				if ((dataSerie == null) || (dataSerie.length == 0)) {
 					continue;
 				}
@@ -1116,7 +1116,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 				/*
 				 * get min/max values
 				 */
-				for (final int dataValue : dataSerie) {
+				for (final float dataValue : dataSerie) {
 
 					if (setInitialValue) {
 						setInitialValue = false;
@@ -1128,11 +1128,11 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 				}
 			}
 
-			if ((minValue == Integer.MIN_VALUE) || (maxValue == Integer.MAX_VALUE)) {
+			if ((minValue == Float.MIN_VALUE) || (maxValue == Float.MAX_VALUE)) {
 				return false;
 			}
 
-			legendConfig.unitFactor = 10;
+			legendConfig.numberFormatDigits = 1;
 			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_PACE);
 
 			legendProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
@@ -1142,13 +1142,13 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 		case TOUR_COLOR_GRADIENT:
 
-			minValue = Integer.MIN_VALUE;
-			maxValue = Integer.MAX_VALUE;
+			minValue = Float.MIN_VALUE;
+			maxValue = Float.MAX_VALUE;
 			setInitialValue = true;
 
 			for (final TourData tourData : _tourDataList) {
 
-				final int[] dataSerie = tourData.getGradientSerie();
+				final float[] dataSerie = tourData.getGradientSerie();
 				if ((dataSerie == null) || (dataSerie.length == 0)) {
 					continue;
 				}
@@ -1156,7 +1156,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 				/*
 				 * get min/max values
 				 */
-				for (final int dataValue : dataSerie) {
+				for (final float dataValue : dataSerie) {
 
 					if (setInitialValue) {
 						setInitialValue = false;
@@ -1168,11 +1168,11 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 				}
 			}
 
-			if ((minValue == Integer.MIN_VALUE) || (maxValue == Integer.MAX_VALUE)) {
+			if ((minValue == Float.MIN_VALUE) || (maxValue == Float.MAX_VALUE)) {
 				return false;
 			}
 
-			legendConfig.unitFactor = 10;
+			legendConfig.numberFormatDigits = 1;
 			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_GRADIENT);
 
 			legendProvider.setLegendColorColors(colorDefinition.getNewLegendColor());

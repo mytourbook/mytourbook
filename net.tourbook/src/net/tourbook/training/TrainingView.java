@@ -136,8 +136,8 @@ public class TrainingView extends ViewPart {
 	private ActionShowAllPulseValues	_actionShowAllPulseValues;
 	private ActionSynchChartScale		_actionSynchVerticalChartScaling;
 
-	private int							_pulseStart;
-	private int[]						_xSeriePulse;
+	private float						_pulseStart;
+	private float[]						_xSeriePulse;
 
 	private ArrayList<TourPersonHRZone>	_personHrZones							= new ArrayList<TourPersonHRZone>();
 	private final BarChartMinMaxKeeper	_minMaxKeeper							= new BarChartMinMaxKeeper();
@@ -1127,7 +1127,7 @@ public class TrainingView extends ViewPart {
 		/*
 		 * check pulse
 		 */
-		final int[] pulseSerie = _tourData.pulseSerie;
+		final float[] pulseSerie = _tourData.pulseSerie;
 		if (pulseSerie == null || pulseSerie.length == 0) {
 
 			// pulse data are not available
@@ -1188,7 +1188,7 @@ public class TrainingView extends ViewPart {
 
 	private void updateUI40HrZoneChart(final HrZoneContext zoneMinMaxBpm) {
 
-		final int[] pulseSerie = _tourData.pulseSerie;
+		final float[] pulseSerie = _tourData.pulseSerie;
 		final int[] timeSerie = _tourData.timeSerie;
 		final boolean[] breakTimeSerie = _tourData.getBreakTimeSerie();
 		final int timeSerieSize = timeSerie.length;
@@ -1214,13 +1214,13 @@ public class TrainingView extends ViewPart {
 		/*
 		 * minPulse will be the first x-data point with the x-value = 0
 		 */
-		int maxPulse;
+		float maxPulse;
 
 		if (_isShowAllPulseValues) {
 
 			_pulseStart = maxPulse = pulseSerie[0];
 
-			for (final int pulse : pulseSerie) {
+			for (final float pulse : pulseSerie) {
 				if (pulse < _pulseStart) {
 					_pulseStart = pulse;
 				} else if (pulse > maxPulse) {
@@ -1236,10 +1236,10 @@ public class TrainingView extends ViewPart {
 		/*
 		 * create x-data series
 		 */
-		final int pulseRange = maxPulse - _pulseStart + 1;
+		final int pulseRange = (int) (maxPulse - _pulseStart + 1);
 
-		_xSeriePulse = new int[pulseRange];
-		final int[] ySeriePulseTime = new int[pulseRange];
+		_xSeriePulse = new float[pulseRange];
+		final float[] ySeriePulseTime = new float[pulseRange];
 
 		final int[] colorIndex = new int[timeSerieSize];
 
@@ -1254,10 +1254,10 @@ public class TrainingView extends ViewPart {
 			zoneIndex = 0;
 			for (; zoneIndex < zoneSize; zoneIndex++) {
 
-				final int minValue = zoneMinBpm[zoneIndex];
-				final int maxValue = zoneMaxBpm[zoneIndex];
+				final float minValue = zoneMinBpm[zoneIndex];
+				final float maxValue = zoneMaxBpm[zoneIndex];
 
-				final int pulse = _pulseStart + pulseIndex;
+				final float pulse = _pulseStart + pulseIndex;
 
 				if (pulse >= minValue && pulse <= maxValue) {
 
@@ -1300,8 +1300,8 @@ public class TrainingView extends ViewPart {
 				}
 			}
 
-			final int pulse = pulseSerie[serieIndex];
-			final int pulseIndex = pulse - _pulseStart;
+			final float pulse = pulseSerie[serieIndex];
+			final int pulseIndex = (int) (pulse - _pulseStart);
 
 			// check array bounds
 			if (pulseIndex >= 0 && pulseIndex < pulseRange) {
@@ -1333,8 +1333,8 @@ public class TrainingView extends ViewPart {
 		final ChartDataYSerie yData = new ChartDataYSerie(
 				ChartDataModel.CHART_TYPE_BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
-				new int[][] { new int[pulseRange] },
-				new int[][] { ySeriePulseTime });
+				new float[][] { new float[pulseRange] },
+				new float[][] { ySeriePulseTime });
 
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
 		yData.setYTitle(Messages.App_Label_H_MM);

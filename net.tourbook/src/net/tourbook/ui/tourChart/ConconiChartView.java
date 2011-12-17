@@ -16,7 +16,7 @@
 package net.tourbook.ui.tourChart;
 
 import gnu.trove.list.array.TDoubleArrayList;
-import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.list.array.TFloatArrayList;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -219,8 +219,8 @@ public class ConconiChartView extends ViewPart {
 
 			final TourData tourData = toursArray[serieIndex];
 
-			final int[] tdPowerSerie = tourData.getPowerSerie();
-			final int[] tdPulseSerie = tourData.pulseSerie;
+			final float[] tdPowerSerie = tourData.getPowerSerie();
+			final float[] tdPulseSerie = tourData.pulseSerie;
 
 			// check if required data series are available
 			if (tdPowerSerie != null && tdPowerSerie.length != 0 && tdPulseSerie != null && tdPulseSerie.length != 0) {
@@ -260,15 +260,15 @@ public class ConconiChartView extends ViewPart {
 				_prefStore,
 				prefGraphName + GraphColorProvider.PREF_COLOR_BRIGHT);
 
-		final int[][] powerSerie = new int[validDataLength][];
-		final int[][] pulseSerie = new int[validDataLength][];
+		final float[][] powerSerie = new float[validDataLength][];
+		final float[][] pulseSerie = new float[validDataLength][];
 		final RGB[] rgbLine = new RGB[validDataLength];
 		final RGB[] rgbDark = new RGB[validDataLength];
 		final RGB[] rgbBright = new RGB[validDataLength];
 
 		final TourData[] validTours = validTourList.toArray(new TourData[validTourList.size()]);
 		int markedIndex = 0;
-		int maxXValue = 0;
+		float maxXValue = 0;
 
 		/*
 		 * create data series which contain valid data, reduce data that the highes value for an x
@@ -278,8 +278,8 @@ public class ConconiChartView extends ViewPart {
 
 			final TourData tourData = validTours[tourIndex];
 
-			final int[] tourPowerSerie = tourData.getPowerSerie();
-			final int[] tourPulseSerie = tourData.pulseSerie;
+			final float[] tourPowerSerie = tourData.getPowerSerie();
+			final float[] tourPulseSerie = tourData.pulseSerie;
 
 			// check if required data series are available
 			if (tourPowerSerie != null
@@ -287,11 +287,11 @@ public class ConconiChartView extends ViewPart {
 					&& tourPulseSerie != null
 					&& tourPulseSerie.length != 0) {
 
-				final TIntArrayList maxXValues = new TIntArrayList();
-				final TIntArrayList maxYValues = new TIntArrayList();
+				final TFloatArrayList maxXValues = new TFloatArrayList();
+				final TFloatArrayList maxYValues = new TFloatArrayList();
 
-				int lastMaxY = Integer.MIN_VALUE;
-				int currentXValue = tourPowerSerie[0];
+				float lastMaxY = Float.MIN_VALUE;
+				float currentXValue = tourPowerSerie[0];
 
 				// loop: all values in the current serie
 				for (int valueIndex = 0; valueIndex < tourPowerSerie.length; valueIndex++) {
@@ -301,8 +301,8 @@ public class ConconiChartView extends ViewPart {
 						break;
 					}
 
-					final int xValue = tourPowerSerie[valueIndex];
-					final int yValue = tourPulseSerie[valueIndex];
+					final float xValue = tourPowerSerie[valueIndex];
+					final float yValue = tourPulseSerie[valueIndex];
 
 					if (xValue == currentXValue) {
 
@@ -361,8 +361,8 @@ public class ConconiChartView extends ViewPart {
 		 * swap last tour with marked tour that the marked tour is painted at last to be not covered
 		 * by other tours
 		 */
-		final int[] markedPowerSerie = powerSerie[markedIndex];
-		final int[] markedPulseSerie = pulseSerie[markedIndex];
+		final float[] markedPowerSerie = powerSerie[markedIndex];
+		final float[] markedPulseSerie = pulseSerie[markedIndex];
 		final RGB markedRgbLine = rgbLine[markedIndex];
 		final RGB markedRgbDark = rgbDark[markedIndex];
 		final RGB markedRgbBright = rgbBright[markedIndex];
@@ -397,6 +397,7 @@ public class ConconiChartView extends ViewPart {
 		_yDataPulse.setRgbDark(rgbDark);
 		_yDataPulse.setRgbBright(rgbBright);
 
+// check x-data visible min value
 		//adjust min/max values that the chart do not stick to a border
 		xDataPower.setVisibleMinValue(0, true);
 		xDataPower.setVisibleMaxValue(xDataPower.getVisibleMaxValue() + ADJUST_MAX_POWER_VALUE, true);
@@ -428,13 +429,13 @@ public class ConconiChartView extends ViewPart {
 		return chartDataModel;
 	}
 
-	private ConconiData createConconiData(final int[] xValues, final int[] yValues) {
+	private ConconiData createConconiData(final float[] xValues, final float[] yValues) {
 
 		final TDoubleArrayList maxXValues = new TDoubleArrayList();
 		final TDoubleArrayList maxYValues = new TDoubleArrayList();
 
-		int lastMaxY = Integer.MIN_VALUE;
-		int currentXValue = xValues[0];
+		float lastMaxY = Float.MIN_VALUE;
+		float currentXValue = xValues[0];
 
 		// loop: all values in the current serie
 		for (int valueIndex = 0; valueIndex < xValues.length; valueIndex++) {
@@ -444,8 +445,8 @@ public class ConconiChartView extends ViewPart {
 				break;
 			}
 
-			final int xValue = xValues[valueIndex];
-			final int yValue = yValues[valueIndex];
+			final float xValue = xValues[valueIndex];
+			final float yValue = yValues[valueIndex];
 
 			if (xValue == currentXValue) {
 

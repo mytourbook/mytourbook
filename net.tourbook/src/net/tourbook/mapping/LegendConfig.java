@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,16 @@ import net.tourbook.ui.UI;
  */
 public class LegendConfig {
 
-	public int				legendMinValue;
-	public int				legendMaxValue;
+	public float		legendMinValue;
+	public float		legendMaxValue;
 
-	public List<Integer>	units;
-	public List<String>		unitLabels;
+	public List<Float>	units;
+	public List<String>	unitLabels;
 
-	public int				unitFactor	= 1;
+	public String		unitText	= UI.EMPTY_STRING;
 
-	public String			unitText	= UI.EMPTY_STRING;
+	/**
+	 * Number of digits when label is formatted, default is 0.
+	 */
+	public int			numberFormatDigits;
 }

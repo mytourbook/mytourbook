@@ -170,7 +170,7 @@ public class TrainingManager {
 		return hrZones;
 	}
 
-	public static int getZoneIndex(final HrZoneContext hrZoneContext, final int pulse) {
+	public static int getZoneIndex(final HrZoneContext hrZoneContext, final float pulse) {
 
 		final int[] zoneMinBpm = hrZoneContext.zoneMinBpm;
 		int zoneIndex = 0;
@@ -200,7 +200,7 @@ public class TrainingManager {
 		if (tourData != null) {
 
 			// check pulse
-			final int[] pulseSerie = tourData.pulseSerie;
+			final float[] pulseSerie = tourData.pulseSerie;
 			final boolean isPulse = pulseSerie != null && pulseSerie.length > 0;
 			if (isPulse) {
 

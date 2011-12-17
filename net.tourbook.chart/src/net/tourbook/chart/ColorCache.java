@@ -1,22 +1,21 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.chart;
 
 import java.util.HashMap;
-import java.util.Iterator;
 
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
@@ -33,32 +32,11 @@ public class ColorCache {
 	}
 
 	/**
-	 * Creates a color in the color cache
-	 * 
-	 * @param colorKey
-	 * @param rgb
-	 * @return Returns the created color
-	 */
-	public Color createColor(final String colorKey, final RGB rgb) {
-
-		// check if key already exists
-		if (_colors.containsKey(colorKey)) {
-			return _colors.get(colorKey);
-		}
-
-		final Color color = new Color(_display, rgb);
-
-		_colors.put(colorKey, color);
-
-		return color;
-	}
-
-	/**
 	 * Dispose all colors in the color cache
 	 */
 	public void dispose() {
-		for (final Iterator<Color> i = _colors.values().iterator(); i.hasNext();) {
-			(i.next()).dispose();
+		for (final Color color : _colors.values()) {
+			(color).dispose();
 		}
 		_colors.clear();
 	}
@@ -70,6 +48,49 @@ public class ColorCache {
 	 */
 	public Color get(final String colorKey) {
 		return _colors.get(colorKey);
+	}
+
+	/**
+	 * @param rgb
+	 *            RGB value
+	 * @return Returns the color from the color cache with the RGB value as the key.
+	 *         <p>
+	 *         The color must not be disposed this is done when the cache is disposed.
+	 */
+	public Color getColor(final RGB rgb) {
+
+// !!! this is a performance bottleneck !!!
+//		final String colorKey = rgb.toString();
+
+		final String colorKey = Integer.toString(rgb.hashCode());
+		final Color color = _colors.get(colorKey);
+
+		if (color == null) {
+			return getColor(colorKey, rgb);
+		} else {
+			return color;
+		}
+	}
+
+	/**
+	 * Creates a color in the color cache when the color is not yet created.
+	 * 
+	 * @param colorKey
+	 * @param rgb
+	 * @return Returns the created color
+	 */
+	public Color getColor(final String colorKey, final RGB rgb) {
+
+		// check if key already exists
+		if (_colors.containsKey(colorKey)) {
+			return _colors.get(colorKey);
+		}
+
+		final Color color = new Color(_display, rgb);
+
+		_colors.put(colorKey, color);
+
+		return color;
 	}
 
 }

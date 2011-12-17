@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -285,24 +285,24 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			/*
 			 * title
 			 */
-			
+
 			label = _tk.createLabel(section, Messages.tour_editor_label_tour_title);
 			_firstColumnControls.add(label);
-			
+
 			// combo: tour title with history
 			_comboTitle = new Combo(section, SWT.BORDER | SWT.FLAT);
 			_comboTitle.setText(UI.EMPTY_STRING);
-			
+
 			_tk.adapt(_comboTitle, true, false);
-		
+
 			GridDataFactory.fillDefaults()//
 					.grab(true, false)
 					.applyTo(_comboTitle);
-	
+
 			// fill combobox
 			final String[] strings = PrefHistory.getHistory(ITourbookPreferences.TOUR_EDITOR_TITLE_HISTORY);
 			_comboTitle.setItems(strings);
-			
+
 			_comboTitle.addModifyListener(new ModifyListener() {
 				@Override
 				public void modifyText(final ModifyEvent e) {
@@ -910,9 +910,9 @@ public class DialogQuickEdit extends TitleAreaDialog {
 		_tourData.setWeather(_txtWeather.getText().trim());
 
 		if (_isTemperatureManuallyModified) {
-			int temperature = _spinTemperature.getSelection();
+			float temperature = _spinTemperature.getSelection();
 			if (_unitValueTemperature != 1) {
-				temperature = (int) ((temperature - UI.UNIT_FAHRENHEIT_ADD) / UI.UNIT_FAHRENHEIT_MULTI);
+				temperature = ((temperature - UI.UNIT_FAHRENHEIT_ADD) / UI.UNIT_FAHRENHEIT_MULTI);
 			}
 			_tourData.setAvgTemperature(temperature);
 		}
@@ -961,16 +961,15 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			/*
 			 * avg temperature
 			 */
-			final int temperatureScale = _tourData.getTemperatureScale();
-			int avgTemperature = _tourData.getAvgTemperature();
+			float avgTemperature = _tourData.getAvgTemperature();
 
 			if (_unitValueTemperature != 1) {
-				final float metricTemperature = (float) avgTemperature / temperatureScale;
-				avgTemperature = (int) ((metricTemperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD) * temperatureScale);
+				final float metricTemperature = avgTemperature;
+				avgTemperature = metricTemperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD;
 			}
 
-			_spinTemperature.setDigits(Util.getNumberOfDigits(temperatureScale) - 1);
-			_spinTemperature.setSelection(avgTemperature);
+			_spinTemperature.setDigits(1);
+			_spinTemperature.setSelection(Math.round(avgTemperature * 10));
 		}
 		_isUpdateUI = false;
 	}

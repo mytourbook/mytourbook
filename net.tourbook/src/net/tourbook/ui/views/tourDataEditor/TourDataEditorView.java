@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -51,7 +51,6 @@ import net.tourbook.database.MyTourbookException;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.importdata.RawDataManager;
-import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.mapping.SelectionMapPosition;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefHistory;
@@ -206,20 +205,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private static final String					CSV_FILE_EXTENSION				= "csv";									//$NON-NLS-1$
 
-	private final IPreferenceStore				_prefStore						= TourbookPlugin
-																						.getDefault()
+	private final IPreferenceStore				_prefStore						= TourbookPlugin.getDefault() //
 																						.getPreferenceStore();
 
-	private final IDialogSettings				_viewState						= TourbookPlugin
-																						.getDefault()
+	private final IDialogSettings				_viewState						= TourbookPlugin.getDefault() //
 																						.getDialogSettingsSection(ID);
 
-	private final IDialogSettings				_viewStateSlice					= TourbookPlugin
-																						.getDefault()
+	private final IDialogSettings				_viewStateSlice					= TourbookPlugin.getDefault() //
 																						.getDialogSettingsSection(//
 																								ID + ".slice");			//$NON-NLS-1$
-	private final IDialogSettings				_viewStateMarker				= TourbookPlugin
-																						.getDefault()
+
+	private final IDialogSettings				_viewStateMarker				= TourbookPlugin.getDefault() //
 																						.getDialogSettingsSection(//
 																								ID + ".marker");			//$NON-NLS-1$
 
@@ -263,15 +259,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 */
 	private int[]								_serieTime;
 
-	private int[]								_serieDistance;
-	private int[]								_serieAltitude;
-	private double[]							_serieTemperature;
-	private int[]								_serieCadence;
-	private int[]								_serieGradient;
-	private int[]								_serieSpeed;
-	private int[]								_seriePace;
-	private int[]								_seriePower;
-	private int[]								_seriePulse;
+	private float[]								_serieDistance;
+	private float[]								_serieAltitude;
+	private float[]								_serieTemperature;
+	private float[]								_serieCadence;
+	private float[]								_serieGradient;
+	private float[]								_serieSpeed;
+	private float[]								_seriePace;
+	private float[]								_seriePower;
+	private float[]								_seriePulse;
 	private double[]							_serieLatitude;
 	private double[]							_serieLongitude;
 	private boolean[]							_serieBreakTime;
@@ -302,16 +298,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private final DateTimeFormatter				_dtFormatter					= DateTimeFormat.mediumDateTime();
 
 	private final NumberFormat					_nf1							= NumberFormat.getNumberInstance();
-
 	private final NumberFormat					_nf1NoGroup						= NumberFormat.getNumberInstance();
 	private final NumberFormat					_nf3							= NumberFormat.getNumberInstance();
+	private final NumberFormat					_nf6							= NumberFormat.getNumberInstance();
 	private final NumberFormat					_nf3NoGroup						= NumberFormat.getNumberInstance();
 	{
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
-
 		_nf3.setMinimumFractionDigits(3);
 		_nf3.setMaximumFractionDigits(3);
+		_nf6.setMinimumFractionDigits(6);
+		_nf6.setMaximumFractionDigits(6);
 
 		_nf1NoGroup.setMinimumFractionDigits(1);
 		_nf1NoGroup.setMaximumFractionDigits(1);
@@ -409,7 +406,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private TourData							_uiRunnableTourData;
 	private boolean								_uiRunnableForceTimeSliceReload;
 	private boolean								_uiRunnableIsDirtyDisabled;
-	private SliceIntegerEditingSupport			_altitudeEditingSupport;
 
 // disabled because tour data get corrupted, the tour date could be from another tour
 //	private int							fUIUpdateCounterTabTour			= -1;
@@ -417,9 +413,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 //	private int							fUIUpdateCounterTabMarker		= -1;
 //	private int							fUIUpdateCounterTabSlices		= -1;
 
-	private SliceIntegerEditingSupport			_pulseEditingSupport;
-	private SliceDouble2EditingSupport			_temperatureEditingSupport;
-	private SliceIntegerEditingSupport			_cadenceEditingSupport;
+	private SliceFloatEditingSupport			_altitudeEditingSupport;
+	private SliceFloatEditingSupport			_pulseEditingSupport;
+	private SliceFloatEditingSupport			_temperatureEditingSupport;
+	private SliceFloatEditingSupport			_cadenceEditingSupport;
 	private SliceDoubleEditingSupport			_latitudeEditingSupport;
 	private SliceDoubleEditingSupport			_longitudeEditingSupport;
 
@@ -691,110 +688,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 	}
 
-	private final class SliceDouble2EditingSupport extends EditingSupport {
-
-		private final TextCellEditor	__cellEditor;
-		private double[]				__dataSerie;
-
-		private SliceDouble2EditingSupport(final TextCellEditor cellEditor, final double[] dataSerie) {
-			super(_sliceViewer);
-			__cellEditor = cellEditor;
-			__dataSerie = dataSerie;
-		}
-
-		@Override
-		protected boolean canEdit(final Object element) {
-
-			if ((__dataSerie == null) || (isTourInDb() == false) || (_isEditMode == false)) {
-				return false;
-			}
-
-			return true;
-		}
-
-		@Override
-		protected CellEditor getCellEditor(final Object element) {
-			return __cellEditor;
-		}
-
-		@Override
-		protected Object getValue(final Object element) {
-
-			final double metricValue = __dataSerie[((TimeSlice) element).serieIndex];
-			double displayedValue = metricValue;
-
-			/*
-			 * convert current measurement system into metric
-			 */
-			if (__dataSerie == _serieTemperature) {
-
-				if (_unitValueTemperature != 1) {
-
-					// none metric measurement systemm
-
-					displayedValue = metricValue * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD;
-				}
-			}
-
-			// remove trailing numbers which should not be displayed
-			final String returnValue = _nf1.format(displayedValue);
-
-			return returnValue;
-		}
-
-		public void setDataSerie(final double[] dataSerie) {
-			__dataSerie = dataSerie;
-		}
-
-		@Override
-		protected void setValue(final Object element, final Object value) {
-
-			if (value instanceof String) {
-
-				try {
-
-					final double enteredValue = Double.parseDouble((String) value);
-					double metricValue = enteredValue;
-
-					final boolean isTemperatureSerie = __dataSerie == _serieTemperature;
-
-					if (isTemperatureSerie) {
-
-						if (_unitValueTemperature != 1) {
-
-							// none metric measurement systemm, convert entered value into metric value
-
-							metricValue = ((enteredValue - UI.UNIT_FAHRENHEIT_ADD)) / UI.UNIT_FAHRENHEIT_MULTI;
-						}
-					}
-
-					final int serieIndex = ((TimeSlice) element).serieIndex;
-
-					// check if metric value has changed
-					if (metricValue != __dataSerie[serieIndex]) {
-
-						// value has changed
-
-						// update dataserie
-						__dataSerie[serieIndex] = metricValue;
-
-						if (isTemperatureSerie) {
-							final int temperatureScale = _tourData.getTemperatureScale();
-							final int[] temperatureSerie = _tourData.temperatureSerie;
-
-							temperatureSerie[serieIndex] = (int) (metricValue * temperatureScale);
-						}
-
-						updateUIAfterSliceEdit();
-					}
-
-				} catch (final Exception e) {
-					// ignore invalid characters
-				}
-			}
-		}
-	}
-
 	private final class SliceDoubleEditingSupport extends EditingSupport {
 
 		private final TextCellEditor	__cellEditor;
@@ -863,12 +756,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 	}
 
-	private final class SliceIntegerEditingSupport extends EditingSupport {
+	private final class SliceFloatEditingSupport extends EditingSupport {
 
 		private final TextCellEditor	__cellEditor;
-		private int[]					__dataSerie;
+		private float[]					__dataSerie;
 
-		private SliceIntegerEditingSupport(final TextCellEditor cellEditor, final int[] dataSerie) {
+		private SliceFloatEditingSupport(final TextCellEditor cellEditor, final float[] dataSerie) {
 			super(_sliceViewer);
 			__cellEditor = cellEditor;
 			__dataSerie = dataSerie;
@@ -892,8 +785,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		@Override
 		protected Object getValue(final Object element) {
 
-			final int metricValue = __dataSerie[((TimeSlice) element).serieIndex];
-			int displayedValue = metricValue;
+			final float metricValue = __dataSerie[((TimeSlice) element).serieIndex];
+			float displayedValue = metricValue;
 
 			/*
 			 * convert current measurement system into metric
@@ -907,12 +800,20 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					displayedValue /= _unitValueAltitude;
 				}
 
+			} else if (__dataSerie == _serieTemperature) {
+
+				if (_unitValueTemperature != 1) {
+
+					// none metric measurement systemm
+
+					displayedValue = metricValue * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD;
+				}
 			}
 
-			return new Integer(displayedValue).toString();
+			return new Float(displayedValue).toString();
 		}
 
-		public void setDataSerie(final int[] dataSerie) {
+		public void setDataSerie(final float[] dataSerie) {
 			__dataSerie = dataSerie;
 		}
 
@@ -926,8 +827,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					/*
 					 * convert entered value into metric value
 					 */
-					final int enteredValue = Integer.parseInt((String) value);
-					int metricValue = enteredValue;
+					final float enteredValue = Float.parseFloat((String) value);
+					float metricValue = enteredValue;
 					if (__dataSerie == _serieAltitude) {
 
 						if (_unitValueAltitude != 1) {
@@ -939,6 +840,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 							metricValue = Math.round(noneMetricValue * _unitValueAltitude);
 						}
 
+					}
+					final boolean isTemperatureSerie = __dataSerie == _serieTemperature;
+
+					if (isTemperatureSerie) {
+
+						if (_unitValueTemperature != 1) {
+
+							// none metric measurement systemm, convert entered value into metric value
+
+							metricValue = ((enteredValue - UI.UNIT_FAHRENHEIT_ADD)) / UI.UNIT_FAHRENHEIT_MULTI;
+						}
 					}
 
 					final int serieIndex = ((TimeSlice) element).serieIndex;
@@ -1032,7 +944,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					tourMarker.setLabel(markerLabel);
 					tourMarker.setVisualPosition(ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
 
-					final int[] distSerie = _tourData.getMetricDistanceSerie();
+					final float[] distSerie = _tourData.getMetricDistanceSerie();
 					if (distSerie != null) {
 						tourMarker.setDistance(distSerie[serieIndex]);
 					}
@@ -1335,7 +1247,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		tourData.setStartDay((short) _calendar.get(Calendar.DAY_OF_MONTH));
 
 		tourData.setWeek(tourData.getStartYear(), tourData.getStartMonth(), tourData.getStartDay());
-		tourData.setTemperatureScale(TourbookDevice.TEMPERATURE_SCALE);
 
 		// tour id must be created after the tour date/time is set
 		tourData.createTourId();
@@ -1432,25 +1343,25 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 				// distance
 				if (_serieDistance != null) {
-					sb.append(_nf3.format(((float) _serieDistance[serieIndex]) / 1000 / _unitValueDistance));
+					sb.append(_nf6.format(_serieDistance[serieIndex] / 1000 / _unitValueDistance));
 				}
 				sb.append(UI.TAB);
 
 				// altitude
 				if (_serieAltitude != null) {
-					sb.append(Integer.toString((int) (_serieAltitude[serieIndex] / _unitValueAltitude)));
+					sb.append(_nf3.format(_serieAltitude[serieIndex] / _unitValueAltitude));
 				}
 				sb.append(UI.TAB);
 
 				// gradient
 				if (_serieGradient != null) {
-					sb.append(_nf1.format((float) _serieGradient[serieIndex] / 10));
+					sb.append(_nf3.format(_serieGradient[serieIndex]));
 				}
 				sb.append(UI.TAB);
 
 				// pulse
 				if (_seriePulse != null) {
-					sb.append(Integer.toString(_seriePulse[serieIndex]));
+					sb.append(_nf3.format(_seriePulse[serieIndex]));
 				}
 				sb.append(UI.TAB);
 
@@ -1464,42 +1375,42 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				// temperature
 				if (_serieTemperature != null) {
 
-					final double metricTemperature = _serieTemperature[serieIndex];
+					final float metricTemperature = _serieTemperature[serieIndex];
 
 					if (_unitValueTemperature != 1) {
 						// use imperial system
-						final double imperialTemp = metricTemperature
+						final float imperialTemp = metricTemperature
 								* UI.UNIT_FAHRENHEIT_MULTI
 								+ UI.UNIT_FAHRENHEIT_ADD;
-						sb.append(Double.toString(imperialTemp));
+						sb.append(_nf3.format(imperialTemp));
 					} else {
 						// use metric system
-						sb.append(Double.toString(metricTemperature));
+						sb.append(_nf3.format(metricTemperature));
 					}
 				}
 				sb.append(UI.TAB);
 
 				// cadence
 				if (_serieCadence != null) {
-					sb.append(Integer.toString(_serieCadence[serieIndex]));
+					sb.append(_nf3.format(_serieCadence[serieIndex]));
 				}
 				sb.append(UI.TAB);
 
 				// speed
 				if (_serieSpeed != null) {
-					sb.append(_nf1.format((float) _serieSpeed[serieIndex] / 10));
+					sb.append(_nf3.format(_serieSpeed[serieIndex]));
 				}
 				sb.append(UI.TAB);
 
 				// pace
 				if (_seriePace != null) {
-					sb.append(UI.format_hhh_mm_ss(_seriePace[serieIndex]));
+					sb.append(UI.format_hhh_mm_ss((long) _seriePace[serieIndex]));
 				}
 				sb.append(UI.TAB);
 
 				// power
 				if (_seriePower != null) {
-					sb.append(Integer.toString(_seriePower[serieIndex]));
+					sb.append(_nf3.format(_seriePower[serieIndex]));
 				}
 				sb.append(UI.TAB);
 
@@ -1644,7 +1555,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		TourManager.removeTimeSlices(_tourData, firstIndex, lastIndex, isRemoveTime);
 
 		updateMarkerMap();
-		convertTemperatureSerie(_tourData.temperatureSerie);
 
 		getDataSeriesFromTourData();
 
@@ -1741,12 +1651,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		// it is already checked if a valid data serie is available and first distance is > 0
 
-		final int[] distanceSerie = _tourData.distanceSerie;
-		final int distanceOffset = distanceSerie[0];
+		final float[] distanceSerie = _tourData.distanceSerie;
+		final float distanceOffset = distanceSerie[0];
 
 		// adjust distance data serie
 		for (int serieIndex = 0; serieIndex < distanceSerie.length; serieIndex++) {
-			final int sliceDistance = distanceSerie[serieIndex];
+			final float sliceDistance = distanceSerie[serieIndex];
 			distanceSerie[serieIndex] = sliceDistance - distanceOffset;
 		}
 
@@ -1755,7 +1665,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		if (allTourMarker != null) {
 
 			for (final TourMarker tourMarker : allTourMarker) {
-				final int markerDistance = tourMarker.getDistance();
+				final float markerDistance = tourMarker.getDistance();
 				if (markerDistance > 0) {
 					tourMarker.setDistance(markerDistance - distanceOffset);
 				}
@@ -2105,18 +2015,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private boolean confirmUndoChanges() {
 
-		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-
 		// check if confirmation is disabled
-		if (prefStore.getBoolean(ITourbookPreferences.TOURDATA_EDITOR_CONFIRMATION_REVERT_TOUR)) {
+		if (_prefStore.getBoolean(ITourbookPreferences.TOURDATA_EDITOR_CONFIRMATION_REVERT_TOUR)) {
 
 			return true;
 
 		} else {
 
-			final MessageDialogWithToggle dialog = MessageDialogWithToggle.openOkCancelConfirm(Display
-					.getCurrent()
-					.getActiveShell(),//
+			final MessageDialogWithToggle dialog = MessageDialogWithToggle.openOkCancelConfirm(//
+					Display.getCurrent().getActiveShell(),//
 					Messages.tour_editor_dlg_revert_tour_title, // title
 					Messages.tour_editor_dlg_revert_tour_message, // message
 					Messages.tour_editor_dlg_revert_tour_toggle_message, // toggle message
@@ -2124,33 +2031,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					null,
 					null);
 
-			prefStore.setValue(ITourbookPreferences.TOURDATA_EDITOR_CONFIRMATION_REVERT_TOUR, dialog.getToggleState());
+			_prefStore.setValue(ITourbookPreferences.TOURDATA_EDITOR_CONFIRMATION_REVERT_TOUR, dialog.getToggleState());
 
 			return dialog.getReturnCode() == Window.OK;
 		}
-	}
-
-	/**
-	 * Convert temperature serie into double
-	 * 
-	 * @param temperatureSerie
-	 */
-	private double[] convertTemperatureSerie(final int[] temperatureSerie) {
-
-		double[] temperatureSerieDouble = null;
-
-		if (temperatureSerie != null) {
-
-			final int temperatureScale = _tourData.getTemperatureScale();
-
-			final int serieLength = temperatureSerie.length;
-			temperatureSerieDouble = new double[serieLength];
-
-			for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
-				temperatureSerieDouble[serieIndex] = (double) temperatureSerie[serieIndex] / temperatureScale;
-			}
-		}
-		return temperatureSerieDouble;
 	}
 
 	private void createActions() {
@@ -2402,7 +2286,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			}
 		});
 
-		// set menu for the tag item
+		// set menu for the tour type link
 		_linkTourType.setMenu(menuMgr.createContextMenu(_linkTourType));
 
 		/*
@@ -2611,10 +2495,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		 */
 		final TextCellEditor cellEditor = new TextCellEditorCustomized(_sliceViewer.getTable());
 
-		_altitudeEditingSupport = new SliceIntegerEditingSupport(cellEditor, _serieAltitude);
-		_pulseEditingSupport = new SliceIntegerEditingSupport(cellEditor, _seriePulse);
-		_temperatureEditingSupport = new SliceDouble2EditingSupport(cellEditor, _serieTemperature);
-		_cadenceEditingSupport = new SliceIntegerEditingSupport(cellEditor, _serieCadence);
+		_altitudeEditingSupport = new SliceFloatEditingSupport(cellEditor, _serieAltitude);
+		_pulseEditingSupport = new SliceFloatEditingSupport(cellEditor, _seriePulse);
+		_temperatureEditingSupport = new SliceFloatEditingSupport(cellEditor, _serieTemperature);
+		_cadenceEditingSupport = new SliceFloatEditingSupport(cellEditor, _serieCadence);
 		_latitudeEditingSupport = new SliceDoubleEditingSupport(cellEditor, _serieLatitude);
 		_longitudeEditingSupport = new SliceDoubleEditingSupport(cellEditor, _serieLongitude);
 
@@ -2848,9 +2732,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					| SWT.H_SCROLL//
 			);
 
-			final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
-
-			int descLines = store.getInt(ITourbookPreferences.TOUR_EDITOR_DESCRIPTION_HEIGHT);
+			int descLines = _prefStore.getInt(ITourbookPreferences.TOUR_EDITOR_DESCRIPTION_HEIGHT);
 			descLines = descLines == 0 ? 5 : descLines;
 
 			// description will grab all vertical space in the tour tab
@@ -3624,10 +3506,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		// keep border style
 		final int defaultBorderStyle = _tk.getBorderStyle();
 		_tk.setBorderStyle(SWT.NULL);
-
 		_sectionInfo = createSection(parent, _tk, Messages.tour_editor_section_info, false, false);
 		final Composite container = (Composite) _sectionInfo.getClient();
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+//		LayoutConstants.getSpacing();
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+		GridLayoutFactory.fillDefaults()//
+				.numColumns(2)
+				.spacing(10, 2)
+				.applyTo(container);
 		{
 			/*
 			 * date/time created
@@ -3717,7 +3603,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					// adjust to the label controls
 					.indent(2, 0)
 					//
-					.align(SWT.BEGINNING, SWT.FILL)
+					.align(SWT.FILL, SWT.FILL)
 					.applyTo(_txtImportFilePath);
 
 			/*
@@ -3917,7 +3803,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 				final TourMarker marker = (TourMarker) cell.getElement();
 
-				final int markerDistance = marker.getDistance();
+				final float markerDistance = marker.getDistance();
 				if (markerDistance == -1) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
@@ -4021,7 +3907,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			public void update(final ViewerCell cell) {
 				if (_serieAltitude != null) {
 					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-					cell.setText(Integer.toString((int) (_serieAltitude[timeSlice.serieIndex] / _unitValueAltitude)));
+					cell.setText(_nf1.format(_serieAltitude[timeSlice.serieIndex] / _unitValueAltitude));
 
 				} else {
 					cell.setText(UI.EMPTY_STRING);
@@ -4066,7 +3952,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			public void update(final ViewerCell cell) {
 				if (_serieCadence != null) {
 					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-					cell.setText(Integer.toString(_serieCadence[timeSlice.serieIndex]));
+					cell.setText(Integer.toString((int) _serieCadence[timeSlice.serieIndex]));
 				} else {
 					cell.setText(UI.EMPTY_STRING);
 				}
@@ -4091,7 +3977,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
 					final int serieIndex = timeSlice.serieIndex;
 
-					final float distance = ((float) _serieDistance[serieIndex]) / 1000 / _unitValueDistance;
+					final float distance = _serieDistance[serieIndex] / 1000 / _unitValueDistance;
 
 					cell.setText(_nf3.format(distance));
 
@@ -4122,12 +4008,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 						cell.setText(Integer.toString(0));
 					} else {
 
-						final float distancePrevious = ((float) _serieDistance[serieIndex - 1])
-								/ 1000
-								/ _unitValueDistance;
-						final float distance = ((float) _serieDistance[serieIndex])//
-								/ 1000
-								/ _unitValueDistance;
+						final float distancePrevious = _serieDistance[serieIndex - 1] / 1000 / _unitValueDistance;
+						final float distance = _serieDistance[serieIndex] / 1000 / _unitValueDistance;
 
 						cell.setText(_nf3.format(distance - distancePrevious));
 					}
@@ -4152,7 +4034,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				if (_serieGradient != null) {
 					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
 
-					cell.setText(_nf1.format((float) _serieGradient[timeSlice.serieIndex] / 10));
+					cell.setText(_nf1.format(_serieGradient[timeSlice.serieIndex]));
 				} else {
 					cell.setText(UI.EMPTY_STRING);
 				}
@@ -4250,7 +4132,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					cell.setText(UI.EMPTY_STRING);
 				} else {
 					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-					final long pace = _seriePace[timeSlice.serieIndex];
+					final long pace = (long) _seriePace[timeSlice.serieIndex];
 
 					cell.setText(UI.format_mm_ss(pace));
 				}
@@ -4270,7 +4152,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			public void update(final ViewerCell cell) {
 				if (_seriePower != null) {
 					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-					cell.setText(Integer.toString(_seriePower[timeSlice.serieIndex]));
+					cell.setText(Integer.toString((int) _seriePower[timeSlice.serieIndex]));
 
 				} else {
 					cell.setText(UI.EMPTY_STRING);
@@ -4292,7 +4174,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			public void update(final ViewerCell cell) {
 				if (_seriePulse != null) {
 					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-					cell.setText(Integer.toString(_seriePulse[timeSlice.serieIndex]));
+					cell.setText(Integer.toString((int) _seriePulse[timeSlice.serieIndex]));
 				} else {
 					cell.setText(UI.EMPTY_STRING);
 				}
@@ -4353,7 +4235,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				if (_serieSpeed != null) {
 
 					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-					final float speed = (float) _serieSpeed[timeSlice.serieIndex] / 10;
+					final float speed = _serieSpeed[timeSlice.serieIndex];
 
 					cell.setText(_nf1.format(speed));
 
@@ -4386,12 +4268,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 						final float timeDiff = (_serieTime[serieIndex] - _serieTime[serieIndex - 1]);
 
-						final float distancePrevious = ((float) _serieDistance[serieIndex - 1])
-								/ 1000
-								/ _unitValueDistance;
-						final float distance = ((float) _serieDistance[serieIndex])//
-								/ 1000
-								/ _unitValueDistance;
+						final float distancePrevious = _serieDistance[serieIndex - 1] / 1000 / _unitValueDistance;
+						final float distance = _serieDistance[serieIndex] / 1000 / _unitValueDistance;
 
 						final float distDiff = distance - distancePrevious;
 						final float speed = timeDiff == 0 ? 0 : distDiff * 3600f / timeDiff;
@@ -4773,7 +4651,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		final boolean isManualAndEdit = _isManualTour && canEdit;
 		final boolean isNotManualTour = _isManualTour == false;
 
-		final int[] serieDistance = _tourData == null ? null : _tourData.distanceSerie;
+		final float[] serieDistance = _tourData == null ? null : _tourData.distanceSerie;
 		final boolean isDistanceSerie = serieDistance != null && serieDistance.length > 0;
 
 		_comboTitle.setEnabled(canEdit);
@@ -5118,7 +4996,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_seriePace = _tourData.getPaceSerieSeconds();
 		_seriePower = _tourData.getPowerSerie();
 
-		_serieTemperature = convertTemperatureSerie(_tourData.temperatureSerie);
+		_serieTemperature = _tourData.temperatureSerie;
 
 		_altitudeEditingSupport.setDataSerie(_serieAltitude);
 		_temperatureEditingSupport.setDataSerie(_serieTemperature);
@@ -6560,6 +6438,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 				// tour type or tags can have been changed within this dialog
 				updateUITourTypeTags();
+
+				setTourDirty();
 			}
 		}
 	}
@@ -6646,7 +6526,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				 * value can cause rounding errors
 				 */
 				final float distanceValue = getFloatValue(_txtTourDistance.getText()) * _unitValueDistance * 1000;
-				_tourData.setTourDistance((int) distanceValue);
+				_tourData.setTourDistance(distanceValue);
 			}
 
 			if (_isAltitudeManuallyModified) {
@@ -6979,12 +6859,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		/*
 		 * avg temperature
 		 */
-		final int temperatureScale = _tourData.getTemperatureScale();
-		int avgTemperature = _tourData.getAvgTemperature();
+		float avgTemperature = _tourData.getAvgTemperature();
 
 		if (_unitValueTemperature != 1) {
-			final float imperialTemperature = (float) avgTemperature / temperatureScale;
-			avgTemperature = (int) ((imperialTemperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD) * temperatureScale);
+			final float imperialTemperature = avgTemperature;
+			avgTemperature = imperialTemperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD;
 		}
 
 		/*
@@ -6992,8 +6871,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		 * recognized
 		 */
 		_isSetDigits = true;
-		_spinTemperature.setDigits(Util.getNumberOfDigits(temperatureScale) - 1);
-		_spinTemperature.setSelection(avgTemperature);
+		_spinTemperature.setDigits(1);
+		_spinTemperature.setSelection((int) avgTemperature);
 
 		// tour date
 		_dtTourDate.setDate(_tourData.getStartYear(), _tourData.getStartMonth() - 1, _tourData.getStartDay());
@@ -7002,12 +6881,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_dtStartTime.setTime(_tourData.getStartHour(), _tourData.getStartMinute(), _tourData.getStartSecond());
 
 		// tour distance
-		final int tourDistance = _tourData.getTourDistance();
+		final float tourDistance = _tourData.getTourDistance();
 		if (tourDistance == 0) {
-			_txtTourDistance.setText(Integer.toString(tourDistance));
+			_txtTourDistance.setText(Integer.toString(0));
 		} else {
 
-			final float distance = ((float) tourDistance) / 1000 / _unitValueDistance;
+			final float distance = tourDistance / 1000 / _unitValueDistance;
 			_txtTourDistance.setText(_nf3NoGroup.format(distance));
 		}
 

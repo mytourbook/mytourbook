@@ -91,10 +91,19 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	private int						time					= -1;
 
 	/**
-	 * Distance in meters in the metric system or <code>-1</code> when the distance is not available
+	 * Distance field before db version 20, this field is required for data conversion AND <b>to
+	 * load entities</b> !!!
+	 */
+	private int						distance				= -1;
+
+	/**
+	 * Distance in meters in the metric system or <code>-1</code> when the distance is not
+	 * available.
+	 * <p>
+	 * 20 == db version 20
 	 */
 	@XmlElement
-	private int						distance				= -1;
+	private float					distance20				= -1;
 
 	private int						visualPosition;
 
@@ -217,7 +226,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 			return false;
 		} else if (label.compareTo(comparedMarker.label) != 0) {
 			return false;
-		} else if (distance != comparedMarker.distance) {
+		} else if (distance20 != comparedMarker.distance20) {
 			return false;
 		} else if (labelXOffset != comparedMarker.labelXOffset) {
 			return false;
@@ -294,8 +303,8 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	 * @return Returns distance in meters in the metric system or -1 when the distance is not
 	 *         available
 	 */
-	public int getDistance() {
-		return distance;
+	public float getDistance() {
+		return distance20;
 	}
 
 	public String getLabel() {
@@ -378,7 +387,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		category = backupMarker.category;
 		label = backupMarker.label;
 
-		distance = backupMarker.distance;
+		distance20 = backupMarker.distance20;
 		labelXOffset = backupMarker.labelXOffset;
 		labelYOffset = backupMarker.labelYOffset;
 		markerId = backupMarker.markerId;
@@ -401,8 +410,8 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	 * @param distance
 	 *            Distance in meter or <code>-1</code> when the distance is not available
 	 */
-	public void setDistance(final int distance) {
-		this.distance = distance;
+	public void setDistance(final float distance) {
+		this.distance20 = distance;
 	}
 
 	public void setLabel(final String label) {
@@ -427,7 +436,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		backupMarker.category = category;
 		backupMarker.label = label;
 
-		backupMarker.distance = distance;
+		backupMarker.distance20 = distance20;
 		backupMarker.labelXOffset = labelXOffset;
 		backupMarker.labelYOffset = labelYOffset;
 		backupMarker.markerId = markerId;
@@ -477,7 +486,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 				.append(" createId:") //$NON-NLS-1$
 				.append(_createId)
 				.append(" distance:") //$NON-NLS-1$
-				.append(distance)
+				.append(distance20)
 				.append(" time:") //$NON-NLS-1$
 				.append(time)
 				.append(" serieIndex:") //$NON-NLS-1$
@@ -498,6 +507,14 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		}
 
 		return null;
+	}
+
+	/**
+	 * Convert fields from old to new data type.
+	 */
+	public void updateDatabase_019_to_020() {
+		distance20 = distance;
+		distance = 0;
 	}
 
 }

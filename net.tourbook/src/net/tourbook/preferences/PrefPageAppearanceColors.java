@@ -73,7 +73,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageAppearanceColors extends PreferencePage implements IWorkbenchPreferencePage, IColorTreeViewer {
 
-	private static final List<Integer>		_unitValues		= Arrays.asList(10, 50, 100, 150, 190);
+	private static final List<Float>		_unitValues		= Arrays.asList(10f, 50f, 100f, 150f, 190f);
 	private static final List<String>		_unitLabels		= Arrays.asList(
 																	Messages.Pref_ChartColors_unit_min,
 																	Messages.Pref_ChartColors_unit_low,

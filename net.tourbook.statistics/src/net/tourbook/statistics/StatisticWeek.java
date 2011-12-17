@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -131,7 +131,6 @@ public abstract class StatisticWeek extends YearStatistic {
 		// create statistic chart
 		_chart = new Chart(parent, SWT.BORDER | SWT.FLAT);
 		_chart.setShowZoomActions(true);
-		_chart.setCanScrollZoomedChart(true);
 		_chart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
 
 		_chartInfoProvider = new IChartInfoProvider() {
@@ -236,10 +235,10 @@ public abstract class StatisticWeek extends YearStatistic {
 				beginDate,
 				endDate,
 				//
-				(float) _tourWeekData.distanceHigh[serieIndex][valueIndex] / 1000,
+				_tourWeekData.distanceHigh[serieIndex][valueIndex] / 1000,
 				UI.UNIT_LABEL_DISTANCE,
 				//
-				_tourWeekData.altitudeHigh[serieIndex][valueIndex],
+				(int) _tourWeekData.altitudeHigh[serieIndex][valueIndex],
 				UI.UNIT_LABEL_ALTITUDE,
 				//
 				recordingTime / 3600,
@@ -265,10 +264,10 @@ public abstract class StatisticWeek extends YearStatistic {
 		return toolTipInfo;
 	}
 
-	private int[] createWeekData() {
+	private float[] createWeekData() {
 
 		final int weekCounter = _tourWeekData.altitudeHigh[0].length;
-		final int allWeeks[] = new int[weekCounter];
+		final float allWeeks[] = new float[weekCounter];
 
 		for (int weekIndex = 0; weekIndex < weekCounter; weekIndex++) {
 			allWeeks[weekIndex] = weekIndex;
@@ -414,8 +413,8 @@ public abstract class StatisticWeek extends YearStatistic {
 		final ChartDataYSerie yData = new ChartDataYSerie(
 				ChartDataModel.CHART_TYPE_BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
-				_tourWeekData.timeLow,
-				_tourWeekData.timeHigh);
+				_tourWeekData.getTimeLowFloat(),
+				_tourWeekData.getTimeHighFloat());
 
 		yData.setYTitle(Messages.LABEL_GRAPH_TIME);
 		yData.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);

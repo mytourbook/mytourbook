@@ -324,7 +324,7 @@ public class GraphColorProvider {
 
 					final IMemento mementoValueColor = mementoLegendColor.createChild(MEMENTO_CHILD_VALUE_COLOR);
 
-					mementoValueColor.putInteger(TAG_VALUE_COLOR_VALUE, valueColor.value);
+					mementoValueColor.putFloat(TAG_VALUE_COLOR_VALUE, valueColor.value);
 					mementoValueColor.putInteger(TAG_VALUE_COLOR_RED, valueColor.red);
 					mementoValueColor.putInteger(TAG_VALUE_COLOR_GREEN, valueColor.green);
 					mementoValueColor.putInteger(TAG_VALUE_COLOR_BLUE, valueColor.blue);
@@ -446,7 +446,7 @@ public class GraphColorProvider {
 				// loop: all value colors
 				for (final IMemento mementoValueColor : mementoValueColors) {
 
-					final Integer value = mementoValueColor.getInteger(TAG_VALUE_COLOR_VALUE);
+					final Float value = mementoValueColor.getFloat(TAG_VALUE_COLOR_VALUE);
 					final Integer red = mementoValueColor.getInteger(TAG_VALUE_COLOR_RED);
 					final Integer green = mementoValueColor.getInteger(TAG_VALUE_COLOR_GREEN);
 					final Integer blue = mementoValueColor.getInteger(TAG_VALUE_COLOR_BLUE);

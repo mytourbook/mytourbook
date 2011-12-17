@@ -21,9 +21,14 @@ public class ChartDrawingData {
 
 	public ArrayList<GraphDrawingData>	graphDrawingData;
 
-	public ChartDataModel				chartDataModel;
+	ChartDataModel						chartDataModel;
 
-	public ChartDrawingData(final ArrayList<GraphDrawingData> graphDrawingData) {
+	int									devMarginTop;
+	int									devXTitelBarHeight;
+	int									devSliderBarHeight;
+	int									devXAxisHeight;
+
+	ChartDrawingData(final ArrayList<GraphDrawingData> graphDrawingData) {
 
 		this.graphDrawingData = graphDrawingData;
 	}

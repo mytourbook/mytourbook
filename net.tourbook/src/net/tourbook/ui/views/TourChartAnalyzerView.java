@@ -18,6 +18,7 @@ package net.tourbook.ui.views;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
@@ -30,6 +31,7 @@ import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.chart.Util;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.SelectionTourChart;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.TourManager;
@@ -38,7 +40,10 @@ import net.tourbook.ui.tourChart.TourChart;
 
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -67,6 +72,10 @@ public class TourChartAnalyzerView extends ViewPart {
 	private static final int			LAYOUT_MEDIUM	= 2;
 	private static final int			LAYOUT_LARGE	= 3;
 
+	private final IPreferenceStore		_prefStore		= TourbookPlugin.getDefault() //
+																.getPreferenceStore();
+
+	private IPropertyChangeListener		_prefChangeListener;
 	private IPartListener2				_partListener;
 	private ISelectionListener			_postSelectionListener;
 
@@ -102,22 +111,6 @@ public class TourChartAnalyzerView extends ViewPart {
 
 	public TourChartAnalyzerView() {
 		super();
-	}
-
-	private void addActions() {
-
-//		/*
-//		 * fill view menu
-//		 */
-//		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
-//		menuMgr.add(_actionSelectAllTours);
-//
-//		/*
-//		 * fill view toolbar
-//		 */
-//		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
-//
-//		tbm.add(_actionRefreshView);
 	}
 
 	private void addListeners() {
@@ -172,6 +165,26 @@ public class TourChartAnalyzerView extends ViewPart {
 		page.addPartListener(_partListener);
 	}
 
+	private void addPrefListeners() {
+
+		_prefChangeListener = new IPropertyChangeListener() {
+			public void propertyChange(final PropertyChangeEvent event) {
+
+				final String property = event.getProperty();
+
+				if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
+
+					// dispose old colors
+					_colorCache.dispose();
+
+					updateInfo(_chartInfo);
+				}
+			}
+		};
+
+		_prefStore.addPropertyChangeListener(_prefChangeListener);
+	}
+
 	@Override
 	public void createPartControl(final Composite parent) {
 
@@ -182,13 +195,7 @@ public class TourChartAnalyzerView extends ViewPart {
 		_fontBold = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
 		addListeners();
-		addActions();
-
-//		// show chart info for the current selection
-//		final ISelection selection = getSite().getWorkbenchWindow().getSelectionService().getSelection();
-//		if (selection != null) {
-//
-//		}
+		addPrefListeners();
 	}
 
 	private void createUIHeader10Left() {
@@ -559,6 +566,8 @@ public class TourChartAnalyzerView extends ViewPart {
 		page.removePostSelectionListener(_postSelectionListener);
 		page.removePartListener(_partListener);
 
+		_prefStore.removePropertyChangeListener(_prefChangeListener);
+
 		_colorCache.dispose();
 
 		super.dispose();
@@ -576,7 +585,7 @@ public class TourChartAnalyzerView extends ViewPart {
 		final Color color = _colorCache.get(colorKey);
 
 		if (color == null) {
-			return _colorCache.createColor(colorKey, rgb);
+			return _colorCache.getColor(colorKey, rgb);
 		} else {
 			return color;
 		}
@@ -712,7 +721,7 @@ public class TourChartAnalyzerView extends ViewPart {
 			_valueIndexRightBackup = valuesIndexRight;
 		}
 
-		int outCounter = 0;
+//		int outCounter = 0;
 
 		for (final GraphInfo graphInfo : _graphInfos) {
 
@@ -728,7 +737,7 @@ public class TourChartAnalyzerView extends ViewPart {
 			final int unitType = serieData.getAxisUnit();
 			final int valueDivisor = serieData.getValueDivisor();
 
-			final int[] values = serieData.getHighValues()[0];
+			final float[] values = serieData.getHighValues()[0];
 			if (values == null) {
 				break;
 			}
@@ -745,18 +754,19 @@ public class TourChartAnalyzerView extends ViewPart {
 			valuesIndexRight = Math.max(0, valuesIndexRight);
 
 			// values at the left/right slider
-			final int leftValue = values[valuesIndexLeft];
-			final int rightValue = values[valuesIndexRight];
+			final float leftValue = values[valuesIndexLeft];
+			final float rightValue = values[valuesIndexRight];
 
 			int dataIndex = valuesIndexLeft;
 			float avg = 0;
 			int avgDiv = 0;
-			int min = 0, max = 0;
+			float min = 0;
+			float max = 0;
 
 			// compute min/max/avg values
 			while (dataIndex <= valuesIndexRight) {
 
-				final int value = values[dataIndex];
+				final float value = values[dataIndex];
 
 				avg += value;
 				avgDiv++;
@@ -799,25 +809,25 @@ public class TourChartAnalyzerView extends ViewPart {
 			if (graphInfo.leftValue != leftValue) {
 				graphInfo.leftValue = leftValue;
 				graphInfo.lblLeft.setText(Util.formatValue(leftValue, unitType, valueDivisor, true) + UI.SPACE);
-				outCounter++;
+//				outCounter++;
 			}
 
 			if (graphInfo.rightValue != rightValue) {
 				graphInfo.rightValue = rightValue;
 				graphInfo.lblRight.setText(Util.formatValue(rightValue, unitType, valueDivisor, true) + UI.SPACE);
-				outCounter++;
+//				outCounter++;
 			}
 
 			if (graphInfo.minValue != min) {
 				graphInfo.minValue = min;
 				graphInfo.lblMin.setText(Util.formatValue(min, unitType, valueDivisor, true) + UI.SPACE);
-				outCounter++;
+//				outCounter++;
 			}
 
 			if (graphInfo.maxValue != max) {
 				graphInfo.maxValue = max;
 				graphInfo.lblMax.setText(Util.formatValue(max, unitType, valueDivisor, true) + UI.SPACE);
-				outCounter++;
+//				outCounter++;
 			}
 
 			// set average value
@@ -839,7 +849,7 @@ public class TourChartAnalyzerView extends ViewPart {
 								analyzerInfo.getAvgDecimals(),
 								false)
 								+ UI.SPACE);
-						outCounter++;
+//						outCounter++;
 					}
 
 				} else {
@@ -847,20 +857,20 @@ public class TourChartAnalyzerView extends ViewPart {
 						graphInfo.avgValue = (int) avgValue;
 						graphInfo.lblAvg.setText(Util.formatValue((int) avgValue, unitType, valueDivisor, true)
 								+ UI.SPACE);
-						outCounter++;
+//						outCounter++;
 					}
 				}
 
 			} else {
 				graphInfo.lblAvg.setText(UI.EMPTY_STRING);
-				outCounter++;
+//				outCounter++;
 			}
 
-			final int diffValue = rightValue - leftValue;
+			final float diffValue = rightValue - leftValue;
 			if (graphInfo.diffValue != diffValue) {
 				graphInfo.diffValue = diffValue;
 				graphInfo.lblDiff.setText(Util.formatValue(diffValue, unitType, valueDivisor, true) + UI.SPACE);
-				outCounter++;
+//				outCounter++;
 			}
 		}
 

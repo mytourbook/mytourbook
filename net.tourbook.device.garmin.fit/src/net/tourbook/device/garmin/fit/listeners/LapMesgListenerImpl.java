@@ -1,7 +1,6 @@
 package net.tourbook.device.garmin.fit.listeners;
 
 import net.tourbook.chart.ChartLabel;
-import net.tourbook.device.garmin.fit.DataConverters;
 import net.tourbook.device.garmin.fit.FitActivityContext;
 import net.tourbook.device.garmin.fit.FitActivityReaderException;
 
@@ -10,15 +9,15 @@ import com.garmin.fit.LapMesgListener;
 
 public class LapMesgListenerImpl extends AbstractMesgListener implements LapMesgListener {
 
-	public LapMesgListenerImpl(FitActivityContext context) {
+	public LapMesgListenerImpl(final FitActivityContext context) {
 		super(context);
 	}
 
 	@Override
-	public void onMesg(LapMesg mesg) {
+	public void onMesg(final LapMesg mesg) {
 		context.beforeLap();
 
-		Integer messageIndex = mesg.getMessageIndex();
+		final Integer messageIndex = mesg.getMessageIndex();
 		if (messageIndex == null) {
 			throw new FitActivityReaderException("Lap message index is missing"); //$NON-NLS-1$
 		}
@@ -27,15 +26,15 @@ public class LapMesgListenerImpl extends AbstractMesgListener implements LapMesg
 
 		getTourMarker().setSerieIndex(context.getSerieIndex() - 1);
 
-		Float totalDistance = mesg.getTotalDistance();
+		final Float totalDistance = mesg.getTotalDistance();
 		if (totalDistance != null) {
-			int lapDistance = context.getLapDistance();
-			lapDistance += DataConverters.convertDistance(totalDistance);
+			float lapDistance = context.getLapDistance();
+			lapDistance += totalDistance;
 			context.setLapDistance(lapDistance);
 			getTourMarker().setDistance(lapDistance);
 		}
 
-		Float totalElapsedTime = mesg.getTotalElapsedTime();
+		final Float totalElapsedTime = mesg.getTotalElapsedTime();
 		if (totalElapsedTime != null) {
 			int lapTime = context.getLapTime();
 			lapTime += Math.round(totalElapsedTime);

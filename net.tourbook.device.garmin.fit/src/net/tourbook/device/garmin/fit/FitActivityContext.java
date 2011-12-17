@@ -1,6 +1,7 @@
 package net.tourbook.device.garmin.fit;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -13,80 +14,77 @@ import org.apache.commons.io.FilenameUtils;
 
 /**
  * Garmin FIT activity context used by message listeners to store activity data loaded from FIT
- * file.
- * The loaded data is converted into {@link TourData} records (one record for each session).
+ * file. The loaded data is converted into {@link TourData} records (one record for each session).
  * 
  * @author Marcin Kuthan <marcin.kuthan@gmail.com>
  */
 public class FitActivityContext {
 
-	private final String				filename;
+	private final String			_filimportFilePathename;
 
-	private final Map<Long, TourData>	tourDataMap;
+	private FitActivityContextData	_contextData;
 
-	private FitActivityContextData		contextData;
+	private boolean					_isSpeedSensorPresent;
+	private boolean					_isHeartRateSensorPresent;
+	private boolean					_isPowerSensorPresent;
 
-	private boolean						speedSensorPresent;
+	private String					_deviceId;
+	private String					_manufacturer;
+	private String					_garminProduct;
+	private String					_softwareVersion;
 
-	private boolean						heartRateSensorPresent;
+	private String					_sessionIndex;
+	private int						_serieIndex;
 
-	private boolean						powerSensorPresent;
+	private float					_lapDistance;
+	private int						_lapTime;
 
-	private String						deviceId;
+	private Map<Long, TourData>		_alreadyImportedTours;
+	private HashMap<Long, TourData>	_newlyImportedTours;
 
-	private String						manufacturer;
+	public FitActivityContext(	final String importFilePath,
+								final Map<Long, TourData> alreadyImportedTours,
+								final HashMap<Long, TourData> newlyImportedTours) {
 
-	private String						garminProduct;
+		_filimportFilePathename = importFilePath;
+		_alreadyImportedTours = alreadyImportedTours;
+		_newlyImportedTours = newlyImportedTours;
 
-	private String						softwareVersion;
-
-	private String						sessionIndex;
-
-	private int							serieIndex;
-
-	private int							lapDistance;
-
-	private int							lapTime;
-
-	public FitActivityContext(final String filename, final Map<Long, TourData> tourDataMap) {
-		this.filename = filename;
-		this.tourDataMap = tourDataMap;
-
-		contextData = new FitActivityContextData();
+		_contextData = new FitActivityContextData();
 	}
 
 	public void afterLap() {
-		contextData.finalizeTourMarker();
+		_contextData.finalizeTourMarker();
 	}
 
 	public void afterRecord() {
-		contextData.finalizeTimeData();
-		serieIndex++;
+		_contextData.finalizeTimeData();
+		_serieIndex++;
 	}
 
 	public void afterSession() {
-		contextData.finalizeTourData();
+		_contextData.finalizeTourData();
 	}
 
 	public void beforeLap() {
-		contextData.initializeTourMarker();
+		_contextData.initializeTourMarker();
 	}
 
 	public void beforeRecord() {
-		contextData.initializeTimeData();
+		_contextData.initializeTimeData();
 	}
 
 	public void beforeSession() {
-		serieIndex = 0;
-		contextData.initializeTourData();
+		_serieIndex = 0;
+		_contextData.initializeTourData();
 	}
 
 	public FitActivityContextData getContextData() {
-		return contextData;
+		return _contextData;
 	}
 
 	public String getDeviceId() {
-		return deviceId;
+		return _deviceId;
 	}
 
 	public String getDeviceName() {
@@ -107,31 +105,31 @@ public class FitActivityContext {
 	}
 
 	public String getGarminProduct() {
-		return garminProduct;
+		return _garminProduct;
 	}
 
-	public int getLapDistance() {
-		return lapDistance;
+	public float getLapDistance() {
+		return _lapDistance;
 	}
 
 	public int getLapTime() {
-		return lapTime;
+		return _lapTime;
 	}
 
 	public String getManufacturer() {
-		return manufacturer;
+		return _manufacturer;
 	}
 
 	public int getSerieIndex() {
-		return serieIndex;
+		return _serieIndex;
 	}
 
 	public String getSessionIndex() {
-		return sessionIndex;
+		return _sessionIndex;
 	}
 
 	public String getSoftwareVersion() {
-		return softwareVersion;
+		return _softwareVersion;
 	}
 
 	public String getTourDescription() {
@@ -139,33 +137,35 @@ public class FitActivityContext {
 	}
 
 	public String getTourTitle() {
-		return String.format("%s (%s)", FilenameUtils.getBaseName(filename), getSessionIndex()); //$NON-NLS-1$
+		return String.format("%s (%s)", FilenameUtils.getBaseName(_filimportFilePathename), getSessionIndex()); //$NON-NLS-1$
 	}
 
 	public boolean isHeartRateSensorPresent() {
-		return heartRateSensorPresent;
+		return _isHeartRateSensorPresent;
 	}
 
 	public boolean isPowerSensorPresent() {
-		return powerSensorPresent;
+		return _isPowerSensorPresent;
 	}
 
 	public boolean isSpeedSensorPresent() {
-		return speedSensorPresent;
+		return _isSpeedSensorPresent;
 	}
 
 	public void processData() {
-		contextData.processData(new FitActivityContextDataHandler() {
+		_contextData.processData(new FitActivityContextDataHandler() {
 
 			@Override
-			public void handleTour(final TourData tourData, final ArrayList<TimeData> timeDataList, final Set<TourMarker> tourMarkerSet) {
+			public void handleTour(	final TourData tourData,
+									final ArrayList<TimeData> timeDataList,
+									final Set<TourMarker> tourMarkerSet) {
 				resetSpeedAtFirstPosition(timeDataList);
 
 				tourData.setTourTitle(getTourTitle());
 				tourData.setTourDescription(getTourDescription());
 
-				tourData.importRawDataFile = filename;
-				tourData.setTourImportFilePath(filename);
+				tourData.importRawDataFile = _filimportFilePathename;
+				tourData.setTourImportFilePath(_filimportFilePathename);
 
 				tourData.setDeviceId(getDeviceId());
 				tourData.setDeviceName(getDeviceName());
@@ -174,7 +174,7 @@ public class FitActivityContext {
 				tourData.setIsDistanceFromSensor(isSpeedSensorPresent());
 
 				final Long tourId = tourData.createTourId(Util.UNIQUE_ID_SUFFIX_GARMIN_FIT);
-				if (!tourDataMap.containsKey(tourId)) {
+				if (_alreadyImportedTours.containsKey(tourId) == false) {
 					tourData.createTimeSeries(timeDataList, false);
 
 					//tourData.computeTourDrivingTime();
@@ -183,7 +183,7 @@ public class FitActivityContext {
 
 					tourData.setTourMarkers(tourMarkerSet);
 
-					tourDataMap.put(tourId, tourData);
+					_newlyImportedTours.put(tourId, tourData);
 				}
 			}
 		});
@@ -191,48 +191,48 @@ public class FitActivityContext {
 
 	private void resetSpeedAtFirstPosition(final ArrayList<TimeData> timeDataList) {
 		if (!timeDataList.isEmpty()) {
-			timeDataList.get(0).speed = Integer.MIN_VALUE;
+			timeDataList.get(0).speed = Float.MIN_VALUE;
 		}
 	}
 
 	public void setDeviceId(final String deviceId) {
-		this.deviceId = deviceId;
+		_deviceId = deviceId;
 	}
 
 	public void setGarminProduct(final String garminProduct) {
-		this.garminProduct = garminProduct;
+		_garminProduct = garminProduct;
 	}
 
 	public void setHeartRateSensorPresent(final boolean heartRateSensorPresent) {
-		this.heartRateSensorPresent = heartRateSensorPresent;
+		_isHeartRateSensorPresent = heartRateSensorPresent;
 	}
 
-	public void setLapDistance(final int lapDistance) {
-		this.lapDistance = lapDistance;
+	public void setLapDistance(final float lapDistance2) {
+		_lapDistance = lapDistance2;
 	}
 
 	public void setLapTime(final int lapTime) {
-		this.lapTime = lapTime;
+		_lapTime = lapTime;
 	}
 
 	public void setManufacturer(final String manufacturer) {
-		this.manufacturer = manufacturer;
+		_manufacturer = manufacturer;
 	}
 
 	public void setPowerSensorPresent(final boolean powerSensorPresent) {
-		this.powerSensorPresent = powerSensorPresent;
+		_isPowerSensorPresent = powerSensorPresent;
 	}
 
 	public void setSessionIndex(final String sessionIndex) {
-		this.sessionIndex = sessionIndex;
+		_sessionIndex = sessionIndex;
 	}
 
 	public void setSoftwareVersion(final String softwareVersion) {
-		this.softwareVersion = softwareVersion;
+		_softwareVersion = softwareVersion;
 	}
 
 	public void setSpeedSensorPresent(final boolean speedSensorPresent) {
-		this.speedSensorPresent = speedSensorPresent;
+		_isSpeedSensorPresent = speedSensorPresent;
 	}
 
 }

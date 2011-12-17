@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,7 +16,6 @@
 /**
  * @author Wolfgang Schramm created 11.07.2005
  */
-
 package net.tourbook.chart;
 
 import java.util.ArrayList;
@@ -28,88 +27,92 @@ import org.eclipse.swt.graphics.Rectangle;
  */
 public class ChartXSlider {
 
-	private static final int				SLIDER_TYPE_NONE		= 0;
-	public static final int					SLIDER_TYPE_LEFT		= 1;
-	public static final int					SLIDER_TYPE_RIGHT		= 2;
+	private static final int				SLIDER_TYPE_NONE	= 0;
+	public static final int					SLIDER_TYPE_LEFT	= 1;
+	public static final int					SLIDER_TYPE_RIGHT	= 2;
 
 	/**
 	 * position of the slider line within the slider (starting from left)
 	 */
-	public final static int					halfSliderHitLineHeight	= 10;
-	public final static int					sliderHitLineHeight		= 2 * halfSliderHitLineHeight;
+	public final static int					SLIDER_LINE_WIDTH	= 10;
 
-	private final Rectangle					hitRectangle			= new Rectangle(0, 0, sliderHitLineHeight, 0);
+	private final Rectangle					_hitRectangle		= new Rectangle(0, 0, SLIDER_LINE_WIDTH * 2, 0);
 
 	/**
 	 * keep the ratio of sliderpos/clientwidth, this is needed when changing the client width, so we
 	 * don't loose the accuracy for the position
 	 */
-	private float							positionRatio;
+	private double							_positionRatio;
 
 	/**
-	 * position of the slider line which is in the middle of the slider
+	 * Position of the slider line which is in the middle of the slider
 	 */
-	private int								devVirtualSliderLinePos;
+	private int								_xxDevSliderLinePos;
 
 	/**
-	 * offset between the left position of the slider hit rectangle and the mouse hit within it
+	 * Contains the offset between the left position of the slider hit rectangle and the mouse hit
+	 * within it.
 	 */
-	private int								devXClickOffset;
+	private int								_devXClickOffset;
 
 	/**
-	 * valuesIndex represents the position of the slider within values array
+	 * Contains the position of the slider within values array
 	 */
-	private int								valuesIndex;
+	private int								_valuesIndex;
 
 	/**
-	 * sliderValue represents the value of the slider on the x axis
+	 * Value of the slider at the x axis
 	 */
-	private int								valueX;
+	private float							_xAxisValue;
 
 	/**
 	 * labelList contains a slider label for each graph
 	 */
-	private ArrayList<ChartXSliderLabel>	labelList;
+	private ArrayList<ChartXSliderLabel>	_labelList;
 
-	private ChartComponentGraph				chartGraph;
+	private ChartComponentGraph				_chartGraph;
 
-	int										sliderType				= SLIDER_TYPE_NONE;
+	int										sliderType			= SLIDER_TYPE_NONE;
 
 	/**
 	 * Constructor
 	 * 
 	 * @param devVirtualSliderLinePos
 	 */
-	ChartXSlider(final ChartComponentGraph graph, final int sliderPosition, final int sliderType) {
+	ChartXSlider(final ChartComponentGraph graph, final int xxDevSliderPosition, final int sliderType) {
 
-		this.chartGraph = graph;
+		_chartGraph = graph;
 		this.sliderType = sliderType;
 
-		moveToDevPosition(sliderPosition, true, true);
+		moveToXXDevPosition(xxDevSliderPosition, true, true);
 	}
 
 	/**
 	 * @return Returns the slider line position in the graph
 	 */
-	public int getDevVirtualSliderLinePos() {
-		return devVirtualSliderLinePos;
+	public int getXXDevSliderLinePos() {
+		return _xxDevSliderLinePos;
 	}
 
 	/**
 	 * @return Returns the devXClickOffset.
 	 */
 	int getDevXClickOffset() {
-		return devXClickOffset;
+		return _devXClickOffset;
 	}
 
 	/**
-	 * @return Returns the hit rectangle
+	 * @return Returns the hit rectangle, rectangle.x contains the left border of the viewport.
 	 */
 	Rectangle getHitRectangle() {
 
-		final Rectangle rect = new Rectangle(hitRectangle.x, hitRectangle.y, hitRectangle.width, hitRectangle.height);
+		final Rectangle rect = new Rectangle(
+				_hitRectangle.x,
+				_hitRectangle.y,
+				_hitRectangle.width,
+				_hitRectangle.height);
 
-		rect.x -= chartGraph.getDevGraphImageXOffset();
+		rect.x -= _chartGraph.getXXDevViewPortLeftBorder();
 
 		return rect;
 	}
@@ -118,25 +121,25 @@ public class ChartXSlider {
 	 * @return Returns a list with all slider labels
 	 */
 	public ArrayList<ChartXSliderLabel> getLabelList() {
-		return labelList;
+		return _labelList;
 	}
 
 	/**
 	 * @return the positionRatio
 	 */
-	float getPositionRatio() {
-		return positionRatio;
+	double getPositionRatio() {
+		return _positionRatio;
 	}
 
 	/**
 	 * @return Returns the position of the slider in the values array
 	 */
 	public int getValuesIndex() {
-		return valuesIndex;
+		return _valuesIndex;
 	}
 
-	public int getValueX() {
-		return valueX;
+	public float getValueX() {
+		return _xAxisValue;
 	}
 
 	/**
@@ -145,9 +148,9 @@ public class ChartXSlider {
 	void handleChartResize(final int devGraphHeight) {
 
 		// resize the hit rectangle
-		hitRectangle.height = devGraphHeight;
+		_hitRectangle.height = devGraphHeight;
 
-		final int devVirtualGraphImageWidth = chartGraph.getDevVirtualGraphImageWidth();
+		final int xxDevGraphWidth = _chartGraph.getXXDevGraphWidth();
 
 		if (sliderType == SLIDER_TYPE_RIGHT) {
 			// position the right slider to the right side, this is done only
@@ -156,21 +159,21 @@ public class ChartXSlider {
 
 			// run the positioning after all is done, otherwise not all is
 			// initialized
-			chartGraph.getDisplay().asyncExec(new Runnable() {
+			_chartGraph.getDisplay().asyncExec(new Runnable() {
 				public void run() {
 
-					moveToDevPosition(devVirtualGraphImageWidth, true, true);
+					moveToXXDevPosition(xxDevGraphWidth, true, true);
 
-					chartGraph.computeXSliderValue(ChartXSlider.this, devVirtualGraphImageWidth);
+					_chartGraph.computeXSliderValue(ChartXSlider.this, xxDevGraphWidth);
 				}
 			});
 
 		} else {
 
 			// reposition the slider line but keep the position ratio
-			final float devSliderPos = devVirtualGraphImageWidth * positionRatio;
+			final double devSliderPos = xxDevGraphWidth * _positionRatio;
 
-			moveToDevPosition((int) (devSliderPos < 0 ? 0 : devSliderPos), true, false);
+			moveToXXDevPosition((int) (devSliderPos < 0 ? 0 : devSliderPos), true, false);
 		}
 	}
 
@@ -178,56 +181,58 @@ public class ChartXSlider {
 	 * Sets a new position for the sliderLine and also updates the slider/line rectangles and value.
 	 * A Slider move event is fired
 	 * 
-	 * @param newDevVirtualSliderLinePos
+	 * @param newXXDevSliderLinePos
 	 */
-	void moveToDevPosition(	int newDevVirtualSliderLinePos,
-							final boolean adjustToImageWidth,
-							final boolean adjustPositionRatio) {
+	void moveToXXDevPosition(	int newXXDevSliderLinePos,
+								final boolean isAdjustToImageWidth,
+								final boolean isAdjustPositionRatio) {
 
-		final int devVirtualGraphImageWidth = chartGraph.getDevVirtualGraphImageWidth();
+		final int _xxDevFullyGraphWidth = _chartGraph.getXXDevGraphWidth();
+
+		if (_xxDevFullyGraphWidth == 0) {
+			return;
+		}
+
 		/*
 		 * the slider line can be out of bounds for the graph image, this can happen when the graph
 		 * is auto-zoomed to the slider position in the mouse up event
 		 */
-		if (adjustToImageWidth) {
-			newDevVirtualSliderLinePos = Math.min(devVirtualGraphImageWidth, Math.max(0, newDevVirtualSliderLinePos));
+		if (isAdjustToImageWidth) {
+			newXXDevSliderLinePos = Math.min(_xxDevFullyGraphWidth, Math.max(0, newXXDevSliderLinePos));
 		}
 
 		// reposition the hit rectangle
-		hitRectangle.x = newDevVirtualSliderLinePos - ChartXSlider.halfSliderHitLineHeight;
+		_hitRectangle.x = newXXDevSliderLinePos - ChartXSlider.SLIDER_LINE_WIDTH;
 
 		// the devVirtualSliderLinePos must be set before the change event is
 		// called, otherwise the event listener would get the old value
-		final int oldPos = devVirtualSliderLinePos;
-		devVirtualSliderLinePos = newDevVirtualSliderLinePos;
+		final int xxDevOldPos = _xxDevSliderLinePos;
+		_xxDevSliderLinePos = newXXDevSliderLinePos;
 
-		if (adjustPositionRatio) {
+		if (isAdjustPositionRatio) {
 
-			positionRatio = (float) newDevVirtualSliderLinePos / (devVirtualGraphImageWidth - 0);
+			_positionRatio = (float) newXXDevSliderLinePos / (_xxDevFullyGraphWidth - 0);
 
 			// enforce max value
-			positionRatio = Math.min(positionRatio, 1);
+			_positionRatio = Math.min(_positionRatio, 1);
 		}
 
-		// System.out.println(("slider:newDevVirtualSliderLinePos " + newDevVirtualSliderLinePos)
-		// + ("\tpositionRatio:" + positionRatio));
-
 		// fire change event when the position has changed
-		if (newDevVirtualSliderLinePos != oldPos) {
-			chartGraph._chart.fireSliderMoveEvent();
+		if (newXXDevSliderLinePos != xxDevOldPos) {
+			_chartGraph._chart.fireSliderMoveEvent();
 		}
 	}
 
 	public void reset() {
 
-		final int devGraphRightBorder = chartGraph.getDevVirtualGraphImageWidth();
+		final int xxDevGraphRightBorder = _chartGraph.getXXDevGraphWidth();
 
-		float devSliderPos = devGraphRightBorder * positionRatio;
-		devSliderPos = devSliderPos < 0 ? 0 : devSliderPos;
+		double xxDevSliderPos = xxDevGraphRightBorder * _positionRatio;
+		xxDevSliderPos = xxDevSliderPos < 0 ? 0 : xxDevSliderPos;
 
-		moveToDevPosition((int) devSliderPos, true, true);
+		moveToXXDevPosition((int) xxDevSliderPos, true, true);
 
-		chartGraph.computeXSliderValue(ChartXSlider.this, (int) devSliderPos);
+		_chartGraph.computeXSliderValue(ChartXSlider.this, (int) xxDevSliderPos);
 	}
 
 	/**
@@ -235,17 +240,17 @@ public class ChartXSlider {
 	 *            The devXClickOffset to set.
 	 */
 	void setDevXClickOffset(final int devXClickOffset) {
-		this.devXClickOffset = devXClickOffset;
+		_devXClickOffset = devXClickOffset;
 	}
 
 	void setLabelList(final ArrayList<ChartXSliderLabel> labelList) {
-		this.labelList = labelList;
+		_labelList = labelList;
 	}
 
 	void setSliderLineValueIndex(final int valueIndex, final int xValue) {
 
-		this.valuesIndex = valueIndex;
-		this.valueX = xValue;
+		_valuesIndex = valueIndex;
+		_xAxisValue = xValue;
 	}
 
 	/**
@@ -254,11 +259,11 @@ public class ChartXSlider {
 	 * @param valuesIndex
 	 */
 	public void setValuesIndex(final int valueIndex) {
-		this.valuesIndex = valueIndex;
+		_valuesIndex = valueIndex;
 	}
 
-	void setValueX(final int sliderValueX) {
-		this.valueX = sliderValueX;
+	void setValueX(final float sliderValueX) {
+		_xAxisValue = sliderValueX;
 	}
 
 }

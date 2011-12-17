@@ -7,6 +7,8 @@ import org.osgi.framework.Version;
 public class ApplicationVersion {
 
 // this is disabled because it contains redundant information and too much numbers which nobody needs
+// the version number is now used from the plugin version, see below
+//
 //	public static final String	APP_VERSION	= TourbookPlugin.getDefault().getVersion().toString();
 //	public static final String	APP_VERSION	= "11.8.2"; //$NON-NLS-1$
 
@@ -61,6 +63,7 @@ public class ApplicationVersion {
 
 		_isDev = qualifier.contains("qualifier"); //$NON-NLS-1$
 		_qualifierText = _isDev ? //
+				//
 				// this text is used to identify development versions
 				"DEVELOPMENT" //$NON-NLS-1$
 				//

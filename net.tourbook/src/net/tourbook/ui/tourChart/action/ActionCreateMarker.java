@@ -73,7 +73,7 @@ public class ActionCreateMarker extends Action {
 		}
 
 		final int serieIndex = slider.getValuesIndex();
-		final int[] distSerie = tourData.getMetricDistanceSerie();
+		final float[] distSerie = tourData.getMetricDistanceSerie();
 
 		// create a new marker
 		final TourMarker tourMarker = new TourMarker(tourData, ChartLabel.MARKER_TYPE_CUSTOM);

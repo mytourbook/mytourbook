@@ -85,6 +85,50 @@ public class Util {
 		spinner.setSelection(spinner.getSelection() + newValue);
 	}
 
+	public static float[] convertIntToFloat(final int[] intValues) {
+
+		if (intValues == null) {
+			return null;
+		}
+
+		if (intValues.length == 0) {
+			return new float[0];
+		}
+
+		final float[] floatValues = new float[intValues.length];
+
+		for (int valueIndex = 0; valueIndex < intValues.length; valueIndex++) {
+			floatValues[valueIndex] = intValues[valueIndex];
+		}
+
+		return floatValues;
+	}
+
+	public static float[][] convertIntToFloat(final int[][] intValues) {
+
+		if (intValues == null) {
+			return null;
+		}
+
+		if (intValues.length == 0 || intValues[0].length == 0) {
+			return new float[0][0];
+		}
+
+		final float[][] floatValues = new float[intValues.length][intValues[0].length];
+
+		for (int outerIndex = 0; outerIndex < intValues.length; outerIndex++) {
+
+			final int[] intOuterValues = intValues[outerIndex];
+			final float[] floutOuterValues = floatValues[outerIndex];
+
+			for (int innerIndex = 0; innerIndex < intOuterValues.length; innerIndex++) {
+				floutOuterValues[innerIndex] = intOuterValues[innerIndex];
+			}
+		}
+
+		return floatValues;
+	}
+
 	/**
 	 * To convert the InputStream to String we use the BufferedReader.readLine() method. We iterate
 	 * until the BufferedReader return null which means there's no more data to read. Each line will
@@ -167,6 +211,26 @@ public class Util {
 		if (original != null) {
 			final int serieLength = original.length;
 			backup = new double[serieLength];
+			System.arraycopy(original, 0, backup, 0, serieLength);
+		}
+
+		return backup;
+	}
+
+	/**
+	 * creates a float array backup
+	 * 
+	 * @param original
+	 * @return Returns a copy of a <code>float[]</code> or <code>null</code> when the original data
+	 *         is <code>null</code>.
+	 */
+	public static float[] createFloatCopy(final float[] original) {
+
+		float[] backup = null;
+
+		if (original != null) {
+			final int serieLength = original.length;
+			backup = new float[serieLength];
 			System.arraycopy(original, 0, backup, 0, serieLength);
 		}
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,14 +16,10 @@
 /**
  * @author Wolfgang Schramm created 11.07.2005
  */
-
 package net.tourbook.chart;
 
 import org.eclipse.swt.graphics.Rectangle;
 
-/**
- * 
- */
 public class ChartYSlider {
 
 	public static final int		SLIDER_TYPE_TOP			= 1;
@@ -35,136 +31,108 @@ public class ChartYSlider {
 	public final static int		halfSliderHitLineHeight	= 10;
 	public final static int		sliderHitLineHeight		= 2 * halfSliderHitLineHeight;
 
-	private ChartDataYSerie		yData;
+	private ChartDataYSerie		_yData;
 
 	/**
 	 * rectangle where the slider can be hit
 	 */
-	private Rectangle			hitRectangle			= new Rectangle(
-																0,
-																0,
-																0,
-																sliderHitLineHeight);
+	private Rectangle			_hitRectangle			= new Rectangle(0, 0, 0, sliderHitLineHeight);
 
 	/**
 	 * y position for the slider line
 	 */
-	private int					devYSliderLine			= 0;
+	private int					_devYSliderLine			= 0;
 
 	/**
-	 * offset between the top of the slider hit rectangle and the mouse hit
-	 * within it
+	 * offset between the top of the slider hit rectangle and the mouse hit within it
 	 */
-	private int					devYClickOffset;
+	int							devYClickOffset;
 
-	private GraphDrawingData	drawingData;
-
-	/**
-	 * y-position of the mouse on the slider line
-	 */
-	private int					graphY;
+	private GraphDrawingData	_drawingData;
 
 	/**
 	 * Constructor
 	 */
 	ChartYSlider(final ChartDataYSerie yData) {
-		this.yData = yData;
-	}
-
-	/**
-	 * @return Returns the devYClickOffset.
-	 */
-	public int getDevYClickOffset() {
-		return devYClickOffset;
+		_yData = yData;
 	}
 
 	/**
 	 * @return Returns the devYSliderLine.
 	 */
 	public int getDevYSliderLine() {
-		return devYSliderLine;
+		return _devYSliderLine;
 	}
 
 	/**
 	 * @return Returns the drawingData.
 	 */
 	public GraphDrawingData getDrawingData() {
-		return drawingData;
-	}
-
-	/**
-	 * @return Returns the graphX.
-	 */
-	public int getGraphX() {
-		return graphY;
+		return _drawingData;
 	}
 
 	/**
 	 * @return Returns the hitRectangle.
 	 */
 	public Rectangle getHitRectangle() {
-		return hitRectangle;
+		return _hitRectangle;
 	}
 
 	/**
 	 * @return Returns the yData.
 	 */
 	public ChartDataYSerie getYData() {
-		return yData;
+		return _yData;
 	}
+
 	/**
 	 * Resize the slider after the chart was resizes
 	 * 
 	 * @param drawingData
 	 */
-	public void handleChartResize(final GraphDrawingData drawingData, final int sliderType) {
+	void handleChartResize(final GraphDrawingData drawingData, final int sliderType) {
 
-		this.drawingData = drawingData;
+		_drawingData = drawingData;
+
 		final int devGraphHeight = drawingData.devGraphHeight;
 		final int devYBottom = drawingData.getDevYBottom();
 
 		if (sliderType == SLIDER_TYPE_BOTTOM) {
 			// set the slider and hit rectangle at the bottom of the chart
-			devYSliderLine = devYBottom;
+			_devYSliderLine = devYBottom;
 		} else {
 			// set the slider and hit rectangle at the top of the chart
-			devYSliderLine = devYBottom - devGraphHeight;
+			_devYSliderLine = devYBottom - devGraphHeight;
 		}
 
-		hitRectangle.y = devYSliderLine - ChartYSlider.halfSliderHitLineHeight;
-		hitRectangle.width = drawingData.devVirtualGraphWidth - 1;
-
-	}
-
-	/**
-	 * @param devYClickOffset
-	 *        The devYClickOffset to set.
-	 */
-	public void setDevYClickOffset(final int devYClickOffset) {
-		this.devYClickOffset = devYClickOffset;
-	}
-
-	/**
-	 * set the y value for the slider line with the same graphX value as the
-	 * current one
-	 * 
-	 * @param devYSliderLine
-	 */
-	public void setDevYSliderLine(final int devYSliderLine) {
-		setDevYSliderLine(graphY, devYSliderLine);
+		_hitRectangle.y = _devYSliderLine - ChartYSlider.halfSliderHitLineHeight;
+		_hitRectangle.width = drawingData.devVirtualGraphWidth - 1;
 	}
 
 	/**
 	 * set y value for the slider line, this is done when the mouse was moved
 	 * 
 	 * @param devYSliderLine
-	 *        The devYSliderLine to set.
+	 *            The devYSliderLine to set.
 	 */
-	public void setDevYSliderLine(final int graphY, final int devYSliderLine) {
+	public void setDevYSliderLine(final int devYSliderLine) {
 
-		this.devYSliderLine = devYSliderLine;
-		this.graphY = graphY;
+		_devYSliderLine = devYSliderLine;
 
-		hitRectangle.y = devYSliderLine - ChartYSlider.halfSliderHitLineHeight;
+		_hitRectangle.y = devYSliderLine - ChartYSlider.halfSliderHitLineHeight;
+	}
+
+	@Override
+	public String toString() {
+		return "ChartYSlider ["
+				+ "devYSliderLine="
+				+ _devYSliderLine
+				+ ", "
+				+ "devYClickOffset="
+				+ devYClickOffset
+				+ ", "
+				+ "hitRectangle="
+				+ _hitRectangle
+				+ "]";
 	}
 }

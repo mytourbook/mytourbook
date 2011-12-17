@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.chart;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -25,7 +26,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -36,114 +36,111 @@ import org.eclipse.swt.widgets.Event;
 /**
  * Chart widget which represents the chart ui The chart consists of these components
  * <p>
- * The chart widget consists has the following heights: <code>
- *  devMarginTop
- *  devTitleBarHeight
- *  devMarkerBarHeight
+ * The chart widget consists has the following heights:
+ * 
+ * <pre>
+ *  {@link #_devMarginTop}
+ *  {@link #_devXTitleBarHeight}
  * 
  *  |devSliderBarHeight
  *  |#graph#
- *  |verticalDistance
+ * 
+ *   verticalDistance
  * 
  *  |devSliderBarHeight
  *  |#graph#
- *  |verticalDistance
+ * 
+ *   verticalDistance
  * 
  *     ...
  * 
  *   |devSliderBarHeight
  *   |#graph#
  * 
- *   xAxisHeight
- * </code>
+ *   {@link #_devXAxisHeight}
+ * </pre>
  */
 public class ChartComponents extends Composite {
 
-	public static final int				BAR_SELECTION_DELAY_TIME		= 100;
+	public static final int		BAR_SELECTION_DELAY_TIME		= 100;
 
 	/**
 	 * min/max pixel widthDev/heightDev of the chart
 	 */
-	static final int					CHART_MIN_WIDTH					= 5;
-	static final int					CHART_MIN_HEIGHT				= 5;
-	static final int					CHART_MAX_WIDTH					= 100000;
-	static final int					CHART_MAX_HEIGHT				= 10000;
+	static final int			CHART_MIN_WIDTH					= 5;
+	static final int			CHART_MIN_HEIGHT				= 5;
+	static final int			CHART_MAX_WIDTH					= 10000000;						// 10'000'000
+	static final int			CHART_MAX_HEIGHT				= 10000;
 
-	static final int					SLIDER_BAR_HEIGHT				= 10;
-	static final int					MARKER_BAR_HEIGHT				= 50;
-	static final int					TITLE_BAR_HEIGHT				= 18;								//15;
-	static final int					MARGIN_TOP_WITH_TITLE			= 5;
-	static final int					MARGIN_TOP_WITHOUT_TITLE		= 10;
+	static final int			SLIDER_BAR_HEIGHT				= 10;
+	static final int			TITLE_BAR_HEIGHT				= 18;								//15;
+	static final int			MARGIN_TOP_WITH_TITLE			= 5;
+	static final int			MARGIN_TOP_WITHOUT_TITLE		= 10;
 
-	private static final int			DAY_IN_SECONDS					= 24 * 60 * 60;
+	private static final int	DAY_IN_SECONDS					= 24 * 60 * 60;
 
-	private final Chart					_chart;
+	private final Chart			_chart;
 
 	/**
 	 * top margin of the chart (and all it's components)
 	 */
-	private int							_devMarginTop					= MARGIN_TOP_WITHOUT_TITLE;
-
-	/**
-	 * height of the marker bar, 0 indicates that the marker bar is not visible
-	 */
-	private int							_devMarkerBarHeight				= 0;
+	private int					_devMarginTop					= MARGIN_TOP_WITHOUT_TITLE;
 
 	/**
 	 * height of the slider bar, 0 indicates that the slider is not visible
 	 */
-	int									_devSliderBarHeight				= 0;
+	int							_devSliderBarHeight				= 0;
 
 	/**
 	 * height of the title bar, 0 indicates that the title is not visible
 	 */
-	private int							_devXTitleBarHeight				= 0;
+	private int					_devXTitleBarHeight				= 0;
 
 	/**
 	 * height of the horizontal axis
 	 */
-	private final int					_xAxisHeight					= 25;
+	private final int			_devXAxisHeight					= 25;
 
 	/**
 	 * width of the vertical axis
 	 */
-	private final int					_yAxisWidthLeft					= 50;
-	private int							_yAxisWidthLeftWithTitle		= _yAxisWidthLeft;
-	private final int					_yAxisWidthRight				= 50;
+	private final int			_yAxisWidthLeft					= 50;
+	private int					_yAxisWidthLeftWithTitle		= _yAxisWidthLeft;
+	private final int			_yAxisWidthRight				= 50;
 
 	/**
 	 * vertical distance between two graphs
 	 */
-	private final int					_chartsVerticalDistance			= 15;
+	private final int			_chartsVerticalDistance			= 15;
 
 	/**
 	 * contains the {@link SynchConfiguration} for the current chart and will be used from the chart
 	 * which is synchronized
 	 */
-	SynchConfiguration					_synchConfigOut					= null;
+	SynchConfiguration			_synchConfigOut					= null;
 
 	/**
 	 * when a {@link SynchConfiguration} is set, this chart will be synchronized with the chart
 	 * which set's the synch config
 	 */
-	SynchConfiguration					_synchConfigSrc					= null;
+	SynchConfiguration			_synchConfigSrc					= null;
 
 	/**
 	 * visible chart rectangle
 	 */
-	private Rectangle					_visibleGraphRect;
+	private Rectangle			_visibleGraphRect;
 
-	private final ChartComponentGraph	_componentGraph;
-	private final ChartComponentAxis	_componentAxisLeft;
-	private final ChartComponentAxis	_componentAxisRight;
+	final ChartComponentGraph	componentGraph;
+	final ChartComponentAxis	componentAxisLeft;
+	final ChartComponentAxis	componentAxisRight;
 
-	private ChartDataModel				_chartDataModel					= null;
+	private ChartDataModel		_chartDataModel					= null;
 
-	private ChartDrawingData			_chartDrawingData;
+	private ChartDrawingData	_chartDrawingData;
 
-	public boolean						_useAdvancedGraphics			= true;
+	public boolean				_useAdvancedGraphics			= true;
 
-	private static final String			_monthLabels[]					= {
+	private static final String	_monthLabels[]					= {
 			Messages.Month_jan,
 			Messages.Month_feb,
 			Messages.Month_mar,
@@ -155,9 +152,9 @@ public class ChartComponents extends Composite {
 			Messages.Month_sep,
 			Messages.Month_oct,
 			Messages.Month_nov,
-			Messages.Month_dec											};
+			Messages.Month_dec									};
 
-	private static final String			_monthShortLabels[]				= {
+	private static final String	_monthShortLabels[]				= {
 			Integer.toString(1),
 			Integer.toString(2),
 			Integer.toString(3),
@@ -169,23 +166,23 @@ public class ChartComponents extends Composite {
 			Integer.toString(9),
 			Integer.toString(10),
 			Integer.toString(11),
-			Integer.toString(12)										};
+			Integer.toString(12)								};
 
 	/**
 	 * Width in pixel for all months in one year
 	 */
-	private int							_devYearEqualMonthsWidth		= -1;
-	private int							_devYearEqualMonthsShortWidth	= -1;
+	private int					_devYearEqualMonthsWidth		= -1;
+	private int					_devYearEqualMonthsShortWidth	= -1;
 
-	private final int[]					_keyDownCounter					= new int[1];
-	private final int[]					_lastKeyDownCounter				= new int[1];
+	private final int[]			_keyDownCounter					= new int[1];
+	private final int[]			_lastKeyDownCounter				= new int[1];
 
-	private final Calendar				_calendar						= GregorianCalendar.getInstance();
+	private final Calendar		_calendar						= GregorianCalendar.getInstance();
 
 	/**
 	 * this error message is displayed instead of the chart when it's not <code>null</code>
 	 */
-	String								errorMessage;
+	String						errorMessage;
 
 	/**
 	 * Create and layout the components of the chart
@@ -213,21 +210,24 @@ public class ChartComponents extends Composite {
 		setLayout(gl);
 
 		// left: create left axis canvas
-		_componentAxisLeft = new ChartComponentAxis(parent, this, SWT.NONE);
+		componentAxisLeft = new ChartComponentAxis(parent, this, SWT.NONE);
 		gd = new GridData(SWT.NONE, SWT.FILL, false, true);
 		gd.widthHint = _yAxisWidthLeft;
-		_componentAxisLeft.setLayoutData(gd);
+		componentAxisLeft.setLayoutData(gd);
 
 		// center: create chart canvas
-		_componentGraph = new ChartComponentGraph(parent, this, SWT.NONE);
+		componentGraph = new ChartComponentGraph(parent, this, SWT.NONE);
 		gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-		_componentGraph.setLayoutData(gd);
+		componentGraph.setLayoutData(gd);
 
 		// right: create right axis canvas
-		_componentAxisRight = new ChartComponentAxis(parent, this, SWT.NONE);
+		componentAxisRight = new ChartComponentAxis(parent, this, SWT.NONE);
 		gd = new GridData(SWT.NONE, SWT.FILL, false, true);
 		gd.widthHint = _yAxisWidthRight;
-		_componentAxisRight.setLayoutData(gd);
+		componentAxisRight.setLayoutData(gd);
+
+		componentAxisLeft.setComponentGraph(componentGraph);
+		componentAxisRight.setComponentGraph(componentGraph);
 
 		addListener();
 	}
@@ -290,11 +290,11 @@ public class ChartComponents extends Composite {
 		// loop all graphs
 		for (final ChartDataYSerie yData : yDataList) {
 
-			final GraphDrawingData drawingData = new GraphDrawingData(yData.getChartType());
+			final GraphDrawingData drawingData = new GraphDrawingData(chartDrawingData, yData.getChartType());
 
 			graphDrawingData.add(drawingData);
 
-			// set chart title
+			// set chart title above the first graph
 			if (graphIndex == 1) {
 
 				drawingData.setXTitle(_chartDataModel.getTitle());
@@ -320,14 +320,17 @@ public class ChartComponents extends Composite {
 			createDrawingDataXValues(drawingData);
 			createDrawingDataYValues(drawingData, graphCount, graphIndex);
 
-			// set values after they have been computed
-			drawingData.setDevMarginTop(_devMarginTop);
-			drawingData.setDevXTitelBarHeight(_devXTitleBarHeight);
-			drawingData.setDevSliderBarHeight(_devSliderBarHeight);
-			drawingData.setDevMarkerBarHeight(_devMarkerBarHeight);
+			// reset adjusted y-slider value
+			yData.adjustedYValue = Float.MIN_VALUE;
 
 			graphIndex++;
 		}
+
+		// set values after they have been computed
+		chartDrawingData.devMarginTop = _devMarginTop;
+		chartDrawingData.devXTitelBarHeight = _devXTitleBarHeight;
+		chartDrawingData.devSliderBarHeight = _devSliderBarHeight;
+		chartDrawingData.devXAxisHeight = _devXAxisHeight;
 
 		return chartDrawingData;
 	}
@@ -339,67 +342,69 @@ public class ChartComponents extends Composite {
 
 		final ChartDataXSerie xData = drawingData.getXData();
 
-		final int xMaxValue = xData.getVisibleMaxValue();
-		final int xAxisUnit = xData.getAxisUnit();
-		final int xStartValue = xData.getStartValue();
+		final float graphMaxValue = xData.getOriginalMaxValue();
+		final int unitType = xData.getAxisUnit();
+		final float xStartValue = xData.getStartValue();
 
-		final int devVirtualGraphWidth = _componentGraph.getDevVirtualGraphImageWidth() - 0;
-
-		// enforce minimum chart width
-//		devGraphWidth = Math.max(devGraphWidth, CHART_MIN_WIDTH);
+		final int devVirtualGraphWidth = componentGraph.getXXDevGraphWidth();
+		final float scaleX = ((float) devVirtualGraphWidth - 1) / graphMaxValue;
 
 		drawingData.devVirtualGraphWidth = devVirtualGraphWidth;
-		drawingData.setScaleX((float) (devVirtualGraphWidth - 1) / xMaxValue);
+		drawingData.setScaleX(scaleX);
 
 		/*
 		 * calculate the number of units which will be visible by dividing the visible length by the
 		 * minimum size which one unit should have in pixels
 		 */
-		final int unitRawNumbers = devVirtualGraphWidth / _chart.gridHorizontalDistance;
+		final int defaultUnitCount = devVirtualGraphWidth / _chart.gridHorizontalDistance;
 
 		// unitRawValue is the number in data values for one unit
-		final int unitRawValue = xMaxValue / Math.max(1, unitRawNumbers);
+		final float defaultUnitValue = graphMaxValue / Math.max(1, defaultUnitCount);
 
 		// get the unit list from the configuration
-		final ArrayList<ChartUnit> units = drawingData.getXUnits();
+		final ArrayList<ChartUnit> unitList = drawingData.getXUnits();
 
-		switch (xAxisUnit) {
+		switch (unitType) {
 
 		case ChartDataSerie.X_AXIS_UNIT_DAY:
 
-			createXValuesDay(drawingData, units, devVirtualGraphWidth);
+			createXValuesDay(drawingData, unitList, devVirtualGraphWidth);
 			break;
 
 		case ChartDataSerie.X_AXIS_UNIT_WEEK:
 
-			createXValuesWeek(drawingData, units, devVirtualGraphWidth);
+			createXValuesWeek(drawingData, unitList, devVirtualGraphWidth);
 			break;
 
 		case ChartDataSerie.X_AXIS_UNIT_MONTH:
 
-			createXValuesMonth(drawingData, units, devVirtualGraphWidth);
+			createXValuesMonth(drawingData, unitList, devVirtualGraphWidth);
 			break;
 
 		case ChartDataSerie.X_AXIS_UNIT_YEAR:
 
-			createXValuesYear(drawingData, units, devVirtualGraphWidth);
+			createXValuesYear(drawingData, unitList, devVirtualGraphWidth);
 			break;
 
 		default:
 
 			// axis unit
-			float unitValue = 1; // this default value should be overwritten
+			double graphUnit = 1; // this default value should be overwritten
+			double majorValue = 0;
 
-			switch (xAxisUnit) {
+			switch (unitType) {
 			case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_SECOND:
 			case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_OPTIONAL_SECOND:
 			case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE:
-				unitValue = Util.roundTimeValue(unitRawValue);
+				graphUnit = Util.roundTimeValue((long) defaultUnitValue, false);
+				majorValue = Util.getMajorTimeValue((long) graphUnit, false);
 				break;
 
 			case ChartDataSerie.AXIS_UNIT_NUMBER:
 			case ChartDataSerie.X_AXIS_UNIT_NUMBER_CENTER:
-				unitValue = Util.roundDecimalValue(unitRawValue);
+				// unit is a decimal number
+				graphUnit = Util.roundDecimalValue(defaultUnitValue);
+				majorValue = Util.getMajorDecimalValue(graphUnit);
 				break;
 
 			default:
@@ -411,29 +416,38 @@ public class ChartComponents extends Composite {
 			 */
 
 			// get the unitOffset when a startValue is set
-			int unitOffset = 0;
+			double unitOffset = 0;
 			if (xStartValue != 0) {
-				unitOffset = (int) (xStartValue % unitValue);
+				unitOffset = xStartValue % graphUnit;
 			}
 
 			final int valueDivisor = xData.getValueDivisor();
-			int graphValue = 0;
-			int infinityLoopIndex = 0;
+			int loopCounter = 0;
 
 			/*
 			 * increase by one unit that the right side of the chart is drawing a unit, in some
 			 * cases this didn't occured
 			 */
-			final float maxUnitValue = xMaxValue + unitValue;
+			double graphMinVisibleValue = xData.getVisibleMinValue();
+			double graphMaxVisibleValue = xData.getVisibleMaxValue();
 
-			while (graphValue <= maxUnitValue) {
+			// decrease min value when it does not fit to unit borders
+			final double graphMinRemainder = graphMinVisibleValue % graphUnit;
+			graphMinVisibleValue = graphMinVisibleValue - graphMinRemainder;
+
+			graphMinVisibleValue = Util.roundFloatToUnit(graphMinVisibleValue, graphUnit, true);
+			graphMaxVisibleValue = Util.roundFloatToUnit(graphMaxVisibleValue, graphUnit, false);
+
+			double graphValue = graphMinVisibleValue;
+
+			while (graphValue <= graphMaxVisibleValue) {
 
 				// create unit value/label
-				final int unitPos = graphValue - unitOffset;
-				int unitLabelValue = unitPos + xStartValue;
+				final double unitPos = graphValue - unitOffset;
+				double unitLabelValue = unitPos + xStartValue;
 
-				if ((xAxisUnit == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_SECOND //
-						|| xAxisUnit == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_OPTIONAL_SECOND)
+				if ((unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_SECOND //
+						|| unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_OPTIONAL_SECOND)
 						&& xStartValue > 0) {
 
 					/*
@@ -443,17 +457,21 @@ public class ChartComponents extends Composite {
 					unitLabelValue = unitLabelValue % DAY_IN_SECONDS;
 				}
 
-				final String unitLabel = Util.formatValue(unitLabelValue, xAxisUnit, valueDivisor, true);
+				final String unitLabel = Util.formatValue((float) unitLabelValue, unitType, valueDivisor, true);
 
-				units.add(new ChartUnit(unitPos, unitLabel));
+				final boolean isMajorValue = graphValue % majorValue == 0;
 
-				graphValue += unitValue;
+				unitList.add(new ChartUnit((float) graphValue, unitLabel, isMajorValue));
 
 				// check for an infinity loop
-				if (infinityLoopIndex++ > 10000) {
+				if (graphValue == graphMaxValue || loopCounter++ > 10000) {
 					break;
 				}
+
+				graphValue += graphUnit;
+				graphValue = Util.roundFloatToUnit(graphValue, graphUnit, false);
 			}
+
 			break;
 		}
 
@@ -462,16 +480,16 @@ public class ChartComponents extends Composite {
 		 */
 		if (_chartDataModel.getChartType() == ChartDataModel.CHART_TYPE_BAR) {
 
-			final int[] highValues = xData.getHighValues()[0];
+			final float[] highValues = xData.getHighValues()[0];
 
-			if (xAxisUnit == ChartDataSerie.AXIS_UNIT_NUMBER || xAxisUnit == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE) {
+			if (unitType == ChartDataSerie.AXIS_UNIT_NUMBER || unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE) {
 
 				final int barWidth = (devVirtualGraphWidth / highValues.length) / 2;
 
 				drawingData.setBarRectangleWidth(Math.max(0, barWidth));
 				drawingData.setBarPosition(GraphDrawingData.BAR_POS_CENTER);
 
-			} else if (xAxisUnit == ChartDataSerie.X_AXIS_UNIT_NUMBER_CENTER) {
+			} else if (unitType == ChartDataSerie.X_AXIS_UNIT_NUMBER_CENTER) {
 
 				/*
 				 * set bar width that it is wide enouth to overlap the next right bar, the
@@ -497,14 +515,235 @@ public class ChartComponents extends Composite {
 											final int graphCount,
 											final int currentGraph) {
 
-		final ChartDataYSerie yData = drawingData.getYData();
+		final int unitType = drawingData.getYData().getAxisUnit();
 
-		final Point graphSize = _componentGraph.getVisibleSizeWithHBar(
-				_visibleGraphRect.width,
-				_visibleGraphRect.height);
+		if (unitType == ChartDataSerie.AXIS_UNIT_NUMBER) {
+
+			createDrawingDataYValues10Numbers(drawingData, graphCount, currentGraph);
+
+		} else if (unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE
+				|| unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H
+				|| unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_SECOND
+				|| unitType == ChartDataSerie.AXIS_UNIT_MINUTE_SECOND) {
+
+			createDrawingDataYValues20Time(drawingData, graphCount, currentGraph);
+		}
+	}
+
+	private void createDrawingDataYValues10Numbers(	final GraphDrawingData drawingData,
+													final int graphCount,
+													final int currentGraph) {
+
+		final ChartDataYSerie yData = drawingData.getYData();
+		final int unitType = yData.getAxisUnit();
 
 		// height of one chart graph including the slider bar
-		int devGraphHeight = graphSize.y - _devMarginTop - _devMarkerBarHeight - _devXTitleBarHeight - _xAxisHeight;
+		final int devChartHeight = getDevChartHeightWithoutTrim();
+
+		int devGraphHeight = devChartHeight;
+
+		/*
+		 * adjust graph device height for stacked graphs, a gap is between two graphs
+		 */
+		if (_chartDataModel.isStackedChart() && graphCount > 1) {
+			final int devGraphHeightSpace = devGraphHeight - (_chartsVerticalDistance * (graphCount - 1));
+			devGraphHeight = (devGraphHeightSpace / graphCount);
+		}
+
+		// enforce minimum chart height
+		devGraphHeight = Math.max(devGraphHeight, CHART_MIN_HEIGHT);
+
+		// remove slider bar from graph height
+		devGraphHeight -= _devSliderBarHeight;
+
+		/*
+		 * all variables starting with graph... contain data values from the graph which are not
+		 * scaled to the device
+		 */
+
+		final float graphMinValue = yData.getVisibleMinValue();
+		final float graphMaxValue = yData.getVisibleMaxValue();
+
+		final float defaultValueRange = graphMaxValue > 0
+				? (graphMaxValue - graphMinValue)
+				: -(graphMinValue - graphMaxValue);
+
+		/*
+		 * calculate the number of units which will be visible by dividing the available height by
+		 * the minimum size which one unit should have in pixels
+		 */
+		final int defaultUnitCount = devGraphHeight / _chart.gridVerticalDistance;
+
+		// defaultUnitValue is the number in data values for one unit
+		final float defaultUnitValue = defaultValueRange / Math.max(1, defaultUnitCount);
+
+		// round the unit
+		final double graphUnit = Util.roundDecimalValue(defaultUnitValue);
+
+		/*
+		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		 * The scaled unit with long min/max values is used because arithmetic with floating point
+		 * values fails. BigDecimal is necessary otherwis the scaledUnit can be wrong !!!
+		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		 */
+		final long valueScaling = Util.getValueScaling(graphUnit);
+
+		final BigDecimal bigGraphUnit = new BigDecimal(Double.valueOf(graphUnit));
+		final BigDecimal bigValueScaling = new BigDecimal(valueScaling);
+		final BigDecimal bigScaledUnit = bigGraphUnit.multiply(bigValueScaling);
+
+		final long scaledUnit = bigScaledUnit.longValue();
+
+		long scaledMinValue = (long) (graphMinValue * valueScaling);
+		long scaledMaxValue = (long) (graphMaxValue * valueScaling);
+
+		/*
+		 * adjustedYValue is set when the y-slider has been moved
+		 */
+		boolean isMinAdjusted = false;
+		boolean isMaxAdjusted = false;
+		final float adjustedYValue = yData.adjustedYValue;
+		final boolean isMinMaxAdjusted = adjustedYValue != Float.MIN_VALUE;
+
+		if (isMinMaxAdjusted) {
+
+			final long scaledAdjustedYValue = (long) (adjustedYValue * valueScaling);
+
+			isMinAdjusted = scaledAdjustedYValue == scaledMinValue;
+			isMaxAdjusted = scaledAdjustedYValue == scaledMaxValue;
+		}
+
+		/*
+		 * adjust min value, decrease min value when it does not fit to unit borders
+		 */
+		float adjustMinValue = 0;
+		final long minRemainder = scaledMinValue % scaledUnit;
+		if (minRemainder != 0 && scaledMinValue < 0) {
+			adjustMinValue = scaledUnit;
+		}
+		final long adjustedScaledMinValue = (long) ((scaledMinValue - adjustMinValue) / scaledUnit) * scaledUnit;
+
+		/*
+		 * ensure that min value is not at the bottom of the graph, except values which start at 0
+		 */
+		if (isMinMaxAdjusted == false && scaledMinValue == adjustedScaledMinValue && scaledMinValue != 0) {
+			scaledMinValue = adjustedScaledMinValue - scaledUnit;
+		} else if (isMinMaxAdjusted && isMinAdjusted) {
+			scaledMinValue = adjustedScaledMinValue;// - scaledUnit;
+		} else {
+			scaledMinValue = adjustedScaledMinValue;
+		}
+
+		/*
+		 * adjust max value, increase the max value when it does not fit to unit borders
+		 */
+		float adjustMaxValue = 0;
+		final long maxRemainder = scaledMaxValue % scaledUnit;
+		if (maxRemainder != 0) {
+			adjustMaxValue = scaledUnit;
+		}
+		final long adjustedScaledMaxValue = ((long) ((scaledMaxValue + adjustMaxValue) / scaledUnit) * scaledUnit);
+
+		// ensure that max value is not at the top of the graph
+		if (isMinMaxAdjusted == false && scaledMaxValue == adjustedScaledMaxValue) {
+			scaledMaxValue = adjustedScaledMaxValue + scaledUnit;
+		} else if (isMinMaxAdjusted && isMaxAdjusted) {
+			scaledMaxValue = adjustedScaledMaxValue;// + scaledUnit;
+		} else {
+			scaledMaxValue = adjustedScaledMaxValue;
+		}
+
+		/*
+		 * check that max is larger than min
+		 */
+		if (scaledMinValue == scaledMaxValue) {
+
+			scaledMinValue = scaledMinValue - scaledUnit;
+			scaledMaxValue = scaledMaxValue + scaledUnit;
+
+		} else if (scaledMinValue > scaledMaxValue) {
+			/*
+			 * this case can happen when the min value is set in the pref dialog, this is more a
+			 * hack than a good solution
+			 */
+			scaledMinValue = scaledMaxValue - (2 * scaledUnit);
+		}
+
+		final long scaledValueRange = scaledMaxValue > 0
+				? (scaledMaxValue - scaledMinValue)
+				: -(scaledMinValue - scaledMaxValue);
+
+		// get major values according to the unit
+		final double majorValue = Util.getMajorDecimalValue(graphUnit);
+
+		// calculate the vertical scaling between graph and device
+		final float value1 = (float) scaledValueRange / valueScaling;
+		final float graphScaleY = devGraphHeight / value1;
+
+		// calculate the vertical device offset
+		int devYTop = _devMarginTop + _devXTitleBarHeight;
+
+		if (_chartDataModel.isStackedChart()) {
+			// each chart has its own drawing rectangle which are stacked on
+			// top of each other
+			devYTop += (currentGraph * (devGraphHeight + _devSliderBarHeight))
+					+ ((currentGraph - 1) * _chartsVerticalDistance);
+
+		} else {
+			// all charts are drawn on the same rectangle
+			devYTop += devGraphHeight;
+		}
+
+		drawingData.setScaleY(graphScaleY);
+
+		drawingData.setDevYBottom(devYTop);
+		drawingData.setDevYTop(devYTop - devGraphHeight);
+
+		drawingData.setGraphYBottom((float) scaledMinValue / valueScaling);
+		drawingData.setGraphYTop((float) scaledMaxValue / valueScaling);
+
+		drawingData.devGraphHeight = devGraphHeight;
+		drawingData.setDevSliderHeight(_devSliderBarHeight);
+
+		final ArrayList<ChartUnit> unitList = drawingData.getYUnits();
+		final int valueDivisor = yData.getValueDivisor();
+		int loopCounter = 0;
+
+		long scaledValue = scaledMinValue;
+
+		// loop: create unit label for all units
+		while (scaledValue <= scaledMaxValue) {
+
+			final double descaledValue = (double) scaledValue / valueScaling;
+
+			final String unitLabel = Util.formatValue((float) descaledValue, unitType, valueDivisor, false);
+			final boolean isMajorValue = descaledValue % majorValue == 0;
+
+			unitList.add(new ChartUnit((float) descaledValue, unitLabel, isMajorValue));
+
+			// prevent endless loops when the unit is 0
+			if (scaledValue == scaledMaxValue || loopCounter++ > 1000) {
+				break;
+			}
+
+			scaledValue += scaledUnit;
+		}
+
+		if (unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H && scaledValue > scaledMaxValue) {
+			unitList.add(new ChartUnit(scaledMaxValue / valueScaling, Util.EMPTY_STRING));
+		}
+	}
+
+	private void createDrawingDataYValues20Time(final GraphDrawingData drawingData,
+												final int graphCount,
+												final int currentGraph) {
+
+		final ChartDataYSerie yData = drawingData.getYData();
+
+		// height of one chart graph including the slider bar
+		final int devChartHeight = getDevChartHeightWithoutTrim();
+
+		int devGraphHeight = devChartHeight;
 
 		// adjust graph device height for stacked graphs, a gap is between two
 		// graphs
@@ -525,14 +764,14 @@ public class ChartComponents extends Composite {
 		 */
 
 		final int unitType = yData.getAxisUnit();
-		int graphMinValue = yData.getVisibleMinValue();
-		int graphMaxValue = yData.getVisibleMaxValue();
+		int graphMinValue = (int) yData.getVisibleMinValue();
+		int graphMaxValue = (int) yData.getVisibleMaxValue();
 
 		// clip max value
-		boolean adjustGraphUnit = false;
+		boolean isAdjustGraphUnit = false;
 		if (unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H && (graphMaxValue / 3600 > 24)) {
 			graphMaxValue = 24 * 3600;
-			adjustGraphUnit = true;
+			isAdjustGraphUnit = true;
 		}
 
 		int graphValueRange = graphMaxValue > 0 ? (graphMaxValue - graphMinValue) : -(graphMinValue - graphMaxValue);
@@ -541,28 +780,17 @@ public class ChartComponents extends Composite {
 		 * calculate the number of units which will be visible by dividing the available height by
 		 * the minimum size which one unit should have in pixels
 		 */
-		final int unitCount = devGraphHeight / _chart.gridVerticalDistance;
+		final float defaultUnitCount = devGraphHeight / _chart.gridVerticalDistance;
 
 		// unitValue is the number in data values for one unit
-		final int graphUnitValue = graphValueRange / Math.max(1, unitCount);
+		final float defaultUnitValue = graphValueRange / Math.max(1, defaultUnitCount);
 
 		// round the unit
-		float graphUnit = 0;
-		switch (unitType) {
-		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE:
-		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H:
-		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_SECOND:
-		case ChartDataSerie.AXIS_UNIT_MINUTE_SECOND:
-			graphUnit = Util.roundTimeValue(graphUnitValue);
-			break;
+		long graphUnit = (long) Util.roundTimeValue(
+				defaultUnitValue,
+				unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H);
 
-		case ChartDataSerie.AXIS_UNIT_NUMBER:
-			// unit is a decimal number
-			graphUnit = Util.roundDecimalValue(graphUnitValue);
-			break;
-		}
-
-		float adjustMinValue = 0;
+		long adjustMinValue = 0;
 		if ((graphMinValue % graphUnit) != 0 && graphMinValue < 0) {
 			adjustMinValue = graphUnit;
 		}
@@ -580,7 +808,7 @@ public class ChartComponents extends Composite {
 		}
 		graphMaxValue = (int) ((int) ((graphMaxValue + adjustMaxValue) / graphUnit) * graphUnit);
 
-		if (adjustGraphUnit || unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H && (graphMaxValue / 3600 > 24)) {
+		if (isAdjustGraphUnit || unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H && (graphMaxValue / 3600 > 24)) {
 
 			// max value exeeds 24h
 
@@ -598,17 +826,18 @@ public class ChartComponents extends Composite {
 			}
 
 			// adjust to 24h
-			graphMaxValue = 24 * 3600;
-			graphMaxValue = Math.min(24 * 3600, (((yData.getVisibleMaxValue()) / 3600) * 3600) + 3600);
+			graphMaxValue = Math.min(24 * 3600, ((((int) yData.getVisibleMaxValue()) / 3600) * 3600) + 3600);
 
 			// adjust to the whole hour
-			graphMinValue = Math.max(0, (((yData.getVisibleMinValue() / 3600) * 3600)));
+			graphMinValue = Math.max(0, ((((int) yData.getVisibleMinValue() / 3600) * 3600)));
 
 			graphUnit = (graphMaxValue - graphMinValue) / unitCounter;
-			graphUnit = Util.roundTimeValue((int) graphUnit);
+			graphUnit = (long) Util.roundTimeValue(graphUnit, unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H);
 		}
 
-		graphValueRange = graphMaxValue > 0 ? (graphMaxValue - graphMinValue) : -(graphMinValue - graphMaxValue);
+		graphValueRange = graphMaxValue > 0 ? //
+				(graphMaxValue - graphMinValue)
+				: -(graphMinValue - graphMaxValue);
 
 		// ensure the chart is drawn correctly with pseudo data
 		if (graphValueRange == 0) {
@@ -617,11 +846,15 @@ public class ChartComponents extends Composite {
 			graphUnit = 1800;
 		}
 
+		final float majorValue = Util.getMajorTimeValue(//
+				graphUnit,
+				unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H);
+
 		// calculate the vertical scaling between graph and device
 		final float graphScaleY = (float) (devGraphHeight) / graphValueRange;
 
 		// calculate the vertical device offset
-		int devYTop = _devMarginTop + _devMarkerBarHeight + _devXTitleBarHeight;
+		int devYTop = _devMarginTop + _devXTitleBarHeight;
 
 		if (_chartDataModel.isStackedChart()) {
 			// each chart has its own drawing rectangle which are stacked on
@@ -654,22 +887,22 @@ public class ChartComponents extends Composite {
 		while (graphValue <= graphMaxValue) {
 
 			final String unitLabel = Util.formatValue(graphValue, unitType, valueDivisor, false);
+			final boolean isMajorValue = graphValue % majorValue == 0;
 
-			unitList.add(new ChartUnit(graphValue, unitLabel));
+			unitList.add(new ChartUnit(graphValue, unitLabel, isMajorValue));
 
 			// prevent endless loops when the unit is 0
-			if (graphValue == graphMaxValue || maxUnits > 1000) {
+			if (graphValue == graphMaxValue || maxUnits++ > 1000) {
 				break;
 			}
 
 			graphValue += graphUnit;
-			maxUnits++;
 		}
 
 		if (unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H && graphValue > graphMaxValue) {
-
 			unitList.add(new ChartUnit(graphMaxValue, Util.EMPTY_STRING));
 		}
+
 	}
 
 	private void createMonthEqualUnits(	final GraphDrawingData drawingData,
@@ -935,15 +1168,15 @@ public class ChartComponents extends Composite {
 		 * create synch configuration data
 		 */
 
-		final int[] xValues = xData.getHighValues()[0];
+		final float[] xValues = xData.getHighValues()[0];
 		final float markerStartValue = xValues[Math.min(markerValueIndexStart, xValues.length - 1)];
 		final float markerEndValue = xValues[Math.min(markerValueIndexEnd, xValues.length - 1)];
 
 		final float valueDiff = markerEndValue - markerStartValue;
 		final float lastValue = xValues[xValues.length - 1];
 
-		final float devVirtualGraphImageWidth = _componentGraph.getDevVirtualGraphImageWidth();
-		final float devGraphImageXOffset = _componentGraph.getDevGraphImageXOffset();
+		final float devVirtualGraphImageWidth = componentGraph.getXXDevGraphWidth();
+		final float devGraphImageXOffset = componentGraph.getXXDevViewPortLeftBorder();
 
 		final float devOneValueSlice = devVirtualGraphImageWidth / lastValue;
 
@@ -1014,7 +1247,7 @@ public class ChartComponents extends Composite {
 
 		final ChartDataXSerie xData = drawingData.getXData();
 
-		final int[] xValues = xData.getHighValues()[0];
+		final float[] xValues = xData.getHighValues()[0];
 		final int allWeeks = xValues.length;
 		final float devWeekWidth = devGraphWidth / allWeeks;
 
@@ -1063,7 +1296,7 @@ public class ChartComponents extends Composite {
 
 		// compute the width and position of the rectangles
 		int barWidth;
-		final int yearWidth = (int) Math.max(0, (scaleX) - 1);
+		final int yearWidth = (int) Math.max(0, scaleX - 1);
 
 		switch (yData.getChartLayout()) {
 		case ChartDataYSerie.BAR_LAYOUT_SINGLE_SERIE:
@@ -1104,15 +1337,15 @@ public class ChartComponents extends Composite {
 	}
 
 	ChartComponentAxis getAxisLeft() {
-		return _componentAxisLeft;
+		return componentAxisLeft;
 	}
 
 	ChartComponentAxis getAxisRight() {
-		return _componentAxisRight;
+		return componentAxisRight;
 	}
 
 	ChartComponentGraph getChartComponentGraph() {
-		return _componentGraph;
+		return componentGraph;
 	}
 
 	ChartDataModel getChartDataModel() {
@@ -1121,6 +1354,22 @@ public class ChartComponents extends Composite {
 
 	ChartDrawingData getChartDrawingData() {
 		return _chartDrawingData;
+	}
+
+	private int getDevChartHeightWithoutTrim() {
+
+		return _visibleGraphRect.height //
+				- _devMarginTop
+				- _devXTitleBarHeight
+				- _devXAxisHeight;
+	}
+
+	int getDevChartMarginBottom() {
+		return _devXAxisHeight;
+	}
+
+	int getDevChartMarginTop() {
+		return _devMarginTop + _devXTitleBarHeight + _devSliderBarHeight;
 	}
 
 	/**
@@ -1181,22 +1430,24 @@ public class ChartComponents extends Composite {
 		if (setWidthToSynchedChart() == false) {
 
 			// chart is not synchronized, compute the 'normal' graph width
-			_componentGraph.updateImageWidthAndOffset();
+			componentGraph.updateGraphSize();
 		}
 
 		// compute the chart data
 		_chartDrawingData = createDrawingData();
 
 		// notify components about the new configuration
-		_componentGraph.setDrawingData(_chartDrawingData);
+		componentGraph.setDrawingData(_chartDrawingData);
 
 		// resize the sliders after the drawing data have changed and the new
 		// chart size is saved
-		_componentGraph.updateSlidersOnResize();
+		componentGraph.updateSlidersOnResize();
 
 		// resize the axis
-		_componentAxisLeft.setDrawingData(_chartDrawingData, true);
-		_componentAxisRight.setDrawingData(_chartDrawingData, false);
+		componentAxisLeft.setDrawingData(_chartDrawingData, true);
+		componentAxisRight.setDrawingData(_chartDrawingData, false);
+
+		componentGraph.updateChartSize();
 
 		// synchronize chart
 		final SynchConfiguration synchConfig = createSynchConfig();
@@ -1215,10 +1466,10 @@ public class ChartComponents extends Composite {
 
 		switch (event.keyCode) {
 		case SWT.ARROW_RIGHT:
-			selectedIndex[0] = _componentGraph.selectBarItemNext();
+			selectedIndex[0] = componentGraph.selectBarItemNext();
 			break;
 		case SWT.ARROW_LEFT:
-			selectedIndex[0] = _componentGraph.selectBarItemPrevious();
+			selectedIndex[0] = componentGraph.selectBarItemPrevious();
 			break;
 		}
 
@@ -1259,13 +1510,6 @@ public class ChartComponents extends Composite {
 	}
 
 	/**
-	 * @param isMarkerVisible
-	 */
-	void setMarkerVisible(final boolean isMarkerVisible) {
-		_devMarkerBarHeight = isMarkerVisible ? MARKER_BAR_HEIGHT : 0;
-	}
-
-	/**
 	 * set the chart data model and redraw the chart
 	 * 
 	 * @param chartModel
@@ -1283,7 +1527,7 @@ public class ChartComponents extends Composite {
 		if ((chartType == ChartDataModel.CHART_TYPE_LINE || chartType == ChartDataModel.CHART_TYPE_LINE_WITH_BARS)
 				&& isShowAllData) {
 
-			_componentGraph.updateYDataMinMaxValues();
+			componentGraph.updateVisibleMinMaxValues();
 		}
 
 		if (onResize()) {
@@ -1292,8 +1536,7 @@ public class ChartComponents extends Composite {
 			 * onResize method
 			 */
 			if (_devSliderBarHeight > 0) {
-				_componentGraph.resetSliders();
-
+				componentGraph.resetSliders();
 			}
 		}
 	}
@@ -1305,7 +1548,7 @@ public class ChartComponents extends Composite {
 
 		_devSliderBarHeight = isSliderVisible ? SLIDER_BAR_HEIGHT : 0;
 
-		_componentGraph.setXSliderVisible(isSliderVisible);
+		componentGraph.setXSliderVisible(isSliderVisible);
 	}
 
 	/**
@@ -1339,10 +1582,10 @@ public class ChartComponents extends Composite {
 
 			_yAxisWidthLeftWithTitle = _yAxisWidthLeft + TITLE_BAR_HEIGHT;
 
-			final GridData gl = (GridData) _componentAxisLeft.getLayoutData();
+			final GridData gl = (GridData) componentAxisLeft.getLayoutData();
 			gl.widthHint = _yAxisWidthLeftWithTitle;
 
-			// relayout after the size was changed
+			// relayout after the layout size has been changed
 			layout();
 		}
 
@@ -1372,7 +1615,7 @@ public class ChartComponents extends Composite {
 		// set min/max values from the source synched chart into this chart
 		_synchConfigSrc.getYDataMinMaxKeeper().setMinMaxValues(_chartDataModel);
 
-		final int[] xValues = xData.getHighValues()[0];
+		final float[] xValues = xData.getHighValues()[0];
 		final float markerValueStart = xValues[markerStartIndex];
 
 		final float valueDiff = xValues[markerEndIndex] - markerValueStart;
@@ -1380,9 +1623,9 @@ public class ChartComponents extends Composite {
 
 		final int devVisibleChartWidth = getDevVisibleChartWidth();
 
-		final float devVirtualGraphImageWidth;
+		final float xxDevGraphWidth;
+		final int xxDevViewPortOffset;
 		final float graphZoomRatio;
-		final int devGraphOffset;
 
 		switch (_chart._synchMode) {
 		case Chart.SYNCH_MODE_BY_SCALE:
@@ -1394,17 +1637,17 @@ public class ChartComponents extends Composite {
 			// virtual graph width
 			final float devMarkerWidth = devVisibleChartWidth * markerWidthRatio;
 			final float devOneValueSlice = devMarkerWidth / valueDiff;
-			devVirtualGraphImageWidth = devOneValueSlice * valueLast;
+			xxDevGraphWidth = devOneValueSlice * valueLast;
 
 			// graph offset
 			final float devMarkerOffset = devVisibleChartWidth * markerOffsetRatio;
 			final float devMarkerStart = devOneValueSlice * markerValueStart;
-			devGraphOffset = (int) (devMarkerStart - devMarkerOffset);
+			xxDevViewPortOffset = (int) (devMarkerStart - devMarkerOffset);
 
 			// zoom ratio
-			graphZoomRatio = devVirtualGraphImageWidth / devVisibleChartWidth;
+			graphZoomRatio = xxDevGraphWidth / devVisibleChartWidth;
 
-			_componentGraph.setGraphImageWidth((int) devVirtualGraphImageWidth, devGraphOffset, graphZoomRatio);
+			componentGraph.setGraphSize((int) xxDevGraphWidth, xxDevViewPortOffset, graphZoomRatio);
 
 			return true;
 
@@ -1415,16 +1658,16 @@ public class ChartComponents extends Composite {
 			final float synchSrcDevMarkerOffset = _synchConfigSrc.getDevMarkerOffset();
 
 			// virtual graph width
-			devVirtualGraphImageWidth = valueLast / valueDiff * synchSrcDevMarkerWidth;
+			xxDevGraphWidth = valueLast / valueDiff * synchSrcDevMarkerWidth;
 
 			// graph offset
-			final int devLeftSynchMarkerPos = (int) (markerValueStart / valueLast * devVirtualGraphImageWidth);
-			devGraphOffset = (int) (devLeftSynchMarkerPos - synchSrcDevMarkerOffset);
+			final int devLeftSynchMarkerPos = (int) (markerValueStart / valueLast * xxDevGraphWidth);
+			xxDevViewPortOffset = (int) (devLeftSynchMarkerPos - synchSrcDevMarkerOffset);
 
 			// zoom ratio
-			graphZoomRatio = devVirtualGraphImageWidth / devVisibleChartWidth;
+			graphZoomRatio = xxDevGraphWidth / devVisibleChartWidth;
 
-			_componentGraph.setGraphImageWidth((int) devVirtualGraphImageWidth, devGraphOffset, graphZoomRatio);
+			componentGraph.setGraphSize((int) xxDevGraphWidth, xxDevViewPortOffset, graphZoomRatio);
 
 			return true;
 
@@ -1454,40 +1697,58 @@ public class ChartComponents extends Composite {
 			return;
 		}
 
-		final ChartXSlider leftSlider = _componentGraph.getLeftSlider();
-		final ChartXSlider rightSlider = _componentGraph.getRightSlider();
+		final ChartXSlider leftSlider = componentGraph.getLeftSlider();
+		final ChartXSlider rightSlider = componentGraph.getRightSlider();
 
 		final int slider0ValueIndex = sliderPosition.getBeforeLeftSliderIndex();
 		final int slider1ValueIndex = sliderPosition.getLeftSliderValueIndex();
 		final int slider2ValueIndex = sliderPosition.getRightSliderValueIndex();
 
-		final int[] xValues = _chartDataModel.getXData()._highValues[0];
-		final boolean centerSliderPosition = sliderPosition.isCenterSliderPosition();
+		final float[] xValues = _chartDataModel.getXData()._highValues[0];
+		final boolean isCenterSliderPosition = sliderPosition.isCenterSliderPosition();
 
 		// move left slider
 		if (slider1ValueIndex == SelectionChartXSliderPosition.SLIDER_POSITION_AT_CHART_BORDER) {
-			_componentGraph.setXSliderValueIndex(leftSlider, 0, centerSliderPosition);
+
+			componentGraph.setXSliderValueIndex(//
+					leftSlider,
+					0,
+					isCenterSliderPosition);
+
 		} else if (slider1ValueIndex != SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
-			_componentGraph.setXSliderValueIndex(leftSlider, slider1ValueIndex, centerSliderPosition);
+
+			componentGraph.setXSliderValueIndex(//
+					leftSlider,
+					slider1ValueIndex,
+					isCenterSliderPosition);
 		}
 
 		if (slider0ValueIndex != SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
 
 			// move second slider before the first slider
 
-			_componentGraph.setXSliderValueIndex(rightSlider, slider0ValueIndex, centerSliderPosition);
+			componentGraph.setXSliderValueIndex(rightSlider, slider0ValueIndex, isCenterSliderPosition);
 
 		} else {
 
 			// move right slider
 			if (slider2ValueIndex == SelectionChartXSliderPosition.SLIDER_POSITION_AT_CHART_BORDER) {
-				_componentGraph.setXSliderValueIndex(rightSlider, xValues.length - 1, centerSliderPosition);
+
+				componentGraph.setXSliderValueIndex(//
+						rightSlider,
+						xValues.length - 1,
+						isCenterSliderPosition);
+
 			} else if (slider2ValueIndex != SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
-				_componentGraph.setXSliderValueIndex(rightSlider, slider2ValueIndex, centerSliderPosition);
+
+				componentGraph.setXSliderValueIndex(//
+						rightSlider,
+						slider2ValueIndex,
+						isCenterSliderPosition);
 			}
 		}
 
-		_componentGraph.redraw();
+		componentGraph.redraw();
 	}
 
 	private void synchronizeChart(final SynchConfiguration newSynchConfigOut) {
@@ -1528,7 +1789,7 @@ public class ChartComponents extends Composite {
 			graphDrawingData.get(graphIndex++).getYData().setCustomForegroundLayers(yData.getCustomForegroundLayers());
 		}
 
-		_componentGraph.updateCustomLayers();
+		componentGraph.updateCustomLayers();
 	}
 
 }

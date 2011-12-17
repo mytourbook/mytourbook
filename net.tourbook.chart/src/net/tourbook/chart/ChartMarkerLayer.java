@@ -66,12 +66,12 @@ public class ChartMarkerLayer implements IChartLayer {
 
 		final int devYTop = drawingData.getDevYTop();
 		final int devYBottom = drawingData.getDevYBottom();
-		final int devGraphImageOffset = chart.getDevGraphImageXOffset();
+		final int devGraphImageOffset = chart.getXXDevViewPortLeftBorder();
 		final int devGraphHeight = drawingData.devGraphHeight;
 		final int devGraphWidth = drawingData.devVirtualGraphWidth;
 
-		final int graphYBottom = drawingData.getGraphYBottom();
-		final int[] yValues = drawingData.getYData().getHighValues()[0];
+		final float graphYBottom = drawingData.getGraphYBottom();
+		final float[] yValues = drawingData.getYData().getHighValues()[0];
 		final float scaleX = drawingData.getScaleX();
 		final float scaleY = drawingData.getScaleY();
 
@@ -81,7 +81,7 @@ public class ChartMarkerLayer implements IChartLayer {
 
 		for (final ChartLabel chartMarker : _chartLabels) {
 
-			final int yValue = yValues[chartMarker.serieIndex];
+			final float yValue = yValues[chartMarker.serieIndex];
 			final int devYGraph = (int) ((yValue - graphYBottom) * scaleY) - 0;
 
 			int devXMarker = (int) (chartMarker.graphX * scaleX) - devGraphImageOffset;
@@ -202,7 +202,7 @@ public class ChartMarkerLayer implements IChartLayer {
 					devXMarker -= labelHeight;
 
 					// don't draw the marker before the chart
-					final int devXImageOffset = chart.getDevGraphImageXOffset();
+					final int devXImageOffset = chart.getXXDevViewPortLeftBorder();
 					if (devXImageOffset == 0 && devXMarker < 0) {
 						devXMarker = 0;
 					}
@@ -237,7 +237,7 @@ public class ChartMarkerLayer implements IChartLayer {
 					 */
 
 					// don't draw the marker before the chart
-					final int devXImageOffset = chart.getDevGraphImageXOffset();
+					final int devXImageOffset = chart.getXXDevViewPortLeftBorder();
 					if (devXImageOffset == 0 && devXMarker < 0) {
 						devXMarker = 0;
 					}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,26 +16,25 @@
 package net.tourbook.ui.views.rawData;
 
 import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
+import net.tourbook.importdata.RawDataManager;
+import net.tourbook.util.ITourViewer3;
 
 import org.eclipse.jface.action.Action;
 
 public class ActionReimportTour extends Action {
 
-	private RawDataView	_rawDataView;
+	private ITourViewer3	_tourViewer;
 
-	public ActionReimportTour(final RawDataView rawDataView) {
+	public ActionReimportTour(final ITourViewer3 tourViewer) {
 
-		_rawDataView = rawDataView;
+		_tourViewer = tourViewer;
 
 		setText(Messages.import_data_action_reimport_tour);
-
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__open_folder_add));
 	}
 
 	@Override
 	public void run() {
-		_rawDataView.actionReimportTour(false);
+		RawDataManager.getInstance().actionReimportTour(RawDataManager.REIMPORT_TOUR, _tourViewer);
 	}
 
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -77,7 +77,7 @@ public abstract class ElevationBase {
 	 * @param lon
 	 * @return
 	 */
-	public synchronized short getElevation(final GeoLat lat, final GeoLon lon) {
+	public synchronized float getElevation(final GeoLat lat, final GeoLon lon) {
 		return 0;
 	}
 
@@ -90,20 +90,20 @@ public abstract class ElevationBase {
 		return 0;
 	}
 
-	public synchronized short getElevationGrid(final GeoLat lat, final GeoLon lon) {
-		return (short) getElevationGridDouble(lat, lon);
+	public synchronized float getElevationGrid(final GeoLat lat, final GeoLon lon) {
+		return (float) getElevationGridDouble(lat, lon);
 	}
 
 	/**
 	 * @param colorButtons
 	 * @param l
-	 * @return Returns {@link Short#MIN_VALUE} when the altitude is invalid, this can happen when
+	 * @return Returns {@link Float#MIN_VALUE} when the altitude is invalid, this can happen when
 	 *         the altitude cannot be read from a file or the file cannot be retrieved from the SRTM
 	 *         host.
 	 */
 	public synchronized double getElevationGridDouble(final GeoLat lat, final GeoLon lon) {
 
-		short elev1, elev2, elev3, elev4;
+		float elev1, elev2, elev3, elev4;
 		double p, q;
 		short ok = 0;
 		double elevMid;
@@ -142,7 +142,7 @@ public abstract class ElevationBase {
 
 			if (ok == 0) {
 				elevMid = (elev1 + elev2 + elev3 + elev4) / 4;
-				return Short.MIN_VALUE;
+				return Float.MIN_VALUE;
 			}
 			
 			elevMid = 0;
@@ -163,16 +163,16 @@ public abstract class ElevationBase {
 			elevMid /= ok;
 			
 			if (!isValidElev1) {
-				elev1 = (short) elevMid;
+				elev1 = (float) elevMid;
 			}
 			if (!isValidElev2) {
-				elev2 = (short) elevMid;
+				elev2 = (float) elevMid;
 			}
 			if (!isValidElev3) {
-				elev3 = (short) elevMid;
+				elev3 = (float) elevMid;
 			}
 			if (!isValidElev4) {
-				elev4 = (short) elevMid;
+				elev4 = (float) elevMid;
 			}
 		}
 

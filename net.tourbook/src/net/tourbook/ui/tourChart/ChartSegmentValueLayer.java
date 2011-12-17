@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,7 +16,6 @@
 /**
  * @author Wolfgang Schramm Created: 06.07.2005
  */
-
 package net.tourbook.ui.tourChart;
 
 import net.tourbook.chart.Chart;
@@ -37,9 +36,9 @@ public class ChartSegmentValueLayer implements IChartLayer {
 
 	private RGB			lineColorRGB	= new RGB(255, 0, 0);
 
-	private TourData	fTourData;
+	private TourData	_tourData;
 
-	private int[]		fXDataSerie;
+	private float[]		_xDataSerie;
 
 	/**
 	 * Draws the marker(s) for the current graph config
@@ -50,7 +49,7 @@ public class ChartSegmentValueLayer implements IChartLayer {
 	 */
 	public void draw(final GC gc, final GraphDrawingData drawingData, final Chart chart) {
 
-		final int[] segmentSerie = fTourData.segmentSerieIndex;
+		final int[] segmentSerie = _tourData.segmentSerieIndex;
 
 		if (segmentSerie == null) {
 			return;
@@ -60,10 +59,9 @@ public class ChartSegmentValueLayer implements IChartLayer {
 
 		final int devYTop = drawingData.getDevYTop();
 		final int devYBottom = drawingData.getDevYBottom();
-		final int devGraphImageXOffset = chart.getDevGraphImageXOffset();
-//		final int devGraphHeight = drawingData.getDevGraphHeight();
+		final int devGraphImageXOffset = chart.getXXDevViewPortLeftBorder();
 
-		final int graphYBottom = drawingData.getGraphYBottom();
+		final float graphYBottom = drawingData.getGraphYBottom();
 
 		final ChartDataYSerie yData = drawingData.getYData();
 
@@ -85,7 +83,7 @@ public class ChartSegmentValueLayer implements IChartLayer {
 		for (int segmentIndex = 0; segmentIndex < segmentSerie.length; segmentIndex++) {
 
 			final int serieIndex = segmentSerie[segmentIndex];
-			final int devXOffset = (int) (fXDataSerie[serieIndex] * scaleX) - devGraphImageXOffset;
+			final int devXOffset = (int) (_xDataSerie[serieIndex] * scaleX) - devGraphImageXOffset;
 
 			final float graphYValue = segmentValues[segmentIndex] * valueDivisor;
 			final int devYGraph = (int) ((graphYValue - graphYBottom) * scaleY);
@@ -129,10 +127,10 @@ public class ChartSegmentValueLayer implements IChartLayer {
 	}
 
 	public void setTourData(final TourData tourData) {
-		fTourData = tourData;
+		_tourData = tourData;
 	}
 
-	public void setXDataSerie(final int[] dataSerie) {
-		fXDataSerie = dataSerie;
+	public void setXDataSerie(final float[] dataSerie) {
+		_xDataSerie = dataSerie;
 	}
 }

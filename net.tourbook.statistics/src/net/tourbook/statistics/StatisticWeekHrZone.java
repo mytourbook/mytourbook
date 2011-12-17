@@ -138,7 +138,6 @@ public class StatisticWeekHrZone extends YearStatistic {
 		// create chart
 		_chart = new Chart(parent, SWT.BORDER | SWT.FLAT);
 		_chart.setShowZoomActions(true);
-		_chart.setCanScrollZoomedChart(true);
 		_chart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
 
 //		_tooltipProvider = new IChartInfoProvider() {
@@ -157,10 +156,10 @@ public class StatisticWeekHrZone extends YearStatistic {
 //		};
 	}
 
-	private int[] createWeekData() {
+	private float[] createWeekData() {
 
 		final int weekCounter = _resortedHrZoneValues[0].length;
-		final int allWeeks[] = new int[weekCounter];
+		final float allWeeks[] = new float[weekCounter];
 
 		for (int weekIndex = 0; weekIndex < weekCounter; weekIndex++) {
 			allWeeks[weekIndex] = weekIndex;
@@ -275,9 +274,9 @@ public class StatisticWeekHrZone extends YearStatistic {
 		final int[][] weekHrZones = _resortedHrZoneValues;
 		final int serieValueLength = weekHrZones[0].length;
 
-		final int[][] hrZones0 = new int[zoneSize][serieValueLength];
+		final float[][] hrZones0 = new float[zoneSize][serieValueLength];
 		final int[][] hrColorIndex = new int[zoneSize][serieValueLength];
-		final int[][] hrZoneValues = new int[zoneSize][];
+		final float[][] hrZoneValues = new float[zoneSize][];
 
 		final RGB[] rgbBright = new RGB[zoneSize];
 		final RGB[] rgbDark = new RGB[zoneSize];
@@ -294,8 +293,15 @@ public class StatisticWeekHrZone extends YearStatistic {
 			// set color index for HR zones
 			Arrays.fill(hrColorIndex[zoneIndex], zoneIndex);
 
-			// truncate values to the available hr zones in the person
-			hrZoneValues[zoneIndex] = weekHrZones[zoneIndex];
+			/*
+			 * truncate values to the available hr zones in the person and convert from in to float
+			 */
+			final int[] weekHrZone = weekHrZones[zoneIndex];
+			final float[] hrZoneValue = hrZoneValues[zoneIndex] = new float[weekHrZone.length];
+
+			for (int valueIndex = 0; valueIndex < weekHrZone.length; valueIndex++) {
+				hrZoneValue[valueIndex] = weekHrZone[valueIndex];
+			}
 
 			zoneIndex++;
 		}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.importdata;
 
 import java.util.HashMap;
@@ -35,22 +34,33 @@ public interface IRawDataReader {
 	/**
 	 * Read the data from the raw data file and create the device and tour data
 	 * 
-	 * @param filePath
+	 * @param importFilePath
 	 * @param deviceData
-	 * @param tourDataMap
-	 *            Contains all tours which are already imported, tour id is the hash map key.
+	 * @param alreadyImportedTours
+	 *            Contains all tours which are already imported and displayed in the import view.
+	 *            Tour id is the hash map key. Newly imported tour should not be added to this map,
+	 *            they are added after this method is returned, they must be put into the parameter
+	 *            <i>importedTours</i> map.
+	 *            <p>
+	 *            This map can be used to check if a tour is already imported and displayed in the
+	 *            import view.
+	 * @param newlyImportedTours
+	 *            Contains all tours which are imported in this method.
 	 * @return Returns <code>true</code> when the import was successfull, the parameters
 	 *         <code>deviceData</code> and <code>tourData</code> are set from the imported file.
 	 */
-	public boolean processDeviceData(String filePath, DeviceData deviceData, HashMap<Long, TourData> tourDataMap);
+	public boolean processDeviceData(	String importFilePath,
+										DeviceData deviceData,
+										HashMap<Long, TourData> alreadyImportedTours,
+										HashMap<Long, TourData> newlyImportedTours);
 
 	/**
 	 * Validate data format
 	 * 
-	 * @param filePath
+	 * @param importFilePath
 	 *            file name for the file which is validated
 	 * @return return <code>true</code> when the file has the format for this device reader
 	 */
-	public boolean validateRawData(String filePath);
+	public boolean validateRawData(String importFilePath);
 
 }

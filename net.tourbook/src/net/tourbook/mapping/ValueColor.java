@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,13 +17,13 @@ package net.tourbook.mapping;
 
 public class ValueColor {
 
-	public int	value;
+	public float	value;
 
-	public int	red;
-	public int	green;
-	public int	blue;
+	public int		red;
+	public int		green;
+	public int		blue;
 
-	public ValueColor(final int value, final int red, final int green, final int blue) {
+	public ValueColor(final float value, final int red, final int green, final int blue) {
 
 		this.value = value;
 

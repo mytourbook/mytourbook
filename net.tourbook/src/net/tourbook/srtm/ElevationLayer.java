@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -40,13 +40,13 @@ public class ElevationLayer {
 		zoom = 0;
 	}
 
-	public short getElevation(final GeoLat lat, final GeoLon lon) {
+	public float getElevation(final GeoLat lat, final GeoLon lon) {
 
 		int layerIndex = fileTypIndexStart;
 
 		while (layerIndex >= 0) {
 			try {
-				final short hoehe = fLayer[layerIndex].getElevation(lat, lon);
+				final float hoehe = fLayer[layerIndex].getElevation(lat, lon);
 
 				if (fLayer[layerIndex].isValid(hoehe)) {
 					return hoehe;

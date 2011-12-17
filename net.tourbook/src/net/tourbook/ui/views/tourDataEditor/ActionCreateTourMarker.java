@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.ui.views.tourDataEditor;
 
 import net.tourbook.Messages;
@@ -58,7 +57,7 @@ public class ActionCreateTourMarker extends Action {
 
 			// create a new marker
 			final int serieIndex = ((TimeSlice) firstElement).serieIndex;
-			final int[] distSerie = tourData.getMetricDistanceSerie();
+			final float[] distSerie = tourData.getMetricDistanceSerie();
 
 			final TourMarker tourMarker = new TourMarker(tourData, ChartLabel.MARKER_TYPE_CUSTOM);
 			tourMarker.setSerieIndex(serieIndex);

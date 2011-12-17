@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,11 +20,14 @@ import java.util.ArrayList;
 import net.tourbook.util.ITourToolTipProvider;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
+import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
@@ -52,8 +55,8 @@ public class ChartComponentAxis extends Canvas {
 	private boolean						_isAxisModified;
 
 	/**
-	 * is set to <code>true</code> when the axis is on the left side, <code>false</code> when on
-	 * the right side
+	 * is set to <code>true</code> when the axis is on the left side, <code>false</code> when on the
+	 * right side
 	 */
 	private boolean						_isLeft;
 
@@ -67,6 +70,13 @@ public class ChartComponentAxis extends Canvas {
 	 * </pre>
 	 */
 	private int							_hoverState	= -1;
+
+	/**
+	 * Client area of this axis canvas
+	 */
+	private Rectangle					_clientArea;
+
+	private ChartComponentGraph			_componentGraph;
 
 	ChartComponentAxis(final Chart chart, final Composite parent, final int style) {
 
@@ -89,12 +99,12 @@ public class ChartComponentAxis extends Canvas {
 		addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseDoubleClick(final MouseEvent e) {
-				_chart._chartComponents.getChartComponentGraph().onMouseDoubleClick(e);
+				_componentGraph.onMouseDoubleClick(e);
 			}
 
 			@Override
 			public void mouseDown(final MouseEvent e) {
-				_chart._chartComponents.getChartComponentGraph().setFocus();
+				onMouseDown(e);
 			}
 
 		});
@@ -102,24 +112,37 @@ public class ChartComponentAxis extends Canvas {
 		addMouseMoveListener(new MouseMoveListener() {
 			@Override
 			public void mouseMove(final MouseEvent e) {
-				checkHoveredArea(e.x, e.y);
+				onMouseMove(e);
+			}
+		});
+
+		addMouseTrackListener(new MouseTrackListener() {
+
+			public void mouseEnter(final MouseEvent e) {
+				onMouseEnter(e);
+			}
+
+			public void mouseExit(final MouseEvent e) {
+				onMouseExit(e);
+			}
+
+			public void mouseHover(final MouseEvent e) {}
+		});
+
+		addControlListener(new ControlListener() {
+
+			@Override
+			public void controlMoved(final ControlEvent e) {}
+
+			@Override
+			public void controlResized(final ControlEvent e) {
+				_clientArea = getClientArea();
 			}
 		});
 
 		addListener(SWT.MouseWheel, new Listener() {
 			public void handleEvent(final Event event) {
-
-				_chart._chartComponents.getChartComponentGraph().onMouseWheel(event);
-
-				/*
-				 * display tour tool tip when mouse is hovered over the tour info icon in the
-				 * statistics and the mouse wheel selects another tour
-				 */
-				checkHoveredArea(event.x, event.y);
-
-				if (_tourToolTipProvider != null && _hoverState == 1) {
-					_tourToolTipProvider.show(new Point(event.x, event.y));
-				}
+				onMouseWheel(event);
 			}
 		});
 	}
@@ -206,6 +229,8 @@ public class ChartComponentAxis extends Canvas {
 			return;
 		}
 
+		gc.setLineStyle(SWT.LINE_SOLID);
+
 		final Display display = getDisplay();
 
 		final int devX = _isLeft ? axisRect.width - 1 : 0;
@@ -214,6 +239,7 @@ public class ChartComponentAxis extends Canvas {
 		for (final GraphDrawingData drawingData : _graphDrawingData) {
 
 			final ArrayList<ChartUnit> yUnits = drawingData.getYUnits();
+			final int unitListSize = yUnits.size();
 
 			final float scaleY = drawingData.getScaleY();
 			final ChartDataYSerie yData = drawingData.getYData();
@@ -222,12 +248,15 @@ public class ChartComponentAxis extends Canvas {
 			final String unitLabel = yData.getUnitLabel();
 			final boolean isBottomUp = yData.isYAxisDirection();
 
-			final int graphYBottom = drawingData.getGraphYBottom();
+			final float graphYBottom = drawingData.getGraphYBottom();
 			final int devGraphHeight = drawingData.devGraphHeight;
 
 			final int devYBottom = drawingData.getDevYBottom();
 			final int devYTop = devYBottom - devGraphHeight;
 
+			/*
+			 * draw axis title
+			 */
 			if (_isLeft && title != null) {
 
 				// create title with unit label
@@ -272,12 +301,12 @@ public class ChartComponentAxis extends Canvas {
 			int devY;
 
 			// loop: all units
-			for (final ChartUnit unit : yUnits) {
+			for (final ChartUnit yUnit : yUnits) {
 
-				final int unitValue = unit.value;
-				final double devYUnit = ((unitValue - graphYBottom) * scaleY) + 0.5;
+				final float unitValue = yUnit.value;
+				final float devYUnit = ((unitValue - graphYBottom) * scaleY) + .5f;
 
-				if (isBottomUp) {
+				if (isBottomUp || unitListSize == 1) {
 					devY = devYBottom - (int) devYUnit;
 				} else {
 					devY = devYTop + (int) devYUnit;
@@ -285,16 +314,11 @@ public class ChartComponentAxis extends Canvas {
 
 				gc.setForeground(display.getSystemColor(SWT.COLOR_DARK_GRAY));
 
-				final String valueLabel = unit.valueLabel;
+				final String valueLabel = yUnit.valueLabel;
 
-				/*
-				 * hide unit tick when label is not set
-				 */
+				// draw the unit tick, hide it when label is not set
 				if (valueLabel.length() > 0) {
 
-					// draw the unit tick
-
-					gc.setLineStyle(SWT.LINE_SOLID);
 					if (_isLeft) {
 						gc.drawLine(devX - 5, devY, devX, devY);
 					} else {
@@ -315,8 +339,50 @@ public class ChartComponentAxis extends Canvas {
 
 			// draw the unit line
 			gc.setForeground(display.getSystemColor(SWT.COLOR_DARK_GRAY));
-			gc.setLineStyle(SWT.LINE_SOLID);
 			gc.drawLine(devX, devYBottom, devX, devYTop);
+		}
+	}
+
+	public Rectangle getAxisClientArea() {
+		return _clientArea;
+	}
+
+	private void onMouseDown(final MouseEvent event) {
+
+		_componentGraph.setFocus();
+
+		_componentGraph.onMouseDownAxis(event);
+	}
+
+	private void onMouseEnter(final MouseEvent event) {
+		_componentGraph.onMouseEnterAxis(event);
+	}
+
+	private void onMouseExit(final MouseEvent event) {
+		_componentGraph.onMouseExitAxis(event);
+	}
+
+	private void onMouseMove(final MouseEvent event) {
+
+		if (_componentGraph.onMouseMoveAxis(event)) {
+			return;
+		}
+
+		checkHoveredArea(event.x, event.y);
+	}
+
+	private void onMouseWheel(final Event event) {
+
+		_componentGraph.onMouseWheel(event);
+
+		/*
+		 * display tour tool tip when mouse is hovered over the tour info icon in the statistics and
+		 * the mouse wheel selects another tour
+		 */
+		checkHoveredArea(event.x, event.y);
+
+		if (_tourToolTipProvider != null && _hoverState == 1) {
+			_tourToolTipProvider.show(new Point(event.x, event.y));
 		}
 	}
 
@@ -330,6 +396,10 @@ public class ChartComponentAxis extends Canvas {
 	void onResize() {
 		_isAxisModified = true;
 		redraw();
+	}
+
+	void setComponentGraph(final ChartComponentGraph componentGraph) {
+		_componentGraph = componentGraph;
 	}
 
 	/**

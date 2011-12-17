@@ -50,11 +50,14 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ScrollBar;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Widget;
 
 /**
  * Draws the graph and axis into the canvas
@@ -63,27 +66,39 @@ import org.eclipse.swt.widgets.ScrollBar;
  */
 public class ChartComponentGraph extends Canvas {
 
-	private static final float			ZOOM_RATIO_FACTOR		= 1.3f;
+	private static final int			TOUR_INFO_ICON_KEEP_OUT_AREA	= 25;
 
-	private static final int			BAR_MARKER_WIDTH		= 16;
+	private static final double			ZOOM_RATIO_FACTOR				= 1.3;
 
-	/**
-	 * the factor is multiplied whth the visible graph width, so that the sliders are indented from
-	 * the border to be good visible
-	 */
-	private static final double			ZOOM_REDUCING_FACTOR	= 0.1;
+	private static final int			BAR_MARKER_WIDTH				= 16;
 
-	private static final NumberFormat	_nf						= NumberFormat.getNumberInstance();
+	private static final int[]			DOT_DASHES						= new int[] { 1, 1 };
 
-	private static final RGB			_gridRGB				= new RGB(241, 239, 226);
+	private static final NumberFormat	_nf								= NumberFormat.getNumberInstance();
+
+	private static final RGB			_gridRGB						= new RGB(241, 239, 226);
+	private static final RGB			_gridRGBMajor					= new RGB(222, 220, 208);
+
+	private static final int[][]		_leftAccelerator				= new int[][] {
+			{ -40, -200 },
+			{ -30, -50 },
+			{ -20, -10 },
+			{ -10, -5 },
+			// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			// !!! move 2 instead of 1, with 1 it would sometimes not move, needs more investigation
+			// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			{ 0, -2 }													};
+
+	private static final int[][]		_rightAccelerator				= new int[][] {
+			{ 10, 2 },
+			{ 20, 5 },
+			{ 30, 10 },
+			{ 40, 50 },
+			{ Integer.MAX_VALUE, 200 }									};
 
 	Chart								_chart;
-	private final ChartComponents		_chartComponents;
 
-	/**
-	 * This image contains the chart without additional layers.
-	 */
-	private Image						_chartImage;
+	private final ChartComponents		_chartComponents;
 
 	/**
 	 * This image contains one single graph without title and x-axis with units.
@@ -91,19 +106,22 @@ public class ChartComponentGraph extends Canvas {
 	 * This image was created to fix clipping bugs which occured when gradient filling was painted
 	 * with a path.
 	 */
-	private Image						_graphImage;
+	private Image						_chartImage10Graphs;
 
 	/**
-	 * Contains layers like the x/y sliders, x-marker, selection or hovered bar.
+	 * This image contains the chart without additional layers.
 	 */
-	private Image						_sliderImage;
+	private Image						_chartImage20Chart;
 
 	/**
 	 * Contains custom layers like the markers or tour segments which are painted in the foreground.
 	 */
-	private Image						_customFgLayerImage;
+	private Image						_chartImage30Custom;
 
-	private int							_horizontalScrollBarPos;
+	/**
+	 * Contains layers like the x/y sliders, x-marker, selection or hovered line/bar.
+	 */
+	private Image						_chartImage40Overlay;
 
 	/**
 	 * 
@@ -113,42 +131,34 @@ public class ChartComponentGraph extends Canvas {
 	/**
 	 * drawing data which is used to draw the chart, when this list is empty, an error is displayed
 	 */
-	private ArrayList<GraphDrawingData>	_graphDrawingData		= new ArrayList<GraphDrawingData>();
+	private ArrayList<GraphDrawingData>	_graphDrawingData				= new ArrayList<GraphDrawingData>();
 
 	/**
 	 * zoom ratio between the visible and the virtual chart width
 	 */
-	private float						_graphZoomRatio			= 1;
+	private double						_graphZoomRatio					= 1;
 
 	/**
-	 * when the graph is zoomed and and can be scrolled, <code>canScrollZoomedChart</code> is
-	 * <code>true</code>, the graph can be wider than the visial part. This field contains the width
-	 * for the image when the whole tour would be displayed and not only a part
+	 * Contains the width for a zoomed graph this includes also the invisible parts.
 	 */
-	private int							_devVirtualGraphImageWidth;
+	private int							_xxDevGraphWidth;
 
 	/**
-	 * when the zoomed graph can't be scrolled the chart image can be wider than the visible part,
-	 * this field contains the offset for the start of the visible chart
+	 * When the graph is zoomed, the chart shows only a part of the whole graph in the viewport.
+	 * This value contains the left border of the viewport.
 	 */
-	private int							_devGraphImageXOffset;
+	private int							_xxDevViewPortLeftBorder;
 
 	/**
 	 * ratio for the position where the chart starts on the left side within the virtual graph width
 	 */
-	private float						_xOffsetZoomRatio;
+	private double						_zoomRatioLeftBorder;
 
 	/**
 	 * ratio where the mouse was double clicked, this position is used to zoom the chart with the
 	 * mouse
 	 */
-	private float						_xOffsetMouseZoomInRatio;
-
-	/**
-	 * the zoomed chart can be scrolled when set to <code>true</code>, for a zoomed chart, the chart
-	 * image can be wider than the visible part and can be scrolled
-	 */
-	boolean								_canScrollZoomedChart;
+	private double						_zoomRatioCenter;
 
 	/**
 	 * when the slider is dragged and the mouse up event occures, the graph is zoomed to the sliders
@@ -176,7 +186,7 @@ public class ChartComponentGraph extends Canvas {
 	 * when <code>true</code> the custom layers above the graph image needs to be redrawn in the
 	 * next paint event
 	 */
-	private boolean						_isCustomFgLayerDirty;
+	private boolean						_isCustomLayerImageDirty;
 
 	/**
 	 * set to <code>true</code> when the selection needs to be redrawn
@@ -222,29 +232,25 @@ public class ChartComponentGraph extends Canvas {
 	private ChartXSlider				_mouseOverXSlider;
 
 	/**
-	 * slider which has the focus
+	 * Contains the slider which has the focus.
 	 */
 	private ChartXSlider				_selectedXSlider;
 
 	/**
-	 * device position of the slider line when the slider is dragged
+	 * Device position of the x-slider line when the slider is dragged. The position can be outside
+	 * of the viewport which causes autoscrolling.
 	 */
-	private int							_devXScrollSliderLine;
+	private int							_devXDraggedXSliderLine;
+
+	/**
+	 * Mouse device position when autoscrolling is done with the mouse but without a x-slider
+	 */
+	private int							_devXAutoScrollMousePosition	= Integer.MIN_VALUE;
 
 	/**
 	 * list for all y-sliders
 	 */
 	private ArrayList<ChartYSlider>		_ySliders;
-
-	/**
-	 * scroll position for the horizontal bar after the graph was zoomed
-	 */
-	private boolean						_isScrollToLeftSlider;
-
-	/**
-	 * <code>true</code> to scroll to the x-data selection
-	 */
-	private boolean						_isScrollToSelection;
 
 	/**
 	 * contextLeftSlider is set when the right mouse button was clicked and the left slider was hit
@@ -264,48 +270,49 @@ public class ChartComponentGraph extends Canvas {
 
 	private Cursor						_cursorResizeTopDown;
 	private Cursor						_cursorDragged;
-	private Cursor						_cursorHand05x;
-	private Cursor						_cursorHand;
-	private Cursor						_cursorHand2x;
-	private Cursor						_cursorHand5x;
 	private Cursor						_cursorModeSlider;
 	private Cursor						_cursorModeZoom;
 	private Cursor						_cursorModeZoomMove;
+	private Cursor						_cursorMove1x;
+	private Cursor						_cursorMove2x;
+	private Cursor						_cursorMove3x;
+	private Cursor						_cursorMove4x;
+	private Cursor						_cursorMove5x;
+	private Cursor						_cursorXSliderLeft;
+	private Cursor						_cursorXSliderRight;
+	private Cursor						_cursorDragXSlider_ModeZoom;
+	private Cursor						_cursorDragXSlider_ModeSlider;
+	private Cursor						_cursorHoverXSlider;
 
 	private Color						_gridColor;
-
-	/**
-	 * is set true when the graph is being moved with the mouse
-	 */
-	private boolean						_isGraphScrolled;
-
-	/**
-	 * position where the graph scrolling started
-	 */
-	private int							_startPosScrollbar;
-
-	private int							_startPosDev;
-	private float						_scrollAcceleration;
-
-	/**
-	 * offset when the chart is in autoscroll mode
-	 */
-	private int							_autoScrollOffset;
-
-	private boolean						_isAutoScrollActive;
+	private Color						_gridColorMajor;
 
 	/**
 	 * serie index for the hovered bar, the bar is hidden when -1;
 	 */
-	private int							_hoveredBarSerieIndex	= -1;
+	private int							_hoveredBarSerieIndex			= -1;
 
 	private int							_hoveredBarValueIndex;
 	private boolean						_isHoveredBarDirty;
-	private ChartYSlider				_ySliderDragged;
 
-	private int							_ySliderGraphX;
+	private ToolTipV1					_hoveredBarToolTip;
+
+	private boolean						_isHoveredLineVisible			= false;
+	private int							_hoveredLineValueIndex			= -1;
+	private ArrayList<Rectangle[]>		_lineFocusRectangles			= new ArrayList<Rectangle[]>();
+	private ArrayList<Point[]>			_lineDevPositions				= new ArrayList<Point[]>();
+
+	/**
+	 * Tooltip for value points, can be <code>null</code> when not set.
+	 */
+	IValuePointToolTip					valuePointToolTip;
 
 	private ChartYSlider				_hitYSlider;
+	private ChartYSlider				_ySliderDragged;
+	private int							_ySliderGraphX;
+
+	private boolean						_isSetXSliderPositionLeft;
+	private boolean						_isSetXSliderPositionRight;
 
 	/**
 	 * <code>true</code> when the x-marker is moved with the mouse
@@ -323,54 +330,57 @@ public class ChartComponentGraph extends Canvas {
 	private int							_devXMarkerDraggedPos;
 
 	private int							_movedXMarkerStartValueIndex;
-
 	private int							_movedXMarkerEndValueIndex;
-	private int							_xMarkerValueDiff;
+
+	private float						_xMarkerValueDiff;
 
 	/**
 	 * <code>true</code> when the chart is dragged with the mouse
 	 */
-	private boolean						_isChartDragged			= false;
+	private boolean						_isChartDragged					= false;
 
 	/**
 	 * <code>true</code> when the mouse button in down but not moved
 	 */
-	private boolean						_isChartDraggedStarted	= false;
+	private boolean						_isChartDraggedStarted			= false;
 
 	private Point						_draggedChartStartPos;
-
 	private Point						_draggedChartDraggedPos;
+
 	private boolean[]					_selectedBarItems;
 
-	private final int[]					_drawCounter			= new int[1];
+	private final int[]					_drawAsyncCounter				= new int[1];
 
-	private final ColorCache			_colorCache				= new ColorCache();
-	int									_graphAlpha				= 0xe0;
+	private boolean						_isAutoScroll;
+	private boolean						_isDisableHoveredLineValueIndex;
+	private int[]						_autoScrollCounter				= new int[1];
+
+	private final ColorCache			_colorCache						= new ColorCache();
 
 	private boolean						_isSelectionVisible;
 
-	private boolean						_isFocusActive;
-	private boolean						_scrollSmoothly;
-	private int							_smoothScrollEndPosition;
-	private boolean						_isSmoothScrollingActive;
-	private int							_smoothScrollCurrentPosition;
-
-	private boolean						_isSliderImageDirty;
-
-	/*
-	 * position of the mouse in the mouse down event
+	/**
+	 * Is <code>true</code> when this chart gained the focus, <code>false</code> when the focus is
+	 * lost.
 	 */
-	private int							_mouseDownDevPositionX;
-	private int							_mouseDownDevPositionY;
+	private boolean						_isFocusActive;
 
-	private boolean						_isPaintDraggedImage	= false;
+	private boolean						_isOverlayDirty;
+
+	/**
+	 * widget relative position of the mouse in the mouse down event
+	 */
+	private int							_devXMouseDown;
+	private int							_devYMouseDown;
+	private int							_devXMouseMove;
+	private int							_devYMouseMove;
+
+	private boolean						_isPaintDraggedImage			= false;
 
 	/**
 	 * is <code>true</code> when data for a graph is available
 	 */
-	private boolean						_isGraphVisible			= false;
-
-	private ToolTipV1					_toolTipV1;
+	private boolean						_isGraphVisible					= false;
 
 	/**
 	 * Client area for this canvas
@@ -378,9 +388,9 @@ public class ChartComponentGraph extends Canvas {
 	Rectangle							_clientArea;
 
 	/**
-	 * is <code>true</code> when the chart is panned
+	 * Time when the chart was painted the last time
 	 */
-//	private boolean						fIsMoveMode				= false;
+	private long						_lastChartDrawingTime;
 
 	/**
 	 * Constructor
@@ -401,16 +411,24 @@ public class ChartComponentGraph extends Canvas {
 		_cursorResizeTopDown = new Cursor(getDisplay(), SWT.CURSOR_SIZENS);
 		_cursorDragged = new Cursor(getDisplay(), SWT.CURSOR_SIZEALL);
 
-		_cursorHand05x = createCursorFromImage(Messages.Image_cursor_hand_05x);
-		_cursorHand = createCursorFromImage(Messages.Image_cursor_hand_10x);
-		_cursorHand2x = createCursorFromImage(Messages.Image_cursor_hand_20x);
-		_cursorHand5x = createCursorFromImage(Messages.Image_cursor_hand_50x);
-
 		_cursorModeSlider = createCursorFromImage(Messages.Image_cursor_mode_slider);
 		_cursorModeZoom = createCursorFromImage(Messages.Image_cursor_mode_zoom);
 		_cursorModeZoomMove = createCursorFromImage(Messages.Image_cursor_mode_zoom_move);
+		_cursorDragXSlider_ModeZoom = createCursorFromImage(Messages.Image_Cursor_DragXSlider_ModeZoom);
+		_cursorDragXSlider_ModeSlider = createCursorFromImage(Messages.Image_Cursor_DragXSlider_ModeSlider);
+		_cursorHoverXSlider = createCursorFromImage(Messages.Image_Cursor_Hover_XSlider);
+
+		_cursorMove1x = createCursorFromImage(Messages.Image_Cursor_Move1x);
+		_cursorMove2x = createCursorFromImage(Messages.Image_Cursor_Move2x);
+		_cursorMove3x = createCursorFromImage(Messages.Image_Cursor_Move3x);
+		_cursorMove4x = createCursorFromImage(Messages.Image_Cursor_Move4x);
+		_cursorMove5x = createCursorFromImage(Messages.Image_Cursor_Move5x);
+
+		_cursorXSliderLeft = createCursorFromImage(Messages.Image_Cursor_X_Slider_Left);
+		_cursorXSliderRight = createCursorFromImage(Messages.Image_Cursor_X_Slider_Right);
 
 		_gridColor = new Color(getDisplay(), _gridRGB);
+		_gridColorMajor = new Color(getDisplay(), _gridRGBMajor);
 
 		_chartComponents = (ChartComponents) parent;
 
@@ -421,12 +439,13 @@ public class ChartComponentGraph extends Canvas {
 		_xSliderOnTop = _xSliderB;
 		_xSliderOnBottom = _xSliderA;
 
-		_toolTipV1 = new ToolTipV1(_chart);
+		_hoveredBarToolTip = new ToolTipV1(_chart);
 
 		addListener();
 		createContextMenu();
 
-		setDefaultCursor();
+		final Point devMouse = this.toControl(getDisplay().getCursorLocation());
+		setCursorStyle(devMouse.y);
 	}
 
 	/**
@@ -465,9 +484,19 @@ public class ChartComponentGraph extends Canvas {
 			public void paintControl(final PaintEvent event) {
 
 				if (_isChartDragged) {
-					draw020DraggedChart(event.gc);
+					drawSync020DraggedChart(event.gc);
 				} else {
-					draw000Chart(event.gc);
+
+//					final long start = System.nanoTime();
+//					System.out.println();
+//					System.out.println("onPaint\tstart\t");
+//					// TODO remove SYSTEM.OUT.PRINTLN
+
+					drawSync000onPaint(event.gc);
+
+//					System.out.println("onPaint\tend\t" + (((double) System.nanoTime() - start) / 1000000) + "ms");
+//					System.out.println();
+//					// TODO remove SYSTEM.OUT.PRINTLN
 				}
 			}
 		});
@@ -486,7 +515,7 @@ public class ChartComponentGraph extends Canvas {
 		addMouseMoveListener(new MouseMoveListener() {
 			public void mouseMove(final MouseEvent e) {
 				if (_isGraphVisible) {
-					onMouseMove(e);
+					onMouseMove(e.x, e.y);
 				}
 			}
 		});
@@ -513,7 +542,9 @@ public class ChartComponentGraph extends Canvas {
 
 		addMouseTrackListener(new MouseTrackListener() {
 			public void mouseEnter(final MouseEvent e) {
-				// forceFocus();
+				if (_isGraphVisible) {
+					onMouseEnter(e);
+				}
 			}
 
 			public void mouseExit(final MouseEvent e) {
@@ -572,7 +603,10 @@ public class ChartComponentGraph extends Canvas {
 
 			@Override
 			public void controlResized(final ControlEvent e) {
+
 				_clientArea = getClientArea();
+
+				_isDisableHoveredLineValueIndex = true;
 			}
 		});
 
@@ -599,19 +633,34 @@ public class ChartComponentGraph extends Canvas {
 		final GraphDrawingData drawingData = _ySliderDragged.getDrawingData();
 
 		final ChartDataYSerie yData = _ySliderDragged.getYData();
-		final ChartYSlider slider1 = yData.getYSliderTop();
-		final ChartYSlider slider2 = yData.getYSliderBottom();
+		final ChartYSlider slider1 = yData.getYSlider1();
+		final ChartYSlider slider2 = yData.getYSlider2();
 
 		final int devYBottom = drawingData.getDevYBottom();
 		final int devYTop = devYBottom - drawingData.devGraphHeight;
-		final int graphYBottom = drawingData.getGraphYBottom();
+
+		final float graphYBottom = drawingData.getGraphYBottom();
 		final float scaleY = drawingData.getScaleY();
 
-		final int graphValue1 = (int) ((devYBottom - slider1.getDevYSliderLine()) / scaleY) + graphYBottom;
-		final int graphValue2 = (int) ((devYBottom - slider2.getDevYSliderLine()) / scaleY) + graphYBottom;
+		final int devYSliderLine1 = slider1.getDevYSliderLine();
+		final int devYSliderLine2 = slider2.getDevYSliderLine();
 
-		int minValue;
-		int maxValue;
+		final float graphValue1 = ((float) devYBottom - devYSliderLine1) / scaleY + graphYBottom;
+		final float graphValue2 = ((float) devYBottom - devYSliderLine2) / scaleY + graphYBottom;
+
+		// get value which was adjusted
+		if (_ySliderDragged == slider1) {
+			yData.adjustedYValue = graphValue1;
+		} else if (_ySliderDragged == slider2) {
+			yData.adjustedYValue = graphValue2;
+		} else {
+			// this case should not happen
+			System.out.println("y-slider is not set correctly\t");//$NON-NLS-1$
+			return;
+		}
+
+		float minValue;
+		float maxValue;
 
 		if (graphValue1 < graphValue2) {
 
@@ -638,8 +687,8 @@ public class ChartComponentGraph extends Canvas {
 
 		_ySliderDragged = null;
 
-		// the cursour could be outside of the chart, reset it
-		setDefaultCursor();
+		// the cursor could be outside of the chart, reset it
+//		setCursorStyle();
 
 		/*
 		 * the hited slider could be outsite of the chart, hide the labels on the slider
@@ -660,14 +709,14 @@ public class ChartComponentGraph extends Canvas {
 			final Integer yDataInfo = (Integer) yData.getCustomData(ChartDataYSerie.YDATA_INFO);
 
 			// adjust min value for the changed y-slider
-			final Integer synchedChartMinValue = synchedChartMinMaxKeeper.getMinValues().get(yDataInfo);
+			final Float synchedChartMinValue = synchedChartMinMaxKeeper.getMinValues().get(yDataInfo);
 
 			if (synchedChartMinValue != null) {
 				synchedChartMinMaxKeeper.getMinValues().put(yDataInfo, minValue);
 			}
 
 			// adjust max value for the changed y-slider
-			final Integer synchedChartMaxValue = synchedChartMinMaxKeeper.getMaxValues().get(yDataInfo);
+			final Float synchedChartMaxValue = synchedChartMinMaxKeeper.getMaxValues().get(yDataInfo);
 
 			if (synchedChartMaxValue != null) {
 				synchedChartMinMaxKeeper.getMaxValues().put(yDataInfo, maxValue);
@@ -675,32 +724,6 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		computeChart();
-	}
-
-	/**
-	 */
-	private void computeAutoScrollOffset() {
-
-		final int visibleGraphWidth = getDevVisibleChartWidth();
-		final ScrollBar hBar = getHorizontalBar();
-
-		_autoScrollOffset = 0;
-
-		// no auto scrolling if the slider is within the client area
-		if (_devXScrollSliderLine >= 0 && _devXScrollSliderLine < visibleGraphWidth) {
-			return;
-		}
-
-		final int scrollScale = 1;
-
-		if (_devXScrollSliderLine < -1 && hBar.getSelection() > 0) {
-			// graph can be scrolled to the left
-			_autoScrollOffset = _devXScrollSliderLine * scrollScale;
-		}
-		if (_devXScrollSliderLine > -1 && hBar.getSelection() < (hBar.getMaximum() - hBar.getThumb())) {
-			// graph can be scrolled to the right
-			_autoScrollOffset = (_devXScrollSliderLine - visibleGraphWidth) * scrollScale;
-		}
 	}
 
 	/**
@@ -716,7 +739,7 @@ public class ChartComponentGraph extends Canvas {
 		});
 	}
 
-	private void computeSliderForContextMenu(final int devX, final int devY, final int graphX) {
+	private void computeSliderForContextMenu(final int devX, final int devY) {
 
 		ChartXSlider slider1 = null;
 		ChartXSlider slider2 = null;
@@ -726,11 +749,11 @@ public class ChartComponentGraph extends Canvas {
 		_contextRightSlider = null;
 
 		// check if a slider or the slider line was hit
-		if (_xSliderA.getHitRectangle().contains(graphX, devY)) {
+		if (_xSliderA.getHitRectangle().contains(devX, devY)) {
 			slider1 = _xSliderA;
 		}
 
-		if (_xSliderB.getHitRectangle().contains(graphX, devY)) {
+		if (_xSliderB.getHitRectangle().contains(devX, devY)) {
 			slider2 = _xSliderB;
 		}
 
@@ -776,14 +799,14 @@ public class ChartComponentGraph extends Canvas {
 		}
 	}
 
-	private int computeXMarkerValue(final int[] xValues,
+	private int computeXMarkerValue(final float[] xValues,
 									final int xmStartIndex,
-									final int valueDiff,
-									final int valueXMarkerPosition) {
+									final float valueDiff,
+									final float valueXMarkerPosition) {
 
 		int valueIndex;
-		int valueX = xValues[xmStartIndex];
-		int valueHalf;
+		float valueX = xValues[xmStartIndex];
+		float valueHalf;
 
 		/*
 		 * get the marker positon for the next value
@@ -821,7 +844,7 @@ public class ChartComponentGraph extends Canvas {
 	}
 
 	/**
-	 * Computes the value of the x axis according to the slider position
+	 * Get the x-axis value according to the slider position in the UI
 	 * 
 	 * @param slider
 	 * @param devXSliderLinePosition
@@ -834,121 +857,127 @@ public class ChartComponentGraph extends Canvas {
 			return;
 		}
 
-		final int[][] xValueSerie = xData.getHighValues();
+		final float[][] xValueSerie = xData.getHighValues();
 
 		if (xValueSerie.length == 0) {
 			// data are not available
 			return;
 		}
 
-		final int[] xDataValues = xValueSerie[0];
+		if (_hoveredLineValueIndex == -1) {
+			// this should not happen
+			return;
+		}
+
+		final float[] xDataValues = xValueSerie[0];
+
+		slider.setValuesIndex(_hoveredLineValueIndex);
+		slider.setValueX(xDataValues[_hoveredLineValueIndex]);
+	}
+
+	/**
+	 * Get the x-axis value according to the slider position in the UI
+	 * 
+	 * @param slider
+	 * @param devXSliderLinePosition
+	 */
+	void computeXSliderValueOLD(final ChartXSlider slider, final int devXSliderLinePosition) {
+
+		final ChartDataXSerie xData = getXData();
+
+		if (xData == null) {
+			return;
+		}
+
+		final float[][] xValueSerie = xData.getHighValues();
+
+		if (xValueSerie.length == 0) {
+			// data are not available
+			return;
+		}
+
+		final float[] xDataValues = xValueSerie[0];
 		final int serieLength = xDataValues.length;
 		final int maxIndex = Math.max(0, serieLength - 1);
 
-		int valueIndex;
-		int xDataValue;
+		/*
+		 * The non time value (distance) is not linear, the value is increasing steadily but with
+		 * different distance on the x axis. So first we have to find the nearest position in the
+		 * values array and then interpolite from the found position to the slider position
+		 */
+
+		final float minValue = xData.getOriginalMinValue();
+		final float maxValue = xData.getOriginalMaxValue();
+		final float valueRange = maxValue > 0 ? (maxValue - minValue) : -(minValue - maxValue);
+
+		final double positionRatio = (double) devXSliderLinePosition / _xxDevGraphWidth;
+		int valueIndex = (int) (positionRatio * serieLength);
+
+		// check array bounds
+		valueIndex = Math.min(valueIndex, maxIndex);
+		valueIndex = Math.max(valueIndex, 0);
+
+		// sliderIndex points into the value array for the current slider position
+		float xDataValue = xDataValues[valueIndex];
+
+		// compute the value for the slider on the x-axis
+		final double sliderValue = positionRatio * valueRange;
+
+		if (xDataValue == sliderValue) {
+
+			// nothing to do
+
+		} else if (sliderValue > xDataValue) {
+
+			/*
+			 * in the value array move towards the end to find the position where the value of the
+			 * slider corresponds with the value in the value array
+			 */
+
+			while (sliderValue > xDataValue) {
+
+				xDataValue = xDataValues[valueIndex++];
+
+				// check if end of the x-data are reached
+				if (valueIndex == serieLength) {
+					break;
+				}
+			}
+			valueIndex--;
+			xDataValue = xDataValues[valueIndex];
+
+		} else {
+
+			/*
+			 * xDataValue > sliderValue
+			 */
+
+			while (sliderValue < xDataValue) {
+
+				// check if beginning of the x-data are reached
+				if (valueIndex == 0) {
+					break;
+				}
+
+				xDataValue = xDataValues[--valueIndex];
+			}
+		}
 
 		/*
-		 * disabled because gps data can have non-linear time, 15.01.2008 Wolfgang
+		 * This is a bit of a hack because at some positions the value is too small. Solving the
+		 * problem in the algorithm would take more time than using this hack.
 		 */
-//		final int xAxisUnit = xData.getAxisUnit();
-//
-//		if (xAxisUnit == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_SECOND) {
-//
-//			/*
-//			 * For a linear x axis the slider value is also linear
-//			 */
-//
-//			final float widthScale = (float) (maxIndex) / fDevVirtualGraphImageWidth;
-//
-//			// ensure the index is not out of bounds
-//			valueIndex = (int) Math.max(0, Math.min(devXSliderLinePosition * widthScale, maxIndex));
-//
-//			xValue = xValues[valueIndex];
-//
-//		} else
-		{
-
-			/*
-			 * The non time value (distance) is not linear, the value is increasing steadily but
-			 * with different distance on the x axis. So first we have to find the nearest position
-			 * in the values array and then interpolite from the found position to the slider
-			 * position
-			 */
-
-			final int minValue = xData.getVisibleMinValue();
-			final int maxValue = xData.getVisibleMaxValue();
-			final int valueRange = maxValue > 0 ? (maxValue - minValue) : -(minValue - maxValue);
-
-			final float positionRatio = (float) devXSliderLinePosition / _devVirtualGraphImageWidth;
-			valueIndex = (int) (positionRatio * serieLength);
-
-			// check array bounds
-			valueIndex = Math.min(valueIndex, maxIndex);
-			valueIndex = Math.max(valueIndex, 0);
-
-			// sliderIndex points into the value array for the current slider position
-			xDataValue = xDataValues[valueIndex];
-
-			// compute the value for the slider on the x-axis
-			final int sliderValue = (int) (positionRatio * valueRange);
-
-			if (xDataValue == sliderValue) {
-
-				// nothing to do
-
-			} else if (sliderValue > xDataValue) {
-
-				/*
-				 * in the value array move towards the end to find the position where the value of
-				 * the slider corresponds with the value in the value array
-				 */
-
-				while (sliderValue > xDataValue) {
-
-					xDataValue = xDataValues[valueIndex++];
-
-					// check if end of the x-data are reached
-					if (valueIndex == serieLength) {
-						break;
-					}
-				}
-				valueIndex--;
-				xDataValue = xDataValues[valueIndex];
-
-			} else {
-
-				/*
-				 * xDataValue > sliderValue
-				 */
-
-				while (sliderValue < xDataValue) {
-
-					// check if beginning of the x-data are reached
-					if (valueIndex == 0) {
-						break;
-					}
-
-					xDataValue = xDataValues[--valueIndex];
-				}
-			}
-
-			/*
-			 * This is a bit of a hack because at some positions the value is too small. Solving the
-			 * problem in the algorithm would take more time than using this hack.
-			 */
-			if (xDataValue < sliderValue) {
-				valueIndex++;
-			}
-
-			// enforce maxIndex
-			valueIndex = Math.min(valueIndex, maxIndex);
-			xDataValue = xDataValues[valueIndex];
-
-			// !!! debug values !!!
-//			xValue = valueIndex * 1000;
-//			xValue = (int) (slider.getPositionRatio() * 1000000000);
+		if (xDataValue < sliderValue) {
+			valueIndex++;
 		}
+
+		// check array bounds
+		valueIndex = Math.min(valueIndex, maxIndex);
+		xDataValue = xDataValues[valueIndex];
+
+		// !!! debug values !!!
+//		xValue = valueIndex * 1000;
+//		xValue = (int) (slider.getPositionRatio() * 1000000000);
 
 		slider.setValuesIndex(valueIndex);
 		slider.setValueX(xDataValue);
@@ -968,7 +997,7 @@ public class ChartComponentGraph extends Canvas {
 
 				actionSelectBars();
 
-				_toolTipV1.toolTip20Hide();
+				_hoveredBarToolTip.toolTip20Hide();
 
 				_chart.fillContextMenu(
 						menuMgr,
@@ -976,8 +1005,8 @@ public class ChartComponentGraph extends Canvas {
 						_contextRightSlider,
 						_hoveredBarSerieIndex,
 						_hoveredBarValueIndex,
-						_mouseDownDevPositionX,
-						_mouseDownDevPositionY);
+						_devXMouseDown,
+						_devYMouseDown);
 			}
 		});
 
@@ -1041,17 +1070,17 @@ public class ChartComponentGraph extends Canvas {
 	 * Creates the label(s) and the position for each graph
 	 * 
 	 * @param gc
-	 * @param slider
+	 * @param xSlider
 	 */
-	private void createXSliderLabel(final GC gc, final ChartXSlider slider) {
+	private void createXSliderLabel(final GC gc, final ChartXSlider xSlider) {
 
-		final int devSliderLinePos = slider.getDevVirtualSliderLinePos() - getDevGraphImageXOffset();
+		final int devSliderLinePos = xSlider.getXXDevSliderLinePos() - _xxDevViewPortLeftBorder;
 
-		int sliderValuesIndex = slider.getValuesIndex();
+		int sliderValuesIndex = xSlider.getValuesIndex();
 		// final int valueX = slider.getValueX();
 
 		final ArrayList<ChartXSliderLabel> labelList = new ArrayList<ChartXSliderLabel>();
-		slider.setLabelList(labelList);
+		xSlider.setLabelList(labelList);
 
 		final ScrollBar hBar = getHorizontalBar();
 		final int hBarOffset = hBar.isVisible() ? hBar.getSelection() : 0;
@@ -1086,13 +1115,13 @@ public class ChartComponentGraph extends Canvas {
 
 			// draw label on the left or on the right side of the slider,
 			// depending on the slider position
-			final int[] yValues = yData.getHighValues()[0];
+			final float[] yValues = yData.getHighValues()[0];
 
 			// make sure the slider value index is not of bounds, this can
 			// happen when the data have changed
 			sliderValuesIndex = Math.min(sliderValuesIndex, yValues.length - 1);
 
-			final int yValue = yValues[sliderValuesIndex];
+			final float yValue = yValues[sliderValuesIndex];
 			// final int xAxisUnit = xData.getAxisUnit();
 			final StringBuilder labelText = new StringBuilder();
 
@@ -1101,7 +1130,7 @@ public class ChartComponentGraph extends Canvas {
 
 				// format: mm:ss
 
-				labelText.append(Util.format_mm_ss(yValue));
+				labelText.append(Util.format_mm_ss((long) yValue));
 
 			} else {
 
@@ -1110,7 +1139,7 @@ public class ChartComponentGraph extends Canvas {
 				if (valueDivisor == 1) {
 					labelText.append(_nf.format(yValue));
 				} else {
-					labelText.append(_nf.format((float) yValue / valueDivisor));
+					labelText.append(_nf.format(yValue / valueDivisor));
 				}
 			}
 
@@ -1125,7 +1154,7 @@ public class ChartComponentGraph extends Canvas {
 
 			final int labelRightPos = labelXPos + labelWidth;
 
-			if (slider == _xSliderDragged) {
+			if (xSlider == _xSliderDragged) {
 				/*
 				 * current slider is the dragged slider, clip the slider label position at the
 				 * viewport
@@ -1149,16 +1178,8 @@ public class ChartComponentGraph extends Canvas {
 					/*
 					 * show the whole label when the slider is on the right border
 					 */
-					if (_canScrollZoomedChart) {
-
-						if (labelRightPos > _devVirtualGraphImageWidth) {
-							labelXPos = _devVirtualGraphImageWidth - labelWidth - 1;
-						}
-
-					} else {
-						if (labelRightPos > getDevVisibleChartWidth()) {
-							labelXPos = getDevVisibleChartWidth() - labelWidth - 1;
-						}
+					if (labelRightPos > getDevVisibleChartWidth()) {
+						labelXPos = getDevVisibleChartWidth() - labelWidth - 1;
 					}
 				}
 			}
@@ -1174,404 +1195,356 @@ public class ChartComponentGraph extends Canvas {
 			/*
 			 * get the y position of the marker which marks the y value in the graph
 			 */
-			int yGraph = drawingData.getDevYBottom()
-					- (int) ((yValue - drawingData.getGraphYBottom()) * drawingData.getScaleY())
-					- 0;
+			int devYGraph = drawingData.getDevYBottom()
+					- (int) ((yValue - drawingData.getGraphYBottom()) * drawingData.getScaleY());
 
 			if (yValue < yData.getVisibleMinValue()) {
-				yGraph = drawingData.getDevYBottom();
+				devYGraph = drawingData.getDevYBottom();
 			}
 			if (yValue > yData.getVisibleMaxValue()) {
-				yGraph = drawingData.getDevYTop();
+				devYGraph = drawingData.getDevYTop();
 			}
-			label.yGraph = yGraph;
+			label.devYGraph = devYGraph;
 		}
 	}
 
-	/**
-	 * Autoscroll to the left or right if the mouse is outside of the clientrect
-	 */
+	void disposeColors() {
+		_colorCache.dispose();
+	}
+
 	private void doAutoScroll() {
 
-		final ScrollBar hBar = getHorizontalBar();
-		final Display display = getDisplay();
-		final int autoScrollInterval = 1;
-		final int visibleGraphWidth = getDevVisibleChartWidth();
+// this is not working the mouse can't sometime not be zoomed to the border, depending on the mouse speed
+//		/*
+//		 * check if the mouse has reached the left or right border
+//		 */
+//		if (_graphDrawingData == null
+//				|| _graphDrawingData.size() == 0
+//				|| _hoveredLineValueIndex == 0
+//				|| _hoveredLineValueIndex == _graphDrawingData.get(0).getXData()._highValues.length - 1) {
+//
+//			_isAutoScroll = false;
+//
+//			return;
+//		}
 
-		if (hBar.isVisible() == false) {
+		final int AUTO_SCROLL_INTERVAL = 50; // 20ms == 50fps
 
-			// no horizontal scrollbar, the graph fits into the client area
+		_isAutoScroll = true;
 
-			// make sure the sliders are at the border of the visible area
-			if (_devXScrollSliderLine < 0) {
-				moveXSlider(_xSliderDragged, 0);
-			} else {
-				if (_devXScrollSliderLine > visibleGraphWidth - 1) {
-					moveXSlider(_xSliderDragged, visibleGraphWidth - 1);
-				}
-			}
-			// redraw slider
-			_isSliderDirty = true;
+		_autoScrollCounter[0]++;
 
-			redraw();
+		getDisplay().timerExec(AUTO_SCROLL_INTERVAL, new Runnable() {
 
-		} else {
-
-			// scrollbar is visible, graph is wider than the client area
-
-			// make sure the sliders are at the border of the visible area
-			// before auto scrolling starts
-			if (_devXScrollSliderLine < 0) {
-				moveXSlider(_xSliderDragged, hBar.getSelection());
-			} else {
-				if (_devXScrollSliderLine >= visibleGraphWidth - 1) {
-					moveXSlider(_xSliderDragged, hBar.getSelection() + visibleGraphWidth - 1);
-				}
-			}
-			// redraw slider
-			_isSliderDirty = true;
-			redraw();
-
-			computeAutoScrollOffset();
-
-			if (_autoScrollOffset != 0) {
-
-				// the graph can be scrolled
-
-				// ensure that only one instance will run
-				_isAutoScrollActive = true;
-
-				// start auto scrolling
-				display.timerExec(autoScrollInterval, new Runnable() {
-
-					public void run() {
-
-						if (isDisposed() || _xSliderDragged == null) {
-							_isAutoScrollActive = false;
-							return;
-						}
-
-						// scroll the horizontal scroll bar
-						final ScrollBar hBar = getHorizontalBar();
-
-						computeAutoScrollOffset();
-
-						hBar.setSelection(hBar.getSelection() + _autoScrollOffset);
-
-						// scroll the slider
-						moveXSlider(_xSliderDragged, _xSliderDragged.getDevVirtualSliderLinePos() + _autoScrollOffset);
-
-						// redraw slider
-						_isSliderDirty = true;
-						redraw();
-
-						// start scrolling again if the bounds have not been
-						// reached
-						if (_autoScrollOffset != 0) {
-							display.timerExec(autoScrollInterval, this);
-						} else {
-							_isAutoScrollActive = false;
-						}
-					}
-				});
-
-			}
-		}
-	}
-
-	/**
-	 * Paint event handler
-	 * 
-	 * <pre>
-	 * Top-down sequence how the images are painted
-	 * 
-	 * {@link #_sliderImage}
-	 * {@link #_customFgLayerImage}
-	 * {@link #_chartImage}
-	 * {@link #_graphImage}
-	 * </pre>
-	 * 
-	 * @param gc
-	 */
-	private void draw000Chart(final GC gc) {
-
-		if (_graphDrawingData == null || _graphDrawingData.size() == 0) {
-
-			// fill the image area when there is no graphic
-			gc.setBackground(_chart.getBackgroundColor());
-			gc.fillRectangle(_clientArea);
-
-			draw999ErrorMessage(gc);
-
-			return;
-		}
-
-		if (_isChartDirty) {
-
-			draw100ChartImage();
-
-			if (_isPaintDraggedImage) {
-
-				/*
-				 * paint dragged chart until the chart is recomputed
-				 */
-				draw020DraggedChart(gc);
-				return;
-			}
-
-			// prevent flickering the graph
-
-			/*
-			 * mac osx is still flickering, added the drawChartImage in version 1.0
-			 */
-			if (_chartImage != null) {
-
-				final Image image = draw010ChartImage(gc);
-				if (image == null) {
-					return;
-				}
-
-				final int gcHeight = _clientArea.height;
-				final int imageHeight = image.getBounds().height;
-
-				if (gcHeight > imageHeight) {
-
-					// fill the gap between the image and the drawable area
-					gc.setBackground(_chart.getBackgroundColor());
-					gc.fillRectangle(0, imageHeight, _clientArea.width, _clientArea.height - imageHeight);
-
-				} else {
-					gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
-				}
-			} else {
-				gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-			}
-
-			return;
-		}
-
-		/*
-		 * if the graph was not drawn (because this is done in another thread) there is nothing to
-		 * do
-		 */
-		if (_chartImage == null) {
-			// fill the image area when there is no graphic
-			gc.setBackground(_chart.getBackgroundColor());
-			gc.fillRectangle(_clientArea);
-			gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
-			return;
-		}
-
-		// calculate the scrollbars before the sliders are created
-		updateHorizontalBar();
-
-		draw300CustomFgLayerImage();
-		draw010ChartImage(gc);
-	}
-
-	private Image draw010ChartImage(final GC gc) {
-
-		final boolean isSliderImageVisible = _isXSliderVisible
-				|| _isYSliderVisible
-				|| _isXMarkerMoved
-				|| _isSelectionVisible;
-
-		if (isSliderImageVisible) {
-			draw400SliderImage();
-		}
-
-		final Rectangle chartRect = _chartImage.getBounds();
-		final ScrollBar hBar = getHorizontalBar();
-		int imageScrollPosition = 0;
-
-		if (chartRect.width < getDevVisibleChartWidth()) {
-
-			// image is smaller than client area, the image is drawn in the top
-			// left corner and the free are is painted with background color
-
-			if (_isXSliderVisible && _sliderImage != null) {
-				hBar.setVisible(false);
-				fillImagePadding(gc, _sliderImage.getBounds());
-			} else {
-				fillImagePadding(gc, chartRect);
-			}
-		} else {
-			if (hBar.isVisible()) {
-				// move the image when the horizontal bar is visible
-				imageScrollPosition = -hBar.getSelection();
-			}
-		}
-
-		if (isSliderImageVisible) {
-			if (_sliderImage != null) {
-				gc.drawImage(_sliderImage, imageScrollPosition, 0);
-			}
-			return _sliderImage;
-
-		} else {
-
-			if (_chartImage != null) {
-				gc.drawImage(_chartImage, imageScrollPosition, 0);
-			}
-			return _chartImage;
-		}
-	}
-
-	private void draw020DraggedChart(final GC gc) {
-
-		if (_draggedChartDraggedPos == null) {
-			return;
-		}
-
-		final int devXDiff = _draggedChartDraggedPos.x - _draggedChartStartPos.x;
-		final int devYDiff = 0;
-
-		gc.setBackground(_chart.getBackgroundColor());
-
-		if (devXDiff > 0) {
-			gc.fillRectangle(0, devYDiff, devXDiff, _clientArea.height);
-		} else {
-			gc.fillRectangle(_clientArea.width + devXDiff, devYDiff, -devXDiff, _clientArea.height);
-		}
-
-		if (_customFgLayerImage != null && _customFgLayerImage.isDisposed() == false) {
-			gc.drawImage(_customFgLayerImage, devXDiff, devYDiff);
-		} else if (_sliderImage != null && _sliderImage.isDisposed() == false) {
-			gc.drawImage(_sliderImage, devXDiff, devYDiff);
-		} else if (_chartImage != null && _chartImage.isDisposed() == false) {
-			gc.drawImage(_chartImage, devXDiff, devYDiff);
-		}
-	}
-
-	/**
-	 * draws the graphs into the chart/graph image
-	 */
-	private void draw100ChartImage() {
-
-		_drawCounter[0]++;
-
-		final Runnable drawRunnable = new Runnable() {
-
-			final int	__runnableDrawCounter	= _drawCounter[0];
+			final int	__runnableScrollCounter	= _autoScrollCounter[0];
 
 			public void run() {
 
-//				final long startTime = System.currentTimeMillis();
-//				// TODO remove SYSTEM.OUT.PRINTLN
+				if (__runnableScrollCounter != _autoScrollCounter[0]) {
+					return;
+				}
+
+				if (isDisposed()
+						|| _isAutoScroll == false
+						|| (_xSliderDragged == null && _devXAutoScrollMousePosition == Integer.MIN_VALUE)) {
+
+					// make sure that autoscroll/automove is disabled
+
+					_isAutoScroll = false;
+					_devXAutoScrollMousePosition = Integer.MIN_VALUE;
+
+					return;
+				}
+
+				_isDisableHoveredLineValueIndex = true;
+
+				/*
+				 * the offset values are determined experimentally and depends on the mouse position
+				 */
+				int devMouseOffset = 0;
+
+				if (_devXAutoScrollMousePosition != Integer.MIN_VALUE) {
+
+					if (_devXAutoScrollMousePosition < 0) {
+
+						// autoscroll the graph to the left
+
+						for (final int[] accelerator : _leftAccelerator) {
+							if (_devXAutoScrollMousePosition < accelerator[0]) {
+								devMouseOffset = accelerator[1];
+								break;
+							}
+						}
+
+					} else {
+
+						// autoscroll the graph to the right
+
+						final int devXAutoScrollMousePositionRelative = _devXAutoScrollMousePosition
+								- getDevVisibleChartWidth();
+
+						for (final int[] accelerator : _rightAccelerator) {
+							if (devXAutoScrollMousePositionRelative < accelerator[0]) {
+								devMouseOffset = accelerator[1];
+								break;
+							}
+						}
+					}
+
+					doAutoScroll10RunnableScrollGraph(this, AUTO_SCROLL_INTERVAL, devMouseOffset);
+
+				} else {
+
+					if (_devXDraggedXSliderLine < 0) {
+
+						// move x-slider to the left
+
+						for (final int[] accelerator : _leftAccelerator) {
+							if (_devXDraggedXSliderLine < accelerator[0]) {
+								devMouseOffset = accelerator[1];
+								break;
+							}
+						}
+
+					} else {
+
+						// move x-slider to the right
+
+						final int devXSliderLineRelative = _devXDraggedXSliderLine - getDevVisibleChartWidth();
+
+						for (final int[] accelerator : _rightAccelerator) {
+							if (devXSliderLineRelative < accelerator[0]) {
+								devMouseOffset = accelerator[1];
+								break;
+							}
+						}
+					}
+
+					doAutoScroll20RunnableMoveSlider(this, AUTO_SCROLL_INTERVAL, devMouseOffset);
+				}
+			}
+		});
+	}
+
+	private void doAutoScroll10RunnableScrollGraph(	final Runnable runnable,
+													final int autoScrollInterval,
+													final int devMouseOffset) {
+
+		final int xxDevNewPosition = _xxDevViewPortLeftBorder + devMouseOffset;
+
+		// reposition chart
+		setChartPosition(xxDevNewPosition);
+
+		// check if scrolling can be redone
+		final boolean isRepeatScrollingLeft = _xxDevViewPortLeftBorder > 1;
+		final boolean isRepeatScrollingRight = xxDevNewPosition < _xxDevGraphWidth;
+		final boolean isRepeatScrolling = isRepeatScrollingLeft || isRepeatScrollingRight;
+
+		// start scrolling again when the bounds have not been reached
+		if (isRepeatScrolling) {
+			getDisplay().timerExec(autoScrollInterval, runnable);
+		} else {
+			_isAutoScroll = false;
+		}
+	}
+
+	private void doAutoScroll20RunnableMoveSlider(	final Runnable runnable,
+													final int autoScrollInterval,
+													final int devMouseOffset) {
+
+		// get new slider position
+		final int xxDevOldSliderLinePos = _xSliderDragged.getXXDevSliderLinePos();
+		final int xxDevNewSliderLinePos2 = xxDevOldSliderLinePos + devMouseOffset;
+		final int xxDevNewSliderLinePos3 = xxDevNewSliderLinePos2 - _xxDevViewPortLeftBorder;
+
+		// move the slider
+		moveXSlider(_xSliderDragged, xxDevNewSliderLinePos3);
+
+		// redraw slider
+		_isSliderDirty = true;
+		redraw();
+
+		// redraw chart
+		setChartPosition(_xSliderDragged, false);
+
+		final boolean isRepeatScrollingLeft = _xxDevViewPortLeftBorder > 1;
+		final boolean isRepeatScrollingRight = _xxDevViewPortLeftBorder + xxDevNewSliderLinePos3 < _xxDevGraphWidth;
+		final boolean isRepeatScrolling = isRepeatScrollingLeft || isRepeatScrollingRight;
+
+		// start scrolling again when the bounds have not been reached
+		if (isRepeatScrolling) {
+			getDisplay().timerExec(autoScrollInterval, runnable);
+		} else {
+			_isAutoScroll = false;
+		}
+	}
+
+	private void doAutoZoomToXSliders() {
+
+		if (_canAutoZoomToSlider) {
+
+			// the graph can't be scrolled but the graph should be
+			// zoomed to the x-slider positions
+
+			// zoom into the chart
+			getDisplay().asyncExec(new Runnable() {
+				public void run() {
+					if (!isDisposed()) {
+						_chart.onExecuteZoomInWithSlider();
+					}
+				}
+			});
+		}
+	}
+
+	/**
+	 * Draw the graphs into the chart+graph image
+	 * 
+	 * @return Return <code>true</code> when the graph was painted directly and not in async mode
+	 */
+	private boolean drawAsync100StartPainting() {
+
+		// get time when the redraw of the may is requested
+		final long requestedRedrawTime = System.currentTimeMillis();
+
+		_drawAsyncCounter[0]++;
+
+//		if (requestedRedrawTime > _lastChartDrawingTime + 100) {
+//
+//			// force a redraw
+//
+//			drawAsync101DoPainting();
+//
+//			return true;
+//
+//		} else {
+//
+		getDisplay().asyncExec(new Runnable() {
+
+			final int	__runnableBgCounter	= _drawAsyncCounter[0];
+
+			public void run() {
 
 				/*
 				 * create the chart image only when a new onPaint event has not occured
 				 */
-				if (__runnableDrawCounter != _drawCounter[0]) {
+				if (__runnableBgCounter != _drawAsyncCounter[0]) {
 					// a new onPaint event occured
 					return;
 				}
 
-				if (isDisposed()) {
-					// this widget is disposed
-					return;
-				}
-
-				if (_graphDrawingData.size() == 0) {
-					// drawing data are not set
-					return;
-				}
-
-				final int devNonScrolledImageWidth = Math.max(
-						ChartComponents.CHART_MIN_WIDTH,
-						getDevVisibleChartWidth());
-
-				final int devNewImageWidth = _canScrollZoomedChart
-						? _devVirtualGraphImageWidth
-						: devNonScrolledImageWidth;
-
-				/*
-				 * the image size is adjusted to the client size but it must be within the min/max
-				 * ranges
-				 */
-				final int devNewImageHeight = Math.max(
-						ChartComponents.CHART_MIN_HEIGHT,
-						Math.min(getDevVisibleGraphHeight(), ChartComponents.CHART_MAX_HEIGHT));
-
-				/*
-				 * when the image is the same size as the new we will redraw it only if it is set to
-				 * dirty
-				 */
-				if (_isChartDirty == false && _chartImage != null) {
-
-					final Rectangle oldBounds = _chartImage.getBounds();
-
-					if (oldBounds.width == devNewImageWidth && oldBounds.height == devNewImageHeight) {
-						return;
-					}
-				}
-
-				final Rectangle chartImageRect = new Rectangle(0, 0, devNewImageWidth, devNewImageHeight);
-
-				// ensure correct image size
-				if (chartImageRect.width <= 0 || chartImageRect.height <= 0) {
-					return;
-				}
-
-				// create image on which the graph is drawn
-				if (Util.canReuseImage(_chartImage, chartImageRect) == false) {
-					_chartImage = Util.createImage(getDisplay(), _chartImage, chartImageRect);
-				}
-
-				/*
-				 * graph image is only the part where ONE single graph is painted without any title
-				 * or unit tick/values
-				 */
-				final int devGraphHeight = _graphDrawingData.get(0).devGraphHeight;
-				final Rectangle graphImageRect = new Rectangle(0, 0, //
-						devNewImageWidth,
-						devGraphHeight < 1 ? 1 : devGraphHeight + 1); // ensure valid height
-
-				if (Util.canReuseImage(_graphImage, graphImageRect) == false) {
-					_graphImage = Util.createImage(getDisplay(), _graphImage, graphImageRect);
-				}
-
-				// create chart context
-				final GC gcChart = new GC(_chartImage);
-				final GC gcGraph = new GC(_graphImage);
-				{
-					gcChart.setFont(_chart.getFont());
-
-					// fill background
-					gcChart.setBackground(_chart.getBackgroundColor());
-					gcChart.fillRectangle(_chartImage.getBounds());
-
-					if (_chartComponents.errorMessage == null) {
-
-						draw102GraphImage(gcChart, gcGraph);
-
-					} else {
-
-						// an error was set in the chart data model
-						draw999ErrorMessage(gcChart);
-					}
-				}
-				gcChart.dispose();
-				gcGraph.dispose();
-
-				// remove dirty status
-				_isChartDirty = false;
-
-				// dragged image will be painted until the graph image is recomputed
-				_isPaintDraggedImage = false;
-
-				// force the layer image to be redrawn
-				_isSliderImageDirty = true;
-
-				redraw();
-
-//				final long endTime = System.currentTimeMillis();
-//				System.out.println("Execution time : " + (endTime - startTime) + " ms   #:" + _drawCounter[0]);
-//				// TODO remove SYSTEM.OUT.PRINTLN
+				drawAsync101DoPainting();
 			}
-		};
+		});
+//		}
 
-		getDisplay().asyncExec(drawRunnable);
+		return false;
+	}
+
+	private void drawAsync101DoPainting() {
+
+		final long startTime = System.nanoTime();
+		// TODO remove SYSTEM.OUT.PRINTLN
+
+		if (isDisposed()) {
+			// this widget is disposed
+			return;
+		}
+
+		if (_graphDrawingData.size() == 0) {
+			// drawing data are not set
+			return;
+		}
+
+		// ensure minimum size
+		final int devNewImageWidth = Math.max(ChartComponents.CHART_MIN_WIDTH, getDevVisibleChartWidth());
+
+		/*
+		 * the image size is adjusted to the client size but it must be within the min/max ranges
+		 */
+		final int devNewImageHeight = Math.max(
+				ChartComponents.CHART_MIN_HEIGHT,
+				Math.min(getDevVisibleGraphHeight(), ChartComponents.CHART_MAX_HEIGHT));
+
+		/*
+		 * when the image is the same size as the new we will redraw it only if it is set to dirty
+		 */
+		if (_isChartDirty == false && _chartImage20Chart != null) {
+
+			final Rectangle oldBounds = _chartImage20Chart.getBounds();
+
+			if (oldBounds.width == devNewImageWidth && oldBounds.height == devNewImageHeight) {
+				return;
+			}
+		}
+
+		final Rectangle chartImageRect = new Rectangle(0, 0, devNewImageWidth, devNewImageHeight);
+
+		// ensure correct image size
+		if (chartImageRect.width <= 0 || chartImageRect.height <= 0) {
+			return;
+		}
+
+		// create image on which the graph is drawn
+		if (Util.canReuseImage(_chartImage20Chart, chartImageRect) == false) {
+			_chartImage20Chart = Util.createImage(getDisplay(), _chartImage20Chart, chartImageRect);
+		}
+
+		/*
+		 * The graph image is only a part where ONE single graph is painted without any title or
+		 * unit tick/values
+		 */
+		final int devGraphHeight = _graphDrawingData.get(0).devGraphHeight;
+		final Rectangle graphImageRect = new Rectangle(0, 0, //
+				devNewImageWidth,
+				devGraphHeight < 1 ? 1 : devGraphHeight + 1); // ensure valid height
+
+		if (Util.canReuseImage(_chartImage10Graphs, graphImageRect) == false) {
+			_chartImage10Graphs = Util.createImage(getDisplay(), _chartImage10Graphs, graphImageRect);
+		}
+
+		// create chart context
+		final GC gcChart = new GC(_chartImage20Chart);
+		final GC gcGraph = new GC(_chartImage10Graphs);
+		{
+			gcChart.setFont(_chart.getFont());
+
+			// fill background
+			gcChart.setBackground(_chart.getBackgroundColor());
+			gcChart.fillRectangle(_chartImage20Chart.getBounds());
+
+			if (_chartComponents.errorMessage == null) {
+
+				drawAsync110GraphImage(gcChart, gcGraph);
+
+			} else {
+
+				// an error was set in the chart data model
+				drawSyncBg999ErrorMessage(gcChart);
+			}
+		}
+		gcChart.dispose();
+		gcGraph.dispose();
+
+		// remove dirty status
+		_isChartDirty = false;
+
+		// dragged image will be painted until the graph image is recomputed
+		_isPaintDraggedImage = false;
+
+		// force the overlay image to be redrawn
+		_isOverlayDirty = true;
+
+		redraw();
+
+		_lastChartDrawingTime = System.currentTimeMillis();
+
+//		final long endTime = System.nanoTime();
+//		System.out.println("drawAsync100: "
+//				+ (((double) endTime - startTime) / 1000000)
+//				+ " ms   #:"
+//				+ _drawAsyncCounter[0]);
+//		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 	/**
@@ -1581,57 +1554,62 @@ public class ChartComponentGraph extends Canvas {
 	 * @param gcChart
 	 * @param gcGraph
 	 */
-	private void draw102GraphImage(final GC gcChart, final GC gcGraph) {
+	private void drawAsync110GraphImage(final GC gcChart, final GC gcGraph) {
 
 		int graphIndex = 0;
 		final int lastGraphIndex = _graphDrawingData.size() - 1;
 
-		final Color chartBackgroundColor = _chart.getBackgroundColor();
-		final Rectangle graphBounds = _graphImage.getBounds();
+		// reset line positions, they are set when a line graph is painted
+		_lineDevPositions.clear();
+		_lineFocusRectangles.clear();
 
-		// loop: all graphs in a chart
-		for (final GraphDrawingData graphDrawingData : _graphDrawingData) {
+		final Color chartBackgroundColor = _chart.getBackgroundColor();
+		final Rectangle graphBounds = _chartImage10Graphs.getBounds();
+
+		// loop: all graphs in the chart
+		for (final GraphDrawingData drawingData : _graphDrawingData) {
 
 			// fill background
 			gcGraph.setBackground(chartBackgroundColor);
-//			gcGraph.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 			gcGraph.fillRectangle(graphBounds);
 
-			final int chartType = graphDrawingData.getChartType();
+			final int chartType = drawingData.getChartType();
 
 			if (graphIndex == 0) {
-				draw130XTitle(gcChart, graphDrawingData);
+				drawAsync200XTitle(gcChart, drawingData);
 			}
 
-			draw120SegmentBg(gcGraph, graphDrawingData);
+			drawAsync150Segments(gcGraph, drawingData);
 
 			if (graphIndex == lastGraphIndex) {
 				// draw the unit label and unit tick for the last graph
-				draw132XUnitsAndVGrid(gcChart, gcGraph, graphDrawingData, true);
+				drawAsync210XUnitsAndVGrid(gcChart, gcGraph, drawingData, true);
 			} else {
-				draw132XUnitsAndVGrid(gcChart, gcGraph, graphDrawingData, false);
+				drawAsync210XUnitsAndVGrid(gcChart, gcGraph, drawingData, false);
 			}
 
 			// draw only the horizontal grid
-			draw140XAsisHGrid(gcGraph, graphDrawingData, false);
+			drawAsync220XAsisHGrid(gcGraph, drawingData, false);
+
+			if (chartType == ChartDataModel.CHART_TYPE_LINE || chartType == ChartDataModel.CHART_TYPE_LINE) {}
 
 			// draw units and grid on the x and y axis
 			switch (chartType) {
 			case ChartDataModel.CHART_TYPE_LINE:
-				draw200LineGraph(gcGraph, graphDrawingData);
-				draw204RangeMarker(gcGraph, graphDrawingData);
+				drawAsync500LineGraph(gcGraph, drawingData);
+				drawAsync520RangeMarker(gcGraph, drawingData);
 				break;
 
 			case ChartDataModel.CHART_TYPE_BAR:
-				draw210BarGraph(gcGraph, graphDrawingData);
+				drawAsync530BarGraph(gcGraph, drawingData);
 				break;
 
 			case ChartDataModel.CHART_TYPE_LINE_WITH_BARS:
-				draw220LineWithBarGraph(gcGraph, graphDrawingData);
+				drawAsync540LineWithBarGraph(gcGraph, drawingData);
 				break;
 
 			case ChartDataModel.CHART_TYPE_XY_SCATTER:
-				draw230XYScatter(gcGraph, graphDrawingData);
+				drawAsync550XYScatter(gcGraph, drawingData);
 				break;
 
 			default:
@@ -1639,16 +1617,36 @@ public class ChartComponentGraph extends Canvas {
 			}
 
 			// draw only the x-axis, this is drawn lately because the graph can overwrite it
-			draw140XAsisHGrid(gcGraph, graphDrawingData, true);
+			drawAsync220XAsisHGrid(gcGraph, drawingData, true);
 
 			// draw graph image into the chart image
-			gcChart.drawImage(_graphImage, 0, graphDrawingData.getDevYTop());
+			gcChart.drawImage(_chartImage10Graphs, 0, drawingData.getDevYTop());
+
+//			System.out.println("20 <- 10\tdrawAsync110GraphImage");
+//			// TODO remove SYSTEM.OUT.PRINTLN
 
 			graphIndex++;
 		}
+
+		if (valuePointToolTip != null) {
+
+			if (_hoveredLineValueIndex == -1) {
+				valuePointToolTip.hide();
+			} else {
+
+				final Point hoveredLinePosition = getAndCheckHoveredLinePosition();
+
+				valuePointToolTip.setValueIndex(
+						_hoveredLineValueIndex,
+						_devXMouseMove,
+						_devYMouseMove,
+						hoveredLinePosition,
+						_graphZoomRatio);
+			}
+		}
 	}
 
-	private void draw120SegmentBg(final GC gc, final GraphDrawingData drawingData) {
+	private void drawAsync150Segments(final GC gc, final GraphDrawingData drawingData) {
 
 		final ChartSegments chartSegments = drawingData.getXData().getChartSegments();
 
@@ -1679,10 +1677,10 @@ public class ChartComponentGraph extends Canvas {
 				final int startValue = startValues[segmentIndex];
 				final int endValue = endValues[segmentIndex];
 
-				final int devXValueStart = (int) (scaleX * startValue) - _devGraphImageXOffset;
+				final int devXValueStart = (int) (scaleX * startValue) - _xxDevViewPortLeftBorder;
 
 				// adjust endValue to fill the last part of the segment
-				final int devValueEnd = (int) (scaleX * (endValue + 1)) - _devGraphImageXOffset;
+				final int devValueEnd = (int) (scaleX * (endValue + 1)) - _xxDevViewPortLeftBorder;
 
 				gc.setBackground(alternateColor);
 				gc.fillRectangle(//
@@ -1696,14 +1694,12 @@ public class ChartComponentGraph extends Canvas {
 		alternateColor.dispose();
 	}
 
-	private void draw130XTitle(final GC gc, final GraphDrawingData drawingData) {
+	private void drawAsync200XTitle(final GC gc, final GraphDrawingData drawingData) {
 
 		final ChartSegments chartSegments = drawingData.getXData().getChartSegments();
-		final int devYTitle = drawingData.getDevMarginTop();
+		final int devYTitle = _chartDrawingData.devMarginTop;
 
-		final int devGraphWidth = _canScrollZoomedChart ? //
-				drawingData.devVirtualGraphWidth
-				: _chartComponents.getDevVisibleChartWidth();
+		final int devGraphWidth = _chartComponents.getDevVisibleChartWidth();
 
 		if (chartSegments == null) {
 
@@ -1747,9 +1743,10 @@ public class ChartComponentGraph extends Canvas {
 					final String segmentTitle = segmentTitles[segmentIndex];
 					if (segmentTitle != null) {
 
-						final int devXSegmentStart = (int) (scaleX * valueStart[segmentIndex]) - _devGraphImageXOffset;
+						final int devXSegmentStart = (int) (scaleX * valueStart[segmentIndex])
+								- _xxDevViewPortLeftBorder;
 						final int devXSegmentEnd = (int) (scaleX * (valueEnd[segmentIndex] + 1))
-								- _devGraphImageXOffset;
+								- _xxDevViewPortLeftBorder;
 
 						final int devXSegmentLength = devXSegmentEnd - devXSegmentStart;
 						final int devXSegmentCenter = devXSegmentEnd - (devXSegmentLength / 2);
@@ -1782,14 +1779,14 @@ public class ChartComponentGraph extends Canvas {
 	 *            <code>true</code> indicate to draws the unit tick and unit label additional to the
 	 *            unit grid line
 	 */
-	private void draw132XUnitsAndVGrid(	final GC gcChart,
-										final GC gcGraph,
-										final GraphDrawingData drawingData,
-										final boolean isDrawUnit) {
+	private void drawAsync210XUnitsAndVGrid(final GC gcChart,
+											final GC gcGraph,
+											final GraphDrawingData drawingData,
+											final boolean isDrawUnit) {
 
 		final Display display = getDisplay();
 
-		final ArrayList<ChartUnit> units = drawingData.getXUnits();
+		final ArrayList<ChartUnit> xUnits = drawingData.getXUnits();
 
 		final ChartDataXSerie xData = drawingData.getXData();
 		final int devYBottom = drawingData.getDevYBottom();
@@ -1812,36 +1809,14 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		// get distance between two units
-		final float devUnitWidth = units.size() > 1 //
-				? ((units.get(1).value * scaleX) - (units.get(0).value * scaleX))
+		final float devUnitWidth = xUnits.size() > 1 //
+				? ((xUnits.get(1).value * scaleX) - (xUnits.get(0).value * scaleX))
 				: 0;
 
-		float devXOffset = 0;
-		int unitCounterInvisibleLeft = 0;
-		int unitCounterInvisibleRight = 0;
 		int unitCounter = 0;
-		boolean isUnitVisibilityChecked = false;
-
 		final int devVisibleChartWidth = getDevVisibleChartWidth();
-		final boolean isLineChart = _chartComponents.getChartDataModel().getChartType() != ChartDataModel.CHART_TYPE_BAR;
-
-		/*
-		 * check if units are outside of the visible chart
-		 */
-		if (isLineChart && _canScrollZoomedChart == false && _devGraphImageXOffset > 0) {
-
-			// calculate the unit offset
-			unitCounterInvisibleLeft = (int) (_devGraphImageXOffset / devUnitWidth);
-			unitCounterInvisibleRight = (int) ((_devGraphImageXOffset + devVisibleChartWidth) / devUnitWidth);
-
-			devXOffset -= _devGraphImageXOffset % devUnitWidth;
-
-			isUnitVisibilityChecked = true;
-		}
 
 		boolean isFirstUnit = true;
-//		int devXLastUnitRightPos = 0;
-//		int devXFirstUnitRightPos = 0;
 		int devXLastUnitRightPosition = -1;
 
 		final String unitLabel = drawingData.getXData().getUnitLabel();
@@ -1850,36 +1825,19 @@ public class ChartComponentGraph extends Canvas {
 		gcChart.setForeground(display.getSystemColor(SWT.COLOR_DARK_GRAY));
 		gcGraph.setForeground(_gridColor);
 
-		for (final ChartUnit unit : units) {
-
-			if (isUnitVisibilityChecked) {
-
-				/*
-				 * skip units which are outside of the chart and not displayed
-				 */
-				if (unitCounter < unitCounterInvisibleLeft) {
-
-					devXOffset -= devUnitWidth;
-
-					unitCounter++;
-					continue;
-				}
-
-				if (unitCounter > unitCounterInvisibleRight) {
-					break;
-				}
-			}
+		for (final ChartUnit xUnit : xUnits) {
 
 			// get dev x-position for the unit tick
 			int devXUnitTick;
 			if (isExtendedScaling) {
 
-				final double scaledUnitValue = ((Math.pow(unit.value, scalingFactor)) * extScaleX);
-
-				// scale with devXOffset
+				// extended scaling
+				final double scaledUnitValue = ((Math.pow(xUnit.value, scalingFactor)) * extScaleX);
 				devXUnitTick = (int) (scaledUnitValue);
+
 			} else {
-				devXUnitTick = (int) (devXOffset + (unit.value * scaleX));
+				// scale with devXOffset
+				devXUnitTick = (int) (xUnit.value * scaleX) - _xxDevViewPortLeftBorder;
 			}
 
 			/*
@@ -1912,7 +1870,7 @@ public class ChartComponentGraph extends Canvas {
 					/*
 					 * draw unit value
 					 */
-					final int devUnitValueWidth = gcChart.textExtent(unit.valueLabel).x;
+					final int devUnitValueWidth = gcChart.textExtent(xUnit.valueLabel).x;
 
 					if (devUnitWidth != 0 && xUnitTextPos == GraphDrawingData.X_UNIT_TEXT_POS_CENTER) {
 
@@ -1934,7 +1892,7 @@ public class ChartComponentGraph extends Canvas {
 
 						} else {
 
-							gcChart.drawText(unit.valueLabel, devXUnitLabelPosition, devYBottom + 7, true);
+							gcChart.drawText(xUnit.valueLabel, devXUnitLabelPosition, devYBottom + 7, true);
 
 							devXLastUnitRightPosition = devXUnitLabelPosition + devUnitValueWidth + 0;
 						}
@@ -1963,7 +1921,7 @@ public class ChartComponentGraph extends Canvas {
 								devXUnit = 0;
 							}
 
-							gcChart.drawText(unit.valueLabel, devXUnit, devYBottom + 7, true);
+							gcChart.drawText(xUnit.valueLabel, devXUnit, devYBottom + 7, true);
 
 							// draw unit label (km, mi, h)
 
@@ -2000,7 +1958,7 @@ public class ChartComponentGraph extends Canvas {
 								if (devXUnitValueDefaultPosition > devXLastUnitRightPosition) {
 
 									gcChart.drawText(
-											unit.valueLabel,
+											xUnit.valueLabel,
 											devXUnitValueDefaultPosition,
 											devYBottom + 7,
 											true);
@@ -2018,11 +1976,24 @@ public class ChartComponentGraph extends Canvas {
 				}
 			}
 
+			// draw vertical gridline but not on the vertical 0 line
 			if (devXUnitTick > 0 && isDrawVerticalGrid) {
 
-				// draw vertical gridline, don't draw it on the vertical 0 line
-
+				if (xUnit.isMajorValue) {
+					gcGraph.setLineStyle(SWT.LINE_SOLID);
+					gcGraph.setForeground(_gridColorMajor);
+				} else {
+					/*
+					 * line width is a complicated topic, when it's not set the gridlines of the
+					 * first graph is different than the subsequent graphs, but setting it globally
+					 * degrades performance dramatically
+					 */
+//					gcGraph.setLineWidth(0);
+					gcGraph.setLineDash(DOT_DASHES);
+					gcGraph.setForeground(_gridColor);
+				}
 				gcGraph.drawLine(devXUnitTick, 0, devXUnitTick, drawingData.devGraphHeight);
+
 			}
 
 			unitCounter++;
@@ -2036,7 +2007,9 @@ public class ChartComponentGraph extends Canvas {
 	 * @param drawingData
 	 * @param isDrawOnlyXAsis
 	 */
-	private void draw140XAsisHGrid(final GC gcGraph, final GraphDrawingData drawingData, final boolean isDrawOnlyXAsis) {
+	private void drawAsync220XAsisHGrid(final GC gcGraph,
+										final GraphDrawingData drawingData,
+										final boolean isDrawOnlyXAsis) {
 
 		final Display display = getDisplay();
 
@@ -2044,17 +2017,17 @@ public class ChartComponentGraph extends Canvas {
 		final int unitListSize = yUnits.size();
 
 		final float scaleY = drawingData.getScaleY();
-		final int graphYBottom = drawingData.getGraphYBottom();
+		final float graphYBottom = drawingData.getGraphYBottom();
 		final int devGraphHeight = drawingData.devGraphHeight;
+		final int devVisibleChartWidth = getDevVisibleChartWidth();
 
 		final boolean isBottomUp = drawingData.getYData().isYAxisDirection();
 		final boolean isTopDown = isBottomUp == false;
 
-		final int devYTop = devGraphHeight;
+		final int devYTop = 0;
+		final int devYBottom = devGraphHeight;
 
 		final boolean isDrawHorizontalGrid = _chart.isShowHorizontalGridLines;
-
-		gcGraph.setLineStyle(SWT.LINE_SOLID);
 
 		int devY;
 		int unitIndex = 0;
@@ -2062,20 +2035,18 @@ public class ChartComponentGraph extends Canvas {
 		// loop: all units
 		for (final ChartUnit yUnit : yUnits) {
 
-			final int unitValue = yUnit.value;
-			final double devYUnit = ((unitValue - graphYBottom) * scaleY) + 0.5;
+			final float unitValue = yUnit.value;
+			final float devYUnit = ((unitValue - graphYBottom) * scaleY) + 0.5f;
 
 			if (isBottomUp || unitListSize == 1) {
-				// bottom->top
-				devY = (int) devYUnit;
+				devY = devYBottom - (int) devYUnit;
 			} else {
-				// top->bottom
-				devY = (int) (devYTop - devYUnit);
+				devY = devYTop + (int) devYUnit;
 			}
 
 			// check if a y-unit is on the x axis
-			final boolean isXAxis = (isTopDown && unitIndex == 0) || //
-					(isBottomUp && unitIndex == unitListSize - 1);
+			final boolean isXAxis = (isTopDown && unitIndex == unitListSize - 1) || //
+					(isBottomUp && unitIndex == 0);
 
 			if (isDrawOnlyXAsis) {
 
@@ -2083,8 +2054,9 @@ public class ChartComponentGraph extends Canvas {
 
 				if (isXAxis) {
 
+					gcGraph.setLineStyle(SWT.LINE_SOLID);
 					gcGraph.setForeground(display.getSystemColor(SWT.COLOR_DARK_GRAY));
-					gcGraph.drawLine(0, devY, _devVirtualGraphImageWidth, devY);
+					gcGraph.drawLine(0, devY, devVisibleChartWidth, devY);
 
 					// only the x-axis needs to be drawn
 					break;
@@ -2096,8 +2068,14 @@ public class ChartComponentGraph extends Canvas {
 
 					// draw gridlines
 
-					gcGraph.setForeground(_gridColor);
-					gcGraph.drawLine(0, devY, _devVirtualGraphImageWidth, devY);
+					if (yUnit.isMajorValue) {
+						gcGraph.setLineStyle(SWT.LINE_SOLID);
+						gcGraph.setForeground(_gridColorMajor);
+					} else {
+						gcGraph.setLineDash(DOT_DASHES);
+						gcGraph.setForeground(_gridColor);
+					}
+					gcGraph.drawLine(0, devY, devVisibleChartWidth, devY);
 				}
 			}
 
@@ -2105,84 +2083,99 @@ public class ChartComponentGraph extends Canvas {
 		}
 	}
 
-	private void draw200LineGraph(final GC gc, final GraphDrawingData graphDrawingData) {
+	private void drawAsync500LineGraph(final GC gcGraph, final GraphDrawingData graphDrawingData) {
 
 		final ChartDataXSerie xData = graphDrawingData.getXData();
 		final ChartDataYSerie yData = graphDrawingData.getYData();
 
-		final int xValues[] = xData.getHighValues()[0];
+		final int serieSize = xData.getHighValues()[0].length;
 		final float scaleX = graphDrawingData.getScaleX();
+
+		// create line hovered positions
+		_lineFocusRectangles.add(new Rectangle[serieSize]);
+		_lineDevPositions.add(new Point[serieSize]);
+		_isHoveredLineVisible = true;
 
 		final RGB rgbFg = yData.getRgbLine()[0];
 		final RGB rgbBgDark = yData.getRgbDark()[0];
 		final RGB rgbBgBright = yData.getRgbBright()[0];
 
 		// get the horizontal offset for the graph
-		int graphValueOffset;
+		float graphValueOffset;
 		if (_chartComponents._synchConfigSrc == null) {
 			// a zoom marker is not set, draw it normally
-			graphValueOffset = (int) (Math.max(0, _devGraphImageXOffset) / scaleX);
+			graphValueOffset = Math.max(0, _xxDevViewPortLeftBorder) / scaleX;
 		} else {
 			// adjust the start position to the zoom marker position
-			graphValueOffset = (int) (_devGraphImageXOffset / scaleX);
+			graphValueOffset = _xxDevViewPortLeftBorder / scaleX;
 		}
 
 		if (xData.getSynchMarkerStartIndex() == -1) {
 
 			// synch marker is not displayed
 
-			draw202LineGraphSegment(
-					gc,
+			int graphLineAlpha = (int) (_chart.graphTransparencyLine * _chart.graphTransparencyAdjustment);
+			int graphFillingAlpha = (int) (_chart.graphTransparencyFilling * _chart.graphTransparencyAdjustment);
+
+			graphLineAlpha = graphLineAlpha < 0 ? 0 : graphLineAlpha > 255 ? 255 : graphLineAlpha;
+			graphFillingAlpha = graphFillingAlpha < 0 ? 0 : graphFillingAlpha > 255 ? 255 : graphFillingAlpha;
+
+			drawAsync510LineGraphSegment(
+					gcGraph,
 					graphDrawingData,
 					0,
-					xValues.length,
+					serieSize,
 					rgbFg,
 					rgbBgDark,
 					rgbBgBright,
-					_graphAlpha,
+					graphLineAlpha,
+					graphFillingAlpha,
 					graphValueOffset);
 
 		} else {
 
 			// draw synched tour
 
-			final int xMarkerAlpha = 0xd0;
-			final int noneMarkerAlpha = 0x60;
+			final int noneMarkerLineAlpha = (int) (_chart.graphTransparencyLine * 0.5);
+			final int noneMarkerFillingAlpha = (int) (_chart.graphTransparencyFilling * 0.5);
 
 			// draw the x-marker
-			draw202LineGraphSegment(
-					gc,
+			drawAsync510LineGraphSegment(
+					gcGraph,
 					graphDrawingData,
 					xData.getSynchMarkerStartIndex(),
 					xData.getSynchMarkerEndIndex() + 1,
 					rgbFg,
 					rgbBgDark,
 					rgbBgBright,
-					xMarkerAlpha,
+					_chart.graphTransparencyLine,
+					_chart.graphTransparencyFilling,
 					graphValueOffset);
 
 			// draw segment before the marker
-			draw202LineGraphSegment(
-					gc,
+			drawAsync510LineGraphSegment(
+					gcGraph,
 					graphDrawingData,
 					0,
 					xData.getSynchMarkerStartIndex() + 1,
 					rgbFg,
 					rgbBgDark,
 					rgbBgBright,
-					noneMarkerAlpha,
+					noneMarkerLineAlpha,
+					noneMarkerFillingAlpha,
 					graphValueOffset);
 
 			// draw segment after the marker
-			draw202LineGraphSegment(
-					gc,
+			drawAsync510LineGraphSegment(
+					gcGraph,
 					graphDrawingData,
 					xData.getSynchMarkerEndIndex() - 0,
-					xValues.length,
+					serieSize,
 					rgbFg,
 					rgbBgDark,
 					rgbBgBright,
-					noneMarkerAlpha,
+					noneMarkerLineAlpha,
+					noneMarkerFillingAlpha,
 					graphValueOffset);
 		}
 	}
@@ -2191,7 +2184,7 @@ public class ChartComponentGraph extends Canvas {
 	 * first we draw the graph into a path, the path is then drawn on the device with a
 	 * transformation
 	 * 
-	 * @param gcGraph
+	 * @param gcSegment
 	 * @param graphDrawingData
 	 * @param startIndex
 	 * @param endIndex
@@ -2200,26 +2193,26 @@ public class ChartComponentGraph extends Canvas {
 	 * @param rgbBgBright
 	 * @param graphValueOffset
 	 */
-	private void draw202LineGraphSegment(	final GC gcGraph,
-											final GraphDrawingData graphDrawingData,
-											final int startIndex,
-											final int endIndex,
-											final RGB rgbFg,
-											final RGB rgbBgDark,
-											final RGB rgbBgBright,
-											final int alphaValue,
-											final int graphValueOffset) {
+	private void drawAsync510LineGraphSegment(	final GC gcSegment,
+												final GraphDrawingData graphDrawingData,
+												final int startIndex,
+												final int endIndex,
+												final RGB rgbFg,
+												final RGB rgbBgDark,
+												final RGB rgbBgBright,
+												final int graphLineAlpha,
+												final int graphFillingAlpha,
+												final float graphValueOffset) {
 
 		final ChartDataXSerie xData = graphDrawingData.getXData();
 		final ChartDataYSerie yData = graphDrawingData.getYData();
 
 		final int graphFillMethod = yData.getGraphFillMethod();
-		final int graphValueOffsetAdjusted = _canScrollZoomedChart ? 0 : graphValueOffset;
 
-		final int[][] yHighValues = yData.getHighValues();
+		final float[][] yHighValues = yData.getHighValues();
 
-		final int xValues[] = xData.getHighValues()[0];
-		final int yValues[] = yHighValues[0];
+		final float xValues[] = xData.getHighValues()[0];
+		final float yValues[] = yHighValues[0];
 
 		final boolean[] noLine = xData.getNoLine();
 
@@ -2234,16 +2227,16 @@ public class ChartComponentGraph extends Canvas {
 		 * 2nd path is currently used to draw the SRTM altitude line
 		 */
 		final boolean isPath2 = yHighValues.length > 1;
-		int[] yValues2 = null;
+		float[] yValues2 = null;
 		if (isPath2) {
 			yValues2 = yHighValues[1];
 		}
 
-//		final int graphDiffNoLineToNext = yData.getDisabledLineToNext();
-
 		// get top/bottom border values of the graph
-		final int graphYBorderTop = graphDrawingData.getGraphYTop();
-		final int graphYBorderBottom = graphDrawingData.getGraphYBottom();
+		final float graphYBorderTop = graphDrawingData.getGraphYTop();
+		final float graphYBorderBottom = graphDrawingData.getGraphYBottom();
+		final int devYTop = graphDrawingData.getDevYTop();
+		final int devChartHeight = getDevVisibleGraphHeight();
 
 		final float scaleX = graphDrawingData.getScaleX();
 		final float scaleY = graphDrawingData.getScaleY();
@@ -2257,19 +2250,24 @@ public class ChartComponentGraph extends Canvas {
 
 		final ArrayList<Point> skippedValues = new ArrayList<Point>();
 
-		final int devCanvasHeight = graphDrawingData.devGraphHeight;
+		final int devGraphHeight = graphDrawingData.devGraphHeight;
 		final float devYGraphTop = scaleY * graphYBorderTop;
-		final float devYGraphBottom = (float) (scaleY * graphYBorderBottom + 0.5);
+		final float devYGraphBottom = scaleY * graphYBorderBottom;
+
+		final Rectangle[] lineFocusRectangles = _lineFocusRectangles.get(_lineFocusRectangles.size() - 1);
+		final Point[] lineDevPositions = _lineDevPositions.get(_lineDevPositions.size() - 1);
+		Rectangle prevLineRect = null;
 
 		/*
 		 * 
 		 */
-		final float devY0Inverse = devCanvasHeight + devYGraphBottom;
+		final float devY0Inverse = devGraphHeight + devYGraphBottom;
 
 		/*
 		 * x-axis line with y==0
 		 */
-		int graphY_XAxisLine = 0;
+		float graphY_XAxisLine = 0;
+
 		if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_BOTTOM
 				|| graphFillMethod == ChartDataYSerie.FILL_METHOD_CUSTOM) {
 
@@ -2287,17 +2285,16 @@ public class ChartComponentGraph extends Canvas {
 		}
 		final float devY_XAxisLine = scaleY * graphY_XAxisLine;
 
-		final int graphXStart = xValues[startIndex] - graphValueOffsetAdjusted;
-		final int graphYStart = yValues[startIndex];
+		final float graphXStart = xValues[startIndex] - graphValueOffset;
+		final float graphYStart = yValues[startIndex];
 
-//		int graphXPrev = graphXStart;
-		int graphY1Prev = graphYStart;
+		float graphY1Prev = graphYStart;
 
 		float devXPrev = graphXStart * scaleX;
 		float devY1Prev = graphY1Prev * scaleY;
 
-		final Rectangle chartRectangle = gcGraph.getClipping();
-		final int devXWidth = chartRectangle.width;
+		final Rectangle chartRectangle = gcSegment.getClipping();
+		final int devXVisibleWidth = chartRectangle.width;
 
 		boolean isDrawFirstPoint = true;
 
@@ -2307,12 +2304,21 @@ public class ChartComponentGraph extends Canvas {
 
 		int valueIndexFirstPoint = startIndex;
 		int valueIndexLastPoint = startIndex;
+		int prevValueIndex = startIndex;
+
+		/*
+		 * set the hovered index only ONCE because when autoscrolling is done to the right side this
+		 * can cause that the last value is used for the hovered index instead of the previous
+		 * before the last
+		 */
+		boolean isSetHoveredIndex = false;
 
 		final int[] devXPositions = new int[endIndex];
+		final float devY0 = devY0Inverse - devY_XAxisLine;
+
 		/*
 		 * draw the lines into the paths
 		 */
-		final float devY0 = devY0Inverse - devY_XAxisLine;
 		for (int valueIndex = startIndex; valueIndex < endIndex; valueIndex++) {
 
 			// check array bounds
@@ -2320,13 +2326,13 @@ public class ChartComponentGraph extends Canvas {
 				break;
 			}
 
-			final int graphX = xValues[valueIndex] - graphValueOffsetAdjusted;
+			final float graphX = xValues[valueIndex] - graphValueOffset;
 			final float devX = graphX * scaleX;
 
-			final int graphY1 = yValues[valueIndex];
+			final float graphY1 = yValues[valueIndex];
 			final float devY1 = graphY1 * scaleY;
 
-			int graphY2 = 0;
+			float graphY2 = 0;
 			float devY2 = 0;
 
 			if (isPath2) {
@@ -2347,6 +2353,7 @@ public class ChartComponentGraph extends Canvas {
 				devY1Prev = devY1;
 
 				valueIndexFirstPoint = valueIndex;
+				prevValueIndex = valueIndex;
 
 				continue;
 			}
@@ -2360,39 +2367,56 @@ public class ChartComponentGraph extends Canvas {
 
 				isDrawFirstPoint = false;
 
-				// set the point before devX==0 that the first line is not visible
+				// set first point before devX==0 that the first line is not visible but correctly painted
 				final float devXFirstPoint = devXPrev;
+				float devYStart = 0;
 
 				if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_BOTTOM
 						|| graphFillMethod == ChartDataYSerie.FILL_METHOD_CUSTOM) {
 
 					// start from the bottom of the graph
 
-					path.moveTo(devXFirstPoint, devCanvasHeight);
+					devYStart = devGraphHeight;
 
 				} else if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_ZERO) {
 
 					// start from the x-axis, y=0
 
-					path.moveTo(devXFirstPoint, devY0);
+					devYStart = devY0;
 				}
 
-				path.lineTo(devXFirstPoint, devY0Inverse - devY1Prev);
+				final float devY = devY0Inverse - devY1Prev;
+
+				path.moveTo(devXFirstPoint, devYStart);
+				path.lineTo(devXFirstPoint, devY);
 
 				if (isPath2) {
 					path2.moveTo(devXFirstPoint, devY0Inverse - devY2);
 					path2.lineTo(devXFirstPoint, devY0Inverse - devY2);
 				}
+
+				// set line hover positions for the first point
+				final Rectangle currentRect = new Rectangle((int) devXFirstPoint, 0, 1, devChartHeight);
+				final Point currentPoint = new Point((int) devXFirstPoint, devYTop + (int) devY);
+
+				lineDevPositions[valueIndexFirstPoint] = currentPoint;
+				lineFocusRectangles[valueIndexFirstPoint] = currentRect;
+
+				prevLineRect = currentRect;
 			}
 
 			/*
 			 * draw line to current point
 			 */
+			if ((int) devX != (int) devXPrev || graphY1 == 0 || (isPath2 && graphY2 == 0)) {
 
-			if ((int) devX != (int) devXPrev || graphY1 == 0 || graphY2 == 0) {
+//				System.out.println(valueIndex + "\t" + graphY1 + "\t" + graphY2);
+//				// TODO remove SYSTEM.OUT.PRINTLN
 
 				// optimization: draw only ONE line for the current x-position
 				// but draw to the 0 line otherwise it's possible that a triangle is painted
+
+				float devY = 0;
 
 				if (noLine != null && noLine[valueIndex]) {
 
@@ -2405,40 +2429,40 @@ public class ChartComponentGraph extends Canvas {
 
 						// start from the bottom of the graph
 
-						path.lineTo(devXPrev, devCanvasHeight);
-						path.lineTo(devX, devCanvasHeight);
+						devY = devGraphHeight;
 
 					} else if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_ZERO) {
 
 						// start from the x-axis, y=0
 
-						path.lineTo(devXPrev, devY0);
-						path.lineTo(devX, devY0);
+						devY = devY0;
 					}
+					path.lineTo(devXPrev, devY);
+					path.lineTo(devX, devY);
 
 					/*
-					 * keep positions, because skipped values will be painted as dot outside of the
-					 * path, but don't draw on the graph bottom or x-axis
+					 * keep positions, because skipped values will be painted as a dot outside of
+					 * the path, but don't draw on the graph bottom or x-axis
 					 */
 					if (isShowSkippedValues) {
 
-						final int devY = (int) (devY0Inverse - devY1);
-						if (devY != devY0 && graphY1 != 0) {
-							skippedValues.add(new Point((int) devX, devY));
+						final int devYSkipped = (int) (devY0Inverse - devY1);
+						if (devYSkipped != devY0 && graphY1 != 0) {
+							skippedValues.add(new Point((int) devX, devYSkipped));
 						}
 					}
 
 					isNoLine = true;
 					devXPrevNoLine = devX;
 
-// path2 is not yet supported
-//					if (isPath2) {
-//						path.lineTo(devXPrev, devY0 - (graphY2 * scaleY));
-//					}
+					// keep correct position that the hovered line dev position is painted at the correct position
+					devY = devY0Inverse - devY1;
 
 				} else {
 
-					// draw line to the current point
+					/*
+					 * draw line to the current point
+					 */
 
 					// check if a NO line was painted
 					if (isNoLine) {
@@ -2448,12 +2472,38 @@ public class ChartComponentGraph extends Canvas {
 						path.lineTo(devXPrevNoLine, devY0Inverse - devY1Prev);
 					}
 
-					path.lineTo(devX, devY0Inverse - devY1);
+					devY = devY0Inverse - devY1;
+
+					path.lineTo(devX, devY);
 
 					if (isPath2) {
 						path2.lineTo(devX, devY0Inverse - devY2);
 					}
 				}
+
+				/*
+				 * set line hover positions
+				 */
+				final float devXDiff = (devX - devXPrev) / 2;
+				final int devXDiffWidth = devXDiff < 1 ? 1 : (int) (devXDiff + 0.5);
+				final int devXRect = (int) (devX - devXDiffWidth);
+
+				// set right part of the rectangle width into the previous rectangle
+				prevLineRect.width += devXDiffWidth + 1;
+
+				// check if hovered line is hit, this check is an inline for .contains(...)
+				if (isSetHoveredIndex == false && prevLineRect.contains(_devXMouseMove, _devYMouseMove)) {
+					_hoveredLineValueIndex = prevValueIndex;
+					isSetHoveredIndex = true;
+				}
+
+				final Rectangle currentRect = new Rectangle(devXRect, 0, devXDiffWidth + 1, devChartHeight);
+				final Point currentPoint = new Point((int) devX, devYTop + (int) devY);
+
+				lineDevPositions[valueIndex] = currentPoint;
+				lineFocusRectangles[valueIndex] = currentRect;
+
+				prevLineRect = currentRect;
 			}
 
 			/*
@@ -2462,25 +2512,27 @@ public class ChartComponentGraph extends Canvas {
 			if (valueIndex == lastIndex || //
 
 					// check if last visible position + 1 is reached
-					devX > devXWidth) {
+					devX > devXVisibleWidth) {
 
 				/*
 				 * this is the last point for a filled graph
 				 */
 
-				path.lineTo(devX, devY0Inverse - devY1);
+				final float devY = devY0Inverse - devY1;
+
+				path.lineTo(devX, devY);
 
 				// move path to the final point
 				if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_BOTTOM
 						|| graphFillMethod == ChartDataYSerie.FILL_METHOD_CUSTOM) {
 
-					// line to the bottom of the graph
+					// draw line to the bottom of the graph
 
-					path.lineTo(devX, devCanvasHeight);
+					path.lineTo(devX, devGraphHeight);
 
 				} else if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_ZERO) {
 
-					// line to the x-axis, y=0
+					// draw line to the x-axis, y=0
 
 					path.lineTo(devX, devY0);
 				}
@@ -2496,30 +2548,58 @@ public class ChartComponentGraph extends Canvas {
 
 				valueIndexLastPoint = valueIndex;
 
+				/*
+				 * set line rectangle
+				 */
+				final float devXDiff = (devX - devXPrev) / 2;
+				final int devXDiffWidth = devXDiff < 1 ? 1 : (int) (devXDiff + 0.5);
+
+				// set right part of the rectangle width into the previous rectangle
+				prevLineRect.width += devXDiffWidth;
+
+				// check if hovered line is hit, this check is an inline for .contains(...)
+				if (isSetHoveredIndex == false && prevLineRect.contains(_devXMouseMove, _devYMouseMove)) {
+					_hoveredLineValueIndex = valueIndex;
+					isSetHoveredIndex = true;
+				}
+
+				final Rectangle lastRect = new Rectangle(
+						(int) (devX - devXDiffWidth),
+						0,
+						devXDiffWidth + 1000,
+						devChartHeight);
+				final Point lastPoint = new Point((int) devX, devYTop + (int) devY);
+
+				lineDevPositions[valueIndex] = lastPoint;
+				lineFocusRectangles[valueIndex] = lastRect;
+
+				if (isSetHoveredIndex == false && lastRect.contains(_devXMouseMove, _devYMouseMove)) {
+					_hoveredLineValueIndex = valueIndex;
+				}
+
 				break;
 			}
 
-//			graphXPrev = graphX;
 			devXPrev = devX;
-
 			devY1Prev = devY1;
+			prevValueIndex = valueIndex;
 		}
 
 		final Color colorLine = new Color(display, rgbFg);
 		final Color colorBgDark = new Color(display, rgbBgDark);
 		final Color colorBgBright = new Color(display, rgbBgBright);
 
-		gcGraph.setAntialias(SWT.OFF);
-		gcGraph.setAlpha(alphaValue);
+		gcSegment.setAntialias(_chart.graphAntialiasing);
+		gcSegment.setAlpha(graphFillingAlpha);
 
-		final int graphWidth = xValues[Math.min(xValueLength - 1, endIndex)] - graphValueOffsetAdjusted;
+		final float graphWidth = xValues[Math.min(xValueLength - 1, endIndex)] - graphValueOffset;
 
 		/*
 		 * force a max width because the fill will not be drawn on Linux
 		 */
 		final int devGraphWidth = Math.min(0x7fff, (int) (graphWidth * scaleX));
 
-		gcGraph.setClipping(path);
+		gcSegment.setClipping(path);
 
 		/*
 		 * fill the graph
@@ -2531,14 +2611,14 @@ public class ChartComponentGraph extends Canvas {
 			 * rectangle
 			 */
 
-			gcGraph.setForeground(colorBgDark);
-			gcGraph.setBackground(colorBgBright);
+			gcSegment.setForeground(colorBgDark);
+			gcSegment.setBackground(colorBgBright);
 
-			gcGraph.fillGradientRectangle(//
+			gcSegment.fillGradientRectangle(//
 					0,
-					devCanvasHeight,
+					devGraphHeight,
 					devGraphWidth,
-					-devCanvasHeight,
+					-devGraphHeight,
 					true);
 
 		} else if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_ZERO) {
@@ -2547,10 +2627,10 @@ public class ChartComponentGraph extends Canvas {
 			 * fill above 0 line
 			 */
 
-			gcGraph.setForeground(colorBgDark);
-			gcGraph.setBackground(colorBgBright);
+			gcSegment.setForeground(colorBgDark);
+			gcSegment.setBackground(colorBgBright);
 
-			gcGraph.fillGradientRectangle(//
+			gcSegment.fillGradientRectangle(//
 					0,
 					(int) devY0,
 					devGraphWidth,
@@ -2560,14 +2640,14 @@ public class ChartComponentGraph extends Canvas {
 			/*
 			 * fill below 0 line
 			 */
-			gcGraph.setForeground(colorBgBright);
-			gcGraph.setBackground(colorBgDark);
+			gcSegment.setForeground(colorBgBright);
+			gcSegment.setBackground(colorBgDark);
 
-			gcGraph.fillGradientRectangle(//
+			gcSegment.fillGradientRectangle(//
 					0,
-					devCanvasHeight, // start from the graph bottom
+					devGraphHeight, // start from the graph bottom
 					devGraphWidth,
-					-(int) Math.min(devCanvasHeight, devCanvasHeight - devY0Inverse),
+					-(int) Math.min(devGraphHeight, devGraphHeight - devY0Inverse),
 					true);
 
 		} else if (graphFillMethod == ChartDataYSerie.FILL_METHOD_CUSTOM) {
@@ -2576,11 +2656,11 @@ public class ChartComponentGraph extends Canvas {
 
 			if (customFillPainter != null) {
 
-				gcGraph.setForeground(colorBgDark);
-				gcGraph.setBackground(colorBgBright);
+				gcSegment.setForeground(colorBgDark);
+				gcSegment.setBackground(colorBgBright);
 
 				customFillPainter.draw(
-						gcGraph,
+						gcSegment,
 						graphDrawingData,
 						_chart,
 						devXPositions,
@@ -2590,31 +2670,33 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		// reset clipping that the line is drawn everywere
-		gcGraph.setClipping((Rectangle) null);
+		gcSegment.setClipping((Rectangle) null);
 
-		gcGraph.setBackground(colorLine);
+		gcSegment.setBackground(colorLine);
 
 		/*
 		 * paint skipped values
 		 */
 		if (isShowSkippedValues && skippedValues.size() > 0) {
 			for (final Point skippedPoint : skippedValues) {
-				gcGraph.fillRectangle(skippedPoint.x, skippedPoint.y, 2, 2);
+				gcSegment.fillRectangle(skippedPoint.x, skippedPoint.y, 2, 2);
 			}
 		}
 
 		/*
 		 * draw line along the path
 		 */
+		gcSegment.setAlpha(graphLineAlpha);
+
 		// set line style
-		gcGraph.setLineStyle(SWT.LINE_SOLID);
-		gcGraph.setLineWidth(1);
+		gcSegment.setLineStyle(SWT.LINE_SOLID);
+//		gcSegment.setLineWidth(1);
 
 		// draw the line of the graph
-		gcGraph.setForeground(colorLine);
+		gcSegment.setForeground(colorLine);
 
 //		gcGraph.setAlpha(0x80);
-		gcGraph.drawPath(path);
+		gcSegment.drawPath(path);
 
 		// dispose resources
 		colorLine.dispose();
@@ -2624,20 +2706,21 @@ public class ChartComponentGraph extends Canvas {
 		path.dispose();
 
 		/*
-		 * draw path2 above the other graph
+		 * draw path2 above the other graph, this is currently used to draw the srtm graph
 		 */
 		if (path2 != null) {
 
-			gcGraph.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-			gcGraph.drawPath(path2);
+			gcSegment.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+			gcSegment.drawPath(path2);
 
 			path2.dispose();
 		}
 
-		gcGraph.setAlpha(0xFF);
+		gcSegment.setAlpha(0xFF);
+		gcSegment.setAntialias(SWT.OFF);
 	}
 
-	private void draw204RangeMarker(final GC gc, final GraphDrawingData drawingData) {
+	private void drawAsync520RangeMarker(final GC gc, final GraphDrawingData drawingData) {
 
 		final ChartDataXSerie xData = drawingData.getXData();
 		final ChartDataYSerie yData = drawingData.getYData();
@@ -2656,27 +2739,34 @@ public class ChartComponentGraph extends Canvas {
 		final RGB rgbBg2 = yData.getRgbBright()[0];
 
 		// get the horizontal offset for the graph
-		int graphValueOffset;
+		float graphValueOffset;
 		if (_chartComponents._synchConfigSrc == null) {
 			// a zoom marker is not set, draw it normally
-			graphValueOffset = (int) (Math.max(0, _devGraphImageXOffset) / scaleX);
+			graphValueOffset = Math.max(0, _xxDevViewPortLeftBorder) / scaleX;
 		} else {
 			// adjust the start position to the zoom marker position
-			graphValueOffset = (int) (_devGraphImageXOffset / scaleX);
+			graphValueOffset = _xxDevViewPortLeftBorder / scaleX;
 		}
+
+		int graphFillingAlpha = (int) (_chart.graphTransparencyFilling * 0.5);
+		int graphLineAlpha = (int) (_chart.graphTransparencyFilling * 0.5);
+
+		graphFillingAlpha = graphFillingAlpha < 0 ? 0 : graphFillingAlpha > 255 ? 255 : graphFillingAlpha;
+		graphLineAlpha = graphLineAlpha < 0 ? 0 : graphLineAlpha > 255 ? 255 : graphLineAlpha;
 
 		int runningIndex = 0;
 		for (final int markerStartIndex : startIndex) {
 
 			// draw range marker
-			draw202LineGraphSegment(gc, //
+			drawAsync510LineGraphSegment(gc, //
 					drawingData,
 					markerStartIndex,
 					endIndex[runningIndex] + 1,
 					rgbFg,
 					rgbBg1,
 					rgbBg2,
-					0x40,
+					graphLineAlpha,
+					graphFillingAlpha,
 					graphValueOffset);
 
 			runningIndex++;
@@ -2690,12 +2780,13 @@ public class ChartComponentGraph extends Canvas {
 	 * @param gcGraph
 	 * @param drawingData
 	 */
-	private void draw210BarGraph(final GC gcGraph, final GraphDrawingData drawingData) {
+	private void drawAsync530BarGraph(final GC gcGraph, final GraphDrawingData drawingData) {
 
 		// get the chart data
 		final ChartDataXSerie xData = drawingData.getXData();
 		final ChartDataYSerie yData = drawingData.getYData();
 		final int[][] colorsIndex = yData.getColorsIndex();
+		final int graphFillMethod = yData.getGraphFillMethod();
 
 		gcGraph.setLineStyle(SWT.LINE_SOLID);
 
@@ -2707,34 +2798,34 @@ public class ChartComponentGraph extends Canvas {
 		// get the chart values
 		final float scaleX = drawingData.getScaleX();
 		final float scaleY = drawingData.getScaleY();
-		final int graphYBorderBottom = drawingData.getGraphYBottom();
-		final boolean axisDirection = yData.isYAxisDirection();
+		final float graphYBorderBottom = drawingData.getGraphYBottom();
+		final boolean isBottomTop = yData.isYAxisDirection();
 
 		// get the horizontal offset for the graph
-		int graphValueOffset;
+		float graphValueOffset;
 		if (_chartComponents._synchConfigSrc == null) {
 			// a synch marker is not set, draw it normally
-			graphValueOffset = (int) (Math.max(0, _devGraphImageXOffset) / scaleX);
+			graphValueOffset = Math.max(0, _xxDevViewPortLeftBorder) / scaleX;
 		} else {
 			// adjust the start position to the synch marker position
-			graphValueOffset = (int) (_devGraphImageXOffset / scaleX);
+			graphValueOffset = _xxDevViewPortLeftBorder / scaleX;
 		}
 
-		final int devCanvasHeight = drawingData.devGraphHeight;
+		final int devGraphCanvasHeight = drawingData.devGraphHeight;
 
 		/*
 		 * Get the top/bottom for the graph, a chart can contain multiple canvas. Canvas is the area
 		 * where the graph is painted.
 		 */
-		final int devYCanvasBottom = devCanvasHeight;
+		final int devYCanvasBottom = devGraphCanvasHeight;
 		final int devYCanvasTop = 0;
 
 		final int devYChartBottom = drawingData.getDevYBottom();
-		final int devYChartTop = devYChartBottom - devCanvasHeight;
+		final int devYChartTop = devYChartBottom - devGraphCanvasHeight;
 
-		final int xValues[] = xData.getHighValues()[0];
-		final int yHighSeries[][] = yData.getHighValues();
-		final int yLowSeries[][] = yData.getLowValues();
+		final float xValues[] = xData.getHighValues()[0];
+		final float yHighSeries[][] = yData.getHighValues();
+		final float yLowSeries[][] = yData.getLowValues();
 
 		final int serieLength = yHighSeries.length;
 		final int valueLength = xValues.length;
@@ -2759,8 +2850,8 @@ public class ChartComponentGraph extends Canvas {
 		// loop: all data series
 		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 
-			final int yHighValues[] = yHighSeries[serieIndex];
-			int yLowValues[] = null;
+			final float yHighValues[] = yHighSeries[serieIndex];
+			float yLowValues[] = null;
 			if (yLowSeries != null) {
 				yLowValues = yLowSeries[serieIndex];
 			}
@@ -2787,24 +2878,33 @@ public class ChartComponentGraph extends Canvas {
 					devXPos -= devBarWidth2;
 				}
 
-				int valueYLow;
-				if (yLowValues == null) {
-					valueYLow = yData.getVisibleMinValue();
+				float valueYLow = 0;
+
+				if (graphFillMethod == ChartDataYSerie.BAR_DRAW_METHOD_BOTTOM) {
+
+					// draw at the bottom
+					valueYLow = graphYBorderBottom;
+
 				} else {
-					// check array bounds
-					if (valueIndex >= yLowValues.length) {
-						break;
+
+					if (yLowValues == null) {
+						valueYLow = yData.getVisibleMinValue();
+					} else {
+						// check array bounds
+						if (valueIndex >= yLowValues.length) {
+							break;
+						}
+						valueYLow = yLowValues[valueIndex];
 					}
-					valueYLow = yLowValues[valueIndex];
 				}
 
 				// check array bounds
 				if (valueIndex >= yHighValues.length) {
 					break;
 				}
-				final int valueYHigh = yHighValues[valueIndex];
+				final float valueYHigh = yHighValues[valueIndex];
 
-				final int barHeight = (Math.max(valueYHigh, valueYLow) - Math.min(valueYHigh, valueYLow));
+				final float barHeight = (Math.max(valueYHigh, valueYLow) - Math.min(valueYHigh, valueYLow));
 				if (barHeight == 0) {
 					continue;
 				}
@@ -2822,7 +2922,7 @@ public class ChartComponentGraph extends Canvas {
 				 */
 				int devYPosChart;
 				int devYPosCanvas;
-				if (axisDirection) {
+				if (isBottomTop) {
 
 					final int devYBar = (int) ((valueYHigh - graphYBorderBottom) * scaleY) + devYPreviousHeight;
 
@@ -2931,7 +3031,7 @@ public class ChartComponentGraph extends Canvas {
 	 * @param gc
 	 * @param drawingData
 	 */
-	private void draw220LineWithBarGraph(final GC gc, final GraphDrawingData drawingData) {
+	private void drawAsync540LineWithBarGraph(final GC gc, final GraphDrawingData drawingData) {
 
 		// get the chart data
 		final ChartDataXSerie xData = drawingData.getXData();
@@ -2948,18 +3048,18 @@ public class ChartComponentGraph extends Canvas {
 		// get the chart values
 		final float scaleX = drawingData.getScaleX();
 		final float scaleY = drawingData.getScaleY();
-		final int graphYBottom = drawingData.getGraphYBottom();
+		final float graphYBottom = drawingData.getGraphYBottom();
 		final boolean axisDirection = yData.isYAxisDirection();
 //		final int barPosition = drawingData.getBarPosition();
 
 		// get the horizontal offset for the graph
-		int graphValueOffset;
+		float graphValueOffset;
 		if (_chartComponents._synchConfigSrc == null) {
 			// a zoom marker is not set, draw it normally
-			graphValueOffset = (int) (Math.max(0, _devGraphImageXOffset) / scaleX);
+			graphValueOffset = Math.max(0, _xxDevViewPortLeftBorder) / scaleX;
 		} else {
 			// adjust the start position to the zoom marker position
-			graphValueOffset = (int) (_devGraphImageXOffset / scaleX);
+			graphValueOffset = _xxDevViewPortLeftBorder / scaleX;
 		}
 
 		// get the top/bottom of the graph
@@ -2971,8 +3071,8 @@ public class ChartComponentGraph extends Canvas {
 
 		gc.setClipping(0, devYTop, gc.getClipping().width, devYBottom - devYTop);
 
-		final int xValues[] = xData.getHighValues()[0];
-		final int yHighSeries[][] = yData.getHighValues();
+		final float xValues[] = xData.getHighValues()[0];
+		final float yHighSeries[][] = yData.getHighValues();
 //		final int yLowSeries[][] = yData.getLowValues();
 
 		final int serieLength = yHighSeries.length;
@@ -2986,7 +3086,7 @@ public class ChartComponentGraph extends Canvas {
 		// loop: all data series
 		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 
-			final int yHighValues[] = yHighSeries[serieIndex];
+			final float yHighValues[] = yHighSeries[serieIndex];
 //			int yLowValues[] = null;
 //			if (yLowSeries != null) {
 //				yLowValues = yLowSeries[serieIndex];
@@ -3009,10 +3109,10 @@ public class ChartComponentGraph extends Canvas {
 //				}
 
 				// get the bar height
-				final int graphYLow = graphYBottom;
-				final int graphYHigh = yHighValues[valueIndex];
+				final float graphYLow = graphYBottom;
+				final float graphYHigh = yHighValues[valueIndex];
 
-				final int graphBarHeight = (Math.max(graphYHigh, graphYLow) - Math.min(graphYHigh, graphYLow));
+				final float graphBarHeight = Math.max(graphYHigh, graphYLow) - Math.min(graphYHigh, graphYLow);
 
 				// skip bars which have no height
 				if (graphBarHeight == 0) {
@@ -3077,14 +3177,14 @@ public class ChartComponentGraph extends Canvas {
 	 * @param gc
 	 * @param drawingData
 	 */
-	private void draw230XYScatter(final GC gc, final GraphDrawingData drawingData) {
+	private void drawAsync550XYScatter(final GC gc, final GraphDrawingData drawingData) {
 
 		// get chart data
 		final ChartDataXSerie xData = drawingData.getXData();
 		final ChartDataYSerie yData = drawingData.getYData();
 		final float scaleX = drawingData.getScaleX();
 		final float scaleY = drawingData.getScaleY();
-		final int graphYBottom = drawingData.getGraphYBottom();
+		final float graphYBottom = drawingData.getGraphYBottom();
 		final double devGraphWidth = drawingData.devVirtualGraphWidth;
 
 		final double scalingFactor = xData.getScalingFactor();
@@ -3103,15 +3203,15 @@ public class ChartComponentGraph extends Canvas {
 		gc.setLineStyle(SWT.LINE_SOLID);
 		gc.setClipping(0, devYTop, gc.getClipping().width, devYBottom - devYTop);
 
-		final int[][] xSeries = xData.getHighValues();
-		final int[][] ySeries = yData.getHighValues();
+		final float[][] xSeries = xData.getHighValues();
+		final float[][] ySeries = yData.getHighValues();
 		final int size = 6;
 		final int size2 = size / 2;
 
 		for (int serieIndex = 0; serieIndex < xSeries.length; serieIndex++) {
 
-			final int xValues[] = xSeries[serieIndex];
-			final int yHighValues[] = ySeries[serieIndex];
+			final float xValues[] = xSeries[serieIndex];
+			final float yHighValues[] = ySeries[serieIndex];
 
 			gc.setBackground(getColor(rgbLine[serieIndex]));
 
@@ -3123,8 +3223,8 @@ public class ChartComponentGraph extends Canvas {
 					break;
 				}
 
-				final int xValue = xValues[valueIndex];
-				final int yValue = yHighValues[valueIndex];
+				final float xValue = xValues[valueIndex];
+				final float yValue = yHighValues[valueIndex];
 
 				// get the x/y positions
 				int devX;
@@ -3148,12 +3248,177 @@ public class ChartComponentGraph extends Canvas {
 	}
 
 	/**
+	 * Paint event handler
+	 * 
+	 * <pre>
+	 * Top-down sequence how the images are painted
+	 * 
+	 * {@link #_chartImage40Overlay}
+	 * {@link #_chartImage30Custom}
+	 * {@link #_chartImage20Chart}
+	 * {@link #_chartImage10Graphs}
+	 * </pre>
+	 * 
+	 * @param gc
+	 */
+	private void drawSync000onPaint(final GC gc) {
+
+		if (_graphDrawingData == null || _graphDrawingData.size() == 0) {
+
+			// fill the image area when there is no graphic
+			gc.setBackground(_chart.getBackgroundColor());
+			gc.fillRectangle(_clientArea);
+
+			drawSyncBg999ErrorMessage(gc);
+
+			return;
+		}
+
+		boolean isPaintedDirectly = false;
+
+		if (_isChartDirty) {
+
+			// draw chart
+
+			isPaintedDirectly = drawAsync100StartPainting();
+
+			if (isPaintedDirectly == false) {
+
+				/*
+				 * paint dragged chart until the chart is recomputed
+				 */
+				if (_isPaintDraggedImage) {
+					drawSync020DraggedChart(gc);
+					return;
+				}
+
+				/*
+				 * mac osx is still flickering, added the drawChartImage in version 1.0
+				 */
+				if (_chartImage20Chart != null) {
+
+					final Image image = drawSync010ImageChart(gc);
+					if (image == null) {
+						return;
+					}
+
+					final int gcHeight = _clientArea.height;
+					final int imageHeight = image.getBounds().height;
+
+					if (gcHeight > imageHeight) {
+
+						// fill the gap between the image and the drawable area
+						gc.setBackground(_chart.getBackgroundColor());
+						gc.fillRectangle(0, imageHeight, _clientArea.width, _clientArea.height - imageHeight);
+
+					} else {
+						gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+					}
+				} else {
+					gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+				}
+			}
+		}
+
+		if (_isChartDirty == false || isPaintedDirectly) {
+
+			/*
+			 * if the graph is not yet drawn (because this is done in another thread) there is
+			 * nothing to do
+			 */
+			if (_chartImage20Chart == null) {
+				// fill the image area when there is no graphic
+				gc.setBackground(_chart.getBackgroundColor());
+				gc.fillRectangle(_clientArea);
+				gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+				return;
+			}
+
+			// redraw() is done in async painting but NOT after images are painted
+			if (isPaintedDirectly) {
+
+//				System.out.println("isPaintedDirectly\t");
+//				// TODO remove SYSTEM.OUT.PRINTLN
+			}
+
+			drawSync300Image30Custom();
+			drawSync010ImageChart(gc);
+		}
+	}
+
+	private Image drawSync010ImageChart(final GC gc) {
+
+		final boolean isOverlayImageVisible = _isXSliderVisible
+				|| _isYSliderVisible
+				|| _isXMarkerMoved
+				|| _isSelectionVisible
+				|| _isHoveredLineVisible;
+
+		if (isOverlayImageVisible) {
+
+			drawSync400OverlayImage();
+
+			if (_chartImage40Overlay != null) {
+//				System.out.println("gc <- 40\tdrawSync010ImageChart");
+//				// TODO remove SYSTEM.OUT.PRINTLN
+
+				gc.drawImage(_chartImage40Overlay, 0, 0);
+			}
+			return _chartImage40Overlay;
+
+		} else {
+
+			if (_chartImage20Chart != null) {
+//				System.out.println("gc <- 20");
+//				// TODO remove SYSTEM.OUT.PRINTLN
+
+				gc.drawImage(_chartImage20Chart, 0, 0);
+			}
+			return _chartImage20Chart;
+		}
+	}
+
+	private void drawSync020DraggedChart(final GC gc) {
+
+		if (_draggedChartDraggedPos == null) {
+			return;
+		}
+
+		final int devXDiff = _draggedChartDraggedPos.x - _draggedChartStartPos.x;
+		final int devYDiff = 0;
+
+		/*
+		 * draw background that the none painted areas do not look ugly
+		 */
+		gc.setBackground(_chart.getBackgroundColor());
+
+		if (devXDiff > 0) {
+			gc.fillRectangle(0, devYDiff, devXDiff, _clientArea.height);
+		} else {
+			gc.fillRectangle(_clientArea.width + devXDiff, devYDiff, -devXDiff, _clientArea.height);
+		}
+
+		if (_chartImage40Overlay != null && _chartImage40Overlay.isDisposed() == false) {
+
+			gc.drawImage(_chartImage40Overlay, devXDiff, devYDiff);
+
+		} else if (_chartImage30Custom != null && _chartImage30Custom.isDisposed() == false) {
+
+			gc.drawImage(_chartImage30Custom, devXDiff, devYDiff);
+
+		} else if (_chartImage20Chart != null && _chartImage20Chart.isDisposed() == false) {
+
+			gc.drawImage(_chartImage20Chart, devXDiff, devYDiff);
+		}
+	}
+
+	/**
 	 * Draws custom foreground layers on top of the graphs.
 	 */
-	private void draw300CustomFgLayerImage() {
+	private void drawSync300Image30Custom() {
 
 		// the layer image has the same size as the graph image
-		final Rectangle chartRect = _chartImage.getBounds();
+		final Rectangle chartRect = _chartImage20Chart.getBounds();
 
 		// ensure correct image size
 		if (chartRect.width <= 0 || chartRect.height <= 0) {
@@ -3164,131 +3429,148 @@ public class ChartComponentGraph extends Canvas {
 		 * when the existing image is the same size as the new image, we will redraw it only if it's
 		 * set to dirty
 		 */
-		if (_isCustomFgLayerDirty == false && _customFgLayerImage != null) {
+		if (_isCustomLayerImageDirty == false && _chartImage30Custom != null) {
 
-			final Rectangle oldBounds = _customFgLayerImage.getBounds();
+			final Rectangle oldBounds = _chartImage30Custom.getBounds();
 
 			if (oldBounds.width == chartRect.width && oldBounds.height == chartRect.height) {
 				return;
 			}
 		}
 
-		if (Util.canReuseImage(_customFgLayerImage, chartRect) == false) {
-			_customFgLayerImage = Util.createImage(getDisplay(), _customFgLayerImage, chartRect);
+		if (Util.canReuseImage(_chartImage30Custom, chartRect) == false) {
+			_chartImage30Custom = Util.createImage(getDisplay(), _chartImage30Custom, chartRect);
 		}
 
-		final GC gcCustomFgLayer = new GC(_customFgLayerImage);
+		final GC gcCustom = new GC(_chartImage30Custom);
 		{
-			gcCustomFgLayer.fillRectangle(chartRect);
+			gcCustom.fillRectangle(chartRect);
 
 			/*
 			 * draw the chart image with the graphs into the custom layer image, the custom
 			 * foreground layers are drawn on top of the graphs
 			 */
-			gcCustomFgLayer.drawImage(_chartImage, 0, 0);
+			gcCustom.drawImage(_chartImage20Chart, 0, 0);
+
+//			System.out.println("30 <- 20\tdrawSync300Image30Custom");
+//			// TODO remove SYSTEM.OUT.PRINTLN
 
 			for (final GraphDrawingData graphDrawingData : _graphDrawingData) {
 
 				final ArrayList<IChartLayer> customFgLayers = graphDrawingData.getYData().getCustomForegroundLayers();
 
 				for (final IChartLayer layer : customFgLayers) {
-					layer.draw(gcCustomFgLayer, graphDrawingData, _chart);
+					layer.draw(gcCustom, graphDrawingData, _chart);
 				}
 			}
 		}
-		gcCustomFgLayer.dispose();
+		gcCustom.dispose();
 
-		_isCustomFgLayerDirty = false;
+		_isCustomLayerImageDirty = false;
 	}
 
 	/**
-	 * draws the slider image which contains the custom layer image
+	 * Draws the overlays into the graph (fg layer image) slider image which contains the custom
+	 * layer image
 	 */
-	private void draw400SliderImage() {
+	private void drawSync400OverlayImage() {
 
-		if (_customFgLayerImage == null) {
+		if (_chartImage30Custom == null) {
 			return;
 		}
 
 		// the slider image is the same size as the graph image
-		final Rectangle graphRect = _customFgLayerImage.getBounds();
+		final Rectangle graphImageRect = _chartImage30Custom.getBounds();
 
-		// check if the slider image redraw is necessary
-		if (_isSliderImageDirty == false
+		// check if an overlay image redraw is necessary
+		if (_isOverlayDirty == false
 				&& _isSliderDirty == false
 				&& _isSelectionDirty == false
 				&& _isHoveredBarDirty == false
-				&& _sliderImage != null) {
+				&& _hoveredLineValueIndex == -1
+				&& _chartImage40Overlay != null) {
 
-			final Rectangle oldBounds = _sliderImage.getBounds();
-			if (oldBounds.width == graphRect.width && oldBounds.height == graphRect.height) {
+			final Rectangle oldBounds = _chartImage40Overlay.getBounds();
+			if (oldBounds.width == graphImageRect.width && oldBounds.height == graphImageRect.height) {
 				return;
 			}
 		}
 
 		// ensure correct image size
-		if (graphRect.width <= 0 || graphRect.height <= 0) {
+		if (graphImageRect.width <= 0 || graphImageRect.height <= 0) {
 			return;
 		}
 
-		if (Util.canReuseImage(_sliderImage, graphRect) == false) {
-			_sliderImage = Util.createImage(getDisplay(), _sliderImage, graphRect);
+		if (Util.canReuseImage(_chartImage40Overlay, graphImageRect) == false) {
+			_chartImage40Overlay = Util.createImage(getDisplay(), _chartImage40Overlay, graphImageRect);
 		}
 
-		if (_sliderImage.isDisposed()) {
+		if (_chartImage40Overlay.isDisposed()) {
 			return;
 		}
 
-		final GC gcSlider = new GC(_sliderImage);
+		final GC gcOverlay = new GC(_chartImage40Overlay);
 		{
-			// copy the graph image into the slider image, the slider will be drawn
-			// on top of the graph
-			gcSlider.fillRectangle(graphRect);
-			gcSlider.drawImage(_customFgLayerImage, 0, 0);
+			/*
+			 * copy the graph image into the slider image, the slider will be drawn on top of the
+			 * graph
+			 */
+			gcOverlay.fillRectangle(graphImageRect);
+			gcOverlay.drawImage(_chartImage30Custom, 0, 0);
+
+//			System.out.println("40 <- 30\tdrawSync400OverlayImage");
+//			// TODO remove SYSTEM.OUT.PRINTLN
 
 			/*
 			 * draw x/y-sliders
 			 */
 			if (_isXSliderVisible) {
-				createXSliderLabel(gcSlider, _xSliderOnTop);
-				createXSliderLabel(gcSlider, _xSliderOnBottom);
+				createXSliderLabel(gcOverlay, _xSliderOnTop);
+				createXSliderLabel(gcOverlay, _xSliderOnBottom);
 				updateXSliderYPosition();
 
-				draw410XSlider(gcSlider, _xSliderOnBottom);
-				draw410XSlider(gcSlider, _xSliderOnTop);
+				drawSync410XSlider(gcOverlay, _xSliderOnBottom);
+				drawSync410XSlider(gcOverlay, _xSliderOnTop);
 			}
 			if (_isYSliderVisible) {
-				draw420YSliders(gcSlider);
+				drawSync420YSliders(gcOverlay);
 			}
 			_isSliderDirty = false;
 
 			if (_isXMarkerMoved) {
-				draw430XMarker(gcSlider);
+				drawSync430XMarker(gcOverlay);
 			}
 
 			if (_isSelectionVisible) {
-				draw440Selection(gcSlider);
+				drawSync440Selection(gcOverlay);
 			}
 
 			if (_isHoveredBarDirty) {
-				draw450HoveredBar(gcSlider);
+				drawSync450HoveredBar(gcOverlay);
 				_isHoveredBarDirty = false;
 			}
-		}
-		gcSlider.dispose();
 
-		_isSliderImageDirty = false;
+			if (_hoveredLineValueIndex != -1 && _lineDevPositions.size() > 0) {
+
+				// hovered lines are set -> draw it
+				drawSync460HoveredLine(gcOverlay);
+			}
+
+		}
+		gcOverlay.dispose();
+
+		_isOverlayDirty = false;
 	}
 
 	/**
-	 * @param gc
+	 * @param gcGraph
 	 * @param slider
 	 */
-	private void draw410XSlider(final GC gc, final ChartXSlider slider) {
+	private void drawSync410XSlider(final GC gcGraph, final ChartXSlider slider) {
 
 		final Display display = getDisplay();
 
-		final int devSliderLinePos = slider.getDevVirtualSliderLinePos() - getDevGraphImageXOffset();
+		final int devSliderLinePos = slider.getXXDevSliderLinePos() - _xxDevViewPortLeftBorder;
 
 		final int grayColorIndex = 60;
 		final Color colorTxt = new Color(display, grayColorIndex, grayColorIndex, grayColorIndex);
@@ -3309,8 +3591,8 @@ public class ChartComponentGraph extends Canvas {
 
 			final int labelHeight = label.height;
 			final int labelWidth = label.width;
-			final int labelX = label.x;
-			final int labelY = label.y;
+			final int devXLabel = label.x;
+			final int devYLabel = label.y;
 
 			final int devYBottom = drawingData.getDevYBottom();
 			final boolean isSliderHovered = _mouseOverXSlider != null && _mouseOverXSlider == slider;
@@ -3318,46 +3600,33 @@ public class ChartComponentGraph extends Canvas {
 			/*
 			 * when the mouse is over the slider, the slider is painted in a darker color
 			 */
+
 			// draw slider line
 			if ((_isFocusActive && _selectedXSlider == slider) || isSliderHovered) {
-				gc.setAlpha(0xd0);
+				gcGraph.setAlpha(0xd0);
 			} else {
-				gc.setAlpha(0x60);
+				gcGraph.setAlpha(0x60);
 			}
-			gc.setForeground(colorLine);
-			gc.setLineStyle(SWT.LINE_DOT);
-			gc.drawLine(devSliderLinePos, labelY + labelHeight, devSliderLinePos, devYBottom);
+			gcGraph.setForeground(colorLine);
+			gcGraph.setLineDash(new int[] { 4, 1, 4, 1 });
+			gcGraph.drawLine(devSliderLinePos, devYLabel + labelHeight, devSliderLinePos, devYBottom);
 
-			/*
-			 * left and right slider have different label backgrounds
-			 */
-//			if (slider == getLeftSlider()) {
-//				// left slider
-			gc.setBackground(colorDark);
-			gc.setForeground(colorBright);
-//			} else {
-//				// right slider
-//				gc.setBackground(colorBright);
-//				gc.setForeground(colorDark);
-//			}
-
-			// draw label background
-//			gc.fillGradientRectangle(labelX + 1, labelY, labelWidth - 1, labelHeight, false);
-//			gc.fillRectangle(labelX + 1, labelY, labelWidth - 1, labelHeight);
+			gcGraph.setBackground(colorDark);
+			gcGraph.setForeground(colorBright);
 
 			// draw label border
-			gc.setForeground(colorLine);
-			gc.setLineStyle(SWT.LINE_SOLID);
-			gc.drawRoundRectangle(labelX, labelY - 4, labelWidth, labelHeight + 3, 4, 4);
+			gcGraph.setForeground(colorLine);
+			gcGraph.setLineStyle(SWT.LINE_SOLID);
+			gcGraph.drawRoundRectangle(devXLabel, devYLabel - 4, labelWidth, labelHeight + 3, 4, 4);
 
 			// draw slider label
-			gc.setAlpha(0xff);
-			gc.setForeground(colorTxt);
-			gc.drawText(label.text, labelX + 2, labelY - 5, true);
+			gcGraph.setAlpha(0xff);
+			gcGraph.setForeground(colorTxt);
+			gcGraph.drawText(label.text, devXLabel + 2, devYLabel - 5, true);
 
 			// draw a tiny marker on the graph
-			gc.setBackground(colorLine);
-			gc.fillRectangle(devSliderLinePos - 3, label.yGraph - 2, 7, 3);
+			gcGraph.setBackground(colorLine);
+			gcGraph.fillRectangle(devSliderLinePos - 3, label.devYGraph - 2, 7, 3);
 
 			/*
 			 * draw a marker below the x-axis to make the selection more visible
@@ -3377,18 +3646,18 @@ public class ChartComponentGraph extends Canvas {
 						devMarkerXPos + markerWidth,
 						devYBottom + 1 + markerWidth2 };
 
-				gc.setAlpha(0xc0);
-				gc.setLineStyle(SWT.LINE_SOLID);
+				gcGraph.setAlpha(0xc0);
+				gcGraph.setLineStyle(SWT.LINE_SOLID);
 
 				// draw background
-				gc.setBackground(colorDark);
-				gc.fillPolygon(marker);
+				gcGraph.setBackground(colorDark);
+				gcGraph.fillPolygon(marker);
 
 				// draw border
-				gc.setForeground(colorLine);
-				gc.drawPolygon(marker);
+				gcGraph.setForeground(colorLine);
+				gcGraph.drawPolygon(marker);
 
-				gc.setAlpha(0xff);
+				gcGraph.setAlpha(0xff);
 			}
 
 			colorLine.dispose();
@@ -3402,15 +3671,22 @@ public class ChartComponentGraph extends Canvas {
 	}
 
 	/**
-	 * @param gc
-	 * @param slider
+	 * Draw the y-slider which it hit.
+	 * 
+	 * @param gcGraph
 	 */
-	private void draw420YSliders(final GC gc) {
+	private void drawSync420YSliders(final GC gcGraph) {
+
+		if (_hitYSlider == null) {
+			return;
+		}
 
 		final Display display = getDisplay();
 
 		final int grayColorIndex = 60;
 		final Color colorTxt = new Color(display, grayColorIndex, grayColorIndex, grayColorIndex);
+
+		final int devXChartWidth = getDevVisibleChartWidth();
 
 		for (final ChartYSlider ySlider : _ySliders) {
 
@@ -3442,7 +3718,8 @@ public class ChartComponentGraph extends Canvas {
 
 				final StringBuilder labelText = new StringBuilder();
 
-				final int devYValue = (int) ((devYBottom - devYSliderLine) / drawingData.getScaleY())
+				final float devYValue = ((float) devYBottom - devYSliderLine)
+						/ drawingData.getScaleY()
 						+ drawingData.getGraphYBottom();
 
 				// create the slider text
@@ -3452,7 +3729,7 @@ public class ChartComponentGraph extends Canvas {
 				labelText.append("  "); //$NON-NLS-1$
 				final String label = labelText.toString();
 
-				final Point labelExtend = gc.stringExtent(label);
+				final Point labelExtend = gcGraph.stringExtent(label);
 
 				final int labelHeight = labelExtend.y - 2;
 				final int labelWidth = labelExtend.x + 0;
@@ -3460,39 +3737,39 @@ public class ChartComponentGraph extends Canvas {
 				final int labelY = devYLabelPos - labelHeight;
 
 				// draw label background
-				gc.setForeground(colorBright);
-				gc.setBackground(colorDark);
-				gc.setAlpha(0xb0);
-				gc.fillGradientRectangle(labelX, labelY, labelWidth, labelHeight, true);
+				gcGraph.setForeground(colorBright);
+				gcGraph.setBackground(colorDark);
+				gcGraph.setAlpha(0xb0);
+				gcGraph.fillGradientRectangle(labelX, labelY, labelWidth, labelHeight, true);
 
 				// draw label border
-				gc.setAlpha(0xa0);
-				gc.setForeground(colorLine);
-				gc.drawRectangle(labelX, labelY, labelWidth, labelHeight);
-				gc.setAlpha(0xff);
+				gcGraph.setAlpha(0xa0);
+				gcGraph.setForeground(colorLine);
+				gcGraph.drawRectangle(labelX, labelY, labelWidth, labelHeight);
+				gcGraph.setAlpha(0xff);
 
 				// draw label text
-				gc.setForeground(colorTxt);
-				gc.drawText(label, labelX + 2, labelY - 2, true);
+				gcGraph.setForeground(colorTxt);
+				gcGraph.drawText(label, labelX + 2, labelY - 2, true);
 
 				// draw slider line
-				final Rectangle hitRect = ySlider.getHitRectangle();
-				gc.setForeground(colorLine);
-				gc.setLineStyle(SWT.LINE_DOT);
-				gc.drawLine(0, devYLabelPos, hitRect.width, devYLabelPos);
-
-				// gc.setLineStyle(SWT.LINE_SOLID);
+				gcGraph.setForeground(colorLine);
+				gcGraph.setLineDash(DOT_DASHES);
+				gcGraph.drawLine(0, devYLabelPos, devXChartWidth, devYLabelPos);
 
 				colorLine.dispose();
 				colorBright.dispose();
 				colorDark.dispose();
+
+				// only 1 y-slider can be hit
+				break;
 			}
 		}
 
 		colorTxt.dispose();
 	}
 
-	private void draw430XMarker(final GC gc) {
+	private void drawSync430XMarker(final GC gc) {
 
 		final Display display = getDisplay();
 		final Color colorXMarker = new Color(display, 255, 153, 0);
@@ -3505,22 +3782,22 @@ public class ChartComponentGraph extends Canvas {
 			final ChartDataXSerie xData = drawingData.getXData();
 			final float scaleX = drawingData.getScaleX();
 
-			final int valueDraggingDiff = (int) (devDraggingDiff / scaleX);
+			final float valueDraggingDiff = devDraggingDiff / scaleX;
 
 			final int synchStartIndex = xData.getSynchMarkerStartIndex();
 			final int synchEndIndex = xData.getSynchMarkerEndIndex();
 
-			final int[] xValues = xData.getHighValues()[0];
-			final int valueXStart = xValues[synchStartIndex];
-			final int valueXEnd = xValues[synchEndIndex];
+			final float[] xValues = xData.getHighValues()[0];
+			final float valueXStart = xValues[synchStartIndex];
+			final float valueXEnd = xValues[synchEndIndex];
 
-			final int devXStart = (int) (scaleX * valueXStart - _devGraphImageXOffset);
-			final int devXEnd = (int) (scaleX * valueXEnd - _devGraphImageXOffset);
+			final int devXStart = (int) (scaleX * valueXStart - _xxDevViewPortLeftBorder);
+			final int devXEnd = (int) (scaleX * valueXEnd - _xxDevViewPortLeftBorder);
 			int devMovedXStart = devXStart;
 			int devMovedXEnd = devXEnd;
 
-			final int valueXStartWithOffset = valueXStart + valueDraggingDiff;
-			final int valueXEndWithOffset = valueXEnd + valueDraggingDiff;
+			final float valueXStartWithOffset = valueXStart + valueDraggingDiff;
+			final float valueXEndWithOffset = valueXEnd + valueDraggingDiff;
 
 			_movedXMarkerStartValueIndex = computeXMarkerValue(
 					xValues,
@@ -3534,14 +3811,14 @@ public class ChartComponentGraph extends Canvas {
 					valueDraggingDiff,
 					valueXEndWithOffset);
 
-			devMovedXStart = (int) (scaleX * xValues[_movedXMarkerStartValueIndex] - _devGraphImageXOffset);
-			devMovedXEnd = (int) (scaleX * xValues[_movedXMarkerEndValueIndex] - _devGraphImageXOffset);
+			devMovedXStart = (int) (scaleX * xValues[_movedXMarkerStartValueIndex] - _xxDevViewPortLeftBorder);
+			devMovedXEnd = (int) (scaleX * xValues[_movedXMarkerEndValueIndex] - _xxDevViewPortLeftBorder);
 
 			/*
 			 * when the moved x-marker is on the right or the left border, make sure that the
 			 * x-markers don't get too small
 			 */
-			final int valueMovedDiff = xValues[_movedXMarkerEndValueIndex] - xValues[_movedXMarkerStartValueIndex];
+			final float valueMovedDiff = xValues[_movedXMarkerEndValueIndex] - xValues[_movedXMarkerStartValueIndex];
 
 			/*
 			 * adjust start and end position
@@ -3571,7 +3848,7 @@ public class ChartComponentGraph extends Canvas {
 				 */
 
 				int valueIndex;
-				final int valueFirstIndex = xValues[xValues.length - 1] - _xMarkerValueDiff;
+				final float valueFirstIndex = xValues[xValues.length - 1] - _xMarkerValueDiff;
 
 				for (valueIndex = xValues.length - 1; valueIndex > 0; valueIndex--) {
 					if (xValues[valueIndex] <= valueFirstIndex) {
@@ -3589,7 +3866,7 @@ public class ChartComponentGraph extends Canvas {
 				 * one value index
 				 */
 
-				final int valueStart = xValues[_movedXMarkerStartValueIndex];
+				final float valueStart = xValues[_movedXMarkerStartValueIndex];
 				int valueIndex;
 				for (valueIndex = _movedXMarkerEndValueIndex - 0; valueIndex >= 0; valueIndex--) {
 					if (xValues[valueIndex] - valueStart < _xMarkerValueDiff) {
@@ -3604,8 +3881,8 @@ public class ChartComponentGraph extends Canvas {
 
 			_movedXMarkerEndValueIndex = Math.min(_movedXMarkerEndValueIndex, xValues.length - 1);
 
-			devMovedXStart = (int) (scaleX * xValues[_movedXMarkerStartValueIndex] - _devGraphImageXOffset);
-			devMovedXEnd = (int) (scaleX * xValues[_movedXMarkerEndValueIndex] - _devGraphImageXOffset);
+			devMovedXStart = (int) (scaleX * xValues[_movedXMarkerStartValueIndex] - _xxDevViewPortLeftBorder);
+			devMovedXEnd = (int) (scaleX * xValues[_movedXMarkerEndValueIndex] - _xxDevViewPortLeftBorder);
 
 			final int devYTop = drawingData.getDevYBottom() - drawingData.devGraphHeight;
 			final int devYBottom = drawingData.getDevYBottom();
@@ -3632,7 +3909,7 @@ public class ChartComponentGraph extends Canvas {
 		colorXMarker.dispose();
 	}
 
-	private void draw440Selection(final GC gc) {
+	private void drawSync440Selection(final GC gc) {
 
 		_isSelectionDirty = false;
 
@@ -3646,7 +3923,7 @@ public class ChartComponentGraph extends Canvas {
 				break;
 
 			case ChartDataModel.CHART_TYPE_BAR:
-				draw442BarSelection(gc, drawingData);
+				drawSync442BarSelection(gc, drawingData);
 				break;
 
 			default:
@@ -3655,7 +3932,7 @@ public class ChartComponentGraph extends Canvas {
 		}
 	}
 
-	private void draw442BarSelection(final GC gc, final GraphDrawingData drawingData) {
+	private void drawSync442BarSelection(final GC gc, final GraphDrawingData drawingData) {
 
 		// check if multiple bars are selected
 		boolean drawSelection = false;
@@ -3821,7 +4098,7 @@ public class ChartComponentGraph extends Canvas {
 		}
 	}
 
-	private void draw450HoveredBar(final GC gc) {
+	private void drawSync450HoveredBar(final GC gcOverlay) {
 
 		// check if hovered bar is disabled
 		if (_hoveredBarSerieIndex == -1) {
@@ -3833,8 +4110,8 @@ public class ChartComponentGraph extends Canvas {
 			return;
 		}
 
-		gc.setLineStyle(SWT.LINE_SOLID);
-		gc.setAlpha(0xd0);
+		gcOverlay.setLineStyle(SWT.LINE_SOLID);
+		gcOverlay.setAlpha(0xd0);
 
 		// loop: all graphs
 		for (final GraphDrawingData drawingData : _graphDrawingData) {
@@ -3897,10 +4174,10 @@ public class ChartComponentGraph extends Canvas {
 				}
 
 				// fill bar background
-				gc.setForeground(colorDark);
-				gc.setBackground(colorBright);
+				gcOverlay.setForeground(colorDark);
+				gcOverlay.setBackground(colorBright);
 
-				gc.fillGradientRectangle(
+				gcOverlay.fillGradientRectangle(
 						hoveredBarShape.x + 1,
 						hoveredBarShape.y + 1,
 						hoveredBarShape.width - 1,
@@ -3908,8 +4185,8 @@ public class ChartComponentGraph extends Canvas {
 						true);
 
 				// draw bar border
-				gc.setForeground(colorLine);
-				gc.drawRoundRectangle(
+				gcOverlay.setForeground(colorLine);
+				gcOverlay.drawRoundRectangle(
 						hoveredBarShape.x,
 						hoveredBarShape.y,
 						hoveredBarShape.width,
@@ -3919,10 +4196,108 @@ public class ChartComponentGraph extends Canvas {
 			}
 		}
 
-		gc.setAlpha(0xff);
+		gcOverlay.setAlpha(0xff);
 	}
 
-	private void draw999ErrorMessage(final GC gc) {
+	private void drawSync460HoveredLine(final GC gcOverlay) {
+
+		int graphIndex = 0;
+
+		gcOverlay.setAntialias(SWT.ON);
+
+		// loop: all graphs
+		for (final GraphDrawingData drawingData : _graphDrawingData) {
+
+			// draw only line graphs
+			if (_chart.getChartDataModel().getChartType() != ChartDataModel.CHART_TYPE_LINE) {
+				continue;
+			}
+
+			// get the chart data
+			final ChartDataYSerie yData = drawingData.getYData();
+			final int[][] colorsIndex = yData.getColorsIndex();
+
+			/*
+			 * get hovered rectangle
+			 */
+			// check bounds
+			if (_lineDevPositions.size() - 1 < graphIndex) {
+				return;
+			}
+
+			// check bounds
+			final Point[] lineDevPositions = _lineDevPositions.get(graphIndex);
+			if (lineDevPositions.length - 1 < graphIndex) {
+				return;
+			}
+
+			final Rectangle[] lineFocusRectangles = _lineFocusRectangles.get(graphIndex);
+
+			final Point devPosition = lineDevPositions[_hoveredLineValueIndex];
+			final Rectangle hoveredRectangle = lineFocusRectangles[_hoveredLineValueIndex];
+
+			// check if hovered line positions are set
+			if (hoveredRectangle == null || devPosition == null) {
+				continue;
+			}
+
+			int devX;
+			final int devVisibleChartWidth = getDevVisibleChartWidth();
+			Color colorLine;
+
+			/*
+			 * paint the points which are outside of the visible area at the border with gray color
+			 */
+			if (devPosition.x < 0) {
+
+				devX = 0;
+				colorLine = Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY);
+
+			} else if (devPosition.x > devVisibleChartWidth) {
+
+				devX = devVisibleChartWidth;
+				colorLine = Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY);
+
+			} else {
+
+				devX = devPosition.x;
+
+				// get the colors
+				final RGB[] rgbLine = yData.getRgbLine();
+				final int colorIndex = colorsIndex[0][_hoveredLineValueIndex];
+
+				final RGB rgbLineDef = rgbLine[colorIndex];
+				colorLine = getColor(rgbLineDef);
+			}
+
+			// draw value point marker
+			final int devOffsetFill = 10;
+			final int devOffsetPoint = 3;
+
+			gcOverlay.setBackground(colorLine);
+
+			gcOverlay.setAlpha(0x40);
+			gcOverlay.fillOval(//
+					devX - devOffsetFill,
+					devPosition.y - devOffsetFill,
+					devOffsetFill * 2,
+					devOffsetFill * 2);
+
+			gcOverlay.setAlpha(0xff);
+			gcOverlay.fillOval(//
+					devX - devOffsetPoint,
+					devPosition.y - devOffsetPoint,
+					devOffsetPoint * 2,
+					devOffsetPoint * 2);
+
+			// move to next graph
+			graphIndex++;
+		}
+
+		gcOverlay.setAntialias(SWT.OFF);
+	}
+
+	private void drawSyncBg999ErrorMessage(final GC gc) {
 
 		final String errorMessage = _chartComponents.errorMessage;
 		if (errorMessage != null) {
@@ -3930,56 +4305,57 @@ public class ChartComponentGraph extends Canvas {
 		}
 	}
 
-	/**
-	 * Fills the surrounding area of an rectangle with background color
-	 * 
-	 * @param gc
-	 * @param imageRect
-	 */
-	private void fillImagePadding(final GC gc, final Rectangle imageRect) {
+	private Point getAndCheckHoveredLinePosition() {
 
-		final int clientHeight = getDevVisibleGraphHeight();
-		final int visibleGraphWidth = getDevVisibleChartWidth();
+		final Point[] lineDevPositions = _lineDevPositions.get(0);
+		Point lineDevPos = lineDevPositions[_hoveredLineValueIndex];
 
-		gc.setBackground(_chart.getBackgroundColor());
+		boolean isAdjusted = false;
 
-		gc.fillRectangle(imageRect.width, 0, visibleGraphWidth, clientHeight);
-		gc.fillRectangle(0, imageRect.height, visibleGraphWidth, clientHeight);
+		/*
+		 * it happened, that lineDevPos was null
+		 */
+		if (lineDevPos == null) {
+
+			int lineDevIndex = _hoveredLineValueIndex;
+
+			// check forward
+			while (lineDevIndex < lineDevPositions.length - 1) {
+
+				lineDevPos = lineDevPositions[++lineDevIndex];
+
+				if (lineDevPos != null) {
+					_hoveredLineValueIndex = lineDevIndex;
+					isAdjusted = true;
+					break;
+				}
+			}
+
+			if (lineDevPos == null) {
+
+				lineDevIndex = _hoveredLineValueIndex;
+
+				// check backward
+				while (lineDevIndex > 0) {
+
+					lineDevPos = lineDevPositions[--lineDevIndex];
+
+					if (lineDevPos != null) {
+						_hoveredLineValueIndex = lineDevIndex;
+						isAdjusted = true;
+						break;
+					}
+				}
+			}
+		}
+
+		if (isAdjusted) {
+			// force repaining
+			_isOverlayDirty = false;
+		}
+
+		return lineDevPos;
 	}
-
-//	void enforceChartImageMinMaxWidth() {
-//
-////		if (graphZoomParts != 1) {
-////
-//////			zoomWithParts(graphZoomParts, graphZoomPartPosition, true);
-////
-////		} else {
-//
-//		final int devVisibleChartWidth = getDevVisibleChartWidth();
-//
-//		final int devImageWidth = (int) (fGraphZoomRatio * devVisibleChartWidth);
-//		final int chartMinWidth = fChart.getChartDataModel().getChartMinWidth();
-//
-//		if (canScrollZoomedChart) {
-//
-//			// enforce min/max width for the chart
-//			final int devMinWidth = Math.max(Math.max(devVisibleChartWidth, chartMinWidth),
-//					ChartComponents.CHART_MIN_WIDTH);
-//
-//			final int devMaxWidth = Math.min(devImageWidth, ChartComponents.CHART_MAX_WIDTH);
-//
-//			fDevVirtualGraphImageWidth = Math.max(devMinWidth, devMaxWidth);
-//
-//		} else {
-//
-//			// enforce min width for the chart
-//			final int devMinWidth = Math.max(Math.max(devVisibleChartWidth, chartMinWidth),
-//					ChartComponents.CHART_MIN_WIDTH);
-//
-//			fDevVirtualGraphImageWidth = Math.max(devMinWidth, devImageWidth);
-//		}
-////		}
-//	}
 
 	/**
 	 * @param rgb
@@ -3995,33 +4371,17 @@ public class ChartComponentGraph extends Canvas {
 		final Color color = _colorCache.get(colorKey);
 
 		if (color == null) {
-			return _colorCache.createColor(colorKey, rgb);
+			return _colorCache.getColor(colorKey, rgb);
 		} else {
 			return color;
 		}
 	}
 
 	/**
-	 * @return when the zoomed graph can't be scrolled the chart image can be wider than the visible
-	 *         part. It returns the device offset to the start of the visible chart
-	 */
-	int getDevGraphImageXOffset() {
-		return _devGraphImageXOffset;
-	}
-
-	/**
-	 * @return Returns the virtual graph image width, this is the width of the graph image when the
-	 *         full graph would be displayed
-	 */
-	int getDevVirtualGraphImageWidth() {
-		return _devVirtualGraphImageWidth;
-	}
-
-	/**
-	 * @return Returns the visible width of the chart graph
+	 * @return Returns the viewport (visible width) of the chart graph
 	 */
 	private int getDevVisibleChartWidth() {
-		return _chartComponents.getDevVisibleChartWidth() - 0;
+		return _chartComponents.getDevVisibleChartWidth();
 	}
 
 	/**
@@ -4031,22 +4391,26 @@ public class ChartComponentGraph extends Canvas {
 		return _chartComponents.getDevVisibleChartHeight();
 	}
 
-	public float getGraphZoomRatio() {
+	double getGraphZoomRatio() {
 		return _graphZoomRatio;
+	}
+
+	int getHoveredLineValueIndex() {
+		return _hoveredLineValueIndex;
 	}
 
 	/**
 	 * @return Returns the left slider
 	 */
 	ChartXSlider getLeftSlider() {
-		return _xSliderA.getDevVirtualSliderLinePos() < _xSliderB.getDevVirtualSliderLinePos() ? _xSliderA : _xSliderB;
+		return _xSliderA.getXXDevSliderLinePos() < _xSliderB.getXXDevSliderLinePos() ? _xSliderA : _xSliderB;
 	}
 
 	/**
 	 * @return Returns the right most slider
 	 */
 	ChartXSlider getRightSlider() {
-		return _xSliderA.getDevVirtualSliderLinePos() < _xSliderB.getDevVirtualSliderLinePos() ? _xSliderB : _xSliderA;
+		return _xSliderA.getXXDevSliderLinePos() < _xSliderB.getXXDevSliderLinePos() ? _xSliderB : _xSliderA;
 	}
 
 	ChartXSlider getSelectedSlider() {
@@ -4057,32 +4421,6 @@ public class ChartComponentGraph extends Canvas {
 			return getLeftSlider();
 		}
 		return slider;
-	}
-
-	/**
-	 * Returns the size of the graph for the given bounds, the size will be reduced when the
-	 * scrollbars are visible
-	 * 
-	 * @param bounds
-	 *            is the size of the receiver where the chart can be drawn
-	 * @return bounds for the chart without scrollbars
-	 */
-	Point getVisibleSizeWithHBar(final int width, final int height) {
-
-		int horizontalBarHeight = 0;
-
-		if (getHorizontalBar() != null) {
-			// to get the size of the horizontal bar forces a resize event on
-			// this component
-			horizontalBarHeight += getHorizontalBar().getSize().y;
-		}
-
-		final int x = width;
-		final int y = (_canScrollZoomedChart && _devVirtualGraphImageWidth > width)
-				? (height - horizontalBarHeight)
-				: height;
-
-		return new Point(x, y);
 	}
 
 	/**
@@ -4100,6 +4438,22 @@ public class ChartComponentGraph extends Canvas {
 		return _graphDrawingData.get(0);
 	}
 
+	/**
+	 * @return Returns the virtual graph image width, this is the width of the graph image when the
+	 *         full graph would be displayed
+	 */
+	int getXXDevGraphWidth() {
+		return _xxDevGraphWidth;
+	}
+
+	/**
+	 * @return When the graph is zoomed, the chart shows only a part of the whole graph in the
+	 *         viewport. Returns the left border of the viewport.
+	 */
+	int getXXDevViewPortLeftBorder() {
+		return _xxDevViewPortLeftBorder;
+	}
+
 	private void handleChartResizeForSliders() {
 
 		// update the width in the sliders
@@ -4110,12 +4464,59 @@ public class ChartComponentGraph extends Canvas {
 	}
 
 	/**
+	 * Mouse event occured in the value point tooltip, move the slider and/or hovered line (value
+	 * point) accordingly.
+	 * 
+	 * @param event
+	 * @param mouseDisplayPosition
+	 */
+	void handleTooltipMouseEvent(final Event event, final Point mouseDisplayPosition) {
+
+		switch (event.type) {
+		case SWT.MouseMove:
+
+			final Point controlPos = toControl(mouseDisplayPosition);
+			final Rectangle clientRect = getClientArea();
+
+			if (clientRect.contains(controlPos)) {
+
+				_isAutoScroll = false;
+
+				onMouseMove(controlPos.x, controlPos.y);
+
+			} else {
+				onMouseMoveAxis(new MouseEvent(event));
+			}
+
+			break;
+
+		case SWT.MouseEnter:
+
+			// simulate a mouse move to do autoscrolling
+			onMouseMoveAxis(new MouseEvent(event));
+
+			break;
+
+		case SWT.MouseExit:
+
+			break;
+
+		case SWT.MouseVerticalWheel:
+			onMouseWheel(event);
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	/**
 	 * check if mouse has moved over a bar
 	 * 
+	 * @param devX
 	 * @param devY
-	 * @param graphX
 	 */
-	private boolean isBarHit(final int devY, final int graphX) {
+	private boolean isBarHit(final int devX, final int devY) {
 
 		boolean isBarHit = false;
 
@@ -4139,13 +4540,13 @@ public class ChartComponentGraph extends Canvas {
 					final Rectangle barInfoFocus = serieRectangles[valueIndex];
 
 					// test if the mouse is within a bar focus rectangle
-					if (barInfoFocus != null && barInfoFocus.contains(graphX, devY)) {
+					if (barInfoFocus != null && barInfoFocus.contains(devX, devY)) {
 
 						// keep the hovered bar index
 						_hoveredBarSerieIndex = serieIndex;
 						_hoveredBarValueIndex = valueIndex;
 
-						_toolTipV1.toolTip10Show(graphX, 100, serieIndex, valueIndex);
+						_hoveredBarToolTip.toolTip10Show(devX, 100, serieIndex, valueIndex);
 
 						isBarHit = true;
 						break;
@@ -4163,7 +4564,7 @@ public class ChartComponentGraph extends Canvas {
 
 		if (isBarHit == false) {
 
-			_toolTipV1.toolTip20Hide();
+			_hoveredBarToolTip.toolTip20Hide();
 
 			if (_hoveredBarSerieIndex != -1) {
 
@@ -4180,6 +4581,87 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		return isBarHit;
+	}
+
+	private boolean isInXSliderSetArea(final int devYMouse) {
+
+		final int devVisibleChartHeight = _chartComponents.getDevVisibleChartHeight();
+		final int devSetArea = (int) Math.min(100, devVisibleChartHeight * 0.3);
+
+		Cursor cursor = null;
+
+		if (devYMouse < devSetArea) {
+
+			cursor = _cursorXSliderLeft;
+
+			_isSetXSliderPositionLeft = true;
+			_isSetXSliderPositionRight = false;
+
+		} else if (devYMouse > (devVisibleChartHeight - devSetArea)) {
+
+			cursor = _cursorXSliderRight;
+
+			_isSetXSliderPositionLeft = false;
+			_isSetXSliderPositionRight = true;
+		}
+
+		if (cursor != null) {
+
+			setCursor(cursor);
+
+			return true;
+
+		} else {
+
+			_isSetXSliderPositionLeft = false;
+			_isSetXSliderPositionRight = false;
+
+			return false;
+		}
+	}
+
+	/**
+	 * Check if mouse has moved over a line value.
+	 * 
+	 * @return
+	 */
+	private boolean isLineHovered() {
+
+		if (_lineDevPositions.size() == 0) {
+			return false;
+		}
+
+		Rectangle lineRect = null;
+
+		for (final Rectangle[] lineFocusRectangles : _lineFocusRectangles) {
+
+			// find the line rectangle which is hovered by the mouse
+			for (int valueIndex = 0; valueIndex < lineFocusRectangles.length; valueIndex++) {
+
+				lineRect = lineFocusRectangles[valueIndex];
+
+				// test if the mouse is within a bar focus rectangle
+				if (lineRect != null) {
+
+					// inline for lineRect.contains
+					if ((_devXMouseMove >= lineRect.x)
+							&& (_devYMouseMove >= lineRect.y)
+							&& _devXMouseMove < (lineRect.x + lineRect.width)
+							&& _devYMouseMove < (lineRect.y + lineRect.height)) {
+
+						// keep the hovered line index
+						_hoveredLineValueIndex = valueIndex;
+
+						return true;
+					}
+				}
+			}
+		}
+
+		// reset index
+		_hoveredLineValueIndex = -1;
+
+		return false;
 	}
 
 	/**
@@ -4202,11 +4684,11 @@ public class ChartComponentGraph extends Canvas {
 			return false;
 		}
 
-		final int[] xValues = xData.getHighValues()[0];
+		final float[] xValues = xData.getHighValues()[0];
 		final float scaleX = getXDrawingData().getScaleX();
 
-		final int devXMarkerStart = (int) (xValues[Math.min(synchMarkerStartIndex, xValues.length - 1)] * scaleX - _devGraphImageXOffset);
-		final int devXMarkerEnd = (int) (xValues[Math.min(synchMarkerEndIndex, xValues.length - 1)] * scaleX - _devGraphImageXOffset);
+		final int devXMarkerStart = (int) (xValues[Math.min(synchMarkerStartIndex, xValues.length - 1)] * scaleX - _xxDevViewPortLeftBorder);
+		final int devXMarkerEnd = (int) (xValues[Math.min(synchMarkerEndIndex, xValues.length - 1)] * scaleX - _xxDevViewPortLeftBorder);
 
 		if (devXGraph >= devXMarkerStart && devXGraph <= devXMarkerEnd) {
 			return true;
@@ -4215,13 +4697,13 @@ public class ChartComponentGraph extends Canvas {
 		return false;
 	}
 
-	private ChartXSlider isXSliderHit(final int devYMouse, final int devXGraph) {
+	private ChartXSlider isXSliderHit(final int devXMouse, final int devYMouse) {
 
 		ChartXSlider xSlider = null;
 
-		if (_xSliderA.getHitRectangle().contains(devXGraph, devYMouse)) {
+		if (_xSliderA.getHitRectangle().contains(devXMouse, devYMouse)) {
 			xSlider = _xSliderA;
-		} else if (_xSliderB.getHitRectangle().contains(devXGraph, devYMouse)) {
+		} else if (_xSliderB.getHitRectangle().contains(devXMouse, devYMouse)) {
 			xSlider = _xSliderB;
 		}
 
@@ -4248,6 +4730,7 @@ public class ChartComponentGraph extends Canvas {
 			}
 		}
 
+		// hide previously hitted y-slider
 		if (_hitYSlider != null) {
 
 			// redraw the sliders to hide the labels
@@ -4260,15 +4743,16 @@ public class ChartComponentGraph extends Canvas {
 	}
 
 	/**
-	 * moves the right slider to the mouse position
+	 * Move left slider to the mouse down position
 	 */
 	void moveLeftSliderHere() {
 
 		final ChartXSlider leftSlider = getLeftSlider();
-		final int devLeftPosition = _devGraphImageXOffset + _mouseDownDevPositionX;
+		final int xxDevLeftPosition = _xxDevViewPortLeftBorder + _devXMouseDown;
 
-		computeXSliderValue(leftSlider, devLeftPosition);
-		leftSlider.moveToDevPosition(devLeftPosition, true, true);
+		computeXSliderValue(leftSlider, xxDevLeftPosition);
+
+		leftSlider.moveToXXDevPosition(xxDevLeftPosition, true, true);
 
 		setZoomInPosition();
 
@@ -4277,15 +4761,16 @@ public class ChartComponentGraph extends Canvas {
 	}
 
 	/**
-	 * moves the left slider to the mouse position
+	 * Move right slider to the mouse down position
 	 */
 	void moveRightSliderHere() {
 
 		final ChartXSlider rightSlider = getRightSlider();
-		final int devRightPosition = _devGraphImageXOffset + _mouseDownDevPositionX;
+		final int xxDevRightPosition = _xxDevViewPortLeftBorder + _devXMouseDown;
 
-		computeXSliderValue(rightSlider, devRightPosition);
-		rightSlider.moveToDevPosition(devRightPosition, true, true);
+		computeXSliderValue(rightSlider, xxDevRightPosition);
+
+		rightSlider.moveToXXDevPosition(xxDevRightPosition, true, true);
 
 		setZoomInPosition();
 
@@ -4313,18 +4798,18 @@ public class ChartComponentGraph extends Canvas {
 		/*
 		 * adjust left slider
 		 */
-		final int devLeftPosition = _devGraphImageXOffset + 2;
+		final int xxDevLeftPosition = _xxDevViewPortLeftBorder + 2;
 
-		computeXSliderValue(leftSlider, devLeftPosition);
-		leftSlider.moveToDevPosition(devLeftPosition, true, true);
+		computeXSliderValue(leftSlider, xxDevLeftPosition);
+		leftSlider.moveToXXDevPosition(xxDevLeftPosition, true, true);
 
 		/*
 		 * adjust right slider
 		 */
-		final int devRightPosition = _devGraphImageXOffset + getDevVisibleChartWidth() - 2;
+		final int xxDevRightPosition = _xxDevViewPortLeftBorder + getDevVisibleChartWidth() - 2;
 
-		computeXSliderValue(rightSlider, devRightPosition);
-		rightSlider.moveToDevPosition(devRightPosition, true, true);
+		computeXSliderValue(rightSlider, xxDevRightPosition);
+		rightSlider.moveToXXDevPosition(xxDevRightPosition, true, true);
 
 		_isSliderDirty = true;
 		redraw();
@@ -4335,111 +4820,23 @@ public class ChartComponentGraph extends Canvas {
 	 * 
 	 * @param xSlider
 	 *            Current slider
-	 * @param devSliderLinePos
+	 * @param xxDevSliderLinePos
 	 *            x coordinate for the slider line within the graph, this can be outside of the
 	 *            visible graph
 	 */
-	private void moveXSlider(final ChartXSlider xSlider, int devSliderLinePos) {
+	private void moveXSlider(final ChartXSlider xSlider, final int devXSliderLinePos) {
 
-		devSliderLinePos += _devGraphImageXOffset;
+		int xxDevSliderLinePos = _xxDevViewPortLeftBorder + devXSliderLinePos;
 
 		/*
 		 * adjust the line position the the min/max width of the graph image
 		 */
-		devSliderLinePos = Math.min(_devVirtualGraphImageWidth, Math.max(0, devSliderLinePos));
+		xxDevSliderLinePos = Math.min(_xxDevGraphWidth, Math.max(0, xxDevSliderLinePos));
 
-		computeXSliderValue(xSlider, devSliderLinePos);
+		computeXSliderValue(xSlider, xxDevSliderLinePos);
 
 		// set new slider line position
-		xSlider.moveToDevPosition(devSliderLinePos, true, true);
-	}
-
-	/**
-	 * move the x-slider with the keyboard
-	 * 
-	 * @param event
-	 */
-	private void moveXSlider(final Event event) {
-
-		boolean isShift = (event.stateMask & SWT.SHIFT) != 0;
-		boolean isCtrl = (event.stateMask & SWT.CTRL) != 0;
-
-		if (_selectedXSlider == null) {
-			final ChartXSlider leftSlider = getLeftSlider();
-			if (leftSlider != null) {
-				// set default slider
-				_selectedXSlider = leftSlider;
-			} else {
-				return;
-			}
-		}
-
-		if (isShift && (event.stateMask & SWT.CTRL) == 0) {
-			// select the other slider
-			_selectedXSlider = _selectedXSlider == _xSliderA ? _xSliderB : _xSliderA;
-			_isSliderDirty = true;
-			redraw();
-			return;
-		}
-
-		if (event.keyCode == SWT.PAGE_UP || event.keyCode == SWT.PAGE_DOWN) {
-			isCtrl = true;
-			isShift = true;
-		}
-
-		int valueIndex = _selectedXSlider.getValuesIndex();
-		final int[] xValues = getXData().getHighValues()[0];
-
-		// accelerate slider move speed
-		int sliderDiff = isCtrl ? 10 : 1;
-		sliderDiff *= isShift ? 10 : 1;
-
-		switch (event.keyCode) {
-		case SWT.PAGE_DOWN:
-		case SWT.ARROW_RIGHT:
-
-			valueIndex += sliderDiff;
-
-			if (valueIndex >= xValues.length) {
-				valueIndex = 0;
-			}
-			break;
-
-		case SWT.PAGE_UP:
-		case SWT.ARROW_LEFT:
-
-			valueIndex -= sliderDiff;
-
-			if (valueIndex < 0) {
-				valueIndex = xValues.length - 1;
-			}
-
-			break;
-
-		case SWT.HOME:
-
-			valueIndex = 0;
-
-			break;
-
-		case SWT.END:
-
-			valueIndex = xValues.length - 1;
-
-			break;
-		}
-
-		setXSliderValueIndex(_selectedXSlider, valueIndex, false);
-
-		redraw();
-		setDefaultCursor();
-	}
-
-	private void moveYSlider(final ChartYSlider ySlider, final int graphX, final int devY) {
-
-		final int devYSliderLine = devY - ySlider.getDevYClickOffset() + ChartYSlider.halfSliderHitLineHeight;
-
-		ySlider.setDevYSliderLine(graphX, devYSliderLine);
+		xSlider.moveToXXDevPosition(xxDevSliderLinePos, true, true);
 	}
 
 	/**
@@ -4451,22 +4848,31 @@ public class ChartComponentGraph extends Canvas {
 		_cursorResizeLeftRight = Util.disposeResource(_cursorResizeLeftRight);
 		_cursorResizeTopDown = Util.disposeResource(_cursorResizeTopDown);
 		_cursorDragged = Util.disposeResource(_cursorDragged);
-		_cursorHand05x = Util.disposeResource(_cursorHand05x);
-		_cursorHand = Util.disposeResource(_cursorHand);
-		_cursorHand2x = Util.disposeResource(_cursorHand2x);
-		_cursorHand5x = Util.disposeResource(_cursorHand5x);
 		_cursorModeSlider = Util.disposeResource(_cursorModeSlider);
 		_cursorModeZoom = Util.disposeResource(_cursorModeZoom);
 		_cursorModeZoomMove = Util.disposeResource(_cursorModeZoomMove);
+		_cursorDragXSlider_ModeZoom = Util.disposeResource(_cursorDragXSlider_ModeZoom);
+		_cursorDragXSlider_ModeSlider = Util.disposeResource(_cursorDragXSlider_ModeSlider);
+		_cursorHoverXSlider = Util.disposeResource(_cursorHoverXSlider);
 
-		_chartImage = Util.disposeResource(_chartImage);
-		_graphImage = Util.disposeResource(_graphImage);
-		_sliderImage = Util.disposeResource(_sliderImage);
-		_customFgLayerImage = Util.disposeResource(_customFgLayerImage);
+		_cursorMove1x = Util.disposeResource(_cursorMove1x);
+		_cursorMove2x = Util.disposeResource(_cursorMove2x);
+		_cursorMove3x = Util.disposeResource(_cursorMove3x);
+		_cursorMove4x = Util.disposeResource(_cursorMove4x);
+		_cursorMove5x = Util.disposeResource(_cursorMove5x);
+
+		_cursorXSliderLeft = Util.disposeResource(_cursorXSliderLeft);
+		_cursorXSliderRight = Util.disposeResource(_cursorXSliderRight);
+
+		_chartImage20Chart = Util.disposeResource(_chartImage20Chart);
+		_chartImage10Graphs = Util.disposeResource(_chartImage10Graphs);
+		_chartImage40Overlay = Util.disposeResource(_chartImage40Overlay);
+		_chartImage30Custom = Util.disposeResource(_chartImage30Custom);
 
 		_gridColor = Util.disposeResource(_gridColor);
+		_gridColorMajor = Util.disposeResource(_gridColorMajor);
 
-		_toolTipV1.dispose();
+		_hoveredBarToolTip.dispose();
 
 		_colorCache.dispose();
 	}
@@ -4479,7 +4885,20 @@ public class ChartComponentGraph extends Canvas {
 			break;
 
 		case ChartDataModel.CHART_TYPE_LINE:
-			moveXSlider(event);
+
+			switch (event.character) {
+			case '+':
+				_chart.onExecuteZoomIn();
+				break;
+
+			case '-':
+				_chart.onExecuteZoomOut(true);
+				break;
+
+			default:
+				onKeyDownMoveXSlider(event);
+			}
+
 			break;
 
 		default:
@@ -4487,7 +4906,128 @@ public class ChartComponentGraph extends Canvas {
 		}
 	}
 
+	/**
+	 * move the x-slider with the keyboard
+	 * 
+	 * @param event
+	 */
+	private void onKeyDownMoveXSlider(final Event event) {
+
+		final int keyCode = event.keyCode;
+
+		/*
+		 * keyboard events behaves different than the mouse event, shift & ctrl can be set in both
+		 * event fields
+		 */
+		boolean isShift = (event.stateMask & SWT.SHIFT) != 0 || (keyCode & SWT.SHIFT) != 0;
+		boolean isCtrl = (event.stateMask & SWT.CTRL) != 0 || (keyCode & SWT.CTRL) != 0;
+
+		// ensure a slider is selected
+		if (_selectedXSlider == null) {
+			final ChartXSlider leftSlider = getLeftSlider();
+			if (leftSlider != null) {
+				// set default slider
+				_selectedXSlider = leftSlider;
+			} else {
+				return;
+			}
+		}
+
+		// toggle selected slider with the shift key
+		if (isShift && isCtrl == false) {
+			_selectedXSlider = _selectedXSlider == _xSliderA ? _xSliderB : _xSliderA;
+			_isSliderDirty = true;
+			redraw();
+
+			return;
+		}
+
+		// accelerate with page up/down
+		if (keyCode == SWT.PAGE_UP || keyCode == SWT.PAGE_DOWN) {
+			isCtrl = true;
+			isShift = true;
+		}
+
+		// accelerate slider move speed depending on shift/ctrl key
+		int valueIndexDiff = isCtrl ? 10 : 1;
+		valueIndexDiff *= isShift ? 10 : 1;
+
+		int valueIndex = _selectedXSlider.getValuesIndex();
+		final float[] xValues = getXData().getHighValues()[0];
+
+		boolean isMoveSlider = false;
+
+//		if (isShift && isCtrl) {
+//
+//			/*
+//			 * this will reposition the x-slider to the exact value position in the graph, the Ctrl
+//			 * key must be pressed first before the Shift key otherwise the slider is toggles
+//			 */
+//			isMoveSlider = true;
+//
+//		} else
+		{
+
+			switch (keyCode) {
+			case SWT.PAGE_DOWN:
+			case SWT.ARROW_RIGHT:
+
+				valueIndex += valueIndexDiff;
+
+				// wrap around
+				if (valueIndex >= xValues.length) {
+					valueIndex = 0;
+				}
+
+				isMoveSlider = true;
+
+				break;
+
+			case SWT.PAGE_UP:
+			case SWT.ARROW_LEFT:
+
+				valueIndex -= valueIndexDiff;
+
+				// wrap around
+				if (valueIndex < 0) {
+					valueIndex = xValues.length - 1;
+				}
+
+				isMoveSlider = true;
+
+				break;
+
+			case SWT.HOME:
+
+				valueIndex = 0;
+
+				isMoveSlider = true;
+
+				break;
+
+			case SWT.END:
+
+				valueIndex = xValues.length - 1;
+
+				isMoveSlider = true;
+
+				break;
+			}
+		}
+
+		if (isMoveSlider) {
+
+			setXSliderValueIndex(_selectedXSlider, valueIndex, false);
+
+			redraw();
+			setCursorStyle(event.y);
+		}
+	}
+
 	void onMouseDoubleClick(final MouseEvent e) {
+
+		// stop dragging the x-slider
+		_xSliderDragged = null;
 
 		if (_hoveredBarSerieIndex != -1) {
 
@@ -4528,10 +5068,10 @@ public class ChartComponentGraph extends Canvas {
 				 * set position where the double click occured, this position will be used when the
 				 * chart is zoomed
 				 */
-				final int devMousePosInChart = _devGraphImageXOffset + e.x;
-				_xOffsetMouseZoomInRatio = (float) devMousePosInChart / _devVirtualGraphImageWidth;
+				final double xxDevMousePosInChart = _xxDevViewPortLeftBorder + e.x;
+				_zoomRatioCenter = xxDevMousePosInChart / _xxDevGraphWidth;
 
-				zoomInWithMouse();
+				zoomInWithMouse(Integer.MIN_VALUE);
 			}
 		}
 	}
@@ -4549,81 +5089,102 @@ public class ChartComponentGraph extends Canvas {
 			return;
 		}
 
-		final ScrollBar hBar = getHorizontalBar();
-		final int hBarOffset = hBar.isVisible() ? hBar.getSelection() : 0;
-
 		final int devXMouse = event.x;
 		final int devYMouse = event.y;
-		final int devXGraph = hBarOffset + devXMouse;
 
-		_mouseDownDevPositionX = event.x;
-		_mouseDownDevPositionY = event.y;
+		final boolean isShift = (event.stateMask & SWT.SHIFT) != 0;
+		final boolean isCtrl = (event.stateMask & SWT.CTRL) != 0;
 
-		// show context menu
+		_devXMouseDown = devXMouse;
+		_devYMouseDown = devYMouse;
+
+		// show slider context menu
 		if (event.button != 1) {
+
+			// stop dragging the x-slider
+			_xSliderDragged = null;
+
 			if (event.button == 3) {
-				computeSliderForContextMenu(devXMouse, devYMouse, devXGraph);
+
+				// right button is pressed
+
+				computeSliderForContextMenu(devXMouse, devYMouse);
 			}
 			return;
 		}
 
-		if (_chart.isMouseDownExternalPre(devXMouse, devYMouse, devXGraph)) {
+		// use external mouse event listener
+		if (_chart.isMouseDownExternalPre(devXMouse, devYMouse)) {
 			return;
-		}
-
-		// check if a x-slider was hit
-		_xSliderDragged = null;
-		if (_xSliderA.getHitRectangle().contains(devXGraph, devYMouse)) {
-			_xSliderDragged = _xSliderA;
-		} else if (_xSliderB.getHitRectangle().contains(devXGraph, devYMouse)) {
-			_xSliderDragged = _xSliderB;
 		}
 
 		if (_xSliderDragged != null) {
 
-			// x-slider was hit and can now be dragged on a mouse move event
+			// x-slider is dragged
 
-			_xSliderOnTop = _xSliderDragged;
-			_xSliderOnBottom = _xSliderOnTop == _xSliderA ? _xSliderB : _xSliderA;
+			// keep x-slider
+			final ChartXSlider xSlider = _xSliderDragged;
 
-			// set the hit offset for the mouse click
-			_xSliderDragged.setDevXClickOffset(devXGraph - _xSliderDragged.getHitRectangle().x);
+			// stop dragging the slider
+			_xSliderDragged = null;
 
-			// the hit x-slider is now the selected x-slider
-			_selectedXSlider = _xSliderDragged;
-			_isSelectionVisible = true;
+			// set mouse zoom double click position
+			final double xxDevMousePosInChart = _xxDevViewPortLeftBorder + devXMouse;
+			_zoomRatioCenter = xxDevMousePosInChart / _xxDevGraphWidth;
+
+			/*
+			 * make sure that the slider is exactly positioned where the value is displayed in the
+			 * graph
+			 */
+			setXSliderValueIndex(xSlider, _hoveredLineValueIndex, false);
+
 			_isSliderDirty = true;
 			redraw();
 
 		} else {
 
-			// a x-slider isn't dragged
+			// check if a x-slider was hit
+			_xSliderDragged = null;
+			if (_xSliderA.getHitRectangle().contains(devXMouse, devYMouse)) {
+				_xSliderDragged = _xSliderA;
+			} else if (_xSliderB.getHitRectangle().contains(devXMouse, devYMouse)) {
+				_xSliderDragged = _xSliderB;
+			}
 
-			// check if a y-slider was hit
-			_ySliderDragged = isYSliderHit(devXGraph, devYMouse);
+			if (_xSliderDragged != null) {
 
-			if (_ySliderDragged != null) {
+				// x-slider is dragged, stop dragging
 
-				// y-slider was hit
+				_xSliderOnTop = _xSliderDragged;
+				_xSliderOnBottom = _xSliderOnTop == _xSliderA ? _xSliderB : _xSliderA;
 
-				_ySliderDragged.setDevYClickOffset(devYMouse - _ySliderDragged.getHitRectangle().y);
+				// set the hit offset for the mouse click
+				_xSliderDragged.setDevXClickOffset(devXMouse - _xxDevViewPortLeftBorder);
+
+				// the hit x-slider is now the selected x-slider
+				_selectedXSlider = _xSliderDragged;
+				_isSelectionVisible = true;
+				_isSliderDirty = true;
+
+				redraw();
+
+			} else if (_ySliderDragged != null) {
+
+				// y-slider is dragged, stop dragging
+
+				adjustYSlider();
+
+			} else if ((_ySliderDragged = isYSliderHit(devXMouse, devYMouse)) != null) {
+
+				// start y-slider dragging
+
+				_ySliderDragged.devYClickOffset = devYMouse - _ySliderDragged.getHitRectangle().y;
 
 			} else if (_hoveredBarSerieIndex != -1) {
 
 				actionSelectBars();
 
-			} else if (hBar.isVisible()) {
-
-				// start scrolling the graph if the scrollbar is visible
-
-				_isGraphScrolled = true;
-
-				_startPosScrollbar = hBarOffset;
-				_startPosDev = devXMouse;
-
-				setupScrollCursor(devXMouse, devYMouse);
-
-			} else if (_chart._draggingListenerXMarker != null && isSynchMarkerHit(devXGraph)) {
+			} else if (_chart._draggingListenerXMarker != null && isSynchMarkerHit(devXMouse)) {
 
 				/*
 				 * start to move the x-marker, when a dragging listener and the x-marker was hit
@@ -4641,37 +5202,103 @@ public class ChartComponentGraph extends Canvas {
 					redraw();
 				}
 
-			} else {
+			} else if (_isXSliderVisible //
+					//
+					// x-slider is NOT dragged
+					&& _xSliderDragged == null
+					//
+					&& (isShift || isCtrl || _isSetXSliderPositionLeft || _isSetXSliderPositionRight)) {
 
-				// do post processing when no other ations are done
+				// position the x-slider and start dragging it
 
-//				if (fChart.isMouseDownExternalPost(devXMouse, devYMouse, devXGraph)) {
-//					return;
-//				}
-
-				if (_graphZoomRatio > 1) {
-
-					// start moving the chart
-
-					/*
-					 * to prevent flickering with the double click event, dragged started is used
-					 */
-					_isChartDraggedStarted = true;
-
-					_draggedChartStartPos = new Point(event.x, event.y);
-
-					/*
-					 * set also the move position because when changing the data model, the old
-					 * position will be used and the chart is painted on the wrong position on mouse
-					 * down
-					 */
-					_draggedChartDraggedPos = _draggedChartStartPos;
-
-					setCursor(_cursorDragged);
-
+				if (_isSetXSliderPositionLeft) {
+					_xSliderDragged = getLeftSlider();
+				} else if (_isSetXSliderPositionRight) {
+					_xSliderDragged = getRightSlider();
+				} else if (isCtrl) {
+					// ctrl is pressed -> left slider
+					_xSliderDragged = getRightSlider();
+				} else {
+					// shift is pressed -> right slider
+					_xSliderDragged = getLeftSlider();
 				}
+
+				_xSliderOnTop = _xSliderDragged;
+				_xSliderOnBottom = _xSliderOnTop == _xSliderA ? _xSliderB : _xSliderA;
+
+				// the left x-slider is now the selected x-slider
+				_selectedXSlider = _xSliderDragged;
+				_isSelectionVisible = true;
+
+				/*
+				 * move the left slider to the mouse down position
+				 */
+
+				_xSliderDragged.setDevXClickOffset(devXMouse - _xxDevViewPortLeftBorder);
+
+				// keep position of the slider line
+				final int devXSliderLinePos = devXMouse;
+				_devXDraggedXSliderLine = devXSliderLinePos;
+
+				moveXSlider(_xSliderDragged, devXSliderLinePos);
+
+				_isSliderDirty = true;
+				redraw();
+
+			} else if (_graphZoomRatio > 1) {
+
+				// start dragging the chart
+
+				/*
+				 * to prevent flickering with the double click event, dragged started is used
+				 */
+				_isChartDraggedStarted = true;
+
+				_draggedChartStartPos = new Point(event.x, event.y);
+
+				/*
+				 * set also the move position because when changing the data model, the old position
+				 * will be used and the chart is painted on the wrong position on mouse down
+				 */
+				_draggedChartDraggedPos = _draggedChartStartPos;
 			}
 		}
+
+		setCursorStyle(devYMouse);
+	}
+
+	/**
+	 * Mouse down event in the x-axis area
+	 * 
+	 * @param event
+	 */
+	void onMouseDownAxis(final MouseEvent event) {
+
+		if (_xSliderDragged != null) {
+
+			// stop dragging the slider
+			_xSliderDragged = null;
+
+			doAutoZoomToXSliders();
+		}
+	}
+
+	private void onMouseEnter(final MouseEvent mouseEvent) {
+
+		if (_ySliderDragged != null) {
+
+			_hitYSlider = _ySliderDragged;
+
+			_isSliderDirty = true;
+			redraw();
+		}
+
+	}
+
+	void onMouseEnterAxis(final MouseEvent event) {
+
+		// simulate a mouse move to do autoscrolling
+		onMouseMoveAxis(event);
 	}
 
 	/**
@@ -4681,11 +5308,11 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private void onMouseExit(final MouseEvent event) {
 
-		_toolTipV1.toolTip20Hide();
+		_hoveredBarToolTip.toolTip20Hide();
 
-		if (_isGraphScrolled) {
-
-			_isGraphScrolled = false;
+		if (_isAutoScroll) {
+			// stop autoscrolling
+			_isAutoScroll = false;
 
 		} else if (_xSliderDragged == null) {
 
@@ -4705,7 +5332,32 @@ public class ChartComponentGraph extends Canvas {
 			redraw();
 		}
 
-		setDefaultCursor();
+		setCursorStyle(event.y);
+	}
+
+	/**
+	 * @param mouseEvent
+	 * @return Returns <code>true</code> when the mouse event was handled.
+	 */
+	boolean onMouseExitAxis(final MouseEvent mouseEvent) {
+
+		if (_isAutoScroll) {
+
+			// stop autoscrolling with x-slider
+			_isAutoScroll = false;
+
+			// stop autoscrolling without x-slider
+			_devXAutoScrollMousePosition = Integer.MIN_VALUE;
+
+			// hide move/scroll cursor
+			if (mouseEvent.widget instanceof ChartComponentAxis) {
+				((ChartComponentAxis) mouseEvent.widget).setCursor(null);
+			}
+
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -4713,91 +5365,46 @@ public class ChartComponentGraph extends Canvas {
 	 * 
 	 * @param event
 	 */
-	private void onMouseMove(final MouseEvent event) {
+	private void onMouseMove(final int devXMouse, final int devYMouse) {
 
-		final ScrollBar hBar = getHorizontalBar();
-		final int hBarOffset = hBar.isVisible() ? hBar.getSelection() : 0;
+		_devXMouseMove = devXMouse;
+		_devYMouseMove = devYMouse;
 
-		final int devXMouse = event.x;
-		final int devYMouse = event.y;
-		final int devXGraph = hBarOffset + devXMouse;
+		boolean isRedraw = false;
 
-		boolean isChartDirty = false;
-
-		if (_isGraphScrolled) {
-
-			// graph is scrolled by the mouse
-
-			final int scrollDiff = devXMouse - _startPosDev;
-			final int scrollPos = (int) (_startPosScrollbar - (scrollDiff * _scrollAcceleration));
-
-			setupScrollCursor(devXMouse, devYMouse);
-
-			// adjust the scroll position if the mouse is moved outside the
-			// bounds
-			if (scrollPos < 0) {
-				_startPosScrollbar = hBarOffset;
-				_startPosDev = devXMouse;
-			} else {
-
-				final int maxSelection = hBar.getMaximum() - hBar.getThumb();
-
-				if (scrollPos > maxSelection) {
-					_startPosScrollbar = hBarOffset;
-					_startPosDev = devXMouse;
-				}
-			}
-
-			hBar.setSelection(scrollPos);
-
-			redraw();
-
-		} else if (_isXSliderVisible && _xSliderDragged != null) {
+		if (_isXSliderVisible && _xSliderDragged != null) {
 
 			// x-slider is dragged
 
 			// keep position of the slider line
-			_devXScrollSliderLine = devXMouse
-					- _xSliderDragged.getDevXClickOffset()
-					+ ChartXSlider.halfSliderHitLineHeight;
+			_devXDraggedXSliderLine = devXMouse;
 
-			if (_canScrollZoomedChart) {
+			/*
+			 * when the x-slider is outside of the visual graph in horizontal direction, the graph
+			 * can be scrolled with the mouse
+			 */
+			final int devVisibleChartWidth = getDevVisibleChartWidth();
+			if (_devXDraggedXSliderLine > -1 && _devXDraggedXSliderLine < devVisibleChartWidth) {
 
-				// the graph can be scrolled
+				// slider is within the visible area, autoscrolling is NOT done
 
-				if (_devXScrollSliderLine > -1 && _devXScrollSliderLine < getDevVisibleChartWidth()) {
+				// autoscroll could be active, disable it
+				_isAutoScroll = false;
 
-					// slider is within the visible area, no autoscrolling is
-					// done
+				moveXSlider(_xSliderDragged, devXMouse);
 
-					moveXSlider(_xSliderDragged, devXGraph
-							- _xSliderDragged.getDevXClickOffset()
-							+ ChartXSlider.halfSliderHitLineHeight);
-
-					_isSliderDirty = true;
-					isChartDirty = true;
-
-				} else {
-
-					// slider is outside the visible area, auto scroll the
-					// slider and graph when this is not yet done
-					if (_isAutoScrollActive == false) {
-						doAutoScroll();
-					}
-				}
+				_isSliderDirty = true;
+				isRedraw = true;
 
 			} else {
 
-				// the graph can't be scrolled
-
-				moveXSlider(_xSliderDragged, devXGraph
-						- _xSliderDragged.getDevXClickOffset()
-						+ ChartXSlider.halfSliderHitLineHeight);
-
-				_isSliderDirty = true;
-				isChartDirty = true;
-
-//				setChartPosition(xSliderDragged);
+				/*
+				 * slider is outside the visible area, auto scroll the slider and graph when this is
+				 * not yet done
+				 */
+				if (_isAutoScroll == false) {
+					doAutoScroll();
+				}
 			}
 
 		} else if (_isChartDraggedStarted || _isChartDragged) {
@@ -4807,38 +5414,41 @@ public class ChartComponentGraph extends Canvas {
 			_isChartDraggedStarted = false;
 			_isChartDragged = true;
 
-			_draggedChartDraggedPos = new Point(event.x, event.y);
+			_draggedChartDraggedPos = new Point(devXMouse, devYMouse);
 
-			isChartDirty = true;
+			isRedraw = true;
 
 		} else if (_isYSliderVisible && _ySliderDragged != null) {
 
 			// y-slider is dragged
 
-			moveYSlider(_ySliderDragged, devXGraph, devYMouse);
-			_ySliderGraphX = devXGraph;
+			final int devYSliderLine = devYMouse
+					- _ySliderDragged.devYClickOffset
+					+ ChartYSlider.halfSliderHitLineHeight;
+
+			_ySliderDragged.setDevYSliderLine(devYSliderLine);
+			_ySliderGraphX = devXMouse;
 
 			_isSliderDirty = true;
-			isChartDirty = true;
+			isRedraw = true;
 
 		} else if (_isXMarkerMoved) {
 
-			_devXMarkerDraggedPos = devXGraph;
+			_devXMarkerDraggedPos = devXMouse;
 
 			_isSliderDirty = true;
-			isChartDirty = true;
+			isRedraw = true;
 
 		} else {
 
-			// set the cursor shape depending on the mouse location
-
 			ChartXSlider xSlider;
 
-			if (_chart.isMouseMoveExternal(devXMouse, devYMouse, devXGraph)) {
+			if (_chart.isMouseMoveExternal(devXMouse, devYMouse)) {
 
+				// set the cursor shape depending on the mouse location
 				setCursor(_cursorDragged);
 
-			} else if (_isXSliderVisible && (xSlider = isXSliderHit(devYMouse, devXGraph)) != null) {
+			} else if (_isXSliderVisible && (xSlider = isXSliderHit(devXMouse, devYMouse)) != null) {
 
 				// mouse is over an x-slider
 
@@ -4852,7 +5462,7 @@ public class ChartComponentGraph extends Canvas {
 					_hitYSlider = null;
 
 					_isSliderDirty = true;
-					isChartDirty = true;
+					isRedraw = true;
 				}
 
 				// set cursor
@@ -4860,64 +5470,273 @@ public class ChartComponentGraph extends Canvas {
 
 			} else if (_mouseOverXSlider != null) {
 
-				// mouse left the x-slider
+				// mouse has left the x-slider
 
 				_mouseOverXSlider = null;
 				_isSliderDirty = true;
-				isChartDirty = true;
+				isRedraw = true;
 
-			} else if (_isYSliderVisible && isYSliderHit(devXGraph, devYMouse) != null) {
+			} else if (_isYSliderVisible && isYSliderHit(devXMouse, devYMouse) != null) {
 
 				// cursor is within a y-slider
 
 				setCursor(_cursorResizeTopDown);
 
 				// show the y-slider labels
-				_ySliderGraphX = devXGraph;
+				_ySliderGraphX = devXMouse;
 
 				_isSliderDirty = true;
-				isChartDirty = true;
+				isRedraw = true;
 
-			} else if (_chart._draggingListenerXMarker != null && isSynchMarkerHit(devXGraph)) {
+			} else if (_chart._draggingListenerXMarker != null && isSynchMarkerHit(devXMouse)) {
 
 				setCursor(_cursorDragged);
 
-			} else if (isBarHit(devYMouse, devXGraph)) {
+			} else if (_isXSliderVisible && isInXSliderSetArea(devYMouse)) {
+
+				// cursor is already set
+
+			} else if (isBarHit(devXMouse, devYMouse)) {
 
 				_isHoveredBarDirty = true;
-				isChartDirty = true;
+				isRedraw = true;
 
-				setDefaultCursor();
-
-			} else if (hBar.isVisible()) {
-
-				// horizontal bar is visible, show the scroll cursor
-
-				setupScrollCursor(devXMouse, devYMouse);
+				setCursorStyle(devYMouse);
 
 			} else {
 
-				setDefaultCursor();
+				setCursorStyle(devYMouse);
 			}
 		}
 
-		if (isChartDirty) {
+		if (_isHoveredLineVisible && isLineHovered()) {
+
+			if (valuePointToolTip != null) {
+
+				final Point hoveredLinePosition = getAndCheckHoveredLinePosition();
+
+				valuePointToolTip.setValueIndex(
+						_hoveredLineValueIndex,
+						_devXMouseMove,
+						_devYMouseMove,
+						hoveredLinePosition,
+						_graphZoomRatio);
+			}
+
+			isRedraw = true;
+
+		} else {
+
+			if (valuePointToolTip != null) {
+				valuePointToolTip.hide();
+			}
+		}
+
+		if (isRedraw) {
 			redraw();
 		}
 	}
 
-//	void onKeyUp(final Event event) {
-//
-//		final boolean isShift = (event.stateMask & SWT.SHIFT) != 0;
-//		final boolean isCtrl = (event.stateMask & SWT.CTRL) != 0;
-//
-//		final boolean isMoveMode = isShift || isCtrl;
-//
-//		fIsMoveMode = !isMoveMode;
-//
-//		System.out.println(fIsMoveMode + " " + event.stateMask + " s:" + isShift + " c:" + isCtrl);
-//		setDefaultCursor();
-//	}
+	/**
+	 * @param mouseEvent
+	 * @return Returns <code>true</code> when the mouse event was been handled.
+	 */
+	boolean onMouseMoveAxis(final MouseEvent mouseEvent) {
+
+		ChartComponentAxis axisComponent = null;
+		int axisWidth = 0;
+
+		int devXMouse = mouseEvent.x;
+		int devYMouse = mouseEvent.y;
+		final Widget mouseWidget = mouseEvent.widget;
+
+		final ChartComponentAxis axisLeft = _chartComponents.getAxisLeft();
+		final ChartComponentAxis axisRight = _chartComponents.getAxisRight();
+
+		boolean isMouseFromRightToolTip = false;
+		boolean isMouseFromLeftToolTip = false;
+
+		if (mouseWidget instanceof ChartComponentAxis) {
+
+			axisComponent = (ChartComponentAxis) mouseWidget;
+			axisWidth = axisComponent.getAxisClientArea().width;
+
+		} else if (valuePointToolTip != null) {
+
+			// check if the event widget is from the tooltip
+
+			// get tooltip shell
+			final Shell ttShell = valuePointToolTip.getToolTipShell();
+			if (ttShell != null) {
+
+				if (mouseWidget instanceof Control) {
+					final Control control = (Control) mouseWidget;
+
+					if (control.getShell() == ttShell) {
+
+						/*
+						 * this event is from the value point tooltip, the control is the tooltip
+						 */
+
+						final Point screenTTMouse = control.toDisplay(devXMouse, devYMouse);
+
+						final Point leftAxisScreen = axisLeft.toDisplay(0, 0);
+						final Point leftAxisSize = axisLeft.getSize();
+
+						final Rectangle leftAxisRect = new Rectangle(
+								leftAxisScreen.x,
+								leftAxisScreen.y,
+								leftAxisSize.x,
+								leftAxisSize.y);
+
+						if (leftAxisRect.contains(screenTTMouse)) {
+
+							// mouse is moved above the left axis
+
+							final Point devLeftAxis = axisLeft.toControl(screenTTMouse);
+							devXMouse = devLeftAxis.x;
+							devYMouse = devLeftAxis.y;
+							axisComponent = axisLeft;
+							axisWidth = leftAxisSize.x;
+
+							isMouseFromLeftToolTip = true;
+
+						} else {
+
+							final Point rightAxisScreen = axisRight.toDisplay(0, 0);
+							final Point rightAxisSize = axisRight.getSize();
+
+							final Rectangle rightAxisRect = new Rectangle(
+									rightAxisScreen.x,
+									rightAxisScreen.y,
+									rightAxisSize.x,
+									rightAxisSize.y);
+
+							if (rightAxisRect.contains(screenTTMouse)) {
+
+								// mouse is moved above the right axis
+
+								final Point devRightAxis = axisRight.toControl(screenTTMouse);
+								devXMouse = devRightAxis.x;
+								devYMouse = devRightAxis.y;
+								axisComponent = axisRight;
+								axisWidth = rightAxisSize.x;
+
+								isMouseFromRightToolTip = true;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		final boolean isLeftAxis = axisComponent == axisLeft;
+
+		if (axisWidth == 0 || axisComponent == null //
+
+				// chart is not zoomed
+				|| _graphZoomRatio == 1
+
+				/*
+				 * ensure the mouse is moved from the graph from the tooltip or is moved over the
+				 * tooltip when it's above the y-axis
+				 */
+//				|| _isMouseMovedFromGraph == false
+//				&& _isMouseMovedFromToolTip == false
+				&& isMouseFromLeftToolTip == false
+				&& isMouseFromRightToolTip == false
+
+				// ensure that the upper part of the chart is reserved for the tour info icon
+				|| isLeftAxis
+				&& devYMouse < TOUR_INFO_ICON_KEEP_OUT_AREA
+		//
+		) {
+
+			// disable autoscroll
+			_isAutoScroll = false;
+
+			if (axisComponent != null) {
+				axisComponent.setCursor(null);
+			}
+
+			return false;
+		}
+
+		final Cursor cursor;
+
+		if (_isXSliderVisible && _xSliderDragged != null) {
+
+			// x-slider is dragged, do autoscroll the graph with the mouse
+
+			if (isLeftAxis) {
+
+				// left x-axis
+
+				_devXDraggedXSliderLine = -axisWidth + devXMouse;
+
+				cursor = //
+				_devXDraggedXSliderLine < _leftAccelerator[0][0] ? _cursorMove5x : //
+						_devXDraggedXSliderLine < _leftAccelerator[1][0] ? _cursorMove4x : //
+								_devXDraggedXSliderLine < _leftAccelerator[2][0] ? _cursorMove3x : //
+										_devXDraggedXSliderLine < _leftAccelerator[3][0] ? _cursorMove2x : //
+												_cursorMove1x;
+
+			} else {
+
+				// right x-axis
+
+				_devXDraggedXSliderLine = getDevVisibleChartWidth() + devXMouse;
+
+				cursor = //
+				devXMouse < _rightAccelerator[0][0] ? _cursorMove1x : //
+						devXMouse < _rightAccelerator[1][0] ? _cursorMove2x : //
+								devXMouse < _rightAccelerator[2][0] ? _cursorMove3x : //
+										devXMouse < _rightAccelerator[3][0] ? _cursorMove4x : //
+												_cursorMove5x;
+			}
+
+		} else {
+
+			// do autoscroll the graph with the moved mouse
+
+			// set mouse position and do autoscrolling
+
+			if (isLeftAxis) {
+
+				// left x-axis
+
+				_devXAutoScrollMousePosition = -axisWidth + devXMouse;
+
+				cursor = //
+				_devXAutoScrollMousePosition < _leftAccelerator[0][0] ? _cursorMove5x : //
+						_devXAutoScrollMousePosition < _leftAccelerator[1][0] ? _cursorMove4x : //
+								_devXAutoScrollMousePosition < _leftAccelerator[2][0] ? _cursorMove3x : //
+										_devXAutoScrollMousePosition < _leftAccelerator[3][0] ? _cursorMove2x : //
+												_cursorMove1x;
+
+			} else {
+
+				// right x-axis
+
+				_devXAutoScrollMousePosition = getDevVisibleChartWidth() + devXMouse;
+
+				cursor = //
+				devXMouse < _rightAccelerator[0][0] ? _cursorMove1x : //
+						devXMouse < _rightAccelerator[1][0] ? _cursorMove2x : //
+								devXMouse < _rightAccelerator[2][0] ? _cursorMove3x : //
+										devXMouse < _rightAccelerator[3][0] ? _cursorMove4x : //
+												_cursorMove5x;
+			}
+		}
+
+		axisComponent.setCursor(cursor);
+
+		if (_isAutoScroll == false) {
+			doAutoScroll();
+		}
+
+		return true;
+	}
 
 	/**
 	 * Mouse up event handler
@@ -4926,80 +5745,66 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private void onMouseUp(final MouseEvent event) {
 
-		final ScrollBar hBar = getHorizontalBar();
-		final int hBarOffset = hBar.isVisible() ? hBar.getSelection() : 0;
-
 		final int devXMouse = event.x;
 		final int devYMouse = event.y;
-		final int devXGraph = hBarOffset + devXMouse;
 
-		if (_isGraphScrolled) {
-			_isGraphScrolled = false;
-		} else {
+		if (_isAutoScroll) {
 
-			if (_chart.isMouseUpExternal(devXMouse, devYMouse, devXGraph)) {
-				return;
-			}
+			// stop auto scolling
+			_isAutoScroll = false;
 
-			if (_xSliderDragged != null) {
-
-				// stop dragging the slider
-				_xSliderDragged = null;
-
-				if (_canScrollZoomedChart == false && _canAutoZoomToSlider) {
-
-					// the graph can't be scrolled but the graph should be
-					// zoomed to the x-slider positions
-
-					// zoom into the chart
-					getDisplay().asyncExec(new Runnable() {
-						public void run() {
-							if (!isDisposed()) {
-								_chart.onExecuteZoomInWithSlider();
-							}
-						}
-					});
-
-				}
-
-			} else if (_ySliderDragged != null) {
-
-				adjustYSlider();
-
-			} else if (_isXMarkerMoved) {
-
-				_isXMarkerMoved = false;
-
-				_isSliderDirty = true;
-				redraw();
-
-				// call the listener which is registered for dragged x-marker
-				if (_chart._draggingListenerXMarker != null) {
-					_chart._draggingListenerXMarker.xMarkerMoved(
-							_movedXMarkerStartValueIndex,
-							_movedXMarkerEndValueIndex);
-				}
-
-			} else if (_isChartDragged || _isChartDraggedStarted) {
-
-				// chart was moved with the mouse
-
-				_isChartDragged = false;
-				_isChartDraggedStarted = false;
-
-				setDefaultCursor();
-
-				updateDraggedChart(_draggedChartDraggedPos.x - _draggedChartStartPos.x);
-			}
-
-			// show scroll cursor if mouse up was not over the slider
-			if (_xSliderA.getHitRectangle().contains(devXGraph, devYMouse)
-					|| _xSliderB.getHitRectangle().contains(devXGraph, devYMouse)) {
-				if (getHorizontalBar().isVisible()) {
-					setupScrollCursor(devXMouse, devYMouse);
+			/*
+			 * make sure that the sliders are at the border of the visible area are at the border
+			 */
+			if (_devXDraggedXSliderLine < 0) {
+				moveXSlider(_xSliderDragged, 0);
+			} else {
+				final int devVisibleChartWidth = getDevVisibleChartWidth();
+				if (_devXDraggedXSliderLine > devVisibleChartWidth - 1) {
+					moveXSlider(_xSliderDragged, devVisibleChartWidth - 1);
 				}
 			}
+
+			// disable dragging
+			_xSliderDragged = null;
+
+			// redraw slider
+			_isSliderDirty = true;
+			redraw();
+
+		} else if (_chart.isMouseUpExternal(devXMouse, devYMouse)) {
+
+			return;
+
+		} else if (_ySliderDragged != null) {
+
+			// y-slider is dragged, stop dragging
+
+			adjustYSlider();
+
+		} else if (_isXMarkerMoved) {
+
+			_isXMarkerMoved = false;
+
+			_isSliderDirty = true;
+			redraw();
+
+			// call the listener which is registered for dragged x-marker
+			if (_chart._draggingListenerXMarker != null) {
+				_chart._draggingListenerXMarker.xMarkerMoved(_movedXMarkerStartValueIndex, _movedXMarkerEndValueIndex);
+			}
+
+		} else if (_isChartDragged || _isChartDraggedStarted) {
+
+			// chart was moved with the mouse
+
+			_isChartDragged = false;
+			_isChartDraggedStarted = false;
+
+			updateDraggedChart(_draggedChartDraggedPos.x - _draggedChartStartPos.x);
 		}
+
+		setCursorStyle(devYMouse);
 	}
 
 	void onMouseWheel(final Event event) {
@@ -5019,9 +5824,9 @@ public class ChartComponentGraph extends Canvas {
 			 * wheel up -> tour editor up
 			 */
 			if (event.count < 0) {
-				event.keyCode = SWT.ARROW_RIGHT;
+				event.keyCode |= SWT.ARROW_RIGHT;
 			} else {
-				event.keyCode = SWT.ARROW_LEFT;
+				event.keyCode |= SWT.ARROW_LEFT;
 			}
 
 			/*
@@ -5044,7 +5849,8 @@ public class ChartComponentGraph extends Canvas {
 
 						zoomInWithSlider();
 						_chartComponents.onResize();
-						if (event.count < 0) {}
+
+//						if (event.count < 0) {}
 					}
 				});
 			}
@@ -5053,7 +5859,13 @@ public class ChartComponentGraph extends Canvas {
 
 			// mouse mode: zoom chart
 
-			if ((event.stateMask & SWT.CONTROL) != 0 || (event.stateMask & SWT.SHIFT) != 0) {
+			final boolean isCtrl = (event.stateMask & SWT.CONTROL) != 0;
+			final boolean isShift = (event.stateMask & SWT.SHIFT) != 0;
+
+//			final boolean isShift = (event.stateMask & SWT.SHIFT) != 0 || (event.keyCode & SWT.SHIFT) != 0;
+//			final boolean isCtrl = (event.stateMask & SWT.CTRL) != 0 || (event.keyCode & SWT.CTRL) != 0;
+
+			if (isCtrl || isShift) {
 
 				// scroll the chart
 
@@ -5064,7 +5876,7 @@ public class ChartComponentGraph extends Canvas {
 					devXDiff = 10;
 				}
 
-				if ((event.stateMask & SWT.SHIFT) != 0) {
+				if (isShift) {
 					devXDiff *= 10;
 				}
 
@@ -5075,9 +5887,9 @@ public class ChartComponentGraph extends Canvas {
 				// zoom the chart
 
 				if (event.count < 0) {
-					zoomOutWithMouse(true);
+					zoomOutWithMouse(true, _devXMouseMove);
 				} else {
-					zoomInWithMouse();
+					zoomInWithMouse(_devXMouseMove);
 				}
 
 				moveSlidersToBorder();
@@ -5140,76 +5952,6 @@ public class ChartComponentGraph extends Canvas {
 		rightSlider.reset();
 	}
 
-	private void scrollSmoothly(final int barSelection) {
-
-		final Display display = Display.getCurrent();
-		final int scrollInterval = 10;
-
-		_smoothScrollEndPosition = Math.abs(barSelection);
-
-		if (_isSmoothScrollingActive == false) {
-
-			_isSmoothScrollingActive = true;
-
-			/*
-			 * start smooth scrolling after the chart is drawn, because the caller for this method
-			 * is in the paint event
-			 */
-			display.asyncExec(new Runnable() {
-				public void run() {
-					display.timerExec(scrollInterval, new Runnable() {
-						public void run() {
-							scrollSmoothlyRunnable(this, scrollInterval);
-						}
-					});
-				}
-			});
-		}
-	}
-
-	private void scrollSmoothlyRunnable(final Runnable runnable, final int scrollInterval) {
-
-		final Display display = Display.getCurrent();
-		final int scrollDiffMax = 5;
-
-		if (isDisposed()) {
-			_isSmoothScrollingActive = false;
-			return;
-		}
-
-		final int scrollDiff = Math.abs(_smoothScrollEndPosition - _smoothScrollCurrentPosition);
-
-		// start scrolling again if the position was not
-		// reached
-		if (scrollDiff > scrollDiffMax) {
-
-			if (_smoothScrollCurrentPosition < _smoothScrollEndPosition) {
-				_smoothScrollCurrentPosition += scrollDiffMax;
-			} else {
-				_smoothScrollCurrentPosition -= scrollDiffMax;
-			}
-
-			// scroll the graph
-			_horizontalScrollBarPos = _smoothScrollCurrentPosition;
-			redraw();
-
-			display.timerExec(scrollInterval, runnable);
-
-		} else {
-
-			_isSmoothScrollingActive = false;
-			_isScrollToSelection = false;
-
-			/*
-			 * the else part is being called in the initializing, I don't know why then the
-			 * scrollDiff == 0
-			 */
-			if (scrollDiff != 0) {
-				_scrollSmoothly = false;
-			}
-		}
-	}
-
 	/**
 	 * select the next bar item
 	 */
@@ -5250,8 +5992,6 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		_selectedBarItems[selectedIndex] = true;
-
-		_scrollSmoothly = true;
 
 		redrawBarSelection();
 
@@ -5301,15 +6041,13 @@ public class ChartComponentGraph extends Canvas {
 
 		_selectedBarItems[selectedIndex] = true;
 
-		_scrollSmoothly = true;
-
 		redrawBarSelection();
 
 		return selectedIndex;
 	}
 
 	void setCanAutoMoveSlidersWhenZoomed(final boolean canMoveSlidersWhenZoomed) {
-		this._canAutoMoveSliders = canMoveSlidersWhenZoomed;
+		_canAutoMoveSliders = canMoveSlidersWhenZoomed;
 	}
 
 	/**
@@ -5318,90 +6056,67 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	void setCanAutoZoomToSlider(final boolean canAutoZoomToSlider) {
 
-		this._canAutoZoomToSlider = canAutoZoomToSlider;
-
-		/*
-		 * an auto-zoomed chart can't be scrolled
-		 */
-		if (canAutoZoomToSlider) {
-			this._canScrollZoomedChart = false;
-		}
+		_canAutoZoomToSlider = canAutoZoomToSlider;
 	}
 
 	/**
-	 * @param _canScrollZoomedChart
-	 *            the canScrollZoomedChart to set
-	 */
-	void setCanScrollZoomedChart(final boolean canScrollZoomedGraph) {
-
-		this._canScrollZoomedChart = canScrollZoomedGraph;
-
-		/*
-		 * a scrolled chart can't have the option to auto-zoom when the slider is dragged
-		 */
-		if (canScrollZoomedGraph) {
-			this._canAutoZoomToSlider = false;
-		}
-	}
-
-	/**
-	 * Move a zoomed chart that the slider gets visible
+	 * Move a zoomed chart so that the slider is visible.
 	 * 
 	 * @param slider
-	 * @param centerSliderPosition
+	 * @param isCenterSliderPosition
 	 */
-	private void setChartPosition(final ChartXSlider slider, final boolean centerSliderPosition) {
+	private void setChartPosition(final ChartXSlider slider, final boolean isCenterSliderPosition) {
 
 		if (_graphZoomRatio == 1) {
-			// nothing to do
+			// chart is not zoomed, nothing to do
 			return;
 		}
 
-		final int devSliderPos = slider.getDevVirtualSliderLinePos();
+		final int xxDevSliderLinePos = slider.getXXDevSliderLinePos();
 
-		final int devVisibleChartWidth = getDevVisibleChartWidth();
-		float devXOffset = devSliderPos;
+		final int devXViewPortWidth = getDevVisibleChartWidth();
+		double xxDevOffset = xxDevSliderLinePos;
 
-		if (centerSliderPosition) {
+		if (isCenterSliderPosition) {
 
-			devXOffset = devSliderPos - devVisibleChartWidth / 2;
+			xxDevOffset = xxDevSliderLinePos - devXViewPortWidth / 2;
 
 		} else {
 
 			/*
 			 * check if the slider is in the visible area
 			 */
-			if (devSliderPos < _devGraphImageXOffset) {
+			if (xxDevSliderLinePos < _xxDevViewPortLeftBorder) {
 
-				devXOffset = devSliderPos + 1;
+				xxDevOffset = xxDevSliderLinePos + 1;
 
-			} else if (devSliderPos > _devGraphImageXOffset + devVisibleChartWidth) {
+			} else if (xxDevSliderLinePos > _xxDevViewPortLeftBorder + devXViewPortWidth) {
 
-				devXOffset = devSliderPos - devVisibleChartWidth - 0;
+				xxDevOffset = xxDevSliderLinePos - devXViewPortWidth;
 			}
 		}
 
-		if (devXOffset != devSliderPos) {
+		if (xxDevOffset != xxDevSliderLinePos) {
 
 			/*
 			 * slider is not visible
 			 */
 
 			// check left border
-			devXOffset = Math.max(devXOffset, 0);
+			xxDevOffset = Math.max(xxDevOffset, 0);
 
 			// check right border
-			devXOffset = Math.min(devXOffset, _devVirtualGraphImageWidth - devVisibleChartWidth);
+			xxDevOffset = Math.min(xxDevOffset, _xxDevGraphWidth - devXViewPortWidth);
 
-			_xOffsetZoomRatio = devXOffset / _devVirtualGraphImageWidth;
+			_zoomRatioLeftBorder = xxDevOffset / _xxDevGraphWidth;
 
 			/*
 			 * reposition the mouse zoom position
 			 */
-			final float xOffsetMouse = _devGraphImageXOffset + devVisibleChartWidth / 2;
-			_xOffsetMouseZoomInRatio = xOffsetMouse / _devVirtualGraphImageWidth;
+			final float xOffsetMouse = _xxDevViewPortLeftBorder + devXViewPortWidth / 2;
+			_zoomRatioCenter = xOffsetMouse / _xxDevGraphWidth;
 
-			updateYDataMinMaxValues();
+			updateVisibleMinMaxValues();
 
 			/*
 			 * prevent to display the old chart image
@@ -5415,10 +6130,62 @@ public class ChartComponentGraph extends Canvas {
 		 * set position where the double click occured, this position will be used when the chart is
 		 * zoomed
 		 */
-		_xOffsetMouseZoomInRatio = (float) devSliderPos / _devVirtualGraphImageWidth;
+		_zoomRatioCenter = (double) xxDevSliderLinePos / _xxDevGraphWidth;
 	}
 
-	void setDefaultCursor() {
+	/**
+	 * Move a zoomed chart to a new position
+	 * 
+	 * @param xxDevNewPosition
+	 */
+	private void setChartPosition(final int xxDevNewPosition) {
+
+		if (_graphZoomRatio == 1) {
+			// chart is not zoomed, nothing to do
+			return;
+		}
+
+		final int devXViewPortWidth = getDevVisibleChartWidth();
+		double xxDevNewPosition2 = xxDevNewPosition;
+
+		if (xxDevNewPosition < _xxDevViewPortLeftBorder) {
+
+			xxDevNewPosition2 = xxDevNewPosition + 1;
+
+		} else if (xxDevNewPosition > _xxDevViewPortLeftBorder + devXViewPortWidth) {
+
+			xxDevNewPosition2 = xxDevNewPosition - devXViewPortWidth;
+		}
+
+		// check left border
+		xxDevNewPosition2 = Math.max(xxDevNewPosition2, 0);
+
+		// check right border
+		xxDevNewPosition2 = Math.min(xxDevNewPosition2, _xxDevGraphWidth - devXViewPortWidth);
+
+		_zoomRatioLeftBorder = xxDevNewPosition2 / _xxDevGraphWidth;
+
+		// reposition the mouse zoom position
+		final float xOffsetMouse = _xxDevViewPortLeftBorder + devXViewPortWidth / 2;
+		_zoomRatioCenter = xOffsetMouse / _xxDevGraphWidth;
+
+		updateVisibleMinMaxValues();
+
+		/*
+		 * prevent to display the old chart image
+		 */
+		_isChartDirty = true;
+
+		_chartComponents.onResize();
+
+		/*
+		 * set position where the double click occured, this position will be used when the chart is
+		 * zoomed
+		 */
+		_zoomRatioCenter = (double) xxDevNewPosition / _xxDevGraphWidth;
+	}
+
+	void setCursorStyle(final int devYMouse) {
 
 		final ChartDataModel chartDataModel = _chart.getChartDataModel();
 		if (chartDataModel == null) {
@@ -5429,15 +6196,41 @@ public class ChartComponentGraph extends Canvas {
 
 		if (chartType == ChartDataModel.CHART_TYPE_LINE || chartType == ChartDataModel.CHART_TYPE_LINE_WITH_BARS) {
 
-			if (_chart.getMouseMode().equals(Chart.MOUSE_MODE_SLIDER)) {
-				setCursor(_cursorModeSlider);
+			final boolean isMouseModeSlider = _chart.getMouseMode().equals(Chart.MOUSE_MODE_SLIDER);
+
+			if (_xSliderDragged != null) {
+
+				// x-slider is dragged
+				if (isMouseModeSlider) {
+					setCursor(_cursorDragXSlider_ModeSlider);
+				} else {
+					setCursor(_cursorDragXSlider_ModeZoom);
+				}
+
+			} else if (_ySliderDragged != null) {
+
+				// y-slider is dragged
+
+				setCursor(_cursorResizeTopDown);
+
+			} else if (_isChartDragged || _isChartDraggedStarted) {
+
+				// chart is dragged
+				setCursor(_cursorDragged);
+
+			} else if (_isXSliderVisible && isInXSliderSetArea(devYMouse)) {
+
+				// cursor is already set
+
 			} else {
-//				if (fIsMoveMode) {
-//					setCursor(fCursorModeZoomMove);
-//				} else {
-//					setCursor(fCursorModeZoom);
-//				}
-				setCursor(_cursorModeZoom);
+
+				// nothing is dragged
+
+				if (isMouseModeSlider) {
+					setCursor(_cursorModeSlider);
+				} else {
+					setCursor(_cursorModeZoom);
+				}
 			}
 		} else {
 			setCursor(null);
@@ -5445,7 +6238,9 @@ public class ChartComponentGraph extends Canvas {
 	}
 
 	/**
-	 * sets a new configuration for the graph, the whole graph will be recreated
+	 * Set a new configuration for the graph, the whole graph will be recreated. This method is
+	 * called when the chart canvas is resized, chart is zoomed or scrolled which requires that the
+	 * chart is recreated.
 	 */
 	void setDrawingData(final ChartDrawingData chartDrawingData) {
 
@@ -5460,11 +6255,28 @@ public class ChartComponentGraph extends Canvas {
 		// force all graphics to be recreated
 		_isChartDirty = true;
 		_isSliderDirty = true;
-		_isCustomFgLayerDirty = true;
+		_isCustomLayerImageDirty = true;
 		_isSelectionDirty = true;
 
+		if (_isDisableHoveredLineValueIndex) {
+			/*
+			 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			 * prevent setting new positions until the chart is redrawn otherwise the slider has the
+			 * value index -1, the chart is flickering when autoscrolling and the map is WRONGLY /
+			 * UGLY positioned
+			 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			 */
+			_isDisableHoveredLineValueIndex = false;
+		} else {
+
+			// prevent using old value index which can cause bound exceptions
+			_hoveredLineValueIndex = -1;
+			_lineDevPositions.clear();
+			_lineFocusRectangles.clear();
+		}
+
 		// hide previous tooltip
-		_toolTipV1.toolTip20Hide();
+		_hoveredBarToolTip.toolTip20Hide();
 
 		// force the graph to be repainted
 		redraw();
@@ -5572,16 +6384,14 @@ public class ChartComponentGraph extends Canvas {
 		return isFocus;
 	}
 
-	void setGraphImageWidth(final int devVirtualGraphImageWidth,
-							final int devGraphImageXOffset,
-							final float graphZoomRatio) {
+	void setGraphSize(final int xxDevGraphWidth, final int xxDevViewPortOffset, final float graphZoomRatio) {
 
-		_devVirtualGraphImageWidth = devVirtualGraphImageWidth;
-		_devGraphImageXOffset = devGraphImageXOffset;
+		_xxDevGraphWidth = xxDevGraphWidth;
+		_xxDevViewPortLeftBorder = xxDevViewPortOffset;
 		_graphZoomRatio = graphZoomRatio;
 
-		_xSliderA.moveToDevPosition(devGraphImageXOffset, false, true);
-		_xSliderB.moveToDevPosition(devVirtualGraphImageWidth, false, true);
+		_xSliderA.moveToXXDevPosition(xxDevViewPortOffset, false, true);
+		_xSliderB.moveToXXDevPosition(xxDevGraphWidth, false, true);
 	}
 
 	void setSelectedBars(final boolean[] selectedItems) {
@@ -5605,80 +6415,21 @@ public class ChartComponentGraph extends Canvas {
 			_selectedBarItems = selectedItems;
 		}
 
-		_isScrollToSelection = true;
-		_scrollSmoothly = true;
-
 		_isSelectionVisible = true;
 
 		redrawBarSelection();
 	}
 
 	/**
-	 * Set the scrolling cursor according to the vertical position of the mouse
-	 * 
-	 * @param devX
-	 * @param devY
-	 *            vertical coordinat of the mouse in the graph
-	 */
-	private void setupScrollCursor(final int devX, final int devY) {
-
-		final int height = getDevVisibleGraphHeight();
-		final int height4 = height / 4;
-		final int height2 = height / 2;
-
-		final float oldValue = _scrollAcceleration;
-
-		_scrollAcceleration = devY < height4 ? 0.25f : devY < height2 ? 1 : devY > height - height4 ? 10 : 2;
-
-		// set cursor according to the position
-		if (_scrollAcceleration == 0.25) {
-			setCursor(_cursorHand05x);
-		} else if (_scrollAcceleration == 1) {
-			setCursor(_cursorHand);
-		} else if (_scrollAcceleration == 2) {
-			setCursor(_cursorHand2x);
-		} else {
-			setCursor(_cursorHand5x);
-		}
-
-		/*
-		 * when the acceleration has changed, the start positions for scrolling the graph must be
-		 * set to the current location
-		 */
-		if (oldValue != _scrollAcceleration) {
-			_startPosScrollbar = getHorizontalBar().getSelection();
-			_startPosDev = devX;
-		}
-	}
-
-	/**
-	 * set the ratio at which the zoomed chart starts
-	 */
-	private void setXOffsetZoomRatio() {
-
-		final int devVisibleChartWidth = getDevVisibleChartWidth();
-
-		float devXOffset = _xOffsetMouseZoomInRatio * _devVirtualGraphImageWidth;
-		devXOffset -= devVisibleChartWidth / 2;
-
-		// adjust left border
-		devXOffset = Math.max(devXOffset, 0);
-
-		// adjust right border
-		devXOffset = Math.min(devXOffset, _devVirtualGraphImageWidth - devVisibleChartWidth);
-
-		_xOffsetZoomRatio = devXOffset / _devVirtualGraphImageWidth;
-	}
-
-	/**
-	 * Set value index for a slider and move the slider to this position, slider will be made
-	 * visible
+	 * Set value index for a slider and move the slider to this position, the slider will be made
+	 * visible.
 	 * 
 	 * @param slider
 	 * @param valueIndex
-	 * @param centerSliderPosition
+	 * @param isCenterSliderPosition
+	 * @param isBorderOffset
 	 */
-	void setXSliderValueIndex(final ChartXSlider slider, int valueIndex, final boolean centerSliderPosition) {
+	void setXSliderValueIndex(final ChartXSlider slider, int valueIndex, final boolean isCenterSliderPosition) {
 
 		final ChartDataXSerie xData = getXData();
 
@@ -5686,18 +6437,24 @@ public class ChartComponentGraph extends Canvas {
 			return;
 		}
 
-		final int[] xValues = xData.getHighValues()[0];
+		final float[] xValues = xData.getHighValues()[0];
 
 		// adjust the slider index to the array bounds
-		valueIndex = valueIndex < 0 ? 0 : valueIndex > (xValues.length - 1) ? xValues.length - 1 : valueIndex;
+		valueIndex = valueIndex < 0 ? //
+				0
+				: valueIndex > (xValues.length - 1) ? //
+						xValues.length - 1
+						: valueIndex;
+
+		final float xValue = xValues[valueIndex];
+		final double xxDevLinePos = (double) _xxDevGraphWidth * xValue / xValues[xValues.length - 1];
 
 		slider.setValuesIndex(valueIndex);
-		slider.setValueX(xValues[valueIndex]);
+		slider.setValueX(xValue);
 
-		final int linePos = (int) (_devVirtualGraphImageWidth * (float) xValues[valueIndex] / xValues[xValues.length - 1]);
-		slider.moveToDevPosition(linePos, true, true);
+		slider.moveToXXDevPosition((int) xxDevLinePos, true, true);
 
-		setChartPosition(slider, centerSliderPosition);
+		setChartPosition(slider, isCenterSliderPosition);
 
 		_isSliderDirty = true;
 	}
@@ -5718,12 +6475,32 @@ public class ChartComponentGraph extends Canvas {
 		final ChartXSlider leftSlider = getLeftSlider();
 		final ChartXSlider rightSlider = getRightSlider();
 
-		final int devLeftVirtualSliderLinePos = leftSlider.getDevVirtualSliderLinePos();
+		final int devLeftVirtualSliderLinePos = leftSlider.getXXDevSliderLinePos();
 
 		final int devZoomInPosInChart = devLeftVirtualSliderLinePos
-				+ ((rightSlider.getDevVirtualSliderLinePos() - devLeftVirtualSliderLinePos) / 2);
+				+ ((rightSlider.getXXDevSliderLinePos() - devLeftVirtualSliderLinePos) / 2);
 
-		_xOffsetMouseZoomInRatio = (float) devZoomInPosInChart / _devVirtualGraphImageWidth;
+		_zoomRatioCenter = (double) devZoomInPosInChart / _xxDevGraphWidth;
+	}
+
+	/**
+	 * Set left border ratio for the zoomed chart, zoomed graph width and ratio is already set.
+	 */
+	private void setZoomRatioLeftBorder() {
+
+		final int devViewPortWidth = getDevVisibleChartWidth();
+
+		double xxDevPosition = _zoomRatioCenter * _xxDevGraphWidth;
+		xxDevPosition -= devViewPortWidth / 2;
+
+		// ensure left border bounds
+		xxDevPosition = Math.max(xxDevPosition, 0);
+
+		// ensure right border by setting the left border value
+		final int leftBorder = _xxDevGraphWidth - devViewPortWidth;
+		xxDevPosition = Math.min(xxDevPosition, leftBorder);
+
+		_zoomRatioLeftBorder = xxDevPosition / _xxDevGraphWidth;
 	}
 
 	/**
@@ -5759,7 +6536,7 @@ public class ChartComponentGraph extends Canvas {
 			return;
 		}
 
-		final int[] xValues = data2nd.getHighValues()[0];
+		final float[] xValues = data2nd.getHighValues()[0];
 		int valueIndex = slider.getValuesIndex();
 
 		if (valueIndex >= xValues.length) {
@@ -5770,13 +6547,25 @@ public class ChartComponentGraph extends Canvas {
 		try {
 			slider.setValueX(xValues[valueIndex]);
 
-			final int linePos = (int) (_devVirtualGraphImageWidth * (((float) xValues[valueIndex] / xValues[xValues.length - 1])));
+			final int linePos = (int) (_xxDevGraphWidth * (xValues[valueIndex] / xValues[xValues.length - 1]));
 
-			slider.moveToDevPosition(linePos, true, true);
+			slider.moveToXXDevPosition(linePos, true, true);
 
 		} catch (final ArrayIndexOutOfBoundsException e) {
 			// ignore
 		}
+	}
+
+	void updateChartSize() {
+
+		if (valuePointToolTip == null) {
+			return;
+		}
+
+		final int marginTop = _chartComponents.getDevChartMarginTop();
+		final int marginBottom = _chartComponents.getDevChartMarginBottom();
+
+		valuePointToolTip.setChartMargins(marginTop, marginBottom);
 	}
 
 	void updateCustomLayers() {
@@ -5785,7 +6574,7 @@ public class ChartComponentGraph extends Canvas {
 			return;
 		}
 
-		_isCustomFgLayerDirty = true;
+		_isCustomLayerImageDirty = true;
 		_isSliderDirty = true;
 
 		redraw();
@@ -5795,24 +6584,22 @@ public class ChartComponentGraph extends Canvas {
 
 		final int devVisibleChartWidth = getDevVisibleChartWidth();
 
-		float devXOffset = _devGraphImageXOffset - devXDiff;
+		double devXOffset = _xxDevViewPortLeftBorder - devXDiff;
 
 		// adjust left border
 		devXOffset = Math.max(devXOffset, 0);
 
 		// adjust right border
-		devXOffset = Math.min(devXOffset, _devVirtualGraphImageWidth - devVisibleChartWidth);
+		devXOffset = Math.min(devXOffset, _xxDevGraphWidth - devVisibleChartWidth);
 
-		_xOffsetZoomRatio = devXOffset / _devVirtualGraphImageWidth;
+		_zoomRatioLeftBorder = devXOffset / _xxDevGraphWidth;
 
 		/*
 		 * reposition the mouse zoom position
 		 */
-		float xOffsetMouse = _xOffsetMouseZoomInRatio * _devVirtualGraphImageWidth;
-		xOffsetMouse = xOffsetMouse - devXDiff;
-		_xOffsetMouseZoomInRatio = xOffsetMouse / _devVirtualGraphImageWidth;
+		_zoomRatioCenter = ((_zoomRatioCenter * _xxDevGraphWidth) - devXDiff) / _xxDevGraphWidth;
 
-		updateYDataMinMaxValues();
+		updateVisibleMinMaxValues();
 
 		/*
 		 * draw the dragged image until the graph image is recomuted
@@ -5824,143 +6611,20 @@ public class ChartComponentGraph extends Canvas {
 		moveSlidersToBorder();
 	}
 
-	/**
-	 * Setup for the horizontal scrollbar
-	 */
-	private void updateHorizontalBar() {
-
-		final ScrollBar hBar = getHorizontalBar();
-
-		if (_canScrollZoomedChart == false) {
-
-			// the graph can't be scrolled, the scrollbar is hidden
-
-			hBar.setVisible(false);
-			hBar.setEnabled(false);
-			return;
-		}
-
-		final int clientWidth = getDevVisibleChartWidth();
-
-		// get current values of the scroll bar
-		int hBarIncrement = hBar.getIncrement();
-		int hBarPageIncrement = hBar.getPageIncrement();
-		int hBarMaximum = hBar.getMaximum();
-		boolean isHBarVisible = hBar.isVisible();
-		int hBarSelection = hBar.getSelection();
-
-		hBarIncrement = (clientWidth / 100);
-		hBarPageIncrement = clientWidth;
-
-		if (_devVirtualGraphImageWidth > clientWidth) {
-
-			// chart image is wider than the client area, show the scrollbar
-
-			hBarMaximum = _devVirtualGraphImageWidth;
-			isHBarVisible = true;
-
-			if (_isScrollToLeftSlider) {
-				hBarSelection = Math
-						.min(_xSliderA.getDevVirtualSliderLinePos(), _xSliderB.getDevVirtualSliderLinePos());
-				hBarSelection -= (float) ((clientWidth * ZOOM_REDUCING_FACTOR) / 2.0);
-
-				_isScrollToLeftSlider = false;
-
-			} else if (_isScrollToSelection) {
-
-				// scroll to the selected x-data
-
-				if (_selectedBarItems != null) {
-
-					for (int selectedIndex = 0; selectedIndex < _selectedBarItems.length; selectedIndex++) {
-
-						if (_selectedBarItems[selectedIndex]) {
-
-							// selected position was found
-							final GraphDrawingData graphDrawingData = _graphDrawingData.get(0);
-							final int[] xValues = graphDrawingData.getXData()._highValues[0];
-
-							final float xPosition = xValues[selectedIndex] * graphDrawingData.getScaleX();
-
-							hBarSelection = (int) xPosition - (clientWidth / 2);
-
-							break;
-						}
-					}
-
-					if (_scrollSmoothly == false) {
-
-						/*
-						 * reset scroll to selection, this is only needed once when it's enable or
-						 * when smooth scrolling is done
-						 */
-						_isScrollToSelection = false;
-					}
-				}
-			}
-
-		} else {
-
-			isHBarVisible = false;
-			hBarSelection = 0;
-		}
-
-		// at least one of the values changed - update all of them
-		hBar.setIncrement(hBarIncrement);
-		hBar.setPageIncrement(hBarPageIncrement);
-		hBar.setMaximum(hBarMaximum);
-		hBar.setThumb(clientWidth);
-		hBar.setEnabled(isHBarVisible);
-		hBar.setVisible(isHBarVisible);
-
-		/*
-		 * scroll bar selection (position of the graph) must be set AFTER the scrollbar is set
-		 * visible/enabled
-		 */
-		if (_horizontalScrollBarPos >= 0) {
-			hBar.setSelection(_horizontalScrollBarPos);
-			_horizontalScrollBarPos = -1;
-		} else {
-
-			if (_scrollSmoothly) {
-
-				scrollSmoothly(hBarSelection);
-
-			} else {
-
-				// initialize smooth scroll start position
-				_smoothScrollCurrentPosition = hBarSelection;
-
-				hBar.setSelection(hBarSelection);
-			}
-		}
-	}
-
-	void updateImageWidthAndOffset() {
+	void updateGraphSize() {
 
 		final int devVisibleChartWidth = getDevVisibleChartWidth();
 
-		if (_canScrollZoomedChart) {
+		// calculate new virtual graph width
+		_xxDevGraphWidth = (int) (_graphZoomRatio * devVisibleChartWidth);
 
-			// the image can be scrolled
-
-			_devGraphImageXOffset = 0;
-
-			_devVirtualGraphImageWidth = (int) (devVisibleChartWidth * _graphZoomRatio);
-
+		if (_graphZoomRatio == 1.0) {
+			// with the ration 1.0 the graph is not zoomed
+			_xxDevViewPortLeftBorder = 0;
 		} else {
-
-			// calculate new virtual graph width
-			_devVirtualGraphImageWidth = (int) (_graphZoomRatio * devVisibleChartWidth);
-
-			if (_graphZoomRatio == 1.0) {
-				// with the ration 1.0 the graph is not zoomed
-				_devGraphImageXOffset = 0;
-			} else {
-				// the graph is zoomed, only a part is displayed which starts at
-				// the offset for the left slider
-				_devGraphImageXOffset = (int) (_xOffsetZoomRatio * _devVirtualGraphImageWidth);
-			}
+			// the graph is zoomed, only a part is displayed which starts at
+			// the offset for the left slider
+			_xxDevViewPortLeftBorder = (int) (_zoomRatioLeftBorder * _xxDevGraphWidth);
 		}
 	}
 
@@ -5988,8 +6652,8 @@ public class ChartComponentGraph extends Canvas {
 
 			if (yData.isShowYSlider()) {
 
-				final ChartYSlider sliderTop = yData.getYSliderTop();
-				final ChartYSlider sliderBottom = yData.getYSliderBottom();
+				final ChartYSlider sliderTop = yData.getYSlider1();
+				final ChartYSlider sliderBottom = yData.getYSlider2();
 
 				sliderTop.handleChartResize(drawingData, ChartYSlider.SLIDER_TYPE_TOP);
 				_ySliders.add(sliderTop);
@@ -5998,6 +6662,124 @@ public class ChartComponentGraph extends Canvas {
 				_ySliders.add(sliderBottom);
 
 				_isYSliderVisible = true;
+			}
+		}
+	}
+
+	/**
+	 * sets the min/max values for the y-axis that the visible area will be filled with the chart
+	 */
+	void updateVisibleMinMaxValues() {
+
+		final ChartDataModel chartDataModel = _chartComponents.getChartDataModel();
+		final ChartDataXSerie xData = chartDataModel.getXData();
+		final ArrayList<ChartDataYSerie> yDataList = chartDataModel.getYData();
+
+		if (xData == null) {
+			return;
+		}
+
+		final float[][] xValueSerie = xData.getHighValues();
+
+		if (xValueSerie.length == 0) {
+			// data are not available
+			return;
+		}
+
+		final float[] xValues = xValueSerie[0];
+		final float lastXValue = xValues[xValues.length - 1];
+		final double valueVisibleArea = lastXValue / _graphZoomRatio;
+
+		final double valueLeftBorder = lastXValue * _zoomRatioLeftBorder;
+		double valueRightBorder = valueLeftBorder + valueVisibleArea;
+
+		// make sure right is higher than left
+		if (valueLeftBorder >= valueRightBorder) {
+			valueRightBorder = valueLeftBorder + 1;
+		}
+
+		/*
+		 * get value index for the left and right border of the visible area
+		 */
+		int xValueIndexLeft = 0;
+		for (int serieIndex = 0; serieIndex < xValues.length; serieIndex++) {
+			final float xValue = xValues[serieIndex];
+			if (xValue == valueLeftBorder) {
+				xValueIndexLeft = serieIndex;
+				break;
+			}
+			if (xValue > valueLeftBorder) {
+				xValueIndexLeft = serieIndex == 0 ? //
+						0
+						// get index from last invisible value
+						: serieIndex - 1;
+				break;
+			}
+		}
+
+		int xValueIndexRight = xValueIndexLeft;
+		for (; xValueIndexRight < xValues.length; xValueIndexRight++) {
+			if (xValues[xValueIndexRight] > valueRightBorder) {
+				break;
+			}
+		}
+
+		/*
+		 * get visible min/max value for the x-data serie which fills the visible area in the chart
+		 */
+		// ensure array bounds
+		final int xValuesLastIndex = xValues.length - 1;
+		xValueIndexLeft = Math.min(xValueIndexLeft, xValuesLastIndex);
+		xValueIndexLeft = Math.max(xValueIndexLeft, 0);
+		xValueIndexRight = Math.min(xValueIndexRight, xValuesLastIndex);
+		xValueIndexRight = Math.max(xValueIndexRight, 0);
+
+		xData.setVisibleMinValue(xValues[xValueIndexLeft]);
+		xData.setVisibleMaxValue(xValues[xValueIndexRight]);
+
+		/*
+		 * get min/max value for each y-data serie to fill the visible area with the chart
+		 */
+		for (final ChartDataYSerie yData : yDataList) {
+
+			final float[][] yValueSeries = yData.getHighValues();
+			final float yValues[] = yValueSeries[0];
+
+			// ensure array bounds
+			final int yValuesLastIndex = yValues.length - 1;
+			xValueIndexLeft = Math.min(xValueIndexLeft, yValuesLastIndex);
+			xValueIndexLeft = Math.max(xValueIndexLeft, 0);
+			xValueIndexRight = Math.min(xValueIndexRight, yValuesLastIndex);
+			xValueIndexRight = Math.max(xValueIndexRight, 0);
+
+			float minValue = yValues[xValueIndexLeft];
+			float maxValue = yValues[xValueIndexLeft];
+
+			for (final float[] yValueSerie : yValueSeries) {
+
+				if (yValueSerie == null) {
+					continue;
+				}
+
+				for (int valueIndex = xValueIndexLeft; valueIndex <= xValueIndexRight; valueIndex++) {
+
+					final float yValue = yValueSerie[valueIndex];
+
+					if (yValue < minValue) {
+						minValue = yValue;
+					}
+					if (yValue > maxValue) {
+						maxValue = yValue;
+					}
+				}
+			}
+
+			if (yData.isForceMinValue() == false && minValue != 0) {
+				yData.setVisibleMinValue(minValue);
+			}
+
+			if (yData.isForceMaxValue() == false && maxValue != 0) {
+				yData.setVisibleMaxValue(maxValue);
 			}
 		}
 	}
@@ -6028,143 +6810,62 @@ public class ChartComponentGraph extends Canvas {
 	}
 
 	/**
-	 * sets the min/max values for the y-axis that the visible area will be filled with the chart
+	 * @param devXMousePosition
+	 *            This relative mouse position is used to keep the position when zoomed in, when set
+	 *            to {@link Integer#MIN_VALUE} this value is ignored.
 	 */
-	void updateYDataMinMaxValues() {
+	void zoomInWithMouse(final int devXMousePosition) {
 
-		final ChartDataModel chartDataModel = _chartComponents.getChartDataModel();
-		final ChartDataXSerie xData = chartDataModel.getXData();
-		final ArrayList<ChartDataYSerie> yDataList = chartDataModel.getYData();
+		if (_xxDevGraphWidth <= ChartComponents.CHART_MAX_WIDTH) {
 
-		if (xData == null) {
-			return;
-		}
+			// chart can be zoomed in
 
-		final int[][] xValueSerie = xData.getHighValues();
+			final int devViewPortWidth = getDevVisibleChartWidth();
+			final double devViewPortWidth2 = (double) devViewPortWidth / 2;
 
-		if (xValueSerie.length == 0) {
-			// data are not available
-			return;
-		}
+			final double newZoomRatio = _graphZoomRatio * ZOOM_RATIO_FACTOR;
+			final int xxDevNewGraphWidth = (int) (devViewPortWidth * newZoomRatio);
 
-		final int[] xValues = xValueSerie[0];
-		final int serieLength = xValues.length;
+			if (_xSliderDragged != null) {
 
-		final int lastXValue = xValues[serieLength - 1];
-		final int valueVisibleArea = (int) (lastXValue / _graphZoomRatio);
+				// set zoom center so that the dragged x-slider keeps position when zoomed in
 
-		final int valueLeftBorder = (int) (lastXValue * _xOffsetZoomRatio);
-		int valueRightBorder = valueLeftBorder + valueVisibleArea;
+				final double xxDevSlider = _xxDevViewPortLeftBorder + _devXDraggedXSliderLine;
+				final double sliderRatio = xxDevSlider / _xxDevGraphWidth;
+				final double xxDevNewSlider = sliderRatio * xxDevNewGraphWidth;
+				final double xxDevNewZoomRatioCenter = xxDevNewSlider - _devXDraggedXSliderLine + devViewPortWidth2;
 
-		// make sure right is higher than left
-		if (valueLeftBorder >= valueRightBorder) {
-			valueRightBorder = valueLeftBorder + 1;
-		}
+				_zoomRatioCenter = xxDevNewZoomRatioCenter / xxDevNewGraphWidth;
 
-		/*
-		 * get value index for the left and right border of the visible area
-		 */
-		int valueIndexLeft = 0;
-		for (final int xValue : xValues) {
-			if (xValue > valueLeftBorder) {
-				break;
-			}
-			valueIndexLeft++;
-		}
-		int valueIndexRight = valueIndexLeft;
-		for (; valueIndexRight < xValues.length; valueIndexRight++) {
-			if (xValues[valueIndexRight] > valueRightBorder) {
-				break;
-			}
-		}
+			} else if (devXMousePosition != Integer.MIN_VALUE) {
 
-		/*
-		 * get min/max value for each dataserie to fill the visible area with the chart
-		 */
-		for (final ChartDataYSerie yData : yDataList) {
+				final double xxDevSlider = _xxDevViewPortLeftBorder + devXMousePosition;
+				final double sliderRatio = xxDevSlider / _xxDevGraphWidth;
+				final double xxDevNewSlider = sliderRatio * xxDevNewGraphWidth;
+				final double xxDevNewZoomRatioCenter = xxDevNewSlider - devXMousePosition + devViewPortWidth2;
 
-			final int[][] yValueSeries = yData.getHighValues();
-			final int yValues[] = yValueSeries[0];
-
-			// ensure array bounds
-			final int maxYValueIndex = yValues.length - 1;
-			valueIndexLeft = Math.min(valueIndexLeft, maxYValueIndex);
-			valueIndexLeft = Math.max(valueIndexLeft, 0);
-			valueIndexRight = Math.min(valueIndexRight, maxYValueIndex);
-			valueIndexRight = Math.max(valueIndexRight, 0);
-
-			int minValue = yValues[valueIndexLeft];
-			int maxValue = yValues[valueIndexLeft];
-
-			for (final int[] yValueSerie : yValueSeries) {
-
-				if (yValueSerie == null) {
-					continue;
-				}
-
-				for (int valueIndex = valueIndexLeft; valueIndex < valueIndexRight; valueIndex++) {
-
-					final int yValue = yValueSerie[valueIndex];
-
-					if (yValue < minValue) {
-						minValue = yValue;
-					}
-					if (yValue > maxValue) {
-						maxValue = yValue;
-					}
-				}
+				_zoomRatioCenter = xxDevNewZoomRatioCenter / xxDevNewGraphWidth;
 			}
 
-			if (yData.isForceMinValue() == false && minValue != 0) {
-				yData.setVisibleMinValue(minValue - 1);
+			if (xxDevNewGraphWidth > ChartComponents.CHART_MAX_WIDTH) {
+
+				// ensure max size
+				_graphZoomRatio = (double) ChartComponents.CHART_MAX_WIDTH / devViewPortWidth;
+				_xxDevGraphWidth = ChartComponents.CHART_MAX_WIDTH;
+
+			} else {
+
+				_graphZoomRatio = newZoomRatio;
+				_xxDevGraphWidth = xxDevNewGraphWidth;
 			}
 
-			if (yData.isForceMaxValue() == false && maxValue != 0) {
-				yData.setVisibleMaxValue(maxValue + 1);
-			}
-		}
-	}
+			setZoomRatioLeftBorder();
+			handleChartResizeForSliders();
 
-	void zoomInWithMouse() {
+			updateVisibleMinMaxValues();
+			moveSlidersToBorder();
 
-		if (_canScrollZoomedChart) {
-
-			// the image can be scrolled
-
-		} else {
-
-			// chart can't be scrolled
-
-			final int devVisibleChartWidth = getDevVisibleChartWidth();
-			final int devMaxChartWidth = ChartComponents.CHART_MAX_WIDTH;
-
-			if (_devVirtualGraphImageWidth <= devMaxChartWidth) {
-
-				// chart is within the range which can be zoomed in
-
-				final float zoomedInRatio = _graphZoomRatio * ZOOM_RATIO_FACTOR;
-				final int devZoomedInWidth = (int) (devVisibleChartWidth * zoomedInRatio);
-
-				if (devZoomedInWidth > devMaxChartWidth) {
-
-					// the zoomed graph would be wider than the max width, reduce it to the max width
-					_graphZoomRatio = (float) devMaxChartWidth / devVisibleChartWidth;
-					_devVirtualGraphImageWidth = devMaxChartWidth;
-
-				} else {
-
-					_graphZoomRatio = zoomedInRatio;
-					_devVirtualGraphImageWidth = devZoomedInWidth;
-				}
-
-				setXOffsetZoomRatio();
-				handleChartResizeForSliders();
-
-				updateYDataMinMaxValues();
-				moveSlidersToBorder();
-
-				_chartComponents.onResize();
-			}
+			_chartComponents.onResize();
 		}
 
 		_chart.enableActions();
@@ -6176,7 +6877,7 @@ public class ChartComponentGraph extends Canvas {
 	void zoomInWithoutSlider() {
 
 		final int visibleGraphWidth = getDevVisibleChartWidth();
-		final int graphImageWidth = _devVirtualGraphImageWidth;
+		final int graphImageWidth = _xxDevGraphWidth;
 
 		final int maxChartWidth = ChartComponents.CHART_MAX_WIDTH;
 
@@ -6190,18 +6891,11 @@ public class ChartComponentGraph extends Canvas {
 				 * width
 				 */
 				_graphZoomRatio = maxChartWidth / visibleGraphWidth;
-				_devVirtualGraphImageWidth = maxChartWidth;
+				_xxDevGraphWidth = maxChartWidth;
 			} else {
 				_graphZoomRatio = _graphZoomRatio * ZOOM_RATIO_FACTOR;
-				_devVirtualGraphImageWidth = (int) (graphImageWidth * ZOOM_RATIO_FACTOR);
+				_xxDevGraphWidth = (int) (graphImageWidth * ZOOM_RATIO_FACTOR);
 			}
-
-			_isScrollToSelection = true;
-
-			/*
-			 * scroll smoothly is started when a bar is selected, otherwise it is disabled
-			 */
-			_scrollSmoothly = false;
 
 			_chart.enableActions();
 		}
@@ -6221,58 +6915,44 @@ public class ChartComponentGraph extends Canvas {
 		final ChartXSlider rightSlider = getRightSlider();
 
 		// get position of the sliders within the graph
-		final int devVirtualLeftSliderPos = leftSlider.getDevVirtualSliderLinePos();
-		final int devVirtualRightSliderPos = rightSlider.getDevVirtualSliderLinePos();
+		final int devVirtualLeftSliderPos = leftSlider.getXXDevSliderLinePos();
+		final int devVirtualRightSliderPos = rightSlider.getXXDevSliderLinePos();
 
 		// difference between left and right slider
 		final float devSliderDiff = devVirtualRightSliderPos - devVirtualLeftSliderPos - 0;
 
 		if (devSliderDiff == 0) {
+
 			// no difference between the slider
 			_graphZoomRatio = 1;
-			_devVirtualGraphImageWidth = devVisibleChartWidth;
-
-			_isScrollToLeftSlider = false;
+			_xxDevGraphWidth = devVisibleChartWidth;
 
 		} else {
 
-			if (_canScrollZoomedChart) {
+			/*
+			 * the graph image can't be scrolled, show only the zoomed part which is defined between
+			 * the two sliders
+			 */
 
-				// the image can be scrolled
+			// calculate new graph ratio
+			_graphZoomRatio = (_xxDevGraphWidth) / (devSliderDiff);
 
-				final int graphWidth = _graphZoomRatio == 1 ? devVisibleChartWidth : _devVirtualGraphImageWidth;
+			// adjust rounding problems
+			_graphZoomRatio = (_graphZoomRatio * devVisibleChartWidth) / devVisibleChartWidth;
 
-				_graphZoomRatio = (float) (graphWidth * (1 - ZOOM_REDUCING_FACTOR) / devSliderDiff);
+			// set the position (ratio) at which the zoomed chart starts
+			_zoomRatioLeftBorder = getLeftSlider().getPositionRatio();
 
-				_isScrollToLeftSlider = true;
-
-			} else {
-
-				/*
-				 * the graph image can't be scrolled, show only the zoomed part which is defined
-				 * between the two sliders
-				 */
-
-				// calculate new graph ratio
-				_graphZoomRatio = (_devVirtualGraphImageWidth) / (devSliderDiff);
-
-				// adjust rounding problems
-				_graphZoomRatio = (_graphZoomRatio * devVisibleChartWidth) / devVisibleChartWidth;
-
-				// set the position (ratio) at which the zoomed chart starts
-				_xOffsetZoomRatio = getLeftSlider().getPositionRatio();
-
-				// set the center of the chart for the position when zooming with the mouse
-				final float devVirtualWidth = _graphZoomRatio * devVisibleChartWidth;
-				final float devXOffset = _xOffsetZoomRatio * devVirtualWidth;
-				final int devCenterPos = (int) (devXOffset + devVisibleChartWidth / 2);
-				_xOffsetMouseZoomInRatio = devCenterPos / devVirtualWidth;
-			}
+			// set the center of the chart for the position when zooming with the mouse
+			final double devVirtualWidth = _graphZoomRatio * devVisibleChartWidth;
+			final double devXOffset = _zoomRatioLeftBorder * devVirtualWidth;
+			final int devCenterPos = (int) (devXOffset + devVisibleChartWidth / 2);
+			_zoomRatioCenter = devCenterPos / devVirtualWidth;
 		}
 
 		handleChartResizeForSliders();
 
-		updateYDataMinMaxValues();
+		updateVisibleMinMaxValues();
 
 		_chart.enableActions();
 	}
@@ -6284,15 +6964,10 @@ public class ChartComponentGraph extends Canvas {
 
 		// reset the data which influence the computed graph image width
 		_graphZoomRatio = 1;
-		_xOffsetZoomRatio = 0;
+		_zoomRatioLeftBorder = 0;
 
-		_devVirtualGraphImageWidth = getDevVisibleChartWidth();
-		_devGraphImageXOffset = 0;
-
-		/*
-		 * scroll smoothly is started when a bar is selected, otherwise it is disabled
-		 */
-		_scrollSmoothly = false;
+		_xxDevGraphWidth = getDevVisibleChartWidth();
+		_xxDevViewPortLeftBorder = 0;
 
 		// reposition the sliders
 		final int visibleGraphHeight = getDevVisibleGraphHeight();
@@ -6307,114 +6982,86 @@ public class ChartComponentGraph extends Canvas {
 	/**
 	 * Zooms out of the graph
 	 * 
-	 * @param updateChart
+	 * @param isUpdateChart
+	 * @param devXMousePosition
+	 *            This relative mouse position is used to keep the position when zoomed in, when set
+	 *            to {@link Integer#MIN_VALUE} this value is ignored.
 	 */
-	void zoomOutWithMouse(final boolean updateChart) {
+	void zoomOutWithMouse(final boolean isUpdateChart, final int devXMousePosition) {
 
-		if (_canScrollZoomedChart) {
+		final int devViewPortWidth = getDevVisibleChartWidth();
+		final double devViewPortWidth2 = (double) devViewPortWidth / 2;
 
-			// the image can be scrolled
+		if (_graphZoomRatio > ZOOM_RATIO_FACTOR) {
 
-			final int visibleGraphWidth = getDevVisibleChartWidth();
-			final int visibleGraphHeight = getDevVisibleGraphHeight();
+			// graph is zoomed
 
-			// reset the data which influence the computed graph image width
-			_graphZoomRatio = 1;
-			_xOffsetZoomRatio = 0;
+			final double newZoomRatio = _graphZoomRatio / ZOOM_RATIO_FACTOR;
+			final int xxDevNewGraphWidth = (int) (devViewPortWidth * newZoomRatio);
 
-			_devVirtualGraphImageWidth = visibleGraphWidth;
-			_devGraphImageXOffset = 0;
+			if (_xSliderDragged != null) {
 
-			/*
-			 * scroll smoothly is started when a bar is selected, otherwise it is disabled
-			 */
-			_scrollSmoothly = false;
+				/**
+				 * Set zoom center so that the dragged x-slider keeps position when zoomed out.
+				 * <p>
+				 * This formula preserves the slider ratio for a resized graph but is using the
+				 * zoomed center to preserve the x-slider position
+				 * <p>
+				 * very complicated and it took me some time to get this formula
+				 */
 
-			// set the new graph width
-			// enforceChartImageMinMaxWidth();
+				// get slider ratio before the graph width is resized
+				final double xxDevSlider = _xxDevViewPortLeftBorder + _devXDraggedXSliderLine;
+				final double sliderRatio = xxDevSlider / _xxDevGraphWidth;
+				final double xxDevNewSlider = sliderRatio * xxDevNewGraphWidth;
+				final double xxDevNewZoomRatioCenter = xxDevNewSlider - _devXDraggedXSliderLine + devViewPortWidth2;
 
-			// reposition the sliders
-			_xSliderA.handleChartResize(visibleGraphHeight);
-			_xSliderB.handleChartResize(visibleGraphHeight);
+				_zoomRatioCenter = xxDevNewZoomRatioCenter / xxDevNewGraphWidth;
 
-			if (updateChart) {
+			} else if (devXMousePosition != Integer.MIN_VALUE) {
+
+				final double xxDevSlider = _xxDevViewPortLeftBorder + devXMousePosition;
+				final double sliderRatio = xxDevSlider / _xxDevGraphWidth;
+				final double xxDevNewSlider = sliderRatio * xxDevNewGraphWidth;
+				final double xxDevNewZoomRatioCenter = xxDevNewSlider - devXMousePosition + devViewPortWidth2;
+
+				_zoomRatioCenter = xxDevNewZoomRatioCenter / xxDevNewGraphWidth;
+			}
+
+			_graphZoomRatio = newZoomRatio;
+			_xxDevGraphWidth = xxDevNewGraphWidth;
+
+			setZoomRatioLeftBorder();
+
+			handleChartResizeForSliders();
+			updateVisibleMinMaxValues();
+
+			if (isUpdateChart) {
 				_chartComponents.onResize();
 			}
 
 		} else {
 
-			final int devVisibleChartWidth = getDevVisibleChartWidth();
+			if (_graphZoomRatio != 1) {
 
-			if (_graphZoomRatio > ZOOM_RATIO_FACTOR) {
+				// show whole graph in the chart
 
-				_graphZoomRatio = _graphZoomRatio / ZOOM_RATIO_FACTOR;
-				_devVirtualGraphImageWidth = (int) (_graphZoomRatio * devVisibleChartWidth);
+				_graphZoomRatio = 1;
+				_xxDevGraphWidth = devViewPortWidth;
 
-				setXOffsetZoomRatio();
+				setZoomRatioLeftBorder();
 
 				handleChartResizeForSliders();
-				updateYDataMinMaxValues();
+				updateVisibleMinMaxValues();
 
-				if (updateChart) {
+				if (isUpdateChart) {
 					_chartComponents.onResize();
 				}
-
-			} else {
-
-				if (_graphZoomRatio != 1) {
-
-					_graphZoomRatio = 1;
-					_devVirtualGraphImageWidth = devVisibleChartWidth;
-
-					setXOffsetZoomRatio();
-
-					handleChartResizeForSliders();
-					updateYDataMinMaxValues();
-
-					if (updateChart) {
-						_chartComponents.onResize();
-					}
-				}
 			}
-
-			moveSlidersToBorder();
 		}
+
+		moveSlidersToBorder();
 
 		_chart.enableActions();
 	}
-
-//	/**
-//	 * zoom in where parts defines how the width of the graph will be splitted and position defines
-//	 * which part is shown
-//	 *
-//	 * @param scrollSmoothly
-//	 * @param ratio
-//	 */
-//	void zoomWithParts(final int parts, final float position, final boolean scrollSmoothly) {
-//
-//		canScrollZoomedChart = true;
-//
-//		final int devVisibleGraphWidth = getDevVisibleChartWidth();
-//		final int graphWidth = Math.min(ChartComponents.CHART_MAX_WIDTH, devVisibleGraphWidth * parts);
-//
-//		// reduce the width so that more than one part will be visible in the
-//		// clientarea
-//		fDevVirtualGraphImageWidth = (int) (graphWidth * ZOOM_WITH_PARTS_RATIO);
-//		fGraphZoomRatio = Math.max(1, (float) fDevVirtualGraphImageWidth / devVisibleGraphWidth);
-//
-//		final int partWidth = fDevVirtualGraphImageWidth / parts;
-//		final int partBorder = devVisibleGraphWidth - partWidth;
-//
-//		// position the graph in the scrollbar
-//		if (position == 0) {
-//			fHorizontalScrollBarPos = 0;
-//		} else {
-//			fHorizontalScrollBarPos = (int) ((partWidth * position - 1) - (partBorder / 2));
-//		}
-//
-//		graphZoomParts = parts;
-//		graphZoomPartPosition = position;
-//
-//		fScrollSmoothly = scrollSmoothly;
-//	}
 }

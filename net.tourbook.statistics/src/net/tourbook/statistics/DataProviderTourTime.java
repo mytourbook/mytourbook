@@ -40,7 +40,7 @@ public class DataProviderTourTime extends DataProvider {
 
 	private Long						_selectedTourId;
 
-	private TourTimeData				_tourDataTime;
+	private TourDataTime				_tourDataTime;
 
 	private DataProviderTourTime() {}
 
@@ -64,7 +64,7 @@ public class DataProviderTourTime extends DataProvider {
 	 * @param numberOfYears
 	 * @return
 	 */
-	TourTimeData getTourTimeData(	final TourPerson person,
+	TourDataTime getTourTimeData(	final TourPerson person,
 									final TourTypeFilter tourTypeFilter,
 									final int lastYear,
 									final int numberOfYears,
@@ -251,34 +251,34 @@ public class DataProviderTourTime extends DataProvider {
 			/*
 			 * create data
 			 */
-			_tourDataTime = new TourTimeData();
+			_tourDataTime = new TourDataTime();
 
-			_tourDataTime.fTourIds = ArrayListToArray.toLong(_tourIds);
+			_tourDataTime.tourIds = ArrayListToArray.toLong(_tourIds);
 
-			_tourDataTime.fTypeIds = ArrayListToArray.toLong(dbTypeIds);
-			_tourDataTime.fTypeColorIndex = ArrayListToArray.toInt(dbTypeColorIndex);
+			_tourDataTime.typeIds = ArrayListToArray.toLong(dbTypeIds);
+			_tourDataTime.typeColorIndex = ArrayListToArray.toInt(dbTypeColorIndex);
 
-			_tourDataTime.fTagIds = dbTagIds;
+			_tourDataTime.tagIds = dbTagIds;
 
 			_tourDataTime.allDaysInAllYears = yearDays;
 			_tourDataTime.yearDays = _yearDays;
 			_tourDataTime.years = _years;
 
-			_tourDataTime.fTourYearValues = ArrayListToArray.toInt(dbTourYear);
-			_tourDataTime.fTourMonthValues = ArrayListToArray.toInt(dbTourMonths);
-			_tourDataTime.fTourDOYValues = ArrayListToArray.toInt(dbAllYearsDOY);
+			_tourDataTime.tourYearValues = ArrayListToArray.toInt(dbTourYear);
+			_tourDataTime.tourMonthValues = ArrayListToArray.toInt(dbTourMonths);
+			_tourDataTime.tourDOYValues = ArrayListToArray.toInt(dbAllYearsDOY);
 			_tourDataTime.weekValues = ArrayListToArray.toInt(dbTourStartWeek);
 
-			_tourDataTime.fTourTimeStartValues = ArrayListToArray.toInt(dbTourStartTime);
-			_tourDataTime.fTourTimeEndValues = ArrayListToArray.toInt(dbTourEndTime);
+			_tourDataTime.tourTimeStartValues = ArrayListToArray.toInt(dbTourStartTime);
+			_tourDataTime.tourTimeEndValues = ArrayListToArray.toInt(dbTourEndTime);
 
-			_tourDataTime.fTourDistanceValues = ArrayListToArray.toInt(dbDistance);
-			_tourDataTime.fTourAltitudeValues = ArrayListToArray.toInt(dbAltitude);
+			_tourDataTime.tourDistanceValues = ArrayListToArray.toInt(dbDistance);
+			_tourDataTime.tourAltitudeValues = ArrayListToArray.toInt(dbAltitude);
 
-			_tourDataTime.fTourRecordingTimeValues = dbTourRecordingTime;
-			_tourDataTime.fTourDrivingTimeValues = dbTourDrivingTime;
+			_tourDataTime.tourRecordingTimeValues = dbTourRecordingTime;
+			_tourDataTime.tourDrivingTimeValues = dbTourDrivingTime;
 
-			_tourDataTime.fTourTitle = dbTourTitle;
+			_tourDataTime.tourTitle = dbTourTitle;
 			_tourDataTime.tourDescription = dbTourDescription;
 
 		} catch (final SQLException e) {

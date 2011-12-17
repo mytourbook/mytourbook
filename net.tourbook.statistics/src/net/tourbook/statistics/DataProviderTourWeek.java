@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.statistics;
 
@@ -34,14 +34,14 @@ public class DataProviderTourWeek extends DataProvider {
 
 	private TourDataWeek				_tourWeekData;
 
+	private DataProviderTourWeek() {}
+
 	public static DataProviderTourWeek getInstance() {
 		if (_instance == null) {
 			_instance = new DataProviderTourWeek();
 		}
 		return _instance;
 	}
-
-	private DataProviderTourWeek() {}
 
 	TourDataWeek getWeekData(	final TourPerson person,
 								final TourTypeFilter tourTypeFilter,
@@ -84,7 +84,7 @@ public class DataProviderTourWeek extends DataProvider {
 
 		int serieLength = colorOffset + tourTypes.length;
 		serieLength = serieLength == 0 ? 1 : serieLength;
-		
+
 		final int valueLength = weekCounter;
 		final SQLFilter sqlFilter = new SQLFilter();
 
@@ -108,8 +108,9 @@ public class DataProviderTourWeek extends DataProvider {
 
 		try {
 
-			final int[][] dbDistance = new int[serieLength][valueLength];
-			final int[][] dbAltitude = new int[serieLength][valueLength];
+			final float[][] dbDistance = new float[serieLength][valueLength];
+			final float[][] dbAltitude = new float[serieLength][valueLength];
+
 			final int[][] dbDurationTime = new int[serieLength][valueLength];
 			final int[][] dbRecordingTime = new int[serieLength][valueLength];
 			final int[][] dbDrivingTime = new int[serieLength][valueLength];
@@ -178,13 +179,13 @@ public class DataProviderTourWeek extends DataProvider {
 			_tourWeekData.yearWeeks = _yearWeeks;
 			_tourWeekData.yearDays = _yearDays;
 
-			_tourWeekData.timeLow = new int[serieLength][valueLength];
-			_tourWeekData.timeHigh = dbDurationTime;
+			_tourWeekData.setTimeLow(new int[serieLength][valueLength]);
+			_tourWeekData.setTimeHigh(dbDurationTime);
 
-			_tourWeekData.distanceLow = new int[serieLength][valueLength];
+			_tourWeekData.distanceLow = new float[serieLength][valueLength];
 			_tourWeekData.distanceHigh = dbDistance;
 
-			_tourWeekData.altitudeLow = new int[serieLength][valueLength];
+			_tourWeekData.altitudeLow = new float[serieLength][valueLength];
 			_tourWeekData.altitudeHigh = dbAltitude;
 
 			_tourWeekData.recordingTime = dbRecordingTime;

@@ -21,6 +21,9 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.messages";							//$NON-NLS-1$
 
+	public static String		Action_ToolTip_Hide;
+
+	public static String	Action_ToolTip_SetDefaults;
 	public static String		Image__ArrowDown;
 	public static String		Image__ArrowUp;
 	public static String		Image__ZoomOut;
@@ -40,9 +43,6 @@ public class Messages extends NLS {
 	public static String		Calendar_View_Action_GotoToday;
 	public static String		Calendar_View_Action_LineInfo;
 	public static String		Calendar_View_Action_LinkWithOtherViews;
-	public static String		Calendar_View_Action_LogicalNavigation;
-	public static String		Calendar_View_Action_PhysicalNavigation;
-	public static String		Calendar_View_Action_ResizeTours;
 	public static String		Calendar_View_Action_ShowDescriptionTitle;
 	public static String		Calendar_View_Action_ShowDayNumberInTinyView;
 	public static String		Calendar_View_Action_ShowDistanceSpeed;
@@ -149,6 +149,7 @@ public class Messages extends NLS {
 
 	public static String		Action_TourType_ModifyTourTypeFilter;
 
+	public static String		Adjust_Altitude_Checkbox_SRTM_SelectWholeTour;
 	public static String		Adjust_Altitude_CreateDummyAltitudeData_Message;
 	public static String		Adjust_Altitude_CreateDummyAltitudeData_Title;
 	public static String		Adjust_Altitude_Group_GeoPosition;
@@ -287,6 +288,8 @@ public class Messages extends NLS {
 
 	public static String		App_Title;
 
+	public static String		App_ToggleState_DoNotShowAgain;
+
 	public static String		App_Tour_type_item_all_types;
 	public static String		App_Tour_type_item_not_defined;
 	public static String		App_TourType_ToolTip;
@@ -385,6 +388,8 @@ public class Messages extends NLS {
 
 	public static String		Database_Confirm_update;
 	public static String		Database_Confirm_update_title;
+
+	public static String	Database_Confirm_Update20;
 	public static String		Database_Monitor_CreateDatabase;
 
 	public static String		Database_Monitor_db_service_task;
@@ -427,7 +432,6 @@ public class Messages extends NLS {
 	public static String		Dialog_JoinTours_InvalidData_InvalidTours;
 	public static String		Dialog_JoinTours_InvalidData_RequiredDataSeries;
 	public static String		Dialog_JoinTours_InvalidData_Speed;
-	public static String		Dialog_JoinTours_InvalidData_Temperature;
 	public static String		Dialog_JoinTours_InvalidData_Time;
 	public static String		Dialog_JoinTours_Label_DefaultTitle;
 	public static String		Dialog_JoinTours_Label_DeviceName;
@@ -501,6 +505,8 @@ public class Messages extends NLS {
 	public static String		Graph_Label_Altitude;
 	public static String		Graph_Label_Cadence;
 	public static String		Graph_Label_Cadence_unit;
+
+	public static String		Graph_Label_Distance;
 	public static String		Graph_Label_Gradiend_unit;
 	public static String		Graph_Label_Gradient;
 	public static String		Graph_Label_Heartbeat;
@@ -512,6 +518,11 @@ public class Messages extends NLS {
 	public static String		Graph_Label_ShowHrZoneBackground_Tooltip;
 	public static String		Graph_Label_Speed;
 	public static String		Graph_Label_Temperature;
+
+	public static String		Graph_Label_TimeDuration;
+
+	public static String		Graph_Label_TimeOfDay;
+
 	public static String		Graph_Label_Tour_Compare;
 	public static String		Graph_Label_Tour_Compare_unit;
 
@@ -603,7 +614,6 @@ public class Messages extends NLS {
 	public static String		Image__layout_hierarchical;
 	public static String		Image__link;
 	public static String		Image__MyTourbook16;
-	public static String		Image__open_folder_add;
 	public static String		Image__options;
 	public static String		Image__PulseZones;
 	public static String		Image__PulseZones_Disabled;
@@ -668,8 +678,6 @@ public class Messages extends NLS {
 	public static String		import_data_action_save_tour_for_person;
 	public static String		import_data_action_save_tour_with_person;
 	public static String		import_data_action_save_tours_for_person;
-	public static String		import_data_dlg_reimport_invalid_file_message;
-	public static String		import_data_dlg_reimport_message;
 	public static String		import_data_dlg_reimport_title;
 	public static String		import_data_dlg_save_tour_msg;
 	public static String		import_data_dlg_save_tour_title;
@@ -678,10 +686,20 @@ public class Messages extends NLS {
 	public static String		import_data_updateDataFromDatabase_subTask;
 	public static String		import_data_updateDataFromDatabase_task;
 
+	public static String		Import_Data_Action_ReimportAltitudeValues;
+	public static String		Import_Data_Action_ReimportTour;
 	public static String		Import_Data_Action_RemoveTour;
 	public static String		Import_Data_Dialog_ConfirmReimport_Message;
+	public static String		Import_Data_Dialog_ConfirmReimportAltitudeValues_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportTimeSlices_Message;
+	public static String		Import_Data_Dialog_GetAlternativePath_Message;
+	public static String		Import_Data_Dialog_GetReimportedFilePath_Message;
+	public static String		Import_Data_Dialog_Reimport_Title;
+	public static String		Import_Data_Dialog_ReimportIsInvalid_CommonError_Message;
+	public static String		Import_Data_Dialog_ReimportIsInvalid_DifferentTourId_Message;
 	public static String		Import_Data_Dialog_ReimportIsInvalid_WrongSliceNumbers_Message;
+	public static String		Import_Data_Error_CreatingFileName_Message;
+	public static String		Import_Data_Error_CreatingFileName_Title;
 	public static String		Import_Data_Label_Hint;
 	public static String		Import_Data_Label_Info;
 	public static String		Import_Data_Link_Import;
@@ -724,6 +742,8 @@ public class Messages extends NLS {
 
 	public static String		Pref_App_Label_TourEditorIsModified;
 
+	public static String		Pref_Appearance_Button_ResetAllToggleDialogs;
+	public static String		Pref_Appearance_Button_ResetAllToggleDialogs_Tooltip;
 	public static String		Pref_Appearance_Check_AutoOpenTagging;
 	public static String		Pref_Appearance_Check_TaggingAnimation;
 	public static String		Pref_Appearance_Group_Tagging;
@@ -771,8 +791,14 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Check_force_minimum_for_gradient;
 	public static String		Pref_Graphs_Check_force_minmax_for_pace;
 	public static String		Pref_Graphs_Check_show_start_time;
+	public static String		Pref_Graphs_Checkbox_GraphAntialiasing;
+	public static String		Pref_Graphs_Checkbox_GraphAntialiasing_Tooltip;
 	public static String		Pref_Graphs_Checkbox_ShowHorizontalGrid;
 	public static String		Pref_Graphs_Checkbox_ShowVerticalGrid;
+	public static String	Pref_Graphs_Dialog_GridLine_Warning_Message;
+
+	public static String	Pref_Graphs_Dialog_GridLine_Warning_Title;
+
 	public static String		Pref_Graphs_Error_one_graph_must_be_selected;
 	public static String		Pref_Graphs_Error_value_must_be_integer;
 	public static String		Pref_Graphs_force_minimum_value;
@@ -783,6 +809,10 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Group_mouse_mode;
 	public static String		Pref_Graphs_Group_units_for_xaxis;
 	public static String		Pref_Graphs_Group_zoom_options;
+	public static String		Pref_Graphs_Label_GraphTransparency;
+	public static String		Pref_Graphs_Label_GraphTransparency_Tooltip;
+	public static String		Pref_Graphs_Label_GraphTransparencyLine;
+	public static String		Pref_Graphs_Label_GraphTransparencyLine_Tooltip;
 	public static String		Pref_Graphs_Label_select_graph;
 	public static String		Pref_Graphs_Label_select_graph_tooltip;
 	public static String		Pref_Graphs_move_sliders_when_zoomed;
@@ -976,6 +1006,40 @@ public class Messages extends NLS {
 	public static String		PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_down;
 	public static String		PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_up;
 
+	public static String		Tooltip_ValuePoint_Action_CloseContextMenu;
+	public static String		Tooltip_ValuePoint_Action_OpenToolTipMenu_ToolTip;
+	public static String		Tooltip_ValuePoint_Action_Orientation_Horizontal;
+	public static String		Tooltip_ValuePoint_Action_Orientation_Vertical;
+	public static String		Tooltip_ValuePoint_Action_PinLocation_BottomLeft;
+	public static String		Tooltip_ValuePoint_Action_PinLocation_BottomRight;
+	public static String		Tooltip_ValuePoint_Action_PinLocation_Header;
+	public static String		Tooltip_ValuePoint_Action_PinLocation_MouseXPosition;
+
+	public static String	Tooltip_ValuePoint_Action_PinLocation_Screen;
+	public static String		Tooltip_ValuePoint_Action_PinLocation_TopLeft;
+	public static String		Tooltip_ValuePoint_Action_PinLocation_TopRight;
+	public static String		Tooltip_ValuePoint_Action_Value_Altimeter;
+	public static String		Tooltip_ValuePoint_Action_Value_Altitude;
+	public static String		Tooltip_ValuePoint_Action_Value_Cadence;
+
+	public static String	Tooltip_ValuePoint_Action_Value_ChartZoomFactor;
+	public static String		Tooltip_ValuePoint_Action_Value_Distance;
+	public static String		Tooltip_ValuePoint_Action_Value_Gradient;
+	public static String		Tooltip_ValuePoint_Action_Value_Header;
+	public static String		Tooltip_ValuePoint_Action_Value_Pace;
+	public static String		Tooltip_ValuePoint_Action_Value_Power;
+	public static String		Tooltip_ValuePoint_Action_Value_Pulse;
+	public static String		Tooltip_ValuePoint_Action_Value_Speed;
+	public static String		Tooltip_ValuePoint_Action_Value_Temperature;
+	public static String		Tooltip_ValuePoint_Action_Value_TimeDuration;
+	public static String		Tooltip_ValuePoint_Action_Value_TimeOfDay;
+	public static String		Tooltip_ValuePoint_Action_Value_TimeSlices;
+	public static String	Tooltip_ValuePoint_Label_ChartZoomFactor_Tooltip;
+
+	public static String		Tooltip_ValuePoint_Label_NoTour;
+	public static String		Tooltip_ValuePoint_Label_SlicesCurrent_Tooltip;
+	public static String		Tooltip_ValuePoint_Label_SlicesMax_Tooltip;
+
 	public static String		Tour_Action_auto_move_sliders_when_zoomed;
 	public static String		Tour_Action_auto_zoom_to_slider_position;
 	public static String		Tour_Action_chart_options_tooltip;
@@ -1006,6 +1070,8 @@ public class Messages extends NLS {
 	public static String		Tour_Action_ShowHrZones_Tooltip;
 	public static String		Tour_Action_ShowTourMarker;
 
+	public static String		Tour_Action_ValuePointToolTip_IsVisible;
+
 	public static String		Tour_Book_Action_delete_selected_tours;
 	public static String		Tour_Book_Action_delete_selected_tours_dlg_message;
 	public static String		Tour_Book_Action_delete_selected_tours_dlg_message_confirm;
@@ -1028,6 +1094,7 @@ public class Messages extends NLS {
 	public static String		Tour_Database_Dialog_ValidateFields_Title;
 	public static String		Tour_Database_load_all_tours;
 	public static String		Tour_Database_PostUpdate011_SetTourCreateTime;
+	public static String		Tour_Database_PostUpdate020_ConvertIntToFloat;
 	public static String		Tour_Database_TourSaveError;
 	public static String		Tour_Database_update_tour;
 	public static String		Tour_Database_Update;
