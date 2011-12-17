@@ -34,7 +34,7 @@ public class ActionReimportAltitudeValues extends Action {
 
 	@Override
 	public void run() {
-		RawDataManager.getInstance().actionReimportTour(RawDataManager.REIMPORT_ALTITUDE_VALUES, _tourViewer);
+		RawDataManager.getInstance().actionReimportTour(RawDataManager.ReImport.OnlyAltitudeValues, _tourViewer);
 	}
 
 }

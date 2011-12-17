@@ -34,7 +34,7 @@ public class ActionReimportTourOnlyTimeSlices extends Action {
 
 	@Override
 	public void run() {
-		RawDataManager.getInstance().actionReimportTour(RawDataManager.REIMPORT_ALL_TIME_SLICES, _tourViewer);
+		RawDataManager.getInstance().actionReimportTour(RawDataManager.ReImport.AllTimeSlices, _tourViewer);
 	}
 
 }

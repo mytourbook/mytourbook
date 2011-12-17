@@ -73,10 +73,6 @@ public class RawDataManager {
 	private static final String				RAW_DATA_LAST_SELECTED_PATH			= "raw-data-view.last-selected-import-path";	//$NON-NLS-1$
 	private static final String				TEMP_IMPORTED_FILE					= "received-device-data.txt";					//$NON-NLS-1$
 
-	public static final int					REIMPORT_TOUR						= 10;
-	public static final int					REIMPORT_ALL_TIME_SLICES			= 20;
-	public static final int					REIMPORT_ALTITUDE_VALUES			= 30;
-
 	private final IPreferenceStore			_prefStore							= TourbookPlugin.getDefault() //
 																						.getPreferenceStore();
 
@@ -110,20 +106,30 @@ public class RawDataManager {
 	private final HashSet<String>			_importedFileNamesChildren			= new HashSet<String>();
 
 	private boolean							_isImported;
-	private boolean							_isImportCanceled;
 
+	private boolean							_isImportCanceled;
 	private int								_importSettingsImportYear			= -1;
+
 	private boolean							_importSettingsIsMergeTracks;
 	private boolean							_importSettingsIsChecksumValidation	= true;
 	private boolean							_importSettingsCreateTourIdWithTime	= false;
-
 	private List<TourbookDevice>			_devicesBySortPriority;
-	private HashMap<String, TourbookDevice>	_devicesByExtension;
 
+	private HashMap<String, TourbookDevice>	_devicesByExtension;
 	/**
 	 * Filepath from the previous reimported tour
 	 */
 	private IPath							_previousSelectedReimportFolder;
+
+	public static enum ReImport {
+		Tour, //
+		AllTimeSlices, //
+		OnlyAltitudeValues
+	}
+
+//	public static final int					REIMPORT_TOUR						= 10;
+//	public static final int					REIMPORT_ALL_TIME_SLICES			= 20;
+//	public static final int					REIMPORT_ALTITUDE_VALUES			= 30;
 
 	private RawDataManager() {}
 
@@ -364,7 +370,7 @@ public class RawDataManager {
 	 * @param tourViewer
 	 *            Tour viewer where the selected tours should be reimported.
 	 */
-	public void actionReimportTour(final int reimportId, final ITourViewer3 tourViewer) {
+	public void actionReimportTour(final ReImport reimportId, final ITourViewer3 tourViewer) {
 
 		// check if the tour editor contains a modified tour
 		if (TourManager.isTourEditorModified()) {
@@ -446,9 +452,9 @@ public class RawDataManager {
 		}
 	}
 
-	private boolean actionReimportTour10Confirm(final int reimportTour) {
+	private boolean actionReimportTour10Confirm(final ReImport reimportTour) {
 
-		if (reimportTour == REIMPORT_TOUR) {
+		if (reimportTour == ReImport.Tour) {
 
 			if (_prefStore.getBoolean(ITourbookPreferences.TOGGLE_STATE_REIMPORT_TOUR)) {
 
@@ -471,7 +477,7 @@ public class RawDataManager {
 				}
 			}
 
-		} else if (reimportTour == REIMPORT_ALL_TIME_SLICES) {
+		} else if (reimportTour == ReImport.AllTimeSlices) {
 
 			if (_prefStore.getBoolean(ITourbookPreferences.TOGGLE_STATE_REIMPORT_ALL_TIME_SLICES)) {
 
@@ -496,7 +502,7 @@ public class RawDataManager {
 				}
 			}
 
-		} else if (reimportTour == REIMPORT_ALTITUDE_VALUES) {
+		} else if (reimportTour == ReImport.OnlyAltitudeValues) {
 
 			if (_prefStore.getBoolean(ITourbookPreferences.TOGGLE_STATE_REIMPORT_ALTITUDE_VALUES)) {
 
@@ -605,7 +611,7 @@ public class RawDataManager {
 
 			final String tourDateTimeShort = TourManager.getTourDateTimeShort(tourData);
 
-			final FileDialog dialog = new FileDialog(Display.getDefault().getActiveShell(), SWT.SAVE);
+			final FileDialog dialog = new FileDialog(Display.getDefault().getActiveShell(), SWT.OPEN);
 			dialog.setText(NLS.bind(Messages.Import_Data_Dialog_Reimport_Title, tourDateTimeShort));
 
 			if (oldImportFilePathName != null) {
@@ -637,7 +643,9 @@ public class RawDataManager {
 		return new File(reimportFilePathName);
 	}
 
-	private boolean actionReimportTour30(final int reimportId, final File reimportedFile, final TourData oldTourData) {
+	private boolean actionReimportTour30(	final ReImport reimportId,
+											final File reimportedFile,
+											final TourData oldTourData) {
 
 		boolean isTourReImported = false;
 		final Long oldTourId = oldTourData.getTourId();
@@ -707,7 +715,9 @@ public class RawDataManager {
 	 * @param oldTourData
 	 * @return Returns {@link TourData} with the reimported time slices.
 	 */
-	private TourData actionReimportTour40(final int reimportId, final File reimportedFile, final TourData oldTourData) {
+	private TourData actionReimportTour40(	final ReImport reimportId,
+											final File reimportedFile,
+											final TourData oldTourData) {
 
 		boolean isWrongLength = false;
 		boolean isWrongTourId = false;
@@ -731,7 +741,7 @@ public class RawDataManager {
 				continue;
 			}
 
-			if (reimportId == REIMPORT_TOUR) {
+			if (reimportId == ReImport.Tour) {
 
 				// replace complete tour
 
@@ -742,7 +752,7 @@ public class RawDataManager {
 
 				return reimportedTourData;
 
-			} else if (reimportId == REIMPORT_ALL_TIME_SLICES || reimportId == REIMPORT_ALTITUDE_VALUES) {
+			} else if (reimportId == ReImport.AllTimeSlices || reimportId == ReImport.OnlyAltitudeValues) {
 
 				// replace part of the tour
 
@@ -754,7 +764,7 @@ public class RawDataManager {
 				// reimport altitude
 				oldTourData.altitudeSerie = reimportedTourData.altitudeSerie;
 
-				if (reimportId == REIMPORT_ALL_TIME_SLICES) {
+				if (reimportId == ReImport.AllTimeSlices) {
 
 					// reimport all data series
 

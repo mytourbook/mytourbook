@@ -292,6 +292,11 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 		_prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_TOUR, false);
 		_prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_ALL_TIME_SLICES, false);
 		_prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_ALTITUDE_VALUES, false);
+
+		MessageDialog.openInformation(
+				getShell(),
+				Messages.Pref_Appearance_Dialog_ResetAllToggleDialogs_Title,
+				Messages.Pref_Appearance_Dialog_ResetAllToggleDialogs_Message);
 	}
 
 	@Override

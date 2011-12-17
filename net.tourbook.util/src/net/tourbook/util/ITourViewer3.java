@@ -17,7 +17,7 @@ package net.tourbook.util;
 
 
 /**
- * @since version 11.12
+ * @since version 12.1
  */
 public interface ITourViewer3 extends ITourViewer {
 

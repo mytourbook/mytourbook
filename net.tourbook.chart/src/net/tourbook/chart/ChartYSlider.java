@@ -124,15 +124,15 @@ public class ChartYSlider {
 
 	@Override
 	public String toString() {
-		return "ChartYSlider ["
-				+ "devYSliderLine="
+		return "ChartYSlider [" //$NON-NLS-1$
+				+ "devYSliderLine=" //$NON-NLS-1$
 				+ _devYSliderLine
-				+ ", "
-				+ "devYClickOffset="
+				+ ", " //$NON-NLS-1$
+				+ "devYClickOffset=" //$NON-NLS-1$
 				+ devYClickOffset
-				+ ", "
-				+ "hitRectangle="
+				+ ", " //$NON-NLS-1$
+				+ "hitRectangle=" //$NON-NLS-1$
 				+ _hitRectangle
-				+ "]";
+				+ "]"; //$NON-NLS-1$
 	}
 }

@@ -40,6 +40,6 @@ public class ChartUnit {
 
 	@Override
 	public String toString() {
-		return "ChartUnit [valueLabel=" + valueLabel + ", value=" + value + ", isMajorValue=" + isMajorValue + "]";
+		return "ChartUnit [valueLabel=" + valueLabel + ", value=" + value + ", isMajorValue=" + isMajorValue + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
 }

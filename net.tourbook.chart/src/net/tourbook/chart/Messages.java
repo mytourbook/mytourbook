@@ -48,27 +48,17 @@ public class Messages extends NLS {
 
 	public static String		Format_number_float;
 
-	public static String		Format_time_hhmm;
-	public static String		Format_time_hhmmss;
-
 	public static String		Image_arrow_left;
 	public static String		Image_arrow_left_disabled;
 	public static String		Image_arrow_right;
 	public static String		Image_arrow_right_disabled;
 
-	public static String		Image_cursor_hand_05x;
-	public static String		Image_cursor_hand_10x;
-	public static String		Image_cursor_hand_20x;
-	public static String		Image_cursor_hand_50x;
 	public static String		Image_cursor_mode_slider;
 	public static String		Image_cursor_mode_zoom;
 	public static String		Image_cursor_mode_zoom_move;
-	public static String	Image_Cursor_DragXSlider_ModeSlider;
-
-	public static String	Image_Cursor_DragXSlider_ModeZoom;
-
-	public static String	Image_Cursor_Hover_XSlider;
-
+	public static String		Image_Cursor_DragXSlider_ModeSlider;
+	public static String		Image_Cursor_DragXSlider_ModeZoom;
+	public static String		Image_Cursor_Hover_XSlider;
 	public static String		Image_Cursor_Move1x;
 	public static String		Image_Cursor_Move2x;
 	public static String		Image_Cursor_Move3x;

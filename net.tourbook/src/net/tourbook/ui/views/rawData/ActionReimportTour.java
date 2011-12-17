@@ -34,7 +34,7 @@ public class ActionReimportTour extends Action {
 
 	@Override
 	public void run() {
-		RawDataManager.getInstance().actionReimportTour(RawDataManager.REIMPORT_TOUR, _tourViewer);
+		RawDataManager.getInstance().actionReimportTour(RawDataManager.ReImport.Tour, _tourViewer);
 	}
 
 }

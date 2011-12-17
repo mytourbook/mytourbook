@@ -746,6 +746,10 @@ public class Messages extends NLS {
 	public static String		Pref_Appearance_Button_ResetAllToggleDialogs_Tooltip;
 	public static String		Pref_Appearance_Check_AutoOpenTagging;
 	public static String		Pref_Appearance_Check_TaggingAnimation;
+	public static String	Pref_Appearance_Dialog_ResetAllToggleDialogs_Message;
+
+	public static String	Pref_Appearance_Dialog_ResetAllToggleDialogs_Title;
+
 	public static String		Pref_Appearance_Group_Tagging;
 	public static String		Pref_Appearance_Label_AutoOpenTagging_Tooltip;
 	public static String		Pref_Appearance_Label_AutoOpenTaggingDelay;
