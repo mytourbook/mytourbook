@@ -89,9 +89,6 @@ import org.joda.time.DateTime;
 /**
  * Tour data contains all data for a tour (except markers), an entity will be saved in the database
  */
-/**
- * @author 081647
- */
 @Entity
 @XmlType(name = "TourData")
 @XmlRootElement(name = "TourData")
@@ -191,7 +188,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private short											startMinute;
 
 	/**
-	 * altitude difference for the merged tour
+	 * 
 	 */
 	private int												startSecond;																			// db-version 7
 

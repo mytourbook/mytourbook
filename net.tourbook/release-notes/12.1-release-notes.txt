@@ -1,49 +1,93 @@
-Improvements:
-- major/minor grid lines in the tour chart
+MyTourbook 12.1 BETA 1 release notes (?? December 2011)
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                       
+		       VERY IMPORTANT INFO
+
+This version has major structural changes in the tour database. 
+It is STRONGLY recommended to do a backup of the data before the 
+new version is used.
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+Major Improvements (see details below):
+
+- modernized tour chart, behaviour is different than before
+- value point tooltip in the tour chart
+- all data series are saved in floating point format
+- altitude values are displayed exactly as saved in the import file, the altitude values for already saved tours can be reimported but adjusted altitude values can not be preserved
+
+
+Other Improvements:
+
+- in the adjust altitude dialog with the method "approach altitude with SRTM" a new checkbox is available to select the whole tour
+- reimporting a tour can also be done for altitude values only
+- reimporting can also be done in the tourbook view (available in the context menu)
+
+
+Tour Chart Improvements:
+
+- transparency and antialiasing for the line graphs
+- major and minor grid lines 
 - improved performance for drawing the tour chart
-- adjust altitude dialog with the method: "approach altitude with SRTM" new checkbox to select the whole tour
-- reimport only altitude data
-- reimport can also be done in the tourbook view
-- renovated tour chart
-	- set transparency and antialiasing for the line graphs
+- increased chart virtual size to 10'000'000 pixel: this is factor 100 more than before
+	
+New Tour Chart Behaviour:
 
-new Tour Chart behaviour,
 - when the chart is zoomed with the mouse wheel, the horizontal position in the chart will be preserved where the mouse is located (in the previous versions the last mouse double click position was preserved, this is still the behaviour of the map)
-
 - scroll tour chart when vertical sliders are dragged outside of the visible area (for a zoomed chart)
-
 - when the chart is zoomed in and the mouse is moved within the x-axis area, the graph is scrolled left/right
 - Ctrl+Shift moves the x-slider to the exact value position (Ctrl MUST be pressed FIRST!!!)
-- increased chart virtual size to 10'000'000 pixel: you can zoom 100 times more into the chart than before
 - mouse wheel zoom in the vertical axis is zooming the left and right border
 - the mouse has 3 different vertical positions:
   - upper part: when the mouse is clicked, the left moust slider will be positions to the mouse
   - lower part: when the mouse is clicked, the right moust slider will be positions to the mouse
   - middle part: when the mouse is clicked and button is kept down, the chart can be dragged (this is the behaviour in previous versions)
-- when the mouse has clicked on a vertical slider, this slider is pinned to the mouse until a second mouse click occures
+- when the mouse is clicked on a vertical slider, this slider is pinned to the mouse until a second mouse click occures
+- horizontal scrolling a zoomed chart with the scrollbar is removed, this was available in the statistic charts
 
-hints:
+
+Hints for using Tour Chart and Map:
 - when a vertical slider in the tour chart is not moving the slider in the map, ensure that the tourchart has the focus
 
+
 Value Point Tooltip
+
 - this tooltip has many features (3000 lines of code) which can be set with the button in the top/right corner of the tooltip
-- when the tooltip was set to be hidden, the chart options menu has the menu item "Show Value Point Tooltip"
-- the tooltip can be dragged with the mouse and keeps the selected pin position when the chart is move on the screen or resized
+- when the tooltip has been set to be hidden, the chart options menu has the menu item "Show Value Point Tooltip"
+- the tooltip can be dragged with the mouse, the selected pin position keeps the tooltip when the chart is move or resized
 
 
-Infos:
+Update Infos:
+
 -conversion time: 1727 tours / 149 seconds = 11.6 tours/second
 
+
 System:
+- Eclipse 3.7.1
+- Derby 10.8.2.1
 -decreased number of plugins, moved most of the device plugins into net.tourbook.device
+
+
+Fixed bugs:
+
+- Tour editor not dirty when changing tour type https://sourceforge.net/tracker/?func=detail&aid=3459317&group_id=179799&atid=890601
+- a tour with 53952 time slices cannot be saved https://sourceforge.net/tracker/?func=detail&aid=3421203&group_id=179799&atid=890601
+
+
+
 
 TODO's
 - double -> float
   - ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED_AS 
   - ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED_AS
 
-- reload time slices REMOVES merged tour data
-
+  
+  
+  
 -hide log in the UI for these errors
 
 C:\offline-srtm\srtm3\N56W020.hgt (The system cannot find the file specified)
