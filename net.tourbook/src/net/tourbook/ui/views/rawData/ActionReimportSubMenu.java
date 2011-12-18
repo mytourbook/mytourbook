@@ -16,6 +16,7 @@
 package net.tourbook.ui.views.rawData;
 
 import net.tourbook.Messages;
+import net.tourbook.importdata.RawDataManager;
 import net.tourbook.util.ITourViewer3;
 
 import org.eclipse.jface.action.Action;
@@ -34,19 +35,62 @@ public class ActionReimportSubMenu extends Action implements IMenuCreator {
 
 	private Menu								_menu;
 
-	private ActionReimportTour					_actionReimportTour;
-	private ActionReimportTourOnlyTimeSlices	_actionReimportTourOnlyTimeSlices;
-	private ActionReimportAltitudeValues		_actionReimportAltitudeValues;
+	private ActionReimportEntireTour			_actionReimportEntireTour;
+	private ActionReimportOnlyTimeSlices		_actionReimportOnlyTimeSlices;
+	private ActionReimportOnlyAltitudeValues	_actionReimportOnlyAltitudeValues;
+
+	private ITourViewer3						_tourViewer;
+
+	private class ActionReimportEntireTour extends Action {
+
+		public ActionReimportEntireTour() {
+			setText(Messages.Import_Data_Action_Reimport_EntireTour);
+		}
+
+		@Override
+		public void run() {
+			RawDataManager.getInstance().actionReimportTour(RawDataManager.ReImport.Tour, _tourViewer);
+		}
+
+	}
+
+	private class ActionReimportOnlyAltitudeValues extends Action {
+
+		public ActionReimportOnlyAltitudeValues() {
+			setText(Messages.Import_Data_Action_Reimport_OnlyAltitudeValues);
+		}
+
+		@Override
+		public void run() {
+			RawDataManager.getInstance().actionReimportTour(RawDataManager.ReImport.OnlyAltitudeValues, _tourViewer);
+		}
+
+	}
+
+	private class ActionReimportOnlyTimeSlices extends Action {
+
+		public ActionReimportOnlyTimeSlices() {
+			setText(Messages.Import_Data_Action_Reimport_OnlyTimeSlices);
+		}
+
+		@Override
+		public void run() {
+			RawDataManager.getInstance().actionReimportTour(RawDataManager.ReImport.AllTimeSlices, _tourViewer);
+		}
+
+	}
 
 	public ActionReimportSubMenu(final ITourViewer3 tourViewer) {
 
-		super(Messages.Import_Data_Action_ReimportTour, AS_DROP_DOWN_MENU);
+		super(Messages.Import_Data_Action_Reimport_Tour, AS_DROP_DOWN_MENU);
 
 		setMenuCreator(this);
 
-		_actionReimportTour = new ActionReimportTour(tourViewer);
-		_actionReimportTourOnlyTimeSlices = new ActionReimportTourOnlyTimeSlices(tourViewer);
-		_actionReimportAltitudeValues = new ActionReimportAltitudeValues(tourViewer);
+		_tourViewer = tourViewer;
+
+		_actionReimportEntireTour = new ActionReimportEntireTour();
+		_actionReimportOnlyTimeSlices = new ActionReimportOnlyTimeSlices();
+		_actionReimportOnlyAltitudeValues = new ActionReimportOnlyAltitudeValues();
 	}
 
 	public void dispose() {
@@ -58,9 +102,9 @@ public class ActionReimportSubMenu extends Action implements IMenuCreator {
 
 	private void fillMenu(final Menu menu) {
 
-		new ActionContributionItem(_actionReimportAltitudeValues).fill(menu, -1);
-		new ActionContributionItem(_actionReimportTourOnlyTimeSlices).fill(menu, -1);
-		new ActionContributionItem(_actionReimportTour).fill(menu, -1);
+		new ActionContributionItem(_actionReimportOnlyAltitudeValues).fill(menu, -1);
+		new ActionContributionItem(_actionReimportOnlyTimeSlices).fill(menu, -1);
+		new ActionContributionItem(_actionReimportEntireTour).fill(menu, -1);
 	}
 
 	public Menu getMenu(final Control parent) {

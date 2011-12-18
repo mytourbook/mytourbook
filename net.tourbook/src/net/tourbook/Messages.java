@@ -23,7 +23,7 @@ public class Messages extends NLS {
 
 	public static String		Action_ToolTip_Hide;
 
-	public static String	Action_ToolTip_SetDefaults;
+	public static String		Action_ToolTip_SetDefaults;
 	public static String		Image__ArrowDown;
 	public static String		Image__ArrowUp;
 	public static String		Image__ZoomOut;
@@ -389,7 +389,7 @@ public class Messages extends NLS {
 	public static String		Database_Confirm_update;
 	public static String		Database_Confirm_update_title;
 
-	public static String	Database_Confirm_Update20;
+	public static String		Database_Confirm_Update20;
 	public static String		Database_Monitor_CreateDatabase;
 
 	public static String		Database_Monitor_db_service_task;
@@ -673,8 +673,6 @@ public class Messages extends NLS {
 	public static String		import_data_action_createTourIdWithTime;
 	public static String		import_data_action_disable_hac4_checksum_validation;
 	public static String		import_data_action_merge_tracks;
-	public static String		import_data_action_reimport_tour;
-	public static String		import_data_action_reimport_tour_OnlyTimeSlices;
 	public static String		import_data_action_save_tour_for_person;
 	public static String		import_data_action_save_tour_with_person;
 	public static String		import_data_action_save_tours_for_person;
@@ -686,8 +684,10 @@ public class Messages extends NLS {
 	public static String		import_data_updateDataFromDatabase_subTask;
 	public static String		import_data_updateDataFromDatabase_task;
 
-	public static String		Import_Data_Action_ReimportAltitudeValues;
-	public static String		Import_Data_Action_ReimportTour;
+	public static String		Import_Data_Action_Reimport_EntireTour;
+	public static String		Import_Data_Action_Reimport_OnlyAltitudeValues;
+	public static String		Import_Data_Action_Reimport_OnlyTimeSlices;
+	public static String		Import_Data_Action_Reimport_Tour;
 	public static String		Import_Data_Action_RemoveTour;
 	public static String		Import_Data_Dialog_ConfirmReimport_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportAltitudeValues_Message;
@@ -746,9 +746,9 @@ public class Messages extends NLS {
 	public static String		Pref_Appearance_Button_ResetAllToggleDialogs_Tooltip;
 	public static String		Pref_Appearance_Check_AutoOpenTagging;
 	public static String		Pref_Appearance_Check_TaggingAnimation;
-	public static String	Pref_Appearance_Dialog_ResetAllToggleDialogs_Message;
+	public static String		Pref_Appearance_Dialog_ResetAllToggleDialogs_Message;
 
-	public static String	Pref_Appearance_Dialog_ResetAllToggleDialogs_Title;
+	public static String		Pref_Appearance_Dialog_ResetAllToggleDialogs_Title;
 
 	public static String		Pref_Appearance_Group_Tagging;
 	public static String		Pref_Appearance_Label_AutoOpenTagging_Tooltip;
@@ -799,10 +799,8 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Checkbox_GraphAntialiasing_Tooltip;
 	public static String		Pref_Graphs_Checkbox_ShowHorizontalGrid;
 	public static String		Pref_Graphs_Checkbox_ShowVerticalGrid;
-	public static String	Pref_Graphs_Dialog_GridLine_Warning_Message;
-
-	public static String	Pref_Graphs_Dialog_GridLine_Warning_Title;
-
+	public static String		Pref_Graphs_Dialog_GridLine_Warning_Message;
+	public static String		Pref_Graphs_Dialog_GridLine_Warning_Title;
 	public static String		Pref_Graphs_Error_one_graph_must_be_selected;
 	public static String		Pref_Graphs_Error_value_must_be_integer;
 	public static String		Pref_Graphs_force_minimum_value;
@@ -1018,15 +1016,13 @@ public class Messages extends NLS {
 	public static String		Tooltip_ValuePoint_Action_PinLocation_BottomRight;
 	public static String		Tooltip_ValuePoint_Action_PinLocation_Header;
 	public static String		Tooltip_ValuePoint_Action_PinLocation_MouseXPosition;
-
-	public static String	Tooltip_ValuePoint_Action_PinLocation_Screen;
+	public static String		Tooltip_ValuePoint_Action_PinLocation_Screen;
 	public static String		Tooltip_ValuePoint_Action_PinLocation_TopLeft;
 	public static String		Tooltip_ValuePoint_Action_PinLocation_TopRight;
 	public static String		Tooltip_ValuePoint_Action_Value_Altimeter;
 	public static String		Tooltip_ValuePoint_Action_Value_Altitude;
 	public static String		Tooltip_ValuePoint_Action_Value_Cadence;
-
-	public static String	Tooltip_ValuePoint_Action_Value_ChartZoomFactor;
+	public static String		Tooltip_ValuePoint_Action_Value_ChartZoomFactor;
 	public static String		Tooltip_ValuePoint_Action_Value_Distance;
 	public static String		Tooltip_ValuePoint_Action_Value_Gradient;
 	public static String		Tooltip_ValuePoint_Action_Value_Header;
@@ -1038,7 +1034,7 @@ public class Messages extends NLS {
 	public static String		Tooltip_ValuePoint_Action_Value_TimeDuration;
 	public static String		Tooltip_ValuePoint_Action_Value_TimeOfDay;
 	public static String		Tooltip_ValuePoint_Action_Value_TimeSlices;
-	public static String	Tooltip_ValuePoint_Label_ChartZoomFactor_Tooltip;
+	public static String		Tooltip_ValuePoint_Label_ChartZoomFactor_Tooltip;
 
 	public static String		Tooltip_ValuePoint_Label_NoTour;
 	public static String		Tooltip_ValuePoint_Label_SlicesCurrent_Tooltip;
