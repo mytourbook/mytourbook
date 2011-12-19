@@ -9,7 +9,7 @@ AppCopyright=MyTourbook Contributors 2005, {#AppYear}
 AppID={{A20227AD-322E-4B3D-B67A-9C1FECF7B4A6}
 
 OutputDir={#ProductRoot}{#AppVersion}
-OutputBaseFilename=mytourbook_{#AppVersion}.win32.win32.x86_64.setup
+OutputBaseFilename=mytourbook_{#AppVersion}{#AppSubVersion}.win32.win32.x86_64.setup
 
 DefaultGroupName=MyTourbook
 DefaultDirName={pf}\MyTourbook
@@ -32,7 +32,7 @@ ArchitecturesAllowed=x64
 ArchitecturesInstallIn64BitMode=x64
 
 [Files]
-Source: {#ProductRoot}{#AppVersion}\mytourbook_{#AppVersion}.win32.win32.x86_64\mytourbook\*; DestDir: {app}; Flags: recursesubdirs; Tasks: ; Languages:
+Source: {#ProductRoot}{#AppVersion}\mytourbook_{#AppVersion}{#AppSubVersion}.win32.win32.x86_64\mytourbook\*; DestDir: {app}; Flags: recursesubdirs; Tasks: ; Languages:
 
 [InstallDelete]
 Name: {app}\*; Type: files

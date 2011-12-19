@@ -6,6 +6,8 @@ import org.osgi.framework.Version;
 
 public class ApplicationVersion {
 
+	private static String	_subVersion	= " BETA 1";	//$NON-NLS-1$
+
 // this is disabled because it contains redundant information and too much numbers which nobody needs
 // the version number is now used from the plugin version, see below
 //
@@ -54,6 +56,7 @@ public class ApplicationVersion {
 	private static String	_versionFull;
 	private static String	_versionSimple;
 	private static String	_qualifierText;
+
 	private static boolean	_isDev;
 
 	private static void createVersionText() {
@@ -62,12 +65,15 @@ public class ApplicationVersion {
 		final String qualifier = version.getQualifier();
 
 		_isDev = qualifier.contains("qualifier"); //$NON-NLS-1$
+
 		_qualifierText = _isDev ? //
 				//
 				// this text is used to identify development versions
 				"DEVELOPMENT" //$NON-NLS-1$
 				//
 				: qualifier.substring(0, 8) + UI.DASH + qualifier.substring(8);
+
+		_qualifierText += _subVersion;
 
 		_versionSimple = UI.EMPTY_STRING
 				+ version.getMajor()
@@ -80,7 +86,12 @@ public class ApplicationVersion {
 	}
 
 	public static String getDevelopmentId() {
-		return _isDev ? " - DEVELOPMENT" : UI.EMPTY_STRING; //$NON-NLS-1$
+
+		String id = _isDev ? " - DEVELOPMENT" : UI.EMPTY_STRING; //$NON-NLS-1$
+
+		id += _subVersion;
+
+		return id;
 	}
 
 	public static String getVersionFull() {

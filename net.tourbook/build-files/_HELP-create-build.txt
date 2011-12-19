@@ -7,27 +7,27 @@ Create Translation Archive
 - set synch option back to "synch versions on build (recommended)"
 
 
-- switch to workspace "mytourbook-TRUNK.nl-DUMMY-HOST"
+- switch to workspace "C:\DAT\ws_mt-NL-projects" 
 - set version number into the feature "feature.z-Dummy-Host"
 - force feature version number into dummy host plugins
 - set synch option back to "synch versions on build (recommended)"
 
 
 - switch to workspace "ws"
-- run script "create-language-archive.xml"
+- run script "CreateTranslationArchive"
 
 
 
 Create Build
 
 requirements:
-- buckminster is installed
+- buckminster is installed to see better error messages
 
 
-- switch to workspace "ws"
-- run script "create-build-files.xml" in plugin net.tourbook and folder ant-build-files
+- switch to workspace "C:\DAT\ws_mt-with-GIT"
+- run script "CreateMyTourbookBuildFiles" in plugin net.tourbook/build-files
 
-- switch to workspace "mytourbook-BUILD-ws"
+- switch to workspace ""C:\DAT\mytourbook-BUILD-ws""
 - refresh all projects with F5
 - run Project/clean... for all projects
 

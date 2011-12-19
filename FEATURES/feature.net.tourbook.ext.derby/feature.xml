@@ -2,7 +2,7 @@
 <feature
       id="feature.net.tourbook.ext.derby"
       label="Derby Database"
-      version="10.5.1.1"
+      version="10.8.1.2"
       plugin="net.tourbook.branding">
 
    <description url="http://www.example.com/description">
@@ -25,6 +25,6 @@
          id="org.apache.derby.core"
          download-size="0"
          install-size="0"
-         version="10.5.1.1"/>
+         version="10.8.1.2"/>
 
 </feature>

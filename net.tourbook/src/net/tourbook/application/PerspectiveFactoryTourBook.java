@@ -15,6 +15,17 @@
  *******************************************************************************/
 package net.tourbook.application;
 
+import net.tourbook.mapping.TourMapView;
+import net.tourbook.statistic.TourStatisticsView;
+import net.tourbook.ui.tourChart.TourChartView;
+import net.tourbook.ui.views.TourMarkerView;
+import net.tourbook.ui.views.TourWaypointView;
+import net.tourbook.ui.views.calendar.CalendarView;
+import net.tourbook.ui.views.rawData.RawDataView;
+import net.tourbook.ui.views.tourBook.TourBookView;
+import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
+
+import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
 
@@ -37,47 +48,47 @@ public class PerspectiveFactoryTourBook implements IPerspectiveFactory {
 
 		//--------------------------------------------------------------------------------
 
-//		final IFolderLayout mapFolder = layout.createFolder(//
-//				FOLDER_ID_MAP,
-//				IPageLayout.RIGHT,
-//				0.5f,
-//				IPageLayout.ID_EDITOR_AREA);
-//
-//		mapFolder.addView(TourMapView.ID);
-//		mapFolder.addView(TourDataEditorView.ID);
-//
-//		//--------------------------------------------------------------------------------
-//
-//		final IFolderLayout chartFolder = layout.createFolder(//
-//				FOLDER_ID_CHART,
-//				IPageLayout.BOTTOM,
-//				0.5f,
-//				FOLDER_ID_MAP);
-//
-//		chartFolder.addView(TourChartView.ID);
-//
-//		//--------------------------------------------------------------------------------
-//
-//		final IFolderLayout listFolder = layout.createFolder(
-//				FOLDER_ID_LIST,
-//				IPageLayout.TOP,
-//				0.6f,
-//				IPageLayout.ID_EDITOR_AREA);
-//
-//		listFolder.addView(RawDataView.ID);
-//		listFolder.addView(TourBookView.ID);
-//		listFolder.addView(CalendarView.ID);
-//		listFolder.addView(TourStatisticsView.ID);
-//
-//		//--------------------------------------------------------------------------------
-//
-//		final IFolderLayout markerFolder = layout.createFolder(
-//				FOLDER_ID_MARKER,
-//				IPageLayout.BOTTOM,
-//				0.6f,
-//				FOLDER_ID_LIST);
-//
-//		markerFolder.addView(TourMarkerView.ID);
-//		markerFolder.addView(TourWaypointView.ID);
+		final IFolderLayout mapFolder = layout.createFolder(//
+				FOLDER_ID_MAP,
+				IPageLayout.RIGHT,
+				0.5f,
+				IPageLayout.ID_EDITOR_AREA);
+
+		mapFolder.addView(TourMapView.ID);
+		mapFolder.addView(TourDataEditorView.ID);
+
+		//--------------------------------------------------------------------------------
+
+		final IFolderLayout chartFolder = layout.createFolder(//
+				FOLDER_ID_CHART,
+				IPageLayout.BOTTOM,
+				0.5f,
+				FOLDER_ID_MAP);
+
+		chartFolder.addView(TourChartView.ID);
+
+		//--------------------------------------------------------------------------------
+
+		final IFolderLayout listFolder = layout.createFolder(
+				FOLDER_ID_LIST,
+				IPageLayout.TOP,
+				0.6f,
+				IPageLayout.ID_EDITOR_AREA);
+
+		listFolder.addView(RawDataView.ID);
+		listFolder.addView(TourBookView.ID);
+		listFolder.addView(CalendarView.ID);
+		listFolder.addView(TourStatisticsView.ID);
+
+		//--------------------------------------------------------------------------------
+
+		final IFolderLayout markerFolder = layout.createFolder(
+				FOLDER_ID_MARKER,
+				IPageLayout.BOTTOM,
+				0.6f,
+				FOLDER_ID_LIST);
+
+		markerFolder.addView(TourMarkerView.ID);
+		markerFolder.addView(TourWaypointView.ID);
 	}
 }

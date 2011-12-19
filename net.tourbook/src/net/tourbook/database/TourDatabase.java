@@ -1917,12 +1917,12 @@ public class TourDatabase {
 				+ ("	deviceTourType 		" + varCharKomma(TourData.DB_LENGTH_DEVICE_TOUR_TYPE)) //$NON-NLS-1$
 				+ ("	devicePluginId		" + varCharKomma(TourData.DB_LENGTH_DEVICE_PLUGIN_ID)) //$NON-NLS-1$
 
-//				+ "	deviceTravelTime 		BIGINT NOT NULL,						\n" //$NON-NLS-1$
-//				+ "	deviceDistance 			INTEGER NOT NULL,						\n" //$NON-NLS-1$
-//				+ "	deviceWheel 			INTEGER NOT NULL,						\n" //$NON-NLS-1$
-//				+ "	deviceWeight 			INTEGER NOT NULL,						\n" //$NON-NLS-1$
-//				+ "	deviceTotalUp 			INTEGER NOT NULL,						\n" //$NON-NLS-1$
-//				+ "	deviceTotalDown 		INTEGER NOT NULL,						\n" //$NON-NLS-1$
+				+ "	deviceTravelTime 		BIGINT NOT NULL,						\n" //$NON-NLS-1$
+				+ "	deviceDistance 			INTEGER NOT NULL,						\n" //$NON-NLS-1$
+				+ "	deviceWheel 			INTEGER NOT NULL,						\n" //$NON-NLS-1$
+				+ "	deviceWeight 			INTEGER NOT NULL,						\n" //$NON-NLS-1$
+				+ "	deviceTotalUp 			INTEGER NOT NULL,						\n" //$NON-NLS-1$
+				+ "	deviceTotalDown 		INTEGER NOT NULL,						\n" //$NON-NLS-1$
 
 				// version 3 start
 				+ "	deviceMode 				SMALLINT,								\n" //$NON-NLS-1$
@@ -2058,7 +2058,7 @@ public class TourDatabase {
 				//
 				// version 18 end ---------
 
-				+ "	serieData20					BLOB 							\n" //$NON-NLS-1$
+				+ "	serieData					BLOB 							\n" //$NON-NLS-1$
 
 				+ ")"; //														//$NON-NLS-1$
 

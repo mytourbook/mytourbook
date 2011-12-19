@@ -3,7 +3,7 @@
 <project name="create-build-files" default="create-build-files" basedir="..">
 
 	<!--
-		copy all project files from "mytourbook-TRUNK" into the build folder "mytourbook-BUILD-temp"
+		copy all project and language files from "mytourbook" into the build folder "mytourbook-BUILD-temp"
 	-->
 
 	<property name="path-mt-trunk" value="../../mytourbook" />

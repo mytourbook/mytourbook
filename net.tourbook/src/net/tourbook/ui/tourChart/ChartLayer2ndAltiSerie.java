@@ -84,8 +84,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		final boolean isDiffValues = yDiffTo2ndSerie != null;
 		final boolean isAdjustedValues = yAdjustedSerie != null;
 
-		final int[] graphSerieIndex = _splineData.serieIndex;
-		final boolean isPointInGraph = _splineData != null && graphSerieIndex != null;
+		final boolean isPointInGraph = _splineData != null && _splineData.serieIndex != null;
 
 		if (xValues == null || xValues.length == 0 /*
 													 * || yValues2ndSerie == null ||
@@ -329,6 +328,8 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		final SplineData splineData = _tourData.splineDataPoints;
 		if (splineData != null) {
 
+			final int[] graphSerieIndex = _splineData.serieIndex;
+
 			final double[] graphXSplineValues = splineData.graphXValues;
 			final double[] graphYSplineValues = splineData.graphYValues;
 			final boolean[] isPointMovable = splineData.isPointMovable;
@@ -418,6 +419,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		if (isPointInGraph && isAdjustedValues) {
 
 			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+			final int[] graphSerieIndex = _splineData.serieIndex;
 
 			for (final int serieIndex : graphSerieIndex) {
 

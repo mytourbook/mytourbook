@@ -9,7 +9,7 @@ AppCopyright=MyTourbook Contributors 2005, {#AppYear}
 AppID={{37852811-BC7D-411C-8122-E69CCA892582}
 
 OutputDir={#ProductRoot}{#AppVersion}
-OutputBaseFilename=mytourbook_{#AppVersion}.win32.win32.x86.setup
+OutputBaseFilename=mytourbook_{#AppVersion}{#AppSubVersion}.win32.win32.x86.setup
 
 DefaultGroupName=MyTourbook
 DefaultDirName={pf}\MyTourbook
@@ -32,7 +32,7 @@ UninstallDisplayIcon={#AppRoot}\mytourbook\net.tourbook\icons\application\tourbo
 
 
 [Files]
-Source: {#ProductRoot}{#AppVersion}\mytourbook_{#AppVersion}.win32.win32.x86\mytourbook\*; DestDir: {app}; Flags: recursesubdirs; Tasks: ; Languages:
+Source: {#ProductRoot}{#AppVersion}\mytourbook_{#AppVersion}{#AppSubVersion}.win32.win32.x86\mytourbook\*; DestDir: {app}; Flags: recursesubdirs; Tasks: ; Languages:
 
 [InstallDelete]
 Name: {app}\*; Type: files
