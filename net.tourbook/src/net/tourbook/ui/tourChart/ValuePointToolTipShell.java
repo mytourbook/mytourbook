@@ -1059,7 +1059,7 @@ public abstract class ValuePointToolTipShell {
 		 * chart is opened in a dialog (e.g. adjust altitude) that a hidden tour chart tooltip in
 		 * the tour chart view is also displayed
 		 */
-		if (_display.getActiveShell() != _ownerControl.getShell()) {
+		if (_display.getActiveShell() != _ownerControl.getShell() || _ownerControl.isVisible() == false) {
 			return;
 		}
 

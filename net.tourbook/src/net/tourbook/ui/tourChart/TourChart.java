@@ -1209,15 +1209,15 @@ public class TourChart extends Chart {
 		_valuePointToolTip.hide();
 	}
 
-	void partIsHidden() {
+	public void partIsHidden() {
 
-		// hide also the tool tip
+		// hide tool tip
 		_valuePointToolTip.setShellVisible(false);
 	}
 
-	void partIsVisible() {
+	public void partIsVisible() {
 
-		// show shell again
+		// show tool tip again
 		_valuePointToolTip.setShellVisible(true);
 	}
 

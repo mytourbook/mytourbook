@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -93,13 +93,21 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
-			public void partHidden(final IWorkbenchPartReference partRef) {}
+			public void partHidden(final IWorkbenchPartReference partRef) {
+				if (partRef.getPart(false) == TourEditor.this) {
+					_tourChart.partIsHidden();
+				}
+			}
 
 			public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
 			public void partOpened(final IWorkbenchPartReference partRef) {}
 
-			public void partVisible(final IWorkbenchPartReference partRef) {}
+			public void partVisible(final IWorkbenchPartReference partRef) {
+				if (partRef.getPart(false) == TourEditor.this) {
+					_tourChart.partIsVisible();
+				}
+			}
 		};
 
 		// register the part listener

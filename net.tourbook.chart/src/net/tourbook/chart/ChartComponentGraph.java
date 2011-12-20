@@ -387,10 +387,10 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	Rectangle							_clientArea;
 
-	/**
-	 * Time when the chart was painted the last time
-	 */
-	private long						_lastChartDrawingTime;
+//	/**
+//	 * Time when the chart was painted the last time
+//	 */
+//	private long						_lastChartDrawingTime;
 
 	/**
 	 * Constructor
@@ -1404,8 +1404,8 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private boolean drawAsync100StartPainting() {
 
-		// get time when the redraw of the may is requested
-		final long requestedRedrawTime = System.currentTimeMillis();
+//		// get time when the redraw of the may is requested
+//		final long requestedRedrawTime = System.currentTimeMillis();
 
 		_drawAsyncCounter[0]++;
 
@@ -1443,8 +1443,8 @@ public class ChartComponentGraph extends Canvas {
 
 	private void drawAsync101DoPainting() {
 
-		final long startTime = System.nanoTime();
-		// TODO remove SYSTEM.OUT.PRINTLN
+//		final long startTime = System.nanoTime();
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		if (isDisposed()) {
 			// this widget is disposed
@@ -1537,7 +1537,7 @@ public class ChartComponentGraph extends Canvas {
 
 		redraw();
 
-		_lastChartDrawingTime = System.currentTimeMillis();
+//		_lastChartDrawingTime = System.currentTimeMillis();
 
 //		final long endTime = System.nanoTime();
 //		System.out.println("drawAsync100: "
@@ -2395,9 +2395,13 @@ public class ChartComponentGraph extends Canvas {
 					path2.lineTo(devXFirstPoint, devY0Inverse - devY2);
 				}
 
-				// set line hover positions for the first point
-				final Rectangle currentRect = new Rectangle((int) devXFirstPoint, 0, 1, devChartHeight);
-				final Point currentPoint = new Point((int) devXFirstPoint, devYTop + (int) devY);
+				/*
+				 * set line hover positions for the first point
+				 */
+				final int devXRect = (int) devXFirstPoint;
+
+				final Rectangle currentRect = new Rectangle(devXRect, 0, 1, devChartHeight);
+				final Point currentPoint = new Point(devXRect, devYTop + (int) devY);
 
 				lineDevPositions[valueIndexFirstPoint] = currentPoint;
 				lineFocusRectangles[valueIndexFirstPoint] = currentRect;
@@ -2409,9 +2413,6 @@ public class ChartComponentGraph extends Canvas {
 			 * draw line to current point
 			 */
 			if ((int) devX != (int) devXPrev || graphY1 == 0 || (isPath2 && graphY2 == 0)) {
-
-//				System.out.println(valueIndex + "\t" + graphY1 + "\t" + graphY2);
-//				// TODO remove SYSTEM.OUT.PRINTLN
 
 				// optimization: draw only ONE line for the current x-position
 				// but draw to the 0 line otherwise it's possible that a triangle is painted
@@ -2488,7 +2489,7 @@ public class ChartComponentGraph extends Canvas {
 				final int devXDiffWidth = devXDiff < 1 ? 1 : (int) (devXDiff + 0.5);
 				final int devXRect = (int) (devX - devXDiffWidth);
 
-				// set right part of the rectangle width into the previous rectangle
+				// add the right part of the rectangle width into the previous rectangle
 				prevLineRect.width += devXDiffWidth + 1;
 
 				// check if hovered line is hit, this check is an inline for .contains(...)
@@ -2553,6 +2554,7 @@ public class ChartComponentGraph extends Canvas {
 				 */
 				final float devXDiff = (devX - devXPrev) / 2;
 				final int devXDiffWidth = devXDiff < 1 ? 1 : (int) (devXDiff + 0.5);
+				final int devXRect = (int) (devX - devXDiffWidth);
 
 				// set right part of the rectangle width into the previous rectangle
 				prevLineRect.width += devXDiffWidth;
@@ -2563,11 +2565,7 @@ public class ChartComponentGraph extends Canvas {
 					isSetHoveredIndex = true;
 				}
 
-				final Rectangle lastRect = new Rectangle(
-						(int) (devX - devXDiffWidth),
-						0,
-						devXDiffWidth + 1000,
-						devChartHeight);
+				final Rectangle lastRect = new Rectangle(devXRect, 0, devXDiffWidth + 1, devChartHeight);
 				final Point lastPoint = new Point((int) devX, devYTop + (int) devY);
 
 				lineDevPositions[valueIndex] = lastPoint;

@@ -6,7 +6,7 @@ import org.osgi.framework.Version;
 
 public class ApplicationVersion {
 
-	private static String	_subVersion	= " BETA 1";	//$NON-NLS-1$
+	private static String	_subVersion	= " BETA 2";	//$NON-NLS-1$
 
 // this is disabled because it contains redundant information and too much numbers which nobody needs
 // the version number is now used from the plugin version, see below

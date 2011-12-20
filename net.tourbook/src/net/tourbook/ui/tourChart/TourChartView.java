@@ -99,24 +99,12 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
-			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == TourChartView.this) {
-//					System.out.println("partClosed\t");
-//					// TODO remove SYSTEM.OUT.PRINTLN
-				}
-			}
+			public void partClosed(final IWorkbenchPartReference partRef) {}
 
-			public void partDeactivated(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == TourChartView.this) {
-//					System.out.println("partDeactivated\t");
-//					// TODO remove SYSTEM.OUT.PRINTLN
-				}
-			}
+			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
 			public void partHidden(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourChartView.this) {
-//					System.out.println("partHidden\t");
-//					// TODO remove SYSTEM.OUT.PRINTLN$
 					_tourChart.partIsHidden();
 				}
 			}
@@ -127,8 +115,6 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 			public void partVisible(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourChartView.this) {
-//					System.out.println("partVisible\t");
-//					// TODO remove SYSTEM.OUT.PRINTLN
 					_tourChart.partIsVisible();
 				}
 			}
@@ -505,7 +491,6 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 		}
 	}
 
-
 	private void saveState() {
 
 		_tourChart.saveState();
@@ -573,7 +558,6 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 		_pageBook.showPage(_tourChart);
 
 		_tourChart.updateTourChart(_tourData, _tourChartConfig, false);
-
 
 		// set application window title tool tip
 		setTitleToolTip(TourManager.getTourDateShort(_tourData));
