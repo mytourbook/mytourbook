@@ -156,21 +156,6 @@ public class Messages extends NLS {
 	public static String		Adjust_Altitude_Label_GeoPosition_Slices;
 	public static String		Adjust_Altitude_Type_HorizontalGeoPosition;
 
-	public static String		App_Action_About;
-	public static String		App_Action_Cancel;
-	public static String		App_Action_edit_tour;
-	public static String		App_Action_ExtractTour;
-	public static String		App_Action_JoinTours;
-	public static String		App_Action_Menu_file;
-	public static String		App_Action_Menu_help;
-	public static String		App_Action_Menu_tools;
-	public static String		App_Action_Menu_view;
-	public static String		App_Action_open_perspective;
-	public static String		App_Action_open_preferences;
-	public static String		App_Action_open_tour_segmenter;
-	public static String		App_Action_open_tour_segmenter_tooltip;
-	public static String		App_Action_OpenOtherViews;
-
 	public static String		action_export_tour;
 	public static String		action_print_tour;
 	public static String		action_tag_add;
@@ -256,6 +241,20 @@ public class Messages extends NLS {
 	public static String		app_unit_minutes;
 	public static String		app_unit_seconds;
 
+	public static String		App_Action_About;
+	public static String		App_Action_Cancel;
+	public static String		App_Action_edit_tour;
+	public static String		App_Action_ExtractTour;
+	public static String		App_Action_JoinTours;
+	public static String		App_Action_Menu_file;
+	public static String		App_Action_Menu_help;
+	public static String		App_Action_Menu_tools;
+	public static String		App_Action_Menu_view;
+	public static String		App_Action_open_perspective;
+	public static String		App_Action_open_preferences;
+	public static String		App_Action_open_tour_segmenter;
+	public static String		App_Action_open_tour_segmenter_tooltip;
+	public static String		App_Action_OpenOtherViews;
 	public static String		App_Action_set_tour_type;
 	public static String		App_Action_Save;
 	public static String		App_Action_SetPerson;
@@ -285,6 +284,8 @@ public class Messages extends NLS {
 	public static String		App_Label_max;
 
 	public static String		App_Link_RestoreDefaultValues;
+
+	public static String		App_Splash_Copyright;
 
 	public static String		App_Title;
 

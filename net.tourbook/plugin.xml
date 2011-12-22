@@ -46,7 +46,9 @@
          </property>
          <property
                name="startupForegroundColor"
-               value="BBCBFF">
+               value="2d84f6"
+               >
+
          </property>
          <property
                name="startupMessageRect"

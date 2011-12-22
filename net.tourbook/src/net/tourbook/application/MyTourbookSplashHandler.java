@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.application;
 
+import net.tourbook.Messages;
+
 import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.swt.events.PaintEvent;
@@ -84,22 +86,36 @@ public class MyTourbookSplashHandler extends BasicSplashHandler {
 		getContent().addPaintListener(new PaintListener() {
 
 			public void paintControl(final PaintEvent e) {
-
-				final GC gc = e.gc;
-
-				final String version = "Version " + ApplicationVersion.getVersionSimple(); //$NON-NLS-1$
-				final Point extendVersion = gc.textExtent(version);
-
-				gc.setForeground(getForeground());
-				gc.drawText(version, 383 - extendVersion.x, 57, true);
-
-				final String qualifier = ApplicationVersion.getVersionQualifier();
-				final Point extendQualifier = gc.textExtent(qualifier);
-
-				gc.setForeground(getForeground());
-				gc.drawText(qualifier, 383 - extendQualifier.x, 57 + extendVersion.y + 2, true);
+				onPaint(e);
 			}
 		});
+	}
+
+	private void onPaint(final PaintEvent e) {
+
+		final GC gc = e.gc;
+		gc.setForeground(getForeground());
+
+		final int borderRight = 385;
+		final int borderBottom = 101;
+
+		final String copyRight = Messages.App_Splash_Copyright;
+		final int textHeight = gc.textExtent(copyRight).y;
+
+		final String version = "Version " + ApplicationVersion.getVersionSimple(); //$NON-NLS-1$
+		final Point versionExtent = gc.textExtent(version);
+
+		final String qualifier = ApplicationVersion.getVersionQualifier();
+		final Point qualifierExtent = gc.textExtent(qualifier);
+
+		gc.drawText(
+				version,
+				borderRight - versionExtent.x,
+				borderBottom - versionExtent.y - 2 - qualifierExtent.y,
+				true);
+		gc.drawText(qualifier, borderRight - qualifierExtent.x, borderBottom - versionExtent.y, true);
+
+		gc.drawText(copyRight, 5, 162 - textHeight, true);
 	}
 
 	private Rectangle parseRect(final String string) {
