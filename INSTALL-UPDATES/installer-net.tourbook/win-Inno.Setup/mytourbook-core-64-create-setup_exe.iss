@@ -18,10 +18,10 @@ VersionInfoVersion={#AppVersion}
 VersionInfoCompany=MyTourbook
 
 WizardImageBackColor=clWhite
-WizardSmallImageFile={#AppRoot}\mytourbook\net.tourbook\icons\installer\win\tourbook55-32.bmp
+WizardSmallImageFile={#AppRoot}\mytourbook\net.tourbook\icons\application\win\tourbook55-32-installer.bmp
 
 LanguageDetectionMethod=locale
-UninstallDisplayIcon={#AppRoot}\mytourbook\net.tourbook\icons\installer\win\tourbook16.ico
+UninstallDisplayIcon={#AppRoot}\mytourbook\net.tourbook\icons\application\win\tourbook16.ico
 
 ; "ArchitecturesAllowed=x64" specifies that Setup cannot run on
 ; anything but x64.
