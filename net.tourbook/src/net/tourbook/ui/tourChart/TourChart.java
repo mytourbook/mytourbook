@@ -528,10 +528,12 @@ public class TourChart extends Chart {
 
 					// measurement system has changed
 
-					UI.updateUnits();
+//					UI.updateUnits();
 
 					isChartModified = true;
 					keepMinMax = false;
+
+					_valuePointToolTip.reopen();
 
 				} else if (property.equals(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE)
 						|| property.equals(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE)

@@ -1012,7 +1012,12 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_ALTITUDE);
 
 			legendProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
-			legendProvider.setLegendColorValues(legendBounds, minValue, maxValue, UI.UNIT_LABEL_ALTITUDE);
+			legendProvider.setLegendColorValues(
+					legendBounds,
+					minValue,
+					maxValue,
+					UI.UNIT_LABEL_ALTITUDE,
+					LegendUnitFormat.Number);
 
 			break;
 
@@ -1056,7 +1061,12 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_HEARTBEAT);
 
 			legendProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
-			legendProvider.setLegendColorValues(legendBounds, minValue, maxValue, Messages.graph_label_heartbeat_unit);
+			legendProvider.setLegendColorValues(
+					legendBounds,
+					minValue,
+					maxValue,
+					Messages.graph_label_heartbeat_unit,
+					LegendUnitFormat.Number);
 
 			break;
 
@@ -1096,7 +1106,12 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_SPEED);
 
 			legendProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
-			legendProvider.setLegendColorValues(legendBounds, minValue, maxValue, UI.UNIT_LABEL_SPEED);
+			legendProvider.setLegendColorValues(
+					legendBounds,
+					minValue,
+					maxValue,
+					UI.UNIT_LABEL_SPEED,
+					LegendUnitFormat.Number);
 
 			break;
 
@@ -1108,7 +1123,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 			for (final TourData tourData : _tourDataList) {
 
-				final float[] dataSerie = tourData.getPaceSerie();
+				final float[] dataSerie = tourData.getPaceSerieSeconds();
 				if ((dataSerie == null) || (dataSerie.length == 0)) {
 					continue;
 				}
@@ -1132,11 +1147,16 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 				return false;
 			}
 
-			legendConfig.numberFormatDigits = 1;
+			legendConfig.unitFormat = LegendUnitFormat.Pace;
 			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_PACE);
 
 			legendProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
-			legendProvider.setLegendColorValues(legendBounds, minValue, maxValue, UI.UNIT_LABEL_PACE);
+			legendProvider.setLegendColorValues(
+					legendBounds,
+					minValue,
+					maxValue,
+					UI.UNIT_LABEL_PACE,
+					LegendUnitFormat.Pace);
 
 			break;
 
@@ -1176,7 +1196,12 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_GRADIENT);
 
 			legendProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
-			legendProvider.setLegendColorValues(legendBounds, minValue, maxValue, Messages.graph_label_gradient_unit);
+			legendProvider.setLegendColorValues(
+					legendBounds,
+					minValue,
+					maxValue,
+					Messages.graph_label_gradient_unit,
+					LegendUnitFormat.Number);
 
 			break;
 

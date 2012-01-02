@@ -15,27 +15,8 @@
  *******************************************************************************/
 package net.tourbook.mapping;
 
-import java.util.List;
+public enum LegendUnitFormat {
 
-import net.tourbook.ui.UI;
-
-/**
- * Configuration for the map legend to visualize one unit in a tour
- */
-public class LegendConfig {
-
-	public float			legendMinValue;
-	public float			legendMaxValue;
-
-	public List<Float>		units;
-	public List<String>		unitLabels;
-
-	public LegendUnitFormat	unitFormat	= LegendUnitFormat.Number;
-
-	public String			unitText	= UI.EMPTY_STRING;
-
-	/**
-	 * Number of digits when label is formatted, default is 0.
-	 */
-	public int				numberFormatDigits;
+	Number, //
+	Pace
 }

@@ -1035,6 +1035,8 @@ public class Messages extends NLS {
 	public static String		Tooltip_ValuePoint_Action_Value_TimeDuration;
 	public static String		Tooltip_ValuePoint_Action_Value_TimeOfDay;
 	public static String		Tooltip_ValuePoint_Action_Value_TimeSlices;
+
+	public static String	Tooltip_ValuePoint_Format_Pace;
 	public static String		Tooltip_ValuePoint_Label_ChartZoomFactor_Tooltip;
 
 	public static String		Tooltip_ValuePoint_Label_NoTour;

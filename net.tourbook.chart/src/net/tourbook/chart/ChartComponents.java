@@ -583,7 +583,7 @@ public class ChartComponents extends Composite {
 		/*
 		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		 * The scaled unit with long min/max values is used because arithmetic with floating point
-		 * values fails. BigDecimal is necessary otherwis the scaledUnit can be wrong !!!
+		 * values fails. BigDecimal is necessary otherwise the scaledUnit can be wrong !!!
 		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		 */
 		final long valueScaling = Util.getValueScaling(graphUnit);

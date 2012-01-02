@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -42,7 +42,20 @@ public class LegendProviderGradientColors implements ILegendProviderGradientColo
 
 	private static List<Float> getLegendUnits(	final Rectangle legendBounds,
 												final float graphMinValue,
-												final float graphMaxValue) {
+												final float graphMaxValue,
+												final LegendUnitFormat unitFormat) {
+
+		if (unitFormat == LegendUnitFormat.Pace) {
+			return getLegendUnits20Pace(legendBounds, (int) graphMinValue, (int) graphMaxValue, unitFormat);
+		} else {
+			return getLegendUnits10Number(legendBounds, graphMinValue, graphMaxValue, unitFormat);
+		}
+	}
+
+	private static List<Float> getLegendUnits10Number(	final Rectangle legendBounds,
+														final float graphMinValue,
+														final float graphMaxValue,
+														final LegendUnitFormat unitFormat) {
 
 		final int legendHeight = legendBounds.height - 2 * TourMapView.LEGEND_MARGIN_TOP_BOTTOM;
 
@@ -51,10 +64,10 @@ public class LegendProviderGradientColors implements ILegendProviderGradientColo
 		 */
 		final float graphRange = graphMaxValue - graphMinValue;
 
-		final int unitCount = legendHeight / TourMapView.LEGEND_UNIT_DISTANCE;
+		final int defaultUnitCount = legendHeight / TourMapView.LEGEND_UNIT_DISTANCE;
 
 		// get altitude range for one unit
-		final float graphUnitValue = graphRange / Math.max(1, unitCount);
+		final float graphUnitValue = graphRange / Math.max(1, defaultUnitCount);
 
 		// round the unit
 		final double graphUnit = Util.roundDecimalValue(graphUnitValue);
@@ -126,6 +139,71 @@ public class LegendProviderGradientColors implements ILegendProviderGradientColo
 		return unitList;
 	}
 
+	private static List<Float> getLegendUnits20Pace(final Rectangle legendBounds,
+													int graphMinValue,
+													int graphMaxValue,
+													final LegendUnitFormat unitFormat) {
+
+		final int legendHeight = legendBounds.height - 2 * TourMapView.LEGEND_MARGIN_TOP_BOTTOM;
+
+		int graphValueRange = graphMaxValue > 0 ? graphMaxValue - graphMinValue : -(graphMinValue - graphMaxValue);
+
+		/*
+		 * calculate the number of units which will be visible by dividing the available height by
+		 * the minimum size which one unit should have in pixels
+		 */
+		final float defaultUnitCount = legendHeight / TourMapView.LEGEND_UNIT_DISTANCE;
+
+		// unitValue is the number in data values for one unit
+		final float defaultUnitValue = graphValueRange / Math.max(1, defaultUnitCount);
+
+		// round the unit
+		long graphUnit = (long) Util.roundTimeValue(defaultUnitValue, false);
+
+		long adjustMinValue = 0;
+		if ((graphMinValue % graphUnit) != 0 && graphMinValue < 0) {
+			adjustMinValue = graphUnit;
+		}
+		graphMinValue = (int) ((int) ((float) (graphMinValue - adjustMinValue) / graphUnit) * graphUnit);
+
+		// increase the max value when it does not fit to unit borders
+		float adjustMaxValue = 0;
+		if ((graphMaxValue % graphUnit) != 0) {
+			adjustMaxValue = graphUnit;
+		}
+		graphMaxValue = (int) ((int) ((graphMaxValue + adjustMaxValue) / graphUnit) * graphUnit);
+
+		graphValueRange = (graphMaxValue > 0 ? //
+				(graphMaxValue - graphMinValue)
+				: -(graphMinValue - graphMaxValue));
+
+		// ensure the chart is drawn correctly with pseudo data
+		if (graphValueRange == 0) {
+			graphValueRange = 3600;
+			graphMaxValue = 3600;
+			graphUnit = 1800;
+		}
+
+		final List<Float> unitList = new ArrayList<Float>();
+		int graphValue = graphMinValue;
+		int maxUnits = 0;
+
+		// loop: create unit label for all units
+		while (graphValue <= graphMaxValue) {
+
+			unitList.add((float) graphValue);
+
+			// prevent endless loops when the unit is 0
+			if (graphValue == graphMaxValue || maxUnits++ > 1000) {
+				break;
+			}
+
+			graphValue += graphUnit;
+		}
+
+		return unitList;
+	}
+
 	@Override
 	public int getColorValue(final float legendValue) {
 		return TourPainter.getLegendColor(_legendConfig, _legendColor, legendValue);
@@ -178,7 +256,12 @@ public class LegendProviderGradientColors implements ILegendProviderGradientColo
 	 * @param legendProvider
 	 * @param unitText
 	 */
-	public void setLegendColorValues(final Rectangle legendBounds, float minValue, float maxValue, final String unitText) {
+	@Override
+	public void setLegendColorValues(	final Rectangle legendBounds,
+										float minValue,
+										float maxValue,
+										final String unitText,
+										final LegendUnitFormat unitFormat) {
 
 		/*
 		 * enforce min/max values, another option is necessary in the pref dialog to not enforce
@@ -189,19 +272,30 @@ public class LegendProviderGradientColors implements ILegendProviderGradientColo
 											 * unitFactor
 											 */) {
 			minValue = _legendColor.overwriteMinValue;
+
+			if (unitFormat == LegendUnitFormat.Pace) {
+				// adjust value from minutes->seconds
+				minValue *= 60;
+			}
 		}
 		if (_legendColor.isMaxValueOverwrite /*
 											 * && maxValue > _legendColor.overwriteMaxValue *
 											 * unitFactor
 											 */) {
 			maxValue = _legendColor.overwriteMaxValue;
+
+			if (unitFormat == LegendUnitFormat.Pace) {
+				// adjust value from minutes->seconds
+				maxValue *= 60;
+			}
 		}
 
 		if (maxValue < minValue) {
 			maxValue = minValue + 1;
 		}
 
-		final List<Float> legendUnits = getLegendUnits(legendBounds, minValue, maxValue);
+		final List<Float> legendUnits = getLegendUnits(legendBounds, minValue, maxValue, unitFormat);
+
 		if (legendUnits.size() > 0) {
 
 			final Float legendMinValue = legendUnits.get(0);
@@ -239,7 +333,10 @@ public class LegendProviderGradientColors implements ILegendProviderGradientColo
 	 * @param legendProvider
 	 * @param unitText
 	 */
-	public void setLegendColorValues(final Rectangle legendBounds, final float[] dataSerie, final String unitText) {
+	public void setLegendColorValues(	final Rectangle legendBounds,
+										final float[] dataSerie,
+										final String unitText,
+										final LegendUnitFormat unitFormat) {
 
 		/*
 		 * get min/max value
@@ -264,7 +361,7 @@ public class LegendProviderGradientColors implements ILegendProviderGradientColo
 			maxValue = _legendColor.overwriteMaxValue;
 		}
 
-		final List<Float> legendUnits = getLegendUnits(legendBounds, minValue, maxValue);
+		final List<Float> legendUnits = getLegendUnits(legendBounds, minValue, maxValue, unitFormat);
 		if (legendUnits.size() > 0) {
 
 			final Float legendMinValue = legendUnits.get(0);
@@ -293,4 +390,5 @@ public class LegendProviderGradientColors implements ILegendProviderGradientColo
 			valueColors[4].value = legendMaxValue - diffMinMax10;
 		}
 	}
+
 }

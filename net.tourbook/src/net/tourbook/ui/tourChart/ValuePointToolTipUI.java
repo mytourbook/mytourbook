@@ -17,6 +17,7 @@ package net.tourbook.ui.tourChart;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Formatter;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -221,7 +222,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 		_isHorizontal = orientation == ValuePointToolTipOrientation.Horizontal;
 
 		if (isReopenToolTip) {
-			reopenTT();
+			reopen();
 		}
 	}
 
@@ -240,7 +241,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 		// update value states
 		updateStateVisibleValues(visibleValues);
 
-		reopenTT();
+		reopen();
 
 		/**
 		 * Get item which is opening the value point tooltip
@@ -281,7 +282,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 					// dispose old colors
 					_colorCache.dispose();
 
-					reopenTT();
+					reopen();
 				}
 			}
 		};
@@ -615,7 +616,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 			_lblPace = createUILabelValue(
 					container,
 					SWT.TRAIL,
-					4,
+					5,
 					Messages.Graph_Label_Pace,
 					GraphColorProvider.PREF_GRAPH_PACE);
 
@@ -1012,9 +1013,10 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 	}
 
 	/**
-	 * Reopens the tooltip.
+	 * Reopens the tooltip at the current position, this will not show the tooltip when it is set to
+	 * be hidden.
 	 */
-	private void reopenTT() {
+	public void reopen() {
 
 		// hide and recreate it
 		hide();
@@ -1058,7 +1060,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 		if (visibleValuesBackup != _allVisibleValues) {
 
 			// reopen when other tour data are set which has other graphs
-			reopenTT();
+			reopen();
 		}
 	}
 
@@ -1272,7 +1274,14 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 		}
 
 		if (_visiblePaceId != 0) {
-			_lblPace.setText(_nf1.format(_tourData.getPaceSerie()[valueIndex]));
+
+			final long pace = (long) _tourData.getPaceSerieSeconds()[valueIndex];
+
+			_lblPace.setText(new Formatter().format(//
+					Messages.Tooltip_ValuePoint_Format_Pace,
+					pace / 60,
+					pace % 60)//
+					.toString());
 		}
 
 		if (_visiblePulseId != 0) {

@@ -4200,6 +4200,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return numberOfHrZones;
 	}
 
+	/**
+	 * @return Returns pace minute data serie in the current measurement system
+	 */
 	public float[] getPaceSerie() {
 
 		if (UI.UNIT_VALUE_DISTANCE == 1) {

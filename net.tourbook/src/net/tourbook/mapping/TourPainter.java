@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Set;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.chart.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourWayPoint;
@@ -191,6 +192,7 @@ public class TourPainter extends MapPainter {
 		final String unitText = legendConfig.unitText;
 		final List<String> unitLabels = legendConfig.unitLabels;
 		final int legendFormatDigits = legendConfig.numberFormatDigits;
+		final LegendUnitFormat unitFormat = legendConfig.unitFormat;
 
 		Rectangle legendBorder;
 
@@ -277,11 +279,18 @@ public class TourPainter extends MapPainter {
 
 							// set default unit label
 
-							if (legendFormatDigits == 0) {
-								valueText = Integer.toString(unitValue.intValue()) + UI.SPACE + unitText;
+							if (unitFormat == LegendUnitFormat.Pace) {
+
+								valueText = Util.format_mm_ss(unitValue.longValue()) + UI.SPACE + unitText;
+
 							} else {
-								// currently only 1 digit is supported
-								valueText = _nf1.format(unitValue) + UI.SPACE + unitText;
+
+								if (legendFormatDigits == 0) {
+									valueText = Integer.toString(unitValue.intValue()) + UI.SPACE + unitText;
+								} else {
+									// currently only 1 digit is supported
+									valueText = _nf1.format(unitValue) + UI.SPACE + unitText;
+								}
 							}
 
 						} else {
@@ -1545,7 +1554,7 @@ public class TourPainter extends MapPainter {
 			break;
 
 		case TourMapView.TOUR_COLOR_PACE:
-			_dataSerie = tourData.getPaceSerie();
+			_dataSerie = tourData.getPaceSerieSeconds();
 			break;
 
 		case TourMapView.TOUR_COLOR_HR_ZONE:
