@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -44,14 +44,17 @@ import org.eclipse.swt.widgets.ToolBar;
 public abstract class ValuePointToolTipShell {
 
 	private static final int					VALUE_POINT_OFFSET					= 20;
-	private static final int					TOOL_TIP_SHELL_LOCATION_OFFSET		= 0;
 
 	private static final String					STATE_VALUE_POINT_TOOLTIP_X			= "ValuePoint_ToolTip_DiffPositionX";				//$NON-NLS-1$
 	private static final String					STATE_VALUE_POINT_TOOLTIP_Y			= "ValuePoint_ToolTip_DiffPositionY";				//$NON-NLS-1$
 	private static final String					STATE_MOUSE_X_POSITION_RELATIVE		= "ValuePoint_ToolTip_MouseXPositionRelative";		//$NON-NLS-1$
 	private static final String					STATE_IS_TOOLTIP_ABOVE_VALUE_POINT	= "ValuePoint_ToolTip_IsToolTipAboveValuePoint";	//$NON-NLS-1$
 	static final String							STATE_VALUE_POINT_PIN_LOCATION		= "ValuePoint_ToolTip_PinnedLocation";				//$NON-NLS-1$
+
 	static final ValuePointToolTipPinLocation	DEFAULT_PIN_LOCATION				= ValuePointToolTipPinLocation.TopRight;
+
+	private static final String					STATE_VP_TOOLTIP_SCREEN_PINNED_X	= "ValuePoint_ToolTip_ScreenPinnedX";				//$NON-NLS-1$
+	private static final String					STATE_VP_TOOLTIP_SCREEN_PINNED_Y	= "ValuePoint_ToolTip_ScreenPinnedY";				//$NON-NLS-1$
 
 	IDialogSettings								state;
 
@@ -103,6 +106,11 @@ public abstract class ValuePointToolTipShell {
 	 * Contains position where the tt shell should be positioned
 	 */
 	private Point								_screenDefaultTTShellLocation;
+
+	/**
+	 * Screen location for the screen pinned location
+	 */
+	private Point								_screenScreenTTShellLocation;
 
 	private Point								_screenRequestedAnimationLocation	= new Point(0, 0);
 
@@ -423,78 +431,99 @@ public abstract class ValuePointToolTipShell {
 
 	/**
 	 * @param tipSize
-	 * @param originalLocation
+	 * @param tipLocation
 	 * @param screenValuePoint
+	 * @param isTTDragged
 	 * @return
 	 */
-	private Point fixupDisplayBounds(final Point tipSize, final Point originalLocation, final Point screenValuePoint) {
+	private Point fixupDisplayBounds(	final Point tipSize,
+										final Point tipLocation,
+										final Point screenValuePoint,
+										final boolean isTTDragged) {
 
-		// create a copy that the original value is not modified
-		final Point location = new Point(originalLocation.x, originalLocation.y);
-
+		int tipLeft = tipLocation.x;
+		int tipTop = tipLocation.y;
 		final int tipWidth = tipSize.x;
 		final int tipHeight = tipSize.y;
+		final int tipRight = tipLeft + tipWidth;
+		final int tipBottom = tipTop + tipHeight;
 
-		Rectangle bounds;
-		final Point rightBounds = new Point(tipWidth + location.x, tipHeight + location.y);
+		Rectangle screenBounds;
 
 		final Monitor[] monitors = _display.getMonitors();
 
 		if (monitors.length > 1) {
 			// By default present in the monitor of the control
-			bounds = _ownerControl.getMonitor().getBounds();
-			final Point p = new Point(location.x, location.y);
+			screenBounds = _ownerControl.getMonitor().getBounds();
+			final Point p = new Point(tipLeft, tipTop);
 
 			// Search on which monitor the event occurred
 			Rectangle tmp;
 			for (final Monitor monitor : monitors) {
 				tmp = monitor.getBounds();
 				if (tmp.contains(p)) {
-					bounds = tmp;
+					screenBounds = tmp;
 					break;
 				}
 			}
 
 		} else {
-			bounds = _display.getBounds();
+			screenBounds = _display.getBounds();
 		}
 
-		if (!(bounds.contains(location) && bounds.contains(rightBounds))) {
+		// create a copy that the original value is not modified
+//		final Point newTipLocation = new Point(tipLeft, tipTop);
+		final Point tipBottomRight = new Point(tipRight, tipBottom);
 
-			if (rightBounds.x > bounds.x + bounds.width) {
+		if (!(screenBounds.contains(tipLocation) && screenBounds.contains(tipBottomRight))) {
 
-				location.x -= rightBounds.x - (bounds.x + bounds.width);
+			if (tipRight > screenBounds.x + screenBounds.width) {
+				tipLeft -= tipRight - (screenBounds.x + screenBounds.width);
 			}
 
-			if (rightBounds.y > bounds.y + bounds.height) {
+			if (tipBottom > screenBounds.y + screenBounds.height) {
 
-				// move to the bottom
-				location.y -= rightBounds.y - (bounds.y + bounds.height);
+				// move to screen bottom
+				tipTop -= tipBottom - (screenBounds.y + screenBounds.height);
 
-				if (location.y < screenValuePoint.y + VALUE_POINT_OFFSET) {
+				if (isTTDragged == false) {
 
-					// this implementation do NOT respect multiple monitors
-					location.y = screenValuePoint.y - tipHeight - VALUE_POINT_OFFSET;
+					// check if value point is covered by the tooltip
+					if (tipTop < screenValuePoint.y + VALUE_POINT_OFFSET) {
+
+						// this implementation do NOT respect multiple monitors
+
+						// move tip above the value point
+						tipTop = screenValuePoint.y - tipHeight - VALUE_POINT_OFFSET;
+					}
 				}
 			}
 
-			if (location.x < bounds.x) {
-				location.x = bounds.x;
+			if (tipLeft < screenBounds.x) {
+				// move to screen left
+				tipLeft = screenBounds.x;
 			}
 
-			if (location.y < bounds.y) {
+			if (tipTop < screenBounds.y) {
 
-				location.y = bounds.y;
+				// move to screen top
+				tipTop = screenBounds.y;
 
-				if (location.y + tipHeight - 0 > screenValuePoint.y - VALUE_POINT_OFFSET) {
+				if (isTTDragged == false) {
 
-					// this implementation do NOT respect multiple monitors
-					location.y = screenValuePoint.y + VALUE_POINT_OFFSET;
+					// check if value point is covered by the tooltip
+					if (tipTop + tipHeight > screenValuePoint.y - VALUE_POINT_OFFSET) {
+
+						// this implementation do NOT respect multiple monitors
+
+						// move tip above the value point
+						tipTop = screenValuePoint.y + VALUE_POINT_OFFSET;
+					}
 				}
 			}
 		}
 
-		return location;
+		return new Point(tipLeft, tipTop);
 	}
 
 	ValuePointToolTipPinLocation getPinnedLocation() {
@@ -654,12 +683,16 @@ public abstract class ValuePointToolTipShell {
 		 */
 		if (state.get(STATE_VALUE_POINT_TOOLTIP_X) != null) {
 
-			final Point ttShellDiff = new Point(0, 0);
+			_ttShellDiff = new Point(//
+					Util.getStateInt(state, STATE_VALUE_POINT_TOOLTIP_X, 0),
+					Util.getStateInt(state, STATE_VALUE_POINT_TOOLTIP_Y, 0));
+		}
 
-			ttShellDiff.x = Util.getStateInt(state, STATE_VALUE_POINT_TOOLTIP_X, 0);
-			ttShellDiff.y = Util.getStateInt(state, STATE_VALUE_POINT_TOOLTIP_Y, 0);
+		if (state.get(STATE_VP_TOOLTIP_SCREEN_PINNED_X) != null) {
 
-			_ttShellDiff = ttShellDiff;
+			_screenScreenTTShellLocation = new Point(
+					Util.getStateInt(state, STATE_VP_TOOLTIP_SCREEN_PINNED_X, 0),
+					Util.getStateInt(state, STATE_VP_TOOLTIP_SCREEN_PINNED_Y, 0));
 		}
 
 		// tooltip orientation
@@ -678,6 +711,12 @@ public abstract class ValuePointToolTipShell {
 
 		state.put(STATE_VALUE_POINT_TOOLTIP_X, _ttShellDiff.x);
 		state.put(STATE_VALUE_POINT_TOOLTIP_Y, _ttShellDiff.y);
+
+		if (_screenScreenTTShellLocation != null) {
+
+			state.put(STATE_VP_TOOLTIP_SCREEN_PINNED_X, _screenScreenTTShellLocation.x);
+			state.put(STATE_VP_TOOLTIP_SCREEN_PINNED_Y, _screenScreenTTShellLocation.y);
+		}
 
 		state.put(STATE_VALUE_POINT_PIN_LOCATION, pinnedLocation.name());
 		state.put(STATE_MOUSE_X_POSITION_RELATIVE, _devPinnedMouseXPositionRelative);
@@ -720,34 +759,54 @@ public abstract class ValuePointToolTipShell {
 		final int ttHeight = ttSize.y;
 
 		// get edge default values
-		final int screenEdgeLeft = screenOwnerLeft + TOOL_TIP_SHELL_LOCATION_OFFSET;
-		final int screenEdgeRight = screenOwnerLeft + ownerWidth - ttWidth - TOOL_TIP_SHELL_LOCATION_OFFSET;
-		final int screenEdgeTop = screenOwnerTop + TOOL_TIP_SHELL_LOCATION_OFFSET + chartMarginTop;
-		final int screenEdgeBottom = screenOwnerBotton - ttHeight - TOOL_TIP_SHELL_LOCATION_OFFSET - chartMarginBottom;
+		final int screenEdgeLeft = screenOwnerLeft;
+		final int screenEdgeRight = screenOwnerLeft + ownerWidth - ttWidth;
+		final int screenEdgeTop = screenOwnerTop + chartMarginTop;
+		final int screenEdgeBottom = screenOwnerBotton - ttHeight - chartMarginBottom;
 
 		final Point screenValuePoint = _ownerControl.toDisplay(_ownerValueDevPosition.x, _ownerValueDevPosition.y);
 		final int screenValuePointTop = screenValuePoint.y;
 
 		boolean isSetLocation = isSetDefaultLocation;
 		boolean isCheckDefaultOffset = false;
-		Point screenDefaultLocation = new Point(0, 0);
+		final Point screenDefaultLocation = new Point(0, 0);
 
 		switch (pinnedLocation) {
 		case Screen:
 
 			// use default location when location was not yet set, center the tooltip in the center of the owner
-			if (_screenDefaultTTShellLocation == null || isSetDefaultLocation) {
+			if (_screenScreenTTShellLocation == null || isSetDefaultLocation) {
 
 				screenDefaultLocation.x = screenOwnerLeft + (ownerWidth / 2) - (ttWidth / 2);
 				screenDefaultLocation.y = screenOwnerTop + (ownerHeight / 2) - (ttHeight / 2);
 
-			} else {
-				screenDefaultLocation = _screenDefaultTTShellLocation;
+				_screenScreenTTShellLocation = new Point(screenDefaultLocation.x, screenDefaultLocation.y);
 			}
 
-			if (_isTTDragged) {
-				screenDefaultLocation.x = screenDefaultLocation.x + _ttShellDiff.x;
-				screenDefaultLocation.y = screenDefaultLocation.y + _ttShellDiff.y;
+			screenDefaultLocation.x = _screenScreenTTShellLocation.x + _ttShellDiff.x;
+			screenDefaultLocation.y = _screenScreenTTShellLocation.y + _ttShellDiff.y;
+
+			if (isTTDragged) {
+
+				if (screenDefaultLocation.y > 1100) {
+					int a = 0;
+					a++;
+				}
+
+				// ensure that the dragged tooltip is within the screen border
+				final Point screenNewLocation = fixupDisplayBounds(
+						ttSize,
+						screenDefaultLocation,
+						screenValuePoint,
+						isTTDragged);
+
+				screenDefaultLocation.x = screenNewLocation.x;
+				screenDefaultLocation.y = screenNewLocation.y;
+
+				_screenScreenTTShellLocation.x = screenNewLocation.x;
+				_screenScreenTTShellLocation.y = screenNewLocation.y;
+				_ttShellDiff.x = 0;
+				_ttShellDiff.y = 0;
 			}
 
 			isCheckDefaultOffset = true;
@@ -825,7 +884,6 @@ public abstract class ValuePointToolTipShell {
 			screenDefaultLocation.x = screenEdgeRight + _ttShellDiff.x;
 			screenDefaultLocation.y = screenEdgeTop + _ttShellDiff.y;
 			isCheckDefaultOffset = true;
-			break;
 		}
 
 		final int defaultY = screenDefaultLocation.y;
@@ -887,7 +945,7 @@ public abstract class ValuePointToolTipShell {
 
 		_screenDefaultTTShellLocation = screenDefaultLocation;
 
-		final Point screenNewLocation = fixupDisplayBounds(ttSize, screenDefaultLocation, screenValuePoint);
+		final Point screenNewLocation = fixupDisplayBounds(ttSize, screenDefaultLocation, screenValuePoint, isTTDragged);
 
 		if (isTTDragged || isAnimation == false) {
 
