@@ -210,8 +210,8 @@ public class CalendarTourDataProvider {
 					dbTourStartTime.add(startTime);
 					dbTourEndTime.add((startTime + recordingTime));
 
-					dbDistance.add((int) (result.getInt(7) / UI.UNIT_VALUE_DISTANCE));
-					dbAltitude.add((int) (result.getInt(8) / UI.UNIT_VALUE_ALTITUDE));
+					dbDistance.add(result.getInt(7));
+					dbAltitude.add(result.getInt(8));
 
 					dbTourRecordingTime.add(recordingTime);
 					dbTourDrivingTime.add(result.getInt(10));
@@ -467,8 +467,8 @@ public class CalendarTourDataProvider {
 						dbTourStartTime.add(startTime);
 						dbTourEndTime.add((startTime + recordingTime));
 
-						dbDistance.add((int) (result.getInt(7) / UI.UNIT_VALUE_DISTANCE));
-						dbAltitude.add((int) (result.getInt(8) / UI.UNIT_VALUE_ALTITUDE));
+						dbDistance.add(result.getInt(7));
+						dbAltitude.add(result.getInt(8));
 
 						dbTourRecordingTime.add(recordingTime);
 						dbTourDrivingTime.add(result.getInt(10));

@@ -157,16 +157,16 @@ public class CalendarView extends ViewPart implements ITourProvider {
 					}
 				}
 			},
-			// - Time -
-			new WeekSummaryFormatter(GraphColorProvider.PREF_GRAPH_TIME) {
+			// - Moving Time -
+			new WeekSummaryFormatter(GraphColorProvider.PREF_GRAPH_TIME, Messages.Calendar_View_Action_SummaryMovingTime) {
 
 				@Override
 				String format(final CalendarTourData data) {
 					if (data.recordingTime > 0) {
 						return new Formatter().format(
 								Messages.Calendar_View_Format_Time,
-								data.recordingTime / 3600,
-								(data.recordingTime % 3600) / 60).toString();
+								data.drivingTime / 3600,
+								(data.drivingTime % 3600) / 60).toString();
 					} else {
 						return "-";
 					}
@@ -216,13 +216,28 @@ public class CalendarView extends ViewPart implements ITourProvider {
 						return "-";
 					}
 				}
-			}
+			},
+			// - Recording Time -
+			new WeekSummaryFormatter(GraphColorProvider.PREF_GRAPH_TIME, Messages.Calendar_View_Action_SummaryRecordingTime) {
+
+				@Override
+				String format(final CalendarTourData data) {
+					if (data.recordingTime > 0) {
+						return new Formatter().format(
+								Messages.Calendar_View_Format_Time,
+								data.recordingTime / 3600,
+								(data.recordingTime % 3600) / 60).toString();
+					} else {
+						return "-";
+					}
+				}
+			},
 																						};
 
 	private TourInfoFormatter[]					_tourInfoFormatter				= {
 																						// fool stupid auto formatter
 			/*
-			 * title - description
+			 * nothing
 			 */
 			new TourInfoFormatter() {
 				@Override
@@ -590,6 +605,12 @@ public class CalendarView extends ViewPart implements ITourProvider {
 
 		int	index;
 		ColorDefinition	cd;
+		String name;
+
+		WeekSummaryFormatter(final String colorName, final String name) {
+			this(colorName);
+			this.name = name;
+		}
 
 		WeekSummaryFormatter(final String colorName) {
 			cd = new GraphColorProvider().getGraphColorDefinition(colorName);
@@ -607,7 +628,11 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		}
 
 		String getText() {
-			return cd.getVisibleName();
+			if (null != name) {
+				return name;
+			} else {
+				return cd.getVisibleName();
+			}
 		}
 	}
 
