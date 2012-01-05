@@ -70,11 +70,14 @@ public class MyTourbookSplashHandler extends BasicSplashHandler {
 
 		// set message color
 		int foregroundColorInteger;
-		try {
-			foregroundColorInteger = Integer.parseInt(foregroundColorString, 16);
-		} catch (final Exception ex) {
-			foregroundColorInteger = 0xD2D7FF; // off white
-		}
+//		try {
+//			// debug color
+//			foregroundColorInteger = Integer.parseInt(foregroundColorString, 16);
+//		} catch (final Exception ex) {
+//			// production color, debug is not using this color
+//			foregroundColorInteger = 0x2d84f6;
+//		}
+		foregroundColorInteger = 0x2a7ce7; //0x2d84f6;
 
 		setForeground(new RGB(
 				(foregroundColorInteger & 0xFF0000) >> 16,

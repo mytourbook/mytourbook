@@ -57,4 +57,8 @@
          id="feature.net.tourbook.app.nl"
          version="0.0.0"/>
 
+   <includes
+         id="net.tourbook.osynce.macro"
+         version="0.0.0"/>
+
 </feature>

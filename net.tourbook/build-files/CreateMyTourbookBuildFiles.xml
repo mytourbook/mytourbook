@@ -6,13 +6,16 @@
 		copy all project and language files from "mytourbook" into the build folder "mytourbook-BUILD-temp"
 	-->
 
-	<property name="path-mt-trunk" value="../../mytourbook" />
-	<property name="path-mt-trunk.nl" value="../../mytourbook/LANGUAGE-FRAGMENTS" />
+	<property name="path-mt-trunk"								value="../../mytourbook" />
+	<property name="path-mt-trunk.nl"							value="../../mytourbook/LANGUAGE-FRAGMENTS" />
 
-	<property name="path-mt-build" value="../../../mytourbook-BUILD-autocreated" />
+	<property name="path-o_synce-Macro-Plugin-for-MyTourbook"	value="../../o_synce-Macro-Plugin-for-MyTourbook" />
+	<property name="path-O-Synce-Macro-Java-Interface"			value="../../O-Synce-Macro-Java-Interface" />
 
-	<property name="path-build-core" value="${path-mt-build}/core" />
-	<property name="path-build-translation" value="${path-mt-build}/translation" />
+	<property name="path-mt-build"								value="../../../mytourbook-BUILD-autocreated" />
+
+	<property name="path-build-core"							value="${path-mt-build}/core" />
+	<property name="path-build-translation"						value="${path-mt-build}/translation" />
 
 	<!--
 		DEFAULT target
@@ -58,21 +61,43 @@
 
 		<copy todir="${path-build-core}" preservelastmodified="true" includeemptydirs="false">
 
+		<!--
+		-->
 			<fileset dir="${path-mt-trunk}">
 
 				<include name="net.tourbook*/**/*" />
 				<include name="de.byteholder*/**/*" />
 				<include name="org.apache.derby*/**" />
 				
-				<!--
-				<include name="FEATURES/**" />
-				<include name="INSTALL-UPDATES/**" />
-				-->
-
 				<exclude name="**/plugin_*.properties" />
 				<exclude name="**/feature_*.properties" />
 				<exclude name="**/messages_*.properties" />
 
+				<exclude name="**/bin/**" />
+				<exclude name="**/classes/**" />
+
+				<!-- ignore empty files -->
+				<size value="0" when="more" />
+
+			</fileset>
+
+			<fileset dir="${path-o_synce-Macro-Plugin-for-MyTourbook}">
+
+				<!-- copy only the plugin and not the feature -->
+				<include name="net.tourbook.device.osynce.macro*/**/*" />
+				
+				<exclude name="**/bin/**" />
+				<exclude name="**/classes/**" />
+
+				<!-- ignore empty files -->
+				<size value="0" when="more" />
+
+			</fileset>
+
+			<fileset dir="${path-O-Synce-Macro-Java-Interface}">
+
+				<include name="de.akuz.osynce.macro*/**/*" />
+				
 				<exclude name="**/bin/**" />
 				<exclude name="**/classes/**" />
 
