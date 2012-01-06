@@ -21,7 +21,7 @@ import org.osgi.framework.Version;
 
 public class ApplicationVersion {
 
-	private static String	_subVersion	= "";	//$NON-NLS-1$
+	private static String	_subVersion	= "  ireland";	//$NON-NLS-1$
 //	private static String	_subVersion	= " BETA 1";	//$NON-NLS-1$
 
 // this is disabled because it contains redundant information and too much numbers which nobody needs
