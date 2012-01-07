@@ -24,6 +24,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -402,6 +403,37 @@ public class Util {
 		final String stateValue = state.get(key);
 
 		return stateValue == null ? defaultValue : stateValue;
+	}
+
+	/**
+	 * Remove duplicate items from a list and add a new item.
+	 * 
+	 * @param allItems
+	 * @param newItem
+	 * @param maxItems
+	 * @return
+	 */
+	public static String[] getUniqueItems(final String[] allItems, final String newItem, final int maxItems) {
+
+		final ArrayList<String> newItems = new ArrayList<String>();
+
+		newItems.add(newItem);
+
+		for (final String oldItem : allItems) {
+
+			// ignore duplicate entries
+			if (newItem.equals(oldItem) == false) {
+				newItems.add(oldItem);
+			}
+
+			if (maxItems > 0) {
+				if (newItems.size() >= maxItems) {
+					break;
+				}
+			}
+		}
+
+		return newItems.toArray(new String[newItems.size()]);
 	}
 
 	/**
