@@ -511,14 +511,23 @@ public class TourDatabase {
 			final ResultSet result = stmt.executeQuery(sqlQuery); //$NON-NLS-1$
 
 			//filter out equal text entries
-			String lastString = "";
+			String lastString = UI.EMPTY_STRING;
 			String newString;
 			while (result.next()) {
 
 				newString = result.getString(1);
-				if (!lastString.equals(newString)) {
-					retString.add(result.getString(1));
-					lastString = newString;
+
+				if (newString != null) {
+
+					newString = newString.trim();
+
+					if (newString.length() > 0) {
+
+						if (!lastString.equals(newString)) {
+							retString.add(newString);
+							lastString = newString;
+						}
+					}
 				}
 			}
 
