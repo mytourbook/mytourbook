@@ -20,12 +20,13 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.IWeather;
 import net.tourbook.data.TourData;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.PrefHistory;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.util.Util;
@@ -99,7 +100,6 @@ public class DialogQuickEdit extends TitleAreaDialog {
 	private int							_hintDefaultSpinnerWidth;
 
 	private boolean						_isUpdateUI						= false;
-	private boolean						_isTitleModified;
 	private boolean						_isTemperatureManuallyModified	= false;
 	private boolean						_isWindSpeedManuallyModified	= false;
 	private int[]						_unitValueWindSpeed;
@@ -300,15 +300,13 @@ public class DialogQuickEdit extends TitleAreaDialog {
 					.applyTo(_comboTitle);
 
 			// fill combobox
-			final String[] strings = PrefHistory.getHistory(ITourbookPreferences.TOUR_EDITOR_TITLE_HISTORY);
-			_comboTitle.setItems(strings);
+			final ArrayList<String> arr = TourDatabase.getAllTourTitles();
+			for (String string : arr) {
+				if (string != null)
+					_comboTitle.add(string);
+			}
 
-			_comboTitle.addModifyListener(new ModifyListener() {
-				@Override
-				public void modifyText(final ModifyEvent e) {
-					_isTitleModified = true;
-				}
-			});
+			new AutocompleteComboInput(_comboTitle);
 
 			/*
 			 * description
@@ -802,9 +800,6 @@ public class DialogQuickEdit extends TitleAreaDialog {
 		if (_tourData.isValidForSave() == false) {
 			// data are not valid to be saved which is done in the action which opened this dialog
 			return;
-		}
-		if (_isTitleModified) {
-			PrefHistory.saveHistory(ITourbookPreferences.TOUR_EDITOR_TITLE_HISTORY, _comboTitle.getText());
 		}
 
 		super.okPressed();

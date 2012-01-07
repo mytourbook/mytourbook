@@ -452,6 +452,93 @@ public class TourDatabase {
 	}
 
 	/**
+	 * Getting all tour titles from the database sorted by alphabet and without any double
+	 * entries.
+	 * 
+	 * @author Stefan F.
+	 * @return titles as string array.
+	 */
+	public static ArrayList<String> getAllTourTitles() {
+
+		return getTextRow("SELECT tourTitle FROM " + TourDatabase.TABLE_TOUR_DATA + " ORDER BY tourTitle"); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	/**
+	 * Getting all tour start places from the database sorted by alphabet and without any double
+	 * entries.
+	 * 
+	 * @author Stefan F.
+	 * @return titles as string array.
+	 */
+	public static ArrayList<String> getAllTourPlaceStarts() {
+
+		return getTextRow("SELECT tourStartPlace FROM " + TourDatabase.TABLE_TOUR_DATA + " ORDER BY tourStartPlace"); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	/**
+	 * Getting all tour place ends from the database sorted by alphabet and without any double
+	 * entries.
+	 * 
+	 * @author Stefan F.
+	 * @return places as string array.
+	 */
+	public static ArrayList<String> getAllTourPlaceEnds() {
+
+		return getTextRow("SELECT tourEndPlace FROM " + TourDatabase.TABLE_TOUR_DATA + " ORDER BY tourEndPlace"); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	/**
+	 * Getting one row from the database sorted by alphabet and without any double entries.
+	 * 
+	 * @author Stefan F.
+	 * @param sqlQuery
+	 *            must look like: "SELECT tourTitle FROM " + TourDatabase.TABLE_TOUR_DATA +
+	 *            " ORDER BY tourTitle"
+	 * @return places as string array.
+	 */
+	private static ArrayList<String> getTextRow(String sqlQuery) {
+
+		final ArrayList<String> retString = new ArrayList<String>();
+
+		Connection conn = null;
+		Statement stmt = null;
+
+		try {
+
+			conn = getInstance().getConnection();
+			stmt = conn.createStatement();
+
+			final ResultSet result = stmt.executeQuery(sqlQuery); //$NON-NLS-1$
+
+			//filter out equal text entries
+			String lastString = "";
+			String newString;
+			while (result.next()) {
+
+				newString = result.getString(1);
+				if (!lastString.equals(newString)) {
+					retString.add(result.getString(1));
+					lastString = newString;
+				}
+			}
+
+		} catch (final SQLException e) {
+			UI.showSQLException(e);
+		} finally {
+			Util.sqlClose(stmt);
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (final SQLException e) {
+					UI.showSQLException(e);
+				}
+			}
+		}
+
+		return retString;
+	}
+
+	/**
 	 * this method is synchronized to conform to FindBugs
 	 * 
 	 * @return Returns all tour tags which are stored in the database, the hash key is the tag id

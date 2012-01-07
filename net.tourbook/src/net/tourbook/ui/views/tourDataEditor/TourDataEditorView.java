@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
+import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
@@ -53,7 +54,6 @@ import net.tourbook.extension.export.ActionExport;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.mapping.SelectionMapPosition;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.PrefHistory;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
@@ -2704,8 +2704,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					.applyTo(_comboTitle);
 
 			// fill combobox
-			String[] strings = PrefHistory.getHistory(ITourbookPreferences.TOUR_EDITOR_TITLE_HISTORY);
-			_comboTitle.setItems(strings);
+			ArrayList<String> arr = TourDatabase.getAllTourTitles();
+			for (String string : arr) {
+				if (string != null)
+					_comboTitle.add(string);
+			}
 
 			_comboTitle.addKeyListener(_keyListener);
 			_comboTitle.addModifyListener(new ModifyListener() {
@@ -2719,6 +2722,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				}
 			});
 
+			new AutocompleteComboInput(_comboTitle);
+			
 			/*
 			 * description
 			 */
@@ -2764,8 +2769,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					.applyTo(_comboStartLocation);
 
 			// fill combobox
-			strings = PrefHistory.getHistory(ITourbookPreferences.TOUR_EDITOR_START_LOCATION_HISTORY);
-			_comboStartLocation.setItems(strings);
+			arr = TourDatabase.getAllTourPlaceStarts();
+			for (String string : arr) {
+				if (string != null)
+					_comboStartLocation.add(string);
+			}
 
 			_comboStartLocation.addModifyListener(new ModifyListener() {
 				@Override
@@ -2777,6 +2785,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					setTourDirty();
 				}
 			});
+
+			new AutocompleteComboInput(_comboStartLocation);
 
 			/*
 			 * end location
@@ -2796,8 +2806,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					.applyTo(_comboEndLocation);
 
 			// fill combobox
-			strings = PrefHistory.getHistory(ITourbookPreferences.TOUR_EDITOR_END_LOCATION_HISTORY);
-			_comboEndLocation.setItems(strings);
+			arr = TourDatabase.getAllTourPlaceEnds();
+			for (String string : arr) {
+				if (string != null)
+					_comboEndLocation.add(string);
+			}
 
 			_comboEndLocation.addModifyListener(new ModifyListener() {
 				@Override
@@ -2809,6 +2822,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					setTourDirty();
 				}
 			});
+
+			new AutocompleteComboInput(_comboEndLocation);
 
 		}
 	}
@@ -6081,23 +6096,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_sectionWeather.setExpanded(Util.getStateBoolean(_viewState, STATE_SECTION_WEATHER, true));
 	}
 
-	/**
-	 * saves combo history
-	 */
-	private void saveComboHistory(final String prefName, final Combo widget) {
-
-		final String text = widget.getText();
-
-		boolean ret;
-
-		ret = PrefHistory.saveHistory(prefName, text);
-		if (ret) {
-			widget.clearSelection();
-			widget.setItems(PrefHistory.getHistory(prefName));
-			widget.update();
-		}
-	}
-
 	private void saveState() {
 
 		// selected tab
@@ -6196,18 +6194,42 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		updateMarkerMap();
 
-		// save combo history
+		// refresh combos
 
 		if (_isTitleModified) {
-			saveComboHistory(ITourbookPreferences.TOUR_EDITOR_TITLE_HISTORY, _comboTitle);
+			_comboTitle.clearSelection();
+			_comboTitle.removeAll();
+			// fill combobox
+			ArrayList<String> arr = TourDatabase.getAllTourTitles();
+			for (String string : arr) {
+				if (string != null)
+					_comboTitle.add(string);
+			}
+			_comboTitle.update();
 			_isTitleModified = false;
 		}
 		if (_isStartLocationModified) {
-			saveComboHistory(ITourbookPreferences.TOUR_EDITOR_START_LOCATION_HISTORY, _comboStartLocation);
+			_comboStartLocation.clearSelection();
+			_comboStartLocation.removeAll();
+			// fill combobox
+			ArrayList<String> arr = TourDatabase.getAllTourPlaceStarts();
+			for (String string : arr) {
+				if (string != null)
+					_comboStartLocation.add(string);
+			}
+			_comboStartLocation.update();
 			_isStartLocationModified = false;
 		}
 		if (_isEndLocationModified) {
-			saveComboHistory(ITourbookPreferences.TOUR_EDITOR_END_LOCATION_HISTORY, _comboEndLocation);
+			_comboEndLocation.clearSelection();
+			_comboEndLocation.removeAll();
+			// fill combobox
+			ArrayList<String> arr = TourDatabase.getAllTourPlaceEnds();
+			for (String string : arr) {
+				if (string != null)
+					_comboEndLocation.add(string);
+			}
+			_comboEndLocation.update();
 			_isEndLocationModified = false;
 		}
 

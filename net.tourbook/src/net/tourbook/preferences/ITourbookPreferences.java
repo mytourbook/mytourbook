@@ -221,9 +221,6 @@ public interface ITourbookPreferences {
 	 */
 	public static final String	TOURDATA_EDITOR_CONFIRMATION_REVERT_TOUR	= "tourdata.editor.confirmation.revert-tour";				//$NON-NLS-1$
 	public static final String	TOUR_EDITOR_DESCRIPTION_HEIGHT				= "tourdata.editor.description-height";					//$NON-NLS-1$
-	public static final String	TOUR_EDITOR_TITLE_HISTORY					= "tourdata.editor.title.history";							//$NON-NLS-1$
-	public static final String	TOUR_EDITOR_START_LOCATION_HISTORY			= "tourdata.editor.start.location.history";				//$NON-NLS-1$
-	public static final String	TOUR_EDITOR_END_LOCATION_HISTORY			= "tourdata.editor.end.location.history";					//$NON-NLS-1$
 
 	/*
 	 * common appearance
