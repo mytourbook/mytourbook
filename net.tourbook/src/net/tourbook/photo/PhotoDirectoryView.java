@@ -19,7 +19,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import net.tourbook.Messages;
@@ -31,18 +30,18 @@ import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.util.ColumnDefinition;
 import net.tourbook.util.ColumnManager;
 import net.tourbook.util.ITourViewer;
+import net.tourbook.util.StatusUtil;
 import net.tourbook.util.Util;
 
 import org.apache.commons.sanselan.ImageReadException;
 import org.apache.commons.sanselan.Sanselan;
 import org.apache.commons.sanselan.SanselanConstants;
-import org.apache.commons.sanselan.SanselanTest.ImageFilter;
 import org.apache.commons.sanselan.common.bytesource.ByteSource;
 import org.apache.commons.sanselan.common.bytesource.ByteSourceFile;
 import org.apache.commons.sanselan.formats.jpeg.JpegImageMetadata;
 import org.apache.commons.sanselan.formats.jpeg.JpegImageParser;
 import org.apache.commons.sanselan.formats.tiff.TiffImageMetadata;
-import org.apache.commons.sanselan.util.Debug;
+import org.apache.commons.sanselan.test.util.FileSystemTraversal;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.Action;
@@ -83,49 +82,32 @@ import org.eclipse.ui.part.ViewPart;
 
 public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 
-	static public final String			ID						= "net.tourbook.photo.photoDirectoryView";				//$NON-NLS-1$
+	static public final String		ID					= "net.tourbook.photo.photoDirectoryView";				//$NON-NLS-1$
 
-	private static final String			STATE_PHOTO_PATH		= "PhotoPath";											//$NON-NLS-1$
+	private static final String		STATE_PHOTO_PATH	= "PhotoPath";											//$NON-NLS-1$
 
-	private final IDialogSettings		_state					= TourbookPlugin.getDefault()//
-																		.getDialogSettingsSection("PhotoDirectory");	//$NON-NLS-1$
-	private final IPreferenceStore		_prefStore				= TourbookPlugin.getDefault()//
-																		.getPreferenceStore();
+	private final IDialogSettings	_state				= TourbookPlugin.getDefault()//
+																.getDialogSettingsSection("PhotoDirectory");	//$NON-NLS-1$
+	private final IPreferenceStore	_prefStore			= TourbookPlugin.getDefault()//
+																.getPreferenceStore();
 
-	private IPartListener2				_partListener;
-	private IPropertyChangeListener		_prefChangeListener;
+	private IPartListener2			_partListener;
+	private IPropertyChangeListener	_prefChangeListener;
 
-	private TableViewer					_photoViewer;
-	private ColumnManager				_columnManager;
+	private TableViewer				_photoViewer;
+	private ColumnManager			_columnManager;
 
-	private ArrayList<PhotoFile>		_photoFiles				= new ArrayList<PhotoFile>();
+	private ArrayList<PhotoFile>	_photoFiles			= new ArrayList<PhotoFile>();
 
-	private ActionRefreshViewer			_actionRefreshViewer;
+	private ActionRefreshViewer		_actionRefreshViewer;
 
 	/*
 	 * UI controls
 	 */
-	private PixelConverter				_pc;
+	private PixelConverter			_pc;
 
-	private Combo						_comboPath;
-	private Button						_btnSelectPath;
-
-	private static final ImageFilter	HAS_EXIF_IMAGE_FILTER	= new ImageFilter() {
-																	public boolean accept(final File file)
-																			throws IOException, ImageReadException {
-																		return hasExifData(file);
-																	}
-																};
-
-	private static final ImageFilter	JPEG_IMAGE_FILTER		= new ImageFilter() {
-																	public boolean accept(final File file)
-																			throws IOException, ImageReadException {
-																		return file
-																				.getName()
-																				.toLowerCase()
-																				.endsWith(".jpg");
-																	}
-																};
+	private Combo					_comboPath;
+	private Button					_btnSelectPath;
 
 	private class ActionRefreshViewer extends Action {
 
@@ -412,8 +394,12 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 	}
 
 	private void doRefresh() {
-		// TODO Auto-generated method stub
 
+		try {
+			refreshViewer();
+		} catch (final Exception e) {
+			StatusUtil.log(e);
+		}
 	}
 
 	@Override
@@ -421,42 +407,33 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 		return _columnManager;
 	}
 
-	private String getPathName() {
-		return _comboPath.getText().trim();
+	private void getImageFiles() throws IOException, ImageReadException {
+
+		_photoFiles.clear();
+
+//		File imagesFolder = new File("C:\\TEST-images\\");
+		File imagesFolder = new File(getPathName());
+
+		imagesFolder = imagesFolder.getAbsoluteFile();
+
+		final FileSystemTraversal.Visitor visitor = new FileSystemTraversal.Visitor() {
+
+			public boolean visit(final File file, final double progressEstimate) {
+
+				if (!Sanselan.hasImageFileExtension(file)) {
+					return true;
+				}
+
+				_photoFiles.add(new PhotoFile(file));
+
+				return true;
+			}
+		};
+		new FileSystemTraversal().traverseFiles(imagesFolder, visitor);
 	}
 
-	private List<File> getTestImages(final ImageFilter filter, final int max) throws IOException, ImageReadException {
-
-		final List<File> images = new ArrayList<File>();
-		int counter = 0;
-
-		for (int i = 0; i < ALL_IMAGES.size(); i++) {
-			final File file = (File) ALL_IMAGES.get(i);
-
-			if (!Sanselan.hasImageFileExtension(file)) {
-				continue;
-			}
-
-			if (counter++ % 10 == 0) {
-				Debug.purgeMemory();
-			}
-
-			if (file.getParentFile().getName().toLowerCase().equals("@broken")) {
-				continue;
-			}
-
-			if (filter != null && !filter.accept(file)) {
-				continue;
-			}
-
-			images.add(file);
-
-			if (max > 0 && images.size() >= max) {
-				break;
-			}
-		}
-
-		return images;
+	private String getPathName() {
+		return _comboPath.getText().trim();
 	}
 
 	@Override
@@ -469,8 +446,6 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 		final DirectoryDialog dialog = new DirectoryDialog(Display.getCurrent().getActiveShell(), SWT.SAVE);
 		dialog.setText(Messages.dialog_export_dir_dialog_text);
 		dialog.setMessage(Messages.dialog_export_dir_dialog_message);
-
-//		dialog.setFilterPath(getExportPathName());
 
 		final String selectedDirectoryName = dialog.open();
 
@@ -499,6 +474,58 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 		return _photoViewer;
 	}
 
+	private void refreshViewer() throws Exception {
+
+		getImageFiles();
+
+		for (final PhotoFile photoFile : _photoFiles) {
+
+			final File imageFile = photoFile.photoFile;
+
+			try {
+				final Map<String, Boolean> params = new HashMap<String, Boolean>();
+				final boolean ignoreImageData = true;//isPhilHarveyTestImage(imageFile);
+				params.put(SanselanConstants.PARAM_KEY_READ_THUMBNAILS, new Boolean(!ignoreImageData));
+
+				final JpegImageMetadata metadata = (JpegImageMetadata) Sanselan.getMetadata(imageFile, params);
+				if (null == metadata) {
+					continue;
+				}
+
+				final TiffImageMetadata exifMetadata = metadata.getExif();
+				if (null == exifMetadata) {
+					continue;
+				}
+
+				final TiffImageMetadata.GPSInfo gpsInfo = exifMetadata.getGPS();
+				if (null == gpsInfo) {
+					continue;
+				}
+
+//				Debug.debug("imageFile", imageFile);
+//				Debug.debug("gpsInfo", gpsInfo);
+//				Debug.debug("gpsInfo longitude as degrees east", gpsInfo.getLongitudeAsDegreesEast());
+//				Debug.debug("gpsInfo latitude as degrees north", gpsInfo.getLatitudeAsDegreesNorth());
+//				Debug.debug();
+
+			} catch (final Exception e) {
+
+//				Debug.debug("imageFile", imageFile.getAbsoluteFile());
+//				Debug.debug("imageFile", imageFile.length());
+//				Debug.debug(e, 13);
+
+				//                File brokenFolder = new File(imageFile.getParentFile(), "@Broken");
+				//                if(!brokenFolder.exists())
+				//                    brokenFolder.mkdirs();
+				//                File movedFile = new File(brokenFolder, imageFile.getName());
+				//                imageFile.renameTo(movedFile);
+
+				throw e;
+			}
+		}
+
+	}
+
 	@Override
 	public void reloadViewer() {
 		// TODO Auto-generated method stub
@@ -523,67 +550,6 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 
 	@Override
 	public void setFocus() {
-
-	}
-
-	public void test() throws Exception {
-
-		final List images = getTestImages(HAS_EXIF_IMAGE_FILTER, 300);
-
-		for (int i = 0; i < images.size(); i++) {
-			if (i % 10 == 0) {
-				Debug.purgeMemory();
-			}
-
-			final File imageFile = (File) images.get(i);
-
-//            Debug.debug();
-//            Debug.debug("imageFile", imageFile);
-
-			if (imageFile.getParentFile().getName().toLowerCase().equals("@broken")) {
-				continue;
-			}
-
-			try {
-				final Map params = new HashMap();
-				final boolean ignoreImageData = true;//isPhilHarveyTestImage(imageFile);
-				params.put(SanselanConstants.PARAM_KEY_READ_THUMBNAILS, new Boolean(!ignoreImageData));
-
-				final JpegImageMetadata metadata = (JpegImageMetadata) Sanselan.getMetadata(imageFile, params);
-				if (null == metadata) {
-					continue;
-				}
-
-				final TiffImageMetadata exifMetadata = metadata.getExif();
-				if (null == exifMetadata) {
-					continue;
-				}
-
-				final TiffImageMetadata.GPSInfo gpsInfo = exifMetadata.getGPS();
-				if (null == gpsInfo) {
-					continue;
-				}
-
-				Debug.debug("imageFile", imageFile);
-				Debug.debug("gpsInfo", gpsInfo);
-				Debug.debug("gpsInfo longitude as degrees east", gpsInfo.getLongitudeAsDegreesEast());
-				Debug.debug("gpsInfo latitude as degrees north", gpsInfo.getLatitudeAsDegreesNorth());
-
-				Debug.debug();
-			} catch (final Exception e) {
-				Debug.debug("imageFile", imageFile.getAbsoluteFile());
-				Debug.debug("imageFile", imageFile.length());
-				Debug.debug(e, 13);
-
-				//                File brokenFolder = new File(imageFile.getParentFile(), "@Broken");
-				//                if(!brokenFolder.exists())
-				//                    brokenFolder.mkdirs();
-				//                File movedFile = new File(brokenFolder, imageFile.getName());
-				//                imageFile.renameTo(movedFile);
-
-				throw e;
-			}
-		}
 
 	}
 

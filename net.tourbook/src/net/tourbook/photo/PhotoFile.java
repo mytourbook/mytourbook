@@ -15,8 +15,16 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
+import java.io.File;
+
 public class PhotoFile {
 
+	File	photoFile;
+
 	String	fileName;
+
+	public PhotoFile(final File file) {
+		photoFile = file;
+	}
 
 }
