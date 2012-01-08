@@ -1041,6 +1041,10 @@ public class Messages extends NLS {
 	public static String	Tooltip_ValuePoint_Format_Pace;
 	public static String		Tooltip_ValuePoint_Label_ChartZoomFactor_Tooltip;
 
+	public static String	Tooltip_ValuePoint_Label_NoData;
+
+	public static String	Tooltip_ValuePoint_Label_NoData_Tooltip;
+
 	public static String		Tooltip_ValuePoint_Label_NoTour;
 	public static String		Tooltip_ValuePoint_Label_SlicesCurrent_Tooltip;
 	public static String		Tooltip_ValuePoint_Label_SlicesMax_Tooltip;

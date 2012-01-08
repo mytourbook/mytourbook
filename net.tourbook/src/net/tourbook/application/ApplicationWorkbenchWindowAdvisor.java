@@ -30,6 +30,7 @@ import net.tourbook.preferences.PrefPagePeople;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.ui.UI;
+import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.util.StatusUtil;
 
@@ -37,6 +38,8 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
@@ -82,7 +85,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	private IPropertyListener					_partPropertyListener;
 
 	private IPreferenceStore					_prefStore		= TourbookPlugin.getDefault().getPreferenceStore();
-
 
 	public ApplicationWorkbenchWindowAdvisor(	final ApplicationWorkbenchAdvisor wbAdvisor,
 												final IWorkbenchWindowConfigurer configurer) {
@@ -342,6 +344,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		final IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
 
 		configurer.setTitle(_appTitle);
+
+		setupImages();
 	}
 
 	@Override
@@ -418,6 +422,39 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	@Override
 	public IStatus restoreState(final IMemento memento) {
 		return super.restoreState(memento);
+	}
+
+	private void setupImages() {
+
+		final ImageRegistry imageRegistry = JFaceResources.getImageRegistry();
+
+		imageRegistry.put(TourChart.COMMAND_ID_GRAPH_ALTIMETER, //
+				TourbookPlugin.getImageDescriptor(Messages.Image__graph_altimeter));
+
+		imageRegistry.put(TourChart.COMMAND_ID_GRAPH_ALTITUDE, //
+				TourbookPlugin.getImageDescriptor(Messages.Image__graph_altitude));
+
+		imageRegistry.put(TourChart.COMMAND_ID_GRAPH_CADENCE, //
+				TourbookPlugin.getImageDescriptor(Messages.Image__graph_cadence));
+
+		imageRegistry.put(TourChart.COMMAND_ID_GRAPH_GRADIENT, //
+				TourbookPlugin.getImageDescriptor(Messages.Image__graph_gradient));
+
+		imageRegistry.put(TourChart.COMMAND_ID_GRAPH_PACE, //
+				TourbookPlugin.getImageDescriptor(Messages.Image__graph_pace));
+
+		imageRegistry.put(TourChart.COMMAND_ID_GRAPH_POWER, //
+				TourbookPlugin.getImageDescriptor(Messages.Image__graph_power));
+
+		imageRegistry.put(TourChart.COMMAND_ID_GRAPH_PULSE, //
+				TourbookPlugin.getImageDescriptor(Messages.Image__graph_heartbeat));
+
+		imageRegistry.put(TourChart.COMMAND_ID_GRAPH_SPEED, //
+				TourbookPlugin.getImageDescriptor(Messages.Image__graph_speed));
+
+		imageRegistry.put(TourChart.COMMAND_ID_GRAPH_TEMPERATURE, //
+				TourbookPlugin.getImageDescriptor(Messages.Image__graph_temperature));
+
 	}
 
 	/**

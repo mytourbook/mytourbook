@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -51,7 +51,7 @@ public class ValuePointToolTipMenuManager {
 	static final int					VALUE_ID_CHART_ZOOM_FACTOR					= 1 << 14;
 
 	static final String					STATE_VALUE_POINT_TOOLTIP_VISIBLE_GRAPHS	= "ValuePoint_ToolTip_VisibleGraphs";		//$NON-NLS-1$
-	static final String					STATE_VALUE_POINT_TOOLTIP_ORIENTATION		= "ValuePoint_ToolTip_Orientation";		//$NON-NLS-1$
+	static final String					STATE_VALUE_POINT_TOOLTIP_ORIENTATION		= "ValuePoint_ToolTip_Orientation";				//$NON-NLS-1$
 
 	static final int					DEFAULT_GRAPHS								= VALUE_ID_TIME_SLICES
 																							| VALUE_ID_TIME_DURATION
@@ -67,7 +67,7 @@ public class ValuePointToolTipMenuManager {
 
 	private Menu						_menu										= null;
 
-	private int							_allVisibleValues;
+	private int							_allVisibleValueIds;
 	private boolean						_isHorizontal;
 
 	/**
@@ -199,11 +199,11 @@ public class ValuePointToolTipMenuManager {
 			final ValuePointToolTipOrientation orientation = ValuePointToolTipMenuManager.DEFAULT_ORIENTATION;
 			_state.put(STATE_VALUE_POINT_TOOLTIP_ORIENTATION, orientation.name());
 
-			_allVisibleValues = DEFAULT_GRAPHS;
-			_state.put(STATE_VALUE_POINT_TOOLTIP_VISIBLE_GRAPHS, _allVisibleValues);
+			_allVisibleValueIds = DEFAULT_GRAPHS;
+			_state.put(STATE_VALUE_POINT_TOOLTIP_VISIBLE_GRAPHS, _allVisibleValueIds);
 
 			// update tooltip with default values
-			_valuePointToolTipUI.actionSetDefaults(_allVisibleValues, orientation);
+			_valuePointToolTipUI.actionSetDefaults(_allVisibleValueIds, orientation);
 		}
 	}
 
@@ -264,13 +264,13 @@ public class ValuePointToolTipMenuManager {
 	 */
 	private void actionValueItem(final int graphId, final boolean isChecked) {
 
-		final int currentVisibleValues = _allVisibleValues;
+		final int currentVisibleValues = _allVisibleValueIds;
 
 		if (isChecked) {
 
 			// display additional graph
 
-			_allVisibleValues = currentVisibleValues | graphId;
+			_allVisibleValueIds = currentVisibleValues | graphId;
 
 		} else {
 
@@ -287,13 +287,13 @@ public class ValuePointToolTipMenuManager {
 			 * ~a = 1100
 			 * </pre>
 			 */
-			_allVisibleValues = (~currentVisibleValues & graphId) | (currentVisibleValues & ~graphId);
+			_allVisibleValueIds = (~currentVisibleValues & graphId) | (currentVisibleValues & ~graphId);
 		}
 
-		_state.put(STATE_VALUE_POINT_TOOLTIP_VISIBLE_GRAPHS, _allVisibleValues);
+		_state.put(STATE_VALUE_POINT_TOOLTIP_VISIBLE_GRAPHS, _allVisibleValueIds);
 
 		// update tooltip with new/removed graphs
-		final ToolItem toolItem = _valuePointToolTipUI.actionVisibleValues(_allVisibleValues);
+		final ToolItem toolItem = _valuePointToolTipUI.actionVisibleValues(_allVisibleValueIds);
 
 		// reopen context menu
 		openToolTipMenu10Reopen(toolItem);
@@ -461,59 +461,59 @@ public class ValuePointToolTipMenuManager {
 		_actionValueHeader.setEnabled(false);
 
 		_actionValueAltimeter.setState(
-				(_allVisibleValues & VALUE_ID_ALTIMETER) > 0,
+				(_allVisibleValueIds & VALUE_ID_ALTIMETER) > 0,
 				_tourData.getAltimeterSerie() != null);
 
 		_actionValueAltitude.setState( //
-				(_allVisibleValues & VALUE_ID_ALTITUDE) > 0,
+				(_allVisibleValueIds & VALUE_ID_ALTITUDE) > 0,
 				_tourData.getAltitudeSerie() != null);
 
 		_actionValueCadence.setState( //
-				(_allVisibleValues & VALUE_ID_CADENCE) > 0,
+				(_allVisibleValueIds & VALUE_ID_CADENCE) > 0,
 				_tourData.cadenceSerie != null);
 
 		_actionValueChartZoomFactor.setState( //
-				(_allVisibleValues & VALUE_ID_CHART_ZOOM_FACTOR) > 0,
+				(_allVisibleValueIds & VALUE_ID_CHART_ZOOM_FACTOR) > 0,
 				true);
 
 		_actionValueDistance.setState( //
-				(_allVisibleValues & VALUE_ID_DISTANCE) > 0,
+				(_allVisibleValueIds & VALUE_ID_DISTANCE) > 0,
 				_tourData.distanceSerie != null);
 
 		_actionValueGradient.setState( //
-				(_allVisibleValues & VALUE_ID_GRADIENT) > 0,
+				(_allVisibleValueIds & VALUE_ID_GRADIENT) > 0,
 				_tourData.getGradientSerie() != null);
 
 		_actionValuePace.setState( //
-				(_allVisibleValues & VALUE_ID_PACE) > 0,
+				(_allVisibleValueIds & VALUE_ID_PACE) > 0,
 				_tourData.getPaceSerie() != null);
 
 		_actionValuePower.setState( //
-				(_allVisibleValues & VALUE_ID_POWER) > 0,
+				(_allVisibleValueIds & VALUE_ID_POWER) > 0,
 				_tourData.getPowerSerie() != null);
 
 		_actionValuePulse.setState( //
-				(_allVisibleValues & VALUE_ID_PULSE) > 0,
+				(_allVisibleValueIds & VALUE_ID_PULSE) > 0,
 				_tourData.pulseSerie != null);
 
 		_actionValueSpeed.setState( //
-				(_allVisibleValues & VALUE_ID_SPEED) > 0,
+				(_allVisibleValueIds & VALUE_ID_SPEED) > 0,
 				_tourData.getSpeedSerie() != null);
 
 		_actionValueTemperature.setState( //
-				(_allVisibleValues & VALUE_ID_TEMPERATURE) > 0,
+				(_allVisibleValueIds & VALUE_ID_TEMPERATURE) > 0,
 				_tourData.temperatureSerie != null);
 
 		_actionValueTimeDuration.setState( //
-				(_allVisibleValues & VALUE_ID_TIME_DURATION) > 0,
+				(_allVisibleValueIds & VALUE_ID_TIME_DURATION) > 0,
 				_tourData.timeSerie != null);
 
 		_actionValueTimeOfDay.setState( //
-				(_allVisibleValues & VALUE_ID_TIME_OF_DAY) > 0,
+				(_allVisibleValueIds & VALUE_ID_TIME_OF_DAY) > 0,
 				_tourData.timeSerie != null);
 
 		_actionValueTimeSlices.setState( //
-				(_allVisibleValues & VALUE_ID_TIME_SLICES) > 0,
+				(_allVisibleValueIds & VALUE_ID_TIME_SLICES) > 0,
 				true);
 	}
 
@@ -584,17 +584,17 @@ public class ValuePointToolTipMenuManager {
 	 * @param event
 	 * @param tourData
 	 * @param isHorizontal
-	 * @param allVisibleValues
+	 * @param allVisibleValueIds
 	 * @param state
 	 */
 	void openToolTipMenu(	final Event event,
 							final TourData tourData,
-							final int allVisibleValues,
+							final int allVisibleValueIds,
 							final boolean isHorizontal) {
 
 		_tourData = tourData;
 
-		_allVisibleValues = allVisibleValues;
+		_allVisibleValueIds = allVisibleValueIds;
 		_isHorizontal = isHorizontal;
 
 		// open and position drop down menu below the action button
