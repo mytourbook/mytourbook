@@ -36,11 +36,15 @@ import net.tourbook.util.Util;
 import org.apache.commons.sanselan.ImageReadException;
 import org.apache.commons.sanselan.Sanselan;
 import org.apache.commons.sanselan.SanselanConstants;
+import org.apache.commons.sanselan.common.IImageMetadata;
 import org.apache.commons.sanselan.common.bytesource.ByteSource;
 import org.apache.commons.sanselan.common.bytesource.ByteSourceFile;
 import org.apache.commons.sanselan.formats.jpeg.JpegImageMetadata;
 import org.apache.commons.sanselan.formats.jpeg.JpegImageParser;
+import org.apache.commons.sanselan.formats.tiff.TiffField;
 import org.apache.commons.sanselan.formats.tiff.TiffImageMetadata;
+import org.apache.commons.sanselan.formats.tiff.constants.TagInfo;
+import org.apache.commons.sanselan.formats.tiff.constants.TiffConstants;
 import org.apache.commons.sanselan.test.util.FileSystemTraversal;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -164,6 +168,15 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 		}
 	}
 
+	private static void printTagValue(final JpegImageMetadata jpegMetadata, final TagInfo tagInfo) {
+		final TiffField field = jpegMetadata.findEXIFValueWithExactMatch(tagInfo);
+		if (field == null) {
+			System.out.println("\t" + tagInfo.name + ":\t" + "Not Found.");
+		} else {
+			System.out.println("\t" + tagInfo.name + ":\t" + field.getValueDescription());
+		}
+	}
+
 	private void addPartListener() {
 
 		_partListener = new IPartListener2() {
@@ -275,6 +288,8 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 			createUI10Path(container);
 			createUI20PhotoViewer(container);
 		}
+
+		createUI500ContextMenu();
 	}
 
 	private void createUI10Path(final Composite parent) {
@@ -361,9 +376,55 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 		});
 	}
 
+	/**
+	 * create the viewer context menu
+	 */
+	private void createUI500ContextMenu() {
+
+		final Table table = (Table) _photoViewer.getControl();
+
+		_columnManager.createHeaderContextMenu(table, null);
+	}
+
 	private void defineAllColumns() {
 
 		defineColumnName();
+		defineColumnLatitude();
+		defineColumnLongitude();
+	}
+
+	/**
+	 * column: latitude
+	 */
+	private void defineColumnLatitude() {
+
+		final ColumnDefinition colDef = net.tourbook.ui.TableColumnFactory.LATITUDE.createColumn(_columnManager, _pc);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final PhotoFile photoFile = (PhotoFile) cell.getElement();
+				cell.setText(photoFile.hasGPSData ? Double.toString(photoFile.latitude) : UI.EMPTY_STRING);
+			}
+		});
+	}
+
+	/**
+	 * column: longitude
+	 */
+	private void defineColumnLongitude() {
+
+		final ColumnDefinition colDef = net.tourbook.ui.TableColumnFactory.LONGITUDE.createColumn(_columnManager, _pc);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final PhotoFile photoFile = (PhotoFile) cell.getElement();
+				cell.setText(photoFile.hasGPSData ? Double.toString(photoFile.longitude) : UI.EMPTY_STRING);
+			}
+		});
 	}
 
 	/**
@@ -480,6 +541,9 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 
 		for (final PhotoFile photoFile : _photoFiles) {
 
+			System.out.println(photoFile.fileName + "\t");
+//			// TODO remove SYSTEM.OUT.PRINTLN
+
 			final File imageFile = photoFile.photoFile;
 
 			try {
@@ -487,43 +551,48 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 				final boolean ignoreImageData = true;//isPhilHarveyTestImage(imageFile);
 				params.put(SanselanConstants.PARAM_KEY_READ_THUMBNAILS, new Boolean(!ignoreImageData));
 
-				final JpegImageMetadata metadata = (JpegImageMetadata) Sanselan.getMetadata(imageFile, params);
-				if (null == metadata) {
-					continue;
-				}
+				final IImageMetadata metadata = Sanselan.getMetadata(imageFile, params);
+				if (metadata instanceof JpegImageMetadata) {
 
-				final TiffImageMetadata exifMetadata = metadata.getExif();
-				if (null == exifMetadata) {
-					continue;
-				}
+					photoFile.hasMetaData = true;
 
-				final TiffImageMetadata.GPSInfo gpsInfo = exifMetadata.getGPS();
-				if (null == gpsInfo) {
-					continue;
-				}
+					final JpegImageMetadata jpegMetadata = (JpegImageMetadata) metadata;
 
-//				Debug.debug("imageFile", imageFile);
-//				Debug.debug("gpsInfo", gpsInfo);
-//				Debug.debug("gpsInfo longitude as degrees east", gpsInfo.getLongitudeAsDegreesEast());
-//				Debug.debug("gpsInfo latitude as degrees north", gpsInfo.getLatitudeAsDegreesNorth());
-//				Debug.debug();
+					printTagValue(jpegMetadata, TiffConstants.TIFF_TAG_XRESOLUTION);
+					printTagValue(jpegMetadata, TiffConstants.TIFF_TAG_DATE_TIME);
+					printTagValue(jpegMetadata, TiffConstants.EXIF_TAG_DATE_TIME_ORIGINAL);
+					printTagValue(jpegMetadata, TiffConstants.EXIF_TAG_CREATE_DATE);
+					printTagValue(jpegMetadata, TiffConstants.EXIF_TAG_ISO);
+					printTagValue(jpegMetadata, TiffConstants.EXIF_TAG_SHUTTER_SPEED_VALUE);
+					printTagValue(jpegMetadata, TiffConstants.EXIF_TAG_APERTURE_VALUE);
+					printTagValue(jpegMetadata, TiffConstants.EXIF_TAG_BRIGHTNESS_VALUE);
+					printTagValue(jpegMetadata, TiffConstants.GPS_TAG_GPS_LATITUDE_REF);
+					printTagValue(jpegMetadata, TiffConstants.GPS_TAG_GPS_LATITUDE);
+					printTagValue(jpegMetadata, TiffConstants.GPS_TAG_GPS_LONGITUDE_REF);
+					printTagValue(jpegMetadata, TiffConstants.GPS_TAG_GPS_LONGITUDE);
+
+					final TiffImageMetadata exifMetadata = jpegMetadata.getExif();
+					if (exifMetadata != null) {
+
+						photoFile.hasExifData = true;
+
+						final TiffImageMetadata.GPSInfo gpsInfo = exifMetadata.getGPS();
+						if (gpsInfo != null) {
+
+							photoFile.hasGPSData = true;
+
+							photoFile.latitude = gpsInfo.getLatitudeAsDegreesNorth();
+							photoFile.longitude = gpsInfo.getLongitudeAsDegreesEast();
+						}
+					}
+				}
 
 			} catch (final Exception e) {
-
-//				Debug.debug("imageFile", imageFile.getAbsoluteFile());
-//				Debug.debug("imageFile", imageFile.length());
-//				Debug.debug(e, 13);
-
-				//                File brokenFolder = new File(imageFile.getParentFile(), "@Broken");
-				//                if(!brokenFolder.exists())
-				//                    brokenFolder.mkdirs();
-				//                File movedFile = new File(brokenFolder, imageFile.getName());
-				//                imageFile.renameTo(movedFile);
-
 				throw e;
 			}
 		}
 
+		_photoViewer.setInput(this);
 	}
 
 	@Override

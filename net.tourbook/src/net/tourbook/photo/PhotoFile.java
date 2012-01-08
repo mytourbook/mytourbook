@@ -20,11 +20,18 @@ import java.io.File;
 public class PhotoFile {
 
 	File	photoFile;
-
 	String	fileName;
+
+	boolean	hasMetaData;
+	boolean	hasExifData;
+	boolean	hasGPSData;
+
+	double	latitude;
+	double	longitude;
 
 	public PhotoFile(final File file) {
 		photoFile = file;
+		fileName = file.getName();
 	}
 
 }
