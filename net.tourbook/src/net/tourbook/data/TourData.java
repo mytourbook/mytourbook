@@ -2441,6 +2441,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		final int serieLength = speedSerie.length;
 
 		speedSerieImperial = new float[serieLength];
+
 		maxSpeed = 0;
 
 		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
@@ -2551,7 +2552,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			float speedMetric = 0;
 			float speedImperial = 0;
 			if (timeDiff != 0) {
-				final float speed = (distDiff * 36) / timeDiff;
+				final float speed = (distDiff * 3.6f) / timeDiff;
 				speedMetric = speed;
 				speedImperial = speed / UI.UNIT_MILE;
 			}
@@ -2672,10 +2673,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 							if ((equalSegmentTimeDiff == 0) || (equalSegmentDistDiff == 0)) {
 								speedMetric = 0;
 							} else {
-								speedMetric = ((equalSegmentDistDiff * 36) / equalSegmentTimeDiff);
+								speedMetric = ((equalSegmentDistDiff * 3.6f) / equalSegmentTimeDiff);
 								speedMetric = speedMetric < 0 ? 0 : speedMetric;
 
-								speedImperial = equalSegmentDistDiff * 36 / (equalSegmentTimeDiff * UI.UNIT_MILE);
+								speedImperial = equalSegmentDistDiff * 3.6f / (equalSegmentTimeDiff * UI.UNIT_MILE);
 								speedImperial = speedImperial < 0 ? 0 : speedImperial;
 							}
 
@@ -2761,10 +2762,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 					// speed must be greater than 1.8 km/h
 					speedMetric = 0;
 				} else {
-					speedMetric = distDiff * 36 / timeDiff;
+					speedMetric = distDiff * 3.6f / timeDiff;
 					speedMetric = speedMetric < 0 ? 0 : speedMetric;
 
-					speedImperial = distDiff * 36 / (timeDiff * UI.UNIT_MILE);
+					speedImperial = distDiff * 3.6f / (timeDiff * UI.UNIT_MILE);
 					speedImperial = speedImperial < 0 ? 0 : speedImperial;
 				}
 			}
@@ -5288,25 +5289,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 		maxSpeed = Math.max(maxSpeed, speedMetric);
 
-		float paceMetricSeconds = 0;
-		float paceImperialSeconds = 0;
-		float paceMetricMinute = 0;
-		float paceImperialMinute = 0;
-
-		if ((speedMetric != 0) && (distDiff != 0)) {
-
-			paceMetricSeconds = timeDiff * 10000 / distDiff;
-			paceImperialSeconds = paceMetricSeconds * UI.UNIT_MILE;
-
-			paceMetricMinute = paceMetricSeconds / 60;
-			paceImperialMinute = paceImperialSeconds / 60;
-		}
+		final float paceMetricSeconds = speedMetric < 1.0 ? 0 : (float) (3600.0 / speedMetric);
+		final float paceImperialSeconds = speedMetric < 0.6 ? 0 : (float) (3600.0 / speedImperial);
 
 		paceSerieSeconds[serieIndex] = paceMetricSeconds;
 		paceSerieSecondsImperial[serieIndex] = paceImperialSeconds;
 
-		paceSerieMinute[serieIndex] = paceMetricMinute;
-		paceSerieMinuteImperial[serieIndex] = paceImperialMinute;
+		paceSerieMinute[serieIndex] = paceMetricSeconds / 60;
+		paceSerieMinuteImperial[serieIndex] = paceImperialSeconds / 60;
 	}
 
 	/**
