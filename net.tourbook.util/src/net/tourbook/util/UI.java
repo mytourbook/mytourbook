@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,8 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.util;
+
+import java.nio.charset.Charset;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabItem;
@@ -68,6 +70,8 @@ public class UI {
 
 	public static final String	UTF_8					= "UTF-8";																	//$NON-NLS-1$
 	public static final String	ISO_8859_1				= "ISO-8859-1";															//$NON-NLS-1$
+
+	public static final Charset	UTF8_CHARSET			= Charset.forName("UTF-8");
 
 	public static void addSashColorHandler(final Sash sash) {
 
@@ -237,8 +241,8 @@ public class UI {
 				final ScrolledComposite scrolledContainer = (ScrolledComposite) parent;
 
 				/*
-				 * update layout: both methods must be called because the size can be modified and a layout
-				 * with resized controls MUST be done !!!!
+				 * update layout: both methods must be called because the size can be modified and a
+				 * layout with resized controls MUST be done !!!!
 				 */
 				scrolledContainer.setMinSize(child.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 				scrolledContainer.layout(true, true);

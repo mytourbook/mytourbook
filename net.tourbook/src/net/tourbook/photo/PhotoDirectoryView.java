@@ -17,7 +17,9 @@ package net.tourbook.photo;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,12 +39,11 @@ import org.apache.commons.sanselan.ImageReadException;
 import org.apache.commons.sanselan.Sanselan;
 import org.apache.commons.sanselan.SanselanConstants;
 import org.apache.commons.sanselan.common.IImageMetadata;
-import org.apache.commons.sanselan.common.bytesource.ByteSource;
-import org.apache.commons.sanselan.common.bytesource.ByteSourceFile;
 import org.apache.commons.sanselan.formats.jpeg.JpegImageMetadata;
-import org.apache.commons.sanselan.formats.jpeg.JpegImageParser;
 import org.apache.commons.sanselan.formats.tiff.TiffField;
 import org.apache.commons.sanselan.formats.tiff.TiffImageMetadata;
+import org.apache.commons.sanselan.formats.tiff.constants.ExifTagConstants;
+import org.apache.commons.sanselan.formats.tiff.constants.GpsTagConstants;
 import org.apache.commons.sanselan.formats.tiff.constants.TagInfo;
 import org.apache.commons.sanselan.formats.tiff.constants.TiffConstants;
 import org.apache.commons.sanselan.test.util.FileSystemTraversal;
@@ -83,35 +84,49 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 
-	static public final String		ID					= "net.tourbook.photo.photoDirectoryView";				//$NON-NLS-1$
+	static public final String			ID					= "net.tourbook.photo.photoDirectoryView";				//$NON-NLS-1$
 
-	private static final String		STATE_PHOTO_PATH	= "PhotoPath";											//$NON-NLS-1$
+	private static final String			STATE_PHOTO_PATH	= "PhotoPath";											//$NON-NLS-1$
 
-	private final IDialogSettings	_state				= TourbookPlugin.getDefault()//
-																.getDialogSettingsSection("PhotoDirectory");	//$NON-NLS-1$
-	private final IPreferenceStore	_prefStore			= TourbookPlugin.getDefault()//
-																.getPreferenceStore();
+	private static DateTimeFormatter	_dtFormatter		= DateTimeFormat.shortDateTime();
 
-	private IPartListener2			_partListener;
-	private IPropertyChangeListener	_prefChangeListener;
+	private static DateTimeFormatter	_dtParser			= DateTimeFormat.forPattern("yyyy:MM:dd HH:mm:ss")// //$NON-NLS-1$
+																	.withZone(DateTimeZone.UTC);
 
-	private TableViewer				_photoViewer;
-	private ColumnManager			_columnManager;
+	private final IDialogSettings		_state				= TourbookPlugin.getDefault()//
+																	.getDialogSettingsSection("PhotoDirectory");	//$NON-NLS-1$
+	private final IPreferenceStore		_prefStore			= TourbookPlugin.getDefault()//
+																	.getPreferenceStore();
+	private final NumberFormat			_nf8				= NumberFormat.getNumberInstance();
+	{
+		_nf8.setMinimumFractionDigits(8);
+		_nf8.setMaximumFractionDigits(8);
+	}
 
-	private ArrayList<PhotoFile>	_photoFiles			= new ArrayList<PhotoFile>();
+	private IPartListener2				_partListener;
+	private IPropertyChangeListener		_prefChangeListener;
 
-	private ActionRefreshViewer		_actionRefreshViewer;
+	private TableViewer					_photoViewer;
+	private ColumnManager				_columnManager;
+
+	private ArrayList<PhotoFile>		_photoFiles			= new ArrayList<PhotoFile>();
+
+	private ActionRefreshViewer			_actionRefreshViewer;
 
 	/*
 	 * UI controls
 	 */
-	private PixelConverter			_pc;
+	private PixelConverter				_pc;
 
-	private Combo					_comboPath;
-	private Button					_btnSelectPath;
+	private Combo						_comboPath;
+	private Button						_btnSelectPath;
 
 	private class ActionRefreshViewer extends Action {
 
@@ -146,36 +161,39 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 		public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
 	}
 
-	protected static boolean hasExifData(final File file) {
-		//        Debug.debug("hasExifData file", file.getAbsoluteFile());
+	static public String byteToHex(final byte b) {
+		// Returns hex String representation of byte b
+		final char hexDigit[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
+		final char[] array = { hexDigit[(b >> 4) & 0x0f], hexDigit[b & 0x0f] };
+		return new String(array);
+	}
 
-		if (!file.getName().toLowerCase().endsWith(".jpg")) {
-			return false;
-			//ImageFormat format = Sanselan.guessFormat(file);
-			//if (format != ImageFormat.IMAGE_FORMAT_JPEG)
-			//    return false;
-		}
+	static public String charToHex(final char c) {
+		// Returns hex String representation of char c
+		final byte hi = (byte) (c >>> 8);
+		final byte lo = (byte) (c & 0xff);
+		return byteToHex(hi) + byteToHex(lo);
+	}
 
-		//        Debug.debug("possible file", file);
-
-		try {
-			final ByteSource byteSource = new ByteSourceFile(file);
-			return new JpegImageParser().hasExifSegment(byteSource);
-		} catch (final Exception e) {
-			//            Debug.debug("Error file", file.getAbsoluteFile());
-			//            Debug.debug(e, 4);
-			return false;
+	public static void printBytes(final byte[] array, final String name) {
+		for (int k = 0; k < array.length; k++) {
+			System.out.println(name + "[" + k + "] = " + "0x" + byteToHex(array[k]));
 		}
 	}
 
-	private static void printTagValue(final JpegImageMetadata jpegMetadata, final TagInfo tagInfo) {
-		final TiffField field = jpegMetadata.findEXIFValueWithExactMatch(tagInfo);
-		if (field == null) {
-			System.out.println("\t" + tagInfo.name + ":\t" + "Not Found.");
-		} else {
-			System.out.println("\t" + tagInfo.name + ":\t" + field.getValueDescription());
-		}
-	}
+//	private static void printTagValue(final JpegImageMetadata jpegMetadata, final TagInfo tagInfo) {
+//
+//		if (tagInfo == null) {
+//			return;
+//		}
+//
+//		final TiffField field = jpegMetadata.findEXIFValueWithExactMatch(tagInfo);
+//		if (field == null) {
+//			System.out.println(new Formatter().format("\t%-25s: n/a", tagInfo.name));
+//		} else {
+//			System.out.println(new Formatter().format("\t%-25s: %s", tagInfo.name, field.getValueDescription()));
+//		}
+//	}
 
 	private void addPartListener() {
 
@@ -276,7 +294,7 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 
 		restoreState();
 
-		_photoViewer.setInput(new Object[0]);
+		updateViewer();
 	}
 
 	private void createUI(final Composite parent) {
@@ -389,8 +407,33 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 	private void defineAllColumns() {
 
 		defineColumnName();
+		defineColumnDateTime();
 		defineColumnLatitude();
 		defineColumnLongitude();
+		defineColumnOtherTags();
+	}
+
+	/**
+	 * column: timestamp
+	 */
+	private void defineColumnDateTime() {
+
+		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_DATE_TIME.createColumn(_columnManager, _pc);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final PhotoFile photoFile = (PhotoFile) cell.getElement();
+
+				final DateTime dt = photoFile.dateTime;
+				if (dt == null) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(_dtFormatter.print(dt.getMillis()));
+				}
+			}
+		});
 	}
 
 	/**
@@ -404,8 +447,13 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 			@Override
 			public void update(final ViewerCell cell) {
 
-				final PhotoFile photoFile = (PhotoFile) cell.getElement();
-				cell.setText(photoFile.hasGPSData ? Double.toString(photoFile.latitude) : UI.EMPTY_STRING);
+				final double latitude = ((PhotoFile) cell.getElement()).latitude;
+
+				if (latitude == Double.MIN_VALUE) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(_nf8.format(latitude));
+				}
 			}
 		});
 	}
@@ -421,8 +469,13 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 			@Override
 			public void update(final ViewerCell cell) {
 
-				final PhotoFile photoFile = (PhotoFile) cell.getElement();
-				cell.setText(photoFile.hasGPSData ? Double.toString(photoFile.longitude) : UI.EMPTY_STRING);
+				final double longitude = ((PhotoFile) cell.getElement()).longitude;
+
+				if (longitude == Double.MIN_VALUE) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(_nf8.format(longitude));
+				}
 			}
 		});
 	}
@@ -444,6 +497,31 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 		});
 	}
 
+	/**
+	 * column: tags which are not used
+	 */
+	private void defineColumnOtherTags() {
+
+		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_OTHER_TAGS.createColumn(_columnManager, _pc);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final PhotoFile photoFile = (PhotoFile) cell.getElement();
+
+				final String otherTags = ("" + photoFile.width)
+						+ ("x" + photoFile.length)
+						+ ("  -  direction:" + (photoFile.imageDirection == Double.MIN_VALUE
+								? "?"
+								: photoFile.imageDirection))
+						+ ("  -  location:" + (photoFile.gpsAreaInfo == null ? "?" : photoFile.gpsAreaInfo));
+
+				cell.setText(otherTags);
+			}
+		});
+	}
+
 	@Override
 	public void dispose() {
 
@@ -457,7 +535,7 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 	private void doRefresh() {
 
 		try {
-			refreshViewer();
+			updateViewer();
 		} catch (final Exception e) {
 			StatusUtil.log(e);
 		}
@@ -466,6 +544,156 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 	@Override
 	public ColumnManager getColumnManager() {
 		return _columnManager;
+	}
+
+	/**
+	 * Date/Time
+	 * 
+	 * @param photoFile
+	 * @param jpegMetadata
+	 * @return
+	 */
+	private DateTime getExifDate(final PhotoFile photoFile, final JpegImageMetadata jpegMetadata) {
+
+//		/*
+//		 * !!! time is not correct, maybe it is the time when the GPS signal was
+//		 * received !!!
+//		 */
+//		printTagValue(jpegMetadata, TiffConstants.GPS_TAG_GPS_TIME_STAMP);
+
+		final TiffField date = jpegMetadata.findEXIFValueWithExactMatch(TiffConstants.TIFF_TAG_DATE_TIME);
+
+		if (date != null) {
+
+			try {
+				return _dtParser.parseDateTime(date.getStringValue());
+			} catch (final Exception e) {
+				// ignore
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * GPS area info
+	 */
+	private String getExifGpsArea(final PhotoFile photoFile, final JpegImageMetadata jpegMetadata) {
+		try {
+			final TiffField field = jpegMetadata
+					.findEXIFValueWithExactMatch(GpsTagConstants.GPS_TAG_GPS_AREA_INFORMATION);
+			if (field != null) {
+				final Object fieldValue = field.getValue();
+				if (fieldValue != null) {
+
+					/**
+					 * source: Exif 2.2 specification
+					 * 
+					 * <pre>
+					 * 
+					 * Table 6 Character Codes and their Designation
+					 * 
+					 * Character Code	Code Designation (8 Bytes) 						References
+					 * ASCII  			41.H, 53.H, 43.H, 49.H, 49.H, 00.H, 00.H, 00.H  ITU-T T.50 IA5
+					 * JIS				A.H, 49.H, 53.H, 00.H, 00.H, 00.H, 00.H, 00.H   JIS X208-1990
+					 * Unicode			55.H, 4E.H, 49.H, 43.H, 4F.H, 44.H, 45.H, 00.H  Unicode Standard
+					 * Undefined		00.H, 00.H, 00.H, 00.H, 00.H, 00.H, 00.H, 00.H  Undefined
+					 * 
+					 * </pre>
+					 */
+					final byte[] byteArrayValue = field.getByteArrayValue();
+					final int fieldLength = byteArrayValue.length;
+
+					if (fieldLength > 0) {
+
+						/**
+						 * <pre>
+						 * 
+						 * skipping 1 + 6 characters:
+						 * 
+						 * 1      character code
+						 * 2...7  have no idea why these bytes are set to none valid characters
+						 * 
+						 * </pre>
+						 */
+						final byte[] valueBytes = Arrays.copyOfRange(byteArrayValue, 7, fieldLength);
+
+						String valueString = null;
+
+						final byte firstByte = byteArrayValue[0];
+						if (firstByte == 0x55) {
+
+							valueString = new String(valueBytes, "UTF-16");
+
+						} else {
+
+							valueString = new String(valueBytes);
+						}
+
+						return valueString;
+					}
+				}
+			}
+		} catch (final Exception e) {
+			// ignore
+		}
+
+		return null;
+	}
+
+	/**
+	 * Image direction
+	 */
+	private double getExifImageDirection(final PhotoFile photoFile, final JpegImageMetadata jpegMetadata) {
+		try {
+			final TiffField field = jpegMetadata.findEXIFValueWithExactMatch(GpsTagConstants.GPS_TAG_GPS_IMG_DIRECTION);
+			if (field != null) {
+				return field.getDoubleValue();
+			}
+		} catch (final Exception e) {
+			// ignore
+		}
+
+		return Double.MIN_VALUE;
+	}
+
+	private int getExifIntValue(final PhotoFile photoFile, final JpegImageMetadata jpegMetadata, final TagInfo tiffTag) {
+
+		try {
+			final TiffField field = jpegMetadata.findEXIFValueWithExactMatch(tiffTag);
+			if (field != null) {
+				return field.getIntValue();
+			}
+		} catch (final Exception e) {
+			// ignore
+		}
+
+		return -1;
+	}
+
+	/**
+	 * Latitude + lLongitude
+	 * 
+	 * @param photoFile
+	 * @param jpegMetadata
+	 * @throws ImageReadException
+	 */
+	private void getExifLatLon(final PhotoFile photoFile, final JpegImageMetadata jpegMetadata) {
+
+		final TiffImageMetadata exifMetadata = jpegMetadata.getExif();
+		if (exifMetadata != null) {
+
+			try {
+				final TiffImageMetadata.GPSInfo gpsInfo = exifMetadata.getGPS();
+				if (gpsInfo != null) {
+
+					photoFile.latitude = gpsInfo.getLatitudeAsDegreesNorth();
+					photoFile.longitude = gpsInfo.getLongitudeAsDegreesEast();
+				}
+			} catch (final Exception e) {
+				// ignore
+			}
+		}
 	}
 
 	private void getImageFiles() throws IOException, ImageReadException {
@@ -535,70 +763,9 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 		return _photoViewer;
 	}
 
-	private void refreshViewer() throws Exception {
-
-		getImageFiles();
-
-		for (final PhotoFile photoFile : _photoFiles) {
-
-			System.out.println(photoFile.fileName + "\t");
-//			// TODO remove SYSTEM.OUT.PRINTLN
-
-			final File imageFile = photoFile.photoFile;
-
-			try {
-				final Map<String, Boolean> params = new HashMap<String, Boolean>();
-				final boolean ignoreImageData = true;//isPhilHarveyTestImage(imageFile);
-				params.put(SanselanConstants.PARAM_KEY_READ_THUMBNAILS, new Boolean(!ignoreImageData));
-
-				final IImageMetadata metadata = Sanselan.getMetadata(imageFile, params);
-				if (metadata instanceof JpegImageMetadata) {
-
-					photoFile.hasMetaData = true;
-
-					final JpegImageMetadata jpegMetadata = (JpegImageMetadata) metadata;
-
-					printTagValue(jpegMetadata, TiffConstants.TIFF_TAG_XRESOLUTION);
-					printTagValue(jpegMetadata, TiffConstants.TIFF_TAG_DATE_TIME);
-					printTagValue(jpegMetadata, TiffConstants.EXIF_TAG_DATE_TIME_ORIGINAL);
-					printTagValue(jpegMetadata, TiffConstants.EXIF_TAG_CREATE_DATE);
-					printTagValue(jpegMetadata, TiffConstants.EXIF_TAG_ISO);
-					printTagValue(jpegMetadata, TiffConstants.EXIF_TAG_SHUTTER_SPEED_VALUE);
-					printTagValue(jpegMetadata, TiffConstants.EXIF_TAG_APERTURE_VALUE);
-					printTagValue(jpegMetadata, TiffConstants.EXIF_TAG_BRIGHTNESS_VALUE);
-					printTagValue(jpegMetadata, TiffConstants.GPS_TAG_GPS_LATITUDE_REF);
-					printTagValue(jpegMetadata, TiffConstants.GPS_TAG_GPS_LATITUDE);
-					printTagValue(jpegMetadata, TiffConstants.GPS_TAG_GPS_LONGITUDE_REF);
-					printTagValue(jpegMetadata, TiffConstants.GPS_TAG_GPS_LONGITUDE);
-
-					final TiffImageMetadata exifMetadata = jpegMetadata.getExif();
-					if (exifMetadata != null) {
-
-						photoFile.hasExifData = true;
-
-						final TiffImageMetadata.GPSInfo gpsInfo = exifMetadata.getGPS();
-						if (gpsInfo != null) {
-
-							photoFile.hasGPSData = true;
-
-							photoFile.latitude = gpsInfo.getLatitudeAsDegreesNorth();
-							photoFile.longitude = gpsInfo.getLongitudeAsDegreesEast();
-						}
-					}
-				}
-
-			} catch (final Exception e) {
-				throw e;
-			}
-		}
-
-		_photoViewer.setInput(this);
-	}
-
 	@Override
 	public void reloadViewer() {
-		// TODO Auto-generated method stub
-
+		_photoViewer.setInput(new Object[0]);
 	}
 
 	private void restoreState() {
@@ -620,6 +787,66 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 	@Override
 	public void setFocus() {
 
+	}
+
+	private void updateViewer() {
+
+		try {
+			getImageFiles();
+		} catch (final Exception e) {
+			StatusUtil.log(e);
+		}
+
+		for (final PhotoFile photoFile : _photoFiles) {
+
+			System.out.println(photoFile.fileName + "\t");
+//			// TODO remove SYSTEM.OUT.PRINTLN
+
+			final File imageFile = photoFile.photoFile;
+
+			try {
+				final Map<String, Boolean> params = new HashMap<String, Boolean>();
+				final boolean ignoreImageData = true;//isPhilHarveyTestImage(imageFile);
+				params.put(SanselanConstants.PARAM_KEY_READ_THUMBNAILS, new Boolean(!ignoreImageData));
+
+				final IImageMetadata metadata = Sanselan.getMetadata(imageFile, params);
+
+				/*
+				 * this will log all available meta data
+				 */
+//				System.out.println(metadata.toString());
+
+				/*
+				 * read meta data for 1 photo
+				 */
+				if (metadata instanceof JpegImageMetadata) {
+
+					final JpegImageMetadata jpegMetadata = (JpegImageMetadata) metadata;
+
+					photoFile.dateTime = getExifDate(photoFile, jpegMetadata);
+
+					photoFile.width = getExifIntValue(
+							photoFile,
+							jpegMetadata,
+							ExifTagConstants.EXIF_TAG_EXIF_IMAGE_WIDTH);
+
+					photoFile.length = getExifIntValue(
+							photoFile,
+							jpegMetadata,
+							ExifTagConstants.EXIF_TAG_EXIF_IMAGE_LENGTH);
+
+					photoFile.imageDirection = getExifImageDirection(photoFile, jpegMetadata);
+
+					getExifLatLon(photoFile, jpegMetadata);
+					photoFile.gpsAreaInfo = getExifGpsArea(photoFile, jpegMetadata);
+				}
+
+			} catch (final Exception e) {
+				StatusUtil.log(e);
+			}
+		}
+
+		_photoViewer.setInput(this);
 	}
 
 	private boolean validateFilePath() {

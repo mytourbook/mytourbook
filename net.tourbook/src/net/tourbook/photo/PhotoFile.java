@@ -17,17 +17,23 @@ package net.tourbook.photo;
 
 import java.io.File;
 
+import org.joda.time.DateTime;
+
 public class PhotoFile {
 
-	File	photoFile;
-	String	fileName;
+	File		photoFile;
+	String		fileName;
 
-	boolean	hasMetaData;
-	boolean	hasExifData;
-	boolean	hasGPSData;
+	DateTime	dateTime;
 
-	double	latitude;
-	double	longitude;
+	int			width			= -1;
+	int			length			= -1;
+
+	double		latitude		= Double.MIN_VALUE;
+	double		longitude		= Double.MIN_VALUE;
+
+	String		gpsAreaInfo;
+	double		imageDirection	= Double.MIN_VALUE;
 
 	public PhotoFile(final File file) {
 		photoFile = file;

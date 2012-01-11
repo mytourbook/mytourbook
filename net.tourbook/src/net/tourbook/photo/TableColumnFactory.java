@@ -25,6 +25,23 @@ import org.eclipse.swt.SWT;
 
 public abstract class TableColumnFactory {
 
+	public static final TableColumnFactory PHOTO_FILE_DATE_TIME = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final int pixelWidth = pixelConverter.convertWidthInCharsToPixels(19);
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "photoDateTime", SWT.LEAD); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_Photo_DateTime);
+			colDef.setColumnHeader(Messages.ColumnFactory_Photo_DateTime_Header);
+			colDef.setDefaultColumnWidth(pixelWidth);
+			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
+			
+			return colDef;
+		};
+	};
+
 	public static final TableColumnFactory PHOTO_FILE_NAME = new TableColumnFactory() {
 		
 		@Override
@@ -42,7 +59,22 @@ public abstract class TableColumnFactory {
 		};
 	};
 	
-
+	public static final TableColumnFactory PHOTO_FILE_OTHER_TAGS = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final int pixelWidth = pixelConverter.convertWidthInCharsToPixels(50);
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "photoOtherTags", SWT.LEAD); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_Photo_OtherTags);
+			colDef.setColumnHeader(Messages.ColumnFactory_Photo_OtherTags);
+			colDef.setDefaultColumnWidth(pixelWidth);
+			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
+			
+			return colDef;
+		};
+	};
 
 	/**
 	 * @param columnManager
