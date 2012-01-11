@@ -1596,6 +1596,8 @@ public class TourChart extends Chart {
 			_tourData = null;
 			_tourChartConfig = null;
 
+			_valuePointToolTip.setTourData(null);
+
 			if (_actionProxies != null) {
 
 				for (final TCActionProxy actionProxy : _actionProxies.values()) {

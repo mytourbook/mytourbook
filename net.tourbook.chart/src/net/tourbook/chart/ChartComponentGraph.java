@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1631,7 +1631,7 @@ public class ChartComponentGraph extends Canvas {
 		if (valuePointToolTip != null) {
 
 			if (_hoveredLineValueIndex == -1) {
-				valuePointToolTip.hide();
+//				valuePointToolTip.hide();
 			} else {
 
 				final Point hoveredLinePosition = getAndCheckHoveredLinePosition();
@@ -5526,7 +5526,7 @@ public class ChartComponentGraph extends Canvas {
 		} else {
 
 			if (valuePointToolTip != null) {
-				valuePointToolTip.hide();
+//				valuePointToolTip.hide();
 			}
 		}
 
