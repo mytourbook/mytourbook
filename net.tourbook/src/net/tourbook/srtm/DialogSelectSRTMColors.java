@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.ui.ImageCanvas;
 import net.tourbook.util.UI;
 
 import org.eclipse.jface.dialogs.IDialogConstants;

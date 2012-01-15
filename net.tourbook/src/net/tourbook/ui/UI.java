@@ -167,15 +167,16 @@ public class UI {
 
 	public static final String								SYMBOL_AVERAGE					= "\u00f8";								//$NON-NLS-1$
 	public static final String								SYMBOL_AVERAGE_WITH_SPACE		= "\u00f8 ";								//$NON-NLS-1$
+	public static final String								SYMBOL_DASH						= "\u2212";								//$NON-NLS-1$
 	public static final String								SYMBOL_DIFFERENCE				= "\u0394";								//$NON-NLS-1$
 	public static final String								SYMBOL_DIFFERENCE_WITH_SPACE	= "\u0394 ";								//$NON-NLS-1$
-	public static final String								SYMBOL_TAU						= "\u03c4";								//$NON-NLS-1$
-	public static final String								SYMBOL_SUM_WITH_SPACE			= "\u2211 ";								//$NON-NLS-1$
 	public static final String								SYMBOL_DOUBLE_HORIZONTAL		= "\u2550";								//$NON-NLS-1$
 	public static final String								SYMBOL_DOUBLE_VERTICAL			= "\u2551";								//$NON-NLS-1$
-	public static final String								SYMBOL_DASH						= "\u2212";								//$NON-NLS-1$
+	public static final String								SYMBOL_DEGREE					= "\u00B0";								//$NON-NLS-1$
 	public static final String								SYMBOL_ELLIPSIS					= "\u2026";								//$NON-NLS-1$
 	public static final String								SYMBOL_INFINITY					= "\u221E";								//$NON-NLS-1$
+	public static final String								SYMBOL_SUM_WITH_SPACE			= "\u2211 ";								//$NON-NLS-1$
+	public static final String								SYMBOL_TAU						= "\u03c4";								//$NON-NLS-1$
 
 	public static final String								SYMBOL_COLON					= ":";										//$NON-NLS-1$
 	public static final String								SYMBOL_EQUAL					= "=";										//$NON-NLS-1$
@@ -1022,6 +1023,53 @@ public class UI {
 		}
 
 		sash.setWeights(newWeights);
+	}
+
+	public static ImageData rotate(final ImageData srcData, final int direction) {
+
+		final int bytesPerPixel = srcData.bytesPerLine / srcData.width;
+		final int destBytesPerLine = (direction == SWT.DOWN) ? //
+				srcData.width * bytesPerPixel
+				: srcData.height * bytesPerPixel;
+
+		final byte[] newData = new byte[srcData.data.length];
+		int width = 0, height = 0;
+
+		for (int srcY = 0; srcY < srcData.height; srcY++) {
+			for (int srcX = 0; srcX < srcData.width; srcX++) {
+
+				int destX = 0, destY = 0, destIndex = 0, srcIndex = 0;
+
+				switch (direction) {
+				case SWT.LEFT: // left 90 degrees
+					destX = srcY;
+					destY = srcData.width - srcX - 1;
+					width = srcData.height;
+					height = srcData.width;
+					break;
+				case SWT.RIGHT: // right 90 degrees
+					destX = srcData.height - srcY - 1;
+					destY = srcX;
+					width = srcData.height;
+					height = srcData.width;
+					break;
+				case SWT.DOWN: // 180 degrees
+					destX = srcData.width - srcX - 1;
+					destY = srcData.height - srcY - 1;
+					width = srcData.width;
+					height = srcData.height;
+					break;
+				}
+
+				destIndex = (destY * destBytesPerLine) + (destX * bytesPerPixel);
+				srcIndex = (srcY * srcData.bytesPerLine) + (srcX * bytesPerPixel);
+
+				System.arraycopy(srcData.data, srcIndex, newData, destIndex, bytesPerPixel);
+			}
+		}
+
+		// destBytesPerLine is used as scanlinePad to ensure that no padding is required
+		return new ImageData(width, height, srcData.depth, srcData.palette, destBytesPerLine, newData);
 	}
 
 	/**

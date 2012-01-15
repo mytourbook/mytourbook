@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -720,6 +720,41 @@ public class Util {
 			}
 
 			return page.showView(viewId, null, IWorkbenchPage.VIEW_ACTIVATE);
+
+		} catch (final PartInitException e) {
+			StatusUtil.showStatus(e);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Open view and do not activate it
+	 * 
+	 * @param viewId
+	 * @return
+	 * @throws PartInitException
+	 */
+	public static IViewPart showViewNotActive(final String viewId) {
+
+		try {
+
+			final IWorkbench wb = PlatformUI.getWorkbench();
+			if (wb == null) {
+				return null;
+			}
+
+			final IWorkbenchWindow wbWin = wb.getActiveWorkbenchWindow();
+			if (wbWin == null) {
+				return null;
+			}
+
+			final IWorkbenchPage page = wbWin.getActivePage();
+			if (page == null) {
+				return null;
+			}
+
+			return page.showView(viewId, null, IWorkbenchPage.VIEW_VISIBLE);
 
 		} catch (final PartInitException e) {
 			StatusUtil.showStatus(e);

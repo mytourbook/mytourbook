@@ -15,29 +15,11 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
-import java.io.File;
+public enum ImageLoadingState {
 
-import org.joda.time.DateTime;
+	LOADING_IS_NOT_YET_CHECKED,
 
-public class PhotoFile {
+	IMAGE_HAS_LOADING_ERROR,
 
-	File		photoFile;
-	String		fileName;
-
-	DateTime	dateTime;
-
-	int			width			= -1;
-	int			length			= -1;
-
-	double		latitude		= Double.MIN_VALUE;
-	double		longitude		= Double.MIN_VALUE;
-
-	String		gpsAreaInfo;
-	double		imageDirection	= Double.MIN_VALUE;
-
-	public PhotoFile(final File file) {
-		photoFile = file;
-		fileName = file.getName();
-	}
-
+	IMAGE_IS_AVAILABLE
 }

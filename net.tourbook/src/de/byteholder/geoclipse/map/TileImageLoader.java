@@ -164,7 +164,7 @@ public class TileImageLoader implements Runnable {
 										e.getMessage());
 
 								// this is hidden because it can happen very often
-								// StatusUtil.log(loadingError, e);
+								// StatusUtil.log(IMAGE_HAS_LOADING_ERROR, e);
 								throw e;
 
 							} catch (final UnknownHostException e) {
@@ -175,7 +175,7 @@ public class TileImageLoader implements Runnable {
 										e.getMessage());
 
 								// this is hidden because it can happen very often
-								// StatusUtil.log(loadingError, e);
+								// StatusUtil.log(IMAGE_HAS_LOADING_ERROR, e);
 								throw e;
 
 							} catch (final Exception e) {
@@ -186,7 +186,7 @@ public class TileImageLoader implements Runnable {
 										e.getMessage());
 
 								// this is hidden because it can happen very often
-								// StatusUtil.log(loadingError, e);
+								// StatusUtil.log(IMAGE_HAS_LOADING_ERROR, e);
 								throw e;
 							}
 						}

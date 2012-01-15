@@ -42,6 +42,7 @@ import java.util.regex.Pattern;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.mapping.WayPointToolTipProvider;
+import net.tourbook.photo.Photo;
 import net.tourbook.ui.IInfoToolTipProvider;
 import net.tourbook.ui.IMapToolTipProvider;
 import net.tourbook.util.HoveredAreaContext;
@@ -230,7 +231,7 @@ public class Map extends Canvas {
 //
 		;
 	}
- 
+
 	/**
 	 * The zoom level. Normally a value between around 0 and 20.
 	 */
@@ -423,6 +424,10 @@ public class Map extends Canvas {
 	private PoiToolTip							_poiTT;
 	private final int							_poiTTOffsetY								= 5;
 
+	private TourToolTip							_tourToolTip;
+
+//	private PhotoToolTip						_photoToolTip;
+
 	/**
 	 * when <code>true</code> the loading... image is not displayed
 	 */
@@ -471,8 +476,6 @@ public class Map extends Canvas {
 	private boolean								_isContextMenuEnabled						= true;
 
 	private DropTarget							_dropTarget;
-
-	private TourToolTip							_tourToolTip;
 
 	private boolean								_isRedrawEnabled							= true;
 
@@ -765,7 +768,7 @@ public class Map extends Canvas {
 	/**
 	 * Adds a map overlay. This is a Painter which will paint on top of the map. It can be used to
 	 * draw waypoints, lines, or static overlays like text messages.
-	 *
+	 * 
 	 * @param overlay
 	 *            the map overlay to use
 	 * @see org.jdesktop.swingx.painters.Painter
@@ -785,7 +788,7 @@ public class Map extends Canvas {
 
 	/**
 	 * Checks if an image can be reused, this is true if the image exists and has the same size
-	 *
+	 * 
 	 * @param newWidth
 	 * @param newHeight
 	 * @return
@@ -872,7 +875,7 @@ public class Map extends Canvas {
 
 	/**
 	 * Creates a new image, old image is disposed
-	 *
+	 * 
 	 * @param display
 	 * @param image
 	 *            image which will be disposed if the image is not null
@@ -1036,7 +1039,7 @@ public class Map extends Canvas {
 	/**
 	 * Gets the current address location of the map. This property does not change when the user
 	 * pans the map. This property is bound.
-	 *
+	 * 
 	 * @return the current map location (address)
 	 */
 	public GeoPosition getAddressLocation() {
@@ -1057,7 +1060,7 @@ public class Map extends Canvas {
 	/**
 	 * A property indicating the center position of the map, or <code>null</code> when a tile
 	 * factory is not set
-	 *
+	 * 
 	 * @return Returns the current center position of the map in latitude/longitude
 	 */
 	public GeoPosition getGeoCenter() {
@@ -1085,7 +1088,7 @@ public class Map extends Canvas {
 
 	/**
 	 * Get the current map provider
-	 *
+	 * 
 	 * @return Returns the current map provider
 	 */
 	public MP getMapProvider() {
@@ -1154,7 +1157,7 @@ public class Map extends Canvas {
 	 * Returns the bounds of the viewport in pixels. This can be used to transform points into the
 	 * world bitmap coordinate space. The viewport is the part of the map, that you can currently
 	 * see on the screen.
-	 *
+	 * 
 	 * @return Returns the bounds in <em>pixels</em> of the "view" of this map
 	 */
 	private Rectangle getWorldPixelTopLeftViewport(final Point2D worldPixelMapCenter) {
@@ -1185,7 +1188,7 @@ public class Map extends Canvas {
 
 	/**
 	 * Gets the current zoom level, or <code>null</code> when a tile factory is not set
-	 *
+	 * 
 	 * @return Returns the current zoom level of the map
 	 */
 	public int getZoom() {
@@ -1224,7 +1227,7 @@ public class Map extends Canvas {
 	/**
 	 * Checks if a part within the parted image is modified. This method is optimized to search
 	 * first all 4 borders and then the whole image.
-	 *
+	 * 
 	 * @param imageData9Parts
 	 * @param srcXStart
 	 * @param srcYStart
@@ -1350,7 +1353,7 @@ public class Map extends Canvas {
 	 * {@link #setMapCenterInWorldPixel(Point2D)}
 	 * <p>
 	 * In version before 10.6 the map was repeated on the x axis.
-	 *
+	 * 
 	 * @param tilePosX
 	 * @param tilePosY
 	 * @return
@@ -1379,7 +1382,7 @@ public class Map extends Canvas {
 
 	/**
 	 * onDispose is called when the map is disposed
-	 *
+	 * 
 	 * @param e
 	 */
 	private void onDispose(final DisposeEvent e) {
@@ -1881,7 +1884,7 @@ public class Map extends Canvas {
 
 	/**
 	 * Draw all visible tiles into the map viewport
-	 *
+	 * 
 	 * @param gc
 	 */
 	private void paintMap10Tiles(final GC gc) {
@@ -1941,7 +1944,7 @@ public class Map extends Canvas {
 
 	/**
 	 * Paint scale for the map center
-	 *
+	 * 
 	 * @param gc
 	 */
 	private void paintMap30Scale(final GC gc) {
@@ -2362,7 +2365,7 @@ public class Map extends Canvas {
 	 * Paints the overlay into the overlay image which is bigger than the tile image so that the
 	 * drawings are not clipped at the tile border. The overlay image is afterwards splitted into
 	 * parts which are drawn into the tile images
-	 *
+	 * 
 	 * @param tile
 	 */
 	private void paintOverlay30PaintTile(final Tile tile) {
@@ -2424,17 +2427,17 @@ public class Map extends Canvas {
 
 	/**
 	 * Splits the overlay tile image into 3*3 parts, the center image is the tile overlay image
-	 *
+	 * 
 	 * <pre>
-	 *
+	 * 
 	 * y,x
-	 *
+	 * 
 	 * 0,0		0,1		0,2
 	 * 1,0		1,1		1,2
 	 * 2,0		2,1		2,2
-	 *
+	 * 
 	 * </pre>
-	 *
+	 * 
 	 * @param tile
 	 * @param imageData9Parts
 	 */
@@ -2604,7 +2607,7 @@ public class Map extends Canvas {
 
 	/**
 	 * Paint the tour in basic mode
-	 *
+	 * 
 	 * @param tile
 	 */
 	private void paintOverlay40PaintTile(final Tile tile) {
@@ -2744,7 +2747,7 @@ public class Map extends Canvas {
 
 	/**
 	 * Draw overlay image when it's available or request the image
-	 *
+	 * 
 	 * @param gc
 	 * @param tile
 	 * @param devTileViewport
@@ -3034,7 +3037,7 @@ public class Map extends Canvas {
 
 	/**
 	 * !!! Recursive !!!
-	 *
+	 * 
 	 * @param tile
 	 * @param sb
 	 */
@@ -3449,7 +3452,7 @@ public class Map extends Canvas {
 
 	/**
 	 * Set tile in the overlay painting queue
-	 *
+	 * 
 	 * @param tile
 	 */
 	private void queueOverlayPainting(final Tile tile) {
@@ -3483,7 +3486,7 @@ public class Map extends Canvas {
 	/**
 	 * Re-centers the map to have the current address location be at the center of the map,
 	 * accounting for the map's width and height.
-	 *
+	 * 
 	 * @see getAddressLocation
 	 */
 	public void recenterToAddressLocation() {
@@ -3499,7 +3502,7 @@ public class Map extends Canvas {
 
 	/**
 	 * Removes a map overlay.
-	 *
+	 * 
 	 * @return the current map overlay
 	 */
 	public void removeOverlayPainter(final MapPainter overlay) {
@@ -3523,7 +3526,7 @@ public class Map extends Canvas {
 
 	/**
 	 * Set map dimming level for the current map factory, this will dimm the map images
-	 *
+	 * 
 	 * @param mapDimLevel
 	 * @param dimColor
 	 */
@@ -3539,7 +3542,7 @@ public class Map extends Canvas {
 
 	/**
 	 * Set the legend for the map, the legend image will be disposed when the map is disposed,
-	 *
+	 * 
 	 * @param legend
 	 *            Legend for the map or <code>null</code> to disable the legend
 	 */
@@ -3557,7 +3560,7 @@ public class Map extends Canvas {
 	 * When set to <code>false</code>, a loading image is displayed when the tile image is not in
 	 * the cache. When set to <code>true</code> a loading... image is not displayed which can
 	 * confuse the user because the map is not displaying the current state.
-	 *
+	 * 
 	 * @param isLiveView
 	 */
 	public void setLiveView(final boolean isLiveView) {
@@ -3566,7 +3569,7 @@ public class Map extends Canvas {
 
 	/**
 	 * Set the center of the map to a geo position (with lat/long)
-	 *
+	 * 
 	 * @param geoPosition
 	 *            Center position in lat/lon
 	 */
@@ -3651,7 +3654,7 @@ public class Map extends Canvas {
 	/**
 	 * Sets the center of the map {@link #_worldPixelMapCenter} in world pixel coordinates. The
 	 * method {@link #isTileOnMap(int, int)}
-	 *
+	 * 
 	 * @param newWorldPixelCenter
 	 */
 	private void setMapCenterInWorldPixel(final Point2D newWorldPixelCenter) {
@@ -3683,7 +3686,7 @@ public class Map extends Canvas {
 
 	/**
 	 * Set map context menu provider
-	 *
+	 * 
 	 * @param mapContextProvider
 	 */
 	public void setMapContextProvider(final IMapContextProvider mapContextProvider) {
@@ -3692,7 +3695,7 @@ public class Map extends Canvas {
 
 	/**
 	 * Sets the map provider for the map and redraws the map
-	 *
+	 * 
 	 * @param mp
 	 *            new map provider
 	 */
@@ -3735,7 +3738,7 @@ public class Map extends Canvas {
 	/**
 	 * Resets current tile factory and sets a new one. The new tile factory is displayed at the same
 	 * position as the previous tile factory
-	 *
+	 * 
 	 * @param mp
 	 */
 	public synchronized void setMapProviderWithReset(final MP mp) {
@@ -3757,11 +3760,21 @@ public class Map extends Canvas {
 
 	/**
 	 * Set a key to uniquely identify overlays which is used to cache the overlays
-	 *
+	 * 
 	 * @param key
 	 */
 	public void setOverlayKey(final String key) {
 		_overlayKey = key;
+	}
+
+	public void setPhoto(final Photo photo) {
+
+		final GeoPosition geoPosition = photo.getGeoPosition();
+		if (geoPosition == null) {
+			return;
+		}
+
+		setMapCenter(geoPosition);
 	}
 
 	public void setPoi(final GeoPosition poiGeoPosition, final int zoomLevel, final String poiText) {
@@ -3841,7 +3854,7 @@ public class Map extends Canvas {
 	/**
 	 * Sets the visibility of the poi tooltip. Poi tooltip is visible when the tooltip is available
 	 * and the poi image is withing the map view port
-	 *
+	 * 
 	 * @param isVisible
 	 *            <code>false</code> will hide the tooltip
 	 */
@@ -3888,7 +3901,7 @@ public class Map extends Canvas {
 
 	/**
 	 * Set if the tile borders should be drawn. Mainly used for debugging.
-	 *
+	 * 
 	 * @param isShowDebugInfo
 	 *            new value of this drawTileBorders
 	 * @param isShowTileBorder
@@ -3901,7 +3914,7 @@ public class Map extends Canvas {
 
 	/**
 	 * Legend will be drawn into the map when the visibility is <code>true</code>
-	 *
+	 * 
 	 * @param visibility
 	 */
 	public void setShowLegend(final boolean visibility) {
@@ -3911,7 +3924,7 @@ public class Map extends Canvas {
 	/**
 	 * set status if overlays are painted, a {@link #queueMapRedraw()} must be called to update the
 	 * map
-	 *
+	 * 
 	 * @param showOverlays
 	 *            set <code>true</code> to see the overlays, <code>false</code> to hide the overlays
 	 */
@@ -3958,7 +3971,7 @@ public class Map extends Canvas {
 	 * checked if the map provider supports the requested zoom level.
 	 * <p>
 	 * The map is initialize when this is not yet done be setting all internal data !!!
-	 *
+	 * 
 	 * @param newZoomLevel
 	 *            zoom level for the map, it is adjusted to the min/max zoom levels
 	 */
@@ -4024,6 +4037,13 @@ public class Map extends Canvas {
 		fireZoomEvent(adjustedZoomLevel);
 	}
 
+//	/** Determine the space between the first two fingers */
+//	private float touchDistance(final Touch touch1, final Touch touch2) {
+//		final float x = touch1.positionX - touch2.positionX;
+//		final float y = touch1.positionY - touch2.positionY;
+//		return (float) Math.sqrt(x * x + y * y);
+//	}
+
 	private void showPoi() {
 
 		if (_poiTT != null && _poiTT.isVisible()) {
@@ -4041,13 +4061,6 @@ public class Map extends Canvas {
 				_poiImageBounds.height,
 				_poiTTOffsetY);
 	}
-
-//	/** Determine the space between the first two fingers */
-//	private float touchDistance(final Touch touch1, final Touch touch2) {
-//		final float x = touch1.positionX - touch2.positionX;
-//		final float y = touch1.positionY - touch2.positionY;
-//		return (float) Math.sqrt(x * x + y * y);
-//	}
 
 	private void updateOfflineAreaEndPosition(final MouseEvent mouseEvent) {
 
@@ -4160,7 +4173,7 @@ public class Map extends Canvas {
 	/**
 	 * Set hovered area context for the current mouse position or <code>null</code> when a tour
 	 * hovered area (e.g. way point) is not hovered.
-	 *
+	 * 
 	 * @param isForceRedraw
 	 */
 	private void updateTourToolTipHoveredArea() {
@@ -4241,7 +4254,7 @@ public class Map extends Canvas {
 	/**
 	 * Sets all viewport data which are necessary to draw the map tiles in
 	 * {@link #paintMap10Tiles(GC)}. Some values are cached to optimize performance.
-	 *
+	 * 
 	 * @return
 	 */
 	private void updateViewPortData() {

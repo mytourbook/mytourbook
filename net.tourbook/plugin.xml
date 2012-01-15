@@ -492,6 +492,12 @@
             	icon="icons/photo-directory.png"
             	label="%View_Name_PhotoDirectory"
             	mnemonic="%View_Name_PhotoDirectory_Mnemonic"/>
+            
+         <command
+            	commandId="net.tourbook.photo.photoImageView"
+            	icon="icons/photo-image.png"
+            	label="%View_Name_PhotoImage"
+            	mnemonic="%View_Name_PhotoImage_Mnemonic"/>
 
          <separator
             name="net.tourbook.separator.TourProperties"
@@ -787,6 +793,11 @@
             id="net.tourbook.photo.photoDirectoryView"
             name="%View_Name_PhotoDirectory"
             defaultHandler="net.tourbook.photo.ActionHandlerOpenViewPhotoDirectory"
+            />
+      <command
+            id="net.tourbook.photo.photoImageView"
+            name="%View_Name_PhotoImage"
+            defaultHandler="net.tourbook.photo.ActionHandlerOpenViewPhotoImage"
             />
 
       <command
@@ -1091,12 +1102,20 @@
 	            id="net.tourbook.views.StatisticView"
 	            name="%view_name_Statistics">
 	      </view>
+	      
 	      <view
 	            category="net.tourbook.category.tourList"
 	            class="net.tourbook.photo.PhotoDirectoryView"
 	            icon="icons/photo-directory.png"
 	            id="net.tourbook.photo.photoDirectoryView"
 	            name="%View_Name_PhotoDirectory">
+	      </view>
+	      <view
+	            category="net.tourbook.category.tourList"
+	            class="net.tourbook.photo.PhotoImageView"
+	            icon="icons/photo-image.png"
+	            id="net.tourbook.photo.photoImageView"
+	            name="%View_Name_PhotoImage">
 	      </view>
 
       <category

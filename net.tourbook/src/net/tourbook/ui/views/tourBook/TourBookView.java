@@ -1734,10 +1734,6 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		enableActions();
 	}
 
-	void firePostSelection(final ISelection selection) {
-		_postSelectionProvider.setSelection(selection);
-	}
-
 	@Override
 	public ColumnManager getColumnManager() {
 		return _columnManager;

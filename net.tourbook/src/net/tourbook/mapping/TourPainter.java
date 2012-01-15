@@ -27,6 +27,7 @@ import net.tourbook.chart.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourWayPoint;
+import net.tourbook.photo.Photo;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceMap;
 import net.tourbook.ui.ColorCacheInt;
@@ -531,7 +532,9 @@ public class TourPainter extends MapPainter {
 	protected boolean doPaint(final GC gc, final Map map, final Tile tile, final int parts) {
 
 		final ArrayList<TourData> tourDataList = _tourPaintConfig.getTourData();
-		if (tourDataList == null) {
+		final ArrayList<Photo> photoList = _tourPaintConfig.getPhotos();
+
+		if (tourDataList.size() == 0 && photoList.size() == 0) {
 			return false;
 		}
 
@@ -578,35 +581,39 @@ public class TourPainter extends MapPainter {
 //			 */
 
 			// status if a marker is drawn
-			boolean isMarkerInTile = false;
+			int staticMarkerCounter = 0;
 
 			// draw start/end marker
 			if (_tourPaintConfig.isShowStartEndInMap) {
 
 				// draw end marker first
-				isMarkerInTile = drawStaticMarker(
+				if (drawStaticMarker(
 						gc,
 						map,
 						tile,
 						latitudeSerie[latitudeSerie.length - 1],
 						longitudeSerie[longitudeSerie.length - 1],
 						_tourEndMarker,
-						parts);
+						parts)) {
 
-				isTourInTile = isTourInTile || isMarkerInTile;
+					staticMarkerCounter++;
+				}
 
 				// draw start marker above the end marker
-				isMarkerInTile = drawStaticMarker(//
+				if (drawStaticMarker(//
 						gc,
 						map,
 						tile,
 						latitudeSerie[0],
 						longitudeSerie[0],
 						_tourStartMarker,
-						parts);
+						parts)) {
+
+					staticMarkerCounter++;
+				}
 			}
 
-			isTourInTile = isTourInTile || isMarkerInTile;
+			isTourInTile = isTourInTile || staticMarkerCounter > 0;
 		}
 
 		if (_tourPaintConfig.isShowTourMarker || _tourPaintConfig.isShowWayPoints) {
@@ -636,8 +643,7 @@ public class TourPainter extends MapPainter {
 
 						// draw tour marker
 
-						boolean isTourMarkerInTile = false;
-						boolean isTourMarkerInTile2 = false;
+						int markerCounter = 0;
 
 						for (final TourMarker tourMarker : sortedMarkers) {
 
@@ -649,19 +655,19 @@ public class TourPainter extends MapPainter {
 							final int serieIndex = tourMarker.getSerieIndex();
 
 							// draw tour marker
-							isTourMarkerInTile2 = drawTourMarker(
+							if (drawTourMarker(
 									gc,
 									map,
 									tile,
 									latitudeSerie[serieIndex],
 									longitudeSerie[serieIndex],
 									tourMarker,
-									parts);
-
-							isTourMarkerInTile = isTourMarkerInTile || isTourMarkerInTile2;
+									parts)) {
+								markerCounter++;
+							}
 						}
 
-						isTourInTile = isTourInTile || isTourMarkerInTile;
+						isTourInTile = isTourInTile || markerCounter > 0;
 					}
 				}
 
@@ -692,25 +698,109 @@ public class TourPainter extends MapPainter {
 						}
 
 						// draw tour way points
-						boolean isTourWayPointInTile = false;
-						boolean isTourWayPointInTile2 = false;
 
+						int wayPointCounter = 0;
 						for (final TourWayPoint tourWayPoint : wayPoints) {
 
 							final Point twpWorldPixel = allWayPointWorldPixel.get(tourWayPoint.hashCode());
 
-							isTourWayPointInTile2 = drawTourWayPoint(gc, map, tile, tourWayPoint, twpWorldPixel, parts);
-
-							isTourWayPointInTile = isTourWayPointInTile || isTourWayPointInTile2;
+							if (drawTourWayPoint(gc, map, tile, tourWayPoint, twpWorldPixel, parts)) {
+								wayPointCounter++;
+							}
 						}
 
-						isTourInTile = isTourInTile || isTourWayPointInTile;
+						isTourInTile = isTourInTile || wayPointCounter > 0;
 					}
 				}
 			}
 		}
 
+		if (_tourPaintConfig.isShowPhoto && photoList.size() > 0) {
+
+			/*
+			 * world positions are cached to optimize performance
+			 */
+			final MP mp = map.getMapProvider();
+			final String projectionId = mp.getProjection().getId();
+			final int mapZoomLevel = map.getZoom();
+
+			int photoCounter = 0;
+
+			for (final Photo photo : photoList) {
+
+				if (photo.getGeoPosition() == null) {
+					continue;
+				}
+
+				final Point photoWorldPixel = photo.getWorldPosition(mp, projectionId, mapZoomLevel);
+
+				if (drawPhoto(gc, map, tile, photo, photoWorldPixel, parts)) {
+					photoCounter++;
+				}
+			}
+
+			isTourInTile = isTourInTile || photoCounter > 0;
+		}
+
 		return isTourInTile;
+	}
+
+	private boolean drawPhoto(	final GC gc,
+								final Map map,
+								final Tile tile,
+								final Photo photo,
+								final Point photoWorldPixel,
+								final int parts) {
+
+		final MP mp = map.getMapProvider();
+		final int zoomLevel = map.getZoom();
+		final int tileSize = mp.getTileSize();
+		final int devPartOffset = ((parts - 1) / 2) * tileSize;
+
+		// get world viewport for the current tile
+		final int tileWorldPixelX = tile.getX() * tileSize;
+		final int tilwWorldPixelY = tile.getY() * tileSize;
+
+		// convert world position into device position
+		final int devWayPointX = photoWorldPixel.x - tileWorldPixelX;
+		final int devWayPointY = photoWorldPixel.y - tilwWorldPixelY;
+
+		final boolean isBoundsInTile = isBoundsInTile(_twpImageBounds, devWayPointX, devWayPointY, tileSize);
+
+		if (isBoundsInTile) {
+
+			int devX = devWayPointX - _twpImageBounds.width / 2;
+			int devY = devWayPointY - _twpImageBounds.height;
+
+			devX += devPartOffset;
+			devY += devPartOffset;
+
+			gc.drawImage(_twpImage, devX, devY);
+
+//			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//			gc.setLineWidth(1);
+//			gc.drawRectangle(devX, devY, _twpImageBounds.width, _twpImageBounds.height);
+//
+			tile.addTourWayPointBounds(//
+					twp,
+					new Rectangle(
+							devX - devPartOffset,
+							devY - devPartOffset,
+							_twpImageBounds.width,
+							_twpImageBounds.height),
+					zoomLevel,
+					parts);
+
+			/*
+			 * check if the way point paints into a neighbour tile
+			 */
+			if (parts > 1) {
+
+			}
+		}
+
+		return isBoundsInTile;
+		return false;
 	}
 
 	private boolean drawStaticMarker(	final GC gc,
@@ -1001,6 +1091,16 @@ public class TourPainter extends MapPainter {
 		}
 	}
 
+	/**
+	 * @param gc
+	 * @param map
+	 * @param tile
+	 * @param latitude
+	 * @param longitude
+	 * @param tourMarker
+	 * @param parts
+	 * @return Returns <code>true</code> when marker has been painted
+	 */
 	private boolean drawTourMarker(	final GC gc,
 									final Map map,
 									final Tile tile,
@@ -1148,6 +1248,15 @@ public class TourPainter extends MapPainter {
 		return markerImage;
 	}
 
+	/**
+	 * @param gc
+	 * @param map
+	 * @param tile
+	 * @param twp
+	 * @param twpWorldPixel
+	 * @param parts
+	 * @return Returns <code>true</code> when way point has been painted
+	 */
 	private boolean drawTourWayPoint(	final GC gc,
 										final Map map,
 										final Tile tile,

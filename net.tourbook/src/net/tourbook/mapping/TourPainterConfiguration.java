@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Set;
 
 import net.tourbook.data.TourData;
+import net.tourbook.photo.Photo;
 import de.byteholder.gpx.GeoPosition;
 
 /**
@@ -29,6 +30,7 @@ public class TourPainterConfiguration {
 	private static TourPainterConfiguration	_instance;
 
 	private final ArrayList<TourData>		_tourDataList	= new ArrayList<TourData>();
+	private ArrayList<Photo>				_photoList		= new ArrayList<Photo>();
 
 	/**
 	 * contains the upper left and lower right position for a tour
@@ -42,6 +44,7 @@ public class TourPainterConfiguration {
 	boolean									isShowStartEndInMap;
 	boolean									isShowTourMarker;
 	boolean									isShowWayPoints;
+	boolean									isShowPhoto;
 
 	private TourPainterConfiguration() {}
 
@@ -56,6 +59,10 @@ public class TourPainterConfiguration {
 
 	public ILegendProvider getLegendProvider() {
 		return _legendProvider;
+	}
+
+	public ArrayList<Photo> getPhotos() {
+		return _photoList;
 	}
 
 	public int getSynchTourZoomLevel() {

@@ -743,6 +743,8 @@ public class Messages extends NLS {
 
 	public static String		NT001_DialogExtractTour_InvalidTourData;
 
+	public static String	Photo_View_Label_AnImageIsNotSelected;
+
 	public static String		Pref_App_Label_TourEditorIsModified;
 
 	public static String		Pref_Appearance_Button_ResetAllToggleDialogs;

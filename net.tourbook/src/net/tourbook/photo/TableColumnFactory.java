@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
+import net.tourbook.ui.UI;
 import net.tourbook.util.ColumnDefinition;
 import net.tourbook.util.ColumnManager;
 import net.tourbook.util.TableColumnDefinition;
@@ -25,16 +26,90 @@ import org.eclipse.swt.SWT;
 
 public abstract class TableColumnFactory {
 
-	public static final TableColumnFactory PHOTO_FILE_DATE_TIME = new TableColumnFactory() {
+	public static final TableColumnFactory PHOTO_FILE_ALTITUDE = new TableColumnFactory() {
 		
 		@Override
 		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
-			final int pixelWidth = pixelConverter.convertWidthInCharsToPixels(19);
-			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "photoDateTime", SWT.LEAD); //$NON-NLS-1$
+			final int pixelWidth = pixelConverter.convertWidthInCharsToPixels(8);
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "photoAltitude", SWT.TRAIL); //$NON-NLS-1$
 			
-			colDef.setColumnLabel(Messages.ColumnFactory_Photo_DateTime);
-			colDef.setColumnHeader(Messages.ColumnFactory_Photo_DateTime_Header);
+			colDef.setColumnLabel(Messages.ColumnFactory_Photo_Altitude);
+			colDef.setColumnHeader(UI.UNIT_LABEL_ALTITUDE);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_Photo_Altitude_Tooltip);
+			colDef.setColumnUnit(UI.UNIT_LABEL_ALTITUDE);
+			colDef.setDefaultColumnWidth(pixelWidth);
+			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
+			
+			return colDef;
+		};
+	};
+	
+	public static final TableColumnFactory PHOTO_FILE_DATE = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final int pixelWidth = pixelConverter.convertWidthInCharsToPixels(10);
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "photoDate", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_Photo_Date);
+			colDef.setColumnHeader(Messages.ColumnFactory_Photo_Date);
+			colDef.setDefaultColumnWidth(pixelWidth);
+			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
+			
+			return colDef;
+		};
+	};
+	
+	public static final TableColumnFactory PHOTO_FILE_LOCATION = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final int pixelWidth = pixelConverter.convertWidthInCharsToPixels(40);
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "photoFileLocation", SWT.LEAD); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_Photo_Location);
+			colDef.setColumnHeader(Messages.ColumnFactory_Photo_Location);
+			colDef.setDefaultColumnWidth(pixelWidth);
+			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
+			
+			return colDef;
+		};
+	};
+	
+	public static final TableColumnFactory PHOTO_FILE_IMAGE_DIRECTION_DEGREE = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final int pixelWidth = pixelConverter.convertWidthInCharsToPixels(6);
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "photoImageDirectionDegree", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_Photo_ImageDirectionDegree_Label);
+			colDef.setColumnHeader(Messages.ColumnFactory_Photo_ImageDirectionDegree_Header);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_Photo_ImageDirectionDegree_Tooltip);
+			colDef.setColumnUnit(UI.SYMBOL_DEGREE);
+			colDef.setDefaultColumnWidth(pixelWidth);
+			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
+			
+			return colDef;
+		};
+	};
+	
+	public static final TableColumnFactory PHOTO_FILE_IMAGE_DIRECTION_TEXT = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final int pixelWidth = pixelConverter.convertWidthInCharsToPixels(6);
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "photoImageDirectionText", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_Photo_ImageDirectionText_Label);
+			colDef.setColumnHeader(Messages.ColumnFactory_Photo_ImageDirectionDegree_Header);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_Photo_ImageDirectionText_Tooltip);
+			colDef.setColumnUnit(UI.SYMBOL_DEGREE);
 			colDef.setDefaultColumnWidth(pixelWidth);
 			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
 			
@@ -59,6 +134,25 @@ public abstract class TableColumnFactory {
 		};
 	};
 	
+
+	public static final TableColumnFactory PHOTO_FILE_ORIENTATION = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final int pixelWidth = pixelConverter.convertWidthInCharsToPixels(5);
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "photoOrientation", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_Photo_Orientation);
+			colDef.setColumnHeader(Messages.ColumnFactory_Photo_Orientation_Header);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_Photo_Orientation_Tooltip);
+			colDef.setDefaultColumnWidth(pixelWidth);
+			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
+			
+			return colDef;
+		};
+	};
+
 	public static final TableColumnFactory PHOTO_FILE_OTHER_TAGS = new TableColumnFactory() {
 		
 		@Override
@@ -76,6 +170,40 @@ public abstract class TableColumnFactory {
 		};
 	};
 
+	public static final TableColumnFactory PHOTO_FILE_DIMENSION = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final int pixelWidth = pixelConverter.convertWidthInCharsToPixels(14);
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "photoDimension", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_Photo_Dimension);
+			colDef.setColumnHeader(Messages.ColumnFactory_Photo_Dimension);
+			colDef.setDefaultColumnWidth(pixelWidth);
+			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
+			
+			return colDef;
+		};
+	};
+
+	public static final TableColumnFactory PHOTO_FILE_TIME = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final int pixelWidth = pixelConverter.convertWidthInCharsToPixels(14);
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "photoTime", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_Photo_Time);
+			colDef.setColumnHeader(Messages.ColumnFactory_Photo_Time);
+			colDef.setDefaultColumnWidth(pixelWidth);
+			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
+			
+			return colDef;
+		};
+	};
+	
 	/**
 	 * @param columnManager
 	 * @param pixelConverter

@@ -570,7 +570,7 @@ public abstract class TableColumnFactory {
 			colDef.setColumnLabel(Messages.ColumnFactory_latitude_label);
 			colDef.setColumnHeader(Messages.ColumnFactory_latitude);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_latitude_tooltip);
-			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(14));
 			
 			return colDef;
 		};
@@ -586,7 +586,7 @@ public abstract class TableColumnFactory {
 			colDef.setColumnLabel(Messages.ColumnFactory_longitude_label);
 			colDef.setColumnHeader(Messages.ColumnFactory_longitude);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_longitude_tooltip);
-			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(14));
 			
 			return colDef;
 		};

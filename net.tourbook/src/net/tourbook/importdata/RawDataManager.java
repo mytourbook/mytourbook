@@ -1118,11 +1118,18 @@ public class RawDataManager {
 
 			_lastImportedFileName = sourceFileName;
 
-			final boolean isImported = device.processDeviceData(
-					sourceFileName,
-					_deviceData,
-					_toursInImportView,
-					_newlyImportedTours);
+			boolean isImported;
+			try {
+
+				isImported = device.processDeviceData(
+						sourceFileName,
+						_deviceData,
+						_toursInImportView,
+						_newlyImportedTours);
+
+			} catch (final Exception e) {
+				return false;
+			}
 
 			if (isTourDisplayedInImportView) {
 				_toursInImportView.putAll(_newlyImportedTours);

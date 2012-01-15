@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,15 +13,13 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.mapping;
+package net.tourbook.photo;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.ui.IMapToolTipProvider;
-import net.tourbook.ui.Messages;
-import net.tourbook.ui.UI;
 import net.tourbook.util.HoveredAreaContext;
 import net.tourbook.util.ITourToolTipProvider;
 import net.tourbook.util.TourToolTip;
@@ -44,7 +42,7 @@ import org.eclipse.swt.widgets.Label;
 import de.byteholder.geoclipse.map.Tile;
 import de.byteholder.geoclipse.mapprovider.MP;
 
-public class WayPointToolTipProvider implements ITourToolTipProvider, IMapToolTipProvider {
+public class PhotoToolTipProvider implements ITourToolTipProvider, IMapToolTipProvider {
 
 //	private TourToolTip		_tourToolTip;
 
@@ -52,7 +50,7 @@ public class WayPointToolTipProvider implements ITourToolTipProvider, IMapToolTi
 	private Color				_fgColor;
 	private Font				_boldFont;
 
-	private TourWayPoint		_hoveredWayPoint;
+	private Photo				_photo;
 
 	private final NumberFormat	_nf_1_1	= NumberFormat.getNumberInstance();
 	{
@@ -60,16 +58,16 @@ public class WayPointToolTipProvider implements ITourToolTipProvider, IMapToolTi
 		_nf_1_1.setMaximumFractionDigits(1);
 	}
 
-	public WayPointToolTipProvider() {}
+	public PhotoToolTipProvider() {}
 
 	@Override
 	public void afterHideToolTip() {
-		_hoveredWayPoint = null;
+		_photo = null;
 	}
 
 	public Composite createToolTipContentArea(final Event event, final Composite parent) {
 
-		if (_hoveredWayPoint == null) {
+		if (_photo == null) {
 			// this case should not happen
 			return null;
 		}
@@ -111,59 +109,17 @@ public class WayPointToolTipProvider implements ITourToolTipProvider, IMapToolTi
 				/*
 				 * name
 				 */
-				final String name = _hoveredWayPoint.getName();
+				final String name = Double.toString(_photo.latitude);
 				if (name != null) {
 
 					label = createUILabel(container, name);
 					GridDataFactory.fillDefaults().span(2, 1).indent(0, -5).applyTo(label);
 					label.setFont(_boldFont);
 				}
-
-				/*
-				 * comment/description
-				 */
-				final String description = _hoveredWayPoint.getDescription();
-				if (description != null) {
-					createUITextarea(container, Messages.Tooltip_WayPoint_Label_Description, description, pc);
-				}
-
-				final String comment = _hoveredWayPoint.getComment();
-				if (comment != null) {
-
-					// ignore comment when it has the same content as the description
-
-					if (description == null || (description != null && description.equals(comment) == false)) {
-						createUITextarea(container, Messages.Tooltip_WayPoint_Label_Comment, comment, pc);
-					}
-				}
-
-				createUIItem(container, Messages.Tooltip_WayPoint_Label_Category, _hoveredWayPoint.getCategory());
-				createUIItem(container, Messages.Tooltip_WayPoint_Label_Symbol, _hoveredWayPoint.getSymbol());
-
-				/*
-				 * altitude
-				 */
-				final float wpAltitude = _hoveredWayPoint.getAltitude();
-				if (wpAltitude != Float.MIN_VALUE) {
-
-					final float altitude = wpAltitude / UI.UNIT_VALUE_ALTITUDE;
-
-					createUIItem(container, Messages.Tooltip_WayPoint_Label_Altitude, //
-							_nf_1_1.format(altitude) + UI.SPACE + UI.UNIT_LABEL_ALTITUDE);
-				}
-
 			}
 		}
 
 		return shellContainer;
-	}
-
-	private void createUIItem(final Composite parent, final String label, final String value) {
-
-		if (value != null) {
-			createUILabel(parent, label);
-			createUILabel(parent, value);
-		}
 	}
 
 	private Label createUILabel(final Composite parent, final String labelText) {
@@ -179,28 +135,6 @@ public class WayPointToolTipProvider implements ITourToolTipProvider, IMapToolTi
 		return label;
 	}
 
-	private void createUITextarea(	final Composite parent,
-									final String labelText,
-									final String areaText,
-									final PixelConverter pc) {
-		Label label;
-		final int horizontalHint = areaText.length() > 80 ? pc.convertWidthInCharsToPixels(80) : SWT.DEFAULT;
-
-		label = createUILabel(parent, labelText);
-		GridDataFactory.fillDefaults()//
-				.align(SWT.FILL, SWT.BEGINNING)
-				.applyTo(label);
-
-		label = new Label(parent, SWT.WRAP);
-		GridDataFactory.fillDefaults()//
-				.hint(horizontalHint, SWT.DEFAULT)
-				.applyTo(label);
-
-		label.setForeground(_fgColor);
-		label.setBackground(_bgColor);
-		label.setText(areaText);
-	}
-
 	@Override
 	public HoveredAreaContext getHoveredContext(final int mousePositionX,
 												final int mousePositionY,
@@ -209,7 +143,7 @@ public class WayPointToolTipProvider implements ITourToolTipProvider, IMapToolTi
 												final int mapZoomLevel,
 												final int tilePixelSize,
 												final boolean isTourPaintMethodEnhanced,
-												final Object requestedObject) {
+												final Object requestedTwp) {
 
 		// get mouse world position
 		final int worldPixelMouseX = worldPixelTopLeftViewPort.x + mousePositionX;
@@ -254,7 +188,7 @@ public class WayPointToolTipProvider implements ITourToolTipProvider, IMapToolTi
 
 					final TourWayPoint hoveredTwp = allTileTwp.get(wpIndex);
 
-					if (requestedObject != null && requestedObject != hoveredTwp) {
+					if (requestedTwp != null && requestedTwp != hoveredTwp) {
 						// this is not the requested way point
 						continue;
 					}
@@ -262,7 +196,7 @@ public class WayPointToolTipProvider implements ITourToolTipProvider, IMapToolTi
 					final int devWayPointX = worldPixelWayPointX - worldPixelTopLeftViewPort.x;
 					final int devWayPointY = worldPixelWayPointY - worldPixelTopLeftViewPort.y;
 
-					_hoveredWayPoint = hoveredTwp;
+//					_photo = hoveredTwp;
 
 					return new HoveredAreaContext(
 							this,
@@ -275,7 +209,7 @@ public class WayPointToolTipProvider implements ITourToolTipProvider, IMapToolTi
 			}
 		}
 
-		_hoveredWayPoint = null;
+		_photo = null;
 
 		return null;
 	}

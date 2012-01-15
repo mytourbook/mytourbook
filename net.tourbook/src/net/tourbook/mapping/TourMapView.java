@@ -28,6 +28,8 @@ import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.importdata.RawDataManager;
+import net.tourbook.photo.Photo;
+import net.tourbook.photo.PhotoToolTipProvider;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceMap;
 import net.tourbook.srtm.IPreferences;
@@ -184,8 +186,10 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	 * tool tips
 	 */
 	private TourToolTip								_tourToolTip;
+
 	private TourInfoToolTipProvider					_tourInfoToolTipProvider			= new TourInfoToolTipProvider();
 	private ITourToolTipProvider					_wayPointToolTipProvider			= new WayPointToolTipProvider();
+	private ITourToolTipProvider					_photoToolTipProvider				= new PhotoToolTipProvider();
 
 	private String									_poiName;
 	private GeoPosition								_poiPosition;
@@ -1780,6 +1784,12 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 						compareResultItem.getComparedTourData().getTourId());
 				paintTours20One(tourData, false, true);
 
+			} else if (firstElement instanceof Photo) {
+
+				final Photo photo = (Photo) firstElement;
+
+				_map.setPhoto(photo);
+
 			} else if (firstElement instanceof TourWayPoint) {
 
 				final TourWayPoint wp = (TourWayPoint) firstElement;
@@ -2170,6 +2180,11 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		if (isShowTourInfo) {
 			_tourToolTip.addToolTipProvider(_tourInfoToolTipProvider);
 		}
+
+		/*
+		 * photo
+		 */
+		_tourToolTip.addToolTipProvider(_photoToolTipProvider);
 
 		// checkbox: show scale
 		final boolean isScaleVisible = Util.getStateBoolean(settings, MEMENTO_SHOW_SCALE_IN_MAP, true);

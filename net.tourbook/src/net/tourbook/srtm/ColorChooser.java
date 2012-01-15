@@ -18,6 +18,8 @@
  */
 package net.tourbook.srtm;
 
+import net.tourbook.ui.ImageCanvas;
+
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
