@@ -2705,9 +2705,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			// fill combobox
 			ArrayList<String> arr = TourDatabase.getAllTourTitles();
-			for (String string : arr) {
-				if (string != null)
+			for (final String string : arr) {
+				if (string != null) {
 					_comboTitle.add(string);
+				}
 			}
 
 			_comboTitle.addKeyListener(_keyListener);
@@ -2770,9 +2771,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			// fill combobox
 			arr = TourDatabase.getAllTourPlaceStarts();
-			for (String string : arr) {
-				if (string != null)
+			for (final String string : arr) {
+				if (string != null) {
 					_comboStartLocation.add(string);
+				}
 			}
 
 			_comboStartLocation.addModifyListener(new ModifyListener() {
@@ -2807,9 +2809,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			// fill combobox
 			arr = TourDatabase.getAllTourPlaceEnds();
-			for (String string : arr) {
-				if (string != null)
+			for (final String string : arr) {
+				if (string != null) {
 					_comboEndLocation.add(string);
+				}
 			}
 
 			_comboEndLocation.addModifyListener(new ModifyListener() {
@@ -6200,10 +6203,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_comboTitle.clearSelection();
 			_comboTitle.removeAll();
 			// fill combobox
-			ArrayList<String> arr = TourDatabase.getAllTourTitles();
-			for (String string : arr) {
-				if (string != null)
+			final ArrayList<String> arr = TourDatabase.getAllTourTitles();
+			for (final String string : arr) {
+				if (string != null) {
 					_comboTitle.add(string);
+				}
 			}
 			_comboTitle.update();
 			_isTitleModified = false;
@@ -6212,10 +6216,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_comboStartLocation.clearSelection();
 			_comboStartLocation.removeAll();
 			// fill combobox
-			ArrayList<String> arr = TourDatabase.getAllTourPlaceStarts();
-			for (String string : arr) {
-				if (string != null)
+			final ArrayList<String> arr = TourDatabase.getAllTourPlaceStarts();
+			for (final String string : arr) {
+				if (string != null) {
 					_comboStartLocation.add(string);
+				}
 			}
 			_comboStartLocation.update();
 			_isStartLocationModified = false;
@@ -6224,10 +6229,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_comboEndLocation.clearSelection();
 			_comboEndLocation.removeAll();
 			// fill combobox
-			ArrayList<String> arr = TourDatabase.getAllTourPlaceEnds();
-			for (String string : arr) {
-				if (string != null)
+			final ArrayList<String> arr = TourDatabase.getAllTourPlaceEnds();
+			for (final String string : arr) {
+				if (string != null) {
 					_comboEndLocation.add(string);
+				}
 			}
 			_comboEndLocation.update();
 			_isEndLocationModified = false;
