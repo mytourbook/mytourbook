@@ -120,16 +120,17 @@ public class PhotoImageView extends ViewPart {
 			if (firstElement instanceof Photo) {
 				final Photo photo = (Photo) firstElement;
 
-				final File imageFile = photo.imageFile;
+				final File imageFile = photo.getImageFile();
 
 				final Image photoImage = new Image(_pageBook.getDisplay(), imageFile.getAbsolutePath());
 
-				if (photo.width == Integer.MIN_VALUE) {
+				if (photo.getWidth() == Integer.MIN_VALUE) {
+
+					// images size is not yet set
 
 					final Rectangle imageSize = photoImage.getBounds();
 
-					photo.width = imageSize.width;
-					photo.height = imageSize.height;
+					photo.setSize(imageSize.width, imageSize.height);
 				}
 
 				_photoCanvas.setImage(photoImage, photo);

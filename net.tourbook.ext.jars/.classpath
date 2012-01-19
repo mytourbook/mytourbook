@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="lib" path="net.sf.swtaddons_0.1.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="trove-3.0.0rc1.jar" sourcepath="C:/E/java-resources/trove/trove-3.0.0rc1.zip">
+	<classpathentry exported="true" kind="lib" path="imgscalr-lib-4.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="trove-3.0.2.jar">
 		<attributes>
-			<attribute name="javadoc_location" value="file:/L:/java-resources/trove/trove-3.0.0rc1/javadocs/"/>
+			<attribute name="javadoc_location" value="jar:file:/C:/E/java-resources/trove/trove-3.0.2.zip!/3.0.2/javadocs"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry exported="true" kind="lib" path="net.sf.swtaddons_0.1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="edtftpj.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>

@@ -415,7 +415,7 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 			public void update(final ViewerCell cell) {
 
 				final Photo photoFile = (Photo) cell.getElement();
-				final double altitude = photoFile.altitude;
+				final double altitude = photoFile.getAltitude();
 
 				if (altitude == Double.MIN_VALUE) {
 					cell.setText(UI.EMPTY_STRING);
@@ -439,7 +439,7 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 
 				final Photo photoFile = (Photo) cell.getElement();
 
-				final DateTime dt = photoFile.dateTime;
+				final DateTime dt = photoFile.getDateTime();
 				if (dt == null) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
@@ -462,8 +462,8 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 			public void update(final ViewerCell cell) {
 
 				final Photo photoFile = (Photo) cell.getElement();
-				final int width = photoFile.width;
-				final int height = photoFile.height;
+				final int width = photoFile.getWidth();
+				final int height = photoFile.getHeight();
 				if (width == Integer.MIN_VALUE || height == Integer.MIN_VALUE) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
@@ -487,7 +487,7 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 			public void update(final ViewerCell cell) {
 
 				final Photo photoFile = (Photo) cell.getElement();
-				final double imageDirection = photoFile.imageDirection;
+				final double imageDirection = photoFile.getImageDirection();
 
 				if (imageDirection == Double.MIN_VALUE) {
 					cell.setText(UI.EMPTY_STRING);
@@ -512,7 +512,7 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 			public void update(final ViewerCell cell) {
 
 				final Photo photoFile = (Photo) cell.getElement();
-				final double imageDirection = photoFile.imageDirection;
+				final double imageDirection = photoFile.getImageDirection();
 
 				if (imageDirection == Double.MIN_VALUE) {
 					cell.setText(UI.EMPTY_STRING);
@@ -536,7 +536,7 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 			@Override
 			public void update(final ViewerCell cell) {
 
-				final double latitude = ((Photo) cell.getElement()).latitude;
+				final double latitude = ((Photo) cell.getElement()).getLatitude();
 
 				if (latitude == Double.MIN_VALUE) {
 					cell.setText(UI.EMPTY_STRING);
@@ -560,7 +560,7 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 			public void update(final ViewerCell cell) {
 
 				final Photo photoFile = (Photo) cell.getElement();
-				cell.setText(photoFile.gpsAreaInfo);
+				cell.setText(photoFile.getGpsAreaInfo());
 			}
 		});
 	}
@@ -577,7 +577,7 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 			@Override
 			public void update(final ViewerCell cell) {
 
-				final double longitude = ((Photo) cell.getElement()).longitude;
+				final double longitude = ((Photo) cell.getElement()).getLongitude();
 
 				if (longitude == Double.MIN_VALUE) {
 					cell.setText(UI.EMPTY_STRING);
@@ -601,7 +601,7 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 			public void update(final ViewerCell cell) {
 
 				final Photo photoFile = (Photo) cell.getElement();
-				cell.setText(photoFile.fileName);
+				cell.setText(photoFile.getFileName());
 			}
 		});
 	}
@@ -619,7 +619,7 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 			public void update(final ViewerCell cell) {
 
 				final Photo photoFile = (Photo) cell.getElement();
-				cell.setText(Integer.toString(photoFile.orientation));
+				cell.setText(Integer.toString(photoFile.getOrientation()));
 			}
 		});
 	}
@@ -639,8 +639,8 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 				final Photo photo = (Photo) cell.getElement();
 
 				final String otherTags = //
-				("  -  orientation:" + photo.orientation)
-						+ ("  -  altitude:" + (photo.altitude == Double.MIN_VALUE ? "?" : photo.altitude));
+				("  -  orientation:" + photo.getOrientation())
+						+ ("  -  altitude:" + (photo.getAltitude() == Double.MIN_VALUE ? "?" : photo.getAltitude()));
 
 				cell.setText(otherTags);
 			}
@@ -661,7 +661,7 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 
 				final Photo photoFile = (Photo) cell.getElement();
 
-				final DateTime dt = photoFile.dateTime;
+				final DateTime dt = photoFile.getDateTime();
 				if (dt == null) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
@@ -832,8 +832,8 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 				final TiffImageMetadata.GPSInfo gpsInfo = exifMetadata.getGPS();
 				if (gpsInfo != null) {
 
-					photoFile.latitude = gpsInfo.getLatitudeAsDegreesNorth();
-					photoFile.longitude = gpsInfo.getLongitudeAsDegreesEast();
+					photoFile.setLatitude(gpsInfo.getLatitudeAsDegreesNorth());
+					photoFile.setLongitude(gpsInfo.getLongitudeAsDegreesEast());
 				}
 			} catch (final Exception e) {
 				// ignore
@@ -959,13 +959,13 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 			}
 
 			final Photo photo = (Photo) firstElement;
-			final int oldWidth = photo.width;
+			final int oldWidth = photo.getWidth();
 
 			_postSelectionProvider.setSelection(structuredSelection);
 
-			if (oldWidth != photo.width) {
+			if (oldWidth != photo.getWidth()) {
 
-				// width & height has been updated -> update viewer
+				// width & height has been updated in the selection listener -> update viewer
 
 				_photoViewer.update(photo, null);
 			}
@@ -1028,10 +1028,10 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 
 		for (final Photo photo : _photos) {
 
-//			System.out.println(photo.fileName + "\t");
+//			System.out.println(photo.getFileName() + "\t");
 //			// TODO remove SYSTEM.OUT.PRINTLN
 
-			final File imageFile = photo.imageFile;
+			final File imageFile = photo.getImageFile();
 
 			try {
 				final Map<String, Boolean> params = new HashMap<String, Boolean>();
@@ -1052,51 +1052,52 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 
 					final TiffImageMetadata tiffMetadata = (TiffImageMetadata) metadata;
 
-					photo.dateTime = getTiffDate(photo, tiffMetadata);
-					photo.width = getTiffIntValue(
-							photo,
-							tiffMetadata,
-							TiffTagConstants.TIFF_TAG_IMAGE_WIDTH,
-							Integer.MIN_VALUE);
-					photo.height = getTiffIntValue(
-							photo,
-							tiffMetadata,
-							TiffTagConstants.TIFF_TAG_IMAGE_LENGTH,
-							Integer.MIN_VALUE);
+					photo.setDateTime(getTiffDate(photo, tiffMetadata));
+					photo.setSize(
+							getTiffIntValue(
+									photo,
+									tiffMetadata,
+									TiffTagConstants.TIFF_TAG_IMAGE_WIDTH,
+									Integer.MIN_VALUE),
+							getTiffIntValue(
+									photo,
+									tiffMetadata,
+									TiffTagConstants.TIFF_TAG_IMAGE_LENGTH,
+									Integer.MIN_VALUE));
 
 				} else if (metadata instanceof JpegImageMetadata) {
 
 					final JpegImageMetadata jpegMetadata = (JpegImageMetadata) metadata;
 
-					photo.dateTime = getExifDate(photo, jpegMetadata);
+					photo.setDateTime(getExifDate(photo, jpegMetadata));
 
-					photo.width = getExifIntValue(
-							photo,
-							jpegMetadata,
-							ExifTagConstants.EXIF_TAG_EXIF_IMAGE_WIDTH,
-							Integer.MIN_VALUE);
-					photo.height = getExifIntValue(
-							photo,
-							jpegMetadata,
-							ExifTagConstants.EXIF_TAG_EXIF_IMAGE_LENGTH,
-							Integer.MIN_VALUE);
+					photo.setSize(
+							getExifIntValue(
+									photo,
+									jpegMetadata,
+									ExifTagConstants.EXIF_TAG_EXIF_IMAGE_WIDTH,
+									Integer.MIN_VALUE),
+							getExifIntValue(
+									photo,
+									jpegMetadata,
+									ExifTagConstants.EXIF_TAG_EXIF_IMAGE_LENGTH,
+									Integer.MIN_VALUE));
 
-					photo.orientation = getExifIntValue(photo, jpegMetadata, ExifTagConstants.EXIF_TAG_ORIENTATION, 1);
+					photo.setOrientation(//
+							getExifIntValue(photo, jpegMetadata, ExifTagConstants.EXIF_TAG_ORIENTATION, 1));
 
-					photo.imageDirection = getExifValueDouble(
-							photo,
-							jpegMetadata,
-							GpsTagConstants.GPS_TAG_GPS_IMG_DIRECTION);
+					photo.setImageDirection(//
+							getExifValueDouble(photo, jpegMetadata, GpsTagConstants.GPS_TAG_GPS_IMG_DIRECTION));
 
-					photo.altitude = getExifValueDouble(photo, jpegMetadata, GpsTagConstants.GPS_TAG_GPS_ALTITUDE);
+					photo.setAltitude(getExifValueDouble(photo, jpegMetadata, GpsTagConstants.GPS_TAG_GPS_ALTITUDE));
 
 					getExifLatLon(photo, jpegMetadata);
-					photo.gpsAreaInfo = getExifGpsArea(photo, jpegMetadata);
+					photo.setGpsAreaInfo(getExifGpsArea(photo, jpegMetadata));
 				}
 
 				// ensure date is set
-				if (photo.dateTime == null) {
-					photo.dateTime = new DateTime(imageFile.lastModified());
+				if (photo.getDateTime() == null) {
+					photo.setDateTime(new DateTime(imageFile.lastModified()));
 				}
 
 			} catch (final Exception e) {

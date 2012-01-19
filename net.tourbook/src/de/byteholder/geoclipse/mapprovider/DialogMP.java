@@ -79,7 +79,7 @@ public class DialogMP extends TitleAreaDialog {
 		_map.setZoom(_mp.getFavoriteZoom());
 		_map.setMapCenter(_mp.getFavoritePosition());
 
-		_map.queueMapRedraw();
+		_map.paint();
 	}
 
 	@Override

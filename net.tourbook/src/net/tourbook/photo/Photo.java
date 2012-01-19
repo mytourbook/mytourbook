@@ -26,11 +26,11 @@ import de.byteholder.gpx.GeoPosition;
 
 public class Photo {
 
-	File									imageFile;
-	String									fileName;
+	private File							_imageFile;
+	private String							_fileName;
 	private String							_filePathName;
 
-	DateTime								dateTime;
+	private DateTime						_dateTime;
 
 	/**
 	 * <pre>
@@ -51,20 +51,22 @@ public class Photo {
 	 * Other        =     reserved
 	 * </pre>
 	 */
-	int										orientation		= 1;
+	private int								_orientation	= 1;
 
-	int										width			= Integer.MIN_VALUE;
+	private int								_width			= Integer.MIN_VALUE;
+	private int								_widthSmall;
 
-	int										height			= Integer.MIN_VALUE;
+	private int								_height			= Integer.MIN_VALUE;
+	private int								_heightSmall;
 
-	double									latitude		= Double.MIN_VALUE;
-	double									longitude		= Double.MIN_VALUE;
+	private double							_latitude		= Double.MIN_VALUE;
+	private double							_longitude		= Double.MIN_VALUE;
 
 	private GeoPosition						_geoPosition;
-	String									gpsAreaInfo;
-	double									imageDirection	= Double.MIN_VALUE;
+	private String							_gpsAreaInfo;
+	private double							_imageDirection	= Double.MIN_VALUE;
 
-	double									altitude		= Double.MIN_VALUE;
+	private double							_altitude		= Double.MIN_VALUE;
 
 	/**
 	 * caches the world positions for the photo lat/long values for each zoom level
@@ -78,8 +80,9 @@ public class Photo {
 	 */
 	public Photo(final File imageFile) {
 
-		this.imageFile = imageFile;
-		fileName = imageFile.getName();
+		this._imageFile = imageFile;
+
+		_fileName = imageFile.getName();
 		_filePathName = imageFile.getAbsolutePath();
 	}
 
@@ -105,6 +108,18 @@ public class Photo {
 		return true;
 	}
 
+	public double getAltitude() {
+		return _altitude;
+	}
+
+	public DateTime getDateTime() {
+		return _dateTime;
+	}
+
+	public String getFileName() {
+		return _fileName;
+	}
+
 	/**
 	 * @return Returns geo position or <code>null</code> when latitude/longitude is not available
 	 */
@@ -112,14 +127,54 @@ public class Photo {
 
 		if (_geoPosition == null) {
 
-			if (latitude == Double.MIN_VALUE || longitude == Double.MIN_VALUE) {
+			if (_latitude == Double.MIN_VALUE || _longitude == Double.MIN_VALUE) {
 				return null;
 			} else {
-				_geoPosition = new GeoPosition(latitude, longitude);
+				_geoPosition = new GeoPosition(_latitude, _longitude);
 			}
 		}
 
 		return _geoPosition;
+	}
+
+	public String getGpsAreaInfo() {
+		return _gpsAreaInfo;
+	}
+
+	public int getHeight() {
+		return _height;
+	}
+
+	public int getHeightSmall() {
+		return _heightSmall;
+	}
+
+	public double getImageDirection() {
+		return _imageDirection;
+	}
+
+	public File getImageFile() {
+		return _imageFile;
+	}
+
+	public double getLatitude() {
+		return _latitude;
+	}
+
+	public double getLongitude() {
+		return _longitude;
+	}
+
+	public int getOrientation() {
+		return _orientation;
+	}
+
+	public int getWidth() {
+		return _width;
+	}
+
+	public int getWidthSmall() {
+		return _widthSmall;
 	}
 
 	/**
@@ -130,20 +185,22 @@ public class Photo {
 	 */
 	public Point getWorldPosition(final MP mapProvider, final String projectionId, final int zoomLevel) {
 
-		if (latitude == Double.MIN_VALUE) {
+		if (_latitude == Double.MIN_VALUE) {
 			return null;
 		}
 
-		final int hashKey = projectionId.hashCode() + zoomLevel;
+		final Integer hashKey = projectionId.hashCode() + zoomLevel;
 
 		Point worldPosition = _worldPosition.get(hashKey);
 
 		if ((worldPosition == null)) {
 			// convert lat/long into world pixels which depends on the map projection
 
-			final GeoPosition geoPosition = new GeoPosition(longitude, latitude);
+			final GeoPosition photoGeoPosition = new GeoPosition(_latitude, _longitude);
 
-			worldPosition = _worldPosition.put(hashKey, mapProvider.geoToPixel(geoPosition, zoomLevel));
+			final Point geoToPixel = mapProvider.geoToPixel(photoGeoPosition, zoomLevel);
+
+			worldPosition = _worldPosition.put(hashKey, geoToPixel);
 		}
 
 		return worldPosition;
@@ -155,6 +212,46 @@ public class Photo {
 		int result = 1;
 		result = prime * result + ((_filePathName == null) ? 0 : _filePathName.hashCode());
 		return result;
+	}
+
+	public void setAltitude(final double altitude) {
+		this._altitude = altitude;
+	}
+
+	public void setDateTime(final DateTime dateTime) {
+		this._dateTime = dateTime;
+	}
+
+	public void setGpsAreaInfo(final String gpsAreaInfo) {
+		this._gpsAreaInfo = gpsAreaInfo;
+	}
+
+	public void setImageDirection(final double imageDirection) {
+		this._imageDirection = imageDirection;
+	}
+
+	public void setLatitude(final double latitude) {
+		this._latitude = latitude;
+	}
+
+	public void setLongitude(final double longitude) {
+		this._longitude = longitude;
+	}
+
+	public void setOrientation(final int orientation) {
+		this._orientation = orientation;
+	}
+
+	public void setSize(final int height, final int width) {
+
+		this._width = width;
+		this._height = height;
+
+		final int SIZE_SMALL = 20;
+		final float ratio = (float) width / height;
+
+		_widthSmall = width > SIZE_SMALL ? SIZE_SMALL : width;
+		_heightSmall = (int) (_widthSmall / ratio);
 	}
 
 }

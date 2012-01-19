@@ -762,45 +762,47 @@ public class TourPainter extends MapPainter {
 		final int tilwWorldPixelY = tile.getY() * tileSize;
 
 		// convert world position into device position
-		final int devWayPointX = photoWorldPixel.x - tileWorldPixelX;
-		final int devWayPointY = photoWorldPixel.y - tilwWorldPixelY;
+		final int devXPhoto = photoWorldPixel.x - tileWorldPixelX;
+		final int devYPhoto = photoWorldPixel.y - tilwWorldPixelY;
 
-		final boolean isBoundsInTile = isBoundsInTile(_twpImageBounds, devWayPointX, devWayPointY, tileSize);
+		final Point photoSize = new Point(100, 100);
 
-		if (isBoundsInTile) {
+		final boolean isPhotoInTile = isPhotoInTile(photoSize, devXPhoto, devYPhoto, tileSize);
 
-			int devX = devWayPointX - _twpImageBounds.width / 2;
-			int devY = devWayPointY - _twpImageBounds.height;
+		if (isPhotoInTile) {
+
+			final int photoWidth = photo.getWidthSmall();
+			final int photoHeight = photo.getWidthSmall();
+//			image = photo.getImageSmall();
+
+			int devX = devXPhoto - photoWidth / 2;
+			int devY = devYPhoto - photoHeight;
 
 			devX += devPartOffset;
 			devY += devPartOffset;
 
-			gc.drawImage(_twpImage, devX, devY);
+//			gc.drawImage(_twpImage, devX, devY);
+
+			gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+			gc.fillRectangle(devX, devY, photoWidth, photoHeight);
 
 //			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 //			gc.setLineWidth(1);
-//			gc.drawRectangle(devX, devY, _twpImageBounds.width, _twpImageBounds.height);
+//			gc.drawRectangle(devX, devY, photoWidth, photoHeight);
 //
-			tile.addTourWayPointBounds(//
-					twp,
-					new Rectangle(
-							devX - devPartOffset,
-							devY - devPartOffset,
-							_twpImageBounds.width,
-							_twpImageBounds.height),
-					zoomLevel,
-					parts);
+//			tile.addTourWayPointBounds(//
+//					twp,
+//					new Rectangle(
+//							devX - devPartOffset,
+//							devY - devPartOffset,
+//							_twpImageBounds.width,
+//							_twpImageBounds.height),
+//					zoomLevel,
+//					parts);
 
-			/*
-			 * check if the way point paints into a neighbour tile
-			 */
-			if (parts > 1) {
-
-			}
 		}
 
-		return isBoundsInTile;
-		return false;
+		return isPhotoInTile;
 	}
 
 	private boolean drawStaticMarker(	final GC gc,
@@ -1505,7 +1507,9 @@ public class TourPainter extends MapPainter {
 	protected boolean isPaintingNeeded(final Map map, final Tile tile) {
 
 		final ArrayList<TourData> tourDataList = _tourPaintConfig.getTourData();
-		if (tourDataList == null) {
+		final ArrayList<Photo> photoList = _tourPaintConfig.getPhotos();
+
+		if (tourDataList.size() == 0 && photoList.size() == 0) {
 			return false;
 		}
 
@@ -1625,6 +1629,63 @@ public class TourPainter extends MapPainter {
 					}
 				}
 			}
+		}
+
+		/*
+		 * check photos
+		 */
+		if (_tourPaintConfig.isShowPhoto && photoList.size() > 0) {
+
+			for (final Photo photo : photoList) {
+
+				final Point photoWorldPixel = photo.getWorldPosition(mp, projectionId, mapZoomLevel);
+
+				if (photoWorldPixel == null) {
+					continue;
+				}
+
+				final int imageWidth = photo.getWidthSmall();
+				final int imageWidth2 = imageWidth / 2;
+				final int imageHeight = photo.getHeightSmall();
+
+				// this is an inline for: tileViewport.contains(tileWorldPos.x, tileWorldPos.y)
+				final int photoWorldPixelX = photoWorldPixel.x;
+				final int photoWorldPixelY = photoWorldPixel.y;
+
+				final int photoImageWorldPixelX = photoWorldPixelX - imageWidth2;
+
+				// check if photo image is within the tile viewport
+				if (photoImageWorldPixelX + imageWidth >= tileWorldPixelLeft
+						&& photoWorldPixelX < tileWorldPixelRight
+						&& photoWorldPixelY >= tileWorldPixelTop
+						&& photoWorldPixelY < tileWorldPixelBottom + imageHeight) {
+
+					// current position is inside the tile
+
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	private boolean isPhotoInTile(final Point photoSize, final int devXPhoto, final int devYPhoto, final int tileSize) {
+
+		// get image size
+		final int imageWidth = photoSize.x;
+		final int imageWidth2 = imageWidth / 2;
+		final int imageHeight = photoSize.y;
+
+		final int devImagePosLeft = devXPhoto - imageWidth2;
+		final int devImagePosRight = devXPhoto + imageWidth2;
+
+		// image position top is in the opposite direction
+		final int devImagePosTop = devYPhoto - imageHeight;
+
+		if (((devImagePosLeft >= 0 && devImagePosLeft <= tileSize) || (devImagePosRight >= 0 && devImagePosRight <= tileSize))
+				&& (devYPhoto >= 0 && devYPhoto <= tileSize || devImagePosTop >= 0 && devImagePosTop <= tileSize)) {
+			return true;
 		}
 
 		return false;

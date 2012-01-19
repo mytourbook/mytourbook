@@ -225,7 +225,7 @@ public class PhotoCanvas extends Canvas {
 		Util.disposeResource(_photoImage);
 		Util.disposeResource(_scaledImage);
 
-		switch (photo.orientation) {
+		switch (photo.getOrientation()) {
 		case 6:
 
 			_photoImage = new Image(this.getDisplay(), UI.rotate(image.getImageData(), SWT.RIGHT));

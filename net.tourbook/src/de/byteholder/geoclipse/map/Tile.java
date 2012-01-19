@@ -1089,8 +1089,8 @@ public class Tile extends Observable {
 				+ (" img=" + (isImageOK ? "OK" : COLUMN_2)) //$NON-NLS-1$ //$NON-NLS-2$
 				+ (isLoadingError() ? " ERR" : COLUMN_4) //$NON-NLS-1$
 				//
-				//                        0123456789012345678901234567890123456789
-				+ (" " + _tileKey.concat("                                        ").substring(0, 40)) //$NON-NLS-1$ //$NON-NLS-2$
+				//                            0123456789012345678901234567890123456789
+				+ (" key=" + _tileKey.concat("                                        ").substring(0, 40)) //$NON-NLS-1$ //$NON-NLS-2$
 		//
 		;
 	}

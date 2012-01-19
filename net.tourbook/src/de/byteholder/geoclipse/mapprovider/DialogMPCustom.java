@@ -316,17 +316,17 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 	public void actionZoomIn() {
 		_map.setZoom(_map.getZoom() + 1);
-		_map.queueMapRedraw();
+		_map.paint();
 	}
 
 	public void actionZoomOut() {
 		_map.setZoom(_map.getZoom() - 1);
-		_map.queueMapRedraw();
+		_map.paint();
 	}
 
 	public void actionZoomOutToMinZoom() {
 		_map.setZoom(_map.getMapProvider().getMinimumZoomLevel());
-		_map.queueMapRedraw();
+		_map.paint();
 	}
 
 	@Override
@@ -895,7 +895,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 				.grab(true, true)
 				.applyTo(_map);
 
-		_map.setQueueMapRedraw(false);
+		_map.setPainting(false);
 		_map.setShowScale(true);
 
 		_map.addMousePositionListener(new IPositionListener() {
@@ -1080,7 +1080,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		_map.setZoom(_mpCustom.getLastUsedZoom());
 		_map.setMapCenter(_mpCustom.getLastUsedPosition());
 
-		_map.setQueueMapRedraw(true);
+		_map.setPainting(true);
 	}
 
 	@Override

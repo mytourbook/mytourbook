@@ -1,11 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
+ * 
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -14,8 +17,10 @@ package net.tourbook.mapping;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import net.tourbook.application.TourbookPlugin;
@@ -170,6 +175,11 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	private final ArrayList<TourData>				_tourDataList						= new ArrayList<TourData>();
 	private TourData								_previousTourData;
 
+	/**
+	 * photos which are displayed in the map
+	 */
+	private final ArrayList<Photo>					_photoList							= new ArrayList<Photo>();
+
 	private boolean									_isMapSynchedWithTour;
 	private boolean									_isMapSynchedWithSlider;
 	private boolean									_isPositionCentered;
@@ -322,7 +332,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 			_map.setZoom(_defaultZoom);
 			_map.setMapCenter(_defaultPosition);
 		}
-		_map.queueMapRedraw();
+		_map.paint();
 	}
 
 	void actionSetShowLegendInMap() {
@@ -339,7 +349,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		// update legend
 		actionShowSlider();
 
-		_map.queueMapRedraw();
+		_map.paint();
 	}
 
 	void actionSetShowScaleInMap() {
@@ -347,7 +357,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		final boolean isScaleVisible = _actionShowScaleInMap.isChecked();
 
 		_map.setShowScale(isScaleVisible);
-		_map.queueMapRedraw();
+		_map.paint();
 	}
 
 	void actionSetShowStartEndInMap() {
@@ -355,7 +365,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		_tourPainterConfig.isShowStartEndInMap = _actionShowStartEndInMap.isChecked();
 
 		_map.disposeOverlayImageCache();
-		_map.queueMapRedraw();
+		_map.paint();
 	}
 
 	void actionSetShowTourInfoInMap() {
@@ -368,7 +378,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 			_tourToolTip.removeToolTipProvider(_tourInfoToolTipProvider);
 		}
 
-		_map.queueMapRedraw();
+		_map.paint();
 	}
 
 	void actionSetShowTourInMap() {
@@ -380,7 +390,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		_tourPainterConfig.isShowTourMarker = _actionShowTourMarker.isChecked();
 
 		_map.disposeOverlayImageCache();
-		_map.queueMapRedraw();
+		_map.paint();
 	}
 
 	void actionSetShowWayPointsInMap() {
@@ -395,7 +405,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		_tourPainterConfig.isShowWayPoints = isShowWayPoints;
 
 		_map.disposeOverlayImageCache();
-		_map.queueMapRedraw();
+		_map.paint();
 	}
 
 	void actionSetTourColor(final int colorId) {
@@ -405,7 +415,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		_tourPainterConfig.setLegendProvider(legendProvider);
 
 		_map.disposeOverlayImageCache();
-		_map.queueMapRedraw();
+		_map.paint();
 
 		createLegendImage(legendProvider);
 	}
@@ -484,13 +494,13 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	void actionZoomIn() {
 		_map.setZoom(_map.getZoom() + 1);
 		centerTour();
-		_map.queueMapRedraw();
+		_map.paint();
 	}
 
 	void actionZoomOut() {
 		_map.setZoom(_map.getZoom() - 1);
 		centerTour();
-		_map.queueMapRedraw();
+		_map.paint();
 	}
 
 	void actionZoomShowEntireMap() {
@@ -498,7 +508,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		_map.setMapCenter(new GeoPosition(0.0, 0.0));
 		_map.setZoom(_map.getMapProvider().getMinimumZoomLevel());
 
-		_map.queueMapRedraw();
+		_map.paint();
 	}
 
 	void actionZoomShowEntireTour() {
@@ -615,7 +625,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 					final boolean isShowTileBorder = _prefStore.getBoolean(PREF_SHOW_TILE_BORDER);
 
 					_map.setShowDebugInfo(isShowTileInfo, isShowTileBorder);
-					_map.queueMapRedraw();
+					_map.paint();
 
 				} else if (property.equals(PREF_DEBUG_MAP_DIM_LEVEL)) {
 
@@ -640,7 +650,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 					createLegendImage(_tourPainterConfig.getLegendProvider());
 
-					_map.queueMapRedraw();
+					_map.paint();
 
 				} else if (property.equals(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD)) {
 
@@ -654,7 +664,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 					createLegendImage(_tourPainterConfig.getLegendProvider());
 
 					_map.disposeOverlayImageCache();
-					_map.queueMapRedraw();
+					_map.paint();
 
 				} else if (property.equals(IPreferences.SRTM_COLORS_SELECTED_PROFILE_KEY)) {
 
@@ -666,7 +676,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 						_selectedProfileKey = prefProfileKey;
 
 						_map.disposeTiles();
-						_map.queueMapRedraw();
+						_map.paint();
 					}
 
 				} else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
@@ -771,7 +781,8 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		_tourDataList.clear();
 		_previousTourData = null;
 
-		_tourPainterConfig.setTourData(new ArrayList<TourData>());
+		_tourPainterConfig.setTourDataList(null);
+		_tourPainterConfig.setPhotos(null);
 
 		_tourInfoToolTipProvider.setTourData(null);
 
@@ -1284,7 +1295,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		_mapLegend = new MapLegend();
 
 		_map = new Map(parent, SWT.NONE);
-		_map.setQueueMapRedraw(false);
+		_map.setPainting(false);
 
 		_map.setDirectPainter(_directMappingPainter);
 //		_map.setLiveView(true);
@@ -1359,14 +1370,14 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 					// a tour is not displayed, find a tour provider which provides a tour
 					showToursFromTourProvider();
 				} else {
-					_map.queueMapRedraw();
+					_map.paint();
 				}
 
 				/*
 				 * enable map drawing, this is done very late to disable flickering which is caused
 				 * by setting up the map
 				 */
-				_map.setQueueMapRedraw(true);
+				_map.setPainting(true);
 
 				if (_mapDimLevel < 30) {
 					showDimWarning();
@@ -1379,6 +1390,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	public void dispose() {
 
 		_tourDataList.clear();
+		_photoList.clear();
 
 		// dispose tilefactory resources
 
@@ -1767,7 +1779,8 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 		} else if (selection instanceof StructuredSelection) {
 
-			final Object firstElement = ((StructuredSelection) selection).getFirstElement();
+			final StructuredSelection structuredSelection = (StructuredSelection) selection;
+			final Object firstElement = structuredSelection.getFirstElement();
 
 			if (firstElement instanceof TVICatalogComparedTour) {
 
@@ -1786,9 +1799,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 			} else if (firstElement instanceof Photo) {
 
-				final Photo photo = (Photo) firstElement;
-
-				_map.setPhoto(photo);
+				paintPhotos(structuredSelection);
 
 			} else if (firstElement instanceof TourWayPoint) {
 
@@ -1825,7 +1836,9 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 			return;
 		}
 
-		_tourPainterConfig.setTourData(_tourDataList);
+		_tourPainterConfig.setTourDataList(_tourDataList);
+		_tourPainterConfig.setPhotos(_photoList);
+
 		_tourInfoToolTipProvider.setTourDataList(_tourDataList);
 
 		final TourData firstTourData = _tourDataList.get(0);
@@ -1847,7 +1860,25 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 		setTourZoomLevel(tourBounds, false);
 
-		_map.queueMapRedraw();
+		_map.paint();
+	}
+
+	@SuppressWarnings("unchecked")
+	private void paintPhotos(final StructuredSelection structuredSelection) {
+
+		_photoList.clear();
+
+		final List<?> photoList = structuredSelection.toList();
+		_photoList.addAll((Collection<? extends Photo>) photoList);
+
+		_tourPainterConfig.setPhotos(_photoList);
+
+		_map.setOverlayKey(Integer.toString(photoList.hashCode()));
+		_map.disposeOverlayImageCache();
+
+		_map.paint();
+
+//		_map.setPhoto(structuredSelection);
 	}
 
 	private void paintTours(final ArrayList<Long> tourIdList) {
@@ -1881,7 +1912,9 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 						newOverlayKey += tourData.getTourId();
 					}
 				}
-				_tourPainterConfig.setTourData(_tourDataList);
+				_tourPainterConfig.setTourDataList(_tourDataList);
+				_tourPainterConfig.setPhotos(_photoList);
+
 				_tourInfoToolTipProvider.setTourDataList(_tourDataList);
 
 				if (_previousOverlayKey != newOverlayKey) {
@@ -1893,7 +1926,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 				}
 
 				createLegendImage(_tourPainterConfig.getLegendProvider());
-				_map.queueMapRedraw();
+				_map.paint();
 			}
 		});
 	}
@@ -2030,7 +2063,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 		}
 
-		_map.queueMapRedraw();
+		_map.paint();
 	}
 
 	/**
@@ -2043,7 +2076,9 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		// force single tour to be repainted
 		_previousTourData = null;
 
-		_tourPainterConfig.setTourData(_tourDataList);
+		_tourPainterConfig.setTourDataList(_tourDataList);
+		_tourPainterConfig.setPhotos(_photoList);
+
 		_tourInfoToolTipProvider.setTourDataList(_tourDataList);
 
 		_directMappingPainter.disablePaintContext();
@@ -2071,7 +2106,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 		createLegendImage(_tourPainterConfig.getLegendProvider());
 
-		_map.queueMapRedraw();
+		_map.paint();
 	}
 
 	private void paintTourSliders(	final TourData tourData,
@@ -2102,7 +2137,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 			setMapToSliderBounds(tourData);
 
-			_map.queueMapRedraw();
+			_map.paint();
 
 		} else {
 
@@ -2120,7 +2155,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 		paintTours10All();
 
-		_map.queueMapRedraw();
+		_map.paint();
 	}
 
 	private void restoreState() {
@@ -2481,7 +2516,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		_map.setShowOverlays(false);
 		_map.setShowLegend(false);
 
-		_map.queueMapRedraw();
+		_map.paint();
 	}
 
 	/**

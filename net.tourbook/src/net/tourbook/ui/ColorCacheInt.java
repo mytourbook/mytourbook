@@ -1,31 +1,30 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui;
 
-import java.util.HashMap;
-import java.util.Iterator;
+import gnu.trove.map.hash.TIntObjectHashMap;
 
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
 
 public class ColorCacheInt {
 
-	private Display					_display;
+	private Display						_display;
 
-	private HashMap<Integer, Color>	_colors	= new HashMap<Integer, Color>();
+	private TIntObjectHashMap<Color>	_colors	= new TIntObjectHashMap<Color>();
 
 	public ColorCacheInt() {
 		_display = Display.getCurrent();
@@ -36,8 +35,12 @@ public class ColorCacheInt {
 	 */
 	public void dispose() {
 
-		for (final Iterator<Color> color = _colors.values().iterator(); color.hasNext();) {
-			(color.next()).dispose();
+		final Object[] hashValues = _colors.values();
+		for (final Object value : hashValues) {
+
+			if (value instanceof Color) {
+				((Color) value).dispose();
+			}
 		}
 
 		_colors.clear();
@@ -49,7 +52,7 @@ public class ColorCacheInt {
 	 *         created when it is not available
 	 */
 	public Color get(final int colorValue) {
- 
+
 //		Color color = _colors.get(new Integer(colorValue));
 		Color color = _colors.get(colorValue);
 		if (color != null) {

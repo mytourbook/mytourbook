@@ -42,7 +42,6 @@ import java.util.regex.Pattern;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.mapping.WayPointToolTipProvider;
-import net.tourbook.photo.Photo;
 import net.tourbook.ui.IInfoToolTipProvider;
 import net.tourbook.ui.IMapToolTipProvider;
 import net.tourbook.util.HoveredAreaContext;
@@ -499,7 +498,7 @@ public class Map extends Canvas {
 					 * Because we are not in the UI thread, we have to queue the call for redraw and
 					 * cannot do it directly.
 					 */
-					queueMapRedraw();
+					paint();
 
 					tile.deleteObserver(this);
 				}
@@ -537,7 +536,7 @@ public class Map extends Canvas {
 				.createImage();
 		_poiImageBounds = _poiImage.getBounds();
 
-		paintOverlay();
+		paintOverlay_0_SetupThread();
 	}
 
 	/**
@@ -585,7 +584,7 @@ public class Map extends Canvas {
 			_isPaintOfflineArea = true;
 
 			redraw();
-			queueMapRedraw();
+			paint();
 
 			openOfflineImageDialog();
 
@@ -602,7 +601,7 @@ public class Map extends Canvas {
 		setCursor(_cursorCross);
 
 		redraw();
-		queueMapRedraw();
+		paint();
 	}
 
 	private void addAllListener() {
@@ -775,7 +774,7 @@ public class Map extends Canvas {
 	 */
 	public void addOverlayPainter(final MapPainter overlay) {
 		_overlays.add(overlay);
-		queueMapRedraw();
+		paint();
 	}
 
 	public void addPOIListener(final IPOIListener poiListener) {
@@ -1352,7 +1351,7 @@ public class Map extends Canvas {
 	 * <p>
 	 * {@link #setMapCenterInWorldPixel(Point2D)}
 	 * <p>
-	 * In version before 10.6 the map was repeated on the x axis.
+	 * Before version 10.6 the map was repeated on the x axis.
 	 * 
 	 * @param tilePosX
 	 * @param tilePosY
@@ -1532,7 +1531,7 @@ public class Map extends Canvas {
 			// ensure that all internal data are correctly setup
 			setZoom(_mapZoomLevel);
 
-			queueMapRedraw();
+			paint();
 		}
 	}
 
@@ -1587,7 +1586,7 @@ public class Map extends Canvas {
 
 			updateOfflineAreaEndPosition(mouseEvent);
 
-			queueMapRedraw();
+			paint();
 
 			return;
 		}
@@ -1673,7 +1672,7 @@ public class Map extends Canvas {
 			_previousOfflineArea = null;
 
 			redraw();
-			queueMapRedraw();
+			paint();
 
 			openOfflineImageDialog();
 
@@ -1798,7 +1797,7 @@ public class Map extends Canvas {
 
 		updateViewPortData();
 
-		queueMapRedraw();
+		paint();
 	}
 
 	private void openOfflineImageDialog() {
@@ -1816,13 +1815,92 @@ public class Map extends Canvas {
 		_mp.disposeTileImages();
 
 		redraw();
-		queueMapRedraw();
+		paint();
+	}
+
+	/**
+	 * Put a map redraw into a queue, the last entry in the queue will be executed
+	 */
+	public void paint() {
+
+		final int redrawCounter = _redrawMapCounter.incrementAndGet();
+
+		if (isDisposed() || _mp == null || _isRedrawEnabled == false) {
+			return;
+		}
+
+		if (_devMapViewport == null) {
+
+			// internal data are not yet initialized, this happens only the first time when a map is displayed
+
+			initMap();
+			updateViewPortData();
+		}
+
+		// get time when the redraw of the may is requested
+		final long requestedRedrawTime = System.currentTimeMillis();
+
+		if (requestedRedrawTime > _lastMapDrawTime + 100) {
+
+			// update display even when this is not the last created runnable
+
+//			System.out.println("queueMapRedraw()-time > 50\t" + (_requestedRedrawTime - _lastMapDrawTime));
+//			// TODO remove SYSTEM.OUT.PRINTLN
+
+			_display.syncExec(new Runnable() {
+
+				@Override
+				public void run() {
+
+					if (isDisposed()) {
+						return;
+					}
+
+					paint_10_PaintMapImage();
+				}
+			});
+
+			/**
+			 * set an additional asynch runnable because it's possible that the synch runnable do
+			 * not draw all tiles
+			 */
+// TODO check if this is working when disabled
+//			_display.asyncExec(synchImageRunnable);
+
+		} else {
+
+			final Runnable asynchImageRunnable = new Runnable() {
+
+				final int	__asynchRunnableCounter	= redrawCounter;
+
+				@Override
+				public void run() {
+
+					if (isDisposed()) {
+						return;
+					}
+
+					// check if a newer runnable is available
+					if (__asynchRunnableCounter != _redrawMapCounter.get()) {
+						// a newer queryRedraw is available
+						return;
+					}
+
+					paint_10_PaintMapImage();
+				}
+			};
+
+			_display.asyncExec(asynchImageRunnable);
+		}
+
+		// tell the overlay thread to draw the overlay images
+		_nextOverlayRedrawTime = requestedRedrawTime;
 	}
 
 	/**
 	 * Draws map tiles/legend/scale into the map image which is displayed in the SWT paint event.
 	 */
-	private void paintMap() {
+	private void paint_10_PaintMapImage() {
 
 		if (isDisposed()) {
 			return;
@@ -1843,14 +1921,14 @@ public class Map extends Canvas {
 
 			gc = new GC(_mapImage);
 			{
-				paintMap10Tiles(gc);
+				paint_30_Tiles(gc);
 
 				if (_isLegendVisible && _mapLegend != null) {
-					paintMap20Legend(gc);
+					paint_40_Legend(gc);
 				}
 
 				if (_isScaleVisible) {
-					paintMap30Scale(gc);
+					paint_50_Scale(gc);
 				}
 
 //				if (_tourToolTip != null) {
@@ -1887,7 +1965,7 @@ public class Map extends Canvas {
 	 * 
 	 * @param gc
 	 */
-	private void paintMap10Tiles(final GC gc) {
+	private void paint_30_Tiles(final GC gc) {
 
 		for (int tilePosX = _tilePosMinX; tilePosX <= _tilePosMaxX; tilePosX++) {
 			for (int tilePosY = _tilePosMinY; tilePosY <= _tilePosMaxY; tilePosY++) {
@@ -1922,7 +2000,7 @@ public class Map extends Canvas {
 		}
 	}
 
-	private void paintMap20Legend(final GC gc) {
+	private void paint_40_Legend(final GC gc) {
 
 		// get legend image from the legend
 		final Image legendImage = _mapLegend.getImage();
@@ -1947,7 +2025,7 @@ public class Map extends Canvas {
 	 * 
 	 * @param gc
 	 */
-	private void paintMap30Scale(final GC gc) {
+	private void paint_50_Scale(final GC gc) {
 
 		final int viewPortWidth = _worldPixelTopLeftViewport.width;
 
@@ -1997,11 +2075,11 @@ public class Map extends Canvas {
 		final Color black = _display.getSystemColor(SWT.COLOR_BLACK);
 		final Color gray = _display.getSystemColor(SWT.COLOR_DARK_GRAY);
 
-		paintMap32ScaleLine(gc, devX1, devX2, devY++, segmentWidth, gray, gray);
-		paintMap32ScaleLine(gc, devX1, devX2, devY++, segmentWidth, white, black);
-		paintMap32ScaleLine(gc, devX1, devX2, devY++, segmentWidth, white, black);
-		paintMap32ScaleLine(gc, devX1, devX2, devY++, segmentWidth, white, black);
-		paintMap32ScaleLine(gc, devX1, devX2, devY, segmentWidth, gray, gray);
+		paint_52_ScaleLine(gc, devX1, devX2, devY++, segmentWidth, gray, gray);
+		paint_52_ScaleLine(gc, devX1, devX2, devY++, segmentWidth, white, black);
+		paint_52_ScaleLine(gc, devX1, devX2, devY++, segmentWidth, white, black);
+		paint_52_ScaleLine(gc, devX1, devX2, devY++, segmentWidth, white, black);
+		paint_52_ScaleLine(gc, devX1, devX2, devY, segmentWidth, gray, gray);
 
 		final int devYText = devYScaleLines - textExtent.y;
 		final int devXText = devX1 + devScaleWidth - textExtent.x;
@@ -2022,13 +2100,13 @@ public class Map extends Canvas {
 		gc.drawText(scaleText, devXText, devYText, true);
 	}
 
-	private void paintMap32ScaleLine(	final GC gc,
-										final int devX1,
-										final int devX2,
-										final int devY,
-										final int segmentWidth,
-										final Color firstColor,
-										final Color secondColor) {
+	private void paint_52_ScaleLine(final GC gc,
+									final int devX1,
+									final int devX2,
+									final int devY,
+									final int segmentWidth,
+									final Color firstColor,
+									final Color secondColor) {
 
 		gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_GRAY));
 		gc.drawPoint(devX1, devY);
@@ -2223,7 +2301,7 @@ public class Map extends Canvas {
 	/**
 	 * Define and start the overlay thread
 	 */
-	private void paintOverlay() {
+	private void paintOverlay_0_SetupThread() {
 
 		_overlayImageCache = new OverlayImageCache();
 
@@ -2247,7 +2325,7 @@ public class Map extends Canvas {
 								if (_tileOverlayPaintQueue.size() > 0) {
 
 									// create overlay images
-									paintOverlay10();
+									paintOverlay_10_RunThread();
 								}
 							}
 						}
@@ -2264,7 +2342,7 @@ public class Map extends Canvas {
 		_overlayThread.start();
 	}
 
-	private void paintOverlay10() {
+	private void paintOverlay_10_RunThread() {
 
 		final int currentRunnableCounter = _overlayRunnableCounter.incrementAndGet();
 
@@ -2292,7 +2370,7 @@ public class Map extends Canvas {
 
 				try {
 
-					paintOverlay20Tiles();
+					paintOverlay_20_Tiles();
 
 				} catch (final Exception e) {
 					e.printStackTrace();
@@ -2305,7 +2383,7 @@ public class Map extends Canvas {
 		_display.asyncExec(uiOverlayRunnable);
 	}
 
-	private void paintOverlay20Tiles() {
+	private void paintOverlay_20_Tiles() {
 
 		BusyIndicator.showWhile(_display, new Runnable() {
 			@Override
@@ -2314,6 +2392,8 @@ public class Map extends Canvas {
 				Tile tile;
 
 				checkImageTemplate9Parts();
+
+				final long startTime = System.currentTimeMillis();
 
 				while ((tile = _tileOverlayPaintQueue.poll()) != null) {
 
@@ -2324,7 +2404,7 @@ public class Map extends Canvas {
 						tile.setOverlayTourStatus(OverlayTourState.TILE_IS_CHECKED);
 
 						/*
-						 * check if the tour is within the current tile
+						 * check if a tour, marker or photo is within the current tile
 						 */
 						boolean isPaintingNeeded = false;
 
@@ -2345,10 +2425,17 @@ public class Map extends Canvas {
 							continue;
 						}
 
+						// paint overlay
 						if (_isTourPaintMethodEnhanced) {
-							paintOverlay30PaintTile(tile);
+							paintOverlay_30_PaintTileEnhanced(tile);
 						} else {
-							paintOverlay40PaintTile(tile);
+							paintOverlay_40_PaintTileBasic(tile);
+						}
+
+						// allow displaying of the painted overlays
+						final long paintTime = System.currentTimeMillis();
+						if (paintTime > startTime + 100) {
+							break;
 						}
 
 					} else {
@@ -2368,7 +2455,7 @@ public class Map extends Canvas {
 	 * 
 	 * @param tile
 	 */
-	private void paintOverlay30PaintTile(final Tile tile) {
+	private void paintOverlay_30_PaintTileEnhanced(final Tile tile) {
 
 		final int parts = 3;
 
@@ -2403,9 +2490,9 @@ public class Map extends Canvas {
 					@Override
 					protected IStatus run(final IProgressMonitor monitor) {
 
-						paintOverlay31SplitParts(tile, imageData9Parts);
+						paintOverlay_31_SplitParts(tile, imageData9Parts);
 
-						queueMapRedraw();
+						paint();
 
 						return Status.OK_STATUS;
 					}
@@ -2441,7 +2528,7 @@ public class Map extends Canvas {
 	 * @param tile
 	 * @param imageData9Parts
 	 */
-	private void paintOverlay31SplitParts(final Tile tile, final ImageData imageData9Parts) {
+	private void paintOverlay_31_SplitParts(final Tile tile, final ImageData imageData9Parts) {
 
 		final TileCache tileCache = MP.getTileCache();
 
@@ -2610,7 +2697,7 @@ public class Map extends Canvas {
 	 * 
 	 * @param tile
 	 */
-	private void paintOverlay40PaintTile(final Tile tile) {
+	private void paintOverlay_40_PaintTileBasic(final Tile tile) {
 
 		boolean isOverlayPainted = false;
 
@@ -2643,7 +2730,7 @@ public class Map extends Canvas {
 			tile.setOverlayImageState(OverlayImageState.TILE_HAS_CONTENT);
 			tile.incrementOverlayContent();
 
-			queueMapRedraw();
+			paint();
 
 		} else {
 
@@ -2671,22 +2758,22 @@ public class Map extends Canvas {
 			gc.drawImage(tileImage, devTileViewport.x, devTileViewport.y);
 
 		} else {
-			paintTile10Image(gc, tile, devTileViewport);
+			paintTile10_Image(gc, tile, devTileViewport);
 		}
 
 		if (_isDrawOverlays) {
-			paintTile20Overlay(gc, tile, devTileViewport);
+			paintTile20_Overlay(gc, tile, devTileViewport);
 		}
 
 		if (_isShowTileInfo || _isShowTileBorder) {
-			paintTile30Info(gc, tile, devTileViewport);
+			paintTile30_Info(gc, tile, devTileViewport);
 		}
 	}
 
 	/**
 	 * draw the tile map image
 	 */
-	private void paintTile10Image(final GC gc, final Tile tile, final Rectangle devTileViewport) {
+	private void paintTile10_Image(final GC gc, final Tile tile, final Rectangle devTileViewport) {
 
 		if (tile.isLoadingError()) {
 
@@ -2753,7 +2840,7 @@ public class Map extends Canvas {
 	 * @param devTileViewport
 	 *            Position of the tile
 	 */
-	private void paintTile20Overlay(final GC gc, final Tile tile, final Rectangle devTileViewport) {
+	private void paintTile20_Overlay(final GC gc, final Tile tile, final Rectangle devTileViewport) {
 
 		/*
 		 * Priority 1: draw overlay image
@@ -2897,7 +2984,7 @@ public class Map extends Canvas {
 	 * @param tile
 	 * @param devTileViewport
 	 */
-	private void paintTile30Info(final GC gc, final Tile tile, final Rectangle devTileViewport) {
+	private void paintTile30_Info(final GC gc, final Tile tile, final Rectangle devTileViewport) {
 
 		final ConcurrentHashMap<String, Tile> childrenWithErrors = tile.getChildrenWithErrors();
 
@@ -3108,7 +3195,7 @@ public class Map extends Canvas {
 		setMapCenterInWorldPixel(new Point2D.Double(newCenterX, newCenterY));
 		updateViewPortData();
 
-		queueMapRedraw();
+		paint();
 	}
 
 	private boolean parsePOIText(String text) {
@@ -3372,85 +3459,6 @@ public class Map extends Canvas {
 	}
 
 	/**
-	 * Put a map redraw into a queue, the last entry in the queue will be executed
-	 */
-	public void queueMapRedraw() {
-
-		final int redrawCounter = _redrawMapCounter.incrementAndGet();
-
-		if (isDisposed() || _mp == null || _isRedrawEnabled == false) {
-			return;
-		}
-
-		if (_devMapViewport == null) {
-
-			// internal data are not yet initialized, this happens only the first time when a map is displayed
-
-			initMap();
-			updateViewPortData();
-		}
-
-		// get time when the redraw of the may is requested
-		final long requestedRedrawTime = System.currentTimeMillis();
-
-		if (requestedRedrawTime > _lastMapDrawTime + 100) {
-
-			// update display even when this is not the last created runnable
-
-//			System.out.println("queueMapRedraw()-time > 50\t" + (_requestedRedrawTime - _lastMapDrawTime));
-//			// TODO remove SYSTEM.OUT.PRINTLN
-
-			_display.syncExec(new Runnable() {
-
-				@Override
-				public void run() {
-
-					if (isDisposed()) {
-						return;
-					}
-
-					paintMap();
-				}
-			});
-
-			/**
-			 * set an additional asynch runnable because it's possible that the synch runnable do
-			 * not draw all tiles
-			 */
-// TODO check if this is working when disabled
-//			_display.asyncExec(synchImageRunnable);
-
-		} else {
-
-			final Runnable asynchImageRunnable = new Runnable() {
-
-				final int	__asynchRunnableCounter	= redrawCounter;
-
-				@Override
-				public void run() {
-
-					if (isDisposed()) {
-						return;
-					}
-
-					// check if a newer runnable is available
-					if (__asynchRunnableCounter != _redrawMapCounter.get()) {
-						// a newer queryRedraw is available
-						return;
-					}
-
-					paintMap();
-				}
-			};
-
-			_display.asyncExec(asynchImageRunnable);
-		}
-
-		// tell the overlay thread to draw the overlay images
-		_nextOverlayRedrawTime = requestedRedrawTime;
-	}
-
-	/**
 	 * Set tile in the overlay painting queue
 	 * 
 	 * @param tile
@@ -3480,7 +3488,7 @@ public class Map extends Canvas {
 		setMapCenterInWorldPixel(pixelCenter);
 		updateViewPortData();
 
-		queueMapRedraw();
+		paint();
 	}
 
 	/**
@@ -3493,7 +3501,7 @@ public class Map extends Canvas {
 
 		setMapCenterInWorldPixel(_mp.geoToPixel(getAddressLocation(), _mapZoomLevel));
 
-		queueMapRedraw();
+		paint();
 	}
 
 	public void removeMousePositionListener(final IPositionListener listner) {
@@ -3507,7 +3515,7 @@ public class Map extends Canvas {
 	 */
 	public void removeOverlayPainter(final MapPainter overlay) {
 		_overlays.remove(overlay);
-		queueMapRedraw();
+		paint();
 	}
 
 	public void removeZoomListener(final IZoomListener listner) {
@@ -3521,7 +3529,7 @@ public class Map extends Canvas {
 
 		_mp.resetAll(false);
 
-		queueMapRedraw();
+		paint();
 	}
 
 	/**
@@ -3568,7 +3576,7 @@ public class Map extends Canvas {
 	}
 
 	/**
-	 * Set the center of the map to a geo position (with lat/long)
+	 * Set the center of the map to a geo position (with lat/long) and redraw the map.
 	 * 
 	 * @param geoPosition
 	 *            Center position in lat/lon
@@ -3598,7 +3606,7 @@ public class Map extends Canvas {
 		updateViewPortData();
 		updateTourToolTip();
 
-		queueMapRedraw();
+		paint();
 	}
 
 	/*
@@ -3732,7 +3740,7 @@ public class Map extends Canvas {
 			setZoom(mp.getDefaultZoomLevel());
 		}
 
-		queueMapRedraw();
+		paint();
 	}
 
 	/**
@@ -3750,7 +3758,7 @@ public class Map extends Canvas {
 
 		_mp = mp;
 
-		queueMapRedraw();
+		paint();
 	}
 
 	public void setMeasurementSystem(final float distanceUnitValue, final String distanceUnitLabel) {
@@ -3767,15 +3775,32 @@ public class Map extends Canvas {
 		_overlayKey = key;
 	}
 
-	public void setPhoto(final Photo photo) {
+	/**
+	 * @param isRedrawEnabled
+	 *            Set <code>true</code> to enable map drawing (which is the default). When
+	 *            <code>false</code>, map drawing is disabled.
+	 *            <p>
+	 *            This feature can enable the drawing of the map very late that flickering of the
+	 *            map is prevented when the map is setup.
+	 */
+	public void setPainting(final boolean isRedrawEnabled) {
 
-		final GeoPosition geoPosition = photo.getGeoPosition();
-		if (geoPosition == null) {
-			return;
+		_isRedrawEnabled = isRedrawEnabled;
+
+		if (isRedrawEnabled) {
+			paint();
 		}
-
-		setMapCenter(geoPosition);
 	}
+
+//	public void setPhoto(final Photo photo) {
+//
+//		final GeoPosition geoPosition = photo.getGeoPosition();
+//		if (geoPosition == null) {
+//			return;
+//		}
+//
+//		setMapCenter(geoPosition);
+//	}
 
 	public void setPoi(final GeoPosition poiGeoPosition, final int zoomLevel, final String poiText) {
 
@@ -3813,7 +3838,7 @@ public class Map extends Canvas {
 			setPoiVisible(false);
 		}
 
-		queueMapRedraw();
+		paint();
 	}
 
 	public void setPOI(final ITourToolTipProvider tourToolTipProvider, final TourWayPoint twp) {
@@ -3883,23 +3908,6 @@ public class Map extends Canvas {
 	}
 
 	/**
-	 * @param isRedrawEnabled
-	 *            Set <code>true</code> to enable map drawing (which is the default). When
-	 *            <code>false</code>, map drawing is disabled.
-	 *            <p>
-	 *            This feature can enable the drawing of the map very late that flickering of the
-	 *            map is prevented when the map is setup.
-	 */
-	public void setQueueMapRedraw(final boolean isRedrawEnabled) {
-
-		_isRedrawEnabled = isRedrawEnabled;
-
-		if (isRedrawEnabled) {
-			queueMapRedraw();
-		}
-	}
-
-	/**
 	 * Set if the tile borders should be drawn. Mainly used for debugging.
 	 * 
 	 * @param isShowDebugInfo
@@ -3909,7 +3917,7 @@ public class Map extends Canvas {
 	public void setShowDebugInfo(final boolean isShowDebugInfo, final boolean isShowTileBorder) {
 		_isShowTileInfo = isShowDebugInfo;
 		_isShowTileBorder = isShowTileBorder;
-		queueMapRedraw();
+		paint();
 	}
 
 	/**
@@ -3922,8 +3930,7 @@ public class Map extends Canvas {
 	}
 
 	/**
-	 * set status if overlays are painted, a {@link #queueMapRedraw()} must be called to update the
-	 * map
+	 * set status if overlays are painted, a {@link #paint()} must be called to update the map
 	 * 
 	 * @param showOverlays
 	 *            set <code>true</code> to see the overlays, <code>false</code> to hide the overlays
@@ -3936,7 +3943,7 @@ public class Map extends Canvas {
 
 		_isPoiVisible = isShowPOI;
 
-		queueMapRedraw();
+		paint();
 	}
 
 	public void setShowScale(final boolean isScaleVisible) {
@@ -4253,7 +4260,7 @@ public class Map extends Canvas {
 
 	/**
 	 * Sets all viewport data which are necessary to draw the map tiles in
-	 * {@link #paintMap10Tiles(GC)}. Some values are cached to optimize performance.
+	 * {@link #paint_30_Tiles(GC)}. Some values are cached to optimize performance.
 	 * 
 	 * @return
 	 */
@@ -4293,11 +4300,11 @@ public class Map extends Canvas {
 
 	public void zoomIn() {
 		setZoom(_mapZoomLevel + 1);
-		queueMapRedraw();
+		paint();
 	}
 
 	public void zoomOut() {
 		setZoom(_mapZoomLevel - 1);
-		queueMapRedraw();
+		paint();
 	}
 }

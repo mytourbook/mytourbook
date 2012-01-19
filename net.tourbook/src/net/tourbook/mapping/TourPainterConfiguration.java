@@ -30,7 +30,7 @@ public class TourPainterConfiguration {
 	private static TourPainterConfiguration	_instance;
 
 	private final ArrayList<TourData>		_tourDataList	= new ArrayList<TourData>();
-	private ArrayList<Photo>				_photoList		= new ArrayList<Photo>();
+	private final ArrayList<Photo>			_photoList		= new ArrayList<Photo>();
 
 	/**
 	 * contains the upper left and lower right position for a tour
@@ -89,23 +89,27 @@ public class TourPainterConfiguration {
 		}
 	}
 
+	public void setPhotos(final ArrayList<Photo> photoList) {
+
+		_photoList.clear();
+
+		if (photoList != null) {
+
+			isShowPhoto = true;
+			_photoList.addAll(photoList);
+
+		} else {
+
+			isShowPhoto = false;
+		}
+	}
+
 	public void setSynchTourZoomLevel(final int zoomLevel) {
 		_synchTourZoomLevel = zoomLevel;
 	}
 
 	public void setTourBounds(final Set<GeoPosition> mapPositions) {
 		_tourBounds = mapPositions;
-	}
-
-	/**
-	 * Sets {@link TourData} for all tours which are displayed
-	 * 
-	 * @param tourDataList
-	 */
-	public void setTourData(final ArrayList<TourData> tourDataList) {
-
-		_tourDataList.clear();
-		_tourDataList.addAll(tourDataList);
 	}
 
 	/**
@@ -118,5 +122,19 @@ public class TourPainterConfiguration {
 
 		_tourDataList.clear();
 		_tourDataList.add(tourData);
+	}
+
+	/**
+	 * Sets {@link TourData} for all tours which are displayed
+	 * 
+	 * @param tourDataList
+	 */
+	public void setTourDataList(final ArrayList<TourData> tourDataList) {
+
+		_tourDataList.clear();
+
+		if (tourDataList != null) {
+			_tourDataList.addAll(tourDataList);
+		}
 	}
 }

@@ -294,17 +294,17 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 	public void actionZoomIn() {
 		_map.setZoom(_map.getZoom() + 1);
-		_map.queueMapRedraw();
+		_map.paint();
 	}
 
 	public void actionZoomOut() {
 		_map.setZoom(_map.getZoom() - 1);
-		_map.queueMapRedraw();
+		_map.paint();
 	}
 
 	public void actionZoomOutToMinZoom() {
 		_map.setZoom(_map.getMapProvider().getMinimumZoomLevel());
-		_map.queueMapRedraw();
+		_map.paint();
 	}
 
 	@Override
@@ -1437,7 +1437,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 				.grab(true, true)
 				.applyTo(_map);
 
-		_map.setQueueMapRedraw(false);
+		_map.setPainting(false);
 		_map.setShowScale(true);
 
 		_map.addZoomListener(new IZoomListener() {
@@ -2645,7 +2645,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		_map.setZoom(_mpProfile.getLastUsedZoom());
 		_map.setMapCenter(_mpProfile.getLastUsedPosition());
 
-		_map.setQueueMapRedraw(true);
+		_map.setPainting(true);
 
 		// create root item and update viewer
 		_rootItem = new TVIMapProviderRoot(_treeViewer, allMpWrappers);

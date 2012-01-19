@@ -109,7 +109,7 @@ public class PhotoToolTipProvider implements ITourToolTipProvider, IMapToolTipPr
 				/*
 				 * name
 				 */
-				final String name = Double.toString(_photo.latitude);
+				final String name = Double.toString(_photo.getLatitude());
 				if (name != null) {
 
 					label = createUILabel(container, name);
