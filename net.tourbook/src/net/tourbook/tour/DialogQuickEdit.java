@@ -301,9 +301,10 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
 			// fill combobox
 			final ArrayList<String> arr = TourDatabase.getAllTourTitles();
-			for (String string : arr) {
-				if (string != null)
+			for (final String string : arr) {
+				if (string != null) {
 					_comboTitle.add(string);
+				}
 			}
 
 			new AutocompleteComboInput(_comboTitle);
@@ -905,7 +906,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 		_tourData.setWeather(_txtWeather.getText().trim());
 
 		if (_isTemperatureManuallyModified) {
-			float temperature = _spinTemperature.getSelection();
+			float temperature = (float) _spinTemperature.getSelection() / 10;
 			if (_unitValueTemperature != 1) {
 				temperature = ((temperature - UI.UNIT_FAHRENHEIT_ADD) / UI.UNIT_FAHRENHEIT_MULTI);
 			}

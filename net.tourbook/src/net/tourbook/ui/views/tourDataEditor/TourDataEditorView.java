@@ -4682,6 +4682,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_spinTemperature.setEnabled(canEdit && (_tourData.temperatureSerie == null));
 		_comboClouds.setEnabled(canEdit);
 		_spinWindDirectionValue.setEnabled(canEdit);
+
 		_spinWindSpeedValue.setEnabled(canEdit);
 		_comboWindDirectionText.setEnabled(canEdit);
 		_comboWindSpeedText.setEnabled(canEdit);
@@ -6531,9 +6532,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_tourData.setWeatherClouds(cloudValue);
 
 			if (_isTemperatureManuallyModified) {
-				int temperature = _spinTemperature.getSelection();
+				float temperature = (float) _spinTemperature.getSelection() / 10;
 				if (_unitValueTemperature != 1) {
-					temperature = (int) ((temperature - UI.UNIT_FAHRENHEIT_ADD) / UI.UNIT_FAHRENHEIT_MULTI);
+					temperature = (temperature - UI.UNIT_FAHRENHEIT_ADD) / UI.UNIT_FAHRENHEIT_MULTI;
 				}
 				_tourData.setAvgTemperature(temperature);
 			}
@@ -6900,7 +6901,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		 */
 		_isSetDigits = true;
 		_spinTemperature.setDigits(1);
-		_spinTemperature.setSelection((int) avgTemperature);
+		_spinTemperature.setSelection(Math.round(avgTemperature * 10));
 
 		// tour date
 		_dtTourDate.setDate(_tourData.getStartYear(), _tourData.getStartMonth() - 1, _tourData.getStartDay());
