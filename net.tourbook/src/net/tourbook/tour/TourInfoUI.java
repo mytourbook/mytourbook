@@ -950,11 +950,11 @@ public class TourInfoUI {
 		_lblAvgPaceUnit.setText(UI.UNIT_LABEL_PACE);
 
 		// avg pulse
-		_lblAvgPulse.setText(Integer.toString(_tourData.getAvgPulse()));
+		_lblAvgPulse.setText(_nf1.format(_tourData.getAvgPulse()));
 		_lblAvgPulseUnit.setText(Messages.Value_Unit_Pulse);
 
 		// avg cadence
-		_lblAvgCadence.setText(Integer.toString(_tourData.getAvgCadence()));
+		_lblAvgCadence.setText(_nf1.format(_tourData.getAvgCadence()));
 		_lblAvgCadenceUnit.setText(Messages.Value_Unit_Cadence);
 
 		_lblCalories.setText(Integer.toString(_tourData.getCalories()));

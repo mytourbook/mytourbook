@@ -293,15 +293,19 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	/**
 	 * Average pulse, this data can also be set from device data and pulse data are not available
+	 * 
+	 * @since is float since db version 21, before it was int
 	 */
 	@XmlElement
-	private int												avgPulse;																				// db-version 4
+	private float											avgPulse;																				// db-version 4
 
 	/**
 	 * Maximum pulse for the current tour.
+	 * 
+	 * @since is float since db version 21, before it was int
 	 */
 	@XmlElement
-	private int												maxPulse;																				// db-version 4
+	private float											maxPulse;																				// db-version 4
 
 	/**
 	 * Number of HR zones which are available for this tour, is 0 when HR zones are not defined.
@@ -359,9 +363,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	/**
 	 * maximum altitude in metric system
+	 * 
+	 * @since is float since db version 21, before it was int
 	 */
 	@XmlElement
-	private int												maxAltitude;																			// db-version 4
+	private float											maxAltitude;																			// db-version 4
 
 	// ############################################# MAX VALUES #############################################
 
@@ -373,9 +379,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	// ############################################# AVERAGE VALUES #############################################
 
+	/**
+	 * @since is float since db version 21, before it was int
+	 */
 	@XmlElement
-	private int												avgCadence;																			// db-version 4
+	private float											avgCadence;																			// db-version 4
 
+	/**
+	 * @since Is float since db version 21, before it was int. In db version 20 this field was
+	 *        already float but not the database field.
+	 */
 	private float											avgTemperature;																		// db-version 4
 	private int												weatherWindDir;																		// db-version 8
 
@@ -1697,7 +1710,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			}
 		}
 		if (cadenceCount > 0) {
-			avgCadence = (int) cadenceSum / cadenceCount;
+			avgCadence = cadenceSum / cadenceCount;
 		}
 	}
 
@@ -1707,7 +1720,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			return;
 		}
 
-		avgPulse = (int) (computeAvgPulseSegment(0, timeSerie.length - 1) + 0.5);
+		avgPulse = computeAvgPulseSegment(0, timeSerie.length - 1);
 	}
 
 	private float computeAvgPulseSegment(final int firstIndex, final int lastIndex) {
@@ -2064,7 +2077,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			}
 		}
 
-		this.maxAltitude = (int) maxAltitude;
+		this.maxAltitude = maxAltitude;
 	}
 
 	private void computeMaxPulse() {
@@ -2085,7 +2098,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			}
 		}
 
-		this.maxPulse = (int) maxPulse;
+		this.maxPulse = maxPulse;
 	}
 
 	private void computeMaxSpeed() {
@@ -3849,14 +3862,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	/**
 	 * @return the avgCadence
 	 */
-	public int getAvgCadence() {
+	public float getAvgCadence() {
 		return avgCadence;
 	}
 
 	/**
 	 * @return the avgPulse
 	 */
-	public int getAvgPulse() {
+	public float getAvgPulse() {
 		return avgPulse;
 	}
 
@@ -4135,14 +4148,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	/**
 	 * @return the maxAltitude
 	 */
-	public int getMaxAltitude() {
+	public float getMaxAltitude() {
 		return maxAltitude;
 	}
 
 	/**
 	 * @return the maxPulse
 	 */
-	public int getMaxPulse() {
+	public float getMaxPulse() {
 		return maxPulse;
 	}
 
@@ -5136,7 +5149,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * @param avgCadence
 	 *            the avgCadence to set
 	 */
-	public void setAvgCadence(final int avgCadence) {
+	public void setAvgCadence(final float avgCadence) {
 		this.avgCadence = avgCadence;
 	}
 
@@ -5144,7 +5157,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * @param avgPulse
 	 *            the avgPulse to set
 	 */
-	public void setAvgPulse(final int avgPulse) {
+	public void setAvgPulse(final float avgPulse) {
 		this.avgPulse = avgPulse;
 	}
 
@@ -5240,7 +5253,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		this.isDistanceFromSensor = (short) (isFromSensor ? 1 : 0);
 	}
 
-	public void setMaxPulse(final int maxPulse) {
+	public void setMaxPulse(final float maxPulse) {
 		this.maxPulse = maxPulse;
 	}
 

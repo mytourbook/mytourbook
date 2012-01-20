@@ -1040,14 +1040,13 @@ public class Messages extends NLS {
 	public static String		Tooltip_ValuePoint_Action_Value_TimeOfDay;
 	public static String		Tooltip_ValuePoint_Action_Value_TimeSlices;
 
-	public static String	Tooltip_ValuePoint_Format_Pace;
+	public static String		Tooltip_ValuePoint_Format_Pace;
 	public static String		Tooltip_ValuePoint_Label_ChartZoomFactor_Tooltip;
 
-	public static String	Tooltip_ValuePoint_Label_NoData;
+	public static String		Tooltip_ValuePoint_Label_NoData;
 
-	public static String	Tooltip_ValuePoint_Label_NoData_Tooltip;
+	public static String		Tooltip_ValuePoint_Label_NoData_Tooltip;
 
-	public static String		Tooltip_ValuePoint_Label_NoTour;
 	public static String		Tooltip_ValuePoint_Label_SlicesCurrent_Tooltip;
 	public static String		Tooltip_ValuePoint_Label_SlicesMax_Tooltip;
 
@@ -1106,9 +1105,11 @@ public class Messages extends NLS {
 	public static String		Tour_Database_load_all_tours;
 	public static String		Tour_Database_PostUpdate011_SetTourCreateTime;
 	public static String		Tour_Database_PostUpdate020_ConvertIntToFloat;
+
 	public static String		Tour_Database_TourSaveError;
 	public static String		Tour_Database_update_tour;
 	public static String		Tour_Database_Update;
+	public static String		Tour_Database_Update_ModifyColumn;
 	public static String		Tour_Database_Update_Subtask;
 	public static String		Tour_Database_Update_TourWeek;
 	public static String		Tour_Database_Update_TourWeek_Info;

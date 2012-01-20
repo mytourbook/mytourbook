@@ -84,8 +84,9 @@ public class TourDatabase {
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int						TOURBOOK_DB_VERSION							= 20;
+	private static final int						TOURBOOK_DB_VERSION							= 21;
 
+//	private static final int						TOURBOOK_DB_VERSION							= 21;	// 12.1.1
 //	private static final int						TOURBOOK_DB_VERSION							= 20;	// 12.1
 //	private static final int						TOURBOOK_DB_VERSION							= 19;	// 11.8
 //	private static final int						TOURBOOK_DB_VERSION							= 18;	// 11.8
@@ -452,30 +453,6 @@ public class TourDatabase {
 	}
 
 	/**
-	 * Getting all tour titles from the database sorted by alphabet and without any double
-	 * entries.
-	 * 
-	 * @author Stefan F.
-	 * @return titles as string array.
-	 */
-	public static ArrayList<String> getAllTourTitles() {
-
-		return getTextRow("SELECT tourTitle FROM " + TourDatabase.TABLE_TOUR_DATA + " ORDER BY tourTitle"); //$NON-NLS-1$ //$NON-NLS-2$
-	}
-
-	/**
-	 * Getting all tour start places from the database sorted by alphabet and without any double
-	 * entries.
-	 * 
-	 * @author Stefan F.
-	 * @return titles as string array.
-	 */
-	public static ArrayList<String> getAllTourPlaceStarts() {
-
-		return getTextRow("SELECT tourStartPlace FROM " + TourDatabase.TABLE_TOUR_DATA + " ORDER BY tourStartPlace"); //$NON-NLS-1$ //$NON-NLS-2$
-	}
-
-	/**
 	 * Getting all tour place ends from the database sorted by alphabet and without any double
 	 * entries.
 	 * 
@@ -488,63 +465,15 @@ public class TourDatabase {
 	}
 
 	/**
-	 * Getting one row from the database sorted by alphabet and without any double entries.
+	 * Getting all tour start places from the database sorted by alphabet and without any double
+	 * entries.
 	 * 
 	 * @author Stefan F.
-	 * @param sqlQuery
-	 *            must look like: "SELECT tourTitle FROM " + TourDatabase.TABLE_TOUR_DATA +
-	 *            " ORDER BY tourTitle"
-	 * @return places as string array.
+	 * @return titles as string array.
 	 */
-	private static ArrayList<String> getTextRow(String sqlQuery) {
+	public static ArrayList<String> getAllTourPlaceStarts() {
 
-		final ArrayList<String> retString = new ArrayList<String>();
-
-		Connection conn = null;
-		Statement stmt = null;
-
-		try {
-
-			conn = getInstance().getConnection();
-			stmt = conn.createStatement();
-
-			final ResultSet result = stmt.executeQuery(sqlQuery); //$NON-NLS-1$
-
-			//filter out equal text entries
-			String lastString = UI.EMPTY_STRING;
-			String newString;
-			while (result.next()) {
-
-				newString = result.getString(1);
-
-				if (newString != null) {
-
-					newString = newString.trim();
-
-					if (newString.length() > 0) {
-
-						if (!lastString.equals(newString)) {
-							retString.add(newString);
-							lastString = newString;
-						}
-					}
-				}
-			}
-
-		} catch (final SQLException e) {
-			UI.showSQLException(e);
-		} finally {
-			Util.sqlClose(stmt);
-			if (conn != null) {
-				try {
-					conn.close();
-				} catch (final SQLException e) {
-					UI.showSQLException(e);
-				}
-			}
-		}
-
-		return retString;
+		return getTextRow("SELECT tourStartPlace FROM " + TourDatabase.TABLE_TOUR_DATA + " ORDER BY tourStartPlace"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
@@ -586,6 +515,17 @@ public class TourDatabase {
 		}
 
 		return _tourTags;
+	}
+
+	/**
+	 * Getting all tour titles from the database sorted by alphabet and without any double entries.
+	 * 
+	 * @author Stefan F.
+	 * @return titles as string array.
+	 */
+	public static ArrayList<String> getAllTourTitles() {
+
+		return getTextRow("SELECT tourTitle FROM " + TourDatabase.TABLE_TOUR_DATA + " ORDER BY tourTitle"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
@@ -820,6 +760,66 @@ public class TourDatabase {
 		}
 
 		return sb.toString();
+	}
+
+	/**
+	 * Getting one row from the database sorted by alphabet and without any double entries.
+	 * 
+	 * @author Stefan F.
+	 * @param sqlQuery
+	 *            must look like: "SELECT tourTitle FROM " + TourDatabase.TABLE_TOUR_DATA +
+	 *            " ORDER BY tourTitle"
+	 * @return places as string array.
+	 */
+	private static ArrayList<String> getTextRow(final String sqlQuery) {
+
+		final ArrayList<String> retString = new ArrayList<String>();
+
+		Connection conn = null;
+		Statement stmt = null;
+
+		try {
+
+			conn = getInstance().getConnection();
+			stmt = conn.createStatement();
+
+			final ResultSet result = stmt.executeQuery(sqlQuery);
+
+			//filter out equal text entries
+			String lastString = UI.EMPTY_STRING;
+			String newString;
+			while (result.next()) {
+
+				newString = result.getString(1);
+
+				if (newString != null) {
+
+					newString = newString.trim();
+
+					if (newString.length() > 0) {
+
+						if (!lastString.equals(newString)) {
+							retString.add(newString);
+							lastString = newString;
+						}
+					}
+				}
+			}
+
+		} catch (final SQLException e) {
+			UI.showSQLException(e);
+		} finally {
+			Util.sqlClose(stmt);
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (final SQLException e) {
+					UI.showSQLException(e);
+				}
+			}
+		}
+
+		return retString;
 	}
 
 	/**
@@ -2028,11 +2028,12 @@ public class TourDatabase {
 				// version 4 start
 
 				// from markus
-				+ "	maxAltitude				INTEGER,								\n" //$NON-NLS-1$
-				+ "	maxPulse				INTEGER,								\n" //$NON-NLS-1$
-				+ "	avgPulse				INTEGER,								\n" //$NON-NLS-1$
-				+ "	avgCadence				INTEGER,								\n" //$NON-NLS-1$
-				+ "	avgTemperature			INTEGER,								\n" //$NON-NLS-1$
+// replaced with float values in version 21
+//				+ "	maxAltitude				INTEGER,								\n" //$NON-NLS-1$
+//				+ "	maxPulse				INTEGER,								\n" //$NON-NLS-1$
+//				+ "	avgPulse				INTEGER,								\n" //$NON-NLS-1$
+//				+ "	avgCadence				INTEGER,								\n" //$NON-NLS-1$
+//				+ "	avgTemperature			INTEGER,								\n" //$NON-NLS-1$
 				+ "	maxSpeed				FLOAT,									\n" //$NON-NLS-1$
 				+ ("	tourTitle			" + varCharKomma(TourData.DB_LENGTH_TOUR_TITLE)) //$NON-NLS-1$
 
@@ -2153,6 +2154,16 @@ public class TourDatabase {
 				+ "	NumberOfHrZones				INTEGER DEFAULT 0, 				\n" //$NON-NLS-1$
 				//
 				// version 18 end ---------
+
+				// version 21 start
+				//
+				+ "	maxAltitude					FLOAT DEFAULT 0,				\n" //$NON-NLS-1$
+				+ "	maxPulse					FLOAT DEFAULT 0,				\n" //$NON-NLS-1$
+				+ "	avgPulse					FLOAT DEFAULT 0,				\n" //$NON-NLS-1$
+				+ "	avgCadence					FLOAT DEFAULT 0,				\n" //$NON-NLS-1$
+				+ "	avgTemperature				FLOAT DEFAULT 0,				\n" //$NON-NLS-1$
+				//
+				// version 21 end ---------
 
 				+ "	serieData					BLOB 							\n" //$NON-NLS-1$
 
@@ -2768,10 +2779,18 @@ public class TourDatabase {
 
 	private void exec(final Statement stmt, final String sql) throws SQLException {
 
-		System.out.println(sql);
+		StatusUtil.log(sql);
 		System.out.println();
 
 		stmt.execute(sql);
+	}
+
+	private void execUpdate(final Statement stmt, final String sql) throws SQLException {
+
+		StatusUtil.log(sql);
+		System.out.println();
+
+		stmt.executeUpdate(sql);
 	}
 
 	public void firePropertyChange(final int propertyId) {
@@ -2871,6 +2890,39 @@ public class TourDatabase {
 		System.out.println(NLS.bind(Messages.Tour_Database_Update, dbVersion));
 	}
 
+	private void modifyColumnType(	final String table,
+									final String fieldName,
+									final String newFieldType,
+									final Statement stmt,
+									final IProgressMonitor monitor,
+									final int no,
+									final int max) throws SQLException {
+
+		if (monitor != null) {
+			monitor.subTask(NLS.bind(Messages.Tour_Database_Update_ModifyColumn, new Object[] { no, max }));
+		}
+
+		//	"ALTER TABLE t ADD COLUMN c1_newtype NEWTYPE"
+		//	"UPDATE t SET c1_newtype = c1"
+		//	"ALTER TABLE t DROP COLUMN c1"
+		//	"RENAME COLUMN t.c1_newtype TO c1"
+
+		String sql;
+		final String tempFieldName = fieldName + "_temp";//$NON-NLS-1$
+
+		sql = "ALTER TABLE " + table + " ADD COLUMN " + tempFieldName + " " + newFieldType; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		exec(stmt, sql);
+
+		sql = "UPDATE " + table + " SET " + tempFieldName + " = " + fieldName; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		execUpdate(stmt, sql);
+
+		sql = "ALTER TABLE " + table + " DROP COLUMN " + fieldName; //$NON-NLS-1$ //$NON-NLS-2$
+		exec(stmt, sql);
+
+		sql = "RENAME COLUMN " + table + "." + tempFieldName + " TO " + fieldName; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		exec(stmt, sql);
+	}
+
 	public void removePropertyListener(final IPropertyListener listener) {
 		_propertyListeners.remove(listener);
 	}
@@ -2880,8 +2932,7 @@ public class TourDatabase {
 	 */
 	private boolean updateDbDesign(final Connection conn, int currentDbVersion, final IProgressMonitor monitor) {
 
-
-				/*
+		/*
 		 * confirm update
 		 */
 
@@ -3036,7 +3087,7 @@ public class TourDatabase {
 			 */
 			updateDbVersionNumber(conn, newVersion);
 
-			/*
+			/**
 			 * do the post update after the version number is updated because the post update uses
 			 * connections which is checking the version number
 			 */
@@ -3055,6 +3106,16 @@ public class TourDatabase {
 			}
 			if (isPostUpdate20) {
 				updateDbDesign_019_to_020_PostUpdate(conn, monitor);
+			}
+
+			/*
+			 * 21
+			 */
+			if (currentDbVersion == 20) {
+
+				currentDbVersion = newVersion = updateDbDesign_020_to_021(conn, monitor);
+
+				updateDbVersionNumber(conn, newVersion);
 			}
 
 		} catch (final SQLException e) {
@@ -4023,79 +4084,49 @@ public class TourDatabase {
 		}
 	}
 
-//	private int updateDbDesign_020_to_021(final Connection conn, final IProgressMonitor monitor) throws SQLException {
-//
-//		final int newDbVersion = 21;
-//
-//		logDbUpdateStart(newDbVersion);
-//
-//		if (monitor != null) {
-//			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, newDbVersion));
-//		}
-//
-//		{
-//			updateDbDesign_021_10DropColumns(conn, monitor, newDbVersion);
-//		}
-//
-//		logDbUpdateEnd(newDbVersion);
-//
-//		return newDbVersion;
-//	}
+	private int updateDbDesign_020_to_021(final Connection conn, final IProgressMonitor monitor) throws SQLException {
 
-//	private void updateDbDesign_021_10DropColumns(	final Connection conn,
-//													final IProgressMonitor monitor,
-//													final int newDbVersion) throws SQLException {
-//
-//		String sql;
-//		final Statement stmt = conn.createStatement();
-//		{
-////				TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA
-////
-////				+ "	distance 				INTEGER NOT NULL,						\n" //$NON-NLS-1$
-////				+ "	deviceDistance 			INTEGER NOT NULL,						\n" //$NON-NLS-1$
-////				+ "	deviceTravelTime 		BIGINT NOT NULL,						\n" //$NON-NLS-1$
-////				+ "	deviceWheel 			INTEGER NOT NULL,						\n" //$NON-NLS-1$
-////				+ "	deviceWeight 			INTEGER NOT NULL,						\n" //$NON-NLS-1$
-////				+ "	deviceTotalUp 			INTEGER NOT NULL,						\n" //$NON-NLS-1$
-////				+ "	deviceTotalDown 		INTEGER NOT NULL,						\n" //$NON-NLS-1$
-////
-////				TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA
-//
-//			showSubTask(monitor, "1/7"); //$NON-NLS-1$
-//			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " DROP distance";//$NON-NLS-1$ //$NON-NLS-2$
-//			exec(stmt, sql);
-//
-//			showSubTask(monitor, "2/7"); //$NON-NLS-1$
-//			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " DROP deviceDistance";//$NON-NLS-1$ //$NON-NLS-2$
-//			exec(stmt, sql);
-//
-//			showSubTask(monitor, "3/7"); //$NON-NLS-1$
-//			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " DROP deviceTravelTime";//$NON-NLS-1$ //$NON-NLS-2$
-//			exec(stmt, sql);
-//
-//			showSubTask(monitor, "4/7"); //$NON-NLS-1$
-//			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " DROP deviceWheel";//$NON-NLS-1$ //$NON-NLS-2$
-//			exec(stmt, sql);
-//
-//			showSubTask(monitor, "5/7"); //$NON-NLS-1$
-//			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " DROP deviceWeight";//$NON-NLS-1$ //$NON-NLS-2$
-//			exec(stmt, sql);
-//
-//			showSubTask(monitor, "6/7"); //$NON-NLS-1$
-//			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " DROP deviceTotalUp";//$NON-NLS-1$ //$NON-NLS-2$
-//			exec(stmt, sql);
-//
-//			showSubTask(monitor, "7/7"); //$NON-NLS-1$
-//			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " DROP deviceTotalDown";//$NON-NLS-1$ //$NON-NLS-2$
-//			exec(stmt, sql);
-//
-//		}
-//		stmt.close();
-//	}
+		final int newDbVersion = 21;
+
+		logDbUpdateStart(newDbVersion);
+
+		if (monitor != null) {
+			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, newDbVersion));
+		}
+
+		final Statement stmt = conn.createStatement();
+		{
+//			TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA
+//			// version 21 start
+//			//
+//			+ "	maxAltitude					FLOAT DEFAULT 0,				\n" //$NON-NLS-1$
+//			+ "	maxPulse					FLOAT DEFAULT 0,				\n" //$NON-NLS-1$
+//			+ "	avgPulse					FLOAT DEFAULT 0,				\n" //$NON-NLS-1$
+//			+ "	avgCadence					FLOAT DEFAULT 0,				\n" //$NON-NLS-1$
+//			+ "	avgTemperature				FLOAT DEFAULT 0,				\n" //$NON-NLS-1$
+//			//
+//			// version 21 end ---------
+//			TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA
+
+			int no = 0;
+			final int max = 5;
+
+			modifyColumnType(TABLE_TOUR_DATA, "maxAltitude", "FLOAT DEFAULT 0", stmt, monitor, ++no, max); //			//$NON-NLS-1$ //$NON-NLS-2$
+			modifyColumnType(TABLE_TOUR_DATA, "maxPulse", "FLOAT DEFAULT 0", stmt, monitor, ++no, max); //				//$NON-NLS-1$ //$NON-NLS-2$
+			modifyColumnType(TABLE_TOUR_DATA, "avgPulse", "FLOAT DEFAULT 0", stmt, monitor, ++no, max); //				//$NON-NLS-1$ //$NON-NLS-2$
+			modifyColumnType(TABLE_TOUR_DATA, "avgCadence", "FLOAT DEFAULT 0", stmt, monitor, ++no, max); //			//$NON-NLS-1$ //$NON-NLS-2$
+			modifyColumnType(TABLE_TOUR_DATA, "avgTemperature", "FLOAT DEFAULT 0", stmt, monitor, ++no, max); //		//$NON-NLS-1$ //$NON-NLS-2$
+		}
+		stmt.close();
+
+		logDbUpdateEnd(newDbVersion);
+
+		return newDbVersion;
+	}
 
 	private void updateDbVersionNumber(final Connection conn, final int newVersion) throws SQLException {
 
-		final String sql = "UPDATE " + TABLE_DB_VERSION + " SET VERSION=" + newVersion + " WHERE 1=1"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		final String sql = "UPDATE " + TABLE_DB_VERSION + " SET VERSION=" + newVersion; //$NON-NLS-1$ //$NON-NLS-2$
 
 		conn.createStatement().executeUpdate(sql);
 	}

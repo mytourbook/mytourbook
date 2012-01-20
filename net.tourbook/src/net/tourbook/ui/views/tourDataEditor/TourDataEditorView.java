@@ -2705,9 +2705,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			// fill combobox
 			ArrayList<String> arr = TourDatabase.getAllTourTitles();
-			for (String string : arr) {
-				if (string != null)
+			for (final String string : arr) {
+				if (string != null) {
 					_comboTitle.add(string);
+				}
 			}
 
 			_comboTitle.addKeyListener(_keyListener);
@@ -2770,9 +2771,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			// fill combobox
 			arr = TourDatabase.getAllTourPlaceStarts();
-			for (String string : arr) {
-				if (string != null)
+			for (final String string : arr) {
+				if (string != null) {
 					_comboStartLocation.add(string);
+				}
 			}
 
 			_comboStartLocation.addModifyListener(new ModifyListener() {
@@ -2807,9 +2809,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			// fill combobox
 			arr = TourDatabase.getAllTourPlaceEnds();
-			for (String string : arr) {
-				if (string != null)
+			for (final String string : arr) {
+				if (string != null) {
 					_comboEndLocation.add(string);
+				}
 			}
 
 			_comboEndLocation.addModifyListener(new ModifyListener() {
@@ -4679,6 +4682,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_spinTemperature.setEnabled(canEdit && (_tourData.temperatureSerie == null));
 		_comboClouds.setEnabled(canEdit);
 		_spinWindDirectionValue.setEnabled(canEdit);
+
 		_spinWindSpeedValue.setEnabled(canEdit);
 		_comboWindDirectionText.setEnabled(canEdit);
 		_comboWindSpeedText.setEnabled(canEdit);
@@ -6200,10 +6204,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_comboTitle.clearSelection();
 			_comboTitle.removeAll();
 			// fill combobox
-			ArrayList<String> arr = TourDatabase.getAllTourTitles();
-			for (String string : arr) {
-				if (string != null)
+			final ArrayList<String> arr = TourDatabase.getAllTourTitles();
+			for (final String string : arr) {
+				if (string != null) {
 					_comboTitle.add(string);
+				}
 			}
 			_comboTitle.update();
 			_isTitleModified = false;
@@ -6212,10 +6217,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_comboStartLocation.clearSelection();
 			_comboStartLocation.removeAll();
 			// fill combobox
-			ArrayList<String> arr = TourDatabase.getAllTourPlaceStarts();
-			for (String string : arr) {
-				if (string != null)
+			final ArrayList<String> arr = TourDatabase.getAllTourPlaceStarts();
+			for (final String string : arr) {
+				if (string != null) {
 					_comboStartLocation.add(string);
+				}
 			}
 			_comboStartLocation.update();
 			_isStartLocationModified = false;
@@ -6224,10 +6230,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_comboEndLocation.clearSelection();
 			_comboEndLocation.removeAll();
 			// fill combobox
-			ArrayList<String> arr = TourDatabase.getAllTourPlaceEnds();
-			for (String string : arr) {
-				if (string != null)
+			final ArrayList<String> arr = TourDatabase.getAllTourPlaceEnds();
+			for (final String string : arr) {
+				if (string != null) {
 					_comboEndLocation.add(string);
+				}
 			}
 			_comboEndLocation.update();
 			_isEndLocationModified = false;
@@ -6525,9 +6532,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_tourData.setWeatherClouds(cloudValue);
 
 			if (_isTemperatureManuallyModified) {
-				int temperature = _spinTemperature.getSelection();
+				float temperature = (float) _spinTemperature.getSelection() / 10;
 				if (_unitValueTemperature != 1) {
-					temperature = (int) ((temperature - UI.UNIT_FAHRENHEIT_ADD) / UI.UNIT_FAHRENHEIT_MULTI);
+					temperature = (temperature - UI.UNIT_FAHRENHEIT_ADD) / UI.UNIT_FAHRENHEIT_MULTI;
 				}
 				_tourData.setAvgTemperature(temperature);
 			}
@@ -6894,7 +6901,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		 */
 		_isSetDigits = true;
 		_spinTemperature.setDigits(1);
-		_spinTemperature.setSelection((int) avgTemperature);
+		_spinTemperature.setSelection(Math.round(avgTemperature * 10));
 
 		// tour date
 		_dtTourDate.setDate(_tourData.getStartYear(), _tourData.getStartMonth() - 1, _tourData.getStartDay());
