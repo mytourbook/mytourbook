@@ -2,7 +2,7 @@
 <feature
       id="feature.net.tourbook.app.nl"
       label="MyTourbook Language Support"
-      version="12.1.0.qualifier"
+      version="12.1.1.qualifier"
       provider-name="MyTourbook"
       plugin="net.tourbook.branding">
 
@@ -27,7 +27,7 @@
       <import plugin="net.tourbook.device"/>
       <import plugin="net.tourbook.device.garmin"/>
       <import plugin="net.tourbook.device.nmea"/>
-      <import plugin="net.tourbook" version="10.11.0"/>
+      <import plugin="net.tourbook"/>
       <import plugin="net.tourbook.statistics"/>
       <import plugin="net.tourbook.util"/>
       <import plugin="net.tourbook.printing"/>
@@ -37,7 +37,7 @@
          id="net.tourbook.chart.nl"
          download-size="0"
          install-size="0"
-         version="12.1.0.qualifier"
+         version="12.1.1.qualifier"
          fragment="true"
          unpack="false"/>
 
@@ -45,7 +45,7 @@
          id="net.tourbook.device.nl"
          download-size="0"
          install-size="0"
-         version="12.1.0.qualifier"
+         version="12.1.1.qualifier"
          fragment="true"
          unpack="false"/>
 
@@ -53,7 +53,7 @@
          id="net.tourbook.device.garmin.nl"
          download-size="0"
          install-size="0"
-         version="12.1.0.qualifier"
+         version="12.1.1.qualifier"
          fragment="true"
          unpack="false"/>
 
@@ -61,7 +61,7 @@
          id="net.tourbook.device.nmea.nl"
          download-size="0"
          install-size="0"
-         version="12.1.0.qualifier"
+         version="12.1.1.qualifier"
          fragment="true"
          unpack="false"/>
 
@@ -69,23 +69,7 @@
          id="net.tourbook.nl"
          download-size="0"
          install-size="0"
-         version="12.1.0.qualifier"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="net.tourbook.statistics.nl"
-         download-size="0"
-         install-size="0"
-         version="12.1.0.qualifier"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="net.tourbook.util.nl"
-         download-size="0"
-         install-size="0"
-         version="12.1.0.qualifier"
+         version="12.1.1.qualifier"
          fragment="true"
          unpack="false"/>
 
@@ -93,7 +77,23 @@
          id="net.tourbook.printing.nl"
          download-size="0"
          install-size="0"
-         version="12.1.0.qualifier"
+         version="12.1.1.qualifier"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.statistics.nl"
+         download-size="0"
+         install-size="0"
+         version="12.1.1.qualifier"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.util.nl"
+         download-size="0"
+         install-size="0"
+         version="12.1.1.qualifier"
          fragment="true"
          unpack="false"/>
 

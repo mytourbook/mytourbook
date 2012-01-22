@@ -2,7 +2,7 @@
 <feature
       id="feature.z_Dummy_Host"
       label="Z_Dummy_Host"
-      version="12.1.0.qualifier"
+      version="12.1.1.qualifier"
       provider-name="dummy feature">
 
    <description url="http://www.example.com/description">
@@ -21,49 +21,56 @@
          id="net.tourbook"
          download-size="0"
          install-size="0"
-         version="12.1.0.qualifier"
+         version="12.1.1.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.chart"
          download-size="0"
          install-size="0"
-         version="12.1.0.qualifier"
+         version="12.1.1.qualifier"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.device"
+         download-size="0"
+         install-size="0"
+         version="12.1.1.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.garmin"
          download-size="0"
          install-size="0"
-         version="12.1.0.qualifier"
+         version="12.1.1.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.nmea"
          download-size="0"
          install-size="0"
-         version="12.1.0.qualifier"
-         unpack="false"/>
-
-   <plugin
-         id="net.tourbook.statistics"
-         download-size="0"
-         install-size="0"
-         version="12.1.0.qualifier"
-         unpack="false"/>
-
-   <plugin
-         id="net.tourbook.util"
-         download-size="0"
-         install-size="0"
-         version="12.1.0.qualifier"
+         version="12.1.1.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.printing"
          download-size="0"
          install-size="0"
-         version="12.1.0.qualifier"
+         version="12.1.1.qualifier"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.statistics"
+         download-size="0"
+         install-size="0"
+         version="12.1.1.qualifier"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.util"
+         download-size="0"
+         install-size="0"
+         version="12.1.1.qualifier"
          unpack="false"/>
 
 </feature>

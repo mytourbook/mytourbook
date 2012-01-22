@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: GPX/TCX Export
 Bundle-SymbolicName: net.tourbook.export;singleton:=true
-Bundle-Version: 12.1.0.qualifier
+Bundle-Version: 12.1.1.qualifier
 Bundle-Activator: net.tourbook.export.Activator
 Bundle-Vendor: MyTourbook
 Require-Bundle: org.eclipse.core.runtime,
@@ -10,6 +10,12 @@ Require-Bundle: org.eclipse.core.runtime,
  net.tourbook,
  net.tourbook.ext.jars,
  net.tourbook.util,
- net.tourbook.ext.velocity
+ net.tourbook.ext.velocity;bundle-version="12.1.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
+Import-Package: net.tourbook.ext.velocity,
+ org.apache.velocity,
+ org.apache.velocity.app,
+ org.dinopolis.gpstool.gpsinput,
+ org.dinopolis.gpstool.gpsinput.garmin,
+ org.dinopolis.util.text
