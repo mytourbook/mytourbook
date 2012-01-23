@@ -28,6 +28,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.IWeather;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.UI;
+import net.tourbook.ui.ViewerDetailForm;
 import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.util.ColumnDefinition;
 import net.tourbook.util.ColumnManager;
@@ -49,8 +50,6 @@ import org.apache.commons.sanselan.formats.tiff.constants.TagInfo;
 import org.apache.commons.sanselan.formats.tiff.constants.TiffConstants;
 import org.apache.commons.sanselan.formats.tiff.constants.TiffTagConstants;
 import org.apache.commons.sanselan.test.util.FileSystemTraversal;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -75,15 +74,13 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbenchPartReference;
@@ -95,24 +92,27 @@ import org.joda.time.format.DateTimeFormatter;
 
 public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 
-	static public final String				ID						= "net.tourbook.photo.photoDirectoryView";	//$NON-NLS-1$
+	static public final String				ID							= "net.tourbook.photo.photoDirectoryView";	//$NON-NLS-1$
 
-	private static final String				STATE_PHOTO_FILE_PATH	= "PhotoFilePath";							//$NON-NLS-1$
+	private static final String				STATE_PHOTO_FILE_PATH		= "PhotoFilePath";							//$NON-NLS-1$
+	private static final String				STATE_FOLDER_VIEWER_WIDTH	= "FolderViewerWidth";						//$NON-NLS-1$
 
-	private static final IDialogSettings	_state					= TourbookPlugin.getDefault()//
-																			.getDialogSettingsSection(
-																					"PhotoDirectoryView");		//$NON-NLS-1$
-	private static final IPreferenceStore	_prefStore				= TourbookPlugin.getDefault()//
-																			.getPreferenceStore();
+	private static final IDialogSettings	_state						= TourbookPlugin.getDefault()//
+																				.getDialogSettingsSection(
+																						"PhotoDirectoryView");		//$NON-NLS-1$
+	private static final IPreferenceStore	_prefStore					= TourbookPlugin.getDefault()//
+																				.getPreferenceStore();
 
-	private static final DateTimeFormatter	_dateFormatter			= DateTimeFormat.shortDate();
-	private static final DateTimeFormatter	_timeFormatter			= DateTimeFormat.mediumTime();
+	private static final DateTimeFormatter	_dateFormatter				= DateTimeFormat.shortDate();
+	private static final DateTimeFormatter	_timeFormatter				= DateTimeFormat.mediumTime();
 
-	private static final DateTimeFormatter	_dtParser				= DateTimeFormat.forPattern("yyyy:MM:dd HH:mm:ss")// //$NON-NLS-1$
-																			.withZone(DateTimeZone.UTC);
+	private static final DateTimeFormatter	_dtParser					= DateTimeFormat.forPattern(
+																				"yyyy:MM:dd HH:mm:ss")// //$NON-NLS-1$
+																				.withZone(DateTimeZone.UTC);
 
-	private static final NumberFormat		_nf0					= NumberFormat.getNumberInstance();
-	private static final NumberFormat		_nf8					= NumberFormat.getNumberInstance();
+	private static final NumberFormat		_nf0						= NumberFormat.getNumberInstance();
+	private static final NumberFormat		_nf8						= NumberFormat.getNumberInstance();
+
 	{
 		_nf0.setMinimumFractionDigits(0);
 		_nf0.setMaximumFractionDigits(0);
@@ -127,17 +127,22 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 	private TableViewer						_photoViewer;
 	private ColumnManager					_columnManager;
 
-	private ArrayList<Photo>				_photos					= new ArrayList<Photo>();
+	private ArrayList<Photo>				_photos						= new ArrayList<Photo>();
 
 	private ActionRefreshViewer				_actionRefreshViewer;
+
+	private PixelConverter					_pc;
 
 	/*
 	 * UI controls
 	 */
-	private PixelConverter					_pc;
 
-	private Combo							_comboPath;
-	private Button							_btnSelectPath;
+	private ViewerDetailForm				_containerFolderPhoto;
+	private Composite						_containerFolder;
+	private Composite						_containerPhoto;
+
+//	private Combo							_comboPath;
+//	private Button							_btnSelectPath;
 
 	private class ActionRefreshViewer extends Action {
 
@@ -279,64 +284,105 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 
 	private void createUI(final Composite parent) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, 0).applyTo(container);
+		final Composite masterDetailContainer = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(masterDetailContainer);
 		{
-			createUI10Path(container);
-			createUI20PhotoViewer(container);
+
+			// folder
+			_containerFolder = new Composite(masterDetailContainer, SWT.NONE);
+			_containerFolder.setLayout(new FillLayout());
+			createUI10Folder(_containerFolder);
+
+			// sash
+			final Sash sash = new Sash(masterDetailContainer, SWT.VERTICAL);
+
+			// photos
+			_containerPhoto = new Composite(masterDetailContainer, SWT.NONE);
+			_containerPhoto.setLayout(new FillLayout());
+			createUI20Files(_containerPhoto);
+
+			// master/detail form
+			_containerFolderPhoto = new ViewerDetailForm(masterDetailContainer, _containerFolder, sash, _containerPhoto);
 		}
+
 	}
 
-	private void createUI10Path(final Composite parent) {
+	private void createUI10Folder(final Composite parent) {
+
+		final Label label = new Label(parent, SWT.NONE);
+		label.setText("test");
+
+	}
+
+	private void createUI20Files(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults()//
-				.numColumns(3)
-				.margins(2, 2)
-				.applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+		GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, 0).applyTo(container);
 		{
-			/*
-			 * label: path
-			 */
-			final Label label = new Label(container, SWT.NONE);
-			label.setText("Photo path:");
-
-			/*
-			 * combo: path
-			 */
-			_comboPath = new Combo(container, SWT.SINGLE | SWT.BORDER);
-			GridDataFactory.fillDefaults().grab(true, false).align(SWT.FILL, SWT.CENTER).applyTo(_comboPath);
-			_comboPath.setVisibleItemCount(20);
-//			_comboPath.addModifyListener(filePathModifyListener);
-			_comboPath.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-//					validateFields();
-				}
-			});
-
-			/*
-			 * button: browse
-			 */
-			_btnSelectPath = new Button(container, SWT.PUSH);
-			_btnSelectPath.setText(Messages.app_btn_browse);
-			_btnSelectPath.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onSelectBrowseDirectory();
-//					validateFields();
-				}
-			});
+//			createUI50Path(container);
+			createUI60PhotoViewer(container);
 		}
 	}
 
 	/**
+	 * create the viewer context menu
+	 */
+	private void createUI500ContextMenu() {
+
+		final Table table = (Table) _photoViewer.getControl();
+
+		_columnManager.createHeaderContextMenu(table, null);
+	}
+
+//	private void createUI50Path(final Composite parent) {
+//
+//		final Composite container = new Composite(parent, SWT.NONE);
+//		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+//		GridLayoutFactory.fillDefaults()//
+//				.numColumns(3)
+//				.margins(2, 2)
+//				.applyTo(container);
+////		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+//		{
+//			/*
+//			 * label: path
+//			 */
+//			final Label label = new Label(container, SWT.NONE);
+//			label.setText("Photo path:");
+//
+//			/*
+//			 * combo: path
+//			 */
+//			_comboPath = new Combo(container, SWT.SINGLE | SWT.BORDER);
+//			GridDataFactory.fillDefaults().grab(true, false).align(SWT.FILL, SWT.CENTER).applyTo(_comboPath);
+//			_comboPath.setVisibleItemCount(20);
+////			_comboPath.addModifyListener(filePathModifyListener);
+//			_comboPath.addSelectionListener(new SelectionAdapter() {
+//				@Override
+//				public void widgetSelected(final SelectionEvent e) {
+////					validateFields();
+//				}
+//			});
+//
+//			/*
+//			 * button: browse
+//			 */
+//			_btnSelectPath = new Button(container, SWT.PUSH);
+//			_btnSelectPath.setText(Messages.app_btn_browse);
+//			_btnSelectPath.addSelectionListener(new SelectionAdapter() {
+//				@Override
+//				public void widgetSelected(final SelectionEvent e) {
+//					onSelectBrowseDirectory();
+////					validateFields();
+//				}
+//			});
+//		}
+//	}
+
+	/**
 	 * @param parent
 	 */
-	private void createUI20PhotoViewer(final Composite parent) {
+	private void createUI60PhotoViewer(final Composite parent) {
 
 		// table
 		final Table table = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.MULTI);
@@ -375,16 +421,6 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 		});
 
 		createUI500ContextMenu();
-	}
-
-	/**
-	 * create the viewer context menu
-	 */
-	private void createUI500ContextMenu() {
-
-		final Table table = (Table) _photoViewer.getControl();
-
-		_columnManager.createHeaderContextMenu(table, null);
 	}
 
 	private void defineAllColumns() {
@@ -863,8 +899,8 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 
 		_photos.clear();
 
-//		File imagesFolder = new File("C:\\TEST-images\\");
-		File imagesFolder = new File(getPathName());
+		File imagesFolder = new File("C:\\TEST-images\\");
+//		File imagesFolder = new File(getPathName());
 
 		imagesFolder = imagesFolder.getAbsoluteFile();
 
@@ -884,9 +920,9 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 		new FileSystemTraversal().traverseFiles(imagesFolder, visitor);
 	}
 
-	private String getPathName() {
-		return _comboPath.getText().trim();
-	}
+//	private String getPathName() {
+//		return _comboPath.getText().trim();
+//	}
 
 	private DateTime getTiffDate(final Photo photo, final TiffImageMetadata tiffMetadata) {
 
@@ -935,7 +971,7 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 		final String selectedDirectoryName = dialog.open();
 
 		if (selectedDirectoryName != null) {
-			_comboPath.setText(selectedDirectoryName);
+//			_comboPath.setText(selectedDirectoryName);
 
 			updateViewer();
 		}
@@ -981,7 +1017,7 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 		viewerParent.setRedraw(false);
 		{
 			viewerControl.dispose();
-			createUI20PhotoViewer(viewerParent);
+			createUI60PhotoViewer(viewerParent);
 			viewerParent.layout();
 
 			// update the viewer
@@ -999,16 +1035,22 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 
 	private void restoreState() {
 
+		// viewer width
+		_containerFolderPhoto.setViewerWidth(Util.getStateInt(_state, STATE_FOLDER_VIEWER_WIDTH, 200));
+
 		// photo path
-		UI.restoreCombo(_comboPath, _state.getArray(STATE_PHOTO_FILE_PATH));
+//		UI.restoreCombo(_comboPath, _state.getArray(STATE_PHOTO_FILE_PATH));
 	}
 
 	private void saveState() {
 
+		// save viewer width
+		_state.put(STATE_FOLDER_VIEWER_WIDTH, _containerFolder.getSize().x);
+
 		// path
-		if (validateFilePath()) {
-			_state.put(STATE_PHOTO_FILE_PATH, Util.getUniqueItems(_comboPath.getItems(), getPathName(), 20));
-		}
+//		if (validateFilePath()) {
+//			_state.put(STATE_PHOTO_FILE_PATH, Util.getUniqueItems(_comboPath.getItems(), getPathName(), 20));
+//		}
 
 		_columnManager.saveState(_state);
 	}
@@ -1108,17 +1150,17 @@ public class PhotoDirectoryView extends ViewPart implements ITourViewer {
 		_photoViewer.setInput(this);
 	}
 
-	private boolean validateFilePath() {
-
-		// check path
-		final IPath filePath = new Path(getPathName());
-		if (new File(filePath.toOSString()).exists() == false) {
-
-			// invalid path
-			return false;
-		}
-
-		return true;
-	}
+//	private boolean validateFilePath() {
+//
+//		// check path
+//		final IPath filePath = new Path(getPathName());
+//		if (new File(filePath.toOSString()).exists() == false) {
+//
+//			// invalid path
+//			return false;
+//		}
+//
+//		return true;
+//	}
 
 }
