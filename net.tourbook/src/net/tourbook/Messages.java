@@ -128,6 +128,19 @@ public class Messages extends NLS {
 	public static String		Dialog_DoubleClickAction_NoAction_Message;
 	public static String		Dialog_DoubleClickAction_NoAction_Title;
 
+	public static String		Dialog_Export_Error_CourseNameIsInvalid;
+	public static String		Dialog_Export_Group_TCX_Options;
+	public static String		Dialog_Export_Label_TCX_CourseName;
+	public static String		Dialog_Export_Label_TCX_NameFrom;
+	public static String		Dialog_Export_Label_TCX_NameFrom_Tooltip;
+	public static String		Dialog_Export_Label_TCX_Type;
+	public static String		Dialog_Export_Radio_TCX_Aktivities;
+	public static String		Dialog_Export_Radio_TCX_Aktivities_Tooltip;
+	public static String		Dialog_Export_Radio_TCX_Courses;
+	public static String		Dialog_Export_Radio_TCX_Courses_Tooltip;
+	public static String		Dialog_Export_Radio_TCX_NameFromField;
+	public static String		Dialog_Export_Radio_TCX_NameFromTour;
+
 	public static String		Dialog_ExtractTour_DlgArea_Message;
 	public static String		Dialog_ExtractTour_DlgArea_Title;
 	public static String		Dialog_ExtractTour_Label_DeviceName;
