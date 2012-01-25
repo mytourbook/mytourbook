@@ -2575,25 +2575,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 			maxSpeed = Math.max(maxSpeed, speedMetric);
 
-			float paceMetricSeconds = 0;
-			float paceImperialSeconds = 0;
-			float paceMetricMinute = 0;
-			float paceImperialMinute = 0;
-
-			if ((speedMetric != 0) && (distDiff != 0)) {
-
-				paceMetricSeconds = timeDiff * 10000 / distDiff;
-				paceImperialSeconds = paceMetricSeconds * UI.UNIT_MILE;
-
-				paceMetricMinute = paceMetricSeconds / 60;
-				paceImperialMinute = paceImperialSeconds / 60;
-			}
-
-			paceSerieMinute[serieIndex] = paceMetricMinute;
-			paceSerieMinuteImperial[serieIndex] = paceImperialMinute;
+			final float paceMetricSeconds = speedMetric < 1.0 ? 0 : (float) (3600.0 / speedMetric);
+			final float paceImperialSeconds = speedMetric < 0.6 ? 0 : (float) (3600.0 / speedImperial);
 
 			paceSerieSeconds[serieIndex] = paceMetricSeconds;
 			paceSerieSecondsImperial[serieIndex] = paceImperialSeconds;
+
+			paceSerieMinute[serieIndex] = paceMetricSeconds / 60;
+			paceSerieMinuteImperial[serieIndex] = paceImperialSeconds / 60;
 		}
 	}
 

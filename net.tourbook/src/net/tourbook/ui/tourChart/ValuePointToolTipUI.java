@@ -1249,6 +1249,11 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 
 		final int[] timeSerie = _tourData.timeSerie;
 
+		if (timeSerie == null) {
+			// this happened with .fitlog import files
+			return;
+		}
+
 		// check bounds
 		if (valueIndex >= timeSerie.length || valueIndex < 0) {
 			valueIndex = timeSerie.length;

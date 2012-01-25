@@ -738,9 +738,9 @@ public class FitLogSAXHandler extends DefaultHandler {
 
 			timeSlice.absoluteDistance = (float) _distanceAbsolute;
 			timeSlice.absoluteAltitude = Util.parseFloat(attributes, ATTRIB_PT_ELE);
-			timeSlice.cadence = Util.parseInt(attributes, ATTRIB_PT_CADENCE);
-			timeSlice.pulse = Util.parseInt(attributes, ATTRIB_PT_HR);
-			timeSlice.power = Util.parseInt(attributes, ATTRIB_PT_POWER);
+			timeSlice.cadence = Util.parseFloat(attributes, ATTRIB_PT_CADENCE);
+			timeSlice.pulse = Util.parseFloat(attributes, ATTRIB_PT_HR);
+			timeSlice.power = Util.parseFloat(attributes, ATTRIB_PT_POWER);
 			timeSlice.latitude = latitude;
 			timeSlice.longitude = longitude;
 

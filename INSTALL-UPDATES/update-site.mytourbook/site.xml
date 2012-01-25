@@ -3,12 +3,14 @@
    <description url="http://mytourbook.sourceforge.net/updates/">
       MyTourbook Update Site
    </description>
-   <feature url="features/patch.net.tourbook.app.10.10.0.patch14_10.10.0.201010121619.jar" id="patch.net.tourbook.app.10.10.0.patch14" version="10.10.0.201010121619" patch="true">
-      <category name="my-tourbook-10.10.0"/>
+   <feature url="features/feature.net.tourbook.app_12.1.1.201201250808.jar" id="feature.net.tourbook.app" version="12.1.1.201201250808">
+      <category name="MyTourbook"/>
    </feature>
-   <feature url="features/patch.net.tourbook.app.10.11.0.patch1_10.11.0.201012030734.jar" id="patch.net.tourbook.app.10.11.0.patch1" version="10.11.0.201012030734" patch="true">
-      <category name="MyTourbook 10.11.0"/>
+   <feature url="features/feature.net.tourbook.app.nl_12.1.1.201201250808.jar" id="feature.net.tourbook.app.nl" version="12.1.1.201201250808">
+      <category name="MyTourbook"/>
    </feature>
-   <category-def name="my-tourbook-10.10.0" label="MyTourbook 10.10.0"/>
-   <category-def name="MyTourbook 10.11.0" label="MyTourbook 10.11.0"/>
+   <feature url="features/feature.o_synce.macro_1.0.1.201201250808.jar" id="feature.o_synce.macro" version="1.0.1.201201250808">
+      <category name="MyTourbook"/>
+   </feature>
+   <category-def name="MyTourbook" label="MyTourbook"/>
 </site>

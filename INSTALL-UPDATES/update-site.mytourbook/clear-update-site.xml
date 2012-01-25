@@ -12,8 +12,11 @@
 			<fileset dir="features" includes="**/*" />
 		</delete>
 
+		<delete dir="logs" />
+
 		<delete file="content.jar" />
 		<delete file="artifacts.jar" />
+		<delete file="logs.zip" />
 
 	</target>
 

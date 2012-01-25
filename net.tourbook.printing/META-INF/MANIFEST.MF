@@ -2,14 +2,18 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Tour Printing
 Bundle-SymbolicName: net.tourbook.printing;singleton:=true
-Bundle-Version: 12.1.0.qualifier
+Bundle-Version: 12.1.1.qualifier
 Bundle-Activator: net.tourbook.printing.Activator
 Bundle-Vendor: MyTourbook
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  net.tourbook,
- net.tourbook.ext.jars.printing,
+ net.tourbook.util,
  net.tourbook.ext.jars,
- net.tourbook.util
+ net.tourbook.ext.jars.printing
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
+Import-Package: org.apache.fop.apps,
+ org.apache.xmlgraphics.util,
+ org.joda.time,
+ org.joda.time.format

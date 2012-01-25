@@ -46,6 +46,9 @@ import org.joda.time.DateTime;
  */
 public class PolarHRMDataReader extends TourbookDevice {
 
+	/**
+	 * Speed is saved in the .hrm file with 0.1 km/h
+	 */
 	private static final int		SPEED_SCALING			= 10;
 
 	private static final String		DATA_DELIMITER			= "\t";											//$NON-NLS-1$
