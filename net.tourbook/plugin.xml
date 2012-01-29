@@ -616,6 +616,18 @@
 
          <toolbar
                id="net.tourbook.toolbars.tourViews">
+            <command
+                  commandId="net.tourbook.photo.photoDirectoryView"
+                  icon="icons/photo-directory.png"
+                  label="%View_Name_PhotoDirectory"
+                  mnemonic="%View_Name_PhotoDirectory_Mnemonic">
+            </command>
+            <command
+                  commandId="net.tourbook.photo.photoImageView"
+                  icon="icons/photo-image.png"
+                  label="%View_Name_PhotoImage"
+                  mnemonic="%View_Name_PhotoImage_Mnemonic">
+            </command>
 
             <command
                   commandId="net.tourbook.command.selectedTour"
@@ -1266,6 +1278,13 @@
 	            id="net.tourbook.mapping.TourMapPropertyView"
 	            name="%view_name_map_properties">
 	      </view>
+
+      <view
+            class="org.dawb.common.ui.views.ImageMonitorView"
+            icon="icons/image.gif"
+            id="org.dawb.workbench.views.imageMonitorView"
+            name="Images Monitor">
+      </view>
 
    </extension>
    

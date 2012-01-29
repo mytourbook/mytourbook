@@ -17,9 +17,28 @@ package net.tourbook.photo;
 
 import java.awt.Point;
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 
+import net.tourbook.util.StatusUtil;
+
+import org.apache.commons.sanselan.ImageReadException;
+import org.apache.commons.sanselan.Sanselan;
+import org.apache.commons.sanselan.SanselanConstants;
+import org.apache.commons.sanselan.common.IImageMetadata;
+import org.apache.commons.sanselan.formats.jpeg.JpegImageMetadata;
+import org.apache.commons.sanselan.formats.tiff.TiffField;
+import org.apache.commons.sanselan.formats.tiff.TiffImageMetadata;
+import org.apache.commons.sanselan.formats.tiff.constants.ExifTagConstants;
+import org.apache.commons.sanselan.formats.tiff.constants.GpsTagConstants;
+import org.apache.commons.sanselan.formats.tiff.constants.TagInfo;
+import org.apache.commons.sanselan.formats.tiff.constants.TiffConstants;
+import org.apache.commons.sanselan.formats.tiff.constants.TiffTagConstants;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.gpx.GeoPosition;
@@ -68,6 +87,9 @@ public class Photo {
 
 	private double							_altitude		= Double.MIN_VALUE;
 
+	private static final DateTimeFormatter	_dtParser		= DateTimeFormat.forPattern("yyyy:MM:dd HH:mm:ss")// //$NON-NLS-1$
+																	.withZone(DateTimeZone.UTC);
+
 	/**
 	 * caches the world positions for the photo lat/long values for each zoom level
 	 * <p>
@@ -80,7 +102,7 @@ public class Photo {
 	 */
 	public Photo(final File imageFile) {
 
-		this._imageFile = imageFile;
+		_imageFile = imageFile;
 
 		_fileName = imageFile.getName();
 		_filePathName = imageFile.getAbsolutePath();
@@ -114,6 +136,135 @@ public class Photo {
 
 	public DateTime getDateTime() {
 		return _dateTime;
+	}
+
+	/**
+	 * Date/Time
+	 * 
+	 * @param jpegMetadata
+	 * @param file
+	 * @return
+	 */
+	private DateTime getExifDate(final JpegImageMetadata jpegMetadata) {
+
+//		/*
+//		 * !!! time is not correct, maybe it is the time when the GPS signal was
+//		 * received !!!
+//		 */
+//		printTagValue(jpegMetadata, TiffConstants.GPS_TAG_GPS_TIME_STAMP);
+
+		try {
+
+			final TiffField date = jpegMetadata.findEXIFValueWithExactMatch(TiffConstants.TIFF_TAG_DATE_TIME);
+
+			if (date != null) {
+				return _dtParser.parseDateTime(date.getStringValue());
+			}
+
+		} catch (final Exception e) {
+			// ignore
+		}
+
+		return null;
+	}
+
+	/**
+	 * GPS area info
+	 */
+	private String getExifGpsArea(final JpegImageMetadata jpegMetadata) {
+
+		try {
+			final TiffField field = jpegMetadata
+					.findEXIFValueWithExactMatch(GpsTagConstants.GPS_TAG_GPS_AREA_INFORMATION);
+			if (field != null) {
+				final Object fieldValue = field.getValue();
+				if (fieldValue != null) {
+
+					/**
+					 * source: Exif 2.2 specification
+					 * 
+					 * <pre>
+					 * 
+					 * Table 6 Character Codes and their Designation
+					 * 
+					 * Character Code	Code Designation (8 Bytes) 						References
+					 * ASCII  			41.H, 53.H, 43.H, 49.H, 49.H, 00.H, 00.H, 00.H  ITU-T T.50 IA5
+					 * JIS				A.H, 49.H, 53.H, 00.H, 00.H, 00.H, 00.H, 00.H   JIS X208-1990
+					 * Unicode			55.H, 4E.H, 49.H, 43.H, 4F.H, 44.H, 45.H, 00.H  Unicode Standard
+					 * Undefined		00.H, 00.H, 00.H, 00.H, 00.H, 00.H, 00.H, 00.H  Undefined
+					 * 
+					 * </pre>
+					 */
+					final byte[] byteArrayValue = field.getByteArrayValue();
+					final int fieldLength = byteArrayValue.length;
+
+					if (fieldLength > 0) {
+
+						/**
+						 * <pre>
+						 * 
+						 * skipping 1 + 6 characters:
+						 * 
+						 * 1      character code
+						 * 2...7  have no idea why these bytes are set to none valid characters
+						 * 
+						 * </pre>
+						 */
+						final byte[] valueBytes = Arrays.copyOfRange(byteArrayValue, 7, fieldLength);
+
+						String valueString = null;
+
+						final byte firstByte = byteArrayValue[0];
+						if (firstByte == 0x55) {
+
+							valueString = new String(valueBytes, "UTF-16");
+
+						} else {
+
+							valueString = new String(valueBytes);
+						}
+
+						return valueString;
+					}
+				}
+			}
+		} catch (final Exception e) {
+			// ignore
+		}
+
+		return null;
+	}
+
+	private int getExifIntValue(final JpegImageMetadata jpegMetadata, final TagInfo tiffTag, final int defaultValue) {
+
+		try {
+			final TiffField field = jpegMetadata.findEXIFValueWithExactMatch(tiffTag);
+			if (field != null) {
+				return field.getIntValue();
+			}
+		} catch (final Exception e) {
+			// ignore
+		}
+
+		return defaultValue;
+	}
+
+	/**
+	 * Image direction
+	 * 
+	 * @param tagInfo
+	 */
+	private double getExifValueDouble(final JpegImageMetadata jpegMetadata, final TagInfo tagInfo) {
+		try {
+			final TiffField field = jpegMetadata.findEXIFValueWithExactMatch(tagInfo);
+			if (field != null) {
+				return field.getDoubleValue();
+			}
+		} catch (final Exception e) {
+			// ignore
+		}
+
+		return Double.MIN_VALUE;
 	}
 
 	public String getFileName() {
@@ -169,6 +320,36 @@ public class Photo {
 		return _orientation;
 	}
 
+	private DateTime getTiffDate(final TiffImageMetadata tiffMetadata) {
+
+		try {
+
+			final TiffField date = tiffMetadata.findField(TiffConstants.TIFF_TAG_DATE_TIME, true);
+			if (date != null) {
+				return _dtParser.parseDateTime(date.getStringValue());
+			}
+
+		} catch (final Exception e) {
+			// ignore
+		}
+
+		return null;
+	}
+
+	private int getTiffIntValue(final TiffImageMetadata tiffMetadata, final TagInfo tiffTag, final int defaultValue) {
+
+		try {
+			final TiffField field = tiffMetadata.findField(tiffTag, true);
+			if (field != null) {
+				return field.getIntValue();
+			}
+		} catch (final Exception e) {
+			// ignore
+		}
+
+		return defaultValue;
+	}
+
 	public int getWidth() {
 		return _width;
 	}
@@ -214,38 +395,118 @@ public class Photo {
 		return result;
 	}
 
+	public void loadMetaData() {
+
+		try {
+			final Map<String, Boolean> params = new HashMap<String, Boolean>();
+			final boolean ignoreImageData = true;//isPhilHarveyTestImage(imageFile);
+			params.put(SanselanConstants.PARAM_KEY_READ_THUMBNAILS, new Boolean(!ignoreImageData));
+
+			final IImageMetadata metadata = Sanselan.getMetadata(_imageFile, params);
+
+			/*
+			 * this will log all available meta data
+			 */
+//			System.out.println(metadata.toString());
+
+			/*
+			 * read meta data for 1 photo
+			 */
+			if (metadata instanceof TiffImageMetadata) {
+
+				final TiffImageMetadata tiffMetadata = (TiffImageMetadata) metadata;
+
+				_dateTime = getTiffDate(tiffMetadata);
+
+				setSize(
+						getTiffIntValue(tiffMetadata, TiffTagConstants.TIFF_TAG_IMAGE_WIDTH, Integer.MIN_VALUE),
+						getTiffIntValue(tiffMetadata, TiffTagConstants.TIFF_TAG_IMAGE_LENGTH, Integer.MIN_VALUE));
+
+			} else if (metadata instanceof JpegImageMetadata) {
+
+				final JpegImageMetadata jpegMetadata = (JpegImageMetadata) metadata;
+
+				_dateTime = getExifDate(jpegMetadata);
+
+				setSize(
+						getExifIntValue(jpegMetadata, ExifTagConstants.EXIF_TAG_EXIF_IMAGE_WIDTH, Integer.MIN_VALUE),
+						getExifIntValue(jpegMetadata, ExifTagConstants.EXIF_TAG_EXIF_IMAGE_LENGTH, Integer.MIN_VALUE));
+
+				_orientation = getExifIntValue(jpegMetadata, ExifTagConstants.EXIF_TAG_ORIENTATION, 1);
+				_imageDirection = getExifValueDouble(jpegMetadata, GpsTagConstants.GPS_TAG_GPS_IMG_DIRECTION);
+				_altitude = getExifValueDouble(jpegMetadata, GpsTagConstants.GPS_TAG_GPS_ALTITUDE);
+
+				setExifLatLon(jpegMetadata);
+				_gpsAreaInfo = getExifGpsArea(jpegMetadata);
+			}
+
+			// ensure date is set
+			if (_dateTime == null) {
+				_dateTime = new DateTime(_imageFile.lastModified());
+			}
+
+		} catch (final Exception e) {
+			StatusUtil.log(e);
+		}
+	}
+
 	public void setAltitude(final double altitude) {
-		this._altitude = altitude;
+		_altitude = altitude;
 	}
 
 	public void setDateTime(final DateTime dateTime) {
-		this._dateTime = dateTime;
+		_dateTime = dateTime;
+	}
+
+	/**
+	 * Latitude + lLongitude
+	 * 
+	 * @param jpegMetadata
+	 * @param file
+	 * @throws ImageReadException
+	 */
+	private void setExifLatLon(final JpegImageMetadata jpegMetadata) {
+
+		final TiffImageMetadata exifMetadata = jpegMetadata.getExif();
+		if (exifMetadata != null) {
+
+			try {
+				final TiffImageMetadata.GPSInfo gpsInfo = exifMetadata.getGPS();
+				if (gpsInfo != null) {
+
+					_latitude = gpsInfo.getLatitudeAsDegreesNorth();
+					_longitude = gpsInfo.getLongitudeAsDegreesEast();
+				}
+			} catch (final Exception e) {
+				// ignore
+			}
+		}
 	}
 
 	public void setGpsAreaInfo(final String gpsAreaInfo) {
-		this._gpsAreaInfo = gpsAreaInfo;
+		_gpsAreaInfo = gpsAreaInfo;
 	}
 
 	public void setImageDirection(final double imageDirection) {
-		this._imageDirection = imageDirection;
+		_imageDirection = imageDirection;
 	}
 
 	public void setLatitude(final double latitude) {
-		this._latitude = latitude;
+		_latitude = latitude;
 	}
 
 	public void setLongitude(final double longitude) {
-		this._longitude = longitude;
+		_longitude = longitude;
 	}
 
 	public void setOrientation(final int orientation) {
-		this._orientation = orientation;
+		_orientation = orientation;
 	}
 
 	public void setSize(final int height, final int width) {
 
-		this._width = width;
-		this._height = height;
+		_width = width;
+		_height = height;
 
 		final int SIZE_SMALL = 20;
 		final float ratio = (float) width / height;

@@ -1,19 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
  *
- * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation version 2 of the License.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along with
- * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package net.tourbook.photo;
+package net.tourbook.photo.fileviewer;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -21,13 +16,21 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
-import java.text.MessageFormat;
 import java.util.Date;
-import java.util.MissingResourceException;
 import java.util.Vector;
 
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DragSource;
+import org.eclipse.swt.dnd.DragSourceEvent;
+import org.eclipse.swt.dnd.DragSourceListener;
+import org.eclipse.swt.dnd.DropTarget;
+import org.eclipse.swt.dnd.DropTargetAdapter;
+import org.eclipse.swt.dnd.DropTargetEvent;
+import org.eclipse.swt.dnd.FileTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -36,6 +39,7 @@ import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.TreeAdapter;
 import org.eclipse.swt.events.TreeEvent;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -58,119 +62,80 @@ import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
-/**
- * File Viewer example
- * <p>
- * original source code (2012-01-21):
- * http://www.java2s.com/Code/Java/SWT-JFace-Eclipse/FileViewerexampleinSWT.htm
- */
-public class FolderViewer {
+public class FileViewer {
 
-//	private final static String		DRIVE_A						= "a:" + File.separator;
-//	private final static String		DRIVE_B						= "b:" + File.separator;
+	private final static String		DRIVE_A						= "a:" + File.separator;
+	private final static String		DRIVE_B						= "b:" + File.separator;
 
 	/* UI elements */
 	private Display					display;
-
 	private Shell					shell;
-
 	private ToolBar					toolBar;
 
 	private Label					numObjectsLabel;
-
 	private Label					diskSpaceLabel;
 
 	private File					currentDirectory			= null;
-
 	private boolean					initial						= true;
 
 	/* Drag and drop optimizations */
 	private boolean					isDragging					= false;							// if this app is dragging
-
 	private boolean					isDropping					= false;							// if this app is dropping
 
-	private File[]					processedDropFiles			= null;							// so Drag only deletes what it
-	// needs to
-
-	private File[]					deferredRefreshFiles		= null;							// to defer notifyRefreshFiles
-	// while we do DND
-
-	private boolean					deferredRefreshRequested	= false;							// to defer
-	// notifyRefreshFiles
-	// while we do DND
-
-	private ProgressDialog			progressDialog				= null;							// progress dialog for
-	// locally-initiated
-	// operations
+	private File[]					processedDropFiles			= null;							// so Drag only deletes what it needs to
+	private File[]					deferredRefreshFiles		= null;							// to defer notifyRefreshFiles while we do DND
+	private boolean					deferredRefreshRequested	= false;							// to defer notifyRefreshFiles while we do DND
+	private ProgressDialog			progressDialog				= null;							// progress dialog for locally-initiated operations
 
 	/* Combo view */
 	private static final String		COMBODATA_ROOTS				= "Combo.roots";
-
 	// File[]: Array of files whose paths are currently displayed in the combo
 	private static final String		COMBODATA_LASTTEXT			= "Combo.lastText";
-
 	// String: Previous selection text string
 
 	private Combo					combo;
 
 	/* Tree view */
-//	private IconCache				iconCache					= new IconCache();
-
+	private IconCache				iconCache					= new IconCache();
 	private static final String		TREEITEMDATA_FILE			= "TreeItem.file";
-
 	// File: File associated with tree item
 	private static final String		TREEITEMDATA_IMAGEEXPANDED	= "TreeItem.imageExpanded";
-
 	// Image: shown when item is expanded
 	private static final String		TREEITEMDATA_IMAGECOLLAPSED	= "TreeItem.imageCollapsed";
-
 	// Image: shown when item is collapsed
 	private static final String		TREEITEMDATA_STUB			= "TreeItem.stub";
-
 	// Object: if not present or null then the item has not been populated
 
 	private Tree					tree;
-
 	private Label					treeScopeLabel;
 
 	/* Table view */
 	private static final DateFormat	dateFormat					= DateFormat.getDateTimeInstance(
 																		DateFormat.MEDIUM,
 																		DateFormat.MEDIUM);
-
 	private static final String		TABLEITEMDATA_FILE			= "TableItem.file";
-
 	// File: File associated with table row
 	private static final String		TABLEDATA_DIR				= "Table.dir";
-
 	// File: Currently visible directory
 	private static final int[]		tableWidths					= new int[] { 150, 60, 75, 150 };
-
 	private final String[]			tableTitles					= new String[] {
-			FolderViewer.getResourceString("table.Name.title"),
-			FolderViewer.getResourceString("table.Size.title"),
-			FolderViewer.getResourceString("table.Type.title"),
-			FolderViewer.getResourceString("table.Modified.title") };
-
+			Messages.table_Name_title,
+			Messages.table_Size_title,
+			Messages.table_Type_title,
+			Messages.table_Modified_title						};
 	private Table					table;
-
 	private Label					tableContentsOfLabel;
 
 	/* Table update worker */
 	// Control data
 	private final Object			workerLock					= new Object();
-
 	// Lock for all worker control data and state
 	private volatile Thread			workerThread				= null;
-
 	// The worker's thread
 	private volatile boolean		workerStopped				= false;
-
 	// True if the worker must exit on completion of the current cycle
 	private volatile boolean		workerCancelled				= false;
-
-	// True if the worker must cancel its operations prematurely perhaps due to
-	// a state update
+	// True if the worker must cancel its operations prematurely perhaps due to a state update
 
 	// Worker state information -- this is what gets synchronized by an update
 	private volatile File			workerStateDir				= null;
@@ -179,8 +144,7 @@ public class FolderViewer {
 	private volatile File			workerNextDir				= null;
 
 	/* Simulate only flag */
-	// when true, disables actual filesystem manipulations and outputs results
-	// to standard out
+	// when true, disables actual filesystem manipulations and outputs results to standard out
 	private boolean					simulateOnly				= true;
 
 	/**
@@ -190,13 +154,15 @@ public class FolderViewer {
 	{
 		workerRunnable = new Runnable() {
 			public void run() {
-
+				
 				while (!workerStopped) {
 					synchronized (workerLock) {
 						workerCancelled = false;
 						workerStateDir = workerNextDir;
 					}
+					
 					workerExecute();
+				
 					synchronized (workerLock) {
 						try {
 							if ((!workerCancelled) && (workerStateDir == workerNextDir)) {
@@ -207,8 +173,8 @@ public class FolderViewer {
 				}
 				workerThread = null;
 
-				// wake up UI thread in case it is in a modal loop awaiting thread
-				// termination (see workerStop())
+				// wake up UI thread in case it is in a modal loop awaiting thread termination
+				// (see workerStop())
 				display.wake();
 			}
 		};
@@ -218,19 +184,14 @@ public class FolderViewer {
 	 * Instances of this class manage a progress dialog for file operations.
 	 */
 	class ProgressDialog {
-
 		public final static int	COPY				= 0;
 		public final static int	DELETE				= 1;
 		public final static int	MOVE				= 2;
 
 		Shell					shell;
-
 		Label					messageLabel, detailLabel;
-
 		ProgressBar				progressBar;
-
 		Button					cancelButton;
-
 		boolean					isCancelled			= false;
 
 		final String			operationKeyName[]	= { "Copy", "Delete", "Move" };
@@ -247,7 +208,7 @@ public class FolderViewer {
 			shell = new Shell(parent, SWT.BORDER | SWT.TITLE | SWT.APPLICATION_MODAL);
 			final GridLayout gridLayout = new GridLayout();
 			shell.setLayout(gridLayout);
-			shell.setText(getResourceString("progressDialog." + operationKeyName[style] + ".title"));
+//			shell.setText(Messages.progressDialog_" + operationKeyName[style] + "_title"));
 			shell.addShellListener(new ShellAdapter() {
 				@Override
 				public void shellClosed(final ShellEvent e) {
@@ -257,7 +218,7 @@ public class FolderViewer {
 
 			messageLabel = new Label(shell, SWT.HORIZONTAL);
 			messageLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.VERTICAL_ALIGN_FILL));
-			messageLabel.setText(getResourceString("progressDialog." + operationKeyName[style] + ".description"));
+//			messageLabel.setText(Messages.progressDialog_" + operationKeyName[style] + "_description"));
 
 			progressBar = new ProgressBar(shell, SWT.HORIZONTAL | SWT.WRAP);
 			progressBar.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.VERTICAL_ALIGN_FILL));
@@ -271,7 +232,7 @@ public class FolderViewer {
 
 			cancelButton = new Button(shell, SWT.PUSH);
 			cancelButton.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END | GridData.VERTICAL_ALIGN_FILL));
-			cancelButton.setText(getResourceString("progressDialog.cancelButton.text"));
+//			cancelButton.setText(Messages.progressDialog_cancelButton_text"));
 			cancelButton.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
@@ -347,9 +308,9 @@ public class FolderViewer {
 		 *            one of COPY, DELETE
 		 */
 		public void setDetailFile(final File file, final int operation) {
-			detailLabel.setText(getResourceString(
-					"progressDialog." + operationKeyName[operation] + ".operation",
-					new Object[] { file }));
+//			detailLabel.setText(getResourceString(
+//					"progressDialog_" + operationKeyName[operation] + "_operation",
+//					new Object[] { file }));
 		}
 
 		/**
@@ -375,10 +336,10 @@ public class FolderViewer {
 	}
 
 	private static int compareFiles(final File a, final File b) {
-		// boolean aIsDir = a.isDirectory();
-		// boolean bIsDir = b.isDirectory();
-		// if (aIsDir && ! bIsDir) return -1;
-		// if (bIsDir && ! aIsDir) return 1;
+//		boolean aIsDir = a.isDirectory();
+//		boolean bIsDir = b.isDirectory();
+//		if (aIsDir && ! bIsDir) return -1;
+//		if (bIsDir && ! aIsDir) return 1;
 
 		// sort case-sensitive files in a case-insensitive manner
 		int compare = a.getName().compareToIgnoreCase(b.getName());
@@ -405,33 +366,11 @@ public class FolderViewer {
 	}
 
 	/**
-	 * Returns a string from the resource bundle. We don't want to crash because of a missing
-	 * String. Returns the key if not found.
-	 */
-	static String getResourceString(final String key) {
-		return key;
-	}
-
-	/**
-	 * Returns a string from the resource bundle and binds it with the given arguments. If the key
-	 * is not found, return the key.
-	 */
-	static String getResourceString(final String key, final Object[] args) {
-		try {
-			return MessageFormat.format(getResourceString(key), args);
-		} catch (final MissingResourceException e) {
-			return key;
-		} catch (final NullPointerException e) {
-			return "!" + key + "!";
-		}
-	}
-
-	/**
 	 * Runs main program.
 	 */
 	public static void main(final String[] args) {
 		final Display display = new Display();
-		final FolderViewer application = new FolderViewer();
+		final FileViewer application = new FileViewer();
 		final Shell shell = application.open(display);
 		while (!shell.isDisposed()) {
 			if (!display.readAndDispatch()) {
@@ -502,7 +441,7 @@ public class FolderViewer {
 	 */
 	void close() {
 		workerStop();
-//		iconCache.freeResources();
+		iconCache.freeResources();
 	}
 
 	/**
@@ -537,8 +476,8 @@ public class FolderViewer {
 				progressDialog.setDetailFile(oldFile, ProgressDialog.COPY);
 			}
 			if (simulateOnly) {
-				// System.out.println(getResourceString("simulate.DirectoriesCreated.text",
-				// new Object[] { newFile.getPath() }));
+				//System.out.println(getResourceString("simulate.DirectoriesCreated.text",
+				//	new Object[] { newFile.getPath() }));
 			} else {
 				if (!newFile.mkdirs()) {
 					return false;
@@ -568,8 +507,8 @@ public class FolderViewer {
 			 * Copy a file
 			 */
 			if (simulateOnly) {
-				// System.out.println(getResourceString("simulate.CopyFromTo.text",
-				// new Object[] { oldFile.getPath(), newFile.getPath() }));
+				//System.out.println(getResourceString("simulate.CopyFromTo.text",
+				//	new Object[] { oldFile.getPath(), newFile.getPath() }));
 			} else {
 				FileReader in = null;
 				FileWriter out = null;
@@ -649,11 +588,11 @@ public class FolderViewer {
 	private void createFileMenu(final Menu parent) {
 		final Menu menu = new Menu(parent);
 		final MenuItem header = new MenuItem(parent, SWT.CASCADE);
-		header.setText(getResourceString("menu.File.text"));
+		header.setText(Messages.menu_File_text);
 		header.setMenu(menu);
 
 		final MenuItem simulateItem = new MenuItem(menu, SWT.CHECK);
-		simulateItem.setText(getResourceString("menu.File.SimulateOnly.text"));
+		simulateItem.setText(Messages.menu_File_SimulateOnly_text);
 		simulateItem.setSelection(simulateOnly);
 		simulateItem.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -663,7 +602,7 @@ public class FolderViewer {
 		});
 
 		final MenuItem item = new MenuItem(menu, SWT.PUSH);
-		item.setText(getResourceString("menu.File.Close.text"));
+		item.setText(Messages.menu_File_Close_text);
 		item.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
@@ -681,19 +620,19 @@ public class FolderViewer {
 	private void createHelpMenu(final Menu parent) {
 		final Menu menu = new Menu(parent);
 		final MenuItem header = new MenuItem(parent, SWT.CASCADE);
-		header.setText(getResourceString("menu.Help.text"));
+		header.setText(Messages.menu_Help_text);
 		header.setMenu(menu);
 
 		final MenuItem item = new MenuItem(menu, SWT.PUSH);
-		item.setText(getResourceString("menu.Help.About.text"));
+		item.setText(Messages.menu_Help_About_text);
 		item.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				final MessageBox box = new MessageBox(shell, SWT.ICON_INFORMATION | SWT.OK);
-				box.setText(getResourceString("dialog.About.title"));
-				box.setMessage(getResourceString(
-						"dialog.About.description",
-						new Object[] { System.getProperty("os.name") }));
+				box.setText(Messages.dialog_About_title);
+//				box.setMessage(getResourceString(
+//						"dialog_About_description",
+//						new Object[] { System.getProperty("os.name") }));
 				box.open();
 			}
 		});
@@ -706,8 +645,8 @@ public class FolderViewer {
 	 *            the ShellContainer managing the Shell we are rendering inside
 	 */
 	private void createShellContents() {
-		shell.setText(getResourceString("Title", new Object[] { "" }));
-//		shell.setImage(iconCache.stockImages[iconCache.shellIcon]);
+		shell.setText(Messages.Title);
+		shell.setImage(iconCache.stockImages[iconCache.shellIcon]);
 		final Menu bar = new Menu(shell, SWT.BAR);
 		shell.setMenuBar(bar);
 		createFileMenu(bar);
@@ -746,13 +685,112 @@ public class FolderViewer {
 	}
 
 	/**
+	 * Creates the Drag & Drop DragSource for items being dragged from the table.
+	 * 
+	 * @return the DragSource for the table
+	 */
+	private DragSource createTableDragSource(final Table table) {
+		final DragSource dragSource = new DragSource(table, DND.DROP_MOVE | DND.DROP_COPY);
+		dragSource.setTransfer(new Transfer[] { FileTransfer.getInstance() });
+		dragSource.addDragListener(new DragSourceListener() {
+			TableItem[]	dndSelection	= null;
+			String[]	sourceNames		= null;
+
+			public void dragFinished(final DragSourceEvent event) {
+				dragSourceHandleDragFinished(event, sourceNames);
+				dndSelection = null;
+				sourceNames = null;
+				isDragging = false;
+				handleDeferredRefresh();
+			}
+
+			public void dragSetData(final DragSourceEvent event) {
+				if (dndSelection == null || dndSelection.length == 0) {
+					return;
+				}
+				if (!FileTransfer.getInstance().isSupportedType(event.dataType)) {
+					return;
+				}
+
+				sourceNames = new String[dndSelection.length];
+				for (int i = 0; i < dndSelection.length; i++) {
+					final File file = (File) dndSelection[i].getData(TABLEITEMDATA_FILE);
+					sourceNames[i] = file.getAbsolutePath();
+				}
+				event.data = sourceNames;
+			}
+
+			public void dragStart(final DragSourceEvent event) {
+				dndSelection = table.getSelection();
+				sourceNames = null;
+				event.doit = dndSelection.length > 0;
+				isDragging = true;
+			}
+		});
+		return dragSource;
+	}
+
+	/**
+	 * Creates the Drag & Drop DropTarget for items being dropped onto the table.
+	 * 
+	 * @return the DropTarget for the table
+	 */
+	private DropTarget createTableDropTarget(final Table table) {
+		final DropTarget dropTarget = new DropTarget(table, DND.DROP_MOVE | DND.DROP_COPY);
+		dropTarget.setTransfer(new Transfer[] { FileTransfer.getInstance() });
+		dropTarget.addDropListener(new DropTargetAdapter() {
+			@Override
+			public void dragEnter(final DropTargetEvent event) {
+				isDropping = true;
+			}
+
+			@Override
+			public void dragLeave(final DropTargetEvent event) {
+				isDropping = false;
+				handleDeferredRefresh();
+			}
+
+			@Override
+			public void dragOver(final DropTargetEvent event) {
+				dropTargetValidate(event, getTargetFile(event));
+				event.feedback |= DND.FEEDBACK_EXPAND | DND.FEEDBACK_SCROLL;
+			}
+
+			@Override
+			public void drop(final DropTargetEvent event) {
+				final File targetFile = getTargetFile(event);
+				if (dropTargetValidate(event, targetFile)) {
+					dropTargetHandleDrop(event, targetFile);
+				}
+			}
+
+			private File getTargetFile(final DropTargetEvent event) {
+				// Determine the target File for the drop
+				final TableItem item = table.getItem(table.toControl(new Point(event.x, event.y)));
+				File targetFile = null;
+				if (item == null) {
+					// We are over an unoccupied area of the table.
+					// If it is a COPY, we can use the table's root file.
+					if (event.detail == DND.DROP_COPY) {
+						targetFile = (File) table.getData(TABLEDATA_DIR);
+					}
+				} else {
+					// We are over a particular item in the table, use the item's file
+					targetFile = (File) item.getData(TABLEITEMDATA_FILE);
+				}
+				return targetFile;
+			}
+		});
+		return dropTarget;
+	}
+
+	/**
 	 * Creates the file details table.
 	 * 
 	 * @param parent
 	 *            the parent control
 	 */
 	private void createTableView(final Composite parent) {
-
 		final Composite composite = new Composite(parent, SWT.NONE);
 		final GridLayout gridLayout = new GridLayout();
 		gridLayout.numColumns = 1;
@@ -792,6 +830,9 @@ public class FolderViewer {
 				notifySelectedFiles(getSelectedFiles());
 			}
 		});
+
+		createTableDragSource(table);
+		createTableDropTarget(table);
 	}
 
 	/**
@@ -803,12 +844,12 @@ public class FolderViewer {
 	 *            the layout data
 	 */
 	private void createToolBar(final Shell shell, final Object layoutData) {
-		toolBar = new ToolBar(shell, SWT.NULL);
+		toolBar = new ToolBar(shell, SWT.NONE);
 		toolBar.setLayoutData(layoutData);
 		ToolItem item = new ToolItem(toolBar, SWT.SEPARATOR);
 		item = new ToolItem(toolBar, SWT.PUSH);
-//		item.setImage(iconCache.stockImages[iconCache.cmdParent]);
-		item.setToolTipText(getResourceString("tool.Parent.tiptext"));
+		item.setImage(iconCache.stockImages[iconCache.cmdParent]);
+		item.setToolTipText(Messages.tool_Parent_tiptext);
 		item.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
@@ -816,8 +857,8 @@ public class FolderViewer {
 			}
 		});
 		item = new ToolItem(toolBar, SWT.PUSH);
-//		item.setImage(iconCache.stockImages[iconCache.cmdRefresh]);
-		item.setToolTipText(getResourceString("tool.Refresh.tiptext"));
+		item.setImage(iconCache.stockImages[iconCache.cmdRefresh]);
+		item.setToolTipText(Messages.tool_Refresh_tiptext);
 		item.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
@@ -828,45 +869,141 @@ public class FolderViewer {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				final MessageBox box = new MessageBox(shell, SWT.ICON_INFORMATION | SWT.OK);
-				box.setText(getResourceString("dialog.NotImplemented.title"));
-				box.setMessage(getResourceString("dialog.ActionNotImplemented.description"));
+				box.setText(Messages.dialog_NotImplemented_title);
+				box.setMessage(Messages.dialog_ActionNotImplemented_description);
 				box.open();
 			}
 		};
 
 		item = new ToolItem(toolBar, SWT.SEPARATOR);
 		item = new ToolItem(toolBar, SWT.PUSH);
-//		item.setImage(iconCache.stockImages[iconCache.cmdCut]);
-		item.setToolTipText(getResourceString("tool.Cut.tiptext"));
+		item.setImage(iconCache.stockImages[iconCache.cmdCut]);
+		item.setToolTipText(Messages.tool_Cut_tiptext);
 		item.addSelectionListener(unimplementedListener);
 		item = new ToolItem(toolBar, SWT.PUSH);
-//		item.setImage(iconCache.stockImages[iconCache.cmdCopy]);
-		item.setToolTipText(getResourceString("tool.Copy.tiptext"));
+		item.setImage(iconCache.stockImages[iconCache.cmdCopy]);
+		item.setToolTipText(Messages.tool_Copy_tiptext);
 		item.addSelectionListener(unimplementedListener);
 		item = new ToolItem(toolBar, SWT.PUSH);
-//		item.setImage(iconCache.stockImages[iconCache.cmdPaste]);
-		item.setToolTipText(getResourceString("tool.Paste.tiptext"));
+		item.setImage(iconCache.stockImages[iconCache.cmdPaste]);
+		item.setToolTipText(Messages.tool_Paste_tiptext);
 		item.addSelectionListener(unimplementedListener);
 
 		item = new ToolItem(toolBar, SWT.SEPARATOR);
 		item = new ToolItem(toolBar, SWT.PUSH);
-//		item.setImage(iconCache.stockImages[iconCache.cmdDelete]);
-		item.setToolTipText(getResourceString("tool.Delete.tiptext"));
+		item.setImage(iconCache.stockImages[iconCache.cmdDelete]);
+		item.setToolTipText(Messages.tool_Delete_tiptext);
 		item.addSelectionListener(unimplementedListener);
 		item = new ToolItem(toolBar, SWT.PUSH);
-//		item.setImage(iconCache.stockImages[iconCache.cmdRename]);
-		item.setToolTipText(getResourceString("tool.Rename.tiptext"));
+		item.setImage(iconCache.stockImages[iconCache.cmdRename]);
+		item.setToolTipText(Messages.tool_Rename_tiptext);
 		item.addSelectionListener(unimplementedListener);
 
 		item = new ToolItem(toolBar, SWT.SEPARATOR);
 		item = new ToolItem(toolBar, SWT.PUSH);
-//		item.setImage(iconCache.stockImages[iconCache.cmdSearch]);
-		item.setToolTipText(getResourceString("tool.Search.tiptext"));
+		item.setImage(iconCache.stockImages[iconCache.cmdSearch]);
+		item.setToolTipText(Messages.tool_Search_tiptext);
 		item.addSelectionListener(unimplementedListener);
 		item = new ToolItem(toolBar, SWT.PUSH);
-//		item.setImage(iconCache.stockImages[iconCache.cmdPrint]);
-		item.setToolTipText(getResourceString("tool.Print.tiptext"));
+		item.setImage(iconCache.stockImages[iconCache.cmdPrint]);
+		item.setToolTipText(Messages.tool_Print_tiptext);
 		item.addSelectionListener(unimplementedListener);
+	}
+
+	/**
+	 * Creates the Drag & Drop DragSource for items being dragged from the tree.
+	 * 
+	 * @return the DragSource for the tree
+	 */
+	private DragSource createTreeDragSource(final Tree tree) {
+		final DragSource dragSource = new DragSource(tree, DND.DROP_MOVE | DND.DROP_COPY);
+		dragSource.setTransfer(new Transfer[] { FileTransfer.getInstance() });
+		dragSource.addDragListener(new DragSourceListener() {
+			TreeItem[]	dndSelection	= null;
+			String[]	sourceNames		= null;
+
+			public void dragFinished(final DragSourceEvent event) {
+				dragSourceHandleDragFinished(event, sourceNames);
+				dndSelection = null;
+				sourceNames = null;
+				isDragging = false;
+				processedDropFiles = null;
+				handleDeferredRefresh();
+			}
+
+			public void dragSetData(final DragSourceEvent event) {
+				if (dndSelection == null || dndSelection.length == 0) {
+					return;
+				}
+				if (!FileTransfer.getInstance().isSupportedType(event.dataType)) {
+					return;
+				}
+
+				sourceNames = new String[dndSelection.length];
+				for (int i = 0; i < dndSelection.length; i++) {
+					final File file = (File) dndSelection[i].getData(TREEITEMDATA_FILE);
+					sourceNames[i] = file.getAbsolutePath();
+				}
+				event.data = sourceNames;
+			}
+
+			public void dragStart(final DragSourceEvent event) {
+				dndSelection = tree.getSelection();
+				sourceNames = null;
+				event.doit = dndSelection.length > 0;
+				isDragging = true;
+				processedDropFiles = null;
+			}
+		});
+		return dragSource;
+	}
+
+	/**
+	 * Creates the Drag & Drop DropTarget for items being dropped onto the tree.
+	 * 
+	 * @return the DropTarget for the tree
+	 */
+	private DropTarget createTreeDropTarget(final Tree tree) {
+		final DropTarget dropTarget = new DropTarget(tree, DND.DROP_MOVE | DND.DROP_COPY);
+		dropTarget.setTransfer(new Transfer[] { FileTransfer.getInstance() });
+		dropTarget.addDropListener(new DropTargetAdapter() {
+			@Override
+			public void dragEnter(final DropTargetEvent event) {
+				isDropping = true;
+			}
+
+			@Override
+			public void dragLeave(final DropTargetEvent event) {
+				isDropping = false;
+				handleDeferredRefresh();
+			}
+
+			@Override
+			public void dragOver(final DropTargetEvent event) {
+				dropTargetValidate(event, getTargetFile(event));
+				event.feedback |= DND.FEEDBACK_EXPAND | DND.FEEDBACK_SCROLL;
+			}
+
+			@Override
+			public void drop(final DropTargetEvent event) {
+				final File targetFile = getTargetFile(event);
+				if (dropTargetValidate(event, targetFile)) {
+					dropTargetHandleDrop(event, targetFile);
+				}
+			}
+
+			private File getTargetFile(final DropTargetEvent event) {
+				// Determine the target File for the drop
+				final TreeItem item = tree.getItem(tree.toControl(new Point(event.x, event.y)));
+				File targetFile = null;
+				if (item != null) {
+					// We are over a particular item in the tree, use the item's file
+					targetFile = (File) item.getData(TREEITEMDATA_FILE);
+				}
+				return targetFile;
+			}
+		});
+		return dropTarget;
 	}
 
 	/**
@@ -876,7 +1013,6 @@ public class FolderViewer {
 	 *            the parent control
 	 */
 	private void createTreeView(final Composite parent) {
-
 		final Composite composite = new Composite(parent, SWT.NONE);
 		final GridLayout gridLayout = new GridLayout();
 		gridLayout.numColumns = 1;
@@ -885,7 +1021,7 @@ public class FolderViewer {
 		composite.setLayout(gridLayout);
 
 		treeScopeLabel = new Label(composite, SWT.BORDER);
-		treeScopeLabel.setText(FolderViewer.getResourceString("details.AllFolders.text"));
+		treeScopeLabel.setText(Messages.details_AllFolders_text);
 		treeScopeLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.VERTICAL_ALIGN_FILL));
 
 		tree = new Tree(composite, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.SINGLE);
@@ -931,6 +1067,8 @@ public class FolderViewer {
 				treeExpandItem(item);
 			}
 		});
+		createTreeDragSource(tree);
+		createTreeDropTarget(tree);
 	}
 
 	/**
@@ -971,12 +1109,11 @@ public class FolderViewer {
 			}
 		}
 		if (simulateOnly) {
-			// System.out.println(getResourceString("simulate.Delete.text",
-			// new Object[] { oldFile.getPath(), oldFile.getPath() }));
+			//System.out.println(getResourceString("simulate.Delete.text",
+			//	new Object[] { oldFile.getPath(), oldFile.getPath() }));
 			return true;
-		} else {
-			return oldFile.delete();
 		}
+		return oldFile.delete();
 	}
 
 	/**
@@ -998,7 +1135,7 @@ public class FolderViewer {
 			final String fileName = file.getAbsolutePath();
 			if (!Program.launch(fileName)) {
 				final MessageBox dialog = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
-				dialog.setMessage(getResourceString("error.FailedLaunch.message", new Object[] { fileName }));
+				dialog.setMessage(NLS.bind(Messages.error_FailedLaunch_message, new Object[] { fileName }));
 				dialog.setText(shell.getText());
 				dialog.open();
 			}
@@ -1024,13 +1161,223 @@ public class FolderViewer {
 	}
 
 	/**
+	 * Handles the completion of a drag on a dragSource.
+	 * <p>
+	 * Used in dragFinished().<br>
+	 * </p>
+	 * 
+	 * @param event
+	 *            the DragSourceEvent passed as parameter to the dragFinished() method
+	 * @param sourceNames
+	 *            the names of the files that were dragged (event.data is invalid)
+	 */
+	private void dragSourceHandleDragFinished(final DragSourceEvent event, final String[] sourceNames) {
+		if (sourceNames == null) {
+			return;
+		}
+		if (event.detail != DND.DROP_MOVE) {
+			return;
+		}
+
+		// Get array of files that were actually transferred
+		final File[] sourceFiles;
+		if (processedDropFiles != null) {
+			sourceFiles = processedDropFiles;
+		} else {
+			sourceFiles = new File[sourceNames.length];
+			for (int i = 0; i < sourceNames.length; ++i) {
+				sourceFiles[i] = new File(sourceNames[i]);
+			}
+		}
+		if (progressDialog == null) {
+			progressDialog = new ProgressDialog(shell, ProgressDialog.MOVE);
+		}
+		progressDialog.setTotalWorkUnits(sourceFiles.length);
+		progressDialog.setProgress(0);
+		progressDialog.open();
+
+		// Delete each file
+		for (int i = 0; (i < sourceFiles.length) && (!progressDialog.isCancelled()); i++) {
+			final File source = sourceFiles[i];
+			progressDialog.setDetailFile(source, ProgressDialog.DELETE);
+			while (!progressDialog.isCancelled()) {
+				if (deleteFileStructure(source)) {
+					break;
+				} else if (!progressDialog.isCancelled()) {
+					final MessageBox box = new MessageBox(shell, SWT.ICON_ERROR | SWT.ABORT | SWT.RETRY | SWT.IGNORE);
+					box.setText(Messages.dialog_FailedDelete_title);
+					box.setMessage(NLS.bind(Messages.dialog_FailedDelete_description, new Object[] { source }));
+					final int button = box.open();
+					if (button == SWT.ABORT) {
+						i = sourceNames.length;
+					}
+					if (button == SWT.RETRY) {
+						break;
+					}
+				}
+			}
+			progressDialog.addProgress(1);
+		}
+		notifyRefreshFiles(sourceFiles);
+		progressDialog.close();
+		progressDialog = null;
+	}
+
+	/**
+	 * Handles a drop on a dropTarget.
+	 * <p>
+	 * Used in drop().<br>
+	 * Note event.detail is modified by this method.
+	 * </p>
+	 * 
+	 * @param event
+	 *            the DropTargetEvent passed as parameter to the drop() method
+	 * @param targetFile
+	 *            the File representing the drop target location under inspection, or null if none
+	 */
+	private void dropTargetHandleDrop(final DropTargetEvent event, final File targetFile) {
+		// Get dropped data (an array of filenames)
+		if (!dropTargetValidate(event, targetFile)) {
+			return;
+		}
+		final String[] sourceNames = (String[]) event.data;
+		if (sourceNames == null) {
+			event.detail = DND.DROP_NONE;
+		}
+		if (event.detail == DND.DROP_NONE) {
+			return;
+		}
+
+		// Open progress dialog
+		progressDialog = new ProgressDialog(shell, (event.detail == DND.DROP_MOVE)
+				? ProgressDialog.MOVE
+				: ProgressDialog.COPY);
+		progressDialog.setTotalWorkUnits(sourceNames.length);
+		progressDialog.open();
+
+		// Copy each file
+		final Vector<File> /* of File */processedFiles = new Vector<File>();
+		for (int i = 0; (i < sourceNames.length) && (!progressDialog.isCancelled()); i++) {
+			final File source = new File(sourceNames[i]);
+			final File dest = new File(targetFile, source.getName());
+			if (source.equals(dest)) {
+				continue; // ignore if in same location
+			}
+
+			progressDialog.setDetailFile(source, ProgressDialog.COPY);
+			while (!progressDialog.isCancelled()) {
+				if (copyFileStructure(source, dest)) {
+					processedFiles.add(source);
+					break;
+				} else if (!progressDialog.isCancelled()) {
+					if (event.detail == DND.DROP_MOVE && (!isDragging)) {
+						// It is not possible to notify an external drag source that a drop
+						// operation was only partially successful.  This is particularly a
+						// problem for DROP_MOVE operations since unless the source gets
+						// DROP_NONE, it will delete the original data including bits that
+						// may not have been transferred successfully.
+						final MessageBox box = new MessageBox(shell, SWT.ICON_ERROR | SWT.RETRY | SWT.CANCEL);
+						box.setText(Messages.dialog_FailedCopy_title);
+						box.setMessage(NLS.bind(Messages.dialog_FailedCopy_description, new Object[] { source, dest }));
+						final int button = box.open();
+						if (button == SWT.CANCEL) {
+							i = sourceNames.length;
+							event.detail = DND.DROP_NONE;
+							break;
+						}
+					} else {
+						// We can recover gracefully from errors if the drag source belongs
+						// to this application since it will look at processedDropFiles.
+						final MessageBox box = new MessageBox(shell, SWT.ICON_ERROR
+								| SWT.ABORT
+								| SWT.RETRY
+								| SWT.IGNORE);
+						box.setText(Messages.dialog_FailedCopy_title);
+						box.setMessage(NLS.bind(Messages.dialog_FailedCopy_description, new Object[] { source, dest }));
+						final int button = box.open();
+						if (button == SWT.ABORT) {
+							i = sourceNames.length;
+						}
+						if (button != SWT.RETRY) {
+							break;
+						}
+					}
+				}
+				progressDialog.addProgress(1);
+			}
+		}
+		if (isDragging) {
+			// Remember exactly which files we processed
+			processedDropFiles = processedFiles.toArray(new File[processedFiles.size()]);
+		} else {
+			progressDialog.close();
+			progressDialog = null;
+		}
+		notifyRefreshFiles(new File[] { targetFile });
+	}
+
+	/**
+	 * Validates a drop target as a candidate for a drop operation.
+	 * <p>
+	 * Used in dragOver() and dropAccept().<br>
+	 * Note event.detail is set to DND.DROP_NONE by this method if the target is not valid.
+	 * </p>
+	 * 
+	 * @param event
+	 *            the DropTargetEvent to validate
+	 * @param targetFile
+	 *            the File representing the drop target location under inspection, or null if none
+	 */
+	private boolean dropTargetValidate(final DropTargetEvent event, final File targetFile) {
+		if (targetFile != null && targetFile.isDirectory()) {
+			if (event.detail != DND.DROP_COPY && event.detail != DND.DROP_MOVE) {
+				event.detail = DND.DROP_MOVE;
+			}
+		} else {
+			event.detail = DND.DROP_NONE;
+		}
+		return event.detail != DND.DROP_NONE;
+	}
+
+	/**
 	 * Gets filesystem root entries
 	 * 
 	 * @return an array of Files corresponding to the root directories on the platform, may be empty
 	 *         but not null
 	 */
 	File[] getRoots() {
-		return File.listRoots();
+		/*
+		 * On JDK 1.22 only...
+		 */
+		// return File.listRoots();
+
+		/*
+		 * On JDK 1.1.7 and beyond... -- PORTABILITY ISSUES HERE --
+		 */
+		if (System.getProperty("os.name").indexOf("Windows") != -1) {
+			final Vector /* of File */list = new Vector();
+			list.add(new File(DRIVE_A));
+			list.add(new File(DRIVE_B));
+			for (char i = 'c'; i <= 'z'; ++i) {
+				final File drive = new File(i + ":" + File.separator);
+				if (drive.isDirectory() && drive.exists()) {
+					list.add(drive);
+					if (initial && i == 'c') {
+						currentDirectory = drive;
+						initial = false;
+					}
+				}
+			}
+			final File[] roots = (File[]) list.toArray(new File[list.size()]);
+			sortFiles(roots);
+			return roots;
+		}
+		final File root = new File(File.separator);
+		if (initial) {
+			currentDirectory = root;
+			initial = false;
+		}
+		return new File[] { root };
 	}
 
 	/**
@@ -1049,7 +1396,7 @@ public class FolderViewer {
 		final File[] files = deferredRefreshFiles;
 		deferredRefreshFiles = null;
 
-//		shell.setCursor(iconCache.stockCursors[iconCache.cursorWait]);
+		shell.setCursor(iconCache.stockCursors[iconCache.cursorWait]);
 
 		/*
 		 * Table view: Refreshes information about any files in the list and their children.
@@ -1115,7 +1462,7 @@ public class FolderViewer {
 		currentDirectory = null;
 		notifySelectedDirectory(dir);
 
-//		shell.setCursor(iconCache.stockCursors[iconCache.cursorDefault]);
+		shell.setCursor(iconCache.stockCursors[iconCache.cursorDefault]);
 	}
 
 	/**
@@ -1161,7 +1508,7 @@ public class FolderViewer {
 		/*
 		 * Shell: Sets the title to indicate the selected directory
 		 */
-		shell.setText(getResourceString("Title", new Object[] { currentDirectory.getPath() }));
+		shell.setText(NLS.bind(Messages.Title, new Object[] { currentDirectory.getPath() }));
 
 		/*
 		 * Table view: Displays the contents of the selected directory.
@@ -1204,10 +1551,8 @@ public class FolderViewer {
 			final File pathElement = (File) path.elementAt(i);
 
 			// Search for a particular File in the array of tree items
-			// No guarantee that the items are sorted in any recognizable
-			// fashion, so we'll
-			// just sequential scan. There shouldn't be more than a few thousand
-			// entries.
+			// No guarantee that the items are sorted in any recognizable fashion, so we'll
+			// just sequential scan.  There shouldn't be more than a few thousand entries.
 			TreeItem item = null;
 			for (int k = 0; k < items.length; ++k) {
 				item = items[k];
@@ -1243,21 +1588,20 @@ public class FolderViewer {
 		 * Details: Update the details that are visible on screen.
 		 */
 		if ((files != null) && (files.length != 0)) {
-			numObjectsLabel.setText(getResourceString("details.NumberOfSelectedFiles.text", new Object[] { new Integer(
+			numObjectsLabel.setText(NLS.bind(Messages.details_NumberOfSelectedFiles_text, new Object[] { new Integer(
 					files.length) }));
 			long fileSize = 0L;
 			for (int i = 0; i < files.length; ++i) {
 				fileSize += files[i].length();
 			}
-			diskSpaceLabel.setText(getResourceString("details.FileSize.text", new Object[] { new Long(fileSize) }));
+			diskSpaceLabel.setText(NLS.bind(Messages.details_FileSize_text, new Object[] { new Long(fileSize) }));
 		} else {
 			// No files selected
 			diskSpaceLabel.setText("");
 			if (currentDirectory != null) {
 				final int numObjects = getDirectoryList(currentDirectory).length;
-				numObjectsLabel.setText(getResourceString(
-						"details.DirNumberOfObjects.text",
-						new Object[] { new Integer(numObjects) }));
+				numObjectsLabel.setText(NLS.bind(Messages.details_DirNumberOfObjects_text, new Object[] { new Integer(
+						numObjects) }));
 			} else {
 				numObjectsLabel.setText("");
 			}
@@ -1270,7 +1614,7 @@ public class FolderViewer {
 	public Shell open(final Display display) {
 		// Create the window
 		this.display = display;
-//		iconCache.initResources(display);
+		iconCache.initResources(display);
 		shell = new Shell();
 		createShellContents();
 		notifyRefreshFiles(null);
@@ -1285,12 +1629,12 @@ public class FolderViewer {
 	 *            the TreeItem to fill in
 	 */
 	private void treeExpandItem(final TreeItem item) {
-//		shell.setCursor(iconCache.stockCursors[iconCache.cursorWait]);
+		shell.setCursor(iconCache.stockCursors[iconCache.cursorWait]);
 		final Object stub = item.getData(TREEITEMDATA_STUB);
 		if (stub == null) {
 			treeRefreshItem(item, true);
 		}
-//		shell.setCursor(iconCache.stockCursors[iconCache.cursorDefault]);
+		shell.setCursor(iconCache.stockCursors[iconCache.cursorDefault]);
 	}
 
 	/**
@@ -1303,10 +1647,10 @@ public class FolderViewer {
 	 */
 	private void treeInitFolder(final TreeItem item, final File folder) {
 		item.setText(folder.getName());
-//		item.setImage(iconCache.stockImages[iconCache.iconClosedFolder]);
+		item.setImage(iconCache.stockImages[iconCache.iconClosedFolder]);
 		item.setData(TREEITEMDATA_FILE, folder);
-//		item.setData(TREEITEMDATA_IMAGEEXPANDED, iconCache.stockImages[iconCache.iconOpenFolder]);
-//		item.setData(TREEITEMDATA_IMAGECOLLAPSED, iconCache.stockImages[iconCache.iconClosedFolder]);
+		item.setData(TREEITEMDATA_IMAGEEXPANDED, iconCache.stockImages[iconCache.iconOpenFolder]);
+		item.setData(TREEITEMDATA_IMAGECOLLAPSED, iconCache.stockImages[iconCache.iconClosedFolder]);
 	}
 
 	/**
@@ -1319,10 +1663,10 @@ public class FolderViewer {
 	 */
 	private void treeInitVolume(final TreeItem item, final File volume) {
 		item.setText(volume.getPath());
-//		item.setImage(iconCache.stockImages[iconCache.iconClosedDrive]);
+		item.setImage(iconCache.stockImages[iconCache.iconClosedDrive]);
 		item.setData(TREEITEMDATA_FILE, volume);
-//		item.setData(TREEITEMDATA_IMAGEEXPANDED, iconCache.stockImages[iconCache.iconOpenDrive]);
-//		item.setData(TREEITEMDATA_IMAGECOLLAPSED, iconCache.stockImages[iconCache.iconClosedDrive]);
+		item.setData(TREEITEMDATA_IMAGEEXPANDED, iconCache.stockImages[iconCache.iconOpenDrive]);
+		item.setData(TREEITEMDATA_IMAGECOLLAPSED, iconCache.stockImages[iconCache.iconClosedDrive]);
 	}
 
 	/*
@@ -1360,9 +1704,9 @@ public class FolderViewer {
 				++masterIndex;
 			} else if (compare < 0) {
 				// should appear before file, insert it
-				final TreeItem newItem = new TreeItem(tree, SWT.NULL, itemIndex);
+				final TreeItem newItem = new TreeItem(tree, SWT.NONE, itemIndex);
 				treeInitVolume(newItem, masterFile);
-				new TreeItem(newItem, SWT.NULL); // placeholder child item to get "expand" button
+				new TreeItem(newItem, SWT.NONE); // placeholder child item to get "expand" button
 				++itemIndex;
 				++masterIndex;
 				--i;
@@ -1373,10 +1717,9 @@ public class FolderViewer {
 		}
 		for (; masterIndex < masterFiles.length; ++masterIndex) {
 			final File masterFile = masterFiles[masterIndex];
-			final TreeItem newItem = new TreeItem(tree, SWT.NULL);
+			final TreeItem newItem = new TreeItem(tree, SWT.NONE);
 			treeInitVolume(newItem, masterFile);
-			new TreeItem(newItem, SWT.NULL); // placeholder child item to get
-			// "expand" button
+			new TreeItem(newItem, SWT.NONE); // placeholder child item to get "expand" button
 		}
 	}
 
@@ -1395,8 +1738,7 @@ public class FolderViewer {
 			// Refresh non-expanded item
 			if (dirItem.getData(TREEITEMDATA_STUB) != null) {
 				treeItemRemoveAll(dirItem);
-				new TreeItem(dirItem, SWT.NULL); // placeholder child item to
-				// get "expand" button
+				new TreeItem(dirItem, SWT.NONE); // placeholder child item to get "expand" button
 				dirItem.setData(TREEITEMDATA_STUB, null);
 			}
 			return;
@@ -1405,7 +1747,7 @@ public class FolderViewer {
 		dirItem.setData(TREEITEMDATA_STUB, this); // clear stub flag
 
 		/* Get directory listing */
-		final File[] subFiles = (dir != null) ? FolderViewer.getDirectoryList(dir) : null;
+		final File[] subFiles = (dir != null) ? FileViewer.getDirectoryList(dir) : null;
 		if (subFiles == null || subFiles.length == 0) {
 			/* Error or no contents */
 			treeItemRemoveAll(dirItem);
@@ -1442,11 +1784,9 @@ public class FolderViewer {
 				++itemIndex;
 			} else if (compare < 0) {
 				// should appear before file, insert it
-				final TreeItem newItem = new TreeItem(dirItem, SWT.NULL, itemIndex);
+				final TreeItem newItem = new TreeItem(dirItem, SWT.NONE, itemIndex);
 				treeInitFolder(newItem, masterFile);
-				new TreeItem(newItem, SWT.NULL); // add a placeholder child
-				// item so we get the
-				// "expand" button
+				new TreeItem(newItem, SWT.NONE); // add a placeholder child item so we get the "expand" button
 				masterFile = null;
 				++itemIndex;
 				--i;
@@ -1457,11 +1797,9 @@ public class FolderViewer {
 		}
 		while ((masterFile != null) || (masterIndex < masterFiles.length)) {
 			if (masterFile != null) {
-				final TreeItem newItem = new TreeItem(dirItem, SWT.NULL);
+				final TreeItem newItem = new TreeItem(dirItem, SWT.NONE);
 				treeInitFolder(newItem, masterFile);
-				new TreeItem(newItem, SWT.NULL); // add a placeholder child
-				// item so we get the
-				// "expand" button
+				new TreeItem(newItem, SWT.NONE); // add a placeholder child item so we get the "expand" button
 				if (masterIndex == masterFiles.length) {
 					break;
 				}
@@ -1481,14 +1819,14 @@ public class FolderViewer {
 		final String dateString = dateFormat.format(new Date(file.lastModified()));
 		final String sizeString;
 		final String typeString;
-//		final Image iconImage;
+		final Image iconImage;
 
 		if (file.isDirectory()) {
-			typeString = getResourceString("filetype.Folder");
+			typeString = Messages.filetype_Folder;
 			sizeString = "";
-//			iconImage = iconCache.stockImages[iconCache.iconClosedFolder];
+			iconImage = iconCache.stockImages[iconCache.iconClosedFolder];
 		} else {
-			sizeString = getResourceString("filesize.KB", new Object[] { new Long((file.length() + 512) / 1024) });
+			sizeString = NLS.bind(Messages.filesize_KB, new Object[] { new Long((file.length() + 512) / 1024) });
 
 			final int dot = nameString.lastIndexOf('.');
 			if (dot != -1) {
@@ -1496,14 +1834,14 @@ public class FolderViewer {
 				final Program program = Program.findProgram(extension);
 				if (program != null) {
 					typeString = program.getName();
-//					iconImage = iconCache.getIconFromProgram(program);
+					iconImage = iconCache.getIconFromProgram(program);
 				} else {
-					typeString = getResourceString("filetype.Unknown", new Object[] { extension.toUpperCase() });
-//					iconImage = iconCache.stockImages[iconCache.iconFile];
+					typeString = NLS.bind(Messages.filetype_Unknown, new Object[] { extension.toUpperCase() });
+					iconImage = iconCache.stockImages[iconCache.iconFile];
 				}
 			} else {
-				typeString = getResourceString("filetype.None");
-//				iconImage = iconCache.stockImages[iconCache.iconFile];
+				typeString = Messages.filetype_None;
+				iconImage = iconCache.stockImages[iconCache.iconFile];
 			}
 		}
 		final String[] strings = new String[] { nameString, sizeString, typeString, dateString };
@@ -1516,7 +1854,7 @@ public class FolderViewer {
 				}
 				final TableItem tableItem = new TableItem(table, 0);
 				tableItem.setText(strings);
-//				tableItem.setImage(iconImage);
+				tableItem.setImage(iconImage);
 				tableItem.setData(TABLEITEMDATA_FILE, file);
 			}
 		});
@@ -1530,8 +1868,8 @@ public class FolderViewer {
 		// Clear existing information
 		display.syncExec(new Runnable() {
 			public void run() {
-				tableContentsOfLabel.setText(FolderViewer.getResourceString(
-						"details.ContentsOf.text",
+				tableContentsOfLabel.setText(NLS.bind(
+						Messages.details_ContentsOf_text,
 						new Object[] { workerStateDir.getPath() }));
 				table.removeAll();
 				table.setData(TABLEDATA_DIR, workerStateDir);

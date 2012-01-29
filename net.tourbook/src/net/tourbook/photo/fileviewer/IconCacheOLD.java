@@ -6,7 +6,7 @@
  * 
  * Contributors: IBM Corporation - initial API and implementation
  ******************************************************************************/
-package net.tourbook.photo;
+package net.tourbook.photo.fileviewer;
 
 import java.io.IOException;
 import java.io.InputStream;
