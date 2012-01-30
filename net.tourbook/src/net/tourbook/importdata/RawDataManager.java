@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -915,7 +915,7 @@ public class RawDataManager {
 									final FileCollisionBehavior fileCollision,
 									final boolean isTourDisplayedInImportView) {
 
-		final String filePathName = importFile.getAbsolutePath();
+		final String importFilePathName = importFile.getAbsolutePath();
 		final Display display = Display.getDefault();
 
 		// check if importFile exist
@@ -929,18 +929,18 @@ public class RawDataManager {
 				MessageDialog.openError(
 						activeShell,
 						Messages.DataImport_Error_file_does_not_exist_title,
-						NLS.bind(Messages.DataImport_Error_file_does_not_exist_msg, filePathName));
+						NLS.bind(Messages.DataImport_Error_file_does_not_exist_msg, importFilePathName));
 			}
 
 			return false;
 		}
 
 		// find the file extension in the filename
-		final int dotPos = filePathName.lastIndexOf("."); //$NON-NLS-1$
+		final int dotPos = importFilePathName.lastIndexOf("."); //$NON-NLS-1$
 		if (dotPos == -1) {
 			return false;
 		}
-		final String fileExtension = filePathName.substring(dotPos + 1);
+		final String fileExtension = importFilePathName.substring(dotPos + 1);
 
 		final List<TourbookDevice> deviceList = getDeviceListSortedByPriority();
 
@@ -989,7 +989,7 @@ public class RawDataManager {
 						// device file extension was found in the filename extension
 						if (importRawData10(
 								device,
-								filePathName,
+								importFilePathName,
 								destinationPath,
 								buildNewFileNames,
 								fileCollision,
@@ -1020,7 +1020,7 @@ public class RawDataManager {
 					for (final TourbookDevice device : deviceList) {
 						if (importRawData10(
 								device,
-								filePathName,
+								importFilePathName,
 								destinationPath,
 								buildNewFileNames,
 								fileCollision,
@@ -1118,11 +1118,18 @@ public class RawDataManager {
 
 			_lastImportedFileName = sourceFileName;
 
-			final boolean isImported = device.processDeviceData(
-					sourceFileName,
-					_deviceData,
-					_toursInImportView,
-					_newlyImportedTours);
+			boolean isImported = false;
+
+			try {
+
+				isImported = device.processDeviceData(
+						sourceFileName,
+						_deviceData,
+						_toursInImportView,
+						_newlyImportedTours);
+			} catch (final Exception e) {
+				StatusUtil.log(e);
+			}
 
 			if (isTourDisplayedInImportView) {
 				_toursInImportView.putAll(_newlyImportedTours);
