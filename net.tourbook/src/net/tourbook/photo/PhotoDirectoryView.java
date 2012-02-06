@@ -19,6 +19,9 @@ import java.io.File;
 import java.util.ArrayList;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.photo.manager.Photo;
+import net.tourbook.photo.manager.PhotoManager;
+import net.tourbook.ui.UI;
 import net.tourbook.ui.ViewerDetailForm;
 import net.tourbook.util.PostSelectionProvider;
 import net.tourbook.util.Util;
@@ -29,10 +32,16 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseWheelListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Sash;
+import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbenchPartReference;
@@ -40,30 +49,57 @@ import org.eclipse.ui.part.ViewPart;
 
 public class PhotoDirectoryView extends ViewPart {
 
-	static public final String				ID					= "net.tourbook.photo.photoDirectoryView";					//$NON-NLS-1$
+	static public final String				ID							= "net.tourbook.photo.photoDirectoryView";	//$NON-NLS-1$
 
-	private static final String				STATE_TREE_WIDTH	= "TreeWidth";												//$NON-NLS-1$
+	private static final String				STATE_TREE_WIDTH			= "STATE_TREE_WIDTH";						//$NON-NLS-1$
+	private static final String				STATE_THUMB_IMAGE_SIZE		= "STATE_THUMB_IMAGE_SIZE";				//$NON-NLS-1$
 
-	private static final IDialogSettings	_state				= TourbookPlugin.getDefault()//
-																		.getDialogSettingsSection("PhotoDirectoryView");	//$NON-NLS-1$
-	private static final IPreferenceStore	_prefStore			= TourbookPlugin.getDefault()//
-																		.getPreferenceStore();
+	private static final IDialogSettings	_state						= TourbookPlugin.getDefault()//
+																				.getDialogSettingsSection(
+																						"PhotoDirectoryView");		//$NON-NLS-1$
+	private static final IPreferenceStore	_prefStore					= TourbookPlugin.getDefault()//
+																				.getPreferenceStore();
+
+	private static final int[]				_thumnailSize				= new int[] { //
+//																		20, // 1
+																		30, // 2
+			40, // 3
+			50, // 4
+			60, // 5
+			80, // 6
+			120, // 7
+			160, // 8
+			200, // 9
+			250, // 10
+			300, // 11
+			400, // 12
+			500, // 13
+			600, // 14
+			700, // 15
+			800, // 16
+			1000, // 17
+																		};
+	private static final int				THUMBNAIL_DEFAULT_SIZE		= 7;
+
+	private static final PhotoManager		_photoMgr					= PhotoManager.getInstance();
 
 	private IPartListener2					_partListener;
 	private IPropertyChangeListener			_prefChangeListener;
 	private PostSelectionProvider			_postSelectionProvider;
 
-	private ArrayList<Photo>				_photos				= new ArrayList<Photo>();
+	private ArrayList<Photo>				_photos						= new ArrayList<Photo>();
 
 	private PicDirFolder					_picDirFolder;
 	private PicDirImages					_picDirImages;
 
+	private int								_prevSelectedThumbnailSize	= -1;
 	/*
 	 * UI controls
 	 */
 	private ViewerDetailForm				_containerMasterDetail;
 	private Composite						_containerFolder;
 	private Composite						_containerImages;
+	private Scale							_scaleThumbnailSize;
 
 	static int compareFiles(final File a, final File b) {
 
@@ -197,7 +233,10 @@ public class PhotoDirectoryView extends ViewPart {
 
 		restoreState();
 
-		_picDirFolder.refresh();
+		// set thumbnail size
+		onSelectThumbnailSize();
+
+		_picDirFolder.initialRefresh();
 	}
 
 	private void createUI(final Composite parent) {
@@ -209,12 +248,13 @@ public class PhotoDirectoryView extends ViewPart {
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(masterDetailContainer);
 		GridLayoutFactory.fillDefaults().applyTo(masterDetailContainer);
 		{
-			// folder
+			// file folder
 			_containerFolder = new Composite(masterDetailContainer, SWT.NONE);
 			GridDataFactory.fillDefaults().applyTo(_containerFolder);
-			_containerFolder.setLayout(new FillLayout());
+			GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(_containerFolder);
 			{
 				_picDirFolder.createUI(_containerFolder);
+				createUI_10_ImageSize(_containerFolder);
 			}
 
 			// sash
@@ -237,6 +277,29 @@ public class PhotoDirectoryView extends ViewPart {
 		}
 	}
 
+	private void createUI_10_ImageSize(final Composite parent) {
+
+		_scaleThumbnailSize = new Scale(parent, SWT.HORIZONTAL);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleThumbnailSize);
+		_scaleThumbnailSize.setMinimum(0);
+		_scaleThumbnailSize.setMaximum((_thumnailSize.length - 1) * 10);
+		_scaleThumbnailSize.setIncrement(10);
+		_scaleThumbnailSize.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				onSelectThumbnailSize();
+			}
+		});
+
+		_scaleThumbnailSize.addMouseWheelListener(new MouseWheelListener() {
+			public void mouseScrolled(final MouseEvent event) {
+
+				UI.adjustScaleValueOnMouseScroll(event);
+				onSelectThumbnailSize();
+			}
+		});
+	}
+
 	@Override
 	public void dispose() {
 
@@ -249,9 +312,34 @@ public class PhotoDirectoryView extends ViewPart {
 		super.dispose();
 	}
 
+	private void onSelectThumbnailSize() {
+
+		final int selectedSize = _scaleThumbnailSize.getSelection();
+
+		if (selectedSize == _prevSelectedThumbnailSize) {
+			// optimize selection
+			return;
+		}
+
+		_prevSelectedThumbnailSize = selectedSize;
+
+		_photoMgr.stopLoadingImages();
+
+		final int thumbnailSize = _thumnailSize[selectedSize / 10];
+		_picDirImages.setThumbnailSize(thumbnailSize);
+
+		_scaleThumbnailSize.setToolTipText(NLS.bind("Thumbnail size: {0}", Integer.toString(thumbnailSize)));
+	}
+
 	private void restoreState() {
 
 		_containerMasterDetail.setViewerWidth(Util.getStateInt(_state, STATE_TREE_WIDTH, 200));
+
+		int stateSize = Util.getStateInt(_state, STATE_THUMB_IMAGE_SIZE, THUMBNAIL_DEFAULT_SIZE);
+		if (stateSize > (_thumnailSize.length - 1) || stateSize < 0) {
+			stateSize = THUMBNAIL_DEFAULT_SIZE;
+		}
+		_scaleThumbnailSize.setSelection(stateSize * 10);
 	}
 
 	private void saveState() {
@@ -260,6 +348,8 @@ public class PhotoDirectoryView extends ViewPart {
 		if (tree != null) {
 			_state.put(STATE_TREE_WIDTH, tree.getSize().x);
 		}
+
+		_state.put(STATE_THUMB_IMAGE_SIZE, _scaleThumbnailSize.getSelection());
 	}
 
 	@Override

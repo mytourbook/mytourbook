@@ -16,79 +16,116 @@
 package net.tourbook.photo;
 
 import java.io.File;
+import java.io.FileFilter;
+import java.util.Comparator;
+import java.util.List;
+
+import net.tourbook.photo.manager.ILoadCallBack;
+import net.tourbook.photo.manager.Photo;
+import net.tourbook.photo.manager.PhotoImageCache;
+import net.tourbook.photo.manager.PhotoLoadingState;
+import net.tourbook.photo.manager.PhotoManager;
+import net.tourbook.photo.manager.ThumbnailStore;
 
 import org.apache.commons.sanselan.Sanselan;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.nebula.widgets.gallery.DefaultGalleryItemRenderer;
+import org.eclipse.nebula.widgets.gallery.AbstractGalleryItemRenderer;
+import org.eclipse.nebula.widgets.gallery.AbstractGridGroupRenderer;
 import org.eclipse.nebula.widgets.gallery.Gallery;
 import org.eclipse.nebula.widgets.gallery.GalleryItem;
-import org.eclipse.nebula.widgets.gallery.NoGroupRenderer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.ProgressBar;
 
 /**
- * The original source code is in org.eclipse.swt.examples.fileviewer
+ * This class is a compilation from different source codes:
+ * 
+ * <pre>
+ * org.eclipse.swt.examples.fileviewer
+ * org.sharemedia.gui.libraryviews.GalleryLibraryView
+ * org.dawb.common
+ * org.apache.commons.sanselan
+ * </pre>
  */
-class PicDirImages {
+public class PicDirImages {
 
-	private NoGroupRenderer				_groupRenderer;
-	private DefaultGalleryItemRenderer	_itemRenderer;
+	private GalleryItem						_rootItem;
 
-	private GalleryItem					rootItem;
+	private AbstractGalleryItemRenderer		_itemRenderer;
+	private AbstractGridGroupRenderer		_groupRenderer;
 
-	private final ImageCache			_imageCache			= new ImageCache();
+	private int								_photoSize			= 64;
+
+	private File[]							_photoFiles;
+	private FileFilter						_fileFilter;
+
+	private static final PhotoManager		_photoMgr			= PhotoManager.getInstance();
+	private static final PhotoImageCache	_imageCache			= PhotoImageCache.getInstance();
+	private static final ThumbnailStore		_thumbnailStore		= ThumbnailStore.getInstance();
 
 	/*
 	 * UI resources
 	 */
-	private Composite					_uiParent;
-	private Display						_display;
-	private Gallery						_gallery;
+	private Color							_bgColor			= new Color(Display.getDefault(), 0x50, 0x50, 0x50);
+
+	/*
+	 * UI controls
+	 */
+	private Display							_display;
+	private Composite						_uiContainer;
+	private Gallery							_gallery;
+	private CLabel							_lblStatusInfo;
+	private ProgressBar						_progbarLoading;
 
 	/*
 	 * worker thread management
 	 */
 	/**
+	 * Worker start time
+	 */
+	private long							_workerStart;
+	/**
 	 * Lock for all worker control data and state
 	 */
-	private final Object				_workerLock			= new Object();
+	private final Object					_workerLock			= new Object();
 
 	/**
 	 * The worker's thread
 	 */
-	private volatile Thread				_workerThread		= null;
+	private volatile Thread					_workerThread		= null;
 
 	/**
 	 * True if the worker must exit on completion of the current cycle
 	 */
-	private volatile boolean			_workerStopped		= false;
+	private volatile boolean				_workerStopped		= false;
 
 	/**
 	 * True if the worker must cancel its operations prematurely perhaps due to a state update
 	 */
-	private volatile boolean			_workerCancelled	= false;
+	private volatile boolean				_workerCancelled	= false;
 
 	/**
 	 * Worker state information -- this is what gets synchronized by an update
 	 */
-	private volatile File				_workerStateDir		= null;
+	private volatile File					_workerStateDir		= null;
 
 	/**
 	 * State information to use for the next cycle
 	 */
-	private volatile File				_workerNextDir		= null;
+	private volatile File					_workerNextFolder	= null;
 
 	/**
 	 * Manages the worker's thread
 	 */
-	private final Runnable				_workerRunnable;
+	private final Runnable					_workerRunnable;
 
 	{
 		_workerRunnable = new Runnable() {
@@ -98,14 +135,14 @@ class PicDirImages {
 
 					synchronized (_workerLock) {
 						_workerCancelled = false;
-						_workerStateDir = _workerNextDir;
+						_workerStateDir = _workerNextFolder;
 					}
 
 					workerExecute();
 
 					synchronized (_workerLock) {
 						try {
-							if ((!_workerCancelled) && (_workerStateDir == _workerNextDir)) {
+							if ((!_workerCancelled) && (_workerStateDir == _workerNextFolder)) {
 
 								/*
 								 * wait until the next images should be displayed
@@ -128,223 +165,361 @@ class PicDirImages {
 		};
 	}
 
-//	void createUI(final Composite parent) {
-//
-//		_uiParent = parent;
-//		_display = parent.getDisplay();
-//
-//		final Composite container = new Composite(parent, SWT.NONE);
-//		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-//		{
-//
-//			/*
-//			 * sample snippet for a nebula gallery (http://www.eclipse.org/nebula/, requires
-//			 * org.eclipse.nebula.widgets.gallery_1.0.0.200802110300.jar)
-//			 */
-//			final Gallery gallery = new Gallery(container, SWT.V_SCROLL | SWT.VIRTUAL);
-//
-//			// Renderers
-//			DefaultGalleryGroupRenderer gr = new DefaultGalleryGroupRenderer();
-//			gr.setItemSize(64, 64);
-//			gr.setMinMargin(3);
-//			DefaultGalleryItemRenderer ir = new DefaultGalleryItemRenderer();
-//
-//			gallery.setGroupRenderer(gr);
-//			gallery.setItemRenderer(ir);
-//
-//			gallery.addListener(SWT.SetData, new Listener() {
-//
-//				public void handleEvent(Event event) {
-//					final Event eventCopy = event;
-//					getShell().getDisplay().asyncExec(new Thread() {
-//						private org.eclipse.swt.graphics.Image loadImage() {
-//							org.eclipse.swt.graphics.Image image = null;
-//							File file = new File("/home/jstaerk/Dokumente/usegroup/RE-OTB-08-18.pdf");
-//							try {
-//								RandomAccessFile raf;
-//								raf = new RandomAccessFile(file, "r");
-//								FileChannel channel = raf.getChannel();
-//								ByteBuffer buf = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
-//								PDFFile pdffile = new PDFFile(buf);
-//
-//								// draw the first page to an image
-//								PDFPage page = pdffile.getPage(0);
-//
-//								//get the width and height for the doc at the default zoom
-//								Rectangle rect = new Rectangle(0, 0, (int) page.getBBox().getWidth(), (int) page
-//										.getBBox()
-//										.getHeight());
-//
-//								//generate the image
-//								java.awt.Image img = page.getImage(rect.width, rect.height, //width & height
-//										rect, // clip rect
-//										null, // null for the ImageObserver
-//										true, // fill background with white
-//										true // block until drawing is done
-//										);
-//								BufferedImage awtBufImage = new BufferedImage(
-//										rect.width,
-//										rect.height,
-//										BufferedImage.TYPE_INT_RGB);
-//								java.awt.Graphics g = awtBufImage.getGraphics();
-//
-//								g.drawImage(img, 0, 0, null);
-//
-//								ImageData swtImageData = convertToSWT(awtBufImage);
-//								image = new org.eclipse.swt.graphics.Image(getShell().getDisplay(), swtImageData);
-//
-//							} catch (FileNotFoundException e) {
-//								// TODO Auto-generated catch block
-//								e.printStackTrace();
-//							} catch (IOException e) {
-//								// TODO Auto-generated catch block
-//								e.printStackTrace();
-//							}
-//							return image;
-//						}
-//
-//						// source: snippet156,
-//						// http://dev.eclipse.org/viewcvs/index.cgi/org.eclipse.swt.snippets/src/org/eclipse/swt/snippets/Snippet156.java?view=co
-//						private ImageData convertToSWT(BufferedImage bufferedImage) {
-//							if (bufferedImage.getColorModel() instanceof DirectColorModel) {
-//								DirectColorModel colorModel = (DirectColorModel) bufferedImage.getColorModel();
-//								PaletteData palette = new PaletteData(colorModel.getRedMask(), colorModel
-//										.getGreenMask(), colorModel.getBlueMask());
-//								ImageData data = new ImageData(
-//										bufferedImage.getWidth(),
-//										bufferedImage.getHeight(),
-//										colorModel.getPixelSize(),
-//										palette);
-//								WritableRaster raster = bufferedImage.getRaster();
-//								int[] pixelArray = new int[3];
-//								for (int y = 0; y < data.height; y++) {
-//									for (int x = 0; x < data.width; x++) {
-//										raster.getPixel(x, y, pixelArray);
-//										int pixel = palette.getPixel(new RGB(
-//												pixelArray[0],
-//												pixelArray[1],
-//												pixelArray[2]));
-//										data.setPixel(x, y, pixel);
-//									}
-//								}
-//								return data;
-//							} else if (bufferedImage.getColorModel() instanceof IndexColorModel) {
-//								IndexColorModel colorModel = (IndexColorModel) bufferedImage.getColorModel();
-//								int size = colorModel.getMapSize();
-//								byte[] reds = new byte[size];
-//								byte[] greens = new byte[size];
-//								byte[] blues = new byte[size];
-//								colorModel.getReds(reds);
-//								colorModel.getGreens(greens);
-//								colorModel.getBlues(blues);
-//								RGB[] rgbs = new RGB[size];
-//								for (int i = 0; i < rgbs.length; i++) {
-//									rgbs[i] = new RGB(reds[i] & 0xFF, greens[i] & 0xFF, blues[i] & 0xFF);
-//								}
-//								PaletteData palette = new PaletteData(rgbs);
-//								ImageData data = new ImageData(
-//										bufferedImage.getWidth(),
-//										bufferedImage.getHeight(),
-//										colorModel.getPixelSize(),
-//										palette);
-//								data.transparentPixel = colorModel.getTransparentPixel();
-//								WritableRaster raster = bufferedImage.getRaster();
-//								int[] pixelArray = new int[1];
-//								for (int y = 0; y < data.height; y++) {
-//									for (int x = 0; x < data.width; x++) {
-//										raster.getPixel(x, y, pixelArray);
-//										data.setPixel(x, y, pixelArray[0]);
-//									}
-//								}
-//								return data;
-//							}
-//							return null;
-//						}
-//
-//						public void run() {
-//							GalleryItem item = (GalleryItem) eventCopy.item;
-//							int index;
-//							if (item.getParentItem() != null) {
-//								index = item.getParentItem().indexOf(item);
-//								item.setItemCount(0);
-//							} else {
-//								index = gallery.indexOf(item);
-//								item.setItemCount(100);
-//							}
-//
-//							// Your image here
-//							ImageLoader loader = new ImageLoader();
-//							final ImageData[] imageData = loader.load("libs/gnu_herd_banner_01.png"); //$NON-NLS-1$
-//							final Image image = new Image(getShell().getDisplay(), imageData[0]);
-//
-//							item.setImage(loadImage());
-//							item.setText("Item " + index);
-//						}
-//					});
-//				}
-//
-//			});
-//
-//			gallery.setItemCount(100);
-//
-//		}
-//
-//		setupGallery();
-//	}
+	/**
+	 * 
+	 */
+	public static final Comparator<File>	NATURAL_SORT		= new SortNatural<File>(true);
 
-	void createUI(final Composite parent) {
+	/**
+	 * 
+	 */
+	public static Comparator<File>			DATE_SORT;
+	{
+		DATE_SORT = new Comparator<File>() {
+			@Override
+			public int compare(final File one, final File two) {
 
-		_uiParent = parent;
-		_display = parent.getDisplay();
+				if (_workerCancelled) {
+					// couldn't find another way how to stop sorting
+					return 0;
+				}
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-		{
-			final Label label = new Label(container, SWT.NONE);
-			GridDataFactory.fillDefaults().applyTo(label);
-			label.setText("images");
+				final long diff = one.lastModified() - two.lastModified();
 
-			_gallery = new Gallery(container, SWT.VIRTUAL | SWT.V_SCROLL | SWT.BORDER);
-			GridDataFactory.fillDefaults().grab(true, true).applyTo(_gallery);
+				if (diff == 0) {
+					return NATURAL_SORT.compare(one, two);
+				}
 
-			_gallery.addListener(SWT.SetData, new Listener() {
-				public void handleEvent(final Event event) {
+				if (diff > 0) {
+					return (int) two.lastModified();
+				}
+				return -1;
+			}
+		};
+	}
+//	private Comparator<File>				_currentComparator	= SortingUtils.DATE_SORT;
+	private Comparator<File>				_currentComparator	= DATE_SORT;
 
-					final GalleryItem gi = (GalleryItem) event.item;
+	private class LoadImageCallback implements ILoadCallBack {
 
-//					final Photo photo = (Photo) gi.getData();
-//
-//					final int index = _gallery.indexOf(gi);
+		private GalleryItem	__galleryItem;
+		private boolean		__isImageDisplayed;
 
-					System.out.println("SWT.SetData: " + gi.getText());
+		/**
+		 * @param gallery
+		 * @param galleryItem
+		 * @param isImageDisplayed
+		 *            When <code>true</code> image is displayed after it is loaded, otherwise it is
+		 *            only loaded into the cache.
+		 */
+		public LoadImageCallback(final GalleryItem galleryItem, final boolean isImageDisplayed) {
+
+			__galleryItem = galleryItem;
+			__isImageDisplayed = isImageDisplayed;
+		}
+
+		@Override
+		public void imageIsLoaded() {
+
+			if (__isImageDisplayed == false) {
+				return;
+			}
+
+			Display.getDefault().syncExec(new Runnable() {
+
+				public void run() {
+
+//					Gallery gallery = LoadItemCallback.this._callbackGallery;
+//					GalleryItem galleryItem = LoadItemCallback.this._galleryItem;
+
+					if (__galleryItem.isDisposed() || _gallery.isDisposed()) {
+						return;
+					}
+
+					final Rectangle bounds = __galleryItem.getBounds();
+
+					_gallery.redraw(bounds.x, bounds.y, bounds.width, bounds.height, false);
 				}
 			});
 		}
 
-		setupGallery();
+// ORIGINAL
+//		public void mediaLoaded(final IMedia media, final int definition, final Image img) {
+//			ImageService.getInstance().acquire(img);
+//			GalleryLibraryView.this.galleryImageCache.setImage(media, definition, img);
+//
+//			Display.getDefault().syncExec(new Runnable() {
+//
+//				public void run() {
+//					if (LoadItemCallback.this.item.isDisposed() || LoadItemCallback.this.callbackGallery.isDisposed()) {
+//						return;
+//					}
+//
+//					final Rectangle bounds = LoadItemCallback.this.item.getBounds();
+//
+//					LoadItemCallback.this.callbackGallery
+//							.redraw(bounds.x, bounds.y, bounds.width, bounds.height, false);
+//				}
+//			});
+//		}
+	}
+
+	/**
+	 * This will be configured from options but for now it is any image accepted.
+	 * 
+	 * @return
+	 */
+	private FileFilter createFileFilter() {
+
+		return new FileFilter() {
+			@Override
+			public boolean accept(final File pathname) {
+
+				if (pathname.isDirectory()) {
+					return false;
+				}
+
+				if (pathname.isHidden()) {
+					return false;
+				}
+
+				final String name = pathname.getName();
+				if (name == null || "".equals(name)) {
+					return false;
+				}
+
+				if (name.startsWith(".")) {
+					return false;
+				}
+
+				if (Sanselan.hasImageFileExtension(pathname)) {
+					return true;
+				}
+
+				return false;
+			}
+		};
+	}
+
+	void createUI(final Composite parent) {
+
+		_uiContainer = parent;
+		_display = parent.getDisplay();
+
+		_fileFilter = createFileFilter();
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, 0).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+		{
+			createUI_10_Gallery(container);
+			createUI_20_StatusLine(container);
+		}
+	}
+
+	/**
+	 * Create gallery
+	 */
+	private void createUI_10_Gallery(final Composite parent) {
+
+		_gallery = new Gallery(parent, SWT.V_SCROLL | SWT.VIRTUAL | SWT.MULTI);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_gallery);
+		_gallery.setBackground(_bgColor);
+		_gallery.setLowQualityOnUserAction(true);
+		_gallery.setHigherQualityDelay(500);
+		_gallery.setAntialias(SWT.OFF);
+		_gallery.setInterpolation(SWT.LOW);
+		_gallery.setVirtualGroups(true);
+		_gallery.setVirtualGroupDefaultItemCount(1);
+		_gallery.setVirtualGroupsCompatibilityMode(true);
+
+		_gallery.addListener(SWT.SetData, new Listener() {
+			public void handleEvent(final Event event) {
+				onSetData(event);
+			}
+		});
+
+		_gallery.addListener(SWT.PaintItem, new Listener() {
+			public void handleEvent(final Event event) {
+				onPaintItem(event);
+			}
+		});
+
+		/*
+		 * set renderer
+		 */
+		_itemRenderer = new PhotoRenderer();
+		final PhotoRenderer photoRenderer = (PhotoRenderer) _itemRenderer;
+		photoRenderer.setShowLabels(false);
+//		photoRenderer.setDropShadows(true);
+//		photoRenderer.setDropShadowsSize(5);
+		_gallery.setItemRenderer(_itemRenderer);
+
+		_groupRenderer = new NoGroupRendererMT();
+		_groupRenderer.setItemSize((int) (_photoSize * (float) 15 / 11), _photoSize);
+		_groupRenderer.setAutoMargin(true);
+		_groupRenderer.setMinMargin(0);
+
+		_gallery.setGroupRenderer(_groupRenderer);
+
+		_rootItem = new GalleryItem(_gallery, SWT.VIRTUAL);
+
+		_gallery.setItemCount(1);
+	}
+
+	private void createUI_20_StatusLine(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+		{
+			/*
+			 * label: info
+			 */
+			_lblStatusInfo = new CLabel(container, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblStatusInfo);
+
+			/*
+			 * progress bar
+			 */
+			_progbarLoading = new ProgressBar(container, SWT.HORIZONTAL | SWT.SMOOTH);
+			GridDataFactory.fillDefaults().grab(true, false).align(SWT.END, SWT.FILL).applyTo(_progbarLoading);
+		}
 	}
 
 	void dispose() {
 
+		_bgColor.dispose();
 		workerStop();
-
-		_imageCache.dispose();
 	}
 
-	private void setupGallery() {
+	private void onPaintItem(final Event event) {
 
-		_groupRenderer = new NoGroupRenderer();
-//		_itemRenderer = new ListItemRenderer();
+		final GalleryItem galleryItem = (GalleryItem) event.item;
 
-//		_groupRenderer = new DefaultGalleryGroupRenderer();
-		_itemRenderer = new DefaultGalleryItemRenderer();
-		_itemRenderer.setShowLabels(true);
+		if (galleryItem != null && galleryItem.getParentItem() != null) {
 
-		_gallery.setGroupRenderer(_groupRenderer);
-		_gallery.setItemRenderer(_itemRenderer);
+			/*
+			 * check if the photo image is available, if not, image must be loaded
+			 */
+
+			final Photo photo = (Photo) galleryItem.getData();
+
+			final PhotoLoadingState[] loadingState = photo.getLoadingState();
+
+			final int imageQuality = _photoSize > PhotoManager.THUMBNAIL_SIZE
+					? PhotoManager.IMAGE_QUALITY_LOW_640
+					: PhotoManager.IMAGE_QUALITY_THUMB_160;
+
+			final PhotoLoadingState defaultLoadingState = loadingState[imageQuality];
+
+			if (defaultLoadingState == PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR) {
+				return;
+			}
+
+			Image photoImage = _imageCache.getImage(photo.getImageKey(imageQuality));
+			if (photoImage != null && photoImage.isDisposed() == false) {
+				return;
+			}
+
+			/*
+			 * the requested image is not available in the image cache -> image must be loaded
+			 */
+
+			final int[] imageQualities = new int[] { -1, -1 };
+			final ILoadCallBack[] imageCallbacks = new ILoadCallBack[] { null, null };
+
+			final int otherImageQuality = _photoSize > PhotoManager.THUMBNAIL_SIZE
+					? PhotoManager.IMAGE_QUALITY_THUMB_160
+					: PhotoManager.IMAGE_QUALITY_LOW_640;
+
+			photoImage = _imageCache.getImage(photo.getImageKey(otherImageQuality));
+
+			if ((photoImage == null || photoImage.isDisposed()) && imageQuality == PhotoManager.IMAGE_QUALITY_LOW_640) {
+
+				// load also the thumb image
+
+				final int thumbQuality = PhotoManager.IMAGE_QUALITY_THUMB_160;
+				final PhotoLoadingState thumbLoadingState = loadingState[thumbQuality];
+
+				if (thumbLoadingState == PhotoLoadingState.UNDEFINED
+						&& thumbLoadingState != PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR) {
+					imageQualities[0] = thumbQuality;
+					imageCallbacks[0] = new LoadImageCallback(galleryItem, false);
+				}
+			}
+
+			if (defaultLoadingState == PhotoLoadingState.UNDEFINED) {
+				imageQualities[1] = imageQuality;
+				imageCallbacks[1] = new LoadImageCallback(galleryItem, true);
+			}
+
+			_photoMgr.loadImage(photo, imageQualities, imageCallbacks);
+
+// ORIGINAL
+//			final IMedia m = (IMedia) galleryItem.getData(DATA_MEDIA);
+//			final int definition = itemHeight > 140 ? IConstants.IMAGE_LOW : IConstants.IMAGE_THUMB;
+//
+//			Image img = getImageCache().getImage(m, definition);
+//
+//			if (img == null) {
+//				img = getImageCache().getImage(m, itemHeight > 140 ? IConstants.IMAGE_THUMB : IConstants.IMAGE_LOW);
+//
+//				final LoadItemCallback callback = new LoadItemCallback(_gallery, galleryItem);
+//
+//				if (img == null && definition == IConstants.IMAGE_LOW) {
+//					MediaDownload.getInstance().load(m, IConstants.IMAGE_THUMB, callback);
+//				}
+//				MediaDownload.getInstance().load(m, definition, callback);
+//			}
+		}
 	}
 
+	private void onSetData(final Event event) {
+
+		final GalleryItem galleryItem = (GalleryItem) event.item;
+
+		if (galleryItem.getParentItem() == null) {
+
+			/*
+			 * It's a group
+			 */
+
+			galleryItem.setItemCount(_photoFiles.length);
+
+		} else {
+
+			/*
+			 * It's an item
+			 */
+
+			final GalleryItem parentItem = galleryItem.getParentItem();
+			final int galleryItemIndex = parentItem.indexOf(galleryItem);
+
+			final Photo photo = new Photo(_photoFiles[galleryItemIndex], galleryItemIndex);
+			galleryItem.setData(photo);
+
+			galleryItem.setText(photo.getFileName());
+		}
+	}
+
+	void setThumbnailSize(final int imageSize) {
+
+		_photoSize = imageSize;
+
+		_groupRenderer.setItemSize((int) (_photoSize * (float) 15 / 11), _photoSize);
+	}
+
+	/**
+	 * Display images for the selected folder.
+	 * 
+	 * @param dir
+	 */
 	void showImages(final File dir) {
+
+		_photoMgr.stopLoadingImages();
+
 		workerUpdate(dir);
 	}
 
@@ -353,82 +528,64 @@ class PicDirImages {
 	 */
 	private void workerExecute() {
 
-		final File[] dirList = PhotoDirectoryView.getDirectoryList(_workerStateDir);
+		_workerStart = System.currentTimeMillis();
 
-		_display.syncExec(new Runnable() {
-			public void run() {
+		File[] newPhotoFiles = null;
 
-				// guard against the ui being closed before this runs
-				if (_uiParent.isDisposed()) {
-					return;
-				}
-
-				// clear existing gallerie items
-				_gallery.removeAll();
-				_imageCache.dispose();
-
-				rootItem = new GalleryItem(_gallery, SWT.None);
-				rootItem.setText("root");
-
-			}
-		});
-
-		for (final File file : dirList) {
-
-			if (_workerCancelled) {
-				break;
-			}
-
-			// check if the file is an image
-			if (Sanselan.hasImageFileExtension(file) == false) {
-				continue;
-			}
-
-			workerExecute_10_loadImage(file, rootItem);
-		}
-	}
-
-	private void workerExecute_10_loadImage(final File imageFile, final GalleryItem rootItem) {
-
-		try {
-
-			final String absolutePath = imageFile.getAbsolutePath();
-
-			final Photo photo = new Photo(imageFile);
-
-			photo.loadMetaData();
-
-			final Image photoImage = new Image(_display, absolutePath);
-
-			if (photo.getWidth() == Integer.MIN_VALUE) {
-
-				// images size is not yet set
-
-				final Rectangle imageSize = photoImage.getBounds();
-
-				photo.setSize(imageSize.width, imageSize.height);
-			}
-			_imageCache.add(absolutePath, photoImage);
+		if (_workerStateDir != null) {
 
 			_display.syncExec(new Runnable() {
 				public void run() {
 
 					// guard against the ui being closed before this runs
-					if (_uiParent.isDisposed()) {
+					if (_uiContainer.isDisposed()) {
 						return;
 					}
 
-					final GalleryItem galItem = new GalleryItem(rootItem, SWT.None);
-
-					galItem.setText(photo.getFileName());
-					galItem.setImage(photoImage);
-
-					galItem.setData(photo);
+					_lblStatusInfo.setText("reading: " + _workerStateDir.getAbsolutePath());
 				}
 			});
 
-		} catch (final Exception e) {
-			// TODO: handle exception
+			// We make file list in this thread for speed reasons
+			final List<File> files = SortingUtils.getSortedFileList(_workerStateDir, _fileFilter, _currentComparator);
+
+			if (_workerCancelled) {
+				return;
+			}
+
+			if (files == null) {
+				// prevent NPE
+				newPhotoFiles = new File[0];
+			} else {
+				newPhotoFiles = files.toArray(new File[files.size()]);
+			}
+
+			_photoFiles = newPhotoFiles;
+
+			_display.syncExec(new Runnable() {
+				public void run() {
+
+					// guard against the ui being closed before this runs
+					if (_uiContainer.isDisposed()) {
+						return;
+					}
+
+					// this will update the gallery
+					_gallery.clearAll();
+
+					/*
+					 * update status info
+					 */
+					final long timeDiff = System.currentTimeMillis() - _workerStart;
+					final String timeDiffText = Long.toString(timeDiff)
+							+ " ms  :  "
+							+ Integer.toString(_photoFiles.length)
+							+ "  :  "
+							+ _workerStateDir.getAbsolutePath();
+
+					_lblStatusInfo.setText(timeDiffText);
+				}
+			});
 		}
 	}
 
@@ -460,22 +617,22 @@ class PicDirImages {
 	 * Notifies the worker that it should update itself with new data. Cancels any previous
 	 * operation and begins a new one.
 	 * 
-	 * @param dir
+	 * @param newFolder
 	 *            the new base directory for the table, null is ignored
 	 */
-	private void workerUpdate(final File dir) {
+	private void workerUpdate(final File newFolder) {
 
-		if (dir == null) {
+		if (newFolder == null) {
 			return;
 		}
 
-		if ((_workerNextDir != null) && (_workerNextDir.equals(dir))) {
+		if ((_workerNextFolder != null) && (_workerNextFolder.equals(newFolder))) {
 			return;
 		}
 
 		synchronized (_workerLock) {
 
-			_workerNextDir = dir;
+			_workerNextFolder = newFolder;
 
 			_workerStopped = false;
 			_workerCancelled = true;
@@ -484,9 +641,8 @@ class PicDirImages {
 		}
 
 		if (_workerThread == null) {
-			_workerThread = new Thread(_workerRunnable, "Image file reader");
+			_workerThread = new Thread(_workerRunnable, "PicDirImages: retrieve files");
 			_workerThread.start();
 		}
 	}
-
 }

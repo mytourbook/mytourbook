@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Set;
 
 import net.tourbook.data.TourData;
-import net.tourbook.photo.Photo;
+import net.tourbook.photo.manager.Photo;
 import de.byteholder.gpx.GeoPosition;
 
 /**

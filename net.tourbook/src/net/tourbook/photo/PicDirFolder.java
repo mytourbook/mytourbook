@@ -84,6 +84,7 @@ class PicDirFolder {
 		_display = parent.getDisplay();
 
 		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, 0).applyTo(container);
 		{
 			createUI_10_TreeView(container);
@@ -98,7 +99,7 @@ class PicDirFolder {
 	 */
 	private void createUI_10_TreeView(final Composite parent) {
 
-		tree = new Tree(parent, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.SINGLE);
+		tree = new Tree(parent, SWT.V_SCROLL | SWT.H_SCROLL | SWT.SINGLE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(tree);
 
 		tree.addSelectionListener(new SelectionListener() {
@@ -190,6 +191,28 @@ class PicDirFolder {
 		return tree;
 	}
 
+	void initialRefresh() {
+
+		BusyIndicator.showWhile(_display, new Runnable() {
+			public void run() {
+
+				_picDirImages.showImages(currentDirectory);
+
+				final File[] roots = getRoots();
+
+				/*
+				 * Tree view: Refreshes information about any files in the list and their children.
+				 */
+				treeRefresh(roots);
+
+				// Remind everyone where we are in the filesystem
+				final File dir = currentDirectory;
+				currentDirectory = null;
+				onSelectedDirectory(dir);
+			}
+		});
+	}
+
 	/**
 	 * Notifies the application components that a new current directory has been selected
 	 * 
@@ -259,28 +282,6 @@ class PicDirFolder {
 		tree.setSelection((lastItem != null) ? //
 				new TreeItem[] { lastItem }
 				: new TreeItem[0]);
-	}
-
-	void refresh() {
-
-		BusyIndicator.showWhile(_display, new Runnable() {
-			public void run() {
-
-				_picDirImages.showImages(currentDirectory);
-
-				final File[] roots = getRoots();
-
-				/*
-				 * Tree view: Refreshes information about any files in the list and their children.
-				 */
-				treeRefresh(roots);
-
-				// Remind everyone where we are in the filesystem
-				final File dir = currentDirectory;
-				currentDirectory = null;
-				onSelectedDirectory(dir);
-			}
-		});
 	}
 
 	/**

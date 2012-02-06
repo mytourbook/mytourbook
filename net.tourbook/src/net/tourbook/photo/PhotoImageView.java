@@ -18,6 +18,7 @@ package net.tourbook.photo;
 import java.io.File;
 
 import net.tourbook.Messages;
+import net.tourbook.photo.manager.Photo;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;

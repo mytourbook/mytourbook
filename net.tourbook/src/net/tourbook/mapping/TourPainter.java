@@ -27,7 +27,7 @@ import net.tourbook.chart.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourWayPoint;
-import net.tourbook.photo.Photo;
+import net.tourbook.photo.manager.Photo;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceMap;
 import net.tourbook.ui.ColorCacheInt;

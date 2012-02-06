@@ -72,6 +72,26 @@ public class Messages extends NLS {
 	public static String		simulate_Delete_text;
 	public static String		error_FailedLaunch_message;
 
+	public static String	PrefPage_Photo_Button_GetNumberOfImages;
+
+	public static String	PrefPage_Photo_Error_ThumbnailLocation;
+
+	public static String	PrefPage_Photo_Group_ThumbnailCacheLocation;
+
+	public static String	PrefPage_Photo_Group_ThumbnailCacheSize;
+
+	public static String	PrefPage_Photo_Label_NumberOfImages;
+
+	public static String	PrefPage_Photo_Label_ThumbnailCacheSizeInfo;
+
+	public static String	PrefPage_Photo_Label_ThumbnailLocation;
+
+	public static String	PrefPage_Photo_Label_UseDefaultThumbnailLocation;
+
+	public static String	PrefPagePhoto_0;
+
+	public static String	PrefPagePhoto_1;
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

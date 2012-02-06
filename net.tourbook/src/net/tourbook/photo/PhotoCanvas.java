@@ -19,6 +19,7 @@
  */
 package net.tourbook.photo;
 
+import net.tourbook.photo.manager.Photo;
 import net.tourbook.ui.UI;
 import net.tourbook.util.Util;
 

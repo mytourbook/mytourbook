@@ -26,6 +26,7 @@ import java.util.Map;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.IWeather;
+import net.tourbook.photo.manager.Photo;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionModifyColumns;

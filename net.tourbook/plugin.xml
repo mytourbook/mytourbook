@@ -304,18 +304,31 @@
       
 -->
 
+
+	<!--
+		Photo
+	-->
+      <page
+            class="net.tourbook.preferences.PrefPagePhoto"
+            id="net.tourbook.preferences.PrefPagePhotoId"
+            name="%Pref_Page_Photo">
+      </page>
+
       <page
             class="net.tourbook.preferences.PrefPagePeople"
             id="net.tourbook.preferences.PrefPagePeopleId"
             name="%preference_page_People">
       </page>
+      
       <page
             class="net.tourbook.srtm.PrefPageSRTM"
             id="net.tourbook.ext.srtm.PrefPageSRTM"
             name="%pref_page_srtm">
       </page>
 
-
+	<!--
+		Map
+	-->
       <page
             class="de.byteholder.geoclipse.preferences.PrefPageMap"
             id="de.byteholder.geoclipse.preferences.map"
@@ -421,6 +434,17 @@
                commandId="net.tourbook.command.OpenForum"
                label="%Command_App_OpenForum"
                mnemonic="%Command_App_OpenForum_Mnemonic">
+         </command>
+         <command
+               commandId="org.eclipse.ui.views.showView"
+               icon="icons/error_log.gif"
+               label="%command_error_view"
+               mnemonic="%command_error_view_mnemonic"
+               style="push">
+            <parameter
+                  name="org.eclipse.ui.views.showView.viewId"
+                  value="org.eclipse.pde.runtime.LogView">
+            </parameter>
          </command>
          <separator
                name="net.tourbook.separator"
@@ -568,21 +592,6 @@
                icon="icons/conconi-chart.png"
                label="%View_Name_ConconiChart"
                mnemonic="%View_Name_ConconiChart_Mnemonic"/>
-      </menuContribution>
-
-      <menuContribution
-            locationURI="menu:views?after=adminViews">
-         <command
-               commandId="org.eclipse.ui.views.showView"
-               icon="icons/error_log.gif"
-               label="%command_error_view"
-               mnemonic="%command_error_view_mnemonic"
-               style="push">
-            <parameter
-                  name="org.eclipse.ui.views.showView.viewId"
-                  value="org.eclipse.pde.runtime.LogView">
-            </parameter>
-         </command>
       </menuContribution>
 
       <menuContribution

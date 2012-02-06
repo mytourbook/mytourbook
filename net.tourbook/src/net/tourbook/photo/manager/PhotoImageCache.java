@@ -1,19 +1,19 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.photo;
+package net.tourbook.photo.manager;
 
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,16 +24,60 @@ import net.tourbook.util.StatusUtil;
 import org.eclipse.swt.graphics.Image;
 
 /**
- * Cache for photo images
+ * <p>
+ * Original implementation: org.sharemedia.services.impl.imagemanager.WidgetImageCache
+ * <p>
  */
-class ImageCache {
+public class PhotoImageCache {
 
-	private static final int						MAX_CACHE_ENTRIES	= 500;
+	private static final int						MAX_CACHE_ENTRIES	= 1000;
+
+	private static PhotoImageCache					_instance;
 
 	private final ConcurrentHashMap<String, Image>	_imageCache			= new ConcurrentHashMap<String, Image>();
 	private final ConcurrentLinkedQueue<String>		_imageCacheFifo		= new ConcurrentLinkedQueue<String>();
 
-	public void add(final String tileKey, final Image image) {
+	public static PhotoImageCache getInstance() {
+
+		if (_instance == null) {
+			_instance = new PhotoImageCache();
+		}
+
+		return _instance;
+	}
+
+	/**
+	 * Dispose all images in the cache
+	 */
+	public synchronized void dispose() {
+
+		// dispose cached images
+		final Collection<Image> images = _imageCache.values();
+		for (final Image image : images) {
+			if (image != null) {
+				image.dispose();
+			}
+		}
+
+		_imageCache.clear();
+		_imageCacheFifo.clear();
+	}
+
+	/**
+	 * @param imageKey
+	 * @return Returns the image or <code>null</code> when the image is not available or disposed
+	 */
+	public Image getImage(final String imageKey) {
+
+		final Image image = _imageCache.get(imageKey);
+		if (image != null && !image.isDisposed()) {
+			return image;
+		}
+
+		return null;
+	}
+
+	public void putImage(final String imageKey, final Image image) {
 
 		final int cacheSize = _imageCacheFifo.size();
 		if (cacheSize > MAX_CACHE_ENTRIES) {
@@ -43,8 +87,8 @@ class ImageCache {
 
 				// remove and dispose oldest image
 
-				final String headTileKey = _imageCacheFifo.poll();
-				final Image headImage = _imageCache.remove(headTileKey);
+				final String headImageKey = _imageCacheFifo.poll();
+				final Image headImage = _imageCache.remove(headImageKey);
 
 				if (headImage != null) {
 					try {
@@ -61,13 +105,13 @@ class ImageCache {
 			/*
 			 * check if the image is already in the cache
 			 */
-			final Image cachedImage = _imageCache.get(tileKey);
+			final Image cachedImage = _imageCache.get(imageKey);
 			if (cachedImage == null) {
 
 				// this is a new image
 
-				_imageCache.put(tileKey, image);
-				_imageCacheFifo.add(tileKey);
+				_imageCache.put(imageKey, image);
+				_imageCacheFifo.add(imageKey);
 
 				return;
 
@@ -94,7 +138,7 @@ class ImageCache {
 					}
 
 					// replace existing image, the image must be already in the fifo queue
-					_imageCache.put(tileKey, image);
+					_imageCache.put(imageKey, image);
 
 					return;
 				}
@@ -104,37 +148,6 @@ class ImageCache {
 		} catch (final Exception e) {
 			StatusUtil.log(e.getMessage(), e);
 		}
-	}
-
-	/**
-	 * Dispose all images in the cache
-	 */
-	public synchronized void dispose() {
-
-		// dispose cached images
-		final Collection<Image> images = _imageCache.values();
-		for (final Image image : images) {
-			if (image != null) {
-				image.dispose();
-			}
-		}
-
-		_imageCache.clear();
-		_imageCacheFifo.clear();
-	}
-
-	/**
-	 * @param tileKey
-	 * @return Returns the image or <code>null</code> when the image is not available or disposed
-	 */
-	public Image get(final String tileKey) {
-
-		final Image image = _imageCache.get(tileKey);
-		if (image != null && !image.isDisposed()) {
-			return image;
-		}
-
-		return null;
 	}
 
 }

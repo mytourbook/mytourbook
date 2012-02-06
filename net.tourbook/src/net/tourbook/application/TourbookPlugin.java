@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,6 +20,7 @@ import java.util.ResourceBundle;
 
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.photo.manager.PhotoImageCache;
 import net.tourbook.ui.TourTypeFilter;
 
 import org.eclipse.core.runtime.IStatus;
@@ -35,6 +36,7 @@ import org.osgi.framework.Version;
 /**
  * The main plugin class to be used in the desktop.
  */
+@SuppressWarnings("restriction")
 public class TourbookPlugin extends AbstractUIPlugin {
 
 	public static final String				PLUGIN_ID								= "net.tourbook";				//$NON-NLS-1$
@@ -196,6 +198,8 @@ public class TourbookPlugin extends AbstractUIPlugin {
 
 		_instance = null;
 		_bundleContext = null;
+
+		PhotoImageCache.getInstance().dispose();
 
 		super.stop(context);
 	}

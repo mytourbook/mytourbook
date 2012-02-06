@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.photo;
+package net.tourbook.photo.manager;
 
 import java.awt.Point;
 import java.io.File;
@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.tourbook.util.StatusUtil;
+import net.tourbook.util.Util;
 
 import org.apache.commons.sanselan.ImageReadException;
 import org.apache.commons.sanselan.Sanselan;
@@ -73,20 +74,20 @@ public class Photo {
 	private int								_orientation	= 1;
 
 	private int								_width			= Integer.MIN_VALUE;
+
 	private int								_widthSmall;
-
 	private int								_height			= Integer.MIN_VALUE;
-	private int								_heightSmall;
 
+	private int								_heightSmall;
 	private double							_latitude		= Double.MIN_VALUE;
+
 	private double							_longitude		= Double.MIN_VALUE;
 
 	private GeoPosition						_geoPosition;
 	private String							_gpsAreaInfo;
+
 	private double							_imageDirection	= Double.MIN_VALUE;
-
 	private double							_altitude		= Double.MIN_VALUE;
-
 	private static final DateTimeFormatter	_dtParser		= DateTimeFormat.forPattern("yyyy:MM:dd HH:mm:ss")// //$NON-NLS-1$
 																	.withZone(DateTimeZone.UTC);
 
@@ -98,14 +99,39 @@ public class Photo {
 	private final HashMap<Integer, Point>	_worldPosition	= new HashMap<Integer, Point>();
 
 	/**
-	 * 
+	 * Location index in the gallery widget
 	 */
-	public Photo(final File imageFile) {
+	private int								_galleryItemIndex;
+
+	/**
+	 * Contains image keys for each image quality which can be used to get images from an image
+	 * cache
+	 */
+	private String[]						_imageKeys;
+
+	/**
+	 * This array keeps track of the loading state for the photo images and for different qualities
+	 */
+	private PhotoLoadingState[]				_photoLoadingState;
+
+	/**
+	 * @param galleryItemIndex
+	 */
+	public Photo(final File imageFile, final int galleryItemIndex) {
 
 		_imageFile = imageFile;
+		_galleryItemIndex = galleryItemIndex;
 
 		_fileName = imageFile.getName();
 		_filePathName = imageFile.getAbsolutePath();
+
+		_imageKeys = new String[PhotoManager.MAX_IMAGE_QUALITY];
+		_photoLoadingState = new PhotoLoadingState[PhotoManager.MAX_IMAGE_QUALITY];
+
+		for (int qualityIndex = 0; qualityIndex < _photoLoadingState.length; qualityIndex++) {
+			_imageKeys[qualityIndex] = Util.computeMD5(_filePathName + "_" + qualityIndex);
+			_photoLoadingState[qualityIndex] = PhotoLoadingState.UNDEFINED;
+		}
 	}
 
 	@Override
@@ -272,6 +298,17 @@ public class Photo {
 	}
 
 	/**
+	 * @return Returns the absolute pathname for the fullsize image
+	 */
+	public String getFilePathName() {
+		return _filePathName;
+	}
+
+	public int getGalleryIndex() {
+		return _galleryItemIndex;
+	}
+
+	/**
 	 * @return Returns geo position or <code>null</code> when latitude/longitude is not available
 	 */
 	public GeoPosition getGeoPosition() {
@@ -308,8 +345,23 @@ public class Photo {
 		return _imageFile;
 	}
 
+	/**
+	 * @param imageQuality
+	 * @return Returns an image key which can be used to get images from an image cache
+	 */
+	public String getImageKey(final int imageQuality) {
+		return _imageKeys[imageQuality];
+	}
+
 	public double getLatitude() {
 		return _latitude;
+	}
+
+	/**
+	 * @return Returns the loading state for each photo quality
+	 */
+	public PhotoLoadingState[] getLoadingState() {
+		return _photoLoadingState;
 	}
 
 	public double getLongitude() {
@@ -495,6 +547,10 @@ public class Photo {
 		_latitude = latitude;
 	}
 
+	public void setLoadingState(final PhotoLoadingState photoLoadingState, final int imageQuality) {
+		_photoLoadingState[imageQuality] = photoLoadingState;
+	}
+
 	public void setLongitude(final double longitude) {
 		_longitude = longitude;
 	}
@@ -513,6 +569,17 @@ public class Photo {
 
 		_widthSmall = width > SIZE_SMALL ? SIZE_SMALL : width;
 		_heightSmall = (int) (_widthSmall / ratio);
+	}
+
+	@Override
+	public String toString() {
+		return "Photo "
+				+ (_fileName)
+				+ (_dateTime == null ? "" : "\t" + _dateTime)
+				+ (_width == Integer.MIN_VALUE ? "" : "\t" + _width + "x" + _height)
+				+ (_latitude == Double.MIN_VALUE ? "" : "\t" + _latitude + "" + _longitude)
+		//
+		;
 	}
 
 }

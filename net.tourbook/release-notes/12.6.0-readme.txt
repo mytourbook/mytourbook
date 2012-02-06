@@ -9,4 +9,5 @@ New
  
  
 PENDENZEN
+- Error Log ist jetzt im Help Menü
 - Exception Handling dokumentieren

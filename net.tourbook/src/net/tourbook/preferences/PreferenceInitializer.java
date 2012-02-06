@@ -24,6 +24,7 @@ import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.BreakTimeTool;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.ISmoothingAlgorithm;
 import net.tourbook.util.StringToArrayConverter;
@@ -348,6 +349,12 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(
 				ITourbookPreferences.VIEW_DOUBLE_CLICK_ACTIONS,
 				PrefPageViews.VIEW_DOUBLE_CLICK_ACTION_QUICK_EDIT);
+
+		/*
+		 * photo
+		 */
+		store.setDefault(ITourbookPreferences.PHOTO_USE_DEFAULT_THUMBNAIL_LOCATION, true);
+		store.setDefault(ITourbookPreferences.PHOTO_CUSTOM_THUMBNAIL_LOCATION, UI.EMPTY_STRING);
 
 	}
 }

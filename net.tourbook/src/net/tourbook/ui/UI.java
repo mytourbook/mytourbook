@@ -74,6 +74,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
@@ -345,6 +346,20 @@ public class UI {
 	}
 
 	private UI() {}
+
+	public static void adjustScaleValueOnMouseScroll(final MouseEvent event) {
+
+		// accelerate with Ctrl + Shift key
+		int accelerator = (event.stateMask & SWT.CONTROL) != 0 ? 10 : 1;
+		accelerator *= (event.stateMask & SWT.SHIFT) != 0 ? 5 : 1;
+
+		final Scale scale = (Scale) event.widget;
+		final int increment = scale.getIncrement();
+		final int oldValue = scale.getSelection();
+		final int valueDiff = ((event.count > 0 ? increment : -increment) * accelerator);
+
+		scale.setSelection(oldValue + valueDiff);
+	}
 
 	public static void adjustSpinnerValueOnMouseScroll(final MouseEvent event) {
 

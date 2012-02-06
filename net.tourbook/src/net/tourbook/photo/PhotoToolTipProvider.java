@@ -19,6 +19,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 
 import net.tourbook.data.TourWayPoint;
+import net.tourbook.photo.manager.Photo;
 import net.tourbook.ui.IMapToolTipProvider;
 import net.tourbook.util.HoveredAreaContext;
 import net.tourbook.util.ITourToolTipProvider;

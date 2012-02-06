@@ -308,4 +308,10 @@ public interface ITourbookPreferences {
 	 */
 	public static final String	VALUE_POINT_TOOL_TIP_IS_VISIBLE				= "VALUE_POINT_TOOL_TIP_IS_VISIBLE";						//$NON-NLS-1$
 
+	/*
+	 * photo
+	 */
+	public static final String	PHOTO_USE_DEFAULT_THUMBNAIL_LOCATION		= "PHOTO_USE_DEFAULT_THUMBNAIL_LOCATION";					//$NON-NLS-1$
+	public static final String	PHOTO_CUSTOM_THUMBNAIL_LOCATION				= "PHOTO_CUSTOM_THUMBNAIL_LOCATION";						//$NON-NLS-1$
+
 }

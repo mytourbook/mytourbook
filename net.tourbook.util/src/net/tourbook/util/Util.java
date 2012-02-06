@@ -22,6 +22,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -84,6 +86,37 @@ public class Util {
 		final int newValue = ((event.count > 0 ? 1 : -1) * accelerator);
 
 		spinner.setSelection(spinner.getSelection() + newValue);
+	}
+
+	/**
+	 * @param text
+	 * @return Returns MD5 for the text or <code>null</code> when an error occures.
+	 */
+	public static String computeMD5(final String text) {
+
+		MessageDigest md5Checker;
+		try {
+			md5Checker = MessageDigest.getInstance("MD5"); //$NON-NLS-1$
+		} catch (final NoSuchAlgorithmException e) {
+			return null;
+		}
+
+		final byte[] textBytes = text.getBytes();
+		for (final byte textByte : textBytes) {
+			md5Checker.update(textByte);
+		}
+
+		final byte[] digest = md5Checker.digest();
+
+		final StringBuffer buf = new StringBuffer();
+		for (final byte element : digest) {
+			if ((element & 0xFF) < 0x10) {
+				buf.append('0');
+			}
+			buf.append(Integer.toHexString(element & 0xFF));
+		}
+
+		return buf.toString();
 	}
 
 	public static float[] convertIntToFloat(final int[] intValues) {
@@ -461,7 +494,7 @@ public class Util {
 
 	/**
 	 * @param fileName
-	 * @return Returns true when the fileName is a valid directory
+	 * @return Returns <code>true</code> when fileName is a valid directory
 	 */
 	public static boolean isDirectory(String fileName) {
 
