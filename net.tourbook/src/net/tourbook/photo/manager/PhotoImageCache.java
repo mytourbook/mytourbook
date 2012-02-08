@@ -17,39 +17,60 @@ package net.tourbook.photo.manager;
 
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingDeque;
 
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.util.StatusUtil;
 
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.graphics.Image;
 
-/**
- * <p>
- * Original implementation: org.sharemedia.services.impl.imagemanager.WidgetImageCache
- * <p>
- */
 public class PhotoImageCache {
 
-	private static final int						MAX_CACHE_ENTRIES	= 1000;
+	private static IPreferenceStore							_prefStore		= TourbookPlugin.getDefault() //
+																					.getPreferenceStore();
 
-	private static PhotoImageCache					_instance;
+	private static int										_maxCacheSize	= _prefStore.getInt(//
+																					ITourbookPreferences.PHOTO_IMAGE_CACHE_SIZE);
 
-	private final ConcurrentHashMap<String, Image>	_imageCache			= new ConcurrentHashMap<String, Image>();
-	private final ConcurrentLinkedQueue<String>		_imageCacheFifo		= new ConcurrentLinkedQueue<String>();
+	private static final ConcurrentHashMap<String, Image>	_imageCache		= new ConcurrentHashMap<String, Image>();
+	private static final LinkedBlockingDeque<String>		_imageCacheFifo	= new LinkedBlockingDeque<String>();
 
-	public static PhotoImageCache getInstance() {
+	private static int										_cacheThreshold	= _maxCacheSize / 10;
 
-		if (_instance == null) {
-			_instance = new PhotoImageCache();
+	private static void checkCacheSize() {
+
+		final int imageCacheSize = _imageCacheFifo.size();
+		if (imageCacheSize > _maxCacheSize) {
+
+			// remove cache items
+			for (int cacheIndex = _maxCacheSize - _cacheThreshold; cacheIndex < imageCacheSize; cacheIndex++) {
+
+				// remove and dispose oldest image
+
+				final String headImageKey = _imageCacheFifo.poll();
+				final Image headImage = _imageCache.remove(headImageKey);
+
+				if (headImage != null) {
+					try {
+						headImage.dispose();
+					} catch (final Exception e) {
+						// it is possible that the image is already disposed by another thread
+					}
+				}
+			}
 		}
-
-		return _instance;
 	}
 
 	/**
 	 * Dispose all images in the cache
 	 */
-	public synchronized void dispose() {
+	public static synchronized void dispose() {
+
+		if (_imageCache == null) {
+			return;
+		}
 
 		// dispose cached images
 		final Collection<Image> images = _imageCache.values();
@@ -67,7 +88,7 @@ public class PhotoImageCache {
 	 * @param imageKey
 	 * @return Returns the image or <code>null</code> when the image is not available or disposed
 	 */
-	public Image getImage(final String imageKey) {
+	public static Image getImage(final String imageKey) {
 
 		final Image image = _imageCache.get(imageKey);
 		if (image != null && !image.isDisposed()) {
@@ -77,28 +98,9 @@ public class PhotoImageCache {
 		return null;
 	}
 
-	public void putImage(final String imageKey, final Image image) {
-
-		final int cacheSize = _imageCacheFifo.size();
-		if (cacheSize > MAX_CACHE_ENTRIES) {
-
-			// remove cache items
-			for (int cacheIndex = MAX_CACHE_ENTRIES; cacheIndex < cacheSize; cacheIndex++) {
-
-				// remove and dispose oldest image
-
-				final String headImageKey = _imageCacheFifo.poll();
-				final Image headImage = _imageCache.remove(headImageKey);
-
-				if (headImage != null) {
-					try {
-						headImage.dispose();
-					} catch (final Exception e) {
-						// it is possible that the image is already disposed by another thread
-					}
-				}
-			}
-		}
+	public static void putImage(final String imageKey, final Image image) {
+ 
+		checkCacheSize();
 
 		try {
 
@@ -147,6 +149,18 @@ public class PhotoImageCache {
 
 		} catch (final Exception e) {
 			StatusUtil.log(e.getMessage(), e);
+		}
+	}
+
+	public static void setCacheSize(final int newCacheSize) {
+
+		final boolean isSmaller = newCacheSize < _maxCacheSize;
+
+		_maxCacheSize = newCacheSize;
+		_cacheThreshold = newCacheSize / 10;
+
+		if (isSmaller) {
+			checkCacheSize();
 		}
 	}
 

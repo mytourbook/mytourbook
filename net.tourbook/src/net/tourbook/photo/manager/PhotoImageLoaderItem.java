@@ -15,30 +15,20 @@
  *******************************************************************************/
 package net.tourbook.photo.manager;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.Future;
-
 import net.tourbook.util.StatusUtil;
 
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 
-public class PhotoImageLoaderItem implements Runnable {
+public class PhotoImageLoaderItem {
 
-	private static final PhotoImageCache								_imageCache		= PhotoImageCache.getInstance();
+	Photo					photo;
+	int						galleryIndex;
+	int						imageQuality;
+	private String			_imageKey;
 
-	private static final ConcurrentLinkedQueue<PhotoImageLoaderItem>	_waitingQueue	= PhotoManager
-																								.getWaitingQueue();
-
-	Photo																photo;
-	private String														_filePathName;
-	int																	galleryIndex;
-	int																	imageQuality;
-
-	private ILoadCallBack												_loadCallBack;
-
-	public Future<?>													future;
+	private ILoadCallBack	_loadCallBack;
 
 	PhotoImageLoaderItem(final Photo photo, final int imageQuality, final ILoadCallBack loadCallBack) {
 
@@ -46,8 +36,8 @@ public class PhotoImageLoaderItem implements Runnable {
 		this.imageQuality = imageQuality;
 		_loadCallBack = loadCallBack;
 
-		_filePathName = photo.getFilePathName();
 		galleryIndex = photo.getGalleryIndex();
+		_imageKey = photo.getImageKey(imageQuality);
 	}
 
 	@Override
@@ -66,14 +56,15 @@ public class PhotoImageLoaderItem implements Runnable {
 		}
 
 		final PhotoImageLoaderItem other = (PhotoImageLoaderItem) obj;
-		if (_filePathName == null) {
-			if (other._filePathName != null) {
-				return false;
-			}
-		} else if (!_filePathName.equals(other._filePathName)) {
+		if (imageQuality != other.imageQuality) {
 			return false;
 		}
-		if (imageQuality != other.imageQuality) {
+
+		if (_imageKey == null) {
+			if (other._imageKey != null) {
+				return false;
+			}
+		} else if (!_imageKey.equals(other._imageKey)) {
 			return false;
 		}
 
@@ -84,33 +75,68 @@ public class PhotoImageLoaderItem implements Runnable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((_filePathName == null) ? 0 : _filePathName.hashCode());
-		result = prime * result + imageQuality;
+		result = prime * result + _imageKey.hashCode();
 		return result;
 	}
 
-	@Override
-	public void run() {
+	/**
+	 * This is called from the executor when the task is starting
+	 */
+	public void loadImage() {
 
 		try {
 
-			final Image image = new Image(Display.getDefault(), photo.getFilePathName());
+//			System.out.println("loading: " + photo.getFileName());
+//			// TODO remove SYSTEM.OUT.PRINTLN
 
-//			_imageCache.setImage(photo, PhotoImageCache.IMAGE_QUALITY_ORIGINAL, image);
-//			AsyncScalr.
+//			// check if the image is still visible
+//			boolean isVisible = false;
+//			final int[] visibleGalleryItems = PhotoManager.getVisibleGalleryItems();
+//			for (final int visibleItemIndex : visibleGalleryItems) {
+//				if (visibleItemIndex == galleryIndex) {
+//					isVisible = true;
+//					break;
+//				}
+//			}
+//
+//			if (isVisible == false) {
+//
+//				// reset state to undefined that it will be loaded again when image is displayed again
+//				photo.setLoadingState(PhotoLoadingState.UNDEFINED, imageQuality);
+//				return;
+//			}
 
-			_imageCache.putImage(photo.getImageKey(imageQuality), image);
+			final Image fullSizeImage = new Image(Display.getDefault(), photo.getFilePathName());
 
-			// reset state to be undefined that it will be loaded again when it is disposed
+//			final BufferedImage img = ImageIO.read(photo.getImageFile());
+//			final BufferedImage scaledImg = Scalr.resize(img, PhotoManager.IMAGE_QUALITY_ORIGINAL);
+//
+//			final Point newSize = ImageUtils.getBestSize(
+//					new Point(fullSizeImage.getBounds().width, fullSizeImage.getBounds().height),
+//					new Point(PhotoManager.IMAGE_QUALITY_THUMB_160, PhotoManager.IMAGE_QUALITY_THUMB_160));
+//
+//			if (ImageUtils.isResizeRequired(fullSizeImage, newSize.x, newSize.y)) {
+//
+//				thumbnailImage = ImageUtils.resize(fullSizeImage, newSize.x, newSize.y);
+//
+//				this.imageService.release(fullSizeImage);
+//				thumbnailImage = this.imageService.acquire(thumbnailImage);
+//
+//			} else {
+//				thumbnailImage = fullSizeImage;
+//			}
+
+			PhotoImageCache.putImage(photo.getImageKey(imageQuality), fullSizeImage);
+
+			// reset state to undefined that it will be loaded again when image is disposed
 			photo.setLoadingState(PhotoLoadingState.UNDEFINED, imageQuality);
 
-			_waitingQueue.remove(this);
-
+			// tell the call back that the image is loaded
 			_loadCallBack.imageIsLoaded();
 
 		} catch (final Exception e) {
 
-			StatusUtil.log(NLS.bind("Image '{0}' cannot be loaded", _filePathName), e);
+			StatusUtil.log(NLS.bind("Image '{0}' cannot be loaded", _imageKey), e);
 
 			// prevent loading it again
 			photo.setLoadingState(PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR, imageQuality);
@@ -120,7 +146,7 @@ public class PhotoImageLoaderItem implements Runnable {
 	@Override
 	public String toString() {
 		return "PhotoImageLoaderItem ["
-				+ ("_filePathName=" + _filePathName + "{)}, ")
+				+ ("_filePathName=" + _imageKey + "{)}, ")
 				+ ("galleryIndex=" + galleryIndex + "{)}, ")
 				+ ("imageQuality=" + imageQuality + "{)}, ")
 				+ ("photo=" + photo)

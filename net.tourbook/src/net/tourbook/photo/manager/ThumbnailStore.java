@@ -33,20 +33,8 @@ public class ThumbnailStore {
 
 	private static IPreferenceStore	_prefStore				= TourbookPlugin.getDefault().getPreferenceStore();
 
-	private static ThumbnailStore	_instance;
-
-	private ThumbnailStore() {
-
+	{
 		final IPath storePath = getThumbnailStorePath();
-	}
-
-	public static ThumbnailStore getInstance() {
-
-		if (_instance == null) {
-			_instance = new ThumbnailStore();
-		}
-
-		return _instance;
 	}
 
 	/**

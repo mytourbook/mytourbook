@@ -32,8 +32,6 @@ import org.eclipse.swt.graphics.Rectangle;
  */
 public class PhotoRenderer extends DefaultGalleryItemRenderer {
 
-	private static final PhotoImageCache	_imageCache	= PhotoImageCache.getInstance();
-
 	@Override
 	public void dispose() {
 		super.dispose();
@@ -43,10 +41,10 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 	public void draw(	final GC gc,
 						final GalleryItem galleryItem,
 						final int index,
-						final int x,
-						final int y,
-						final int width,
-						final int height) {
+						final int devXGallery,
+						final int devYGallery,
+						final int galleryItemWidth,
+						final int galleryItemHeight) {
 
 		final Object itemData = galleryItem.getData();
 		if ((itemData instanceof Photo) == false) {
@@ -55,74 +53,103 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 
 		final Photo photo = (Photo) itemData;
 
-		final int defaultImageQuality = height > PhotoManager.THUMBNAIL_SIZE
-				? PhotoManager.IMAGE_QUALITY_LOW_640
+		final int defaultImageQuality = galleryItemHeight > PhotoManager.THUMBNAIL_DEFAULT_SIZE
+				? PhotoManager.IMAGE_QUALITY_600
 				: PhotoManager.IMAGE_QUALITY_THUMB_160;
 
-		Image photoImage = _imageCache.getImage(photo.getImageKey(defaultImageQuality));
+		Image photoImage = PhotoImageCache.getImage(photo.getImageKey(defaultImageQuality));
 		if (photoImage == null) {
 
-			final int lowerImageQuality = height > PhotoManager.THUMBNAIL_SIZE
+			final int lowerImageQuality = galleryItemHeight > PhotoManager.THUMBNAIL_DEFAULT_SIZE
 					? PhotoManager.IMAGE_QUALITY_THUMB_160
-					: PhotoManager.IMAGE_QUALITY_LOW_640;
+					: PhotoManager.IMAGE_QUALITY_600;
 
-			photoImage = _imageCache.getImage(photo.getImageKey(lowerImageQuality));
+			photoImage = PhotoImageCache.getImage(photo.getImageKey(lowerImageQuality));
 		}
 
-		if (photoImage == null || photoImage.isDisposed()) {
-
-			drawText(gc, x, y, photo, false);
-			return;
-		}
+		final int imageBorderWidth = 2;
+		final int roundingArc = 8;
 
 		int imageWidth = 0;
 		int imageHeight = 0;
-		int xShift = 0;
-		int yShift = 0;
-		final int dropShadowsSize = this.getDropShadowsSize();
-		final int useableHeight = height;
+		int useableHeight = galleryItemHeight;
+		int fontHeight = 0;
+		final boolean isText = galleryItem.getText() != null && isShowLabels();
 
-		// draw background
-//		gc.fillRoundRectangle(x, y, width, useableHeight, 15, 15);
-//		if (item.getText() != null && isShowLabels()) {
-//			gc.fillRoundRectangle(x, y + height - fontHeight, width, fontHeight, 15, 15);
-//		}
+		if (isText) {
+			fontHeight = gc.getFontMetrics().getHeight();
+			useableHeight -= fontHeight + 2;
+		}
 
-		final Rectangle itemImageBounds = photoImage.getBounds();
-		imageWidth = itemImageBounds.width;
-		imageHeight = itemImageBounds.height;
+		if (selected) {
+			// draw selection
+			gc.setBackground(getSelectionBackgroundColor());
+			gc.setForeground(getSelectionBackgroundColor());
+		} else {
+			gc.setBackground(getBackgroundColor());
+		}
 
-		final Point size = RendererHelper.getBestSize(//
-				imageWidth,
-				imageHeight,
-				width - 8 - 2 * dropShadowsSize,
-				useableHeight - 8 - 2 * dropShadowsSize);
+		gc.fillRoundRectangle(//
+				devXGallery,
+				devYGallery,
+				galleryItemWidth,
+				useableHeight,
+				roundingArc,
+				roundingArc);
 
-		xShift = (width - size.x) >> 1;
-		yShift = (useableHeight - size.y) >> 1;
+		if (isText) {
+			gc.fillRoundRectangle(
+					devXGallery,
+					devYGallery + galleryItemHeight - fontHeight,
+					galleryItemWidth,
+					fontHeight,
+					roundingArc,
+					roundingArc);
+		}
 
-		// Draw image
-		if (size.x > 0 && size.y > 0) {
+		if (photoImage != null && photoImage.isDisposed() == false) {
+
+			// draw image
 
 			/*
-			 * exception can occure when image is disposed, this happened several times during
-			 * development
+			 * exception can occure becaus the image could be disposed before it is drawn
 			 */
 			try {
-				gc.drawImage(photoImage, //
-						0,
-						0,
+
+				final Rectangle itemImageBounds = photoImage.getBounds();
+				imageWidth = itemImageBounds.width;
+				imageHeight = itemImageBounds.height;
+
+				final Point size = RendererHelper.getBestSize(//
 						imageWidth,
 						imageHeight,
-						//
-						x + xShift,
-						y + yShift,
-						size.x,
-						size.y);
-			} catch (final Exception e) {
-				drawText(gc, x, y, photo, true);
-			}
+						galleryItemWidth - imageBorderWidth,
+						useableHeight - imageBorderWidth);
 
+				final int xShift = (galleryItemWidth - size.x) >> 1;
+				final int yShift = (useableHeight - size.y) >> 1;
+				// Draw image
+				if (size.x > 0 && size.y > 0) {
+
+					gc.drawImage(photoImage, //
+							0,
+							0,
+							imageWidth,
+							imageHeight,
+							//
+							devXGallery + xShift,
+							devYGallery + yShift,
+							size.x,
+							size.y);
+				}
+			} catch (final Exception e) {
+				drawText(gc, devXGallery, devYGallery, photo, true);
+			}
+		} else {
+
+			// image is not available
+
+			drawText(gc, devXGallery, devYGallery, photo, false);
 		}
 	}
 

@@ -60,29 +60,6 @@ public class PhotoDirectoryView extends ViewPart {
 	private static final IPreferenceStore	_prefStore					= TourbookPlugin.getDefault()//
 																				.getPreferenceStore();
 
-	private static final int[]				_thumnailSize				= new int[] { //
-//																		20, // 1
-																		30, // 2
-			40, // 3
-			50, // 4
-			60, // 5
-			80, // 6
-			120, // 7
-			160, // 8
-			200, // 9
-			250, // 10
-			300, // 11
-			400, // 12
-			500, // 13
-			600, // 14
-			700, // 15
-			800, // 16
-			1000, // 17
-																		};
-	private static final int				THUMBNAIL_DEFAULT_SIZE		= 7;
-
-	private static final PhotoManager		_photoMgr					= PhotoManager.getInstance();
-
 	private IPartListener2					_partListener;
 	private IPropertyChangeListener			_prefChangeListener;
 	private PostSelectionProvider			_postSelectionProvider;
@@ -92,7 +69,7 @@ public class PhotoDirectoryView extends ViewPart {
 	private PicDirFolder					_picDirFolder;
 	private PicDirImages					_picDirImages;
 
-	private int								_prevSelectedThumbnailSize	= -1;
+	private int								_prevSelectedThumbnailIndex	= -1;
 	/*
 	 * UI controls
 	 */
@@ -282,7 +259,7 @@ public class PhotoDirectoryView extends ViewPart {
 		_scaleThumbnailSize = new Scale(parent, SWT.HORIZONTAL);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleThumbnailSize);
 		_scaleThumbnailSize.setMinimum(0);
-		_scaleThumbnailSize.setMaximum((_thumnailSize.length - 1) * 10);
+		_scaleThumbnailSize.setMaximum((PhotoManager.THUMBNAIL_SIZES.length - 1) * 10);
 		_scaleThumbnailSize.setIncrement(10);
 		_scaleThumbnailSize.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -293,7 +270,6 @@ public class PhotoDirectoryView extends ViewPart {
 
 		_scaleThumbnailSize.addMouseWheelListener(new MouseWheelListener() {
 			public void mouseScrolled(final MouseEvent event) {
-
 				UI.adjustScaleValueOnMouseScroll(event);
 				onSelectThumbnailSize();
 			}
@@ -314,18 +290,22 @@ public class PhotoDirectoryView extends ViewPart {
 
 	private void onSelectThumbnailSize() {
 
-		final int selectedSize = _scaleThumbnailSize.getSelection();
+		final int selectedSizeIndex = _scaleThumbnailSize.getSelection();
 
-		if (selectedSize == _prevSelectedThumbnailSize) {
+		if (selectedSizeIndex == _prevSelectedThumbnailIndex) {
 			// optimize selection
 			return;
 		}
 
-		_prevSelectedThumbnailSize = selectedSize;
+		_prevSelectedThumbnailIndex = selectedSizeIndex;
 
-		_photoMgr.stopLoadingImages();
+		PhotoManager.stopImageLoading();
 
-		final int thumbnailSize = _thumnailSize[selectedSize / 10];
+		/**
+		 * must be muliplied with 10 that enough increment labels are displayed
+		 */
+		final int thumbnailSize = PhotoManager.THUMBNAIL_SIZES[selectedSizeIndex / 10];
+
 		_picDirImages.setThumbnailSize(thumbnailSize);
 
 		_scaleThumbnailSize.setToolTipText(NLS.bind("Thumbnail size: {0}", Integer.toString(thumbnailSize)));
@@ -335,11 +315,26 @@ public class PhotoDirectoryView extends ViewPart {
 
 		_containerMasterDetail.setViewerWidth(Util.getStateInt(_state, STATE_TREE_WIDTH, 200));
 
-		int stateSize = Util.getStateInt(_state, STATE_THUMB_IMAGE_SIZE, THUMBNAIL_DEFAULT_SIZE);
-		if (stateSize > (_thumnailSize.length - 1) || stateSize < 0) {
-			stateSize = THUMBNAIL_DEFAULT_SIZE;
+		final int stateSize = Util.getStateInt(_state, STATE_THUMB_IMAGE_SIZE, PhotoManager.THUMBNAIL_DEFAULT_SIZE);
+
+		int thumbSize = -1;
+		for (final int thumbnailSize : PhotoManager.THUMBNAIL_SIZES) {
+			if (thumbnailSize == stateSize) {
+				thumbSize = thumbnailSize;
+				break;
+			}
 		}
-		_scaleThumbnailSize.setSelection(stateSize * 10);
+		final int thumbnailSize = thumbSize == -1 ? PhotoManager.THUMBNAIL_DEFAULT_SIZE : thumbSize;
+		int thumbnailSizeIndex = -1;
+
+		for (int sizeIndex = 0; sizeIndex < PhotoManager.THUMBNAIL_SIZES.length; sizeIndex++) {
+			if (PhotoManager.THUMBNAIL_SIZES[sizeIndex] == thumbnailSize) {
+				thumbnailSizeIndex = sizeIndex;
+				break;
+			}
+		}
+
+		_scaleThumbnailSize.setSelection(thumbnailSizeIndex * 10);
 	}
 
 	private void saveState() {
@@ -349,7 +344,10 @@ public class PhotoDirectoryView extends ViewPart {
 			_state.put(STATE_TREE_WIDTH, tree.getSize().x);
 		}
 
-		_state.put(STATE_THUMB_IMAGE_SIZE, _scaleThumbnailSize.getSelection());
+		final int sizeSelection = _scaleThumbnailSize.getSelection();
+		final int thumbnailSize = PhotoManager.THUMBNAIL_SIZES[sizeSelection / 10];
+
+		_state.put(STATE_THUMB_IMAGE_SIZE, thumbnailSize);
 	}
 
 	@Override

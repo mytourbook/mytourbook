@@ -25,7 +25,6 @@ import net.tourbook.photo.manager.Photo;
 import net.tourbook.photo.manager.PhotoImageCache;
 import net.tourbook.photo.manager.PhotoLoadingState;
 import net.tourbook.photo.manager.PhotoManager;
-import net.tourbook.photo.manager.ThumbnailStore;
 
 import org.apache.commons.sanselan.Sanselan;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -66,10 +65,6 @@ public class PicDirImages {
 
 	private File[]							_photoFiles;
 	private FileFilter						_fileFilter;
-
-	private static final PhotoManager		_photoMgr			= PhotoManager.getInstance();
-	private static final PhotoImageCache	_imageCache			= PhotoImageCache.getInstance();
-	private static final ThumbnailStore		_thumbnailStore		= ThumbnailStore.getInstance();
 
 	/*
 	 * UI resources
@@ -203,40 +198,31 @@ public class PicDirImages {
 	private class LoadImageCallback implements ILoadCallBack {
 
 		private GalleryItem	__galleryItem;
-		private boolean		__isImageDisplayed;
 
 		/**
 		 * @param gallery
 		 * @param galleryItem
-		 * @param isImageDisplayed
-		 *            When <code>true</code> image is displayed after it is loaded, otherwise it is
-		 *            only loaded into the cache.
 		 */
-		public LoadImageCallback(final GalleryItem galleryItem, final boolean isImageDisplayed) {
+		public LoadImageCallback(final GalleryItem galleryItem) {
 
 			__galleryItem = galleryItem;
-			__isImageDisplayed = isImageDisplayed;
 		}
 
 		@Override
 		public void imageIsLoaded() {
 
-			if (__isImageDisplayed == false) {
-				return;
-			}
-
 			Display.getDefault().syncExec(new Runnable() {
 
 				public void run() {
-
-//					Gallery gallery = LoadItemCallback.this._callbackGallery;
-//					GalleryItem galleryItem = LoadItemCallback.this._galleryItem;
 
 					if (__galleryItem.isDisposed() || _gallery.isDisposed()) {
 						return;
 					}
 
 					final Rectangle bounds = __galleryItem.getBounds();
+
+//					System.out.println("redraw: " + bounds);
+//					// TODO remove SYSTEM.OUT.PRINTLN
 
 					_gallery.redraw(bounds.x, bounds.y, bounds.width, bounds.height, false);
 				}
@@ -284,7 +270,7 @@ public class PicDirImages {
 				}
 
 				final String name = pathname.getName();
-				if (name == null || "".equals(name)) {
+				if (name == null || name.length() == 0) {
 					return false;
 				}
 
@@ -351,6 +337,7 @@ public class PicDirImages {
 		_itemRenderer = new PhotoRenderer();
 		final PhotoRenderer photoRenderer = (PhotoRenderer) _itemRenderer;
 		photoRenderer.setShowLabels(false);
+		photoRenderer.setBackgroundColor(_bgColor);
 //		photoRenderer.setDropShadows(true);
 //		photoRenderer.setDropShadowsSize(5);
 		_gallery.setItemRenderer(_itemRenderer);
@@ -406,56 +393,24 @@ public class PicDirImages {
 
 			final Photo photo = (Photo) galleryItem.getData();
 
-			final PhotoLoadingState[] loadingState = photo.getLoadingState();
-
-			final int imageQuality = _photoSize > PhotoManager.THUMBNAIL_SIZE
-					? PhotoManager.IMAGE_QUALITY_LOW_640
+			final int imageQuality = _photoSize > PhotoManager.THUMBNAIL_DEFAULT_SIZE
+					? PhotoManager.IMAGE_QUALITY_600
 					: PhotoManager.IMAGE_QUALITY_THUMB_160;
 
-			final PhotoLoadingState defaultLoadingState = loadingState[imageQuality];
-
-			if (defaultLoadingState == PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR) {
+			// check if image is already loaded or has an loading error
+			final PhotoLoadingState photoLoadingState = photo.getLoadingState()[imageQuality];
+			if (photoLoadingState == PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR
+					|| photoLoadingState == PhotoLoadingState.IMAGE_IS_BEING_LOADED) {
 				return;
 			}
 
-			Image photoImage = _imageCache.getImage(photo.getImageKey(imageQuality));
-			if (photoImage != null && photoImage.isDisposed() == false) {
-				return;
+			final Image photoImage = PhotoImageCache.getImage(photo.getImageKey(imageQuality));
+			if (photoImage == null || photoImage.isDisposed()) {
+
+				// the requested image is not available in the image cache -> image must be loaded
+
+				PhotoManager.loadImage(photo, imageQuality, new LoadImageCallback(galleryItem));
 			}
-
-			/*
-			 * the requested image is not available in the image cache -> image must be loaded
-			 */
-
-			final int[] imageQualities = new int[] { -1, -1 };
-			final ILoadCallBack[] imageCallbacks = new ILoadCallBack[] { null, null };
-
-			final int otherImageQuality = _photoSize > PhotoManager.THUMBNAIL_SIZE
-					? PhotoManager.IMAGE_QUALITY_THUMB_160
-					: PhotoManager.IMAGE_QUALITY_LOW_640;
-
-			photoImage = _imageCache.getImage(photo.getImageKey(otherImageQuality));
-
-			if ((photoImage == null || photoImage.isDisposed()) && imageQuality == PhotoManager.IMAGE_QUALITY_LOW_640) {
-
-				// load also the thumb image
-
-				final int thumbQuality = PhotoManager.IMAGE_QUALITY_THUMB_160;
-				final PhotoLoadingState thumbLoadingState = loadingState[thumbQuality];
-
-				if (thumbLoadingState == PhotoLoadingState.UNDEFINED
-						&& thumbLoadingState != PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR) {
-					imageQualities[0] = thumbQuality;
-					imageCallbacks[0] = new LoadImageCallback(galleryItem, false);
-				}
-			}
-
-			if (defaultLoadingState == PhotoLoadingState.UNDEFINED) {
-				imageQualities[1] = imageQuality;
-				imageCallbacks[1] = new LoadImageCallback(galleryItem, true);
-			}
-
-			_photoMgr.loadImage(photo, imageQualities, imageCallbacks);
 
 // ORIGINAL
 //			final IMedia m = (IMedia) galleryItem.getData(DATA_MEDIA);
@@ -518,7 +473,7 @@ public class PicDirImages {
 	 */
 	void showImages(final File dir) {
 
-		_photoMgr.stopLoadingImages();
+		PhotoManager.stopImageLoading();
 
 		workerUpdate(dir);
 	}

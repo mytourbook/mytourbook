@@ -15,113 +15,86 @@
  *******************************************************************************/
 package net.tourbook.photo.manager;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.ThreadPoolExecutor;
 
 public class PhotoManager {
 
-	public static final int												THUMBNAIL_SIZE			= 160;
+	public static final int											THUMBNAIL_DEFAULT_SIZE	= 160;
 
-	// SET_FORMATTING_OFF
-	public int[]														IMAGE_WIDTH	 = { THUMBNAIL_SIZE, 640, 800, 1024 };
-	public int[]														IMAGE_HEIGHT = { THUMBNAIL_SIZE, 480, 600, 768 };
-	// SET_FORMATTING_ON
+// SET_FORMATTING_OFF
+	
+	public static final int[]										THUMBNAIL_SIZES = new int[]
+			{
+				30, 40, 50, 60, 70, 80, 90, 100, 120, 140, THUMBNAIL_DEFAULT_SIZE, 200, 250, 300, 400, 500, 600
+			};
+	
+	public static int[]												IMAGE_SIZE = { THUMBNAIL_DEFAULT_SIZE, 600, 999999 };
+	
+// SET_FORMATTING_ON
 
-	public static int													IMAGE_QUALITY_THUMB_160	= 0;													// 160x160 max
-	public static int													IMAGE_QUALITY_LOW_640	= 1;													// 640x480 max
-//	public static int													IMAGE_STD		= 2;										// 800x600 max
-//	public static int													IMAGE_HIGH		= 3;										// 1024x768 max
-	public static int													IMAGE_QUALITY_ORIGINAL	= 4;													// Full size
+	public static int												IMAGE_QUALITY_THUMB_160	= 0;
+	public static int												IMAGE_QUALITY_600		= 1;
+	public static int												IMAGE_QUALITY_ORIGINAL	= 2;
+	/**
+	 * This must be the max image quality which is also used as array.length()
+	 */
+	public static int												MAX_IMAGE_QUALITY		= 2;
+
+	private static ThreadPoolExecutor								_executorService;
+
+	private static final LinkedBlockingDeque<PhotoImageLoaderItem>	_waitingQueue			= new LinkedBlockingDeque<PhotoImageLoaderItem>();
+
+	static {
+
+		final int cpuCores = 4;
+
+		final ThreadFactory threadFactory = new ThreadFactory() {
+
+			private int	_threadNumber	= 0;
+
+			public Thread newThread(final Runnable r) {
+
+				final String threadName = "Photo-Image-Loader-" + _threadNumber++; //$NON-NLS-1$
+
+				final Thread thread = new Thread(r, threadName);
+
+				thread.setPriority(Thread.MIN_PRIORITY);
+				thread.setDaemon(true);
+
+				return thread;
+			}
+		};
+
+		_executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(cpuCores, threadFactory);
+
+		// setup image scaler, set number of max threads
+//		System.setProperty("imgscalr.async.threadCount", Integer.toString(cpuCores));
+//		AsyncScalr.getService();
+	}
 
 	/**
-	 * This must be the max image quality which is also used as an index in an array
+	 * Removes LIFO item from the queue and loads the image
 	 */
-	public static int													MAX_IMAGE_QUALITY		= 4;
+	private static final class LoadingTask implements Runnable {
 
-	private static ExecutorService										_executorService;
+		@Override
+		public void run() {
 
-	private static PhotoManager											_instance;
+			final PhotoImageLoaderItem loadingItem = _waitingQueue.pollLast();
 
-	private static final ThumbnailStore									_thumbnailStore			= ThumbnailStore
-																										.getInstance();
-	private static final PhotoImageCache								_imageCache				= PhotoImageCache
-																										.getInstance();
-
-	private static final ReentrantLock									INSTANCE_LOCK			= new ReentrantLock();
-
-	private static final ConcurrentLinkedQueue<PhotoImageLoaderItem>	_waitingQueue			= new ConcurrentLinkedQueue<PhotoImageLoaderItem>();
-
-	private PhotoManager() {}
-
-	public static PhotoManager getInstance() {
-
-		final int cpuCores = 2;
-
-		if (_instance == null) {
-
-			INSTANCE_LOCK.lock();
-			{
-				try {
-
-					if (_instance != null) {
-						return _instance;
-					}
-
-					_instance = new PhotoManager();
-
-					final ThreadFactory threadFactory = new ThreadFactory() {
-
-						private int	_threadNumber	= 0;
-
-						public Thread newThread(final Runnable r) {
-
-							final String threadName = "Photo-Loader-" + _threadNumber++; //$NON-NLS-1$
-
-							final Thread thread = new Thread(r, threadName);
-
-							thread.setPriority(Thread.MIN_PRIORITY);
-							thread.setDaemon(true);
-
-							return thread;
-						}
-					};
-
-					_executorService = Executors.newFixedThreadPool(cpuCores, threadFactory);
-
-				} finally {
-					INSTANCE_LOCK.unlock();
-				}
-			}
-
-			// setup image scaler
-			System.setProperty("imgscalr.async.threadCount", Integer.toString(cpuCores));
-//			AsyncScalr.getService();
-		}
-
-		return _instance;
-	}
-
-	static ConcurrentLinkedQueue<PhotoImageLoaderItem> getWaitingQueue() {
-		return _waitingQueue;
-	}
-
-	public void loadImage(final Photo photo, final int[] imageQualities, final ILoadCallBack[] imageCallback) {
-
-		for (int imageIndex = 0; imageIndex < imageCallback.length; imageIndex++) {
-
-			final int imageQuality = imageQualities[imageIndex];
-			final ILoadCallBack loadCallBack = imageCallback[imageIndex];
-
-			if (imageQuality != -1 && loadCallBack != null) {
-				loadImage_10(photo, imageQuality, loadCallBack);
+			if (loadingItem != null) {
+				loadingItem.loadImage();
 			}
 		}
 	}
 
+// Original in org.sharemedia.services.impl.mediadownload.MediaDownload
+//
 //	synchronized public void load(final IMedia m, final int imageQuality, final ILoadCallBack callback) {
 //
 //		final LoadItem newItem = new LoadItem();
@@ -168,9 +141,7 @@ public class PhotoManager {
 //		}
 //	}
 
-	private void loadImage_10(final Photo photo, final int imageQuality, final ILoadCallBack loadCallBack) {
-
-//		final ThreadPoolExecutor exec = (ThreadPoolExecutor) _executorService;
+	public static void loadImage(final Photo photo, final int imageQuality, final ILoadCallBack imageLoadCallback) {
 
 //		final Image image = null;
 
@@ -189,45 +160,57 @@ public class PhotoManager {
 //		if (imageQuality == PhotoImageCache.IMAGE_QUALITY_ORIGINAL) {
 //
 //		}
-		final PhotoImageLoaderItem loadingTask = new PhotoImageLoaderItem(photo, imageQuality, loadCallBack);
-
-		_waitingQueue.add(loadingTask);
+		final PhotoImageLoaderItem loadingCallback = new PhotoImageLoaderItem(photo, imageQuality, imageLoadCallback);
 
 		photo.getLoadingState()[imageQuality] = PhotoLoadingState.IMAGE_IS_BEING_LOADED;
 
-		final Future<?> taskFuture = _executorService.submit(loadingTask);
+		/*
+		 * removes existing loader item if exists so that it can be queued on top
+		 */
+//		_waitingQueue.remove(loadingCallback);
 
-		loadingTask.future = taskFuture;
+		_waitingQueue.add(loadingCallback);
+
+		_executorService.submit(new LoadingTask());
 	}
 
 	/**
 	 * Remove all items in the image loading queue.
 	 */
-	public synchronized void stopLoadingImages() {
+	public synchronized static void stopImageLoading() {
 
-		final int queueSize = _waitingQueue.size();
+//		final int queueSize = _waitingQueue.size();
+//
+//		if (queueSize == 0) {
+//			return;
+//		}
 
-		if (queueSize == 0) {
-			return;
+		final Object[] photosInQueue = _waitingQueue.toArray();
+
+		/*
+		 * terminate all submitted tasks, the executor shutdownNow() creates
+		 * RejectedExecutionException when reusing the executor, I found no other way how to stop
+		 * the submitted tasks
+		 */
+		final BlockingQueue<Runnable> taskQueue = _executorService.getQueue();
+		for (final Runnable runnable : taskQueue) {
+			final FutureTask<?> task = (FutureTask<?>) runnable;
+			task.cancel(true);
 		}
-
-		final PhotoImageLoaderItem[] photosInQueue = _waitingQueue.toArray(new PhotoImageLoaderItem[queueSize]);
 
 		_waitingQueue.clear();
 
-		// stop executer tasks
-		for (final PhotoImageLoaderItem photoImageLoaderItem : photosInQueue) {
+		// reset loading state for not loaded images
+		for (final Object object : photosInQueue) {
 
-			if (photoImageLoaderItem == null) {
+			if (object == null) {
 				// item can already be removed
 				continue;
 			}
 
-			// stop downloading task in the executer
-			photoImageLoaderItem.future.cancel(true);
-
-			// reset state
+			final PhotoImageLoaderItem photoImageLoaderItem = (PhotoImageLoaderItem) object;
 			photoImageLoaderItem.photo.getLoadingState()[photoImageLoaderItem.imageQuality] = PhotoLoadingState.UNDEFINED;
 		}
 	}
+
 }

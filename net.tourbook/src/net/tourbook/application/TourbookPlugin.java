@@ -177,7 +177,6 @@ public class TourbookPlugin extends AbstractUIPlugin {
 		getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, 0, message, exception));
 	}
 
-	@SuppressWarnings("restriction")
 	@Override
 	public void start(final BundleContext context) throws Exception {
 
@@ -196,10 +195,10 @@ public class TourbookPlugin extends AbstractUIPlugin {
 	@Override
 	public void stop(final BundleContext context) throws Exception {
 
+		PhotoImageCache.dispose();
+
 		_instance = null;
 		_bundleContext = null;
-
-		PhotoImageCache.getInstance().dispose();
 
 		super.stop(context);
 	}

@@ -15,15 +15,12 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
-import net.tourbook.photo.manager.PhotoManager;
-
 import org.eclipse.nebula.widgets.gallery.GalleryItem;
 import org.eclipse.nebula.widgets.gallery.NoGroupRenderer;
 import org.eclipse.swt.graphics.GC;
 
 public class NoGroupRendererMT extends NoGroupRenderer {
 
-	private PhotoManager	_photoMgr	= PhotoManager.getInstance();
 
 	@Override
 	public void draw(	final GC gc,
@@ -35,17 +32,17 @@ public class NoGroupRendererMT extends NoGroupRenderer {
 						final int clipWidth,
 						final int clipHeight) {
 
-		// Get items in the clipping area
+		// get items in the clipping area
 		final int[] visibleIndexes = getVisibleItems(group, x, y, clipX, clipY, clipWidth, clipHeight, OFFSET);
-
-//		_photoMgr.resetCache(visibleIndexes);
 
 		if (visibleIndexes != null && visibleIndexes.length > 0) {
 
 			for (int i = visibleIndexes.length - 1; i >= 0; i--) {
 
 				// Draw item
-				final boolean isSelected = group.isSelected(group.getItem(visibleIndexes[i]));
+				final GalleryItem galleryItem = group.getItem(visibleIndexes[i]);
+
+				final boolean isSelected = group.isSelected(galleryItem);
 
 				drawItem(gc, visibleIndexes[i], isSelected, group, OFFSET);
 			}

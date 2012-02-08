@@ -355,6 +355,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		 */
 		store.setDefault(ITourbookPreferences.PHOTO_USE_DEFAULT_THUMBNAIL_LOCATION, true);
 		store.setDefault(ITourbookPreferences.PHOTO_CUSTOM_THUMBNAIL_LOCATION, UI.EMPTY_STRING);
-
+		store.setDefault(ITourbookPreferences.PHOTO_IMAGE_CACHE_SIZE, 500);
 	}
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,11 +14,12 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package de.byteholder.geoclipse.preferences;
- 
+
 import java.io.File;
 import java.text.NumberFormat;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.util.UI;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -53,181 +54,193 @@ import org.eclipse.ui.PlatformUI;
 
 import de.byteholder.geoclipse.map.TileImageCache;
 
+/**
+ * Cache for offline map images
+ */
 public class PrefPageCache extends PreferencePage implements IWorkbenchPreferencePage {
 
-	private static final String		EMPTY_STRING		= "";													//$NON-NLS-1$
-	private static final String		SIZE_MBYTE			= Messages.prefPage_cache_MByte;
+	private static final String			SIZE_MBYTE			= Messages.prefPage_cache_MByte;
 
-	final static NumberFormat		nf					= NumberFormat.getNumberInstance();
+	private final static NumberFormat	_nf					= NumberFormat.getNumberInstance();
 
-	final String					fDefaultCachePath	= Platform.getInstanceLocation().getURL().getPath();
+	private final String				_defaultCachePath	= Platform.getInstanceLocation().getURL().getPath();
 
-	private Composite				fPrefContainer;
-	private Group					fOfflineContainer;
-	private BooleanFieldEditor		fUseOffLineCache;
-	private BooleanFieldEditor		fUseDefaultLocation;
-	private Composite				fPathContainer;
+	private int							_fileCounter;
+	private long						_fileSize;
+	private File						_tileCacheDir;
 
-	private DirectoryFieldEditor	fCachePathEditor;
+	private Job							_offlineInfoJob;
+	private int							_lastFileCounterUIUpdate;
+	private boolean						_isOfflineInfoJobCanceled;
 
-	private Label					fLblInfoPath;
-	private Label					fLblInfoPathValue;
-	private Label					fLblInfoFiles;
-	private Label					fLblInfoFilesValue;
-	private Label					fLblInfoSize;
-	private Label					fLblInfoSizeValue;
-	private Label					fLblInfoWaiting;
-	private Label					fLblInfoWaitingValue;
-	private Button					fBtnDeleteOfflineCache;
+	/*
+	 * UI controls
+	 */
+	private Group						_groupOffline;
+	private BooleanFieldEditor			_boolEditorUseOffLineCache;
+	private BooleanFieldEditor			_boolEditorUseDefaultLocation;
+	private Composite					_containerPath;
 
-	private int						fFileCounter;
-	private long					fFileSize;
-	private File					fTileCacheDir;
+	private DirectoryFieldEditor		_dirEditorCachePath;
 
-	private Job						fOfflineInfoJob;
-	private int						fLastFileCounterUIUpdate;
-	private boolean					fIsOfflineInfoJobCanceled;
+	private Label						_lblInfoPath;
+	private Label						_lblInfoPathValue;
+	private Label						_lblInfoFiles;
+	private Label						_lblInfoFilesValue;
+	private Label						_lblInfoSize;
+	private Label						_lblInfoSizeValue;
+	private Label						_lblInfoWaiting;
+	private Label						_lblInfoWaitingValue;
+	private Button						_btnDeleteOfflineCache;
 
 	@Override
 	protected Control createContents(final Composite parent) {
 
-		createUI(parent);
+		final Control ui = createUI(parent);
 
 		enableControls();
 
 		getOfflineInfo();
 
-		return fPrefContainer;
+		return ui;
 	}
 
-	private void createUI(final Composite parent) {
+	private Control createUI(final Composite parent) {
 
 		final IPreferenceStore prefStore = getPreferenceStore();
 
-		fPrefContainer = new Composite(parent, SWT.NONE);
-		GridDataFactory.swtDefaults().grab(true, false).applyTo(fPrefContainer);
-		GridLayoutFactory.fillDefaults().applyTo(fPrefContainer);
+		final Composite uiContainer = new Composite(parent, SWT.NONE);
+		GridDataFactory.swtDefaults().grab(true, false).applyTo(uiContainer);
+		GridLayoutFactory.fillDefaults().applyTo(uiContainer);
 //		fPrefContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+		{
+			// checkbox: is offline enabled
+			_boolEditorUseOffLineCache = new BooleanFieldEditor(
+					IMappingPreferences.OFFLINE_CACHE_USE_OFFLINE,
+					Messages.pref_cache_use_offline,
+					uiContainer);
+			_boolEditorUseOffLineCache.setPreferenceStore(prefStore);
+			_boolEditorUseOffLineCache.setPage(this);
+			_boolEditorUseOffLineCache.load();
+			_boolEditorUseOffLineCache.setPropertyChangeListener(new IPropertyChangeListener() {
+				public void propertyChange(final PropertyChangeEvent event) {
+					enableControls();
+				}
+			});
 
-		// checkbox: is offline enabled
-		fUseOffLineCache = new BooleanFieldEditor(IMappingPreferences.OFFLINE_CACHE_USE_OFFLINE,
-				Messages.pref_cache_use_offline,
-				fPrefContainer);
-		fUseOffLineCache.setPreferenceStore(prefStore);
-		fUseOffLineCache.setPage(this);
-		fUseOffLineCache.load();
-		fUseOffLineCache.setPropertyChangeListener(new IPropertyChangeListener() {
-			public void propertyChange(final PropertyChangeEvent event) {
-				enableControls();
-			}
-		});
+			/*
+			 * offline cache settings
+			 */
+			final Composite offlineContainer = new Composite(uiContainer, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).indent(15, 5).applyTo(offlineContainer);
+			GridLayoutFactory.fillDefaults().applyTo(offlineContainer);
 
-		/*
-		 * offline cache settings
-		 */
-		final Composite offlineContainer = new Composite(fPrefContainer, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).indent(15, 5).applyTo(offlineContainer);
-		GridLayoutFactory.fillDefaults().applyTo(offlineContainer);
-
-		createUICacheSettings(offlineContainer);
-		createUICacheInfo(offlineContainer);
+			createUI_10_CacheSettings(offlineContainer);
+			createUI_20_CacheInfo(offlineContainer);
+		}
 
 		/*
 		 * hide error messages, this happend when the cache path is invalid but the offline cache is
 		 * disabled
 		 */
-		if (fUseOffLineCache.getBooleanValue() == false) {
+		if (_boolEditorUseOffLineCache.getBooleanValue() == false) {
 			setErrorMessage(null);
 		}
+
+		return uiContainer;
 	}
 
-	private void createUICacheInfo(final Composite parent) {
+	private void createUI_10_CacheSettings(final Composite parent) {
+
+		final IPreferenceStore prefStore = getPreferenceStore();
+
+		_groupOffline = new Group(parent, SWT.NONE);
+		_groupOffline.setText(Messages.prefPage_cache_group_offlineDirectory);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(_groupOffline);
+//		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(group);
+		{
+			// field: use default location
+			_boolEditorUseDefaultLocation = new BooleanFieldEditor(
+					IMappingPreferences.OFFLINE_CACHE_USE_DEFAULT_LOCATION,
+					Messages.pref_cache_use_default_location,
+					_groupOffline);
+			_boolEditorUseDefaultLocation.setPreferenceStore(prefStore);
+			_boolEditorUseDefaultLocation.setPage(this);
+			_boolEditorUseDefaultLocation.load();
+			_boolEditorUseDefaultLocation.setPropertyChangeListener(new IPropertyChangeListener() {
+				public void propertyChange(final PropertyChangeEvent event) {
+					enableControls();
+				}
+			});
+			new Label(_groupOffline, SWT.NONE);
+
+			_containerPath = new Composite(_groupOffline, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(_containerPath);
+			{
+				// field: path for the tile cache
+				_dirEditorCachePath = new DirectoryFieldEditor(
+						IMappingPreferences.OFFLINE_CACHE_PATH,
+						Messages.pref_cache_location,
+						_containerPath);
+				_dirEditorCachePath.setPreferenceStore(prefStore);
+				_dirEditorCachePath.setPage(this);
+				_dirEditorCachePath.setEmptyStringAllowed(false);
+				_dirEditorCachePath.load();
+				_dirEditorCachePath.setPropertyChangeListener(new IPropertyChangeListener() {
+					public void propertyChange(final PropertyChangeEvent event) {
+						getOfflineInfo();
+					}
+				});
+			}
+		}
+
+		// !!! set layout after the editor was created because the editor sets the parents layout
+		GridLayoutFactory.swtDefaults().numColumns(3).applyTo(_groupOffline);
+	}
+
+	private void createUI_20_CacheInfo(final Composite parent) {
 
 		final Group group = new Group(parent, SWT.NONE);
 		group.setText(Messages.prefPage_cache_group_offlineInfo);
 		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
-
-		fLblInfoPath = new Label(group, SWT.NONE);
-		fLblInfoPath.setText(Messages.prefPage_cache_label_path);
-		fLblInfoPathValue = new Label(group, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(fLblInfoPathValue);
-
-		fLblInfoFiles = new Label(group, SWT.NONE);
-		fLblInfoFiles.setText(Messages.prefPage_cache_label_files);
-		fLblInfoFilesValue = new Label(group, SWT.NONE);
-		GridDataFactory.fillDefaults().applyTo(fLblInfoFilesValue);
-
-		fLblInfoSize = new Label(group, SWT.NONE);
-		fLblInfoSize.setText(Messages.prefPage_cache_label_size);
-		fLblInfoSizeValue = new Label(group, SWT.NONE);
-		GridDataFactory.fillDefaults().applyTo(fLblInfoSizeValue);
-
-		fLblInfoWaiting = new Label(group, SWT.NONE);
-		fLblInfoWaiting.setText(Messages.prefPage_cache_label_status);
-
-		fLblInfoWaitingValue = new Label(group, SWT.NONE);
-		fLblInfoWaitingValue.setText(Messages.prefPage_cache_status_retrieving);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(fLblInfoWaitingValue);
-
-		// button: delete offline files
-		fBtnDeleteOfflineCache = new Button(group, SWT.PUSH);
-		fBtnDeleteOfflineCache.setText(Messages.pref_cache_clear_cache);
-		GridDataFactory.swtDefaults().span(2, 1).applyTo(fBtnDeleteOfflineCache);
-		fBtnDeleteOfflineCache.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-
-				stopOfflineInfoJob();
-
-				deleteOfflineFiles();
-			}
-		});
-	}
-
-	private void createUICacheSettings(final Composite parent) {
-
-		final IPreferenceStore prefStore = getPreferenceStore();
-
-		fOfflineContainer = new Group(parent, SWT.NONE);
-		fOfflineContainer.setText(Messages.prefPage_cache_group_offlineDirectory);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(fOfflineContainer);
-//		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(group);
-
-		// field: use default location
-		fUseDefaultLocation = new BooleanFieldEditor(IMappingPreferences.OFFLINE_CACHE_USE_DEFAULT_LOCATION,
-				Messages.pref_cache_use_default_location,
-				fOfflineContainer);
-		fUseDefaultLocation.setPreferenceStore(prefStore);
-		fUseDefaultLocation.setPage(this);
-		fUseDefaultLocation.load();
-		fUseDefaultLocation.setPropertyChangeListener(new IPropertyChangeListener() {
-			public void propertyChange(final PropertyChangeEvent event) {
-				enableControls();
-			}
-		});
-		new Label(fOfflineContainer, SWT.NONE);
-
-		fPathContainer = new Composite(fOfflineContainer, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(fPathContainer);
 		{
-			// field: path for the tile cache
-			fCachePathEditor = new DirectoryFieldEditor(IMappingPreferences.OFFLINE_CACHE_PATH,
-					Messages.pref_cache_location,
-					fPathContainer);
-			fCachePathEditor.setPreferenceStore(prefStore);
-			fCachePathEditor.setPage(this);
-			fCachePathEditor.setEmptyStringAllowed(false);
-			fCachePathEditor.load();
-			fCachePathEditor.setPropertyChangeListener(new IPropertyChangeListener() {
-				public void propertyChange(final PropertyChangeEvent event) {
-					getOfflineInfo();
+			_lblInfoPath = new Label(group, SWT.NONE);
+			_lblInfoPath.setText(Messages.prefPage_cache_label_path);
+			_lblInfoPathValue = new Label(group, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblInfoPathValue);
+
+			_lblInfoFiles = new Label(group, SWT.NONE);
+			_lblInfoFiles.setText(Messages.prefPage_cache_label_files);
+			_lblInfoFilesValue = new Label(group, SWT.NONE);
+			GridDataFactory.fillDefaults().applyTo(_lblInfoFilesValue);
+
+			_lblInfoSize = new Label(group, SWT.NONE);
+			_lblInfoSize.setText(Messages.prefPage_cache_label_size);
+			_lblInfoSizeValue = new Label(group, SWT.NONE);
+			GridDataFactory.fillDefaults().applyTo(_lblInfoSizeValue);
+
+			_lblInfoWaiting = new Label(group, SWT.NONE);
+			_lblInfoWaiting.setText(Messages.prefPage_cache_label_status);
+
+			_lblInfoWaitingValue = new Label(group, SWT.NONE);
+			_lblInfoWaitingValue.setText(Messages.prefPage_cache_status_retrieving);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblInfoWaitingValue);
+
+			// button: delete offline files
+			_btnDeleteOfflineCache = new Button(group, SWT.PUSH);
+			_btnDeleteOfflineCache.setText(Messages.pref_cache_clear_cache);
+			GridDataFactory.swtDefaults().span(2, 1).applyTo(_btnDeleteOfflineCache);
+			_btnDeleteOfflineCache.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+
+					stopOfflineInfoJob();
+
+					deleteOfflineFiles();
 				}
 			});
 		}
-
-		// !!! set layout after the editor was created because the editor sets the parents layout
-		GridLayoutFactory.swtDefaults().numColumns(3).applyTo(fOfflineContainer);
 	}
 
 	/**
@@ -261,18 +274,19 @@ public class PrefPageCache extends PreferencePage implements IWorkbenchPreferenc
 
 		final Display display = Display.getCurrent();
 
-		if (MessageDialog.openConfirm(display.getActiveShell(),
+		if (MessageDialog.openConfirm(
+				display.getActiveShell(),
 				Messages.prefPage_cache_dlg_confirmDelete_title,
-				NLS.bind(Messages.prefPage_cache_dlg_confirmDelete_message, fTileCacheDir.getAbsolutePath()))) {
+				NLS.bind(Messages.prefPage_cache_dlg_confirmDelete_message, _tileCacheDir.getAbsolutePath()))) {
 
 			BusyIndicator.showWhile(display, new Runnable() {
 
 				public void run() {
 
-					fLblInfoWaitingValue.setText(Messages.prefPage_cache_status_deletingFiles);
-					fLblInfoWaitingValue.pack(true);
+					_lblInfoWaitingValue.setText(Messages.prefPage_cache_status_deletingFiles);
+					_lblInfoWaitingValue.pack(true);
 
-					deleteDir(fTileCacheDir);
+					deleteDir(_tileCacheDir);
 					getOfflineInfo();
 				}
 			});
@@ -291,21 +305,21 @@ public class PrefPageCache extends PreferencePage implements IWorkbenchPreferenc
 
 	private void enableControls() {
 
-		final boolean useOffLineCache = fUseOffLineCache.getBooleanValue();
-		final boolean useDefaultLocation = fUseDefaultLocation.getBooleanValue();
+		final boolean useOffLineCache = _boolEditorUseOffLineCache.getBooleanValue();
+		final boolean useDefaultLocation = _boolEditorUseDefaultLocation.getBooleanValue();
 
-		fUseDefaultLocation.setEnabled(useOffLineCache, fOfflineContainer);
+		_boolEditorUseDefaultLocation.setEnabled(useOffLineCache, _groupOffline);
 
 		// enable cache path editor, set default path
 		if (useOffLineCache) {
 			if (useDefaultLocation) {
-				fCachePathEditor.setEnabled(false, fPathContainer);
-				fCachePathEditor.setStringValue(fDefaultCachePath);
+				_dirEditorCachePath.setEnabled(false, _containerPath);
+				_dirEditorCachePath.setStringValue(_defaultCachePath);
 			} else {
-				fCachePathEditor.setEnabled(true, fPathContainer);
+				_dirEditorCachePath.setEnabled(true, _containerPath);
 			}
 		} else {
-			fCachePathEditor.setEnabled(false, fPathContainer);
+			_dirEditorCachePath.setEnabled(false, _containerPath);
 		}
 	}
 
@@ -316,12 +330,12 @@ public class PrefPageCache extends PreferencePage implements IWorkbenchPreferenc
 	 */
 	private void getFilesInfo(final File[] listOfFiles) {
 
-		if (fIsOfflineInfoJobCanceled) {
+		if (_isOfflineInfoJobCanceled) {
 			return;
 		}
 
-		if (fFileCounter > fLastFileCounterUIUpdate + 1000) {
-			fLastFileCounterUIUpdate = fFileCounter;
+		if (_fileCounter > _lastFileCounterUIUpdate + 1000) {
+			_lastFileCounterUIUpdate = _fileCounter;
 			updateUIOfflineInfo(false);
 		}
 
@@ -330,15 +344,15 @@ public class PrefPageCache extends PreferencePage implements IWorkbenchPreferenc
 
 				// file
 
-				fFileCounter++;
-				fFileSize += file.length();
+				_fileCounter++;
+				_fileSize += file.length();
 
 			} else if (file.isDirectory()) {
 
 				// directory
 
 				getFilesInfo(file.listFiles());
-				if (fIsOfflineInfoJobCanceled) {
+				if (_isOfflineInfoJobCanceled) {
 					return;
 				}
 			}
@@ -349,16 +363,16 @@ public class PrefPageCache extends PreferencePage implements IWorkbenchPreferenc
 
 		stopOfflineInfoJob();
 
-		final String workingDirectory = fCachePathEditor.getStringValue();
+		final String workingDirectory = _dirEditorCachePath.getStringValue();
 
 		// check if working directory is available
 		if (new File(workingDirectory).exists() == false) {
 
-			fLblInfoPathValue.setText(workingDirectory);
-			fLblInfoPathValue.pack(true);
+			_lblInfoPathValue.setText(workingDirectory);
+			_lblInfoPathValue.pack(true);
 
-			fLblInfoWaitingValue.setText(Messages.prefPage_cache_status_directoryIsNotAvailable);
-			fLblInfoWaitingValue.pack(true);
+			_lblInfoWaitingValue.setText(Messages.prefPage_cache_status_directoryIsNotAvailable);
+			_lblInfoWaitingValue.pack(true);
 
 			updateUIInvalidOfflineCache();
 			return;
@@ -366,30 +380,30 @@ public class PrefPageCache extends PreferencePage implements IWorkbenchPreferenc
 
 		final IPath tileCachePath = new Path(workingDirectory).append(TileImageCache.TILE_OFFLINE_CACHE_OS_PATH);
 
-		fLblInfoPathValue.setText(tileCachePath.toOSString());
-		fLblInfoPathValue.pack(true);
+		_lblInfoPathValue.setText(tileCachePath.toOSString());
+		_lblInfoPathValue.pack(true);
 
-		fTileCacheDir = tileCachePath.toFile();
-		if (fTileCacheDir.exists() == false) {
+		_tileCacheDir = tileCachePath.toFile();
+		if (_tileCacheDir.exists() == false) {
 
-			fLblInfoWaitingValue.setText(Messages.prefPage_cache_status_directoryIsNotAvailable);
-			fLblInfoWaitingValue.pack(true);
+			_lblInfoWaitingValue.setText(Messages.prefPage_cache_status_directoryIsNotAvailable);
+			_lblInfoWaitingValue.pack(true);
 
 			updateUIInvalidOfflineCache();
 			return;
 		}
 
-		fOfflineInfoJob = new Job(Messages.prefPage_cache_jobNameReadOfflineInfo) {
+		_offlineInfoJob = new Job(Messages.prefPage_cache_jobNameReadOfflineInfo) {
 
 			@Override
 			protected IStatus run(final IProgressMonitor monitor) {
 
-				fFileCounter = 0;
-				fFileSize = 0;
-				fLastFileCounterUIUpdate = 0;
-				fIsOfflineInfoJobCanceled = false;
+				_fileCounter = 0;
+				_fileSize = 0;
+				_lastFileCounterUIUpdate = 0;
+				_isOfflineInfoJobCanceled = false;
 
-				getFilesInfo(fTileCacheDir.listFiles());
+				getFilesInfo(_tileCacheDir.listFiles());
 
 				updateUIOfflineInfo(true);
 
@@ -397,7 +411,7 @@ public class PrefPageCache extends PreferencePage implements IWorkbenchPreferenc
 			}
 		};
 
-		fOfflineInfoJob.schedule();
+		_offlineInfoJob.schedule();
 	}
 
 	public void init(final IWorkbench workbench) {}
@@ -427,8 +441,8 @@ public class PrefPageCache extends PreferencePage implements IWorkbenchPreferenc
 
 		stopOfflineInfoJob();
 
-		fUseOffLineCache.loadDefault();
-		fUseDefaultLocation.loadDefault();
+		_boolEditorUseOffLineCache.loadDefault();
+		_boolEditorUseDefaultLocation.loadDefault();
 
 		enableControls();
 
@@ -448,23 +462,26 @@ public class PrefPageCache extends PreferencePage implements IWorkbenchPreferenc
 		boolean isModified = false;
 
 		// check if the cache settings have changed
-		if (prefStore.getBoolean(IMappingPreferences.OFFLINE_CACHE_USE_OFFLINE) != fUseOffLineCache.getBooleanValue()) {
+		if (prefStore.getBoolean(IMappingPreferences.OFFLINE_CACHE_USE_OFFLINE) != _boolEditorUseOffLineCache
+				.getBooleanValue()) {
 			isModified = true;
 		}
-		if (prefStore.getBoolean(IMappingPreferences.OFFLINE_CACHE_USE_DEFAULT_LOCATION) != fUseDefaultLocation.getBooleanValue()) {
+		if (prefStore.getBoolean(IMappingPreferences.OFFLINE_CACHE_USE_DEFAULT_LOCATION) != _boolEditorUseDefaultLocation
+				.getBooleanValue()) {
 			isModified = true;
 		}
-		if (prefStore.getString(IMappingPreferences.OFFLINE_CACHE_PATH).equals(fCachePathEditor.getStringValue()) == false) {
+		if (prefStore.getString(IMappingPreferences.OFFLINE_CACHE_PATH).equals(_dirEditorCachePath.getStringValue()) == false) {
 			isModified = true;
 		}
 
-		fUseOffLineCache.store();
-		fUseDefaultLocation.store();
-		fCachePathEditor.store();
+		_boolEditorUseOffLineCache.store();
+		_boolEditorUseDefaultLocation.store();
+		_dirEditorCachePath.store();
 
 		if (isModified) {
 
-			if (MessageDialog.openQuestion(Display.getDefault().getActiveShell(),
+			if (MessageDialog.openQuestion(
+					Display.getDefault().getActiveShell(),
 					Messages.pref_cache_message_box_title,
 					Messages.pref_cache_message_box_text)) {
 
@@ -481,15 +498,15 @@ public class PrefPageCache extends PreferencePage implements IWorkbenchPreferenc
 
 	private void stopOfflineInfoJob() {
 
-		if (fOfflineInfoJob == null) {
+		if (_offlineInfoJob == null) {
 			return;
 		}
 
-		fOfflineInfoJob.cancel();
-		fIsOfflineInfoJobCanceled = true;
+		_offlineInfoJob.cancel();
+		_isOfflineInfoJobCanceled = true;
 
 		try {
-			fOfflineInfoJob.join();
+			_offlineInfoJob.join();
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -500,13 +517,13 @@ public class PrefPageCache extends PreferencePage implements IWorkbenchPreferenc
 	 */
 	private void updateUIInvalidOfflineCache() {
 
-		fLblInfoFilesValue.setText(EMPTY_STRING);
-		fLblInfoFilesValue.pack(true);
+		_lblInfoFilesValue.setText(UI.EMPTY_STRING);
+		_lblInfoFilesValue.pack(true);
 
-		fLblInfoSizeValue.setText(EMPTY_STRING);
-		fLblInfoSizeValue.pack(true);
+		_lblInfoSizeValue.setText(UI.EMPTY_STRING);
+		_lblInfoSizeValue.pack(true);
 
-		fBtnDeleteOfflineCache.setEnabled(false);
+		_btnDeleteOfflineCache.setEnabled(false);
 	}
 
 	/**
@@ -520,38 +537,38 @@ public class PrefPageCache extends PreferencePage implements IWorkbenchPreferenc
 			public void run() {
 
 				// check if the controls are available
-				if (fLblInfoFilesValue.isDisposed()) {
+				if (_lblInfoFilesValue.isDisposed()) {
 					return;
 				}
-				
-				if (fIsOfflineInfoJobCanceled) {
 
-					fLblInfoFilesValue.setText(Messages.prefPage_cache_status_noValue);
-					fLblInfoSizeValue.setText(Messages.prefPage_cache_status_noValue);
-					fLblInfoWaitingValue.setText(Messages.prefPage_cache_status_infoWasCanceled);
+				if (_isOfflineInfoJobCanceled) {
+
+					_lblInfoFilesValue.setText(Messages.prefPage_cache_status_noValue);
+					_lblInfoSizeValue.setText(Messages.prefPage_cache_status_noValue);
+					_lblInfoWaitingValue.setText(Messages.prefPage_cache_status_infoWasCanceled);
 
 				} else {
 
-					nf.setMinimumIntegerDigits(0);
-					nf.setMaximumFractionDigits(0);
-					fLblInfoFilesValue.setText(nf.format(fFileCounter));
+					_nf.setMinimumIntegerDigits(0);
+					_nf.setMaximumFractionDigits(0);
+					_lblInfoFilesValue.setText(_nf.format(_fileCounter));
 
-					nf.setMinimumIntegerDigits(2);
-					nf.setMaximumFractionDigits(2);
-					fLblInfoSizeValue.setText(nf.format((float) fFileSize / 1024 / 1024) + SIZE_MBYTE);
+					_nf.setMinimumIntegerDigits(2);
+					_nf.setMaximumFractionDigits(2);
+					_lblInfoSizeValue.setText(_nf.format((float) _fileSize / 1024 / 1024) + SIZE_MBYTE);
 
 					if (isJobFinished) {
-						fLblInfoWaitingValue.setText(EMPTY_STRING);
+						_lblInfoWaitingValue.setText(UI.EMPTY_STRING);
 					} else {
-						fLblInfoWaitingValue.setText(Messages.prefPage_cache_status_retrieving);
+						_lblInfoWaitingValue.setText(Messages.prefPage_cache_status_retrieving);
 					}
 				}
 
-				fLblInfoFilesValue.pack(true);
-				fLblInfoSizeValue.pack(true);
-				fLblInfoWaitingValue.pack(true);
+				_lblInfoFilesValue.pack(true);
+				_lblInfoSizeValue.pack(true);
+				_lblInfoWaitingValue.pack(true);
 
-				fBtnDeleteOfflineCache.setEnabled(true);
+				_btnDeleteOfflineCache.setEnabled(true);
 			}
 		});
 	}
@@ -559,15 +576,15 @@ public class PrefPageCache extends PreferencePage implements IWorkbenchPreferenc
 	private boolean validateData() {
 
 		boolean isValid = true;
-		final boolean useOffLineCache = fUseOffLineCache.getBooleanValue();
+		final boolean useOffLineCache = _boolEditorUseOffLineCache.getBooleanValue();
 
 		if (useOffLineCache
-				&& fUseDefaultLocation.getBooleanValue() == false
-				&& (!fCachePathEditor.isValid() || fCachePathEditor.getStringValue().trim().length() == 0)) {
+				&& _boolEditorUseDefaultLocation.getBooleanValue() == false
+				&& (!_dirEditorCachePath.isValid() || _dirEditorCachePath.getStringValue().trim().length() == 0)) {
 
 			isValid = false;
 			setErrorMessage(Messages.pref_error_invalid_path);
-			fCachePathEditor.setFocus();
+			_dirEditorCachePath.setFocus();
 		}
 
 		if (isValid) {

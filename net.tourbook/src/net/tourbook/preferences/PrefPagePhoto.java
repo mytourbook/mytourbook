@@ -19,6 +19,7 @@ import java.util.ArrayList;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.photo.Messages;
+import net.tourbook.photo.manager.PhotoImageCache;
 import net.tourbook.ui.UI;
 import net.tourbook.util.StatusUtil;
 import net.tourbook.util.Util;
@@ -180,7 +181,7 @@ public class PrefPagePhoto extends PreferencePage implements IWorkbenchPreferenc
 					.align(SWT.BEGINNING, SWT.FILL)
 					.applyTo(_spinnerNumberOfImages);
 			_spinnerNumberOfImages.setMinimum(10);
-			_spinnerNumberOfImages.setMaximum(100000);
+			_spinnerNumberOfImages.setMaximum(Integer.MAX_VALUE);
 			_spinnerNumberOfImages.addMouseWheelListener(new MouseWheelListener() {
 				public void mouseScrolled(final MouseEvent event) {
 					UI.adjustSpinnerValueOnMouseScroll(event);
@@ -286,6 +287,9 @@ public class PrefPagePhoto extends PreferencePage implements IWorkbenchPreferenc
 	protected void performDefaults() {
 
 		_editorBoolUseDefaultLocation.loadDefault();
+		_editorDirThumbnailLocation.loadDefault();
+
+		_spinnerNumberOfImages.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.PHOTO_IMAGE_CACHE_SIZE));
 
 		enableControls();
 
@@ -311,15 +315,30 @@ public class PrefPagePhoto extends PreferencePage implements IWorkbenchPreferenc
 
 	private void restoreState() {
 
+		_spinnerNumberOfImages.setSelection(_prefStore.getInt(ITourbookPreferences.PHOTO_IMAGE_CACHE_SIZE));
+
 		_editorBoolUseDefaultLocation.load();
 		_editorDirThumbnailLocation.load();
 	}
 
 	private void saveState() {
 
+		boolean isModified = false;
+
+		final int newCacheSize = _spinnerNumberOfImages.getSelection();
+		final int oldCacheSize = _prefStore.getInt(ITourbookPreferences.PHOTO_IMAGE_CACHE_SIZE);
+
+		if (oldCacheSize != newCacheSize) {
+			isModified = true;
+			_prefStore.setValue(ITourbookPreferences.PHOTO_IMAGE_CACHE_SIZE, newCacheSize);
+		}
+
 		_editorBoolUseDefaultLocation.store();
 		_editorDirThumbnailLocation.store();
 
+		if (isModified) {
+			PhotoImageCache.setCacheSize(newCacheSize);
+		}
 	}
 
 	private boolean validateData() {

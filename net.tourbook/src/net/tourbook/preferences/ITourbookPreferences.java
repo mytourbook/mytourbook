@@ -313,5 +313,6 @@ public interface ITourbookPreferences {
 	 */
 	public static final String	PHOTO_USE_DEFAULT_THUMBNAIL_LOCATION		= "PHOTO_USE_DEFAULT_THUMBNAIL_LOCATION";					//$NON-NLS-1$
 	public static final String	PHOTO_CUSTOM_THUMBNAIL_LOCATION				= "PHOTO_CUSTOM_THUMBNAIL_LOCATION";						//$NON-NLS-1$
+	public static final String	PHOTO_IMAGE_CACHE_SIZE						= "PHOTO_IMAGE_CACHE_SIZE";								//$NON-NLS-1$
 
 }
