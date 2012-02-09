@@ -74,6 +74,12 @@ public class Messages extends NLS {
 
 	public static String	PrefPage_Photo_Button_GetNumberOfImages;
 
+	public static String	PrefPage_Photo_Dialog_MaxHandle_CreatedImagesBeforeError;
+
+	public static String	PrefPage_Photo_Dialog_MaxHandle_NoError;
+
+	public static String	PrefPage_Photo_Dialog_MaxHandle_Title;
+
 	public static String	PrefPage_Photo_Error_ThumbnailLocation;
 
 	public static String	PrefPage_Photo_Group_ThumbnailCacheLocation;
@@ -87,10 +93,6 @@ public class Messages extends NLS {
 	public static String	PrefPage_Photo_Label_ThumbnailLocation;
 
 	public static String	PrefPage_Photo_Label_UseDefaultThumbnailLocation;
-
-	public static String	PrefPagePhoto_0;
-
-	public static String	PrefPagePhoto_1;
 
 	static {
 		// initialize resource bundle

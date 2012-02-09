@@ -251,6 +251,7 @@ public class PrefPagePhoto extends PreferencePage implements IWorkbenchPreferenc
 		final Display display = Display.getCurrent();
 		final ArrayList<Image> imageHandels = new ArrayList<Image>();
 		final int[] imageNo = { 0 };
+		final int maxTest = 10000;
 
 		BusyIndicator.showWhile(display, new Runnable() {
 			public void run() {
@@ -263,7 +264,7 @@ public class PrefPagePhoto extends PreferencePage implements IWorkbenchPreferenc
 
 						imageNo[0]++;
 					}
-					while (imageNo[0] < Integer.MAX_VALUE);
+					while (imageNo[0] < maxTest);
 
 				} catch (final Exception e) {
 					// ignore because it will happen
@@ -273,11 +274,20 @@ public class PrefPagePhoto extends PreferencePage implements IWorkbenchPreferenc
 						image.dispose();
 					}
 
-					final String message = NLS.bind(Messages.PrefPagePhoto_0, Integer.toString(imageNo[0]));
+					String message;
+					if (imageNo[0] == maxTest) {
+						message = NLS.bind(//
+								Messages.PrefPage_Photo_Dialog_MaxHandle_NoError,
+								Integer.toString(maxTest));
+					} else {
+						message = NLS.bind(
+								Messages.PrefPage_Photo_Dialog_MaxHandle_CreatedImagesBeforeError,
+								Integer.toString(imageNo[0]));
+					}
 
 					StatusUtil.log(message);
 
-					MessageDialog.openInformation(getShell(), Messages.PrefPagePhoto_1, message);
+					MessageDialog.openInformation(getShell(), Messages.PrefPage_Photo_Dialog_MaxHandle_Title, message);
 				}
 			}
 		});
