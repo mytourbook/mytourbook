@@ -11,13 +11,15 @@ Bundle-ClassPath: joda-time-1.5.2.jar,
  edtftpj.jar,
  net.sf.swtaddons_0.1.1.jar,
  trove-3.0.2.jar,
- imgscalr-lib-4.2.jar
+ imgscalr-lib-4.2.jar,
+ concurrentlinkedhashmap-lru-1.2.jar
 Bundle-Vendor: MyTourbook
 Export-Package: com.enterprisedt,
  com.enterprisedt.net.ftp,
  com.enterprisedt.net.ftp.internal,
  com.enterprisedt.net.ftp.test,
  com.enterprisedt.util.debug,
+ com.googlecode.concurrentlinkedhashmap,
  com.mchange,
  com.mchange.lang,
  com.mchange.util,

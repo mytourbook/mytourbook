@@ -15,52 +15,56 @@
  *******************************************************************************/
 package net.tourbook.photo.manager;
 
+import java.io.IOException;
 import java.util.Collection;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.util.StatusUtil;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.graphics.Image;
 
+import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
+import com.googlecode.concurrentlinkedhashmap.EvictionListener;
+
 public class PhotoImageCache {
 
-	private static IPreferenceStore							_prefStore		= TourbookPlugin.getDefault() //
-																					.getPreferenceStore();
+	private static IPreferenceStore								_prefStore		= TourbookPlugin.getDefault() //
+																						.getPreferenceStore();
 
-	private static int										_maxCacheSize	= _prefStore.getInt(//
-																					ITourbookPreferences.PHOTO_IMAGE_CACHE_SIZE);
+	private static int											_maxCacheSize	= _prefStore.getInt(//
+																						ITourbookPreferences.PHOTO_IMAGE_CACHE_SIZE);
 
-	private static final ConcurrentHashMap<String, Image>	_imageCache		= new ConcurrentHashMap<String, Image>();
-	private static final LinkedBlockingDeque<String>		_imageCacheFifo	= new LinkedBlockingDeque<String>();
+	private static final ConcurrentLinkedHashMap<String, Image>	_imageCache;
 
-	private static int										_cacheThreshold	= _maxCacheSize / 10;
+	static {
 
-	private static void checkCacheSize() {
+		final EvictionListener<String, Image> evictionListener = new EvictionListener<String, Image>() {
 
-		final int imageCacheSize = _imageCacheFifo.size();
-		if (imageCacheSize > _maxCacheSize) {
+			final ExecutorService	executor	= Executors.newSingleThreadExecutor();
 
-			// remove cache items
-			for (int cacheIndex = _maxCacheSize - _cacheThreshold; cacheIndex < imageCacheSize; cacheIndex++) {
+			@Override
+			public void onEviction(final String fileName, final Image image) {
 
-				// remove and dispose oldest image
+//				image.dispose();
 
-				final String headImageKey = _imageCacheFifo.poll();
-				final Image headImage = _imageCache.remove(headImageKey);
-
-				if (headImage != null) {
-					try {
-						headImage.dispose();
-					} catch (final Exception e) {
-						// it is possible that the image is already disposed by another thread
+				executor.submit(new Callable<Void>() {
+					@Override
+					public Void call() throws IOException {
+						image.dispose();
+						return null;
 					}
-				}
+				});
 			}
-		}
+		};
+
+		_imageCache = new ConcurrentLinkedHashMap.Builder<String, Image>()
+				.maximumWeightedCapacity(_maxCacheSize)
+				.listener(evictionListener)
+				.build();
 	}
 
 	/**
@@ -81,87 +85,17 @@ public class PhotoImageCache {
 		}
 
 		_imageCache.clear();
-		_imageCacheFifo.clear();
 	}
 
-	/**
-	 * @param imageKey
-	 * @return Returns the image or <code>null</code> when the image is not available or disposed
-	 */
 	public static Image getImage(final String imageKey) {
-
-		final Image image = _imageCache.get(imageKey);
-		if (image != null && !image.isDisposed()) {
-			return image;
-		}
-
-		return null;
+		return _imageCache.get(imageKey);
 	}
 
 	public static void putImage(final String imageKey, final Image image) {
- 
-		checkCacheSize();
-
-		try {
-
-			/*
-			 * check if the image is already in the cache
-			 */
-			final Image cachedImage = _imageCache.get(imageKey);
-			if (cachedImage == null) {
-
-				// this is a new image
-
-				_imageCache.put(imageKey, image);
-				_imageCacheFifo.add(imageKey);
-
-				return;
-
-			} else {
-
-				// an image for the key already exists
-
-				if (cachedImage == image) {
-
-					// image is already in the cache
-
-					return;
-
-				} else {
-
-					// dispose cached image which has the same key but is another image
-
-					if (cachedImage != null) {
-						try {
-							cachedImage.dispose();
-						} catch (final Exception e) {
-							// it is possible that the image is already disposed by another thread
-						}
-					}
-
-					// replace existing image, the image must be already in the fifo queue
-					_imageCache.put(imageKey, image);
-
-					return;
-				}
-
-			}
-
-		} catch (final Exception e) {
-			StatusUtil.log(e.getMessage(), e);
-		}
+		_imageCache.put(imageKey, image);
 	}
 
 	public static void setCacheSize(final int newCacheSize) {
-
-		final boolean isSmaller = newCacheSize < _maxCacheSize;
-
-		_maxCacheSize = newCacheSize;
-		_cacheThreshold = newCacheSize / 10;
-
-		if (isSmaller) {
-			checkCacheSize();
-		}
+		_imageCache.setCapacity(newCacheSize);
 	}
-
 }

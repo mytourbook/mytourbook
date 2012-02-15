@@ -25,6 +25,7 @@ import net.tourbook.photo.manager.Photo;
 import net.tourbook.photo.manager.PhotoImageCache;
 import net.tourbook.photo.manager.PhotoLoadingState;
 import net.tourbook.photo.manager.PhotoManager;
+import net.tourbook.ui.UI;
 
 import org.apache.commons.sanselan.Sanselan;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -33,6 +34,7 @@ import org.eclipse.nebula.widgets.gallery.AbstractGalleryItemRenderer;
 import org.eclipse.nebula.widgets.gallery.AbstractGridGroupRenderer;
 import org.eclipse.nebula.widgets.gallery.Gallery;
 import org.eclipse.nebula.widgets.gallery.GalleryItem;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.graphics.Color;
@@ -41,8 +43,10 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ProgressBar;
+import org.eclipse.ui.part.PageBook;
 
 /**
  * This class is a compilation from different source codes:
@@ -56,8 +60,6 @@ import org.eclipse.swt.widgets.ProgressBar;
  */
 public class PicDirImages {
 
-	private GalleryItem						_rootItem;
-
 	private AbstractGalleryItemRenderer		_itemRenderer;
 	private AbstractGridGroupRenderer		_groupRenderer;
 
@@ -65,11 +67,6 @@ public class PicDirImages {
 
 	private File[]							_photoFiles;
 	private FileFilter						_fileFilter;
-
-	/*
-	 * UI resources
-	 */
-	private Color							_bgColor			= new Color(Display.getDefault(), 0x50, 0x50, 0x50);
 
 	/*
 	 * UI controls
@@ -195,6 +192,13 @@ public class PicDirImages {
 //	private Comparator<File>				_currentComparator	= SortingUtils.DATE_SORT;
 	private Comparator<File>				_currentComparator	= DATE_SORT;
 
+	/*
+	 * UI controls
+	 */
+	private PageBook						_pageBook;
+	private Label							_lblLoading;
+	private Composite						_pageLoading;
+
 	private class LoadImageCallback implements ILoadCallBack {
 
 		private GalleryItem	__galleryItem;
@@ -209,7 +213,7 @@ public class PicDirImages {
 		}
 
 		@Override
-		public void imageIsLoaded() {
+		public void callBackImageIsLoaded(final Rectangle galleryItemBounds) {
 
 			Display.getDefault().syncExec(new Runnable() {
 
@@ -219,12 +223,15 @@ public class PicDirImages {
 						return;
 					}
 
-					final Rectangle bounds = __galleryItem.getBounds();
-
-//					System.out.println("redraw: " + bounds);
+//					System.out.println("redraw: " + galleryItemBounds);
 //					// TODO remove SYSTEM.OUT.PRINTLN
 
-					_gallery.redraw(bounds.x, bounds.y, bounds.width, bounds.height, false);
+					_gallery.redraw(
+							galleryItemBounds.x,
+							galleryItemBounds.y,
+							galleryItemBounds.width,
+							galleryItemBounds.height,
+							false);
 				}
 			});
 		}
@@ -274,7 +281,7 @@ public class PicDirImages {
 					return false;
 				}
 
-				if (name.startsWith(".")) {
+				if (name.startsWith(".")) { //$NON-NLS-1$
 					return false;
 				}
 
@@ -296,25 +303,36 @@ public class PicDirImages {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, 0).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
-			createUI_10_Gallery(container);
+			_pageBook = new PageBook(container, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBook);
+			{
+				createUI_10_PageGallery(_pageBook);
+				createUI_12_PageLoading(_pageBook);
+			}
+
 			createUI_20_StatusLine(container);
 		}
+
+		_lblLoading.setText(Messages.Pic_Dir_Label_FolderIsNotSelected);
 	}
 
 	/**
 	 * Create gallery
 	 */
-	private void createUI_10_Gallery(final Composite parent) {
+	private void createUI_10_PageGallery(final Composite parent) {
 
-		_gallery = new Gallery(parent, SWT.V_SCROLL | SWT.VIRTUAL | SWT.MULTI);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(_gallery);
-		_gallery.setBackground(_bgColor);
+		_gallery = new PicDirGallery(parent, SWT.V_SCROLL | SWT.VIRTUAL | SWT.MULTI);
+		//		GridDataFactory.fillDefaults().grab(true, true).applyTo(_gallery);
+
 		_gallery.setLowQualityOnUserAction(true);
-		_gallery.setHigherQualityDelay(500);
-		_gallery.setAntialias(SWT.OFF);
-		_gallery.setInterpolation(SWT.LOW);
+		_gallery.setHigherQualityDelay(200);
+//		_gallery.setAntialias(SWT.OFF);
+//		_gallery.setInterpolation(SWT.LOW);
+		_gallery.setAntialias(SWT.ON);
+		_gallery.setInterpolation(SWT.HIGH);
+
 		_gallery.setVirtualGroups(true);
 		_gallery.setVirtualGroupDefaultItemCount(1);
 		_gallery.setVirtualGroupsCompatibilityMode(true);
@@ -337,7 +355,6 @@ public class PicDirImages {
 		_itemRenderer = new PhotoRenderer();
 		final PhotoRenderer photoRenderer = (PhotoRenderer) _itemRenderer;
 		photoRenderer.setShowLabels(false);
-		photoRenderer.setBackgroundColor(_bgColor);
 //		photoRenderer.setDropShadows(true);
 //		photoRenderer.setDropShadowsSize(5);
 		_gallery.setItemRenderer(_itemRenderer);
@@ -349,9 +366,27 @@ public class PicDirImages {
 
 		_gallery.setGroupRenderer(_groupRenderer);
 
-		_rootItem = new GalleryItem(_gallery, SWT.VIRTUAL);
+		// create root item (is needed)
+		new GalleryItem(_gallery, SWT.VIRTUAL);
 
 		_gallery.setItemCount(1);
+	}
+
+	private void createUI_12_PageLoading(final PageBook parent) {
+
+		_pageLoading = new Composite(parent, SWT.NONE);
+//		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults()//
+				.numColumns(1)
+				.margins(5, 5)
+				.applyTo(_pageLoading);
+		{
+			_lblLoading = new Label(_pageLoading, SWT.WRAP);
+			GridDataFactory.fillDefaults()//
+					.grab(true, true)
+					.align(SWT.FILL, SWT.FILL)
+					.applyTo(_lblLoading);
+		}
 	}
 
 	private void createUI_20_StatusLine(final Composite parent) {
@@ -377,7 +412,16 @@ public class PicDirImages {
 
 	void dispose() {
 
-		_bgColor.dispose();
+		//////////////////////////////////////////
+		//
+		// MUST BE REMOVED, IS ONLY FOR TESTING
+		//
+		PhotoImageCache.dispose();
+		//
+		// MUST BE REMOVED, IS ONLY FOR TESTING
+		//
+		//////////////////////////////////////////
+
 		workerStop();
 	}
 
@@ -398,9 +442,9 @@ public class PicDirImages {
 					: PhotoManager.IMAGE_QUALITY_THUMB_160;
 
 			// check if image is already loaded or has an loading error
-			final PhotoLoadingState photoLoadingState = photo.getLoadingState()[imageQuality];
+			final PhotoLoadingState photoLoadingState = photo.getLoadingState(imageQuality);
 			if (photoLoadingState == PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR
-					|| photoLoadingState == PhotoLoadingState.IMAGE_IS_BEING_LOADED) {
+					|| photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE) {
 				return;
 			}
 
@@ -409,7 +453,17 @@ public class PicDirImages {
 
 				// the requested image is not available in the image cache -> image must be loaded
 
-				PhotoManager.loadImage(photo, imageQuality, new LoadImageCallback(galleryItem));
+				final LoadImageCallback imageLoadCallback = new LoadImageCallback(galleryItem);
+
+				PhotoManager.putImageInLoadingQueue(galleryItem, photo, imageQuality, imageLoadCallback);
+
+//				final PhotoImageLoaderItem loaderItem = new PhotoImageLoaderItem(//
+//						galleryItem,
+//						photo,
+//						imageQuality,
+//						imageLoadCallback);
+//
+//				loaderItem.loadImage();
 			}
 
 // ORIGINAL
@@ -459,6 +513,21 @@ public class PicDirImages {
 		}
 	}
 
+	void setColor(final Color fgColor, final Color bgColor) {
+
+		_gallery.setForeground(fgColor);
+		_gallery.setBackground(bgColor);
+
+		final PhotoRenderer photoRenderer = (PhotoRenderer) _itemRenderer;
+		photoRenderer.setForegroundColor(fgColor);
+		photoRenderer.setBackgroundColor(bgColor);
+
+		_pageLoading.setBackground(bgColor);
+
+		_lblLoading.setForeground(fgColor);
+		_lblLoading.setBackground(bgColor);
+	}
+
 	void setThumbnailSize(final int imageSize) {
 
 		_photoSize = imageSize;
@@ -472,6 +541,23 @@ public class PicDirImages {
 	 * @param dir
 	 */
 	void showImages(final File dir) {
+
+		//////////////////////////////////////////
+		//
+		// MUST BE REMOVED, IS ONLY FOR TESTING
+		//
+		PhotoImageCache.dispose();
+		//
+		// MUST BE REMOVED, IS ONLY FOR TESTING
+		//
+		//////////////////////////////////////////
+
+		if (dir == null) {
+			_lblLoading.setText(Messages.Pic_Dir_Label_FolderIsNotSelected);
+		} else {
+			_lblLoading.setText(NLS.bind(Messages.Pic_Dir_Label_Loading, dir.getAbsolutePath()));
+		}
+		_pageBook.showPage(_pageLoading);
 
 		PhotoManager.stopImageLoading();
 
@@ -497,7 +583,8 @@ public class PicDirImages {
 						return;
 					}
 
-					_lblStatusInfo.setText("reading: " + _workerStateDir.getAbsolutePath());
+//					_lblStatusInfo.setText(NLS.bind(Messages.Pic_Dir_Status_Reading, _workerStateDir.getAbsolutePath()));
+					_lblStatusInfo.setText(UI.EMPTY_STRING);
 				}
 			});
 
@@ -532,13 +619,13 @@ public class PicDirImages {
 					 * update status info
 					 */
 					final long timeDiff = System.currentTimeMillis() - _workerStart;
-					final String timeDiffText = Long.toString(timeDiff)
-							+ " ms  :  "
-							+ Integer.toString(_photoFiles.length)
-							+ "  :  "
-							+ _workerStateDir.getAbsolutePath();
+					final String timeDiffText = NLS.bind(
+							Messages.Pic_Dir_Status_Loaded,
+							new Object[] { Long.toString(timeDiff), Integer.toString(_photoFiles.length) });
 
 					_lblStatusInfo.setText(timeDiffText);
+
+					_pageBook.showPage(_gallery);
 				}
 			});
 		}
@@ -596,7 +683,7 @@ public class PicDirImages {
 		}
 
 		if (_workerThread == null) {
-			_workerThread = new Thread(_workerRunnable, "PicDirImages: retrieve files");
+			_workerThread = new Thread(_workerRunnable, "PicDirImages: retrieve files"); //$NON-NLS-1$
 			_workerThread.start();
 		}
 	}

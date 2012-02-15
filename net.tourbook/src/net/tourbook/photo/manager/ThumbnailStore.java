@@ -26,6 +26,10 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.ImageLoader;
 
 public class ThumbnailStore {
 
@@ -33,14 +37,83 @@ public class ThumbnailStore {
 
 	private static IPreferenceStore	_prefStore				= TourbookPlugin.getDefault().getPreferenceStore();
 
-	{
-		final IPath storePath = getThumbnailStorePath();
+	private static IPath			_storePath				= getThumbnailStorePath();
+
+//	private static final ReentrantLock	SAVE_LOCK				= new ReentrantLock();
+
+//			PhotoManager.IMAGE_QUALITY_600
+
+//			final BufferedImage img = ImageIO.read(photo.getImageFile());
+//			final BufferedImage scaledImg = Scalr.resize(img, PhotoManager.IMAGE_QUALITY_ORIGINAL);
+
+//	static Image getImage(final Photo photo, final int requestedImageQuality) {
+//
+//		IPath storeImageFilePath = null;
+//
+//		try {
+//
+//			storeImageFilePath = getStoreImageFile(photo, requestedImageQuality);
+//
+//			// check if image is available
+//			final File storeImageFile = new File(storeImageFilePath.toOSString());
+//			if (storeImageFile.isFile()) {
+//
+//				// photo image is available
+//
+//				return new Image(Display.getDefault(), storeImageFilePath.toOSString());
+//			}
+//
+//			// load full size image
+//			final Image fullSizeImage = new Image(Display.getDefault(), photo.getFilePathName());
+//
+//			final Rectangle fullSizeImageBounds = fullSizeImage.getBounds();
+//			final int thumbSize160 = PhotoManager.IMAGE_SIZE[PhotoManager.IMAGE_QUALITY_THUMB_160];
+//
+//			final Point newSize = ImageUtils.getBestSize(//
+//					new Point(fullSizeImageBounds.width, fullSizeImageBounds.height),
+//					new Point(thumbSize160, thumbSize160));
+//
+//			Image thumbnailImage;
+//			if (ImageUtils.isResizeRequired(fullSizeImage, newSize.x, newSize.y)) {
+//
+//				thumbnailImage = ImageUtils.resize(fullSizeImage, newSize.x, newSize.y);
+//
+//				saveImage(thumbnailImage, storeImageFilePath);
+//
+//			} else {
+//				thumbnailImage = fullSizeImage;
+//			}
+//
+//			return thumbnailImage;
+//
+//		} catch (final Exception e) {
+//
+//			StatusUtil.log(NLS.bind("Image '{0}' cannot be loaded", storeImageFilePath.toOSString()), e); //$NON-NLS-1$
+//		}
+//
+//		return null;
+//	}
+
+	static synchronized IPath getStoreImagePath(final Photo photo, final int imageQuality) {
+
+		final String imageKey = photo.getImageKey(imageQuality);
+
+		final int imageQualitySize = PhotoManager.IMAGE_SIZE[imageQuality];
+		final String imageKeyFolder = imageKey.substring(0, 2);
+
+		final String imageFileName = imageKey + "_" + imageQualitySize + "_" + photo.getFileName();
+
+		final IPath imageFilePath = _storePath//
+				.append(imageKeyFolder)
+				.append(imageFileName);
+
+		return imageFilePath;
 	}
 
 	/**
 	 * @return Returns the file path for the thumbnail store
 	 */
-	private IPath getThumbnailStorePath() {
+	private static IPath getThumbnailStorePath() {
 
 		final boolean useDefaultLocation = _prefStore.getBoolean(//
 				ITourbookPreferences.PHOTO_USE_DEFAULT_THUMBNAIL_LOCATION);
@@ -81,7 +154,7 @@ public class ThumbnailStore {
 			}
 		}
 
-		// append a unique path so that deleting tiles is not doing it in the wrong directory
+		// append a unique folder so that deleting images is not being done in the wrong directory
 		final IPath tnFolderPath = new Path(tnFolderName).append(THUMBNAIL_STORE_OS_PATH);
 		final File tnFolderFileUnique = tnFolderPath.toFile();
 		if (tnFolderFileUnique.exists() == false || tnFolderFileUnique.isDirectory() == false) {
@@ -103,7 +176,42 @@ public class ThumbnailStore {
 			}
 		}
 
-		return tnFolderPath;
+		return tnFolderPath.addTrailingSeparator();
 	}
 
+	static void saveImage(final Image thumbnailImage, final IPath storeImageFilePath) {
+
+		try {
+
+			final IPath imagePathWithoutExt = storeImageFilePath.removeFileExtension();
+
+			// check store sub directory
+			final File storeSubDir = imagePathWithoutExt.removeLastSegments(1).toFile();
+			if (storeSubDir.exists() == false) {
+
+				// create store sub directory
+
+				if (storeSubDir.mkdirs() == false) {
+
+					StatusUtil.log(NLS.bind(//
+							"Thumbnail image path \"{0}\" cannot be created", //$NON-NLS-1$
+							storeSubDir.getAbsolutePath()), new Exception());
+					return;
+				}
+			}
+
+			final ImageLoader imageLoader = new ImageLoader();
+			imageLoader.data = new ImageData[] { thumbnailImage.getImageData() };
+
+			final IPath fullImageFilePath = imagePathWithoutExt.addFileExtension("jpg");
+
+			imageLoader.save(fullImageFilePath.toOSString(), SWT.IMAGE_JPEG);
+
+		} catch (final Exception e) {
+
+			StatusUtil.log(NLS.bind(//
+					"Cannot save thumbnail image: \"{0}\"", //$NON-NLS-1$
+					storeImageFilePath.toOSString()), new Exception());
+		}
+	}
 }

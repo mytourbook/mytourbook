@@ -27,6 +27,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.TreeAdapter;
 import org.eclipse.swt.events.TreeEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -79,7 +80,7 @@ class PicDirFolder {
 		}
 	}
 
-	public void createUI(final Composite parent) {
+	void createUI(final Composite parent) {
 
 		_display = parent.getDisplay();
 
@@ -99,7 +100,7 @@ class PicDirFolder {
 	 */
 	private void createUI_10_TreeView(final Composite parent) {
 
-		tree = new Tree(parent, SWT.V_SCROLL | SWT.H_SCROLL | SWT.SINGLE);
+		tree = new Tree(parent, SWT.V_SCROLL | SWT.H_SCROLL | SWT.SINGLE | SWT.FULL_SELECTION);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(tree);
 
 		tree.addSelectionListener(new SelectionListener() {
@@ -176,7 +177,7 @@ class PicDirFolder {
 				}
 			}
 			final File[] roots = list.toArray(new File[list.size()]);
-			PhotoDirectoryView.sortFiles(roots);
+			PicDirView.sortFiles(roots);
 			return roots;
 		}
 		final File root = new File(File.separator);
@@ -187,11 +188,15 @@ class PicDirFolder {
 		return new File[] { root };
 	}
 
+	File getSelectedFolder() {
+		return currentDirectory;
+	}
+
 	Tree getTree() {
 		return tree;
 	}
 
-	void initialRefresh() {
+	void initialRefresh(final String folderPath) {
 
 		BusyIndicator.showWhile(_display, new Runnable() {
 			public void run() {
@@ -206,8 +211,16 @@ class PicDirFolder {
 				treeRefresh(roots);
 
 				// Remind everyone where we are in the filesystem
-				final File dir = currentDirectory;
+				File dir = currentDirectory;
 				currentDirectory = null;
+
+				if (folderPath != null) {
+					final File folderFile = new File(folderPath);
+					if (folderFile.isDirectory()) {
+						dir = folderFile;
+					}
+				}
+
 				onSelectedDirectory(dir);
 			}
 		});
@@ -284,6 +297,20 @@ class PicDirFolder {
 				: new TreeItem[0]);
 	}
 
+	void setColor(final Color fgColor, final Color bgColor) {
+
+		tree.setForeground(fgColor);
+		tree.setBackground(bgColor);
+	}
+
+	/*
+	 * This worker updates the table with file information in the background. <p> Implementation
+	 * notes: <ul> <li> It is designed such that it can be interrupted cleanly. <li> It uses
+	 * asyncExec() in some places to ensure that SWT Widgets are manipulated in the right thread.
+	 * Exclusive use of syncExec() would be inappropriate as it would require a pair of context
+	 * switches between each table update operation. </ul> </p>
+	 */
+
 	/**
 	 * Handles expand events on a tree item.
 	 * 
@@ -302,14 +329,6 @@ class PicDirFolder {
 			});
 		}
 	}
-
-	/*
-	 * This worker updates the table with file information in the background. <p> Implementation
-	 * notes: <ul> <li> It is designed such that it can be interrupted cleanly. <li> It uses
-	 * asyncExec() in some places to ensure that SWT Widgets are manipulated in the right thread.
-	 * Exclusive use of syncExec() would be inappropriate as it would require a pair of context
-	 * switches between each table update operation. </ul> </p>
-	 */
 
 	/**
 	 * Initializes a folder item.
@@ -364,7 +383,7 @@ class PicDirFolder {
 				continue;
 			}
 			final File masterFile = masterFiles[masterIndex];
-			final int compare = PhotoDirectoryView.compareFiles(masterFile, itemFile);
+			final int compare = PicDirView.compareFiles(masterFile, itemFile);
 			if (compare == 0) {
 				// same file, update it
 				treeRefreshItem(item, false);
@@ -417,7 +436,7 @@ class PicDirFolder {
 		dirItem.setData(TREEITEMDATA_STUB, this); // clear stub flag
 
 		/* Get directory listing */
-		final File[] subFiles = (dir != null) ? PhotoDirectoryView.getDirectoryList(dir) : null;
+		final File[] subFiles = (dir != null) ? PicDirView.getDirectoryList(dir) : null;
 
 		if (subFiles == null || subFiles.length == 0) {
 			/* Error or no contents */
@@ -447,7 +466,7 @@ class PicDirFolder {
 				item.dispose();
 				continue;
 			}
-			final int compare = PhotoDirectoryView.compareFiles(masterFile, itemFile);
+			final int compare = PicDirView.compareFiles(masterFile, itemFile);
 			if (compare == 0) {
 				// same file, update it
 				treeRefreshItem(item, false);

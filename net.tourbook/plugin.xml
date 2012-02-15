@@ -512,7 +512,7 @@
             mnemonic="%view_name_Statistics_Mnemonic"/>
             
          <command
-            	commandId="net.tourbook.photo.photoDirectoryView"
+            	commandId="command.net.tourbook.photo.PicDirView"
             	icon="icons/photo-directory.png"
             	label="%View_Name_PhotoDirectory"
             	mnemonic="%View_Name_PhotoDirectory_Mnemonic"/>
@@ -626,7 +626,7 @@
          <toolbar
                id="net.tourbook.toolbars.tourViews">
             <command
-                  commandId="net.tourbook.photo.photoDirectoryView"
+                  commandId="command.net.tourbook.photo.PicDirView"
                   icon="icons/photo-directory.png"
                   label="%View_Name_PhotoDirectory"
                   mnemonic="%View_Name_PhotoDirectory_Mnemonic">
@@ -811,7 +811,7 @@
             />
             
       <command
-            id="net.tourbook.photo.photoDirectoryView"
+            id="command.net.tourbook.photo.PicDirView"
             name="%View_Name_PhotoDirectory"
             defaultHandler="net.tourbook.photo.ActionHandlerOpenViewPhotoDirectory"
             />
@@ -1126,9 +1126,9 @@
 	      
 	      <view
 	            category="net.tourbook.category.tourList"
-	            class="net.tourbook.photo.PhotoDirectoryView"
+	            class="net.tourbook.photo.PicDirView"
 	            icon="icons/photo-directory.png"
-	            id="net.tourbook.photo.photoDirectoryView"
+	            id="net.tourbook.photo.PicDirView"
 	            name="%View_Name_PhotoDirectory">
 	      </view>
 	      <view

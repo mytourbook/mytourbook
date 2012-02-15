@@ -38,8 +38,10 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Tree;
@@ -47,16 +49,17 @@ import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 
-public class PhotoDirectoryView extends ViewPart {
+public class PicDirView extends ViewPart {
 
-	static public final String				ID							= "net.tourbook.photo.photoDirectoryView";	//$NON-NLS-1$
+	static public final String				ID							= "net.tourbook.photo.PicDirView";		//$NON-NLS-1$
 
-	private static final String				STATE_TREE_WIDTH			= "STATE_TREE_WIDTH";						//$NON-NLS-1$
-	private static final String				STATE_THUMB_IMAGE_SIZE		= "STATE_THUMB_IMAGE_SIZE";				//$NON-NLS-1$
+	private static final String				STATE_TREE_WIDTH			= "STATE_TREE_WIDTH";					//$NON-NLS-1$
+	private static final String				STATE_THUMB_IMAGE_SIZE		= "STATE_THUMB_IMAGE_SIZE";			//$NON-NLS-1$
+	private static final String				STATE_SELECTED_FOLDER		= "STATE_SELECTED_FOLDER";				//$NON-NLS-1$
 
 	private static final IDialogSettings	_state						= TourbookPlugin.getDefault()//
 																				.getDialogSettingsSection(
-																						"PhotoDirectoryView");		//$NON-NLS-1$
+																						"PhotoDirectoryView");	//$NON-NLS-1$
 	private static final IPreferenceStore	_prefStore					= TourbookPlugin.getDefault()//
 																				.getPreferenceStore();
 
@@ -70,6 +73,21 @@ public class PhotoDirectoryView extends ViewPart {
 	private PicDirImages					_picDirImages;
 
 	private int								_prevSelectedThumbnailIndex	= -1;
+
+	/*
+	 * UI resources
+	 */
+	private Color							_fgColor					= new Color(
+																				Display.getDefault(),
+																				0xbb,
+																				0xbb,
+																				0xbb);
+	private Color							_bgColor					= new Color(
+																				Display.getDefault(),
+																				0x50,
+																				0x50,
+																				0x50);
+
 	/*
 	 * UI controls
 	 */
@@ -162,7 +180,7 @@ public class PhotoDirectoryView extends ViewPart {
 
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == PhotoDirectoryView.this) {
+				if (partRef.getPart(false) == PicDirView.this) {
 					saveState();
 				}
 			}
@@ -213,7 +231,8 @@ public class PhotoDirectoryView extends ViewPart {
 		// set thumbnail size
 		onSelectThumbnailSize();
 
-		_picDirFolder.initialRefresh();
+		final String selectedFolder = Util.getStateString(_state, STATE_SELECTED_FOLDER, null);
+		_picDirFolder.initialRefresh(selectedFolder);
 	}
 
 	private void createUI(final Composite parent) {
@@ -231,6 +250,7 @@ public class PhotoDirectoryView extends ViewPart {
 			GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(_containerFolder);
 			{
 				_picDirFolder.createUI(_containerFolder);
+				_picDirFolder.setColor(_fgColor, _bgColor);
 				createUI_10_ImageSize(_containerFolder);
 			}
 
@@ -243,6 +263,7 @@ public class PhotoDirectoryView extends ViewPart {
 			_containerImages.setLayout(new FillLayout());
 			{
 				_picDirImages.createUI(_containerImages);
+				_picDirImages.setColor(_fgColor, _bgColor);
 			}
 
 			// master/detail form
@@ -278,6 +299,9 @@ public class PhotoDirectoryView extends ViewPart {
 
 	@Override
 	public void dispose() {
+
+		_fgColor.dispose();
+		_bgColor.dispose();
 
 		_picDirImages.dispose();
 
@@ -315,6 +339,9 @@ public class PhotoDirectoryView extends ViewPart {
 
 		_containerMasterDetail.setViewerWidth(Util.getStateInt(_state, STATE_TREE_WIDTH, 200));
 
+		/*
+		 * thumbnail size
+		 */
 		final int stateSize = Util.getStateInt(_state, STATE_THUMB_IMAGE_SIZE, PhotoManager.THUMBNAIL_DEFAULT_SIZE);
 
 		int thumbSize = -1;
@@ -339,11 +366,24 @@ public class PhotoDirectoryView extends ViewPart {
 
 	private void saveState() {
 
+		if (_containerFolder.isDisposed()) {
+			// this happened
+			return;
+		}
+
+		// keep width of the dir folder view in the master detail container
 		final Tree tree = _picDirFolder.getTree();
 		if (tree != null) {
 			_state.put(STATE_TREE_WIDTH, tree.getSize().x);
 		}
 
+		// selected folder
+		final File selectedFolder = _picDirFolder.getSelectedFolder();
+		if (selectedFolder != null) {
+			_state.put(STATE_SELECTED_FOLDER, selectedFolder.getAbsolutePath());
+		}
+
+		// thumbnail size
 		final int sizeSelection = _scaleThumbnailSize.getSelection();
 		final int thumbnailSize = PhotoManager.THUMBNAIL_SIZES[sizeSelection / 10];
 

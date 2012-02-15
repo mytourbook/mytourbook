@@ -180,7 +180,7 @@ public class PrefPagePhoto extends PreferencePage implements IWorkbenchPreferenc
 			GridDataFactory.fillDefaults() //
 					.align(SWT.BEGINNING, SWT.FILL)
 					.applyTo(_spinnerNumberOfImages);
-			_spinnerNumberOfImages.setMinimum(10);
+			_spinnerNumberOfImages.setMinimum(0);
 			_spinnerNumberOfImages.setMaximum(Integer.MAX_VALUE);
 			_spinnerNumberOfImages.addMouseWheelListener(new MouseWheelListener() {
 				public void mouseScrolled(final MouseEvent event) {
@@ -251,7 +251,7 @@ public class PrefPagePhoto extends PreferencePage implements IWorkbenchPreferenc
 		final Display display = Display.getCurrent();
 		final ArrayList<Image> imageHandels = new ArrayList<Image>();
 		final int[] imageNo = { 0 };
-		final int maxTest = 10000;
+		final int maxTest = 50000;
 
 		BusyIndicator.showWhile(display, new Runnable() {
 			public void run() {

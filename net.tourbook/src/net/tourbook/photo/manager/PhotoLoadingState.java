@@ -28,8 +28,13 @@ public enum PhotoLoadingState {
 	IMAGE_HAS_A_LOADING_ERROR,
 
 	/**
-	 * Imas is currently in the loading queue
+	 * Image is currently in the loading queue
 	 */
-	IMAGE_IS_BEING_LOADED
+	IMAGE_IS_IN_LOADING_QUEUE,
+
+	/**
+	 * Image is currently being loaded
+	 */
+	IMAGE_IS_BEING_LOADED,
 
 }

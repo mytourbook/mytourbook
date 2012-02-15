@@ -112,7 +112,7 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 			// draw image
 
 			/*
-			 * exception can occure becaus the image could be disposed before it is drawn
+			 * exception can occure because the image could be disposed before it is drawn
 			 */
 			try {
 

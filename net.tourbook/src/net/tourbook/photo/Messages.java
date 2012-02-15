@@ -3,7 +3,7 @@ package net.tourbook.photo;
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
-	private static final String	BUNDLE_NAME	= "net.tourbook.photo.messages";		//$NON-NLS-1$
+	private static final String	BUNDLE_NAME	= "net.tourbook.photo.messages";				//$NON-NLS-1$
 
 	public static String		ColumnFactory_Photo_Altitude;
 	public static String		ColumnFactory_Photo_Altitude_Tooltip;
@@ -72,27 +72,27 @@ public class Messages extends NLS {
 	public static String		simulate_Delete_text;
 	public static String		error_FailedLaunch_message;
 
-	public static String	PrefPage_Photo_Button_GetNumberOfImages;
+	public static String	Pic_Dir_Label_FolderIsNotSelected;
 
-	public static String	PrefPage_Photo_Dialog_MaxHandle_CreatedImagesBeforeError;
+	public static String		Pic_Dir_Label_Loading;
 
-	public static String	PrefPage_Photo_Dialog_MaxHandle_NoError;
+	public static String	Pic_Dir_Status_Loaded;
 
-	public static String	PrefPage_Photo_Dialog_MaxHandle_Title;
+	public static String	Pic_Dir_Status_Reading;
 
-	public static String	PrefPage_Photo_Error_ThumbnailLocation;
-
-	public static String	PrefPage_Photo_Group_ThumbnailCacheLocation;
-
-	public static String	PrefPage_Photo_Group_ThumbnailCacheSize;
-
-	public static String	PrefPage_Photo_Label_NumberOfImages;
-
-	public static String	PrefPage_Photo_Label_ThumbnailCacheSizeInfo;
-
-	public static String	PrefPage_Photo_Label_ThumbnailLocation;
-
-	public static String	PrefPage_Photo_Label_UseDefaultThumbnailLocation;
+	public static String		PrefPage_Photo_Button_GetNumberOfImages;
+	public static String		PrefPage_Photo_Dialog_MaxHandle_CreatedImagesBeforeError;
+	public static String		PrefPage_Photo_Dialog_MaxHandle_NoError;
+	public static String		PrefPage_Photo_Dialog_MaxHandle_Title;
+	public static String		PrefPage_Photo_Dialog_ResizeCache_Message;
+	public static String		PrefPage_Photo_Dialog_ResizeCache_Title;
+	public static String		PrefPage_Photo_Error_ThumbnailLocation;
+	public static String		PrefPage_Photo_Group_ThumbnailCacheLocation;
+	public static String		PrefPage_Photo_Group_ThumbnailCacheSize;
+	public static String		PrefPage_Photo_Label_NumberOfImages;
+	public static String		PrefPage_Photo_Label_ThumbnailCacheSizeInfo;
+	public static String		PrefPage_Photo_Label_ThumbnailLocation;
+	public static String		PrefPage_Photo_Label_UseDefaultThumbnailLocation;
 
 	static {
 		// initialize resource bundle

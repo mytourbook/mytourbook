@@ -24,7 +24,7 @@ import com.mchange.v1.util.ArrayUtils;
  * Original implementation: org.sharemedia.services.impl.imagemanager.WidgetImageCache
  * <p>
  */
-public class PhotoImageCache_DISABLED {
+public class PhotoImageCache_org_sharemedia {
 
 	private static final int		EXPIRED					= 1000 * 20;
 	public static final int			THUMBNAIL_SIZE			= 160;
@@ -42,7 +42,7 @@ public class PhotoImageCache_DISABLED {
 	 */
 	public static int				MAX_IMAGE_QUALITY		= 4;
 
-	private static PhotoImageCache_DISABLED	_instance;
+	private static PhotoImageCache_org_sharemedia	_instance;
 
 	private Image[]					_images;
 	private Photo[]					_photos;
@@ -52,7 +52,7 @@ public class PhotoImageCache_DISABLED {
 	private int						_lastIndex				= 0;
 	private int						_maxSize;
 
-	private PhotoImageCache_DISABLED() {
+	private PhotoImageCache_org_sharemedia() {
 
 		final int maxSize = 50;
 
@@ -70,10 +70,10 @@ public class PhotoImageCache_DISABLED {
 		}
 	}
 
-	public static PhotoImageCache_DISABLED getInstance() {
+	public static PhotoImageCache_org_sharemedia getInstance() {
 
 		if (_instance == null) {
-			_instance = new PhotoImageCache_DISABLED();
+			_instance = new PhotoImageCache_org_sharemedia();
 		}
 
 		return _instance;

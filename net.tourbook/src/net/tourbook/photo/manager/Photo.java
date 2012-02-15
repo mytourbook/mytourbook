@@ -347,7 +347,8 @@ public class Photo {
 
 	/**
 	 * @param imageQuality
-	 * @return Returns an image key which can be used to get images from an image cache
+	 * @return Returns an image key which can be used to get images from an image cache. This key is
+	 *         a MD5 hash from the full image file path and the image quality.
 	 */
 	public String getImageKey(final int imageQuality) {
 		return _imageKeys[imageQuality];
@@ -358,10 +359,11 @@ public class Photo {
 	}
 
 	/**
+	 * @param imageQuality
 	 * @return Returns the loading state for each photo quality
 	 */
-	public PhotoLoadingState[] getLoadingState() {
-		return _photoLoadingState;
+	public PhotoLoadingState getLoadingState(final int imageQuality) {
+		return _photoLoadingState[imageQuality];
 	}
 
 	public double getLongitude() {

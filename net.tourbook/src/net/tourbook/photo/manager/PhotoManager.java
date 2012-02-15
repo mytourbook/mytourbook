@@ -22,6 +22,8 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import org.eclipse.nebula.widgets.gallery.GalleryItem;
+
 public class PhotoManager {
 
 	public static final int											THUMBNAIL_DEFAULT_SIZE	= 160;
@@ -30,7 +32,7 @@ public class PhotoManager {
 	
 	public static final int[]										THUMBNAIL_SIZES = new int[]
 			{
-				30, 40, 50, 60, 70, 80, 90, 100, 120, 140, THUMBNAIL_DEFAULT_SIZE, 200, 250, 300, 400, 500, 600
+				50, 60, 70, 80, 90, 100, 120, 140, THUMBNAIL_DEFAULT_SIZE, 200, 250, 300, 400, 500, 600
 			};
 	
 	public static int[]												IMAGE_SIZE = { THUMBNAIL_DEFAULT_SIZE, 600, 999999 };
@@ -51,7 +53,7 @@ public class PhotoManager {
 
 	static {
 
-		final int cpuCores = 4;
+		final int cpuCores = 2;
 
 		final ThreadFactory threadFactory = new ThreadFactory() {
 
@@ -77,20 +79,32 @@ public class PhotoManager {
 //		AsyncScalr.getService();
 	}
 
-	/**
-	 * Removes LIFO item from the queue and loads the image
-	 */
-	private static final class LoadingTask implements Runnable {
+	public static void putImageInLoadingQueue(	final GalleryItem galleryItem,
+												final Photo photo,
+												final int imageQuality,
+												final ILoadCallBack imageLoadCallback) {
 
-		@Override
-		public void run() {
+		// set state
+		photo.setLoadingState(PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE, imageQuality);
 
-			final PhotoImageLoaderItem loadingItem = _waitingQueue.pollLast();
+		// add loading item into the waiting queue
+		_waitingQueue.add(new PhotoImageLoaderItem(//
+				galleryItem,
+				photo,
+				imageQuality,
+				imageLoadCallback));
 
-			if (loadingItem != null) {
-				loadingItem.loadImage();
+		_executorService.submit(new Runnable() {
+			public void run() {
+
+				// get last added loader itme
+				final PhotoImageLoaderItem loadingItem = _waitingQueue.pollLast();
+
+				if (loadingItem != null) {
+					loadingItem.loadImage();
+				}
 			}
-		}
+		});
 	}
 
 // Original in org.sharemedia.services.impl.mediadownload.MediaDownload
@@ -141,51 +155,12 @@ public class PhotoManager {
 //		}
 //	}
 
-	public static void loadImage(final Photo photo, final int imageQuality, final ILoadCallBack imageLoadCallback) {
-
-//		final Image image = null;
-
-		/*
-		 * check if image is available in the thumbnail store
-		 */
-//		final Image image = _thumbnailStore.getImage(photo, imageQuality);
-//		if (image != null) {
-//			loadCallBack.imageIsLoaded();
-//			return;
-//		}
-
-		/*
-		 * check if original image should be loaded
-		 */
-//		if (imageQuality == PhotoImageCache.IMAGE_QUALITY_ORIGINAL) {
-//
-//		}
-		final PhotoImageLoaderItem loadingCallback = new PhotoImageLoaderItem(photo, imageQuality, imageLoadCallback);
-
-		photo.getLoadingState()[imageQuality] = PhotoLoadingState.IMAGE_IS_BEING_LOADED;
-
-		/*
-		 * removes existing loader item if exists so that it can be queued on top
-		 */
-//		_waitingQueue.remove(loadingCallback);
-
-		_waitingQueue.add(loadingCallback);
-
-		_executorService.submit(new LoadingTask());
-	}
-
 	/**
 	 * Remove all items in the image loading queue.
 	 */
 	public synchronized static void stopImageLoading() {
 
-//		final int queueSize = _waitingQueue.size();
-//
-//		if (queueSize == 0) {
-//			return;
-//		}
-
-		final Object[] photosInQueue = _waitingQueue.toArray();
+		final Object[] queuedPhotoImageLoaderItems = _waitingQueue.toArray();
 
 		/*
 		 * terminate all submitted tasks, the executor shutdownNow() creates
@@ -201,15 +176,16 @@ public class PhotoManager {
 		_waitingQueue.clear();
 
 		// reset loading state for not loaded images
-		for (final Object object : photosInQueue) {
+		for (final Object object : queuedPhotoImageLoaderItems) {
 
 			if (object == null) {
-				// item can already be removed
+				// queue item can already be removed
 				continue;
 			}
 
 			final PhotoImageLoaderItem photoImageLoaderItem = (PhotoImageLoaderItem) object;
-			photoImageLoaderItem.photo.getLoadingState()[photoImageLoaderItem.imageQuality] = PhotoLoadingState.UNDEFINED;
+
+			photoImageLoaderItem.photo.setLoadingState(PhotoLoadingState.UNDEFINED, photoImageLoaderItem.imageQuality);
 		}
 	}
 
