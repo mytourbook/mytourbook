@@ -15,7 +15,11 @@
  *******************************************************************************/
 package net.tourbook.photo.manager;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.concurrent.locks.ReentrantLock;
+
+import javax.imageio.ImageIO;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -33,13 +37,13 @@ import org.eclipse.swt.graphics.ImageLoader;
 
 public class ThumbnailStore {
 
-	private static final String		THUMBNAIL_STORE_OS_PATH	= "thumbnail-store";								//$NON-NLS-1$
+	private static final String			THUMBNAIL_STORE_OS_PATH	= "thumbnail-store";								//$NON-NLS-1$
 
-	private static IPreferenceStore	_prefStore				= TourbookPlugin.getDefault().getPreferenceStore();
+	private static IPreferenceStore		_prefStore				= TourbookPlugin.getDefault().getPreferenceStore();
 
-	private static IPath			_storePath				= getThumbnailStorePath();
+	private static IPath				_storePath				= getThumbnailStorePath();
 
-//	private static final ReentrantLock	SAVE_LOCK				= new ReentrantLock();
+	private static final ReentrantLock	SAVE_LOCK				= new ReentrantLock();
 
 //			PhotoManager.IMAGE_QUALITY_600
 
@@ -93,6 +97,39 @@ public class ThumbnailStore {
 //
 //		return null;
 //	}
+
+	private static IPath checkPath(final IPath storeImageFilePath) {
+
+		final IPath imagePathWithoutExt = storeImageFilePath.removeFileExtension();
+
+		// check store sub directory
+		final File storeSubDir = imagePathWithoutExt.removeLastSegments(1).toFile();
+		if (storeSubDir.exists() == false) {
+
+			SAVE_LOCK.lock();
+
+			try {
+				// check again
+				if (storeSubDir.exists() == false) {
+
+					// create store sub directory
+
+					if (storeSubDir.mkdirs() == false) {
+
+						StatusUtil.log(NLS.bind(//
+								"Thumbnail image path \"{0}\" cannot be created", //$NON-NLS-1$
+								storeSubDir.getAbsolutePath()), new Exception());
+
+						return null;
+					}
+				}
+
+			} finally {
+				SAVE_LOCK.unlock();
+			}
+		}
+		return imagePathWithoutExt;
+	}
 
 	static synchronized IPath getStoreImagePath(final Photo photo, final int imageQuality) {
 
@@ -179,25 +216,32 @@ public class ThumbnailStore {
 		return tnFolderPath.addTrailingSeparator();
 	}
 
-	static void saveImage(final Image thumbnailImage, final IPath storeImageFilePath) {
+	static void saveImageAWT(final BufferedImage scaledImg, final IPath storeImageFilePath) {
 
 		try {
 
-			final IPath imagePathWithoutExt = storeImageFilePath.removeFileExtension();
+			final IPath imagePathWithoutExt = checkPath(storeImageFilePath);
+			if (imagePathWithoutExt == null) {
+				return;
+			}
 
-			// check store sub directory
-			final File storeSubDir = imagePathWithoutExt.removeLastSegments(1).toFile();
-			if (storeSubDir.exists() == false) {
+			ImageIO.write(scaledImg, "jpg", new File(storeImageFilePath.toOSString()));
 
-				// create store sub directory
+		} catch (final Exception e) {
 
-				if (storeSubDir.mkdirs() == false) {
+			StatusUtil.log(NLS.bind(//
+					"Cannot save thumbnail image: \"{0}\"", //$NON-NLS-1$
+					storeImageFilePath.toOSString()), new Exception());
+		}
+	}
 
-					StatusUtil.log(NLS.bind(//
-							"Thumbnail image path \"{0}\" cannot be created", //$NON-NLS-1$
-							storeSubDir.getAbsolutePath()), new Exception());
-					return;
-				}
+	static void saveImageSWT(final Image thumbnailImage, final IPath storeImageFilePath) {
+
+		try {
+
+			final IPath imagePathWithoutExt = checkPath(storeImageFilePath);
+			if (imagePathWithoutExt == null) {
+				return;
 			}
 
 			final ImageLoader imageLoader = new ImageLoader();

@@ -204,7 +204,6 @@ public class PicDirImages {
 		private GalleryItem	__galleryItem;
 
 		/**
-		 * @param gallery
 		 * @param galleryItem
 		 */
 		public LoadImageCallback(final GalleryItem galleryItem) {
@@ -213,13 +212,41 @@ public class PicDirImages {
 		}
 
 		@Override
-		public void callBackImageIsLoaded(final Rectangle galleryItemBounds) {
+		public void callBackImageIsLoaded() {
 
 			Display.getDefault().syncExec(new Runnable() {
+
+				private boolean isImageVisible(final Rectangle galleryItemBounds) {
+
+					// check if the image is still visible
+
+					final int itemTop = galleryItemBounds.y;
+					final int itemBottom = itemTop + galleryItemBounds.height;
+
+					final PicDirGallery gallery = (PicDirGallery) _gallery;
+					final int translate = gallery.getTranslate();
+					final Rectangle clientArea = gallery.getClientArea();
+					final int visibleBottom = translate + clientArea.height;
+
+					if (itemBottom < 0 || itemTop > visibleBottom) {
+
+						// item is not visible
+
+						return false;
+					}
+
+					return true;
+				}
 
 				public void run() {
 
 					if (__galleryItem.isDisposed() || _gallery.isDisposed()) {
+						return;
+					}
+
+					final Rectangle galleryItemBounds = __galleryItem.getBounds();
+
+					if (isImageVisible(galleryItemBounds) == false) {
 						return;
 					}
 
@@ -354,7 +381,7 @@ public class PicDirImages {
 		 */
 		_itemRenderer = new PhotoRenderer();
 		final PhotoRenderer photoRenderer = (PhotoRenderer) _itemRenderer;
-		photoRenderer.setShowLabels(false);
+		photoRenderer.setShowLabels(true);
 //		photoRenderer.setDropShadows(true);
 //		photoRenderer.setDropShadowsSize(5);
 		_gallery.setItemRenderer(_itemRenderer);

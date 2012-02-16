@@ -89,23 +89,23 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 			gc.setBackground(getBackgroundColor());
 		}
 
-		gc.fillRoundRectangle(//
-				devXGallery,
-				devYGallery,
-				galleryItemWidth,
-				useableHeight,
-				roundingArc,
-				roundingArc);
-
-		if (isText) {
-			gc.fillRoundRectangle(
-					devXGallery,
-					devYGallery + galleryItemHeight - fontHeight,
-					galleryItemWidth,
-					fontHeight,
-					roundingArc,
-					roundingArc);
-		}
+//		gc.fillRoundRectangle(//
+//				devXGallery,
+//				devYGallery,
+//				galleryItemWidth,
+//				useableHeight,
+//				roundingArc,
+//				roundingArc);
+//
+//		if (isText) {
+//			gc.fillRoundRectangle(
+//					devXGallery,
+//					devYGallery + galleryItemHeight - fontHeight,
+//					galleryItemWidth,
+//					fontHeight,
+//					roundingArc,
+//					roundingArc);
+//		}
 
 		if (photoImage != null && photoImage.isDisposed() == false) {
 
@@ -126,8 +126,12 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 						galleryItemWidth - imageBorderWidth,
 						useableHeight - imageBorderWidth);
 
-				final int xShift = (galleryItemWidth - size.x) >> 1;
-				final int yShift = (useableHeight - size.y) >> 1;
+				final int xShiftSrc = galleryItemWidth - size.x;
+				final int yShiftSrc = useableHeight - size.y;
+
+				final int xShift = xShiftSrc >> 1;
+				final int yShift = yShiftSrc >> 1;
+
 				// Draw image
 				if (size.x > 0 && size.y > 0) {
 
@@ -151,6 +155,45 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 
 			drawText(gc, devXGallery, devYGallery, photo, false);
 		}
+
+		// Draw label
+		if (galleryItem.getText() != null && isShowLabels()) {
+			// Set colors
+			if (selected) {
+				// Selected : use selection colors.
+				gc.setForeground(getSelectionForegroundColor());
+				gc.setBackground(getSelectionBackgroundColor());
+			} else {
+				// Not selected, use item values or defaults.
+
+				// Background
+//				if (itemBackgroundColor != null) {
+//					gc.setBackground(itemBackgroundColor);
+//				} else {
+//					gc.setBackground(getBackgroundColor());
+//				}
+				gc.setBackground(getBackgroundColor());
+
+				// Foreground
+//				if (itemForegroundColor != null) {
+//					gc.setForeground(itemForegroundColor);
+//				} else {
+//					gc.setForeground(getForegroundColor());
+//				}
+				gc.setForeground(getForegroundColor());
+			}
+
+			// Create label
+			final String text = RendererHelper.createLabel(galleryItem.getText(), gc, galleryItemWidth - 10);
+
+			// Center text
+			final int textWidth = gc.textExtent(text).x;
+			final int textxShift = (galleryItemWidth - (textWidth > galleryItemWidth ? galleryItemWidth : textWidth)) >> 1;
+
+			// Draw
+			gc.drawText(text, devXGallery + textxShift, devYGallery + galleryItemHeight - fontHeight, true);
+		}
+
 	}
 
 	private void drawText(final GC gc, final int x, final int y, final Photo photo, final boolean isError) {

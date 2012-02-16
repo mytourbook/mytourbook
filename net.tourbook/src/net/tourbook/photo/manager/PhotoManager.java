@@ -27,12 +27,14 @@ import org.eclipse.nebula.widgets.gallery.GalleryItem;
 public class PhotoManager {
 
 	public static final int											THUMBNAIL_DEFAULT_SIZE	= 160;
+//	public static final int											THUMBNAIL_DEFAULT_SIZE	= 50;
 
 // SET_FORMATTING_OFF
 	
 	public static final int[]										THUMBNAIL_SIZES = new int[]
 			{
 				50, 60, 70, 80, 90, 100, 120, 140, THUMBNAIL_DEFAULT_SIZE, 200, 250, 300, 400, 500, 600
+//				THUMBNAIL_DEFAULT_SIZE, 60, 70, 80, 90, 100, 120, 140, 160, 200, 250, 300, 400, 500, 600
 			};
 	
 	public static int[]												IMAGE_SIZE = { THUMBNAIL_DEFAULT_SIZE, 600, 999999 };
@@ -53,7 +55,12 @@ public class PhotoManager {
 
 	static {
 
-		final int cpuCores = 2;
+		int processors = Runtime.getRuntime().availableProcessors() - 2;
+		processors = Math.max(processors, 1);
+
+		processors = 4;
+
+		System.out.println("Number of processors: " + processors);
 
 		final ThreadFactory threadFactory = new ThreadFactory() {
 
@@ -72,7 +79,7 @@ public class PhotoManager {
 			}
 		};
 
-		_executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(cpuCores, threadFactory);
+		_executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(processors, threadFactory);
 
 		// setup image scaler, set number of max threads
 //		System.setProperty("imgscalr.async.threadCount", Integer.toString(cpuCores));
@@ -170,7 +177,7 @@ public class PhotoManager {
 		final BlockingQueue<Runnable> taskQueue = _executorService.getQueue();
 		for (final Runnable runnable : taskQueue) {
 			final FutureTask<?> task = (FutureTask<?>) runnable;
-			task.cancel(true);
+			task.cancel(false);
 		}
 
 		_waitingQueue.clear();

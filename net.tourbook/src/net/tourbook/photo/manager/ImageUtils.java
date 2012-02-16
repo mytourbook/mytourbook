@@ -16,6 +16,7 @@
 package net.tourbook.photo.manager;
 
 import java.awt.Point;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 
 import org.eclipse.swt.SWT;
@@ -98,6 +99,10 @@ public class ImageUtils {
 		return !(bounds.width == width && bounds.height == height);
 	}
 
+	public static boolean isResizeRequiredAWT(final BufferedImage img, final int width, final int height) {
+		return !(img.getWidth() == width && img.getHeight() == height);
+	}
+
 	/**
 	 * Returns a new scaled image. new Image must be disposed after use.
 	 * 
@@ -109,6 +114,17 @@ public class ImageUtils {
 	public static Image resize(final Image image, final int width, final int height) {
 		return resize(image, width, height, SWT.ON, SWT.HIGH);
 	}
+
+//	public Image resize(int w, int h, Image img) {
+//		Image newImage = new Image(Display.getDefault(), w, h);
+//		GC gc = new GC(newImage);
+//		gc.setAntialias(SWT.ON);
+//		gc.setInterpolation(SWT.HIGH);
+//		gc.drawImage(img, 0, 0, img.getBounds().width, img.getBounds().height, 0, 0, w, h);
+//		gc.dispose();
+//		img.dispose();
+//		return newImage;
+//	}
 
 	public static Image resize(	final Image image,
 								final int width,
@@ -136,15 +152,15 @@ public class ImageUtils {
 
 			final Rectangle originalImageBounds = image.getBounds();
 
-			System.out.println("resize()\tfrom  "
-					+ originalImageBounds.width
-					+ "\t"
-					+ originalImageBounds.height
-					+ "\tto  "
-					+ width
-					+ "\t"
-					+ height);
-			// TODO remove SYSTEM.OUT.PRINTLN
+//			System.out.println("resize()\tfrom  "
+//					+ originalImageBounds.width
+//					+ "\t"
+//					+ originalImageBounds.height
+//					+ "\tto  "
+//					+ width
+//					+ "\t"
+//					+ height);
+//			// TODO remove SYSTEM.OUT.PRINTLN
 
 			gc.drawImage(image, //
 					0,
@@ -161,17 +177,6 @@ public class ImageUtils {
 
 		return scaledImage;
 	}
-
-//	public Image resize(int w, int h, Image img) {
-//		Image newImage = new Image(Display.getDefault(), w, h);
-//		GC gc = new GC(newImage);
-//		gc.setAntialias(SWT.ON);
-//		gc.setInterpolation(SWT.HIGH);
-//		gc.drawImage(img, 0, 0, img.getBounds().width, img.getBounds().height, 0, 0, w, h);
-//		gc.dispose();
-//		img.dispose();
-//		return newImage;
-//	}
 
 	public static ImageData resize(	final ImageData imageData,
 									final int width,

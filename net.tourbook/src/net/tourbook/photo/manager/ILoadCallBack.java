@@ -15,10 +15,9 @@
  *******************************************************************************/
 package net.tourbook.photo.manager;
 
-import org.eclipse.swt.graphics.Rectangle;
 
 public interface ILoadCallBack {
 
-	void callBackImageIsLoaded(Rectangle galleryItemBounds);
+	void callBackImageIsLoaded();
 
 }

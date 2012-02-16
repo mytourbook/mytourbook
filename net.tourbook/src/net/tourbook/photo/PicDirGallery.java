@@ -16,6 +16,10 @@
 package net.tourbook.photo;
 
 import org.eclipse.nebula.widgets.gallery.Gallery;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 
 /**
@@ -23,12 +27,32 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class PicDirGallery extends Gallery {
 
+	private Rectangle	_clientArea;
+	private boolean		_isVertical;
+
 	public PicDirGallery(final Composite parent, final int style) {
 		super(parent, style);
+
+		_isVertical = (style & SWT.V_SCROLL) > 0;
+
+		addControlListener(new ControlAdapter() {
+			@Override
+			public void controlResized(final ControlEvent e) {
+				_clientArea = getClientArea();
+			}
+		});
+	}
+
+	public Rectangle getClientAreaGallery() {
+		return _clientArea;
 	}
 
 	public int getTranslate() {
 		return translate;
+	}
+
+	public boolean isVerticalGallery() {
+		return _isVertical;
 	}
 
 }
