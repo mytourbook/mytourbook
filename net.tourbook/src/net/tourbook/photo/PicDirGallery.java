@@ -15,7 +15,8 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
-import org.eclipse.nebula.widgets.gallery.Gallery;
+import net.tourbook.photo.gallery.GalleryMT;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -25,7 +26,7 @@ import org.eclipse.swt.widgets.Composite;
 /**
  * Wrapper for the {@link Gallery} to get access to protected fields.
  */
-public class PicDirGallery extends Gallery {
+public class PicDirGallery extends GalleryMT {
 
 	private Rectangle	_clientArea;
 	private boolean		_isVertical;

@@ -21,8 +21,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.dawb.common.util.list.SortNatural;
-
 /**
  * @author fcp94556
  *
@@ -44,12 +42,14 @@ public class SortingUtils {
 	 */
 	public static final Comparator<File> DATE_SORT = new Comparator<File>() {
 		@Override
-		public int compare(File one, File two) {
+		public int compare(final File one, final File two) {
 			final long diff = one.lastModified()-two.lastModified();
 			if (diff==0) {
 				return NATURAL_SORT.compare(one, two);
 			}
-			if (diff>0) return (int)two.lastModified();
+			if (diff>0) {
+				return (int)two.lastModified();
+			}
 			return -1;
 		}
 	};
@@ -59,12 +59,14 @@ public class SortingUtils {
 	 */
 	public static final Comparator<File> DATE_SORT_BACKWARDS = new Comparator<File>() {
 		@Override
-		public int compare(File one, File two) {
+		public int compare(final File one, final File two) {
 			final long diff = two.lastModified()-one.lastModified();
 			if (diff==0) {
 				return NATURAL_SORT.compare(one, two);
 			}
-			if (diff>0) return (int)one.lastModified();
+			if (diff>0) {
+				return (int)one.lastModified();
+			}
 			return -1;
 		}
 	};
@@ -72,7 +74,7 @@ public class SortingUtils {
 
 	public static final Comparator<File> DEFAULT_COMPARATOR = new Comparator<File>() {
 			@Override
-			public int compare(File one, File two) {
+			public int compare(final File one, final File two) {
 				return one.compareTo(two);
 			}
 		};
@@ -96,21 +98,21 @@ public class SortingUtils {
 	
 	/**
 	 * @param dir
-	 * @param fileFilter 
-	 * @param comp
-	 * @return  List<File>
+	 * @param fileFilter
+	 * @return List<File> 
 	 */
-	public static List<File> getSortedFileList(final File dir, FileFilter fileFilter, final Comparator<File> comp) {  
-	    return getSortedFileList(dir.listFiles(fileFilter), comp);
+	public static List<File> getSortedFileList(final File dir, final FileFilter fileFilter) {
+	    return getSortedFileList(dir.listFiles(fileFilter), DEFAULT_COMPARATOR);
 	}
 	
 	/**
 	 * @param dir
-	 * @param fileFilter
-	 * @return List<File> 
+	 * @param fileFilter 
+	 * @param comp
+	 * @return  List<File>
 	 */
-	public static List<File> getSortedFileList(File dir, FileFilter fileFilter) {
-	    return getSortedFileList(dir.listFiles(fileFilter), DEFAULT_COMPARATOR);
+	public static List<File> getSortedFileList(final File dir, final FileFilter fileFilter, final Comparator<File> comp) {  
+	    return getSortedFileList(dir.listFiles(fileFilter), comp);
 	}
 
 	/**
@@ -119,7 +121,9 @@ public class SortingUtils {
 	 */
 	public static List<File> getSortedFileList(final File[] fa, final Comparator<File> comp) {
 	    
-	    if (fa == null || fa.length<1) return null;
+	    if (fa == null || fa.length<1) {
+			return null;
+		}
 	    
 	    final List<File> files = new ArrayList<File>(fa.length);
 	    files.addAll(Arrays.asList(fa));
@@ -128,12 +132,16 @@ public class SortingUtils {
 	    return files;
 	}
 
-	public static void removeIgnoredNames(Collection<String> sets, Collection<Pattern> patterns) {
-		if (patterns==null) return;
-		if (sets==null)     return;
-		for (Iterator<String> it = sets.iterator(); it.hasNext();) {
+	public static void removeIgnoredNames(final Collection<String> sets, final Collection<Pattern> patterns) {
+		if (patterns==null) {
+			return;
+		}
+		if (sets==null) {
+			return;
+		}
+		for (final Iterator<String> it = sets.iterator(); it.hasNext();) {
 			final String name = it.next();
-			PATTERN_LOOP: for (Pattern pattern : patterns) {
+			PATTERN_LOOP: for (final Pattern pattern : patterns) {
 				if (pattern.matcher(name).matches()) {
 					it.remove();
 					break PATTERN_LOOP;

@@ -15,13 +15,13 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
+import net.tourbook.photo.gallery.DefaultGalleryItemRenderer;
+import net.tourbook.photo.gallery.GalleryMTItem;
+import net.tourbook.photo.gallery.RendererHelper;
 import net.tourbook.photo.manager.Photo;
 import net.tourbook.photo.manager.PhotoImageCache;
 import net.tourbook.photo.manager.PhotoManager;
 
-import org.eclipse.nebula.widgets.gallery.DefaultGalleryItemRenderer;
-import org.eclipse.nebula.widgets.gallery.GalleryItem;
-import org.eclipse.nebula.widgets.gallery.RendererHelper;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -39,7 +39,7 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 
 	@Override
 	public void draw(	final GC gc,
-						final GalleryItem galleryItem,
+						final GalleryMTItem galleryItem,
 						final int index,
 						final int devXGallery,
 						final int devYGallery,

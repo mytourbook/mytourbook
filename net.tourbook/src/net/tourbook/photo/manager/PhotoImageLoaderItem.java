@@ -23,10 +23,10 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.imageio.ImageIO;
 
 import net.tourbook.photo.PicDirGallery;
+import net.tourbook.photo.gallery.GalleryMTItem;
 import net.tourbook.util.StatusUtil;
 
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.nebula.widgets.gallery.GalleryItem;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
@@ -38,7 +38,7 @@ public class PhotoImageLoaderItem {
 	private static final ReentrantLock	RESIZE_LOCK		= new ReentrantLock();
 
 	Photo								photo;
-	private GalleryItem					_galleryItem;
+	private GalleryMTItem				_galleryItem;
 	int									galleryIndex;
 	int									imageQuality;
 	private String						_imageKey;
@@ -49,7 +49,7 @@ public class PhotoImageLoaderItem {
 
 	private static int					_checkCounter	= 0;
 
-	public PhotoImageLoaderItem(final GalleryItem galleryItem,
+	public PhotoImageLoaderItem(final GalleryMTItem galleryItem,
 								final Photo photo,
 								final int imageQuality,
 								final ILoadCallBack loadCallBack) {
@@ -399,8 +399,8 @@ public class PhotoImageLoaderItem {
 				/*
 				 * check if photo is available in the thumbnail store
 				 */
-				final Image storeImage = getStoreImageAWT(photo, imageQuality);
-//				final Image storeImage = getStoreImageSWT(photo, imageQuality);
+//				final Image storeImage = getStoreImageAWT(photo, imageQuality);
+				final Image storeImage = getStoreImageSWT(photo, imageQuality);
 
 				if (storeImage == null) {
 					throw new Exception();

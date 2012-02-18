@@ -20,6 +20,10 @@ import java.io.FileFilter;
 import java.util.Comparator;
 import java.util.List;
 
+import net.tourbook.photo.gallery.AbstractGalleryItemRenderer;
+import net.tourbook.photo.gallery.AbstractGridGroupRenderer;
+import net.tourbook.photo.gallery.GalleryMT;
+import net.tourbook.photo.gallery.GalleryMTItem;
 import net.tourbook.photo.manager.ILoadCallBack;
 import net.tourbook.photo.manager.Photo;
 import net.tourbook.photo.manager.PhotoImageCache;
@@ -30,10 +34,6 @@ import net.tourbook.ui.UI;
 import org.apache.commons.sanselan.Sanselan;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.nebula.widgets.gallery.AbstractGalleryItemRenderer;
-import org.eclipse.nebula.widgets.gallery.AbstractGridGroupRenderer;
-import org.eclipse.nebula.widgets.gallery.Gallery;
-import org.eclipse.nebula.widgets.gallery.GalleryItem;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
@@ -73,7 +73,7 @@ public class PicDirImages {
 	 */
 	private Display							_display;
 	private Composite						_uiContainer;
-	private Gallery							_gallery;
+	private GalleryMT						_gallery;
 	private CLabel							_lblStatusInfo;
 	private ProgressBar						_progbarLoading;
 
@@ -201,12 +201,12 @@ public class PicDirImages {
 
 	private class LoadImageCallback implements ILoadCallBack {
 
-		private GalleryItem	__galleryItem;
+		private GalleryMTItem	__galleryItem;
 
 		/**
 		 * @param galleryItem
 		 */
-		public LoadImageCallback(final GalleryItem galleryItem) {
+		public LoadImageCallback(final GalleryMTItem galleryItem) {
 
 			__galleryItem = galleryItem;
 		}
@@ -394,7 +394,7 @@ public class PicDirImages {
 		_gallery.setGroupRenderer(_groupRenderer);
 
 		// create root item (is needed)
-		new GalleryItem(_gallery, SWT.VIRTUAL);
+		new GalleryMTItem(_gallery, SWT.VIRTUAL);
 
 		_gallery.setItemCount(1);
 	}
@@ -454,7 +454,7 @@ public class PicDirImages {
 
 	private void onPaintItem(final Event event) {
 
-		final GalleryItem galleryItem = (GalleryItem) event.item;
+		final GalleryMTItem galleryItem = (GalleryMTItem) event.item;
 
 		if (galleryItem != null && galleryItem.getParentItem() != null) {
 
@@ -514,7 +514,7 @@ public class PicDirImages {
 
 	private void onSetData(final Event event) {
 
-		final GalleryItem galleryItem = (GalleryItem) event.item;
+		final GalleryMTItem galleryItem = (GalleryMTItem) event.item;
 
 		if (galleryItem.getParentItem() == null) {
 
@@ -530,7 +530,7 @@ public class PicDirImages {
 			 * It's an item
 			 */
 
-			final GalleryItem parentItem = galleryItem.getParentItem();
+			final GalleryMTItem parentItem = galleryItem.getParentItem();
 			final int galleryItemIndex = parentItem.indexOf(galleryItem);
 
 			final Photo photo = new Photo(_photoFiles[galleryItemIndex], galleryItemIndex);

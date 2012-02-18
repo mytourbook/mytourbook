@@ -22,7 +22,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import org.eclipse.nebula.widgets.gallery.GalleryItem;
+import net.tourbook.photo.gallery.GalleryMTItem;
 
 public class PhotoManager {
 
@@ -86,7 +86,7 @@ public class PhotoManager {
 //		AsyncScalr.getService();
 	}
 
-	public static void putImageInLoadingQueue(	final GalleryItem galleryItem,
+	public static void putImageInLoadingQueue(	final GalleryMTItem galleryItem,
 												final Photo photo,
 												final int imageQuality,
 												final ILoadCallBack imageLoadCallback) {

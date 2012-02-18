@@ -15,8 +15,9 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
-import org.eclipse.nebula.widgets.gallery.GalleryItem;
-import org.eclipse.nebula.widgets.gallery.NoGroupRenderer;
+import net.tourbook.photo.gallery.GalleryMTItem;
+import net.tourbook.photo.gallery.NoGroupRenderer;
+
 import org.eclipse.swt.graphics.GC;
 
 public class NoGroupRendererMT extends NoGroupRenderer {
@@ -24,7 +25,7 @@ public class NoGroupRendererMT extends NoGroupRenderer {
 
 	@Override
 	public void draw(	final GC gc,
-						final GalleryItem group,
+						final GalleryMTItem group,
 						final int x,
 						final int y,
 						final int clipX,
@@ -40,7 +41,7 @@ public class NoGroupRendererMT extends NoGroupRenderer {
 			for (int i = visibleIndexes.length - 1; i >= 0; i--) {
 
 				// Draw item
-				final GalleryItem galleryItem = group.getItem(visibleIndexes[i]);
+				final GalleryMTItem galleryItem = group.getItem(visibleIndexes[i]);
 
 				final boolean isSelected = group.isSelected(galleryItem);
 
