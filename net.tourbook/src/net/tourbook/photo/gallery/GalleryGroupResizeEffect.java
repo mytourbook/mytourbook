@@ -71,9 +71,9 @@ public class GalleryGroupResizeEffect extends AbstractEffect {
 
 			item.setData(DefaultGalleryGroupRenderer.DATA_ANIMATION, new Double(value));
 
-			item.getParent().updateStructuralValues(null, false);
-			item.getParent().updateScrollBarsProperties();
-			item.getParent().redraw();
+			item.getGallery().updateStructuralValues(null, false);
+			item.getGallery().updateScrollBarsProperties();
+			item.getGallery().redraw();
 
 		}
 	}

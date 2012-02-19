@@ -165,7 +165,7 @@ public abstract class AbstractGalleryItemRenderer {
 		Color backgroundColor = item.background;
 
 		if (backgroundColor == null) {
-			backgroundColor = item.getParent().getBackground();
+			backgroundColor = item.getGallery().getBackground();
 		}
 
 		return backgroundColor;
@@ -181,7 +181,7 @@ public abstract class AbstractGalleryItemRenderer {
 	protected Font getFont(final GalleryMTItem item) {
 		Font font = item.getFont(true);
 		if (font == null) {
-			font = item.getParent().getFont();
+			font = item.getGallery().getFont();
 		}
 		return font;
 	}
@@ -196,7 +196,7 @@ public abstract class AbstractGalleryItemRenderer {
 	protected Color getForeground(final GalleryMTItem item) {
 		Color foregroundColor = item.getForeground(true);
 		if (foregroundColor == null) {
-			foregroundColor = item.getParent().getForeground();
+			foregroundColor = item.getGallery().getForeground();
 		}
 
 		return foregroundColor;

@@ -108,137 +108,47 @@ public class DefaultGalleryGroupRenderer extends AbstractGridGroupRenderer {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.nebula.widgets.gallery.AbstractGalleryGroupRenderer#setGallery
-	 * (org.eclipse.nebula.widgets.gallery.Gallery)
+	 * org.eclipse.nebula.widgets.gallery.AbstractGridGroupRenderer#draw(org
+	 * .eclipse.swt.graphics.GC, org.eclipse.nebula.widgets.gallery.GalleryItem,
+	 * int, int, int, int, int, int)
 	 */
-	public void setGallery(GalleryMT gallery) {
-		super.setGallery(gallery);
+	@Override
+	public void draw(final GC gc, final GalleryMTItem group, final int x, final int y, final int clipX,
+			final int clipY, final int clipWidth, final int clipHeight) {
+		// Draw group
+		drawGroup(gc, group, x, y, clipX, clipY, clipWidth, clipHeight);
 
-		// Set defaults
-		if (titleForeground == null) {
-			// Reset defaults.
-			this.setTitleForeground(null);
-		}
+		final int groupOffset = getGroupOffset(group);
 
-		if (titleBackground == null) {
-			// Reset default gradient.
-			setTitleBackgroundGradient(null, null);
-		}
+		// Display item
+		if (isGroupExpanded(group)) {
+			int[] indexes = getVisibleItems(group, x, y, clipX, clipY,
+					clipWidth, clipHeight, groupOffset);
 
-		if (descriptionColor == null) {
-			descriptionColor = gallery.getDisplay().getSystemColor(
-					SWT.COLOR_DARK_BLUE);
-		}
-
-	}
-
-	/**
-	 * Draw group background using system default gradient or the user-defined
-	 * color.
-	 * 
-	 * @param gc
-	 * @param item
-	 *            TODO
-	 * @param x
-	 * @param y
-	 * @param width
-	 * @param height
-	 */
-	protected void drawGroupBackground(GC gc, GalleryMTItem item, int x, int y,
-			int width, int height) {
-		Color itemLocalBackground = item.getBackground(true);
-		if (!titleBackgroundGradient || itemLocalBackground != null) {
-			// User defined background
-			gc.setBackground(itemLocalBackground != null ? itemLocalBackground
-					: titleBackground);
-			gc.fillRectangle(x, y, width, height);
-		} else {
-			// Default gradient Background
-			gc.setBackground(this.titleBackground);
-			gc.setForeground(this.titleBackground2);
-			gc.fillGradientRectangle(x, y, width, height, true);
-		}
-	}
-
-	/**
-	 * Draw the toggle button.
-	 * 
-	 * @param gc
-	 * @param x
-	 * @param y
-	 * @param group
-	 */
-	protected int drawGroupToggleButton(GC gc, int x, int y, GalleryMTItem group) {
-		if (!isAlwaysExpanded()) {
-			// Toggle Button
-
-			int xShift = RendererHelper.getShift(titleHeight, 9);
-			int yShift = RendererHelper.getShift(titleHeight, 9);
-
-			int toggleX = x + xShift;
-			int toggleY = y + yShift;
-
-			gc.setBackground(gc.getDevice().getSystemColor(
-					SWT.COLOR_LIST_BACKGROUND));
-			gc.fillRectangle(toggleX, toggleY, 8, 8);
-
-			gc.setForeground(gc.getDevice().getSystemColor(
-					SWT.COLOR_WIDGET_FOREGROUND));
-			gc.drawLine(toggleX + 2, toggleY + 4, toggleX + 6, toggleY + 4);
-			if (!expanded) {
-				gc.drawLine(toggleX + 4, toggleY + 2, toggleX + 4, toggleY + 6);
+			if (fill) {
+				indexes = new int[] { indexes[0] };
 			}
-			gc.setForeground(gc.getDevice().getSystemColor(
-					SWT.COLOR_WIDGET_NORMAL_SHADOW));
-			gc.drawRectangle(toggleX, toggleY, 8, 8);
 
-			// if (isFocus()) {
-			// gc.setBackground(back);
-			// gc.setForeground(fore);
-			// gc.drawFocus(-1, -1, 11, 11);
-			// }
+			if (indexes != null && indexes.length > 0) {
+				for (int i = indexes.length - 1; i >= 0; i--) {
 
+					final boolean selected = group.isSelected(group
+							.getItem(indexes[i]));
+
+
+					drawItem(gc, indexes[i], selected, group, groupOffset);
+
+				}
+			}
 		}
-
-		return titleHeight + minMargin;
 	}
 
-	protected Rectangle getToggleButtonBounds() {
-		return new Rectangle(minMargin
-				+ RendererHelper.getShift(titleHeight, 9), RendererHelper
-				.getShift(titleHeight, 9), 9, 9);
-	}
-
-	protected int getGroupHeight(GalleryMTItem group) {
-		int groupHeight = titleHeight;
-
-		if (group.getImage() != null) {
-			Point imageSize = RendererHelper.getBestSize(group.getImage()
-					.getBounds().width, group.getImage().getBounds().height,
-					maxImageWidth, maxImageHeight);
-			groupHeight = Math.max(titleHeight, imageSize.y + 2 * minMargin);
-		}
-
-		// Ensure there is enough room to display all text.
-		int lineCount = 1;
-		if (group.getText(1) != null && !EMPTY_STRING.equals(group.getText(1))) {
-			lineCount++;
-		}
-
-		if (group.getText(2) != null && !EMPTY_STRING.equals(group.getText(2))) {
-			lineCount++;
-		}
-
-		groupHeight = Math.max(groupHeight, lineCount * (fontHeight + 2) + 2);
-
-		return groupHeight;
-	}
-
-	protected void drawGroup(GC gc, GalleryMTItem group, int x, int y, int clipX,
-			int clipY, int clipWidth, int clipHeight) {
+	protected void drawGroup(final GC gc, final GalleryMTItem group, final int x, final int y, final int clipX,
+			final int clipY, final int clipWidth, final int clipHeight) {
 		// Do not paint group if on single column and filling on.
-		if (fill)
+		if (fill) {
 			return;
+		}
 
 		imageSize = null;
 		if (group.getImage() != null) {
@@ -246,7 +156,7 @@ public class DefaultGalleryGroupRenderer extends AbstractGridGroupRenderer {
 					group.getImage().getBounds().width, group.getImage()
 							.getBounds().height, maxImageWidth, maxImageHeight);
 		}
-		int groupHeight = getGroupHeight(group);
+		final int groupHeight = getGroupHeight(group);
 
 		if (gallery.isVertical()) {
 			int baseX = x + minMargin;
@@ -292,7 +202,7 @@ public class DefaultGalleryGroupRenderer extends AbstractGridGroupRenderer {
 
 		} else {
 
-			Transform transform = new Transform(gc.getDevice());
+			final Transform transform = new Transform(gc.getDevice());
 			transform.rotate(-90);
 			gc.setTransform(transform);
 
@@ -340,6 +250,139 @@ public class DefaultGalleryGroupRenderer extends AbstractGridGroupRenderer {
 		}
 	}
 
+	/**
+	 * Draw group background using system default gradient or the user-defined
+	 * color.
+	 * 
+	 * @param gc
+	 * @param item
+	 *            TODO
+	 * @param x
+	 * @param y
+	 * @param width
+	 * @param height
+	 */
+	protected void drawGroupBackground(final GC gc, final GalleryMTItem item, final int x, final int y,
+			final int width, final int height) {
+		final Color itemLocalBackground = item.getBackground(true);
+		if (!titleBackgroundGradient || itemLocalBackground != null) {
+			// User defined background
+			gc.setBackground(itemLocalBackground != null ? itemLocalBackground
+					: titleBackground);
+			gc.fillRectangle(x, y, width, height);
+		} else {
+			// Default gradient Background
+			gc.setBackground(this.titleBackground);
+			gc.setForeground(this.titleBackground2);
+			gc.fillGradientRectangle(x, y, width, height, true);
+		}
+	}
+
+	private int drawGroupImage(final GC gc, final GalleryMTItem group, final int x, final int y,
+			final Point imageSize2) {
+		if (imageSize2 == null) {
+			return 0;
+		}
+
+		final Image img = group.getImage();
+		final Rectangle imgSize = img.getBounds();
+
+		final Point offset = RendererHelper.getImageOffset(imageSize2.x,
+				imageSize2.y, maxImageWidth, getGroupHeight(group));
+		gc.drawImage(img, 0, 0, imgSize.width, imgSize.height, x + offset.x, y
+				+ offset.y, imageSize2.x, imageSize2.y);
+
+		return maxImageWidth + 2 * minMargin;
+	}
+
+	/**
+	 * Draw the toggle button.
+	 * 
+	 * @param gc
+	 * @param x
+	 * @param y
+	 * @param group
+	 */
+	protected int drawGroupToggleButton(final GC gc, final int x, final int y, final GalleryMTItem group) {
+		if (!isAlwaysExpanded()) {
+			// Toggle Button
+
+			final int xShift = RendererHelper.getShift(titleHeight, 9);
+			final int yShift = RendererHelper.getShift(titleHeight, 9);
+
+			final int toggleX = x + xShift;
+			final int toggleY = y + yShift;
+
+			gc.setBackground(gc.getDevice().getSystemColor(
+					SWT.COLOR_LIST_BACKGROUND));
+			gc.fillRectangle(toggleX, toggleY, 8, 8);
+
+			gc.setForeground(gc.getDevice().getSystemColor(
+					SWT.COLOR_WIDGET_FOREGROUND));
+			gc.drawLine(toggleX + 2, toggleY + 4, toggleX + 6, toggleY + 4);
+			if (!expanded) {
+				gc.drawLine(toggleX + 4, toggleY + 2, toggleX + 4, toggleY + 6);
+			}
+			gc.setForeground(gc.getDevice().getSystemColor(
+					SWT.COLOR_WIDGET_NORMAL_SHADOW));
+			gc.drawRectangle(toggleX, toggleY, 8, 8);
+
+			// if (isFocus()) {
+			// gc.setBackground(back);
+			// gc.setForeground(fore);
+			// gc.drawFocus(-1, -1, 11, 11);
+			// }
+
+		}
+
+		return titleHeight + minMargin;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.nebula.widgets.gallery.AbstractGridGroupRenderer#drawItem
+	 * (org.eclipse.swt.graphics.GC, int, boolean,
+	 * org.eclipse.nebula.widgets.gallery.GalleryItem, int)
+	 */
+	@Override
+	protected void drawItem(final GC gc, final int index, final boolean selected,
+			final GalleryMTItem parent, final int offsetY) {
+
+		if (fill) {
+			final Item item = parent.getItem(index);
+
+			// No item ? return
+			if (item == null) {
+				return;
+			}
+
+			final GalleryMTItem gItem = (GalleryMTItem) item;
+
+			final Rectangle area = gallery.getClientArea();
+
+			gItem.x = area.x;
+			gItem.y = area.y + gallery._galleryPosition;
+
+			gItem.height = area.height;
+			gItem.width = area.width;
+
+			gallery.sendPaintItemEvent(item, index, gc, area.x, area.y,
+					area.width, area.height);
+
+			if (gallery.getItemRenderer() != null) {
+				gallery.getItemRenderer().setSelected(selected);
+				gallery.getItemRenderer().draw(gc, gItem, index, area.x,
+						area.y, area.width, area.height);
+			}
+
+			return;
+		}
+
+		super.drawItem(gc, index, selected, parent, offsetY);
+	}
+
 	// /*
 	// * (non-Javadoc)
 	// *
@@ -372,29 +415,66 @@ public class DefaultGalleryGroupRenderer extends AbstractGridGroupRenderer {
 	// return null;
 	// }
 
-	private int drawGroupImage(GC gc, GalleryMTItem group, int x, int y,
-			Point imageSize2) {
-		if (imageSize2 == null)
-			return 0;
-
-		Image img = group.getImage();
-		Rectangle imgSize = img.getBounds();
-
-		Point offset = RendererHelper.getImageOffset(imageSize2.x,
-				imageSize2.y, maxImageWidth, getGroupHeight(group));
-		gc.drawImage(img, 0, 0, imgSize.width, imgSize.height, x + offset.x, y
-				+ offset.y, imageSize2.x, imageSize2.y);
-
-		return maxImageWidth + 2 * minMargin;
+	/**
+	 * @see #setAnimationCloseMovement(IMovement)
+	 * @return
+	 */
+	public IMovement getAnimationCloseMovement() {
+		return animationCloseMovement;
 	}
 
-	protected String getGroupTitle(GalleryMTItem group) {
-		StringBuffer titleBuffer = new StringBuffer();
-		titleBuffer.append(group.getText());
-		titleBuffer.append(PARENTHESIS_OPEN);
-		titleBuffer.append(group.getItemCount());
-		titleBuffer.append(PARENTHESIS_CLOSE);
-		return titleBuffer.toString();
+	/**
+	 * @see #setAnimationLength(int)
+	 * @return
+	 */
+	public int getAnimationLength() {
+		return animationLength;
+	}
+
+	/**
+	 * Get the current movement used for animation
+	 * 
+	 * @see #setAnimationOpenMovement(IMovement)
+	 * 
+	 * @return
+	 */
+	public IMovement getAnimationOpenMovement() {
+		return animationOpenMovement;
+	}
+
+	/**
+	 * Returns the font used for drawing the group title or <tt>null</tt> if
+	 * system font is used.
+	 * 
+	 * @return the font
+	 */
+	public Font getFont() {
+		return font;
+	}
+
+	protected int getGroupHeight(final GalleryMTItem group) {
+		int groupHeight = titleHeight;
+
+		if (group.getImage() != null) {
+			final Point imageSize = RendererHelper.getBestSize(group.getImage()
+					.getBounds().width, group.getImage().getBounds().height,
+					maxImageWidth, maxImageHeight);
+			groupHeight = Math.max(titleHeight, imageSize.y + 2 * minMargin);
+		}
+
+		// Ensure there is enough room to display all text.
+		int lineCount = 1;
+		if (group.getText(1) != null && !EMPTY_STRING.equals(group.getText(1))) {
+			lineCount++;
+		}
+
+		if (group.getText(2) != null && !EMPTY_STRING.equals(group.getText(2))) {
+			lineCount++;
+		}
+
+		groupHeight = Math.max(groupHeight, lineCount * (fontHeight + 2) + 2);
+
+		return groupHeight;
 	}
 
 	/**
@@ -403,7 +483,7 @@ public class DefaultGalleryGroupRenderer extends AbstractGridGroupRenderer {
 	 * @param item
 	 * @return group offset or 0 if the item is not a group
 	 */
-	protected int getGroupOffset(GalleryMTItem item) {
+	protected int getGroupOffset(final GalleryMTItem item) {
 		if (item.getParentItem() != null) {
 			return 0;
 		}
@@ -411,59 +491,161 @@ public class DefaultGalleryGroupRenderer extends AbstractGridGroupRenderer {
 		return getGroupHeight(item) + minMargin;
 	}
 
+	protected String getGroupTitle(final GalleryMTItem group) {
+		final StringBuffer titleBuffer = new StringBuffer();
+		titleBuffer.append(group.getText());
+		titleBuffer.append(PARENTHESIS_OPEN);
+		titleBuffer.append(group.getItemCount());
+		titleBuffer.append(PARENTHESIS_CLOSE);
+		return titleBuffer.toString();
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.nebula.widgets.gallery.AbstractGridGroupRenderer#draw(org
-	 * .eclipse.swt.graphics.GC, org.eclipse.nebula.widgets.gallery.GalleryItem,
-	 * int, int, int, int, int, int)
+	 * org.eclipse.nebula.widgets.gallery.AbstractGridGroupRenderer#getItem(
+	 * org.eclipse.nebula.widgets.gallery.GalleryItem,
+	 * org.eclipse.swt.graphics.Point)
 	 */
-	public void draw(GC gc, GalleryMTItem group, int x, int y, int clipX,
-			int clipY, int clipWidth, int clipHeight) {
-		// Draw group
-		drawGroup(gc, group, x, y, clipX, clipY, clipWidth, clipHeight);
-
-		int groupOffset = getGroupOffset(group);
-
-		// Display item
-		if (isGroupExpanded(group)) {
-			int[] indexes = getVisibleItems(group, x, y, clipX, clipY,
-					clipWidth, clipHeight, groupOffset);
-
-			if (fill) {
-				indexes = new int[] { indexes[0] };
-			}
-
-			if (indexes != null && indexes.length > 0) {
-				for (int i = indexes.length - 1; i >= 0; i--) {
-
-					boolean selected = group.isSelected(group
-							.getItem(indexes[i]));
-
-					if (GalleryMT.DEBUG) {
-						System.out.println("Selected : " + selected //$NON-NLS-1$
-								+ " index : " + indexes[i] + "item : " //$NON-NLS-1$//$NON-NLS-2$
-								+ group.getItem(indexes[i]));
-					}
-
-					drawItem(gc, indexes[i], selected, group, groupOffset);
-
-				}
-			}
+	@Override
+	public GalleryMTItem getItem(final GalleryMTItem group, final Point coords) {
+		// Cannot select an item if the group is not expanded
+		if (!isGroupExpanded(group)) {
+			return null;
 		}
+
+		return super.getItem(group, coords, getGroupOffset(group));
 	}
 
-	public void layout(GC gc, GalleryMTItem group) {
+	/**
+	 * @see #setMaxImageHeight(int)
+	 * @return
+	 */
+	public int getMaxImageHeight() {
+		return maxImageHeight;
+	}
 
-		int countLocal = group.getItemCount();
+	/**
+	 * @see #setMaxImageWidth(int)
+	 * @return
+	 */
+	public int getMaxImageWidth() {
+		return maxImageWidth;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.nebula.widgets.gallery.AbstractGalleryGroupRenderer#
+	 * getScrollBarIncrement()
+	 */
+	@Override
+	public int getScrollBarIncrement() {
+		if (fill) {
+			if (gallery.isVertical()) {
+				// Vertical fill
+				return gallery.getClientArea().height;
+			}
+
+			// Horizontal fill
+			return gallery.getClientArea().width;
+		}
+
+		// Standard behavior
+		return super.getScrollBarIncrement();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.nebula.widgets.gallery.AbstractGridGroupRenderer#getSize(
+	 * org.eclipse.nebula.widgets.gallery.GalleryItem)
+	 */
+	@Override
+	public Rectangle getSize(final GalleryMTItem item) {
+		// If the item is not a group, get its parent
+		GalleryMTItem group = item.getParentItem();
+		if (group == null) {
+			group = item;
+		}
+
+		return super.getSize(item, getGroupOffset(group));
+	}
+
+	public Color getTitleBackground() {
+		return titleBackground;
+	}
+
+	public Color getTitleBackground2() {
+		return titleBackground2;
+	}
+
+	/**
+	 * Get group title text color.
+	 * 
+	 * @return current color.
+	 */
+	public Color getTitleForeground() {
+		return titleForeground;
+	}
+
+	protected Rectangle getToggleButtonBounds() {
+		return new Rectangle(minMargin
+				+ RendererHelper.getShift(titleHeight, 9), RendererHelper
+				.getShift(titleHeight, 9), 9, 9);
+	}
+
+	/**
+	 * @see #setAnimation(boolean)
+	 * @return
+	 */
+	public boolean isAnimation() {
+		return animation;
+	}
+
+	/**
+	 * @see #setFillIfSingleColumn(boolean)
+	 * @return
+	 */
+	public boolean isFillIfSingleColumn() {
+		return fillIfSingleColumn;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.nebula.widgets.gallery.AbstractGridGroupRenderer#isGroupExpanded
+	 * (org.eclipse.nebula.widgets.gallery.GalleryItem)
+	 */
+	@Override
+	protected boolean isGroupExpanded(final GalleryMTItem item) {
+
+		if (animation) {
+			if (item.getData(DefaultGalleryGroupRenderer.DATA_ANIMATION) != null) {
+				return true;
+			}
+		}
+		return super.isGroupExpanded(item);
+	}
+
+	public boolean isTitleBackgroundGradient() {
+		return titleBackgroundGradient;
+	}
+
+	@Override
+	public void layout(final GC gc, final GalleryMTItem group) {
+
+		final int countLocal = group.getItemCount();
 
 		double animationRatio = 1;
 
 		// If animation is used, load the current size ratio from the object
 		// itself.
 		if (animation) {
-			Object animationGroupData = group
+			final Object animationGroupData = group
 					.getData(DefaultGalleryGroupRenderer.DATA_ANIMATION);
 			if (animationGroupData != null
 					&& animationGroupData instanceof Double) {
@@ -475,12 +657,12 @@ public class DefaultGalleryGroupRenderer extends AbstractGridGroupRenderer {
 		}
 
 		if (gallery.isVertical()) {
-			int sizeX = group.width;
+			final int sizeX = group.width;
 			group.height = getGroupOffset(group);
 
-			Point l = gridLayout(sizeX, countLocal, itemWidth);
-			int hCount = l.x;
-			int vCount = l.y;
+			final Point l = gridLayout(sizeX, countLocal, itemWidth);
+			final int hCount = l.x;
+			final int vCount = l.y;
 
 			if (autoMargin && hCount > 0) {
 				// If margins have not been calculated
@@ -489,48 +671,40 @@ public class DefaultGalleryGroupRenderer extends AbstractGridGroupRenderer {
 					margin = calculateMargins(sizeX, hCount, itemWidth);
 					marginCalculated = true;
 
-					if (GalleryMT.DEBUG)
-						System.out.println("margin " + margin); //$NON-NLS-1$
 				}
 			}
 
 			if (isGroupExpanded(group)) {
 
-				Point s = this.getSize(hCount, vCount, itemWidth, itemHeight,
+				final Point s = this.getSize(hCount, vCount, itemWidth, itemHeight,
 						minMargin, margin);
 				group.height += s.y * animationRatio;
 
-				if (GalleryMT.DEBUG)
-					System.out.println("group.height " + group.height); //$NON-NLS-1$
 
 				group.setData(H_COUNT, new Integer(hCount));
 				group.setData(V_COUNT, new Integer(vCount));
-				if (GalleryMT.DEBUG)
-					System.out.println("Hnb" + hCount + "Vnb" + vCount); //$NON-NLS-1$//$NON-NLS-2$
 
 				fill = (fillIfSingleColumn && hCount == 1);
 			}
 
 		} else {
 			// Horizontal
-			int sizeY = group.height;
+			final int sizeY = group.height;
 			group.width = getGroupOffset(group);
 
-			Point l = gridLayout(sizeY, countLocal, itemHeight);
-			int vCount = l.x;
-			int hCount = l.y;
+			final Point l = gridLayout(sizeY, countLocal, itemHeight);
+			final int vCount = l.x;
+			final int hCount = l.y;
 			if (autoMargin && vCount > 0) {
 				// Calculate best margins
 				margin = calculateMargins(sizeY, vCount, itemHeight);
 				marginCalculated = true;
 
-				if (GalleryMT.DEBUG)
-					System.out.println("margin " + margin); //$NON-NLS-1$
 			}
 
 			if (isGroupExpanded(group)) {
 
-				Point s = this.getSize(hCount, vCount, itemWidth, itemHeight,
+				final Point s = this.getSize(hCount, vCount, itemWidth, itemHeight,
 						minMargin, margin);
 				group.width += s.x * animationRatio;
 
@@ -544,89 +718,6 @@ public class DefaultGalleryGroupRenderer extends AbstractGridGroupRenderer {
 
 	}
 
-	public void preDraw(GC gc) {
-		pre(gc);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.nebula.widgets.gallery.AbstractGridGroupRenderer#preLayout
-	 * (org.eclipse.swt.graphics.GC)
-	 */
-	public void preLayout(GC gc) {
-		this.marginCalculated = false;
-		pre(gc);
-		super.preLayout(gc);
-	}
-
-	/**
-	 * Prepare font metrics and title height for both preLayout and preDraw.
-	 * 
-	 * @param myGc
-	 */
-	private void pre(GC myGc) {
-		GC gc = myGc;
-		boolean gcCreated = false;
-
-		if (gc == null) {
-			gc = new GC(gallery, SWT.NONE);
-			gcCreated = true;
-		}
-
-		// Get font height
-		gc.setFont(font);
-		fontHeight = gc.getFontMetrics().getHeight();
-
-		// Compute title height & grid offset
-		titleHeight = fontHeight + 5;
-
-		if (gcCreated)
-			gc.dispose();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.nebula.widgets.gallery.AbstractGridGroupRenderer#getItem(
-	 * org.eclipse.nebula.widgets.gallery.GalleryItem,
-	 * org.eclipse.swt.graphics.Point)
-	 */
-	public GalleryMTItem getItem(GalleryMTItem group, Point coords) {
-		// Cannot select an item if the group is not expanded
-		if (!isGroupExpanded(group))
-			return null;
-
-		return super.getItem(group, coords, getGroupOffset(group));
-	}
-
-	protected void startGroupAnimation(GalleryMTItem group, boolean doOpen) {
-		if (animation) {
-			if (group.getData(DATA_ANIMATION) == null) {
-				group.setData(DATA_ANIMATION, new Double(doOpen ? 0 : 1));
-			}
-
-			int start, end;
-			IMovement movement;
-			if (doOpen) {
-				start = 0;
-				end = 1;
-				movement = animationOpenMovement;
-			} else {
-				start = 1;
-				end = 0;
-				movement = animationCloseMovement;
-
-			}
-
-			animationRunner.runEffect(new GalleryGroupResizeEffect(group,
-					start, end, animationLength, movement, null, null));
-		}
-
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -635,7 +726,8 @@ public class DefaultGalleryGroupRenderer extends AbstractGridGroupRenderer {
 	 * (org.eclipse.nebula.widgets.gallery.GalleryItem,
 	 * org.eclipse.swt.events.MouseEvent, org.eclipse.swt.graphics.Point)
 	 */
-	public boolean mouseDown(final GalleryMTItem group, MouseEvent e, Point coords) {
+	@Override
+	public boolean mouseDown(final GalleryMTItem group, final MouseEvent e, final Point coords) {
 
 		if (gallery.isVertical()) { // V_SCROLL
 			if (coords.y - group.y <= getGroupHeight(group)) {
@@ -650,7 +742,7 @@ public class DefaultGalleryGroupRenderer extends AbstractGridGroupRenderer {
 					// button and the test is ignored
 
 					// Toggle expand state
-					boolean doOpen = !group.isExpanded();
+					final boolean doOpen = !group.isExpanded();
 					startGroupAnimation(group, doOpen);
 					group._setExpanded(doOpen, false);
 
@@ -701,7 +793,7 @@ public class DefaultGalleryGroupRenderer extends AbstractGridGroupRenderer {
 
 					// Toggle expand state
 					// Toggle expand state
-					boolean doOpen = !group.isExpanded();
+					final boolean doOpen = !group.isExpanded();
 					startGroupAnimation(group, doOpen);
 					group._setExpanded(doOpen, false);
 
@@ -744,62 +836,193 @@ public class DefaultGalleryGroupRenderer extends AbstractGridGroupRenderer {
 		return true;
 	}
 
+	/**
+	 * Prepare font metrics and title height for both preLayout and preDraw.
+	 * 
+	 * @param myGc
+	 */
+	private void pre(final GC myGc) {
+		GC gc = myGc;
+		boolean gcCreated = false;
+
+		if (gc == null) {
+			gc = new GC(gallery, SWT.NONE);
+			gcCreated = true;
+		}
+
+		// Get font height
+		gc.setFont(font);
+		fontHeight = gc.getFontMetrics().getHeight();
+
+		// Compute title height & grid offset
+		titleHeight = fontHeight + 5;
+
+		if (gcCreated) {
+			gc.dispose();
+		}
+	}
+
+	@Override
+	public void preDraw(final GC gc) {
+		pre(gc);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.nebula.widgets.gallery.AbstractGridGroupRenderer#getSize(
-	 * org.eclipse.nebula.widgets.gallery.GalleryItem)
+	 * org.eclipse.nebula.widgets.gallery.AbstractGridGroupRenderer#preLayout
+	 * (org.eclipse.swt.graphics.GC)
 	 */
-	public Rectangle getSize(GalleryMTItem item) {
-		// If the item is not a group, get its parent
-		GalleryMTItem group = item.getParentItem();
-		if (group == null) {
-			group = item;
-		}
-
-		return super.getSize(item, getGroupOffset(group));
+	@Override
+	public void preLayout(final GC gc) {
+		this.marginCalculated = false;
+		pre(gc);
+		super.preLayout(gc);
 	}
 
 	/**
-	 * Get group title text color.
+	 * Enable animation for group expand/collapse.
 	 * 
-	 * @return current color.
+	 * @see #setAnimationLength(int)
+	 * @see #setAnimationOpenMovement(IMovement)
+	 * 
+	 * @param animation
 	 */
-	public Color getTitleForeground() {
-		return titleForeground;
+	public void setAnimation(final boolean animation) {
+		this.animation = animation;
 	}
 
 	/**
-	 * Change group title text color.
 	 * 
-	 * @param titleColor
-	 *            Color or null to revert to default.
+	 * Set the movement used for close animation.
+	 * 
+	 * @see #setAnimation(boolean)
+	 * @see #setAnimationLength(int)
+	 * @param animationMovement
 	 */
-	public void setTitleForeground(Color titleColor) {
-		if (titleColor == null) {
-			if (gallery == null) {
-				throw new IllegalArgumentException(
-						"Please associate this renderer with a Gallery before trying to reset foreground defaults"); //$NON-NLS-1$
+	public void setAnimationCloseMovement(final IMovement animationMovement) {
+		this.animationCloseMovement = animationMovement;
+	}
+
+	/**
+	 * Set the length of the animation
+	 * 
+	 * @see #setAnimation(boolean)
+	 * @see #setAnimationOpenMovement(IMovement)
+	 * 
+	 * @param animationLength
+	 */
+	public void setAnimationLength(final int animationLength) {
+		this.animationLength = animationLength;
+	}
+
+	/**
+	 * 
+	 * Set the movement used for open animation.
+	 * 
+	 * @see #setAnimation(boolean)
+	 * @see #setAnimationLength(int)
+	 * 
+	 * @param animationMovement
+	 */
+	public void setAnimationOpenMovement(final IMovement animationMovement) {
+		this.animationOpenMovement = animationMovement;
+	}
+
+	/**
+	 * <p>
+	 * <b>Experimental feature.</b>
+	 * </p>
+	 * <p>
+	 * If set to true, this will enable a special behavior when the items are so
+	 * large that only one can fit in the client area. In this case, items are
+	 * always resized and centered to fit best in the client area.
+	 * </p>
+	 * <p>
+	 * See bug 266613 : https://bugs.eclipse.org/266613
+	 * </p>
+	 * 
+	 * @param fillIfSingle
+	 */
+	public void setFillIfSingleColumn(final boolean fillIfSingle) {
+		this.fillIfSingleColumn = fillIfSingle;
+	}
+
+	/**
+	 * Set the font for drawing the group title or <tt>null</tt> to use system
+	 * font.
+	 * 
+	 * @param font
+	 *            the font to set
+	 */
+	public void setFont(final Font font) {
+		if (this.font != font) {
+			this.font = font;
+			if (getGallery() != null) {
+				getGallery().redraw();
 			}
-			titleForeground = gallery.getDisplay().getSystemColor(
-					SWT.COLOR_TITLE_FOREGROUND);
-		} else {
-			this.titleForeground = titleColor;
 		}
 	}
 
-	public Color getTitleBackground() {
-		return titleBackground;
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.nebula.widgets.gallery.AbstractGalleryGroupRenderer#setGallery
+	 * (org.eclipse.nebula.widgets.gallery.Gallery)
+	 */
+	@Override
+	public void setGallery(final GalleryMT gallery) {
+		super.setGallery(gallery);
+
+		// Set defaults
+		if (titleForeground == null) {
+			// Reset defaults.
+			this.setTitleForeground(null);
+		}
+
+		if (titleBackground == null) {
+			// Reset default gradient.
+			setTitleBackgroundGradient(null, null);
+		}
+
+		if (descriptionColor == null) {
+			descriptionColor = gallery.getDisplay().getSystemColor(
+					SWT.COLOR_DARK_BLUE);
+		}
+
 	}
 
-	public void setTitleBackground(Color titleBackground) {
+	/**
+	 * Set the maximum height for a group image in the title bar.
+	 * 
+	 * @see GalleryMTItem#setImage(Image)
+	 * 
+	 * @param imageHeight
+	 */
+	public void setMaxImageHeight(final int imageHeight) {
+		this.maxImageHeight = imageHeight;
+	}
+
+	/**
+	 * Set the maximum width for a group image in the title bar.
+	 * 
+	 * @see GalleryMTItem#setImage(Image)
+	 * 
+	 * @param imageWidth
+	 */
+	public void setMaxImageWidth(final int imageWidth) {
+		this.maxImageWidth = imageWidth;
+	}
+
+	public void setTitleBackground(final Color titleBackground) {
 		this.titleBackgroundGradient = false;
 		this.titleBackground = titleBackground;
 	}
 
-	public void setTitleBackgroundGradient(Color gradientBackground,
-			Color gradientForeground) {
+	public void setTitleBackgroundGradient(final Color gradientBackground,
+			final Color gradientForeground) {
 		this.titleBackgroundGradient = true;
 
 		if (gradientBackground != null && gradientForeground != null) {
@@ -820,265 +1043,47 @@ public class DefaultGalleryGroupRenderer extends AbstractGridGroupRenderer {
 	}
 
 	/**
-	 * Returns the font used for drawing the group title or <tt>null</tt> if
-	 * system font is used.
+	 * Change group title text color.
 	 * 
-	 * @return the font
+	 * @param titleColor
+	 *            Color or null to revert to default.
 	 */
-	public Font getFont() {
-		return font;
-	}
-
-	/**
-	 * Set the font for drawing the group title or <tt>null</tt> to use system
-	 * font.
-	 * 
-	 * @param font
-	 *            the font to set
-	 */
-	public void setFont(Font font) {
-		if (this.font != font) {
-			this.font = font;
-			if (getGallery() != null)
-				getGallery().redraw();
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.nebula.widgets.gallery.AbstractGridGroupRenderer#drawItem
-	 * (org.eclipse.swt.graphics.GC, int, boolean,
-	 * org.eclipse.nebula.widgets.gallery.GalleryItem, int)
-	 */
-	protected void drawItem(GC gc, int index, boolean selected,
-			GalleryMTItem parent, int offsetY) {
-
-		if (fill) {
-			Item item = parent.getItem(index);
-
-			// No item ? return
-			if (item == null)
-				return;
-
-			GalleryMTItem gItem = (GalleryMTItem) item;
-
-			Rectangle area = gallery.getClientArea();
-
-			gItem.x = area.x;
-			gItem.y = area.y + gallery.translate;
-
-			gItem.height = area.height;
-			gItem.width = area.width;
-
-			gallery.sendPaintItemEvent(item, index, gc, area.x, area.y,
-					area.width, area.height);
-
-			if (gallery.getItemRenderer() != null) {
-				gallery.getItemRenderer().setSelected(selected);
-				gallery.getItemRenderer().draw(gc, gItem, index, area.x,
-						area.y, area.width, area.height);
+	public void setTitleForeground(final Color titleColor) {
+		if (titleColor == null) {
+			if (gallery == null) {
+				throw new IllegalArgumentException(
+						"Please associate this renderer with a Gallery before trying to reset foreground defaults"); //$NON-NLS-1$
 			}
-
-			return;
+			titleForeground = gallery.getDisplay().getSystemColor(
+					SWT.COLOR_TITLE_FOREGROUND);
+		} else {
+			this.titleForeground = titleColor;
 		}
-
-		super.drawItem(gc, index, selected, parent, offsetY);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.nebula.widgets.gallery.AbstractGalleryGroupRenderer#
-	 * getScrollBarIncrement()
-	 */
-	public int getScrollBarIncrement() {
-		if (fill) {
-			if (gallery.isVertical()) {
-				// Vertical fill
-				return gallery.getClientArea().height;
-			}
-
-			// Horizontal fill
-			return gallery.getClientArea().width;
-		}
-
-		// Standard behavior
-		return super.getScrollBarIncrement();
-	}
-
-	/**
-	 * @see #setFillIfSingleColumn(boolean)
-	 * @return
-	 */
-	public boolean isFillIfSingleColumn() {
-		return fillIfSingleColumn;
-	}
-
-	/**
-	 * <p>
-	 * <b>Experimental feature.</b>
-	 * </p>
-	 * <p>
-	 * If set to true, this will enable a special behavior when the items are so
-	 * large that only one can fit in the client area. In this case, items are
-	 * always resized and centered to fit best in the client area.
-	 * </p>
-	 * <p>
-	 * See bug 266613 : https://bugs.eclipse.org/266613
-	 * </p>
-	 * 
-	 * @param fillIfSingle
-	 */
-	public void setFillIfSingleColumn(boolean fillIfSingle) {
-		this.fillIfSingleColumn = fillIfSingle;
-	}
-
-	/**
-	 * @see #setMaxImageWidth(int)
-	 * @return
-	 */
-	public int getMaxImageWidth() {
-		return maxImageWidth;
-	}
-
-	/**
-	 * Set the maximum width for a group image in the title bar.
-	 * 
-	 * @see GalleryMTItem#setImage(Image)
-	 * 
-	 * @param imageWidth
-	 */
-	public void setMaxImageWidth(int imageWidth) {
-		this.maxImageWidth = imageWidth;
-	}
-
-	/**
-	 * @see #setMaxImageHeight(int)
-	 * @return
-	 */
-	public int getMaxImageHeight() {
-		return maxImageHeight;
-	}
-
-	/**
-	 * Set the maximum height for a group image in the title bar.
-	 * 
-	 * @see GalleryMTItem#setImage(Image)
-	 * 
-	 * @param imageHeight
-	 */
-	public void setMaxImageHeight(int imageHeight) {
-		this.maxImageHeight = imageHeight;
-	}
-
-	/**
-	 * @see #setAnimation(boolean)
-	 * @return
-	 */
-	public boolean isAnimation() {
-		return animation;
-	}
-
-	/**
-	 * Enable animation for group expand/collapse.
-	 * 
-	 * @see #setAnimationLength(int)
-	 * @see #setAnimationOpenMovement(IMovement)
-	 * 
-	 * @param animation
-	 */
-	public void setAnimation(boolean animation) {
-		this.animation = animation;
-	}
-
-	/**
-	 * @see #setAnimationLength(int)
-	 * @return
-	 */
-	public int getAnimationLength() {
-		return animationLength;
-	}
-
-	/**
-	 * Set the length of the animation
-	 * 
-	 * @see #setAnimation(boolean)
-	 * @see #setAnimationOpenMovement(IMovement)
-	 * 
-	 * @param animationLength
-	 */
-	public void setAnimationLength(int animationLength) {
-		this.animationLength = animationLength;
-	}
-
-	/**
-	 * Get the current movement used for animation
-	 * 
-	 * @see #setAnimationOpenMovement(IMovement)
-	 * 
-	 * @return
-	 */
-	public IMovement getAnimationOpenMovement() {
-		return animationOpenMovement;
-	}
-
-	/**
-	 * @see #setAnimationCloseMovement(IMovement)
-	 * @return
-	 */
-	public IMovement getAnimationCloseMovement() {
-		return animationCloseMovement;
-	}
-
-	/**
-	 * 
-	 * Set the movement used for open animation.
-	 * 
-	 * @see #setAnimation(boolean)
-	 * @see #setAnimationLength(int)
-	 * 
-	 * @param animationMovement
-	 */
-	public void setAnimationOpenMovement(IMovement animationMovement) {
-		this.animationOpenMovement = animationMovement;
-	}
-
-	/**
-	 * 
-	 * Set the movement used for close animation.
-	 * 
-	 * @see #setAnimation(boolean)
-	 * @see #setAnimationLength(int)
-	 * @param animationMovement
-	 */
-	public void setAnimationCloseMovement(IMovement animationMovement) {
-		this.animationCloseMovement = animationMovement;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.nebula.widgets.gallery.AbstractGridGroupRenderer#isGroupExpanded
-	 * (org.eclipse.nebula.widgets.gallery.GalleryItem)
-	 */
-	protected boolean isGroupExpanded(GalleryMTItem item) {
-
+	protected void startGroupAnimation(final GalleryMTItem group, final boolean doOpen) {
 		if (animation) {
-			if (item.getData(DefaultGalleryGroupRenderer.DATA_ANIMATION) != null)
-				return true;
+			if (group.getData(DATA_ANIMATION) == null) {
+				group.setData(DATA_ANIMATION, new Double(doOpen ? 0 : 1));
+			}
+
+			int start, end;
+			IMovement movement;
+			if (doOpen) {
+				start = 0;
+				end = 1;
+				movement = animationOpenMovement;
+			} else {
+				start = 1;
+				end = 0;
+				movement = animationCloseMovement;
+
+			}
+
+			animationRunner.runEffect(new GalleryGroupResizeEffect(group,
+					start, end, animationLength, movement, null, null));
 		}
-		return super.isGroupExpanded(item);
-	}
 
-	public boolean isTitleBackgroundGradient() {
-		return titleBackgroundGradient;
-	}
-
-	public Color getTitleBackground2() {
-		return titleBackground2;
 	}
 
 }

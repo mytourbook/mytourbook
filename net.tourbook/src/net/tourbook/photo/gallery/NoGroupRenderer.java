@@ -17,99 +17,112 @@ import org.eclipse.swt.graphics.Rectangle;
 
 /**
  * <p>
- * Alternate group renderer for the Gallery widget. This group renderer does not
- * draw group titles. Only items are displayed. All groups are considered as
- * expanded.
+ * Alternate group renderer for the Gallery widget. This group renderer does not draw group titles.
+ * Only items are displayed. All groups are considered as expanded.
  * </p>
  * <p>
  * The visual aspect is the same as the first version of the gallery widget.
- * 
  * </p>
  * <p>
  * NOTE: THIS WIDGET AND ITS API ARE STILL UNDER DEVELOPMENT.
  * </p>
  * 
- * 
  * @author Nicolas Richeton (nicolas.richeton@gmail.com)
  */
 public class NoGroupRenderer extends AbstractGridGroupRenderer {
 
-	protected static int OFFSET = 0;
+	protected static int	OFFSET	= 0;
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.nebula.widgets.gallery.AbstractGridGroupRenderer#draw(org
-	 * .eclipse.swt.graphics.GC, org.eclipse.nebula.widgets.gallery.GalleryItem,
-	 * int, int, int, int, int, int)
+	 * @see org.eclipse.nebula.widgets.gallery.AbstractGridGroupRenderer#draw(org
+	 * .eclipse.swt.graphics.GC, org.eclipse.nebula.widgets.gallery.GalleryItem, int, int, int, int,
+	 * int, int)
 	 */
-	public void draw(GC gc, GalleryMTItem group, int x, int y, int clipX,
-			int clipY, int clipWidth, int clipHeight) {
+	@Override
+	public void draw(	final GC gc,
+						final GalleryMTItem group,
+						final int x,
+						final int y,
+						final int clipX,
+						final int clipY,
+						final int clipWidth,
+						final int clipHeight) {
 
 		// Get items in the clipping area
-		int[] indexes = getVisibleItems(group, x, y, clipX, clipY, clipWidth,
-				clipHeight, OFFSET);
+		final int[] indexes = getVisibleItems(group, x, y, clipX, clipY, clipWidth, clipHeight, OFFSET);
 
 		if (indexes != null && indexes.length > 0) {
 			for (int i = indexes.length - 1; i >= 0; i--) {
-				// Draw item
-				boolean selected = group.isSelected(group.getItem(indexes[i]));
 
-				if (GalleryMT.DEBUG) {
-					System.out
-							.println("Selected : " + selected + " index : " + indexes[i] + "item : " + group.getItem(indexes[i])); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-				}
+				// Draw item
+				final boolean selected = group.isSelected(group.getItem(indexes[i]));
 
 				drawItem(gc, indexes[i], selected, group, OFFSET);
-
 			}
 		}
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.nebula.widgets.gallery.AbstractGridGroupRenderer#layout(org
+	 * @see org.eclipse.nebula.widgets.gallery.AbstractGridGroupRenderer#getItem(
+	 * org.eclipse.nebula.widgets.gallery.GalleryItem, org.eclipse.swt.graphics.Point)
+	 */
+	@Override
+	public GalleryMTItem getItem(final GalleryMTItem group, final Point coords) {
+		return super.getItem(group, coords, OFFSET);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.nebula.widgets.gallery.AbstractGridGroupRenderer#getSize(
+	 * org.eclipse.nebula.widgets.gallery.GalleryItem)
+	 */
+	@Override
+	public Rectangle getSize(final GalleryMTItem item) {
+		return super.getSize(item, OFFSET);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.nebula.widgets.gallery.AbstractGridGroupRenderer#layout(org
 	 * .eclipse.swt.graphics.GC, org.eclipse.nebula.widgets.gallery.GalleryItem)
 	 */
-	public void layout(GC gc, GalleryMTItem group) {
+	@Override
+	public void layout(final GC gc, final GalleryMTItem group) {
 
-		int countLocal = group.getItemCount();
+		final int countLocal = group.getItemCount();
 
 		if (gallery.isVertical()) {
-			int sizeX = group.width;
+			final int sizeX = group.width;
 			group.height = OFFSET;
 
-			Point l = gridLayout(sizeX, countLocal, itemWidth);
-			int hCount = l.x;
-			int vCount = l.y;
+			final Point l = gridLayout(sizeX, countLocal, itemWidth);
+			final int hCount = l.x;
+			final int vCount = l.y;
 			if (autoMargin) {
 				// Calculate best margins
 				margin = calculateMargins(sizeX, hCount, itemWidth);
 			}
 
-			Point s = this.getSize(hCount, vCount, itemWidth, itemHeight,
-					minMargin, margin);
+			final Point s = this.getSize(hCount, vCount, itemWidth, itemHeight, minMargin, margin);
 			group.height += s.y;
 
 			group.setData(H_COUNT, new Integer(hCount));
 			group.setData(V_COUNT, new Integer(vCount));
 		} else {
-			int sizeY = group.height;
+			final int sizeY = group.height;
 			group.width = OFFSET;
 
-			Point l = gridLayout(sizeY, countLocal, itemHeight);
-			int vCount = l.x;
-			int hCount = l.y;
+			final Point l = gridLayout(sizeY, countLocal, itemHeight);
+			final int vCount = l.x;
+			final int hCount = l.y;
 			if (autoMargin) {
 				// Calculate best margins
 				margin = calculateMargins(sizeY, vCount, itemHeight);
 			}
 
-			Point s = this.getSize(hCount, vCount, itemWidth, itemHeight,
-					minMargin, margin);
+			final Point s = this.getSize(hCount, vCount, itemWidth, itemHeight, minMargin, margin);
 			group.width += s.x;
 
 			group.setData(H_COUNT, new Integer(hCount));
@@ -120,37 +133,13 @@ public class NoGroupRenderer extends AbstractGridGroupRenderer {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.nebula.widgets.gallery.AbstractGridGroupRenderer#getItem(
-	 * org.eclipse.nebula.widgets.gallery.GalleryItem,
+	 * @see org.eclipse.nebula.widgets.gallery.AbstractGridGroupRenderer#mouseDown
+	 * (org.eclipse.nebula.widgets.gallery.GalleryItem, org.eclipse.swt.events.MouseEvent,
 	 * org.eclipse.swt.graphics.Point)
 	 */
-	public GalleryMTItem getItem(GalleryMTItem group, Point coords) {
-		return super.getItem(group, coords, OFFSET);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.nebula.widgets.gallery.AbstractGridGroupRenderer#mouseDown
-	 * (org.eclipse.nebula.widgets.gallery.GalleryItem,
-	 * org.eclipse.swt.events.MouseEvent, org.eclipse.swt.graphics.Point)
-	 */
-	public boolean mouseDown(GalleryMTItem group, MouseEvent e, Point coords) {
+	@Override
+	public boolean mouseDown(final GalleryMTItem group, final MouseEvent e, final Point coords) {
 		// Do nothing
 		return true;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.nebula.widgets.gallery.AbstractGridGroupRenderer#getSize(
-	 * org.eclipse.nebula.widgets.gallery.GalleryItem)
-	 */
-	public Rectangle getSize(GalleryMTItem item) {
-		return super.getSize(item, OFFSET);
 	}
 }

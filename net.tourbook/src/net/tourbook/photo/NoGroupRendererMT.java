@@ -19,9 +19,9 @@ import net.tourbook.photo.gallery.GalleryMTItem;
 import net.tourbook.photo.gallery.NoGroupRenderer;
 
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Rectangle;
 
 public class NoGroupRendererMT extends NoGroupRenderer {
-
 
 	@Override
 	public void draw(	final GC gc,
@@ -38,15 +38,36 @@ public class NoGroupRendererMT extends NoGroupRenderer {
 
 		if (visibleIndexes != null && visibleIndexes.length > 0) {
 
-			for (int i = visibleIndexes.length - 1; i >= 0; i--) {
+			for (int itemIndex = visibleIndexes.length - 1; itemIndex >= 0; itemIndex--) {
 
 				// Draw item
-				final GalleryMTItem galleryItem = group.getItem(visibleIndexes[i]);
+				final GalleryMTItem galleryItem = group.getItem(visibleIndexes[itemIndex]);
 
 				final boolean isSelected = group.isSelected(galleryItem);
 
-				drawItem(gc, visibleIndexes[i], isSelected, group, OFFSET);
+				drawItem(gc, visibleIndexes[itemIndex], isSelected, group, OFFSET);
 			}
+
+			setAllVisibleItems(group, x, y);
+		}
+
+	}
+
+	public void setAllVisibleItems(final GalleryMTItem group, final int x, final int y) {
+
+		final Rectangle clientArea = group.getGallery().getClientAreaCached();
+
+		final int[] visibleIndexes = getVisibleItems(group, x, y, 0, 0, clientArea.width, clientArea.height, OFFSET);
+
+		if (visibleIndexes != null && visibleIndexes.length > 0) {
+
+			final GalleryMTItem[] visibleItems = new GalleryMTItem[visibleIndexes.length];
+
+			for (int itemIndex = visibleIndexes.length - 1; itemIndex >= 0; itemIndex--) {
+				visibleItems[itemIndex] = group.getItem(visibleIndexes[itemIndex]);
+			}
+
+			group.setVisibleItems(visibleItems);
 		}
 	}
 

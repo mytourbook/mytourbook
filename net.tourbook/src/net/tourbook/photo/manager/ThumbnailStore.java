@@ -45,59 +45,6 @@ public class ThumbnailStore {
 
 	private static final ReentrantLock	SAVE_LOCK				= new ReentrantLock();
 
-//			PhotoManager.IMAGE_QUALITY_600
-
-//			final BufferedImage img = ImageIO.read(photo.getImageFile());
-//			final BufferedImage scaledImg = Scalr.resize(img, PhotoManager.IMAGE_QUALITY_ORIGINAL);
-
-//	static Image getImage(final Photo photo, final int requestedImageQuality) {
-//
-//		IPath storeImageFilePath = null;
-//
-//		try {
-//
-//			storeImageFilePath = getStoreImageFile(photo, requestedImageQuality);
-//
-//			// check if image is available
-//			final File storeImageFile = new File(storeImageFilePath.toOSString());
-//			if (storeImageFile.isFile()) {
-//
-//				// photo image is available
-//
-//				return new Image(Display.getDefault(), storeImageFilePath.toOSString());
-//			}
-//
-//			// load full size image
-//			final Image fullSizeImage = new Image(Display.getDefault(), photo.getFilePathName());
-//
-//			final Rectangle fullSizeImageBounds = fullSizeImage.getBounds();
-//			final int thumbSize160 = PhotoManager.IMAGE_SIZE[PhotoManager.IMAGE_QUALITY_THUMB_160];
-//
-//			final Point newSize = ImageUtils.getBestSize(//
-//					new Point(fullSizeImageBounds.width, fullSizeImageBounds.height),
-//					new Point(thumbSize160, thumbSize160));
-//
-//			Image thumbnailImage;
-//			if (ImageUtils.isResizeRequired(fullSizeImage, newSize.x, newSize.y)) {
-//
-//				thumbnailImage = ImageUtils.resize(fullSizeImage, newSize.x, newSize.y);
-//
-//				saveImage(thumbnailImage, storeImageFilePath);
-//
-//			} else {
-//				thumbnailImage = fullSizeImage;
-//			}
-//
-//			return thumbnailImage;
-//
-//		} catch (final Exception e) {
-//
-//			StatusUtil.log(NLS.bind("Image '{0}' cannot be loaded", storeImageFilePath.toOSString()), e); //$NON-NLS-1$
-//		}
-//
-//		return null;
-//	}
-
 	private static IPath checkPath(final IPath storeImageFilePath) {
 
 		final IPath imagePathWithoutExt = storeImageFilePath.removeFileExtension();
@@ -231,7 +178,7 @@ public class ThumbnailStore {
 
 			StatusUtil.log(NLS.bind(//
 					"Cannot save thumbnail image: \"{0}\"", //$NON-NLS-1$
-					storeImageFilePath.toOSString()), new Exception());
+					storeImageFilePath.toOSString()), e);
 		}
 	}
 
@@ -255,7 +202,7 @@ public class ThumbnailStore {
 
 			StatusUtil.log(NLS.bind(//
 					"Cannot save thumbnail image: \"{0}\"", //$NON-NLS-1$
-					storeImageFilePath.toOSString()), new Exception());
+					storeImageFilePath.toOSString()), e);
 		}
 	}
 }

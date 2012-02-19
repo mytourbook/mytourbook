@@ -111,8 +111,8 @@ public class ImageUtils {
 	 * @param height
 	 * @return
 	 */
-	public static Image resize(final Image image, final int width, final int height) {
-		return resize(image, width, height, SWT.ON, SWT.HIGH);
+	public static Image resize(final Display display, final Image image, final int width, final int height) {
+		return resize(display, image, width, height, SWT.ON, SWT.HIGH);
 	}
 
 //	public Image resize(int w, int h, Image img) {
@@ -126,41 +126,26 @@ public class ImageUtils {
 //		return newImage;
 //	}
 
-	public static Image resize(	final Image image,
-								final int width,
-								final int height,
-								final int antialias,
-								final int interpolation) {
+	public static/* synchronized */Image resize(	final Display display,
+											final Image image,
+											final int width,
+											final int height,
+											final int antialias,
+											final int interpolation) {
 
 		if (image == null) {
 			return null;
 		}
 
-		final Image scaledImage = new Image(Display.getDefault(), width, height);
+		final Image scaledImage = new Image(display, width, height);
 		final GC gc = new GC(scaledImage);
 		{
-			// Linux-GTK Bug 174932
-//			if (!SWT.getPlatform().equals("gtk")) {
-//			}
-			// this bug is solved
 			gc.setAdvanced(true);
 
-			if (gc.getAdvanced()) {
-				gc.setAntialias(antialias);
-				gc.setInterpolation(interpolation);
-			}
+			gc.setAntialias(antialias);
+			gc.setInterpolation(interpolation);
 
 			final Rectangle originalImageBounds = image.getBounds();
-
-//			System.out.println("resize()\tfrom  "
-//					+ originalImageBounds.width
-//					+ "\t"
-//					+ originalImageBounds.height
-//					+ "\tto  "
-//					+ width
-//					+ "\t"
-//					+ height);
-//			// TODO remove SYSTEM.OUT.PRINTLN
 
 			gc.drawImage(image, //
 					0,
@@ -178,7 +163,8 @@ public class ImageUtils {
 		return scaledImage;
 	}
 
-	public static ImageData resize(	final ImageData imageData,
+	public static ImageData resize(	final Display display,
+									final ImageData imageData,
 									final int width,
 									final int height,
 									final boolean antiAliasing) {
@@ -193,9 +179,9 @@ public class ImageUtils {
 
 		if (antiAliasing) {
 			Image tmpImage = null;
-			final Image fullImage = new Image(Display.getCurrent(), imageData);
+			final Image fullImage = new Image(display, imageData);
 			ImageData result = null;
-			tmpImage = resize(fullImage, width, height);
+			tmpImage = resize(display, fullImage, width, height);
 
 			result = tmpImage.getImageData();
 			tmpImage.dispose();
@@ -214,7 +200,7 @@ public class ImageUtils {
 	 * @param maxHeight
 	 * @return
 	 */
-	public static Image resizeBestSize(final Image img, final int maxWidth, final int maxHeight) {
+	public static Image resizeBestSize(final Display display, final Image img, final int maxWidth, final int maxHeight) {
 		// Check for null
 		if (img == null) {
 			return null;
@@ -224,7 +210,7 @@ public class ImageUtils {
 		final Point newSize = getBestSize(img.getBounds().width, img.getBounds().height, maxWidth, maxHeight);
 
 		// Resize image
-		return ImageUtils.resize(img, newSize.x, newSize.y);
+		return ImageUtils.resize(display, img, newSize.x, newSize.y);
 	}
 
 	public static byte[] saveImage(final Image image, final int format) {

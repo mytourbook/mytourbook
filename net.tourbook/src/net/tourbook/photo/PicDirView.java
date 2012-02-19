@@ -279,8 +279,9 @@ public class PicDirView extends ViewPart {
 
 		_scaleThumbnailSize = new Scale(parent, SWT.HORIZONTAL);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleThumbnailSize);
-		_scaleThumbnailSize.setMinimum(0);
-		_scaleThumbnailSize.setMaximum((PhotoManager.THUMBNAIL_SIZES.length - 1) * 10);
+		_scaleThumbnailSize.setMinimum(50);
+//		_scaleThumbnailSize.setMaximum((PhotoManager.THUMBNAIL_SIZES.length - 1) * 10);
+		_scaleThumbnailSize.setMaximum(600);
 		_scaleThumbnailSize.setIncrement(10);
 		_scaleThumbnailSize.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -328,7 +329,8 @@ public class PicDirView extends ViewPart {
 		/**
 		 * must be muliplied with 10 that enough increment labels are displayed
 		 */
-		final int thumbnailSize = PhotoManager.THUMBNAIL_SIZES[selectedSizeIndex / 10];
+//		final int thumbnailSize = PhotoManager.THUMBNAIL_SIZES[selectedSizeIndex / 10];
+		final int thumbnailSize = _scaleThumbnailSize.getSelection();
 
 		_picDirImages.setThumbnailSize(thumbnailSize);
 
@@ -344,24 +346,25 @@ public class PicDirView extends ViewPart {
 		 */
 		final int stateSize = Util.getStateInt(_state, STATE_THUMB_IMAGE_SIZE, PhotoManager.THUMBNAIL_DEFAULT_SIZE);
 
-		int thumbSize = -1;
-		for (final int thumbnailSize : PhotoManager.THUMBNAIL_SIZES) {
-			if (thumbnailSize == stateSize) {
-				thumbSize = thumbnailSize;
-				break;
-			}
-		}
-		final int thumbnailSize = thumbSize == -1 ? PhotoManager.THUMBNAIL_DEFAULT_SIZE : thumbSize;
-		int thumbnailSizeIndex = -1;
-
-		for (int sizeIndex = 0; sizeIndex < PhotoManager.THUMBNAIL_SIZES.length; sizeIndex++) {
-			if (PhotoManager.THUMBNAIL_SIZES[sizeIndex] == thumbnailSize) {
-				thumbnailSizeIndex = sizeIndex;
-				break;
-			}
-		}
-
-		_scaleThumbnailSize.setSelection(thumbnailSizeIndex * 10);
+//		int thumbSize = -1;
+//		for (final int thumbnailSize : PhotoManager.THUMBNAIL_SIZES) {
+//			if (thumbnailSize == stateSize) {
+//				thumbSize = thumbnailSize;
+//				break;
+//			}
+//		}
+//		final int thumbnailSize = thumbSize == -1 ? PhotoManager.THUMBNAIL_DEFAULT_SIZE : thumbSize;
+//		int thumbnailSizeIndex = -1;
+//
+//		for (int sizeIndex = 0; sizeIndex < PhotoManager.THUMBNAIL_SIZES.length; sizeIndex++) {
+//			if (PhotoManager.THUMBNAIL_SIZES[sizeIndex] == thumbnailSize) {
+//				thumbnailSizeIndex = sizeIndex;
+//				break;
+//			}
+//		}
+//
+//		_scaleThumbnailSize.setSelection(thumbnailSizeIndex * 10);
+		_scaleThumbnailSize.setSelection(stateSize);
 	}
 
 	private void saveState() {
@@ -385,9 +388,10 @@ public class PicDirView extends ViewPart {
 
 		// thumbnail size
 		final int sizeSelection = _scaleThumbnailSize.getSelection();
-		final int thumbnailSize = PhotoManager.THUMBNAIL_SIZES[sizeSelection / 10];
-
-		_state.put(STATE_THUMB_IMAGE_SIZE, thumbnailSize);
+//		final int thumbnailSize = PhotoManager.THUMBNAIL_SIZES[sizeSelection / 10];
+//
+//		_state.put(STATE_THUMB_IMAGE_SIZE, thumbnailSize);
+		_state.put(STATE_THUMB_IMAGE_SIZE, sizeSelection);
 	}
 
 	@Override

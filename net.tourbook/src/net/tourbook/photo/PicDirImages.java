@@ -212,31 +212,13 @@ public class PicDirImages {
 		}
 
 		@Override
-		public void callBackImageIsLoaded() {
+		public void callBackImageIsLoaded(final boolean isImageStillVisible) {
 
-			Display.getDefault().syncExec(new Runnable() {
+			if (isImageStillVisible == false) {
+				return;
+			}
 
-				private boolean isImageVisible(final Rectangle galleryItemBounds) {
-
-					// check if the image is still visible
-
-					final int itemTop = galleryItemBounds.y;
-					final int itemBottom = itemTop + galleryItemBounds.height;
-
-					final PicDirGallery gallery = (PicDirGallery) _gallery;
-					final int translate = gallery.getTranslate();
-					final Rectangle clientArea = gallery.getClientArea();
-					final int visibleBottom = translate + clientArea.height;
-
-					if (itemBottom < 0 || itemTop > visibleBottom) {
-
-						// item is not visible
-
-						return false;
-					}
-
-					return true;
-				}
+			_display.asyncExec(new Runnable() {
 
 				public void run() {
 
@@ -245,10 +227,6 @@ public class PicDirImages {
 					}
 
 					final Rectangle galleryItemBounds = __galleryItem.getBounds();
-
-					if (isImageVisible(galleryItemBounds) == false) {
-						return;
-					}
 
 //					System.out.println("redraw: " + galleryItemBounds);
 //					// TODO remove SYSTEM.OUT.PRINTLN
@@ -330,7 +308,7 @@ public class PicDirImages {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, 0).applyTo(container);
-		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+		container.setBackground(_display.getSystemColor(SWT.COLOR_RED));
 		{
 			_pageBook = new PageBook(container, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBook);
@@ -350,7 +328,7 @@ public class PicDirImages {
 	 */
 	private void createUI_10_PageGallery(final Composite parent) {
 
-		_gallery = new PicDirGallery(parent, SWT.V_SCROLL | SWT.VIRTUAL | SWT.MULTI);
+		_gallery = new GalleryMT(parent, SWT.V_SCROLL | SWT.VIRTUAL | SWT.MULTI);
 		//		GridDataFactory.fillDefaults().grab(true, true).applyTo(_gallery);
 
 		_gallery.setLowQualityOnUserAction(true);

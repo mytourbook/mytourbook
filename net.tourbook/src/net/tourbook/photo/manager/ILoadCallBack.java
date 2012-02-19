@@ -18,6 +18,6 @@ package net.tourbook.photo.manager;
 
 public interface ILoadCallBack {
 
-	void callBackImageIsLoaded();
+	void callBackImageIsLoaded(boolean isImageStillVisible);
 
 }

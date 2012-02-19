@@ -21,7 +21,9 @@ import net.tourbook.photo.gallery.RendererHelper;
 import net.tourbook.photo.manager.Photo;
 import net.tourbook.photo.manager.PhotoImageCache;
 import net.tourbook.photo.manager.PhotoManager;
+import net.tourbook.ui.UI;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -83,9 +85,10 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 
 		if (selected) {
 			// draw selection
-			gc.setBackground(getSelectionBackgroundColor());
 			gc.setForeground(getSelectionBackgroundColor());
+			gc.setBackground(getSelectionBackgroundColor());
 		} else {
+			gc.setForeground(getForegroundColor());
 			gc.setBackground(getBackgroundColor());
 		}
 
@@ -145,15 +148,18 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 							devYGallery + yShift,
 							size.x,
 							size.y);
+//					setForegroundColor(gc.getDevice().getSystemColor(SWT.COLOR_BLUE));
+//					setBackgroundColor(gc.getDevice().getSystemColor(SWT.COLOR_WHITE));
+//					drawText(gc, devXGallery, devYGallery, photo, false, false);
 				}
 			} catch (final Exception e) {
-				drawText(gc, devXGallery, devYGallery, photo, true);
+				drawText(gc, devXGallery, devYGallery, photo, true, false);
 			}
 		} else {
 
 			// image is not available
 
-			drawText(gc, devXGallery, devYGallery, photo, false);
+			drawText(gc, devXGallery, devYGallery, photo, false, true);
 		}
 
 		// Draw label
@@ -184,7 +190,11 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 			}
 
 			// Create label
-			final String text = RendererHelper.createLabel(galleryItem.getText(), gc, galleryItemWidth - 10);
+
+			// RendererHelper IS A PERFORMANCE HOG when small images are displayed
+
+//			final String text = RendererHelper.createLabel(galleryItem.getText(), gc, galleryItemWidth - 10);
+			final String text = galleryItem.getText();
 
 			// Center text
 			final int textWidth = gc.textExtent(text).x;
@@ -196,9 +206,26 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 
 	}
 
-	private void drawText(final GC gc, final int x, final int y, final Photo photo, final boolean isError) {
+	private void drawText(	final GC gc,
+							final int x,
+							final int y,
+							final Photo photo,
+							final boolean isError,
+							final boolean isLoading) {
 
-		final String photoData = (isError ? "!!! " : "") + photo.getFileName();
+		String photoData = UI.EMPTY_STRING;
+
+		if (isError) {
+			photoData = "Error ";
+			setForegroundColor(gc.getDevice().getSystemColor(SWT.COLOR_RED));
+			setBackgroundColor(gc.getDevice().getSystemColor(SWT.COLOR_WHITE));
+		} else if (isLoading) {
+			photoData = "Loading ";
+			setForegroundColor(gc.getDevice().getSystemColor(SWT.COLOR_YELLOW));
+			setBackgroundColor(gc.getDevice().getSystemColor(SWT.COLOR_BLACK));
+		}
+		photoData += photo.getFileName();
+
 		gc.drawText(photoData, x, y);
 	}
 }

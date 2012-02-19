@@ -35,15 +35,15 @@ import org.eclipse.swt.widgets.Item;
 
 public class GalleryMTItem extends Item {
 
-	private static final String	EMPTY_STRING	= "";											//$NON-NLS-1$
+	private static final String			EMPTY_STRING	= "";											//$NON-NLS-1$
 
-	private String[]			text			= { EMPTY_STRING, EMPTY_STRING, EMPTY_STRING };
+	private String[]					text			= { EMPTY_STRING, EMPTY_STRING, EMPTY_STRING };
 
 	// This is managed by the Gallery
 	/**
 	 * Children of this item. Only used when groups are enabled.
 	 */
-	protected GalleryMTItem[]	items			= null;
+	protected GalleryMTItem[]			items			= null;
 
 	/**
 	 * Bounds of this items in the current Gallery. X and Y values are used for vertical or
@@ -51,52 +51,57 @@ public class GalleryMTItem extends Item {
 	 * and height
 	 */
 	// protected Rectangle bounds = new Rectangle(0, 0, 0, 0);
-	protected int				x				= 0;
+	protected int						x				= 0;
 
-	protected int				y				= 0;
+	protected int						y				= 0;
 
 	/**
 	 * Size of the group, including its title.
 	 */
-	protected int				width			= 0;
+	protected int						width			= 0;
 
-	protected int				height			= 0;
+	protected int						height			= 0;
 
-	protected int				marginBottom	= 0;
+	protected int						marginBottom	= 0;
 
-	protected int				hCount			= 0;
+	protected int						hCount			= 0;
 
-	protected int				vCount			= 0;
+	protected int						vCount			= 0;
 
 	/**
 	 * Last result of indexOf( GalleryItem). Used for optimisation.
 	 */
-	protected int				lastIndexOf		= 0;
+	protected int						lastIndexOf		= 0;
 
 	/**
 	 * True if the Gallery was created wih SWT.VIRTUAL
 	 */
-	private boolean				virtualGallery;
+	private boolean						virtualGallery;
 
-	private GalleryMT			parent;
+	private GalleryMT					_gallery;
 
-	private GalleryMTItem		parentItem;
+	private GalleryMTItem				parentItem;
 
 	/**
 	 * Selection bit flags. Each 'int' contains flags for 32 items.
 	 */
-	protected int[]				selectionFlags	= null;
+	protected int[]						selectionFlags	= null;
 
-	protected Font				font;
+	protected Font						font;
 
-	protected Color				foreground, background;
+	protected Color						foreground, background;
 
-	private boolean				ultraLazyDummy	= false;
+	private boolean						ultraLazyDummy	= false;
 
 	/**
 	 * 
 	 */
-	private boolean				expanded;
+	private boolean						expanded;
+
+	/**
+	 * Index for items which are currently be visible when this item is a group
+	 */
+	private volatile GalleryMTItem[]	_visibleItems;
 
 	public GalleryMTItem(final GalleryMT parent, final int style) {
 		this(parent, style, -1, true);
@@ -108,7 +113,7 @@ public class GalleryMTItem extends Item {
 
 	protected GalleryMTItem(final GalleryMT parent, final int style, final int index, final boolean create) {
 		super(parent, style);
-		this.parent = parent;
+		this._gallery = parent;
 		this.parentItem = null;
 		if ((parent.getStyle() & SWT.VIRTUAL) > 0) {
 			virtualGallery = true;
@@ -131,7 +136,7 @@ public class GalleryMTItem extends Item {
 	protected GalleryMTItem(final GalleryMTItem parent, final int style, final int index, final boolean create) {
 		super(parent, style);
 
-		this.parent = parent.parent;
+		this._gallery = parent._gallery;
 		this.parentItem = parent;
 		if ((parent.getStyle() & SWT.VIRTUAL) > 0) {
 			virtualGallery = true;
@@ -148,16 +153,16 @@ public class GalleryMTItem extends Item {
 		// this item in virtual mode
 
 		// Insert item
-		items = (GalleryMTItem[]) parent._arrayAddItem(items, item, position);
+		items = (GalleryMTItem[]) _gallery._arrayAddItem(items, item, position);
 
 		// Update Gallery
-		parent.updateStructuralValues(null, false);
-		parent.updateScrollBarsProperties();
+		_gallery.updateStructuralValues(null, false);
+		_gallery.updateScrollBarsProperties();
 	}
 
 	protected void _addSelection(final GalleryMTItem item) {
 		// Deselect all items is multi selection is disabled
-		if (!parent.multi) {
+		if (!_gallery._isMultiSelection) {
 			_deselectAll();
 		}
 
@@ -226,7 +231,7 @@ public class GalleryMTItem extends Item {
 					items[items.length - 1]._dispose();
 				} else {
 					// This is an uninitialized item, just remove the slot
-					parent._remove(this, items.length - 1);
+					_gallery._remove(this, items.length - 1);
 				}
 			}
 		}
@@ -238,11 +243,11 @@ public class GalleryMTItem extends Item {
 
 	public void _setExpanded(final boolean expanded, final boolean redraw) {
 		this.expanded = expanded;
-		parent.updateStructuralValues(this, false);
-		parent.updateScrollBarsProperties();
+		_gallery.updateStructuralValues(this, false);
+		_gallery.updateScrollBarsProperties();
 
 		if (redraw) {
-			parent.redraw();
+			_gallery.redraw();
 		}
 	}
 
@@ -257,7 +262,7 @@ public class GalleryMTItem extends Item {
 	 * Reset item values to defaults.
 	 */
 	public void clear() {
-		checkWidget();
+//		checkWidget();
 		// Clear all attributes
 		text[0] = EMPTY_STRING;
 		text[1] = EMPTY_STRING;
@@ -268,7 +273,7 @@ public class GalleryMTItem extends Item {
 		foreground = null;
 
 		// Force redraw
-		this.parent.redraw(this);
+		this._gallery.redraw(this);
 	}
 
 	public void clearAll() {
@@ -276,7 +281,7 @@ public class GalleryMTItem extends Item {
 	}
 
 	public void clearAll(final boolean all) {
-		checkWidget();
+//		checkWidget();
 
 		if (items == null) {
 			return;
@@ -300,22 +305,22 @@ public class GalleryMTItem extends Item {
 	 * Deselect all children of this item
 	 */
 	public void deselectAll() {
-		checkWidget();
+//		checkWidget();
 		_deselectAll();
-		parent.redraw();
+		_gallery.redraw();
 	}
 
 	@Override
 	public void dispose() {
-		checkWidget();
+//		checkWidget();
 
 		removeFromParent();
 		_disposeChildren();
 		super.dispose();
 
-		parent.updateStructuralValues(null, false);
-		parent.updateScrollBarsProperties();
-		parent.redraw();
+		_gallery.updateStructuralValues(null, false);
+		_gallery.updateScrollBarsProperties();
+		_gallery.redraw();
 	}
 
 	/**
@@ -348,7 +353,7 @@ public class GalleryMTItem extends Item {
 	 *                </ul>
 	 */
 	public Color getBackground(final boolean itemOnly) {
-		checkWidget();
+//		checkWidget();
 
 		// If itemOnly, return this item's color attribute.
 		if (itemOnly) {
@@ -356,12 +361,12 @@ public class GalleryMTItem extends Item {
 		}
 
 		// Let the renderer decide the color.
-		if (parent.getGroupRenderer() != null) {
-			return parent.getGroupRenderer().getBackground(this);
+		if (_gallery.getGroupRenderer() != null) {
+			return _gallery.getGroupRenderer().getBackground(this);
 		}
 
 		// Default SWT behavior if no renderer.
-		return background != null ? background : parent.getBackground();
+		return background != null ? background : _gallery.getBackground();
 	}
 
 	/**
@@ -371,16 +376,17 @@ public class GalleryMTItem extends Item {
 	 * @return
 	 */
 	public Rectangle getBounds() {
+
 		// The y coords is relative to the client area because it may return
 		// wrong values
 		// on win32 when using the scroll bars. Instead, I use the absolute
 		// position and make it relative using the current translation.
 
-		if (parent.isVertical()) {
-			return new Rectangle(x, y - parent.translate, width, height);
+		if (_gallery.isVertical()) {
+			return new Rectangle(x, y - _gallery._galleryPosition, width, height);
 		}
 
-		return new Rectangle(x - parent.translate, y, width, height);
+		return new Rectangle(x - _gallery._galleryPosition, y, width, height);
 	}
 
 	/**
@@ -397,19 +403,19 @@ public class GalleryMTItem extends Item {
 	}
 
 	public Font getFont(final boolean itemOnly) {
-		checkWidget();
+//		checkWidget();
 
 		if (itemOnly) {
 			return font;
 		}
 
 		// Let the renderer decide the color.
-		if (parent.getGroupRenderer() != null) {
-			return parent.getGroupRenderer().getFont(this);
+		if (_gallery.getGroupRenderer() != null) {
+			return _gallery.getGroupRenderer().getFont(this);
 		}
 
 		// Default SWT behavior if no renderer.
-		return font != null ? font : parent.getFont();
+		return font != null ? font : _gallery.getFont();
 	}
 
 	/**
@@ -442,19 +448,19 @@ public class GalleryMTItem extends Item {
 	 *                </ul>
 	 */
 	public Color getForeground(final boolean itemOnly) {
-		checkWidget();
+//		checkWidget();
 
 		if (itemOnly) {
 			return this.foreground;
 		}
 
 		// Let the renderer decide the color.
-		if (parent.getGroupRenderer() != null) {
-			return parent.getGroupRenderer().getForeground(this);
+		if (_gallery.getGroupRenderer() != null) {
+			return _gallery.getGroupRenderer().getForeground(this);
 		}
 
 		// Default SWT behavior if no renderer.
-		return foreground != null ? foreground : parent.getForeground();
+		return foreground != null ? foreground : _gallery.getForeground();
 	}
 
 	/**
@@ -468,8 +474,8 @@ public class GalleryMTItem extends Item {
 	 * @return : the GalleryItem or null if index is out of bounds
 	 */
 	public GalleryMTItem getItem(final int index) {
-		checkWidget();
-		return parent._getItem(this, index);
+//		checkWidget();
+		return _gallery._getItem(this, index);
 	}
 
 	/**
@@ -488,7 +494,7 @@ public class GalleryMTItem extends Item {
 	}
 
 	public GalleryMTItem[] getItems() {
-		checkWidget();
+//		checkWidget();
 		if (items == null) {
 			return new GalleryMTItem[0];
 		}
@@ -499,8 +505,8 @@ public class GalleryMTItem extends Item {
 		return itemsLocal;
 	}
 
-	public GalleryMT getParent() {
-		return parent;
+	public GalleryMT getGallery() {
+		return _gallery;
 	}
 
 	public GalleryMTItem getParentItem() {
@@ -513,8 +519,12 @@ public class GalleryMTItem extends Item {
 	}
 
 	public String getText(final int index) {
-		checkWidget();
+//		checkWidget();
 		return text[index];
+	}
+
+	public GalleryMTItem[] getVisibleItems() {
+		return _visibleItems;
 	}
 
 	/**
@@ -525,9 +535,9 @@ public class GalleryMTItem extends Item {
 	 * @return
 	 */
 	public int indexOf(final GalleryMTItem childItem) {
-		checkWidget();
+//		checkWidget();
 
-		return parent._indexOf(this, childItem);
+		return _gallery._indexOf(this, childItem);
 	}
 
 	/**
@@ -569,33 +579,29 @@ public class GalleryMTItem extends Item {
 	}
 
 	public void remove(final int index) {
-		checkWidget();
-		parent._remove(this, index);
+//		checkWidget();
+		_gallery._remove(this, index);
 
-		parent.updateStructuralValues(null, false);
-		parent.updateScrollBarsProperties();
-		parent.redraw();
+		_gallery.updateStructuralValues(null, false);
+		_gallery.updateScrollBarsProperties();
+		_gallery.redraw();
 	}
 
 	protected void removeFromParent() {
 		if (parentItem != null) {
-			final int index = parent._indexOf(parentItem, this);
-			parent._remove(parentItem, index);
+			final int index = _gallery._indexOf(parentItem, this);
+			_gallery._remove(parentItem, index);
 		} else {
-			final int index = parent._indexOf(this);
-			parent._remove(index);
+			final int index = _gallery._indexOf(this);
+			_gallery._remove(index);
 		}
 	}
 
 	protected void select(final int from, final int to) {
-		if (GalleryMT.DEBUG)
-		 {
-			System.out.println("GalleryItem.select(  " + from + "," + to + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		}
 
 		for (int i = from; i <= to; i++) {
 			final GalleryMTItem item = getItem(i);
-			parent._addSelection(item);
+			_gallery._addSelection(item);
 			item._selectAll();
 		}
 	}
@@ -604,9 +610,9 @@ public class GalleryMTItem extends Item {
 	 * Selects all of the items in the receiver.
 	 */
 	public void selectAll() {
-		checkWidget();
+//		checkWidget();
 		_selectAll();
-		parent.redraw();
+		_gallery.redraw();
 	}
 
 	/**
@@ -627,12 +633,12 @@ public class GalleryMTItem extends Item {
 	 *                </ul>
 	 */
 	public void setBackground(final Color background) {
-		checkWidget();
+//		checkWidget();
 		if (background != null && background.isDisposed()) {
 			SWT.error(SWT.ERROR_INVALID_ARGUMENT);
 		}
 		this.background = background;
-		this.parent.redraw(this);
+		this._gallery.redraw(this);
 	}
 
 	/**
@@ -650,17 +656,17 @@ public class GalleryMTItem extends Item {
 	 * @param expanded
 	 */
 	public void setExpanded(final boolean expanded) {
-		checkWidget();
+//		checkWidget();
 		_setExpanded(expanded, true);
 	}
 
 	public void setFont(final Font font) {
-		checkWidget();
+//		checkWidget();
 		if (font != null && font.isDisposed()) {
 			SWT.error(SWT.ERROR_INVALID_ARGUMENT);
 		}
 		this.font = font;
-		this.parent.redraw(this);
+		this._gallery.redraw(this);
 	}
 
 	/**
@@ -681,18 +687,18 @@ public class GalleryMTItem extends Item {
 	 *                </ul>
 	 */
 	public void setForeground(final Color foreground) {
-		checkWidget();
+//		checkWidget();
 		if (foreground != null && foreground.isDisposed()) {
 			SWT.error(SWT.ERROR_INVALID_ARGUMENT);
 		}
 		this.foreground = foreground;
-		this.parent.redraw(this);
+		this._gallery.redraw(this);
 	}
 
 	@Override
 	public void setImage(final Image image) {
 		super.setImage(image);
-		parent.redraw(this);
+		_gallery.redraw(this);
 	}
 
 	/**
@@ -716,7 +722,7 @@ public class GalleryMTItem extends Item {
 	}
 
 	protected void setParent(final GalleryMT parent) {
-		this.parent = parent;
+		this._gallery = parent;
 	}
 
 	protected void setParentItem(final GalleryMTItem parentItem) {
@@ -724,12 +730,12 @@ public class GalleryMTItem extends Item {
 	}
 
 	public void setText(final int index, final String string) {
-		checkWidget();
+//		checkWidget();
 		if (string == null) {
 			SWT.error(SWT.ERROR_NULL_ARGUMENT);
 		}
 		text[index] = string;
-		parent.redraw(this);
+		_gallery.redraw(this);
 	}
 
 	@Override
@@ -739,6 +745,10 @@ public class GalleryMTItem extends Item {
 
 	protected void setUltraLazyDummy(final boolean ultraLazyDummy) {
 		this.ultraLazyDummy = ultraLazyDummy;
+	}
+
+	public void setVisibleItems(final GalleryMTItem[] _visibleItems) {
+		this._visibleItems = _visibleItems;
 	}
 
 }

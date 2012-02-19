@@ -24,41 +24,47 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import net.tourbook.photo.gallery.GalleryMTItem;
 
+import org.eclipse.swt.widgets.Display;
+
 public class PhotoManager {
 
-	public static final int											THUMBNAIL_DEFAULT_SIZE	= 160;
+	public static final int										THUMBNAIL_DEFAULT_SIZE	= 160;
 //	public static final int											THUMBNAIL_DEFAULT_SIZE	= 50;
 
 // SET_FORMATTING_OFF
 	
-	public static final int[]										THUMBNAIL_SIZES = new int[]
-			{
-				50, 60, 70, 80, 90, 100, 120, 140, THUMBNAIL_DEFAULT_SIZE, 200, 250, 300, 400, 500, 600
-//				THUMBNAIL_DEFAULT_SIZE, 60, 70, 80, 90, 100, 120, 140, 160, 200, 250, 300, 400, 500, 600
-			};
+//	public static final int[]										THUMBNAIL_SIZES = new int[]
+//			{
+//				50, 60, 70, 80, 90, 100, 120, 140, THUMBNAIL_DEFAULT_SIZE, 200, 250, 300, 400, 500, 600
+////				THUMBNAIL_DEFAULT_SIZE, 60, 70, 80, 90, 100, 120, 140, 160, 200, 250, 300, 400, 500, 600
+//			};
 	
 	public static int[]												IMAGE_SIZE = { THUMBNAIL_DEFAULT_SIZE, 600, 999999 };
 	
 // SET_FORMATTING_ON
 
-	public static int												IMAGE_QUALITY_THUMB_160	= 0;
-	public static int												IMAGE_QUALITY_600		= 1;
-	public static int												IMAGE_QUALITY_ORIGINAL	= 2;
+	public static int											IMAGE_QUALITY_THUMB_160	= 0;
+	public static int											IMAGE_QUALITY_600		= 1;
+	public static int											IMAGE_QUALITY_ORIGINAL	= 2;
 	/**
 	 * This must be the max image quality which is also used as array.length()
 	 */
-	public static int												MAX_IMAGE_QUALITY		= 2;
+	public static int											MAX_IMAGE_QUALITY		= 2;
 
-	private static ThreadPoolExecutor								_executorService;
+	private static Display										_display;
 
-	private static final LinkedBlockingDeque<PhotoImageLoaderItem>	_waitingQueue			= new LinkedBlockingDeque<PhotoImageLoaderItem>();
+	private static ThreadPoolExecutor							_executorService;
+
+	private static final LinkedBlockingDeque<PhotoImageLoader>	_waitingQueue			= new LinkedBlockingDeque<PhotoImageLoader>();
 
 	static {
+
+		_display = Display.getDefault();
 
 		int processors = Runtime.getRuntime().availableProcessors() - 2;
 		processors = Math.max(processors, 1);
 
-		processors = 4;
+		processors = 1;
 
 		System.out.println("Number of processors: " + processors);
 
@@ -95,7 +101,8 @@ public class PhotoManager {
 		photo.setLoadingState(PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE, imageQuality);
 
 		// add loading item into the waiting queue
-		_waitingQueue.add(new PhotoImageLoaderItem(//
+		_waitingQueue.add(new PhotoImageLoader(
+				_display,
 				galleryItem,
 				photo,
 				imageQuality,
@@ -105,7 +112,7 @@ public class PhotoManager {
 			public void run() {
 
 				// get last added loader itme
-				final PhotoImageLoaderItem loadingItem = _waitingQueue.pollLast();
+				final PhotoImageLoader loadingItem = _waitingQueue.pollLast();
 
 				if (loadingItem != null) {
 					loadingItem.loadImage();
@@ -190,7 +197,7 @@ public class PhotoManager {
 				continue;
 			}
 
-			final PhotoImageLoaderItem photoImageLoaderItem = (PhotoImageLoaderItem) object;
+			final PhotoImageLoader photoImageLoaderItem = (PhotoImageLoader) object;
 
 			photoImageLoaderItem.photo.setLoadingState(PhotoLoadingState.UNDEFINED, photoImageLoaderItem.imageQuality);
 		}

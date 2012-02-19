@@ -77,7 +77,7 @@ public abstract class AbstractGalleryGroupRenderer {
 			}
 
 			// Then parent color.
-			return item.getParent().getBackground();
+			return item.getGallery().getBackground();
 
 		}
 		return null;
@@ -107,7 +107,7 @@ public abstract class AbstractGalleryGroupRenderer {
 			}
 
 			// Then parent font.
-			return item.getParent().getFont();
+			return item.getGallery().getFont();
 
 		}
 		return null;
@@ -137,7 +137,7 @@ public abstract class AbstractGalleryGroupRenderer {
 			}
 
 			// Then parent color.
-			return item.getParent().getForeground();
+			return item.getGallery().getForeground();
 
 		}
 		return null;
@@ -191,16 +191,6 @@ public abstract class AbstractGalleryGroupRenderer {
 	 * @return
 	 */
 	public abstract Rectangle getSize(GalleryMTItem item);
-
-	/**
-	 * This method can be used as a condition to print trace or debug informations in standard
-	 * output.
-	 * 
-	 * @return true if Debug mode is enabled
-	 */
-	protected boolean isDebugMode() {
-		return GalleryMT.DEBUG;
-	}
 
 	/**
 	 * Get the expand/collapse state of the current group

@@ -22,20 +22,20 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.imageio.ImageIO;
 
-import net.tourbook.photo.PicDirGallery;
 import net.tourbook.photo.gallery.GalleryMTItem;
 import net.tourbook.util.StatusUtil;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 import org.imgscalr.Scalr;
 
-public class PhotoImageLoaderItem {
+public class PhotoImageLoader {
 
-	private static final ReentrantLock	RESIZE_LOCK		= new ReentrantLock();
+	private static final ReentrantLock	RESIZE_LOCK	= new ReentrantLock();
 
 	Photo								photo;
 	private GalleryMTItem				_galleryItem;
@@ -43,17 +43,17 @@ public class PhotoImageLoaderItem {
 	int									imageQuality;
 	private String						_imageKey;
 
-	Display								_display		= Display.getDefault();
-
 	private ILoadCallBack				_loadCallBack;
 
-	private static int					_checkCounter	= 0;
+	Display								_display;							;
 
-	public PhotoImageLoaderItem(final GalleryMTItem galleryItem,
-								final Photo photo,
-								final int imageQuality,
-								final ILoadCallBack loadCallBack) {
+	public PhotoImageLoader(final Display display,
+							final GalleryMTItem galleryItem,
+							final Photo photo,
+							final int imageQuality,
+							final ILoadCallBack loadCallBack) {
 
+		_display = display;
 		_galleryItem = galleryItem;
 		this.photo = photo;
 		this.imageQuality = imageQuality;
@@ -63,7 +63,7 @@ public class PhotoImageLoaderItem {
 		_imageKey = photo.getImageKey(imageQuality);
 	}
 
-	private Image getStoreImageAWT(final Photo photo, final int requestedImageQuality) {
+	private Image getThumbImageAWT(final Photo photo, final int requestedImageQuality) {
 
 		IPath storeImageFilePath = null;
 
@@ -134,21 +134,21 @@ public class PhotoImageLoaderItem {
 
 			final long endLoadSWT = System.currentTimeMillis();
 
-			System.out.println((Thread.currentThread().getName() + "\t")
-					+ photo.getFileName()
-					+ "\tload:\t"
-					+ ((endLoadAWT - startLoadAWT) + "")
-					+ "\tresize:\t"
-					+ ((endResize - startResize) + "")
-					+ "\tsave AWT:\t"
-					+ ((endSaveAWT - startSaveAWT) + "")
-					+ "\tload SWT:\t"
-					+ ((endLoadSWT - startLoadSWT) + "")
-					+ "\ttotal:\t"
-					+ ((endLoadSWT - startLoadAWT) + "")
-			//
-					);
-			// TODO remove SYSTEM.OUT.PRINTLN
+//			System.out.println((Thread.currentThread().getName() + "\t")
+//					+ photo.getFileName()
+//					+ "\tload: "
+//					+ ((endLoadAWT - startLoadAWT) + "")
+//					+ "\tresize: "
+//					+ ((endResize - startResize) + "")
+//					+ "\tsave AWT: "
+//					+ ((endSaveAWT - startSaveAWT) + "")
+//					+ "\tload SWT: "
+//					+ ((endLoadSWT - startLoadSWT) + "")
+//					+ "\ttotal: "
+//					+ ((endLoadSWT - startLoadAWT) + "")
+//			//
+//					);
+//			// TODO remove SYSTEM.OUT.PRINTLN
 
 			return thumbnailImage;
 
@@ -159,7 +159,7 @@ public class PhotoImageLoaderItem {
 		return null;
 	}
 
-	private Image getStoreImageSWT(final Photo photo, final int requestedImageQuality) {
+	private Image getThumbImageSWT(final Photo photo, final int requestedImageQuality) {
 
 		IPath storeImageFilePath = null;
 
@@ -217,11 +217,25 @@ public class PhotoImageLoaderItem {
 			final boolean isResizeRequired = !(fullSizeImageBounds.width == bestSize.x && fullSizeImageBounds.height == bestSize.y);
 
 			if (isResizeRequired) {
-//				RESIZE_LOCK.lock();
+				RESIZE_LOCK.lock();
 				{
 					try {
 
-						thumbnailImage = ImageUtils.resize(fullSizeImage, bestSize.x, bestSize.y);
+						thumbnailImage = ImageUtils.resize(
+								_display,
+								fullSizeImage,
+								bestSize.x,
+								bestSize.y,
+								SWT.ON,
+								SWT.HIGH);
+
+						endResize = System.currentTimeMillis();
+
+						startSave = System.currentTimeMillis();
+
+						ThumbnailStore.saveImageSWT(thumbnailImage, storeImageFilePath);
+
+						endSave = System.currentTimeMillis();
 
 					} catch (final Exception e) {
 						StatusUtil.log(NLS.bind("Image \"{0}\" cannot be resized", fullSizePathName), e); //$NON-NLS-1$
@@ -229,34 +243,26 @@ public class PhotoImageLoaderItem {
 
 					} finally {
 						fullSizeImage.dispose();
-//						RESIZE_LOCK.unlock();
+						RESIZE_LOCK.unlock();
 					}
 				}
-
-				endResize = System.currentTimeMillis();
-
-				startSave = System.currentTimeMillis();
-
-				ThumbnailStore.saveImageSWT(thumbnailImage, storeImageFilePath);
-
-				endSave = System.currentTimeMillis();
 			} else {
 				thumbnailImage = fullSizeImage;
 			}
 
-			System.out.println((Thread.currentThread().getName() + "\t")
-					+ photo.getFileName()
-					+ "\tload:\t"
-					+ ((endLoading - startLoading) + "")
-					+ "\tresize:\t"
-					+ ((endResize - startResize) + "")
-					+ "\tsave:\t"
-					+ ((endSave - startSave) + "")
-					+ "\ttotal:\t"
-					+ ((endSave - startLoading) + "")
-			//
-					);
-			// TODO remove SYSTEM.OUT.PRINTLN
+//			System.out.println((Thread.currentThread().getName() + "\t")
+//					+ photo.getFileName()
+//					+ "\tload: "
+//					+ ((endLoading - startLoading) + "")
+//					+ "\tresize: "
+//					+ ((endResize - startResize) + "")
+//					+ "\tsave: "
+//					+ ((endSave - startSave) + "")
+//					+ "\ttotal: "
+//					+ ((endSave - startLoading) + "")
+//			//
+//					);
+//			// TODO remove SYSTEM.OUT.PRINTLN
 
 			return thumbnailImage;
 
@@ -274,43 +280,38 @@ public class PhotoImageLoaderItem {
 	 */
 	private boolean isImageVisible() {
 
-		if (_display.isDisposed()) {
-			// this happened
-			return false;
+		final GalleryMTItem group = _galleryItem.getParentItem();
+		if (group == null) {
+			return true;
 		}
 
-		final PicDirGallery gallery = (PicDirGallery) _galleryItem.getParent();
-		final Rectangle[] galleryItemBoundses = { null };
-		final Rectangle[] clientAreas = { null };
+		final GalleryMTItem[] visibleItems = group.getVisibleItems();
+		if (visibleItems == null) {
+			return true;
+		}
 
-		_display.syncExec(new Runnable() {
-			public void run() {
-				if (_galleryItem.isDisposed()) {
-					return;
-				}
-				galleryItemBoundses[0] = _galleryItem.getBounds();
-				clientAreas[0] = gallery.getClientArea();
+		for (final GalleryMTItem visibleItem : visibleItems) {
+
+			if (visibleItem == null) {
+				continue;
 			}
-		});
 
-		final Rectangle galleryItemBounds = galleryItemBoundses[0];
+			if (visibleItem.equals(_galleryItem)) {
+//				System.out.println("is visible\t" + photo.getFileName());
+//				// TODO remove SYSTEM.OUT.PRINTLN
 
-		final Rectangle clientArea = clientAreas[0];
-		final int translate = gallery.getTranslate();
-
-		final int itemTop = galleryItemBounds.y;
-		final int itemBottom = itemTop + galleryItemBounds.height;
-		final int visibleBottom = translate + clientArea.height;
-
-		if (itemBottom < 0 || itemTop > visibleBottom) {
-
-			// item is not visible
-
-			resetState();
-			return false;
+				return true;
+			}
 		}
 
-		return true;
+		// item is not visible
+
+//		System.out.println("not visible\t" + photo.getFileName());
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
+		resetState();
+
+		return false;
 	}
 
 	/**
@@ -381,6 +382,11 @@ public class PhotoImageLoaderItem {
 
 		try {
 
+//			if (_display.isDisposed()) {
+//				// this happened
+//				return;
+//			}
+
 			if (isImageVisible() == false) {
 				return;
 			}
@@ -399,20 +405,20 @@ public class PhotoImageLoaderItem {
 				/*
 				 * check if photo is available in the thumbnail store
 				 */
-//				final Image storeImage = getStoreImageAWT(photo, imageQuality);
-				final Image storeImage = getStoreImageSWT(photo, imageQuality);
+//				final Image thumbImage = getThumbImageAWT(photo, imageQuality);
+				final Image thumbImage = getThumbImageSWT(photo, imageQuality);
 
-				if (storeImage == null) {
+				if (thumbImage == null) {
 					throw new Exception();
 				} else {
-					PhotoImageCache.putImage(_imageKey, storeImage);
+					PhotoImageCache.putImage(_imageKey, thumbImage);
 				}
 			}
 
 			resetState();
 
 			// tell the call back that the image is loaded
-			_loadCallBack.callBackImageIsLoaded();
+			_loadCallBack.callBackImageIsLoaded(isImageVisible());
 
 		} catch (final Exception e) {
 
