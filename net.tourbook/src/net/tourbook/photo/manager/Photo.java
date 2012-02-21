@@ -33,9 +33,9 @@ import org.apache.commons.sanselan.formats.tiff.TiffField;
 import org.apache.commons.sanselan.formats.tiff.TiffImageMetadata;
 import org.apache.commons.sanselan.formats.tiff.constants.ExifTagConstants;
 import org.apache.commons.sanselan.formats.tiff.constants.GpsTagConstants;
-import org.apache.commons.sanselan.formats.tiff.constants.TagInfo;
-import org.apache.commons.sanselan.formats.tiff.constants.TiffConstants;
 import org.apache.commons.sanselan.formats.tiff.constants.TiffTagConstants;
+import org.apache.commons.sanselan.formats.tiff.taginfos.TagInfo;
+import org.apache.commons.sanselan.formats.tiff.taginfos.TagInfoShortOrLong;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -181,7 +181,7 @@ public class Photo {
 
 		try {
 
-			final TiffField date = jpegMetadata.findEXIFValueWithExactMatch(TiffConstants.TIFF_TAG_DATE_TIME);
+			final TiffField date = jpegMetadata.findEXIFValueWithExactMatch(TiffTagConstants.TIFF_TAG_DATE_TIME);
 
 			if (date != null) {
 				return _dtParser.parseDateTime(date.getStringValue());
@@ -378,7 +378,7 @@ public class Photo {
 
 		try {
 
-			final TiffField date = tiffMetadata.findField(TiffConstants.TIFF_TAG_DATE_TIME, true);
+			final TiffField date = tiffMetadata.findField(TiffTagConstants.TIFF_TAG_DATE_TIME, true);
 			if (date != null) {
 				return _dtParser.parseDateTime(date.getStringValue());
 			}
@@ -390,7 +390,9 @@ public class Photo {
 		return null;
 	}
 
-	private int getTiffIntValue(final TiffImageMetadata tiffMetadata, final TagInfo tiffTag, final int defaultValue) {
+	private int getTiffIntValue(final TiffImageMetadata tiffMetadata,
+								final TagInfoShortOrLong tiffTag,
+								final int defaultValue) {
 
 		try {
 			final TiffField field = tiffMetadata.findField(tiffTag, true);

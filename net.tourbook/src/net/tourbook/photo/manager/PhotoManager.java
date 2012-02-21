@@ -39,7 +39,7 @@ public class PhotoManager {
 ////				THUMBNAIL_DEFAULT_SIZE, 60, 70, 80, 90, 100, 120, 140, 160, 200, 250, 300, 400, 500, 600
 //			};
 	
-	public static int[]												IMAGE_SIZE = { THUMBNAIL_DEFAULT_SIZE, 600, 999999 };
+	public static int[]											IMAGE_SIZE = { THUMBNAIL_DEFAULT_SIZE, 600, 999999 };
 	
 // SET_FORMATTING_ON
 
@@ -64,7 +64,7 @@ public class PhotoManager {
 		int processors = Runtime.getRuntime().availableProcessors() - 2;
 		processors = Math.max(processors, 1);
 
-		processors = 1;
+		processors = 2;
 
 		System.out.println("Number of processors: " + processors);
 

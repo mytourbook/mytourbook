@@ -18,6 +18,8 @@ package net.tourbook.photo.manager;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.imageio.ImageIO;
@@ -25,6 +27,10 @@ import javax.imageio.ImageIO;
 import net.tourbook.photo.gallery.GalleryMTItem;
 import net.tourbook.util.StatusUtil;
 
+import org.apache.commons.sanselan.ImageReadException;
+import org.apache.commons.sanselan.Sanselan;
+import org.apache.commons.sanselan.common.IImageMetadata;
+import org.apache.commons.sanselan.formats.jpeg.JpegImageMetadata;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -174,6 +180,14 @@ public class PhotoImageLoader {
 			return new Image(_display, storeImageFilePath.toOSString());
 		}
 
+		/*
+		 * check thumbnail image in the EXIF data
+		 */
+		final Image exifThumbnail = getThumbnailFromEXIF(photo, storeImageFilePath);
+		if (exifThumbnail != null) {
+			return exifThumbnail;
+		}
+
 		// load full size image
 		final long startLoading = System.currentTimeMillis();
 
@@ -268,6 +282,74 @@ public class PhotoImageLoader {
 
 		} catch (final Exception e) {
 			StatusUtil.log(NLS.bind("Store image \"{0}\" cannot be created", storeImageFilePath.toOSString()), e); //$NON-NLS-1$
+		}
+
+		return null;
+	}
+
+	private Image getThumbnailFromEXIF(final Photo photo, final IPath storeImageFilePath) {
+
+		try {
+			final File imageFile = new File(photo.getFilePathName());
+
+			final IImageMetadata metadata = Sanselan.getMetadata(imageFile, new HashMap<Object, Object>());
+
+			if (metadata == null) {
+				return null;
+			}
+
+//			System.out.println();
+//			System.out.println(metadata);
+//			System.out.println("\t");
+//			// TODO remove SYSTEM.OUT.PRINTLN
+
+			if (metadata instanceof JpegImageMetadata) {
+
+				final JpegImageMetadata jpegMetadata = (JpegImageMetadata) metadata;
+
+				final BufferedImage bufferedImage = jpegMetadata.getEXIFThumbnail();
+
+				if (bufferedImage == null) {
+					System.out.println(photo.getFileName() + "\tNO EXIF THUMB");
+					// TODO remove SYSTEM.OUT.PRINTLN
+
+					return null;
+				}
+
+				System.out.println(photo.getFileName()
+						+ "\tWITH EXIF THUMB\t"
+						+ bufferedImage.getWidth()
+						+ "x"
+						+ bufferedImage.getHeight());
+				// TODO remove SYSTEM.OUT.PRINTLN
+
+				//#########################################################
+
+				try {
+
+					try {
+						ThumbnailStore.saveImageAWT(bufferedImage, storeImageFilePath);
+					} catch (final Exception e) {
+						StatusUtil.log(NLS.bind("Image \"{0}\" cannot be resized", photo.getFilePathName()), e); //$NON-NLS-1$
+						return null;
+					}
+
+					final Image thumbnailImage = new Image(_display, storeImageFilePath.toOSString());
+
+					return thumbnailImage;
+
+				} catch (final Exception e) {
+					StatusUtil.log(
+							NLS.bind("Store image \"{0}\" cannot be created", storeImageFilePath.toOSString()), e); //$NON-NLS-1$
+				}
+
+				//#########################################################
+
+			}
+		} catch (final ImageReadException e) {
+			StatusUtil.log(e);
+		} catch (final IOException e) {
+			StatusUtil.log(e);
 		}
 
 		return null;
