@@ -315,4 +315,11 @@ public interface ITourbookPreferences {
 	public static final String	PHOTO_CUSTOM_THUMBNAIL_LOCATION				= "PHOTO_CUSTOM_THUMBNAIL_LOCATION";						//$NON-NLS-1$
 	public static final String	PHOTO_IMAGE_CACHE_SIZE						= "PHOTO_IMAGE_CACHE_SIZE";								//$NON-NLS-1$
 
+	public static final String	PHOTO_VIEWER_PREF_STORE_EVENT				= "PHOTO_VIEWER_PREF_STORE_EVENT";							//$NON-NLS-1$
+	public static final String	PHOTO_VIEWER_COLOR_FOREGROUND				= "PHOTO_VIEWER_COLOR_FOREGROUND";							//$NON-NLS-1$
+	public static final String	PHOTO_VIEWER_COLOR_BACKGROUND				= "PHOTO_VIEWER_COLOR_BACKGROUND";							//$NON-NLS-1$
+	public static final String	PHOTO_VIEWER_IS_SHOW_FILE_FOLDER			= "PHOTO_VIEWER_IS_SHOW_FILE_FOLDER";						//$NON-NLS-1$
+	public static final String	PHOTO_VIEWER_COLOR_FOLDER					= "PHOTO_VIEWER_COLOR_FOLDER";								//$NON-NLS-1$
+	public static final String	PHOTO_VIEWER_COLOR_FILE						= "PHOTO_VIEWER_COLOR_FILE";								//$NON-NLS-1$
+
 }

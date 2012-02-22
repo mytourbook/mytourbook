@@ -356,5 +356,24 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.PHOTO_USE_DEFAULT_THUMBNAIL_LOCATION, true);
 		store.setDefault(ITourbookPreferences.PHOTO_CUSTOM_THUMBNAIL_LOCATION, UI.EMPTY_STRING);
 		store.setDefault(ITourbookPreferences.PHOTO_IMAGE_CACHE_SIZE, 500);
+
+		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_IS_SHOW_FILE_FOLDER, true);
+
+		PreferenceConverter.setDefault(store, //
+				ITourbookPreferences.PHOTO_VIEWER_COLOR_FOREGROUND,
+				new RGB(0xf3, 0xf3, 0xf3));
+
+		PreferenceConverter.setDefault(store, //
+				ITourbookPreferences.PHOTO_VIEWER_COLOR_BACKGROUND,
+				new RGB(0x50, 0x50, 0x50));
+
+		PreferenceConverter.setDefault(store, //
+				ITourbookPreferences.PHOTO_VIEWER_COLOR_FOLDER,
+				new RGB(0x55, 0xC8, 0xFF));
+
+		PreferenceConverter.setDefault(store, //
+				ITourbookPreferences.PHOTO_VIEWER_COLOR_FILE,
+				new RGB(0xAD, 0xF2, 0x0D));
+
 	}
 }

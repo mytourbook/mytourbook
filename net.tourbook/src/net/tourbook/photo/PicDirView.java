@@ -38,10 +38,8 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Tree;
@@ -73,20 +71,6 @@ public class PicDirView extends ViewPart {
 	private PicDirImages					_picDirImages;
 
 	private int								_prevSelectedThumbnailIndex	= -1;
-
-	/*
-	 * UI resources
-	 */
-	private Color							_fgColor					= new Color(
-																				Display.getDefault(),
-																				0xbb,
-																				0xbb,
-																				0xbb);
-	private Color							_bgColor					= new Color(
-																				Display.getDefault(),
-																				0x50,
-																				0x50,
-																				0x50);
 
 	/*
 	 * UI controls
@@ -209,6 +193,7 @@ public class PicDirView extends ViewPart {
 			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 
+				_picDirFolder.handlePrefStoreModifications(event);
 			}
 		};
 
@@ -250,7 +235,6 @@ public class PicDirView extends ViewPart {
 			GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(_containerFolder);
 			{
 				_picDirFolder.createUI(_containerFolder);
-				_picDirFolder.setColor(_fgColor, _bgColor);
 				createUI_10_ImageSize(_containerFolder);
 			}
 
@@ -263,7 +247,6 @@ public class PicDirView extends ViewPart {
 			_containerImages.setLayout(new FillLayout());
 			{
 				_picDirImages.createUI(_containerImages);
-				_picDirImages.setColor(_fgColor, _bgColor);
 			}
 
 			// master/detail form
@@ -300,9 +283,6 @@ public class PicDirView extends ViewPart {
 
 	@Override
 	public void dispose() {
-
-		_fgColor.dispose();
-		_bgColor.dispose();
 
 		_picDirImages.dispose();
 

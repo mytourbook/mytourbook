@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,8 +26,10 @@ import net.tourbook.data.TourPerson;
  */
 public abstract class TreeViewerItem {
 
-	private TreeViewerItem				_parentItem	= null;
-	private ArrayList<TreeViewerItem>	_children	= null;
+	private TreeViewerItem				_parentItem;
+	private ArrayList<TreeViewerItem>	_children;
+
+	private boolean						_isChildChildrenFetched;
 
 	/**
 	 * Adds a new child to this tree item
@@ -88,10 +90,6 @@ public abstract class TreeViewerItem {
 
 		fetchChildrenInternal();
 
-		if (_children == null) {
-			_children = new ArrayList<TreeViewerItem>();
-		}
-
 		return _children;
 	}
 
@@ -104,7 +102,29 @@ public abstract class TreeViewerItem {
 			fetchChildrenInternal();
 		}
 
-		if (_children == null || _children.size() == 0) {
+		if (_children.size() == 0) {
+			return new Object[0];
+		}
+
+		return _children.toArray();
+	}
+
+	public Object[] getFetchedChildrenWithChildrenAsArray() {
+
+		if (_children == null) {
+			fetchChildrenInternal();
+		}
+
+		if (_isChildChildrenFetched == false) {
+
+			for (final TreeViewerItem child : _children) {
+				child.getFetchedChildren();
+			}
+
+			_isChildChildrenFetched = true;
+		}
+
+		if (_children.size() == 0) {
 			return new Object[0];
 		}
 

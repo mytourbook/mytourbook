@@ -309,11 +309,27 @@
 		Photo
 	-->
       <page
-            class="net.tourbook.preferences.PrefPagePhoto"
+            class="net.tourbook.photo.PrefPagePhoto"
             id="net.tourbook.preferences.PrefPagePhotoId"
-            name="%Pref_Page_Photo">
+            name="%PrefPage_Photo">
       </page>
+	      <page
+	            category="net.tourbook.preferences.PrefPagePhotoId"
+	            class="net.tourbook.photo.PrefPagePhotoViewer"
+	            id="net.tourbook.preferences.PrefPagePhotoViewerId"
+	            name="%PrefPage_Photo_PhotoViewer">
+	      </page>
+	      <page
+	            category="net.tourbook.preferences.PrefPagePhotoId"
+	            class="net.tourbook.photo.PrefPagePhotoThumbnailCache"
+	            id="net.tourbook.preferences.PrefPagePhotoThumbnailCacheId"
+	            name="%PrefPage_Photo_ThumbnailCache">
+	      </page>
 
+
+	<!--
+		People
+	-->
       <page
             class="net.tourbook.preferences.PrefPagePeople"
             id="net.tourbook.preferences.PrefPagePeopleId"

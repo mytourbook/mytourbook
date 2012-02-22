@@ -288,6 +288,8 @@ public class UI {
 	public static Styler									TAG_STYLER;
 	public static Styler									TAG_CATEGORY_STYLER;
 	public static Styler									TAG_SUB_STYLER;
+	public static Styler									PHOTO_FOLDER_STYLER;
+	public static Styler									PHOTO_FILE_STYLER;
 
 	private final static HashMap<String, Image>				_imageCache						= new HashMap<String, Image>();
 	private final static HashMap<String, ImageDescriptor>	_imageCacheDescriptor			= new HashMap<String, ImageDescriptor>();
@@ -297,6 +299,7 @@ public class UI {
 
 		updateUnits();
 		setViewColorsFromPrefStore();
+		setPhotoColorsFromPrefStore();
 
 		/*
 		 * load images into the image registry
@@ -338,11 +341,19 @@ public class UI {
 				TourbookPlugin.getImageDescriptor(Messages.Image__Weather_Severe));
 
 		/*
-		 * set styler
+		 * set tag styler
 		 */
 		TAG_CATEGORY_STYLER = StyledString.createColorRegistryStyler(VIEW_COLOR_CATEGORY, null);
 		TAG_STYLER = StyledString.createColorRegistryStyler(VIEW_COLOR_TITLE, null);
 		TAG_SUB_STYLER = StyledString.createColorRegistryStyler(VIEW_COLOR_SUB, null);
+
+		/*
+		 * set photo styler
+		 */
+		PHOTO_FOLDER_STYLER = StyledString.createColorRegistryStyler(
+				ITourbookPreferences.PHOTO_VIEWER_COLOR_FOLDER,
+				null);
+		PHOTO_FILE_STYLER = StyledString.createColorRegistryStyler(ITourbookPreferences.PHOTO_VIEWER_COLOR_FILE, null);
 	}
 
 	private UI() {}
@@ -1171,17 +1182,37 @@ public class UI {
 	}
 
 	/**
-	 * set the tag colors in the JFace color registry from the pref store
-	 * 
-	 * @param prefs
+	 * Set photo colors in the JFace color registry from the pref store
+	 */
+	public static void setPhotoColorsFromPrefStore() {
+
+		// pref store var cannot be set from a static field because it can be null !!!
+		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+
+		final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
+
+		colorRegistry.put(ITourbookPreferences.PHOTO_VIEWER_COLOR_FOREGROUND, //
+				PreferenceConverter.getColor(prefStore, ITourbookPreferences.PHOTO_VIEWER_COLOR_FOREGROUND));
+
+		colorRegistry.put(ITourbookPreferences.PHOTO_VIEWER_COLOR_BACKGROUND, //
+				PreferenceConverter.getColor(prefStore, ITourbookPreferences.PHOTO_VIEWER_COLOR_BACKGROUND));
+
+		colorRegistry.put(ITourbookPreferences.PHOTO_VIEWER_COLOR_FOLDER, //
+				PreferenceConverter.getColor(prefStore, ITourbookPreferences.PHOTO_VIEWER_COLOR_FOLDER));
+
+		colorRegistry.put(ITourbookPreferences.PHOTO_VIEWER_COLOR_FILE, //
+				PreferenceConverter.getColor(prefStore, ITourbookPreferences.PHOTO_VIEWER_COLOR_FILE));
+	}
+
+	/**
+	 * Set tag colors in the JFace color registry from the pref store
 	 */
 	public static void setViewColorsFromPrefStore() {
 
-		/*
-		 * set colors
-		 */
-		final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
+		// pref store var cannot be set from a static field because it can be null !!!
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+
+		final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
 
 		colorRegistry.put(VIEW_COLOR_CATEGORY, //
 				PreferenceConverter.getColor(prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_CATEGORY));
@@ -1298,9 +1329,7 @@ public class UI {
 	 */
 	public static void updateUnits() {
 
-		/*
-		 * this cannot be set from a static field because it can be null !!!
-		 */
+		// pref store var cannot be set from a static field because it can be null !!!
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
 		/*

@@ -83,12 +83,14 @@ public class ThumbnailStore {
 		final String imageKey = photo.getImageKey(imageQuality);
 
 		final int imageQualitySize = PhotoManager.IMAGE_SIZE[imageQuality];
-		final String imageKeyFolder = imageKey.substring(0, 2);
+		final String imageKey1Folder = imageKey.substring(0, 1);
+		final String imageKey2Folder = imageKey.substring(0, 5);
 
 		final String imageFileName = imageKey + "_" + imageQualitySize + "_" + photo.getFileName();
 
 		final IPath imageFilePath = _storePath//
-				.append(imageKeyFolder)
+				.append(imageKey1Folder)
+				.append(imageKey2Folder)
 				.append(imageFileName);
 
 		return imageFilePath;

@@ -17,67 +17,124 @@ package net.tourbook.photo;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Vector;
+
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.ui.TreeViewerItem;
+import net.tourbook.ui.UI;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.TreeColumnLayout;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.resource.ColorRegistry;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.IElementComparer;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StyledCellLabelProvider;
+import org.eclipse.jface.viewers.StyledString;
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.TreeViewerColumn;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.events.TreeAdapter;
-import org.eclipse.swt.events.TreeEvent;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.swt.widgets.TreeColumn;
 
 /**
- * The original source code is in org.eclipse.swt.examples.fileviewer
+ * This folder viewer is from org.eclipse.swt.examples.fileviewer but with many modifications.
  */
 class PicDirFolder {
 
-	private PicDirImages		_picDirImages;
+	private final IPreferenceStore	_prefStore			= TourbookPlugin.getDefault().getPreferenceStore();
 
-	private File				currentDirectory			= null;
+	private PicDirImages			_picDirImages;
 
-	private boolean				initial						= true;
+	private boolean					_isShowFileFolder;
+	private File					currentDirectory	= null;
 
-	// File: File associated with tree item
-	private static final String	TREEITEMDATA_FILE			= "TreeItem.file";
+	private boolean					initial				= true;
 
-	// Image: shown when item is expanded
-	private static final String	TREEITEMDATA_IMAGEEXPANDED	= "TreeItem.imageExpanded";
-
-	// Image: shown when item is collapsed
-	private static final String	TREEITEMDATA_IMAGECOLLAPSED	= "TreeItem.imageCollapsed";
-
-	// Object: if not present or null then the item has not been populated
-	private static final String	TREEITEMDATA_STUB			= "TreeItem.stub";
+	private TVIFolderRoot			_rootItem;
 
 	/*
 	 * UI controls
 	 */
-	private Display				_display;
-	private Tree				tree;
+	private Display					_display;
+	private TreeViewer				_folderViewer;
+
+	private static final class FolderComparer implements IElementComparer {
+
+		@Override
+		public boolean equals(final Object a, final Object b) {
+
+			if (a == b) {
+				return true;
+			}
+
+			if (a instanceof TVIFolderFolder && b instanceof TVIFolderFolder) {
+
+				final TVIFolderFolder item1 = (TVIFolderFolder) a;
+				final TVIFolderFolder item2 = (TVIFolderFolder) b;
+
+				final String folder1Name = item1._treeItemFolder.getName();
+				final String folder2Name = item2._treeItemFolder.getName();
+
+				return folder1Name.equals(folder2Name);
+			}
+			return false;
+		}
+
+		@Override
+		public int hashCode(final Object element) {
+
+			final TVIFolderFolder item1 = (TVIFolderFolder) element;
+			final String folderName = item1._treeItemFolder.getName();
+
+			return folderName.hashCode();
+		}
+	}
+
+	private class FolderContentProvicer implements ITreeContentProvider {
+
+		public void dispose() {}
+
+		public Object[] getChildren(final Object parentElement) {
+
+			/*
+			 * force to get children so that the user can see if a folder can be expanded or not
+			 */
+
+			return ((TreeViewerItem) parentElement).getFetchedChildrenAsArray();
+		}
+
+		public Object[] getElements(final Object inputElement) {
+			return _rootItem.getFetchedChildrenAsArray();
+		}
+
+		public Object getParent(final Object element) {
+			return ((TreeViewerItem) element).getParentItem();
+		}
+
+		public boolean hasChildren(final Object element) {
+			return ((TreeViewerItem) element).hasChildren();
+		}
+
+		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
+	}
 
 	PicDirFolder(final PicDirImages picDirImages) {
 		_picDirImages = picDirImages;
-	}
-
-	/**
-	 * Foreign method: removes all children of a TreeItem.
-	 * 
-	 * @param treeItem
-	 *            the TreeItem
-	 */
-	private static void treeItemRemoveAll(final TreeItem treeItem) {
-		final TreeItem[] children = treeItem.getItems();
-		for (int i = 0; i < children.length; ++i) {
-			children[i].dispose();
-		}
 	}
 
 	void createUI(final Composite parent) {
@@ -90,62 +147,121 @@ class PicDirFolder {
 		{
 			createUI_10_TreeView(container);
 		}
+
+		// update UI from pref store
+		_folderViewer.getTree().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+		updateColors();
+
 	}
 
-	/**
-	 * Creates the file tree view.
-	 * 
-	 * @param parent
-	 *            the parent control
-	 */
 	private void createUI_10_TreeView(final Composite parent) {
 
-		tree = new Tree(parent, SWT.V_SCROLL | SWT.H_SCROLL | SWT.SINGLE | SWT.FULL_SELECTION);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(tree);
+		/*
+		 * create tree layout
+		 */
 
-		tree.addSelectionListener(new SelectionListener() {
+		final Composite layoutContainer = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.grab(true, true)
+				.hint(200, 100)
+				.applyTo(layoutContainer);
 
-			public void widgetDefaultSelected(final SelectionEvent event) {
-				final TreeItem[] selection = tree.getSelection();
-				if (selection != null && selection.length != 0) {
-					final TreeItem item = selection[0];
-					item.setExpanded(true);
-					treeExpandItem(item);
-				}
-			}
+		final TreeColumnLayout treeLayout = new TreeColumnLayout();
+		layoutContainer.setLayout(treeLayout);
 
-			public void widgetSelected(final SelectionEvent event) {
-				final TreeItem[] selection = tree.getSelection();
-				if (selection != null && selection.length != 0) {
-					final TreeItem item = selection[0];
-					final File file = (File) item.getData(TREEITEMDATA_FILE);
+		/*
+		 * create viewer
+		 */
+		final Tree tree = new Tree(layoutContainer, SWT.V_SCROLL | SWT.SINGLE | SWT.FULL_SELECTION);
 
-					onSelectedDirectory(file);
+		tree.setHeaderVisible(false);
+
+		_folderViewer = new TreeViewer(tree);
+
+		_folderViewer.setContentProvider(new FolderContentProvicer());
+		_folderViewer.setComparer(new FolderComparer());
+		_folderViewer.setUseHashlookup(true);
+
+		_folderViewer.addDoubleClickListener(new IDoubleClickListener() {
+			public void doubleClick(final DoubleClickEvent event) {
+
+				// expand/collapse current item
+				final Object selection = ((IStructuredSelection) _folderViewer.getSelection()).getFirstElement();
+
+				final TreeViewerItem treeItem = (TreeViewerItem) selection;
+
+				if (_folderViewer.getExpandedState(treeItem)) {
+					_folderViewer.collapseToLevel(treeItem, 1);
+				} else {
+
+					if (treeItem.hasChildren()) {
+						_folderViewer.expandToLevel(treeItem, 1);
+					}
 				}
 			}
 		});
 
-		tree.addTreeListener(new TreeAdapter() {
-			@Override
-			public void treeCollapsed(final TreeEvent event) {
-				final TreeItem item = (TreeItem) event.item;
-				final Image image = (Image) item.getData(TREEITEMDATA_IMAGECOLLAPSED);
-				if (image != null) {
-					item.setImage(image);
-				}
-			}
+		_folderViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			public void selectionChanged(final SelectionChangedEvent event) {
 
-			@Override
-			public void treeExpanded(final TreeEvent event) {
-				final TreeItem item = (TreeItem) event.item;
-				final Image image = (Image) item.getData(TREEITEMDATA_IMAGEEXPANDED);
-				if (image != null) {
-					item.setImage(image);
-				}
-				treeExpandItem(item);
 			}
-
 		});
+
+		/*
+		 * create columns
+		 */
+		TreeViewerColumn tvc;
+		TreeColumn tvcColumn;
+
+		// column: os folder
+		tvc = new TreeViewerColumn(_folderViewer, SWT.TRAIL);
+		tvcColumn = tvc.getColumn();
+		tvc.setLabelProvider(new StyledCellLabelProvider() {
+
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+
+				if (element instanceof TVIFolderFolder) {
+					final TVIFolderFolder folderItem = (TVIFolderFolder) element;
+
+					final String folderName = folderItem._isVolume
+							? folderItem._treeItemFolder.getPath()
+							: folderItem._treeItemFolder.getName();
+
+					final StyledString styledString = new StyledString();
+
+					styledString.append(folderName);
+
+					if (_isShowFileFolder) {
+
+						// force that file list is loaded and number of files is available
+						folderItem.hasChildren();
+
+						final int folderCounter = folderItem.getFolderCounter();
+						if (folderCounter > 0) {
+							styledString.append(UI.SPACE2);
+							styledString.append(Integer.toString(folderCounter), UI.PHOTO_FOLDER_STYLER);
+						}
+
+						final int fileCounter = folderItem.getFileCounter();
+						if (fileCounter > 0) {
+							styledString.append(UI.SPACE2);
+							styledString.append(Integer.toString(fileCounter), UI.PHOTO_FILE_STYLER);
+						}
+					}
+
+					cell.setText(styledString.getString());
+					cell.setStyleRanges(styledString.getStyleRanges());
+				}
+			}
+		});
+		treeLayout.setColumnData(tvcColumn, new ColumnWeightData(100, true));
+	}
+
+	File getSelectedFolder() {
+		return currentDirectory;
 	}
 
 	/**
@@ -154,7 +270,7 @@ class PicDirFolder {
 	 * @return an array of Files corresponding to the root directories on the platform, may be empty
 	 *         but not null
 	 */
-	private File[] getRoots() {
+	private File[] getSortedRoots() {
 		/*
 		 * On JDK 1.22 only...
 		 */
@@ -164,37 +280,73 @@ class PicDirFolder {
 		 * On JDK 1.1.7 and beyond... -- PORTABILITY ISSUES HERE --
 		 */
 		if (System.getProperty("os.name").indexOf("Windows") != -1) {
-			final Vector<File> list = new Vector<File>();
-//			list.add(new File(DRIVE_A));
-//			list.add(new File(DRIVE_B));
+
+			final ArrayList<File> list = new ArrayList<File>();
+
 			for (char i = 'c'; i <= 'z'; ++i) {
+
 				final File drive = new File(i + ":" + File.separator);
+
 				if (drive.isDirectory() && drive.exists()) {
+
 					list.add(drive);
+
 					if (initial && i == 'c') {
 						currentDirectory = drive;
 						initial = false;
 					}
 				}
 			}
-			final File[] roots = list.toArray(new File[list.size()]);
-			PicDirView.sortFiles(roots);
-			return roots;
-		}
-		final File root = new File(File.separator);
-		if (initial) {
-			currentDirectory = root;
-			initial = false;
-		}
-		return new File[] { root };
-	}
 
-	File getSelectedFolder() {
-		return currentDirectory;
+			final File[] roots = list.toArray(new File[list.size()]);
+
+			PicDirView.sortFiles(roots);
+
+			return roots;
+
+		} else {
+
+			final File root = new File(File.separator);
+			if (initial) {
+				currentDirectory = root;
+				initial = false;
+			}
+			return new File[] { root };
+		}
 	}
 
 	Tree getTree() {
-		return tree;
+		return _folderViewer.getTree();
+	}
+
+	void handlePrefStoreModifications(final PropertyChangeEvent event) {
+
+		final String property = event.getProperty();
+		boolean isViewerRefresh = false;
+
+		if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
+
+			_folderViewer.getTree().setLinesVisible(
+					_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+
+			isViewerRefresh = true;
+
+		} else if (property.equals(ITourbookPreferences.PHOTO_VIEWER_PREF_STORE_EVENT)) {
+
+			updateColors();
+
+			isViewerRefresh = true;
+		}
+
+		if (isViewerRefresh) {
+
+			_folderViewer.refresh();
+
+			/*
+			 * the tree must be redrawn because the styled text does not show with the new color
+			 */
+			_folderViewer.getTree().redraw();
+		}
 	}
 
 	void initialRefresh(final String folderPath) {
@@ -202,14 +354,19 @@ class PicDirFolder {
 		BusyIndicator.showWhile(_display, new Runnable() {
 			public void run() {
 
+				// set root item
+				_rootItem = new TVIFolderRoot(_folderViewer, getSortedRoots());
+
+				_folderViewer.setInput(new Object());
+
 				_picDirImages.showImages(currentDirectory);
 
-				final File[] roots = getRoots();
-
-				/*
-				 * Tree view: Refreshes information about any files in the list and their children.
-				 */
-				treeRefresh(roots);
+//				final File[] roots = getRoots();
+//
+//				/*
+//				 * Tree view: Refreshes information about any files in the list and their children.
+//				 */
+//				treeRefresh(roots);
 
 				// Remind everyone where we are in the filesystem
 				File dir = currentDirectory;
@@ -254,252 +411,61 @@ class PicDirFolder {
 		 * directory until it is visible.
 		 */
 
-		final ArrayList<File> path = new ArrayList<File>();
-		File dirRunnable = dir;
+//		_folderViewer.setSelection(selection, true);
 
-		// Build a stack of paths from the root of the tree
-		while (dirRunnable != null) {
-			path.add(dirRunnable);
-			dirRunnable = dirRunnable.getParentFile();
-		}
-		// Recursively expand the tree to get to the specified directory
-		TreeItem[] items = tree.getItems();
-		TreeItem lastItem = null;
-		for (int i = path.size() - 1; i >= 0; --i) {
-			final File pathElement = path.get(i);
-
-			// Search for a particular File in the array of tree items
-			// No guarantee that the items are sorted in any recognizable fashion, so we'll
-			// just sequential scan.  There shouldn't be more than a few thousand entries.
-			TreeItem item = null;
-			for (int k = 0; k < items.length; ++k) {
-				item = items[k];
-				if (item.isDisposed()) {
-					continue;
-				}
-				final File itemFile = (File) item.getData(TREEITEMDATA_FILE);
-				if (itemFile != null && itemFile.equals(pathElement)) {
-					break;
-				}
-			}
-			if (item == null) {
-				break;
-			}
-			lastItem = item;
-			if (i != 0 && !item.getExpanded()) {
-				treeExpandItem(item);
-				item.setExpanded(true);
-			}
-			items = item.getItems();
-		}
-
-		tree.setSelection((lastItem != null) ? //
-				new TreeItem[] { lastItem }
-				: new TreeItem[0]);
+//		final ArrayList<File> path = new ArrayList<File>();
+//		File dirRunnable = dir;
+//
+//		// Build a stack of paths from the root of the tree
+//		while (dirRunnable != null) {
+//			path.add(dirRunnable);
+//			dirRunnable = dirRunnable.getParentFile();
+//		}
+//		// Recursively expand the tree to get to the specified directory
+//		TreeItem[] items = tree.getItems();
+//		TreeItem lastItem = null;
+//		for (int i = path.size() - 1; i >= 0; --i) {
+//			final File pathElement = path.get(i);
+//
+//			// Search for a particular File in the array of tree items
+//			// No guarantee that the items are sorted in any recognizable fashion, so we'll
+//			// just sequential scan.  There shouldn't be more than a few thousand entries.
+//			TreeItem item = null;
+//			for (int k = 0; k < items.length; ++k) {
+//				item = items[k];
+//				if (item.isDisposed()) {
+//					continue;
+//				}
+//				final File itemFile = (File) item.getData(TREEITEMDATA_FILE);
+//				if (itemFile != null && itemFile.equals(pathElement)) {
+//					break;
+//				}
+//			}
+//			if (item == null) {
+//				break;
+//			}
+//			lastItem = item;
+//			if (i != 0 && !item.getExpanded()) {
+//				treeExpandItem(item);
+//				item.setExpanded(true);
+//			}
+//			items = item.getItems();
+//		}
+//
+//		tree.setSelection((lastItem != null) ? //
+//				new TreeItem[] { lastItem }
+//				: new TreeItem[0]);
 	}
 
-	void setColor(final Color fgColor, final Color bgColor) {
+	private void updateColors() {
 
-		tree.setForeground(fgColor);
-		tree.setBackground(bgColor);
-	}
+		_isShowFileFolder = _prefStore.getBoolean(ITourbookPreferences.PHOTO_VIEWER_IS_SHOW_FILE_FOLDER);
+		final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
 
-	/*
-	 * This worker updates the table with file information in the background. <p> Implementation
-	 * notes: <ul> <li> It is designed such that it can be interrupted cleanly. <li> It uses
-	 * asyncExec() in some places to ensure that SWT Widgets are manipulated in the right thread.
-	 * Exclusive use of syncExec() would be inappropriate as it would require a pair of context
-	 * switches between each table update operation. </ul> </p>
-	 */
+		final Tree tree = _folderViewer.getTree();
 
-	/**
-	 * Handles expand events on a tree item.
-	 * 
-	 * @param item
-	 *            the TreeItem to fill in
-	 */
-	private void treeExpandItem(final TreeItem item) {
-
-		final Object stub = item.getData(TREEITEMDATA_STUB);
-		if (stub == null) {
-
-			BusyIndicator.showWhile(_display, new Runnable() {
-				public void run() {
-					treeRefreshItem(item, true);
-				}
-			});
-		}
-	}
-
-	/**
-	 * Initializes a folder item.
-	 * 
-	 * @param item
-	 *            the TreeItem to initialize
-	 * @param folder
-	 *            the File associated with this TreeItem
-	 */
-	private void treeInitFolder(final TreeItem item, final File folder) {
-		item.setText(folder.getName());
-//		item.setImage(iconCache.stockImages[iconCache.iconClosedFolder]);
-		item.setData(TREEITEMDATA_FILE, folder);
-//		item.setData(TREEITEMDATA_IMAGEEXPANDED, iconCache.stockImages[iconCache.iconOpenFolder]);
-//		item.setData(TREEITEMDATA_IMAGECOLLAPSED, iconCache.stockImages[iconCache.iconClosedFolder]);
-	}
-
-	/**
-	 * Initializes a volume item.
-	 * 
-	 * @param item
-	 *            the TreeItem to initialize
-	 * @param volume
-	 *            the File associated with this TreeItem
-	 */
-	private void treeInitVolume(final TreeItem item, final File volume) {
-		item.setText(volume.getPath());
-//		item.setImage(iconCache.stockImages[iconCache.iconClosedDrive]);
-		item.setData(TREEITEMDATA_FILE, volume);
-//		item.setData(TREEITEMDATA_IMAGEEXPANDED, iconCache.stockImages[iconCache.iconOpenDrive]);
-//		item.setData(TREEITEMDATA_IMAGECOLLAPSED, iconCache.stockImages[iconCache.iconClosedDrive]);
-	}
-
-	/**
-	 * Traverse the entire tree and update only what has changed.
-	 * 
-	 * @param roots
-	 *            the root directory listing
-	 */
-	private void treeRefresh(final File[] masterFiles) {
-
-		final TreeItem[] items = tree.getItems();
-		int masterIndex = 0;
-		int itemIndex = 0;
-
-		for (int i = 0; i < items.length; ++i) {
-			final TreeItem item = items[i];
-			final File itemFile = (File) item.getData(TREEITEMDATA_FILE);
-			if ((itemFile == null) || (masterIndex == masterFiles.length)) {
-				// remove bad item or placeholder
-				item.dispose();
-				continue;
-			}
-			final File masterFile = masterFiles[masterIndex];
-			final int compare = PicDirView.compareFiles(masterFile, itemFile);
-			if (compare == 0) {
-				// same file, update it
-				treeRefreshItem(item, false);
-				++itemIndex;
-				++masterIndex;
-			} else if (compare < 0) {
-				// should appear before file, insert it
-				final TreeItem newItem = new TreeItem(tree, SWT.NONE, itemIndex);
-				treeInitVolume(newItem, masterFile);
-				new TreeItem(newItem, SWT.NONE); // placeholder child item to get "expand" button
-				++itemIndex;
-				++masterIndex;
-				--i;
-			} else {
-				// should appear after file, delete stale item
-				item.dispose();
-			}
-		}
-
-		for (; masterIndex < masterFiles.length; ++masterIndex) {
-			final File masterFile = masterFiles[masterIndex];
-			final TreeItem newItem = new TreeItem(tree, SWT.NONE);
-			treeInitVolume(newItem, masterFile);
-			new TreeItem(newItem, SWT.NONE); // placeholder child item to get "expand" button
-		}
-	}
-
-	/**
-	 * Traverse an item in the tree and update only what has changed.
-	 * 
-	 * @param dirItem
-	 *            the tree item of the directory
-	 * @param forcePopulate
-	 *            true iff we should populate non-expanded items as well
-	 */
-	private void treeRefreshItem(final TreeItem dirItem, final boolean forcePopulate) {
-
-		final File dir = (File) dirItem.getData(TREEITEMDATA_FILE);
-
-		if (!forcePopulate && !dirItem.getExpanded()) {
-			// Refresh non-expanded item
-			if (dirItem.getData(TREEITEMDATA_STUB) != null) {
-				treeItemRemoveAll(dirItem);
-				new TreeItem(dirItem, SWT.NONE); // placeholder child item to get "expand" button
-				dirItem.setData(TREEITEMDATA_STUB, null);
-			}
-			return;
-		}
-		// Refresh expanded item
-		dirItem.setData(TREEITEMDATA_STUB, this); // clear stub flag
-
-		/* Get directory listing */
-		final File[] subFiles = (dir != null) ? PicDirView.getDirectoryList(dir) : null;
-
-		if (subFiles == null || subFiles.length == 0) {
-			/* Error or no contents */
-			treeItemRemoveAll(dirItem);
-			dirItem.setExpanded(false);
-			return;
-		}
-
-		/* Refresh sub-items */
-		final TreeItem[] items = dirItem.getItems();
-		final File[] masterFiles = subFiles;
-		int masterIndex = 0;
-		int itemIndex = 0;
-		File masterFile = null;
-		for (int i = 0; i < items.length; ++i) {
-			while ((masterFile == null) && (masterIndex < masterFiles.length)) {
-				masterFile = masterFiles[masterIndex++];
-				if (!masterFile.isDirectory()) {
-					masterFile = null;
-				}
-			}
-
-			final TreeItem item = items[i];
-			final File itemFile = (File) item.getData(TREEITEMDATA_FILE);
-			if ((itemFile == null) || (masterFile == null)) {
-				// remove bad item or placeholder
-				item.dispose();
-				continue;
-			}
-			final int compare = PicDirView.compareFiles(masterFile, itemFile);
-			if (compare == 0) {
-				// same file, update it
-				treeRefreshItem(item, false);
-				masterFile = null;
-				++itemIndex;
-			} else if (compare < 0) {
-				// should appear before file, insert it
-				final TreeItem newItem = new TreeItem(dirItem, SWT.NONE, itemIndex);
-				treeInitFolder(newItem, masterFile);
-				new TreeItem(newItem, SWT.NONE); // add a placeholder child item so we get the "expand" button
-				masterFile = null;
-				++itemIndex;
-				--i;
-			} else {
-				// should appear after file, delete stale item
-				item.dispose();
-			}
-		}
-		while ((masterFile != null) || (masterIndex < masterFiles.length)) {
-			if (masterFile != null) {
-				final TreeItem newItem = new TreeItem(dirItem, SWT.NONE);
-				treeInitFolder(newItem, masterFile);
-				new TreeItem(newItem, SWT.NONE); // add a placeholder child item so we get the "expand" button
-				if (masterIndex == masterFiles.length) {
-					break;
-				}
-			}
-			masterFile = masterFiles[masterIndex++];
-			if (!masterFile.isDirectory()) {
-				masterFile = null;
-			}
-		}
+		tree.setForeground(colorRegistry.get(ITourbookPreferences.PHOTO_VIEWER_COLOR_FOREGROUND));
+		tree.setBackground(colorRegistry.get(ITourbookPreferences.PHOTO_VIEWER_COLOR_BACKGROUND));
 	}
 
 }

@@ -13,13 +13,13 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.preferences;
+package net.tourbook.photo;
 
 import java.util.ArrayList;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.photo.Messages;
 import net.tourbook.photo.manager.PhotoImageCache;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.UI;
 import net.tourbook.util.StatusUtil;
 import net.tourbook.util.Util;
@@ -55,7 +55,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public class PrefPagePhoto extends PreferencePage implements IWorkbenchPreferencePage {
+public class PrefPagePhotoThumbnailCache extends PreferencePage implements IWorkbenchPreferencePage {
 
 	private IPreferenceStore		_prefStore					= TourbookPlugin.getDefault().getPreferenceStore();
 
@@ -107,7 +107,7 @@ public class PrefPagePhoto extends PreferencePage implements IWorkbenchPreferenc
 		Text textDirEditor;
 
 		final Group group = new Group(parent, SWT.NONE);
-		group.setText(Messages.PrefPage_Photo_Group_ThumbnailCacheLocation);
+		group.setText(Messages.PrefPage_Photo_Cache_Group_ThumbnailCacheLocation);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
 		{
 			/*
@@ -115,7 +115,7 @@ public class PrefPagePhoto extends PreferencePage implements IWorkbenchPreferenc
 			 */
 			_editorBoolUseDefaultLocation = new BooleanFieldEditor(
 					ITourbookPreferences.PHOTO_USE_DEFAULT_THUMBNAIL_LOCATION,
-					Messages.PrefPage_Photo_Label_UseDefaultThumbnailLocation,
+					Messages.PrefPage_Photo_Cache_Label_UseDefaultThumbnailLocation,
 					group);
 			_editorBoolUseDefaultLocation.setPage(this);
 			_editorBoolUseDefaultLocation.setPreferenceStore(_prefStore);
@@ -132,7 +132,7 @@ public class PrefPagePhoto extends PreferencePage implements IWorkbenchPreferenc
 				// field: path for the srtm data
 				_editorDirThumbnailLocation = new DirectoryFieldEditor(
 						ITourbookPreferences.PHOTO_CUSTOM_THUMBNAIL_LOCATION,
-						Messages.PrefPage_Photo_Label_ThumbnailLocation,
+						Messages.PrefPage_Photo_Cache_Label_ThumbnailLocation,
 						_containerLocation);
 
 				_editorDirThumbnailLocation.setPage(this);
@@ -161,7 +161,7 @@ public class PrefPagePhoto extends PreferencePage implements IWorkbenchPreferenc
 
 		final Group group = new Group(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
-		group.setText(Messages.PrefPage_Photo_Group_ThumbnailCacheSize);
+		group.setText(Messages.PrefPage_Photo_Cache_Group_ThumbnailCacheSize);
 		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
 		{
 			/*
@@ -171,7 +171,7 @@ public class PrefPagePhoto extends PreferencePage implements IWorkbenchPreferenc
 			GridDataFactory.fillDefaults()//
 					.align(SWT.BEGINNING, SWT.CENTER)
 					.applyTo(label);
-			label.setText(Messages.PrefPage_Photo_Label_NumberOfImages);
+			label.setText(Messages.PrefPage_Photo_Cache_Label_NumberOfImages);
 
 			/*
 			 * spinner: nof images
@@ -196,7 +196,7 @@ public class PrefPagePhoto extends PreferencePage implements IWorkbenchPreferenc
 					.span(2, 1)
 					.align(SWT.BEGINNING, SWT.FILL)
 					.applyTo(buttonGetHandels);
-			buttonGetHandels.setText(Messages.PrefPage_Photo_Button_GetNumberOfImages);
+			buttonGetHandels.setText(Messages.PrefPage_Photo_Cache_Button_GetNumberOfImages);
 			buttonGetHandels.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
@@ -213,7 +213,7 @@ public class PrefPagePhoto extends PreferencePage implements IWorkbenchPreferenc
 					.span(2, 1)
 					.hint(400, SWT.DEFAULT)
 					.applyTo(label);
-			label.setText(Messages.PrefPage_Photo_Label_ThumbnailCacheSizeInfo);
+			label.setText(Messages.PrefPage_Photo_Cache_Label_ThumbnailCacheSizeInfo);
 		}
 	}
 
@@ -277,17 +277,17 @@ public class PrefPagePhoto extends PreferencePage implements IWorkbenchPreferenc
 					String message;
 					if (imageNo[0] == maxTest) {
 						message = NLS.bind(//
-								Messages.PrefPage_Photo_Dialog_MaxHandle_NoError,
+								Messages.PrefPage_Photo_Cache_Dialog_MaxHandle_NoError,
 								Integer.toString(maxTest));
 					} else {
 						message = NLS.bind(
-								Messages.PrefPage_Photo_Dialog_MaxHandle_CreatedImagesBeforeError,
+								Messages.PrefPage_Photo_Cache_Dialog_MaxHandle_CreatedImagesBeforeError,
 								Integer.toString(imageNo[0]));
 					}
 
 					StatusUtil.log(message);
 
-					MessageDialog.openInformation(getShell(), Messages.PrefPage_Photo_Dialog_MaxHandle_Title, message);
+					MessageDialog.openInformation(getShell(), Messages.PrefPage_Photo_Cache_Dialog_MaxHandle_Title, message);
 				}
 			}
 		});
@@ -365,7 +365,7 @@ public class PrefPagePhoto extends PreferencePage implements IWorkbenchPreferenc
 
 				isValid = false;
 
-				setErrorMessage(Messages.PrefPage_Photo_Error_ThumbnailLocation);
+				setErrorMessage(Messages.PrefPage_Photo_Cache_Error_ThumbnailLocation);
 				_editorDirThumbnailLocation.setFocus();
 			}
 		}

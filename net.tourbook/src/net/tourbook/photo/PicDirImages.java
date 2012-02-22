@@ -518,7 +518,7 @@ public class PicDirImages {
 		}
 	}
 
-	void setColor(final Color fgColor, final Color bgColor) {
+	private void setColor(final Color fgColor, final Color bgColor) {
 
 		_gallery.setForeground(fgColor);
 		_gallery.setBackground(bgColor);
