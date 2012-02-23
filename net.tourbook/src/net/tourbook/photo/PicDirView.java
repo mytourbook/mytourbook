@@ -26,6 +26,8 @@ import net.tourbook.ui.ViewerDetailForm;
 import net.tourbook.util.PostSelectionProvider;
 import net.tourbook.util.Util;
 
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -200,10 +202,19 @@ public class PicDirView extends ViewPart {
 		_prefStore.addPropertyChangeListener(_prefChangeListener);
 	}
 
+	private void createActions() {
+
+		_picDirFolder.createActions();
+//		_actionEditQuick = new ActionEditQuick(this);
+
+
+		fillActionBars();
+	}
 	@Override
 	public void createPartControl(final Composite parent) {
 
 		createUI(parent);
+		createActions();
 
 		addPartListener();
 		addPrefListener();
@@ -216,8 +227,8 @@ public class PicDirView extends ViewPart {
 		// set thumbnail size
 		onSelectThumbnailSize();
 
-		final String selectedFolder = Util.getStateString(_state, STATE_SELECTED_FOLDER, null);
-		_picDirFolder.initialRefresh(selectedFolder);
+		final String previousSelectedFolder = Util.getStateString(_state, STATE_SELECTED_FOLDER, null);
+		_picDirFolder.restoreFolder(previousSelectedFolder);
 	}
 
 	private void createUI(final Composite parent) {
@@ -291,6 +302,67 @@ public class PicDirView extends ViewPart {
 		_prefStore.removePropertyChangeListener(_prefChangeListener);
 
 		super.dispose();
+	}
+
+	private void fillActionBars() {
+
+		/*
+		 * fill view menu
+		 */
+//		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
+//		menuMgr.add(_actionSelectAllTours);
+//		menuMgr.add(_actionYearSubCategorySelect);
+//		menuMgr.add(new Separator());
+//
+//		menuMgr.add(_actionModifyColumns);
+
+		/*
+		 * fill view toolbar
+		 */
+		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+
+		_picDirFolder.fillActionBar();
+
+//		tbm.add(_actionExpandSelection);
+//		tbm.add(_actionCollapseAll);
+//
+//		tbm.add(_actionRefreshView);
+	}
+
+	private void fillContextMenu(final IMenuManager menuMgr) {
+
+//		menuMgr.add(_actionEditQuick);
+//		menuMgr.add(_actionEditTour);
+//		menuMgr.add(_actionOpenMarkerDialog);
+//		menuMgr.add(_actionOpenAdjustAltitudeDialog);
+//		menuMgr.add(_actionOpenTour);
+//		menuMgr.add(_actionMergeTour);
+//		menuMgr.add(_actionJoinTours);
+//		menuMgr.add(_actionComputeDistanceValuesFromGeoposition);
+//		menuMgr.add(_actionSetAltitudeFromSRTM);
+//
+//		_tagMenuMgr.fillTagMenu(menuMgr);
+//
+//		// tour type actions
+//		menuMgr.add(new Separator());
+//		menuMgr.add(_actionSetTourType);
+//		TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, this, true);
+//
+//		menuMgr.add(new Separator());
+//		menuMgr.add(_actionCollapseOthers);
+//		menuMgr.add(_actionExpandSelection);
+//		menuMgr.add(_actionCollapseAll);
+//
+//		menuMgr.add(new Separator());
+//		menuMgr.add(_actionExportTour);
+//		menuMgr.add(_actionReimportSubMenu);
+//		menuMgr.add(_actionPrintTour);
+//
+//		menuMgr.add(new Separator());
+//		menuMgr.add(_actionSetOtherPerson);
+//		menuMgr.add(_actionDeleteTour);
+//
+//		enableActions();
 	}
 
 	private void onSelectThumbnailSize() {

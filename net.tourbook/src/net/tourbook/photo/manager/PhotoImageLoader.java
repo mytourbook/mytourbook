@@ -200,6 +200,10 @@ public class PhotoImageLoader {
 			fullSizeImage = new Image(_display, fullSizePathName);
 
 		} catch (final Exception e) {
+
+			// #######################################
+			// this must be handled without logging
+			// #######################################
 			StatusUtil.log(NLS.bind("Fullsize image \"{0}\" cannot be loaded", fullSizePathName), e); //$NON-NLS-1$
 		} finally {
 			endLoading = System.currentTimeMillis();

@@ -23,6 +23,8 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.TreeViewerItem;
 import net.tourbook.ui.UI;
 
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.TreeColumnLayout;
@@ -37,9 +39,12 @@ import org.eclipse.jface.viewers.IElementComparer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
+import org.eclipse.jface.viewers.TreePath;
+import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
@@ -56,21 +61,20 @@ import org.eclipse.swt.widgets.TreeColumn;
  */
 class PicDirFolder {
 
-	private final IPreferenceStore	_prefStore			= TourbookPlugin.getDefault().getPreferenceStore();
+	private final IPreferenceStore	_prefStore		= TourbookPlugin.getDefault().getPreferenceStore();
 
 	private PicDirImages			_picDirImages;
 
 	private boolean					_isShowFileFolder;
-	private File					currentDirectory	= null;
 
-	private boolean					initial				= true;
-
+	private File					_selectedFolder	= null;
 	private TVIFolderRoot			_rootItem;
 
 	/*
 	 * UI controls
 	 */
 	private Display					_display;
+
 	private TreeViewer				_folderViewer;
 
 	private static final class FolderComparer implements IElementComparer {
@@ -98,10 +102,12 @@ class PicDirFolder {
 		@Override
 		public int hashCode(final Object element) {
 
-			final TVIFolderFolder item1 = (TVIFolderFolder) element;
-			final String folderName = item1._treeItemFolder.getName();
+//			final TVIFolderFolder item1 = (TVIFolderFolder) element;
+//			final String folderName = item1._treeItemFolder.getName();
+//
+//			return folderName.hashCode();
 
-			return folderName.hashCode();
+			return element.hashCode();
 		}
 	}
 
@@ -135,6 +141,13 @@ class PicDirFolder {
 
 	PicDirFolder(final PicDirImages picDirImages) {
 		_picDirImages = picDirImages;
+	}
+
+	void createActions() {
+		
+//		_actionExpandSelection = new ActionExpandSelection(this);
+//		_actionCollapseAll = new ActionCollapseAll();
+//		_actionCollapseOthers = new ActionCollapseOthers(this);
 	}
 
 	void createUI(final Composite parent) {
@@ -203,7 +216,7 @@ class PicDirFolder {
 
 		_folderViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(final SelectionChangedEvent event) {
-
+				onSelectFolder(event);
 			}
 		});
 
@@ -226,13 +239,9 @@ class PicDirFolder {
 				if (element instanceof TVIFolderFolder) {
 					final TVIFolderFolder folderItem = (TVIFolderFolder) element;
 
-					final String folderName = folderItem._isVolume
-							? folderItem._treeItemFolder.getPath()
-							: folderItem._treeItemFolder.getName();
-
 					final StyledString styledString = new StyledString();
 
-					styledString.append(folderName);
+					styledString.append(folderItem._folderName);
 
 					if (_isShowFileFolder) {
 
@@ -260,8 +269,9 @@ class PicDirFolder {
 		treeLayout.setColumnData(tvcColumn, new ColumnWeightData(100, true));
 	}
 
-	File getSelectedFolder() {
-		return currentDirectory;
+	void fillActionBar() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	/**
@@ -270,7 +280,14 @@ class PicDirFolder {
 	 * @return an array of Files corresponding to the root directories on the platform, may be empty
 	 *         but not null
 	 */
-	private File[] getSortedRoots() {
+	private File[] getRootsSorted() {
+
+		final File[] roots = File.listRoots();
+
+		PicDirView.sortFiles(roots);
+
+		return roots;
+
 		/*
 		 * On JDK 1.22 only...
 		 */
@@ -279,40 +296,44 @@ class PicDirFolder {
 		/*
 		 * On JDK 1.1.7 and beyond... -- PORTABILITY ISSUES HERE --
 		 */
-		if (System.getProperty("os.name").indexOf("Windows") != -1) {
+//		if (System.getProperty("os.name").indexOf("Windows") != -1) {
+//
+//			final ArrayList<File> list = new ArrayList<File>();
+//
+//			for (char i = 'c'; i <= 'z'; ++i) {
+//
+//				final File drive = new File(i + ":" + File.separator);
+//
+//				if (drive.isDirectory() && drive.exists()) {
+//
+//					list.add(drive);
+//
+//					if (initial && i == 'c') {
+//						_selectedFolder = drive;
+//						initial = false;
+//					}
+//				}
+//			}
+//
+//			final File[] roots = list.toArray(new File[list.size()]);
+//
+//			PicDirView.sortFiles(roots);
+//
+//			return roots;
+//
+//		} else {
+//
+//			final File root = new File(File.separator);
+//			if (initial) {
+//				_selectedFolder = root;
+//				initial = false;
+//			}
+//			return new File[] { root };
+//		}
+	}
 
-			final ArrayList<File> list = new ArrayList<File>();
-
-			for (char i = 'c'; i <= 'z'; ++i) {
-
-				final File drive = new File(i + ":" + File.separator);
-
-				if (drive.isDirectory() && drive.exists()) {
-
-					list.add(drive);
-
-					if (initial && i == 'c') {
-						currentDirectory = drive;
-						initial = false;
-					}
-				}
-			}
-
-			final File[] roots = list.toArray(new File[list.size()]);
-
-			PicDirView.sortFiles(roots);
-
-			return roots;
-
-		} else {
-
-			final File root = new File(File.separator);
-			if (initial) {
-				currentDirectory = root;
-				initial = false;
-			}
-			return new File[] { root };
-		}
+	File getSelectedFolder() {
+		return _selectedFolder;
 	}
 
 	Tree getTree() {
@@ -349,112 +370,132 @@ class PicDirFolder {
 		}
 	}
 
-	void initialRefresh(final String folderPath) {
+	private void onSelectFolder(final SelectionChangedEvent event) {
+
+		final TreeSelection treeSelection = (TreeSelection) event.getSelection();
+		final TreePath[] treePaths = treeSelection.getPaths();
+		if (treePaths.length == 0) {
+			return;
+		}
+		final TreePath treePath = treePaths[0];
+		if (treePath == null) {
+			return;
+		}
+
+		final TVIFolderFolder tviFolder = (TVIFolderFolder) treePath.getLastSegment();
+		final File selectedFolder = tviFolder._treeItemFolder;
+
+		if (selectedFolder == null) {
+			return;
+		}
+
+		// optimize, don't select again the same folder
+		if (_selectedFolder != null && selectedFolder.equals(_selectedFolder)) {
+			return;
+		}
+
+		_selectedFolder = selectedFolder;
+
+		/*
+		 * image gallery: displays the contents of the selected directory
+		 */
+		_picDirImages.showImages(selectedFolder);
+	}
+
+	void restoreFolder(final String folderPath) {
 
 		BusyIndicator.showWhile(_display, new Runnable() {
 			public void run() {
 
 				// set root item
-				_rootItem = new TVIFolderRoot(_folderViewer, getSortedRoots());
+				_rootItem = new TVIFolderRoot(_folderViewer, getRootsSorted());
 
 				_folderViewer.setInput(new Object());
 
-				_picDirImages.showImages(currentDirectory);
-
-//				final File[] roots = getRoots();
-//
-//				/*
-//				 * Tree view: Refreshes information about any files in the list and their children.
-//				 */
-//				treeRefresh(roots);
+				_picDirImages.showImages(_selectedFolder);
 
 				// Remind everyone where we are in the filesystem
-				File dir = currentDirectory;
-				currentDirectory = null;
+				File restoreFolder = _selectedFolder;
+				_selectedFolder = null;
 
 				if (folderPath != null) {
 					final File folderFile = new File(folderPath);
 					if (folderFile.isDirectory()) {
-						dir = folderFile;
+						restoreFolder = folderFile;
 					}
 				}
 
-				onSelectedDirectory(dir);
+				final String restorePathName = restoreFolder.getAbsolutePath();
+
+				final IPath restorePath = new Path(restorePathName);
+				final IPath restoreRoot = new Path(restorePathName).removeFirstSegments(9999);
+
+				final String[] folderSegments = restorePath.segments();
+				final ArrayList<String> allFolderSegments = new ArrayList<String>();
+
+				allFolderSegments.add(restoreRoot.toOSString());
+				for (final String folderSegmentName : folderSegments) {
+					allFolderSegments.add(folderSegmentName);
+				}
+
+				final ArrayList<TVIFolder> treePathItems = new ArrayList<TVIFolder>();
+				TVIFolder folderSegmentItem = _rootItem;
+				treePathItems.add(folderSegmentItem);
+
+				// create tree path for each folder segment
+				for (final String folderSegmentName : allFolderSegments) {
+
+					boolean isPathSegmentAvailable = false;
+
+					final ArrayList<TreeViewerItem> tviChildren = folderSegmentItem.getFetchedChildren();
+					for (final TreeViewerItem tviChild : tviChildren) {
+
+						final TVIFolderFolder childFolder = (TVIFolderFolder) tviChild;
+						String childFolderName;
+
+						if (childFolder._isRootFolder) {
+
+							if (UI.IS_WIN) {
+								// remove \ from device name
+								childFolderName = childFolder._folderName.substring(0, 2);
+							} else {
+								childFolderName = childFolder._folderName;
+							}
+
+						} else {
+
+							childFolderName = childFolder._folderName;
+						}
+
+						if (folderSegmentName.equals(childFolderName)) {
+
+							isPathSegmentAvailable = true;
+
+							treePathItems.add(childFolder);
+							folderSegmentItem = childFolder;
+
+							break;
+						}
+					}
+
+					if (isPathSegmentAvailable == false) {
+						// requested path is not available, select partial path in the viewer
+						break;
+					}
+				}
+
+				if (treePathItems.size() == 0) {
+					// there is nothing which can be selected
+					return;
+				}
+
+				final TVIFolder[] treePathArray = treePathItems.toArray(new TVIFolder[treePathItems.size()]);
+				final TreePath treePath = new TreePath(treePathArray);
+				final ITreeSelection selection = new TreeSelection(treePath);
+
+				_folderViewer.setSelection(selection, true);
 			}
 		});
-	}
-
-	/**
-	 * Notifies the application components that a new current directory has been selected
-	 * 
-	 * @param dir
-	 *            the directory that was selected, null is ignored
-	 */
-	private void onSelectedDirectory(final File dir) {
-
-		if (dir == null) {
-			return;
-		}
-		if (currentDirectory != null && dir.equals(currentDirectory)) {
-			return;
-		}
-
-		currentDirectory = dir;
-
-		/*
-		 * image gallery: displays the contents of the selected directory
-		 */
-		_picDirImages.showImages(dir);
-
-		/*
-		 * Tree view: If not already expanded, recursively expands the parents of the specified
-		 * directory until it is visible.
-		 */
-
-//		_folderViewer.setSelection(selection, true);
-
-//		final ArrayList<File> path = new ArrayList<File>();
-//		File dirRunnable = dir;
-//
-//		// Build a stack of paths from the root of the tree
-//		while (dirRunnable != null) {
-//			path.add(dirRunnable);
-//			dirRunnable = dirRunnable.getParentFile();
-//		}
-//		// Recursively expand the tree to get to the specified directory
-//		TreeItem[] items = tree.getItems();
-//		TreeItem lastItem = null;
-//		for (int i = path.size() - 1; i >= 0; --i) {
-//			final File pathElement = path.get(i);
-//
-//			// Search for a particular File in the array of tree items
-//			// No guarantee that the items are sorted in any recognizable fashion, so we'll
-//			// just sequential scan.  There shouldn't be more than a few thousand entries.
-//			TreeItem item = null;
-//			for (int k = 0; k < items.length; ++k) {
-//				item = items[k];
-//				if (item.isDisposed()) {
-//					continue;
-//				}
-//				final File itemFile = (File) item.getData(TREEITEMDATA_FILE);
-//				if (itemFile != null && itemFile.equals(pathElement)) {
-//					break;
-//				}
-//			}
-//			if (item == null) {
-//				break;
-//			}
-//			lastItem = item;
-//			if (i != 0 && !item.getExpanded()) {
-//				treeExpandItem(item);
-//				item.setExpanded(true);
-//			}
-//			items = item.getItems();
-//		}
-//
-//		tree.setSelection((lastItem != null) ? //
-//				new TreeItem[] { lastItem }
-//				: new TreeItem[0]);
 	}
 
 	private void updateColors() {

@@ -92,20 +92,26 @@ public class UI {
 //	long endTime = System.currentTimeMillis();
 //	System.out.println("Execution time : " + (endTime - startTime) + " ms");
 
-	public static final String								EMPTY_STRING					= "";										//$NON-NLS-1$
-	public static final String								SPACE							= " ";										//$NON-NLS-1$
-	public static final String								SPACE2							= "  ";									//$NON-NLS-1$
-	public static final String								SPACE4							= "    ";									//$NON-NLS-1$
-	public static final String								COLON_SPACE						= ": ";									//$NON-NLS-1$
-	public static final String								COMMA_SPACE						= ", ";									//$NON-NLS-1$
-	public static final String								UNDERSCORE						= "_";										//$NON-NLS-1$
-	public static final String								DASH							= "-";										//$NON-NLS-1$
-	public static final String								DASH_WITH_SPACE					= " - ";									//$NON-NLS-1$
-	public static final String								DASH_WITH_DOUBLE_SPACE			= "   -   ";								//$NON-NLS-1$
-	public static final String								SLASH_WITH_SPACE				= " / ";									//$NON-NLS-1$
-	public static final String								EMPTY_STRING_FORMAT				= "%s";									//$NON-NLS-1$
-	public static final String								MNEMONIC						= "&";										//$NON-NLS-1$
-	public static final String								BREAK_TIME_MARKER				= "x";										//$NON-NLS-1$
+	public static final boolean								IS_LINUX						= "gtk"	.equals(SWT.getPlatform());			//$NON-NLS-1$
+	public static final boolean								IS_OSX							= "carbon".equals(SWT.getPlatform()) //$NON-NLS-1$
+																									|| "cocoa".equals(SWT.getPlatform());	//$NON-NLS-1$
+	public static final boolean								IS_WIN							= "win32".equals(SWT.getPlatform()) //$NON-NLS-1$
+																									|| "wpf".equals(SWT.getPlatform());	//$NON-NLS-1$
+
+	public static final String								EMPTY_STRING					= "";											//$NON-NLS-1$
+	public static final String								SPACE							= " ";											//$NON-NLS-1$
+	public static final String								SPACE2							= "  ";										//$NON-NLS-1$
+	public static final String								SPACE4							= "    ";										//$NON-NLS-1$
+	public static final String								COLON_SPACE						= ": ";										//$NON-NLS-1$
+	public static final String								COMMA_SPACE						= ", ";										//$NON-NLS-1$
+	public static final String								UNDERSCORE						= "_";											//$NON-NLS-1$
+	public static final String								DASH							= "-";											//$NON-NLS-1$
+	public static final String								DASH_WITH_SPACE					= " - ";										//$NON-NLS-1$
+	public static final String								DASH_WITH_DOUBLE_SPACE			= "   -   ";									//$NON-NLS-1$
+	public static final String								SLASH_WITH_SPACE				= " / ";										//$NON-NLS-1$
+	public static final String								EMPTY_STRING_FORMAT				= "%s";										//$NON-NLS-1$
+	public static final String								MNEMONIC						= "&";											//$NON-NLS-1$
+	public static final String								BREAK_TIME_MARKER				= "x";											//$NON-NLS-1$
 
 	public static final char								TAB								= '\t';
 	public static final char								DOT								= '.';
@@ -113,25 +119,25 @@ public class UI {
 	/**
 	 * contains a new line
 	 */
-	public static final String								NEW_LINE						= "\n";									//$NON-NLS-1$
+	public static final String								NEW_LINE						= "\n";										//$NON-NLS-1$
 
 	/**
 	 * contains 2 new lines
 	 */
-	public static final String								NEW_LINE2						= "\n\n";									//$NON-NLS-1$
+	public static final String								NEW_LINE2						= "\n\n";										//$NON-NLS-1$
 
 	public static final String								SYSTEM_NEW_LINE					= System
-																									.getProperty("line.separator");	//$NON-NLS-1$
+																									.getProperty("line.separator");		//$NON-NLS-1$
 
-	public static final String								IS_NOT_INITIALIZED				= "IS NOT INITIALIZED";					//$NON-NLS-1$
+	public static final String								IS_NOT_INITIALIZED				= "IS NOT INITIALIZED";						//$NON-NLS-1$
 
-	public static final String								VIEW_COLOR_CATEGORY				= "view.color.category";					//$NON-NLS-1$
-	public static final String								VIEW_COLOR_TITLE				= "view.color.title";						//$NON-NLS-1$
-	public static final String								VIEW_COLOR_SUB					= "view.color.sub";						//$NON-NLS-1$
-	public static final String								VIEW_COLOR_SUB_SUB				= "view.color.sub-sub";					//$NON-NLS-1$
-	public static final String								VIEW_COLOR_TOUR					= "view.color.tour";						//$NON-NLS-1$
-	public static final String								VIEW_COLOR_BG_SEGMENTER_UP		= "view.colorBG.segmenterUp";				//$NON-NLS-1$
-	public static final String								VIEW_COLOR_BG_SEGMENTER_DOWN	= "view.colorBG.segmenterDown";			//$NON-NLS-1$
+	public static final String								VIEW_COLOR_CATEGORY				= "view.color.category";						//$NON-NLS-1$
+	public static final String								VIEW_COLOR_TITLE				= "view.color.title";							//$NON-NLS-1$
+	public static final String								VIEW_COLOR_SUB					= "view.color.sub";							//$NON-NLS-1$
+	public static final String								VIEW_COLOR_SUB_SUB				= "view.color.sub-sub";						//$NON-NLS-1$
+	public static final String								VIEW_COLOR_TOUR					= "view.color.tour";							//$NON-NLS-1$
+	public static final String								VIEW_COLOR_BG_SEGMENTER_UP		= "view.colorBG.segmenterUp";					//$NON-NLS-1$
+	public static final String								VIEW_COLOR_BG_SEGMENTER_DOWN	= "view.colorBG.segmenterDown";				//$NON-NLS-1$
 
 	public static final int									DEFAULT_FIELD_WIDTH				= 40;
 	public static final int									FORM_FIRST_COLUMN_INDENT		= 16;
@@ -141,51 +147,51 @@ public class UI {
 	 */
 	public static final int									DEFAULT_DESCRIPTION_WIDTH		= 350;
 
-	public static final String								UTF_8							= "UTF-8";									//$NON-NLS-1$
+	public static final String								UTF_8							= "UTF-8";										//$NON-NLS-1$
 
 	/*
 	 * labels for the different measurement systems
 	 */
-	public static final String								UNIT_METER						= "m";										//$NON-NLS-1$
-	private static final String								UNIT_ALTITUDE_M					= "m";										//$NON-NLS-1$
-	public static final String								UNIT_DISTANCE_KM				= "km";									//$NON-NLS-1$
-	private static final String								UNIT_SPEED_KM_H					= "km/h";									//$NON-NLS-1$
-	private static final String								UNIT_TEMPERATURE_C				= "\u00B0C";								//$NON-NLS-1$
-	private static final String								UNIT_ALTIMETER_M_H				= "m/h";									//$NON-NLS-1$
-	private static final String								UNIT_PACE_MIN_P_KM				= "min/km";								//$NON-NLS-1$
-	public static final String								UNIT_WEIGHT_KG					= "kg";									//$NON-NLS-1$
+	public static final String								UNIT_METER						= "m";											//$NON-NLS-1$
+	private static final String								UNIT_ALTITUDE_M					= "m";											//$NON-NLS-1$
+	public static final String								UNIT_DISTANCE_KM				= "km";										//$NON-NLS-1$
+	private static final String								UNIT_SPEED_KM_H					= "km/h";										//$NON-NLS-1$
+	private static final String								UNIT_TEMPERATURE_C				= "\u00B0C";									//$NON-NLS-1$
+	private static final String								UNIT_ALTIMETER_M_H				= "m/h";										//$NON-NLS-1$
+	private static final String								UNIT_PACE_MIN_P_KM				= "min/km";									//$NON-NLS-1$
+	public static final String								UNIT_WEIGHT_KG					= "kg";										//$NON-NLS-1$
 
-	private static final String								UNIT_DISTANCE_YARD				= "yd";									//$NON-NLS-1$
-	private static final String								UNIT_ALTITUDE_FT				= "ft";									//$NON-NLS-1$
-	public static final String								UNIT_DISTANCE_MI				= "mi";									//$NON-NLS-1$
-	private static final String								UNIT_SPEED_MPH					= "mph";									//$NON-NLS-1$
-	private static final String								UNIT_TEMPERATURE_F				= "\u00B0F";								//$NON-NLS-1$
-	private static final String								UNIT_ALTIMETER_FT_H				= "ft/h";									//$NON-NLS-1$
-	private static final String								UNIT_PACE_MIN_P_MILE			= "min/mi";								//$NON-NLS-1$
+	private static final String								UNIT_DISTANCE_YARD				= "yd";										//$NON-NLS-1$
+	private static final String								UNIT_ALTITUDE_FT				= "ft";										//$NON-NLS-1$
+	public static final String								UNIT_DISTANCE_MI				= "mi";										//$NON-NLS-1$
+	private static final String								UNIT_SPEED_MPH					= "mph";										//$NON-NLS-1$
+	private static final String								UNIT_TEMPERATURE_F				= "\u00B0F";									//$NON-NLS-1$
+	private static final String								UNIT_ALTIMETER_FT_H				= "ft/h";										//$NON-NLS-1$
+	private static final String								UNIT_PACE_MIN_P_MILE			= "min/mi";									//$NON-NLS-1$
 
-	public static final String								UNIT_LABEL_POWER				= "Watt";									//$NON-NLS-1$
-	public static final String								UNIT_LABEL_MS					= "ms";									//$NON-NLS-1$
+	public static final String								UNIT_LABEL_POWER				= "Watt";										//$NON-NLS-1$
+	public static final String								UNIT_LABEL_MS					= "ms";										//$NON-NLS-1$
 
-	public static final String								SYMBOL_AVERAGE					= "\u00f8";								//$NON-NLS-1$
-	public static final String								SYMBOL_AVERAGE_WITH_SPACE		= "\u00f8 ";								//$NON-NLS-1$
-	public static final String								SYMBOL_DASH						= "\u2212";								//$NON-NLS-1$
-	public static final String								SYMBOL_DIFFERENCE				= "\u0394";								//$NON-NLS-1$
-	public static final String								SYMBOL_DIFFERENCE_WITH_SPACE	= "\u0394 ";								//$NON-NLS-1$
-	public static final String								SYMBOL_DOUBLE_HORIZONTAL		= "\u2550";								//$NON-NLS-1$
-	public static final String								SYMBOL_DOUBLE_VERTICAL			= "\u2551";								//$NON-NLS-1$
-	public static final String								SYMBOL_DEGREE					= "\u00B0";								//$NON-NLS-1$
-	public static final String								SYMBOL_ELLIPSIS					= "\u2026";								//$NON-NLS-1$
-	public static final String								SYMBOL_INFINITY					= "\u221E";								//$NON-NLS-1$
-	public static final String								SYMBOL_SUM_WITH_SPACE			= "\u2211 ";								//$NON-NLS-1$
-	public static final String								SYMBOL_TAU						= "\u03c4";								//$NON-NLS-1$
+	public static final String								SYMBOL_AVERAGE					= "\u00f8";									//$NON-NLS-1$
+	public static final String								SYMBOL_AVERAGE_WITH_SPACE		= "\u00f8 ";									//$NON-NLS-1$
+	public static final String								SYMBOL_DASH						= "\u2212";									//$NON-NLS-1$
+	public static final String								SYMBOL_DIFFERENCE				= "\u0394";									//$NON-NLS-1$
+	public static final String								SYMBOL_DIFFERENCE_WITH_SPACE	= "\u0394 ";									//$NON-NLS-1$
+	public static final String								SYMBOL_DOUBLE_HORIZONTAL		= "\u2550";									//$NON-NLS-1$
+	public static final String								SYMBOL_DOUBLE_VERTICAL			= "\u2551";									//$NON-NLS-1$
+	public static final String								SYMBOL_DEGREE					= "\u00B0";									//$NON-NLS-1$
+	public static final String								SYMBOL_ELLIPSIS					= "\u2026";									//$NON-NLS-1$
+	public static final String								SYMBOL_INFINITY					= "\u221E";									//$NON-NLS-1$
+	public static final String								SYMBOL_SUM_WITH_SPACE			= "\u2211 ";									//$NON-NLS-1$
+	public static final String								SYMBOL_TAU						= "\u03c4";									//$NON-NLS-1$
 
-	public static final String								SYMBOL_COLON					= ":";										//$NON-NLS-1$
-	public static final String								SYMBOL_EQUAL					= "=";										//$NON-NLS-1$
-	public static final String								SYMBOL_GREATER_THAN				= ">";										//$NON-NLS-1$
-	public static final String								SYMBOL_LESS_THAN				= "<";										//$NON-NLS-1$
-	public static final String								SYMBOL_PERCENTAGE				= "%";										//$NON-NLS-1$
-	public static final String								SYMBOL_WIND_WITH_SPACE			= "W ";									//$NON-NLS-1$
-	public static final String								SYMBOL_EXCLAMATION_POINT		= "!";										//$NON-NLS-1$
+	public static final String								SYMBOL_COLON					= ":";											//$NON-NLS-1$
+	public static final String								SYMBOL_EQUAL					= "=";											//$NON-NLS-1$
+	public static final String								SYMBOL_GREATER_THAN				= ">";											//$NON-NLS-1$
+	public static final String								SYMBOL_LESS_THAN				= "<";											//$NON-NLS-1$
+	public static final String								SYMBOL_PERCENTAGE				= "%";											//$NON-NLS-1$
+	public static final String								SYMBOL_WIND_WITH_SPACE			= "W ";										//$NON-NLS-1$
+	public static final String								SYMBOL_EXCLAMATION_POINT		= "!";											//$NON-NLS-1$
 
 	/**
 	 * Imperial system for distance
@@ -230,7 +236,7 @@ public class UI {
 	public static final float								UNIT_FAHRENHEIT_MULTI			= 1.8f;
 	public static final float								UNIT_FAHRENHEIT_ADD				= 32;
 
-	public static final String								UNIT_LABEL_TIME					= "h";										//$NON-NLS-1$
+	public static final String								UNIT_LABEL_TIME					= "h";											//$NON-NLS-1$
 
 	/**
 	 * contains the unit label in the currenty measurement system for the distance values
@@ -242,9 +248,9 @@ public class UI {
 	public static String									UNIT_LABEL_TEMPERATURE;
 	public static String									UNIT_LABEL_SPEED;
 	public static String									UNIT_LABEL_PACE;
-	public static String									UNIT_LABEL_DIRECTION			= "\u00B0";								//$NON-NLS-1$
+	public static String									UNIT_LABEL_DIRECTION			= "\u00B0";									//$NON-NLS-1$
 
-	private static final String								TOUR_TYPE_PREFIX				= "tourType";								//$NON-NLS-1$
+	private static final String								TOUR_TYPE_PREFIX				= "tourType";									//$NON-NLS-1$
 //	private static final String						WEATHER_CLOUDS_PREFIX			= "weatherClouds-";						//$NON-NLS-1$
 
 	public final static ImageRegistry						IMAGE_REGISTRY;
@@ -252,10 +258,10 @@ public class UI {
 	/*
 	 * image keys for images which are stored in the image registry
 	 */
-	public static final String								IMAGE_EMPTY_16					= "_empty16";								//$NON-NLS-1$
+	public static final String								IMAGE_EMPTY_16					= "_empty16";									//$NON-NLS-1$
 
-	public static final String								IMAGE_TOUR_TYPE_FILTER			= "tourType-filter";						//$NON-NLS-1$
-	public static final String								IMAGE_TOUR_TYPE_FILTER_SYSTEM	= "tourType-filter-system";				//$NON-NLS-1$
+	public static final String								IMAGE_TOUR_TYPE_FILTER			= "tourType-filter";							//$NON-NLS-1$
+	public static final String								IMAGE_TOUR_TYPE_FILTER_SYSTEM	= "tourType-filter-system";					//$NON-NLS-1$
 
 	private static final int								TOUR_TYPE_IMAGE_WIDTH			= 16;
 	private static final int								TOUR_TYPE_IMAGE_HEIGHT			= 16;
@@ -271,9 +277,9 @@ public class UI {
 	public static final DateFormat							DateFormatterFull				= DateFormat
 																									.getDateInstance(DateFormat.FULL);
 	public static final SimpleDateFormat					MonthFormatter					= new SimpleDateFormat(
-																									"MMM");							//$NON-NLS-1$
+																									"MMM");								//$NON-NLS-1$
 	public static final SimpleDateFormat					WeekDayFormatter				= new SimpleDateFormat(
-																									"EEEE");							//$NON-NLS-1$
+																									"EEEE");								//$NON-NLS-1$
 
 	public static final DateTimeFormatter					DTFormatterShort				= DateTimeFormat
 																									.shortDateTime();

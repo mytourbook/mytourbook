@@ -23,10 +23,10 @@ import org.eclipse.jface.viewers.TreeViewer;
 public class TVIFolderFolder extends TVIFolder {
 
 	File						_treeItemFolder;
+	String						_folderName;
+	boolean						_isRootFolder;
 
-	private File[]				_folderList;
-
-	boolean						_isVolume;
+	private File[]				_children;
 
 	int							_folderCounter;
 	int							_fileCounter;
@@ -58,12 +58,14 @@ public class TVIFolderFolder extends TVIFolder {
 		};
 	}
 
-	public TVIFolderFolder(final TreeViewer tagViewer, final File folder, final boolean isVolume) {
+	public TVIFolderFolder(final TreeViewer tagViewer, final File folder, final boolean isRootFolder) {
 
 		super(tagViewer);
 
 		_treeItemFolder = folder;
-		_isVolume = isVolume;
+
+		_isRootFolder = isRootFolder;
+		_folderName = _isRootFolder ? folder.getPath() : folder.getName();
 	}
 
 	@Override
@@ -73,11 +75,11 @@ public class TVIFolderFolder extends TVIFolder {
 			readFolderList();
 		}
 
-		if (_folderList != null) {
+		if (_children != null) {
 
-			PicDirView.sortFiles(_folderList);
+			PicDirView.sortFiles(_children);
 
-			for (final File childFolder : _folderList) {
+			for (final File childFolder : _children) {
 				addChild(new TVIFolderFolder(_folderViewer, childFolder, false));
 			}
 		}
@@ -108,12 +110,12 @@ public class TVIFolderFolder extends TVIFolder {
 			readFolderList();
 		}
 
-		return _folderList == null ? false : _folderList.length > 0;
+		return _children == null ? false : _children.length > 0;
 	}
 
 	private void readFolderList() {
 
-		_folderList = _treeItemFolder.listFiles(_folderFilter);
+		_children = _treeItemFolder.listFiles(_folderFilter);
 
 		_isFolderChecked = true;
 	}
