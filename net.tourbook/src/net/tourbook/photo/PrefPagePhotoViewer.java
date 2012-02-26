@@ -36,7 +36,9 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-	private final IPreferenceStore	_prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
+	public static final String		PREF_PAGE_ID	= "net.tourbook.preferences.PrefPagePhotoViewerId"; //$NON-NLS-1$
+
+	private final IPreferenceStore	_prefStore		= TourbookPlugin.getDefault().getPreferenceStore();
 
 	private boolean					_isEditorModified;
 
@@ -163,9 +165,9 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 
 	@Override
 	protected void initialize() {
-		
+
 		super.initialize();
-		
+
 		enableControls();
 	}
 

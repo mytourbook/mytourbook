@@ -221,30 +221,35 @@
 
    <!-- PREF PAGES   -->
 
-   <extension
-         point="org.eclipse.ui.preferencePages">
-
-
-      <page
-            class="net.tourbook.preferences.PrefPageGeneral"
-            id="net.tourbook.preferences.PrefPageGeneralId"
-            name="%preference_page_general">
-      </page>
-	      <page
-	            category="net.tourbook.preferences.PrefPageGeneralId"
-	            class="net.tourbook.preferences.PrefPageComputedValues"
-	            id="net.tourbook.preferences.PrefPageComputedValues"
-	            name="%preference_page_computedValues">
-	      </page>
-	      <page
-	            category="net.tourbook.preferences.PrefPageGeneralId"
-	            class="net.tourbook.preferences.PrefPageTour"
-	            id="net.tourbook.preferences.PrefPageTour"
-	            name="%Pref_Page_Tour">
-          <keywordReference
-                id="net.tourbook.keywordReference.PrefPageTour">
-          </keywordReference>
-	      </page>
+	<extension
+		point="org.eclipse.ui.preferencePages">
+	
+	
+		<page
+			class="net.tourbook.preferences.PrefPageGeneral"
+			id="net.tourbook.preferences.PrefPageGeneralId"
+			name="%preference_page_general">
+		</page>
+			<page category="net.tourbook.preferences.PrefPageGeneralId"
+				class="net.tourbook.preferences.PrefPageGeneralExternalPrograms"
+				id="net.tourbook.preferences.PrefPageGeneralExternalProgramsID"
+				name="%PrefPage_General_ExternalApplications">
+			</page>
+	
+			<page category="net.tourbook.preferences.PrefPageGeneralId"
+				class="net.tourbook.preferences.PrefPageComputedValues"
+				id="net.tourbook.preferences.PrefPageComputedValues"
+				name="%preference_page_computedValues">
+			</page>
+	
+			<page category="net.tourbook.preferences.PrefPageGeneralId"
+				class="net.tourbook.preferences.PrefPageTour"
+				id="net.tourbook.preferences.PrefPageTour"
+				name="%Pref_Page_Tour">
+				<keywordReference
+					id="net.tourbook.keywordReference.PrefPageTour">
+				</keywordReference>
+			</page>
 
 
       <page
@@ -313,14 +318,14 @@
             id="net.tourbook.preferences.PrefPagePhotoId"
             name="%PrefPage_Photo">
       </page>
-	      <page
-	            category="net.tourbook.preferences.PrefPagePhotoId"
+	      <page category="net.tourbook.preferences.PrefPagePhotoId"
+	            
 	            class="net.tourbook.photo.PrefPagePhotoViewer"
 	            id="net.tourbook.preferences.PrefPagePhotoViewerId"
 	            name="%PrefPage_Photo_PhotoViewer">
 	      </page>
-	      <page
-	            category="net.tourbook.preferences.PrefPagePhotoId"
+	      <page category="net.tourbook.preferences.PrefPagePhotoId"
+	            
 	            class="net.tourbook.photo.PrefPagePhotoThumbnailCache"
 	            id="net.tourbook.preferences.PrefPagePhotoThumbnailCacheId"
 	            name="%PrefPage_Photo_ThumbnailCache">

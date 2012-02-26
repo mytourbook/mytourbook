@@ -785,6 +785,10 @@ public class Messages extends NLS {
 
 	public static String		Pref_DataImport_Label;
 
+	public static String	Pref_ExtPrograms_Label_ExplorerPath;
+
+	public static String	Pref_ExtPrograms_Label_Info;
+
 	public static String		Pref_general_imperial_unit_fahrenheit;
 	public static String		Pref_general_imperial_unit_feet;
 	public static String		Pref_general_imperial_unit_mi;

@@ -109,28 +109,6 @@ public abstract class TreeViewerItem {
 		return _children.toArray();
 	}
 
-	public Object[] getFetchedChildrenWithChildrenAsArray() {
-
-		if (_children == null) {
-			fetchChildrenInternal();
-		}
-
-		if (_isChildChildrenFetched == false) {
-
-			for (final TreeViewerItem child : _children) {
-				child.getFetchedChildren();
-			}
-
-			_isChildChildrenFetched = true;
-		}
-
-		if (_children.size() == 0) {
-			return new Object[0];
-		}
-
-		return _children.toArray();
-	}
-
 	public TreeViewerItem getParentItem() {
 		return _parentItem;
 	}

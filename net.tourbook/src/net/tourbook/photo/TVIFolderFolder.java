@@ -26,7 +26,7 @@ public class TVIFolderFolder extends TVIFolder {
 	String						_folderName;
 	boolean						_isRootFolder;
 
-	private File[]				_children;
+	private File[]				_folderChildren;
 
 	int							_folderCounter;
 	int							_fileCounter;
@@ -69,17 +69,27 @@ public class TVIFolderFolder extends TVIFolder {
 	}
 
 	@Override
+	public void clearChildren() {
+
+		_folderCounter = 0;
+		_fileCounter = 0;
+		_isFolderChecked = false;
+
+		super.clearChildren();
+	}
+
+	@Override
 	protected void fetchChildren() {
 
 		if (_isFolderChecked == false) {
 			readFolderList();
 		}
 
-		if (_children != null) {
+		if (_folderChildren != null) {
 
-			PicDirView.sortFiles(_children);
+			PicDirView.sortFiles(_folderChildren);
 
-			for (final File childFolder : _children) {
+			for (final File childFolder : _folderChildren) {
 				addChild(new TVIFolderFolder(_folderViewer, childFolder, false));
 			}
 		}
@@ -110,12 +120,12 @@ public class TVIFolderFolder extends TVIFolder {
 			readFolderList();
 		}
 
-		return _children == null ? false : _children.length > 0;
+		return _folderChildren == null ? false : _folderChildren.length > 0;
 	}
 
 	private void readFolderList() {
 
-		_children = _treeItemFolder.listFiles(_folderFilter);
+		_folderChildren = _treeItemFolder.listFiles(_folderFilter);
 
 		_isFolderChecked = true;
 	}

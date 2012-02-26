@@ -37,13 +37,17 @@ import org.eclipse.swt.graphics.ImageLoader;
 
 public class ThumbnailStore {
 
-	private static final String			THUMBNAIL_STORE_OS_PATH	= "thumbnail-store";								//$NON-NLS-1$
+	private static final String			THUMBNAIL_IMAGE_EXTENSION_JPG	= "jpg";
 
-	private static IPreferenceStore		_prefStore				= TourbookPlugin.getDefault().getPreferenceStore();
+	private static final String			THUMBNAIL_STORE_OS_PATH			= "thumbnail-store";			//$NON-NLS-1$
 
-	private static IPath				_storePath				= getThumbnailStorePath();
+	private static IPreferenceStore		_prefStore						= TourbookPlugin
+																				.getDefault()
+																				.getPreferenceStore();
 
-	private static final ReentrantLock	SAVE_LOCK				= new ReentrantLock();
+	private static IPath				_storePath						= getThumbnailStorePath();
+
+	private static final ReentrantLock	SAVE_LOCK						= new ReentrantLock();
 
 	private static IPath checkPath(final IPath storeImageFilePath) {
 
@@ -83,10 +87,14 @@ public class ThumbnailStore {
 		final String imageKey = photo.getImageKey(imageQuality);
 
 		final int imageQualitySize = PhotoManager.IMAGE_SIZE[imageQuality];
-		final String imageKey1Folder = imageKey.substring(0, 1);
-		final String imageKey2Folder = imageKey.substring(0, 5);
+		final String imageKey1Folder = imageKey.substring(0, 2);
+		final String imageKey2Folder = imageKey.substring(0, 4);
 
-		final String imageFileName = imageKey + "_" + imageQualitySize + "_" + photo.getFileName();
+		// thumbnail images are stored as jpg file
+		IPath jpgPhotoFilePath = new Path(photo.getFileName());
+		jpgPhotoFilePath = jpgPhotoFilePath.removeFileExtension().addFileExtension(THUMBNAIL_IMAGE_EXTENSION_JPG);
+
+		final String imageFileName = imageKey + "_" + imageQualitySize + "_" + jpgPhotoFilePath.toOSString();
 
 		final IPath imageFilePath = _storePath//
 				.append(imageKey1Folder)
@@ -174,7 +182,7 @@ public class ThumbnailStore {
 				return;
 			}
 
-			ImageIO.write(scaledImg, "jpg", new File(storeImageFilePath.toOSString()));
+			ImageIO.write(scaledImg, THUMBNAIL_IMAGE_EXTENSION_JPG, new File(storeImageFilePath.toOSString()));
 
 		} catch (final Exception e) {
 
@@ -196,7 +204,7 @@ public class ThumbnailStore {
 			final ImageLoader imageLoader = new ImageLoader();
 			imageLoader.data = new ImageData[] { thumbnailImage.getImageData() };
 
-			final IPath fullImageFilePath = imagePathWithoutExt.addFileExtension("jpg");
+			final IPath fullImageFilePath = imagePathWithoutExt.addFileExtension(THUMBNAIL_IMAGE_EXTENSION_JPG);
 
 			imageLoader.save(fullImageFilePath.toOSString(), SWT.IMAGE_JPEG);
 

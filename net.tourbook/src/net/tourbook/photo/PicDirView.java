@@ -16,18 +16,13 @@
 package net.tourbook.photo;
 
 import java.io.File;
-import java.util.ArrayList;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.photo.manager.Photo;
 import net.tourbook.photo.manager.PhotoManager;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.ViewerDetailForm;
-import net.tourbook.util.PostSelectionProvider;
 import net.tourbook.util.Util;
 
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -55,7 +50,6 @@ public class PicDirView extends ViewPart {
 
 	private static final String				STATE_TREE_WIDTH			= "STATE_TREE_WIDTH";					//$NON-NLS-1$
 	private static final String				STATE_THUMB_IMAGE_SIZE		= "STATE_THUMB_IMAGE_SIZE";			//$NON-NLS-1$
-	private static final String				STATE_SELECTED_FOLDER		= "STATE_SELECTED_FOLDER";				//$NON-NLS-1$
 
 	private static final IDialogSettings	_state						= TourbookPlugin.getDefault()//
 																				.getDialogSettingsSection(
@@ -65,9 +59,6 @@ public class PicDirView extends ViewPart {
 
 	private IPartListener2					_partListener;
 	private IPropertyChangeListener			_prefChangeListener;
-	private PostSelectionProvider			_postSelectionProvider;
-
-	private ArrayList<Photo>				_photos						= new ArrayList<Photo>();
 
 	private PicDirFolder					_picDirFolder;
 	private PicDirImages					_picDirImages;
@@ -82,7 +73,7 @@ public class PicDirView extends ViewPart {
 	private Composite						_containerImages;
 	private Scale							_scaleThumbnailSize;
 
-	static int compareFiles(final File a, final File b) {
+	static int compareFiles(final File file1, final File file2) {
 
 //		boolean aIsDir = a.isDirectory();
 //		boolean bIsDir = b.isDirectory();
@@ -90,9 +81,25 @@ public class PicDirView extends ViewPart {
 //		if (bIsDir && ! aIsDir) return 1;
 
 		// sort case-sensitive files in a case-insensitive manner
-		int compare = a.getName().compareToIgnoreCase(b.getName());
+		final String file1Name = file1.getName();
+		final String file2Name = file2.getName();
+
+		// try to sort by numbers
+		try {
+
+			final int file1No = Integer.parseInt(file1Name);
+			final int file2No = Integer.parseInt(file2Name);
+
+			return file1No - file2No;
+
+		} catch (final Exception e) {
+			// at least one filename co not contain a number, sort by string
+		}
+
+		int compare = file1Name.compareToIgnoreCase(file2Name);
+
 		if (compare == 0) {
-			compare = a.getName().compareTo(b.getName());
+			compare = file1Name.compareTo(file2Name);
 		}
 		return compare;
 	}
@@ -113,7 +120,7 @@ public class PicDirView extends ViewPart {
 		return list;
 	}
 
-	static void sortBlock(final File[] files, final int start, final int end, final File[] mergeTemp) {
+	private static void sortBlock(final File[] files, final int start, final int end, final File[] mergeTemp) {
 		final int length = end - start + 1;
 		if (length < 8) {
 			for (int i = end; i > start; --i) {
@@ -151,6 +158,7 @@ public class PicDirView extends ViewPart {
 	 *            the array of Files to be sorted
 	 */
 	static void sortFiles(final File[] files) {
+
 		/* Very lazy merge sort algorithm */
 		sortBlock(files, 0, files.length - 1, new File[files.length]);
 	}
@@ -202,33 +210,15 @@ public class PicDirView extends ViewPart {
 		_prefStore.addPropertyChangeListener(_prefChangeListener);
 	}
 
-	private void createActions() {
-
-		_picDirFolder.createActions();
-//		_actionEditQuick = new ActionEditQuick(this);
-
-
-		fillActionBars();
-	}
 	@Override
 	public void createPartControl(final Composite parent) {
 
 		createUI(parent);
-		createActions();
 
 		addPartListener();
 		addPrefListener();
 
-		// set selection provider
-		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider());
-
 		restoreState();
-
-		// set thumbnail size
-		onSelectThumbnailSize();
-
-		final String previousSelectedFolder = Util.getStateString(_state, STATE_SELECTED_FOLDER, null);
-		_picDirFolder.restoreFolder(previousSelectedFolder);
 	}
 
 	private void createUI(final Composite parent) {
@@ -304,67 +294,6 @@ public class PicDirView extends ViewPart {
 		super.dispose();
 	}
 
-	private void fillActionBars() {
-
-		/*
-		 * fill view menu
-		 */
-//		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
-//		menuMgr.add(_actionSelectAllTours);
-//		menuMgr.add(_actionYearSubCategorySelect);
-//		menuMgr.add(new Separator());
-//
-//		menuMgr.add(_actionModifyColumns);
-
-		/*
-		 * fill view toolbar
-		 */
-		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
-
-		_picDirFolder.fillActionBar();
-
-//		tbm.add(_actionExpandSelection);
-//		tbm.add(_actionCollapseAll);
-//
-//		tbm.add(_actionRefreshView);
-	}
-
-	private void fillContextMenu(final IMenuManager menuMgr) {
-
-//		menuMgr.add(_actionEditQuick);
-//		menuMgr.add(_actionEditTour);
-//		menuMgr.add(_actionOpenMarkerDialog);
-//		menuMgr.add(_actionOpenAdjustAltitudeDialog);
-//		menuMgr.add(_actionOpenTour);
-//		menuMgr.add(_actionMergeTour);
-//		menuMgr.add(_actionJoinTours);
-//		menuMgr.add(_actionComputeDistanceValuesFromGeoposition);
-//		menuMgr.add(_actionSetAltitudeFromSRTM);
-//
-//		_tagMenuMgr.fillTagMenu(menuMgr);
-//
-//		// tour type actions
-//		menuMgr.add(new Separator());
-//		menuMgr.add(_actionSetTourType);
-//		TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, this, true);
-//
-//		menuMgr.add(new Separator());
-//		menuMgr.add(_actionCollapseOthers);
-//		menuMgr.add(_actionExpandSelection);
-//		menuMgr.add(_actionCollapseAll);
-//
-//		menuMgr.add(new Separator());
-//		menuMgr.add(_actionExportTour);
-//		menuMgr.add(_actionReimportSubMenu);
-//		menuMgr.add(_actionPrintTour);
-//
-//		menuMgr.add(new Separator());
-//		menuMgr.add(_actionSetOtherPerson);
-//		menuMgr.add(_actionDeleteTour);
-//
-//		enableActions();
-	}
-
 	private void onSelectThumbnailSize() {
 
 		final int selectedSizeIndex = _scaleThumbnailSize.getSelection();
@@ -381,7 +310,6 @@ public class PicDirView extends ViewPart {
 		/**
 		 * must be muliplied with 10 that enough increment labels are displayed
 		 */
-//		final int thumbnailSize = PhotoManager.THUMBNAIL_SIZES[selectedSizeIndex / 10];
 		final int thumbnailSize = _scaleThumbnailSize.getSelection();
 
 		_picDirImages.setThumbnailSize(thumbnailSize);
@@ -397,26 +325,12 @@ public class PicDirView extends ViewPart {
 		 * thumbnail size
 		 */
 		final int stateSize = Util.getStateInt(_state, STATE_THUMB_IMAGE_SIZE, PhotoManager.THUMBNAIL_DEFAULT_SIZE);
-
-//		int thumbSize = -1;
-//		for (final int thumbnailSize : PhotoManager.THUMBNAIL_SIZES) {
-//			if (thumbnailSize == stateSize) {
-//				thumbSize = thumbnailSize;
-//				break;
-//			}
-//		}
-//		final int thumbnailSize = thumbSize == -1 ? PhotoManager.THUMBNAIL_DEFAULT_SIZE : thumbSize;
-//		int thumbnailSizeIndex = -1;
-//
-//		for (int sizeIndex = 0; sizeIndex < PhotoManager.THUMBNAIL_SIZES.length; sizeIndex++) {
-//			if (PhotoManager.THUMBNAIL_SIZES[sizeIndex] == thumbnailSize) {
-//				thumbnailSizeIndex = sizeIndex;
-//				break;
-//			}
-//		}
-//
-//		_scaleThumbnailSize.setSelection(thumbnailSizeIndex * 10);
 		_scaleThumbnailSize.setSelection(stateSize);
+
+		_picDirFolder.restoreState(_state);
+
+		// restore thumbnail size
+		onSelectThumbnailSize();
 	}
 
 	private void saveState() {
@@ -432,18 +346,10 @@ public class PicDirView extends ViewPart {
 			_state.put(STATE_TREE_WIDTH, tree.getSize().x);
 		}
 
-		// selected folder
-		final File selectedFolder = _picDirFolder.getSelectedFolder();
-		if (selectedFolder != null) {
-			_state.put(STATE_SELECTED_FOLDER, selectedFolder.getAbsolutePath());
-		}
-
 		// thumbnail size
-		final int sizeSelection = _scaleThumbnailSize.getSelection();
-//		final int thumbnailSize = PhotoManager.THUMBNAIL_SIZES[sizeSelection / 10];
-//
-//		_state.put(STATE_THUMB_IMAGE_SIZE, thumbnailSize);
-		_state.put(STATE_THUMB_IMAGE_SIZE, sizeSelection);
+		_state.put(STATE_THUMB_IMAGE_SIZE, _scaleThumbnailSize.getSelection());
+
+		_picDirFolder.saveState(_state);
 	}
 
 	@Override

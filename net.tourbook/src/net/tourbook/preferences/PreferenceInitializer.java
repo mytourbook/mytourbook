@@ -369,11 +369,15 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
 		PreferenceConverter.setDefault(store, //
 				ITourbookPreferences.PHOTO_VIEWER_COLOR_FOLDER,
-				new RGB(0x55, 0xC8, 0xFF));
+				new RGB(0xFF, 0x6A, 0x11)
+//				new RGB(0x55, 0xC8, 0xFF)
+				);
 
 		PreferenceConverter.setDefault(store, //
 				ITourbookPreferences.PHOTO_VIEWER_COLOR_FILE,
-				new RGB(0xAD, 0xF2, 0x0D));
+				new RGB(0x55, 0xC8, 0xFF)
+//				new RGB(0xAD, 0xF2, 0x0D)
+				);
 
 	}
 }

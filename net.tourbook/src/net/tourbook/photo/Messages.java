@@ -23,6 +23,11 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_Photo_OtherTags;
 	public static String		ColumnFactory_Photo_Time;
 
+	public static String		Pic_Dir_Action_Preferences;
+
+	public static String	Pic_Dir_Action_Refresh;
+	public static String		Pic_Dir_Action_SingleClickExpand;
+	public static String		Pic_Dir_Action_SingleExpandCollapseOthers;
 	public static String		Pic_Dir_Label_FolderIsNotSelected;
 	public static String		Pic_Dir_Label_Loading;
 	public static String		Pic_Dir_Status_Loaded;
@@ -39,19 +44,13 @@ public class Messages extends NLS {
 	public static String		PrefPage_Photo_Cache_Label_ThumbnailLocation;
 	public static String		PrefPage_Photo_Cache_Label_UseDefaultThumbnailLocation;
 
-	public static String	PrefPage_Photo_Viewer_Checkbox_ShowNumbersInFolderView;
-
-	public static String	PrefPage_Photo_Viewer_Checkbox_ShowNumbersInFolderView_Tooltip;
-
-	public static String	PrefPage_Photo_Viewer_Group_Colors;
-
-	public static String	PrefPage_Photo_Viewer_Label_BackgroundColor;
-
-	public static String	PrefPage_Photo_Viewer_Label_FileColor;
-
-	public static String	PrefPage_Photo_Viewer_Label_FolderColor;
-
-	public static String	PrefPage_Photo_Viewer_Label_ForgroundColor;
+	public static String		PrefPage_Photo_Viewer_Checkbox_ShowNumbersInFolderView;
+	public static String		PrefPage_Photo_Viewer_Checkbox_ShowNumbersInFolderView_Tooltip;
+	public static String		PrefPage_Photo_Viewer_Group_Colors;
+	public static String		PrefPage_Photo_Viewer_Label_BackgroundColor;
+	public static String		PrefPage_Photo_Viewer_Label_FileColor;
+	public static String		PrefPage_Photo_Viewer_Label_FolderColor;
+	public static String		PrefPage_Photo_Viewer_Label_ForgroundColor;
 
 	static {
 		// initialize resource bundle
