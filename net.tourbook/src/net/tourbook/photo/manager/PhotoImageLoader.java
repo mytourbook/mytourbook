@@ -22,8 +22,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.imageio.ImageIO;
-
 import net.tourbook.photo.gallery.GalleryMTItem;
 import net.tourbook.util.StatusUtil;
 
@@ -37,7 +35,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
-import org.imgscalr.Scalr;
+import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
 public class PhotoImageLoader {
 
@@ -69,113 +68,115 @@ public class PhotoImageLoader {
 		_imageKey = photo.getImageKey(imageQuality);
 	}
 
-	private Image getThumbImageAWT(final Photo photo, final int requestedImageQuality) {
-
-		IPath storeImageFilePath = null;
-
-		storeImageFilePath = ThumbnailStore.getStoreImagePath(photo, requestedImageQuality);
-
-		// check if image is available
-		final File storeImageFile = new File(storeImageFilePath.toOSString());
-		if (storeImageFile.isFile()) {
-
-			// photo image is available in the thumbnail store
-
-			return new Image(_display, storeImageFilePath.toOSString());
-		}
-
-		try {
-
-			// load full size image
-			final long startLoadAWT = System.currentTimeMillis();
-
-			final BufferedImage img = ImageIO.read(photo.getImageFile());
-			if (img == null) {
-				StatusUtil.log(NLS.bind("Image \"{0}\" cannot be loaded", photo.getFilePathName())); //$NON-NLS-1$
-				return null;
-			}
-			final long endLoadAWT = System.currentTimeMillis();
-
-//			RESIZE_LOCK.lock();
-			long startSaveAWT = 0;
-			long endSaveAWT = 0;
-			long endResize = 0;
-			long startResize = 0;
-			{
-				final int thumbSize = PhotoManager.IMAGE_SIZE[imageQuality];
-
-				final Point bestSize = ImageUtils.getBestSize(//
-						new Point(img.getWidth(), img.getHeight()),
-						new Point(thumbSize, thumbSize));
-
-				try {
-					final boolean isResizeRequired = ImageUtils.isResizeRequiredAWT(img, bestSize.x, bestSize.y);
-
-					if (isResizeRequired) {
-
-						startResize = System.currentTimeMillis();
-
-						final BufferedImage scaledImg = Scalr.resize(img, Math.max(bestSize.x, bestSize.y));
-
-						endResize = System.currentTimeMillis();
-						startSaveAWT = System.currentTimeMillis();
-
-						ThumbnailStore.saveImageAWT(scaledImg, storeImageFilePath);
-
-						endSaveAWT = System.currentTimeMillis();
-
-					}
-				} catch (final Exception e) {
-					StatusUtil.log(NLS.bind("Image \"{0}\" cannot be resized", photo.getFilePathName()), e); //$NON-NLS-1$
-					return null;
-
-				} finally {
-//					RESIZE_LOCK.unlock();
-				}
-			}
-
-			final long startLoadSWT = System.currentTimeMillis();
-
-			final Image thumbnailImage = new Image(_display, storeImageFilePath.toOSString());
-
-			final long endLoadSWT = System.currentTimeMillis();
-
-//			System.out.println((Thread.currentThread().getName() + "\t")
-//					+ photo.getFileName()
-//					+ "\tload: "
-//					+ ((endLoadAWT - startLoadAWT) + "")
-//					+ "\tresize: "
-//					+ ((endResize - startResize) + "")
-//					+ "\tsave AWT: "
-//					+ ((endSaveAWT - startSaveAWT) + "")
-//					+ "\tload SWT: "
-//					+ ((endLoadSWT - startLoadSWT) + "")
-//					+ "\ttotal: "
-//					+ ((endLoadSWT - startLoadAWT) + "")
-//			//
-//					);
-//			// TODO remove SYSTEM.OUT.PRINTLN
-
-			return thumbnailImage;
-
-		} catch (final Exception e) {
-			StatusUtil.log(NLS.bind("Store image \"{0}\" cannot be created", storeImageFilePath.toOSString()), e); //$NON-NLS-1$
-		}
-
-		return null;
-	}
+//	private Image getThumbImageAWT(final Photo photo, final int requestedImageQuality) {
+//
+//		IPath storeImageFilePath = ThumbnailStore.getStoreImagePath(photo, requestedImageQuality);
+//
+//		// check if image is available
+//		final File storeImageFile = new File(storeImageFilePath.toOSString());
+//		if (storeImageFile.isFile()) {
+//
+//			// photo image is available in the thumbnail store
+//
+//			return new Image(_display, storeImageFilePath.toOSString());
+//		}
+//
+//		try {
+//
+//			// load full size image
+//			final long startLoadAWT = System.currentTimeMillis();
+//
+//			final BufferedImage img = ImageIO.read(photo.getImageFile());
+//			if (img == null) {
+//				StatusUtil.log(NLS.bind("Image \"{0}\" cannot be loaded", photo.getFilePathName())); //$NON-NLS-1$
+//				return null;
+//			}
+//			final long endLoadAWT = System.currentTimeMillis();
+//
+////			RESIZE_LOCK.lock();
+//			long startSaveAWT = 0;
+//			long endSaveAWT = 0;
+//			long endResize = 0;
+//			long startResize = 0;
+//			{
+//				final int thumbSize = PhotoManager.IMAGE_SIZE[imageQuality];
+//
+//				final Point bestSize = ImageUtils.getBestSize(//
+//						new Point(img.getWidth(), img.getHeight()),
+//						new Point(thumbSize, thumbSize));
+//
+//				try {
+//					final boolean isResizeRequired = ImageUtils.isResizeRequiredAWT(img, bestSize.x, bestSize.y);
+//
+//					if (isResizeRequired) {
+//
+//						startResize = System.currentTimeMillis();
+//
+//						final BufferedImage scaledImg = Scalr.resize(img, Math.max(bestSize.x, bestSize.y));
+//
+//						endResize = System.currentTimeMillis();
+//						startSaveAWT = System.currentTimeMillis();
+//
+//						ThumbnailStore.saveImageAWT(scaledImg, storeImageFilePath);
+//
+//						endSaveAWT = System.currentTimeMillis();
+//
+//					}
+//				} catch (final Exception e) {
+//					StatusUtil.log(NLS.bind("Image \"{0}\" cannot be resized", photo.getFilePathName()), e); //$NON-NLS-1$
+//					return null;
+//
+//				} finally {
+////					RESIZE_LOCK.unlock();
+//				}
+//			}
+//
+//			final long startLoadSWT = System.currentTimeMillis();
+//
+//			final Image thumbnailImage = new Image(_display, storeImageFilePath.toOSString());
+//
+//			final long endLoadSWT = System.currentTimeMillis();
+//
+////			System.out.println((Thread.currentThread().getName() + "\t")
+////					+ photo.getFileName()
+////					+ "\tload: "
+////					+ ((endLoadAWT - startLoadAWT) + "")
+////					+ "\tresize: "
+////					+ ((endResize - startResize) + "")
+////					+ "\tsave AWT: "
+////					+ ((endSaveAWT - startSaveAWT) + "")
+////					+ "\tload SWT: "
+////					+ ((endLoadSWT - startLoadSWT) + "")
+////					+ "\ttotal: "
+////					+ ((endLoadSWT - startLoadAWT) + "")
+////			//
+////					);
+////			// TODO remove SYSTEM.OUT.PRINTLN
+//
+//			return thumbnailImage;
+//
+//		} catch (final Exception e) {
+//			StatusUtil.log(NLS.bind("Store image \"{0}\" cannot be created", storeImageFilePath.toOSString()), e); //$NON-NLS-1$
+//		}
+//
+//		return null;
+//	}
 
 	private Image getThumbImageSWT(final Photo photo, final int requestedImageQuality) {
 
-		IPath storeImageFilePath = null;
-
-		storeImageFilePath = ThumbnailStore.getStoreImagePath(photo, requestedImageQuality);
+		final IPath storeImageFilePath = ThumbnailStore.getStoreImagePath(photo, requestedImageQuality);
 
 		// check if image is available
 		final File storeImageFile = new File(storeImageFilePath.toOSString());
 		if (storeImageFile.isFile()) {
 
 			// photo image is available in the thumbnail store
+
+			// touch store file when it is not yet done today
+			final LocalDate dtModified = new LocalDate(storeImageFile.lastModified());
+			if (dtModified.equals(new LocalDate()) == false) {
+				storeImageFile.setLastModified(new DateTime().getMillis());
+			}
 
 			return new Image(_display, storeImageFilePath.toOSString());
 		}

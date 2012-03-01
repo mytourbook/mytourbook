@@ -15,26 +15,22 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
-import net.tourbook.application.TourbookPlugin;
-
 import org.eclipse.jface.action.Action;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.dialogs.PreferencesUtil;
 
-public class ActionPreferences extends Action {
+public class ActionRunPhotoViewer extends Action {
 
-	public ActionPreferences() {
+	private PicDirFolder	_picDirFolder;
 
-		setText(Messages.Pic_Dir_Action_Preferences);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(net.tourbook.Messages.Image__options));
+	public ActionRunPhotoViewer(final PicDirFolder picDirFolder) {
+
+		super(Messages.Pic_Dir_Action_RunFileBrowser, AS_PUSH_BUTTON);
+
+		_picDirFolder = picDirFolder;
+
 	}
 
 	@Override
 	public void run() {
-		PreferencesUtil.createPreferenceDialogOn(
-				Display.getCurrent().getActiveShell(),
-				PrefPagePhotoViewer.ID,
-				null,
-				null).open();
+		_picDirFolder.actionRunExternalPhotoViewer();
 	}
 }

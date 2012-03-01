@@ -16,12 +16,14 @@
 package net.tourbook.photo;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.TreeViewerItem;
 import net.tourbook.ui.UI;
+import net.tourbook.util.StatusUtil;
 import net.tourbook.util.Util;
 
 import org.eclipse.core.runtime.IPath;
@@ -31,6 +33,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.TreeColumnLayout;
@@ -64,18 +67,23 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 
 /**
  * This folder viewer is from org.eclipse.swt.examples.fileviewer but with many modifications.
  */
 class PicDirFolder {
 
+	static String								WIN_PROGRAMFILES						= System.getenv("programfiles");			//$NON-NLS-1$
+	static String								FILE_SEPARATOR							= System
+																								.getProperty("file.separator");	//$NON-NLS-1$
+
 	private static final String					STATE_SELECTED_FOLDER					= "STATE_SELECTED_FOLDER";					//$NON-NLS-1$
 	private static final String					STATE_IS_SINGLE_CLICK_EXPAND			= "STATE_IS_SINGLE_CLICK_EXPAND";			//$NON-NLS-1$
 	private static final String					STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS	= "STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS"; //$NON-NLS-1$
 
-	private final IPreferenceStore				_prefStore								= TourbookPlugin
-																								.getDefault()
+	private final IPreferenceStore				_prefStore								= TourbookPlugin.getDefault() //
 																								.getPreferenceStore();
 
 	private PicDirImages						_picDirImages;
@@ -86,6 +94,11 @@ class PicDirFolder {
 	private boolean								_isSingleClickExpand;
 	private boolean								_isSingleExpandCollapseOthers;
 	private boolean								_isShowFileFolderInFolderItem;
+
+	/**
+	 * Is true when the mouse click is for the context menu
+	 */
+	private boolean								_isMouseContextMenu;
 	private boolean								_isMouseEvent;
 
 	private TVIFolderRoot						_rootItem;
@@ -93,6 +106,7 @@ class PicDirFolder {
 	private File								_selectedFolder;
 
 	private ActionRefreshFolder					_actionRefreshFolder;
+	private ActionRunPhotoViewer				_actionRunPhotoViewer;
 	private ActionPreferences					_actionPreferences;
 	private ActionSingleClickExpand				_actionSingleClickExpand;
 	private ActionSingleExpandCollapseOthers	_actionSingleExpandCollapseOthers;
@@ -177,6 +191,7 @@ class PicDirFolder {
 				final Tree tree = _folderViewer.getTree();
 				tree.setRedraw(false);
 				{
+					final TreeItem topItem = tree.getTopItem();
 
 					// remove children from viewer
 					final ArrayList<TreeViewerItem> unfetchedChildren = _selectedTVIFolder.getUnfetchedChildren();
@@ -189,10 +204,65 @@ class PicDirFolder {
 
 					// update viewer
 					_folderViewer.refresh(_selectedTVIFolder);
+
+					// expand selected folder
+					_folderViewer.setExpandedState(_selectedTVIFolder, true);
+					tree.setTopItem(topItem);
 				}
 				tree.setRedraw(true);
 			}
 		});
+	}
+
+	void actionRunExternalPhotoViewer() {
+
+		if (_selectedTVIFolder == null) {
+			return;
+		}
+
+		final String prefPhotoViewer = _prefStore.getString(ITourbookPreferences.PHOTO_EXTERNAL_PHOTO_VIEWER);
+
+		if (prefPhotoViewer.length() == 0) {
+			MessageDialog.openInformation(
+					Display.getCurrent().getActiveShell(),
+					Messages.Pic_Dir_Dialog_ExternalPhotoViewer_Title,
+					Messages.Pic_Dir_Dialog_ExternalPhotoViewer_Message);
+
+			PreferencesUtil.createPreferenceDialogOn(
+					Display.getCurrent().getActiveShell(),
+					PrefPagePhotoViewer.ID,
+					null,
+					null).open();
+			return;
+		}
+
+		if (UI.IS_WIN) {
+
+			final String folder = _selectedTVIFolder._treeItemFolder.getAbsolutePath();
+
+			final String[] commands = { "cmd.exe", //$NON-NLS-1$
+					"/c", //$NON-NLS-1$
+					"\"" + prefPhotoViewer + "\"",
+					folder
+//					"\"" + folder + "\""
+			//
+			};
+			try {
+
+//			"\"C:\\Program Files (x86)\\FastStone Image Viewer\\FSViewer.exe\"",
+//			"\"C:\\Program Files\\Q-Dir\\Q-Dir.exe\"";
+//				System.out.println("\t");
+//				for (final String cmd : commands) {
+//					System.out.println(cmd);
+//				}
+
+				Runtime.getRuntime().exec(commands);
+
+			} catch (final IOException e) {
+				StatusUtil.showStatus(e);
+			}
+		}
+
 	}
 
 	void actionSingleClickExpand() {
@@ -207,6 +277,7 @@ class PicDirFolder {
 
 		_actionPreferences = new ActionPreferences();
 		_actionRefreshFolder = new ActionRefreshFolder(this);
+		_actionRunPhotoViewer = new ActionRunPhotoViewer(this);
 		_actionSingleClickExpand = new ActionSingleClickExpand(this);
 		_actionSingleExpandCollapseOthers = new ActionSingleExpandCollapseOthers(this);
 	}
@@ -281,17 +352,9 @@ class PicDirFolder {
 			@Override
 			public void mouseDown(final MouseEvent e) {
 				_isMouseEvent = true;
+				_isMouseContextMenu = e.button == 3;
 			}
 		});
-
-//		tree.addSelectionListener(new SelectionAdapter() {
-//
-//			@Override
-//			public void widgetSelected(final SelectionEvent e) {
-//
-////				onSelectFolder(e);
-//			}
-//		});
 
 		_folderViewer = new TreeViewer(tree);
 
@@ -401,9 +464,12 @@ class PicDirFolder {
 
 	private void fillContextMenu(final IMenuManager menuMgr) {
 
+		menuMgr.add(_actionRunPhotoViewer);
+		menuMgr.add(_actionRefreshFolder);
+
+		menuMgr.add(new Separator());
 		menuMgr.add(_actionSingleClickExpand);
 		menuMgr.add(_actionSingleExpandCollapseOthers);
-		menuMgr.add(_actionRefreshFolder);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionPreferences);
@@ -539,7 +605,13 @@ class PicDirFolder {
 
 		final TVIFolderFolder tviFolder = (TVIFolderFolder) selectedTreePath.getLastSegment();
 
-		if (tviFolder.getFolderCounter() == 0) {
+		if (_isMouseContextMenu) {
+
+			// context menu has been opened, do no expand/collapse
+
+			displayFolderImages(tviFolder);
+
+		} else if (tviFolder.getFolderCounter() == 0) {
 
 			// there is no folder which can be expanded
 
@@ -567,6 +639,7 @@ class PicDirFolder {
 	private void onSelectFolder_10_WithMouse(	final ITreeSelection treeSelection,
 												final TreePath selectedTreePath,
 												final TVIFolderFolder tviFolder) {
+
 		if (_isSingleExpandCollapseOthers) {
 
 			/*
@@ -588,29 +661,7 @@ class PicDirFolder {
 						return;
 					}
 
-					_isExpandingSelection = true;
-					{
-						final Tree tree = _folderViewer.getTree();
-						tree.setRedraw(false);
-						{
-							final boolean isExpanded = _folderViewer.getExpandedState(__selectedTreePath);
-
-							_folderViewer.setExpandedTreePaths(new TreePath[] { __selectedTreePath });
-//							_folderViewer.setSelection(__treeSelection, true);
-
-							if (_isSingleClickExpand && isExpanded) {
-
-								// auto collapse expanded folder
-								_folderViewer.setExpandedState(__selectedTreePath, false);
-							}
-						}
-						tree.setRedraw(true);
-
-						_folderViewer.setSelection(__treeSelection, true);
-					}
-					_isExpandingSelection = false;
-
-					displayFolderImages(__selectedFolderItem);
+					onSelectFolder_10_WithMouseRunnable(__selectedFolderItem, __treeSelection, __selectedTreePath);
 				}
 			});
 
@@ -624,6 +675,43 @@ class PicDirFolder {
 
 			displayFolderImages(tviFolder);
 		}
+	}
+
+	private void onSelectFolder_10_WithMouseRunnable(	final TVIFolderFolder __selectedFolderItem,
+														final ITreeSelection treeSelection,
+														final TreePath selectedTreePath) {
+
+		final Tree tree = _folderViewer.getTree();
+
+		_isExpandingSelection = true;
+		{
+			tree.setRedraw(false);
+			{
+				final TreeItem topItem = tree.getTopItem();
+
+				final boolean isExpanded = _folderViewer.getExpandedState(selectedTreePath);
+
+				_folderViewer.setExpandedTreePaths(new TreePath[] { selectedTreePath });
+				_folderViewer.setSelection(treeSelection, true);
+
+				if (_isSingleClickExpand && isExpanded) {
+
+					// auto collapse expanded folder
+					_folderViewer.setExpandedState(selectedTreePath, false);
+				}
+
+				/*
+				 * set top item to the previous top item, otherwise the expanded/collapse item is
+				 * positioned at the bottom and the UI is jumping all the time
+				 */
+				tree.setTopItem(topItem);
+			}
+			tree.setRedraw(true);
+
+		}
+		_isExpandingSelection = false;
+
+		displayFolderImages(__selectedFolderItem);
 	}
 
 	private void restoreFolder(final String folderPathName) {

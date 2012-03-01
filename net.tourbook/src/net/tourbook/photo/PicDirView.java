@@ -19,6 +19,7 @@ import java.io.File;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.photo.manager.PhotoManager;
+import net.tourbook.photo.manager.ThumbnailStore;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.ViewerDetailForm;
 import net.tourbook.util.Util;
@@ -175,6 +176,7 @@ public class PicDirView extends ViewPart {
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == PicDirView.this) {
+					ThumbnailStore.cleanupStoreFiles(false, false);
 					saveState();
 				}
 			}
@@ -281,6 +283,8 @@ public class PicDirView extends ViewPart {
 			}
 		});
 	}
+
+
 
 	@Override
 	public void dispose() {

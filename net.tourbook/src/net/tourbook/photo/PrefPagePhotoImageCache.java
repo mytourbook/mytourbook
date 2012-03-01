@@ -22,23 +22,15 @@ import net.tourbook.photo.manager.PhotoImageCache;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.UI;
 import net.tourbook.util.StatusUtil;
-import net.tourbook.util.Util;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.preference.BooleanFieldEditor;
-import org.eclipse.jface.preference.DirectoryFieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -51,21 +43,14 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public class PrefPagePhotoThumbnailCache extends PreferencePage implements IWorkbenchPreferencePage {
+public class PrefPagePhotoImageCache extends PreferencePage implements IWorkbenchPreferencePage {
 
-	private IPreferenceStore		_prefStore					= TourbookPlugin.getDefault().getPreferenceStore();
+	private IPreferenceStore	_prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
 
-	private final String			_defaultThumbnailStorePath	= Platform.getInstanceLocation().getURL().getPath();
-
-	private Composite				_containerLocation;
-	private BooleanFieldEditor		_editorBoolUseDefaultLocation;
-	private DirectoryFieldEditor	_editorDirThumbnailLocation;
-
-	private Spinner					_spinnerNumberOfImages;
+	private Spinner				_spinnerNumberOfImages;
 
 	@Override
 	protected Control createContents(final Composite parent) {
@@ -75,15 +60,6 @@ public class PrefPagePhotoThumbnailCache extends PreferencePage implements IWork
 		final Composite ui = createUI(parent);
 
 		restoreState();
-
-		enableControls();
-
-		/*
-		 * hide error messages, it appears when the thumbnail location is invalid
-		 */
-		if (_editorBoolUseDefaultLocation.getBooleanValue() == false) {
-			setErrorMessage(null);
-		}
 
 		return ui;
 	}
@@ -95,66 +71,10 @@ public class PrefPagePhotoThumbnailCache extends PreferencePage implements IWork
 		GridLayoutFactory.fillDefaults().applyTo(container);
 		GridDataFactory.swtDefaults().applyTo(container);
 		{
-			createUI_10_ThumbnailCache(container);
 			createUI_20_ImageCache(container);
 		}
 
 		return container;
-	}
-
-	private void createUI_10_ThumbnailCache(final Composite parent) {
-
-		Text textDirEditor;
-
-		final Group group = new Group(parent, SWT.NONE);
-		group.setText(Messages.PrefPage_Photo_Cache_Group_ThumbnailCacheLocation);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
-		{
-			/*
-			 * field: use default location
-			 */
-			_editorBoolUseDefaultLocation = new BooleanFieldEditor(
-					ITourbookPreferences.PHOTO_USE_DEFAULT_THUMBNAIL_LOCATION,
-					Messages.PrefPage_Photo_Cache_Label_UseDefaultThumbnailLocation,
-					group);
-			_editorBoolUseDefaultLocation.setPage(this);
-			_editorBoolUseDefaultLocation.setPreferenceStore(_prefStore);
-			_editorBoolUseDefaultLocation.setPropertyChangeListener(new IPropertyChangeListener() {
-				public void propertyChange(final PropertyChangeEvent event) {
-					enableControls();
-				}
-			});
-			new Label(group, SWT.NONE);
-
-			_containerLocation = new Composite(group, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(_containerLocation);
-			{
-				// field: path for the srtm data
-				_editorDirThumbnailLocation = new DirectoryFieldEditor(
-						ITourbookPreferences.PHOTO_CUSTOM_THUMBNAIL_LOCATION,
-						Messages.PrefPage_Photo_Cache_Label_ThumbnailLocation,
-						_containerLocation);
-
-				_editorDirThumbnailLocation.setPage(this);
-				_editorDirThumbnailLocation.setPreferenceStore(_prefStore);
-				_editorDirThumbnailLocation.setEmptyStringAllowed(false);
-
-				textDirEditor = _editorDirThumbnailLocation.getTextControl(_containerLocation);
-				textDirEditor.addModifyListener(new ModifyListener() {
-					@Override
-					public void modifyText(final ModifyEvent e) {
-						validateData();
-					}
-				});
-			}
-		}
-
-		// !!! set layout after the editor was created because the editor sets the parents layout
-		GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
-
-		// set width for the text control that the pref dialog is not as wide as the full path
-//		final GridData gd = (GridData) textDirEditor.getLayoutData();
-//		gd.widthHint = 200;
 	}
 
 	private void createUI_20_ImageCache(final Composite parent) {
@@ -222,29 +142,7 @@ public class PrefPagePhotoThumbnailCache extends PreferencePage implements IWork
 		return _prefStore;
 	}
 
-	private void enableControls() {
-
-		final boolean useDefaultLocation = _editorBoolUseDefaultLocation.getBooleanValue();
-
-		if (useDefaultLocation) {
-			_editorDirThumbnailLocation.setEnabled(false, _containerLocation);
-			_editorDirThumbnailLocation.setStringValue(_defaultThumbnailStorePath);
-		} else {
-			_editorDirThumbnailLocation.setEnabled(true, _containerLocation);
-		}
-	}
-
 	public void init(final IWorkbench workbench) {}
-
-	@Override
-	public boolean okToLeave() {
-
-		if (validateData() == false) {
-			return false;
-		}
-
-		return super.okToLeave();
-	}
 
 	private void onSelectGetImageHandels() {
 
@@ -287,7 +185,10 @@ public class PrefPagePhotoThumbnailCache extends PreferencePage implements IWork
 
 					StatusUtil.log(message);
 
-					MessageDialog.openInformation(getShell(), Messages.PrefPage_Photo_Cache_Dialog_MaxHandle_Title, message);
+					MessageDialog.openInformation(
+							getShell(),
+							Messages.PrefPage_Photo_Cache_Dialog_MaxHandle_Title,
+							message);
 				}
 			}
 		});
@@ -296,27 +197,13 @@ public class PrefPagePhotoThumbnailCache extends PreferencePage implements IWork
 	@Override
 	protected void performDefaults() {
 
-		_editorBoolUseDefaultLocation.loadDefault();
-		_editorDirThumbnailLocation.loadDefault();
-
-		_spinnerNumberOfImages.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.PHOTO_IMAGE_CACHE_SIZE));
-
-		enableControls();
+		_spinnerNumberOfImages.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.PHOTO_THUMBNAIL_IMAGE_CACHE_SIZE));
 
 		super.performDefaults();
 	}
 
 	@Override
 	public boolean performOk() {
-
-		if (_editorBoolUseDefaultLocation == null) {
-			// page is not initialized this case happened and created an NPE
-			return super.performOk();
-		}
-
-		if (validateData() == false) {
-			return false;
-		}
 
 		saveState();
 
@@ -325,10 +212,7 @@ public class PrefPagePhotoThumbnailCache extends PreferencePage implements IWork
 
 	private void restoreState() {
 
-		_spinnerNumberOfImages.setSelection(_prefStore.getInt(ITourbookPreferences.PHOTO_IMAGE_CACHE_SIZE));
-
-		_editorBoolUseDefaultLocation.load();
-		_editorDirThumbnailLocation.load();
+		_spinnerNumberOfImages.setSelection(_prefStore.getInt(ITourbookPreferences.PHOTO_THUMBNAIL_IMAGE_CACHE_SIZE));
 	}
 
 	private void saveState() {
@@ -336,47 +220,16 @@ public class PrefPagePhotoThumbnailCache extends PreferencePage implements IWork
 		boolean isModified = false;
 
 		final int newCacheSize = _spinnerNumberOfImages.getSelection();
-		final int oldCacheSize = _prefStore.getInt(ITourbookPreferences.PHOTO_IMAGE_CACHE_SIZE);
+		final int oldCacheSize = _prefStore.getInt(ITourbookPreferences.PHOTO_THUMBNAIL_IMAGE_CACHE_SIZE);
 
 		if (oldCacheSize != newCacheSize) {
 			isModified = true;
-			_prefStore.setValue(ITourbookPreferences.PHOTO_IMAGE_CACHE_SIZE, newCacheSize);
+			_prefStore.setValue(ITourbookPreferences.PHOTO_THUMBNAIL_IMAGE_CACHE_SIZE, newCacheSize);
 		}
-
-		_editorBoolUseDefaultLocation.store();
-		_editorDirThumbnailLocation.store();
 
 		if (isModified) {
 			PhotoImageCache.setCacheSize(newCacheSize);
 		}
-	}
-
-	private boolean validateData() {
-
-		boolean isValid = true;
-
-		if (_editorBoolUseDefaultLocation.getBooleanValue() == false) {
-
-			// use custom location
-
-			final String customFilePath = _editorDirThumbnailLocation.getStringValue();
-
-			if (Util.isDirectory(customFilePath) == false) {
-
-				isValid = false;
-
-				setErrorMessage(Messages.PrefPage_Photo_Cache_Error_ThumbnailLocation);
-				_editorDirThumbnailLocation.setFocus();
-			}
-		}
-
-		if (isValid) {
-			setErrorMessage(null);
-		}
-
-		setValid(isValid);
-
-		return isValid;
 	}
 
 }

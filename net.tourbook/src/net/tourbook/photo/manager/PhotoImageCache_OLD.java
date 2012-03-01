@@ -32,7 +32,7 @@ public class PhotoImageCache_OLD {
 																						.getPreferenceStore();
 
 	private static int										_maxCacheSize		= _prefStore.getInt(//
-																						ITourbookPreferences.PHOTO_IMAGE_CACHE_SIZE);
+																						ITourbookPreferences.PHOTO_THUMBNAIL_IMAGE_CACHE_SIZE);
 
 	private static final ConcurrentHashMap<String, Image>	_imageCacheStore	= new ConcurrentHashMap<String, Image>();
 	private static final LinkedBlockingDeque<String>		_imageCacheFifo		= new LinkedBlockingDeque<String>();

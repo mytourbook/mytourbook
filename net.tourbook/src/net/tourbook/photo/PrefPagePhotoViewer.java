@@ -25,18 +25,23 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.LayoutConstants;
 import org.eclipse.jface.preference.ColorFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.jface.preference.FileFieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-	public static final String		PREF_PAGE_ID	= "net.tourbook.preferences.PrefPagePhotoViewerId"; //$NON-NLS-1$
+	public static final String		ID	= "net.tourbook.preferences.PrefPagePhotoViewerID"; //$NON-NLS-1$
 
 	private final IPreferenceStore	_prefStore		= TourbookPlugin.getDefault().getPreferenceStore();
 
@@ -50,6 +55,7 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 	private BooleanFieldEditor2		_chkEditorIsShowFileFolder;
 	private ColorFieldEditor		_colorEditorFolder;
 	private ColorFieldEditor		_colorEditorFile;
+	private FileFieldEditor			_editorExternalPhotoViewer;
 
 	@Override
 	protected void createFieldEditors() {
@@ -65,6 +71,7 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 			GridLayoutFactory.fillDefaults().applyTo(parent);
 
 			createUI_10_Colors(parent);
+			createUI_20_ExternalPhotoViewer(parent);
 		}
 	}
 
@@ -131,6 +138,55 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 				addField(_colorEditorFile);
 			}
 		}
+	}
+
+	/**
+	 * field: path to save raw tour data
+	 */
+	private void createUI_20_ExternalPhotoViewer(final Composite parent) {
+
+		final Group group = new Group(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.grab(true, false)
+				.applyTo(group);
+		group.setText(Messages.PrefPage_Photo_ExtViewer_Group_ExternalApplication);
+		{
+			/*
+			 * label: info
+			 */
+			Label label = new Label(group, SWT.WRAP);
+			GridDataFactory.fillDefaults()//
+					.span(3, 1)
+					.indent(0, 5)
+					.hint(UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
+					.applyTo(label);
+			label.setText(Messages.PrefPage_Photo_ExtViewer_Label_Info);
+
+			/*
+			 * editor: external file browser
+			 */
+			_editorExternalPhotoViewer = new FileFieldEditor(
+					ITourbookPreferences.PHOTO_EXTERNAL_PHOTO_VIEWER,
+					Messages.PrefPage_Photo_ExtViewer_Label_ExternalApplication,
+					group);
+			_editorExternalPhotoViewer.setEmptyStringAllowed(true);
+			_editorExternalPhotoViewer.setValidateStrategy(StringFieldEditor.VALIDATE_ON_KEY_STROKE);
+
+			label = _editorExternalPhotoViewer.getLabelControl(group);
+			label.setToolTipText(Messages.PrefPage_Photo_ExtViewer_Label_ExternalApplication_Tooltip);
+
+			addField(_editorExternalPhotoViewer);
+		}
+
+		// set layout after the fields are created
+		GridLayoutFactory.swtDefaults().numColumns(3).extendedMargins(0, 0, 0, 0).applyTo(group);
+
+		/*
+		 * set width for the text control that the pref dialog is not as wide as the full path
+		 */
+		final Text rawPathControl = _editorExternalPhotoViewer.getTextControl(group);
+		final GridData gd = (GridData) rawPathControl.getLayoutData();
+		gd.widthHint = 200;
 	}
 
 	private void enableControls() {
