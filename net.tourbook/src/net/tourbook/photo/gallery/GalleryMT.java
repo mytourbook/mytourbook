@@ -308,9 +308,12 @@ public class GalleryMT extends Canvas {
 					}
 
 					break;
+
 				case SWT.CR:
+
 					final GalleryMTItem[] selection = getSelection();
 					GalleryMTItem item = null;
+
 					if (selection != null && selection.length > 0) {
 						item = selection[0];
 					}

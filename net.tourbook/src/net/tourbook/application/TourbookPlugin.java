@@ -66,6 +66,8 @@ public class TourbookPlugin extends AbstractUIPlugin {
 
 	private Version							_version;
 
+	private ApplicationActionBarAdvisor		_applicationActionBarAdvisor;
+
 	/**
 	 * The constructor.
 	 */
@@ -152,6 +154,10 @@ public class TourbookPlugin extends AbstractUIPlugin {
 		_splashHandler = splashHandler;
 	}
 
+	public ApplicationActionBarAdvisor getApplicationActionBarAdvisor() {
+		return _applicationActionBarAdvisor;
+	}
+
 	/**
 	 * @param sectionName
 	 * @return Returns the dialog setting section for the sectionName, a section is always returned
@@ -169,12 +175,16 @@ public class TourbookPlugin extends AbstractUIPlugin {
 		return section;
 	}
 
-	public Version getVersion() {
+	public Version getVersion()  {
 		return _version;
 	}
 
 	public void log(final String message, final Throwable exception) {
 		getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, 0, message, exception));
+	}
+
+	public void setActionBarAdvisor(final ApplicationActionBarAdvisor applicationActionBarAdvisor) {
+		_applicationActionBarAdvisor = applicationActionBarAdvisor;
 	}
 
 	@Override

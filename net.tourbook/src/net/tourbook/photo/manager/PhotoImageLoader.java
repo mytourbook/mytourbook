@@ -504,15 +504,17 @@ public class PhotoImageLoader {
 
 			resetState();
 
-			// tell the call back that the image is loaded
-			_loadCallBack.callBackImageIsLoaded(isImageVisible());
-
 		} catch (final Exception e) {
 
-			StatusUtil.log(NLS.bind("Image \"{0}\" cannot be loaded ({1})", photo.getFileName(), _imageKey), e); //$NON-NLS-1$
+//			StatusUtil.log(NLS.bind("Image \"{0}\" cannot be loaded ({1})", photo.getFileName(), _imageKey), e); //$NON-NLS-1$
 
 			// prevent loading it again
 			photo.setLoadingState(PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR, imageQuality);
+
+		} finally {
+
+			// tell the call back that the image is loaded
+			_loadCallBack.callBackImageIsLoaded(isImageVisible());
 		}
 	}
 

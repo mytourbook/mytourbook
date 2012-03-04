@@ -589,6 +589,7 @@ public class Messages extends NLS {
 	public static String		Image__App_Trash;
 	public static String		Image__assignMergedTour;
 	public static String		Image__assignMergedTour_disabled;
+	public static String		Image__Backward_Nav;
 	public static String		Image__chart_analyzer;
 	public static String		Image__collapse_all;
 	public static String		Image__database;
@@ -605,6 +606,7 @@ public class Messages extends NLS {
 	public static String		Image__edit_tour_marker_new;
 	public static String		Image__edit_tour_marker_new_disabled;
 	public static String		Image__expand_all;
+	public static String		Image__Forward_Nav;
 	public static String		Image__graph_altimeter;
 	public static String		Image__graph_altitude;
 	public static String		Image__graph_cadence;
@@ -756,7 +758,7 @@ public class Messages extends NLS {
 
 	public static String		NT001_DialogExtractTour_InvalidTourData;
 
-	public static String	Photo_View_Label_AnImageIsNotSelected;
+	public static String		Photo_View_Label_AnImageIsNotSelected;
 
 	public static String		Pref_App_Label_TourEditorIsModified;
 
@@ -765,9 +767,7 @@ public class Messages extends NLS {
 	public static String		Pref_Appearance_Check_AutoOpenTagging;
 	public static String		Pref_Appearance_Check_TaggingAnimation;
 	public static String		Pref_Appearance_Dialog_ResetAllToggleDialogs_Message;
-
 	public static String		Pref_Appearance_Dialog_ResetAllToggleDialogs_Title;
-
 	public static String		Pref_Appearance_Group_Tagging;
 	public static String		Pref_Appearance_Label_AutoOpenTagging_Tooltip;
 	public static String		Pref_Appearance_Label_AutoOpenTaggingDelay;
@@ -785,9 +785,8 @@ public class Messages extends NLS {
 
 	public static String		Pref_DataImport_Label;
 
-	public static String	Pref_ExtPrograms_Label_ExplorerPath;
-
-	public static String	Pref_ExtPrograms_Label_Info;
+	public static String		Pref_ExtPrograms_Label_ExplorerPath;
+	public static String		Pref_ExtPrograms_Label_Info;
 
 	public static String		Pref_general_imperial_unit_fahrenheit;
 	public static String		Pref_general_imperial_unit_feet;
@@ -1059,11 +1058,8 @@ public class Messages extends NLS {
 
 	public static String		Tooltip_ValuePoint_Format_Pace;
 	public static String		Tooltip_ValuePoint_Label_ChartZoomFactor_Tooltip;
-
 	public static String		Tooltip_ValuePoint_Label_NoData;
-
 	public static String		Tooltip_ValuePoint_Label_NoData_Tooltip;
-
 	public static String		Tooltip_ValuePoint_Label_SlicesCurrent_Tooltip;
 	public static String		Tooltip_ValuePoint_Label_SlicesMax_Tooltip;
 
@@ -1096,7 +1092,6 @@ public class Messages extends NLS {
 	public static String		Tour_Action_ShowBreaktimeValues;
 	public static String		Tour_Action_ShowHrZones_Tooltip;
 	public static String		Tour_Action_ShowTourMarker;
-
 	public static String		Tour_Action_ValuePointToolTip_IsVisible;
 
 	public static String		Tour_Book_Action_delete_selected_tours;
@@ -1107,7 +1102,6 @@ public class Messages extends NLS {
 	public static String		Tour_Book_Action_delete_selected_tours_menu;
 	public static String		Tour_Book_Action_DeleteSelectedTours_Monitor;
 	public static String		Tour_Book_Action_DeleteSelectedTours_MonitorSubtask;
-
 	public static String		Tour_Book_Combo_statistic_tooltip;
 	public static String		Tour_Book_Combo_year_tooltip;
 	public static String		Tour_Book_Label_chart_title;
@@ -1122,7 +1116,6 @@ public class Messages extends NLS {
 	public static String		Tour_Database_load_all_tours;
 	public static String		Tour_Database_PostUpdate011_SetTourCreateTime;
 	public static String		Tour_Database_PostUpdate020_ConvertIntToFloat;
-
 	public static String		Tour_Database_TourSaveError;
 	public static String		Tour_Database_update_tour;
 	public static String		Tour_Database_Update;

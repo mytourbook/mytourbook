@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -218,7 +218,9 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 		// hook up the listeners to update the window title
 
-		configurer.getWindow().addPageListener(new IPageListener() {
+		final IWorkbenchWindow configurerWindow = configurer.getWindow();
+
+		configurerWindow.addPageListener(new IPageListener() {
 
 			public void pageActivated(final IWorkbenchPage page) {
 				updateTitle();
@@ -231,7 +233,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 			public void pageOpened(final IWorkbenchPage page) {}
 		});
 
-		configurer.getWindow().addPerspectiveListener(new PerspectiveAdapter() {
+		configurerWindow.addPerspectiveListener(new PerspectiveAdapter() {
 
 			@Override
 			public void perspectiveActivated(final IWorkbenchPage page, final IPerspectiveDescriptor perspective) {
@@ -251,7 +253,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 			}
 		});
 
-		configurer.getWindow().getPartService().addPartListener(new IPartListener2() {
+		configurerWindow.getPartService().addPartListener(new IPartListener2() {
 
 			public void partActivated(final IWorkbenchPartReference ref) {
 				if ((ref instanceof IEditorReference) || (ref instanceof IViewReference)) {

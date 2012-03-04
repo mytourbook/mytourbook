@@ -1045,6 +1045,20 @@
             name="%Command_App_OpenForum"
             defaultHandler="net.tourbook.ui.action.ActionHandlerOpenForum"
             />
+            
+	<!--
+		Photo folder history
+	-->            
+	           
+      <command
+            id="net.tourbook.command.picdir.history.backward"
+            name="%Command_PicDir_History_Backward">
+      </command>
+	           
+      <command
+            id="net.tourbook.command.picdir.history.forward"
+            name="%Command_PicDir_History_Forward">
+      </command>
 
    </extension>
 
@@ -1307,13 +1321,6 @@
 	            name="%view_name_map_properties">
 	      </view>
 
-      <view
-            class="org.dawb.common.ui.views.ImageMonitorView"
-            icon="icons/image.gif"
-            id="org.dawb.workbench.views.imageMonitorView"
-            name="Images Monitor">
-      </view>
-
    </extension>
    
    <extension
@@ -1324,6 +1331,27 @@
             label="%Pref_Page_Tour_Keywords">
       </keyword>
 
+   </extension>
+   
+   <extension
+         point="org.eclipse.ui.bindings">
+      <scheme
+            id="net.tourbook.scheme"
+            name="MyTourbook Scheme"
+            parentId="org.eclipse.ui.defaultAcceleratorConfiguration">
+      </scheme>
+      <key
+            commandId="net.tourbook.command.picdir.history.backward"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="net.tourbook.scheme"
+            sequence="M3+ARROW_LEFT">
+      </key>
+      <key
+            commandId="net.tourbook.command.picdir.history.forward"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="net.tourbook.scheme"
+            sequence="M3+ARROW_RIGHT">
+      </key>
    </extension>
 
 </plugin>

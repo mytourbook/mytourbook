@@ -41,9 +41,9 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-	public static final String		ID	= "net.tourbook.preferences.PrefPagePhotoViewerID"; //$NON-NLS-1$
+	public static final String		ID			= "net.tourbook.preferences.PrefPagePhotoViewerID"; //$NON-NLS-1$
 
-	private final IPreferenceStore	_prefStore		= TourbookPlugin.getDefault().getPreferenceStore();
+	private final IPreferenceStore	_prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
 
 	private boolean					_isEditorModified;
 
@@ -112,30 +112,41 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 						_containerFileFolder);
 				addField(_chkEditorIsShowFileFolder);
 
-				final Button editorLinesControl = _chkEditorIsShowFileFolder.getChangeControl(_containerFileFolder);
+				final Button editorControl = _chkEditorIsShowFileFolder.getChangeControl(_containerFileFolder);
 				GridDataFactory.fillDefaults()//
 						.span(2, 1)
-						.applyTo(editorLinesControl);
-				editorLinesControl
-						.setToolTipText(Messages.PrefPage_Photo_Viewer_Checkbox_ShowNumbersInFolderView_Tooltip);
+						.applyTo(editorControl);
+				editorControl.setToolTipText(//
+						Messages.PrefPage_Photo_Viewer_Checkbox_ShowNumbersInFolderView_Tooltip);
+				{
+					/*
+					 * color: folder
+					 */
+					_colorEditorFolder = new ColorFieldEditor(
+							ITourbookPreferences.PHOTO_VIEWER_COLOR_FOLDER,
+							Messages.PrefPage_Photo_Viewer_Label_FolderColor,
+							_containerFileFolder);
+					addField(_colorEditorFolder);
 
-				/*
-				 * color: folder
-				 */
-				_colorEditorFolder = new ColorFieldEditor(
-						ITourbookPreferences.PHOTO_VIEWER_COLOR_FOLDER,
-						Messages.PrefPage_Photo_Viewer_Label_FolderColor,
-						_containerFileFolder);
-				addField(_colorEditorFolder);
+					// indent label
+					Label labelControl = _colorEditorFolder.getLabelControl(_containerFileFolder);
+					GridData gd = (GridData) labelControl.getLayoutData();
+					gd.horizontalIndent = 16;
 
-				/*
-				 * color: file
-				 */
-				_colorEditorFile = new ColorFieldEditor(
-						ITourbookPreferences.PHOTO_VIEWER_COLOR_FILE,
-						Messages.PrefPage_Photo_Viewer_Label_FileColor,
-						_containerFileFolder);
-				addField(_colorEditorFile);
+					/*
+					 * color: file
+					 */
+					_colorEditorFile = new ColorFieldEditor(
+							ITourbookPreferences.PHOTO_VIEWER_COLOR_FILE,
+							Messages.PrefPage_Photo_Viewer_Label_FileColor,
+							_containerFileFolder);
+					addField(_colorEditorFile);
+
+					// indent label
+					labelControl = _colorEditorFile.getLabelControl(_containerFileFolder);
+					gd = (GridData) labelControl.getLayoutData();
+					gd.horizontalIndent = 16;
+				}
 			}
 		}
 	}

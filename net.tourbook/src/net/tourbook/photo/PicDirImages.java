@@ -17,9 +17,12 @@ package net.tourbook.photo;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import net.tourbook.application.ApplicationActionBarAdvisor;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.photo.gallery.AbstractGalleryItemRenderer;
 import net.tourbook.photo.gallery.AbstractGridGroupRenderer;
 import net.tourbook.photo.gallery.GalleryMT;
@@ -30,22 +33,39 @@ import net.tourbook.photo.manager.PhotoImageCache;
 import net.tourbook.photo.manager.PhotoLoadingState;
 import net.tourbook.photo.manager.PhotoManager;
 import net.tourbook.ui.UI;
+import net.tourbook.util.Util;
 
 import org.apache.commons.sanselan.Sanselan;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ProgressBar;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.part.PageBook;
 
 /**
@@ -60,22 +80,9 @@ import org.eclipse.ui.part.PageBook;
  */
 public class PicDirImages {
 
-	private AbstractGalleryItemRenderer		_itemRenderer;
-	private AbstractGridGroupRenderer		_groupRenderer;
+	private static final int				MAX_HISTORY_ENTRIES		= 200;
 
-	private int								_photoSize			= 64;
-
-	private File[]							_photoFiles;
-	private FileFilter						_fileFilter;
-
-	/*
-	 * UI controls
-	 */
-	private Display							_display;
-	private Composite						_uiContainer;
-	private GalleryMT						_gallery;
-	private CLabel							_lblStatusInfo;
-	private ProgressBar						_progbarLoading;
+	private static final String				STATE_FOLDER_HISTORY	= "STATE_FOLDER_HISTORY";		//$NON-NLS-1$
 
 	/*
 	 * worker thread management
@@ -87,37 +94,89 @@ public class PicDirImages {
 	/**
 	 * Lock for all worker control data and state
 	 */
-	private final Object					_workerLock			= new Object();
+	private final Object					_workerLock				= new Object();
 
 	/**
 	 * The worker's thread
 	 */
-	private volatile Thread					_workerThread		= null;
+	private volatile Thread					_workerThread			= null;
 
 	/**
 	 * True if the worker must exit on completion of the current cycle
 	 */
-	private volatile boolean				_workerStopped		= false;
+	private volatile boolean				_workerStopped			= false;
 
 	/**
 	 * True if the worker must cancel its operations prematurely perhaps due to a state update
 	 */
-	private volatile boolean				_workerCancelled	= false;
+	private volatile boolean				_workerCancelled		= false;
 
 	/**
 	 * Worker state information -- this is what gets synchronized by an update
 	 */
-	private volatile File					_workerStateDir		= null;
+	private volatile File					_workerStateDir			= null;
 
 	/**
 	 * State information to use for the next cycle
 	 */
-	private volatile File					_workerNextFolder	= null;
+	private volatile File					_workerNextFolder		= null;
 
 	/**
 	 * Manages the worker's thread
 	 */
 	private final Runnable					_workerRunnable;
+
+	/**
+	 * 
+	 */
+	public static final Comparator<File>	NATURAL_SORT			= new SortNatural<File>(true);
+
+	/**
+	 * 
+	 */
+	public static Comparator<File>			DATE_SORT;
+
+//	private Comparator<File>				_currentComparator	= SortingUtils.DATE_SORT;
+	private Comparator<File>				_currentComparator		= DATE_SORT;
+
+	private AbstractGalleryItemRenderer		_itemRenderer;
+	private AbstractGridGroupRenderer		_groupRenderer;
+
+	private int								_photoSize				= 64;
+
+	private File[]							_photoFiles;
+	private FileFilter						_fileFilter;
+
+	private PicDirView						_picDirView;
+	private PicDirFolder					_picDirFolder;
+
+	private boolean							_isKey;
+
+	private int								_selectedHistoryIndex;
+	private ArrayList<String>				_folderHistory			= new ArrayList<String>();
+
+	private ActionNavigateHistoryBackward	_actionNavigateBackward;
+	private ActionNavigateHistoryForward	_actionNavigateForward;
+	private ActionClearNavigationHistory	_actionClearNavigationHistory;
+
+	/*
+	 * UI controls
+	 */
+	private Display							_display;
+	private Composite						_uiContainer;
+
+	private Composite						_containerActionBar;
+	private ToolBar							_toolbar;
+
+	private GalleryMT						_gallery;
+	private CLabel							_lblStatusInfo;
+	private ProgressBar						_progbarLoading;
+
+	private PageBook						_pageBook;
+	private Label							_lblLoading;
+	private Composite						_pageLoading;
+	private Combo							_comboPathHistory;
+	private Composite						_containerStatusLine;
 
 	{
 		_workerRunnable = new Runnable() {
@@ -155,18 +214,7 @@ public class PicDirImages {
 				_display.wake();
 			}
 		};
-	}
 
-	/**
-	 * 
-	 */
-	public static final Comparator<File>	NATURAL_SORT		= new SortNatural<File>(true);
-
-	/**
-	 * 
-	 */
-	public static Comparator<File>			DATE_SORT;
-	{
 		DATE_SORT = new Comparator<File>() {
 			@Override
 			public int compare(final File one, final File two) {
@@ -189,15 +237,6 @@ public class PicDirImages {
 			}
 		};
 	}
-//	private Comparator<File>				_currentComparator	= SortingUtils.DATE_SORT;
-	private Comparator<File>				_currentComparator	= DATE_SORT;
-
-	/*
-	 * UI controls
-	 */
-	private PageBook						_pageBook;
-	private Label							_lblLoading;
-	private Composite						_pageLoading;
 
 	private class LoadImageCallback implements ILoadCallBack {
 
@@ -262,6 +301,136 @@ public class PicDirImages {
 //		}
 	}
 
+// LOG ALL BINDINGS
+//
+//		final IWorkbench workbench = PlatformUI.getWorkbench();
+//		final IBindingService bindingService = (IBindingService) workbench.getAdapter(IBindingService.class);
+//
+//		System.out.println(bindingService.getActiveScheme());
+//
+//		for (final Binding binding : bindingService.getBindings()) {
+//			System.out.println(binding);
+//		}
+
+	void actionClearHistory() {
+
+		final String selectedFolder = _comboPathHistory.getText();
+
+		_comboPathHistory.removeAll();
+		_comboPathHistory.add(selectedFolder);
+		_comboPathHistory.select(0);
+
+		_folderHistory.clear();
+		_folderHistory.add(selectedFolder);
+
+		_actionClearNavigationHistory.setEnabled(false);
+		_actionNavigateBackward.setEnabled(false);
+		_actionNavigateForward.setEnabled(false);
+	}
+
+	void actionNavigateBackward() {
+
+		final int historySize = _folderHistory.size();
+		if (_selectedHistoryIndex >= historySize - 1) {
+
+			// last entry is already selected
+
+			_selectedHistoryIndex = historySize - 1;
+			_actionNavigateBackward.setEnabled(false);
+
+			return;
+		}
+
+		_selectedHistoryIndex++;
+
+		// select combo history
+		_comboPathHistory.select(_selectedHistoryIndex);
+
+		// enabel/disable history navigation
+		_actionNavigateBackward.setEnabled(_selectedHistoryIndex < historySize - 1);
+		_actionNavigateForward.setEnabled(true);
+
+		BusyIndicator.showWhile(_display, new Runnable() {
+			public void run() {
+				final String prevFolderPathName = _folderHistory.get(_selectedHistoryIndex);
+				_picDirFolder.selectFolder(prevFolderPathName, false, true);
+			}
+		});
+	}
+
+	void actionNavigateForward() {
+
+		final int historySize = _folderHistory.size();
+		if (_selectedHistoryIndex == 0) {
+
+			// first entry is already selected
+
+			_actionNavigateForward.setEnabled(false);
+
+			return;
+		}
+
+		_selectedHistoryIndex--;
+
+		// select combo history
+		_comboPathHistory.select(_selectedHistoryIndex);
+
+		// enabel/disable history navigation
+		_actionNavigateBackward.setEnabled(historySize > 1);
+		_actionNavigateForward.setEnabled(_selectedHistoryIndex > 0);
+
+		BusyIndicator.showWhile(_display, new Runnable() {
+			public void run() {
+				final String prevFolderPathName = _folderHistory.get(_selectedHistoryIndex);
+				_picDirFolder.selectFolder(prevFolderPathName, false, true);
+			}
+		});
+	}
+
+	private void createActions() {
+
+		final ToolBarManager tbm = new ToolBarManager(_toolbar);
+
+		_actionNavigateBackward = new ActionNavigateHistoryBackward(this);
+		_actionNavigateForward = new ActionNavigateHistoryForward(this);
+
+		tbm.add(_actionNavigateBackward);
+		tbm.add(_actionNavigateForward);
+
+		_toolbar.setMenu(createContextMenu(_toolbar));
+
+		final ApplicationActionBarAdvisor actionbarAdvisor = TourbookPlugin
+				.getDefault()
+				.getApplicationActionBarAdvisor();
+
+		actionbarAdvisor.registerAction(_actionNavigateBackward);
+		actionbarAdvisor.registerAction(_actionNavigateForward);
+
+		tbm.update(true);
+	}
+
+	/**
+	 * create context menu
+	 */
+	private Menu createContextMenu(final Control parent) {
+
+		_actionClearNavigationHistory = new ActionClearNavigationHistory(PicDirImages.this);
+
+		final MenuManager menuMgr = new MenuManager();
+
+		menuMgr.setRemoveAllWhenShown(true);
+
+		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
+			public void menuAboutToShow(final IMenuManager menuMgr) {
+
+				menuMgr.add(_actionClearNavigationHistory);
+			}
+		});
+
+		return menuMgr.createContextMenu(parent);
+	}
+
 	/**
 	 * This will be configured from options but for now it is any image accepted.
 	 * 
@@ -299,34 +468,114 @@ public class PicDirImages {
 		};
 	}
 
-	void createUI(final Composite parent) {
+	void createUI(final PicDirView picDirView, final PicDirFolder picDirFolder, final Composite parent) {
 
+		_picDirView = picDirView;
+		_picDirFolder = picDirFolder;
 		_uiContainer = parent;
 		_display = parent.getDisplay();
 
 		_fileFilter = createFileFilter();
 
+		createUI_0(parent);
+
+		_lblLoading.setText(Messages.Pic_Dir_Label_FolderIsNotSelected);
+
+		createActions();
+	}
+
+	void createUI_0(final Composite parent) {
+
 		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, 0).applyTo(container);
-		container.setBackground(_display.getSystemColor(SWT.COLOR_RED));
+//		container.setBackground(_display.getSystemColor(SWT.COLOR_RED));
 		{
+			createUI_10_ActionBar(container);
+
 			_pageBook = new PageBook(container, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBook);
 			{
-				createUI_10_PageGallery(_pageBook);
-				createUI_12_PageLoading(_pageBook);
+				createUI_20_PageGallery(_pageBook);
+				createUI_30_PageLoading(_pageBook);
 			}
 
-			createUI_20_StatusLine(container);
+			createUI_50_StatusLine(container);
 		}
+	}
 
-		_lblLoading.setText(Messages.Pic_Dir_Label_FolderIsNotSelected);
+	private void createUI_10_ActionBar(final Composite parent) {
+
+		_containerActionBar = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(_containerActionBar);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(_containerActionBar);
+		{
+			/*
+			 * toolbar actions
+			 */
+			_toolbar = new ToolBar(_containerActionBar, SWT.FLAT);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.BEGINNING, SWT.CENTER)
+					.applyTo(_toolbar);
+
+			/*
+			 * combo: path history
+			 */
+			_comboPathHistory = new Combo(_containerActionBar, SWT.SIMPLE | SWT.DROP_DOWN);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_comboPathHistory);
+			_comboPathHistory.setVisibleItemCount(30);
+
+			_comboPathHistory.addMouseListener(new MouseListener() {
+
+				@Override
+				public void mouseDoubleClick(final MouseEvent e) {}
+
+				@Override
+				public void mouseDown(final MouseEvent e) {
+
+					// show list
+					_comboPathHistory.setListVisible(true);
+				}
+
+				@Override
+				public void mouseUp(final MouseEvent e) {}
+			});
+
+			/**
+			 * This combination of key and selection listener causes a folder selection only with
+			 * the <Enter> key or with a mouse selection in the drop down box.
+			 */
+			_comboPathHistory.addKeyListener(new KeyAdapter() {
+				@Override
+				public void keyPressed(final KeyEvent e) {
+
+					_isKey = true;
+
+					if (e.keyCode == SWT.CR) {
+						onSelectHistoryFolder(_comboPathHistory.getText());
+					}
+				}
+			});
+
+			_comboPathHistory.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+
+					final boolean isKey = _isKey;
+					_isKey = false;
+
+					if (isKey == false) {
+						onSelectHistoryFolder(_comboPathHistory.getText());
+					}
+				}
+			});
+		}
 	}
 
 	/**
 	 * Create gallery
 	 */
-	private void createUI_10_PageGallery(final Composite parent) {
+	private void createUI_20_PageGallery(final Composite parent) {
 
 		_gallery = new GalleryMT(parent, SWT.V_SCROLL | SWT.VIRTUAL | SWT.MULTI);
 		//		GridDataFactory.fillDefaults().grab(true, true).applyTo(_gallery);
@@ -344,7 +593,7 @@ public class PicDirImages {
 
 		_gallery.addListener(SWT.SetData, new Listener() {
 			public void handleEvent(final Event event) {
-				onSetData(event);
+				onSetGalleryItemData(event);
 			}
 		});
 
@@ -377,7 +626,7 @@ public class PicDirImages {
 		_gallery.setItemCount(1);
 	}
 
-	private void createUI_12_PageLoading(final PageBook parent) {
+	private void createUI_30_PageLoading(final PageBook parent) {
 
 		_pageLoading = new Composite(parent, SWT.NONE);
 //		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -394,24 +643,24 @@ public class PicDirImages {
 		}
 	}
 
-	private void createUI_20_StatusLine(final Composite parent) {
+	private void createUI_50_StatusLine(final Composite parent) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		_containerStatusLine = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(_containerStatusLine);
+		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(_containerStatusLine);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
 			/*
 			 * label: info
 			 */
-			_lblStatusInfo = new CLabel(container, SWT.NONE);
+			_lblStatusInfo = new CLabel(_containerStatusLine, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblStatusInfo);
 
-			/*
-			 * progress bar
-			 */
-			_progbarLoading = new ProgressBar(container, SWT.HORIZONTAL | SWT.SMOOTH);
-			GridDataFactory.fillDefaults().grab(true, false).align(SWT.END, SWT.FILL).applyTo(_progbarLoading);
+//			/*
+//			 * progress bar
+//			 */
+//			_progbarLoading = new ProgressBar(_containerStatusLine, SWT.HORIZONTAL | SWT.SMOOTH);
+//			GridDataFactory.fillDefaults().grab(true, false).align(SWT.END, SWT.FILL).applyTo(_progbarLoading);
 		}
 	}
 
@@ -490,7 +739,18 @@ public class PicDirImages {
 		}
 	}
 
-	private void onSetData(final Event event) {
+	private void onSelectHistoryFolder(final String selectedFolder) {
+
+		updateHistory(selectedFolder);
+
+		BusyIndicator.showWhile(_display, new Runnable() {
+			public void run() {
+				_picDirFolder.selectFolder(selectedFolder, false, false);
+			}
+		});
+	}
+
+	private void onSetGalleryItemData(final Event event) {
 
 		final GalleryMTItem galleryItem = (GalleryMTItem) event.item;
 
@@ -518,19 +778,23 @@ public class PicDirImages {
 		}
 	}
 
-	private void setColor(final Color fgColor, final Color bgColor) {
+	void restoreState(final IDialogSettings state) {
 
-		_gallery.setForeground(fgColor);
-		_gallery.setBackground(bgColor);
+		final String[] historyEntries = Util.getStateArray(state, STATE_FOLDER_HISTORY, null);
 
-		final PhotoRenderer photoRenderer = (PhotoRenderer) _itemRenderer;
-		photoRenderer.setForegroundColor(fgColor);
-		photoRenderer.setBackgroundColor(bgColor);
+		if (historyEntries != null) {
 
-		_pageLoading.setBackground(bgColor);
+			// update history and combo
+			for (final String history : historyEntries) {
+				_folderHistory.add(history);
+				_comboPathHistory.add(history);
+			}
+		}
+	}
 
-		_lblLoading.setForeground(fgColor);
-		_lblLoading.setBackground(bgColor);
+	void saveState(final IDialogSettings state) {
+
+		state.put(STATE_FOLDER_HISTORY, _folderHistory.toArray(new String[_folderHistory.size()]));
 	}
 
 	void setThumbnailSize(final int imageSize) {
@@ -543,30 +807,131 @@ public class PicDirImages {
 	/**
 	 * Display images for the selected folder.
 	 * 
-	 * @param dir
+	 * @param imageFolder
+	 * @param isNavigation
 	 */
-	void showImages(final File dir) {
+	void showImages(final File imageFolder, final boolean isNavigation) {
 
 		//////////////////////////////////////////
 		//
 		// MUST BE REMOVED, IS ONLY FOR TESTING
 		//
-		PhotoImageCache.dispose();
+//		PhotoImageCache.dispose();
 		//
 		// MUST BE REMOVED, IS ONLY FOR TESTING
 		//
 		//////////////////////////////////////////
 
-		if (dir == null) {
+		if (imageFolder == null) {
 			_lblLoading.setText(Messages.Pic_Dir_Label_FolderIsNotSelected);
 		} else {
-			_lblLoading.setText(NLS.bind(Messages.Pic_Dir_Label_Loading, dir.getAbsolutePath()));
+
+			_lblLoading.setText(NLS.bind(Messages.Pic_Dir_Label_Loading, imageFolder.getAbsolutePath()));
+
+			if (isNavigation == false) {
+				/*
+				 * don't update history when the navigation in the history caused to display images
+				 */
+				updateHistory(imageFolder.getAbsolutePath());
+			}
 		}
+
 		_pageBook.showPage(_pageLoading);
 
 		PhotoManager.stopImageLoading();
 
-		workerUpdate(dir);
+		workerUpdate(imageFolder);
+	}
+
+	void updateColors(final Color fgColor, final Color bgColor) {
+
+		/*
+		 * action bar
+		 */
+		_containerActionBar.setForeground(fgColor);
+		_containerActionBar.setBackground(bgColor);
+		_toolbar.setForeground(fgColor);
+		_toolbar.setBackground(bgColor);
+
+		_comboPathHistory.setForeground(fgColor);
+		_comboPathHistory.setBackground(bgColor);
+
+		/*
+		 * gallery
+		 */
+		_gallery.setForeground(fgColor);
+		_gallery.setBackground(bgColor);
+
+		final PhotoRenderer photoRenderer = (PhotoRenderer) _itemRenderer;
+		photoRenderer.setForegroundColor(fgColor);
+		photoRenderer.setBackgroundColor(bgColor);
+
+		_pageLoading.setBackground(bgColor);
+
+		/*
+		 * status line
+		 */
+		_containerStatusLine.setForeground(fgColor);
+		_containerStatusLine.setBackground(bgColor);
+
+		_lblStatusInfo.setForeground(fgColor);
+		_lblStatusInfo.setBackground(bgColor);
+
+		/*
+		 * loading page
+		 */
+		_lblLoading.setForeground(fgColor);
+		_lblLoading.setBackground(bgColor);
+	}
+
+	private void updateHistory(final String newFolderPathName) {
+
+		int historyIndex = -1;
+		int historyCounter = 0;
+
+		// check if new path is already in the history
+		for (final String historyItem : _folderHistory) {
+			if (historyItem.equals(newFolderPathName)) {
+				historyIndex = historyCounter;
+				break;
+			}
+			historyCounter++;
+		}
+
+		if (historyIndex != -1) {
+
+			// this is an existing history entry, move it to the top
+
+			// remove from history
+			_folderHistory.remove(historyIndex);
+
+			// remove from combo
+			_comboPathHistory.remove(historyIndex);
+		}
+
+		// check max history size
+		final int historySize = _folderHistory.size();
+		if (historySize > MAX_HISTORY_ENTRIES) {
+
+			_folderHistory.remove(historySize - 1);
+			_comboPathHistory.remove(historySize - 1);
+		}
+
+		// update history
+		_folderHistory.add(0, newFolderPathName);
+
+		// update combo
+		_comboPathHistory.add(newFolderPathName, 0);
+
+		// must be selected otherwise the text field can be empty when selected from the dropdown list
+		_comboPathHistory.select(0);
+
+		// enabel/disable history navigation
+		_selectedHistoryIndex = 0;
+		_actionNavigateBackward.setEnabled(historySize > 1);
+		_actionNavigateForward.setEnabled(false);
+		_actionClearNavigationHistory.setEnabled(historySize > 1);
+
 	}
 
 	/**
