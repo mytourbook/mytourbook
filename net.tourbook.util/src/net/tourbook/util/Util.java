@@ -332,6 +332,20 @@ public class Util {
 	 * @param state
 	 * @param key
 	 * @param defaultValue
+	 * @return Returns a string value from {@link IDialogSettings}. When the key is not found, the
+	 *         default value is returned.
+	 */
+	public static String[] getStateArray(final IDialogSettings state, final String key, final String[] defaultValue) {
+
+		final String[] stateValue = state.getArray(key);
+
+		return stateValue == null ? defaultValue : stateValue;
+	}
+
+	/**
+	 * @param state
+	 * @param key
+	 * @param defaultValue
 	 * @return Returns a boolean value from {@link IDialogSettings}. When the key is not found, the
 	 *         default value is returned.
 	 */

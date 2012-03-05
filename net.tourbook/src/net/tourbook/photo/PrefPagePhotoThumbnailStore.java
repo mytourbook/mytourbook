@@ -46,6 +46,8 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 public class PrefPagePhotoThumbnailStore extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
@@ -53,6 +55,11 @@ public class PrefPagePhotoThumbnailStore extends FieldEditorPreferencePage imple
 
 	private final String			_defaultThumbnailStorePath	= Platform.getInstanceLocation().getURL().getPath();
 
+	private final DateTimeFormatter	_dateFormatter				= DateTimeFormat.fullDateTime();
+
+	/*
+	 * UI controls
+	 */
 	private Composite				_containerLocation;
 	private BooleanFieldEditor		_editorBoolUseDefaultLocation;
 	private BooleanFieldEditor		_editorBoolDoCleanup;
@@ -68,6 +75,7 @@ public class PrefPagePhotoThumbnailStore extends FieldEditorPreferencePage imple
 
 	private Button					_btnCleanupNow;
 	private Button					_btnCleanupAll;
+	private Label					_lblLastCleanup;
 
 	@Override
 	protected void createFieldEditors() {
@@ -162,6 +170,7 @@ public class PrefPagePhotoThumbnailStore extends FieldEditorPreferencePage imple
 
 			createUI_30_CleanupOptions(group);
 			createUI_40_CleanupNow(group);
+			createUI_50_LastCleanup(group);
 		}
 
 		// !!! set layout after the editor was created because the editor sets the parents layout
@@ -173,6 +182,7 @@ public class PrefPagePhotoThumbnailStore extends FieldEditorPreferencePage imple
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
 			/*
 			 * label: cleanup perion
@@ -283,11 +293,40 @@ public class PrefPagePhotoThumbnailStore extends FieldEditorPreferencePage imple
 		}
 	}
 
+	private void createUI_50_LastCleanup(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+			/*
+			 * label: cleanup perion
+			 */
+			final Label label = new Label(container, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.FILL, SWT.FILL)
+					.applyTo(label);
+			label.setText(Messages.PrefPage_Photo_Thumbstore_Label_LastCleanup);
+
+			/*
+			 * label: cleanup perion
+			 */
+			_lblLastCleanup = new Label(container, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.FILL, SWT.FILL)
+					.grab(true, false)
+					.applyTo(_lblLastCleanup);
+		}
+	}
+
 	private void doCleanupNow(final boolean isDeleteAllImages) {
 
 		// update pref store values
 		if (performOk()) {
+
 			ThumbnailStore.cleanupStoreFiles(isDeleteAllImages, true);
+
+			updateUILastCleanup();
 		}
 	}
 
@@ -440,6 +479,8 @@ public class PrefPagePhotoThumbnailStore extends FieldEditorPreferencePage imple
 		_spinnerCleanupPeriod.setSelection(_prefStore.getInt(//
 				ITourbookPreferences.PHOTO_THUMBNAIL_STORE_CLEANUP_PERIOD));
 
+		updateUILastCleanup();
+
 		enableControls();
 	}
 
@@ -456,4 +497,11 @@ public class PrefPagePhotoThumbnailStore extends FieldEditorPreferencePage imple
 		ThumbnailStore.updateStoreLocation();
 	}
 
+	private void updateUILastCleanup() {
+
+		final long lastCleanup = _prefStore.getLong(//
+				ITourbookPreferences.PHOTO_THUMBNAIL_STORE_LAST_CLEANUP_DATE_TIME);
+
+		_lblLastCleanup.setText(lastCleanup == 0 ? UI.EMPTY_STRING : _dateFormatter.print(lastCleanup));
+	}
 }

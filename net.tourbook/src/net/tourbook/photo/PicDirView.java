@@ -20,6 +20,7 @@ import java.io.File;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.photo.manager.PhotoManager;
 import net.tourbook.photo.manager.ThumbnailStore;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.ViewerDetailForm;
 import net.tourbook.util.Util;
@@ -28,6 +29,8 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.resource.ColorRegistry;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.osgi.util.NLS;
@@ -36,7 +39,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Scale;
@@ -205,6 +208,13 @@ public class PicDirView extends ViewPart {
 			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 
+				final String property = event.getProperty();
+
+				if (property.equals(ITourbookPreferences.PHOTO_VIEWER_PREF_STORE_EVENT)) {
+
+					updateColors();
+				}
+
 				_picDirFolder.handlePrefStoreModifications(event);
 			}
 		};
@@ -225,8 +235,8 @@ public class PicDirView extends ViewPart {
 
 	private void createUI(final Composite parent) {
 
-		_picDirImages = new PicDirImages();
-		_picDirFolder = new PicDirFolder(_picDirImages);
+		_picDirImages = new PicDirImages(this);
+		_picDirFolder = new PicDirFolder(this, _picDirImages);
 
 		final Composite masterDetailContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(masterDetailContainer);
@@ -247,9 +257,10 @@ public class PicDirView extends ViewPart {
 			// photos
 			_containerImages = new Composite(masterDetailContainer, SWT.NONE);
 			GridDataFactory.fillDefaults().applyTo(_containerImages);
-			_containerImages.setLayout(new FillLayout());
+			GridLayoutFactory.fillDefaults().applyTo(_containerImages);
+//			_containerImages.setLayout(new FillLayout());
 			{
-				_picDirImages.createUI(_containerImages);
+				_picDirImages.createUI(_picDirFolder, _containerImages);
 			}
 
 			// master/detail form
@@ -283,8 +294,6 @@ public class PicDirView extends ViewPart {
 			}
 		});
 	}
-
-
 
 	@Override
 	public void dispose() {
@@ -331,7 +340,14 @@ public class PicDirView extends ViewPart {
 		final int stateSize = Util.getStateInt(_state, STATE_THUMB_IMAGE_SIZE, PhotoManager.THUMBNAIL_DEFAULT_SIZE);
 		_scaleThumbnailSize.setSelection(stateSize);
 
+		/*
+		 * image restore must be done be for folder restore because folder restore is also loading
+		 * the folder and updates folder history
+		 */
+		_picDirImages.restoreState(_state);
 		_picDirFolder.restoreState(_state);
+
+		updateColors();
 
 		// restore thumbnail size
 		onSelectThumbnailSize();
@@ -354,11 +370,22 @@ public class PicDirView extends ViewPart {
 		_state.put(STATE_THUMB_IMAGE_SIZE, _scaleThumbnailSize.getSelection());
 
 		_picDirFolder.saveState(_state);
+		_picDirImages.saveState(_state);
 	}
 
 	@Override
 	public void setFocus() {
 		_picDirFolder.getTree().setFocus();
+	}
+
+	private void updateColors() {
+
+		final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
+		final Color fgColor = colorRegistry.get(ITourbookPreferences.PHOTO_VIEWER_COLOR_FOREGROUND);
+		final Color bgColor = colorRegistry.get(ITourbookPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
+
+		_scaleThumbnailSize.setForeground(fgColor);
+		_scaleThumbnailSize.setBackground(bgColor);
 	}
 
 }

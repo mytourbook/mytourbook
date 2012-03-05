@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,16 +23,16 @@ package net.tourbook.application;
  */
 public interface ICommandIds {
 
-	public static final String	CMD_OPENVIEW_IMPORTEDDATA	= "Tourbook.openViewImportedData";	//$NON-NLS-1$
-	public static final String	CMD_OPENVIEW_TOURLIST		= "Tourbook.openViewTourList";		//$NON-NLS-1$
-	public static final String	CMD_OPENVIEW_YEARMAP		= "Tourbook.openViewYearMap";		//$NON-NLS-1$
-	public static final String	CMD_OPENVIEW_TOURCATALOG	= "Tourbook.openViewTourCatalog";	//$NON-NLS-1$
-	public static final String	CMD_OPENVIEW_TOURCOMPARER	= "Tourbook.openViewTourCompare";	//$NON-NLS-1$
-	public static final String	CMD_OPENVIEW_TOURFINDER		= "Tourbook.openViewTourviewer";	//$NON-NLS-1$
-	public static final String	CMD_OPENVIEW_TOURCHART		= "Tourbook.openViewTourChart";	//$NON-NLS-1$
-	public static final String	CMD_OPENVIEW_STATISTICS		= "Tourbook.openViewStatistics";	//$NON-NLS-1$
+	public static final String	CMD_OPENVIEW_IMPORTEDDATA		= "Tourbook.openViewImportedData";					//$NON-NLS-1$
+	public static final String	CMD_OPENVIEW_TOURLIST			= "Tourbook.openViewTourList";						//$NON-NLS-1$
+	public static final String	CMD_OPENVIEW_YEARMAP			= "Tourbook.openViewYearMap";						//$NON-NLS-1$
+	public static final String	CMD_OPENVIEW_TOURCATALOG		= "Tourbook.openViewTourCatalog";					//$NON-NLS-1$
+	public static final String	CMD_OPENVIEW_TOURCOMPARER		= "Tourbook.openViewTourCompare";					//$NON-NLS-1$
+	public static final String	CMD_OPENVIEW_TOURFINDER			= "Tourbook.openViewTourviewer";					//$NON-NLS-1$
+	public static final String	CMD_OPENVIEW_TOURCHART			= "Tourbook.openViewTourChart";					//$NON-NLS-1$
+	public static final String	CMD_OPENVIEW_STATISTICS			= "Tourbook.openViewStatistics";					//$NON-NLS-1$
 
-	public static final String	ACTION_ADD_TAG				= "ACTION_ADD_TAG";				//$NON-NLS-1$
-	public static final String	ACTION_REMOVE_TAG			= "ACTION_REMOVE_TAG";				//$NON-NLS-1$
+	public static final String	ACTION_ADD_TAG					= "ACTION_ADD_TAG";								//$NON-NLS-1$
+	public static final String	ACTION_REMOVE_TAG				= "ACTION_REMOVE_TAG";								//$NON-NLS-1$
 
 }

@@ -58,10 +58,12 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
@@ -86,20 +88,22 @@ class PicDirFolder {
 	private final IPreferenceStore				_prefStore								= TourbookPlugin.getDefault() //
 																								.getPreferenceStore();
 
+	private PicDirView							_picDirView;
 	private PicDirImages						_picDirImages;
 
 	private long								_expandRunnableCounter;
 	private boolean								_isExpandingSelection;
 
-	private boolean								_isSingleClickExpand;
-	private boolean								_isSingleExpandCollapseOthers;
-	private boolean								_isShowFileFolderInFolderItem;
+	private boolean								_isBehaviourSingleClickExpand;
+	private boolean								_isBehaviourSingleExpandCollapseOthers;
+	private boolean								_isStateShowFileFolderInFolderItem;
 
 	/**
 	 * Is true when the mouse click is for the context menu
 	 */
 	private boolean								_isMouseContextMenu;
-	private boolean								_isMouseEvent;
+	private boolean								_doAutoCollapseExpand;
+	private boolean								_isNavigation;
 
 	private TVIFolderRoot						_rootItem;
 	private TVIFolderFolder						_selectedTVIFolder;
@@ -173,7 +177,8 @@ class PicDirFolder {
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
-	PicDirFolder(final PicDirImages picDirImages) {
+	PicDirFolder(final PicDirView picDirView, final PicDirImages picDirImages) {
+		_picDirView = picDirView;
 		_picDirImages = picDirImages;
 	}
 
@@ -242,7 +247,7 @@ class PicDirFolder {
 
 			final String[] commands = { "cmd.exe", //$NON-NLS-1$
 					"/c", //$NON-NLS-1$
-					"\"" + prefPhotoViewer + "\"",
+					"\"" + prefPhotoViewer + "\"", //$NON-NLS-1$ //$NON-NLS-2$
 					folder
 //					"\"" + folder + "\""
 			//
@@ -266,11 +271,11 @@ class PicDirFolder {
 	}
 
 	void actionSingleClickExpand() {
-		_isSingleClickExpand = _actionSingleClickExpand.isChecked();
+		_isBehaviourSingleClickExpand = _actionSingleClickExpand.isChecked();
 	}
 
 	void actionSingleExpandCollapseOthers() {
-		_isSingleExpandCollapseOthers = _actionSingleExpandCollapseOthers.isChecked();
+		_isBehaviourSingleExpandCollapseOthers = _actionSingleExpandCollapseOthers.isChecked();
 	}
 
 	private void createActions() {
@@ -311,7 +316,6 @@ class PicDirFolder {
 
 		// update UI from pref store
 		_folderViewer.getTree().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
-		updateColors();
 	}
 
 	private void createUI_0(final Composite parent) {
@@ -351,7 +355,7 @@ class PicDirFolder {
 		tree.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseDown(final MouseEvent e) {
-				_isMouseEvent = true;
+				_doAutoCollapseExpand = true;
 				_isMouseContextMenu = e.button == 3;
 			}
 		});
@@ -403,7 +407,7 @@ class PicDirFolder {
 
 					styledString.append(folderItem._folderName);
 
-					if (_isShowFileFolderInFolderItem) {
+					if (_isStateShowFileFolderInFolderItem) {
 
 						// force that file list is loaded and number of files is available
 						folderItem.hasChildren();
@@ -429,11 +433,11 @@ class PicDirFolder {
 		treeLayout.setColumnData(tvcColumn, new ColumnWeightData(100, true));
 	}
 
-	private void displayFolderImages(final TVIFolderFolder tviFolder) {
+	private void displayFolderImages(final TVIFolderFolder tviFolder, final boolean isNavigation) {
 
 		final File selectedFolder = tviFolder._treeItemFolder;
 
-		// optimize, don't select again the same folder
+		// optimize, don't select the same folder again
 		if (_selectedFolder != null && selectedFolder.equals(_selectedFolder)) {
 			return;
 		}
@@ -442,7 +446,7 @@ class PicDirFolder {
 		_selectedTVIFolder = tviFolder;
 
 		// display imaged for the selected folder
-		_picDirImages.showImages(selectedFolder);
+		_picDirImages.showImages(selectedFolder, isNavigation);
 	}
 
 	private void enableActions() {
@@ -476,6 +480,15 @@ class PicDirFolder {
 
 		enableActions();
 	}
+
+//	private void onSelectFolder(final SelectionEvent selectionEvent) {
+//
+//		final TreeItem treeItem = (TreeItem) selectionEvent.item;
+//
+////		treeItem.
+//
+//		onSelectFolder_10((ITreeSelection) _folderViewer.getSelection());
+//	}
 
 	/**
 	 * Gets filesystem root entries
@@ -539,15 +552,6 @@ class PicDirFolder {
 		return _folderViewer.getTree();
 	}
 
-//	private void onSelectFolder(final SelectionEvent selectionEvent) {
-//
-//		final TreeItem treeItem = (TreeItem) selectionEvent.item;
-//
-////		treeItem.
-//
-//		onSelectFolder_10((ITreeSelection) _folderViewer.getSelection());
-//	}
-
 	void handlePrefStoreModifications(final PropertyChangeEvent event) {
 
 		final String property = event.getProperty();
@@ -591,8 +595,8 @@ class PicDirFolder {
 		}
 
 		// keep & reset mouse event
-		final boolean isMouseEvent = _isMouseEvent;
-		_isMouseEvent = false;
+		final boolean doAutoCollapseExpand = _doAutoCollapseExpand;
+		_doAutoCollapseExpand = false;
 
 		final TreePath[] selectedTreePaths = treeSelection.getPaths();
 		if (selectedTreePaths.length == 0) {
@@ -609,22 +613,19 @@ class PicDirFolder {
 
 			// context menu has been opened, do no expand/collapse
 
-			displayFolderImages(tviFolder);
-
-		} else if (tviFolder.getFolderCounter() == 0) {
-
-			// there is no folder which can be expanded
-
-			displayFolderImages(tviFolder);
+			displayFolderImages(tviFolder, _isNavigation);
 
 		} else {
 
-			if (isMouseEvent) {
-				onSelectFolder_10_WithMouse(treeSelection, selectedTreePath, tviFolder);
+			if (doAutoCollapseExpand) {
+				onSelectFolder_10_AutoExpandCollapse(treeSelection, selectedTreePath, tviFolder);
 			} else {
-				displayFolderImages(tviFolder);
+				displayFolderImages(tviFolder, _isNavigation);
 			}
 		}
+
+		// reset navigation state, this is a bit of a complex behaviour
+		_isNavigation = false;
 	}
 
 	/**
@@ -636,11 +637,11 @@ class PicDirFolder {
 	 * @param selectedTreePath
 	 * @param tviFolder
 	 */
-	private void onSelectFolder_10_WithMouse(	final ITreeSelection treeSelection,
-												final TreePath selectedTreePath,
-												final TVIFolderFolder tviFolder) {
+	private void onSelectFolder_10_AutoExpandCollapse(	final ITreeSelection treeSelection,
+														final TreePath selectedTreePath,
+														final TVIFolderFolder tviFolder) {
 
-		if (_isSingleExpandCollapseOthers) {
+		if (_isBehaviourSingleExpandCollapseOthers) {
 
 			/*
 			 * run async because this is doing a reselection which cannot be done within the current
@@ -653,6 +654,7 @@ class PicDirFolder {
 				private TVIFolderFolder	__selectedFolderItem	= tviFolder;
 				private ITreeSelection	__treeSelection			= treeSelection;
 				private TreePath		__selectedTreePath		= selectedTreePath;
+				private boolean			__isNavigation			= _isNavigation;
 
 				public void run() {
 
@@ -661,60 +663,87 @@ class PicDirFolder {
 						return;
 					}
 
-					onSelectFolder_10_WithMouseRunnable(__selectedFolderItem, __treeSelection, __selectedTreePath);
+					onSelectFolder_10_AutoExpandCollapse_Runnable(
+							__selectedFolderItem,
+							__treeSelection,
+							__selectedTreePath,
+							__isNavigation);
 				}
 			});
 
 		} else {
 
-			if (_isSingleClickExpand) {
+			if (_isBehaviourSingleClickExpand) {
 
 				// expand folder with one mouse click but not with the keyboard
 				expandCollapseFolder(tviFolder);
 			}
 
-			displayFolderImages(tviFolder);
+			displayFolderImages(tviFolder, _isNavigation);
 		}
 	}
 
-	private void onSelectFolder_10_WithMouseRunnable(	final TVIFolderFolder __selectedFolderItem,
-														final ITreeSelection treeSelection,
-														final TreePath selectedTreePath) {
-
-		final Tree tree = _folderViewer.getTree();
-
+	/**
+	 * This behavior is complex and still have possible problems.
+	 * 
+	 * @param selectedFolderItem
+	 * @param treeSelection
+	 * @param selectedTreePath
+	 * @param isNavigation
+	 */
+	private void onSelectFolder_10_AutoExpandCollapse_Runnable(	final TVIFolderFolder selectedFolderItem,
+																final ITreeSelection treeSelection,
+																final TreePath selectedTreePath,
+																final boolean isNavigation) {
 		_isExpandingSelection = true;
 		{
+			final Tree tree = _folderViewer.getTree();
+
 			tree.setRedraw(false);
 			{
 				final TreeItem topItem = tree.getTopItem();
 
 				final boolean isExpanded = _folderViewer.getExpandedState(selectedTreePath);
 
+				/*
+				 * collapse all tree paths
+				 */
+				final TreePath[] allExpandedTreePaths = _folderViewer.getExpandedTreePaths();
+				for (final TreePath treePath : allExpandedTreePaths) {
+					_folderViewer.setExpandedState(treePath, false);
+				}
+
+				/*
+				 * expand and select selected folder
+				 */
 				_folderViewer.setExpandedTreePaths(new TreePath[] { selectedTreePath });
 				_folderViewer.setSelection(treeSelection, true);
 
-				if (_isSingleClickExpand && isExpanded) {
+				if (_isBehaviourSingleClickExpand && isExpanded) {
 
 					// auto collapse expanded folder
 					_folderViewer.setExpandedState(selectedTreePath, false);
 				}
 
-				/*
+				/**
 				 * set top item to the previous top item, otherwise the expanded/collapse item is
 				 * positioned at the bottom and the UI is jumping all the time
+				 * <p>
+				 * win behaviour: when an item is set to top which was collapsed bevore, it will be
+				 * expanded
 				 */
-				tree.setTopItem(topItem);
+				if (topItem.isDisposed() == false) {
+					tree.setTopItem(topItem);
+				}
 			}
 			tree.setRedraw(true);
-
 		}
 		_isExpandingSelection = false;
 
-		displayFolderImages(__selectedFolderItem);
+		displayFolderImages(selectedFolderItem, isNavigation);
 	}
 
-	private void restoreFolder(final String folderPathName) {
+	private void restoreFolder(final String restoreFolderName) {
 
 		BusyIndicator.showWhile(_display, new Runnable() {
 			public void run() {
@@ -724,122 +753,26 @@ class PicDirFolder {
 
 				_folderViewer.setInput(new Object());
 
-				_picDirImages.showImages(_selectedFolder);
-
-				// Remind everyone where we are in the filesystem
-				File restoreFolder = _selectedFolder;
 				_selectedFolder = null;
 				_selectedTVIFolder = null;
 
-				if (folderPathName != null) {
-					final File folderFile = new File(folderPathName);
-					if (folderFile.isDirectory()) {
-						restoreFolder = folderFile;
-					}
-					if (restoreFolder == null) {
-						// previously selected folder is not available, try to move up the hierarchy
-
-						IPath folderPath = new Path(folderPathName);
-
-						final int segmentCount = folderPath.segmentCount();
-						for (int segmentIndex = segmentCount; segmentIndex > 0; segmentIndex--) {
-
-							folderPath = folderPath.removeLastSegments(1);
-
-							final File folderPathFile = new File(folderPath.toOSString());
-							if (folderPathFile.isDirectory()) {
-								restoreFolder = folderPathFile;
-								break;
-							}
-						}
-					}
-				}
-
-				if (restoreFolder == null) {
-					// previous selected folder is not available
-					return;
-				}
-
-				final String restorePathName = restoreFolder.getAbsolutePath();
-
-				final IPath restorePath = new Path(restorePathName);
-				final IPath restoreRoot = new Path(restorePathName).removeFirstSegments(9999);
-
-				final String[] folderSegments = restorePath.segments();
-				final ArrayList<String> allFolderSegments = new ArrayList<String>();
-
-				allFolderSegments.add(restoreRoot.toOSString());
-				for (final String folderSegmentName : folderSegments) {
-					allFolderSegments.add(folderSegmentName);
-				}
-
-				final ArrayList<TVIFolder> treePathItems = new ArrayList<TVIFolder>();
-				TVIFolder folderSegmentItem = _rootItem;
-				treePathItems.add(folderSegmentItem);
-
-				// create tree path for each folder segment
-				for (final String folderSegmentName : allFolderSegments) {
-
-					boolean isPathSegmentAvailable = false;
-
-					final ArrayList<TreeViewerItem> tviChildren = folderSegmentItem.getFetchedChildren();
-					for (final TreeViewerItem tviChild : tviChildren) {
-
-						final TVIFolderFolder childFolder = (TVIFolderFolder) tviChild;
-						String childFolderName;
-
-						if (childFolder._isRootFolder) {
-
-							if (UI.IS_WIN) {
-								// remove \ from device name
-								childFolderName = childFolder._folderName.substring(0, 2);
-							} else {
-								childFolderName = childFolder._folderName;
-							}
-
-						} else {
-
-							childFolderName = childFolder._folderName;
-						}
-
-						if (folderSegmentName.equals(childFolderName)) {
-
-							isPathSegmentAvailable = true;
-
-							treePathItems.add(childFolder);
-							folderSegmentItem = childFolder;
-
-							break;
-						}
-					}
-
-					if (isPathSegmentAvailable == false) {
-						// requested path is not available, select partial path in the viewer
-						break;
-					}
-				}
-
-				if (treePathItems.size() == 0) {
-					// there is nothing which can be selected
-					return;
-				}
-
-				final TVIFolder[] treePathArray = treePathItems.toArray(new TVIFolder[treePathItems.size()]);
-				final TreePath treePath = new TreePath(treePathArray);
-				final ITreeSelection selection = new TreeSelection(treePath);
-
-				_folderViewer.setSelection(selection, true);
+				selectFolder(restoreFolderName, true, false);
 			}
 		});
 	}
 
 	void restoreState(final IDialogSettings state) {
 
-		_isSingleClickExpand = Util.getStateBoolean(state, STATE_IS_SINGLE_CLICK_EXPAND, false);
-		_actionSingleClickExpand.setChecked(_isSingleClickExpand);
+		_isBehaviourSingleClickExpand = Util.getStateBoolean(state, STATE_IS_SINGLE_CLICK_EXPAND, false);
+		_actionSingleClickExpand.setChecked(_isBehaviourSingleClickExpand);
 
-		_isSingleExpandCollapseOthers = Util.getStateBoolean(state, STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS, false);
-		_actionSingleExpandCollapseOthers.setChecked(_isSingleExpandCollapseOthers);
+		_isBehaviourSingleExpandCollapseOthers = Util.getStateBoolean(
+				state,
+				STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS,
+				false);
+		_actionSingleExpandCollapseOthers.setChecked(_isBehaviourSingleExpandCollapseOthers);
+
+		updateColors();
 
 		final String previousSelectedFolder = Util.getStateString(state, STATE_SELECTED_FOLDER, null);
 		restoreFolder(previousSelectedFolder);
@@ -856,15 +789,157 @@ class PicDirFolder {
 		state.put(STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS, _actionSingleExpandCollapseOthers.isChecked());
 	}
 
+	/**
+	 * @param requestedFolderName
+	 * @param isMoveUpHierarchyWhenFolderIsInvalid
+	 * @param isNavigation
+	 *            Set <code>true</code> when the folder was selected from the navigations history
+	 *            which prevents that the naviation history is updated.
+	 * @return Return <code>false</code> when the folder which should be selected is not available
+	 */
+	boolean selectFolder(	final String requestedFolderName,
+							final boolean isMoveUpHierarchyWhenFolderIsInvalid,
+							final boolean isNavigation) {
+
+		_isNavigation = isNavigation;
+
+		boolean isRequestedFolderAvailable = false;
+		File selectedFolder = null;
+
+		if (requestedFolderName != null) {
+
+			final File folderFile = new File(requestedFolderName);
+			if (folderFile.isDirectory()) {
+				selectedFolder = folderFile;
+				isRequestedFolderAvailable = true;
+			}
+
+			if (selectedFolder == null && isMoveUpHierarchyWhenFolderIsInvalid) {
+
+				// previously selected folder is not available, try to move up the hierarchy
+
+				IPath folderPath = new Path(requestedFolderName);
+
+				final int segmentCount = folderPath.segmentCount();
+				for (int segmentIndex = segmentCount; segmentIndex > 0; segmentIndex--) {
+
+					folderPath = folderPath.removeLastSegments(1);
+
+					final File folderPathFile = new File(folderPath.toOSString());
+					if (folderPathFile.isDirectory()) {
+						selectedFolder = folderPathFile;
+						break;
+					}
+				}
+			}
+		}
+
+		if (requestedFolderName != null && isRequestedFolderAvailable == false) {
+
+			// restored folder is not available
+
+			MessageDialog.openInformation(
+					_display.getActiveShell(),
+					Messages.Pic_Dir_Dialog_FolderIsNotAvailable_Title,
+					NLS.bind(Messages.Pic_Dir_Dialog_FolderIsNotAvailable_Message, requestedFolderName));
+		}
+
+		if (selectedFolder == null) {
+
+			// previously selected folder is not available
+			return false;
+		}
+
+		final String restorePathName = selectedFolder.getAbsolutePath();
+
+		final IPath restorePath = new Path(restorePathName);
+		final IPath restoreRoot = new Path(restorePathName).removeFirstSegments(9999);
+
+		final String[] folderSegments = restorePath.segments();
+		final ArrayList<String> allFolderSegments = new ArrayList<String>();
+
+		allFolderSegments.add(restoreRoot.toOSString());
+		for (final String folderSegmentName : folderSegments) {
+			allFolderSegments.add(folderSegmentName);
+		}
+
+		final ArrayList<TVIFolder> treePathItems = new ArrayList<TVIFolder>();
+		TVIFolder folderSegmentItem = _rootItem;
+		treePathItems.add(folderSegmentItem);
+
+		// create tree path for each folder segment
+		for (final String folderSegmentName : allFolderSegments) {
+
+			boolean isPathSegmentAvailable = false;
+
+			final ArrayList<TreeViewerItem> tviChildren = folderSegmentItem.getFetchedChildren();
+			for (final TreeViewerItem tviChild : tviChildren) {
+
+				final TVIFolderFolder childFolder = (TVIFolderFolder) tviChild;
+				String childFolderName;
+
+				if (childFolder._isRootFolder) {
+
+					if (UI.IS_WIN) {
+						// remove \ from device name
+						childFolderName = childFolder._folderName.substring(0, 2);
+					} else {
+						childFolderName = childFolder._folderName;
+					}
+
+				} else {
+
+					childFolderName = childFolder._folderName;
+				}
+
+				if (folderSegmentName.equals(childFolderName)) {
+
+					isPathSegmentAvailable = true;
+
+					treePathItems.add(childFolder);
+					folderSegmentItem = childFolder;
+
+					break;
+				}
+			}
+
+			if (isPathSegmentAvailable == false) {
+				// requested path is not available, select partial path in the viewer
+				break;
+			}
+		}
+
+		if (treePathItems.size() == 0) {
+			// there is nothing which can be selected
+			return false;
+		}
+
+		final TVIFolder[] treePathArray = treePathItems.toArray(new TVIFolder[treePathItems.size()]);
+		final TreePath treePath = new TreePath(treePathArray);
+		final ITreeSelection treeSelection = new TreeSelection(treePath);
+
+		_doAutoCollapseExpand = true;
+
+		// select folder in the tree viewer, this triggers onSelectFolder(...)
+		_folderViewer.setSelection(treeSelection, true);
+
+		return true;
+	}
+
 	private void updateColors() {
 
-		_isShowFileFolderInFolderItem = _prefStore.getBoolean(ITourbookPreferences.PHOTO_VIEWER_IS_SHOW_FILE_FOLDER);
+		_isStateShowFileFolderInFolderItem = _prefStore.getBoolean(//
+				ITourbookPreferences.PHOTO_VIEWER_IS_SHOW_FILE_FOLDER);
+
 		final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
+		final Color fgColor = colorRegistry.get(ITourbookPreferences.PHOTO_VIEWER_COLOR_FOREGROUND);
+		final Color bgColor = colorRegistry.get(ITourbookPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
 
 		final Tree tree = _folderViewer.getTree();
+		tree.setForeground(fgColor);
+		tree.setBackground(bgColor);
 
-		tree.setForeground(colorRegistry.get(ITourbookPreferences.PHOTO_VIEWER_COLOR_FOREGROUND));
-		tree.setBackground(colorRegistry.get(ITourbookPreferences.PHOTO_VIEWER_COLOR_BACKGROUND));
+		_picDirImages.updateColors(fgColor, bgColor);
 	}
 
 }

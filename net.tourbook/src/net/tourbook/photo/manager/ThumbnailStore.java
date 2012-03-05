@@ -214,11 +214,11 @@ public class ThumbnailStore {
 	}
 
 	/**
-	 * !!!!!!!!!!!!!! RECURSIVE !!!!!!!!!!!!!!!!!<br>
+	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! RECURSIVE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
 	 * <br>
 	 * Deletes files and subdirectories. If a deletion fails, the method stops attempting to delete. <br>
 	 * <br>
-	 * !!!!!!!!!!!!!! RECURSIVE !!!!!!!!!!!!!!!!!
+	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! RECURSIVE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
 	 * 
 	 * @param fileOrFolder
 	 * @param monitor
@@ -231,14 +231,6 @@ public class ThumbnailStore {
 		}
 
 		boolean doDeleteFileFolder = false;
-
-// DELAY FOR DEBUGGING
-//		try {
-//			Thread.sleep(5);
-//		} catch (final InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
 
 		if (fileOrFolder.isDirectory()) {
 
@@ -289,7 +281,6 @@ public class ThumbnailStore {
 
 			// the folder is now empty so it can be deleted
 			isFileFolderDeleted = fileOrFolder.delete();
-//			isFileFolderDeleted = true;
 
 			_deleteUI_DeletedFiles++;
 		}

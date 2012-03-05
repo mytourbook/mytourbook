@@ -4,6 +4,11 @@ New
 -better resonse time when tours are displayed in the map, especially when multiple tours are displayed
  tours in the map are being displayed after a map tile has been painted and not after ALL tiles are painted
  
+Improved usability, started to implement key shortcuts:
+	<Ctrl><Shift>+P - Preferences
+	<Alt>+Left		- navigate folder history in the photo directory
+	<Alt>+Right
+ 
  
 Used resources from:
 :pserver:anonymous@dev.eclipse.org:/cvsroot/technology

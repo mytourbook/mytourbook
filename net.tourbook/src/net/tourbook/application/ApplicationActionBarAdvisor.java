@@ -253,7 +253,15 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		_actionCloseAllPerspective = ActionFactory.CLOSE_ALL_PERSPECTIVES.create(window);
 		register(_actionCloseAllPerspective);
 
+		/*
+		 * keep action bar advisor to register other actions
+		 */
+//		TourbookPlugin.getDefault().setActionBarAdvisor(this);
 	}
+
+//	public void registerAction(final IAction action) {
+//		register(action);
+//	}
 
 	@Override
 	public IStatus saveState(final IMemento memento) {
