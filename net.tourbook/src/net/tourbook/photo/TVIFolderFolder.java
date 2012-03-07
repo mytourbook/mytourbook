@@ -31,10 +31,9 @@ public class TVIFolderFolder extends TVIFolder {
 	int							_folderCounter;
 	int							_fileCounter;
 
-	private final FileFilter	_folderFilter;
-
 	private boolean				_isFolderChecked;
 
+	private final FileFilter	_folderFilter;
 	{
 		_folderFilter = new FileFilter() {
 			@Override
@@ -82,10 +81,13 @@ public class TVIFolderFolder extends TVIFolder {
 	protected void fetchChildren() {
 
 		if (_isFolderChecked == false) {
+			// read folder files
 			readFolderList();
 		}
 
 		if (_folderChildren != null) {
+
+			// create tvi children
 
 			PicDirView.sortFiles(_folderChildren);
 

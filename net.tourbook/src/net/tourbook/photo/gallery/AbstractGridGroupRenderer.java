@@ -86,21 +86,23 @@ public abstract class AbstractGridGroupRenderer extends AbstractGalleryGroupRend
 	 * 
 	 * @param gc
 	 * @param index
-	 * @param selected
+	 * @param isSelected
 	 * @param parent
 	 */
 	protected void drawItem(final GC gc,
 							final int index,
-							final boolean selected,
+							final boolean isSelected,
 							final GalleryMTItem parent,
 							final int offsetY) {
 
 		if (index < parent.getItemCount()) {
+
 			final int hCount = ((Integer) parent.getData(H_COUNT)).intValue();
 			final int vCount = ((Integer) parent.getData(V_COUNT)).intValue();
 
+			final boolean isVertical = gallery.isVertical();
 			int posX, posY;
-			if (gallery.isVertical()) {
+			if (isVertical) {
 				posX = index % hCount;
 				posY = (index - posX) / hCount;
 			} else {
@@ -118,7 +120,7 @@ public abstract class AbstractGridGroupRenderer extends AbstractGalleryGroupRend
 			final GalleryMTItem gItem = (GalleryMTItem) item;
 
 			int xPixelPos, yPixelPos;
-			if (gallery.isVertical()) {
+			if (isVertical) {
 				xPixelPos = posX * (itemWidth + margin) + margin;
 				yPixelPos = posY * (itemHeight + minMargin) - gallery._galleryPosition
 				/* + minMargin */
@@ -139,13 +141,17 @@ public abstract class AbstractGridGroupRenderer extends AbstractGalleryGroupRend
 
 			gallery.sendPaintItemEvent(item, index, gc, xPixelPos, yPixelPos, this.itemWidth, this.itemHeight);
 
-			if (gallery.getItemRenderer() != null) {
-				// gc.setClipping(xPixelPos, yPixelPos, itemWidth, itemHeight);
-				gallery.getItemRenderer().setSelected(selected);
-				final Rectangle oldClipping = gc.getClipping();
+			final AbstractGalleryItemRenderer itemRenderer = gallery.getItemRenderer();
 
+			if (itemRenderer != null) {
+				// gc.setClipping(xPixelPos, yPixelPos, itemWidth, itemHeight);
+				itemRenderer.setSelected(isSelected);
+
+				final Rectangle oldClipping = gc.getClipping();
 				gc.setClipping(oldClipping.intersection(new Rectangle(xPixelPos, yPixelPos, itemWidth, itemHeight)));
-				gallery.getItemRenderer().draw(gc, gItem, index, xPixelPos, yPixelPos, itemWidth, itemHeight);
+				{
+					itemRenderer.draw(gc, gItem, index, xPixelPos, yPixelPos, itemWidth, itemHeight);
+				}
 				gc.setClipping(oldClipping);
 			}
 		}

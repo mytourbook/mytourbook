@@ -16,6 +16,7 @@ http://svn.apache.org/repos/asf/commons/proper/sanselan
  
  
 PENDENZEN
+- document key shortcuts: Shortcut_Key_
 - Error Log ist jetzt im Help Menü
 - Exception Handling dokumentieren
 - Ansicht "Touren Import" dokumentieren, ist z.Z. in http://mytourbook.sourceforge.net/mytourbook/index.php/documentation/get-tours/save-tours

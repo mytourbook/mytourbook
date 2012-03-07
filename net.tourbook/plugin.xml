@@ -1046,12 +1046,17 @@
 	-->            
 	           
       <command
-            id="net.tourbook.command.picdir.history.backward"
+            id="net.tourbook.command.PicDir.ShowNaviationHistory"
+            name="%Command_PicDir_ShowNaviationHistory">
+      </command>
+
+      <command
+            id="net.tourbook.command.PicDir.NavigateHistoryBackward"
             name="%Command_PicDir_History_Backward">
       </command>
 	           
       <command
-            id="net.tourbook.command.picdir.history.forward"
+            id="net.tourbook.command.PicDir.NavigateHistoryForward"
             name="%Command_PicDir_History_Forward">
       </command>
 	           
@@ -1339,13 +1344,20 @@
 	  <!-- Picture directory -->            
       
       <key
-            commandId="net.tourbook.command.picdir.history.backward"
+            commandId="net.tourbook.command.PicDir.ShowNaviationHistory"
+            sequence="%Shortcut_Key_PicDir_ShowNavigationHistory"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="net.tourbook.scheme">
+      </key>
+      
+      <key
+            commandId="net.tourbook.command.PicDir.NavigateHistoryBackward"
             sequence="%Shortcut_Key_PicDir_History_Backward"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="net.tourbook.scheme">
       </key>
       <key
-            commandId="net.tourbook.command.picdir.history.forward"
+            commandId="net.tourbook.command.PicDir.NavigateHistoryForward"
             sequence="%Shortcut_Key_PicDir_History_Forward"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="net.tourbook.scheme">

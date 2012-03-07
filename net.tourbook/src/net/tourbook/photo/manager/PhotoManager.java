@@ -29,15 +29,8 @@ import org.eclipse.swt.widgets.Display;
 public class PhotoManager {
 
 	public static final int										THUMBNAIL_DEFAULT_SIZE	= 160;
-//	public static final int											THUMBNAIL_DEFAULT_SIZE	= 50;
 
 // SET_FORMATTING_OFF
-	
-//	public static final int[]										THUMBNAIL_SIZES = new int[]
-//			{
-//				50, 60, 70, 80, 90, 100, 120, 140, THUMBNAIL_DEFAULT_SIZE, 200, 250, 300, 400, 500, 600
-////				THUMBNAIL_DEFAULT_SIZE, 60, 70, 80, 90, 100, 120, 140, 160, 200, 250, 300, 400, 500, 600
-//			};
 	
 	public static int[]											IMAGE_SIZE = { THUMBNAIL_DEFAULT_SIZE, 600, 999999 };
 	
@@ -86,10 +79,6 @@ public class PhotoManager {
 		};
 
 		_executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(processors, threadFactory);
-
-		// setup image scaler, set number of max threads
-//		System.setProperty("imgscalr.async.threadCount", Integer.toString(cpuCores));
-//		AsyncScalr.getService();
 	}
 
 	public static void putImageInLoadingQueue(	final GalleryMTItem galleryItem,
@@ -101,12 +90,7 @@ public class PhotoManager {
 		photo.setLoadingState(PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE, imageQuality);
 
 		// add loading item into the waiting queue
-		_waitingQueue.add(new PhotoImageLoader(
-				_display,
-				galleryItem,
-				photo,
-				imageQuality,
-				imageLoadCallback));
+		_waitingQueue.add(new PhotoImageLoader(_display, galleryItem, photo, imageQuality, imageLoadCallback));
 
 		_executorService.submit(new Runnable() {
 			public void run() {
@@ -120,54 +104,6 @@ public class PhotoManager {
 			}
 		});
 	}
-
-// Original in org.sharemedia.services.impl.mediadownload.MediaDownload
-//
-//	synchronized public void load(final IMedia m, final int imageQuality, final ILoadCallBack callback) {
-//
-//		final LoadItem newItem = new LoadItem();
-//		newItem.setMedia(m);
-//		newItem.setDefinition(imageQuality);
-//
-//		if (logger.isDebugEnabled()) {
-//			logger.debug("Media " + m + " def " + imageQuality);
-//		}
-//
-//		LoadItem queuedItem = null;
-//
-//		if ((queuedItem = getLoadItem(loading, newItem)) != null) {
-//
-//			addCallBack(queuedItem, callback);
-//			if (logger.isDebugEnabled()) {
-//				logger.debug("Media is loading, adding callback");
-//			}
-//
-//		} else if ((queuedItem = getLoadItem(waitList, newItem)) != null) {
-//
-//			addCallBack(queuedItem, callback);
-//			waitList.remove(queuedItem);
-//			waitList.push(queuedItem);
-//			if (logger.isDebugEnabled()) {
-//				logger.debug("Media is waiting, adding callback and queue on top");
-//			}
-//
-//		} else {
-//
-//			newItem.addCallback(callback);
-//			waitList.push(newItem);
-//			if (logger.isDebugEnabled()) {
-//				logger.debug("Media not queued, adding to queue");
-//			}
-//		}
-//
-//		if (nbThread < maxThreads) {
-//			if (logger.isDebugEnabled()) {
-//				logger.debug("Starting Thread");
-//			}
-//			nbThread++;
-//			new LoadThead().start();
-//		}
-//	}
 
 	/**
 	 * Remove all items in the image loading queue.

@@ -15,11 +15,33 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
-public enum ImageLoadingState {
+import net.tourbook.application.TourbookPlugin;
 
-	LOADING_IS_NOT_YET_CHECKED,
+import org.eclipse.jface.action.Action;
 
-	IMAGE_HAS_LOADING_ERROR,
+public class ActionNavigateShowHistory extends Action {
 
-	IMAGE_IS_AVAILABLE
+	private static final String	ACTION_ID	= "net.tourbook.command.PicDir.ShowNaviationHistory";	//$NON-NLS-1$
+
+	private PicDirImages		_picDirImages;
+
+	public ActionNavigateShowHistory(final PicDirImages picDirImages, final PicDirView picDirView) {
+
+		// this action is currently not visible, only the short cut is used
+
+		setToolTipText("show history");
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(net.tourbook.Messages.Image__Forward_Nav));
+
+//		setId(ACTION_ID);
+		setActionDefinitionId(ACTION_ID);
+
+		picDirView.getViewSite().getActionBars().setGlobalActionHandler(ACTION_ID, this);
+
+		_picDirImages = picDirImages;
+	}
+
+	@Override
+	public void run() {
+		_picDirImages.actionShowNavigationHistory();
+	}
 }

@@ -18,10 +18,7 @@ package net.tourbook.photo;
 import java.io.File;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.photo.manager.PhotoManager;
 import net.tourbook.photo.manager.ThumbnailStore;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.ViewerDetailForm;
 import net.tourbook.util.Util;
 
@@ -29,20 +26,11 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.resource.ColorRegistry;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Sash;
-import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbenchPartReference;
@@ -50,16 +38,14 @@ import org.eclipse.ui.part.ViewPart;
 
 public class PicDirView extends ViewPart {
 
-	static public final String				ID							= "net.tourbook.photo.PicDirView";		//$NON-NLS-1$
+	static public final String				ID					= "net.tourbook.photo.PicDirView";							//$NON-NLS-1$
 
-	private static final String				STATE_TREE_WIDTH			= "STATE_TREE_WIDTH";					//$NON-NLS-1$
-	private static final String				STATE_THUMB_IMAGE_SIZE		= "STATE_THUMB_IMAGE_SIZE";			//$NON-NLS-1$
+	private static final String				STATE_TREE_WIDTH	= "STATE_TREE_WIDTH";										//$NON-NLS-1$
 
-	private static final IDialogSettings	_state						= TourbookPlugin.getDefault()//
-																				.getDialogSettingsSection(
-																						"PhotoDirectoryView");	//$NON-NLS-1$
-	private static final IPreferenceStore	_prefStore					= TourbookPlugin.getDefault()//
-																				.getPreferenceStore();
+	private static final IDialogSettings	_state				= TourbookPlugin.getDefault()//
+																		.getDialogSettingsSection("PhotoDirectoryView");	//$NON-NLS-1$
+	private static final IPreferenceStore	_prefStore			= TourbookPlugin.getDefault()//
+																		.getPreferenceStore();
 
 	private IPartListener2					_partListener;
 	private IPropertyChangeListener			_prefChangeListener;
@@ -67,15 +53,12 @@ public class PicDirView extends ViewPart {
 	private PicDirFolder					_picDirFolder;
 	private PicDirImages					_picDirImages;
 
-	private int								_prevSelectedThumbnailIndex	= -1;
-
 	/*
 	 * UI controls
 	 */
 	private ViewerDetailForm				_containerMasterDetail;
 	private Composite						_containerFolder;
 	private Composite						_containerImages;
-	private Scale							_scaleThumbnailSize;
 
 	static int compareFiles(final File file1, final File file2) {
 
@@ -208,13 +191,6 @@ public class PicDirView extends ViewPart {
 			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 
-				final String property = event.getProperty();
-
-				if (property.equals(ITourbookPreferences.PHOTO_VIEWER_PREF_STORE_EVENT)) {
-
-					updateColors();
-				}
-
 				_picDirFolder.handlePrefStoreModifications(event);
 			}
 		};
@@ -248,7 +224,6 @@ public class PicDirView extends ViewPart {
 			GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(_containerFolder);
 			{
 				_picDirFolder.createUI(_containerFolder);
-				createUI_10_ImageSize(_containerFolder);
 			}
 
 			// sash
@@ -272,29 +247,6 @@ public class PicDirView extends ViewPart {
 		}
 	}
 
-	private void createUI_10_ImageSize(final Composite parent) {
-
-		_scaleThumbnailSize = new Scale(parent, SWT.HORIZONTAL);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleThumbnailSize);
-		_scaleThumbnailSize.setMinimum(50);
-//		_scaleThumbnailSize.setMaximum((PhotoManager.THUMBNAIL_SIZES.length - 1) * 10);
-		_scaleThumbnailSize.setMaximum(600);
-		_scaleThumbnailSize.setIncrement(10);
-		_scaleThumbnailSize.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onSelectThumbnailSize();
-			}
-		});
-
-		_scaleThumbnailSize.addMouseWheelListener(new MouseWheelListener() {
-			public void mouseScrolled(final MouseEvent event) {
-				UI.adjustScaleValueOnMouseScroll(event);
-				onSelectThumbnailSize();
-			}
-		});
-	}
-
 	@Override
 	public void dispose() {
 
@@ -307,38 +259,9 @@ public class PicDirView extends ViewPart {
 		super.dispose();
 	}
 
-	private void onSelectThumbnailSize() {
-
-		final int selectedSizeIndex = _scaleThumbnailSize.getSelection();
-
-		if (selectedSizeIndex == _prevSelectedThumbnailIndex) {
-			// optimize selection
-			return;
-		}
-
-		_prevSelectedThumbnailIndex = selectedSizeIndex;
-
-		PhotoManager.stopImageLoading();
-
-		/**
-		 * must be muliplied with 10 that enough increment labels are displayed
-		 */
-		final int thumbnailSize = _scaleThumbnailSize.getSelection();
-
-		_picDirImages.setThumbnailSize(thumbnailSize);
-
-		_scaleThumbnailSize.setToolTipText(NLS.bind("Thumbnail size: {0}", Integer.toString(thumbnailSize)));
-	}
-
 	private void restoreState() {
 
 		_containerMasterDetail.setViewerWidth(Util.getStateInt(_state, STATE_TREE_WIDTH, 200));
-
-		/*
-		 * thumbnail size
-		 */
-		final int stateSize = Util.getStateInt(_state, STATE_THUMB_IMAGE_SIZE, PhotoManager.THUMBNAIL_DEFAULT_SIZE);
-		_scaleThumbnailSize.setSelection(stateSize);
 
 		/*
 		 * image restore must be done be for folder restore because folder restore is also loading
@@ -346,11 +269,6 @@ public class PicDirView extends ViewPart {
 		 */
 		_picDirImages.restoreState(_state);
 		_picDirFolder.restoreState(_state);
-
-		updateColors();
-
-		// restore thumbnail size
-		onSelectThumbnailSize();
 	}
 
 	private void saveState() {
@@ -366,9 +284,6 @@ public class PicDirView extends ViewPart {
 			_state.put(STATE_TREE_WIDTH, tree.getSize().x);
 		}
 
-		// thumbnail size
-		_state.put(STATE_THUMB_IMAGE_SIZE, _scaleThumbnailSize.getSelection());
-
 		_picDirFolder.saveState(_state);
 		_picDirImages.saveState(_state);
 	}
@@ -376,16 +291,6 @@ public class PicDirView extends ViewPart {
 	@Override
 	public void setFocus() {
 		_picDirFolder.getTree().setFocus();
-	}
-
-	private void updateColors() {
-
-		final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
-		final Color fgColor = colorRegistry.get(ITourbookPreferences.PHOTO_VIEWER_COLOR_FOREGROUND);
-		final Color bgColor = colorRegistry.get(ITourbookPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
-
-		_scaleThumbnailSize.setForeground(fgColor);
-		_scaleThumbnailSize.setBackground(bgColor);
 	}
 
 }

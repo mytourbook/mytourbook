@@ -49,6 +49,7 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
@@ -62,6 +63,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.part.PageBook;
 
@@ -80,6 +82,7 @@ public class PicDirImages {
 	private static final int						MAX_HISTORY_ENTRIES		= 200;
 
 	private static final String						STATE_FOLDER_HISTORY	= "STATE_FOLDER_HISTORY";		//$NON-NLS-1$
+	private static final String						STATE_THUMB_IMAGE_SIZE	= "STATE_THUMB_IMAGE_SIZE";	//$NON-NLS-1$
 
 	/*
 	 * worker thread management
@@ -152,7 +155,8 @@ public class PicDirImages {
 
 	private PicDirFolder							_picDirFolder;
 
-	private boolean									_isKey;
+	private boolean									_isComboKeyPressed;
+	private int										_prevThumbnailSize		= -1;
 
 	private int										_selectedHistoryIndex;
 	private ArrayList<String>						_folderHistory			= new ArrayList<String>();
@@ -170,6 +174,8 @@ public class PicDirImages {
 
 	private Composite								_containerActionBar;
 	private ToolBar									_toolbar;
+	private Spinner									_spinnerThumbSize;
+	private Combo									_comboPathHistory;
 
 	private GalleryMT								_gallery;
 	private CLabel									_lblStatusInfo;
@@ -177,7 +183,6 @@ public class PicDirImages {
 	private PageBook								_pageBook;
 	private Label									_lblLoading;
 	private Composite								_pageLoading;
-	private Combo									_comboPathHistory;
 	private Composite								_containerStatusLine;
 
 	{
@@ -303,17 +308,6 @@ public class PicDirImages {
 //		}
 	}
 
-// LOG ALL BINDINGS
-//
-//		final IWorkbench workbench = PlatformUI.getWorkbench();
-//		final IBindingService bindingService = (IBindingService) workbench.getAdapter(IBindingService.class);
-//
-//		System.out.println(bindingService.getActiveScheme());
-//
-//		for (final Binding binding : bindingService.getBindings()) {
-//			System.out.println(binding);
-//		}
-
 	PicDirImages(final PicDirView picDirView) {
 		_picDirView = picDirView;
 	}
@@ -334,6 +328,17 @@ public class PicDirImages {
 		_actionNavigateBackward.setEnabled(false);
 		_actionNavigateForward.setEnabled(false);
 	}
+
+// LOG ALL BINDINGS
+//
+//		final IWorkbench workbench = PlatformUI.getWorkbench();
+//		final IBindingService bindingService = (IBindingService) workbench.getAdapter(IBindingService.class);
+//
+//		System.out.println(bindingService.getActiveScheme());
+//
+//		for (final Binding binding : bindingService.getBindings()) {
+//			System.out.println(binding);
+//		}
 
 	void actionNavigateBackward() {
 
@@ -412,12 +417,21 @@ public class PicDirImages {
 		});
 	}
 
+	void actionShowNavigationHistory() {
+
+		_comboPathHistory.setFocus();
+		_comboPathHistory.setListVisible(true);
+	}
+
 	private void createActions() {
 
 		final ToolBarManager tbm = new ToolBarManager(_toolbar);
 
 		_actionNavigateBackward = new ActionNavigateHistoryBackward(this, _picDirView);
 		_actionNavigateForward = new ActionNavigateHistoryForward(this, _picDirView);
+
+		// this action activates the shortcut key <Ctrl><Shift>H but the action is not displayed
+		new ActionNavigateShowHistory(this, _picDirView);
 
 		/*
 		 * fill actionbar
@@ -427,18 +441,7 @@ public class PicDirImages {
 
 		_toolbar.setMenu(createContextMenu(_toolbar));
 
-//		final ApplicationActionBarAdvisor actionbarAdvisor = TourbookPlugin
-//				.getDefault()
-//				.getApplicationActionBarAdvisor();
-//
-//		actionbarAdvisor.registerAction(_actionNavigateBackward);
-//		actionbarAdvisor.registerAction(_actionNavigateForward);
-
 		tbm.update(true);
-
-		// aktivate key bindings which are set with setGlobalActionHandler()
-//		_picDirView.getViewSite().getActionBars().updateActionBars();
-
 	}
 
 	/**
@@ -541,8 +544,9 @@ public class PicDirImages {
 
 		_containerActionBar = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(_containerActionBar);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(_containerActionBar);
+		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(_containerActionBar);
 		{
+
 			/*
 			 * toolbar actions
 			 */
@@ -551,58 +555,95 @@ public class PicDirImages {
 					.align(SWT.BEGINNING, SWT.CENTER)
 					.applyTo(_toolbar);
 
-			/*
-			 * combo: path history
-			 */
-			_comboPathHistory = new Combo(_containerActionBar, SWT.SIMPLE | SWT.DROP_DOWN);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(_comboPathHistory);
-			_comboPathHistory.setVisibleItemCount(30);
-
-			_comboPathHistory.addMouseListener(new MouseListener() {
-
-				@Override
-				public void mouseDoubleClick(final MouseEvent e) {}
-
-				@Override
-				public void mouseDown(final MouseEvent e) {
-
-					// show list
-					_comboPathHistory.setListVisible(true);
-				}
-
-				@Override
-				public void mouseUp(final MouseEvent e) {}
-			});
-
-			/**
-			 * This combination of key and selection listener causes a folder selection only with
-			 * the <Enter> key or with a mouse selection in the drop down box.
-			 */
-			_comboPathHistory.addKeyListener(new KeyAdapter() {
-				@Override
-				public void keyPressed(final KeyEvent e) {
-
-					_isKey = true;
-
-					if (e.keyCode == SWT.CR) {
-						onSelectHistoryFolder(_comboPathHistory.getText());
-					}
-				}
-			});
-
-			_comboPathHistory.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-
-					final boolean isKey = _isKey;
-					_isKey = false;
-
-					if (isKey == false) {
-						onSelectHistoryFolder(_comboPathHistory.getText());
-					}
-				}
-			});
+			createUI_18_ComboHistory(_containerActionBar);
+			createUI_19_ImageSize(_containerActionBar);
 		}
+	}
+
+	/**
+	 * combo: path history
+	 */
+	void createUI_18_ComboHistory(final Composite parent) {
+
+		_comboPathHistory = new Combo(parent, SWT.SIMPLE | SWT.DROP_DOWN);
+		GridDataFactory.fillDefaults()//
+				.grab(true, false)
+				.align(SWT.FILL, SWT.CENTER)
+				.applyTo(_comboPathHistory);
+		_comboPathHistory.setVisibleItemCount(30);
+
+		_comboPathHistory.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseDoubleClick(final MouseEvent e) {}
+
+			@Override
+			public void mouseDown(final MouseEvent e) {
+
+				// show list
+				_comboPathHistory.setListVisible(true);
+			}
+
+			@Override
+			public void mouseUp(final MouseEvent e) {}
+		});
+
+		/**
+		 * This combination of key and selection listener causes a folder selection only with the
+		 * <Enter> key or with a mouse selection in the drop down box.
+		 */
+		_comboPathHistory.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(final KeyEvent e) {
+
+				_isComboKeyPressed = true;
+
+				if (e.keyCode == SWT.CR) {
+					onSelectHistoryFolder(_comboPathHistory.getText());
+				}
+			}
+		});
+
+		_comboPathHistory.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+
+				final boolean isKey = _isComboKeyPressed;
+				_isComboKeyPressed = false;
+
+				if (isKey == false) {
+					onSelectHistoryFolder(_comboPathHistory.getText());
+				}
+			}
+		});
+	}
+
+	/**
+	 * spinner: thumb size
+	 */
+	private void createUI_19_ImageSize(final Composite parent) {
+
+		_spinnerThumbSize = new Spinner(parent, SWT.BORDER);
+		GridDataFactory.fillDefaults() //
+				.align(SWT.BEGINNING, SWT.FILL)
+				.applyTo(_spinnerThumbSize);
+		_spinnerThumbSize.setMinimum(10);
+		_spinnerThumbSize.setMaximum(999);
+		_spinnerThumbSize.setIncrement(10);
+		_spinnerThumbSize.setPageIncrement(50);
+		_spinnerThumbSize.setToolTipText(Messages.Pic_Dir_Spinner_ThumbnailSize_Tooltip);
+		_spinnerThumbSize.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				onSelectThumbnailSize();
+			}
+		});
+		_spinnerThumbSize.addMouseWheelListener(new MouseWheelListener() {
+			public void mouseScrolled(final MouseEvent event) {
+				UI.adjustSpinnerValueOnMouseScroll(event);
+				onSelectThumbnailSize();
+			}
+		});
 	}
 
 	/**
@@ -626,13 +667,13 @@ public class PicDirImages {
 
 		_gallery.addListener(SWT.SetData, new Listener() {
 			public void handleEvent(final Event event) {
-				onSetGalleryItemData(event);
+				onGallery1SetItemData(event);
 			}
 		});
 
 		_gallery.addListener(SWT.PaintItem, new Listener() {
 			public void handleEvent(final Event event) {
-				onPaintItem(event);
+				onGallery2PaintItem(event);
 			}
 		});
 
@@ -712,7 +753,47 @@ public class PicDirImages {
 		workerStop();
 	}
 
-	private void onPaintItem(final Event event) {
+	/**
+	 * This event is called first of all before a gallery item is painted, it sets the photo into
+	 * the gallery item.
+	 * 
+	 * @param event
+	 */
+	private void onGallery1SetItemData(final Event event) {
+
+		final GalleryMTItem galleryItem = (GalleryMTItem) event.item;
+
+		if (galleryItem.getParentItem() == null) {
+
+			/*
+			 * It's a group
+			 */
+
+			galleryItem.setItemCount(_photoFiles.length);
+
+		} else {
+
+			/*
+			 * It's an item
+			 */
+
+			final GalleryMTItem parentItem = galleryItem.getParentItem();
+			final int galleryItemIndex = parentItem.indexOf(galleryItem);
+
+			final Photo photo = new Photo(_photoFiles[galleryItemIndex], galleryItemIndex);
+
+			galleryItem.setData(photo);
+			galleryItem.setText(photo.getFileName());
+		}
+	}
+
+	/**
+	 * This event checks if the image for the photo is available in the image cache, if not it is
+	 * put into a queue to be loaded, the {@link PhotoRenderer} will then pain the image.
+	 * 
+	 * @param event
+	 */
+	private void onGallery2PaintItem(final Event event) {
 
 		final GalleryMTItem galleryItem = (GalleryMTItem) event.item;
 
@@ -788,32 +869,24 @@ public class PicDirImages {
 		});
 	}
 
-	private void onSetGalleryItemData(final Event event) {
+	private void onSelectThumbnailSize() {
 
-		final GalleryMTItem galleryItem = (GalleryMTItem) event.item;
+		final int thumbnailSize = _spinnerThumbSize.getSelection();
 
-		if (galleryItem.getParentItem() == null) {
-
-			/*
-			 * It's a group
-			 */
-
-			galleryItem.setItemCount(_photoFiles.length);
-
-		} else {
-
-			/*
-			 * It's an item
-			 */
-
-			final GalleryMTItem parentItem = galleryItem.getParentItem();
-			final int galleryItemIndex = parentItem.indexOf(galleryItem);
-
-			final Photo photo = new Photo(_photoFiles[galleryItemIndex], galleryItemIndex);
-			galleryItem.setData(photo);
-
-			galleryItem.setText(photo.getFileName());
+		if (thumbnailSize == _prevThumbnailSize) {
+			// optimize selection
+			return;
 		}
+
+		_prevThumbnailSize = thumbnailSize;
+
+		PhotoManager.stopImageLoading();
+
+		/**
+		 * must be muliplied with 10 that enough increment labels are displayed
+		 */
+
+		setThumbnailSize(thumbnailSize);
 	}
 
 	private void removeInvalidFolder(final String invalidFolderPathName) {
@@ -892,11 +965,23 @@ public class PicDirImages {
 				_comboPathHistory.add(history);
 			}
 		}
+
+		/*
+		 * thumbnail size
+		 */
+		final int stateSize = Util.getStateInt(state, STATE_THUMB_IMAGE_SIZE, PhotoManager.THUMBNAIL_DEFAULT_SIZE);
+		_spinnerThumbSize.setSelection(stateSize);
+
+		// restore thumbnail size
+		onSelectThumbnailSize();
 	}
 
 	void saveState(final IDialogSettings state) {
 
 		state.put(STATE_FOLDER_HISTORY, _folderHistory.toArray(new String[_folderHistory.size()]));
+
+		// thumbnail size
+		state.put(STATE_THUMB_IMAGE_SIZE, _spinnerThumbSize.getSelection());
 	}
 
 	void setThumbnailSize(final int imageSize) {
@@ -954,6 +1039,9 @@ public class PicDirImages {
 		_containerActionBar.setBackground(bgColor);
 		_toolbar.setForeground(fgColor);
 		_toolbar.setBackground(bgColor);
+
+		_spinnerThumbSize.setForeground(fgColor);
+		_spinnerThumbSize.setBackground(bgColor);
 
 		_comboPathHistory.setForeground(fgColor);
 		_comboPathHistory.setBackground(bgColor);

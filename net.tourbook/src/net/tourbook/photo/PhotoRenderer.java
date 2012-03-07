@@ -30,6 +30,8 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
 /**
+ * Paint image in the gallery canvas.
+ * <p>
  * Original: org.sharemedia.utils.gallery.ShareMediaIconRenderer2
  */
 public class PhotoRenderer extends DefaultGalleryItemRenderer {

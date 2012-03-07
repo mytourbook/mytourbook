@@ -21,7 +21,7 @@ import org.eclipse.jface.action.Action;
 
 public class ActionNavigateHistoryForward extends Action {
 
-	private static final String	ACTION_ID	= "net.tourbook.command.picdir.history.forward";	//$NON-NLS-1$
+	private static final String	ACTION_ID	= "net.tourbook.command.PicDir.NavigateHistoryForward"; //$NON-NLS-1$
 
 	private PicDirImages		_picDirImages;
 
@@ -30,7 +30,7 @@ public class ActionNavigateHistoryForward extends Action {
 		setToolTipText(Messages.Pic_Dir_Action_NavigateHistoryForward);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(net.tourbook.Messages.Image__Forward_Nav));
 
-		setId(ACTION_ID);
+//		setId(ACTION_ID);
 		setActionDefinitionId(ACTION_ID);
 
 		picDirView.getViewSite().getActionBars().setGlobalActionHandler(ACTION_ID, this);

@@ -21,7 +21,7 @@ import org.eclipse.jface.action.Action;
 
 public class ActionNavigateHistoryBackward extends Action {
 
-	private static final String	ACTION_ID	= "net.tourbook.command.picdir.history.backward";	//$NON-NLS-1$
+	private static final String	ACTION_ID	= "net.tourbook.command.PicDir.NavigateHistoryBackward";	//$NON-NLS-1$
 
 	private PicDirImages		_picDirImages;
 
@@ -30,7 +30,7 @@ public class ActionNavigateHistoryBackward extends Action {
 		setToolTipText(Messages.Pic_Dir_Action_NavigateHistoryBackward);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(net.tourbook.Messages.Image__Backward_Nav));
 
-		setId(ACTION_ID);
+//		setId(ACTION_ID);
 		setActionDefinitionId(ACTION_ID);
 
 		picDirView.getViewSite().getActionBars().setGlobalActionHandler(ACTION_ID, this);

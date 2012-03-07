@@ -88,7 +88,7 @@ class PicDirFolder {
 	private final IPreferenceStore				_prefStore								= TourbookPlugin.getDefault() //
 																								.getPreferenceStore();
 
-	private PicDirView							_picDirView;
+//	private PicDirView							_picDirView;
 	private PicDirImages						_picDirImages;
 
 	private long								_expandRunnableCounter;
@@ -178,7 +178,7 @@ class PicDirFolder {
 	}
 
 	PicDirFolder(final PicDirView picDirView, final PicDirImages picDirImages) {
-		_picDirView = picDirView;
+//		_picDirView = picDirView;
 		_picDirImages = picDirImages;
 	}
 
@@ -190,6 +190,8 @@ class PicDirFolder {
 
 		BusyIndicator.showWhile(_display, new Runnable() {
 			public void run() {
+
+				final boolean isExpanded = _folderViewer.getExpandedState(_selectedTVIFolder);
 
 				_folderViewer.collapseToLevel(_selectedTVIFolder, 1);
 
@@ -211,7 +213,11 @@ class PicDirFolder {
 					_folderViewer.refresh(_selectedTVIFolder);
 
 					// expand selected folder
-					_folderViewer.setExpandedState(_selectedTVIFolder, true);
+					if (isExpanded) {
+						_folderViewer.setExpandedState(_selectedTVIFolder, true);
+					}
+
+					// position tree items to the old position
 					tree.setTopItem(topItem);
 				}
 				tree.setRedraw(true);
@@ -449,11 +455,6 @@ class PicDirFolder {
 		_picDirImages.showImages(selectedFolder, isNavigation);
 	}
 
-	private void enableActions() {
-		// TODO Auto-generated method stub
-
-	}
-
 	private void expandCollapseFolder(final TreeViewerItem treeItem) {
 
 		if (_folderViewer.getExpandedState(treeItem)) {
@@ -477,18 +478,7 @@ class PicDirFolder {
 
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionPreferences);
-
-		enableActions();
 	}
-
-//	private void onSelectFolder(final SelectionEvent selectionEvent) {
-//
-//		final TreeItem treeItem = (TreeItem) selectionEvent.item;
-//
-////		treeItem.
-//
-//		onSelectFolder_10((ITreeSelection) _folderViewer.getSelection());
-//	}
 
 	/**
 	 * Gets filesystem root entries

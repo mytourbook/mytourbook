@@ -166,7 +166,9 @@ public class PhotoImageLoader {
 
 		final IPath storeImageFilePath = ThumbnailStore.getStoreImagePath(photo, requestedImageQuality);
 
-		// check if image is available
+		/*
+		 * check if image is available in the thumbstore
+		 */
 		final File storeImageFile = new File(storeImageFilePath.toOSString());
 		if (storeImageFile.isFile()) {
 
@@ -402,7 +404,7 @@ public class PhotoImageLoader {
 	}
 
 	/**
-	 * This is called from the executor when the task is starting
+	 * This is called from the executor when the loading task is starting
 	 * 
 	 * <pre>
 	 * 
