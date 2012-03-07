@@ -144,15 +144,15 @@ public abstract class AbstractGridGroupRenderer extends AbstractGalleryGroupRend
 			final AbstractGalleryItemRenderer itemRenderer = gallery.getItemRenderer();
 
 			if (itemRenderer != null) {
-				// gc.setClipping(xPixelPos, yPixelPos, itemWidth, itemHeight);
+				gc.setClipping(xPixelPos, yPixelPos, itemWidth, itemHeight);
 				itemRenderer.setSelected(isSelected);
 
-				final Rectangle oldClipping = gc.getClipping();
-				gc.setClipping(oldClipping.intersection(new Rectangle(xPixelPos, yPixelPos, itemWidth, itemHeight)));
-				{
+//				final Rectangle oldClipping = gc.getClipping();
+//				gc.setClipping(oldClipping.intersection(new Rectangle(xPixelPos, yPixelPos, itemWidth, itemHeight)));
+//				{
 					itemRenderer.draw(gc, gItem, index, xPixelPos, yPixelPos, itemWidth, itemHeight);
-				}
-				gc.setClipping(oldClipping);
+//				}
+//				gc.setClipping(oldClipping);
 			}
 		}
 	}
@@ -876,6 +876,7 @@ public abstract class AbstractGridGroupRenderer extends AbstractGalleryGroupRend
 	}
 
 	public void setItemSize(final int width, final int height) {
+
 		this.itemHeight = height;
 		this.itemWidth = width;
 

@@ -51,9 +51,9 @@ public class GalleryMTItem extends Item {
 	 * and height
 	 */
 	// protected Rectangle bounds = new Rectangle(0, 0, 0, 0);
-	protected int						x				= 0;
+	public int							x				= 0;
 
-	protected int						y				= 0;
+	public int							y				= 0;
 
 	/**
 	 * Size of the group, including its title.
@@ -463,6 +463,10 @@ public class GalleryMTItem extends Item {
 		return foreground != null ? foreground : _gallery.getForeground();
 	}
 
+	public GalleryMT getGallery() {
+		return _gallery;
+	}
+
 	/**
 	 * Searches the receiver's list starting at the first item (index 0) until an item is found that
 	 * is equal to the argument, and returns the index of that item. <br/>
@@ -475,7 +479,10 @@ public class GalleryMTItem extends Item {
 	 */
 	public GalleryMTItem getItem(final int index) {
 //		checkWidget();
-		return _gallery._getItem(this, index);
+
+		final int itemCount = items == null ? 0 : items.length;
+
+		return _gallery._getItem(this, index, itemCount);
 	}
 
 	/**
@@ -503,10 +510,6 @@ public class GalleryMTItem extends Item {
 		System.arraycopy(items, 0, itemsLocal, 0, this.items.length);
 
 		return itemsLocal;
-	}
-
-	public GalleryMT getGallery() {
-		return _gallery;
 	}
 
 	public GalleryMTItem getParentItem() {

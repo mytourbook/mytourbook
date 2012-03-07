@@ -385,12 +385,16 @@ public class PhotoImageLoader {
 				continue;
 			}
 
-			if (visibleItem.equals(_galleryItem)) {
-//				System.out.println("is visible\t" + photo.getFileName());
-//				// TODO remove SYSTEM.OUT.PRINTLN
-
+			// .equals() is a performance hog when many items are displayed
+			if (visibleItem.x == _galleryItem.x && visibleItem.y == _galleryItem.y) {
 				return true;
 			}
+//			if (visibleItem.equals(_galleryItem)) {
+////				System.out.println("is visible\t" + photo.getFileName());
+////				// TODO remove SYSTEM.OUT.PRINTLN
+//
+//				return true;
+//			}
 		}
 
 		// item is not visible

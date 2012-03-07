@@ -78,8 +78,10 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 		int imageHeight = 0;
 		int useableHeight = galleryItemHeight;
 		int fontHeight = 0;
-		final boolean isText = galleryItem.getText() != null && isShowLabels();
-
+		boolean isText = galleryItem.getText() != null && isShowLabels();
+		if (galleryItemHeight <= 50) {
+			isText = false;
+		}
 		if (isText) {
 			fontHeight = gc.getFontMetrics().getHeight();
 			useableHeight -= fontHeight + 2;
@@ -87,7 +89,7 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 
 		if (selected) {
 			// draw selection
-			gc.setForeground(getSelectionBackgroundColor());
+			gc.setForeground(getSelectionForegroundColor());
 			gc.setBackground(getSelectionBackgroundColor());
 		} else {
 			gc.setForeground(getForegroundColor());
@@ -165,7 +167,8 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 		}
 
 		// Draw label
-		if (galleryItem.getText() != null && isShowLabels()) {
+		if (isText) {
+
 			// Set colors
 			if (selected) {
 				// Selected : use selection colors.
@@ -206,6 +209,8 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 			gc.drawText(text, devXGallery + textxShift, devYGallery + galleryItemHeight - fontHeight, true);
 		}
 
+//		gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+//		gc.drawRectangle(devXGallery, devYGallery, galleryItemWidth - 2, galleryItemHeight - 2);
 	}
 
 	private void drawText(	final GC gc,

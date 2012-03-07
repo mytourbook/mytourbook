@@ -217,6 +217,11 @@ public class GalleryMT extends Canvas {
 
 	private boolean					_isPanGallery;
 
+	/**
+	 * Is <code>true</code> when paint event should be interrupted
+	 */
+	private boolean					_isInterruptPaintEvent;
+
 	protected class RedrawTimer implements Runnable {
 		public void run() {
 			redraw();
@@ -288,6 +293,8 @@ public class GalleryMT extends Canvas {
 
 			public void keyPressed(final KeyEvent e) {
 
+				_isInterruptPaintEvent = true;
+
 				switch (e.keyCode) {
 				case SWT.ARROW_LEFT:
 				case SWT.ARROW_RIGHT:
@@ -337,14 +344,17 @@ public class GalleryMT extends Canvas {
 		addMouseListener(new MouseListener() {
 
 			public void mouseDoubleClick(final MouseEvent e) {
+				_isInterruptPaintEvent = true;
 				onMouseDoubleClick(e);
 			}
 
 			public void mouseDown(final MouseEvent e) {
+				_isInterruptPaintEvent = true;
 				onMouseDown(e);
 			}
 
 			public void mouseUp(final MouseEvent e) {
+				_isInterruptPaintEvent = true;
 				onMouseUp(e);
 			}
 
@@ -354,6 +364,7 @@ public class GalleryMT extends Canvas {
 
 			@Override
 			public void mouseMove(final MouseEvent e) {
+				_isInterruptPaintEvent = true;
 				onMouseMove(e);
 			}
 		});
@@ -366,6 +377,7 @@ public class GalleryMT extends Canvas {
 		addPaintListener(new PaintListener() {
 			public void paintControl(final PaintEvent event) {
 				onPaint(event.gc);
+				_isInterruptPaintEvent = false;
 			}
 		});
 	}
@@ -377,6 +389,8 @@ public class GalleryMT extends Canvas {
 		addControlListener(new ControlAdapter() {
 			@Override
 			public void controlResized(final ControlEvent event) {
+
+				_isInterruptPaintEvent = true;
 
 				_clientArea = getClientArea();
 
@@ -400,6 +414,7 @@ public class GalleryMT extends Canvas {
 				@Override
 				public void widgetSelected(final SelectionEvent event) {
 					if (_isVertical) {
+						_isInterruptPaintEvent = true;
 						scrollVertical();
 					}
 				}
@@ -415,6 +430,7 @@ public class GalleryMT extends Canvas {
 				@Override
 				public void widgetSelected(final SelectionEvent event) {
 					if (!_isVertical) {
+						_isInterruptPaintEvent = true;
 						scrollHorizontal();
 					}
 				}
@@ -722,20 +738,47 @@ public class GalleryMT extends Canvas {
 	/**
 	 * This method is used by items to implement getItem( index )
 	 * 
-	 * @param parent
-	 * @param index
+	 * @param parentItem
+	 * @param itemIndex
+	 * @param parentItemCount
 	 * @return
 	 */
-	protected GalleryMTItem _getItem(final GalleryMTItem parent, final int index) {
+	protected GalleryMTItem _getItem(final GalleryMTItem parentItem, final int itemIndex, final int parentItemCount) {
 
-		if (index < parent.getItemCount()) {
+		if (itemIndex < parentItemCount) {
+
 			// Refresh item if it is not set yet
-			updateItem(parent, index, true);
 
-			if (parent.items == null) {
+			/*
+			 * this is an optimization for updateItem()
+			 */
+			if (_isVirtual) {
+
+				GalleryMTItem galleryItem;
+
+				if (parentItem == null) {
+
+					// Parent is the Gallery widget
+					updateItem(parentItem, itemIndex, true);
+
+				} else {
+
+					// Parent is another GalleryItem
+
+					galleryItem = parentItem.items[itemIndex];
+					if (galleryItem == null) {
+
+						galleryItem = new GalleryMTItem(parentItem, SWT.NONE, itemIndex, false);
+						parentItem.items[itemIndex] = galleryItem;
+						setData(galleryItem, itemIndex);
+					}
+				}
+			}
+
+			if (parentItem.items == null) {
 				return null;
 			} else {
-				return parent.items[index];
+				return parentItem.items[itemIndex];
 			}
 		}
 
@@ -766,8 +809,12 @@ public class GalleryMT extends Canvas {
 	 */
 	protected GalleryMTItem _getItem(final int index, final boolean create) {
 
-		if (index < getItemCount()) {
+		final int galleryItemsCount = _galleryItems == null ? 0 : _galleryItems.length;
+
+		if (index < galleryItemsCount) {
+
 			updateItem(null, index, create);
+
 			return _galleryItems[index];
 		}
 
@@ -1525,6 +1572,10 @@ public class GalleryMT extends Canvas {
 		return _isLowQualityOnUserAction;
 	}
 
+	public boolean isPaintingInterrupted() {
+		return _isInterruptPaintEvent;
+	}
+
 	protected boolean isSelected(final GalleryMTItem item) {
 
 		if (item == null) {
@@ -1661,6 +1712,19 @@ public class GalleryMT extends Canvas {
 		mouseClickHandled = true;
 	}
 
+	// TODO: Not used ATM
+	// private void clear() {
+	// checkWidget();
+	// if (virtual) {
+	// setItemCount(0);
+	// } else {
+	// items = null;
+	// }
+	//
+	// updateStructuralValues(true);
+	// updateScrollBarsProperties();
+	// }
+
 	void onMouseDown(final MouseEvent e) {
 
 		mouseClickHandled = false;
@@ -1699,19 +1763,6 @@ public class GalleryMT extends Canvas {
 			onMouseHandleRight(e, item, true, false);
 		}
 	}
-
-	// TODO: Not used ATM
-	// private void clear() {
-	// checkWidget();
-	// if (virtual) {
-	// setItemCount(0);
-	// } else {
-	// items = null;
-	// }
-	//
-	// updateStructuralValues(true);
-	// updateScrollBarsProperties();
-	// }
 
 	void onMouseHandleLeft(final MouseEvent e, final GalleryMTItem item, final boolean down, final boolean up) {
 		if (down) {
@@ -2468,10 +2519,13 @@ public class GalleryMT extends Canvas {
 	 * @return
 	 */
 	private void updateItem(final GalleryMTItem parentItem, final int i, final boolean create) {
+
 		if (_isVirtual) {
 
 			GalleryMTItem galleryItem;
+
 			if (parentItem == null) {
+
 				// Parent is the Gallery widget
 				galleryItem = _galleryItems[i];
 
@@ -2489,7 +2543,9 @@ public class GalleryMT extends Canvas {
 					}
 				}
 			} else {
+
 				// Parent is another GalleryItem
+
 				galleryItem = parentItem.items[i];
 				if (galleryItem == null) {
 
