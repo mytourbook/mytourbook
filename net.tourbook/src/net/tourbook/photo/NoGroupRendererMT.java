@@ -20,24 +20,23 @@ import net.tourbook.photo.gallery.NoGroupRenderer;
 
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Display;
 
 public class NoGroupRendererMT extends NoGroupRenderer {
 
-	/**
-	 * Threshold for how often the event loop is spun, in ms.
-	 */
-	private static int	T_THRESH	= 100;
-
-	/**
-	 * Maximum amount of time to spend processing events, in ms.
-	 */
-	private static int	T_MAX		= 50;
-
-	/**
-	 * Last time the event loop was spun.
-	 */
-	private long		lastTime	= System.currentTimeMillis();
+//	/**
+//	 * Threshold for how often the event loop is spun, in ms.
+//	 */
+//	private static int	T_THRESH	= 100;
+//
+//	/**
+//	 * Maximum amount of time to spend processing events, in ms.
+//	 */
+//	private static int	T_MAX		= 50;
+//
+//	/**
+//	 * Last time the event loop was spun.
+//	 */
+//	private long		lastTime	= System.currentTimeMillis();
 
 	@Override
 	public void draw(	final GC gc,
@@ -49,22 +48,14 @@ public class NoGroupRendererMT extends NoGroupRenderer {
 						final int clipWidth,
 						final int clipHeight) {
 
-//		System.out.println("draw\tclipX:"
-//				+ clipX
-//				+ "  clipY:"
-//				+ clipY
-//				+ "  clipWidth:"
-//				+ clipWidth
-//				+ "  clipHeight:"
-//				+ clipHeight);
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
 		// get items in the clipping area
 		final int[] visibleIndexes = getVisibleItems(group, x, y, clipX, clipY, clipWidth, clipHeight, OFFSET);
 
 		if (visibleIndexes != null && visibleIndexes.length > 0) {
 
-			final long start = System.currentTimeMillis();
+//			final long start = System.currentTimeMillis();
+//			final GalleryMT gallery = group.getGallery();
+//			final boolean isLowQuality = gallery.isLowQualityPainting();
 
 			for (int itemIndex = visibleIndexes.length - 1; itemIndex >= 0; itemIndex--) {
 
@@ -75,20 +66,31 @@ public class NoGroupRendererMT extends NoGroupRenderer {
 
 				drawItem(gc, visibleIndexes[itemIndex], isSelected, group, OFFSET);
 
-				// check if a paint interruption occured
-				if (itemIndex % 100 == 0) {
-//					runEventLoop();
-//					if (group.getGallery().isPaintingInterrupted()) {
+// THIS IS NOT WORKING BECAUSE WHEN PAINTING IS INTERRUPTED, THE BACKGROUND IS PAINTED FOR NOT PAINTED ITEMS
+// the background is painted because of SWT.DOUBLE_BUFFER, SWT.NO_BACKGROUND is very slow
 //
-//						System.out.println("time\t"
-//								+ (System.currentTimeMillis() - start)
-//								+ " ms - isPaintingInterrupted\t");
-//						// TODO remove SYSTEM.OUT.PRINTLN
+//				if (isLowQuality == false) {
 //
+//					// currently high quality painting is done
 //
-//						return;
+//					// check if a paint interruption occured
+//					final long now = System.currentTimeMillis();
+//					if (now - start > 50) {
+//
+//						runEventLoop();
+//						if (gallery.isPaintingInterrupted()) {
+//
+//							System.out.println(now
+//									+ "  time\t"
+//									+ (now - start)
+//									+ " ms - isPaintingInterrupted\tpainted:"
+//									+ (visibleIndexes.length - 1 - itemIndex));
+//							// TODO remove SYSTEM.OUT.PRINTLN
+//
+//							return;
+//						}
 //					}
-				}
+//				}
 			}
 
 			setAllVisibleItems(group, x, y);
@@ -96,44 +98,45 @@ public class NoGroupRendererMT extends NoGroupRenderer {
 
 	}
 
-	/**
-	 * Runs an event loop.
-	 */
-	private void runEventLoop() {
-		// Only run the event loop so often, as it is expensive on some platforms
-		// (namely Motif).
-		final long t = System.currentTimeMillis();
-		if (t - lastTime < T_THRESH) {
-			return;
-		}
-		lastTime = t;
-		// Run the event loop.
-		final Display disp = Display.getDefault();
-		if (disp == null) {
-			return;
-		}
+//	/**
+//	 * Runs an event loop.
+//	 */
+//	private void runEventLoop() {
+//		// Only run the event loop so often, as it is expensive on some platforms
+//		// (namely Motif).
+//		final long t = System.currentTimeMillis();
+//		if (t - lastTime < T_THRESH) {
+//			return;
+//		}
+//		lastTime = t;
+//		// Run the event loop.
+//		final Display disp = Display.getDefault();
+//		if (disp == null) {
+//			return;
+//		}
+//
+//		//Initialize an exception handler from the window class.
+////		final ExceptionHandler handler = ExceptionHandler.getInstance();
+//
+//		for (;;) {
+//			try {
+//				if (!disp.readAndDispatch()) {
+//					break;
+//				}
+//			} catch (final Throwable e) {//Handle the exception the same way as the workbench
+////				handler.handleException(e);
+//				break;
+//			}
+//
+//			// Only run the event loop for so long.
+//			// Otherwise, this would never return if some other thread was
+//			// constantly generating events.
+//			if (System.currentTimeMillis() - t > T_MAX) {
+//				break;
+//			}
+//		}
+//	}
 
-		//Initialize an exception handler from the window class.
-//		final ExceptionHandler handler = ExceptionHandler.getInstance();
-
-		for (;;) {
-			try {
-				if (!disp.readAndDispatch()) {
-					break;
-				}
-			} catch (final Throwable e) {//Handle the exception the same way as the workbench
-//				handler.handleException(e);
-				break;
-			}
-
-			// Only run the event loop for so long.
-			// Otherwise, this would never return if some other thread was
-			// constantly generating events.
-			if (System.currentTimeMillis() - t > T_MAX) {
-				break;
-			}
-		}
-	}
 	public void setAllVisibleItems(final GalleryMTItem groupItem, final int x, final int y) {
 
 		final Rectangle clientArea = groupItem.getGallery().getClientAreaCached();

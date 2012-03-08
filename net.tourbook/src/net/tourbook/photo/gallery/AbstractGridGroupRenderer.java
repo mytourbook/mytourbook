@@ -144,7 +144,9 @@ public abstract class AbstractGridGroupRenderer extends AbstractGalleryGroupRend
 			final AbstractGalleryItemRenderer itemRenderer = gallery.getItemRenderer();
 
 			if (itemRenderer != null) {
+
 				gc.setClipping(xPixelPos, yPixelPos, itemWidth, itemHeight);
+
 				itemRenderer.setSelected(isSelected);
 
 //				final Rectangle oldClipping = gc.getClipping();

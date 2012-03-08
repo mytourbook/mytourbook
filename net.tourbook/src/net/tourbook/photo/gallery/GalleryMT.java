@@ -38,6 +38,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.ScrollBar;
@@ -218,7 +219,9 @@ public class GalleryMT extends Canvas {
 	private boolean					_isPanGallery;
 
 	/**
-	 * Is <code>true</code> when paint event should be interrupted
+	 * Is <code>true</code> when the paint event should be interrupted. This will only be set when
+	 * in the paint event the eventloop is run {@link Display#readAndDispatch()} from the painting
+	 * method.
 	 */
 	private boolean					_isInterruptPaintEvent;
 
@@ -243,6 +246,9 @@ public class GalleryMT extends Canvas {
 	public GalleryMT(final Composite parent, final int style) {
 
 		super(parent, style | SWT.DOUBLE_BUFFERED);
+//		super(parent, style | SWT.DOUBLE_BUFFERED | SWT.NO_BACKGROUND);
+//		super(parent, style | SWT.NO_BACKGROUND);
+//		super(parent, style);
 
 		_isVirtual = (style & SWT.VIRTUAL) > 0;
 		_isVertical = (style & SWT.V_SCROLL) > 0;
@@ -696,9 +702,10 @@ public class GalleryMT extends Canvas {
 
 		clipping.intersect(new Rectangle(x, y, item.width, item.height));
 		gc.setClipping(clipping);
-		// Draw group
-		groupRenderer.draw(gc, item, x, y, clipping.x, clipping.y, clipping.width, clipping.height);
-
+		{
+			// Draw group
+			groupRenderer.draw(gc, item, x, y, clipping.x, clipping.y, clipping.width, clipping.height);
+		}
 		gc.setClipping(previousClipping);
 	}
 
@@ -1572,6 +1579,19 @@ public class GalleryMT extends Canvas {
 		return _isLowQualityOnUserAction;
 	}
 
+	/**
+	 * @return Returns <code>true</code> when painting is currently done in low quality.
+	 */
+	public boolean isLowQualityPainting() {
+
+		// check if the content is scrolled or window is resized
+		final boolean isScrolledOrResized = _galleryPosition != _prevTranslation
+				|| (_prevViewportWidth != _clientArea.width || _prevViewportHeight != _clientArea.height)
+				|| (_prevContentHeight != _contentVirtualHeight || _prevContentWidth != _contentVirtualWidth);
+
+		return _isLowQualityOnUserAction && isScrolledOrResized;
+	}
+
 	public boolean isPaintingInterrupted() {
 		return _isInterruptPaintEvent;
 	}
@@ -1703,15 +1723,6 @@ public class GalleryMT extends Canvas {
 
 	}
 
-	void onMouseDoubleClick(final MouseEvent e) {
-
-		final GalleryMTItem item = getItem(new Point(e.x, e.y));
-		if (item != null) {
-			notifySelectionListeners(item, 0, true);
-		}
-		mouseClickHandled = true;
-	}
-
 	// TODO: Not used ATM
 	// private void clear() {
 	// checkWidget();
@@ -1724,6 +1735,15 @@ public class GalleryMT extends Canvas {
 	// updateStructuralValues(true);
 	// updateScrollBarsProperties();
 	// }
+
+	void onMouseDoubleClick(final MouseEvent e) {
+
+		final GalleryMTItem item = getItem(new Point(e.x, e.y));
+		if (item != null) {
+			notifySelectionListeners(item, 0, true);
+		}
+		mouseClickHandled = true;
+	}
 
 	void onMouseDown(final MouseEvent e) {
 
@@ -1902,23 +1922,15 @@ public class GalleryMT extends Canvas {
 
 	void onPaint(final GC gc) {
 
-		final long start = System.nanoTime();
+//		final long start = System.nanoTime();
 
 		final Rectangle clipping = gc.getClipping();
 
-		final int viewportWidth = _clientArea.width;
-		final int viewportHeight = _clientArea.height;
-
-		// check if the content is scrolled or window is resized
-		final boolean isScrolledOrResized = _galleryPosition != _prevTranslation
-				|| (_prevViewportWidth != viewportWidth || _prevViewportHeight != viewportHeight)
-				|| (_prevContentHeight != _contentVirtualHeight || _prevContentWidth != _contentVirtualWidth);
-
-		final boolean lowQualityPaint = _isLowQualityOnUserAction && isScrolledOrResized;
+		final boolean isLowQualityPainting = isLowQualityPainting();
 
 		try {
 
-			if (lowQualityPaint) {
+			if (isLowQualityPainting) {
 				gc.setAntialias(SWT.OFF);
 				gc.setInterpolation(SWT.OFF);
 			} else {
@@ -1927,7 +1939,7 @@ public class GalleryMT extends Canvas {
 			}
 
 			gc.setBackground(getBackground());
-			drawBackground(gc, clipping.x, clipping.y, clipping.width, clipping.height);
+//			drawBackground(gc, clipping.x, clipping.y, clipping.width, clipping.height);
 
 			final int[] indexes = getVisibleItems(clipping);
 
@@ -1965,13 +1977,13 @@ public class GalleryMT extends Canvas {
 
 			_prevTranslation = _galleryPosition;
 
-			_prevViewportWidth = viewportWidth;
-			_prevViewportHeight = viewportHeight;
+			_prevViewportWidth = _clientArea.width;
+			_prevViewportHeight = _clientArea.height;
 
 			_prevContentHeight = _contentVirtualHeight;
 			_prevContentWidth = _contentVirtualWidth;
 
-			if (lowQualityPaint) {
+			if (isLowQualityPainting) {
 				// Calling timerExec with the same object just delays the
 				// execution (doesn't run twice)
 				getDisplay().timerExec(higherQualityDelay, redrawTimer);
@@ -2105,7 +2117,7 @@ public class GalleryMT extends Canvas {
 
 	protected void scrollVertical() {
 
-		final long start = System.nanoTime();
+//		final long start = System.nanoTime();
 
 		final int areaHeight = _clientArea.height;
 

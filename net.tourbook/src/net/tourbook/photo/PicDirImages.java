@@ -789,7 +789,7 @@ public class PicDirImages {
 
 	/**
 	 * This event checks if the image for the photo is available in the image cache, if not it is
-	 * put into a queue to be loaded, the {@link PhotoRenderer} will then pain the image.
+	 * put into a queue to be loaded, the {@link PhotoRenderer} will then paint the image.
 	 * 
 	 * @param event
 	 */
