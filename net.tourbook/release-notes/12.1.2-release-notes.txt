@@ -1,0 +1,10 @@
+Version: 12.1.2                                         7. March 2012 
+
+
+Release Notes
+=============
+
+
+There are no new features implemented compared with version 12.1.1 Patch #1.
+
+This version was created to do an easier installation of version 12.1.0 and all bug fixes and patches.
