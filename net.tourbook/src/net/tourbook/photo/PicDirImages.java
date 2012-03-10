@@ -81,6 +81,9 @@ public class PicDirImages {
 
 	private static final int						MAX_HISTORY_ENTRIES		= 200;
 
+	private static final int						MIN_ITEM_HEIGHT			= 10;
+	private static final int						MAX_ITEM_HEIGHT			= 999;
+
 	private static final String						STATE_FOLDER_HISTORY	= "STATE_FOLDER_HISTORY";		//$NON-NLS-1$
 	private static final String						STATE_THUMB_IMAGE_SIZE	= "STATE_THUMB_IMAGE_SIZE";	//$NON-NLS-1$
 
@@ -627,8 +630,8 @@ public class PicDirImages {
 		GridDataFactory.fillDefaults() //
 				.align(SWT.BEGINNING, SWT.FILL)
 				.applyTo(_spinnerThumbSize);
-		_spinnerThumbSize.setMinimum(10);
-		_spinnerThumbSize.setMaximum(999);
+		_spinnerThumbSize.setMinimum(MIN_ITEM_HEIGHT);
+		_spinnerThumbSize.setMaximum(MAX_ITEM_HEIGHT);
 		_spinnerThumbSize.setIncrement(10);
 		_spinnerThumbSize.setPageIncrement(50);
 		_spinnerThumbSize.setToolTipText(Messages.Pic_Dir_Spinner_ThumbnailSize_Tooltip);
@@ -689,6 +692,7 @@ public class PicDirImages {
 
 		_groupRenderer = new NoGroupRendererMT();
 		_groupRenderer.setItemSize((int) (_photoSize * (float) 15 / 11), _photoSize);
+		_groupRenderer.setItemHeightMinMax(MIN_ITEM_HEIGHT, MAX_ITEM_HEIGHT);
 		_groupRenderer.setAutoMargin(true);
 		_groupRenderer.setMinMargin(0);
 

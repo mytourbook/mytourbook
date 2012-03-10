@@ -42,8 +42,11 @@ public abstract class AbstractGridGroupRenderer extends AbstractGalleryGroupRend
 	protected boolean				autoMargin;
 
 	protected int					itemWidth		= DEFAULT_SIZE;
-
 	protected int					itemHeight		= DEFAULT_SIZE;
+	private double					_itemRatio;
+
+	private int						_minItemHeight	= -1;
+	private int						_maxItemHeight	= -1;
 
 	public static final String		H_COUNT			= "g.h";		//$NON-NLS-1$
 
@@ -152,7 +155,7 @@ public abstract class AbstractGridGroupRenderer extends AbstractGalleryGroupRend
 //				final Rectangle oldClipping = gc.getClipping();
 //				gc.setClipping(oldClipping.intersection(new Rectangle(xPixelPos, yPixelPos, itemWidth, itemHeight)));
 //				{
-					itemRenderer.draw(gc, gItem, index, xPixelPos, yPixelPos, itemWidth, itemHeight);
+				itemRenderer.draw(gc, gItem, index, xPixelPos, yPixelPos, itemWidth, itemHeight);
 //				}
 //				gc.setClipping(oldClipping);
 			}
@@ -315,6 +318,27 @@ public abstract class AbstractGridGroupRenderer extends AbstractGalleryGroupRend
 
 	public int getItemHeight() {
 		return itemHeight;
+	}
+
+	/**
+	 * @return Returns maximum gallery item height or <code>-1</code> when max height is not set.
+	 */
+	public int getItemMaxHeight() {
+		return _maxItemHeight;
+	}
+
+	/**
+	 * @return Returns minimum gallery item height or <code>-1</code> when min height is not set.
+	 */
+	public int getItemMinHeight() {
+		return _minItemHeight;
+	}
+
+	/**
+	 * @return Returns ratio between item height and item width.
+	 */
+	public double getItemRatio() {
+		return _itemRatio;
 	}
 
 	public int getItemWidth() {
@@ -877,10 +901,17 @@ public abstract class AbstractGridGroupRenderer extends AbstractGalleryGroupRend
 		updateGallery();
 	}
 
+	public void setItemHeightMinMax(final int minItemHeight, final int maxItemHeight) {
+		_minItemHeight = minItemHeight;
+		_maxItemHeight = maxItemHeight;
+	}
+
 	public void setItemSize(final int width, final int height) {
 
 		this.itemHeight = height;
 		this.itemWidth = width;
+
+		_itemRatio = (double) itemWidth / itemHeight;
 
 		updateGallery();
 	}

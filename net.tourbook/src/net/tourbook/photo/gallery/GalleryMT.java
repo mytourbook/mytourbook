@@ -107,6 +107,8 @@ import org.eclipse.swt.widgets.TypedListener;
 
 public class GalleryMT extends Canvas {
 
+//	private static final int		ZOOM_INCREMENT						= 10;
+
 	GalleryMTItem[]					_galleryItems						= null;
 
 	private GalleryMTItem[]			_selectedItems						= null;
@@ -214,9 +216,11 @@ public class GalleryMT extends Canvas {
 
 	private Rectangle				_clientArea;
 
+	private Point					_mouseMovePosition;
 	private Point					_mousePanStartPosition;
+	private int						_lastZoomEventTime;
 
-	private boolean					_isPanGallery;
+	private boolean					_isGalleryPanned;
 
 	/**
 	 * Is <code>true</code> when the paint event should be interrupted. This will only be set when
@@ -224,6 +228,13 @@ public class GalleryMT extends Canvas {
 	 * method.
 	 */
 	private boolean					_isInterruptPaintEvent;
+
+//	/**
+//	 * Mouse wheel listener must be set as a display filter, when set on the canvas it will not be
+//	 * fired only the scrollbar select listener is fired but the mouse wheel direction should be
+//	 * discovered for image zooming which will also disable the scrollbar event.
+//	 */
+//	private Listener				_mouseWheelListener;
 
 	protected class RedrawTimer implements Runnable {
 		public void run() {
@@ -412,16 +423,28 @@ public class GalleryMT extends Canvas {
 	 * Add internal scrollbars listeners to this gallery.
 	 */
 	private void _addScrollBarsListeners() {
+
 		// Vertical bar
 		final ScrollBar verticalBar = getVerticalBar();
 		if (verticalBar != null) {
+
 			verticalBar.addSelectionListener(new SelectionAdapter() {
 
 				@Override
 				public void widgetSelected(final SelectionEvent event) {
-					if (_isVertical) {
-						_isInterruptPaintEvent = true;
-						scrollVertical();
+
+					if (event.stateMask == SWT.CTRL) {
+
+						// zoom image in/out
+
+						zoomImage(event);
+
+					} else {
+
+						if (_isVertical) {
+							_isInterruptPaintEvent = true;
+							scrollVertical();
+						}
 					}
 				}
 			});
@@ -1723,19 +1746,6 @@ public class GalleryMT extends Canvas {
 
 	}
 
-	// TODO: Not used ATM
-	// private void clear() {
-	// checkWidget();
-	// if (virtual) {
-	// setItemCount(0);
-	// } else {
-	// items = null;
-	// }
-	//
-	// updateStructuralValues(true);
-	// updateScrollBarsProperties();
-	// }
-
 	void onMouseDoubleClick(final MouseEvent e) {
 
 		final GalleryMTItem item = getItem(new Point(e.x, e.y));
@@ -1776,13 +1786,26 @@ public class GalleryMT extends Canvas {
 			}
 
 			// keep position to pan the gallery
-			_isPanGallery = true;
+			_isGalleryPanned = true;
 			_mousePanStartPosition = new Point(e.x, e.y);
 
 		} else if (e.button == 3) {
 			onMouseHandleRight(e, item, true, false);
 		}
 	}
+
+	// TODO: Not used ATM
+	// private void clear() {
+	// checkWidget();
+	// if (virtual) {
+	// setItemCount(0);
+	// } else {
+	// items = null;
+	// }
+	//
+	// updateStructuralValues(true);
+	// updateScrollBarsProperties();
+	// }
 
 	void onMouseHandleLeft(final MouseEvent e, final GalleryMTItem item, final boolean down, final boolean up) {
 		if (down) {
@@ -1863,48 +1886,51 @@ public class GalleryMT extends Canvas {
 
 	private void onMouseMove(final MouseEvent e) {
 
-		if (_isPanGallery == false) {
-			return;
-		}
-
 		final int mouseX = e.x;
 		final int mouseY = e.y;
+		_mouseMovePosition = new Point(mouseX, mouseY);
 
-		if (_isVertical) {
+		if (_isGalleryPanned) {
 
-			if (_contentVirtualHeight > _clientArea.height) {
+			// gallery is panned
 
-				// image is higher than client area
+			if (_isVertical) {
 
-				final int yDiff = mouseY - _mousePanStartPosition.y;
+				if (_contentVirtualHeight > _clientArea.height) {
 
-				final ScrollBar verticalBar = getVerticalBar();
+					// image is higher than client area
 
-				final int oldBarSelection = verticalBar.getSelection();
-				final int newBarSelection = oldBarSelection - yDiff;
+					final int yDiff = mouseY - _mousePanStartPosition.y;
 
-				verticalBar.setSelection(newBarSelection);
+					final ScrollBar verticalBar = getVerticalBar();
 
-				scrollVertical();
+					final int oldBarSelection = verticalBar.getSelection();
+					final int newBarSelection = oldBarSelection - yDiff;
+
+					verticalBar.setSelection(newBarSelection);
+
+					scrollVertical();
+				}
+			} else {
+
+				// not yet implemented
 			}
-		} else {
 
-			// not yet implemented
+			// set down position to current mouse position
+			_mousePanStartPosition = _mouseMovePosition;
 		}
-
-		// set down position to current mouse position
-		_mousePanStartPosition = new Point(mouseX, mouseY);
 	}
 
 	void onMouseUp(final MouseEvent e) {
 
-		_isPanGallery = false;
+		_isGalleryPanned = false;
 
 		if (mouseClickHandled) {
 			return;
 		}
 
 		if (e.button == 1) {
+
 			final GalleryMTItem item = getItem(new Point(e.x, e.y));
 			if (item == null) {
 				return;
@@ -2725,5 +2751,81 @@ public class GalleryMT extends Canvas {
 			_galleryPosition = 0;
 		}
 
+	}
+
+	private void zoomImage(final SelectionEvent event) {
+
+		if (_mouseMovePosition == null) {
+			return;
+		}
+
+		// check if this the same event which can be send multiple times
+		final int eventTime = event.time;
+		if (_lastZoomEventTime == eventTime) {
+			return;
+		}
+		_lastZoomEventTime = eventTime;
+
+		// get item from mouse position
+		final GalleryMTItem currentItem = getItem(_mouseMovePosition);
+
+		if (currentItem == null) {
+			return;
+		}
+
+		final AbstractGalleryGroupRenderer renderer = getGroupRenderer();
+		if (renderer instanceof AbstractGridGroupRenderer) {
+			final AbstractGridGroupRenderer groupRenderer = (AbstractGridGroupRenderer) renderer;
+
+			final int minHeight = groupRenderer.getItemMinHeight();
+			final int maxHeight = groupRenderer.getItemMaxHeight();
+			if (minHeight == -1 || maxHeight == -1) {
+				// min or max height is not set
+				return;
+			}
+
+			final boolean isUp = event.detail == SWT.ARROW_UP;
+			int itemHeight = groupRenderer.getItemHeight();
+
+			final int ZOOM_INCREMENT = 5;
+			if (isUp) {
+
+				// zoom in
+
+				// check if max zoom is reached
+				if (itemHeight >= maxHeight) {
+					// max is reached
+					return;
+				}
+
+				itemHeight += ZOOM_INCREMENT;
+				if (itemHeight > maxHeight) {
+					itemHeight = maxHeight;
+				}
+
+			} else {
+
+				// zoom out
+
+				if (itemHeight <= minHeight) {
+					// min is reached
+					return;
+				}
+
+				itemHeight -= ZOOM_INCREMENT;
+				if (itemHeight < minHeight) {
+					itemHeight = minHeight;
+				}
+			}
+
+			final int itemWidth = (int) (groupRenderer.getItemRatio() * itemHeight);
+
+			groupRenderer.setItemSize(itemWidth, itemHeight);
+
+			System.out.println(itemWidth + "\t" + itemHeight);
+			// TODO remove SYSTEM.OUT.PRINTLN
+
+//			fireZoomNotification(itemWidth,itemHeight);
+		}
 	}
 }

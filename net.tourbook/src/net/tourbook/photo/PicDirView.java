@@ -171,7 +171,11 @@ public class PicDirView extends ViewPart {
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
 			@Override
-			public void partHidden(final IWorkbenchPartReference partRef) {}
+			public void partHidden(final IWorkbenchPartReference partRef) {
+//				if (partRef.getPart(false) == PicDirView.this) {
+//					_picDirImages.onPartIsHidden();
+//				}
+			}
 
 			@Override
 			public void partInputChanged(final IWorkbenchPartReference partRef) {}
@@ -180,7 +184,11 @@ public class PicDirView extends ViewPart {
 			public void partOpened(final IWorkbenchPartReference partRef) {}
 
 			@Override
-			public void partVisible(final IWorkbenchPartReference partRef) {}
+			public void partVisible(final IWorkbenchPartReference partRef) {
+//				if (partRef.getPart(false) == PicDirView.this) {
+//					_picDirImages.onPartIsVisible();
+//				}
+			}
 		};
 		getViewSite().getPage().addPartListener(_partListener);
 	}
