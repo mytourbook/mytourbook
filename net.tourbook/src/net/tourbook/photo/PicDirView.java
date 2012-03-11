@@ -200,6 +200,7 @@ public class PicDirView extends ViewPart {
 			public void propertyChange(final PropertyChangeEvent event) {
 
 				_picDirFolder.handlePrefStoreModifications(event);
+				_picDirImages.handlePrefStoreModifications(event);
 			}
 		};
 

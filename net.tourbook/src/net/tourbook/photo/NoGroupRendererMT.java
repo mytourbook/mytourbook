@@ -23,121 +23,54 @@ import org.eclipse.swt.graphics.Rectangle;
 
 public class NoGroupRendererMT extends NoGroupRenderer {
 
-//	/**
-//	 * Threshold for how often the event loop is spun, in ms.
-//	 */
-//	private static int	T_THRESH	= 100;
-//
-//	/**
-//	 * Maximum amount of time to spend processing events, in ms.
-//	 */
-//	private static int	T_MAX		= 50;
-//
-//	/**
-//	 * Last time the event loop was spun.
-//	 */
-//	private long		lastTime	= System.currentTimeMillis();
+	@Override
+	public void dispose() {
+		super.dispose();
+	}
 
 	@Override
 	public void draw(	final GC gc,
 						final GalleryMTItem group,
-						final int x,
-						final int y,
-						final int clipX,
-						final int clipY,
-						final int clipWidth,
-						final int clipHeight) {
+						final int galleryPosX,
+						final int galleryPosY,
+						final int clippingX,
+						final int clippingY,
+						final int clippingWidth,
+						final int clippingHeight) {
 
-		// get items in the clipping area
-		final int[] visibleIndexes = getVisibleItems(group, x, y, clipX, clipY, clipWidth, clipHeight, OFFSET);
+		// get visible items in the clipping area
+		final int[] visibleIndexes = getVisibleItems(
+				group,
+				galleryPosX,
+				galleryPosY,
+				clippingX,
+				clippingY,
+				clippingWidth,
+				clippingHeight,
+				OFFSET);
 
 		if (visibleIndexes != null && visibleIndexes.length > 0) {
 
-//			final long start = System.currentTimeMillis();
-//			final GalleryMT gallery = group.getGallery();
-//			final boolean isLowQuality = gallery.isLowQualityPainting();
-
 			for (int itemIndex = visibleIndexes.length - 1; itemIndex >= 0; itemIndex--) {
 
-				// Draw item
 				final GalleryMTItem galleryItem = group.getItem(visibleIndexes[itemIndex]);
-
 				final boolean isSelected = group.isSelected(galleryItem);
 
 				drawItem(gc, visibleIndexes[itemIndex], isSelected, group, OFFSET);
-
-// THIS IS NOT WORKING BECAUSE WHEN PAINTING IS INTERRUPTED, THE BACKGROUND IS PAINTED FOR NOT PAINTED ITEMS
-// the background is painted because of SWT.DOUBLE_BUFFER, SWT.NO_BACKGROUND is very slow
-//
-//				if (isLowQuality == false) {
-//
-//					// currently high quality painting is done
-//
-//					// check if a paint interruption occured
-//					final long now = System.currentTimeMillis();
-//					if (now - start > 50) {
-//
-//						runEventLoop();
-//						if (gallery.isPaintingInterrupted()) {
-//
-//							System.out.println(now
-//									+ "  time\t"
-//									+ (now - start)
-//									+ " ms - isPaintingInterrupted\tpainted:"
-//									+ (visibleIndexes.length - 1 - itemIndex));
-//							// TODO remove SYSTEM.OUT.PRINTLN
-//
-//							return;
-//						}
-//					}
-//				}
 			}
 
-			setAllVisibleItems(group, x, y);
+			setAllVisibleItems(group, galleryPosX, galleryPosY);
 		}
-
 	}
 
-//	/**
-//	 * Runs an event loop.
-//	 */
-//	private void runEventLoop() {
-//		// Only run the event loop so often, as it is expensive on some platforms
-//		// (namely Motif).
-//		final long t = System.currentTimeMillis();
-//		if (t - lastTime < T_THRESH) {
-//			return;
-//		}
-//		lastTime = t;
-//		// Run the event loop.
-//		final Display disp = Display.getDefault();
-//		if (disp == null) {
-//			return;
-//		}
-//
-//		//Initialize an exception handler from the window class.
-////		final ExceptionHandler handler = ExceptionHandler.getInstance();
-//
-//		for (;;) {
-//			try {
-//				if (!disp.readAndDispatch()) {
-//					break;
-//				}
-//			} catch (final Throwable e) {//Handle the exception the same way as the workbench
-////				handler.handleException(e);
-//				break;
-//			}
-//
-//			// Only run the event loop for so long.
-//			// Otherwise, this would never return if some other thread was
-//			// constantly generating events.
-//			if (System.currentTimeMillis() - t > T_MAX) {
-//				break;
-//			}
-//		}
-//	}
-
-	public void setAllVisibleItems(final GalleryMTItem groupItem, final int x, final int y) {
+	/**
+	 * Get visible state for all items, this is used to stop loading images which are not displayed.
+	 * 
+	 * @param groupItem
+	 * @param x
+	 * @param y
+	 */
+	private void setAllVisibleItems(final GalleryMTItem groupItem, final int x, final int y) {
 
 		final Rectangle clientArea = groupItem.getGallery().getClientAreaCached();
 

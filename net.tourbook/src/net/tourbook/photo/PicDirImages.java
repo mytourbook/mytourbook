@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.photo.gallery.AbstractGalleryItemRenderer;
 import net.tourbook.photo.gallery.AbstractGridGroupRenderer;
 import net.tourbook.photo.gallery.GalleryMT;
@@ -30,6 +31,7 @@ import net.tourbook.photo.manager.Photo;
 import net.tourbook.photo.manager.PhotoImageCache;
 import net.tourbook.photo.manager.PhotoLoadingState;
 import net.tourbook.photo.manager.PhotoManager;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.UI;
 import net.tourbook.util.Util;
 
@@ -41,6 +43,8 @@ import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -81,11 +85,14 @@ public class PicDirImages {
 
 	private static final int						MAX_HISTORY_ENTRIES		= 200;
 
-	private static final int						MIN_ITEM_HEIGHT			= 10;
-	private static final int						MAX_ITEM_HEIGHT			= 999;
+	static final int								MIN_ITEM_HEIGHT			= 10;
+	static final int								MAX_ITEM_HEIGHT			= 999;
 
 	private static final String						STATE_FOLDER_HISTORY	= "STATE_FOLDER_HISTORY";		//$NON-NLS-1$
 	private static final String						STATE_THUMB_IMAGE_SIZE	= "STATE_THUMB_IMAGE_SIZE";	//$NON-NLS-1$
+
+	private final IPreferenceStore					_prefStore				= TourbookPlugin.getDefault() //
+																					.getPreferenceStore();
 
 	/*
 	 * worker thread management
@@ -657,7 +664,6 @@ public class PicDirImages {
 		_gallery = new GalleryMT(parent, SWT.V_SCROLL | SWT.VIRTUAL | SWT.MULTI);
 		//		GridDataFactory.fillDefaults().grab(true, true).applyTo(_gallery);
 
-		_gallery.setLowQualityOnUserAction(true);
 		_gallery.setHigherQualityDelay(200);
 //		_gallery.setAntialias(SWT.OFF);
 //		_gallery.setInterpolation(SWT.LOW);
@@ -677,6 +683,12 @@ public class PicDirImages {
 		_gallery.addListener(SWT.PaintItem, new Listener() {
 			public void handleEvent(final Event event) {
 				onGallery2PaintItem(event);
+			}
+		});
+
+		_gallery.addListener(SWT.Modify, new Listener() {
+			public void handleEvent(final Event event) {
+				onZoomInOut(event);
 			}
 		});
 
@@ -755,6 +767,15 @@ public class PicDirImages {
 		//////////////////////////////////////////
 
 		workerStop();
+	}
+
+	void handlePrefStoreModifications(final PropertyChangeEvent event) {
+
+		final String property = event.getProperty();
+
+		if (property.equals(ITourbookPreferences.PHOTO_VIEWER_PREF_STORE_EVENT)) {
+			updateImageQuality();
+		}
 	}
 
 	/**
@@ -893,6 +914,11 @@ public class PicDirImages {
 		setThumbnailSize(thumbnailSize);
 	}
 
+	private void onZoomInOut(final Event event) {
+
+		_spinnerThumbSize.setSelection(event.height);
+	}
+
 	private void removeInvalidFolder(final String invalidFolderPathName) {
 
 		// search invalid folder in history
@@ -959,8 +985,10 @@ public class PicDirImages {
 
 	void restoreState(final IDialogSettings state) {
 
+		/*
+		 * history
+		 */
 		final String[] historyEntries = Util.getStateArray(state, STATE_FOLDER_HISTORY, null);
-
 		if (historyEntries != null) {
 
 			// update history and combo
@@ -969,6 +997,11 @@ public class PicDirImages {
 				_comboPathHistory.add(history);
 			}
 		}
+
+		/*
+		 * image quality
+		 */
+		updateImageQuality();
 
 		/*
 		 * thumbnail size
@@ -1131,6 +1164,16 @@ public class PicDirImages {
 
 		_actionClearNavigationHistory.setEnabled(historySize > 1);
 		_actionRemoveInvalidFoldersFromHistory.setEnabled(historySize > 1);
+	}
+
+	private void updateImageQuality() {
+
+		final boolean isShowHighQuality = _prefStore.getBoolean(//
+				ITourbookPreferences.PHOTO_VIEWER_IS_SHOW_IMAGE_WITH_HIGH_QUALITY);
+		final int hqMinSize = _prefStore.getInt(//
+				ITourbookPreferences.PHOTO_VIEWER_HIGH_QUALITY_IMAGE_MIN_SIZE);
+
+		_gallery.setImageQuality(isShowHighQuality, hqMinSize);
 	}
 
 	/**

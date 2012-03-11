@@ -51,6 +51,8 @@ public class Messages extends NLS {
 	public static String		PrefPage_Photo_Cache_Label_NumberOfImages;
 	public static String		PrefPage_Photo_Cache_Label_ThumbnailCacheSizeInfo;
 	public static String		PrefPage_Photo_ExtViewer_Group_ExternalApplication;
+
+	public static String	PrefPage_Photo_ExtViewer_Group_ImageQuality;
 	public static String		PrefPage_Photo_ExtViewer_Label_ExternalApplication;
 	public static String		PrefPage_Photo_ExtViewer_Label_ExternalApplication_Tooltip;
 	public static String		PrefPage_Photo_ExtViewer_Label_Info;
@@ -72,6 +74,10 @@ public class Messages extends NLS {
 	public static String		PrefPage_Photo_Thumbstore_Spinner_KeepImagesNumberOfDays;
 	public static String		PrefPage_Photo_Thumbstore_Spinner_KeepImagesNumberOfDays_Tooltip;
 
+	public static String	PrefPage_Photo_Viewer_Checkbox_ShowHighQuality;
+
+	public static String	PrefPage_Photo_Viewer_Checkbox_ShowHighQuality_Tooltip;
+
 	public static String		PrefPage_Photo_Viewer_Checkbox_ShowNumbersInFolderView;
 	public static String		PrefPage_Photo_Viewer_Checkbox_ShowNumbersInFolderView_Tooltip;
 	public static String		PrefPage_Photo_Viewer_Group_Colors;
@@ -79,6 +85,10 @@ public class Messages extends NLS {
 	public static String		PrefPage_Photo_Viewer_Label_FileColor;
 	public static String		PrefPage_Photo_Viewer_Label_FolderColor;
 	public static String		PrefPage_Photo_Viewer_Label_ForgroundColor;
+
+	public static String	PrefPage_Photo_Viewer_Label_HQThumbnailSize;
+
+	public static String	PrefPage_Photo_Viewer_Label_HQThumbnailSize_Tooltip;
 
 	public static String		Thumbnail_Store_CleanupTask;
 	public static String		Thumbnail_Store_CleanupTask_AllFiles;

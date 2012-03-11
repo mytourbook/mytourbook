@@ -48,8 +48,14 @@ public abstract class AbstractGridGroupRenderer extends AbstractGalleryGroupRend
 	private int						_minItemHeight	= -1;
 	private int						_maxItemHeight	= -1;
 
+	/**
+	 * Number of images which are displayed in horizontal direction for a vertical gallery
+	 */
 	public static final String		H_COUNT			= "g.h";		//$NON-NLS-1$
 
+	/**
+	 * Number of images which are displayed in vertical direction for a horizontal gallery
+	 */
 	public static final String		V_COUNT			= "g.v";		//$NON-NLS-1$
 
 	protected static final String	EMPTY_STRING	= "";			//$NON-NLS-1$
@@ -122,20 +128,25 @@ public abstract class AbstractGridGroupRenderer extends AbstractGalleryGroupRend
 
 			final GalleryMTItem gItem = (GalleryMTItem) item;
 
+			final int scrollbarPosition = gallery._galleryPosition;
 			int xPixelPos, yPixelPos;
+
 			if (isVertical) {
+
 				xPixelPos = posX * (itemWidth + margin) + margin;
-				yPixelPos = posY * (itemHeight + minMargin) - gallery._galleryPosition
-				/* + minMargin */
-				+ ((parent == null) ? 0 : (parent.y) + offsetY);
+				yPixelPos = (posY * (itemHeight + minMargin) - scrollbarPosition)
+						+ ((parent == null) ? 0 : (parent.y) + offsetY);
+
 				gItem.x = xPixelPos;
-				gItem.y = yPixelPos + gallery._galleryPosition;
+				gItem.y = yPixelPos + scrollbarPosition;
+
 			} else {
-				xPixelPos = posX * (itemWidth + minMargin) - gallery._galleryPosition
-				/* + minMargin */
-				+ ((parent == null) ? 0 : (parent.x) + offsetY);
+
+				xPixelPos = (posX * (itemWidth + minMargin) - scrollbarPosition)
+						+ ((parent == null) ? 0 : (parent.x) + offsetY);
 				yPixelPos = posY * (itemHeight + margin) + margin;
-				gItem.x = xPixelPos + gallery._galleryPosition;
+
+				gItem.x = xPixelPos + scrollbarPosition;
 				gItem.y = yPixelPos;
 			}
 
@@ -572,8 +583,8 @@ public abstract class AbstractGridGroupRenderer extends AbstractGalleryGroupRend
 	}
 
 	protected int[] getVisibleItems(final GalleryMTItem group,
-									final int x,
-									final int y,
+									final int galleryPosX,
+									final int galleryPosY,
 									final int clipX,
 									final int clipY,
 									final int clipWidth,
@@ -581,53 +592,78 @@ public abstract class AbstractGridGroupRenderer extends AbstractGalleryGroupRend
 									final int offset) {
 		int[] indexes;
 
+		final int itemWidthTotal = itemWidth + minMargin;
+		final int itemHeightTotal = itemHeight + minMargin;
+
 		if (gallery.isVertical()) {
-			final int count = ((Integer) group.getData(H_COUNT)).intValue();
+
 			// TODO: Not used ATM
 			// int vCount = ((Integer) group.getData(V_COUNT)).intValue();
 
-			int firstLine = (clipY - y - offset - minMargin) / (itemHeight + minMargin);
+			final int horizontalImages = ((Integer) group.getData(H_COUNT)).intValue();
+
+			int firstLine = (clipY - galleryPosY - offset - minMargin) / itemHeightTotal;
 			if (firstLine < 0) {
 				firstLine = 0;
 			}
 
-			final int firstItem = firstLine * count;
-
-			int lastLine = (clipY - y - offset + clipHeight - minMargin) / (itemHeight + minMargin);
-
+			int lastLine = (clipY - galleryPosY - offset + clipHeight - minMargin) / itemHeightTotal;
 			if (lastLine < firstLine) {
 				lastLine = firstLine;
 			}
 
-			final int lastItem = (lastLine + 1) * count;
+			int firstItem;
+			int lastItem;
+
+			if (clipWidth == itemWidth /* && clipHeight == itemHeight */) {
+
+				// optimize when only 1 item is visible in the clipping area
+
+				final int horizontalItem = (clipX - minMargin) / itemWidthTotal;
+
+				firstItem = firstLine * horizontalImages;
+				firstItem += horizontalItem;
+
+				lastItem = firstItem + 1;
+
+			} else {
+
+				firstItem = firstLine * horizontalImages;
+				lastItem = (lastLine + 1) * horizontalImages;
+			}
 
 			// exit if no item selected
-			if (lastItem - firstItem == 0) {
+			final int itemsCount = lastItem - firstItem;
+			if (itemsCount == 0) {
 				return null;
 			}
 
-			indexes = new int[lastItem - firstItem];
-			for (int i = 0; i < (lastItem - firstItem); i++) {
-				indexes[i] = firstItem + i;
+			indexes = new int[itemsCount];
+			for (int itemIndex = 0; itemIndex < itemsCount; itemIndex++) {
+				indexes[itemIndex] = firstItem + itemIndex;
 			}
 
-		} else {
-			final int count = ((Integer) group.getData(V_COUNT)).intValue();
+//			System.out.println("visible: " + indexes.length);
+//			// TODO remove SYSTEM.OUT.PRINTLN
 
-			int firstLine = (clipX - x - offset - minMargin) / (itemWidth + minMargin);
+		} else {
+
+			final int verticalImages = ((Integer) group.getData(V_COUNT)).intValue();
+
+			int firstLine = (clipX - galleryPosX - offset - minMargin) / itemWidthTotal;
 			if (firstLine < 0) {
 				firstLine = 0;
 			}
 
-			final int firstItem = firstLine * count;
+			final int firstItem = firstLine * verticalImages;
 
-			int lastLine = (clipX - x - offset + clipWidth - minMargin) / (itemWidth + minMargin);
+			int lastLine = (clipX - galleryPosX - offset + clipWidth - minMargin) / itemWidthTotal;
 
 			if (lastLine < firstLine) {
 				lastLine = firstLine;
 			}
 
-			final int lastItem = (lastLine + 1) * count;
+			final int lastItem = (lastLine + 1) * verticalImages;
 
 			// exit if no item selected
 			if (lastItem - firstItem == 0) {

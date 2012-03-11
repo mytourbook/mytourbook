@@ -30,11 +30,16 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseWheelListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
@@ -57,6 +62,11 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 	private ColorFieldEditor		_colorEditorFile;
 	private FileFieldEditor			_editorExternalPhotoViewer;
 
+	private Composite				_containerImageQuality;
+	private BooleanFieldEditor2		_chkEditorIsHighImageQuality;
+	private Label					_lblThumbSize;
+	private Spinner					_spinnerThumbSize;
+
 	@Override
 	protected void createFieldEditors() {
 
@@ -71,7 +81,8 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 			GridLayoutFactory.fillDefaults().applyTo(parent);
 
 			createUI_10_Colors(parent);
-			createUI_20_ExternalPhotoViewer(parent);
+			createUI_20_ImageQuality(parent);
+			createUI_30_ExternalPhotoViewer(parent);
 		}
 	}
 
@@ -151,10 +162,82 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 		}
 	}
 
+	private void createUI_20_ImageQuality(final Composite parent) {
+
+		final Group group = new Group(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.grab(true, false)
+				.applyTo(group);
+		GridLayoutFactory.swtDefaults().applyTo(group);
+		group.setText(Messages.PrefPage_Photo_ExtViewer_Group_ImageQuality);
+		{
+			_containerImageQuality = new Composite(group, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_containerImageQuality);
+//			_containerImageQuality.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+			{
+
+				/*
+				 * checkbox: enable/disable high quality
+				 */
+				_chkEditorIsHighImageQuality = new BooleanFieldEditor2(
+						ITourbookPreferences.PHOTO_VIEWER_IS_SHOW_IMAGE_WITH_HIGH_QUALITY,
+						Messages.PrefPage_Photo_Viewer_Checkbox_ShowHighQuality,
+						_containerImageQuality);
+				addField(_chkEditorIsHighImageQuality);
+
+				final Button editorControl = _chkEditorIsHighImageQuality.getChangeControl(_containerImageQuality);
+				GridDataFactory.fillDefaults()//
+						.span(2, 1)
+						.applyTo(editorControl);
+				editorControl.setToolTipText(//
+						Messages.PrefPage_Photo_Viewer_Checkbox_ShowHighQuality_Tooltip);
+
+				/*
+				 * label: thumbnail size
+				 */
+				_lblThumbSize = new Label(_containerImageQuality, SWT.NONE);
+				GridDataFactory.fillDefaults()//
+						.align(SWT.BEGINNING, SWT.CENTER)
+						.indent(16, 0)
+						.applyTo(_lblThumbSize);
+				_lblThumbSize.setText(Messages.PrefPage_Photo_Viewer_Label_HQThumbnailSize);
+				_lblThumbSize.setToolTipText(Messages.PrefPage_Photo_Viewer_Label_HQThumbnailSize_Tooltip);
+
+				/*
+				 * spinner: thumbnail size
+				 */
+				_spinnerThumbSize = new Spinner(_containerImageQuality, SWT.BORDER);
+				GridDataFactory.fillDefaults() //
+						.align(SWT.BEGINNING, SWT.FILL)
+						.applyTo(_spinnerThumbSize);
+				_spinnerThumbSize.setMinimum(PicDirImages.MIN_ITEM_HEIGHT);
+				_spinnerThumbSize.setMaximum(PicDirImages.MAX_ITEM_HEIGHT);
+				_spinnerThumbSize.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						_isEditorModified = true;
+					}
+				});
+				_spinnerThumbSize.addMouseWheelListener(new MouseWheelListener() {
+					public void mouseScrolled(final MouseEvent event) {
+						UI.adjustSpinnerValueOnMouseScroll(event);
+						_isEditorModified = true;
+					}
+				});
+			}
+
+			// set layout after the fields are created
+			GridLayoutFactory.fillDefaults() //
+					.numColumns(2)
+					.spacing(5, 0)
+					.applyTo(_containerImageQuality);
+		}
+	}
+
 	/**
 	 * field: path to save raw tour data
 	 */
-	private void createUI_20_ExternalPhotoViewer(final Composite parent) {
+	private void createUI_30_ExternalPhotoViewer(final Composite parent) {
 
 		final Group group = new Group(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
@@ -202,14 +285,19 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 
 	private void enableControls() {
 
-		final Button chkIsShowFileFolder = _chkEditorIsShowFileFolder.getChangeControl(_containerFileFolder);
-		final boolean isChecked = chkIsShowFileFolder.getSelection();
+		final boolean isShowFileFolder = _chkEditorIsShowFileFolder.getChangeControl(_containerFileFolder) //
+				.getSelection();
 
-		_colorEditorFile.getColorSelector().setEnabled(isChecked);
-		_colorEditorFile.getLabelControl(_containerFileFolder).setEnabled(isChecked);
+		_colorEditorFile.getColorSelector().setEnabled(isShowFileFolder);
+		_colorEditorFile.getLabelControl(_containerFileFolder).setEnabled(isShowFileFolder);
 
-		_colorEditorFolder.getColorSelector().setEnabled(isChecked);
-		_colorEditorFolder.getLabelControl(_containerFileFolder).setEnabled(isChecked);
+		_colorEditorFolder.getColorSelector().setEnabled(isShowFileFolder);
+		_colorEditorFolder.getLabelControl(_containerFileFolder).setEnabled(isShowFileFolder);
+
+		final boolean isHighQuality = _chkEditorIsHighImageQuality.getChangeControl(_containerImageQuality) //
+				.getSelection();
+		_lblThumbSize.setEnabled(isHighQuality);
+		_spinnerThumbSize.setEnabled(isHighQuality);
 	}
 
 	private void fireModifyEvent() {
@@ -220,10 +308,9 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 
 			UI.setPhotoColorsFromPrefStore();
 
-			// fire one event for all modified colors
+			// fire one event for all modified values
 			getPreferenceStore().setValue(ITourbookPreferences.PHOTO_VIEWER_PREF_STORE_EVENT, Math.random());
 		}
-
 	}
 
 	public void init(final IWorkbench workbench) {
@@ -235,6 +322,8 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 
 		super.initialize();
 
+		restoreState();
+
 		enableControls();
 	}
 
@@ -242,6 +331,8 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 	public boolean okToLeave() {
 
 		if (_isEditorModified) {
+
+			saveState();
 
 			// save the colors in the pref store
 			super.performOk();
@@ -257,6 +348,9 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 
 		_isEditorModified = true;
 
+		_spinnerThumbSize.setSelection(//
+				_prefStore.getDefaultInt(ITourbookPreferences.PHOTO_VIEWER_HIGH_QUALITY_IMAGE_MIN_SIZE));
+
 		super.performDefaults();
 
 		enableControls();
@@ -264,6 +358,8 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 
 	@Override
 	public boolean performOk() {
+
+		saveState();
 
 		final boolean isOK = super.performOk();
 
@@ -279,10 +375,24 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 
 		_isEditorModified = true;
 
-		if (event.getSource() == _chkEditorIsShowFileFolder) {
+		final Object sourceEditor = event.getSource();
+
+		if (sourceEditor == _chkEditorIsShowFileFolder || sourceEditor == _chkEditorIsHighImageQuality) {
 			enableControls();
 		}
 
 		super.propertyChange(event);
+	}
+
+	private void restoreState() {
+
+		_spinnerThumbSize.setSelection(//
+				_prefStore.getInt(ITourbookPreferences.PHOTO_VIEWER_HIGH_QUALITY_IMAGE_MIN_SIZE));
+	}
+
+	private void saveState() {
+
+		_prefStore.setValue(ITourbookPreferences.PHOTO_VIEWER_HIGH_QUALITY_IMAGE_MIN_SIZE, //
+				_spinnerThumbSize.getSelection());
 	}
 }

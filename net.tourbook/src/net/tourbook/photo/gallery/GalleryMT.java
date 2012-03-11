@@ -26,6 +26,7 @@ import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
+import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -38,7 +39,6 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.ScrollBar;
@@ -109,6 +109,9 @@ public class GalleryMT extends Canvas {
 
 //	private static final int		ZOOM_INCREMENT						= 10;
 
+	/**
+	 * Gallery root items
+	 */
 	GalleryMTItem[]					_galleryItems						= null;
 
 	private GalleryMTItem[]			_selectedItems						= null;
@@ -170,14 +173,9 @@ public class GalleryMT extends Canvas {
 	 */
 	protected int					_galleryPosition					= 0;
 
-	/**
-	 * Low quality on user action : decrease drawing quality on scrolling or resize. (faster)
-	 */
-	boolean							_isLowQualityOnUserAction			= false;
-
 	protected int					higherQualityDelay					= 500;
 
-	protected int					_prevTranslation					= 0;
+	protected int					_prevGalleryPosition				= 0;
 	protected int					_prevViewportWidth					= 0;
 	protected int					_prevViewportHeight					= 0;
 	protected int					_prevContentHeight					= 0;
@@ -214,6 +212,9 @@ public class GalleryMT extends Canvas {
 
 	RedrawTimer						redrawTimer							= new RedrawTimer();
 
+	/**
+	 * Cached client area
+	 */
 	private Rectangle				_clientArea;
 
 	private Point					_mouseMovePosition;
@@ -222,19 +223,33 @@ public class GalleryMT extends Canvas {
 
 	private boolean					_isGalleryPanned;
 
-	/**
-	 * Is <code>true</code> when the paint event should be interrupted. This will only be set when
-	 * in the paint event the eventloop is run {@link Display#readAndDispatch()} from the painting
-	 * method.
-	 */
-	private boolean					_isInterruptPaintEvent;
-
 //	/**
-//	 * Mouse wheel listener must be set as a display filter, when set on the canvas it will not be
-//	 * fired only the scrollbar select listener is fired but the mouse wheel direction should be
-//	 * discovered for image zooming which will also disable the scrollbar event.
+//	 * Is <code>true</code> when the paint event should be interrupted. This will <b>only</b> be set
+//	 * when in the paint event the eventloop {@link Display#readAndDispatch()} is run.
 //	 */
-//	private Listener				_mouseWheelListener;
+//	private boolean					_isPaintingInterrupted;
+//
+//	/**
+//	 * Is <code>true</code> when painting is currently done with low image quality
+//	 */
+//	private boolean					_isLowQualityPainting;
+
+	private boolean					_isGalleryMoved;
+
+	private Composite				_shell;
+	private ControlAdapter			_shellControlListener;
+
+	/**
+	 * When <code>true</code> images are painted in higher quality but must be larger than the high
+	 * quality minimum size which is set in {@link #setImageQuality(boolean, int)}.
+	 */
+	private boolean					_isShowHighQuality;
+
+	/**
+	 * When images size (height) is larger than this values, the images are painted with high
+	 * quality in a 2nd run.
+	 */
+	private int						_highQualityMinSize;
 
 	protected class RedrawTimer implements Runnable {
 		public void run() {
@@ -310,8 +325,6 @@ public class GalleryMT extends Canvas {
 
 			public void keyPressed(final KeyEvent e) {
 
-				_isInterruptPaintEvent = true;
-
 				switch (e.keyCode) {
 				case SWT.ARROW_LEFT:
 				case SWT.ARROW_RIGHT:
@@ -358,20 +371,44 @@ public class GalleryMT extends Canvas {
 	 * Add internal mouse listeners to this gallery.
 	 */
 	private void _addMouseListeners() {
+
+		addMouseWheelListener(new MouseWheelListener() {
+
+			@Override
+			public void mouseScrolled(final MouseEvent event) {
+
+				/**
+				 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
+				 * <br>
+				 * This event is fired ONLY when the scrollbars are not visible <br>
+				 * <br>
+				 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+				 */
+
+				final boolean isShift = (event.stateMask & SWT.SHIFT) != 0;
+				final boolean isCtrl = (event.stateMask & SWT.CTRL) != 0;
+
+				/*
+				 * ensure <ctrl> or <shift> is pressed, otherwise it is zoomed when the scrollbar is
+				 * hidden
+				 */
+				if (isCtrl || isShift) {
+					zoomImage(event.time, event.count > 0, isShift, isCtrl);
+				}
+			}
+		});
+
 		addMouseListener(new MouseListener() {
 
 			public void mouseDoubleClick(final MouseEvent e) {
-				_isInterruptPaintEvent = true;
 				onMouseDoubleClick(e);
 			}
 
 			public void mouseDown(final MouseEvent e) {
-				_isInterruptPaintEvent = true;
 				onMouseDown(e);
 			}
 
 			public void mouseUp(final MouseEvent e) {
-				_isInterruptPaintEvent = true;
 				onMouseUp(e);
 			}
 
@@ -381,7 +418,6 @@ public class GalleryMT extends Canvas {
 
 			@Override
 			public void mouseMove(final MouseEvent e) {
-				_isInterruptPaintEvent = true;
 				onMouseMove(e);
 			}
 		});
@@ -394,7 +430,6 @@ public class GalleryMT extends Canvas {
 		addPaintListener(new PaintListener() {
 			public void paintControl(final PaintEvent event) {
 				onPaint(event.gc);
-				_isInterruptPaintEvent = false;
 			}
 		});
 	}
@@ -403,11 +438,11 @@ public class GalleryMT extends Canvas {
 	 * Add internal resize listeners to this gallery.
 	 */
 	private void _addResizeListeners() {
+
 		addControlListener(new ControlAdapter() {
+
 			@Override
 			public void controlResized(final ControlEvent event) {
-
-				_isInterruptPaintEvent = true;
 
 				_clientArea = getClientArea();
 
@@ -417,6 +452,24 @@ public class GalleryMT extends Canvas {
 				redraw();
 			}
 		});
+
+		Composite parent = getParent();
+		while (parent != null) {
+
+			_shell = parent;
+			parent = parent.getParent();
+		}
+
+		_shellControlListener = new ControlAdapter() {
+
+			@Override
+			public void controlMoved(final ControlEvent e) {
+				// makes moving the shell not perfect but better
+				_isGalleryMoved = true;
+			}
+		};
+		_shell.addControlListener(_shellControlListener);
+
 	}
 
 	/**
@@ -433,16 +486,20 @@ public class GalleryMT extends Canvas {
 				@Override
 				public void widgetSelected(final SelectionEvent event) {
 
-					if (event.stateMask == SWT.CTRL) {
+					final boolean isCtrl = (event.stateMask & SWT.CTRL) != 0;
+					final boolean isShift = (event.stateMask & SWT.SHIFT) != 0;
 
-						// zoom image in/out
+					if (isCtrl || isShift) {
 
-						zoomImage(event);
+						// zoom image in/out when <ctrl> is pressed, <shift> will accelerate zooming
+
+						final boolean isUp = event.detail == SWT.ARROW_UP;
+
+						zoomImage(event.time, isUp, isShift, isCtrl);
 
 					} else {
 
 						if (_isVertical) {
-							_isInterruptPaintEvent = true;
 							scrollVertical();
 						}
 					}
@@ -459,7 +516,6 @@ public class GalleryMT extends Canvas {
 				@Override
 				public void widgetSelected(final SelectionEvent event) {
 					if (!_isVertical) {
-						_isInterruptPaintEvent = true;
 						scrollHorizontal();
 					}
 				}
@@ -676,17 +732,18 @@ public class GalleryMT extends Canvas {
 	 * @param index
 	 */
 	private void _drawGroup(final GC gc, final int index) {
-		GalleryMTItem item = null;
+
+		GalleryMTItem groupItem = null;
 
 		if (_isVirtualGroups) {
 			// Ultra virtual : when a group is about to be drawn, initialize it
 			// and update gallery layout according to the new size
-			item = _getItem(index, false);
-			if (item.isUltraLazyDummy()) {
-				final boolean updateLocation = (_isVertical && item.y < _galleryPosition)
-						|| (!_isVertical && item.x < _galleryPosition);
-				final int oldSize = item.height;
-				item = _getItem(index, true);
+			groupItem = _getItem(index, false);
+			if (groupItem.isUltraLazyDummy()) {
+				final boolean updateLocation = (_isVertical && groupItem.y < _galleryPosition)
+						|| (!_isVertical && groupItem.x < _galleryPosition);
+				final int oldSize = groupItem.height;
+				groupItem = _getItem(index, true);
 
 				// Compatibility mode : ensure all previous items are already
 				// initialized
@@ -696,40 +753,55 @@ public class GalleryMT extends Canvas {
 					}
 				}
 
-				updateStructuralValues(item, false);
+				updateStructuralValues(groupItem, false);
 
 				if (updateLocation) {
-					_galleryPosition += (item.height - oldSize);
+					_galleryPosition += (groupItem.height - oldSize);
 				}
 				updateScrollBarsProperties();
 				redraw();
 			}
 		} else {
 			// Default behavior : get the item with no special handling.
-			item = getItem(index);
+			groupItem = getItem(index);
 		}
 
-		if (item == null) {
+		if (groupItem == null) {
 			return;
 		}
 
 		// update item attributes
-		groupRenderer.setExpanded(item.isExpanded());
+		groupRenderer.setExpanded(groupItem.isExpanded());
 
 		// Drawing area
-		final int x = _isVertical ? item.x : item.x - _galleryPosition;
-		final int y = _isVertical ? item.y - _galleryPosition : item.y;
+		final int galleryPosX = _isVertical ? groupItem.x : groupItem.x - _galleryPosition;
+		final int galleryPosY = _isVertical ? groupItem.y - _galleryPosition : groupItem.y;
 
 		final Rectangle clipping = gc.getClipping();
 		final Rectangle previousClipping = new Rectangle(clipping.x, clipping.y, clipping.width, clipping.height);
 
-		clipping.intersect(new Rectangle(x, y, item.width, item.height));
+		clipping.intersect(new Rectangle(galleryPosX, galleryPosY, groupItem.width, groupItem.height));
 		gc.setClipping(clipping);
 		{
 			// Draw group
-			groupRenderer.draw(gc, item, x, y, clipping.x, clipping.y, clipping.width, clipping.height);
+			groupRenderer.draw(
+					gc,
+					groupItem,
+					galleryPosX,
+					galleryPosY,
+					clipping.x,
+					clipping.y,
+					clipping.width,
+					clipping.height);
 		}
 		gc.setClipping(previousClipping);
+
+//		System.out.println("_drawGroup: "
+//				+ clipping
+//				+ "\t"
+//				+ previousClipping
+//				+ (_isLowQualityPainting ? "\tlow" : "\thigh"));
+//		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 	/**
@@ -1078,7 +1150,7 @@ public class GalleryMT extends Canvas {
 	 * @see SelectionEvent
 	 */
 	public void addSelectionListener(final SelectionListener listener) {
-//		checkWidget();
+
 		if (listener == null) {
 			SWT.error(SWT.ERROR_NULL_ARGUMENT);
 		}
@@ -1096,7 +1168,7 @@ public class GalleryMT extends Canvas {
 	 * @param listener
 	 */
 	public void addTreeListener(final TreeListener listener) {
-//		checkWidget();
+
 		if (listener == null) {
 			SWT.error(SWT.ERROR_NULL_ARGUMENT);
 		}
@@ -1119,7 +1191,6 @@ public class GalleryMT extends Canvas {
 	 * @param all
 	 */
 	public void clear(final int index, final boolean all) {
-//		checkWidget();
 
 		// Item is already cleared, return immediately.
 		if (_galleryItems[index] == null) {
@@ -1161,7 +1232,6 @@ public class GalleryMT extends Canvas {
 	 *            If true, all children will be cleared. Only groups are cleared otherwise.
 	 */
 	public void clearAll(final boolean all) {
-//		checkWidget();
 
 		if (_galleryItems == null) {
 			return;
@@ -1272,7 +1342,7 @@ public class GalleryMT extends Canvas {
 	 * Deselects all items.
 	 */
 	public void deselectAll() {
-//		checkWidget();
+
 		_deselectAll(false);
 
 		redraw();
@@ -1286,10 +1356,6 @@ public class GalleryMT extends Canvas {
 		return antialias;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.swt.widgets.Control#getBackground()
-	 */
 	@Override
 	public Color getBackground() {
 		return getBackground(false);
@@ -1376,7 +1442,6 @@ public class GalleryMT extends Canvas {
 	 * @return
 	 */
 	public GalleryMTItem getGroup(final Point coords) {
-//		checkWidget();
 		return _getGroup(coords);
 	}
 
@@ -1410,7 +1475,6 @@ public class GalleryMT extends Canvas {
 	 * @return the GalleryItem or null if index is out of bounds
 	 */
 	public GalleryMTItem getItem(final int index) {
-//		checkWidget();
 		return _getItem(index);
 	}
 
@@ -1421,7 +1485,6 @@ public class GalleryMT extends Canvas {
 	 * @return GalleryItem or null
 	 */
 	public GalleryMTItem getItem(final Point coords) {
-//		checkWidget();
 
 		final int pos = _isVertical ? (coords.y + _galleryPosition) : (coords.x + _galleryPosition);
 
@@ -1439,7 +1502,6 @@ public class GalleryMT extends Canvas {
 	 * @return
 	 */
 	public int getItemCount() {
-//		checkWidget();
 
 		if (_galleryItems == null) {
 			return 0;
@@ -1454,12 +1516,11 @@ public class GalleryMT extends Canvas {
 	 * @return
 	 */
 	public AbstractGalleryItemRenderer getItemRenderer() {
-//		checkWidget();
 		return itemRenderer;
 	}
 
 	public GalleryMTItem[] getItems() {
-//		checkWidget();
+
 		if (_galleryItems == null) {
 			return new GalleryMTItem[0];
 		}
@@ -1580,7 +1641,7 @@ public class GalleryMT extends Canvas {
 	 * @return
 	 */
 	public int indexOf(final GalleryMTItem item) {
-//		checkWidget();
+
 		if (item == null) {
 			SWT.error(SWT.ERROR_NULL_ARGUMENT);
 			// SWT.error throws an exception
@@ -1591,32 +1652,6 @@ public class GalleryMT extends Canvas {
 		}
 
 		return _indexOf(item.getParentItem(), item);
-	}
-
-	/**
-	 * #see {@link #setLowQualityOnUserAction(boolean)}
-	 * 
-	 * @return
-	 */
-	public boolean isLowQualityOnUserAction() {
-		return _isLowQualityOnUserAction;
-	}
-
-	/**
-	 * @return Returns <code>true</code> when painting is currently done in low quality.
-	 */
-	public boolean isLowQualityPainting() {
-
-		// check if the content is scrolled or window is resized
-		final boolean isScrolledOrResized = _galleryPosition != _prevTranslation
-				|| (_prevViewportWidth != _clientArea.width || _prevViewportHeight != _clientArea.height)
-				|| (_prevContentHeight != _contentVirtualHeight || _prevContentWidth != _contentVirtualWidth);
-
-		return _isLowQualityOnUserAction && isScrolledOrResized;
-	}
-
-	public boolean isPaintingInterrupted() {
-		return _isInterruptPaintEvent;
 	}
 
 	protected boolean isSelected(final GalleryMTItem item) {
@@ -1657,7 +1692,6 @@ public class GalleryMT extends Canvas {
 	 * @return true if the gallery has the SWT.V_SCROLL style.
 	 */
 	public boolean isVertical() {
-//		checkWidget();
 		return _isVertical;
 	}
 
@@ -1727,6 +1761,26 @@ public class GalleryMT extends Canvas {
 	}
 
 	/**
+	 * Send a zoom event
+	 * 
+	 * @param itemWidth
+	 * @param itemHeight
+	 */
+	private void notifyZoomListener(final int itemWidth, final int itemHeight) {
+
+		final Event e = new Event();
+		e.widget = this;
+		e.width = itemWidth;
+		e.height = itemHeight;
+
+		try {
+			notifyListeners(SWT.Modify, e);
+		} catch (final RuntimeException ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	/**
 	 * Clean up the Gallery and renderers on dispose.
 	 */
 	void onDispose() {
@@ -1744,6 +1798,9 @@ public class GalleryMT extends Canvas {
 			groupRenderer.dispose();
 		}
 
+		if (_shell != null) {
+			_shell.removeControlListener(_shellControlListener);
+		}
 	}
 
 	void onMouseDoubleClick(final MouseEvent e) {
@@ -1754,6 +1811,19 @@ public class GalleryMT extends Canvas {
 		}
 		mouseClickHandled = true;
 	}
+
+	// TODO: Not used ATM
+	// private void clear() {
+	// checkWidget();
+	// if (virtual) {
+	// setItemCount(0);
+	// } else {
+	// items = null;
+	// }
+	//
+	// updateStructuralValues(true);
+	// updateScrollBarsProperties();
+	// }
 
 	void onMouseDown(final MouseEvent e) {
 
@@ -1793,19 +1863,6 @@ public class GalleryMT extends Canvas {
 			onMouseHandleRight(e, item, true, false);
 		}
 	}
-
-	// TODO: Not used ATM
-	// private void clear() {
-	// checkWidget();
-	// if (virtual) {
-	// setItemCount(0);
-	// } else {
-	// items = null;
-	// }
-	//
-	// updateStructuralValues(true);
-	// updateScrollBarsProperties();
-	// }
 
 	void onMouseHandleLeft(final MouseEvent e, final GalleryMTItem item, final boolean down, final boolean up) {
 		if (down) {
@@ -1948,11 +2005,35 @@ public class GalleryMT extends Canvas {
 
 	void onPaint(final GC gc) {
 
-//		final long start = System.nanoTime();
+		final long start = System.nanoTime();
+
+		int itemHeight = -1;
+		if (groupRenderer instanceof AbstractGridGroupRenderer) {
+			final AbstractGridGroupRenderer gridRenderer = (AbstractGridGroupRenderer) groupRenderer;
+			itemHeight = gridRenderer.getItemHeight();
+		}
+		// is true when image can not be painted with high quality
+		final boolean isSmallerThanHQMinSize = itemHeight == -1 || itemHeight < _highQualityMinSize;
+
+		// check if the content is scrolled or window is resized
+		final boolean isScrolled = _galleryPosition != _prevGalleryPosition;
+
+		final boolean isContentResized = _prevContentHeight != _contentVirtualHeight
+				|| _prevContentWidth != _contentVirtualWidth;
+
+		final boolean isWindowResized = _prevViewportWidth != _clientArea.width
+				|| _prevViewportHeight != _clientArea.height;
+
+		final boolean isLowQualityPainting = isScrolled
+				|| isWindowResized
+				|| isContentResized
+				|| _isGalleryMoved
+				|| isSmallerThanHQMinSize;
+
+		// reset state
+		_isGalleryMoved = false;
 
 		final Rectangle clipping = gc.getClipping();
-
-		final boolean isLowQualityPainting = isLowQualityPainting();
 
 		try {
 
@@ -1967,9 +2048,9 @@ public class GalleryMT extends Canvas {
 			gc.setBackground(getBackground());
 //			drawBackground(gc, clipping.x, clipping.y, clipping.width, clipping.height);
 
-			final int[] indexes = getVisibleItems(clipping);
+			final int[] visibleRootItems = getVisibleItems(clipping);
 
-			if (indexes != null && indexes.length > 0) {
+			if (visibleRootItems != null && visibleRootItems.length > 0) {
 
 				// Call preDraw for optimization
 				if (groupRenderer != null) {
@@ -1979,8 +2060,8 @@ public class GalleryMT extends Canvas {
 					itemRenderer.preDraw(gc);
 				}
 
-				for (int i = indexes.length - 1; i >= 0; i--) {
-					_drawGroup(gc, indexes[i]);
+				for (int i = visibleRootItems.length - 1; i >= 0; i--) {
+					_drawGroup(gc, visibleRootItems[i]);
 				}
 
 				// Call postDraw for optimization / cleanup
@@ -1999,9 +2080,9 @@ public class GalleryMT extends Canvas {
 
 		// When lowQualityOnUserAction is enabled, keep last state and wait
 		// before updating with a higher quality
-		if (_isLowQualityOnUserAction) {
+		if (_isShowHighQuality) {
 
-			_prevTranslation = _galleryPosition;
+			_prevGalleryPosition = _galleryPosition;
 
 			_prevViewportWidth = _clientArea.width;
 			_prevViewportHeight = _clientArea.height;
@@ -2009,17 +2090,17 @@ public class GalleryMT extends Canvas {
 			_prevContentHeight = _contentVirtualHeight;
 			_prevContentWidth = _contentVirtualWidth;
 
-			if (isLowQualityPainting) {
+			if (isLowQualityPainting && isSmallerThanHQMinSize == false) {
 				// Calling timerExec with the same object just delays the
 				// execution (doesn't run twice)
 				getDisplay().timerExec(higherQualityDelay, redrawTimer);
 			}
 		}
-//		final float timeDiff = (float) (System.nanoTime() - start) / 1000000;
-//		if (timeDiff > 10) {
-//			System.out.println("onPaint\t\t" + timeDiff + " ms\t" + clipping);
-//		}
-//		// TODO remove SYSTEM.OUT.PRINTLN
+
+		final float timeDiff = (float) (System.nanoTime() - start) / 1000000;
+		if (timeDiff > 10) {}
+		System.out.println("onPaint:\t" + timeDiff + " ms\t" + clipping);
+		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 	/**
@@ -2028,11 +2109,13 @@ public class GalleryMT extends Canvas {
 	 * @param item
 	 */
 	public void redraw(final GalleryMTItem item) {
-//		checkWidget();
 
-		// Redraw only the item's bounds
-		final Rectangle bounds = item.getBounds();
-		redraw(bounds.x, bounds.y, bounds.width, bounds.height, true);
+//		// Redraw only the item's bounds
+//		final Rectangle bounds = item.getBounds();
+//		redraw(bounds.x, bounds.y, bounds.width, bounds.height, true);
+//
+//		System.out.println("redraw\t" + bounds);
+//		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 	/**
@@ -2044,7 +2127,6 @@ public class GalleryMT extends Canvas {
 	 * @param index
 	 */
 	public void refresh(final int index) {
-//		checkWidget();
 		if (index < getItemCount()) {
 			// TODO: refresh
 		}
@@ -2059,7 +2141,7 @@ public class GalleryMT extends Canvas {
 	}
 
 	public void remove(final int index) {
-//		checkWidget();
+
 		_remove(index);
 
 		updateStructuralValues(null, false);
@@ -2068,7 +2150,6 @@ public class GalleryMT extends Canvas {
 	}
 
 	public void removeAll() {
-//		checkWidget();
 
 		if (_galleryItems != null) {
 			// Clear items
@@ -2108,7 +2189,7 @@ public class GalleryMT extends Canvas {
 	 * @see #addSelectionListener(SelectionListener)
 	 */
 	public void removeSelectionListener(final SelectionListener listener) {
-//		checkWidget();
+
 		removeListener(SWT.Selection, listener);
 		removeListener(SWT.DefaultSelection, listener);
 	}
@@ -2120,7 +2201,6 @@ public class GalleryMT extends Canvas {
 	 * @param listener
 	 */
 	public void removeTreeListener(final SelectionListener listener) {
-//		checkWidget();
 		removeListener(SWT.Expand, listener);
 	}
 
@@ -2152,7 +2232,9 @@ public class GalleryMT extends Canvas {
 			// image is higher than client area
 
 			final int barSelection = getVerticalBar().getSelection();
+
 			scroll(0, _galleryPosition - barSelection, 0, 0, _clientArea.width, areaHeight, false);
+
 			_galleryPosition = barSelection;
 
 		} else {
@@ -2211,7 +2293,7 @@ public class GalleryMT extends Canvas {
 	 * Selects all of the items in the receiver.
 	 */
 	public void selectAll() {
-//		checkWidget();
+
 		_selectAll();
 		redraw();
 	}
@@ -2326,6 +2408,12 @@ public class GalleryMT extends Canvas {
 		this.higherQualityDelay = higherQualityDelay;
 	}
 
+	public void setImageQuality(final boolean isShowHighQuality, final int hqMinSize) {
+
+		_isShowHighQuality = isShowHighQuality;
+		_highQualityMinSize = hqMinSize;
+	}
+
 	/**
 	 * Sets the gallery's interpolation setting to the parameter, which must be one of
 	 * <code>SWT.DEFAULT</code>, <code>SWT.NONE</code>, <code>SWT.LOW</code> or
@@ -2343,7 +2431,6 @@ public class GalleryMT extends Canvas {
 	 * @return
 	 */
 	public void setItemCount(final int count) {
-//		checkWidget();
 
 		if (count == 0) {
 			// No items
@@ -2371,7 +2458,7 @@ public class GalleryMT extends Canvas {
 	 * @param itemRenderer
 	 */
 	public void setItemRenderer(final AbstractGalleryItemRenderer itemRenderer) {
-//		checkWidget();
+
 		this.itemRenderer = itemRenderer;
 
 		if (itemRenderer != null) {
@@ -2379,19 +2466,6 @@ public class GalleryMT extends Canvas {
 		}
 
 		redraw();
-	}
-
-	/**
-	 * If set to true, the gallery will disable antialiasing and interpolation while the user is
-	 * resizing or scrolling the gallery. This enables faster redraws at the cost of lower image
-	 * quality. When every redraw is finished a last one will be issued using the default (higher)
-	 * quality.
-	 * 
-	 * @see #setHigherQualityDelay(int)
-	 * @param lowQualityOnUserAction
-	 */
-	public void setLowQualityOnUserAction(final boolean lowQualityOnUserAction) {
-		this._isLowQualityOnUserAction = lowQualityOnUserAction;
 	}
 
 	/**
@@ -2441,8 +2515,9 @@ public class GalleryMT extends Canvas {
 	}
 
 	public void setSelection(final GalleryMTItem[] items) {
-//		checkWidget();
+
 		_deselectAll(false);
+
 		for (final GalleryMTItem item : items) {
 			setSelected(item, true, false);
 
@@ -2476,7 +2551,7 @@ public class GalleryMT extends Canvas {
 	 */
 	@Deprecated
 	public void setVertical(final boolean vertical) {
-//		checkWidget();
+
 		this._isVertical = vertical;
 		updateStructuralValues(null, true);
 		redraw();
@@ -2546,7 +2621,6 @@ public class GalleryMT extends Canvas {
 	 *            Item to show
 	 */
 	public void showItem(final GalleryMTItem item) {
-//		checkWidget();
 		_showItem(item);
 	}
 
@@ -2613,8 +2687,8 @@ public class GalleryMT extends Canvas {
 		}
 
 		bar.setMinimum(0);
-		bar.setPageIncrement(clientArea);
 		bar.setMaximum(contentSize);
+		bar.setPageIncrement(clientArea);
 		bar.setThumb(clientArea);
 
 		// Let the group renderer use a custom increment value.
@@ -2753,25 +2827,33 @@ public class GalleryMT extends Canvas {
 
 	}
 
-	private void zoomImage(final SelectionEvent event) {
+	/**
+	 * @param eventTime
+	 * @param isZoomIn
+	 * @param isAccelerated
+	 * @param isAccelerated
+	 */
+	private void zoomImage(	final int eventTime,
+							final boolean isZoomIn,
+							final boolean isDeceleration,
+							final boolean isAccelerated) {
 
 		if (_mouseMovePosition == null) {
 			return;
 		}
 
 		// check if this the same event which can be send multiple times
-		final int eventTime = event.time;
 		if (_lastZoomEventTime == eventTime) {
 			return;
 		}
 		_lastZoomEventTime = eventTime;
 
 		// get item from mouse position
-		final GalleryMTItem currentItem = getItem(_mouseMovePosition);
-
-		if (currentItem == null) {
-			return;
-		}
+//		final GalleryMTItem currentItem = getItem(_mouseMovePosition);
+//
+//		if (currentItem == null) {
+//			return;
+//		}
 
 		final AbstractGalleryGroupRenderer renderer = getGroupRenderer();
 		if (renderer instanceof AbstractGridGroupRenderer) {
@@ -2784,11 +2866,18 @@ public class GalleryMT extends Canvas {
 				return;
 			}
 
-			final boolean isUp = event.detail == SWT.ARROW_UP;
 			int itemHeight = groupRenderer.getItemHeight();
 
-			final int ZOOM_INCREMENT = 5;
-			if (isUp) {
+			int ZOOM_INCREMENT = 5;
+			if (isDeceleration && isAccelerated == false) {
+				ZOOM_INCREMENT = 1;
+			} else if (isAccelerated && isDeceleration == false) {
+				ZOOM_INCREMENT = 10;
+			} else if (isAccelerated && isDeceleration) {
+				ZOOM_INCREMENT = 50;
+			}
+
+			if (isZoomIn) {
 
 				// zoom in
 
@@ -2822,10 +2911,11 @@ public class GalleryMT extends Canvas {
 
 			groupRenderer.setItemSize(itemWidth, itemHeight);
 
-			System.out.println(itemWidth + "\t" + itemHeight);
-			// TODO remove SYSTEM.OUT.PRINTLN
+//			System.out.println(itemWidth + "\t" + itemHeight);
+//			// TODO remove SYSTEM.OUT.PRINTLN
 
-//			fireZoomNotification(itemWidth,itemHeight);
+			notifyZoomListener(itemWidth, itemHeight);
 		}
 	}
+
 }

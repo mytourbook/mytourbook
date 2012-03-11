@@ -8,7 +8,9 @@ Improved usability, started to implement key shortcuts:
 	<Ctrl><Shift>+P - Preferences
 	<Alt>+Left		- navigate folder history in the photo directory
 	<Alt>+Right
- 
+
+
+
  
 Used resources from:
 :pserver:anonymous@dev.eclipse.org:/cvsroot/technology
@@ -20,3 +22,13 @@ PENDENZEN
 - Error Log ist jetzt im Help Menü
 - Exception Handling dokumentieren
 - Ansicht "Touren Import" dokumentieren, ist z.Z. in http://mytourbook.sourceforge.net/mytourbook/index.php/documentation/get-tours/save-tours
+
+
+Photo Gallery
+=============
+
+Zoom factor in pixel when these keys are pressed:
+<Shift>: 1
+<Ctrl>: 10
+<Ctrl><Shift>: 50
+

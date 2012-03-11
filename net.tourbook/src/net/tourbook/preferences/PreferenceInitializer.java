@@ -363,6 +363,9 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.PHOTO_THUMBNAIL_IMAGE_CACHE_SIZE, 500);
 		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_IS_SHOW_FILE_FOLDER, true);
 
+		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_IS_SHOW_IMAGE_WITH_HIGH_QUALITY, true);
+		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_HIGH_QUALITY_IMAGE_MIN_SIZE, 50);
+
 		PreferenceConverter.setDefault(store, //
 				ITourbookPreferences.PHOTO_VIEWER_COLOR_FOREGROUND,
 				new RGB(0xf3, 0xf3, 0xf3));
