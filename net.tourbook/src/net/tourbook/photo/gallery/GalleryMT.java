@@ -15,6 +15,8 @@ package net.tourbook.photo.gallery;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
+import net.tourbook.ui.UI;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.events.ControlAdapter;
@@ -98,7 +100,7 @@ import org.eclipse.swt.widgets.TypedListener;
  * <p>
  * NOTE: THIS WIDGET AND ITS API ARE STILL UNDER DEVELOPMENT.
  * </p>
- * 
+ *
  * @author Nicolas Richeton (nicolas.richeton@gmail.com)
  * @contributor Peter Centgraf (bugs 212071, 212073)
  * @contributor Robert Handschmann (bug 215817)
@@ -188,14 +190,14 @@ public class GalleryMT extends Canvas {
 
 	/**
 	 * Background color, if Control#getBackground() is not used.
-	 * 
+	 *
 	 * @see GalleryMT#useControlColors
 	 */
 	private Color					backgroundColor;
 
 	/**
 	 * Foreground color, if Control#getForeground() is not used.
-	 * 
+	 *
 	 * @see GalleryMT#useControlColors
 	 */
 	private Color					foregroundColor;
@@ -251,6 +253,14 @@ public class GalleryMT extends Canvas {
 	 */
 	private int						_highQualityMinSize;
 
+	/**
+	 * Is <code>true</code> during zooming. OSX do fire a mouse wheel event always, Win do fire a
+	 * mouse wheel event when scrollbars are not visible.
+	 * <p>
+	 * Terrible behaviour !!!
+	 */
+	private boolean					_isZoomed;
+
 	protected class RedrawTimer implements Runnable {
 		public void run() {
 			redraw();
@@ -259,7 +269,7 @@ public class GalleryMT extends Canvas {
 
 	/**
 	 * Create a Gallery
-	 * 
+	 *
 	 * @param parent
 	 * @param style
 	 *            - SWT.VIRTUAL switches in virtual mode. <br/>
@@ -377,16 +387,25 @@ public class GalleryMT extends Canvas {
 			@Override
 			public void mouseScrolled(final MouseEvent event) {
 
+				_isZoomed = false;
+
 				/**
 				 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
 				 * <br>
-				 * This event is fired ONLY when the scrollbars are not visible <br>
+				 * This event is fired ONLY when the scrollbars are not visible, on Win 7<br>
 				 * <br>
 				 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 				 */
 
-				final boolean isShift = (event.stateMask & SWT.SHIFT) != 0;
-				final boolean isCtrl = (event.stateMask & SWT.CTRL) != 0;
+				boolean isShift;
+				boolean isCtrl;
+				if (UI.IS_OSX) {
+					isShift = (event.stateMask & SWT.ALT) != 0;
+					isCtrl = (event.stateMask & SWT.COMMAND) != 0;
+				} else {
+					isShift = (event.stateMask & SWT.SHIFT) != 0;
+					isCtrl = (event.stateMask & SWT.CTRL) != 0;
+				}
 
 				/*
 				 * ensure <ctrl> or <shift> is pressed, otherwise it is zoomed when the scrollbar is
@@ -394,6 +413,7 @@ public class GalleryMT extends Canvas {
 				 */
 				if (isCtrl || isShift) {
 					zoomImage(event.time, event.count > 0, isShift, isCtrl);
+					_isZoomed = true;
 				}
 			}
 		});
@@ -486,23 +506,42 @@ public class GalleryMT extends Canvas {
 				@Override
 				public void widgetSelected(final SelectionEvent event) {
 
-					final boolean isCtrl = (event.stateMask & SWT.CTRL) != 0;
-					final boolean isShift = (event.stateMask & SWT.SHIFT) != 0;
+					if (_isZoomed == false) {
 
-					if (isCtrl || isShift) {
+						/*
+						 * Zooming can happen in the mouse wheel event before the selection event is
+						 * fired. When it is already zoomed, no other action should be done.
+						 */
 
-						// zoom image in/out when <ctrl> is pressed, <shift> will accelerate zooming
+						boolean isShift;
+						boolean isCtrl;
+						if (UI.IS_OSX) {
+							isShift = (event.stateMask & SWT.ALT) != 0;
+							isCtrl = (event.stateMask & SWT.COMMAND) != 0;
+						} else {
+							isShift = (event.stateMask & SWT.SHIFT) != 0;
+							isCtrl = (event.stateMask & SWT.CTRL) != 0;
+						}
 
-						final boolean isUp = event.detail == SWT.ARROW_UP;
+						/*
+						 * ensure <ctrl> or <shift> is pressed, otherwise it is zoomed when the
+						 * scrollbar is hidden
+						 */
+						if (isCtrl || isShift) {
 
-						zoomImage(event.time, isUp, isShift, isCtrl);
+							final boolean isZoomIn = event.detail == SWT.ARROW_UP;
 
-					} else {
+							zoomImage(event.time, isZoomIn, isShift, isCtrl);
 
-						if (_isVertical) {
-							scrollVertical();
+						} else {
+
+							if (_isVertical) {
+								scrollVertical();
+							}
 						}
 					}
+
+					_isZoomed = false;
 				}
 			});
 		}
@@ -576,7 +615,7 @@ public class GalleryMT extends Canvas {
 
 	/**
 	 * Adds an item to an array.
-	 * 
+	 *
 	 * @param array
 	 * @param object
 	 * @param index
@@ -693,7 +732,7 @@ public class GalleryMT extends Canvas {
 
 	/**
 	 * Deselects all items and send selection event depending on parameter.
-	 * 
+	 *
 	 * @param notifyListeners
 	 *            If true, a selection event will be sent to all the current selection listeners.
 	 */
@@ -727,7 +766,7 @@ public class GalleryMT extends Canvas {
 
 	/**
 	 * Handle the drawing of root items
-	 * 
+	 *
 	 * @param gc
 	 * @param index
 	 */
@@ -806,7 +845,7 @@ public class GalleryMT extends Canvas {
 
 	/**
 	 * Get group at pixel position
-	 * 
+	 *
 	 * @param coords
 	 * @return GalleryItem or null
 	 */
@@ -839,7 +878,7 @@ public class GalleryMT extends Canvas {
 
 	/**
 	 * This method is used by items to implement getItem( index )
-	 * 
+	 *
 	 * @param parentItem
 	 * @param itemIndex
 	 * @param parentItemCount
@@ -892,7 +931,7 @@ public class GalleryMT extends Canvas {
 	 * If SWT.VIRTUAL is used and the item has not been used yet, the item is created and a
 	 * SWT.SetData is fired.<br/>
 	 * This is the internal implementation of this method : checkWidget() is not used.
-	 * 
+	 *
 	 * @param index
 	 * @return The item at 'index' (not null)
 	 */
@@ -904,7 +943,7 @@ public class GalleryMT extends Canvas {
 	 * Get the item at 'index'.<br/>
 	 * If SWT.VIRTUAL is used, 'create' is true and the item has not been used yet, the item is
 	 * created and a SWT.SetData is fired.<br/>
-	 * 
+	 *
 	 * @param index
 	 * @param create
 	 * @return The item at 'index' or null if there was no item and 'create' was false.
@@ -925,7 +964,7 @@ public class GalleryMT extends Canvas {
 
 	/**
 	 * Returns the index of a GalleryItem when it is a root Item
-	 * 
+	 *
 	 * @param parentItem
 	 * @param item
 	 * @return
@@ -964,7 +1003,7 @@ public class GalleryMT extends Canvas {
 
 	/**
 	 * Returns the index of a GalleryItem when it is not a root Item
-	 * 
+	 *
 	 * @param parentItem
 	 * @param item
 	 * @return
@@ -1003,7 +1042,7 @@ public class GalleryMT extends Canvas {
 
 	/**
 	 * Forward the mouseDown event to the corresponding group according to the mouse position.
-	 * 
+	 *
 	 * @param e
 	 * @return
 	 */
@@ -1132,7 +1171,7 @@ public class GalleryMT extends Canvas {
 	 * <p>
 	 * When <code>widgetSelected</code> is called, the item field of the event object is valid.
 	 * </p>
-	 * 
+	 *
 	 * @param listener
 	 *            the listener which should be notified
 	 * @exception IllegalArgumentException
@@ -1164,7 +1203,7 @@ public class GalleryMT extends Canvas {
 	 * Adds the listener to the collection of listeners who will be notified when an item in the
 	 * receiver is expanded or collapsed by sending it one of the messages defined in the
 	 * TreeListener interface.
-	 * 
+	 *
 	 * @param listener
 	 */
 	public void addTreeListener(final TreeListener listener) {
@@ -1177,7 +1216,7 @@ public class GalleryMT extends Canvas {
 
 	/**
 	 * Clear one item.<br/>
-	 * 
+	 *
 	 * @param index
 	 */
 	public void clear(final int index) {
@@ -1186,7 +1225,7 @@ public class GalleryMT extends Canvas {
 
 	/**
 	 * Clear one item and all its children if 'all' is true
-	 * 
+	 *
 	 * @param index
 	 * @param all
 	 */
@@ -1227,7 +1266,7 @@ public class GalleryMT extends Canvas {
 	 * Clear all Gallery items.<br/>
 	 * If the Gallery is virtual, the item count is not reseted and all items will be created again
 	 * at their first use.<br/>
-	 * 
+	 *
 	 * @param all
 	 *            If true, all children will be cleared. Only groups are cleared otherwise.
 	 */
@@ -1264,7 +1303,7 @@ public class GalleryMT extends Canvas {
 	/**
 	 * Calculate full height (or width) of the Gallery. The group renderer is used to calculate the
 	 * size of each group.
-	 * 
+	 *
 	 * @return
 	 */
 	private int computeContentSize(final GalleryMTItem onlyUpdateGroup) {
@@ -1363,7 +1402,7 @@ public class GalleryMT extends Canvas {
 
 	/**
 	 * Returns the receiver's background color.
-	 * 
+	 *
 	 * @param galleryOnly
 	 *            If TRUE, does not try to parent widget or Display defaults to guess the real
 	 *            background color. Note : FALSE is the default behavior.
@@ -1403,7 +1442,7 @@ public class GalleryMT extends Canvas {
 
 	/**
 	 * Returns the receiver's foreground color.
-	 * 
+	 *
 	 * @param galleryOnly
 	 *            If TRUE, does not try to parent widget or Display defaults to guess the real
 	 *            foreground color. Note : FALSE is the default behavior.
@@ -1437,7 +1476,7 @@ public class GalleryMT extends Canvas {
 	 * This is an experimental API which is exposing an internal method, it may become deprecated at
 	 * some point.
 	 * </p>
-	 * 
+	 *
 	 * @param coords
 	 * @return
 	 */
@@ -1469,7 +1508,7 @@ public class GalleryMT extends Canvas {
 	 * Get the item at index.<br/>
 	 * If SWT.VIRTUAL is used and the item has not been used yet, the item is created and a
 	 * SWT.SetData event is fired.
-	 * 
+	 *
 	 * @param index
 	 *            index of the item.
 	 * @return the GalleryItem or null if index is out of bounds
@@ -1480,7 +1519,7 @@ public class GalleryMT extends Canvas {
 
 	/**
 	 * Get item at pixel position
-	 * 
+	 *
 	 * @param coords
 	 * @return GalleryItem or null
 	 */
@@ -1498,7 +1537,7 @@ public class GalleryMT extends Canvas {
 
 	/**
 	 * Return the number of root-level items in the receiver. Does not include children.
-	 * 
+	 *
 	 * @return
 	 */
 	public int getItemCount() {
@@ -1512,7 +1551,7 @@ public class GalleryMT extends Canvas {
 
 	/**
 	 * Get current item renderer
-	 * 
+	 *
 	 * @return
 	 */
 	public AbstractGalleryItemRenderer getItemRenderer() {
@@ -1635,7 +1674,7 @@ public class GalleryMT extends Canvas {
 
 	/**
 	 * Returns the index of a GalleryItem.
-	 * 
+	 *
 	 * @param parentItem
 	 * @param item
 	 * @return
@@ -1688,7 +1727,7 @@ public class GalleryMT extends Canvas {
 
 	/**
 	 * Checks if the Gallery was created with SWT.V_SCROLL (ie has a vertical scroll bar).
-	 * 
+	 *
 	 * @return true if the gallery has the SWT.V_SCROLL style.
 	 */
 	public boolean isVertical() {
@@ -1713,7 +1752,7 @@ public class GalleryMT extends Canvas {
 
 	/**
 	 * Send a selection event for a gallery item
-	 * 
+	 *
 	 * @param item
 	 */
 	protected void notifySelectionListeners(final GalleryMTItem item, final int index, final boolean isDefault) {
@@ -1739,7 +1778,7 @@ public class GalleryMT extends Canvas {
 
 	/**
 	 * Send an Expand event for a GalleryItem
-	 * 
+	 *
 	 * @param item
 	 * @param index
 	 */
@@ -1762,7 +1801,7 @@ public class GalleryMT extends Canvas {
 
 	/**
 	 * Send a zoom event
-	 * 
+	 *
 	 * @param itemWidth
 	 * @param itemHeight
 	 */
@@ -1922,7 +1961,7 @@ public class GalleryMT extends Canvas {
 
 	/**
 	 * Handle right click.
-	 * 
+	 *
 	 * @param e
 	 * @param item
 	 *            : The item which is under the cursor or null
@@ -2105,7 +2144,7 @@ public class GalleryMT extends Canvas {
 
 	/**
 	 * Redraw the item given as parameter.
-	 * 
+	 *
 	 * @param item
 	 */
 	public void redraw(final GalleryMTItem item) {
@@ -2123,7 +2162,7 @@ public class GalleryMT extends Canvas {
 	 * <p>
 	 * Currently not implemented.
 	 * </p>
-	 * 
+	 *
 	 * @param index
 	 */
 	public void refresh(final int index) {
@@ -2172,7 +2211,7 @@ public class GalleryMT extends Canvas {
 	/**
 	 * Removes the listener from the collection of listeners who will be notified when the
 	 * receiver's selection changes.
-	 * 
+	 *
 	 * @param listener
 	 *            the listener which should no longer be notified
 	 * @exception IllegalArgumentException
@@ -2197,7 +2236,7 @@ public class GalleryMT extends Canvas {
 	/**
 	 * Removes the listener from the collection of listeners who will be notified when items in the
 	 * receiver are expanded or collapsed.
-	 * 
+	 *
 	 * @param listener
 	 */
 	public void removeTreeListener(final SelectionListener listener) {
@@ -2300,7 +2339,7 @@ public class GalleryMT extends Canvas {
 
 	/**
 	 * Send SWT.PaintItem for one item.
-	 * 
+	 *
 	 * @param item
 	 * @param index
 	 * @param gc
@@ -2332,7 +2371,7 @@ public class GalleryMT extends Canvas {
 	/**
 	 * Sets the gallery's anti-aliasing value to the parameter, which must be one of
 	 * <code>SWT.DEFAULT</code>, <code>SWT.OFF</code> or <code>SWT.ON</code>.
-	 * 
+	 *
 	 * @param antialias
 	 */
 	public void setAntialias(final int antialias) {
@@ -2357,7 +2396,7 @@ public class GalleryMT extends Canvas {
 
 	/**
 	 * Sends SWT.SetData event. Used if SWT.VIRTUAL
-	 * 
+	 *
 	 * @param galleryItem
 	 * @param index
 	 */
@@ -2400,7 +2439,7 @@ public class GalleryMT extends Canvas {
 
 	/**
 	 * Set the delay after the last user action before the redraw at higher quality is triggered
-	 * 
+	 *
 	 * @see #setLowQualityOnUserAction(boolean)
 	 * @param higherQualityDelay
 	 */
@@ -2418,7 +2457,7 @@ public class GalleryMT extends Canvas {
 	 * Sets the gallery's interpolation setting to the parameter, which must be one of
 	 * <code>SWT.DEFAULT</code>, <code>SWT.NONE</code>, <code>SWT.LOW</code> or
 	 * <code>SWT.HIGH</code>.
-	 * 
+	 *
 	 * @param interpolation
 	 */
 	public void setInterpolation(final int interpolation) {
@@ -2427,7 +2466,7 @@ public class GalleryMT extends Canvas {
 
 	/**
 	 * Sets the number of root-level items contained in the receiver. Only work in VIRTUAL mode.
-	 * 
+	 *
 	 * @return
 	 */
 	public void setItemCount(final int count) {
@@ -2454,7 +2493,7 @@ public class GalleryMT extends Canvas {
 	/**
 	 * Set item receiver. Usually, this does not trigger gallery update. redraw must be called right
 	 * after setGroupRenderer to reflect this change.
-	 * 
+	 *
 	 * @param itemRenderer
 	 */
 	public void setItemRenderer(final AbstractGalleryItemRenderer itemRenderer) {
@@ -2470,7 +2509,7 @@ public class GalleryMT extends Canvas {
 
 	/**
 	 * Toggle item selection status
-	 * 
+	 *
 	 * @param item
 	 *            Item which state is to be changed.
 	 * @param selected
@@ -2538,7 +2577,7 @@ public class GalleryMT extends Canvas {
 	 * are stored locally in Gallery, and you'll get the same object each time you call
 	 * getXXXColor() on Gallery orGalleryItem. The Gallery may not catch color changes on parent
 	 * control.
-	 * 
+	 *
 	 * @param useControlColors
 	 */
 	public void setUseControlColors(final boolean useControlColors) {
@@ -2561,7 +2600,7 @@ public class GalleryMT extends Canvas {
 	 * Set the item count used when a group is not yet initialized (with virtual groups). Since the
 	 * virtual groups make the size of the gallery change while scrolling, a fine tuned item count
 	 * can improve the accuracy of the slider.
-	 * 
+	 *
 	 * @see #setVirtualGroups(boolean)
 	 * @param defaultItemCount
 	 */
@@ -2595,7 +2634,7 @@ public class GalleryMT extends Canvas {
 	 * SAT Smooth Scrolling. In that case, you can enable the compatibility mode which is little
 	 * less lazy that the default virtual groups, but still better than the standard virtual mode
 	 * </p>
-	 * 
+	 *
 	 * @see #setVirtualGroupDefaultItemCount(int)
 	 * @see #setVirtualGroupsCompatibilityMode(boolean)
 	 * @param virtualGroups
@@ -2606,7 +2645,7 @@ public class GalleryMT extends Canvas {
 
 	/**
 	 * Enable the compatibility workaround for problems with the ultra virtual mode.
-	 * 
+	 *
 	 * @see #setVirtualGroups(boolean)
 	 * @param compatibilityMode
 	 */
@@ -2616,7 +2655,7 @@ public class GalleryMT extends Canvas {
 
 	/**
 	 * Scroll the Gallery in order to make 'item' visible.
-	 * 
+	 *
 	 * @param item
 	 *            Item to show
 	 */
@@ -2627,7 +2666,7 @@ public class GalleryMT extends Canvas {
 	/**
 	 * If table is virtual and item at pos i has not been set, call the callback listener to set its
 	 * value.
-	 * 
+	 *
 	 * @return
 	 */
 	private void updateItem(final GalleryMTItem parentItem, final int i, final boolean create) {
@@ -2672,7 +2711,7 @@ public class GalleryMT extends Canvas {
 
 	/**
 	 * Move the scrollbar to reflect the current visible items position.
-	 * 
+	 *
 	 * @param bar
 	 *            - the scroll bar to move
 	 * @param clientArea
@@ -2731,7 +2770,7 @@ public class GalleryMT extends Canvas {
 	/**
 	 * Recalculate structural values using the group renderer<br>
 	 * Gallery and item size will be updated.
-	 * 
+	 *
 	 * @param keepLocation
 	 *            if true, the current scrollbars position ratio is saved and restored even if the
 	 *            gallery size has changed. (Visible items stay visible)
@@ -2745,7 +2784,7 @@ public class GalleryMT extends Canvas {
 	/**
 	 * Recalculate structural values using the group renderer<br>
 	 * Gallery and item size will be updated.
-	 * 
+	 *
 	 * @param changedGroup
 	 *            the group that was modified since the last layout. If the group renderer or more
 	 *            that one group have changed, use null as parameter (full update)
