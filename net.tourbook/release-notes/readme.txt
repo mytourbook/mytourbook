@@ -1,91 +1,11 @@
-Version: 12.1.0                                         9. January 2012 
+Version: 12.1.2                                           7. March 2012
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+Release Notes
+-------------
 
-IMPORTANT INFO
+This version do not contain new features or bugfixes compared with the 
+last patch: 12.1.1 Patch #1, it's only a compilition of version 12.1 and 
+all bug fixes. 
 
-Major structural changes for the tour database has been carried out in 
-this version. It is STRONGLY recommended to do a BACKUP of the data 
-because when the update fails, your saved tours will be lost forever. 
-
-The database update is performing about 10 tours per second, my test 
-values: 1727 tours / 149 seconds = 11.6 tours/second 
-
-When the database update is performed and the splash screen has been 
-covered with another window or the focus is set with the mouse, it can 
-happen (on Win7) that the splash screen is not updated until the 
-database update has finished which is showing an info box. 
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
-
-
-
-New 
-
-* import and transfer tours from a Macro cycle computer provided by Till 
-Klocke
-
-* autocomplete tour title + start/end location in the tour editor with
-existing values from all tours, provided by Stefan Fussenegger 
-
-* new application icon and web site refreshed, the new icon reflects, 
-that MyTourbook can be used for any kind of tours. The old icon seems to 
-be associated only for bycicle tours. The upper right part of the icon 
-reflects a bicycle helmet which was very important for me, I had very 
-likely my cycling accident not survived without it. 
-
-
-
-New Chart Features 
-
-* value point tool tip 
-
-* the behaviour for the vertical slider is completely different compared 
-with previous versions 
-
-* altitude values are displayed exactly as they are saved in the import 
-file and are not truncated at the decimal point 
-
-* line graphs can be displayed with transparency and antialiasing 
-
-* major and minor grid lines can be displayed Improvements 
-
-* import laps from gpx files, provided by Jochen (deep-n-steep) 
-
-* adjust altitude dialog has a new checkbox to select the whole tour 
-when using the method "Approach altitude with SRTM data" 
-
-* reimporting can also be done in the tourbook view (available in the 
-context menu) 
-
-* improved performance for drawing the tour chart 
-
-
-
-Fixed Bugs 
-
-* 3459317 tour editor is not dirty when changing tour type 
-
-* 3421203 a tour with 53952 time slices cannot be saved 
-
-* 3405318 calendar view using imperial system of measurement 
-
-* addressed bug: 3458195 Calendar wrongly calculate time 
-
-
-
-Development 
-
-* decreased number of plugins, moved most of the device plugins into the 
-net.tourbook.device plugin 
-
-* all data series are now saved in floating point format 
-
-
-
-System 
-
-* Eclipse 3.7.1 
-
-* Derby 10.8.2.1 
-
+This version was created to do an easier installation of version 12.1.0 
+and all bug fixes and patches.
