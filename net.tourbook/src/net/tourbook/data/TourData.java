@@ -3070,6 +3070,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 				}
 
 				/*
+				 * power
+				 */
+				if (isPower) {
+					final float tdPower = timeData.power;
+					powerSerie[serieIndex] = tdPower == Float.MIN_VALUE ? 0 : tdPower;
+				}
+
+				/*
 				 * speed
 				 */
 				if (isSpeed) {
@@ -5068,6 +5076,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 		latitudeSerie = serieData.latitude;
 		longitudeSerie = serieData.longitude;
+
+		if (powerSerie != null) {
+			isPowerSerieFromDevice = true;
+		}
+
+		if (speedSerie != null) {
+			isSpeedSerieFromDevice = true;
+		}
 	}
 
 	/**

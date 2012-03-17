@@ -559,6 +559,10 @@ public class PolarHRMDataReader extends TourbookDevice {
 				tourSlice.cadence = hrSlice.cadence;
 			}
 
+			if (hrSlice.power != Integer.MIN_VALUE) {
+				tourSlice.power = hrSlice.power;
+			}
+
 			timeDataList.add(tourSlice);
 
 			relativeTime += sliceTimeInterval;
