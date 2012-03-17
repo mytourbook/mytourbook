@@ -482,7 +482,7 @@ class PicDirFolder {
 
 	/**
 	 * Gets filesystem root entries
-	 * 
+	 *
 	 * @return an array of Files corresponding to the root directories on the platform, may be empty
 	 *         but not null
 	 */
@@ -574,7 +574,7 @@ class PicDirFolder {
 
 	/**
 	 * Do the actions when a folder is selected
-	 * 
+	 *
 	 * @param iSelection
 	 */
 	private void onSelectFolder(final ITreeSelection treeSelection) {
@@ -622,7 +622,7 @@ class PicDirFolder {
 	 * This is not yet working thoroughly because the expanded position moves up or down and all
 	 * expanded childrens are not visible (but they could) like when the triangle (+/-) icon in the
 	 * tree is clicked.
-	 * 
+	 *
 	 * @param treeSelection
 	 * @param selectedTreePath
 	 * @param tviFolder
@@ -675,7 +675,7 @@ class PicDirFolder {
 
 	/**
 	 * This behavior is complex and still have possible problems.
-	 * 
+	 *
 	 * @param selectedFolderItem
 	 * @param treeSelection
 	 * @param selectedTreePath
@@ -842,13 +842,20 @@ class PicDirFolder {
 
 		final String restorePathName = selectedFolder.getAbsolutePath();
 
-		final IPath restorePath = new Path(restorePathName);
-		final IPath restoreRoot = new Path(restorePathName).removeFirstSegments(9999);
-
-		final String[] folderSegments = restorePath.segments();
 		final ArrayList<String> allFolderSegments = new ArrayList<String>();
 
-		allFolderSegments.add(restoreRoot.toOSString());
+		if (UI.IS_WIN) {
+			// add device, e.g. c:, z:
+			final IPath restoreRoot = new Path(restorePathName).removeFirstSegments(9999);
+			allFolderSegments.add(restoreRoot.toOSString());
+		} else {
+			// add root
+			allFolderSegments.add("/");
+		}
+
+		final IPath restorePath = new Path(restorePathName);
+		final String[] folderSegments = restorePath.segments();
+
 		for (final String folderSegmentName : folderSegments) {
 			allFolderSegments.add(folderSegmentName);
 		}

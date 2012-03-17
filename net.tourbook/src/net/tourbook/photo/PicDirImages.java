@@ -73,7 +73,7 @@ import org.eclipse.ui.part.PageBook;
 
 /**
  * This class is a compilation from different source codes:
- * 
+ *
  * <pre>
  * org.eclipse.swt.examples.fileviewer
  * org.sharemedia.gui.libraryviews.GalleryLibraryView
@@ -137,12 +137,12 @@ public class PicDirImages {
 	private final Runnable							_workerRunnable;
 
 	/**
-	 * 
+	 *
 	 */
 	public static final Comparator<File>			NATURAL_SORT			= new SortNatural<File>(true);
 
 	/**
-	 * 
+	 *
 	 */
 	public static Comparator<File>					DATE_SORT;
 
@@ -430,6 +430,8 @@ public class PicDirImages {
 	void actionShowNavigationHistory() {
 
 		_comboPathHistory.setFocus();
+
+		// this is not working with osx: https://bugs.eclipse.org/bugs/show_bug.cgi?id=300979
 		_comboPathHistory.setListVisible(true);
 	}
 
@@ -480,7 +482,7 @@ public class PicDirImages {
 
 	/**
 	 * This will be configured from options but for now it is any image accepted.
-	 * 
+	 *
 	 * @return
 	 */
 	private FileFilter createFileFilter() {
@@ -554,9 +556,11 @@ public class PicDirImages {
 
 		_containerActionBar = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(_containerActionBar);
-		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(_containerActionBar);
+		GridLayoutFactory.fillDefaults()//
+				.numColumns(3)
+				.extendedMargins(0, 0, 2, 2)
+				.applyTo(_containerActionBar);
 		{
-
 			/*
 			 * toolbar actions
 			 */
@@ -589,6 +593,9 @@ public class PicDirImages {
 
 			@Override
 			public void mouseDown(final MouseEvent e) {
+
+				System.out.println("mouse down");
+				// TODO remove SYSTEM.OUT.PRINTLN
 
 				// show list
 				_comboPathHistory.setListVisible(true);
@@ -641,7 +648,9 @@ public class PicDirImages {
 		_spinnerThumbSize.setMaximum(MAX_ITEM_HEIGHT);
 		_spinnerThumbSize.setIncrement(10);
 		_spinnerThumbSize.setPageIncrement(50);
-		_spinnerThumbSize.setToolTipText(Messages.Pic_Dir_Spinner_ThumbnailSize_Tooltip);
+		_spinnerThumbSize.setToolTipText(UI.IS_OSX
+				? Messages.Pic_Dir_Spinner_ThumbnailSize_Tooltip_OSX
+				: Messages.Pic_Dir_Spinner_ThumbnailSize_Tooltip);
 		_spinnerThumbSize.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
@@ -781,7 +790,7 @@ public class PicDirImages {
 	/**
 	 * This event is called first of all before a gallery item is painted, it sets the photo into
 	 * the gallery item.
-	 * 
+	 *
 	 * @param event
 	 */
 	private void onGallery1SetItemData(final Event event) {
@@ -815,7 +824,7 @@ public class PicDirImages {
 	/**
 	 * This event checks if the image for the photo is available in the image cache, if not it is
 	 * put into a queue to be loaded, the {@link PhotoRenderer} will then paint the image.
-	 * 
+	 *
 	 * @param event
 	 */
 	private void onGallery2PaintItem(final Event event) {
@@ -1030,7 +1039,7 @@ public class PicDirImages {
 
 	/**
 	 * Display images for the selected folder.
-	 * 
+	 *
 	 * @param imageFolder
 	 * @param isNavigation
 	 */
@@ -1072,16 +1081,21 @@ public class PicDirImages {
 		/*
 		 * action bar
 		 */
-		_containerActionBar.setForeground(fgColor);
-		_containerActionBar.setBackground(bgColor);
-		_toolbar.setForeground(fgColor);
-		_toolbar.setBackground(bgColor);
+		if (UI.IS_OSX == false) {
 
-		_spinnerThumbSize.setForeground(fgColor);
-		_spinnerThumbSize.setBackground(bgColor);
+			_containerActionBar.setForeground(fgColor);
+			_containerActionBar.setBackground(bgColor);
+			_toolbar.setForeground(fgColor);
+			_toolbar.setBackground(bgColor);
 
-		_comboPathHistory.setForeground(fgColor);
-		_comboPathHistory.setBackground(bgColor);
+			// combobox list is almost invisible when colors are set on osx
+
+			_spinnerThumbSize.setForeground(fgColor);
+			_spinnerThumbSize.setBackground(bgColor);
+
+			_comboPathHistory.setForeground(fgColor);
+			_comboPathHistory.setBackground(bgColor);
+		}
 
 		/*
 		 * gallery
@@ -1271,7 +1285,7 @@ public class PicDirImages {
 	/**
 	 * Notifies the worker that it should update itself with new data. Cancels any previous
 	 * operation and begins a new one.
-	 * 
+	 *
 	 * @param newFolder
 	 *            the new base directory for the table, null is ignored
 	 */

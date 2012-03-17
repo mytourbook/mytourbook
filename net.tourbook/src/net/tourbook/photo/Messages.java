@@ -40,6 +40,7 @@ public class Messages extends NLS {
 	public static String		Pic_Dir_Label_FolderIsNotSelected;
 	public static String		Pic_Dir_Label_Loading;
 	public static String	Pic_Dir_Spinner_ThumbnailSize_Tooltip;
+	public static String	Pic_Dir_Spinner_ThumbnailSize_Tooltip_OSX;
 
 	public static String		Pic_Dir_Status_Loaded;
 
