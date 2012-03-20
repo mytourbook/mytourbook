@@ -125,8 +125,12 @@ public class Photo {
 		_fileName = imageFile.getName();
 		_filePathName = imageFile.getAbsolutePath();
 
-		_imageKeys = new String[PhotoManager.MAX_IMAGE_QUALITY];
-		_photoLoadingState = new PhotoLoadingState[PhotoManager.MAX_IMAGE_QUALITY];
+		/*
+		 * initialize image keys and loading states
+		 */
+		final int imageSizeLength = PhotoManager.IMAGE_SIZES.length;
+		_imageKeys = new String[imageSizeLength];
+		_photoLoadingState = new PhotoLoadingState[imageSizeLength];
 
 		for (int qualityIndex = 0; qualityIndex < _photoLoadingState.length; qualityIndex++) {
 			_imageKeys[qualityIndex] = Util.computeMD5(_filePathName + "_" + qualityIndex);
@@ -579,9 +583,9 @@ public class Photo {
 	public String toString() {
 		return "Photo "
 				+ (_fileName)
-				+ (_dateTime == null ? "" : "\t" + _dateTime)
-				+ (_width == Integer.MIN_VALUE ? "" : "\t" + _width + "x" + _height)
-				+ (_latitude == Double.MIN_VALUE ? "" : "\t" + _latitude + "" + _longitude)
+				+ (_dateTime == null ? "-no date-" : "\t" + _dateTime)
+				+ (_width == Integer.MIN_VALUE ? "-no size-" : "\t" + _width + "x" + _height)
+				+ (_latitude == Double.MIN_VALUE ? "-no GPS-" : "\t" + _latitude + "" + _longitude)
 		//
 		;
 	}

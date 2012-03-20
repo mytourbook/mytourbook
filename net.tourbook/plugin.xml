@@ -1357,8 +1357,22 @@
             schemeId="net.tourbook.scheme">
       </key>
       <key
+            commandId="net.tourbook.command.PicDir.NavigateHistoryBackward"
+            sequence="%Shortcut_Key_PicDir_History_Backward_OSX"
+            platform="carbon,cocoa"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="net.tourbook.scheme">
+      </key>
+      <key
             commandId="net.tourbook.command.PicDir.NavigateHistoryForward"
             sequence="%Shortcut_Key_PicDir_History_Forward"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="net.tourbook.scheme">
+      </key>
+      <key
+            commandId="net.tourbook.command.PicDir.NavigateHistoryForward"
+            sequence="%Shortcut_Key_PicDir_History_Forward_OSX"
+            platform="carbon,cocoa"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="net.tourbook.scheme">
       </key>

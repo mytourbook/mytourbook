@@ -20,7 +20,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.concurrent.locks.ReentrantLock;
 
 import net.tourbook.photo.gallery.GalleryMTItem;
 import net.tourbook.util.StatusUtil;
@@ -39,8 +38,6 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
 public class PhotoImageLoader {
-
-	private static final ReentrantLock	RESIZE_LOCK	= new ReentrantLock();
 
 	Photo								photo;
 	private GalleryMTItem				_galleryItem;
@@ -162,45 +159,22 @@ public class PhotoImageLoader {
 //		return null;
 //	}
 
-	private Image getThumbImageSWT(final Photo photo, final int requestedImageQuality) {
+	private Image getHQImage(final Photo photo, final int requestedImageQuality) {
 
-		final IPath storeImageFilePath = ThumbnailStore.getStoreImagePath(photo, requestedImageQuality);
-
-		/*
-		 * check if image is available in the thumbstore
-		 */
-		final File storeImageFile = new File(storeImageFilePath.toOSString());
-		if (storeImageFile.isFile()) {
-
-			// photo image is available in the thumbnail store
-
-			// touch store file when it is not yet done today
-			final LocalDate dtModified = new LocalDate(storeImageFile.lastModified());
-			if (dtModified.equals(new LocalDate()) == false) {
-				storeImageFile.setLastModified(new DateTime().getMillis());
-			}
-
-			return new Image(_display, storeImageFilePath.toOSString());
-		}
-
-		/*
-		 * check thumbnail image in the EXIF data
-		 */
-		final Image exifThumbnail = getThumbnailFromEXIF(photo, storeImageFilePath);
-		if (exifThumbnail != null) {
-			return exifThumbnail;
-		}
+		System.out.println("getHQImage\t" + photo);
+		// TODO remove SYSTEM.OUT.PRINTLN
 
 		// load full size image
-		final long startLoading = System.currentTimeMillis();
-
 		final String fullSizePathName = photo.getFilePathName();
-		Image fullSizeImage = null;
+		final Image fullSizeImage[] = { null };
 
-		long endLoading;
 		try {
 
-			fullSizeImage = new Image(_display, fullSizePathName);
+//			_display.asyncExec(new Runnable() {
+//				public void run() {
+//				}
+//			});
+			fullSizeImage[0] = new Image(_display, fullSizePathName);
 
 		} catch (final Exception e) {
 
@@ -208,10 +182,10 @@ public class PhotoImageLoader {
 			// this must be handled without logging
 			// #######################################
 			StatusUtil.log(NLS.bind("Fullsize image \"{0}\" cannot be loaded", fullSizePathName), e); //$NON-NLS-1$
-		} finally {
-			endLoading = System.currentTimeMillis();
 
-			if (fullSizeImage == null) {
+		} finally {
+
+			if (fullSizeImage[0] == null) {
 				StatusUtil.log(NLS.bind(//
 						"Fullsize image \"{0}\" cannot be loaded",
 						fullSizePathName), new Exception());
@@ -219,82 +193,81 @@ public class PhotoImageLoader {
 			}
 		}
 
-		try {
+		Image requestedImage = null;
 
-			Image thumbnailImage = null;
+		final Rectangle fullSizeImageBounds = fullSizeImage[0].getBounds();
+		final int fullSizeWidth = fullSizeImageBounds.width;
+		final int fullSizeHeight = fullSizeImageBounds.height;
 
-			long startSave = 0;
-			long endSave = 0;
-			long endResize = 0;
+		System.out.println("getHQImage\t" + fullSizeImageBounds);
+		// TODO remove SYSTEM.OUT.PRINTLN
 
-			final Rectangle fullSizeImageBounds = fullSizeImage.getBounds();
-			final int thumbSize = PhotoManager.IMAGE_SIZE[imageQuality];
+		final int[] thumbSizes = PhotoManager.IMAGE_SIZES;
 
-			final Point bestSize = ImageUtils.getBestSize(//
-					new Point(fullSizeImageBounds.width, fullSizeImageBounds.height),
-					new Point(thumbSize, thumbSize));
+		// the original size will not be stored in the thumb store
+		for (int imageQuality = thumbSizes.length - 2; imageQuality >= 0; imageQuality--) {
 
-			final long startResize = System.currentTimeMillis();
-			final boolean isResizeRequired = !(fullSizeImageBounds.width == bestSize.x && fullSizeImageBounds.height == bestSize.y);
+			final int thumbSize = thumbSizes[imageQuality];
 
-			if (isResizeRequired) {
-				RESIZE_LOCK.lock();
-				{
-					try {
+			Image resizedImage = null;
+			IPath storeImagePath = null;
 
-						thumbnailImage = ImageUtils.resize(
-								_display,
-								fullSizeImage,
-								bestSize.x,
-								bestSize.y,
-								SWT.ON,
-								SWT.HIGH);
+			try {
 
-						endResize = System.currentTimeMillis();
+				if (fullSizeWidth > thumbSize || fullSizeHeight > thumbSize) {
 
-						startSave = System.currentTimeMillis();
+					final Point bestSize = ImageUtils.getBestSize(fullSizeWidth, fullSizeHeight, thumbSize, thumbSize);
 
-						ThumbnailStore.saveImageSWT(thumbnailImage, storeImageFilePath);
+					resizedImage = ImageUtils.resize(
+							_display,
+							fullSizeImage[0],
+							bestSize.x,
+							bestSize.y,
+							SWT.ON,
+							SWT.HIGH);
 
-						endSave = System.currentTimeMillis();
+				} else {
 
-					} catch (final Exception e) {
-						StatusUtil.log(NLS.bind("Image \"{0}\" cannot be resized", fullSizePathName), e); //$NON-NLS-1$
-						return null;
-
-					} finally {
-						fullSizeImage.dispose();
-						RESIZE_LOCK.unlock();
-					}
+					resizedImage = fullSizeImage[0];
 				}
-			} else {
-				thumbnailImage = fullSizeImage;
+
+				storeImagePath = ThumbnailStore.getStoreImagePath(photo, imageQuality);
+				ThumbnailStore.saveImageSWT(//
+						resizedImage,
+						storeImagePath);
+
+			} catch (final Exception e) {
+				StatusUtil.log(NLS.bind("Store image \"{0}\" couldn't be created", storeImagePath.toOSString()), e); //$NON-NLS-1$
 			}
 
-//			System.out.println((Thread.currentThread().getName() + "\t")
-//					+ photo.getFileName()
-//					+ "\tload: "
-//					+ ((endLoading - startLoading) + "")
-//					+ "\tresize: "
-//					+ ((endResize - startResize) + "")
-//					+ "\tsave: "
-//					+ ((endSave - startSave) + "")
-//					+ "\ttotal: "
-//					+ ((endSave - startLoading) + "")
-//			//
-//					);
-//			// TODO remove SYSTEM.OUT.PRINTLN
+			// requested image will be cached
+			if (imageQuality == requestedImageQuality) {
 
-			return thumbnailImage;
+				// keep requested image in cache
+				PhotoImageCache.putImage(_imageKey, resizedImage);
 
-		} catch (final Exception e) {
-			StatusUtil.log(NLS.bind("Store image \"{0}\" cannot be created", storeImageFilePath.toOSString()), e); //$NON-NLS-1$
+				requestedImage = resizedImage;
+
+			} else {
+
+				// dispose resized image
+
+				if (resizedImage != fullSizeImage[0]) {
+					resizedImage.dispose();
+				}
+			}
 		}
 
-		return null;
+		return requestedImage;
 	}
 
-	private Image getThumbnailFromEXIF(final Photo photo, final IPath storeImageFilePath) {
+	/**
+	 * @param photo
+	 * @param storeImageFilePath
+	 *            Path to store image in the thumbnail store
+	 * @return
+	 */
+	private Image getImageFromEXIFThumbnail(final Photo photo, final IPath storeImageFilePath) {
 
 		try {
 			final File imageFile = new File(photo.getFilePathName());
@@ -337,7 +310,9 @@ public class PhotoImageLoader {
 					try {
 						ThumbnailStore.saveImageAWT(bufferedImage, storeImageFilePath);
 					} catch (final Exception e) {
-						StatusUtil.log(NLS.bind("Image \"{0}\" cannot be resized", photo.getFilePathName()), e); //$NON-NLS-1$
+						StatusUtil.log(NLS.bind(//
+								"Image \"{0}\" cannot be resized", //$NON-NLS-1$
+								photo.getFilePathName()), e);
 						return null;
 					}
 
@@ -346,8 +321,9 @@ public class PhotoImageLoader {
 					return thumbnailImage;
 
 				} catch (final Exception e) {
-					StatusUtil.log(
-							NLS.bind("Store image \"{0}\" cannot be created", storeImageFilePath.toOSString()), e); //$NON-NLS-1$
+					StatusUtil.log(NLS.bind(//
+							"Store image \"{0}\" cannot be created", //$NON-NLS-1$
+							storeImageFilePath.toOSString()), e);
 				}
 
 				//#########################################################
@@ -361,6 +337,54 @@ public class PhotoImageLoader {
 
 		return null;
 	}
+
+	/**
+	 * Get image from thumb store with the requested image quality.
+	 * 
+	 * @param photo
+	 * @param requestedImageQuality
+	 * @return
+	 */
+	private Image getImageFromStore(final Photo photo, final int requestedImageQuality) {
+
+		final IPath requestedStoreImageFilePath = ThumbnailStore.getStoreImagePath(photo, requestedImageQuality);
+
+		/*
+		 * check if image is available in the thumbstore
+		 */
+		final File storeImageFile = new File(requestedStoreImageFilePath.toOSString());
+		if (storeImageFile.isFile()) {
+
+			// photo image is available in the thumbnail store
+
+			/*
+			 * touch store file when it is not yet done today, this is done to track last access
+			 * time so that a store cleanup can check the date
+			 */
+			final LocalDate dtModified = new LocalDate(storeImageFile.lastModified());
+			if (dtModified.equals(new LocalDate()) == false) {
+				storeImageFile.setLastModified(new DateTime().getMillis());
+			}
+
+			return new Image(_display, requestedStoreImageFilePath.toOSString());
+		}
+
+		return null;
+	}
+
+	//			System.out.println((Thread.currentThread().getName() + "\t")
+//					+ photo.getFileName()
+//					+ "\tload: "
+//					+ ((endLoading - startLoading) + "")
+//					+ "\tresize: "
+//					+ ((endResize - startResize) + "")
+//					+ "\tsave: "
+//					+ ((endSave - startSave) + "")
+//					+ "\ttotal: "
+//					+ ((endSave - startLoading) + "")
+//			//
+//					);
+//			// TODO remove SYSTEM.OUT.PRINTLN
 
 	/**
 	 * check if the image is still visible
@@ -385,24 +409,13 @@ public class PhotoImageLoader {
 				continue;
 			}
 
-			// .equals() is a performance hog when many items are displayed
+			// !!! visibleItem.equals() is a performance hog when many items are displayed !!!
 			if (visibleItem.x == _galleryItem.x && visibleItem.y == _galleryItem.y) {
 				return true;
 			}
-//			if (visibleItem.equals(_galleryItem)) {
-////				System.out.println("is visible\t" + photo.getFileName());
-////				// TODO remove SYSTEM.OUT.PRINTLN
-//
-//				return true;
-//			}
 		}
 
 		// item is not visible
-
-//		System.out.println("not visible\t" + photo.getFileName());
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
-		resetState();
 
 		return false;
 	}
@@ -473,60 +486,146 @@ public class PhotoImageLoader {
 	 */
 	public void loadImage() {
 
+		boolean isImageLoadedInRequestedQuality = false;
+		Image loadedImage = null;
+		String imageKey = null;
+		boolean isLoadingError = false;
+
 		try {
 
-//			if (_display.isDisposed()) {
-//				// this happened
-//				return;
-//			}
-
 			if (isImageVisible() == false) {
+				setStateUndefined();
 				return;
 			}
 
-//			final String imageKey = photo.getImageKey(imageQuality);
-			if (imageQuality == PhotoManager.IMAGE_QUALITY_ORIGINAL) {
+			// 1. get image from image store
+			final Image storeImage = getImageFromStore(photo, imageQuality);
+			if (storeImage != null) {
 
-				// load original image
-
-				final Image fullSizeImage = new Image(_display, photo.getFilePathName());
-
-				PhotoImageCache.putImage(_imageKey, fullSizeImage);
+				isImageLoadedInRequestedQuality = true;
+				imageKey = _imageKey;
+				loadedImage = storeImage;
 
 			} else {
 
-				/*
-				 * check if photo is available in the thumbnail store
-				 */
-//				final Image thumbImage = getThumbImageAWT(photo, imageQuality);
-				final Image thumbImage = getThumbImageSWT(photo, imageQuality);
+				final int defaultThumbQuality = PhotoManager.IMAGE_QUALITY_THUMB_160;
 
-				if (thumbImage == null) {
-					throw new Exception();
+				// 2. get image from thumbnail image in the EXIF data
+				final IPath storeThumbImageFilePath = ThumbnailStore.getStoreImagePath(photo, defaultThumbQuality);
+				final Image exifThumbnail = getImageFromEXIFThumbnail(photo, storeThumbImageFilePath);
+
+				if (exifThumbnail != null) {
+					isImageLoadedInRequestedQuality = imageQuality == defaultThumbQuality;
+					imageKey = photo.getImageKey(defaultThumbQuality);
+					loadedImage = exifThumbnail;
 				} else {
-					PhotoImageCache.putImage(_imageKey, thumbImage);
+
+					/*
+					 * image could not be loaded the fast way, it must be loaded the slow way
+					 */
+
+					if (imageQuality == PhotoManager.IMAGE_QUALITY_ORIGINAL) {
+
+						// load original image
+
+						imageKey = _imageKey;
+						loadedImage = new Image(_display, photo.getFilePathName());
+					}
 				}
 			}
 
-			resetState();
-
 		} catch (final Exception e) {
 
-//			StatusUtil.log(NLS.bind("Image \"{0}\" cannot be loaded ({1})", photo.getFileName(), _imageKey), e); //$NON-NLS-1$
+			setStateLoadingError();
 
-			// prevent loading it again
-			photo.setLoadingState(PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR, imageQuality);
+			isLoadingError = true;
 
 		} finally {
 
-			// tell the call back that the image is loaded
-			_loadCallBack.callBackImageIsLoaded(isImageVisible());
+			final boolean isImageLoaded = loadedImage != null;
+			final boolean isImageVisible = isImageVisible();
+
+			if (isImageLoaded) {
+				// keep image in cache
+				PhotoImageCache.putImage(imageKey, loadedImage);
+			}
+
+			if (isImageVisible == false) {
+
+				// image is NOT visible
+				setStateUndefined();
+
+			} else if (isImageLoadedInRequestedQuality) {
+
+				// image is loaded with requested quality
+				setStateUndefined();
+
+			} else {
+
+				// load image with requested quality
+
+				PhotoManager.putImageInHQLoadingQueue(_galleryItem, photo, imageQuality, _loadCallBack);
+			}
+
+			// display image in the loading callback
+			_loadCallBack.callBackImageIsLoaded(isImageVisible, isImageLoaded || isLoadingError);
 		}
 	}
 
-	private void resetState() {
+	/**
+	 * Image could not be loaded with {@link #loadImage()}, try to load high quality image.
+	 */
+	public void loadImageHQ() {
 
-		// reset state to undefined that it will be loaded again when image is visible again
+		boolean isLoadingError = false;
+		Image hqImage = null;
+
+		try {
+
+			if (isImageVisible() == false) {
+				setStateUndefined();
+				return;
+			}
+
+			// load original image and create thumbs
+			hqImage = getHQImage(photo, imageQuality);
+
+		} catch (final Exception e) {
+
+			setStateLoadingError();
+
+			isLoadingError = true;
+
+		} finally {
+
+			final boolean isImageLoaded = hqImage != null;
+			final boolean isImageVisible = isImageVisible();
+
+			if (isImageLoaded) {
+
+				setStateUndefined();
+
+			} else {
+
+				setStateLoadingError();
+
+				isLoadingError = true;
+			}
+
+			// display image in the loading callback
+			_loadCallBack.callBackImageIsLoaded(isImageVisible, isImageLoaded || isLoadingError);
+		}
+	}
+
+	private void setStateLoadingError() {
+
+		// prevent loading the image again
+		photo.setLoadingState(PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR, imageQuality);
+	}
+
+	private void setStateUndefined() {
+
+		// set state to undefined that it will be loaded again when image is visible
 		photo.setLoadingState(PhotoLoadingState.UNDEFINED, imageQuality);
 	}
 

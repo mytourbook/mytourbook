@@ -23,18 +23,13 @@ public enum PhotoLoadingState {
 	UNDEFINED,
 
 	/**
-	 * Loading the image for a foto failed
+	 * Loading the image for a photo failed
 	 */
 	IMAGE_HAS_A_LOADING_ERROR,
 
 	/**
-	 * Image is currently in the loading queue
+	 * Image is currently in the loading queue and is waiting to be loaded
 	 */
 	IMAGE_IS_IN_LOADING_QUEUE,
-
-	/**
-	 * Image is currently being loaded
-	 */
-	IMAGE_IS_BEING_LOADED,
 
 }

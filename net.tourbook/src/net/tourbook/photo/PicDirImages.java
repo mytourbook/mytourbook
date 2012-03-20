@@ -73,7 +73,7 @@ import org.eclipse.ui.part.PageBook;
 
 /**
  * This class is a compilation from different source codes:
- *
+ * 
  * <pre>
  * org.eclipse.swt.examples.fileviewer
  * org.sharemedia.gui.libraryviews.GalleryLibraryView
@@ -88,8 +88,8 @@ public class PicDirImages {
 	static final int								MIN_ITEM_HEIGHT			= 10;
 	static final int								MAX_ITEM_HEIGHT			= 999;
 
-	private static final String						STATE_FOLDER_HISTORY	= "STATE_FOLDER_HISTORY";		//$NON-NLS-1$
-	private static final String						STATE_THUMB_IMAGE_SIZE	= "STATE_THUMB_IMAGE_SIZE";	//$NON-NLS-1$
+	private static final String						STATE_FOLDER_HISTORY	= "STATE_FOLDER_HISTORY";				//$NON-NLS-1$
+	private static final String						STATE_THUMB_IMAGE_SIZE	= "STATE_THUMB_IMAGE_SIZE";			//$NON-NLS-1$
 
 	private final IPreferenceStore					_prefStore				= TourbookPlugin.getDefault() //
 																					.getPreferenceStore();
@@ -154,7 +154,10 @@ public class PicDirImages {
 	private AbstractGalleryItemRenderer				_itemRenderer;
 	private AbstractGridGroupRenderer				_groupRenderer;
 
-	private int										_photoSize				= 64;
+	/**
+	 * Photo image height (thumbnail size)
+	 */
+	private int										_photoSize				= PhotoManager.THUMBNAIL_DEFAULT_SIZE;
 
 	/**
 	 * Folder which images are currently displayed
@@ -268,54 +271,35 @@ public class PicDirImages {
 		}
 
 		@Override
-		public void callBackImageIsLoaded(final boolean isImageStillVisible) {
+		public void callBackImageIsLoaded(	final boolean isImageStillVisible,
+											final boolean isImageLoadedOrHasLoadingError) {
 
 			if (isImageStillVisible == false) {
 				return;
 			}
 
-			_display.asyncExec(new Runnable() {
+			if (isImageLoadedOrHasLoadingError) {
 
-				public void run() {
+				_display.asyncExec(new Runnable() {
 
-					if (__galleryItem.isDisposed() || _gallery.isDisposed()) {
-						return;
+					public void run() {
+
+						if (__galleryItem.isDisposed() || _gallery.isDisposed()) {
+							return;
+						}
+
+						final Rectangle galleryItemBounds = __galleryItem.getBounds();
+
+						_gallery.redraw(
+								galleryItemBounds.x,
+								galleryItemBounds.y,
+								galleryItemBounds.width,
+								galleryItemBounds.height,
+								false);
 					}
-
-					final Rectangle galleryItemBounds = __galleryItem.getBounds();
-
-//					System.out.println("redraw: " + galleryItemBounds);
-//					// TODO remove SYSTEM.OUT.PRINTLN
-
-					_gallery.redraw(
-							galleryItemBounds.x,
-							galleryItemBounds.y,
-							galleryItemBounds.width,
-							galleryItemBounds.height,
-							false);
-				}
-			});
+				});
+			}
 		}
-
-// ORIGINAL
-//		public void mediaLoaded(final IMedia media, final int definition, final Image img) {
-//			ImageService.getInstance().acquire(img);
-//			GalleryLibraryView.this.galleryImageCache.setImage(media, definition, img);
-//
-//			Display.getDefault().syncExec(new Runnable() {
-//
-//				public void run() {
-//					if (LoadItemCallback.this.item.isDisposed() || LoadItemCallback.this.callbackGallery.isDisposed()) {
-//						return;
-//					}
-//
-//					final Rectangle bounds = LoadItemCallback.this.item.getBounds();
-//
-//					LoadItemCallback.this.callbackGallery
-//							.redraw(bounds.x, bounds.y, bounds.width, bounds.height, false);
-//				}
-//			});
-//		}
 	}
 
 	PicDirImages(final PicDirView picDirView) {
@@ -482,7 +466,7 @@ public class PicDirImages {
 
 	/**
 	 * This will be configured from options but for now it is any image accepted.
-	 *
+	 * 
 	 * @return
 	 */
 	private FileFilter createFileFilter() {
@@ -594,7 +578,7 @@ public class PicDirImages {
 			@Override
 			public void mouseDown(final MouseEvent e) {
 
-				System.out.println("mouse down");
+				System.out.println("mouse down"); //$NON-NLS-1$
 				// TODO remove SYSTEM.OUT.PRINTLN
 
 				// show list
@@ -607,7 +591,7 @@ public class PicDirImages {
 
 		/**
 		 * This combination of key and selection listener causes a folder selection only with the
-		 * <Enter> key or with a mouse selection in the drop down box.
+		 * <Enter> key or with a selection with the mouse in the drop down box
 		 */
 		_comboPathHistory.addKeyListener(new KeyAdapter() {
 			@Override
@@ -790,7 +774,7 @@ public class PicDirImages {
 	/**
 	 * This event is called first of all before a gallery item is painted, it sets the photo into
 	 * the gallery item.
-	 *
+	 * 
 	 * @param event
 	 */
 	private void onGallery1SetItemData(final Event event) {
@@ -824,7 +808,7 @@ public class PicDirImages {
 	/**
 	 * This event checks if the image for the photo is available in the image cache, if not it is
 	 * put into a queue to be loaded, the {@link PhotoRenderer} will then paint the image.
-	 *
+	 * 
 	 * @param event
 	 */
 	private void onGallery2PaintItem(final Event event) {
@@ -839,17 +823,18 @@ public class PicDirImages {
 
 			final Photo photo = (Photo) galleryItem.getData();
 
-			final int imageQuality = _photoSize > PhotoManager.THUMBNAIL_DEFAULT_SIZE
-					? PhotoManager.IMAGE_QUALITY_600
-					: PhotoManager.IMAGE_QUALITY_THUMB_160;
+			final int imageQuality = _photoSize <= PhotoManager.THUMBNAIL_DEFAULT_SIZE
+					? PhotoManager.IMAGE_QUALITY_THUMB_160
+					: PhotoManager.IMAGE_QUALITY_HQ_1000;
 
-			// check if image is already loaded or has an loading error
+			// check if image is already being loaded or has an loading error
 			final PhotoLoadingState photoLoadingState = photo.getLoadingState(imageQuality);
 			if (photoLoadingState == PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR
 					|| photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE) {
 				return;
 			}
 
+			// check if image is in the cache
 			final Image photoImage = PhotoImageCache.getImage(photo.getImageKey(imageQuality));
 			if (photoImage == null || photoImage.isDisposed()) {
 
@@ -858,32 +843,7 @@ public class PicDirImages {
 				final LoadImageCallback imageLoadCallback = new LoadImageCallback(galleryItem);
 
 				PhotoManager.putImageInLoadingQueue(galleryItem, photo, imageQuality, imageLoadCallback);
-
-//				final PhotoImageLoaderItem loaderItem = new PhotoImageLoaderItem(//
-//						galleryItem,
-//						photo,
-//						imageQuality,
-//						imageLoadCallback);
-//
-//				loaderItem.loadImage();
 			}
-
-// ORIGINAL
-//			final IMedia m = (IMedia) galleryItem.getData(DATA_MEDIA);
-//			final int definition = itemHeight > 140 ? IConstants.IMAGE_LOW : IConstants.IMAGE_THUMB;
-//
-//			Image img = getImageCache().getImage(m, definition);
-//
-//			if (img == null) {
-//				img = getImageCache().getImage(m, itemHeight > 140 ? IConstants.IMAGE_THUMB : IConstants.IMAGE_LOW);
-//
-//				final LoadItemCallback callback = new LoadItemCallback(_gallery, galleryItem);
-//
-//				if (img == null && definition == IConstants.IMAGE_LOW) {
-//					MediaDownload.getInstance().load(m, IConstants.IMAGE_THUMB, callback);
-//				}
-//				MediaDownload.getInstance().load(m, definition, callback);
-//			}
 		}
 	}
 
@@ -926,6 +886,8 @@ public class PicDirImages {
 	private void onZoomInOut(final Event event) {
 
 		_spinnerThumbSize.setSelection(event.height);
+
+		onSelectThumbnailSize();
 	}
 
 	private void removeInvalidFolder(final String invalidFolderPathName) {
@@ -1039,17 +1001,18 @@ public class PicDirImages {
 
 	/**
 	 * Display images for the selected folder.
-	 *
+	 * 
 	 * @param imageFolder
-	 * @param isNavigation
+	 * @param isFromNavigationHistory
 	 */
-	void showImages(final File imageFolder, final boolean isNavigation) {
+	void showImages(final File imageFolder, final boolean isFromNavigationHistory) {
 
 		//////////////////////////////////////////
 		//
 		// MUST BE REMOVED, IS ONLY FOR TESTING
 		//
-//		PhotoImageCache.dispose();
+		PhotoImageCache.dispose();
+//		ThumbnailStore.cleanupStoreFiles(true, true);
 		//
 		// MUST BE REMOVED, IS ONLY FOR TESTING
 		//
@@ -1061,10 +1024,8 @@ public class PicDirImages {
 
 			_lblLoading.setText(NLS.bind(Messages.Pic_Dir_Label_Loading, imageFolder.getAbsolutePath()));
 
-			if (isNavigation == false) {
-				/*
-				 * don't update history when the navigation in the history caused to display images
-				 */
+			if (isFromNavigationHistory == false) {
+				// don't update history when the navigation in the history caused to display the images
 				updateHistory(imageFolder.getAbsolutePath());
 			}
 		}
@@ -1285,7 +1246,7 @@ public class PicDirImages {
 	/**
 	 * Notifies the worker that it should update itself with new data. Cancels any previous
 	 * operation and begins a new one.
-	 *
+	 * 
 	 * @param newFolder
 	 *            the new base directory for the table, null is ignored
 	 */

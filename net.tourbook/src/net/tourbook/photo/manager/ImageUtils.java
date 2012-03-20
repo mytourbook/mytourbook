@@ -40,7 +40,7 @@ public class ImageUtils {
 
 			if (qualityIndex < PhotoManager.IMAGE_QUALITY_ORIGINAL) {
 
-				final int qualitySize = PhotoManager.IMAGE_SIZE[qualityIndex];
+				final int qualitySize = PhotoManager.IMAGE_SIZES[qualityIndex];
 
 				if (qualitySize > width || qualitySize > height) {
 					return imageQuality;

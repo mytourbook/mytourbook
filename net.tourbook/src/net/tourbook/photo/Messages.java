@@ -36,12 +36,10 @@ public class Messages extends NLS {
 	public static String		Pic_Dir_Dialog_ExternalPhotoViewer_Title;
 	public static String		Pic_Dir_Dialog_FolderIsNotAvailable_Message;
 	public static String		Pic_Dir_Dialog_FolderIsNotAvailable_Title;
-
 	public static String		Pic_Dir_Label_FolderIsNotSelected;
 	public static String		Pic_Dir_Label_Loading;
-	public static String	Pic_Dir_Spinner_ThumbnailSize_Tooltip;
-	public static String	Pic_Dir_Spinner_ThumbnailSize_Tooltip_OSX;
-
+	public static String		Pic_Dir_Spinner_ThumbnailSize_Tooltip;
+	public static String		Pic_Dir_Spinner_ThumbnailSize_Tooltip_OSX;
 	public static String		Pic_Dir_Status_Loaded;
 
 	public static String		PrefPage_Photo_Cache_Button_GetNumberOfImages;
@@ -52,8 +50,7 @@ public class Messages extends NLS {
 	public static String		PrefPage_Photo_Cache_Label_NumberOfImages;
 	public static String		PrefPage_Photo_Cache_Label_ThumbnailCacheSizeInfo;
 	public static String		PrefPage_Photo_ExtViewer_Group_ExternalApplication;
-
-	public static String	PrefPage_Photo_ExtViewer_Group_ImageQuality;
+	public static String		PrefPage_Photo_ExtViewer_Group_ImageQuality;
 	public static String		PrefPage_Photo_ExtViewer_Label_ExternalApplication;
 	public static String		PrefPage_Photo_ExtViewer_Label_ExternalApplication_Tooltip;
 	public static String		PrefPage_Photo_ExtViewer_Label_Info;
@@ -68,17 +65,13 @@ public class Messages extends NLS {
 	public static String		PrefPage_Photo_ThumbStore_Group_ThumbnailStoreLocation;
 	public static String		PrefPage_Photo_ThumbStore_Text_Location;
 	public static String		PrefPage_Photo_Thumbstore_Label_LastCleanup;
-
 	public static String		PrefPage_Photo_Thumbstore_Label_UnitDays;
 	public static String		PrefPage_Photo_Thumbstore_Spinner_CleanupPeriod;
 	public static String		PrefPage_Photo_Thumbstore_Spinner_CleanupPeriod_Tooltip;
 	public static String		PrefPage_Photo_Thumbstore_Spinner_KeepImagesNumberOfDays;
 	public static String		PrefPage_Photo_Thumbstore_Spinner_KeepImagesNumberOfDays_Tooltip;
-
-	public static String	PrefPage_Photo_Viewer_Checkbox_ShowHighQuality;
-
-	public static String	PrefPage_Photo_Viewer_Checkbox_ShowHighQuality_Tooltip;
-
+	public static String		PrefPage_Photo_Viewer_Checkbox_ShowHighQuality;
+	public static String		PrefPage_Photo_Viewer_Checkbox_ShowHighQuality_Tooltip;
 	public static String		PrefPage_Photo_Viewer_Checkbox_ShowNumbersInFolderView;
 	public static String		PrefPage_Photo_Viewer_Checkbox_ShowNumbersInFolderView_Tooltip;
 	public static String		PrefPage_Photo_Viewer_Group_Colors;
@@ -86,10 +79,8 @@ public class Messages extends NLS {
 	public static String		PrefPage_Photo_Viewer_Label_FileColor;
 	public static String		PrefPage_Photo_Viewer_Label_FolderColor;
 	public static String		PrefPage_Photo_Viewer_Label_ForgroundColor;
-
-	public static String	PrefPage_Photo_Viewer_Label_HQThumbnailSize;
-
-	public static String	PrefPage_Photo_Viewer_Label_HQThumbnailSize_Tooltip;
+	public static String		PrefPage_Photo_Viewer_Label_HQThumbnailSize;
+	public static String		PrefPage_Photo_Viewer_Label_HQThumbnailSize_Tooltip;
 
 	public static String		Thumbnail_Store_CleanupTask;
 	public static String		Thumbnail_Store_CleanupTask_AllFiles;

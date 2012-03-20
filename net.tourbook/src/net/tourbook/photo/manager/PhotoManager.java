@@ -19,8 +19,10 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import net.tourbook.photo.gallery.GalleryMTItem;
 
@@ -32,32 +34,41 @@ public class PhotoManager {
 
 // SET_FORMATTING_OFF
 	
-	public static int[]											IMAGE_SIZE = { THUMBNAIL_DEFAULT_SIZE, 600, 999999 };
+	/**
+	 * Contains image sizes for different image qualities
+	 */
+	public static int[]											IMAGE_SIZES = { THUMBNAIL_DEFAULT_SIZE, 1000, Integer.MAX_VALUE };
 	
 // SET_FORMATTING_ON
 
-	public static int											IMAGE_QUALITY_THUMB_160	= 0;
-	public static int											IMAGE_QUALITY_600		= 1;
-	public static int											IMAGE_QUALITY_ORIGINAL	= 2;
-	/**
-	 * This must be the max image quality which is also used as array.length()
+	/*
+	 * image quality is the index in IMAGE_SIZE
 	 */
-	public static int											MAX_IMAGE_QUALITY		= 2;
+	public static int											IMAGE_QUALITY_THUMB_160	= 0;
+	public static int											IMAGE_QUALITY_HQ_1000	= 1;
+	public static int											IMAGE_QUALITY_ORIGINAL	= 2;
 
 	private static Display										_display;
 
 	private static ThreadPoolExecutor							_executorService;
 
+	/**
+	 * (H)igh(Q)ality executor is running only in one thread because multiple threads are slowing
+	 * down the process loading of fullsize images.
+	 */
+	private static ThreadPoolExecutor							_executorServiceHQ;
+
 	private static final LinkedBlockingDeque<PhotoImageLoader>	_waitingQueue			= new LinkedBlockingDeque<PhotoImageLoader>();
+	private static final LinkedBlockingDeque<PhotoImageLoader>	_waitingQueueHQ			= new LinkedBlockingDeque<PhotoImageLoader>();
 
 	static {
 
 		_display = Display.getDefault();
 
-		int processors = Runtime.getRuntime().availableProcessors() - 2;
+		int processors = Runtime.getRuntime().availableProcessors() - 0;
 		processors = Math.max(processors, 1);
 
-		processors = 2;
+//		processors = 2;
 
 		System.out.println("Number of processors: " + processors);
 
@@ -79,6 +90,70 @@ public class PhotoManager {
 		};
 
 		_executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(processors, threadFactory);
+
+		_executorServiceHQ = new ThreadPoolExecutor(
+				1,
+				1,
+				0L,
+				TimeUnit.MILLISECONDS,
+				new LinkedBlockingQueue<Runnable>());
+
+	}
+
+	private static void clearQueue(	final LinkedBlockingDeque<PhotoImageLoader> waitingQueue,
+									final ThreadPoolExecutor executorService) {
+
+		final Object[] queuedPhotoImageLoaderItems = waitingQueue.toArray();
+
+		/*
+		 * terminate all submitted tasks, the executor shutdownNow() creates
+		 * RejectedExecutionException when reusing the executor, I found no other way how to stop
+		 * the submitted tasks
+		 */
+		final BlockingQueue<Runnable> taskQueue = executorService.getQueue();
+		for (final Runnable runnable : taskQueue) {
+			final FutureTask<?> task = (FutureTask<?>) runnable;
+			task.cancel(false);
+		}
+
+		waitingQueue.clear();
+
+		// reset loading state for not loaded images
+		for (final Object object : queuedPhotoImageLoaderItems) {
+
+			if (object == null) {
+				// it's possible that a queue item is already be removed
+				continue;
+			}
+
+			final PhotoImageLoader photoImageLoaderItem = (PhotoImageLoader) object;
+
+			photoImageLoaderItem.photo.setLoadingState(PhotoLoadingState.UNDEFINED, photoImageLoaderItem.imageQuality);
+		}
+	}
+
+	public static void putImageInHQLoadingQueue(final GalleryMTItem galleryItem,
+												final Photo photo,
+												final int imageQuality,
+												final ILoadCallBack loadCallBack) {
+		// set state
+		photo.setLoadingState(PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE, imageQuality);
+
+		// set HQ image loading item into the waiting queue
+		_waitingQueueHQ.add(new PhotoImageLoader(_display, galleryItem, photo, imageQuality, loadCallBack));
+
+		final Runnable executorTask = new Runnable() {
+			public void run() {
+
+				// get last added loader itme
+				final PhotoImageLoader loadingItem = _waitingQueueHQ.pollLast();
+
+				if (loadingItem != null) {
+					loadingItem.loadImageHQ();
+				}
+			}
+		};
+		_executorServiceHQ.submit(executorTask);
 	}
 
 	public static void putImageInLoadingQueue(	final GalleryMTItem galleryItem,
@@ -89,10 +164,10 @@ public class PhotoManager {
 		// set state
 		photo.setLoadingState(PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE, imageQuality);
 
-		// add loading item into the waiting queue
+		// put image loading item into the waiting queue
 		_waitingQueue.add(new PhotoImageLoader(_display, galleryItem, photo, imageQuality, imageLoadCallback));
 
-		_executorService.submit(new Runnable() {
+		final Runnable executorTask = new Runnable() {
 			public void run() {
 
 				// get last added loader itme
@@ -102,7 +177,8 @@ public class PhotoManager {
 					loadingItem.loadImage();
 				}
 			}
-		});
+		};
+		_executorService.submit(executorTask);
 	}
 
 	/**
@@ -110,33 +186,7 @@ public class PhotoManager {
 	 */
 	public synchronized static void stopImageLoading() {
 
-		final Object[] queuedPhotoImageLoaderItems = _waitingQueue.toArray();
-
-		/*
-		 * terminate all submitted tasks, the executor shutdownNow() creates
-		 * RejectedExecutionException when reusing the executor, I found no other way how to stop
-		 * the submitted tasks
-		 */
-		final BlockingQueue<Runnable> taskQueue = _executorService.getQueue();
-		for (final Runnable runnable : taskQueue) {
-			final FutureTask<?> task = (FutureTask<?>) runnable;
-			task.cancel(false);
-		}
-
-		_waitingQueue.clear();
-
-		// reset loading state for not loaded images
-		for (final Object object : queuedPhotoImageLoaderItems) {
-
-			if (object == null) {
-				// queue item can already be removed
-				continue;
-			}
-
-			final PhotoImageLoader photoImageLoaderItem = (PhotoImageLoader) object;
-
-			photoImageLoaderItem.photo.setLoadingState(PhotoLoadingState.UNDEFINED, photoImageLoaderItem.imageQuality);
-		}
+		clearQueue(_waitingQueue, _executorService);
+		clearQueue(_waitingQueueHQ, _executorServiceHQ);
 	}
-
 }

@@ -88,7 +88,6 @@ class PicDirFolder {
 	private final IPreferenceStore				_prefStore								= TourbookPlugin.getDefault() //
 																								.getPreferenceStore();
 
-//	private PicDirView							_picDirView;
 	private PicDirImages						_picDirImages;
 
 	private long								_expandRunnableCounter;
@@ -103,7 +102,7 @@ class PicDirFolder {
 	 */
 	private boolean								_isMouseContextMenu;
 	private boolean								_doAutoCollapseExpand;
-	private boolean								_isNavigation;
+	private boolean								_isFromNavigationHistory;
 
 	private TVIFolderRoot						_rootItem;
 	private TVIFolderFolder						_selectedTVIFolder;
@@ -439,7 +438,7 @@ class PicDirFolder {
 		treeLayout.setColumnData(tvcColumn, new ColumnWeightData(100, true));
 	}
 
-	private void displayFolderImages(final TVIFolderFolder tviFolder, final boolean isNavigation) {
+	private void displayFolderImages(final TVIFolderFolder tviFolder, final boolean isFromNavigationHistory) {
 
 		final File selectedFolder = tviFolder._treeItemFolder;
 
@@ -452,7 +451,7 @@ class PicDirFolder {
 		_selectedTVIFolder = tviFolder;
 
 		// display imaged for the selected folder
-		_picDirImages.showImages(selectedFolder, isNavigation);
+		_picDirImages.showImages(selectedFolder, isFromNavigationHistory);
 	}
 
 	private void expandCollapseFolder(final TreeViewerItem treeItem) {
@@ -603,19 +602,19 @@ class PicDirFolder {
 
 			// context menu has been opened, do no expand/collapse
 
-			displayFolderImages(tviFolder, _isNavigation);
+			displayFolderImages(tviFolder, _isFromNavigationHistory);
 
 		} else {
 
 			if (doAutoCollapseExpand) {
 				onSelectFolder_10_AutoExpandCollapse(treeSelection, selectedTreePath, tviFolder);
 			} else {
-				displayFolderImages(tviFolder, _isNavigation);
+				displayFolderImages(tviFolder, _isFromNavigationHistory);
 			}
 		}
 
 		// reset navigation state, this is a bit of a complex behaviour
-		_isNavigation = false;
+		_isFromNavigationHistory = false;
 	}
 
 	/**
@@ -644,7 +643,7 @@ class PicDirFolder {
 				private TVIFolderFolder	__selectedFolderItem	= tviFolder;
 				private ITreeSelection	__treeSelection			= treeSelection;
 				private TreePath		__selectedTreePath		= selectedTreePath;
-				private boolean			__isNavigation			= _isNavigation;
+				private boolean			__isFromNavigationHistory	= _isFromNavigationHistory;
 
 				public void run() {
 
@@ -657,7 +656,7 @@ class PicDirFolder {
 							__selectedFolderItem,
 							__treeSelection,
 							__selectedTreePath,
-							__isNavigation);
+							__isFromNavigationHistory);
 				}
 			});
 
@@ -669,22 +668,22 @@ class PicDirFolder {
 				expandCollapseFolder(tviFolder);
 			}
 
-			displayFolderImages(tviFolder, _isNavigation);
+			displayFolderImages(tviFolder, _isFromNavigationHistory);
 		}
 	}
 
 	/**
 	 * This behavior is complex and still have possible problems.
-	 *
+	 * 
 	 * @param selectedFolderItem
 	 * @param treeSelection
 	 * @param selectedTreePath
-	 * @param isNavigation
+	 * @param isFromNavigationHistory
 	 */
 	private void onSelectFolder_10_AutoExpandCollapse_Runnable(	final TVIFolderFolder selectedFolderItem,
 																final ITreeSelection treeSelection,
 																final TreePath selectedTreePath,
-																final boolean isNavigation) {
+																final boolean isFromNavigationHistory) {
 		_isExpandingSelection = true;
 		{
 			final Tree tree = _folderViewer.getTree();
@@ -730,7 +729,7 @@ class PicDirFolder {
 		}
 		_isExpandingSelection = false;
 
-		displayFolderImages(selectedFolderItem, isNavigation);
+		displayFolderImages(selectedFolderItem, isFromNavigationHistory);
 	}
 
 	private void restoreFolder(final String restoreFolderName) {
@@ -782,16 +781,16 @@ class PicDirFolder {
 	/**
 	 * @param requestedFolderName
 	 * @param isMoveUpHierarchyWhenFolderIsInvalid
-	 * @param isNavigation
+	 * @param isFromNavigationHistory
 	 *            Set <code>true</code> when the folder was selected from the navigations history
 	 *            which prevents that the naviation history is updated.
 	 * @return Return <code>false</code> when the folder which should be selected is not available
 	 */
 	boolean selectFolder(	final String requestedFolderName,
 							final boolean isMoveUpHierarchyWhenFolderIsInvalid,
-							final boolean isNavigation) {
+							final boolean isFromNavigationHistory) {
 
-		_isNavigation = isNavigation;
+		_isFromNavigationHistory = isFromNavigationHistory;
 
 		boolean isRequestedFolderAvailable = false;
 		File selectedFolder = null;

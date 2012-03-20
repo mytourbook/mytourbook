@@ -19,6 +19,7 @@ http://svn.apache.org/repos/asf/commons/proper/sanselan
  
 PENDENZEN
 - document key shortcuts: Shortcut_Key_
+- document portable version by setting data directory http://mytourbook.sourceforge.net/mytourbook/index.php/download-install/data-directory
 - Error Log ist jetzt im Help Menü
 - Exception Handling dokumentieren
 - Ansicht "Touren Import" dokumentieren, ist z.Z. in http://mytourbook.sourceforge.net/mytourbook/index.php/documentation/get-tours/save-tours

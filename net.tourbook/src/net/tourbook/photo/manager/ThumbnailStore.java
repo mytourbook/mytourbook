@@ -100,6 +100,12 @@ public class ThumbnailStore {
 		return imagePathWithoutExt;
 	}
 
+	/**
+	 * @param isDeleteAllImages
+	 *            When <code>true</code> all images will be deleted and
+	 *            <code>isIgnoreCleanupPeriod</code> is ignored
+	 * @param isIgnoreCleanupPeriod
+	 */
 	public static void cleanupStoreFiles(final boolean isDeleteAllImages, final boolean isIgnoreCleanupPeriod) {
 
 		if (isDeleteAllImages) {
@@ -157,7 +163,7 @@ public class ThumbnailStore {
 		}
 
 		if (_errorFile != null) {
-			StatusUtil.showStatus(
+			StatusUtil.log(
 					NLS.bind(Messages.Thumbnail_Store_Error_CannotDeleteFolder, _errorFile.toString()),
 					new Exception());
 		}
@@ -307,7 +313,7 @@ public class ThumbnailStore {
 
 		final String imageKey = photo.getImageKey(imageQuality);
 
-		final int imageQualitySize = PhotoManager.IMAGE_SIZE[imageQuality];
+		final int imageQualitySize = PhotoManager.IMAGE_SIZES[imageQuality];
 		final String imageKey1Folder = imageKey.substring(0, 2);
 		final String imageKey2Folder = imageKey.substring(0, 4);
 
@@ -426,6 +432,11 @@ public class ThumbnailStore {
 
 			final IPath fullImageFilePath = imagePathWithoutExt.addFileExtension(THUMBNAIL_IMAGE_EXTENSION_JPG);
 
+			/*
+			 * save thumbnail as jpg image, Eclipse 3.8 M5 saves it with better quality, default is
+			 * 75%, compression in the imageloader could be set
+			 */
+			imageLoader.compression = 80;
 			imageLoader.save(fullImageFilePath.toOSString(), SWT.IMAGE_JPEG);
 
 		} catch (final Exception e) {

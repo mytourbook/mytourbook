@@ -15,9 +15,15 @@
  *******************************************************************************/
 package net.tourbook.photo.manager;
 
-
 public interface ILoadCallBack {
 
-	void callBackImageIsLoaded(boolean isImageStillVisible);
+	/**
+	 * @param isImageStillVisible
+	 *            Is <code>true</code> when the image is still visible after it has been loaded.
+	 * @param isImageLoaded
+	 *            Is <code>false</code> when an image could not be loaded.
+	 */
+	void callBackImageIsLoaded(	boolean isImageStillVisible,
+								boolean isImageLoaded);
 
 }

@@ -58,7 +58,7 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 		final Photo photo = (Photo) itemData;
 
 		final int defaultImageQuality = galleryItemHeight > PhotoManager.THUMBNAIL_DEFAULT_SIZE
-				? PhotoManager.IMAGE_QUALITY_600
+				? PhotoManager.IMAGE_QUALITY_HQ_1000
 				: PhotoManager.IMAGE_QUALITY_THUMB_160;
 
 		Image photoImage = PhotoImageCache.getImage(photo.getImageKey(defaultImageQuality));
@@ -66,7 +66,7 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 
 			final int lowerImageQuality = galleryItemHeight > PhotoManager.THUMBNAIL_DEFAULT_SIZE
 					? PhotoManager.IMAGE_QUALITY_THUMB_160
-					: PhotoManager.IMAGE_QUALITY_600;
+					: PhotoManager.IMAGE_QUALITY_HQ_1000;
 
 			photoImage = PhotoImageCache.getImage(photo.getImageKey(lowerImageQuality));
 		}
