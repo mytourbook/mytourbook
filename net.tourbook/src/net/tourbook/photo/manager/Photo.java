@@ -19,14 +19,12 @@ import java.awt.Point;
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
 
 import net.tourbook.util.StatusUtil;
 import net.tourbook.util.Util;
 
 import org.apache.commons.sanselan.ImageReadException;
 import org.apache.commons.sanselan.Sanselan;
-import org.apache.commons.sanselan.SanselanConstants;
 import org.apache.commons.sanselan.common.IImageMetadata;
 import org.apache.commons.sanselan.formats.jpeg.JpegImageMetadata;
 import org.apache.commons.sanselan.formats.tiff.TiffField;
@@ -113,6 +111,7 @@ public class Photo {
 	 * This array keeps track of the loading state for the photo images and for different qualities
 	 */
 	private PhotoLoadingState[]				_photoLoadingState;
+	private IImageMetadata					_metadata;
 
 	/**
 	 * @param galleryItemIndex
@@ -374,6 +373,67 @@ public class Photo {
 		return _longitude;
 	}
 
+	public IImageMetadata getMetaData() {
+
+		if (_metadata != null) {
+			return _metadata;
+		}
+
+		try {
+
+			// SanselanConstants.PARAM_KEY_READ_THUMBNAILS
+
+			// read metadata WITH thumbnail image info
+			_metadata = Sanselan.getMetadata(_imageFile, new HashMap<Object, Object>());
+
+			/*
+			 * this will log all available meta data
+			 */
+//			System.out.println(metadata.toString());
+
+			/*
+			 * read meta data for this photo
+			 */
+			if (_metadata instanceof TiffImageMetadata) {
+
+				final TiffImageMetadata tiffMetadata = (TiffImageMetadata) _metadata;
+
+				_dateTime = getTiffDate(tiffMetadata);
+
+				setSize(
+						getTiffIntValue(tiffMetadata, TiffTagConstants.TIFF_TAG_IMAGE_WIDTH, Integer.MIN_VALUE),
+						getTiffIntValue(tiffMetadata, TiffTagConstants.TIFF_TAG_IMAGE_LENGTH, Integer.MIN_VALUE));
+
+			} else if (_metadata instanceof JpegImageMetadata) {
+
+				final JpegImageMetadata jpegMetadata = (JpegImageMetadata) _metadata;
+
+				_dateTime = getExifDate(jpegMetadata);
+
+				setSize(
+						getExifIntValue(jpegMetadata, ExifTagConstants.EXIF_TAG_EXIF_IMAGE_WIDTH, Integer.MIN_VALUE),
+						getExifIntValue(jpegMetadata, ExifTagConstants.EXIF_TAG_EXIF_IMAGE_LENGTH, Integer.MIN_VALUE));
+
+				_orientation = getExifIntValue(jpegMetadata, ExifTagConstants.EXIF_TAG_ORIENTATION, 1);
+				_imageDirection = getExifValueDouble(jpegMetadata, GpsTagConstants.GPS_TAG_GPS_IMG_DIRECTION);
+				_altitude = getExifValueDouble(jpegMetadata, GpsTagConstants.GPS_TAG_GPS_ALTITUDE);
+
+				setExifLatLon(jpegMetadata);
+				_gpsAreaInfo = getExifGpsArea(jpegMetadata);
+			}
+
+			// ensure date is set
+			if (_dateTime == null) {
+				_dateTime = new DateTime(_imageFile.lastModified());
+			}
+
+		} catch (final Exception e) {
+			StatusUtil.log(e);
+		}
+
+		return _metadata;
+	}
+
 	public int getOrientation() {
 		return _orientation;
 	}
@@ -453,61 +513,6 @@ public class Photo {
 		int result = 1;
 		result = prime * result + ((_filePathName == null) ? 0 : _filePathName.hashCode());
 		return result;
-	}
-
-	public void loadMetaData() {
-
-		try {
-			final Map<String, Boolean> params = new HashMap<String, Boolean>();
-			final boolean ignoreImageData = true;//isPhilHarveyTestImage(imageFile);
-			params.put(SanselanConstants.PARAM_KEY_READ_THUMBNAILS, new Boolean(!ignoreImageData));
-
-			final IImageMetadata metadata = Sanselan.getMetadata(_imageFile, params);
-
-			/*
-			 * this will log all available meta data
-			 */
-//			System.out.println(metadata.toString());
-
-			/*
-			 * read meta data for 1 photo
-			 */
-			if (metadata instanceof TiffImageMetadata) {
-
-				final TiffImageMetadata tiffMetadata = (TiffImageMetadata) metadata;
-
-				_dateTime = getTiffDate(tiffMetadata);
-
-				setSize(
-						getTiffIntValue(tiffMetadata, TiffTagConstants.TIFF_TAG_IMAGE_WIDTH, Integer.MIN_VALUE),
-						getTiffIntValue(tiffMetadata, TiffTagConstants.TIFF_TAG_IMAGE_LENGTH, Integer.MIN_VALUE));
-
-			} else if (metadata instanceof JpegImageMetadata) {
-
-				final JpegImageMetadata jpegMetadata = (JpegImageMetadata) metadata;
-
-				_dateTime = getExifDate(jpegMetadata);
-
-				setSize(
-						getExifIntValue(jpegMetadata, ExifTagConstants.EXIF_TAG_EXIF_IMAGE_WIDTH, Integer.MIN_VALUE),
-						getExifIntValue(jpegMetadata, ExifTagConstants.EXIF_TAG_EXIF_IMAGE_LENGTH, Integer.MIN_VALUE));
-
-				_orientation = getExifIntValue(jpegMetadata, ExifTagConstants.EXIF_TAG_ORIENTATION, 1);
-				_imageDirection = getExifValueDouble(jpegMetadata, GpsTagConstants.GPS_TAG_GPS_IMG_DIRECTION);
-				_altitude = getExifValueDouble(jpegMetadata, GpsTagConstants.GPS_TAG_GPS_ALTITUDE);
-
-				setExifLatLon(jpegMetadata);
-				_gpsAreaInfo = getExifGpsArea(jpegMetadata);
-			}
-
-			// ensure date is set
-			if (_dateTime == null) {
-				_dateTime = new DateTime(_imageFile.lastModified());
-			}
-
-		} catch (final Exception e) {
-			StatusUtil.log(e);
-		}
 	}
 
 	public void setAltitude(final double altitude) {

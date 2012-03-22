@@ -31,6 +31,7 @@ import net.tourbook.photo.manager.Photo;
 import net.tourbook.photo.manager.PhotoImageCache;
 import net.tourbook.photo.manager.PhotoLoadingState;
 import net.tourbook.photo.manager.PhotoManager;
+import net.tourbook.photo.manager.ThumbnailStore;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.UI;
 import net.tourbook.util.Util;
@@ -73,7 +74,7 @@ import org.eclipse.ui.part.PageBook;
 
 /**
  * This class is a compilation from different source codes:
- * 
+ *
  * <pre>
  * org.eclipse.swt.examples.fileviewer
  * org.sharemedia.gui.libraryviews.GalleryLibraryView
@@ -466,7 +467,7 @@ public class PicDirImages {
 
 	/**
 	 * This will be configured from options but for now it is any image accepted.
-	 * 
+	 *
 	 * @return
 	 */
 	private FileFilter createFileFilter() {
@@ -774,7 +775,7 @@ public class PicDirImages {
 	/**
 	 * This event is called first of all before a gallery item is painted, it sets the photo into
 	 * the gallery item.
-	 * 
+	 *
 	 * @param event
 	 */
 	private void onGallery1SetItemData(final Event event) {
@@ -808,7 +809,7 @@ public class PicDirImages {
 	/**
 	 * This event checks if the image for the photo is available in the image cache, if not it is
 	 * put into a queue to be loaded, the {@link PhotoRenderer} will then paint the image.
-	 * 
+	 *
 	 * @param event
 	 */
 	private void onGallery2PaintItem(final Event event) {
@@ -1001,7 +1002,7 @@ public class PicDirImages {
 
 	/**
 	 * Display images for the selected folder.
-	 * 
+	 *
 	 * @param imageFolder
 	 * @param isFromNavigationHistory
 	 */
@@ -1012,7 +1013,7 @@ public class PicDirImages {
 		// MUST BE REMOVED, IS ONLY FOR TESTING
 		//
 		PhotoImageCache.dispose();
-//		ThumbnailStore.cleanupStoreFiles(true, true);
+		ThumbnailStore.cleanupStoreFiles(true, true);
 		//
 		// MUST BE REMOVED, IS ONLY FOR TESTING
 		//
@@ -1246,7 +1247,7 @@ public class PicDirImages {
 	/**
 	 * Notifies the worker that it should update itself with new data. Cancels any previous
 	 * operation and begins a new one.
-	 * 
+	 *
 	 * @param newFolder
 	 *            the new base directory for the table, null is ignored
 	 */

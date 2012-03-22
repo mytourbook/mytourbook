@@ -79,7 +79,7 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 		int useableHeight = galleryItemHeight;
 		int fontHeight = 0;
 		boolean isText = galleryItem.getText() != null && isShowLabels();
-		if (galleryItemHeight <= 300) {
+		if (galleryItemHeight <= 100) {
 			isText = false;
 		}
 		if (isText) {

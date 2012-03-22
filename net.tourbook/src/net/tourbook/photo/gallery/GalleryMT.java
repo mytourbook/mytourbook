@@ -2138,7 +2138,7 @@ public class GalleryMT extends Canvas {
 
 		final float timeDiff = (float) (System.nanoTime() - start) / 1000000;
 		if (timeDiff > 10) {}
-		System.out.println("onPaint:\t" + timeDiff + " ms\t" + clipping);
+//		System.out.println("onPaint:\t" + timeDiff + " ms\t" + clipping);
 		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 

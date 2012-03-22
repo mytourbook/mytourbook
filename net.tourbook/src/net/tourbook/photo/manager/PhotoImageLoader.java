@@ -19,13 +19,11 @@ import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 
 import net.tourbook.photo.gallery.GalleryMTItem;
 import net.tourbook.util.StatusUtil;
 
 import org.apache.commons.sanselan.ImageReadException;
-import org.apache.commons.sanselan.Sanselan;
 import org.apache.commons.sanselan.common.IImageMetadata;
 import org.apache.commons.sanselan.formats.jpeg.JpegImageMetadata;
 import org.eclipse.core.runtime.IPath;
@@ -39,15 +37,15 @@ import org.joda.time.LocalDate;
 
 public class PhotoImageLoader {
 
-	Photo								photo;
-	private GalleryMTItem				_galleryItem;
-	int									galleryIndex;
-	int									imageQuality;
-	private String						_imageKey;
+	Photo					photo;
+	private GalleryMTItem	_galleryItem;
+	int						galleryIndex;
+	int						imageQuality;
+	private String			_imageKey;
 
-	private ILoadCallBack				_loadCallBack;
+	private ILoadCallBack	_loadCallBack;
 
-	Display								_display;							;
+	Display					_display;		;
 
 	public PhotoImageLoader(final Display display,
 							final GalleryMTItem galleryItem,
@@ -159,108 +157,6 @@ public class PhotoImageLoader {
 //		return null;
 //	}
 
-	private Image getHQImage(final Photo photo, final int requestedImageQuality) {
-
-		System.out.println("getHQImage\t" + photo);
-		// TODO remove SYSTEM.OUT.PRINTLN
-
-		// load full size image
-		final String fullSizePathName = photo.getFilePathName();
-		final Image fullSizeImage[] = { null };
-
-		try {
-
-//			_display.asyncExec(new Runnable() {
-//				public void run() {
-//				}
-//			});
-			fullSizeImage[0] = new Image(_display, fullSizePathName);
-
-		} catch (final Exception e) {
-
-			// #######################################
-			// this must be handled without logging
-			// #######################################
-			StatusUtil.log(NLS.bind("Fullsize image \"{0}\" cannot be loaded", fullSizePathName), e); //$NON-NLS-1$
-
-		} finally {
-
-			if (fullSizeImage[0] == null) {
-				StatusUtil.log(NLS.bind(//
-						"Fullsize image \"{0}\" cannot be loaded",
-						fullSizePathName), new Exception());
-				return null;
-			}
-		}
-
-		Image requestedImage = null;
-
-		final Rectangle fullSizeImageBounds = fullSizeImage[0].getBounds();
-		final int fullSizeWidth = fullSizeImageBounds.width;
-		final int fullSizeHeight = fullSizeImageBounds.height;
-
-		System.out.println("getHQImage\t" + fullSizeImageBounds);
-		// TODO remove SYSTEM.OUT.PRINTLN
-
-		final int[] thumbSizes = PhotoManager.IMAGE_SIZES;
-
-		// the original size will not be stored in the thumb store
-		for (int imageQuality = thumbSizes.length - 2; imageQuality >= 0; imageQuality--) {
-
-			final int thumbSize = thumbSizes[imageQuality];
-
-			Image resizedImage = null;
-			IPath storeImagePath = null;
-
-			try {
-
-				if (fullSizeWidth > thumbSize || fullSizeHeight > thumbSize) {
-
-					final Point bestSize = ImageUtils.getBestSize(fullSizeWidth, fullSizeHeight, thumbSize, thumbSize);
-
-					resizedImage = ImageUtils.resize(
-							_display,
-							fullSizeImage[0],
-							bestSize.x,
-							bestSize.y,
-							SWT.ON,
-							SWT.HIGH);
-
-				} else {
-
-					resizedImage = fullSizeImage[0];
-				}
-
-				storeImagePath = ThumbnailStore.getStoreImagePath(photo, imageQuality);
-				ThumbnailStore.saveImageSWT(//
-						resizedImage,
-						storeImagePath);
-
-			} catch (final Exception e) {
-				StatusUtil.log(NLS.bind("Store image \"{0}\" couldn't be created", storeImagePath.toOSString()), e); //$NON-NLS-1$
-			}
-
-			// requested image will be cached
-			if (imageQuality == requestedImageQuality) {
-
-				// keep requested image in cache
-				PhotoImageCache.putImage(_imageKey, resizedImage);
-
-				requestedImage = resizedImage;
-
-			} else {
-
-				// dispose resized image
-
-				if (resizedImage != fullSizeImage[0]) {
-					resizedImage.dispose();
-				}
-			}
-		}
-
-		return requestedImage;
-	}
-
 	/**
 	 * @param photo
 	 * @param storeImageFilePath
@@ -270,9 +166,8 @@ public class PhotoImageLoader {
 	private Image getImageFromEXIFThumbnail(final Photo photo, final IPath storeImageFilePath) {
 
 		try {
-			final File imageFile = new File(photo.getFilePathName());
 
-			final IImageMetadata metadata = Sanselan.getMetadata(imageFile, new HashMap<Object, Object>());
+			final IImageMetadata metadata = photo.getMetaData();
 
 			if (metadata == null) {
 				return null;
@@ -288,7 +183,6 @@ public class PhotoImageLoader {
 				final JpegImageMetadata jpegMetadata = (JpegImageMetadata) metadata;
 
 				final BufferedImage bufferedImage = jpegMetadata.getEXIFThumbnail();
-
 				if (bufferedImage == null) {
 					System.out.println(photo.getFileName() + "\tNO EXIF THUMB");
 					// TODO remove SYSTEM.OUT.PRINTLN
@@ -306,6 +200,8 @@ public class PhotoImageLoader {
 				//#########################################################
 
 				try {
+
+					// get SWT image from AWT image
 
 					try {
 						ThumbnailStore.saveImageAWT(bufferedImage, storeImageFilePath);
@@ -371,20 +267,6 @@ public class PhotoImageLoader {
 
 		return null;
 	}
-
-	//			System.out.println((Thread.currentThread().getName() + "\t")
-//					+ photo.getFileName()
-//					+ "\tload: "
-//					+ ((endLoading - startLoading) + "")
-//					+ "\tresize: "
-//					+ ((endResize - startResize) + "")
-//					+ "\tsave: "
-//					+ ((endSave - startSave) + "")
-//					+ "\ttotal: "
-//					+ ((endSave - startLoading) + "")
-//			//
-//					);
-//			// TODO remove SYSTEM.OUT.PRINTLN
 
 	/**
 	 * check if the image is still visible
@@ -486,17 +368,17 @@ public class PhotoImageLoader {
 	 */
 	public void loadImage() {
 
+		if (isImageVisible() == false) {
+			setStateUndefined();
+			return;
+		}
+
 		boolean isImageLoadedInRequestedQuality = false;
 		Image loadedImage = null;
 		String imageKey = null;
 		boolean isLoadingError = false;
 
 		try {
-
-			if (isImageVisible() == false) {
-				setStateUndefined();
-				return;
-			}
 
 			// 1. get image from image store
 			final Image storeImage = getImageFromStore(photo, imageQuality);
@@ -577,18 +459,20 @@ public class PhotoImageLoader {
 	 */
 	public void loadImageHQ() {
 
+		final long start = System.currentTimeMillis();
+
+		if (isImageVisible() == false) {
+			setStateUndefined();
+			return;
+		}
+
 		boolean isLoadingError = false;
 		Image hqImage = null;
 
 		try {
 
-			if (isImageVisible() == false) {
-				setStateUndefined();
-				return;
-			}
-
 			// load original image and create thumbs
-			hqImage = getHQImage(photo, imageQuality);
+			hqImage = loadImageHQ_10(photo, imageQuality);
 
 		} catch (final Exception e) {
 
@@ -614,10 +498,127 @@ public class PhotoImageLoader {
 
 			// display image in the loading callback
 			_loadCallBack.callBackImageIsLoaded(isImageVisible, isImageLoaded || isLoadingError);
+
+			System.out.println("loadImageHQ() time: " + (System.currentTimeMillis() - start) + " ms  " + photo);
+			// TODO remove SYSTEM.OUT.PRINTLN
 		}
 	}
 
+	private Image loadImageHQ_10(final Photo photo, final int requestedImageQuality) {
+
+		// load full size image
+		final String fullSizePathName = photo.getFilePathName();
+		Image loadedHQImage = null;
+
+		int loadedImageWidth = 0;
+		int loadedImageHeight = 0;
+
+		try {
+
+			// !!! this is not working on win7 with images 3500x5000 !!!
+			loadedHQImage = new Image(_display, fullSizePathName);
+
+			final Rectangle imageSize = loadedHQImage.getBounds();
+			loadedImageWidth = imageSize.width;
+			loadedImageHeight = imageSize.height;
+
+		} catch (final Exception e) {
+
+			// #######################################
+			// this must be handled without logging
+			// #######################################
+			StatusUtil.log(NLS.bind("Fullsize image \"{0}\" cannot be loaded", fullSizePathName), e); //$NON-NLS-1$
+
+		} finally {
+
+			if (loadedHQImage == null) {
+
+				/**
+				 * sometimes (when images are loaded concurrently) larger images could not be loaded
+				 * with SWT methods on Win7 (Eclipse 3.8 M6), try to load image with AWT, this
+				 * <code>https://bugs.eclipse.org/bugs/show_bug.cgi?id=350783</code> bug fix has not
+				 * solved this problem
+				 */
+
+				loadedHQImage = loadImageHQ_20_AWT();
+
+				if (loadedHQImage == null) {
+					StatusUtil.log(NLS.bind(//
+							"Fullsize image \"{0}\" cannot be loaded",
+							fullSizePathName), new Exception());
+					return null;
+				}
+			}
+		}
+
+		Image requestedImage = null;
+
+		final int[] thumbSizes = PhotoManager.IMAGE_SIZES;
+
+		// the original size will not be stored in the thumb store
+		for (int imageQuality = thumbSizes.length - 2; imageQuality >= 0; imageQuality--) {
+
+			final int thumbSize = thumbSizes[imageQuality];
+
+			Image resizedImage = null;
+			IPath storeImagePath = null;
+
+			try {
+
+				if (loadedImageWidth > thumbSize || loadedImageHeight > thumbSize) {
+
+					final Point bestSize = ImageUtils.getBestSize(
+							loadedImageWidth,
+							loadedImageHeight,
+							thumbSize,
+							thumbSize);
+
+					resizedImage = ImageUtils.resize(_display, loadedHQImage, bestSize.x, bestSize.y, SWT.ON, SWT.HIGH);
+
+				} else {
+
+					resizedImage = loadedHQImage;
+				}
+
+				storeImagePath = ThumbnailStore.getStoreImagePath(photo, imageQuality);
+				ThumbnailStore.saveImageSWT(//
+						resizedImage,
+						storeImagePath);
+
+			} catch (final Exception e) {
+				StatusUtil.log(NLS.bind("Store image \"{0}\" couldn't be created", storeImagePath.toOSString()), e); //$NON-NLS-1$
+			}
+
+			// requested image will be cached
+			if (imageQuality == requestedImageQuality) {
+
+				// keep requested image in cache
+				PhotoImageCache.putImage(_imageKey, resizedImage);
+
+				requestedImage = resizedImage;
+
+			} else {
+
+				// dispose resized image
+
+				if (resizedImage != loadedHQImage) {
+					resizedImage.dispose();
+				}
+			}
+		}
+
+		return requestedImage;
+	}
+
+	private Image loadImageHQ_20_AWT() {
+
+		return null;
+	}
+
 	private void setStateLoadingError() {
+
+		System.out.println("setStateLoadingError\t" + photo);
+		// TODO remove SYSTEM.OUT.PRINTLN
 
 		// prevent loading the image again
 		photo.setLoadingState(PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR, imageQuality);

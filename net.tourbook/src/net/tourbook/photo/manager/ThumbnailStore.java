@@ -225,7 +225,7 @@ public class ThumbnailStore {
 	 * Deletes files and subdirectories. If a deletion fails, the method stops attempting to delete. <br>
 	 * <br>
 	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! RECURSIVE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
-	 * 
+	 *
 	 * @param fileOrFolder
 	 * @param monitor
 	 * @return Returns number of deleted files
@@ -436,7 +436,7 @@ public class ThumbnailStore {
 			 * save thumbnail as jpg image, Eclipse 3.8 M5 saves it with better quality, default is
 			 * 75%, compression in the imageloader could be set
 			 */
-			imageLoader.compression = 80;
+			imageLoader.compression = 75;
 			imageLoader.save(fullImageFilePath.toOSString(), SWT.IMAGE_JPEG);
 
 		} catch (final Exception e) {

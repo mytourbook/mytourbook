@@ -33,12 +33,12 @@ public class PhotoManager {
 	public static final int										THUMBNAIL_DEFAULT_SIZE	= 160;
 
 // SET_FORMATTING_OFF
-	
+
 	/**
 	 * Contains image sizes for different image qualities
 	 */
 	public static int[]											IMAGE_SIZES = { THUMBNAIL_DEFAULT_SIZE, 1000, Integer.MAX_VALUE };
-	
+
 // SET_FORMATTING_ON
 
 	/*
@@ -65,7 +65,7 @@ public class PhotoManager {
 
 		_display = Display.getDefault();
 
-		int processors = Runtime.getRuntime().availableProcessors() - 0;
+		int processors = Runtime.getRuntime().availableProcessors() - 1;
 		processors = Math.max(processors, 1);
 
 //		processors = 2;
@@ -122,7 +122,7 @@ public class PhotoManager {
 		for (final Object object : queuedPhotoImageLoaderItems) {
 
 			if (object == null) {
-				// it's possible that a queue item is already be removed
+				// it's possible that a queue item has already been removed
 				continue;
 			}
 
