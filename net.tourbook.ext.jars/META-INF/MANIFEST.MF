@@ -11,7 +11,8 @@ Bundle-ClassPath: joda-time-2.1.jar,
  edtftpj.jar,
  net.sf.swtaddons_0.1.1.jar,
  trove-3.0.2.jar,
- concurrentlinkedhashmap-lru-1.2.jar
+ concurrentlinkedhashmap-lru-1.2.jar,
+ imgscalr-lib-4.2.jar
 Bundle-Vendor: MyTourbook
 Export-Package: com.enterprisedt,
  com.enterprisedt.net.ftp,
@@ -111,6 +112,7 @@ Export-Package: com.enterprisedt,
  net.sf.swtaddons.autocomplete,
  net.sf.swtaddons.autocomplete.combo,
  net.sf.swtaddons.autocomplete.text,
+ org.imgscalr,
  org.joda.time,
  org.joda.time.base,
  org.joda.time.chrono,

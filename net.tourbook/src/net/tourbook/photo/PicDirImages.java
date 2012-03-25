@@ -74,7 +74,7 @@ import org.eclipse.ui.part.PageBook;
 
 /**
  * This class is a compilation from different source codes:
- *
+ * 
  * <pre>
  * org.eclipse.swt.examples.fileviewer
  * org.sharemedia.gui.libraryviews.GalleryLibraryView
@@ -87,7 +87,8 @@ public class PicDirImages {
 	private static final int						MAX_HISTORY_ENTRIES		= 200;
 
 	static final int								MIN_ITEM_HEIGHT			= 10;
-	static final int								MAX_ITEM_HEIGHT			= 999;
+//	static final int								MAX_ITEM_HEIGHT			= 999;
+	static final int								MAX_ITEM_HEIGHT			= 2000;
 
 	private static final String						STATE_FOLDER_HISTORY	= "STATE_FOLDER_HISTORY";				//$NON-NLS-1$
 	private static final String						STATE_THUMB_IMAGE_SIZE	= "STATE_THUMB_IMAGE_SIZE";			//$NON-NLS-1$
@@ -467,7 +468,7 @@ public class PicDirImages {
 
 	/**
 	 * This will be configured from options but for now it is any image accepted.
-	 *
+	 * 
 	 * @return
 	 */
 	private FileFilter createFileFilter() {
@@ -768,14 +769,29 @@ public class PicDirImages {
 		final String property = event.getProperty();
 
 		if (property.equals(ITourbookPreferences.PHOTO_VIEWER_PREF_STORE_EVENT)) {
+
 			updateImageQuality();
+
+//			if (isQualityModified) {
+//
+//			}
+			_display.asyncExec(new Runnable() {
+				public void run() {
+
+					PhotoImageCache.dispose();
+					ThumbnailStore.cleanupStoreFiles(true, true);
+
+					// this will update the gallery
+					_gallery.clearAll();
+				}
+			});
 		}
 	}
 
 	/**
 	 * This event is called first of all before a gallery item is painted, it sets the photo into
 	 * the gallery item.
-	 *
+	 * 
 	 * @param event
 	 */
 	private void onGallery1SetItemData(final Event event) {
@@ -809,7 +825,7 @@ public class PicDirImages {
 	/**
 	 * This event checks if the image for the photo is available in the image cache, if not it is
 	 * put into a queue to be loaded, the {@link PhotoRenderer} will then paint the image.
-	 *
+	 * 
 	 * @param event
 	 */
 	private void onGallery2PaintItem(final Event event) {
@@ -1002,7 +1018,7 @@ public class PicDirImages {
 
 	/**
 	 * Display images for the selected folder.
-	 *
+	 * 
 	 * @param imageFolder
 	 * @param isFromNavigationHistory
 	 */
@@ -1146,10 +1162,15 @@ public class PicDirImages {
 
 		final boolean isShowHighQuality = _prefStore.getBoolean(//
 				ITourbookPreferences.PHOTO_VIEWER_IS_SHOW_IMAGE_WITH_HIGH_QUALITY);
+
 		final int hqMinSize = _prefStore.getInt(//
 				ITourbookPreferences.PHOTO_VIEWER_HIGH_QUALITY_IMAGE_MIN_SIZE);
 
 		_gallery.setImageQuality(isShowHighQuality, hqMinSize);
+
+		final String resizeQualityId = _prefStore.getString(//
+				ITourbookPreferences.PHOTO_VIEWER_IMAGE_RESIZE_QUALITY);
+		PhotoManager.setResizeQuality(resizeQualityId);
 	}
 
 	/**
@@ -1247,7 +1268,7 @@ public class PicDirImages {
 	/**
 	 * Notifies the worker that it should update itself with new data. Cancels any previous
 	 * operation and begins a new one.
-	 *
+	 * 
 	 * @param newFolder
 	 *            the new base directory for the table, null is ignored
 	 */

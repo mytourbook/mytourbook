@@ -434,6 +434,27 @@ public class Photo {
 		return _metadata;
 	}
 
+	/**
+	 * <pre>
+	 * Orientation
+	 * 
+	 * The image orientation viewed in terms of rows and columns.
+	 * Type		=      SHORT
+	 * Default  =      1
+	 * 
+	 * 1  =     The 0th row is at the visual top of the image, and the 0th column is the visual left-hand side.
+	 * 2  =     The 0th row is at the visual top of the image, and the 0th column is the visual right-hand side.
+	 * 3  =     The 0th row is at the visual bottom of the image, and the 0th column is the visual right-hand side.
+	 * 4  =     The 0th row is at the visual bottom of the image, and the 0th column is the visual left-hand side.
+	 * 5  =     The 0th row is the visual left-hand side of the image, and the 0th column is the visual top.
+	 * 6  =     The 0th row is the visual right-hand side of the image, and the 0th column is the visual top.
+	 * 7  =     The 0th row is the visual right-hand side of the image, and the 0th column is the visual bottom.
+	 * 8  =     The 0th row is the visual left-hand side of the image, and the 0th column is the visual bottom.
+	 * Other        =     reserved
+	 * </pre>
+	 * 
+	 * @return
+	 */
 	public int getOrientation() {
 		return _orientation;
 	}
@@ -552,10 +573,6 @@ public class Photo {
 		_gpsAreaInfo = gpsAreaInfo;
 	}
 
-	public void setImageDirection(final double imageDirection) {
-		_imageDirection = imageDirection;
-	}
-
 	public void setLatitude(final double latitude) {
 		_latitude = latitude;
 	}
@@ -566,10 +583,6 @@ public class Photo {
 
 	public void setLongitude(final double longitude) {
 		_longitude = longitude;
-	}
-
-	public void setOrientation(final int orientation) {
-		_orientation = orientation;
 	}
 
 	public void setSize(final int height, final int width) {

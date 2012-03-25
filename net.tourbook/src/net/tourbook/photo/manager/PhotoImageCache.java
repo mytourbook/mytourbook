@@ -91,8 +91,20 @@ public class PhotoImageCache {
 		return _imageCache.get(imageKey);
 	}
 
+	/**
+	 * Put a new image into the image cache. When an old image with the same image key already
+	 * exists, this image will be disposed.
+	 * 
+	 * @param imageKey
+	 * @param image
+	 */
 	public static void putImage(final String imageKey, final Image image) {
-		_imageCache.put(imageKey, image);
+
+		final Image oldImage = _imageCache.put(imageKey, image);
+
+		if (oldImage != null) {
+			oldImage.dispose();
+		}
 	}
 
 	public static void setCacheSize(final int newCacheSize) {

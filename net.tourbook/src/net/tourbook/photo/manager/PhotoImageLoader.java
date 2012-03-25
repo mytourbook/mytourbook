@@ -20,6 +20,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+import javax.imageio.ImageIO;
+
 import net.tourbook.photo.gallery.GalleryMTItem;
 import net.tourbook.util.StatusUtil;
 
@@ -32,6 +34,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
+import org.imgscalr.Scalr;
+import org.imgscalr.Scalr.Method;
+import org.imgscalr.Scalr.Rotation;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
@@ -158,31 +163,26 @@ public class PhotoImageLoader {
 //	}
 
 	/**
-	 * @param photo
 	 * @param storeImageFilePath
 	 *            Path to store image in the thumbnail store
 	 * @return
 	 */
-	private Image getImageFromEXIFThumbnail(final Photo photo, final IPath storeImageFilePath) {
+	private Image getImageFromEXIFThumbnail(final IPath storeImageFilePath) {
 
 		try {
 
+			// read exif meta data
 			final IImageMetadata metadata = photo.getMetaData();
 
 			if (metadata == null) {
 				return null;
 			}
 
-//			System.out.println();
-//			System.out.println(metadata);
-//			System.out.println("\t");
-//			// TODO remove SYSTEM.OUT.PRINTLN
-
 			if (metadata instanceof JpegImageMetadata) {
 
 				final JpegImageMetadata jpegMetadata = (JpegImageMetadata) metadata;
 
-				final BufferedImage bufferedImage = jpegMetadata.getEXIFThumbnail();
+				BufferedImage bufferedImage = jpegMetadata.getEXIFThumbnail();
 				if (bufferedImage == null) {
 					System.out.println(photo.getFileName() + "\tNO EXIF THUMB");
 					// TODO remove SYSTEM.OUT.PRINTLN
@@ -204,7 +204,11 @@ public class PhotoImageLoader {
 					// get SWT image from AWT image
 
 					try {
+
+						bufferedImage = rotateImage(bufferedImage);
+
 						ThumbnailStore.saveImageAWT(bufferedImage, storeImageFilePath);
+
 					} catch (final Exception e) {
 						StatusUtil.log(NLS.bind(//
 								"Image \"{0}\" cannot be resized", //$NON-NLS-1$
@@ -241,7 +245,7 @@ public class PhotoImageLoader {
 	 * @param requestedImageQuality
 	 * @return
 	 */
-	private Image getImageFromStore(final Photo photo, final int requestedImageQuality) {
+	private Image getImageFromStore(final int requestedImageQuality) {
 
 		final IPath requestedStoreImageFilePath = ThumbnailStore.getStoreImagePath(photo, requestedImageQuality);
 
@@ -381,7 +385,7 @@ public class PhotoImageLoader {
 		try {
 
 			// 1. get image from image store
-			final Image storeImage = getImageFromStore(photo, imageQuality);
+			final Image storeImage = getImageFromStore(imageQuality);
 			if (storeImage != null) {
 
 				isImageLoadedInRequestedQuality = true;
@@ -394,7 +398,7 @@ public class PhotoImageLoader {
 
 				// 2. get image from thumbnail image in the EXIF data
 				final IPath storeThumbImageFilePath = ThumbnailStore.getStoreImagePath(photo, defaultThumbQuality);
-				final Image exifThumbnail = getImageFromEXIFThumbnail(photo, storeThumbImageFilePath);
+				final Image exifThumbnail = getImageFromEXIFThumbnail(storeThumbImageFilePath);
 
 				if (exifThumbnail != null) {
 					isImageLoadedInRequestedQuality = imageQuality == defaultThumbQuality;
@@ -472,7 +476,8 @@ public class PhotoImageLoader {
 		try {
 
 			// load original image and create thumbs
-			hqImage = loadImageHQ_10(photo, imageQuality);
+//			hqImage = loadImageHQ_10(photo, imageQuality);
+			hqImage = loadImageHQ_19_AWT();
 
 		} catch (final Exception e) {
 
@@ -504,23 +509,23 @@ public class PhotoImageLoader {
 		}
 	}
 
-	private Image loadImageHQ_10(final Photo photo, final int requestedImageQuality) {
+	private Image loadImageHQ_10(final int requestedImageQuality) {
 
 		// load full size image
 		final String fullSizePathName = photo.getFilePathName();
 		Image loadedHQImage = null;
 
-		int loadedImageWidth = 0;
-		int loadedImageHeight = 0;
+		int hqImageWidth = 0;
+		int hqImageHeight = 0;
 
 		try {
 
 			// !!! this is not working on win7 with images 3500x5000 !!!
 			loadedHQImage = new Image(_display, fullSizePathName);
 
-			final Rectangle imageSize = loadedHQImage.getBounds();
-			loadedImageWidth = imageSize.width;
-			loadedImageHeight = imageSize.height;
+			final Rectangle hqImageSize = loadedHQImage.getBounds();
+			hqImageWidth = hqImageSize.width;
+			hqImageHeight = hqImageSize.height;
 
 		} catch (final Exception e) {
 
@@ -535,84 +540,237 @@ public class PhotoImageLoader {
 
 				/**
 				 * sometimes (when images are loaded concurrently) larger images could not be loaded
-				 * with SWT methods on Win7 (Eclipse 3.8 M6), try to load image with AWT, this
-				 * <code>https://bugs.eclipse.org/bugs/show_bug.cgi?id=350783</code> bug fix has not
+				 * with SWT methods in Win7 (Eclipse 3.8 M6), try to load image with AWT. This bug
+				 * fix <code>https://bugs.eclipse.org/bugs/show_bug.cgi?id=350783</code> has not
 				 * solved this problem
 				 */
 
-				loadedHQImage = loadImageHQ_20_AWT();
+				final Image awtImage = loadImageHQ_20_AWT();
 
-				if (loadedHQImage == null) {
+				if (awtImage == null) {
 					StatusUtil.log(NLS.bind(//
 							"Fullsize image \"{0}\" cannot be loaded",
 							fullSizePathName), new Exception());
-					return null;
 				}
+
+				return awtImage;
 			}
 		}
 
 		Image requestedImage = null;
 
+		/*
+		 * the source image starts with the HQ Image and is scaled down to the smallest thumb image
+		 */
+		Image srcImage = loadedHQImage;
+		int srcWidth = hqImageWidth;
+		int srcHeight = hqImageHeight;
+
 		final int[] thumbSizes = PhotoManager.IMAGE_SIZES;
 
 		// the original size will not be stored in the thumb store
-		for (int imageQuality = thumbSizes.length - 2; imageQuality >= 0; imageQuality--) {
+		for (int thumbImageQuality = thumbSizes.length - 2; thumbImageQuality >= 0; thumbImageQuality--) {
 
-			final int thumbSize = thumbSizes[imageQuality];
+			final int thumbSize = thumbSizes[thumbImageQuality];
 
-			Image resizedImage = null;
+			Image scaledImage = null;
 			IPath storeImagePath = null;
 
 			try {
 
-				if (loadedImageWidth > thumbSize || loadedImageHeight > thumbSize) {
+				if (srcWidth > thumbSize || srcHeight > thumbSize) {
 
-					final Point bestSize = ImageUtils.getBestSize(
-							loadedImageWidth,
-							loadedImageHeight,
-							thumbSize,
-							thumbSize);
+					final Point bestSize = ImageUtils.getBestSize(srcWidth, srcHeight, thumbSize, thumbSize);
 
-					resizedImage = ImageUtils.resize(_display, loadedHQImage, bestSize.x, bestSize.y, SWT.ON, SWT.HIGH);
+					scaledImage = ImageUtils.resize(_display, srcImage, bestSize.x, bestSize.y, SWT.ON, SWT.HIGH);
 
 				} else {
 
-					resizedImage = loadedHQImage;
+					scaledImage = srcImage;
 				}
 
-				storeImagePath = ThumbnailStore.getStoreImagePath(photo, imageQuality);
-				ThumbnailStore.saveImageSWT(//
-						resizedImage,
-						storeImagePath);
+				storeImagePath = ThumbnailStore.getStoreImagePath(photo, thumbImageQuality);
+				ThumbnailStore.saveImageSWT(scaledImage, storeImagePath);
 
 			} catch (final Exception e) {
 				StatusUtil.log(NLS.bind("Store image \"{0}\" couldn't be created", storeImagePath.toOSString()), e); //$NON-NLS-1$
 			}
 
 			// requested image will be cached
-			if (imageQuality == requestedImageQuality) {
+			if (thumbImageQuality == requestedImageQuality) {
 
 				// keep requested image in cache
-				PhotoImageCache.putImage(_imageKey, resizedImage);
+				PhotoImageCache.putImage(_imageKey, scaledImage);
 
-				requestedImage = resizedImage;
-
-			} else {
-
-				// dispose resized image
-
-				if (resizedImage != loadedHQImage) {
-					resizedImage.dispose();
-				}
+				requestedImage = scaledImage;
 			}
+
+			// dispose source image
+			if (srcImage != requestedImage && srcImage != scaledImage) {
+				srcImage.dispose();
+			}
+
+			// replace source image with scaled image
+			srcImage = scaledImage;
+			final Rectangle srcSize = srcImage.getBounds();
+			srcWidth = srcSize.width;
+			srcHeight = srcSize.height;
 		}
 
 		return requestedImage;
 	}
 
+	private Image loadImageHQ_19_AWT() {
+
+		/**
+		 * sometimes (when images are loaded concurrently) larger images could not be loaded with
+		 * SWT methods in Win7 (Eclipse 3.8 M6), try to load image with AWT. This bug fix
+		 * <code>https://bugs.eclipse.org/bugs/show_bug.cgi?id=350783</code> has not solved this
+		 * problem
+		 */
+
+		final Image awtImage = loadImageHQ_20_AWT();
+
+		if (awtImage == null) {
+			StatusUtil.log(NLS.bind(//
+					"Fullsize image \"{0}\" cannot be loaded",
+					photo.getFilePathName()), new Exception());
+		}
+
+		return awtImage;
+	}
+
 	private Image loadImageHQ_20_AWT() {
 
-		return null;
+		Image requestedSWTImage = null;
+
+		try {
+			final BufferedImage loadedHQImage = ImageIO.read(photo.getImageFile());
+			if (loadedHQImage == null) {
+				return null;
+			}
+
+			/*
+			 * the source image starts with the HQ Image and is scaled down to the smallest thumb
+			 * image
+			 */
+			BufferedImage srcImage = loadedHQImage;
+			int srcWidth = srcImage.getWidth();
+			int srcHeight = srcImage.getHeight();
+
+			final int[] thumbSizes = PhotoManager.IMAGE_SIZES;
+			final Method resizeQuality = PhotoManager.getResizeQuality();
+			boolean isRotated = false;
+
+			// the original image will not be stored in the thumb store
+			for (int thumbImageQuality = thumbSizes.length - 2; thumbImageQuality >= 0; thumbImageQuality--) {
+
+				final int thumbSize = thumbSizes[thumbImageQuality];
+
+				BufferedImage scaledImage = null;
+				IPath storeImagePath = null;
+
+				try {
+
+					if (srcWidth > thumbSize || srcHeight > thumbSize) {
+
+						final Point bestSize = ImageUtils.getBestSize(srcWidth, srcHeight, thumbSize, thumbSize);
+						final int maxSize = Math.max(bestSize.x, bestSize.y);
+
+						// resize image
+						scaledImage = Scalr.resize(srcImage, resizeQuality, maxSize);
+
+						// rotate image according to the exif flag
+						if (isRotated == false) {
+
+							isRotated = true;
+
+							scaledImage = rotateImage(scaledImage);
+						}
+
+					} else {
+
+						scaledImage = srcImage;
+					}
+
+					// save scaled image in store
+					storeImagePath = ThumbnailStore.getStoreImagePath(photo, thumbImageQuality);
+					ThumbnailStore.saveImageAWT(scaledImage, storeImagePath);
+
+				} catch (final Exception e) {
+					StatusUtil.log(NLS.bind("Store image \"{0}\" couldn't be created", storeImagePath.toOSString()), e); //$NON-NLS-1$
+				}
+
+				// check if the scaled image has the requested image quality
+				if (thumbImageQuality == imageQuality) {
+
+					// create swt image
+
+					requestedSWTImage = getImageFromStore(imageQuality);
+
+					// keep requested image in cache
+					PhotoImageCache.putImage(_imageKey, requestedSWTImage);
+
+				} else if (thumbImageQuality == PhotoManager.IMAGE_QUALITY_THUMB_160) {
+
+					// replace exif thumbnail with this thumbnail because quality is mostly better
+
+					final int defaultQuality = PhotoManager.IMAGE_QUALITY_THUMB_160;
+					final String defaultImageKey = photo.getImageKey(defaultQuality);
+
+					// check if thumb image is cached
+					final Image cachedImage = PhotoImageCache.getImage(defaultImageKey);
+					if (cachedImage != null) {
+
+						// thumb image is cached, replace it
+
+						final Image swtStoreImage = getImageFromStore(defaultQuality);
+						PhotoImageCache.putImage(defaultImageKey, swtStoreImage);
+					}
+				}
+
+				// flush source image
+				srcImage.flush();
+
+				// replace source image with scaled image
+				srcImage = scaledImage;
+				srcWidth = scaledImage.getWidth();
+				srcHeight = scaledImage.getHeight();
+			}
+
+			srcImage.flush();
+
+		} catch (final IOException e) {
+			StatusUtil.log(e);
+		}
+
+		return requestedSWTImage;
+	}
+
+	/**
+	 * @param scaledImage
+	 * @return Returns rotated image when orientations is not default
+	 */
+	private BufferedImage rotateImage(BufferedImage scaledImage) {
+
+		final int orientation = photo.getOrientation();
+		if (orientation > 1) {
+
+			// see here http://www.impulseadventure.com/photo/exif-orientation.html
+
+			Rotation correction = null;
+			if (orientation == 8) {
+				correction = Rotation.CW_270;
+			} else if (orientation == 3) {
+				correction = Rotation.CW_180;
+			} else if (orientation == 6) {
+				correction = Rotation.CW_90;
+			}
+
+			scaledImage = Scalr.rotate(scaledImage, correction);
+		}
+
+		return scaledImage;
 	}
 
 	private void setStateLoadingError() {

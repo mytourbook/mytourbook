@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.photo.manager;
 
+import java.lang.reflect.Method;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
@@ -24,9 +25,11 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import net.tourbook.photo.Messages;
 import net.tourbook.photo.gallery.GalleryMTItem;
 
 import org.eclipse.swt.widgets.Display;
+import org.imgscalr.Scalr;
 
 public class PhotoManager {
 
@@ -48,6 +51,60 @@ public class PhotoManager {
 	public static int											IMAGE_QUALITY_HQ_1000	= 1;
 	public static int											IMAGE_QUALITY_ORIGINAL	= 2;
 
+	/**
+	 * Used to indicate that the scaling implementation should decide which method to use in order
+	 * to get the best looking scaled image in the least amount of time.
+	 * <p/>
+	 * The scaling algorithm will use the {@link Scalr#THRESHOLD_QUALITY_BALANCED} or
+	 * {@link Scalr#THRESHOLD_BALANCED_SPEED} thresholds as cut-offs to decide between selecting the
+	 * <code>QUALITY</code>, <code>BALANCED</code> or <code>SPEED</code> scaling algorithms.
+	 * <p/>
+	 * <b>AUTOMATIC</b><br>
+	 * By default the thresholds chosen will give nearly the best looking result in the fastest
+	 * amount of time. We intend this method to work for 80% of people looking to scale an image
+	 * quickly and get a good looking result.
+	 * <p>
+	 * <b> SPEED </b><br>
+	 * Used to indicate that the scaling implementation should scale as fast as possible and return
+	 * a result. For smaller images (800px in size) this can result in noticeable aliasing but it
+	 * can be a few magnitudes times faster than using the QUALITY method.
+	 * <p>
+	 * <b> BALANCED </b><br>
+	 * Used to indicate that the scaling implementation should use a scaling operation balanced
+	 * between SPEED and QUALITY. Sometimes SPEED looks too low quality to be useful (e.g. text can
+	 * become unreadable when scaled using SPEED) but using QUALITY mode will increase the
+	 * processing time too much. This mode provides a "better than SPEED" quality in a
+	 * "less than QUALITY" amount of time.
+	 * <p>
+	 * <b> QUALITY </b><br>
+	 * Used to indicate that the scaling implementation should do everything it can to create as
+	 * nice of a result as possible. This approach is most important for smaller pictures (800px or
+	 * smaller) and less important for larger pictures as the difference between this method and the
+	 * SPEED method become less and less noticeable as the source-image size increases. Using the
+	 * AUTOMATIC method will automatically prefer the QUALITY method when scaling an image down
+	 * below 800px in size.
+	 * <p>
+	 * <b> ULTRA_QUALITY </b><br>
+	 * Used to indicate that the scaling implementation should go above and beyond the work done by
+	 * {@link Method#QUALITY} to make the image look exceptionally good at the cost of more
+	 * processing time. This is especially evident when generating thumbnails of images that look
+	 * jagged with some of the other {@link Method}s (even {@link Method#QUALITY}).
+	 * <p>
+	 */
+	public static String[]										SCALING_QUALITY_TEXT	= {
+			Messages.Scaling_Quality_Automatic,
+			Messages.Scaling_Quality_Speed,
+			Messages.Scaling_Quality_Balanced,
+			Messages.Scaling_Quality_Quality,
+			Messages.Scaling_Quality_UltraQuality										};
+
+	public static Scalr.Method[]								SCALING_QUALITY_ID		= {
+			Scalr.Method.AUTOMATIC,
+			Scalr.Method.SPEED,
+			Scalr.Method.BALANCED,
+			Scalr.Method.QUALITY,
+			Scalr.Method.ULTRA_QUALITY													};
+
 	private static Display										_display;
 
 	private static ThreadPoolExecutor							_executorService;
@@ -57,6 +114,8 @@ public class PhotoManager {
 	 * down the process loading of fullsize images.
 	 */
 	private static ThreadPoolExecutor							_executorServiceHQ;
+
+	private static org.imgscalr.Scalr.Method					_resizeQuality;
 
 	private static final LinkedBlockingDeque<PhotoImageLoader>	_waitingQueue			= new LinkedBlockingDeque<PhotoImageLoader>();
 	private static final LinkedBlockingDeque<PhotoImageLoader>	_waitingQueueHQ			= new LinkedBlockingDeque<PhotoImageLoader>();
@@ -70,7 +129,7 @@ public class PhotoManager {
 
 //		processors = 2;
 
-		System.out.println("Number of processors: " + processors);
+		System.out.println("Number of processors: " + processors); //$NON-NLS-1$
 
 		final ThreadFactory threadFactory = new ThreadFactory() {
 
@@ -132,6 +191,10 @@ public class PhotoManager {
 		}
 	}
 
+	public static Scalr.Method getResizeQuality() {
+		return _resizeQuality;
+	}
+
 	public static void putImageInHQLoadingQueue(final GalleryMTItem galleryItem,
 												final Photo photo,
 												final int imageQuality,
@@ -179,6 +242,19 @@ public class PhotoManager {
 			}
 		};
 		_executorService.submit(executorTask);
+	}
+
+	public static void setResizeQuality(final String requestedResizeQualityId) {
+
+		// set default value
+		_resizeQuality = Scalr.Method.SPEED;
+
+		for (final Scalr.Method quality : SCALING_QUALITY_ID) {
+			if (quality.name().equals(requestedResizeQualityId)) {
+				_resizeQuality = quality;
+				break;
+			}
+		}
 	}
 
 	/**

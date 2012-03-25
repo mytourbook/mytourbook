@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.swt.graphics.RGB;
+import org.imgscalr.Scalr;
 
 /**
  * Class used to initialize default preference values.
@@ -365,6 +366,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
 		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_IS_SHOW_IMAGE_WITH_HIGH_QUALITY, true);
 		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_HIGH_QUALITY_IMAGE_MIN_SIZE, 50);
+		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_IMAGE_RESIZE_QUALITY, Scalr.Method.SPEED.name());
 
 		PreferenceConverter.setDefault(store, //
 				ITourbookPreferences.PHOTO_VIEWER_COLOR_FOREGROUND,

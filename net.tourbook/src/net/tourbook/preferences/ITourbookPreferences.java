@@ -332,5 +332,6 @@ public interface ITourbookPreferences {
 	public static final String	PHOTO_VIEWER_COLOR_FILE								= "PHOTO_VIEWER_COLOR_FILE";								//$NON-NLS-1$
 	public static final String	PHOTO_VIEWER_IS_SHOW_IMAGE_WITH_HIGH_QUALITY		= "PHOTO_VIEWER_IS_SHOW_IMAGE_WITH_HIGH_QUALITY";			//$NON-NLS-1$
 	public static final String	PHOTO_VIEWER_HIGH_QUALITY_IMAGE_MIN_SIZE			= "PHOTO_VIEWER_HIGH_QUALITY_IMAGE_MIN_SIZE";				//$NON-NLS-1$
+	public static final String	PHOTO_VIEWER_IMAGE_RESIZE_QUALITY					= "PHOTO_VIEWER_IMAGE_RESIZE_QUALITY";						//$NON-NLS-1$
 
 }

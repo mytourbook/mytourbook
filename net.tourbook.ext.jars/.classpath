@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="imgscalr-lib-4.2.jar" sourcepath="C:/Users/IBM_ADMIN/AppData/Local/Microsoft/Windows/Temporary Internet Files/Content.IE5/OPI9OOM7/imgscalr-lib-4.2-sources[1].jar"/>
 	<classpathentry exported="true" kind="lib" path="concurrentlinkedhashmap-lru-1.2.jar" sourcepath="C:/DAT/ws/com.googlecode.concurrentlinkedhashmap/src/java"/>
 	<classpathentry exported="true" kind="lib" path="joda-time-2.1.jar" sourcepath="C:/E/java-resources/joda-time/joda-time-2.1-dist/joda-time-2.1/joda-time-2.1-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="trove-3.0.2.jar">
