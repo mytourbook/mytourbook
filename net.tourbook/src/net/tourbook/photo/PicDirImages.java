@@ -682,6 +682,9 @@ public class PicDirImages {
 		});
 
 		_gallery.addListener(SWT.Modify, new Listener() {
+
+			// a modify event is fired when gallery is zoomed in/out
+
 			public void handleEvent(final Event event) {
 				onZoomInOut(event);
 			}
@@ -1021,8 +1024,9 @@ public class PicDirImages {
 	 * 
 	 * @param imageFolder
 	 * @param isFromNavigationHistory
+	 * @param isReloadFolder
 	 */
-	void showImages(final File imageFolder, final boolean isFromNavigationHistory) {
+	void showImages(final File imageFolder, final boolean isFromNavigationHistory, final boolean isReloadFolder) {
 
 		//////////////////////////////////////////
 		//
@@ -1051,7 +1055,7 @@ public class PicDirImages {
 
 		PhotoManager.stopImageLoading();
 
-		workerUpdate(imageFolder);
+		workerUpdate(imageFolder, isReloadFolder);
 	}
 
 	void updateColors(final Color fgColor, final Color bgColor) {
@@ -1271,14 +1275,15 @@ public class PicDirImages {
 	 * 
 	 * @param newFolder
 	 *            the new base directory for the table, null is ignored
+	 * @param isReloadFolder
 	 */
-	private void workerUpdate(final File newFolder) {
+	private void workerUpdate(final File newFolder, final boolean isReloadFolder) {
 
 		if (newFolder == null) {
 			return;
 		}
 
-		if ((_workerNextFolder != null) && (_workerNextFolder.equals(newFolder))) {
+		if (isReloadFolder == false && _workerNextFolder != null && _workerNextFolder.equals(newFolder)) {
 			return;
 		}
 

@@ -22,6 +22,7 @@ import net.tourbook.photo.manager.Photo;
 import net.tourbook.photo.manager.PhotoImageCache;
 import net.tourbook.photo.manager.PhotoManager;
 import net.tourbook.ui.UI;
+import net.tourbook.util.StatusUtil;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
@@ -57,12 +58,16 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 
 		final Photo photo = (Photo) itemData;
 
-		final int defaultImageQuality = galleryItemHeight > PhotoManager.THUMBNAIL_DEFAULT_SIZE
+		final int requestedImageQuality = galleryItemHeight > PhotoManager.THUMBNAIL_DEFAULT_SIZE
 				? PhotoManager.IMAGE_QUALITY_HQ_1000
 				: PhotoManager.IMAGE_QUALITY_THUMB_160;
 
-		Image photoImage = PhotoImageCache.getImage(photo.getImageKey(defaultImageQuality));
+		// get image with requested size
+		Image photoImage = PhotoImageCache.getImage(photo.getImageKey(requestedImageQuality));
+
 		if (photoImage == null) {
+
+			// requested size is not available
 
 			final int lowerImageQuality = galleryItemHeight > PhotoManager.THUMBNAIL_DEFAULT_SIZE
 					? PhotoManager.IMAGE_QUALITY_THUMB_160
@@ -96,24 +101,6 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 			gc.setBackground(getBackgroundColor());
 		}
 
-//		gc.fillRoundRectangle(//
-//				devXGallery,
-//				devYGallery,
-//				galleryItemWidth,
-//				useableHeight,
-//				roundingArc,
-//				roundingArc);
-//
-//		if (isText) {
-//			gc.fillRoundRectangle(
-//					devXGallery,
-//					devYGallery + galleryItemHeight - fontHeight,
-//					galleryItemWidth,
-//					fontHeight,
-//					roundingArc,
-//					roundingArc);
-//		}
-
 		if (photoImage != null && photoImage.isDisposed() == false) {
 
 			// draw image
@@ -123,24 +110,60 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 			 */
 			try {
 
-				final Rectangle itemImageBounds = photoImage.getBounds();
-				imageWidth = itemImageBounds.width;
-				imageHeight = itemImageBounds.height;
+				final Rectangle imageBounds = photoImage.getBounds();
+				imageWidth = imageBounds.width;
+				imageHeight = imageBounds.height;
 
-				final Point size = RendererHelper.getBestSize(//
+				final int photoWidth = photo.getWidth();
+				final int photoHeight = photo.getHeight();
+				if (photoWidth != Integer.MIN_VALUE && photoHeight != Integer.MIN_VALUE) {
+
+//					if (imageWidth > photoWidth || imageHeight > photoHeight) {
+//
+//						/*
+//						 * photo image should not be displayed larger than the original photo even
+//						 * when the thumb image is larger, this can happen when image is resized
+//						 */
+//
+//						imageWidth = photoWidth;
+//						imageHeight = photoHeight;
+//
+//					} else if (photoWidth > imageWidth && photoHeight > imageHeight) {
+//
+//						/*
+//						 * photo is larger than the thumb, draw thumb larger with photo size, the
+//						 * thumb will be blured until the original image is loaded
+//						 */
+////						imageWidth = galleryItemWidth;
+////						imageHeight = galleryItemHeight;
+//					}
+				}
+
+				final Point bestSize = RendererHelper.getBestSize(//
 						imageWidth,
 						imageHeight,
 						galleryItemWidth - imageBorderWidth,
 						useableHeight - imageBorderWidth);
 
-				final int xShiftSrc = galleryItemWidth - size.x;
-				final int yShiftSrc = useableHeight - size.y;
+				int bestWidth = bestSize.x;
+				int bestHeight = bestSize.y;
 
-				final int xShift = xShiftSrc >> 1;
-				final int yShift = yShiftSrc >> 1;
+				if (bestWidth > imageWidth || bestHeight > imageHeight) {
+					bestWidth = imageWidth;
+					bestHeight = imageHeight;
+				}
 
 				// Draw image
-				if (size.x > 0 && size.y > 0) {
+				if (bestWidth > 0 && bestHeight > 0) {
+
+//					System.out.println(imageWidth + "x" + imageHeight + " - " + bestWidth + "x" + bestHeight);
+//					// TODO remove SYSTEM.OUT.PRINTLN
+
+					final int xShiftSrc = galleryItemWidth - bestWidth;
+					final int yShiftSrc = useableHeight - bestHeight;
+
+					final int xShift = xShiftSrc >> 1;
+					final int yShift = yShiftSrc >> 1;
 
 					gc.drawImage(photoImage, //
 							0,
@@ -150,20 +173,21 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 							//
 							devXGallery + xShift,
 							devYGallery + yShift,
-							size.x,
-							size.y);
+							bestWidth,
+							bestHeight);
 //					setForegroundColor(gc.getDevice().getSystemColor(SWT.COLOR_BLUE));
 //					setBackgroundColor(gc.getDevice().getSystemColor(SWT.COLOR_WHITE));
 //					drawText(gc, devXGallery, devYGallery, photo, false, false);
 				}
 			} catch (final Exception e) {
-				drawText(gc, devXGallery, devYGallery, photo, true, false);
+				drawText(gc, devXGallery, devYGallery, photo, e.getMessage(), false);
+				StatusUtil.log(e);
 			}
 		} else {
 
 			// image is not available
 
-			drawText(gc, devXGallery, devYGallery, photo, false, true);
+			drawText(gc, devXGallery, devYGallery, photo, null, true);
 		}
 
 		// Draw label
@@ -217,13 +241,13 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 							final int x,
 							final int y,
 							final Photo photo,
-							final boolean isError,
+							final String errorMessage,
 							final boolean isLoading) {
 
 		String photoData = UI.EMPTY_STRING;
 
-		if (isError) {
-			photoData = "Error ";
+		if (errorMessage != null) {
+			photoData = "Error " + errorMessage + " in ";
 			setForegroundColor(gc.getDevice().getSystemColor(SWT.COLOR_RED));
 			setBackgroundColor(gc.getDevice().getSystemColor(SWT.COLOR_WHITE));
 		} else if (isLoading) {

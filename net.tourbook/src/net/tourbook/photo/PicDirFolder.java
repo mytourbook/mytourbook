@@ -208,15 +208,18 @@ class PicDirFolder {
 					// remove children from model
 					_selectedTVIFolder.clearChildren();
 
-					// update viewer
+					// update folder viewer
 					_folderViewer.refresh(_selectedTVIFolder);
+
+					// update images and force folder reload
+					displayFolderImages(_selectedTVIFolder, false, true);
 
 					// expand selected folder
 					if (isExpanded) {
 						_folderViewer.setExpandedState(_selectedTVIFolder, true);
 					}
 
-					// position tree items to the old position
+					// position tree items to the old location
 					tree.setTopItem(topItem);
 				}
 				tree.setRedraw(true);
@@ -438,12 +441,19 @@ class PicDirFolder {
 		treeLayout.setColumnData(tvcColumn, new ColumnWeightData(100, true));
 	}
 
-	private void displayFolderImages(final TVIFolderFolder tviFolder, final boolean isFromNavigationHistory) {
+	/**
+	 * @param tviFolder
+	 * @param isFromNavigationHistory
+	 * @param isReloadFolder
+	 */
+	private void displayFolderImages(	final TVIFolderFolder tviFolder,
+										final boolean isFromNavigationHistory,
+										final boolean isReloadFolder) {
 
 		final File selectedFolder = tviFolder._treeItemFolder;
 
 		// optimize, don't select the same folder again
-		if (_selectedFolder != null && selectedFolder.equals(_selectedFolder)) {
+		if (isReloadFolder == false && _selectedFolder != null && selectedFolder.equals(_selectedFolder)) {
 			return;
 		}
 
@@ -451,7 +461,7 @@ class PicDirFolder {
 		_selectedTVIFolder = tviFolder;
 
 		// display imaged for the selected folder
-		_picDirImages.showImages(selectedFolder, isFromNavigationHistory);
+		_picDirImages.showImages(selectedFolder, isFromNavigationHistory, isReloadFolder);
 	}
 
 	private void expandCollapseFolder(final TreeViewerItem treeItem) {
@@ -481,7 +491,7 @@ class PicDirFolder {
 
 	/**
 	 * Gets filesystem root entries
-	 *
+	 * 
 	 * @return an array of Files corresponding to the root directories on the platform, may be empty
 	 *         but not null
 	 */
@@ -573,7 +583,7 @@ class PicDirFolder {
 
 	/**
 	 * Do the actions when a folder is selected
-	 *
+	 * 
 	 * @param iSelection
 	 */
 	private void onSelectFolder(final ITreeSelection treeSelection) {
@@ -602,14 +612,14 @@ class PicDirFolder {
 
 			// context menu has been opened, do no expand/collapse
 
-			displayFolderImages(tviFolder, _isFromNavigationHistory);
+			displayFolderImages(tviFolder, _isFromNavigationHistory, false);
 
 		} else {
 
 			if (doAutoCollapseExpand) {
 				onSelectFolder_10_AutoExpandCollapse(treeSelection, selectedTreePath, tviFolder);
 			} else {
-				displayFolderImages(tviFolder, _isFromNavigationHistory);
+				displayFolderImages(tviFolder, _isFromNavigationHistory, false);
 			}
 		}
 
@@ -621,7 +631,7 @@ class PicDirFolder {
 	 * This is not yet working thoroughly because the expanded position moves up or down and all
 	 * expanded childrens are not visible (but they could) like when the triangle (+/-) icon in the
 	 * tree is clicked.
-	 *
+	 * 
 	 * @param treeSelection
 	 * @param selectedTreePath
 	 * @param tviFolder
@@ -638,11 +648,11 @@ class PicDirFolder {
 			 */
 			Display.getCurrent().asyncExec(new Runnable() {
 
-				private long			__expandRunnableCounter	= ++_expandRunnableCounter;
+				private long			__expandRunnableCounter		= ++_expandRunnableCounter;
 
-				private TVIFolderFolder	__selectedFolderItem	= tviFolder;
-				private ITreeSelection	__treeSelection			= treeSelection;
-				private TreePath		__selectedTreePath		= selectedTreePath;
+				private TVIFolderFolder	__selectedFolderItem		= tviFolder;
+				private ITreeSelection	__treeSelection				= treeSelection;
+				private TreePath		__selectedTreePath			= selectedTreePath;
 				private boolean			__isFromNavigationHistory	= _isFromNavigationHistory;
 
 				public void run() {
@@ -668,7 +678,7 @@ class PicDirFolder {
 				expandCollapseFolder(tviFolder);
 			}
 
-			displayFolderImages(tviFolder, _isFromNavigationHistory);
+			displayFolderImages(tviFolder, _isFromNavigationHistory, false);
 		}
 	}
 
@@ -729,7 +739,7 @@ class PicDirFolder {
 		}
 		_isExpandingSelection = false;
 
-		displayFolderImages(selectedFolderItem, isFromNavigationHistory);
+		displayFolderImages(selectedFolderItem, isFromNavigationHistory, false);
 	}
 
 	private void restoreFolder(final String restoreFolderName) {

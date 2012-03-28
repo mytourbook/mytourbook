@@ -24,11 +24,19 @@ public class TVIFolderFolder extends TVIFolder {
 
 	File						_treeItemFolder;
 	String						_folderName;
+
 	boolean						_isRootFolder;
 
 	private File[]				_folderChildren;
 
+	/**
+	 * Number of folder in this folder
+	 */
 	int							_folderCounter;
+
+	/**
+	 * Number of files in this folder
+	 */
 	int							_fileCounter;
 
 	private boolean				_isFolderChecked;
@@ -72,7 +80,9 @@ public class TVIFolderFolder extends TVIFolder {
 
 		_folderCounter = 0;
 		_fileCounter = 0;
+
 		_isFolderChecked = false;
+		_folderChildren = null;
 
 		super.clearChildren();
 	}

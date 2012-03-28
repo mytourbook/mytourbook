@@ -163,6 +163,106 @@ public class PhotoImageLoader {
 //	}
 
 	/**
+	 * Crop thumb image if it has a diff ratio than the original image
+	 * 
+	 * @param thumbImage
+	 * @param width
+	 * @param height
+	 * @return
+	 */
+	private BufferedImage doImageCrop(final BufferedImage thumbImage, final Photo photo) {
+
+		final int thumbWidth = thumbImage.getWidth();
+		final int thumbHeight = thumbImage.getHeight();
+		final int photoWidth = photo.getWidth();
+		final int photoHeight = photo.getHeight();
+
+		final double thumbRatio = (double) thumbWidth / thumbHeight;
+		final double photoRatio = (double) photoWidth / photoHeight;
+
+		if (thumbRatio < 1.0 && photoRatio > 1.0 || thumbRatio > 1.0 && photoRatio < 1.0) {
+
+			/*
+			 * thumb and photo have total different ratios, this can happen when an image is resized
+			 * or rotated and the thumb image was not adjusted
+			 */
+
+			return thumbImage;
+		}
+
+		final int thumbRationTruncated = (int) (thumbRatio * 100);
+		final int photoRationTruncated = (int) (photoRatio * 100);
+
+		if (thumbRationTruncated == photoRationTruncated) {
+			// ration is the same
+			return thumbImage;
+		}
+
+		int cropX;
+		int cropY;
+		int cropWidth;
+		int cropHeight;
+
+		if (thumbRationTruncated < photoRationTruncated) {
+
+			// thumb height is smaller than photo height
+
+			cropWidth = thumbWidth;
+			cropHeight = (int) (thumbWidth / photoRatio);
+
+			cropX = 0;
+			cropY = thumbHeight - cropHeight;
+			cropY /= 2;
+
+		} else {
+
+			// thumb width is smaller than photo width
+
+			cropWidth = (int) (thumbHeight / photoRatio);
+			cropHeight = thumbHeight;
+
+			cropX = thumbWidth - cropWidth;
+			cropX /= 2;
+			cropY = 0;
+		}
+
+		final BufferedImage croppedImage = Scalr.crop(thumbImage, cropX, cropY, cropWidth, cropHeight);
+
+		return croppedImage;
+	}
+
+	/**
+	 * @param scaledImage
+	 * @return Returns rotated image when orientations is not default
+	 */
+	private BufferedImage doImageRotate(final BufferedImage scaledImage) {
+
+		BufferedImage rotatedImage = scaledImage;
+
+		final int orientation = photo.getOrientation();
+
+		if (orientation > 1) {
+
+			// see here http://www.impulseadventure.com/photo/exif-orientation.html
+
+			Rotation correction = null;
+			if (orientation == 8) {
+				correction = Rotation.CW_270;
+			} else if (orientation == 3) {
+				correction = Rotation.CW_180;
+			} else if (orientation == 6) {
+				correction = Rotation.CW_90;
+			}
+
+			rotatedImage = Scalr.rotate(scaledImage, correction);
+
+			scaledImage.flush();
+		}
+
+		return rotatedImage;
+	}
+
+	/**
 	 * @param storeImageFilePath
 	 *            Path to store image in the thumbnail store
 	 * @return
@@ -190,12 +290,12 @@ public class PhotoImageLoader {
 					return null;
 				}
 
-				System.out.println(photo.getFileName()
-						+ "\tWITH EXIF THUMB\t"
-						+ bufferedImage.getWidth()
-						+ "x"
-						+ bufferedImage.getHeight());
-				// TODO remove SYSTEM.OUT.PRINTLN
+//				System.out.println(photo.getFileName()
+//						+ "\tWITH EXIF THUMB\t"
+//						+ bufferedImage.getWidth()
+//						+ "x"
+//						+ bufferedImage.getHeight());
+//				// TODO remove SYSTEM.OUT.PRINTLN
 
 				//#########################################################
 
@@ -205,7 +305,8 @@ public class PhotoImageLoader {
 
 					try {
 
-						bufferedImage = rotateImage(bufferedImage);
+						bufferedImage = doImageCrop(bufferedImage, photo);
+						bufferedImage = doImageRotate(bufferedImage);
 
 						ThumbnailStore.saveImageAWT(bufferedImage, storeImageFilePath);
 
@@ -270,6 +371,40 @@ public class PhotoImageLoader {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Checks if an image is in the thumb store with the requested image quality.
+	 * 
+	 * @param photo
+	 * @param requestedImageQuality
+	 * @return
+	 */
+	private boolean isImageInStore(final int requestedImageQuality) {
+
+		final IPath requestedStoreImageFilePath = ThumbnailStore.getStoreImagePath(photo, requestedImageQuality);
+
+		/*
+		 * check if image is available in the thumbstore
+		 */
+		final File storeImageFile = new File(requestedStoreImageFilePath.toOSString());
+		if (storeImageFile.isFile()) {
+
+			// photo image is available in the thumbnail store
+
+			/*
+			 * touch store file when it is not yet done today, this is done to track last access
+			 * time so that a store cleanup can check the date
+			 */
+			final LocalDate dtModified = new LocalDate(storeImageFile.lastModified());
+			if (dtModified.equals(new LocalDate()) == false) {
+				storeImageFile.setLastModified(new DateTime().getMillis());
+			}
+
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -504,8 +639,8 @@ public class PhotoImageLoader {
 			// display image in the loading callback
 			_loadCallBack.callBackImageIsLoaded(isImageVisible, isImageLoaded || isLoadingError);
 
-			System.out.println("loadImageHQ() time: " + (System.currentTimeMillis() - start) + " ms  " + photo);
-			// TODO remove SYSTEM.OUT.PRINTLN
+//			System.out.println("loadImageHQ() time: " + (System.currentTimeMillis() - start) + " ms  " + photo);
+//			// TODO remove SYSTEM.OUT.PRINTLN
 		}
 	}
 
@@ -674,18 +809,25 @@ public class PhotoImageLoader {
 
 					if (srcWidth > thumbSize || srcHeight > thumbSize) {
 
+						// src image is larger than the current thumb size -> resize image
+
 						final Point bestSize = ImageUtils.getBestSize(srcWidth, srcHeight, thumbSize, thumbSize);
 						final int maxSize = Math.max(bestSize.x, bestSize.y);
 
 						// resize image
-						scaledImage = Scalr.resize(srcImage, resizeQuality, maxSize);
+						if (thumbImageQuality == PhotoManager.IMAGE_QUALITY_THUMB_160) {
+							// scale small image with better quality
+							scaledImage = Scalr.resize(srcImage, Method.QUALITY, maxSize);
+						} else {
+							scaledImage = Scalr.resize(srcImage, resizeQuality, maxSize);
+						}
 
 						// rotate image according to the exif flag
 						if (isRotated == false) {
 
 							isRotated = true;
 
-							scaledImage = rotateImage(scaledImage);
+							scaledImage = doImageRotate(scaledImage);
 						}
 
 					} else {
@@ -747,36 +889,10 @@ public class PhotoImageLoader {
 		return requestedSWTImage;
 	}
 
-	/**
-	 * @param scaledImage
-	 * @return Returns rotated image when orientations is not default
-	 */
-	private BufferedImage rotateImage(BufferedImage scaledImage) {
-
-		final int orientation = photo.getOrientation();
-		if (orientation > 1) {
-
-			// see here http://www.impulseadventure.com/photo/exif-orientation.html
-
-			Rotation correction = null;
-			if (orientation == 8) {
-				correction = Rotation.CW_270;
-			} else if (orientation == 3) {
-				correction = Rotation.CW_180;
-			} else if (orientation == 6) {
-				correction = Rotation.CW_90;
-			}
-
-			scaledImage = Scalr.rotate(scaledImage, correction);
-		}
-
-		return scaledImage;
-	}
-
 	private void setStateLoadingError() {
 
-		System.out.println("setStateLoadingError\t" + photo);
-		// TODO remove SYSTEM.OUT.PRINTLN
+//		System.out.println("setStateLoadingError\t" + photo);
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		// prevent loading the image again
 		photo.setLoadingState(PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR, imageQuality);

@@ -585,7 +585,7 @@ public class Photo {
 		_longitude = longitude;
 	}
 
-	public void setSize(final int height, final int width) {
+	public void setSize(final int width, final int height) {
 
 		_width = width;
 		_height = height;
