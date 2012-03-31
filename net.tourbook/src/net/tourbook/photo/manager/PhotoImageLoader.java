@@ -163,106 +163,6 @@ public class PhotoImageLoader {
 //	}
 
 	/**
-	 * Crop thumb image if it has a diff ratio than the original image
-	 * 
-	 * @param thumbImage
-	 * @param width
-	 * @param height
-	 * @return
-	 */
-	private BufferedImage doImageCrop(final BufferedImage thumbImage, final Photo photo) {
-
-		final int thumbWidth = thumbImage.getWidth();
-		final int thumbHeight = thumbImage.getHeight();
-		final int photoWidth = photo.getWidth();
-		final int photoHeight = photo.getHeight();
-
-		final double thumbRatio = (double) thumbWidth / thumbHeight;
-		final double photoRatio = (double) photoWidth / photoHeight;
-
-		if (thumbRatio < 1.0 && photoRatio > 1.0 || thumbRatio > 1.0 && photoRatio < 1.0) {
-
-			/*
-			 * thumb and photo have total different ratios, this can happen when an image is resized
-			 * or rotated and the thumb image was not adjusted
-			 */
-
-			return thumbImage;
-		}
-
-		final int thumbRationTruncated = (int) (thumbRatio * 100);
-		final int photoRationTruncated = (int) (photoRatio * 100);
-
-		if (thumbRationTruncated == photoRationTruncated) {
-			// ration is the same
-			return thumbImage;
-		}
-
-		int cropX;
-		int cropY;
-		int cropWidth;
-		int cropHeight;
-
-		if (thumbRationTruncated < photoRationTruncated) {
-
-			// thumb height is smaller than photo height
-
-			cropWidth = thumbWidth;
-			cropHeight = (int) (thumbWidth / photoRatio);
-
-			cropX = 0;
-			cropY = thumbHeight - cropHeight;
-			cropY /= 2;
-
-		} else {
-
-			// thumb width is smaller than photo width
-
-			cropWidth = (int) (thumbHeight / photoRatio);
-			cropHeight = thumbHeight;
-
-			cropX = thumbWidth - cropWidth;
-			cropX /= 2;
-			cropY = 0;
-		}
-
-		final BufferedImage croppedImage = Scalr.crop(thumbImage, cropX, cropY, cropWidth, cropHeight);
-
-		return croppedImage;
-	}
-
-	/**
-	 * @param scaledImage
-	 * @return Returns rotated image when orientations is not default
-	 */
-	private BufferedImage doImageRotate(final BufferedImage scaledImage) {
-
-		BufferedImage rotatedImage = scaledImage;
-
-		final int orientation = photo.getOrientation();
-
-		if (orientation > 1) {
-
-			// see here http://www.impulseadventure.com/photo/exif-orientation.html
-
-			Rotation correction = null;
-			if (orientation == 8) {
-				correction = Rotation.CW_270;
-			} else if (orientation == 3) {
-				correction = Rotation.CW_180;
-			} else if (orientation == 6) {
-				correction = Rotation.CW_90;
-			}
-
-			rotatedImage = Scalr.rotate(scaledImage, correction);
-
-			scaledImage.flush();
-		}
-
-		return rotatedImage;
-	}
-
-	/**
 	 * @param storeImageFilePath
 	 *            Path to store image in the thumbnail store
 	 * @return
@@ -305,8 +205,8 @@ public class PhotoImageLoader {
 
 					try {
 
-						bufferedImage = doImageCrop(bufferedImage, photo);
-						bufferedImage = doImageRotate(bufferedImage);
+						bufferedImage = transformCropImage(bufferedImage, photo);
+						bufferedImage = transformRotateImage(bufferedImage);
 
 						ThumbnailStore.saveImageAWT(bufferedImage, storeImageFilePath);
 
@@ -800,84 +700,84 @@ public class PhotoImageLoader {
 			// the original image will not be stored in the thumb store
 			for (int thumbImageQuality = thumbSizes.length - 2; thumbImageQuality >= 0; thumbImageQuality--) {
 
-				final int thumbSize = thumbSizes[thumbImageQuality];
+				// check if default (smallest) thumbnail already exist in the thumbstore
+				Image defaultThumbImage = null;
+				if (thumbImageQuality == PhotoManager.IMAGE_QUALITY_THUMB_160) {
+					defaultThumbImage = getImageFromStore(thumbImageQuality);
+				}
 
-				BufferedImage scaledImage = null;
-				IPath storeImagePath = null;
+				if (defaultThumbImage != null && thumbImageQuality == imageQuality) {
 
-				try {
+					requestedSWTImage = defaultThumbImage;
 
-					if (srcWidth > thumbSize || srcHeight > thumbSize) {
+				} else {
 
-						// src image is larger than the current thumb size -> resize image
+					final int thumbSize = thumbSizes[thumbImageQuality];
 
-						final Point bestSize = ImageUtils.getBestSize(srcWidth, srcHeight, thumbSize, thumbSize);
-						final int maxSize = Math.max(bestSize.x, bestSize.y);
+					BufferedImage scaledImage = null;
+					IPath storeImagePath = null;
 
-						// resize image
-						if (thumbImageQuality == PhotoManager.IMAGE_QUALITY_THUMB_160) {
-							// scale small image with better quality
-							scaledImage = Scalr.resize(srcImage, Method.QUALITY, maxSize);
+					try {
+
+						if (srcWidth > thumbSize || srcHeight > thumbSize) {
+
+							// src image is larger than the current thumb size -> resize image
+
+							final Point bestSize = ImageUtils.getBestSize(srcWidth, srcHeight, thumbSize, thumbSize);
+							final int maxSize = Math.max(bestSize.x, bestSize.y);
+
+							// resize image
+							if (thumbImageQuality == PhotoManager.IMAGE_QUALITY_THUMB_160) {
+								// scale small image with better quality
+								scaledImage = Scalr.resize(srcImage, Method.QUALITY, maxSize);
+							} else {
+								scaledImage = Scalr.resize(srcImage, resizeQuality, maxSize);
+							}
+
+							// rotate image according to the exif flag
+							if (isRotated == false) {
+
+								isRotated = true;
+
+								scaledImage = transformRotateImage(scaledImage);
+							}
+
 						} else {
-							scaledImage = Scalr.resize(srcImage, resizeQuality, maxSize);
+
+							scaledImage = srcImage;
 						}
 
-						// rotate image according to the exif flag
-						if (isRotated == false) {
+						// save scaled image in store
+						storeImagePath = ThumbnailStore.getStoreImagePath(photo, thumbImageQuality);
+						ThumbnailStore.saveImageAWT(scaledImage, storeImagePath);
 
-							isRotated = true;
-
-							scaledImage = doImageRotate(scaledImage);
-						}
-
-					} else {
-
-						scaledImage = srcImage;
+					} catch (final Exception e) {
+						StatusUtil.log(
+								NLS.bind("Store image \"{0}\" couldn't be created", storeImagePath.toOSString()), e); //$NON-NLS-1$
 					}
 
-					// save scaled image in store
-					storeImagePath = ThumbnailStore.getStoreImagePath(photo, thumbImageQuality);
-					ThumbnailStore.saveImageAWT(scaledImage, storeImagePath);
+					// check if the scaled image has the requested image quality
+					if (thumbImageQuality == imageQuality) {
 
-				} catch (final Exception e) {
-					StatusUtil.log(NLS.bind("Store image \"{0}\" couldn't be created", storeImagePath.toOSString()), e); //$NON-NLS-1$
-				}
+						// create swt image from saved AWT image
 
-				// check if the scaled image has the requested image quality
-				if (thumbImageQuality == imageQuality) {
-
-					// create swt image
-
-					requestedSWTImage = getImageFromStore(imageQuality);
-
-					// keep requested image in cache
-					PhotoImageCache.putImage(_imageKey, requestedSWTImage);
-
-				} else if (thumbImageQuality == PhotoManager.IMAGE_QUALITY_THUMB_160) {
-
-					// replace exif thumbnail with this thumbnail because quality is mostly better
-
-					final int defaultQuality = PhotoManager.IMAGE_QUALITY_THUMB_160;
-					final String defaultImageKey = photo.getImageKey(defaultQuality);
-
-					// check if thumb image is cached
-					final Image cachedImage = PhotoImageCache.getImage(defaultImageKey);
-					if (cachedImage != null) {
-
-						// thumb image is cached, replace it
-
-						final Image swtStoreImage = getImageFromStore(defaultQuality);
-						PhotoImageCache.putImage(defaultImageKey, swtStoreImage);
+						requestedSWTImage = getImageFromStore(imageQuality);
 					}
+
+					// flush source image
+					srcImage.flush();
+
+					// replace source image with scaled image
+					srcImage = scaledImage;
+					srcWidth = scaledImage.getWidth();
+					srcHeight = scaledImage.getHeight();
 				}
+			}
 
-				// flush source image
-				srcImage.flush();
+			if (requestedSWTImage != null) {
 
-				// replace source image with scaled image
-				srcImage = scaledImage;
-				srcWidth = scaledImage.getWidth();
-				srcHeight = scaledImage.getHeight();
+				// keep requested image in cache
+				PhotoImageCache.putImage(_imageKey, requestedSWTImage);
 			}
 
 			srcImage.flush();
@@ -912,5 +812,110 @@ public class PhotoImageLoader {
 				+ ("imageQuality=" + imageQuality + "{)}, ") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("photo=" + photo) //$NON-NLS-1$
 				+ "]"; //$NON-NLS-1$
+	}
+
+	/**
+	 * Crop thumb image when it has a different ratio than the original image. This will remove the
+	 * black margins which are set in the thumb image depending on the image ratio.
+	 * 
+	 * @param thumbImage
+	 * @param width
+	 * @param height
+	 * @return
+	 */
+	private BufferedImage transformCropImage(final BufferedImage thumbImage, final Photo photo) {
+
+		final int thumbWidth = thumbImage.getWidth();
+		final int thumbHeight = thumbImage.getHeight();
+//		final int photoWidth = photo.getWidthRotated();
+//		final int photoHeight = photo.getHeightRotated();
+		final int photoWidth = photo.getWidth();
+		final int photoHeight = photo.getHeight();
+
+		final double thumbRatio = (double) thumbWidth / thumbHeight;
+		final double photoRatio = (double) photoWidth / photoHeight;
+
+		if (thumbRatio < 1.0 && photoRatio > 1.0 || thumbRatio > 1.0 && photoRatio < 1.0) {
+
+			/*
+			 * thumb and photo have total different ratios, this can happen when an image is resized
+			 * or rotated and the thumb image was not adjusted
+			 */
+
+			return thumbImage;
+		}
+
+		final int thumbRationTruncated = (int) (thumbRatio * 100);
+		final int photoRationTruncated = (int) (photoRatio * 100);
+
+		if (thumbRationTruncated == photoRationTruncated) {
+			// ration is the same
+			return thumbImage;
+		}
+
+		int cropX;
+		int cropY;
+		int cropWidth;
+		int cropHeight;
+
+		if (thumbRationTruncated < photoRationTruncated) {
+
+			// thumb height is smaller than photo height
+
+			cropWidth = thumbWidth;
+			cropHeight = (int) (thumbWidth / photoRatio);
+
+			cropX = 0;
+
+			cropY = thumbHeight - cropHeight;
+			cropY /= 2;
+
+		} else {
+
+			// thumb width is smaller than photo width
+
+			cropWidth = (int) (thumbHeight * photoRatio);
+			cropHeight = thumbHeight;
+
+			cropX = thumbWidth - cropWidth;
+			cropX /= 2;
+
+			cropY = 0;
+		}
+
+		final BufferedImage croppedImage = Scalr.crop(thumbImage, cropX, cropY, cropWidth, cropHeight);
+
+		return croppedImage;
+	}
+
+	/**
+	 * @param scaledImage
+	 * @return Returns rotated image when orientations is not default
+	 */
+	private BufferedImage transformRotateImage(final BufferedImage scaledImage) {
+
+		BufferedImage rotatedImage = scaledImage;
+
+		final int orientation = photo.getOrientation();
+
+		if (orientation > 1) {
+
+			// see here http://www.impulseadventure.com/photo/exif-orientation.html
+
+			Rotation correction = null;
+			if (orientation == 8) {
+				correction = Rotation.CW_270;
+			} else if (orientation == 3) {
+				correction = Rotation.CW_180;
+			} else if (orientation == 6) {
+				correction = Rotation.CW_90;
+			}
+
+			rotatedImage = Scalr.rotate(scaledImage, correction);
+
+			scaledImage.flush();
+		}
+
+		return rotatedImage;
 	}
 }

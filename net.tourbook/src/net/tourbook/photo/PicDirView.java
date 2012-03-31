@@ -273,10 +273,13 @@ public class PicDirView extends ViewPart {
 		_containerMasterDetail.setViewerWidth(Util.getStateInt(_state, STATE_TREE_WIDTH, 200));
 
 		/*
-		 * image restore must be done be for folder restore because folder restore is also loading
+		 * image restore must be done BEFORE folder restore because folder restore is also loading
 		 * the folder and updates folder history
 		 */
+		// 1.
 		_picDirImages.restoreState(_state);
+
+		// 2.
 		_picDirFolder.restoreState(_state);
 	}
 

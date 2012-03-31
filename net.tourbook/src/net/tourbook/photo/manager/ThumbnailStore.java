@@ -315,7 +315,7 @@ public class ThumbnailStore {
 
 		final int imageQualitySize = PhotoManager.IMAGE_SIZES[imageQuality];
 		final String imageKey1Folder = imageKey.substring(0, 2);
-		final String imageKey2Folder = imageKey.substring(0, 4);
+		final String imageKey2Folder = imageKey.substring(0, 3);
 
 		// thumbnail images are stored as jpg file
 		IPath jpgPhotoFilePath = new Path(photo.getFileName());

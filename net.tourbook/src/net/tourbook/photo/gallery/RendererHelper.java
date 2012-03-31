@@ -19,25 +19,21 @@ import org.eclipse.swt.graphics.Point;
  * <p>
  * Utility methods for Gallery item and group renderers
  * </p>
- * 
  * <p>
  * NOTE: THIS WIDGET AND ITS API ARE STILL UNDER DEVELOPMENT.
  * </p>
  * 
  * @author Nicolas Richeton (nicolas.richeton@gmail.com)
  * @contributor Richard Michalsky
- * 
  */
 public class RendererHelper {
-	private static final String ELLIPSIS = "..."; //$NON-NLS-1$
+	private static final String	ELLIPSIS	= "...";	//$NON-NLS-1$
 
 	/**
-	 * Shorten the given text <code>text</code> so that its length doesn't
-	 * exceed the given width. The default implementation replaces characters in
-	 * the center of the original string with an ellipsis ("..."). Override if
-	 * you need a different strategy.
-	 * 
-	 * Note: Code originally from org.eclipse.cwt.CLabel
+	 * Shorten the given text <code>text</code> so that its length doesn't exceed the given width.
+	 * The default implementation replaces characters in the center of the original string with an
+	 * ellipsis ("..."). Override if you need a different strategy. Note: Code originally from
+	 * org.eclipse.cwt.CLabel
 	 * 
 	 * @param gc
 	 *            the gc to use for text measurement
@@ -47,10 +43,11 @@ public class RendererHelper {
 	 *            the width to shorten the text to, in pixels
 	 * @return the shortened text
 	 */
-	public static String createLabel(String text, GC gc, int width) {
+	public static String createLabel(final String text, final GC gc, final int width) {
 
-		if (text == null)
+		if (text == null) {
 			return null;
+		}
 
 		final int extent = gc.textExtent(text).x;
 
@@ -85,8 +82,7 @@ public class RendererHelper {
 
 				return text;
 			}
-			String result = text.substring(0, mid) + ELLIPSIS
-					+ text.substring(l - mid, l);
+			final String result = text.substring(0, mid) + ELLIPSIS + text.substring(l - mid, l);
 
 			return result;
 		}
@@ -104,22 +100,21 @@ public class RendererHelper {
 	 * @param maxY
 	 * @return
 	 */
-	public static Point getBestSize(int originalX, int originalY, int maxX,
-			int maxY) {
-		double widthRatio = (double) originalX / (double) maxX;
-		double heightRatio = (double) originalY / (double) maxY;
+	public static Point getBestSize(final int originalX, final int originalY, final int maxX, final int maxY) {
 
-		double bestRatio = widthRatio > heightRatio ? widthRatio : heightRatio;
+		final double widthRatio = (double) originalX / (double) maxX;
+		final double heightRatio = (double) originalY / (double) maxY;
 
-		int newWidth = (int) (originalX / bestRatio);
-		int newHeight = (int) (originalY / bestRatio);
+		final double bestRatio = widthRatio > heightRatio ? widthRatio : heightRatio;
+
+		final int newWidth = (int) (originalX / bestRatio);
+		final int newHeight = (int) (originalY / bestRatio);
 
 		return new Point(newWidth, newHeight);
 	}
 
 	/**
-	 * Return both width and height offsets for an image to be centered in a
-	 * given area.
+	 * Return both width and height offsets for an image to be centered in a given area.
 	 * 
 	 * @param imageWidth
 	 * @param imageHeight
@@ -127,10 +122,11 @@ public class RendererHelper {
 	 * @param areaHeight
 	 * @return
 	 */
-	public static Point getImageOffset(int imageWidth, int imageHeight,
-			int areaWidth, int areaHeight) {
-		return new Point(getShift(areaWidth, imageWidth), getShift(areaHeight,
-				imageHeight));
+	public static Point getImageOffset(	final int imageWidth,
+										final int imageHeight,
+										final int areaWidth,
+										final int areaHeight) {
+		return new Point(getShift(areaWidth, imageWidth), getShift(areaHeight, imageHeight));
 	}
 
 	/**
@@ -140,17 +136,17 @@ public class RendererHelper {
 	 * @param size
 	 * @return
 	 */
-	public static int getShift(int totalSize, int size) {
+	public static int getShift(final int totalSize, final int size) {
 		int xShift = totalSize - size;
-		if (xShift < 0)
+		if (xShift < 0) {
 			xShift = 0;
+		}
 		xShift = xShift >> 1;
 		return xShift;
 	}
 
 	/**
-	 * Checks if two colors are equals by comparing their RGB values.
-	 * This method is null-proof.
+	 * Checks if two colors are equals by comparing their RGB values. This method is null-proof.
 	 * 
 	 * @param galleryColor
 	 *            First color
@@ -158,7 +154,7 @@ public class RendererHelper {
 	 *            Second color.
 	 * @return true if same object or RGB values are equals.
 	 */
-	public static boolean isColorsEquals(Color galleryColor, Color itemColor) {
+	public static boolean isColorsEquals(final Color galleryColor, final Color itemColor) {
 
 		// Default case
 		if (galleryColor == itemColor) {

@@ -19,11 +19,12 @@ import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.photo.gallery.AbstractGalleryItemRenderer;
-import net.tourbook.photo.gallery.AbstractGridGroupRenderer;
 import net.tourbook.photo.gallery.GalleryMT;
 import net.tourbook.photo.gallery.GalleryMTItem;
 import net.tourbook.photo.manager.ILoadCallBack;
@@ -84,17 +85,19 @@ import org.eclipse.ui.part.PageBook;
  */
 public class PicDirImages {
 
-	private static final int						MAX_HISTORY_ENTRIES		= 200;
+	private static final int						MAX_HISTORY_ENTRIES				= 200;
 
-	static final int								MIN_ITEM_HEIGHT			= 10;
-//	static final int								MAX_ITEM_HEIGHT			= 999;
-	static final int								MAX_ITEM_HEIGHT			= 2000;
+	static final int								MIN_ITEM_HEIGHT					= 10;
+//	static final int								MAX_ITEM_HEIGHT					= 999;
+	static final int								MAX_ITEM_HEIGHT					= 2000;
 
-	private static final String						STATE_FOLDER_HISTORY	= "STATE_FOLDER_HISTORY";				//$NON-NLS-1$
-	private static final String						STATE_THUMB_IMAGE_SIZE	= "STATE_THUMB_IMAGE_SIZE";			//$NON-NLS-1$
+	private static final String						STATE_FOLDER_HISTORY			= "STATE_FOLDER_HISTORY";				//$NON-NLS-1$
+	private static final String						STATE_THUMB_IMAGE_SIZE			= "STATE_THUMB_IMAGE_SIZE";			//$NON-NLS-1$
+	private static final String						STATE_GALLERY_POSITION_FOLDER	= "STATE_GALLERY_POSITION_FOLDER";		//$NON-NLS-1$
+	private static final String						STATE_GALLERY_POSITION_VALUE	= "STATE_GALLERY_POSITION_VALUE";		//$NON-NLS-1$
 
-	private final IPreferenceStore					_prefStore				= TourbookPlugin.getDefault() //
-																					.getPreferenceStore();
+	private final IPreferenceStore					_prefStore						= TourbookPlugin.getDefault() //
+																							.getPreferenceStore();
 
 	/*
 	 * worker thread management
@@ -106,32 +109,32 @@ public class PicDirImages {
 	/**
 	 * Lock for all worker control data and state
 	 */
-	private final Object							_workerLock				= new Object();
+	private final Object							_workerLock						= new Object();
 
 	/**
 	 * The worker's thread
 	 */
-	private volatile Thread							_workerThread			= null;
+	private volatile Thread							_workerThread					= null;
 
 	/**
 	 * True if the worker must exit on completion of the current cycle
 	 */
-	private volatile boolean						_workerStopped			= false;
+	private volatile boolean						_workerStopped					= false;
 
 	/**
 	 * True if the worker must cancel its operations prematurely perhaps due to a state update
 	 */
-	private volatile boolean						_workerCancelled		= false;
+	private volatile boolean						_workerCancelled				= false;
 
 	/**
 	 * Worker state information -- this is what gets synchronized by an update
 	 */
-	private volatile File							_workerStateDir			= null;
+	private volatile File							_workerStateDir					= null;
 
 	/**
 	 * State information to use for the next cycle
 	 */
-	private volatile File							_workerNextFolder		= null;
+	private volatile File							_workerNextFolder				= null;
 
 	/**
 	 * Manages the worker's thread
@@ -141,7 +144,7 @@ public class PicDirImages {
 	/**
 	 *
 	 */
-	public static final Comparator<File>			NATURAL_SORT			= new SortNatural<File>(true);
+	public static final Comparator<File>			NATURAL_SORT					= new SortNatural<File>(true);
 
 	/**
 	 *
@@ -149,20 +152,20 @@ public class PicDirImages {
 	public static Comparator<File>					DATE_SORT;
 
 //	private Comparator<File>						_currentComparator	= SortingUtils.DATE_SORT;
-	private Comparator<File>						_currentComparator		= DATE_SORT;
+	private Comparator<File>						_currentComparator				= DATE_SORT;
 
 	private PicDirView								_picDirView;
 
 	private AbstractGalleryItemRenderer				_itemRenderer;
-	private AbstractGridGroupRenderer				_groupRenderer;
+	private NoGroupRendererMT						_groupRenderer;
 
 	/**
 	 * Photo image height (thumbnail size)
 	 */
-	private int										_photoSize				= PhotoManager.THUMBNAIL_DEFAULT_SIZE;
+	private int										_photoSize						= PhotoManager.THUMBNAIL_DEFAULT_SIZE;
 
 	/**
-	 * Folder which images are currently displayed
+	 * Folder which images are currently be displayed
 	 */
 	private File									_photoFolder;
 	private File[]									_photoFiles;
@@ -171,15 +174,20 @@ public class PicDirImages {
 	private PicDirFolder							_picDirFolder;
 
 	private boolean									_isComboKeyPressed;
-	private int										_prevThumbnailSize		= -1;
+	private int										_prevThumbnailSize				= -1;
 
 	private int										_selectedHistoryIndex;
-	private ArrayList<String>						_folderHistory			= new ArrayList<String>();
+	private ArrayList<String>						_folderHistory					= new ArrayList<String>();
 
 	private ActionNavigateHistoryBackward			_actionNavigateBackward;
 	private ActionNavigateHistoryForward			_actionNavigateForward;
 	private ActionClearNavigationHistory			_actionClearNavigationHistory;
 	private ActionRemoveInvalidFoldersFromHistory	_actionRemoveInvalidFoldersFromHistory;
+
+	private LinkedHashMap<String, Double>			_galleryPositions				= new LinkedHashMap<String, Double>(
+																							100,
+																							0.75f,
+																							true);
 
 	/*
 	 * UI controls
@@ -1002,6 +1010,32 @@ public class PicDirImages {
 
 		// restore thumbnail size
 		onSelectThumbnailSize();
+
+		/*
+		 * gallery folder image positions
+		 */
+		final String[] positionFolders = state.getArray(STATE_GALLERY_POSITION_FOLDER);
+		final String[] positionValues = state.getArray(STATE_GALLERY_POSITION_VALUE);
+		if (positionFolders != null && positionValues != null) {
+
+			// ensure same size
+			if (positionFolders.length == positionValues.length) {
+
+				for (int positionIndex = 0; positionIndex < positionFolders.length; positionIndex++) {
+
+					final String positionValueString = positionValues[positionIndex];
+
+					try {
+						final Double positionValue = Double.parseDouble(positionValueString);
+
+						_galleryPositions.put(positionFolders[positionIndex], positionValue);
+
+					} catch (final Exception e) {
+						// ignore
+					}
+				}
+			}
+		}
 	}
 
 	void saveState(final IDialogSettings state) {
@@ -1010,6 +1044,33 @@ public class PicDirImages {
 
 		// thumbnail size
 		state.put(STATE_THUMB_IMAGE_SIZE, _spinnerThumbSize.getSelection());
+
+		/*
+		 * gallery positions for each folder
+		 */
+
+		// get current position
+		if (_photoFolder != null) {
+			_galleryPositions.put(_photoFolder.getAbsolutePath(), _gallery.getGalleryPosition());
+		}
+
+		final Set<String> positionFolders = _galleryPositions.keySet();
+		final int positionSize = positionFolders.size();
+
+		if (positionSize > 0) {
+
+			final String[] positionFolderArray = positionFolders.toArray(new String[positionSize]);
+			final String[] positionValues = new String[positionSize];
+
+			for (int positionIndex = 0; positionIndex < positionFolderArray.length; positionIndex++) {
+				final String positionKey = positionFolderArray[positionIndex];
+				positionValues[positionIndex] = _galleryPositions.get(positionKey).toString();
+			}
+
+			state.put(STATE_GALLERY_POSITION_FOLDER, positionFolderArray);
+			state.put(STATE_GALLERY_POSITION_VALUE, positionValues);
+		}
+
 	}
 
 	void setThumbnailSize(final int imageSize) {
@@ -1032,8 +1093,8 @@ public class PicDirImages {
 		//
 		// MUST BE REMOVED, IS ONLY FOR TESTING
 		//
-		PhotoImageCache.dispose();
-		ThumbnailStore.cleanupStoreFiles(true, true);
+//		PhotoImageCache.dispose();
+//		ThumbnailStore.cleanupStoreFiles(true, true);
 		//
 		// MUST BE REMOVED, IS ONLY FOR TESTING
 		//
@@ -1046,7 +1107,7 @@ public class PicDirImages {
 			_lblLoading.setText(NLS.bind(Messages.Pic_Dir_Label_Loading, imageFolder.getAbsolutePath()));
 
 			if (isFromNavigationHistory == false) {
-				// don't update history when the navigation in the history caused to display the images
+				// don't update history when the navigation in the history has caused to display the images
 				updateHistory(imageFolder.getAbsolutePath());
 			}
 		}
@@ -1215,6 +1276,7 @@ public class PicDirImages {
 				newPhotoFiles = files.toArray(new File[files.size()]);
 			}
 
+			final File prevPhotoFolder = _photoFolder;
 			_photoFolder = _workerStateDir;
 			_photoFiles = newPhotoFiles;
 
@@ -1226,7 +1288,21 @@ public class PicDirImages {
 						return;
 					}
 
-					// this will update the gallery
+					// keep previous gallery position
+					if (prevPhotoFolder != null) {
+						_galleryPositions.put(prevPhotoFolder.getAbsolutePath(), _gallery.getGalleryPosition());
+					}
+
+					// set gallery position
+					final Double newPosition = _galleryPositions.get(_photoFolder.getAbsolutePath());
+					if (newPosition != null) {
+						_gallery.setGalleryPositionWhenUpdated(newPosition);
+					}
+
+					/*
+					 * this will also update the gallery, it's not easy to understand the update
+					 * procedure
+					 */
 					_gallery.clearAll();
 
 					/*

@@ -771,20 +771,20 @@ public class TourPainter extends MapPainter {
 
 		if (isPhotoInTile) {
 
-			final int photoWidth = photo.getWidthSmall();
-			final int photoHeight = photo.getWidthSmall();
+//			final int photoWidth = photo.getWidthSmall();
+//			final int photoHeight = photo.getWidthSmall();
 //			image = photo.getImageSmall();
 
-			int devX = devXPhoto - photoWidth / 2;
-			int devY = devYPhoto - photoHeight;
+//			int devX = devXPhoto - photoWidth / 2;
+//			int devY = devYPhoto - photoHeight;
 
-			devX += devPartOffset;
-			devY += devPartOffset;
+//			devX += devPartOffset;
+//			devY += devPartOffset;
 
 //			gc.drawImage(_twpImage, devX, devY);
 
-			gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-			gc.fillRectangle(devX, devY, photoWidth, photoHeight);
+//			gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+//			gc.fillRectangle(devX, devY, photoWidth, photoHeight);
 
 //			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 //			gc.setLineWidth(1);

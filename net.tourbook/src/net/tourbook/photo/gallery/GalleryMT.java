@@ -114,7 +114,7 @@ public class GalleryMT extends Canvas {
 	/**
 	 * Gallery root items
 	 */
-	GalleryMTItem[]					_galleryItems						= null;
+	GalleryMTItem[]					_galleryRootItems					= null;
 
 	private GalleryMTItem[]			_selectedItems						= null;
 
@@ -171,9 +171,12 @@ public class GalleryMT extends Canvas {
 	protected GalleryMTItem			lastSingleClick						= null;
 
 	/**
-	 * Current translation (scroll bar position). Can be used by renderer during paint.
+	 * Current gallery top/left position (this is also the scroll bar position). Can be used by
+	 * renderer during paint.
 	 */
 	protected int					_galleryPosition					= 0;
+
+	private Double					_galleryPositionWhenUpdated;
 
 	protected int					higherQualityDelay					= 500;
 
@@ -323,7 +326,7 @@ public class GalleryMT extends Canvas {
 
 	private void _addItem(final GalleryMTItem item, final int position) {
 		// Insert item
-		_galleryItems = (GalleryMTItem[]) _arrayAddItem(_galleryItems, item, position);
+		_galleryRootItems = (GalleryMTItem[]) _arrayAddItem(_galleryRootItems, item, position);
 
 		// Update Gallery
 		updateStructuralValues(null, false);
@@ -596,7 +599,7 @@ public class GalleryMT extends Canvas {
 				// Create selectionFlag array
 				// Add 31 before dividing by 32 to ensure at least one 'int' is
 				// created if size < 32.
-				selectionFlags = new int[(_galleryItems.length + 31) >> 5];
+				selectionFlags = new int[(_galleryRootItems.length + 31) >> 5];
 			} else if (n >= selectionFlags.length) {
 				// Expand selectionArray
 				final int[] oldFlags = selectionFlags;
@@ -756,10 +759,10 @@ public class GalleryMT extends Canvas {
 			}
 		}
 
-		if (_galleryItems == null) {
+		if (_galleryRootItems == null) {
 			return;
 		}
-		for (final GalleryMTItem item : _galleryItems) {
+		for (final GalleryMTItem item : _galleryRootItems) {
 			if (item != null) {
 				item._deselectAll();
 			}
@@ -782,13 +785,19 @@ public class GalleryMT extends Canvas {
 		GalleryMTItem groupItem = null;
 
 		if (_isVirtualGroups) {
+
 			// Ultra virtual : when a group is about to be drawn, initialize it
 			// and update gallery layout according to the new size
+
 			groupItem = _getItem(index, false);
+
 			if (groupItem.isUltraLazyDummy()) {
+
 				final boolean updateLocation = (_isVertical && groupItem.y < _galleryPosition)
 						|| (!_isVertical && groupItem.x < _galleryPosition);
+
 				final int oldSize = groupItem.height;
+
 				groupItem = _getItem(index, true);
 
 				// Compatibility mode : ensure all previous items are already
@@ -801,12 +810,25 @@ public class GalleryMT extends Canvas {
 
 				updateStructuralValues(groupItem, false);
 
-				if (updateLocation) {
+				if (_galleryPositionWhenUpdated != null) {
+
+					final double newPosition = _galleryPositionWhenUpdated.doubleValue();
+
+					// set only once
+					_galleryPositionWhenUpdated = null;
+
+					_galleryPosition = (int) (_contentVirtualHeight * newPosition);
+
+//					setGalleryPositionWhenUpdatedInternal(newPosition);
+
+				} else if (updateLocation) {
 					_galleryPosition += (groupItem.height - oldSize);
 				}
+
 				updateScrollBarsProperties();
 				redraw();
 			}
+
 		} else {
 			// Default behavior : get the item with no special handling.
 			groupItem = getItem(index);
@@ -858,7 +880,7 @@ public class GalleryMT extends Canvas {
 	 */
 	private GalleryMTItem _getGroup(final Point coords) {
 		// If there is no item in the gallery, return asap
-		if (_galleryItems == null) {
+		if (_galleryRootItems == null) {
 			return null;
 		}
 
@@ -866,7 +888,7 @@ public class GalleryMT extends Canvas {
 
 		int index = 0;
 		GalleryMTItem item = null;
-		while (index < _galleryItems.length) {
+		while (index < _galleryRootItems.length) {
 			item = getItem(index);
 
 			if ((_isVertical ? item.y : item.x) > pos) {
@@ -957,13 +979,13 @@ public class GalleryMT extends Canvas {
 	 */
 	protected GalleryMTItem _getItem(final int index, final boolean create) {
 
-		final int galleryItemsCount = _galleryItems == null ? 0 : _galleryItems.length;
+		final int galleryItemsCount = _galleryRootItems == null ? 0 : _galleryRootItems.length;
 
 		if (index < galleryItemsCount) {
 
 			updateItem(null, index, create);
 
-			return _galleryItems[index];
+			return _galleryRootItems[index];
 		}
 
 		return null;
@@ -982,25 +1004,25 @@ public class GalleryMT extends Canvas {
 			SWT.error(SWT.ERROR_NULL_ARGUMENT);
 		}
 		if (1 <= lastIndexOf && lastIndexOf < itemCount - 1) {
-			if (_galleryItems[lastIndexOf] == item) {
+			if (_galleryRootItems[lastIndexOf] == item) {
 				return lastIndexOf;
 			}
-			if (_galleryItems[lastIndexOf + 1] == item) {
+			if (_galleryRootItems[lastIndexOf + 1] == item) {
 				return ++lastIndexOf;
 			}
-			if (_galleryItems[lastIndexOf - 1] == item) {
+			if (_galleryRootItems[lastIndexOf - 1] == item) {
 				return --lastIndexOf;
 			}
 		}
 		if (lastIndexOf < itemCount / 2) {
 			for (int i = 0; i < itemCount; i++) {
-				if (_galleryItems[i] == item) {
+				if (_galleryRootItems[i] == item) {
 					return lastIndexOf = i;
 				}
 			}
 		} else {
 			for (int i = itemCount - 1; i >= 0; --i) {
-				if (_galleryItems[i] == item) {
+				if (_galleryRootItems[i] == item) {
 					return lastIndexOf = i;
 				}
 			}
@@ -1074,11 +1096,11 @@ public class GalleryMT extends Canvas {
 
 	protected void _remove(final int index) {
 		// if (!virtual) {
-		if (isSelected(_galleryItems[index])) {
-			setSelected(_galleryItems[index], false, false);
+		if (isSelected(_galleryRootItems[index])) {
+			setSelected(_galleryRootItems[index], false, false);
 		}
 
-		_galleryItems = (GalleryMTItem[]) _arrayRemoveItem(_galleryItems, index);
+		_galleryRootItems = (GalleryMTItem[]) _arrayRemoveItem(_galleryRootItems, index);
 
 		// if( virtual)
 		// itemCount--;
@@ -1128,7 +1150,7 @@ public class GalleryMT extends Canvas {
 	}
 
 	public void _setGalleryItems(final GalleryMTItem[] items) {
-		this._galleryItems = items;
+		this._galleryRootItems = items;
 	}
 
 	void _showItem(final GalleryMTItem item) {
@@ -1239,13 +1261,13 @@ public class GalleryMT extends Canvas {
 	public void clear(final int index, final boolean all) {
 
 		// Item is already cleared, return immediately.
-		if (_galleryItems[index] == null) {
+		if (_galleryRootItems[index] == null) {
 			return;
 		}
 
 		if (_isVirtual) {
 			// Clear item
-			_galleryItems[index] = null;
+			_galleryRootItems[index] = null;
 
 			// In virtual mode, clearing an item can change its content, so
 			// force content update
@@ -1253,9 +1275,9 @@ public class GalleryMT extends Canvas {
 			updateScrollBarsProperties();
 		} else {
 			// Reset item
-			_galleryItems[index].clear();
+			_galleryRootItems[index].clear();
 			if (all) {
-				_galleryItems[index].clearAll(true);
+				_galleryRootItems[index].clearAll(true);
 			}
 		}
 
@@ -1279,14 +1301,14 @@ public class GalleryMT extends Canvas {
 	 */
 	public void clearAll(final boolean all) {
 
-		if (_galleryItems == null) {
+		if (_galleryRootItems == null) {
 			return;
 		}
 
 		if (_isVirtual) {
-			_galleryItems = new GalleryMTItem[_galleryItems.length];
+			_galleryRootItems = new GalleryMTItem[_galleryRootItems.length];
 		} else {
-			for (final GalleryMTItem item : _galleryItems) {
+			for (final GalleryMTItem item : _galleryRootItems) {
 				if (item != null) {
 					if (all) {
 						item.clearAll(true);
@@ -1476,6 +1498,37 @@ public class GalleryMT extends Canvas {
 	}
 
 	/**
+	 * @return Returns gallery relative position
+	 */
+	public double getGalleryPosition() {
+
+		if (_isVertical) {
+
+			final ScrollBar vBar = getVerticalBar();
+			if (vBar == null) {
+				return 1;
+			}
+
+			final int selection = vBar.getSelection();
+			final int maximum = vBar.getMaximum();
+
+			return (double) selection / maximum;
+
+		} else {
+
+			final ScrollBar hBar = getHorizontalBar();
+			if (hBar == null) {
+				return 1;
+			}
+
+			final int selection = hBar.getSelection();
+			final int maximum = hBar.getMaximum();
+
+			return (double) selection / maximum;
+		}
+	}
+
+	/**
 	 * <p>
 	 * Get group at pixel position (relative to client area).
 	 * </p>
@@ -1549,11 +1602,11 @@ public class GalleryMT extends Canvas {
 	 */
 	public int getItemCount() {
 
-		if (_galleryItems == null) {
+		if (_galleryRootItems == null) {
 			return 0;
 		}
 
-		return _galleryItems.length;
+		return _galleryRootItems.length;
 	}
 
 	/**
@@ -1567,12 +1620,12 @@ public class GalleryMT extends Canvas {
 
 	public GalleryMTItem[] getItems() {
 
-		if (_galleryItems == null) {
+		if (_galleryRootItems == null) {
 			return new GalleryMTItem[0];
 		}
 
-		final GalleryMTItem[] itemsLocal = new GalleryMTItem[_galleryItems.length];
-		System.arraycopy(_galleryItems, 0, itemsLocal, 0, _galleryItems.length);
+		final GalleryMTItem[] itemsLocal = new GalleryMTItem[_galleryRootItems.length];
+		System.arraycopy(_galleryRootItems, 0, itemsLocal, 0, _galleryRootItems.length);
 
 		return itemsLocal;
 	}
@@ -1636,7 +1689,7 @@ public class GalleryMT extends Canvas {
 
 	private int[] getVisibleItems(final Rectangle clipping) {
 
-		if (_galleryItems == null) {
+		if (_galleryRootItems == null) {
 			return null;
 		}
 
@@ -1651,7 +1704,7 @@ public class GalleryMT extends Canvas {
 		final ArrayList<Integer> al = new ArrayList<Integer>();
 		int index = 0;
 		GalleryMTItem item = null;
-		while (index < _galleryItems.length) {
+		while (index < _galleryRootItems.length) {
 
 			if (_isVirtualGroups) {
 				item = _getItem(index, false);
@@ -1849,15 +1902,6 @@ public class GalleryMT extends Canvas {
 		}
 	}
 
-	void onMouseDoubleClick(final MouseEvent e) {
-
-		final GalleryMTItem item = getItem(new Point(e.x, e.y));
-		if (item != null) {
-			notifySelectionListeners(item, 0, true);
-		}
-		mouseClickHandled = true;
-	}
-
 	// TODO: Not used ATM
 	// private void clear() {
 	// checkWidget();
@@ -1870,6 +1914,15 @@ public class GalleryMT extends Canvas {
 	// updateStructuralValues(true);
 	// updateScrollBarsProperties();
 	// }
+
+	void onMouseDoubleClick(final MouseEvent e) {
+
+		final GalleryMTItem item = getItem(new Point(e.x, e.y));
+		if (item != null) {
+			notifySelectionListeners(item, 0, true);
+		}
+		mouseClickHandled = true;
+	}
 
 	void onMouseDown(final MouseEvent e) {
 
@@ -2197,11 +2250,11 @@ public class GalleryMT extends Canvas {
 
 	public void removeAll() {
 
-		if (_galleryItems != null) {
+		if (_galleryRootItems != null) {
 			// Clear items
 
-			final GalleryMTItem[] tmpArray = new GalleryMTItem[_galleryItems.length];
-			System.arraycopy(_galleryItems, 0, tmpArray, 0, _galleryItems.length);
+			final GalleryMTItem[] tmpArray = new GalleryMTItem[_galleryRootItems.length];
+			System.arraycopy(_galleryRootItems, 0, tmpArray, 0, _galleryRootItems.length);
 
 			for (final GalleryMTItem element : tmpArray) {
 
@@ -2269,13 +2322,11 @@ public class GalleryMT extends Canvas {
 
 	protected void scrollVertical() {
 
-//		final long start = System.nanoTime();
-
 		final int areaHeight = _clientArea.height;
 
 		if (_contentVirtualHeight > areaHeight) {
 
-			// image is higher than client area
+			// content is larger than visible client area
 
 			final int barSelection = getVerticalBar().getSelection();
 
@@ -2286,12 +2337,6 @@ public class GalleryMT extends Canvas {
 		} else {
 			_galleryPosition = 0;
 		}
-
-//		final float timeDiff = (float) (System.nanoTime() - start) / 1000000;
-//		if (timeDiff > 10) {
-//			System.out.println("scrollVertical\t" + timeDiff + " ms");
-//		}
-//		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 	private void select(final GalleryMTItem from, final GalleryMTItem to) {
@@ -2432,6 +2477,10 @@ public class GalleryMT extends Canvas {
 		super.setForeground(color);
 	}
 
+	public void setGalleryPositionWhenUpdated(final Double newPosition) {
+		_galleryPositionWhenUpdated = newPosition;
+	}
+
 	public void setGroupRenderer(final AbstractGalleryGroupRenderer groupRenderer) {
 		this.groupRenderer = groupRenderer;
 
@@ -2480,15 +2529,15 @@ public class GalleryMT extends Canvas {
 
 		if (count == 0) {
 			// No items
-			_galleryItems = null;
+			_galleryRootItems = null;
 		} else {
 			// At least one item, create a new array and copy data from the
 			// old one.
 			final GalleryMTItem[] newItems = new GalleryMTItem[count];
-			if (_galleryItems != null) {
-				System.arraycopy(_galleryItems, 0, newItems, 0, Math.min(count, _galleryItems.length));
+			if (_galleryRootItems != null) {
+				System.arraycopy(_galleryRootItems, 0, newItems, 0, Math.min(count, _galleryRootItems.length));
 			}
-			_galleryItems = newItems;
+			_galleryRootItems = newItems;
 		}
 
 		updateStructuralValues(null, false);
@@ -2685,12 +2734,12 @@ public class GalleryMT extends Canvas {
 			if (parentItem == null) {
 
 				// Parent is the Gallery widget
-				galleryItem = _galleryItems[i];
+				galleryItem = _galleryRootItems[i];
 
 				if (galleryItem == null || (_isVirtualGroups && galleryItem.isUltraLazyDummy() && create)) {
 
 					galleryItem = new GalleryMTItem(this, SWT.NONE, i, false);
-					_galleryItems[i] = galleryItem;
+					_galleryRootItems[i] = galleryItem;
 
 					if (_isVirtualGroups && !create) {
 						galleryItem.setItemCount(_virtualGroupDefaultItemCount);
@@ -2835,7 +2884,6 @@ public class GalleryMT extends Canvas {
 		}
 
 		validateGalleryPosition();
-
 	}
 
 	/**
@@ -2844,7 +2892,8 @@ public class GalleryMT extends Canvas {
 	 */
 	private void validateGalleryPosition() {
 
-		// Ensure that translate has a valid value.
+		// Ensure that gallery position has a valid value.
+
 		int contentSize = 0;
 		int clientSize = 0;
 
@@ -2870,7 +2919,6 @@ public class GalleryMT extends Canvas {
 		} else {
 			_galleryPosition = 0;
 		}
-
 	}
 
 	/**

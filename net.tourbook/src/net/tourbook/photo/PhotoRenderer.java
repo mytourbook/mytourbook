@@ -114,56 +114,62 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 				imageWidth = imageBounds.width;
 				imageHeight = imageBounds.height;
 
-				final int photoWidth = photo.getWidth();
-				final int photoHeight = photo.getHeight();
+				final int imageCanvasWidth = galleryItemWidth - imageBorderWidth;
+				final int imageCanvasHeight = useableHeight - imageBorderWidth;
+
+				final Point bestSize = RendererHelper.getBestSize(
+						imageWidth,
+						imageHeight,
+						imageCanvasWidth,
+						imageCanvasHeight);
+
+				int photoPaintedWidth = bestSize.x;
+				int photoPaintedHeight = bestSize.y;
+
+				final int photoWidth = photo.getWidthRotated();
+				final int photoHeight = photo.getHeightRotated();
+
 				if (photoWidth != Integer.MIN_VALUE && photoHeight != Integer.MIN_VALUE) {
 
-//					if (imageWidth > photoWidth || imageHeight > photoHeight) {
-//
-//						/*
-//						 * photo image should not be displayed larger than the original photo even
-//						 * when the thumb image is larger, this can happen when image is resized
-//						 */
-//
-//						imageWidth = photoWidth;
-//						imageHeight = photoHeight;
-//
+					// photo is loaded
+
+					if (photoPaintedWidth > photoWidth || photoPaintedHeight > photoHeight) {
+
+						/*
+						 * photo image should not be displayed larger than the original photo even
+						 * when the thumb image is larger, this can happen when image is resized
+						 */
+
+						photoPaintedWidth = photoWidth;
+						photoPaintedHeight = photoHeight;
+
 //					} else if (photoWidth > imageWidth && photoHeight > imageHeight) {
 //
 //						/*
-//						 * photo is larger than the thumb, draw thumb larger with photo size, the
-//						 * thumb will be blured until the original image is loaded
+//						 * photo is larger than the thumb, draw thumb with photo size, the thumb
+//						 * will be blured until the original image is loaded
 //						 */
-////						imageWidth = galleryItemWidth;
-////						imageHeight = galleryItemHeight;
+////						bestWidth = galleryItemWidth;
+////						bestHeight = galleryItemHeight;
+					}
+
+//				} else {
+//
+//					// photo is not loaded
+//
+//					if (photoPaintedWidth > imageWidth || photoPaintedHeight > imageHeight) {
+//						photoPaintedWidth = imageWidth;
+//						photoPaintedHeight = imageHeight;
 //					}
 				}
 
-				final Point bestSize = RendererHelper.getBestSize(//
-						imageWidth,
-						imageHeight,
-						galleryItemWidth - imageBorderWidth,
-						useableHeight - imageBorderWidth);
-
-				int bestWidth = bestSize.x;
-				int bestHeight = bestSize.y;
-
-				if (bestWidth > imageWidth || bestHeight > imageHeight) {
-					bestWidth = imageWidth;
-					bestHeight = imageHeight;
-				}
-
 				// Draw image
-				if (bestWidth > 0 && bestHeight > 0) {
+				if (photoPaintedWidth > 0 && photoPaintedHeight > 0) {
 
-//					System.out.println(imageWidth + "x" + imageHeight + " - " + bestWidth + "x" + bestHeight);
-//					// TODO remove SYSTEM.OUT.PRINTLN
 
-					final int xShiftSrc = galleryItemWidth - bestWidth;
-					final int yShiftSrc = useableHeight - bestHeight;
-
-					final int xShift = xShiftSrc >> 1;
-					final int yShift = yShiftSrc >> 1;
+					// center image
+					final int offsetX = (galleryItemWidth - photoPaintedWidth) / 2;
+					final int offsetY = (useableHeight - photoPaintedHeight) / 2;
 
 					gc.drawImage(photoImage, //
 							0,
@@ -171,10 +177,11 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 							imageWidth,
 							imageHeight,
 							//
-							devXGallery + xShift,
-							devYGallery + yShift,
-							bestWidth,
-							bestHeight);
+							devXGallery + offsetX,
+							devYGallery + offsetY,
+							photoPaintedWidth,
+							photoPaintedHeight);
+
 //					setForegroundColor(gc.getDevice().getSystemColor(SWT.COLOR_BLUE));
 //					setBackgroundColor(gc.getDevice().getSystemColor(SWT.COLOR_WHITE));
 //					drawText(gc, devXGallery, devYGallery, photo, false, false);
@@ -234,7 +241,7 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 		}
 
 //		gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-//		gc.drawRectangle(devXGallery, devYGallery, galleryItemWidth - 2, galleryItemHeight - 2);
+//		gc.drawRectangle(devXGallery, devYGallery, galleryItemWidth - 1, galleryItemHeight - 1);
 	}
 
 	private void drawText(	final GC gc,

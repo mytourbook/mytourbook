@@ -76,6 +76,16 @@ public class Photo {
 	private int								_widthSmall;
 	private int								_height			= Integer.MIN_VALUE;
 
+	/**
+	 * Contains photo image width after it is rotated with the EXIF orientation
+	 */
+	private int								_widthRotated	= _width;
+
+	/**
+	 * Contains photo image height after it is rotated with the EXIF orientation
+	 */
+	private int								_heightRotated	= _height;
+
 	private int								_heightSmall;
 	private double							_latitude		= Double.MIN_VALUE;
 
@@ -336,6 +346,13 @@ public class Photo {
 		return _height;
 	}
 
+	/**
+	 * @return Returns photo image height after it is rotated with the EXIF orientation
+	 */
+	public int getHeightRotated() {
+		return _heightRotated;
+	}
+
 	public int getHeightSmall() {
 		return _heightSmall;
 	}
@@ -402,7 +419,8 @@ public class Photo {
 
 				setSize(
 						getTiffIntValue(tiffMetadata, TiffTagConstants.TIFF_TAG_IMAGE_WIDTH, Integer.MIN_VALUE),
-						getTiffIntValue(tiffMetadata, TiffTagConstants.TIFF_TAG_IMAGE_LENGTH, Integer.MIN_VALUE));
+						getTiffIntValue(tiffMetadata, TiffTagConstants.TIFF_TAG_IMAGE_LENGTH, Integer.MIN_VALUE),
+						1);
 
 			} else if (_metadata instanceof JpegImageMetadata) {
 
@@ -410,11 +428,13 @@ public class Photo {
 
 				_dateTime = getExifDate(jpegMetadata);
 
+				_orientation = getExifIntValue(jpegMetadata, ExifTagConstants.EXIF_TAG_ORIENTATION, 1);
+
 				setSize(
 						getExifIntValue(jpegMetadata, ExifTagConstants.EXIF_TAG_EXIF_IMAGE_WIDTH, Integer.MIN_VALUE),
-						getExifIntValue(jpegMetadata, ExifTagConstants.EXIF_TAG_EXIF_IMAGE_LENGTH, Integer.MIN_VALUE));
+						getExifIntValue(jpegMetadata, ExifTagConstants.EXIF_TAG_EXIF_IMAGE_LENGTH, Integer.MIN_VALUE),
+						_orientation);
 
-				_orientation = getExifIntValue(jpegMetadata, ExifTagConstants.EXIF_TAG_ORIENTATION, 1);
 				_imageDirection = getExifValueDouble(jpegMetadata, GpsTagConstants.GPS_TAG_GPS_IMG_DIRECTION);
 				_altitude = getExifValueDouble(jpegMetadata, GpsTagConstants.GPS_TAG_GPS_ALTITUDE);
 
@@ -493,6 +513,13 @@ public class Photo {
 
 	public int getWidth() {
 		return _width;
+	}
+
+	/**
+	 * @return Return photo image width after it is rotated with the EXIF orientation
+	 */
+	public int getWidthRotated() {
+		return _widthRotated;
 	}
 
 	public int getWidthSmall() {
@@ -585,7 +612,7 @@ public class Photo {
 		_longitude = longitude;
 	}
 
-	public void setSize(final int width, final int height) {
+	public void setSize(final int width, final int height, final int orientation) {
 
 		_width = width;
 		_height = height;
@@ -595,6 +622,27 @@ public class Photo {
 
 		_widthSmall = width > SIZE_SMALL ? SIZE_SMALL : width;
 		_heightSmall = (int) (_widthSmall / ratio);
+
+		boolean isSwapWidthHeight = false;
+
+		if (orientation > 1) {
+
+			// see here http://www.impulseadventure.com/photo/exif-orientation.html
+
+			if (orientation == 8) {
+				isSwapWidthHeight = true;
+			} else if (orientation == 6) {
+				isSwapWidthHeight = true;
+			}
+		}
+
+		if (isSwapWidthHeight) {
+			_widthRotated = _height;
+			_heightRotated = _width;
+		} else {
+			_widthRotated = _width;
+			_heightRotated = _height;
+		}
 	}
 
 	@Override
