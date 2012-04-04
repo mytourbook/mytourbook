@@ -2478,6 +2478,10 @@ public class GalleryMT extends Canvas {
 	}
 
 	public void setGalleryPositionWhenUpdated(final Double newPosition) {
+
+//		System.out.println("gal pos: " + newPosition);
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
 		_galleryPositionWhenUpdated = newPosition;
 	}
 
@@ -2960,7 +2964,7 @@ public class GalleryMT extends Canvas {
 				return;
 			}
 
-			int itemHeight = groupRenderer.getItemHeight();
+			int itemWidth = groupRenderer.getItemWidth();
 
 			int ZOOM_INCREMENT = 5;
 			if (isShiftKey && isCtrlKey == false) {
@@ -2980,32 +2984,34 @@ public class GalleryMT extends Canvas {
 				// zoom in
 
 				// check if max zoom is reached
-				if (itemHeight >= maxHeight) {
+				if (itemWidth >= maxHeight) {
 					// max is reached
 					return;
 				}
 
-				itemHeight += ZOOM_INCREMENT;
-				if (itemHeight > maxHeight) {
-					itemHeight = maxHeight;
+				itemWidth += ZOOM_INCREMENT;
+				if (itemWidth > maxHeight) {
+					itemWidth = maxHeight;
 				}
 
 			} else {
 
 				// zoom out
 
-				if (itemHeight <= minHeight) {
+				if (itemWidth <= minHeight) {
 					// min is reached
 					return;
 				}
 
-				itemHeight -= ZOOM_INCREMENT;
-				if (itemHeight < minHeight) {
-					itemHeight = minHeight;
+				itemWidth -= ZOOM_INCREMENT;
+				if (itemWidth < minHeight) {
+					itemWidth = minHeight;
 				}
 			}
 
-			final int itemWidth = (int) (groupRenderer.getItemRatio() * itemHeight);
+			final double itemRatio = groupRenderer.getItemRatio();
+
+			final int itemHeight = (int) (itemWidth / itemRatio);
 
 			groupRenderer.setItemSize(itemWidth, itemHeight);
 

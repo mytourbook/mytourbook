@@ -87,9 +87,8 @@ public class PicDirImages {
 
 	private static final int						MAX_HISTORY_ENTRIES				= 200;
 
-	static final int								MIN_ITEM_HEIGHT					= 10;
-//	static final int								MAX_ITEM_HEIGHT					= 999;
-	static final int								MAX_ITEM_HEIGHT					= 2000;
+	static final int								MIN_ITEM_WIDTH					= 10;
+	static final int								MAX_ITEM_WIDTH					= 2000;
 
 	private static final String						STATE_FOLDER_HISTORY			= "STATE_FOLDER_HISTORY";				//$NON-NLS-1$
 	private static final String						STATE_THUMB_IMAGE_SIZE			= "STATE_THUMB_IMAGE_SIZE";			//$NON-NLS-1$
@@ -162,7 +161,7 @@ public class PicDirImages {
 	/**
 	 * Photo image height (thumbnail size)
 	 */
-	private int										_photoSize						= PhotoManager.THUMBNAIL_DEFAULT_SIZE;
+	private int										_photoWidth						= PhotoManager.THUMBNAIL_DEFAULT_SIZE;
 
 	/**
 	 * Folder which images are currently be displayed
@@ -174,7 +173,7 @@ public class PicDirImages {
 	private PicDirFolder							_picDirFolder;
 
 	private boolean									_isComboKeyPressed;
-	private int										_prevThumbnailSize				= -1;
+//	private int										_prevThumbnailSize				= -1;
 
 	private int										_selectedHistoryIndex;
 	private ArrayList<String>						_folderHistory					= new ArrayList<String>();
@@ -588,9 +587,6 @@ public class PicDirImages {
 			@Override
 			public void mouseDown(final MouseEvent e) {
 
-				System.out.println("mouse down"); //$NON-NLS-1$
-				// TODO remove SYSTEM.OUT.PRINTLN
-
 				// show list
 				_comboPathHistory.setListVisible(true);
 			}
@@ -638,8 +634,8 @@ public class PicDirImages {
 		GridDataFactory.fillDefaults() //
 				.align(SWT.BEGINNING, SWT.FILL)
 				.applyTo(_spinnerThumbSize);
-		_spinnerThumbSize.setMinimum(MIN_ITEM_HEIGHT);
-		_spinnerThumbSize.setMaximum(MAX_ITEM_HEIGHT);
+		_spinnerThumbSize.setMinimum(MIN_ITEM_WIDTH);
+		_spinnerThumbSize.setMaximum(MAX_ITEM_WIDTH);
 		_spinnerThumbSize.setIncrement(10);
 		_spinnerThumbSize.setPageIncrement(50);
 		_spinnerThumbSize.setToolTipText(UI.IS_OSX
@@ -648,13 +644,18 @@ public class PicDirImages {
 		_spinnerThumbSize.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
-				onSelectThumbnailSize();
+				System.out.println("selection\t");
+				// TODO remove SYSTEM.OUT.PRINTLN
+
+				onSelectThumbnailSize(_spinnerThumbSize.getSelection());
 			}
 		});
 		_spinnerThumbSize.addMouseWheelListener(new MouseWheelListener() {
 			public void mouseScrolled(final MouseEvent event) {
 				UI.adjustSpinnerValueOnMouseScroll(event);
-				onSelectThumbnailSize();
+				System.out.println("scroll\t");
+				// TODO remove SYSTEM.OUT.PRINTLN
+				onSelectThumbnailSize(_spinnerThumbSize.getSelection());
 			}
 		});
 	}
@@ -694,7 +695,7 @@ public class PicDirImages {
 			// a modify event is fired when gallery is zoomed in/out
 
 			public void handleEvent(final Event event) {
-				onZoomInOut(event);
+				onSelectThumbnailSize(event.width);
 			}
 		});
 
@@ -709,8 +710,8 @@ public class PicDirImages {
 		_gallery.setItemRenderer(_itemRenderer);
 
 		_groupRenderer = new NoGroupRendererMT();
-		_groupRenderer.setItemSize((int) (_photoSize * (float) 15 / 11), _photoSize);
-		_groupRenderer.setItemHeightMinMax(MIN_ITEM_HEIGHT, MAX_ITEM_HEIGHT);
+		_groupRenderer.setItemSize(_photoWidth, (int) (_photoWidth * (float) 15 / 11));
+		_groupRenderer.setItemHeightMinMax(MIN_ITEM_WIDTH, MAX_ITEM_WIDTH);
 		_groupRenderer.setAutoMargin(true);
 		_groupRenderer.setMinMargin(0);
 
@@ -851,7 +852,7 @@ public class PicDirImages {
 
 			final Photo photo = (Photo) galleryItem.getData();
 
-			final int imageQuality = _photoSize <= PhotoManager.THUMBNAIL_DEFAULT_SIZE
+			final int imageQuality = _photoWidth <= PhotoManager.THUMBNAIL_DEFAULT_SIZE
 					? PhotoManager.IMAGE_QUALITY_THUMB_160
 					: PhotoManager.IMAGE_QUALITY_HQ_1000;
 
@@ -863,7 +864,7 @@ public class PicDirImages {
 			}
 
 			// check if image is in the cache
-			final Image photoImage = PhotoImageCache.getImage(photo.getImageKey(imageQuality));
+			final Image photoImage = PhotoImageCache.getImage(photo, imageQuality);
 			if (photoImage == null || photoImage.isDisposed()) {
 
 				// the requested image is not available in the image cache -> image must be loaded
@@ -891,31 +892,82 @@ public class PicDirImages {
 		});
 	}
 
-	private void onSelectThumbnailSize() {
+	private void onSelectThumbnailSize(final int newThumbSize) {
 
-		final int thumbnailSize = _spinnerThumbSize.getSelection();
+		final double galleryWidth = _gallery.getClientArea().width;
+		final int prevPhotoWidth = _photoWidth;
 
-		if (thumbnailSize == _prevThumbnailSize) {
+		final double prevNumberOfImages = galleryWidth / prevPhotoWidth;
+
+		int newPhotoWidth = newThumbSize;
+
+		if (newThumbSize > prevPhotoWidth) {
+
+			// increased width -> fewer images
+
+			int imageCounter = (int) (prevNumberOfImages - 1);
+
+			/**
+			 * when only 1 image is displayed horizontally, there is a bug in the drawing algorithm
+			 * that only 1 displayed even when multiple image could be displayed vertically
+			 */
+			if (imageCounter >= 2) {
+
+				newPhotoWidth = (int) (galleryWidth / imageCounter);
+
+				if (newPhotoWidth == prevPhotoWidth) {
+
+					// size has not changed
+
+					while (newPhotoWidth == prevPhotoWidth) {
+
+						if (imageCounter < 3) {
+							break;
+						}
+
+						newPhotoWidth = (int) (galleryWidth / --imageCounter);
+					}
+				}
+			}
+
+		} else {
+
+			// decreased width -> more images
+
+			final double tempImageCounter = galleryWidth / newThumbSize;
+
+			/*
+			 * size by number of images only, when more than 2 images are displayed, otherwise size
+			 * by newThumbSize
+			 */
+			if (tempImageCounter > 2) {
+
+				final int numberOfImages = (int) (prevNumberOfImages + 1);
+
+				final int newTempPhotoWidth = (int) (galleryWidth / numberOfImages);
+				if (newTempPhotoWidth > MIN_ITEM_WIDTH) {
+					newPhotoWidth = newTempPhotoWidth;
+				}
+			}
+		}
+
+		final int photoWidth = newPhotoWidth;
+		final int photoHeight = (int) (newPhotoWidth * (float) 11 / 15);
+
+		if (photoWidth == _photoWidth) {
 			// optimize selection
 			return;
 		}
 
-		_prevThumbnailSize = thumbnailSize;
-
 		PhotoManager.stopImageLoading();
 
-		/**
-		 * must be muliplied with 10 that enough increment labels are displayed
+		/*
+		 * update UI with new size
 		 */
+		_photoWidth = photoWidth;
 
-		setThumbnailSize(thumbnailSize);
-	}
-
-	private void onZoomInOut(final Event event) {
-
-		_spinnerThumbSize.setSelection(event.height);
-
-		onSelectThumbnailSize();
+		_spinnerThumbSize.setSelection(photoWidth);
+		_groupRenderer.setItemSize(photoWidth, photoHeight);
 	}
 
 	private void removeInvalidFolder(final String invalidFolderPathName) {
@@ -1005,11 +1057,11 @@ public class PicDirImages {
 		/*
 		 * thumbnail size
 		 */
-		final int stateSize = Util.getStateInt(state, STATE_THUMB_IMAGE_SIZE, PhotoManager.THUMBNAIL_DEFAULT_SIZE);
-		_spinnerThumbSize.setSelection(stateSize);
+		final int stateThumbSize = Util.getStateInt(state, STATE_THUMB_IMAGE_SIZE, PhotoManager.THUMBNAIL_DEFAULT_SIZE);
+		_spinnerThumbSize.setSelection(stateThumbSize);
 
 		// restore thumbnail size
-		onSelectThumbnailSize();
+		onSelectThumbnailSize(stateThumbSize);
 
 		/*
 		 * gallery folder image positions
@@ -1073,11 +1125,14 @@ public class PicDirImages {
 
 	}
 
-	void setThumbnailSize(final int imageSize) {
+	private void setThumbnailSizeOLD(final int newImageWidth) {
 
-		_photoSize = imageSize;
+		final int photoWidth = newImageWidth;
+		final int photoHeight = (int) (newImageWidth * (float) 11 / 15);
 
-		_groupRenderer.setItemSize((int) (_photoSize * (float) 15 / 11), _photoSize);
+		_photoWidth = photoWidth;
+
+		_groupRenderer.setItemSize(photoWidth, photoHeight);
 	}
 
 	/**
@@ -1131,7 +1186,7 @@ public class PicDirImages {
 			_toolbar.setForeground(fgColor);
 			_toolbar.setBackground(bgColor);
 
-			// combobox list is almost invisible when colors are set on osx
+			// combobox list entries are almost invisible when colors are set on osx
 
 			_spinnerThumbSize.setForeground(fgColor);
 			_spinnerThumbSize.setBackground(bgColor);

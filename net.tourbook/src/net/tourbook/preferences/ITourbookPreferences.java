@@ -24,6 +24,8 @@ public interface ITourbookPreferences {
 	 */
 	public static final String	DUMMY_FIELD											= UI.EMPTY_STRING;
 
+	public static final String	GENERAL_NOTES										= "GENERAL_NOTES";											//$NON-NLS-1$
+
 	/*
 	 * notifications
 	 */

@@ -809,6 +809,10 @@ public class Messages extends NLS {
 	public static String		Pref_General_Label_MinimalDaysInFirstWeek;
 	public static String		Pref_General_Label_MinimalDaysInFirstWeek_Tooltip;
 
+	public static String	Pref_General_Notes;
+
+	public static String	Pref_General_Notes_Tooltip;
+
 	public static String		Pref_Graphs_Button_down;
 	public static String		Pref_Graphs_Button_up;
 	public static String		Pref_Graphs_Check_autozoom;

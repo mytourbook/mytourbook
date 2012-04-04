@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -45,6 +45,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.PlatformUI;
@@ -80,6 +81,8 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 	private Combo				_comboFirstDay;
 	private Combo				_comboMinDaysInFirstWeek;
 
+	private Text				_txtNotes;
+
 	/**
 	 * check if the user has changed calendar week and if the tour data are inconsistent
 	 */
@@ -107,12 +110,15 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 	}
 
 	private void createUI() {
-		final Composite parent = getFieldEditorParent();
-		GridLayoutFactory.fillDefaults().applyTo(parent);
 
-		createUI10MeasurementSystem(parent);
-//		createUI20Confirmations(parent);
-		createUI30WeekNumber(parent);
+		final Composite parent = getFieldEditorParent();
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(parent);
+		GridLayoutFactory.fillDefaults().applyTo(parent);
+		{
+			createUI10MeasurementSystem(parent);
+			createUI30WeekNumber(parent);
+			createUI40Notes(parent);
+		}
 	}
 
 	private void createUI10MeasurementSystem(final Composite parent) {
@@ -362,6 +368,19 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 		}
 	}
 
+	private void createUI40Notes(final Composite parent) {
+
+		final Group group = new Group(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(group);
+		group.setText(Messages.Pref_General_Notes);
+		group.setToolTipText(Messages.Pref_General_Notes_Tooltip);
+		GridLayoutFactory.swtDefaults().applyTo(group);
+		{
+			_txtNotes = new Text(group, SWT.BORDER | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
+			GridDataFactory.fillDefaults().grab(true, true).applyTo(_txtNotes);
+		}
+	}
+
 	private void enableControls() {
 
 		/*
@@ -556,26 +575,35 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
 	private void restoreState() {
 
-		_backupFirstDayOfWeek = _currentFirstDayOfWeek = _prefStore
-				.getInt(ITourbookPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
+		// calendar week
+		_backupFirstDayOfWeek = //
+		_currentFirstDayOfWeek = _prefStore.getInt(ITourbookPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
 
-		_backupMinimalDaysInFirstWeek = _currentMinimalDaysInFirstWeek = _prefStore
-				.getInt(ITourbookPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK);
+		_backupMinimalDaysInFirstWeek = //
+		_currentMinimalDaysInFirstWeek = _prefStore.getInt(ITourbookPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK);
 
 		_comboFirstDay.select(_backupFirstDayOfWeek - 1);
 		_comboMinDaysInFirstWeek.select(_backupMinimalDaysInFirstWeek - 1);
 
+		// general
+		_txtNotes.setText(_prefStore.getString(ITourbookPreferences.GENERAL_NOTES));
+
+		// measurement system
 		MeasurementSystemContributionItem.selectSystemFromPrefStore(_comboSystem);
 		onSelectSystem();
 	}
 
 	private void saveState() {
 
+		// calendar week
 		final int firstDayOfWeek = _comboFirstDay.getSelectionIndex() + 1;
 		final int minDays = _comboMinDaysInFirstWeek.getSelectionIndex() + 1;
 
 		_prefStore.setValue(ITourbookPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK, firstDayOfWeek);
 		_prefStore.setValue(ITourbookPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK, minDays);
+
+		// general
+		_prefStore.setValue(ITourbookPreferences.GENERAL_NOTES, _txtNotes.getText());
 
 		// measurement system
 		int selectedIndex = _comboSystem.getSelectionIndex();

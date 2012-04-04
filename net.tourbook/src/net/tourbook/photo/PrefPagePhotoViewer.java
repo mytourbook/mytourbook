@@ -258,8 +258,8 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 			GridDataFactory.fillDefaults() //
 					.align(SWT.BEGINNING, SWT.FILL)
 					.applyTo(_spinnerThumbSize);
-			_spinnerThumbSize.setMinimum(PicDirImages.MIN_ITEM_HEIGHT);
-			_spinnerThumbSize.setMaximum(PicDirImages.MAX_ITEM_HEIGHT);
+			_spinnerThumbSize.setMinimum(PicDirImages.MIN_ITEM_WIDTH);
+			_spinnerThumbSize.setMaximum(PicDirImages.MAX_ITEM_WIDTH);
 			_spinnerThumbSize.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {

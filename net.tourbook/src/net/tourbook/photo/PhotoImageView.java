@@ -131,7 +131,7 @@ public class PhotoImageView extends ViewPart {
 
 					final Rectangle imageSize = photoImage.getBounds();
 
-					photo.setSize(imageSize.width, imageSize.height, 1);
+					photo.updateSize(imageSize.width, imageSize.height, 1);
 				}
 
 				_photoCanvas.setImage(photoImage, photo);

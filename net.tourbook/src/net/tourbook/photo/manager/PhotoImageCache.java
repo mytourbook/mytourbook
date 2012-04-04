@@ -30,38 +30,46 @@ import org.eclipse.swt.graphics.Image;
 import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 import com.googlecode.concurrentlinkedhashmap.EvictionListener;
 
+/**
+ * This cache is caching photo images with it's metadata.
+ */
 public class PhotoImageCache {
 
-	private static IPreferenceStore								_prefStore		= TourbookPlugin.getDefault() //
-																						.getPreferenceStore();
+	private static IPreferenceStore											_prefStore		= TourbookPlugin
+																									.getDefault()
+																									.getPreferenceStore();
 
-	private static int											_maxCacheSize	= _prefStore.getInt(//
-																						ITourbookPreferences.PHOTO_THUMBNAIL_IMAGE_CACHE_SIZE);
+	private static int														_maxCacheSize	= _prefStore.getInt(//
+																									ITourbookPreferences.PHOTO_THUMBNAIL_IMAGE_CACHE_SIZE);
 
-	private static final ConcurrentLinkedHashMap<String, Image>	_imageCache;
+	private static final ConcurrentLinkedHashMap<String, ImageCacheWrapper>	_imageCache;
 
 	static {
 
-		final EvictionListener<String, Image> evictionListener = new EvictionListener<String, Image>() {
+		final EvictionListener<String, ImageCacheWrapper> evictionListener = new EvictionListener<String, ImageCacheWrapper>() {
 
 			final ExecutorService	executor	= Executors.newSingleThreadExecutor();
 
 			@Override
-			public void onEviction(final String fileName, final Image image) {
-
-//				image.dispose();
+			public void onEviction(final String fileName, final ImageCacheWrapper cacheWrapper) {
 
 				executor.submit(new Callable<Void>() {
 					@Override
 					public Void call() throws IOException {
-						image.dispose();
+
+						// dispose cached image
+						final Image image = cacheWrapper.image;
+						if (image != null) {
+							image.dispose();
+						}
+
 						return null;
 					}
 				});
 			}
 		};
 
-		_imageCache = new ConcurrentLinkedHashMap.Builder<String, Image>()
+		_imageCache = new ConcurrentLinkedHashMap.Builder<String, ImageCacheWrapper>()
 				.maximumWeightedCapacity(_maxCacheSize)
 				.listener(evictionListener)
 				.build();
@@ -77,18 +85,39 @@ public class PhotoImageCache {
 		}
 
 		// dispose cached images
-		final Collection<Image> images = _imageCache.values();
-		for (final Image image : images) {
-			if (image != null) {
-				image.dispose();
+		final Collection<ImageCacheWrapper> allWrappers = _imageCache.values();
+		for (final ImageCacheWrapper cacheWrapper : allWrappers) {
+
+			if (cacheWrapper != null) {
+
+				final Image image = cacheWrapper.image;
+
+				if (image != null) {
+					image.dispose();
+				}
 			}
 		}
 
 		_imageCache.clear();
 	}
 
-	public static Image getImage(final String imageKey) {
-		return _imageCache.get(imageKey);
+	public static Image getImage(final Photo photo, final int imageQuality) {
+
+		final String imageKey = photo.getImageKey(imageQuality);
+
+		final ImageCacheWrapper cacheWrapper = _imageCache.get(imageKey);
+
+		Image photoImage = null;
+
+		if (cacheWrapper != null) {
+
+			photoImage = cacheWrapper.image;
+
+			// ensure metadata are set in the photo
+			photo.updatePhotoMetadata();
+		}
+
+		return photoImage;
 	}
 
 	/**
@@ -97,13 +126,17 @@ public class PhotoImageCache {
 	 * 
 	 * @param imageKey
 	 * @param image
+	 * @param imageMetadata
 	 */
-	public static void putImage(final String imageKey, final Image image) {
+	public static void putImage(final String imageKey, final Image image, final PhotoImageMetadata imageMetadata) {
 
-		final Image oldImage = _imageCache.put(imageKey, image);
+		final ImageCacheWrapper oldWrapper = _imageCache.put(imageKey, new ImageCacheWrapper(image, imageMetadata));
 
-		if (oldImage != null) {
-			oldImage.dispose();
+		if (oldWrapper != null) {
+			final Image oldImage = oldWrapper.image;
+			if (oldImage != null) {
+				oldImage.dispose();
+			}
 		}
 	}
 

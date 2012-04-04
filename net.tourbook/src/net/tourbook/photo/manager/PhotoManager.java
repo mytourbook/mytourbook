@@ -38,9 +38,10 @@ public class PhotoManager {
 // SET_FORMATTING_OFF
 
 	/**
-	 * Contains image sizes for different image qualities
+	 * Contains image sizes for different image qualities. 1000er are slow when painted therefor a
+	 * medium size is choosen.
 	 */
-	public static int[]											IMAGE_SIZES = { THUMBNAIL_DEFAULT_SIZE, 1000, Integer.MAX_VALUE };
+	public static int[]											IMAGE_SIZES = { THUMBNAIL_DEFAULT_SIZE, 600, Integer.MAX_VALUE };
 
 // SET_FORMATTING_ON
 
@@ -127,7 +128,7 @@ public class PhotoManager {
 		int processors = Runtime.getRuntime().availableProcessors() - 1;
 		processors = Math.max(processors, 1);
 
-//		processors = 2;
+//		processors = 1;
 
 		System.out.println("Number of processors: " + processors); //$NON-NLS-1$
 
