@@ -25,7 +25,9 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.widgets.Display;
+import org.imgscalr.Scalr.Rotation;
 
 /**
  * Original code: org.sharemedia.utils.ImageUtils
@@ -34,9 +36,9 @@ public class ImageUtils {
 
 	public static int getBestQuality(final Photo photo, final int width, final int height, final int maxDef) {
 
-		final int imageQuality = PhotoManager.IMAGE_QUALITY_THUMB_160;
+		final int imageQuality = PhotoManager.IMAGE_QUALITY_EXIF_THUMB_160;
 
-		for (int qualityIndex = PhotoManager.IMAGE_QUALITY_THUMB_160; qualityIndex <= maxDef; qualityIndex++) {
+		for (int qualityIndex = PhotoManager.IMAGE_QUALITY_EXIF_THUMB_160; qualityIndex <= maxDef; qualityIndex++) {
 
 			if (qualityIndex < PhotoManager.IMAGE_QUALITY_ORIGINAL) {
 
@@ -112,7 +114,7 @@ public class ImageUtils {
 	 * @return
 	 */
 	public static Image resize(final Display display, final Image image, final int width, final int height) {
-		return resize(display, image, width, height, SWT.ON, SWT.HIGH);
+		return resize(display, image, width, height, SWT.ON, SWT.HIGH, null);
 	}
 
 //	public Image resize(int w, int h, Image img) {
@@ -127,38 +129,96 @@ public class ImageUtils {
 //	}
 
 	public static/* synchronized */Image resize(	final Display display,
-											final Image image,
-											final int width,
-											final int height,
-											final int antialias,
-											final int interpolation) {
+												final Image image,
+												final int newWidth,
+												final int newHeight,
+												final int antialias,
+												final int interpolation,
+												final Rotation rotation) {
 
 		if (image == null) {
 			return null;
 		}
 
-		final Image scaledImage = new Image(display, width, height);
+		final Rectangle originalImageBounds = image.getBounds();
+		final int originalWidth = originalImageBounds.width;
+		final int originalHeight = originalImageBounds.height;
+
+		final int srcWidth = originalWidth;
+		final int srcHeight = originalHeight;
+		final int destWidth = newWidth;
+		final int destHeight = newHeight;
+
+		int imgWidth = newWidth;
+		int imgHeight = newHeight;
+
+		if (rotation == Rotation.CW_90 || rotation == Rotation.CW_270) {
+			// swap width/height
+			imgWidth = newHeight;
+			imgHeight = newWidth;
+		}
+
+		final Image scaledImage = new Image(display, imgWidth, imgHeight);
 		final GC gc = new GC(scaledImage);
+		Transform transformation = null;
 		{
 			gc.setAdvanced(true);
 
 			gc.setAntialias(antialias);
 			gc.setInterpolation(interpolation);
 
-			final Rectangle originalImageBounds = image.getBounds();
+			int destX = 0;
+			int destY = 0;
+
+			if (rotation != null) {
+
+				final int imgWidth2 = imgWidth / 2;
+				final int imgHeight2 = imgHeight / 2;
+
+				transformation = new Transform(display);
+				transformation.translate(imgWidth2, imgHeight2);
+
+				if (rotation == Rotation.CW_90) {
+
+					transformation.rotate(90);
+
+					destX = -imgHeight2;
+					destY = -imgWidth2;
+
+				} else if (rotation == Rotation.CW_180) {
+
+					// this case is not yet tested
+
+					transformation.rotate(180);
+
+					destX = -imgWidth2;
+					destY = -imgHeight2;
+
+				} else if (rotation == Rotation.CW_270) {
+
+					transformation.rotate(270);
+
+					destX = -imgHeight2;
+					destY = -imgWidth2;
+				}
+				gc.setTransform(transformation);
+			}
 
 			gc.drawImage(image, //
 					0,
 					0,
-					originalImageBounds.width,
-					originalImageBounds.height,
+					srcWidth,
+					srcHeight,
 					//
-					0,
-					0,
-					width,
-					height);
+					destX,
+					destY,
+					destWidth,
+					destHeight);
 		}
 		gc.dispose();
+		if (transformation != null) {
+			transformation.dispose();
+		}
 
 		return scaledImage;
 	}

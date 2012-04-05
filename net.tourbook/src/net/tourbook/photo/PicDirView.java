@@ -162,8 +162,7 @@ public class PicDirView extends ViewPart {
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == PicDirView.this) {
-					ThumbnailStore.cleanupStoreFiles(false, false);
-					saveState();
+					onPartClose();
 				}
 			}
 
@@ -171,11 +170,7 @@ public class PicDirView extends ViewPart {
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
 			@Override
-			public void partHidden(final IWorkbenchPartReference partRef) {
-//				if (partRef.getPart(false) == PicDirView.this) {
-//					_picDirImages.onPartIsHidden();
-//				}
-			}
+			public void partHidden(final IWorkbenchPartReference partRef) {}
 
 			@Override
 			public void partInputChanged(final IWorkbenchPartReference partRef) {}
@@ -184,11 +179,7 @@ public class PicDirView extends ViewPart {
 			public void partOpened(final IWorkbenchPartReference partRef) {}
 
 			@Override
-			public void partVisible(final IWorkbenchPartReference partRef) {
-//				if (partRef.getPart(false) == PicDirView.this) {
-//					_picDirImages.onPartIsVisible();
-//				}
-			}
+			public void partVisible(final IWorkbenchPartReference partRef) {}
 		};
 		getViewSite().getPage().addPartListener(_partListener);
 	}
@@ -259,13 +250,21 @@ public class PicDirView extends ViewPart {
 	@Override
 	public void dispose() {
 
-		_picDirImages.dispose();
-
 		getViewSite().getPage().removePartListener(_partListener);
 
 		_prefStore.removePropertyChangeListener(_prefChangeListener);
 
 		super.dispose();
+	}
+
+	private void onPartClose() {
+
+		// close images first, this will stop loading images
+		_picDirImages.onClose();
+
+		ThumbnailStore.cleanupStoreFiles(false, false);
+
+		saveState();
 	}
 
 	private void restoreState() {

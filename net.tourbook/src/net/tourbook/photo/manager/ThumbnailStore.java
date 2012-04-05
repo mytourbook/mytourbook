@@ -46,8 +46,9 @@ import org.joda.time.LocalDate;
 
 public class ThumbnailStore {
 
-	private static final String			THUMBNAIL_IMAGE_EXTENSION_JPG	= "jpg";						//$NON-NLS-1$
+	private static final long			MBYTE							= 1024 * 1024;
 
+	private static final String			THUMBNAIL_IMAGE_EXTENSION_JPG	= "jpg";						//$NON-NLS-1$
 	private static final String			THUMBNAIL_STORE_OS_PATH			= "thumbnail-store";			//$NON-NLS-1$
 
 	private static IPreferenceStore		_prefStore						= TourbookPlugin.getDefault()//
@@ -63,6 +64,7 @@ public class ThumbnailStore {
 	private static long					_deleteUI_UpdateTime;
 	private static int					_deleteUI_DeletedFiles;
 	private static int					_deleteUI_CheckedFiles;
+	private static long					_deleteUI_FilesSize;
 	private static File					_errorFile;
 
 	private static final ReentrantLock	SAVE_LOCK						= new ReentrantLock();
@@ -163,7 +165,7 @@ public class ThumbnailStore {
 		}
 
 		if (_errorFile != null) {
-			StatusUtil.log(
+			StatusUtil.showStatus(
 					NLS.bind(Messages.Thumbnail_Store_Error_CannotDeleteFolder, _errorFile.toString()),
 					new Exception());
 		}
@@ -176,6 +178,7 @@ public class ThumbnailStore {
 		_deleteUI_UpdateTime = System.currentTimeMillis();
 		_deleteUI_DeletedFiles = 0;
 		_deleteUI_CheckedFiles = 0;
+		_deleteUI_FilesSize = 0;
 
 		try {
 
@@ -225,7 +228,7 @@ public class ThumbnailStore {
 	 * Deletes files and subdirectories. If a deletion fails, the method stops attempting to delete. <br>
 	 * <br>
 	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! RECURSIVE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
-	 *
+	 * 
 	 * @param fileOrFolder
 	 * @param monitor
 	 * @return Returns number of deleted files
@@ -236,6 +239,7 @@ public class ThumbnailStore {
 			return 0;
 		}
 
+		boolean isFile = false;
 		boolean doDeleteFileFolder = false;
 
 		if (fileOrFolder.isDirectory()) {
@@ -263,13 +267,14 @@ public class ThumbnailStore {
 				// show only the ending part of the folder name
 				final String fileFolderName = fileOrFolder.toString();
 				final int endIndex = fileFolderName.length();
-				int beginIndex = endIndex - 100;
+				int beginIndex = endIndex - 90;
 				beginIndex = beginIndex < 0 ? 0 : beginIndex;
 
 				monitor.subTask(NLS.bind(Messages.Thumbnail_Store_CleanupTask_Subtask, //
 						new Object[] {
 								_deleteUI_CheckedFiles,
 								_deleteUI_DeletedFiles,
+								Long.toString(_deleteUI_FilesSize / MBYTE),
 								fileFolderName.substring(beginIndex, endIndex) }));
 			}
 
@@ -279,11 +284,16 @@ public class ThumbnailStore {
 
 			if (_dateToDeleteOlderImages == Long.MIN_VALUE || fileOrFolder.lastModified() < _dateToDeleteOlderImages) {
 				doDeleteFileFolder = true;
+				isFile = true;
 			}
 		}
 
 		boolean isFileFolderDeleted = false;
 		if (doDeleteFileFolder) {
+
+			if (isFile) {
+				_deleteUI_FilesSize += fileOrFolder.length();
+			}
 
 			// the folder is now empty so it can be deleted
 			isFileFolderDeleted = fileOrFolder.delete();
@@ -399,7 +409,7 @@ public class ThumbnailStore {
 		return tnFolderPath.addTrailingSeparator();
 	}
 
-	static void saveImageAWT(final BufferedImage scaledImg, final IPath storeImageFilePath) {
+	static void saveImageAWT(final BufferedImage thumbImg, final IPath storeImageFilePath) {
 
 		try {
 
@@ -408,7 +418,7 @@ public class ThumbnailStore {
 				return;
 			}
 
-			ImageIO.write(scaledImg, THUMBNAIL_IMAGE_EXTENSION_JPG, new File(storeImageFilePath.toOSString()));
+			ImageIO.write(thumbImg, THUMBNAIL_IMAGE_EXTENSION_JPG, new File(storeImageFilePath.toOSString()));
 
 		} catch (final Exception e) {
 

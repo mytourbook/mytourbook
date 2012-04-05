@@ -20,10 +20,8 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import net.tourbook.photo.Messages;
 import net.tourbook.photo.gallery.GalleryMTItem;
@@ -33,7 +31,7 @@ import org.imgscalr.Scalr;
 
 public class PhotoManager {
 
-	public static final int										THUMBNAIL_DEFAULT_SIZE	= 160;
+	public static final int										THUMBNAIL_DEFAULT_SIZE			= 160;
 
 // SET_FORMATTING_OFF
 
@@ -48,9 +46,9 @@ public class PhotoManager {
 	/*
 	 * image quality is the index in IMAGE_SIZE
 	 */
-	public static int											IMAGE_QUALITY_THUMB_160	= 0;
-	public static int											IMAGE_QUALITY_HQ_1000	= 1;
-	public static int											IMAGE_QUALITY_ORIGINAL	= 2;
+	public static int											IMAGE_QUALITY_EXIF_THUMB_160	= 0;
+	public static int											IMAGE_QUALITY_HQ_1000			= 1;
+	public static int											IMAGE_QUALITY_ORIGINAL			= 2;
 
 	/**
 	 * Used to indicate that the scaling implementation should decide which method to use in order
@@ -92,19 +90,19 @@ public class PhotoManager {
 	 * jagged with some of the other {@link Method}s (even {@link Method#QUALITY}).
 	 * <p>
 	 */
-	public static String[]										SCALING_QUALITY_TEXT	= {
+	public static String[]										SCALING_QUALITY_TEXT			= {
 			Messages.Scaling_Quality_Automatic,
 			Messages.Scaling_Quality_Speed,
 			Messages.Scaling_Quality_Balanced,
 			Messages.Scaling_Quality_Quality,
-			Messages.Scaling_Quality_UltraQuality										};
+			Messages.Scaling_Quality_UltraQuality												};
 
-	public static Scalr.Method[]								SCALING_QUALITY_ID		= {
+	public static Scalr.Method[]								SCALING_QUALITY_ID				= {
 			Scalr.Method.AUTOMATIC,
 			Scalr.Method.SPEED,
 			Scalr.Method.BALANCED,
 			Scalr.Method.QUALITY,
-			Scalr.Method.ULTRA_QUALITY													};
+			Scalr.Method.ULTRA_QUALITY															};
 
 	private static Display										_display;
 
@@ -118,19 +116,21 @@ public class PhotoManager {
 
 	private static org.imgscalr.Scalr.Method					_resizeQuality;
 
-	private static final LinkedBlockingDeque<PhotoImageLoader>	_waitingQueue			= new LinkedBlockingDeque<PhotoImageLoader>();
-	private static final LinkedBlockingDeque<PhotoImageLoader>	_waitingQueueHQ			= new LinkedBlockingDeque<PhotoImageLoader>();
+	private static final LinkedBlockingDeque<PhotoImageLoader>	_waitingQueue					= new LinkedBlockingDeque<PhotoImageLoader>();
+	private static final LinkedBlockingDeque<PhotoImageLoader>	_waitingQueueHQ					= new LinkedBlockingDeque<PhotoImageLoader>();
 
 	static {
 
 		_display = Display.getDefault();
 
-		int processors = Runtime.getRuntime().availableProcessors() - 1;
+		final int availableProcessors = Runtime.getRuntime().availableProcessors();
+
+		System.out.println("Number of processors: " + availableProcessors); //$NON-NLS-1$
+
+		int processors = availableProcessors - 1; // one processor for hq loading
 		processors = Math.max(processors, 1);
 
 //		processors = 1;
-
-		System.out.println("Number of processors: " + processors); //$NON-NLS-1$
 
 		final ThreadFactory threadFactory = new ThreadFactory() {
 
@@ -149,14 +149,33 @@ public class PhotoManager {
 			}
 		};
 
+		final ThreadFactory threadFactoryHQ = new ThreadFactory() {
+
+			private int	_threadNumber	= 0;
+
+			public Thread newThread(final Runnable r) {
+
+				final String threadName = "Photo-Image-Loader-HQ-" + _threadNumber++; //$NON-NLS-1$
+
+				final Thread thread = new Thread(r, threadName);
+
+				thread.setPriority(Thread.MIN_PRIORITY);
+				thread.setDaemon(true);
+
+				return thread;
+			}
+		};
+
 		_executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(processors, threadFactory);
 
-		_executorServiceHQ = new ThreadPoolExecutor(
-				1,
-				1,
-				0L,
-				TimeUnit.MILLISECONDS,
-				new LinkedBlockingQueue<Runnable>());
+		_executorServiceHQ = (ThreadPoolExecutor) Executors.newFixedThreadPool(1, threadFactoryHQ);
+
+//		_executorServiceHQ = new ThreadPoolExecutor(
+//				1,
+//				1,
+//				0L,
+//				TimeUnit.MILLISECONDS,
+//				new LinkedBlockingQueue<Runnable>());
 
 	}
 
@@ -213,7 +232,7 @@ public class PhotoManager {
 				final PhotoImageLoader loadingItem = _waitingQueueHQ.pollLast();
 
 				if (loadingItem != null) {
-					loadingItem.loadImageHQ();
+					loadingItem.loadImageHQ(_waitingQueue);
 				}
 			}
 		};

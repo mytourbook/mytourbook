@@ -81,22 +81,15 @@ public class Messages extends NLS {
 	public static String		PrefPage_Photo_Viewer_Label_ForgroundColor;
 	public static String		PrefPage_Photo_Viewer_Label_HQThumbnailSize;
 	public static String		PrefPage_Photo_Viewer_Label_HQThumbnailSize_Tooltip;
+	public static String		PrefPage_Photo_Viewer_Label_HQThumbnailSizeUnit;
+	public static String		PrefPage_Photo_Viewer_Label_ResizeImageQuality;
+	public static String		PrefPage_Photo_Viewer_Label_ResizeImageQuality_Tooltip;
 
-	public static String	PrefPage_Photo_Viewer_Label_HQThumbnailSizeUnit;
-
-	public static String	PrefPage_Photo_Viewer_Label_ResizeImageQuality;
-
-	public static String	PrefPage_Photo_Viewer_Label_ResizeImageQuality_Tooltip;
-
-	public static String	Scaling_Quality_Automatic;
-
-	public static String	Scaling_Quality_Balanced;
-
-	public static String	Scaling_Quality_Quality;
-
-	public static String	Scaling_Quality_Speed;
-
-	public static String	Scaling_Quality_UltraQuality;
+	public static String		Scaling_Quality_Automatic;
+	public static String		Scaling_Quality_Balanced;
+	public static String		Scaling_Quality_Quality;
+	public static String		Scaling_Quality_Speed;
+	public static String		Scaling_Quality_UltraQuality;
 
 	public static String		Thumbnail_Store_CleanupTask;
 	public static String		Thumbnail_Store_CleanupTask_AllFiles;

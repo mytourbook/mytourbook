@@ -644,17 +644,12 @@ public class PicDirImages {
 		_spinnerThumbSize.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
-				System.out.println("selection\t");
-				// TODO remove SYSTEM.OUT.PRINTLN
-
 				onSelectThumbnailSize(_spinnerThumbSize.getSelection());
 			}
 		});
 		_spinnerThumbSize.addMouseWheelListener(new MouseWheelListener() {
 			public void mouseScrolled(final MouseEvent event) {
 				UI.adjustSpinnerValueOnMouseScroll(event);
-				System.out.println("scroll\t");
-				// TODO remove SYSTEM.OUT.PRINTLN
 				onSelectThumbnailSize(_spinnerThumbSize.getSelection());
 			}
 		});
@@ -761,7 +756,35 @@ public class PicDirImages {
 		}
 	}
 
-	void dispose() {
+	private void disposeAllImages() {
+		PhotoImageCache.dispose();
+		ThumbnailStore.cleanupStoreFiles(true, true);
+	}
+
+	void handlePrefStoreModifications(final PropertyChangeEvent event) {
+
+		final String property = event.getProperty();
+
+		if (property.equals(ITourbookPreferences.PHOTO_VIEWER_PREF_STORE_EVENT)) {
+
+			updateImageQuality();
+
+			_display.asyncExec(new Runnable() {
+				public void run() {
+
+					disposeAllImages();
+
+					// this will update the gallery
+					_gallery.clearAll();
+				}
+
+			});
+		}
+	}
+
+	void onClose() {
+
+		PhotoManager.stopImageLoading();
 
 		//////////////////////////////////////////
 		//
@@ -774,30 +797,6 @@ public class PicDirImages {
 		//////////////////////////////////////////
 
 		workerStop();
-	}
-
-	void handlePrefStoreModifications(final PropertyChangeEvent event) {
-
-		final String property = event.getProperty();
-
-		if (property.equals(ITourbookPreferences.PHOTO_VIEWER_PREF_STORE_EVENT)) {
-
-			updateImageQuality();
-
-//			if (isQualityModified) {
-//
-//			}
-			_display.asyncExec(new Runnable() {
-				public void run() {
-
-					PhotoImageCache.dispose();
-					ThumbnailStore.cleanupStoreFiles(true, true);
-
-					// this will update the gallery
-					_gallery.clearAll();
-				}
-			});
-		}
 	}
 
 	/**
@@ -853,7 +852,7 @@ public class PicDirImages {
 			final Photo photo = (Photo) galleryItem.getData();
 
 			final int imageQuality = _photoWidth <= PhotoManager.THUMBNAIL_DEFAULT_SIZE
-					? PhotoManager.IMAGE_QUALITY_THUMB_160
+					? PhotoManager.IMAGE_QUALITY_EXIF_THUMB_160
 					: PhotoManager.IMAGE_QUALITY_HQ_1000;
 
 			// check if image is already being loaded or has an loading error
