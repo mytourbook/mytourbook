@@ -60,18 +60,17 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 	/*
 	 * UI controls
 	 */
-	private Composite				_containerFileFolder;
-
-	private BooleanFieldEditor2		_chkEditorIsShowFileFolder;
+	private Button					_chkIsShowFileFolder;
 	private ColorFieldEditor		_colorEditorFolder;
 	private ColorFieldEditor		_colorEditorFile;
+	private Label					_lblFileColor;
+	private Label					_lblFolderColor;
 	private FileFieldEditor			_editorExternalPhotoViewer;
 
 	private Button					_rdoImageSystemSWT;
 	private Button					_rdoImageSystemAWT;
 	private Button					_chkIsHighImageQuality;
 	private Combo					_comboHQImageSize;
-	private BooleanFieldEditor2		_chkEditorIsHighImageQuality;
 	private Label					_lblThumbSize;
 	private Label					_lblThumbSizeUnit;
 	private Spinner					_spinnerThumbSize;
@@ -122,23 +121,24 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 						containerLeft));
 			}
 
-			_containerFileFolder = new Composite(colorGroup, SWT.NONE);
+			final Composite containerFileFolder = new Composite(colorGroup, SWT.NONE);
 			{
 				/*
 				 * checkbox: show file/folder number
 				 */
-				_chkEditorIsShowFileFolder = new BooleanFieldEditor2(
+				final BooleanFieldEditor2 chkEditorIsShowFileFolder = new BooleanFieldEditor2(
 						ITourbookPreferences.PHOTO_VIEWER_IS_SHOW_FILE_FOLDER,
 						Messages.PrefPage_Photo_Viewer_Checkbox_ShowNumbersInFolderView,
-						_containerFileFolder);
-				addField(_chkEditorIsShowFileFolder);
+						containerFileFolder);
+				addField(chkEditorIsShowFileFolder);
 
-				final Button editorControl = _chkEditorIsShowFileFolder.getChangeControl(_containerFileFolder);
+				_chkIsShowFileFolder = chkEditorIsShowFileFolder.getChangeControl(containerFileFolder);
 				GridDataFactory.fillDefaults()//
 						.span(2, 1)
-						.applyTo(editorControl);
-				editorControl.setToolTipText(//
+						.applyTo(_chkIsShowFileFolder);
+				_chkIsShowFileFolder.setToolTipText(//
 						Messages.PrefPage_Photo_Viewer_Checkbox_ShowNumbersInFolderView_Tooltip);
+				_chkIsShowFileFolder.addSelectionListener(_defaultSelectionListener);
 				{
 					/*
 					 * color: folder
@@ -146,12 +146,12 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 					_colorEditorFolder = new ColorFieldEditor(
 							ITourbookPreferences.PHOTO_VIEWER_COLOR_FOLDER,
 							Messages.PrefPage_Photo_Viewer_Label_FolderColor,
-							_containerFileFolder);
+							containerFileFolder);
 					addField(_colorEditorFolder);
 
 					// indent label
-					Label labelControl = _colorEditorFolder.getLabelControl(_containerFileFolder);
-					GridData gd = (GridData) labelControl.getLayoutData();
+					_lblFolderColor = _colorEditorFolder.getLabelControl(containerFileFolder);
+					GridData gd = (GridData) _lblFolderColor.getLayoutData();
 					gd.horizontalIndent = 16;
 
 					/*
@@ -160,12 +160,12 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 					_colorEditorFile = new ColorFieldEditor(
 							ITourbookPreferences.PHOTO_VIEWER_COLOR_FILE,
 							Messages.PrefPage_Photo_Viewer_Label_FileColor,
-							_containerFileFolder);
+							containerFileFolder);
 					addField(_colorEditorFile);
 
 					// indent label
-					labelControl = _colorEditorFile.getLabelControl(_containerFileFolder);
-					gd = (GridData) labelControl.getLayoutData();
+					_lblFileColor = _colorEditorFile.getLabelControl(containerFileFolder);
+					gd = (GridData) _lblFileColor.getLayoutData();
 					gd.horizontalIndent = 16;
 				}
 			}
@@ -258,39 +258,32 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 		}
 	}
 
-	private void createUI_26_DisplayImageQuality(final Group group) {
+	private void createUI_26_DisplayImageQuality(final Composite parent) {
 
-		final Composite container = new Composite(group, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(container);
-//			_containerImageQuality.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+		/*
+		 * checkbox: enable/disable high quality
+		 */
+		_chkIsHighImageQuality = new Button(parent, SWT.CHECK);
+		GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsHighImageQuality);
+		_chkIsHighImageQuality.setText(Messages.PrefPage_Photo_Viewer_Checkbox_ShowHighQuality);
+		_chkIsHighImageQuality.setToolTipText(Messages.PrefPage_Photo_Viewer_Checkbox_ShowHighQuality_Tooltip);
+		_chkIsHighImageQuality.addSelectionListener(_defaultSelectionListener);
+
+		/*
+		 * label: thumbnail size
+		 */
+		_lblThumbSize = new Label(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.align(SWT.BEGINNING, SWT.CENTER)
+				.indent(16, 0)
+				.applyTo(_lblThumbSize);
+		_lblThumbSize.setText(Messages.PrefPage_Photo_Viewer_Label_HQThumbnailSize);
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
-
-			/*
-			 * checkbox: enable/disable high quality
-			 */
-			_chkEditorIsHighImageQuality = new BooleanFieldEditor2(
-					ITourbookPreferences.PHOTO_VIEWER_IS_SHOW_IMAGE_WITH_HIGH_QUALITY,
-					Messages.PrefPage_Photo_Viewer_Checkbox_ShowHighQuality,
-					container);
-			addField(_chkEditorIsHighImageQuality);
-			_chkIsHighImageQuality = _chkEditorIsHighImageQuality.getChangeControl(container);
-//			final Button editorControl = _chkEditorIsHighImageQuality.getChangeControl(container);
-			GridDataFactory.fillDefaults()//
-					.span(3, 1)
-					.applyTo(_chkIsHighImageQuality);
-			_chkIsHighImageQuality.setToolTipText(//
-					Messages.PrefPage_Photo_Viewer_Checkbox_ShowHighQuality_Tooltip);
-
-			/*
-			 * label: thumbnail size
-			 */
-			_lblThumbSize = new Label(container, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.align(SWT.BEGINNING, SWT.CENTER)
-					.indent(16, 0)
-					.applyTo(_lblThumbSize);
-			_lblThumbSize.setText(Messages.PrefPage_Photo_Viewer_Label_HQThumbnailSize);
-
 			/*
 			 * spinner: thumbnail size
 			 */
@@ -309,6 +302,7 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 					_isEditorModified = true;
 				}
 			});
+
 			/*
 			 * label: unit
 			 */
@@ -318,12 +312,12 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 					.applyTo(_lblThumbSizeUnit);
 			_lblThumbSizeUnit.setText(Messages.App_Unit_Pixel);
 		}
-
-		// set layout after the fields are created
-		GridLayoutFactory.fillDefaults() //
-				.numColumns(3)
-				.spacing(5, 0)
-				.applyTo(container);
+//
+//		// set layout after the fields are created
+//		GridLayoutFactory.fillDefaults() //
+//				.numColumns(3)
+//				.spacing(5, 0)
+//				.applyTo(container);
 	}
 
 	/**
@@ -377,14 +371,13 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 
 	private void enableControls() {
 
-		final boolean isShowFileFolder = _chkEditorIsShowFileFolder.getChangeControl(_containerFileFolder) //
-				.getSelection();
+		final boolean isShowFileFolder = _chkIsShowFileFolder.getSelection();
 
 		_colorEditorFile.getColorSelector().setEnabled(isShowFileFolder);
-		_colorEditorFile.getLabelControl(_containerFileFolder).setEnabled(isShowFileFolder);
+		_lblFileColor.setEnabled(isShowFileFolder);
 
 		_colorEditorFolder.getColorSelector().setEnabled(isShowFileFolder);
-		_colorEditorFolder.getLabelControl(_containerFileFolder).setEnabled(isShowFileFolder);
+		_lblFolderColor.setEnabled(isShowFileFolder);
 
 		final boolean isHighQuality = _chkIsHighImageQuality.getSelection();
 
@@ -453,12 +446,17 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 	private void onModify() {
 
 		_isEditorModified = true;
+
+		enableControls();
 	}
 
 	@Override
 	protected void performDefaults() {
 
 		_isEditorModified = true;
+
+		_chkIsHighImageQuality.setSelection(//
+				_prefStore.getDefaultBoolean(ITourbookPreferences.PHOTO_VIEWER_IS_SHOW_IMAGE_WITH_HIGH_QUALITY));
 
 		_spinnerThumbSize.setSelection(//
 				_prefStore.getDefaultInt(ITourbookPreferences.PHOTO_VIEWER_HIGH_QUALITY_IMAGE_MIN_SIZE));
@@ -503,16 +501,13 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 
 		_isEditorModified = true;
 
-		final Object sourceEditor = event.getSource();
-
-		if (sourceEditor == _chkEditorIsShowFileFolder || sourceEditor == _chkEditorIsHighImageQuality) {
-			enableControls();
-		}
-
 		super.propertyChange(event);
 	}
 
 	private void restoreState() {
+
+		_chkIsHighImageQuality.setSelection(//
+				_prefStore.getBoolean(ITourbookPreferences.PHOTO_VIEWER_IS_SHOW_IMAGE_WITH_HIGH_QUALITY));
 
 		_spinnerThumbSize.setSelection(//
 				_prefStore.getInt(ITourbookPreferences.PHOTO_VIEWER_HIGH_QUALITY_IMAGE_MIN_SIZE));
@@ -538,6 +533,9 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 		_prefStore.setValue(ITourbookPreferences.PHOTO_VIEWER_IMAGE_FRAMEWORK, _rdoImageSystemSWT.getSelection()
 				? PhotoManager.IMAGE_FRAMEWORK_SWT
 				: PhotoManager.IMAGE_FRAMEWORK_AWT);
+
+		_prefStore.setValue(ITourbookPreferences.PHOTO_VIEWER_IS_SHOW_IMAGE_WITH_HIGH_QUALITY, //
+				_chkIsHighImageQuality.getSelection());
 
 		_prefStore.setValue(ITourbookPreferences.PHOTO_VIEWER_HIGH_QUALITY_IMAGE_MIN_SIZE, //
 				_spinnerThumbSize.getSelection());

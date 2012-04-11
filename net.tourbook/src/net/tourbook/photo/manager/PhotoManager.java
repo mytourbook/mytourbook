@@ -45,7 +45,7 @@ public class PhotoManager {
 			{ IMAGE_SIZE_THUMBNAIL, IMAGE_SIZE_HQ_DEFAULT, Integer.MAX_VALUE };
 	
 	public static final int[]									HQ_IMAGE_SIZES					=
-			{ 200, IMAGE_SIZE_HQ_DEFAULT, 1000, 1500, 2000 };
+			{ 200, IMAGE_SIZE_HQ_DEFAULT, 1000, 2000 };
 
 // SET_FORMATTING_ON
 
