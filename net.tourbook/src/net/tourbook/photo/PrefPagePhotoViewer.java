@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -63,11 +63,12 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 	private Composite				_containerFileFolder;
 
 	private BooleanFieldEditor2		_chkEditorIsShowFileFolder;
+
 	private ColorFieldEditor		_colorEditorFolder;
 	private ColorFieldEditor		_colorEditorFile;
 	private FileFieldEditor			_editorExternalPhotoViewer;
-
 	private Button					_rdoImageSystemSWT;
+
 	private Button					_rdoImageSystemAWT;
 	private Button					_chkIsHighImageQuality;
 	private Combo					_comboHQImageSize;
@@ -75,6 +76,18 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 	private Label					_lblThumbSize;
 	private Label					_lblThumbSizeUnit;
 	private Spinner					_spinnerThumbSize;
+
+	public class FileFieldEditorNoValidation extends FileFieldEditor {
+
+		public FileFieldEditorNoValidation(final String name, final String labelText, final Composite parent) {
+			super(name, labelText, parent);
+		}
+
+		@Override
+		protected boolean checkState() {
+			return true;
+		}
+	}
 
 	@Override
 	protected void createFieldEditors() {
@@ -351,7 +364,7 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 			/*
 			 * editor: external file browser
 			 */
-			_editorExternalPhotoViewer = new FileFieldEditor(
+			_editorExternalPhotoViewer = new FileFieldEditorNoValidation(
 					ITourbookPreferences.PHOTO_EXTERNAL_PHOTO_VIEWER,
 					Messages.PrefPage_Photo_ExtViewer_Label_ExternalApplication,
 					group);
