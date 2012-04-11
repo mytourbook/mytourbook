@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.photo.manager;
 
-import java.lang.reflect.Method;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
@@ -23,86 +22,39 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import net.tourbook.photo.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.photo.gallery.GalleryMTItem;
+import net.tourbook.preferences.ITourbookPreferences;
 
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Display;
-import org.imgscalr.Scalr;
 
 public class PhotoManager {
 
-	public static final int										THUMBNAIL_DEFAULT_SIZE			= 160;
+	private static final IPreferenceStore						_prefStore;
+
+	public static final int										IMAGE_SIZE_THUMBNAIL			= 160;
+	public static final int										IMAGE_SIZE_HQ_DEFAULT			= 600;
 
 // SET_FORMATTING_OFF
 
 	/**
-	 * Contains image sizes for different image qualities. 1000er are slow when painted therefor a
-	 * medium size is choosen.
+	 * Contains image sizes for different image qualities.
 	 */
-	public static int[]											IMAGE_SIZES = { THUMBNAIL_DEFAULT_SIZE, 600, Integer.MAX_VALUE };
+	public static int[]											IMAGE_SIZES						=
+			{ IMAGE_SIZE_THUMBNAIL, IMAGE_SIZE_HQ_DEFAULT, Integer.MAX_VALUE };
+	
+	public static final int[]									HQ_IMAGE_SIZES					=
+			{ 200, IMAGE_SIZE_HQ_DEFAULT, 1000, 1500, 2000 };
 
 // SET_FORMATTING_ON
 
 	/*
-	 * image quality is the index in IMAGE_SIZE
+	 * image quality is the index in HQ_IMAGE_SIZES
 	 */
 	public static int											IMAGE_QUALITY_EXIF_THUMB_160	= 0;
-	public static int											IMAGE_QUALITY_HQ_1000			= 1;
+	public static int											IMAGE_QUALITY_HQ_600			= 1;
 	public static int											IMAGE_QUALITY_ORIGINAL			= 2;
-
-	/**
-	 * Used to indicate that the scaling implementation should decide which method to use in order
-	 * to get the best looking scaled image in the least amount of time.
-	 * <p/>
-	 * The scaling algorithm will use the {@link Scalr#THRESHOLD_QUALITY_BALANCED} or
-	 * {@link Scalr#THRESHOLD_BALANCED_SPEED} thresholds as cut-offs to decide between selecting the
-	 * <code>QUALITY</code>, <code>BALANCED</code> or <code>SPEED</code> scaling algorithms.
-	 * <p/>
-	 * <b>AUTOMATIC</b><br>
-	 * By default the thresholds chosen will give nearly the best looking result in the fastest
-	 * amount of time. We intend this method to work for 80% of people looking to scale an image
-	 * quickly and get a good looking result.
-	 * <p>
-	 * <b> SPEED </b><br>
-	 * Used to indicate that the scaling implementation should scale as fast as possible and return
-	 * a result. For smaller images (800px in size) this can result in noticeable aliasing but it
-	 * can be a few magnitudes times faster than using the QUALITY method.
-	 * <p>
-	 * <b> BALANCED </b><br>
-	 * Used to indicate that the scaling implementation should use a scaling operation balanced
-	 * between SPEED and QUALITY. Sometimes SPEED looks too low quality to be useful (e.g. text can
-	 * become unreadable when scaled using SPEED) but using QUALITY mode will increase the
-	 * processing time too much. This mode provides a "better than SPEED" quality in a
-	 * "less than QUALITY" amount of time.
-	 * <p>
-	 * <b> QUALITY </b><br>
-	 * Used to indicate that the scaling implementation should do everything it can to create as
-	 * nice of a result as possible. This approach is most important for smaller pictures (800px or
-	 * smaller) and less important for larger pictures as the difference between this method and the
-	 * SPEED method become less and less noticeable as the source-image size increases. Using the
-	 * AUTOMATIC method will automatically prefer the QUALITY method when scaling an image down
-	 * below 800px in size.
-	 * <p>
-	 * <b> ULTRA_QUALITY </b><br>
-	 * Used to indicate that the scaling implementation should go above and beyond the work done by
-	 * {@link Method#QUALITY} to make the image look exceptionally good at the cost of more
-	 * processing time. This is especially evident when generating thumbnails of images that look
-	 * jagged with some of the other {@link Method}s (even {@link Method#QUALITY}).
-	 * <p>
-	 */
-	public static String[]										SCALING_QUALITY_TEXT			= {
-			Messages.Scaling_Quality_Automatic,
-			Messages.Scaling_Quality_Speed,
-			Messages.Scaling_Quality_Balanced,
-			Messages.Scaling_Quality_Quality,
-			Messages.Scaling_Quality_UltraQuality												};
-
-	public static Scalr.Method[]								SCALING_QUALITY_ID				= {
-			Scalr.Method.AUTOMATIC,
-			Scalr.Method.SPEED,
-			Scalr.Method.BALANCED,
-			Scalr.Method.QUALITY,
-			Scalr.Method.ULTRA_QUALITY															};
 
 	private static Display										_display;
 
@@ -114,20 +66,29 @@ public class PhotoManager {
 	 */
 	private static ThreadPoolExecutor							_executorServiceHQ;
 
-	private static org.imgscalr.Scalr.Method					_resizeQuality;
-
 	private static final LinkedBlockingDeque<PhotoImageLoader>	_waitingQueue					= new LinkedBlockingDeque<PhotoImageLoader>();
 	private static final LinkedBlockingDeque<PhotoImageLoader>	_waitingQueueHQ					= new LinkedBlockingDeque<PhotoImageLoader>();
+
+	public static final String									IMAGE_FRAMEWORK_SWT				= "swt";										//$NON-NLS-1$
+	public static final String									IMAGE_FRAMEWORK_AWT				= "awt";										//$NON-NLS-1$
+
+	private static String										_imageFramework;
+	private static int											_hqImageSize;
 
 	static {
 
 		_display = Display.getDefault();
 
+		_prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+
+		_imageFramework = _prefStore.getString(ITourbookPreferences.PHOTO_VIEWER_IMAGE_FRAMEWORK);
+		_hqImageSize = _prefStore.getInt(ITourbookPreferences.PHOTO_VIEWER_HQ_IMAGE_SIZE);
+
 		final int availableProcessors = Runtime.getRuntime().availableProcessors();
 
 		System.out.println("Number of processors: " + availableProcessors); //$NON-NLS-1$
 
-		int processors = availableProcessors - 1; // one processor for hq loading
+		int processors = availableProcessors - 1; // one processor for HQ loading
 		processors = Math.max(processors, 1);
 
 //		processors = 1;
@@ -167,16 +128,7 @@ public class PhotoManager {
 		};
 
 		_executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(processors, threadFactory);
-
 		_executorServiceHQ = (ThreadPoolExecutor) Executors.newFixedThreadPool(1, threadFactoryHQ);
-
-//		_executorServiceHQ = new ThreadPoolExecutor(
-//				1,
-//				1,
-//				0L,
-//				TimeUnit.MILLISECONDS,
-//				new LinkedBlockingQueue<Runnable>());
-
 	}
 
 	private static void clearQueue(	final LinkedBlockingDeque<PhotoImageLoader> waitingQueue,
@@ -207,12 +159,39 @@ public class PhotoManager {
 
 			final PhotoImageLoader photoImageLoaderItem = (PhotoImageLoader) object;
 
-			photoImageLoaderItem.photo.setLoadingState(PhotoLoadingState.UNDEFINED, photoImageLoaderItem.imageQuality);
+			photoImageLoaderItem.photo.setLoadingState(
+					PhotoLoadingState.UNDEFINED,
+					photoImageLoaderItem.requestedmageQuality);
 		}
 	}
 
-	public static Scalr.Method getResizeQuality() {
-		return _resizeQuality;
+	/**
+	 * @param hqImageSize
+	 * @return Returns the index in the HQ image size array for the requested image size, default is
+	 *         used when requested size is not available
+	 */
+	public static int getHQImageSizeIndex(final int hqImageSize) {
+
+		int hqImageSizeIndex = -1;
+
+		// try to get stored image size index
+		for (int imageIndex = 0; imageIndex < HQ_IMAGE_SIZES.length; imageIndex++) {
+			if (HQ_IMAGE_SIZES[imageIndex] == hqImageSize) {
+				hqImageSizeIndex = imageIndex;
+				break;
+			}
+		}
+		if (hqImageSizeIndex == -1) {
+			// get default size
+			for (int imageIndex = 0; imageIndex < HQ_IMAGE_SIZES.length; imageIndex++) {
+				if (HQ_IMAGE_SIZES[imageIndex] == IMAGE_SIZE_HQ_DEFAULT) {
+					hqImageSizeIndex = imageIndex;
+					break;
+				}
+			}
+		}
+
+		return hqImageSizeIndex;
 	}
 
 	public static void putImageInHQLoadingQueue(final GalleryMTItem galleryItem,
@@ -223,7 +202,14 @@ public class PhotoManager {
 		photo.setLoadingState(PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE, imageQuality);
 
 		// set HQ image loading item into the waiting queue
-		_waitingQueueHQ.add(new PhotoImageLoader(_display, galleryItem, photo, imageQuality, loadCallBack));
+		_waitingQueueHQ.add(new PhotoImageLoader(
+				_display,
+				galleryItem,
+				photo,
+				imageQuality,
+				_imageFramework,
+				_hqImageSize,
+				loadCallBack));
 
 		final Runnable executorTask = new Runnable() {
 			public void run() {
@@ -248,7 +234,14 @@ public class PhotoManager {
 		photo.setLoadingState(PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE, imageQuality);
 
 		// put image loading item into the waiting queue
-		_waitingQueue.add(new PhotoImageLoader(_display, galleryItem, photo, imageQuality, imageLoadCallback));
+		_waitingQueue.add(new PhotoImageLoader(
+				_display,
+				galleryItem,
+				photo,
+				imageQuality,
+				_imageFramework,
+				_hqImageSize,
+				imageLoadCallback));
 
 		final Runnable executorTask = new Runnable() {
 			public void run() {
@@ -264,17 +257,9 @@ public class PhotoManager {
 		_executorService.submit(executorTask);
 	}
 
-	public static void setResizeQuality(final String requestedResizeQualityId) {
-
-		// set default value
-		_resizeQuality = Scalr.Method.SPEED;
-
-		for (final Scalr.Method quality : SCALING_QUALITY_ID) {
-			if (quality.name().equals(requestedResizeQualityId)) {
-				_resizeQuality = quality;
-				break;
-			}
-		}
+	public static void setFromPrefStore(final String imageFramework, final int hqImageSize) {
+		_imageFramework = imageFramework;
+		_hqImageSize = hqImageSize;
 	}
 
 	/**
@@ -285,4 +270,5 @@ public class PhotoManager {
 		clearQueue(_waitingQueue, _executorService);
 		clearQueue(_waitingQueueHQ, _executorServiceHQ);
 	}
+
 }

@@ -34,24 +34,24 @@ import org.imgscalr.Scalr.Rotation;
  */
 public class ImageUtils {
 
-	public static int getBestQuality(final Photo photo, final int width, final int height, final int maxDef) {
-
-		final int imageQuality = PhotoManager.IMAGE_QUALITY_EXIF_THUMB_160;
-
-		for (int qualityIndex = PhotoManager.IMAGE_QUALITY_EXIF_THUMB_160; qualityIndex <= maxDef; qualityIndex++) {
-
-			if (qualityIndex < PhotoManager.IMAGE_QUALITY_ORIGINAL) {
-
-				final int qualitySize = PhotoManager.IMAGE_SIZES[qualityIndex];
-
-				if (qualitySize > width || qualitySize > height) {
-					return imageQuality;
-				}
-			}
-		}
-
-		return imageQuality;
-	}
+//	public static int getBestQuality(final Photo photo, final int width, final int height, final int maxDef) {
+//
+//		final int imageQuality = PhotoManager.IMAGE_QUALITY_EXIF_THUMB_160;
+//
+//		for (int qualityIndex = PhotoManager.IMAGE_QUALITY_EXIF_THUMB_160; qualityIndex <= maxDef; qualityIndex++) {
+//
+//			if (qualityIndex < PhotoManager.IMAGE_QUALITY_ORIGINAL) {
+//
+//				final int qualitySize = PhotoManager.IMAGE_SIZES[qualityIndex];
+//
+//				if (qualitySize > width || qualitySize > height) {
+//					return imageQuality;
+//				}
+//			}
+//		}
+//
+//		return imageQuality;
+//	}
 
 // ORIGINAL
 //
@@ -129,18 +129,18 @@ public class ImageUtils {
 //	}
 
 	public static/* synchronized */Image resize(	final Display display,
-												final Image image,
+												final Image srcImage,
 												final int newWidth,
 												final int newHeight,
 												final int antialias,
 												final int interpolation,
 												final Rotation rotation) {
 
-		if (image == null) {
+		if (srcImage == null) {
 			return null;
 		}
 
-		final Rectangle originalImageBounds = image.getBounds();
+		final Rectangle originalImageBounds = srcImage.getBounds();
 		final int originalWidth = originalImageBounds.width;
 		final int originalHeight = originalImageBounds.height;
 
@@ -157,6 +157,10 @@ public class ImageUtils {
 			imgWidth = newHeight;
 			imgHeight = newWidth;
 		}
+
+//		final ImageData srcImageData = srcImage.getImageData();
+//		final ImageData scaledImageData = srcImageData.scaledTo(destWidth, destHeight);
+//		final Image scaledImage = new Image(display, scaledImageData);
 
 		final Image scaledImage = new Image(display, imgWidth, imgHeight);
 		final GC gc = new GC(scaledImage);
@@ -204,7 +208,7 @@ public class ImageUtils {
 				gc.setTransform(transformation);
 			}
 
-			gc.drawImage(image, //
+			gc.drawImage(srcImage, //
 					0,
 					0,
 					srcWidth,

@@ -43,6 +43,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -161,7 +162,7 @@ public class PicDirImages {
 	/**
 	 * Photo image height (thumbnail size)
 	 */
-	private int										_photoWidth						= PhotoManager.THUMBNAIL_DEFAULT_SIZE;
+	private int										_photoWidth						= PhotoManager.IMAGE_SIZE_THUMBNAIL;
 
 	/**
 	 * Folder which images are currently be displayed
@@ -173,7 +174,6 @@ public class PicDirImages {
 	private PicDirFolder							_picDirFolder;
 
 	private boolean									_isComboKeyPressed;
-//	private int										_prevThumbnailSize				= -1;
 
 	private int										_selectedHistoryIndex;
 	private ArrayList<String>						_folderHistory					= new ArrayList<String>();
@@ -757,8 +757,8 @@ public class PicDirImages {
 	}
 
 	private void disposeAllImages() {
-		PhotoImageCache.dispose();
 		ThumbnailStore.cleanupStoreFiles(true, true);
+		PhotoImageCache.dispose();
 	}
 
 	void handlePrefStoreModifications(final PropertyChangeEvent event) {
@@ -772,12 +772,19 @@ public class PicDirImages {
 			_display.asyncExec(new Runnable() {
 				public void run() {
 
-					disposeAllImages();
+					if (MessageDialog.openQuestion(
+							_display.getActiveShell(),
+							Messages.Pic_Dir_Dialog_CleanupStoreImages_Title,
+							Messages.Pic_Dir_Dialog_CleanupStoreImages_Message) == false) {
+
+						disposeAllImages();
+					}
+
+					_gallery.keepGalleryPosition();
 
 					// this will update the gallery
 					_gallery.clearAll();
 				}
-
 			});
 		}
 	}
@@ -851,9 +858,9 @@ public class PicDirImages {
 
 			final Photo photo = (Photo) galleryItem.getData();
 
-			final int imageQuality = _photoWidth <= PhotoManager.THUMBNAIL_DEFAULT_SIZE
+			final int imageQuality = _photoWidth <= PhotoManager.IMAGE_SIZE_THUMBNAIL
 					? PhotoManager.IMAGE_QUALITY_EXIF_THUMB_160
-					: PhotoManager.IMAGE_QUALITY_HQ_1000;
+					: PhotoManager.IMAGE_QUALITY_HQ_600;
 
 			// check if image is already being loaded or has an loading error
 			final PhotoLoadingState photoLoadingState = photo.getLoadingState(imageQuality);
@@ -1056,7 +1063,7 @@ public class PicDirImages {
 		/*
 		 * thumbnail size
 		 */
-		final int stateThumbSize = Util.getStateInt(state, STATE_THUMB_IMAGE_SIZE, PhotoManager.THUMBNAIL_DEFAULT_SIZE);
+		final int stateThumbSize = Util.getStateInt(state, STATE_THUMB_IMAGE_SIZE, PhotoManager.IMAGE_SIZE_THUMBNAIL);
 		_spinnerThumbSize.setSelection(stateThumbSize);
 
 		// restore thumbnail size
@@ -1122,16 +1129,6 @@ public class PicDirImages {
 			state.put(STATE_GALLERY_POSITION_VALUE, positionValues);
 		}
 
-	}
-
-	private void setThumbnailSizeOLD(final int newImageWidth) {
-
-		final int photoWidth = newImageWidth;
-		final int photoHeight = (int) (newImageWidth * (float) 11 / 15);
-
-		_photoWidth = photoWidth;
-
-		_groupRenderer.setItemSize(photoWidth, photoHeight);
 	}
 
 	/**
@@ -1287,9 +1284,6 @@ public class PicDirImages {
 
 		_gallery.setImageQuality(isShowHighQuality, hqMinSize);
 
-		final String resizeQualityId = _prefStore.getString(//
-				ITourbookPreferences.PHOTO_VIEWER_IMAGE_RESIZE_QUALITY);
-		PhotoManager.setResizeQuality(resizeQualityId);
 	}
 
 	/**

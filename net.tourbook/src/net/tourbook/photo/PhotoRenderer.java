@@ -58,8 +58,8 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 
 		final Photo photo = (Photo) itemData;
 
-		final int requestedImageQuality = galleryItemHeight > PhotoManager.THUMBNAIL_DEFAULT_SIZE
-				? PhotoManager.IMAGE_QUALITY_HQ_1000
+		final int requestedImageQuality = galleryItemHeight > PhotoManager.IMAGE_SIZE_THUMBNAIL
+				? PhotoManager.IMAGE_QUALITY_HQ_600
 				: PhotoManager.IMAGE_QUALITY_EXIF_THUMB_160;
 
 		boolean isRequestedQuality = true;
@@ -73,9 +73,9 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 
 			isRequestedQuality = false;
 
-			final int lowerImageQuality = galleryItemHeight > PhotoManager.THUMBNAIL_DEFAULT_SIZE
+			final int lowerImageQuality = galleryItemHeight > PhotoManager.IMAGE_SIZE_THUMBNAIL
 					? PhotoManager.IMAGE_QUALITY_EXIF_THUMB_160
-					: PhotoManager.IMAGE_QUALITY_HQ_1000;
+					: PhotoManager.IMAGE_QUALITY_HQ_600;
 
 			photoImage = PhotoImageCache.getImage(photo, lowerImageQuality);
 		}

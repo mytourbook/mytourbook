@@ -22,6 +22,7 @@ import net.tourbook.chart.Chart;
 import net.tourbook.colors.ColorDefinition;
 import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.photo.manager.PhotoManager;
 import net.tourbook.tour.BreakTimeTool;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
@@ -33,7 +34,6 @@ import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.swt.graphics.RGB;
-import org.imgscalr.Scalr;
 
 /**
  * Class used to initialize default preference values.
@@ -366,7 +366,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
 		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_IS_SHOW_IMAGE_WITH_HIGH_QUALITY, true);
 		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_HIGH_QUALITY_IMAGE_MIN_SIZE, 50);
-		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_IMAGE_RESIZE_QUALITY, Scalr.Method.SPEED.name());
+		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_HQ_IMAGE_SIZE, PhotoManager.IMAGE_SIZE_HQ_DEFAULT);
 
 		PreferenceConverter.setDefault(store, //
 				ITourbookPreferences.PHOTO_VIEWER_COLOR_FOREGROUND,
@@ -378,15 +378,15 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
 		PreferenceConverter.setDefault(store, //
 				ITourbookPreferences.PHOTO_VIEWER_COLOR_FOLDER,
-				new RGB(0xFF, 0x6A, 0x11)
-//				new RGB(0x55, 0xC8, 0xFF)
-				);
+				new RGB(0xFF, 0x6A, 0x11));
 
 		PreferenceConverter.setDefault(store, //
 				ITourbookPreferences.PHOTO_VIEWER_COLOR_FILE,
-				new RGB(0x55, 0xC8, 0xFF)
-//				new RGB(0xAD, 0xF2, 0x0D)
-				);
+				new RGB(0x55, 0xC8, 0xFF));
+
+		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_IMAGE_FRAMEWORK, UI.IS_WIN
+				? PhotoManager.IMAGE_FRAMEWORK_AWT
+				: PhotoManager.IMAGE_FRAMEWORK_SWT);
 
 	}
 }

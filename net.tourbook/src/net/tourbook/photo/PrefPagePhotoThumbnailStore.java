@@ -16,6 +16,7 @@
 package net.tourbook.photo;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.photo.manager.PhotoImageCache;
 import net.tourbook.photo.manager.ThumbnailStore;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.UI;
@@ -324,7 +325,11 @@ public class PrefPagePhotoThumbnailStore extends FieldEditorPreferencePage imple
 		// update pref store values
 		if (performOk()) {
 
+			// remove store files
 			ThumbnailStore.cleanupStoreFiles(isDeleteAllImages, true);
+
+			// dispose cached images
+			PhotoImageCache.dispose();
 
 			updateUILastCleanup();
 		}

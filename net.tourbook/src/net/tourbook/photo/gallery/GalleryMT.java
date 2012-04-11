@@ -819,8 +819,6 @@ public class GalleryMT extends Canvas {
 
 					_galleryPosition = (int) (_contentVirtualHeight * newPosition);
 
-//					setGalleryPositionWhenUpdatedInternal(newPosition);
-
 				} else if (updateLocation) {
 					_galleryPosition += (groupItem.height - oldSize);
 				}
@@ -1810,6 +1808,12 @@ public class GalleryMT extends Canvas {
 		return _isVirtualGroupsCompatibilityMode;
 	}
 
+	public void keepGalleryPosition() {
+
+		final double currentPos = getGalleryPosition();
+		setGalleryPositionWhenUpdated(currentPos);
+	}
+
 	/**
 	 * Send a selection event for a gallery item
 	 * 
@@ -2477,6 +2481,10 @@ public class GalleryMT extends Canvas {
 		super.setForeground(color);
 	}
 
+	/**
+	 * @param newPosition
+	 *            Relative position
+	 */
 	public void setGalleryPositionWhenUpdated(final Double newPosition) {
 
 //		System.out.println("gal pos: " + newPosition);

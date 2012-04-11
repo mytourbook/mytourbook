@@ -36,6 +36,7 @@ import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -45,7 +46,6 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
-import org.imgscalr.Scalr.Method;
 
 public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
@@ -54,6 +54,8 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 	private final IPreferenceStore	_prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
 
 	private boolean					_isEditorModified;
+
+	private SelectionAdapter		_defaultSelectionListener;
 
 	/*
 	 * UI controls
@@ -65,19 +67,19 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 	private ColorFieldEditor		_colorEditorFile;
 	private FileFieldEditor			_editorExternalPhotoViewer;
 
-	private Composite				_containerDisplayImageQuality;
+	private Button					_rdoImageSystemSWT;
+	private Button					_rdoImageSystemAWT;
+	private Button					_chkIsHighImageQuality;
+	private Combo					_comboHQImageSize;
 	private BooleanFieldEditor2		_chkEditorIsHighImageQuality;
 	private Label					_lblThumbSize;
 	private Label					_lblThumbSizeUnit;
 	private Spinner					_spinnerThumbSize;
 
-	private Composite				_containerResizeImageQuality;
-	private Label					_lblResizeImageQuality;
-	private Combo					_comboResizeQuality;
-
 	@Override
 	protected void createFieldEditors() {
 
+		initUI();
 		createUI();
 	}
 
@@ -179,48 +181,87 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 		GridLayoutFactory.swtDefaults().applyTo(group);
 		group.setText(Messages.PrefPage_Photo_ExtViewer_Group_ImageQuality);
 		{
-			createUI_21_ResizeImageQuality(group);
-			createUI_22_DisplayImageQuality(group);
+			createUI_22_ImageFramework(group);
+			createUI_24_HQImageSize(group);
+			createUI_26_DisplayImageQuality(group);
 		}
+
+		// set group margin after the fields are created
+		final GridLayout gl = (GridLayout) group.getLayout();
+		gl.numColumns = 2;
+		gl.marginHeight = 5;
+		gl.marginWidth = 5;
 	}
 
-	private void createUI_21_ResizeImageQuality(final Composite parent) {
+	private void createUI_22_ImageFramework(final Composite parent) {
 
-		_containerResizeImageQuality = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(_containerResizeImageQuality);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(_containerResizeImageQuality);
+		// label
+		final Label label = new Label(parent, SWT.NONE);
+		label.setText(Messages.PrefPage_Photo_Viewer_Label_ImageFramework);
+
+		// radio
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+			_rdoImageSystemSWT = new Button(container, SWT.RADIO);
+			_rdoImageSystemSWT.setText(Messages.PrefPage_Photo_Viewer_Radio_ImageFramework_SWT);
+			_rdoImageSystemSWT.setToolTipText(Messages.PrefPage_Photo_Viewer_Radio_ImageFramework_SWT_Tooltip);
+			_rdoImageSystemSWT.addSelectionListener(_defaultSelectionListener);
+
+			_rdoImageSystemAWT = new Button(container, SWT.RADIO);
+			_rdoImageSystemAWT.setText(Messages.PrefPage_Photo_Viewer_Radio_ImageFramework_AWT);
+			_rdoImageSystemAWT.setToolTipText(Messages.PrefPage_Photo_Viewer_Radio_ImageFramework_AWT_Tooltip);
+			_rdoImageSystemAWT.addSelectionListener(_defaultSelectionListener);
+		}
+
+	}
+
+	private void createUI_24_HQImageSize(final Composite parent) {
+
+		/*
+		 * label: image size
+		 */
+		Label label = new Label(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.align(SWT.BEGINNING, SWT.CENTER)
+				.applyTo(label);
+		label.setText(Messages.PrefPage_Photo_Viewer_Label_HQImageSize);
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 		{
 			/*
-			 * label: load image quality
+			 * combo: hq image size
 			 */
-			_lblResizeImageQuality = new Label(_containerResizeImageQuality, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.align(SWT.BEGINNING, SWT.CENTER)
-					.applyTo(_lblResizeImageQuality);
-			_lblResizeImageQuality.setText(Messages.PrefPage_Photo_Viewer_Label_ResizeImageQuality);
-			_lblResizeImageQuality.setToolTipText(Messages.PrefPage_Photo_Viewer_Label_ResizeImageQuality_Tooltip);
-
-			_comboResizeQuality = new Combo(_containerResizeImageQuality, SWT.READ_ONLY | SWT.DROP_DOWN);
-			GridDataFactory.fillDefaults().applyTo(_comboResizeQuality);
-			_comboResizeQuality.setVisibleItemCount(20);
-			_comboResizeQuality.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					_isEditorModified = true;
-				}
-			});
+			_comboHQImageSize = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
+			GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(_comboHQImageSize);
+			_comboHQImageSize.setVisibleItemCount(20);
+			_comboHQImageSize.setToolTipText(Messages.PrefPage_Photo_Viewer_Label_HQImageSize_Tooltip);
+			_comboHQImageSize.addSelectionListener(_defaultSelectionListener);
 
 			// fill combobox
-			for (final String quality : PhotoManager.SCALING_QUALITY_TEXT) {
-				_comboResizeQuality.add(quality);
+			for (final int hqImageSize : PhotoManager.HQ_IMAGE_SIZES) {
+				_comboHQImageSize.add(Integer.toString(hqImageSize));
 			}
+
+			/*
+			 * label: image size unit
+			 */
+			label = new Label(container, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.BEGINNING, SWT.CENTER)
+					.applyTo(label);
+			label.setText(Messages.App_Unit_Pixel);
 		}
 	}
 
-	private void createUI_22_DisplayImageQuality(final Group group) {
+	private void createUI_26_DisplayImageQuality(final Group group) {
 
-		_containerDisplayImageQuality = new Composite(group, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(_containerDisplayImageQuality);
+		final Composite container = new Composite(group, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(container);
 //			_containerImageQuality.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
 
@@ -230,42 +271,38 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 			_chkEditorIsHighImageQuality = new BooleanFieldEditor2(
 					ITourbookPreferences.PHOTO_VIEWER_IS_SHOW_IMAGE_WITH_HIGH_QUALITY,
 					Messages.PrefPage_Photo_Viewer_Checkbox_ShowHighQuality,
-					_containerDisplayImageQuality);
+					container);
 			addField(_chkEditorIsHighImageQuality);
-
-			final Button editorControl = _chkEditorIsHighImageQuality.getChangeControl(_containerDisplayImageQuality);
+			_chkIsHighImageQuality = _chkEditorIsHighImageQuality.getChangeControl(container);
+//			final Button editorControl = _chkEditorIsHighImageQuality.getChangeControl(container);
 			GridDataFactory.fillDefaults()//
 					.span(3, 1)
-					.applyTo(editorControl);
-			editorControl.setToolTipText(//
+					.applyTo(_chkIsHighImageQuality);
+			_chkIsHighImageQuality.setToolTipText(//
 					Messages.PrefPage_Photo_Viewer_Checkbox_ShowHighQuality_Tooltip);
 
 			/*
 			 * label: thumbnail size
 			 */
-			_lblThumbSize = new Label(_containerDisplayImageQuality, SWT.NONE);
+			_lblThumbSize = new Label(container, SWT.NONE);
 			GridDataFactory.fillDefaults()//
 					.align(SWT.BEGINNING, SWT.CENTER)
 					.indent(16, 0)
 					.applyTo(_lblThumbSize);
 			_lblThumbSize.setText(Messages.PrefPage_Photo_Viewer_Label_HQThumbnailSize);
-			_lblThumbSize.setToolTipText(Messages.PrefPage_Photo_Viewer_Label_HQThumbnailSize_Tooltip);
 
 			/*
 			 * spinner: thumbnail size
 			 */
-			_spinnerThumbSize = new Spinner(_containerDisplayImageQuality, SWT.BORDER);
+			_spinnerThumbSize = new Spinner(container, SWT.BORDER);
 			GridDataFactory.fillDefaults() //
 					.align(SWT.BEGINNING, SWT.FILL)
 					.applyTo(_spinnerThumbSize);
 			_spinnerThumbSize.setMinimum(PicDirImages.MIN_ITEM_WIDTH);
 			_spinnerThumbSize.setMaximum(PicDirImages.MAX_ITEM_WIDTH);
-			_spinnerThumbSize.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					_isEditorModified = true;
-				}
-			});
+			_spinnerThumbSize.setToolTipText(Messages.PrefPage_Photo_Viewer_Label_HQThumbnailSize_Tooltip);
+
+			_spinnerThumbSize.addSelectionListener(_defaultSelectionListener);
 			_spinnerThumbSize.addMouseWheelListener(new MouseWheelListener() {
 				public void mouseScrolled(final MouseEvent event) {
 					UI.adjustSpinnerValueOnMouseScroll(event);
@@ -273,20 +310,20 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 				}
 			});
 			/*
-			 * label: thumbnail size
+			 * label: unit
 			 */
-			_lblThumbSizeUnit = new Label(_containerDisplayImageQuality, SWT.NONE);
+			_lblThumbSizeUnit = new Label(container, SWT.NONE);
 			GridDataFactory.fillDefaults()//
 					.align(SWT.BEGINNING, SWT.CENTER)
 					.applyTo(_lblThumbSizeUnit);
-			_lblThumbSizeUnit.setText(Messages.PrefPage_Photo_Viewer_Label_HQThumbnailSizeUnit);
+			_lblThumbSizeUnit.setText(Messages.App_Unit_Pixel);
 		}
 
 		// set layout after the fields are created
 		GridLayoutFactory.fillDefaults() //
 				.numColumns(3)
 				.spacing(5, 0)
-				.applyTo(_containerDisplayImageQuality);
+				.applyTo(container);
 	}
 
 	/**
@@ -349,8 +386,7 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 		_colorEditorFolder.getColorSelector().setEnabled(isShowFileFolder);
 		_colorEditorFolder.getLabelControl(_containerFileFolder).setEnabled(isShowFileFolder);
 
-		final boolean isHighQuality = _chkEditorIsHighImageQuality.getChangeControl(//
-				_containerDisplayImageQuality).getSelection();
+		final boolean isHighQuality = _chkIsHighImageQuality.getSelection();
 
 		_lblThumbSize.setEnabled(isHighQuality);
 		_lblThumbSizeUnit.setEnabled(isHighQuality);
@@ -365,22 +401,13 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 
 			UI.setPhotoColorsFromPrefStore();
 
+			final String imageFramework = _prefStore.getString(ITourbookPreferences.PHOTO_VIEWER_IMAGE_FRAMEWORK);
+			final int hqImageSize = PhotoManager.HQ_IMAGE_SIZES[_comboHQImageSize.getSelectionIndex()];
+			PhotoManager.setFromPrefStore(imageFramework, hqImageSize);
+
 			// fire one event for all modified values
 			getPreferenceStore().setValue(ITourbookPreferences.PHOTO_VIEWER_PREF_STORE_EVENT, Math.random());
 		}
-	}
-
-	private String getResizeQualityId() {
-
-		int selectedIndex = _comboResizeQuality.getSelectionIndex();
-		if (selectedIndex == -1 || selectedIndex >= PhotoManager.SCALING_QUALITY_ID.length) {
-			// ensure valid selection
-			selectedIndex = 0;
-		}
-
-		final Method selectedQualityId = PhotoManager.SCALING_QUALITY_ID[selectedIndex];
-
-		return selectedQualityId.name();
 	}
 
 	public void init(final IWorkbench workbench) {
@@ -395,6 +422,16 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 		restoreState();
 
 		enableControls();
+	}
+
+	private void initUI() {
+
+		_defaultSelectionListener = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				onModify();
+			}
+		};
 	}
 
 	@Override
@@ -413,6 +450,11 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 		return super.okToLeave();
 	}
 
+	private void onModify() {
+
+		_isEditorModified = true;
+	}
+
 	@Override
 	protected void performDefaults() {
 
@@ -421,8 +463,22 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 		_spinnerThumbSize.setSelection(//
 				_prefStore.getDefaultInt(ITourbookPreferences.PHOTO_VIEWER_HIGH_QUALITY_IMAGE_MIN_SIZE));
 
-		setResizeQuality(_prefStore.getDefaultString(ITourbookPreferences.PHOTO_VIEWER_IMAGE_RESIZE_QUALITY));
+		/*
+		 * image framework
+		 */
+		final boolean isSWT = _prefStore.getDefaultString(ITourbookPreferences.PHOTO_VIEWER_IMAGE_FRAMEWORK)//
+				.equals(PhotoManager.IMAGE_FRAMEWORK_SWT);
+		_rdoImageSystemSWT.setSelection(isSWT);
+		_rdoImageSystemAWT.setSelection(!isSWT);
 
+		/*
+		 * hq image size
+		 */
+		final int hqImageSize = _prefStore.getDefaultInt(ITourbookPreferences.PHOTO_VIEWER_HQ_IMAGE_SIZE);
+		final int hqImageSizeIndex = PhotoManager.getHQImageSizeIndex(hqImageSize);
+		_comboHQImageSize.select(hqImageSizeIndex);
+
+		// set editor defaults
 		super.performDefaults();
 
 		enableControls();
@@ -461,50 +517,33 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 		_spinnerThumbSize.setSelection(//
 				_prefStore.getInt(ITourbookPreferences.PHOTO_VIEWER_HIGH_QUALITY_IMAGE_MIN_SIZE));
 
-		setResizeQuality(_prefStore.getString(ITourbookPreferences.PHOTO_VIEWER_IMAGE_RESIZE_QUALITY));
+		/*
+		 * image framework
+		 */
+		final String imageFramework = _prefStore.getString(ITourbookPreferences.PHOTO_VIEWER_IMAGE_FRAMEWORK);
+		final boolean isSWT = imageFramework.equals(PhotoManager.IMAGE_FRAMEWORK_SWT);
+		_rdoImageSystemSWT.setSelection(isSWT);
+		_rdoImageSystemAWT.setSelection(!isSWT);
+
+		/*
+		 * HQ image size
+		 */
+		final int hqImageSize = _prefStore.getInt(ITourbookPreferences.PHOTO_VIEWER_HQ_IMAGE_SIZE);
+		final int hqImageSizeIndex = PhotoManager.getHQImageSizeIndex(hqImageSize);
+		_comboHQImageSize.select(hqImageSizeIndex);
 	}
 
 	private void saveState() {
 
+		_prefStore.setValue(ITourbookPreferences.PHOTO_VIEWER_IMAGE_FRAMEWORK, _rdoImageSystemSWT.getSelection()
+				? PhotoManager.IMAGE_FRAMEWORK_SWT
+				: PhotoManager.IMAGE_FRAMEWORK_AWT);
+
 		_prefStore.setValue(ITourbookPreferences.PHOTO_VIEWER_HIGH_QUALITY_IMAGE_MIN_SIZE, //
 				_spinnerThumbSize.getSelection());
 
-		_prefStore.setValue(ITourbookPreferences.PHOTO_VIEWER_IMAGE_RESIZE_QUALITY, //
-				getResizeQualityId());
+		_prefStore.setValue(ITourbookPreferences.PHOTO_VIEWER_HQ_IMAGE_SIZE, //
+				PhotoManager.HQ_IMAGE_SIZES[_comboHQImageSize.getSelectionIndex()]);
 	}
 
-	private void setResizeQuality(final String requestedResizeQualityId) {
-
-		/*
-		 * get combo index for a default id
-		 */
-		Method resizeQualityId = Method.SPEED;
-		int comboIndex = 0;
-		int qualityIndex = 0;
-		for (final Method availableQuality : PhotoManager.SCALING_QUALITY_ID) {
-			if (availableQuality.name().equals(resizeQualityId)) {
-				resizeQualityId = availableQuality;
-				comboIndex = qualityIndex;
-				break;
-			}
-
-			qualityIndex++;
-		}
-
-		/*
-		 * get combo index for requested id
-		 */
-		qualityIndex = 0;
-		for (final Method quality : PhotoManager.SCALING_QUALITY_ID) {
-			if (quality.name().equals(requestedResizeQualityId)) {
-				resizeQualityId = quality;
-				comboIndex = qualityIndex;
-				break;
-			}
-
-			qualityIndex++;
-		}
-
-		_comboResizeQuality.select(comboIndex);
-	}
 }
