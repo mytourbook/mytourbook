@@ -16,7 +16,6 @@
 package net.tourbook.photo;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import net.tourbook.application.TourbookPlugin;
@@ -233,9 +232,9 @@ class PicDirFolder {
 			return;
 		}
 
-		final String prefPhotoViewer = _prefStore.getString(ITourbookPreferences.PHOTO_EXTERNAL_PHOTO_VIEWER);
+		final String prefExtApp = _prefStore.getString(ITourbookPreferences.PHOTO_EXTERNAL_PHOTO_VIEWER);
 
-		if (prefPhotoViewer.length() == 0) {
+		if (prefExtApp.length() == 0) {
 			MessageDialog.openInformation(
 					Display.getCurrent().getActiveShell(),
 					Messages.Pic_Dir_Dialog_ExternalPhotoViewer_Title,
@@ -249,33 +248,52 @@ class PicDirFolder {
 			return;
 		}
 
+		final String folder = _selectedTVIFolder._treeItemFolder.getAbsolutePath();
+
+		String commands[] = null;
 		if (UI.IS_WIN) {
 
-			final String folder = _selectedTVIFolder._treeItemFolder.getAbsolutePath();
+			final String[] commandsWin = { "cmd.exe", "/c", //$NON-NLS-1$ //$NON-NLS-2$
+					"\"" + prefExtApp + "\"", //$NON-NLS-1$ //$NON-NLS-2$
+					folder };
 
-			final String[] commands = { "cmd.exe", //$NON-NLS-1$
-					"/c", //$NON-NLS-1$
-					"\"" + prefPhotoViewer + "\"", //$NON-NLS-1$ //$NON-NLS-2$
-					folder
-//					"\"" + folder + "\""
-			//
-			};
+			commands = commandsWin;
+
+		} else if (UI.IS_OSX) {
+
+			final String[] commandsOSX = { "/usr/bin/open", "-a", //
+					prefExtApp,
+					folder };
+
+			commands = commandsOSX;
+
+		} else if (UI.IS_LINUX) {
+
+//			String []commandsLinux = { "/usr/bin/open", "-a", //
+//					prefExtApp,
+//					folder };
+//
+//			commands=commandsLinux;
+		}
+
+		if (commands != null) {
+
 			try {
 
-//			"\"C:\\Program Files (x86)\\FastStone Image Viewer\\FSViewer.exe\"",
-//			"\"C:\\Program Files\\Q-Dir\\Q-Dir.exe\"";
-//				System.out.println("\t");
+//				final StringBuilder sb = new StringBuilder();
 //				for (final String cmd : commands) {
-//					System.out.println(cmd);
+//					sb.append(cmd);
+//					sb.append(" ");
 //				}
+//				System.out.println(sb.toString());
+//				// TODO remove SYSTEM.OUT.PRINTLN
 
 				Runtime.getRuntime().exec(commands);
 
-			} catch (final IOException e) {
+			} catch (final Exception e) {
 				StatusUtil.showStatus(e);
 			}
 		}
-
 	}
 
 	void actionSingleClickExpand() {
@@ -491,7 +509,7 @@ class PicDirFolder {
 
 	/**
 	 * Gets filesystem root entries
-	 * 
+	 *
 	 * @return an array of Files corresponding to the root directories on the platform, may be empty
 	 *         but not null
 	 */
@@ -583,7 +601,7 @@ class PicDirFolder {
 
 	/**
 	 * Do the actions when a folder is selected
-	 * 
+	 *
 	 * @param iSelection
 	 */
 	private void onSelectFolder(final ITreeSelection treeSelection) {
@@ -631,7 +649,7 @@ class PicDirFolder {
 	 * This is not yet working thoroughly because the expanded position moves up or down and all
 	 * expanded childrens are not visible (but they could) like when the triangle (+/-) icon in the
 	 * tree is clicked.
-	 * 
+	 *
 	 * @param treeSelection
 	 * @param selectedTreePath
 	 * @param tviFolder
@@ -684,7 +702,7 @@ class PicDirFolder {
 
 	/**
 	 * This behavior is complex and still have possible problems.
-	 * 
+	 *
 	 * @param selectedFolderItem
 	 * @param treeSelection
 	 * @param selectedTreePath

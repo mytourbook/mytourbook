@@ -19,6 +19,8 @@ import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 
+import net.tourbook.ui.UI;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -107,7 +109,7 @@ public class ImageUtils {
 
 	/**
 	 * Returns a new scaled image. new Image must be disposed after use.
-	 * 
+	 *
 	 * @param image
 	 * @param width
 	 * @param height
@@ -152,15 +154,14 @@ public class ImageUtils {
 		int imgWidth = newWidth;
 		int imgHeight = newHeight;
 
-		if (rotation == Rotation.CW_90 || rotation == Rotation.CW_270) {
-			// swap width/height
-			imgWidth = newHeight;
-			imgHeight = newWidth;
-		}
+		if (UI.IS_OSX == false) {
 
-//		final ImageData srcImageData = srcImage.getImageData();
-//		final ImageData scaledImageData = srcImageData.scaledTo(destWidth, destHeight);
-//		final Image scaledImage = new Image(display, scaledImageData);
+			if (rotation == Rotation.CW_90 || rotation == Rotation.CW_270) {
+				// swap width/height
+				imgWidth = newHeight;
+				imgHeight = newWidth;
+			}
+		}
 
 		final Image scaledImage = new Image(display, imgWidth, imgHeight);
 		final GC gc = new GC(scaledImage);
@@ -174,7 +175,10 @@ public class ImageUtils {
 			int destX = 0;
 			int destY = 0;
 
-			if (rotation != null) {
+
+			if (rotation != null && UI.IS_OSX == false) {
+
+				// OSX is rotating the image automatically
 
 				final int imgWidth2 = imgWidth / 2;
 				final int imgHeight2 = imgHeight / 2;
@@ -205,6 +209,7 @@ public class ImageUtils {
 					destX = -imgHeight2;
 					destY = -imgWidth2;
 				}
+
 				gc.setTransform(transformation);
 			}
 
@@ -258,7 +263,7 @@ public class ImageUtils {
 	/**
 	 * Resize an image to the best fitting size. Old and new Image (result)must be disposed after
 	 * use.
-	 * 
+	 *
 	 * @param img
 	 * @param maxWidth
 	 * @param maxHeight

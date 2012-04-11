@@ -75,6 +75,18 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 	private Label					_lblThumbSizeUnit;
 	private Spinner					_spinnerThumbSize;
 
+	public class FileFieldEditorNoValidation extends FileFieldEditor {
+
+		public FileFieldEditorNoValidation(final String name, final String labelText, final Composite parent) {
+			super(name, labelText, parent);
+		}
+
+		@Override
+		protected boolean checkState() {
+			return true;
+		}
+	}
+
 	@Override
 	protected void createFieldEditors() {
 
@@ -345,7 +357,7 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 			/*
 			 * editor: external file browser
 			 */
-			_editorExternalPhotoViewer = new FileFieldEditor(
+			_editorExternalPhotoViewer = new FileFieldEditorNoValidation(
 					ITourbookPreferences.PHOTO_EXTERNAL_PHOTO_VIEWER,
 					Messages.PrefPage_Photo_ExtViewer_Label_ExternalApplication,
 					group);
