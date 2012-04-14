@@ -76,6 +76,9 @@
       <initializer
             class="de.byteholder.geoclipse.preferences.PreferenceInitializer">
       </initializer>
+      <initializer
+            class="net.tourbook.proxy.PreferenceInitializer">
+      </initializer>
    </extension>
 
    <extension
@@ -308,6 +311,11 @@
             class="net.tourbook.preferences.PrefPagePeople"
             id="net.tourbook.preferences.PrefPagePeopleId"
             name="%preference_page_People">
+      </page>
+      <page
+            class="net.tourbook.proxy.PrefPageProxy"
+            id="net.tourbook.preferences.PrefPageProxyId"
+            name="%preference_page_Proxy">
       </page>
       <page
             class="net.tourbook.srtm.PrefPageSRTM"

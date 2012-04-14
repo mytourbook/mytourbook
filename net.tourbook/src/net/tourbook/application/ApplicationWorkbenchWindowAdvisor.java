@@ -15,6 +15,9 @@
  *******************************************************************************/
 package net.tourbook.application;
 
+import java.net.Authenticator;
+import java.net.PasswordAuthentication;
+import java.net.ProxySelector;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -27,6 +30,8 @@ import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPagePeople;
+import net.tourbook.proxy.DefaultProxySelector;
+import net.tourbook.proxy.IPreferences;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.ui.UI;
@@ -84,7 +89,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 	private IPropertyListener					_partPropertyListener;
 
-	private IPreferenceStore					_prefStore		= TourbookPlugin.getDefault().getPreferenceStore();
+	private static IPreferenceStore				_prefStore		= TourbookPlugin.getDefault().getPreferenceStore();
 
 	public ApplicationWorkbenchWindowAdvisor(	final ApplicationWorkbenchAdvisor wbAdvisor,
 												final IWorkbenchWindowConfigurer configurer) {
@@ -95,6 +100,31 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		_appTitle = Messages.App_Title + " - " //$NON-NLS-1$
 				+ ApplicationVersion.getVersionSimple()
 				+ ApplicationVersion.getDevelopmentId();
+	}
+
+	public static void setupProxy() {
+
+		ProxySelector.setDefault(new DefaultProxySelector(ProxySelector.getDefault()));
+
+		// if http-authentication
+//		IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+		final String proxyUser = _prefStore.getString(IPreferences.PROXY_USER);
+		final String proxyPassword = _prefStore.getString(IPreferences.PROXY_PWD);
+
+		final Authenticator authenticator = new Authenticator() {
+
+			@Override
+			public PasswordAuthentication getPasswordAuthentication() {
+				if (getRequestorType().equals(Authenticator.RequestorType.PROXY)) {
+					return (new PasswordAuthentication(proxyUser, proxyPassword.toCharArray()));
+				}
+				return null;
+			}
+		};
+
+		if (authenticator != null) {
+			Authenticator.setDefault(authenticator);
+		}
 	}
 
 	private String computeTitle() {
@@ -361,6 +391,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 				TourTypeMenuManager.restoreState();
 
 				loadPeopleData();
+				setupProxy();
 			}
 		});
 	}
@@ -385,8 +416,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		uiPrefStore.setValue(IWorkbenchPreferenceConstants.SHOW_PROGRESS_ON_STARTUP, true);
 
 		// show memory monitor
-		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-		final boolean isMemoryMonitorVisible = prefStore
+//		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+		final boolean isMemoryMonitorVisible = _prefStore
 				.getBoolean(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR);
 		uiPrefStore.setValue(IWorkbenchPreferenceConstants.SHOW_MEMORY_MONITOR, isMemoryMonitorVisible);
 
