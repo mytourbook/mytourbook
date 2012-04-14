@@ -388,6 +388,9 @@ public class Photo {
 		return Double.MIN_VALUE;
 	}
 
+	/**
+	 * @return Returns photo image file name without path
+	 */
 	public String getFileName() {
 		return _fileName;
 	}

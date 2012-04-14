@@ -171,6 +171,8 @@ public class ImageUtils {
 
 			gc.setAntialias(antialias);
 			gc.setInterpolation(interpolation);
+//			gc.setAntialias(SWT.ON);
+//			gc.setInterpolation(SWT.LOW);
 
 			int destX = 0;
 			int destY = 0;

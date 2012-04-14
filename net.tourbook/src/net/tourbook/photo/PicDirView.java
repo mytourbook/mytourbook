@@ -22,6 +22,7 @@ import net.tourbook.photo.manager.ThumbnailStore;
 import net.tourbook.ui.ViewerDetailForm;
 import net.tourbook.util.Util;
 
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -38,20 +39,30 @@ import org.eclipse.ui.part.ViewPart;
 
 public class PicDirView extends ViewPart {
 
-	static public final String				ID					= "net.tourbook.photo.PicDirView";							//$NON-NLS-1$
+	static public final String				ID						= "net.tourbook.photo.PicDirView";		//$NON-NLS-1$
 
-	private static final String				STATE_TREE_WIDTH	= "STATE_TREE_WIDTH";										//$NON-NLS-1$
+	static final int						GALLERY_SORTING_BY_DATE	= 0;
+	static final int						GALLERY_SORTING_BY_NAME	= 1;
 
-	private static final IDialogSettings	_state				= TourbookPlugin.getDefault()//
-																		.getDialogSettingsSection("PhotoDirectoryView");	//$NON-NLS-1$
-	private static final IPreferenceStore	_prefStore			= TourbookPlugin.getDefault()//
-																		.getPreferenceStore();
+	private static final String				STATE_TREE_WIDTH		= "STATE_TREE_WIDTH";					//$NON-NLS-1$
+	private static final String				STATE_GALLERY_SORTING	= "STATE_GALLERY_SORTING";				//$NON-NLS-1$
+
+	private static final IDialogSettings	_state					= TourbookPlugin.getDefault()//
+																			.getDialogSettingsSection(
+																					"PhotoDirectoryView");	//$NON-NLS-1$
+	private static final IPreferenceStore	_prefStore				= TourbookPlugin.getDefault()//
+																			.getPreferenceStore();
+
+	private int								_gallerySorting;
 
 	private IPartListener2					_partListener;
 	private IPropertyChangeListener			_prefChangeListener;
 
 	private PicDirFolder					_picDirFolder;
 	private PicDirImages					_picDirImages;
+
+	private ActionSortByDate				_actionSortByDate;
+	private ActionSortByName				_actionSortByName;
 
 	/*
 	 * UI controls
@@ -150,6 +161,36 @@ public class PicDirView extends ViewPart {
 		sortBlock(files, 0, files.length - 1, new File[files.length]);
 	}
 
+	void actionSortByDate() {
+
+		final boolean isChecked = _actionSortByDate.isChecked();
+
+		if (isChecked) {
+			_gallerySorting = GALLERY_SORTING_BY_DATE;
+			_actionSortByName.setChecked(false);
+		} else {
+			_gallerySorting = GALLERY_SORTING_BY_NAME;
+			_actionSortByName.setChecked(true);
+		}
+
+		sortGallery();
+	}
+
+	void actionSortByName() {
+
+		final boolean isChecked = _actionSortByName.isChecked();
+
+		if (isChecked) {
+			_gallerySorting = GALLERY_SORTING_BY_NAME;
+			_actionSortByDate.setChecked(false);
+		} else {
+			_gallerySorting = GALLERY_SORTING_BY_DATE;
+			_actionSortByDate.setChecked(true);
+		}
+
+		sortGallery();
+	}
+
 	private void addPartListener() {
 
 		_partListener = new IPartListener2() {
@@ -198,10 +239,20 @@ public class PicDirView extends ViewPart {
 		_prefStore.addPropertyChangeListener(_prefChangeListener);
 	}
 
+	private void createActions() {
+
+		_actionSortByDate = new ActionSortByDate(this);
+		_actionSortByName = new ActionSortByName(this);
+
+	}
+
 	@Override
 	public void createPartControl(final Composite parent) {
 
 		createUI(parent);
+		createActions();
+
+		fillToolbar();
 
 		addPartListener();
 		addPrefListener();
@@ -257,6 +308,17 @@ public class PicDirView extends ViewPart {
 		super.dispose();
 	}
 
+	private void fillToolbar() {
+		/*
+		 * fill view toolbar
+		 */
+		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+
+		tbm.add(_actionSortByDate);
+		tbm.add(_actionSortByName);
+//		tbm.add(new Separator());
+	}
+
 	private void onPartClose() {
 
 		// close images first, this will stop loading images
@@ -270,6 +332,13 @@ public class PicDirView extends ViewPart {
 	private void restoreState() {
 
 		_containerMasterDetail.setViewerWidth(Util.getStateInt(_state, STATE_TREE_WIDTH, 200));
+
+		// gallery sorting
+		_gallerySorting = Util.getStateInt(_state, STATE_GALLERY_SORTING, GALLERY_SORTING_BY_DATE);
+		_actionSortByDate.setChecked(_gallerySorting == GALLERY_SORTING_BY_DATE);
+		_actionSortByName.setChecked(_gallerySorting == GALLERY_SORTING_BY_NAME);
+
+		_picDirImages.sortGallery(_gallerySorting, false);
 
 		/*
 		 * image restore must be done BEFORE folder restore because folder restore is also loading
@@ -289,6 +358,11 @@ public class PicDirView extends ViewPart {
 			return;
 		}
 
+		// gallery sorting
+		_state.put(STATE_GALLERY_SORTING, _actionSortByDate.isChecked()
+				? GALLERY_SORTING_BY_DATE
+				: GALLERY_SORTING_BY_NAME);
+
 		// keep width of the dir folder view in the master detail container
 		final Tree tree = _picDirFolder.getTree();
 		if (tree != null) {
@@ -302,6 +376,10 @@ public class PicDirView extends ViewPart {
 	@Override
 	public void setFocus() {
 		_picDirFolder.getTree().setFocus();
+	}
+
+	private void sortGallery() {
+		_picDirImages.sortGallery(_gallerySorting, true);
 	}
 
 }

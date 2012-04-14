@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
@@ -76,7 +77,7 @@ import org.eclipse.ui.part.PageBook;
 
 /**
  * This class is a compilation from different source codes:
- *
+ * 
  * <pre>
  * org.eclipse.swt.examples.fileviewer
  * org.sharemedia.gui.libraryviews.GalleryLibraryView
@@ -149,10 +150,15 @@ public class PicDirImages {
 	/**
 	 *
 	 */
-	public static Comparator<File>					DATE_SORT;
+	public static Comparator<File>					SORT_BY_FILE_DATE;
+	public static Comparator<File>					SORT_BY_FILE_NAME;
+//	private Comparator<File>						_currentComparator				= SORT_BY_FILE_DATE;
 
-//	private Comparator<File>						_currentComparator	= SortingUtils.DATE_SORT;
-	private Comparator<File>						_currentComparator				= DATE_SORT;
+	/**
+	 * Contains current gallery sorting id: {@link PicDirView#GALLERY_SORTING_BY_DATE} or
+	 * {@link PicDirView#GALLERY_SORTING_BY_NAME}
+	 */
+	private int										_gallerySorting;
 
 	private PicDirView								_picDirView;
 
@@ -207,6 +213,8 @@ public class PicDirImages {
 	private Composite								_pageLoading;
 	private Composite								_containerStatusLine;
 
+	private ImageSizeIndicator						_canvasImageSizeIndicator;
+
 	{
 		_workerRunnable = new Runnable() {
 			public void run() {
@@ -244,25 +252,34 @@ public class PicDirImages {
 			}
 		};
 
-		DATE_SORT = new Comparator<File>() {
+		SORT_BY_FILE_DATE = new Comparator<File>() {
 			@Override
-			public int compare(final File one, final File two) {
+			public int compare(final File file1, final File file2) {
 
 				if (_workerCancelled) {
 					// couldn't find another way how to stop sorting
 					return 0;
 				}
 
-				final long diff = one.lastModified() - two.lastModified();
+				final long time1 = file1.lastModified();
+				final long time2 = file2.lastModified();
 
-				if (diff == 0) {
-					return NATURAL_SORT.compare(one, two);
+				final long diff = time1 - time2;
+
+				return diff < 0 ? -1 : diff > 0 ? 1 : 0;
+			}
+		};
+
+		SORT_BY_FILE_NAME = new Comparator<File>() {
+			@Override
+			public int compare(final File file1, final File file2) {
+
+				if (_workerCancelled) {
+					// couldn't find another way how to stop sorting
+					return 0;
 				}
 
-				if (diff > 0) {
-					return (int) two.lastModified();
-				}
-				return -1;
+				return file1.getPath().compareToIgnoreCase(file2.getPath());
 			}
 		};
 	}
@@ -475,7 +492,7 @@ public class PicDirImages {
 
 	/**
 	 * This will be configured from options but for now it is any image accepted.
-	 *
+	 * 
 	 * @return
 	 */
 	private FileFilter createFileFilter() {
@@ -550,7 +567,7 @@ public class PicDirImages {
 		_containerActionBar = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(_containerActionBar);
 		GridLayoutFactory.fillDefaults()//
-				.numColumns(3)
+				.numColumns(4)
 				.extendedMargins(0, 0, 2, 2)
 				.applyTo(_containerActionBar);
 		{
@@ -562,15 +579,16 @@ public class PicDirImages {
 					.align(SWT.BEGINNING, SWT.CENTER)
 					.applyTo(_toolbar);
 
-			createUI_18_ComboHistory(_containerActionBar);
-			createUI_19_ImageSize(_containerActionBar);
+			createUI_16_ComboHistory(_containerActionBar);
+			createUI_17_ImageSize(_containerActionBar);
+			createUI_18_ImageSizeIndicator(_containerActionBar);
 		}
 	}
 
 	/**
 	 * combo: path history
 	 */
-	void createUI_18_ComboHistory(final Composite parent) {
+	void createUI_16_ComboHistory(final Composite parent) {
 
 		_comboPathHistory = new Combo(parent, SWT.SIMPLE | SWT.DROP_DOWN);
 		GridDataFactory.fillDefaults()//
@@ -628,7 +646,7 @@ public class PicDirImages {
 	/**
 	 * spinner: thumb size
 	 */
-	private void createUI_19_ImageSize(final Composite parent) {
+	private void createUI_17_ImageSize(final Composite parent) {
 
 		_spinnerThumbSize = new Spinner(parent, SWT.BORDER);
 		GridDataFactory.fillDefaults() //
@@ -636,7 +654,7 @@ public class PicDirImages {
 				.applyTo(_spinnerThumbSize);
 		_spinnerThumbSize.setMinimum(MIN_ITEM_WIDTH);
 		_spinnerThumbSize.setMaximum(MAX_ITEM_WIDTH);
-		_spinnerThumbSize.setIncrement(10);
+		_spinnerThumbSize.setIncrement(1);
 		_spinnerThumbSize.setPageIncrement(50);
 		_spinnerThumbSize.setToolTipText(UI.IS_OSX
 				? Messages.Pic_Dir_Spinner_ThumbnailSize_Tooltip_OSX
@@ -653,6 +671,20 @@ public class PicDirImages {
 				onSelectThumbnailSize(_spinnerThumbSize.getSelection());
 			}
 		});
+	}
+
+	/**
+	 * canvas: image size indicator
+	 */
+	private void createUI_18_ImageSizeIndicator(final Composite parent) {
+
+		_canvasImageSizeIndicator = new ImageSizeIndicator(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.hint(16, 16)
+				.align(SWT.CENTER, SWT.CENTER)
+				.applyTo(_canvasImageSizeIndicator);
+
+		_canvasImageSizeIndicator.setToolTipText(Messages.Pic_Dir_ImageSizeIndicator_Tooltip);
 	}
 
 	/**
@@ -809,7 +841,7 @@ public class PicDirImages {
 	/**
 	 * This event is called first of all before a gallery item is painted, it sets the photo into
 	 * the gallery item.
-	 *
+	 * 
 	 * @param event
 	 */
 	private void onGallery1SetItemData(final Event event) {
@@ -833,6 +865,7 @@ public class PicDirImages {
 			final GalleryMTItem parentItem = galleryItem.getParentItem();
 			final int galleryItemIndex = parentItem.indexOf(galleryItem);
 
+			// create a photo for an image file
 			final Photo photo = new Photo(_photoFiles[galleryItemIndex], galleryItemIndex);
 
 			galleryItem.setData(photo);
@@ -843,7 +876,7 @@ public class PicDirImages {
 	/**
 	 * This event checks if the image for the photo is available in the image cache, if not it is
 	 * put into a queue to be loaded, the {@link PhotoRenderer} will then paint the image.
-	 *
+	 * 
 	 * @param event
 	 */
 	private void onGallery2PaintItem(final Event event) {
@@ -971,6 +1004,9 @@ public class PicDirImages {
 		 * update UI with new size
 		 */
 		_photoWidth = photoWidth;
+
+		final boolean isHqImage = photoWidth > PhotoManager.IMAGE_SIZE_THUMBNAIL;
+		_canvasImageSizeIndicator.setIndicator(isHqImage);
 
 		_spinnerThumbSize.setSelection(photoWidth);
 		_groupRenderer.setItemSize(photoWidth, photoHeight);
@@ -1133,7 +1169,7 @@ public class PicDirImages {
 
 	/**
 	 * Display images for the selected folder.
-	 *
+	 * 
 	 * @param imageFolder
 	 * @param isFromNavigationHistory
 	 * @param isReloadFolder
@@ -1170,6 +1206,98 @@ public class PicDirImages {
 		workerUpdate(imageFolder, isReloadFolder);
 	}
 
+	/**
+	 * @param folder
+	 * @return
+	 */
+	private List<File> sortFiles(final File folder) {
+
+		final Comparator<File> comparator = _gallerySorting == PicDirView.GALLERY_SORTING_BY_DATE
+				? SORT_BY_FILE_DATE
+				: SORT_BY_FILE_NAME;
+
+		// We make file list in this thread for speed reasons
+		final List<File> files = SortingUtils.getSortedFileList(folder, _fileFilter, comparator);
+
+		return files;
+	}
+
+	void sortGallery(final int gallerySorting, final boolean isUpdateGallery) {
+
+		// check if resorting is needed
+		if (_gallerySorting == gallerySorting) {
+			return;
+		}
+
+		// set new sorting algorithm
+		_gallerySorting = gallerySorting;
+
+		if (isUpdateGallery) {
+
+			BusyIndicator.showWhile(_display, new Runnable() {
+				public void run() {
+					sortGalleryRunnable();
+				}
+			});
+		}
+	}
+
+	/**
+	 * This will sort the galleries first root item
+	 */
+	private void sortGalleryRunnable() {
+
+		if (_photoFiles == null || _photoFiles.length == 0) {
+			// there are no files
+			return;
+		}
+
+		final GalleryMTItem[] rootItems = _gallery.getItems();
+		if (rootItems.length == 0) {
+			// there is no root item
+			return;
+		}
+
+		// sort image files
+		final List<File> sortedFiles = sortFiles(_photoFolder);
+		final File[] sortedFilesArray = sortedFiles.toArray(new File[sortedFiles.size()]);
+
+		/*
+		 * sort gallery items according to the sorted image files
+		 */
+		final GalleryMTItem rootItem = rootItems[0];
+		final GalleryMTItem[] existingGalleryItems = rootItem.getItems();
+
+		final HashMap<String, GalleryMTItem> existingGalleryItemsMap = new HashMap<String, GalleryMTItem>();
+
+		// create map with existing gallery items, items can be null when not yet displayed
+		for (final GalleryMTItem existingGalleryItem : existingGalleryItems) {
+			if (existingGalleryItem != null) {
+
+				final Photo photo = (Photo) existingGalleryItem.getData();
+				final String photoImageFileName = photo.getFileName();
+
+				existingGalleryItemsMap.put(photoImageFileName, existingGalleryItem);
+			}
+		}
+
+		final GalleryMTItem[] sortedGalleryItems = new GalleryMTItem[existingGalleryItems.length];
+
+		// convert sorted images files into sorted gallery items
+		for (int itemIndex = 0; itemIndex < sortedFilesArray.length; itemIndex++) {
+
+			final File imageFile = sortedFilesArray[itemIndex];
+
+			final GalleryMTItem galleryItem = existingGalleryItemsMap.get(imageFile.getName());
+
+			if (galleryItem != null) {
+				sortedGalleryItems[itemIndex] = galleryItem;
+			}
+		}
+
+		_gallery.setSortedItems(sortedGalleryItems);
+	}
+
 	void updateColors(final Color fgColor, final Color bgColor) {
 
 		/*
@@ -1184,11 +1312,14 @@ public class PicDirImages {
 
 			// combobox list entries are almost invisible when colors are set on osx
 
+			_comboPathHistory.setForeground(fgColor);
+			_comboPathHistory.setBackground(bgColor);
+
 			_spinnerThumbSize.setForeground(fgColor);
 			_spinnerThumbSize.setBackground(bgColor);
 
-			_comboPathHistory.setForeground(fgColor);
-			_comboPathHistory.setBackground(bgColor);
+			_canvasImageSizeIndicator.setForeground(fgColor);
+			_canvasImageSizeIndicator.setBackground(bgColor);
 		}
 
 		/*
@@ -1310,8 +1441,7 @@ public class PicDirImages {
 				}
 			});
 
-			// We make file list in this thread for speed reasons
-			final List<File> files = SortingUtils.getSortedFileList(_workerStateDir, _fileFilter, _currentComparator);
+			final List<File> files = sortFiles(_workerStateDir);
 
 			if (_workerCancelled) {
 				return;
@@ -1336,15 +1466,15 @@ public class PicDirImages {
 						return;
 					}
 
-					// keep previous gallery position
+					// keep current gallery position
 					if (prevPhotoFolder != null) {
 						_galleryPositions.put(prevPhotoFolder.getAbsolutePath(), _gallery.getGalleryPosition());
 					}
 
-					// set gallery position
-					final Double newPosition = _galleryPositions.get(_photoFolder.getAbsolutePath());
-					if (newPosition != null) {
-						_gallery.setGalleryPositionWhenUpdated(newPosition);
+					// set old gallery position
+					final Double oldPosition = _galleryPositions.get(_photoFolder.getAbsolutePath());
+					if (oldPosition != null) {
+						_gallery.setGalleryPositionWhenUpdated(oldPosition);
 					}
 
 					/*
@@ -1396,7 +1526,7 @@ public class PicDirImages {
 	/**
 	 * Notifies the worker that it should update itself with new data. Cancels any previous
 	 * operation and begins a new one.
-	 *
+	 * 
 	 * @param newFolder
 	 *            the new base directory for the table, null is ignored
 	 * @param isReloadFolder

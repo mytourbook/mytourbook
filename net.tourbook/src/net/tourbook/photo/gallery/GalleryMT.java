@@ -2555,7 +2555,6 @@ public class GalleryMT extends Canvas {
 		updateStructuralValues(null, false);
 		updateScrollBarsProperties();
 		redraw();
-
 	}
 
 	/**
@@ -2634,6 +2633,24 @@ public class GalleryMT extends Canvas {
 			// Simulate mouse click to enable keyboard navigation
 			lastSingleClick = item;
 		}
+		redraw();
+	}
+
+	/**
+	 * Set gallery items in the first root item
+	 * 
+	 * @param sortedGalleryItems
+	 */
+	public void setSortedItems(final GalleryMTItem[] sortedGalleryItems) {
+
+		if (_galleryRootItems == null || _galleryRootItems.length == 0) {
+			return;
+		}
+
+		_galleryRootItems[0].items = sortedGalleryItems;
+
+		updateStructuralValues(null, true);
+		updateScrollBarsProperties();
 		redraw();
 	}
 

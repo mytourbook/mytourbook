@@ -750,8 +750,8 @@ public class GalleryMTItem extends Item {
 		this.ultraLazyDummy = ultraLazyDummy;
 	}
 
-	public void setVisibleItems(final GalleryMTItem[] _visibleItems) {
-		this._visibleItems = _visibleItems;
+	public void setVisibleItems(final GalleryMTItem[] visibleItems) {
+		_visibleItems = visibleItems;
 	}
 
 }

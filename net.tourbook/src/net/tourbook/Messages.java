@@ -649,6 +649,8 @@ public class Messages extends NLS {
 	public static String		Image__show_distance_on_x_axis;
 	public static String		Image__show_distance_on_x_axis_disabled;
 	public static String		Image__show_time_on_x_axis;
+	public static String		Image__SortByDate;
+	public static String		Image__SortByName;
 	public static String		Image__spline_point;
 	public static String		Image__synch_graph_byScale;
 	public static String		Image__synch_graph_byScale_disabled;
@@ -808,10 +810,8 @@ public class Messages extends NLS {
 	public static String		Pref_General_Label_MeasurementSystem;
 	public static String		Pref_General_Label_MinimalDaysInFirstWeek;
 	public static String		Pref_General_Label_MinimalDaysInFirstWeek_Tooltip;
-
-	public static String	Pref_General_Notes;
-
-	public static String	Pref_General_Notes_Tooltip;
+	public static String		Pref_General_Notes;
+	public static String		Pref_General_Notes_Tooltip;
 
 	public static String		Pref_Graphs_Button_down;
 	public static String		Pref_Graphs_Button_up;

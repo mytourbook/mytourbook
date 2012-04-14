@@ -29,6 +29,9 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 /**
  * Paint image in the gallery canvas.
@@ -36,6 +39,10 @@ import org.eclipse.swt.graphics.Rectangle;
  * Original: org.sharemedia.utils.gallery.ShareMediaIconRenderer2
  */
 public class PhotoRenderer extends DefaultGalleryItemRenderer {
+
+	private int						_fontHeight		= -1;
+
+	private final DateTimeFormatter	_dtFormatter	= DateTimeFormat.mediumDateTime();
 
 	@Override
 	public void dispose() {
@@ -54,6 +61,10 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 		final Object itemData = galleryItem.getData();
 		if ((itemData instanceof Photo) == false) {
 			return;
+		}
+
+		if (_fontHeight == -1) {
+			_fontHeight = gc.getFontMetrics().getHeight();
 		}
 
 		final Photo photo = (Photo) itemData;
@@ -84,14 +95,12 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 		final int roundingArc = 8;
 
 		int imageUseableHeight = galleryItemHeight;
-		int fontHeight = 0;
 		boolean isText = galleryItem.getText() != null && isShowLabels();
-		if (galleryItemHeight <= 100) {
+		if (galleryItemHeight <= 50) {
 			isText = false;
 		}
 		if (isText) {
-			fontHeight = gc.getFontMetrics().getHeight();
-			imageUseableHeight -= fontHeight + 2;
+			imageUseableHeight -= 2 * _fontHeight + 2;
 		}
 
 		if (selected) {
@@ -165,12 +174,20 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 			final int textxShift = (galleryItemWidth - (textWidth > galleryItemWidth ? galleryItemWidth : textWidth)) >> 1;
 
 			// Draw
-			gc.drawText(text, devXGallery + textxShift, devYGallery + galleryItemHeight - fontHeight, true);
+			final int devX = devXGallery + textxShift;
+			final int devY = devYGallery + galleryItemHeight;
+
+			gc.drawText(text, devX, devY - _fontHeight, true);
+
+			final DateTime dateTime = photo.getDateTime();
+			if (dateTime != null) {
+				gc.drawText(_dtFormatter.print(dateTime), devXGallery + 10, devY - 2 * _fontHeight, true);
+			}
 		}
 
 		if (isRequestedQuality == false) {
 
-			final int devY = devYGallery + galleryItemHeight - fontHeight + 0;
+			final int devY = devYGallery + galleryItemHeight - _fontHeight + 0;
 
 			gc.setBackground(getBackgroundColor());
 			gc.fillRectangle(devXGallery, devY, 10, 10);
@@ -294,19 +311,19 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 							final String errorMessage,
 							final boolean isLoading) {
 
-		String photoData = UI.EMPTY_STRING;
+		String photoText = UI.EMPTY_STRING;
 
 		if (errorMessage != null) {
-			photoData = "Error " + errorMessage + " in ";
+			photoText = "Error " + errorMessage + " in ";
 			setForegroundColor(gc.getDevice().getSystemColor(SWT.COLOR_RED));
 			setBackgroundColor(gc.getDevice().getSystemColor(SWT.COLOR_WHITE));
 		} else if (isLoading) {
-			photoData = "Loading ";
+			photoText = "Loading ";
 			setForegroundColor(gc.getDevice().getSystemColor(SWT.COLOR_YELLOW));
 			setBackgroundColor(gc.getDevice().getSystemColor(SWT.COLOR_BLACK));
 		}
-		photoData += photo.getFileName();
+		photoText += photo.getFileName();
 
-		gc.drawText(photoData, x, y);
+		gc.drawText(photoText, x, y);
 	}
 }

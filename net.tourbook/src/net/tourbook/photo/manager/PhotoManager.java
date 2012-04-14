@@ -161,7 +161,7 @@ public class PhotoManager {
 
 			photoImageLoaderItem.photo.setLoadingState(
 					PhotoLoadingState.UNDEFINED,
-					photoImageLoaderItem.requestedmageQuality);
+					photoImageLoaderItem.requestedImageQuality);
 		}
 	}
 

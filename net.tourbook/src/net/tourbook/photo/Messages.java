@@ -34,14 +34,21 @@ public class Messages extends NLS {
 	public static String		Pic_Dir_Action_RunFileBrowser;
 	public static String		Pic_Dir_Action_SingleClickExpand;
 	public static String		Pic_Dir_Action_SingleExpandCollapseOthers;
+
+	public static String	Pic_Dir_Action_SortByDate;
+
+	public static String	Pic_Dir_Action_SortByDate_Tooltip;
+
+	public static String	Pic_Dir_Action_SortByName;
+
+	public static String	Pic_Dir_Action_SortByName_Tooltip;
 	public static String		Pic_Dir_Dialog_CleanupStoreImages_Message;
-
 	public static String		Pic_Dir_Dialog_CleanupStoreImages_Title;
-
 	public static String		Pic_Dir_Dialog_ExternalPhotoViewer_Message;
 	public static String		Pic_Dir_Dialog_ExternalPhotoViewer_Title;
 	public static String		Pic_Dir_Dialog_FolderIsNotAvailable_Message;
 	public static String		Pic_Dir_Dialog_FolderIsNotAvailable_Title;
+	public static String		Pic_Dir_ImageSizeIndicator_Tooltip;
 	public static String		Pic_Dir_Label_FolderIsNotSelected;
 	public static String		Pic_Dir_Label_Loading;
 	public static String		Pic_Dir_Spinner_ThumbnailSize_Tooltip;
@@ -92,14 +99,11 @@ public class Messages extends NLS {
 	public static String		PrefPage_Photo_Viewer_Label_ImageFramework;
 	public static String		PrefPage_Photo_Viewer_Label_ResizeImageQuality;
 	public static String		PrefPage_Photo_Viewer_Label_ResizeImageQuality_Tooltip;
+	public static String		PrefPage_Photo_Viewer_Radio_ImageFramework_AWT;
+	public static String		PrefPage_Photo_Viewer_Radio_ImageFramework_AWT_Tooltip;
+	public static String		PrefPage_Photo_Viewer_Radio_ImageFramework_SWT;
+	public static String		PrefPage_Photo_Viewer_Radio_ImageFramework_SWT_Tooltip;
 
-	public static String	PrefPage_Photo_Viewer_Radio_ImageFramework_AWT;
-
-	public static String	PrefPage_Photo_Viewer_Radio_ImageFramework_AWT_Tooltip;
-
-	public static String	PrefPage_Photo_Viewer_Radio_ImageFramework_SWT;
-
-	public static String	PrefPage_Photo_Viewer_Radio_ImageFramework_SWT_Tooltip;
 	public static String		Scaling_Quality_Automatic;
 	public static String		Scaling_Quality_Balanced;
 	public static String		Scaling_Quality_Quality;
