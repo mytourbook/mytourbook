@@ -1622,6 +1622,7 @@ public class TourDatabase {
 					StatusUtil.logInfo("checking if derby server is running after server.start");//$NON-NLS-1$
 
 					int pingCounter = 1;
+					final int threadSleepTime = 100;
 
 					// wait until the server is started
 					while (true) {
@@ -1646,13 +1647,15 @@ public class TourDatabase {
 								throw new InvocationTargetException(e1);
 							}
 
-							StatusUtil.logInfo(NLS.bind("...waiting for derby server startup: {0}", pingCounter++)); //$NON-NLS-1$
+							StatusUtil.logInfo(NLS.bind("...waiting ({0} ms) for derby server startup: {1}", //$NON-NLS-1$
+									threadSleepTime,
+									pingCounter++));
 
-//							try {
-//								Thread.sleep(1);
-//							} catch (final InterruptedException e2) {
-//								StatusUtil.log(e2);
-//							}
+							try {
+								Thread.sleep(threadSleepTime);
+							} catch (final InterruptedException e2) {
+								StatusUtil.log(e2);
+							}
 						}
 					}
 
