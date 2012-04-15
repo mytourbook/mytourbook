@@ -25,6 +25,8 @@ import net.tourbook.ui.UI;
 import net.tourbook.util.StatusUtil;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Device;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -63,15 +65,15 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 			return;
 		}
 
+		final Photo photo = (Photo) itemData;
+
 		if (_fontHeight == -1) {
 			_fontHeight = gc.getFontMetrics().getHeight();
 		}
 
-		final Photo photo = (Photo) itemData;
-
 		final int requestedImageQuality = galleryItemHeight > PhotoManager.IMAGE_SIZE_THUMBNAIL
-				? PhotoManager.IMAGE_QUALITY_HQ_600
-				: PhotoManager.IMAGE_QUALITY_EXIF_THUMB_160;
+				? PhotoManager.IMAGE_QUALITY_LARGE_IMAGE
+				: PhotoManager.IMAGE_QUALITY_EXIF_THUMB;
 
 		boolean isRequestedQuality = true;
 
@@ -85,8 +87,8 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 			isRequestedQuality = false;
 
 			final int lowerImageQuality = galleryItemHeight > PhotoManager.IMAGE_SIZE_THUMBNAIL
-					? PhotoManager.IMAGE_QUALITY_EXIF_THUMB_160
-					: PhotoManager.IMAGE_QUALITY_HQ_600;
+					? PhotoManager.IMAGE_QUALITY_EXIF_THUMB
+					: PhotoManager.IMAGE_QUALITY_LARGE_IMAGE;
 
 			photoImage = PhotoImageCache.getImage(photo, lowerImageQuality);
 		}
@@ -95,10 +97,11 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 		final int roundingArc = 8;
 
 		int imageUseableHeight = galleryItemHeight;
-		boolean isText = galleryItem.getText() != null && isShowLabels();
-		if (galleryItemHeight <= 50) {
-			isText = false;
-		}
+		final boolean isText = isShowLabels();
+//		boolean isText = galleryItem.getText() != null && isShowLabels();
+//		if (galleryItemHeight <= 50) {
+//			isText = false;
+//		}
 		if (isText) {
 			imageUseableHeight -= 2 * _fontHeight + 2;
 		}
@@ -106,11 +109,10 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 		if (selected) {
 			// draw selection
 			gc.setForeground(getSelectionForegroundColor());
-			gc.setBackground(getSelectionBackgroundColor());
 		} else {
 			gc.setForeground(getForegroundColor());
-			gc.setBackground(getBackgroundColor());
 		}
+		gc.setBackground(getBackgroundColor());
 
 		if (photoImage != null && photoImage.isDisposed() == false) {
 
@@ -179,7 +181,7 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 
 			gc.drawText(text, devX, devY - _fontHeight, true);
 
-			final DateTime dateTime = photo.getDateTime();
+			final DateTime dateTime = photo.getFileDateTime();
 			if (dateTime != null) {
 				gc.drawText(_dtFormatter.print(dateTime), devXGallery + 10, devY - 2 * _fontHeight, true);
 			}
@@ -312,18 +314,29 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 							final boolean isLoading) {
 
 		String photoText = UI.EMPTY_STRING;
+		final Device device = gc.getDevice();
 
 		if (errorMessage != null) {
 			photoText = "Error " + errorMessage + " in ";
-			setForegroundColor(gc.getDevice().getSystemColor(SWT.COLOR_RED));
-			setBackgroundColor(gc.getDevice().getSystemColor(SWT.COLOR_WHITE));
+			gc.setForeground(device.getSystemColor(SWT.COLOR_RED));
+			gc.setBackground(device.getSystemColor(SWT.COLOR_WHITE));
 		} else if (isLoading) {
 			photoText = "Loading ";
-			setForegroundColor(gc.getDevice().getSystemColor(SWT.COLOR_YELLOW));
-			setBackgroundColor(gc.getDevice().getSystemColor(SWT.COLOR_BLACK));
+			gc.setForeground(device.getSystemColor(SWT.COLOR_YELLOW));
+			gc.setBackground(device.getSystemColor(SWT.COLOR_BLACK));
 		}
+
 		photoText += photo.getFileName();
 
 		gc.drawText(photoText, x, y);
+	}
+
+	@Override
+	public void setFont(final Font font) {
+
+		// force font update
+		_fontHeight = -1;
+
+		super.setFont(font);
 	}
 }

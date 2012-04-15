@@ -218,7 +218,7 @@ public class PhotoImageLoader {
 
 				// 2. get image from thumbnail image in the EXIF data
 
-				final int defaultThumbQuality = PhotoManager.IMAGE_QUALITY_EXIF_THUMB_160;
+				final int defaultThumbQuality = PhotoManager.IMAGE_QUALITY_EXIF_THUMB;
 				final IPath storeThumbImageFilePath = ThumbnailStore.getStoreImagePath(photo, defaultThumbQuality);
 
 				final Image exifThumbnail = loadImageFromEXIFThumbnail(storeThumbImageFilePath);
@@ -563,7 +563,7 @@ public class PhotoImageLoader {
 			 * when the EXIF thumb image is already extracted from the image
 			 */
 			Image exifThumbImage = null;
-			if (imageQuality == PhotoManager.IMAGE_QUALITY_EXIF_THUMB_160) {
+			if (imageQuality == PhotoManager.IMAGE_QUALITY_EXIF_THUMB) {
 				exifThumbImage = loadImageFromStore(imageQuality);
 			}
 
@@ -584,7 +584,7 @@ public class PhotoImageLoader {
 				} else {
 
 					int thumbSize;
-					if (imageQuality == PhotoManager.IMAGE_QUALITY_HQ_600) {
+					if (imageQuality == PhotoManager.IMAGE_QUALITY_LARGE_IMAGE) {
 						thumbSize = _hqImageSize;
 					} else {
 						thumbSize = thumbSizes[imageQuality];
@@ -747,7 +747,7 @@ public class PhotoImageLoader {
 				 * exist when the EXIF thumb image is available
 				 */
 				Image exifThumbImage = null;
-				if (imageQuality == PhotoManager.IMAGE_QUALITY_EXIF_THUMB_160) {
+				if (imageQuality == PhotoManager.IMAGE_QUALITY_EXIF_THUMB) {
 					exifThumbImage = loadImageFromStore(imageQuality);
 				}
 
@@ -768,7 +768,7 @@ public class PhotoImageLoader {
 					} else {
 
 						int thumbSize;
-						if (imageQuality == PhotoManager.IMAGE_QUALITY_HQ_600) {
+						if (imageQuality == PhotoManager.IMAGE_QUALITY_LARGE_IMAGE) {
 							thumbSize = _hqImageSize;
 						} else {
 							thumbSize = thumbSizes[imageQuality];
@@ -793,7 +793,7 @@ public class PhotoImageLoader {
 								final long startResize = System.currentTimeMillis();
 
 								// resize image
-								if (imageQuality == PhotoManager.IMAGE_QUALITY_EXIF_THUMB_160) {
+								if (imageQuality == PhotoManager.IMAGE_QUALITY_EXIF_THUMB) {
 									// scale small image with better quality
 									scaledImage = Scalr.resize(srcImage, Method.QUALITY, maxSize);
 								} else {

@@ -326,9 +326,12 @@ public interface ITourbookPreferences {
 
 	public static final String	PHOTO_EXTERNAL_PHOTO_VIEWER							= "PHOTO_EXTERNAL_PHOTO_VIEWER";							//$NON-NLS-1$
 
-	public static final String	PHOTO_VIEWER_PREF_STORE_EVENT						= "PHOTO_VIEWER_PREF_STORE_EVENT";							//$NON-NLS-1$
+	public static final String	PHOTO_VIEWER_PREF_EVENT_IMAGE_QUALITY_IS_MODIFIED	= "PHOTO_VIEWER_PREF_EVENT_IMAGE_QUALITY_IS_MODIFIED";		//$NON-NLS-1$
+	public static final String	PHOTO_VIEWER_PREF_EVENT_IMAGE_VIEWER_UI_IS_MODIFIED	= "PHOTO_VIEWER_PREF_EVENT_IMAGE_VIEWER_UI_IS_MODIFIED";	//$NON-NLS-1$
+	public static final String	PHOTO_VIEWER_FONT									= "PHOTO_VIEWER_FONT";										//$NON-NLS-1$
 	public static final String	PHOTO_VIEWER_COLOR_FOREGROUND						= "PHOTO_VIEWER_COLOR_FOREGROUND";							//$NON-NLS-1$
 	public static final String	PHOTO_VIEWER_COLOR_BACKGROUND						= "PHOTO_VIEWER_COLOR_BACKGROUND";							//$NON-NLS-1$
+	public static final String	PHOTO_VIEWER_COLOR_SELECTION_FOREGROUND				= "PHOTO_VIEWER_COLOR_SELECTION_FOREGROUND";				//$NON-NLS-1$
 	public static final String	PHOTO_VIEWER_IS_SHOW_FILE_FOLDER					= "PHOTO_VIEWER_IS_SHOW_FILE_FOLDER";						//$NON-NLS-1$
 	public static final String	PHOTO_VIEWER_COLOR_FOLDER							= "PHOTO_VIEWER_COLOR_FOLDER";								//$NON-NLS-1$
 	public static final String	PHOTO_VIEWER_COLOR_FILE								= "PHOTO_VIEWER_COLOR_FILE";								//$NON-NLS-1$

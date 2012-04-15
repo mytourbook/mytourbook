@@ -509,7 +509,7 @@ class PicDirFolder {
 
 	/**
 	 * Gets filesystem root entries
-	 *
+	 * 
 	 * @return an array of Files corresponding to the root directories on the platform, may be empty
 	 *         but not null
 	 */
@@ -581,7 +581,7 @@ class PicDirFolder {
 
 			isViewerRefresh = true;
 
-		} else if (property.equals(ITourbookPreferences.PHOTO_VIEWER_PREF_STORE_EVENT)) {
+		} else if (property.equals(ITourbookPreferences.PHOTO_VIEWER_PREF_EVENT_IMAGE_VIEWER_UI_IS_MODIFIED)) {
 
 			updateColors();
 
@@ -601,7 +601,7 @@ class PicDirFolder {
 
 	/**
 	 * Do the actions when a folder is selected
-	 *
+	 * 
 	 * @param iSelection
 	 */
 	private void onSelectFolder(final ITreeSelection treeSelection) {
@@ -649,7 +649,7 @@ class PicDirFolder {
 	 * This is not yet working thoroughly because the expanded position moves up or down and all
 	 * expanded childrens are not visible (but they could) like when the triangle (+/-) icon in the
 	 * tree is clicked.
-	 *
+	 * 
 	 * @param treeSelection
 	 * @param selectedTreePath
 	 * @param tviFolder
@@ -702,7 +702,7 @@ class PicDirFolder {
 
 	/**
 	 * This behavior is complex and still have possible problems.
-	 *
+	 * 
 	 * @param selectedFolderItem
 	 * @param treeSelection
 	 * @param selectedTreePath
@@ -958,12 +958,13 @@ class PicDirFolder {
 		final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
 		final Color fgColor = colorRegistry.get(ITourbookPreferences.PHOTO_VIEWER_COLOR_FOREGROUND);
 		final Color bgColor = colorRegistry.get(ITourbookPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
+		final Color selectionFgColor = colorRegistry.get(ITourbookPreferences.PHOTO_VIEWER_COLOR_SELECTION_FOREGROUND);
 
 		final Tree tree = _folderViewer.getTree();
 		tree.setForeground(fgColor);
 		tree.setBackground(bgColor);
 
-		_picDirImages.updateColors(fgColor, bgColor);
+		_picDirImages.updateColors(fgColor, bgColor, selectionFgColor);
 	}
 
 }

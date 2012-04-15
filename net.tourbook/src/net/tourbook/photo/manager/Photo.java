@@ -49,7 +49,8 @@ public class Photo {
 
 	private PhotoImageMetadata				_photoImageMetadata;
 
-	private DateTime						_dateTime;
+	private DateTime						_fileDateTime;
+	private DateTime						_exifDateTime;
 
 	/**
 	 * <pre>
@@ -170,7 +171,7 @@ public class Photo {
 
 			final TiffImageMetadata tiffMetadata = (TiffImageMetadata) imageFileMetadata;
 
-			photoMetadata.dateTime = getTiffDate(tiffMetadata);
+			photoMetadata.exifDateTime = getTiffDate(tiffMetadata);
 
 			photoMetadata.orientation = 1;
 
@@ -187,7 +188,7 @@ public class Photo {
 
 			final JpegImageMetadata jpegMetadata = (JpegImageMetadata) imageFileMetadata;
 
-			photoMetadata.dateTime = getExifDate(jpegMetadata);
+			photoMetadata.exifDateTime = getExifDate(jpegMetadata);
 
 			photoMetadata.orientation = getExifIntValue(jpegMetadata, ExifTagConstants.EXIF_TAG_ORIENTATION, 1);
 
@@ -221,10 +222,8 @@ public class Photo {
 			photoMetadata.gpsAreaInfo = getExifGpsArea(jpegMetadata);
 		}
 
-		// ensure date is set
-		if (photoMetadata.dateTime == null) {
-			photoMetadata.dateTime = new DateTime(_imageFile.lastModified());
-		}
+		// set file date time
+		photoMetadata.fileDateTime = new DateTime(_imageFile.lastModified());
 
 		return photoMetadata;
 	}
@@ -255,10 +254,6 @@ public class Photo {
 		return _altitude;
 	}
 
-	public DateTime getDateTime() {
-		return _dateTime;
-	}
-
 	/**
 	 * Date/Time
 	 * 
@@ -287,6 +282,10 @@ public class Photo {
 		}
 
 		return null;
+	}
+
+	public DateTime getExifDateTime() {
+		return _exifDateTime;
 	}
 
 	/**
@@ -386,6 +385,10 @@ public class Photo {
 		}
 
 		return Double.MIN_VALUE;
+	}
+
+	public DateTime getFileDateTime() {
+		return _fileDateTime;
 	}
 
 	/**
@@ -589,7 +592,7 @@ public class Photo {
 	}
 
 	public void setDateTime(final DateTime dateTime) {
-		_dateTime = dateTime;
+		_exifDateTime = dateTime;
 	}
 
 	public void setGpsAreaInfo(final String gpsAreaInfo) {
@@ -617,7 +620,7 @@ public class Photo {
 
 		return "Photo " //
 				+ (_fileName)
-				+ (_dateTime == null ? "-no date-" : "\t" + _dateTime)
+				+ (_exifDateTime == null ? "-no date-" : "\t" + _exifDateTime)
 				+ ("\trotate:" + rotateDegree)
 				+ (_imageWidth == Integer.MIN_VALUE ? "-no size-" : "\t" + _imageWidth + "x" + _imageHeight)
 				+ (_latitude == Double.MIN_VALUE ? "\t-no GPS-" : "\t" + _latitude + " - " + _longitude)
@@ -671,7 +674,8 @@ public class Photo {
 
 	private void updatePhotoImageMetadata(final PhotoImageMetadata photoImageMetadata) {
 
-		_dateTime = photoImageMetadata.dateTime;
+		_exifDateTime = photoImageMetadata.exifDateTime;
+		_fileDateTime = photoImageMetadata.fileDateTime;
 
 		_imageWidth = photoImageMetadata.imageWidth;
 		_imageHeight = photoImageMetadata.imageHeight;

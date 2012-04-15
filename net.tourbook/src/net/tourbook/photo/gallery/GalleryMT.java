@@ -2110,13 +2110,13 @@ public class GalleryMT extends Canvas {
 
 		final long start = System.nanoTime();
 
-		int itemHeight = -1;
+		int itemWidth = -1;
 		if (groupRenderer instanceof AbstractGridGroupRenderer) {
 			final AbstractGridGroupRenderer gridRenderer = (AbstractGridGroupRenderer) groupRenderer;
-			itemHeight = gridRenderer.getItemHeight();
+			itemWidth = gridRenderer.getItemWidth();
 		}
 		// is true when image can not be painted with high quality
-		final boolean isSmallerThanHQMinSize = itemHeight == -1 || itemHeight < _highQualityMinSize;
+		final boolean isSmallerThanHQMinSize = itemWidth == -1 || itemWidth < _highQualityMinSize;
 
 		// check if the content is scrolled or window is resized
 		final boolean isScrolled = _galleryPosition != _prevGalleryPosition;
@@ -2519,6 +2519,8 @@ public class GalleryMT extends Canvas {
 
 		_isShowHighQuality = isShowHighQuality;
 		_highQualityMinSize = hqMinSize;
+
+		redraw();
 	}
 
 	/**

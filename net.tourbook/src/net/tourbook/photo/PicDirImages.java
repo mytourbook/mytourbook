@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Set;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.photo.gallery.AbstractGalleryItemRenderer;
 import net.tourbook.photo.gallery.GalleryMT;
 import net.tourbook.photo.gallery.GalleryMTItem;
 import net.tourbook.photo.manager.ILoadCallBack;
@@ -36,6 +35,7 @@ import net.tourbook.photo.manager.PhotoManager;
 import net.tourbook.photo.manager.ThumbnailStore;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.UI;
+import net.tourbook.util.StatusUtil;
 import net.tourbook.util.Util;
 
 import org.apache.commons.sanselan.Sanselan;
@@ -61,6 +61,8 @@ import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Combo;
@@ -96,6 +98,8 @@ public class PicDirImages {
 	private static final String						STATE_THUMB_IMAGE_SIZE			= "STATE_THUMB_IMAGE_SIZE";			//$NON-NLS-1$
 	private static final String						STATE_GALLERY_POSITION_FOLDER	= "STATE_GALLERY_POSITION_FOLDER";		//$NON-NLS-1$
 	private static final String						STATE_GALLERY_POSITION_VALUE	= "STATE_GALLERY_POSITION_VALUE";		//$NON-NLS-1$
+
+	private static final String						DEFAULT_GALLERY_FONT			= "arial,sans-serif";					//$NON-NLS-1$
 
 	private final IPreferenceStore					_prefStore						= TourbookPlugin.getDefault() //
 																							.getPreferenceStore();
@@ -152,7 +156,6 @@ public class PicDirImages {
 	 */
 	public static Comparator<File>					SORT_BY_FILE_DATE;
 	public static Comparator<File>					SORT_BY_FILE_NAME;
-//	private Comparator<File>						_currentComparator				= SORT_BY_FILE_DATE;
 
 	/**
 	 * Contains current gallery sorting id: {@link PicDirView#GALLERY_SORTING_BY_DATE} or
@@ -162,7 +165,7 @@ public class PicDirImages {
 
 	private PicDirView								_picDirView;
 
-	private AbstractGalleryItemRenderer				_itemRenderer;
+	private PhotoRenderer							_photoRenderer;
 	private NoGroupRendererMT						_groupRenderer;
 
 	/**
@@ -189,6 +192,9 @@ public class PicDirImages {
 	private ActionClearNavigationHistory			_actionClearNavigationHistory;
 	private ActionRemoveInvalidFoldersFromHistory	_actionRemoveInvalidFoldersFromHistory;
 
+	/**
+	 * keep gallery position for each used folder
+	 */
 	private LinkedHashMap<String, Double>			_galleryPositions				= new LinkedHashMap<String, Double>(
 																							100,
 																							0.75f,
@@ -214,6 +220,8 @@ public class PicDirImages {
 	private Composite								_containerStatusLine;
 
 	private ImageSizeIndicator						_canvasImageSizeIndicator;
+
+	private Font									_galleryFont;
 
 	{
 		_workerRunnable = new Runnable() {
@@ -527,6 +535,27 @@ public class PicDirImages {
 		};
 	}
 
+	private void createGalleryFont() {
+
+		if (_galleryFont != null) {
+			_galleryFont.dispose();
+		}
+
+		final String prefGalleryFont = _prefStore.getString(ITourbookPreferences.PHOTO_VIEWER_FONT);
+		if (prefGalleryFont.length() > 0) {
+			try {
+				_galleryFont = new Font(_display, new FontData(prefGalleryFont));
+			} catch (final Exception e) {
+				// ignore
+			}
+		}
+
+		if (_galleryFont == null) {
+			StatusUtil.log("This font cannot be created: \"" + prefGalleryFont + "\"");//$NON-NLS-1$ //$NON-NLS-2$
+			_galleryFont = new Font(_display, DEFAULT_GALLERY_FONT, 7, SWT.NORMAL);
+		}
+	}
+
 	void createUI(final PicDirFolder picDirFolder, final Composite parent) {
 
 		_picDirFolder = picDirFolder;
@@ -729,12 +758,12 @@ public class PicDirImages {
 		/*
 		 * set renderer
 		 */
-		_itemRenderer = new PhotoRenderer();
-		final PhotoRenderer photoRenderer = (PhotoRenderer) _itemRenderer;
-		photoRenderer.setShowLabels(true);
+		_photoRenderer = new PhotoRenderer();
+//		final PhotoRenderer photoRenderer = (PhotoRenderer) _photoRenderer;
+//		photoRenderer.setShowLabels(true);
 //		photoRenderer.setDropShadows(true);
 //		photoRenderer.setDropShadowsSize(5);
-		_gallery.setItemRenderer(_itemRenderer);
+		_gallery.setItemRenderer(_photoRenderer);
 
 		_groupRenderer = new NoGroupRendererMT();
 		_groupRenderer.setItemSize(_photoWidth, (int) (_photoWidth * (float) 15 / 11));
@@ -797,9 +826,7 @@ public class PicDirImages {
 
 		final String property = event.getProperty();
 
-		if (property.equals(ITourbookPreferences.PHOTO_VIEWER_PREF_STORE_EVENT)) {
-
-			updateImageQuality();
+		if (property.equals(ITourbookPreferences.PHOTO_VIEWER_PREF_EVENT_IMAGE_QUALITY_IS_MODIFIED)) {
 
 			_display.asyncExec(new Runnable() {
 				public void run() {
@@ -818,10 +845,24 @@ public class PicDirImages {
 					_gallery.clearAll();
 				}
 			});
+
+		} else if (property.equals(ITourbookPreferences.PHOTO_VIEWER_PREF_EVENT_IMAGE_VIEWER_UI_IS_MODIFIED)) {
+
+			setLargeImageQuality();
+
+		} else if (property.equals(ITourbookPreferences.PHOTO_VIEWER_FONT)) {
+
+			createGalleryFont();
+
+			_photoRenderer.setFont(_galleryFont);
 		}
 	}
 
 	void onClose() {
+
+		if (_galleryFont != null) {
+			_galleryFont.dispose();
+		}
 
 		PhotoManager.stopImageLoading();
 
@@ -892,8 +933,8 @@ public class PicDirImages {
 			final Photo photo = (Photo) galleryItem.getData();
 
 			final int imageQuality = _photoWidth <= PhotoManager.IMAGE_SIZE_THUMBNAIL
-					? PhotoManager.IMAGE_QUALITY_EXIF_THUMB_160
-					: PhotoManager.IMAGE_QUALITY_HQ_600;
+					? PhotoManager.IMAGE_QUALITY_EXIF_THUMB
+					: PhotoManager.IMAGE_QUALITY_LARGE_IMAGE;
 
 			// check if image is already being loaded or has an loading error
 			final PhotoLoadingState photoLoadingState = photo.getLoadingState(imageQuality);
@@ -1091,10 +1132,13 @@ public class PicDirImages {
 			}
 		}
 
+		createGalleryFont();
+		_photoRenderer.setFont(_galleryFont);
+
 		/*
 		 * image quality
 		 */
-		updateImageQuality();
+		setLargeImageQuality();
 
 		/*
 		 * thumbnail size
@@ -1167,6 +1211,17 @@ public class PicDirImages {
 
 	}
 
+	private void setLargeImageQuality() {
+
+		final boolean isShowHighQuality = _prefStore.getBoolean(//
+				ITourbookPreferences.PHOTO_VIEWER_IS_SHOW_IMAGE_WITH_HIGH_QUALITY);
+
+		final int hqMinSize = _prefStore.getInt(//
+				ITourbookPreferences.PHOTO_VIEWER_HIGH_QUALITY_IMAGE_MIN_SIZE);
+
+		_gallery.setImageQuality(isShowHighQuality, hqMinSize);
+	}
+
 	/**
 	 * Display images for the selected folder.
 	 * 
@@ -1206,7 +1261,18 @@ public class PicDirImages {
 		workerUpdate(imageFolder, isReloadFolder);
 	}
 
+	void showInfo(final boolean isShowInfo, final boolean isUpdateGallery) {
+
+		_photoRenderer.setShowLabels(isShowInfo);
+
+		if (isUpdateGallery) {
+			_gallery.redraw();
+		}
+	}
+
 	/**
+	 * Sort files for the folder
+	 * 
 	 * @param folder
 	 * @return
 	 */
@@ -1298,10 +1364,10 @@ public class PicDirImages {
 		_gallery.setSortedItems(sortedGalleryItems);
 	}
 
-	void updateColors(final Color fgColor, final Color bgColor) {
+	void updateColors(final Color fgColor, final Color bgColor, final Color selectionFgColor) {
 
 		/*
-		 * action bar
+		 * action bar, setting action bar color in OSX looks not very good
 		 */
 		if (UI.IS_OSX == false) {
 
@@ -1328,9 +1394,10 @@ public class PicDirImages {
 		_gallery.setForeground(fgColor);
 		_gallery.setBackground(bgColor);
 
-		final PhotoRenderer photoRenderer = (PhotoRenderer) _itemRenderer;
+		final PhotoRenderer photoRenderer = _photoRenderer;
 		photoRenderer.setForegroundColor(fgColor);
 		photoRenderer.setBackgroundColor(bgColor);
+		photoRenderer.setSelectionForegroundColor(selectionFgColor);
 
 		_pageLoading.setBackground(bgColor);
 
@@ -1403,18 +1470,6 @@ public class PicDirImages {
 
 		_actionClearNavigationHistory.setEnabled(historySize > 1);
 		_actionRemoveInvalidFoldersFromHistory.setEnabled(historySize > 1);
-	}
-
-	private void updateImageQuality() {
-
-		final boolean isShowHighQuality = _prefStore.getBoolean(//
-				ITourbookPreferences.PHOTO_VIEWER_IS_SHOW_IMAGE_WITH_HIGH_QUALITY);
-
-		final int hqMinSize = _prefStore.getInt(//
-				ITourbookPreferences.PHOTO_VIEWER_HIGH_QUALITY_IMAGE_MIN_SIZE);
-
-		_gallery.setImageQuality(isShowHighQuality, hqMinSize);
-
 	}
 
 	/**

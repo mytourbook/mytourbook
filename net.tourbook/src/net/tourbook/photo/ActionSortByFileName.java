@@ -13,30 +13,29 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.photo.manager;
+package net.tourbook.photo;
 
-import org.joda.time.DateTime;
+import net.tourbook.application.TourbookPlugin;
 
-/**
- * Metadata for the original photo image file.
- */
-public class PhotoImageMetadata {
+import org.eclipse.jface.action.Action;
 
-	public DateTime	fileDateTime;
-	public DateTime	exifDateTime;
+public class ActionSortByFileName extends Action {
 
-	public int		imageWidth		= Integer.MIN_VALUE;
-	public int		imageHeight		= Integer.MIN_VALUE;
+	private PicDirView	_picDirView;
 
-	public int		orientation		= 1;
+	public ActionSortByFileName(final PicDirView picDirView) {
 
-	public double	imageDirection	= Double.MIN_VALUE;
-	public double	altitude		= Double.MIN_VALUE;
+		super(Messages.Pic_Dir_Action_SortByName, AS_CHECK_BOX);
 
-	public double	latitude		= Double.MIN_VALUE;
-	public double	longitude		= Double.MIN_VALUE;
+		_picDirView = picDirView;
 
-	public String	gpsAreaInfo;
+		setToolTipText(Messages.Pic_Dir_Action_SortByName_Tooltip);
 
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(net.tourbook.Messages.Image__SortByName));
+	}
 
+	@Override
+	public void run() {
+		_picDirView.actionSortByName();
+	}
 }

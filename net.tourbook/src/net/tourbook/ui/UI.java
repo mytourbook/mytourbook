@@ -1203,6 +1203,9 @@ public class UI {
 		colorRegistry.put(ITourbookPreferences.PHOTO_VIEWER_COLOR_BACKGROUND, //
 				PreferenceConverter.getColor(prefStore, ITourbookPreferences.PHOTO_VIEWER_COLOR_BACKGROUND));
 
+		colorRegistry.put(ITourbookPreferences.PHOTO_VIEWER_COLOR_SELECTION_FOREGROUND, //
+				PreferenceConverter.getColor(prefStore, ITourbookPreferences.PHOTO_VIEWER_COLOR_SELECTION_FOREGROUND));
+
 		colorRegistry.put(ITourbookPreferences.PHOTO_VIEWER_COLOR_FOLDER, //
 				PreferenceConverter.getColor(prefStore, ITourbookPreferences.PHOTO_VIEWER_COLOR_FOLDER));
 

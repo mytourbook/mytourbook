@@ -19,11 +19,11 @@ import net.tourbook.application.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionSortByDate extends Action {
+public class ActionSortByFileDate extends Action {
 
 	private PicDirView	_picDirView;
 
-	public ActionSortByDate(final PicDirView picDirView) {
+	public ActionSortByFileDate(final PicDirView picDirView) {
 
 		super(Messages.Pic_Dir_Action_SortByDate, AS_CHECK_BOX);
 

@@ -32,16 +32,16 @@ public class Messages extends NLS {
 	public static String		Pic_Dir_Action_Refresh;
 	public static String		Pic_Dir_Action_RemoveInvalidFolders;
 	public static String		Pic_Dir_Action_RunFileBrowser;
+	public static String	Pic_Dir_Action_ShowPhotoInfo;
+
+	public static String	Pic_Dir_Action_ShowPhotoInfo_Tooltip;
+
 	public static String		Pic_Dir_Action_SingleClickExpand;
 	public static String		Pic_Dir_Action_SingleExpandCollapseOthers;
-
-	public static String	Pic_Dir_Action_SortByDate;
-
-	public static String	Pic_Dir_Action_SortByDate_Tooltip;
-
-	public static String	Pic_Dir_Action_SortByName;
-
-	public static String	Pic_Dir_Action_SortByName_Tooltip;
+	public static String		Pic_Dir_Action_SortByDate;
+	public static String		Pic_Dir_Action_SortByDate_Tooltip;
+	public static String		Pic_Dir_Action_SortByName;
+	public static String		Pic_Dir_Action_SortByName_Tooltip;
 	public static String		Pic_Dir_Dialog_CleanupStoreImages_Message;
 	public static String		Pic_Dir_Dialog_CleanupStoreImages_Title;
 	public static String		Pic_Dir_Dialog_ExternalPhotoViewer_Message;
@@ -88,10 +88,13 @@ public class Messages extends NLS {
 	public static String		PrefPage_Photo_Viewer_Checkbox_ShowNumbersInFolderView;
 	public static String		PrefPage_Photo_Viewer_Checkbox_ShowNumbersInFolderView_Tooltip;
 	public static String		PrefPage_Photo_Viewer_Group_Colors;
+	public static String		PrefPage_Photo_Viewer_Group_GalleryFont;
 	public static String		PrefPage_Photo_Viewer_Label_BackgroundColor;
 	public static String		PrefPage_Photo_Viewer_Label_FileColor;
 	public static String		PrefPage_Photo_Viewer_Label_FolderColor;
+	public static String		PrefPage_Photo_Viewer_Label_FontExample;
 	public static String		PrefPage_Photo_Viewer_Label_ForgroundColor;
+	public static String		PrefPage_Photo_Viewer_Label_GalleryFont;
 	public static String		PrefPage_Photo_Viewer_Label_HQImageSize;
 	public static String		PrefPage_Photo_Viewer_Label_HQImageSize_Tooltip;
 	public static String		PrefPage_Photo_Viewer_Label_HQThumbnailSize;
@@ -99,6 +102,8 @@ public class Messages extends NLS {
 	public static String		PrefPage_Photo_Viewer_Label_ImageFramework;
 	public static String		PrefPage_Photo_Viewer_Label_ResizeImageQuality;
 	public static String		PrefPage_Photo_Viewer_Label_ResizeImageQuality_Tooltip;
+
+	public static String	PrefPage_Photo_Viewer_Label_SelectionForegroundColor;
 	public static String		PrefPage_Photo_Viewer_Radio_ImageFramework_AWT;
 	public static String		PrefPage_Photo_Viewer_Radio_ImageFramework_AWT_Tooltip;
 	public static String		PrefPage_Photo_Viewer_Radio_ImageFramework_SWT;

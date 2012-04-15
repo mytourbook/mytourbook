@@ -33,8 +33,8 @@ public class PhotoManager {
 
 	private static final IPreferenceStore						_prefStore;
 
-	public static final int										IMAGE_SIZE_THUMBNAIL			= 160;
-	public static final int										IMAGE_SIZE_HQ_DEFAULT			= 600;
+	public static final int										IMAGE_SIZE_THUMBNAIL		= 160;
+	public static final int										IMAGE_SIZE_LARGE_DEFAULT	= 600;
 
 // SET_FORMATTING_OFF
 
@@ -42,19 +42,19 @@ public class PhotoManager {
 	 * Contains image sizes for different image qualities.
 	 */
 	public static int[]											IMAGE_SIZES						=
-			{ IMAGE_SIZE_THUMBNAIL, IMAGE_SIZE_HQ_DEFAULT, Integer.MAX_VALUE };
+			{ IMAGE_SIZE_THUMBNAIL, IMAGE_SIZE_LARGE_DEFAULT, Integer.MAX_VALUE };
 	
 	public static final int[]									HQ_IMAGE_SIZES					=
-			{ 200, IMAGE_SIZE_HQ_DEFAULT, 1000, 2000 };
+			{ 200, IMAGE_SIZE_LARGE_DEFAULT, 1000, 2000 };
 
 // SET_FORMATTING_ON
 
 	/*
 	 * image quality is the index in HQ_IMAGE_SIZES
 	 */
-	public static int											IMAGE_QUALITY_EXIF_THUMB_160	= 0;
-	public static int											IMAGE_QUALITY_HQ_600			= 1;
-	public static int											IMAGE_QUALITY_ORIGINAL			= 2;
+	public static int											IMAGE_QUALITY_EXIF_THUMB	= 0;
+	public static int											IMAGE_QUALITY_LARGE_IMAGE	= 1;
+	public static int											IMAGE_QUALITY_ORIGINAL		= 2;
 
 	private static Display										_display;
 
@@ -66,11 +66,11 @@ public class PhotoManager {
 	 */
 	private static ThreadPoolExecutor							_executorServiceHQ;
 
-	private static final LinkedBlockingDeque<PhotoImageLoader>	_waitingQueue					= new LinkedBlockingDeque<PhotoImageLoader>();
-	private static final LinkedBlockingDeque<PhotoImageLoader>	_waitingQueueHQ					= new LinkedBlockingDeque<PhotoImageLoader>();
+	private static final LinkedBlockingDeque<PhotoImageLoader>	_waitingQueue				= new LinkedBlockingDeque<PhotoImageLoader>();
+	private static final LinkedBlockingDeque<PhotoImageLoader>	_waitingQueueHQ				= new LinkedBlockingDeque<PhotoImageLoader>();
 
-	public static final String									IMAGE_FRAMEWORK_SWT				= "swt";										//$NON-NLS-1$
-	public static final String									IMAGE_FRAMEWORK_AWT				= "awt";										//$NON-NLS-1$
+	public static final String									IMAGE_FRAMEWORK_SWT			= "swt";										//$NON-NLS-1$
+	public static final String									IMAGE_FRAMEWORK_AWT			= "awt";										//$NON-NLS-1$
 
 	private static String										_imageFramework;
 	private static int											_hqImageSize;
@@ -184,7 +184,7 @@ public class PhotoManager {
 		if (hqImageSizeIndex == -1) {
 			// get default size
 			for (int imageIndex = 0; imageIndex < HQ_IMAGE_SIZES.length; imageIndex++) {
-				if (HQ_IMAGE_SIZES[imageIndex] == IMAGE_SIZE_HQ_DEFAULT) {
+				if (HQ_IMAGE_SIZES[imageIndex] == IMAGE_SIZE_LARGE_DEFAULT) {
 					hqImageSizeIndex = imageIndex;
 					break;
 				}
