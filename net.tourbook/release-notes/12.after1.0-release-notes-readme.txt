@@ -1,0 +1,16 @@
+Version: 12.?.?                                           ?. ???? 2012
+
+Release Notes
+-------------
+
+New
+===
+
+- use proxy when accessing internet, provided by Meinhard Ritscher
+
+
+Bugfix
+======
+
+!!! IS NOT YET IMPLEMENTED !!!
+- gpx export: enclose <time> and <bounds> with <metadata>, provided by markxy (sourceforge user)
