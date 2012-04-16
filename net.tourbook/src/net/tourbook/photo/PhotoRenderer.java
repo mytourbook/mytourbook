@@ -20,8 +20,8 @@ import net.tourbook.photo.gallery.GalleryMTItem;
 import net.tourbook.photo.gallery.RendererHelper;
 import net.tourbook.photo.manager.Photo;
 import net.tourbook.photo.manager.PhotoImageCache;
+import net.tourbook.photo.manager.PhotoLoadingState;
 import net.tourbook.photo.manager.PhotoManager;
-import net.tourbook.ui.UI;
 import net.tourbook.util.StatusUtil;
 
 import org.eclipse.swt.SWT;
@@ -55,23 +55,35 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 	public void draw(	final GC gc,
 						final GalleryMTItem galleryItem,
 						final int index,
-						final int devXGallery,
-						final int devYGallery,
+						final int galleryPosX,
+						final int galleryPosY,
 						final int galleryItemWidth,
 						final int galleryItemHeight) {
-
-		final Object itemData = galleryItem.getData();
-		if ((itemData instanceof Photo) == false) {
-			return;
-		}
-
-		final Photo photo = (Photo) itemData;
 
 		if (_fontHeight == -1) {
 			_fontHeight = gc.getFontMetrics().getHeight();
 		}
 
-		final int requestedImageQuality = galleryItemHeight > PhotoManager.IMAGE_SIZE_THUMBNAIL
+		final Object itemData = galleryItem.getData();
+
+		Photo photo = null;
+		if (itemData instanceof Photo) {
+			photo = (Photo) itemData;
+		} else {
+			// this case should not happten
+			gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_RED));
+			gc.drawText("error: gallery item is not a photo", //
+					galleryPosX + 3,
+					galleryPosY + 3 + _fontHeight);
+			return;
+		}
+
+		final int photoPosX = galleryPosX + 2;
+		final int photoPosY = galleryPosY + 2;
+		final int photoWidth = galleryItemWidth - 4;
+		final int photoHeight = galleryItemHeight - 4;
+
+		final int requestedImageQuality = photoHeight > PhotoManager.IMAGE_SIZE_THUMBNAIL
 				? PhotoManager.IMAGE_QUALITY_LARGE_IMAGE
 				: PhotoManager.IMAGE_QUALITY_EXIF_THUMB;
 
@@ -86,130 +98,112 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 
 			isRequestedQuality = false;
 
-			final int lowerImageQuality = galleryItemHeight > PhotoManager.IMAGE_SIZE_THUMBNAIL
+			final int lowerImageQuality = photoHeight > PhotoManager.IMAGE_SIZE_THUMBNAIL
 					? PhotoManager.IMAGE_QUALITY_EXIF_THUMB
 					: PhotoManager.IMAGE_QUALITY_LARGE_IMAGE;
 
 			photoImage = PhotoImageCache.getImage(photo, lowerImageQuality);
 		}
 
-		final int imageBorderWidth = 2;
-		final int roundingArc = 8;
+		int imageCanvasHeight = photoHeight;
 
-		int imageUseableHeight = galleryItemHeight;
-		final boolean isText = isShowLabels();
-//		boolean isText = galleryItem.getText() != null && isShowLabels();
-//		if (galleryItemHeight <= 50) {
-//			isText = false;
-//		}
-		if (isText) {
-			imageUseableHeight -= 2 * _fontHeight + 2;
+		final boolean isShowText = isShowLabels();
+		if (isShowText) {
+			imageCanvasHeight -= 2 * _fontHeight + 0;
 		}
 
-		if (selected) {
-			// draw selection
-			gc.setForeground(getSelectionForegroundColor());
-		} else {
-			gc.setForeground(getForegroundColor());
-		}
+		gc.setForeground(getForegroundColor());
 		gc.setBackground(getBackgroundColor());
 
 		if (photoImage != null && photoImage.isDisposed() == false) {
 
-			// draw image
+			// draw photo image
 
-			drawImage(
-					photo,
-					photoImage,
-					gc,
-					devXGallery,
-					devYGallery,
-					galleryItemWidth,
-					imageBorderWidth,
-					imageUseableHeight);
+			drawImage(gc, photo, photoImage, photoPosX, photoPosY, photoWidth, imageCanvasHeight);
 
 		} else {
 
 			// image is not available
 
-			drawText(gc, devXGallery, devYGallery, photo, null, true);
+			drawStatusText(gc, photo, photoPosX, photoPosY, photoWidth, imageCanvasHeight, requestedImageQuality);
 		}
 
 		// Draw label
-		if (isText) {
+		if (isShowText) {
 
-			// Set colors
-			if (selected) {
-				// Selected : use selection colors.
-				gc.setForeground(getSelectionForegroundColor());
-				gc.setBackground(getSelectionBackgroundColor());
-
-			} else {
-				// Not selected, use item values or defaults.
-
-				// Background
-//				if (itemBackgroundColor != null) {
-//					gc.setBackground(itemBackgroundColor);
-//				} else {
-//					gc.setBackground(getBackgroundColor());
-//				}
-				gc.setBackground(getBackgroundColor());
-
-				// Foreground
-//				if (itemForegroundColor != null) {
-//					gc.setForeground(itemForegroundColor);
-//				} else {
-//					gc.setForeground(getForegroundColor());
-//				}
-				gc.setForeground(getForegroundColor());
-			}
-
-			// Create label
-
-			// RendererHelper IS A PERFORMANCE HOG when small images are displayed
-
-//			final String text = RendererHelper.createLabel(galleryItem.getText(), gc, galleryItemWidth - 10);
 			final String text = galleryItem.getText();
 
-			// Center text
-			final int textWidth = gc.textExtent(text).x;
-			final int textxShift = (galleryItemWidth - (textWidth > galleryItemWidth ? galleryItemWidth : textWidth)) >> 1;
-
 			// Draw
-			final int devX = devXGallery + textxShift;
-			final int devY = devYGallery + galleryItemHeight;
-
-			gc.drawText(text, devX, devY - _fontHeight, true);
-
-			final DateTime dateTime = photo.getFileDateTime();
-			if (dateTime != null) {
-				gc.drawText(_dtFormatter.print(dateTime), devXGallery + 10, devY - 2 * _fontHeight, true);
-			}
-		}
-
-		if (isRequestedQuality == false) {
-
-			final int devY = devYGallery + galleryItemHeight - _fontHeight + 0;
+			final int textPosY = photoPosY + imageCanvasHeight;
 
 			gc.setBackground(getBackgroundColor());
-			gc.fillRectangle(devXGallery, devY, 10, 10);
+			gc.setForeground(getForegroundColor());
 
-//			gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_WHITE));
-//			gc.drawLine(devXGallery, devY, devXGallery + galleryItemWidth, devY);
+			/*
+			 * draw 1st line
+			 */
+			final DateTime dateTime = photo.getFileDateTime();
+			if (dateTime != null) {
+
+				final String textDateTime = _dtFormatter.print(dateTime);
+
+				// Center text
+				final int textWidth = gc.textExtent(textDateTime).x;
+				final int textOffset = (photoWidth - (textWidth > photoWidth ? photoWidth : textWidth)) / 2;
+
+				gc.drawString(textDateTime, photoPosX + textOffset, textPosY, true);
+			}
+
+			/*
+			 * draw 2nd line
+			 */
+			// Center text
+			final int textWidth = gc.textExtent(text).x;
+			final int textOffset = (photoWidth - (textWidth > photoWidth ? photoWidth : textWidth)) / 2;
+
+			gc.drawString(text, photoPosX + textOffset, textPosY + _fontHeight, true);
 		}
 
-//		gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-//		gc.drawRectangle(devXGallery, devYGallery, galleryItemWidth - 1, galleryItemHeight - 1);
+//		if (isRequestedQuality == false) {
+//
+//			final int devY = photoPosY + photoHeight - _fontHeight + 0;
+//
+//			gc.setBackground(getBackgroundColor());
+//			gc.fillRectangle(photoPosX, devY, 10, 10);
+//
+////			gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_WHITE));
+////			gc.drawLine(devXGallery, devY, devXGallery + photoWidth, devY);
+//		}
+
+		// draw selection border
+		if (selected) {
+			gc.setForeground(getSelectionForegroundColor());
+			gc.drawRoundRectangle(galleryPosX + 1, galleryPosY + 1, galleryItemWidth - 3, galleryItemHeight - 3, 6, 6);
+		}
+
+		// debug box for the whole gallery item area
+//		gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_GREEN));
+//		gc.drawRectangle(galleryPosX, galleryPosY, galleryItemWidth - 1, galleryItemHeight - 1);
 	}
 
-	private void drawImage(	final Photo photo,
+	/**
+	 * Draw photo image centered in the photo canvas.
+	 * 
+	 * @param gc
+	 * @param photo
+	 * @param photoImage
+	 * @param photoPosX
+	 * @param photoPosY
+	 * @param photoWidth
+	 * @param photoHeight
+	 */
+	private void drawImage(	final GC gc,
+							final Photo photo,
 							final Image photoImage,
-							final GC gc,
-							final int devXGallery,
-							final int devYGallery,
-							final int galleryItemWidth,
-							final int imageBorderWidth,
-							final int imageUseableHeight) {
+							final int photoPosX,
+							final int photoPosY,
+							final int photoWidth,
+							final int photoHeight) {
 
 		int photoPaintedWidth = 0;
 		int photoPaintedHeight = 0;
@@ -229,8 +223,10 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 			imageWidth = imageBounds.width;
 			imageHeight = imageBounds.height;
 
-			final int imageCanvasWidth = galleryItemWidth - imageBorderWidth;
-			final int imageCanvasHeight = imageUseableHeight - imageBorderWidth;
+			final int imageBorderWidth = 0;
+
+			final int imageCanvasWidth = photoWidth - imageBorderWidth;
+			final int imageCanvasHeight = photoHeight - imageBorderWidth;
 
 			final Point bestSize = RendererHelper.getBestSize(
 					imageWidth,
@@ -241,22 +237,22 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 			photoPaintedWidth = bestSize.x;
 			photoPaintedHeight = bestSize.y;
 
-			final int photoWidth = photo.getWidthRotated();
-			final int photoHeight = photo.getHeightRotated();
+			final int photoWidthRotated = photo.getWidthRotated();
+			final int photoHeightRotated = photo.getHeightRotated();
 
-			if (photoWidth != Integer.MIN_VALUE && photoHeight != Integer.MIN_VALUE) {
+			if (photoWidthRotated != Integer.MIN_VALUE && photoHeightRotated != Integer.MIN_VALUE) {
 
 				// photo is loaded
 
-				if (photoPaintedWidth > photoWidth || photoPaintedHeight > photoHeight) {
+				if (photoPaintedWidth > photoWidthRotated || photoPaintedHeight > photoHeightRotated) {
 
 					/*
 					 * photo image should not be displayed larger than the original photo even when
 					 * the thumb image is larger, this can happen when image is resized
 					 */
 
-					photoPaintedWidth = photoWidth;
-					photoPaintedHeight = photoHeight;
+					photoPaintedWidth = photoWidthRotated;
+					photoPaintedHeight = photoHeightRotated;
 				}
 			}
 
@@ -264,8 +260,8 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 			if (photoPaintedWidth > 0 && photoPaintedHeight > 0) {
 
 				// center image
-				offsetX = (galleryItemWidth - photoPaintedWidth) / 2;
-				offsetY = (imageUseableHeight - photoPaintedHeight) / 2;
+				offsetX = (photoWidth - photoPaintedWidth) / 2;
+				offsetY = (photoHeight - photoPaintedHeight) / 2;
 
 			}
 		} catch (final Exception e) {
@@ -276,8 +272,8 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 		int destY = 0;
 		try {
 
-			destX = devXGallery + offsetX;
-			destY = devYGallery + offsetY;
+			destX = photoPosX + offsetX;
+			destY = photoPosY + offsetY;
 
 			gc.drawImage(photoImage, //
 					0,
@@ -292,7 +288,7 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 
 		} catch (final Exception e) {
 
-			drawText(gc, devXGallery, devYGallery, photo, e.getMessage(), false);
+			gc.drawString(e.getMessage(), photoPosX, photoPosY);
 
 			final String message = ("srcWidth: " + imageWidth)
 					+ ("  srcHeight:" + imageHeight)
@@ -306,29 +302,34 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 		}
 	}
 
-	private void drawText(	final GC gc,
-							final int x,
-							final int y,
-							final Photo photo,
-							final String errorMessage,
-							final boolean isLoading) {
+	private void drawStatusText(final GC gc,
+								final Photo photo,
+								final int photoPosX,
+								final int photoPosY,
+								final int photoWidth,
+								final int imageCanvasHeight,
+								final int requestedImageQuality) {
 
-		String photoText = UI.EMPTY_STRING;
+		final PhotoLoadingState photoLoadingState = photo.getLoadingState(requestedImageQuality);
+		final boolean isError = photoLoadingState == PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR;
+		final String statusText = isError //
+				? photo.getFileName() + " cannot be loaded"
+				: photo.getFileName() + " is being loaded";
+		;
+
+		// Center text
+		final int textWidth = gc.textExtent(statusText).x;
+		final int textOffsetX = (photoWidth - (textWidth > photoWidth ? photoWidth : textWidth)) / 2;
+		final int textOffsetY = (imageCanvasHeight - (_fontHeight > imageCanvasHeight ? imageCanvasHeight : _fontHeight)) / 2;
+
 		final Device device = gc.getDevice();
-
-		if (errorMessage != null) {
-			photoText = "Error " + errorMessage + " in ";
+		if (isError) {
 			gc.setForeground(device.getSystemColor(SWT.COLOR_RED));
-			gc.setBackground(device.getSystemColor(SWT.COLOR_WHITE));
-		} else if (isLoading) {
-			photoText = "Loading ";
+		} else {
 			gc.setForeground(device.getSystemColor(SWT.COLOR_YELLOW));
-			gc.setBackground(device.getSystemColor(SWT.COLOR_BLACK));
 		}
 
-		photoText += photo.getFileName();
-
-		gc.drawText(photoText, x, y);
+		gc.drawString(statusText, photoPosX + textOffsetX, photoPosY + textOffsetY, true);
 	}
 
 	@Override

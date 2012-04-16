@@ -514,6 +514,7 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 	protected void performDefaults() {
 
 		_isImageQualityModified = true;
+		_isImageViewerUIModified = true;
 
 		_chkIsHighImageQuality.setSelection(//
 				_prefStore.getDefaultBoolean(ITourbookPreferences.PHOTO_VIEWER_IS_SHOW_IMAGE_WITH_HIGH_QUALITY));
@@ -536,8 +537,14 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 		final int hqImageSizeIndex = PhotoManager.getHQImageSizeIndex(hqImageSize);
 		_comboHQImageSize.select(hqImageSizeIndex);
 
+		// prevent setting external app
+		final String externalAppBackup = _editorExternalPhotoViewer.getStringValue();
+
 		// set editor defaults
 		super.performDefaults();
+
+		// reset external app
+		_editorExternalPhotoViewer.setStringValue(externalAppBackup);
 
 		enableControls();
 	}

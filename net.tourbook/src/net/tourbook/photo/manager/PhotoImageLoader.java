@@ -472,7 +472,7 @@ public class PhotoImageLoader {
 				// must be logged in another way
 				StatusUtil.log(NLS.bind(//
 						"Fullsize image \"{0}\" cannot be loaded",
-						photo.getFilePathName()), new Exception());
+						photo.getFilePathName()));
 			}
 
 			final boolean isImageLoaded = hqImage != null;
