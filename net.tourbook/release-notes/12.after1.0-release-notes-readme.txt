@@ -12,5 +12,4 @@ New
 Bugfix
 ======
 
-!!! IS NOT YET IMPLEMENTED !!!
 - gpx export: enclose <time> and <bounds> with <metadata>, provided by markxy (sourceforge user)

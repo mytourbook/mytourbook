@@ -9,9 +9,11 @@
 	http://www.cluetrust.com/XML/GPXDATA/1/0 http://www.cluetrust.com/Schemas/gpxdata10.xsd 
 	http://www.garmin.com/xmlschemas/GpxExtensions/v3 http://www.garmin.com/xmlschemas/GpxExtensionsv3.xsd 
 	http://www.garmin.com/xmlschemas/TrackPointExtension/v1 http://www.garmin.com/xmlschemas/TrackPointExtensionv1.xsd"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">	
-	<time>$dateformatter.format($creation_date)</time>
-	<bounds minlat="$min_latitude" minlon="$min_longitude" maxlat="$max_latitude" maxlon="$max_longitude"/>
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<metadata>	
+		<time>$dateformatter.format($creation_date)</time>
+		<bounds minlat="$min_latitude" minlon="$min_longitude" maxlat="$max_latitude" maxlon="$max_longitude"/>
+	</metadata>
 ##
 ##
 ## print all waypoints that are available:
