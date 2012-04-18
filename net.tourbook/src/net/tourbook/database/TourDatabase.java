@@ -30,10 +30,12 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -71,6 +73,7 @@ import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IPropertyListener;
@@ -169,6 +172,14 @@ public class TourDatabase {
 
 	private static HashMap<Long, TagCollection>		_tagCollections								= new HashMap<Long, TagCollection>();
 
+	/*
+	 * cached distinct fields
+	 */
+	private static TreeSet<String>					_dbTourTitles;
+	private static TreeSet<String>					_dbTourStartPlace;
+	private static TreeSet<String>					_dbTourEndPlace;
+	private static TreeSet<String>					_dbTourMarkerNames;
+
 	private boolean									_isTableChecked;
 	private boolean									_isVersionChecked;
 
@@ -228,6 +239,17 @@ public class TourDatabase {
 		}
 
 		UI.getInstance().setTourTypeImagesDirty();
+	}
+
+	public static void closeConnection(final Connection conn) {
+
+		if (conn != null) {
+			try {
+				conn.close();
+			} catch (final SQLException e) {
+				UI.showSQLException(e);
+			}
+		}
 	}
 
 	private static void computeComputedValuesForAllTours(final IProgressMonitor monitor) {
@@ -439,17 +461,20 @@ public class TourDatabase {
 			UI.showSQLException(e);
 		} finally {
 			Util.sqlClose(stmt);
-			if (conn != null) {
-				try {
-					conn.close();
-				} catch (final SQLException e) {
-					UI.showSQLException(e);
-				}
-			}
+			closeConnection(conn);
 
 		}
 
 		return tourIds;
+	}
+
+	public static TreeSet<String> getAllTourMarkerNames() {
+
+		if (_dbTourMarkerNames == null) {
+			_dbTourMarkerNames = getDistinctValues(TourDatabase.TABLE_TOUR_MARKER, "label"); // $NON-NLS-1$
+		}
+
+		return _dbTourMarkerNames;
 	}
 
 	/**
@@ -459,9 +484,13 @@ public class TourDatabase {
 	 * @author Stefan F.
 	 * @return places as string array.
 	 */
-	public static ArrayList<String> getAllTourPlaceEnds() {
+	public static TreeSet<String> getAllTourPlaceEnds() {
 
-		return getTextRow("SELECT tourEndPlace FROM " + TourDatabase.TABLE_TOUR_DATA + " ORDER BY tourEndPlace"); //$NON-NLS-1$ //$NON-NLS-2$
+		if (_dbTourEndPlace == null) {
+			_dbTourEndPlace = getDistinctValues(TourDatabase.TABLE_TOUR_DATA, "tourEndPlace"); // $NON-NLS-1$
+		}
+
+		return _dbTourEndPlace;
 	}
 
 	/**
@@ -471,9 +500,13 @@ public class TourDatabase {
 	 * @author Stefan F.
 	 * @return titles as string array.
 	 */
-	public static ArrayList<String> getAllTourPlaceStarts() {
+	public static TreeSet<String> getAllTourPlaceStarts() {
 
-		return getTextRow("SELECT tourStartPlace FROM " + TourDatabase.TABLE_TOUR_DATA + " ORDER BY tourStartPlace"); //$NON-NLS-1$ //$NON-NLS-2$
+		if (_dbTourStartPlace == null) {
+			_dbTourStartPlace = getDistinctValues(TourDatabase.TABLE_TOUR_DATA, "tourStartPlace"); // $NON-NLS-1$
+		}
+
+		return _dbTourStartPlace;
 	}
 
 	/**
@@ -523,9 +556,13 @@ public class TourDatabase {
 	 * @author Stefan F.
 	 * @return titles as string array.
 	 */
-	public static ArrayList<String> getAllTourTitles() {
+	public static TreeSet<String> getAllTourTitles() {
 
-		return getTextRow("SELECT tourTitle FROM " + TourDatabase.TABLE_TOUR_DATA + " ORDER BY tourTitle"); //$NON-NLS-1$ //$NON-NLS-2$
+		if (_dbTourTitles == null) {
+			_dbTourTitles = getDistinctValues(TourDatabase.TABLE_TOUR_DATA, "tourTitle"); // $NON-NLS-1$
+		}
+
+		return _dbTourTitles;
 	}
 
 	/**
@@ -564,6 +601,84 @@ public class TourDatabase {
 		}
 
 		return _tourTypes;
+	}
+
+	/**
+	 * Getting one row from the database sorted by alphabet and without any double entries.
+	 * 
+	 * @author Stefan F.
+	 * @param sqlQuery
+	 *            must look like: "SELECT tourTitle FROM " + TourDatabase.TABLE_TOUR_DATA +
+	 *            " ORDER BY tourTitle"
+	 * @return places as string array.
+	 */
+	private static TreeSet<String> getDistinctValues(final String db, final String fieldname) {
+
+		final TreeSet<String> sortedValues = new TreeSet<String>(new Comparator<String>() {
+			@Override
+			public int compare(final String s1, final String s2) {
+				// sort without case
+				return s1.compareToIgnoreCase(s2);
+			}
+		});
+
+		BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+			public void run() {
+
+				Connection conn = null;
+				Statement stmt = null;
+				String sqlQuery = null;
+
+				try {
+
+					conn = getInstance().getConnection();
+					stmt = conn.createStatement();
+
+					sqlQuery = "SELECT" //$NON-NLS-1$
+							+ " DISTINCT" //$NON-NLS-1$
+							+ " " + fieldname //$NON-NLS-1$
+							+ " FROM " + db //$NON-NLS-1$
+							+ " ORDER BY " + fieldname; //$NON-NLS-1$
+
+					final ResultSet result = stmt.executeQuery(sqlQuery);
+
+					while (result.next()) {
+
+						String dbValue = result.getString(1);
+						if (dbValue != null) {
+
+							dbValue = dbValue.trim();
+
+							if (dbValue.length() > 0) {
+								sortedValues.add(dbValue);
+							}
+						}
+					}
+
+				} catch (final SQLException e) {
+					UI.showSQLException(e);
+				} finally {
+					Util.sqlClose(stmt);
+					closeConnection(conn);
+				}
+
+				/*
+				 * log existing values
+				 */
+//				final StringBuilder sb = new StringBuilder();
+//				for (final String text : sortedValues) {
+//					sb.append(text);
+//					sb.append(UI.NEW_LINE);
+//				}
+//				System.out.println(UI.NEW_LINE2);
+//				System.out.println(sqlQuery);
+//				System.out.println(UI.NEW_LINE);
+//				System.out.println(sb.toString());
+//				// TODO remove SYSTEM.OUT.PRINTLN
+			}
+		});
+
+		return sortedValues;
 	}
 
 	public static TourDatabase getInstance() {
@@ -762,65 +877,31 @@ public class TourDatabase {
 		return sb.toString();
 	}
 
-	/**
-	 * Getting one row from the database sorted by alphabet and without any double entries.
-	 * 
-	 * @author Stefan F.
-	 * @param sqlQuery
-	 *            must look like: "SELECT tourTitle FROM " + TourDatabase.TABLE_TOUR_DATA +
-	 *            " ORDER BY tourTitle"
-	 * @return places as string array.
-	 */
-	private static ArrayList<String> getTextRow(final String sqlQuery) {
-
-		final ArrayList<String> retString = new ArrayList<String>();
-
-		Connection conn = null;
-		Statement stmt = null;
-
-		try {
-
-			conn = getInstance().getConnection();
-			stmt = conn.createStatement();
-
-			final ResultSet result = stmt.executeQuery(sqlQuery);
-
-			//filter out equal text entries
-			String lastString = UI.EMPTY_STRING;
-			String newString;
-			while (result.next()) {
-
-				newString = result.getString(1);
-
-				if (newString != null) {
-
-					newString = newString.trim();
-
-					if (newString.length() > 0) {
-
-						if (!lastString.equals(newString)) {
-							retString.add(newString);
-							lastString = newString;
-						}
-					}
-				}
-			}
-
-		} catch (final SQLException e) {
-			UI.showSQLException(e);
-		} finally {
-			Util.sqlClose(stmt);
-			if (conn != null) {
-				try {
-					conn.close();
-				} catch (final SQLException e) {
-					UI.showSQLException(e);
-				}
-			}
-		}
-
-		return retString;
-	}
+//	/**
+//	 * @return Returns all tour people in the db sorted by last/first name
+//	 */
+//	@SuppressWarnings("unchecked")
+//	public static ArrayList<TourPerson> getTourPeople() {
+//
+//		ArrayList<TourPerson> tourPeople = new ArrayList<TourPerson>();
+//
+//		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+//
+//		if (em != null) {
+//
+//			final Query emQuery = em.createQuery(//
+//					//
+//					"SELECT TourPerson" //$NON-NLS-1$
+//							+ (" FROM TourPerson AS TourPerson") //$NON-NLS-1$
+//							+ (" ORDER BY TourPerson.lastName, TourPerson.firstName")); //$NON-NLS-1$
+//
+//			tourPeople = (ArrayList<TourPerson>) emQuery.getResultList();
+//
+//			em.close();
+//		}
+//
+//		return tourPeople;
+//	}
 
 	/**
 	 * @return Returns all tour types in the db sorted by name
@@ -847,32 +928,6 @@ public class TourDatabase {
 
 		return bikeList;
 	}
-
-//	/**
-//	 * @return Returns all tour people in the db sorted by last/first name
-//	 */
-//	@SuppressWarnings("unchecked")
-//	public static ArrayList<TourPerson> getTourPeople() {
-//
-//		ArrayList<TourPerson> tourPeople = new ArrayList<TourPerson>();
-//
-//		final EntityManager em = TourDatabase.getInstance().getEntityManager();
-//
-//		if (em != null) {
-//
-//			final Query emQuery = em.createQuery(//
-//					//
-//					"SELECT TourPerson" //$NON-NLS-1$
-//							+ (" FROM TourPerson AS TourPerson") //$NON-NLS-1$
-//							+ (" ORDER BY TourPerson.lastName, TourPerson.firstName")); //$NON-NLS-1$
-//
-//			tourPeople = (ArrayList<TourPerson>) emQuery.getResultList();
-//
-//			em.close();
-//		}
-//
-//		return tourPeople;
-//	}
 
 	/**
 	 * Get a tour from the database
@@ -1132,13 +1187,7 @@ public class TourDatabase {
 			UI.showSQLException(e);
 		} finally {
 
-			if (conn != null) {
-				try {
-					conn.close();
-				} catch (final SQLException e) {
-					UI.showSQLException(e);
-				}
-			}
+			closeConnection(conn);
 		}
 	}
 
@@ -1367,6 +1416,8 @@ public class TourDatabase {
 			em.close();
 
 			TourManager.getInstance().updateTourInCache(persistedEntity);
+
+			updateCachedFields(persistedEntity);
 		}
 
 		return persistedEntity;
@@ -1423,6 +1474,40 @@ public class TourDatabase {
 
 		// set default empty list
 		_activeTourTypes = new ArrayList<TourType>();
+	}
+
+	private static void updateCachedFields(final TourData tourData) {
+
+		// cache tour title
+		final TreeSet<String> allTitles = getAllTourTitles();
+		final String tourTitle = tourData.getTourTitle();
+		if (tourTitle.length() > 0) {
+			allTitles.add(tourTitle);
+		}
+
+		// cache tour start place
+		final TreeSet<String> allPlaceStarts = getAllTourPlaceStarts();
+		final String tourStartPlace = tourData.getTourStartPlace();
+		if (tourStartPlace.length() > 0) {
+			allPlaceStarts.add(tourStartPlace);
+		}
+
+		// cache tour end place
+		final TreeSet<String> allPlaceEnds = getAllTourPlaceEnds();
+		final String tourEndPlace = tourData.getTourEndPlace();
+		if (tourEndPlace.length() > 0) {
+			allPlaceEnds.add(tourEndPlace);
+		}
+
+		// cache tour marker names
+		final TreeSet<String> allMarkerNames = getAllTourMarkerNames();
+		final Set<TourMarker> allTourMarker = tourData.getTourMarkers();
+		for (final TourMarker tourMarker : allTourMarker) {
+			final String label = tourMarker.getLabel();
+			if (label.length() > 0) {
+				allMarkerNames.add(label);
+			}
+		}
 	}
 
 	/**
@@ -1844,37 +1929,6 @@ public class TourDatabase {
 		return true;
 	}
 
-	/**
-	 * Create index for {@link TourData} will dramatically improve performance *
-	 * <p>
-	 * since db version 5
-	 * 
-	 * @param stmt
-	 * @throws SQLException
-	 */
-	private void createIndexTourData(final Statement stmt) throws SQLException {
-
-		String sql;
-
-		/*
-		 * CREATE INDEX YearMonth
-		 */
-		sql = "CREATE INDEX YearMonth" + " ON " + TABLE_TOUR_DATA + " (startYear, startMonth)"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		exec(stmt, sql);
-
-		/*
-		 * CREATE INDEX TourType
-		 */
-		sql = "CREATE INDEX TourType" + " ON " + TABLE_TOUR_DATA + " (tourType_typeId)"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		exec(stmt, sql);
-
-		/*
-		 * CREATE INDEX TourPerson
-		 */
-		sql = "CREATE INDEX TourPerson" + " ON " + TABLE_TOUR_DATA + " (tourPerson_personId)"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		exec(stmt, sql);
-	}
-
 //	/**
 //	 * create table {@link #TABLE_TOUR_CATEGORY}
 //	 *
@@ -1912,6 +1966,37 @@ public class TourDatabase {
 //				+ (" ADD CONSTRAINT " + JOINTABLE_TOURCATEGORY__TOURDATA + "_pk") //$NON-NLS-1$ //$NON-NLS-2$
 //				+ (" PRIMARY KEY (" + TABLE_TOUR_CATEGORY + "_categoryId)")); //$NON-NLS-1$ //$NON-NLS-2$
 //	}
+
+	/**
+	 * Create index for {@link TourData} will dramatically improve performance *
+	 * <p>
+	 * since db version 5
+	 * 
+	 * @param stmt
+	 * @throws SQLException
+	 */
+	private void createIndexTourData(final Statement stmt) throws SQLException {
+
+		String sql;
+
+		/*
+		 * CREATE INDEX YearMonth
+		 */
+		sql = "CREATE INDEX YearMonth" + " ON " + TABLE_TOUR_DATA + " (startYear, startMonth)"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		exec(stmt, sql);
+
+		/*
+		 * CREATE INDEX TourType
+		 */
+		sql = "CREATE INDEX TourType" + " ON " + TABLE_TOUR_DATA + " (tourType_typeId)"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		exec(stmt, sql);
+
+		/*
+		 * CREATE INDEX TourPerson
+		 */
+		sql = "CREATE INDEX TourPerson" + " ON " + TABLE_TOUR_DATA + " (tourPerson_personId)"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		exec(stmt, sql);
+	}
 
 	/**
 	 * create table {@link #TABLE_TOUR_BIKE}

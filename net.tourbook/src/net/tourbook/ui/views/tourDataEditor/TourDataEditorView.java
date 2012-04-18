@@ -32,6 +32,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.TreeSet;
 
 import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
 import net.tourbook.Messages;
@@ -2703,14 +2704,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					.grab(true, false)
 					.applyTo(_comboTitle);
 
-			// fill combobox
-			ArrayList<String> arr = TourDatabase.getAllTourTitles();
-			for (final String string : arr) {
-				if (string != null) {
-					_comboTitle.add(string);
-				}
-			}
-
 			_comboTitle.addKeyListener(_keyListener);
 			_comboTitle.addModifyListener(new ModifyListener() {
 				@Override
@@ -2723,8 +2716,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				}
 			});
 
+			// fill combobox
+			TreeSet<String> arr = TourDatabase.getAllTourTitles();
+			for (final String string : arr) {
+				_comboTitle.add(string);
+			}
 			new AutocompleteComboInput(_comboTitle);
-			
+
 			/*
 			 * description
 			 */
@@ -2769,14 +2767,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					.hint(_hintTextColumnWidth, SWT.DEFAULT)
 					.applyTo(_comboStartLocation);
 
-			// fill combobox
-			arr = TourDatabase.getAllTourPlaceStarts();
-			for (final String string : arr) {
-				if (string != null) {
-					_comboStartLocation.add(string);
-				}
-			}
-
 			_comboStartLocation.addModifyListener(new ModifyListener() {
 				@Override
 				public void modifyText(final ModifyEvent e) {
@@ -2788,6 +2778,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				}
 			});
 
+			// fill combobox
+			arr = TourDatabase.getAllTourPlaceStarts();
+			for (final String string : arr) {
+				if (string != null) {
+					_comboStartLocation.add(string);
+				}
+			}
 			new AutocompleteComboInput(_comboStartLocation);
 
 			/*
@@ -2807,14 +2804,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					.hint(_hintTextColumnWidth, SWT.DEFAULT)
 					.applyTo(_comboEndLocation);
 
-			// fill combobox
-			arr = TourDatabase.getAllTourPlaceEnds();
-			for (final String string : arr) {
-				if (string != null) {
-					_comboEndLocation.add(string);
-				}
-			}
-
 			_comboEndLocation.addModifyListener(new ModifyListener() {
 				@Override
 				public void modifyText(final ModifyEvent e) {
@@ -2826,8 +2815,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				}
 			});
 
+			// fill combobox
+			arr = TourDatabase.getAllTourPlaceEnds();
+			for (final String string : arr) {
+				if (string != null) {
+					_comboEndLocation.add(string);
+				}
+			}
 			new AutocompleteComboInput(_comboEndLocation);
-
 		}
 	}
 
@@ -6204,37 +6199,33 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_comboTitle.clearSelection();
 			_comboTitle.removeAll();
 			// fill combobox
-			final ArrayList<String> arr = TourDatabase.getAllTourTitles();
+			final TreeSet<String> arr = TourDatabase.getAllTourTitles();
 			for (final String string : arr) {
-				if (string != null) {
-					_comboTitle.add(string);
-				}
+				_comboTitle.add(string);
 			}
 			_comboTitle.update();
 			_isTitleModified = false;
 		}
+
 		if (_isStartLocationModified) {
 			_comboStartLocation.clearSelection();
 			_comboStartLocation.removeAll();
 			// fill combobox
-			final ArrayList<String> arr = TourDatabase.getAllTourPlaceStarts();
+			final TreeSet<String> arr = TourDatabase.getAllTourPlaceStarts();
 			for (final String string : arr) {
-				if (string != null) {
-					_comboStartLocation.add(string);
-				}
+				_comboStartLocation.add(string);
 			}
 			_comboStartLocation.update();
 			_isStartLocationModified = false;
 		}
+
 		if (_isEndLocationModified) {
 			_comboEndLocation.clearSelection();
 			_comboEndLocation.removeAll();
 			// fill combobox
-			final ArrayList<String> arr = TourDatabase.getAllTourPlaceEnds();
+			final TreeSet<String> arr = TourDatabase.getAllTourPlaceEnds();
 			for (final String string : arr) {
-				if (string != null) {
-					_comboEndLocation.add(string);
-				}
+				_comboEndLocation.add(string);
 			}
 			_comboEndLocation.update();
 			_isEndLocationModified = false;

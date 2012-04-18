@@ -4,12 +4,19 @@ Release Notes
 -------------
 
 New
-===
+---
 
 - use proxy when accessing internet, provided by Meinhard Ritscher
 
 
+Improvements
+------------
+
+- type ahead for tour marker label
+- improved performance for type ahead lists (they have been loaded every time from the database) 
+
+
 Bugfix
-======
+------
 
 - gpx export: enclose <time> and <bounds> with <metadata>, provided by markxy (sourceforge user)

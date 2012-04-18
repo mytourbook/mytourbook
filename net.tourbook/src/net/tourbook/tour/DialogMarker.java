@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,7 +17,9 @@ package net.tourbook.tour;
 
 import java.text.NumberFormat;
 import java.util.HashSet;
+import java.util.TreeSet;
 
+import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ChartDataModel;
@@ -25,6 +27,7 @@ import net.tourbook.chart.ChartLabel;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.ViewerDetailForm;
 import net.tourbook.ui.tourChart.TourChart;
@@ -71,14 +74,13 @@ import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.Text;
 
 public class DialogMarker extends TitleAreaDialog {
 
 	private static final String		DIALOG_SETTINGS_POSITION		= "marker_position";								//$NON-NLS-1$
 	private static final String		DIALOG_SETTINGS_VIEWER_WIDTH	= "viewer_width";									//$NON-NLS-1$
 
-//	private static final int	COLUMN_FORCE_RIGHT_ALIGN		= 0;
+//	private static final int		COLUMN_FORCE_RIGHT_ALIGN		= 0;
 	private static final int		COLUMN_DISTANCE					= 1;
 	private static final int		COLUMN_MARKER_LABEL				= 2;
 	private static final int		COLUMN_X_OFFSET					= 3;
@@ -118,8 +120,9 @@ public class DialogMarker extends TitleAreaDialog {
 	 */
 	private TableViewer				_markerViewer;
 
-	private Text					_txtMarkerName;
-	private Combo					_cboMarkerPosition;
+//	private Text					_txtMarkerName;
+	private Combo					_comboMarkerName;
+	private Combo					_comboMarkerPosition;
 
 	private Scale					_scaleX;
 	private Label					_lblXValue;
@@ -260,8 +263,7 @@ public class DialogMarker extends TitleAreaDialog {
 		_markerViewer.refresh();
 		_markerViewer.setSelection(new StructuredSelection(newTourMarker), true);
 
-		_txtMarkerName.selectAll();
-		_txtMarkerName.setFocus();
+		_comboMarkerName.setFocus();
 
 		// update chart
 		_tourChart.updateLayerMarker(true);
@@ -326,8 +328,7 @@ public class DialogMarker extends TitleAreaDialog {
 			_markerViewer.setSelection(new StructuredSelection(_initialTourMarker), true);
 		}
 
-		_txtMarkerName.selectAll();
-		_txtMarkerName.setFocus();
+		_comboMarkerName.setFocus();
 
 		enableControls();
 
@@ -499,8 +500,7 @@ public class DialogMarker extends TitleAreaDialog {
 
 		_markerViewer.addDoubleClickListener(new IDoubleClickListener() {
 			public void doubleClick(final DoubleClickEvent event) {
-				_txtMarkerName.setFocus();
-				_txtMarkerName.selectAll();
+				_comboMarkerName.setFocus();
 			}
 		});
 
@@ -518,24 +518,29 @@ public class DialogMarker extends TitleAreaDialog {
 		GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
 		// markerSettingsContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 		{
-			/*
-			 * marker name
-			 */
 			label = new Label(container, SWT.NONE);
 			label.setText(Messages.Dlg_TourMarker_Label_marker_name);
 
-			_txtMarkerName = new Text(container, SWT.BORDER);
-			GridDataFactory.fillDefaults()//
-					.grab(true, false)
-//					.minSize(convertWidthInCharsToPixels(10), SWT.DEFAULT)
-					.applyTo(_txtMarkerName);
-
-			_txtMarkerName.addKeyListener(new KeyAdapter() {
+			/*
+			 * marker name
+			 */
+			_comboMarkerName = new Combo(container, SWT.BORDER | SWT.FLAT);
+			_comboMarkerName.addKeyListener(new KeyAdapter() {
 				@Override
 				public void keyReleased(final KeyEvent e) {
 					onChangeMarkerUI();
 				}
 			});
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_comboMarkerName);
+//			_comboMarkerName.setText(UI.EMPTY_STRING);
+
+			// fill combobox
+			final TreeSet<String> dbTitles = TourDatabase.getAllTourMarkerNames();
+			for (final String title : dbTitles) {
+				_comboMarkerName.add(title);
+			}
+
+			new AutocompleteComboInput(_comboMarkerName);
 
 			/*
 			 * marker position
@@ -543,9 +548,9 @@ public class DialogMarker extends TitleAreaDialog {
 			label = new Label(container, SWT.NONE);
 			label.setText(Messages.Dlg_TourMarker_Label_position);
 
-			_cboMarkerPosition = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-			_cboMarkerPosition.setVisibleItemCount(20);
-			_cboMarkerPosition.addSelectionListener(new SelectionAdapter() {
+			_comboMarkerPosition = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+			_comboMarkerPosition.setVisibleItemCount(20);
+			_comboMarkerPosition.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					onChangeMarkerUI();
@@ -554,7 +559,7 @@ public class DialogMarker extends TitleAreaDialog {
 
 			// fill position combo
 			for (final String position : TourMarker.visualPositionLabels) {
-				_cboMarkerPosition.add(position);
+				_comboMarkerPosition.add(position);
 			}
 		}
 	}
@@ -724,8 +729,8 @@ public class DialogMarker extends TitleAreaDialog {
 			_btnReset.setEnabled(false);
 		}
 
-		_txtMarkerName.setEnabled(isMarkerAvailable);
-		_cboMarkerPosition.setEnabled(isMarkerAvailable);
+		_comboMarkerName.setEnabled(isMarkerAvailable);
+		_comboMarkerPosition.setEnabled(isMarkerAvailable);
 		_scaleX.setEnabled(isMarkerAvailable);
 		_scaleY.setEnabled(isMarkerAvailable);
 	}
@@ -861,7 +866,7 @@ public class DialogMarker extends TitleAreaDialog {
 
 	private void saveState() {
 
-		_state.put(DIALOG_SETTINGS_POSITION, _cboMarkerPosition.getSelectionIndex());
+		_state.put(DIALOG_SETTINGS_POSITION, _comboMarkerPosition.getSelectionIndex());
 		_state.put(DIALOG_SETTINGS_VIEWER_WIDTH, _markerListContainer.getSize().x);
 	}
 
@@ -871,8 +876,8 @@ public class DialogMarker extends TitleAreaDialog {
 			return;
 		}
 
-		tourMarker.setLabel(_txtMarkerName.getText());
-		tourMarker.setVisualPosition(_cboMarkerPosition.getSelectionIndex());
+		tourMarker.setLabel(_comboMarkerName.getText());
+		tourMarker.setVisualPosition(_comboMarkerPosition.getSelectionIndex());
 
 		tourMarker.setLabelXOffset(_scaleX.getSelection() - OFFSET_0);
 		tourMarker.setLabelYOffset(_scaleY.getSelection() - OFFSET_0);
@@ -886,8 +891,8 @@ public class DialogMarker extends TitleAreaDialog {
 		// make the marker more visible by setting another type
 		_selectedTourMarker.setVisibleType(ChartLabel.VISIBLE_TYPE_TYPE_EDIT);
 
-		_txtMarkerName.setText(_selectedTourMarker.getLabel());
-		_cboMarkerPosition.select(_selectedTourMarker.getVisualPosition());
+		_comboMarkerName.setText(_selectedTourMarker.getLabel());
+		_comboMarkerPosition.select(_selectedTourMarker.getVisualPosition());
 
 		_scaleX.setSelection(_selectedTourMarker.getLabelXOffset() + OFFSET_0);
 		_scaleY.setSelection(_selectedTourMarker.getLabelYOffset() + OFFSET_0);
