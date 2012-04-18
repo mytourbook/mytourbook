@@ -19,6 +19,7 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.TreeSet;
 
 import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
 import net.tourbook.Messages;
@@ -300,11 +301,9 @@ public class DialogQuickEdit extends TitleAreaDialog {
 					.applyTo(_comboTitle);
 
 			// fill combobox
-			final ArrayList<String> arr = TourDatabase.getAllTourTitles();
-			for (final String string : arr) {
-				if (string != null) {
-					_comboTitle.add(string);
-				}
+			final TreeSet<String> dbTitles = TourDatabase.getAllTourTitles();
+			for (final String title : dbTitles) {
+				_comboTitle.add(title);
 			}
 
 			new AutocompleteComboInput(_comboTitle);

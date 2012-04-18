@@ -307,6 +307,9 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		return distance20;
 	}
 
+	/**
+	 * @return Returns the marker label or an empty string when the label is not set.
+	 */
 	public String getLabel() {
 		return label;
 	}
