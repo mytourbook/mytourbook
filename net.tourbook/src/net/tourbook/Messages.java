@@ -633,8 +633,10 @@ public class Messages extends NLS {
 	public static String		Image__link;
 	public static String		Image__MyTourbook16;
 	public static String		Image__options;
-	public static String	Image__PhotoInfo;
-
+	public static String		Image__PhotoInfoDate;
+	public static String		Image__PhotoInfoName;
+	public static String		Image__PhotoSortByDate;
+	public static String		Image__PhotoSortByName;
 	public static String		Image__PulseZones;
 	public static String		Image__PulseZones_Disabled;
 	public static String		Image__quick_edit;
@@ -651,8 +653,6 @@ public class Messages extends NLS {
 	public static String		Image__show_distance_on_x_axis;
 	public static String		Image__show_distance_on_x_axis_disabled;
 	public static String		Image__show_time_on_x_axis;
-	public static String		Image__SortByDate;
-	public static String		Image__SortByName;
 	public static String		Image__spline_point;
 	public static String		Image__synch_graph_byScale;
 	public static String		Image__synch_graph_byScale_disabled;

@@ -19,19 +19,19 @@ import net.tourbook.application.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionShowPhotoInfo extends Action {
+public class ActionShowPhotoDate extends Action {
 
 	private PicDirView	_picDirView;
 
-	public ActionShowPhotoInfo(final PicDirView picDirView) {
+	public ActionShowPhotoDate(final PicDirView picDirView) {
 
-		super(Messages.Pic_Dir_Action_ShowPhotoInfo, AS_CHECK_BOX);
+		super(Messages.Pic_Dir_Action_ShowPhotoInfoFileDate, AS_CHECK_BOX);
 
 		_picDirView = picDirView;
 
-		setToolTipText(Messages.Pic_Dir_Action_ShowPhotoInfo_Tooltip);
+		setToolTipText(Messages.Pic_Dir_Action_ShowPhotoInfoFileDate_Tooltip);
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(net.tourbook.Messages.Image__PhotoInfo));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(net.tourbook.Messages.Image__PhotoInfoDate));
 	}
 
 	@Override

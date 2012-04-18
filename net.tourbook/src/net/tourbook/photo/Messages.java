@@ -32,9 +32,13 @@ public class Messages extends NLS {
 	public static String		Pic_Dir_Action_Refresh;
 	public static String		Pic_Dir_Action_RemoveInvalidFolders;
 	public static String		Pic_Dir_Action_RunFileBrowser;
-	public static String	Pic_Dir_Action_ShowPhotoInfo;
+	public static String	Pic_Dir_Action_ShowPhotoFileName;
 
-	public static String	Pic_Dir_Action_ShowPhotoInfo_Tooltip;
+	public static String	Pic_Dir_Action_ShowPhotoFileName_Tooltip;
+
+	public static String	Pic_Dir_Action_ShowPhotoInfoFileDate;
+
+	public static String	Pic_Dir_Action_ShowPhotoInfoFileDate_Tooltip;
 
 	public static String		Pic_Dir_Action_SingleClickExpand;
 	public static String		Pic_Dir_Action_SingleExpandCollapseOthers;

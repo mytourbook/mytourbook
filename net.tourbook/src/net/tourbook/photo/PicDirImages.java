@@ -169,7 +169,7 @@ public class PicDirImages {
 	private NoGroupRendererMT						_groupRenderer;
 
 	/**
-	 * Photo image height (thumbnail size)
+	 * Photo image width (thumbnail size)
 	 */
 	private int										_photoWidth						= PhotoManager.IMAGE_SIZE_THUMBNAIL;
 
@@ -1261,9 +1261,9 @@ public class PicDirImages {
 		workerUpdate(imageFolder, isReloadFolder);
 	}
 
-	void showInfo(final boolean isShowInfo, final boolean isUpdateGallery) {
+	void showInfo(final boolean isShowPhotoName, final boolean isShowPhotoDate, final boolean isUpdateGallery) {
 
-		_photoRenderer.setShowLabels(isShowInfo);
+		_photoRenderer.setShowLabels(isShowPhotoName, isShowPhotoDate);
 
 		if (isUpdateGallery) {
 			_gallery.redraw();

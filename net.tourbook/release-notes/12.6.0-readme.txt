@@ -18,6 +18,7 @@ http://svn.apache.org/repos/asf/commons/proper/sanselan
  
  
 PENDENZEN
+- LINUX: open external app from pic dir folder
 - document key shortcuts: Shortcut_Key_
 - document portable version by setting data directory http://mytourbook.sourceforge.net/mytourbook/index.php/download-install/data-directory
 - Error Log ist jetzt im Help Menü

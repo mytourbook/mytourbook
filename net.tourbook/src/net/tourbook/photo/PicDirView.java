@@ -23,6 +23,7 @@ import net.tourbook.ui.ViewerDetailForm;
 import net.tourbook.util.Util;
 
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -46,7 +47,8 @@ public class PicDirView extends ViewPart {
 
 	private static final String				STATE_TREE_WIDTH					= "STATE_TREE_WIDTH";						//$NON-NLS-1$
 	private static final String				STATE_GALLERY_SORTING				= "STATE_GALLERY_SORTING";					//$NON-NLS-1$
-	private static final String				STATE_IS_SHOW_PHOTO_INFO_IN_GALLERY	= "STATE_IS_SHOW_PHOTO_INFO_IN_GALLERY";	//$NON-NLS-1$
+	private static final String				STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY	= "STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY";	//$NON-NLS-1$
+	private static final String				STATE_IS_SHOW_PHOTO_DATE_IN_GALLERY	= "STATE_IS_SHOW_PHOTO_DATE_IN_GALLERY";	//$NON-NLS-1$
 
 	private static final IDialogSettings	_state								= TourbookPlugin.getDefault()//
 																						.getDialogSettingsSection(
@@ -62,7 +64,8 @@ public class PicDirView extends ViewPart {
 	private PicDirFolder					_picDirFolder;
 	private PicDirImages					_picDirImages;
 
-	private ActionShowPhotoInfo				_actionShowPhotoInfo;
+	private ActionShowPhotoDate				_actionShowPhotoDate;
+	private ActionShowPhotoName				_actionShowPhotoName;
 	private ActionSortByFileDate			_actionSortFileByDate;
 	private ActionSortByFileName			_actionSortByFileName;
 
@@ -164,10 +167,7 @@ public class PicDirView extends ViewPart {
 	}
 
 	void actionShowPhotoInfo() {
-
-		final boolean isShowInfo = _actionShowPhotoInfo.isChecked();
-
-		_picDirImages.showInfo(isShowInfo, true);
+		_picDirImages.showInfo(_actionShowPhotoName.isChecked(), _actionShowPhotoDate.isChecked(), true);
 	}
 
 	void actionSortByDate() {
@@ -250,10 +250,11 @@ public class PicDirView extends ViewPart {
 
 	private void createActions() {
 
-		_actionShowPhotoInfo = new ActionShowPhotoInfo(this);
-		_actionSortFileByDate = new ActionSortByFileDate(this);
-		_actionSortByFileName = new ActionSortByFileName(this);
+		_actionShowPhotoName = new ActionShowPhotoName(this);
+		_actionShowPhotoDate = new ActionShowPhotoDate(this);
 
+		_actionSortByFileName = new ActionSortByFileName(this);
+		_actionSortFileByDate = new ActionSortByFileDate(this);
 	}
 
 	@Override
@@ -324,10 +325,12 @@ public class PicDirView extends ViewPart {
 		 */
 		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
-		tbm.add(_actionShowPhotoInfo);
-		tbm.add(_actionSortFileByDate);
+		tbm.add(_actionShowPhotoName);
+		tbm.add(_actionShowPhotoDate);
+		tbm.add(new Separator());
+
 		tbm.add(_actionSortByFileName);
-//		tbm.add(new Separator());
+		tbm.add(_actionSortFileByDate);
 	}
 
 	private void onPartClose() {
@@ -347,9 +350,12 @@ public class PicDirView extends ViewPart {
 		/*
 		 * photo info
 		 */
-		final boolean isShowPhotoInfo = Util.getStateBoolean(_state, STATE_IS_SHOW_PHOTO_INFO_IN_GALLERY, true);
-		_actionShowPhotoInfo.setChecked(isShowPhotoInfo);
-		_picDirImages.showInfo(isShowPhotoInfo, false);
+		final boolean isShowPhotoName = Util.getStateBoolean(_state, STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY, true);
+		final boolean isShowPhotoDate = Util.getStateBoolean(_state, STATE_IS_SHOW_PHOTO_DATE_IN_GALLERY, true);
+
+		_actionShowPhotoName.setChecked(isShowPhotoName);
+		_actionShowPhotoDate.setChecked(isShowPhotoDate);
+		_picDirImages.showInfo(isShowPhotoName, isShowPhotoDate, false);
 
 		/*
 		 * gallery sorting
@@ -389,7 +395,8 @@ public class PicDirView extends ViewPart {
 			_state.put(STATE_TREE_WIDTH, tree.getSize().x);
 		}
 
-		_state.put(STATE_IS_SHOW_PHOTO_INFO_IN_GALLERY, _actionShowPhotoInfo.isChecked());
+		_state.put(STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY, _actionShowPhotoName.isChecked());
+		_state.put(STATE_IS_SHOW_PHOTO_DATE_IN_GALLERY, _actionShowPhotoDate.isChecked());
 
 		_picDirFolder.saveState(_state);
 		_picDirImages.saveState(_state);

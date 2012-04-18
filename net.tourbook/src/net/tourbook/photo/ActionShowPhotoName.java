@@ -19,23 +19,23 @@ import net.tourbook.application.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionSortByFileDate extends Action {
+public class ActionShowPhotoName extends Action {
 
 	private PicDirView	_picDirView;
 
-	public ActionSortByFileDate(final PicDirView picDirView) {
+	public ActionShowPhotoName(final PicDirView picDirView) {
 
-		super(Messages.Pic_Dir_Action_SortByDate, AS_CHECK_BOX);
+		super(Messages.Pic_Dir_Action_ShowPhotoFileName, AS_CHECK_BOX);
 
 		_picDirView = picDirView;
 
-		setToolTipText(Messages.Pic_Dir_Action_SortByDate_Tooltip);
+		setToolTipText(Messages.Pic_Dir_Action_ShowPhotoFileName_Tooltip);
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(net.tourbook.Messages.Image__PhotoSortByDate));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(net.tourbook.Messages.Image__PhotoInfoName));
 	}
 
 	@Override
 	public void run() {
-		_picDirView.actionSortByDate();
+		_picDirView.actionShowPhotoInfo();
 	}
 }

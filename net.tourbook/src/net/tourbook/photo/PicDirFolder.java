@@ -255,7 +255,9 @@ class PicDirFolder {
 
 			final String[] commandsWin = { "cmd.exe", "/c", //$NON-NLS-1$ //$NON-NLS-2$
 					"\"" + prefExtApp + "\"", //$NON-NLS-1$ //$NON-NLS-2$
-					folder };
+//					"\"" + folder + "\""
+					folder //
+			};
 
 			commands = commandsWin;
 
@@ -280,13 +282,13 @@ class PicDirFolder {
 
 			try {
 
-//				final StringBuilder sb = new StringBuilder();
-//				for (final String cmd : commands) {
-//					sb.append(cmd);
-//					sb.append(" ");
-//				}
-//				System.out.println(sb.toString());
-//				// TODO remove SYSTEM.OUT.PRINTLN
+				final StringBuilder sb = new StringBuilder();
+				int counter = 1;
+				for (final String cmd : commands) {
+					sb.append(Integer.toString(counter++) + ": |" + cmd + "| ");
+				}
+				System.out.println(sb.toString());
+				// TODO remove SYSTEM.OUT.PRINTLN
 
 				Runtime.getRuntime().exec(commands);
 
