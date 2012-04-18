@@ -391,7 +391,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 				ITourbookPreferences.PHOTO_VIEWER_COLOR_FILE,
 				new RGB(0x55, 0xC8, 0xFF));
 
-		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_FONT, "1|sans-serif|6.75|0|"); //$NON-NLS-1$
+		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_FONT, "1|sans-serif|9|0|"); //$NON-NLS-1$
 //																  1|DejaVu Sans|6.75|0|WINDOWS|1|-9|0|0|0|400|0|0|0|0|3|2|1|34|DejaVu Sans
 
 		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_IMAGE_FRAMEWORK, UI.IS_WIN
