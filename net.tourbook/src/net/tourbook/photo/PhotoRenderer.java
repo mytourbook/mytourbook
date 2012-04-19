@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.photo.gallery.DefaultGalleryItemRenderer;
 import net.tourbook.photo.gallery.GalleryMTItem;
 import net.tourbook.photo.gallery.RendererHelper;
@@ -22,6 +23,7 @@ import net.tourbook.photo.manager.Photo;
 import net.tourbook.photo.manager.PhotoImageCache;
 import net.tourbook.photo.manager.PhotoLoadingState;
 import net.tourbook.photo.manager.PhotoManager;
+import net.tourbook.ui.UI;
 import net.tourbook.util.StatusUtil;
 
 import org.eclipse.swt.SWT;
@@ -42,11 +44,16 @@ import org.joda.time.format.DateTimeFormatterBuilder;
  */
 public class PhotoRenderer extends DefaultGalleryItemRenderer {
 
-	private static final int		MIN_PHOTO_IMAGE_HEIGHT	= 20;
+	/**
+	 * this value has been evaluated by some test
+	 */
+	private static final int		MIN_PHOTO_IMAGE_HEIGHT	= 50;
+
+	private static final String		PHOTO_ANNOTATION_GPS	= "PHOTO_ANNOTATION_GPS";	//$NON-NLS-1$
 
 	private int						_fontHeight				= -1;
 
-//	private final DateTimeFormatter	_dtFormatter	= DateTimeFormat.forStyle("SM");
+//	private final DateTimeFormatter	_dtFormatter			= DateTimeFormat.forStyle("SM");
 	private final DateTimeFormatter	_dtFormatter			= new DateTimeFormatterBuilder()
 																	.appendYear(4, 4)
 																	.appendLiteral('-')
@@ -63,6 +70,25 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 
 	private boolean					_isShowPhotoDate;
 	private boolean					_isShowPhotoName;
+	private boolean					_isShowAnnotations;
+
+	private static Image			_annotationGPS;
+	private static int				_gpsWidth;
+	private static int				_gpsHeight;
+
+//	photo-annotation-gps
+
+	static {
+		UI.IMAGE_REGISTRY.put(
+				PHOTO_ANNOTATION_GPS,
+				TourbookPlugin.getImageDescriptor(Messages.Image__PhotoAnnotationGPS));
+
+		_annotationGPS = UI.IMAGE_REGISTRY.get(PHOTO_ANNOTATION_GPS);
+
+		final Rectangle bounds = _annotationGPS.getBounds();
+		_gpsWidth = bounds.width;
+		_gpsHeight = bounds.height;
+	}
 
 	@Override
 	public void dispose() {
@@ -79,7 +105,7 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 						final int galleryItemHeight) {
 
 		if (_fontHeight == -1) {
-			_fontHeight = gc.getFontMetrics().getHeight();
+			_fontHeight = gc.getFontMetrics().getHeight() - 1;
 		}
 
 		final Object itemData = galleryItem.getData();
@@ -90,7 +116,7 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 		} else {
 			// this case should not happten
 			gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_RED));
-			gc.drawText("error: gallery item is not a photo", //
+			gc.drawText("error: gallery item is not a photo", // //$NON-NLS-1$
 					galleryPosX + 3,
 					galleryPosY + 3 + _fontHeight);
 			return;
@@ -100,21 +126,6 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 		final int photoPosY = galleryPosY + 0;
 		final int photoWidth = galleryItemWidth - 2;
 		final int photoHeight = galleryItemHeight - 1;
-
-		int imageCanvasHeight = photoHeight;
-
-		boolean isDrawText = true;
-		if (_isShowPhotoName) {
-			imageCanvasHeight -= _fontHeight;
-		}
-		if (_isShowPhotoDate) {
-			imageCanvasHeight -= _fontHeight;
-		}
-
-//		final int relativePhotoWidth = (int) (imageCanvasHeight * (float) 15 / 11);
-
-//		System.out.println("relativePhotoWidth: " + relativePhotoWidth);
-//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		final int requestedImageQuality = galleryItemWidth > PhotoManager.IMAGE_SIZE_THUMBNAIL
 				? PhotoManager.IMAGE_QUALITY_LARGE_IMAGE
@@ -138,6 +149,8 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 			photoImage = PhotoImageCache.getImage(photo, lowerImageQuality);
 		}
 
+		boolean isDrawText = true;
+
 		gc.setForeground(getForegroundColor());
 		gc.setBackground(getBackgroundColor());
 
@@ -148,64 +161,30 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 			 * picture but not the text is displayed
 			 */
 
-			int imageHeight = imageCanvasHeight;
-			if (imageHeight < MIN_PHOTO_IMAGE_HEIGHT) {
-				imageHeight = photoHeight;
+			if (photoHeight < MIN_PHOTO_IMAGE_HEIGHT) {
 				isDrawText = false;
 			}
 
-			drawImage(gc, photo, photoImage, photoPosX, photoPosY, photoWidth, imageHeight, isRequestedQuality);
+			drawImage(gc, photo, photoImage, photoPosX, photoPosY, photoWidth, photoHeight, isRequestedQuality);
 
 		} else {
 
 			// image is not available
 
-			drawStatusText(gc, photo, photoPosX, photoPosY, photoWidth, imageCanvasHeight, requestedImageQuality);
+			drawStatusText(gc, photo, photoPosX, photoPosY, photoWidth, photoHeight, requestedImageQuality);
 		}
 
-		// draw name & date
+		// draw name & date & annotations
 		if (isDrawText && (_isShowPhotoName || _isShowPhotoDate)) {
+			drawInfoText(gc, photo, photoPosX, photoPosY, photoWidth, photoHeight);
+		}
 
-			int textPosY = photoPosY + imageCanvasHeight;
-
-			gc.setForeground(getForegroundColor());
-			gc.setBackground(getBackgroundColor());
-
-			/*
-			 * draw 1st line
-			 */
-			if (_isShowPhotoDate) {
-
-				final DateTime dateTime = photo.getFileDateTime();
-				if (dateTime != null) {
-
-					final String textDateTime = _dtFormatter.print(dateTime);
-
-					// Center text
-					final int textWidth = gc.textExtent(textDateTime).x;
-					final int textOffset = (photoWidth - (textWidth > photoWidth ? photoWidth : textWidth)) / 2;
-
-//					gc.setBackground(gc.getDevice().getSystemColor(SWT.COLOR_RED));
-					gc.drawString(textDateTime, photoPosX + textOffset, textPosY, true);
-
-					// advance to next position
-					textPosY = textPosY + _fontHeight;
-				}
-			}
-
-			/*
-			 * draw 2nd line
-			 */
-			if (_isShowPhotoName) {
-
-				// Center text
-				final String text = galleryItem.getText();
-				final int textWidth = gc.textExtent(text).x;
-				final int textOffset = (photoWidth - (textWidth > photoWidth ? photoWidth : textWidth)) / 2;
-
-//				gc.setBackground(gc.getDevice().getSystemColor(SWT.COLOR_BLUE));
-				gc.drawString(text, photoPosX + textOffset, textPosY, true);
-			}
+		// annotations are drawn on top of the info lines
+//		if (isDrawText && _isShowAnnotations && photo.getGeoPosition() != null) {
+		if (_isShowAnnotations && photo.getGeoPosition() != null) {
+			gc.drawImage(_annotationGPS, //
+					photoPosX + photoWidth - _gpsWidth,
+					photoPosY + photoHeight - _gpsHeight);
 		}
 
 		// debug box for the whole gallery item area
@@ -277,7 +256,6 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 
 				if (photoPaintedWidth > photoWidthRotated || photoPaintedHeight > photoHeightRotated) {
 
-
 					photoPaintedWidth = photoWidthRotated;
 					photoPaintedHeight = photoHeightRotated;
 				}
@@ -331,9 +309,9 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 				final int markerSize = 9;
 
 				gc.setBackground(getSelectionForegroundColor());
-				gc.fillRectangle(
+				gc.fillRectangle(//
 						destX + photoPaintedWidth - markerSize,
-						destY + photoPaintedHeight - markerSize,
+						destY,// + photoPaintedHeight - markerSize,
 						markerSize,
 						markerSize);
 			}
@@ -342,15 +320,111 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 
 			gc.drawString(e.getMessage(), photoPosX, photoPosY);
 
-			final String message = ("srcWidth: " + imageWidth)
-					+ ("  srcHeight:" + imageHeight)
-					+ ("  destX:" + destX)
-					+ ("  destY:" + destY)
-					+ ("  destWidth: " + photoPaintedWidth)
-					+ ("  destHeight :" + photoPaintedHeight)
-					+ ("  " + photo);
+			final String message = ("srcWidth: " + imageWidth) //$NON-NLS-1$
+					+ ("  srcHeight:" + imageHeight) //$NON-NLS-1$
+					+ ("  destX:" + destX) //$NON-NLS-1$
+					+ ("  destY:" + destY) //$NON-NLS-1$
+					+ ("  destWidth: " + photoPaintedWidth) //$NON-NLS-1$
+					+ ("  destHeight :" + photoPaintedHeight) //$NON-NLS-1$
+					+ ("  " + photo); //$NON-NLS-1$
 
 			StatusUtil.log(message, e);
+		}
+	}
+
+	private void drawInfoText(	final GC gc,
+								final Photo photo,
+								final int photoPosX,
+								final int photoPosY,
+								final int photoWidth,
+								final int photoHeight) {
+
+		/*
+		 * get text for date/filename
+		 */
+		int textFileNameWidth = -1;
+		int textDateTimeWidth = -1;
+		String textFileName = null;
+		String textDateTime = null;
+
+		int textFileNamePosCenterX = 0;
+		int textDateTimePosCenterX = 0;
+
+		if (_isShowPhotoName) {
+			textFileName = photo.getFileName();
+			textFileNameWidth = gc.textExtent(textFileName).x;
+
+			textFileNamePosCenterX = (photoWidth - (textFileNameWidth > photoWidth ? photoWidth : textFileNameWidth)) / 2;
+		}
+		if (_isShowPhotoDate) {
+			final DateTime dateTime = photo.getFileDateTime();
+			if (dateTime != null) {
+				textDateTime = _dtFormatter.print(dateTime);
+				textDateTimeWidth = gc.textExtent(textDateTime).x;
+
+				textDateTimePosCenterX = (photoWidth - (textDateTimeWidth > photoWidth ? photoWidth : textDateTimeWidth)) / 2;
+			}
+		}
+
+		/*
+		 * get text position
+		 */
+		final int defaultTextPosY = photoPosY + photoHeight - _fontHeight;
+
+		int posXFilename = photoPosX;
+		int posYFilename = defaultTextPosY;
+		int posXDate = photoPosX;
+		final int posYDate = defaultTextPosY;
+
+		if (textFileNameWidth != -1 && textDateTimeWidth != -1) {
+
+			// paint filename & date
+
+			final int textSpacing = 10;
+			final int textWidth = textFileNameWidth + textSpacing + textDateTimeWidth;
+
+			if (textWidth > photoWidth) {
+
+				// paint on top of each other, filename first
+
+				posXFilename += textFileNamePosCenterX;
+				posXDate += textDateTimePosCenterX;
+				posYFilename -= _fontHeight;
+
+			} else {
+
+				// center text
+
+				final int textX = (photoWidth - textWidth) / 2;
+				posXFilename += textX;
+				posXDate += textX + textFileNameWidth + textSpacing;
+			}
+
+		} else if (textFileNameWidth != -1) {
+
+			// paint only filename
+			posXFilename += textFileNamePosCenterX;
+
+		} else if (textDateTimeWidth != -1) {
+
+			// paint only date
+			posXDate += textDateTimePosCenterX;
+		}
+
+		/*
+		 * draw text
+		 */
+		gc.setForeground(getForegroundColor());
+		gc.setBackground(getBackgroundColor());
+
+		// draw filename
+		if (textFileNameWidth != -1) {
+			gc.drawString(textFileName, posXFilename, posYFilename, false);
+		}
+
+		// draw date time
+		if (textDateTimeWidth != -1) {
+			gc.drawString(textDateTime, posXDate, posYDate, false);
 		}
 	}
 
@@ -400,8 +474,11 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 	 * @param isShowPhotoName
 	 * @see DefaultGalleryItemRenderer#isShowLabels()
 	 */
-	public void setShowLabels(final boolean isShowPhotoName, final boolean isShowPhotoDate) {
+	public void setShowLabels(	final boolean isShowPhotoName,
+								final boolean isShowPhotoDate,
+								final boolean isShowAnnotations) {
 		_isShowPhotoName = isShowPhotoName;
 		_isShowPhotoDate = isShowPhotoDate;
+		_isShowAnnotations = isShowAnnotations;
 	}
 }

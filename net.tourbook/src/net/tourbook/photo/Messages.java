@@ -25,6 +25,10 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_Photo_OtherTags;
 	public static String		ColumnFactory_Photo_Time;
 
+	public static String		Image__PhotoAnnotationGPS;
+
+	public static String	Image__PhotoInfoAnnotations;
+
 	public static String		Pic_Dir_Action_ClearHistory;
 	public static String		Pic_Dir_Action_NavigateHistoryBackward;
 	public static String		Pic_Dir_Action_NavigateHistoryForward;
@@ -32,14 +36,14 @@ public class Messages extends NLS {
 	public static String		Pic_Dir_Action_Refresh;
 	public static String		Pic_Dir_Action_RemoveInvalidFolders;
 	public static String		Pic_Dir_Action_RunFileBrowser;
-	public static String	Pic_Dir_Action_ShowPhotoFileName;
+	public static String	Pic_Dir_Action_ShowPhotoAnnotations;
 
-	public static String	Pic_Dir_Action_ShowPhotoFileName_Tooltip;
+	public static String	Pic_Dir_Action_ShowPhotoAnnotations_Tooltip;
 
-	public static String	Pic_Dir_Action_ShowPhotoInfoFileDate;
-
-	public static String	Pic_Dir_Action_ShowPhotoInfoFileDate_Tooltip;
-
+	public static String		Pic_Dir_Action_ShowPhotoFileName;
+	public static String		Pic_Dir_Action_ShowPhotoFileName_Tooltip;
+	public static String		Pic_Dir_Action_ShowPhotoInfoFileDate;
+	public static String		Pic_Dir_Action_ShowPhotoInfoFileDate_Tooltip;
 	public static String		Pic_Dir_Action_SingleClickExpand;
 	public static String		Pic_Dir_Action_SingleExpandCollapseOthers;
 	public static String		Pic_Dir_Action_SortByDate;
@@ -106,8 +110,7 @@ public class Messages extends NLS {
 	public static String		PrefPage_Photo_Viewer_Label_ImageFramework;
 	public static String		PrefPage_Photo_Viewer_Label_ResizeImageQuality;
 	public static String		PrefPage_Photo_Viewer_Label_ResizeImageQuality_Tooltip;
-
-	public static String	PrefPage_Photo_Viewer_Label_SelectionForegroundColor;
+	public static String		PrefPage_Photo_Viewer_Label_SelectionForegroundColor;
 	public static String		PrefPage_Photo_Viewer_Radio_ImageFramework_AWT;
 	public static String		PrefPage_Photo_Viewer_Radio_ImageFramework_AWT_Tooltip;
 	public static String		PrefPage_Photo_Viewer_Radio_ImageFramework_SWT;

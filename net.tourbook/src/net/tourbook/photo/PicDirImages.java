@@ -914,7 +914,6 @@ public class PicDirImages {
 			final Photo photo = new Photo(_photoFiles[galleryItemIndex], galleryItemIndex);
 
 			galleryItem.setData(photo);
-			galleryItem.setText(photo.getFileName());
 		}
 	}
 
@@ -1265,9 +1264,12 @@ public class PicDirImages {
 		workerUpdate(imageFolder, isReloadFolder);
 	}
 
-	void showInfo(final boolean isShowPhotoName, final boolean isShowPhotoDate, final boolean isUpdateGallery) {
+	void showInfo(	final boolean isShowPhotoName,
+					final boolean isShowPhotoDate,
+					final boolean isShowAnnotations,
+					final boolean isUpdateGallery) {
 
-		_photoRenderer.setShowLabels(isShowPhotoName, isShowPhotoDate);
+		_photoRenderer.setShowLabels(isShowPhotoName, isShowPhotoDate, isShowAnnotations);
 
 		if (isUpdateGallery) {
 			_gallery.redraw();

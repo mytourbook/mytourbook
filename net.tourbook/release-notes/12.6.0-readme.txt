@@ -10,7 +10,9 @@ Improved usability, started to implement key shortcuts:
 	<Alt>+Right
 
 
-
+PROBLEMS:
+- it can happen that the selected external app cannot open selected folder when the folder name contains space characters 
+ 
  
 Used resources from:
 :pserver:anonymous@dev.eclipse.org:/cvsroot/technology
