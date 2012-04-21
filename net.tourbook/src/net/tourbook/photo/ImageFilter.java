@@ -13,21 +13,23 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.photo.manager;
+package net.tourbook.photo;
 
-import org.eclipse.swt.graphics.Image;
+enum ImageFilter {
 
-/**
- * This wrapper tries to store a minimum of data
- */
-public class ImageCacheWrapper {
+	/**
+	 * an image filter is not set, all images are displayed
+	 */
+	NoFilter,
 
-	public Image				image;
-	public PhotoImageMetadata	photoMetadata;
+	/**
+	 * images with GPS data are displayed
+	 */
+	GPS,
 
-	public ImageCacheWrapper(final Image image, final PhotoImageMetadata photoMetadata) {
-		this.image = image;
-		this.photoMetadata = photoMetadata;
-	}
+	/**
+	 * images without GPS data are displayed
+	 */
+	NoGPS,
 
 }

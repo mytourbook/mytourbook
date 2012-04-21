@@ -26,20 +26,30 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_Photo_Time;
 
 	public static String		Image__PhotoAnnotationGPS;
-
-	public static String	Image__PhotoInfoAnnotations;
+	public static String		Image__PhotoFilterGPS;
+	public static String		Image__PhotoFilterNoFilter;
+	public static String		Image__PhotoFilterNoGPS;
+	public static String		Image__PhotoInfoAnnotations;
 
 	public static String		Pic_Dir_Action_ClearHistory;
 	public static String		Pic_Dir_Action_NavigateHistoryBackward;
 	public static String		Pic_Dir_Action_NavigateHistoryForward;
+	public static String		Pic_Dir_Action_PhotoFilterGPS;
+	public static String		Pic_Dir_Action_PhotoFilterGPS_Tooltip;
+
+	public static String	Pic_Dir_Action_PhotoFilterGPSTooltip;
+	public static String	Pic_Dir_Action_PhotoFilterNoFilter;
+
+	public static String		Pic_Dir_Action_PhotoFilterNoFilter_Tooltip;
+	public static String	Pic_Dir_Action_PhotoFilterNoGPS;
+
+	public static String		Pic_Dir_Action_PhotoFilterNoGPS_Tooltip;
 	public static String		Pic_Dir_Action_Preferences;
 	public static String		Pic_Dir_Action_Refresh;
 	public static String		Pic_Dir_Action_RemoveInvalidFolders;
 	public static String		Pic_Dir_Action_RunFileBrowser;
-	public static String	Pic_Dir_Action_ShowPhotoAnnotations;
-
-	public static String	Pic_Dir_Action_ShowPhotoAnnotations_Tooltip;
-
+	public static String		Pic_Dir_Action_ShowPhotoAnnotations;
+	public static String		Pic_Dir_Action_ShowPhotoAnnotations_Tooltip;
 	public static String		Pic_Dir_Action_ShowPhotoFileName;
 	public static String		Pic_Dir_Action_ShowPhotoFileName_Tooltip;
 	public static String		Pic_Dir_Action_ShowPhotoInfoFileDate;

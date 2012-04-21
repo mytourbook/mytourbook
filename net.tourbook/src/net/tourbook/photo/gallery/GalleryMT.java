@@ -2108,7 +2108,7 @@ public class GalleryMT extends Canvas {
 
 	void onPaint(final GC gc) {
 
-		final long start = System.nanoTime();
+//		final long start = System.nanoTime();
 
 		int itemWidth = -1;
 		if (groupRenderer instanceof AbstractGridGroupRenderer) {
@@ -2200,8 +2200,8 @@ public class GalleryMT extends Canvas {
 			}
 		}
 
-		final float timeDiff = (float) (System.nanoTime() - start) / 1000000;
-		if (timeDiff > 10) {}
+//		final float timeDiff = (float) (System.nanoTime() - start) / 1000000;
+//		if (timeDiff > 10) {}
 //		System.out.println("onPaint:\t" + timeDiff + " ms\t" + clipping);
 		// TODO remove SYSTEM.OUT.PRINTLN
 	}
@@ -2653,6 +2653,7 @@ public class GalleryMT extends Canvas {
 
 		updateStructuralValues(null, true);
 		updateScrollBarsProperties();
+
 		redraw();
 	}
 

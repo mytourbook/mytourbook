@@ -19,9 +19,11 @@ import java.io.File;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.photo.manager.ThumbnailStore;
+import net.tourbook.ui.UI;
 import net.tourbook.ui.ViewerDetailForm;
 import net.tourbook.util.Util;
 
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -47,9 +49,14 @@ public class PicDirView extends ViewPart {
 
 	private static final String				STATE_TREE_WIDTH							= "STATE_TREE_WIDTH";							//$NON-NLS-1$
 	private static final String				STATE_GALLERY_SORTING						= "STATE_GALLERY_SORTING";						//$NON-NLS-1$
+	private static final String				STATE_IMAGE_FILTER							= "STATE_IMAGE_FILTER";						//$NON-NLS-1$
 	private static final String				STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY			= "STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY";		//$NON-NLS-1$
 	private static final String				STATE_IS_SHOW_PHOTO_DATE_IN_GALLERY			= "STATE_IS_SHOW_PHOTO_DATE_IN_GALLERY";		//$NON-NLS-1$
 	private static final String				STATE_IS_SHOW_PHOTO_ANNOTATIONS_IN_GALLERY	= "STATE_IS_SHOW_PHOTO_ANNOTATIONS_IN_GALLERY"; //$NON-NLS-1$
+
+	static final String						IMAGE_PHOTO_FILTER_NO_FILTER				= "IMAGE_PHOTO_FILTER_NO_FILTER";				//$NON-NLS-1$
+	static final String						IMAGE_PHOTO_FILTER_GPS						= "IMAGE_PHOTO_FILTER_GPS";					//$NON-NLS-1$
+	static final String						IMAGE_PHOTO_FILTER_NO_GPS					= "IMAGE_PHOTO_FILTER_NO_GPS";					//$NON-NLS-1$
 
 	private static final IDialogSettings	_state										= TourbookPlugin.getDefault()//
 																								.getDialogSettingsSection(
@@ -65,6 +72,8 @@ public class PicDirView extends ViewPart {
 	private PicDirFolder					_picDirFolder;
 	private PicDirImages					_picDirImages;
 
+	private ActionImageFilterGPS			_actionImageFilterGPS;
+	private ActionImageFilterNoGPS			_actionImageFilterNoGPS;
 	private ActionShowPhotoName				_actionShowPhotoName;
 	private ActionShowPhotoDate				_actionShowPhotoDate;
 	private ActionShowPhotoAnnotations		_actionShowPhotoAnnotations;
@@ -78,6 +87,19 @@ public class PicDirView extends ViewPart {
 	private Composite						_containerFolder;
 	private Composite						_containerImages;
 
+	private ImageFilter						_currentImageFilter							= ImageFilter.NoFilter;
+
+	static {
+		UI.IMAGE_REGISTRY.put(
+				IMAGE_PHOTO_FILTER_NO_FILTER,
+				TourbookPlugin.getImageDescriptor(Messages.Image__PhotoFilterNoFilter));
+		UI.IMAGE_REGISTRY.put(//
+				IMAGE_PHOTO_FILTER_GPS,
+				TourbookPlugin.getImageDescriptor(Messages.Image__PhotoFilterGPS));
+		UI.IMAGE_REGISTRY.put(
+				IMAGE_PHOTO_FILTER_NO_GPS,
+				TourbookPlugin.getImageDescriptor(Messages.Image__PhotoFilterNoGPS));
+	}
 
 	static int compareFiles(final File file1, final File file2) {
 
@@ -169,6 +191,27 @@ public class PicDirView extends ViewPart {
 		sortBlock(files, 0, files.length - 1, new File[files.length]);
 	}
 
+	void actionImageFilter(final Action actionImageFilter) {
+
+		/*
+		 * get selected filter, uncheck other
+		 */
+		if (actionImageFilter == _actionImageFilterGPS) {
+
+			_currentImageFilter = actionImageFilter.isChecked() ? ImageFilter.GPS : ImageFilter.NoFilter;
+
+			_actionImageFilterNoGPS.setChecked(false);
+
+		} else if (actionImageFilter == _actionImageFilterNoGPS) {
+
+			_currentImageFilter = actionImageFilter.isChecked() ? ImageFilter.NoGPS : ImageFilter.NoFilter;
+
+			_actionImageFilterGPS.setChecked(false);
+		}
+
+		// update gallery
+	}
+
 	void actionShowPhotoInfo() {
 		_picDirImages.showInfo(
 				_actionShowPhotoName.isChecked(),
@@ -257,6 +300,9 @@ public class PicDirView extends ViewPart {
 
 	private void createActions() {
 
+		_actionImageFilterGPS = new ActionImageFilterGPS(this);
+		_actionImageFilterNoGPS = new ActionImageFilterNoGPS(this);
+
 		_actionShowPhotoName = new ActionShowPhotoName(this);
 		_actionShowPhotoDate = new ActionShowPhotoDate(this);
 		_actionShowPhotoAnnotations = new ActionShowPhotoAnnotations(this);
@@ -333,6 +379,10 @@ public class PicDirView extends ViewPart {
 		 */
 		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
+		tbm.add(_actionImageFilterGPS);
+		tbm.add(_actionImageFilterNoGPS);
+		tbm.add(new Separator());
+
 		tbm.add(_actionShowPhotoName);
 		tbm.add(_actionShowPhotoDate);
 		tbm.add(_actionShowPhotoAnnotations);
@@ -355,6 +405,18 @@ public class PicDirView extends ViewPart {
 	private void restoreState() {
 
 		_containerMasterDetail.setViewerWidth(Util.getStateInt(_state, STATE_TREE_WIDTH, 200));
+
+		/*
+		 * image filter
+		 */
+		final String prefImageFilter = Util.getStateString(_state, STATE_IMAGE_FILTER, ImageFilter.NoFilter.name());
+		try {
+			_currentImageFilter = ImageFilter.valueOf(prefImageFilter);
+		} catch (final Exception e) {
+			_currentImageFilter = ImageFilter.NoFilter;
+		}
+		_actionImageFilterGPS.setChecked(_currentImageFilter == ImageFilter.GPS);
+		_actionImageFilterNoGPS.setChecked(_currentImageFilter == ImageFilter.NoGPS);
 
 		/*
 		 * photo info
@@ -397,7 +459,14 @@ public class PicDirView extends ViewPart {
 			return;
 		}
 
-		// gallery sorting
+		/*
+		 * image filter
+		 */
+		_state.put(STATE_IMAGE_FILTER, _currentImageFilter.name());
+
+		/*
+		 * gallery sorting
+		 */
 		_state.put(STATE_GALLERY_SORTING, _actionSortFileByDate.isChecked()
 				? GALLERY_SORTING_BY_DATE
 				: GALLERY_SORTING_BY_NAME);
@@ -424,5 +493,4 @@ public class PicDirView extends ViewPart {
 	private void sortGallery() {
 		_picDirImages.sortGallery(_gallerySorting, true);
 	}
-
 }

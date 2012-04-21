@@ -919,8 +919,8 @@ public class PicDirImages {
 
 	/**
 	 * This event checks if the image for the photo is available in the image cache, if not it is
-	 * put into a queue to be loaded, the {@link PhotoRenderer} will then paint the image.
-	 *
+	 * put into a queue to be loaded, {@link PhotoRenderer} will then paint the image.
+	 * 
 	 * @param event
 	 */
 	private void onGallery2PaintItem(final Event event) {

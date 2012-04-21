@@ -31,7 +31,7 @@ import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 import com.googlecode.concurrentlinkedhashmap.EvictionListener;
 
 /**
- * This cache is caching photo images with it's metadata.
+ * This cache is caching photo images and it's metadata.
  */
 public class PhotoImageCache {
 

@@ -13,21 +13,28 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.photo.manager;
+package net.tourbook.photo;
 
-import org.eclipse.swt.graphics.Image;
+import net.tourbook.ui.UI;
 
-/**
- * This wrapper tries to store a minimum of data
- */
-public class ImageCacheWrapper {
+import org.eclipse.jface.action.Action;
 
-	public Image				image;
-	public PhotoImageMetadata	photoMetadata;
+public class ActionImageFilterGPS extends Action {
 
-	public ImageCacheWrapper(final Image image, final PhotoImageMetadata photoMetadata) {
-		this.image = image;
-		this.photoMetadata = photoMetadata;
+	private PicDirView	_picDirView;
+
+	public ActionImageFilterGPS(final PicDirView picDirView) {
+
+		super(Messages.Pic_Dir_Action_PhotoFilterGPS, AS_CHECK_BOX);
+
+		setToolTipText(Messages.Pic_Dir_Action_PhotoFilterGPSTooltip);
+		setImageDescriptor(UI.IMAGE_REGISTRY.getDescriptor(PicDirView.IMAGE_PHOTO_FILTER_GPS));
+
+		_picDirView = picDirView;
 	}
 
+	@Override
+	public void run() {
+		_picDirView.actionImageFilter(this);
+	}
 }
