@@ -108,10 +108,10 @@ public class Photo {
 	 */
 	private final HashMap<Integer, Point>	_worldPosition	= new HashMap<Integer, Point>();
 
-	/**
-	 * Location index in the gallery widget
-	 */
-	private int								_galleryItemIndex;
+//	/**
+//	 * Location index in the gallery widget
+//	 */
+//	private int								_galleryItemIndex;
 
 	/**
 	 * Contains image keys for each image quality which can be used to get images from an image
@@ -127,10 +127,10 @@ public class Photo {
 	/**
 	 * @param galleryItemIndex
 	 */
-	public Photo(final File imageFile, final int galleryItemIndex) {
+	public Photo(final File imageFile) {
 
 		_imageFile = imageFile;
-		_galleryItemIndex = galleryItemIndex;
+//		_galleryItemIndex = galleryItemIndex;
 
 		_fileName = imageFile.getName();
 		_filePathName = imageFile.getAbsolutePath();
@@ -405,9 +405,9 @@ public class Photo {
 		return _filePathName;
 	}
 
-	public int getGalleryIndex() {
-		return _galleryItemIndex;
-	}
+//	public int getGalleryIndex() {
+//		return _galleryItemIndex;
+//	}
 
 	/**
 	 * @return Returns geo position or <code>null</code> when latitude/longitude is not available

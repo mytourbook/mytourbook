@@ -23,7 +23,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.photo.gallery.GalleryMTItem;
+import net.tourbook.photo.gallery.MT20.GalleryMT20Item;
 import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -194,7 +194,7 @@ public class PhotoManager {
 		return hqImageSizeIndex;
 	}
 
-	public static void putImageInHQLoadingQueue(final GalleryMTItem galleryItem,
+	public static void putImageInHQLoadingQueue(final GalleryMT20Item galleryItem,
 												final Photo photo,
 												final int imageQuality,
 												final ILoadCallBack loadCallBack) {
@@ -225,7 +225,7 @@ public class PhotoManager {
 		_executorServiceHQ.submit(executorTask);
 	}
 
-	public static void putImageInLoadingQueue(	final GalleryMTItem galleryItem,
+	public static void putImageInLoadingQueue(	final GalleryMT20Item galleryItem,
 												final Photo photo,
 												final int imageQuality,
 												final ILoadCallBack imageLoadCallback) {

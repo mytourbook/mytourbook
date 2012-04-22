@@ -19,18 +19,16 @@ import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.photo.gallery.GalleryMT;
-import net.tourbook.photo.gallery.GalleryMTItem;
+import net.tourbook.photo.gallery.MT20.GalleryMT20;
+import net.tourbook.photo.gallery.MT20.GalleryMT20Item;
 import net.tourbook.photo.manager.ILoadCallBack;
 import net.tourbook.photo.manager.Photo;
 import net.tourbook.photo.manager.PhotoImageCache;
-import net.tourbook.photo.manager.PhotoLoadingState;
 import net.tourbook.photo.manager.PhotoManager;
 import net.tourbook.photo.manager.ThumbnailStore;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -63,8 +61,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -79,7 +75,7 @@ import org.eclipse.ui.part.PageBook;
 
 /**
  * This class is a compilation from different source codes:
- *
+ * 
  * <pre>
  * org.eclipse.swt.examples.fileviewer
  * org.sharemedia.gui.libraryviews.GalleryLibraryView
@@ -166,7 +162,7 @@ public class PicDirImages {
 	private PicDirView								_picDirView;
 
 	private PhotoRenderer							_photoRenderer;
-	private NoGroupRendererMT						_groupRenderer;
+//	private NoGroupRendererMT						_groupRenderer;
 
 	/**
 	 * Photo image width (thumbnail size)
@@ -211,7 +207,7 @@ public class PicDirImages {
 	private Spinner									_spinnerThumbSize;
 	private Combo									_comboPathHistory;
 
-	private GalleryMT								_gallery;
+	private GalleryMT20								_gallery;
 	private CLabel									_lblStatusInfo;
 
 	private PageBook								_pageBook;
@@ -292,14 +288,14 @@ public class PicDirImages {
 		};
 	}
 
-	private class LoadImageCallback implements ILoadCallBack {
+	class LoadImageCallback implements ILoadCallBack {
 
-		private GalleryMTItem	__galleryItem;
+		private GalleryMT20Item	__galleryItem;
 
 		/**
 		 * @param galleryItem
 		 */
-		public LoadImageCallback(final GalleryMTItem galleryItem) {
+		public LoadImageCallback(final GalleryMT20Item galleryItem) {
 
 			__galleryItem = galleryItem;
 		}
@@ -318,21 +314,35 @@ public class PicDirImages {
 
 					public void run() {
 
-						if (__galleryItem.isDisposed() || _gallery.isDisposed()) {
+						if (_gallery.isDisposed()) {
 							return;
 						}
 
-						final Rectangle galleryItemBounds = __galleryItem.getBounds();
-
 						_gallery.redraw(
-								galleryItemBounds.x,
-								galleryItemBounds.y,
-								galleryItemBounds.width,
-								galleryItemBounds.height,
+								__galleryItem.viewPortX,
+								__galleryItem.viewPortY,
+								__galleryItem.width,
+								__galleryItem.height,
 								false);
 					}
 				});
 			}
+		}
+	}
+
+	private class PhotoGallery extends GalleryMT20 {
+
+		public PhotoGallery(final Composite parent, final int style) {
+			super(parent, style);
+		}
+
+		@Override
+		public void initItem(final GalleryMT20Item galleryItem, final int itemIndex) {
+
+			// create a photo for an image file
+			final Photo photo = new Photo(_photoFiles[itemIndex]);
+
+			galleryItem.data = photo;
 		}
 	}
 
@@ -500,7 +510,7 @@ public class PicDirImages {
 
 	/**
 	 * This will be configured from options but for now it is any image accepted.
-	 *
+	 * 
 	 * @return
 	 */
 	private FileFilter createFileFilter() {
@@ -725,30 +735,14 @@ public class PicDirImages {
 	 */
 	private void createUI_20_PageGallery(final Composite parent) {
 
-		_gallery = new GalleryMT(parent, SWT.V_SCROLL | SWT.VIRTUAL | SWT.MULTI);
-		//		GridDataFactory.fillDefaults().grab(true, true).applyTo(_gallery);
+		_gallery = new PhotoGallery(parent, SWT.V_SCROLL | SWT.MULTI);
 
 		_gallery.setHigherQualityDelay(200);
 //		_gallery.setAntialias(SWT.OFF);
 //		_gallery.setInterpolation(SWT.LOW);
 		_gallery.setAntialias(SWT.ON);
 		_gallery.setInterpolation(SWT.HIGH);
-
-		_gallery.setVirtualGroups(true);
-		_gallery.setVirtualGroupDefaultItemCount(1);
-		_gallery.setVirtualGroupsCompatibilityMode(true);
-
-		_gallery.addListener(SWT.SetData, new Listener() {
-			public void handleEvent(final Event event) {
-				onGallery1SetItemData(event);
-			}
-		});
-
-		_gallery.addListener(SWT.PaintItem, new Listener() {
-			public void handleEvent(final Event event) {
-				onGallery2PaintItem(event);
-			}
-		});
+		_gallery.setItemMinMaxSize(MIN_ITEM_WIDTH, MAX_ITEM_WIDTH);
 
 		_gallery.addListener(SWT.Modify, new Listener() {
 
@@ -760,27 +754,10 @@ public class PicDirImages {
 		});
 
 		/*
-		 * set renderer
+		 * set photo renderer
 		 */
-		_photoRenderer = new PhotoRenderer();
-//		final PhotoRenderer photoRenderer = (PhotoRenderer) _photoRenderer;
-//		photoRenderer.setShowLabels(true);
-//		photoRenderer.setDropShadows(true);
-//		photoRenderer.setDropShadowsSize(5);
+		_photoRenderer = new PhotoRenderer(_gallery, this);
 		_gallery.setItemRenderer(_photoRenderer);
-
-		_groupRenderer = new NoGroupRendererMT();
-		_groupRenderer.setItemSize(_photoWidth, (int) (_photoWidth * (float) 15 / 11));
-		_groupRenderer.setItemHeightMinMax(MIN_ITEM_WIDTH, MAX_ITEM_WIDTH);
-		_groupRenderer.setAutoMargin(true);
-		_groupRenderer.setMinMargin(0);
-
-		_gallery.setGroupRenderer(_groupRenderer);
-
-		// create root item (is needed)
-		new GalleryMTItem(_gallery, SWT.VIRTUAL);
-
-		_gallery.setItemCount(1);
 	}
 
 	private void createUI_30_PageLoading(final PageBook parent) {
@@ -843,10 +820,10 @@ public class PicDirImages {
 						disposeAllImages();
 					}
 
-					_gallery.keepGalleryPosition();
+//					_gallery.keepGalleryPosition();
 
 					// this will update the gallery
-					_gallery.clearAll();
+//					_gallery.clearAll();
 				}
 			});
 
@@ -881,82 +858,6 @@ public class PicDirImages {
 		//////////////////////////////////////////
 
 		workerStop();
-	}
-
-	/**
-	 * This event is called first of all before a gallery item is painted, it sets the photo into
-	 * the gallery item.
-	 *
-	 * @param event
-	 */
-	private void onGallery1SetItemData(final Event event) {
-
-		final GalleryMTItem galleryItem = (GalleryMTItem) event.item;
-
-		if (galleryItem.getParentItem() == null) {
-
-			/*
-			 * It's a group
-			 */
-
-			galleryItem.setItemCount(_photoFiles.length);
-
-		} else {
-
-			/*
-			 * It's an item
-			 */
-
-			final GalleryMTItem parentItem = galleryItem.getParentItem();
-			final int galleryItemIndex = parentItem.indexOf(galleryItem);
-
-			// create a photo for an image file
-			final Photo photo = new Photo(_photoFiles[galleryItemIndex], galleryItemIndex);
-
-			galleryItem.setData(photo);
-		}
-	}
-
-	/**
-	 * This event checks if the image for the photo is available in the image cache, if not it is
-	 * put into a queue to be loaded, {@link PhotoRenderer} will then paint the image.
-	 * 
-	 * @param event
-	 */
-	private void onGallery2PaintItem(final Event event) {
-
-		final GalleryMTItem galleryItem = (GalleryMTItem) event.item;
-
-		if (galleryItem != null && galleryItem.getParentItem() != null) {
-
-			/*
-			 * check if the photo image is available, if not, image must be loaded
-			 */
-
-			final Photo photo = (Photo) galleryItem.getData();
-
-			final int imageQuality = _photoWidth <= PhotoManager.IMAGE_SIZE_THUMBNAIL
-					? PhotoManager.IMAGE_QUALITY_EXIF_THUMB
-					: PhotoManager.IMAGE_QUALITY_LARGE_IMAGE;
-
-			// check if image is already being loaded or has an loading error
-			final PhotoLoadingState photoLoadingState = photo.getLoadingState(imageQuality);
-			if (photoLoadingState == PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR
-					|| photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE) {
-				return;
-			}
-
-			// check if image is in the cache
-			final Image photoImage = PhotoImageCache.getImage(photo, imageQuality);
-			if (photoImage == null || photoImage.isDisposed()) {
-
-				// the requested image is not available in the image cache -> image must be loaded
-
-				final LoadImageCallback imageLoadCallback = new LoadImageCallback(galleryItem);
-
-				PhotoManager.putImageInLoadingQueue(galleryItem, photo, imageQuality, imageLoadCallback);
-			}
-		}
 	}
 
 	private void onSelectHistoryFolder(final String selectedFolder) {
@@ -1053,7 +954,7 @@ public class PicDirImages {
 		_canvasImageSizeIndicator.setIndicator(isHqImage);
 
 		_spinnerThumbSize.setSelection(photoWidth);
-		_groupRenderer.setItemSize(photoWidth, photoHeight);
+		_gallery.setItemSize(photoWidth, photoHeight);
 	}
 
 	private void removeInvalidFolder(final String invalidFolderPathName) {
@@ -1227,7 +1128,7 @@ public class PicDirImages {
 
 	/**
 	 * Display images for the selected folder.
-	 *
+	 * 
 	 * @param imageFolder
 	 * @param isFromNavigationHistory
 	 * @param isReloadFolder
@@ -1278,7 +1179,7 @@ public class PicDirImages {
 
 	/**
 	 * Sort files for the folder
-	 *
+	 * 
 	 * @param folder
 	 * @return
 	 */
@@ -1324,50 +1225,50 @@ public class PicDirImages {
 			return;
 		}
 
-		final GalleryMTItem[] rootItems = _gallery.getItems();
-		if (rootItems.length == 0) {
-			// there is no root item
-			return;
-		}
-
-		// sort image files
-		final List<File> sortedFiles = sortFiles(_photoFolder);
-		final File[] sortedFilesArray = sortedFiles.toArray(new File[sortedFiles.size()]);
-
-		/*
-		 * sort gallery items according to the sorted image files
-		 */
-		final GalleryMTItem rootItem = rootItems[0];
-		final GalleryMTItem[] existingGalleryItems = rootItem.getItems();
-
-		final HashMap<String, GalleryMTItem> existingGalleryItemsMap = new HashMap<String, GalleryMTItem>();
-
-		// create map with existing gallery items, items can be null when not yet displayed
-		for (final GalleryMTItem existingGalleryItem : existingGalleryItems) {
-			if (existingGalleryItem != null) {
-
-				final Photo photo = (Photo) existingGalleryItem.getData();
-				final String photoImageFileName = photo.getFileName();
-
-				existingGalleryItemsMap.put(photoImageFileName, existingGalleryItem);
-			}
-		}
-
-		final GalleryMTItem[] sortedGalleryItems = new GalleryMTItem[existingGalleryItems.length];
-
-		// convert sorted images files into sorted gallery items
-		for (int itemIndex = 0; itemIndex < sortedFilesArray.length; itemIndex++) {
-
-			final File imageFile = sortedFilesArray[itemIndex];
-
-			final GalleryMTItem galleryItem = existingGalleryItemsMap.get(imageFile.getName());
-
-			if (galleryItem != null) {
-				sortedGalleryItems[itemIndex] = galleryItem;
-			}
-		}
-
-		_gallery.setSortedItems(sortedGalleryItems);
+//		final GalleryMT20Item[] rootItems = _gallery.getItems();
+//		if (rootItems.length == 0) {
+//			// there is no root item
+//			return;
+//		}
+//
+//		// sort image files
+//		final List<File> sortedFiles = sortFiles(_photoFolder);
+//		final File[] sortedFilesArray = sortedFiles.toArray(new File[sortedFiles.size()]);
+//
+//		/*
+//		 * sort gallery items according to the sorted image files
+//		 */
+//		final GalleryMT20Item rootItem = rootItems[0];
+//		final GalleryMT20Item[] existingGalleryItems = rootItem.getItems();
+//
+//		final HashMap<String, GalleryMT20Item> existingGalleryItemsMap = new HashMap<String, GalleryMT20Item>();
+//
+//		// create map with existing gallery items, items can be null when not yet displayed
+//		for (final GalleryMT20Item existingGalleryItem : existingGalleryItems) {
+//			if (existingGalleryItem != null) {
+//
+//				final Photo photo = (Photo) existingGalleryItem.getData();
+//				final String photoImageFileName = photo.getFileName();
+//
+//				existingGalleryItemsMap.put(photoImageFileName, existingGalleryItem);
+//			}
+//		}
+//
+//		final GalleryMT20Item[] sortedGalleryItems = new GalleryMT20Item[existingGalleryItems.length];
+//
+//		// convert sorted images files into sorted gallery items
+//		for (int itemIndex = 0; itemIndex < sortedFilesArray.length; itemIndex++) {
+//
+//			final File imageFile = sortedFilesArray[itemIndex];
+//
+//			final GalleryMT20Item galleryItem = existingGalleryItemsMap.get(imageFile.getName());
+//
+//			if (galleryItem != null) {
+//				sortedGalleryItems[itemIndex] = galleryItem;
+//			}
+//		}
+//
+//		_gallery.setSortedItems(sortedGalleryItems);
 	}
 
 	void updateColors(final Color fgColor, final Color bgColor, final Color selectionFgColor) {
@@ -1400,10 +1301,7 @@ public class PicDirImages {
 		_gallery.setForeground(fgColor);
 		_gallery.setBackground(bgColor);
 
-		final PhotoRenderer photoRenderer = _photoRenderer;
-		photoRenderer.setForegroundColor(fgColor);
-		photoRenderer.setBackgroundColor(bgColor);
-		photoRenderer.setSelectionForegroundColor(selectionFgColor);
+		_photoRenderer.setColors(fgColor, bgColor, selectionFgColor);
 
 		_pageLoading.setBackground(bgColor);
 
@@ -1535,14 +1433,15 @@ public class PicDirImages {
 					// set old gallery position
 					final Double oldPosition = _galleryPositions.get(_photoFolder.getAbsolutePath());
 					if (oldPosition != null) {
-						_gallery.setGalleryPositionWhenUpdated(oldPosition);
+//						_gallery.setGalleryPositionWhenUpdated(oldPosition);
 					}
 
 					/*
 					 * this will also update the gallery, it's not easy to understand the update
 					 * procedure
 					 */
-					_gallery.clearAll();
+//					_gallery.clearAll();
+					_gallery.setupItems(_photoFiles.length);
 
 					/*
 					 * update status info
@@ -1587,7 +1486,7 @@ public class PicDirImages {
 	/**
 	 * Notifies the worker that it should update itself with new data. Cancels any previous
 	 * operation and begins a new one.
-	 *
+	 * 
 	 * @param newFolder
 	 *            the new base directory for the table, null is ignored
 	 * @param isReloadFolder

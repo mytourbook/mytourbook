@@ -24,7 +24,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 
 import javax.imageio.ImageIO;
 
-import net.tourbook.photo.gallery.GalleryMTItem;
+import net.tourbook.photo.gallery.MT20.GalleryMT20Item;
 import net.tourbook.util.StatusUtil;
 
 import org.apache.commons.sanselan.ImageReadException;
@@ -45,8 +45,7 @@ import org.joda.time.LocalDate;
 public class PhotoImageLoader {
 
 	Photo								photo;
-	private GalleryMTItem				_galleryItem;
-	int									galleryIndex;
+	private GalleryMT20Item				_galleryItem;
 	int									requestedImageQuality;
 	private String						_imageFramework;
 	private int							_hqImageSize;
@@ -59,7 +58,7 @@ public class PhotoImageLoader {
 	private ArrayList<BufferedImage>	_trackedAWTImages	= new ArrayList<BufferedImage>();
 
 	public PhotoImageLoader(final Display display,
-							final GalleryMTItem galleryItem,
+							final GalleryMT20Item galleryItem,
 							final Photo photo,
 							final int imageQuality,
 							final String imageFramework,
@@ -74,7 +73,6 @@ public class PhotoImageLoader {
 		_hqImageSize = hqImageSize;
 		_loadCallBack = loadCallBack;
 
-		galleryIndex = photo.getGalleryIndex();
 		_imageKey = photo.getImageKey(imageQuality);
 	}
 
@@ -96,27 +94,18 @@ public class PhotoImageLoader {
 	 */
 	private boolean isImageVisible() {
 
-		final GalleryMTItem group = _galleryItem.getParentItem();
-		if (group == null) {
+		final GalleryMT20Item[] visibleGalleryItems = _galleryItem.galleryMT20.getVisibleGalleryItems();
+		if (visibleGalleryItems == null) {
 			return true;
 		}
 
-		final GalleryMTItem[] visibleItems = group.getVisibleItems();
-		if (visibleItems == null) {
-			return true;
-		}
-
-		final int galleryItemX = _galleryItem.x;
-		final int galleryItemY = _galleryItem.y;
-
-		for (final GalleryMTItem visibleItem : visibleItems) {
+		for (final GalleryMT20Item visibleItem : visibleGalleryItems) {
 
 			if (visibleItem == null) {
 				continue;
 			}
 
-			// !!! visibleItem.equals() is a performance hog when many items are displayed !!!
-			if (visibleItem.x == galleryItemX && visibleItem.y == galleryItemY) {
+			if (_galleryItem == visibleItem) {
 				return true;
 			}
 		}
@@ -892,7 +881,6 @@ public class PhotoImageLoader {
 	public String toString() {
 		return "PhotoImageLoaderItem [" //$NON-NLS-1$
 				+ ("_filePathName=" + _imageKey + "{)}, ") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("galleryIndex=" + galleryIndex + "{)}, ") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("imageQuality=" + requestedImageQuality + "{)}, ") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("photo=" + photo) //$NON-NLS-1$
 				+ "]"; //$NON-NLS-1$

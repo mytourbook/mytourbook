@@ -16,9 +16,12 @@
 package net.tourbook.photo;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.photo.gallery.DefaultGalleryItemRenderer;
-import net.tourbook.photo.gallery.GalleryMTItem;
+import net.tourbook.photo.PicDirImages.LoadImageCallback;
 import net.tourbook.photo.gallery.RendererHelper;
+import net.tourbook.photo.gallery.MT20.AbstractGalleryMT20ItemRenderer;
+import net.tourbook.photo.gallery.MT20.DefaultGalleryMT20ItemRenderer;
+import net.tourbook.photo.gallery.MT20.GalleryMT20;
+import net.tourbook.photo.gallery.MT20.GalleryMT20Item;
 import net.tourbook.photo.manager.Photo;
 import net.tourbook.photo.manager.PhotoImageCache;
 import net.tourbook.photo.manager.PhotoLoadingState;
@@ -27,6 +30,7 @@ import net.tourbook.ui.UI;
 import net.tourbook.util.StatusUtil;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
@@ -42,7 +46,7 @@ import org.joda.time.format.DateTimeFormatterBuilder;
  * <p>
  * Original: org.sharemedia.utils.gallery.ShareMediaIconRenderer2
  */
-public class PhotoRenderer extends DefaultGalleryItemRenderer {
+public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 	/**
 	 * this value has been evaluated by some test
@@ -52,6 +56,10 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 	private static final String		PHOTO_ANNOTATION_GPS	= "PHOTO_ANNOTATION_GPS";	//$NON-NLS-1$
 
 	private int						_fontHeight				= -1;
+
+	private Color					_fgColor;
+	private Color					_bgColor;
+	private Color					_selectionFgColor;
 
 //	private final DateTimeFormatter	_dtFormatter			= DateTimeFormat.forStyle("SM");
 	private final DateTimeFormatter	_dtFormatter			= new DateTimeFormatterBuilder()
@@ -72,6 +80,9 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 	private boolean					_isShowPhotoName;
 	private boolean					_isShowAnnotations;
 
+	private GalleryMT20				_galleryMT20;
+	private PicDirImages			_picDirImages;
+
 	private static Image			_annotationGPS;
 	private static int				_gpsWidth;
 	private static int				_gpsHeight;
@@ -90,55 +101,55 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 		_gpsHeight = bounds.height;
 	}
 
-	@Override
-	public void dispose() {
-		super.dispose();
+	public PhotoRenderer(final GalleryMT20 galleryMT20, final PicDirImages picDirImages) {
+		_galleryMT20 = galleryMT20;
+		_picDirImages = picDirImages;
 	}
 
 	@Override
 	public void draw(	final GC gc,
-						final GalleryMTItem galleryItem,
+						final GalleryMT20Item galleryItem,
 						final int index,
-						final int galleryPosX,
-						final int galleryPosY,
+						final int galleryItemViewPortX,
+						final int galleryItemViewPortY,
 						final int galleryItemWidth,
-						final int galleryItemHeight) {
+						final int galleryItemHeight,
+						final boolean isSelected) {
 
+		// init fontheight
 		if (_fontHeight == -1) {
 			_fontHeight = gc.getFontMetrics().getHeight() - 1;
 		}
 
-		final Object itemData = galleryItem.getData();
+		final Photo photo = (Photo) galleryItem.data;
 
-		Photo photo = null;
-		if (itemData instanceof Photo) {
-			photo = (Photo) itemData;
-		} else {
-			// this case should not happten
-			gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_RED));
-			gc.drawText("error: gallery item is not a photo", // //$NON-NLS-1$
-					galleryPosX + 3,
-					galleryPosY + 3 + _fontHeight);
+		final int requestedImageQuality = galleryItemWidth <= PhotoManager.IMAGE_SIZE_THUMBNAIL
+				? PhotoManager.IMAGE_QUALITY_EXIF_THUMB
+				: PhotoManager.IMAGE_QUALITY_LARGE_IMAGE;
+
+		// check if image is already being loaded or has an loading error
+		final PhotoLoadingState photoLoadingState = photo.getLoadingState(requestedImageQuality);
+		if (photoLoadingState == PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR
+				|| photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE) {
 			return;
 		}
 
-		final int photoPosX = galleryPosX + 1;
-		final int photoPosY = galleryPosY + 0;
-		final int photoWidth = galleryItemWidth - 2;
-		final int photoHeight = galleryItemHeight - 1;
+		// check if image is in the cache
+		Image photoImage = PhotoImageCache.getImage(photo, requestedImageQuality);
+		if (photoImage == null || photoImage.isDisposed()) {
 
-		final int requestedImageQuality = galleryItemWidth > PhotoManager.IMAGE_SIZE_THUMBNAIL
-				? PhotoManager.IMAGE_QUALITY_LARGE_IMAGE
-				: PhotoManager.IMAGE_QUALITY_EXIF_THUMB;
+			// the requested image is not available in the image cache -> image must be loaded
+
+			final LoadImageCallback imageLoadCallback = _picDirImages.new LoadImageCallback(galleryItem);
+
+			PhotoManager.putImageInLoadingQueue(galleryItem, photo, requestedImageQuality, imageLoadCallback);
+		}
 
 		boolean isRequestedQuality = true;
 
-		// get image with requested size
-		Image photoImage = PhotoImageCache.getImage(photo, requestedImageQuality);
-
 		if (photoImage == null) {
 
-			// requested size is not available
+			// requested size is not available, try to get image with lower quality
 
 			isRequestedQuality = false;
 
@@ -151,8 +162,13 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 
 		boolean isDrawText = true;
 
-		gc.setForeground(getForegroundColor());
-		gc.setBackground(getBackgroundColor());
+		final int photoPosX = galleryItemViewPortX + 1;
+		final int photoPosY = galleryItemViewPortY + 0;
+		final int photoWidth = galleryItemWidth - 2;
+		final int photoHeight = galleryItemHeight - 1;
+
+		gc.setForeground(_fgColor);
+		gc.setBackground(_bgColor);
 
 		if (photoImage != null && photoImage.isDisposed() == false) {
 
@@ -165,7 +181,16 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 				isDrawText = false;
 			}
 
-			drawImage(gc, photo, photoImage, photoPosX, photoPosY, photoWidth, photoHeight, isRequestedQuality);
+			drawImage(
+					gc,
+					photo,
+					photoImage,
+					photoPosX,
+					photoPosY,
+					photoWidth,
+					photoHeight,
+					isRequestedQuality,
+					isSelected);
 
 		} else {
 
@@ -203,6 +228,7 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 	 * @param photoWidth
 	 * @param photoHeight
 	 * @param isRequestedQuality
+	 * @param isSelected
 	 */
 	private void drawImage(	final GC gc,
 							final Photo photo,
@@ -211,7 +237,8 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 							final int photoPosY,
 							final int photoWidth,
 							final int photoHeight,
-							final boolean isRequestedQuality) {
+							final boolean isRequestedQuality,
+							final boolean isSelected) {
 
 		int photoPaintedWidth = 0;
 		int photoPaintedHeight = 0;
@@ -295,10 +322,10 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 					photoPaintedWidth,
 					photoPaintedHeight);
 
-			if (selected) {
+			if (isSelected) {
 
 				// draw marker line on the left side
-				gc.setBackground(getSelectionForegroundColor());
+				gc.setBackground(_selectionFgColor);
 				gc.fillRectangle(destX, destY, 2, photoPaintedHeight);
 			}
 
@@ -308,7 +335,7 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 
 				final int markerSize = 9;
 
-				gc.setBackground(getSelectionForegroundColor());
+				gc.setBackground(_selectionFgColor);
 				gc.fillRectangle(//
 						destX + photoPaintedWidth - markerSize,
 						destY,// + photoPaintedHeight - markerSize,
@@ -414,8 +441,8 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 		/*
 		 * draw text
 		 */
-		gc.setForeground(getForegroundColor());
-		gc.setBackground(getBackgroundColor());
+		gc.setForeground(_fgColor);
+		gc.setBackground(_bgColor);
 
 		// draw filename
 		if (textFileNameWidth != -1) {
@@ -458,13 +485,18 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 		gc.drawString(statusText, photoPosX + textOffsetX, photoPosY + textOffsetY, true);
 	}
 
-	@Override
+	public void setColors(final Color fgColor, final Color bgColor, final Color selectionFgColor) {
+		_fgColor = fgColor;
+		_bgColor = bgColor;
+		_selectionFgColor = selectionFgColor;
+	}
+
 	public void setFont(final Font font) {
 
 		// force font update
 		_fontHeight = -1;
 
-		super.setFont(font);
+		_galleryMT20.setFont(font);
 	}
 
 	/**
@@ -472,7 +504,7 @@ public class PhotoRenderer extends DefaultGalleryItemRenderer {
 	 * 
 	 * @param isShowPhotoDate
 	 * @param isShowPhotoName
-	 * @see DefaultGalleryItemRenderer#isShowLabels()
+	 * @see DefaultGalleryMT20ItemRenderer#isShowLabels()
 	 */
 	public void setShowLabels(	final boolean isShowPhotoName,
 								final boolean isShowPhotoDate,
