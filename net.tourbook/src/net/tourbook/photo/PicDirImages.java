@@ -318,9 +318,18 @@ public class PicDirImages {
 							return;
 						}
 
+//						final Rectangle galleryItemBounds = __galleryItem.getBounds();
+//
+//						_gallery.redraw(
+//								galleryItemBounds.x,
+//								galleryItemBounds.y,
+//								galleryItemBounds.width,
+//								galleryItemBounds.height,
+//								false);
+
 						_gallery.redraw(
-								__galleryItem.viewPortX,
-								__galleryItem.viewPortY,
+								__galleryItem.virtualPosX,
+								__galleryItem.virtualPosY,
 								__galleryItem.width,
 								__galleryItem.height,
 								false);

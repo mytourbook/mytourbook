@@ -213,8 +213,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		}
 
 		// debug box for the whole gallery item area
-//		gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_GREEN));
-//		gc.drawRectangle(galleryPosX, galleryPosY, galleryItemWidth - 1, galleryItemHeight - 1);
+		gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_GREEN));
+		gc.drawRectangle(photoPosX, photoPosY, galleryItemWidth - 1, galleryItemHeight - 1);
 	}
 
 	/**

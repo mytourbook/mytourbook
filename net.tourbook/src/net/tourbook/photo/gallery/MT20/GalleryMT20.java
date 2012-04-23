@@ -510,62 +510,6 @@ public abstract class GalleryMT20 extends Canvas {
 	}
 
 	/**
-	 * Original method: AbstractGridGroupRenderer.drawItem()
-	 * 
-	 * @param gc
-	 * @param galleryItem
-	 * @param itemIndex
-	 * @param isSelected
-	 */
-	private void drawItem(final GC gc, final GalleryMT20Item galleryItem, final int itemIndex, final boolean isSelected) {
-
-		int posX, posY;
-		if (_isVertical) {
-			posX = itemIndex % _numberOfHorizItems;
-			posY = (itemIndex - posX) / _numberOfHorizItems;
-		} else {
-			posY = itemIndex % _numberOfVertItems;
-			posX = (itemIndex - posY) / _numberOfVertItems;
-		}
-
-		final int scrollbarPosition = _galleryPosition;
-		int itemViewPortX;
-		int itemViewportY;
-
-		if (_isVertical) {
-
-			itemViewPortX = posX * (_itemWidth);
-			itemViewportY = (posY * (_itemHeight) - scrollbarPosition);
-
-			galleryItem.viewPortX = itemViewPortX;
-			galleryItem.viewPortY = itemViewportY + scrollbarPosition;
-
-		} else {
-
-			itemViewPortX = (posX * (_itemWidth) - scrollbarPosition);
-			itemViewportY = posY * (_itemHeight);
-
-			galleryItem.viewPortX = itemViewPortX + scrollbarPosition;
-			galleryItem.viewPortY = itemViewportY;
-		}
-
-		galleryItem.height = _itemHeight;
-		galleryItem.width = _itemWidth;
-
-		gc.setClipping(itemViewPortX, itemViewportY, _itemWidth, _itemHeight);
-
-		_itemRenderer.draw(
-				gc,
-				galleryItem,
-				itemIndex,
-				itemViewPortX,
-				itemViewportY,
-				_itemWidth,
-				_itemHeight,
-				isSelected);
-	}
-
-	/**
 	 * @return Returns gallery relative position
 	 */
 	public double getGalleryPosition() {
@@ -594,132 +538,6 @@ public abstract class GalleryMT20 extends Canvas {
 
 			return (double) selection / maximum;
 		}
-	}
-
-	/**
-	 * Original method: AbstractGridGroupRenderer.getVisibleItems()
-	 * 
-	 * @param clipX
-	 * @param clipY
-	 * @param clipWidth
-	 * @param clipHeight
-	 * @return Returns indices for all visible gallery items contained in the clipping area.
-	 */
-	private int[] getIndexesForVisibleItems(final Rectangle clippingArea) {
-
-		final int clipX = clippingArea.x;
-		final int clipY = clippingArea.y;
-		final int clipWidth = clippingArea.width;
-		final int clipHeight = clippingArea.height;
-
-		int[] indexes;
-
-		final int galleryPosX = _isVertical ? 0 : _galleryPosition;
-		final int galleryPosY = _isVertical ? _galleryPosition : 0;
-
-		final int itemWidthTotal = _itemWidth;
-		final int itemHeightTotal = _itemHeight;
-
-		if (_isVertical) {
-
-			int horizontalImages = _clientArea.width / _itemWidth;
-			if (horizontalImages < 0) {
-				horizontalImages = 1;
-			}
-
-			int firstLine = (clipY - galleryPosY) / itemHeightTotal;
-			if (firstLine < 0) {
-				firstLine = 0;
-			}
-
-			int lastLine = (clipY - galleryPosY + clipHeight) / itemHeightTotal;
-			if (lastLine < firstLine) {
-				lastLine = firstLine;
-			}
-
-			int firstItem;
-			int lastItem;
-
-			if (clipWidth == _itemWidth /* && clipHeight == itemHeight */) {
-
-				// optimize when only 1 item is visible in the clipping area
-
-				final int horizontalItem = (clipX) / itemWidthTotal;
-
-				firstItem = firstLine * horizontalImages;
-				firstItem += horizontalItem;
-
-				lastItem = firstItem + 1;
-
-			} else {
-
-				firstItem = firstLine * horizontalImages;
-				lastItem = (lastLine + 1) * horizontalImages;
-			}
-
-			// ensure number of available items
-			final int numberOfItems = _galleryItems.length;
-			if (lastItem > numberOfItems) {
-				lastItem = numberOfItems;
-				if (firstItem > lastItem) {
-					firstItem = lastItem;
-				}
-			}
-
-			// exit if no item selected
-			final int itemsCount = lastItem - firstItem;
-			if (itemsCount == 0) {
-				return null;
-			}
-
-			indexes = new int[itemsCount];
-			for (int itemIndex = 0; itemIndex < itemsCount; itemIndex++) {
-				indexes[itemIndex] = firstItem + itemIndex;
-			}
-
-		} else {
-
-			int verticalImages = _clientArea.height / _itemHeight;
-			if (verticalImages < 0) {
-				verticalImages = 1;
-			}
-
-			int firstLine = (clipX - galleryPosX) / itemWidthTotal;
-			if (firstLine < 0) {
-				firstLine = 0;
-			}
-
-			int firstItem = firstLine * verticalImages;
-
-			int lastLine = (clipX - galleryPosX + clipWidth) / itemWidthTotal;
-
-			if (lastLine < firstLine) {
-				lastLine = firstLine;
-			}
-
-			int lastItem = (lastLine + 1) * verticalImages;
-
-			// ensure number of available items
-			final int numberOfItems = _galleryItems.length;
-			if (lastItem > numberOfItems) {
-				lastItem = numberOfItems;
-				if (firstItem > lastItem) {
-					firstItem = lastItem;
-				}
-			}
-
-			// exit if no item selected
-			if (lastItem - firstItem == 0) {
-				return null;
-			}
-
-			indexes = new int[lastItem - firstItem];
-			for (int i = 0; i < (lastItem - firstItem); i++) {
-				indexes[i] = firstItem + i;
-			}
-		}
-
-		return indexes;
 	}
 
 	private GalleryMT20Item getItem(final int itemIndex) {
@@ -775,6 +593,116 @@ public abstract class GalleryMT20 extends Canvas {
 
 	public GalleryMT20Item[] getVisibleGalleryItems() {
 		return _visibleGalleryItems;
+	}
+
+	/**
+	 * Original method: AbstractGridGroupRenderer.getVisibleItems()
+	 * 
+	 * @param clippingArea
+	 * @return Returns indices for all visible gallery items contained in the clipping area.
+	 */
+	private int[] getVisibleItems(final Rectangle clippingArea) {
+
+		final int clipX = clippingArea.x;
+		final int clipY = clippingArea.y;
+		final int clipWidth = clippingArea.width;
+		final int clipHeight = clippingArea.height;
+
+		int[] indexes;
+
+		if (_isVertical) {
+
+			int firstLine = (clipY + _galleryPosition) / _itemHeight;
+			if (firstLine < 0) {
+				firstLine = 0;
+			}
+
+			int lastLine = (clipY + _galleryPosition + clipHeight) / _itemHeight;
+			if (lastLine < firstLine) {
+				lastLine = firstLine;
+			}
+
+			int firstItem;
+			int lastItem;
+
+			if (clipWidth == _itemWidth) {
+
+				// optimize when only 1 item is visible in the clipping area
+
+				final int horizontalItem = (clipX) / _itemWidth;
+
+				firstItem = firstLine * _numberOfHorizItems;
+				firstItem += horizontalItem;
+
+				lastItem = firstItem + 1;
+
+			} else {
+
+				firstItem = firstLine * _numberOfHorizItems;
+				lastItem = (lastLine + 1) * _numberOfHorizItems;
+			}
+
+			// ensure number of available items
+			final int numberOfItems = _galleryItems.length;
+			if (lastItem > numberOfItems) {
+				lastItem = numberOfItems;
+				if (firstItem > lastItem) {
+					firstItem = lastItem;
+				}
+			}
+
+			// exit if no item selected
+			final int itemsCount = lastItem - firstItem;
+			if (itemsCount == 0) {
+				return null;
+			}
+
+			indexes = new int[itemsCount];
+			for (int itemIndex = 0; itemIndex < itemsCount; itemIndex++) {
+				indexes[itemIndex] = firstItem + itemIndex;
+			}
+
+			System.out.println("first:" + firstItem + "\tlast:" + lastItem);
+			// TODO remove SYSTEM.OUT.PRINTLN
+
+		} else {
+
+			int firstLine = (clipX + _galleryPosition) / _itemWidth;
+			if (firstLine < 0) {
+				firstLine = 0;
+			}
+
+			int firstItem = firstLine * _numberOfVertItems;
+
+			int lastLine = (clipX + _galleryPosition + clipWidth) / _itemWidth;
+
+			if (lastLine < firstLine) {
+				lastLine = firstLine;
+			}
+
+			int lastItem = (lastLine + 1) * _numberOfVertItems;
+
+			// ensure number of available items
+			final int numberOfItems = _galleryItems.length;
+			if (lastItem > numberOfItems) {
+				lastItem = numberOfItems;
+				if (firstItem > lastItem) {
+					firstItem = lastItem;
+				}
+			}
+
+			// exit if no item selected
+			if (lastItem - firstItem == 0) {
+				return null;
+			}
+
+			indexes = new int[lastItem - firstItem];
+			for (int i = 0; i < (lastItem - firstItem); i++) {
+				indexes[i] = firstItem + i;
+			}
+		}
+
+		return indexes;
 	}
 
 	/**
@@ -1092,6 +1020,10 @@ public abstract class GalleryMT20 extends Canvas {
 
 			final Rectangle clippingArea = gc.getClipping();
 
+			System.out.println("\t");
+			System.out.println("clipping: " + clippingArea);
+			// TODO remove SYSTEM.OUT.PRINTLN
+
 			if (isLowQualityPainting) {
 				gc.setAntialias(SWT.OFF);
 				gc.setInterpolation(SWT.OFF);
@@ -1101,29 +1033,28 @@ public abstract class GalleryMT20 extends Canvas {
 			}
 
 			gc.setBackground(getBackground());
-//			drawBackground(gc, clipping.x, clipping.y, clipping.width, clipping.height);
 
 			// get visible items in the clipping area
-			final int[] visibleIndexes = getIndexesForVisibleItems(clippingArea);
-			final int numberOfVisibleItems = visibleIndexes.length;
+			final int[] visibleIndexes = getVisibleItems(clippingArea);
+			if (visibleIndexes != null) {
 
-			_visibleGalleryItems = new GalleryMT20Item[numberOfVisibleItems];
+				final int numberOfVisibleItems = visibleIndexes.length;
 
-			System.out.println("\t");
-			// TODO remove SYSTEM.OUT.PRINTLN
+				_visibleGalleryItems = new GalleryMT20Item[numberOfVisibleItems];
 
-			if (visibleIndexes != null && numberOfVisibleItems > 0) {
+				if (numberOfVisibleItems > 0) {
 
-				for (int itemIndex = numberOfVisibleItems - 1; itemIndex >= 0; itemIndex--) {
+					for (int itemIndex = numberOfVisibleItems - 1; itemIndex >= 0; itemIndex--) {
 
-					final GalleryMT20Item galleryItem = getItem(visibleIndexes[itemIndex]);
+						final GalleryMT20Item galleryItem = getItem(visibleIndexes[itemIndex]);
 
-					_visibleGalleryItems[itemIndex] = galleryItem;
+						_visibleGalleryItems[itemIndex] = galleryItem;
 
-//					final boolean isSelected = isSelected(galleryItem);
-					final boolean isSelected = false;
+//						final boolean isSelected = isSelected(galleryItem);
+						final boolean isSelected = false;
 
-					drawItem(gc, galleryItem, itemIndex, isSelected);
+						onPaint_10_DrawItem(gc, galleryItem, itemIndex, isSelected);
+					}
 				}
 			}
 
@@ -1156,6 +1087,139 @@ public abstract class GalleryMT20 extends Canvas {
 //		if (timeDiff > 10) {}
 //		System.out.println("onPaint:\t" + timeDiff + " ms\t" + clipping);
 		// TODO remove SYSTEM.OUT.PRINTLN
+	}
+
+	/**
+	 * Original method: AbstractGridGroupRenderer.drawItem()
+	 * 
+	 * @param gc
+	 * @param galleryItem
+	 * @param itemIndex
+	 * @param isSelected
+	 */
+	private void onPaint_10_DrawItem(	final GC gc,
+										final GalleryMT20Item galleryItem,
+										final int itemIndex,
+										final boolean isSelected) {
+
+		int numberOfItemsX;
+		int numberOfItemsY;
+		if (_isVertical) {
+			numberOfItemsX = itemIndex % _numberOfHorizItems;
+			numberOfItemsY = (itemIndex - numberOfItemsX) / _numberOfHorizItems;
+		} else {
+			numberOfItemsY = itemIndex % _numberOfVertItems;
+			numberOfItemsX = (itemIndex - numberOfItemsY) / _numberOfVertItems;
+		}
+
+		int viewPortX;
+		int viewPortY;
+
+		final int virtualPosX = numberOfItemsX * _itemWidth;
+		final int virtualPosY = numberOfItemsY * _itemHeight;
+
+		if (_isVertical) {
+
+			viewPortX = virtualPosX;
+			viewPortY = virtualPosY - _galleryPosition;
+
+		} else {
+
+			viewPortX = virtualPosX - _galleryPosition;
+			viewPortY = virtualPosY;
+		}
+
+		galleryItem.virtualPosX = virtualPosX;
+		galleryItem.virtualPosY = virtualPosY;
+		galleryItem.height = _itemHeight;
+		galleryItem.width = _itemWidth;
+
+		gc.setClipping(viewPortX, viewPortY, _itemWidth, _itemHeight);
+
+		_itemRenderer.draw(gc, galleryItem, itemIndex, viewPortX, viewPortY, _itemWidth, _itemHeight, isSelected);
+
+//		// Drawing area
+//		final int galleryPosX = _isVertical ? groupItem.x : groupItem.x - _galleryPosition;
+//		final int galleryPosY = _isVertical ? groupItem.y - _galleryPosition : groupItem.y;
+//
+//		final Rectangle clipping = gc.getClipping();
+//		final Rectangle previousClipping = new Rectangle(clipping.x, clipping.y, clipping.width, clipping.height);
+//
+//		clipping.intersect(new Rectangle(galleryPosX, galleryPosY, groupItem.width, groupItem.height));
+//		gc.setClipping(clipping);
+//		{
+//			// Draw group
+//			groupRenderer.draw(
+//					gc,
+//					groupItem,
+//					galleryPosX,
+//					galleryPosY,
+//					clipping.x,
+//					clipping.y,
+//					clipping.width,
+//					clipping.height);
+//		}
+//		gc.setClipping(previousClipping);
+
+	}
+
+	/**
+	 * Original method: AbstractGridGroupRenderer.drawItem()
+	 * 
+	 * @param gc
+	 * @param galleryItem
+	 * @param itemIndex
+	 * @param isSelected
+	 */
+	private void onPaint_10_DrawItem_OLD(	final GC gc,
+											final GalleryMT20Item galleryItem,
+											final int itemIndex,
+											final boolean isSelected) {
+
+		int posX, posY;
+		if (_isVertical) {
+			posX = itemIndex % _numberOfHorizItems;
+			posY = (itemIndex - posX) / _numberOfHorizItems;
+		} else {
+			posY = itemIndex % _numberOfVertItems;
+			posX = (itemIndex - posY) / _numberOfVertItems;
+		}
+
+		final int scrollbarPosition = _galleryPosition;
+		int itemViewPortX;
+		int itemViewportY;
+
+		if (_isVertical) {
+
+			itemViewPortX = posX * (_itemWidth);
+			itemViewportY = (posY * (_itemHeight) - scrollbarPosition);
+
+			galleryItem.virtualPosX = itemViewPortX;
+			galleryItem.virtualPosY = itemViewportY + scrollbarPosition;
+
+		} else {
+
+			itemViewPortX = (posX * (_itemWidth) - scrollbarPosition);
+			itemViewportY = posY * (_itemHeight);
+
+			galleryItem.virtualPosX = itemViewPortX + scrollbarPosition;
+			galleryItem.virtualPosY = itemViewportY;
+		}
+
+		galleryItem.height = _itemHeight;
+		galleryItem.width = _itemWidth;
+
+		gc.setClipping(itemViewPortX, itemViewportY, _itemWidth, _itemHeight);
+
+		_itemRenderer.draw(
+				gc,
+				galleryItem,
+				itemIndex,
+				itemViewPortX,
+				itemViewportY,
+				_itemWidth,
+				_itemHeight,
+				isSelected);
 	}
 
 	private void onScrollHorizontal() {

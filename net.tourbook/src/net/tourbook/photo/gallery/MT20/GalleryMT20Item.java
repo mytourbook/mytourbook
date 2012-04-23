@@ -30,8 +30,8 @@ public class GalleryMT20Item {
 	 * Screen viewport for this gallery item where it is painted for the currently scrolled gallery
 	 * position.
 	 */
-	public int			viewPortX;
-	public int			viewPortY;
+	public int			virtualPosX;
+	public int			virtualPosY;
 
 	public int			width;
 	public int			height;
