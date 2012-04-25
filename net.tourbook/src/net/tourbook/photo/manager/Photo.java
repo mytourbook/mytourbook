@@ -618,12 +618,13 @@ public class Photo {
 				: _orientation == 3 ? "180" //
 						: _orientation == 6 ? "90" : "0";
 
-		return "Photo " //
+		return ""
+//				+"Photo " //
 				+ (_fileName)
-				+ (_exifDateTime == null ? "-no date-" : "\t" + _exifDateTime)
-				+ ("\trotate:" + rotateDegree)
-				+ (_imageWidth == Integer.MIN_VALUE ? "-no size-" : "\t" + _imageWidth + "x" + _imageHeight)
-				+ (_latitude == Double.MIN_VALUE ? "\t-no GPS-" : "\t" + _latitude + " - " + _longitude)
+//				+ (_exifDateTime == null ? "-no date-" : "\t" + _exifDateTime)
+//				+ ("\trotate:" + rotateDegree)
+//				+ (_imageWidth == Integer.MIN_VALUE ? "-no size-" : "\t" + _imageWidth + "x" + _imageHeight)
+//				+ (_latitude == Double.MIN_VALUE ? "\t-no GPS-" : "\t" + _latitude + " - " + _longitude)
 		//
 		;
 	}

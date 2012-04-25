@@ -109,7 +109,6 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	@Override
 	public void draw(	final GC gc,
 						final GalleryMT20Item galleryItem,
-						final int index,
 						final int galleryItemViewPortX,
 						final int galleryItemViewPortY,
 						final int galleryItemWidth,
@@ -127,37 +126,41 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 				? PhotoManager.IMAGE_QUALITY_EXIF_THUMB
 				: PhotoManager.IMAGE_QUALITY_LARGE_IMAGE;
 
-		// check if image is already being loaded or has an loading error
+		Image photoImage = null;
+		boolean isRequestedQuality = false;
+
+		// check if image has an loading error
 		final PhotoLoadingState photoLoadingState = photo.getLoadingState(requestedImageQuality);
-		if (photoLoadingState == PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR
-				|| photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE) {
-			return;
-		}
+		if (photoLoadingState != PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR) {
 
-		// check if image is in the cache
-		Image photoImage = PhotoImageCache.getImage(photo, requestedImageQuality);
-		if (photoImage == null || photoImage.isDisposed()) {
+			// image is not yet loaded
 
-			// the requested image is not available in the image cache -> image must be loaded
+			// check if image is in the cache
+			photoImage = PhotoImageCache.getImage(photo, requestedImageQuality);
+			if ((photoImage == null || photoImage.isDisposed())
+					&& photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
 
-			final LoadImageCallback imageLoadCallback = _picDirImages.new LoadImageCallback(galleryItem);
+				// the requested image is not available in the image cache -> image must be loaded
 
-			PhotoManager.putImageInLoadingQueue(galleryItem, photo, requestedImageQuality, imageLoadCallback);
-		}
+				final LoadImageCallback imageLoadCallback = _picDirImages.new LoadImageCallback(galleryItem);
 
-		boolean isRequestedQuality = true;
+				PhotoManager.putImageInLoadingQueue(galleryItem, photo, requestedImageQuality, imageLoadCallback);
+			}
 
-		if (photoImage == null) {
+			isRequestedQuality = true;
 
-			// requested size is not available, try to get image with lower quality
+			if (photoImage == null) {
 
-			isRequestedQuality = false;
+				// requested size is not available, try to get image with lower quality
 
-			final int lowerImageQuality = galleryItemWidth > PhotoManager.IMAGE_SIZE_THUMBNAIL
-					? PhotoManager.IMAGE_QUALITY_EXIF_THUMB
-					: PhotoManager.IMAGE_QUALITY_LARGE_IMAGE;
+				isRequestedQuality = false;
 
-			photoImage = PhotoImageCache.getImage(photo, lowerImageQuality);
+				final int lowerImageQuality = galleryItemWidth > PhotoManager.IMAGE_SIZE_THUMBNAIL
+						? PhotoManager.IMAGE_QUALITY_EXIF_THUMB
+						: PhotoManager.IMAGE_QUALITY_LARGE_IMAGE;
+
+				photoImage = PhotoImageCache.getImage(photo, lowerImageQuality);
+			}
 		}
 
 		boolean isDrawText = true;
@@ -212,9 +215,9 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 					photoPosY + photoHeight - _gpsHeight);
 		}
 
-		// debug box for the whole gallery item area
-		gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_GREEN));
-		gc.drawRectangle(photoPosX, photoPosY, galleryItemWidth - 1, galleryItemHeight - 1);
+//		// debug box for the whole gallery item area
+//		gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_GREEN));
+//		gc.drawRectangle(photoPosX, photoPosY, galleryItemWidth - 1, galleryItemHeight - 1);
 	}
 
 	/**

@@ -36,13 +36,10 @@ public class Messages extends NLS {
 	public static String		Pic_Dir_Action_NavigateHistoryForward;
 	public static String		Pic_Dir_Action_PhotoFilterGPS;
 	public static String		Pic_Dir_Action_PhotoFilterGPS_Tooltip;
-
-	public static String	Pic_Dir_Action_PhotoFilterGPSTooltip;
-	public static String	Pic_Dir_Action_PhotoFilterNoFilter;
-
+	public static String		Pic_Dir_Action_PhotoFilterGPSTooltip;
+	public static String		Pic_Dir_Action_PhotoFilterNoFilter;
 	public static String		Pic_Dir_Action_PhotoFilterNoFilter_Tooltip;
-	public static String	Pic_Dir_Action_PhotoFilterNoGPS;
-
+	public static String		Pic_Dir_Action_PhotoFilterNoGPS;
 	public static String		Pic_Dir_Action_PhotoFilterNoGPS_Tooltip;
 	public static String		Pic_Dir_Action_Preferences;
 	public static String		Pic_Dir_Action_Refresh;
@@ -95,11 +92,11 @@ public class Messages extends NLS {
 	public static String		PrefPage_Photo_ThumbStore_Group_Cleanup;
 	public static String		PrefPage_Photo_ThumbStore_Group_ThumbnailStoreLocation;
 	public static String		PrefPage_Photo_ThumbStore_Text_Location;
+	public static String		PrefPage_Photo_Thumbstore_Label_CleanupPeriod;
+	public static String		PrefPage_Photo_Thumbstore_Label_KeepImagesNumberOfDays;
 	public static String		PrefPage_Photo_Thumbstore_Label_LastCleanup;
 	public static String		PrefPage_Photo_Thumbstore_Label_UnitDays;
-	public static String		PrefPage_Photo_Thumbstore_Spinner_CleanupPeriod;
 	public static String		PrefPage_Photo_Thumbstore_Spinner_CleanupPeriod_Tooltip;
-	public static String		PrefPage_Photo_Thumbstore_Spinner_KeepImagesNumberOfDays;
 	public static String		PrefPage_Photo_Thumbstore_Spinner_KeepImagesNumberOfDays_Tooltip;
 	public static String		PrefPage_Photo_Viewer_Checkbox_ShowHighQuality;
 	public static String		PrefPage_Photo_Viewer_Checkbox_ShowHighQuality_Tooltip;

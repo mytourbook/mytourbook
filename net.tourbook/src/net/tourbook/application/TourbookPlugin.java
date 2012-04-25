@@ -21,6 +21,7 @@ import java.util.ResourceBundle;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.photo.manager.PhotoImageCache;
+import net.tourbook.photo.manager.PhotoManager;
 import net.tourbook.ui.TourTypeFilter;
 
 import org.eclipse.core.runtime.IStatus;
@@ -175,7 +176,7 @@ public class TourbookPlugin extends AbstractUIPlugin {
 		return section;
 	}
 
-	public Version getVersion()  {
+	public Version getVersion() {
 		return _version;
 	}
 
@@ -205,6 +206,7 @@ public class TourbookPlugin extends AbstractUIPlugin {
 	@Override
 	public void stop(final BundleContext context) throws Exception {
 
+		PhotoManager.stopImageLoading();
 		PhotoImageCache.dispose();
 
 		_instance = null;

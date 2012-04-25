@@ -29,7 +29,6 @@ public class DefaultGalleryMT20ItemRenderer extends AbstractGalleryMT20ItemRende
 	@Override
 	public void draw(	final GC gc,
 						final GalleryMT20Item galleryItem,
-						final int index,
 						final int viewPortX,
 						final int viewPortY,
 						final int galleryItemWidth,

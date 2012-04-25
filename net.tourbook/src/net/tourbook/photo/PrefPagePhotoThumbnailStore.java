@@ -17,6 +17,7 @@ package net.tourbook.photo;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.photo.manager.PhotoImageCache;
+import net.tourbook.photo.manager.PhotoManager;
 import net.tourbook.photo.manager.ThumbnailStore;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.UI;
@@ -193,8 +194,7 @@ public class PrefPagePhotoThumbnailStore extends FieldEditorPreferencePage imple
 					.align(SWT.BEGINNING, SWT.CENTER)
 					.indent(16, 0)
 					.applyTo(_lblCheckStore);
-			_lblCheckStore.setText(Messages.PrefPage_Photo_Thumbstore_Spinner_CleanupPeriod);
-			_lblCheckStore.setToolTipText(Messages.PrefPage_Photo_Thumbstore_Spinner_CleanupPeriod_Tooltip);
+			_lblCheckStore.setText(Messages.PrefPage_Photo_Thumbstore_Label_CleanupPeriod);
 
 			/*
 			 * spinner: cleanup perion
@@ -203,6 +203,7 @@ public class PrefPagePhotoThumbnailStore extends FieldEditorPreferencePage imple
 			GridDataFactory.fillDefaults() //
 					.align(SWT.BEGINNING, SWT.FILL)
 					.applyTo(_spinnerCleanupPeriod);
+			_spinnerCleanupPeriod.setToolTipText(Messages.PrefPage_Photo_Thumbstore_Spinner_CleanupPeriod_Tooltip);
 			_spinnerCleanupPeriod.setMinimum(0);
 			_spinnerCleanupPeriod.setMaximum(9999);
 			_spinnerCleanupPeriod.addMouseWheelListener(new MouseWheelListener() {
@@ -230,14 +231,17 @@ public class PrefPagePhotoThumbnailStore extends FieldEditorPreferencePage imple
 					.align(SWT.BEGINNING, SWT.CENTER)
 					.indent(16, 0)
 					.applyTo(_lblCleanup);
-			_lblCleanup.setText(Messages.PrefPage_Photo_Thumbstore_Spinner_KeepImagesNumberOfDays);
-			_lblCleanup.setToolTipText(Messages.PrefPage_Photo_Thumbstore_Spinner_KeepImagesNumberOfDays_Tooltip);
+			_lblCleanup.setText(Messages.PrefPage_Photo_Thumbstore_Label_KeepImagesNumberOfDays);
 
 			/*
 			 * spinner: keep images for x days
 			 */
 			_spinnerNumberOfDaysToKeepImages = new Spinner(container, SWT.BORDER);
-			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_spinnerNumberOfDaysToKeepImages);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.BEGINNING, SWT.FILL)
+					.applyTo(_spinnerNumberOfDaysToKeepImages);
+			_spinnerNumberOfDaysToKeepImages.setToolTipText(//
+					Messages.PrefPage_Photo_Thumbstore_Spinner_KeepImagesNumberOfDays_Tooltip);
 			_spinnerNumberOfDaysToKeepImages.setMinimum(0);
 			_spinnerNumberOfDaysToKeepImages.setMaximum(9999);
 			_spinnerNumberOfDaysToKeepImages.addMouseWheelListener(new MouseWheelListener() {
@@ -324,6 +328,8 @@ public class PrefPagePhotoThumbnailStore extends FieldEditorPreferencePage imple
 
 		// update pref store values
 		if (performOk()) {
+
+			PhotoManager.stopImageLoading();
 
 			// remove store files
 			ThumbnailStore.cleanupStoreFiles(isDeleteAllImages, true);

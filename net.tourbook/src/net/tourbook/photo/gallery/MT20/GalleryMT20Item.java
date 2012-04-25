@@ -30,14 +30,27 @@ public class GalleryMT20Item {
 	 * Screen viewport for this gallery item where it is painted for the currently scrolled gallery
 	 * position.
 	 */
-	public int			virtualPosX;
-	public int			virtualPosY;
+	public int			viewPortX;
+	public int			viewPortY;
 
 	public int			width;
 	public int			height;
 
 	public GalleryMT20Item(final GalleryMT20 galleryMT20) {
 		this.galleryMT20 = galleryMT20;
+	}
+
+	@Override
+	public String toString() {
+		return ""
+//				"GalleryMT20Item"
+				+ (" " + data)
+				+ (" 			x=" + viewPortX)
+				+ ("\ty=" + viewPortY)
+				+ ("\t" + width)
+				+ ("x" + height)
+//
+		;
 	}
 
 }

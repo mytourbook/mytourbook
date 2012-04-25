@@ -15,8 +15,9 @@
  *******************************************************************************/
 package net.tourbook.photo.gallery.MT20;
 
-import net.tourbook.photo.manager.Photo;
-import net.tourbook.ui.UI;
+import java.util.concurrent.LinkedBlockingQueue;
+
+import net.tourbook.util.UI;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
@@ -47,103 +48,112 @@ import org.eclipse.swt.widgets.ScrollBar;
  */
 public abstract class GalleryMT20 extends Canvas {
 
-	private boolean							_isVertical;
-	private boolean							_isMultiSelection;
+	private boolean										_isVertical;
+	private boolean										_isMultiSelection;
 
-	private boolean							_isGalleryMoved;
+	private boolean										_isGalleryMoved;
 
 	/**
 	 * Current gallery top/left position (this is also the scroll bar position). Can be used by
 	 * renderer during paint.
 	 */
-	private int								_galleryPosition		= 0;
+	private int											_galleryPosition		= 0;
 
-	private Double							_galleryPositionWhenUpdated;
+	private Double										_galleryPositionWhenUpdated;
 
 	/**
 	 * When <code>true</code> images are painted in higher quality but must be larger than the high
 	 * quality minimum size which is set in {@link #setImageQuality(boolean, int)}.
 	 */
-	private boolean							_isShowHighQuality;
+	private boolean										_isShowHighQuality;
 
 	/**
 	 * When images size (height) is larger than this values, the images are painted with high
 	 * quality in a 2nd run.
 	 */
-	private int								_highQualityMinSize;
+	private int											_highQualityMinSize;
 
 	/**
 	 * Image quality : interpolation
 	 */
-	private int								_interpolation			= SWT.HIGH;
+	private int											_interpolation			= SWT.HIGH;
 
 	/**
 	 * Image quality : antialias
 	 */
-	private int								_antialias				= SWT.ON;
+	private int											_antialias				= SWT.ON;
 
 	/*
 	 * width and height for the whole gallery
 	 */
-	private int								_contentVirtualHeight	= 0;
+	private int											_contentVirtualHeight	= 0;
 
-	private int								_contentVirtualWidth	= 0;
-	private int								_prevGalleryPosition;
+	private int											_contentVirtualWidth	= 0;
+	private int											_prevGalleryPosition;
 
-	private int								_prevViewportWidth;
-	private int								_prevViewportHeight;
-	private int								_prevContentHeight;
-	private int								_prevContentWidth;
+	private int											_prevViewportWidth;
+	private int											_prevViewportHeight;
+	private int											_prevContentHeight;
+	private int											_prevContentWidth;
 
-	private AbstractGalleryMT20ItemRenderer	_itemRenderer;
+	private AbstractGalleryMT20ItemRenderer				_itemRenderer;
 
 	/**
 	 * Cached client area
 	 */
-	private Rectangle						_clientArea;
+	private Rectangle									_clientArea;
 
-	private Composite						_parent;
+	private Composite									_parent;
 
-	private ControlAdapter					_parentControlListener;
-	private int								_higherQualityDelay;
+	private ControlAdapter								_parentControlListener;
+	private int											_higherQualityDelay;
 
-	private RedrawTimer						_redrawTimer			= new RedrawTimer();
+	private RedrawTimer									_redrawTimer			= new RedrawTimer();
 
 	/**
 	 * Contains items which are displayed in the gallery. Initially the items are not set because
 	 * they are virtual until they are displayed.
 	 */
-	private GalleryMT20Item[]				_galleryItems;
+	private GalleryMT20Item[]							_galleryItems;
 
 	/**
-	 * Contains items which are currently be visible in the viewport area. This is used to stop
-	 * loading images which are not displayed.
+	 * Contains items indices for the current client area. It can also contains indices for gallery
+	 * item which are out of scope. Therefore it is necessary to check if the index is within the
+	 * arraybounds of {@link #_visibleGalleryItems}.
+	 * <p>
+	 * This is used to stop loading images which are not displayed.
 	 */
-	private GalleryMT20Item[]				_visibleGalleryItems;
+	private int[]										_clientAreaItemsIndices;
 
-	private GalleryMT20Item[]				_selectedItems			= null;
+	/**
+	 * Represents items which are filtered. It contains the indices of the gallery items in
+	 * {@link #_galleryItems}.
+	 */
+	private int[]										_filteredItemsIndices;
+
+	private GalleryMT20Item[]							_selectedItems			= null;
 
 	/**
 	 * Selection bit flags. Each 'int' contains flags for 32 items.
 	 */
-	private int[]							selectionFlags			= null;
+	private int[]										selectionFlags			= null;
 
-	private int								_itemWidth				= 80;
-	private int								_itemHeight				= (int) (_itemWidth * (float) 15 / 11);
-	private double							_itemRatio				= (double) _itemWidth / _itemHeight;
+	private int											_itemWidth				= 80;
+	private int											_itemHeight				= (int) (_itemWidth * (float) 15 / 11);
+	private double										_itemRatio				= (double) _itemWidth / _itemHeight;
 
 	/**
 	 * @return Returns minimum gallery item width or <code>-1</code> when value is not set.
 	 */
-	private int								_minItemWidth			= -1;
+	private int											_minItemWidth			= -1;
 
 	/**
 	 * @return Returns maximum gallery item width or <code>-1</code> when value is not set.
 	 */
-	private int								_maxItemWidth			= -1;
+	private int											_maxItemWidth			= -1;
 
-	private int								_numberOfHorizItems;
-	private int								_numberOfVertItems;
+	private int											_numberOfHorizItems;
+	private int											_numberOfVertItems;
 
 	/**
 	 * Is <code>true</code> during zooming. OSX do fire a mouse wheel event always, Win do fire a
@@ -151,23 +161,30 @@ public abstract class GalleryMT20 extends Canvas {
 	 * <p>
 	 * Terrible behaviour !!!
 	 */
-	private boolean							_isZoomed;
+	private boolean										_isZoomed;
 
 	/**
 	 * Keeps track of the last selected item. This is necessary to support "Shift+Mouse button"
 	 * where we have to select all items between the previous and the current item and keyboard
 	 * navigation.
 	 */
-	private GalleryMT20Item					lastSingleClick			= null;
+	private GalleryMT20Item								lastSingleClick			= null;
 
-	private Point							_mouseMovePosition;
-	private Point							_mousePanStartPosition;
-	private int								_lastZoomEventTime;
-	private boolean							_mouseClickHandled;
-	private boolean							_isGalleryPanned;
+	private final LinkedBlockingQueue<GalleryMT20Item>	_redrawGalleryItems		= new LinkedBlockingQueue<GalleryMT20Item>();
+
+	private Point										_mouseMovePosition;
+	private Point										_mousePanStartPosition;
+	private int											_lastZoomEventTime;
+	private boolean										_mouseClickHandled;
+	private boolean										_isGalleryPanned;
 
 	private class RedrawTimer implements Runnable {
 		public void run() {
+
+			if (isDisposed()) {
+				return;
+			}
+
 			redraw();
 		}
 	}
@@ -185,7 +202,12 @@ public abstract class GalleryMT20 extends Canvas {
 	 */
 	public GalleryMT20(final Composite parent, final int style) {
 
+//		super(parent, style);
 		super(parent, style | SWT.DOUBLE_BUFFERED);
+//		super(parent, style | SWT.NO_BACKGROUND);
+//		super(parent, style | SWT.NO_BACKGROUND | SWT.NO_REDRAW_RESIZE);
+//		super(parent, style | SWT.DOUBLE_BUFFERED | SWT.NO_BACKGROUND | SWT.NO_REDRAW_RESIZE);
+//		super(parent, style | SWT.NO_MERGE_PAINTS);
 
 		_isVertical = (style & SWT.V_SCROLL) > 0;
 		_isMultiSelection = (style & SWT.MULTI) > 0;
@@ -454,14 +476,15 @@ public abstract class GalleryMT20 extends Canvas {
 
 		if (_isVertical) {
 
-			final Point vhNumbers = computeNumberOfVertHorizItems(_clientArea.width, _itemWidth);
+			final Point vhNumbers = computeNumberOfVertHorizItems_10(_clientArea.width, _itemWidth);
 
 			_numberOfHorizItems = vhNumbers.x;
 			_numberOfVertItems = vhNumbers.y;
 
 		} else {
 
-			final Point vhNumbers = computeNumberOfVertHorizItems(_clientArea.height, _itemHeight);
+			final Point vhNumbers = computeNumberOfVertHorizItems_10(_clientArea.height, _itemHeight);
+
 			_numberOfHorizItems = vhNumbers.y;
 			_numberOfVertItems = vhNumbers.x;
 		}
@@ -474,13 +497,13 @@ public abstract class GalleryMT20 extends Canvas {
 	 * @param itemSize
 	 * @return
 	 */
-	private Point computeNumberOfVertHorizItems(final int visibleSize, final int itemSize) {
+	private Point computeNumberOfVertHorizItems_10(final int visibleSize, final int itemSize) {
 
-		if (_galleryItems == null) {
+		if (_filteredItemsIndices == null) {
 			return new Point(0, 0);
 		}
 
-		final int numberOfItems = _galleryItems.length;
+		final int numberOfItems = _filteredItemsIndices.length;
 		if (numberOfItems == 0) {
 			return new Point(0, 0);
 		}
@@ -510,98 +533,13 @@ public abstract class GalleryMT20 extends Canvas {
 	}
 
 	/**
-	 * @return Returns gallery relative position
-	 */
-	public double getGalleryPosition() {
-
-		if (_isVertical) {
-
-			final ScrollBar vBar = getVerticalBar();
-			if (vBar == null) {
-				return 1;
-			}
-
-			final int selection = vBar.getSelection();
-			final int maximum = vBar.getMaximum();
-
-			return (double) selection / maximum;
-
-		} else {
-
-			final ScrollBar hBar = getHorizontalBar();
-			if (hBar == null) {
-				return 1;
-			}
-
-			final int selection = hBar.getSelection();
-			final int maximum = hBar.getMaximum();
-
-			return (double) selection / maximum;
-		}
-	}
-
-	private GalleryMT20Item getItem(final int itemIndex) {
-
-		GalleryMT20Item galleryItem = _galleryItems[itemIndex];
-
-		if (galleryItem == null) {
-
-			galleryItem = new GalleryMT20Item(this);
-			_galleryItems[itemIndex] = galleryItem;
-
-			initItem(galleryItem, itemIndex);
-		}
-
-		System.out.println("\t" + ((Photo) galleryItem.data).getFileName());
-		// TODO remove SYSTEM.OUT.PRINTLN
-
-		return galleryItem;
-	}
-
-	/**
-	 * Get item at pixel position
-	 * 
-	 * @param coords
-	 * @return GalleryItem or null
-	 */
-	public GalleryMT20Item getItem(final Point coords) {
-
-		final int pos = _isVertical ? (coords.y + _galleryPosition) : (coords.x + _galleryPosition);
-
-//		final GalleryMT20Item group = _getGroup(coords);
-//		if (group != null) {
-//			return groupRenderer.getItem(group, new Point(_isVertical ? coords.x : pos, _isVertical ? pos : coords.y));
-//		}
-
-		return null;
-	}
-
-	public int getScrollBarIncrement() {
-
-		if (_isVertical) {
-			// Vertical fill
-			return _clientArea.height;
-		} else {
-
-			// Horizontal fill
-			return _clientArea.width;
-		}
-
-//		// Standard behavior
-//		return 16;
-	}
-
-	public GalleryMT20Item[] getVisibleGalleryItems() {
-		return _visibleGalleryItems;
-	}
-
-	/**
 	 * Original method: AbstractGridGroupRenderer.getVisibleItems()
 	 * 
 	 * @param clippingArea
-	 * @return Returns indices for all visible gallery items contained in the clipping area.
+	 * @return Returns indices for all gallery items contained in the clipping area. This can also
+	 *         contain indices for which items are not available.
 	 */
-	private int[] getVisibleItems(final Rectangle clippingArea) {
+	private int[] getAreaItemsIndices(final Rectangle clippingArea) {
 
 		final int clipX = clippingArea.x;
 		final int clipY = clippingArea.y;
@@ -642,15 +580,6 @@ public abstract class GalleryMT20 extends Canvas {
 				lastItem = (lastLine + 1) * _numberOfHorizItems;
 			}
 
-			// ensure number of available items
-			final int numberOfItems = _galleryItems.length;
-			if (lastItem > numberOfItems) {
-				lastItem = numberOfItems;
-				if (firstItem > lastItem) {
-					firstItem = lastItem;
-				}
-			}
-
 			// exit if no item selected
 			final int itemsCount = lastItem - firstItem;
 			if (itemsCount == 0) {
@@ -662,8 +591,8 @@ public abstract class GalleryMT20 extends Canvas {
 				indexes[itemIndex] = firstItem + itemIndex;
 			}
 
-			System.out.println("first:" + firstItem + "\tlast:" + lastItem);
-			// TODO remove SYSTEM.OUT.PRINTLN
+//			System.out.println("first:" + firstItem + "\tlast:" + lastItem);
+//			// TODO remove SYSTEM.OUT.PRINTLN
 
 		} else {
 
@@ -672,7 +601,7 @@ public abstract class GalleryMT20 extends Canvas {
 				firstLine = 0;
 			}
 
-			int firstItem = firstLine * _numberOfVertItems;
+			final int firstItem = firstLine * _numberOfVertItems;
 
 			int lastLine = (clipX + _galleryPosition + clipWidth) / _itemWidth;
 
@@ -680,16 +609,7 @@ public abstract class GalleryMT20 extends Canvas {
 				lastLine = firstLine;
 			}
 
-			int lastItem = (lastLine + 1) * _numberOfVertItems;
-
-			// ensure number of available items
-			final int numberOfItems = _galleryItems.length;
-			if (lastItem > numberOfItems) {
-				lastItem = numberOfItems;
-				if (firstItem > lastItem) {
-					firstItem = lastItem;
-				}
-			}
+			final int lastItem = (lastLine + 1) * _numberOfVertItems;
 
 			// exit if no item selected
 			if (lastItem - firstItem == 0) {
@@ -706,6 +626,70 @@ public abstract class GalleryMT20 extends Canvas {
 	}
 
 	/**
+	 * @return Returns gallery relative position
+	 */
+	public double getGalleryPosition() {
+
+		if (_isVertical) {
+
+			final ScrollBar vBar = getVerticalBar();
+			if (vBar == null) {
+				return 1;
+			}
+
+			final int selection = vBar.getSelection();
+			final int maximum = vBar.getMaximum();
+
+			return (double) selection / maximum;
+
+		} else {
+
+			final ScrollBar hBar = getHorizontalBar();
+			if (hBar == null) {
+				return 1;
+			}
+
+			final int selection = hBar.getSelection();
+			final int maximum = hBar.getMaximum();
+
+			return (double) selection / maximum;
+		}
+	}
+
+	/**
+	 * Get item at pixel position
+	 * 
+	 * @param coords
+	 * @return GalleryItem or null
+	 */
+	public GalleryMT20Item getItem(final Point coords) {
+
+		final int pos = _isVertical ? (coords.y + _galleryPosition) : (coords.x + _galleryPosition);
+
+//		final GalleryMT20Item group = _getGroup(coords);
+//		if (group != null) {
+//			return groupRenderer.getItem(group, new Point(_isVertical ? coords.x : pos, _isVertical ? pos : coords.y));
+//		}
+
+		return null;
+	}
+
+	public int getScrollBarIncrement() {
+
+		if (_isVertical) {
+			// Vertical fill
+			return _clientArea.height;
+		} else {
+
+			// Horizontal fill
+			return _clientArea.width;
+		}
+
+//		// Standard behavior
+//		return 16;
+	}
+
+	/**
 	 * Initializes a gallery item which can be used to set data into the item. This method is called
 	 * before a gallery item is painted.
 	 * 
@@ -713,6 +697,81 @@ public abstract class GalleryMT20 extends Canvas {
 	 * @param itemIndex
 	 */
 	public abstract void initItem(final GalleryMT20Item galleryItem, final int itemIndex);
+
+	/**
+	 * @param checkedGalleryItem
+	 * @return Returns <code>true</code> when the requested gallery item is currently visible in the
+	 *         client area.
+	 */
+	public boolean isItemVisible(final GalleryMT20Item checkedGalleryItem) {
+
+		final GalleryMT20Item[] galleryItems = _galleryItems;
+		final int[] areaItemsIndices = _clientAreaItemsIndices;
+		final int[] filteredItemsIndices = _filteredItemsIndices;
+
+		if (filteredItemsIndices == null
+				|| filteredItemsIndices.length == 0
+				|| areaItemsIndices == null
+				|| areaItemsIndices.length == 0) {
+			return false;
+		}
+
+		final int numberOfAreaItems = areaItemsIndices.length;
+		final int numberOfFilterItems = filteredItemsIndices.length;
+
+		for (int areaIndex = 0; areaIndex < numberOfAreaItems; areaIndex++) {
+
+			final int filterIndex = areaItemsIndices[areaIndex];
+
+			// ensure number of available items
+			if (filterIndex >= numberOfFilterItems) {
+				return false;
+			}
+
+			final int galleryIndex = filteredItemsIndices[filterIndex];
+
+			final GalleryMT20Item galleryItem = galleryItems[galleryIndex];
+
+			if (galleryItem == checkedGalleryItem) {
+
+				int numberOfItemsX;
+				int numberOfItemsY;
+				if (_isVertical) {
+					numberOfItemsX = filterIndex % _numberOfHorizItems;
+					numberOfItemsY = (filterIndex - numberOfItemsX) / _numberOfHorizItems;
+				} else {
+					numberOfItemsY = filterIndex % _numberOfVertItems;
+					numberOfItemsX = (filterIndex - numberOfItemsY) / _numberOfVertItems;
+				}
+
+				int viewPortX;
+				int viewPortY;
+
+				final int galleryVirtualPosX = numberOfItemsX * _itemWidth;
+				final int galleryVirtualPosY = numberOfItemsY * _itemHeight;
+
+				if (_isVertical) {
+
+					viewPortX = galleryVirtualPosX;
+					viewPortY = galleryVirtualPosY - _galleryPosition;
+
+				} else {
+
+					viewPortX = galleryVirtualPosX - _galleryPosition;
+					viewPortY = galleryVirtualPosY;
+				}
+
+				galleryItem.viewPortX = viewPortX;
+				galleryItem.viewPortY = viewPortY;
+				galleryItem.height = _itemHeight;
+				galleryItem.width = _itemWidth;
+
+				return true;
+			}
+		}
+
+		return false;
+	}
 
 	private boolean isSelected(final GalleryMT20Item item) {
 
@@ -1016,13 +1075,11 @@ public abstract class GalleryMT20 extends Canvas {
 		// reset state
 		_isGalleryMoved = false;
 
+		int redrawQueueSize = 0;
+
 		try {
 
 			final Rectangle clippingArea = gc.getClipping();
-
-			System.out.println("\t");
-			System.out.println("clipping: " + clippingArea);
-			// TODO remove SYSTEM.OUT.PRINTLN
 
 			if (isLowQualityPainting) {
 				gc.setAntialias(SWT.OFF);
@@ -1032,28 +1089,47 @@ public abstract class GalleryMT20 extends Canvas {
 				gc.setInterpolation(_interpolation);
 			}
 
-			gc.setBackground(getBackground());
+			redrawQueueSize = _redrawGalleryItems.size();
 
-			// get visible items in the clipping area
-			final int[] visibleIndexes = getVisibleItems(clippingArea);
-			if (visibleIndexes != null) {
+			if (redrawQueueSize > 0) {
 
-				final int numberOfVisibleItems = visibleIndexes.length;
+//				final boolean isSelected = isSelected(galleryItem);
+				final boolean isSelected = false;
 
-				_visibleGalleryItems = new GalleryMT20Item[numberOfVisibleItems];
+				onPaint_20_DrawItem(gc, clippingArea, _redrawGalleryItems.take(), -1, isSelected, true);
 
-				if (numberOfVisibleItems > 0) {
+				redrawQueueSize--;
 
-					for (int itemIndex = numberOfVisibleItems - 1; itemIndex >= 0; itemIndex--) {
+			} else {
 
-						final GalleryMT20Item galleryItem = getItem(visibleIndexes[itemIndex]);
+				// get visible items in the clipping area
+				final int[] areaItemsIndices = getAreaItemsIndices(clippingArea);
+				if (areaItemsIndices != null) {
 
-						_visibleGalleryItems[itemIndex] = galleryItem;
+					final int numberOfAreaItems = areaItemsIndices.length;
+					if (numberOfAreaItems > 0) {
 
-//						final boolean isSelected = isSelected(galleryItem);
-						final boolean isSelected = false;
+						final int filterLength = _filteredItemsIndices.length;
 
-						onPaint_10_DrawItem(gc, galleryItem, itemIndex, isSelected);
+						// loop: all gallery items in the clipping area
+						for (int areaIndex = numberOfAreaItems - 1; areaIndex >= 0; areaIndex--) {
+
+							final int filterIndex = areaItemsIndices[areaIndex];
+
+							// ensure number of available items
+							if (filterIndex >= filterLength) {
+								continue;
+							}
+
+							final int galleryIndex = _filteredItemsIndices[filterIndex];
+
+							final GalleryMT20Item galleryItem = onPaint_10_getItem(galleryIndex);
+
+//							final boolean isSelected = isSelected(galleryItem);
+							final boolean isSelected = false;
+
+							onPaint_20_DrawItem(gc, clippingArea, galleryItem, filterIndex, isSelected, false);
+						}
 					}
 				}
 			}
@@ -1064,22 +1140,29 @@ public abstract class GalleryMT20 extends Canvas {
 			e.printStackTrace();
 		}
 
-		// When lowQualityOnUserAction is enabled, keep last state and wait
-		// before updating with a higher quality
-		if (_isShowHighQuality) {
+		if (redrawQueueSize > 0) {
 
-			_prevGalleryPosition = _galleryPosition;
+			getDisplay().timerExec(0, _redrawTimer);
 
-			_prevViewportWidth = _clientArea.width;
-			_prevViewportHeight = _clientArea.height;
+		} else {
 
-			_prevContentHeight = _contentVirtualHeight;
-			_prevContentWidth = _contentVirtualWidth;
+			// When lowQualityOnUserAction is enabled, keep last state and wait
+			// before updating with a higher quality
+			if (_isShowHighQuality) {
 
-			if (isLowQualityPainting && isSmallerThanHQMinSize == false) {
-				// Calling timerExec with the same object just delays the
-				// execution (doesn't run twice)
-				getDisplay().timerExec(_higherQualityDelay, _redrawTimer);
+				_prevGalleryPosition = _galleryPosition;
+
+				_prevViewportWidth = _clientArea.width;
+				_prevViewportHeight = _clientArea.height;
+
+				_prevContentHeight = _contentVirtualHeight;
+				_prevContentWidth = _contentVirtualWidth;
+
+				if (isLowQualityPainting && isSmallerThanHQMinSize == false) {
+					// Calling timerExec with the same object just delays the
+					// execution (doesn't run twice)
+					getDisplay().timerExec(_higherQualityDelay, _redrawTimer);
+				}
 			}
 		}
 
@@ -1089,137 +1172,104 @@ public abstract class GalleryMT20 extends Canvas {
 		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
-	/**
-	 * Original method: AbstractGridGroupRenderer.drawItem()
-	 * 
-	 * @param gc
-	 * @param galleryItem
-	 * @param itemIndex
-	 * @param isSelected
-	 */
-	private void onPaint_10_DrawItem(	final GC gc,
-										final GalleryMT20Item galleryItem,
-										final int itemIndex,
-										final boolean isSelected) {
+	private GalleryMT20Item onPaint_10_getItem(final int galleryIndex) {
 
-		int numberOfItemsX;
-		int numberOfItemsY;
-		if (_isVertical) {
-			numberOfItemsX = itemIndex % _numberOfHorizItems;
-			numberOfItemsY = (itemIndex - numberOfItemsX) / _numberOfHorizItems;
-		} else {
-			numberOfItemsY = itemIndex % _numberOfVertItems;
-			numberOfItemsX = (itemIndex - numberOfItemsY) / _numberOfVertItems;
+		GalleryMT20Item galleryItem = _galleryItems[galleryIndex];
+
+		if (galleryItem == null) {
+
+			galleryItem = new GalleryMT20Item(this);
+			_galleryItems[galleryIndex] = galleryItem;
+
+			initItem(galleryItem, galleryIndex);
 		}
 
-		int viewPortX;
-		int viewPortY;
-
-		final int virtualPosX = numberOfItemsX * _itemWidth;
-		final int virtualPosY = numberOfItemsY * _itemHeight;
-
-		if (_isVertical) {
-
-			viewPortX = virtualPosX;
-			viewPortY = virtualPosY - _galleryPosition;
-
-		} else {
-
-			viewPortX = virtualPosX - _galleryPosition;
-			viewPortY = virtualPosY;
-		}
-
-		galleryItem.virtualPosX = virtualPosX;
-		galleryItem.virtualPosY = virtualPosY;
-		galleryItem.height = _itemHeight;
-		galleryItem.width = _itemWidth;
-
-		gc.setClipping(viewPortX, viewPortY, _itemWidth, _itemHeight);
-
-		_itemRenderer.draw(gc, galleryItem, itemIndex, viewPortX, viewPortY, _itemWidth, _itemHeight, isSelected);
-
-//		// Drawing area
-//		final int galleryPosX = _isVertical ? groupItem.x : groupItem.x - _galleryPosition;
-//		final int galleryPosY = _isVertical ? groupItem.y - _galleryPosition : groupItem.y;
-//
-//		final Rectangle clipping = gc.getClipping();
-//		final Rectangle previousClipping = new Rectangle(clipping.x, clipping.y, clipping.width, clipping.height);
-//
-//		clipping.intersect(new Rectangle(galleryPosX, galleryPosY, groupItem.width, groupItem.height));
-//		gc.setClipping(clipping);
-//		{
-//			// Draw group
-//			groupRenderer.draw(
-//					gc,
-//					groupItem,
-//					galleryPosX,
-//					galleryPosY,
-//					clipping.x,
-//					clipping.y,
-//					clipping.width,
-//					clipping.height);
-//		}
-//		gc.setClipping(previousClipping);
-
+		return galleryItem;
 	}
 
 	/**
 	 * Original method: AbstractGridGroupRenderer.drawItem()
 	 * 
 	 * @param gc
+	 * @param clippingArea
 	 * @param galleryItem
-	 * @param itemIndex
+	 * @param filterIndex
 	 * @param isSelected
+	 * @param isRedrawItem
 	 */
-	private void onPaint_10_DrawItem_OLD(	final GC gc,
-											final GalleryMT20Item galleryItem,
-											final int itemIndex,
-											final boolean isSelected) {
+	private void onPaint_20_DrawItem(	final GC gc,
+										final Rectangle clippingArea,
+										final GalleryMT20Item galleryItem,
+										final int filterIndex,
+										final boolean isSelected,
+										final boolean isRedrawItem) {
 
-		int posX, posY;
-		if (_isVertical) {
-			posX = itemIndex % _numberOfHorizItems;
-			posY = (itemIndex - posX) / _numberOfHorizItems;
+		int viewPortX;
+		int viewPortY;
+
+		if (isRedrawItem) {
+
+			// check visibility, this will also set gallery position
+			final boolean isVisible = isItemVisible(galleryItem);
+
+			if (isVisible == false) {
+				return;
+			}
+
+			viewPortX = galleryItem.viewPortX;
+			viewPortY = galleryItem.viewPortY;
+
+			// adjust the redraw area
+			// this is a very tricky redraw solution but it works finally :-)))
+			// it is combined with a redraw in redrawGalleryItem
+
+			redraw(viewPortX, viewPortY, _itemWidth, _itemHeight, false);
+
 		} else {
-			posY = itemIndex % _numberOfVertItems;
-			posX = (itemIndex - posY) / _numberOfVertItems;
+
+			int numberOfItemsX;
+			int numberOfItemsY;
+			if (_isVertical) {
+				numberOfItemsX = filterIndex % _numberOfHorizItems;
+				numberOfItemsY = (filterIndex - numberOfItemsX) / _numberOfHorizItems;
+			} else {
+				numberOfItemsY = filterIndex % _numberOfVertItems;
+				numberOfItemsX = (filterIndex - numberOfItemsY) / _numberOfVertItems;
+			}
+
+			final int galleryVirtualPosX = numberOfItemsX * _itemWidth;
+			final int galleryVirtualPosY = numberOfItemsY * _itemHeight;
+
+			if (_isVertical) {
+
+				viewPortX = galleryVirtualPosX;
+				viewPortY = galleryVirtualPosY - _galleryPosition;
+
+			} else {
+
+				viewPortX = galleryVirtualPosX - _galleryPosition;
+				viewPortY = galleryVirtualPosY;
+			}
+
+			galleryItem.viewPortX = viewPortX;
+			galleryItem.viewPortY = viewPortY;
+			galleryItem.height = _itemHeight;
+			galleryItem.width = _itemWidth;
 		}
 
-		final int scrollbarPosition = _galleryPosition;
-		int itemViewPortX;
-		int itemViewportY;
+		// reset clipping
+//		gc.setClipping((Rectangle) null);
 
-		if (_isVertical) {
+//		gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 
-			itemViewPortX = posX * (_itemWidth);
-			itemViewportY = (posY * (_itemHeight) - scrollbarPosition);
+		gc.setClipping(viewPortX, viewPortY, _itemWidth, _itemHeight);
 
-			galleryItem.virtualPosX = itemViewPortX;
-			galleryItem.virtualPosY = itemViewportY + scrollbarPosition;
+//
+//		gc.setBackground(getBackground());
+//		gc.fillRectangle(viewPortX, viewPortY, _itemWidth, _itemHeight);
 
-		} else {
+		_itemRenderer.draw(gc, galleryItem, viewPortX, viewPortY, _itemWidth, _itemHeight, isSelected);
 
-			itemViewPortX = (posX * (_itemWidth) - scrollbarPosition);
-			itemViewportY = posY * (_itemHeight);
-
-			galleryItem.virtualPosX = itemViewPortX + scrollbarPosition;
-			galleryItem.virtualPosY = itemViewportY;
-		}
-
-		galleryItem.height = _itemHeight;
-		galleryItem.width = _itemWidth;
-
-		gc.setClipping(itemViewPortX, itemViewportY, _itemWidth, _itemHeight);
-
-		_itemRenderer.draw(
-				gc,
-				galleryItem,
-				itemIndex,
-				itemViewPortX,
-				itemViewportY,
-				_itemWidth,
-				_itemHeight,
-				isSelected);
 	}
 
 	private void onScrollHorizontal() {
@@ -1237,6 +1287,7 @@ public abstract class GalleryMT20 extends Canvas {
 			_galleryPosition = 0;
 		}
 
+		_clientAreaItemsIndices = getAreaItemsIndices(_clientArea);
 	}
 
 	private void onScrollVertical(final SelectionEvent event) {
@@ -1306,6 +1357,31 @@ public abstract class GalleryMT20 extends Canvas {
 		} else {
 			_galleryPosition = 0;
 		}
+
+		_clientAreaItemsIndices = getAreaItemsIndices(_clientArea);
+	}
+
+	/**
+	 * Redraw a gallery item. A redraw is done for the whole client area because a partial redraw
+	 * has not worked when gallery has been scrolled with
+	 * {@link #scroll(int, int, int, int, int, int, boolean)}
+	 * <p>
+	 * Because a full redraw is done, {@link SWT#NO_BACKGROUND} must be set that the background is
+	 * not painter over gallery items which are not repainted.
+	 * <p>
+	 * This method must be run in the UI thread.
+	 * <p>
+	 * I found no better solution after many days of experimenting this redraw issue.
+	 * 
+	 * @param galleryItem
+	 */
+	public void redrawGalleryItem(final GalleryMT20Item galleryItem) {
+
+		_redrawGalleryItems.add(galleryItem);
+
+		// this is a very tricky redraw solution but it works finally :-)))
+		// it is combined with a redraw in the paint event
+		redraw(0, 0, 1, 1, false);
 	}
 
 	/**
@@ -1441,6 +1517,12 @@ public abstract class GalleryMT20 extends Canvas {
 
 		_galleryItems = new GalleryMT20Item[numberOfItems];
 
+		_filteredItemsIndices = new int[numberOfItems];
+
+		for (int index = 0; index < numberOfItems; index++) {
+			_filteredItemsIndices[index] = index;
+		}
+
 //		// TODO: I'm clearing selection here
 //		// but we have to check that Table has the same behavior
 //		_deselectAll(false);
@@ -1452,6 +1534,8 @@ public abstract class GalleryMT20 extends Canvas {
 
 		updateStructuralValues(isKeepLocation);
 		updateScrollBars();
+
+		_clientAreaItemsIndices = getAreaItemsIndices(_clientArea);
 
 		redraw();
 	}
@@ -1621,7 +1705,7 @@ public abstract class GalleryMT20 extends Canvas {
 		_lastZoomEventTime = eventTime;
 
 		// get item from mouse position
-		final GalleryMT20Item currentItem = getItem(_mouseMovePosition);
+//		final GalleryMT20Item currentItem = getItem(_mouseMovePosition);
 
 //		if (currentItem == null) {
 //			return;
@@ -1639,7 +1723,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 			ZOOM_INCREMENT = 10;
 
-//				ZOOM_INCREMENT = (int) Math.pow(itemHeight / 4, 1.00);
+//			ZOOM_INCREMENT = (int) Math.pow(itemHeight / 4, 1.00);
 
 		} else if (isCtrlKey && isShiftKey) {
 			ZOOM_INCREMENT = 50;
@@ -1676,8 +1760,6 @@ public abstract class GalleryMT20 extends Canvas {
 				itemWidth = _minItemWidth;
 			}
 		}
-
-//		final double itemRatio = groupRenderer.getItemRatio();
 
 		final int itemHeight = (int) (itemWidth / _itemRatio);
 

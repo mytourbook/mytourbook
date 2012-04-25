@@ -44,6 +44,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Sash;
+import org.epics.css.dal.Timestamp;
 
 public class UI {
 
@@ -204,6 +205,10 @@ public class UI {
 			return data;
 		}
 		return null;
+	}
+
+	public static String getSystemTime() {
+		return (new Timestamp()).toString();
 	}
 
 	/**
@@ -428,6 +433,7 @@ public class UI {
 			}
 		};
 	}
+
 	public static VerifyListener verifyListenerTypeLong() {
 
 		return new VerifyListener() {

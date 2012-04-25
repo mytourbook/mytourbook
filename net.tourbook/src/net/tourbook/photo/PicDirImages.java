@@ -32,8 +32,8 @@ import net.tourbook.photo.manager.PhotoImageCache;
 import net.tourbook.photo.manager.PhotoManager;
 import net.tourbook.photo.manager.ThumbnailStore;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.ui.UI;
 import net.tourbook.util.StatusUtil;
+import net.tourbook.util.UI;
 import net.tourbook.util.Util;
 
 import org.apache.commons.sanselan.Sanselan;
@@ -318,21 +318,7 @@ public class PicDirImages {
 							return;
 						}
 
-//						final Rectangle galleryItemBounds = __galleryItem.getBounds();
-//
-//						_gallery.redraw(
-//								galleryItemBounds.x,
-//								galleryItemBounds.y,
-//								galleryItemBounds.width,
-//								galleryItemBounds.height,
-//								false);
-
-						_gallery.redraw(
-								__galleryItem.virtualPosX,
-								__galleryItem.virtualPosY,
-								__galleryItem.width,
-								__galleryItem.height,
-								false);
+						_gallery.redrawGalleryItem(__galleryItem);
 					}
 				});
 			}
@@ -719,7 +705,7 @@ public class PicDirImages {
 		});
 		_spinnerThumbSize.addMouseWheelListener(new MouseWheelListener() {
 			public void mouseScrolled(final MouseEvent event) {
-				UI.adjustSpinnerValueOnMouseScroll(event);
+				net.tourbook.ui.UI.adjustSpinnerValueOnMouseScroll(event);
 				onSelectThumbnailSize(_spinnerThumbSize.getSelection());
 			}
 		});
@@ -808,6 +794,7 @@ public class PicDirImages {
 	}
 
 	private void disposeAllImages() {
+		PhotoManager.stopImageLoading();
 		ThumbnailStore.cleanupStoreFiles(true, true);
 		PhotoImageCache.dispose();
 	}
@@ -1148,8 +1135,7 @@ public class PicDirImages {
 		//
 		// MUST BE REMOVED, IS ONLY FOR TESTING
 		//
-//		PhotoImageCache.dispose();
-//		ThumbnailStore.cleanupStoreFiles(true, true);
+		disposeAllImages();
 		//
 		// MUST BE REMOVED, IS ONLY FOR TESTING
 		//

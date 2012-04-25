@@ -94,25 +94,12 @@ public class PhotoImageLoader {
 	 */
 	private boolean isImageVisible() {
 
-		final GalleryMT20Item[] visibleGalleryItems = _galleryItem.galleryMT20.getVisibleGalleryItems();
-		if (visibleGalleryItems == null) {
-			return true;
-		}
+		final boolean isItemVisible = _galleryItem.galleryMT20.isItemVisible(_galleryItem);
 
-		for (final GalleryMT20Item visibleItem : visibleGalleryItems) {
+//		System.out.println("isItemVisible:" + isItemVisible + "  " + _galleryItem);
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
-			if (visibleItem == null) {
-				continue;
-			}
-
-			if (_galleryItem == visibleItem) {
-				return true;
-			}
-		}
-
-		// item is not visible
-
-		return false;
+		return isItemVisible;
 	}
 
 	/**
@@ -331,6 +318,17 @@ public class PhotoImageLoader {
 
 					// get SWT image from saved AWT image
 					final Image thumbnailImage = new Image(_display, storeImageFilePath.toOSString());
+
+//////////////////////////////////////////
+//
+// MUST BE REMOVED, IS ONLY FOR TESTING
+//
+//
+					new File(storeImageFilePath.toOSString()).delete();
+//
+// MUST BE REMOVED, IS ONLY FOR TESTING
+//
+//////////////////////////////////////////
 
 					return thumbnailImage;
 
@@ -848,19 +846,19 @@ public class PhotoImageLoader {
 			setStateLoadingError();
 		}
 
-//		final long timeTotal = endHqLoad + endResize + endSave;
-		final long end = System.currentTimeMillis() - start;
-
-		System.out.println("AWT: "
-				+ (Thread.currentThread().getName() + " " + photo.getFileName())
-				+ ("\tload: " + endHqLoad)
-				+ ("\tresize: " + endResize)
-				+ ("\tsave: " + endSave)
-				+ ("\ttotal: " + end)
-//				+ ("\tdiff: " + (end - timeTotal))
-				//
-				);
-		// TODO remove SYSTEM.OUT.PRINTLN
+////		final long timeTotal = endHqLoad + endResize + endSave;
+//		final long end = System.currentTimeMillis() - start;
+//
+//		System.out.println("AWT: "
+//				+ (Thread.currentThread().getName() + " " + photo.getFileName())
+//				+ ("\tload: " + endHqLoad)
+//				+ ("\tresize: " + endResize)
+//				+ ("\tsave: " + endSave)
+//				+ ("\ttotal: " + end)
+////				+ ("\tdiff: " + (end - timeTotal))
+//				//
+//				);
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		return requestedSWTImage;
 	}

@@ -23,7 +23,6 @@ public abstract class AbstractGalleryMT20ItemRenderer {
 
 	public abstract void draw(	GC gc,
 								GalleryMT20Item galleryItem,
-								int index,
 								int viewPortX,
 								int viewPortY,
 								int galleryItemWidth,

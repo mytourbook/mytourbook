@@ -112,8 +112,7 @@ public class ThumbnailStore {
 
 		if (isDeleteAllImages) {
 
-			_dateToDeleteOlderImages = Long.MIN_VALUE;
-			doCleanup(Integer.MIN_VALUE);
+			doCleanup(Integer.MIN_VALUE, Long.MIN_VALUE, true);
 
 			return;
 		}
@@ -130,8 +129,7 @@ public class ThumbnailStore {
 		// ckeck if cleanup is done always
 		if (daysToKeepImages == 0) {
 
-			_dateToDeleteOlderImages = Long.MIN_VALUE;
-			doCleanup(Integer.MIN_VALUE);
+			doCleanup(Integer.MIN_VALUE, Long.MIN_VALUE, true);
 
 		} else {
 
@@ -158,9 +156,9 @@ public class ThumbnailStore {
 
 				// convert kept days into a date in milliseconds
 				final LocalDate cleanupDate = today.minusDays(daysToKeepImages);
-				_dateToDeleteOlderImages = cleanupDate.toDateTimeAtCurrentTime().getMillis();
+				final long dateToDeleteOlderImages = cleanupDate.toDateTimeAtCurrentTime().getMillis();
 
-				doCleanup(daysToKeepImages);
+				doCleanup(daysToKeepImages, dateToDeleteOlderImages, false);
 			}
 		}
 
@@ -171,9 +169,12 @@ public class ThumbnailStore {
 		}
 	}
 
-	private static void doCleanup(final int daysToKeepImages) {
+	private static void doCleanup(	final int daysToKeepImages,
+									final long dateToDeleteOlderImages,
+									final boolean isDeleteAll) {
 
 		_errorFile = null;
+		_dateToDeleteOlderImages = dateToDeleteOlderImages;
 
 		_deleteUI_UpdateTime = System.currentTimeMillis();
 		_deleteUI_DeletedFiles = 0;
@@ -192,7 +193,7 @@ public class ThumbnailStore {
 
 					// show tasks info
 					String message;
-					if (daysToKeepImages == Integer.MIN_VALUE) {
+					if (isDeleteAll) {
 						message = Messages.Thumbnail_Store_CleanupTask_AllFiles;
 					} else {
 						message = NLS.bind(Messages.Thumbnail_Store_CleanupTask, daysToKeepImages);
@@ -201,7 +202,12 @@ public class ThumbnailStore {
 
 					for (final File folder : rootFiles) {
 
-						doCleanupDeleteFiles(folder, monitor);
+						if (isDeleteAll) {
+							doCleanupAll(folder, monitor);
+						} else {
+
+							doCleanupDeleteFiles(folder, monitor);
+						}
 
 						monitor.worked(1);
 					}
@@ -220,6 +226,41 @@ public class ThumbnailStore {
 		_prefStore.setValue(
 				ITourbookPreferences.PHOTO_THUMBNAIL_STORE_LAST_CLEANUP_DATE_TIME,
 				new DateTime().getMillis());
+	}
+
+	/**
+	 * recursivly delete directory
+	 * 
+	 * @param directory
+	 * @param monitor
+	 */
+	private static boolean doCleanupAll(final File directory, final IProgressMonitor monitor) {
+
+		boolean result = false;
+
+		if (directory.isDirectory()) {
+			final File[] files = directory.listFiles();
+
+			for (final File file : files) {
+				if (file.isDirectory()) {
+					doCleanupAll(file, monitor);
+				}
+
+				/*
+				 * !!! canceled must be checked before isFileFolderDeleted is checked because this
+				 * returns false when the monitor is canceled !!!
+				 */
+				if (monitor.isCanceled()) {
+					return true;
+				}
+
+				file.delete();
+			}
+
+			result = directory.delete();
+		}
+
+		return result;
 	}
 
 	/**
@@ -325,7 +366,7 @@ public class ThumbnailStore {
 
 		final int imageQualitySize = PhotoManager.IMAGE_SIZES[imageQuality];
 		final String imageKey1Folder = imageKey.substring(0, 2);
-		final String imageKey2Folder = imageKey.substring(0, 3);
+//		final String imageKey2Folder = imageKey.substring(0, 3);
 
 		// thumbnail images are stored as jpg file
 		IPath jpgPhotoFilePath = new Path(photo.getFileName());
@@ -335,7 +376,7 @@ public class ThumbnailStore {
 
 		final IPath imageFilePath = _storePath//
 				.append(imageKey1Folder)
-				.append(imageKey2Folder)
+//				.append(imageKey2Folder)
 				.append(imageFileName);
 
 		return imageFilePath;
