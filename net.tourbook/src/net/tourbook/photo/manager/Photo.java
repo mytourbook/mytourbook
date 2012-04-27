@@ -108,21 +108,18 @@ public class Photo {
 	 */
 	private final HashMap<Integer, Point>	_worldPosition	= new HashMap<Integer, Point>();
 
-//	/**
-//	 * Location index in the gallery widget
-//	 */
-//	private int								_galleryItemIndex;
-
 	/**
 	 * Contains image keys for each image quality which can be used to get images from an image
 	 * cache
 	 */
-	private String[]						_imageKeys;
+	private String							_imageKeyHQ;
+	private String							_imageKeyThumb;
 
 	/**
 	 * This array keeps track of the loading state for the photo images and for different qualities
 	 */
-	private PhotoLoadingState[]				_photoLoadingState;
+	private PhotoLoadingState				_photoLoadingStateHQ;
+	private PhotoLoadingState				_photoLoadingStateThumb;
 
 	/**
 	 * @param galleryItemIndex
@@ -130,7 +127,6 @@ public class Photo {
 	public Photo(final File imageFile) {
 
 		_imageFile = imageFile;
-//		_galleryItemIndex = galleryItemIndex;
 
 		_fileName = imageFile.getName();
 		_filePathName = imageFile.getAbsolutePath();
@@ -138,14 +134,11 @@ public class Photo {
 		/*
 		 * initialize image keys and loading states
 		 */
-		final int imageSizeLength = PhotoManager.IMAGE_SIZES.length;
-		_imageKeys = new String[imageSizeLength];
-		_photoLoadingState = new PhotoLoadingState[imageSizeLength];
+		_imageKeyHQ = Util.computeMD5(_filePathName + "_HQ");//$NON-NLS-1$
+		_imageKeyThumb = Util.computeMD5(_filePathName + "_Thumb");//$NON-NLS-1$
 
-		for (int qualityIndex = 0; qualityIndex < _photoLoadingState.length; qualityIndex++) {
-			_imageKeys[qualityIndex] = Util.computeMD5(_filePathName + "_" + qualityIndex);
-			_photoLoadingState[qualityIndex] = PhotoLoadingState.UNDEFINED;
-		}
+		_photoLoadingStateHQ = PhotoLoadingState.UNDEFINED;
+		_photoLoadingStateThumb = PhotoLoadingState.UNDEFINED;
 	}
 
 	/**
@@ -226,6 +219,16 @@ public class Photo {
 		photoMetadata.fileDateTime = new DateTime(_imageFile.lastModified());
 
 		return photoMetadata;
+	}
+
+	public String dumpLoadingState() {
+
+		final StringBuilder sb = new StringBuilder();
+
+		sb.append("Thumb:" + _photoLoadingStateThumb);
+		sb.append("\tHQ:" + _photoLoadingStateHQ);
+
+		return sb.toString();
 	}
 
 	@Override
@@ -405,10 +408,6 @@ public class Photo {
 		return _filePathName;
 	}
 
-//	public int getGalleryIndex() {
-//		return _galleryItemIndex;
-//	}
-
 	/**
 	 * @return Returns geo position or <code>null</code> when latitude/longitude is not available
 	 */
@@ -454,12 +453,11 @@ public class Photo {
 	}
 
 	/**
-	 * @param imageQuality
 	 * @return Returns an image key which can be used to get images from an image cache. This key is
 	 *         a MD5 hash from the full image file path and the image quality.
 	 */
-	public String getImageKey(final int imageQuality) {
-		return _imageKeys[imageQuality];
+	public String getImageKey(final ImageQuality imageQuality) {
+		return imageQuality == ImageQuality.HQ ? _imageKeyHQ : _imageKeyThumb;
 	}
 
 	public double getLatitude() {
@@ -467,11 +465,10 @@ public class Photo {
 	}
 
 	/**
-	 * @param imageQuality
-	 * @return Returns the loading state for each photo quality
+	 * @return Returns the loading state for the given photo quality
 	 */
-	public PhotoLoadingState getLoadingState(final int imageQuality) {
-		return _photoLoadingState[imageQuality];
+	public PhotoLoadingState getLoadingState(final ImageQuality imageQuality) {
+		return imageQuality == ImageQuality.HQ ? _photoLoadingStateHQ : _photoLoadingStateThumb;
 	}
 
 	public double getLongitude() {
@@ -603,8 +600,12 @@ public class Photo {
 		_latitude = latitude;
 	}
 
-	public void setLoadingState(final PhotoLoadingState photoLoadingState, final int imageQuality) {
-		_photoLoadingState[imageQuality] = photoLoadingState;
+	public void setLoadingState(final PhotoLoadingState photoLoadingState, final ImageQuality imageQuality) {
+		if (imageQuality == ImageQuality.HQ) {
+			_photoLoadingStateHQ = photoLoadingState;
+		} else {
+			_photoLoadingStateThumb = photoLoadingState;
+		}
 	}
 
 	public void setLongitude(final double longitude) {

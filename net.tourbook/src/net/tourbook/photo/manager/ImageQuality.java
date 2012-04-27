@@ -15,12 +15,15 @@
  *******************************************************************************/
 package net.tourbook.photo.manager;
 
-public interface ILoadCallBack {
+public enum ImageQuality {
 
 	/**
-	 * @param isImageLoaded
-	 *            Is <code>false</code> when an image could not be loaded.
+	 * Image is in thumb size
 	 */
-	void callBackImageIsLoaded(boolean isImageLoaded);
+	THUMB,
 
+	/**
+	 * Image is in HQ (high quality) size
+	 */
+	HQ,
 }

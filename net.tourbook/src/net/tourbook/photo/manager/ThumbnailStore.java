@@ -360,11 +360,10 @@ public class ThumbnailStore {
 		return isFileFolderDeleted ? 1 : 0;
 	}
 
-	static synchronized IPath getStoreImagePath(final Photo photo, final int imageQuality) {
+	static synchronized IPath getStoreImagePath(final Photo photo, final ImageQuality imageQuality) {
 
 		final String imageKey = photo.getImageKey(imageQuality);
 
-		final int imageQualitySize = PhotoManager.IMAGE_SIZES[imageQuality];
 		final String imageKey1Folder = imageKey.substring(0, 2);
 //		final String imageKey2Folder = imageKey.substring(0, 3);
 
@@ -372,7 +371,7 @@ public class ThumbnailStore {
 		IPath jpgPhotoFilePath = new Path(photo.getFileName());
 		jpgPhotoFilePath = jpgPhotoFilePath.removeFileExtension().addFileExtension(THUMBNAIL_IMAGE_EXTENSION_JPG);
 
-		final String imageFileName = imageKey + "_" + imageQualitySize + "_" + jpgPhotoFilePath.toOSString(); //$NON-NLS-1$ //$NON-NLS-2$
+		final String imageFileName = imageKey + "_" + imageQuality.name() + "_" + jpgPhotoFilePath.toOSString(); //$NON-NLS-1$ //$NON-NLS-2$
 
 		final IPath imageFilePath = _storePath//
 				.append(imageKey1Folder)

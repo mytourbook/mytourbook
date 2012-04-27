@@ -22,6 +22,7 @@ import net.tourbook.photo.gallery.MT20.AbstractGalleryMT20ItemRenderer;
 import net.tourbook.photo.gallery.MT20.DefaultGalleryMT20ItemRenderer;
 import net.tourbook.photo.gallery.MT20.GalleryMT20;
 import net.tourbook.photo.gallery.MT20.GalleryMT20Item;
+import net.tourbook.photo.manager.ImageQuality;
 import net.tourbook.photo.manager.Photo;
 import net.tourbook.photo.manager.PhotoImageCache;
 import net.tourbook.photo.manager.PhotoLoadingState;
@@ -122,21 +123,23 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 		final Photo photo = (Photo) galleryItem.data;
 
-		final int requestedImageQuality = galleryItemWidth <= PhotoManager.IMAGE_SIZE_THUMBNAIL
-				? PhotoManager.IMAGE_QUALITY_EXIF_THUMB
-				: PhotoManager.IMAGE_QUALITY_LARGE_IMAGE;
+		final ImageQuality requestedImageQuality = galleryItemWidth <= PhotoManager.IMAGE_SIZE_THUMBNAIL
+				? ImageQuality.THUMB
+				: ImageQuality.HQ;
 
 		Image photoImage = null;
 		boolean isRequestedQuality = false;
 
 		// check if image has an loading error
 		final PhotoLoadingState photoLoadingState = photo.getLoadingState(requestedImageQuality);
+
 		if (photoLoadingState != PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR) {
 
 			// image is not yet loaded
 
 			// check if image is in the cache
 			photoImage = PhotoImageCache.getImage(photo, requestedImageQuality);
+
 			if ((photoImage == null || photoImage.isDisposed())
 					&& photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
 
@@ -149,15 +152,15 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 			isRequestedQuality = true;
 
-			if (photoImage == null) {
+			if (photoImage == null || photoImage.isDisposed()) {
 
 				// requested size is not available, try to get image with lower quality
 
 				isRequestedQuality = false;
 
-				final int lowerImageQuality = galleryItemWidth > PhotoManager.IMAGE_SIZE_THUMBNAIL
-						? PhotoManager.IMAGE_QUALITY_EXIF_THUMB
-						: PhotoManager.IMAGE_QUALITY_LARGE_IMAGE;
+				final ImageQuality lowerImageQuality = galleryItemWidth > PhotoManager.IMAGE_SIZE_THUMBNAIL
+						? ImageQuality.THUMB
+						: ImageQuality.HQ;
 
 				photoImage = PhotoImageCache.getImage(photo, lowerImageQuality);
 			}
@@ -172,6 +175,17 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 		gc.setForeground(_fgColor);
 		gc.setBackground(_bgColor);
+
+//		if (photoImage != null) {
+//			if (photoImage.isDisposed()) {
+//				System.out.println("is disposed    " + photo + "  " + photo.dumpLoadingState());
+//				// TODO remove SYSTEM.OUT.PRINTLN
+//			} else {
+//
+//				System.out.println("not isdisposed " + photo + "  " + photo.dumpLoadingState());
+//				// TODO remove SYSTEM.OUT.PRINTLN
+//			}
+//		}
 
 		if (photoImage != null && photoImage.isDisposed() == false) {
 
@@ -208,7 +222,6 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		}
 
 		// annotations are drawn on top of the info lines
-//		if (isDrawText && _isShowAnnotations && photo.getGeoPosition() != null) {
 		if (_isShowAnnotations && photo.getGeoPosition() != null) {
 			gc.drawImage(_annotationGPS, //
 					photoPosX + photoWidth - _gpsWidth,
@@ -314,16 +327,22 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 			destX = photoPosX + offsetX;
 			destY = photoPosY + offsetY;
 
-			gc.drawImage(photoImage, //
-					0,
-					0,
-					imageWidth,
-					imageHeight,
-					//
-					destX,
-					destY,
-					photoPaintedWidth,
-					photoPaintedHeight);
+			try {
+
+				gc.drawImage(photoImage, //
+						0,
+						0,
+						imageWidth,
+						imageHeight,
+						//
+						destX,
+						destY,
+						photoPaintedWidth,
+						photoPaintedHeight);
+
+			} catch (final Exception e) {
+				// this bug is covered here: https://bugs.eclipse.org/bugs/show_bug.cgi?id=375845
+			}
 
 			if (isSelected) {
 
@@ -350,15 +369,16 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 			gc.drawString(e.getMessage(), photoPosX, photoPosY);
 
-			final String message = ("srcWidth: " + imageWidth) //$NON-NLS-1$
-					+ ("  srcHeight:" + imageHeight) //$NON-NLS-1$
-					+ ("  destX:" + destX) //$NON-NLS-1$
-					+ ("  destY:" + destY) //$NON-NLS-1$
-					+ ("  destWidth: " + photoPaintedWidth) //$NON-NLS-1$
-					+ ("  destHeight :" + photoPaintedHeight) //$NON-NLS-1$
-					+ ("  " + photo); //$NON-NLS-1$
-
-			StatusUtil.log(message, e);
+			// this case can happen very often when an image is drawn
+//			final String message = ("srcWidth: " + imageWidth) //$NON-NLS-1$
+//					+ ("  srcHeight:" + imageHeight) //$NON-NLS-1$
+//					+ ("  destX:" + destX) //$NON-NLS-1$
+//					+ ("  destY:" + destY) //$NON-NLS-1$
+//					+ ("  destWidth: " + photoPaintedWidth) //$NON-NLS-1$
+//					+ ("  destHeight :" + photoPaintedHeight) //$NON-NLS-1$
+//					+ ("  " + photo); //$NON-NLS-1$
+//
+//			StatusUtil.log(message, e);
 		}
 	}
 
@@ -464,17 +484,19 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 								final int photoPosY,
 								final int photoWidth,
 								final int imageCanvasHeight,
-								final int requestedImageQuality) {
+								final ImageQuality requestedImageQuality) {
 
 		final PhotoLoadingState photoLoadingState = photo.getLoadingState(requestedImageQuality);
 		final boolean isError = photoLoadingState == PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR;
-		final String statusText = isError //
-				? photo.getFileName() + " cannot be loaded"
-				: photo.getFileName() + " is being loaded";
-		;
+
+		final String textLoadingError = photo.getFileName() + " cannot be loaded";
+		final String textIsBeingLoaded = photo.getFileName() + " is being loaded";
+
+		final String statusText = isError ? textLoadingError : textIsBeingLoaded;
+
+		final int textWidth = gc.textExtent(statusText).x;
 
 		// Center text
-		final int textWidth = gc.textExtent(statusText).x;
 		final int textOffsetX = (photoWidth - (textWidth > photoWidth ? photoWidth : textWidth)) / 2;
 		final int textOffsetY = (imageCanvasHeight - (_fontHeight > imageCanvasHeight ? imageCanvasHeight : _fontHeight)) / 2;
 

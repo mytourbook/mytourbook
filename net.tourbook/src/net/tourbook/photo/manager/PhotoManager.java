@@ -38,23 +38,18 @@ public class PhotoManager {
 
 // SET_FORMATTING_OFF
 
-	/**
-	 * Contains image sizes for different image qualities.
-	 */
-	public static int[]											IMAGE_SIZES						=
-			{ IMAGE_SIZE_THUMBNAIL, IMAGE_SIZE_LARGE_DEFAULT, Integer.MAX_VALUE };
 	
 	public static final int[]									HQ_IMAGE_SIZES					=
 			{ 200, IMAGE_SIZE_LARGE_DEFAULT, 1000, 2000 };
 
 // SET_FORMATTING_ON
 
-	/*
-	 * image quality is the index in HQ_IMAGE_SIZES
-	 */
-	public static int											IMAGE_QUALITY_EXIF_THUMB	= 0;
-	public static int											IMAGE_QUALITY_LARGE_IMAGE	= 1;
-	public static int											IMAGE_QUALITY_ORIGINAL		= 2;
+//	/*
+//	 * image quality is the index in HQ_IMAGE_SIZES
+//	 */
+//	public static int											IMAGE_QUALITY_EXIF_THUMB	= 0;
+//	public static int											IMAGE_QUALITY_LARGE_IMAGE	= 1;
+//	public static int											IMAGE_QUALITY_ORIGINAL		= 2;
 
 	private static Display										_display;
 
@@ -159,10 +154,14 @@ public class PhotoManager {
 
 			final PhotoImageLoader photoImageLoaderItem = (PhotoImageLoader) object;
 
-			photoImageLoaderItem.photo.setLoadingState(
+			photoImageLoaderItem._photo.setLoadingState(
 					PhotoLoadingState.UNDEFINED,
-					photoImageLoaderItem.requestedImageQuality);
+					photoImageLoaderItem._requestedImageQuality);
 		}
+	}
+
+	public static int getHQImageSize() {
+		return _hqImageSize;
 	}
 
 	/**
@@ -196,7 +195,7 @@ public class PhotoManager {
 
 	public static void putImageInHQLoadingQueue(final GalleryMT20Item galleryItem,
 												final Photo photo,
-												final int imageQuality,
+												final ImageQuality imageQuality,
 												final ILoadCallBack loadCallBack) {
 		// set state
 		photo.setLoadingState(PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE, imageQuality);
@@ -227,7 +226,7 @@ public class PhotoManager {
 
 	public static void putImageInLoadingQueue(	final GalleryMT20Item galleryItem,
 												final Photo photo,
-												final int imageQuality,
+												final ImageQuality imageQuality,
 												final ILoadCallBack imageLoadCallback) {
 
 		// set state

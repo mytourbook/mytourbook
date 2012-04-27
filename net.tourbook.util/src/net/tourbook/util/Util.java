@@ -108,7 +108,7 @@ public class Util {
 
 		final byte[] digest = md5Checker.digest();
 
-		final StringBuffer buf = new StringBuffer();
+		final StringBuilder buf = new StringBuilder();
 		for (final byte element : digest) {
 			if ((element & 0xFF) < 0x10) {
 				buf.append('0');

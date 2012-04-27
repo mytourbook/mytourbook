@@ -101,7 +101,7 @@ public class PhotoImageCache {
 		_imageCache.clear();
 	}
 
-	public static Image getImage(final Photo photo, final int imageQuality) {
+	public static Image getImage(final Photo photo, final ImageQuality imageQuality) {
 
 		final String imageKey = photo.getImageKey(imageQuality);
 

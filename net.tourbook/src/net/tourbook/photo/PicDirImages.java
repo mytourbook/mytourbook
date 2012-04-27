@@ -162,7 +162,6 @@ public class PicDirImages {
 	private PicDirView								_picDirView;
 
 	private PhotoRenderer							_photoRenderer;
-//	private NoGroupRendererMT						_groupRenderer;
 
 	/**
 	 * Photo image width (thumbnail size)
@@ -301,27 +300,34 @@ public class PicDirImages {
 		}
 
 		@Override
-		public void callBackImageIsLoaded(	final boolean isImageStillVisible,
-											final boolean isImageLoadedOrHasLoadingError) {
+		public void callBackImageIsLoaded(final boolean isImageLoadedOrHasLoadingError) {
 
-			if (isImageStillVisible == false) {
+			if (isImageLoadedOrHasLoadingError == false) {
 				return;
 			}
 
-			if (isImageLoadedOrHasLoadingError) {
+			// mark image area as needed to be redrawn
+			_display.asyncExec(new Runnable() {
 
-				_display.asyncExec(new Runnable() {
+				public void run() {
 
-					public void run() {
-
-						if (_gallery.isDisposed()) {
-							return;
-						}
-
-						_gallery.redrawGalleryItem(__galleryItem);
+					if (_gallery.isDisposed()) {
+						return;
 					}
-				});
-			}
+
+					final boolean isItemVisible = __galleryItem.galleryMT20.isItemVisible(__galleryItem);
+
+					if (isItemVisible) {
+
+						_gallery.redraw(
+								__galleryItem.viewPortX,
+								__galleryItem.viewPortY,
+								__galleryItem.width,
+								__galleryItem.height,
+								false);
+					}
+				}
+			});
 		}
 	}
 
@@ -829,9 +835,7 @@ public class PicDirImages {
 
 		} else if (property.equals(ITourbookPreferences.PHOTO_VIEWER_FONT)) {
 
-			createGalleryFont();
-
-			_photoRenderer.setFont(_galleryFont);
+			onModifyFont();
 		}
 	}
 
@@ -854,6 +858,23 @@ public class PicDirImages {
 		//////////////////////////////////////////
 
 		workerStop();
+	}
+
+	private void onModifyFont() {
+
+		createGalleryFont();
+
+		_photoRenderer.setFont(_galleryFont);
+
+		// reset cached text size in the photos
+		final GalleryMT20Item[] galleryItems = _gallery.getGalleryItems();
+		if (galleryItems != null) {
+
+//			for (final GalleryMT20Item galleryItem : galleryItems) {
+//				final Photo photo = (Photo) galleryItem.data;
+//				photo.resetCachedFontSizes();
+//			}
+		}
 	}
 
 	private void onSelectHistoryFolder(final String selectedFolder) {
@@ -1032,8 +1053,7 @@ public class PicDirImages {
 			}
 		}
 
-		createGalleryFont();
-		_photoRenderer.setFont(_galleryFont);
+		onModifyFont();
 
 		/*
 		 * image quality
