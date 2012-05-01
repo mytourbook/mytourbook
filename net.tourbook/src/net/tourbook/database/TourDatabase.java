@@ -622,7 +622,15 @@ public class TourDatabase {
 			}
 		});
 
-		BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+		/*
+		 * run in UI thread otherwise the busyindicator fails
+		 */
+		final Display display = Display.getDefault();
+
+		display.syncExec(new Runnable() {
+			public void run() {
+
+				BusyIndicator.showWhile(display, new Runnable() {
 			public void run() {
 
 				Connection conn = null;
@@ -675,6 +683,8 @@ public class TourDatabase {
 //				System.out.println(UI.NEW_LINE);
 //				System.out.println(sb.toString());
 //				// TODO remove SYSTEM.OUT.PRINTLN
+			}
+		});
 			}
 		});
 
