@@ -18,7 +18,7 @@ package net.tourbook.photo.manager;
 public enum PhotoLoadingState {
 
 	/**
-	 * Image is not yet loaded for this photo
+	 * Image is not yet loaded for this photo or it's in the image cache
 	 */
 	UNDEFINED,
 

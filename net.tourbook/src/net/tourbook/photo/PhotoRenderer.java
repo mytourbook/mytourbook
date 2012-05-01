@@ -25,6 +25,7 @@ import net.tourbook.photo.gallery.MT20.GalleryMT20Item;
 import net.tourbook.photo.manager.ImageQuality;
 import net.tourbook.photo.manager.Photo;
 import net.tourbook.photo.manager.PhotoImageCache;
+import net.tourbook.photo.manager.PhotoImageMetadata;
 import net.tourbook.photo.manager.PhotoLoadingState;
 import net.tourbook.photo.manager.PhotoManager;
 import net.tourbook.ui.UI;
@@ -49,12 +50,12 @@ import org.joda.time.format.DateTimeFormatterBuilder;
  */
 public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
+	private static final String		PHOTO_ANNOTATION_GPS	= "PHOTO_ANNOTATION_GPS";	//$NON-NLS-1$
+
 	/**
 	 * this value has been evaluated by some test
 	 */
-	private static final int		MIN_PHOTO_IMAGE_HEIGHT	= 50;
-
-	private static final String		PHOTO_ANNOTATION_GPS	= "PHOTO_ANNOTATION_GPS";	//$NON-NLS-1$
+	private int						_textMinThumbSize		= 50;
 
 	private int						_fontHeight				= -1;
 
@@ -194,7 +195,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 			 * picture but not the text is displayed
 			 */
 
-			if (photoHeight < MIN_PHOTO_IMAGE_HEIGHT) {
+			if (photoWidth < _textMinThumbSize) {
 				isDrawText = false;
 			}
 
@@ -213,7 +214,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 			// image is not available
 
-			drawStatusText(gc, photo, photoPosX, photoPosY, photoWidth, photoHeight, requestedImageQuality);
+			drawStatusText(gc, photo, photoPosX, photoPosY, photoWidth, photoHeight, requestedImageQuality, //
+					isDrawText && _isShowPhotoName);
 		}
 
 		// draw name & date & annotations
@@ -290,7 +292,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 			final int photoHeightRotated = photo.getHeightRotated();
 
 			/*
-			 * photo image should not be displayed larger than the original photo even when the
+			 * the photo image should not be displayed larger than the original photo even when the
 			 * thumb image is larger, this can happen when image is resized
 			 */
 			if (photoWidthRotated != Integer.MIN_VALUE && photoHeightRotated != Integer.MIN_VALUE) {
@@ -484,15 +486,28 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 								final int photoPosY,
 								final int photoWidth,
 								final int imageCanvasHeight,
-								final ImageQuality requestedImageQuality) {
+								final ImageQuality requestedImageQuality,
+								final boolean isImageNameDisplayed) {
 
-		final PhotoLoadingState photoLoadingState = photo.getLoadingState(requestedImageQuality);
-		final boolean isError = photoLoadingState == PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR;
+		final boolean isError = photo.getLoadingState(requestedImageQuality) == PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR;
 
-		final String textLoadingError = photo.getFileName() + " cannot be loaded";
-		final String textIsBeingLoaded = photo.getFileName() + " is being loaded";
+		final String photoImageFileName = isImageNameDisplayed ? //
+				// don't show file name a 2nd time
+				UI.EMPTY_STRING
+				: photo.getFileName();
+		String statusText;
+		boolean isMetaData = false;
 
-		final String statusText = isError ? textLoadingError : textIsBeingLoaded;
+		if (isError) {
+			statusText = photoImageFileName + " cannot be loaded";
+		} else {
+			final PhotoImageMetadata metaData = photo.getImageMetaData();
+			if (metaData != null) {
+				// meta data are already loaded
+				isMetaData = true;
+			}
+			statusText = photoImageFileName + " is being loaded";
+		}
 
 		final int textWidth = gc.textExtent(statusText).x;
 
@@ -504,7 +519,11 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		if (isError) {
 			gc.setForeground(device.getSystemColor(SWT.COLOR_RED));
 		} else {
-			gc.setForeground(device.getSystemColor(SWT.COLOR_YELLOW));
+			if (isMetaData) {
+				gc.setForeground(device.getSystemColor(SWT.COLOR_GREEN));
+			} else {
+				gc.setForeground(device.getSystemColor(SWT.COLOR_YELLOW));
+			}
 		}
 
 		gc.drawString(statusText, photoPosX + textOffsetX, photoPosY + textOffsetY, true);
@@ -537,5 +556,9 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		_isShowPhotoName = isShowPhotoName;
 		_isShowPhotoDate = isShowPhotoDate;
 		_isShowAnnotations = isShowAnnotations;
+	}
+
+	public void setTextMinThumbSize(final int textMinThumbSize) {
+		_textMinThumbSize = textMinThumbSize;
 	}
 }

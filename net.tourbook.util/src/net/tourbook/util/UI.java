@@ -45,6 +45,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Sash;
 import org.epics.css.dal.Timestamp;
+import org.epics.css.dal.Timestamp.Format;
 
 public class UI {
 
@@ -207,10 +208,6 @@ public class UI {
 		return null;
 	}
 
-	public static String getSystemTime() {
-		return (new Timestamp()).toString();
-	}
-
 	/**
 	 * Opens the control context menu, the menue is aligned below the control to the right side
 	 * 
@@ -330,6 +327,14 @@ public class UI {
 		gc.dispose();
 
 		return shortText;
+	}
+
+	public static String timeStamp() {
+		return (new Timestamp()).toString(Format.Log);
+	}
+
+	public static String timeStampNano() {
+		return (new Timestamp()).toString();
 	}
 
 	public static void updateScrolledContent(final Composite composite) {

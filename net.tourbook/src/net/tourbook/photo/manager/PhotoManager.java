@@ -25,6 +25,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.photo.gallery.MT20.GalleryMT20Item;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.util.UI;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Display;
@@ -33,6 +34,7 @@ public class PhotoManager {
 
 	private static final IPreferenceStore						_prefStore;
 
+//	public static final int										IMAGE_SIZE_THUMBNAIL		= 20;
 	public static final int										IMAGE_SIZE_THUMBNAIL		= 160;
 	public static final int										IMAGE_SIZE_LARGE_DEFAULT	= 600;
 
@@ -81,7 +83,7 @@ public class PhotoManager {
 
 		final int availableProcessors = Runtime.getRuntime().availableProcessors();
 
-		System.out.println("Number of processors: " + availableProcessors); //$NON-NLS-1$
+		System.out.println(UI.timeStamp() + "Number of processors: " + availableProcessors); //$NON-NLS-1$
 
 		int processors = availableProcessors - 1; // one processor for HQ loading
 		processors = Math.max(processors, 1);
@@ -158,10 +160,6 @@ public class PhotoManager {
 					PhotoLoadingState.UNDEFINED,
 					photoImageLoaderItem._requestedImageQuality);
 		}
-	}
-
-	public static int getHQImageSize() {
-		return _hqImageSize;
 	}
 
 	/**

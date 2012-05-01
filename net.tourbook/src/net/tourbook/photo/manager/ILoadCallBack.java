@@ -18,9 +18,9 @@ package net.tourbook.photo.manager;
 public interface ILoadCallBack {
 
 	/**
-	 * @param isImageLoaded
+	 * @param isUpdateUI
 	 *            Is <code>false</code> when an image could not be loaded.
 	 */
-	void callBackImageIsLoaded(boolean isImageLoaded);
+	void callBackImageIsLoaded(boolean isUpdateUI);
 
 }

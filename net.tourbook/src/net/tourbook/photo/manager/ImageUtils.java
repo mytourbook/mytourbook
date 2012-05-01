@@ -109,7 +109,7 @@ public class ImageUtils {
 
 	/**
 	 * Returns a new scaled image. new Image must be disposed after use.
-	 *
+	 * 
 	 * @param image
 	 * @param width
 	 * @param height
@@ -166,7 +166,7 @@ public class ImageUtils {
 		final Image scaledImage = new Image(display, imgWidth, imgHeight);
 		final GC gc = new GC(scaledImage);
 		Transform transformation = null;
-		{
+		try {
 			gc.setAdvanced(true);
 
 			gc.setAntialias(antialias);
@@ -176,7 +176,6 @@ public class ImageUtils {
 
 			int destX = 0;
 			int destY = 0;
-
 
 			if (rotation != null && UI.IS_OSX == false) {
 
@@ -225,10 +224,15 @@ public class ImageUtils {
 					destY,
 					destWidth,
 					destHeight);
-		}
-		gc.dispose();
-		if (transformation != null) {
-			transformation.dispose();
+		} finally {
+
+			// ensure resources are disposed when an error occures
+
+			gc.dispose();
+
+			if (transformation != null) {
+				transformation.dispose();
+			}
 		}
 
 		return scaledImage;
@@ -265,7 +269,7 @@ public class ImageUtils {
 	/**
 	 * Resize an image to the best fitting size. Old and new Image (result)must be disposed after
 	 * use.
-	 *
+	 * 
 	 * @param img
 	 * @param maxWidth
 	 * @param maxHeight

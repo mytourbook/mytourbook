@@ -27,6 +27,7 @@ import net.tourbook.util.Util;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -108,7 +109,11 @@ class PicDirFolder {
 	private File								_selectedFolder;
 
 	private ActionRefreshFolder					_actionRefreshFolder;
-	private ActionRunPhotoViewer				_actionRunPhotoViewer;
+	private ActionRunExternalAppTitle			_actionRunExternalAppTitle;
+	private ActionRunExternalApp				_actionRunExternalAppDefault;
+	private ActionRunExternalApp				_actionRunExternalApp1;
+	private ActionRunExternalApp				_actionRunExternalApp2;
+	private ActionRunExternalApp				_actionRunExternalApp3;
 	private ActionPreferences					_actionPreferences;
 	private ActionSingleClickExpand				_actionSingleClickExpand;
 	private ActionSingleExpandCollapseOthers	_actionSingleExpandCollapseOthers;
@@ -118,6 +123,17 @@ class PicDirFolder {
 	 */
 	private Display								_display;
 	private TreeViewer							_folderViewer;
+
+	private class ActionRunExternalAppTitle extends Action {
+
+		public ActionRunExternalAppTitle() {
+			super(Messages.Pic_Dir_Action_RunExternalAppTitle, AS_PUSH_BUTTON);
+			setEnabled(false);
+		}
+
+		@Override
+		public void run() {}
+	}
 
 	private static final class FolderComparer implements IElementComparer {
 
@@ -226,26 +242,30 @@ class PicDirFolder {
 		});
 	}
 
-	void actionRunExternalPhotoViewer() {
+	void actionRunExternalApp(final ActionRunExternalApp actionRunExternalApp) {
 
 		if (_selectedTVIFolder == null) {
 			return;
 		}
 
-		final String prefExtApp = _prefStore.getString(ITourbookPreferences.PHOTO_EXTERNAL_PHOTO_VIEWER);
-
-		if (prefExtApp.length() == 0) {
-			MessageDialog.openInformation(
-					Display.getCurrent().getActiveShell(),
-					Messages.Pic_Dir_Dialog_ExternalPhotoViewer_Title,
-					Messages.Pic_Dir_Dialog_ExternalPhotoViewer_Message);
+		// check if an app is defined
+		if (actionRunExternalApp == _actionRunExternalAppDefault) {
 
 			PreferencesUtil.createPreferenceDialogOn(
 					Display.getCurrent().getActiveShell(),
-					PrefPagePhotoViewer.ID,
+					PrefPagePhotoExternalApp.ID,
 					null,
 					null).open();
 			return;
+		}
+
+		String extApp = null;
+		if (actionRunExternalApp == _actionRunExternalApp1) {
+			extApp = _prefStore.getString(ITourbookPreferences.PHOTO_EXTERNAL_PHOTO_VIEWER_1).trim();
+		} else if (actionRunExternalApp == _actionRunExternalApp2) {
+			extApp = _prefStore.getString(ITourbookPreferences.PHOTO_EXTERNAL_PHOTO_VIEWER_2).trim();
+		} else if (actionRunExternalApp == _actionRunExternalApp3) {
+			extApp = _prefStore.getString(ITourbookPreferences.PHOTO_EXTERNAL_PHOTO_VIEWER_3).trim();
 		}
 
 		final String folder = _selectedTVIFolder._treeItemFolder.getAbsolutePath();
@@ -254,7 +274,7 @@ class PicDirFolder {
 		if (UI.IS_WIN) {
 
 			final String[] commandsWin = { "cmd.exe", "/c", //$NON-NLS-1$ //$NON-NLS-2$
-					"\"" + prefExtApp + "\"", //$NON-NLS-1$ //$NON-NLS-2$
+					"\"" + extApp + "\"", //$NON-NLS-1$ //$NON-NLS-2$
 //					"\"" + folder + "\""
 					folder //
 			};
@@ -263,8 +283,8 @@ class PicDirFolder {
 
 		} else if (UI.IS_OSX) {
 
-			final String[] commandsOSX = { "/usr/bin/open", "-a", //
-					prefExtApp,
+			final String[] commandsOSX = { "/usr/bin/open", "-a", // //$NON-NLS-1$ //$NON-NLS-2$
+					extApp,
 					folder };
 
 			commands = commandsOSX;
@@ -282,13 +302,13 @@ class PicDirFolder {
 
 			try {
 
+				// log command
 				final StringBuilder sb = new StringBuilder();
 				int counter = 1;
 				for (final String cmd : commands) {
-					sb.append(Integer.toString(counter++) + ": |" + cmd + "| ");
+					sb.append(Integer.toString(counter++) + ": |" + cmd + "| "); //$NON-NLS-1$ //$NON-NLS-2$
 				}
-				System.out.println(sb.toString());
-				// TODO remove SYSTEM.OUT.PRINTLN
+				System.out.println(net.tourbook.util.UI.timeStamp() + sb.toString());
 
 				Runtime.getRuntime().exec(commands);
 
@@ -310,7 +330,13 @@ class PicDirFolder {
 
 		_actionPreferences = new ActionPreferences();
 		_actionRefreshFolder = new ActionRefreshFolder(this);
-		_actionRunPhotoViewer = new ActionRunPhotoViewer(this);
+
+		_actionRunExternalAppTitle = new ActionRunExternalAppTitle();
+		_actionRunExternalAppDefault = new ActionRunExternalApp(this);
+		_actionRunExternalApp1 = new ActionRunExternalApp(this);
+		_actionRunExternalApp2 = new ActionRunExternalApp(this);
+		_actionRunExternalApp3 = new ActionRunExternalApp(this);
+
 		_actionSingleClickExpand = new ActionSingleClickExpand(this);
 		_actionSingleExpandCollapseOthers = new ActionSingleExpandCollapseOthers(this);
 	}
@@ -498,7 +524,9 @@ class PicDirFolder {
 
 	private void fillContextMenu(final IMenuManager menuMgr) {
 
-		menuMgr.add(_actionRunPhotoViewer);
+		fillExternalApp(menuMgr);
+
+		menuMgr.add(new Separator());
 		menuMgr.add(_actionRefreshFolder);
 
 		menuMgr.add(new Separator());
@@ -507,6 +535,46 @@ class PicDirFolder {
 
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionPreferences);
+	}
+
+	private void fillExternalApp(final IMenuManager menuMgr) {
+
+		menuMgr.add(_actionRunExternalAppTitle);
+
+		boolean isApp = false;
+
+		final String prefExtApp1 = _prefStore.getString(ITourbookPreferences.PHOTO_EXTERNAL_PHOTO_VIEWER_1).trim();
+		if (prefExtApp1.length() > 0) {
+
+			isApp = true;
+
+			_actionRunExternalApp1.setText(new Path(prefExtApp1).lastSegment());
+
+			menuMgr.add(_actionRunExternalApp1);
+		}
+
+		final String prefExtApp2 = _prefStore.getString(ITourbookPreferences.PHOTO_EXTERNAL_PHOTO_VIEWER_2).trim();
+		if (prefExtApp2.length() > 0) {
+
+			isApp = true;
+
+			_actionRunExternalApp2.setText(new Path(prefExtApp2).lastSegment());
+
+			menuMgr.add(_actionRunExternalApp2);
+		}
+
+		final String prefExtApp3 = _prefStore.getString(ITourbookPreferences.PHOTO_EXTERNAL_PHOTO_VIEWER_3).trim();
+		if (prefExtApp3.length() > 0) {
+
+			isApp = true;
+
+			_actionRunExternalApp3.setText(new Path(prefExtApp3).lastSegment());
+
+			menuMgr.add(_actionRunExternalApp3);
+		}
+
+		// show default when app is not defined
+		menuMgr.add(_actionRunExternalAppDefault);
 	}
 
 	/**
@@ -879,7 +947,7 @@ class PicDirFolder {
 			allFolderSegments.add(restoreRoot.toOSString());
 		} else {
 			// add root
-			allFolderSegments.add("/");
+			allFolderSegments.add("/"); //$NON-NLS-1$
 		}
 
 		final IPath restorePath = new Path(restorePathName);

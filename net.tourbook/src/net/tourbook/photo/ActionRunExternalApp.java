@@ -17,20 +17,19 @@ package net.tourbook.photo;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionRunPhotoViewer extends Action {
+public class ActionRunExternalApp extends Action {
 
 	private PicDirFolder	_picDirFolder;
 
-	public ActionRunPhotoViewer(final PicDirFolder picDirFolder) {
+	public ActionRunExternalApp(final PicDirFolder picDirFolder) {
 
-		super(Messages.Pic_Dir_Action_RunFileBrowser, AS_PUSH_BUTTON);
+		super(Messages.Pic_Dir_Action_DefineExternalApp, AS_PUSH_BUTTON);
 
 		_picDirFolder = picDirFolder;
-
 	}
 
 	@Override
 	public void run() {
-		_picDirFolder.actionRunExternalPhotoViewer();
+		_picDirFolder.actionRunExternalApp(this);
 	}
 }

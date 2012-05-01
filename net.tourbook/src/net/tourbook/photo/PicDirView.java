@@ -19,6 +19,7 @@ import java.io.File;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.photo.manager.ThumbnailStore;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.ViewerDetailForm;
 import net.tourbook.util.Util;
@@ -100,6 +101,9 @@ public class PicDirView extends ViewPart {
 				IMAGE_PHOTO_FILTER_NO_GPS,
 				TourbookPlugin.getImageDescriptor(Messages.Image__PhotoFilterNoGPS));
 	}
+
+	private int								_thumbnailSize;
+	private int								_textMinThumbSize;
 
 	static int compareFiles(final File file1, final File file2) {
 
@@ -290,6 +294,12 @@ public class PicDirView extends ViewPart {
 			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 
+				final String property = event.getProperty();
+
+				if (property.equals(ITourbookPreferences.PHOTO_VIEWER_PREF_EVENT_IMAGE_VIEWER_UI_IS_MODIFIED)) {
+					updateFromPrefStore();
+				}
+
 				_picDirFolder.handlePrefStoreModifications(event);
 				_picDirImages.handlePrefStoreModifications(event);
 			}
@@ -322,7 +332,16 @@ public class PicDirView extends ViewPart {
 		addPartListener();
 		addPrefListener();
 
-		restoreState();
+		/*
+		 * restore async because a previous folder can contain many files and it can take a long
+		 * time to show the UI, this can be worrisome for the user when the UI is not displayed
+		 * during application startup
+		 */
+		parent.getDisplay().asyncExec(new Runnable() {
+			public void run() {
+				restoreState();
+			}
+		});
 	}
 
 	private void createUI(final Composite parent) {
@@ -371,6 +390,14 @@ public class PicDirView extends ViewPart {
 		_prefStore.removePropertyChangeListener(_prefChangeListener);
 
 		super.dispose();
+	}
+
+	private void enableActions() {
+
+		final boolean isEnableGalleryText = _thumbnailSize >= _textMinThumbSize;
+
+		_actionShowPhotoName.setEnabled(isEnableGalleryText);
+		_actionShowPhotoDate.setEnabled(isEnableGalleryText);
 	}
 
 	private void fillToolbar() {
@@ -450,6 +477,14 @@ public class PicDirView extends ViewPart {
 
 		// 2.
 		_picDirFolder.restoreState(_state);
+
+		/*
+		 * thumbnail size enables/disables actions
+		 */
+		_thumbnailSize = _picDirImages.getThumbnailSize();
+		_textMinThumbSize = _prefStore.getInt(ITourbookPreferences.PHOTO_VIEWER_TEXT_MIN_THUMB_SIZE);
+
+		enableActions();
 	}
 
 	private void saveState() {
@@ -490,7 +525,21 @@ public class PicDirView extends ViewPart {
 		_picDirFolder.getTree().setFocus();
 	}
 
+	void setThumbnailSize(final int photoWidth) {
+
+		_thumbnailSize = photoWidth;
+
+		enableActions();
+	}
+
 	private void sortGallery() {
 		_picDirImages.sortGallery(_gallerySorting, true);
+	}
+
+	private void updateFromPrefStore() {
+
+		_textMinThumbSize = _prefStore.getInt(ITourbookPreferences.PHOTO_VIEWER_TEXT_MIN_THUMB_SIZE);
+
+		enableActions();
 	}
 }

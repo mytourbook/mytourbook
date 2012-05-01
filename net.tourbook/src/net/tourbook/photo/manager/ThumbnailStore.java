@@ -209,6 +209,9 @@ public class ThumbnailStore {
 							doCleanupDeleteFiles(folder, monitor);
 						}
 
+						if (monitor.isCanceled()) {
+							return;
+						}
 						monitor.worked(1);
 					}
 				}

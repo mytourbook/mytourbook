@@ -32,6 +32,7 @@ public class Messages extends NLS {
 	public static String		Image__PhotoInfoAnnotations;
 
 	public static String		Pic_Dir_Action_ClearHistory;
+	public static String		Pic_Dir_Action_DefineExternalApp;
 	public static String		Pic_Dir_Action_NavigateHistoryBackward;
 	public static String		Pic_Dir_Action_NavigateHistoryForward;
 	public static String		Pic_Dir_Action_PhotoFilterGPS;
@@ -44,7 +45,7 @@ public class Messages extends NLS {
 	public static String		Pic_Dir_Action_Preferences;
 	public static String		Pic_Dir_Action_Refresh;
 	public static String		Pic_Dir_Action_RemoveInvalidFolders;
-	public static String		Pic_Dir_Action_RunFileBrowser;
+	public static String		Pic_Dir_Action_RunExternalAppTitle;
 	public static String		Pic_Dir_Action_ShowPhotoAnnotations;
 	public static String		Pic_Dir_Action_ShowPhotoAnnotations_Tooltip;
 	public static String		Pic_Dir_Action_ShowPhotoFileName;
@@ -59,8 +60,8 @@ public class Messages extends NLS {
 	public static String		Pic_Dir_Action_SortByName_Tooltip;
 	public static String		Pic_Dir_Dialog_CleanupStoreImages_Message;
 	public static String		Pic_Dir_Dialog_CleanupStoreImages_Title;
-	public static String		Pic_Dir_Dialog_ExternalPhotoViewer_Message;
-	public static String		Pic_Dir_Dialog_ExternalPhotoViewer_Title;
+	public static String		Pic_Dir_Dialog_ExternalApplication_Message;
+	public static String		Pic_Dir_Dialog_ExternalApplication_Title;
 	public static String		Pic_Dir_Dialog_FolderIsNotAvailable_Message;
 	public static String		Pic_Dir_Dialog_FolderIsNotAvailable_Title;
 	public static String		Pic_Dir_ImageSizeIndicator_Tooltip;
@@ -79,8 +80,10 @@ public class Messages extends NLS {
 	public static String		PrefPage_Photo_Cache_Label_ThumbnailCacheSizeInfo;
 	public static String		PrefPage_Photo_ExtViewer_Group_ExternalApplication;
 	public static String		PrefPage_Photo_ExtViewer_Group_ImageQuality;
-	public static String		PrefPage_Photo_ExtViewer_Label_ExternalApplication;
 	public static String		PrefPage_Photo_ExtViewer_Label_ExternalApplication_Tooltip;
+	public static String		PrefPage_Photo_ExtViewer_Label_ExternalApplication1;
+	public static String		PrefPage_Photo_ExtViewer_Label_ExternalApplication2;
+	public static String		PrefPage_Photo_ExtViewer_Label_ExternalApplication3;
 	public static String		PrefPage_Photo_ExtViewer_Label_Info;
 	public static String		PrefPage_Photo_ThumbStore_Button_CleanupAll;
 	public static String		PrefPage_Photo_ThumbStore_Button_CleanupAll_Tooltip;
@@ -103,10 +106,11 @@ public class Messages extends NLS {
 	public static String		PrefPage_Photo_Viewer_Checkbox_ShowNumbersInFolderView;
 	public static String		PrefPage_Photo_Viewer_Checkbox_ShowNumbersInFolderView_Tooltip;
 	public static String		PrefPage_Photo_Viewer_Group_Colors;
-	public static String		PrefPage_Photo_Viewer_Group_GalleryFont;
+	public static String		PrefPage_Photo_Viewer_Group_PhotoGallery;
 	public static String		PrefPage_Photo_Viewer_Label_BackgroundColor;
 	public static String		PrefPage_Photo_Viewer_Label_FileColor;
 	public static String		PrefPage_Photo_Viewer_Label_FolderColor;
+	public static String		PrefPage_Photo_Viewer_Label_FontEditor;
 	public static String		PrefPage_Photo_Viewer_Label_FontExample;
 	public static String		PrefPage_Photo_Viewer_Label_ForgroundColor;
 	public static String		PrefPage_Photo_Viewer_Label_GalleryFont;
@@ -118,6 +122,8 @@ public class Messages extends NLS {
 	public static String		PrefPage_Photo_Viewer_Label_ResizeImageQuality;
 	public static String		PrefPage_Photo_Viewer_Label_ResizeImageQuality_Tooltip;
 	public static String		PrefPage_Photo_Viewer_Label_SelectionForegroundColor;
+	public static String		PrefPage_Photo_Viewer_Label_TextMinThumbSize;
+	public static String		PrefPage_Photo_Viewer_Label_TextMinThumbSize_Tooltip;
 	public static String		PrefPage_Photo_Viewer_Radio_ImageFramework_AWT;
 	public static String		PrefPage_Photo_Viewer_Radio_ImageFramework_AWT_Tooltip;
 	public static String		PrefPage_Photo_Viewer_Radio_ImageFramework_SWT;

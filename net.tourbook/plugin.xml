@@ -319,6 +319,12 @@
 			category="net.tourbook.preferences.PrefPagePhotoID"
 			name="%PrefPage_Photo_PhotoViewer">
 		</page>
+
+		<page id="net.tourbook.preferences.PrefPagePhotoExternalAppID"
+			class="net.tourbook.photo.PrefPagePhotoExternalApp"
+			category="net.tourbook.preferences.PrefPagePhotoID"
+			name="%PrefPage_Photo_PhotoExternalApp">
+		</page>
 		
 		<page id="net.tourbook.preferences.PrefPagePhotoImageCacheID"
 			class="net.tourbook.photo.PrefPagePhotoImageCache"

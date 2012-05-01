@@ -122,6 +122,12 @@ public class Photo {
 	private PhotoLoadingState				_photoLoadingStateThumb;
 
 	/**
+	 * Is <code>true</code> when EXIF thumb image could be loaded
+	 */
+	private boolean							_isEXIFThumbAvailable;
+	private boolean							_isSwapWidthHeight;
+
+	/**
 	 * @param galleryItemIndex
 	 */
 	public Photo(final File imageFile) {
@@ -460,6 +466,13 @@ public class Photo {
 		return imageQuality == ImageQuality.HQ ? _imageKeyHQ : _imageKeyThumb;
 	}
 
+	/**
+	 * @return Returns image meta data or <code>null</code> when not loaded
+	 */
+	public PhotoImageMetadata getImageMetaData() {
+		return _photoImageMetadata;
+	}
+
 	public double getLatitude() {
 		return _latitude;
 	}
@@ -532,12 +545,15 @@ public class Photo {
 		return defaultValue;
 	}
 
+	/**
+	 * @return Returns photo image width or {@link Integer#MIN_VALUE} when width is not set.
+	 */
 	public int getWidth() {
 		return _imageWidth;
 	}
 
 	/**
-	 * @return Returns photo image width after it is rotated with the EXIF orientation
+	 * @return Returns photo image width after it is rotated with the EXIF orientation.
 	 */
 	public int getWidthRotated() {
 		return _widthRotated;
@@ -584,6 +600,13 @@ public class Photo {
 		return result;
 	}
 
+	/**
+	 * @return Returns <code>true</code> when EXIF thumb image could be loaded
+	 */
+	public boolean isEXIFThumbAvailable() {
+		return _isEXIFThumbAvailable;
+	}
+
 	public void setAltitude(final double altitude) {
 		_altitude = altitude;
 	}
@@ -594,6 +617,10 @@ public class Photo {
 
 	public void setGpsAreaInfo(final String gpsAreaInfo) {
 		_gpsAreaInfo = gpsAreaInfo;
+	}
+
+	public void setIsEXIFThumb() {
+		_isEXIFThumbAvailable = true;
 	}
 
 	public void setLatitude(final double latitude) {
@@ -725,20 +752,20 @@ public class Photo {
 		_widthSmall = width > SIZE_SMALL ? SIZE_SMALL : width;
 		_heightSmall = (int) (_widthSmall / ratio);
 
-		boolean isSwapWidthHeight = false;
+		_isSwapWidthHeight = false;
 
 		if (orientation > 1) {
 
 			// see here http://www.impulseadventure.com/photo/exif-orientation.html
 
 			if (orientation == 8) {
-				isSwapWidthHeight = true;
+				_isSwapWidthHeight = true;
 			} else if (orientation == 6) {
-				isSwapWidthHeight = true;
+				_isSwapWidthHeight = true;
 			}
 		}
 
-		if (isSwapWidthHeight) {
+		if (_isSwapWidthHeight) {
 			_widthRotated = _imageHeight;
 			_heightRotated = _imageWidth;
 		} else {

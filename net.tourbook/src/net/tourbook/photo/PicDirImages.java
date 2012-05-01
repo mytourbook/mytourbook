@@ -300,14 +300,14 @@ public class PicDirImages {
 		}
 
 		@Override
-		public void callBackImageIsLoaded(final boolean isImageLoadedOrHasLoadingError) {
+		public void callBackImageIsLoaded(final boolean isUpdateUI) {
 
-			if (isImageLoadedOrHasLoadingError == false) {
+			if (isUpdateUI == false) {
 				return;
 			}
 
 			// mark image area as needed to be redrawn
-			_display.asyncExec(new Runnable() {
+			_display.syncExec(new Runnable() {
 
 				public void run() {
 
@@ -315,10 +315,17 @@ public class PicDirImages {
 						return;
 					}
 
+					/*
+					 * Visibility check must be done in the UI thread because scrolling the gallery
+					 * can reposition the gallery item. This can be a BIG problem because the
+					 * redraw() method is painting the background color at the specified rectangle,
+					 * this cost me a lot of time to figure it out.
+					 */
 					final boolean isItemVisible = __galleryItem.galleryMT20.isItemVisible(__galleryItem);
 
 					if (isItemVisible) {
 
+						// redraw gallery item WITH background
 						_gallery.redraw(
 								__galleryItem.viewPortX,
 								__galleryItem.viewPortY,
@@ -556,7 +563,7 @@ public class PicDirImages {
 		if (prefGalleryFont.length() > 0) {
 			try {
 
-				StatusUtil.log("set gallery font: " + prefGalleryFont);
+				System.out.println(UI.timeStamp() + "setting gallery font: " + prefGalleryFont);
 
 				_galleryFont = new Font(_display, new FontData(prefGalleryFont));
 
@@ -805,6 +812,10 @@ public class PicDirImages {
 		PhotoImageCache.dispose();
 	}
 
+	int getThumbnailSize() {
+		return _spinnerThumbSize.getSelection();
+	}
+
 	void handlePrefStoreModifications(final PropertyChangeEvent event) {
 
 		final String property = event.getProperty();
@@ -831,7 +842,7 @@ public class PicDirImages {
 
 		} else if (property.equals(ITourbookPreferences.PHOTO_VIEWER_PREF_EVENT_IMAGE_VIEWER_UI_IS_MODIFIED)) {
 
-			setLargeImageQuality();
+			updateFromPrefStore();
 
 		} else if (property.equals(ITourbookPreferences.PHOTO_VIEWER_FONT)) {
 
@@ -971,6 +982,7 @@ public class PicDirImages {
 		_canvasImageSizeIndicator.setIndicator(isHqImage);
 
 		_spinnerThumbSize.setSelection(photoWidth);
+		_picDirView.setThumbnailSize(photoWidth);
 		_gallery.setItemSize(photoWidth, photoHeight);
 	}
 
@@ -1058,7 +1070,7 @@ public class PicDirImages {
 		/*
 		 * image quality
 		 */
-		setLargeImageQuality();
+		updateFromPrefStore();
 
 		/*
 		 * thumbnail size
@@ -1129,17 +1141,6 @@ public class PicDirImages {
 			state.put(STATE_GALLERY_POSITION_VALUE, positionValues);
 		}
 
-	}
-
-	private void setLargeImageQuality() {
-
-		final boolean isShowHighQuality = _prefStore.getBoolean(//
-				ITourbookPreferences.PHOTO_VIEWER_IS_SHOW_IMAGE_WITH_HIGH_QUALITY);
-
-		final int hqMinSize = _prefStore.getInt(//
-				ITourbookPreferences.PHOTO_VIEWER_HIGH_QUALITY_IMAGE_MIN_SIZE);
-
-		_gallery.setImageQuality(isShowHighQuality, hqMinSize);
 	}
 
 	/**
@@ -1334,6 +1335,26 @@ public class PicDirImages {
 		 */
 		_lblLoading.setForeground(fgColor);
 		_lblLoading.setBackground(bgColor);
+	}
+
+	private void updateFromPrefStore() {
+
+		/*
+		 * image quality
+		 */
+		final boolean isShowHighQuality = _prefStore.getBoolean(//
+				ITourbookPreferences.PHOTO_VIEWER_IS_SHOW_IMAGE_WITH_HIGH_QUALITY);
+
+		final int hqMinSize = _prefStore.getInt(//
+				ITourbookPreferences.PHOTO_VIEWER_HIGH_QUALITY_IMAGE_MIN_SIZE);
+
+		_gallery.setImageQuality(isShowHighQuality, hqMinSize);
+
+		/*
+		 * text minimum thumb size
+		 */
+		final int textMinThumbSize = _prefStore.getInt(ITourbookPreferences.PHOTO_VIEWER_TEXT_MIN_THUMB_SIZE);
+		_photoRenderer.setTextMinThumbSize(textMinThumbSize);
 	}
 
 	private void updateHistory(final String newFolderPathName) {

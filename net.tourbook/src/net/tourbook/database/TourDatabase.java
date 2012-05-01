@@ -622,59 +622,69 @@ public class TourDatabase {
 			}
 		});
 
-		BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+		/*
+		 * run in UI thread otherwise the busyindicator fails
+		 */
+		final Display display = Display.getDefault();
+
+		display.syncExec(new Runnable() {
 			public void run() {
 
-				Connection conn = null;
-				Statement stmt = null;
-				String sqlQuery = null;
+				BusyIndicator.showWhile(display, new Runnable() {
+					public void run() {
 
-				try {
+						Connection conn = null;
+						Statement stmt = null;
+						String sqlQuery = null;
 
-					conn = getInstance().getConnection();
-					stmt = conn.createStatement();
+						try {
 
-					sqlQuery = "SELECT" //$NON-NLS-1$
-							+ " DISTINCT" //$NON-NLS-1$
-							+ " " + fieldname //$NON-NLS-1$
-							+ " FROM " + db //$NON-NLS-1$
-							+ " ORDER BY " + fieldname; //$NON-NLS-1$
+							conn = getInstance().getConnection();
+							stmt = conn.createStatement();
 
-					final ResultSet result = stmt.executeQuery(sqlQuery);
+							sqlQuery = "SELECT" //$NON-NLS-1$
+									+ " DISTINCT" //$NON-NLS-1$
+									+ " " + fieldname //$NON-NLS-1$
+									+ " FROM " + db //$NON-NLS-1$
+									+ " ORDER BY " + fieldname; //$NON-NLS-1$
 
-					while (result.next()) {
+							final ResultSet result = stmt.executeQuery(sqlQuery);
 
-						String dbValue = result.getString(1);
-						if (dbValue != null) {
+							while (result.next()) {
 
-							dbValue = dbValue.trim();
+								String dbValue = result.getString(1);
+								if (dbValue != null) {
 
-							if (dbValue.length() > 0) {
-								sortedValues.add(dbValue);
+									dbValue = dbValue.trim();
+
+									if (dbValue.length() > 0) {
+										sortedValues.add(dbValue);
+									}
+								}
 							}
+
+						} catch (final SQLException e) {
+							UI.showSQLException(e);
+						} finally {
+							Util.sqlClose(stmt);
+							closeConnection(conn);
 						}
+
+						/*
+						 * log existing values
+						 */
+//						final StringBuilder sb = new StringBuilder();
+//						for (final String text : sortedValues) {
+//							sb.append(text);
+//							sb.append(UI.NEW_LINE);
+//						}
+//						System.out.println(UI.NEW_LINE2);
+//						System.out.println(sqlQuery);
+//						System.out.println(UI.NEW_LINE);
+//						System.out.println(sb.toString());
+//						// TODO remove SYSTEM.OUT.PRINTLN
 					}
-
-				} catch (final SQLException e) {
-					UI.showSQLException(e);
-				} finally {
-					Util.sqlClose(stmt);
-					closeConnection(conn);
-				}
-
-				/*
-				 * log existing values
-				 */
-//				final StringBuilder sb = new StringBuilder();
-//				for (final String text : sortedValues) {
-//					sb.append(text);
-//					sb.append(UI.NEW_LINE);
-//				}
-//				System.out.println(UI.NEW_LINE2);
-//				System.out.println(sqlQuery);
-//				System.out.println(UI.NEW_LINE);
-//				System.out.println(sb.toString());
-//				// TODO remove SYSTEM.OUT.PRINTLN
+				});
 			}
 		});
 

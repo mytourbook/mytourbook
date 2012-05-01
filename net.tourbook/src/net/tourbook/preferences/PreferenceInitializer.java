@@ -368,35 +368,33 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_HIGH_QUALITY_IMAGE_MIN_SIZE, 50);
 		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_HQ_IMAGE_SIZE, PhotoManager.IMAGE_SIZE_LARGE_DEFAULT);
 
-		PreferenceConverter.setDefault(store, //
-				ITourbookPreferences.PHOTO_VIEWER_COLOR_FOREGROUND,
+		PreferenceConverter.setDefault(store, ITourbookPreferences.PHOTO_VIEWER_COLOR_FOREGROUND, //
 				new RGB(0xf3, 0xf3, 0xf3));
 
-		PreferenceConverter.setDefault(store, //
-				ITourbookPreferences.PHOTO_VIEWER_COLOR_BACKGROUND,
+		PreferenceConverter.setDefault(store, ITourbookPreferences.PHOTO_VIEWER_COLOR_BACKGROUND, //
 				new RGB(0x50, 0x50, 0x50));
 
-		PreferenceConverter.setDefault(store, //
-				ITourbookPreferences.PHOTO_VIEWER_COLOR_SELECTION_FOREGROUND,
-//				new RGB(0xFF, 0x98, 0x5D));
-//				new RGB(0xFF, 0x6A, 0x11));
-//				new RGB(0xB7, 0xFF, 0x55));
+		PreferenceConverter.setDefault(store, ITourbookPreferences.PHOTO_VIEWER_COLOR_SELECTION_FOREGROUND, //
 				new RGB(0xFF, 0x80, 0x33));
 
-		PreferenceConverter.setDefault(store, //
-				ITourbookPreferences.PHOTO_VIEWER_COLOR_FOLDER,
+		PreferenceConverter.setDefault(store, ITourbookPreferences.PHOTO_VIEWER_COLOR_FOLDER, //
 				new RGB(0xFF, 0x6A, 0x11));
 
-		PreferenceConverter.setDefault(store, //
-				ITourbookPreferences.PHOTO_VIEWER_COLOR_FILE,
+		PreferenceConverter.setDefault(store, ITourbookPreferences.PHOTO_VIEWER_COLOR_FILE, //
 				new RGB(0x55, 0xC8, 0xFF));
 
-		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_FONT, "1|sans-serif|9|0|"); //$NON-NLS-1$
-//																  1|DejaVu Sans|6.75|0|WINDOWS|1|-9|0|0|0|400|0|0|0|0|3|2|1|34|DejaVu Sans
+		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_TEXT_MIN_THUMB_SIZE, 80);
 
-		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_IMAGE_FRAMEWORK, UI.IS_WIN
-				? PhotoManager.IMAGE_FRAMEWORK_AWT
-				: PhotoManager.IMAGE_FRAMEWORK_SWT);
+		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_FONT, //
+				UI.IS_OSX //
+						? "1|sans-serif|9|0|"//$NON-NLS-1$
+						: "1|sans-serif|7|0|");//$NON-NLS-1$
+/////////////////////	  1|DejaVu Sans|6.75|0|WINDOWS|1|-9|0|0|0|400|0|0|0|0|3|2|1|34|DejaVu Sans
+
+		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_IMAGE_FRAMEWORK, //
+				UI.IS_WIN //
+						? PhotoManager.IMAGE_FRAMEWORK_AWT
+						: PhotoManager.IMAGE_FRAMEWORK_SWT);
 
 	}
 }
