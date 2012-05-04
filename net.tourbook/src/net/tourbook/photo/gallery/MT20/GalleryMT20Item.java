@@ -36,8 +36,22 @@ public class GalleryMT20Item {
 	public int			width;
 	public int			height;
 
+	/**
+	 * Each gallery item needs a uniqueue id.
+	 */
+	public String		itemID;
+
 	public GalleryMT20Item(final GalleryMT20 galleryMT20) {
 		this.galleryMT20 = galleryMT20;
+	}
+
+	/**
+	 * @param data
+	 * @param itemID
+	 */
+	public void setData(final Object data, final String itemID) {
+		this.data = data;
+		this.itemID = itemID;
 	}
 
 	@Override

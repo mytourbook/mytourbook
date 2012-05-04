@@ -90,12 +90,12 @@ public class PicDirImages {
 	static final int								MIN_ITEM_WIDTH					= 10;
 	static final int								MAX_ITEM_WIDTH					= 2000;
 
-	private static final String						STATE_FOLDER_HISTORY			= "STATE_FOLDER_HISTORY";				//$NON-NLS-1$
-	private static final String						STATE_THUMB_IMAGE_SIZE			= "STATE_THUMB_IMAGE_SIZE";			//$NON-NLS-1$
-	private static final String						STATE_GALLERY_POSITION_FOLDER	= "STATE_GALLERY_POSITION_FOLDER";		//$NON-NLS-1$
-	private static final String						STATE_GALLERY_POSITION_VALUE	= "STATE_GALLERY_POSITION_VALUE";		//$NON-NLS-1$
+	private static final String						STATE_FOLDER_HISTORY			= "STATE_FOLDER_HISTORY";			//$NON-NLS-1$
+	private static final String						STATE_THUMB_IMAGE_SIZE			= "STATE_THUMB_IMAGE_SIZE";		//$NON-NLS-1$
+	private static final String						STATE_GALLERY_POSITION_FOLDER	= "STATE_GALLERY_POSITION_FOLDER";	//$NON-NLS-1$
+	private static final String						STATE_GALLERY_POSITION_VALUE	= "STATE_GALLERY_POSITION_VALUE";	//$NON-NLS-1$
 
-	private static final String						DEFAULT_GALLERY_FONT			= "arial,sans-serif";					//$NON-NLS-1$
+	private static final String						DEFAULT_GALLERY_FONT			= "arial,sans-serif";				//$NON-NLS-1$
 
 	private final IPreferenceStore					_prefStore						= TourbookPlugin.getDefault() //
 																							.getPreferenceStore();
@@ -164,11 +164,6 @@ public class PicDirImages {
 	private PhotoRenderer							_photoRenderer;
 
 	/**
-	 * Photo image width (thumbnail size)
-	 */
-	private int										_photoWidth						= PhotoManager.IMAGE_SIZE_THUMBNAIL;
-
-	/**
 	 * Folder which images are currently be displayed
 	 */
 	private File									_photoFolder;
@@ -186,6 +181,8 @@ public class PicDirImages {
 	private ActionNavigateHistoryForward			_actionNavigateForward;
 	private ActionClearNavigationHistory			_actionClearNavigationHistory;
 	private ActionRemoveInvalidFoldersFromHistory	_actionRemoveInvalidFoldersFromHistory;
+
+	private int										_prevThumbSize;
 
 	/**
 	 * keep gallery position for each used folder
@@ -350,7 +347,7 @@ public class PicDirImages {
 			// create a photo for an image file
 			final Photo photo = new Photo(_photoFiles[itemIndex]);
 
-			galleryItem.data = photo;
+			galleryItem.setData(photo, photo.getFilePathName());
 		}
 	}
 
@@ -375,7 +372,7 @@ public class PicDirImages {
 		_actionNavigateForward.setEnabled(false);
 	}
 
-// LOG ALL BINDINGS
+//////// LOG ALL BINDINGS
 //
 //		final IWorkbench workbench = PlatformUI.getWorkbench();
 //		final IBindingService bindingService = (IBindingService) workbench.getAdapter(IBindingService.class);
@@ -743,7 +740,7 @@ public class PicDirImages {
 	 */
 	private void createUI_20_PageGallery(final Composite parent) {
 
-		_gallery = new PhotoGallery(parent, SWT.V_SCROLL | SWT.MULTI);
+		_gallery = new PhotoGallery(parent, SWT.MULTI | SWT.V_SCROLL | SWT.MULTI);
 
 		_gallery.setHigherQualityDelay(200);
 //		_gallery.setAntialias(SWT.OFF);
@@ -833,10 +830,7 @@ public class PicDirImages {
 						disposeAllImages();
 					}
 
-//					_gallery.keepGalleryPosition();
-
-					// this will update the gallery
-//					_gallery.clearAll();
+					_gallery.updateGallery(false, _gallery.getGalleryPosition());
 				}
 			});
 
@@ -881,6 +875,7 @@ public class PicDirImages {
 		final GalleryMT20Item[] galleryItems = _gallery.getGalleryItems();
 		if (galleryItems != null) {
 
+// this is not yet implemented
 //			for (final GalleryMT20Item galleryItem : galleryItems) {
 //				final Photo photo = (Photo) galleryItem.data;
 //				photo.resetCachedFontSizes();
@@ -906,45 +901,43 @@ public class PicDirImages {
 
 	private void onSelectThumbnailSize(final int newThumbSize) {
 
-		final double galleryWidth = _gallery.getClientArea().width;
-		final int prevPhotoWidth = _photoWidth;
+		if (newThumbSize == _prevThumbSize) {
+			// nothing has changed
+			return;
+		}
 
-		final double prevNumberOfImages = galleryWidth / prevPhotoWidth;
+		final double galleryWidth = _gallery.getClientArea().width;
+		final int prevPhotoWidth = _gallery.getItemWidth();
+
+		final int prevNumberOfImages = _gallery.getNumberOfHorizontalImages();
 
 		int newPhotoWidth = newThumbSize;
 
-		if (newThumbSize > prevPhotoWidth) {
+		if (newThumbSize > _prevThumbSize) {
 
-			// increased width -> fewer images
+			if (prevNumberOfImages > 2) {
 
-			int imageCounter = (int) (prevNumberOfImages - 1);
+				// increased width -> fewer images
 
-			/**
-			 * when only 1 image is displayed horizontally, there is a bug in the drawing algorithm
-			 * that only 1 displayed even when multiple image could be displayed vertically
-			 */
-			if (imageCounter >= 2) {
+				newPhotoWidth = (int) (galleryWidth / (prevNumberOfImages - 1));
 
-				newPhotoWidth = (int) (galleryWidth / imageCounter);
+			} else {
 
-				if (newPhotoWidth == prevPhotoWidth) {
+				// number of photos is already 1, only increase photo width
 
-					// size has not changed
-
-					while (newPhotoWidth == prevPhotoWidth) {
-
-						if (imageCounter < 3) {
-							break;
-						}
-
-						newPhotoWidth = (int) (galleryWidth / --imageCounter);
-					}
-				}
+				newPhotoWidth = newThumbSize;
 			}
 
 		} else {
 
 			// decreased width -> more images
+
+//			newPhotoWidth = (int) (galleryWidth / (prevNumberOfImages + 1));
+//
+//			if (newPhotoWidth < MIN_ITEM_WIDTH) {
+//				newPhotoWidth = MIN_ITEM_WIDTH;
+//			}
+//
 
 			final double tempImageCounter = galleryWidth / newThumbSize;
 
@@ -954,7 +947,7 @@ public class PicDirImages {
 			 */
 			if (tempImageCounter > 2) {
 
-				final int numberOfImages = (int) (prevNumberOfImages + 1);
+				final int numberOfImages = prevNumberOfImages + 1;
 
 				final int newTempPhotoWidth = (int) (galleryWidth / numberOfImages);
 				if (newTempPhotoWidth > MIN_ITEM_WIDTH) {
@@ -963,27 +956,36 @@ public class PicDirImages {
 			}
 		}
 
-		final int photoWidth = newPhotoWidth;
-		final int photoHeight = (int) (newPhotoWidth * (float) 11 / 15);
-
-		if (photoWidth == _photoWidth) {
-			// optimize selection
+		if (newPhotoWidth == prevPhotoWidth) {
+			// nothing has changed
 			return;
 		}
-
-		PhotoManager.stopImageLoading();
 
 		/*
 		 * update UI with new size
 		 */
-		_photoWidth = photoWidth;
 
-		final boolean isHqImage = photoWidth > PhotoManager.IMAGE_SIZE_THUMBNAIL;
+		PhotoManager.stopImageLoading();
+
+		// update gallery
+		final int newSize = _gallery.setItemSize(newPhotoWidth);
+		if (newSize != newPhotoWidth) {
+
+			/*
+			 * size has been modified, this case can occure when the gallery is switching the
+			 * scrollbars on/off depending on the content
+			 */
+
+			newPhotoWidth = newSize;
+		}
+
+		_spinnerThumbSize.setSelection(newPhotoWidth);
+		_prevThumbSize = newPhotoWidth;
+
+		final boolean isHqImage = newPhotoWidth > PhotoManager.IMAGE_SIZE_THUMBNAIL;
 		_canvasImageSizeIndicator.setIndicator(isHqImage);
 
-		_spinnerThumbSize.setSelection(photoWidth);
-		_picDirView.setThumbnailSize(photoWidth);
-		_gallery.setItemSize(photoWidth, photoHeight);
+		_picDirView.setThumbnailSize(newPhotoWidth);
 	}
 
 	private void removeInvalidFolder(final String invalidFolderPathName) {
@@ -1077,6 +1079,7 @@ public class PicDirImages {
 		 */
 		final int stateThumbSize = Util.getStateInt(state, STATE_THUMB_IMAGE_SIZE, PhotoManager.IMAGE_SIZE_THUMBNAIL);
 		_spinnerThumbSize.setSelection(stateThumbSize);
+		_prevThumbSize = stateThumbSize;
 
 		// restore thumbnail size
 		onSelectThumbnailSize(stateThumbSize);
@@ -1156,7 +1159,7 @@ public class PicDirImages {
 		//
 		// MUST BE REMOVED, IS ONLY FOR TESTING
 		//
-		disposeAllImages();
+//		disposeAllImages();
 		//
 		// MUST BE REMOVED, IS ONLY FOR TESTING
 		//
@@ -1466,18 +1469,10 @@ public class PicDirImages {
 						_galleryPositions.put(prevPhotoFolder.getAbsolutePath(), _gallery.getGalleryPosition());
 					}
 
-					// set old gallery position
+					// get old gallery position
 					final Double oldPosition = _galleryPositions.get(_photoFolder.getAbsolutePath());
-					if (oldPosition != null) {
-//						_gallery.setGalleryPositionWhenUpdated(oldPosition);
-					}
 
-					/*
-					 * this will also update the gallery, it's not easy to understand the update
-					 * procedure
-					 */
-//					_gallery.clearAll();
-					_gallery.setupItems(_photoFiles.length);
+					_gallery.setupItems(_photoFiles.length, oldPosition);
 
 					/*
 					 * update status info
