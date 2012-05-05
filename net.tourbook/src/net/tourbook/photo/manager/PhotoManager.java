@@ -38,6 +38,12 @@ public class PhotoManager {
 	public static final int										IMAGE_SIZE_THUMBNAIL		= 160;
 	public static final int										IMAGE_SIZE_LARGE_DEFAULT	= 600;
 
+//	/**
+//	 * Default image ratio between image width/height. It is the average between 4000x3000 (1.3333)
+//	 * and 5184x3456 (1.5)
+//	 */
+//	public static final double									IMAGE_RATIO					= 15.0 / 10;									//1.41;
+
 // SET_FORMATTING_OFF
 
 	

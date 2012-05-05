@@ -383,7 +383,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		PreferenceConverter.setDefault(store, ITourbookPreferences.PHOTO_VIEWER_COLOR_FILE, //
 				new RGB(0x55, 0xC8, 0xFF));
 
-		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_TEXT_MIN_THUMB_SIZE, 80);
+		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_TEXT_MIN_THUMB_SIZE, 100);
 
 		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_FONT, //
 				UI.IS_OSX //
