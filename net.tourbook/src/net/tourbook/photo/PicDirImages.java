@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
@@ -182,7 +183,7 @@ public class PicDirImages {
 	private ActionClearNavigationHistory			_actionClearNavigationHistory;
 	private ActionRemoveInvalidFoldersFromHistory	_actionRemoveInvalidFoldersFromHistory;
 
-	private int										_prevThumbSize;
+	private int										_prevThumbSize					= -1;
 
 	/**
 	 * keep gallery position for each used folder
@@ -754,7 +755,7 @@ public class PicDirImages {
 			// a modify event is fired when gallery is zoomed in/out
 
 			public void handleEvent(final Event event) {
-				onSelectThumbnailSize(event.width);
+				updateUIAfterZoomInOut(event.width);
 			}
 		});
 
@@ -836,7 +837,7 @@ public class PicDirImages {
 
 		} else if (property.equals(ITourbookPreferences.PHOTO_VIEWER_PREF_EVENT_IMAGE_VIEWER_UI_IS_MODIFIED)) {
 
-			updateFromPrefStore();
+			updateUIFromPrefStore();
 
 		} else if (property.equals(ITourbookPreferences.PHOTO_VIEWER_FONT)) {
 
@@ -919,7 +920,23 @@ public class PicDirImages {
 
 				// increased width -> fewer images
 
-				newPhotoWidth = (int) (galleryWidth / (prevNumberOfImages - 1));
+				int numberOfImages = prevNumberOfImages - 1;
+
+				newPhotoWidth = (int) (galleryWidth / numberOfImages);
+
+				if (newPhotoWidth == prevPhotoWidth) {
+
+					// size has not changed, decrease number of images until the width has changed
+
+					while (newPhotoWidth == prevPhotoWidth) {
+
+						if (numberOfImages < 3) {
+							break;
+						}
+
+						newPhotoWidth = (int) (galleryWidth / --numberOfImages);
+					}
+				}
 
 			} else {
 
@@ -931,13 +948,6 @@ public class PicDirImages {
 		} else {
 
 			// decreased width -> more images
-
-//			newPhotoWidth = (int) (galleryWidth / (prevNumberOfImages + 1));
-//
-//			if (newPhotoWidth < MIN_ITEM_WIDTH) {
-//				newPhotoWidth = MIN_ITEM_WIDTH;
-//			}
-//
 
 			final double tempImageCounter = galleryWidth / newThumbSize;
 
@@ -979,13 +989,7 @@ public class PicDirImages {
 			newPhotoWidth = newSize;
 		}
 
-		_spinnerThumbSize.setSelection(newPhotoWidth);
-		_prevThumbSize = newPhotoWidth;
-
-		final boolean isHqImage = newPhotoWidth > PhotoManager.IMAGE_SIZE_THUMBNAIL;
-		_canvasImageSizeIndicator.setIndicator(isHqImage);
-
-		_picDirView.setThumbnailSize(newPhotoWidth);
+		updateUIAfterZoomInOut(newPhotoWidth);
 	}
 
 	private void removeInvalidFolder(final String invalidFolderPathName) {
@@ -1072,14 +1076,13 @@ public class PicDirImages {
 		/*
 		 * image quality
 		 */
-		updateFromPrefStore();
+		updateUIFromPrefStore();
 
 		/*
 		 * thumbnail size
 		 */
 		final int stateThumbSize = Util.getStateInt(state, STATE_THUMB_IMAGE_SIZE, PhotoManager.IMAGE_SIZE_THUMBNAIL);
 		_spinnerThumbSize.setSelection(stateThumbSize);
-		_prevThumbSize = stateThumbSize;
 
 		// restore thumbnail size
 		onSelectThumbnailSize(stateThumbSize);
@@ -1235,7 +1238,7 @@ public class PicDirImages {
 	}
 
 	/**
-	 * This will sort the galleries first root item
+	 * This will sort the gallery items
 	 */
 	private void sortGalleryRunnable() {
 
@@ -1244,8 +1247,66 @@ public class PicDirImages {
 			return;
 		}
 
-//		final GalleryMT20Item[] rootItems = _gallery.getItems();
-//		if (rootItems.length == 0) {
+		final GalleryMT20Item[] galleryItems = _gallery.getGalleryItems();
+		if (galleryItems.length == 0) {
+			// there is no root item
+			return;
+		}
+		final int[] filterIndices = _gallery.getFilteredItemsIndices();
+
+		/*
+		 * sort gallery items according to the sorted image files
+		 */
+
+		final HashMap<String, GalleryMT20Item> existingGalleryItemsMap = new HashMap<String, GalleryMT20Item>();
+
+		// create a map with all existing gallery items, an item can be null when not yet displayed/initialized
+//		for (final int filterIndex : filterIndices) {
+//
+//			final GalleryMT20Item existingGalleryItem = galleryItems[filterIndex];
+//
+//			if (existingGalleryItem != null) {
+//
+//				final Photo photo = (Photo) existingGalleryItem.data;
+//				final String photoImageFileName = photo.getFileName();
+//
+//				existingGalleryItemsMap.put(photoImageFileName, existingGalleryItem);
+//			}
+//		}
+//
+//		// sort image files
+//		final List<File> sortedFiles = sortFiles(_photoFolder);
+//		final File[] sortedFilesArray = sortedFiles.toArray(new File[sortedFiles.size()]);
+//
+//		final GalleryMT20Item[] sortedGalleryItems = new GalleryMT20Item[existingGalleryItems.length];
+//
+//		// convert sorted images files into sorted gallery items
+//		for (int itemIndex = 0; itemIndex < sortedFilesArray.length; itemIndex++) {
+//
+//			final File imageFile = sortedFilesArray[itemIndex];
+//
+//			final GalleryMT20Item galleryItem = existingGalleryItemsMap.get(imageFile.getName());
+//
+//			if (galleryItem != null) {
+//				sortedGalleryItems[itemIndex] = galleryItem;
+//			}
+//		}
+//
+//		_gallery.setSortedItems(sortedGalleryItems);
+	}
+
+//	/**
+//	 * This will sort the gallery items
+//	 */
+//	private void sortGalleryRunnable_OLD() {
+//
+//		if (_photoFiles == null || _photoFiles.length == 0) {
+//			// there are no files
+//			return;
+//		}
+//
+//		final GalleryMT20Item[] galleryItems = _gallery.getGalleryItems();
+//		if (galleryItems.length == 0) {
 //			// there is no root item
 //			return;
 //		}
@@ -1288,7 +1349,7 @@ public class PicDirImages {
 //		}
 //
 //		_gallery.setSortedItems(sortedGalleryItems);
-	}
+//	}
 
 	void updateColors(final Color fgColor, final Color bgColor, final Color selectionFgColor) {
 
@@ -1338,26 +1399,6 @@ public class PicDirImages {
 		 */
 		_lblLoading.setForeground(fgColor);
 		_lblLoading.setBackground(bgColor);
-	}
-
-	private void updateFromPrefStore() {
-
-		/*
-		 * image quality
-		 */
-		final boolean isShowHighQuality = _prefStore.getBoolean(//
-				ITourbookPreferences.PHOTO_VIEWER_IS_SHOW_IMAGE_WITH_HIGH_QUALITY);
-
-		final int hqMinSize = _prefStore.getInt(//
-				ITourbookPreferences.PHOTO_VIEWER_HIGH_QUALITY_IMAGE_MIN_SIZE);
-
-		_gallery.setImageQuality(isShowHighQuality, hqMinSize);
-
-		/*
-		 * text minimum thumb size
-		 */
-		final int textMinThumbSize = _prefStore.getInt(ITourbookPreferences.PHOTO_VIEWER_TEXT_MIN_THUMB_SIZE);
-		_photoRenderer.setTextMinThumbSize(textMinThumbSize);
 	}
 
 	private void updateHistory(final String newFolderPathName) {
@@ -1413,6 +1454,37 @@ public class PicDirImages {
 
 		_actionClearNavigationHistory.setEnabled(historySize > 1);
 		_actionRemoveInvalidFoldersFromHistory.setEnabled(historySize > 1);
+	}
+
+	private void updateUIAfterZoomInOut(final int newPhotoWidth) {
+
+		_spinnerThumbSize.setSelection(newPhotoWidth);
+		_prevThumbSize = newPhotoWidth;
+
+		final boolean isHqImage = newPhotoWidth > PhotoManager.IMAGE_SIZE_THUMBNAIL;
+		_canvasImageSizeIndicator.setIndicator(isHqImage);
+
+		_picDirView.setThumbnailSize(newPhotoWidth);
+	}
+
+	private void updateUIFromPrefStore() {
+
+		/*
+		 * image quality
+		 */
+		final boolean isShowHighQuality = _prefStore.getBoolean(//
+				ITourbookPreferences.PHOTO_VIEWER_IS_SHOW_IMAGE_WITH_HIGH_QUALITY);
+
+		final int hqMinSize = _prefStore.getInt(//
+				ITourbookPreferences.PHOTO_VIEWER_HIGH_QUALITY_IMAGE_MIN_SIZE);
+
+		_gallery.setImageQuality(isShowHighQuality, hqMinSize);
+
+		/*
+		 * text minimum thumb size
+		 */
+		final int textMinThumbSize = _prefStore.getInt(ITourbookPreferences.PHOTO_VIEWER_TEXT_MIN_THUMB_SIZE);
+		_photoRenderer.setTextMinThumbSize(textMinThumbSize);
 	}
 
 	/**
