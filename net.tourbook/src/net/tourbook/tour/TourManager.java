@@ -636,29 +636,33 @@ public class TourManager {
 		return false;
 	}
 
-	public static TourDataEditorView openTourEditor(final boolean isActive) {
+	public static void openTourEditor(final boolean isActive) {
 
-		IViewPart viewPart = null;
-		TourDataEditorView tourDataEditorView = null;
+		/*
+		 * must be run in the UI thread because PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+		 * returns null in none UI threads
+		 */
+		Display.getDefault().syncExec(new Runnable() {
+			public void run() {
 
-		try {
+				try {
 
-			final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+					final IWorkbenchWindow activeWorkbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 
-			viewPart = page.showView(TourDataEditorView.ID, null, IWorkbenchPage.VIEW_VISIBLE);
+					final IWorkbenchPage page = activeWorkbenchWindow.getActivePage();
 
-			if (viewPart instanceof TourDataEditorView) {
+					final IViewPart viewPart = page.showView(TourDataEditorView.ID, null, IWorkbenchPage.VIEW_VISIBLE);
 
-				tourDataEditorView = (TourDataEditorView) viewPart;
+					if (viewPart instanceof TourDataEditorView) {
 
-				if (isActive) {
+						if (isActive) {
 
-					page.showView(TourDataEditorView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
+							page.showView(TourDataEditorView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
 
-				} else if (page.isPartVisible(viewPart) == false || isActive) {
+						} else if (page.isPartVisible(viewPart) == false || isActive) {
 
-					page.bringToTop(viewPart);
-				}
+							page.bringToTop(viewPart);
+						}
 
 // HINT: this does not restore the part when it's in a fast view
 //
@@ -667,13 +671,13 @@ public class TourManager {
 //			page.setPartState(partRef, IWorkbenchPage.STATE_MAXIMIZED);
 //			page.setPartState(partRef, IWorkbenchPage.STATE_RESTORED);
 
+					}
+
+				} catch (final PartInitException e) {
+					StatusUtil.log(e);
+				}
 			}
-
-		} catch (final PartInitException e) {
-			StatusUtil.log(e);
-		}
-
-		return tourDataEditorView;
+		});
 	}
 
 	/**
