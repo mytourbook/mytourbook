@@ -16,7 +16,6 @@
 package net.tourbook.photo.manager;
 
 import java.awt.Point;
-import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -43,13 +42,13 @@ import de.byteholder.gpx.GeoPosition;
 
 public class Photo {
 
-	private File							_imageFile;
-	private String							_fileName;
-	private String							_filePathName;
+	private PhotoWrapper					_photoWrapper;
+
+	private String							_uniqueId;
 
 	private PhotoImageMetadata				_photoImageMetadata;
 
-	private DateTime						_fileDateTime;
+	private DateTime						_imageFileDateTime;
 	private DateTime						_exifDateTime;
 
 	/**
@@ -130,18 +129,17 @@ public class Photo {
 	/**
 	 * @param galleryItemIndex
 	 */
-	public Photo(final File imageFile) {
+	public Photo(final PhotoWrapper photoWrapper) {
 
-		_imageFile = imageFile;
+		_photoWrapper = photoWrapper;
 
-		_fileName = imageFile.getName();
-		_filePathName = imageFile.getAbsolutePath();
+		_uniqueId = photoWrapper.imageFilePathName;
 
 		/*
 		 * initialize image keys and loading states
 		 */
-		_imageKeyHQ = Util.computeMD5(_filePathName + "_HQ");//$NON-NLS-1$
-		_imageKeyThumb = Util.computeMD5(_filePathName + "_Thumb");//$NON-NLS-1$
+		_imageKeyHQ = Util.computeMD5(_photoWrapper.imageFilePathName + "_HQ");//$NON-NLS-1$
+		_imageKeyThumb = Util.computeMD5(_photoWrapper.imageFilePathName + "_Thumb");//$NON-NLS-1$
 
 		_photoLoadingStateHQ = PhotoLoadingState.UNDEFINED;
 		_photoLoadingStateThumb = PhotoLoadingState.UNDEFINED;
@@ -222,7 +220,7 @@ public class Photo {
 		}
 
 		// set file date time
-		photoMetadata.fileDateTime = new DateTime(_imageFile.lastModified());
+		photoMetadata.fileDateTime = new DateTime(_photoWrapper.imageFileLastModified);
 
 		return photoMetadata;
 	}
@@ -249,11 +247,11 @@ public class Photo {
 			return false;
 		}
 		final Photo other = (Photo) obj;
-		if (_filePathName == null) {
-			if (other._filePathName != null) {
+		if (_uniqueId == null) {
+			if (other._uniqueId != null) {
 				return false;
 			}
-		} else if (!_filePathName.equals(other._filePathName)) {
+		} else if (!_uniqueId.equals(other._uniqueId)) {
 			return false;
 		}
 		return true;
@@ -396,24 +394,6 @@ public class Photo {
 		return Double.MIN_VALUE;
 	}
 
-	public DateTime getFileDateTime() {
-		return _fileDateTime;
-	}
-
-	/**
-	 * @return Returns photo image file name without path
-	 */
-	public String getFileName() {
-		return _fileName;
-	}
-
-	/**
-	 * @return Returns the absolute pathname for the fullsize image
-	 */
-	public String getFilePathName() {
-		return _filePathName;
-	}
-
 	/**
 	 * @return Returns geo position or <code>null</code> when latitude/longitude is not available
 	 */
@@ -454,9 +434,13 @@ public class Photo {
 		return _imageDirection;
 	}
 
-	public File getImageFile() {
-		return _imageFile;
+	public DateTime getImageFileDateTime() {
+		return _imageFileDateTime;
 	}
+
+//	public File getImageFile() {
+//		return _imageFile;
+//	}
 
 	/**
 	 * @return Returns an image key which can be used to get images from an image cache. This key is
@@ -465,6 +449,20 @@ public class Photo {
 	public String getImageKey(final ImageQuality imageQuality) {
 		return imageQuality == ImageQuality.HQ ? _imageKeyHQ : _imageKeyThumb;
 	}
+
+//	/**
+//	 * @return Returns photo image file name without path
+//	 */
+//	public String getImageFileName() {
+//		return _imageFileName;
+//	}
+
+//	/**
+//	 * @return Returns the absolute pathname for the fullsize image
+//	 */
+//	public String getImageFilePathName() {
+//		return _imageFilePathName;
+//	}
 
 	/**
 	 * @return Returns image meta data or <code>null</code> when not loaded
@@ -511,6 +509,10 @@ public class Photo {
 	 */
 	public int getOrientation() {
 		return _orientation;
+	}
+
+	public PhotoWrapper getPhotoWrapper() {
+		return _photoWrapper;
 	}
 
 	private DateTime getTiffDate(final TiffImageMetadata tiffMetadata) {
@@ -596,7 +598,7 @@ public class Photo {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((_filePathName == null) ? 0 : _filePathName.hashCode());
+		result = prime * result + ((_uniqueId == null) ? 0 : _uniqueId.hashCode());
 		return result;
 	}
 
@@ -648,7 +650,7 @@ public class Photo {
 
 		return ""
 //				+"Photo " //
-				+ (_fileName)
+				+ (_photoWrapper.imageFileName)
 //				+ (_exifDateTime == null ? "-no date-" : "\t" + _exifDateTime)
 //				+ ("\trotate:" + rotateDegree)
 //				+ (_imageWidth == Integer.MIN_VALUE ? "-no size-" : "\t" + _imageWidth + "x" + _imageHeight)
@@ -684,7 +686,7 @@ public class Photo {
 			final HashMap<Object, Object> params = new HashMap<Object, Object>();
 			params.put(SanselanConstants.PARAM_KEY_READ_THUMBNAILS, isReadThumbnail);
 
-			imageFileMetadata = Sanselan.getMetadata(_imageFile, params);
+			imageFileMetadata = Sanselan.getMetadata(_photoWrapper.imageFile, params);
 
 		} catch (final Exception e) {
 // must be logged in another way
@@ -704,7 +706,7 @@ public class Photo {
 	private void updatePhotoImageMetadata(final PhotoImageMetadata photoImageMetadata) {
 
 		_exifDateTime = photoImageMetadata.exifDateTime;
-		_fileDateTime = photoImageMetadata.fileDateTime;
+		_imageFileDateTime = photoImageMetadata.fileDateTime;
 
 		_imageWidth = photoImageMetadata.imageWidth;
 		_imageHeight = photoImageMetadata.imageHeight;
@@ -720,6 +722,9 @@ public class Photo {
 		_gpsAreaInfo = photoImageMetadata.gpsAreaInfo;
 
 		updateSize(_imageWidth, _imageHeight, _orientation);
+
+		// set state if gps data are available, this state is used for filtering the photos
+		_photoWrapper.gpsState = _latitude == Double.MIN_VALUE || _longitude == Double.MIN_VALUE ? 0 : 1;
 	}
 
 	/**

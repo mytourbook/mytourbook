@@ -39,30 +39,32 @@ public class GalleryMT20Item {
 	/**
 	 * Each gallery item needs a uniqueue id.
 	 */
-	public String		itemID;
+	public String		uniqueItemID;
 
 	public GalleryMT20Item(final GalleryMT20 galleryMT20) {
 		this.galleryMT20 = galleryMT20;
 	}
 
 	/**
+	 * Set data for the gallery item and a unique key to identify it (e.g. for selection)
+	 * 
 	 * @param data
-	 * @param itemID
+	 * @param uniqueItemID
 	 */
-	public void setData(final Object data, final String itemID) {
+	public void setData(final Object data, final String uniqueItemID) {
 		this.data = data;
-		this.itemID = itemID;
+		this.uniqueItemID = uniqueItemID;
 	}
 
 	@Override
 	public String toString() {
 		return ""
 //				"GalleryMT20Item"
-				+ (" " + data)
 				+ (" 			x=" + viewPortX)
 				+ ("\ty=" + viewPortY)
 				+ ("\t" + width)
 				+ ("x" + height)
+				+ (" " + data)
 //
 		;
 	}

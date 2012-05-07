@@ -18,6 +18,7 @@ package net.tourbook.photo;
 import java.io.File;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.photo.manager.GallerySorting;
 import net.tourbook.photo.manager.ThumbnailStore;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.UI;
@@ -45,8 +46,8 @@ public class PicDirView extends ViewPart {
 
 	static public final String				ID											= "net.tourbook.photo.PicDirView";				//$NON-NLS-1$
 
-	static final int						GALLERY_SORTING_BY_DATE						= 0;
-	static final int						GALLERY_SORTING_BY_NAME						= 1;
+//	static final int						GALLERY_SORTING_BY_DATE						= 0;
+//	static final int						GALLERY_SORTING_BY_NAME						= 1;
 
 	private static final String				STATE_TREE_WIDTH							= "STATE_TREE_WIDTH";							//$NON-NLS-1$
 	private static final String				STATE_GALLERY_SORTING						= "STATE_GALLERY_SORTING";						//$NON-NLS-1$
@@ -65,7 +66,7 @@ public class PicDirView extends ViewPart {
 	private static final IPreferenceStore	_prefStore									= TourbookPlugin.getDefault()//
 																								.getPreferenceStore();
 
-	private int								_gallerySorting;
+	private GallerySorting					_gallerySorting;
 
 	private IPartListener2					_partListener;
 	private IPropertyChangeListener			_prefChangeListener;
@@ -229,10 +230,10 @@ public class PicDirView extends ViewPart {
 		final boolean isChecked = _actionSortFileByDate.isChecked();
 
 		if (isChecked) {
-			_gallerySorting = GALLERY_SORTING_BY_DATE;
+			_gallerySorting = GallerySorting.FILE_DATE;
 			_actionSortByFileName.setChecked(false);
 		} else {
-			_gallerySorting = GALLERY_SORTING_BY_NAME;
+			_gallerySorting = GallerySorting.FILE_NAME;
 			_actionSortByFileName.setChecked(true);
 		}
 
@@ -244,10 +245,10 @@ public class PicDirView extends ViewPart {
 		final boolean isChecked = _actionSortByFileName.isChecked();
 
 		if (isChecked) {
-			_gallerySorting = GALLERY_SORTING_BY_NAME;
+			_gallerySorting = GallerySorting.FILE_NAME;
 			_actionSortFileByDate.setChecked(false);
 		} else {
-			_gallerySorting = GALLERY_SORTING_BY_DATE;
+			_gallerySorting = GallerySorting.FILE_DATE;
 			_actionSortFileByDate.setChecked(true);
 		}
 
@@ -462,9 +463,14 @@ public class PicDirView extends ViewPart {
 		/*
 		 * gallery sorting
 		 */
-		_gallerySorting = Util.getStateInt(_state, STATE_GALLERY_SORTING, GALLERY_SORTING_BY_DATE);
-		_actionSortFileByDate.setChecked(_gallerySorting == GALLERY_SORTING_BY_DATE);
-		_actionSortByFileName.setChecked(_gallerySorting == GALLERY_SORTING_BY_NAME);
+		final String prefSorting = Util.getStateString(_state, STATE_GALLERY_SORTING, GallerySorting.FILE_DATE.name());
+		try {
+			_gallerySorting = GallerySorting.valueOf(prefSorting);
+		} catch (final Exception e) {
+			_gallerySorting = GallerySorting.FILE_DATE;
+		}
+		_actionSortFileByDate.setChecked(_gallerySorting == GallerySorting.FILE_DATE);
+		_actionSortByFileName.setChecked(_gallerySorting == GallerySorting.FILE_NAME);
 
 		_picDirImages.sortGallery(_gallerySorting, false);
 
@@ -503,8 +509,8 @@ public class PicDirView extends ViewPart {
 		 * gallery sorting
 		 */
 		_state.put(STATE_GALLERY_SORTING, _actionSortFileByDate.isChecked()
-				? GALLERY_SORTING_BY_DATE
-				: GALLERY_SORTING_BY_NAME);
+				? GallerySorting.FILE_DATE.name()
+				: GallerySorting.FILE_NAME.name());
 
 		// keep width of the dir folder view in the master detail container
 		final Tree tree = _picDirFolder.getTree();

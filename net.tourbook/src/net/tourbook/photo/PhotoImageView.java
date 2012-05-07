@@ -121,7 +121,7 @@ public class PhotoImageView extends ViewPart {
 			if (firstElement instanceof Photo) {
 				final Photo photo = (Photo) firstElement;
 
-				final File imageFile = photo.getImageFile();
+				final File imageFile = photo.getPhotoWrapper().imageFile;
 
 				final Image photoImage = new Image(_pageBook.getDisplay(), imageFile.getAbsolutePath());
 

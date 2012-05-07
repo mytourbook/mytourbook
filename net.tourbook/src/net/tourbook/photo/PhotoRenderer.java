@@ -28,6 +28,7 @@ import net.tourbook.photo.manager.PhotoImageCache;
 import net.tourbook.photo.manager.PhotoImageMetadata;
 import net.tourbook.photo.manager.PhotoLoadingState;
 import net.tourbook.photo.manager.PhotoManager;
+import net.tourbook.photo.manager.PhotoWrapper;
 import net.tourbook.ui.UI;
 import net.tourbook.util.StatusUtil;
 
@@ -82,7 +83,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	private boolean					_isShowPhotoName;
 	private boolean					_isShowAnnotations;
 
-	private GalleryMT20				_galleryMT20;
+	private GalleryMT20				_gallery;
 	private PicDirImages			_picDirImages;
 
 	private static Image			_annotationGPS;
@@ -104,7 +105,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	}
 
 	public PhotoRenderer(final GalleryMT20 galleryMT20, final PicDirImages picDirImages) {
-		_galleryMT20 = galleryMT20;
+		_gallery = galleryMT20;
 		_picDirImages = picDirImages;
 	}
 
@@ -122,7 +123,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 			_fontHeight = gc.getFontMetrics().getHeight() - 1;
 		}
 
-		final Photo photo = (Photo) galleryItem.data;
+		final PhotoWrapper photoWrapper = (PhotoWrapper) galleryItem.data;
+		final Photo photo = photoWrapper.photo;
 
 		final ImageQuality requestedImageQuality = galleryItemWidth <= PhotoManager.IMAGE_SIZE_THUMBNAIL
 				? ImageQuality.THUMB
@@ -201,7 +203,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 			drawImage(
 					gc,
-					photo,
+					photoWrapper,
 					photoImage,
 					photoPosX,
 					photoPosY,
@@ -214,17 +216,17 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 			// image is not available
 
-			drawStatusText(gc, photo, photoPosX, photoPosY, photoWidth, photoHeight, requestedImageQuality, //
+			drawStatusText(gc, photoWrapper, photoPosX, photoPosY, photoWidth, photoHeight, requestedImageQuality, //
 					isDrawText && _isShowPhotoName);
 		}
 
 		// draw name & date & annotations
 		if (isDrawText && (_isShowPhotoName || _isShowPhotoDate)) {
-			drawInfoText(gc, photo, photoPosX, photoPosY, photoWidth, photoHeight);
+			drawInfoText(gc, photoWrapper, photoPosX, photoPosY, photoWidth, photoHeight);
 		}
 
 		// annotations are drawn on top of the info lines
-		if (_isShowAnnotations && photo.getGeoPosition() != null) {
+		if (_isShowAnnotations && photoWrapper.gpsState == 1) {
 			gc.drawImage(_annotationGPS, //
 					photoPosX + photoWidth - _gpsWidth,
 					photoPosY + photoHeight - _gpsHeight);
@@ -249,7 +251,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	 * @param isSelected
 	 */
 	private void drawImage(	final GC gc,
-							final Photo photo,
+							final PhotoWrapper photoWrapper,
 							final Image photoImage,
 							final int photoPosX,
 							final int photoPosY,
@@ -288,6 +290,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 			photoPaintedWidth = bestSize.x;
 			photoPaintedHeight = bestSize.y;
 
+			final Photo photo = photoWrapper.photo;
 			final int photoWidthRotated = photo.getWidthRotated();
 			final int photoHeightRotated = photo.getHeightRotated();
 
@@ -385,7 +388,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	}
 
 	private void drawInfoText(	final GC gc,
-								final Photo photo,
+								final PhotoWrapper photoWrapper,
 								final int photoPosX,
 								final int photoPosY,
 								final int photoWidth,
@@ -403,13 +406,13 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		int textDateTimePosCenterX = 0;
 
 		if (_isShowPhotoName) {
-			textFileName = photo.getFileName();
+			textFileName = photoWrapper.imageFileName;
 			textFileNameWidth = gc.textExtent(textFileName).x;
 
 			textFileNamePosCenterX = (photoWidth - (textFileNameWidth > photoWidth ? photoWidth : textFileNameWidth)) / 2;
 		}
 		if (_isShowPhotoDate) {
-			final DateTime dateTime = photo.getFileDateTime();
+			final DateTime dateTime = photoWrapper.photo.getImageFileDateTime();
 			if (dateTime != null) {
 				textDateTime = _dtFormatter.print(dateTime);
 				textDateTimeWidth = gc.textExtent(textDateTime).x;
@@ -481,7 +484,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	}
 
 	private void drawStatusText(final GC gc,
-								final Photo photo,
+								final PhotoWrapper photoWrapper,
 								final int photoPosX,
 								final int photoPosY,
 								final int photoWidth,
@@ -489,24 +492,29 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 								final ImageQuality requestedImageQuality,
 								final boolean isImageNameDisplayed) {
 
-		final boolean isError = photo.getLoadingState(requestedImageQuality) == PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR;
+		final Photo photo = photoWrapper.photo;
 
 		final String photoImageFileName = isImageNameDisplayed ? //
 				// don't show file name a 2nd time
 				UI.EMPTY_STRING
-				: photo.getFileName();
+				: photoWrapper.imageFileName;
+
 		String statusText;
 		boolean isMetaData = false;
+
+		final boolean isError = photo.getLoadingState(requestedImageQuality) == PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR;
 
 		if (isError) {
 			statusText = photoImageFileName + " cannot be loaded";
 		} else {
 			final PhotoImageMetadata metaData = photo.getImageMetaData();
-			if (metaData != null) {
+			if (metaData == null) {
+				statusText = photoImageFileName + " is being loaded...";
+			} else {
 				// meta data are already loaded
 				isMetaData = true;
+				statusText = photoImageFileName + " no EXIF thumb, loading fullsize...";
 			}
-			statusText = photoImageFileName + " is being loaded";
 		}
 
 		final int textWidth = gc.textExtent(statusText).x;
@@ -540,7 +548,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		// force font update
 		_fontHeight = -1;
 
-		_galleryMT20.setFont(font);
+		_gallery.setFont(font);
 	}
 
 	/**

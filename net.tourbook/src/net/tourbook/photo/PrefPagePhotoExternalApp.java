@@ -31,6 +31,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
@@ -110,6 +111,14 @@ public class PrefPagePhotoExternalApp extends FieldEditorPreferencePage implemen
 					.hint(UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
 					.applyTo(label);
 			label.setText(Messages.PrefPage_Photo_ExtViewer_Label_Info);
+
+			// spacer
+			final Canvas spacer = new Canvas(group, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.span(3, 1)
+					.indent(0, 10)
+					.hint(1, 1)
+					.applyTo(spacer);
 
 			// App 1
 			{

@@ -18,19 +18,20 @@ package net.tourbook.photo;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Set;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.photo.gallery.MT20.GalleryMT20;
 import net.tourbook.photo.gallery.MT20.GalleryMT20Item;
+import net.tourbook.photo.manager.GallerySorting;
 import net.tourbook.photo.manager.ILoadCallBack;
 import net.tourbook.photo.manager.Photo;
 import net.tourbook.photo.manager.PhotoImageCache;
 import net.tourbook.photo.manager.PhotoManager;
+import net.tourbook.photo.manager.PhotoWrapper;
 import net.tourbook.photo.manager.ThumbnailStore;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.util.StatusUtil;
@@ -108,6 +109,7 @@ public class PicDirImages {
 	 * Worker start time
 	 */
 	private long									_workerStart;
+
 	/**
 	 * Lock for all worker control data and state
 	 */
@@ -151,14 +153,14 @@ public class PicDirImages {
 	/**
 	 *
 	 */
-	public static Comparator<File>					SORT_BY_FILE_DATE;
-	public static Comparator<File>					SORT_BY_FILE_NAME;
+	public static Comparator<PhotoWrapper>			SORT_BY_FILE_DATE;
+	public static Comparator<PhotoWrapper>			SORT_BY_FILE_NAME;
 
 	/**
 	 * Contains current gallery sorting id: {@link PicDirView#GALLERY_SORTING_BY_DATE} or
 	 * {@link PicDirView#GALLERY_SORTING_BY_NAME}
 	 */
-	private int										_gallerySorting;
+	private GallerySorting							_sortingAlgorithm;
 
 	private PicDirView								_picDirView;
 
@@ -168,7 +170,20 @@ public class PicDirImages {
 	 * Folder which images are currently be displayed
 	 */
 	private File									_photoFolder;
-	private File[]									_photoFiles;
+
+	/**
+	 * Contains ALL gallery items for the current photo folder
+	 */
+	private PhotoWrapper[]							_allPhotoWrapper;
+
+	/**
+	 * Contains filtered gallery items.
+	 * <p>
+	 * Only these items are displayed in the gallery, the {@link #_allPhotoWrapper} items contains
+	 * also hidden gallery items.
+	 */
+	private PhotoWrapper[]							_filteredPhotoWrapper;
+
 	private FileFilter								_fileFilter;
 
 	private PicDirFolder							_picDirFolder;
@@ -253,37 +268,54 @@ public class PicDirImages {
 			}
 		};
 
-		SORT_BY_FILE_DATE = new Comparator<File>() {
+		SORT_BY_FILE_DATE = new Comparator<PhotoWrapper>() {
 			@Override
-			public int compare(final File file1, final File file2) {
+			public int compare(final PhotoWrapper wrapper1, final PhotoWrapper wrapper2) {
 
 				if (_workerCancelled) {
 					// couldn't find another way how to stop sorting
 					return 0;
 				}
 
-				final long time1 = file1.lastModified();
-				final long time2 = file2.lastModified();
+				final long time1 = wrapper1.imageFileLastModified;
+				final long time2 = wrapper2.imageFileLastModified;
 
 				final long diff = time1 - time2;
 
 				return diff < 0 ? -1 : diff > 0 ? 1 : 0;
+
+//				return (int) (wrapper1.imageFileLastModified - wrapper2.imageFileLastModified);
 			}
 		};
 
-		SORT_BY_FILE_NAME = new Comparator<File>() {
+		SORT_BY_FILE_NAME = new Comparator<PhotoWrapper>() {
 			@Override
-			public int compare(final File file1, final File file2) {
+			public int compare(final PhotoWrapper wrapper1, final PhotoWrapper wrapper2) {
 
 				if (_workerCancelled) {
 					// couldn't find another way how to stop sorting
 					return 0;
 				}
 
-				return file1.getPath().compareToIgnoreCase(file2.getPath());
+				return wrapper1.imageFilePathName.compareToIgnoreCase(wrapper2.imageFilePathName);
 			}
 		};
 	}
+
+	//	/**
+//	 * Sort files for the folder
+//	 *
+//	 * @param folder
+//	 * @return
+//	 */
+//	private List<File> sortFiles(final File folder) {
+//
+//		final Comparator<PhotoWrapper> comparator = _sortingAlgorithm == GallerySorting.FILE_DATE
+//				? SORT_BY_FILE_DATE
+//				: SORT_BY_FILE_NAME;
+//
+//		// We make file list in this thread for speed reasons
+//	final List<File>	files	= SortingUtils.getSortedFileList(folder, _fileFilter, comparator);
 
 	class LoadImageCallback implements ILoadCallBack {
 
@@ -343,18 +375,35 @@ public class PicDirImages {
 		}
 
 		@Override
-		public void initItem(final GalleryMT20Item galleryItem, final int itemIndex) {
+		public int initItem(final GalleryMT20Item galleryItem, final int filterIndex) {
 
-			// create a photo for an image file
-			final Photo photo = new Photo(_photoFiles[itemIndex]);
+			// initialize a wrapper for an image file
 
-			galleryItem.setData(photo, photo.getFilePathName());
+			final PhotoWrapper photoWrapper = _filteredPhotoWrapper[filterIndex];
+
+			photoWrapper.photo = new Photo(photoWrapper);
+
+			// set wrapper as custom data in the gallery item
+			galleryItem.setData(photoWrapper, photoWrapper.imageFilePathName);
+
+			return photoWrapper.wrapperIndex;
 		}
 	}
 
 	PicDirImages(final PicDirView picDirView) {
 		_picDirView = picDirView;
 	}
+
+//////// LOG ALL BINDINGS
+//
+//		final IWorkbench workbench = PlatformUI.getWorkbench();
+//		final IBindingService bindingService = (IBindingService) workbench.getAdapter(IBindingService.class);
+//
+//		System.out.println(bindingService.getActiveScheme());
+//
+//		for (final Binding binding : bindingService.getBindings()) {
+//			System.out.println(binding);
+//		}
 
 	void actionClearHistory() {
 
@@ -372,17 +421,6 @@ public class PicDirImages {
 		_actionNavigateBackward.setEnabled(false);
 		_actionNavigateForward.setEnabled(false);
 	}
-
-//////// LOG ALL BINDINGS
-//
-//		final IWorkbench workbench = PlatformUI.getWorkbench();
-//		final IBindingService bindingService = (IBindingService) workbench.getAdapter(IBindingService.class);
-//
-//		System.out.println(bindingService.getActiveScheme());
-//
-//		for (final Binding binding : bindingService.getBindings()) {
-//			System.out.println(binding);
-//		}
 
 	void actionNavigateBackward() {
 
@@ -755,6 +793,9 @@ public class PicDirImages {
 			// a modify event is fired when gallery is zoomed in/out
 
 			public void handleEvent(final Event event) {
+
+				PhotoManager.stopImageLoading();
+
 				updateUIAfterZoomInOut(event.width);
 			}
 		});
@@ -764,6 +805,8 @@ public class PicDirImages {
 		 */
 		_photoRenderer = new PhotoRenderer(_gallery, this);
 		_gallery.setItemRenderer(_photoRenderer);
+
+		_gallery.setFilterProvider(new PhotoFilter(_gallery, this));
 	}
 
 	private void createUI_30_PageLoading(final PageBook parent) {
@@ -1168,6 +1211,8 @@ public class PicDirImages {
 		//
 		//////////////////////////////////////////
 
+		PhotoManager.stopImageLoading();
+
 		if (imageFolder == null) {
 			_lblLoading.setText(Messages.Pic_Dir_Label_FolderIsNotSelected);
 		} else {
@@ -1181,8 +1226,6 @@ public class PicDirImages {
 		}
 
 		_pageBook.showPage(_pageLoading);
-
-		PhotoManager.stopImageLoading();
 
 		workerUpdate(imageFolder, isReloadFolder);
 	}
@@ -1199,39 +1242,25 @@ public class PicDirImages {
 		}
 	}
 
-	/**
-	 * Sort files for the folder
-	 * 
-	 * @param folder
-	 * @return
-	 */
-	private List<File> sortFiles(final File folder) {
+//
+//		return files;
+//	}
 
-		final Comparator<File> comparator = _gallerySorting == PicDirView.GALLERY_SORTING_BY_DATE
-				? SORT_BY_FILE_DATE
-				: SORT_BY_FILE_NAME;
-
-		// We make file list in this thread for speed reasons
-		final List<File> files = SortingUtils.getSortedFileList(folder, _fileFilter, comparator);
-
-		return files;
-	}
-
-	void sortGallery(final int gallerySorting, final boolean isUpdateGallery) {
+	void sortGallery(final GallerySorting gallerySorting, final boolean isUpdateGallery) {
 
 		// check if resorting is needed
-		if (_gallerySorting == gallerySorting) {
+		if (_sortingAlgorithm == gallerySorting) {
 			return;
 		}
 
 		// set new sorting algorithm
-		_gallerySorting = gallerySorting;
+		_sortingAlgorithm = gallerySorting;
 
 		if (isUpdateGallery) {
 
 			BusyIndicator.showWhile(_display, new Runnable() {
 				public void run() {
-					sortGalleryRunnable();
+					sortGallery_Runnable();
 				}
 			});
 		}
@@ -1240,40 +1269,43 @@ public class PicDirImages {
 	/**
 	 * This will sort the gallery items
 	 */
-	private void sortGalleryRunnable() {
+	private void sortGallery_Runnable() {
 
-		if (_photoFiles == null || _photoFiles.length == 0) {
+		if (_allPhotoWrapper == null || _allPhotoWrapper.length == 0) {
 			// there are no files
 			return;
 		}
 
-		final GalleryMT20Item[] galleryItems = _gallery.getGalleryItems();
-		if (galleryItems.length == 0) {
-			// there is no root item
+		final GalleryMT20Item[] filteredGalleryItems = _gallery.getFilteredItems();
+		if (filteredGalleryItems.length == 0) {
+			// there are no items
 			return;
 		}
-		final int[] filterIndices = _gallery.getFilteredItemsIndices();
 
-		/*
-		 * sort gallery items according to the sorted image files
-		 */
-
-		final HashMap<String, GalleryMT20Item> existingGalleryItemsMap = new HashMap<String, GalleryMT20Item>();
-
-		// create a map with all existing gallery items, an item can be null when not yet displayed/initialized
+//		final int[] filterIndices = _gallery.getFilteredItemsIndices();
+//
+//		/*
+//		 * create a map with all existing gallery items, an item can be null when not yet
+//		 * displayed/initialized
+//		 */
+//		final HashMap<String, GalleryMT20Item> existingGalleryItemsMap = new HashMap<String, GalleryMT20Item>();
+//
 //		for (final int filterIndex : filterIndices) {
 //
 //			final GalleryMT20Item existingGalleryItem = galleryItems[filterIndex];
 //
 //			if (existingGalleryItem != null) {
 //
-//				final Photo photo = (Photo) existingGalleryItem.data;
-//				final String photoImageFileName = photo.getFileName();
+//				final PhotoWrapper photoWrapper = (PhotoWrapper) existingGalleryItem.data;
+//				final String photoImageFileName = photoWrapper.imageFilePathName;
 //
 //				existingGalleryItemsMap.put(photoImageFileName, existingGalleryItem);
 //			}
 //		}
 //
+//		/*
+//		 * sort gallery items according to the sorted image files
+//		 */
 //		// sort image files
 //		final List<File> sortedFiles = sortFiles(_photoFolder);
 //		final File[] sortedFilesArray = sortedFiles.toArray(new File[sortedFiles.size()]);
@@ -1494,7 +1526,7 @@ public class PicDirImages {
 
 		_workerStart = System.currentTimeMillis();
 
-		File[] newPhotoFiles = null;
+		PhotoWrapper[] newPhotoWrapper = null;
 
 		if (_workerStateDir != null) {
 
@@ -1511,22 +1543,53 @@ public class PicDirImages {
 				}
 			});
 
-			final List<File> files = sortFiles(_workerStateDir);
+			// get all image files, sorting is not yet done
+			final File[] files = _workerStateDir.listFiles(_fileFilter);
 
+			// check if interruption occred
 			if (_workerCancelled) {
 				return;
 			}
 
 			if (files == null) {
 				// prevent NPE
-				newPhotoFiles = new File[0];
+				newPhotoWrapper = new PhotoWrapper[0];
 			} else {
-				newPhotoFiles = files.toArray(new File[files.size()]);
+
+				// image files are available
+
+				final int numberOfImages = files.length;
+
+				newPhotoWrapper = new PhotoWrapper[numberOfImages];
+
+				// create a wrapper for each image file
+				for (int fileIndex = 0; fileIndex < numberOfImages; fileIndex++) {
+					newPhotoWrapper[fileIndex] = new PhotoWrapper(files[fileIndex]);
+				}
+
+				Arrays.sort(newPhotoWrapper, _sortingAlgorithm == GallerySorting.FILE_DATE
+						? SORT_BY_FILE_DATE
+						: SORT_BY_FILE_NAME);
+
+				/*
+				 * set gallery index in each gallery item, this index will never be modified until
+				 * new gallery items are set
+				 */
+				for (int itemIndex = 0; itemIndex < numberOfImages; itemIndex++) {
+					newPhotoWrapper[itemIndex].wrapperIndex = itemIndex;
+				}
+			}
+
+			// check if the previous files retrival has been interrupted
+			if (_workerCancelled) {
+				return;
 			}
 
 			final File prevPhotoFolder = _photoFolder;
+
 			_photoFolder = _workerStateDir;
-			_photoFiles = newPhotoFiles;
+			_allPhotoWrapper = newPhotoWrapper;
+			_filteredPhotoWrapper = newPhotoWrapper;
 
 			_display.syncExec(new Runnable() {
 				public void run() {
@@ -1544,7 +1607,10 @@ public class PicDirImages {
 					// get old gallery position
 					final Double oldPosition = _galleryPositions.get(_photoFolder.getAbsolutePath());
 
-					_gallery.setupItems(_photoFiles.length, oldPosition);
+					/*
+					 * start gallery update
+					 */
+					_gallery.setupItems(_filteredPhotoWrapper.length, oldPosition);
 
 					/*
 					 * update status info
@@ -1552,7 +1618,7 @@ public class PicDirImages {
 					final long timeDiff = System.currentTimeMillis() - _workerStart;
 					final String timeDiffText = NLS.bind(
 							Messages.Pic_Dir_Status_Loaded,
-							new Object[] { Long.toString(timeDiff), Integer.toString(_photoFiles.length) });
+							new Object[] { Long.toString(timeDiff), Integer.toString(_filteredPhotoWrapper.length) });
 
 					_lblStatusInfo.setText(timeDiffText);
 

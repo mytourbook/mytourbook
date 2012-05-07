@@ -371,7 +371,7 @@ public class ThumbnailStore {
 //		final String imageKey2Folder = imageKey.substring(0, 3);
 
 		// thumbnail images are stored as jpg file
-		IPath jpgPhotoFilePath = new Path(photo.getFileName());
+		IPath jpgPhotoFilePath = new Path(photo.getPhotoWrapper().imageFileName);
 		jpgPhotoFilePath = jpgPhotoFilePath.removeFileExtension().addFileExtension(THUMBNAIL_IMAGE_EXTENSION_JPG);
 
 		final String imageFileName = imageKey + "_" + imageQuality.name() + "_" + jpgPhotoFilePath.toOSString(); //$NON-NLS-1$ //$NON-NLS-2$

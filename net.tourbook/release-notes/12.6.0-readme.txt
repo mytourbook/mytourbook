@@ -36,3 +36,7 @@ Zoom factor in pixel when these keys are pressed:
 <Ctrl>: 10
 <Ctrl><Shift>: 50
 
+
+Tips:
+- when zooming in/out, the selected image is centered, when nothing is selected, the current center keeps centered
+

@@ -303,12 +303,19 @@ class PicDirFolder {
 			try {
 
 				// log command
-				final StringBuilder sb = new StringBuilder();
-				int counter = 1;
+				StringBuilder sb = new StringBuilder();
+//				int counter = 1;
+//				for (final String cmd : commands) {
+//					sb.append(Integer.toString(counter++) + ": |" + cmd + "| "); //$NON-NLS-1$ //$NON-NLS-2$
+//				}
+//				StatusUtil.log(sb.toString());
+
+				// log command
+				sb = new StringBuilder();
 				for (final String cmd : commands) {
-					sb.append(Integer.toString(counter++) + ": |" + cmd + "| "); //$NON-NLS-1$ //$NON-NLS-2$
+					sb.append(cmd + " "); //$NON-NLS-1$
 				}
-				System.out.println(net.tourbook.util.UI.timeStamp() + sb.toString());
+				StatusUtil.logInfo(sb.toString());
 
 				Runtime.getRuntime().exec(commands);
 
@@ -541,34 +548,43 @@ class PicDirFolder {
 
 		menuMgr.add(_actionRunExternalAppTitle);
 
-		boolean isApp = false;
+		int appNo = 1;
 
+		/*
+		 * App1
+		 */
 		final String prefExtApp1 = _prefStore.getString(ITourbookPreferences.PHOTO_EXTERNAL_PHOTO_VIEWER_1).trim();
 		if (prefExtApp1.length() > 0) {
 
-			isApp = true;
-
-			_actionRunExternalApp1.setText(new Path(prefExtApp1).lastSegment());
+			_actionRunExternalApp1.setText(NLS.bind(Messages.Pic_Dir_Label_ExternalApp, //
+					appNo++,
+					new Path(prefExtApp1).lastSegment()));
 
 			menuMgr.add(_actionRunExternalApp1);
 		}
 
+		/*
+		 * App2
+		 */
 		final String prefExtApp2 = _prefStore.getString(ITourbookPreferences.PHOTO_EXTERNAL_PHOTO_VIEWER_2).trim();
 		if (prefExtApp2.length() > 0) {
 
-			isApp = true;
-
-			_actionRunExternalApp2.setText(new Path(prefExtApp2).lastSegment());
+			_actionRunExternalApp2.setText(NLS.bind(Messages.Pic_Dir_Label_ExternalApp, //
+					appNo++,
+					new Path(prefExtApp2).lastSegment()));
 
 			menuMgr.add(_actionRunExternalApp2);
 		}
 
+		/*
+		 * App3
+		 */
 		final String prefExtApp3 = _prefStore.getString(ITourbookPreferences.PHOTO_EXTERNAL_PHOTO_VIEWER_3).trim();
 		if (prefExtApp3.length() > 0) {
 
-			isApp = true;
-
-			_actionRunExternalApp3.setText(new Path(prefExtApp3).lastSegment());
+			_actionRunExternalApp3.setText(NLS.bind(Messages.Pic_Dir_Label_ExternalApp, //
+					appNo++,
+					new Path(prefExtApp3).lastSegment()));
 
 			menuMgr.add(_actionRunExternalApp3);
 		}
