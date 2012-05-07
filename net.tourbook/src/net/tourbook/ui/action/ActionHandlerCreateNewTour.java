@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,7 @@
 package net.tourbook.ui.action;
 
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -29,9 +30,11 @@ public class ActionHandlerCreateNewTour extends AbstractHandler {
 			return null;
 		}
 
-		TourManager.openTourEditor(true).actionCreateTour();
+		final TourDataEditorView tourEditor = TourManager.openTourEditor(true);
+		if (tourEditor != null) {
+			tourEditor.actionCreateTour();
+		}
 
 		return null;
 	}
-
 }

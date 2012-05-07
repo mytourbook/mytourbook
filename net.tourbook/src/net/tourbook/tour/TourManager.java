@@ -636,13 +636,16 @@ public class TourManager {
 		return false;
 	}
 
-	public static void openTourEditor(final boolean isActive) {
+	public static TourDataEditorView openTourEditor(final boolean isActive) {
+
+		final TourDataEditorView tourDataEditorView[] = { null };
 
 		/*
 		 * must be run in the UI thread because PlatformUI.getWorkbench().getActiveWorkbenchWindow()
 		 * returns null in none UI threads
 		 */
 		Display.getDefault().syncExec(new Runnable() {
+
 			public void run() {
 
 				try {
@@ -654,6 +657,8 @@ public class TourManager {
 					final IViewPart viewPart = page.showView(TourDataEditorView.ID, null, IWorkbenchPage.VIEW_VISIBLE);
 
 					if (viewPart instanceof TourDataEditorView) {
+
+						tourDataEditorView[0] = (TourDataEditorView) viewPart;
 
 						if (isActive) {
 
@@ -678,6 +683,8 @@ public class TourManager {
 				}
 			}
 		});
+
+		return tourDataEditorView[0];
 	}
 
 	/**

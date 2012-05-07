@@ -2,7 +2,7 @@
 <feature
       id="feature.net.tourbook.app"
       label="MyTourbook Application"
-      version="12.1.2.qualifier"
+      version="12.1.3.qualifier"
       provider-name="MyTourbook"
       plugin="net.tourbook.branding">
 
@@ -42,7 +42,7 @@
          id="net.tourbook"
          download-size="0"
          install-size="0"
-         version="12.1.2.qualifier"
+         version="12.1.3.qualifier"
          unpack="false"/>
 
    <plugin
@@ -56,14 +56,14 @@
          id="net.tourbook.chart"
          download-size="0"
          install-size="0"
-         version="12.1.2.qualifier"
+         version="12.1.3.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.export"
          download-size="0"
          install-size="0"
-         version="12.1.2.qualifier"
+         version="12.1.3.qualifier"
          unpack="false"/>
 
    <plugin

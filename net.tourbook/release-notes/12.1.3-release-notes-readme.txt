@@ -1,0 +1,23 @@
+Version: 12.1.3                                           ?. ???? 2012
+
+Release Notes
+-------------
+
+New
+---
+
+- use proxy when accessing internet, provided by Meinhard Ritscher
+
+
+Improvements
+------------
+
+- type ahead for tour marker label
+- improved performance for type ahead lists, now they are cached (they had been loaded every time from the database) 
+
+
+Bugfix
+------
+
+- gpx export: enclose <time> and <bounds> with <metadata>, provided by markxy (sourceforge user)
+- create reference tour on Mac OSX, depending on the used mouse (apple or none apple mouse) it was not possible
