@@ -999,6 +999,11 @@ public class ChartComponentGraph extends Canvas {
 
 				_hoveredBarToolTip.toolTip20Hide();
 
+				// get cursor location relativ to this graph canvas
+				final Point devMouse = ChartComponentGraph.this.toControl(getDisplay().getCursorLocation());
+
+				computeSliderForContextMenu(devMouse.x, devMouse.y);
+
 				_chart.fillContextMenu(
 						menuMgr,
 						_contextLeftSlider,
@@ -5106,7 +5111,9 @@ public class ChartComponentGraph extends Canvas {
 
 				// right button is pressed
 
-				computeSliderForContextMenu(devXMouse, devYMouse);
+// this was disabled because it is not working on OSX, partly it works,
+// propably depending on the mouse: OSX mouse or Logitech mouse
+//				computeSliderForContextMenu(devXMouse, devYMouse);
 			}
 			return;
 		}
