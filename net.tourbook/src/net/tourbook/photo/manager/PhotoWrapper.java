@@ -17,10 +17,12 @@ package net.tourbook.photo.manager;
 
 import java.io.File;
 
+import net.tourbook.photo.gallery.MT20.IGalleryCustomData;
+
 /**
  * Wrapper for a photo image file, sorting and filtering attributes and the {@link Photo} itself.
  */
-public class PhotoWrapper {
+public class PhotoWrapper implements IGalleryCustomData {
 
 	/**
 	 * Photo image file
@@ -44,7 +46,7 @@ public class PhotoWrapper {
 	 */
 	public int		gpsState	= -1;
 
-	public int		wrapperIndex;
+	public int		galleryIndex;
 
 	public PhotoWrapper(final File file) {
 
@@ -53,6 +55,16 @@ public class PhotoWrapper {
 		imageFileName = imageFile.getName();
 		imageFilePathName = imageFile.getPath();
 		imageFileLastModified = imageFile.lastModified();
+	}
+
+	@Override
+	public int getGalleryIndex() {
+		return galleryIndex;
+	}
+
+	@Override
+	public String getUniqueId() {
+		return imageFilePathName;
 	}
 
 	@Override

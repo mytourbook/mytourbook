@@ -20,12 +20,15 @@ import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Set;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.photo.gallery.MT20.GalleryMT20;
 import net.tourbook.photo.gallery.MT20.GalleryMT20Item;
+import net.tourbook.photo.gallery.MT20.IFilterProvider;
+import net.tourbook.photo.gallery.MT20.IGalleryCustomData;
 import net.tourbook.photo.manager.GallerySorting;
 import net.tourbook.photo.manager.ILoadCallBack;
 import net.tourbook.photo.manager.Photo;
@@ -85,7 +88,7 @@ import org.eclipse.ui.part.PageBook;
  * org.apache.commons.sanselan
  * </pre>
  */
-public class PicDirImages {
+public class PicDirImages implements IFilterProvider {
 
 	private static final int						MAX_HISTORY_ENTRIES				= 200;
 
@@ -231,6 +234,8 @@ public class PicDirImages {
 
 	private Font									_galleryFont;
 
+	private ImageFilter								_currentImageFilter;
+
 	{
 		_workerRunnable = new Runnable() {
 			public void run() {
@@ -349,11 +354,13 @@ public class PicDirImages {
 					 * Visibility check must be done in the UI thread because scrolling the gallery
 					 * can reposition the gallery item. This can be a BIG problem because the
 					 * redraw() method is painting the background color at the specified rectangle,
-					 * this cost me a lot of time to figure it out.
+					 * it cost me a lot of time to figure this out.
 					 */
-					final boolean isItemVisible = __galleryItem.galleryMT20.isItemVisible(__galleryItem);
+					final boolean isItemVisible = __galleryItem.gallery.isItemVisible(__galleryItem);
 
 					if (isItemVisible) {
+
+						_gallery.updateFilter();
 
 						// redraw gallery item WITH background
 						_gallery.redraw(
@@ -375,18 +382,14 @@ public class PicDirImages {
 		}
 
 		@Override
-		public int initItem(final GalleryMT20Item galleryItem, final int filterIndex) {
-
-			// initialize a wrapper for an image file
+		public IGalleryCustomData initializeGalleryItem(final int filterIndex) {
 
 			final PhotoWrapper photoWrapper = _filteredPhotoWrapper[filterIndex];
 
+			// create photo which is used to draw the photo image
 			photoWrapper.photo = new Photo(photoWrapper);
 
-			// set wrapper as custom data in the gallery item
-			galleryItem.setData(photoWrapper, photoWrapper.imageFilePathName);
-
-			return photoWrapper.wrapperIndex;
+			return photoWrapper;
 		}
 	}
 
@@ -806,7 +809,7 @@ public class PicDirImages {
 		_photoRenderer = new PhotoRenderer(_gallery, this);
 		_gallery.setItemRenderer(_photoRenderer);
 
-		_gallery.setFilterProvider(new PhotoFilter(_gallery, this));
+		_gallery.setFilterProvider(this);
 	}
 
 	private void createUI_30_PageLoading(final PageBook parent) {
@@ -851,6 +854,101 @@ public class PicDirImages {
 		PhotoManager.stopImageLoading();
 		ThumbnailStore.cleanupStoreFiles(true, true);
 		PhotoImageCache.dispose();
+	}
+
+	void filterGallery(final ImageFilter currentImageFilter, final boolean isUpdateGallery) {
+
+		_currentImageFilter = currentImageFilter;
+
+		if (isUpdateGallery) {
+			_gallery.updateFilter();
+		}
+	}
+
+	@Override
+	public GalleryMT20Item[] getFilteredGalleryItems(final GalleryMT20Item[] galleryItems) {
+
+//		System.out.println(UI.timeStampNano() + "getFilteredGalleryItems");
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
+		
+		if (galleryItems == null || _currentImageFilter == null || _currentImageFilter == ImageFilter.NoFilter) {
+			// filter is not set or filter is disabled, display all
+			return galleryItems;
+		}
+
+		/*
+		 * copy all filtered items into temp list
+		 */
+
+		final boolean isGPSFilter = _currentImageFilter == ImageFilter.GPS;
+		final boolean isNoGPSFilter = _currentImageFilter == ImageFilter.NoGPS;
+
+		final int numberOfGalleryItems = galleryItems.length;
+		final PhotoWrapper[] tempFilteredWrapper = new PhotoWrapper[numberOfGalleryItems];
+		final GalleryMT20Item[] tempFilteredItems = new GalleryMT20Item[numberOfGalleryItems];
+
+		// filterindex is incremented when the filter contains a gallery item
+		int filterIndex = 0;
+		int galleryIndex = 0;
+
+		for (final GalleryMT20Item galleryItem : galleryItems) {
+
+			if (galleryItem == null) {
+
+				// gallery item is not yet created/initialized (it is currently out of visible area)
+
+				tempFilteredItems[filterIndex] = null;
+				tempFilteredWrapper[filterIndex] = _allPhotoWrapper[galleryIndex];
+
+				filterIndex++;
+
+			} else {
+
+				final IGalleryCustomData customData = galleryItem.customData;
+
+// this case should not happen
+//				if (customData == null) {
+//
+//					tempFilteredItems[filterIndex] = galleryItem;
+//					tempFilteredWrapper[filterIndex] = null;
+//
+//					filterIndex++;
+//
+//				} else
+
+				final int gpsState = ((PhotoWrapper) customData).gpsState;
+
+				if (isGPSFilter) {
+					if (gpsState == -1 || gpsState == 1) {
+
+						tempFilteredItems[filterIndex] = galleryItem;
+						tempFilteredWrapper[filterIndex] = _allPhotoWrapper[galleryIndex];
+
+						filterIndex++;
+					}
+
+				} else if (isNoGPSFilter) {
+
+					if (gpsState == -1 || gpsState == 0) {
+
+						tempFilteredItems[filterIndex] = galleryItem;
+						tempFilteredWrapper[filterIndex] = _allPhotoWrapper[galleryIndex];
+
+						filterIndex++;
+					}
+				}
+			}
+
+			galleryIndex++;
+		}
+
+		final GalleryMT20Item[] newFilteredItems = Arrays.copyOf(tempFilteredItems, filterIndex);
+
+		// set filtered wrapper
+		_filteredPhotoWrapper = Arrays.copyOf(tempFilteredWrapper, filterIndex);
+
+		return newFilteredItems;
 	}
 
 	int getThumbnailSize() {
@@ -916,15 +1014,15 @@ public class PicDirImages {
 		_photoRenderer.setFont(_galleryFont);
 
 		// reset cached text size in the photos
-		final GalleryMT20Item[] galleryItems = _gallery.getGalleryItems();
-		if (galleryItems != null) {
-
-// this is not yet implemented
-//			for (final GalleryMT20Item galleryItem : galleryItems) {
-//				final Photo photo = (Photo) galleryItem.data;
-//				photo.resetCachedFontSizes();
-//			}
-		}
+//		final GalleryMT20Item[] galleryItems = _gallery.getGalleryItems();
+//		if (galleryItems != null) {
+//
+//// this is not yet implemented
+////			for (final GalleryMT20Item galleryItem : galleryItems) {
+////				final Photo photo = (Photo) galleryItem.data;
+////				photo.resetCachedFontSizes();
+////			}
+//		}
 	}
 
 	private void onSelectHistoryFolder(final String selectedFolder) {
@@ -1157,6 +1255,10 @@ public class PicDirImages {
 		}
 	}
 
+//
+//		return files;
+//	}
+
 	void saveState(final IDialogSettings state) {
 
 		state.put(STATE_FOLDER_HISTORY, _folderHistory.toArray(new String[_folderHistory.size()]));
@@ -1189,7 +1291,6 @@ public class PicDirImages {
 			state.put(STATE_GALLERY_POSITION_FOLDER, positionFolderArray);
 			state.put(STATE_GALLERY_POSITION_VALUE, positionValues);
 		}
-
 	}
 
 	/**
@@ -1228,103 +1329,6 @@ public class PicDirImages {
 		_pageBook.showPage(_pageLoading);
 
 		workerUpdate(imageFolder, isReloadFolder);
-	}
-
-	void showInfo(	final boolean isShowPhotoName,
-					final boolean isShowPhotoDate,
-					final boolean isShowAnnotations,
-					final boolean isUpdateGallery) {
-
-		_photoRenderer.setShowLabels(isShowPhotoName, isShowPhotoDate, isShowAnnotations);
-
-		if (isUpdateGallery) {
-			_gallery.redraw();
-		}
-	}
-
-//
-//		return files;
-//	}
-
-	void sortGallery(final GallerySorting gallerySorting, final boolean isUpdateGallery) {
-
-		// check if resorting is needed
-		if (_sortingAlgorithm == gallerySorting) {
-			return;
-		}
-
-		// set new sorting algorithm
-		_sortingAlgorithm = gallerySorting;
-
-		if (isUpdateGallery) {
-
-			BusyIndicator.showWhile(_display, new Runnable() {
-				public void run() {
-					sortGallery_Runnable();
-				}
-			});
-		}
-	}
-
-	/**
-	 * This will sort the gallery items
-	 */
-	private void sortGallery_Runnable() {
-
-		if (_allPhotoWrapper == null || _allPhotoWrapper.length == 0) {
-			// there are no files
-			return;
-		}
-
-		final GalleryMT20Item[] filteredGalleryItems = _gallery.getFilteredItems();
-		if (filteredGalleryItems.length == 0) {
-			// there are no items
-			return;
-		}
-
-//		final int[] filterIndices = _gallery.getFilteredItemsIndices();
-//
-//		/*
-//		 * create a map with all existing gallery items, an item can be null when not yet
-//		 * displayed/initialized
-//		 */
-//		final HashMap<String, GalleryMT20Item> existingGalleryItemsMap = new HashMap<String, GalleryMT20Item>();
-//
-//		for (final int filterIndex : filterIndices) {
-//
-//			final GalleryMT20Item existingGalleryItem = galleryItems[filterIndex];
-//
-//			if (existingGalleryItem != null) {
-//
-//				final PhotoWrapper photoWrapper = (PhotoWrapper) existingGalleryItem.data;
-//				final String photoImageFileName = photoWrapper.imageFilePathName;
-//
-//				existingGalleryItemsMap.put(photoImageFileName, existingGalleryItem);
-//			}
-//		}
-//
-//		/*
-//		 * sort gallery items according to the sorted image files
-//		 */
-//		// sort image files
-//		final List<File> sortedFiles = sortFiles(_photoFolder);
-//		final File[] sortedFilesArray = sortedFiles.toArray(new File[sortedFiles.size()]);
-//
-//		final GalleryMT20Item[] sortedGalleryItems = new GalleryMT20Item[existingGalleryItems.length];
-//
-//		// convert sorted images files into sorted gallery items
-//		for (int itemIndex = 0; itemIndex < sortedFilesArray.length; itemIndex++) {
-//
-//			final File imageFile = sortedFilesArray[itemIndex];
-//
-//			final GalleryMT20Item galleryItem = existingGalleryItemsMap.get(imageFile.getName());
-//
-//			if (galleryItem != null) {
-//				sortedGalleryItems[itemIndex] = galleryItem;
-//			}
-//		}
-//
-//		_gallery.setSortedItems(sortedGalleryItems);
 	}
 
 //	/**
@@ -1382,6 +1386,102 @@ public class PicDirImages {
 //
 //		_gallery.setSortedItems(sortedGalleryItems);
 //	}
+
+	void showInfo(	final boolean isShowPhotoName,
+					final boolean isShowPhotoDate,
+					final boolean isShowAnnotations,
+					final boolean isUpdateGallery) {
+
+		_photoRenderer.setShowLabels(isShowPhotoName, isShowPhotoDate, isShowAnnotations);
+
+		if (isUpdateGallery) {
+			_gallery.redraw();
+		}
+	}
+
+	void sortGallery(final GallerySorting gallerySorting, final boolean isUpdateGallery) {
+
+		// check if resorting is needed
+		if (_sortingAlgorithm == gallerySorting) {
+			return;
+		}
+
+		// set new sorting algorithm
+		_sortingAlgorithm = gallerySorting;
+
+		if (isUpdateGallery) {
+
+			BusyIndicator.showWhile(_display, new Runnable() {
+				public void run() {
+					sortGallery_Runnable();
+				}
+			});
+		}
+	}
+
+	/**
+	 * This will sort the gallery items
+	 */
+	private void sortGallery_Runnable() {
+
+		if (_allPhotoWrapper == null || _allPhotoWrapper.length == 0) {
+			// there are no files
+			return;
+		}
+
+		final GalleryMT20Item[] filteredGalleryItems = _gallery.getFilteredItems();
+		final int itemsSize = filteredGalleryItems.length;
+
+		if (itemsSize == 0) {
+			// there are no items
+			return;
+		}
+
+		/*
+		 * create a map with all existing gallery items, an item can be null when not yet
+		 * displayed/initialized
+		 */
+		final HashMap<String, GalleryMT20Item> existingGalleryItems = new HashMap<String, GalleryMT20Item>();
+
+		for (final GalleryMT20Item galleryItem : filteredGalleryItems) {
+
+			if (galleryItem != null) {
+
+				final PhotoWrapper photoWrapper = (PhotoWrapper) galleryItem.customData;
+				final String imageFilePathName = photoWrapper.imageFilePathName;
+
+				existingGalleryItems.put(imageFilePathName, galleryItem);
+			}
+		}
+
+		/*
+		 * sort filtered photos
+		 */
+		Arrays.sort(_filteredPhotoWrapper, _sortingAlgorithm == GallerySorting.FILE_DATE
+				? SORT_BY_FILE_DATE
+				: SORT_BY_FILE_NAME);
+
+		/*
+		 * set gallery items into a list according to the new sorting
+		 */
+		final GalleryMT20Item[] sortedGalleryItems = new GalleryMT20Item[itemsSize];
+
+		// convert sorted photos into sorted gallery items
+		for (int itemIndex = 0; itemIndex < _filteredPhotoWrapper.length; itemIndex++) {
+
+			final PhotoWrapper photoWrapper = _filteredPhotoWrapper[itemIndex];
+
+			// retrieve gallery item for the current photo
+			final GalleryMT20Item galleryItem = existingGalleryItems.get(photoWrapper.imageFilePathName);
+
+			if (galleryItem != null) {
+				sortedGalleryItems[itemIndex] = galleryItem;
+			}
+		}
+
+		// update gallery
+		_gallery.setFilteredItems(sortedGalleryItems);
+	}
 
 	void updateColors(final Color fgColor, final Color bgColor, final Color selectionFgColor) {
 
@@ -1551,6 +1651,8 @@ public class PicDirImages {
 				return;
 			}
 
+			int numberOfImages = 0;
+
 			if (files == null) {
 				// prevent NPE
 				newPhotoWrapper = new PhotoWrapper[0];
@@ -1558,7 +1660,7 @@ public class PicDirImages {
 
 				// image files are available
 
-				final int numberOfImages = files.length;
+				numberOfImages = files.length;
 
 				newPhotoWrapper = new PhotoWrapper[numberOfImages];
 
@@ -1576,7 +1678,7 @@ public class PicDirImages {
 				 * new gallery items are set
 				 */
 				for (int itemIndex = 0; itemIndex < numberOfImages; itemIndex++) {
-					newPhotoWrapper[itemIndex].wrapperIndex = itemIndex;
+					newPhotoWrapper[itemIndex].galleryIndex = itemIndex;
 				}
 			}
 
@@ -1588,8 +1690,11 @@ public class PicDirImages {
 			final File prevPhotoFolder = _photoFolder;
 
 			_photoFolder = _workerStateDir;
+
 			_allPhotoWrapper = newPhotoWrapper;
-			_filteredPhotoWrapper = newPhotoWrapper;
+
+			// initially all photos are setup until the gallery filter is applied
+			_filteredPhotoWrapper = Arrays.copyOf(newPhotoWrapper, numberOfImages);
 
 			_display.syncExec(new Runnable() {
 				public void run() {
@@ -1607,10 +1712,12 @@ public class PicDirImages {
 					// get old gallery position
 					final Double oldPosition = _galleryPositions.get(_photoFolder.getAbsolutePath());
 
+					final int allPhotoSize = _allPhotoWrapper.length;
+
 					/*
-					 * start gallery update
+					 * update gallery
 					 */
-					_gallery.setupItems(_filteredPhotoWrapper.length, oldPosition);
+					_gallery.setupItems(allPhotoSize, oldPosition);
 
 					/*
 					 * update status info
@@ -1618,7 +1725,7 @@ public class PicDirImages {
 					final long timeDiff = System.currentTimeMillis() - _workerStart;
 					final String timeDiffText = NLS.bind(
 							Messages.Pic_Dir_Status_Loaded,
-							new Object[] { Long.toString(timeDiff), Integer.toString(_filteredPhotoWrapper.length) });
+							new Object[] { Long.toString(timeDiff), Integer.toString(allPhotoSize) });
 
 					_lblStatusInfo.setText(timeDiffText);
 

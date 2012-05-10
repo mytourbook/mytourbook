@@ -13,19 +13,18 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.photo;
+package net.tourbook.photo.gallery.MT20;
 
-import net.tourbook.photo.gallery.MT20.GalleryMT20;
-import net.tourbook.photo.gallery.MT20.IFilterProvider;
+public interface IGalleryCustomData {
 
-public class PhotoFilter implements IFilterProvider {
+	/**
+	 * @return Returns an index for all available gallery items.
+	 */
+	public int getGalleryIndex();
 
-	private GalleryMT20		_gallery;
-	private PicDirImages	_picDirImages;
-
-	public PhotoFilter(final GalleryMT20 gallery, final PicDirImages picDirImages) {
-		_gallery = gallery;
-		_picDirImages = picDirImages;
-	}
-
+	/**
+	 * @return Returns a unique id for this custom data. This id is used to identify selected
+	 *         gallery items.
+	 */
+	public String getUniqueId();
 }

@@ -123,7 +123,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 			_fontHeight = gc.getFontMetrics().getHeight() - 1;
 		}
 
-		final PhotoWrapper photoWrapper = (PhotoWrapper) galleryItem.data;
+		final PhotoWrapper photoWrapper = (PhotoWrapper) galleryItem.customData;
 		final Photo photo = photoWrapper.photo;
 
 		final ImageQuality requestedImageQuality = galleryItemWidth <= PhotoManager.IMAGE_SIZE_THUMBNAIL

@@ -22,27 +22,27 @@ package net.tourbook.photo.gallery.MT20;
 
 public class GalleryMT20Item {
 
-	public GalleryMT20	galleryMT20;
-
-	public Object		data;
+	public GalleryMT20			gallery;
 
 	/**
 	 * Screen viewport for this gallery item where it is painted for the currently scrolled gallery
 	 * position.
 	 */
-	public int			viewPortX;
-	public int			viewPortY;
+	public int					viewPortX;
+	public int					viewPortY;
 
-	public int			width;
-	public int			height;
+	public int					width;
+	public int					height;
+
+	public IGalleryCustomData	customData;
 
 	/**
 	 * Each gallery item needs a uniqueue id.
 	 */
-	public String		uniqueItemID;
+	public String				uniqueItemID;
 
 	public GalleryMT20Item(final GalleryMT20 galleryMT20) {
-		this.galleryMT20 = galleryMT20;
+		this.gallery = galleryMT20;
 	}
 
 	/**
@@ -51,8 +51,8 @@ public class GalleryMT20Item {
 	 * @param data
 	 * @param uniqueItemID
 	 */
-	public void setData(final Object data, final String uniqueItemID) {
-		this.data = data;
+	void setCustomData(final IGalleryCustomData data, final String uniqueItemID) {
+		this.customData = data;
 		this.uniqueItemID = uniqueItemID;
 	}
 
@@ -64,7 +64,7 @@ public class GalleryMT20Item {
 				+ ("\ty=" + viewPortY)
 				+ ("\t" + width)
 				+ ("x" + height)
-				+ (" " + data)
+				+ (" " + customData)
 //
 		;
 	}

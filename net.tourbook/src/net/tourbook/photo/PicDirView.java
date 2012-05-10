@@ -215,6 +215,8 @@ public class PicDirView extends ViewPart {
 		}
 
 		// update gallery
+
+		_picDirImages.filterGallery(_currentImageFilter, true);
 	}
 
 	void actionShowPhotoInfo() {
@@ -473,6 +475,7 @@ public class PicDirView extends ViewPart {
 		_actionSortByFileName.setChecked(_gallerySorting == GallerySorting.FILE_NAME);
 
 		_picDirImages.sortGallery(_gallerySorting, false);
+		_picDirImages.filterGallery(_currentImageFilter, false);
 
 		/*
 		 * image restore must be done BEFORE folder restore because folder restore is also loading

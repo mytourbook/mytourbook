@@ -17,4 +17,12 @@ package net.tourbook.photo.gallery.MT20;
 
 public interface IFilterProvider {
 
+	/**
+	 * @param galleryItems
+	 *            Contains all gallery items which can be <code>null</code> when gallery item is not
+	 *            yet displayed.
+	 * @return Returns filtered gallery items
+	 */
+	GalleryMT20Item[] getFilteredGalleryItems(GalleryMT20Item[] galleryItems);
+
 }

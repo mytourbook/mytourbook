@@ -21,6 +21,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import net.tourbook.util.StatusUtil;
 import net.tourbook.util.UI;
 
 import org.eclipse.swt.SWT;
@@ -43,6 +44,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.ScrollBar;
 
@@ -118,27 +120,21 @@ public abstract class GalleryMT20 extends Canvas {
 	private RedrawTimer							_redrawTimer			= new RedrawTimer();
 
 	/**
-	 * Contains items which are displayed in the gallery. Initially the items are <code>null</code>
-	 * because they are virtual until they are displayed.
+	 * Contains all gallery items. Initially the items are <code>null</code> because they are
+	 * virtual until they are displayed.
 	 */
-	private GalleryMT20Item[]					_galleryItems;
+	private GalleryMT20Item[]					_allGalleryItems;
 
 	private GalleryMT20Item[]					_filteredGalleryItems;
 
 	/**
 	 * Contains items indices for the current client area. It can also contains indices for gallery
 	 * item which are out of scope. Therefore it is necessary to check if the index is within the
-	 * arraybounds of {@link #_visibleGalleryItems}.
+	 * arraybounds of {@link #_filteredGalleryItems}.
 	 * <p>
 	 * This is used to stop loading images which are not displayed.
 	 */
 	private int[]								_clientAreaItemsIndices;
-
-//	/**
-//	 * Represents items which are filtered. It contains the indices of the gallery items for
-//	 * {@link #_galleryItems}.
-//	 */
-//	private int[]								_filteredItemsIndices;
 
 	/**
 	 * Contains gallery items which are currently be selected in the UI.
@@ -216,44 +212,12 @@ public abstract class GalleryMT20 extends Canvas {
 
 	private int									_lastSelectedItemFilterIndex;
 
+	private IFilterProvider						_filterProvider;
 	private final AtomicLong					_filterLastDirtyTime	= new AtomicLong();
 	private final Lock							FILTER_LOCK				= new ReentrantLock();
 	private final Condition						_filterWaker			= FILTER_LOCK.newCondition();
-	private final Thread						_filterThread;
-	{
-		_filterThread = new Thread("Filtering Gallery Images") {//$NON-NLS-1$
-
-			private long	_lastRunTime;
-
-			@Override
-			public void run() {
-
-				while (true) {
-					try {
-						FILTER_LOCK.lock();
-
-						if (_filterLastDirtyTime.get() >= _lastRunTime) {
-							// filter is dirty again
-							Thread.sleep(100);
-						} else {
-							// filter is not dirty, wait until a wakeup call
-							_filterWaker.await();
-						}
-
-						filterThreadRunTask();
-
-						// set last run time
-						_lastRunTime = System.currentTimeMillis();
-
-					} catch (final InterruptedException e) {
-						// ignore
-					} finally {
-						FILTER_LOCK.unlock();
-					}
-				}
-			}
-		};
-	}
+	private Thread								_filterThread;
+	private boolean								_filterThreadStopped;
 
 	private class RedrawTimer implements Runnable {
 		public void run() {
@@ -294,25 +258,25 @@ public abstract class GalleryMT20 extends Canvas {
 		setForeground(getDisplay().getSystemColor(SWT.COLOR_LIST_FOREGROUND));
 
 		// Add listeners : redraws, mouse and keyboard
-		_addDisposeListeners();
-		_addResizeListeners();
-		_addPaintListeners();
-		_addScrollBarsListeners();
-		_addMouseListeners();
-		_addKeyListeners();
+		addDisposeListeners();
+		addResizeListeners();
+		addPaintListeners();
+		addScrollBarsListeners();
+		addMouseListeners();
+		addKeyListeners();
 
-		_filterThread.start();
+		filterThread_10_Setup();
 
 		// set item renderer
 		_itemRenderer = new DefaultGalleryMT20ItemRenderer();
 
-		updateGallery(false, null);
+		updateGallery(false);
 	}
 
 	/**
 	 * Add internal dispose listeners to this gallery.
 	 */
-	private void _addDisposeListeners() {
+	private void addDisposeListeners() {
 		addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(final DisposeEvent e) {
 				onDispose();
@@ -320,7 +284,7 @@ public abstract class GalleryMT20 extends Canvas {
 		});
 	}
 
-	private void _addKeyListeners() {
+	private void addKeyListeners() {
 		addKeyListener(new KeyListener() {
 
 			public void keyPressed(final KeyEvent e) {
@@ -370,7 +334,7 @@ public abstract class GalleryMT20 extends Canvas {
 	/**
 	 * Add internal mouse listeners to this gallery.
 	 */
-	private void _addMouseListeners() {
+	private void addMouseListeners() {
 
 		addMouseWheelListener(new MouseWheelListener() {
 
@@ -436,7 +400,7 @@ public abstract class GalleryMT20 extends Canvas {
 	/**
 	 * Add internal paint listeners to this gallery.
 	 */
-	private void _addPaintListeners() {
+	private void addPaintListeners() {
 		addPaintListener(new PaintListener() {
 			public void paintControl(final PaintEvent event) {
 				onPaint(event.gc);
@@ -447,7 +411,7 @@ public abstract class GalleryMT20 extends Canvas {
 	/**
 	 * Add internal resize listeners to this gallery.
 	 */
-	private void _addResizeListeners() {
+	private void addResizeListeners() {
 
 		addControlListener(new ControlAdapter() {
 
@@ -456,7 +420,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 				_clientArea = getClientArea();
 
-				updateGallery(true, null);
+				updateGallery(true);
 			}
 		});
 
@@ -482,7 +446,7 @@ public abstract class GalleryMT20 extends Canvas {
 	/**
 	 * Add internal scrollbars listeners to this gallery.
 	 */
-	private void _addScrollBarsListeners() {
+	private void addScrollBarsListeners() {
 
 		// Vertical bar
 		final ScrollBar verticalBar = getVerticalBar();
@@ -514,7 +478,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 	}
 
-	private void _addSelection(final GalleryMT20Item item) {
+	private void addSelection(final GalleryMT20Item item) {
 
 		if (item == null) {
 			return;
@@ -526,10 +490,10 @@ public abstract class GalleryMT20 extends Canvas {
 
 		// Deselect all items if multi selection is disabled
 		if (!_isMultiSelection) {
-			_deselectAll(false);
+			deselectAll(false);
 		}
 
-		final int itemFilterIndex = _indexOfFilter(item);
+		final int itemFilterIndex = indexOfFilter(item);
 
 		// Divide position by 32 to get selection bloc for this item.
 		final int n = itemFilterIndex >> 5;
@@ -537,8 +501,10 @@ public abstract class GalleryMT20 extends Canvas {
 			// Create selectionFlag array
 			// Add 31 before dividing by 32 to ensure at least one 'int' is
 			// created if size < 32.
-			filterSelectionFlags = new int[(_galleryItems.length + 31) >> 5];
+			filterSelectionFlags = new int[(_filteredGalleryItems.length + 31) >> 5];
+
 		} else if (n >= filterSelectionFlags.length) {
+
 			// Expand selectionArray
 			final int[] oldFlags = filterSelectionFlags;
 			filterSelectionFlags = new int[n + 1];
@@ -554,7 +520,7 @@ public abstract class GalleryMT20 extends Canvas {
 		_selectedItems.put(item.uniqueItemID, item);
 	}
 
-	private void _addSelection(final int itemFilterIndex, final GalleryMT20Item item) {
+	private void addSelection(final int itemFilterIndex, final GalleryMT20Item item) {
 
 		if (isSelected(itemFilterIndex)) {
 			return;
@@ -562,7 +528,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 		// Deselect all items if multi selection is disabled
 		if (!_isMultiSelection) {
-			_deselectAll(false);
+			deselectAll(false);
 		}
 
 		// Divide position by 32 to get selection bloc for this item.
@@ -571,8 +537,10 @@ public abstract class GalleryMT20 extends Canvas {
 			// Create selectionFlag array
 			// Add 31 before dividing by 32 to ensure at least one 'int' is
 			// created if size < 32.
-			filterSelectionFlags = new int[(_galleryItems.length + 31) >> 5];
+			filterSelectionFlags = new int[(_filteredGalleryItems.length + 31) >> 5];
+
 		} else if (n >= filterSelectionFlags.length) {
+
 			// Expand selectionArray
 			final int[] oldFlags = filterSelectionFlags;
 			filterSelectionFlags = new int[n + 1];
@@ -586,108 +554,6 @@ public abstract class GalleryMT20 extends Canvas {
 		_lastSelectedItemFilterIndex = itemFilterIndex;
 
 		_selectedItems.put(item.uniqueItemID, item);
-	}
-
-	/**
-	 * Deselects all items and send selection event depending on parameter.
-	 * 
-	 * @param notifyListeners
-	 *            If true, a selection event will be sent to all the current selection listeners.
-	 */
-	private void _deselectAll(final boolean notifyListeners) {
-
-		_lastSelectedItem = null;
-		_selectedItems.clear();
-
-		// Deselect groups
-		// We could set selectionFlags to null, but we rather set all values to
-		// 0 to redure garbage collection. On each iteration, we deselect 32
-		// items.
-		if (filterSelectionFlags != null) {
-			for (int i = 0; i < filterSelectionFlags.length; i++) {
-				filterSelectionFlags[i] = 0;
-			}
-		}
-
-		// Notify listeners if necessary.
-		if (notifyListeners) {
-			notifySelectionListeners(null, -1, false);
-		}
-	}
-
-	/**
-	 * @param filterIndex
-	 * @return Returns initialized gallery item from the given gallery position.
-	 */
-	private GalleryMT20Item _getItemFromGallery(final int filterIndex) {
-
-		GalleryMT20Item galleryItem = _filteredGalleryItems[filterIndex];
-
-		if (galleryItem == null) {
-
-			galleryItem = new GalleryMT20Item(this);
-
-			final int galleryIndex = initItem(galleryItem, filterIndex);
-
-			_galleryItems[galleryIndex] = galleryItem;
-			_filteredGalleryItems[filterIndex] = galleryItem;
-		}
-
-		return galleryItem;
-	}
-
-	/**
-	 * Returns the index of a GalleryItem in the filtered gallery items
-	 * {@link #_filteredItemsIndices}.
-	 * 
-	 * @param item
-	 * @return
-	 */
-	private int _indexOfFilter(final GalleryMT20Item item) {
-
-		final int filterItemCount = _filteredGalleryItems.length;
-
-		if (1 <= _lastIndexOfItemFilter && _lastIndexOfItemFilter < filterItemCount - 1) {
-
-			if (_filteredGalleryItems[_lastIndexOfItemFilter] == item) {
-				return _lastIndexOfItemFilter;
-			}
-
-			if (_filteredGalleryItems[_lastIndexOfItemFilter + 1] == item) {
-				return ++_lastIndexOfItemFilter;
-			}
-
-			if (_filteredGalleryItems[_lastIndexOfItemFilter - 1] == item) {
-				return --_lastIndexOfItemFilter;
-			}
-		}
-
-		if (_lastIndexOfItemFilter < filterItemCount / 2) {
-
-			for (int itemIndex = 0; itemIndex < filterItemCount; itemIndex++) {
-				if (_filteredGalleryItems[itemIndex] == item) {
-					return _lastIndexOfItemFilter = itemIndex;
-				}
-			}
-		} else {
-
-			for (int itemFilterIndex = filterItemCount - 1; itemFilterIndex >= 0; --itemFilterIndex) {
-				if (_filteredGalleryItems[itemFilterIndex] == item) {
-					return _lastIndexOfItemFilter = itemFilterIndex;
-				}
-			}
-		}
-
-		return -1;
-	}
-
-	private void _removeSelection(final GalleryMT20Item item) {
-
-		final int itemFilterIndex = _indexOfFilter(item);
-		filterSelectionFlags[itemFilterIndex >> 5] &= ~(1 << (itemFilterIndex & 0x1f));
-
-		_lastSelectedItem = null;
-		_selectedItems.remove(item.uniqueItemID);
 	}
 
 	/**
@@ -727,46 +593,6 @@ public abstract class GalleryMT20 extends Canvas {
 
 		return galleryPositionRatio;
 	}
-
-//	/**
-//	 * Returns the index of a GalleryItem in all gallery items {@link #_galleryItems}.
-//	 *
-//	 * @param item
-//	 * @return
-//	 */
-//	private int _indexOfGallery(final GalleryMT20Item item) {
-//
-//		final int itemCount = _galleryItems.length;
-//
-//		if (1 <= _lastIndexOf && _lastIndexOf < itemCount - 1) {
-//			if (_galleryItems[_lastIndexOf] == item) {
-//				return _lastIndexOf;
-//			}
-//			if (_galleryItems[_lastIndexOf + 1] == item) {
-//				return ++_lastIndexOf;
-//			}
-//			if (_galleryItems[_lastIndexOf - 1] == item) {
-//				return --_lastIndexOf;
-//			}
-//		}
-//		if (_lastIndexOf < itemCount / 2) {
-//
-//			for (int itemIndex = 0; itemIndex < itemCount; itemIndex++) {
-//				if (_galleryItems[itemIndex] == item) {
-//					return _lastIndexOf = itemIndex;
-//				}
-//			}
-//		} else {
-//
-//			for (int itemIndex = itemCount - 1; itemIndex >= 0; --itemIndex) {
-//				if (_galleryItems[itemIndex] == item) {
-//					return _lastIndexOf = itemIndex;
-//				}
-//			}
-//		}
-//
-//		return -1;
-//	}
 
 	/**
 	 * Sets number of vertical and horizontal items for the whole gallery in
@@ -824,13 +650,115 @@ public abstract class GalleryMT20 extends Canvas {
 	 */
 	public void deselectAll() {
 
-		_deselectAll(false);
+		deselectAll(false);
 
 		redraw();
 	}
 
-	private void filterThreadRunTask() {
+	/**
+	 * Deselects all items and send selection event depending on parameter.
+	 * 
+	 * @param notifyListeners
+	 *            If true, a selection event will be sent to all the current selection listeners.
+	 */
+	private void deselectAll(final boolean notifyListeners) {
 
+		_lastSelectedItem = null;
+		_selectedItems.clear();
+
+		// Deselect groups
+		// We could set selectionFlags to null, but we rather set all values to
+		// 0 to redure garbage collection. On each iteration, we deselect 32
+		// items.
+		if (filterSelectionFlags != null) {
+			for (int i = 0; i < filterSelectionFlags.length; i++) {
+				filterSelectionFlags[i] = 0;
+			}
+		}
+
+		// Notify listeners if necessary.
+		if (notifyListeners) {
+			notifySelectionListeners(null, -1, false);
+		}
+	}
+
+	private void filterThread_10_Setup() {
+
+		_filterThread = new Thread("Gallery: Filtering Images") {//$NON-NLS-1$
+
+			@Override
+			public void run() {
+				filterThread_20_Run();
+			}
+		};
+
+		_filterThread.start();
+	}
+
+	private void filterThread_20_Run() {
+
+		long lastRun = 0;
+
+		while (_filterThreadStopped != true) {
+
+			try {
+				FILTER_LOCK.lock();
+
+				final long lastDirty = _filterLastDirtyTime.get();
+
+				System.out.println("lastDirty > _lastRunTime\t"
+						+ (lastDirty > lastRun)
+						+ (" diff: " + (lastDirty - lastRun)));
+				System.out.println("lastDirty:    " + lastDirty);
+				System.out.println("_lastRunTime: " + lastRun);
+				System.out.println();
+				// TODO remove SYSTEM.OUT.PRINTLN
+
+				if (lastDirty > lastRun) {
+
+					// filter is dirty again
+					Thread.sleep(1000);
+				} else {
+					// filter is not dirty, wait until a wakeup call
+					_filterWaker.await();
+				}
+
+				try {
+					filterThread_20_RunTask();
+				} catch (final Exception e) {
+					StatusUtil.log(e);
+				}
+
+				// set last run time
+				lastRun = System.nanoTime();
+
+			} catch (final InterruptedException e) {
+				// ignore
+			} finally {
+				FILTER_LOCK.unlock();
+			}
+		}
+	}
+
+	private void filterThread_20_RunTask() {
+
+		final Display display = getDisplay();
+
+		if (display.isDisposed()) {
+			return;
+		}
+
+		if (_filterProvider == null) {
+			return;
+		}
+
+		_filteredGalleryItems = _filterProvider.getFilteredGalleryItems(_allGalleryItems);
+
+		display.syncExec(new Runnable() {
+			public void run() {
+				updateGallery(true);
+			}
+		});
 	}
 
 	/**
@@ -838,18 +766,17 @@ public abstract class GalleryMT20 extends Canvas {
 	 */
 	private void filterThreadWakeup() {
 
+		// filter thread is already running, inform the thread that the filter must be run again
+		_filterLastDirtyTime.set(System.nanoTime());
+
 		// don't wait if the filter thread is already running
 		if (FILTER_LOCK.tryLock()) {
 
 			try {
-				FILTER_LOCK.lock();
 				_filterWaker.signal();
 			} finally {
 				FILTER_LOCK.unlock();
 			}
-		} else {
-			// filter thread is already running, inform the thread that the filter must be run again
-			_filterLastDirtyTime.set(System.currentTimeMillis());
 		}
 	}
 
@@ -944,24 +871,8 @@ public abstract class GalleryMT20 extends Canvas {
 		return indexes;
 	}
 
-//	/**
-//	 * @return Returns gallery filter indices or <code>null</code> when items are not set with
-//	 *         {@link #setupItems(int)}
-//	 */
-//	public GalleryMT20Item[] getGalleryFilterIndices() {
-//		return _filteredGalleryItems;
-//	}
-
 	public GalleryMT20Item[] getFilteredItems() {
 		return _filteredGalleryItems;
-	}
-
-	/**
-	 * @return Returns all gallery items or <code>null</code> when items are not set with
-	 *         {@link #setupItems(int)}
-	 */
-	public GalleryMT20Item[] getGalleryItems() {
-		return _galleryItems;
 	}
 
 	/**
@@ -993,6 +904,37 @@ public abstract class GalleryMT20 extends Canvas {
 
 			return (double) selection / maximum;
 		}
+	}
+
+	/**
+	 * @param filterIndex
+	 * @return Returns initialized gallery item from the given gallery position.
+	 */
+	private GalleryMT20Item getItemFromGallery(final int filterIndex) {
+
+		if (filterIndex >= _filteredGalleryItems.length) {
+			return null;
+		}
+
+		GalleryMT20Item galleryItem = _filteredGalleryItems[filterIndex];
+
+		if (galleryItem == null) {
+
+			galleryItem = new GalleryMT20Item(this);
+
+			final IGalleryCustomData customData = initializeGalleryItem(filterIndex);
+
+			galleryItem.customData = customData;
+			galleryItem.uniqueItemID = customData.getUniqueId();
+
+			_allGalleryItems[customData.getGalleryIndex()] = galleryItem;
+
+			_filteredGalleryItems[filterIndex] = galleryItem;
+
+			filterThreadWakeup();
+		}
+
+		return galleryItem;
 	}
 
 	/**
@@ -1113,16 +1055,57 @@ public abstract class GalleryMT20 extends Canvas {
 	}
 
 	/**
+	 * @param item
+	 * @return Returns the index of the gallery item
+	 */
+	private int indexOfFilter(final GalleryMT20Item item) {
+
+		final int filterItemCount = _filteredGalleryItems.length;
+
+		if (1 <= _lastIndexOfItemFilter && _lastIndexOfItemFilter < filterItemCount - 1) {
+
+			if (_filteredGalleryItems[_lastIndexOfItemFilter] == item) {
+				return _lastIndexOfItemFilter;
+			}
+
+			if (_filteredGalleryItems[_lastIndexOfItemFilter + 1] == item) {
+				return ++_lastIndexOfItemFilter;
+			}
+
+			if (_filteredGalleryItems[_lastIndexOfItemFilter - 1] == item) {
+				return --_lastIndexOfItemFilter;
+			}
+		}
+
+		if (_lastIndexOfItemFilter < filterItemCount / 2) {
+
+			for (int itemIndex = 0; itemIndex < filterItemCount; itemIndex++) {
+				if (_filteredGalleryItems[itemIndex] == item) {
+					return _lastIndexOfItemFilter = itemIndex;
+				}
+			}
+		} else {
+
+			for (int itemFilterIndex = filterItemCount - 1; itemFilterIndex >= 0; --itemFilterIndex) {
+				if (_filteredGalleryItems[itemFilterIndex] == item) {
+					return _lastIndexOfItemFilter = itemFilterIndex;
+				}
+			}
+		}
+
+		return -1;
+	}
+
+	/**
 	 * Initializes a gallery item which can be used to set data into the item. This method is called
 	 * before a gallery item is painted.
 	 * 
-	 * @param galleryItem
 	 * @param filterIndex
 	 *            Index within the filtered gallery items, these are the gallery items which the
 	 *            gallery can display, it excludes items which are filtered out.
-	 * @return Returns the gallery index which is the index in {@link #_galleryItems}
+	 * @return
 	 */
-	public abstract int initItem(final GalleryMT20Item galleryItem, final int filterIndex);
+	public abstract IGalleryCustomData initializeGalleryItem(final int filterIndex);
 
 	/**
 	 * @param checkedGalleryItem
@@ -1175,7 +1158,7 @@ public abstract class GalleryMT20 extends Canvas {
 			return false;
 		}
 
-		final int itemFilterIndex = _indexOfFilter(item);
+		final int itemFilterIndex = indexOfFilter(item);
 
 		final int itemFlagIndex = itemFilterIndex >> 5;
 		if (itemFlagIndex >= filterSelectionFlags.length) {
@@ -1253,6 +1236,15 @@ public abstract class GalleryMT20 extends Canvas {
 	 */
 	private void onDispose() {
 
+		_filterThreadStopped = true;
+		_filterThread.interrupt();
+
+		try {
+			_filterThread.join();
+		} catch (final InterruptedException e) {
+			StatusUtil.log(e);
+		}
+
 		// dispose renderer
 		if (_itemRenderer != null) {
 			_itemRenderer.dispose();
@@ -1283,7 +1275,7 @@ public abstract class GalleryMT20 extends Canvas {
 			// left mouse button is pressed
 
 			if (item == null) {
-				_deselectAll(true);
+				deselectAll(true);
 				redraw();
 				_mouseClickHandled = true;
 				_lastSingleClick = null;
@@ -1309,7 +1301,7 @@ public abstract class GalleryMT20 extends Canvas {
 	private void onMouseHandleLeft(final MouseEvent e, final GalleryMT20Item item, final boolean down, final boolean up) {
 		if (down) {
 			if (!isSelected(item)) {
-				_deselectAll(false);
+				deselectAll(false);
 
 				setSelected(item, true, true);
 
@@ -1319,10 +1311,10 @@ public abstract class GalleryMT20 extends Canvas {
 			}
 		} else if (up) {
 			if (item == null) {
-				_deselectAll(true);
+				deselectAll(true);
 			} else {
 
-				_deselectAll(false);
+				deselectAll(false);
 				setSelected(item, true, _lastSingleClick != item);
 				_lastSingleClick = item;
 			}
@@ -1351,14 +1343,14 @@ public abstract class GalleryMT20 extends Canvas {
 			return;
 		}
 
-		_deselectAll(false);
+		deselectAll(false);
 
 		/*
 		 * select items between current item and last click item
 		 */
 
-		final int filterIndexLast = _indexOfFilter(_lastSingleClick);
-		final int filterIndexCurrent = _indexOfFilter(currentItem);
+		final int filterIndexLast = indexOfFilter(_lastSingleClick);
+		final int filterIndexCurrent = indexOfFilter(currentItem);
 
 		int filterIndexFrom;
 		int filterIndexTo;
@@ -1373,9 +1365,9 @@ public abstract class GalleryMT20 extends Canvas {
 
 		for (int filterIndex = filterIndexFrom; filterIndex <= filterIndexTo; filterIndex++) {
 
-			final GalleryMT20Item item = _getItemFromGallery(filterIndex);
+			final GalleryMT20Item item = getItemFromGallery(filterIndex);
 
-			_addSelection(filterIndex, item);
+			addSelection(filterIndex, item);
 		}
 
 //	???	notifySelectionListeners(to, indexOf(to), false);
@@ -1396,7 +1388,7 @@ public abstract class GalleryMT20 extends Canvas {
 		if (down) {
 
 			if (item != null && !isSelected(item)) {
-				_deselectAll(false);
+				deselectAll(false);
 				setSelected(item, true, true);
 				redraw();
 				_mouseClickHandled = true;
@@ -1528,7 +1520,12 @@ public abstract class GalleryMT20 extends Canvas {
 							continue;
 						}
 
-						final GalleryMT20Item galleryItem = _getItemFromGallery(filterIndex);
+						final GalleryMT20Item galleryItem = getItemFromGallery(filterIndex);
+
+						if (galleryItem == null) {
+							continue;
+						}
+
 						final boolean isSelected = isSelected(galleryItem);
 
 						setItemPosition(galleryItem, filterIndex);
@@ -1637,6 +1634,8 @@ public abstract class GalleryMT20 extends Canvas {
 		}
 
 		_isZoomed = false;
+
+		filterThreadWakeup();
 	}
 
 	private void onScrollVertical_10() {
@@ -1663,6 +1662,15 @@ public abstract class GalleryMT20 extends Canvas {
 		_clientAreaItemsIndices = getAreaItemsIndices(_clientArea);
 	}
 
+	private void removeSelection(final GalleryMT20Item item) {
+
+		final int itemFilterIndex = indexOfFilter(item);
+		filterSelectionFlags[itemFilterIndex >> 5] &= ~(1 << (itemFilterIndex & 0x1f));
+
+		_lastSelectedItem = null;
+		_selectedItems.remove(item.uniqueItemID);
+	}
+
 	/**
 	 * Sets the gallery's anti-aliasing value to the parameter, which must be one of
 	 * <code>SWT.DEFAULT</code>, <code>SWT.OFF</code> or <code>SWT.ON</code>.
@@ -1673,9 +1681,25 @@ public abstract class GalleryMT20 extends Canvas {
 		_antialias = antialias;
 	}
 
-	public void setFilterProvider(final IFilterProvider filterProvider) {
-		// TODO Auto-generated method stub
+	/**
+	 * Set filtered gallery items
+	 * 
+	 * @param filteredGalleryItems
+	 */
+	public void setFilteredItems(final GalleryMT20Item[] filteredGalleryItems) {
 
+		_filteredGalleryItems = filteredGalleryItems;
+
+		updateGallery(true);
+
+		filterThreadWakeup();
+	}
+
+	public void setFilterProvider(final IFilterProvider filterProvider) {
+
+		_filterProvider = filterProvider;
+
+		filterThreadWakeup();
 	}
 
 	/**
@@ -1858,12 +1882,12 @@ public abstract class GalleryMT20 extends Canvas {
 
 		if (isSelected) {
 			if (!isSelected(item)) {
-				_addSelection(item);
+				addSelection(item);
 			}
 
 		} else {
 			if (isSelected(item)) {
-				_removeSelection(item);
+				removeSelection(item);
 			}
 		}
 
@@ -1884,7 +1908,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 			int index = -1;
 			if (notifiedItem != null) {
-				index = _indexOfFilter(notifiedItem);
+				index = indexOfFilter(notifiedItem);
 			}
 
 			notifySelectionListeners(notifiedItem, index, false);
@@ -1892,26 +1916,10 @@ public abstract class GalleryMT20 extends Canvas {
 	}
 
 	/**
-	 * Set gallery items in the first root item
-	 * 
-	 * @param sortedGalleryItems
-	 */
-	public void setSortedItems(final GalleryMT20Item[] sortedGalleryItems) {
-
-//		if (_galleryRootItems == null || _galleryRootItems.length == 0) {
-//			return;
-//		}
-//
-//		_galleryRootItems[0].items = sortedGalleryItems;
-//
-//		updateStructuralValues(null, true);
-//		updateScrollBarsProperties();
-//
-//		redraw();
-	}
-
-	/**
-	 * Set number of items in the gallery, this will also start a gallery update.
+	 * Set number of items in the gallery, the items itself are created when they are displayed.
+	 * <p>
+	 * This will also start a gallery update which runs the
+	 * {@link #initializeGalleryItem(GalleryMT20Item, int)} method to initialize gallery items.
 	 * 
 	 * @param numberOfItems
 	 * @param galleryPosition
@@ -1921,16 +1929,28 @@ public abstract class GalleryMT20 extends Canvas {
 	public void setupItems(final int numberOfItems, final Double galleryPosition) {
 
 		// create empty (null) gallery items
-		_galleryItems = new GalleryMT20Item[numberOfItems];
+		_allGalleryItems = new GalleryMT20Item[numberOfItems];
 
 		// initially all items can be displayed
-		_filteredGalleryItems = _galleryItems;
+		_filteredGalleryItems = new GalleryMT20Item[numberOfItems];
 
-		_deselectAll(false);
+		deselectAll(false);
 
 		updateGallery(false, galleryPosition);
 
 		filterThreadWakeup();
+	}
+
+	public void updateFilter() {
+		filterThreadWakeup();
+	}
+
+	/**
+	 * @param isKeepLocation
+	 *            Keeps gallery position when <code>true</code>, otherwise position will be reset.
+	 */
+	public void updateGallery(final boolean isKeepLocation) {
+		updateGallery(isKeepLocation, null);
 	}
 
 	/**
@@ -1957,6 +1977,9 @@ public abstract class GalleryMT20 extends Canvas {
 			_clientAreaItemsIndices = getAreaItemsIndices(_clientArea);
 		}
 
+		filterThreadWakeup();
+
+		// start a paint event
 		redraw();
 	}
 

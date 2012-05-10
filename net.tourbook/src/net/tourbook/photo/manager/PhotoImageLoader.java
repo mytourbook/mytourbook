@@ -137,10 +137,7 @@ public class PhotoImageLoader {
 	 */
 	private boolean isImageVisible() {
 
-		final boolean isItemVisible = _galleryItem.galleryMT20.isItemVisible(_galleryItem);
-
-//		System.out.println("isItemVisible:" + isItemVisible + "  " + _galleryItem);
-//		// TODO remove SYSTEM.OUT.PRINTLN
+		final boolean isItemVisible = _galleryItem.gallery.isItemVisible(_galleryItem);
 
 		return isItemVisible;
 	}
@@ -331,7 +328,9 @@ public class PhotoImageLoader {
 				Image swtThumbnailImage = null;
 				try {
 
-					// transform EXIF image and save it in the thumb store
+					/*
+					 * transform EXIF image and save it in the thumb store
+					 */
 					try {
 
 						awtBufferedImage = transformImageCrop(awtBufferedImage);
@@ -360,6 +359,7 @@ public class PhotoImageLoader {
 // MUST BE REMOVED, IS ONLY FOR TESTING
 //
 //
+						// it performs better when existing thumb images do not keep saved
 						new File(storeImageFilePath.toOSString()).delete();
 //
 // MUST BE REMOVED, IS ONLY FOR TESTING
