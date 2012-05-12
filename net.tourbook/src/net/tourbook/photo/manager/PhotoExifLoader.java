@@ -13,16 +13,26 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.photo.gallery.MT20;
+package net.tourbook.photo.manager;
 
-public interface IFilterProvider {
 
-	/**
-	 * @param galleryItems
-	 *            Contains all gallery items which can be <code>null</code> when gallery item is not
-	 *            yet displayed.
-	 * @return Returns filtered gallery items
-	 */
-	GalleryMT20Item[] getFilteredGalleryItems(GalleryMT20Item[] galleryItems);
+public class PhotoExifLoader {
+
+	private Photo			_photo;
+	private ILoadCallBack	_loadCallBack;
+
+	public PhotoExifLoader(final Photo photo, final ILoadCallBack imageLoadCallback) {
+
+		_photo = photo;
+		_loadCallBack = imageLoadCallback;
+	}
+
+	public void loadExif() {
+
+		// load metadata
+		_photo.getImageMetaData();
+
+		_loadCallBack.callBackImageIsLoaded(false);
+	}
 
 }

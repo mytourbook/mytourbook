@@ -266,7 +266,7 @@ public class PhotoImageLoader {
 			 * keep image in cache
 			 */
 			if (isImageLoaded) {
-				PhotoImageCache.putImage(imageKey, loadedImage, _photo.updatePhotoMetadata());
+				PhotoImageCache.putImage(imageKey, loadedImage, _photo.getImageMetaData());
 			}
 
 			/*
@@ -286,7 +286,7 @@ public class PhotoImageLoader {
 			}
 
 			// show in the UI, that meta data are loaded, loading message is displayed with another color
-			final boolean isUpdateUI = _photo.getImageMetaData() != null;
+			final boolean isUpdateUI = _photo.getImageMetaDataRaw() != null;
 
 			// display image in the loading callback
 			_loadCallBack.callBackImageIsLoaded(isUpdateUI || isImageLoaded || isLoadingError);
@@ -305,7 +305,7 @@ public class PhotoImageLoader {
 		try {
 
 			// read exif meta data
-			final IImageMetadata metadata = _photo.updateMetadataFromImageFile(true);
+			final IImageMetadata metadata = _photo.getImageMetaData(true);
 
 			if (metadata == null) {
 				return null;
@@ -454,17 +454,21 @@ public class PhotoImageLoader {
 	 * 
 	 * @param smallImageWaitingQueue
 	 *            waiting queue for small images
+	 * @param waitingQueueExif
 	 */
-	public void loadImageHQ(final LinkedBlockingDeque<PhotoImageLoader> smallImageWaitingQueue) {
+	public void loadImageHQ(final LinkedBlockingDeque<PhotoImageLoader> smallImageWaitingQueue,
+							final LinkedBlockingDeque<PhotoExifLoader> waitingQueueExif) {
 
 		if (isImageVisible() == false) {
 			setStateUndefined();
 			return;
 		}
 
-		// wait until small images are loaded
+		/*
+		 * wait until small images are loaded
+		 */
 		try {
-			while (smallImageWaitingQueue.size() > 0) {
+			while (smallImageWaitingQueue.size() > 0 || waitingQueueExif.size() > 0) {
 				Thread.sleep(300);
 			}
 		} catch (final InterruptedException e) {
@@ -748,7 +752,7 @@ public class PhotoImageLoader {
 		if (requestedSWTImage != null) {
 
 			// keep requested image in cache
-			PhotoImageCache.putImage(_requestedImageKey, requestedSWTImage, _photo.updatePhotoMetadata());
+			PhotoImageCache.putImage(_requestedImageKey, requestedSWTImage, _photo.getImageMetaData());
 		}
 
 		if (requestedSWTImage == null) {
@@ -993,7 +997,7 @@ public class PhotoImageLoader {
 		if (requestedSWTImage != null) {
 
 			// keep requested image in cache
-			PhotoImageCache.putImage(_requestedImageKey, requestedSWTImage, _photo.updatePhotoMetadata());
+			PhotoImageCache.putImage(_requestedImageKey, requestedSWTImage, _photo.getImageMetaData());
 		}
 
 		if (requestedSWTImage == null) {

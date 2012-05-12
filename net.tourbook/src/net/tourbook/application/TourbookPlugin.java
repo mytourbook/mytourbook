@@ -206,7 +206,7 @@ public class TourbookPlugin extends AbstractUIPlugin {
 	@Override
 	public void stop(final BundleContext context) throws Exception {
 
-		PhotoManager.stopImageLoading();
+		PhotoManager.stopImageLoading(true);
 		PhotoImageCache.dispose();
 
 		_instance = null;

@@ -114,7 +114,7 @@ public class PhotoImageCache {
 			photoImage = cacheWrapper.image;
 
 			// ensure metadata are set in the photo
-			photo.updatePhotoMetadata();
+			photo.getImageMetaData();
 		}
 
 		return photoImage;

@@ -17,10 +17,10 @@ package net.tourbook.photo.gallery.MT20;
 
 public interface IGalleryCustomData {
 
-	/**
-	 * @return Returns an index for all available gallery items.
-	 */
-	public int getGalleryIndex();
+//	/**
+//	 * @return Returns an index for all available gallery items.
+//	 */
+//	public int getGalleryIndex();
 
 	/**
 	 * @return Returns a unique id for this custom data. This id is used to identify selected

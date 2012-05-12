@@ -46,7 +46,7 @@ public class PhotoWrapper implements IGalleryCustomData {
 	 */
 	public int		gpsState	= -1;
 
-	public int		galleryIndex;
+//	public int		galleryIndex;
 
 	public PhotoWrapper(final File file) {
 
@@ -58,18 +58,16 @@ public class PhotoWrapper implements IGalleryCustomData {
 	}
 
 	@Override
-	public int getGalleryIndex() {
-		return galleryIndex;
-	}
-
-	@Override
 	public String getUniqueId() {
 		return imageFilePathName;
 	}
 
 	@Override
 	public String toString() {
-		return photo.toString();
+
+		return (imageFileLastModified + "  ") + imageFileName;
+
+//		return photo.toString();
 	}
 
 }

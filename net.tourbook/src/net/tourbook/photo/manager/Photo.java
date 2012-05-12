@@ -176,6 +176,7 @@ public class Photo {
 					tiffMetadata,
 					TiffTagConstants.TIFF_TAG_IMAGE_WIDTH,
 					Integer.MIN_VALUE);
+
 			photoMetadata.imageHeight = getTiffIntValue(
 					tiffMetadata,
 					TiffTagConstants.TIFF_TAG_IMAGE_LENGTH,
@@ -465,9 +466,68 @@ public class Photo {
 //	}
 
 	/**
-	 * @return Returns image meta data or <code>null</code> when not loaded
+	 * Updates metadata from image file.
+	 * 
+	 * @return Returns photo image metadata, metadata is loaded from the image file when it's not
+	 *         yet loaded.
 	 */
 	public PhotoImageMetadata getImageMetaData() {
+
+		if (_photoImageMetadata == null) {
+			getImageMetaData(false);
+		}
+
+		return _photoImageMetadata;
+	}
+
+	/**
+	 * Updated metadata from the image file
+	 * 
+	 * @param isReadThumbnail
+	 * @return Returns image metadata <b>with</b> image thumbnail <b>only</b> when
+	 *         <code>isReadThumbnail</code> is <code>true</code>, otherwise it checks if metadata
+	 *         are already loaded.
+	 */
+	public IImageMetadata getImageMetaData(final Boolean isReadThumbnail) {
+
+		if (_photoImageMetadata != null && isReadThumbnail == false) {
+			return null;
+		}
+
+		IImageMetadata imageFileMetadata = null;
+
+		try {
+
+			// SanselanConstants.PARAM_KEY_READ_THUMBNAILS
+
+			/*
+			 * read metadata WITH thumbnail image info, this is the default when the pamameter is
+			 * ommitted
+			 */
+			final HashMap<Object, Object> params = new HashMap<Object, Object>();
+			params.put(SanselanConstants.PARAM_KEY_READ_THUMBNAILS, isReadThumbnail);
+
+			imageFileMetadata = Sanselan.getMetadata(_photoWrapper.imageFile, params);
+
+		} catch (final Exception e) {
+// must be logged in another way
+//			StatusUtil.log(NLS.bind(//
+//					"Cannot read metadata from image \"{0}\"",
+//					getFilePathName()), e);
+		} finally {
+
+			_photoImageMetadata = createPhotoMetadata(imageFileMetadata);
+
+			updatePhotoImageMetadata(_photoImageMetadata);
+		}
+
+		return imageFileMetadata;
+	}
+
+	/**
+	 * @return Returns image meta data or <code>null</code> when not loaded
+	 */
+	public PhotoImageMetadata getImageMetaDataRaw() {
 		return _photoImageMetadata;
 	}
 
@@ -659,50 +719,6 @@ public class Photo {
 		;
 	}
 
-	/**
-	 * Updated metadata from the image file
-	 * 
-	 * @param isReadThumbnail
-	 * @return Returns image metadata <b>with</b> image thumbnail <b>only</b> when
-	 *         <code>isReadThumbnail</code> is <code>true</code>, otherwise it checks if metadata
-	 *         are already loaded.
-	 */
-	public IImageMetadata updateMetadataFromImageFile(final Boolean isReadThumbnail) {
-
-		if (_photoImageMetadata != null && isReadThumbnail == false) {
-			return null;
-		}
-
-		IImageMetadata imageFileMetadata = null;
-
-		try {
-
-			// SanselanConstants.PARAM_KEY_READ_THUMBNAILS
-
-			/*
-			 * read metadata WITH thumbnail image info, this is the default when the pamameter is
-			 * ommitted
-			 */
-			final HashMap<Object, Object> params = new HashMap<Object, Object>();
-			params.put(SanselanConstants.PARAM_KEY_READ_THUMBNAILS, isReadThumbnail);
-
-			imageFileMetadata = Sanselan.getMetadata(_photoWrapper.imageFile, params);
-
-		} catch (final Exception e) {
-// must be logged in another way
-//			StatusUtil.log(NLS.bind(//
-//					"Cannot read metadata from image \"{0}\"",
-//					getFilePathName()), e);
-		} finally {
-
-			_photoImageMetadata = createPhotoMetadata(imageFileMetadata);
-
-			updatePhotoImageMetadata(_photoImageMetadata);
-		}
-
-		return imageFileMetadata;
-	}
-
 	private void updatePhotoImageMetadata(final PhotoImageMetadata photoImageMetadata) {
 
 		_exifDateTime = photoImageMetadata.exifDateTime;
@@ -725,21 +741,6 @@ public class Photo {
 
 		// set state if gps data are available, this state is used for filtering the photos
 		_photoWrapper.gpsState = _latitude == Double.MIN_VALUE || _longitude == Double.MIN_VALUE ? 0 : 1;
-	}
-
-	/**
-	 * Updates metadata from image file.
-	 * 
-	 * @return Returns photo image metadata, metadata are loaded from the image file when not yet
-	 *         loaded.
-	 */
-	public PhotoImageMetadata updatePhotoMetadata() {
-
-		if (_photoImageMetadata == null) {
-			updateMetadataFromImageFile(false);
-		}
-
-		return _photoImageMetadata;
 	}
 
 	public void updateSize(final int width, final int height, final int orientation) {

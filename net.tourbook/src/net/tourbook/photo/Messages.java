@@ -6,6 +6,9 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.photo.messages";						//$NON-NLS-1$
 
+	public static String		App_JobName_FilteringGalleryImages;
+	public static String		App_JobName_RetrievingFolderImageFiles;
+
 	public static String		App_Unit_Pixel;
 
 	public static String		ColumnFactory_Photo_Altitude;
@@ -65,10 +68,10 @@ public class Messages extends NLS {
 	public static String		Pic_Dir_Dialog_FolderIsNotAvailable_Message;
 	public static String		Pic_Dir_Dialog_FolderIsNotAvailable_Title;
 	public static String		Pic_Dir_ImageSizeIndicator_Tooltip;
-	public static String	Pic_Dir_Label_ExternalApp;
-
+	public static String		Pic_Dir_Label_ExternalApp;
 	public static String		Pic_Dir_Label_FolderIsNotSelected;
 	public static String		Pic_Dir_Label_Loading;
+	public static String		Pic_Dir_ProgressBar_Filter_Tooltip;
 	public static String		Pic_Dir_Spinner_ThumbnailSize_Tooltip;
 	public static String		Pic_Dir_Spinner_ThumbnailSize_Tooltip_OSX;
 	public static String		Pic_Dir_Status_Loaded;

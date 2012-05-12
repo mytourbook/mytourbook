@@ -150,7 +150,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 				final LoadImageCallback imageLoadCallback = _picDirImages.new LoadImageCallback(galleryItem);
 
-				PhotoManager.putImageInLoadingQueue(galleryItem, photo, requestedImageQuality, imageLoadCallback);
+				PhotoManager.putImageInThumbLoadingQueue(galleryItem, photo, requestedImageQuality, imageLoadCallback);
 			}
 
 			isRequestedQuality = true;
@@ -507,7 +507,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		if (isError) {
 			statusText = photoImageFileName + " cannot be loaded";
 		} else {
-			final PhotoImageMetadata metaData = photo.getImageMetaData();
+			final PhotoImageMetadata metaData = photo.getImageMetaDataRaw();
 			if (metaData == null) {
 				statusText = photoImageFileName + " is being loaded...";
 			} else {

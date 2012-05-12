@@ -329,7 +329,7 @@ public class PrefPagePhotoThumbnailStore extends FieldEditorPreferencePage imple
 		// update pref store values
 		if (performOk()) {
 
-			PhotoManager.stopImageLoading();
+			PhotoManager.stopImageLoading(true);
 
 			// remove store files
 			ThumbnailStore.cleanupStoreFiles(isDeleteAllImages, true);

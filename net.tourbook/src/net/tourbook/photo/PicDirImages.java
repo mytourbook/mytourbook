@@ -23,11 +23,12 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.ReentrantLock;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.photo.gallery.MT20.GalleryMT20;
 import net.tourbook.photo.gallery.MT20.GalleryMT20Item;
-import net.tourbook.photo.gallery.MT20.IFilterProvider;
 import net.tourbook.photo.gallery.MT20.IGalleryCustomData;
 import net.tourbook.photo.manager.GallerySorting;
 import net.tourbook.photo.manager.ILoadCallBack;
@@ -42,6 +43,10 @@ import net.tourbook.util.UI;
 import net.tourbook.util.Util;
 
 import org.apache.commons.sanselan.Sanselan;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -74,6 +79,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.part.PageBook;
@@ -88,17 +94,21 @@ import org.eclipse.ui.part.PageBook;
  * org.apache.commons.sanselan
  * </pre>
  */
-public class PicDirImages implements IFilterProvider {
+public class PicDirImages {
+
+	private static final int						FILTER_DELAY					= 500;								// ms
 
 	private static final int						MAX_HISTORY_ENTRIES				= 200;
+	private static final int						MAX_FILTER_PROGRESS_BAR			= 30;								// pixel
 
-	static final int								MIN_ITEM_WIDTH					= 10;
-	static final int								MAX_ITEM_WIDTH					= 2000;
+	static final int								MIN_ITEM_WIDTH					= 10;								// pixel
+	static final int								MAX_ITEM_WIDTH					= 2000;							// pixel
 
 	private static final String						STATE_FOLDER_HISTORY			= "STATE_FOLDER_HISTORY";			//$NON-NLS-1$
 	private static final String						STATE_THUMB_IMAGE_SIZE			= "STATE_THUMB_IMAGE_SIZE";		//$NON-NLS-1$
 	private static final String						STATE_GALLERY_POSITION_FOLDER	= "STATE_GALLERY_POSITION_FOLDER";	//$NON-NLS-1$
 	private static final String						STATE_GALLERY_POSITION_VALUE	= "STATE_GALLERY_POSITION_VALUE";	//$NON-NLS-1$
+	private static final String						STATE_IMAGE_SORTING				= "STATE_IMAGE_SORTING";			//$NON-NLS-1$
 
 	private static final String						DEFAULT_GALLERY_FONT			= "arial,sans-serif";				//$NON-NLS-1$
 
@@ -163,7 +173,9 @@ public class PicDirImages implements IFilterProvider {
 	 * Contains current gallery sorting id: {@link PicDirView#GALLERY_SORTING_BY_DATE} or
 	 * {@link PicDirView#GALLERY_SORTING_BY_NAME}
 	 */
-	private GallerySorting							_sortingAlgorithm;
+	private Comparator<PhotoWrapper>				_currentComparator;
+	private GallerySorting							_currentSorting;
+	private GallerySorting							_initialSorting;
 
 	private PicDirView								_picDirView;
 
@@ -185,7 +197,7 @@ public class PicDirImages implements IFilterProvider {
 	 * Only these items are displayed in the gallery, the {@link #_allPhotoWrapper} items contains
 	 * also hidden gallery items.
 	 */
-	private PhotoWrapper[]							_filteredPhotoWrapper;
+	private PhotoWrapper[]							_sortedAndFilteredPhotoWrapper;
 
 	private FileFilter								_fileFilter;
 
@@ -211,6 +223,20 @@ public class PicDirImages implements IFilterProvider {
 																							0.75f,
 																							true);
 
+	private ImageFilter								_currentImageFilter;
+
+	private Job										_filterJob;
+	private boolean									_filterJobIsCanceled;
+	private AtomicBoolean							_filterJobIsSubsequentScheduled	= new AtomicBoolean();
+	private ReentrantLock							FILTER_JOB_LOCK					= new ReentrantLock();
+
+	private int										_filterJobDirtyCounter;
+	private boolean									_isFilterInitialStart;
+
+	private int										_filterProgessBarMax;
+	private int										_filterProgessBarLoaded;
+
+	private Font									_galleryFont;
 	/*
 	 * UI controls
 	 */
@@ -232,9 +258,9 @@ public class PicDirImages implements IFilterProvider {
 
 	private ImageSizeIndicator						_canvasImageSizeIndicator;
 
-	private Font									_galleryFont;
+	private ProgressBar								_progbarFilter;
 
-	private ImageFilter								_currentImageFilter;
+	private long									_filterProgessBarLastUIUpdate;
 
 	{
 		_workerRunnable = new Runnable() {
@@ -288,8 +314,6 @@ public class PicDirImages implements IFilterProvider {
 				final long diff = time1 - time2;
 
 				return diff < 0 ? -1 : diff > 0 ? 1 : 0;
-
-//				return (int) (wrapper1.imageFileLastModified - wrapper2.imageFileLastModified);
 			}
 		};
 
@@ -321,6 +345,16 @@ public class PicDirImages implements IFilterProvider {
 //
 //		// We make file list in this thread for speed reasons
 //	final List<File>	files	= SortingUtils.getSortedFileList(folder, _fileFilter, comparator);
+
+	class LoadExifCallback implements ILoadCallBack {
+
+		public LoadExifCallback() {}
+
+		@Override
+		public void callBackImageIsLoaded(final boolean isUpdateUI) {
+			filterJob_60_StartSubsequent();
+		}
+	}
 
 	class LoadImageCallback implements ILoadCallBack {
 
@@ -360,8 +394,6 @@ public class PicDirImages implements IFilterProvider {
 
 					if (isItemVisible) {
 
-						_gallery.updateFilter();
-
 						// redraw gallery item WITH background
 						_gallery.redraw(
 								__galleryItem.viewPortX,
@@ -382,19 +414,29 @@ public class PicDirImages implements IFilterProvider {
 		}
 
 		@Override
-		public IGalleryCustomData initializeGalleryItem(final int filterIndex) {
+		public IGalleryCustomData getCustomData(final int filterIndex) {
 
-			final PhotoWrapper photoWrapper = _filteredPhotoWrapper[filterIndex];
+			if (filterIndex >= _sortedAndFilteredPhotoWrapper.length) {
+				return null;
+			}
 
-			// create photo which is used to draw the photo image
-			photoWrapper.photo = new Photo(photoWrapper);
+			final PhotoWrapper photoWrapper = _sortedAndFilteredPhotoWrapper[filterIndex];
+
+			if (photoWrapper.photo == null) {
+
+				// create photo which is used to draw the photo image
+				photoWrapper.photo = new Photo(photoWrapper);
+			}
 
 			return photoWrapper;
 		}
 	}
 
 	PicDirImages(final PicDirView picDirView) {
+
 		_picDirView = picDirView;
+
+		filterJob_10_Setup();
 	}
 
 //////// LOG ALL BINDINGS
@@ -602,7 +644,7 @@ public class PicDirImages implements IFilterProvider {
 		if (prefGalleryFont.length() > 0) {
 			try {
 
-				System.out.println(UI.timeStamp() + "setting gallery font: " + prefGalleryFont);
+				System.out.println(UI.timeStamp() + "setting gallery font: " + prefGalleryFont); //$NON-NLS-1$
 
 				_galleryFont = new Font(_display, new FontData(prefGalleryFont));
 
@@ -657,7 +699,7 @@ public class PicDirImages implements IFilterProvider {
 		_containerActionBar = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(_containerActionBar);
 		GridLayoutFactory.fillDefaults()//
-				.numColumns(4)
+				.numColumns(5)
 				.extendedMargins(0, 0, 2, 2)
 				.applyTo(_containerActionBar);
 		{
@@ -672,6 +714,9 @@ public class PicDirImages implements IFilterProvider {
 			createUI_16_ComboHistory(_containerActionBar);
 			createUI_17_ImageSize(_containerActionBar);
 			createUI_18_ImageSizeIndicator(_containerActionBar);
+
+			createUI_19_FilterProgressBar(_containerActionBar);
+
 		}
 	}
 
@@ -778,6 +823,22 @@ public class PicDirImages implements IFilterProvider {
 	}
 
 	/**
+	 * filter progress bar
+	 */
+	private void createUI_19_FilterProgressBar(final Composite parent) {
+
+		_progbarFilter = new ProgressBar(parent, SWT.HORIZONTAL | SWT.SMOOTH);
+		GridDataFactory.fillDefaults()//
+//				.grab(true, false)
+				.align(SWT.FILL, SWT.CENTER)
+				.hint(MAX_FILTER_PROGRESS_BAR, SWT.DEFAULT)
+				.applyTo(_progbarFilter);
+		_progbarFilter.setMinimum(0);
+		_progbarFilter.setMaximum(MAX_FILTER_PROGRESS_BAR);
+		_progbarFilter.setToolTipText(Messages.Pic_Dir_ProgressBar_Filter_Tooltip);
+	}
+
+	/**
 	 * Create gallery
 	 */
 	private void createUI_20_PageGallery(final Composite parent) {
@@ -797,7 +858,7 @@ public class PicDirImages implements IFilterProvider {
 
 			public void handleEvent(final Event event) {
 
-				PhotoManager.stopImageLoading();
+				PhotoManager.stopImageLoading(false);
 
 				updateUIAfterZoomInOut(event.width);
 			}
@@ -808,8 +869,6 @@ public class PicDirImages implements IFilterProvider {
 		 */
 		_photoRenderer = new PhotoRenderer(_gallery, this);
 		_gallery.setItemRenderer(_photoRenderer);
-
-		_gallery.setFilterProvider(this);
 	}
 
 	private void createUI_30_PageLoading(final PageBook parent) {
@@ -842,113 +901,288 @@ public class PicDirImages implements IFilterProvider {
 			_lblStatusInfo = new CLabel(_containerStatusLine, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblStatusInfo);
 
-//			/*
-//			 * progress bar
-//			 */
-//			_progbarLoading = new ProgressBar(_containerStatusLine, SWT.HORIZONTAL | SWT.SMOOTH);
-//			GridDataFactory.fillDefaults().grab(true, false).align(SWT.END, SWT.FILL).applyTo(_progbarLoading);
 		}
 	}
 
 	private void disposeAllImages() {
-		PhotoManager.stopImageLoading();
+		PhotoManager.stopImageLoading(true);
 		ThumbnailStore.cleanupStoreFiles(true, true);
 		PhotoImageCache.dispose();
 	}
 
+	/**
+	 * This is called when a filter button is pressed.
+	 * 
+	 * @param currentImageFilter
+	 * @param isUpdateGallery
+	 */
 	void filterGallery(final ImageFilter currentImageFilter, final boolean isUpdateGallery) {
 
 		_currentImageFilter = currentImageFilter;
 
 		if (isUpdateGallery) {
-			_gallery.updateFilter();
+			filterJob_50_StartInitial();
 		}
 	}
 
-	@Override
-	public GalleryMT20Item[] getFilteredGalleryItems(final GalleryMT20Item[] galleryItems) {
+	private void filterJob_10_Setup() {
 
-//		System.out.println(UI.timeStampNano() + "getFilteredGalleryItems");
-//		// TODO remove SYSTEM.OUT.PRINTLN
+		_filterJob = new Job(Messages.App_JobName_FilteringGalleryImages) {
 
-		
-		if (galleryItems == null || _currentImageFilter == null || _currentImageFilter == ImageFilter.NoFilter) {
-			// filter is not set or filter is disabled, display all
-			return galleryItems;
-		}
+			@Override
+			protected IStatus run(final IProgressMonitor monitor) {
 
-		/*
-		 * copy all filtered items into temp list
-		 */
+				_filterJobIsCanceled = false;
+
+				_filterJobIsSubsequentScheduled.set(false);
+
+				try {
+
+					filterJob_20_Run();
+
+				} catch (final Exception e) {
+					StatusUtil.log(e);
+				}
+
+				return Status.OK_STATUS;
+			}
+		};
+
+		_filterJob.setSystem(true);
+	}
+
+	private void filterJob_20_Run() {
 
 		final boolean isGPSFilter = _currentImageFilter == ImageFilter.GPS;
 		final boolean isNoGPSFilter = _currentImageFilter == ImageFilter.NoGPS;
 
-		final int numberOfGalleryItems = galleryItems.length;
-		final PhotoWrapper[] tempFilteredWrapper = new PhotoWrapper[numberOfGalleryItems];
-		final GalleryMT20Item[] tempFilteredItems = new GalleryMT20Item[numberOfGalleryItems];
+		// get current dirty counter
+		final int currentDirtyCounter = _filterJobDirtyCounter;
 
-		// filterindex is incremented when the filter contains a gallery item
-		int filterIndex = 0;
-		int galleryIndex = 0;
+		PhotoWrapper[] newFilteredWrapper = null;
 
-		for (final GalleryMT20Item galleryItem : galleryItems) {
+		if (isGPSFilter || isNoGPSFilter) {
 
-			if (galleryItem == null) {
+			final int numberOfWrapper = _allPhotoWrapper.length;
+			final PhotoWrapper[] tempFilteredWrapper = new PhotoWrapper[numberOfWrapper];
 
-				// gallery item is not yet created/initialized (it is currently out of visible area)
+			// filterindex is incremented when the filter contains a gallery item
+			int filterIndex = 0;
+			int wrapperIndex = 0;
 
-				tempFilteredItems[filterIndex] = null;
-				tempFilteredWrapper[filterIndex] = _allPhotoWrapper[galleryIndex];
+			// loop: all photos
+			for (final PhotoWrapper photoWrapper : _allPhotoWrapper) {
 
-				filterIndex++;
+				if (_filterJobIsCanceled) {
+					return;
+				}
 
-			} else {
+				final int gpsState = photoWrapper.gpsState;
 
-				final IGalleryCustomData customData = galleryItem.customData;
+				if (_isFilterInitialStart && gpsState == -1) {
 
-// this case should not happen
-//				if (customData == null) {
-//
-//					tempFilteredItems[filterIndex] = galleryItem;
-//					tempFilteredWrapper[filterIndex] = null;
-//
-//					filterIndex++;
-//
-//				} else
+					/*
+					 * image is not yet loaded, it must be loaded to get the gps state
+					 */
 
-				final int gpsState = ((PhotoWrapper) customData).gpsState;
+					Photo photo = photoWrapper.photo;
 
-				if (isGPSFilter) {
-					if (gpsState == -1 || gpsState == 1) {
+					// photo is not yet set
+					if (photoWrapper.photo == null) {
 
-						tempFilteredItems[filterIndex] = galleryItem;
-						tempFilteredWrapper[filterIndex] = _allPhotoWrapper[galleryIndex];
-
-						filterIndex++;
+						// create photo which is used to draw the photo image
+						photoWrapper.photo = photo = new Photo(photoWrapper);
 					}
 
-				} else if (isNoGPSFilter) {
+					PhotoManager.putImageInExifLoadingQueue(photo, new LoadExifCallback());
 
-					if (gpsState == -1 || gpsState == 0) {
+				} else {
 
-						tempFilteredItems[filterIndex] = galleryItem;
-						tempFilteredWrapper[filterIndex] = _allPhotoWrapper[galleryIndex];
+					if (isGPSFilter) {
+						if (gpsState == 1) {
 
-						filterIndex++;
+							tempFilteredWrapper[filterIndex] = _allPhotoWrapper[wrapperIndex];
+
+							filterIndex++;
+						}
+
+					} else if (isNoGPSFilter) {
+
+						if (gpsState == 0) {
+
+							tempFilteredWrapper[filterIndex] = _allPhotoWrapper[wrapperIndex];
+
+							filterIndex++;
+						}
+					}
+
+					if (_isFilterInitialStart) {
+						_filterProgessBarMax--;
 					}
 				}
+
+				wrapperIndex++;
 			}
 
-			galleryIndex++;
+			// remove trailing array items which are not set
+			newFilteredWrapper = Arrays.copyOf(tempFilteredWrapper, filterIndex);
+
+		} else {
+
+			// a filter is not set, display all
+
+			newFilteredWrapper = _allPhotoWrapper;
 		}
 
-		final GalleryMT20Item[] newFilteredItems = Arrays.copyOf(tempFilteredItems, filterIndex);
+		if (newFilteredWrapper != null) {
 
-		// set filtered wrapper
-		_filteredPhotoWrapper = Arrays.copyOf(tempFilteredWrapper, filterIndex);
+			// check sorting
+			if (_initialSorting != _currentSorting) {
 
-		return newFilteredItems;
+				/*
+				 * wrapper must be sorted because sorting is different than the initial sorting,
+				 * this will sort only the filtered gallery items
+				 */
+
+				Arrays.sort(newFilteredWrapper, getCurrentComparator());
+			}
+
+			updateUIGalleryItems(newFilteredWrapper);
+		}
+
+		// reset state
+		_isFilterInitialStart = false;
+
+		if (_filterJobDirtyCounter > currentDirtyCounter) {
+
+			// filter is dirty again
+
+			final boolean isScheduled = _filterJobIsSubsequentScheduled.getAndSet(true);
+			if (isScheduled == false) {
+				_filterJob.schedule(FILTER_DELAY);
+			}
+		}
+	}
+
+	private void filterJob_50_StartInitial() {
+
+		FILTER_JOB_LOCK.lock();
+		{
+			try {
+
+				// filter must be stopped before new wrappers are set
+				filterJob_70_Stop();
+
+				_isFilterInitialStart = true;
+				_sortedAndFilteredPhotoWrapper = new PhotoWrapper[0];
+
+				_filterProgessBarLoaded = 0;
+				_filterProgessBarMax = _allPhotoWrapper.length;
+
+				_display.syncExec(new Runnable() {
+					public void run() {
+
+						if (_progbarFilter.isDisposed()) {
+							return;
+						}
+
+//						_progbarFilter.setEnabled(true);
+						_progbarFilter.setSelection(0);
+					}
+				});
+
+				_filterJob.schedule();
+
+			} finally {
+				FILTER_JOB_LOCK.unlock();
+			}
+		}
+	}
+
+	private void filterJob_60_StartSubsequent() {
+
+		FILTER_JOB_LOCK.lock();
+		{
+			try {
+
+				_filterJobDirtyCounter++;
+
+				if ((_filterJob.getState() == Job.RUNNING) == false) {
+
+					// filter job is NOT running, schedule it
+
+					final boolean isScheduled = _filterJobIsSubsequentScheduled.getAndSet(true);
+
+					if (isScheduled == false) {
+						_filterJob.schedule(FILTER_DELAY);
+					}
+				}
+
+			} finally {
+				FILTER_JOB_LOCK.unlock();
+			}
+		}
+
+		_filterProgessBarLoaded++;
+
+		/*
+		 * update progress bar
+		 */
+		final long now = System.currentTimeMillis();
+		if (now > _filterProgessBarLastUIUpdate + 100) {
+
+			_filterProgessBarLastUIUpdate = now;
+
+			_display.syncExec(new Runnable() {
+				public void run() {
+
+					if (_progbarFilter.isDisposed()) {
+						return;
+					}
+
+					double value = (double) _filterProgessBarLoaded / _filterProgessBarMax;
+					value = value * MAX_FILTER_PROGRESS_BAR;
+
+					_progbarFilter.setSelection((int) value);
+				}
+			});
+		}
+
+		/*
+		 * disable progress bar when all exif data are loaded
+		 */
+		if (_filterProgessBarLoaded == _filterProgessBarMax) {
+
+			_display.syncExec(new Runnable() {
+				public void run() {
+
+					if (_progbarFilter.isDisposed()) {
+						return;
+					}
+
+//					_progbarFilter.setSelection(MAX_FILTER_PROGRESS_BAR);
+					_progbarFilter.setSelection(0);
+//					_progbarFilter.setEnabled(false);
+				}
+			});
+		}
+	}
+
+	private void filterJob_70_Stop() {
+
+		_filterJobIsCanceled = true;
+
+		// wait until the filter job has been canceled
+		try {
+			_filterJob.cancel();
+			_filterJob.join();
+		} catch (final InterruptedException e) {
+			StatusUtil.log(e);
+		}
+	}
+
+	private Comparator<PhotoWrapper> getCurrentComparator() {
+		return _currentSorting == GallerySorting.FILE_NAME ? SORT_BY_FILE_NAME : SORT_BY_FILE_DATE;
 	}
 
 	int getThumbnailSize() {
@@ -988,17 +1222,25 @@ public class PicDirImages implements IFilterProvider {
 
 	void onClose() {
 
+		// stop filter job
+		try {
+			_filterJob.cancel();
+			_filterJob.join();
+		} catch (final InterruptedException e) {
+			StatusUtil.log(e);
+		}
+
 		if (_galleryFont != null) {
 			_galleryFont.dispose();
 		}
 
-		PhotoManager.stopImageLoading();
+		PhotoManager.stopImageLoading(true);
 
 		//////////////////////////////////////////
 		//
 		// MUST BE REMOVED, IS ONLY FOR TESTING
 		//
-		PhotoImageCache.dispose();
+//		PhotoImageCache.dispose();
 		//
 		// MUST BE REMOVED, IS ONLY FOR TESTING
 		//
@@ -1116,7 +1358,7 @@ public class PicDirImages implements IFilterProvider {
 		 * update UI with new size
 		 */
 
-		PhotoManager.stopImageLoading();
+		PhotoManager.stopImageLoading(false);
 
 		// update gallery
 		final int newSize = _gallery.setItemSize(newPhotoWidth);
@@ -1159,176 +1401,6 @@ public class PicDirImages implements IFilterProvider {
 
 		// display previously successfully loaded folder
 		_comboPathHistory.setText(_photoFolder.getAbsolutePath());
-	}
-
-	/**
-	 * Checks all folders in the history and removes all folders which are not available any more.
-	 */
-	private void removeInvalidFolders() {
-
-		final ArrayList<String> invalidFolders = new ArrayList<String>();
-		final ArrayList<Integer> invalidFolderIndexes = new ArrayList<Integer>();
-
-		int folderIndex = 0;
-
-		for (final String historyFolder : _folderHistory) {
-
-			final File folder = new File(historyFolder);
-			if (folder.isDirectory() == false) {
-				invalidFolders.add(historyFolder);
-				invalidFolderIndexes.add(folderIndex);
-			}
-
-			folderIndex++;
-		}
-
-		if (invalidFolders.size() == 0) {
-			// nothing to do
-			return;
-		}
-
-		_folderHistory.removeAll(invalidFolders);
-
-		final Integer[] invalidIndexes = invalidFolderIndexes.toArray(new Integer[invalidFolderIndexes.size()]);
-
-		// remove from the end that the index numbers do not disappear
-		for (int index = invalidIndexes.length - 1; index >= 0; index--) {
-			_comboPathHistory.remove(invalidIndexes[index]);
-		}
-	}
-
-	void restoreState(final IDialogSettings state) {
-
-		/*
-		 * history
-		 */
-		final String[] historyEntries = Util.getStateArray(state, STATE_FOLDER_HISTORY, null);
-		if (historyEntries != null) {
-
-			// update history and combo
-			for (final String history : historyEntries) {
-				_folderHistory.add(history);
-				_comboPathHistory.add(history);
-			}
-		}
-
-		onModifyFont();
-
-		/*
-		 * image quality
-		 */
-		updateUIFromPrefStore();
-
-		/*
-		 * thumbnail size
-		 */
-		final int stateThumbSize = Util.getStateInt(state, STATE_THUMB_IMAGE_SIZE, PhotoManager.IMAGE_SIZE_THUMBNAIL);
-		_spinnerThumbSize.setSelection(stateThumbSize);
-
-		// restore thumbnail size
-		onSelectThumbnailSize(stateThumbSize);
-
-		/*
-		 * gallery folder image positions
-		 */
-		final String[] positionFolders = state.getArray(STATE_GALLERY_POSITION_FOLDER);
-		final String[] positionValues = state.getArray(STATE_GALLERY_POSITION_VALUE);
-		if (positionFolders != null && positionValues != null) {
-
-			// ensure same size
-			if (positionFolders.length == positionValues.length) {
-
-				for (int positionIndex = 0; positionIndex < positionFolders.length; positionIndex++) {
-
-					final String positionValueString = positionValues[positionIndex];
-
-					try {
-						final Double positionValue = Double.parseDouble(positionValueString);
-
-						_galleryPositions.put(positionFolders[positionIndex], positionValue);
-
-					} catch (final Exception e) {
-						// ignore
-					}
-				}
-			}
-		}
-	}
-
-//
-//		return files;
-//	}
-
-	void saveState(final IDialogSettings state) {
-
-		state.put(STATE_FOLDER_HISTORY, _folderHistory.toArray(new String[_folderHistory.size()]));
-
-		// thumbnail size
-		state.put(STATE_THUMB_IMAGE_SIZE, _spinnerThumbSize.getSelection());
-
-		/*
-		 * gallery positions for each folder
-		 */
-
-		// get current position
-		if (_photoFolder != null) {
-			_galleryPositions.put(_photoFolder.getAbsolutePath(), _gallery.getGalleryPosition());
-		}
-
-		final Set<String> positionFolders = _galleryPositions.keySet();
-		final int positionSize = positionFolders.size();
-
-		if (positionSize > 0) {
-
-			final String[] positionFolderArray = positionFolders.toArray(new String[positionSize]);
-			final String[] positionValues = new String[positionSize];
-
-			for (int positionIndex = 0; positionIndex < positionFolderArray.length; positionIndex++) {
-				final String positionKey = positionFolderArray[positionIndex];
-				positionValues[positionIndex] = _galleryPositions.get(positionKey).toString();
-			}
-
-			state.put(STATE_GALLERY_POSITION_FOLDER, positionFolderArray);
-			state.put(STATE_GALLERY_POSITION_VALUE, positionValues);
-		}
-	}
-
-	/**
-	 * Display images for the selected folder.
-	 * 
-	 * @param imageFolder
-	 * @param isFromNavigationHistory
-	 * @param isReloadFolder
-	 */
-	void showImages(final File imageFolder, final boolean isFromNavigationHistory, final boolean isReloadFolder) {
-
-		//////////////////////////////////////////
-		//
-		// MUST BE REMOVED, IS ONLY FOR TESTING
-		//
-//		disposeAllImages();
-		//
-		// MUST BE REMOVED, IS ONLY FOR TESTING
-		//
-		//////////////////////////////////////////
-
-		PhotoManager.stopImageLoading();
-
-		if (imageFolder == null) {
-			_lblLoading.setText(Messages.Pic_Dir_Label_FolderIsNotSelected);
-		} else {
-
-			_lblLoading.setText(NLS.bind(Messages.Pic_Dir_Label_Loading, imageFolder.getAbsolutePath()));
-
-			if (isFromNavigationHistory == false) {
-				// don't update history when the navigation in the history has caused to display the images
-				updateHistory(imageFolder.getAbsolutePath());
-			}
-		}
-
-		_pageBook.showPage(_pageLoading);
-
-		workerUpdate(imageFolder, isReloadFolder);
 	}
 
 //	/**
@@ -1387,6 +1459,185 @@ public class PicDirImages implements IFilterProvider {
 //		_gallery.setSortedItems(sortedGalleryItems);
 //	}
 
+	/**
+	 * Checks all folders in the history and removes all folders which are not available any more.
+	 */
+	private void removeInvalidFolders() {
+
+		final ArrayList<String> invalidFolders = new ArrayList<String>();
+		final ArrayList<Integer> invalidFolderIndexes = new ArrayList<Integer>();
+
+		int folderIndex = 0;
+
+		for (final String historyFolder : _folderHistory) {
+
+			final File folder = new File(historyFolder);
+			if (folder.isDirectory() == false) {
+				invalidFolders.add(historyFolder);
+				invalidFolderIndexes.add(folderIndex);
+			}
+
+			folderIndex++;
+		}
+
+		if (invalidFolders.size() == 0) {
+			// nothing to do
+			return;
+		}
+
+		_folderHistory.removeAll(invalidFolders);
+
+		final Integer[] invalidIndexes = invalidFolderIndexes.toArray(new Integer[invalidFolderIndexes.size()]);
+
+		// remove from the end that the index numbers do not disappear
+		for (int index = invalidIndexes.length - 1; index >= 0; index--) {
+			_comboPathHistory.remove(invalidIndexes[index]);
+		}
+	}
+
+	void restoreState(final IDialogSettings state) {
+
+		/*
+		 * history
+		 */
+		final String[] historyEntries = Util.getStateArray(state, STATE_FOLDER_HISTORY, null);
+		if (historyEntries != null) {
+
+			// update history and combo
+			for (final String history : historyEntries) {
+				_folderHistory.add(history);
+				_comboPathHistory.add(history);
+			}
+		}
+
+		// set font
+		onModifyFont();
+
+		/*
+		 * gallery sorting
+		 */
+		final GallerySorting defaultSorting = GallerySorting.FILE_NAME;
+		final String stateValue = Util.getStateString(state, STATE_IMAGE_SORTING, defaultSorting.name());
+		try {
+			_currentSorting = GallerySorting.valueOf(stateValue);
+		} catch (final Exception e) {
+			_currentSorting = defaultSorting;
+		}
+
+		/*
+		 * image quality
+		 */
+		updateUIFromPrefStore();
+
+		/*
+		 * thumbnail size
+		 */
+		final int stateThumbSize = Util.getStateInt(state, STATE_THUMB_IMAGE_SIZE, PhotoManager.IMAGE_SIZE_THUMBNAIL);
+		_spinnerThumbSize.setSelection(stateThumbSize);
+
+		// restore thumbnail size
+		onSelectThumbnailSize(stateThumbSize);
+
+		/*
+		 * gallery folder image positions
+		 */
+		final String[] positionFolders = state.getArray(STATE_GALLERY_POSITION_FOLDER);
+		final String[] positionValues = state.getArray(STATE_GALLERY_POSITION_VALUE);
+		if (positionFolders != null && positionValues != null) {
+
+			// ensure same size
+			if (positionFolders.length == positionValues.length) {
+
+				for (int positionIndex = 0; positionIndex < positionFolders.length; positionIndex++) {
+
+					final String positionValueString = positionValues[positionIndex];
+
+					try {
+						final Double positionValue = Double.parseDouble(positionValueString);
+
+						_galleryPositions.put(positionFolders[positionIndex], positionValue);
+
+					} catch (final Exception e) {
+						// ignore
+					}
+				}
+			}
+		}
+	}
+
+	void saveState(final IDialogSettings state) {
+
+		state.put(STATE_FOLDER_HISTORY, _folderHistory.toArray(new String[_folderHistory.size()]));
+
+		state.put(STATE_THUMB_IMAGE_SIZE, _spinnerThumbSize.getSelection());
+
+		state.put(STATE_IMAGE_SORTING, _currentSorting.name());
+
+		/*
+		 * gallery positions for each folder
+		 */
+
+		// get current position
+		if (_photoFolder != null) {
+			_galleryPositions.put(_photoFolder.getAbsolutePath(), _gallery.getGalleryPosition());
+		}
+
+		final Set<String> positionFolders = _galleryPositions.keySet();
+		final int positionSize = positionFolders.size();
+
+		if (positionSize > 0) {
+
+			final String[] positionFolderArray = positionFolders.toArray(new String[positionSize]);
+			final String[] positionValues = new String[positionSize];
+
+			for (int positionIndex = 0; positionIndex < positionFolderArray.length; positionIndex++) {
+				final String positionKey = positionFolderArray[positionIndex];
+				positionValues[positionIndex] = _galleryPositions.get(positionKey).toString();
+			}
+
+			state.put(STATE_GALLERY_POSITION_FOLDER, positionFolderArray);
+			state.put(STATE_GALLERY_POSITION_VALUE, positionValues);
+		}
+	}
+
+	/**
+	 * Display images for the selected folder.
+	 * 
+	 * @param imageFolder
+	 * @param isFromNavigationHistory
+	 * @param isReloadFolder
+	 */
+	void showImages(final File imageFolder, final boolean isFromNavigationHistory, final boolean isReloadFolder) {
+
+		PhotoManager.stopImageLoading(true);
+
+		//////////////////////////////////////////
+		//
+		// MUST BE REMOVED, IS ONLY FOR TESTING
+		//
+//		disposeAllImages();
+		//
+		// MUST BE REMOVED, IS ONLY FOR TESTING
+		//
+		//////////////////////////////////////////
+
+		if (imageFolder == null) {
+			_lblLoading.setText(Messages.Pic_Dir_Label_FolderIsNotSelected);
+		} else {
+
+			_lblLoading.setText(NLS.bind(Messages.Pic_Dir_Label_Loading, imageFolder.getAbsolutePath()));
+
+			if (isFromNavigationHistory == false) {
+				// don't update history when the navigation in the history has caused to display the images
+				updateHistory(imageFolder.getAbsolutePath());
+			}
+		}
+
+		_pageBook.showPage(_pageLoading);
+
+		workerUpdate(imageFolder, isReloadFolder);
+	}
+
 	void showInfo(	final boolean isShowPhotoName,
 					final boolean isShowPhotoDate,
 					final boolean isShowAnnotations,
@@ -1402,85 +1653,45 @@ public class PicDirImages implements IFilterProvider {
 	void sortGallery(final GallerySorting gallerySorting, final boolean isUpdateGallery) {
 
 		// check if resorting is needed
-		if (_sortingAlgorithm == gallerySorting) {
+		if (_currentSorting == gallerySorting) {
 			return;
 		}
 
 		// set new sorting algorithm
-		_sortingAlgorithm = gallerySorting;
+		_currentSorting = gallerySorting;
 
 		if (isUpdateGallery) {
 
 			BusyIndicator.showWhile(_display, new Runnable() {
 				public void run() {
-					sortGallery_Runnable();
+					sortGallery_10_Runnable();
 				}
 			});
 		}
 	}
 
 	/**
-	 * This will sort the gallery items
+	 * This will sort all already created gallery items
 	 */
-	private void sortGallery_Runnable() {
+	private void sortGallery_10_Runnable() {
 
 		if (_allPhotoWrapper == null || _allPhotoWrapper.length == 0) {
 			// there are no files
 			return;
 		}
 
-		final GalleryMT20Item[] filteredGalleryItems = _gallery.getFilteredItems();
-		final int itemsSize = filteredGalleryItems.length;
+		final GalleryMT20Item[] virtualGalleryItems = _gallery.getVirtualItems();
+		final int virtualSize = virtualGalleryItems.length;
 
-		if (itemsSize == 0) {
+		if (virtualSize == 0) {
 			// there are no items
 			return;
 		}
 
-		/*
-		 * create a map with all existing gallery items, an item can be null when not yet
-		 * displayed/initialized
-		 */
-		final HashMap<String, GalleryMT20Item> existingGalleryItems = new HashMap<String, GalleryMT20Item>();
+		// sort photos with new sorting algorithm
+		Arrays.sort(_sortedAndFilteredPhotoWrapper, getCurrentComparator());
 
-		for (final GalleryMT20Item galleryItem : filteredGalleryItems) {
-
-			if (galleryItem != null) {
-
-				final PhotoWrapper photoWrapper = (PhotoWrapper) galleryItem.customData;
-				final String imageFilePathName = photoWrapper.imageFilePathName;
-
-				existingGalleryItems.put(imageFilePathName, galleryItem);
-			}
-		}
-
-		/*
-		 * sort filtered photos
-		 */
-		Arrays.sort(_filteredPhotoWrapper, _sortingAlgorithm == GallerySorting.FILE_DATE
-				? SORT_BY_FILE_DATE
-				: SORT_BY_FILE_NAME);
-
-		/*
-		 * set gallery items into a list according to the new sorting
-		 */
-		final GalleryMT20Item[] sortedGalleryItems = new GalleryMT20Item[itemsSize];
-
-		// convert sorted photos into sorted gallery items
-		for (int itemIndex = 0; itemIndex < _filteredPhotoWrapper.length; itemIndex++) {
-
-			final PhotoWrapper photoWrapper = _filteredPhotoWrapper[itemIndex];
-
-			// retrieve gallery item for the current photo
-			final GalleryMT20Item galleryItem = existingGalleryItems.get(photoWrapper.imageFilePathName);
-
-			if (galleryItem != null) {
-				sortedGalleryItems[itemIndex] = galleryItem;
-			}
-		}
-
-		// update gallery
-		_gallery.setFilteredItems(sortedGalleryItems);
+		updateUIGalleryItems(_sortedAndFilteredPhotoWrapper);
 	}
 
 	void updateColors(final Color fgColor, final Color bgColor, final Color selectionFgColor) {
@@ -1619,8 +1830,46 @@ public class PicDirImages implements IFilterProvider {
 		_photoRenderer.setTextMinThumbSize(textMinThumbSize);
 	}
 
+	/*
+	 * set gallery items into a list according to the new sorting/filtering
+	 */
+	private void updateUIGalleryItems(final PhotoWrapper[] filteredAndSortedWrapper) {
+
+		final HashMap<String, GalleryMT20Item> existingGalleryItems = _gallery.getCreatedGalleryItems();
+
+		final int wrapperSize = filteredAndSortedWrapper.length;
+		final GalleryMT20Item[] sortedGalleryItems = new GalleryMT20Item[wrapperSize];
+
+		// convert sorted photos into sorted gallery items
+		for (int itemIndex = 0; itemIndex < wrapperSize; itemIndex++) {
+
+			final PhotoWrapper sortedPhotoWrapper = filteredAndSortedWrapper[itemIndex];
+
+			// get gallery item for the current photo
+			final GalleryMT20Item galleryItem = existingGalleryItems.get(sortedPhotoWrapper.imageFilePathName);
+
+			if (galleryItem != null) {
+				sortedGalleryItems[itemIndex] = galleryItem;
+			}
+		}
+
+		_sortedAndFilteredPhotoWrapper = filteredAndSortedWrapper;
+
+		Display.getDefault().syncExec(new Runnable() {
+			public void run() {
+
+				if (_gallery.isDisposed()) {
+					return;
+				}
+
+				// update gallery
+				_gallery.setVirtualItems(sortedGalleryItems);
+			}
+		});
+	}
+
 	/**
-	 * Updates the gallery contents
+	 * Get image files from current directory
 	 */
 	private void workerExecute() {
 
@@ -1669,17 +1918,12 @@ public class PicDirImages implements IFilterProvider {
 					newPhotoWrapper[fileIndex] = new PhotoWrapper(files[fileIndex]);
 				}
 
-				Arrays.sort(newPhotoWrapper, _sortingAlgorithm == GallerySorting.FILE_DATE
-						? SORT_BY_FILE_DATE
-						: SORT_BY_FILE_NAME);
+				_currentComparator = getCurrentComparator();
 
-				/*
-				 * set gallery index in each gallery item, this index will never be modified until
-				 * new gallery items are set
-				 */
-				for (int itemIndex = 0; itemIndex < numberOfImages; itemIndex++) {
-					newPhotoWrapper[itemIndex].galleryIndex = itemIndex;
-				}
+				// keep initial sorting algorithm
+				_initialSorting = _currentSorting;
+
+				Arrays.sort(newPhotoWrapper, _currentComparator);
 			}
 
 			// check if the previous files retrival has been interrupted
@@ -1693,8 +1937,23 @@ public class PicDirImages implements IFilterProvider {
 
 			_allPhotoWrapper = newPhotoWrapper;
 
-			// initially all photos are setup until the gallery filter is applied
-			_filteredPhotoWrapper = Arrays.copyOf(newPhotoWrapper, numberOfImages);
+			final int allPhotoSize;
+			boolean isFilterUsed = false;
+
+			if (_currentImageFilter == ImageFilter.NoFilter) {
+
+				// display all photos
+
+				allPhotoSize = newPhotoWrapper.length;
+				_sortedAndFilteredPhotoWrapper = Arrays.copyOf(newPhotoWrapper, numberOfImages);
+
+			} else {
+
+				// initially display no photos until the filter is run
+
+				allPhotoSize = 0;
+				isFilterUsed = true;
+			}
 
 			_display.syncExec(new Runnable() {
 				public void run() {
@@ -1712,10 +1971,8 @@ public class PicDirImages implements IFilterProvider {
 					// get old gallery position
 					final Double oldPosition = _galleryPositions.get(_photoFolder.getAbsolutePath());
 
-					final int allPhotoSize = _allPhotoWrapper.length;
-
 					/*
-					 * update gallery
+					 * initialize and update gallery with new items
 					 */
 					_gallery.setupItems(allPhotoSize, oldPosition);
 
@@ -1725,13 +1982,20 @@ public class PicDirImages implements IFilterProvider {
 					final long timeDiff = System.currentTimeMillis() - _workerStart;
 					final String timeDiffText = NLS.bind(
 							Messages.Pic_Dir_Status_Loaded,
-							new Object[] { Long.toString(timeDiff), Integer.toString(allPhotoSize) });
+							new Object[] { Long.toString(timeDiff), Integer.toString(_allPhotoWrapper.length) });
 
 					_lblStatusInfo.setText(timeDiffText);
 
 					_pageBook.showPage(_gallery);
 				}
 			});
+
+			if (isFilterUsed) {
+
+				// filter job must be run
+
+				filterJob_50_StartInitial();
+			}
 		}
 	}
 
@@ -1788,7 +2052,7 @@ public class PicDirImages implements IFilterProvider {
 		}
 
 		if (_workerThread == null) {
-			_workerThread = new Thread(_workerRunnable, "PicDirImages: retrieve files"); //$NON-NLS-1$
+			_workerThread = new Thread(_workerRunnable, Messages.App_JobName_RetrievingFolderImageFiles);
 			_workerThread.start();
 		}
 	}

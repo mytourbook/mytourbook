@@ -409,13 +409,13 @@ public class PicDirView extends ViewPart {
 		 */
 		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
-		tbm.add(_actionImageFilterGPS);
-		tbm.add(_actionImageFilterNoGPS);
-		tbm.add(new Separator());
-
 		tbm.add(_actionShowPhotoName);
 		tbm.add(_actionShowPhotoDate);
 		tbm.add(_actionShowPhotoAnnotations);
+		tbm.add(new Separator());
+
+		tbm.add(_actionImageFilterGPS);
+		tbm.add(_actionImageFilterNoGPS);
 		tbm.add(new Separator());
 
 		tbm.add(_actionSortByFileName);
