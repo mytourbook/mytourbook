@@ -16,8 +16,9 @@ import de.byteholder.gpx.PointOfInterest;
 
 public class GeoQuery extends Observable implements Runnable {
 
-//	private final static String			URL	= "http://www.frankieandshadow.com/osm/search.xml?find="; //$NON-NLS-1$
-	private final static String			SEARCH_URL		= "http://gazetteer.openstreetmap.org/namefinder/search.xml?find="; //$NON-NLS-1$
+//	private final static String			URL	= 			"http://www.frankieandshadow.com/osm/search.xml?find="; //$NON-NLS-1$
+//	private final static String			SEARCH_URL		= "http://gazetteer.openstreetmap.org/namefinder/search.xml?find="; //$NON-NLS-1$
+	private final static String			SEARCH_URL		= "http://nominatim.openstreetmap.org/search?format=xml&addressdetails=1&q=";	//$NON-NLS-1$
 
 	private ArrayList<PointOfInterest>	_searchResult	= new ArrayList<PointOfInterest>();
 
@@ -57,9 +58,9 @@ public class GeoQuery extends Observable implements Runnable {
 
 			_searchResult.clear();
 
-			SAXParserFactory.newInstance().newSAXParser().parse(//
-					SEARCH_URL + URLEncoder.encode(_query, "utf8"), // //$NON-NLS-1$
-					new GeoQuerySAXHandler(_searchResult));//$NON-NLS-1$
+			final String uri = SEARCH_URL + URLEncoder.encode(_query, "utf8");
+
+			SAXParserFactory.newInstance().newSAXParser().parse(uri, new GeoQuerySAXHandler(_searchResult));
 
 		} catch (final Exception e) {
 			_exception = e;
