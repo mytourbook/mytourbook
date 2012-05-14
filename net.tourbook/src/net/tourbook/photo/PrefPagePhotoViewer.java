@@ -16,7 +16,7 @@
 package net.tourbook.photo;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.photo.manager.PhotoManager;
+import net.tourbook.photo.manager.PhotoLoadManager;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.BooleanFieldEditor2;
 import net.tourbook.ui.UI;
@@ -27,7 +27,6 @@ import org.eclipse.jface.layout.LayoutConstants;
 import org.eclipse.jface.preference.ColorFieldEditor;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
-import org.eclipse.jface.preference.FileFieldEditor;
 import org.eclipse.jface.preference.FontFieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -49,9 +48,12 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-	public static final String		ID			= "net.tourbook.preferences.PrefPagePhotoViewerID"; //$NON-NLS-1$
+	public static final String		ID				= "net.tourbook.preferences.PrefPagePhotoViewerID"; //$NON-NLS-1$
 
-	private final IPreferenceStore	_prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
+	private static final int		BORDER_MIN_SIZE	= 0;
+	private static final int		BORDER_MAX_SIZE	= 8;
+
+	private final IPreferenceStore	_prefStore		= TourbookPlugin.getDefault().getPreferenceStore();
 
 	private boolean					_isImageViewerUIModified;
 	private boolean					_isImageQualityModified;
@@ -72,24 +74,13 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 	private Button					_rdoImageSystemAWT;
 	private Button					_chkIsHighImageQuality;
 	private Spinner					_spinnerTextMinThumbSize;
+	private Spinner					_spinnerImageBorderSize;
 	private Combo					_comboHQImageSize;
 	private Label					_lblThumbSize;
 	private Label					_lblThumbSizeUnit;
 	private Spinner					_spinnerThumbSize;
 
 	private FontFieldEditor			_galleryFontEditor;
-
-	private class FileFieldEditorNoValidation extends FileFieldEditor {
-
-		public FileFieldEditorNoValidation(final String name, final String labelText, final Composite parent) {
-			super(name, labelText, parent);
-		}
-
-		@Override
-		protected boolean checkState() {
-			return true;
-		}
-	}
 
 	@Override
 	protected void createFieldEditors() {
@@ -205,7 +196,7 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 			/*
 			 * text min size
 			 */
-			createUI_14_TextMinSize(group);
+			createUI_14_MinSize(group);
 
 			/*
 			 * gallery font
@@ -228,7 +219,18 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 		gl.makeColumnsEqualWidth = true;
 	}
 
-	private void createUI_14_TextMinSize(final Composite parent) {
+	private void createUI_14_MinSize(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+			createUI_16_MinSizeBorder(container);
+			createUI_18_MinSizeText(container);
+		}
+	}
+
+	private void createUI_16_MinSizeBorder(final Composite parent) {
 
 		/*
 		 * label: display text when thumbnail min size
@@ -237,7 +239,52 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 		GridDataFactory.fillDefaults()//
 				.align(SWT.BEGINNING, SWT.CENTER)
 				.applyTo(label);
-		label.setText(Messages.PrefPage_Photo_Viewer_Label_TextMinThumbSize);
+		label.setText(Messages.PrefPage_Photo_Viewer_Label_MinSizeBorder);
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+		{
+			/*
+			 * spinner: thumbnail size
+			 */
+			_spinnerImageBorderSize = new Spinner(container, SWT.BORDER);
+			GridDataFactory.fillDefaults() //
+					.align(SWT.BEGINNING, SWT.FILL)
+					.hint(convertWidthInCharsToPixels(5), SWT.DEFAULT)
+					.applyTo(_spinnerImageBorderSize);
+			_spinnerImageBorderSize.setMinimum(BORDER_MIN_SIZE);
+			_spinnerImageBorderSize.setMaximum(BORDER_MAX_SIZE);
+			_spinnerImageBorderSize.setToolTipText(Messages.PrefPage_Photo_Viewer_Label_MinSizeBorder_Tooltip);
+
+			_spinnerImageBorderSize.addSelectionListener(_viewerUISelectionListener);
+			_spinnerImageBorderSize.addMouseWheelListener(new MouseWheelListener() {
+				public void mouseScrolled(final MouseEvent event) {
+					UI.adjustSpinnerValueOnMouseScroll(event);
+					_isImageViewerUIModified = true;
+				}
+			});
+
+			/*
+			 * label: unit
+			 */
+			label = new Label(container, SWT.NONE);
+			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(label);
+			label.setText(Messages.App_Unit_Pixel);
+		}
+	}
+
+	private void createUI_18_MinSizeText(final Composite parent) {
+
+		/*
+		 * label: display text when thumbnail min size
+		 */
+		Label label = new Label(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.align(SWT.BEGINNING, SWT.CENTER)
+				.applyTo(label);
+		label.setText(Messages.PrefPage_Photo_Viewer_Label_MinSizeText);
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -250,10 +297,11 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 			_spinnerTextMinThumbSize = new Spinner(container, SWT.BORDER);
 			GridDataFactory.fillDefaults() //
 					.align(SWT.BEGINNING, SWT.FILL)
+					.hint(convertWidthInCharsToPixels(5), SWT.DEFAULT)
 					.applyTo(_spinnerTextMinThumbSize);
 			_spinnerTextMinThumbSize.setMinimum(PicDirImages.MIN_ITEM_WIDTH);
 			_spinnerTextMinThumbSize.setMaximum(PicDirImages.MAX_ITEM_WIDTH);
-			_spinnerTextMinThumbSize.setToolTipText(Messages.PrefPage_Photo_Viewer_Label_TextMinThumbSize_Tooltip);
+			_spinnerTextMinThumbSize.setToolTipText(Messages.PrefPage_Photo_Viewer_Label_MinSizeText_Tooltip);
 
 			_spinnerTextMinThumbSize.addSelectionListener(_viewerUISelectionListener);
 			_spinnerTextMinThumbSize.addMouseWheelListener(new MouseWheelListener() {
@@ -343,7 +391,7 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 			_comboHQImageSize.addSelectionListener(_imageQualitySelectionListener);
 
 			// fill combobox
-			for (final int hqImageSize : PhotoManager.HQ_IMAGE_SIZES) {
+			for (final int hqImageSize : PhotoLoadManager.HQ_IMAGE_SIZES) {
 				_comboHQImageSize.add(Integer.toString(hqImageSize));
 			}
 
@@ -438,8 +486,8 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 			_isImageQualityModified = false;
 
 			final String imageFramework = _prefStore.getString(ITourbookPreferences.PHOTO_VIEWER_IMAGE_FRAMEWORK);
-			final int hqImageSize = PhotoManager.HQ_IMAGE_SIZES[_comboHQImageSize.getSelectionIndex()];
-			PhotoManager.setFromPrefStore(imageFramework, hqImageSize);
+			final int hqImageSize = PhotoLoadManager.HQ_IMAGE_SIZES[_comboHQImageSize.getSelectionIndex()];
+			PhotoLoadManager.setFromPrefStore(imageFramework, hqImageSize);
 
 			getPreferenceStore().setValue(
 					ITourbookPreferences.PHOTO_VIEWER_PREF_EVENT_IMAGE_QUALITY_IS_MODIFIED,
@@ -524,11 +572,14 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 		_spinnerTextMinThumbSize.setSelection(//
 				_prefStore.getDefaultInt(ITourbookPreferences.PHOTO_VIEWER_TEXT_MIN_THUMB_SIZE));
 
+		_spinnerImageBorderSize.setSelection(//
+				_prefStore.getDefaultInt(ITourbookPreferences.PHOTO_VIEWER_IMAGE_BORDER_SIZE));
+
 		/*
 		 * image framework
 		 */
 		final boolean isSWT = _prefStore.getDefaultString(ITourbookPreferences.PHOTO_VIEWER_IMAGE_FRAMEWORK)//
-				.equals(PhotoManager.IMAGE_FRAMEWORK_SWT);
+				.equals(PhotoLoadManager.IMAGE_FRAMEWORK_SWT);
 		_rdoImageSystemSWT.setSelection(isSWT);
 		_rdoImageSystemAWT.setSelection(!isSWT);
 
@@ -536,7 +587,7 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 		 * hq image size
 		 */
 		final int hqImageSize = _prefStore.getDefaultInt(ITourbookPreferences.PHOTO_VIEWER_HQ_IMAGE_SIZE);
-		final int hqImageSizeIndex = PhotoManager.getHQImageSizeIndex(hqImageSize);
+		final int hqImageSizeIndex = PhotoLoadManager.getHQImageSizeIndex(hqImageSize);
 		_comboHQImageSize.select(hqImageSizeIndex);
 
 		// set editor defaults
@@ -607,11 +658,14 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 		_spinnerTextMinThumbSize.setSelection(//
 				_prefStore.getInt(ITourbookPreferences.PHOTO_VIEWER_TEXT_MIN_THUMB_SIZE));
 
+		_spinnerImageBorderSize.setSelection(//
+				_prefStore.getInt(ITourbookPreferences.PHOTO_VIEWER_IMAGE_BORDER_SIZE));
+
 		/*
 		 * image framework
 		 */
 		final String imageFramework = _prefStore.getString(ITourbookPreferences.PHOTO_VIEWER_IMAGE_FRAMEWORK);
-		final boolean isSWT = imageFramework.equals(PhotoManager.IMAGE_FRAMEWORK_SWT);
+		final boolean isSWT = imageFramework.equals(PhotoLoadManager.IMAGE_FRAMEWORK_SWT);
 		_rdoImageSystemSWT.setSelection(isSWT);
 		_rdoImageSystemAWT.setSelection(!isSWT);
 
@@ -619,15 +673,15 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 		 * HQ image size
 		 */
 		final int hqImageSize = _prefStore.getInt(ITourbookPreferences.PHOTO_VIEWER_HQ_IMAGE_SIZE);
-		final int hqImageSizeIndex = PhotoManager.getHQImageSizeIndex(hqImageSize);
+		final int hqImageSizeIndex = PhotoLoadManager.getHQImageSizeIndex(hqImageSize);
 		_comboHQImageSize.select(hqImageSizeIndex);
 	}
 
 	private void saveState() {
 
 		_prefStore.setValue(ITourbookPreferences.PHOTO_VIEWER_IMAGE_FRAMEWORK, _rdoImageSystemSWT.getSelection()
-				? PhotoManager.IMAGE_FRAMEWORK_SWT
-				: PhotoManager.IMAGE_FRAMEWORK_AWT);
+				? PhotoLoadManager.IMAGE_FRAMEWORK_SWT
+				: PhotoLoadManager.IMAGE_FRAMEWORK_AWT);
 
 		_prefStore.setValue(ITourbookPreferences.PHOTO_VIEWER_IS_SHOW_IMAGE_WITH_HIGH_QUALITY, //
 				_chkIsHighImageQuality.getSelection());
@@ -638,8 +692,11 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 		_prefStore.setValue(ITourbookPreferences.PHOTO_VIEWER_TEXT_MIN_THUMB_SIZE, //
 				_spinnerTextMinThumbSize.getSelection());
 
+		_prefStore.setValue(ITourbookPreferences.PHOTO_VIEWER_IMAGE_BORDER_SIZE, //
+				_spinnerImageBorderSize.getSelection());
+
 		_prefStore.setValue(ITourbookPreferences.PHOTO_VIEWER_HQ_IMAGE_SIZE, //
-				PhotoManager.HQ_IMAGE_SIZES[_comboHQImageSize.getSelectionIndex()]);
+				PhotoLoadManager.HQ_IMAGE_SIZES[_comboHQImageSize.getSelectionIndex()]);
 	}
 
 }

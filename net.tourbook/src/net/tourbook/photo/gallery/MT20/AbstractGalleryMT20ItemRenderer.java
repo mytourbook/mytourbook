@@ -29,4 +29,5 @@ public abstract class AbstractGalleryMT20ItemRenderer {
 								int galleryItemHeight,
 								boolean isSelected);
 
+	public abstract int getBorderSize();
 }

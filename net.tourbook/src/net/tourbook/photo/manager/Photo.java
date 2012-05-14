@@ -292,10 +292,6 @@ public class Photo {
 		return null;
 	}
 
-	public DateTime getExifDateTime() {
-		return _exifDateTime;
-	}
-
 	/**
 	 * GPS area info
 	 */
@@ -739,8 +735,16 @@ public class Photo {
 
 		updateSize(_imageWidth, _imageHeight, _orientation);
 
-		// set state if gps data are available, this state is used for filtering the photos
+		/*
+		 * set state if gps data are available, this state is used for filtering the photos and to
+		 * indicate that exif data are loaded
+		 */
 		_photoWrapper.gpsState = _latitude == Double.MIN_VALUE || _longitude == Double.MIN_VALUE ? 0 : 1;
+
+		// sort by exif date when available
+		if (_exifDateTime != null) {
+			_photoWrapper.imageSortingTime = _exifDateTime.getMillis();
+		}
 	}
 
 	public void updateSize(final int width, final int height, final int orientation) {

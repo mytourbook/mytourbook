@@ -26,8 +26,8 @@ import net.tourbook.photo.manager.ImageQuality;
 import net.tourbook.photo.manager.Photo;
 import net.tourbook.photo.manager.PhotoImageCache;
 import net.tourbook.photo.manager.PhotoImageMetadata;
+import net.tourbook.photo.manager.PhotoLoadManager;
 import net.tourbook.photo.manager.PhotoLoadingState;
-import net.tourbook.photo.manager.PhotoManager;
 import net.tourbook.photo.manager.PhotoWrapper;
 import net.tourbook.ui.UI;
 import net.tourbook.util.StatusUtil;
@@ -86,11 +86,20 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	private GalleryMT20				_gallery;
 	private PicDirImages			_picDirImages;
 
+	/*
+	 * position and size where the photo image is painted
+	 */
+	private int						_photoPaintedX;
+	private int						_photoPaintedY;
+	private int						_imagePaintedWidth;
+	private int						_imagePaintedHeight;
+
+	private int						_gridBorder				= 1;
+	private int						_imageBorder			= 5;
+
 	private static Image			_annotationGPS;
 	private static int				_gpsWidth;
 	private static int				_gpsHeight;
-
-//	photo-annotation-gps
 
 	static {
 		UI.IMAGE_REGISTRY.put(
@@ -123,10 +132,34 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 			_fontHeight = gc.getFontMetrics().getHeight() - 1;
 		}
 
+		boolean isDrawText = true;
+
+		final int photoViewPortX = galleryItemViewPortX + _gridBorder;
+		final int photoViewPortY = galleryItemViewPortY + _gridBorder;
+
+		int imageWidth = galleryItemWidth - _gridBorder;
+		int imageHeight = galleryItemHeight - _gridBorder;
+
+		// ignore border for small images
+		final boolean isBorder = imageWidth - _imageBorder >= _textMinThumbSize;
+		final int border = _imageBorder;
+		final int border2 = border / 2;
+
+		final int imageX = photoViewPortX + (isBorder ? border2 : 0);
+		final int imageY = photoViewPortY + (isBorder ? border2 : 0);
+
+		imageWidth -= isBorder ? border : 0;
+		imageHeight -= isBorder ? border : 0;
+
 		final PhotoWrapper photoWrapper = (PhotoWrapper) galleryItem.customData;
+		if (photoWrapper == null) {
+			// this case should not happen but it did
+			return;
+		}
+
 		final Photo photo = photoWrapper.photo;
 
-		final ImageQuality requestedImageQuality = galleryItemWidth <= PhotoManager.IMAGE_SIZE_THUMBNAIL
+		final ImageQuality requestedImageQuality = imageWidth <= PhotoLoadManager.IMAGE_SIZE_THUMBNAIL
 				? ImageQuality.THUMB
 				: ImageQuality.HQ;
 
@@ -150,7 +183,11 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 				final LoadImageCallback imageLoadCallback = _picDirImages.new LoadImageCallback(galleryItem);
 
-				PhotoManager.putImageInThumbLoadingQueue(galleryItem, photo, requestedImageQuality, imageLoadCallback);
+				PhotoLoadManager.putImageInThumbLoadingQueue(
+						galleryItem,
+						photo,
+						requestedImageQuality,
+						imageLoadCallback);
 			}
 
 			isRequestedQuality = true;
@@ -161,7 +198,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 				isRequestedQuality = false;
 
-				final ImageQuality lowerImageQuality = galleryItemWidth > PhotoManager.IMAGE_SIZE_THUMBNAIL
+				final ImageQuality lowerImageQuality = galleryItemWidth > PhotoLoadManager.IMAGE_SIZE_THUMBNAIL
 						? ImageQuality.THUMB
 						: ImageQuality.HQ;
 
@@ -169,26 +206,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 			}
 		}
 
-		boolean isDrawText = true;
-
-		final int photoPosX = galleryItemViewPortX + 1;
-		final int photoPosY = galleryItemViewPortY + 0;
-		final int photoWidth = galleryItemWidth - 2;
-		final int photoHeight = galleryItemHeight - 1;
-
 		gc.setForeground(_fgColor);
 		gc.setBackground(_bgColor);
-
-//		if (photoImage != null) {
-//			if (photoImage.isDisposed()) {
-//				System.out.println("is disposed    " + photo + "  " + photo.dumpLoadingState());
-//				// TODO remove SYSTEM.OUT.PRINTLN
-//			} else {
-//
-//				System.out.println("not isdisposed " + photo + "  " + photo.dumpLoadingState());
-//				// TODO remove SYSTEM.OUT.PRINTLN
-//			}
-//		}
 
 		if (photoImage != null && photoImage.isDisposed() == false) {
 
@@ -197,7 +216,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 			 * picture but not the text is displayed
 			 */
 
-			if (photoWidth < _textMinThumbSize) {
+			if (imageWidth < _textMinThumbSize) {
 				isDrawText = false;
 			}
 
@@ -205,36 +224,48 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 					gc,
 					photoWrapper,
 					photoImage,
-					photoPosX,
-					photoPosY,
-					photoWidth,
-					photoHeight,
+					imageX,
+					imageY,
+					imageWidth,
+					imageHeight,
 					isRequestedQuality,
 					isSelected);
+
+//			System.out.println("itemWidth "
+//					+ galleryItemWidth
+//					+ "  photoWidth "
+//					+ imageWidth
+//					+ "  border "
+//					+ _imageBorder);
+////			 final TODO remove SYSTEM.OUT.PRINTLN
+
+			// debug box for the image area
+//			gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_RED));
+//			gc.drawRectangle(imageX, imageY, imageWidth - 2, imageHeight - 1);
 
 		} else {
 
 			// image is not available
 
-			drawStatusText(gc, photoWrapper, photoPosX, photoPosY, photoWidth, photoHeight, requestedImageQuality, //
+			drawStatusText(gc, photoWrapper, imageX, imageY, imageWidth, imageHeight, requestedImageQuality, //
 					isDrawText && _isShowPhotoName);
 		}
 
 		// draw name & date & annotations
 		if (isDrawText && (_isShowPhotoName || _isShowPhotoDate)) {
-			drawInfoText(gc, photoWrapper, photoPosX, photoPosY, photoWidth, photoHeight);
+			drawInfoText(gc, photoWrapper, imageX, imageY, imageWidth, imageHeight);
 		}
 
-		// annotations are drawn on top of the info lines
+		// annotations are drawn in the bottom right corner of the image
 		if (_isShowAnnotations && photoWrapper.gpsState == 1) {
 			gc.drawImage(_annotationGPS, //
-					photoPosX + photoWidth - _gpsWidth,
-					photoPosY + photoHeight - _gpsHeight);
+					_photoPaintedX + _imagePaintedWidth - _gpsWidth,
+					_photoPaintedY + _imagePaintedHeight - _gpsHeight);
 		}
 
 //		// debug box for the whole gallery item area
 //		gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_GREEN));
-//		gc.drawRectangle(photoPosX, photoPosY, galleryItemWidth - 1, galleryItemHeight - 1);
+//		gc.drawRectangle(photoViewPortX - 1, photoViewPortY, galleryItemWidth - 1, galleryItemHeight - 1);
 	}
 
 	/**
@@ -260,12 +291,14 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 							final boolean isRequestedQuality,
 							final boolean isSelected) {
 
-		int photoPaintedWidth = 0;
-		int photoPaintedHeight = 0;
-		int offsetX = 0;
-		int offsetY = 0;
+		int centerOffsetX = 0;
+		int centerOffsetY = 0;
+
 		int imageWidth = 0;
 		int imageHeight = 0;
+
+		_imagePaintedWidth = 0;
+		_imagePaintedHeight = 0;
 
 		/*
 		 * exception can occure because the image could be disposed before it is drawn
@@ -287,8 +320,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 					imageCanvasWidth,
 					imageCanvasHeight);
 
-			photoPaintedWidth = bestSize.x;
-			photoPaintedHeight = bestSize.y;
+			_imagePaintedWidth = bestSize.x;
+			_imagePaintedHeight = bestSize.y;
 
 			final Photo photo = photoWrapper.photo;
 			final int photoWidthRotated = photo.getWidthRotated();
@@ -302,35 +335,33 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 				// photo is loaded
 
-				if (photoPaintedWidth > photoWidthRotated || photoPaintedHeight > photoHeightRotated) {
+				if (_imagePaintedWidth > photoWidthRotated || _imagePaintedHeight > photoHeightRotated) {
 
-					photoPaintedWidth = photoWidthRotated;
-					photoPaintedHeight = photoHeightRotated;
+					_imagePaintedWidth = photoWidthRotated;
+					_imagePaintedHeight = photoHeightRotated;
 				}
-			} else if (photoPaintedWidth > imageWidth || photoPaintedHeight > imageHeight) {
+			} else if (_imagePaintedWidth > imageWidth || _imagePaintedHeight > imageHeight) {
 
-				photoPaintedWidth = imageWidth;
-				photoPaintedHeight = imageHeight;
+				_imagePaintedWidth = imageWidth;
+				_imagePaintedHeight = imageHeight;
 			}
 
 			// Draw image
-			if (photoPaintedWidth > 0 && photoPaintedHeight > 0) {
+			if (_imagePaintedWidth > 0 && _imagePaintedHeight > 0) {
 
 				// center image
-				offsetX = (photoWidth - photoPaintedWidth) / 2;
-				offsetY = (photoHeight - photoPaintedHeight) / 2;
+				centerOffsetX = (photoWidth - _imagePaintedWidth) / 2;
+				centerOffsetY = (photoHeight - _imagePaintedHeight) / 2;
 
 			}
 		} catch (final Exception e) {
 			StatusUtil.log(e);
 		}
 
-		int destX = 0;
-		int destY = 0;
 		try {
 
-			destX = photoPosX + offsetX;
-			destY = photoPosY + offsetY;
+			_photoPaintedX = photoPosX + centerOffsetX;
+			_photoPaintedY = photoPosY + centerOffsetY;
 
 			try {
 
@@ -340,10 +371,10 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 						imageWidth,
 						imageHeight,
 						//
-						destX,
-						destY,
-						photoPaintedWidth,
-						photoPaintedHeight);
+						_photoPaintedX,
+						_photoPaintedY,
+						_imagePaintedWidth,
+						_imagePaintedHeight);
 
 			} catch (final Exception e) {
 				// this bug is covered here: https://bugs.eclipse.org/bugs/show_bug.cgi?id=375845
@@ -353,7 +384,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 				// draw marker line on the left side
 				gc.setBackground(_selectionFgColor);
-				gc.fillRectangle(destX, destY, 2, photoPaintedHeight);
+				gc.fillRectangle(_photoPaintedX, _photoPaintedY, 2, _imagePaintedHeight);
 			}
 
 			if (isRequestedQuality == false) {
@@ -364,8 +395,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 				gc.setBackground(_selectionFgColor);
 				gc.fillRectangle(//
-						destX + photoPaintedWidth - markerSize,
-						destY,// + photoPaintedHeight - markerSize,
+						_photoPaintedX + _imagePaintedWidth - markerSize,
+						_photoPaintedY,// + photoPaintedHeight - markerSize,
 						markerSize,
 						markerSize);
 			}
@@ -537,6 +568,11 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		gc.drawString(statusText, photoPosX + textOffsetX, photoPosY + textOffsetY, true);
 	}
 
+	@Override
+	public int getBorderSize() {
+		return _gridBorder + _imageBorder;
+	}
+
 	public void setColors(final Color fgColor, final Color bgColor, final Color selectionFgColor) {
 		_fgColor = fgColor;
 		_bgColor = bgColor;
@@ -549,6 +585,10 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		_fontHeight = -1;
 
 		_gallery.setFont(font);
+	}
+
+	public void setImageBorderSize(final int imageBorderSize) {
+		_imageBorder = imageBorderSize;
 	}
 
 	/**

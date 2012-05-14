@@ -30,7 +30,7 @@ import net.tourbook.util.UI;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Display;
 
-public class PhotoManager {
+public class PhotoLoadManager {
 
 	private static final IPreferenceStore						_prefStore;
 
@@ -277,7 +277,7 @@ public class PhotoManager {
 				final PhotoImageLoader loadingItem = _waitingQueueThumb.pollLast();
 
 				if (loadingItem != null) {
-					loadingItem.loadImage();
+					loadingItem.loadImage(_waitingQueueExif);
 				}
 			}
 		};

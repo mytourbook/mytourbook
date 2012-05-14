@@ -32,6 +32,7 @@ public class PhotoWrapper implements IGalleryCustomData {
 	public String	imageFileName;
 	public String	imageFilePathName;
 	public long		imageFileLastModified;
+	public long		imageSortingTime;
 
 	public Photo	photo;
 
@@ -39,14 +40,12 @@ public class PhotoWrapper implements IGalleryCustomData {
 	 * GPS has three states:
 	 * 
 	 * <pre>
-	 * -1 state is not yet set
+	 * -1 state is not yet set, EXIF data are not yet loaded
 	 *  0 photo do not contain GPS data
 	 *  1 photo contains GPS data
 	 * </pre>
 	 */
 	public int		gpsState	= -1;
-
-//	public int		galleryIndex;
 
 	public PhotoWrapper(final File file) {
 
@@ -55,6 +54,9 @@ public class PhotoWrapper implements IGalleryCustomData {
 		imageFileName = imageFile.getName();
 		imageFilePathName = imageFile.getPath();
 		imageFileLastModified = imageFile.lastModified();
+
+		// initially sort by file date until exif data are loaded
+		imageSortingTime = imageFileLastModified;
 	}
 
 	@Override

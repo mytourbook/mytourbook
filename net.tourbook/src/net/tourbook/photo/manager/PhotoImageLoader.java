@@ -208,12 +208,25 @@ public class PhotoImageLoader {
 	 * 												10479			7050			390				160			18079
 	 * 
 	 * </pre>
+	 * 
+	 * @param waitingqueueexif
 	 */
-	public void loadImage() {
+	public void loadImage(final LinkedBlockingDeque<PhotoExifLoader> waitingQueueExif) {
 
 		if (isImageVisible() == false) {
 			setStateUndefined();
 			return;
+		}
+
+		/*
+		 * wait until small images are loaded
+		 */
+		try {
+			while (waitingQueueExif.size() > 0) {
+				Thread.sleep(100);
+			}
+		} catch (final InterruptedException e) {
+			// should not happen, I hope so
 		}
 
 		boolean isImageLoadedInRequestedQuality = false;
@@ -282,7 +295,7 @@ public class PhotoImageLoader {
 
 				// load image with higher quality
 
-				PhotoManager.putImageInHQLoadingQueue(_galleryItem, _photo, _requestedImageQuality, _loadCallBack);
+				PhotoLoadManager.putImageInHQLoadingQueue(_galleryItem, _photo, _requestedImageQuality, _loadCallBack);
 			}
 
 			// show in the UI, that meta data are loaded, loading message is displayed with another color
@@ -433,15 +446,40 @@ public class PhotoImageLoader {
 
 			} catch (final Exception e) {
 				StatusUtil.log(
-						NLS.bind("Store image \"{0}\" cannot be loaded", requestedStoreImageFilePath.toOSString()), //$NON-NLS-1$
+						NLS.bind("Image \"{0}\" cannot be loaded (1)", requestedStoreImageFilePath.toOSString()), //$NON-NLS-1$
 						e);
 			} finally {
 
 				if (storeImage == null) {
 
-					final String message = "Store image \"{0}\" cannot be loaded. The image file is available but it's possible that SWT.ERROR_NO_HANDLES occured";
+					String message = "Image \"{0}\" cannot be loaded and an exception did not occure.\n"
+							+ "The image file is available but it's possible that SWT.ERROR_NO_HANDLES occured";
 
 					System.out.println(UI.timeStamp() + NLS.bind(message, requestedStoreImageFilePath.toOSString()));
+
+					PhotoImageCache.dispose();
+
+					/*
+					 * try loading again
+					 */
+					try {
+
+						storeImage = new Image(_display, requestedStoreImageFilePath.toOSString());
+
+					} catch (final Exception e) {
+						StatusUtil.log(NLS.bind(
+								"Image \"{0}\" cannot be loaded (2)", requestedStoreImageFilePath.toOSString()), //$NON-NLS-1$
+								e);
+					} finally {
+
+						if (storeImage == null) {
+
+							message = "Image \"{0}\" cannot be loaded again, even when disposing the image cache";
+
+							System.out.println(UI.timeStamp()
+									+ NLS.bind(message, requestedStoreImageFilePath.toOSString()));
+						}
+					}
 				}
 			}
 		}
@@ -489,7 +527,7 @@ public class PhotoImageLoader {
 
 			// load original image and create thumbs
 
-			if (_imageFramework.equals(PhotoManager.IMAGE_FRAMEWORK_SWT)) {
+			if (_imageFramework.equals(PhotoLoadManager.IMAGE_FRAMEWORK_SWT)) {
 				hqImage = loadImageHQ_10_WithSWT();
 			} else {
 				hqImage = loadImageHQ_20_WithAWT();
@@ -592,7 +630,7 @@ public class PhotoImageLoader {
 		int imageWidth = imageBounds.width;
 		int imageHeight = imageBounds.height;
 
-		final int thumbSize = PhotoManager.IMAGE_SIZE_THUMBNAIL;
+		final int thumbSize = PhotoLoadManager.IMAGE_SIZE_THUMBNAIL;
 
 		// images are rotated only ONE time (the first one)
 		boolean isRotated = false;
@@ -892,7 +930,7 @@ public class PhotoImageLoader {
 		 */
 		BufferedImage saveThumbAWT = null;
 
-		final int thumbSize = PhotoManager.IMAGE_SIZE_THUMBNAIL;
+		final int thumbSize = PhotoLoadManager.IMAGE_SIZE_THUMBNAIL;
 		if (imageWidth >= thumbSize || imageHeight >= thumbSize) {
 
 			/*

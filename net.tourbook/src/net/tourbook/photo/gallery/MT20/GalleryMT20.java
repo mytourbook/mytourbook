@@ -186,6 +186,7 @@ public abstract class GalleryMT20 extends Canvas {
 	private Point								_mouseMovePosition;
 
 	private Point								_mousePanStartPosition;
+
 	private int									_lastZoomEventTime;
 	private boolean								_mouseClickHandled;
 	private boolean								_isGalleryPanned;
@@ -193,11 +194,10 @@ public abstract class GalleryMT20 extends Canvas {
 	 * Last result of _indexOf(GalleryItem). Used for optimisation.
 	 */
 	private int									_lastIndexOfItemFilter	= -1;
-
 	/**
 	 * Vertical/horizontal offset for centered gallery items
 	 */
-	private int									_itemCenterOffset;
+	private int									_itemCenterOffsetX;
 
 	/**
 	 * Gallery item which was selected at last
@@ -795,7 +795,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 		if (_isVertical) {
 
-			final int contentPosX = viewPortX - _itemCenterOffset;
+			final int contentPosX = viewPortX - _itemCenterOffsetX;
 			final int contentPosY = _galleryPosition + viewPortY;
 
 			final int indexX = contentPosX / _itemWidth;
@@ -1630,17 +1630,19 @@ public abstract class GalleryMT20 extends Canvas {
 			final int allItemsWidth = _gridHorizItems * _itemWidth;
 
 			if (_contentVirtualWidth > allItemsWidth) {
-				_itemCenterOffset = (_contentVirtualWidth - allItemsWidth) / 2;
+				_itemCenterOffsetX = (_contentVirtualWidth - allItemsWidth) / 2;
 			} else if (allItemsWidth > _contentVirtualWidth) {
-				_itemCenterOffset = -(allItemsWidth - _contentVirtualWidth) / 2;
+				_itemCenterOffsetX = -(allItemsWidth - _contentVirtualWidth) / 2;
 			} else {
-				_itemCenterOffset = 0;
+				_itemCenterOffsetX = 0;
 			}
 
-			viewPortX = galleryVirtualPosX + _itemCenterOffset;
+			viewPortX = galleryVirtualPosX + _itemCenterOffsetX;
 			viewPortY = galleryVirtualPosY - _galleryPosition;
 
 		} else {
+
+			// not yet fully implemented
 
 			viewPortX = galleryVirtualPosX - _galleryPosition;
 			viewPortY = galleryVirtualPosY;
@@ -1666,7 +1668,7 @@ public abstract class GalleryMT20 extends Canvas {
 	}
 
 	/**
-	 * Sets the size (width) of the gallery item.
+	 * Sets the size (width) of the gallery item, this contains the image width and the border.
 	 * 
 	 * @param itemSize
 	 * @return Returns the size which has been set. This value can differ from the requested item

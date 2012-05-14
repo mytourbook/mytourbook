@@ -37,4 +37,9 @@ public class DefaultGalleryMT20ItemRenderer extends AbstractGalleryMT20ItemRende
 
 	}
 
+	@Override
+	public int getBorderSize() {
+		return 0;
+	}
+
 }

@@ -34,7 +34,7 @@ import net.tourbook.photo.manager.GallerySorting;
 import net.tourbook.photo.manager.ILoadCallBack;
 import net.tourbook.photo.manager.Photo;
 import net.tourbook.photo.manager.PhotoImageCache;
-import net.tourbook.photo.manager.PhotoManager;
+import net.tourbook.photo.manager.PhotoLoadManager;
 import net.tourbook.photo.manager.PhotoWrapper;
 import net.tourbook.photo.manager.ThumbnailStore;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -95,6 +95,8 @@ import org.eclipse.ui.part.PageBook;
  * </pre>
  */
 public class PicDirImages {
+
+	private static final int						IMAGE_INDICATOR_SIZE			= 16;
 
 	private static final int						FILTER_DELAY					= 500;								// ms
 
@@ -213,7 +215,9 @@ public class PicDirImages {
 	private ActionClearNavigationHistory			_actionClearNavigationHistory;
 	private ActionRemoveInvalidFoldersFromHistory	_actionRemoveInvalidFoldersFromHistory;
 
-	private int										_prevThumbSize					= -1;
+	private int										_prevGalleryItemSize			= -1;
+	private int										_photoImageSize;
+	private int										_photoBorderSize;
 
 	/**
 	 * keep gallery position for each used folder
@@ -228,10 +232,11 @@ public class PicDirImages {
 	private Job										_filterJob;
 	private boolean									_filterJobIsCanceled;
 	private AtomicBoolean							_filterJobIsSubsequentScheduled	= new AtomicBoolean();
+	private long									_filterProgessBarLastUIUpdate;
 	private ReentrantLock							FILTER_JOB_LOCK					= new ReentrantLock();
 
 	private int										_filterJobDirtyCounter;
-	private boolean									_isFilterInitialStart;
+	private boolean									_isFilterInInitialStart;
 
 	private int										_filterProgessBarMax;
 	private int										_filterProgessBarLoaded;
@@ -256,11 +261,12 @@ public class PicDirImages {
 	private Composite								_pageLoading;
 	private Composite								_containerStatusLine;
 
+	private Composite								_pageFolderInfo;
+	private Label									_lblFolderInfo;
+
 	private ImageSizeIndicator						_canvasImageSizeIndicator;
 
 	private ProgressBar								_progbarFilter;
-
-	private long									_filterProgessBarLastUIUpdate;
 
 	{
 		_workerRunnable = new Runnable() {
@@ -308,10 +314,7 @@ public class PicDirImages {
 					return 0;
 				}
 
-				final long time1 = wrapper1.imageFileLastModified;
-				final long time2 = wrapper2.imageFileLastModified;
-
-				final long diff = time1 - time2;
+				final long diff = wrapper1.imageSortingTime - wrapper2.imageSortingTime;
 
 				return diff < 0 ? -1 : diff > 0 ? 1 : 0;
 			}
@@ -688,6 +691,7 @@ public class PicDirImages {
 			{
 				createUI_20_PageGallery(_pageBook);
 				createUI_30_PageLoading(_pageBook);
+				createUI_40_PageFolderInfo(_pageBook);
 			}
 
 			createUI_50_StatusLine(container);
@@ -714,9 +718,7 @@ public class PicDirImages {
 			createUI_16_ComboHistory(_containerActionBar);
 			createUI_17_ImageSize(_containerActionBar);
 			createUI_18_ImageSizeIndicator(_containerActionBar);
-
 			createUI_19_FilterProgressBar(_containerActionBar);
-
 		}
 	}
 
@@ -815,7 +817,7 @@ public class PicDirImages {
 
 		_canvasImageSizeIndicator = new ImageSizeIndicator(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
-				.hint(16, 16)
+				.hint(IMAGE_INDICATOR_SIZE, IMAGE_INDICATOR_SIZE)
 				.align(SWT.CENTER, SWT.CENTER)
 				.applyTo(_canvasImageSizeIndicator);
 
@@ -831,7 +833,7 @@ public class PicDirImages {
 		GridDataFactory.fillDefaults()//
 //				.grab(true, false)
 				.align(SWT.FILL, SWT.CENTER)
-				.hint(MAX_FILTER_PROGRESS_BAR, SWT.DEFAULT)
+				.hint(MAX_FILTER_PROGRESS_BAR, IMAGE_INDICATOR_SIZE)
 				.applyTo(_progbarFilter);
 		_progbarFilter.setMinimum(0);
 		_progbarFilter.setMaximum(MAX_FILTER_PROGRESS_BAR);
@@ -858,9 +860,9 @@ public class PicDirImages {
 
 			public void handleEvent(final Event event) {
 
-				PhotoManager.stopImageLoading(false);
+				PhotoLoadManager.stopImageLoading(false);
 
-				updateUIAfterZoomInOut(event.width);
+				updateUI_AfterZoomInOut(event.width);
 			}
 		});
 
@@ -868,6 +870,7 @@ public class PicDirImages {
 		 * set photo renderer
 		 */
 		_photoRenderer = new PhotoRenderer(_gallery, this);
+
 		_gallery.setItemRenderer(_photoRenderer);
 	}
 
@@ -888,6 +891,22 @@ public class PicDirImages {
 		}
 	}
 
+	private void createUI_40_PageFolderInfo(final PageBook parent) {
+
+		_pageFolderInfo = new Composite(parent, SWT.NONE);
+//		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults()//
+				.numColumns(1)
+				.margins(5, 5)
+				.applyTo(_pageFolderInfo);
+		{
+			_lblFolderInfo = new Label(_pageFolderInfo, SWT.WRAP);
+			GridDataFactory.fillDefaults()//
+					.grab(true, false)
+					.applyTo(_lblFolderInfo);
+		}
+	}
+
 	private void createUI_50_StatusLine(final Composite parent) {
 
 		_containerStatusLine = new Composite(parent, SWT.NONE);
@@ -905,7 +924,7 @@ public class PicDirImages {
 	}
 
 	private void disposeAllImages() {
-		PhotoManager.stopImageLoading(true);
+		PhotoLoadManager.stopImageLoading(true);
 		ThumbnailStore.cleanupStoreFiles(true, true);
 		PhotoImageCache.dispose();
 	}
@@ -979,22 +998,11 @@ public class PicDirImages {
 
 				final int gpsState = photoWrapper.gpsState;
 
-				if (_isFilterInitialStart && gpsState == -1) {
+				if (_isFilterInInitialStart && gpsState == -1) {
 
-					/*
-					 * image is not yet loaded, it must be loaded to get the gps state
-					 */
+					// image is not yet loaded, it must be loaded to get the gps state
 
-					Photo photo = photoWrapper.photo;
-
-					// photo is not yet set
-					if (photoWrapper.photo == null) {
-
-						// create photo which is used to draw the photo image
-						photoWrapper.photo = photo = new Photo(photoWrapper);
-					}
-
-					PhotoManager.putImageInExifLoadingQueue(photo, new LoadExifCallback());
+					putImageInExifLoadingQueue(photoWrapper);
 
 				} else {
 
@@ -1016,7 +1024,7 @@ public class PicDirImages {
 						}
 					}
 
-					if (_isFilterInitialStart) {
+					if (_isFilterInInitialStart) {
 						_filterProgessBarMax--;
 					}
 				}
@@ -1029,29 +1037,48 @@ public class PicDirImages {
 
 		} else {
 
-			// a filter is not set, display all
+			// a filter is not set, display all images but load exif data
 
-			newFilteredWrapper = _allPhotoWrapper;
-		}
+			newFilteredWrapper = Arrays.copyOf(_allPhotoWrapper, _allPhotoWrapper.length);
 
-		if (newFilteredWrapper != null) {
+			// loop: all photos
+			for (final PhotoWrapper photoWrapper : _allPhotoWrapper) {
 
-			// check sorting
-			if (_initialSorting != _currentSorting) {
+				if (_filterJobIsCanceled) {
+					return;
+				}
 
-				/*
-				 * wrapper must be sorted because sorting is different than the initial sorting,
-				 * this will sort only the filtered gallery items
-				 */
+				final int gpsState = photoWrapper.gpsState;
 
-				Arrays.sort(newFilteredWrapper, getCurrentComparator());
+				if (_isFilterInInitialStart && gpsState == -1) {
+
+					// image is not yet loaded, it must be loaded to get the gps state
+					putImageInExifLoadingQueue(photoWrapper);
+
+				} else {
+
+					if (_isFilterInInitialStart) {
+						_filterProgessBarMax--;
+					}
+				}
 			}
-
-			updateUIGalleryItems(newFilteredWrapper);
 		}
 
-		// reset state
-		_isFilterInitialStart = false;
+		// check sorting
+		if (_initialSorting != _currentSorting) {
+
+			/*
+			 * wrapper must be sorted because sorting is different than the initial sorting, this
+			 * will sort only the filtered gallery items
+			 */
+
+			Arrays.sort(newFilteredWrapper, getCurrentComparator());
+		}
+
+		updateUI_GalleryItems(newFilteredWrapper);
+
+		// reset state after UI update !!!
+		_isFilterInInitialStart = false;
 
 		if (_filterJobDirtyCounter > currentDirtyCounter) {
 
@@ -1073,7 +1100,7 @@ public class PicDirImages {
 				// filter must be stopped before new wrappers are set
 				filterJob_70_Stop();
 
-				_isFilterInitialStart = true;
+				_isFilterInInitialStart = true;
 				_sortedAndFilteredPhotoWrapper = new PhotoWrapper[0];
 
 				_filterProgessBarLoaded = 0;
@@ -1086,7 +1113,7 @@ public class PicDirImages {
 							return;
 						}
 
-//						_progbarFilter.setEnabled(true);
+						// initialize filter progressbar
 						_progbarFilter.setSelection(0);
 					}
 				});
@@ -1212,7 +1239,9 @@ public class PicDirImages {
 
 		} else if (property.equals(ITourbookPreferences.PHOTO_VIEWER_PREF_EVENT_IMAGE_VIEWER_UI_IS_MODIFIED)) {
 
-			updateUIFromPrefStore();
+			updateUI_FromPrefStore();
+
+			updateUI_AfterZoomInOut(_prevGalleryItemSize);
 
 		} else if (property.equals(ITourbookPreferences.PHOTO_VIEWER_FONT)) {
 
@@ -1234,7 +1263,7 @@ public class PicDirImages {
 			_galleryFont.dispose();
 		}
 
-		PhotoManager.stopImageLoading(true);
+		PhotoLoadManager.stopImageLoading(true);
 
 		//////////////////////////////////////////
 		//
@@ -1283,21 +1312,21 @@ public class PicDirImages {
 		});
 	}
 
-	private void onSelectThumbnailSize(final int newThumbSize) {
+	private void onSelectThumbnailSize(final int newImageSize) {
 
-		if (newThumbSize == _prevThumbSize) {
+		int newGalleryItemSize = newImageSize + _photoBorderSize;
+
+		if (newGalleryItemSize == _prevGalleryItemSize) {
 			// nothing has changed
 			return;
 		}
 
 		final double galleryWidth = _gallery.getClientArea().width;
-		final int prevPhotoWidth = _gallery.getItemWidth();
+		final int prevGalleryItemSize = _gallery.getItemWidth();
 
 		final int prevNumberOfImages = _gallery.getNumberOfHorizontalImages();
 
-		int newPhotoWidth = newThumbSize;
-
-		if (newThumbSize > _prevThumbSize) {
+		if (newGalleryItemSize > _prevGalleryItemSize) {
 
 			if (prevNumberOfImages > 2) {
 
@@ -1305,34 +1334,32 @@ public class PicDirImages {
 
 				int numberOfImages = prevNumberOfImages - 1;
 
-				newPhotoWidth = (int) (galleryWidth / numberOfImages);
+				newGalleryItemSize = (int) (galleryWidth / numberOfImages);
 
-				if (newPhotoWidth == prevPhotoWidth) {
+				if (newGalleryItemSize == prevGalleryItemSize) {
 
 					// size has not changed, decrease number of images until the width has changed
 
-					while (newPhotoWidth == prevPhotoWidth) {
+					while (newGalleryItemSize == prevGalleryItemSize) {
 
 						if (numberOfImages < 3) {
 							break;
 						}
 
-						newPhotoWidth = (int) (galleryWidth / --numberOfImages);
+						newGalleryItemSize = (int) (galleryWidth / --numberOfImages);
 					}
 				}
 
 			} else {
 
-				// number of photos is already 1, only increase photo width
-
-				newPhotoWidth = newThumbSize;
+				// number of photos is already 1, only increase photo width -> this is already set
 			}
 
 		} else {
 
 			// decreased width -> more images
 
-			final double tempImageCounter = galleryWidth / newThumbSize;
+			final double tempImageCounter = galleryWidth / newGalleryItemSize;
 
 			/*
 			 * size by number of images only, when more than 2 images are displayed, otherwise size
@@ -1344,12 +1371,12 @@ public class PicDirImages {
 
 				final int newTempPhotoWidth = (int) (galleryWidth / numberOfImages);
 				if (newTempPhotoWidth > MIN_ITEM_WIDTH) {
-					newPhotoWidth = newTempPhotoWidth;
+					newGalleryItemSize = newTempPhotoWidth;
 				}
 			}
 		}
 
-		if (newPhotoWidth == prevPhotoWidth) {
+		if (newGalleryItemSize == prevGalleryItemSize) {
 			// nothing has changed
 			return;
 		}
@@ -1358,21 +1385,38 @@ public class PicDirImages {
 		 * update UI with new size
 		 */
 
-		PhotoManager.stopImageLoading(false);
+		PhotoLoadManager.stopImageLoading(false);
 
 		// update gallery
-		final int newSize = _gallery.setItemSize(newPhotoWidth);
-		if (newSize != newPhotoWidth) {
+		final int adjustedSize = _gallery.setItemSize(newGalleryItemSize);
+		if (adjustedSize != newGalleryItemSize) {
 
 			/*
 			 * size has been modified, this case can occure when the gallery is switching the
 			 * scrollbars on/off depending on the content
 			 */
 
-			newPhotoWidth = newSize;
+			newGalleryItemSize = adjustedSize;
 		}
 
-		updateUIAfterZoomInOut(newPhotoWidth);
+		updateUI_AfterZoomInOut(newGalleryItemSize);
+	}
+
+	/**
+	 * Get gps state and exif data
+	 */
+	private void putImageInExifLoadingQueue(final PhotoWrapper photoWrapper) {
+
+		Photo photo = photoWrapper.photo;
+
+		// photo is not yet set
+		if (photoWrapper.photo == null) {
+
+			// create photo which is used to draw the photo image
+			photoWrapper.photo = photo = new Photo(photoWrapper);
+		}
+
+		PhotoLoadManager.putImageInExifLoadingQueue(photo, new LoadExifCallback());
 	}
 
 	private void removeInvalidFolder(final String invalidFolderPathName) {
@@ -1401,6 +1445,42 @@ public class PicDirImages {
 
 		// display previously successfully loaded folder
 		_comboPathHistory.setText(_photoFolder.getAbsolutePath());
+	}
+
+	/**
+	 * Checks all folders in the history and removes all folders which are not available any more.
+	 */
+	private void removeInvalidFolders() {
+
+		final ArrayList<String> invalidFolders = new ArrayList<String>();
+		final ArrayList<Integer> invalidFolderIndexes = new ArrayList<Integer>();
+
+		int folderIndex = 0;
+
+		for (final String historyFolder : _folderHistory) {
+
+			final File folder = new File(historyFolder);
+			if (folder.isDirectory() == false) {
+				invalidFolders.add(historyFolder);
+				invalidFolderIndexes.add(folderIndex);
+			}
+
+			folderIndex++;
+		}
+
+		if (invalidFolders.size() == 0) {
+			// nothing to do
+			return;
+		}
+
+		_folderHistory.removeAll(invalidFolders);
+
+		final Integer[] invalidIndexes = invalidFolderIndexes.toArray(new Integer[invalidFolderIndexes.size()]);
+
+		// remove from the end that the index numbers do not disappear
+		for (int index = invalidIndexes.length - 1; index >= 0; index--) {
+			_comboPathHistory.remove(invalidIndexes[index]);
+		}
 	}
 
 //	/**
@@ -1459,42 +1539,6 @@ public class PicDirImages {
 //		_gallery.setSortedItems(sortedGalleryItems);
 //	}
 
-	/**
-	 * Checks all folders in the history and removes all folders which are not available any more.
-	 */
-	private void removeInvalidFolders() {
-
-		final ArrayList<String> invalidFolders = new ArrayList<String>();
-		final ArrayList<Integer> invalidFolderIndexes = new ArrayList<Integer>();
-
-		int folderIndex = 0;
-
-		for (final String historyFolder : _folderHistory) {
-
-			final File folder = new File(historyFolder);
-			if (folder.isDirectory() == false) {
-				invalidFolders.add(historyFolder);
-				invalidFolderIndexes.add(folderIndex);
-			}
-
-			folderIndex++;
-		}
-
-		if (invalidFolders.size() == 0) {
-			// nothing to do
-			return;
-		}
-
-		_folderHistory.removeAll(invalidFolders);
-
-		final Integer[] invalidIndexes = invalidFolderIndexes.toArray(new Integer[invalidFolderIndexes.size()]);
-
-		// remove from the end that the index numbers do not disappear
-		for (int index = invalidIndexes.length - 1; index >= 0; index--) {
-			_comboPathHistory.remove(invalidIndexes[index]);
-		}
-	}
-
 	void restoreState(final IDialogSettings state) {
 
 		/*
@@ -1527,15 +1571,18 @@ public class PicDirImages {
 		/*
 		 * image quality
 		 */
-		updateUIFromPrefStore();
+		updateUI_FromPrefStore();
 
 		/*
 		 * thumbnail size
 		 */
-		final int stateThumbSize = Util.getStateInt(state, STATE_THUMB_IMAGE_SIZE, PhotoManager.IMAGE_SIZE_THUMBNAIL);
+		final int stateThumbSize = Util.getStateInt(
+				state,
+				STATE_THUMB_IMAGE_SIZE,
+				PhotoLoadManager.IMAGE_SIZE_THUMBNAIL);
 		_spinnerThumbSize.setSelection(stateThumbSize);
 
-		// restore thumbnail size
+		// restore thumbnail image size
 		onSelectThumbnailSize(stateThumbSize);
 
 		/*
@@ -1569,7 +1616,7 @@ public class PicDirImages {
 
 		state.put(STATE_FOLDER_HISTORY, _folderHistory.toArray(new String[_folderHistory.size()]));
 
-		state.put(STATE_THUMB_IMAGE_SIZE, _spinnerThumbSize.getSelection());
+		state.put(STATE_THUMB_IMAGE_SIZE, _photoImageSize);
 
 		state.put(STATE_IMAGE_SORTING, _currentSorting.name());
 
@@ -1609,7 +1656,7 @@ public class PicDirImages {
 	 */
 	void showImages(final File imageFolder, final boolean isFromNavigationHistory, final boolean isReloadFolder) {
 
-		PhotoManager.stopImageLoading(true);
+		PhotoLoadManager.stopImageLoading(true);
 
 		//////////////////////////////////////////
 		//
@@ -1691,7 +1738,7 @@ public class PicDirImages {
 		// sort photos with new sorting algorithm
 		Arrays.sort(_sortedAndFilteredPhotoWrapper, getCurrentComparator());
 
-		updateUIGalleryItems(_sortedAndFilteredPhotoWrapper);
+		updateUI_GalleryItems(_sortedAndFilteredPhotoWrapper);
 	}
 
 	void updateColors(final Color fgColor, final Color bgColor, final Color selectionFgColor) {
@@ -1723,6 +1770,8 @@ public class PicDirImages {
 		 */
 		_gallery.setForeground(fgColor);
 		_gallery.setBackground(bgColor);
+//		_gallery.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+//		_gallery.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
 		_photoRenderer.setColors(fgColor, bgColor, selectionFgColor);
 
@@ -1742,6 +1791,14 @@ public class PicDirImages {
 		 */
 		_lblLoading.setForeground(fgColor);
 		_lblLoading.setBackground(bgColor);
+
+		/*
+		 * page: folder info
+		 */
+		_pageFolderInfo.setForeground(fgColor);
+		_pageFolderInfo.setBackground(bgColor);
+		_lblFolderInfo.setForeground(fgColor);
+		_lblFolderInfo.setBackground(bgColor);
 	}
 
 	private void updateHistory(final String newFolderPathName) {
@@ -1799,18 +1856,68 @@ public class PicDirImages {
 		_actionRemoveInvalidFoldersFromHistory.setEnabled(historySize > 1);
 	}
 
-	private void updateUIAfterZoomInOut(final int newPhotoWidth) {
+	private void updateUI_AfterZoomInOut(final int galleryItemSize) {
 
-		_spinnerThumbSize.setSelection(newPhotoWidth);
-		_prevThumbSize = newPhotoWidth;
+		final int imageSize = galleryItemSize - _photoBorderSize;
 
-		final boolean isHqImage = newPhotoWidth > PhotoManager.IMAGE_SIZE_THUMBNAIL;
-		_canvasImageSizeIndicator.setIndicator(isHqImage);
+		if (imageSize != _photoImageSize) {
 
-		_picDirView.setThumbnailSize(newPhotoWidth);
+			// image size has changed
+
+			_photoImageSize = imageSize;
+
+			_spinnerThumbSize.setSelection(imageSize);
+			_prevGalleryItemSize = galleryItemSize;
+
+			final boolean isHqImage = imageSize > PhotoLoadManager.IMAGE_SIZE_THUMBNAIL;
+			_canvasImageSizeIndicator.setIndicator(isHqImage);
+
+			_picDirView.setThumbnailSize(imageSize);
+		}
 	}
 
-	private void updateUIFromPrefStore() {
+	private void updateUI_FolderInfo() {
+
+		_display.syncExec(new Runnable() {
+			public void run() {
+
+				if (_gallery.isDisposed()) {
+					return;
+				}
+
+				final int imageCount = _allPhotoWrapper.length;
+
+				if (imageCount == 0) {
+
+					_lblFolderInfo.setText("No images in this folder");
+
+				} else {
+
+					if (_isFilterInInitialStart) {
+
+						_lblFolderInfo.setText("Filtering images");
+
+					} else {
+
+						if (_sortedAndFilteredPhotoWrapper.length == 0) {
+
+							if (imageCount == 1) {
+								_lblFolderInfo.setText("1 image is hidden by the image filter");
+							} else {
+								_lblFolderInfo.setText(NLS
+										.bind("{0} images are hidden by the image filter", imageCount));
+							}
+
+						} else {
+							// this case should not happen, the gallery is displayed
+						}
+					}
+				}
+			}
+		});
+	}
+
+	private void updateUI_FromPrefStore() {
 
 		/*
 		 * image quality
@@ -1828,12 +1935,18 @@ public class PicDirImages {
 		 */
 		final int textMinThumbSize = _prefStore.getInt(ITourbookPreferences.PHOTO_VIEWER_TEXT_MIN_THUMB_SIZE);
 		_photoRenderer.setTextMinThumbSize(textMinThumbSize);
+
+		final int imageBorderSize = _prefStore.getInt(ITourbookPreferences.PHOTO_VIEWER_IMAGE_BORDER_SIZE);
+		_photoRenderer.setImageBorderSize(imageBorderSize);
+
+		// get update border size
+		_photoBorderSize = _photoRenderer.getBorderSize();
 	}
 
 	/*
 	 * set gallery items into a list according to the new sorting/filtering
 	 */
-	private void updateUIGalleryItems(final PhotoWrapper[] filteredAndSortedWrapper) {
+	private void updateUI_GalleryItems(final PhotoWrapper[] filteredAndSortedWrapper) {
 
 		final HashMap<String, GalleryMT20Item> existingGalleryItems = _gallery.getCreatedGalleryItems();
 
@@ -1855,15 +1968,26 @@ public class PicDirImages {
 
 		_sortedAndFilteredPhotoWrapper = filteredAndSortedWrapper;
 
-		Display.getDefault().syncExec(new Runnable() {
+		_display.syncExec(new Runnable() {
 			public void run() {
 
 				if (_gallery.isDisposed()) {
 					return;
 				}
 
-				// update gallery
-				_gallery.setVirtualItems(sortedGalleryItems);
+				if (sortedGalleryItems.length > 0) {
+
+					_pageBook.showPage(_gallery);
+
+					// update gallery
+					_gallery.setVirtualItems(sortedGalleryItems);
+
+				} else {
+
+					_pageBook.showPage(_pageFolderInfo);
+
+					updateUI_FolderInfo();
+				}
 			}
 		});
 	}
@@ -1937,24 +2061,6 @@ public class PicDirImages {
 
 			_allPhotoWrapper = newPhotoWrapper;
 
-			final int allPhotoSize;
-			boolean isFilterUsed = false;
-
-			if (_currentImageFilter == ImageFilter.NoFilter) {
-
-				// display all photos
-
-				allPhotoSize = newPhotoWrapper.length;
-				_sortedAndFilteredPhotoWrapper = Arrays.copyOf(newPhotoWrapper, numberOfImages);
-
-			} else {
-
-				// initially display no photos until the filter is run
-
-				allPhotoSize = 0;
-				isFilterUsed = true;
-			}
-
 			_display.syncExec(new Runnable() {
 				public void run() {
 
@@ -1974,7 +2080,7 @@ public class PicDirImages {
 					/*
 					 * initialize and update gallery with new items
 					 */
-					_gallery.setupItems(allPhotoSize, oldPosition);
+					_gallery.setupItems(0, oldPosition);
 
 					/*
 					 * update status info
@@ -1985,17 +2091,14 @@ public class PicDirImages {
 							new Object[] { Long.toString(timeDiff), Integer.toString(_allPhotoWrapper.length) });
 
 					_lblStatusInfo.setText(timeDiffText);
-
-					_pageBook.showPage(_gallery);
 				}
 			});
 
-			if (isFilterUsed) {
-
-				// filter job must be run
-
-				filterJob_50_StartInitial();
-			}
+			/*
+			 * start filter always, even when no filter is set because it is loading exif data which
+			 * is used to sort images correctly by exif date (when available) and not by file date
+			 */
+			filterJob_50_StartInitial();
 		}
 	}
 
