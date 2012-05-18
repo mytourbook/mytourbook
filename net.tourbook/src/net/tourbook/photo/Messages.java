@@ -9,6 +9,8 @@ public class Messages extends NLS {
 	public static String		App_JobName_FilteringGalleryImages;
 	public static String		App_JobName_RetrievingFolderImageFiles;
 
+	public static String	App_JobName_UpdateUIWithFilteredGalleryImages;
+
 	public static String		App_Unit_Pixel;
 
 	public static String		ColumnFactory_Photo_Altitude;
@@ -124,14 +126,10 @@ public class Messages extends NLS {
 	public static String		PrefPage_Photo_Viewer_Label_HQThumbnailSize;
 	public static String		PrefPage_Photo_Viewer_Label_HQThumbnailSize_Tooltip;
 	public static String		PrefPage_Photo_Viewer_Label_ImageFramework;
-	public static String	PrefPage_Photo_Viewer_Label_MinSizeBorder;
-
-	public static String	PrefPage_Photo_Viewer_Label_MinSizeBorder_Tooltip;
-
-	public static String	PrefPage_Photo_Viewer_Label_MinSizeText;
-
-	public static String	PrefPage_Photo_Viewer_Label_MinSizeText_Tooltip;
-
+	public static String		PrefPage_Photo_Viewer_Label_MinSizeBorder;
+	public static String		PrefPage_Photo_Viewer_Label_MinSizeBorder_Tooltip;
+	public static String		PrefPage_Photo_Viewer_Label_MinSizeText;
+	public static String		PrefPage_Photo_Viewer_Label_MinSizeText_Tooltip;
 	public static String		PrefPage_Photo_Viewer_Label_ResizeImageQuality;
 	public static String		PrefPage_Photo_Viewer_Label_ResizeImageQuality_Tooltip;
 	public static String		PrefPage_Photo_Viewer_Label_SelectionForegroundColor;

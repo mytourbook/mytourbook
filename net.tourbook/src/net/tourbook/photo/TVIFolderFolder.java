@@ -32,14 +32,16 @@ public class TVIFolderFolder extends TVIFolder {
 	/**
 	 * Number of folder in this folder
 	 */
-	int							_folderCounter;
+	private int					_folderCounter;
 
 	/**
 	 * Number of files in this folder
 	 */
-	int							_fileCounter;
+	private int					_fileCounter;
 
 	private boolean				_isFolderChecked;
+
+//	private static int			_allCounter;
 
 	private final FileFilter	_folderFilter;
 	{
@@ -60,14 +62,29 @@ public class TVIFolderFolder extends TVIFolder {
 					_fileCounter++;
 				}
 
+//				_allCounter++;
+//
+//				// update UI that files are retrieved from the filesystem
+//				if (_allCounter % 500 == 0) {
+//
+////					System.out.println(NLS.bind("Retrieving... {0}  Folder: {1}  Files: {2}", //
+////							new Object[] { _folderName, _folderCounter, _fileCounter }));
+////					// TODO remove SYSTEM.OUT.PRINTLN
+//
+////					_picDirFolder.updateUI_RetrievedFileFolder(_folderName, _folderCounter, _fileCounter);
+//				}
+
 				return false;
 			}
 		};
 	}
 
-	public TVIFolderFolder(final TreeViewer tagViewer, final File folder, final boolean isRootFolder) {
+	public TVIFolderFolder(	final PicDirFolder picDirFolder,
+							final TreeViewer folderViewer,
+							final File folder,
+							final boolean isRootFolder) {
 
-		super(tagViewer);
+		super(picDirFolder, folderViewer);
 
 		_treeItemFolder = folder;
 
@@ -102,7 +119,7 @@ public class TVIFolderFolder extends TVIFolder {
 			PicDirView.sortFiles(_folderChildren);
 
 			for (final File childFolder : _folderChildren) {
-				addChild(new TVIFolderFolder(_folderViewer, childFolder, false));
+				addChild(new TVIFolderFolder(_picDirFolder, _folderViewer, childFolder, false));
 			}
 		}
 	}

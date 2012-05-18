@@ -20,3 +20,4 @@ Bugfix
 ------
 
 - gpx export: enclose <time> and <bounds> with <metadata>, provided by markxy (sourceforge user)
+- OS X + Apple mouse: create marker/reference tour in the tour chart with the "right" mouse button

@@ -19,6 +19,7 @@ import java.awt.Point;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import net.tourbook.util.StatusUtil;
 import net.tourbook.util.Util;
 
 import org.apache.commons.sanselan.Sanselan;
@@ -32,6 +33,7 @@ import org.apache.commons.sanselan.formats.tiff.constants.GpsTagConstants;
 import org.apache.commons.sanselan.formats.tiff.constants.TiffTagConstants;
 import org.apache.commons.sanselan.formats.tiff.taginfos.TagInfo;
 import org.apache.commons.sanselan.formats.tiff.taginfos.TagInfoShortOrLong;
+import org.eclipse.osgi.util.NLS;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -435,10 +437,6 @@ public class Photo {
 		return _imageFileDateTime;
 	}
 
-//	public File getImageFile() {
-//		return _imageFile;
-//	}
-
 	/**
 	 * @return Returns an image key which can be used to get images from an image cache. This key is
 	 *         a MD5 hash from the full image file path and the image quality.
@@ -446,20 +444,6 @@ public class Photo {
 	public String getImageKey(final ImageQuality imageQuality) {
 		return imageQuality == ImageQuality.HQ ? _imageKeyHQ : _imageKeyThumb;
 	}
-
-//	/**
-//	 * @return Returns photo image file name without path
-//	 */
-//	public String getImageFileName() {
-//		return _imageFileName;
-//	}
-
-//	/**
-//	 * @return Returns the absolute pathname for the fullsize image
-//	 */
-//	public String getImageFilePathName() {
-//		return _imageFilePathName;
-//	}
 
 	/**
 	 * Updates metadata from image file.
@@ -507,9 +491,9 @@ public class Photo {
 
 		} catch (final Exception e) {
 // must be logged in another way
-//			StatusUtil.log(NLS.bind(//
-//					"Cannot read metadata from image \"{0}\"",
-//					getFilePathName()), e);
+			StatusUtil.log(NLS.bind(//
+					"Could not read metadata from image \"{0}\"",
+					_photoWrapper.imageFile));
 		} finally {
 
 			_photoImageMetadata = createPhotoMetadata(imageFileMetadata);

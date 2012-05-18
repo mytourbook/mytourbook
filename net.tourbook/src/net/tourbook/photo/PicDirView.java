@@ -46,15 +46,12 @@ public class PicDirView extends ViewPart {
 
 	static public final String				ID											= "net.tourbook.photo.PicDirView";				//$NON-NLS-1$
 
-//	static final int						GALLERY_SORTING_BY_DATE						= 0;
-//	static final int						GALLERY_SORTING_BY_NAME						= 1;
-
 	private static final String				STATE_TREE_WIDTH							= "STATE_TREE_WIDTH";							//$NON-NLS-1$
 	private static final String				STATE_GALLERY_SORTING						= "STATE_GALLERY_SORTING";						//$NON-NLS-1$
 	private static final String				STATE_IMAGE_FILTER							= "STATE_IMAGE_FILTER";						//$NON-NLS-1$
 	private static final String				STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY			= "STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY";		//$NON-NLS-1$
-	private static final String				STATE_IS_SHOW_PHOTO_DATE_IN_GALLERY			= "STATE_IS_SHOW_PHOTO_DATE_IN_GALLERY";		//$NON-NLS-1$
 	private static final String				STATE_IS_SHOW_PHOTO_ANNOTATIONS_IN_GALLERY	= "STATE_IS_SHOW_PHOTO_ANNOTATIONS_IN_GALLERY"; //$NON-NLS-1$
+	private static final String				STATE_PHOTO_INFO_DATE						= "STATE_PHOTO_INFO_DATE";						//$NON-NLS-1$
 
 	static final String						IMAGE_PHOTO_FILTER_NO_FILTER				= "IMAGE_PHOTO_FILTER_NO_FILTER";				//$NON-NLS-1$
 	static final String						IMAGE_PHOTO_FILTER_GPS						= "IMAGE_PHOTO_FILTER_GPS";					//$NON-NLS-1$
@@ -105,6 +102,8 @@ public class PicDirView extends ViewPart {
 
 	private int								_thumbnailSize;
 	private int								_textMinThumbSize;
+
+	private PhotoDateInfo					_photoDateInfo;
 
 	static int compareFiles(final File file1, final File file2) {
 
@@ -216,15 +215,47 @@ public class PicDirView extends ViewPart {
 
 		// update gallery
 
-		_picDirImages.filterGallery(_currentImageFilter, true);
+		_picDirImages.filterGallery(_currentImageFilter);
 	}
 
-	void actionShowPhotoInfo() {
+	void actionShowPhotoInfo(final Action action) {
+
+		if (action == _actionShowPhotoDate) {
+
+			// toggle date info
+
+			if (_photoDateInfo == PhotoDateInfo.NoDateTime) {
+
+				// nothing -> date
+
+				_photoDateInfo = PhotoDateInfo.Date;
+
+			} else if (_photoDateInfo == PhotoDateInfo.Date) {
+
+				// date -> time
+
+				_photoDateInfo = PhotoDateInfo.Time;
+
+			} else if (_photoDateInfo == PhotoDateInfo.Time) {
+
+				// time -> date/time
+
+				_photoDateInfo = PhotoDateInfo.DateTime;
+
+			} else {
+
+				// time -> nothing
+
+				_photoDateInfo = PhotoDateInfo.NoDateTime;
+			}
+
+			_actionShowPhotoDate.setChecked(_photoDateInfo != PhotoDateInfo.NoDateTime);
+		}
+
 		_picDirImages.showInfo(
 				_actionShowPhotoName.isChecked(),
-				_actionShowPhotoDate.isChecked(),
-				_actionShowPhotoAnnotations.isChecked(),
-				true);
+				_photoDateInfo,
+				_actionShowPhotoAnnotations.isChecked());
 	}
 
 	void actionSortByDate() {
@@ -239,7 +270,7 @@ public class PicDirView extends ViewPart {
 			_actionSortByFileName.setChecked(true);
 		}
 
-		sortGallery();
+		_picDirImages.sortGallery(_gallerySorting);
 	}
 
 	void actionSortByName() {
@@ -254,7 +285,7 @@ public class PicDirView extends ViewPart {
 			_actionSortFileByDate.setChecked(true);
 		}
 
-		sortGallery();
+		_picDirImages.sortGallery(_gallerySorting);
 	}
 
 	private void addPartListener() {
@@ -451,16 +482,23 @@ public class PicDirView extends ViewPart {
 		/*
 		 * photo info
 		 */
+		final String prefDateInfo = Util.getStateString(_state, STATE_PHOTO_INFO_DATE, PhotoDateInfo.Date.name());
+		try {
+			_photoDateInfo = PhotoDateInfo.valueOf(prefDateInfo);
+		} catch (final Exception e) {
+			_photoDateInfo = PhotoDateInfo.DateTime;
+		}
+
 		final boolean isShowPhotoName = Util.getStateBoolean(_state, STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY, true);
-		final boolean isShowPhotoDate = Util.getStateBoolean(_state, STATE_IS_SHOW_PHOTO_DATE_IN_GALLERY, false);
 		final boolean isShowPhotoAnnotations = Util.getStateBoolean(_state, //
 				STATE_IS_SHOW_PHOTO_ANNOTATIONS_IN_GALLERY,
 				true);
 
 		_actionShowPhotoName.setChecked(isShowPhotoName);
-		_actionShowPhotoDate.setChecked(isShowPhotoDate);
+		_actionShowPhotoDate.setChecked(_photoDateInfo != PhotoDateInfo.NoDateTime);
 		_actionShowPhotoAnnotations.setChecked(isShowPhotoAnnotations);
-		_picDirImages.showInfo(isShowPhotoName, isShowPhotoDate, isShowPhotoAnnotations, false);
+
+		_picDirImages.setInfo(isShowPhotoName, _photoDateInfo, isShowPhotoAnnotations);
 
 		/*
 		 * gallery sorting
@@ -474,8 +512,8 @@ public class PicDirView extends ViewPart {
 		_actionSortFileByDate.setChecked(_gallerySorting == GallerySorting.FILE_DATE);
 		_actionSortByFileName.setChecked(_gallerySorting == GallerySorting.FILE_NAME);
 
-		_picDirImages.sortGallery(_gallerySorting, false);
-		_picDirImages.filterGallery(_currentImageFilter, false);
+		_picDirImages.setSorting(_gallerySorting);
+		_picDirImages.setFilter(_currentImageFilter);
 
 		/*
 		 * image restore must be done BEFORE folder restore because folder restore is also loading
@@ -488,7 +526,7 @@ public class PicDirView extends ViewPart {
 		_picDirFolder.restoreState(_state);
 
 		/*
-		 * thumbnail size enables/disables actions
+		 * the thumbnail size enables/disables actions
 		 */
 		_thumbnailSize = _picDirImages.getThumbnailSize();
 		_textMinThumbSize = _prefStore.getInt(ITourbookPreferences.PHOTO_VIEWER_TEXT_MIN_THUMB_SIZE);
@@ -504,11 +542,6 @@ public class PicDirView extends ViewPart {
 		}
 
 		/*
-		 * image filter
-		 */
-		_state.put(STATE_IMAGE_FILTER, _currentImageFilter.name());
-
-		/*
 		 * gallery sorting
 		 */
 		_state.put(STATE_GALLERY_SORTING, _actionSortFileByDate.isChecked()
@@ -522,8 +555,10 @@ public class PicDirView extends ViewPart {
 		}
 
 		_state.put(STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY, _actionShowPhotoName.isChecked());
-		_state.put(STATE_IS_SHOW_PHOTO_DATE_IN_GALLERY, _actionShowPhotoDate.isChecked());
 		_state.put(STATE_IS_SHOW_PHOTO_ANNOTATIONS_IN_GALLERY, _actionShowPhotoAnnotations.isChecked());
+
+		_state.put(STATE_PHOTO_INFO_DATE, _photoDateInfo.name());
+		_state.put(STATE_IMAGE_FILTER, _currentImageFilter.name());
 
 		_picDirFolder.saveState(_state);
 		_picDirImages.saveState(_state);
@@ -539,10 +574,6 @@ public class PicDirView extends ViewPart {
 		_thumbnailSize = photoWidth;
 
 		enableActions();
-	}
-
-	private void sortGallery() {
-		_picDirImages.sortGallery(_gallerySorting, true);
 	}
 
 	private void updateFromPrefStore() {

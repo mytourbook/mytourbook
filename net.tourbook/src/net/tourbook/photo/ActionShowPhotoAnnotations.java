@@ -36,6 +36,6 @@ public class ActionShowPhotoAnnotations extends Action {
 
 	@Override
 	public void run() {
-		_picDirView.actionShowPhotoInfo();
+		_picDirView.actionShowPhotoInfo(this);
 	}
 }

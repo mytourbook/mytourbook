@@ -26,14 +26,17 @@ import net.tourbook.util.StatusUtil;
 import net.tourbook.util.Util;
 
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.TreeColumnLayout;
@@ -71,6 +74,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.dialogs.PreferencesUtil;
+import org.eclipse.ui.progress.UIJob;
 
 /**
  * This folder viewer is from org.eclipse.swt.examples.fileviewer but with many modifications.
@@ -88,6 +92,7 @@ class PicDirFolder {
 	private final IPreferenceStore				_prefStore								= TourbookPlugin.getDefault() //
 																								.getPreferenceStore();
 
+//	private PicDirView							_picDirView;
 	private PicDirImages						_picDirImages;
 
 	private long								_expandRunnableCounter;
@@ -513,7 +518,7 @@ class PicDirFolder {
 		_selectedFolder = selectedFolder;
 		_selectedTVIFolder = tviFolder;
 
-		// display imaged for the selected folder
+		// display images for the selected folder
 		_picDirImages.showImages(selectedFolder, isFromNavigationHistory, isReloadFolder);
 	}
 
@@ -669,7 +674,7 @@ class PicDirFolder {
 
 		} else if (property.equals(ITourbookPreferences.PHOTO_VIEWER_PREF_EVENT_IMAGE_VIEWER_UI_IS_MODIFIED)) {
 
-			updateColors();
+			updateColors(false);
 
 			isViewerRefresh = true;
 		}
@@ -852,12 +857,14 @@ class PicDirFolder {
 			public void run() {
 
 				// set root item
-				_rootItem = new TVIFolderRoot(_folderViewer, getRootsSorted());
+				_rootItem = new TVIFolderRoot(PicDirFolder.this, _folderViewer, getRootsSorted());
 
 				_folderViewer.setInput(new Object());
 
 				_selectedFolder = null;
 				_selectedTVIFolder = null;
+
+				_picDirImages.showRestoreFolder(restoreFolderName);
 
 				selectFolder(restoreFolderName, true, false);
 			}
@@ -875,10 +882,26 @@ class PicDirFolder {
 				false);
 		_actionSingleExpandCollapseOthers.setChecked(_isBehaviourSingleExpandCollapseOthers);
 
-		updateColors();
+		updateColors(true);
 
-		final String previousSelectedFolder = Util.getStateString(state, STATE_SELECTED_FOLDER, null);
-		restoreFolder(previousSelectedFolder);
+		/*
+		 * delay folder retrieval so that the UI can be updated immediatedly
+		 */
+		final Job folderJob = new UIJob(UI.EMPTY_STRING) {
+
+			@Override
+			public IStatus runInUIThread(final IProgressMonitor monitor) {
+
+				final String previousSelectedFolder = Util.getStateString(state, STATE_SELECTED_FOLDER, null);
+
+				restoreFolder(previousSelectedFolder);
+
+				return Status.OK_STATUS;
+			}
+		};
+
+		folderJob.setSystem(true);
+		folderJob.schedule();
 	}
 
 	void saveState(final IDialogSettings state) {
@@ -941,10 +964,7 @@ class PicDirFolder {
 
 			// restored folder is not available
 
-			MessageDialog.openInformation(
-					_display.getActiveShell(),
-					Messages.Pic_Dir_Dialog_FolderIsNotAvailable_Title,
-					NLS.bind(Messages.Pic_Dir_Dialog_FolderIsNotAvailable_Message, requestedFolderName));
+			_picDirImages.setMessage(NLS.bind("Folder is not available: {0}", requestedFolderName));
 		}
 
 		if (selectedFolder == null) {
@@ -1036,7 +1056,7 @@ class PicDirFolder {
 		return true;
 	}
 
-	private void updateColors() {
+	private void updateColors(final boolean isRestore) {
 
 		_isStateShowFileFolderInFolderItem = _prefStore.getBoolean(//
 				ITourbookPreferences.PHOTO_VIEWER_IS_SHOW_FILE_FOLDER);
@@ -1050,7 +1070,11 @@ class PicDirFolder {
 		tree.setForeground(fgColor);
 		tree.setBackground(bgColor);
 
-		_picDirImages.updateColors(fgColor, bgColor, selectionFgColor);
+		_picDirImages.updateColors(fgColor, bgColor, selectionFgColor, isRestore);
+	}
+
+	void updateUI_RetrievedFileFolder(final String folderName, final int folderCounter, final int fileCounter) {
+		_picDirImages.updateUI_RetrievedFileFolder(folderName, folderCounter, fileCounter);
 	}
 
 }

@@ -223,7 +223,7 @@ public class PhotoImageLoader {
 		 */
 		try {
 			while (waitingQueueExif.size() > 0) {
-				Thread.sleep(100);
+				Thread.sleep(50);
 			}
 		} catch (final InterruptedException e) {
 			// should not happen, I hope so
@@ -492,10 +492,10 @@ public class PhotoImageLoader {
 	 * 
 	 * @param smallImageWaitingQueue
 	 *            waiting queue for small images
-	 * @param waitingQueueExif
+	 * @param exifWaitingQueue
 	 */
 	public void loadImageHQ(final LinkedBlockingDeque<PhotoImageLoader> smallImageWaitingQueue,
-							final LinkedBlockingDeque<PhotoExifLoader> waitingQueueExif) {
+							final LinkedBlockingDeque<PhotoExifLoader> exifWaitingQueue) {
 
 		if (isImageVisible() == false) {
 			setStateUndefined();
@@ -506,8 +506,8 @@ public class PhotoImageLoader {
 		 * wait until small images are loaded
 		 */
 		try {
-			while (smallImageWaitingQueue.size() > 0 || waitingQueueExif.size() > 0) {
-				Thread.sleep(300);
+			while (smallImageWaitingQueue.size() > 0 || exifWaitingQueue.size() > 0) {
+				Thread.sleep(100);
 			}
 		} catch (final InterruptedException e) {
 			// should not happen, I hope so
@@ -544,10 +544,36 @@ public class PhotoImageLoader {
 			disposeTrackedImages();
 
 			if (hqImage == null) {
-				// must be logged in another way
+
 				System.out.println(NLS.bind(//
-						UI.timeStamp() + "Image \"{0}\" cannot be loaded",
+						UI.timeStamp() + "image == NULL when loading with " + _imageFramework + ": \"{0}\"",
 						_photo.getPhotoWrapper().imageFilePathName));
+
+				if (_imageFramework.equals(PhotoLoadManager.IMAGE_FRAMEWORK_AWT)) {
+
+					/*
+					 * AWT fails, try to load image with SWT
+					 */
+
+					try {
+
+						hqImage = loadImageHQ_10_WithSWT();
+
+					} catch (final Exception e2) {
+
+						setStateLoadingError();
+
+						isLoadingError = true;
+
+					} finally {
+
+						if (hqImage == null) {
+							System.out.println(NLS.bind(//
+									UI.timeStamp() + "image == NULL when loading with SWT: \"{0}\"",
+									_photo.getPhotoWrapper().imageFilePathName));
+						}
+					}
+				}
 			}
 
 			// update image state
@@ -602,7 +628,7 @@ public class PhotoImageLoader {
 			// #######################################
 			StatusUtil.log(NLS.bind(//
 					"SWT: image \"{0}\" cannot be loaded", //$NON-NLS-1$
-					originalImagePathName), e);
+					originalImagePathName));
 
 		} finally {
 
@@ -849,7 +875,7 @@ public class PhotoImageLoader {
 
 		} catch (final Exception e) {
 
-			StatusUtil.log(NLS.bind("AWT: image \"{0}\" cannot be loaded.", originalPathName), e); //$NON-NLS-1$
+			StatusUtil.log(NLS.bind("AWT: image \"{0}\" cannot be loaded.", originalPathName)); //$NON-NLS-1$
 
 		} finally {
 

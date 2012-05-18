@@ -22,6 +22,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 
 public class ImageSizeIndicator extends Canvas {
 
@@ -46,20 +47,21 @@ public class ImageSizeIndicator extends Canvas {
 
 		final Rectangle bounds = getBounds();
 
-		final int margin = 2;
+		final int margin = 0;
 		final int margin2 = 2 * margin;
 		final int width = bounds.width;
 		final int height = bounds.height;
 
-//		gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
-//		gc.fillRectangle(0, 0, bounds.width, bounds.height);
+		// debug box
+		gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+		gc.fillRectangle(0, 0, bounds.width, bounds.height);
 
 		if (_isHqImage) {
 			gc.setBackground(getDisplay().getSystemColor(SWT.COLOR_RED));
 		} else {
 			gc.setBackground(getDisplay().getSystemColor(SWT.COLOR_GREEN));
 		}
-		gc.fillRectangle(0, margin, width - margin2, height - margin2);
+		gc.fillRectangle(margin, margin, width - margin2, height - margin2);
 	}
 
 	void setIndicator(final boolean isHqImage) {

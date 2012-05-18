@@ -372,7 +372,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 				new RGB(0xf3, 0xf3, 0xf3));
 
 		PreferenceConverter.setDefault(store, ITourbookPreferences.PHOTO_VIEWER_COLOR_BACKGROUND, //
-				new RGB(0x50, 0x50, 0x50));
+//				new RGB(0x50, 0x50, 0x50));
+				new RGB(0x33, 0x33, 0x33));
 
 		PreferenceConverter.setDefault(store, ITourbookPreferences.PHOTO_VIEWER_COLOR_SELECTION_FOREGROUND, //
 				new RGB(0xFF, 0x80, 0x33));
@@ -383,11 +384,11 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		PreferenceConverter.setDefault(store, ITourbookPreferences.PHOTO_VIEWER_COLOR_FILE, //
 				new RGB(0x55, 0xC8, 0xFF));
 
-		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_TEXT_MIN_THUMB_SIZE, 100);
+		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_TEXT_MIN_THUMB_SIZE, 70);
 		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_IMAGE_BORDER_SIZE, 4);
 
 		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_FONT, //
-				UI.IS_OSX // the font for OSX cannot be selected in the UI 
+				UI.IS_OSX // the font for OSX cannot be selected in the UI
 							// but this font is smaller than the fonts which can be selected
 						? "1|sans-serif|9|0|"//$NON-NLS-1$
 						: "1|sans-serif|7|0|");//$NON-NLS-1$

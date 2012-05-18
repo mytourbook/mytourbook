@@ -24,9 +24,12 @@ import org.eclipse.jface.viewers.TreeViewer;
  */
 public abstract class TVIFolder extends TreeViewerItem {
 
+	protected PicDirFolder	_picDirFolder;
 	protected TreeViewer	_folderViewer;
 
-	public TVIFolder(final TreeViewer folderViewer) {
+	public TVIFolder(final PicDirFolder picDirFolder, final TreeViewer folderViewer) {
+
+		_picDirFolder = picDirFolder;
 		_folderViewer = folderViewer;
 	}
 

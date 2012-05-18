@@ -65,7 +65,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	private Color					_selectionFgColor;
 
 //	private final DateTimeFormatter	_dtFormatter			= DateTimeFormat.forStyle("SM");
-	private final DateTimeFormatter	_dtFormatter			= new DateTimeFormatterBuilder()
+	private final DateTimeFormatter	_dtFormatterDateTime	= new DateTimeFormatterBuilder()
 																	.appendYear(4, 4)
 																	.appendLiteral('-')
 																	.appendMonthOfYear(2)
@@ -79,23 +79,48 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 																	.appendSecondOfMinute(2)
 																	.toFormatter();
 
-	private boolean					_isShowPhotoDate;
+	private final DateTimeFormatter	_dtFormatterTime		= new DateTimeFormatterBuilder()
+																	.appendHourOfDay(2)
+																	.appendLiteral(':')
+																	.appendMinuteOfHour(2)
+																	.appendLiteral(':')
+																	.appendSecondOfMinute(2)
+																	.toFormatter();
+
+	private final DateTimeFormatter	_dtFormatterDate		= new DateTimeFormatterBuilder()
+																	.appendYear(4, 4)
+																	.appendLiteral('-')
+																	.appendMonthOfYear(2)
+																	.appendLiteral('-')
+																	.appendDayOfMonth(2)
+																	.toFormatter();
+
 	private boolean					_isShowPhotoName;
 	private boolean					_isShowAnnotations;
+	private boolean					_isShowDateInfo;
+	private PhotoDateInfo			_photoDateInfo;
 
 	private GalleryMT20				_gallery;
 	private PicDirImages			_picDirImages;
 
-	/*
-	 * position and size where the photo image is painted
-	 */
-	private int						_photoPaintedX;
-	private int						_photoPaintedY;
-	private int						_imagePaintedWidth;
-	private int						_imagePaintedHeight;
-
 	private int						_gridBorder				= 1;
 	private int						_imageBorder			= 5;
+
+	/**
+	 * photo dimension without grid border but including image border
+	 */
+	private int						_photoX;
+	private int						_photoY;
+	private int						_photoWidth;
+	private int						_photoHeight;
+
+	/**
+	 * position and size where the photo image is painted
+	 */
+	private int						_imagePaintedX;
+	private int						_imagePaintedY;
+	private int						_imagePaintedWidth;
+	private int						_imagePaintedHeight;
 
 	private static Image			_annotationGPS;
 	private static int				_gpsWidth;
@@ -134,22 +159,26 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 		boolean isDrawText = true;
 
-		final int photoViewPortX = galleryItemViewPortX + _gridBorder;
-		final int photoViewPortY = galleryItemViewPortY + _gridBorder;
+		_photoX = galleryItemViewPortX + _gridBorder;
+		_photoY = galleryItemViewPortY + _gridBorder;
+		_photoWidth = galleryItemWidth - _gridBorder;
+		_photoHeight = galleryItemHeight - _gridBorder;
 
-		int imageWidth = galleryItemWidth - _gridBorder;
-		int imageHeight = galleryItemHeight - _gridBorder;
+		int imageWidth = _photoWidth;
+		int imageHeight = _photoHeight;
 
 		// ignore border for small images
 		final boolean isBorder = imageWidth - _imageBorder >= _textMinThumbSize;
 		final int border = _imageBorder;
 		final int border2 = border / 2;
 
-		final int imageX = photoViewPortX + (isBorder ? border2 : 0);
-		final int imageY = photoViewPortY + (isBorder ? border2 : 0);
+		final int imageX = _photoX + (isBorder ? border2 : 0);
+		final int imageY = _photoY + (isBorder ? border2 : 0);
 
 		imageWidth -= isBorder ? border : 0;
 		imageHeight -= isBorder ? border : 0;
+		_imagePaintedWidth = imageWidth;
+		_imagePaintedHeight = imageHeight;
 
 		final PhotoWrapper photoWrapper = (PhotoWrapper) galleryItem.customData;
 		if (photoWrapper == null) {
@@ -231,14 +260,6 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 					isRequestedQuality,
 					isSelected);
 
-//			System.out.println("itemWidth "
-//					+ galleryItemWidth
-//					+ "  photoWidth "
-//					+ imageWidth
-//					+ "  border "
-//					+ _imageBorder);
-////			 final TODO remove SYSTEM.OUT.PRINTLN
-
 			// debug box for the image area
 //			gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_RED));
 //			gc.drawRectangle(imageX, imageY, imageWidth - 2, imageHeight - 1);
@@ -252,15 +273,15 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		}
 
 		// draw name & date & annotations
-		if (isDrawText && (_isShowPhotoName || _isShowPhotoDate)) {
+		if (isDrawText && (_isShowPhotoName || _isShowDateInfo)) {
 			drawInfoText(gc, photoWrapper, imageX, imageY, imageWidth, imageHeight);
 		}
 
 		// annotations are drawn in the bottom right corner of the image
 		if (_isShowAnnotations && photoWrapper.gpsState == 1) {
 			gc.drawImage(_annotationGPS, //
-					_photoPaintedX + _imagePaintedWidth - _gpsWidth,
-					_photoPaintedY + _imagePaintedHeight - _gpsHeight);
+					_imagePaintedX + _imagePaintedWidth - _gpsWidth,
+					_imagePaintedY + _imagePaintedHeight - _gpsHeight);
 		}
 
 //		// debug box for the whole gallery item area
@@ -297,9 +318,6 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		int imageWidth = 0;
 		int imageHeight = 0;
 
-		_imagePaintedWidth = 0;
-		_imagePaintedHeight = 0;
-
 		/*
 		 * exception can occure because the image could be disposed before it is drawn
 		 */
@@ -309,10 +327,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 			imageWidth = imageBounds.width;
 			imageHeight = imageBounds.height;
 
-			final int imageBorderWidth = 0;
-
-			final int imageCanvasWidth = photoWidth - imageBorderWidth;
-			final int imageCanvasHeight = photoHeight - imageBorderWidth;
+			final int imageCanvasWidth = photoWidth;
+			final int imageCanvasHeight = photoHeight;
 
 			final Point bestSize = RendererHelper.getBestSize(
 					imageWidth,
@@ -349,6 +365,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 			// Draw image
 			if (_imagePaintedWidth > 0 && _imagePaintedHeight > 0) {
 
+//				photoWidth - _imagePaintedWidth
+
 				// center image
 				centerOffsetX = (photoWidth - _imagePaintedWidth) / 2;
 				centerOffsetY = (photoHeight - _imagePaintedHeight) / 2;
@@ -360,8 +378,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 		try {
 
-			_photoPaintedX = photoPosX + centerOffsetX;
-			_photoPaintedY = photoPosY + centerOffsetY;
+			_imagePaintedX = photoPosX + centerOffsetX;
+			_imagePaintedY = photoPosY + centerOffsetY;
 
 			try {
 
@@ -371,8 +389,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 						imageWidth,
 						imageHeight,
 						//
-						_photoPaintedX,
-						_photoPaintedY,
+						_imagePaintedX,
+						_imagePaintedY,
 						_imagePaintedWidth,
 						_imagePaintedHeight);
 
@@ -384,7 +402,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 				// draw marker line on the left side
 				gc.setBackground(_selectionFgColor);
-				gc.fillRectangle(_photoPaintedX, _photoPaintedY, 2, _imagePaintedHeight);
+				gc.fillRectangle(_imagePaintedX, _imagePaintedY, 2, _imagePaintedHeight);
 			}
 
 			if (isRequestedQuality == false) {
@@ -395,8 +413,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 				gc.setBackground(_selectionFgColor);
 				gc.fillRectangle(//
-						_photoPaintedX + _imagePaintedWidth - markerSize,
-						_photoPaintedY,// + photoPaintedHeight - markerSize,
+						_imagePaintedX + _imagePaintedWidth - markerSize,
+						_imagePaintedY,
 						markerSize,
 						markerSize);
 			}
@@ -442,10 +460,23 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 			textFileNamePosCenterX = (photoWidth - (textFileNameWidth > photoWidth ? photoWidth : textFileNameWidth)) / 2;
 		}
-		if (_isShowPhotoDate) {
+
+		if (_isShowDateInfo) {
 			final DateTime dateTime = photoWrapper.photo.getImageFileDateTime();
 			if (dateTime != null) {
-				textDateTime = _dtFormatter.print(dateTime);
+
+				if (_photoDateInfo == PhotoDateInfo.Date) {
+
+					textDateTime = _dtFormatterDate.print(dateTime);
+
+				} else if (_photoDateInfo == PhotoDateInfo.Time) {
+
+					textDateTime = _dtFormatterTime.print(dateTime);
+
+				} else {
+					textDateTime = _dtFormatterDateTime.print(dateTime);
+				}
+
 				textDateTimeWidth = gc.textExtent(textDateTime).x;
 
 				textDateTimePosCenterX = (photoWidth - (textDateTimeWidth > photoWidth ? photoWidth : textDateTimeWidth)) / 2;
@@ -594,16 +625,20 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	/**
 	 * Enables / disables labels at the bottom of each item.
 	 * 
-	 * @param isShowPhotoDate
+	 * @param dateInfo
 	 * @param isShowPhotoName
 	 * @see DefaultGalleryMT20ItemRenderer#isShowLabels()
 	 */
 	public void setShowLabels(	final boolean isShowPhotoName,
-								final boolean isShowPhotoDate,
+								final PhotoDateInfo dateInfo,
 								final boolean isShowAnnotations) {
+
+		_photoDateInfo = dateInfo;
+
+		_isShowDateInfo = _photoDateInfo != PhotoDateInfo.NoDateTime;
 		_isShowPhotoName = isShowPhotoName;
-		_isShowPhotoDate = isShowPhotoDate;
 		_isShowAnnotations = isShowAnnotations;
+
 	}
 
 	public void setTextMinThumbSize(final int textMinThumbSize) {

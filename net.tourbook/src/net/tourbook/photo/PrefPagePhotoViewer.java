@@ -51,7 +51,7 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 	public static final String		ID				= "net.tourbook.preferences.PrefPagePhotoViewerID"; //$NON-NLS-1$
 
 	private static final int		BORDER_MIN_SIZE	= 0;
-	private static final int		BORDER_MAX_SIZE	= 8;
+	private static final int		BORDER_MAX_SIZE	= 20;
 
 	private final IPreferenceStore	_prefStore		= TourbookPlugin.getDefault().getPreferenceStore();
 
@@ -299,8 +299,8 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 					.align(SWT.BEGINNING, SWT.FILL)
 					.hint(convertWidthInCharsToPixels(5), SWT.DEFAULT)
 					.applyTo(_spinnerTextMinThumbSize);
-			_spinnerTextMinThumbSize.setMinimum(PicDirImages.MIN_ITEM_WIDTH);
-			_spinnerTextMinThumbSize.setMaximum(PicDirImages.MAX_ITEM_WIDTH);
+			_spinnerTextMinThumbSize.setMinimum(PicDirImages.MIN_GALLERY_ITEM_WIDTH);
+			_spinnerTextMinThumbSize.setMaximum(PicDirImages.MAX_GALLERY_ITEM_WIDTH);
 			_spinnerTextMinThumbSize.setToolTipText(Messages.PrefPage_Photo_Viewer_Label_MinSizeText_Tooltip);
 
 			_spinnerTextMinThumbSize.addSelectionListener(_viewerUISelectionListener);
@@ -439,8 +439,8 @@ public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IW
 			GridDataFactory.fillDefaults() //
 					.align(SWT.BEGINNING, SWT.FILL)
 					.applyTo(_spinnerThumbSize);
-			_spinnerThumbSize.setMinimum(PicDirImages.MIN_ITEM_WIDTH);
-			_spinnerThumbSize.setMaximum(PicDirImages.MAX_ITEM_WIDTH);
+			_spinnerThumbSize.setMinimum(PicDirImages.MIN_GALLERY_ITEM_WIDTH);
+			_spinnerThumbSize.setMaximum(PicDirImages.MAX_GALLERY_ITEM_WIDTH);
 			_spinnerThumbSize.setToolTipText(Messages.PrefPage_Photo_Viewer_Label_HQThumbnailSize_Tooltip);
 
 			_spinnerThumbSize.addSelectionListener(_viewerUISelectionListener);

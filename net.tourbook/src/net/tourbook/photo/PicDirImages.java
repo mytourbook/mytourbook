@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
 import net.tourbook.application.TourbookPlugin;
@@ -79,10 +80,10 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.part.PageBook;
+import org.eclipse.ui.progress.UIJob;
 
 /**
  * This class is a compilation from different source codes:
@@ -98,13 +99,13 @@ public class PicDirImages {
 
 	private static final int						IMAGE_INDICATOR_SIZE			= 16;
 
-	private static final int						FILTER_DELAY					= 500;								// ms
+	private static final long						DELAY_FOR_UI_UPDATE				= 100;								// ms
+	private static final int						DELAY_FOR_SUBSEQUENT_FILTER		= 500;								// ms
 
-	private static final int						MAX_HISTORY_ENTRIES				= 200;
-	private static final int						MAX_FILTER_PROGRESS_BAR			= 30;								// pixel
+	private static final int						MAX_HISTORY_ENTRIES				= 500;
 
-	static final int								MIN_ITEM_WIDTH					= 10;								// pixel
-	static final int								MAX_ITEM_WIDTH					= 2000;							// pixel
+	static final int								MIN_GALLERY_ITEM_WIDTH			= 10;								// pixel
+	static final int								MAX_GALLERY_ITEM_WIDTH			= 2000;							// pixel
 
 	private static final String						STATE_FOLDER_HISTORY			= "STATE_FOLDER_HISTORY";			//$NON-NLS-1$
 	private static final String						STATE_THUMB_IMAGE_SIZE			= "STATE_THUMB_IMAGE_SIZE";		//$NON-NLS-1$
@@ -189,7 +190,7 @@ public class PicDirImages {
 	private File									_photoFolder;
 
 	/**
-	 * Contains ALL gallery items for the current photo folder
+	 * Contains photo wrapper for ALL gallery items for the current photo folder
 	 */
 	private PhotoWrapper[]							_allPhotoWrapper;
 
@@ -203,6 +204,7 @@ public class PicDirImages {
 
 	private FileFilter								_fileFilter;
 
+	private AtomicInteger							_exifLoadingQueueSize			= new AtomicInteger();
 	private PicDirFolder							_picDirFolder;
 
 	private boolean									_isComboKeyPressed;
@@ -229,19 +231,28 @@ public class PicDirImages {
 
 	private ImageFilter								_currentImageFilter;
 
-	private Job										_filterJob;
+	private boolean									_filterJobIsInitialRun;
 	private boolean									_filterJobIsCanceled;
-	private AtomicBoolean							_filterJobIsSubsequentScheduled	= new AtomicBoolean();
-	private long									_filterProgessBarLastUIUpdate;
+
 	private ReentrantLock							FILTER_JOB_LOCK					= new ReentrantLock();
-
+	private Job										_filterJob;
+	private AtomicBoolean							_filterJobIsSubsequentScheduled	= new AtomicBoolean();
 	private int										_filterJobDirtyCounter;
-	private boolean									_isFilterInInitialStart;
 
-	private int										_filterProgessBarMax;
-	private int										_filterProgessBarLoaded;
+	private UIJob									_filterUIUpdateJob;
+	private AtomicBoolean							_filterUIUpdateJobIsScheduled	= new AtomicBoolean();
+	private int										_filterUIUpdateJobDirtyCounter;
+	private PhotoWrapper[]							_filterUIUpdateJobPhotoWrapper;
 
+	private int										_filterProgessMax;
+	private AtomicInteger							_filterProgessLoaded			= new AtomicInteger();
+	private long									_filterProgessLastUIUpdate;
+
+	/*
+	 * UI resources
+	 */
 	private Font									_galleryFont;
+
 	/*
 	 * UI controls
 	 */
@@ -254,7 +265,7 @@ public class PicDirImages {
 	private Combo									_comboPathHistory;
 
 	private GalleryMT20								_gallery;
-	private CLabel									_lblStatusInfo;
+	private CLabel									_lblStatusLine;
 
 	private PageBook								_pageBook;
 	private Label									_lblLoading;
@@ -265,8 +276,6 @@ public class PicDirImages {
 	private Label									_lblFolderInfo;
 
 	private ImageSizeIndicator						_canvasImageSizeIndicator;
-
-	private ProgressBar								_progbarFilter;
 
 	{
 		_workerRunnable = new Runnable() {
@@ -351,11 +360,14 @@ public class PicDirImages {
 
 	class LoadExifCallback implements ILoadCallBack {
 
-		public LoadExifCallback() {}
-
 		@Override
 		public void callBackImageIsLoaded(final boolean isUpdateUI) {
-			filterJob_60_StartSubsequent();
+
+			_filterProgessLoaded.incrementAndGet();
+
+			_exifLoadingQueueSize.decrementAndGet();
+
+			filterJob_22_ScheduleSubsequent();
 		}
 	}
 
@@ -439,7 +451,8 @@ public class PicDirImages {
 
 		_picDirView = picDirView;
 
-		filterJob_10_Setup();
+		filterJob_10_CreateJob();
+		filterUIJob_10_CreateJob();
 	}
 
 //////// LOG ALL BINDINGS
@@ -670,14 +683,12 @@ public class PicDirImages {
 
 		_fileFilter = createFileFilter();
 
-		createUI_0(parent);
-
-		_lblLoading.setText(Messages.Pic_Dir_Label_FolderIsNotSelected);
+		createUI_05(parent);
 
 		createActions();
 	}
 
-	void createUI_0(final Composite parent) {
+	void createUI_05(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
@@ -704,7 +715,8 @@ public class PicDirImages {
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(_containerActionBar);
 		GridLayoutFactory.fillDefaults()//
 				.numColumns(5)
-				.extendedMargins(0, 0, 2, 2)
+				.extendedMargins(0, 2, 2, 2)
+				.spacing(3, 0)
 				.applyTo(_containerActionBar);
 		{
 			/*
@@ -718,7 +730,6 @@ public class PicDirImages {
 			createUI_16_ComboHistory(_containerActionBar);
 			createUI_17_ImageSize(_containerActionBar);
 			createUI_18_ImageSizeIndicator(_containerActionBar);
-			createUI_19_FilterProgressBar(_containerActionBar);
 		}
 	}
 
@@ -789,8 +800,8 @@ public class PicDirImages {
 		GridDataFactory.fillDefaults() //
 				.align(SWT.BEGINNING, SWT.FILL)
 				.applyTo(_spinnerThumbSize);
-		_spinnerThumbSize.setMinimum(MIN_ITEM_WIDTH);
-		_spinnerThumbSize.setMaximum(MAX_ITEM_WIDTH);
+		_spinnerThumbSize.setMinimum(MIN_GALLERY_ITEM_WIDTH);
+		_spinnerThumbSize.setMaximum(MAX_GALLERY_ITEM_WIDTH);
 		_spinnerThumbSize.setIncrement(1);
 		_spinnerThumbSize.setPageIncrement(50);
 		_spinnerThumbSize.setToolTipText(UI.IS_OSX
@@ -825,22 +836,6 @@ public class PicDirImages {
 	}
 
 	/**
-	 * filter progress bar
-	 */
-	private void createUI_19_FilterProgressBar(final Composite parent) {
-
-		_progbarFilter = new ProgressBar(parent, SWT.HORIZONTAL | SWT.SMOOTH);
-		GridDataFactory.fillDefaults()//
-//				.grab(true, false)
-				.align(SWT.FILL, SWT.CENTER)
-				.hint(MAX_FILTER_PROGRESS_BAR, IMAGE_INDICATOR_SIZE)
-				.applyTo(_progbarFilter);
-		_progbarFilter.setMinimum(0);
-		_progbarFilter.setMaximum(MAX_FILTER_PROGRESS_BAR);
-		_progbarFilter.setToolTipText(Messages.Pic_Dir_ProgressBar_Filter_Tooltip);
-	}
-
-	/**
 	 * Create gallery
 	 */
 	private void createUI_20_PageGallery(final Composite parent) {
@@ -852,7 +847,7 @@ public class PicDirImages {
 //		_gallery.setInterpolation(SWT.LOW);
 		_gallery.setAntialias(SWT.ON);
 		_gallery.setInterpolation(SWT.HIGH);
-		_gallery.setItemMinMaxSize(MIN_ITEM_WIDTH, MAX_ITEM_WIDTH);
+		_gallery.setItemMinMaxSize(MIN_GALLERY_ITEM_WIDTH, MAX_GALLERY_ITEM_WIDTH);
 
 		_gallery.addListener(SWT.Modify, new Listener() {
 
@@ -917,8 +912,8 @@ public class PicDirImages {
 			/*
 			 * label: info
 			 */
-			_lblStatusInfo = new CLabel(_containerStatusLine, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblStatusInfo);
+			_lblStatusLine = new CLabel(_containerStatusLine, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblStatusLine);
 
 		}
 	}
@@ -935,16 +930,14 @@ public class PicDirImages {
 	 * @param currentImageFilter
 	 * @param isUpdateGallery
 	 */
-	void filterGallery(final ImageFilter currentImageFilter, final boolean isUpdateGallery) {
+	void filterGallery(final ImageFilter currentImageFilter) {
 
 		_currentImageFilter = currentImageFilter;
 
-		if (isUpdateGallery) {
-			filterJob_50_StartInitial();
-		}
+		filterJob_20_ScheduleInitial();
 	}
 
-	private void filterJob_10_Setup() {
+	private void filterJob_10_CreateJob() {
 
 		_filterJob = new Job(Messages.App_JobName_FilteringGalleryImages) {
 
@@ -952,12 +945,19 @@ public class PicDirImages {
 			protected IStatus run(final IProgressMonitor monitor) {
 
 				_filterJobIsCanceled = false;
-
 				_filterJobIsSubsequentScheduled.set(false);
 
 				try {
 
-					filterJob_20_Run();
+					if (_filterJobIsInitialRun) {
+
+						_filterJobIsInitialRun = false;
+
+						filterJob_30_RunInitial();
+
+					} else {
+						filterJob_32_RunSubsequent();
+					}
 
 				} catch (final Exception e) {
 					StatusUtil.log(e);
@@ -970,7 +970,235 @@ public class PicDirImages {
 		_filterJob.setSystem(true);
 	}
 
-	private void filterJob_20_Run() {
+	private void filterJob_12_Stop() {
+
+		_filterJobIsCanceled = true;
+		_filterUIUpdateJobPhotoWrapper = null;
+
+		// wait until the filter job has been canceled
+		try {
+
+			_filterJob.cancel();
+			_filterJob.join();
+
+// !!! can causes deadlocks when selecting another folder when the other folder is not loaded !!!
+//			_filterUIUpdateJob.cancel();
+//			_filterUIUpdateJob.join();
+//			_filterUIUpdateJobIsScheduled.set(false);
+
+		} catch (final InterruptedException e) {
+			StatusUtil.log(e);
+		}
+	}
+
+	private void filterJob_20_ScheduleInitial() {
+
+		FILTER_JOB_LOCK.lock();
+		{
+			try {
+
+				// filter must be stopped before new wrappers are set
+				filterJob_12_Stop();
+
+				// this is the initial run of the filter job
+				_filterJobIsInitialRun = true;
+
+				_sortedAndFilteredPhotoWrapper = new PhotoWrapper[0];
+
+				_filterProgessLoaded.set(0);
+				_filterProgessMax = _allPhotoWrapper.length;
+
+				updateUI_FilterProgress();
+
+				_filterJob.schedule();
+
+			} finally {
+				FILTER_JOB_LOCK.unlock();
+			}
+		}
+	}
+
+	private void filterJob_22_ScheduleSubsequent() {
+
+		FILTER_JOB_LOCK.lock();
+		{
+			try {
+
+				_filterJobDirtyCounter++;
+
+				if ((_filterJob.getState() == Job.RUNNING) == false) {
+
+					// filter job is NOT running, schedule it
+
+					final boolean isScheduled = _filterJobIsSubsequentScheduled.getAndSet(true);
+
+					if (isScheduled == false) {
+						_filterJob.schedule(DELAY_FOR_SUBSEQUENT_FILTER);
+					}
+				}
+
+			} finally {
+				FILTER_JOB_LOCK.unlock();
+			}
+		}
+
+		updateUI_FilterProgress();
+	}
+
+	private void filterJob_30_RunInitial() {
+
+//		final long start = System.nanoTime();
+
+		if (_allPhotoWrapper.length == 0) {
+
+			// there are no images in the current folder
+
+//			setMessage(UI.EMPTY_STRING);
+
+			updateUI_FolderInfo();
+
+			return;
+		}
+
+		final boolean isGPSFilter = _currentImageFilter == ImageFilter.GPS;
+		final boolean isNoGPSFilter = _currentImageFilter == ImageFilter.NoGPS;
+
+		// get current dirty counter
+		final int currentDirtyCounter = _filterJobDirtyCounter;
+
+		_exifLoadingQueueSize.set(0);
+
+		PhotoWrapper[] newFilteredWrapper = null;
+
+		if (isGPSFilter || isNoGPSFilter) {
+
+			final int numberOfWrapper = _allPhotoWrapper.length;
+			final PhotoWrapper[] tempFilteredWrapper = new PhotoWrapper[numberOfWrapper];
+
+			// filterindex is incremented when the filter contains a gallery item
+			int filterIndex = 0;
+			int wrapperIndex = 0;
+
+			// loop: all photos
+			for (final PhotoWrapper photoWrapper : _allPhotoWrapper) {
+
+				if (_filterJobIsCanceled) {
+					return;
+				}
+
+				final int gpsState = photoWrapper.gpsState;
+
+				if (gpsState == -1) {
+
+					// image is not yet loaded, it must be loaded to get the gps state
+
+					putImageInExifLoadingQueue(photoWrapper);
+
+				} else {
+
+					if (isGPSFilter) {
+						if (gpsState == 1) {
+
+							tempFilteredWrapper[filterIndex] = _allPhotoWrapper[wrapperIndex];
+
+							filterIndex++;
+						}
+
+					} else if (isNoGPSFilter) {
+
+						if (gpsState == 0) {
+
+							tempFilteredWrapper[filterIndex] = _allPhotoWrapper[wrapperIndex];
+
+							filterIndex++;
+						}
+					}
+
+					_filterProgessMax--;
+				}
+
+				wrapperIndex++;
+			}
+
+			// remove trailing array items which are not set
+			newFilteredWrapper = Arrays.copyOf(tempFilteredWrapper, filterIndex);
+
+		} else {
+
+			// a filter is not set, display all images but load exif data which is necessary when filtering by date
+
+			newFilteredWrapper = Arrays.copyOf(_allPhotoWrapper, _allPhotoWrapper.length);
+
+			// loop: all photos
+			for (final PhotoWrapper photoWrapper : _allPhotoWrapper) {
+
+				if (_filterJobIsCanceled) {
+					return;
+				}
+
+				final int gpsState = photoWrapper.gpsState;
+
+				if (gpsState == -1) {
+
+					// image is not yet loaded, it must be loaded to get the gps state
+					putImageInExifLoadingQueue(photoWrapper);
+
+				} else {
+
+					_filterProgessMax--;
+				}
+			}
+		}
+
+		/*
+		 * update UI
+		 */
+		if (newFilteredWrapper.length == 0) {
+
+			filterUIJob_20_Schedule(0);
+
+		} else {
+
+			// check sorting
+			if (_initialSorting != _currentSorting) {
+
+				/*
+				 * wrapper must be sorted because sorting is different than the initial sorting,
+				 * this will sort only the filtered wrapper
+				 */
+
+				Arrays.sort(newFilteredWrapper, getCurrentComparator());
+			}
+		}
+
+		/*
+		 * gallery MUST be updated even when no images are displayed because images from the
+		 * previous folder are still displayed
+		 */
+		updateUI_GalleryItems(newFilteredWrapper);
+
+		if (_filterJobDirtyCounter > currentDirtyCounter) {
+
+			// filter is dirty again
+
+			filterJob_22_ScheduleSubsequent();
+
+		} else {
+
+			// clear progress bar
+
+			updateUI_FilterProgress();
+		}
+
+//		final float timeDiff = (float) (System.nanoTime() - start) / 1000000;
+////		if (timeDiff > 10) {}
+//		System.out.println("filterJob_20_RunInitial:\t" + timeDiff + " ms\t");
+//		// TODO remove SYSTEM.OUT.PRINTLN
+	}
+
+	private void filterJob_32_RunSubsequent() {
+
+//		final long start = System.nanoTime();
 
 		final boolean isGPSFilter = _currentImageFilter == ImageFilter.GPS;
 		final boolean isNoGPSFilter = _currentImageFilter == ImageFilter.NoGPS;
@@ -998,34 +1226,21 @@ public class PicDirImages {
 
 				final int gpsState = photoWrapper.gpsState;
 
-				if (_isFilterInInitialStart && gpsState == -1) {
+				if (isGPSFilter) {
+					if (gpsState == 1) {
 
-					// image is not yet loaded, it must be loaded to get the gps state
+						tempFilteredWrapper[filterIndex] = _allPhotoWrapper[wrapperIndex];
 
-					putImageInExifLoadingQueue(photoWrapper);
-
-				} else {
-
-					if (isGPSFilter) {
-						if (gpsState == 1) {
-
-							tempFilteredWrapper[filterIndex] = _allPhotoWrapper[wrapperIndex];
-
-							filterIndex++;
-						}
-
-					} else if (isNoGPSFilter) {
-
-						if (gpsState == 0) {
-
-							tempFilteredWrapper[filterIndex] = _allPhotoWrapper[wrapperIndex];
-
-							filterIndex++;
-						}
+						filterIndex++;
 					}
 
-					if (_isFilterInInitialStart) {
-						_filterProgessBarMax--;
+				} else if (isNoGPSFilter) {
+
+					if (gpsState == 0) {
+
+						tempFilteredWrapper[filterIndex] = _allPhotoWrapper[wrapperIndex];
+
+						filterIndex++;
 					}
 				}
 
@@ -1037,31 +1252,9 @@ public class PicDirImages {
 
 		} else {
 
-			// a filter is not set, display all images but load exif data
+			// a filter is not set, display all images but load exif data which is necessary when filtering by date
 
 			newFilteredWrapper = Arrays.copyOf(_allPhotoWrapper, _allPhotoWrapper.length);
-
-			// loop: all photos
-			for (final PhotoWrapper photoWrapper : _allPhotoWrapper) {
-
-				if (_filterJobIsCanceled) {
-					return;
-				}
-
-				final int gpsState = photoWrapper.gpsState;
-
-				if (_isFilterInInitialStart && gpsState == -1) {
-
-					// image is not yet loaded, it must be loaded to get the gps state
-					putImageInExifLoadingQueue(photoWrapper);
-
-				} else {
-
-					if (_isFilterInInitialStart) {
-						_filterProgessBarMax--;
-					}
-				}
-			}
 		}
 
 		// check sorting
@@ -1069,79 +1262,75 @@ public class PicDirImages {
 
 			/*
 			 * wrapper must be sorted because sorting is different than the initial sorting, this
-			 * will sort only the filtered gallery items
+			 * will sort only the filtered wrapper
 			 */
 
 			Arrays.sort(newFilteredWrapper, getCurrentComparator());
 		}
 
-		updateUI_GalleryItems(newFilteredWrapper);
-
-		// reset state after UI update !!!
-		_isFilterInInitialStart = false;
+		/**
+		 * UI update must be run in a UI job because the update can be very long when many
+		 * (thousands) small images are displayed
+		 */
+		_filterUIUpdateJobPhotoWrapper = newFilteredWrapper;
+		filterUIJob_20_Schedule(0);
 
 		if (_filterJobDirtyCounter > currentDirtyCounter) {
 
 			// filter is dirty again
 
-			final boolean isScheduled = _filterJobIsSubsequentScheduled.getAndSet(true);
-			if (isScheduled == false) {
-				_filterJob.schedule(FILTER_DELAY);
-			}
+			filterJob_22_ScheduleSubsequent();
+
+		} else {
+
+			// clear progress bar
+
+			updateUI_FilterProgress();
 		}
+
+//		final float timeDiff = (float) (System.nanoTime() - start) / 1000000;
+//		System.out.println("filterJob_30_RunSubsequent:\t" + timeDiff + " ms\t");
+//		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
-	private void filterJob_50_StartInitial() {
+	private void filterUIJob_10_CreateJob() {
+
+		_filterUIUpdateJob = new UIJob(Messages.App_JobName_UpdateUIWithFilteredGalleryImages) {
+
+			@Override
+			public IStatus runInUIThread(final IProgressMonitor monitor) {
+
+				_filterUIUpdateJobIsScheduled.set(false);
+
+				try {
+					filterUIJob_30_Run();
+				} catch (final Exception e) {
+					StatusUtil.log(e);
+				}
+
+				return Status.OK_STATUS;
+			}
+		};
+
+		_filterUIUpdateJob.setSystem(true);
+	}
+
+	private void filterUIJob_20_Schedule(final long delay) {
 
 		FILTER_JOB_LOCK.lock();
 		{
 			try {
 
-				// filter must be stopped before new wrappers are set
-				filterJob_70_Stop();
+				_filterUIUpdateJobDirtyCounter++;
 
-				_isFilterInInitialStart = true;
-				_sortedAndFilteredPhotoWrapper = new PhotoWrapper[0];
-
-				_filterProgessBarLoaded = 0;
-				_filterProgessBarMax = _allPhotoWrapper.length;
-
-				_display.syncExec(new Runnable() {
-					public void run() {
-
-						if (_progbarFilter.isDisposed()) {
-							return;
-						}
-
-						// initialize filter progressbar
-						_progbarFilter.setSelection(0);
-					}
-				});
-
-				_filterJob.schedule();
-
-			} finally {
-				FILTER_JOB_LOCK.unlock();
-			}
-		}
-	}
-
-	private void filterJob_60_StartSubsequent() {
-
-		FILTER_JOB_LOCK.lock();
-		{
-			try {
-
-				_filterJobDirtyCounter++;
-
-				if ((_filterJob.getState() == Job.RUNNING) == false) {
+				if ((_filterUIUpdateJob.getState() == Job.RUNNING) == false) {
 
 					// filter job is NOT running, schedule it
 
-					final boolean isScheduled = _filterJobIsSubsequentScheduled.getAndSet(true);
+					final boolean isScheduled = _filterUIUpdateJobIsScheduled.getAndSet(true);
 
 					if (isScheduled == false) {
-						_filterJob.schedule(FILTER_DELAY);
+						_filterUIUpdateJob.schedule(delay);
 					}
 				}
 
@@ -1149,62 +1338,24 @@ public class PicDirImages {
 				FILTER_JOB_LOCK.unlock();
 			}
 		}
-
-		_filterProgessBarLoaded++;
-
-		/*
-		 * update progress bar
-		 */
-		final long now = System.currentTimeMillis();
-		if (now > _filterProgessBarLastUIUpdate + 100) {
-
-			_filterProgessBarLastUIUpdate = now;
-
-			_display.syncExec(new Runnable() {
-				public void run() {
-
-					if (_progbarFilter.isDisposed()) {
-						return;
-					}
-
-					double value = (double) _filterProgessBarLoaded / _filterProgessBarMax;
-					value = value * MAX_FILTER_PROGRESS_BAR;
-
-					_progbarFilter.setSelection((int) value);
-				}
-			});
-		}
-
-		/*
-		 * disable progress bar when all exif data are loaded
-		 */
-		if (_filterProgessBarLoaded == _filterProgessBarMax) {
-
-			_display.syncExec(new Runnable() {
-				public void run() {
-
-					if (_progbarFilter.isDisposed()) {
-						return;
-					}
-
-//					_progbarFilter.setSelection(MAX_FILTER_PROGRESS_BAR);
-					_progbarFilter.setSelection(0);
-//					_progbarFilter.setEnabled(false);
-				}
-			});
-		}
 	}
 
-	private void filterJob_70_Stop() {
+	private void filterUIJob_30_Run() {
 
-		_filterJobIsCanceled = true;
+		final PhotoWrapper[] uiUpdatePhotoWrapper = _filterUIUpdateJobPhotoWrapper;
+		_filterUIUpdateJobPhotoWrapper = null;
 
-		// wait until the filter job has been canceled
-		try {
-			_filterJob.cancel();
-			_filterJob.join();
-		} catch (final InterruptedException e) {
-			StatusUtil.log(e);
+		if (uiUpdatePhotoWrapper == null) {
+			return;
+		}
+
+		final int currentDirtyCounter = _filterUIUpdateJobDirtyCounter;
+
+		updateUI_GalleryItems(uiUpdatePhotoWrapper);
+
+		if (_filterUIUpdateJobDirtyCounter > currentDirtyCounter) {
+			// UI is dirty again
+			filterUIJob_20_Schedule(DELAY_FOR_UI_UPDATE);
 		}
 	}
 
@@ -1321,82 +1472,26 @@ public class PicDirImages {
 			return;
 		}
 
-		final double galleryWidth = _gallery.getClientArea().width;
 		final int prevGalleryItemSize = _gallery.getItemWidth();
 
-		final int prevNumberOfImages = _gallery.getNumberOfHorizontalImages();
+		// update gallery
+		final int adjustedItemSize = _gallery.zoomGallery(newGalleryItemSize);
 
-		if (newGalleryItemSize > _prevGalleryItemSize) {
-
-			if (prevNumberOfImages > 2) {
-
-				// increased width -> fewer images
-
-				int numberOfImages = prevNumberOfImages - 1;
-
-				newGalleryItemSize = (int) (galleryWidth / numberOfImages);
-
-				if (newGalleryItemSize == prevGalleryItemSize) {
-
-					// size has not changed, decrease number of images until the width has changed
-
-					while (newGalleryItemSize == prevGalleryItemSize) {
-
-						if (numberOfImages < 3) {
-							break;
-						}
-
-						newGalleryItemSize = (int) (galleryWidth / --numberOfImages);
-					}
-				}
-
-			} else {
-
-				// number of photos is already 1, only increase photo width -> this is already set
-			}
-
-		} else {
-
-			// decreased width -> more images
-
-			final double tempImageCounter = galleryWidth / newGalleryItemSize;
-
-			/*
-			 * size by number of images only, when more than 2 images are displayed, otherwise size
-			 * by newThumbSize
-			 */
-			if (tempImageCounter > 2) {
-
-				final int numberOfImages = prevNumberOfImages + 1;
-
-				final int newTempPhotoWidth = (int) (galleryWidth / numberOfImages);
-				if (newTempPhotoWidth > MIN_ITEM_WIDTH) {
-					newGalleryItemSize = newTempPhotoWidth;
-				}
-			}
-		}
-
-		if (newGalleryItemSize == prevGalleryItemSize) {
+		if (adjustedItemSize == prevGalleryItemSize) {
 			// nothing has changed
 			return;
 		}
 
-		/*
-		 * update UI with new size
-		 */
-
 		PhotoLoadManager.stopImageLoading(false);
 
-		// update gallery
-		final int adjustedSize = _gallery.setItemSize(newGalleryItemSize);
-		if (adjustedSize != newGalleryItemSize) {
+		if (adjustedItemSize != newGalleryItemSize) {
 
 			/*
 			 * size has been modified, this case can occure when the gallery is switching the
 			 * scrollbars on/off depending on the content
 			 */
 
-			newGalleryItemSize = adjustedSize;
+			newGalleryItemSize = adjustedItemSize;
 		}
 
 		updateUI_AfterZoomInOut(newGalleryItemSize);
@@ -1406,6 +1501,8 @@ public class PicDirImages {
 	 * Get gps state and exif data
 	 */
 	private void putImageInExifLoadingQueue(final PhotoWrapper photoWrapper) {
+
+		_exifLoadingQueueSize.incrementAndGet();
 
 		Photo photo = photoWrapper.photo;
 
@@ -1483,62 +1580,6 @@ public class PicDirImages {
 		}
 	}
 
-//	/**
-//	 * This will sort the gallery items
-//	 */
-//	private void sortGalleryRunnable_OLD() {
-//
-//		if (_photoFiles == null || _photoFiles.length == 0) {
-//			// there are no files
-//			return;
-//		}
-//
-//		final GalleryMT20Item[] galleryItems = _gallery.getGalleryItems();
-//		if (galleryItems.length == 0) {
-//			// there is no root item
-//			return;
-//		}
-//
-//		// sort image files
-//		final List<File> sortedFiles = sortFiles(_photoFolder);
-//		final File[] sortedFilesArray = sortedFiles.toArray(new File[sortedFiles.size()]);
-//
-//		/*
-//		 * sort gallery items according to the sorted image files
-//		 */
-//		final GalleryMT20Item rootItem = rootItems[0];
-//		final GalleryMT20Item[] existingGalleryItems = rootItem.getItems();
-//
-//		final HashMap<String, GalleryMT20Item> existingGalleryItemsMap = new HashMap<String, GalleryMT20Item>();
-//
-//		// create map with existing gallery items, items can be null when not yet displayed
-//		for (final GalleryMT20Item existingGalleryItem : existingGalleryItems) {
-//			if (existingGalleryItem != null) {
-//
-//				final Photo photo = (Photo) existingGalleryItem.getData();
-//				final String photoImageFileName = photo.getFileName();
-//
-//				existingGalleryItemsMap.put(photoImageFileName, existingGalleryItem);
-//			}
-//		}
-//
-//		final GalleryMT20Item[] sortedGalleryItems = new GalleryMT20Item[existingGalleryItems.length];
-//
-//		// convert sorted images files into sorted gallery items
-//		for (int itemIndex = 0; itemIndex < sortedFilesArray.length; itemIndex++) {
-//
-//			final File imageFile = sortedFilesArray[itemIndex];
-//
-//			final GalleryMT20Item galleryItem = existingGalleryItemsMap.get(imageFile.getName());
-//
-//			if (galleryItem != null) {
-//				sortedGalleryItems[itemIndex] = galleryItem;
-//			}
-//		}
-//
-//		_gallery.setSortedItems(sortedGalleryItems);
-//	}
-
 	void restoreState(final IDialogSettings state) {
 
 		/*
@@ -1568,13 +1609,23 @@ public class PicDirImages {
 			_currentSorting = defaultSorting;
 		}
 
-		/*
-		 * image quality
-		 */
+		// pref store settings
 		updateUI_FromPrefStore();
 
-		/*
-		 * thumbnail size
+		/**
+		 * !!! very important !!!
+		 * <p>
+		 * show gallery to initialize client area, otherwise the width is 0 until the page is
+		 * displayed in a later step
+		 */
+		_pageBook.showPage(_gallery);
+
+		// show loading page until a folder is selected
+		_lblLoading.setText(Messages.Pic_Dir_Label_FolderIsNotSelected);
+		_pageBook.showPage(_pageLoading);
+
+		/**
+		 * set thumbnail size after gallery client area is set
 		 */
 		final int stateThumbSize = Util.getStateInt(
 				state,
@@ -1648,6 +1699,29 @@ public class PicDirImages {
 	}
 
 	/**
+	 * This is called when a filter button is pressed.
+	 * 
+	 * @param currentImageFilter
+	 */
+	void setFilter(final ImageFilter currentImageFilter) {
+		_currentImageFilter = currentImageFilter;
+	}
+
+	void setInfo(final boolean isShowPhotoName, final PhotoDateInfo photoDateInfo, final boolean isShowAnnotations) {
+		_photoRenderer.setShowLabels(isShowPhotoName, photoDateInfo, isShowAnnotations);
+	}
+
+	void setMessage(final String message) {
+		_lblStatusLine.setText(message);
+	}
+
+	void setSorting(final GallerySorting gallerySorting) {
+
+		// set new sorting algorithm
+		_currentSorting = gallerySorting;
+	}
+
+	/**
 	 * Display images for the selected folder.
 	 * 
 	 * @param imageFolder
@@ -1655,6 +1729,17 @@ public class PicDirImages {
 	 * @param isReloadFolder
 	 */
 	void showImages(final File imageFolder, final boolean isFromNavigationHistory, final boolean isReloadFolder) {
+
+		FILTER_JOB_LOCK.lock();
+		{
+			try {
+
+				filterJob_12_Stop();
+
+			} finally {
+				FILTER_JOB_LOCK.unlock();
+			}
+		}
 
 		PhotoLoadManager.stopImageLoading(true);
 
@@ -1685,19 +1770,21 @@ public class PicDirImages {
 		workerUpdate(imageFolder, isReloadFolder);
 	}
 
-	void showInfo(	final boolean isShowPhotoName,
-					final boolean isShowPhotoDate,
-					final boolean isShowAnnotations,
-					final boolean isUpdateGallery) {
+	void showInfo(final boolean isShowPhotoName, final PhotoDateInfo photoDateInfo, final boolean isShowAnnotations) {
 
-		_photoRenderer.setShowLabels(isShowPhotoName, isShowPhotoDate, isShowAnnotations);
+		_photoRenderer.setShowLabels(isShowPhotoName, photoDateInfo, isShowAnnotations);
 
-		if (isUpdateGallery) {
-			_gallery.redraw();
-		}
+		_gallery.redraw();
 	}
 
-	void sortGallery(final GallerySorting gallerySorting, final boolean isUpdateGallery) {
+	void showRestoreFolder(final String restoreFolderName) {
+
+//		_lblLoading.setText(NLS.bind(Messages.Pic_Dir_Label_Loading, restoreFolderName));
+		_lblLoading.setText(NLS.bind("Initial loading {0}", restoreFolderName));
+		_pageBook.showPage(_pageLoading);
+	}
+
+	void sortGallery(final GallerySorting gallerySorting) {
 
 		// check if resorting is needed
 		if (_currentSorting == gallerySorting) {
@@ -1707,14 +1794,11 @@ public class PicDirImages {
 		// set new sorting algorithm
 		_currentSorting = gallerySorting;
 
-		if (isUpdateGallery) {
-
-			BusyIndicator.showWhile(_display, new Runnable() {
-				public void run() {
-					sortGallery_10_Runnable();
-				}
-			});
-		}
+		BusyIndicator.showWhile(_display, new Runnable() {
+			public void run() {
+				sortGallery_10_Runnable();
+			}
+		});
 	}
 
 	/**
@@ -1741,7 +1825,15 @@ public class PicDirImages {
 		updateUI_GalleryItems(_sortedAndFilteredPhotoWrapper);
 	}
 
-	void updateColors(final Color fgColor, final Color bgColor, final Color selectionFgColor) {
+	/**
+	 * @param fgColor
+	 * @param bgColor
+	 * @param selectionFgColor
+	 * @param initUI
+	 *            Is <code>true</code> after a restore to update the UI that not a default UI color
+	 *            is displayed.
+	 */
+	void updateColors(final Color fgColor, final Color bgColor, final Color selectionFgColor, final boolean initUI) {
 
 		/*
 		 * action bar, setting action bar color in OSX looks not very good
@@ -1777,14 +1869,19 @@ public class PicDirImages {
 
 		_pageLoading.setBackground(bgColor);
 
+		if (initUI) {
+//			_gallery.redraw();
+//			_gallery.update();
+		}
+
 		/*
 		 * status line
 		 */
 		_containerStatusLine.setForeground(fgColor);
 		_containerStatusLine.setBackground(bgColor);
 
-		_lblStatusInfo.setForeground(fgColor);
-		_lblStatusInfo.setBackground(bgColor);
+		_lblStatusLine.setForeground(fgColor);
+		_lblStatusLine.setBackground(bgColor);
 
 		/*
 		 * loading page
@@ -1876,6 +1973,53 @@ public class PicDirImages {
 		}
 	}
 
+	private void updateUI_FilterProgress() {
+
+		final int filterProgessLoaded = _filterProgessLoaded.get();
+
+		if (filterProgessLoaded == _filterProgessMax) {
+
+			// reset progress bar when all exif data are loaded
+
+			_display.asyncExec(new Runnable() {
+				public void run() {
+
+					if (_gallery.isDisposed()) {
+						return;
+					}
+
+					setMessage(UI.EMPTY_STRING);
+				}
+			});
+
+		} else {
+
+			// update progress bar periodically
+
+			final long now = System.currentTimeMillis();
+			if (now > _filterProgessLastUIUpdate + 100) {
+
+				_filterProgessLastUIUpdate = now;
+
+				_display.asyncExec(new Runnable() {
+					public void run() {
+
+						if (_gallery.isDisposed()) {
+							return;
+						}
+
+						final double valueD = (double) filterProgessLoaded / _filterProgessMax;
+
+						setMessage(NLS.bind("Reading EXIF data:  {0} %     {1} / {2}", new Object[] {
+								(int) (valueD * 100),
+								filterProgessLoaded,
+								_filterProgessMax, }));
+					}
+				});
+			}
+		}
+	}
+
 	private void updateUI_FolderInfo() {
 
 		_display.syncExec(new Runnable() {
@@ -1885,6 +2029,8 @@ public class PicDirImages {
 					return;
 				}
 
+				_pageBook.showPage(_pageFolderInfo);
+
 				final int imageCount = _allPhotoWrapper.length;
 
 				if (imageCount == 0) {
@@ -1893,9 +2039,14 @@ public class PicDirImages {
 
 				} else {
 
-					if (_isFilterInInitialStart) {
+					final int exifLoadingQueueSize = _exifLoadingQueueSize.get();
 
-						_lblFolderInfo.setText("Filtering images");
+					if (exifLoadingQueueSize > 0) {
+
+						// show filter message only when image files are being loaded
+
+						_lblFolderInfo.setText(NLS
+								.bind("Filtering images, remaining images: {0}", exifLoadingQueueSize));
 
 					} else {
 
@@ -1977,6 +2128,8 @@ public class PicDirImages {
 
 				if (sortedGalleryItems.length > 0) {
 
+					// gallery items are available
+
 					_pageBook.showPage(_gallery);
 
 					// update gallery
@@ -1984,10 +2137,20 @@ public class PicDirImages {
 
 				} else {
 
-					_pageBook.showPage(_pageFolderInfo);
+					// no gallery items
 
 					updateUI_FolderInfo();
 				}
+			}
+		});
+	}
+
+	void updateUI_RetrievedFileFolder(final String folderName, final int folderCounter, final int fileCounter) {
+
+		_display.syncExec(new Runnable() {
+			public void run() {
+				setMessage(NLS.bind("Retrieving... {0}  Folder: {1}  Files: {2}", //
+						new Object[] { folderName, folderCounter, fileCounter }));
 			}
 		});
 	}
@@ -2012,7 +2175,7 @@ public class PicDirImages {
 					}
 
 //					_lblStatusInfo.setText(NLS.bind(Messages.Pic_Dir_Status_Reading, _workerStateDir.getAbsolutePath()));
-					_lblStatusInfo.setText(UI.EMPTY_STRING);
+					_lblStatusLine.setText(UI.EMPTY_STRING);
 				}
 			});
 
@@ -2042,6 +2205,9 @@ public class PicDirImages {
 					newPhotoWrapper[fileIndex] = new PhotoWrapper(files[fileIndex]);
 				}
 
+				/*
+				 * sort wrappers with currently selected comparator
+				 */
 				_currentComparator = getCurrentComparator();
 
 				// keep initial sorting algorithm
@@ -2090,7 +2256,7 @@ public class PicDirImages {
 							Messages.Pic_Dir_Status_Loaded,
 							new Object[] { Long.toString(timeDiff), Integer.toString(_allPhotoWrapper.length) });
 
-					_lblStatusInfo.setText(timeDiffText);
+					_lblStatusLine.setText(timeDiffText);
 				}
 			});
 
@@ -2098,7 +2264,7 @@ public class PicDirImages {
 			 * start filter always, even when no filter is set because it is loading exif data which
 			 * is used to sort images correctly by exif date (when available) and not by file date
 			 */
-			filterJob_50_StartInitial();
+			filterJob_20_ScheduleInitial();
 		}
 	}
 
