@@ -44,7 +44,7 @@ import net.tourbook.util.StatusUtil;
 import net.tourbook.util.UI;
 import net.tourbook.util.Util;
 
-import org.apache.commons.sanselan.Sanselan;
+import org.apache.commons.imaging.Imaging;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -666,7 +666,7 @@ public class PicDirImages {
 					return false;
 				}
 
-				if (Sanselan.hasImageFileExtension(pathname)) {
+				if (Imaging.hasImageFileExtension(pathname)) {
 					return true;
 				}
 

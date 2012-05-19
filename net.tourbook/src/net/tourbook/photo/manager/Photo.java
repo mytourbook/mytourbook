@@ -22,17 +22,17 @@ import java.util.HashMap;
 import net.tourbook.util.StatusUtil;
 import net.tourbook.util.Util;
 
-import org.apache.commons.sanselan.Sanselan;
-import org.apache.commons.sanselan.SanselanConstants;
-import org.apache.commons.sanselan.common.IImageMetadata;
-import org.apache.commons.sanselan.formats.jpeg.JpegImageMetadata;
-import org.apache.commons.sanselan.formats.tiff.TiffField;
-import org.apache.commons.sanselan.formats.tiff.TiffImageMetadata;
-import org.apache.commons.sanselan.formats.tiff.constants.ExifTagConstants;
-import org.apache.commons.sanselan.formats.tiff.constants.GpsTagConstants;
-import org.apache.commons.sanselan.formats.tiff.constants.TiffTagConstants;
-import org.apache.commons.sanselan.formats.tiff.taginfos.TagInfo;
-import org.apache.commons.sanselan.formats.tiff.taginfos.TagInfoShortOrLong;
+import org.apache.commons.imaging.Imaging;
+import org.apache.commons.imaging.ImagingConstants;
+import org.apache.commons.imaging.common.IImageMetadata;
+import org.apache.commons.imaging.formats.jpeg.JpegImageMetadata;
+import org.apache.commons.imaging.formats.tiff.TiffField;
+import org.apache.commons.imaging.formats.tiff.TiffImageMetadata;
+import org.apache.commons.imaging.formats.tiff.constants.ExifTagConstants;
+import org.apache.commons.imaging.formats.tiff.constants.GpsTagConstants;
+import org.apache.commons.imaging.formats.tiff.constants.TiffTagConstants;
+import org.apache.commons.imaging.formats.tiff.taginfos.TagInfo;
+import org.apache.commons.imaging.formats.tiff.taginfos.TagInfoShortOrLong;
 import org.eclipse.osgi.util.NLS;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -200,7 +200,7 @@ public class Photo {
 
 			photoMetadata.exifDateTime = getExifDate(jpegMetadata);
 
-			photoMetadata.orientation = getExifIntValue(jpegMetadata, ExifTagConstants.EXIF_TAG_ORIENTATION, 1);
+			photoMetadata.orientation = getExifIntValue(jpegMetadata, TiffTagConstants.TIFF_TAG_ORIENTATION, 1);
 
 			photoMetadata.imageWidth = getExifIntValue(
 					jpegMetadata,
@@ -511,11 +511,11 @@ public class Photo {
 			 * ommitted
 			 */
 			final HashMap<Object, Object> params = new HashMap<Object, Object>();
-			params.put(SanselanConstants.PARAM_KEY_READ_THUMBNAILS, isReadThumbnail);
+			params.put(ImagingConstants.PARAM_KEY_READ_THUMBNAILS, isReadThumbnail);
 
 			final long start = System.currentTimeMillis();
 
-			imageFileMetadata = Sanselan.getMetadata(_photoWrapper.imageFile, params);
+			imageFileMetadata = Imaging.getMetadata(_photoWrapper.imageFile, params);
 
 			System.out.println("read exif\t"
 					+ ((System.currentTimeMillis() - start) + " ms")

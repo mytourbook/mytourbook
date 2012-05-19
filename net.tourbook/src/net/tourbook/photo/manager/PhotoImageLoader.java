@@ -28,9 +28,9 @@ import net.tourbook.photo.gallery.MT20.GalleryMT20Item;
 import net.tourbook.util.StatusUtil;
 import net.tourbook.util.UI;
 
-import org.apache.commons.sanselan.ImageReadException;
-import org.apache.commons.sanselan.common.IImageMetadata;
-import org.apache.commons.sanselan.formats.jpeg.JpegImageMetadata;
+import org.apache.commons.imaging.ImageReadException;
+import org.apache.commons.imaging.common.IImageMetadata;
+import org.apache.commons.imaging.formats.jpeg.JpegImageMetadata;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -146,6 +146,22 @@ public class PhotoImageLoader {
 		}
 
 		return thumbRotation;
+	}
+
+	/**
+	 * @return Returns <code>true</code> when the image file can be loaded with AWT
+	 */
+	private boolean isAWTImageSupported() {
+
+		final String photoSuffix = _photo.getPhotoWrapper().imageFileExt;
+
+		for (final String awtImageSuffix : awtImageFileSuffixes) {
+			if (photoSuffix.equals(awtImageSuffix)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -547,7 +563,10 @@ public class PhotoImageLoader {
 
 			// load original image and create thumbs
 
-			if (_imageFramework.equals(PhotoLoadManager.IMAGE_FRAMEWORK_SWT)) {
+			if (_imageFramework.equals(PhotoLoadManager.IMAGE_FRAMEWORK_SWT)
+			// use SWT when image format is not supported by AWT which is the case for tiff images
+					|| isAWTImageSupported() == false) {
+
 				hqImage = loadImageHQ_10_WithSWT();
 			} else {
 				hqImage = loadImageHQ_20_WithAWT();
@@ -887,7 +906,7 @@ public class PhotoImageLoader {
 
 			final long startHqLoad = System.currentTimeMillis();
 			{
-				originalImage = loadImageHQ_22_ExtendedAWT(photoWrapper);
+				originalImage = ImageIO.read(photoWrapper.imageFile);
 
 				_trackedAWTImages.add(originalImage);
 			}
@@ -1105,49 +1124,39 @@ public class PhotoImageLoader {
 		return requestedSWTImage;
 	}
 
-	private BufferedImage loadImageHQ_22_ExtendedAWT(final PhotoWrapper photoWrapper) throws IOException {
-
-		final String photoSuffix = photoWrapper.imageFileExt;
-		boolean isAWTImageSupported = false;
-
-		for (final String awtImageSuffix : awtImageFileSuffixes) {
-			if (photoSuffix.equals(awtImageSuffix)) {
-				isAWTImageSupported = true;
-				break;
-			}
-		}
-
-		if (isAWTImageSupported == false) {
-
-			// extension is not supported
-
-			return null;
-
-// JAI implementation
+//	private BufferedImage loadImageHQ_22_ExtendedAWT(final PhotoWrapper photoWrapper) throws IOException {
 //
-//			final SeekableStream s = new FileSeekableStream(photoWrapper.imageFile);
+//		if (isAWTImageSupported == false) {
 //
-//			final TIFFDecodeParam param = null;
+//			// extension is not supported
 //
-//			final ImageDecoder dec = ImageCodec.createImageDecoder("tiff", s, param);
+//			return null;
 //
-//			// Which of the multiple images in the TIFF file do we want to load
-//			// 0 refers to the first, 1 to the second and so on.
-//			final int imageToLoad = 0;
+//// JAI implementation
+////
+////			final SeekableStream s = new FileSeekableStream(_photo.getPhotoWrapper().imageFile);
+////
+////			final TIFFDecodeParam param = null;
+////
+////			final ImageDecoder dec = ImageCodec.createImageDecoder("tiff", s, param);
+////
+////			// Which of the multiple images in the TIFF file do we want to load
+////			// 0 refers to the first, 1 to the second and so on.
+////			final int imageToLoad = 0;
+////
+////			final RenderedImage op = new NullOpImage(
+////					dec.decodeAsRenderedImage(imageToLoad),
+////					null,
+////					OpImage.OP_IO_BOUND,
+////					null);
+////
+////			final BufferedImage img = new BufferedImage(op.getWidth(), op.getHeight(), BufferedImage.TYPE_INT_ARGB);
 //
-//			final RenderedImage op = new NullOpImage(
-//					dec.decodeAsRenderedImage(imageToLoad),
-//					null,
-//					OpImage.OP_IO_BOUND,
-//					null);
+//		} else {
 //
-//			final BufferedImage img = new BufferedImage(op.getWidth(), op.getHeight(), BufferedImage.TYPE_INT_ARGB);
-
-		} else {
-
-			return ImageIO.read(photoWrapper.imageFile);
-		}
-	}
+//			return ImageIO.read(photoWrapper.imageFile);
+//		}
+//	}
 
 	private void setStateLoadingError() {
 
