@@ -562,19 +562,21 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 				: photoWrapper.imageFileName;
 
 		String statusText;
-		boolean isMetaData = false;
+		PhotoImageMetadata metaData = null;
 
 		final boolean isError = photo.getLoadingState(requestedImageQuality) == PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR;
 
 		if (isError) {
 			statusText = photoImageFileName + " cannot be loaded";
 		} else {
-			final PhotoImageMetadata metaData = photo.getImageMetaDataRaw();
-			if (metaData == null) {
+
+			final int exifThumbImageState = photo.getExifThumbImageState();
+			metaData = photo.getImageMetaDataRaw();
+
+			if (metaData == null || exifThumbImageState == -1) {
 				statusText = photoImageFileName + " is being loaded...";
 			} else {
 				// meta data are already loaded
-				isMetaData = true;
 				statusText = photoImageFileName + " no EXIF thumb, loading fullsize...";
 			}
 		}
@@ -589,7 +591,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		if (isError) {
 			gc.setForeground(device.getSystemColor(SWT.COLOR_RED));
 		} else {
-			if (isMetaData) {
+			if (metaData != null) {
 				gc.setForeground(device.getSystemColor(SWT.COLOR_GREEN));
 			} else {
 				gc.setForeground(device.getSystemColor(SWT.COLOR_YELLOW));

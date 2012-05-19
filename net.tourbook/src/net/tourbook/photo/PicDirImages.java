@@ -35,6 +35,7 @@ import net.tourbook.photo.manager.GallerySorting;
 import net.tourbook.photo.manager.ILoadCallBack;
 import net.tourbook.photo.manager.Photo;
 import net.tourbook.photo.manager.PhotoImageCache;
+import net.tourbook.photo.manager.PhotoImageMetadata;
 import net.tourbook.photo.manager.PhotoLoadManager;
 import net.tourbook.photo.manager.PhotoWrapper;
 import net.tourbook.photo.manager.ThumbnailStore;
@@ -85,6 +86,8 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.progress.UIJob;
 
+import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
+
 /**
  * This class is a compilation from different source codes:
  * 
@@ -97,26 +100,28 @@ import org.eclipse.ui.progress.UIJob;
  */
 public class PicDirImages {
 
-	private static final int						IMAGE_INDICATOR_SIZE			= 16;
+	private static final int									IMAGE_INDICATOR_SIZE			= 16;
 
-	private static final long						DELAY_FOR_UI_UPDATE				= 100;								// ms
-	private static final int						DELAY_FOR_SUBSEQUENT_FILTER		= 500;								// ms
+	private static final int									DELAY_JOB_SUBSEQUENT_FILTER		= 500;								// ms
+	private static final long									DELAY_JOB_UI_FILTER				= 200;								// ms
+	private static final long									DELAY_JOB_UI_LOADING			= 200;								// ms
 
-	private static final int						MAX_HISTORY_ENTRIES				= 500;
+	private static final int									MAX_HISTORY_ENTRIES				= 500;
 
-	static final int								MIN_GALLERY_ITEM_WIDTH			= 10;								// pixel
-	static final int								MAX_GALLERY_ITEM_WIDTH			= 2000;							// pixel
+	static final int											MIN_GALLERY_ITEM_WIDTH			= 10;								// pixel
+	static final int											MAX_GALLERY_ITEM_WIDTH			= 2000;							// pixel
 
-	private static final String						STATE_FOLDER_HISTORY			= "STATE_FOLDER_HISTORY";			//$NON-NLS-1$
-	private static final String						STATE_THUMB_IMAGE_SIZE			= "STATE_THUMB_IMAGE_SIZE";		//$NON-NLS-1$
-	private static final String						STATE_GALLERY_POSITION_FOLDER	= "STATE_GALLERY_POSITION_FOLDER";	//$NON-NLS-1$
-	private static final String						STATE_GALLERY_POSITION_VALUE	= "STATE_GALLERY_POSITION_VALUE";	//$NON-NLS-1$
-	private static final String						STATE_IMAGE_SORTING				= "STATE_IMAGE_SORTING";			//$NON-NLS-1$
+	private static final String									STATE_FOLDER_HISTORY			= "STATE_FOLDER_HISTORY";			//$NON-NLS-1$
+	private static final String									STATE_THUMB_IMAGE_SIZE			= "STATE_THUMB_IMAGE_SIZE";		//$NON-NLS-1$
+	private static final String									STATE_GALLERY_POSITION_FOLDER	= "STATE_GALLERY_POSITION_FOLDER";	//$NON-NLS-1$
+	private static final String									STATE_GALLERY_POSITION_VALUE	= "STATE_GALLERY_POSITION_VALUE";	//$NON-NLS-1$
+	private static final String									STATE_IMAGE_SORTING				= "STATE_IMAGE_SORTING";			//$NON-NLS-1$
 
-	private static final String						DEFAULT_GALLERY_FONT			= "arial,sans-serif";				//$NON-NLS-1$
+	private static final String									DEFAULT_GALLERY_FONT			= "arial,sans-serif";				//$NON-NLS-1$
 
-	private final IPreferenceStore					_prefStore						= TourbookPlugin.getDefault() //
-																							.getPreferenceStore();
+	private final IPreferenceStore								_prefStore						= TourbookPlugin
+																										.getDefault()
+																										.getPreferenceStore();
 
 	/*
 	 * worker thread management
@@ -124,75 +129,76 @@ public class PicDirImages {
 	/**
 	 * Worker start time
 	 */
-	private long									_workerStart;
+	private long												_workerStart;
 
 	/**
 	 * Lock for all worker control data and state
 	 */
-	private final Object							_workerLock						= new Object();
+	private final Object										_workerLock						= new Object();
 
 	/**
 	 * The worker's thread
 	 */
-	private volatile Thread							_workerThread					= null;
+	private volatile Thread										_workerThread					= null;
 
 	/**
 	 * True if the worker must exit on completion of the current cycle
 	 */
-	private volatile boolean						_workerStopped					= false;
+	private volatile boolean									_workerStopped					= false;
 
 	/**
 	 * True if the worker must cancel its operations prematurely perhaps due to a state update
 	 */
-	private volatile boolean						_workerCancelled				= false;
+	private volatile boolean									_workerCancelled				= false;
 
 	/**
 	 * Worker state information -- this is what gets synchronized by an update
 	 */
-	private volatile File							_workerStateDir					= null;
+	private volatile File										_workerStateDir					= null;
 
 	/**
 	 * State information to use for the next cycle
 	 */
-	private volatile File							_workerNextFolder				= null;
+	private volatile File										_workerNextFolder				= null;
 
 	/**
 	 * Manages the worker's thread
 	 */
-	private final Runnable							_workerRunnable;
+	private final Runnable										_workerRunnable;
 
 	/**
 	 *
 	 */
-	public static final Comparator<File>			NATURAL_SORT					= new SortNatural<File>(true);
+	public static final Comparator<File>						NATURAL_SORT					= new SortNatural<File>(
+																										true);
 
 	/**
 	 *
 	 */
-	public static Comparator<PhotoWrapper>			SORT_BY_FILE_DATE;
-	public static Comparator<PhotoWrapper>			SORT_BY_FILE_NAME;
+	public static Comparator<PhotoWrapper>						SORT_BY_FILE_DATE;
+	public static Comparator<PhotoWrapper>						SORT_BY_FILE_NAME;
 
 	/**
 	 * Contains current gallery sorting id: {@link PicDirView#GALLERY_SORTING_BY_DATE} or
 	 * {@link PicDirView#GALLERY_SORTING_BY_NAME}
 	 */
-	private Comparator<PhotoWrapper>				_currentComparator;
-	private GallerySorting							_currentSorting;
-	private GallerySorting							_initialSorting;
+	private Comparator<PhotoWrapper>							_currentComparator;
+	private GallerySorting										_currentSorting;
+	private GallerySorting										_initialSorting;
 
-	private PicDirView								_picDirView;
+	private PicDirView											_picDirView;
 
-	private PhotoRenderer							_photoRenderer;
+	private PhotoRenderer										_photoRenderer;
 
 	/**
 	 * Folder which images are currently be displayed
 	 */
-	private File									_photoFolder;
+	private File												_photoFolder;
 
 	/**
 	 * Contains photo wrapper for ALL gallery items for the current photo folder
 	 */
-	private PhotoWrapper[]							_allPhotoWrapper;
+	private PhotoWrapper[]										_allPhotoWrapper;
 
 	/**
 	 * Contains filtered gallery items.
@@ -200,84 +206,94 @@ public class PicDirImages {
 	 * Only these items are displayed in the gallery, the {@link #_allPhotoWrapper} items contains
 	 * also hidden gallery items.
 	 */
-	private PhotoWrapper[]							_sortedAndFilteredPhotoWrapper;
+	private PhotoWrapper[]										_sortedAndFilteredPhotoWrapper;
 
-	private FileFilter								_fileFilter;
+	private FileFilter											_fileFilter;
 
-	private AtomicInteger							_exifLoadingQueueSize			= new AtomicInteger();
-	private PicDirFolder							_picDirFolder;
+	private AtomicInteger										_exifLoadingQueueSize			= new AtomicInteger();
+	private PicDirFolder										_picDirFolder;
 
-	private boolean									_isComboKeyPressed;
+	private boolean												_isComboKeyPressed;
 
-	private int										_selectedHistoryIndex;
-	private ArrayList<String>						_folderHistory					= new ArrayList<String>();
+	private int													_selectedHistoryIndex;
+	private ArrayList<String>									_folderHistory					= new ArrayList<String>();
 
-	private ActionNavigateHistoryBackward			_actionNavigateBackward;
-	private ActionNavigateHistoryForward			_actionNavigateForward;
-	private ActionClearNavigationHistory			_actionClearNavigationHistory;
-	private ActionRemoveInvalidFoldersFromHistory	_actionRemoveInvalidFoldersFromHistory;
+	private ActionNavigateHistoryBackward						_actionNavigateBackward;
+	private ActionNavigateHistoryForward						_actionNavigateForward;
+	private ActionClearNavigationHistory						_actionClearNavigationHistory;
+	private ActionRemoveInvalidFoldersFromHistory				_actionRemoveInvalidFoldersFromHistory;
 
-	private int										_prevGalleryItemSize			= -1;
-	private int										_photoImageSize;
-	private int										_photoBorderSize;
+	private int													_prevGalleryItemSize			= -1;
+	private int													_photoImageSize;
+	private int													_photoBorderSize;
 
 	/**
 	 * keep gallery position for each used folder
 	 */
-	private LinkedHashMap<String, Double>			_galleryPositions				= new LinkedHashMap<String, Double>(
-																							100,
-																							0.75f,
-																							true);
+	private LinkedHashMap<String, Double>						_galleryPositions;
 
-	private ImageFilter								_currentImageFilter;
+	/**
+	 * Cache for exif meta data, key is file path
+	 */
+	private ConcurrentLinkedHashMap<String, PhotoImageMetadata>	_exifCache;
 
-	private boolean									_filterJobIsInitialRun;
-	private boolean									_filterJobIsCanceled;
+	private ImageFilter											_currentImageFilter;
 
-	private ReentrantLock							FILTER_JOB_LOCK					= new ReentrantLock();
-	private Job										_filterJob;
-	private AtomicBoolean							_filterJobIsSubsequentScheduled	= new AtomicBoolean();
-	private int										_filterJobDirtyCounter;
+	private boolean												_filterJobIsFirstRun;
+	private boolean												_filterJobIsCanceled;
 
-	private UIJob									_filterUIUpdateJob;
-	private AtomicBoolean							_filterUIUpdateJobIsScheduled	= new AtomicBoolean();
-	private int										_filterUIUpdateJobDirtyCounter;
-	private PhotoWrapper[]							_filterUIUpdateJobPhotoWrapper;
+	private ReentrantLock										JOB_LOCK						= new ReentrantLock();
+	private Job													_jobFilter;
+	private AtomicBoolean										_jobFilterIsSubsequentScheduled	= new AtomicBoolean();
+	private int													_jobFilterDirtyCounter;
 
-	private int										_filterProgessMax;
-	private AtomicInteger							_filterProgessLoaded			= new AtomicInteger();
-	private long									_filterProgessLastUIUpdate;
+	private UIJob												_jobUIFilter;
+	private AtomicBoolean										_jobUIFilterJobIsScheduled		= new AtomicBoolean();
+	private int													_jobUIFilterDirtyCounter;
+	private PhotoWrapper[]										_jobUIFilterPhotoWrapper;
+
+	private int													_currentExifRunId;
+
+	private Job													_jobUILoading;
+	private AtomicBoolean										_jobUILoadingIsScheduled		= new AtomicBoolean();
+	private int													_jobUILoadingDirtyCounter;
 
 	/*
 	 * UI resources
 	 */
-	private Font									_galleryFont;
+	private Font												_galleryFont;
 
 	/*
 	 * UI controls
 	 */
-	private Display									_display;
-	private Composite								_uiContainer;
+	private Display												_display;
+	private Composite											_uiContainer;
 
-	private Composite								_containerActionBar;
-	private ToolBar									_toolbar;
-	private Spinner									_spinnerThumbSize;
-	private Combo									_comboPathHistory;
+	private Composite											_containerActionBar;
+	private ToolBar												_toolbar;
+	private Spinner												_spinnerThumbSize;
+	private Combo												_comboPathHistory;
 
-	private GalleryMT20								_gallery;
-	private CLabel									_lblStatusLine;
+	private GalleryMT20											_gallery;
+	private CLabel												_lblStatusLine;
 
-	private PageBook								_pageBook;
-	private Label									_lblLoading;
-	private Composite								_pageLoading;
-	private Composite								_containerStatusLine;
+	private PageBook											_pageBook;
+	private Label												_lblLoading;
+	private Composite											_pageLoading;
+	private Composite											_containerStatusLine;
 
-	private Composite								_pageFolderInfo;
-	private Label									_lblFolderInfo;
+	private Composite											_pageGalleryInfo;
+	private Label												_lblGalleryInfo;
 
-	private ImageSizeIndicator						_canvasImageSizeIndicator;
+	private ImageSizeIndicator									_canvasImageSizeIndicator;
 
 	{
+		_galleryPositions = new LinkedHashMap<String, Double>(100, 0.75f, true);
+
+		_exifCache = new ConcurrentLinkedHashMap.Builder<String, PhotoImageMetadata>()//
+				.maximumWeightedCapacity(20000)
+				.build();
+
 		_workerRunnable = new Runnable() {
 			public void run() {
 
@@ -343,31 +359,37 @@ public class PicDirImages {
 		};
 	}
 
-	//	/**
-//	 * Sort files for the folder
-//	 *
-//	 * @param folder
-//	 * @return
-//	 */
-//	private List<File> sortFiles(final File folder) {
-//
-//		final Comparator<PhotoWrapper> comparator = _sortingAlgorithm == GallerySorting.FILE_DATE
-//				? SORT_BY_FILE_DATE
-//				: SORT_BY_FILE_NAME;
-//
-//		// We make file list in this thread for speed reasons
-//	final List<File>	files	= SortingUtils.getSortedFileList(folder, _fileFilter, comparator);
-
 	class LoadExifCallback implements ILoadCallBack {
+
+		private int		__runId;
+		private Photo	__photo;
+
+		public LoadExifCallback(final Photo photo, final int runId) {
+
+			__photo = photo;
+			__runId = runId;
+		}
 
 		@Override
 		public void callBackImageIsLoaded(final boolean isUpdateUI) {
 
-			_filterProgessLoaded.incrementAndGet();
+			// keep exif metadata
+			final PhotoImageMetadata metadata = __photo.getImageMetaDataRaw();
+			if (metadata != null) {
+				_exifCache.put(__photo.getPhotoWrapper().imageFilePathName, metadata);
+			}
+
+			if (__runId != _currentExifRunId) {
+
+				// this callback is from an older run ID, ignore it
+
+				return;
+			}
 
 			_exifLoadingQueueSize.decrementAndGet();
 
-			filterJob_22_ScheduleSubsequent();
+			jobFilter_22_ScheduleSubsequent(DELAY_JOB_SUBSEQUENT_FILTER);
+			jobUILoading_20_Schedule();
 		}
 	}
 
@@ -419,6 +441,8 @@ public class PicDirImages {
 					}
 				}
 			});
+
+			jobUILoading_20_Schedule();
 		}
 	}
 
@@ -451,8 +475,9 @@ public class PicDirImages {
 
 		_picDirView = picDirView;
 
-		filterJob_10_CreateJob();
-		filterUIJob_10_CreateJob();
+		jobFilter_10_Create();
+		jobUIFilter_10_Create();
+		jobUILoading_10_Create();
 	}
 
 //////// LOG ALL BINDINGS
@@ -702,7 +727,7 @@ public class PicDirImages {
 			{
 				createUI_20_PageGallery(_pageBook);
 				createUI_30_PageLoading(_pageBook);
-				createUI_40_PageFolderInfo(_pageBook);
+				createUI_40_PageGalleryInfo(_pageBook);
 			}
 
 			createUI_50_StatusLine(container);
@@ -886,19 +911,19 @@ public class PicDirImages {
 		}
 	}
 
-	private void createUI_40_PageFolderInfo(final PageBook parent) {
+	private void createUI_40_PageGalleryInfo(final PageBook parent) {
 
-		_pageFolderInfo = new Composite(parent, SWT.NONE);
+		_pageGalleryInfo = new Composite(parent, SWT.NONE);
 //		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.fillDefaults()//
 				.numColumns(1)
 				.margins(5, 5)
-				.applyTo(_pageFolderInfo);
+				.applyTo(_pageGalleryInfo);
 		{
-			_lblFolderInfo = new Label(_pageFolderInfo, SWT.WRAP);
+			_lblGalleryInfo = new Label(_pageGalleryInfo, SWT.WRAP);
 			GridDataFactory.fillDefaults()//
 					.grab(true, false)
-					.applyTo(_lblFolderInfo);
+					.applyTo(_lblGalleryInfo);
 		}
 	}
 
@@ -918,10 +943,27 @@ public class PicDirImages {
 		}
 	}
 
+	/**
+	 * Remove all cached metadata which starts with the folder path.
+	 * 
+	 * @param folderPath
+	 */
+	void deleteCachedMetadata(final String folderPath) {
+
+		for (final String cachedPath : _exifCache.keySet()) {
+			if (cachedPath.startsWith(folderPath)) {
+				_exifCache.remove(cachedPath);
+			}
+		}
+	}
+
 	private void disposeAllImages() {
+
 		PhotoLoadManager.stopImageLoading(true);
 		ThumbnailStore.cleanupStoreFiles(true, true);
+
 		PhotoImageCache.dispose();
+		_exifCache.clear();
 	}
 
 	/**
@@ -934,29 +976,70 @@ public class PicDirImages {
 
 		_currentImageFilter = currentImageFilter;
 
-		filterJob_20_ScheduleInitial();
+		jobFilter_22_ScheduleSubsequent(0);
 	}
 
-	private void filterJob_10_CreateJob() {
+	private Comparator<PhotoWrapper> getCurrentComparator() {
+		return _currentSorting == GallerySorting.FILE_NAME ? SORT_BY_FILE_NAME : SORT_BY_FILE_DATE;
+	}
 
-		_filterJob = new Job(Messages.App_JobName_FilteringGalleryImages) {
+	int getThumbnailSize() {
+		return _spinnerThumbSize.getSelection();
+	}
+
+	void handlePrefStoreModifications(final PropertyChangeEvent event) {
+
+		final String property = event.getProperty();
+
+		if (property.equals(ITourbookPreferences.PHOTO_VIEWER_PREF_EVENT_IMAGE_QUALITY_IS_MODIFIED)) {
+
+			_display.asyncExec(new Runnable() {
+				public void run() {
+
+					if (MessageDialog.openQuestion(
+							_display.getActiveShell(),
+							Messages.Pic_Dir_Dialog_CleanupStoreImages_Title,
+							Messages.Pic_Dir_Dialog_CleanupStoreImages_Message) == false) {
+
+						disposeAllImages();
+					}
+
+					_gallery.updateGallery(false, _gallery.getGalleryPosition());
+				}
+			});
+
+		} else if (property.equals(ITourbookPreferences.PHOTO_VIEWER_PREF_EVENT_IMAGE_VIEWER_UI_IS_MODIFIED)) {
+
+			updateUI_FromPrefStore();
+
+			updateUI_AfterZoomInOut(_prevGalleryItemSize);
+
+		} else if (property.equals(ITourbookPreferences.PHOTO_VIEWER_FONT)) {
+
+			onModifyFont();
+		}
+	}
+
+	private void jobFilter_10_Create() {
+
+		_jobFilter = new Job(Messages.App_JobName_PicDirImages_FilteringGalleryImages) {
 
 			@Override
 			protected IStatus run(final IProgressMonitor monitor) {
 
 				_filterJobIsCanceled = false;
-				_filterJobIsSubsequentScheduled.set(false);
+				_jobFilterIsSubsequentScheduled.set(false);
 
 				try {
 
-					if (_filterJobIsInitialRun) {
+					if (_filterJobIsFirstRun) {
 
-						_filterJobIsInitialRun = false;
+						_filterJobIsFirstRun = false;
 
-						filterJob_30_RunInitial();
+						jobFilter_30_RunFirst();
 
 					} else {
-						filterJob_32_RunSubsequent();
+						jobFilter_32_RunSubsequent();
 					}
 
 				} catch (final Exception e) {
@@ -967,95 +1050,110 @@ public class PicDirImages {
 			}
 		};
 
-		_filterJob.setSystem(true);
+		_jobFilter.setSystem(true);
 	}
 
-	private void filterJob_12_Stop() {
+	private void jobFilter_12_Stop() {
 
 		_filterJobIsCanceled = true;
-		_filterUIUpdateJobPhotoWrapper = null;
+		_jobUIFilterPhotoWrapper = null;
 
 		// wait until the filter job has been canceled
 		try {
 
-			_filterJob.cancel();
-			_filterJob.join();
-
-// !!! can causes deadlocks when selecting another folder when the other folder is not loaded !!!
-//			_filterUIUpdateJob.cancel();
-//			_filterUIUpdateJob.join();
-//			_filterUIUpdateJobIsScheduled.set(false);
+			_jobFilter.cancel();
+			_jobFilter.join();
 
 		} catch (final InterruptedException e) {
 			StatusUtil.log(e);
 		}
 	}
 
-	private void filterJob_20_ScheduleInitial() {
+	private void jobFilter_20_ScheduleInitial() {
 
-		FILTER_JOB_LOCK.lock();
+		JOB_LOCK.lock();
 		{
 			try {
 
 				// filter must be stopped before new wrappers are set
-				filterJob_12_Stop();
+				jobFilter_12_Stop();
 
 				// this is the initial run of the filter job
-				_filterJobIsInitialRun = true;
+				_filterJobIsFirstRun = true;
 
 				_sortedAndFilteredPhotoWrapper = new PhotoWrapper[0];
 
-				_filterProgessLoaded.set(0);
-				_filterProgessMax = _allPhotoWrapper.length;
+				_currentExifRunId++;
 
-				updateUI_FilterProgress();
-
-				_filterJob.schedule();
+				_jobFilter.schedule();
 
 			} finally {
-				FILTER_JOB_LOCK.unlock();
+				JOB_LOCK.unlock();
 			}
 		}
+
+		/*
+		 * hide status message for the first delay, because when nothing is filtered, the UI is
+		 * flickering with an initial message
+		 */
+		setStatusMessageInUIThread(UI.EMPTY_STRING);
 	}
 
-	private void filterJob_22_ScheduleSubsequent() {
+	private void jobFilter_22_ScheduleSubsequent(final long delay) {
 
-		FILTER_JOB_LOCK.lock();
+		JOB_LOCK.lock();
 		{
 			try {
 
-				_filterJobDirtyCounter++;
+				_jobFilterDirtyCounter++;
 
-				if ((_filterJob.getState() == Job.RUNNING) == false) {
+				if ((_jobFilter.getState() == Job.RUNNING) == false) {
 
 					// filter job is NOT running, schedule it
 
-					final boolean isScheduled = _filterJobIsSubsequentScheduled.getAndSet(true);
+					final boolean isScheduled = _jobFilterIsSubsequentScheduled.getAndSet(true);
 
 					if (isScheduled == false) {
-						_filterJob.schedule(DELAY_FOR_SUBSEQUENT_FILTER);
+						_jobFilter.schedule(delay);
 					}
 				}
 
 			} finally {
-				FILTER_JOB_LOCK.unlock();
+				JOB_LOCK.unlock();
 			}
 		}
-
-		updateUI_FilterProgress();
 	}
 
-	private void filterJob_30_RunInitial() {
+	private void jobFilter_23_ScheduleSubsequentWithoutRunCheck() {
+
+		_jobFilterDirtyCounter++;
+
+		// filter job is NOT running, schedule it
+
+		final boolean isScheduled = _jobFilterIsSubsequentScheduled.getAndSet(true);
+
+		if (isScheduled == false) {
+			_jobFilter.schedule(DELAY_JOB_SUBSEQUENT_FILTER);
+		}
+	}
+
+	/**
+	 * Filter and sort photos and load EXIF data (which is required for sorting).
+	 */
+	private void jobFilter_30_RunFirst() {
 
 //		final long start = System.nanoTime();
 
 		if (_allPhotoWrapper.length == 0) {
 
-			// there are no images in the current folder
+			// there are no images in the current folder,
 
-//			setMessage(UI.EMPTY_STRING);
+			/*
+			 * gallery MUST be updated even when no images are displayed because images from the
+			 * previous folder are still displayed
+			 */
 
-			updateUI_FolderInfo();
+			updateUI_GalleryInfo();
 
 			return;
 		}
@@ -1064,7 +1162,7 @@ public class PicDirImages {
 		final boolean isNoGPSFilter = _currentImageFilter == ImageFilter.NoGPS;
 
 		// get current dirty counter
-		final int currentDirtyCounter = _filterJobDirtyCounter;
+		final int currentDirtyCounter = _jobFilterDirtyCounter;
 
 		_exifLoadingQueueSize.set(0);
 
@@ -1086,15 +1184,19 @@ public class PicDirImages {
 					return;
 				}
 
-				final int gpsState = photoWrapper.gpsState;
+				int gpsState = photoWrapper.gpsState;
 
 				if (gpsState == -1) {
 
 					// image is not yet loaded, it must be loaded to get the gps state
 
 					putImageInExifLoadingQueue(photoWrapper);
+				}
 
-				} else {
+				// check again, the gps state could have been cached and set
+				gpsState = photoWrapper.gpsState;
+
+				if (gpsState != -1) {
 
 					if (isGPSFilter) {
 						if (gpsState == 1) {
@@ -1113,8 +1215,6 @@ public class PicDirImages {
 							filterIndex++;
 						}
 					}
-
-					_filterProgessMax--;
 				}
 
 				wrapperIndex++;
@@ -1125,7 +1225,7 @@ public class PicDirImages {
 
 		} else {
 
-			// a filter is not set, display all images but load exif data which is necessary when filtering by date
+			// a filter is not set, display all images but load exif data which is necessary when sorting by date
 
 			newFilteredWrapper = Arrays.copyOf(_allPhotoWrapper, _allPhotoWrapper.length);
 
@@ -1142,52 +1242,40 @@ public class PicDirImages {
 
 					// image is not yet loaded, it must be loaded to get the gps state
 					putImageInExifLoadingQueue(photoWrapper);
-
-				} else {
-
-					_filterProgessMax--;
 				}
 			}
 		}
 
-		/*
-		 * update UI
-		 */
-		if (newFilteredWrapper.length == 0) {
+		// check sorting
+		if (_initialSorting != _currentSorting) {
 
-			filterUIJob_20_Schedule(0);
+			/*
+			 * wrapper must be sorted because sorting is different than the initial sorting, this
+			 * will sort only the filtered wrapper
+			 */
 
-		} else {
-
-			// check sorting
-			if (_initialSorting != _currentSorting) {
-
-				/*
-				 * wrapper must be sorted because sorting is different than the initial sorting,
-				 * this will sort only the filtered wrapper
-				 */
-
-				Arrays.sort(newFilteredWrapper, getCurrentComparator());
-			}
+			Arrays.sort(newFilteredWrapper, getCurrentComparator());
 		}
 
-		/*
+		/**
+		 * Update UI
+		 * <p>
 		 * gallery MUST be updated even when no images are displayed because images from the
 		 * previous folder are still displayed
 		 */
 		updateUI_GalleryItems(newFilteredWrapper);
 
-		if (_filterJobDirtyCounter > currentDirtyCounter) {
+		if (_jobFilterDirtyCounter > currentDirtyCounter) {
 
 			// filter is dirty again
 
-			filterJob_22_ScheduleSubsequent();
+			jobFilter_23_ScheduleSubsequentWithoutRunCheck();
 
 		} else {
 
 			// clear progress bar
 
-			updateUI_FilterProgress();
+			jobUILoading_20_Schedule();
 		}
 
 //		final float timeDiff = (float) (System.nanoTime() - start) / 1000000;
@@ -1196,7 +1284,10 @@ public class PicDirImages {
 //		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
-	private void filterJob_32_RunSubsequent() {
+	/**
+	 * Run filter and sorting again with newly loaded EXIF data until all EXIF data are loaded.
+	 */
+	private void jobFilter_32_RunSubsequent() {
 
 //		final long start = System.nanoTime();
 
@@ -1204,7 +1295,7 @@ public class PicDirImages {
 		final boolean isNoGPSFilter = _currentImageFilter == ImageFilter.NoGPS;
 
 		// get current dirty counter
-		final int currentDirtyCounter = _filterJobDirtyCounter;
+		final int currentDirtyCounter = _jobFilterDirtyCounter;
 
 		PhotoWrapper[] newFilteredWrapper = null;
 
@@ -1272,20 +1363,21 @@ public class PicDirImages {
 		 * UI update must be run in a UI job because the update can be very long when many
 		 * (thousands) small images are displayed
 		 */
-		_filterUIUpdateJobPhotoWrapper = newFilteredWrapper;
-		filterUIJob_20_Schedule(0);
+		_jobUIFilterPhotoWrapper = newFilteredWrapper;
 
-		if (_filterJobDirtyCounter > currentDirtyCounter) {
+		jobUIFilter_20_Schedule(0);
+
+		if (_jobFilterDirtyCounter > currentDirtyCounter) {
 
 			// filter is dirty again
 
-			filterJob_22_ScheduleSubsequent();
+			jobFilter_23_ScheduleSubsequentWithoutRunCheck();
 
 		} else {
 
 			// clear progress bar
 
-			updateUI_FilterProgress();
+			jobUILoading_20_Schedule();
 		}
 
 //		final float timeDiff = (float) (System.nanoTime() - start) / 1000000;
@@ -1293,17 +1385,17 @@ public class PicDirImages {
 //		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
-	private void filterUIJob_10_CreateJob() {
+	private void jobUIFilter_10_Create() {
 
-		_filterUIUpdateJob = new UIJob(Messages.App_JobName_UpdateUIWithFilteredGalleryImages) {
+		_jobUIFilter = new UIJob(Messages.App_JobName_PicDirImages_UpdateUIWithFilteredGalleryImages) {
 
 			@Override
 			public IStatus runInUIThread(final IProgressMonitor monitor) {
 
-				_filterUIUpdateJobIsScheduled.set(false);
+				_jobUIFilterJobIsScheduled.set(false);
 
 				try {
-					filterUIJob_30_Run();
+					jobUIFilter_30_Run();
 				} catch (final Exception e) {
 					StatusUtil.log(e);
 				}
@@ -1312,102 +1404,151 @@ public class PicDirImages {
 			}
 		};
 
-		_filterUIUpdateJob.setSystem(true);
+		_jobUIFilter.setSystem(true);
 	}
 
-	private void filterUIJob_20_Schedule(final long delay) {
+	private void jobUIFilter_20_Schedule(final long delay) {
 
-		FILTER_JOB_LOCK.lock();
+		JOB_LOCK.lock();
 		{
 			try {
 
-				_filterUIUpdateJobDirtyCounter++;
+				_jobUIFilterDirtyCounter++;
 
-				if ((_filterUIUpdateJob.getState() == Job.RUNNING) == false) {
+				if ((_jobUIFilter.getState() == Job.RUNNING) == false) {
 
 					// filter job is NOT running, schedule it
 
-					final boolean isScheduled = _filterUIUpdateJobIsScheduled.getAndSet(true);
+					final boolean isScheduled = _jobUIFilterJobIsScheduled.getAndSet(true);
 
 					if (isScheduled == false) {
-						_filterUIUpdateJob.schedule(delay);
+						_jobUIFilter.schedule(delay);
 					}
 				}
 
 			} finally {
-				FILTER_JOB_LOCK.unlock();
+				JOB_LOCK.unlock();
 			}
 		}
 	}
 
-	private void filterUIJob_30_Run() {
+	private void jobUIFilter_30_Run() {
 
-		final PhotoWrapper[] uiUpdatePhotoWrapper = _filterUIUpdateJobPhotoWrapper;
-		_filterUIUpdateJobPhotoWrapper = null;
+		final PhotoWrapper[] uiUpdatePhotoWrapper = _jobUIFilterPhotoWrapper;
+		_jobUIFilterPhotoWrapper = null;
 
 		if (uiUpdatePhotoWrapper == null) {
 			return;
 		}
 
-		final int currentDirtyCounter = _filterUIUpdateJobDirtyCounter;
+		final int currentDirtyCounter = _jobUIFilterDirtyCounter;
 
 		updateUI_GalleryItems(uiUpdatePhotoWrapper);
 
-		if (_filterUIUpdateJobDirtyCounter > currentDirtyCounter) {
+		if (_jobUIFilterDirtyCounter > currentDirtyCounter) {
 			// UI is dirty again
-			filterUIJob_20_Schedule(DELAY_FOR_UI_UPDATE);
+			jobUIFilter_20_Schedule(DELAY_JOB_UI_FILTER);
 		}
 	}
 
-	private Comparator<PhotoWrapper> getCurrentComparator() {
-		return _currentSorting == GallerySorting.FILE_NAME ? SORT_BY_FILE_NAME : SORT_BY_FILE_DATE;
-	}
+	private void jobUILoading_10_Create() {
 
-	int getThumbnailSize() {
-		return _spinnerThumbSize.getSelection();
-	}
+		_jobUILoading = new UIJob(Messages.App_JobName_PicDirImages_UpdateUIWhenLoadingImages) {
 
-	void handlePrefStoreModifications(final PropertyChangeEvent event) {
+			@Override
+			public IStatus runInUIThread(final IProgressMonitor monitor) {
 
-		final String property = event.getProperty();
+				_jobUILoadingIsScheduled.set(false);
 
-		if (property.equals(ITourbookPreferences.PHOTO_VIEWER_PREF_EVENT_IMAGE_QUALITY_IS_MODIFIED)) {
-
-			_display.asyncExec(new Runnable() {
-				public void run() {
-
-					if (MessageDialog.openQuestion(
-							_display.getActiveShell(),
-							Messages.Pic_Dir_Dialog_CleanupStoreImages_Title,
-							Messages.Pic_Dir_Dialog_CleanupStoreImages_Message) == false) {
-
-						disposeAllImages();
-					}
-
-					_gallery.updateGallery(false, _gallery.getGalleryPosition());
+				try {
+					jobUILoading_30_Run();
+				} catch (final Exception e) {
+					StatusUtil.log(e);
 				}
-			});
 
-		} else if (property.equals(ITourbookPreferences.PHOTO_VIEWER_PREF_EVENT_IMAGE_VIEWER_UI_IS_MODIFIED)) {
+				return Status.OK_STATUS;
+			}
 
-			updateUI_FromPrefStore();
+		};
 
-			updateUI_AfterZoomInOut(_prevGalleryItemSize);
+		_jobUILoading.setSystem(true);
+	}
 
-		} else if (property.equals(ITourbookPreferences.PHOTO_VIEWER_FONT)) {
+	private void jobUILoading_20_Schedule() {
 
-			onModifyFont();
+		JOB_LOCK.lock();
+		{
+			try {
+
+				_jobUILoadingDirtyCounter++;
+
+				if ((_jobUILoading.getState() == Job.RUNNING) == false) {
+
+					// UI job is NOT running, schedule it
+
+					final boolean isScheduled = _jobUILoadingIsScheduled.getAndSet(true);
+
+					if (isScheduled == false) {
+						_jobUILoading.schedule(DELAY_JOB_UI_LOADING);
+					}
+				}
+
+			} finally {
+				JOB_LOCK.unlock();
+			}
+		}
+	}
+
+	private void jobUILoading_21_ScheduleWithoutRunCheck() {
+
+		_jobUILoadingDirtyCounter++;
+
+		final boolean isScheduled = _jobUILoadingIsScheduled.getAndSet(true);
+
+		if (isScheduled == false) {
+			_jobUILoading.schedule(DELAY_JOB_UI_LOADING);
+		}
+	}
+
+	private void jobUILoading_30_Run() {
+
+		final int currentDirtyCounter = _jobUILoadingDirtyCounter;
+
+		final int exifQueueSize = PhotoLoadManager.getExifQueueSize();
+		final int imageQueueSize = PhotoLoadManager.getImageQueueSize();
+		final int imageHQQueueSize = PhotoLoadManager.getImageHQQueueSize();
+
+		if (exifQueueSize > 0 || imageQueueSize > 0 || imageHQQueueSize > 0) {
+
+			setStatusMessageInUIThread(NLS.bind(
+					"Loading images  -  EXIF: {0}  -  small: {1}  -  large: {2}",
+					new Object[] { exifQueueSize, imageQueueSize, imageHQQueueSize }));
+
+		} else {
+
+			// hide last message
+
+			setStatusMessageInUIThread(UI.EMPTY_STRING);
+		}
+
+		if (_jobUILoadingDirtyCounter > currentDirtyCounter) {
+
+			// UI is dirty again, schedule it again
+
+			jobUILoading_21_ScheduleWithoutRunCheck();
 		}
 	}
 
 	void onClose() {
 
-		// stop filter job
-		try {
-			_filterJob.cancel();
-			_filterJob.join();
-		} catch (final InterruptedException e) {
-			StatusUtil.log(e);
+		// stop jobs
+		JOB_LOCK.lock();
+		{
+			try {
+				jobFilter_12_Stop();
+			} finally {
+				JOB_LOCK.unlock();
+			}
 		}
 
 		if (_galleryFont != null) {
@@ -1499,21 +1640,29 @@ public class PicDirImages {
 
 	/**
 	 * Get gps state and exif data
+	 * 
+	 * @return Returns <code>true</code> when exif data is already available from the cache and must
+	 *         not be loaded.
 	 */
-	private void putImageInExifLoadingQueue(final PhotoWrapper photoWrapper) {
+	private boolean putImageInExifLoadingQueue(final PhotoWrapper photoWrapper) {
+
+		// create photo which is used to draw the photo image
+		final Photo photo = photoWrapper.photo = new Photo(photoWrapper);
+
+		final PhotoImageMetadata photoImageMetadata = _exifCache.get(photoWrapper.imageFilePathName);
+
+		if (photoImageMetadata != null) {
+
+			photo.setImageMetadata(photoImageMetadata);
+
+			return true;
+		}
 
 		_exifLoadingQueueSize.incrementAndGet();
 
-		Photo photo = photoWrapper.photo;
+		PhotoLoadManager.putImageInExifLoadingQueue(photo, new LoadExifCallback(photo, _currentExifRunId));
 
-		// photo is not yet set
-		if (photoWrapper.photo == null) {
-
-			// create photo which is used to draw the photo image
-			photoWrapper.photo = photo = new Photo(photoWrapper);
-		}
-
-		PhotoLoadManager.putImageInExifLoadingQueue(photo, new LoadExifCallback());
+		return false;
 	}
 
 	private void removeInvalidFolder(final String invalidFolderPathName) {
@@ -1711,14 +1860,28 @@ public class PicDirImages {
 		_photoRenderer.setShowLabels(isShowPhotoName, photoDateInfo, isShowAnnotations);
 	}
 
-	void setMessage(final String message) {
-		_lblStatusLine.setText(message);
-	}
-
 	void setSorting(final GallerySorting gallerySorting) {
 
 		// set new sorting algorithm
 		_currentSorting = gallerySorting;
+	}
+
+	void setStatusMessage(final String message) {
+		_lblStatusLine.setText(message);
+	}
+
+	void setStatusMessageInUIThread(final String message) {
+
+		_display.asyncExec(new Runnable() {
+			public void run() {
+
+				if (_gallery.isDisposed()) {
+					return;
+				}
+
+				_lblStatusLine.setText(message);
+			}
+		});
 	}
 
 	/**
@@ -1730,14 +1893,14 @@ public class PicDirImages {
 	 */
 	void showImages(final File imageFolder, final boolean isFromNavigationHistory, final boolean isReloadFolder) {
 
-		FILTER_JOB_LOCK.lock();
+		JOB_LOCK.lock();
 		{
 			try {
 
-				filterJob_12_Stop();
+				jobFilter_12_Stop();
 
 			} finally {
-				FILTER_JOB_LOCK.unlock();
+				JOB_LOCK.unlock();
 			}
 		}
 
@@ -1747,7 +1910,7 @@ public class PicDirImages {
 		//
 		// MUST BE REMOVED, IS ONLY FOR TESTING
 		//
-//		disposeAllImages();
+		disposeAllImages();
 		//
 		// MUST BE REMOVED, IS ONLY FOR TESTING
 		//
@@ -1892,10 +2055,10 @@ public class PicDirImages {
 		/*
 		 * page: folder info
 		 */
-		_pageFolderInfo.setForeground(fgColor);
-		_pageFolderInfo.setBackground(bgColor);
-		_lblFolderInfo.setForeground(fgColor);
-		_lblFolderInfo.setBackground(bgColor);
+		_pageGalleryInfo.setForeground(fgColor);
+		_pageGalleryInfo.setBackground(bgColor);
+		_lblGalleryInfo.setForeground(fgColor);
+		_lblGalleryInfo.setBackground(bgColor);
 	}
 
 	private void updateHistory(final String newFolderPathName) {
@@ -1973,101 +2136,6 @@ public class PicDirImages {
 		}
 	}
 
-	private void updateUI_FilterProgress() {
-
-		final int filterProgessLoaded = _filterProgessLoaded.get();
-
-		if (filterProgessLoaded == _filterProgessMax) {
-
-			// reset progress bar when all exif data are loaded
-
-			_display.asyncExec(new Runnable() {
-				public void run() {
-
-					if (_gallery.isDisposed()) {
-						return;
-					}
-
-					setMessage(UI.EMPTY_STRING);
-				}
-			});
-
-		} else {
-
-			// update progress bar periodically
-
-			final long now = System.currentTimeMillis();
-			if (now > _filterProgessLastUIUpdate + 100) {
-
-				_filterProgessLastUIUpdate = now;
-
-				_display.asyncExec(new Runnable() {
-					public void run() {
-
-						if (_gallery.isDisposed()) {
-							return;
-						}
-
-						final double valueD = (double) filterProgessLoaded / _filterProgessMax;
-
-						setMessage(NLS.bind("Reading EXIF data:  {0} %     {1} / {2}", new Object[] {
-								(int) (valueD * 100),
-								filterProgessLoaded,
-								_filterProgessMax, }));
-					}
-				});
-			}
-		}
-	}
-
-	private void updateUI_FolderInfo() {
-
-		_display.syncExec(new Runnable() {
-			public void run() {
-
-				if (_gallery.isDisposed()) {
-					return;
-				}
-
-				_pageBook.showPage(_pageFolderInfo);
-
-				final int imageCount = _allPhotoWrapper.length;
-
-				if (imageCount == 0) {
-
-					_lblFolderInfo.setText("No images in this folder");
-
-				} else {
-
-					final int exifLoadingQueueSize = _exifLoadingQueueSize.get();
-
-					if (exifLoadingQueueSize > 0) {
-
-						// show filter message only when image files are being loaded
-
-						_lblFolderInfo.setText(NLS
-								.bind("Filtering images, remaining images: {0}", exifLoadingQueueSize));
-
-					} else {
-
-						if (_sortedAndFilteredPhotoWrapper.length == 0) {
-
-							if (imageCount == 1) {
-								_lblFolderInfo.setText("1 image is hidden by the image filter");
-							} else {
-								_lblFolderInfo.setText(NLS
-										.bind("{0} images are hidden by the image filter", imageCount));
-							}
-
-						} else {
-							// this case should not happen, the gallery is displayed
-						}
-					}
-				}
-			}
-		});
-	}
-
 	private void updateUI_FromPrefStore() {
 
 		/*
@@ -2092,6 +2160,56 @@ public class PicDirImages {
 
 		// get update border size
 		_photoBorderSize = _photoRenderer.getBorderSize();
+	}
+
+	private void updateUI_GalleryInfo() {
+
+		_display.syncExec(new Runnable() {
+			public void run() {
+
+				if (_gallery.isDisposed()) {
+					return;
+				}
+
+				_pageBook.showPage(_pageGalleryInfo);
+
+				final int imageCount = _allPhotoWrapper.length;
+
+				if (imageCount == 0) {
+
+					_lblGalleryInfo.setText("No images in this folder");
+
+				} else {
+
+					final int exifLoadingQueueSize = _exifLoadingQueueSize.get();
+
+					if (exifLoadingQueueSize > 0) {
+
+						// show filter message only when image files are being loaded
+
+						_lblGalleryInfo.setText(NLS.bind(
+								"Filtering images, remaining images: {0}",
+								exifLoadingQueueSize));
+
+					} else {
+
+						if (_sortedAndFilteredPhotoWrapper.length == 0) {
+
+							if (imageCount == 1) {
+								_lblGalleryInfo.setText("1 image is hidden by the image filter");
+							} else {
+								_lblGalleryInfo.setText(NLS.bind(
+										"{0} images are hidden by the image filter",
+										imageCount));
+							}
+
+						} else {
+							// this case should not happen, the gallery is displayed
+						}
+					}
+				}
+			}
+		});
 	}
 
 	/*
@@ -2139,7 +2257,7 @@ public class PicDirImages {
 
 					// no gallery items
 
-					updateUI_FolderInfo();
+					updateUI_GalleryInfo();
 				}
 			}
 		});
@@ -2149,7 +2267,7 @@ public class PicDirImages {
 
 		_display.syncExec(new Runnable() {
 			public void run() {
-				setMessage(NLS.bind("Retrieving... {0}  Folder: {1}  Files: {2}", //
+				setStatusMessage(NLS.bind("Retrieving... {0}  Folder: {1}  Files: {2}", //
 						new Object[] { folderName, folderCounter, fileCounter }));
 			}
 		});
@@ -2264,7 +2382,7 @@ public class PicDirImages {
 			 * start filter always, even when no filter is set because it is loading exif data which
 			 * is used to sort images correctly by exif date (when available) and not by file date
 			 */
-			filterJob_20_ScheduleInitial();
+			jobFilter_20_ScheduleInitial();
 		}
 	}
 

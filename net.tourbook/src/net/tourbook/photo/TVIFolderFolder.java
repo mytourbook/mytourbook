@@ -65,13 +65,13 @@ public class TVIFolderFolder extends TVIFolder {
 //				_allCounter++;
 //
 //				// update UI that files are retrieved from the filesystem
-//				if (_allCounter % 500 == 0) {
+//				if (_allCounter % 100 == 0) {
 //
-////					System.out.println(NLS.bind("Retrieving... {0}  Folder: {1}  Files: {2}", //
-////							new Object[] { _folderName, _folderCounter, _fileCounter }));
-////					// TODO remove SYSTEM.OUT.PRINTLN
+//					System.out.println(NLS.bind("Retrieving... {0}  Folder: {1}  Files: {2}", //
+//							new Object[] { _folderName, _folderCounter, _fileCounter }));
+//					// TODO remove SYSTEM.OUT.PRINTLN
 //
-////					_picDirFolder.updateUI_RetrievedFileFolder(_folderName, _folderCounter, _fileCounter);
+//					_picDirFolder.updateUI_RetrievedFileFolder(_folderName, _folderCounter, _fileCounter);
 //				}
 
 				return false;

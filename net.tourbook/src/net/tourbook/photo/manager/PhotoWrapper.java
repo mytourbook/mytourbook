@@ -18,6 +18,7 @@ package net.tourbook.photo.manager;
 import java.io.File;
 
 import net.tourbook.photo.gallery.MT20.IGalleryCustomData;
+import net.tourbook.ui.UI;
 
 /**
  * Wrapper for a photo image file, sorting and filtering attributes and the {@link Photo} itself.
@@ -30,6 +31,7 @@ public class PhotoWrapper implements IGalleryCustomData {
 	public File		imageFile;
 
 	public String	imageFileName;
+	public String	imageFileExt;
 	public String	imageFilePathName;
 	public long		imageFileLastModified;
 	public long		imageSortingTime;
@@ -54,6 +56,9 @@ public class PhotoWrapper implements IGalleryCustomData {
 		imageFileName = imageFile.getName();
 		imageFilePathName = imageFile.getPath();
 		imageFileLastModified = imageFile.lastModified();
+
+		final int dotPos = imageFileName.lastIndexOf(".");
+		imageFileExt = dotPos > 0 ? imageFileName.substring(dotPos + 1).toLowerCase() : UI.EMPTY_STRING;
 
 		// initially sort by file date until exif data are loaded
 		imageSortingTime = imageFileLastModified;

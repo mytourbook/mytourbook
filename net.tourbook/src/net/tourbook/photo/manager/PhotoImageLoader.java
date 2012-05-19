@@ -46,6 +46,8 @@ import org.joda.time.LocalDate;
 
 public class PhotoImageLoader {
 
+	private static String[]				awtImageFileSuffixes;
+
 	Photo								_photo;
 	private GalleryMT20Item				_galleryItem;
 	ImageQuality						_requestedImageQuality;
@@ -68,6 +70,22 @@ public class PhotoImageLoader {
 	private ArrayList<Image>			_trackedSWTImages	= new ArrayList<Image>();
 
 	private int[]						_recursiveCounter	= { 0 };
+
+	static {
+
+		awtImageFileSuffixes = ImageIO.getReaderFileSuffixes();
+
+//		final String[] formatNames = ImageIO.getReaderFormatNames();
+//		final String mimeReadFormats[] = ImageIO.getReaderMIMETypes();
+//
+//		System.out.println("Mime Reader:      " + Arrays.asList(mimeReadFormats));
+//		System.out.println("Format Reader:    " + Arrays.asList(formatNames));
+//		System.out.println("Suffixes Readers: " + Arrays.asList(fileSuffixes));
+
+//		final String writeFormats[] = ImageIO.getWriterMIMETypes();
+//		System.out.println("Mime Writers:     " + Arrays.asList(writeFormats));
+
+	}
 
 	public PhotoImageLoader(final Display display,
 							final GalleryMT20Item galleryItem,
@@ -219,7 +237,7 @@ public class PhotoImageLoader {
 		}
 
 		/*
-		 * wait until small images are loaded
+		 * wait until exif data are loaded
 		 */
 		try {
 			while (waitingQueueExif.size() > 0) {
@@ -333,6 +351,8 @@ public class PhotoImageLoader {
 
 				awtBufferedImage = jpegMetadata.getEXIFThumbnail();
 				_trackedAWTImages.add(awtBufferedImage);
+
+				_photo.setExifThumbState(awtBufferedImage == null ? 0 : 1);
 
 				if (awtBufferedImage == null) {
 					return null;
@@ -867,7 +887,7 @@ public class PhotoImageLoader {
 
 			final long startHqLoad = System.currentTimeMillis();
 			{
-				originalImage = ImageIO.read(photoWrapper.imageFile);
+				originalImage = loadImageHQ_22_ExtendedAWT(photoWrapper);
 
 				_trackedAWTImages.add(originalImage);
 			}
@@ -1083,6 +1103,50 @@ public class PhotoImageLoader {
 				);
 
 		return requestedSWTImage;
+	}
+
+	private BufferedImage loadImageHQ_22_ExtendedAWT(final PhotoWrapper photoWrapper) throws IOException {
+
+		final String photoSuffix = photoWrapper.imageFileExt;
+		boolean isAWTImageSupported = false;
+
+		for (final String awtImageSuffix : awtImageFileSuffixes) {
+			if (photoSuffix.equals(awtImageSuffix)) {
+				isAWTImageSupported = true;
+				break;
+			}
+		}
+
+		if (isAWTImageSupported == false) {
+
+			// extension is not supported
+
+			return null;
+
+// JAI implementation
+//
+//			final SeekableStream s = new FileSeekableStream(photoWrapper.imageFile);
+//
+//			final TIFFDecodeParam param = null;
+//
+//			final ImageDecoder dec = ImageCodec.createImageDecoder("tiff", s, param);
+//
+//			// Which of the multiple images in the TIFF file do we want to load
+//			// 0 refers to the first, 1 to the second and so on.
+//			final int imageToLoad = 0;
+//
+//			final RenderedImage op = new NullOpImage(
+//					dec.decodeAsRenderedImage(imageToLoad),
+//					null,
+//					OpImage.OP_IO_BOUND,
+//					null);
+//
+//			final BufferedImage img = new BufferedImage(op.getWidth(), op.getHeight(), BufferedImage.TYPE_INT_ARGB);
+
+		} else {
+
+			return ImageIO.read(photoWrapper.imageFile);
+		}
 	}
 
 	private void setStateLoadingError() {

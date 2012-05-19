@@ -231,6 +231,8 @@ class PicDirFolder {
 					// update folder viewer
 					_folderViewer.refresh(_selectedTVIFolder);
 
+					_picDirImages.deleteCachedMetadata(_selectedTVIFolder._treeItemFolder.getAbsolutePath());
+
 					// update images and force folder reload
 					displayFolderImages(_selectedTVIFolder, false, true);
 
@@ -964,7 +966,7 @@ class PicDirFolder {
 
 			// restored folder is not available
 
-			_picDirImages.setMessage(NLS.bind("Folder is not available: {0}", requestedFolderName));
+			_picDirImages.setStatusMessage(NLS.bind("Folder is not available: {0}", requestedFolderName));
 		}
 
 		if (selectedFolder == null) {

@@ -152,6 +152,10 @@ public class PhotoLoadManager {
 		_executorHQ = (ThreadPoolExecutor) Executors.newFixedThreadPool(1, threadFactoryHQ);
 	}
 
+	public static void clearExifLoadingQueue() {
+		clearWaitingQueue(_waitingQueueExif, _executorExif);
+	}
+
 	private static Object[] clearWaitingQueue(	final LinkedBlockingDeque<?> waitingQueue,
 												final ThreadPoolExecutor executorService) {
 
@@ -171,6 +175,10 @@ public class PhotoLoadManager {
 		waitingQueue.clear();
 
 		return waitingQueueItems;
+	}
+
+	public static int getExifQueueSize() {
+		return _waitingQueueExif.size();
 	}
 
 	/**
@@ -200,6 +208,14 @@ public class PhotoLoadManager {
 		}
 
 		return hqImageSizeIndex;
+	}
+
+	public static int getImageHQQueueSize() {
+		return _waitingQueueHQ.size();
+	}
+
+	public static int getImageQueueSize() {
+		return _waitingQueueThumb.size();
 	}
 
 	public static void putImageInExifLoadingQueue(final Photo photo, final ILoadCallBack imageLoadCallback) {
@@ -242,7 +258,7 @@ public class PhotoLoadManager {
 			public void run() {
 
 				// get last added loader itme
-				final PhotoImageLoader loadingItem = _waitingQueueHQ.pollLast();
+				final PhotoImageLoader loadingItem = _waitingQueueHQ.pollFirst();
 
 				if (loadingItem != null) {
 					loadingItem.loadImageHQ(_waitingQueueThumb, _waitingQueueExif);
@@ -274,7 +290,7 @@ public class PhotoLoadManager {
 			public void run() {
 
 				// get last added loader itme
-				final PhotoImageLoader loadingItem = _waitingQueueThumb.pollLast();
+				final PhotoImageLoader loadingItem = _waitingQueueThumb.pollFirst();
 
 				if (loadingItem != null) {
 					loadingItem.loadImage(_waitingQueueExif);
@@ -321,7 +337,7 @@ public class PhotoLoadManager {
 		resetLoadingState(waitingQueueItems);
 
 		if (isClearExifQueue) {
-			clearWaitingQueue(_waitingQueueExif, _executorExif);
+			clearExifLoadingQueue();
 		}
 	}
 

@@ -72,10 +72,10 @@ public class Photo {
 	 * Other        =     reserved
 	 * </pre>
 	 */
-	private int								_orientation	= 1;
+	private int								_orientation			= 1;
 
-	private int								_imageWidth		= Integer.MIN_VALUE;
-	private int								_imageHeight	= Integer.MIN_VALUE;
+	private int								_imageWidth				= Integer.MIN_VALUE;
+	private int								_imageHeight			= Integer.MIN_VALUE;
 
 	private int								_widthSmall;
 	private int								_heightSmall;
@@ -83,31 +83,31 @@ public class Photo {
 	/**
 	 * Contains photo image width after it is rotated with the EXIF orientation
 	 */
-	private int								_widthRotated	= _imageWidth;
+	private int								_widthRotated			= _imageWidth;
 
 	/**
 	 * Contains photo image height after it is rotated with the EXIF orientation
 	 */
-	private int								_heightRotated	= _imageHeight;
+	private int								_heightRotated			= _imageHeight;
 
-	private double							_latitude		= Double.MIN_VALUE;
-	private double							_longitude		= Double.MIN_VALUE;
+	private double							_latitude				= Double.MIN_VALUE;
+	private double							_longitude				= Double.MIN_VALUE;
 
 	private GeoPosition						_geoPosition;
 	private String							_gpsAreaInfo;
 
-	private double							_imageDirection	= Double.MIN_VALUE;
-	private double							_altitude		= Double.MIN_VALUE;
+	private double							_imageDirection			= Double.MIN_VALUE;
+	private double							_altitude				= Double.MIN_VALUE;
 
-	private static final DateTimeFormatter	_dtParser		= DateTimeFormat.forPattern("yyyy:MM:dd HH:mm:ss")// //$NON-NLS-1$
-																	.withZone(DateTimeZone.UTC);
+	private static final DateTimeFormatter	_dtParser				= DateTimeFormat.forPattern("yyyy:MM:dd HH:mm:ss")// //$NON-NLS-1$
+																			.withZone(DateTimeZone.UTC);
 
 	/**
 	 * caches the world positions for the photo lat/long values for each zoom level
 	 * <p>
 	 * key: projection id + zoom level
 	 */
-	private final HashMap<Integer, Point>	_worldPosition	= new HashMap<Integer, Point>();
+	private final HashMap<Integer, Point>	_worldPosition			= new HashMap<Integer, Point>();
 
 	/**
 	 * Contains image keys for each image quality which can be used to get images from an image
@@ -127,6 +127,18 @@ public class Photo {
 	 */
 	private boolean							_isEXIFThumbAvailable;
 	private boolean							_isSwapWidthHeight;
+
+	/**
+	 * Exif thumb state
+	 * <p>
+	 * 
+	 * <pre>
+	 * 1  exif thumb image is available
+	 * 0  exif thumb image is not available
+	 * -1 exif thumb has not yet been retrieved
+	 * </pre>
+	 */
+	private int								_exifThumbImageState	= -1;
 
 	/**
 	 * @param galleryItemIndex
@@ -156,9 +168,7 @@ public class Photo {
 	 */
 	private PhotoImageMetadata createPhotoMetadata(final IImageMetadata imageFileMetadata) {
 
-		/*
-		 * this will log all available meta data
-		 */
+// this will log all available meta data
 //		System.out.println(metadata.toString());
 
 		final PhotoImageMetadata photoMetadata = new PhotoImageMetadata();
@@ -376,6 +386,19 @@ public class Photo {
 	}
 
 	/**
+	 * @return Returns EXIF thumb image stage
+	 * 
+	 *         <pre>
+	 * 1  exif thumb image is available
+	 * 0  exif thumb image is not available
+	 * -1 exif thumb has not yet been retrieved
+	 * </pre>
+	 */
+	public int getExifThumbImageState() {
+		return _exifThumbImageState;
+	}
+
+	/**
 	 * Image direction
 	 * 
 	 * @param tagInfo
@@ -471,6 +494,9 @@ public class Photo {
 	public IImageMetadata getImageMetaData(final Boolean isReadThumbnail) {
 
 		if (_photoImageMetadata != null && isReadThumbnail == false) {
+
+			// meta data are available but the exif thumnail is not requested
+
 			return null;
 		}
 
@@ -487,18 +513,30 @@ public class Photo {
 			final HashMap<Object, Object> params = new HashMap<Object, Object>();
 			params.put(SanselanConstants.PARAM_KEY_READ_THUMBNAILS, isReadThumbnail);
 
+			final long start = System.currentTimeMillis();
+
 			imageFileMetadata = Sanselan.getMetadata(_photoWrapper.imageFile, params);
 
+			System.out.println("read exif\t"
+					+ ((System.currentTimeMillis() - start) + " ms")
+					+ ("\tWithThumb: " + isReadThumbnail)
+					+ ("\t" + _photoWrapper.imageFilePathName)
+			//
+					);
+			// TODO remove SYSTEM.OUT.PRINTLN
+
+//			System.out.println(imageFileMetadata);
+//			// TODO remove SYSTEM.OUT.PRINTLN
+
 		} catch (final Exception e) {
-// must be logged in another way
 			StatusUtil.log(NLS.bind(//
-					"Could not read metadata from image \"{0}\"",
+					"Could not read metadata from image \"{0}\"", //$NON-NLS-1$
 					_photoWrapper.imageFile));
 		} finally {
 
-			_photoImageMetadata = createPhotoMetadata(imageFileMetadata);
+			final PhotoImageMetadata photoImageMetadata = createPhotoMetadata(imageFileMetadata);
 
-			updatePhotoImageMetadata(_photoImageMetadata);
+			setImageMetadata(photoImageMetadata);
 		}
 
 		return imageFileMetadata;
@@ -657,49 +695,17 @@ public class Photo {
 		_exifDateTime = dateTime;
 	}
 
+	public void setExifThumbState(final int exifThumbState) {
+		_exifThumbImageState = exifThumbState;
+	}
+
 	public void setGpsAreaInfo(final String gpsAreaInfo) {
 		_gpsAreaInfo = gpsAreaInfo;
 	}
 
-	public void setIsEXIFThumb() {
-		_isEXIFThumbAvailable = true;
-	}
+	public void setImageMetadata(final PhotoImageMetadata photoImageMetadata) {
 
-	public void setLatitude(final double latitude) {
-		_latitude = latitude;
-	}
-
-	public void setLoadingState(final PhotoLoadingState photoLoadingState, final ImageQuality imageQuality) {
-		if (imageQuality == ImageQuality.HQ) {
-			_photoLoadingStateHQ = photoLoadingState;
-		} else {
-			_photoLoadingStateThumb = photoLoadingState;
-		}
-	}
-
-	public void setLongitude(final double longitude) {
-		_longitude = longitude;
-	}
-
-	@Override
-	public String toString() {
-
-		final String rotateDegree = _orientation == 8 ? "270" //
-				: _orientation == 3 ? "180" //
-						: _orientation == 6 ? "90" : "0";
-
-		return ""
-//				+"Photo " //
-				+ (_photoWrapper.imageFileName)
-//				+ (_exifDateTime == null ? "-no date-" : "\t" + _exifDateTime)
-//				+ ("\trotate:" + rotateDegree)
-//				+ (_imageWidth == Integer.MIN_VALUE ? "-no size-" : "\t" + _imageWidth + "x" + _imageHeight)
-//				+ (_latitude == Double.MIN_VALUE ? "\t-no GPS-" : "\t" + _latitude + " - " + _longitude)
-		//
-		;
-	}
-
-	private void updatePhotoImageMetadata(final PhotoImageMetadata photoImageMetadata) {
+		_photoImageMetadata = photoImageMetadata;
 
 		_exifDateTime = photoImageMetadata.exifDateTime;
 		_imageFileDateTime = photoImageMetadata.fileDateTime;
@@ -729,6 +735,44 @@ public class Photo {
 		if (_exifDateTime != null) {
 			_photoWrapper.imageSortingTime = _exifDateTime.getMillis();
 		}
+	}
+
+	public void setIsEXIFThumb() {
+		_isEXIFThumbAvailable = true;
+	}
+
+	public void setLatitude(final double latitude) {
+		_latitude = latitude;
+	}
+
+	public void setLoadingState(final PhotoLoadingState photoLoadingState, final ImageQuality imageQuality) {
+		if (imageQuality == ImageQuality.HQ) {
+			_photoLoadingStateHQ = photoLoadingState;
+		} else {
+			_photoLoadingStateThumb = photoLoadingState;
+		}
+	}
+
+	public void setLongitude(final double longitude) {
+		_longitude = longitude;
+	}
+
+	@Override
+	public String toString() {
+
+//		final String rotateDegree = _orientation == 8 ? "270" //
+//				: _orientation == 3 ? "180" //
+//						: _orientation == 6 ? "90" : "0";
+
+		return ""
+//				+"Photo " //
+				+ (_photoWrapper.imageFileName)
+//				+ (_exifDateTime == null ? "-no date-" : "\t" + _exifDateTime)
+//				+ ("\trotate:" + rotateDegree)
+//				+ (_imageWidth == Integer.MIN_VALUE ? "-no size-" : "\t" + _imageWidth + "x" + _imageHeight)
+//				+ (_latitude == Double.MIN_VALUE ? "\t-no GPS-" : "\t" + _latitude + " - " + _longitude)
+		//
+		;
 	}
 
 	public void updateSize(final int width, final int height, final int orientation) {

@@ -6,10 +6,13 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.photo.messages";						//$NON-NLS-1$
 
-	public static String		App_JobName_FilteringGalleryImages;
-	public static String		App_JobName_RetrievingFolderImageFiles;
+	public static String	App_JobName_PicDirImages_FilteringGalleryImages;
 
-	public static String	App_JobName_UpdateUIWithFilteredGalleryImages;
+	public static String	App_JobName_PicDirImages_UpdateUIWhenLoadingImages;
+
+	public static String	App_JobName_PicDirImages_UpdateUIWithFilteredGalleryImages;
+
+	public static String		App_JobName_RetrievingFolderImageFiles;
 
 	public static String		App_Unit_Pixel;
 

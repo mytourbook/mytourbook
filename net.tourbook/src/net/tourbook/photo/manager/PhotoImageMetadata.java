@@ -23,20 +23,20 @@ import org.joda.time.DateTime;
 public class PhotoImageMetadata {
 
 	public DateTime	fileDateTime;
+
 	public DateTime	exifDateTime;
-
 	public int		imageWidth		= Integer.MIN_VALUE;
-	public int		imageHeight		= Integer.MIN_VALUE;
 
+	public int		imageHeight		= Integer.MIN_VALUE;
 	public int		orientation		= 1;
 
 	public double	imageDirection	= Double.MIN_VALUE;
+
 	public double	altitude		= Double.MIN_VALUE;
-
 	public double	latitude		= Double.MIN_VALUE;
-	public double	longitude		= Double.MIN_VALUE;
 
+	public double	longitude		= Double.MIN_VALUE;
 	public String	gpsAreaInfo;
 
-
+	public PhotoImageMetadata() {}
 }
