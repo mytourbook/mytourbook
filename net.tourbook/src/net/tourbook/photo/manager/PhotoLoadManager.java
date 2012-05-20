@@ -230,7 +230,7 @@ public class PhotoLoadManager {
 				final PhotoExifLoader loadingItem = _waitingQueueExif.pollLast();
 
 				if (loadingItem != null) {
-					loadingItem.loadExif();
+					loadingItem.loadExif(_waitingQueueThumb);
 				}
 			}
 		};
@@ -293,7 +293,7 @@ public class PhotoLoadManager {
 				final PhotoImageLoader loadingItem = _waitingQueueThumb.pollFirst();
 
 				if (loadingItem != null) {
-					loadingItem.loadImage(_waitingQueueExif);
+					loadingItem.loadImage();
 				}
 			}
 		};

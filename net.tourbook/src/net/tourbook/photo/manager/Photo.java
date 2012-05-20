@@ -513,18 +513,20 @@ public class Photo {
 			final HashMap<Object, Object> params = new HashMap<Object, Object>();
 			params.put(ImagingConstants.PARAM_KEY_READ_THUMBNAILS, isReadThumbnail);
 
-			final long start = System.currentTimeMillis();
+//			final long start = System.currentTimeMillis();
 
 			imageFileMetadata = Imaging.getMetadata(_photoWrapper.imageFile, params);
 
-			System.out.println("read exif\t"
-					+ ((System.currentTimeMillis() - start) + " ms")
-					+ ("\tWithThumb: " + isReadThumbnail)
-					+ ("\t" + _photoWrapper.imageFilePathName)
-			//
-					);
-			// TODO remove SYSTEM.OUT.PRINTLN
-
+//			System.out.println(UI.timeStamp()
+//					+ Thread.currentThread().getName()
+//					+ "read exif\t"
+//					+ ((System.currentTimeMillis() - start) + " ms")
+//					+ ("\tWithThumb: " + isReadThumbnail)
+//					+ ("\t" + _photoWrapper.imageFilePathName)
+//			//
+//					);
+//			// TODO remove SYSTEM.OUT.PRINTLN
+//
 //			System.out.println(imageFileMetadata);
 //			// TODO remove SYSTEM.OUT.PRINTLN
 

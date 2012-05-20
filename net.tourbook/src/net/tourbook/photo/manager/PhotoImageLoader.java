@@ -80,7 +80,7 @@ public class PhotoImageLoader {
 //
 //		System.out.println("Mime Reader:      " + Arrays.asList(mimeReadFormats));
 //		System.out.println("Format Reader:    " + Arrays.asList(formatNames));
-//		System.out.println("Suffixes Readers: " + Arrays.asList(fileSuffixes));
+//		System.out.println("Suffixes Readers: " + Arrays.asList(awtImageFileSuffixes));
 
 //		final String writeFormats[] = ImageIO.getWriterMIMETypes();
 //		System.out.println("Mime Writers:     " + Arrays.asList(writeFormats));
@@ -245,22 +245,11 @@ public class PhotoImageLoader {
 	 * 
 	 * @param waitingqueueexif
 	 */
-	public void loadImage(final LinkedBlockingDeque<PhotoExifLoader> waitingQueueExif) {
+	public void loadImage() {
 
 		if (isImageVisible() == false) {
 			setStateUndefined();
 			return;
-		}
-
-		/*
-		 * wait until exif data are loaded
-		 */
-		try {
-			while (waitingQueueExif.size() > 0) {
-				Thread.sleep(50);
-			}
-		} catch (final InterruptedException e) {
-			// should not happen, I hope so
 		}
 
 		boolean isImageLoadedInRequestedQuality = false;
@@ -1124,6 +1113,8 @@ public class PhotoImageLoader {
 		return requestedSWTImage;
 	}
 
+// JAI implementation to read tiff images with AWT
+//
 //	private BufferedImage loadImageHQ_22_ExtendedAWT(final PhotoWrapper photoWrapper) throws IOException {
 //
 //		if (isAWTImageSupported == false) {
@@ -1132,7 +1123,6 @@ public class PhotoImageLoader {
 //
 //			return null;
 //
-//// JAI implementation
 ////
 ////			final SeekableStream s = new FileSeekableStream(_photo.getPhotoWrapper().imageFile);
 ////

@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
 import net.tourbook.application.TourbookPlugin;
@@ -210,7 +209,6 @@ public class PicDirImages {
 
 	private FileFilter											_fileFilter;
 
-	private AtomicInteger										_exifLoadingQueueSize			= new AtomicInteger();
 	private PicDirFolder										_picDirFolder;
 
 	private boolean												_isComboKeyPressed;
@@ -239,7 +237,7 @@ public class PicDirImages {
 
 	private ImageFilter											_currentImageFilter;
 
-	private boolean												_filterJobIsFirstRun;
+	private boolean												_filterJob1stRun;
 	private boolean												_filterJobIsCanceled;
 
 	private ReentrantLock										JOB_LOCK						= new ReentrantLock();
@@ -385,8 +383,6 @@ public class PicDirImages {
 
 				return;
 			}
-
-			_exifLoadingQueueSize.decrementAndGet();
 
 			jobFilter_22_ScheduleSubsequent(DELAY_JOB_SUBSEQUENT_FILTER);
 			jobUILoading_20_Schedule();
@@ -1032,11 +1028,11 @@ public class PicDirImages {
 
 				try {
 
-					if (_filterJobIsFirstRun) {
+					if (_filterJob1stRun) {
 
-						_filterJobIsFirstRun = false;
+						_filterJob1stRun = false;
 
-						jobFilter_30_RunFirst();
+						jobFilter_30_Run1st();
 
 					} else {
 						jobFilter_32_RunSubsequent();
@@ -1069,17 +1065,17 @@ public class PicDirImages {
 		}
 	}
 
-	private void jobFilter_20_ScheduleInitial() {
+	private void jobFilter_20_Schedule1st() {
+
+		// filter must be stopped before new wrappers are set
+		jobFilter_12_Stop();
 
 		JOB_LOCK.lock();
 		{
 			try {
 
-				// filter must be stopped before new wrappers are set
-				jobFilter_12_Stop();
-
 				// this is the initial run of the filter job
-				_filterJobIsFirstRun = true;
+				_filterJob1stRun = true;
 
 				_sortedAndFilteredPhotoWrapper = new PhotoWrapper[0];
 
@@ -1096,7 +1092,7 @@ public class PicDirImages {
 		 * hide status message for the first delay, because when nothing is filtered, the UI is
 		 * flickering with an initial message
 		 */
-		setStatusMessageInUIThread(UI.EMPTY_STRING);
+		updateUI_StatusMessageInUIThread(UI.EMPTY_STRING);
 	}
 
 	private void jobFilter_22_ScheduleSubsequent(final long delay) {
@@ -1140,7 +1136,7 @@ public class PicDirImages {
 	/**
 	 * Filter and sort photos and load EXIF data (which is required for sorting).
 	 */
-	private void jobFilter_30_RunFirst() {
+	private void jobFilter_30_Run1st() {
 
 //		final long start = System.nanoTime();
 
@@ -1163,8 +1159,6 @@ public class PicDirImages {
 
 		// get current dirty counter
 		final int currentDirtyCounter = _jobFilterDirtyCounter;
-
-		_exifLoadingQueueSize.set(0);
 
 		PhotoWrapper[] newFilteredWrapper = null;
 
@@ -1520,15 +1514,15 @@ public class PicDirImages {
 
 		if (exifQueueSize > 0 || imageQueueSize > 0 || imageHQQueueSize > 0) {
 
-			setStatusMessageInUIThread(NLS.bind(
-					"Loading images  -  EXIF: {0}  -  small: {1}  -  large: {2}",
-					new Object[] { exifQueueSize, imageQueueSize, imageHQQueueSize }));
+			updateUI_StatusMessageInUIThread(NLS.bind(
+					"Loading images  -  thumbs: {0}  -  normal: {1}  -  filter data: {2}",
+					new Object[] { imageQueueSize, imageHQQueueSize, exifQueueSize }));
 
 		} else {
 
 			// hide last message
 
-			setStatusMessageInUIThread(UI.EMPTY_STRING);
+			updateUI_StatusMessageInUIThread(UI.EMPTY_STRING);
 		}
 
 		if (_jobUILoadingDirtyCounter > currentDirtyCounter) {
@@ -1542,14 +1536,7 @@ public class PicDirImages {
 	void onClose() {
 
 		// stop jobs
-		JOB_LOCK.lock();
-		{
-			try {
-				jobFilter_12_Stop();
-			} finally {
-				JOB_LOCK.unlock();
-			}
-		}
+		jobFilter_12_Stop();
 
 		if (_galleryFont != null) {
 			_galleryFont.dispose();
@@ -1647,7 +1634,11 @@ public class PicDirImages {
 	private boolean putImageInExifLoadingQueue(final PhotoWrapper photoWrapper) {
 
 		// create photo which is used to draw the photo image
-		final Photo photo = photoWrapper.photo = new Photo(photoWrapper);
+		Photo photo = photoWrapper.photo;
+
+		if (photo == null) {
+			photo = photoWrapper.photo = new Photo(photoWrapper);
+		}
 
 		final PhotoImageMetadata photoImageMetadata = _exifCache.get(photoWrapper.imageFilePathName);
 
@@ -1657,8 +1648,6 @@ public class PicDirImages {
 
 			return true;
 		}
-
-		_exifLoadingQueueSize.incrementAndGet();
 
 		PhotoLoadManager.putImageInExifLoadingQueue(photo, new LoadExifCallback(photo, _currentExifRunId));
 
@@ -1866,24 +1855,6 @@ public class PicDirImages {
 		_currentSorting = gallerySorting;
 	}
 
-	void setStatusMessage(final String message) {
-		_lblStatusLine.setText(message);
-	}
-
-	void setStatusMessageInUIThread(final String message) {
-
-		_display.asyncExec(new Runnable() {
-			public void run() {
-
-				if (_gallery.isDisposed()) {
-					return;
-				}
-
-				_lblStatusLine.setText(message);
-			}
-		});
-	}
-
 	/**
 	 * Display images for the selected folder.
 	 * 
@@ -1893,16 +1864,7 @@ public class PicDirImages {
 	 */
 	void showImages(final File imageFolder, final boolean isFromNavigationHistory, final boolean isReloadFolder) {
 
-		JOB_LOCK.lock();
-		{
-			try {
-
-				jobFilter_12_Stop();
-
-			} finally {
-				JOB_LOCK.unlock();
-			}
-		}
+		jobFilter_12_Stop();
 
 		PhotoLoadManager.stopImageLoading(true);
 
@@ -1910,7 +1872,7 @@ public class PicDirImages {
 		//
 		// MUST BE REMOVED, IS ONLY FOR TESTING
 		//
-		disposeAllImages();
+//		disposeAllImages();
 		//
 		// MUST BE REMOVED, IS ONLY FOR TESTING
 		//
@@ -2181,14 +2143,14 @@ public class PicDirImages {
 
 				} else {
 
-					final int exifLoadingQueueSize = _exifLoadingQueueSize.get();
+					final int exifLoadingQueueSize = PhotoLoadManager.getExifQueueSize();
 
 					if (exifLoadingQueueSize > 0) {
 
 						// show filter message only when image files are being loaded
 
 						_lblGalleryInfo.setText(NLS.bind(
-								"Filtering images, remaining images: {0}",
+								"Filtering images, filter info (image EXIF data) not loaded: {0}",
 								exifLoadingQueueSize));
 
 					} else {
@@ -2265,10 +2227,33 @@ public class PicDirImages {
 
 	void updateUI_RetrievedFileFolder(final String folderName, final int folderCounter, final int fileCounter) {
 
-		_display.syncExec(new Runnable() {
+// this is currently not working !!! it must be implemented in another thread
+
+//		setStatusMessage(NLS.bind("Retrieving Folders: {0}  Files: {1}  in {2}", //
+//				new Object[] { folderCounter, fileCounter, folderName }));
+//
+//		_lblStatusLine.update();
+//
+//		// flush event queue to update statusline because this method is running in the UI thread
+//		while (_display.readAndDispatch()) {
+//			;
+//		}
+	}
+
+	void updateUI_StatusMessage(final String message) {
+		_lblStatusLine.setText(message);
+	}
+
+	void updateUI_StatusMessageInUIThread(final String message) {
+
+		_display.asyncExec(new Runnable() {
 			public void run() {
-				setStatusMessage(NLS.bind("Retrieving... {0}  Folder: {1}  Files: {2}", //
-						new Object[] { folderName, folderCounter, fileCounter }));
+
+				if (_gallery.isDisposed()) {
+					return;
+				}
+
+				_lblStatusLine.setText(message);
 			}
 		});
 	}
@@ -2382,7 +2367,7 @@ public class PicDirImages {
 			 * start filter always, even when no filter is set because it is loading exif data which
 			 * is used to sort images correctly by exif date (when available) and not by file date
 			 */
-			jobFilter_20_ScheduleInitial();
+			jobFilter_20_Schedule1st();
 		}
 	}
 

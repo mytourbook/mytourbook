@@ -62,16 +62,17 @@ public class TVIFolderFolder extends TVIFolder {
 					_fileCounter++;
 				}
 
+// this MUST be run in another thread because currently it is running in the UI thread and will not update the UI !!!
+//
 //				_allCounter++;
 //
 //				// update UI that files are retrieved from the filesystem
-//				if (_allCounter % 100 == 0) {
+//				if (_allCounter % 500 == 0) {
 //
-//					System.out.println(NLS.bind("Retrieving... {0}  Folder: {1}  Files: {2}", //
-//							new Object[] { _folderName, _folderCounter, _fileCounter }));
-//					// TODO remove SYSTEM.OUT.PRINTLN
-//
-//					_picDirFolder.updateUI_RetrievedFileFolder(_folderName, _folderCounter, _fileCounter);
+//					_picDirFolder.updateUI_RetrievedFileFolder(
+//							_treeItemFolder.getAbsolutePath(),
+//							_folderCounter,
+//							_fileCounter);
 //				}
 
 				return false;

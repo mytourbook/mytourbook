@@ -966,7 +966,7 @@ class PicDirFolder {
 
 			// restored folder is not available
 
-			_picDirImages.setStatusMessage(NLS.bind("Folder is not available: {0}", requestedFolderName));
+			_picDirImages.updateUI_StatusMessage(NLS.bind("Folder is not available: {0}", requestedFolderName));
 		}
 
 		if (selectedFolder == null) {

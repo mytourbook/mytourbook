@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.photo.manager;
 
+import java.util.concurrent.LinkedBlockingDeque;
 
 public class PhotoExifLoader {
 
@@ -27,7 +28,18 @@ public class PhotoExifLoader {
 		_loadCallBack = imageLoadCallback;
 	}
 
-	public void loadExif() {
+	public void loadExif(final LinkedBlockingDeque<PhotoImageLoader> waitingQueueThumb) {
+
+		/*
+		 * wait until thumb images are loaded
+		 */
+		try {
+			while (waitingQueueThumb.size() > 0) {
+				Thread.sleep(50);
+			}
+		} catch (final InterruptedException e) {
+			// should not happen, I hope so
+		}
 
 		// load metadata
 		_photo.getImageMetaData();
