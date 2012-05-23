@@ -13,22 +13,29 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.photo.manager;
+package net.tourbook.photo;
 
-public enum PhotoLoadingState {
+import net.tourbook.util.ToolTip;
 
-	/**
-	 * Image is not yet loaded for this photo or it's in the image cache
-	 */
-	UNDEFINED,
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 
-	/**
-	 * Loading the image for a photo failed
-	 */
-	IMAGE_HAS_A_LOADING_ERROR,
+public class PhotoToolTip extends ToolTip {
 
-	/**
-	 * Image is currently in the loading queue and is waiting to be loaded
-	 */
-	IMAGE_IS_IN_LOADING_QUEUE
+	private Control	_toolTipControl;
+
+	public PhotoToolTip(final Control control) {
+
+		super(control, NO_RECREATE, false);
+
+		_toolTipControl = control;
+	}
+
+	@Override
+	protected Composite createToolTipContentArea(final Event event, final Composite parent) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

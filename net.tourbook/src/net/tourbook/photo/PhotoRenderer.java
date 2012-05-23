@@ -249,10 +249,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 				isDrawText = false;
 			}
 
-			drawImage(
-					gc,
-					photoWrapper,
-					photoImage,
+			drawImage(gc, photoWrapper, photoImage, //
 					imageX,
 					imageY,
 					imageWidth,
@@ -268,13 +265,23 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 			// image is not available
 
-			drawStatusText(gc, photoWrapper, imageX, imageY, imageWidth, imageHeight, requestedImageQuality, //
-					isDrawText && _isShowPhotoName);
+			drawStatusText(gc, photoWrapper, //
+					imageX,
+					imageY,
+					imageWidth,
+					imageHeight,
+					requestedImageQuality,
+					isDrawText && _isShowPhotoName,
+					isSelected);
 		}
 
 		// draw name & date & annotations
 		if (isDrawText && (_isShowPhotoName || _isShowDateInfo)) {
-			drawInfoText(gc, photoWrapper, imageX, imageY, imageWidth, imageHeight);
+			drawPhotoDateName(gc, photoWrapper, //
+					imageX,
+					imageY,
+					imageWidth,
+					imageHeight);
 		}
 
 		// annotations are drawn in the bottom right corner of the image
@@ -436,12 +443,12 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		}
 	}
 
-	private void drawInfoText(	final GC gc,
-								final PhotoWrapper photoWrapper,
-								final int photoPosX,
-								final int photoPosY,
-								final int photoWidth,
-								final int photoHeight) {
+	private void drawPhotoDateName(	final GC gc,
+									final PhotoWrapper photoWrapper,
+									final int photoPosX,
+									final int photoPosY,
+									final int photoWidth,
+									final int photoHeight) {
 
 		/*
 		 * get text for date/filename
@@ -552,7 +559,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 								final int photoWidth,
 								final int imageCanvasHeight,
 								final ImageQuality requestedImageQuality,
-								final boolean isImageNameDisplayed) {
+								final boolean isImageNameDisplayed,
+								final boolean isSelected) {
 
 		final Photo photo = photoWrapper.photo;
 
@@ -599,6 +607,13 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		}
 
 		gc.drawString(statusText, photoPosX + textOffsetX, photoPosY + textOffsetY, true);
+
+		if (isSelected) {
+
+			// draw marker line on the left side
+			gc.setBackground(_selectionFgColor);
+			gc.fillRectangle(photoPosX, photoPosY, 2, imageCanvasHeight);
+		}
 	}
 
 	@Override

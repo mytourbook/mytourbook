@@ -500,6 +500,11 @@ public class Photo {
 			return null;
 		}
 
+		if (PhotoLoadManager.isImageLoadingError(_photoWrapper.imageFilePathName)) {
+			// image could not be loaded previously
+			return null;
+		}
+
 		IImageMetadata imageFileMetadata = null;
 
 		try {
@@ -531,9 +536,13 @@ public class Photo {
 //			// TODO remove SYSTEM.OUT.PRINTLN
 
 		} catch (final Exception e) {
+
 			StatusUtil.log(NLS.bind(//
 					"Could not read metadata from image \"{0}\"", //$NON-NLS-1$
 					_photoWrapper.imageFile));
+
+			PhotoLoadManager.putPhotoInLoadingErrorMap(getPhotoWrapper().imageFilePathName);
+
 		} finally {
 
 			final PhotoImageMetadata photoImageMetadata = createPhotoMetadata(imageFileMetadata);
@@ -759,6 +768,10 @@ public class Photo {
 		_longitude = longitude;
 	}
 
+	public void setThumbSaveError() {
+		PhotoLoadManager.putPhotoInThumbSaveErrorMap(_photoWrapper.imageFilePathName);
+	}
+
 	@Override
 	public String toString() {
 
@@ -813,5 +826,4 @@ public class Photo {
 			_heightRotated = _imageHeight;
 		}
 	}
-
 }

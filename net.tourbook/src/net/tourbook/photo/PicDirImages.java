@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -30,6 +31,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.photo.gallery.MT20.GalleryMT20;
 import net.tourbook.photo.gallery.MT20.GalleryMT20Item;
 import net.tourbook.photo.gallery.MT20.IGalleryCustomData;
+import net.tourbook.photo.gallery.MT20.IItemHovereredListener;
 import net.tourbook.photo.manager.GallerySorting;
 import net.tourbook.photo.manager.ILoadCallBack;
 import net.tourbook.photo.manager.Photo;
@@ -97,7 +99,7 @@ import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
  * org.apache.commons.sanselan
  * </pre>
  */
-public class PicDirImages {
+public class PicDirImages implements IItemHovereredListener {
 
 	private static final int									IMAGE_INDICATOR_SIZE			= 16;
 
@@ -188,6 +190,8 @@ public class PicDirImages {
 	private PicDirView											_picDirView;
 
 	private PhotoRenderer										_photoRenderer;
+
+	private PhotoToolTip										_photoTooltip;
 
 	/**
 	 * Folder which images are currently be displayed
@@ -728,6 +732,9 @@ public class PicDirImages {
 
 			createUI_50_StatusLine(container);
 		}
+
+		_photoTooltip = new PhotoToolTip(_gallery);
+		_gallery.addItemHoveredListener(this);
 	}
 
 	private void createUI_10_ActionBar(final Composite parent) {
@@ -882,9 +889,17 @@ public class PicDirImages {
 			}
 		});
 
-		/*
-		 * set photo renderer
-		 */
+		_gallery.addListener(SWT.Selection, new Listener() {
+
+			// a gallery item is selected/deselected
+
+			@Override
+			public void handleEvent(final Event event) {
+				onSelectPhoto();
+			}
+		});
+
+		// set photo renderer which paints the image but also starts the image loading
 		_photoRenderer = new PhotoRenderer(_gallery, this);
 
 		_gallery.setItemRenderer(_photoRenderer);
@@ -979,6 +994,18 @@ public class PicDirImages {
 		return _currentSorting == GallerySorting.FILE_NAME ? SORT_BY_FILE_NAME : SORT_BY_FILE_DATE;
 	}
 
+	/**
+	 * This message is displayed when no other message should be displayed.
+	 * 
+	 * @return
+	 */
+	private String getStatusDefaultMessage() {
+
+		final Collection<GalleryMT20Item> allSelectedPhoto = _gallery.getSelection();
+
+		return NLS.bind("Selected: {0}", allSelectedPhoto.size());
+	}
+
 	int getThumbnailSize() {
 		return _spinnerThumbSize.getSelection();
 	}
@@ -1014,6 +1041,14 @@ public class PicDirImages {
 
 			onModifyFont();
 		}
+	}
+
+	@Override
+	public void hoveredItem(final GalleryMT20Item hoveredItem) {
+
+		System.out.println(UI.timeStamp() + "hovered: " + hoveredItem);
+		// TODO remove SYSTEM.OUT.PRINTLN
+
 	}
 
 	private void jobFilter_10_Create() {
@@ -1512,10 +1547,16 @@ public class PicDirImages {
 		final int imageQueueSize = PhotoLoadManager.getImageQueueSize();
 		final int imageHQQueueSize = PhotoLoadManager.getImageHQQueueSize();
 
-		if (exifQueueSize > 0 || imageQueueSize > 0 || imageHQQueueSize > 0) {
+		if (exifQueueSize > 0) {
 
 			updateUI_StatusMessageInUIThread(NLS.bind(
 					"Loading images  -  thumbs: {0}  -  normal: {1}  -  filter data: {2}",
+					new Object[] { imageQueueSize, imageHQQueueSize, exifQueueSize }));
+
+		} else if (imageQueueSize > 0 || imageHQQueueSize > 0) {
+
+			updateUI_StatusMessageInUIThread(NLS.bind(//
+					"Loading images  -  thumbs: {0}  -  normal: {1}",
 					new Object[] { imageQueueSize, imageHQQueueSize, exifQueueSize }));
 
 		} else {
@@ -1589,6 +1630,12 @@ public class PicDirImages {
 				}
 			}
 		});
+	}
+
+	private void onSelectPhoto() {
+
+		// show default message
+		updateUI_StatusMessage(UI.EMPTY_STRING);
 	}
 
 	private void onSelectThumbnailSize(final int newImageSize) {
@@ -1873,6 +1920,7 @@ public class PicDirImages {
 		// MUST BE REMOVED, IS ONLY FOR TESTING
 		//
 //		disposeAllImages();
+//		PhotoLoadManager.removeInvalidImageFiles();
 		//
 		// MUST BE REMOVED, IS ONLY FOR TESTING
 		//
@@ -2241,7 +2289,12 @@ public class PicDirImages {
 	}
 
 	void updateUI_StatusMessage(final String message) {
-		_lblStatusLine.setText(message);
+
+		if (message.length() == 0) {
+			_lblStatusLine.setText(getStatusDefaultMessage());
+		} else {
+			_lblStatusLine.setText(message);
+		}
 	}
 
 	void updateUI_StatusMessageInUIThread(final String message) {
@@ -2253,7 +2306,11 @@ public class PicDirImages {
 					return;
 				}
 
-				_lblStatusLine.setText(message);
+				if (message.length() == 0) {
+					_lblStatusLine.setText(getStatusDefaultMessage());
+				} else {
+					_lblStatusLine.setText(message);
+				}
 			}
 		});
 	}

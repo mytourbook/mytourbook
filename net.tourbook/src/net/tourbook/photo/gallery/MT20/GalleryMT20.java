@@ -15,10 +15,13 @@
  *******************************************************************************/
 package net.tourbook.photo.gallery.MT20;
 
+import java.util.Collection;
 import java.util.HashMap;
 
+import net.tourbook.util.StatusUtil;
 import net.tourbook.util.UI;
 
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -26,6 +29,8 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.MenuDetectEvent;
+import org.eclipse.swt.events.MenuDetectListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
@@ -63,7 +68,12 @@ public abstract class GalleryMT20 extends Canvas {
 	private int									_galleryPosition		= 0;
 
 	private int									_prevGalleryPosition;
-	private Double								_newGalleryPositionRatio;
+
+	/**
+	 * This is the saved and restored position. The gallery will be positioned here, until the user
+	 * has scrolled or navigated the gallery.
+	 */
+	private Double								_defaultGalleryPositionRatio;
 
 	/**
 	 * When <code>true</code> images are painted in higher quality but must be larger than the high
@@ -103,6 +113,8 @@ public abstract class GalleryMT20 extends Canvas {
 	private int									_prevContentWidth;
 
 	private AbstractGalleryMT20ItemRenderer		_itemRenderer;
+
+	private final ListenerList					_hoveredListeners		= new ListenerList(ListenerList.IDENTITY);
 
 	/**
 	 * Cached client area
@@ -179,29 +191,25 @@ public abstract class GalleryMT20 extends Canvas {
 	 */
 	private boolean								_isZoomed;
 
-	/**
-	 * Keeps track of the last selected item. This is necessary to support "Shift+Mouse button"
-	 * where we have to select all items between the previous and the current item and keyboard
-	 * navigation.
-	 */
-	private GalleryMT20Item						_lastSingleClick		= null;
-
 	private Point								_mouseMovePosition;
 
 	private Point								_mousePanStartPosition;
 
 	private int									_lastZoomEventTime;
-	private boolean								_mouseClickHandled;
+	private boolean								_isMouseClickHandled;
 	private boolean								_isGalleryPanned;
 
-	/**
-	 * Last result of _indexOf(GalleryItem). Used for optimisation.
-	 */
-	private int									_lastIndexOfVirtualItem	= -1;
 	/**
 	 * Vertical/horizontal offset for centered gallery items
 	 */
 	private int									_itemCenterOffsetX;
+
+	/**
+	 * Keeps track of the last selected item. This is necessary to support "Shift+Mouse button"
+	 * where we have to select all items between the previous and the current item and keyboard
+	 * navigation.
+	 */
+	private int									_lastSingleClick		= -1;
 
 	/**
 	 * Gallery item which was selected at last
@@ -273,50 +281,20 @@ public abstract class GalleryMT20 extends Canvas {
 		});
 	}
 
+	public void addItemHoveredListener(final IItemHovereredListener hoveredListener) {
+		_hoveredListeners.add(hoveredListener);
+	}
+
 	private void addKeyListeners() {
 		addKeyListener(new KeyListener() {
 
 			public void keyPressed(final KeyEvent e) {
-
-				switch (e.keyCode) {
-				case SWT.ARROW_LEFT:
-				case SWT.ARROW_RIGHT:
-				case SWT.ARROW_UP:
-				case SWT.ARROW_DOWN:
-				case SWT.PAGE_UP:
-				case SWT.PAGE_DOWN:
-				case SWT.HOME:
-				case SWT.END:
-//					final GalleryMT20Item newItem = groupRenderer.getNextItem(lastSingleClick, e.keyCode);
-//
-//					if (newItem != null) {
-//						_deselectAll(false);
-//						setSelected(newItem, true, true);
-//						lastSingleClick = newItem;
-//						_showItem(newItem);
-//						redraw();
-//					}
-
-					break;
-
-				case SWT.CR:
-
-//					final GalleryMTFilterItem[] selection = getSelection();
-//					GalleryMTFilterItem item = null;
-//
-//					if (selection != null && selection.length > 0) {
-//						item = selection[0];
-//					}
-//
-//					notifySelectionListeners(item, 0, true);
-					break;
-				}
+				onKeyPressed(e);
 			}
 
 			public void keyReleased(final KeyEvent e) {
 				// Nothing yet.
 			}
-
 		});
 	}
 
@@ -326,38 +304,9 @@ public abstract class GalleryMT20 extends Canvas {
 	private void addMouseListeners() {
 
 		addMouseWheelListener(new MouseWheelListener() {
-
 			@Override
 			public void mouseScrolled(final MouseEvent event) {
-
-				_isZoomed = false;
-
-				/**
-				 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
-				 * <br>
-				 * This event is fired ONLY when the scrollbars are not visible, on Win 7<br>
-				 * <br>
-				 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-				 */
-
-				boolean isShift;
-				boolean isCtrl;
-				if (UI.IS_OSX) {
-					isShift = (event.stateMask & SWT.ALT) != 0;
-					isCtrl = (event.stateMask & SWT.COMMAND) != 0;
-				} else {
-					isShift = (event.stateMask & SWT.SHIFT) != 0;
-					isCtrl = (event.stateMask & SWT.CTRL) != 0;
-				}
-
-				/*
-				 * ensure <ctrl> or <shift> is pressed, otherwise it is zoomed when the scrollbar is
-				 * hidden
-				 */
-				if (isCtrl || isShift) {
-					zoomGallery(event.time, event.count > 0, isShift, isCtrl);
-					_isZoomed = true;
-				}
+				onMouseWheel(event);
 			}
 		});
 
@@ -382,6 +331,13 @@ public abstract class GalleryMT20 extends Canvas {
 			@Override
 			public void mouseMove(final MouseEvent e) {
 				onMouseMove(e);
+			}
+		});
+
+		addMenuDetectListener(new MenuDetectListener() {
+			@Override
+			public void menuDetected(final MenuDetectEvent menuEvent) {
+				onMouseContextMenu(menuEvent);
 			}
 		});
 	}
@@ -467,84 +423,6 @@ public abstract class GalleryMT20 extends Canvas {
 
 	}
 
-	private void addSelection(final GalleryMT20Item item) {
-
-		if (item == null) {
-			return;
-		}
-
-		if (isSelected(item)) {
-			return;
-		}
-
-		// Deselect all items if multi selection is disabled
-		if (!_isMultiSelection) {
-			deselectAll(false);
-		}
-
-		final int itemVirtualIndex = getItemIndex(item);
-
-		// Divide position by 32 to get selection bloc for this item.
-		final int n = itemVirtualIndex >> 5;
-		if (_virtualSelectionFlags == null) {
-			// Create selectionFlag array
-			// Add 31 before dividing by 32 to ensure at least one 'int' is
-			// created if size < 32.
-			_virtualSelectionFlags = new int[(_virtualGalleryItems.length + 31) >> 5];
-
-		} else if (n >= _virtualSelectionFlags.length) {
-
-			// Expand selectionArray
-			final int[] oldFlags = _virtualSelectionFlags;
-			_virtualSelectionFlags = new int[n + 1];
-			System.arraycopy(oldFlags, 0, _virtualSelectionFlags, 0, oldFlags.length);
-		}
-
-		// Get flag position in the 32 bit block and ensure is selected.
-		_virtualSelectionFlags[n] |= 1 << (itemVirtualIndex & 0x1f);
-
-		_lastSelectedItem = item;
-		_lastSelectedItemVirtualIndex = itemVirtualIndex;
-
-		_selectedItems.put(item.uniqueItemID, item);
-	}
-
-	private void addSelection(final int itemVirtualIndex, final GalleryMT20Item item) {
-
-		if (isSelected(itemVirtualIndex)) {
-			return;
-		}
-
-		// Deselect all items if multi selection is disabled
-		if (!_isMultiSelection) {
-			deselectAll(false);
-		}
-
-		// Divide position by 32 to get selection bloc for this item.
-		final int n = itemVirtualIndex >> 5;
-		if (_virtualSelectionFlags == null) {
-			// Create selectionFlag array
-			// Add 31 before dividing by 32 to ensure at least one 'int' is
-			// created if size < 32.
-			_virtualSelectionFlags = new int[(_virtualGalleryItems.length + 31) >> 5];
-
-		} else if (n >= _virtualSelectionFlags.length) {
-
-			// Expand selectionArray
-			final int[] oldFlags = _virtualSelectionFlags;
-			_virtualSelectionFlags = new int[n + 1];
-			System.arraycopy(oldFlags, 0, _virtualSelectionFlags, 0, oldFlags.length);
-		}
-
-		// Get flag position in the 32 bit block and ensure is selected.
-		_virtualSelectionFlags[n] |= 1 << (itemVirtualIndex & 0x1f);
-
-		_lastSelectedItem = item;
-		_lastSelectedItemVirtualIndex = itemVirtualIndex;
-
-		_selectedItems.put(item.uniqueItemID, item);
-	}
-
 	/**
 	 * Center selected item
 	 * 
@@ -595,10 +473,10 @@ public abstract class GalleryMT20 extends Canvas {
 	/**
 	 * Deselects all items and send selection event depending on parameter.
 	 * 
-	 * @param notifyListeners
+	 * @param isNotifyListeners
 	 *            If true, a selection event will be sent to all the current selection listeners.
 	 */
-	private void deselectAll(final boolean notifyListeners) {
+	private void deselectAll(final boolean isNotifyListeners) {
 
 		_lastSelectedItem = null;
 		_selectedItems.clear();
@@ -614,8 +492,16 @@ public abstract class GalleryMT20 extends Canvas {
 		}
 
 		// Notify listeners if necessary.
-		if (notifyListeners) {
+		if (isNotifyListeners) {
 			notifySelectionListeners(null, -1, false);
+		}
+	}
+
+	private void fireItemHoverEvent(final GalleryMT20Item hoveredItem) {
+
+		final Object[] listeners = _hoveredListeners.getListeners();
+		for (final Object listener : listeners) {
+			((IItemHovereredListener) listener).hoveredItem(hoveredItem);
 		}
 	}
 
@@ -760,7 +646,7 @@ public abstract class GalleryMT20 extends Canvas {
 	 * @param virtualIndex
 	 * @return Returns initialized gallery item from the given gallery position.
 	 */
-	private GalleryMT20Item getItemFromGallery(final int virtualIndex) {
+	private GalleryMT20Item getInitializedItem(final int virtualIndex) {
 
 		if (virtualIndex >= _virtualGalleryItems.length) {
 			return null;
@@ -789,12 +675,13 @@ public abstract class GalleryMT20 extends Canvas {
 	}
 
 	/**
-	 * Get item at pixel position
+	 * Get item virtual index at pixel position
 	 * 
 	 * @param coords
-	 * @return GalleryItem or null
+	 * @return Returns gallery item index in {@link #_virtualGalleryItems} or <code>-1</code> when
+	 *         item is not available.
 	 */
-	public GalleryMT20Item getItemFromPosition(final int viewPortX, final int viewPortY) {
+	public int getItemIndexFromPosition(final int viewPortX, final int viewPortY) {
 
 		if (_isVertical) {
 
@@ -806,12 +693,12 @@ public abstract class GalleryMT20 extends Canvas {
 
 			// ckeck if mouse click is outside of the gallery horizontal items
 			if (indexX >= _gridHorizItems) {
-				return null;
+				return -1;
 			}
 
 			// ckeck if mouse click is outside of the gallery vertical items
 			if (indexY >= _gridVertItems) {
-				return null;
+				return -1;
 			}
 
 			final int itemIndex = indexY * _gridHorizItems + indexX;
@@ -819,56 +706,14 @@ public abstract class GalleryMT20 extends Canvas {
 			// ensure array bounds
 			final int maxItems = _virtualGalleryItems.length;
 			if (itemIndex >= maxItems) {
-				return null;
+				return -1;
 			}
 
-			return _virtualGalleryItems[itemIndex];
+			return itemIndex;
 
 		} else {
 
 			// is not yet implemented
-		}
-
-		return null;
-	}
-
-	/**
-	 * @param item
-	 * @return Returns the index of the gallery item
-	 */
-	private int getItemIndex(final GalleryMT20Item item) {
-
-		final int virtualItemCount = _virtualGalleryItems.length;
-
-		if (1 <= _lastIndexOfVirtualItem && _lastIndexOfVirtualItem < virtualItemCount - 1) {
-
-			if (_virtualGalleryItems[_lastIndexOfVirtualItem] == item) {
-				return _lastIndexOfVirtualItem;
-			}
-
-			if (_virtualGalleryItems[_lastIndexOfVirtualItem + 1] == item) {
-				return ++_lastIndexOfVirtualItem;
-			}
-
-			if (_virtualGalleryItems[_lastIndexOfVirtualItem - 1] == item) {
-				return --_lastIndexOfVirtualItem;
-			}
-		}
-
-		if (_lastIndexOfVirtualItem < virtualItemCount / 2) {
-
-			for (int itemIndex = 0; itemIndex < virtualItemCount; itemIndex++) {
-				if (_virtualGalleryItems[itemIndex] == item) {
-					return _lastIndexOfVirtualItem = itemIndex;
-				}
-			}
-		} else {
-
-			for (int itemVirtualIndex = virtualItemCount - 1; itemVirtualIndex >= 0; --itemVirtualIndex) {
-				if (_virtualGalleryItems[itemVirtualIndex] == item) {
-					return _lastIndexOfVirtualItem = itemVirtualIndex;
-				}
-			}
 		}
 
 		return -1;
@@ -881,6 +726,67 @@ public abstract class GalleryMT20 extends Canvas {
 	public int getNumberOfHorizontalImages() {
 		return _gridHorizItems;
 	}
+
+//	private GalleryMT20Item getNextItem_OLD(final int keyCode) {
+//
+//		if (_lastSingleClick == null) {
+//
+//			// nothing is selected, select first item
+//
+//			final GalleryMT20Item firstItem = getInitializedItem(0);
+//
+//			_lastSingleClick = firstItem;
+//
+//			return firstItem;
+//		}
+//
+//		// Handle HOME and END
+//		switch (keyCode) {
+//		case SWT.HOME:
+//			return getInitializedItem(0);
+//
+//		case SWT.END:
+//			return getInitializedItem(_virtualGalleryItems.length - 1);
+//		}
+//
+//		// Handle arrows and page up / down
+//		if (_isVertical) {
+//
+//			final int maxVisibleRows = Math.max((_clientArea.height / _itemHeight) - 1, 1);
+//
+////			switch (keyCode) {
+////			case SWT.ARROW_LEFT:
+////				next = goLeft(group, pos);
+////				break;
+////
+////			case SWT.ARROW_RIGHT:
+////				next = goRight(group, pos);
+////				break;
+////
+////			case SWT.ARROW_UP:
+////				next = goUp(group, pos, hCount, 1);
+////				break;
+////
+////			case SWT.ARROW_DOWN:
+////				next = goDown(group, pos, hCount, 1);
+////				break;
+////
+////			case SWT.PAGE_UP:
+////				next = goUp(group, pos, hCount, Math.max(maxVisibleRows - 1, 1));
+////				break;
+////
+////			case SWT.PAGE_DOWN:
+////				next = goDown(group, pos, hCount, Math.max(maxVisibleRows - 1, 1));
+////				break;
+////			}
+//
+//		} else {
+//
+//			// is not yet implemented
+//		}
+//
+//		return null;
+//	}
 
 	public int getScrollBarIncrement() {
 
@@ -895,6 +801,13 @@ public abstract class GalleryMT20 extends Canvas {
 
 //		// Standard behavior
 //		return 16;
+	}
+
+	/**
+	 * @return Returns all selected items in an unorderd {@link Collection}.
+	 */
+	public Collection<GalleryMT20Item> getSelection() {
+		return _selectedItems.values();
 	}
 
 	/**
@@ -965,6 +878,26 @@ public abstract class GalleryMT20 extends Canvas {
 	}
 
 	/**
+	 * @param itemIndex
+	 * @return Returns <code>true</code> when the item is selected
+	 */
+	private boolean isItemSelected(final int itemIndex) {
+
+		if (_virtualSelectionFlags == null) {
+			return false;
+		}
+
+		final int itemFlagIndex = itemIndex >> 5;
+		if (itemFlagIndex >= _virtualSelectionFlags.length || itemFlagIndex < 0) {
+			return false;
+		}
+
+		final int flags = _virtualSelectionFlags[itemFlagIndex];
+
+		return flags != 0 && (flags & 1 << (itemIndex & 0x1f)) != 0;
+	}
+
+	/**
 	 * @param checkedGalleryItem
 	 * @return Returns <code>true</code> when the requested gallery item is currently visible in the
 	 *         client area.
@@ -996,7 +929,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 			if (galleryItem == checkedGalleryItem) {
 
-				setItemPosition(galleryItem, virtualIndex);
+				updateItemPosition(galleryItem, virtualIndex);
 
 				return true;
 			}
@@ -1005,67 +938,35 @@ public abstract class GalleryMT20 extends Canvas {
 		return false;
 	}
 
-	private boolean isSelected(final GalleryMT20Item item) {
-
-		if (item == null) {
-			return false;
-		}
-
-		if (_virtualSelectionFlags == null) {
-			return false;
-		}
-
-		final int itemVirtualIndex = getItemIndex(item);
-
-		final int itemFlagIndex = itemVirtualIndex >> 5;
-		if (itemFlagIndex >= _virtualSelectionFlags.length) {
-			return false;
-		}
-
-		final int flags = _virtualSelectionFlags[itemFlagIndex];
-
-		return flags != 0 && (flags & 1 << (itemVirtualIndex & 0x1f)) != 0;
-	}
-
-	private boolean isSelected(final int itemVirtualIndex) {
-
-		if (_virtualSelectionFlags == null) {
-			return false;
-		}
-
-		final int itemFlagIndex = itemVirtualIndex >> 5;
-		if (itemFlagIndex >= _virtualSelectionFlags.length) {
-			return false;
-		}
-
-		final int flags = _virtualSelectionFlags[itemFlagIndex];
-
-		return flags != 0 && (flags & 1 << (itemVirtualIndex & 0x1f)) != 0;
-	}
-
 	/**
-	 * Send a selection event for a gallery item
+	 * Send a selection event {@link SWT#Selection} or {@link SWT#DefaultSelection} for a gallery
+	 * item.
+	 * <p>
+	 * {@link Event#data} contains the selected/deselected gallery item or <code>null</code> when
+	 * nothing is selected
 	 * 
 	 * @param item
+	 * @param index
+	 * @param isDefault
 	 */
 	private void notifySelectionListeners(final GalleryMT20Item item, final int index, final boolean isDefault) {
 
-//		final Event e = new Event();
-//		e.widget = this;
-//		e.item = item;
-//		if (item != null) {
-//			e.data = item.getData();
-//		}
-//
-//		try {
-//			if (isDefault) {
-//				notifyListeners(SWT.DefaultSelection, e);
-//			} else {
-//				notifyListeners(SWT.Selection, e);
-//			}
-//		} catch (final RuntimeException ex) {
-//			ex.printStackTrace();
-//		}
+		final Event e = new Event();
+		e.widget = this;
+
+		if (item != null) {
+			e.data = item;
+		}
+
+		try {
+			if (isDefault) {
+				notifyListeners(SWT.DefaultSelection, e);
+			} else {
+				notifyListeners(SWT.Selection, e);
+			}
+		} catch (final RuntimeException ex) {
+			StatusUtil.log(ex);
+		}
 	}
 
 	/**
@@ -1103,91 +1004,321 @@ public abstract class GalleryMT20 extends Canvas {
 		}
 	}
 
-	private void onMouseDoubleClick(final MouseEvent e) {
+	/**
+	 * <pre>
+	 * 
+	 * Modifier Mask		Description
+	 * 
+	 * SWT.MOD1 			The first modifier was down (often SWT.CONTROL)
+	 * SWT.MOD2 			The second modifier was down (often SWT.SHIFT)
+	 * SWT.MOD3 			The third modifier was down (often SWT.ALT)
+	 * SWT.MOD4 			The fourth modifier was down (often zero)
+	 * SWT.MODIFIER_MASK 	Bitwise-OR of all valid modifiers
+	 * 
+	 * </pre>
+	 * 
+	 * @param keyEvent
+	 */
+	private void onKeyPressed(final KeyEvent keyEvent) {
 
-		final GalleryMT20Item item = getItemFromPosition(e.x, e.y);
-		if (item != null) {
-			notifySelectionListeners(item, 0, true);
+		final int virtualSize = _virtualGalleryItems.length;
+
+		// handle no items
+		if (virtualSize == 0) {
+			return;
 		}
-		_mouseClickHandled = true;
+
+		// handle 1st item
+		if (virtualSize == 1) {
+
+			// toggle selection for the only available item
+
+			selectItem(0, true);
+
+			// reset position when position is modified manually
+			_defaultGalleryPositionRatio = null;
+
+			return;
+		}
+
+		/*
+		 * handle 2nd ... n item
+		 */
+		boolean isResetPosition = false;
+
+		boolean isShift;
+		boolean isCtrl;
+		if (UI.IS_OSX) {
+//			isCtrl = (keyEvent.stateMask & SWT.COMMAND) != 0;
+//			isShift = (keyEvent.stateMask & SWT.ALT) != 0;
+			isCtrl = (keyEvent.stateMask & SWT.MOD1) != 0;
+			isShift = (keyEvent.stateMask & SWT.MOD2) != 0;
+		} else {
+			isCtrl = (keyEvent.stateMask & SWT.MOD1) != 0;
+			isShift = (keyEvent.stateMask & SWT.MOD2) != 0;
+		}
+
+		final int maxVisibleRows = Math.max((_clientArea.height / _itemHeight) - 1, 1);
+		final int maxVisibleItems = maxVisibleRows * _gridHorizItems;
+
+		switch (keyEvent.character) {
+		case '+':
+
+			// zoom IN
+
+			zoomGallery(keyEvent.time, true, isShift, isCtrl);
+
+			isResetPosition = true;
+			break;
+
+		case '-':
+
+			// zoom OUT
+
+			zoomGallery(keyEvent.time, false, isShift, isCtrl);
+
+			isResetPosition = true;
+			break;
+		}
+
+		switch (keyEvent.keyCode) {
+		case 'a':
+		case 'A':
+
+			// select ALL with <Ctrl><A>
+
+			if (isCtrl) {
+				selectAll();
+				isResetPosition = true;
+			}
+
+			break;
+
+		case SWT.ARROW_LEFT:
+
+			if (_lastSelectedItemVirtualIndex > 0) {
+				selectItem(_lastSelectedItemVirtualIndex - 1, true);
+				isResetPosition = true;
+			}
+
+			break;
+
+		case SWT.ARROW_RIGHT:
+
+			if (_lastSelectedItemVirtualIndex < virtualSize - 1) {
+				selectItem(_lastSelectedItemVirtualIndex + 1, true);
+				isResetPosition = true;
+			}
+
+			break;
+
+		case SWT.ARROW_UP:
+
+			if (_lastSelectedItemVirtualIndex < _gridHorizItems) {
+				// selection is already in the first row
+				return;
+			}
+
+			selectItem(_lastSelectedItemVirtualIndex - _gridHorizItems, true);
+
+			isResetPosition = true;
+			break;
+
+		case SWT.ARROW_DOWN:
+
+			final int nextRowIndex = _lastSelectedItemVirtualIndex + _gridHorizItems;
+
+			if (nextRowIndex >= virtualSize) {
+				// selection is already in the last row
+				return;
+			}
+
+			selectItem(nextRowIndex, true);
+
+			isResetPosition = true;
+			break;
+
+		case SWT.PAGE_UP:
+
+			if (_lastSelectedItemVirtualIndex < _gridHorizItems) {
+				// selection is already in the first row
+				return;
+			}
+
+			final int itemIndexPageUp = _lastSelectedItemVirtualIndex - maxVisibleItems;
+
+			selectItem(itemIndexPageUp < 0 ? 0 : itemIndexPageUp, true);
+
+			isResetPosition = true;
+			break;
+
+		case SWT.PAGE_DOWN:
+
+			int itemIndexPageDown = _lastSelectedItemVirtualIndex + _gridHorizItems;
+
+			if (itemIndexPageDown >= virtualSize) {
+				// selection is already in the last row
+				return;
+			}
+
+			itemIndexPageDown = _lastSelectedItemVirtualIndex + maxVisibleItems;
+
+			selectItem(itemIndexPageDown >= virtualSize ? virtualSize - 1 : itemIndexPageDown, true);
+
+			isResetPosition = true;
+			break;
+
+		case SWT.HOME:
+
+			if (_lastSelectedItemVirtualIndex == 0) {
+				// selection is already at the first item
+				return;
+			}
+
+			selectItem(0, true);
+
+			isResetPosition = true;
+			break;
+
+		case SWT.END:
+
+			if (_lastSelectedItemVirtualIndex == virtualSize - 1) {
+				// selection is already at the last item
+				return;
+			}
+
+			selectItem(virtualSize - 1, true);
+
+			isResetPosition = true;
+			break;
+
+		case SWT.CR:
+// handle default selection
+//
+//					final GalleryMTFilterItem[] selection = getSelection();
+//					GalleryMTFilterItem item = null;
+//
+//					if (selection != null && selection.length > 0) {
+//						item = selection[0];
+//					}
+//
+//					notifySelectionListeners(item, 0, true);
+//			isResetPosition=true;
+			break;
+		}
+
+		// reset position when position is modified manually
+		if (isResetPosition) {
+			_defaultGalleryPositionRatio = null;
+		}
 	}
 
-	private void onMouseDown(final MouseEvent e) {
+	private void onMouseContextMenu(final MenuDetectEvent menuEvent) {
 
-		_mouseClickHandled = false;
+	}
 
-		final GalleryMT20Item item = getItemFromPosition(e.x, e.y);
+	private void onMouseDoubleClick(final MouseEvent e) {
 
-		if (e.button == 1) {
+		final int itemIndex = getItemIndexFromPosition(e.x, e.y);
+		final GalleryMT20Item item = _virtualGalleryItems[itemIndex];
+
+		if (item != null) {
+			notifySelectionListeners(item, itemIndex, true);
+		}
+
+		_isMouseClickHandled = true;
+	}
+
+	private void onMouseDown(final MouseEvent mouseEvent) {
+
+		_isMouseClickHandled = false;
+
+		final int itemIndex = getItemIndexFromPosition(mouseEvent.x, mouseEvent.y);
+
+		if (mouseEvent.button == 1) {
 
 			// left mouse button is pressed
 
-			if (item == null) {
+			if (itemIndex == -1) {
+
+				// mouse is clicke beside an item
+
 				deselectAll(true);
 				redraw();
-				_mouseClickHandled = true;
-				_lastSingleClick = null;
+
+				_isMouseClickHandled = true;
+				_lastSingleClick = -1;
+
 			} else {
-				if ((e.stateMask & SWT.MOD1) > 0) {
-					onMouseHandleLeftMod1(e, item, true, false);
-				} else if ((e.stateMask & SWT.SHIFT) > 0) {
-					onMouseHandleLeftShift(e, item);
+
+				// item is selected
+
+				final boolean isCtrlKey = (mouseEvent.stateMask & SWT.MOD1) > 0;
+				final boolean isShiftKey = (mouseEvent.stateMask & SWT.MOD2) > 0;
+				final boolean isAltKey = (mouseEvent.stateMask & SWT.MOD3) > 0;
+
+				if (isAltKey) {
+
+					// pan gallery, keep position
+					_isGalleryPanned = true;
+					_mousePanStartPosition = new Point(mouseEvent.x, mouseEvent.y);
+
+				} else if (isCtrlKey) {
+					onMouseHandleCtrlLeft(mouseEvent, itemIndex, true, false);
+				} else if (isShiftKey) {
+					onMouseHandleShiftLeft(mouseEvent, itemIndex);
 				} else {
-					onMouseHandleLeft(e, item, true, false);
+					onMouseHandleLeft(mouseEvent, itemIndex, true, false);
 				}
 			}
-
-			// keep position to pan the gallery
-			_isGalleryPanned = true;
-			_mousePanStartPosition = new Point(e.x, e.y);
-
-		} else if (e.button == 3) {
-			onMouseHandleRight(e, item, true, false);
 		}
 	}
 
-	private void onMouseHandleLeft(final MouseEvent e, final GalleryMT20Item item, final boolean down, final boolean up) {
-		if (down) {
-			if (!isSelected(item)) {
-				deselectAll(false);
-
-				setSelected(item, true, true);
-
-				_lastSingleClick = item;
-				redraw();
-				_mouseClickHandled = true;
+	private void onMouseHandleCtrlLeft(	final MouseEvent e,
+										final int itemIndex,
+										final boolean isMouseDownEvent,
+										final boolean isMouseUpEvent) {
+		if (isMouseUpEvent) {
+			if (itemIndex != -1) {
+				selectItem(itemIndex, false);
 			}
-		} else if (up) {
-			if (item == null) {
+		}
+	}
+
+	private void onMouseHandleLeft(	final MouseEvent e,
+									final int itemIndex,
+									final boolean isMouseDownEvent,
+									final boolean isMouseUpEvent) {
+
+		if (isMouseDownEvent) {
+			if (!isItemSelected(itemIndex)) {
+
+				deselectAll(false);
+				selectItem(itemIndex, true, true);
+				_lastSingleClick = itemIndex;
+
+				redraw();
+
+				_isMouseClickHandled = true;
+			}
+
+		} else if (isMouseUpEvent) {
+
+			if (itemIndex == -1) {
 				deselectAll(true);
 			} else {
 
 				deselectAll(false);
-				setSelected(item, true, _lastSingleClick != item);
-				_lastSingleClick = item;
+				selectItem(itemIndex, true, _lastSingleClick != itemIndex);
+				_lastSingleClick = itemIndex;
 			}
 			redraw();
 		}
 	}
 
-	private void onMouseHandleLeftMod1(	final MouseEvent e,
-										final GalleryMT20Item item,
-										final boolean down,
-										final boolean up) {
-		if (up) {
-			// if (lastSingleClick != null) {
-			if (item != null) {
-				setSelected(item, !isSelected(item), true);
-				_lastSingleClick = item;
-				redraw();
-			}
-			// }
-		}
-	}
+	private void onMouseHandleShiftLeft(final MouseEvent e, final int itemIndex) {
 
-	private void onMouseHandleLeftShift(final MouseEvent e, final GalleryMT20Item currentItem) {
-
-		if (_lastSingleClick == null) {
+		if (_lastSingleClick == -1) {
 			return;
 		}
 
@@ -1197,8 +1328,8 @@ public abstract class GalleryMT20 extends Canvas {
 		 * select items between current item and last click item
 		 */
 
-		final int virtualLast = getItemIndex(_lastSingleClick);
-		final int virtualCurrent = getItemIndex(currentItem);
+		final int virtualLast = _lastSingleClick;
+		final int virtualCurrent = itemIndex;
 
 		int virtualIndexFrom;
 		int virtualIndexTo;
@@ -1212,42 +1343,18 @@ public abstract class GalleryMT20 extends Canvas {
 		}
 
 		for (int virtualIndex = virtualIndexFrom; virtualIndex <= virtualIndexTo; virtualIndex++) {
-
-			final GalleryMT20Item item = getItemFromGallery(virtualIndex);
-
-			addSelection(virtualIndex, item);
+			selectionAdd(virtualIndex);
 		}
 
-//	???	notifySelectionListeners(to, indexOf(to), false);
+		notifySelectionListeners(getInitializedItem(virtualLast), virtualLast, false);
 
 		redraw();
 	}
 
-	/**
-	 * Handle right click.
-	 * 
-	 * @param e
-	 * @param item
-	 *            : The item which is under the cursor or null
-	 * @param down
-	 * @param up
-	 */
-	private void onMouseHandleRight(final MouseEvent e, final GalleryMT20Item item, final boolean down, final boolean up) {
-		if (down) {
+	private void onMouseMove(final MouseEvent mouseEvent) {
 
-			if (item != null && !isSelected(item)) {
-				deselectAll(false);
-				setSelected(item, true, true);
-				redraw();
-				_mouseClickHandled = true;
-			}
-		}
-	}
-
-	private void onMouseMove(final MouseEvent e) {
-
-		final int mouseX = e.x;
-		final int mouseY = e.y;
+		final int mouseX = mouseEvent.x;
+		final int mouseY = mouseEvent.y;
 		_mouseMovePosition = new Point(mouseX, mouseY);
 
 		if (_isGalleryPanned) {
@@ -1278,38 +1385,98 @@ public abstract class GalleryMT20 extends Canvas {
 
 			// set down position to current mouse position
 			_mousePanStartPosition = _mouseMovePosition;
+
+		} else {
+
+			final int itemIndex = getItemIndexFromPosition(mouseEvent.x, mouseEvent.y);
+
+			GalleryMT20Item hoveredItem = null;
+
+			if (itemIndex != -1) {
+				hoveredItem = getInitializedItem(itemIndex);
+				updateItemPosition(hoveredItem, itemIndex);
+			}
+
+			fireItemHoverEvent(hoveredItem);
 		}
 	}
 
 	private void onMouseUp(final MouseEvent e) {
 
-		_isGalleryPanned = false;
+		if (_isGalleryPanned) {
 
-		if (_mouseClickHandled) {
+			// panning has ended
+
+			_isGalleryPanned = false;
 			return;
 		}
 
+		if (_isMouseClickHandled) {
+			// mouse click is already handled in the mouse down event
+			return;
+		}
+
+		/*
+		 * handle mouse click event
+		 */
+
 		if (e.button == 1) {
 
-			final GalleryMT20Item item = getItemFromPosition(e.x, e.y);
+			final int itemIndex = getItemIndexFromPosition(e.x, e.y);
 
-			if (item == null) {
+			if (itemIndex == -1) {
 				return;
 			}
 
 			if ((e.stateMask & SWT.MOD1) > 0) {
 
-				onMouseHandleLeftMod1(e, item, false, true);
+				onMouseHandleCtrlLeft(e, itemIndex, false, true);
 
-			} else if ((e.stateMask & SWT.SHIFT) > 0) {
+			} else if ((e.stateMask & SWT.MOD2) > 0) {
 
-				onMouseHandleLeftShift(e, item);
+				onMouseHandleShiftLeft(e, itemIndex);
 
 			} else {
 
-				onMouseHandleLeft(e, item, false, true);
+				onMouseHandleLeft(e, itemIndex, false, true);
 			}
 		}
+	}
+
+	private void onMouseWheel(final MouseEvent event) {
+
+		_isZoomed = false;
+
+		/**
+		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
+		 * <br>
+		 * This event is fired ONLY when the scrollbars are not visible, on Win 7<br>
+		 * <br>
+		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		 */
+
+		boolean isShift;
+		boolean isCtrl;
+		if (UI.IS_OSX) {
+//			isCtrl = (event.stateMask & SWT.COMMAND) != 0;
+//			isShift = (event.stateMask & SWT.ALT) != 0;
+			isCtrl = (event.stateMask & SWT.MOD1) != 0;
+			isShift = (event.stateMask & SWT.MOD2) != 0;
+		} else {
+			isCtrl = (event.stateMask & SWT.MOD1) != 0;
+			isShift = (event.stateMask & SWT.MOD2) != 0;
+		}
+
+		/*
+		 * ensure <ctrl> or <shift> is pressed, otherwise it is zoomed when the scrollbar is hidden
+		 */
+		if (isCtrl || isShift) {
+			zoomGallery(event.time, event.count > 0, isShift, isCtrl);
+			_isZoomed = true;
+		}
+
+		// reset position when position is modified manually
+		_defaultGalleryPositionRatio = null;
 	}
 
 	private void onPaint(final GC gc) {
@@ -1368,15 +1535,15 @@ public abstract class GalleryMT20 extends Canvas {
 							continue;
 						}
 
-						final GalleryMT20Item galleryItem = getItemFromGallery(virtualIndex);
+						final GalleryMT20Item galleryItem = getInitializedItem(virtualIndex);
 
 						if (galleryItem == null) {
 							continue;
 						}
 
-						final boolean isSelected = isSelected(galleryItem);
+						final boolean isSelected = isItemSelected(virtualIndex);
 
-						setItemPosition(galleryItem, virtualIndex);
+						updateItemPosition(galleryItem, virtualIndex);
 
 						final int viewPortX = galleryItem.viewPortX;
 						final int viewPortY = galleryItem.viewPortY;
@@ -1422,6 +1589,9 @@ public abstract class GalleryMT20 extends Canvas {
 
 	private void onScrollHorizontal() {
 
+		// reset position when position is modified manually
+		_defaultGalleryPositionRatio = null;
+
 		final int areaWidth = _clientArea.width;
 		if (_contentVirtualWidth > areaWidth) {
 
@@ -1450,11 +1620,12 @@ public abstract class GalleryMT20 extends Canvas {
 			boolean isShift;
 			boolean isCtrl;
 			if (UI.IS_OSX) {
-				isShift = (event.stateMask & SWT.ALT) != 0;
 				isCtrl = (event.stateMask & SWT.COMMAND) != 0;
+//				isShift = (event.stateMask & SWT.ALT) != 0;
+				isShift = (event.stateMask & SWT.MOD2) != 0;
 			} else {
-				isShift = (event.stateMask & SWT.SHIFT) != 0;
-				isCtrl = (event.stateMask & SWT.CTRL) != 0;
+				isCtrl = (event.stateMask & SWT.MOD1) != 0;
+				isShift = (event.stateMask & SWT.MOD2) != 0;
 			}
 
 			/*
@@ -1487,6 +1658,9 @@ public abstract class GalleryMT20 extends Canvas {
 
 	private void onScrollVertical_10() {
 
+		// reset position when position is modified manually
+		_defaultGalleryPositionRatio = null;
+
 		final int areaHeight = _clientArea.height;
 
 		if (_contentVirtualHeight > areaHeight) {
@@ -1509,13 +1683,164 @@ public abstract class GalleryMT20 extends Canvas {
 		_clientAreaItemsIndices = getAreaItemsIndices(_clientArea);
 	}
 
-	private void removeSelection(final GalleryMT20Item item) {
+	private void selectAll() {
 
-		final int itemVirtualIndex = getItemIndex(item);
-		_virtualSelectionFlags[itemVirtualIndex >> 5] &= ~(1 << (itemVirtualIndex & 0x1f));
+		final int itemSize = _virtualGalleryItems.length;
+
+		if (itemSize == 0) {
+			return;
+		}
+
+		for (int itemIndex = 0; itemIndex < itemSize; itemIndex++) {
+			selectionAdd(itemIndex);
+		}
+
+		notifySelectionListeners(getInitializedItem(0), 0, false);
+
+		redraw();
+	}
+
+	/**
+	 * Adds a gallery item to the selected items
+	 * 
+	 * @param itemIndex
+	 */
+	private void selectionAdd(final int itemIndex) {
+
+		if (itemIndex == -1) {
+			return;
+		}
+
+		if (isItemSelected(itemIndex)) {
+			return;
+		}
+
+		// Deselect all items if multi selection is disabled
+		if (!_isMultiSelection) {
+			deselectAll(false);
+		}
+
+		// Divide position by 32 to get selection bloc for this item.
+		final int n = itemIndex >> 5;
+		if (_virtualSelectionFlags == null) {
+			// Create selectionFlag array
+			// Add 31 before dividing by 32 to ensure at least one 'int' is
+			// created if size < 32.
+			_virtualSelectionFlags = new int[(_virtualGalleryItems.length + 31) >> 5];
+
+		} else if (n >= _virtualSelectionFlags.length) {
+
+			// Expand selectionArray
+			final int[] oldFlags = _virtualSelectionFlags;
+			_virtualSelectionFlags = new int[n + 1];
+			System.arraycopy(oldFlags, 0, _virtualSelectionFlags, 0, oldFlags.length);
+		}
+
+		// Get flag position in the 32 bit block and ensure is selected.
+		_virtualSelectionFlags[n] |= 1 << (itemIndex & 0x1f);
+
+		final GalleryMT20Item initializedItem = getInitializedItem(itemIndex);
+
+		_lastSelectedItem = initializedItem;
+		_lastSelectedItemVirtualIndex = itemIndex;
+
+		_selectedItems.put(initializedItem.uniqueItemID, initializedItem);
+	}
+
+	/**
+	 * Removes a gallery item ftom the selected items.
+	 * 
+	 * @param itemIndex
+	 */
+	private void selectionRemove(final int itemIndex) {
+
+		_virtualSelectionFlags[itemIndex >> 5] &= ~(1 << (itemIndex & 0x1f));
 
 		_lastSelectedItem = null;
+
+		final GalleryMT20Item item = getInitializedItem(itemIndex);
+
 		_selectedItems.remove(item.uniqueItemID);
+	}
+
+	/**
+	 * Toggle selection of the given gallery item and notify listener.
+	 * 
+	 * @param itemIndex
+	 * @param isDeselectAll
+	 */
+	private void selectItem(final int itemIndex, final boolean isDeselectAll) {
+
+		final boolean isItemSelected = isItemSelected(itemIndex);
+
+		if (isDeselectAll) {
+			deselectAll(false);
+		}
+
+		selectItem(itemIndex, !isItemSelected, true);
+
+		_lastSingleClick = itemIndex;
+
+		showItem(itemIndex);
+	}
+
+	/**
+	 * Toggle item selection status
+	 * 
+	 * @param itemIndex
+	 *            Item which state is to be changed.
+	 * @param isSelected
+	 *            true is the item is now selected, false if it is now unselected.
+	 * @param notifyListeners
+	 *            If true, a selection event will be sent to all the current selection listeners.
+	 */
+	private void selectItem(final int itemIndex, final boolean isSelected, final boolean notifyListeners) {
+
+		final boolean isItemSelected = isItemSelected(itemIndex);
+
+		if (isSelected) {
+
+			// select item
+
+			if (!isItemSelected) {
+
+				// select only when not yet selected
+				selectionAdd(itemIndex);
+			}
+
+		} else {
+
+			// deselect item
+
+			if (isItemSelected) {
+
+				// deselect only when selected
+				selectionRemove(itemIndex);
+			}
+		}
+
+		// Notify listeners if necessary.
+		if (notifyListeners) {
+
+			final int index = -1;
+			GalleryMT20Item notifiedItem = null;
+
+			if (itemIndex != -1 && isSelected) {
+				notifiedItem = getInitializedItem(itemIndex);
+			} else {
+
+// this code is using the last selected item, have not yet discovery why this item is used ????
+//				if (_selectedItems.length > 0) {
+//					notifiedItem = _selectedItems[_selectedItems.length - 1];
+//				}
+			}
+//
+//			if (notifiedItem != null) {
+//				index = getItemIndex(notifiedItem);
+//			}
+
+			notifySelectionListeners(notifiedItem, index, false);
+		}
 	}
 
 	/**
@@ -1611,60 +1936,6 @@ public abstract class GalleryMT20 extends Canvas {
 	public void setItemMinMaxSize(final int minItemSize, final int maxItemSize) {
 		_minItemWidth = minItemSize;
 		_maxItemWidth = maxItemSize;
-	}
-
-	/**
-	 * Set items gallery position.
-	 * 
-	 * @param galleryItem
-	 * @param virtualIndex
-	 */
-	private void setItemPosition(final GalleryMT20Item galleryItem, final int virtualIndex) {
-
-		int viewPortX;
-		int viewPortY;
-
-		int numberOfItemsX;
-		int numberOfItemsY;
-
-		if (_isVertical) {
-			numberOfItemsX = virtualIndex % _gridHorizItems;
-			numberOfItemsY = (virtualIndex - numberOfItemsX) / _gridHorizItems;
-		} else {
-			numberOfItemsY = virtualIndex % _gridVertItems;
-			numberOfItemsX = (virtualIndex - numberOfItemsY) / _gridVertItems;
-		}
-
-		final int galleryVirtualPosX = numberOfItemsX * _itemWidth;
-		final int galleryVirtualPosY = numberOfItemsY * _itemHeight;
-
-		if (_isVertical) {
-
-			final int allItemsWidth = _gridHorizItems * _itemWidth;
-
-			if (_contentVirtualWidth > allItemsWidth) {
-				_itemCenterOffsetX = (_contentVirtualWidth - allItemsWidth) / 2;
-			} else if (allItemsWidth > _contentVirtualWidth) {
-				_itemCenterOffsetX = -(allItemsWidth - _contentVirtualWidth) / 2;
-			} else {
-				_itemCenterOffsetX = 0;
-			}
-
-			viewPortX = galleryVirtualPosX + _itemCenterOffsetX;
-			viewPortY = galleryVirtualPosY - _galleryPosition;
-
-		} else {
-
-			// not yet fully implemented
-
-			viewPortX = galleryVirtualPosX - _galleryPosition;
-			viewPortY = galleryVirtualPosY;
-		}
-
-		galleryItem.viewPortX = viewPortX;
-		galleryItem.viewPortY = viewPortY;
-		galleryItem.height = _itemHeight;
-		galleryItem.width = _itemWidth;
 	}
 
 	/**
@@ -1791,53 +2062,6 @@ public abstract class GalleryMT20 extends Canvas {
 	}
 
 	/**
-	 * Toggle item selection status
-	 * 
-	 * @param item
-	 *            Item which state is to be changed.
-	 * @param isSelected
-	 *            true is the item is now selected, false if it is now unselected.
-	 * @param notifyListeners
-	 *            If true, a selection event will be sent to all the current selection listeners.
-	 */
-	private void setSelected(final GalleryMT20Item item, final boolean isSelected, final boolean notifyListeners) {
-
-		if (isSelected) {
-			if (!isSelected(item)) {
-				addSelection(item);
-			}
-
-		} else {
-			if (isSelected(item)) {
-				removeSelection(item);
-			}
-		}
-
-		// Notify listeners if necessary.
-		if (notifyListeners) {
-
-			GalleryMT20Item notifiedItem = null;
-
-			if (item != null && isSelected) {
-				notifiedItem = item;
-			} else {
-
-// this code is using the last selected item, have not yet discovery why this item is used ????
-//				if (_selectedItems != null && _selectedItems.length > 0) {
-//					notifiedItem = _selectedItems[_selectedItems.length - 1];
-//				}
-			}
-
-			int index = -1;
-			if (notifiedItem != null) {
-				index = getItemIndex(notifiedItem);
-			}
-
-			notifySelectionListeners(notifiedItem, index, false);
-		}
-	}
-
-	/**
 	 * Set number of items in the gallery, the items itself are created when they are displayed.
 	 * <p>
 	 * This will also start a gallery update which runs the
@@ -1853,10 +2077,10 @@ public abstract class GalleryMT20 extends Canvas {
 		// create empty (null) gallery items
 		_createdGalleryItems.clear();
 
+		deselectAll(false);
+
 		// initially all items can be displayed
 		_virtualGalleryItems = new GalleryMT20Item[numberOfItems];
-
-		deselectAll(false);
 
 		updateGallery(false, galleryPosition);
 	}
@@ -1867,11 +2091,77 @@ public abstract class GalleryMT20 extends Canvas {
 	 * 
 	 * @param virtualGalleryItems
 	 */
-	public void setVirtualItems(final GalleryMT20Item[] virtualGalleryItems) {
+	public void setVirtualItems(GalleryMT20Item[] virtualGalleryItems) {
+
+		// prevent NPE
+		if (virtualGalleryItems == null) {
+			virtualGalleryItems = new GalleryMT20Item[0];
+		}
 
 		_virtualGalleryItems = virtualGalleryItems;
 
 		updateGallery(true);
+	}
+
+	/**
+	 * Show item in the client area.
+	 * 
+	 * @param itemIndex
+	 */
+	private void showItem(final int itemIndex) {
+
+		if (_isVertical) {
+
+			final int visibleHeight = _clientArea.height;
+
+			final int row = itemIndex / _gridHorizItems;
+			final int itemPosY = row * _itemHeight;
+
+			if (_gridHorizItems == 1) {
+
+				// center image vertically
+
+				if (_itemHeight > visibleHeight) {
+
+					final int offset = (_itemHeight - visibleHeight) / 2;
+
+					_galleryPosition = itemPosY + offset;
+
+				} else {
+
+					final int offset = (visibleHeight - _itemHeight) / 2;
+
+					_galleryPosition = itemPosY - offset;
+				}
+
+			} else if (itemPosY < _galleryPosition) {
+
+				_galleryPosition = itemPosY;
+
+			} else if (_galleryPosition + visibleHeight < itemPosY + _itemHeight) {
+
+				_galleryPosition = itemPosY + _itemHeight - visibleHeight;
+			}
+
+		} else {
+
+			final int visibleWidth = _clientArea.width;
+
+			final int column = itemIndex / _gridVertItems;
+			final int itemX = column * _itemWidth;
+
+			if (itemX < _galleryPosition) {
+				_galleryPosition = itemX;
+			} else if (_galleryPosition + visibleWidth < itemX + _itemWidth) {
+				_galleryPosition = itemX + _itemWidth - visibleWidth;
+			}
+		}
+
+		_clientAreaItemsIndices = getAreaItemsIndices(_clientArea);
+
+		updateScrollBars();
+
+		redraw();
 	}
 
 	/**
@@ -1885,13 +2175,13 @@ public abstract class GalleryMT20 extends Canvas {
 	/**
 	 * @param isKeepLocation
 	 *            Keeps gallery position when <code>true</code>, otherwise position will be reset.
-	 * @param newPositionRatio
+	 * @param defaultPositionRatio
 	 */
-	public void updateGallery(final boolean isKeepLocation, final Double newPositionRatio) {
+	public void updateGallery(final boolean isKeepLocation, final Double defaultPositionRatio) {
 
 		// !!! prevent setting it to NULL, especially when the UI is not initialized !!!
-		if (newPositionRatio != null) {
-			_newGalleryPositionRatio = newPositionRatio;
+		if (defaultPositionRatio != null) {
+			_defaultGalleryPositionRatio = defaultPositionRatio;
 		}
 
 		if (_clientArea.width == 0 || _clientArea.height == 0) {
@@ -1908,6 +2198,63 @@ public abstract class GalleryMT20 extends Canvas {
 
 		// start a paint event
 		redraw();
+	}
+
+	/**
+	 * Set the items gallery position.
+	 * <p>
+	 * The item position can change when {@link #setVirtualItems(GalleryMT20Item[])} is called and
+	 * the item is not yet displayed.
+	 * 
+	 * @param galleryItem
+	 * @param virtualIndex
+	 */
+	private void updateItemPosition(final GalleryMT20Item galleryItem, final int virtualIndex) {
+
+		int viewPortX;
+		int viewPortY;
+
+		int numberOfItemsX;
+		int numberOfItemsY;
+
+		if (_isVertical) {
+			numberOfItemsX = virtualIndex % _gridHorizItems;
+			numberOfItemsY = (virtualIndex - numberOfItemsX) / _gridHorizItems;
+		} else {
+			numberOfItemsY = virtualIndex % _gridVertItems;
+			numberOfItemsX = (virtualIndex - numberOfItemsY) / _gridVertItems;
+		}
+
+		final int galleryVirtualPosX = numberOfItemsX * _itemWidth;
+		final int galleryVirtualPosY = numberOfItemsY * _itemHeight;
+
+		if (_isVertical) {
+
+			final int allItemsWidth = _gridHorizItems * _itemWidth;
+
+			if (_contentVirtualWidth > allItemsWidth) {
+				_itemCenterOffsetX = (_contentVirtualWidth - allItemsWidth) / 2;
+			} else if (allItemsWidth > _contentVirtualWidth) {
+				_itemCenterOffsetX = -(allItemsWidth - _contentVirtualWidth) / 2;
+			} else {
+				_itemCenterOffsetX = 0;
+			}
+
+			viewPortX = galleryVirtualPosX + _itemCenterOffsetX;
+			viewPortY = galleryVirtualPosY - _galleryPosition;
+
+		} else {
+
+			// not yet fully implemented
+
+			viewPortX = galleryVirtualPosX - _galleryPosition;
+			viewPortY = galleryVirtualPosY;
+		}
+
+		galleryItem.viewPortX = viewPortX;
+		galleryItem.viewPortY = viewPortY;
+		galleryItem.height = _itemHeight;
+		galleryItem.width = _itemWidth;
 	}
 
 	/**
@@ -2000,12 +2347,9 @@ public abstract class GalleryMT20 extends Canvas {
 			_contentVirtualWidth = clientAreaWidth;
 			_contentVirtualHeight = _gridVertItems * _itemHeight;
 
-			if (_newGalleryPositionRatio != null) {
+			if (_defaultGalleryPositionRatio != null) {
 
-				_galleryPosition = (int) (_contentVirtualHeight * _newGalleryPositionRatio);
-
-				// set position only ONCE
-				_newGalleryPositionRatio = null;
+				_galleryPosition = (int) (_contentVirtualHeight * _defaultGalleryPositionRatio);
 
 			} else {
 

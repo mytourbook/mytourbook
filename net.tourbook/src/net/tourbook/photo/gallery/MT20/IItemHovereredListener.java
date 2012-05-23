@@ -13,22 +13,16 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.photo.manager;
+package net.tourbook.photo.gallery.MT20;
 
-public enum PhotoLoadingState {
-
-	/**
-	 * Image is not yet loaded for this photo or it's in the image cache
-	 */
-	UNDEFINED,
+public interface IItemHovereredListener {
 
 	/**
-	 * Loading the image for a photo failed
+	 * Mouse has hovered a gallery item.
+	 * 
+	 * @param hoveredItem
+	 *            Hovered item or <code>null</code> when mouse has not hovered over a gallery item.
 	 */
-	IMAGE_HAS_A_LOADING_ERROR,
+	public void hoveredItem(GalleryMT20Item hoveredItem);
 
-	/**
-	 * Image is currently in the loading queue and is waiting to be loaded
-	 */
-	IMAGE_IS_IN_LOADING_QUEUE
 }

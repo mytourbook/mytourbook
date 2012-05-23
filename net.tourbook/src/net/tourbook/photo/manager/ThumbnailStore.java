@@ -365,20 +365,25 @@ public class ThumbnailStore {
 
 	static synchronized IPath getStoreImagePath(final Photo photo, final ImageQuality imageQuality) {
 
-		final String imageKey = photo.getImageKey(imageQuality);
+		final PhotoWrapper photoWrapper = photo.getPhotoWrapper();
 
-		final String imageKey1Folder = imageKey.substring(0, 2);
-//		final String imageKey2Folder = imageKey.substring(0, 3);
+		if (photoWrapper.imageFilePathName.startsWith(_storePath.toOSString())) {
+
+			// photo image is already from the thumb store
+
+			return new Path(photoWrapper.imageFilePathName);
+		}
 
 		// thumbnail images are stored as jpg file
-		IPath jpgPhotoFilePath = new Path(photo.getPhotoWrapper().imageFileName);
+		IPath jpgPhotoFilePath = new Path(photoWrapper.imageFileName);
 		jpgPhotoFilePath = jpgPhotoFilePath.removeFileExtension().addFileExtension(THUMBNAIL_IMAGE_EXTENSION_JPG);
 
+		final String imageKey = photo.getImageKey(imageQuality);
+		final String imageKey1Folder = imageKey.substring(0, 2);
 		final String imageFileName = imageKey + "_" + imageQuality.name() + "_" + jpgPhotoFilePath.toOSString(); //$NON-NLS-1$ //$NON-NLS-2$
 
 		final IPath imageFilePath = _storePath//
 				.append(imageKey1Folder)
-//				.append(imageKey2Folder)
 				.append(imageFileName);
 
 		return imageFilePath;
@@ -452,13 +457,18 @@ public class ThumbnailStore {
 		return tnFolderPath.addTrailingSeparator();
 	}
 
-	static void saveImageAWT(final BufferedImage thumbImg, final IPath storeImageFilePath) {
+	/**
+	 * @param thumbImg
+	 * @param storeImageFilePath
+	 * @return Returns <code>true</code>when the image could be saved in the thumb store.
+	 */
+	static boolean saveThumbImageWithAWT(final BufferedImage thumbImg, final IPath storeImageFilePath) {
 
 		try {
 
 			final IPath imagePathWithoutExt = checkPath(storeImageFilePath);
 			if (imagePathWithoutExt == null) {
-				return;
+				return false;
 			}
 
 			ImageIO.write(thumbImg, THUMBNAIL_IMAGE_EXTENSION_JPG, new File(storeImageFilePath.toOSString()));
@@ -466,12 +476,16 @@ public class ThumbnailStore {
 		} catch (final Exception e) {
 
 			StatusUtil.log(NLS.bind(//
-					"Cannot save thumbnail image: \"{0}\"", //$NON-NLS-1$
+					"Cannot save thumbnail image with AWT: \"{0}\"", //$NON-NLS-1$
 					storeImageFilePath.toOSString()), e);
+
+			return false;
 		}
+
+		return true;
 	}
 
-	static void saveImageSWT(final Image thumbnailImage, final IPath storeImageFilePath) {
+	static void saveThumbImageWithSWT(final Image thumbnailImage, final IPath storeImageFilePath) {
 
 		try {
 
@@ -495,7 +509,7 @@ public class ThumbnailStore {
 		} catch (final Exception e) {
 
 			StatusUtil.log(NLS.bind(//
-					"Cannot save thumbnail image: \"{0}\"", //$NON-NLS-1$
+					"Cannot save thumbnail image with SWT: \"{0}\"", //$NON-NLS-1$
 					storeImageFilePath.toOSString()), e);
 		}
 	}

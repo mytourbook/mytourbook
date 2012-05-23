@@ -16,6 +16,7 @@
 package net.tourbook.photo.manager;
 
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -73,6 +74,12 @@ public class PhotoLoadManager {
 	private static final LinkedBlockingDeque<PhotoExifLoader>	_waitingQueueExif			= new LinkedBlockingDeque<PhotoExifLoader>();
 	private static final LinkedBlockingDeque<PhotoImageLoader>	_waitingQueueThumb			= new LinkedBlockingDeque<PhotoImageLoader>();
 	private static final LinkedBlockingDeque<PhotoImageLoader>	_waitingQueueHQ				= new LinkedBlockingDeque<PhotoImageLoader>();
+
+	/*
+	 * key is the photo image file path
+	 */
+	private static final ConcurrentHashMap<String, Object>		_photoWithLoadingError		= new ConcurrentHashMap<String, Object>();
+	private static final ConcurrentHashMap<String, Object>		_photoWithThumbSaveError	= new ConcurrentHashMap<String, Object>();
 
 	public static final String									IMAGE_FRAMEWORK_SWT			= "swt";										//$NON-NLS-1$
 	public static final String									IMAGE_FRAMEWORK_AWT			= "awt";										//$NON-NLS-1$
@@ -218,6 +225,19 @@ public class PhotoLoadManager {
 		return _waitingQueueThumb.size();
 	}
 
+	public static boolean isImageLoadingError(final String imageFilePath) {
+		return _photoWithLoadingError.containsKey(imageFilePath);
+	}
+
+	/**
+	 * @param imageFilePath
+	 * @return Returns <code>true</code> when the thumb image cannot be saved, the original image
+	 *         will be displayed. Possible AWT save error: "Bogus input colorspace"
+	 */
+	public static boolean isThumbSaveError(final String imageFilePath) {
+		return _photoWithThumbSaveError.containsKey(imageFilePath);
+	}
+
 	public static void putImageInExifLoadingQueue(final Photo photo, final ILoadCallBack imageLoadCallback) {
 
 		// put image loading item into the waiting queue
@@ -272,7 +292,6 @@ public class PhotoLoadManager {
 													final Photo photo,
 													final ImageQuality imageQuality,
 													final ILoadCallBack imageLoadCallback) {
-
 		// set state
 		photo.setLoadingState(PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE, imageQuality);
 
@@ -293,11 +312,34 @@ public class PhotoLoadManager {
 				final PhotoImageLoader loadingItem = _waitingQueueThumb.pollFirst();
 
 				if (loadingItem != null) {
-					loadingItem.loadImage();
+
+					final String errorKey = loadingItem._photo.getPhotoWrapper().imageFilePathName;
+
+					if (_photoWithLoadingError.containsKey(errorKey)) {
+
+						photo.setLoadingState(PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR, imageQuality);
+
+					} else {
+
+						loadingItem.loadImage();
+					}
 				}
 			}
 		};
 		_executorThumb.submit(executorTask);
+	}
+
+	public static void putPhotoInLoadingErrorMap(final String errorKey) {
+		_photoWithLoadingError.put(errorKey, new Object());
+	}
+
+	public static void putPhotoInThumbSaveErrorMap(final String errorKey) {
+		_photoWithThumbSaveError.put(errorKey, new Object());
+	}
+
+	public static void removeInvalidImageFiles() {
+		_photoWithLoadingError.clear();
+		_photoWithThumbSaveError.clear();
 	}
 
 	private static void resetLoadingState(final Object[] waitingQueueItems) {

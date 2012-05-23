@@ -4688,6 +4688,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_timePaused.setEditMode(isManualAndEdit);
 		_timeDriving.setEditMode(isManualAndEdit);
 
+		// distance can be edited when no distance time slices are available
 		_txtTourDistance.setEnabled(canEdit && isDistanceSerie == false);
 		_txtAltitudeUp.setEnabled(isManualAndEdit);
 		_txtAltitudeDown.setEnabled(isManualAndEdit);
