@@ -31,7 +31,7 @@ public class ActionSortByFileDate extends Action {
 
 		setToolTipText(Messages.Pic_Dir_Action_SortByDate_Tooltip);
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(net.tourbook.Messages.Image__PhotoSortByDate));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__PhotoSortByDate));
 	}
 
 	@Override

@@ -31,7 +31,7 @@ public class ActionShowPhotoDate extends Action {
 
 		setToolTipText(Messages.Pic_Dir_Action_ShowPhotoInfoFileDate_Tooltip);
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(net.tourbook.Messages.Image__PhotoInfoDate));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__PhotoInfoDate));
 	}
 
 	@Override

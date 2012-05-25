@@ -61,8 +61,8 @@ public abstract class ToolTip {
 	public static final int				RECREATE				= 1;
 
 	/**
-	 * Don't recreate the tooltip as long the mouse doesn't leave the area
-	 * triggering the tooltip creation
+	 * Don't recreate the tooltip as long the mouse doesn't leave the area triggering the tooltip
+	 * creation
 	 */
 	public static final int				NO_RECREATE				= 1 << 1;
 
@@ -80,14 +80,25 @@ public abstract class ToolTip {
 
 	private Object						currentArea;
 
+	private boolean						_hideOnMouseMove;
+
 	private class TooltipHideListener implements Listener {
+
 		public void handleEvent(final Event event) {
+
 			if (event.widget instanceof Control) {
 
 				final Control c = (Control) event.widget;
 				final Shell shell = c.getShell();
 
 				switch (event.type) {
+				case SWT.MouseMove:
+
+					if (_hideOnMouseMove) {
+						hide();
+					}
+					break;
+
 				case SWT.MouseDown:
 					if (isHideOnMouseDown()) {
 						toolTipHide(shell, event);
@@ -95,8 +106,7 @@ public abstract class ToolTip {
 					break;
 				case SWT.MouseExit:
 					/*
-					 * Give some insets to ensure we get exit informations from
-					 * a wider area ;-)
+					 * Give some insets to ensure we get exit informations from a wider area ;-)
 					 */
 					/**
 					 * !!! this adjustment do not work on Linux because the tooltip gets hidden when
@@ -143,8 +153,7 @@ public abstract class ToolTip {
 				break;
 			case SWT.MouseExit:
 				/*
-				 * Check if the mouse exit happened because we move over the
-				 * tooltip
+				 * Check if the mouse exit happened because we move over the tooltip
 				 */
 				if (CURRENT_TOOLTIP != null && !CURRENT_TOOLTIP.isDisposed()) {
 					if (CURRENT_TOOLTIP.getBounds().contains(control.toDisplay(event.x, event.y))) {
@@ -327,8 +336,8 @@ public abstract class ToolTip {
 	}
 
 	/**
-	 * Get the display relative location where the tooltip is displayed.
-	 * Subclasses may overwrite to implement custom positioning.
+	 * Get the display relative location where the tooltip is displayed. Subclasses may overwrite to
+	 * implement custom positioning.
 	 * 
 	 * @param tipSize
 	 *            the size of the tooltip to be shown
@@ -341,18 +350,17 @@ public abstract class ToolTip {
 	}
 
 	/**
-	 * This method is called to check for which area the tooltip is
-	 * created/hidden for. In case of {@link #NO_RECREATE} this is used to
-	 * decide if the tooltip is hidden recreated.
+	 * This method is called to check for which area the tooltip is created/hidden for. In case of
+	 * {@link #NO_RECREATE} this is used to decide if the tooltip is hidden recreated.
 	 * <code>By the default it is the widget the tooltip is created for but could be any object. To decide if
 	 * the area changed the {@link Object#equals(Object)} method is used.</code>
 	 * 
 	 * @param event
 	 *            the event
 	 * @return the area responsible for the tooltip creation or <code>null</code> this could be any
-	 *         object describing the area
-	 *         (e.g. the {@link Control} onto which the tooltip is bound to, a
-	 *         part of this area e.g. for {@link ColumnViewer} this could be a {@link ViewerCell})
+	 *         object describing the area (e.g. the {@link Control} onto which the tooltip is bound
+	 *         to, a part of this area e.g. for {@link ColumnViewer} this could be a
+	 *         {@link ViewerCell})
 	 */
 	protected Object getToolTipArea(final Event event) {
 		return control;
@@ -372,6 +380,10 @@ public abstract class ToolTip {
 	 */
 	public boolean isHideOnMouseDown() {
 		return hideOnMouseDown;
+	}
+
+	public boolean isHideOnMouseMove() {
+		return _hideOnMouseMove;
 	}
 
 	/**
@@ -430,14 +442,13 @@ public abstract class ToolTip {
 	}
 
 	/**
-	 * If you don't want the tool tip to be hidden when the user clicks inside
-	 * the tool tip set this to <code>false</code>. You maybe also need to
-	 * hide the tool tip yourself depending on what you do after clicking in the
-	 * tooltip (e.g. if you open a new {@link Shell})
+	 * If you don't want the tool tip to be hidden when the user clicks inside the tool tip set this
+	 * to <code>false</code>. You maybe also need to hide the tool tip yourself depending on what
+	 * you do after clicking in the tooltip (e.g. if you open a new {@link Shell})
 	 * 
 	 * @param hideOnMouseDown
-	 *            flag to indicate of tooltip is hidden automatically on mouse
-	 *            down inside the tool tip
+	 *            flag to indicate of tooltip is hidden automatically on mouse down inside the tool
+	 *            tip
 	 */
 	public void setHideOnMouseDown(final boolean hideOnMouseDown) {
 		// Only needed if there's currently a tooltip active
@@ -459,6 +470,10 @@ public abstract class ToolTip {
 		this.hideOnMouseDown = hideOnMouseDown;
 	}
 
+	public void setHideOnMouseMove(final boolean hideOnMouseMove) {
+		_hideOnMouseMove = hideOnMouseMove;
+	}
+
 	/**
 	 * Set the popup delay.
 	 * 
@@ -471,9 +486,8 @@ public abstract class ToolTip {
 	}
 
 	/**
-	 * Set to <code>false</code> if display bounds should not be respected or
-	 * to <code>true</code> if the tooltip is should repositioned to not
-	 * overlap the display bounds.
+	 * Set to <code>false</code> if display bounds should not be respected or to <code>true</code>
+	 * if the tooltip is should repositioned to not overlap the display bounds.
 	 * <p>
 	 * Default is <code>true</code>
 	 * </p>
@@ -485,10 +499,9 @@ public abstract class ToolTip {
 	}
 
 	/**
-	 * Set to <code>false</code> if monitor bounds should not be respected or
-	 * to <code>true</code> if the tooltip is should repositioned to not
-	 * overlap the monitors bounds. The monitor the tooltip belongs to is the
-	 * same is control's monitor the tooltip is shown for.
+	 * Set to <code>false</code> if monitor bounds should not be respected or to <code>true</code>
+	 * if the tooltip is should repositioned to not overlap the monitors bounds. The monitor the
+	 * tooltip belongs to is the same is control's monitor the tooltip is shown for.
 	 * <p>
 	 * Default is <code>true</code>
 	 * </p>
@@ -500,8 +513,7 @@ public abstract class ToolTip {
 	}
 
 	/**
-	 * Set the shift (from the mouse position triggered the event) used to
-	 * display the tooltip.
+	 * Set the shift (from the mouse position triggered the event) used to display the tooltip.
 	 * <p>
 	 * By default the tooltip is shifted 3 pixels to the right.
 	 * </p>
@@ -604,6 +616,9 @@ public abstract class ToolTip {
 	}
 
 	private void toolTipHookBothRecursively(final Control c) {
+
+		c.addListener(SWT.MouseMove, hideListener);
+
 		c.addListener(SWT.MouseDown, hideListener);
 		c.addListener(SWT.MouseExit, hideListener);
 

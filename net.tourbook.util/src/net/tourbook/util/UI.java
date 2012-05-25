@@ -123,7 +123,7 @@ public class UI {
 	 *            the image to be converted
 	 * @return An ImageData that represents the same image as bufferedImage
 	 */
-	public static ImageData convertToSWT(final BufferedImage bufferedImage) {
+	public static ImageData convertAWTimageToSWTimage(final BufferedImage bufferedImage) {
 
 		if (bufferedImage.getColorModel() instanceof DirectColorModel) {
 			final DirectColorModel colorModel = (DirectColorModel) bufferedImage.getColorModel();

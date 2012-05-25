@@ -26,6 +26,7 @@ import net.tourbook.ui.ViewerDetailForm;
 import net.tourbook.util.Util;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -44,24 +45,25 @@ import org.eclipse.ui.part.ViewPart;
 
 public class PicDirView extends ViewPart {
 
-	static public final String				ID											= "net.tourbook.photo.PicDirView";				//$NON-NLS-1$
+	static public final String				ID									= "net.tourbook.photo.PicDirView";			//$NON-NLS-1$
 
-	private static final String				STATE_TREE_WIDTH							= "STATE_TREE_WIDTH";							//$NON-NLS-1$
-	private static final String				STATE_GALLERY_SORTING						= "STATE_GALLERY_SORTING";						//$NON-NLS-1$
-	private static final String				STATE_IMAGE_FILTER							= "STATE_IMAGE_FILTER";						//$NON-NLS-1$
-	private static final String				STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY			= "STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY";		//$NON-NLS-1$
-	private static final String				STATE_IS_SHOW_PHOTO_ANNOTATIONS_IN_GALLERY	= "STATE_IS_SHOW_PHOTO_ANNOTATIONS_IN_GALLERY"; //$NON-NLS-1$
-	private static final String				STATE_PHOTO_INFO_DATE						= "STATE_PHOTO_INFO_DATE";						//$NON-NLS-1$
+	private static final String				STATE_TREE_WIDTH					= "STATE_TREE_WIDTH";						//$NON-NLS-1$
+	private static final String				STATE_GALLERY_SORTING				= "STATE_GALLERY_SORTING";					//$NON-NLS-1$
+	private static final String				STATE_IMAGE_FILTER					= "STATE_IMAGE_FILTER";					//$NON-NLS-1$
+	private static final String				STATE_PHOTO_INFO_DATE				= "STATE_PHOTO_INFO_DATE";					//$NON-NLS-1$
+	private static final String				STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY	= "STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY";	//$NON-NLS-1$
+	private static final String				STATE_IS_SHOW_PHOTO_GPS_ANNOTATION	= "STATE_IS_SHOW_PHOTO_GPS_ANNOTATION";	//$NON-NLS-1$
+	private static final String				STATE_IS_SHOW_PHOTO_TOOLTIP			= "STATE_IS_SHOW_PHOTO_TOOLTIP";			//$NON-NLS-1$
 
-	static final String						IMAGE_PHOTO_FILTER_NO_FILTER				= "IMAGE_PHOTO_FILTER_NO_FILTER";				//$NON-NLS-1$
-	static final String						IMAGE_PHOTO_FILTER_GPS						= "IMAGE_PHOTO_FILTER_GPS";					//$NON-NLS-1$
-	static final String						IMAGE_PHOTO_FILTER_NO_GPS					= "IMAGE_PHOTO_FILTER_NO_GPS";					//$NON-NLS-1$
+	static final String						IMAGE_PHOTO_FILTER_NO_FILTER		= "IMAGE_PHOTO_FILTER_NO_FILTER";			//$NON-NLS-1$
+	static final String						IMAGE_PHOTO_FILTER_GPS				= "IMAGE_PHOTO_FILTER_GPS";				//$NON-NLS-1$
+	static final String						IMAGE_PHOTO_FILTER_NO_GPS			= "IMAGE_PHOTO_FILTER_NO_GPS";				//$NON-NLS-1$
 
-	private static final IDialogSettings	_state										= TourbookPlugin.getDefault()//
-																								.getDialogSettingsSection(
-																										"PhotoDirectoryView");			//$NON-NLS-1$
-	private static final IPreferenceStore	_prefStore									= TourbookPlugin.getDefault()//
-																								.getPreferenceStore();
+	private static final IDialogSettings	_state								= TourbookPlugin.getDefault()//
+																						.getDialogSettingsSection(
+																								"PhotoDirectoryView");		//$NON-NLS-1$
+	private static final IPreferenceStore	_prefStore							= TourbookPlugin.getDefault()//
+																						.getPreferenceStore();
 
 	private GallerySorting					_gallerySorting;
 
@@ -75,7 +77,8 @@ public class PicDirView extends ViewPart {
 	private ActionImageFilterNoGPS			_actionImageFilterNoGPS;
 	private ActionShowPhotoName				_actionShowPhotoName;
 	private ActionShowPhotoDate				_actionShowPhotoDate;
-	private ActionShowPhotoAnnotations		_actionShowPhotoAnnotations;
+	private ActionShowPhotoTooltip			_actionShowPhotoTooltip;
+	private ActionShowGPSAnnotations		_actionShowGPSAnnotation;
 	private ActionSortByFileDate			_actionSortFileByDate;
 	private ActionSortByFileName			_actionSortByFileName;
 
@@ -86,7 +89,7 @@ public class PicDirView extends ViewPart {
 	private Composite						_containerFolder;
 	private Composite						_containerImages;
 
-	private ImageFilter						_currentImageFilter							= ImageFilter.NoFilter;
+	private ImageFilter						_currentImageFilter					= ImageFilter.NoFilter;
 
 	static {
 		UI.IMAGE_REGISTRY.put(
@@ -252,11 +255,13 @@ public class PicDirView extends ViewPart {
 			_actionShowPhotoDate.setChecked(_photoDateInfo != PhotoDateInfo.NoDateTime);
 		}
 
-		_picDirImages.showInfo(
+		_picDirImages.showInfo(//
 				_actionShowPhotoName.isChecked(),
 				_photoDateInfo,
-				_actionShowPhotoAnnotations.isChecked());
+				_actionShowGPSAnnotation.isChecked(),
+				_actionShowPhotoTooltip.isChecked());
 	}
+
 
 	void actionSortByDate() {
 
@@ -347,9 +352,11 @@ public class PicDirView extends ViewPart {
 		_actionImageFilterGPS = new ActionImageFilterGPS(this);
 		_actionImageFilterNoGPS = new ActionImageFilterNoGPS(this);
 
+		_actionShowGPSAnnotation = new ActionShowGPSAnnotations(this);
+
 		_actionShowPhotoName = new ActionShowPhotoName(this);
 		_actionShowPhotoDate = new ActionShowPhotoDate(this);
-		_actionShowPhotoAnnotations = new ActionShowPhotoAnnotations(this);
+		_actionShowPhotoTooltip = new ActionShowPhotoTooltip(this);
 
 		_actionSortByFileName = new ActionSortByFileName(this);
 		_actionSortFileByDate = new ActionSortByFileDate(this);
@@ -361,7 +368,7 @@ public class PicDirView extends ViewPart {
 		createUI(parent);
 		createActions();
 
-		fillToolbar();
+		fillActionBars();
 
 		addPartListener();
 		addPrefListener();
@@ -434,7 +441,11 @@ public class PicDirView extends ViewPart {
 		_actionShowPhotoDate.setEnabled(isEnableGalleryText);
 	}
 
-	private void fillToolbar() {
+	/**
+	 * fill view toolbar
+	 */
+	private void fillActionBars() {
+
 		/*
 		 * fill view toolbar
 		 */
@@ -442,7 +453,8 @@ public class PicDirView extends ViewPart {
 
 		tbm.add(_actionShowPhotoName);
 		tbm.add(_actionShowPhotoDate);
-		tbm.add(_actionShowPhotoAnnotations);
+		tbm.add(_actionShowPhotoTooltip);
+		tbm.add(_actionShowGPSAnnotation);
 		tbm.add(new Separator());
 
 		tbm.add(_actionImageFilterGPS);
@@ -451,6 +463,13 @@ public class PicDirView extends ViewPart {
 
 		tbm.add(_actionSortByFileName);
 		tbm.add(_actionSortFileByDate);
+
+		/*
+		 * fill view menu
+		 */
+		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
+
+		_picDirImages.fillViewMenu(menuMgr);
 	}
 
 	private void onPartClose() {
@@ -490,15 +509,17 @@ public class PicDirView extends ViewPart {
 		}
 
 		final boolean isShowPhotoName = Util.getStateBoolean(_state, STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY, true);
+		final boolean isShowTooltip = Util.getStateBoolean(_state, STATE_IS_SHOW_PHOTO_TOOLTIP, true);
 		final boolean isShowPhotoAnnotations = Util.getStateBoolean(_state, //
-				STATE_IS_SHOW_PHOTO_ANNOTATIONS_IN_GALLERY,
+				STATE_IS_SHOW_PHOTO_GPS_ANNOTATION,
 				true);
 
 		_actionShowPhotoName.setChecked(isShowPhotoName);
 		_actionShowPhotoDate.setChecked(_photoDateInfo != PhotoDateInfo.NoDateTime);
-		_actionShowPhotoAnnotations.setChecked(isShowPhotoAnnotations);
+		_actionShowPhotoTooltip.setChecked(isShowTooltip);
+		_actionShowGPSAnnotation.setChecked(isShowPhotoAnnotations);
 
-		_picDirImages.setInfo(isShowPhotoName, _photoDateInfo, isShowPhotoAnnotations);
+		_picDirImages.restoreInfo(isShowPhotoName, _photoDateInfo, isShowPhotoAnnotations, isShowTooltip);
 
 		/*
 		 * gallery sorting
@@ -514,6 +535,7 @@ public class PicDirView extends ViewPart {
 
 		_picDirImages.setSorting(_gallerySorting);
 		_picDirImages.setFilter(_currentImageFilter);
+
 
 		/*
 		 * image restore must be done BEFORE folder restore because folder restore is also loading
@@ -555,7 +577,8 @@ public class PicDirView extends ViewPart {
 		}
 
 		_state.put(STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY, _actionShowPhotoName.isChecked());
-		_state.put(STATE_IS_SHOW_PHOTO_ANNOTATIONS_IN_GALLERY, _actionShowPhotoAnnotations.isChecked());
+		_state.put(STATE_IS_SHOW_PHOTO_TOOLTIP, _actionShowPhotoTooltip.isChecked());
+		_state.put(STATE_IS_SHOW_PHOTO_GPS_ANNOTATION, _actionShowGPSAnnotation.isChecked());
 
 		_state.put(STATE_PHOTO_INFO_DATE, _photoDateInfo.name());
 		_state.put(STATE_IMAGE_FILTER, _currentImageFilter.name());

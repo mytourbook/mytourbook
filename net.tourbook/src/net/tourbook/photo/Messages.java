@@ -6,12 +6,9 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.photo.messages";						//$NON-NLS-1$
 
-	public static String	App_JobName_PicDirImages_FilteringGalleryImages;
-
-	public static String	App_JobName_PicDirImages_UpdateUIWhenLoadingImages;
-
-	public static String	App_JobName_PicDirImages_UpdateUIWithFilteredGalleryImages;
-
+	public static String		App_JobName_PicDirImages_FilteringGalleryImages;
+	public static String		App_JobName_PicDirImages_UpdateUIWhenLoadingImages;
+	public static String		App_JobName_PicDirImages_UpdateUIWithFilteredGalleryImages;
 	public static String		App_JobName_RetrievingFolderImageFiles;
 
 	public static String		App_Unit_Pixel;
@@ -34,10 +31,16 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_Photo_Time;
 
 	public static String		Image__PhotoAnnotationGPS;
+
+	public static String	Image__PhotoAnnotationGPSAction;
 	public static String		Image__PhotoFilterGPS;
 	public static String		Image__PhotoFilterNoFilter;
 	public static String		Image__PhotoFilterNoGPS;
 	public static String		Image__PhotoInfoAnnotations;
+	public static String		Image__PhotoInfoDate;
+	public static String		Image__PhotoInfoName;
+	public static String		Image__PhotoSortByDate;
+	public static String		Image__PhotoSortByName;
 
 	public static String		Pic_Dir_Action_ClearHistory;
 	public static String		Pic_Dir_Action_DefineExternalApp;
@@ -60,6 +63,10 @@ public class Messages extends NLS {
 	public static String		Pic_Dir_Action_ShowPhotoFileName_Tooltip;
 	public static String		Pic_Dir_Action_ShowPhotoInfoFileDate;
 	public static String		Pic_Dir_Action_ShowPhotoInfoFileDate_Tooltip;
+
+	public static String	Pic_Dir_Action_ShowPhotoTooltip;
+
+	public static String	Pic_Dir_Action_ShowPhotoTooltip_Tooltip;
 	public static String		Pic_Dir_Action_SingleClickExpand;
 	public static String		Pic_Dir_Action_SingleExpandCollapseOthers;
 	public static String		Pic_Dir_Action_SortByDate;

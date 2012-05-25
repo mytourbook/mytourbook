@@ -50,9 +50,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -76,12 +74,10 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.part.PageBook;
@@ -229,6 +225,8 @@ public class PicDirImages implements IItemHovereredListener {
 	private int													_photoImageSize;
 	private int													_photoBorderSize;
 
+	private boolean												_isShowTooltip;
+
 	/**
 	 * keep gallery position for each used folder
 	 */
@@ -274,7 +272,7 @@ public class PicDirImages implements IItemHovereredListener {
 	private Composite											_containerActionBar;
 	private ToolBar												_toolbar;
 	private Spinner												_spinnerThumbSize;
-	private Combo												_comboPathHistory;
+	private Combo												_comboHistory;
 
 	private GalleryMT20											_gallery;
 	private CLabel												_lblStatusLine;
@@ -493,11 +491,11 @@ public class PicDirImages implements IItemHovereredListener {
 
 	void actionClearHistory() {
 
-		final String selectedFolder = _comboPathHistory.getText();
+		final String selectedFolder = _comboHistory.getText();
 
-		_comboPathHistory.removeAll();
-		_comboPathHistory.add(selectedFolder);
-		_comboPathHistory.select(0);
+		_comboHistory.removeAll();
+		_comboHistory.add(selectedFolder);
+		_comboHistory.select(0);
 
 		_folderHistory.clear();
 		_folderHistory.add(selectedFolder);
@@ -524,7 +522,7 @@ public class PicDirImages implements IItemHovereredListener {
 		_selectedHistoryIndex++;
 
 		// select combo history
-		_comboPathHistory.select(_selectedHistoryIndex);
+		_comboHistory.select(_selectedHistoryIndex);
 
 		// enabel/disable history navigation
 		_actionNavigateBackward.setEnabled(_selectedHistoryIndex < historySize - 1);
@@ -558,7 +556,7 @@ public class PicDirImages implements IItemHovereredListener {
 		_selectedHistoryIndex--;
 
 		// select combo history
-		_comboPathHistory.select(_selectedHistoryIndex);
+		_comboHistory.select(_selectedHistoryIndex);
 
 		// enabel/disable history navigation
 		_actionNavigateBackward.setEnabled(historySize > 1);
@@ -587,15 +585,13 @@ public class PicDirImages implements IItemHovereredListener {
 
 	void actionShowNavigationHistory() {
 
-		_comboPathHistory.setFocus();
+		_comboHistory.setFocus();
 
 		// this is not working with osx: https://bugs.eclipse.org/bugs/show_bug.cgi?id=300979
-		_comboPathHistory.setListVisible(true);
+		_comboHistory.setListVisible(true);
 	}
 
 	private void createActions() {
-
-		final ToolBarManager tbm = new ToolBarManager(_toolbar);
 
 		_actionNavigateBackward = new ActionNavigateHistoryBackward(this, _picDirView);
 		_actionNavigateForward = new ActionNavigateHistoryForward(this, _picDirView);
@@ -603,39 +599,8 @@ public class PicDirImages implements IItemHovereredListener {
 		// this action activates the shortcut key <Ctrl><Shift>H but the action is not displayed
 		new ActionNavigateShowHistory(this, _picDirView);
 
-		/*
-		 * fill actionbar
-		 */
-		tbm.add(_actionNavigateBackward);
-		tbm.add(_actionNavigateForward);
-
-		_toolbar.setMenu(createContextMenu(_toolbar));
-
-		tbm.update(true);
-	}
-
-	/**
-	 * create context menu
-	 */
-	private Menu createContextMenu(final Control parent) {
-
 		_actionClearNavigationHistory = new ActionClearNavigationHistory(this);
 		_actionRemoveInvalidFoldersFromHistory = new ActionRemoveInvalidFoldersFromHistory(this);
-
-		final MenuManager menuMgr = new MenuManager();
-
-		menuMgr.setRemoveAllWhenShown(true);
-
-		menuMgr.addMenuListener(new IMenuListener() {
-			@Override
-			public void menuAboutToShow(final IMenuManager menuMgr) {
-
-				menuMgr.add(_actionRemoveInvalidFoldersFromHistory);
-				menuMgr.add(_actionClearNavigationHistory);
-			}
-		});
-
-		return menuMgr.createContextMenu(parent);
 	}
 
 	/**
@@ -711,6 +676,7 @@ public class PicDirImages implements IItemHovereredListener {
 		createUI_05(parent);
 
 		createActions();
+		fillToolbars();
 	}
 
 	void createUI_05(final Composite parent) {
@@ -734,6 +700,7 @@ public class PicDirImages implements IItemHovereredListener {
 		}
 
 		_photoTooltip = new PhotoToolTip(_gallery);
+		_photoTooltip.setHideOnMouseMove(true);
 		_gallery.addItemHoveredListener(this);
 	}
 
@@ -766,14 +733,14 @@ public class PicDirImages implements IItemHovereredListener {
 	 */
 	void createUI_16_ComboHistory(final Composite parent) {
 
-		_comboPathHistory = new Combo(parent, SWT.SIMPLE | SWT.DROP_DOWN);
+		_comboHistory = new Combo(parent, SWT.SIMPLE | SWT.DROP_DOWN);
 		GridDataFactory.fillDefaults()//
 				.grab(true, false)
 				.align(SWT.FILL, SWT.CENTER)
-				.applyTo(_comboPathHistory);
-		_comboPathHistory.setVisibleItemCount(30);
+				.applyTo(_comboHistory);
+		_comboHistory.setVisibleItemCount(30);
 
-		_comboPathHistory.addMouseListener(new MouseListener() {
+		_comboHistory.addMouseListener(new MouseListener() {
 
 			@Override
 			public void mouseDoubleClick(final MouseEvent e) {}
@@ -782,7 +749,7 @@ public class PicDirImages implements IItemHovereredListener {
 			public void mouseDown(final MouseEvent e) {
 
 				// show list
-				_comboPathHistory.setListVisible(true);
+				_comboHistory.setListVisible(true);
 			}
 
 			@Override
@@ -793,19 +760,19 @@ public class PicDirImages implements IItemHovereredListener {
 		 * This combination of key and selection listener causes a folder selection only with the
 		 * <Enter> key or with a selection with the mouse in the drop down box
 		 */
-		_comboPathHistory.addKeyListener(new KeyAdapter() {
+		_comboHistory.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(final KeyEvent e) {
 
 				_isComboKeyPressed = true;
 
 				if (e.keyCode == SWT.CR) {
-					onSelectHistoryFolder(_comboPathHistory.getText());
+					onSelectHistoryFolder(_comboHistory.getText());
 				}
 			}
 		});
 
-		_comboPathHistory.addSelectionListener(new SelectionAdapter() {
+		_comboHistory.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 
@@ -813,7 +780,7 @@ public class PicDirImages implements IItemHovereredListener {
 				_isComboKeyPressed = false;
 
 				if (isKey == false) {
-					onSelectHistoryFolder(_comboPathHistory.getText());
+					onSelectHistoryFolder(_comboHistory.getText());
 				}
 			}
 		});
@@ -978,6 +945,28 @@ public class PicDirImages implements IItemHovereredListener {
 	}
 
 	/**
+	 * fill actionbar's
+	 */
+	private void fillToolbars() {
+
+		final ToolBarManager tbm = new ToolBarManager(_toolbar);
+
+		tbm.add(_actionNavigateBackward);
+		tbm.add(_actionNavigateForward);
+
+//		_toolbar.setMenu(createContextMenu(_toolbar));
+
+		tbm.update(true);
+	}
+
+	void fillViewMenu(final IMenuManager menuMgr) {
+
+		menuMgr.add(_actionRemoveInvalidFoldersFromHistory);
+		menuMgr.add(_actionClearNavigationHistory);
+
+	}
+
+	/**
 	 * This is called when a filter button is pressed.
 	 * 
 	 * @param currentImageFilter
@@ -1046,9 +1035,9 @@ public class PicDirImages implements IItemHovereredListener {
 	@Override
 	public void hoveredItem(final GalleryMT20Item hoveredItem) {
 
-		System.out.println(UI.timeStamp() + "hovered: " + hoveredItem);
-		// TODO remove SYSTEM.OUT.PRINTLN
-
+		if (_isShowTooltip) {
+			_photoTooltip.show(hoveredItem);
+		}
 	}
 
 	private void jobFilter_10_Create() {
@@ -1723,10 +1712,10 @@ public class PicDirImages implements IItemHovereredListener {
 
 		// remove invalid folder
 		_folderHistory.remove(invalidIndex);
-		_comboPathHistory.remove(invalidIndex);
+		_comboHistory.remove(invalidIndex);
 
 		// display previously successfully loaded folder
-		_comboPathHistory.setText(_photoFolder.getAbsolutePath());
+		_comboHistory.setText(_photoFolder.getAbsolutePath());
 	}
 
 	/**
@@ -1761,8 +1750,15 @@ public class PicDirImages implements IItemHovereredListener {
 
 		// remove from the end that the index numbers do not disappear
 		for (int index = invalidIndexes.length - 1; index >= 0; index--) {
-			_comboPathHistory.remove(invalidIndexes[index]);
+			_comboHistory.remove(invalidIndexes[index]);
 		}
+	}
+
+	void restoreInfo(final boolean isShowPhotoName, final PhotoDateInfo photoDateInfo, final boolean isShowAnnotations, final boolean isShowTooltip) {
+		
+		_photoRenderer.setShowLabels(isShowPhotoName, photoDateInfo, isShowAnnotations);
+		
+		_isShowTooltip=isShowTooltip;
 	}
 
 	void restoreState(final IDialogSettings state) {
@@ -1776,7 +1772,7 @@ public class PicDirImages implements IItemHovereredListener {
 			// update history and combo
 			for (final String history : historyEntries) {
 				_folderHistory.add(history);
-				_comboPathHistory.add(history);
+				_comboHistory.add(history);
 			}
 		}
 
@@ -1892,10 +1888,6 @@ public class PicDirImages implements IItemHovereredListener {
 		_currentImageFilter = currentImageFilter;
 	}
 
-	void setInfo(final boolean isShowPhotoName, final PhotoDateInfo photoDateInfo, final boolean isShowAnnotations) {
-		_photoRenderer.setShowLabels(isShowPhotoName, photoDateInfo, isShowAnnotations);
-	}
-
 	void setSorting(final GallerySorting gallerySorting) {
 
 		// set new sorting algorithm
@@ -1943,9 +1935,17 @@ public class PicDirImages implements IItemHovereredListener {
 		workerUpdate(imageFolder, isReloadFolder);
 	}
 
-	void showInfo(final boolean isShowPhotoName, final PhotoDateInfo photoDateInfo, final boolean isShowAnnotations) {
+	void showInfo(	final boolean isShowPhotoName,
+					final PhotoDateInfo photoDateInfo,
+					final boolean isShowAnnotations,
+					final boolean isShowTooltip) {
 
 		_photoRenderer.setShowLabels(isShowPhotoName, photoDateInfo, isShowAnnotations);
+
+		_isShowTooltip = isShowTooltip;
+
+		// reset tooltip, otherwise it could be displayed if it should not
+		_photoTooltip.reset();
 
 		_gallery.redraw();
 	}
@@ -2020,8 +2020,8 @@ public class PicDirImages implements IItemHovereredListener {
 
 			// combobox list entries are almost invisible when colors are set on osx
 
-			_comboPathHistory.setForeground(fgColor);
-			_comboPathHistory.setBackground(bgColor);
+			_comboHistory.setForeground(fgColor);
+			_comboHistory.setBackground(bgColor);
 
 			_spinnerThumbSize.setForeground(fgColor);
 			_spinnerThumbSize.setBackground(bgColor);
@@ -2093,7 +2093,7 @@ public class PicDirImages implements IItemHovereredListener {
 			_folderHistory.remove(historyIndex);
 
 			// remove from combo
-			_comboPathHistory.remove(historyIndex);
+			_comboHistory.remove(historyIndex);
 		}
 
 		// check max history size
@@ -2101,17 +2101,17 @@ public class PicDirImages implements IItemHovereredListener {
 		if (historySize > MAX_HISTORY_ENTRIES) {
 
 			_folderHistory.remove(historySize - 1);
-			_comboPathHistory.remove(historySize - 1);
+			_comboHistory.remove(historySize - 1);
 		}
 
 		// update history
 		_folderHistory.add(0, newFolderPathName);
 
 		// update combo
-		_comboPathHistory.add(newFolderPathName, 0);
+		_comboHistory.add(newFolderPathName, 0);
 
 		// must be selected otherwise the text field can be empty when selected from the dropdown list
-		_comboPathHistory.select(0);
+		_comboHistory.select(0);
 
 		/*
 		 * enabel/disable history navigation
@@ -2334,7 +2334,6 @@ public class PicDirImages implements IItemHovereredListener {
 						return;
 					}
 
-//					_lblStatusInfo.setText(NLS.bind(Messages.Pic_Dir_Status_Reading, _workerStateDir.getAbsolutePath()));
 					_lblStatusLine.setText(UI.EMPTY_STRING);
 				}
 			});
@@ -2394,6 +2393,9 @@ public class PicDirImages implements IItemHovereredListener {
 					if (_uiContainer.isDisposed()) {
 						return;
 					}
+
+					// initialize tooltip for a new folder
+					_photoTooltip.reset();
 
 					// keep current gallery position
 					if (prevPhotoFolder != null) {

@@ -108,16 +108,10 @@ public class PhotoImageLoader {
 
 	private Image createSWTimageFromAWTimage(final BufferedImage awtImage) {
 
-		final ImageData swtImageData = UI.convertToSWT(awtImage);
+		final ImageData swtImageData = UI.convertAWTimageToSWTimage(awtImage);
 
 		if (swtImageData != null) {
-
-			final Image swtThumbnailImage = new Image(_display, swtImageData);
-
-			// keep requested image in cache
-			PhotoImageCache.putImage(_requestedImageKey, swtThumbnailImage, _photo.getImageMetaData());
-
-			return swtThumbnailImage;
+			return new Image(_display, swtImageData);
 		}
 
 		return null;
@@ -269,7 +263,7 @@ public class PhotoImageLoader {
 			return;
 		}
 
-		boolean isImageLoadedInRequestedQuality = false;
+		boolean isLoadedImageInRequestedQuality = false;
 		Image loadedImage = null;
 		String imageKey = null;
 		boolean isLoadingError = false;
@@ -280,7 +274,7 @@ public class PhotoImageLoader {
 			final Image storeImage = loadImageFromStore(_requestedImageQuality);
 			if (storeImage != null) {
 
-				isImageLoadedInRequestedQuality = true;
+				isLoadedImageInRequestedQuality = true;
 
 				imageKey = _requestedImageKey;
 				loadedImage = storeImage;
@@ -296,7 +290,7 @@ public class PhotoImageLoader {
 
 					// EXIF image is available
 
-					isImageLoadedInRequestedQuality = _requestedImageQuality == ImageQuality.THUMB;
+					isLoadedImageInRequestedQuality = _requestedImageQuality == ImageQuality.THUMB;
 
 					imageKey = _photo.getImageKey(ImageQuality.THUMB);
 					loadedImage = exifThumbnail;
@@ -319,13 +313,16 @@ public class PhotoImageLoader {
 			 * keep image in cache
 			 */
 			if (isImageLoaded) {
+
 				PhotoImageCache.putImage(imageKey, loadedImage, _photo.getImageMetaData());
+
+				updateImageData(loadedImage);
 			}
 
 			/*
 			 * update loading state
 			 */
-			if (isImageLoadedInRequestedQuality) {
+			if (isLoadedImageInRequestedQuality) {
 
 				// image is loaded with requested quality, reset image state
 
@@ -364,17 +361,14 @@ public class PhotoImageLoader {
 				return null;
 			}
 
-/////////// this will print out all metadata
+// this will print out all metadata
 //			System.out.println(metadata);
 
 			if (metadata instanceof JpegImageMetadata) {
 
-				final JpegImageMetadata jpegMetadata = (JpegImageMetadata) metadata;
+				awtBufferedImage = ((JpegImageMetadata) metadata).getEXIFThumbnail();
 
-				awtBufferedImage = jpegMetadata.getEXIFThumbnail();
 				_trackedAWTImages.add(awtBufferedImage);
-
-				_photo.setExifThumbState(awtBufferedImage == null ? 0 : 1);
 
 				if (awtBufferedImage == null) {
 					return null;
@@ -422,13 +416,13 @@ public class PhotoImageLoader {
 ////////////////////////////////////////////
 //					} else {
 
-					final ImageData imageData = UI.convertToSWT(awtBufferedImage);
+					final ImageData imageData = UI.convertAWTimageToSWTimage(awtBufferedImage);
 
 					if (imageData != null) {
 
 						swtThumbnailImage = new Image(_display, imageData);
 
-						_photo.setIsEXIFThumb();
+						_photo.setStateExifThumb(awtBufferedImage == null ? 0 : 1);
 
 						return swtThumbnailImage;
 					}
@@ -550,7 +544,7 @@ public class PhotoImageLoader {
 		}
 
 		/*
-		 * wait until small images are loaded
+		 * wait until exif data and small images are loaded
 		 */
 		try {
 			while (smallImageWaitingQueue.size() > 0 || exifWaitingQueue.size() > 0) {
@@ -596,7 +590,8 @@ public class PhotoImageLoader {
 			if (hqImage == null) {
 
 				System.out.println(NLS.bind(//
-						UI.timeStamp() + "image == NULL when loading with " + _imageFramework + ": \"{0}\"",
+						UI.timeStamp() + "image == NULL when loading with {0}: \"{1}\"",
+						_imageFramework.toUpperCase(),
 						_photo.getPhotoWrapper().imageFilePathName));
 
 				if (_imageFramework.equals(PhotoLoadManager.IMAGE_FRAMEWORK_AWT)) {
@@ -673,10 +668,7 @@ public class PhotoImageLoader {
 
 		} catch (final Exception e) {
 
-			// #######################################
-			// this must be handled without logging
-			// #######################################
-			StatusUtil.log(NLS.bind(//
+			System.out.println(NLS.bind(//
 					"SWT: image \"{0}\" cannot be loaded", //$NON-NLS-1$
 					originalImagePathName));
 
@@ -802,7 +794,7 @@ public class PhotoImageLoader {
 				}
 			}
 
-			if (_photo.isEXIFThumbAvailable()) {
+			if (_photo.getExifThumbImageState() == 1) {
 
 				if (requestedSWTImage == null) {
 
@@ -871,6 +863,8 @@ public class PhotoImageLoader {
 
 			// keep requested image in cache
 			PhotoImageCache.putImage(_requestedImageKey, requestedSWTImage, _photo.getImageMetaData());
+
+			updateImageData(requestedSWTImage);
 		}
 
 		if (requestedSWTImage == null) {
@@ -1054,12 +1048,12 @@ public class PhotoImageLoader {
 
 					if (_requestedImageQuality == ImageQuality.HQ) {
 
-						final ImageData imageData = UI.convertToSWT(originalImage);
+						final ImageData imageData = UI.convertAWTimageToSWTimage(originalImage);
 						requestedSWTImage = new Image(_display, imageData);
 					}
 				}
 
-				if (_photo.isEXIFThumbAvailable()) {
+				if (_photo.getExifThumbImageState() == 1) {
 
 					if (requestedSWTImage == null) {
 
@@ -1125,31 +1119,50 @@ public class PhotoImageLoader {
 			/*
 			 * save thumb image
 			 */
-			boolean isSaved = true;
-			if (saveThumbAWT != null) {
+			if (saveThumbAWT == originalImage) {
 
-				final long startSaveThumb = System.currentTimeMillis();
-				{
-					final IPath storeThumbImagePath = ThumbnailStore.getStoreImagePath(_photo, ImageQuality.THUMB);
-
-					isSaved = ThumbnailStore.saveThumbImageWithAWT(saveThumbAWT, storeThumbImagePath);
-				}
-				endSaveThumb = System.currentTimeMillis() - startSaveThumb;
-			}
-
-			if (isSaved == false) {
-
-				// AWT save error has occured, possible error: "Bogus input colorspace"
-				_photo.setThumbSaveError();
+				// original image is not saved as a thumb
 
 				if (requestedSWTImage == null) {
 
 					requestedSWTImage = createSWTimageFromAWTimage(saveThumbAWT);
 
 					if (requestedSWTImage == null) {
-						exceptionMessage = NLS.bind(
-								"Photo image with thumb save error cannot be created with SWT (2): ", //$NON-NLS-1$
+						exceptionMessage = NLS.bind(//
+								"Photo image cannot be converted from AWT to SWT: ", //$NON-NLS-1$
 								originalPathName);
+					}
+				}
+
+			} else {
+
+				boolean isSaved = true;
+
+				if (saveThumbAWT != null) {
+
+					final long startSaveThumb = System.currentTimeMillis();
+					{
+						final IPath storeThumbImagePath = ThumbnailStore.getStoreImagePath(_photo, ImageQuality.THUMB);
+
+						isSaved = ThumbnailStore.saveThumbImageWithAWT(saveThumbAWT, storeThumbImagePath);
+					}
+					endSaveThumb = System.currentTimeMillis() - startSaveThumb;
+				}
+
+				if (isSaved == false) {
+
+					// AWT save error has occured, possible error: "Bogus input colorspace"
+					_photo.setThumbSaveError();
+
+					if (requestedSWTImage == null) {
+
+						requestedSWTImage = createSWTimageFromAWTimage(saveThumbAWT);
+
+						if (requestedSWTImage == null) {
+							exceptionMessage = NLS.bind(
+									"Photo image with thumb save error cannot be created with SWT (2): ", //$NON-NLS-1$
+									originalPathName);
+						}
 					}
 				}
 			}
@@ -1166,6 +1179,8 @@ public class PhotoImageLoader {
 
 				// keep requested image in cache
 				PhotoImageCache.putImage(_requestedImageKey, requestedSWTImage, _photo.getImageMetaData());
+
+				updateImageData(requestedSWTImage);
 			}
 
 			if (requestedSWTImage == null) {
@@ -1192,6 +1207,14 @@ public class PhotoImageLoader {
 		}
 
 		return requestedSWTImage;
+	}
+
+	private void setStateLoadingError() {
+
+		// prevent loading the image again
+		_photo.setLoadingState(PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR, _requestedImageQuality);
+
+		PhotoLoadManager.putPhotoInLoadingErrorMap(_photo.getPhotoWrapper().imageFilePathName);
 	}
 
 // JAI implementation to read tiff images with AWT
@@ -1228,14 +1251,6 @@ public class PhotoImageLoader {
 //			return ImageIO.read(photoWrapper.imageFile);
 //		}
 //	}
-
-	private void setStateLoadingError() {
-
-		// prevent loading the image again
-		_photo.setLoadingState(PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR, _requestedImageQuality);
-
-		PhotoLoadManager.putPhotoInLoadingErrorMap(_photo.getPhotoWrapper().imageFilePathName);
-	}
 
 	private void setStateUndefined() {
 
@@ -1371,5 +1386,20 @@ public class PhotoImageLoader {
 		}
 
 		return rotatedImage;
+	}
+
+	/**
+	 * @param loadedImage
+	 */
+	private void updateImageData(final Image loadedImage) {
+
+		// check if height is set
+		if (_photo.getHeight() == Integer.MIN_VALUE) {
+
+			// image dimension is not yet set
+
+			final Rectangle bounds = loadedImage.getBounds();
+			_photo.setDimension(bounds.width, bounds.height);
+		}
 	}
 }

@@ -19,11 +19,11 @@ import net.tourbook.application.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionShowPhotoAnnotations extends Action {
+public class ActionShowGPSAnnotations extends Action {
 
 	private PicDirView	_picDirView;
 
-	public ActionShowPhotoAnnotations(final PicDirView picDirView) {
+	public ActionShowGPSAnnotations(final PicDirView picDirView) {
 
 		super(Messages.Pic_Dir_Action_ShowPhotoAnnotations, AS_CHECK_BOX);
 
@@ -31,7 +31,7 @@ public class ActionShowPhotoAnnotations extends Action {
 
 		setToolTipText(Messages.Pic_Dir_Action_ShowPhotoAnnotations_Tooltip);
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__PhotoInfoAnnotations));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__PhotoAnnotationGPSAction));
 	}
 
 	@Override

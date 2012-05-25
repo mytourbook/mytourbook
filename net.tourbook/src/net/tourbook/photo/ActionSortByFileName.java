@@ -31,7 +31,7 @@ public class ActionSortByFileName extends Action {
 
 		setToolTipText(Messages.Pic_Dir_Action_SortByName_Tooltip);
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(net.tourbook.Messages.Image__PhotoSortByName));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__PhotoSortByName));
 	}
 
 	@Override

@@ -122,11 +122,12 @@ public class Photo {
 	private PhotoLoadingState				_photoLoadingStateHQ;
 	private PhotoLoadingState				_photoLoadingStateThumb;
 
+	private boolean							_isSwapWidthHeight;
+
 	/**
 	 * Is <code>true</code> when EXIF thumb image could be loaded
 	 */
-	private boolean							_isEXIFThumbAvailable;
-	private boolean							_isSwapWidthHeight;
+//	private boolean							_isEXIFThumbAvailable;
 
 	/**
 	 * Exif thumb state
@@ -694,9 +695,9 @@ public class Photo {
 	/**
 	 * @return Returns <code>true</code> when EXIF thumb image could be loaded
 	 */
-	public boolean isEXIFThumbAvailable() {
-		return _isEXIFThumbAvailable;
-	}
+//	public boolean isEXIFThumbAvailable() {
+//		return _isEXIFThumbAvailable;
+//	}
 
 	public void setAltitude(final double altitude) {
 		_altitude = altitude;
@@ -706,8 +707,9 @@ public class Photo {
 		_exifDateTime = dateTime;
 	}
 
-	public void setExifThumbState(final int exifThumbState) {
-		_exifThumbImageState = exifThumbState;
+	public void setDimension(final int width, final int height) {
+		_imageWidth = width;
+		_imageHeight = height;
 	}
 
 	public void setGpsAreaInfo(final String gpsAreaInfo) {
@@ -748,10 +750,6 @@ public class Photo {
 		}
 	}
 
-	public void setIsEXIFThumb() {
-		_isEXIFThumbAvailable = true;
-	}
-
 	public void setLatitude(final double latitude) {
 		_latitude = latitude;
 	}
@@ -766,6 +764,14 @@ public class Photo {
 
 	public void setLongitude(final double longitude) {
 		_longitude = longitude;
+	}
+
+//	public void setStateExifThumbIsLoaded(final boolean isExifThumb) {
+//		_isEXIFThumbAvailable = isExifThumb;
+//	}
+
+	public void setStateExifThumb(final int exifThumbState) {
+		_exifThumbImageState = exifThumbState;
 	}
 
 	public void setThumbSaveError() {

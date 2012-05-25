@@ -497,8 +497,32 @@ public abstract class GalleryMT20 extends Canvas {
 		}
 	}
 
-	private void fireItemHoverEvent(final GalleryMT20Item hoveredItem) {
+	private void fireItemHoverEvent() {
 
+		final Point devMouse = this.toControl(getDisplay().getCursorLocation());
+
+		fireItemHoverEvent(devMouse.x, devMouse.y);
+	}
+
+	private void fireItemHoverEvent(final int mouseX, final int mouseY) {
+
+		GalleryMT20Item hoveredItem = null;
+
+		if (_isGalleryPanned) {
+
+			// tooltip is disable when items are panned, this behaviour needs more investigation, not now
+
+		} else {
+
+			final int itemIndex = getItemIndexFromPosition(mouseX, mouseY);
+
+			if (itemIndex != -1) {
+				hoveredItem = getInitializedItem(itemIndex);
+				updateItemPosition(hoveredItem, itemIndex);
+			}
+		}
+
+		// fire event to hover listener
 		final Object[] listeners = _hoveredListeners.getListeners();
 		for (final Object listener : listeners) {
 			((IItemHovereredListener) listener).hoveredItem(hoveredItem);
@@ -719,14 +743,6 @@ public abstract class GalleryMT20 extends Canvas {
 		return -1;
 	}
 
-	public int getItemWidth() {
-		return _itemWidth;
-	}
-
-	public int getNumberOfHorizontalImages() {
-		return _gridHorizItems;
-	}
-
 //	private GalleryMT20Item getNextItem_OLD(final int keyCode) {
 //
 //		if (_lastSingleClick == null) {
@@ -787,6 +803,21 @@ public abstract class GalleryMT20 extends Canvas {
 //
 //		return null;
 //	}
+
+	/**
+	 * @return Returns ratio with: width / height
+	 */
+	public double getItemRatio() {
+		return _itemRatio;
+	}
+
+	public int getItemWidth() {
+		return _itemWidth;
+	}
+
+	public int getNumberOfHorizontalImages() {
+		return _gridHorizItems;
+	}
 
 	public int getScrollBarIncrement() {
 
@@ -1355,6 +1386,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 		final int mouseX = mouseEvent.x;
 		final int mouseY = mouseEvent.y;
+
 		_mouseMovePosition = new Point(mouseX, mouseY);
 
 		if (_isGalleryPanned) {
@@ -1388,16 +1420,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 		} else {
 
-			final int itemIndex = getItemIndexFromPosition(mouseEvent.x, mouseEvent.y);
-
-			GalleryMT20Item hoveredItem = null;
-
-			if (itemIndex != -1) {
-				hoveredItem = getInitializedItem(itemIndex);
-				updateItemPosition(hoveredItem, itemIndex);
-			}
-
-			fireItemHoverEvent(hoveredItem);
+			fireItemHoverEvent(mouseX, mouseY);
 		}
 	}
 
@@ -1681,6 +1704,8 @@ public abstract class GalleryMT20 extends Canvas {
 		}
 
 		_clientAreaItemsIndices = getAreaItemsIndices(_clientArea);
+
+		fireItemHoverEvent();
 	}
 
 	private void selectAll() {
