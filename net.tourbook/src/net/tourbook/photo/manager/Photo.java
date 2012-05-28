@@ -18,6 +18,7 @@ package net.tourbook.photo.manager;
 import java.awt.Point;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import net.tourbook.util.StatusUtil;
 import net.tourbook.util.Util;
@@ -25,7 +26,11 @@ import net.tourbook.util.Util;
 import org.apache.commons.imaging.Imaging;
 import org.apache.commons.imaging.ImagingConstants;
 import org.apache.commons.imaging.common.IImageMetadata;
+import org.apache.commons.imaging.common.IImageMetadata.IImageMetadataItem;
+import org.apache.commons.imaging.common.ImageMetadata.Item;
 import org.apache.commons.imaging.formats.jpeg.JpegImageMetadata;
+import org.apache.commons.imaging.formats.jpeg.JpegPhotoshopMetadata;
+import org.apache.commons.imaging.formats.jpeg.iptc.IptcTypes;
 import org.apache.commons.imaging.formats.tiff.TiffField;
 import org.apache.commons.imaging.formats.tiff.TiffImageMetadata;
 import org.apache.commons.imaging.formats.tiff.constants.ExifTagConstants;
@@ -35,7 +40,6 @@ import org.apache.commons.imaging.formats.tiff.taginfos.TagInfo;
 import org.apache.commons.imaging.formats.tiff.taginfos.TagInfoShortOrLong;
 import org.eclipse.osgi.util.NLS;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -50,6 +54,9 @@ public class Photo {
 
 	private PhotoImageMetadata				_photoImageMetadata;
 
+	/**
+	 * Last modified in GMT
+	 */
 	private DateTime						_imageFileDateTime;
 	private DateTime						_exifDateTime;
 
@@ -99,8 +106,10 @@ public class Photo {
 	private double							_imageDirection			= Double.MIN_VALUE;
 	private double							_altitude				= Double.MIN_VALUE;
 
-	private static final DateTimeFormatter	_dtParser				= DateTimeFormat.forPattern("yyyy:MM:dd HH:mm:ss")// //$NON-NLS-1$
-																			.withZone(DateTimeZone.UTC);
+	private static final DateTimeFormatter	_dtParser				= DateTimeFormat//
+																			.forPattern("yyyy:MM:dd HH:mm:ss") //$NON-NLS-1$
+//																			.withZone(DateTimeZone.UTC)
+																	;
 
 	/**
 	 * caches the world positions for the photo lat/long values for each zoom level
@@ -163,51 +172,53 @@ public class Photo {
 	/**
 	 * Creates metadata from image metadata
 	 * 
-	 * @param imageFileMetadata
+	 * @param imageMetadata
 	 *            Can be <code>null</code> when not available
 	 * @return
 	 */
-	private PhotoImageMetadata createPhotoMetadata(final IImageMetadata imageFileMetadata) {
+	private PhotoImageMetadata createPhotoMetadata(final IImageMetadata imageMetadata) {
 
 // this will log all available meta data
-//		System.out.println(metadata.toString());
+//		System.out.println(imageMetadata.toString());
 
 		final PhotoImageMetadata photoMetadata = new PhotoImageMetadata();
 
 		/*
 		 * read meta data for this photo
 		 */
-		if (imageFileMetadata instanceof TiffImageMetadata) {
+		if (imageMetadata instanceof TiffImageMetadata) {
 
-			final TiffImageMetadata tiffMetadata = (TiffImageMetadata) imageFileMetadata;
+			final TiffImageMetadata tiffMetadata = (TiffImageMetadata) imageMetadata;
 
-			photoMetadata.exifDateTime = getTiffDate(tiffMetadata);
+			photoMetadata.exifDateTime = getTiffValueDate(tiffMetadata);
 
 			photoMetadata.orientation = 1;
 
-			photoMetadata.imageWidth = getTiffIntValue(
+			photoMetadata.imageWidth = getTiffValueInt(
 					tiffMetadata,
 					TiffTagConstants.TIFF_TAG_IMAGE_WIDTH,
 					Integer.MIN_VALUE);
 
-			photoMetadata.imageHeight = getTiffIntValue(
+			photoMetadata.imageHeight = getTiffValueInt(
 					tiffMetadata,
 					TiffTagConstants.TIFF_TAG_IMAGE_LENGTH,
 					Integer.MIN_VALUE);
 
-		} else if (imageFileMetadata instanceof JpegImageMetadata) {
+			photoMetadata.model = getTiffValueString(tiffMetadata, TiffTagConstants.TIFF_TAG_MODEL);
 
-			final JpegImageMetadata jpegMetadata = (JpegImageMetadata) imageFileMetadata;
+		} else if (imageMetadata instanceof JpegImageMetadata) {
 
-			photoMetadata.exifDateTime = getExifDate(jpegMetadata);
+			final JpegImageMetadata jpegMetadata = (JpegImageMetadata) imageMetadata;
 
-			photoMetadata.orientation = getExifIntValue(jpegMetadata, TiffTagConstants.TIFF_TAG_ORIENTATION, 1);
+			photoMetadata.exifDateTime = getExifValueDate(jpegMetadata);
 
-			photoMetadata.imageWidth = getExifIntValue(
+			photoMetadata.orientation = getExifValueInt(jpegMetadata, TiffTagConstants.TIFF_TAG_ORIENTATION, 1);
+
+			photoMetadata.imageWidth = getExifValueInt(
 					jpegMetadata,
 					ExifTagConstants.EXIF_TAG_EXIF_IMAGE_WIDTH,
 					Integer.MIN_VALUE);
-			photoMetadata.imageHeight = getExifIntValue(
+			photoMetadata.imageHeight = getExifValueInt(
 					jpegMetadata,
 					ExifTagConstants.EXIF_TAG_EXIF_IMAGE_LENGTH,
 					Integer.MIN_VALUE);
@@ -215,7 +226,11 @@ public class Photo {
 			photoMetadata.imageDirection = getExifValueDouble(jpegMetadata, GpsTagConstants.GPS_TAG_GPS_IMG_DIRECTION);
 			photoMetadata.altitude = getExifValueDouble(jpegMetadata, GpsTagConstants.GPS_TAG_GPS_ALTITUDE);
 
-			// GPS
+			photoMetadata.model = getExifValueString(jpegMetadata, TiffTagConstants.TIFF_TAG_MODEL);
+
+			/*
+			 * GPS
+			 */
 			final TiffImageMetadata exifMetadata = jpegMetadata.getExif();
 			if (exifMetadata != null) {
 
@@ -230,10 +245,38 @@ public class Photo {
 					// ignore
 				}
 			}
-			photoMetadata.gpsAreaInfo = getExifGpsArea(jpegMetadata);
+			photoMetadata.gpsAreaInfo = getExifValueGpsArea(jpegMetadata);
+
+			/*
+			 * photoshop metadata
+			 */
+			final JpegPhotoshopMetadata pshopMetadata = jpegMetadata.getPhotoshop();
+			if (pshopMetadata != null) {
+
+				final List<? extends IImageMetadataItem> pshopItems = pshopMetadata.getItems();
+
+				for (final IImageMetadataItem pshopItem : pshopItems) {
+
+					if (pshopItem instanceof Item) {
+
+						final Item item = (Item) pshopItem;
+						final String keyword = item.getKeyword();
+
+						if (keyword.equals(IptcTypes.OBJECT_NAME.name)) {
+
+							photoMetadata.objectName = item.getText();
+
+						} else if (keyword.equals(IptcTypes.CAPTION_ABSTRACT.name)) {
+							photoMetadata.captionAbstract = item.getText();
+						}
+					}
+				}
+
+			}
 		}
 
 		// set file date time
+//		photoMetadata.fileDateTime = new DateTime(DateTimeZone.UTC).withMillis(_photoWrapper.imageFileLastModified);
 		photoMetadata.fileDateTime = new DateTime(_photoWrapper.imageFileLastModified);
 
 		return photoMetadata;
@@ -275,6 +318,23 @@ public class Photo {
 		return _altitude;
 	}
 
+	public DateTime getExifDateTime() {
+		return _exifDateTime;
+	}
+
+	/**
+	 * @return Returns EXIF thumb image stage
+	 * 
+	 *         <pre>
+	 * 1  exif thumb image is available
+	 * 0  exif thumb image is not available
+	 * -1 exif thumb has not yet been retrieved
+	 * </pre>
+	 */
+	public int getExifThumbImageState() {
+		return _exifThumbImageState;
+	}
+
 	/**
 	 * Date/Time
 	 * 
@@ -282,7 +342,7 @@ public class Photo {
 	 * @param file
 	 * @return
 	 */
-	private DateTime getExifDate(final JpegImageMetadata jpegMetadata) {
+	private DateTime getExifValueDate(final JpegImageMetadata jpegMetadata) {
 
 //		/*
 //		 * !!! time is not correct, maybe it is the time when the GPS signal was
@@ -292,10 +352,17 @@ public class Photo {
 
 		try {
 
-			final TiffField date = jpegMetadata.findEXIFValueWithExactMatch(TiffTagConstants.TIFF_TAG_DATE_TIME);
+			final TiffField originalDate = jpegMetadata.findEXIFValueWithExactMatch(//
+					ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL);
 
-			if (date != null) {
-				return _dtParser.parseDateTime(date.getStringValue());
+			if (originalDate != null) {
+				return _dtParser.parseDateTime(originalDate.getStringValue());
+			}
+
+			final TiffField tiffDate = jpegMetadata.findEXIFValueWithExactMatch(TiffTagConstants.TIFF_TAG_DATE_TIME);
+
+			if (tiffDate != null) {
+				return _dtParser.parseDateTime(tiffDate.getStringValue());
 			}
 
 		} catch (final Exception e) {
@@ -306,9 +373,27 @@ public class Photo {
 	}
 
 	/**
+	 * Image direction
+	 * 
+	 * @param tagInfo
+	 */
+	private double getExifValueDouble(final JpegImageMetadata jpegMetadata, final TagInfo tagInfo) {
+		try {
+			final TiffField field = jpegMetadata.findEXIFValueWithExactMatch(tagInfo);
+			if (field != null) {
+				return field.getDoubleValue();
+			}
+		} catch (final Exception e) {
+			// ignore
+		}
+
+		return Double.MIN_VALUE;
+	}
+
+	/**
 	 * GPS area info
 	 */
-	private String getExifGpsArea(final JpegImageMetadata jpegMetadata) {
+	private String getExifValueGpsArea(final JpegImageMetadata jpegMetadata) {
 
 		try {
 			final TiffField field = jpegMetadata
@@ -372,7 +457,7 @@ public class Photo {
 		return null;
 	}
 
-	private int getExifIntValue(final JpegImageMetadata jpegMetadata, final TagInfo tiffTag, final int defaultValue) {
+	private int getExifValueInt(final JpegImageMetadata jpegMetadata, final TagInfo tiffTag, final int defaultValue) {
 
 		try {
 			final TiffField field = jpegMetadata.findEXIFValueWithExactMatch(tiffTag);
@@ -386,35 +471,18 @@ public class Photo {
 		return defaultValue;
 	}
 
-	/**
-	 * @return Returns EXIF thumb image stage
-	 * 
-	 *         <pre>
-	 * 1  exif thumb image is available
-	 * 0  exif thumb image is not available
-	 * -1 exif thumb has not yet been retrieved
-	 * </pre>
-	 */
-	public int getExifThumbImageState() {
-		return _exifThumbImageState;
-	}
+	private String getExifValueString(final JpegImageMetadata jpegMetadata, final TagInfo tagInfo) {
 
-	/**
-	 * Image direction
-	 * 
-	 * @param tagInfo
-	 */
-	private double getExifValueDouble(final JpegImageMetadata jpegMetadata, final TagInfo tagInfo) {
 		try {
 			final TiffField field = jpegMetadata.findEXIFValueWithExactMatch(tagInfo);
 			if (field != null) {
-				return field.getDoubleValue();
+				return field.getStringValue();
 			}
 		} catch (final Exception e) {
 			// ignore
 		}
 
-		return Double.MIN_VALUE;
+		return null;
 	}
 
 	/**
@@ -510,8 +578,6 @@ public class Photo {
 
 		try {
 
-			// SanselanConstants.PARAM_KEY_READ_THUMBNAILS
-
 			/*
 			 * read metadata WITH thumbnail image info, this is the default when the pamameter is
 			 * ommitted
@@ -601,13 +667,23 @@ public class Photo {
 		return _orientation;
 	}
 
+	public DateTime getOriginalDateTime() {
+		return _exifDateTime != null ? _exifDateTime : _imageFileDateTime;
+	}
+
 	public PhotoWrapper getPhotoWrapper() {
 		return _photoWrapper;
 	}
 
-	private DateTime getTiffDate(final TiffImageMetadata tiffMetadata) {
+	private DateTime getTiffValueDate(final TiffImageMetadata tiffMetadata) {
 
 		try {
+
+			final TiffField originalDate = tiffMetadata.findField(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL, true);
+
+			if (originalDate != null) {
+				return _dtParser.parseDateTime(originalDate.getStringValue());
+			}
 
 			final TiffField date = tiffMetadata.findField(TiffTagConstants.TIFF_TAG_DATE_TIME, true);
 			if (date != null) {
@@ -621,7 +697,7 @@ public class Photo {
 		return null;
 	}
 
-	private int getTiffIntValue(final TiffImageMetadata tiffMetadata,
+	private int getTiffValueInt(final TiffImageMetadata tiffMetadata,
 								final TagInfoShortOrLong tiffTag,
 								final int defaultValue) {
 
@@ -635,6 +711,20 @@ public class Photo {
 		}
 
 		return defaultValue;
+	}
+
+	private String getTiffValueString(final TiffImageMetadata tiffMetadata, final TagInfo tagInfo) {
+
+		try {
+			final TiffField field = tiffMetadata.findField(tagInfo, true);
+			if (field != null) {
+				return field.getStringValue();
+			}
+		} catch (final Exception e) {
+			// ignore
+		}
+
+		return null;
 	}
 
 	/**
@@ -703,10 +793,6 @@ public class Photo {
 		_altitude = altitude;
 	}
 
-	public void setDateTime(final DateTime dateTime) {
-		_exifDateTime = dateTime;
-	}
-
 	public void setDimension(final int width, final int height) {
 		_imageWidth = width;
 		_imageHeight = height;
@@ -754,6 +840,10 @@ public class Photo {
 		_latitude = latitude;
 	}
 
+//	public void setStateExifThumbIsLoaded(final boolean isExifThumb) {
+//		_isEXIFThumbAvailable = isExifThumb;
+//	}
+
 	public void setLoadingState(final PhotoLoadingState photoLoadingState, final ImageQuality imageQuality) {
 		if (imageQuality == ImageQuality.HQ) {
 			_photoLoadingStateHQ = photoLoadingState;
@@ -765,10 +855,6 @@ public class Photo {
 	public void setLongitude(final double longitude) {
 		_longitude = longitude;
 	}
-
-//	public void setStateExifThumbIsLoaded(final boolean isExifThumb) {
-//		_isEXIFThumbAvailable = isExifThumb;
-//	}
 
 	public void setStateExifThumb(final int exifThumbState) {
 		_exifThumbImageState = exifThumbState;

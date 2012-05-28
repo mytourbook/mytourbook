@@ -31,7 +31,7 @@ public class ActionShowPhotoTooltip extends Action {
 
 		setToolTipText(Messages.Pic_Dir_Action_ShowPhotoTooltip_Tooltip);
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__PhotoInfoName));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__PhotoTooltip));
 	}
 
 	@Override

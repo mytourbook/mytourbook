@@ -33,8 +33,14 @@ public class PhotoWrapper implements IGalleryCustomData {
 	public String	imageFileName;
 	public String	imageFileExt;
 	public String	imageFilePathName;
+
+	/**
+	 * Last modified in GMT
+	 */
 	public long		imageFileLastModified;
 	public long		imageSortingTime;
+
+	public long		imageFileSize;
 
 	public Photo	photo;
 
@@ -56,6 +62,8 @@ public class PhotoWrapper implements IGalleryCustomData {
 		imageFileName = imageFile.getName();
 		imageFilePathName = imageFile.getPath();
 		imageFileLastModified = imageFile.lastModified();
+
+		imageFileSize = imageFile.length();
 
 		final int dotPos = imageFileName.lastIndexOf(".");
 		imageFileExt = dotPos > 0 ? imageFileName.substring(dotPos + 1).toLowerCase() : UI.EMPTY_STRING;

@@ -31,23 +31,25 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_Photo_Time;
 
 	public static String		Image__PhotoAnnotationGPS;
-
-	public static String	Image__PhotoAnnotationGPSAction;
+	public static String		Image__PhotoAnnotationGPSAction;
 	public static String		Image__PhotoFilterGPS;
 	public static String		Image__PhotoFilterNoFilter;
 	public static String		Image__PhotoFilterNoGPS;
-	public static String		Image__PhotoInfoAnnotations;
+
+	public static String	Image__PhotoFolderGallery;
+
+	public static String	Image__PhotoFolderGallery_OnlyPhotos;
 	public static String		Image__PhotoInfoDate;
 	public static String		Image__PhotoInfoName;
 	public static String		Image__PhotoSortByDate;
 	public static String		Image__PhotoSortByName;
+	public static String		Image__PhotoTooltip;
 
 	public static String		Pic_Dir_Action_ClearHistory;
 	public static String		Pic_Dir_Action_DefineExternalApp;
 	public static String		Pic_Dir_Action_NavigateHistoryBackward;
 	public static String		Pic_Dir_Action_NavigateHistoryForward;
 	public static String		Pic_Dir_Action_PhotoFilterGPS;
-	public static String		Pic_Dir_Action_PhotoFilterGPS_Tooltip;
 	public static String		Pic_Dir_Action_PhotoFilterGPSTooltip;
 	public static String		Pic_Dir_Action_PhotoFilterNoFilter;
 	public static String		Pic_Dir_Action_PhotoFilterNoFilter_Tooltip;
@@ -63,16 +65,23 @@ public class Messages extends NLS {
 	public static String		Pic_Dir_Action_ShowPhotoFileName_Tooltip;
 	public static String		Pic_Dir_Action_ShowPhotoInfoFileDate;
 	public static String		Pic_Dir_Action_ShowPhotoInfoFileDate_Tooltip;
-
-	public static String	Pic_Dir_Action_ShowPhotoTooltip;
-
-	public static String	Pic_Dir_Action_ShowPhotoTooltip_Tooltip;
+	public static String		Pic_Dir_Action_ShowPhotoTooltip;
+	public static String		Pic_Dir_Action_ShowPhotoTooltip_Tooltip;
 	public static String		Pic_Dir_Action_SingleClickExpand;
 	public static String		Pic_Dir_Action_SingleExpandCollapseOthers;
 	public static String		Pic_Dir_Action_SortByDate;
 	public static String		Pic_Dir_Action_SortByDate_Tooltip;
 	public static String		Pic_Dir_Action_SortByName;
 	public static String		Pic_Dir_Action_SortByName_Tooltip;
+
+	public static String	Pic_Dir_Action_ToggleFolderGallery;
+
+	public static String	Pic_Dir_Action_ToggleFolderGallery_OnlyPhotos;
+
+	public static String	Pic_Dir_Action_ToggleFolderGallery_OnlyPhotos_Tooltip;
+
+	public static String	Pic_Dir_Action_ToggleFolderGallery_Tooltip;
+
 	public static String		Pic_Dir_Dialog_CleanupStoreImages_Message;
 	public static String		Pic_Dir_Dialog_CleanupStoreImages_Title;
 	public static String		Pic_Dir_Dialog_ExternalApplication_Message;

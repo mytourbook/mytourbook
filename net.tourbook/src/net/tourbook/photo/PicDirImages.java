@@ -113,6 +113,7 @@ public class PicDirImages implements IItemHovereredListener {
 	private static final String									STATE_GALLERY_POSITION_FOLDER	= "STATE_GALLERY_POSITION_FOLDER";	//$NON-NLS-1$
 	private static final String									STATE_GALLERY_POSITION_VALUE	= "STATE_GALLERY_POSITION_VALUE";	//$NON-NLS-1$
 	private static final String									STATE_IMAGE_SORTING				= "STATE_IMAGE_SORTING";			//$NON-NLS-1$
+	private static final String									STATE_IS_SHOW_ONLY_PHOTOS		= "STATE_IS_SHOW_ONLY_PHOTOS";		//$NON-NLS-1$
 
 	private static final String									DEFAULT_GALLERY_FONT			= "arial,sans-serif";				//$NON-NLS-1$
 
@@ -220,6 +221,13 @@ public class PicDirImages implements IItemHovereredListener {
 	private ActionNavigateHistoryForward						_actionNavigateForward;
 	private ActionClearNavigationHistory						_actionClearNavigationHistory;
 	private ActionRemoveInvalidFoldersFromHistory				_actionRemoveInvalidFoldersFromHistory;
+	private ActionToggleFolderGallery							_actionToggleFolderGallery;
+
+	/**
+	 * Is <code>true</code> when folders and gallery photos are displayed, is <code>false</code>
+	 * when only photos are displayed.
+	 */
+	private boolean												_isShowOnlyPhotos;
 
 	private int													_prevGalleryItemSize			= -1;
 	private int													_photoImageSize;
@@ -591,6 +599,13 @@ public class PicDirImages implements IItemHovereredListener {
 		_comboHistory.setListVisible(true);
 	}
 
+	void actionToggleFolderGallery() {
+
+		_isShowOnlyPhotos = _isShowOnlyPhotos ? false : true;
+
+		updateUI_Action_FolderGallery();
+	}
+
 	private void createActions() {
 
 		_actionNavigateBackward = new ActionNavigateHistoryBackward(this, _picDirView);
@@ -601,6 +616,8 @@ public class PicDirImages implements IItemHovereredListener {
 
 		_actionClearNavigationHistory = new ActionClearNavigationHistory(this);
 		_actionRemoveInvalidFoldersFromHistory = new ActionRemoveInvalidFoldersFromHistory(this);
+
+		_actionToggleFolderGallery = new ActionToggleFolderGallery(this);
 	}
 
 	/**
@@ -935,6 +952,14 @@ public class PicDirImages implements IItemHovereredListener {
 		}
 	}
 
+	private void deselectAll() {
+
+		_gallery.deselectAll();
+
+		// update UI
+		onSelectPhoto();
+	}
+
 	private void disposeAllImages() {
 
 		PhotoLoadManager.stopImageLoading(true);
@@ -951,6 +976,7 @@ public class PicDirImages implements IItemHovereredListener {
 
 		final ToolBarManager tbm = new ToolBarManager(_toolbar);
 
+		tbm.add(_actionToggleFolderGallery);
 		tbm.add(_actionNavigateBackward);
 		tbm.add(_actionNavigateForward);
 
@@ -963,7 +989,6 @@ public class PicDirImages implements IItemHovereredListener {
 
 		menuMgr.add(_actionRemoveInvalidFoldersFromHistory);
 		menuMgr.add(_actionClearNavigationHistory);
-
 	}
 
 	/**
@@ -975,6 +1000,11 @@ public class PicDirImages implements IItemHovereredListener {
 	void filterGallery(final ImageFilter currentImageFilter) {
 
 		_currentImageFilter = currentImageFilter;
+
+		/*
+		 * deselect all, this could be better implemented to keep selection, but is not yet done
+		 */
+		deselectAll();
 
 		jobFilter_22_ScheduleSubsequent(0);
 	}
@@ -1754,14 +1784,20 @@ public class PicDirImages implements IItemHovereredListener {
 		}
 	}
 
-	void restoreInfo(final boolean isShowPhotoName, final PhotoDateInfo photoDateInfo, final boolean isShowAnnotations, final boolean isShowTooltip) {
-		
+	void restoreInfo(	final boolean isShowPhotoName,
+						final PhotoDateInfo photoDateInfo,
+						final boolean isShowAnnotations,
+						final boolean isShowTooltip) {
+
 		_photoRenderer.setShowLabels(isShowPhotoName, photoDateInfo, isShowAnnotations);
-		
-		_isShowTooltip=isShowTooltip;
+
+		_isShowTooltip = isShowTooltip;
 	}
 
 	void restoreState(final IDialogSettings state) {
+
+		_isShowOnlyPhotos = Util.getStateBoolean(state, STATE_IS_SHOW_ONLY_PHOTOS, true);
+		updateUI_Action_FolderGallery();
 
 		/*
 		 * history
@@ -1851,6 +1887,8 @@ public class PicDirImages implements IItemHovereredListener {
 		state.put(STATE_THUMB_IMAGE_SIZE, _photoImageSize);
 
 		state.put(STATE_IMAGE_SORTING, _currentSorting.name());
+
+		state.put(STATE_IS_SHOW_ONLY_PHOTOS, _isShowOnlyPhotos);
 
 		/*
 		 * gallery positions for each folder
@@ -1963,6 +2001,11 @@ public class PicDirImages implements IItemHovereredListener {
 		if (_currentSorting == gallerySorting) {
 			return;
 		}
+
+		/*
+		 * deselect all, this could be better implemented to keep selection, but is not yet done
+		 */
+		deselectAll();
 
 		// set new sorting algorithm
 		_currentSorting = gallerySorting;
@@ -2126,6 +2169,30 @@ public class PicDirImages implements IItemHovereredListener {
 		_actionRemoveInvalidFoldersFromHistory.setEnabled(historySize > 1);
 	}
 
+	private void updateUI_Action_FolderGallery() {
+
+		if (_isShowOnlyPhotos) {
+
+			// show folder and gallery
+
+			_actionToggleFolderGallery.setText(Messages.Pic_Dir_Action_ToggleFolderGallery_OnlyPhotos);
+			_actionToggleFolderGallery.setToolTipText(Messages.Pic_Dir_Action_ToggleFolderGallery_OnlyPhotos);
+			_actionToggleFolderGallery.setImageDescriptor(TourbookPlugin
+					.getImageDescriptor(Messages.Image__PhotoFolderGallery_OnlyPhotos));
+
+		} else {
+
+			// show only photos
+
+			_actionToggleFolderGallery.setText(Messages.Pic_Dir_Action_ToggleFolderGallery);
+			_actionToggleFolderGallery.setToolTipText(Messages.Pic_Dir_Action_ToggleFolderGallery_Tooltip);
+			_actionToggleFolderGallery.setImageDescriptor(TourbookPlugin
+					.getImageDescriptor(Messages.Image__PhotoFolderGallery));
+		}
+
+		_picDirView.setMaximizedControl(_isShowOnlyPhotos);
+	}
+
 	private void updateUI_AfterZoomInOut(final int galleryItemSize) {
 
 		final int imageSize = galleryItemSize - _photoBorderSize;
@@ -2143,6 +2210,9 @@ public class PicDirImages implements IItemHovereredListener {
 			_canvasImageSizeIndicator.setIndicator(isHqImage);
 
 			_picDirView.setThumbnailSize(imageSize);
+
+			_photoTooltip.setImageSize(_photoImageSize);
+			_photoTooltip.reset();
 		}
 	}
 
@@ -2206,10 +2276,10 @@ public class PicDirImages implements IItemHovereredListener {
 						if (_sortedAndFilteredPhotoWrapper.length == 0) {
 
 							if (imageCount == 1) {
-								_lblGalleryInfo.setText("1 image is hidden by the image filter");
+								_lblGalleryInfo.setText("1 image is hidden by the photo filter");
 							} else {
 								_lblGalleryInfo.setText(NLS.bind(
-										"{0} images are hidden by the image filter",
+										"{0} images are hidden by the photo filter",
 										imageCount));
 							}
 

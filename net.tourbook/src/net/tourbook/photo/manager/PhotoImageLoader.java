@@ -49,12 +49,12 @@ public class PhotoImageLoader {
 	private static String[]				awtImageFileSuffixes;
 
 	Photo								_photo;
+
 	private GalleryMT20Item				_galleryItem;
 	ImageQuality						_requestedImageQuality;
 	private String						_imageFramework;
 	private int							_hqImageSize;
 	private String						_requestedImageKey;
-
 	private ILoadCallBack				_loadCallBack;
 
 	Display								_display;
@@ -133,6 +133,7 @@ public class PhotoImageLoader {
 		}
 		_trackedSWTImages.clear();
 	}
+
 
 	/**
 	 * @return Returns roatation according to the EXIF data or <code>null</code> when image is not
@@ -313,10 +314,12 @@ public class PhotoImageLoader {
 			 * keep image in cache
 			 */
 			if (isImageLoaded) {
-
-				PhotoImageCache.putImage(imageKey, loadedImage, _photo.getImageMetaData());
-
-				updateImageData(loadedImage);
+				PhotoImageCache.putImage(
+						imageKey,
+						loadedImage,
+						_photo.getImageMetaData(),
+						_photo.getWidth(),
+						_photo.getHeight());
 			}
 
 			/*
@@ -652,7 +655,7 @@ public class PhotoImageLoader {
 		long endSaveHQ = 0;
 		long endSaveThumb = 0;
 
-		Image loadedImage = null;
+		Image originalImage = null;
 
 		/*
 		 * load original image
@@ -662,7 +665,7 @@ public class PhotoImageLoader {
 
 			final long startHqLoad = System.currentTimeMillis();
 
-			loadedImage = new Image(_display, originalImagePathName);
+			originalImage = new Image(_display, originalImagePathName);
 
 			endHqLoad = System.currentTimeMillis() - startHqLoad;
 
@@ -674,7 +677,7 @@ public class PhotoImageLoader {
 
 		} finally {
 
-			if (loadedImage == null) {
+			if (originalImage == null) {
 
 				System.out.println(NLS.bind( //
 						UI.timeStamp() + "SWT: image \"{0}\" cannot be loaded, will load with AWT", //$NON-NLS-1$
@@ -695,12 +698,15 @@ public class PhotoImageLoader {
 				} catch (final Exception e) {
 					throw e;
 				}
-			}
+			} else {}
 		}
 
-		Rectangle imageBounds = loadedImage.getBounds();
+		Rectangle imageBounds = originalImage.getBounds();
 		int imageWidth = imageBounds.width;
 		int imageHeight = imageBounds.height;
+
+		// update dimension
+		updateImageData(imageWidth, imageHeight);
 
 		final int thumbSize = PhotoLoadManager.IMAGE_SIZE_THUMBNAIL;
 
@@ -734,7 +740,7 @@ public class PhotoImageLoader {
 
 			final Image scaledHQImage = ImageUtils.resize(
 					_display,
-					loadedImage,
+					originalImage,
 					bestSize.x,
 					bestSize.y,
 					SWT.ON,
@@ -750,7 +756,7 @@ public class PhotoImageLoader {
 			imageHeight = imageBounds.height;
 
 			// new image has been created, loaded must be disposed
-			_trackedSWTImages.add(loadedImage);
+			_trackedSWTImages.add(originalImage);
 
 			if (_requestedImageQuality == ImageQuality.HQ) {
 				// keep scaled image
@@ -773,7 +779,7 @@ public class PhotoImageLoader {
 			endSaveHQ = System.currentTimeMillis() - startSaveHQ;
 
 		} else {
-			hqImage = loadedImage;
+			hqImage = originalImage;
 		}
 
 		/*
@@ -856,15 +862,18 @@ public class PhotoImageLoader {
 
 			// loaded image is smaller than a thumb image
 
-			requestedSWTImage = loadedImage;
+			requestedSWTImage = originalImage;
 		}
 
 		if (requestedSWTImage != null) {
 
 			// keep requested image in cache
-			PhotoImageCache.putImage(_requestedImageKey, requestedSWTImage, _photo.getImageMetaData());
-
-			updateImageData(requestedSWTImage);
+			PhotoImageCache.putImage(
+					_requestedImageKey,
+					requestedSWTImage,
+					_photo.getImageMetaData(),
+					_photo.getWidth(),
+					_photo.getHeight());
 		}
 
 		if (requestedSWTImage == null) {
@@ -968,6 +977,10 @@ public class PhotoImageLoader {
 
 			int imageWidth = originalImage.getWidth();
 			int imageHeight = originalImage.getHeight();
+
+			// update dimension
+			updateImageData(imageWidth, imageHeight);
+
 			BufferedImage hqImage;
 
 			if (imageWidth >= _hqImageSize || imageHeight >= _hqImageSize) {
@@ -1178,9 +1191,12 @@ public class PhotoImageLoader {
 			if (requestedSWTImage != null) {
 
 				// keep requested image in cache
-				PhotoImageCache.putImage(_requestedImageKey, requestedSWTImage, _photo.getImageMetaData());
-
-				updateImageData(requestedSWTImage);
+				PhotoImageCache.putImage(
+						_requestedImageKey,
+						requestedSWTImage,
+						_photo.getImageMetaData(),
+						_photo.getWidth(),
+						_photo.getHeight());
 			}
 
 			if (requestedSWTImage == null) {
@@ -1215,6 +1231,12 @@ public class PhotoImageLoader {
 		_photo.setLoadingState(PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR, _requestedImageQuality);
 
 		PhotoLoadManager.putPhotoInLoadingErrorMap(_photo.getPhotoWrapper().imageFilePathName);
+	}
+
+	private void setStateUndefined() {
+
+		// set state to undefined that it will be loaded again when image is visible and not in the cache
+		_photo.setLoadingState(PhotoLoadingState.UNDEFINED, _requestedImageQuality);
 	}
 
 // JAI implementation to read tiff images with AWT
@@ -1252,12 +1274,6 @@ public class PhotoImageLoader {
 //		}
 //	}
 
-	private void setStateUndefined() {
-
-		// set state to undefined that it will be loaded again when image is visible and not in the cache
-		_photo.setLoadingState(PhotoLoadingState.UNDEFINED, _requestedImageQuality);
-	}
-
 	@Override
 	public String toString() {
 		return "PhotoImageLoaderItem [" //$NON-NLS-1$
@@ -1284,34 +1300,42 @@ public class PhotoImageLoader {
 		final int photoHeight = _photo.getHeightRotated();
 
 		final double thumbRatio = (double) thumbWidth / thumbHeight;
-		double photoRatio = (double) photoWidth / photoHeight;
-
+		double photoRatio;
 		boolean isRotate = false;
 
-		if (thumbRatio < 1.0 && photoRatio > 1.0 || thumbRatio > 1.0 && photoRatio < 1.0) {
+		if (photoWidth == Integer.MIN_VALUE) {
 
-			/*
-			 * thumb and photo have total different ratios, this can happen when an image is resized
-			 * or rotated and the thumb image was not adjusted
-			 */
+			return thumbImage;
 
-			photoRatio = 1.0 / photoRatio;
+		} else {
 
-			/*
-			 * rotate image to the photo orientation, it's rotated 90 degree to the right but it
-			 * cannot be determined which is the correct direction
-			 */
-			if (_photo.getOrientation() <= 1) {
-				// rotate it only when rotation is not set in the exif data
-				isRotate = true;
+			photoRatio = (double) photoWidth / photoHeight;
+
+			if (thumbRatio < 1.0 && photoRatio > 1.0 || thumbRatio > 1.0 && photoRatio < 1.0) {
+
+				/*
+				 * thumb and photo have total different ratios, this can happen when an image is
+				 * resized or rotated and the thumb image was not adjusted
+				 */
+
+				photoRatio = 1.0 / photoRatio;
+
+				/*
+				 * rotate image to the photo orientation, it's rotated 90 degree to the right but it
+				 * cannot be determined which is the correct direction
+				 */
+				if (_photo.getOrientation() <= 1) {
+					// rotate it only when rotation is not set in the exif data
+					isRotate = true;
+				}
 			}
 		}
 
-		final int thumbRationTruncated = (int) (thumbRatio * 100);
-		final int photoRationTruncated = (int) (photoRatio * 100);
+		final int thumbRatioTruncated = (int) (thumbRatio * 100);
+		final int photoRatioTruncated = (int) (photoRatio * 100);
 
-		if (thumbRationTruncated == photoRationTruncated) {
-			// ration is the same
+		if (thumbRatioTruncated == photoRatioTruncated) {
+			// ratio is the same
 			return thumbImage;
 		}
 
@@ -1320,7 +1344,7 @@ public class PhotoImageLoader {
 		int cropWidth;
 		int cropHeight;
 
-		if (thumbRationTruncated < photoRationTruncated) {
+		if (thumbRatioTruncated < photoRatioTruncated) {
 
 			// thumb height is smaller than photo height
 
@@ -1391,15 +1415,15 @@ public class PhotoImageLoader {
 	/**
 	 * @param loadedImage
 	 */
-	private void updateImageData(final Image loadedImage) {
+	private void updateImageData(final int imageWidth, final int imageHeight) {
 
 		// check if height is set
 		if (_photo.getHeight() == Integer.MIN_VALUE) {
 
 			// image dimension is not yet set
 
-			final Rectangle bounds = loadedImage.getBounds();
-			_photo.setDimension(bounds.width, bounds.height);
+			_photo.setDimension(imageWidth, imageHeight);
 		}
 	}
+
 }

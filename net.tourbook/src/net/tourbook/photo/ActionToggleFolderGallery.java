@@ -13,48 +13,28 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.photo.manager;
+package net.tourbook.photo;
 
-import org.joda.time.DateTime;
+import net.tourbook.application.TourbookPlugin;
 
-/**
- * Metadata for the original photo image file.
- */
-public class PhotoImageMetadata {
+import org.eclipse.jface.action.Action;
 
-	/**
-	 * Last modified in GMT
-	 */
-	public DateTime	fileDateTime;
-	public DateTime	exifDateTime;
+public class ActionToggleFolderGallery extends Action {
 
-	public int		imageWidth		= Integer.MIN_VALUE;
+	private PicDirImages	_picDirImages;
 
-	public int		imageHeight		= Integer.MIN_VALUE;
-	public int		orientation		= 1;
+	public ActionToggleFolderGallery(final PicDirImages picDirImages) {
 
-	public double	imageDirection	= Double.MIN_VALUE;
+		super(Messages.Pic_Dir_Action_ToggleFolderGallery_OnlyPhotos, AS_PUSH_BUTTON);
 
-	public double	altitude		= Double.MIN_VALUE;
-	public double	latitude		= Double.MIN_VALUE;
+		_picDirImages = picDirImages;
 
-	public double	longitude		= Double.MIN_VALUE;
-	public String	gpsAreaInfo;
+		setToolTipText(Messages.Pic_Dir_Action_ToggleFolderGallery_OnlyPhotos_Tooltip);
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__PhotoFolderGallery_OnlyPhotos));
+	}
 
-	/**
-	 * Title
-	 */
-	public String	objectName;
-
-	/**
-	 * Description
-	 */
-	public String	captionAbstract;
-
-	/**
-	 * Camera or scanner name
-	 */
-	public String	model;
-
-	public PhotoImageMetadata() {}
+	@Override
+	public void run() {
+		_picDirImages.actionToggleFolderGallery();
+	}
 }

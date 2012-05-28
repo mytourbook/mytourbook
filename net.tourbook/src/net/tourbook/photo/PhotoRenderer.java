@@ -249,7 +249,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 				isDrawText = false;
 			}
 
-			drawImage(gc, photoWrapper, photoImage, //
+			drawImage(gc, photoWrapper, photoImage, galleryItem,//
 					imageX,
 					imageY,
 					imageWidth,
@@ -302,6 +302,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	 * @param gc
 	 * @param photo
 	 * @param photoImage
+	 * @param galleryItem
 	 * @param photoPosX
 	 * @param photoPosY
 	 * @param photoWidth
@@ -312,6 +313,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	private void drawImage(	final GC gc,
 							final PhotoWrapper photoWrapper,
 							final Image photoImage,
+							final GalleryMT20Item galleryItem,
 							final int photoPosX,
 							final int photoPosY,
 							final int photoWidth,
@@ -325,10 +327,21 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		int imageWidth = 0;
 		int imageHeight = 0;
 
+		final Photo photo = photoWrapper.photo;
+
 		/*
 		 * exception can occure because the image could be disposed before it is drawn
 		 */
 		try {
+
+//			imageWidth = photo.getWidth();
+//			imageHeight = photo.getHeight();
+//
+//			if (imageWidth == Integer.MIN_VALUE) {
+//				final Rectangle imageBounds = photoImage.getBounds();
+//				imageWidth = imageBounds.width;
+//				imageHeight = imageBounds.height;
+//			}
 
 			final Rectangle imageBounds = photoImage.getBounds();
 			imageWidth = imageBounds.width;
@@ -346,9 +359,13 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 			_imagePaintedWidth = bestSize.x;
 			_imagePaintedHeight = bestSize.y;
 
-			final Photo photo = photoWrapper.photo;
-			final int photoWidthRotated = photo.getWidthRotated();
-			final int photoHeightRotated = photo.getHeightRotated();
+			int photoWidthRotated = photo.getWidthRotated();
+			int photoHeightRotated = photo.getHeightRotated();
+
+			if (photoWidthRotated == Integer.MIN_VALUE) {
+				photoWidthRotated = photo.getWidth();
+				photoHeightRotated = photo.getHeight();
+			}
 
 			/*
 			 * the photo image should not be displayed larger than the original photo even when the
@@ -400,6 +417,11 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 						_imagePaintedY,
 						_imagePaintedWidth,
 						_imagePaintedHeight);
+
+				galleryItem.imagePaintedX = _imagePaintedX;
+				galleryItem.imagePaintedY = _imagePaintedY;
+				galleryItem.imagePaintedWidth = _imagePaintedWidth;
+				galleryItem.imagePaintedHeight = _imagePaintedHeight;
 
 			} catch (final Exception e) {
 				// this bug is covered here: https://bugs.eclipse.org/bugs/show_bug.cgi?id=375845
@@ -469,7 +491,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		}
 
 		if (_isShowDateInfo) {
-			final DateTime dateTime = photoWrapper.photo.getImageFileDateTime();
+			final DateTime dateTime = photoWrapper.photo.getOriginalDateTime();
 			if (dateTime != null) {
 
 				if (_photoDateInfo == PhotoDateInfo.Date) {

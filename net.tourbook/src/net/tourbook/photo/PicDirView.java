@@ -262,7 +262,6 @@ public class PicDirView extends ViewPart {
 				_actionShowPhotoTooltip.isChecked());
 	}
 
-
 	void actionSortByDate() {
 
 		final boolean isChecked = _actionSortFileByDate.isChecked();
@@ -536,7 +535,6 @@ public class PicDirView extends ViewPart {
 		_picDirImages.setSorting(_gallerySorting);
 		_picDirImages.setFilter(_currentImageFilter);
 
-
 		/*
 		 * image restore must be done BEFORE folder restore because folder restore is also loading
 		 * the folder and updates folder history
@@ -590,6 +588,10 @@ public class PicDirView extends ViewPart {
 	@Override
 	public void setFocus() {
 		_picDirFolder.getTree().setFocus();
+	}
+
+	void setMaximizedControl(final boolean isShowFolderAndGallery) {
+		_containerMasterDetail.setMaximizedControl(isShowFolderAndGallery ? null : _containerImages);
 	}
 
 	void setThumbnailSize(final int photoWidth) {

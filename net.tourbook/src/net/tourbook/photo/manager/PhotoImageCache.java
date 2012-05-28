@@ -113,8 +113,23 @@ public class PhotoImageCache {
 
 			photoImage = cacheWrapper.image;
 
-			// ensure metadata are set in the photo
+			/*
+			 * ensure image and metadata are set in the photo
+			 */
 			photo.getImageMetaData();
+
+			// check if height is set
+			if (photo.getHeight() == Integer.MIN_VALUE) {
+
+				// image dimension is not yet set
+
+				if (cacheWrapper.imageHeight != Integer.MIN_VALUE) {
+
+					// image dimension is available
+
+					photo.setDimension(cacheWrapper.imageWidth, cacheWrapper.imageHeight);
+				}
+			}
 		}
 
 		return photoImage;
@@ -127,10 +142,18 @@ public class PhotoImageCache {
 	 * @param imageKey
 	 * @param image
 	 * @param imageMetadata
+	 * @param imageHeight
+	 * @param imageWidth
 	 */
-	public static void putImage(final String imageKey, final Image image, final PhotoImageMetadata imageMetadata) {
+	public static void putImage(final String imageKey,
+								final Image image,
+								final PhotoImageMetadata imageMetadata,
+								final int imageWidth,
+								final int imageHeight) {
 
-		final ImageCacheWrapper oldWrapper = _imageCache.put(imageKey, new ImageCacheWrapper(image, imageMetadata));
+		final ImageCacheWrapper imageCacheWrapper = new ImageCacheWrapper(image, imageMetadata, imageWidth, imageHeight);
+
+		final ImageCacheWrapper oldWrapper = _imageCache.put(imageKey, imageCacheWrapper);
 
 		if (oldWrapper != null) {
 			final Image oldImage = oldWrapper.image;

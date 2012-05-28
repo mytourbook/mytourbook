@@ -25,9 +25,17 @@ public class ImageCacheWrapper {
 	public Image				image;
 	public PhotoImageMetadata	photoMetadata;
 
-	public ImageCacheWrapper(final Image image, final PhotoImageMetadata photoMetadata) {
+	public int					imageWidth;
+	public int					imageHeight;
+
+	public ImageCacheWrapper(	final Image image,
+								final PhotoImageMetadata photoMetadata,
+								final int imageWidth,
+								final int imageHeight) {
 		this.image = image;
 		this.photoMetadata = photoMetadata;
+		this.imageWidth = imageWidth;
+		this.imageHeight = imageHeight;
 	}
 
 }
