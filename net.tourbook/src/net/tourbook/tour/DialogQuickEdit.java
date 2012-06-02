@@ -277,8 +277,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
 	private void createUISection110Title(final Composite parent) {
 
-		//ComboViewer label;
 		Label label;
+		final int defaultTextWidth = _pc.convertWidthInCharsToPixels(40);
 
 		final Composite section = createSection(parent, Messages.tour_editor_section_tour, true);
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(section);
@@ -298,6 +298,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
 			GridDataFactory.fillDefaults()//
 					.grab(true, false)
+					.hint(defaultTextWidth, SWT.DEFAULT)
 					.applyTo(_comboTitle);
 
 			// fill combobox
@@ -330,7 +331,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 					//
 					// SWT.DEFAULT causes lot's of problems with the layout therefore the hint is set
 					//
-					.hint(_pc.convertWidthInCharsToPixels(40), _pc.convertHeightInCharsToPixels(descLines))
+					.hint(defaultTextWidth, _pc.convertHeightInCharsToPixels(descLines))
 					.applyTo(_txtDescription);
 		}
 	}

@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Geotools Jars
 Bundle-SymbolicName: de.byteholder.geoclipse.ext.geotools
-Bundle-Version: 12.1.0.qualifier
+Bundle-Version: 12.1.2.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Eclipse-BuddyPolicy: registered
 Bundle-ClassPath: lib/geoapi-2.2.0.jar,

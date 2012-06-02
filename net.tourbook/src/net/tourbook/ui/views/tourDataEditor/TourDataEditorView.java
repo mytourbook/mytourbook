@@ -2702,6 +2702,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			GridDataFactory.fillDefaults()//
 					.grab(true, false)
+					.hint(_hintTextColumnWidth, SWT.DEFAULT)
 					.applyTo(_comboTitle);
 
 			_comboTitle.addKeyListener(_keyListener);

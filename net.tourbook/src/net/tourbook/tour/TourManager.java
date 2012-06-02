@@ -638,27 +638,36 @@ public class TourManager {
 
 	public static TourDataEditorView openTourEditor(final boolean isActive) {
 
-		IViewPart viewPart = null;
-		TourDataEditorView tourDataEditorView = null;
+		final TourDataEditorView tourDataEditorView[] = { null };
 
-		try {
+		/*
+		 * must be run in the UI thread because PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+		 * returns null in none UI threads
+		 */
+		Display.getDefault().syncExec(new Runnable() {
 
-			final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+			public void run() {
 
-			viewPart = page.showView(TourDataEditorView.ID, null, IWorkbenchPage.VIEW_VISIBLE);
+				try {
 
-			if (viewPart instanceof TourDataEditorView) {
+					final IWorkbenchWindow activeWorkbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 
-				tourDataEditorView = (TourDataEditorView) viewPart;
+					final IWorkbenchPage page = activeWorkbenchWindow.getActivePage();
 
-				if (isActive) {
+					final IViewPart viewPart = page.showView(TourDataEditorView.ID, null, IWorkbenchPage.VIEW_VISIBLE);
 
-					page.showView(TourDataEditorView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
+					if (viewPart instanceof TourDataEditorView) {
 
-				} else if (page.isPartVisible(viewPart) == false || isActive) {
+						tourDataEditorView[0] = (TourDataEditorView) viewPart;
 
-					page.bringToTop(viewPart);
-				}
+						if (isActive) {
+
+							page.showView(TourDataEditorView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
+
+						} else if (page.isPartVisible(viewPart) == false || isActive) {
+
+							page.bringToTop(viewPart);
+						}
 
 // HINT: this does not restore the part when it's in a fast view
 //
@@ -667,13 +676,15 @@ public class TourManager {
 //			page.setPartState(partRef, IWorkbenchPage.STATE_MAXIMIZED);
 //			page.setPartState(partRef, IWorkbenchPage.STATE_RESTORED);
 
+					}
+
+				} catch (final PartInitException e) {
+					StatusUtil.log(e);
+				}
 			}
+		});
 
-		} catch (final PartInitException e) {
-			StatusUtil.log(e);
-		}
-
-		return tourDataEditorView;
+		return tourDataEditorView[0];
 	}
 
 	/**
