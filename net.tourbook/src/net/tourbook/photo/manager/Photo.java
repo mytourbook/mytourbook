@@ -122,14 +122,16 @@ public class Photo {
 	 * Contains image keys for each image quality which can be used to get images from an image
 	 * cache
 	 */
-	private String							_imageKeyHQ;
 	private String							_imageKeyThumb;
+	private String							_imageKeyHQ;
+	private String							_imageKeyOriginal;
 
 	/**
 	 * This array keeps track of the loading state for the photo images and for different qualities
 	 */
-	private PhotoLoadingState				_photoLoadingStateHQ;
 	private PhotoLoadingState				_photoLoadingStateThumb;
+	private PhotoLoadingState				_photoLoadingStateHQ;
+	private PhotoLoadingState				_photoLoadingStateOriginal;
 
 	private boolean							_isSwapWidthHeight;
 
@@ -157,16 +159,28 @@ public class Photo {
 
 		_photoWrapper = photoWrapper;
 
-		_uniqueId = photoWrapper.imageFilePathName;
+		final String imageFilePathName = photoWrapper.imageFilePathName;
+
+		_uniqueId = imageFilePathName;
 
 		/*
 		 * initialize image keys and loading states
 		 */
-		_imageKeyHQ = Util.computeMD5(_photoWrapper.imageFilePathName + "_HQ");//$NON-NLS-1$
-		_imageKeyThumb = Util.computeMD5(_photoWrapper.imageFilePathName + "_Thumb");//$NON-NLS-1$
+		_imageKeyThumb = getImageKeyThumb(imageFilePathName);
+		_imageKeyHQ = getImageKeyHQ(imageFilePathName);
+		_imageKeyOriginal = Util.computeMD5(imageFilePathName + "_Original");//$NON-NLS-1$
 
-		_photoLoadingStateHQ = PhotoLoadingState.UNDEFINED;
 		_photoLoadingStateThumb = PhotoLoadingState.UNDEFINED;
+		_photoLoadingStateHQ = PhotoLoadingState.UNDEFINED;
+		_photoLoadingStateOriginal = PhotoLoadingState.UNDEFINED;
+	}
+
+	static String getImageKeyHQ(final String imageFilePathName) {
+		return Util.computeMD5(imageFilePathName + "_HQ");//$NON-NLS-1$
+	}
+
+	static String getImageKeyThumb(final String imageFilePathName) {
+		return Util.computeMD5(imageFilePathName + "_Thumb");//$NON-NLS-1$
 	}
 
 	/**
@@ -288,6 +302,7 @@ public class Photo {
 
 		sb.append("Thumb:" + _photoLoadingStateThumb);
 		sb.append("\tHQ:" + _photoLoadingStateHQ);
+		sb.append("\tOriginal:" + _photoLoadingStateOriginal);
 
 		return sb.toString();
 	}
@@ -534,7 +549,14 @@ public class Photo {
 	 *         a MD5 hash from the full image file path and the image quality.
 	 */
 	public String getImageKey(final ImageQuality imageQuality) {
-		return imageQuality == ImageQuality.HQ ? _imageKeyHQ : _imageKeyThumb;
+
+		if (imageQuality == ImageQuality.HQ) {
+			return _imageKeyHQ;
+		} else if (imageQuality == ImageQuality.ORIGINAL) {
+			return _imageKeyOriginal;
+		} else {
+			return _imageKeyThumb;
+		}
 	}
 
 	/**
@@ -635,7 +657,14 @@ public class Photo {
 	 * @return Returns the loading state for the given photo quality
 	 */
 	public PhotoLoadingState getLoadingState(final ImageQuality imageQuality) {
-		return imageQuality == ImageQuality.HQ ? _photoLoadingStateHQ : _photoLoadingStateThumb;
+
+		if (imageQuality == ImageQuality.HQ) {
+			return _photoLoadingStateHQ;
+		} else if (imageQuality == ImageQuality.ORIGINAL) {
+			return _photoLoadingStateOriginal;
+		} else {
+			return _photoLoadingStateThumb;
+		}
 	}
 
 	public double getLongitude() {
@@ -847,6 +876,8 @@ public class Photo {
 	public void setLoadingState(final PhotoLoadingState photoLoadingState, final ImageQuality imageQuality) {
 		if (imageQuality == ImageQuality.HQ) {
 			_photoLoadingStateHQ = photoLoadingState;
+		} else if (imageQuality == ImageQuality.ORIGINAL) {
+			_photoLoadingStateOriginal = photoLoadingState;
 		} else {
 			_photoLoadingStateThumb = photoLoadingState;
 		}

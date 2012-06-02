@@ -335,7 +335,7 @@ public class PrefPagePhotoThumbnailStore extends FieldEditorPreferencePage imple
 			ThumbnailStore.cleanupStoreFiles(isDeleteAllImages, true);
 
 			// dispose cached images
-			PhotoImageCache.dispose();
+			PhotoImageCache.disposeAll();
 
 			updateUILastCleanup();
 		}

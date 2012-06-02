@@ -169,6 +169,38 @@ public class ThumbnailStore {
 		}
 	}
 
+	/**
+	 * Cleanup store files for a specific folder.
+	 * 
+	 * @param folderPath
+	 */
+	public static void cleanupStoreFiles(final File[] imageFiles) {
+
+		for (final File imageFile : imageFiles) {
+
+			cleanupStoreFiles_10(imageFile, ImageQuality.THUMB, Photo.getImageKeyThumb(imageFile.getPath()));
+			cleanupStoreFiles_10(imageFile, ImageQuality.HQ, Photo.getImageKeyHQ(imageFile.getPath()));
+		}
+	}
+
+	private static void cleanupStoreFiles_10(	final File imageFile,
+												final ImageQuality imageQuality,
+												final String imageKey) {
+
+		final IPath storeImagePath = getStoreImagePath(imageFile.getName(), imageKey, imageQuality);
+
+		final String storeFilePath = storeImagePath.toOSString();
+
+		final File storeFile = new File(storeFilePath);
+
+		if (storeFile.isFile()) {
+			final boolean isDeleted = storeFile.delete();
+			if (isDeleted == false) {
+				StatusUtil.log(NLS.bind("cannot delete file: {0}", storeFilePath));
+			}
+		}
+	}
+
 	private static void doCleanup(	final int daysToKeepImages,
 									final long dateToDeleteOlderImages,
 									final boolean isDeleteAll) {
@@ -374,11 +406,22 @@ public class ThumbnailStore {
 			return new Path(photoWrapper.imageFilePathName);
 		}
 
+		final String rawImageFileName = photoWrapper.imageFileName;
+		final String imageKey = photo.getImageKey(imageQuality);
+
+		final IPath imageFilePath = getStoreImagePath(rawImageFileName, imageKey, imageQuality);
+
+		return imageFilePath;
+	}
+
+	private static IPath getStoreImagePath(	final String rawImageFileName,
+											final String imageKey,
+											final ImageQuality imageQuality) {
+
 		// thumbnail images are stored as jpg file
-		IPath jpgPhotoFilePath = new Path(photoWrapper.imageFileName);
+		IPath jpgPhotoFilePath = new Path(rawImageFileName);
 		jpgPhotoFilePath = jpgPhotoFilePath.removeFileExtension().addFileExtension(THUMBNAIL_IMAGE_EXTENSION_JPG);
 
-		final String imageKey = photo.getImageKey(imageQuality);
 		final String imageKey1Folder = imageKey.substring(0, 2);
 		final String imageFileName = imageKey + "_" + imageQuality.name() + "_" + jpgPhotoFilePath.toOSString(); //$NON-NLS-1$ //$NON-NLS-2$
 

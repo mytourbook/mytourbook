@@ -26,4 +26,9 @@ public enum ImageQuality {
 	 * Image is in HQ (high quality) size
 	 */
 	HQ,
+
+	/**
+	 * Image in original size
+	 */
+	ORIGINAL,
 }

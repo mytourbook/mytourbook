@@ -29,5 +29,24 @@ public abstract class AbstractGalleryMT20ItemRenderer {
 								int galleryItemHeight,
 								boolean isSelected);
 
+	/**
+	 * @param gc
+	 * @param galleryItem
+	 * @param monitorWidth
+	 * @param monitorHeight
+	 * @param zoomState
+	 *            Is <code>true</code> when image is displayed with fullsize or zoomed, is
+	 *            <code>false</code> when image fits the window size.
+	 * @param zoomFactor
+	 * @return Returns painting parameters when image is painted or <code>null</code> when image
+	 *         could not be painted.
+	 */
+	public abstract PaintingResult drawFullSize(GC gc,
+												GalleryMT20Item galleryItem,
+												int monitorWidth,
+												int monitorHeight,
+												ZoomState zoomState,
+												double zoomFactor);
+
 	public abstract int getBorderSize();
 }

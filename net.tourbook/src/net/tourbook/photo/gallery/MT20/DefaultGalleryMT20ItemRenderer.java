@@ -38,6 +38,17 @@ public class DefaultGalleryMT20ItemRenderer extends AbstractGalleryMT20ItemRende
 	}
 
 	@Override
+	public PaintingResult drawFullSize(	final GC gc,
+										final GalleryMT20Item galleryItem,
+										final int monitorWidth,
+										final int monitorHeight,
+										final ZoomState zoomState,
+										final double zoomFactor) {
+
+		return null;
+	}
+
+	@Override
 	public int getBorderSize() {
 		return 0;
 	}

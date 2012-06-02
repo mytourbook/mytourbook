@@ -209,7 +209,7 @@ public class TourbookPlugin extends AbstractUIPlugin {
 		PhotoLoadManager.stopImageLoading(true);
 		PhotoLoadManager.removeInvalidImageFiles();
 
-		PhotoImageCache.dispose();
+		PhotoImageCache.disposeAll();
 
 		_instance = null;
 		_bundleContext = null;

@@ -41,9 +41,6 @@ public class GalleryMT20Item {
 	 */
 	public String				uniqueItemID;
 
-	public int					imagePaintedX;
-	public int					imagePaintedY;
-
 	/**
 	 * When width is <code>-1</code>, the image is not yet painted
 	 */

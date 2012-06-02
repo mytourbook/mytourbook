@@ -24,6 +24,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 
 import javax.imageio.ImageIO;
 
+import net.tourbook.photo.gallery.MT20.GalleryMT20;
 import net.tourbook.photo.gallery.MT20.GalleryMT20Item;
 import net.tourbook.util.StatusUtil;
 import net.tourbook.util.UI;
@@ -133,7 +134,6 @@ public class PhotoImageLoader {
 		}
 		_trackedSWTImages.clear();
 	}
-
 
 	/**
 	 * @return Returns roatation according to the EXIF data or <code>null</code> when image is not
@@ -255,17 +255,29 @@ public class PhotoImageLoader {
 	 * 
 	 * </pre>
 	 * 
+	 * @param waitingqueueoriginal
 	 * @param waitingqueueexif
 	 */
-	public void loadImage() {
+	public void loadImage(final LinkedBlockingDeque<PhotoImageLoader> waitingQueueOriginal) {
 
 		if (isImageVisible() == false) {
 			setStateUndefined();
 			return;
 		}
 
+		/*
+		 * wait until original images are loaded
+		 */
+		try {
+			while (waitingQueueOriginal.size() > 0) {
+				Thread.sleep(50);
+			}
+		} catch (final InterruptedException e) {
+			// should not happen, I hope so
+		}
+
 		boolean isLoadedImageInRequestedQuality = false;
-		Image loadedImage = null;
+		Image loadedExifImage = null;
 		String imageKey = null;
 		boolean isLoadingError = false;
 
@@ -278,7 +290,7 @@ public class PhotoImageLoader {
 				isLoadedImageInRequestedQuality = true;
 
 				imageKey = _requestedImageKey;
-				loadedImage = storeImage;
+				loadedExifImage = storeImage;
 
 			} else {
 
@@ -294,7 +306,7 @@ public class PhotoImageLoader {
 					isLoadedImageInRequestedQuality = _requestedImageQuality == ImageQuality.THUMB;
 
 					imageKey = _photo.getImageKey(ImageQuality.THUMB);
-					loadedImage = exifThumbnail;
+					loadedExifImage = exifThumbnail;
 				}
 			}
 
@@ -308,18 +320,22 @@ public class PhotoImageLoader {
 
 			disposeTrackedImages();
 
-			final boolean isImageLoaded = loadedImage != null;
+			final boolean isImageLoaded = loadedExifImage != null;
 
 			/*
 			 * keep image in cache
 			 */
 			if (isImageLoaded) {
+
+				final String originalImagePathName = _photo.getPhotoWrapper().imageFilePathName;
+
 				PhotoImageCache.putImage(
 						imageKey,
-						loadedImage,
+						loadedExifImage,
 						_photo.getImageMetaData(),
 						_photo.getWidth(),
-						_photo.getHeight());
+						_photo.getHeight(),
+						originalImagePathName);
 			}
 
 			/*
@@ -335,7 +351,7 @@ public class PhotoImageLoader {
 
 				// load image with higher quality
 
-				PhotoLoadManager.putImageInHQLoadingQueue(_galleryItem, _photo, _requestedImageQuality, _loadCallBack);
+				PhotoLoadManager.putImageInLoadingQueueHQ(_galleryItem, _photo, _requestedImageQuality, _loadCallBack);
 			}
 
 			// show in the UI, that meta data are loaded, loading message is displayed with another color
@@ -455,6 +471,52 @@ public class PhotoImageLoader {
 		return null;
 	}
 
+	private void loadImageFromEXIFThumbnailOriginal() {
+
+		Image loadedExifImage = null;
+		String imageKey = null;
+
+		try {
+
+			// get image from thumbnail image in the EXIF data
+
+			final IPath storeThumbImageFilePath = ThumbnailStore.getStoreImagePath(_photo, ImageQuality.THUMB);
+
+			final Image exifThumbnail = loadImageFromEXIFThumbnail(storeThumbImageFilePath);
+			if (exifThumbnail != null) {
+
+				// EXIF image is available
+
+				imageKey = _photo.getImageKey(ImageQuality.THUMB);
+				loadedExifImage = exifThumbnail;
+			}
+
+		} catch (final Exception e) {
+
+		} finally {
+
+			disposeTrackedImages();
+
+			if (loadedExifImage != null) {
+
+				// cache loaded thumb, that the redraw finds the image
+
+				final String originalImagePathName = _photo.getPhotoWrapper().imageFilePathName;
+
+				PhotoImageCache.putImage(
+						imageKey,
+						loadedExifImage,
+						_photo.getImageMetaData(),
+						_photo.getWidth(),
+						_photo.getHeight(),
+						originalImagePathName);
+
+				// display image in the loading callback
+				_loadCallBack.callBackImageIsLoaded(true);
+			}
+		}
+	}
+
 	/**
 	 * Get image from thumb store with the requested image quality.
 	 * 
@@ -503,7 +565,7 @@ public class PhotoImageLoader {
 
 					System.out.println(UI.timeStamp() + NLS.bind(message, imageStoreFilePath));
 
-					PhotoImageCache.dispose();
+					PhotoImageCache.disposeThumbs(null);
 
 					/*
 					 * try loading again
@@ -551,7 +613,7 @@ public class PhotoImageLoader {
 		 */
 		try {
 			while (smallImageWaitingQueue.size() > 0 || exifWaitingQueue.size() > 0) {
-				Thread.sleep(100);
+				Thread.sleep(50);
 			}
 		} catch (final InterruptedException e) {
 			// should not happen, I hope so
@@ -834,8 +896,13 @@ public class PhotoImageLoader {
 						SWT.LOW,
 						thumbRotation);
 
-				// new image has been created, source image must be disposed
-				_trackedSWTImages.add(hqImage);
+				/*
+				 * new image has been created, source image must be disposed when it's not the
+				 * requested image
+				 */
+				if (requestedSWTImage != hqImage) {
+					_trackedSWTImages.add(hqImage);
+				}
 
 				if (requestedSWTImage == null) {
 					// keep scaled image
@@ -873,7 +940,8 @@ public class PhotoImageLoader {
 					requestedSWTImage,
 					_photo.getImageMetaData(),
 					_photo.getWidth(),
-					_photo.getHeight());
+					_photo.getHeight(),
+					originalImagePathName);
 		}
 
 		if (requestedSWTImage == null) {
@@ -920,7 +988,7 @@ public class PhotoImageLoader {
 		 * load original image
 		 */
 		BufferedImage originalImage = null;
-		final String originalPathName = photoWrapper.imageFilePathName;
+		final String originalImagePathName = photoWrapper.imageFilePathName;
 		try {
 
 			final long startHqLoad = System.currentTimeMillis();
@@ -933,7 +1001,7 @@ public class PhotoImageLoader {
 
 		} catch (final Exception e) {
 
-			StatusUtil.log(NLS.bind("AWT: image \"{0}\" cannot be loaded.", originalPathName)); //$NON-NLS-1$
+			StatusUtil.log(NLS.bind("AWT: image \"{0}\" cannot be loaded.", originalImagePathName)); //$NON-NLS-1$
 
 		} finally {
 
@@ -941,7 +1009,7 @@ public class PhotoImageLoader {
 
 				System.out.println(NLS.bind(//
 						UI.timeStamp() + "AWT: image \"{0}\" cannot be loaded, will load with SWT", //$NON-NLS-1$
-						originalPathName));
+						originalImagePathName));
 
 				return loadImageHQ_10_WithSWT();
 			}
@@ -950,7 +1018,7 @@ public class PhotoImageLoader {
 		/*
 		 * handle thumb save error
 		 */
-		final boolean isThumbSaveError = PhotoLoadManager.isThumbSaveError(originalPathName);
+		final boolean isThumbSaveError = PhotoLoadManager.isThumbSaveError(originalImagePathName);
 		if (isThumbSaveError) {
 
 			// the thumb image could not be previously saved in the thumb store, display original image
@@ -961,7 +1029,7 @@ public class PhotoImageLoader {
 
 				exceptionMessage = NLS.bind(//
 						"Photo image with thumb save error cannot be created with SWT (1): ", //$NON-NLS-1$
-						originalPathName);
+						originalImagePathName);
 			} else {
 
 				requestedSWTImage = swtImage;
@@ -1143,7 +1211,7 @@ public class PhotoImageLoader {
 					if (requestedSWTImage == null) {
 						exceptionMessage = NLS.bind(//
 								"Photo image cannot be converted from AWT to SWT: ", //$NON-NLS-1$
-								originalPathName);
+								originalImagePathName);
 					}
 				}
 
@@ -1174,7 +1242,7 @@ public class PhotoImageLoader {
 						if (requestedSWTImage == null) {
 							exceptionMessage = NLS.bind(
 									"Photo image with thumb save error cannot be created with SWT (2): ", //$NON-NLS-1$
-									originalPathName);
+									originalImagePathName);
 						}
 					}
 				}
@@ -1196,7 +1264,8 @@ public class PhotoImageLoader {
 						requestedSWTImage,
 						_photo.getImageMetaData(),
 						_photo.getWidth(),
-						_photo.getHeight());
+						_photo.getHeight(),
+						originalImagePathName);
 			}
 
 			if (requestedSWTImage == null) {
@@ -1225,18 +1294,253 @@ public class PhotoImageLoader {
 		return requestedSWTImage;
 	}
 
+	public void loadImageOriginal() {
+
+		final GalleryMT20 gallery = _galleryItem.gallery;
+		if (gallery.isDisposed()) {
+			return;
+		}
+
+		// check if this image is still displayed
+		if (gallery.getFullsizeViewer().getCurrentItem() != _galleryItem) {
+
+			// another gallery item is displayed
+
+			setStateUndefined();
+
+			return;
+		}
+
+		final long start = System.currentTimeMillis();
+		long endOriginalLoad1 = 0;
+		long endOriginalLoad2 = 0;
+		long endOriginalLoad3 = 0;
+		long endRotate = 0;
+
+		/*
+		 * display thumb image during loading the original when it's not in the cache, when it's in
+		 * the cache, the thumb is already displayed
+		 */
+		final Image photoImage = PhotoImageCache.getImage(_photo, ImageQuality.THUMB);
+		if (photoImage == null || photoImage.isDisposed()) {
+			loadImageFromEXIFThumbnailOriginal();
+		}
+
+		/*
+		 * ensure metadata are loaded, is needed for image rotation, it can be not loaded when many
+		 * images are in the gallery and loading exif data has not yet finished
+		 */
+		final PhotoImageMetadata imageMetaData = _photo.getImageMetaData();
+
+		final PhotoWrapper photoWrapper = _photo.getPhotoWrapper();
+
+		boolean isLoadingException = false;
+		Image swtImage = null;
+		final String originalImagePathName = photoWrapper.imageFilePathName;
+
+		try {
+
+			/*
+			 * 1st try: load original image only with SWT
+			 */
+			try {
+
+				final long startLoading = System.currentTimeMillis();
+
+				swtImage = new Image(_display, originalImagePathName);
+
+				endOriginalLoad1 = System.currentTimeMillis() - startLoading;
+
+			} catch (final Exception e) {
+
+				isLoadingException = true;
+
+				System.out.println(NLS.bind(//
+						"SWT: image \"{0}\" cannot be loaded (1)", //$NON-NLS-1$
+						originalImagePathName));
+
+			} finally {
+
+				if (swtImage == null) {
+
+					/*
+					 * 2nd try
+					 */
+
+					System.out.println(NLS.bind( //
+							UI.timeStamp() + "SWT: image \"{0}\" cannot be loaded (2)", //$NON-NLS-1$
+							originalImagePathName));
+
+					/**
+					 * sometimes (when images are loaded concurrently) larger images could not be
+					 * loaded with SWT methods in Win7 (Eclipse 3.8 M6), try to load image with AWT.
+					 * This bug fix <code>
+					 * https://bugs.eclipse.org/bugs/show_bug.cgi?id=350783
+					 * https://bugs.eclipse.org/bugs/show_bug.cgi?id=375845
+					 * </code>
+					 * has not solved this problem
+					 */
+
+					PhotoImageCache.disposeOriginal(null);
+
+					try {
+
+						final long startLoading = System.currentTimeMillis();
+
+						swtImage = new Image(_display, originalImagePathName);
+
+						endOriginalLoad2 = System.currentTimeMillis() - startLoading;
+
+					} catch (final Exception e) {
+
+						isLoadingException = true;
+
+						System.out.println(NLS.bind(//
+								"SWT: image \"{0}\" cannot be loaded (3)", //$NON-NLS-1$
+								originalImagePathName));
+
+					} finally {
+
+						if (swtImage == null) {
+
+							/*
+							 * 3rd try
+							 */
+
+							System.out.println(NLS.bind( //
+									UI.timeStamp() + "SWT: image \"{0}\" cannot be loaded (4)", //$NON-NLS-1$
+									originalImagePathName));
+
+							/**
+							 * sometimes (when images are loaded concurrently) larger images could
+							 * not be loaded with SWT methods in Win7 (Eclipse 3.8 M6), try to load
+							 * image with AWT. This bug fix <code>
+							 * https://bugs.eclipse.org/bugs/show_bug.cgi?id=350783
+							 * https://bugs.eclipse.org/bugs/show_bug.cgi?id=375845
+							 * </code>
+							 * has not solved this problem
+							 */
+
+							PhotoImageCache.disposeThumbs(null);
+
+							try {
+
+								final long startLoading = System.currentTimeMillis();
+
+								swtImage = new Image(_display, originalImagePathName);
+
+								endOriginalLoad3 = System.currentTimeMillis() - startLoading;
+
+							} catch (final Exception e) {
+
+								isLoadingException = true;
+
+								System.out.println(NLS.bind(//
+										"SWT: image \"{0}\" cannot be loaded (5)", //$NON-NLS-1$
+										originalImagePathName));
+
+							} finally {
+
+								if (swtImage == null) {
+									System.out.println(NLS.bind( //
+											UI.timeStamp() + "SWT: image \"{0}\" cannot be loaded (6)", //$NON-NLS-1$
+											originalImagePathName));
+								}
+							}
+
+						}
+					}
+				}
+			}
+
+		} finally {
+
+			/**
+			 * The not thrown NO MORE HANDLE EXCEPTION cannot be catched therefore the check:
+			 * swtImage == null
+			 */
+
+			disposeTrackedImages();
+
+			if (swtImage != null) {
+
+				final Rectangle imageBounds = swtImage.getBounds();
+				final int imageWidth = imageBounds.width;
+				final int imageHeight = imageBounds.height;
+
+				// update dimension
+				updateImageData(imageWidth, imageHeight);
+
+				/*
+				 * rotate image when necessary
+				 */
+
+				final Rotation rotation = getRotation();
+				if (rotation != null) {
+
+					// image must be rotated
+
+					final long startRotate = System.currentTimeMillis();
+
+					final Image rotatedImage = ImageUtils.resize(
+							_display,
+							swtImage,
+							imageWidth,
+							imageHeight,
+							SWT.ON,
+							SWT.LOW,
+							rotation);
+
+					swtImage.dispose();
+					swtImage = rotatedImage;
+
+					endRotate = System.currentTimeMillis() - startRotate;
+				}
+
+				// keep requested image in cache
+				PhotoImageCache.putImageOriginal(
+						_requestedImageKey,
+						swtImage,
+						imageMetaData,
+						imageWidth,
+						imageHeight,
+						originalImagePathName);
+			}
+
+			if (isLoadingException) {
+				setStateLoadingError();
+			} else {
+
+				// image is loaded with requested quality or a SWT error has occured, reset image state
+				setStateUndefined();
+			}
+
+			final long end = System.currentTimeMillis() - start;
+
+			System.out.println(UI.timeStamp()
+					+ "SWT: "
+					+ Thread.currentThread().getName()
+					+ " "
+					+ photoWrapper.imageFileName
+					+ ("\ttotal: " + end)
+					+ ("\tload1: " + endOriginalLoad1)
+					+ ("\tload2: " + endOriginalLoad2)
+					+ ("\tload3: " + endOriginalLoad3)
+					+ ("\trotate: " + endRotate)
+			//
+					);
+
+			// display image in the loading callback
+			_loadCallBack.callBackImageIsLoaded(true);
+		}
+	}
+
 	private void setStateLoadingError() {
 
 		// prevent loading the image again
 		_photo.setLoadingState(PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR, _requestedImageQuality);
 
 		PhotoLoadManager.putPhotoInLoadingErrorMap(_photo.getPhotoWrapper().imageFilePathName);
-	}
-
-	private void setStateUndefined() {
-
-		// set state to undefined that it will be loaded again when image is visible and not in the cache
-		_photo.setLoadingState(PhotoLoadingState.UNDEFINED, _requestedImageQuality);
 	}
 
 // JAI implementation to read tiff images with AWT
@@ -1273,6 +1577,12 @@ public class PhotoImageLoader {
 //			return ImageIO.read(photoWrapper.imageFile);
 //		}
 //	}
+
+	private void setStateUndefined() {
+
+		// set state to undefined that it will be loaded again when image is visible and not in the cache
+		_photo.setLoadingState(PhotoLoadingState.UNDEFINED, _requestedImageQuality);
+	}
 
 	@Override
 	public String toString() {

@@ -19,6 +19,8 @@ import java.io.File;
 import java.util.ArrayList;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.photo.manager.PhotoImageCache;
+import net.tourbook.photo.manager.ThumbnailStore;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.TreeViewerItem;
 import net.tourbook.ui.UI;
@@ -231,7 +233,17 @@ class PicDirFolder {
 					// update folder viewer
 					_folderViewer.refresh(_selectedTVIFolder);
 
-					_picDirImages.deleteCachedMetadata(_selectedTVIFolder._treeItemFolder.getAbsolutePath());
+					final String folderPath = _selectedTVIFolder._treeItemFolder.getAbsolutePath();
+
+					_picDirImages.removeCachedExifData(folderPath);
+
+					// remove cached images
+					PhotoImageCache.disposePath(folderPath);
+
+					// delete store files
+					final File folder = new File(folderPath);
+					final File[] imageFiles = folder.listFiles(_picDirImages._fileFilter);
+					ThumbnailStore.cleanupStoreFiles(imageFiles);
 
 					// update images and force folder reload
 					displayFolderImages(_selectedTVIFolder, false, true);

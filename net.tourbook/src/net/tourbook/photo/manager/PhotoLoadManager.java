@@ -70,10 +70,12 @@ public class PhotoLoadManager {
 	 * down the process loading of fullsize images.
 	 */
 	private static ThreadPoolExecutor							_executorHQ;
+	private static ThreadPoolExecutor							_executorOriginal;
 
 	private static final LinkedBlockingDeque<PhotoExifLoader>	_waitingQueueExif			= new LinkedBlockingDeque<PhotoExifLoader>();
 	private static final LinkedBlockingDeque<PhotoImageLoader>	_waitingQueueThumb			= new LinkedBlockingDeque<PhotoImageLoader>();
 	private static final LinkedBlockingDeque<PhotoImageLoader>	_waitingQueueHQ				= new LinkedBlockingDeque<PhotoImageLoader>();
+	private static final LinkedBlockingDeque<PhotoImageLoader>	_waitingQueueOriginal		= new LinkedBlockingDeque<PhotoImageLoader>();
 
 	/*
 	 * key is the photo image file path
@@ -109,7 +111,7 @@ public class PhotoLoadManager {
 
 			public Thread newThread(final Runnable r) {
 
-				final String threadName = "ImageLoader-Exif-" + _threadNumberExif++; //$NON-NLS-1$
+				final String threadName = "LoadImg-Exif-" + _threadNumberExif++; //$NON-NLS-1$
 
 				final Thread thread = new Thread(r, threadName);
 
@@ -126,7 +128,7 @@ public class PhotoLoadManager {
 
 			public Thread newThread(final Runnable r) {
 
-				final String threadName = "ImageLoader-Thumb-" + _threadNumber++; //$NON-NLS-1$
+				final String threadName = "LoadImg-Thumb-" + _threadNumber++; //$NON-NLS-1$
 
 				final Thread thread = new Thread(r, threadName);
 
@@ -143,7 +145,24 @@ public class PhotoLoadManager {
 
 			public Thread newThread(final Runnable r) {
 
-				final String threadName = "ImageLoader-HQ-" + _threadNumber++; //$NON-NLS-1$
+				final String threadName = "LoadImg-HQ-" + _threadNumber++; //$NON-NLS-1$
+
+				final Thread thread = new Thread(r, threadName);
+
+				thread.setPriority(Thread.MIN_PRIORITY);
+				thread.setDaemon(true);
+
+				return thread;
+			}
+		};
+
+		final ThreadFactory threadFactoryOriginal = new ThreadFactory() {
+
+			private int	_threadNumber	= 0;
+
+			public Thread newThread(final Runnable r) {
+
+				final String threadName = "LoadImg-Original-" + _threadNumber++; //$NON-NLS-1$
 
 				final Thread thread = new Thread(r, threadName);
 
@@ -156,7 +175,9 @@ public class PhotoLoadManager {
 
 		_executorExif = (ThreadPoolExecutor) Executors.newFixedThreadPool(processors, threadFactoryExif);
 		_executorThumb = (ThreadPoolExecutor) Executors.newFixedThreadPool(processors, threadFactoryThumb);
+
 		_executorHQ = (ThreadPoolExecutor) Executors.newFixedThreadPool(1, threadFactoryHQ);
+		_executorOriginal = (ThreadPoolExecutor) Executors.newFixedThreadPool(1, threadFactoryOriginal);
 	}
 
 	public static void clearExifLoadingQueue() {
@@ -238,7 +259,7 @@ public class PhotoLoadManager {
 		return _photoWithThumbSaveError.containsKey(imageFilePath);
 	}
 
-	public static void putImageInExifLoadingQueue(final Photo photo, final ILoadCallBack imageLoadCallback) {
+	public static void putImageInLoadingQueueExif(final Photo photo, final ILoadCallBack imageLoadCallback) {
 
 		// put image loading item into the waiting queue
 		_waitingQueueExif.add(new PhotoExifLoader(photo, imageLoadCallback));
@@ -257,7 +278,7 @@ public class PhotoLoadManager {
 		_executorExif.submit(executorTask);
 	}
 
-	public static void putImageInHQLoadingQueue(final GalleryMT20Item galleryItem,
+	public static void putImageInLoadingQueueHQ(final GalleryMT20Item galleryItem,
 												final Photo photo,
 												final ImageQuality imageQuality,
 												final ILoadCallBack loadCallBack) {
@@ -288,7 +309,43 @@ public class PhotoLoadManager {
 		_executorHQ.submit(executorTask);
 	}
 
-	public static void putImageInThumbLoadingQueue(	final GalleryMT20Item galleryItem,
+	public static void putImageInLoadingQueueOriginal(	final GalleryMT20Item galleryItem,
+														final Photo photo,
+														final ILoadCallBack imageLoadCallback) {
+		// set state
+		photo.setLoadingState(PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE, ImageQuality.ORIGINAL);
+
+		// set original image loading item into the waiting queue
+		_waitingQueueOriginal.add(new PhotoImageLoader(
+				_display,
+				galleryItem,
+				photo,
+				ImageQuality.ORIGINAL,
+				_imageFramework,
+				_hqImageSize,
+				imageLoadCallback));
+
+		final Runnable executorTask = new Runnable() {
+			public void run() {
+
+				// get last added loader itme
+				final PhotoImageLoader loadingItem = _waitingQueueOriginal.pollLast();
+
+				try {
+					if (loadingItem != null) {
+						loadingItem.loadImageOriginal();
+					}
+				} catch (final Exception e) {
+					System.out.println(e);
+					// TODO remove SYSTEM.OUT.PRINTLN
+
+				}
+			}
+		};
+		_executorOriginal.submit(executorTask);
+	}
+
+	public static void putImageInLoadingQueueThumb(	final GalleryMT20Item galleryItem,
 													final Photo photo,
 													final ImageQuality imageQuality,
 													final ILoadCallBack imageLoadCallback) {
@@ -321,7 +378,7 @@ public class PhotoLoadManager {
 
 					} else {
 
-						loadingItem.loadImage();
+						loadingItem.loadImage(_waitingQueueOriginal);
 					}
 				}
 			}
@@ -376,6 +433,9 @@ public class PhotoLoadManager {
 		resetLoadingState(waitingQueueItems);
 
 		waitingQueueItems = clearWaitingQueue(_waitingQueueHQ, _executorHQ);
+		resetLoadingState(waitingQueueItems);
+
+		waitingQueueItems = clearWaitingQueue(_waitingQueueOriginal, _executorOriginal);
 		resetLoadingState(waitingQueueItems);
 
 		if (isClearExifQueue) {

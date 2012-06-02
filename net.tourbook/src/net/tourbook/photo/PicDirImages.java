@@ -28,6 +28,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.photo.gallery.MT20.FullSizeViewer;
 import net.tourbook.photo.gallery.MT20.GalleryMT20;
 import net.tourbook.photo.gallery.MT20.GalleryMT20Item;
 import net.tourbook.photo.gallery.MT20.IGalleryCustomData;
@@ -188,6 +189,7 @@ public class PicDirImages implements IItemHovereredListener {
 
 	private PhotoRenderer										_photoRenderer;
 
+	private FullSizeViewer										_fullSizeViewer;
 	private PhotoToolTip										_photoTooltip;
 
 	/**
@@ -208,7 +210,7 @@ public class PicDirImages implements IItemHovereredListener {
 	 */
 	private PhotoWrapper[]										_sortedAndFilteredPhotoWrapper;
 
-	private FileFilter											_fileFilter;
+	FileFilter													_fileFilter;
 
 	private PicDirFolder										_picDirFolder;
 
@@ -367,12 +369,12 @@ public class PicDirImages implements IItemHovereredListener {
 		};
 	}
 
-	class LoadExifCallback implements ILoadCallBack {
+	class LoadCallbackExif implements ILoadCallBack {
 
 		private int		__runId;
 		private Photo	__photo;
 
-		public LoadExifCallback(final Photo photo, final int runId) {
+		public LoadCallbackExif(final Photo photo, final int runId) {
 
 			__photo = photo;
 			__runId = runId;
@@ -399,15 +401,14 @@ public class PicDirImages implements IItemHovereredListener {
 		}
 	}
 
-	class LoadImageCallback implements ILoadCallBack {
+	class LoadCallbackImage implements ILoadCallBack {
 
 		private GalleryMT20Item	__galleryItem;
 
 		/**
 		 * @param galleryItem
 		 */
-		public LoadImageCallback(final GalleryMT20Item galleryItem) {
-
+		public LoadCallbackImage(final GalleryMT20Item galleryItem) {
 			__galleryItem = galleryItem;
 		}
 
@@ -449,6 +450,44 @@ public class PicDirImages implements IItemHovereredListener {
 			});
 
 			jobUILoading_20_Schedule();
+		}
+	}
+
+	class LoadCallbackOriginalImage implements ILoadCallBack {
+
+		private GalleryMT20Item	__galleryItem;
+		private Photo			__photo;
+
+		public LoadCallbackOriginalImage(final GalleryMT20Item galleryItem, final Photo photo) {
+			__galleryItem = galleryItem;
+			__photo = photo;
+		}
+
+		@Override
+		public void callBackImageIsLoaded(final boolean isUpdateUI) {
+
+			// keep exif metadata
+			final PhotoImageMetadata metadata = __photo.getImageMetaDataRaw();
+			if (metadata != null) {
+				_exifCache.put(__photo.getPhotoWrapper().imageFilePathName, metadata);
+			}
+
+			if (_fullSizeViewer.getCurrentItem() != __galleryItem) {
+				// another gallery item is displayed
+				return;
+			}
+
+			_display.syncExec(new Runnable() {
+
+				public void run() {
+
+					if (_gallery.isDisposed()) {
+						return;
+					}
+
+					_fullSizeViewer.updateUI();
+				}
+			});
 		}
 	}
 
@@ -883,6 +922,8 @@ public class PicDirImages implements IItemHovereredListener {
 			}
 		});
 
+		_fullSizeViewer = _gallery.getFullsizeViewer();
+
 		// set photo renderer which paints the image but also starts the image loading
 		_photoRenderer = new PhotoRenderer(_gallery, this);
 
@@ -938,20 +979,6 @@ public class PicDirImages implements IItemHovereredListener {
 		}
 	}
 
-	/**
-	 * Remove all cached metadata which starts with the folder path.
-	 * 
-	 * @param folderPath
-	 */
-	void deleteCachedMetadata(final String folderPath) {
-
-		for (final String cachedPath : _exifCache.keySet()) {
-			if (cachedPath.startsWith(folderPath)) {
-				_exifCache.remove(cachedPath);
-			}
-		}
-	}
-
 	private void deselectAll() {
 
 		_gallery.deselectAll();
@@ -965,7 +992,8 @@ public class PicDirImages implements IItemHovereredListener {
 		PhotoLoadManager.stopImageLoading(true);
 		ThumbnailStore.cleanupStoreFiles(true, true);
 
-		PhotoImageCache.dispose();
+		PhotoImageCache.disposeAll();
+
 		_exifCache.clear();
 	}
 
@@ -1715,9 +1743,24 @@ public class PicDirImages implements IItemHovereredListener {
 			return true;
 		}
 
-		PhotoLoadManager.putImageInExifLoadingQueue(photo, new LoadExifCallback(photo, _currentExifRunId));
+		PhotoLoadManager.putImageInLoadingQueueExif(photo, new LoadCallbackExif(photo, _currentExifRunId));
 
 		return false;
+	}
+
+	/**
+	 * Remove all cached metadata which starts with the folder path.
+	 * 
+	 * @param folderPath
+	 */
+	void removeCachedExifData(final String folderPath) {
+
+		// remove cached exif data
+		for (final String cachedPath : _exifCache.keySet()) {
+			if (cachedPath.startsWith(folderPath)) {
+				_exifCache.remove(cachedPath);
+			}
+		}
 	}
 
 	private void removeInvalidFolder(final String invalidFolderPathName) {
@@ -1795,6 +1838,8 @@ public class PicDirImages implements IItemHovereredListener {
 	}
 
 	void restoreState(final IDialogSettings state) {
+
+		_gallery.restoreState(state);
 
 		_isShowOnlyPhotos = Util.getStateBoolean(state, STATE_IS_SHOW_ONLY_PHOTOS, true);
 		updateUI_Action_FolderGallery();
@@ -1915,6 +1960,8 @@ public class PicDirImages implements IItemHovereredListener {
 			state.put(STATE_GALLERY_POSITION_FOLDER, positionFolderArray);
 			state.put(STATE_GALLERY_POSITION_VALUE, positionValues);
 		}
+
+		_gallery.saveState(state);
 	}
 
 	/**
@@ -2076,10 +2123,7 @@ public class PicDirImages implements IItemHovereredListener {
 		/*
 		 * gallery
 		 */
-		_gallery.setForeground(fgColor);
-		_gallery.setBackground(bgColor);
-//		_gallery.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
-//		_gallery.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+		_gallery.setColors(fgColor, bgColor);
 
 		_photoRenderer.setColors(fgColor, bgColor, selectionFgColor);
 

@@ -13,37 +13,12 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.photo.manager;
+package net.tourbook.photo.gallery.MT20;
 
-import org.eclipse.swt.graphics.Image;
+public class PaintingResult {
 
-/**
- * This wrapper tries to store a minimum of data
- */
-public class ImageCacheWrapper {
+	public double	imagePaintedZoomFactor;
 
-	public String				imageKey;
-
-	public Image				image;
-	public PhotoImageMetadata	photoMetadata;
-
-	public int					imageWidth;
-	public int					imageHeight;
-
-	public String				originalImagePathName;
-
-	public ImageCacheWrapper(	final Image image,
-								final PhotoImageMetadata photoMetadata,
-								final int imageWidth,
-								final int imageHeight,
-								final String originalImagePathName,
-								final String imageKey) {
-		this.image = image;
-		this.photoMetadata = photoMetadata;
-		this.imageWidth = imageWidth;
-		this.imageHeight = imageHeight;
-		this.originalImagePathName = originalImagePathName;
-		this.imageKey = imageKey;
-	}
+	public PaintingResult() {}
 
 }
