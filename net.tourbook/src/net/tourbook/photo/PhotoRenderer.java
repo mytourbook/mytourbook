@@ -136,6 +136,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 	private double					_imagePaintedZoomFactor;
 
+	private Image					_prevImage;
+
 	private static Image			_gpsImage;
 	private static int				_gpsImageWidth;
 	private static int				_gpsImageHeight;
@@ -498,7 +500,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 		final ImageQuality requestedImageQuality = ImageQuality.ORIGINAL;
 
-		final boolean isError = photo.getLoadingState(requestedImageQuality) == PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR;
+		final boolean isLoadingError = photo.getLoadingState(requestedImageQuality) == PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR;
 		boolean isRequestedQuality = false;
 		boolean isThumbImage = false;
 		boolean isImageAvailable = false;
@@ -554,12 +556,25 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		gc.setForeground(_fgColor);
 
 		isImageAvailable = photoImage != null && photoImage.isDisposed() == false;
+		boolean isCorrectImageAvailable = isImageAvailable;
 
 		/*
-		 * paint background but not when another image is being loaded and the loading message is
-		 * displayed
+		 * Linux draws always a background, even when it should not, try to draw the previous image
 		 */
-		if (isImageAvailable || isError) {
+		if (UI.IS_LINUX && isCorrectImageAvailable == false && _prevImage != null && _prevImage.isDisposed() == false) {
+			photoImage = _prevImage;
+			isImageAvailable = true;
+		}
+
+		if (isCorrectImageAvailable) {
+			_prevImage = photoImage;
+		}
+
+		/*
+		 * paint background only when an image is availabe or when image could not be loaded to show
+		 * an error message without image
+		 */
+		if (isImageAvailable || isLoadingError) {
 			gc.setBackground(_bgColor);
 			gc.fillRectangle(0, 0, canvasWidth, canvasHeight);
 		}
@@ -607,7 +622,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		/*
 		 * draw status message
 		 */
-		if (isThumbImage || isImageAvailable == false) {
+		if (isThumbImage || isCorrectImageAvailable == false) {
 
 			// image is not available or thumb image is displayed
 
