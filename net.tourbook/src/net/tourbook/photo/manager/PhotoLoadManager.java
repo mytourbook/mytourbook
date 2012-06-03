@@ -83,8 +83,8 @@ public class PhotoLoadManager {
 	private static final ConcurrentHashMap<String, Object>		_photoWithLoadingError		= new ConcurrentHashMap<String, Object>();
 	private static final ConcurrentHashMap<String, Object>		_photoWithThumbSaveError	= new ConcurrentHashMap<String, Object>();
 
-	public static final String									IMAGE_FRAMEWORK_SWT			= "swt";										//$NON-NLS-1$
-	public static final String									IMAGE_FRAMEWORK_AWT			= "awt";										//$NON-NLS-1$
+	public static final String									IMAGE_FRAMEWORK_SWT			= "SWT";										//$NON-NLS-1$
+	public static final String									IMAGE_FRAMEWORK_AWT			= "AWT";										//$NON-NLS-1$
 
 	private static String										_imageFramework;
 	private static int											_hqImageSize;

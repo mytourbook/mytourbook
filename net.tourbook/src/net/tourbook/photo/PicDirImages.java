@@ -882,8 +882,6 @@ public class PicDirImages implements IItemHovereredListener {
 				.hint(IMAGE_INDICATOR_SIZE, IMAGE_INDICATOR_SIZE)
 				.align(SWT.CENTER, SWT.CENTER)
 				.applyTo(_canvasImageSizeIndicator);
-
-		_canvasImageSizeIndicator.setToolTipText(Messages.Pic_Dir_ImageSizeIndicator_Tooltip);
 	}
 
 	/**
@@ -987,7 +985,10 @@ public class PicDirImages implements IItemHovereredListener {
 		onSelectPhoto();
 	}
 
-	private void disposeAllImages() {
+	/**
+	 * Disposes and deletes all thumb images.
+	 */
+	private void disposeAndDeleteAllImages() {
 
 		PhotoLoadManager.stopImageLoading(true);
 		ThumbnailStore.cleanupStoreFiles(true, true);
@@ -1050,7 +1051,7 @@ public class PicDirImages implements IItemHovereredListener {
 
 		final Collection<GalleryMT20Item> allSelectedPhoto = _gallery.getSelection();
 
-		return NLS.bind("Selected: {0}", allSelectedPhoto.size());
+		return NLS.bind(Messages.Pic_Dir_StatusLabel_SelectedImages, allSelectedPhoto.size());
 	}
 
 	int getThumbnailSize() {
@@ -1066,15 +1067,25 @@ public class PicDirImages implements IItemHovereredListener {
 			_display.asyncExec(new Runnable() {
 				public void run() {
 
-					if (MessageDialog.openQuestion(
+					final MessageDialog messageDialog = new MessageDialog(
 							_display.getActiveShell(),
 							Messages.Pic_Dir_Dialog_CleanupStoreImages_Title,
-							Messages.Pic_Dir_Dialog_CleanupStoreImages_Message) == false) {
+							null,
+							Messages.Pic_Dir_Dialog_CleanupStoreImages_Message,
+							MessageDialog.QUESTION,
+							new String[] {
+									Messages.Pic_Dir_Dialog_CleanupStoreImages_KeepImages,
+									Messages.Pic_Dir_Dialog_CleanupStoreImages_DiscardImages },
+							0);
 
-						disposeAllImages();
+					if (messageDialog.open() == 1) {
+						// discard all imaged
+						disposeAndDeleteAllImages();
 					}
 
 					_gallery.updateGallery(false, _gallery.getGalleryPosition());
+
+					updateUI_ImageIndicatorTooltip();
 				}
 			});
 
@@ -1596,14 +1607,15 @@ public class PicDirImages implements IItemHovereredListener {
 
 		if (exifQueueSize > 0) {
 
-			updateUI_StatusMessageInUIThread(NLS.bind(
-					"Loading images  -  thumbs: {0}  -  normal: {1}  -  filter data: {2}",
-					new Object[] { imageQueueSize, imageHQQueueSize, exifQueueSize }));
+			updateUI_StatusMessageInUIThread(NLS.bind(Messages.Pic_Dir_StatusLabel_LoadingImagesFilter, new Object[] {
+					imageQueueSize,
+					imageHQQueueSize,
+					exifQueueSize }));
 
 		} else if (imageQueueSize > 0 || imageHQQueueSize > 0) {
 
 			updateUI_StatusMessageInUIThread(NLS.bind(//
-					"Loading images  -  thumbs: {0}  -  normal: {1}",
+					Messages.Pic_Dir_StatusLabel_LoadingImages,
 					new Object[] { imageQueueSize, imageHQQueueSize, exifQueueSize }));
 
 		} else {
@@ -1874,6 +1886,8 @@ public class PicDirImages implements IItemHovereredListener {
 		// pref store settings
 		updateUI_FromPrefStore();
 
+		updateUI_ImageIndicatorTooltip();
+
 		/**
 		 * !!! very important !!!
 		 * <p>
@@ -1996,7 +2010,7 @@ public class PicDirImages implements IItemHovereredListener {
 		//
 		// MUST BE REMOVED, IS ONLY FOR TESTING
 		//
-//		disposeAllImages();
+//		disposeAndDeleteAllImages();
 //		PhotoLoadManager.removeInvalidImageFiles();
 		//
 		// MUST BE REMOVED, IS ONLY FOR TESTING
@@ -2038,7 +2052,7 @@ public class PicDirImages implements IItemHovereredListener {
 	void showRestoreFolder(final String restoreFolderName) {
 
 //		_lblLoading.setText(NLS.bind(Messages.Pic_Dir_Label_Loading, restoreFolderName));
-		_lblLoading.setText(NLS.bind("Initial loading {0}", restoreFolderName));
+		_lblLoading.setText(NLS.bind(Messages.Pic_Dir_StatusLabel_InitialLoading, restoreFolderName));
 		_pageBook.showPage(_pageLoading);
 	}
 
@@ -2301,7 +2315,7 @@ public class PicDirImages implements IItemHovereredListener {
 
 				if (imageCount == 0) {
 
-					_lblGalleryInfo.setText("No images in this folder");
+					_lblGalleryInfo.setText(Messages.Pic_Dir_StatusLabel_NoImagesInFolder);
 
 				} else {
 
@@ -2312,7 +2326,7 @@ public class PicDirImages implements IItemHovereredListener {
 						// show filter message only when image files are being loaded
 
 						_lblGalleryInfo.setText(NLS.bind(
-								"Filtering images, filter info (image EXIF data) not loaded: {0}",
+								Messages.Pic_Dir_StatusLabel_FilteringImages,
 								exifLoadingQueueSize));
 
 					} else {
@@ -2320,10 +2334,10 @@ public class PicDirImages implements IItemHovereredListener {
 						if (_sortedAndFilteredPhotoWrapper.length == 0) {
 
 							if (imageCount == 1) {
-								_lblGalleryInfo.setText("1 image is hidden by the photo filter");
+								_lblGalleryInfo.setText(Messages.Pic_Dir_StatusLabel_1ImageIsHiddenByFilter);
 							} else {
 								_lblGalleryInfo.setText(NLS.bind(
-										"{0} images are hidden by the photo filter",
+										Messages.Pic_Dir_StatusLabel_nImagesAreHiddenByFilter,
 										imageCount));
 							}
 
@@ -2385,6 +2399,13 @@ public class PicDirImages implements IItemHovereredListener {
 				}
 			}
 		});
+	}
+
+	private void updateUI_ImageIndicatorTooltip() {
+
+		_canvasImageSizeIndicator.setToolTipText(NLS.bind(
+				Messages.Pic_Dir_ImageSizeIndicator_Tooltip,
+				_prefStore.getString(ITourbookPreferences.PHOTO_VIEWER_IMAGE_FRAMEWORK)));
 	}
 
 	void updateUI_RetrievedFileFolder(final String folderName, final int folderCounter, final int fileCounter) {

@@ -26,6 +26,7 @@ import javax.imageio.ImageIO;
 
 import net.tourbook.photo.gallery.MT20.GalleryMT20;
 import net.tourbook.photo.gallery.MT20.GalleryMT20Item;
+import net.tourbook.util.SWT2Dutil;
 import net.tourbook.util.StatusUtil;
 import net.tourbook.util.UI;
 
@@ -107,15 +108,58 @@ public class PhotoImageLoader {
 		_requestedImageKey = photo.getImageKey(_requestedImageQuality);
 	}
 
-	private Image createSWTimageFromAWTimage(final BufferedImage awtImage) {
+	private Image createSWTimageFromAWTimage(final BufferedImage awtBufferedImage, final String imageFilePath) {
 
-		final ImageData swtImageData = UI.convertAWTimageToSWTimage(awtImage);
+//		final ImageData swtImageData = UI.convertAWTimageIntoSWTimage(awtBufferedImage, imageFilePath);
+
+		final ImageData swtImageData = SWT2Dutil.convertToSWT(awtBufferedImage, imageFilePath);
 
 		if (swtImageData != null) {
+			// image could be converted
 			return new Image(_display, swtImageData);
 		}
 
-		return null;
+		/*
+		 * try to convert it to a jpg file
+		 */
+
+		String tempFilename = null;
+		Image swtThumbnailImage = null;
+
+		try {
+
+			// get temp file name
+			final File tempFile = File.createTempFile("prefix", "");
+			tempFilename = tempFile.getName();
+			tempFile.delete();
+
+			ImageIO.write(awtBufferedImage, ThumbnailStore.THUMBNAIL_IMAGE_EXTENSION_JPG, new File(tempFilename));
+
+		} catch (final Exception e) {
+
+			StatusUtil.log(NLS.bind(//
+					"Cannot save thumbnail image with AWT: \"{0}\"", //$NON-NLS-1$
+					imageFilePath), e);
+		} finally {
+
+			try {
+
+				// get SWT image from saved AWT image
+				swtThumbnailImage = new Image(_display, tempFilename);
+
+			} catch (final Exception e) {
+
+				StatusUtil.log(NLS.bind(//
+						"Cannot load thumbnail image with SWT: \"{0}\"", //$NON-NLS-1$
+						tempFilename), e);
+			} finally {
+
+				// remove temp tile
+				new File(tempFilename).delete();
+			}
+		}
+
+		return swtThumbnailImage;
 	}
 
 	private void disposeTrackedImages() {
@@ -329,12 +373,31 @@ public class PhotoImageLoader {
 
 				final String originalImagePathName = _photo.getPhotoWrapper().imageFilePathName;
 
+				// get/set metadata if available
+				final PhotoImageMetadata imageMetaData = _photo.getImageMetaData();
+
+				int imageWidth = _photo.getWidth();
+				int imageHeight = _photo.getHeight();
+
+				// check if width is set
+				if (imageWidth == Integer.MIN_VALUE) {
+
+					// image width is not set from metadata, set it from the image
+
+					final Rectangle imageBounds = loadedExifImage.getBounds();
+					imageWidth = imageBounds.width;
+					imageHeight = imageBounds.height;
+
+					// update dimension
+					updateImageData(imageWidth, imageHeight);
+				}
+
 				PhotoImageCache.putImage(
 						imageKey,
 						loadedExifImage,
-						_photo.getImageMetaData(),
-						_photo.getWidth(),
-						_photo.getHeight(),
+						imageMetaData,
+						imageWidth,
+						imageHeight,
 						originalImagePathName);
 			}
 
@@ -411,42 +474,14 @@ public class PhotoImageLoader {
 						return null;
 					}
 
-					/*
-					 * convert awt into swt image
-					 */
-//					final boolean isUseFileConversion = false;
-//					if (isUseFileConversion) {
-//
-//						ThumbnailStore.saveImageAWT(awtBufferedImage, storeImageFilePath);
-//
-//						// get SWT image from saved AWT image
-//						swtThumbnailImage = new Image(_display, storeImageFilePath.toOSString());
-//
-////////////////////////////////////////////
-////
-//// MUST BE REMOVED, IS ONLY FOR TESTING
-////
-////
-//						// it performs better when existing thumb images do not keep saved
-//						new File(storeImageFilePath.toOSString()).delete();
-////
-//// MUST BE REMOVED, IS ONLY FOR TESTING
-////
-////////////////////////////////////////////
-//					} else {
+					swtThumbnailImage = createSWTimageFromAWTimage(awtBufferedImage, storeImageFilePath.toOSString());
 
-					final ImageData imageData = UI.convertAWTimageToSWTimage(awtBufferedImage);
+					// set state after creating image, this could cause an error
+					_photo.setStateExifThumb(swtThumbnailImage == null ? 0 : 1);
 
-					if (imageData != null) {
-
-						swtThumbnailImage = new Image(_display, imageData);
-
-						_photo.setStateExifThumb(awtBufferedImage == null ? 0 : 1);
-
+					if (swtThumbnailImage != null) {
 						return swtThumbnailImage;
 					}
-
-//					}
 
 				} catch (final Exception e) {
 					StatusUtil.log(NLS.bind(//
@@ -987,15 +1022,15 @@ public class PhotoImageLoader {
 		/*
 		 * load original image
 		 */
-		BufferedImage originalImage = null;
+		BufferedImage awtOriginalImage = null;
 		final String originalImagePathName = photoWrapper.imageFilePathName;
 		try {
 
 			final long startHqLoad = System.currentTimeMillis();
 			{
-				originalImage = ImageIO.read(photoWrapper.imageFile);
+				awtOriginalImage = ImageIO.read(photoWrapper.imageFile);
 
-				_trackedAWTImages.add(originalImage);
+				_trackedAWTImages.add(awtOriginalImage);
 			}
 			endHqLoad = System.currentTimeMillis() - startHqLoad;
 
@@ -1005,7 +1040,7 @@ public class PhotoImageLoader {
 
 		} finally {
 
-			if (originalImage == null) {
+			if (awtOriginalImage == null) {
 
 				System.out.println(NLS.bind(//
 						UI.timeStamp() + "AWT: image \"{0}\" cannot be loaded, will load with SWT", //$NON-NLS-1$
@@ -1023,7 +1058,7 @@ public class PhotoImageLoader {
 
 			// the thumb image could not be previously saved in the thumb store, display original image
 
-			final Image swtImage = createSWTimageFromAWTimage(originalImage);
+			final Image swtImage = createSWTimageFromAWTimage(awtOriginalImage, originalImagePathName);
 
 			if (swtImage == null) {
 
@@ -1043,8 +1078,8 @@ public class PhotoImageLoader {
 
 			boolean isHQCreated = false;
 
-			int imageWidth = originalImage.getWidth();
-			int imageHeight = originalImage.getHeight();
+			int imageWidth = awtOriginalImage.getWidth();
+			int imageHeight = awtOriginalImage.getHeight();
 
 			// update dimension
 			updateImageData(imageWidth, imageHeight);
@@ -1062,7 +1097,7 @@ public class PhotoImageLoader {
 					final Point bestSize = ImageUtils.getBestSize(imageWidth, imageHeight, _hqImageSize, _hqImageSize);
 					final int maxSize = Math.max(bestSize.x, bestSize.y);
 
-					scaledHQImage = Scalr.resize(originalImage, Method.SPEED, maxSize);
+					scaledHQImage = Scalr.resize(awtOriginalImage, Method.SPEED, maxSize);
 
 					_trackedAWTImages.add(scaledHQImage);
 
@@ -1108,7 +1143,7 @@ public class PhotoImageLoader {
 				isHQCreated = true;
 
 			} else {
-				hqImage = originalImage;
+				hqImage = awtOriginalImage;
 			}
 
 			/*
@@ -1128,9 +1163,7 @@ public class PhotoImageLoader {
 					// image size is between thumb and HQ
 
 					if (_requestedImageQuality == ImageQuality.HQ) {
-
-						final ImageData imageData = UI.convertAWTimageToSWTimage(originalImage);
-						requestedSWTImage = new Image(_display, imageData);
+						requestedSWTImage = createSWTimageFromAWTimage(awtOriginalImage, originalImagePathName);
 					}
 				}
 
@@ -1194,19 +1227,19 @@ public class PhotoImageLoader {
 
 				// loaded image is smaller than a thumb image
 
-				saveThumbAWT = originalImage;
+				saveThumbAWT = awtOriginalImage;
 			}
 
 			/*
 			 * save thumb image
 			 */
-			if (saveThumbAWT == originalImage) {
+			if (saveThumbAWT == awtOriginalImage) {
 
 				// original image is not saved as a thumb
 
 				if (requestedSWTImage == null) {
 
-					requestedSWTImage = createSWTimageFromAWTimage(saveThumbAWT);
+					requestedSWTImage = createSWTimageFromAWTimage(saveThumbAWT, originalImagePathName);
 
 					if (requestedSWTImage == null) {
 						exceptionMessage = NLS.bind(//
@@ -1237,7 +1270,7 @@ public class PhotoImageLoader {
 
 					if (requestedSWTImage == null) {
 
-						requestedSWTImage = createSWTimageFromAWTimage(saveThumbAWT);
+						requestedSWTImage = createSWTimageFromAWTimage(saveThumbAWT, originalImagePathName);
 
 						if (requestedSWTImage == null) {
 							exceptionMessage = NLS.bind(

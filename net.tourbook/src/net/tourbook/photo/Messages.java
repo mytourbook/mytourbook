@@ -35,10 +35,8 @@ public class Messages extends NLS {
 	public static String		Image__PhotoFilterGPS;
 	public static String		Image__PhotoFilterNoFilter;
 	public static String		Image__PhotoFilterNoGPS;
-
-	public static String	Image__PhotoFolderGallery;
-
-	public static String	Image__PhotoFolderGallery_OnlyPhotos;
+	public static String		Image__PhotoFolderGallery;
+	public static String		Image__PhotoFolderGallery_OnlyPhotos;
 	public static String		Image__PhotoInfoDate;
 	public static String		Image__PhotoInfoName;
 	public static String		Image__PhotoSortByDate;
@@ -73,15 +71,12 @@ public class Messages extends NLS {
 	public static String		Pic_Dir_Action_SortByDate_Tooltip;
 	public static String		Pic_Dir_Action_SortByName;
 	public static String		Pic_Dir_Action_SortByName_Tooltip;
-
-	public static String	Pic_Dir_Action_ToggleFolderGallery;
-
-	public static String	Pic_Dir_Action_ToggleFolderGallery_OnlyPhotos;
-
-	public static String	Pic_Dir_Action_ToggleFolderGallery_OnlyPhotos_Tooltip;
-
-	public static String	Pic_Dir_Action_ToggleFolderGallery_Tooltip;
-
+	public static String		Pic_Dir_Action_ToggleFolderGallery;
+	public static String		Pic_Dir_Action_ToggleFolderGallery_OnlyPhotos;
+	public static String		Pic_Dir_Action_ToggleFolderGallery_OnlyPhotos_Tooltip;
+	public static String		Pic_Dir_Action_ToggleFolderGallery_Tooltip;
+	public static String		Pic_Dir_Dialog_CleanupStoreImages_DiscardImages;
+	public static String		Pic_Dir_Dialog_CleanupStoreImages_KeepImages;
 	public static String		Pic_Dir_Dialog_CleanupStoreImages_Message;
 	public static String		Pic_Dir_Dialog_CleanupStoreImages_Title;
 	public static String		Pic_Dir_Dialog_ExternalApplication_Message;
@@ -96,6 +91,20 @@ public class Messages extends NLS {
 	public static String		Pic_Dir_Spinner_ThumbnailSize_Tooltip;
 	public static String		Pic_Dir_Spinner_ThumbnailSize_Tooltip_OSX;
 	public static String		Pic_Dir_Status_Loaded;
+	public static String		Pic_Dir_StatusLabel_1ImageIsHiddenByFilter;
+	public static String		Pic_Dir_StatusLabel_FilteringImages;
+	public static String		Pic_Dir_StatusLabel_InitialLoading;
+	public static String	Pic_Dir_StatusLabel_LoadingFailed;
+
+	public static String	Pic_Dir_StatusLabel_LoadingFullsize;
+
+	public static String		Pic_Dir_StatusLabel_LoadingImages;
+	public static String		Pic_Dir_StatusLabel_LoadingImagesFilter;
+
+	public static String	Pic_Dir_StatusLabel_LoadingThumbExif;
+	public static String		Pic_Dir_StatusLabel_nImagesAreHiddenByFilter;
+	public static String		Pic_Dir_StatusLabel_NoImagesInFolder;
+	public static String		Pic_Dir_StatusLabel_SelectedImages;
 
 	public static String		PrefPage_Photo_Cache_Button_GetNumberOfImages;
 	public static String		PrefPage_Photo_Cache_Dialog_MaxHandle_CreatedImagesBeforeError;

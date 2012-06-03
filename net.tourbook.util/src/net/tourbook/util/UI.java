@@ -15,11 +15,6 @@
  *******************************************************************************/
 package net.tourbook.util;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.ComponentColorModel;
-import java.awt.image.DirectColorModel;
-import java.awt.image.IndexColorModel;
-import java.awt.image.WritableRaster;
 import java.nio.charset.Charset;
 
 import org.eclipse.swt.SWT;
@@ -32,10 +27,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.TextLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -116,97 +108,113 @@ public class UI {
 		});
 	}
 
-	/**
-	 * Converts a Swing BufferedImage into a lightweight ImageData object for SWT
-	 * 
-	 * @param bufferedImage
-	 *            the image to be converted
-	 * @return An ImageData that represents the same image as bufferedImage
-	 */
-	public static ImageData convertAWTimageToSWTimage(final BufferedImage bufferedImage) {
-
-		if (bufferedImage.getColorModel() instanceof DirectColorModel) {
-			final DirectColorModel colorModel = (DirectColorModel) bufferedImage.getColorModel();
-			final PaletteData palette = new PaletteData(
-					colorModel.getRedMask(),
-					colorModel.getGreenMask(),
-					colorModel.getBlueMask());
-			final ImageData data = new ImageData(
-					bufferedImage.getWidth(),
-					bufferedImage.getHeight(),
-					colorModel.getPixelSize(),
-					palette);
-			final WritableRaster raster = bufferedImage.getRaster();
-			final int[] pixelArray = new int[3];
-			for (int y = 0; y < data.height; y++) {
-				for (int x = 0; x < data.width; x++) {
-					raster.getPixel(x, y, pixelArray);
-					final int pixel = palette.getPixel(new RGB(pixelArray[0], pixelArray[1], pixelArray[2]));
-					data.setPixel(x, y, pixel);
-				}
-			}
-			return data;
-
-		} else if (bufferedImage.getColorModel() instanceof IndexColorModel) {
-
-			final IndexColorModel colorModel = (IndexColorModel) bufferedImage.getColorModel();
-			final int size = colorModel.getMapSize();
-			final byte[] reds = new byte[size];
-			final byte[] greens = new byte[size];
-			final byte[] blues = new byte[size];
-			colorModel.getReds(reds);
-			colorModel.getGreens(greens);
-			colorModel.getBlues(blues);
-			final RGB[] rgbs = new RGB[size];
-			for (int i = 0; i < rgbs.length; i++) {
-				rgbs[i] = new RGB(reds[i] & 0xFF, greens[i] & 0xFF, blues[i] & 0xFF);
-			}
-			final PaletteData palette = new PaletteData(rgbs);
-			final ImageData data = new ImageData(
-					bufferedImage.getWidth(),
-					bufferedImage.getHeight(),
-					colorModel.getPixelSize(),
-					palette);
-			data.transparentPixel = colorModel.getTransparentPixel();
-			final WritableRaster raster = bufferedImage.getRaster();
-			final int[] pixelArray = new int[1];
-			for (int y = 0; y < data.height; y++) {
-				for (int x = 0; x < data.width; x++) {
-					raster.getPixel(x, y, pixelArray);
-					data.setPixel(x, y, pixelArray[0]);
-				}
-			}
-			return data;
-
-		} else if (bufferedImage.getColorModel() instanceof ComponentColorModel) {
-
-			final ComponentColorModel colorModel = (ComponentColorModel) bufferedImage.getColorModel();
-
-			//ASSUMES: 3 BYTE BGR IMAGE TYPE
-
-			final PaletteData palette = new PaletteData(0x0000FF, 0x00FF00, 0xFF0000);
-			final ImageData data = new ImageData(
-					bufferedImage.getWidth(),
-					bufferedImage.getHeight(),
-					colorModel.getPixelSize(),
-					palette);
-
-			//This is valid because we are using a 3-byte Data model with no transparent pixels
-			data.transparentPixel = -1;
-
-			final WritableRaster raster = bufferedImage.getRaster();
-			final int[] pixelArray = new int[3];
-			for (int y = 0; y < data.height; y++) {
-				for (int x = 0; x < data.width; x++) {
-					raster.getPixel(x, y, pixelArray);
-					final int pixel = palette.getPixel(new RGB(pixelArray[0], pixelArray[1], pixelArray[2]));
-					data.setPixel(x, y, pixel);
-				}
-			}
-			return data;
-		}
-		return null;
-	}
+// this conversion is not working for all png images, found SWT2Dutil.java
+//
+//	/**
+//	 * Converts a Swing BufferedImage into a lightweight ImageData object for SWT
+//	 *
+//	 * @param bufferedImage
+//	 *            the image to be converted
+//	 * @param originalImagePathName
+//	 * @return An ImageData that represents the same image as bufferedImage
+//	 */
+//	public static ImageData convertAWTimageIntoSWTimage(final BufferedImage bufferedImage, final String imagePathName) {
+//
+//		try {
+//
+//			if (bufferedImage.getColorModel() instanceof DirectColorModel) {
+//				final DirectColorModel colorModel = (DirectColorModel) bufferedImage.getColorModel();
+//				final PaletteData palette = new PaletteData(
+//						colorModel.getRedMask(),
+//						colorModel.getGreenMask(),
+//						colorModel.getBlueMask());
+//				final ImageData data = new ImageData(
+//						bufferedImage.getWidth(),
+//						bufferedImage.getHeight(),
+//						colorModel.getPixelSize(),
+//						palette);
+//				final WritableRaster raster = bufferedImage.getRaster();
+//				final int[] pixelArray = new int[3];
+//				for (int y = 0; y < data.height; y++) {
+//					for (int x = 0; x < data.width; x++) {
+//						raster.getPixel(x, y, pixelArray);
+//						final int pixel = palette.getPixel(new RGB(pixelArray[0], pixelArray[1], pixelArray[2]));
+//						data.setPixel(x, y, pixel);
+//					}
+//				}
+//				return data;
+//
+//			} else if (bufferedImage.getColorModel() instanceof IndexColorModel) {
+//
+//				final IndexColorModel colorModel = (IndexColorModel) bufferedImage.getColorModel();
+//				final int size = colorModel.getMapSize();
+//				final byte[] reds = new byte[size];
+//				final byte[] greens = new byte[size];
+//				final byte[] blues = new byte[size];
+//				colorModel.getReds(reds);
+//				colorModel.getGreens(greens);
+//				colorModel.getBlues(blues);
+//				final RGB[] rgbs = new RGB[size];
+//				for (int i = 0; i < rgbs.length; i++) {
+//					rgbs[i] = new RGB(reds[i] & 0xFF, greens[i] & 0xFF, blues[i] & 0xFF);
+//				}
+//				final PaletteData palette = new PaletteData(rgbs);
+//				final ImageData data = new ImageData(
+//						bufferedImage.getWidth(),
+//						bufferedImage.getHeight(),
+//						colorModel.getPixelSize(),
+//						palette);
+//				data.transparentPixel = colorModel.getTransparentPixel();
+//				final WritableRaster raster = bufferedImage.getRaster();
+//				final int[] pixelArray = new int[1];
+//				for (int y = 0; y < data.height; y++) {
+//					for (int x = 0; x < data.width; x++) {
+//						raster.getPixel(x, y, pixelArray);
+//						data.setPixel(x, y, pixelArray[0]);
+//					}
+//				}
+//				return data;
+//
+//			} else if (bufferedImage.getColorModel() instanceof ComponentColorModel) {
+//
+//				final ComponentColorModel colorModel = (ComponentColorModel) bufferedImage.getColorModel();
+//
+//				//ASSUMES: 3 BYTE BGR IMAGE TYPE
+//
+//				final PaletteData palette = new PaletteData(0x0000FF, 0x00FF00, 0xFF0000);
+//				final ImageData data = new ImageData(
+//						bufferedImage.getWidth(),
+//						bufferedImage.getHeight(),
+//						colorModel.getPixelSize(),
+//						palette);
+//
+//				//This is valid because we are using a 3-byte Data model with no transparent pixels
+//				data.transparentPixel = -1;
+//
+//				final WritableRaster raster = bufferedImage.getRaster();
+//
+////				final int[] pixelArray = new int[3];
+//				final int[] pixelArray = colorModel.getComponentSize();
+//
+//				for (int y = 0; y < data.height; y++) {
+//					for (int x = 0; x < data.width; x++) {
+//						raster.getPixel(x, y, pixelArray);
+//						final int pixel = palette.getPixel(new RGB(pixelArray[0], pixelArray[1], pixelArray[2]));
+//						data.setPixel(x, y, pixel);
+//					}
+//				}
+//				return data;
+//			}
+//
+//		} catch (final Exception e) {
+//
+//			System.out.println(NLS.bind(//
+//					UI.timeStamp() + "Cannot convert AWT image into SWT image: {0}",
+//					imagePathName));
+//		}
+//
+//		return null;
+//	}
 
 	/**
 	 * Opens the control context menu, the menue is aligned below the control to the right side

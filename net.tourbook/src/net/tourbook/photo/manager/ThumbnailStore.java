@@ -48,7 +48,7 @@ public class ThumbnailStore {
 
 	private static final long			MBYTE							= 1024 * 1024;
 
-	private static final String			THUMBNAIL_IMAGE_EXTENSION_JPG	= "jpg";						//$NON-NLS-1$
+	static final String					THUMBNAIL_IMAGE_EXTENSION_JPG	= "jpg";						//$NON-NLS-1$
 	private static final String			THUMBNAIL_STORE_OS_PATH			= "thumbnail-store";			//$NON-NLS-1$
 
 	private static IPreferenceStore		_prefStore						= TourbookPlugin.getDefault()//

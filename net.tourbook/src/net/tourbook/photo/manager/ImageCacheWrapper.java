@@ -44,6 +44,11 @@ public class ImageCacheWrapper {
 		this.imageHeight = imageHeight;
 		this.originalImagePathName = originalImagePathName;
 		this.imageKey = imageKey;
+
+		if (imageWidth == Integer.MIN_VALUE) {
+			int a = 0;
+			a++;
+		}
 	}
 
 }

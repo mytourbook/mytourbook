@@ -35,6 +35,7 @@ import net.tourbook.photo.manager.PhotoWrapper;
 import net.tourbook.ui.UI;
 import net.tourbook.util.StatusUtil;
 
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
@@ -865,17 +866,17 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		PhotoImageMetadata metaData = null;
 
 		if (isError) {
-			statusText = photoImageFileName + " cannot be loaded";
+			statusText = NLS.bind(Messages.Pic_Dir_StatusLabel_LoadingFailed, photoImageFileName);
 		} else {
 
 			final int exifThumbImageState = photo.getExifThumbImageState();
 			metaData = photo.getImageMetaDataRaw();
 
 			if (metaData == null || exifThumbImageState == -1) {
-				statusText = photoImageFileName + " is being loaded...";
+				statusText = NLS.bind(Messages.Pic_Dir_StatusLabel_LoadingThumbExif, photoImageFileName);
 			} else {
 				// meta data are already loaded
-				statusText = photoImageFileName + " loading fullsize...";
+				statusText = NLS.bind(Messages.Pic_Dir_StatusLabel_LoadingFullsize, photoImageFileName);
 			}
 		}
 
@@ -890,7 +891,6 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 			gc.setForeground(device.getSystemColor(SWT.COLOR_RED));
 		} else {
 			if (metaData != null) {
-//				gc.setForeground(device.getSystemColor(SWT.COLOR_GREEN));
 				gc.setForeground(_fgColor);
 			} else {
 				gc.setForeground(device.getSystemColor(SWT.COLOR_YELLOW));

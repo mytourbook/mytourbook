@@ -192,7 +192,7 @@ public class PhotoImageCache {
 
 				// image dimension is not yet set
 
-				if (cacheWrapper.imageHeight != Integer.MIN_VALUE) {
+				if (cacheWrapper.imageWidth != Integer.MIN_VALUE) {
 
 					// image dimension is available
 
