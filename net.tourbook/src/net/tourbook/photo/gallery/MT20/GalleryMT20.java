@@ -244,7 +244,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 	/**
 	 * Create a Gallery
-	 * 
+	 *
 	 * @param parent
 	 * @param style
 	 *            SWT.V_SCROLL add vertical slider and switches to vertical mode. <br/>
@@ -441,7 +441,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 	/**
 	 * Center selected item
-	 * 
+	 *
 	 * @return Returns center position ratio for the last selected gallery item.
 	 */
 	private Double centerSelectedItem() {
@@ -488,7 +488,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 	/**
 	 * Deselects all items and send selection event depending on parameter.
-	 * 
+	 *
 	 * @param isNotifyListeners
 	 *            If true, a selection event will be sent to all the current selection listeners.
 	 */
@@ -541,7 +541,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 	/**
 	 * Original method: AbstractGridGroupRenderer.getVisibleItems()
-	 * 
+	 *
 	 * @param clippingArea
 	 * @return Returns indices for all gallery items contained in the clipping area. This can also
 	 *         contain indices for which items are not available.
@@ -637,7 +637,7 @@ public abstract class GalleryMT20 extends Canvas {
 	/**
 	 * Initializes a gallery item which can be used to set data into the item. This method is called
 	 * before a gallery item is painted.
-	 * 
+	 *
 	 * @param virtualIndex
 	 *            Index within the gallery items, these are the gallery items which the gallery can
 	 *            display.
@@ -777,7 +777,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 	/**
 	 * Get item virtual index at pixel position
-	 * 
+	 *
 	 * @param coords
 	 * @return Returns gallery item index in {@link #_virtualGalleryItems} or <code> <0</code> when
 	 *         item is not available.
@@ -1009,7 +1009,7 @@ public abstract class GalleryMT20 extends Canvas {
 	 * <p>
 	 * {@link Event#data} contains the selected/deselected gallery item or <code>null</code> when
 	 * nothing is selected
-	 * 
+	 *
 	 * @param item
 	 * @param index
 	 * @param isDefault
@@ -1036,7 +1036,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 	/**
 	 * Send a zoom in/out event with {@link SWT#Modify} (found no better SWT event)
-	 * 
+	 *
 	 * @param itemWidth
 	 * @param itemHeight
 	 */
@@ -1081,17 +1081,17 @@ public abstract class GalleryMT20 extends Canvas {
 
 	/**
 	 * <pre>
-	 * 
+	 *
 	 * Modifier Mask		Description
-	 * 
+	 *
 	 * SWT.MOD1 			The first modifier was down (often SWT.CONTROL)
 	 * SWT.MOD2 			The second modifier was down (often SWT.SHIFT)
 	 * SWT.MOD3 			The third modifier was down (often SWT.ALT)
 	 * SWT.MOD4 			The fourth modifier was down (often zero)
 	 * SWT.MODIFIER_MASK 	Bitwise-OR of all valid modifiers
-	 * 
+	 *
 	 * </pre>
-	 * 
+	 *
 	 * @param keyEvent
 	 */
 	private void onKeyPressed(final KeyEvent keyEvent) {
@@ -1121,20 +1121,22 @@ public abstract class GalleryMT20 extends Canvas {
 		 */
 		boolean isResetPosition = false;
 
-		boolean isShift;
-		boolean isCtrl;
+		boolean isCtrlKey;
+		boolean isShiftKey;
+
 		if (UI.IS_OSX) {
-//			isCtrl = (keyEvent.stateMask & SWT.COMMAND) != 0;
-//			isShift = (keyEvent.stateMask & SWT.ALT) != 0;
-			isCtrl = (keyEvent.stateMask & SWT.MOD1) != 0;
-			isShift = (keyEvent.stateMask & SWT.MOD2) != 0;
+			isCtrlKey = (keyEvent.stateMask & SWT.MOD1) > 0;
+			isShiftKey = (keyEvent.stateMask & SWT.MOD3) > 0;
 		} else {
-			isCtrl = (keyEvent.stateMask & SWT.MOD1) != 0;
-			isShift = (keyEvent.stateMask & SWT.MOD2) != 0;
+			isCtrlKey = (keyEvent.stateMask & SWT.MOD1) > 0;
+			isShiftKey = (keyEvent.stateMask & SWT.MOD2) > 0;
 		}
 
+//		System.out.println(isCtrlKey + "  " + isShiftKey + "  " + keyEvent.stateMask);
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
 		boolean isMultiSelection = false;
-		final int keyCode = keyEvent.keyCode;
+		int keyCode = keyEvent.keyCode;
 
 		// check if multiple selection starts
 		if (keyCode == SWT.ARROW_LEFT
@@ -1146,14 +1148,24 @@ public abstract class GalleryMT20 extends Canvas {
 				|| keyCode == SWT.HOME
 				|| keyCode == SWT.END) {
 
-			if (isShift && _prevKeyIsShift == false //
+			if (UI.IS_OSX) {
+				if (isCtrlKey) {
+					if (keyCode == SWT.ARROW_UP) {
+						keyCode = SWT.HOME;
+					} else if (keyCode == SWT.ARROW_DOWN) {
+						keyCode = SWT.END;
+					}
+				}
+			}
+
+			if (isShiftKey && _prevKeyIsShift == false //
 					// item is selected
 					&& _lastSelectedItem != null) {
 
 				// start multiple selection
 				_lastSingleClick = _lastSelectedItemIndex;
 
-			} else if (isShift && _prevKeyIsShift) {
+			} else if (isShiftKey && _prevKeyIsShift) {
 
 				// continue multiple selection
 
@@ -1164,9 +1176,9 @@ public abstract class GalleryMT20 extends Canvas {
 				_lastSingleClick = -1;
 			}
 
-			_prevKeyIsShift = isShift;
+			_prevKeyIsShift = isShiftKey;
 
-			isMultiSelection = isShift && _lastSingleClick != -1;
+			isMultiSelection = isShiftKey && _lastSingleClick != -1;
 		}
 
 		final int maxVisibleRows = Math.max((_clientArea.height / _itemHeight) - 1, 1);
@@ -1177,7 +1189,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 			// zoom IN
 
-			zoomGallery(keyEvent.time, true, isShift, isCtrl);
+			zoomGallery(keyEvent.time, true, isShiftKey, isCtrlKey);
 
 			isResetPosition = true;
 			break;
@@ -1186,7 +1198,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 			// zoom OUT
 
-			zoomGallery(keyEvent.time, false, isShift, isCtrl);
+			zoomGallery(keyEvent.time, false, isShiftKey, isCtrlKey);
 
 			isResetPosition = true;
 			break;
@@ -1204,7 +1216,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 			// select ALL with <Ctrl><A>
 
-			if (isCtrl) {
+			if (isCtrlKey) {
 				selectAll();
 				isResetPosition = true;
 			}
@@ -1571,23 +1583,22 @@ public abstract class GalleryMT20 extends Canvas {
 		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		 */
 
-		boolean isShift;
-		boolean isCtrl;
+		boolean isCtrlKey;
+		boolean isShiftKey;
+
 		if (UI.IS_OSX) {
-//			isCtrl = (event.stateMask & SWT.COMMAND) != 0;
-//			isShift = (event.stateMask & SWT.ALT) != 0;
-			isCtrl = (event.stateMask & SWT.MOD1) != 0;
-			isShift = (event.stateMask & SWT.MOD2) != 0;
+			isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
+			isShiftKey = (event.stateMask & SWT.MOD3) > 0;
 		} else {
-			isCtrl = (event.stateMask & SWT.MOD1) != 0;
-			isShift = (event.stateMask & SWT.MOD2) != 0;
+			isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
+			isShiftKey = (event.stateMask & SWT.MOD2) > 0;
 		}
 
 		/*
 		 * ensure <ctrl> or <shift> is pressed, otherwise it is zoomed when the scrollbar is hidden
 		 */
-		if (isCtrl || isShift) {
-			zoomGallery(event.time, event.count > 0, isShift, isCtrl);
+		if (isCtrlKey || isShiftKey) {
+			zoomGallery(event.time, event.count > 0, isShiftKey, isCtrlKey);
 			_isZoomed = true;
 		}
 
@@ -1803,7 +1814,7 @@ public abstract class GalleryMT20 extends Canvas {
 	}
 
 	public void restoreState(final IDialogSettings state) {
-		
+
 		_fullSizeViewer.restoreState(state);
 	}
 
@@ -1831,7 +1842,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 	/**
 	 * Adds a gallery item to the selected items
-	 * 
+	 *
 	 * @param itemIndex
 	 */
 	private void selectionAdd(final int itemIndex) {
@@ -1878,7 +1889,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 	/**
 	 * Removes a gallery item ftom the selected items.
-	 * 
+	 *
 	 * @param itemIndex
 	 */
 	private void selectionRemove(final int itemIndex) {
@@ -1894,7 +1905,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 	/**
 	 * Navigate full size viewer
-	 * 
+	 *
 	 * @param numberOfItems
 	 */
 	void selectItem(final int numberOfItems) {
@@ -2025,7 +2036,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 	/**
 	 * Toggle item selection status
-	 * 
+	 *
 	 * @param itemIndex
 	 *            Item which state is to be changed.
 	 * @param isSelected
@@ -2118,7 +2129,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 	/**
 	 * Toggle selection of the given gallery item and notify listener.
-	 * 
+	 *
 	 * @param itemIndex
 	 * @param isDeselectAll
 	 */
@@ -2140,7 +2151,7 @@ public abstract class GalleryMT20 extends Canvas {
 	/**
 	 * Sets the gallery's anti-aliasing value to the parameter, which must be one of
 	 * <code>SWT.DEFAULT</code>, <code>SWT.OFF</code> or <code>SWT.ON</code>.
-	 * 
+	 *
 	 * @param antialias
 	 */
 	public void setAntialias(final int antialias) {
@@ -2179,7 +2190,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 	/**
 	 * Calculate how many items are displayed horizontally or vertically.
-	 * 
+	 *
 	 * @param visibleSize
 	 * @param itemSize
 	 * @return
@@ -2208,7 +2219,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 	/**
 	 * Set the delay after the last user action before the redraw at higher quality is triggered
-	 * 
+	 *
 	 * @see #setLowQualityOnUserAction(boolean)
 	 * @param higherQualityDelay
 	 */
@@ -2228,7 +2239,7 @@ public abstract class GalleryMT20 extends Canvas {
 	 * Sets the gallery's interpolation setting to the parameter, which must be one of
 	 * <code>SWT.DEFAULT</code>, <code>SWT.NONE</code>, <code>SWT.LOW</code> or
 	 * <code>SWT.HIGH</code>.
-	 * 
+	 *
 	 * @param interpolation
 	 */
 	public void setInterpolation(final int interpolation) {
@@ -2243,7 +2254,7 @@ public abstract class GalleryMT20 extends Canvas {
 	/**
 	 * Set item receiver. Usually, this does not trigger gallery update. redraw must be called right
 	 * after setGroupRenderer to reflect this change.
-	 * 
+	 *
 	 * @param itemRenderer
 	 */
 	public void setItemRenderer(final AbstractGalleryMT20ItemRenderer itemRenderer) {
@@ -2257,7 +2268,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 	/**
 	 * Sets the size (width) of the gallery item, this contains the image width and the border.
-	 * 
+	 *
 	 * @param requestedNumberOfImages
 	 *            or <code>-1</code> to use the requested item size
 	 * @param requestedItemSize
@@ -2370,7 +2381,7 @@ public abstract class GalleryMT20 extends Canvas {
 	 * <p>
 	 * This will also start a gallery update which runs the
 	 * {@link #initializeGalleryItem(GalleryMT20Item, int)} method to initialize gallery items.
-	 * 
+	 *
 	 * @param numberOfItems
 	 * @param galleryPosition
 	 *            Gallery position where the gallery should be used to display gallery items, or
@@ -2392,7 +2403,7 @@ public abstract class GalleryMT20 extends Canvas {
 	/**
 	 * Set gallery items, which can be retrieved with {@link #getVirtualItems()}. With this get/set
 	 * mechanism, the gallery items can be sorted.
-	 * 
+	 *
 	 * @param virtualGalleryItems
 	 */
 	public void setVirtualItems(GalleryMT20Item[] virtualGalleryItems) {
@@ -2409,7 +2420,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 	/**
 	 * Show full size image
-	 * 
+	 *
 	 * @param itemIndex
 	 */
 	private void showFullsizeImage(final int itemIndex) {
@@ -2423,7 +2434,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 	/**
 	 * Show item in the client area.
-	 * 
+	 *
 	 * @param itemIndex
 	 */
 	private void showItem(final int itemIndex) {
@@ -2528,7 +2539,7 @@ public abstract class GalleryMT20 extends Canvas {
 	 * <p>
 	 * The item position can change when {@link #setVirtualItems(GalleryMT20Item[])} is called and
 	 * the item is not yet displayed.
-	 * 
+	 *
 	 * @param galleryItem
 	 * @param virtualIndex
 	 */
@@ -2597,7 +2608,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 	/**
 	 * Move the scrollbar to reflect the current visible items position.
-	 * 
+	 *
 	 * @param bar
 	 *            - the scroll bar to move
 	 * @param clientAreaSize
@@ -2643,7 +2654,7 @@ public abstract class GalleryMT20 extends Canvas {
 	/**
 	 * Recalculate structural values using the group renderer<br>
 	 * Gallery and item size will be updated.
-	 * 
+	 *
 	 * @param changedGroup
 	 *            the group that was modified since the last layout. If the group renderer or more
 	 *            that one group have changed, use null as parameter (full update)

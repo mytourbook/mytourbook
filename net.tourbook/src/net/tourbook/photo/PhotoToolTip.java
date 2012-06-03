@@ -97,6 +97,9 @@ public class PhotoToolTip extends ToolTip {
 
 	private Image					_photoImage;
 
+	private Canvas					_canvas;
+	private Composite				_canvasContainer;
+
 	public PhotoToolTip(final GalleryMT20 control) {
 
 		super(control, NO_RECREATE, false);
@@ -267,7 +270,7 @@ public class PhotoToolTip extends ToolTip {
 
 	/**
 	 * Photo image will only be displayed when image is loaded and available in the image cache.
-	 * 
+	 *
 	 * @param parent
 	 */
 	private void createUI_PhotoImage(final Composite parent) {
@@ -335,19 +338,20 @@ public class PhotoToolTip extends ToolTip {
 			StatusUtil.log(e);
 		}
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+		_canvasContainer = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().applyTo(_canvasContainer);
+		GridLayoutFactory.fillDefaults().numColumns(1).extendedMargins(0, 0, 5, 5).applyTo(_canvasContainer);
+		_canvasContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
-			final Canvas canvas = new Canvas(container, SWT.NONE);
+			_canvas = new Canvas(_canvasContainer, SWT.NONE);
 			GridDataFactory.fillDefaults()//
 					.grab(true, false)
 					.align(SWT.CENTER, SWT.CENTER)
 					.hint(_imagePaintedWidth, _imagePaintedHeight)
-					.applyTo(canvas);
+//					.indent(0, 5)
+					.applyTo(_canvas);
 
-			canvas.addPaintListener(new PaintListener() {
+			_canvas.addPaintListener(new PaintListener() {
 
 				@Override
 				public void paintControl(final PaintEvent event) {
@@ -365,7 +369,7 @@ public class PhotoToolTip extends ToolTip {
 			// image is not yet painted, show at the bottom of the gallery item
 		}
 
-		final int margin = 10;
+		final int margin = 0;//10;
 
 		final int itemPosX = _currentHoveredGalleryItem.viewPortX;
 		final int itemPosY = _currentHoveredGalleryItem.viewPortY;
@@ -413,8 +417,11 @@ public class PhotoToolTip extends ToolTip {
 
 		final Display display = control.getDisplay();
 
-		_bgColor = display.getSystemColor(SWT.COLOR_INFO_BACKGROUND);
-		_fgColor = display.getSystemColor(SWT.COLOR_INFO_FOREGROUND);
+//		_bgColor = display.getSystemColor(SWT.COLOR_INFO_BACKGROUND);
+//		_fgColor = display.getSystemColor(SWT.COLOR_INFO_FOREGROUND);
+		_bgColor = _gallery.getBackground();
+		_fgColor = _gallery.getForeground();
+
 //		_boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
 		final PixelConverter pc = new PixelConverter(control);
@@ -515,6 +522,9 @@ public class PhotoToolTip extends ToolTip {
 
 	private void updateUI_colors(final Control child) {
 
+		_bgColor = _gallery.getBackground();
+		_fgColor = _gallery.getForeground();
+
 		child.setBackground(_bgColor);
 		child.setForeground(_fgColor);
 
@@ -524,6 +534,13 @@ public class PhotoToolTip extends ToolTip {
 				updateUI_colors(element);
 			}
 		}
+
+		// set image preview background
+
+//		_canvas.setBackground(_gallery.getBackground());
+//		_canvasContainer.setBackground(_gallery.getBackground());
+
 	}
+
 
 }
