@@ -9,7 +9,7 @@
  *    Nicolas Richeton (nicolas.richeton@gmail.com) - initial API and implementation
  *    Richard Michalsky - bug 195439
  *******************************************************************************/
-package net.tourbook.photo.gallery;
+package net.tourbook.photo.gallery.MT20;
 
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;

@@ -17,9 +17,9 @@ package net.tourbook.photo;
 
 import java.text.NumberFormat;
 
-import net.tourbook.photo.gallery.RendererHelper;
 import net.tourbook.photo.gallery.MT20.GalleryMT20;
 import net.tourbook.photo.gallery.MT20.GalleryMT20Item;
+import net.tourbook.photo.gallery.MT20.RendererHelper;
 import net.tourbook.photo.manager.ImageQuality;
 import net.tourbook.photo.manager.Photo;
 import net.tourbook.photo.manager.PhotoImageCache;

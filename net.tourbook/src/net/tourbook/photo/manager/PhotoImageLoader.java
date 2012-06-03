@@ -1314,7 +1314,7 @@ public class PhotoImageLoader {
 		final long start = System.currentTimeMillis();
 		long endOriginalLoad1 = 0;
 		long endOriginalLoad2 = 0;
-		long endOriginalLoad3 = 0;
+		final long endOriginalLoad3 = 0;
 		long endRotate = 0;
 
 		/*
@@ -1382,6 +1382,7 @@ public class PhotoImageLoader {
 					 */
 
 					PhotoImageCache.disposeOriginal(null);
+					PhotoImageCache.disposeThumbs(null);
 
 					try {
 
@@ -1411,43 +1412,42 @@ public class PhotoImageLoader {
 									UI.timeStamp() + "SWT: image \"{0}\" cannot be loaded (4)", //$NON-NLS-1$
 									originalImagePathName));
 
-							/**
-							 * sometimes (when images are loaded concurrently) larger images could
-							 * not be loaded with SWT methods in Win7 (Eclipse 3.8 M6), try to load
-							 * image with AWT. This bug fix <code>
-							 * https://bugs.eclipse.org/bugs/show_bug.cgi?id=350783
-							 * https://bugs.eclipse.org/bugs/show_bug.cgi?id=375845
-							 * </code>
-							 * has not solved this problem
-							 */
-
-							PhotoImageCache.disposeThumbs(null);
-
-							try {
-
-								final long startLoading = System.currentTimeMillis();
-
-								swtImage = new Image(_display, originalImagePathName);
-
-								endOriginalLoad3 = System.currentTimeMillis() - startLoading;
-
-							} catch (final Exception e) {
-
-								isLoadingException = true;
-
-								System.out.println(NLS.bind(//
-										"SWT: image \"{0}\" cannot be loaded (5)", //$NON-NLS-1$
-										originalImagePathName));
-
-							} finally {
-
-								if (swtImage == null) {
-									System.out.println(NLS.bind( //
-											UI.timeStamp() + "SWT: image \"{0}\" cannot be loaded (6)", //$NON-NLS-1$
-											originalImagePathName));
-								}
-							}
-
+//							/**
+//							 * sometimes (when images are loaded concurrently) larger images could
+//							 * not be loaded with SWT methods in Win7 (Eclipse 3.8 M6), try to load
+//							 * image with AWT. This bug fix <code>
+//							 * https://bugs.eclipse.org/bugs/show_bug.cgi?id=350783
+//							 * https://bugs.eclipse.org/bugs/show_bug.cgi?id=375845
+//							 * </code>
+//							 * has not solved this problem
+//							 */
+//
+//							PhotoImageCache.disposeThumbs(null);
+//
+//							try {
+//
+//								final long startLoading = System.currentTimeMillis();
+//
+//								swtImage = new Image(_display, originalImagePathName);
+//
+//								endOriginalLoad3 = System.currentTimeMillis() - startLoading;
+//
+//							} catch (final Exception e) {
+//
+//								isLoadingException = true;
+//
+//								System.out.println(NLS.bind(//
+//										"SWT: image \"{0}\" cannot be loaded (5)", //$NON-NLS-1$
+//										originalImagePathName));
+//
+//							} finally {
+//
+//								if (swtImage == null) {
+//									System.out.println(NLS.bind( //
+//											UI.timeStamp() + "SWT: image \"{0}\" cannot be loaded (6)", //$NON-NLS-1$
+//											originalImagePathName));
+//								}
+//							}
 						}
 					}
 				}

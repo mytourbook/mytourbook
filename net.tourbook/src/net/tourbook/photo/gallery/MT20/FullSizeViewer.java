@@ -240,6 +240,11 @@ public class FullSizeViewer {
 			return;
 		}
 
+		if (_galleryItem == null) {
+			// can happen after close event (it did)
+			return;
+		}
+
 		if (_zoomFactor == 0.0) {
 			_zoomState = ZoomState.FIT_WINDOW;
 		}

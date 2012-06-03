@@ -18,12 +18,12 @@ package net.tourbook.photo;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.photo.PicDirImages.LoadCallbackImage;
 import net.tourbook.photo.PicDirImages.LoadCallbackOriginalImage;
-import net.tourbook.photo.gallery.RendererHelper;
 import net.tourbook.photo.gallery.MT20.AbstractGalleryMT20ItemRenderer;
 import net.tourbook.photo.gallery.MT20.DefaultGalleryMT20ItemRenderer;
 import net.tourbook.photo.gallery.MT20.GalleryMT20;
 import net.tourbook.photo.gallery.MT20.GalleryMT20Item;
 import net.tourbook.photo.gallery.MT20.PaintingResult;
+import net.tourbook.photo.gallery.MT20.RendererHelper;
 import net.tourbook.photo.gallery.MT20.ZoomState;
 import net.tourbook.photo.manager.ImageQuality;
 import net.tourbook.photo.manager.Photo;
@@ -485,8 +485,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 										final ZoomState zoomState,
 										final double zoomFactor) {
 
-		System.out.println("zoom " + zoomFactor);
-		// TODO remove SYSTEM.OUT.PRINTLN
+//		System.out.println("zoom " + zoomFactor);
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		final PhotoWrapper photoWrapper = (PhotoWrapper) galleryItem.customData;
 		if (photoWrapper == null) {
