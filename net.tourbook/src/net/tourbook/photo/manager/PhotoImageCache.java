@@ -76,7 +76,7 @@ public class PhotoImageCache {
 				.build();
 
 		_imageCacheOriginal = new ConcurrentLinkedHashMap.Builder<String, ImageCacheWrapper>()
-				.maximumWeightedCapacity(1)
+				.maximumWeightedCapacity(5)
 				.listener(evictionListener)
 				.build();
 	}

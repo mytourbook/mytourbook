@@ -26,6 +26,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.photo.gallery.MT20.GalleryMT20Item;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.util.StatusUtil;
 import net.tourbook.util.UI;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -35,7 +36,6 @@ public class PhotoLoadManager {
 
 	private static final IPreferenceStore						_prefStore;
 
-//	public static final int										IMAGE_SIZE_THUMBNAIL		= 20;
 	public static final int										IMAGE_SIZE_THUMBNAIL		= 160;
 	public static final int										IMAGE_SIZE_LARGE_DEFAULT	= 600;
 
@@ -271,7 +271,7 @@ public class PhotoLoadManager {
 				final PhotoExifLoader loadingItem = _waitingQueueExif.pollLast();
 
 				if (loadingItem != null) {
-					loadingItem.loadExif(_waitingQueueThumb);
+					loadingItem.loadExif(_waitingQueueThumb, _waitingQueueOriginal);
 				}
 			}
 		};
@@ -336,9 +336,7 @@ public class PhotoLoadManager {
 						loadingItem.loadImageOriginal();
 					}
 				} catch (final Exception e) {
-					System.out.println(e);
-					// TODO remove SYSTEM.OUT.PRINTLN
-
+					StatusUtil.log(e);
 				}
 			}
 		};

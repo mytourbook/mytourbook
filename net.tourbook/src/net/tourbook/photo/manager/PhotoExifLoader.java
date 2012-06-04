@@ -28,13 +28,14 @@ public class PhotoExifLoader {
 		_loadCallBack = imageLoadCallback;
 	}
 
-	public void loadExif(final LinkedBlockingDeque<PhotoImageLoader> waitingQueueThumb) {
+	public void loadExif(	final LinkedBlockingDeque<PhotoImageLoader> waitingQueueThumb,
+							final LinkedBlockingDeque<PhotoImageLoader> waitingQueueOriginal) {
 
 		/*
-		 * wait until thumb images are loaded
+		 * wait until thumb images and original images are loaded
 		 */
 		try {
-			while (waitingQueueThumb.size() > 0) {
+			while (waitingQueueThumb.size() > 0 || waitingQueueOriginal.size() > 0) {
 				Thread.sleep(50);
 			}
 		} catch (final InterruptedException e) {

@@ -369,7 +369,7 @@ public class PicDirImages implements IItemHovereredListener {
 		};
 	}
 
-	class LoadCallbackExif implements ILoadCallBack {
+	private class LoadCallbackExif implements ILoadCallBack {
 
 		private int		__runId;
 		private Photo	__photo;

@@ -94,13 +94,18 @@ public class FullSizeViewer {
 
 	private void createUI_Shell() {
 
-		_shell = new Shell(SWT.NO_TRIM /* | SWT.ON_TOP */);
+//		_shell = new Shell(SWT.NO_TRIM /* | SWT.ON_TOP */);
+		_shell = new Shell(SWT.NO_TRIM | SWT.ON_TOP);
 
 		_shell.setLayout(new FillLayout());
 
-		_canvas = new Canvas(_shell, SWT.DOUBLE_BUFFERED | SWT.NO_BACKGROUND);
+		/*
+		 * SWT.NO_BACKGROUND can cause that other content which is drawn in another window can be
+		 * displayed, e.g the gallery content was painted at the top of the canvas
+		 */
+//		_canvas = new Canvas(_shell, SWT.DOUBLE_BUFFERED | SWT.NO_BACKGROUND);
+		_canvas = new Canvas(_shell, SWT.DOUBLE_BUFFERED);
 //		_canvas = new Canvas(_shell, SWT.NONE);
-		
 
 //		_canvas = new Canvas(_shell, SWT.DOUBLE_BUFFERED | SWT.NO_BACKGROUND| SWT.NO_REDRAW_RESIZE| SWT.NO_MERGE_PAINTS);
 //		super(parent, style | SWT.NO_BACKGROUND);
@@ -108,7 +113,6 @@ public class FullSizeViewer {
 //		super(parent, style | SWT.DOUBLE_BUFFERED | SWT.NO_BACKGROUND | SWT.NO_REDRAW_RESIZE);
 //		super(parent, style | SWT.NO_MERGE_PAINTS);
 
-		
 		_canvas.setForeground(_fgColor);
 		_canvas.setBackground(_bgColor);
 //		_canvas.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));

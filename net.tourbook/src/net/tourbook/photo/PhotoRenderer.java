@@ -138,6 +138,15 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 	private Image					_prevImage;
 
+	private int						_prevSrcX;
+	private int						_prevSrcY;
+	private int						_prevSrcWidth;
+	private int						_prevSrcHeight;
+	private int						_prevDestX;
+	private int						_prevDestY;
+	private int						_prevDestWidth;
+	private int						_prevDestHeight;
+
 	private static Image			_gpsImage;
 	private static int				_gpsImageWidth;
 	private static int				_gpsImageHeight;
@@ -333,7 +342,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 					itemImageWidth,
 					itemImageHeight,
 					isRequestedQuality,
-					isSelected);
+					isSelected,
+					false);
 
 			// debug box for the image area
 //			gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_RED));
@@ -388,6 +398,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	 * @param imageCanvasHeight
 	 * @param isRequestedQuality
 	 * @param isSelected
+	 * @param isFullsizeImage
 	 */
 	private void draw_Image(final GC gc,
 							final PhotoWrapper photoWrapper,
@@ -398,7 +409,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 							final int imageCanvasWidth,
 							final int imageCanvasHeight,
 							final boolean isRequestedQuality,
-							final boolean isSelected) {
+							final boolean isSelected,
+							final boolean isFullsizeImage) {
 
 		final Point bestSize = computeBestSize(photoWrapper.photo, imageCanvasWidth, imageCanvasHeight);
 
@@ -437,6 +449,18 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 				galleryItem.imagePaintedWidth = _imagePaintedWidth;
 				galleryItem.imagePaintedHeight = _imagePaintedHeight;
+
+				if (isFullsizeImage) {
+					_prevImage = photoImage;
+					_prevSrcX = 0;
+					_prevSrcY = 0;
+					_prevSrcWidth = _imageWidth;
+					_prevSrcHeight = _imageHeight;
+					_prevDestX = _imagePaintedX;
+					_prevDestY = _imagePaintedY;
+					_prevDestWidth = _imagePaintedWidth;
+					_prevDestHeight = _imagePaintedHeight;
+				}
 
 			} catch (final Exception e) {
 				// this bug is covered here: https://bugs.eclipse.org/bugs/show_bug.cgi?id=375845
@@ -488,9 +512,6 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 										final ZoomState zoomState,
 										final double zoomFactor) {
 
-//		System.out.println("zoom " + zoomFactor);
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
 		final PhotoWrapper photoWrapper = (PhotoWrapper) galleryItem.customData;
 		if (photoWrapper == null) {
 			return null;
@@ -500,7 +521,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 		final ImageQuality requestedImageQuality = ImageQuality.ORIGINAL;
 
-		final boolean isLoadingError = photo.getLoadingState(requestedImageQuality) == PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR;
+//		final boolean isLoadingError = photo.getLoadingState(requestedImageQuality) == PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR;
 		boolean isRequestedQuality = false;
 		boolean isThumbImage = false;
 		boolean isImageAvailable = false;
@@ -532,6 +553,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 				PhotoLoadManager.putImageInLoadingQueueOriginal(galleryItem, photo, imageLoadCallback);
 			}
 
+// this causes a choppy image
+//
 			if (photoImage == null || photoImage.isDisposed()) {
 
 				// requested size is not available, try to get image with lower quality
@@ -551,38 +574,55 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 				photoImage = PhotoImageCache.getImage(photo, ImageQuality.THUMB);
 			}
+//
+// this causes a choppy image
 		}
 
-		gc.setForeground(_fgColor);
-
 		isImageAvailable = photoImage != null && photoImage.isDisposed() == false;
-		boolean isCorrectImageAvailable = isImageAvailable;
 
 		/*
 		 * Linux draws always a background, even when it should not, try to draw the previous image
 		 */
-		if (UI.IS_LINUX && isCorrectImageAvailable == false && _prevImage != null && _prevImage.isDisposed() == false) {
-			photoImage = _prevImage;
+		boolean isPrevImage = false;
+
+		final boolean isLinux = true;//UI.IS_LINUX;
+//		final boolean isLinux = UI.IS_LINUX;
+		if (isLinux && isImageAvailable == false && _prevImage != null && _prevImage.isDisposed() == false) {
+
+			// display previous image
+
+			isPrevImage = true;
 			isImageAvailable = true;
 		}
 
-		if (isCorrectImageAvailable) {
-			_prevImage = photoImage;
-		}
+		gc.setForeground(_fgColor);
 
 		/*
-		 * paint background only when an image is availabe or when image could not be loaded to show
+		 * paint background ONLY when an image is availabe or when image could not be loaded to show
 		 * an error message without image
 		 */
-		if (isImageAvailable || isLoadingError) {
+//		if (isImageAvailable || isLoadingError) {
 			gc.setBackground(_bgColor);
 			gc.fillRectangle(0, 0, canvasWidth, canvasHeight);
-		}
+//		}
 
 		/*
 		 * paint image
 		 */
-		if (isImageAvailable) {
+		if (isPrevImage) {
+
+			gc.drawImage(_prevImage, //
+					_prevSrcX,
+					_prevSrcY,
+					_prevSrcWidth,
+					_prevSrcHeight,
+					//
+					_prevDestX,
+					_prevDestY,
+					_prevDestWidth,
+					_prevDestHeight);
+
+		} else if (isImageAvailable) {
 
 			/*
 			 * an exception can occure because the image could be disposed before it is drawn
@@ -604,7 +644,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 						canvasWidth,
 						canvasHeight,
 						isRequestedQuality,
-						false);
+						false,
+						true);
 
 				setPaintedZoomFactor(_imageWidth, _imageHeight, _imagePaintedWidth, _imagePaintedHeight);
 
@@ -622,7 +663,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		/*
 		 * draw status message
 		 */
-		if (isThumbImage || isCorrectImageAvailable == false) {
+		if (isThumbImage || isPrevImage) {
 
 			// image is not available or thumb image is displayed
 
@@ -704,6 +745,16 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 						destY,
 						destWidth,
 						destHeight);
+
+				_prevImage = photoImage;
+				_prevSrcX = srcX;
+				_prevSrcY = srcY;
+				_prevSrcWidth = srcWidth;
+				_prevSrcHeight = srcHeight;
+				_prevDestX = srcX;
+				_prevDestY = srcY;
+				_prevDestWidth = srcWidth;
+				_prevDestHeight = srcHeight;
 
 			} catch (final Exception e) {
 				// this bug is covered here: https://bugs.eclipse.org/bugs/show_bug.cgi?id=375845
@@ -881,16 +932,23 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		PhotoImageMetadata metaData = null;
 
 		if (isError) {
+
+			// {0} loading failed
 			statusText = NLS.bind(Messages.Pic_Dir_StatusLabel_LoadingFailed, photoImageFileName);
+
 		} else {
 
 			final int exifThumbImageState = photo.getExifThumbImageState();
 			metaData = photo.getImageMetaDataRaw();
 
 			if (metaData == null || exifThumbImageState == -1) {
+
+				// {0} loading thumb and exif...
 				statusText = NLS.bind(Messages.Pic_Dir_StatusLabel_LoadingThumbExif, photoImageFileName);
+
 			} else {
-				// meta data are already loaded
+
+				// {0} loading fullsize...
 				statusText = NLS.bind(Messages.Pic_Dir_StatusLabel_LoadingFullsize, photoImageFileName);
 			}
 		}

@@ -133,8 +133,12 @@ public class PhotoToolTip extends ToolTip {
 		final boolean isImageLoaded = imageWidth != Integer.MIN_VALUE;
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.fillDefaults().margins(3, 3).spacing(3, 1).numColumns(1).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+		GridLayoutFactory.fillDefaults()//
+				.extendedMargins(5, 5, 5, 5)
+				.spacing(3, 1)
+				.numColumns(1)
+				.applyTo(container);
+		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 		{
 			final Composite containerHeader = new Composite(container, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(containerHeader);
@@ -270,7 +274,7 @@ public class PhotoToolTip extends ToolTip {
 
 	/**
 	 * Photo image will only be displayed when image is loaded and available in the image cache.
-	 *
+	 * 
 	 * @param parent
 	 */
 	private void createUI_PhotoImage(final Composite parent) {
@@ -340,7 +344,10 @@ public class PhotoToolTip extends ToolTip {
 
 		_canvasContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().applyTo(_canvasContainer);
-		GridLayoutFactory.fillDefaults().numColumns(1).extendedMargins(0, 0, 5, 5).applyTo(_canvasContainer);
+		GridLayoutFactory.fillDefaults()//
+				.numColumns(1)
+				.extendedMargins(0, 0, 5, 5)
+				.applyTo(_canvasContainer);
 		_canvasContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
 			_canvas = new Canvas(_canvasContainer, SWT.NONE);
@@ -541,6 +548,5 @@ public class PhotoToolTip extends ToolTip {
 //		_canvasContainer.setBackground(_gallery.getBackground());
 
 	}
-
 
 }
