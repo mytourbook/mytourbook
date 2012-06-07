@@ -84,19 +84,6 @@ public class Photo {
 	private int								_imageWidth				= Integer.MIN_VALUE;
 	private int								_imageHeight			= Integer.MIN_VALUE;
 
-	private int								_widthSmall;
-	private int								_heightSmall;
-
-	/**
-	 * Contains photo image width after it is rotated with the EXIF orientation
-	 */
-	private int								_widthRotated			= _imageWidth;
-
-	/**
-	 * Contains photo image height after it is rotated with the EXIF orientation
-	 */
-	private int								_heightRotated			= _imageHeight;
-
 	private double							_latitude				= Double.MIN_VALUE;
 	private double							_longitude				= Double.MIN_VALUE;
 
@@ -132,8 +119,6 @@ public class Photo {
 	private PhotoLoadingState				_photoLoadingStateThumb;
 	private PhotoLoadingState				_photoLoadingStateHQ;
 	private PhotoLoadingState				_photoLoadingStateOriginal;
-
-	private boolean							_isSwapWidthHeight;
 
 	/**
 	 * Is <code>true</code> when EXIF thumb image could be loaded
@@ -521,27 +506,16 @@ public class Photo {
 		return _gpsAreaInfo;
 	}
 
-	public int getHeight() {
-		return _imageHeight;
-	}
-
-	/**
-	 * @return Returns photo image height after it is rotated with the EXIF orientation
-	 */
-	public int getHeightRotated() {
-		return _heightRotated;
-	}
-
-	public int getHeightSmall() {
-		return _heightSmall;
-	}
-
 	public double getImageDirection() {
 		return _imageDirection;
 	}
 
 	public DateTime getImageFileDateTime() {
 		return _imageFileDateTime;
+	}
+
+	public int getImageHeight() {
+		return _imageHeight;
 	}
 
 	/**
@@ -647,6 +621,13 @@ public class Photo {
 	 */
 	public PhotoImageMetadata getImageMetaDataRaw() {
 		return _photoImageMetadata;
+	}
+
+	/**
+	 * @return Returns photo image width or {@link Integer#MIN_VALUE} when width is not set.
+	 */
+	public int getImageWidth() {
+		return _imageWidth;
 	}
 
 	public double getLatitude() {
@@ -756,23 +737,12 @@ public class Photo {
 		return null;
 	}
 
-	/**
-	 * @return Returns photo image width or {@link Integer#MIN_VALUE} when width is not set.
-	 */
-	public int getWidth() {
-		return _imageWidth;
-	}
-
-	/**
-	 * @return Returns photo image width after it is rotated with the EXIF orientation.
-	 */
-	public int getWidthRotated() {
-		return _widthRotated;
-	}
-
-	public int getWidthSmall() {
-		return _widthSmall;
-	}
+//	/**
+//	 * @return Returns photo image width after it is rotated with the EXIF orientation.
+//	 */
+//	public int getWidthRotated() {
+//		return _widthRotated;
+//	}
 
 	/**
 	 * @param mapProvider
@@ -851,7 +821,24 @@ public class Photo {
 
 		_gpsAreaInfo = photoImageMetadata.gpsAreaInfo;
 
-		updateSize(_imageWidth, _imageHeight, _orientation);
+		// rotate image, swap with and height
+		if (_imageWidth != Integer.MIN_VALUE && _imageHeight != Integer.MIN_VALUE) {
+
+			if (_orientation > 1) {
+
+				// see here http://www.impulseadventure.com/photo/exif-orientation.html
+
+				if (_orientation == 6 || _orientation == 8) {
+
+					// camera is rotated to the left or right by 90 degree
+
+					final int imageWidth = _imageWidth;
+
+					_imageWidth = _imageHeight;
+					_imageHeight = imageWidth;
+				}
+			}
+		}
 
 		/*
 		 * set state if gps data are available, this state is used for filtering the photos and to
@@ -913,40 +900,34 @@ public class Photo {
 		;
 	}
 
-	public void updateSize(final int width, final int height, final int orientation) {
-
-		if (width == Integer.MIN_VALUE || height == Integer.MIN_VALUE) {
-			return;
-		}
-
-		_imageWidth = width;
-		_imageHeight = height;
-
-		final int SIZE_SMALL = 20;
-		final float ratio = (float) width / height;
-
-		_widthSmall = width > SIZE_SMALL ? SIZE_SMALL : width;
-		_heightSmall = (int) (_widthSmall / ratio);
-
-		_isSwapWidthHeight = false;
-
-		if (orientation > 1) {
-
-			// see here http://www.impulseadventure.com/photo/exif-orientation.html
-
-			if (orientation == 8) {
-				_isSwapWidthHeight = true;
-			} else if (orientation == 6) {
-				_isSwapWidthHeight = true;
-			}
-		}
-
-		if (_isSwapWidthHeight) {
-			_widthRotated = _imageHeight;
-			_heightRotated = _imageWidth;
-		} else {
-			_widthRotated = _imageWidth;
-			_heightRotated = _imageHeight;
-		}
-	}
+//	private void updateSize(final int width, final int height, final int orientation) {
+//
+//		if (width == Integer.MIN_VALUE || height == Integer.MIN_VALUE) {
+//			return;
+//		}
+//
+//		_imageWidth = width;
+//		_imageHeight = height;
+//
+//		boolean isSwapSize = false;
+//
+//		if (orientation > 1) {
+//
+//			// see here http://www.impulseadventure.com/photo/exif-orientation.html
+//
+//			if (orientation == 8) {
+//				isSwapSize = true;
+//			} else if (orientation == 6) {
+//				isSwapSize = true;
+//			}
+//		}
+//
+//		if (isSwapSize) {
+//
+//			final int imageWidth = _imageWidth;
+//
+//			_imageWidth = _imageHeight;
+//			_imageHeight = imageWidth;
+//		}
+//	}
 }

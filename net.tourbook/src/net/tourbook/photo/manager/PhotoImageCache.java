@@ -35,12 +35,21 @@ import com.googlecode.concurrentlinkedhashmap.EvictionListener;
  */
 public class PhotoImageCache {
 
-	private static IPreferenceStore											_prefStore		= TourbookPlugin
-																									.getDefault()
-																									.getPreferenceStore();
+	private static IPreferenceStore											_prefStore					= TourbookPlugin
+																												.getDefault()
+																												.getPreferenceStore();
 
-	private static int														_maxCacheSize	= _prefStore.getInt(//
-																									ITourbookPreferences.PHOTO_THUMBNAIL_IMAGE_CACHE_SIZE);
+	private static int														_maxThumbImageCacheSize		= _prefStore
+																												.getInt(ITourbookPreferences.PHOTO_THUMBNAIL_IMAGE_CACHE_SIZE);
+
+	/**
+	 * This cache size should not be too large otherwise OS has no resources, loading images is
+	 * slowing down until all image caches must be disposed. This size is optimal for image size
+	 * 5184x3456 on win7 for smaller image it could be larger for bigger images it should be
+	 * smaller.
+	 */
+	private static int														_maxOriginalImageCacheSize	= _prefStore
+																												.getInt(ITourbookPreferences.PHOTO_ORIGINAL_IMAGE_CACHE_SIZE);
 
 	private static final ConcurrentLinkedHashMap<String, ImageCacheWrapper>	_imageCache;
 	private static final ConcurrentLinkedHashMap<String, ImageCacheWrapper>	_imageCacheOriginal;
@@ -71,12 +80,12 @@ public class PhotoImageCache {
 		};
 
 		_imageCache = new ConcurrentLinkedHashMap.Builder<String, ImageCacheWrapper>()
-				.maximumWeightedCapacity(_maxCacheSize)
+				.maximumWeightedCapacity(_maxThumbImageCacheSize)
 				.listener(evictionListener)
 				.build();
 
 		_imageCacheOriginal = new ConcurrentLinkedHashMap.Builder<String, ImageCacheWrapper>()
-				.maximumWeightedCapacity(5)
+				.maximumWeightedCapacity(_maxOriginalImageCacheSize)
 				.listener(evictionListener)
 				.build();
 	}
@@ -88,7 +97,7 @@ public class PhotoImageCache {
 	 *            otherwise all images are disposed.
 	 */
 	private static synchronized void dispose(	final ConcurrentLinkedHashMap<String, ImageCacheWrapper> imageCache,
-										final String folderPath) {
+												final String folderPath) {
 
 		if (imageCache == null) {
 			return;
@@ -112,7 +121,7 @@ public class PhotoImageCache {
 
 						continue;
 					}
-					
+
 					imageCache.remove(cacheWrapper.imageKey);
 				}
 
@@ -188,7 +197,7 @@ public class PhotoImageCache {
 			photo.getImageMetaData();
 
 			// check if height is set
-			if (photo.getHeight() == Integer.MIN_VALUE) {
+			if (photo.getImageWidth() == Integer.MIN_VALUE) {
 
 				// image dimension is not yet set
 
@@ -285,7 +294,11 @@ public class PhotoImageCache {
 				originalImagePathName);
 	}
 
-	public static void setCacheSize(final int newCacheSize) {
+	public static void setOriginalImageCacheSize(final int newCacheSize) {
+		_imageCacheOriginal.setCapacity(newCacheSize);
+	}
+
+	public static void setThumbCacheSize(final int newCacheSize) {
 		_imageCache.setCapacity(newCacheSize);
 	}
 }

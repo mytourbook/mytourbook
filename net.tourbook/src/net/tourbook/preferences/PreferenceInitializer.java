@@ -361,7 +361,9 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.PHOTO_THUMBNAIL_STORE_NUMBER_OF_DAYS_TO_KEEP_IMAGES, 90);
 		store.setDefault(ITourbookPreferences.PHOTO_THUMBNAIL_STORE_CLEANUP_PERIOD, 30);
 
-		store.setDefault(ITourbookPreferences.PHOTO_THUMBNAIL_IMAGE_CACHE_SIZE, 500);
+		store.setDefault(ITourbookPreferences.PHOTO_THUMBNAIL_IMAGE_CACHE_SIZE, 2000);
+		store.setDefault(ITourbookPreferences.PHOTO_ORIGINAL_IMAGE_CACHE_SIZE, 3);
+
 		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_IS_SHOW_FILE_FOLDER, true);
 
 		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_IS_SHOW_IMAGE_WITH_HIGH_QUALITY, true);
@@ -372,7 +374,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 				new RGB(0xf3, 0xf3, 0xf3));
 
 		PreferenceConverter.setDefault(store, ITourbookPreferences.PHOTO_VIEWER_COLOR_BACKGROUND, //
-//				new RGB(0x50, 0x50, 0x50));
 				new RGB(0x33, 0x33, 0x33));
 
 		PreferenceConverter.setDefault(store, ITourbookPreferences.PHOTO_VIEWER_COLOR_SELECTION_FOREGROUND, //
@@ -398,6 +399,10 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 				UI.IS_WIN //
 						? PhotoLoadManager.IMAGE_FRAMEWORK_AWT
 						: PhotoLoadManager.IMAGE_FRAMEWORK_SWT);
+
+		store.setDefault(ITourbookPreferences.PHOTO_FULLSIZE_VIEWER_IS_SHOW_PREVIEW, false);
+		store.setDefault(ITourbookPreferences.PHOTO_FULLSIZE_VIEWER_IS_SHOW_LOADING_MESSAGE, true);
+		store.setDefault(ITourbookPreferences.PHOTO_FULLSIZE_VIEWER_IS_SHOW_HQ_IMAGE, false);
 
 	}
 }

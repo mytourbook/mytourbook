@@ -1644,26 +1644,26 @@ public class TourPainter extends MapPainter {
 					continue;
 				}
 
-				final int imageWidth = photo.getWidthSmall();
-				final int imageWidth2 = imageWidth / 2;
-				final int imageHeight = photo.getHeightSmall();
-
-				// this is an inline for: tileViewport.contains(tileWorldPos.x, tileWorldPos.y)
-				final int photoWorldPixelX = photoWorldPixel.x;
-				final int photoWorldPixelY = photoWorldPixel.y;
-
-				final int photoImageWorldPixelX = photoWorldPixelX - imageWidth2;
-
-				// check if photo image is within the tile viewport
-				if (photoImageWorldPixelX + imageWidth >= tileWorldPixelLeft
-						&& photoWorldPixelX < tileWorldPixelRight
-						&& photoWorldPixelY >= tileWorldPixelTop
-						&& photoWorldPixelY < tileWorldPixelBottom + imageHeight) {
-
-					// current position is inside the tile
-
-					return true;
-				}
+//				final int imageWidth = photo.getWidthSmall();
+//				final int imageWidth2 = imageWidth / 2;
+//				final int imageHeight = photo.getHeightSmall();
+//
+//				// this is an inline for: tileViewport.contains(tileWorldPos.x, tileWorldPos.y)
+//				final int photoWorldPixelX = photoWorldPixel.x;
+//				final int photoWorldPixelY = photoWorldPixel.y;
+//
+//				final int photoImageWorldPixelX = photoWorldPixelX - imageWidth2;
+//
+//				// check if photo image is within the tile viewport
+//				if (photoImageWorldPixelX + imageWidth >= tileWorldPixelLeft
+//						&& photoWorldPixelX < tileWorldPixelRight
+//						&& photoWorldPixelY >= tileWorldPixelTop
+//						&& photoWorldPixelY < tileWorldPixelBottom + imageHeight) {
+//
+//					// current position is inside the tile
+//
+//					return true;
+//				}
 			}
 		}
 

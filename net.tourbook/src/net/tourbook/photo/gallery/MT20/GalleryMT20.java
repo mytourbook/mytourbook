@@ -18,10 +18,17 @@ package net.tourbook.photo.gallery.MT20;
 import java.util.Collection;
 import java.util.HashMap;
 
+import net.tourbook.photo.Messages;
+import net.tourbook.photo.PrefPagePhotoViewer;
+import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.util.StatusUtil;
 import net.tourbook.util.UI;
 
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
@@ -229,7 +236,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 	private FullSizeViewer						_fullSizeViewer;
 
-//	private int									_multiSelectionItemIndexStart;
+	private ActionOpenPrefDialog				_actionGalleryPrefPage;
 
 	private class RedrawTimer implements Runnable {
 		public void run() {
@@ -244,7 +251,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 	/**
 	 * Create a Gallery
-	 *
+	 * 
 	 * @param parent
 	 * @param style
 	 *            SWT.V_SCROLL add vertical slider and switches to vertical mode. <br/>
@@ -276,6 +283,9 @@ public abstract class GalleryMT20 extends Canvas {
 		addScrollBarsListeners();
 		addMouseListeners();
 		addKeyListeners();
+
+		createActions();
+		createContextMenu();
 
 		// set item renderer
 		_itemRenderer = new DefaultGalleryMT20ItemRenderer();
@@ -441,7 +451,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 	/**
 	 * Center selected item
-	 *
+	 * 
 	 * @return Returns center position ratio for the last selected gallery item.
 	 */
 	private Double centerSelectedItem() {
@@ -476,6 +486,32 @@ public abstract class GalleryMT20 extends Canvas {
 		return galleryPositionRatio;
 	}
 
+	private void createActions() {
+
+		_actionGalleryPrefPage = new ActionOpenPrefDialog(
+				Messages.Action_Photo_OpenPrefPage_Gallery,
+				PrefPagePhotoViewer.ID);
+	}
+
+	/**
+	 * Create context menu for the gallery
+	 */
+	private void createContextMenu() {
+
+		final MenuManager menuMgr = new MenuManager();
+
+		menuMgr.setRemoveAllWhenShown(true);
+
+		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
+			public void menuAboutToShow(final IMenuManager menuMgr) {
+				fillContextMenu(menuMgr);
+			}
+		});
+
+		setMenu(menuMgr.createContextMenu(this));
+	}
+
 	/**
 	 * Deselects all items.
 	 */
@@ -488,7 +524,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 	/**
 	 * Deselects all items and send selection event depending on parameter.
-	 *
+	 * 
 	 * @param isNotifyListeners
 	 *            If true, a selection event will be sent to all the current selection listeners.
 	 */
@@ -511,6 +547,12 @@ public abstract class GalleryMT20 extends Canvas {
 		if (isNotifyListeners) {
 			notifySelectionListeners(null, -1, false);
 		}
+	}
+
+	private void fillContextMenu(final IMenuManager menuMgr) {
+
+		menuMgr.add(new Separator());
+		menuMgr.add(_actionGalleryPrefPage);
 	}
 
 	private void fireItemHoverEvent(final int mouseX, final int mouseY) {
@@ -541,7 +583,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 	/**
 	 * Original method: AbstractGridGroupRenderer.getVisibleItems()
-	 *
+	 * 
 	 * @param clippingArea
 	 * @return Returns indices for all gallery items contained in the clipping area. This can also
 	 *         contain indices for which items are not available.
@@ -637,7 +679,7 @@ public abstract class GalleryMT20 extends Canvas {
 	/**
 	 * Initializes a gallery item which can be used to set data into the item. This method is called
 	 * before a gallery item is painted.
-	 *
+	 * 
 	 * @param virtualIndex
 	 *            Index within the gallery items, these are the gallery items which the gallery can
 	 *            display.
@@ -777,7 +819,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 	/**
 	 * Get item virtual index at pixel position
-	 *
+	 * 
 	 * @param coords
 	 * @return Returns gallery item index in {@link #_virtualGalleryItems} or <code> <0</code> when
 	 *         item is not available.
@@ -1009,7 +1051,7 @@ public abstract class GalleryMT20 extends Canvas {
 	 * <p>
 	 * {@link Event#data} contains the selected/deselected gallery item or <code>null</code> when
 	 * nothing is selected
-	 *
+	 * 
 	 * @param item
 	 * @param index
 	 * @param isDefault
@@ -1036,7 +1078,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 	/**
 	 * Send a zoom in/out event with {@link SWT#Modify} (found no better SWT event)
-	 *
+	 * 
 	 * @param itemWidth
 	 * @param itemHeight
 	 */
@@ -1081,17 +1123,17 @@ public abstract class GalleryMT20 extends Canvas {
 
 	/**
 	 * <pre>
-	 *
+	 * 
 	 * Modifier Mask		Description
-	 *
+	 * 
 	 * SWT.MOD1 			The first modifier was down (often SWT.CONTROL)
 	 * SWT.MOD2 			The second modifier was down (often SWT.SHIFT)
 	 * SWT.MOD3 			The third modifier was down (often SWT.ALT)
 	 * SWT.MOD4 			The fourth modifier was down (often zero)
 	 * SWT.MODIFIER_MASK 	Bitwise-OR of all valid modifiers
-	 *
+	 * 
 	 * </pre>
-	 *
+	 * 
 	 * @param keyEvent
 	 */
 	private void onKeyPressed(final KeyEvent keyEvent) {
@@ -1842,7 +1884,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 	/**
 	 * Adds a gallery item to the selected items
-	 *
+	 * 
 	 * @param itemIndex
 	 */
 	private void selectionAdd(final int itemIndex) {
@@ -1889,7 +1931,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 	/**
 	 * Removes a gallery item ftom the selected items.
-	 *
+	 * 
 	 * @param itemIndex
 	 */
 	private void selectionRemove(final int itemIndex) {
@@ -1905,7 +1947,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 	/**
 	 * Navigate full size viewer
-	 *
+	 * 
 	 * @param numberOfItems
 	 */
 	void selectItem(final int numberOfItems) {
@@ -2036,7 +2078,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 	/**
 	 * Toggle item selection status
-	 *
+	 * 
 	 * @param itemIndex
 	 *            Item which state is to be changed.
 	 * @param isSelected
@@ -2129,7 +2171,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 	/**
 	 * Toggle selection of the given gallery item and notify listener.
-	 *
+	 * 
 	 * @param itemIndex
 	 * @param isDeselectAll
 	 */
@@ -2151,7 +2193,7 @@ public abstract class GalleryMT20 extends Canvas {
 	/**
 	 * Sets the gallery's anti-aliasing value to the parameter, which must be one of
 	 * <code>SWT.DEFAULT</code>, <code>SWT.OFF</code> or <code>SWT.ON</code>.
-	 *
+	 * 
 	 * @param antialias
 	 */
 	public void setAntialias(final int antialias) {
@@ -2190,7 +2232,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 	/**
 	 * Calculate how many items are displayed horizontally or vertically.
-	 *
+	 * 
 	 * @param visibleSize
 	 * @param itemSize
 	 * @return
@@ -2219,7 +2261,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 	/**
 	 * Set the delay after the last user action before the redraw at higher quality is triggered
-	 *
+	 * 
 	 * @see #setLowQualityOnUserAction(boolean)
 	 * @param higherQualityDelay
 	 */
@@ -2239,7 +2281,7 @@ public abstract class GalleryMT20 extends Canvas {
 	 * Sets the gallery's interpolation setting to the parameter, which must be one of
 	 * <code>SWT.DEFAULT</code>, <code>SWT.NONE</code>, <code>SWT.LOW</code> or
 	 * <code>SWT.HIGH</code>.
-	 *
+	 * 
 	 * @param interpolation
 	 */
 	public void setInterpolation(final int interpolation) {
@@ -2254,7 +2296,7 @@ public abstract class GalleryMT20 extends Canvas {
 	/**
 	 * Set item receiver. Usually, this does not trigger gallery update. redraw must be called right
 	 * after setGroupRenderer to reflect this change.
-	 *
+	 * 
 	 * @param itemRenderer
 	 */
 	public void setItemRenderer(final AbstractGalleryMT20ItemRenderer itemRenderer) {
@@ -2268,7 +2310,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 	/**
 	 * Sets the size (width) of the gallery item, this contains the image width and the border.
-	 *
+	 * 
 	 * @param requestedNumberOfImages
 	 *            or <code>-1</code> to use the requested item size
 	 * @param requestedItemSize
@@ -2381,7 +2423,7 @@ public abstract class GalleryMT20 extends Canvas {
 	 * <p>
 	 * This will also start a gallery update which runs the
 	 * {@link #initializeGalleryItem(GalleryMT20Item, int)} method to initialize gallery items.
-	 *
+	 * 
 	 * @param numberOfItems
 	 * @param galleryPosition
 	 *            Gallery position where the gallery should be used to display gallery items, or
@@ -2403,7 +2445,7 @@ public abstract class GalleryMT20 extends Canvas {
 	/**
 	 * Set gallery items, which can be retrieved with {@link #getVirtualItems()}. With this get/set
 	 * mechanism, the gallery items can be sorted.
-	 *
+	 * 
 	 * @param virtualGalleryItems
 	 */
 	public void setVirtualItems(GalleryMT20Item[] virtualGalleryItems) {
@@ -2420,7 +2462,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 	/**
 	 * Show full size image
-	 *
+	 * 
 	 * @param itemIndex
 	 */
 	private void showFullsizeImage(final int itemIndex) {
@@ -2434,7 +2476,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 	/**
 	 * Show item in the client area.
-	 *
+	 * 
 	 * @param itemIndex
 	 */
 	private void showItem(final int itemIndex) {
@@ -2539,7 +2581,7 @@ public abstract class GalleryMT20 extends Canvas {
 	 * <p>
 	 * The item position can change when {@link #setVirtualItems(GalleryMT20Item[])} is called and
 	 * the item is not yet displayed.
-	 *
+	 * 
 	 * @param galleryItem
 	 * @param virtualIndex
 	 */
@@ -2608,7 +2650,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 	/**
 	 * Move the scrollbar to reflect the current visible items position.
-	 *
+	 * 
 	 * @param bar
 	 *            - the scroll bar to move
 	 * @param clientAreaSize
@@ -2654,7 +2696,7 @@ public abstract class GalleryMT20 extends Canvas {
 	/**
 	 * Recalculate structural values using the group renderer<br>
 	 * Gallery and item size will be updated.
-	 *
+	 * 
 	 * @param changedGroup
 	 *            the group that was modified since the last layout. If the group renderer or more
 	 *            that one group have changed, use null as parameter (full update)

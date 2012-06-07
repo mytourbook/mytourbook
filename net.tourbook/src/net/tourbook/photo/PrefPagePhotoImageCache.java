@@ -51,6 +51,7 @@ public class PrefPagePhotoImageCache extends PreferencePage implements IWorkbenc
 	private IPreferenceStore	_prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
 
 	private Spinner				_spinnerNumberOfImages;
+	private Spinner				_spinnerNumberOfOriginalImages;
 
 	@Override
 	protected Control createContents(final Composite parent) {
@@ -72,6 +73,7 @@ public class PrefPagePhotoImageCache extends PreferencePage implements IWorkbenc
 		GridDataFactory.swtDefaults().applyTo(container);
 		{
 			createUI_20_ImageCache(container);
+			createUI_30_OriginalImageCache(container);
 		}
 
 		return container;
@@ -81,7 +83,7 @@ public class PrefPagePhotoImageCache extends PreferencePage implements IWorkbenc
 
 		final Group group = new Group(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
-		group.setText(Messages.PrefPage_Photo_Cache_Group_ThumbnailCacheSize);
+		group.setText(Messages.PrefPage_Photo_Cache_Group_ThumbnailCache);
 		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
 		{
 			/*
@@ -134,6 +136,50 @@ public class PrefPagePhotoImageCache extends PreferencePage implements IWorkbenc
 					.hint(400, SWT.DEFAULT)
 					.applyTo(label);
 			label.setText(Messages.PrefPage_Photo_Cache_Label_ThumbnailCacheSizeInfo);
+		}
+	}
+
+	private void createUI_30_OriginalImageCache(final Composite parent) {
+
+		final Group group = new Group(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
+		group.setText(Messages.PrefPage_Photo_Cache_Group_OriginalImageCacheSize);
+		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
+		{
+			/*
+			 * label: nof images
+			 */
+			Label label = new Label(group, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.BEGINNING, SWT.CENTER)
+					.applyTo(label);
+			label.setText(Messages.PrefPage_Photo_Cache_Label_NumberOfOriginalImages);
+
+			/*
+			 * spinner: nof original images
+			 */
+			_spinnerNumberOfOriginalImages = new Spinner(group, SWT.BORDER);
+			GridDataFactory.fillDefaults() //
+					.align(SWT.BEGINNING, SWT.FILL)
+					.applyTo(_spinnerNumberOfOriginalImages);
+			_spinnerNumberOfOriginalImages.setMinimum(1);
+			_spinnerNumberOfOriginalImages.setMaximum(50);
+			_spinnerNumberOfOriginalImages.addMouseWheelListener(new MouseWheelListener() {
+				public void mouseScrolled(final MouseEvent event) {
+					UI.adjustSpinnerValueOnMouseScroll(event);
+				}
+			});
+
+			/*
+			 * label: info
+			 */
+			label = new Label(group, SWT.WRAP);
+			GridDataFactory.fillDefaults()//
+					.grab(true, false)
+					.span(2, 1)
+					.hint(400, SWT.DEFAULT)
+					.applyTo(label);
+			label.setText(Messages.PrefPage_Photo_Cache_Label_OriginalCacheSizeInfo);
 		}
 	}
 
@@ -197,7 +243,11 @@ public class PrefPagePhotoImageCache extends PreferencePage implements IWorkbenc
 	@Override
 	protected void performDefaults() {
 
-		_spinnerNumberOfImages.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.PHOTO_THUMBNAIL_IMAGE_CACHE_SIZE));
+		_spinnerNumberOfImages.setSelection(_prefStore.getDefaultInt(//
+				ITourbookPreferences.PHOTO_THUMBNAIL_IMAGE_CACHE_SIZE));
+
+		_spinnerNumberOfOriginalImages.setSelection(_prefStore.getDefaultInt(//
+				ITourbookPreferences.PHOTO_ORIGINAL_IMAGE_CACHE_SIZE));
 
 		super.performDefaults();
 	}
@@ -212,24 +262,37 @@ public class PrefPagePhotoImageCache extends PreferencePage implements IWorkbenc
 
 	private void restoreState() {
 
-		_spinnerNumberOfImages.setSelection(_prefStore.getInt(ITourbookPreferences.PHOTO_THUMBNAIL_IMAGE_CACHE_SIZE));
+		_spinnerNumberOfImages.setSelection(_prefStore.getInt(//
+				ITourbookPreferences.PHOTO_THUMBNAIL_IMAGE_CACHE_SIZE));
+
+		_spinnerNumberOfOriginalImages.setSelection(_prefStore.getInt(//
+				ITourbookPreferences.PHOTO_ORIGINAL_IMAGE_CACHE_SIZE));
 	}
 
 	private void saveState() {
 
-		boolean isModified = false;
-
-		final int newCacheSize = _spinnerNumberOfImages.getSelection();
-		final int oldCacheSize = _prefStore.getInt(ITourbookPreferences.PHOTO_THUMBNAIL_IMAGE_CACHE_SIZE);
+		/*
+		 * set thumb cache size
+		 */
+		int newCacheSize = _spinnerNumberOfImages.getSelection();
+		int oldCacheSize = _prefStore.getInt(ITourbookPreferences.PHOTO_THUMBNAIL_IMAGE_CACHE_SIZE);
 
 		if (oldCacheSize != newCacheSize) {
-			isModified = true;
 			_prefStore.setValue(ITourbookPreferences.PHOTO_THUMBNAIL_IMAGE_CACHE_SIZE, newCacheSize);
+			PhotoImageCache.setThumbCacheSize(newCacheSize);
 		}
 
-		if (isModified) {
-			PhotoImageCache.setCacheSize(newCacheSize);
+		/*
+		 * set original image cache size
+		 */
+		newCacheSize = _spinnerNumberOfOriginalImages.getSelection();
+		oldCacheSize = _prefStore.getInt(ITourbookPreferences.PHOTO_ORIGINAL_IMAGE_CACHE_SIZE);
+
+		if (oldCacheSize != newCacheSize) {
+			_prefStore.setValue(ITourbookPreferences.PHOTO_ORIGINAL_IMAGE_CACHE_SIZE, newCacheSize);
+			PhotoImageCache.setOriginalImageCacheSize(newCacheSize);
 		}
+
 	}
 
 }

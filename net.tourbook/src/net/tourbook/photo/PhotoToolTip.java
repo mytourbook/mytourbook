@@ -129,7 +129,7 @@ public class PhotoToolTip extends ToolTip {
 
 		parent.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
-		final int imageWidth = _photo.getWidth();
+		final int imageWidth = _photo.getImageWidth();
 		final boolean isImageLoaded = imageWidth != Integer.MIN_VALUE;
 
 		final Composite container = new Composite(parent, SWT.NONE);
@@ -154,7 +154,7 @@ public class PhotoToolTip extends ToolTip {
 					// dimension
 					label = new Label(containerHeader, SWT.NONE);
 					GridDataFactory.fillDefaults().grab(true, false).align(SWT.END, SWT.FILL).applyTo(label);
-					label.setText(imageWidth + " x " + _photo.getHeight());
+					label.setText(imageWidth + " x " + _photo.getImageHeight());
 				}
 			}
 
@@ -307,7 +307,7 @@ public class PhotoToolTip extends ToolTip {
 			final int imageCanvasWidth = PhotoLoadManager.IMAGE_SIZE_THUMBNAIL;
 			final int imageCanvasHeight = (int) (PhotoLoadManager.IMAGE_SIZE_THUMBNAIL / _gallery.getItemRatio());
 
-			final Point bestSize = RendererHelper.getBestSize(
+			final Point bestSize = RendererHelper.getCanvasSize(
 					_imageWidth,
 					_imageHeight,
 					imageCanvasWidth,
@@ -316,21 +316,21 @@ public class PhotoToolTip extends ToolTip {
 			_imagePaintedWidth = bestSize.x;
 			_imagePaintedHeight = bestSize.y;
 
-			final int photoWidthRotated = _photo.getWidthRotated();
-			final int photoHeightRotated = _photo.getHeightRotated();
+			final int photoImageWidth = _photo.getImageWidth();
+			final int photoImageHeight = _photo.getImageHeight();
 
 			/*
 			 * the photo image should not be displayed larger than the original photo even when the
 			 * thumb image is larger, this can happen when image is resized
 			 */
-			if (photoWidthRotated != Integer.MIN_VALUE && photoHeightRotated != Integer.MIN_VALUE) {
+			if (photoImageWidth != Integer.MIN_VALUE) {
 
 				// photo is loaded
 
-				if (_imagePaintedWidth > photoWidthRotated || _imagePaintedHeight > photoHeightRotated) {
+				if (_imagePaintedWidth > photoImageWidth || _imagePaintedHeight > photoImageHeight) {
 
-					_imagePaintedWidth = photoWidthRotated;
-					_imagePaintedHeight = photoHeightRotated;
+					_imagePaintedWidth = photoImageWidth;
+					_imagePaintedHeight = photoImageHeight;
 				}
 			} else if (_imagePaintedWidth > _imageWidth || _imagePaintedHeight > _imageHeight) {
 
@@ -422,8 +422,8 @@ public class PhotoToolTip extends ToolTip {
 
 	private void initUI(final Control control) {
 
-		final Display display = control.getDisplay();
-
+//		final Display display = control.getDisplay();
+//
 //		_bgColor = display.getSystemColor(SWT.COLOR_INFO_BACKGROUND);
 //		_fgColor = display.getSystemColor(SWT.COLOR_INFO_FOREGROUND);
 		_bgColor = _gallery.getBackground();

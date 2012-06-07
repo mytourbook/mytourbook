@@ -376,8 +376,8 @@ public class PhotoImageLoader {
 				// get/set metadata if available
 				final PhotoImageMetadata imageMetaData = _photo.getImageMetaData();
 
-				int imageWidth = _photo.getWidth();
-				int imageHeight = _photo.getHeight();
+				int imageWidth = _photo.getImageWidth();
+				int imageHeight = _photo.getImageHeight();
 
 				// check if width is set
 				if (imageWidth == Integer.MIN_VALUE) {
@@ -389,7 +389,7 @@ public class PhotoImageLoader {
 					imageHeight = imageBounds.height;
 
 					// update dimension
-					updateImageData(imageWidth, imageHeight);
+					updateImageSize(imageWidth, imageHeight);
 				}
 
 				PhotoImageCache.putImage(
@@ -542,8 +542,8 @@ public class PhotoImageLoader {
 						imageKey,
 						loadedExifImage,
 						_photo.getImageMetaData(),
-						_photo.getWidth(),
-						_photo.getHeight(),
+						_photo.getImageWidth(),
+						_photo.getImageHeight(),
 						originalImagePathName);
 
 				// display image in the loading callback
@@ -803,7 +803,7 @@ public class PhotoImageLoader {
 		int imageHeight = imageBounds.height;
 
 		// update dimension
-		updateImageData(imageWidth, imageHeight);
+		updateImageSize(imageWidth, imageHeight);
 
 		final int thumbSize = PhotoLoadManager.IMAGE_SIZE_THUMBNAIL;
 
@@ -974,8 +974,8 @@ public class PhotoImageLoader {
 					_requestedImageKey,
 					requestedSWTImage,
 					_photo.getImageMetaData(),
-					_photo.getWidth(),
-					_photo.getHeight(),
+					_photo.getImageWidth(),
+					_photo.getImageHeight(),
 					originalImagePathName);
 		}
 
@@ -1082,7 +1082,7 @@ public class PhotoImageLoader {
 			int imageHeight = awtOriginalImage.getHeight();
 
 			// update dimension
-			updateImageData(imageWidth, imageHeight);
+			updateImageSize(imageWidth, imageHeight);
 
 			BufferedImage hqImage;
 
@@ -1296,8 +1296,8 @@ public class PhotoImageLoader {
 						_requestedImageKey,
 						requestedSWTImage,
 						_photo.getImageMetaData(),
-						_photo.getWidth(),
-						_photo.getHeight(),
+						_photo.getImageWidth(),
+						_photo.getImageHeight(),
 						originalImagePathName);
 			}
 
@@ -1502,7 +1502,7 @@ public class PhotoImageLoader {
 				final int imageHeight = imageBounds.height;
 
 				// update dimension
-				updateImageData(imageWidth, imageHeight);
+				updateImageSize(imageWidth, imageHeight);
 
 				/*
 				 * rotate image when necessary
@@ -1558,7 +1558,7 @@ public class PhotoImageLoader {
 					+ ("\ttotal: " + end)
 					+ ("\tload1: " + endOriginalLoad1)
 					+ ("\tload2: " + endOriginalLoad2)
-					+ ("\tload3: " + endOriginalLoad3)
+//					+ ("\tload3: " + endOriginalLoad3)
 					+ ("\trotate: " + endRotate)
 			//
 					);
@@ -1639,20 +1639,20 @@ public class PhotoImageLoader {
 
 		final int thumbWidth = thumbImage.getWidth();
 		final int thumbHeight = thumbImage.getHeight();
-		final int photoWidth = _photo.getWidthRotated();
-		final int photoHeight = _photo.getHeightRotated();
+		final int photoImageWidth = _photo.getImageWidth();
+		final int photoImageHeight = _photo.getImageHeight();
 
 		final double thumbRatio = (double) thumbWidth / thumbHeight;
 		double photoRatio;
 		boolean isRotate = false;
 
-		if (photoWidth == Integer.MIN_VALUE) {
+		if (photoImageWidth == Integer.MIN_VALUE) {
 
 			return thumbImage;
 
 		} else {
 
-			photoRatio = (double) photoWidth / photoHeight;
+			photoRatio = (double) photoImageWidth / photoImageHeight;
 
 			if (thumbRatio < 1.0 && photoRatio > 1.0 || thumbRatio > 1.0 && photoRatio < 1.0) {
 
@@ -1758,10 +1758,10 @@ public class PhotoImageLoader {
 	/**
 	 * @param loadedImage
 	 */
-	private void updateImageData(final int imageWidth, final int imageHeight) {
+	private void updateImageSize(final int imageWidth, final int imageHeight) {
 
 		// check if height is set
-		if (_photo.getHeight() == Integer.MIN_VALUE) {
+		if (_photo.getImageWidth() == Integer.MIN_VALUE) {
 
 			// image dimension is not yet set
 

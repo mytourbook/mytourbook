@@ -15,17 +15,23 @@
  *******************************************************************************/
 package net.tourbook.photo.gallery.MT20;
 
-public class PaintingResult {
+import net.tourbook.photo.Messages;
 
-	public double	imagePaintedZoomFactor;
+import org.eclipse.jface.action.Action;
 
-	/**
-	 * Is <code>true</code> when the image is painted in the requested quality.
-	 */
-	public boolean	isOriginalImagePainted;
+public class ActionShowThumbPreview extends Action {
 
-	public boolean	isLoadingError;
+	private FullSizeViewer	_fullSizeViewer;
 
-	public PaintingResult() {}
+	public ActionShowThumbPreview(final FullSizeViewer fullSizeViewer) {
 
+		super(Messages.PrefPage_Photo_FullsizeViewer_Checkbox_Preview, AS_CHECK_BOX);
+
+		_fullSizeViewer = fullSizeViewer;
+	}
+
+	@Override
+	public void run() {
+		_fullSizeViewer.actionUpdatePrefStore();
+	}
 }

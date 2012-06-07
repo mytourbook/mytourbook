@@ -26,8 +26,13 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.TextLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -215,6 +220,26 @@ public class UI {
 //
 //		return null;
 //	}
+
+	/**
+	 * @return Returns a cursor which is hidden. This cursor must be disposed.
+	 */
+	public static Cursor createHiddenCursor() {
+
+		// create a cursor with a transparent image
+
+		final Display display = Display.getDefault();
+
+		final Color white = display.getSystemColor(SWT.COLOR_WHITE);
+		final Color black = display.getSystemColor(SWT.COLOR_BLACK);
+
+		final PaletteData palette = new PaletteData(new RGB[] { white.getRGB(), black.getRGB() });
+
+		final ImageData sourceData = new ImageData(16, 16, 1, palette);
+		sourceData.transparentPixel = 0;
+
+		return new Cursor(display, sourceData, 0, 0);
+	}
 
 	/**
 	 * Opens the control context menu, the menue is aligned below the control to the right side

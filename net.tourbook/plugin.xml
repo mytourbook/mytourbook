@@ -314,29 +314,43 @@
 		id="net.tourbook.preferences.PrefPagePhotoID"
 		name="%PrefPage_Photo">
 	</page>
+	
+		<page id="net.tourbook.preferences.PrefPagePhotoExternalAppID"
+			class="net.tourbook.photo.PrefPagePhotoExternalApp"
+			category="net.tourbook.preferences.PrefPagePhotoID"
+			name="%PrefPage_Photo_PhotoExternalApp">
+		</page>
+
+		<page id="net.tourbook.preferences.PrefPagePhotoFullsizeViewerID"
+			class="net.tourbook.photo.PrefPagePhotoFullsizeViewer"
+			category="net.tourbook.preferences.PrefPagePhotoID"
+			name="%PrefPage_Photo_PhotoFullsizeViewer">
+		</page>
+		
 		<page id="net.tourbook.preferences.PrefPagePhotoViewerID"
 			class="net.tourbook.photo.PrefPagePhotoViewer"
 			category="net.tourbook.preferences.PrefPagePhotoID"
 			name="%PrefPage_Photo_PhotoViewer">
 		</page>
 
-		<page id="net.tourbook.preferences.PrefPagePhotoExternalAppID"
-			class="net.tourbook.photo.PrefPagePhotoExternalApp"
+		<page
+			class="net.tourbook.photo.PrefPagePhotoSystem"
+			id="net.tourbook.preferences.PrefPagePhotoSystemID"
 			category="net.tourbook.preferences.PrefPagePhotoID"
-			name="%PrefPage_Photo_PhotoExternalApp">
+			name="%PrefPage_Photo_Sytem">
 		</page>
 		
-		<page id="net.tourbook.preferences.PrefPagePhotoImageCacheID"
-			class="net.tourbook.photo.PrefPagePhotoImageCache"
-			category="net.tourbook.preferences.PrefPagePhotoID"
-			name="%PrefPage_Photo_ImageCache">
-		</page>
-		
-		<page id="net.tourbook.preferences.PrefPagePhotoThumbnailStoreID"
-			class="net.tourbook.photo.PrefPagePhotoThumbnailStore"
-			category="net.tourbook.preferences.PrefPagePhotoID"
-			name="%PrefPage_Photo_ThumbnailStore">
-		</page>
+			<page id="net.tourbook.preferences.PrefPagePhotoImageCacheID"
+				class="net.tourbook.photo.PrefPagePhotoImageCache"
+				category="net.tourbook.preferences.PrefPagePhotoSystemID"
+				name="%PrefPage_Photo_ImageCache">
+			</page>
+			
+			<page id="net.tourbook.preferences.PrefPagePhotoThumbnailStoreID"
+				class="net.tourbook.photo.PrefPagePhotoThumbnailStore"
+				category="net.tourbook.preferences.PrefPagePhotoSystemID"
+				name="%PrefPage_Photo_ThumbnailStore">
+			</page>
 
 
 	<!--
@@ -550,12 +564,6 @@
             	label="%View_Name_PhotoDirectory"
             	mnemonic="%View_Name_PhotoDirectory_Mnemonic"/>
             
-         <command
-            	commandId="net.tourbook.photo.photoImageView"
-            	icon="icons/photo-image.png"
-            	label="%View_Name_PhotoImage"
-            	mnemonic="%View_Name_PhotoImage_Mnemonic"/>
-
          <separator
             name="net.tourbook.separator.TourProperties"
             visible="true">
@@ -663,12 +671,6 @@
                   icon="icons/photo-directory.png"
                   label="%View_Name_PhotoDirectory"
                   mnemonic="%View_Name_PhotoDirectory_Mnemonic">
-            </command>
-            <command
-                  commandId="net.tourbook.photo.photoImageView"
-                  icon="icons/photo-image.png"
-                  label="%View_Name_PhotoImage"
-                  mnemonic="%View_Name_PhotoImage_Mnemonic">
             </command>
 
             <command
@@ -847,11 +849,6 @@
             id="command.net.tourbook.photo.PicDirView"
             name="%View_Name_PhotoDirectory"
             defaultHandler="net.tourbook.photo.ActionHandlerOpenViewPhotoDirectory"
-            />
-      <command
-            id="net.tourbook.photo.photoImageView"
-            name="%View_Name_PhotoImage"
-            defaultHandler="net.tourbook.photo.ActionHandlerOpenViewPhotoImage"
             />
 
       <command
@@ -1177,13 +1174,6 @@
 	            icon="icons/photo-directory.png"
 	            id="net.tourbook.photo.PicDirView"
 	            name="%View_Name_PhotoDirectory">
-	      </view>
-	      <view
-	            category="net.tourbook.category.tourList"
-	            class="net.tourbook.photo.PhotoImageView"
-	            icon="icons/photo-image.png"
-	            id="net.tourbook.photo.photoImageView"
-	            name="%View_Name_PhotoImage">
 	      </view>
 
       <category

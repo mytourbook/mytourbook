@@ -15,10 +15,23 @@
  *******************************************************************************/
 package net.tourbook.photo.gallery.MT20;
 
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.photo.Messages;
+import net.tourbook.photo.PrefPagePhotoFullsizeViewer;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.ui.action.ActionOpenPrefDialog;
+import net.tourbook.util.UI;
 import net.tourbook.util.Util;
 
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseEvent;
@@ -28,19 +41,30 @@ import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Canvas;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 
 public class FullSizeViewer {
 
-	private static final String				STATE_FULL_SIZE_VIEWER_ZOOM_STATE	= "STATE_FULL_SIZE_VIEWER_ZOOM_STATE";	//$NON-NLS-1$
+	private static final int				TIME_BEFORE_CURSOR_GETS_HIDDEN			= 2000;
+//	private static final int				TIME_BEFORE_HQ_PAINTING					= 100;
+	private static final int				TIME_BEFORE_WAITING_CURSOR_IS_DISPLAYED	= 100;
 
-	private static double					MIN_ZOOM							= 1.0 / 50;
-	private static double					MAX_ZOOM							= 50;
+	private static final String				STATE_FULL_SIZE_VIEWER_ZOOM_STATE		= "STATE_FULL_SIZE_VIEWER_ZOOM_STATE";	//$NON-NLS-1$
+
+	private static double					MIN_ZOOM								= 1.0 / 50;
+	private static double					MAX_ZOOM								= 50;
+
+	private final IPreferenceStore			_prefStore								= TourbookPlugin
+																							.getDefault()
+																							.getPreferenceStore();
 
 	private GalleryMT20						_gallery;
 	private AbstractGalleryMT20ItemRenderer	_itemRenderer;
@@ -57,11 +81,22 @@ public class FullSizeViewer {
 
 	private double							_zoomFactor;
 
+	private TimerWaitCursor					_timerWaitingCursor						= new TimerWaitCursor();
+	private TimerSleepCursor				_timerSleepCursor						= new TimerSleepCursor();
+
+	private boolean							_isShowHQImages;
+	private boolean							_isShowWaitCursor;
+
+	private ActionOpenPrefDialog			_actionOpenFullsizePrefPage;
+	private ActionShowThumbPreview			_actionShowThumbPreview;
+	private ActionShowLoadingMessage		_actionShowLoadingMessage;
+	private ActionShowHQImage				_actionShowHQImage;
+
 	/*
 	 * UI resources
 	 */
 	private Color							_fgColor;
-	private Color							_bgColor;
+//	private Color							_bgColor;
 
 	/*
 	 * UI controls
@@ -69,18 +104,75 @@ public class FullSizeViewer {
 	private Shell							_shell;
 	private Canvas							_canvas;
 
-	public FullSizeViewer() {
+	private Cursor							_cursorWait;
+	private Cursor							_cursorHidden;
+	private Cursor							_cursorSizeAll;
 
+	private class TimerSleepCursor implements Runnable {
+		public void run() {
+
+			if (_shell == null || _shell.isDisposed()) {
+				return;
+			}
+
+			_canvas.setCursor(_cursorHidden);
+		}
 	}
+
+	private class TimerWaitCursor implements Runnable {
+		public void run() {
+
+			if (_shell == null || _shell.isDisposed()) {
+				return;
+			}
+
+			// check if the cursor still needs to display waiting state
+			if (_isShowWaitCursor) {
+				_canvas.setCursor(_cursorWait);
+			}
+		}
+	}
+
+	public FullSizeViewer() {}
 
 	public FullSizeViewer(final GalleryMT20 gallery, final AbstractGalleryMT20ItemRenderer itemRenderer) {
 
 		_gallery = gallery;
 
 		_itemRenderer = itemRenderer;
+
+		createActions();
+	}
+
+	void actionUpdatePrefStore() {
+
+		// get state from actions
+		final boolean isShowPreview = _actionShowThumbPreview.isChecked();
+		final boolean isShowLoadingMessage = _actionShowLoadingMessage.isChecked();
+		final boolean isShowHQImage = _actionShowHQImage.isChecked();
+
+		// set state into pref store
+		_prefStore.setValue(//
+				ITourbookPreferences.PHOTO_FULLSIZE_VIEWER_IS_SHOW_PREVIEW,
+				isShowPreview);
+
+		_prefStore.setValue(//
+				ITourbookPreferences.PHOTO_FULLSIZE_VIEWER_IS_SHOW_LOADING_MESSAGE,
+				isShowLoadingMessage);
+
+		_prefStore.setValue(//
+				ITourbookPreferences.PHOTO_FULLSIZE_VIEWER_IS_SHOW_HQ_IMAGE,
+				isShowHQImage);
+
+		setPrefSettings(isShowPreview, isShowLoadingMessage, isShowHQImage);
+
+		updateUI_Redraw();
 	}
 
 	void close() {
+
+		// prevent that an old image is displayed
+		_itemRenderer.resetPreviousImage();
 
 		if (_shell != null) {
 
@@ -92,10 +184,27 @@ public class FullSizeViewer {
 		}
 	}
 
-	private void createUI_Shell() {
+	private void createActions() {
 
-//		_shell = new Shell(SWT.NO_TRIM /* | SWT.ON_TOP */);
-		_shell = new Shell(SWT.NO_TRIM | SWT.ON_TOP);
+		_actionOpenFullsizePrefPage = new ActionOpenPrefDialog(
+				Messages.Action_Photo_OpenPrefPage_FullsizeViewer,
+				PrefPagePhotoFullsizeViewer.ID);
+
+		_actionShowThumbPreview = new ActionShowThumbPreview(this);
+		_actionShowLoadingMessage = new ActionShowLoadingMessage(this);
+		_actionShowHQImage = new ActionShowHQImage(this);
+	}
+
+	private void createUI() {
+
+//		_shell = new Shell(SWT.NO_TRIM | SWT.ON_TOP);
+		_shell = new Shell(SWT.NO_TRIM);
+
+		_shell.setForeground(_fgColor);
+//		_shell.setBackground(_bgColor);
+		_shell.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+
+		updateBounds();
 
 		_shell.setLayout(new FillLayout());
 
@@ -105,17 +214,10 @@ public class FullSizeViewer {
 		 */
 //		_canvas = new Canvas(_shell, SWT.DOUBLE_BUFFERED | SWT.NO_BACKGROUND);
 		_canvas = new Canvas(_shell, SWT.DOUBLE_BUFFERED);
-//		_canvas = new Canvas(_shell, SWT.NONE);
-
-//		_canvas = new Canvas(_shell, SWT.DOUBLE_BUFFERED | SWT.NO_BACKGROUND| SWT.NO_REDRAW_RESIZE| SWT.NO_MERGE_PAINTS);
-//		super(parent, style | SWT.NO_BACKGROUND);
-//		super(parent, style | SWT.NO_BACKGROUND | SWT.NO_REDRAW_RESIZE);
-//		super(parent, style | SWT.DOUBLE_BUFFERED | SWT.NO_BACKGROUND | SWT.NO_REDRAW_RESIZE);
-//		super(parent, style | SWT.NO_MERGE_PAINTS);
 
 		_canvas.setForeground(_fgColor);
-		_canvas.setBackground(_bgColor);
-//		_canvas.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+//		_canvas.setBackground(_bgColor);
+		_canvas.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
 
 		_canvas.addKeyListener(new KeyAdapter() {
 			@Override
@@ -159,17 +261,61 @@ public class FullSizeViewer {
 			}
 		});
 
-		_shell.open();
+		_canvas.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(final DisposeEvent e) {
+				onDispose();
+			}
+		});
 
-		updateBounds();
+		_canvas.setMenu(createUI_ContextMenu(_canvas));
 
-		_shell.setVisible(true);
+		_cursorHidden = UI.createHiddenCursor();
+		_cursorSizeAll = new Cursor(_shell.getDisplay(), SWT.CURSOR_SIZEALL);
+		_cursorWait = new Cursor(_shell.getDisplay(), SWT.CURSOR_WAIT);
+
 //		_shell.setFullScreen(true);
+		_shell.setVisible(true);
 		_shell.setActive();
+
+		_shell.open();
+	}
+
+	private Menu createUI_ContextMenu(final Composite parent) {
+
+		final MenuManager menuMgr = new MenuManager();
+
+		menuMgr.setRemoveAllWhenShown(true);
+
+		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
+			public void menuAboutToShow(final IMenuManager menuMgr) {
+				fillContextMenu(menuMgr);
+			}
+		});
+
+		return menuMgr.createContextMenu(parent);
+	}
+
+	private void fillContextMenu(final IMenuManager menuMgr) {
+
+		menuMgr.add(_actionShowHQImage);
+		menuMgr.add(_actionShowLoadingMessage);
+		menuMgr.add(_actionShowThumbPreview);
+
+		menuMgr.add(new Separator());
+		menuMgr.add(_actionOpenFullsizePrefPage);
 	}
 
 	public GalleryMT20Item getCurrentItem() {
 		return _galleryItem;
+	}
+
+	private void onDispose() {
+
+		_cursorHidden.dispose();
+		_cursorSizeAll.dispose();
+		_cursorWait.dispose();
 	}
 
 	private void onKeyPressed(final KeyEvent keyEvent) {
@@ -190,7 +336,7 @@ public class FullSizeViewer {
 			_zoomState = _zoomState == ZoomState.FIT_WINDOW ? ZoomState.ZOOMING : ZoomState.FIT_WINDOW;
 			_zoomFactor = 1.0;
 
-			updateUI();
+			updateUI_Redraw();
 
 			break;
 
@@ -212,13 +358,14 @@ public class FullSizeViewer {
 	}
 
 	private void onMouseDown(final MouseEvent mouseEvent) {
-		// TODO Auto-generated method stub
 
 	}
 
 	private void onMouseMove(final MouseEvent mouseEvent) {
-		// TODO Auto-generated method stub
 
+		_canvas.setCursor(_cursorSizeAll);
+
+		sleepCursor();
 	}
 
 	private void onMouseWheel(final MouseEvent mouseEvent) {
@@ -258,9 +405,19 @@ public class FullSizeViewer {
 			return;
 		}
 
+		if (_isShowHQImages) {
+			gc.setAntialias(SWT.ON);
+			gc.setInterpolation(SWT.LOW);
+		} else {
+			gc.setAntialias(SWT.OFF);
+			gc.setInterpolation(SWT.OFF);
+		}
+
 		if (_zoomFactor == 0.0) {
 			_zoomState = ZoomState.FIT_WINDOW;
 		}
+
+		final long start = System.currentTimeMillis();
 
 		final PaintingResult paintingResult = _itemRenderer.drawFullSize(
 				gc,
@@ -270,11 +427,37 @@ public class FullSizeViewer {
 				_zoomState,
 				_zoomFactor);
 
+		System.out.println("FSV onPaint\t" + (System.currentTimeMillis() - start) + " ms"); //$NON-NLS-1$ //$NON-NLS-2$
+//		 TODO remove SYSTEM.OUT.PRINTLN
+
 		if (paintingResult != null) {
 
 			// get zoomfactor when image is painted to fill window
 
 			_zoomFactor = paintingResult.imagePaintedZoomFactor;
+		}
+
+		final boolean isOriginalImagePainted = paintingResult.isOriginalImagePainted;
+
+		// hide cursor when image is finally painted or when loading error
+		if (isOriginalImagePainted || paintingResult.isLoadingError) {
+
+			_isShowWaitCursor = false;
+			_canvas.setCursor(_cursorHidden);
+
+		} else {
+
+			/*
+			 * schedule showing the waiting cursor, this is delayed because smaller images are
+			 * displayed very fast and showing the waiting cursor for a short time is flickering the
+			 * display
+			 */
+
+			_isShowWaitCursor = true;
+
+			// Calling timerExec with the same object just delays the
+			// execution (doesn't run twice)
+			_shell.getDisplay().timerExec(TIME_BEFORE_WAITING_CURSOR_IS_DISPLAYED, _timerWaitingCursor);
 		}
 	}
 
@@ -288,6 +471,14 @@ public class FullSizeViewer {
 			_zoomState = defaultZoom;
 		}
 
+		_actionShowThumbPreview.setChecked(_prefStore.getBoolean(//
+				ITourbookPreferences.PHOTO_FULLSIZE_VIEWER_IS_SHOW_PREVIEW));
+
+		_actionShowHQImage.setChecked(_prefStore.getBoolean(//
+				ITourbookPreferences.PHOTO_FULLSIZE_VIEWER_IS_SHOW_HQ_IMAGE));
+
+		_actionShowLoadingMessage.setChecked(_prefStore.getBoolean(//
+				ITourbookPreferences.PHOTO_FULLSIZE_VIEWER_IS_SHOW_LOADING_MESSAGE));
 	}
 
 	void saveState(final IDialogSettings state) {
@@ -297,11 +488,41 @@ public class FullSizeViewer {
 
 	void setColors(final Color fgColor, final Color bgColor) {
 		_fgColor = fgColor;
-		_bgColor = bgColor;
+//		_bgColor = bgColor;
 	}
 
 	void setItemRenderer(final AbstractGalleryMT20ItemRenderer itemRenderer) {
 		_itemRenderer = itemRenderer;
+	}
+
+	public void setPrefSettings(final boolean isUpdateUI) {
+
+		final boolean isShowPreview = _prefStore.getBoolean(ITourbookPreferences.PHOTO_FULLSIZE_VIEWER_IS_SHOW_PREVIEW);
+
+		final boolean isShowLoadingMessage = _prefStore.getBoolean(//
+				ITourbookPreferences.PHOTO_FULLSIZE_VIEWER_IS_SHOW_LOADING_MESSAGE);
+
+		final boolean isShowHQImage = _prefStore.getBoolean(//
+				ITourbookPreferences.PHOTO_FULLSIZE_VIEWER_IS_SHOW_HQ_IMAGE);
+
+		_actionShowThumbPreview.setChecked(isShowPreview);
+		_actionShowHQImage.setChecked(isShowHQImage);
+		_actionShowLoadingMessage.setChecked(isShowLoadingMessage);
+
+		setPrefSettings(isShowPreview, isShowLoadingMessage, isShowHQImage);
+
+		if (isUpdateUI) {
+			updateUI_Redraw();
+		}
+	}
+
+	private void setPrefSettings(	final boolean isShowPreview,
+									final boolean isShowLoadingMessage,
+									final boolean isShowHQImage) {
+
+		_itemRenderer.setPrefSettings(isShowPreview, isShowLoadingMessage);
+
+		_isShowHQImages = isShowHQImage;
 	}
 
 	void showImage(final GalleryMT20Item galleryItem) {
@@ -309,7 +530,7 @@ public class FullSizeViewer {
 		_galleryItem = galleryItem;
 
 		if (_shell == null || _shell.isDisposed()) {
-			createUI_Shell();
+			createUI();
 		}
 
 		_shell.setActive();
@@ -317,12 +538,23 @@ public class FullSizeViewer {
 		_canvas.redraw();
 	}
 
+	private void sleepCursor() {
+
+		// Calling timerExec with the same object just delays the
+		// execution (doesn't run twice)
+		_shell.getDisplay().timerExec(TIME_BEFORE_CURSOR_GETS_HIDDEN, _timerSleepCursor);
+
+	}
+
 	private void updateBounds() {
 
 		final Rectangle monitorBounds = Display.getDefault().getPrimaryMonitor().getBounds();
 
-		_monitorWidth = (int) (monitorBounds.width * 0.7);
-		_monitorHeight = (int) (monitorBounds.height * 0.7);
+		final double partialFullsize = 0.5;
+//		final double partialFullsize = 1;
+
+		_monitorWidth = (int) (monitorBounds.width * partialFullsize);
+		_monitorHeight = (int) (monitorBounds.height * partialFullsize);
 
 //		_shell.setBounds(monitorBounds);
 		_shell.setBounds(100, 10, _monitorWidth, _monitorHeight);
@@ -331,10 +563,10 @@ public class FullSizeViewer {
 	/**
 	 * Update canvas by starting a redraw
 	 */
-	public void updateUI() {
+	public void updateUI_Redraw() {
 
 		if (_shell == null) {
-			createUI_Shell();
+			createUI();
 		}
 
 		_canvas.redraw();
@@ -355,7 +587,7 @@ public class FullSizeViewer {
 			// ensure max zoom
 			_zoomFactor = Math.min(MAX_ZOOM, _zoomFactor);
 
-			updateUI();
+			updateUI_Redraw();
 		}
 	}
 
@@ -385,7 +617,7 @@ public class FullSizeViewer {
 			// ensure min zoom
 			_zoomFactor = Math.max(MIN_ZOOM, _zoomFactor);
 
-			updateUI();
+			updateUI_Redraw();
 		}
 	}
 

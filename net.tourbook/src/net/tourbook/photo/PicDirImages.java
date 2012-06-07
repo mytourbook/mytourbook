@@ -477,7 +477,7 @@ public class PicDirImages implements IItemHovereredListener {
 				return;
 			}
 
-			_display.syncExec(new Runnable() {
+			_display.asyncExec(new Runnable() {
 
 				public void run() {
 
@@ -485,7 +485,13 @@ public class PicDirImages implements IItemHovereredListener {
 						return;
 					}
 
-					_fullSizeViewer.updateUI();
+					// check again
+					if (_fullSizeViewer.getCurrentItem() != __galleryItem) {
+						// another gallery item is displayed
+						return;
+					}
+
+					_fullSizeViewer.updateUI_Redraw();
 				}
 			});
 		}
@@ -1089,9 +1095,10 @@ public class PicDirImages implements IItemHovereredListener {
 				}
 			});
 
-		} else if (property.equals(ITourbookPreferences.PHOTO_VIEWER_PREF_EVENT_IMAGE_VIEWER_UI_IS_MODIFIED)) {
+		} else if (property.equals(ITourbookPreferences.PHOTO_VIEWER_PREF_EVENT_IMAGE_VIEWER_UI_IS_MODIFIED)
+				|| property.equals(ITourbookPreferences.PHOTO_VIEWER_PREF_EVENT_FULLSIZE_VIEWER_IS_MODIFIED)) {
 
-			updateUI_FromPrefStore();
+			updateUI_FromPrefStore(true);
 
 			updateUI_AfterZoomInOut(_prevGalleryItemSize);
 
@@ -1884,7 +1891,7 @@ public class PicDirImages implements IItemHovereredListener {
 		}
 
 		// pref store settings
-		updateUI_FromPrefStore();
+		updateUI_FromPrefStore(false);
 
 		updateUI_ImageIndicatorTooltip();
 
@@ -1897,7 +1904,7 @@ public class PicDirImages implements IItemHovereredListener {
 		_pageBook.showPage(_gallery);
 
 		// show loading page until a folder is selected
-		_lblLoading.setText(Messages.Pic_Dir_Label_FolderIsNotSelected);
+		_lblLoading.setText(Messages.Pic_Dir_Label_FolderAreNotInitialized);
 		_pageBook.showPage(_pageLoading);
 
 		/**
@@ -2010,15 +2017,15 @@ public class PicDirImages implements IItemHovereredListener {
 		//
 		// MUST BE REMOVED, IS ONLY FOR TESTING
 		//
-//		disposeAndDeleteAllImages();
-//		PhotoLoadManager.removeInvalidImageFiles();
+		disposeAndDeleteAllImages();
+		PhotoLoadManager.removeInvalidImageFiles();
 		//
 		// MUST BE REMOVED, IS ONLY FOR TESTING
 		//
 		//////////////////////////////////////////
 
 		if (imageFolder == null) {
-			_lblLoading.setText(Messages.Pic_Dir_Label_FolderIsNotSelected);
+			_lblLoading.setText(Messages.Pic_Dir_Label_FolderAreNotInitialized);
 		} else {
 
 			_lblLoading.setText(NLS.bind(Messages.Pic_Dir_Label_Loading, imageFolder.getAbsolutePath()));
@@ -2052,7 +2059,7 @@ public class PicDirImages implements IItemHovereredListener {
 	void showRestoreFolder(final String restoreFolderName) {
 
 //		_lblLoading.setText(NLS.bind(Messages.Pic_Dir_Label_Loading, restoreFolderName));
-		_lblLoading.setText(NLS.bind(Messages.Pic_Dir_StatusLabel_InitialLoading, restoreFolderName));
+		_lblLoading.setText(NLS.bind(Messages.Pic_Dir_StatusLabel_RestoringFolder, restoreFolderName));
 		_pageBook.showPage(_pageLoading);
 	}
 
@@ -2274,7 +2281,7 @@ public class PicDirImages implements IItemHovereredListener {
 		}
 	}
 
-	private void updateUI_FromPrefStore() {
+	private void updateUI_FromPrefStore(final boolean isUpdateUI) {
 
 		/*
 		 * image quality
@@ -2290,14 +2297,13 @@ public class PicDirImages implements IItemHovereredListener {
 		/*
 		 * text minimum thumb size
 		 */
-		final int textMinThumbSize = _prefStore.getInt(ITourbookPreferences.PHOTO_VIEWER_TEXT_MIN_THUMB_SIZE);
-		_photoRenderer.setTextMinThumbSize(textMinThumbSize);
-
-		final int imageBorderSize = _prefStore.getInt(ITourbookPreferences.PHOTO_VIEWER_IMAGE_BORDER_SIZE);
-		_photoRenderer.setImageBorderSize(imageBorderSize);
+		_photoRenderer.setTextMinThumbSize(_prefStore.getInt(ITourbookPreferences.PHOTO_VIEWER_TEXT_MIN_THUMB_SIZE));
+		_photoRenderer.setImageBorderSize(_prefStore.getInt(ITourbookPreferences.PHOTO_VIEWER_IMAGE_BORDER_SIZE));
 
 		// get update border size
 		_photoBorderSize = _photoRenderer.getBorderSize();
+
+		_fullSizeViewer.setPrefSettings(isUpdateUI);
 	}
 
 	private void updateUI_GalleryInfo() {

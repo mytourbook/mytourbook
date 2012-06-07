@@ -6,6 +6,10 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.photo.messages";						//$NON-NLS-1$
 
+	public static String	Action_Photo_OpenPrefPage_FullsizeViewer;
+
+	public static String	Action_Photo_OpenPrefPage_Gallery;
+
 	public static String		App_JobName_PicDirImages_FilteringGalleryImages;
 	public static String		App_JobName_PicDirImages_UpdateUIWhenLoadingImages;
 	public static String		App_JobName_PicDirImages_UpdateUIWithFilteredGalleryImages;
@@ -85,7 +89,7 @@ public class Messages extends NLS {
 	public static String		Pic_Dir_Dialog_FolderIsNotAvailable_Title;
 	public static String		Pic_Dir_ImageSizeIndicator_Tooltip;
 	public static String		Pic_Dir_Label_ExternalApp;
-	public static String		Pic_Dir_Label_FolderIsNotSelected;
+	public static String		Pic_Dir_Label_FolderAreNotInitialized;
 	public static String		Pic_Dir_Label_Loading;
 	public static String		Pic_Dir_ProgressBar_Filter_Tooltip;
 	public static String		Pic_Dir_Spinner_ThumbnailSize_Tooltip;
@@ -93,25 +97,26 @@ public class Messages extends NLS {
 	public static String		Pic_Dir_Status_Loaded;
 	public static String		Pic_Dir_StatusLabel_1ImageIsHiddenByFilter;
 	public static String		Pic_Dir_StatusLabel_FilteringImages;
-	public static String		Pic_Dir_StatusLabel_InitialLoading;
-	public static String	Pic_Dir_StatusLabel_LoadingFailed;
-
-	public static String	Pic_Dir_StatusLabel_LoadingFullsize;
-
+	public static String		Pic_Dir_StatusLabel_LoadingFailed;
+	public static String		Pic_Dir_StatusLabel_LoadingFullsize;
 	public static String		Pic_Dir_StatusLabel_LoadingImages;
 	public static String		Pic_Dir_StatusLabel_LoadingImagesFilter;
-
-	public static String	Pic_Dir_StatusLabel_LoadingThumbExif;
+	public static String		Pic_Dir_StatusLabel_LoadingThumbExif;
 	public static String		Pic_Dir_StatusLabel_nImagesAreHiddenByFilter;
 	public static String		Pic_Dir_StatusLabel_NoImagesInFolder;
+
+	public static String	Pic_Dir_StatusLabel_RestoringFolder;
 	public static String		Pic_Dir_StatusLabel_SelectedImages;
 
 	public static String		PrefPage_Photo_Cache_Button_GetNumberOfImages;
 	public static String		PrefPage_Photo_Cache_Dialog_MaxHandle_CreatedImagesBeforeError;
 	public static String		PrefPage_Photo_Cache_Dialog_MaxHandle_NoError;
 	public static String		PrefPage_Photo_Cache_Dialog_MaxHandle_Title;
-	public static String		PrefPage_Photo_Cache_Group_ThumbnailCacheSize;
+	public static String		PrefPage_Photo_Cache_Group_OriginalImageCacheSize;
+	public static String		PrefPage_Photo_Cache_Group_ThumbnailCache;
 	public static String		PrefPage_Photo_Cache_Label_NumberOfImages;
+	public static String		PrefPage_Photo_Cache_Label_NumberOfOriginalImages;
+	public static String		PrefPage_Photo_Cache_Label_OriginalCacheSizeInfo;
 	public static String		PrefPage_Photo_Cache_Label_ThumbnailCacheSizeInfo;
 	public static String		PrefPage_Photo_ExtViewer_Group_ExternalApplication;
 	public static String		PrefPage_Photo_ExtViewer_Group_ImageQuality;
@@ -120,6 +125,12 @@ public class Messages extends NLS {
 	public static String		PrefPage_Photo_ExtViewer_Label_ExternalApplication2;
 	public static String		PrefPage_Photo_ExtViewer_Label_ExternalApplication3;
 	public static String		PrefPage_Photo_ExtViewer_Label_Info;
+	public static String		PrefPage_Photo_FullsizeViewer_Checkbox_HQImage;
+	public static String		PrefPage_Photo_FullsizeViewer_Checkbox_HQImage_Tooltip;
+	public static String		PrefPage_Photo_FullsizeViewer_Checkbox_Preview;
+	public static String		PrefPage_Photo_FullsizeViewer_Checkbox_Preview_Tooltip;
+	public static String		PrefPage_Photo_FullsizeViewer_Checkbox_ShowLoadingMessage;
+	public static String		PrefPage_Photo_FullsizeViewer_Checkbox_ShowLoadingMessage_Tooltip;
 	public static String		PrefPage_Photo_ThumbStore_Button_CleanupAll;
 	public static String		PrefPage_Photo_ThumbStore_Button_CleanupAll_Tooltip;
 	public static String		PrefPage_Photo_ThumbStore_Button_CleanupNow;

@@ -49,4 +49,9 @@ public abstract class AbstractGalleryMT20ItemRenderer {
 												double zoomFactor);
 
 	public abstract int getBorderSize();
+
+	public abstract void resetPreviousImage();
+
+	public abstract void setPrefSettings(boolean isShowFullsizePreview, boolean isShowLoadingMessage);
+
 }
