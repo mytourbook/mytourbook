@@ -477,7 +477,7 @@ public class PicDirImages implements IItemHovereredListener {
 				return;
 			}
 
-			_display.asyncExec(new Runnable() {
+			_display.syncExec(new Runnable() {
 
 				public void run() {
 

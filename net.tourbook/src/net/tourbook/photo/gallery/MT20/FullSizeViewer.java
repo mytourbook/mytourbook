@@ -84,7 +84,7 @@ public class FullSizeViewer {
 	private TimerWaitCursor					_timerWaitingCursor						= new TimerWaitCursor();
 	private TimerSleepCursor				_timerSleepCursor						= new TimerSleepCursor();
 
-	private boolean							_isShowHQImages;
+//	private boolean							_isShowHQImages;
 	private boolean							_isShowWaitCursor;
 
 	private ActionOpenPrefDialog			_actionOpenFullsizePrefPage;
@@ -405,14 +405,6 @@ public class FullSizeViewer {
 			return;
 		}
 
-		if (_isShowHQImages) {
-			gc.setAntialias(SWT.ON);
-			gc.setInterpolation(SWT.LOW);
-		} else {
-			gc.setAntialias(SWT.OFF);
-			gc.setInterpolation(SWT.OFF);
-		}
-
 		if (_zoomFactor == 0.0) {
 			_zoomState = ZoomState.FIT_WINDOW;
 		}
@@ -427,7 +419,7 @@ public class FullSizeViewer {
 				_zoomState,
 				_zoomFactor);
 
-		System.out.println("FSV onPaint\t" + (System.currentTimeMillis() - start) + " ms"); //$NON-NLS-1$ //$NON-NLS-2$
+		System.out.println("onPaint Fullsize\t" + (System.currentTimeMillis() - start) + " ms"); //$NON-NLS-1$ //$NON-NLS-2$
 //		 TODO remove SYSTEM.OUT.PRINTLN
 
 		if (paintingResult != null) {
@@ -520,22 +512,16 @@ public class FullSizeViewer {
 									final boolean isShowLoadingMessage,
 									final boolean isShowHQImage) {
 
-		_itemRenderer.setPrefSettings(isShowPreview, isShowLoadingMessage);
-
-		_isShowHQImages = isShowHQImage;
+		_itemRenderer.setPrefSettings(isShowPreview, isShowLoadingMessage, isShowHQImage);
 	}
 
 	void showImage(final GalleryMT20Item galleryItem) {
 
 		_galleryItem = galleryItem;
 
-		if (_shell == null || _shell.isDisposed()) {
-			createUI();
-		}
+		updateUI_Redraw();
 
 		_shell.setActive();
-
-		_canvas.redraw();
 	}
 
 	private void sleepCursor() {
@@ -550,8 +536,8 @@ public class FullSizeViewer {
 
 		final Rectangle monitorBounds = Display.getDefault().getPrimaryMonitor().getBounds();
 
-		final double partialFullsize = 0.5;
 //		final double partialFullsize = 1;
+		final double partialFullsize = 0.8;
 
 		_monitorWidth = (int) (monitorBounds.width * partialFullsize);
 		_monitorHeight = (int) (monitorBounds.height * partialFullsize);

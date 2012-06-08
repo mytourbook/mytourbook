@@ -191,6 +191,8 @@ public class PhotoImageCache {
 
 			photoImage = cacheWrapper.image;
 
+			final long start = System.currentTimeMillis();
+
 			/*
 			 * ensure image and metadata are set in the photo
 			 */

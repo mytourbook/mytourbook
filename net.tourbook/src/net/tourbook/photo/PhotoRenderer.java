@@ -133,6 +133,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	private int						_paintedDestWidth		= -1;
 	private int						_paintedDestHeight;
 
+	private boolean					_isShowFullsizeHQImage;
 	private boolean					_isShowFullsizePreview;
 	private boolean					_isShowFullsizeLoadingMessage;
 
@@ -550,11 +551,16 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 			isImageAvailable = true;
 		}
 
-		gc.setForeground(_fgColor);
-//		gc.setBackground(_bgColor);
-		gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+		if (_isShowFullsizeHQImage && isOriginalImageAvailable) {
+			gc.setAntialias(SWT.ON);
+			gc.setInterpolation(SWT.LOW);
+		} else {
+			gc.setAntialias(SWT.OFF);
+			gc.setInterpolation(SWT.OFF);
+		}
 
-		gc.fillRectangle(0, 0, canvasWidth, canvasHeight);
+		gc.setForeground(_fgColor);
+		gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
 
 		/*
 		 * paint image
@@ -679,7 +685,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 			drawLoadingIndicator(gc, photoWrapper, //
 					canvasWidth,
-					canvasHeight);
+					canvasHeight,
+					_loadCounter - 2);
 		}
 
 		if (isLoadOriginal) {
@@ -811,20 +818,18 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	private void drawLoadingIndicator(	final GC gc,
 										final PhotoWrapper photoWrapper,
 										final int imageCanvasWidth,
-										final int imageCanvasHeight) {
+										final int imageCanvasHeight,
+										final int counter) {
 
 		// create text
 		final StringBuilder sb = new StringBuilder();
-		for (int index = 0; index < _loadCounter - 2; index++) {
-//			sb.append('.');
-//			sb.append("\u25Ab");
-			sb.append("\u00b7");
+		for (int index = 0; index < counter - 2; index++) {
+			sb.append("\u00b7"); //$NON-NLS-1$
 		}
-		final String statusText = sb.toString();
 
-		gc.setBackground(_bgColor);
-		gc.setForeground(_fgColor);
-		gc.drawString(statusText, 3, imageCanvasHeight - _fontHeight - 5, false);
+//		gc.setForeground(_fgColor);
+		gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+		gc.drawString(sb.toString(), 0, imageCanvasHeight - _fontHeight - 0, true);
 	}
 
 	private void drawPhotoDateName(	final GC gc,
@@ -1108,9 +1113,13 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	}
 
 	@Override
-	public void setPrefSettings(final boolean isShowFullsizePreview, final boolean isShowLoadingMessage) {
+	public void setPrefSettings(final boolean isShowFullsizePreview,
+								final boolean isShowLoadingMessage,
+								final boolean isShowHQImage) {
+
 		_isShowFullsizePreview = isShowFullsizePreview;
 		_isShowFullsizeLoadingMessage = isShowLoadingMessage;
+		_isShowFullsizeHQImage = isShowHQImage;
 	}
 
 	/**

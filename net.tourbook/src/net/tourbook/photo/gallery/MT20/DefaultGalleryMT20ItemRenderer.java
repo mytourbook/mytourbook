@@ -57,6 +57,8 @@ public class DefaultGalleryMT20ItemRenderer extends AbstractGalleryMT20ItemRende
 	public void resetPreviousImage() {}
 
 	@Override
-	public void setPrefSettings(final boolean isShowFullsizePreview, final boolean isShowLoadingMessage) {}
+	public void setPrefSettings(final boolean isShowFullsizePreview,
+								final boolean isShowLoadingMessage,
+								final boolean isShowHQImage) {}
 
 }

@@ -52,6 +52,8 @@ public abstract class AbstractGalleryMT20ItemRenderer {
 
 	public abstract void resetPreviousImage();
 
-	public abstract void setPrefSettings(boolean isShowFullsizePreview, boolean isShowLoadingMessage);
+	public abstract void setPrefSettings(	boolean isShowFullsizePreview,
+											boolean isShowLoadingMessage,
+											boolean isShowHQImage);
 
 }

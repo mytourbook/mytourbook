@@ -454,14 +454,14 @@ public class PicDirView extends ViewPart {
 		tbm.add(_actionShowPhotoDate);
 		tbm.add(_actionShowPhotoTooltip);
 		tbm.add(_actionShowGPSAnnotation);
-		tbm.add(new Separator());
 
+		tbm.add(new Separator());
 		tbm.add(_actionImageFilterGPS);
 		tbm.add(_actionImageFilterNoGPS);
-		tbm.add(new Separator());
 
-		tbm.add(_actionSortByFileName);
+		tbm.add(new Separator());
 		tbm.add(_actionSortFileByDate);
+		tbm.add(_actionSortByFileName);
 
 		/*
 		 * fill view menu
