@@ -328,7 +328,7 @@ public class Photo {
 	 *         <pre>
 	 * 1  exif thumb image is available
 	 * 0  exif thumb image is not available
-	 * -1 exif thumb has not yet been retrieved
+	 * -1 exif thumb has not yet been loaded
 	 * </pre>
 	 */
 	public int getExifThumbImageState() {

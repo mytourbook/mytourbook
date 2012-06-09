@@ -491,7 +491,7 @@ public class PicDirImages implements IItemHovereredListener {
 						return;
 					}
 
-					_fullSizeViewer.updateUI_Redraw();
+					_fullSizeViewer.updateUI();
 				}
 			});
 		}
@@ -530,17 +530,6 @@ public class PicDirImages implements IItemHovereredListener {
 		jobUIFilter_10_Create();
 		jobUILoading_10_Create();
 	}
-
-//////// LOG ALL BINDINGS
-//
-//		final IWorkbench workbench = PlatformUI.getWorkbench();
-//		final IBindingService bindingService = (IBindingService) workbench.getAdapter(IBindingService.class);
-//
-//		System.out.println(bindingService.getActiveScheme());
-//
-//		for (final Binding binding : bindingService.getBindings()) {
-//			System.out.println(binding);
-//		}
 
 	void actionClearHistory() {
 
@@ -1669,17 +1658,6 @@ public class PicDirImages implements IItemHovereredListener {
 		createGalleryFont();
 
 		_photoRenderer.setFont(_galleryFont);
-
-		// reset cached text size in the photos
-//		final GalleryMT20Item[] galleryItems = _gallery.getGalleryItems();
-//		if (galleryItems != null) {
-//
-//// this is not yet implemented
-////			for (final GalleryMT20Item galleryItem : galleryItems) {
-////				final Photo photo = (Photo) galleryItem.data;
-////				photo.resetCachedFontSizes();
-////			}
-//		}
 	}
 
 	private void onSelectHistoryFolder(final String selectedFolder) {

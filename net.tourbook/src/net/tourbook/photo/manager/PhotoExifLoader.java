@@ -36,7 +36,7 @@ public class PhotoExifLoader {
 		 */
 		try {
 			while (waitingQueueThumb.size() > 0 || waitingQueueOriginal.size() > 0) {
-				Thread.sleep(50);
+				Thread.sleep(PhotoLoadManager.DELAY_TO_CHECK_WAITING_QUEUE);
 			}
 		} catch (final InterruptedException e) {
 			// should not happen, I hope so

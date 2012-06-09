@@ -16,10 +16,16 @@
 package net.tourbook.photo.gallery.MT20;
 
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Rectangle;
 
 public class DefaultGalleryMT20ItemRenderer extends AbstractGalleryMT20ItemRenderer {
 
 	public DefaultGalleryMT20ItemRenderer() {}
+
+	@Override
+	public Rectangle drawFullSizeSetContext(final GalleryMT20Item galleryItem, final int monitorWidth, final int monitorHeight) {
+		return null;
+	}
 
 	@Override
 	public void dispose() {

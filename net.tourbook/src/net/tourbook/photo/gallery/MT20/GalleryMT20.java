@@ -48,6 +48,7 @@ import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -66,8 +67,8 @@ public abstract class GalleryMT20 extends Canvas {
 	private static final int					GALLERY_ITEM_MIN_SIZE	= 10;
 
 	private boolean								_isVertical;
-	private boolean								_isMultiSelection;
 
+	private boolean								_isMultiSelection;
 	private boolean								_isGalleryMoved;
 
 	/**
@@ -117,10 +118,10 @@ public abstract class GalleryMT20 extends Canvas {
 	private int									_contentVirtualHeight	= 0;
 
 	private int									_prevViewportWidth;
+
 	private int									_prevViewportHeight;
 	private int									_prevContentHeight;
 	private int									_prevContentWidth;
-
 	private AbstractGalleryMT20ItemRenderer		_itemRenderer;
 
 	private final ListenerList					_hoveredListeners		= new ListenerList(ListenerList.IDENTITY);
@@ -133,8 +134,8 @@ public abstract class GalleryMT20 extends Canvas {
 	private Composite							_parent;
 
 	private ControlAdapter						_parentControlListener;
-	private int									_higherQualityDelay;
 
+	private int									_higherQualityDelay;
 	private RedrawTimer							_redrawTimer			= new RedrawTimer();
 
 	/**
@@ -172,12 +173,12 @@ public abstract class GalleryMT20 extends Canvas {
 	private double								_itemRatio				= 15.0 / 10;								//((4.0 / 3.0) + (15.0 / 10.0)) / 2;
 
 	private int									_itemWidth				= 80;
+
 	private int									_itemHeight				= (int) (_itemWidth / _itemRatio);
 	/**
 	 * @return Contains minimum gallery item width or <code>-1</code> when value is not set.
 	 */
 	private int									_minItemWidth			= -1;
-
 	/**
 	 * @return Contains maximum gallery item width or <code>-1</code> when value is not set.
 	 */
@@ -206,9 +207,9 @@ public abstract class GalleryMT20 extends Canvas {
 	private Point								_mousePanStartPosition;
 
 	private int									_lastZoomEventTime;
+
 	private boolean								_isMouseClickHandled;
 	private boolean								_isGalleryPanned;
-
 	/**
 	 * Vertical/horizontal offset for centered gallery items
 	 */
@@ -756,6 +757,56 @@ public abstract class GalleryMT20 extends Canvas {
 		return galleryItem;
 	}
 
+	/**
+	 * Get item virtual index at pixel position
+	 * 
+	 * @param coords
+	 * @return Returns gallery item index in {@link #_virtualGalleryItems} or <code> <0</code> when
+	 *         item is not available.
+	 */
+	public int getItemIndexFromPosition(final int viewPortX, final int viewPortY) {
+
+		if (_isVertical) {
+
+			if (_clientArea.contains(viewPortX, viewPortY) == false) {
+				// mouse is outside of the gallery
+				return -1;
+			}
+
+			final int contentPosX = viewPortX - _itemCenterOffsetX;
+			final int contentPosY = _galleryPosition + viewPortY;
+
+			final int indexX = contentPosX / _itemWidth;
+			final int indexY = contentPosY / _itemHeight;
+
+			// ckeck if mouse click is outside of the gallery horizontal items
+			if (indexX >= _gridHorizItems) {
+				return -1;
+			}
+
+			// ckeck if mouse click is outside of the gallery vertical items
+			if (indexY >= _gridVertItems) {
+				return -1;
+			}
+
+			final int itemIndex = indexY * _gridHorizItems + indexX;
+
+			// ensure array bounds
+			final int maxItems = _virtualGalleryItems.length;
+			if (itemIndex >= maxItems) {
+				return -1;
+			}
+
+			return itemIndex;
+
+		} else {
+
+			// is not yet implemented
+		}
+
+		return -1;
+	}
+
 //	private GalleryMT20Item getNextItem_OLD(final int keyCode) {
 //
 //		if (_lastSingleClick == null) {
@@ -816,56 +867,6 @@ public abstract class GalleryMT20 extends Canvas {
 //
 //		return null;
 //	}
-
-	/**
-	 * Get item virtual index at pixel position
-	 * 
-	 * @param coords
-	 * @return Returns gallery item index in {@link #_virtualGalleryItems} or <code> <0</code> when
-	 *         item is not available.
-	 */
-	public int getItemIndexFromPosition(final int viewPortX, final int viewPortY) {
-
-		if (_isVertical) {
-
-			if (_clientArea.contains(viewPortX, viewPortY) == false) {
-				// mouse is outside of the gallery
-				return -1;
-			}
-
-			final int contentPosX = viewPortX - _itemCenterOffsetX;
-			final int contentPosY = _galleryPosition + viewPortY;
-
-			final int indexX = contentPosX / _itemWidth;
-			final int indexY = contentPosY / _itemHeight;
-
-			// ckeck if mouse click is outside of the gallery horizontal items
-			if (indexX >= _gridHorizItems) {
-				return -1;
-			}
-
-			// ckeck if mouse click is outside of the gallery vertical items
-			if (indexY >= _gridVertItems) {
-				return -1;
-			}
-
-			final int itemIndex = indexY * _gridHorizItems + indexX;
-
-			// ensure array bounds
-			final int maxItems = _virtualGalleryItems.length;
-			if (itemIndex >= maxItems) {
-				return -1;
-			}
-
-			return itemIndex;
-
-		} else {
-
-			// is not yet implemented
-		}
-
-		return -1;
-	}
 
 	/**
 	 * @return Returns ratio with: width / height
@@ -2206,6 +2207,14 @@ public abstract class GalleryMT20 extends Canvas {
 		setBackground(bgColor);
 
 		_fullSizeViewer.setColors(fgColor, bgColor);
+	}
+
+	@Override
+	public void setFont(final Font font) {
+
+		_fullSizeViewer.setFont(font);
+
+		super.setFont(font);
 	}
 
 	/**
