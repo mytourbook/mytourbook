@@ -314,7 +314,7 @@ public class PhotoImageLoader {
 		 */
 		try {
 			while (waitingQueueOriginal.size() > 0) {
-				Thread.sleep(50);
+				Thread.sleep(PhotoLoadManager.DELAY_TO_CHECK_WAITING_QUEUE);
 			}
 		} catch (final InterruptedException e) {
 			// should not happen, I hope so
@@ -631,11 +631,11 @@ public class PhotoImageLoader {
 	/**
 	 * Image could not be loaded with {@link #loadImage()}, try to load high quality image.
 	 * 
-	 * @param smallImageWaitingQueue
+	 * @param thumbImageWaitingQueue
 	 *            waiting queue for small images
 	 * @param exifWaitingQueue
 	 */
-	public void loadImageHQ(final LinkedBlockingDeque<PhotoImageLoader> smallImageWaitingQueue,
+	public void loadImageHQ(final LinkedBlockingDeque<PhotoImageLoader> thumbImageWaitingQueue,
 							final LinkedBlockingDeque<PhotoExifLoader> exifWaitingQueue) {
 
 		if (isImageVisible() == false) {
@@ -647,8 +647,8 @@ public class PhotoImageLoader {
 		 * wait until exif data and small images are loaded
 		 */
 		try {
-			while (smallImageWaitingQueue.size() > 0 || exifWaitingQueue.size() > 0) {
-				Thread.sleep(50);
+			while (thumbImageWaitingQueue.size() > 0 || exifWaitingQueue.size() > 0) {
+				Thread.sleep(PhotoLoadManager.DELAY_TO_CHECK_WAITING_QUEUE);
 			}
 		} catch (final InterruptedException e) {
 			// should not happen, I hope so

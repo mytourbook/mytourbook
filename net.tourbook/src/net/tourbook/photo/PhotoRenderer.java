@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
+import java.text.NumberFormat;
+
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.photo.PicDirImages.LoadCallbackImage;
 import net.tourbook.photo.PicDirImages.LoadCallbackOriginalImage;
@@ -45,6 +47,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
+import org.imgscalr.Scalr.Rotation;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.DateTimeFormatterBuilder;
@@ -56,108 +59,108 @@ import org.joda.time.format.DateTimeFormatterBuilder;
  */
 public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
-	private static final String		PHOTO_ANNOTATION_GPS	= "PHOTO_ANNOTATION_GPS";	//$NON-NLS-1$
+	private static final String			PHOTO_ANNOTATION_GPS	= "PHOTO_ANNOTATION_GPS";								//$NON-NLS-1$
 
 	/**
 	 * this value has been evaluated by some test
 	 */
-	private int						_textMinThumbSize		= 50;
+	private int							_textMinThumbSize		= 50;
 
-	private int						_fontHeight				= -1;
+	private int							_fontHeight				= -1;
 
-	private Color					_fgColor;
-	private Color					_bgColor;
-	private Color					_selectionFgColor;
+	private Color						_fgColor;
+	private Color						_bgColor;
+	private Color						_selectionFgColor;
 
 //	private final DateTimeFormatter	_dtFormatter					= DateTimeFormat.forStyle("SM");
-	private final DateTimeFormatter	_dtFormatterDateTime	= new DateTimeFormatterBuilder()
-																	.appendYear(4, 4)
-																	.appendLiteral('-')
-																	.appendMonthOfYear(2)
-																	.appendLiteral('-')
-																	.appendDayOfMonth(2)
-																	.appendLiteral(' ')
-																	.appendHourOfDay(2)
-																	.appendLiteral(':')
-																	.appendMinuteOfHour(2)
-																	.appendLiteral(':')
-																	.appendSecondOfMinute(2)
-																	.toFormatter();
+	private final DateTimeFormatter		_dtFormatterDateTime	= new DateTimeFormatterBuilder()
+																		.appendYear(4, 4)
+																		.appendLiteral('-')
+																		.appendMonthOfYear(2)
+																		.appendLiteral('-')
+																		.appendDayOfMonth(2)
+																		.appendLiteral(' ')
+																		.appendHourOfDay(2)
+																		.appendLiteral(':')
+																		.appendMinuteOfHour(2)
+																		.appendLiteral(':')
+																		.appendSecondOfMinute(2)
+																		.toFormatter();
 
-	private final DateTimeFormatter	_dtFormatterTime		= new DateTimeFormatterBuilder()
-																	.appendHourOfDay(2)
-																	.appendLiteral(':')
-																	.appendMinuteOfHour(2)
-																	.appendLiteral(':')
-																	.appendSecondOfMinute(2)
-																	.toFormatter();
+	private final DateTimeFormatter		_dtFormatterTime		= new DateTimeFormatterBuilder()
+																		.appendHourOfDay(2)
+																		.appendLiteral(':')
+																		.appendMinuteOfHour(2)
+																		.appendLiteral(':')
+																		.appendSecondOfMinute(2)
+																		.toFormatter();
 
-	private final DateTimeFormatter	_dtFormatterDate		= new DateTimeFormatterBuilder()
-																	.appendYear(4, 4)
-																	.appendLiteral('-')
-																	.appendMonthOfYear(2)
-																	.appendLiteral('-')
-																	.appendDayOfMonth(2)
-																	.toFormatter();
+	private final DateTimeFormatter		_dtFormatterDate		= new DateTimeFormatterBuilder()
+																		.appendYear(4, 4)
+																		.appendLiteral('-')
+																		.appendMonthOfYear(2)
+																		.appendLiteral('-')
+																		.appendDayOfMonth(2)
+																		.toFormatter();
 
-	private boolean					_isShowPhotoName;
-	private boolean					_isShowAnnotations;
-	private boolean					_isShowDateInfo;
-	private PhotoDateInfo			_photoDateInfo;
+	private boolean						_isShowPhotoName;
+	private boolean						_isShowAnnotations;
+	private boolean						_isShowDateInfo;
+	private PhotoDateInfo				_photoDateInfo;
 
-	private GalleryMT20				_gallery;
-	private PicDirImages			_picDirImages;
+	private GalleryMT20					_gallery;
+	private PicDirImages				_picDirImages;
 
-	private int						_gridBorder				= 1;
-	private int						_imageBorder			= 5;
+	private int							_gridBorder				= 1;
+	private int							_imageBorder			= 5;
 
 	/**
 	 * photo dimension without grid border but including image border
 	 */
-	private int						_photoX;
-	private int						_photoY;
-	private int						_photoWidth;
-	private int						_photoHeight;
+	private int							_photoX;
+	private int							_photoY;
+	private int							_photoWidth;
+	private int							_photoHeight;
 
 	/*
 	 * position and size where the photo image is painted
 	 */
-	private int						_photoImageWidth;
-	private int						_photoImageHeight;
-	private int						_paintedDestX;
-	private int						_paintedDestY;
+	private int							_photoImageWidth;
+	private int							_photoImageHeight;
+	private int							_paintedDestX;
+	private int							_paintedDestY;
 
 	/**
 	 * Width for the painted image or <code>-1</code> when not initialized.
 	 */
-	private int						_paintedDestWidth		= -1;
-	private int						_paintedDestHeight;
+	private int							_paintedDestWidth		= -1;
+	private int							_paintedDestHeight;
 
-	private boolean					_isShowFullsizeHQImage;
-	private boolean					_isShowFullsizePreview;
-	private boolean					_isShowFullsizeLoadingMessage;
+	private boolean						_isShowFullsizeHQImage;
+	private boolean						_isShowFullsizePreview;
+	private boolean						_isShowFullsizeLoadingMessage;
 
-	private double					_imagePaintedZoomFactor;
+	private double						_imagePaintedZoomFactor;
 
-	private Image					_prevImage;
+	private int							_paintedImageWidth;
+	private int							_paintedImageHeight;
 
-	private int						_prevSrcX;
-	private int						_prevSrcY;
-	private int						_prevSrcWidth;
-	private int						_prevSrcHeight;
-	private int						_prevDestX;
-	private int						_prevDestY;
-	private int						_prevDestWidth;
-	private int						_prevDestHeight;
+	/*
+	 * full size context fields
+	 */
+	private Image						_fullsizePaintedImage;
+	private LoadCallbackOriginalImage	_fullsizeImageLoadCallback;
+	private boolean						_isFullsizeImageAvailable;
+	private boolean						_isFullsizeLoadingError;
 
-	private int						_paintedImageWidth;
-	private int						_paintedImageHeight;
+	/*
+	 * UI resources
+	 */
+	private Color						_fullsizeBgColor		= Display.getCurrent().getSystemColor(SWT.COLOR_BLACK);
 
-	private int						_loadCounter;
-
-	private static Image			_gpsImage;
-	private static int				_gpsImageWidth;
-	private static int				_gpsImageHeight;
+	private static Image				_gpsImage;
+	private static int					_gpsImageWidth;
+	private static int					_gpsImageHeight;
 
 	static {
 
@@ -170,6 +173,13 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		final Rectangle bounds = _gpsImage.getBounds();
 		_gpsImageWidth = bounds.width;
 		_gpsImageHeight = bounds.height;
+	}
+
+	private final NumberFormat			_nfMByte				= NumberFormat.getNumberInstance();
+	{
+		_nfMByte.setMinimumFractionDigits(3);
+		_nfMByte.setMaximumFractionDigits(3);
+		_nfMByte.setMinimumIntegerDigits(1);
 	}
 
 	public PhotoRenderer(final GalleryMT20 galleryMT20, final PicDirImages picDirImages) {
@@ -188,7 +198,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 		// init fontheight
 		if (_fontHeight == -1) {
-			_fontHeight = gc.getFontMetrics().getHeight() - 1;
+			_fontHeight = gc.getFontMetrics().getHeight();
 		}
 
 		boolean isDrawText = true;
@@ -302,8 +312,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 					itemImageWidth,
 					itemImageHeight,
 					isRequestedQuality,
-					isSelected,
-					false);
+					isSelected);
 
 			// debug box for the image area
 //			gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_RED));
@@ -321,7 +330,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 					requestedImageQuality,
 					isDrawText && _isShowPhotoName,
 					isSelected,
-					false);
+					false,
+					_bgColor);
 		}
 
 		// draw name & date & annotations
@@ -369,8 +379,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 							final int imageCanvasWidth,
 							final int imageCanvasHeight,
 							final boolean isRequestedQuality,
-							final boolean isSelected,
-							final boolean isFullsizeImage) {
+							final boolean isSelected) {
 
 		final Point bestSize = getBestSize(
 				photoWrapper.photo,
@@ -407,22 +416,11 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 				galleryItem.imagePaintedWidth = _paintedDestWidth;
 				galleryItem.imagePaintedHeight = _paintedDestHeight;
 
-				if (isFullsizeImage) {
-					_prevImage = photoImage;
-					_prevSrcX = 0;
-					_prevSrcY = 0;
-					_prevSrcWidth = _paintedImageWidth;
-					_prevSrcHeight = _paintedImageHeight;
-					_prevDestX = _paintedDestX;
-					_prevDestY = _paintedDestY;
-					_prevDestWidth = _paintedDestWidth;
-					_prevDestHeight = _paintedDestHeight;
-				}
-
 			} catch (final Exception e) {
 
-				// this bug is covered here: https://bugs.eclipse.org/bugs/show_bug.cgi?id=375845
-				e.printStackTrace();
+				System.out.println("SWT exception occured when painting valid image " //$NON-NLS-1$
+						+ photoWrapper.imageFilePathName
+						+ " it's potentially this bug: https://bugs.eclipse.org/bugs/show_bug.cgi?id=375845"); //$NON-NLS-1$
 			}
 
 			if (isSelected) {
@@ -480,78 +478,12 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 		final ImageQuality requestedImageQuality = ImageQuality.ORIGINAL;
 
-		boolean isThumbImage = false;
-		boolean isImageAvailable = false;
-		boolean isOriginalImageAvailable = false;
-
 		// painted image can have different sizes for 1 photo: original, HQ and thumb
-		Image paintedImage = null;
+		final Image paintedImage = _fullsizePaintedImage;
 
-		boolean isLoadOriginal = false;
+		final boolean isImageAvailable = paintedImage != null && paintedImage.isDisposed() == false;
 
-		// check if image has an loading error
-		final PhotoLoadingState photoLoadingState = photo.getLoadingState(requestedImageQuality);
-		final boolean isLoadingError = photoLoadingState == PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR;
-
-		if (isLoadingError == false) {
-
-			// image is not yet loaded
-
-			// check if image is in the cache
-			paintedImage = PhotoImageCache.getImageOriginal(photo);
-
-			isOriginalImageAvailable = paintedImage != null && paintedImage.isDisposed() == false;
-
-			if (isOriginalImageAvailable == false
-					&& photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
-
-				// the requested image is not available in the image cache -> image must be loaded
-
-				// delay loading after the image is painted
-				isLoadOriginal = true;
-
-				if (_isShowFullsizePreview) {
-
-					if (paintedImage == null || paintedImage.isDisposed()) {
-
-						// requested size is not available, try to get image with lower quality
-
-						isThumbImage = true;
-
-						paintedImage = PhotoImageCache.getImage(photo, ImageQuality.HQ);
-					}
-
-					if (paintedImage == null || paintedImage.isDisposed()) {
-
-						// requested size is not available, try to get image with lower quality
-
-						isThumbImage = true;
-
-						paintedImage = PhotoImageCache.getImage(photo, ImageQuality.THUMB);
-					}
-				}
-			}
-		}
-
-		isImageAvailable = paintedImage != null && paintedImage.isDisposed() == false;
-
-		/*
-		 * Linux draws always a background, even when it should not, try to draw the previous image
-		 */
-		boolean isPrevImage = false;
-
-		if (isImageAvailable == false
-				&& _prevImage != null
-				&& _prevImage.isDisposed() == false
-				&& isLoadingError == false) {
-
-			// display previous image
-
-			isPrevImage = true;
-			isImageAvailable = true;
-		}
-
-		if (_isShowFullsizeHQImage && isOriginalImageAvailable) {
+		if (_isShowFullsizeHQImage && _isFullsizeImageAvailable) {
 			gc.setAntialias(SWT.ON);
 			gc.setInterpolation(SWT.LOW);
 		} else {
@@ -560,50 +492,12 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		}
 
 		gc.setForeground(_fgColor);
-		gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+		gc.setBackground(_fullsizeBgColor);
 
 		/*
 		 * paint image
 		 */
-		if (isPrevImage) {
-
-			/*
-			 * The preview image is painted because when a redraw() is done, the background is
-			 * filled with the background color because SWT.NO_BACKGROUND is NOT set because this
-			 * causes other problems.
-			 */
-
-			try {
-				//an exception can occure because the image could be disposed before it is drawn
-				final Rectangle imageBounds = _prevImage.getBounds();
-				final int prevImageWidth = imageBounds.width;
-				final int prevImageHeight = imageBounds.height;
-
-				// ensure src size, this case happened
-				if (_prevSrcWidth > prevImageWidth || _prevSrcHeight > prevImageHeight) {
-					_prevSrcWidth = prevImageWidth;
-					_prevSrcHeight = prevImageHeight;
-				}
-			} catch (final Exception e1) {
-				StatusUtil.log(e1);
-			}
-
-			try {
-				gc.drawImage(_prevImage, //
-						_prevSrcX,
-						_prevSrcY,
-						_prevSrcWidth,
-						_prevSrcHeight,
-						//
-						_prevDestX,
-						_prevDestY,
-						_prevDestWidth,
-						_prevDestHeight);
-			} catch (final Exception e) {
-				// image could be disposed
-			}
-
-		} else if (isImageAvailable) {
+		if (isImageAvailable) {
 
 			//an exception can occure because the image could be disposed before it is drawn
 			try {
@@ -635,9 +529,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 						0,
 						canvasWidth,
 						canvasHeight,
-						isOriginalImageAvailable,
-						false,
-						true);
+						_isFullsizeImageAvailable,
+						false);
 
 				setPaintedZoomFactor(_photoImageWidth, _photoImageHeight, _paintedDestWidth, _paintedDestHeight);
 
@@ -648,61 +541,40 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 						canvasHeight,
 						zoomState,
 						zoomFactor,
-						isOriginalImageAvailable);
+						_isFullsizeImageAvailable);
 			}
-		}
-
-		if (isOriginalImageAvailable) {
-			_loadCounter = 0;
-		} else {
-			_loadCounter++;
 		}
 
 		/*
 		 * draw status message
 		 */
-		if (isThumbImage || isPrevImage || isLoadingError) {
-
-			// image is not available or thumb image is displayed
-
-			final double textPosition = 0.95;
+		if (_isShowFullsizeLoadingMessage && _isFullsizeImageAvailable == false || _isFullsizeLoadingError) {
 
 			drawStatusText(gc, photoWrapper, //
-					0,
-					(int) (canvasHeight * textPosition), // y pos
-					canvasWidth,
-					(int) (canvasHeight * (1 - textPosition)), // height
+					0, // 								x
+					canvasHeight - _fontHeight - 1, //	y
+					canvasWidth, // 					width
+					_fontHeight + 1, // 				height
 					requestedImageQuality,
 					false,
 					false,
-					true);
+					true,
+					_fullsizeBgColor);
 		}
 
-		/*
-		 * draw loading indicator
-		 */
-		if (_loadCounter > 2 && _isShowFullsizeLoadingMessage == false) {
+		// load fullsize image delayed, after the UI is updated
+		if (_fullsizeImageLoadCallback != null) {
 
-			drawLoadingIndicator(gc, photoWrapper, //
-					canvasWidth,
-					canvasHeight,
-					_loadCounter - 2);
-		}
+			PhotoLoadManager.putImageInLoadingQueueOriginal(galleryItem, photo, _fullsizeImageLoadCallback);
 
-		if (isLoadOriginal) {
-
-			final LoadCallbackOriginalImage imageLoadCallback = _picDirImages.new LoadCallbackOriginalImage(
-					galleryItem,
-					photo);
-
-			PhotoLoadManager.putImageInLoadingQueueOriginal(galleryItem, photo, imageLoadCallback);
+			_fullsizeImageLoadCallback = null;
 		}
 
 		final PaintingResult paintingResult = new PaintingResult();
 
 		paintingResult.imagePaintedZoomFactor = _imagePaintedZoomFactor;
-		paintingResult.isOriginalImagePainted = isOriginalImageAvailable;
-		paintingResult.isLoadingError = isLoadingError;
+		paintingResult.isOriginalImagePainted = _isFullsizeImageAvailable;
+		paintingResult.isLoadingError = _isFullsizeLoadingError;
 
 		return paintingResult;
 	}
@@ -766,16 +638,6 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 						destWidth,
 						destHeight);
 
-				_prevImage = photoImage;
-				_prevSrcX = srcX;
-				_prevSrcY = srcY;
-				_prevSrcWidth = srcWidth;
-				_prevSrcHeight = srcHeight;
-				_prevDestX = srcX;
-				_prevDestY = srcY;
-				_prevDestWidth = srcWidth;
-				_prevDestHeight = srcHeight;
-
 			} catch (final Exception e) {
 				// this bug is covered here: https://bugs.eclipse.org/bugs/show_bug.cgi?id=375845
 			}
@@ -815,21 +677,99 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 	}
 
-	private void drawLoadingIndicator(	final GC gc,
-										final PhotoWrapper photoWrapper,
-										final int imageCanvasWidth,
-										final int imageCanvasHeight,
-										final int counter) {
+	@Override
+	public Rectangle drawFullSizeSetContext(final GalleryMT20Item galleryItem,
+											final int monitorWidth,
+											final int monitorHeight) {
 
-		// create text
-		final StringBuilder sb = new StringBuilder();
-		for (int index = 0; index < counter - 2; index++) {
-			sb.append("\u00b7"); //$NON-NLS-1$
+		final PhotoWrapper photoWrapper = (PhotoWrapper) galleryItem.customData;
+		if (photoWrapper == null) {
+			return null;
 		}
 
-//		gc.setForeground(_fgColor);
-		gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
-		gc.drawString(sb.toString(), 0, imageCanvasHeight - _fontHeight - 0, true);
+		final Photo photo = photoWrapper.photo;
+
+		final ImageQuality requestedImageQuality = ImageQuality.ORIGINAL;
+
+		_isFullsizeImageAvailable = false;
+
+		// painted image can have different sizes for 1 photo: original, HQ and thumb
+
+		// check if image has an loading error
+		final PhotoLoadingState photoLoadingState = photo.getLoadingState(requestedImageQuality);
+
+		_fullsizePaintedImage = null;
+		_fullsizeImageLoadCallback = null;
+
+		_isFullsizeLoadingError = photoLoadingState == PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR;
+
+		if (_isFullsizeLoadingError == false) {
+
+			// image is not yet loaded
+
+			// check if fullsize image is in the cache
+			_fullsizePaintedImage = PhotoImageCache.getImageOriginal(photo);
+
+			_isFullsizeImageAvailable = _fullsizePaintedImage != null && _fullsizePaintedImage.isDisposed() == false;
+
+			if (_isFullsizeImageAvailable == false
+					&& photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
+
+				/*
+				 * the requested image is not available in the image cache -> image must be loaded
+				 * but is delayed that the status text is immediatedly be displayed, it
+				 */
+				_fullsizeImageLoadCallback = _picDirImages.new LoadCallbackOriginalImage(galleryItem, photo);
+
+				/*
+				 * get thumb image
+				 */
+				if (_isShowFullsizePreview) {
+
+					// original size is not available, try to get image with lower quality
+
+					_fullsizePaintedImage = PhotoImageCache.getImage(photo, ImageQuality.HQ);
+
+					if (_fullsizePaintedImage == null || _fullsizePaintedImage.isDisposed()) {
+
+						// requested size is not available, try to get image with lower quality
+
+						_fullsizePaintedImage = PhotoImageCache.getImage(photo, ImageQuality.THUMB);
+					}
+				}
+			}
+		}
+
+		if (_isFullsizeImageAvailable
+				|| (_fullsizePaintedImage != null && _fullsizePaintedImage.isDisposed() == false)
+				|| _isFullsizeLoadingError) {
+
+			// paint image, original or thumb
+
+			return new Rectangle(0, 0, monitorWidth, monitorHeight);
+
+		} else if (_isShowFullsizeLoadingMessage) {
+
+			// paint status text
+
+			final int statusHeight = _fontHeight + 1;
+			return new Rectangle(0, monitorHeight - statusHeight, monitorWidth, statusHeight);
+		}
+
+		if (_fullsizeImageLoadCallback != null) {
+
+			/*
+			 * an image loading is done at the end of the paint event, but a redraw is not fired
+			 * when reaching this point -> load image now
+			 */
+
+			PhotoLoadManager.putImageInLoadingQueueOriginal(galleryItem, photo, _fullsizeImageLoadCallback);
+
+			_fullsizeImageLoadCallback = null;
+		}
+
+		// paint nothing
+		return null;
 	}
 
 	private void drawPhotoDateName(	final GC gc,
@@ -941,6 +881,19 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		}
 	}
 
+	/**
+	 * @param gc
+	 * @param photoWrapper
+	 * @param photoPosX
+	 * @param photoPosY
+	 * @param imageCanvasWidth
+	 * @param imageCanvasHeight
+	 * @param requestedImageQuality
+	 * @param isImageNameDisplayed
+	 * @param isSelected
+	 * @param isFullsizeImage
+	 * @param bgColor
+	 */
 	private void drawStatusText(final GC gc,
 								final PhotoWrapper photoWrapper,
 								final int photoPosX,
@@ -950,7 +903,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 								final ImageQuality requestedImageQuality,
 								final boolean isImageNameDisplayed,
 								final boolean isSelected,
-								final boolean isFullsizeImage) {
+								final boolean isFullsizeImage,
+								final Color bgColor) {
 
 		final Photo photo = photoWrapper.photo;
 
@@ -978,15 +932,68 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 			final int exifThumbImageState = photo.getExifThumbImageState();
 			metaData = photo.getImageMetaDataRaw();
 
-			if (metaData == null || exifThumbImageState == -1) {
+			if (isFullsizeImage) {
 
-				// {0} loading thumb and exif...
-				statusText = NLS.bind(Messages.Pic_Dir_StatusLabel_LoadingThumbExif, photoImageFileName);
+				if (metaData == null) {
+
+					statusText = NLS.bind(Messages.Pic_Dir_StatusLabel_LoadingFullsizeNoMeta, photoImageFileName);
+
+				} else {
+
+					final int imageWidth = photo.getImageWidth();
+					final boolean isImageLoaded = imageWidth != Integer.MIN_VALUE;
+
+					/*
+					 * dimension
+					 */
+					String textDimension = UI.EMPTY_STRING;
+					if (isImageLoaded) {
+						textDimension = imageWidth + " x " + photo.getImageHeight(); //$NON-NLS-1$
+					}
+
+					/*
+					 * size
+					 */
+					final String textSize = _nfMByte.format(photoWrapper.imageFileSize / 1024.0 / 1024.0) + " " //$NON-NLS-1$
+							+ de.byteholder.geoclipse.map.UI.MBYTES;
+
+					/*
+					 * orientation
+					 */
+					String textOrientation = UI.EMPTY_STRING;
+					final int orientation = photo.getOrientation();
+					if (orientation > 1) {
+						// see here http://www.impulseadventure.com/photo/exif-orientation.html
+
+						if (orientation == 8) {
+							textOrientation = Rotation.CW_270.toString();
+						} else if (orientation == 3) {
+							textOrientation = Rotation.CW_180.toString();
+						} else if (orientation == 6) {
+							textOrientation = Rotation.CW_90.toString();
+						}
+					}
+
+					statusText = NLS.bind(Messages.Pic_Dir_StatusLabel_LoadingFullsizeMeta, new Object[] {
+							photoImageFileName,
+							textDimension,
+							textSize,
+							textOrientation });
+				}
 
 			} else {
 
-				// {0} loading fullsize...
-				statusText = NLS.bind(Messages.Pic_Dir_StatusLabel_LoadingFullsize, photoImageFileName);
+				if (metaData == null || exifThumbImageState == -1) {
+
+					// {0} loading thumb and exif...
+
+					statusText = NLS.bind(Messages.Pic_Dir_StatusLabel_LoadingThumbExif, photoImageFileName);
+
+				} else {
+
+					// {0} loading fullsize...
+					statusText = NLS.bind(Messages.Pic_Dir_StatusLabel_LoadingFullsize, photoImageFileName);
+				}
 			}
 		}
 
@@ -1007,7 +1014,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 			}
 		}
 
-		gc.setBackground(_bgColor);
+		gc.setBackground(bgColor);
 
 		gc.drawString(statusText, photoPosX + textOffsetX, photoPosY + textOffsetY, false);
 
@@ -1078,7 +1085,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	@Override
 	public void resetPreviousImage() {
 
-		_prevImage = null;
+		_fullsizePaintedImage = null;
 	}
 
 	public void setColors(final Color fgColor, final Color bgColor, final Color selectionFgColor) {

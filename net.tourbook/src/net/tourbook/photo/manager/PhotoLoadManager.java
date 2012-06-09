@@ -36,8 +36,10 @@ public class PhotoLoadManager {
 
 	private static final IPreferenceStore						_prefStore;
 
-	public static final int										IMAGE_SIZE_THUMBNAIL		= 160;
-	public static final int										IMAGE_SIZE_LARGE_DEFAULT	= 600;
+	public static final int										IMAGE_SIZE_THUMBNAIL			= 160;
+	public static final int										IMAGE_SIZE_LARGE_DEFAULT		= 600;
+
+	public static final long									DELAY_TO_CHECK_WAITING_QUEUE	= 100;
 
 //	/**
 //	 * Default image ratio between image width/height. It is the average between 4000x3000 (1.3333)
@@ -72,19 +74,19 @@ public class PhotoLoadManager {
 	private static ThreadPoolExecutor							_executorHQ;
 	private static ThreadPoolExecutor							_executorOriginal;
 
-	private static final LinkedBlockingDeque<PhotoExifLoader>	_waitingQueueExif			= new LinkedBlockingDeque<PhotoExifLoader>();
-	private static final LinkedBlockingDeque<PhotoImageLoader>	_waitingQueueThumb			= new LinkedBlockingDeque<PhotoImageLoader>();
-	private static final LinkedBlockingDeque<PhotoImageLoader>	_waitingQueueHQ				= new LinkedBlockingDeque<PhotoImageLoader>();
-	private static final LinkedBlockingDeque<PhotoImageLoader>	_waitingQueueOriginal		= new LinkedBlockingDeque<PhotoImageLoader>();
+	private static final LinkedBlockingDeque<PhotoExifLoader>	_waitingQueueExif				= new LinkedBlockingDeque<PhotoExifLoader>();
+	private static final LinkedBlockingDeque<PhotoImageLoader>	_waitingQueueThumb				= new LinkedBlockingDeque<PhotoImageLoader>();
+	private static final LinkedBlockingDeque<PhotoImageLoader>	_waitingQueueHQ					= new LinkedBlockingDeque<PhotoImageLoader>();
+	private static final LinkedBlockingDeque<PhotoImageLoader>	_waitingQueueOriginal			= new LinkedBlockingDeque<PhotoImageLoader>();
 
 	/*
 	 * key is the photo image file path
 	 */
-	private static final ConcurrentHashMap<String, Object>		_photoWithLoadingError		= new ConcurrentHashMap<String, Object>();
-	private static final ConcurrentHashMap<String, Object>		_photoWithThumbSaveError	= new ConcurrentHashMap<String, Object>();
+	private static final ConcurrentHashMap<String, Object>		_photoWithLoadingError			= new ConcurrentHashMap<String, Object>();
+	private static final ConcurrentHashMap<String, Object>		_photoWithThumbSaveError		= new ConcurrentHashMap<String, Object>();
 
-	public static final String									IMAGE_FRAMEWORK_SWT			= "SWT";										//$NON-NLS-1$
-	public static final String									IMAGE_FRAMEWORK_AWT			= "AWT";										//$NON-NLS-1$
+	public static final String									IMAGE_FRAMEWORK_SWT				= "SWT";										//$NON-NLS-1$
+	public static final String									IMAGE_FRAMEWORK_AWT				= "AWT";										//$NON-NLS-1$
 
 	private static String										_imageFramework;
 	private static int											_hqImageSize;

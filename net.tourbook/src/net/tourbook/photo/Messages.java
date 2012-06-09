@@ -6,9 +6,8 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.photo.messages";						//$NON-NLS-1$
 
-	public static String	Action_Photo_OpenPrefPage_FullsizeViewer;
-
-	public static String	Action_Photo_OpenPrefPage_Gallery;
+	public static String		Action_Photo_OpenPrefPage_FullsizeViewer;
+	public static String		Action_Photo_OpenPrefPage_Gallery;
 
 	public static String		App_JobName_PicDirImages_FilteringGalleryImages;
 	public static String		App_JobName_PicDirImages_UpdateUIWhenLoadingImages;
@@ -99,13 +98,16 @@ public class Messages extends NLS {
 	public static String		Pic_Dir_StatusLabel_FilteringImages;
 	public static String		Pic_Dir_StatusLabel_LoadingFailed;
 	public static String		Pic_Dir_StatusLabel_LoadingFullsize;
+
+	public static String	Pic_Dir_StatusLabel_LoadingFullsizeMeta;
+
+	public static String	Pic_Dir_StatusLabel_LoadingFullsizeNoMeta;
 	public static String		Pic_Dir_StatusLabel_LoadingImages;
 	public static String		Pic_Dir_StatusLabel_LoadingImagesFilter;
 	public static String		Pic_Dir_StatusLabel_LoadingThumbExif;
 	public static String		Pic_Dir_StatusLabel_nImagesAreHiddenByFilter;
 	public static String		Pic_Dir_StatusLabel_NoImagesInFolder;
-
-	public static String	Pic_Dir_StatusLabel_RestoringFolder;
+	public static String		Pic_Dir_StatusLabel_RestoringFolder;
 	public static String		Pic_Dir_StatusLabel_SelectedImages;
 
 	public static String		PrefPage_Photo_Cache_Button_GetNumberOfImages;

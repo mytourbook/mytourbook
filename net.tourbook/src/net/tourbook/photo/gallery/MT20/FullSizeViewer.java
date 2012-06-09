@@ -42,6 +42,7 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
@@ -54,8 +55,7 @@ import org.eclipse.swt.widgets.Shell;
 public class FullSizeViewer {
 
 	private static final int				TIME_BEFORE_CURSOR_GETS_HIDDEN			= 2000;
-//	private static final int				TIME_BEFORE_HQ_PAINTING					= 100;
-	private static final int				TIME_BEFORE_WAITING_CURSOR_IS_DISPLAYED	= 100;
+	private static final int				TIME_BEFORE_WAITING_CURSOR_IS_DISPLAYED	= 200;
 
 	private static final String				STATE_FULL_SIZE_VIEWER_ZOOM_STATE		= "STATE_FULL_SIZE_VIEWER_ZOOM_STATE";	//$NON-NLS-1$
 
@@ -84,8 +84,8 @@ public class FullSizeViewer {
 	private TimerWaitCursor					_timerWaitingCursor						= new TimerWaitCursor();
 	private TimerSleepCursor				_timerSleepCursor						= new TimerSleepCursor();
 
-//	private boolean							_isShowHQImages;
 	private boolean							_isShowWaitCursor;
+	private boolean							_isShowLoadingMessage;
 
 	private ActionOpenPrefDialog			_actionOpenFullsizePrefPage;
 	private ActionShowThumbPreview			_actionShowThumbPreview;
@@ -107,6 +107,7 @@ public class FullSizeViewer {
 	private Cursor							_cursorWait;
 	private Cursor							_cursorHidden;
 	private Cursor							_cursorSizeAll;
+	private Font							_font;
 
 	private class TimerSleepCursor implements Runnable {
 		public void run() {
@@ -166,7 +167,7 @@ public class FullSizeViewer {
 
 		setPrefSettings(isShowPreview, isShowLoadingMessage, isShowHQImage);
 
-		updateUI_Redraw();
+		updateUI();
 	}
 
 	void close() {
@@ -218,6 +219,8 @@ public class FullSizeViewer {
 		_canvas.setForeground(_fgColor);
 //		_canvas.setBackground(_bgColor);
 		_canvas.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+
+		_canvas.setFont(_font);
 
 		_canvas.addKeyListener(new KeyAdapter() {
 			@Override
@@ -311,6 +314,25 @@ public class FullSizeViewer {
 		return _galleryItem;
 	}
 
+	private boolean isViewerInitialized() {
+
+		if (_zoomFactor == 0.0) {
+			_zoomState = ZoomState.FIT_WINDOW;
+		}
+
+		if (_monitorWidth == 0) {
+			// ui is not initialized
+			return false;
+		}
+
+		if (_galleryItem == null) {
+			// can happen after close event (it did)
+			return false;
+		}
+
+		return true;
+	}
+
 	private void onDispose() {
 
 		_cursorHidden.dispose();
@@ -336,7 +358,7 @@ public class FullSizeViewer {
 			_zoomState = _zoomState == ZoomState.FIT_WINDOW ? ZoomState.ZOOMING : ZoomState.FIT_WINDOW;
 			_zoomFactor = 1.0;
 
-			updateUI_Redraw();
+			updateUI();
 
 			break;
 
@@ -395,18 +417,8 @@ public class FullSizeViewer {
 
 	private void onPaint(final GC gc) {
 
-		if (_monitorWidth == 0) {
-			// ui is not initialized
+		if (isViewerInitialized() == false) {
 			return;
-		}
-
-		if (_galleryItem == null) {
-			// can happen after close event (it did)
-			return;
-		}
-
-		if (_zoomFactor == 0.0) {
-			_zoomState = ZoomState.FIT_WINDOW;
 		}
 
 		final long start = System.currentTimeMillis();
@@ -419,8 +431,7 @@ public class FullSizeViewer {
 				_zoomState,
 				_zoomFactor);
 
-		System.out.println("onPaint Fullsize\t" + (System.currentTimeMillis() - start) + " ms"); //$NON-NLS-1$ //$NON-NLS-2$
-//		 TODO remove SYSTEM.OUT.PRINTLN
+		System.out.println(UI.timeStamp() + "draw fullsize image " + (System.currentTimeMillis() - start) + " ms"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		if (paintingResult != null) {
 
@@ -437,19 +448,11 @@ public class FullSizeViewer {
 			_isShowWaitCursor = false;
 			_canvas.setCursor(_cursorHidden);
 
-		} else {
+		} else if (_isShowLoadingMessage == false) {
 
-			/*
-			 * schedule showing the waiting cursor, this is delayed because smaller images are
-			 * displayed very fast and showing the waiting cursor for a short time is flickering the
-			 * display
-			 */
+			// do not show waiting cursor when loading message is displayed
 
-			_isShowWaitCursor = true;
-
-			// Calling timerExec with the same object just delays the
-			// execution (doesn't run twice)
-			_shell.getDisplay().timerExec(TIME_BEFORE_WAITING_CURSOR_IS_DISPLAYED, _timerWaitingCursor);
+			showWaitingCursor();
 		}
 	}
 
@@ -483,6 +486,15 @@ public class FullSizeViewer {
 //		_bgColor = bgColor;
 	}
 
+	void setFont(final Font font) {
+
+		_font = font;
+
+		if (_canvas != null && _canvas.isDisposed() == false) {
+			_canvas.setFont(font);
+		}
+	}
+
 	void setItemRenderer(final AbstractGalleryMT20ItemRenderer itemRenderer) {
 		_itemRenderer = itemRenderer;
 	}
@@ -504,13 +516,15 @@ public class FullSizeViewer {
 		setPrefSettings(isShowPreview, isShowLoadingMessage, isShowHQImage);
 
 		if (isUpdateUI) {
-			updateUI_Redraw();
+			updateUI();
 		}
 	}
 
 	private void setPrefSettings(	final boolean isShowPreview,
 									final boolean isShowLoadingMessage,
 									final boolean isShowHQImage) {
+
+		_isShowLoadingMessage = isShowLoadingMessage;
 
 		_itemRenderer.setPrefSettings(isShowPreview, isShowLoadingMessage, isShowHQImage);
 	}
@@ -519,9 +533,24 @@ public class FullSizeViewer {
 
 		_galleryItem = galleryItem;
 
-		updateUI_Redraw();
+		if (updateUI() == false) {
+			return;
+		}
 
 		_shell.setActive();
+	}
+
+	/**
+	 * Schedule showing the waiting cursor, this is delayed because smaller images are displayed
+	 * very fast and showing the waiting cursor for a short time is flickering the display.
+	 */
+	private void showWaitingCursor() {
+
+		_isShowWaitCursor = true;
+
+		// Calling timerExec with the same object just delays the
+		// execution (doesn't run twice)
+		_shell.getDisplay().timerExec(TIME_BEFORE_WAITING_CURSOR_IS_DISPLAYED, _timerWaitingCursor);
 	}
 
 	private void sleepCursor() {
@@ -536,26 +565,60 @@ public class FullSizeViewer {
 
 		final Rectangle monitorBounds = Display.getDefault().getPrimaryMonitor().getBounds();
 
-//		final double partialFullsize = 1;
-		final double partialFullsize = 0.8;
+		final double partialFullsize = 1;
+//		final double partialFullsize = 0.8;
 
 		_monitorWidth = (int) (monitorBounds.width * partialFullsize);
 		_monitorHeight = (int) (monitorBounds.height * partialFullsize);
 
-//		_shell.setBounds(monitorBounds);
-		_shell.setBounds(100, 10, _monitorWidth, _monitorHeight);
+		_shell.setBounds(monitorBounds);
+//		_shell.setBounds(100, 10, _monitorWidth, _monitorHeight);
 	}
 
 	/**
 	 * Update canvas by starting a redraw
+	 * 
+	 * @return
 	 */
-	public void updateUI_Redraw() {
+	public boolean updateUI() {
 
 		if (_shell == null) {
 			createUI();
 		}
 
-		_canvas.redraw();
+		if (isViewerInitialized() == false) {
+			return false;
+		}
+
+		/*
+		 * painting is complicated because Linux is ignoring the SWT.NO_BACKGROUND style in the
+		 * canvas, therefore when doing a redraw() the whole canvas is first painted with the
+		 * background color
+		 */
+		final Rectangle clippingArea = _itemRenderer.drawFullSizeSetContext(//
+				_galleryItem,
+				_monitorWidth,
+				_monitorHeight);
+
+		if (clippingArea != null) {
+
+			// redraw canvas
+
+			_canvas.redraw(clippingArea.x, clippingArea.y, clippingArea.width, clippingArea.height, false);
+
+		} else {
+
+			// canvas is not painted
+
+			if (_isShowLoadingMessage == false) {
+
+				// do not show waiting cursor when loading message is displayed
+
+				showWaitingCursor();
+			}
+		}
+
+		return true;
 	}
 
 	private void zoomIn(final boolean isShift) {
@@ -573,7 +636,7 @@ public class FullSizeViewer {
 			// ensure max zoom
 			_zoomFactor = Math.min(MAX_ZOOM, _zoomFactor);
 
-			updateUI_Redraw();
+			updateUI();
 		}
 	}
 
@@ -603,7 +666,7 @@ public class FullSizeViewer {
 			// ensure min zoom
 			_zoomFactor = Math.max(MIN_ZOOM, _zoomFactor);
 
-			updateUI_Redraw();
+			updateUI();
 		}
 	}
 

@@ -16,8 +16,18 @@
 package net.tourbook.photo.gallery.MT20;
 
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Rectangle;
 
 public abstract class AbstractGalleryMT20ItemRenderer {
+
+	/**
+	 * @param galleryItem
+	 * @param monitorWidth
+	 * @param monitorHeight
+	 * @return Returns a rectangle which should be redrawn or <code>null</code> when nothing should
+	 *         be redrawn.
+	 */
+	public abstract Rectangle drawFullSizeSetContext(GalleryMT20Item galleryItem, int monitorWidth, int monitorHeight);
 
 	public void dispose() {}
 
