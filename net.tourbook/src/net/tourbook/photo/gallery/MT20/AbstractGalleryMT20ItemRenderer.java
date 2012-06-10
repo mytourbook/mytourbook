@@ -17,17 +17,9 @@ package net.tourbook.photo.gallery.MT20;
 
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Shell;
 
 public abstract class AbstractGalleryMT20ItemRenderer {
-
-	/**
-	 * @param galleryItem
-	 * @param monitorWidth
-	 * @param monitorHeight
-	 * @return Returns a rectangle which should be redrawn or <code>null</code> when nothing should
-	 *         be redrawn.
-	 */
-	public abstract Rectangle drawFullSizeSetContext(GalleryMT20Item galleryItem, int monitorWidth, int monitorHeight);
 
 	public void dispose() {}
 
@@ -57,6 +49,19 @@ public abstract class AbstractGalleryMT20ItemRenderer {
 												int monitorHeight,
 												ZoomState zoomState,
 												double zoomFactor);
+
+	/**
+	 * @param shell
+	 * @param galleryItem
+	 * @param monitorWidth
+	 * @param monitorHeight
+	 * @return Returns a rectangle which should be redrawn or <code>null</code> when nothing should
+	 *         be redrawn.
+	 */
+	public abstract Rectangle drawFullSizeSetContext(	Shell shell,
+														GalleryMT20Item galleryItem,
+														int monitorWidth,
+														int monitorHeight);
 
 	public abstract int getBorderSize();
 

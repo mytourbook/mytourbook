@@ -17,15 +17,11 @@ package net.tourbook.photo.gallery.MT20;
 
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Shell;
 
 public class DefaultGalleryMT20ItemRenderer extends AbstractGalleryMT20ItemRenderer {
 
 	public DefaultGalleryMT20ItemRenderer() {}
-
-	@Override
-	public Rectangle drawFullSizeSetContext(final GalleryMT20Item galleryItem, final int monitorWidth, final int monitorHeight) {
-		return null;
-	}
 
 	@Override
 	public void dispose() {
@@ -51,6 +47,14 @@ public class DefaultGalleryMT20ItemRenderer extends AbstractGalleryMT20ItemRende
 										final ZoomState zoomState,
 										final double zoomFactor) {
 
+		return null;
+	}
+
+	@Override
+	public Rectangle drawFullSizeSetContext(final Shell shell,
+											final GalleryMT20Item galleryItem,
+											final int monitorWidth,
+											final int monitorHeight) {
 		return null;
 	}
 

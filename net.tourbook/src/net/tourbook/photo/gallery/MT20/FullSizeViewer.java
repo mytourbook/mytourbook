@@ -44,6 +44,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Canvas;
@@ -54,13 +55,13 @@ import org.eclipse.swt.widgets.Shell;
 
 public class FullSizeViewer {
 
-	private static final int				TIME_BEFORE_CURSOR_GETS_HIDDEN			= 2000;
+	private static final int				TIME_BEFORE_CURSOR_GETS_HIDDEN			= 500;
 	private static final int				TIME_BEFORE_WAITING_CURSOR_IS_DISPLAYED	= 200;
 
 	private static final String				STATE_FULL_SIZE_VIEWER_ZOOM_STATE		= "STATE_FULL_SIZE_VIEWER_ZOOM_STATE";	//$NON-NLS-1$
 
-	private static double					MIN_ZOOM								= 1.0 / 50;
-	private static double					MAX_ZOOM								= 50;
+//	private static double					MIN_ZOOM								= 1.0 / 50;
+//	private static double					MAX_ZOOM								= 50;
 
 	private final IPreferenceStore			_prefStore								= TourbookPlugin
 																							.getDefault()
@@ -101,12 +102,14 @@ public class FullSizeViewer {
 	/*
 	 * UI controls
 	 */
+	private Image[]							_shellImage;
 	private Shell							_shell;
 	private Canvas							_canvas;
 
 	private Cursor							_cursorWait;
 	private Cursor							_cursorHidden;
-	private Cursor							_cursorSizeAll;
+	private Cursor							_cursorNotImplemented;
+
 	private Font							_font;
 
 	private class TimerSleepCursor implements Runnable {
@@ -209,6 +212,12 @@ public class FullSizeViewer {
 
 		_shell.setLayout(new FillLayout());
 
+		_shellImage = new Image[] { //
+//				TourbookPlugin.getImageDescriptor(Messages.Image__PhotoFullsizeShellImage16).createImage(),
+		TourbookPlugin.getImageDescriptor(Messages.Image__PhotoFullsizeShellImage128).createImage() //
+		};
+		_shell.setImages(_shellImage);
+
 		/*
 		 * SWT.NO_BACKGROUND can cause that other content which is drawn in another window can be
 		 * displayed, e.g the gallery content was painted at the top of the canvas
@@ -273,11 +282,15 @@ public class FullSizeViewer {
 
 		_canvas.setMenu(createUI_ContextMenu(_canvas));
 
+		final Image cursorImage = TourbookPlugin.getImageDescriptor(Messages.Image__CursorNotImplemented).createImage();
+		_cursorNotImplemented = new Cursor(_shell.getDisplay(), cursorImage.getImageData(), 0, 0);
+
+		cursorImage.dispose();
+
 		_cursorHidden = UI.createHiddenCursor();
-		_cursorSizeAll = new Cursor(_shell.getDisplay(), SWT.CURSOR_SIZEALL);
 		_cursorWait = new Cursor(_shell.getDisplay(), SWT.CURSOR_WAIT);
 
-//		_shell.setFullScreen(true);
+		_shell.setFullScreen(true);
 		_shell.setVisible(true);
 		_shell.setActive();
 
@@ -336,47 +349,77 @@ public class FullSizeViewer {
 	private void onDispose() {
 
 		_cursorHidden.dispose();
-		_cursorSizeAll.dispose();
 		_cursorWait.dispose();
+		_cursorNotImplemented.dispose();
+
+		for (final Image image : _shellImage) {
+			image.dispose();
+		}
 	}
 
 	private void onKeyPressed(final KeyEvent keyEvent) {
 
-		switch (keyEvent.keyCode) {
+		final int keyCode = keyEvent.keyCode;
+//		final boolean isShift = (keyEvent.stateMask & SWT.MOD2) != 0;
+
+		switch (keyCode) {
 		case SWT.ESC:
 			close();
 			break;
-		}
 
-		final boolean isShift = (keyEvent.stateMask & SWT.MOD2) != 0;
+		case SWT.ARROW_LEFT:
+		case SWT.ARROW_UP:
+
+			_gallery.navigateItem(-1);
+
+			break;
+
+		case SWT.ARROW_DOWN:
+		case SWT.ARROW_RIGHT:
+
+			_gallery.navigateItem(1);
+
+			break;
+
+		case SWT.HOME:
+
+			_gallery.navigateItem(Integer.MIN_VALUE);
+			break;
+
+		case SWT.END:
+
+			_gallery.navigateItem(Integer.MAX_VALUE);
+			break;
+		}
 
 		switch (keyEvent.character) {
-		case '1':
-
-			// toggle full size and fit window
-
-			_zoomState = _zoomState == ZoomState.FIT_WINDOW ? ZoomState.ZOOMING : ZoomState.FIT_WINDOW;
-			_zoomFactor = 1.0;
-
-			updateUI();
-
-			break;
-
-		case '+':
-
-			// zoom IN
-
-			zoomIn(isShift);
-			break;
-
-		case '-':
-
-			// zoom OUT
-
-			zoomOut(isShift);
-			break;
+//		case '1':
+//
+//			// toggle full size and fit window
+//
+//			_zoomState = _zoomState == ZoomState.FIT_WINDOW ? ZoomState.ZOOMING : ZoomState.FIT_WINDOW;
+//			_zoomFactor = 1.0;
+//
+//			updateUI();
+//
+//			break;
+//
+//		case '+':
+//
+//			// zoom IN
+//
+//			zoomIn(isShift);
+//			break;
+//
+//		case '-':
+//
+//			// zoom OUT
+//
+//			zoomOut(isShift);
+//			break;
 
 		}
+
 	}
 
 	private void onMouseDown(final MouseEvent mouseEvent) {
@@ -385,7 +428,7 @@ public class FullSizeViewer {
 
 	private void onMouseMove(final MouseEvent mouseEvent) {
 
-		_canvas.setCursor(_cursorSizeAll);
+		_canvas.setCursor(_cursorNotImplemented);
 
 		sleepCursor();
 	}
@@ -395,23 +438,23 @@ public class FullSizeViewer {
 		final boolean isDown = mouseEvent.count > 0;
 
 		final boolean isCtrl = (mouseEvent.stateMask & SWT.MOD1) != 0;
-		final boolean isShift = (mouseEvent.stateMask & SWT.MOD2) != 0;
+//		final boolean isShift = (mouseEvent.stateMask & SWT.MOD2) != 0;
 
 		if (isCtrl) {
 
 			// zoom image
 
-			if (isDown) {
-				zoomIn(isShift);
-			} else {
-				zoomOut(isShift);
-			}
+//			if (isDown) {
+//				zoomIn(isShift);
+//			} else {
+//				zoomOut(isShift);
+//			}
 
 		} else {
 
 			// select next/previous image
 
-			_gallery.selectItem(isDown ? -1 : 1);
+			_gallery.navigateItem(isDown ? -1 : 1);
 		}
 	}
 
@@ -596,6 +639,7 @@ public class FullSizeViewer {
 		 * background color
 		 */
 		final Rectangle clippingArea = _itemRenderer.drawFullSizeSetContext(//
+				_shell,
 				_galleryItem,
 				_monitorWidth,
 				_monitorHeight);
@@ -621,53 +665,53 @@ public class FullSizeViewer {
 		return true;
 	}
 
-	private void zoomIn(final boolean isShift) {
-
-		if (_zoomFactor < MAX_ZOOM) {
-
-			final int accelerator = isShift ? 5 : 1;
-
-			_zoomState = ZoomState.ZOOMING;
-
-			_zoomFactor = _zoomFactor < 1//
-					? _zoomFactor + (0.02 * accelerator)
-					: _zoomFactor + (1 * accelerator);
-
-			// ensure max zoom
-			_zoomFactor = Math.min(MAX_ZOOM, _zoomFactor);
-
-			updateUI();
-		}
-	}
-
-	private void zoomOut(final boolean isShift) {
-
-		if (_zoomFactor > MIN_ZOOM) {
-
-			final int accelerator = isShift ? 5 : 1;
-
-			_zoomState = ZoomState.ZOOMING;
-
-			if (_zoomFactor > 1) {
-
-				final double zoomFactor = _zoomFactor - (1 * accelerator);
-
-				// check if threshold 1 has changed
-				if (zoomFactor > 1) {
-					_zoomFactor = zoomFactor;
-				} else {
-					_zoomFactor = 1;
-				}
-
-			} else {
-				_zoomFactor = _zoomFactor - (0.02 * accelerator);
-			}
-
-			// ensure min zoom
-			_zoomFactor = Math.max(MIN_ZOOM, _zoomFactor);
-
-			updateUI();
-		}
-	}
+//	private void zoomIn(final boolean isShift) {
+//
+//		if (_zoomFactor < MAX_ZOOM) {
+//
+//			final int accelerator = isShift ? 5 : 1;
+//
+//			_zoomState = ZoomState.ZOOMING;
+//
+//			_zoomFactor = _zoomFactor < 1//
+//					? _zoomFactor + (0.02 * accelerator)
+//					: _zoomFactor + (1 * accelerator);
+//
+//			// ensure max zoom
+//			_zoomFactor = Math.min(MAX_ZOOM, _zoomFactor);
+//
+//			updateUI();
+//		}
+//	}
+//
+//	private void zoomOut(final boolean isShift) {
+//
+//		if (_zoomFactor > MIN_ZOOM) {
+//
+//			final int accelerator = isShift ? 5 : 1;
+//
+//			_zoomState = ZoomState.ZOOMING;
+//
+//			if (_zoomFactor > 1) {
+//
+//				final double zoomFactor = _zoomFactor - (1 * accelerator);
+//
+//				// check if threshold 1 has changed
+//				if (zoomFactor > 1) {
+//					_zoomFactor = zoomFactor;
+//				} else {
+//					_zoomFactor = 1;
+//				}
+//
+//			} else {
+//				_zoomFactor = _zoomFactor - (0.02 * accelerator);
+//			}
+//
+//			// ensure min zoom
+//			_zoomFactor = Math.max(MIN_ZOOM, _zoomFactor);
+//
+//			updateUI();
+//		}
+//	}
 
 }

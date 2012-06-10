@@ -9,6 +9,8 @@ public class Messages extends NLS {
 	public static String		Action_Photo_OpenPrefPage_FullsizeViewer;
 	public static String		Action_Photo_OpenPrefPage_Gallery;
 
+	public static String	App__PhotoShell_Title;
+
 	public static String		App_JobName_PicDirImages_FilteringGalleryImages;
 	public static String		App_JobName_PicDirImages_UpdateUIWhenLoadingImages;
 	public static String		App_JobName_PicDirImages_UpdateUIWithFilteredGalleryImages;
@@ -33,6 +35,8 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_Photo_OtherTags;
 	public static String		ColumnFactory_Photo_Time;
 
+	public static String	Image__CursorNotImplemented;
+
 	public static String		Image__PhotoAnnotationGPS;
 	public static String		Image__PhotoAnnotationGPSAction;
 	public static String		Image__PhotoFilterGPS;
@@ -40,6 +44,11 @@ public class Messages extends NLS {
 	public static String		Image__PhotoFilterNoGPS;
 	public static String		Image__PhotoFolderGallery;
 	public static String		Image__PhotoFolderGallery_OnlyPhotos;
+
+	public static String	Image__PhotoFullsizeShellImage128;
+
+	public static String	Image__PhotoFullsizeShellImage16;
+
 	public static String		Image__PhotoInfoDate;
 	public static String		Image__PhotoInfoName;
 	public static String		Image__PhotoSortByDate;

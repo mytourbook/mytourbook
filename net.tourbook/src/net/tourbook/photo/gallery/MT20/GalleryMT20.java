@@ -1047,6 +1047,93 @@ public abstract class GalleryMT20 extends Canvas {
 	}
 
 	/**
+	 * Navigate items for the full size viewer.
+	 * 
+	 * @param numberOfItems
+	 */
+	void navigateItem(final int numberOfItems) {
+
+		final int virtualSize = _virtualGalleryItems.length;
+
+		if (virtualSize < 2) {
+			// there is nothing to navigate
+			return;
+		}
+
+		boolean isNavigate = false;
+
+		if (_lastSelectedItemIndex >= virtualSize) {
+
+			// it's possible that the gallery content has changed
+
+			_lastSelectedItemIndex = 0;
+
+			isNavigate = true;
+		}
+
+		final int oldIndex = _lastSelectedItemIndex;
+
+		if (numberOfItems < 0) {
+
+			// previous item
+
+			if (numberOfItems == Integer.MIN_VALUE) {
+
+				// 1st item
+
+				navigateItem_10(0);
+
+			} else if (_lastSelectedItemIndex > 0) {
+
+				// 2nd ... nth item
+
+				navigateItem_10(_lastSelectedItemIndex - 1);
+
+			} else if (_lastSelectedItemIndex == 0) {
+
+				// 1st item
+
+				navigateItem_10(_lastSelectedItemIndex);
+			}
+
+		} else {
+
+			// next item
+
+			if (numberOfItems == Integer.MAX_VALUE) {
+
+				// last item
+
+				navigateItem_10(virtualSize - 1);
+
+			} else if (_lastSelectedItemIndex < virtualSize - 1) {
+
+				navigateItem_10(_lastSelectedItemIndex + 1);
+
+			} else if (_lastSelectedItemIndex == virtualSize - 1) {
+
+				// last item
+
+				navigateItem_10(_lastSelectedItemIndex);
+			}
+		}
+
+		if (isNavigate || oldIndex != _lastSelectedItemIndex) {
+
+			// index has changed
+
+			showFullsizeImage(_lastSelectedItemIndex);
+		}
+	}
+
+	private void navigateItem_10(final int itemIndex) {
+
+		deselectAll(false);
+
+		selectionAdd(itemIndex);
+	}
+
+	/**
 	 * Send a selection event {@link SWT#Selection} or {@link SWT#DefaultSelection} for a gallery
 	 * item.
 	 * <p>
@@ -1944,79 +2031,6 @@ public abstract class GalleryMT20 extends Canvas {
 		final GalleryMT20Item item = getInitializedItem(itemIndex);
 
 		_selectedItems.remove(item.uniqueItemID);
-	}
-
-	/**
-	 * Navigate full size viewer
-	 * 
-	 * @param numberOfItems
-	 */
-	void selectItem(final int numberOfItems) {
-
-		final int virtualSize = _virtualGalleryItems.length;
-
-		if (virtualSize < 2) {
-			// there is nothing to navigate
-			return;
-		}
-
-		boolean isNavigate = false;
-
-		if (_lastSelectedItemIndex >= virtualSize) {
-
-			// it's possible that the gallery content has changed
-
-			_lastSelectedItemIndex = 0;
-
-			isNavigate = true;
-		}
-
-		final int oldIndex = _lastSelectedItemIndex;
-
-		if (numberOfItems < 0) {
-
-			// previous item
-
-			if (_lastSelectedItemIndex > 0) {
-
-				// 2nd ... nth item
-
-				selectItem_10(_lastSelectedItemIndex - 1);
-
-			} else if (_lastSelectedItemIndex == 0) {
-
-				// 1st item
-
-				selectItem_10(_lastSelectedItemIndex);
-			}
-		} else {
-
-			// next item
-
-			if (_lastSelectedItemIndex < virtualSize - 1) {
-
-				selectItem_10(_lastSelectedItemIndex + 1);
-
-			} else if (_lastSelectedItemIndex == virtualSize - 1) {
-
-				// last item
-
-				selectItem_10(_lastSelectedItemIndex);
-			}
-		}
-
-		if (isNavigate || oldIndex != _lastSelectedItemIndex) {
-			// index has changed
-			showFullsizeImage(_lastSelectedItemIndex);
-		}
-
-	}
-
-	private void selectItem_10(final int itemIndex) {
-
-		deselectAll(false);
-
-		selectionAdd(itemIndex);
 	}
 
 	private boolean selectItem_Next(final boolean isMultiSelection) {

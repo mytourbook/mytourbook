@@ -47,8 +47,10 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.imgscalr.Scalr.Rotation;
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.DateTimeFormatterBuilder;
 
@@ -153,6 +155,15 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	private boolean						_isFullsizeImageAvailable;
 	private boolean						_isFullsizeLoadingError;
 
+	private final DateTimeFormatter		_dtFormatter			= DateTimeFormat.forStyle("ML");						//$NON-NLS-1$
+	private final DateTimeFormatter		_dtWeekday				= DateTimeFormat.forPattern("E");						//$NON-NLS-1$
+	private final NumberFormat			_nfMByte				= NumberFormat.getNumberInstance();
+	{
+		_nfMByte.setMinimumFractionDigits(3);
+		_nfMByte.setMaximumFractionDigits(3);
+		_nfMByte.setMinimumIntegerDigits(1);
+	}
+
 	/*
 	 * UI resources
 	 */
@@ -173,13 +184,6 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		final Rectangle bounds = _gpsImage.getBounds();
 		_gpsImageWidth = bounds.width;
 		_gpsImageHeight = bounds.height;
-	}
-
-	private final NumberFormat			_nfMByte				= NumberFormat.getNumberInstance();
-	{
-		_nfMByte.setMinimumFractionDigits(3);
-		_nfMByte.setMaximumFractionDigits(3);
-		_nfMByte.setMinimumIntegerDigits(1);
 	}
 
 	public PhotoRenderer(final GalleryMT20 galleryMT20, final PicDirImages picDirImages) {
@@ -678,7 +682,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	}
 
 	@Override
-	public Rectangle drawFullSizeSetContext(final GalleryMT20Item galleryItem,
+	public Rectangle drawFullSizeSetContext(final Shell shell,
+											final GalleryMT20Item galleryItem,
 											final int monitorWidth,
 											final int monitorHeight) {
 
@@ -686,6 +691,9 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		if (photoWrapper == null) {
 			return null;
 		}
+
+		// show image file name in the shell
+		shell.setText(NLS.bind(Messages.App__PhotoShell_Title, photoWrapper.imageFileName));
 
 		final Photo photo = photoWrapper.photo;
 
@@ -958,6 +966,15 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 							+ de.byteholder.geoclipse.map.UI.MBYTES;
 
 					/*
+					 * date/time
+					 */
+					final DateTime dateTime = photoWrapper.photo.getOriginalDateTime();
+					String textDateTime = UI.EMPTY_STRING;
+					if (dateTime != null) {
+						textDateTime = _dtWeekday.print(dateTime) + "  " + _dtFormatter.print(dateTime); //$NON-NLS-1$
+					}
+
+					/*
 					 * orientation
 					 */
 					String textOrientation = UI.EMPTY_STRING;
@@ -978,6 +995,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 							photoImageFileName,
 							textDimension,
 							textSize,
+							textDateTime,
 							textOrientation });
 				}
 

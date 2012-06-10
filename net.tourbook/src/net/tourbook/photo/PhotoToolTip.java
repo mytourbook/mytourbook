@@ -74,7 +74,7 @@ public class PhotoToolTip extends ToolTip {
 	private int						_imagePaintedWidth	= 0;
 	private int						_imagePaintedHeight	= 0;
 
-	private int						_galleryImageSize;
+	private int						_galleryImageSize	= 120;
 
 	private int						_defaultTextWidthPixel;
 

@@ -1995,8 +1995,8 @@ public class PicDirImages implements IItemHovereredListener {
 		//
 		// MUST BE REMOVED, IS ONLY FOR TESTING
 		//
-		disposeAndDeleteAllImages();
-		PhotoLoadManager.removeInvalidImageFiles();
+//		disposeAndDeleteAllImages();
+//		PhotoLoadManager.removeInvalidImageFiles();
 		//
 		// MUST BE REMOVED, IS ONLY FOR TESTING
 		//
