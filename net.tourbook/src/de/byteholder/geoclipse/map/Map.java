@@ -1949,11 +1949,11 @@ public class Map extends Canvas {
 			}
 		}
 
-		System.out.println("paintMap() "
-				+ ((int) (((System.nanoTime() - start) / 1000000)) + " ms\t")
-				+ ((int) (1000f / ((System.nanoTime() - start) / 1000000)) + " fps") //
-		);
-		// TODO remove SYSTEM.OUT.PRINTLN
+//		System.out.println("paintMap() "
+//				+ ((int) (((System.nanoTime() - start) / 1000000)) + " ms\t")
+//				+ ((int) (1000f / ((System.nanoTime() - start) / 1000000)) + " fps") //
+//		);
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		redraw();
 

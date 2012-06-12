@@ -781,9 +781,7 @@ public class TourPainter extends MapPainter {
 		}
 
 		final MP mp = map.getMapProvider();
-		final int zoomLevel = map.getZoom();
 		final int tileSize = mp.getTileSize();
-		final int devPartOffset = ((parts - 1) / 2) * tileSize;
 
 		// get world viewport for the current tile
 		final int tileWorldPixelX = tile.getX() * tileSize;
@@ -796,6 +794,9 @@ public class TourPainter extends MapPainter {
 		final boolean isPhotoInTile = isPhotoInTile(photoSize, devXPhoto, devYPhoto, tileSize);
 
 		if (isPhotoInTile) {
+
+//			final int zoomLevel = map.getZoom();
+			final int devPartOffset = ((parts - 1) / 2) * tileSize;
 
 			final Image image = getMapImage(photo);
 
@@ -1656,24 +1657,15 @@ public class TourPainter extends MapPainter {
 					continue;
 				}
 
-				final int imageWidth = photoSize.x;
-				final int imageWidth2 = imageWidth / 2;
-				final int imageHeight = photoSize.y;
+				final int tileSize = mp.getTileSize();
 
-				// this is an inline for: tileViewport.contains(tileWorldPos.x, tileWorldPos.y)
-				final int photoWorldPixelX = photoWorldPixel.x;
-				final int photoWorldPixelY = photoWorldPixel.y;
+				// convert world position into tile position
+				final int devXPhoto = photoWorldPixel.x - tileWorldPixelLeft;
+				final int devYPhoto = photoWorldPixel.y - tileWorldPixelTop;
 
-				final int photoImageWorldPixelX = photoWorldPixelX - imageWidth2;
+				final boolean isPhotoInTile = isPhotoInTile(photoSize, devXPhoto, devYPhoto, tileSize);
 
-				// check if photo image is within the tile viewport
-				if (photoImageWorldPixelX + imageWidth >= tileWorldPixelLeft
-						&& photoWorldPixelX < tileWorldPixelRight
-						&& photoWorldPixelY >= tileWorldPixelTop
-						&& photoWorldPixelY < tileWorldPixelBottom + imageHeight) {
-
-					// current position is inside the tile
-
+				if (isPhotoInTile) {
 					return true;
 				}
 			}
