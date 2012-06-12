@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import net.tourbook.photo.gallery.MT20.RendererHelper;
 import net.tourbook.util.StatusUtil;
 import net.tourbook.util.Util;
 
@@ -121,9 +122,9 @@ public class Photo {
 	private PhotoLoadingState				_photoLoadingStateOriginal;
 
 	/**
-	 * Is <code>true</code> when EXIF thumb image could be loaded
+	 * Is <code>true</code> when loading the image causes an error.
 	 */
-//	private boolean							_isEXIFThumbAvailable;
+	private boolean							_isLoadingError;
 
 	/**
 	 * Exif thumb state
@@ -136,6 +137,11 @@ public class Photo {
 	 * </pre>
 	 */
 	private int								_exifThumbImageState	= -1;
+
+	/**
+	 * Image size which is painted in the map
+	 */
+	private org.eclipse.swt.graphics.Point	_mapImageSize;
 
 	/**
 	 * @param galleryItemIndex
@@ -158,6 +164,8 @@ public class Photo {
 		_photoLoadingStateThumb = PhotoLoadingState.UNDEFINED;
 		_photoLoadingStateHQ = PhotoLoadingState.UNDEFINED;
 		_photoLoadingStateOriginal = PhotoLoadingState.UNDEFINED;
+
+		_isLoadingError = false;
 	}
 
 	static String getImageKeyHQ(final String imageFilePathName) {
@@ -506,6 +514,10 @@ public class Photo {
 		return _gpsAreaInfo;
 	}
 
+	/**
+	 * @return Returns the cardinal direction (Himmelsrichtung) in degrees or
+	 *         {@link Double#MIN_VALUE} when not set.
+	 */
 	public double getImageDirection() {
 		return _imageDirection;
 	}
@@ -653,6 +665,13 @@ public class Photo {
 	}
 
 	/**
+	 * @return Returns size when image is painted on the map or <code>null</code>, when not yet set.
+	 */
+	public org.eclipse.swt.graphics.Point getMapImageSize() {
+		return _mapImageSize;
+	}
+
+	/**
 	 * <pre>
 	 * Orientation
 	 * 
@@ -737,13 +756,6 @@ public class Photo {
 		return null;
 	}
 
-//	/**
-//	 * @return Returns photo image width after it is rotated with the EXIF orientation.
-//	 */
-//	public int getWidthRotated() {
-//		return _widthRotated;
-//	}
-
 	/**
 	 * @param mapProvider
 	 * @param projectionId
@@ -758,16 +770,18 @@ public class Photo {
 
 		final Integer hashKey = projectionId.hashCode() + zoomLevel;
 
-		Point worldPosition = _worldPosition.get(hashKey);
+		final Point worldPosition = _worldPosition.get(hashKey);
 
-		if ((worldPosition == null)) {
+		if (worldPosition == null) {
 			// convert lat/long into world pixels which depends on the map projection
 
 			final GeoPosition photoGeoPosition = new GeoPosition(_latitude, _longitude);
 
 			final Point geoToPixel = mapProvider.geoToPixel(photoGeoPosition, zoomLevel);
 
-			worldPosition = _worldPosition.put(hashKey, geoToPixel);
+			_worldPosition.put(hashKey, geoToPixel);
+
+			return geoToPixel;
 		}
 
 		return worldPosition;
@@ -781,20 +795,20 @@ public class Photo {
 		return result;
 	}
 
-	/**
-	 * @return Returns <code>true</code> when EXIF thumb image could be loaded
-	 */
-//	public boolean isEXIFThumbAvailable() {
-//		return _isEXIFThumbAvailable;
-//	}
+	public boolean isLoadingError() {
+		return _isLoadingError;
+	}
 
 	public void setAltitude(final double altitude) {
 		_altitude = altitude;
 	}
 
 	public void setDimension(final int width, final int height) {
+
 		_imageWidth = width;
 		_imageHeight = height;
+
+		setMapImageSize();
 	}
 
 	public void setGpsAreaInfo(final String gpsAreaInfo) {
@@ -840,6 +854,8 @@ public class Photo {
 			}
 		}
 
+		setMapImageSize();
+
 		/*
 		 * set state if gps data are available, this state is used for filtering the photos and to
 		 * indicate that exif data are loaded
@@ -856,11 +872,8 @@ public class Photo {
 		_latitude = latitude;
 	}
 
-//	public void setStateExifThumbIsLoaded(final boolean isExifThumb) {
-//		_isEXIFThumbAvailable = isExifThumb;
-//	}
-
 	public void setLoadingState(final PhotoLoadingState photoLoadingState, final ImageQuality imageQuality) {
+
 		if (imageQuality == ImageQuality.HQ) {
 			_photoLoadingStateHQ = photoLoadingState;
 		} else if (imageQuality == ImageQuality.ORIGINAL) {
@@ -868,10 +881,30 @@ public class Photo {
 		} else {
 			_photoLoadingStateThumb = photoLoadingState;
 		}
+
+		if (photoLoadingState == PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR) {
+			_isLoadingError = true;
+		}
+//
+//		System.out
+//				.println("set state\t" + imageQuality + "\t" + photoLoadingState + "\t" + _photoWrapper.imageFileName);
+//		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 	public void setLongitude(final double longitude) {
 		_longitude = longitude;
+	}
+
+	private void setMapImageSize() {
+
+		final int imageCanvasWidth = 50;
+		final int imageCanvasHeight = 50;
+
+		_mapImageSize = RendererHelper.getBestSize(this, //
+				_imageWidth,
+				_imageHeight,
+				imageCanvasWidth,
+				imageCanvasHeight);
 	}
 
 	public void setStateExifThumb(final int exifThumbState) {
@@ -900,34 +933,4 @@ public class Photo {
 		;
 	}
 
-//	private void updateSize(final int width, final int height, final int orientation) {
-//
-//		if (width == Integer.MIN_VALUE || height == Integer.MIN_VALUE) {
-//			return;
-//		}
-//
-//		_imageWidth = width;
-//		_imageHeight = height;
-//
-//		boolean isSwapSize = false;
-//
-//		if (orientation > 1) {
-//
-//			// see here http://www.impulseadventure.com/photo/exif-orientation.html
-//
-//			if (orientation == 8) {
-//				isSwapSize = true;
-//			} else if (orientation == 6) {
-//				isSwapSize = true;
-//			}
-//		}
-//
-//		if (isSwapSize) {
-//
-//			final int imageWidth = _imageWidth;
-//
-//			_imageWidth = _imageHeight;
-//			_imageHeight = imageWidth;
-//		}
-//	}
 }

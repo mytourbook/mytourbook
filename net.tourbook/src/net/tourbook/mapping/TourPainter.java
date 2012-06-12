@@ -27,7 +27,12 @@ import net.tourbook.chart.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourWayPoint;
+import net.tourbook.photo.manager.ILoadCallBack;
+import net.tourbook.photo.manager.ImageQuality;
 import net.tourbook.photo.manager.Photo;
+import net.tourbook.photo.manager.PhotoImageCache;
+import net.tourbook.photo.manager.PhotoLoadManager;
+import net.tourbook.photo.manager.PhotoLoadingState;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceMap;
 import net.tourbook.ui.ColorCacheInt;
@@ -59,49 +64,49 @@ import de.byteholder.gpx.GeoPosition;
 public class TourPainter extends MapPainter {
 
 	private static final int				MARKER_MARGIN		= 2;
-	private static final int				MARKER_POLE			= 16;
 
+	private static final int				MARKER_POLE			= 16;
 	private final static IPreferenceStore	_prefStore			= TourbookPlugin.getDefault().getPreferenceStore();
 
 	private static IPropertyChangeListener	_prefChangeListener;
 
 	private float[]							_dataSerie;
-	private ILegendProvider					_legendProvider;
 
+	private ILegendProvider					_legendProvider;
 	// painting parameter
 	private int								_lineWidth;
-	private int								_lineWidth2;
 
+	private int								_lineWidth2;
 	private static boolean					_prefIsDrawLine;
+
 	private static boolean					_prefIsDrawSquare;
 	private static int						_prefLineWidth;
 	private static boolean					_prefWithBorder;
 	private static int						_prefBorderWidth;
-
 	private static boolean					_isImageAvailable	= false;
 
 	/**
 	 * Tour start/end image
 	 */
 	private static Image					_tourStartMarker;
-	private static Image					_tourEndMarker;
 
+	private static Image					_tourEndMarker;
 	/**
 	 * Tour Way Point image
 	 */
 	private static Image					_twpImage;
-	private static Rectangle				_twpImageBounds;
 
+	private static Rectangle				_twpImageBounds;
 	private static TourPainterConfiguration	_tourPaintConfig;
 
 	private final static ColorCacheInt		_colorCache			= new ColorCacheInt();
 
 	private final static NumberFormat		_nf1				= NumberFormat.getNumberInstance();
+
 	{
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
 	}
-
 	static {
 
 		_tourPaintConfig = TourPainterConfiguration.getInstance();
@@ -138,6 +143,15 @@ public class TourPainter extends MapPainter {
 //				TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(_prefChangeListener);
 //			}
 //		});
+	}
+
+	public class LoadCallbackImage implements ILoadCallBack {
+
+		@Override
+		public void callBackImageIsLoaded(final boolean isUpdateUI) {
+			// TODO Auto-generated method stub
+
+		}
 	}
 
 	public TourPainter() {
@@ -544,7 +558,7 @@ public class TourPainter extends MapPainter {
 			createImages();
 		}
 
-		// draw tour first, then the marker
+		// first draw the tour, then the marker
 		for (final TourData tourData : tourDataList) {
 
 			if (tourData == null) {
@@ -752,6 +766,11 @@ public class TourPainter extends MapPainter {
 								final Point photoWorldPixel,
 								final int parts) {
 
+		final org.eclipse.swt.graphics.Point photoSize = photo.getMapImageSize();
+		if (photoSize == null) {
+			return false;
+		}
+
 		final MP mp = map.getMapProvider();
 		final int zoomLevel = map.getZoom();
 		final int tileSize = mp.getTileSize();
@@ -765,31 +784,37 @@ public class TourPainter extends MapPainter {
 		final int devXPhoto = photoWorldPixel.x - tileWorldPixelX;
 		final int devYPhoto = photoWorldPixel.y - tilwWorldPixelY;
 
-		final Point photoSize = new Point(100, 100);
-
 		final boolean isPhotoInTile = isPhotoInTile(photoSize, devXPhoto, devYPhoto, tileSize);
 
 		if (isPhotoInTile) {
 
-//			final int photoWidth = photo.getWidthSmall();
-//			final int photoHeight = photo.getWidthSmall();
-//			image = photo.getImageSmall();
+			final Image image = getMapImage(photo);
 
-//			int devX = devXPhoto - photoWidth / 2;
-//			int devY = devYPhoto - photoHeight;
+			if (image == null) {
+				return false;
+			}
 
-//			devX += devPartOffset;
-//			devY += devPartOffset;
+			final int photoWidth = photoSize.x;
+			final int photoHeight = photoSize.y;
 
-//			gc.drawImage(_twpImage, devX, devY);
+//			final int photoWidth = 100;
+//			final int photoHeight = 100;
 
-//			gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-//			gc.fillRectangle(devX, devY, photoWidth, photoHeight);
+			int devX = devXPhoto - photoWidth / 2;
+			int devY = devYPhoto - photoHeight;
 
-//			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-//			gc.setLineWidth(1);
-//			gc.drawRectangle(devX, devY, photoWidth, photoHeight);
-//
+			devX += devPartOffset;
+			devY += devPartOffset;
+
+			gc.drawImage(image, devX, devY);
+
+			gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+			gc.fillRectangle(devX, devY, photoWidth, photoHeight);
+
+			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+			gc.setLineWidth(1);
+			gc.drawRectangle(devX, devY, photoWidth, photoHeight);
+
 //			tile.addTourWayPointBounds(//
 //					twp,
 //					new Rectangle(
@@ -799,7 +824,6 @@ public class TourPainter extends MapPainter {
 //							_twpImageBounds.height),
 //					zoomLevel,
 //					parts);
-
 		}
 
 		return isPhotoInTile;
@@ -1374,6 +1398,36 @@ public class TourPainter extends MapPainter {
 		return valuePosition;
 	}
 
+	private Image getMapImage(final Photo photo) {
+
+		final ImageQuality requestedImageQuality = ImageQuality.THUMB;
+
+		Image paintedImage = null;
+
+		// check if image has an loading error
+		final PhotoLoadingState photoLoadingState = photo.getLoadingState(requestedImageQuality);
+
+		if (photoLoadingState != PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR) {
+
+			// image is not yet loaded
+
+			// check if image is in the cache
+			paintedImage = PhotoImageCache.getImage(photo, requestedImageQuality);
+
+			if ((paintedImage == null || paintedImage.isDisposed())
+					&& photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
+
+				// the requested image is not available in the image cache -> image must be loaded
+
+				final ILoadCallBack imageLoadCallback = this.new LoadCallbackImage();
+
+				PhotoLoadManager.putImageInLoadingQueueThumbMap(photo, requestedImageQuality, imageLoadCallback);
+			}
+		}
+
+		return null;
+	}
+
 	private Color getTourColor(	final TourData tourData,
 								final int serieIndex,
 								final boolean isBorder,
@@ -1529,6 +1583,95 @@ public class TourPainter extends MapPainter {
 		final int tileWorldPixelTop = tile.getY() * tileSize;
 		final int tileWorldPixelBottom = tileWorldPixelTop + tileSize;
 
+		if (isPaintingNeeded_Tours(
+				tourDataList,
+				mp,
+				mapZoomLevel,
+				projectionId,
+				tileWorldPixelLeft,
+				tileWorldPixelRight,
+				tileWorldPixelTop,
+				tileWorldPixelBottom)) {
+
+			return true;
+		}
+
+		if (isPaintingNeeded_Photos(
+				photoList,
+				mp,
+				mapZoomLevel,
+				projectionId,
+				tileWorldPixelLeft,
+				tileWorldPixelRight,
+				tileWorldPixelTop,
+				tileWorldPixelBottom)) {
+
+			return true;
+		}
+
+		return false;
+	}
+
+	private boolean isPaintingNeeded_Photos(final ArrayList<Photo> photoList,
+											final MP mp,
+											final int mapZoomLevel,
+											final String projectionId,
+											final int tileWorldPixelLeft,
+											final int tileWorldPixelRight,
+											final int tileWorldPixelTop,
+											final int tileWorldPixelBottom) {
+		/*
+		 * check photos
+		 */
+		if (_tourPaintConfig.isShowPhoto && photoList.size() > 0) {
+
+			for (final Photo photo : photoList) {
+
+				final Point photoWorldPixel = photo.getWorldPosition(mp, projectionId, mapZoomLevel);
+
+				if (photoWorldPixel == null) {
+					continue;
+				}
+
+				final org.eclipse.swt.graphics.Point photoSize = photo.getMapImageSize();
+				if (photoSize == null) {
+					continue;
+				}
+
+				final int imageWidth = photoSize.x;
+				final int imageWidth2 = imageWidth / 2;
+				final int imageHeight = photoSize.y;
+
+				// this is an inline for: tileViewport.contains(tileWorldPos.x, tileWorldPos.y)
+				final int photoWorldPixelX = photoWorldPixel.x;
+				final int photoWorldPixelY = photoWorldPixel.y;
+
+				final int photoImageWorldPixelX = photoWorldPixelX - imageWidth2;
+
+				// check if photo image is within the tile viewport
+				if (photoImageWorldPixelX + imageWidth >= tileWorldPixelLeft
+						&& photoWorldPixelX < tileWorldPixelRight
+						&& photoWorldPixelY >= tileWorldPixelTop
+						&& photoWorldPixelY < tileWorldPixelBottom + imageHeight) {
+
+					// current position is inside the tile
+
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	private boolean isPaintingNeeded_Tours(	final ArrayList<TourData> tourDataList,
+											final MP mp,
+											final int mapZoomLevel,
+											final String projectionId,
+											final int tileWorldPixelLeft,
+											final int tileWorldPixelRight,
+											final int tileWorldPixelTop,
+											final int tileWorldPixelBottom) {
 		/*
 		 * check tours
 		 */
@@ -1631,46 +1774,13 @@ public class TourPainter extends MapPainter {
 			}
 		}
 
-		/*
-		 * check photos
-		 */
-		if (_tourPaintConfig.isShowPhoto && photoList.size() > 0) {
-
-			for (final Photo photo : photoList) {
-
-				final Point photoWorldPixel = photo.getWorldPosition(mp, projectionId, mapZoomLevel);
-
-				if (photoWorldPixel == null) {
-					continue;
-				}
-
-//				final int imageWidth = photo.getWidthSmall();
-//				final int imageWidth2 = imageWidth / 2;
-//				final int imageHeight = photo.getHeightSmall();
-//
-//				// this is an inline for: tileViewport.contains(tileWorldPos.x, tileWorldPos.y)
-//				final int photoWorldPixelX = photoWorldPixel.x;
-//				final int photoWorldPixelY = photoWorldPixel.y;
-//
-//				final int photoImageWorldPixelX = photoWorldPixelX - imageWidth2;
-//
-//				// check if photo image is within the tile viewport
-//				if (photoImageWorldPixelX + imageWidth >= tileWorldPixelLeft
-//						&& photoWorldPixelX < tileWorldPixelRight
-//						&& photoWorldPixelY >= tileWorldPixelTop
-//						&& photoWorldPixelY < tileWorldPixelBottom + imageHeight) {
-//
-//					// current position is inside the tile
-//
-//					return true;
-//				}
-			}
-		}
-
 		return false;
 	}
 
-	private boolean isPhotoInTile(final Point photoSize, final int devXPhoto, final int devYPhoto, final int tileSize) {
+	private boolean isPhotoInTile(	final org.eclipse.swt.graphics.Point photoSize,
+									final int devXPhoto,
+									final int devYPhoto,
+									final int tileSize) {
 
 		// get image size
 		final int imageWidth = photoSize.x;

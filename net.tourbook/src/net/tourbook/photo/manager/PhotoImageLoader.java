@@ -24,8 +24,6 @@ import java.util.concurrent.LinkedBlockingDeque;
 
 import javax.imageio.ImageIO;
 
-import net.tourbook.photo.gallery.MT20.GalleryMT20;
-import net.tourbook.photo.gallery.MT20.GalleryMT20Item;
 import net.tourbook.util.SWT2Dutil;
 import net.tourbook.util.StatusUtil;
 import net.tourbook.util.UI;
@@ -52,7 +50,6 @@ public class PhotoImageLoader {
 
 	Photo								_photo;
 
-	private GalleryMT20Item				_galleryItem;
 	ImageQuality						_requestedImageQuality;
 	private String						_imageFramework;
 	private int							_hqImageSize;
@@ -90,7 +87,6 @@ public class PhotoImageLoader {
 	}
 
 	public PhotoImageLoader(final Display display,
-							final GalleryMT20Item galleryItem,
 							final Photo photo,
 							final ImageQuality imageQuality,
 							final String imageFramework,
@@ -98,7 +94,6 @@ public class PhotoImageLoader {
 							final ILoadCallBack loadCallBack) {
 
 		_display = display;
-		_galleryItem = galleryItem;
 		_photo = photo;
 		_requestedImageQuality = imageQuality;
 		_imageFramework = imageFramework;
@@ -218,211 +213,6 @@ public class PhotoImageLoader {
 		}
 
 		return false;
-	}
-
-	/**
-	 * check if the image is still visible
-	 * 
-	 * @return
-	 */
-	private boolean isImageVisible() {
-
-		final boolean isItemVisible = _galleryItem.gallery.isItemVisible(_galleryItem);
-
-		return isItemVisible;
-	}
-
-	/**
-	 * This is called from the executor when the loading task is starting. It loads an image and
-	 * puts it into the image cache from where it is fetched when painted.
-	 * 
-	 * <pre>
-	 * 
-	 * 2 Threads
-	 * =========
-	 * 
-	 * SWT
-	 * Photo-Image-Loader-1	IMG_1219_10.JPG	load:	1165	resize:	645	save:	110	total:	1920
-	 * Photo-Image-Loader-0	IMG_1219_9.JPG	load:	1165	resize:	650	save:	110	total:	1925
-	 * Photo-Image-Loader-1	IMG_1219.JPG	load:	566		resize:	875	save:	60	total:	1501
-	 * Photo-Image-Loader-0	IMG_1219_2.JPG	load:	835		resize:	326	save:	55	total:	1216
-	 * Photo-Image-Loader-1	IMG_1219_3.JPG	load:	1150	resize:	625	save:	55	total:	1830
-	 * Photo-Image-Loader-0	IMG_1219_4.JPG	load:	565		resize:	630	save:	60	total:	1255
-	 * Photo-Image-Loader-1	IMG_1219_5.JPG	load:	566		resize:	880	save:	60	total:	1506
-	 * Photo-Image-Loader-0	IMG_1219_6.JPG	load:	845		resize:	341	save:	65	total:	1251
-	 * Photo-Image-Loader-1	IMG_1219_7.JPG	load:	575		resize:	875	save:	50	total:	1500
-	 * Photo-Image-Loader-0	IMG_1219_8.JPG	load:	845		resize:	356	save:	45	total:	1246
-	 * 												8277			6203		670			15150
-	 * 
-	 * 
-	 * AWT
-	 * Photo-Image-Loader-1	IMG_1219_9.JPG	load:	1005	resize:	770		save AWT:	25	load SWT:	10	total:	1810
-	 * Photo-Image-Loader-0	IMG_1219_10.JPG	load:	1015	resize:	1311	save AWT:	145	load SWT:	5	total:	2476
-	 * Photo-Image-Loader-1	IMG_1219.JPG	load:	931		resize:	755		save AWT:	65	load SWT:	5	total:	1756
-	 * Photo-Image-Loader-0	IMG_1219_2.JPG	load:	960		resize:	737		save AWT:	30	load SWT:	5	total:	1732
-	 * Photo-Image-Loader-1	IMG_1219_3.JPG	load:	1340	resize:	700		save AWT:	25	load SWT:	10	total:	2075
-	 * Photo-Image-Loader-0	IMG_1219_4.JPG	load:	935		resize:	751		save AWT:	25	load SWT:	10	total:	1721
-	 * Photo-Image-Loader-1	IMG_1219_5.JPG	load:	981		resize:	810		save AWT:	25	load SWT:	5	total:	1821
-	 * Photo-Image-Loader-0	IMG_1219_6.JPG	load:	970		resize:	821		save AWT:	30	load SWT:	5	total:	1826
-	 * Photo-Image-Loader-1	IMG_1219_7.JPG	load:	950		resize:	710		save AWT:	25	load SWT:	5	total:	1690
-	 * Photo-Image-Loader-0	IMG_1219_8.JPG	load:	950		resize:	706		save AWT:	30	load SWT:	5	total:	1691
-	 * 												10037			8071				425				65			18598
-	 * 
-	 * 1 Thread
-	 * ========
-	 * 
-	 * SWT
-	 * Photo-Image-Loader-0	IMG_1219_10.JPG	load:	595	resize:	330	save:	70	total:	995
-	 * Photo-Image-Loader-0	IMG_1219.JPG	load:	561	resize:	325	save:	80	total:	966
-	 * Photo-Image-Loader-0	IMG_1219_2.JPG	load:	560	resize:	330	save:	50	total:	940
-	 * Photo-Image-Loader-0	IMG_1219_3.JPG	load:	561	resize:	325	save:	45	total:	931
-	 * Photo-Image-Loader-0	IMG_1219_4.JPG	load:	570	resize:	325	save:	50	total:	945
-	 * Photo-Image-Loader-0	IMG_1219_5.JPG	load:	570	resize:	340	save:	50	total:	960
-	 * Photo-Image-Loader-0	IMG_1219_6.JPG	load:	575	resize:	330	save:	45	total:	950
-	 * Photo-Image-Loader-0	IMG_1219_7.JPG	load:	560	resize:	335	save:	50	total:	945
-	 * Photo-Image-Loader-0	IMG_1219_8.JPG	load:	565	resize:	330	save:	45	total:	940
-	 * Photo-Image-Loader-0	IMG_1219_9.JPG	load:	565	resize:	330	save:	45	total:	940
-	 * 												5682		3300		530			9512
-	 * 
-	 * AWT
-	 * Photo-Image-Loader-0	IMG_1219.JPG	load:	1115	resize:	790	save AWT:	45	load SWT:	5	total:	1955
-	 * Photo-Image-Loader-0	IMG_1219_2.JPG	load:	1070	resize:	695	save AWT:	30	load SWT:	5	total:	1800
-	 * Photo-Image-Loader-0	IMG_1219_3.JPG	load:	1035	resize:	695	save AWT:	25	load SWT:	5	total:	1760
-	 * Photo-Image-Loader-0	IMG_1219_4.JPG	load:	1040	resize:	695	save AWT:	25	load SWT:	5	total:	1765
-	 * Photo-Image-Loader-0	IMG_1219_5.JPG	load:	1040	resize:	695	save AWT:	25	load SWT:	110	total:	1870
-	 * Photo-Image-Loader-0	IMG_1219_6.JPG	load:	1050	resize:	690	save AWT:	25	load SWT:	5	total:	1770
-	 * Photo-Image-Loader-0	IMG_1219_7.JPG	load:	1035	resize:	690	save AWT:	145	load SWT:	5	total:	1875
-	 * Photo-Image-Loader-0	IMG_1219_8.JPG	load:	1032	resize:	700	save AWT:	20	load SWT:	10	total:	1762
-	 * Photo-Image-Loader-0	IMG_1219_9.JPG	load:	1030	resize:	700	save AWT:	25	load SWT:	5	total:	1760
-	 * Photo-Image-Loader-0	IMG_1219_10.JPG	load:	1032	resize:	700	save AWT:	25	load SWT:	5	total:	1762
-	 * 												10479			7050			390				160			18079
-	 * 
-	 * </pre>
-	 * 
-	 * @param waitingqueueoriginal
-	 * @param waitingqueueexif
-	 */
-	public void loadImage(final LinkedBlockingDeque<PhotoImageLoader> waitingQueueOriginal) {
-
-		if (isImageVisible() == false) {
-			setStateUndefined();
-			return;
-		}
-
-		/*
-		 * wait until original images are loaded
-		 */
-		try {
-			while (waitingQueueOriginal.size() > 0) {
-				Thread.sleep(PhotoLoadManager.DELAY_TO_CHECK_WAITING_QUEUE);
-			}
-		} catch (final InterruptedException e) {
-			// should not happen, I hope so
-		}
-
-		boolean isLoadedImageInRequestedQuality = false;
-		Image loadedExifImage = null;
-		String imageKey = null;
-		boolean isLoadingError = false;
-
-		try {
-
-			// 1. get image with the requested quality from the image store
-			final Image storeImage = loadImageFromStore(_requestedImageQuality);
-			if (storeImage != null) {
-
-				isLoadedImageInRequestedQuality = true;
-
-				imageKey = _requestedImageKey;
-				loadedExifImage = storeImage;
-
-			} else {
-
-				// 2. get image from thumbnail image in the EXIF data
-
-				final IPath storeThumbImageFilePath = ThumbnailStore.getStoreImagePath(_photo, ImageQuality.THUMB);
-
-				final Image exifThumbnail = loadImageFromEXIFThumbnail(storeThumbImageFilePath);
-				if (exifThumbnail != null) {
-
-					// EXIF image is available
-
-					isLoadedImageInRequestedQuality = _requestedImageQuality == ImageQuality.THUMB;
-
-					imageKey = _photo.getImageKey(ImageQuality.THUMB);
-					loadedExifImage = exifThumbnail;
-				}
-			}
-
-		} catch (final Exception e) {
-
-			setStateLoadingError();
-
-			isLoadingError = true;
-
-		} finally {
-
-			disposeTrackedImages();
-
-			final boolean isImageLoaded = loadedExifImage != null;
-
-			/*
-			 * keep image in cache
-			 */
-			if (isImageLoaded) {
-
-				final String originalImagePathName = _photo.getPhotoWrapper().imageFilePathName;
-
-				// get/set metadata if available
-				final PhotoImageMetadata imageMetaData = _photo.getImageMetaData();
-
-				int imageWidth = _photo.getImageWidth();
-				int imageHeight = _photo.getImageHeight();
-
-				// check if width is set
-				if (imageWidth == Integer.MIN_VALUE) {
-
-					// image width is not set from metadata, set it from the image
-
-					final Rectangle imageBounds = loadedExifImage.getBounds();
-					imageWidth = imageBounds.width;
-					imageHeight = imageBounds.height;
-
-					// update dimension
-					updateImageSize(imageWidth, imageHeight);
-				}
-
-				PhotoImageCache.putImage(
-						imageKey,
-						loadedExifImage,
-						imageMetaData,
-						imageWidth,
-						imageHeight,
-						originalImagePathName);
-			}
-
-			/*
-			 * update loading state
-			 */
-			if (isLoadedImageInRequestedQuality) {
-
-				// image is loaded with requested quality, reset image state
-
-				setStateUndefined();
-
-			} else {
-
-				// load image with higher quality
-
-				PhotoLoadManager.putImageInLoadingQueueHQ(_galleryItem, _photo, _requestedImageQuality, _loadCallBack);
-			}
-
-			// show in the UI, that meta data are loaded, loading message is displayed with another color
-			final boolean isUpdateUI = _photo.getImageMetaDataRaw() != null;
-
-			// display image in the loading callback
-			_loadCallBack.callBackImageIsLoaded(isUpdateUI || isImageLoaded || isLoadingError);
-		}
 	}
 
 	/**
@@ -638,10 +428,10 @@ public class PhotoImageLoader {
 	public void loadImageHQ(final LinkedBlockingDeque<PhotoImageLoader> thumbImageWaitingQueue,
 							final LinkedBlockingDeque<PhotoExifLoader> exifWaitingQueue) {
 
-		if (isImageVisible() == false) {
-			setStateUndefined();
-			return;
-		}
+//		if (isImageVisible() == false) {
+//			setStateUndefined();
+//			return;
+//		}
 
 		/*
 		 * wait until exif data and small images are loaded
@@ -1329,21 +1119,6 @@ public class PhotoImageLoader {
 
 	public void loadImageOriginal() {
 
-		final GalleryMT20 gallery = _galleryItem.gallery;
-		if (gallery.isDisposed()) {
-			return;
-		}
-
-		// check if this image is still displayed
-		if (gallery.getFullsizeViewer().getCurrentItem() != _galleryItem) {
-
-			// another gallery item is displayed
-
-			setStateUndefined();
-
-			return;
-		}
-
 		final long start = System.currentTimeMillis();
 		long endOriginalLoad1 = 0;
 		long endOriginalLoad2 = 0;
@@ -1435,11 +1210,6 @@ public class PhotoImageLoader {
 					} finally {
 
 						if (swtImage == null) {
-
-							/*
-							 * 3rd try
-							 */
-
 							System.out.println(NLS.bind( //
 									UI.timeStamp() + "SWT: image \"{0}\" cannot be loaded (4)", //$NON-NLS-1$
 									originalImagePathName));
@@ -1504,6 +1274,7 @@ public class PhotoImageLoader {
 
 			if (isLoadingException) {
 				setStateLoadingError();
+
 			} else {
 
 				// image is loaded with requested quality or a SWT error has occured, reset image state
@@ -1520,7 +1291,6 @@ public class PhotoImageLoader {
 					+ ("\ttotal: " + end)
 					+ ("\tload1: " + endOriginalLoad1)
 					+ ("\tload2: " + endOriginalLoad2)
-//					+ ("\tload3: " + endOriginalLoad3)
 					+ ("\trotate: " + endRotate)
 			//
 					);
@@ -1528,6 +1298,199 @@ public class PhotoImageLoader {
 			// display image in the loading callback
 			_loadCallBack.callBackImageIsLoaded(true);
 		}
+	}
+
+	/**
+	 * This is called from the executor when the loading task is starting. It loads an image and
+	 * puts it into the image cache from where it is fetched when painted.
+	 * 
+	 * <pre>
+	 * 
+	 * 2 Threads
+	 * =========
+	 * 
+	 * SWT
+	 * Photo-Image-Loader-1	IMG_1219_10.JPG	load:	1165	resize:	645	save:	110	total:	1920
+	 * Photo-Image-Loader-0	IMG_1219_9.JPG	load:	1165	resize:	650	save:	110	total:	1925
+	 * Photo-Image-Loader-1	IMG_1219.JPG	load:	566		resize:	875	save:	60	total:	1501
+	 * Photo-Image-Loader-0	IMG_1219_2.JPG	load:	835		resize:	326	save:	55	total:	1216
+	 * Photo-Image-Loader-1	IMG_1219_3.JPG	load:	1150	resize:	625	save:	55	total:	1830
+	 * Photo-Image-Loader-0	IMG_1219_4.JPG	load:	565		resize:	630	save:	60	total:	1255
+	 * Photo-Image-Loader-1	IMG_1219_5.JPG	load:	566		resize:	880	save:	60	total:	1506
+	 * Photo-Image-Loader-0	IMG_1219_6.JPG	load:	845		resize:	341	save:	65	total:	1251
+	 * Photo-Image-Loader-1	IMG_1219_7.JPG	load:	575		resize:	875	save:	50	total:	1500
+	 * Photo-Image-Loader-0	IMG_1219_8.JPG	load:	845		resize:	356	save:	45	total:	1246
+	 * 												8277			6203		670			15150
+	 * 
+	 * 
+	 * AWT
+	 * Photo-Image-Loader-1	IMG_1219_9.JPG	load:	1005	resize:	770		save AWT:	25	load SWT:	10	total:	1810
+	 * Photo-Image-Loader-0	IMG_1219_10.JPG	load:	1015	resize:	1311	save AWT:	145	load SWT:	5	total:	2476
+	 * Photo-Image-Loader-1	IMG_1219.JPG	load:	931		resize:	755		save AWT:	65	load SWT:	5	total:	1756
+	 * Photo-Image-Loader-0	IMG_1219_2.JPG	load:	960		resize:	737		save AWT:	30	load SWT:	5	total:	1732
+	 * Photo-Image-Loader-1	IMG_1219_3.JPG	load:	1340	resize:	700		save AWT:	25	load SWT:	10	total:	2075
+	 * Photo-Image-Loader-0	IMG_1219_4.JPG	load:	935		resize:	751		save AWT:	25	load SWT:	10	total:	1721
+	 * Photo-Image-Loader-1	IMG_1219_5.JPG	load:	981		resize:	810		save AWT:	25	load SWT:	5	total:	1821
+	 * Photo-Image-Loader-0	IMG_1219_6.JPG	load:	970		resize:	821		save AWT:	30	load SWT:	5	total:	1826
+	 * Photo-Image-Loader-1	IMG_1219_7.JPG	load:	950		resize:	710		save AWT:	25	load SWT:	5	total:	1690
+	 * Photo-Image-Loader-0	IMG_1219_8.JPG	load:	950		resize:	706		save AWT:	30	load SWT:	5	total:	1691
+	 * 												10037			8071				425				65			18598
+	 * 
+	 * 1 Thread
+	 * ========
+	 * 
+	 * SWT
+	 * Photo-Image-Loader-0	IMG_1219_10.JPG	load:	595	resize:	330	save:	70	total:	995
+	 * Photo-Image-Loader-0	IMG_1219.JPG	load:	561	resize:	325	save:	80	total:	966
+	 * Photo-Image-Loader-0	IMG_1219_2.JPG	load:	560	resize:	330	save:	50	total:	940
+	 * Photo-Image-Loader-0	IMG_1219_3.JPG	load:	561	resize:	325	save:	45	total:	931
+	 * Photo-Image-Loader-0	IMG_1219_4.JPG	load:	570	resize:	325	save:	50	total:	945
+	 * Photo-Image-Loader-0	IMG_1219_5.JPG	load:	570	resize:	340	save:	50	total:	960
+	 * Photo-Image-Loader-0	IMG_1219_6.JPG	load:	575	resize:	330	save:	45	total:	950
+	 * Photo-Image-Loader-0	IMG_1219_7.JPG	load:	560	resize:	335	save:	50	total:	945
+	 * Photo-Image-Loader-0	IMG_1219_8.JPG	load:	565	resize:	330	save:	45	total:	940
+	 * Photo-Image-Loader-0	IMG_1219_9.JPG	load:	565	resize:	330	save:	45	total:	940
+	 * 												5682		3300		530			9512
+	 * 
+	 * AWT
+	 * Photo-Image-Loader-0	IMG_1219.JPG	load:	1115	resize:	790	save AWT:	45	load SWT:	5	total:	1955
+	 * Photo-Image-Loader-0	IMG_1219_2.JPG	load:	1070	resize:	695	save AWT:	30	load SWT:	5	total:	1800
+	 * Photo-Image-Loader-0	IMG_1219_3.JPG	load:	1035	resize:	695	save AWT:	25	load SWT:	5	total:	1760
+	 * Photo-Image-Loader-0	IMG_1219_4.JPG	load:	1040	resize:	695	save AWT:	25	load SWT:	5	total:	1765
+	 * Photo-Image-Loader-0	IMG_1219_5.JPG	load:	1040	resize:	695	save AWT:	25	load SWT:	110	total:	1870
+	 * Photo-Image-Loader-0	IMG_1219_6.JPG	load:	1050	resize:	690	save AWT:	25	load SWT:	5	total:	1770
+	 * Photo-Image-Loader-0	IMG_1219_7.JPG	load:	1035	resize:	690	save AWT:	145	load SWT:	5	total:	1875
+	 * Photo-Image-Loader-0	IMG_1219_8.JPG	load:	1032	resize:	700	save AWT:	20	load SWT:	10	total:	1762
+	 * Photo-Image-Loader-0	IMG_1219_9.JPG	load:	1030	resize:	700	save AWT:	25	load SWT:	5	total:	1760
+	 * Photo-Image-Loader-0	IMG_1219_10.JPG	load:	1032	resize:	700	save AWT:	25	load SWT:	5	total:	1762
+	 * 												10479			7050			390				160			18079
+	 * 
+	 * </pre>
+	 * 
+	 * @param waitingqueueoriginal
+	 * @param waitingqueueexif
+	 * @return Returns <code>true</code> when image should be loaded in HQ.
+	 */
+	public boolean loadImageThumb(final LinkedBlockingDeque<PhotoImageLoader> waitingQueueOriginal) {
+
+		/*
+		 * wait until original images are loaded
+		 */
+		try {
+			while (waitingQueueOriginal.size() > 0) {
+				Thread.sleep(PhotoLoadManager.DELAY_TO_CHECK_WAITING_QUEUE);
+			}
+		} catch (final InterruptedException e) {
+			// should not happen, I hope so
+		}
+
+		boolean isLoadedImageInRequestedQuality = false;
+		Image loadedExifImage = null;
+		String imageKey = null;
+		boolean isLoadingError = false;
+
+		boolean isHQRequired = false;
+
+		try {
+
+			// 1. get image with the requested quality from the image store
+			final Image storeImage = loadImageFromStore(_requestedImageQuality);
+			if (storeImage != null) {
+
+				isLoadedImageInRequestedQuality = true;
+
+				imageKey = _requestedImageKey;
+				loadedExifImage = storeImage;
+
+			} else {
+
+				// 2. get image from thumbnail image in the EXIF data
+
+				final IPath storeThumbImageFilePath = ThumbnailStore.getStoreImagePath(_photo, ImageQuality.THUMB);
+
+				final Image exifThumbnail = loadImageFromEXIFThumbnail(storeThumbImageFilePath);
+				if (exifThumbnail != null) {
+
+					// EXIF image is available
+
+					isLoadedImageInRequestedQuality = _requestedImageQuality == ImageQuality.THUMB;
+
+					imageKey = _photo.getImageKey(ImageQuality.THUMB);
+					loadedExifImage = exifThumbnail;
+				}
+			}
+
+		} catch (final Exception e) {
+
+			setStateLoadingError();
+
+			isLoadingError = true;
+
+		} finally {
+
+			disposeTrackedImages();
+
+			final boolean isImageLoaded = loadedExifImage != null;
+
+			/*
+			 * keep image in cache
+			 */
+			if (isImageLoaded) {
+
+				final String originalImagePathName = _photo.getPhotoWrapper().imageFilePathName;
+
+				// get/set metadata if available
+				final PhotoImageMetadata imageMetaData = _photo.getImageMetaData();
+
+				int imageWidth = _photo.getImageWidth();
+				int imageHeight = _photo.getImageHeight();
+
+				// check if width is set
+				if (imageWidth == Integer.MIN_VALUE) {
+
+					// image width is not set from metadata, set it from the image
+
+					final Rectangle imageBounds = loadedExifImage.getBounds();
+					imageWidth = imageBounds.width;
+					imageHeight = imageBounds.height;
+
+					// update dimension
+					updateImageSize(imageWidth, imageHeight);
+				}
+
+				PhotoImageCache.putImage(
+						imageKey,
+						loadedExifImage,
+						imageMetaData,
+						imageWidth,
+						imageHeight,
+						originalImagePathName);
+			}
+
+			/*
+			 * update loading state
+			 */
+			if (isLoadedImageInRequestedQuality) {
+
+				// image is loaded with requested quality, reset image state
+
+				setStateUndefined();
+
+			} else {
+
+				// load image with higher quality
+
+				isHQRequired = true;
+			}
+
+			// show in the UI, that meta data are loaded, loading message is displayed with another color
+			final boolean isUpdateUI = _photo.getImageMetaDataRaw() != null;
+
+			// display image in the loading callback
+			_loadCallBack.callBackImageIsLoaded(isUpdateUI || isImageLoaded || isLoadingError);
+		}
+
+		return isHQRequired;
 	}
 
 	private void setStateLoadingError() {

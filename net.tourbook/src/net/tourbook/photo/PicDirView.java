@@ -23,6 +23,7 @@ import net.tourbook.photo.manager.ThumbnailStore;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.ViewerDetailForm;
+import net.tourbook.util.PostSelectionProvider;
 import net.tourbook.util.Util;
 
 import org.eclipse.jface.action.Action;
@@ -35,10 +36,10 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Sash;
-import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
@@ -107,6 +108,8 @@ public class PicDirView extends ViewPart {
 	private int								_textMinThumbSize;
 
 	private PhotoDateInfo					_photoDateInfo;
+
+	private PostSelectionProvider			_postSelectionProvider;
 
 	static int compareFiles(final File file1, final File file2) {
 
@@ -372,6 +375,9 @@ public class PicDirView extends ViewPart {
 		addPartListener();
 		addPrefListener();
 
+		// set selection provider
+		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider());
+
 		/*
 		 * restore async because a previous folder can contain many files and it can take a long
 		 * time to show the UI, this can be worrisome for the user when the UI is not displayed
@@ -569,10 +575,7 @@ public class PicDirView extends ViewPart {
 				: GallerySorting.FILE_NAME.name());
 
 		// keep width of the dir folder view in the master detail container
-		final Tree tree = _picDirFolder.getTree();
-		if (tree != null) {
-			_state.put(STATE_TREE_WIDTH, tree.getSize().x);
-		}
+		_state.put(STATE_TREE_WIDTH, _containerMasterDetail.getViewerWidth());
 
 		_state.put(STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY, _actionShowPhotoName.isChecked());
 		_state.put(STATE_IS_SHOW_PHOTO_TOOLTIP, _actionShowPhotoTooltip.isChecked());
@@ -592,6 +595,10 @@ public class PicDirView extends ViewPart {
 
 	void setMaximizedControl(final boolean isShowFolderAndGallery) {
 		_containerMasterDetail.setMaximizedControl(isShowFolderAndGallery ? null : _containerImages);
+	}
+
+	void setSelection(final StructuredSelection structuredSelection) {
+		_postSelectionProvider.setSelection(structuredSelection);
 	}
 
 	void setThumbnailSize(final int photoWidth) {

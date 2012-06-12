@@ -678,29 +678,34 @@ public abstract class ToolTip {
 	private void toolTipShow(final Shell tip, final Event event) {
 		if (!tip.isDisposed()) {
 			currentArea = getToolTipArea(event);
-			createToolTipContentArea(event, tip);
-			if (isHideOnMouseDown()) {
-				toolTipHookBothRecursively(tip);
-			} else {
-				toolTipHookByTypeRecursively(tip, true, SWT.MouseExit);
+			final Composite contentArea = createToolTipContentArea(event, tip);
+			if (contentArea != null) {
+
+				// don't show the tooltip when content area is not created
+
+				if (isHideOnMouseDown()) {
+					toolTipHookBothRecursively(tip);
+				} else {
+					toolTipHookByTypeRecursively(tip, true, SWT.MouseExit);
+				}
+
+				tip.pack();
+				final Point size = tip.getSize();
+				final Point location = fixupDisplayBounds(size, getLocation(size, event));
+
+				// Need to adjust a bit more if the mouse cursor.y == tip.y and
+				// the cursor.x is inside the tip
+				final Point cursorLocation = tip.getDisplay().getCursorLocation();
+
+				if (cursorLocation.y == location.y
+						&& location.x < cursorLocation.x
+						&& location.x + size.x > cursorLocation.x) {
+					location.y -= 2;
+				}
+
+				tip.setLocation(location);
+				tip.setVisible(true);
 			}
-
-			tip.pack();
-			final Point size = tip.getSize();
-			final Point location = fixupDisplayBounds(size, getLocation(size, event));
-
-			// Need to adjust a bit more if the mouse cursor.y == tip.y and
-			// the cursor.x is inside the tip
-			final Point cursorLocation = tip.getDisplay().getCursorLocation();
-
-			if (cursorLocation.y == location.y
-					&& location.x < cursorLocation.x
-					&& location.x + size.x > cursorLocation.x) {
-				location.y -= 2;
-			}
-
-			tip.setLocation(location);
-			tip.setVisible(true);
 		}
 	}
 }

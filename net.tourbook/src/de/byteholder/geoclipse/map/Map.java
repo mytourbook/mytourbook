@@ -323,7 +323,7 @@ public class Map extends Canvas {
 	 */
 	private final ConcurrentLinkedQueue<Tile>	_tileOverlayPaintQueue						= new ConcurrentLinkedQueue<Tile>();
 
-	private boolean								_isDrawOverlayRunning						= false;
+	private boolean								_isRunningDrawOverlay						= false;
 
 	private String								_overlayKey;
 
@@ -1012,8 +1012,8 @@ public class Map extends Canvas {
 		final MapPositionEvent event = new MapPositionEvent(geoPosition, _mapZoomLevel);
 
 		final Object[] listeners = _mousePositionListeners.getListeners();
-		for (int i = 0; i < listeners.length; ++i) {
-			((IPositionListener) listeners[i]).setPosition(event);
+		for (final Object listener : listeners) {
+			((IPositionListener) listener).setPosition(event);
 		}
 	}
 
@@ -1022,8 +1022,8 @@ public class Map extends Canvas {
 		final MapPOIEvent event = new MapPOIEvent(geoPosition, _mapZoomLevel, poiText);
 
 		final Object[] listeners = _poiListeners.getListeners();
-		for (int i = 0; i < listeners.length; ++i) {
-			((IPOIListener) listeners[i]).setPOI(event);
+		for (final Object listener : listeners) {
+			((IPOIListener) listener).setPOI(event);
 		}
 	}
 
@@ -1906,8 +1906,8 @@ public class Map extends Canvas {
 			return;
 		}
 
-//		final long start = System.nanoTime();
-//		// TODO remove SYSTEM.OUT.PRINTLN
+		final long start = System.nanoTime();
+		// TODO remove SYSTEM.OUT.PRINTLN
 
 		// Draw the map
 		GC gc = null;
@@ -1949,11 +1949,11 @@ public class Map extends Canvas {
 			}
 		}
 
-//		System.out.println("paintMap() "
-//				+ ((int) (((System.nanoTime() - start) / 1000000)) + " ms\t")
-//				+ ((int) (1000f / ((System.nanoTime() - start) / 1000000)) + " fps") //
-//		);
-//		// TODO remove SYSTEM.OUT.PRINTLN
+		System.out.println("paintMap() "
+				+ ((int) (((System.nanoTime() - start) / 1000000)) + " ms\t")
+				+ ((int) (1000f / ((System.nanoTime() - start) / 1000000)) + " fps") //
+		);
+		// TODO remove SYSTEM.OUT.PRINTLN
 
 		redraw();
 
@@ -2315,20 +2315,22 @@ public class Map extends Canvas {
 
 						Thread.sleep(20);
 
-						if (_isDrawOverlayRunning == false) {
+						if (_isRunningDrawOverlay) {
+							continue;
+						}
 
-							// overlay drawing is not running
+						// overlay drawing is not running
 
-							final long currentTime = System.currentTimeMillis();
+						final long currentTime = System.currentTimeMillis();
 
-							if (currentTime > _nextOverlayRedrawTime + 50) {
-								if (_tileOverlayPaintQueue.size() > 0) {
+						if (currentTime > _nextOverlayRedrawTime + 50) {
+							if (_tileOverlayPaintQueue.size() > 0) {
 
-									// create overlay images
-									paintOverlay_10_RunThread();
-								}
+								// create overlay images
+								paintOverlay_10_RunThread();
 							}
 						}
+
 					} catch (final InterruptedException e) {
 						interrupt();
 					} catch (final Exception e) {
@@ -2366,7 +2368,7 @@ public class Map extends Canvas {
 					return;
 				}
 
-				_isDrawOverlayRunning = true;
+				_isRunningDrawOverlay = true;
 
 				try {
 
@@ -2375,7 +2377,7 @@ public class Map extends Canvas {
 				} catch (final Exception e) {
 					e.printStackTrace();
 				} finally {
-					_isDrawOverlayRunning = false;
+					_isRunningDrawOverlay = false;
 				}
 			}
 		};
@@ -2432,7 +2434,7 @@ public class Map extends Canvas {
 							paintOverlay_40_PaintTileBasic(tile);
 						}
 
-						// allow displaying of the painted overlays
+						// allow to display painted overlays
 						final long paintTime = System.currentTimeMillis();
 						if (paintTime > startTime + 100) {
 							break;
@@ -2467,9 +2469,9 @@ public class Map extends Canvas {
 			_9PartGC.fillRectangle(_9PartImage.getBounds());
 
 			// paint all overlays for the current tile
-			for (final MapPainter overlay : _overlays) {
+			for (final MapPainter overlayPainter : _overlays) {
 
-				final boolean isPainted = overlay.doPaint(_9PartGC, Map.this, tile, parts);
+				final boolean isPainted = overlayPainter.doPaint(_9PartGC, Map.this, tile, parts);
 
 				isOverlayPainted = isOverlayPainted || isPainted;
 			}
@@ -2708,9 +2710,9 @@ public class Map extends Canvas {
 		final GC gc1Part = new GC(overlayImage);
 		{
 			// paint all overlays for the current tile
-			for (final MapPainter mapPainter : _overlays) {
+			for (final MapPainter overlayPainter : _overlays) {
 
-				final boolean isPainted = mapPainter.doPaint(gc1Part, Map.this, tile, 1);
+				final boolean isPainted = overlayPainter.doPaint(gc1Part, Map.this, tile, 1);
 
 				isOverlayPainted = isOverlayPainted || isPainted;
 			}

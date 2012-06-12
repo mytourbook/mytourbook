@@ -11,6 +11,8 @@
  *******************************************************************************/
 package net.tourbook.photo.gallery.MT20;
 
+import net.tourbook.photo.manager.Photo;
+
 import org.eclipse.swt.graphics.Point;
 
 /**
@@ -27,6 +29,53 @@ import org.eclipse.swt.graphics.Point;
 public class RendererHelper {
 
 	/**
+	 * Compute image size for the canvas size.
+	 * 
+	 * @param photoWrapper
+	 * @param imageHeight
+	 * @param imageWidth
+	 * @param imageCanvasWidth
+	 * @param imageCanvasHeight
+	 * @return
+	 */
+	public static Point getBestSize(final Photo photo,
+									final int imageWidth,
+									final int imageHeight,
+									final int imageCanvasWidth,
+									final int imageCanvasHeight) {
+
+		final Point canvasSize = getCanvasSize(imageWidth, imageHeight, imageCanvasWidth, imageCanvasHeight);
+
+		int imagePaintedWidth = canvasSize.x;
+		int imagePaintedHeight = canvasSize.y;
+
+		/*
+		 * the photo image should not be displayed larger than the original photo even when the
+		 * thumb image is larger, this can happen when image is resized
+		 */
+
+		final int photoImageWidth = photo.getImageWidth();
+		final int photoImageHeight = photo.getImageHeight();
+
+		if (photoImageWidth != Integer.MIN_VALUE) {
+
+			// photo is loaded
+
+			if (imagePaintedWidth > photoImageWidth || imagePaintedHeight > photoImageHeight) {
+
+				imagePaintedWidth = photoImageWidth;
+				imagePaintedHeight = photoImageHeight;
+			}
+		} else if (imagePaintedWidth > imageWidth || imagePaintedHeight > imageHeight) {
+
+			imagePaintedWidth = imageWidth;
+			imagePaintedHeight = imageHeight;
+		}
+
+		return new Point(imagePaintedWidth, imagePaintedHeight);
+	}
+
+	/**
 	 * Get best-fit size for an image drawn in an area of maxX, maxY
 	 * 
 	 * @param imageWidth
@@ -35,7 +84,7 @@ public class RendererHelper {
 	 * @param canvasHeight
 	 * @return
 	 */
-	public static Point getCanvasSize(	final int imageWidth,
+	private static Point getCanvasSize(	final int imageWidth,
 										final int imageHeight,
 										final int canvasWidth,
 										final int canvasHeight) {
@@ -50,5 +99,4 @@ public class RendererHelper {
 
 		return new Point(newWidth, newHeight);
 	}
-
 }

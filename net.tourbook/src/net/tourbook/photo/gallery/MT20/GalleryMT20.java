@@ -2009,12 +2009,12 @@ public abstract class GalleryMT20 extends Canvas {
 		// Get flag position in the 32 bit block and ensure is selected.
 		_selectionFlags[n] |= 1 << (itemIndex & 0x1f);
 
-		final GalleryMT20Item initializedItem = getInitializedItem(itemIndex);
+		final GalleryMT20Item galleryItem = getInitializedItem(itemIndex);
 
-		_lastSelectedItem = initializedItem;
+		_lastSelectedItem = galleryItem;
 		_lastSelectedItemIndex = itemIndex;
 
-		_selectedItems.put(initializedItem.uniqueItemID, initializedItem);
+		_selectedItems.put(galleryItem.uniqueItemID, galleryItem);
 	}
 
 	/**
@@ -2441,6 +2441,12 @@ public abstract class GalleryMT20 extends Canvas {
 		return _itemWidth;
 	}
 
+	public void setSelection(final Collection<GalleryMT20Item> selection) {
+		
+		// IS NOT YET IMPLEMENTED
+
+	}
+
 	/**
 	 * Set number of items in the gallery, the items itself are created when they are displayed.
 	 * <p>
@@ -2490,10 +2496,10 @@ public abstract class GalleryMT20 extends Canvas {
 	 */
 	private void showFullsizeImage(final int itemIndex) {
 
-		final GalleryMT20Item lastSelectedItem = getInitializedItem(itemIndex);
+		final GalleryMT20Item initializedItem = getInitializedItem(itemIndex);
 
-		if (lastSelectedItem != null) {
-			_fullSizeViewer.showImage(lastSelectedItem);
+		if (initializedItem != null) {
+			_fullSizeViewer.showImage(initializedItem);
 		}
 	}
 

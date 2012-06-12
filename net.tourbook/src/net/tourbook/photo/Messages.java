@@ -97,8 +97,11 @@ public class Messages extends NLS {
 	public static String		Pic_Dir_Dialog_FolderIsNotAvailable_Title;
 	public static String		Pic_Dir_ImageSizeIndicator_Tooltip;
 	public static String		Pic_Dir_Label_ExternalApp;
-	public static String		Pic_Dir_Label_FolderAreNotInitialized;
+
+	public static String	Pic_Dir_Label_ImageLoadingFailed;
 	public static String		Pic_Dir_Label_Loading;
+
+	public static String	Pic_Dir_Label_ReadingFolders;
 	public static String		Pic_Dir_ProgressBar_Filter_Tooltip;
 	public static String		Pic_Dir_Spinner_ThumbnailSize_Tooltip;
 	public static String		Pic_Dir_Spinner_ThumbnailSize_Tooltip_OSX;

@@ -24,6 +24,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.photo.gallery.MT20.GalleryMT20;
 import net.tourbook.photo.gallery.MT20.GalleryMT20Item;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.util.StatusUtil;
@@ -54,13 +55,6 @@ public class PhotoLoadManager {
 			{ 200, IMAGE_SIZE_LARGE_DEFAULT, 1000, 2000 };
 
 // SET_FORMATTING_ON
-
-//	/*
-//	 * image quality is the index in HQ_IMAGE_SIZES
-//	 */
-//	public static int											IMAGE_QUALITY_EXIF_THUMB	= 0;
-//	public static int											IMAGE_QUALITY_LARGE_IMAGE	= 1;
-//	public static int											IMAGE_QUALITY_ORIGINAL		= 2;
 
 	private static Display										_display;
 
@@ -253,6 +247,19 @@ public class PhotoLoadManager {
 	}
 
 	/**
+	 * check if the image is still visible
+	 * 
+	 * @param galleryItem
+	 * @return
+	 */
+	private static boolean isImageVisible(final GalleryMT20Item galleryItem) {
+
+		final boolean isItemVisible = galleryItem.gallery.isItemVisible(galleryItem);
+
+		return isItemVisible;
+	}
+
+	/**
 	 * @param imageFilePath
 	 * @return Returns <code>true</code> when the thumb image cannot be saved, the original image
 	 *         will be displayed. Possible AWT save error: "Bogus input colorspace"
@@ -269,7 +276,7 @@ public class PhotoLoadManager {
 		final Runnable executorTask = new Runnable() {
 			public void run() {
 
-				// get last added loader itme
+				// get last added loader item
 				final PhotoExifLoader loadingItem = _waitingQueueExif.pollLast();
 
 				if (loadingItem != null) {
@@ -280,17 +287,16 @@ public class PhotoLoadManager {
 		_executorExif.submit(executorTask);
 	}
 
-	public static void putImageInLoadingQueueHQ(final GalleryMT20Item galleryItem,
-												final Photo photo,
-												final ImageQuality imageQuality,
-												final ILoadCallBack loadCallBack) {
+	private static void putImageInLoadingQueueHQ(	final GalleryMT20Item galleryItem,
+													final Photo photo,
+													final ImageQuality imageQuality,
+													final ILoadCallBack loadCallBack) {
 		// set state
 		photo.setLoadingState(PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE, imageQuality);
 
 		// set HQ image loading item into the waiting queue
 		_waitingQueueHQ.add(new PhotoImageLoader(
 				_display,
-				galleryItem,
 				photo,
 				imageQuality,
 				_imageFramework,
@@ -304,6 +310,14 @@ public class PhotoLoadManager {
 				final PhotoImageLoader loadingItem = _waitingQueueHQ.pollFirst();
 
 				if (loadingItem != null) {
+
+					if (isImageVisible(galleryItem) == false) {
+
+						resetLoadingState(photo, imageQuality);
+
+						return;
+					}
+
 					loadingItem.loadImageHQ(_waitingQueueThumb, _waitingQueueExif);
 				}
 			}
@@ -311,16 +325,21 @@ public class PhotoLoadManager {
 		_executorHQ.submit(executorTask);
 	}
 
-	public static void putImageInLoadingQueueOriginal(	final GalleryMT20Item galleryItem,
+	/**
+	 * @param requestedItem
+	 * @param photo
+	 * @param imageLoadCallback
+	 */
+	public static void putImageInLoadingQueueOriginal(	final GalleryMT20Item requestedItem,
 														final Photo photo,
 														final ILoadCallBack imageLoadCallback) {
+
 		// set state
 		photo.setLoadingState(PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE, ImageQuality.ORIGINAL);
 
 		// set original image loading item into the waiting queue
 		_waitingQueueOriginal.add(new PhotoImageLoader(
 				_display,
-				galleryItem,
 				photo,
 				ImageQuality.ORIGINAL,
 				_imageFramework,
@@ -328,34 +347,73 @@ public class PhotoLoadManager {
 				imageLoadCallback));
 
 		final Runnable executorTask = new Runnable() {
+
 			public void run() {
 
-				// get last added loader itme
-				final PhotoImageLoader loadingItem = _waitingQueueOriginal.pollLast();
+				// get last added image loader
+				final PhotoImageLoader imageLoader = _waitingQueueOriginal.pollFirst();
+
+				if (imageLoader == null) {
+					// should not happen
+					return;
+				}
+
+				boolean isReset = false;
 
 				try {
-					if (loadingItem != null) {
-						loadingItem.loadImageOriginal();
+
+					final GalleryMT20 gallery = requestedItem.gallery;
+
+					if (gallery.isDisposed()) {
+						return;
 					}
+
+					// check if this image is still displayed
+					final GalleryMT20Item currentFullsizeItem = gallery.getFullsizeViewer().getCurrentItem();
+
+					if (currentFullsizeItem != requestedItem) {
+
+						// another gallery item is displayed
+
+						isReset = true;
+
+					} else {
+
+						imageLoader.loadImageOriginal();
+					}
+
 				} catch (final Exception e) {
 					StatusUtil.log(e);
+				} finally {
+
+					if (isReset
+
+					/*
+					 * this error occured when drawing an image in the photo renderer, it caused an
+					 * SWT exception even when the image is valid, potentially bug
+					 * https://bugs.eclipse.org/bugs/show_bug.cgi?id=375845
+					 */
+					|| photo.getLoadingState(ImageQuality.ORIGINAL) == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE) {
+
+						// reset state
+						resetLoadingState(photo, ImageQuality.ORIGINAL);
+					}
 				}
 			}
 		};
 		_executorOriginal.submit(executorTask);
 	}
 
-	public static void putImageInLoadingQueueThumb(	final GalleryMT20Item galleryItem,
-													final Photo photo,
-													final ImageQuality imageQuality,
-													final ILoadCallBack imageLoadCallback) {
+	public static void putImageInLoadingQueueThumbGallery(	final GalleryMT20Item galleryItem,
+															final Photo photo,
+															final ImageQuality imageQuality,
+															final ILoadCallBack imageLoadCallback) {
 		// set state
 		photo.setLoadingState(PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE, imageQuality);
 
 		// put image loading item into the waiting queue
 		_waitingQueueThumb.add(new PhotoImageLoader(
 				_display,
-				galleryItem,
 				photo,
 				imageQuality,
 				_imageFramework,
@@ -365,7 +423,7 @@ public class PhotoLoadManager {
 		final Runnable executorTask = new Runnable() {
 			public void run() {
 
-				// get last added loader itme
+				// get last added loader item
 				final PhotoImageLoader loadingItem = _waitingQueueThumb.pollFirst();
 
 				if (loadingItem != null) {
@@ -378,7 +436,62 @@ public class PhotoLoadManager {
 
 					} else {
 
-						loadingItem.loadImage(_waitingQueueOriginal);
+						if (isImageVisible(galleryItem) == false) {
+
+							resetLoadingState(photo, imageQuality);
+
+							return;
+						}
+
+						if (loadingItem.loadImageThumb(_waitingQueueOriginal)) {
+
+							// HQ image is requested
+
+							PhotoLoadManager.putImageInLoadingQueueHQ(//
+									galleryItem,
+									photo,
+									imageQuality,
+									imageLoadCallback);
+						}
+					}
+				}
+			}
+		};
+		_executorThumb.submit(executorTask);
+	}
+
+	public static void putImageInLoadingQueueThumbMap(	final Photo photo,
+														final ImageQuality imageQuality,
+														final ILoadCallBack imageLoadCallback) {
+		// set state
+		photo.setLoadingState(PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE, imageQuality);
+
+		// put image loading item into the waiting queue
+		_waitingQueueThumb.add(new PhotoImageLoader(
+				_display,
+				photo,
+				imageQuality,
+				_imageFramework,
+				_hqImageSize,
+				imageLoadCallback));
+
+		final Runnable executorTask = new Runnable() {
+			public void run() {
+
+				// get last added loader item
+				final PhotoImageLoader loadingItem = _waitingQueueThumb.pollFirst();
+
+				if (loadingItem != null) {
+
+					final String errorKey = loadingItem._photo.getPhotoWrapper().imageFilePathName;
+
+					if (_photoWithLoadingError.containsKey(errorKey)) {
+
+						photo.setLoadingState(PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR, imageQuality);
+
+					} else {
+
+						loadingItem.loadImageThumb(_waitingQueueOriginal);
 					}
 				}
 			}
@@ -415,6 +528,11 @@ public class PhotoLoadManager {
 					PhotoLoadingState.UNDEFINED,
 					photoImageLoaderItem._requestedImageQuality);
 		}
+	}
+
+	private static void resetLoadingState(final Photo photo, final ImageQuality imageQuality) {
+		// set state to undefined that it will be loaded again when image is visible and not in the cache
+		photo.setLoadingState(PhotoLoadingState.UNDEFINED, imageQuality);
 	}
 
 	public static void setFromPrefStore(final String imageFramework, final int hqImageSize) {

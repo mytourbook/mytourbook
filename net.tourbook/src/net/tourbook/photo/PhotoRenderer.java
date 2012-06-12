@@ -261,7 +261,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 				final LoadCallbackImage imageLoadCallback = _picDirImages.new LoadCallbackImage(galleryItem);
 
-				PhotoLoadManager.putImageInLoadingQueueThumb(
+				PhotoLoadManager.putImageInLoadingQueueThumbGallery(
 						galleryItem,
 						photo,
 						requestedImageQuality,
@@ -310,13 +310,17 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 				isDrawText = false;
 			}
 
-			draw_Image(gc, photoWrapper, paintedImage, galleryItem,//
+			final boolean isPainted = draw_Image(gc, photoWrapper, paintedImage, galleryItem,//
 					imageX,
 					imageY,
 					itemImageWidth,
 					itemImageHeight,
 					isRequestedQuality,
 					isSelected);
+
+			if (isPainted == false) {
+				// error occured painting the image, invalidate canvas
+			}
 
 			// debug box for the image area
 //			gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_RED));
@@ -373,19 +377,20 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	 * @param isRequestedQuality
 	 * @param isSelected
 	 * @param isFullsizeImage
+	 * @return
 	 */
-	private void draw_Image(final GC gc,
-							final PhotoWrapper photoWrapper,
-							final Image photoImage,
-							final GalleryMT20Item galleryItem,
-							final int photoPosX,
-							final int photoPosY,
-							final int imageCanvasWidth,
-							final int imageCanvasHeight,
-							final boolean isRequestedQuality,
-							final boolean isSelected) {
+	private boolean draw_Image(	final GC gc,
+								final PhotoWrapper photoWrapper,
+								final Image photoImage,
+								final GalleryMT20Item galleryItem,
+								final int photoPosX,
+								final int photoPosY,
+								final int imageCanvasWidth,
+								final int imageCanvasHeight,
+								final boolean isRequestedQuality,
+								final boolean isSelected) {
 
-		final Point bestSize = getBestSize(
+		final Point bestSize = RendererHelper.getBestSize(
 				photoWrapper.photo,
 				_paintedImageWidth,
 				_paintedImageHeight,
@@ -425,6 +430,11 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 				System.out.println("SWT exception occured when painting valid image " //$NON-NLS-1$
 						+ photoWrapper.imageFilePathName
 						+ " it's potentially this bug: https://bugs.eclipse.org/bugs/show_bug.cgi?id=375845"); //$NON-NLS-1$
+
+				// ensure image is valid after reloading
+				photoImage.dispose();
+
+				return false;
 			}
 
 			if (isSelected) {
@@ -463,6 +473,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 //
 //			StatusUtil.log(message, e);
 		}
+
+		return true;
 	}
 
 	@Override
@@ -498,6 +510,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		gc.setForeground(_fgColor);
 		gc.setBackground(_fullsizeBgColor);
 
+		boolean isPainted = true;
+
 		/*
 		 * paint image
 		 */
@@ -528,7 +542,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 			if (zoomState == ZoomState.FIT_WINDOW || zoomFactor == 0.0) {
 
-				draw_Image(gc, photoWrapper, paintedImage, galleryItem,//
+				isPainted = draw_Image(gc, photoWrapper, paintedImage, galleryItem,//
 						0,
 						0,
 						canvasWidth,
@@ -579,6 +593,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		paintingResult.imagePaintedZoomFactor = _imagePaintedZoomFactor;
 		paintingResult.isOriginalImagePainted = _isFullsizeImageAvailable;
 		paintingResult.isLoadingError = _isFullsizeLoadingError;
+		paintingResult.isPainted = isPainted;
 
 		return paintingResult;
 	}
@@ -1042,57 +1057,6 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 			gc.setBackground(_selectionFgColor);
 			gc.fillRectangle(photoPosX, photoPosY, 2, imageCanvasHeight);
 		}
-	}
-
-	/**
-	 * Compute image size for the canvas size.
-	 * 
-	 * @param photoWrapper
-	 * @param imageHeight
-	 * @param imageWidth
-	 * @param imageCanvasWidth
-	 * @param imageCanvasHeight
-	 * @return
-	 */
-	private Point getBestSize(	final Photo photo,
-								final int imageWidth,
-								final int imageHeight,
-								final int imageCanvasWidth,
-								final int imageCanvasHeight) {
-
-		final Point canvasSize = RendererHelper.getCanvasSize(
-				imageWidth,
-				imageHeight,
-				imageCanvasWidth,
-				imageCanvasHeight);
-
-		int imagePaintedWidth = canvasSize.x;
-		int imagePaintedHeight = canvasSize.y;
-
-		/*
-		 * the photo image should not be displayed larger than the original photo even when the
-		 * thumb image is larger, this can happen when image is resized
-		 */
-
-		final int photoImageWidth = photo.getImageWidth();
-		final int photoImageHeight = photo.getImageHeight();
-
-		if (photoImageWidth != Integer.MIN_VALUE) {
-
-			// photo is loaded
-
-			if (imagePaintedWidth > photoImageWidth || imagePaintedHeight > photoImageHeight) {
-
-				imagePaintedWidth = photoImageWidth;
-				imagePaintedHeight = photoImageHeight;
-			}
-		} else if (imagePaintedWidth > imageWidth || imagePaintedHeight > imageHeight) {
-
-			imagePaintedWidth = imageWidth;
-			imagePaintedHeight = imageHeight;
-		}
-
-		return new Point(imagePaintedWidth, imagePaintedHeight);
 	}
 
 	@Override

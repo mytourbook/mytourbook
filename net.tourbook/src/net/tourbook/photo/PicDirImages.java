@@ -59,6 +59,7 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -267,6 +268,8 @@ public class PicDirImages implements IItemHovereredListener {
 	private Job													_jobUILoading;
 	private AtomicBoolean										_jobUILoadingIsScheduled		= new AtomicBoolean();
 	private int													_jobUILoadingDirtyCounter;
+
+	private Collection<GalleryMT20Item>							_selectionBeforeImageFilter;
 
 	/*
 	 * UI resources
@@ -1028,7 +1031,9 @@ public class PicDirImages implements IItemHovereredListener {
 		/*
 		 * deselect all, this could be better implemented to keep selection, but is not yet done
 		 */
-		deselectAll();
+//		deselectAll();
+
+		_selectionBeforeImageFilter = _gallery.getSelection();
 
 		jobFilter_22_ScheduleSubsequent(0);
 	}
@@ -1038,7 +1043,7 @@ public class PicDirImages implements IItemHovereredListener {
 	}
 
 	/**
-	 * This message is displayed when no other message should be displayed.
+	 * This message is displayed when no other message is displayed.
 	 * 
 	 * @return
 	 */
@@ -1143,7 +1148,7 @@ public class PicDirImages implements IItemHovereredListener {
 		_filterJobIsCanceled = true;
 		_jobUIFilterPhotoWrapper = null;
 
-		// wait until the filter job has been canceled
+		// wait until the filter job has ended
 		try {
 
 			_jobFilter.cancel();
@@ -1680,6 +1685,24 @@ public class PicDirImages implements IItemHovereredListener {
 
 		// show default message
 		updateUI_StatusMessage(UI.EMPTY_STRING);
+
+		/*
+		 * fire selection
+		 */
+		final Collection<GalleryMT20Item> allItems = _gallery.getSelection();
+
+		final ArrayList<Photo> photos = new ArrayList<Photo>();
+
+		for (final GalleryMT20Item item : allItems) {
+
+			final IGalleryCustomData customData = item.customData;
+
+			if (customData instanceof PhotoWrapper) {
+				photos.add(((PhotoWrapper) customData).photo);
+			}
+		}
+
+		_picDirView.setSelection(new StructuredSelection(photos));
 	}
 
 	private void onSelectThumbnailSize(final int newImageSize) {
@@ -1882,7 +1905,7 @@ public class PicDirImages implements IItemHovereredListener {
 		_pageBook.showPage(_gallery);
 
 		// show loading page until a folder is selected
-		_lblLoading.setText(Messages.Pic_Dir_Label_FolderAreNotInitialized);
+		_lblLoading.setText(Messages.Pic_Dir_Label_ReadingFolders);
 		_pageBook.showPage(_pageLoading);
 
 		/**
@@ -1987,6 +2010,9 @@ public class PicDirImages implements IItemHovereredListener {
 	 */
 	void showImages(final File imageFolder, final boolean isFromNavigationHistory, final boolean isReloadFolder) {
 
+		// prevent reselection
+		_selectionBeforeImageFilter = null;
+
 		jobFilter_12_Stop();
 
 		PhotoLoadManager.stopImageLoading(true);
@@ -2003,7 +2029,7 @@ public class PicDirImages implements IItemHovereredListener {
 		//////////////////////////////////////////
 
 		if (imageFolder == null) {
-			_lblLoading.setText(Messages.Pic_Dir_Label_FolderAreNotInitialized);
+			_lblLoading.setText(Messages.Pic_Dir_Label_ReadingFolders);
 		} else {
 
 			_lblLoading.setText(NLS.bind(Messages.Pic_Dir_Label_Loading, imageFolder.getAbsolutePath()));
@@ -2375,9 +2401,13 @@ public class PicDirImages implements IItemHovereredListener {
 					// update gallery
 					_gallery.setVirtualItems(sortedGalleryItems);
 
+					if (_selectionBeforeImageFilter != null) {
+						_gallery.setSelection(_selectionBeforeImageFilter);
+					}
+
 				} else {
 
-					// no gallery items
+					// there is no gallery item
 
 					updateUI_GalleryInfo();
 				}

@@ -766,15 +766,6 @@ public class DialogQuickEdit extends TitleAreaDialog {
 //		return null;
 	}
 
-	private int getWindDirectionTextIndex(final int degreeDirection) {
-
-		final float degree = (degreeDirection + 22.5f) / 45.0f;
-
-		final int directionIndex = ((int) degree) % 8;
-
-		return directionIndex;
-	}
-
 	private int getWindSpeedTextIndex(final int speed) {
 
 		// set speed to max index value
@@ -842,8 +833,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			_spinWindDirectionValue.setSelection(degree);
 		}
 
-		_comboWindDirectionText.select(getWindDirectionTextIndex(degree));
-
+		_comboWindDirectionText.select(UI.getCardinalDirectionTextIndex(degree));
 	}
 
 	private void onSelectWindSpeedText() {
@@ -940,7 +930,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			// wind direction
 			final int weatherWindDirDegree = _tourData.getWeatherWindDir();
 			_spinWindDirectionValue.setSelection(weatherWindDirDegree);
-			_comboWindDirectionText.select(getWindDirectionTextIndex(weatherWindDirDegree));
+			_comboWindDirectionText.select(UI.getCardinalDirectionTextIndex(weatherWindDirDegree));
 
 			// wind speed
 			final int windSpeed = _tourData.getWeatherWindSpeed();

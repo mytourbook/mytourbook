@@ -43,6 +43,7 @@ public class ViewerDetailForm {
 	private Control				_detail;
 
 	private Integer				_viewerWidth;
+	private Integer				_sashWidth;
 	private FormData			_sashLayoutData;
 
 	private boolean				_isInitialResize;
@@ -108,16 +109,20 @@ public class ViewerDetailForm {
 				final Rectangle parentRect = parent.getClientArea();
 
 				final int right = parentRect.width - sashRect.width - MINIMUM_WIDTH;
-				final int sashWidth = Math.max(Math.min(e.x, right), MINIMUM_WIDTH);
+				_sashWidth = Math.max(Math.min(e.x, right), MINIMUM_WIDTH);
 
-				if (sashWidth != sashRect.x) {
-					_sashLayoutData.left = new FormAttachment(0, sashWidth);
+				if (_sashWidth != sashRect.x) {
+					_sashLayoutData.left = new FormAttachment(0, _sashWidth);
 					parent.layout();
 				}
 
-				_viewerWidth = sashWidth;
+				_viewerWidth = _sashWidth;
 			}
 		});
+	}
+
+	public int getViewerWidth() {
+		return _sashWidth == null ? MINIMUM_WIDTH : _sashWidth;
 	}
 
 	private void onResize() {
@@ -201,6 +206,7 @@ public class ViewerDetailForm {
 	 */
 	public void setViewerWidth(final Integer viewerWidth) {
 		_viewerWidth = viewerWidth == null ? null : Math.max(MINIMUM_WIDTH, viewerWidth);
+		_sashWidth = _viewerWidth;
 		onResize();
 	}
 }

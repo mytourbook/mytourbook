@@ -108,7 +108,7 @@ public class FullSizeViewer {
 
 	private Cursor							_cursorWait;
 	private Cursor							_cursorHidden;
-	private Cursor							_cursorNotImplemented;
+//	private Cursor							_cursorNotImplemented;
 
 	private Font							_font;
 
@@ -283,7 +283,7 @@ public class FullSizeViewer {
 		_canvas.setMenu(createUI_ContextMenu(_canvas));
 
 		final Image cursorImage = TourbookPlugin.getImageDescriptor(Messages.Image__CursorNotImplemented).createImage();
-		_cursorNotImplemented = new Cursor(_shell.getDisplay(), cursorImage.getImageData(), 0, 0);
+//		_cursorNotImplemented = new Cursor(_shell.getDisplay(), cursorImage.getImageData(), 0, 0);
 
 		cursorImage.dispose();
 
@@ -350,7 +350,7 @@ public class FullSizeViewer {
 
 		_cursorHidden.dispose();
 		_cursorWait.dispose();
-		_cursorNotImplemented.dispose();
+//		_cursorNotImplemented.dispose();
 
 		for (final Image image : _shellImage) {
 			image.dispose();
@@ -428,7 +428,8 @@ public class FullSizeViewer {
 
 	private void onMouseMove(final MouseEvent mouseEvent) {
 
-		_canvas.setCursor(_cursorNotImplemented);
+//		_canvas.setCursor(_cursorNotImplemented);
+		_canvas.setCursor(null);
 
 		sleepCursor();
 	}
@@ -476,26 +477,30 @@ public class FullSizeViewer {
 
 		System.out.println(UI.timeStamp() + "draw fullsize image " + (System.currentTimeMillis() - start) + " ms"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		if (paintingResult != null) {
-
-			// get zoomfactor when image is painted to fill window
-
-			_zoomFactor = paintingResult.imagePaintedZoomFactor;
+		if (paintingResult == null) {
+			return;
 		}
 
-		final boolean isOriginalImagePainted = paintingResult.isOriginalImagePainted;
+		if (paintingResult.isPainted == false) {
+			// image is disposed, try to load and paint again
+			updateUI();
+		} else {
 
-		// hide cursor when image is finally painted or when loading error
-		if (isOriginalImagePainted || paintingResult.isLoadingError) {
+			// get zoomfactor when image is painted to fill window
+			_zoomFactor = paintingResult.imagePaintedZoomFactor;
 
-			_isShowWaitCursor = false;
-			_canvas.setCursor(_cursorHidden);
+			// hide cursor when image is finally painted or when loading error
+			if (paintingResult.isOriginalImagePainted || paintingResult.isLoadingError) {
 
-		} else if (_isShowLoadingMessage == false) {
+				_isShowWaitCursor = false;
+				_canvas.setCursor(_cursorHidden);
 
-			// do not show waiting cursor when loading message is displayed
+			} else if (_isShowLoadingMessage == false) {
 
-			showWaitingCursor();
+				// do not show waiting cursor when loading message is displayed
+
+				showWaitingCursor();
+			}
 		}
 	}
 
@@ -625,6 +630,11 @@ public class FullSizeViewer {
 	 */
 	public boolean updateUI() {
 
+		if (_galleryItem == null) {
+			// there is nothing which can be displayed
+			return false;
+		}
+
 		if (_shell == null) {
 			createUI();
 		}
@@ -646,7 +656,7 @@ public class FullSizeViewer {
 
 		if (clippingArea != null) {
 
-			// redraw canvas
+			// redraw canvas, which fires an paint event
 
 			_canvas.redraw(clippingArea.x, clippingArea.y, clippingArea.width, clippingArea.height, false);
 

@@ -26,6 +26,7 @@ import net.tourbook.photo.manager.PhotoImageCache;
 import net.tourbook.photo.manager.PhotoImageMetadata;
 import net.tourbook.photo.manager.PhotoLoadManager;
 import net.tourbook.photo.manager.PhotoWrapper;
+import net.tourbook.ui.UI;
 import net.tourbook.util.StatusUtil;
 import net.tourbook.util.ToolTip;
 
@@ -50,8 +51,6 @@ import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-
-import de.byteholder.geoclipse.map.UI;
 
 public class PhotoToolTip extends ToolTip {
 
@@ -100,6 +99,8 @@ public class PhotoToolTip extends ToolTip {
 	private Canvas					_canvas;
 	private Composite				_canvasContainer;
 
+	private Label					_labelError;
+
 	public PhotoToolTip(final GalleryMT20 control) {
 
 		super(control, NO_RECREATE, false);
@@ -117,9 +118,18 @@ public class PhotoToolTip extends ToolTip {
 	@Override
 	protected Composite createToolTipContentArea(final Event event, final Composite parent) {
 
+		if (_photo == null) {
+			return null;
+		}
+
 		final Composite container = createUI(parent);
 
-		// set colors for all controls
+		/*
+		 * set colors for all controls
+		 */
+		_bgColor = _gallery.getBackground();
+		_fgColor = _gallery.getForeground();
+
 		updateUI_colors(parent);
 
 		return container;
@@ -138,7 +148,7 @@ public class PhotoToolTip extends ToolTip {
 				.spacing(3, 1)
 				.numColumns(1)
 				.applyTo(container);
-		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 		{
 			final Composite containerHeader = new Composite(container, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(containerHeader);
@@ -163,6 +173,19 @@ public class PhotoToolTip extends ToolTip {
 				createUI_Metadata(container, metaData);
 			}
 
+			/*
+			 * label: loading error
+			 */
+			if (_photo.isLoadingError()) {
+
+				_labelError = new Label(container, SWT.WRAP);
+				GridDataFactory.fillDefaults()//
+						.indent(0, 5)
+//						.hint(DEFAULT_TEXT_WIDTH, SWT.DEFAULT)
+						.applyTo(_labelError);
+				_labelError.setText(Messages.Pic_Dir_Label_ImageLoadingFailed);
+			}
+
 			// display thumb image only when the gallery image is smaller than the default thumb size
 //			if (_galleryImageSize < PhotoLoadManager.IMAGE_SIZE_THUMBNAIL) {
 			if (_galleryImageSize < 120) {
@@ -181,10 +204,6 @@ public class PhotoToolTip extends ToolTip {
 		final boolean isModel = metaData.model != null;
 		final boolean isExifDate = exifDateTime != null;
 
-//		if (!isTitle && !isDescription && !isModel) {
-//			return;
-//		}
-
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
 		GridLayoutFactory.fillDefaults().spacing(5, 1).numColumns(2).applyTo(container);
@@ -198,7 +217,7 @@ public class PhotoToolTip extends ToolTip {
 				createUI_MetadataLine(
 						container,
 						"Date:",
-						_dtWeekday.print(exifDateTime) + "  " + _dtFormatter.print(exifDateTime));
+						_dtWeekday.print(exifDateTime) + UI.SPACE2 + _dtFormatter.print(exifDateTime));
 
 				// display modified date only when it differs from the exif/original date
 
@@ -227,9 +246,21 @@ public class PhotoToolTip extends ToolTip {
 						_dtWeekday.print(imageFileDateTime) + "  " + _dtFormatter.print(imageFileDateTime));
 			}
 
-			createUI_MetadataLine(container, //
+			/*
+			 * size + cardinal direction
+			 */
+			final double photoImageDirection = _photo.getImageDirection();
+			final int degreeDirectionInt = (int) (photoImageDirection);
+			final String imageDirection = photoImageDirection == Double.MIN_VALUE //
+					? UI.EMPTY_STRING
+					: UI.getCardinalDirectionText(degreeDirectionInt)
+							+ UI.SPACE4
+							+ (degreeDirectionInt + UI.SPACE + net.tourbook.ui.UI.SYMBOL_DEGREE);
+
+			createUI_MetadataLine2(container, //
 					"Size:",
-					_nfMByte.format(_photoWrapper.imageFileSize / 1024.0 / 1024.0) + " " + UI.MBYTES);
+					_nfMByte.format(_photoWrapper.imageFileSize / 1024.0 / 1024.0) + UI.SPACE2 + UI.UNIT_MBYTES,
+					imageDirection);
 
 			if (isTitle) {
 				createUI_MetadataLine(container, "Title:", metaData.objectName);
@@ -272,6 +303,50 @@ public class PhotoToolTip extends ToolTip {
 //		label.pack();
 	}
 
+	private void createUI_MetadataLine2(final Composite container,
+										final String name,
+										final String value,
+										final String value2) {
+
+		/*
+		 * use hint only when text is too large, otherwise it will displays the white space allways
+		 */
+		final int hintX = value.length() > DEFAULT_TEXT_WIDTH ? _defaultTextWidthPixel : SWT.DEFAULT;
+
+		/*
+		 * name
+		 */
+		Label label;
+		label = new Label(container, SWT.NONE);
+		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
+		label.setText(name);
+
+		final Composite valueContainer = new Composite(container, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(valueContainer);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(valueContainer);
+		{
+			/*
+			 * value 1
+			 */
+			label = new Label(valueContainer, SWT.WRAP);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.BEGINNING, SWT.BEGINNING)
+					.hint(hintX, SWT.DEFAULT)
+					.applyTo(label);
+			label.setText(value);
+
+			/*
+			 * value 2
+			 */
+			label = new Label(valueContainer, SWT.WRAP);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.END, SWT.BEGINNING)
+					.grab(true, false)
+					.applyTo(label);
+			label.setText(value2);
+		}
+	}
+
 	/**
 	 * Photo image will only be displayed when image is loaded and available in the image cache.
 	 * 
@@ -307,7 +382,8 @@ public class PhotoToolTip extends ToolTip {
 			final int imageCanvasWidth = PhotoLoadManager.IMAGE_SIZE_THUMBNAIL;
 			final int imageCanvasHeight = (int) (PhotoLoadManager.IMAGE_SIZE_THUMBNAIL / _gallery.getItemRatio());
 
-			final Point bestSize = RendererHelper.getCanvasSize(
+			final Point bestSize = RendererHelper.getBestSize(
+					_photo,
 					_imageWidth,
 					_imageHeight,
 					imageCanvasWidth,
@@ -316,27 +392,36 @@ public class PhotoToolTip extends ToolTip {
 			_imagePaintedWidth = bestSize.x;
 			_imagePaintedHeight = bestSize.y;
 
-			final int photoImageWidth = _photo.getImageWidth();
-			final int photoImageHeight = _photo.getImageHeight();
-
-			/*
-			 * the photo image should not be displayed larger than the original photo even when the
-			 * thumb image is larger, this can happen when image is resized
-			 */
-			if (photoImageWidth != Integer.MIN_VALUE) {
-
-				// photo is loaded
-
-				if (_imagePaintedWidth > photoImageWidth || _imagePaintedHeight > photoImageHeight) {
-
-					_imagePaintedWidth = photoImageWidth;
-					_imagePaintedHeight = photoImageHeight;
-				}
-			} else if (_imagePaintedWidth > _imageWidth || _imagePaintedHeight > _imageHeight) {
-
-				_imagePaintedWidth = _imageWidth;
-				_imagePaintedHeight = _imageHeight;
-			}
+//			final Point bestSize = RendererHelper.getCanvasSize(
+//					_imageWidth,
+//					_imageHeight,
+//					imageCanvasWidth,
+//					imageCanvasHeight);
+//
+//			_imagePaintedWidth = bestSize.x;
+//			_imagePaintedHeight = bestSize.y;
+//
+//			final int photoImageWidth = _photo.getImageWidth();
+//			final int photoImageHeight = _photo.getImageHeight();
+//
+//			/*
+//			 * the photo image should not be displayed larger than the original photo even when the
+//			 * thumb image is larger, this can happen when image is resized
+//			 */
+//			if (photoImageWidth != Integer.MIN_VALUE) {
+//
+//				// photo is loaded
+//
+//				if (_imagePaintedWidth > photoImageWidth || _imagePaintedHeight > photoImageHeight) {
+//
+//					_imagePaintedWidth = photoImageWidth;
+//					_imagePaintedHeight = photoImageHeight;
+//				}
+//			} else if (_imagePaintedWidth > _imageWidth || _imagePaintedHeight > _imageHeight) {
+//
+//				_imagePaintedWidth = _imageWidth;
+//				_imagePaintedHeight = _imageHeight;
+//			}
 
 		} catch (final Exception e) {
 			StatusUtil.log(e);
@@ -502,35 +587,33 @@ public class PhotoToolTip extends ToolTip {
 
 		} else {
 
-			// show tooltip
+			// another item is hovered, show tooltip
 
 			if (_currentHoveredGalleryItem != null) {
-				hide();
+				reset();
 			}
 
 			_photoWrapper = (PhotoWrapper) hoveredItem.customData;
 
 			if (_photoWrapper == null) {
+
 				reset();
-				return;
+
+			} else {
+
+				_currentHoveredGalleryItem = hoveredItem;
+				_photo = _photoWrapper.photo;
+
+				final Point location = new Point(//
+						hoveredItem.viewPortX,
+						hoveredItem.viewPortY + hoveredItem.height);
+
+				show(location);
 			}
-
-			_currentHoveredGalleryItem = hoveredItem;
-			_photo = _photoWrapper.photo;
-
-			final Point location = new Point(//
-					hoveredItem.viewPortX,
-					hoveredItem.viewPortY + hoveredItem.height);
-
-			show(location);
 		}
-
 	}
 
 	private void updateUI_colors(final Control child) {
-
-		_bgColor = _gallery.getBackground();
-		_fgColor = _gallery.getForeground();
 
 		child.setBackground(_bgColor);
 		child.setForeground(_fgColor);
@@ -538,12 +621,18 @@ public class PhotoToolTip extends ToolTip {
 		if (child instanceof Composite) {
 			final Control[] children = ((Composite) child).getChildren();
 			for (final Control element : children) {
-				updateUI_colors(element);
+
+				if (element != null && element.isDisposed() == false) {
+					updateUI_colors(element);
+				}
 			}
 		}
 
-		// set image preview background
+		if (_labelError != null && _labelError.isDisposed() == false) {
+			_labelError.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+		}
 
+// set image preview background
 //		_canvas.setBackground(_gallery.getBackground());
 //		_canvasContainer.setBackground(_gallery.getBackground());
 

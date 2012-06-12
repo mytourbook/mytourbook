@@ -160,6 +160,7 @@ public class UI {
 	private static final String								UNIT_ALTIMETER_M_H				= "m/h";										//$NON-NLS-1$
 	private static final String								UNIT_PACE_MIN_P_KM				= "min/km";									//$NON-NLS-1$
 	public static final String								UNIT_WEIGHT_KG					= "kg";										//$NON-NLS-1$
+	public static final String								UNIT_MBYTES						= "MByte";										//$NON-NLS-1$
 
 	private static final String								UNIT_DISTANCE_YARD				= "yd";										//$NON-NLS-1$
 	private static final String								UNIT_ALTITUDE_FT				= "ft";										//$NON-NLS-1$
@@ -418,7 +419,7 @@ public class UI {
 
 	/**
 	 * Change the title for the application
-	 *
+	 * 
 	 * @param newTitle
 	 *            new title for the application or <code>null</code> to set the original title
 	 */
@@ -543,7 +544,7 @@ public class UI {
 
 	/**
 	 * Checks if tour id is contained in the property data
-	 *
+	 * 
 	 * @param propertyData
 	 * @param checkedTourId
 	 * @return Returns the tour id when it is contained in the property data, otherwise it returns
@@ -589,7 +590,7 @@ public class UI {
 
 	/**
 	 * Display text as a bulleted list
-	 *
+	 * 
 	 * @param parent
 	 * @param bulletText
 	 * @param startLine
@@ -652,6 +653,38 @@ public class UI {
 		return styledText;
 	}
 
+	/**
+	 * Creates a label which is wrapped and grabs the width.
+	 * 
+	 * @param formToolkit
+	 * @param parent
+	 * @param labelText
+	 * @return
+	 */
+	public static Composite createLabel(final FormToolkit formToolkit, final Composite parent, final String labelText) {
+
+		final Composite container = formToolkit.createComposite(parent);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
+		{
+			final Label label = formToolkit.createLabel(container, labelText, SWT.WRAP);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
+		}
+
+		return container;
+	}
+
+	/**
+	 * Disables all controls and their children
+	 */
+	public static void disableAllControls(final Composite container) {
+
+		disableAllControlsInternal(container);
+
+		// !!! force controls (text,combo...) to be updated !!!
+		container.update();
+	}
+
 //	/**
 //	 * Converts the image into an image with the map transparent background color. Original image
 //	 * will be disposed and the transparent image is returned.
@@ -691,38 +724,6 @@ public class UI {
 //	}
 
 	/**
-	 * Creates a label which is wrapped and grabs the width.
-	 *
-	 * @param formToolkit
-	 * @param parent
-	 * @param labelText
-	 * @return
-	 */
-	public static Composite createLabel(final FormToolkit formToolkit, final Composite parent, final String labelText) {
-
-		final Composite container = formToolkit.createComposite(parent);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
-		{
-			final Label label = formToolkit.createLabel(container, labelText, SWT.WRAP);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
-		}
-
-		return container;
-	}
-
-	/**
-	 * Disables all controls and their children
-	 */
-	public static void disableAllControls(final Composite container) {
-
-		disableAllControlsInternal(container);
-
-		// !!! force controls (text,combo...) to be updated !!!
-		container.update();
-	}
-
-	/**
 	 * !!!!!!!!!!!!!!! RECURSIVE !!!!!!!!!!!!!!!!!!
 	 */
 	private static void disableAllControlsInternal(final Composite container) {
@@ -746,7 +747,7 @@ public class UI {
 
 	/**
 	 * Hours are ignored when they are 0. An empty string is returned when time = <code>-1</code>
-	 *
+	 * 
 	 * @param time
 	 * @return
 	 */
@@ -781,7 +782,7 @@ public class UI {
 
 	/**
 	 * force hours to be displayed
-	 *
+	 * 
 	 * @param time
 	 * @return
 	 */
@@ -848,13 +849,35 @@ public class UI {
 				.toString();
 	}
 
+	/**
+	 * @param degreeDirection
+	 * @return Returns cardinal direction
+	 */
+	public static String getCardinalDirectionText(final int degreeDirection) {
+
+		return IWeather.windDirectionText[getCardinalDirectionTextIndex(degreeDirection)];
+	}
+
+	/**
+	 * @param degreeDirection
+	 * @return Returns cardinal direction index for {@link IWeather#windDirectionText}
+	 */
+	public static int getCardinalDirectionTextIndex(final int degreeDirection) {
+
+		final float degree = (degreeDirection + 22.5f) / 45.0f;
+
+		final int directionIndex = ((int) degree) % 8;
+
+		return directionIndex;
+	}
+
 	public static ColumnPixelData getColumnPixelWidth(final PixelConverter pixelConverter, final int width) {
 		return new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(width), false);
 	}
 
 	/******************************************************************************
 	 * this method is copied from the following source and was adjusted
-	 *
+	 * 
 	 * <pre>
 	 * Product: Compiere ERP &amp; CRM Smart Business Solution                    *
 	 * Copyright (C) 1999-2006 ComPiere, Inc. All Rights Reserved.                *
@@ -871,7 +894,7 @@ public class UI {
 	 * ComPiere, Inc., 2620 Augustine Dr. #245, Santa Clara, CA 95054, USA        *
 	 * or via info@compiere.org or http://www.compiere.org/license.html           *
 	 * </pre>
-	 *
+	 * 
 	 * @return date formatter with leading zeros for month and day and 4-digit year
 	 */
 	public static DateFormat getFormatterDateShort() {
@@ -928,7 +951,7 @@ public class UI {
 
 	/******************************************************************************
 	 * this method is copied from the following source and was adjusted
-	 *
+	 * 
 	 * <pre>
 	 * Product: Compiere ERP &amp; CRM Smart Business Solution                    *
 	 * Copyright (C) 1999-2006 ComPiere, Inc. All Rights Reserved.                *
@@ -945,7 +968,7 @@ public class UI {
 	 * ComPiere, Inc., 2620 Augustine Dr. #245, Santa Clara, CA 95054, USA        *
 	 * or via info@compiere.org or http://www.compiere.org/license.html           *
 	 * </pre>
-	 *
+	 * 
 	 * @return date formatter with leading zeros for month and day and 4-digit year
 	 */
 	public static DateFormat getFormatterTimeShort() {
@@ -1008,7 +1031,7 @@ public class UI {
 
 	/**
 	 * Checks if propertyData has the same tour as the oldTourData
-	 *
+	 * 
 	 * @param propertyData
 	 * @param oldTourData
 	 * @return Returns {@link TourData} from the propertyData or <code>null</code> when it's another
@@ -1050,7 +1073,7 @@ public class UI {
 
 	/**
 	 * Restore the sash weight from a memento
-	 *
+	 * 
 	 * @param sash
 	 * @param fMemento
 	 * @param weightKey
@@ -1132,7 +1155,7 @@ public class UI {
 
 	/**
 	 * Store the weights for the sash in a memento
-	 *
+	 * 
 	 * @param sash
 	 * @param memento
 	 * @param weightKey
@@ -1148,7 +1171,7 @@ public class UI {
 
 	/**
 	 * Set grid layout with no margins for a composite
-	 *
+	 * 
 	 * @param composite
 	 */
 	public static void set0GridLayout(final Composite composite) {
@@ -1337,7 +1360,7 @@ public class UI {
 
 	/**
 	 * Sets the tour type image and text into a {@link CLabel}
-	 *
+	 * 
 	 * @param tourData
 	 * @param lblTourType
 	 * @param isTextDisplayed
@@ -1597,7 +1620,7 @@ public class UI {
 	/**
 	 * The image descriptor is cached because the creation takes system resources and it's called
 	 * very often
-	 *
+	 * 
 	 * @param tourTypeId
 	 *            Tour type id
 	 * @return Returns image descriptor for the tour type id
@@ -1648,7 +1671,7 @@ public class UI {
 
 	/**
 	 * updates an existing tour type image
-	 *
+	 * 
 	 * @param existingImage
 	 */
 	private Image updateTourTypeImage(final Image existingImage, final long typeId, final String keyColorId) {

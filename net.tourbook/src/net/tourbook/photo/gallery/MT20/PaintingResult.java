@@ -26,6 +26,8 @@ public class PaintingResult {
 
 	public boolean	isLoadingError;
 
+	public boolean	isPainted;
+
 	public PaintingResult() {}
 
 }
