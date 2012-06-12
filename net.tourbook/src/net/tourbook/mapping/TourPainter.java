@@ -39,6 +39,8 @@ import net.tourbook.ui.ColorCacheInt;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.resource.ColorRegistry;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
@@ -91,23 +93,31 @@ public class TourPainter extends MapPainter {
 	private static Image					_tourStartMarker;
 
 	private static Image					_tourEndMarker;
+
+	private static Rectangle				_twpImageBounds;
+	private static TourPainterConfiguration	_tourPaintConfig;
+
+	private final static NumberFormat		_nf1				= NumberFormat.getNumberInstance();
+	{
+		_nf1.setMinimumFractionDigits(1);
+		_nf1.setMaximumFractionDigits(1);
+	}
+
+	/*
+	 * UI resources
+	 */
+	private static Color					_bgColor;
+
 	/**
 	 * Tour Way Point image
 	 */
 	private static Image					_twpImage;
 
-	private static Rectangle				_twpImageBounds;
-	private static TourPainterConfiguration	_tourPaintConfig;
-
 	private final static ColorCacheInt		_colorCache			= new ColorCacheInt();
-
-	private final static NumberFormat		_nf1				= NumberFormat.getNumberInstance();
-
-	{
-		_nf1.setMinimumFractionDigits(1);
-		_nf1.setMaximumFractionDigits(1);
-	}
 	static {
+
+		final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
+		_bgColor = colorRegistry.get(ITourbookPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
 
 		_tourPaintConfig = TourPainterConfiguration.getInstance();
 
@@ -552,7 +562,7 @@ public class TourPainter extends MapPainter {
 			return false;
 		}
 
-		boolean isTourInTile = false;
+		boolean isContentInTile = false;
 
 		if (_isImageAvailable == false) {
 			createImages();
@@ -576,7 +586,7 @@ public class TourPainter extends MapPainter {
 
 			final boolean isDrawTourInTile = drawTour10InTile(gc, map, tile, tourData, parts);
 
-			isTourInTile = isTourInTile || isDrawTourInTile;
+			isContentInTile = isContentInTile || isDrawTourInTile;
 
 //			/**
 //			 * DEBUG Start
@@ -627,7 +637,7 @@ public class TourPainter extends MapPainter {
 				}
 			}
 
-			isTourInTile = isTourInTile || staticMarkerCounter > 0;
+			isContentInTile = isContentInTile || staticMarkerCounter > 0;
 		}
 
 		if (_tourPaintConfig.isShowTourMarker || _tourPaintConfig.isShowWayPoints) {
@@ -681,7 +691,7 @@ public class TourPainter extends MapPainter {
 							}
 						}
 
-						isTourInTile = isTourInTile || markerCounter > 0;
+						isContentInTile = isContentInTile || markerCounter > 0;
 					}
 				}
 
@@ -723,7 +733,7 @@ public class TourPainter extends MapPainter {
 							}
 						}
 
-						isTourInTile = isTourInTile || wayPointCounter > 0;
+						isContentInTile = isContentInTile || wayPointCounter > 0;
 					}
 				}
 			}
@@ -742,21 +752,20 @@ public class TourPainter extends MapPainter {
 
 			for (final Photo photo : photoList) {
 
-				if (photo.getGeoPosition() == null) {
+				final Point photoWorldPixel = photo.getWorldPosition(mp, projectionId, mapZoomLevel);
+				if (photoWorldPixel == null) {
 					continue;
 				}
-
-				final Point photoWorldPixel = photo.getWorldPosition(mp, projectionId, mapZoomLevel);
 
 				if (drawPhoto(gc, map, tile, photo, photoWorldPixel, parts)) {
 					photoCounter++;
 				}
 			}
 
-			isTourInTile = isTourInTile || photoCounter > 0;
+			isContentInTile = isContentInTile || photoCounter > 0;
 		}
 
-		return isTourInTile;
+		return isContentInTile;
 	}
 
 	private boolean drawPhoto(	final GC gc,
@@ -794,11 +803,10 @@ public class TourPainter extends MapPainter {
 				return false;
 			}
 
+			final Rectangle imageSize = image.getBounds();
+
 			final int photoWidth = photoSize.x;
 			final int photoHeight = photoSize.y;
-
-//			final int photoWidth = 100;
-//			final int photoHeight = 100;
 
 			int devX = devXPhoto - photoWidth / 2;
 			int devY = devYPhoto - photoHeight;
@@ -806,12 +814,22 @@ public class TourPainter extends MapPainter {
 			devX += devPartOffset;
 			devY += devPartOffset;
 
-			gc.drawImage(image, devX, devY);
+			gc.drawImage(image, //
+					0,
+					0,
+					imageSize.width,
+					imageSize.height,
 
-			gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-			gc.fillRectangle(devX, devY, photoWidth, photoHeight);
+					//
+					devX,
+					devY,
+					photoWidth,
+					photoHeight);
 
-			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//			gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+//			gc.fillRectangle(devX, devY, photoWidth, photoHeight);
+
+			gc.setForeground(_bgColor);
 			gc.setLineWidth(1);
 			gc.drawRectangle(devX, devY, photoWidth, photoHeight);
 
@@ -1400,21 +1418,21 @@ public class TourPainter extends MapPainter {
 
 	private Image getMapImage(final Photo photo) {
 
-		final ImageQuality requestedImageQuality = ImageQuality.THUMB;
+		Image mapImage = null;
 
-		Image paintedImage = null;
+		final ImageQuality requestedImageQuality = ImageQuality.THUMB;
 
 		// check if image has an loading error
 		final PhotoLoadingState photoLoadingState = photo.getLoadingState(requestedImageQuality);
 
-		if (photoLoadingState != PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR) {
+		if (photoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
 
 			// image is not yet loaded
 
 			// check if image is in the cache
-			paintedImage = PhotoImageCache.getImage(photo, requestedImageQuality);
+			mapImage = PhotoImageCache.getImage(photo, requestedImageQuality);
 
-			if ((paintedImage == null || paintedImage.isDisposed())
+			if ((mapImage == null || mapImage.isDisposed())
 					&& photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
 
 				// the requested image is not available in the image cache -> image must be loaded
@@ -1425,7 +1443,7 @@ public class TourPainter extends MapPainter {
 			}
 		}
 
-		return null;
+		return mapImage;
 	}
 
 	private Color getTourColor(	final TourData tourData,

@@ -247,7 +247,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		// check if image has an loading error
 		final PhotoLoadingState photoLoadingState = photo.getLoadingState(requestedImageQuality);
 
-		if (photoLoadingState != PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR) {
+		if (photoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
 
 			// image is not yet loaded
 
@@ -724,7 +724,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		_fullsizePaintedImage = null;
 		_fullsizeImageLoadCallback = null;
 
-		_isFullsizeLoadingError = photoLoadingState == PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR;
+		_isFullsizeLoadingError = photoLoadingState == PhotoLoadingState.IMAGE_IS_INVALID;
 
 		if (_isFullsizeLoadingError == false) {
 
@@ -931,7 +931,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 		final Photo photo = photoWrapper.photo;
 
-		final boolean isLoadingError = photo.getLoadingState(requestedImageQuality) == PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR;
+		final boolean isLoadingError = photo.getLoadingState(requestedImageQuality) == PhotoLoadingState.IMAGE_IS_INVALID;
 
 		if (isFullsizeImage && isLoadingError == false && _isShowFullsizeLoadingMessage == false) {
 			return;

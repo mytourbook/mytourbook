@@ -1496,7 +1496,7 @@ public class PhotoImageLoader {
 	private void setStateLoadingError() {
 
 		// prevent loading the image again
-		_photo.setLoadingState(PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR, _requestedImageQuality);
+		_photo.setLoadingState(PhotoLoadingState.IMAGE_IS_INVALID, _requestedImageQuality);
 
 		PhotoLoadManager.putPhotoInLoadingErrorMap(_photo.getPhotoWrapper().imageFilePathName);
 	}

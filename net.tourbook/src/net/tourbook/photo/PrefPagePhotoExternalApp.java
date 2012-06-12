@@ -21,15 +21,11 @@ import net.tourbook.ui.UI;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.FileFieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.StringFieldEditor;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
@@ -44,10 +40,6 @@ public class PrefPagePhotoExternalApp extends FieldEditorPreferencePage implemen
 	public static final String			ID			= "net.tourbook.preferences.PrefPagePhotoExternalAppID";	//$NON-NLS-1$
 
 	private final IPreferenceStore		_prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
-
-	private boolean						_isModified;
-
-	private SelectionAdapter			_viewerUISelectionListener;
 
 	/*
 	 * UI controls
@@ -74,8 +66,6 @@ public class PrefPagePhotoExternalApp extends FieldEditorPreferencePage implemen
 
 	@Override
 	protected void createFieldEditors() {
-
-		initUI();
 		createUI();
 	}
 
@@ -201,43 +191,7 @@ public class PrefPagePhotoExternalApp extends FieldEditorPreferencePage implemen
 	}
 
 	@Override
-	protected void initialize() {
-
-		super.initialize();
-
-		restoreState();
-	}
-
-	private void initUI() {
-
-		_viewerUISelectionListener = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-
-				_isModified = true;
-			}
-		};
-
-	}
-
-	@Override
-	public boolean okToLeave() {
-
-		if (_isModified) {
-
-			saveState();
-
-			// save the colors in the pref store
-			super.performOk();
-		}
-
-		return super.okToLeave();
-	}
-
-	@Override
 	protected void performDefaults() {
-
-		_isModified = true;
 
 		// prevent setting external app
 		final String externalApp1Backup = _editorExternalPhotoViewer1.getStringValue();
@@ -252,57 +206,4 @@ public class PrefPagePhotoExternalApp extends FieldEditorPreferencePage implemen
 		_editorExternalPhotoViewer2.setStringValue(externalApp2Backup);
 		_editorExternalPhotoViewer3.setStringValue(externalApp3Backup);
 	}
-
-	@Override
-	public boolean performOk() {
-
-		saveState();
-
-		// store editor fields
-		final boolean isOK = super.performOk();
-
-		return isOK;
-	}
-
-	@Override
-	public void propertyChange(final PropertyChangeEvent event) {
-
-//		final String property = event.getProperty();
-
-		final Object source = event.getSource();
-		if (source instanceof FieldEditor) {
-
-			final String prefName = ((FieldEditor) source).getPreferenceName();
-
-			if (prefName.equals(ITourbookPreferences.PHOTO_VIEWER_COLOR_FOREGROUND)
-					|| prefName.equals(ITourbookPreferences.PHOTO_VIEWER_COLOR_BACKGROUND)
-					|| prefName.equals(ITourbookPreferences.PHOTO_VIEWER_COLOR_SELECTION_FOREGROUND)
-					|| prefName.equals(ITourbookPreferences.PHOTO_VIEWER_IS_SHOW_FILE_FOLDER)
-					|| prefName.equals(ITourbookPreferences.PHOTO_VIEWER_COLOR_FOLDER)
-					|| prefName.equals(ITourbookPreferences.PHOTO_VIEWER_COLOR_FILE)
-					|| prefName.equals(ITourbookPreferences.PHOTO_VIEWER_FONT)
-			//
-			) {
-
-				_isModified = true;
-			}
-		}
-
-		super.propertyChange(event);
-	}
-
-	private void restoreState() {
-
-//		_chkIsHighImageQuality.setSelection(//
-//				_prefStore.getBoolean(ITourbookPreferences.PHOTO_VIEWER_IS_SHOW_IMAGE_WITH_HIGH_QUALITY));
-
-	}
-
-	private void saveState() {
-
-//		_prefStore.setValue(ITourbookPreferences.PHOTO_VIEWER_IS_SHOW_IMAGE_WITH_HIGH_QUALITY, //
-//				_chkIsHighImageQuality.getSelection());
-
-	}
-
 }

@@ -432,7 +432,7 @@ public class PhotoLoadManager {
 
 					if (_photoWithLoadingError.containsKey(errorKey)) {
 
-						photo.setLoadingState(PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR, imageQuality);
+						photo.setLoadingState(PhotoLoadingState.IMAGE_IS_INVALID, imageQuality);
 
 					} else {
 
@@ -487,7 +487,7 @@ public class PhotoLoadManager {
 
 					if (_photoWithLoadingError.containsKey(errorKey)) {
 
-						photo.setLoadingState(PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR, imageQuality);
+						photo.setLoadingState(PhotoLoadingState.IMAGE_IS_INVALID, imageQuality);
 
 					} else {
 

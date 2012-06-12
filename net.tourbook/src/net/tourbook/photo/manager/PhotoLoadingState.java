@@ -25,7 +25,7 @@ public enum PhotoLoadingState {
 	/**
 	 * Loading the image for a photo failed
 	 */
-	IMAGE_HAS_A_LOADING_ERROR,
+	IMAGE_IS_INVALID,
 
 	/**
 	 * Image is currently in the loading queue and is waiting to be loaded

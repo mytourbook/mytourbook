@@ -493,22 +493,22 @@ public class Photo {
 		return null;
 	}
 
-	/**
-	 * @return Returns geo position or <code>null</code> when latitude/longitude is not available
-	 */
-	public GeoPosition getGeoPosition() {
-
-		if (_geoPosition == null) {
-
-			if (_latitude == Double.MIN_VALUE || _longitude == Double.MIN_VALUE) {
-				return null;
-			} else {
-				_geoPosition = new GeoPosition(_latitude, _longitude);
-			}
-		}
-
-		return _geoPosition;
-	}
+//	/**
+//	 * @return Returns geo position or <code>null</code> when latitude/longitude is not available
+//	 */
+//	public GeoPosition getGeoPosition() {
+//
+//		if (_geoPosition == null) {
+//
+//			if (_latitude == Double.MIN_VALUE || _longitude == Double.MIN_VALUE) {
+//				return null;
+//			} else {
+//				_geoPosition = new GeoPosition(_latitude, _longitude);
+//			}
+//		}
+//
+//		return _geoPosition;
+//	}
 
 	public String getGpsAreaInfo() {
 		return _gpsAreaInfo;
@@ -760,7 +760,8 @@ public class Photo {
 	 * @param mapProvider
 	 * @param projectionId
 	 * @param zoomLevel
-	 * @return Returns the world position for this photo
+	 * @return Returns the world position for this photo or <code>null</code> when geo position is
+	 *         not set.
 	 */
 	public Point getWorldPosition(final MP mapProvider, final String projectionId, final int zoomLevel) {
 
@@ -882,7 +883,7 @@ public class Photo {
 			_photoLoadingStateThumb = photoLoadingState;
 		}
 
-		if (photoLoadingState == PhotoLoadingState.IMAGE_HAS_A_LOADING_ERROR) {
+		if (photoLoadingState == PhotoLoadingState.IMAGE_IS_INVALID) {
 			_isLoadingError = true;
 		}
 //
@@ -897,8 +898,8 @@ public class Photo {
 
 	private void setMapImageSize() {
 
-		final int imageCanvasWidth = 50;
-		final int imageCanvasHeight = 50;
+		final int imageCanvasWidth = 80;
+		final int imageCanvasHeight = imageCanvasWidth;
 
 		_mapImageSize = RendererHelper.getBestSize(this, //
 				_imageWidth,
