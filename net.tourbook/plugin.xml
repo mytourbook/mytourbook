@@ -327,8 +327,8 @@
 			name="%PrefPage_Photo_PhotoFullsizeViewer">
 		</page>
 		
-		<page id="net.tourbook.preferences.PrefPagePhotoViewerID"
-			class="net.tourbook.photo.PrefPagePhotoViewer"
+		<page id="net.tourbook.preferences.PrefPagePhotoDirectoryID"
+			class="net.tourbook.photo.PrefPagePhotoDirectory"
 			category="net.tourbook.preferences.PrefPagePhotoID"
 			name="%PrefPage_Photo_PhotoViewer">
 		</page>
@@ -666,12 +666,6 @@
 
          <toolbar
                id="net.tourbook.toolbars.tourViews">
-            <command
-                  commandId="command.net.tourbook.photo.PicDirView"
-                  icon="icons/photo-directory.png"
-                  label="%View_Name_PhotoDirectory"
-                  mnemonic="%View_Name_PhotoDirectory_Mnemonic">
-            </command>
 
             <command
                   commandId="net.tourbook.command.selectedTour"
@@ -706,6 +700,12 @@
                   mnemonic="%command_tourChart_tool_graphAnalyzer_mnemonic"
                   style="push"
                   tooltip="%command_tourChart_tool_graphAnalyzer_tooltip">
+            </command>
+            <command
+                  commandId="command.net.tourbook.photo.PicDirView"
+                  icon="icons/photo-directory.png"
+                  label="%View_Name_PhotoDirectory"
+                  mnemonic="%View_Name_PhotoDirectory_Mnemonic">
             </command>
 
          </toolbar>

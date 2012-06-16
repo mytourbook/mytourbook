@@ -23,13 +23,26 @@ public abstract class AbstractGalleryMT20ItemRenderer {
 
 	public void dispose() {}
 
+	/**
+	 * @param gc
+	 * @param galleryItem
+	 * @param viewPortX
+	 * @param viewPortY
+	 * @param galleryItemWidth
+	 * @param galleryItemHeight
+	 * @param isSelected
+	 *            Is <code>true</code> when the gallery item is currently selected.
+	 * @param isFocusActive
+	 *            Is <code>true</code> when the gallery has currently the focus.
+	 */
 	public abstract void draw(	GC gc,
 								GalleryMT20Item galleryItem,
 								int viewPortX,
 								int viewPortY,
 								int galleryItemWidth,
 								int galleryItemHeight,
-								boolean isSelected);
+								boolean isSelected,
+								boolean isFocusActive);
 
 	/**
 	 * @param gc

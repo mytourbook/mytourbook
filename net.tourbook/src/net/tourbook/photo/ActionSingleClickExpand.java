@@ -22,12 +22,12 @@ public class ActionSingleClickExpand extends Action {
 	private PicDirFolder	_picDirFolder;
 
 	public ActionSingleClickExpand(final PicDirFolder picDirFolder) {
-		super(Messages.Pic_Dir_Action_SingleClickExpand, AS_CHECK_BOX);
+		super(Messages.Pic_Dir_Action_AutoExpandCollapse, AS_CHECK_BOX);
 		_picDirFolder = picDirFolder;
 	}
 
 	@Override
 	public void run() {
-		_picDirFolder.actionSingleClickExpand();
+		_picDirFolder.actionAutoExpandCollapse();
 	}
 }

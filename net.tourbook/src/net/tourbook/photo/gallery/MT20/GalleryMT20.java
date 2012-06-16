@@ -19,7 +19,7 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import net.tourbook.photo.Messages;
-import net.tourbook.photo.PrefPagePhotoViewer;
+import net.tourbook.photo.PrefPagePhotoDirectory;
 import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.util.StatusUtil;
 import net.tourbook.util.UI;
@@ -35,6 +35,8 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MenuDetectEvent;
@@ -47,6 +49,8 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
@@ -239,6 +243,11 @@ public abstract class GalleryMT20 extends Canvas {
 
 	private ActionOpenPrefDialog				_actionGalleryPrefPage;
 
+	/**
+	 * Is <code>true</code> when gallery has currently the focus.
+	 */
+	private boolean								_isFocusActive;
+
 	private class RedrawTimer implements Runnable {
 		public void run() {
 
@@ -284,6 +293,8 @@ public abstract class GalleryMT20 extends Canvas {
 		addScrollBarsListeners();
 		addMouseListeners();
 		addKeyListeners();
+		addFocusListener();
+		addTraverseListener();
 
 		createActions();
 		createContextMenu();
@@ -304,6 +315,22 @@ public abstract class GalleryMT20 extends Canvas {
 		addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(final DisposeEvent e) {
 				onDispose();
+			}
+		});
+	}
+
+	private void addFocusListener() {
+
+		addFocusListener(new FocusListener() {
+
+			@Override
+			public void focusGained(final FocusEvent event) {
+				onFocusGained(event);
+			}
+
+			@Override
+			public void focusLost(final FocusEvent event) {
+				onFocusLost(event);
 			}
 		});
 	}
@@ -450,6 +477,25 @@ public abstract class GalleryMT20 extends Canvas {
 
 	}
 
+	private void addTraverseListener() {
+		addTraverseListener(new TraverseListener() {
+
+			@Override
+			public void keyTraversed(final TraverseEvent event) {
+
+				/*
+				 * traverse with the tab key to the next/previous control
+				 */
+				switch (event.detail) {
+				case SWT.TRAVERSE_TAB_NEXT:
+				case SWT.TRAVERSE_TAB_PREVIOUS:
+					event.doit = true;
+					break;
+				}
+			}
+		});
+	}
+
 	/**
 	 * Center selected item
 	 * 
@@ -491,7 +537,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 		_actionGalleryPrefPage = new ActionOpenPrefDialog(
 				Messages.Action_Photo_OpenPrefPage_Gallery,
-				PrefPagePhotoViewer.ID);
+				PrefPagePhotoDirectory.ID);
 	}
 
 	/**
@@ -807,6 +853,17 @@ public abstract class GalleryMT20 extends Canvas {
 		return -1;
 	}
 
+	/**
+	 * @return Returns ratio with: width / height
+	 */
+	public double getItemRatio() {
+		return _itemRatio;
+	}
+
+	public int getItemWidth() {
+		return _itemWidth;
+	}
+
 //	private GalleryMT20Item getNextItem_OLD(final int keyCode) {
 //
 //		if (_lastSingleClick == null) {
@@ -867,17 +924,6 @@ public abstract class GalleryMT20 extends Canvas {
 //
 //		return null;
 //	}
-
-	/**
-	 * @return Returns ratio with: width / height
-	 */
-	public double getItemRatio() {
-		return _itemRatio;
-	}
-
-	public int getItemWidth() {
-		return _itemWidth;
-	}
 
 	public int getNumberOfHorizontalImages() {
 		return _gridHorizItems;
@@ -1209,6 +1255,18 @@ public abstract class GalleryMT20 extends Canvas {
 		_fullSizeViewer.close();
 	}
 
+	private void onFocusGained(final FocusEvent event) {
+
+		_isFocusActive = true;
+		redraw();
+	}
+
+	private void onFocusLost(final FocusEvent event) {
+
+		_isFocusActive = false;
+		redraw();
+	}
+
 	/**
 	 * <pre>
 	 * 
@@ -1251,6 +1309,28 @@ public abstract class GalleryMT20 extends Canvas {
 		 */
 		boolean isResetPosition = false;
 
+		if (_lastSelectedItem == null) {
+
+			// nothing is selected, select first item
+
+			selectItemSingle(0, true, false);
+
+			isResetPosition = true;
+
+		} else {
+
+			isResetPosition = onKeyPressed_10(keyEvent, virtualSize);
+		}
+
+		// reset position when position is modified manually
+		if (isResetPosition) {
+			_defaultGalleryPositionRatio = null;
+			hideTooltip();
+		}
+	}
+
+	private boolean onKeyPressed_10(final KeyEvent keyEvent, final int virtualSize) {
+
 		boolean isCtrlKey;
 		boolean isShiftKey;
 
@@ -1261,9 +1341,6 @@ public abstract class GalleryMT20 extends Canvas {
 			isCtrlKey = (keyEvent.stateMask & SWT.MOD1) > 0;
 			isShiftKey = (keyEvent.stateMask & SWT.MOD2) > 0;
 		}
-
-//		System.out.println(isCtrlKey + "  " + isShiftKey + "  " + keyEvent.stateMask);
-//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		boolean isMultiSelection = false;
 		int keyCode = keyEvent.keyCode;
@@ -1321,8 +1398,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 			zoomGallery(keyEvent.time, true, isShiftKey, isCtrlKey);
 
-			isResetPosition = true;
-			break;
+			return true;
 
 		case '-':
 
@@ -1330,14 +1406,13 @@ public abstract class GalleryMT20 extends Canvas {
 
 			zoomGallery(keyEvent.time, false, isShiftKey, isCtrlKey);
 
-			isResetPosition = true;
-			break;
+			return true;
 
 		case ' ':
 
 			showFullsizeImage(_lastSelectedItemIndex);
 
-			break;
+			return false;
 		}
 
 		switch (keyCode) {
@@ -1348,28 +1423,24 @@ public abstract class GalleryMT20 extends Canvas {
 
 			if (isCtrlKey) {
 				selectAll();
-				isResetPosition = true;
+				return true;
 			}
 
-			break;
+			return false;
 
 		case SWT.ARROW_LEFT:
 
-			isResetPosition = selectItem_Previous(isMultiSelection);
-
-			break;
+			return selectItem_Previous(isMultiSelection);
 
 		case SWT.ARROW_RIGHT:
 
-			isResetPosition = selectItem_Next(isMultiSelection);
-
-			break;
+			return selectItem_Next(isMultiSelection);
 
 		case SWT.ARROW_UP:
 
 			if (_lastSelectedItemIndex < _gridHorizItems) {
 				// selection is already in the first row
-				return;
+				return false;
 			}
 
 			if (isMultiSelection) {
@@ -1378,8 +1449,7 @@ public abstract class GalleryMT20 extends Canvas {
 				selectItemSingle(_lastSelectedItemIndex - _gridHorizItems, true, true);
 			}
 
-			isResetPosition = true;
-			break;
+			return true;
 
 		case SWT.ARROW_DOWN:
 
@@ -1387,7 +1457,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 			if (nextRowIndex >= virtualSize) {
 				// selection is already in the last row
-				return;
+				return false;
 			}
 
 			if (isMultiSelection) {
@@ -1396,22 +1466,20 @@ public abstract class GalleryMT20 extends Canvas {
 				selectItemSingle(nextRowIndex, true, true);
 			}
 
-			isResetPosition = true;
-			break;
+			return true;
 
 		case SWT.PAGE_UP:
 
 			if (_lastSelectedItemIndex < _gridHorizItems) {
 				// selection is already in the first row
-				return;
+				return false;
 			}
 
 			final int itemIndexPageUp = _lastSelectedItemIndex - maxVisibleItems;
 
 			selectItemSingle(itemIndexPageUp < 0 ? 0 : itemIndexPageUp, true, false);
 
-			isResetPosition = true;
-			break;
+			return true;
 
 		case SWT.PAGE_DOWN:
 
@@ -1419,60 +1487,44 @@ public abstract class GalleryMT20 extends Canvas {
 
 			if (itemIndexPageDown >= virtualSize) {
 				// selection is already in the last row
-				return;
+				return false;
 			}
 
 			itemIndexPageDown = _lastSelectedItemIndex + maxVisibleItems;
 
 			selectItemSingle(itemIndexPageDown >= virtualSize ? virtualSize - 1 : itemIndexPageDown, true, false);
 
-			isResetPosition = true;
-			break;
+			return true;
 
 		case SWT.HOME:
 
 			if (_lastSelectedItemIndex == 0) {
 				// selection is already at the first item
-				return;
+				return false;
 			}
 
 			selectItemSingle(0, true, false);
 
-			isResetPosition = true;
-			break;
+			return true;
 
 		case SWT.END:
 
 			if (_lastSelectedItemIndex == virtualSize - 1) {
 				// selection is already at the last item
-				return;
+				return false;
 			}
 
 			selectItemSingle(virtualSize - 1, true, false);
 
-			isResetPosition = true;
-			break;
+			return true;
 
 		case SWT.CR:
-// handle default selection
-//
-//					final GalleryMTFilterItem[] selection = getSelection();
-//					GalleryMTFilterItem item = null;
-//
-//					if (selection != null && selection.length > 0) {
-//						item = selection[0];
-//					}
-//
-//					notifySelectionListeners(item, 0, true);
-//			isResetPosition=true;
-			break;
+			showFullsizeImage(_lastSelectedItemIndex);
+
+			return false;
 		}
 
-		// reset position when position is modified manually
-		if (isResetPosition) {
-			_defaultGalleryPositionRatio = null;
-			hideTooltip();
-		}
+		return false;
 	}
 
 	private void onMouseContextMenu(final MenuDetectEvent menuEvent) {
@@ -1496,6 +1548,10 @@ public abstract class GalleryMT20 extends Canvas {
 	}
 
 	private void onMouseDown(final MouseEvent mouseEvent) {
+
+		if (isFocusControl() == false) {
+			super.setFocus();
+		}
 
 		_isMouseClickHandled = false;
 
@@ -1807,7 +1863,15 @@ public abstract class GalleryMT20 extends Canvas {
 
 						gc.setClipping(viewPortX, viewPortY, _itemWidth, _itemHeight);
 
-						_itemRenderer.draw(gc, galleryItem, viewPortX, viewPortY, _itemWidth, _itemHeight, isSelected);
+						_itemRenderer.draw(
+								gc,
+								galleryItem,
+								viewPortX,
+								viewPortY,
+								_itemWidth,
+								_itemHeight,
+								isSelected,
+								_isFocusActive);
 					}
 				}
 			}
@@ -2224,6 +2288,11 @@ public abstract class GalleryMT20 extends Canvas {
 	}
 
 	@Override
+	public boolean setFocus() {
+		return true;
+	}
+
+	@Override
 	public void setFont(final Font font) {
 
 		_fullSizeViewer.setFont(font);
@@ -2442,7 +2511,7 @@ public abstract class GalleryMT20 extends Canvas {
 	}
 
 	public void setSelection(final Collection<GalleryMT20Item> selection) {
-		
+
 		// IS NOT YET IMPLEMENTED
 
 	}

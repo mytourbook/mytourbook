@@ -70,10 +70,6 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 	private int							_fontHeight				= -1;
 
-	private Color						_fgColor;
-	private Color						_bgColor;
-	private Color						_selectionFgColor;
-
 //	private final DateTimeFormatter	_dtFormatter					= DateTimeFormat.forStyle("SM");
 	private final DateTimeFormatter		_dtFormatterDateTime	= new DateTimeFormatterBuilder()
 																		.appendYear(4, 4)
@@ -164,10 +160,20 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		_nfMByte.setMinimumIntegerDigits(1);
 	}
 
+	/**
+	 * 
+	 */
+	private boolean						_isFocusActive;
+
 	/*
 	 * UI resources
 	 */
 	private Color						_fullsizeBgColor		= Display.getCurrent().getSystemColor(SWT.COLOR_BLACK);
+
+	private Color						_fgColor;
+	private Color						_bgColor;
+	private Color						_selectionFgColor;
+	private Color						_noFocusSelectionFgColor;
 
 	private static Image				_gpsImage;
 	private static int					_gpsImageWidth;
@@ -198,7 +204,10 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 						final int galleryItemViewPortY,
 						final int galleryItemWidth,
 						final int galleryItemHeight,
-						final boolean isSelected) {
+						final boolean isSelected,
+						final boolean isFocusActive) {
+
+		_isFocusActive = isFocusActive;
 
 		// init fontheight
 		if (_fontHeight == -1) {
@@ -437,13 +446,19 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 				return false;
 			}
 
+			/*
+			 * draw selection
+			 */
 			if (isSelected) {
 
 				// draw marker line on the left side
-				gc.setBackground(_selectionFgColor);
+				gc.setBackground(_isFocusActive ? _selectionFgColor : _noFocusSelectionFgColor);
 				gc.fillRectangle(_paintedDestX, _paintedDestY, 2, _paintedDestHeight);
 			}
 
+			/*
+			 * draw HQ marker
+			 */
 			if (isRequestedQuality == false) {
 
 				// draw an marker that the requested image quality is not yet painted
@@ -1070,10 +1085,14 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		_fullsizePaintedImage = null;
 	}
 
-	public void setColors(final Color fgColor, final Color bgColor, final Color selectionFgColor) {
+	public void setColors(	final Color fgColor,
+							final Color bgColor,
+							final Color selectionFgColor,
+							final Color noFocusSelectionFgColor) {
 		_fgColor = fgColor;
 		_bgColor = bgColor;
 		_selectionFgColor = selectionFgColor;
+		_noFocusSelectionFgColor = noFocusSelectionFgColor;
 	}
 
 	public void setFont(final Font font) {

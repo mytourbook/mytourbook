@@ -35,7 +35,8 @@ public class DefaultGalleryMT20ItemRenderer extends AbstractGalleryMT20ItemRende
 						final int viewPortY,
 						final int galleryItemWidth,
 						final int galleryItemHeight,
-						final boolean isSelected) {
+						final boolean isSelected,
+						final boolean isFocusActive) {
 
 	}
 

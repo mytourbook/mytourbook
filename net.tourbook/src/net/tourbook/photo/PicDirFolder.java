@@ -100,8 +100,8 @@ class PicDirFolder {
 	private long								_expandRunnableCounter;
 	private boolean								_isExpandingSelection;
 
-	private boolean								_isBehaviourSingleClickExpand;
-	private boolean								_isBehaviourSingleExpandCollapseOthers;
+	private boolean								_isBehaviourAutoExpandCollapse;
+	private boolean								_isBehaviourSingleExpandedOthersCollapse;
 	private boolean								_isStateShowFileFolderInFolderItem;
 
 	/**
@@ -122,7 +122,7 @@ class PicDirFolder {
 	private ActionRunExternalApp				_actionRunExternalApp2;
 	private ActionRunExternalApp				_actionRunExternalApp3;
 	private ActionPreferences					_actionPreferences;
-	private ActionSingleClickExpand				_actionSingleClickExpand;
+	private ActionSingleClickExpand				_actionAutoExpandCollapse;
 	private ActionSingleExpandCollapseOthers	_actionSingleExpandCollapseOthers;
 
 	/*
@@ -201,6 +201,11 @@ class PicDirFolder {
 	PicDirFolder(final PicDirView picDirView, final PicDirImages picDirImages) {
 //		_picDirView = picDirView;
 		_picDirImages = picDirImages;
+	}
+
+	void actionAutoExpandCollapse() {
+		_isBehaviourAutoExpandCollapse = _actionAutoExpandCollapse.isChecked();
+		enableActions();
 	}
 
 	void actionRefreshFolder() {
@@ -292,10 +297,11 @@ class PicDirFolder {
 		String commands[] = null;
 		if (UI.IS_WIN) {
 
-			final String[] commandsWin = { "cmd.exe", "/c", //$NON-NLS-1$ //$NON-NLS-2$
+			final String[] commandsWin = {
+//					"cmd.exe", "/c", //$NON-NLS-1$ //$NON-NLS-2$
 					"\"" + extApp + "\"", //$NON-NLS-1$ //$NON-NLS-2$
-//					"\"" + folder + "\""
-					folder //
+					"\"" + folder + "\""
+//					folder //
 			};
 
 			commands = commandsWin;
@@ -310,11 +316,9 @@ class PicDirFolder {
 
 		} else if (UI.IS_LINUX) {
 
-//			String []commandsLinux = { "/usr/bin/open", "-a", //
-//					prefExtApp,
-//					folder };
-//
-//			commands=commandsLinux;
+			final String[] commandsLinux = { extApp, folder };
+
+			commands = commandsLinux;
 		}
 
 		if (commands != null) {
@@ -344,12 +348,9 @@ class PicDirFolder {
 		}
 	}
 
-	void actionSingleClickExpand() {
-		_isBehaviourSingleClickExpand = _actionSingleClickExpand.isChecked();
-	}
-
 	void actionSingleExpandCollapseOthers() {
-		_isBehaviourSingleExpandCollapseOthers = _actionSingleExpandCollapseOthers.isChecked();
+		_isBehaviourSingleExpandedOthersCollapse = _actionSingleExpandCollapseOthers.isChecked();
+		enableActions();
 	}
 
 	private void createActions() {
@@ -363,7 +364,7 @@ class PicDirFolder {
 		_actionRunExternalApp2 = new ActionRunExternalApp(this);
 		_actionRunExternalApp3 = new ActionRunExternalApp(this);
 
-		_actionSingleClickExpand = new ActionSingleClickExpand(this);
+		_actionAutoExpandCollapse = new ActionSingleClickExpand(this);
 		_actionSingleExpandCollapseOthers = new ActionSingleExpandCollapseOthers(this);
 	}
 
@@ -536,6 +537,16 @@ class PicDirFolder {
 		_picDirImages.showImages(selectedFolder, isFromNavigationHistory, isReloadFolder);
 	}
 
+	private void enableActions() {
+
+		/*
+		 * auto expand is disabled when single expand is selected -> single expand always expands
+		 * (this is not the best solution but it is complicated to implement otherwise)
+		 */
+
+		_actionAutoExpandCollapse.setEnabled(_isBehaviourSingleExpandedOthersCollapse == false);
+	}
+
 	private void expandCollapseFolder(final TreeViewerItem treeItem) {
 
 		if (_folderViewer.getExpandedState(treeItem)) {
@@ -556,7 +567,7 @@ class PicDirFolder {
 		menuMgr.add(_actionRefreshFolder);
 
 		menuMgr.add(new Separator());
-		menuMgr.add(_actionSingleClickExpand);
+		menuMgr.add(_actionAutoExpandCollapse);
 		menuMgr.add(_actionSingleExpandCollapseOthers);
 
 		menuMgr.add(new Separator());
@@ -567,8 +578,6 @@ class PicDirFolder {
 
 		menuMgr.add(_actionRunExternalAppTitle);
 
-		int appNo = 1;
-
 		/*
 		 * App1
 		 */
@@ -576,8 +585,11 @@ class PicDirFolder {
 		if (prefExtApp1.length() > 0) {
 
 			_actionRunExternalApp1.setText(NLS.bind(Messages.Pic_Dir_Label_ExternalApp, //
-					appNo++,
-					new Path(prefExtApp1).lastSegment()));
+					1,
+					new Path(prefExtApp1).lastSegment()
+//					prefExtApp1
+					//
+					));
 
 			menuMgr.add(_actionRunExternalApp1);
 		}
@@ -589,8 +601,11 @@ class PicDirFolder {
 		if (prefExtApp2.length() > 0) {
 
 			_actionRunExternalApp2.setText(NLS.bind(Messages.Pic_Dir_Label_ExternalApp, //
-					appNo++,
-					new Path(prefExtApp2).lastSegment()));
+					2,
+					new Path(prefExtApp2).lastSegment()
+//					prefExtApp2
+					//
+					));
 
 			menuMgr.add(_actionRunExternalApp2);
 		}
@@ -602,8 +617,11 @@ class PicDirFolder {
 		if (prefExtApp3.length() > 0) {
 
 			_actionRunExternalApp3.setText(NLS.bind(Messages.Pic_Dir_Label_ExternalApp, //
-					appNo++,
-					new Path(prefExtApp3).lastSegment()));
+					3,
+					new Path(prefExtApp3).lastSegment()
+//					prefExtApp3
+					//
+					));
 
 			menuMgr.add(_actionRunExternalApp3);
 		}
@@ -763,7 +781,7 @@ class PicDirFolder {
 														final TreePath selectedTreePath,
 														final TVIFolderFolder tviFolder) {
 
-		if (_isBehaviourSingleExpandCollapseOthers) {
+		if (_isBehaviourSingleExpandedOthersCollapse) {
 
 			/*
 			 * run async because this is doing a reselection which cannot be done within the current
@@ -795,7 +813,7 @@ class PicDirFolder {
 
 		} else {
 
-			if (_isBehaviourSingleClickExpand) {
+			if (_isBehaviourAutoExpandCollapse) {
 
 				// expand folder with one mouse click but not with the keyboard
 				expandCollapseFolder(tviFolder);
@@ -841,7 +859,7 @@ class PicDirFolder {
 				_folderViewer.setExpandedTreePaths(new TreePath[] { selectedTreePath });
 				_folderViewer.setSelection(treeSelection, true);
 
-				if (_isBehaviourSingleClickExpand && isExpanded) {
+				if (_isBehaviourAutoExpandCollapse && isExpanded) {
 
 					// auto collapse expanded folder
 					_folderViewer.setExpandedState(selectedTreePath, false);
@@ -887,16 +905,17 @@ class PicDirFolder {
 
 	void restoreState(final IDialogSettings state) {
 
-		_isBehaviourSingleClickExpand = Util.getStateBoolean(state, STATE_IS_SINGLE_CLICK_EXPAND, false);
-		_actionSingleClickExpand.setChecked(_isBehaviourSingleClickExpand);
+		_isBehaviourAutoExpandCollapse = Util.getStateBoolean(state, STATE_IS_SINGLE_CLICK_EXPAND, false);
+		_actionAutoExpandCollapse.setChecked(_isBehaviourAutoExpandCollapse);
 
-		_isBehaviourSingleExpandCollapseOthers = Util.getStateBoolean(
+		_isBehaviourSingleExpandedOthersCollapse = Util.getStateBoolean(
 				state,
 				STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS,
 				false);
-		_actionSingleExpandCollapseOthers.setChecked(_isBehaviourSingleExpandCollapseOthers);
+		_actionSingleExpandCollapseOthers.setChecked(_isBehaviourSingleExpandedOthersCollapse);
 
 		updateColors(true);
+		enableActions();
 
 		/*
 		 * delay folder retrieval so that the UI can be updated immediatedly
@@ -925,7 +944,7 @@ class PicDirFolder {
 			state.put(STATE_SELECTED_FOLDER, _selectedFolder.getAbsolutePath());
 		}
 
-		state.put(STATE_IS_SINGLE_CLICK_EXPAND, _actionSingleClickExpand.isChecked());
+		state.put(STATE_IS_SINGLE_CLICK_EXPAND, _actionAutoExpandCollapse.isChecked());
 		state.put(STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS, _actionSingleExpandCollapseOthers.isChecked());
 	}
 
@@ -1080,11 +1099,13 @@ class PicDirFolder {
 		final Color bgColor = colorRegistry.get(ITourbookPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
 		final Color selectionFgColor = colorRegistry.get(ITourbookPreferences.PHOTO_VIEWER_COLOR_SELECTION_FOREGROUND);
 
+		final Color noFocusSelectionFgColor = Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND);
+
 		final Tree tree = _folderViewer.getTree();
 		tree.setForeground(fgColor);
 		tree.setBackground(bgColor);
 
-		_picDirImages.updateColors(fgColor, bgColor, selectionFgColor, isRestore);
+		_picDirImages.updateColors(fgColor, bgColor, selectionFgColor, noFocusSelectionFgColor, isRestore);
 	}
 
 	void updateUI_RetrievedFileFolder(final String folderName, final int folderCounter, final int fileCounter) {

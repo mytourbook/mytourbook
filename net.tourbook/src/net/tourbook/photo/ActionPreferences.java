@@ -33,7 +33,7 @@ public class ActionPreferences extends Action {
 	public void run() {
 		PreferencesUtil.createPreferenceDialogOn(
 				Display.getCurrent().getActiveShell(),
-				PrefPagePhotoViewer.ID,
+				PrefPagePhotoDirectory.ID,
 				null,
 				null).open();
 	}

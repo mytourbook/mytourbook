@@ -404,5 +404,21 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.PHOTO_FULLSIZE_VIEWER_IS_SHOW_LOADING_MESSAGE, true);
 		store.setDefault(ITourbookPreferences.PHOTO_FULLSIZE_VIEWER_IS_SHOW_HQ_IMAGE, false);
 
+		/*
+		 * external photo viewer
+		 */
+		if (UI.IS_WIN) {
+
+			store.setDefault(ITourbookPreferences.PHOTO_EXTERNAL_PHOTO_VIEWER_1, "explorer.exe"); //$NON-NLS-1$
+
+		} else if (UI.IS_OSX) {
+
+			store.setDefault(ITourbookPreferences.PHOTO_EXTERNAL_PHOTO_VIEWER_1, "Preview.app"); //$NON-NLS-1$
+			store.setDefault(ITourbookPreferences.PHOTO_EXTERNAL_PHOTO_VIEWER_2, "Finder.app"); //$NON-NLS-1$
+
+		} else if (UI.IS_LINUX) {
+			store.setDefault(ITourbookPreferences.PHOTO_EXTERNAL_PHOTO_VIEWER_1, "nautilus"); //$NON-NLS-1$
+		}
+
 	}
 }

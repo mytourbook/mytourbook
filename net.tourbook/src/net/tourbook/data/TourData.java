@@ -136,9 +136,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	/**
 	 * THIS IS NOT UNUSED !!!<br>
 	 * <br>
-	 * initialize SRTM
+	 * it initializes SRTM
 	 */
-	@SuppressWarnings("unused")
 	@Transient
 	private static final NumberForm							srtmNumberForm						= new NumberForm();
 

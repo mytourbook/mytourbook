@@ -46,9 +46,9 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public class PrefPagePhotoViewer extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
+public class PrefPagePhotoDirectory extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-	public static final String		ID				= "net.tourbook.preferences.PrefPagePhotoViewerID"; //$NON-NLS-1$
+	public static final String		ID				= "net.tourbook.preferences.PrefPagePhotoDirectoryID";	//$NON-NLS-1$
 
 	private static final int		BORDER_MIN_SIZE	= 0;
 	private static final int		BORDER_MAX_SIZE	= 20;

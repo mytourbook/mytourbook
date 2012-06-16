@@ -456,8 +456,8 @@ public class PicDirView extends ViewPart {
 		 */
 		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
-		tbm.add(_actionShowPhotoName);
 		tbm.add(_actionShowPhotoDate);
+		tbm.add(_actionShowPhotoName);
 		tbm.add(_actionShowPhotoTooltip);
 		tbm.add(_actionShowGPSAnnotation);
 

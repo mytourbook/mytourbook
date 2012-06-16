@@ -269,7 +269,7 @@ public class PicDirImages implements IItemHovereredListener {
 	private AtomicBoolean										_jobUILoadingIsScheduled		= new AtomicBoolean();
 	private int													_jobUILoadingDirtyCounter;
 
-	private Collection<GalleryMT20Item>							_selectionBeforeImageFilter;
+//	private Collection<GalleryMT20Item>							_selectionBeforeImageFilter;
 
 	/*
 	 * UI resources
@@ -1031,9 +1031,9 @@ public class PicDirImages implements IItemHovereredListener {
 		/*
 		 * deselect all, this could be better implemented to keep selection, but is not yet done
 		 */
-//		deselectAll();
+		deselectAll();
 
-		_selectionBeforeImageFilter = _gallery.getSelection();
+//		_selectionBeforeImageFilter = _gallery.getSelection();
 
 		jobFilter_22_ScheduleSubsequent(0);
 	}
@@ -1335,15 +1335,15 @@ public class PicDirImages implements IItemHovereredListener {
 		}
 
 		// check sorting
-		if (_initialSorting != _currentSorting) {
-
-			/*
-			 * wrapper must be sorted because sorting is different than the initial sorting, this
-			 * will sort only the filtered wrapper
-			 */
-
+//		if (_initialSorting != _currentSorting) {
+//
+//			/*
+//			 * wrapper must be sorted because sorting is different than the initial sorting, this
+//			 * will sort only the filtered wrapper
+//			 */
+//
 			Arrays.sort(newFilteredWrapper, getCurrentComparator());
-		}
+//		}
 
 		/**
 		 * Update UI
@@ -1368,7 +1368,7 @@ public class PicDirImages implements IItemHovereredListener {
 
 //		final float timeDiff = (float) (System.nanoTime() - start) / 1000000;
 ////		if (timeDiff > 10) {}
-//		System.out.println("filterJob_20_RunInitial:\t" + timeDiff + " ms\t");
+//		System.out.println("filterJob_20_RunInitial:\t" + timeDiff + " ms\t"); //$NON-NLS-1$ //$NON-NLS-2$
 //		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
@@ -1437,15 +1437,15 @@ public class PicDirImages implements IItemHovereredListener {
 		}
 
 		// check sorting
-		if (_initialSorting != _currentSorting) {
-
-			/*
-			 * wrapper must be sorted because sorting is different than the initial sorting, this
-			 * will sort only the filtered wrapper
-			 */
-
+//		if (_initialSorting != _currentSorting) {
+//
+//			/*
+//			 * wrapper must be sorted because sorting is different than the initial sorting, this
+//			 * will sort only the filtered wrapper
+//			 */
+//
 			Arrays.sort(newFilteredWrapper, getCurrentComparator());
-		}
+//		}
 
 		/**
 		 * UI update must be run in a UI job because the update can be very long when many
@@ -1469,7 +1469,7 @@ public class PicDirImages implements IItemHovereredListener {
 		}
 
 //		final float timeDiff = (float) (System.nanoTime() - start) / 1000000;
-//		System.out.println("filterJob_30_RunSubsequent:\t" + timeDiff + " ms\t");
+//		System.out.println("filterJob_30_RunSubsequent:\t" + timeDiff + " ms\t"); //$NON-NLS-1$ //$NON-NLS-2$
 //		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
@@ -2011,7 +2011,7 @@ public class PicDirImages implements IItemHovereredListener {
 	void showImages(final File imageFolder, final boolean isFromNavigationHistory, final boolean isReloadFolder) {
 
 		// prevent reselection
-		_selectionBeforeImageFilter = null;
+//		_selectionBeforeImageFilter = null;
 
 		jobFilter_12_Stop();
 
@@ -2117,11 +2117,16 @@ public class PicDirImages implements IItemHovereredListener {
 	 * @param fgColor
 	 * @param bgColor
 	 * @param selectionFgColor
+	 * @param noFocusSelectionFgColor
 	 * @param initUI
 	 *            Is <code>true</code> after a restore to update the UI that not a default UI color
 	 *            is displayed.
 	 */
-	void updateColors(final Color fgColor, final Color bgColor, final Color selectionFgColor, final boolean initUI) {
+	protected void updateColors(	final Color fgColor,
+						final Color bgColor,
+						final Color selectionFgColor,
+						final Color noFocusSelectionFgColor,
+						final boolean initUI) {
 
 		/*
 		 * action bar, setting action bar color in OSX looks not very good
@@ -2150,7 +2155,7 @@ public class PicDirImages implements IItemHovereredListener {
 		 */
 		_gallery.setColors(fgColor, bgColor);
 
-		_photoRenderer.setColors(fgColor, bgColor, selectionFgColor);
+		_photoRenderer.setColors(fgColor, bgColor, selectionFgColor, noFocusSelectionFgColor);
 
 		_pageLoading.setBackground(bgColor);
 
@@ -2401,9 +2406,9 @@ public class PicDirImages implements IItemHovereredListener {
 					// update gallery
 					_gallery.setVirtualItems(sortedGalleryItems);
 
-					if (_selectionBeforeImageFilter != null) {
-						_gallery.setSelection(_selectionBeforeImageFilter);
-					}
+//					if (_selectionBeforeImageFilter != null) {
+//						_gallery.setSelection(_selectionBeforeImageFilter);
+//					}
 
 				} else {
 

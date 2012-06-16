@@ -55,6 +55,8 @@ public class Messages extends NLS {
 	public static String		Image__PhotoSortByName;
 	public static String		Image__PhotoTooltip;
 
+	public static String	Pic_Dir_Action_AutoExpandCollapse;
+
 	public static String		Pic_Dir_Action_ClearHistory;
 	public static String		Pic_Dir_Action_DefineExternalApp;
 	public static String		Pic_Dir_Action_NavigateHistoryBackward;
@@ -77,7 +79,6 @@ public class Messages extends NLS {
 	public static String		Pic_Dir_Action_ShowPhotoInfoFileDate_Tooltip;
 	public static String		Pic_Dir_Action_ShowPhotoTooltip;
 	public static String		Pic_Dir_Action_ShowPhotoTooltip_Tooltip;
-	public static String		Pic_Dir_Action_SingleClickExpand;
 	public static String		Pic_Dir_Action_SingleExpandCollapseOthers;
 	public static String		Pic_Dir_Action_SortByDate;
 	public static String		Pic_Dir_Action_SortByDate_Tooltip;

@@ -61,7 +61,7 @@ public class PrefPagePhotoExternalApp extends FieldEditorPreferencePage implemen
 	}
 
 	public PrefPagePhotoExternalApp() {
-		noDefaultAndApplyButton();
+//		noDefaultAndApplyButton();
 	}
 
 	@Override
@@ -188,22 +188,5 @@ public class PrefPagePhotoExternalApp extends FieldEditorPreferencePage implemen
 
 	public void init(final IWorkbench workbench) {
 		setPreferenceStore(_prefStore);
-	}
-
-	@Override
-	protected void performDefaults() {
-
-		// prevent setting external app
-		final String externalApp1Backup = _editorExternalPhotoViewer1.getStringValue();
-		final String externalApp2Backup = _editorExternalPhotoViewer2.getStringValue();
-		final String externalApp3Backup = _editorExternalPhotoViewer3.getStringValue();
-
-		// set editor defaults
-		super.performDefaults();
-
-		// reset external app
-		_editorExternalPhotoViewer1.setStringValue(externalApp1Backup);
-		_editorExternalPhotoViewer2.setStringValue(externalApp2Backup);
-		_editorExternalPhotoViewer3.setStringValue(externalApp3Backup);
 	}
 }
