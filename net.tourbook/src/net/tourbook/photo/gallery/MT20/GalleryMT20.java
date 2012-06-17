@@ -1258,6 +1258,22 @@ public abstract class GalleryMT20 extends Canvas {
 	private void onFocusGained(final FocusEvent event) {
 
 		_isFocusActive = true;
+
+//		if (_lastSelectedItem == null) {
+//
+//			// nothing is selected, select item in the center
+//
+//			int itemIndexFromPosition = getItemIndexFromPosition(_clientArea.width / 2, _clientArea.height / 2);
+//
+//			if (itemIndexFromPosition < 0) {
+//				itemIndexFromPosition = getItemIndexFromPosition(0, 0);
+//			}
+//
+//			if (itemIndexFromPosition >= 0) {
+//				selectItemSingle(itemIndexFromPosition, true, true);
+//			}
+//		}
+
 		redraw();
 	}
 
@@ -1291,36 +1307,7 @@ public abstract class GalleryMT20 extends Canvas {
 			return;
 		}
 
-		// handle 1st item
-//		if (virtualSize == 1) {
-//
-//			// toggle selection for the only available item
-//
-//			selectItemSingle(0, true, true);
-//
-//			// reset position when position is modified manually
-//			_defaultGalleryPositionRatio = null;
-//
-//			return;
-//		}
-
-		/*
-		 * handle 2nd ... n item
-		 */
-		boolean isResetPosition = false;
-
-		if (_lastSelectedItem == null) {
-
-			// nothing is selected, select first item
-
-			selectItemSingle(0, true, false);
-
-			isResetPosition = true;
-
-		} else {
-
-			isResetPosition = onKeyPressed_10(keyEvent, virtualSize);
-		}
+		final boolean isResetPosition = onKeyPressed_10(keyEvent, virtualSize);
 
 		// reset position when position is modified manually
 		if (isResetPosition) {
@@ -2304,18 +2291,18 @@ public abstract class GalleryMT20 extends Canvas {
 	 * Sets number of vertical and horizontal items for the whole gallery in
 	 * {@link #_gridHorizItems} and {@link #_gridVertItems}
 	 */
-	private void setGridForAllVirtualItems() {
+	private void setGridSize() {
 
 		if (_isVertical) {
 
-			final Point vhNumbers = setGridForAllVirtualItems_10(_clientArea.width, _itemWidth);
+			final Point vhNumbers = setGridSize_10(_clientArea.width, _itemWidth);
 
 			_gridHorizItems = vhNumbers.x;
 			_gridVertItems = vhNumbers.y;
 
 		} else {
 
-			final Point vhNumbers = setGridForAllVirtualItems_10(_clientArea.height, _itemHeight);
+			final Point vhNumbers = setGridSize_10(_clientArea.height, _itemHeight);
 
 			_gridHorizItems = vhNumbers.y;
 			_gridVertItems = vhNumbers.x;
@@ -2329,7 +2316,7 @@ public abstract class GalleryMT20 extends Canvas {
 	 * @param itemSize
 	 * @return
 	 */
-	private Point setGridForAllVirtualItems_10(final int visibleSize, final int itemSize) {
+	private Point setGridSize_10(final int visibleSize, final int itemSize) {
 
 		if (_virtualGalleryItems == null || _virtualGalleryItems.length == 0) {
 			return new Point(1, 1);
@@ -2398,116 +2385,6 @@ public abstract class GalleryMT20 extends Canvas {
 		_fullSizeViewer.setItemRenderer(itemRenderer);
 
 		redraw();
-	}
-
-	/**
-	 * Sets the size (width) of the gallery item, this contains the image width and the border.
-	 * 
-	 * @param requestedNumberOfImages
-	 *            or <code>-1</code> to use the requested item size
-	 * @param requestedItemSize
-	 * @return Returns the size which has been set. This value can differ from the requested item
-	 *         size when a scrollbar needs to be displayed.
-	 */
-	private int setItemSize(int requestedNumberOfImages, final int requestedItemSize) {
-
-		if (requestedNumberOfImages == -1) {
-
-			_itemWidth = requestedItemSize;
-			_itemHeight = (int) (_itemWidth / _itemRatio);
-
-		} else {
-
-			int newItemWidth = _clientArea.width / requestedNumberOfImages;
-
-			if (newItemWidth == _itemWidth) {
-
-				/*
-				 * size has not changed, this occures by small images
-				 */
-
-				newItemWidth++;
-				requestedNumberOfImages = _clientArea.width / newItemWidth;
-			}
-
-			_itemWidth = newItemWidth;
-			_itemHeight = (int) (_itemWidth / _itemRatio);
-		}
-
-		// ensure min size otherwise it can cause device by zero
-		if (_itemWidth < 10) {
-			_itemWidth = 10;
-			_itemHeight = (int) (_itemWidth / _itemRatio);
-		}
-
-		setGridForAllVirtualItems();
-
-		if (_isVertical) {
-
-			if (requestedNumberOfImages > 1) {
-
-				final int contentVirtualHeight = _gridVertItems * _itemHeight;
-
-				// check scrollbar
-				if (contentVirtualHeight > _clientArea.height) {
-
-					// content is larger than visible area -> vertical scrollbar must be displayed
-
-					final ScrollBar bar = getVerticalBar();
-
-					if (bar != null) {
-
-						if (bar.isVisible()) {
-
-							// virtual height is already correctly computed -> nothing more to do
-
-						} else {
-
-							/*
-							 * vertical bar is not yet displayed but the content is larger than the
-							 * visible area, vertical bar needs to be displayed and the content
-							 * width and hight must be adjusted
-							 */
-
-							final int barWidth = bar.getSize().x;
-
-							// visible area width with scrollbar
-							final int areaWidthWithScrollbar = _clientArea.width - barWidth;
-
-							int newItemWidth = areaWidthWithScrollbar / requestedNumberOfImages;
-
-							if (newItemWidth <= _itemWidth) {
-
-								/*
-								 * size has not changed again or is even smaller, this occures by
-								 * small images
-								 */
-
-								newItemWidth = _itemWidth + 1;
-								requestedNumberOfImages = areaWidthWithScrollbar / newItemWidth;
-							}
-
-							_itemWidth = newItemWidth;
-							_itemHeight = (int) (_itemWidth / _itemRatio);
-						}
-					}
-				}
-			}
-
-		} else {
-
-			// is not yet implemented
-		}
-
-		// compute new content width/height
-		updateStructuralValues(true);
-
-		// ensure scrollbars are correctly displayed/hidden
-		updateScrollBars();
-
-		updateGallery(true, centerSelectedItem());
-
-		return _itemWidth;
 	}
 
 	public void setSelection(final Collection<GalleryMT20Item> selection) {
@@ -2805,7 +2682,7 @@ public abstract class GalleryMT20 extends Canvas {
 	 */
 	private void updateStructuralValues(final boolean isKeepLocation) {
 
-		setGridForAllVirtualItems();
+		setGridSize();
 
 		final int clientAreaWidth = _clientArea.width;
 		final int clientAreaHeight = _clientArea.height;
@@ -2922,9 +2799,11 @@ public abstract class GalleryMT20 extends Canvas {
 		}
 
 		// set state to use image width instead of number of images
-		int newNumberOfImages = -1;
+		int stateNumberOfImages = -1;
 
-		if (newZoomedSize > _itemWidth) {
+		final boolean isZoomIn = newZoomedSize > _itemWidth;
+
+		if (isZoomIn) {
 
 			// zoom IN
 
@@ -2936,7 +2815,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 				// less images in a row
 
-				newNumberOfImages = prevNumberOfImages - 1;
+				stateNumberOfImages = prevNumberOfImages - 1;
 			}
 
 		} else {
@@ -2953,7 +2832,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 				// less images in a row
 
-				newNumberOfImages = prevNumberOfImages + 1;
+				stateNumberOfImages = prevNumberOfImages + 1;
 			}
 		}
 
@@ -2963,7 +2842,7 @@ public abstract class GalleryMT20 extends Canvas {
 		hideTooltip();
 
 		// update gallery
-		final int newItemSize = setItemSize(newNumberOfImages, newZoomedSize);
+		final int newItemSize = zoomGallerySetItemSize(stateNumberOfImages, newZoomedSize, isZoomIn);
 
 		notifyZoomListener(_itemWidth, _itemHeight);
 
@@ -3004,6 +2883,162 @@ public abstract class GalleryMT20 extends Canvas {
 		}
 
 		zoomGallery(newZoomedSize);
+	}
+
+	/**
+	 * Sets the size (width) of the gallery item, this contains the image width and the border.
+	 * 
+	 * @param requestedNumberOfImages
+	 *            Number of requested horizontal/vertical images, or <code>-1</code> to use the
+	 *            requested item size
+	 * @param requestedItemSize
+	 * @param isZoomIn
+	 * @return Returns the size which has been set. This value can differ from the requested item
+	 *         size when a scrollbar needs to be displayed.
+	 */
+	private int zoomGallerySetItemSize(	final int requestedNumberOfImages,
+										final int requestedItemSize,
+										final boolean isZoomIn) {
+
+		final boolean isForceNumberOfImages = requestedNumberOfImages != -1;
+		boolean isForceWidth = false;
+
+		int numberOfImages = requestedNumberOfImages;
+		final int oldItemWidth = _itemWidth;
+
+		if (isForceNumberOfImages) {
+
+			int newItemWidth = _clientArea.width / requestedNumberOfImages;
+
+			// ensure width is not the same
+			if (newItemWidth == _itemWidth) {
+
+				// size has not changed, this occures by small images
+
+				newItemWidth = isZoomIn ? _itemWidth + 1 : _itemWidth - 1;
+				numberOfImages = _clientArea.width / newItemWidth;
+
+				isForceWidth = true;
+			}
+
+			_itemWidth = newItemWidth;
+			_itemHeight = (int) (_itemWidth / _itemRatio);
+
+		} else {
+
+			// only 1 horizontal image is displayed
+
+			_itemWidth = requestedItemSize;
+			_itemHeight = (int) (_itemWidth / _itemRatio);
+
+		}
+
+		// ensure min size otherwise it can cause devide by zero
+		if (_itemWidth < 10) {
+			_itemWidth = 10;
+			_itemHeight = (int) (_itemWidth / _itemRatio);
+		}
+
+		setGridSize();
+
+		/*
+		 * adjust to scrollbar visibility
+		 */
+		if (_isVertical) {
+
+			if (numberOfImages > 1) {
+
+				final int contentVirtualHeight = _gridVertItems * _itemHeight;
+
+				// check scrollbar
+				if (contentVirtualHeight > _clientArea.height) {
+
+					// content is larger than visible area -> vertical scrollbar must be displayed
+
+					final ScrollBar bar = getVerticalBar();
+
+					if (bar != null) {
+
+						if (bar.isVisible()) {
+
+							// virtual height is already correctly computed -> nothing more to do
+
+						} else {
+
+							/*
+							 * vertical bar is not yet displayed but the content is larger than the
+							 * visible area, vertical bar needs to be displayed and the content
+							 * width and hight must be adjusted
+							 */
+
+							final int barWidth = bar.getSize().x;
+
+							// visible area width with scrollbar
+							final int areaWidthWithScrollbar = _clientArea.width - barWidth;
+
+							/*
+							 * super hack, otherwise following computations are using client area
+							 * without scrollbar until a resize is done, it took me many hours to
+							 * solve zooming problems
+							 */
+//							_clientArea.width = areaWidthWithScrollbar;
+
+							int newItemWidthWithScrollbar = _itemWidth;
+
+							if (isForceWidth) {
+
+//								int itemWidthWithScrollbar = areaWidthWithScrollbar / numberOfImages;
+//
+//								if (itemWidthWithScrollbar != _itemWidth) {
+//
+//									// size is different, this occures by small images
+//
+//									newItemWidthWithScrollbar = _itemWidth;
+//								}
+
+							} else if (isForceNumberOfImages) {
+
+								newItemWidthWithScrollbar = areaWidthWithScrollbar / requestedNumberOfImages;
+
+								// ensure item width has changed otherwise image is not zoomed
+
+								while (newItemWidthWithScrollbar == oldItemWidth) {
+
+									// ensure that this is not an enless loop
+									if (numberOfImages < 2 || numberOfImages > 1000) {
+										break;
+									}
+
+									numberOfImages += isZoomIn ? -1 : 1;
+
+									newItemWidthWithScrollbar = areaWidthWithScrollbar / numberOfImages;
+								}
+							}
+
+							_itemWidth = newItemWidthWithScrollbar;
+							_itemHeight = (int) (_itemWidth / _itemRatio);
+
+							// this will fire a resize event
+//							bar.setVisible(true);
+						}
+					}
+				}
+			}
+
+		} else {
+
+			// is not yet implemented
+		}
+
+//		// compute new content width/height
+//		updateStructuralValues(true);
+//
+//		// ensure scrollbars are correctly displayed/hidden
+//		updateScrollBars();
+
+		updateGallery(true, centerSelectedItem());
+
+		return _itemWidth;
 	}
 
 }
