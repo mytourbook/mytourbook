@@ -1354,6 +1354,12 @@ public class TourDatabase {
 			return null;
 		}
 
+		/**
+		 * ensure HR zones are computed, it requires that a person is set which is not the case when
+		 * a device importer calls the method {@link TourData#computeComputedValues()}
+		 */
+		tourData.getNumberOfHrZones();
+
 		final DateTime dtNow = new DateTime();
 
 		final long dtSaved = (dtNow.getYear() * 10000000000L)

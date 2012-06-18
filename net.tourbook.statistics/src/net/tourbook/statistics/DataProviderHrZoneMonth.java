@@ -132,11 +132,14 @@ public class DataProviderHrZoneMonth extends DataProvider {
 
 			_monthData.hrZoneValues = dbHrZones;
 
+//			System.out.println("HR Zones\t");
+//			// TODO remove SYSTEM.OUT.PRINTLN
+//
 //			for (int zoneIndex = 0; zoneIndex < 10; zoneIndex++) {
 //				for (int monthIndex = 0; monthIndex < 12; monthIndex++) {
 //					final int hrZone = dbHrZones[zoneIndex][monthIndex];
 //					if (hrZone > 0) {
-//						System.out.println("z:" + zoneIndex + "\tm:" + monthIndex + "\thr:" + hrZone);
+//						System.out.println("\tz:" + zoneIndex + "\tm:" + monthIndex + "\thr:" + hrZone);
 //						// TODO remove SYSTEM.OUT.PRINTLN
 //					}
 //				}
