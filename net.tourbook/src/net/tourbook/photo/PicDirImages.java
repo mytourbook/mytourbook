@@ -996,6 +996,12 @@ public class PicDirImages implements IItemHovereredListener {
 		_exifCache.clear();
 	}
 
+	private void enableControls() {
+
+		_actionNavigateBackward.setEnabled(false);
+		_actionNavigateForward.setEnabled(false);
+	}
+
 	/**
 	 * fill actionbar's
 	 */
@@ -1342,7 +1348,7 @@ public class PicDirImages implements IItemHovereredListener {
 //			 * will sort only the filtered wrapper
 //			 */
 //
-			Arrays.sort(newFilteredWrapper, getCurrentComparator());
+		Arrays.sort(newFilteredWrapper, getCurrentComparator());
 //		}
 
 		/**
@@ -1444,7 +1450,7 @@ public class PicDirImages implements IItemHovereredListener {
 //			 * will sort only the filtered wrapper
 //			 */
 //
-			Arrays.sort(newFilteredWrapper, getCurrentComparator());
+		Arrays.sort(newFilteredWrapper, getCurrentComparator());
 //		}
 
 		/**
@@ -1945,6 +1951,8 @@ public class PicDirImages implements IItemHovereredListener {
 				}
 			}
 		}
+
+		enableControls();
 	}
 
 	void saveState(final IDialogSettings state) {
@@ -2062,8 +2070,12 @@ public class PicDirImages implements IItemHovereredListener {
 
 	void showRestoreFolder(final String restoreFolderName) {
 
-//		_lblLoading.setText(NLS.bind(Messages.Pic_Dir_Label_Loading, restoreFolderName));
-		_lblLoading.setText(NLS.bind(Messages.Pic_Dir_StatusLabel_RestoringFolder, restoreFolderName));
+		if (restoreFolderName == null) {
+			_lblLoading.setText(Messages.Pic_Dir_StatusLabel_NoFolder);
+		} else {
+			_lblLoading.setText(NLS.bind(Messages.Pic_Dir_StatusLabel_RestoringFolder, restoreFolderName));
+		}
+
 		_pageBook.showPage(_pageLoading);
 	}
 
@@ -2122,11 +2134,11 @@ public class PicDirImages implements IItemHovereredListener {
 	 *            Is <code>true</code> after a restore to update the UI that not a default UI color
 	 *            is displayed.
 	 */
-	protected void updateColors(	final Color fgColor,
-						final Color bgColor,
-						final Color selectionFgColor,
-						final Color noFocusSelectionFgColor,
-						final boolean initUI) {
+	protected void updateColors(final Color fgColor,
+								final Color bgColor,
+								final Color selectionFgColor,
+								final Color noFocusSelectionFgColor,
+								final boolean initUI) {
 
 		/*
 		 * action bar, setting action bar color in OSX looks not very good
@@ -2562,7 +2574,7 @@ public class PicDirImages implements IItemHovereredListener {
 					/*
 					 * initialize and update gallery with new items
 					 */
-					_gallery.setupItems(0, oldPosition);
+					_gallery.setupItems(0, oldPosition == null ? 0 : oldPosition);
 
 					/*
 					 * update status info

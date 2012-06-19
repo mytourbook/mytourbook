@@ -2,7 +2,7 @@
 <feature
       id="feature.net.tourbook.ext.eclipse"
       label="Additional Eclipse Plugins for MyTourbook"
-      version="3.7.1.qualifier">
+      version="3.8.0.qualifier">
 
    <description url="http://www.example.com/description">
       [Enter Feature Description here.]

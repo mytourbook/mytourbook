@@ -1,20 +1,27 @@
 
 Create Translation Archive
 
-- switch to workspace "ws"
-- set version number in "feature.net.tourbook.app.nl"
-- force feature version number into the *.nl fragments
-- set synch option back to "synch versions on build (recommended)"
+- switch to workspace "C:\DAT\ws_mt-with-GIT" 
 
+	- set version number in "feature.net.tourbook.app"
+	- force feature version number into net.tourbook.* plugins
+
+	
 
 - switch to workspace "C:\DAT\ws_mt-NL-projects" 
-- set version number into the feature "feature.z-Dummy-Host"
-- force feature version number into dummy host plugins
-- set synch option back to "synch versions on build (recommended)"
 
+	- set version number in "feature.net.tourbook.app.nl"
+	- force feature version number into the *.nl fragments
+	- set synch option back to "synch versions on build (recommended)"
 
-- switch to workspace "ws"
-- run script "CreateTranslationArchive"
+	- set version number into the feature "feature.z-Dummy-Host"
+	- force feature version number into dummy host plugins
+	- set synch option back to "synch versions on build (recommended)"
+
+	
+- switch to workspace "C:\DAT\ws_mt-with-GIT"
+
+	- run script "CreateTranslationArchive"
 
 
 
@@ -25,17 +32,20 @@ requirements:
 
 
 - switch to workspace "C:\DAT\ws_mt-with-GIT"
-- run script "CreateMyTourbookBuildFiles" in plugin net.tourbook/build-files
+	
+	- run script "CreateMyTourbookBuildFiles" in plugin net.tourbook/build-files
 
-- switch to workspace ""C:\DAT\mytourbook-BUILD-ws""
-- refresh all projects with F5
-- run Project/clean... for all projects
+	
+- switch to workspace "C:\DAT\mytourbook-BUILD-ws"
+	
+	- refresh all projects with F5
+	- run Project/clean... for all projects
 
-- update version number in build.feature.net.tourbook.product
-- replace feature net.tourbook.product.feature with new version number
-- set build target correctly ???
-- delete old exported files when a reexport is done, export will add new files to an existing product archive
-- run product export wizard in the product file
+	- update version number in build.feature.net.tourbook.product
+	- replace feature net.tourbook.product.feature with new version number
+	- set build target correctly ???
+	- delete old exported files when a reexport is done, export will add new files to an existing product archive
+	- run product export wizard in the product file
 
 
 Create Update Site

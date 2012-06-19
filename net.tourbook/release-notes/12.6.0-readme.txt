@@ -1,18 +1,6 @@
 Version: 12.?.0                                         ? 2012 
-
-New
--better resonse time when tours are displayed in the map, especially when multiple tours are displayed
- tours in the map are being displayed after a map tile has been painted and not after ALL tiles are painted
  
-Improved usability, started to implement key shortcuts:
-	<Ctrl><Shift>+P - Preferences
-	<Alt>+Left		- navigate folder history in the photo directory
-	<Alt>+Right
 
-
-PROBLEMS:
-- it can happen that the selected external app cannot open selected folder when the folder name contains space characters 
- 
  
 Used resources from:
 :pserver:anonymous@dev.eclipse.org:/cvsroot/technology
@@ -20,23 +8,8 @@ http://svn.apache.org/repos/asf/commons/proper/sanselan
  
  
 PENDENZEN
-- LINUX: open external app from pic dir folder
-- document key shortcuts: Shortcut_Key_
+
 - document portable version by setting data directory http://mytourbook.sourceforge.net/mytourbook/index.php/download-install/data-directory
-- Error Log ist jetzt im Help Menü
 - Exception Handling dokumentieren, external request
 - Ansicht "Touren Import" dokumentieren, ist z.Z. in http://mytourbook.sourceforge.net/mytourbook/index.php/documentation/get-tours/save-tours
-
-
-Photo Gallery
-=============
-
-Zoom factor in pixel when these keys are pressed:
-<Shift>: 1
-<Ctrl>: 10
-<Ctrl><Shift>: 50
-
-
-Tips:
-- when zooming in/out, the selected image is centered, when nothing is selected, the current center keeps centered
 

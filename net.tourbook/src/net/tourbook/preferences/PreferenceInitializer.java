@@ -357,7 +357,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.PHOTO_THUMBNAIL_STORE_IS_DEFAULT_LOCATION, true);
 		store.setDefault(ITourbookPreferences.PHOTO_THUMBNAIL_STORE_CUSTOM_LOCATION, UI.EMPTY_STRING);
 
-		store.setDefault(ITourbookPreferences.PHOTO_THUMBNAIL_STORE_IS_CLEANUP, true);
+		store.setDefault(ITourbookPreferences.PHOTO_THUMBNAIL_STORE_IS_CLEANUP, false);
 		store.setDefault(ITourbookPreferences.PHOTO_THUMBNAIL_STORE_NUMBER_OF_DAYS_TO_KEEP_IMAGES, 90);
 		store.setDefault(ITourbookPreferences.PHOTO_THUMBNAIL_STORE_CLEANUP_PERIOD, 30);
 

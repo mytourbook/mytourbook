@@ -119,6 +119,8 @@ public class Messages extends NLS {
 	public static String		Pic_Dir_StatusLabel_LoadingImagesFilter;
 	public static String		Pic_Dir_StatusLabel_LoadingThumbExif;
 	public static String		Pic_Dir_StatusLabel_nImagesAreHiddenByFilter;
+	public static String	Pic_Dir_StatusLabel_NoFolder;
+
 	public static String		Pic_Dir_StatusLabel_NoImagesInFolder;
 	public static String		Pic_Dir_StatusLabel_RestoringFolder;
 	public static String		Pic_Dir_StatusLabel_SelectedImages;
