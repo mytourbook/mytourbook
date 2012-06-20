@@ -9,7 +9,7 @@ public class Messages extends NLS {
 	public static String		Action_Photo_OpenPrefPage_FullsizeViewer;
 	public static String		Action_Photo_OpenPrefPage_Gallery;
 
-	public static String	App__PhotoShell_Title;
+	public static String		App__PhotoShell_Title;
 
 	public static String		App_JobName_PicDirImages_FilteringGalleryImages;
 	public static String		App_JobName_PicDirImages_UpdateUIWhenLoadingImages;
@@ -35,8 +35,7 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_Photo_OtherTags;
 	public static String		ColumnFactory_Photo_Time;
 
-	public static String	Image__CursorNotImplemented;
-
+	public static String		Image__CursorNotImplemented;
 	public static String		Image__PhotoAnnotationGPS;
 	public static String		Image__PhotoAnnotationGPSAction;
 	public static String		Image__PhotoFilterGPS;
@@ -44,27 +43,20 @@ public class Messages extends NLS {
 	public static String		Image__PhotoFilterNoGPS;
 	public static String		Image__PhotoFolderGallery;
 	public static String		Image__PhotoFolderGallery_OnlyPhotos;
-
-	public static String	Image__PhotoFullsizeShellImage128;
-
-	public static String	Image__PhotoFullsizeShellImage16;
-
+	public static String		Image__PhotoFullsizeShellImage128;
 	public static String		Image__PhotoInfoDate;
 	public static String		Image__PhotoInfoName;
 	public static String		Image__PhotoSortByDate;
 	public static String		Image__PhotoSortByName;
 	public static String		Image__PhotoTooltip;
 
-	public static String	Pic_Dir_Action_AutoExpandCollapse;
-
+	public static String		Pic_Dir_Action_AutoExpandCollapse;
 	public static String		Pic_Dir_Action_ClearHistory;
 	public static String		Pic_Dir_Action_DefineExternalApp;
 	public static String		Pic_Dir_Action_NavigateHistoryBackward;
 	public static String		Pic_Dir_Action_NavigateHistoryForward;
 	public static String		Pic_Dir_Action_PhotoFilterGPS;
 	public static String		Pic_Dir_Action_PhotoFilterGPSTooltip;
-	public static String		Pic_Dir_Action_PhotoFilterNoFilter;
-	public static String		Pic_Dir_Action_PhotoFilterNoFilter_Tooltip;
 	public static String		Pic_Dir_Action_PhotoFilterNoGPS;
 	public static String		Pic_Dir_Action_PhotoFilterNoGPS_Tooltip;
 	public static String		Pic_Dir_Action_Preferences;
@@ -92,18 +84,11 @@ public class Messages extends NLS {
 	public static String		Pic_Dir_Dialog_CleanupStoreImages_KeepImages;
 	public static String		Pic_Dir_Dialog_CleanupStoreImages_Message;
 	public static String		Pic_Dir_Dialog_CleanupStoreImages_Title;
-	public static String		Pic_Dir_Dialog_ExternalApplication_Message;
-	public static String		Pic_Dir_Dialog_ExternalApplication_Title;
-	public static String		Pic_Dir_Dialog_FolderIsNotAvailable_Message;
-	public static String		Pic_Dir_Dialog_FolderIsNotAvailable_Title;
 	public static String		Pic_Dir_ImageSizeIndicator_Tooltip;
 	public static String		Pic_Dir_Label_ExternalApp;
-
-	public static String	Pic_Dir_Label_ImageLoadingFailed;
+	public static String		Pic_Dir_Label_ImageLoadingFailed;
 	public static String		Pic_Dir_Label_Loading;
-
-	public static String	Pic_Dir_Label_ReadingFolders;
-	public static String		Pic_Dir_ProgressBar_Filter_Tooltip;
+	public static String		Pic_Dir_Label_ReadingFolders;
 	public static String		Pic_Dir_Spinner_ThumbnailSize_Tooltip;
 	public static String		Pic_Dir_Spinner_ThumbnailSize_Tooltip_OSX;
 	public static String		Pic_Dir_Status_Loaded;
@@ -111,16 +96,13 @@ public class Messages extends NLS {
 	public static String		Pic_Dir_StatusLabel_FilteringImages;
 	public static String		Pic_Dir_StatusLabel_LoadingFailed;
 	public static String		Pic_Dir_StatusLabel_LoadingFullsize;
-
-	public static String	Pic_Dir_StatusLabel_LoadingFullsizeMeta;
-
-	public static String	Pic_Dir_StatusLabel_LoadingFullsizeNoMeta;
+	public static String		Pic_Dir_StatusLabel_LoadingFullsizeMeta;
+	public static String		Pic_Dir_StatusLabel_LoadingFullsizeNoMeta;
 	public static String		Pic_Dir_StatusLabel_LoadingImages;
 	public static String		Pic_Dir_StatusLabel_LoadingImagesFilter;
 	public static String		Pic_Dir_StatusLabel_LoadingThumbExif;
 	public static String		Pic_Dir_StatusLabel_nImagesAreHiddenByFilter;
-	public static String	Pic_Dir_StatusLabel_NoFolder;
-
+	public static String		Pic_Dir_StatusLabel_NoFolder;
 	public static String		Pic_Dir_StatusLabel_NoImagesInFolder;
 	public static String		Pic_Dir_StatusLabel_RestoringFolder;
 	public static String		Pic_Dir_StatusLabel_SelectedImages;
@@ -176,7 +158,6 @@ public class Messages extends NLS {
 	public static String		PrefPage_Photo_Viewer_Label_FontEditor;
 	public static String		PrefPage_Photo_Viewer_Label_FontExample;
 	public static String		PrefPage_Photo_Viewer_Label_ForgroundColor;
-	public static String		PrefPage_Photo_Viewer_Label_GalleryFont;
 	public static String		PrefPage_Photo_Viewer_Label_HQImageSize;
 	public static String		PrefPage_Photo_Viewer_Label_HQImageSize_Tooltip;
 	public static String		PrefPage_Photo_Viewer_Label_HQThumbnailSize;
@@ -186,19 +167,11 @@ public class Messages extends NLS {
 	public static String		PrefPage_Photo_Viewer_Label_MinSizeBorder_Tooltip;
 	public static String		PrefPage_Photo_Viewer_Label_MinSizeText;
 	public static String		PrefPage_Photo_Viewer_Label_MinSizeText_Tooltip;
-	public static String		PrefPage_Photo_Viewer_Label_ResizeImageQuality;
-	public static String		PrefPage_Photo_Viewer_Label_ResizeImageQuality_Tooltip;
 	public static String		PrefPage_Photo_Viewer_Label_SelectionForegroundColor;
 	public static String		PrefPage_Photo_Viewer_Radio_ImageFramework_AWT;
 	public static String		PrefPage_Photo_Viewer_Radio_ImageFramework_AWT_Tooltip;
 	public static String		PrefPage_Photo_Viewer_Radio_ImageFramework_SWT;
 	public static String		PrefPage_Photo_Viewer_Radio_ImageFramework_SWT_Tooltip;
-
-	public static String		Scaling_Quality_Automatic;
-	public static String		Scaling_Quality_Balanced;
-	public static String		Scaling_Quality_Quality;
-	public static String		Scaling_Quality_Speed;
-	public static String		Scaling_Quality_UltraQuality;
 
 	public static String		Thumbnail_Store_CleanupTask;
 	public static String		Thumbnail_Store_CleanupTask_AllFiles;

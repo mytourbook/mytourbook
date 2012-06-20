@@ -81,31 +81,6 @@
 
 			</fileset>
 
-			<fileset dir="${path-o_synce-Macro-Plugin-for-MyTourbook}">
-
-				<!-- copy only the plugin and not the feature -->
-				<include name="net.tourbook.device.osynce.macro*/**/*" />
-				
-				<exclude name="**/bin/**" />
-				<exclude name="**/classes/**" />
-
-				<!-- ignore empty files -->
-				<size value="0" when="more" />
-
-			</fileset>
-
-			<fileset dir="${path-O-Synce-Macro-Java-Interface}">
-
-				<include name="de.akuz.osynce.macro*/**/*" />
-				
-				<exclude name="**/bin/**" />
-				<exclude name="**/classes/**" />
-
-				<!-- ignore empty files -->
-				<size value="0" when="more" />
-
-			</fileset>
-
 		</copy>
 
 	</target>

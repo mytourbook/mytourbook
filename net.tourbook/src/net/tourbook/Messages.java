@@ -61,10 +61,8 @@ public class Messages extends NLS {
 	public static String		Calendar_View_Action_ZoomIn_Tooltip;
 	public static String		Calendar_View_Action_ZoomOut;
 	public static String		Calendar_View_Action_ZoomOut_Tooltip;
-
 	public static String		Calendar_View_Combo_Month_Tooltip;
 	public static String		Calendar_View_Combo_Year_Tooltip;
-
 	public static String		Calendar_View_Format_DistancePace;
 	public static String		Calendar_View_Format_DistanceSpeed;
 	public static String		Calendar_View_Format_DistanceTime;
@@ -534,11 +532,8 @@ public class Messages extends NLS {
 	public static String		Graph_Label_ShowHrZoneBackground_Tooltip;
 	public static String		Graph_Label_Speed;
 	public static String		Graph_Label_Temperature;
-
 	public static String		Graph_Label_TimeDuration;
-
 	public static String		Graph_Label_TimeOfDay;
-
 	public static String		Graph_Label_Tour_Compare;
 	public static String		Graph_Label_Tour_Compare_unit;
 
@@ -548,7 +543,6 @@ public class Messages extends NLS {
 	public static String		Graph_Pref_color_mapping;
 	public static String		Graph_Pref_color_statistic_distance;
 	public static String		Graph_Pref_color_statistic_time;
-
 	public static String		Graph_Pref_ColorText;
 
 	public static String		HR_Zone_01_060_Moderate;
@@ -758,8 +752,6 @@ public class Messages extends NLS {
 
 	public static String		NT001_DialogExtractTour_InvalidTourData;
 
-	public static String		Photo_View_Label_AnImageIsNotSelected;
-
 	public static String		Pref_App_Label_TourEditorIsModified;
 
 	public static String		Pref_Appearance_Button_ResetAllToggleDialogs;
@@ -784,9 +776,6 @@ public class Messages extends NLS {
 	public static String		Pref_ChartColors_unit_min;
 
 	public static String		Pref_DataImport_Label;
-
-	public static String		Pref_ExtPrograms_Label_ExplorerPath;
-	public static String		Pref_ExtPrograms_Label_Info;
 
 	public static String		Pref_general_imperial_unit_fahrenheit;
 	public static String		Pref_general_imperial_unit_feet;

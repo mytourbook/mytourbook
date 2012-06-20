@@ -4,7 +4,7 @@
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry exported="true" kind="lib" path="derby.jar" sourcepath="C:/E/java-resources/apache/derby/10.8.1/db-derby-10.8.1.2-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="derbyclient.jar"/>
-	<classpathentry exported="true" kind="lib" path="derbytools.jar"/>
 	<classpathentry exported="true" kind="lib" path="derbynet.jar" sourcepath="C:/E/java-resources/apache/derby/10.8.1/db-derby-10.8.1.2-src.zip"/>
+	<classpathentry exported="true" kind="lib" path="derbytools.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
