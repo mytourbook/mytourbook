@@ -504,16 +504,17 @@ public class PicDirView extends ViewPart {
 		_actionImageFilterNoGPS.setChecked(_currentImageFilter == ImageFilter.NoGPS);
 
 		/*
-		 * photo info
+		 * photo date / time / name / tooltip / annotation
 		 */
-		final String prefDateInfo = Util.getStateString(_state, STATE_PHOTO_INFO_DATE, PhotoDateInfo.Date.name());
+		final PhotoDateInfo photoDateDefault = PhotoDateInfo.NoDateTime;
+		final String prefDateInfo = Util.getStateString(_state, STATE_PHOTO_INFO_DATE, photoDateDefault.name());
 		try {
 			_photoDateInfo = PhotoDateInfo.valueOf(prefDateInfo);
 		} catch (final Exception e) {
-			_photoDateInfo = PhotoDateInfo.DateTime;
+			_photoDateInfo = photoDateDefault;
 		}
 
-		final boolean isShowPhotoName = Util.getStateBoolean(_state, STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY, true);
+		final boolean isShowPhotoName = Util.getStateBoolean(_state, STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY, false);
 		final boolean isShowTooltip = Util.getStateBoolean(_state, STATE_IS_SHOW_PHOTO_TOOLTIP, true);
 		final boolean isShowPhotoAnnotations = Util.getStateBoolean(_state, //
 				STATE_IS_SHOW_PHOTO_GPS_ANNOTATION,

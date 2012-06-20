@@ -389,16 +389,21 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_IMAGE_BORDER_SIZE, 4);
 
 		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_FONT, //
-				UI.IS_OSX // the font for OSX cannot be selected in the UI
-							// but this font is smaller than the fonts which can be selected
-						? "1|sans-serif|9|0|"//$NON-NLS-1$
+				UI.IS_OSX /*
+						 * this small font for OSX cannot be selected in the UI, but is smaller than
+						 * the fonts which can be selected
+						 */
+				? "1|sans-serif|9|0|"//$NON-NLS-1$
 						: "1|sans-serif|7|0|");//$NON-NLS-1$
 /////////////////////	  1|DejaVu Sans|6.75|0|WINDOWS|1|-9|0|0|0|400|0|0|0|0|3|2|1|34|DejaVu Sans
 
 		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_IMAGE_FRAMEWORK, //
-				UI.IS_WIN //
-						? PhotoLoadManager.IMAGE_FRAMEWORK_AWT
-						: PhotoLoadManager.IMAGE_FRAMEWORK_SWT);
+				UI.IS_OSX //
+						? PhotoLoadManager.IMAGE_FRAMEWORK_SWT
+						//
+						// SWT is terrible when scolling large images on win & linux, osx is smoothly
+						//
+						: PhotoLoadManager.IMAGE_FRAMEWORK_AWT);
 
 		store.setDefault(ITourbookPreferences.PHOTO_FULLSIZE_VIEWER_IS_SHOW_PREVIEW, false);
 		store.setDefault(ITourbookPreferences.PHOTO_FULLSIZE_VIEWER_IS_SHOW_LOADING_MESSAGE, true);
