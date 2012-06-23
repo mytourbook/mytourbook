@@ -46,6 +46,16 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
 
 		/*
+		 * system
+		 */
+		store.setDefault(ITourbookPreferences.TOUR_CACHE_SIZE, 500);
+
+		/*
+		 * tour database, default is embedded
+		 */
+		store.setDefault(ITourbookPreferences.TOUR_DATABASE_IS_DERBY_EMBEDDED, true);
+
+		/*
 		 * regional settings
 		 */
 
@@ -280,11 +290,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
 		store.setDefault(ITourbookPreferences.MERGE_TOUR_SET_TOUR_TYPE, false);
 		store.setDefault(ITourbookPreferences.MERGE_TOUR_SET_TOUR_TYPE_ID, TourDatabase.ENTITY_IS_NOT_SAVED);
-
-		/*
-		 * system
-		 */
-		store.setDefault(ITourbookPreferences.TOUR_CACHE_SIZE, 500);
 
 		/*
 		 * computed values

@@ -1,0 +1,15 @@
+Version: 12.?.0                                         ? 2012 
+ 
+
+ 
+Used resources from:
+:pserver:anonymous@dev.eclipse.org:/cvsroot/technology
+http://svn.apache.org/repos/asf/commons/proper/sanselan
+ 
+ 
+PENDENZEN
+
+- document portable version by setting data directory http://mytourbook.sourceforge.net/mytourbook/index.php/download-install/data-directory
+- Exception Handling dokumentieren, external request
+- Ansicht "Touren Import" dokumentieren, ist z.Z. in http://mytourbook.sourceforge.net/mytourbook/index.php/documentation/get-tours/save-tours
+

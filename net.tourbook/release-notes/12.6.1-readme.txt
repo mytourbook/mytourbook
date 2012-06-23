@@ -1,0 +1,27 @@
+Version: 12.6.1                                           2?. June 2012 
+
+
+New 
+
+ * use embedded SQL server instead of network based server to store tour 
+data, the application startup is now 2 sec faster (this is now the 
+default setting, using the network sql server can be activated in the 
+preferences) 
+
+
+
+Improvements 
+
+
+
+Other modifications 
+
+
+
+Fixed Bugs 
+
+
+
+System 
+
+* Eclipse 3.8

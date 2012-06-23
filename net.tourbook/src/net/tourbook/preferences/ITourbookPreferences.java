@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -25,6 +25,17 @@ public interface ITourbookPreferences {
 	public static final String	DUMMY_FIELD											= UI.EMPTY_STRING;
 
 	public static final String	GENERAL_NOTES										= "GENERAL_NOTES";											//$NON-NLS-1$
+
+
+	/*
+	 * system
+	 */
+	public static final String	TOUR_CACHE_SIZE										= "TourCacheSize";											//$NON-NLS-1$
+
+	/*
+	 * tour database
+	 */
+	public static final String	TOUR_DATABASE_IS_DERBY_EMBEDDED						= "TOUR_DATABASE_IS_DERBY_EMBEDDED";						//$NON-NLS-1$
 
 	/*
 	 * notifications
@@ -144,11 +155,6 @@ public interface ITourbookPreferences {
 	public static final String	BREAK_TIME_SHORTEST_TIME							= "BreakTime_ShortestTime";								//$NON-NLS-1$
 	public static final String	BREAK_TIME_MAX_DISTANCE								= "BreakTime_MaxDistance";									//$NON-NLS-1$
 	public static final String	BREAK_TIME_SLICE_DIFF								= "BreakTime_SliceDiff";									//$NON-NLS-1$
-
-	/*
-	 * system
-	 */
-	public static final String	TOUR_CACHE_SIZE										= "TourCacheSize";											//$NON-NLS-1$
 
 	/*
 	 * measurement system
@@ -350,6 +356,5 @@ public interface ITourbookPreferences {
 	public static final String	PHOTO_FULLSIZE_VIEWER_IS_SHOW_HQ_IMAGE				= "PHOTO_FULLSIZE_VIEWER_IS_SHOW_HQ_IMAGE";				//$NON-NLS-1$
 
 	public static final String	PHOTO_ORIGINAL_IMAGE_CACHE_SIZE						= "PHOTO_ORIGINAL_IMAGE_CACHE_SIZE";						//$NON-NLS-1$
-
 
 }

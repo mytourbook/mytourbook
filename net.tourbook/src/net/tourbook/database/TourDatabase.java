@@ -34,6 +34,7 @@ import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -56,6 +57,7 @@ import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
 import net.tourbook.data.TourType;
 import net.tourbook.data.TourWayPoint;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.TagCollection;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.TourTypeFilter;
@@ -71,6 +73,7 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -109,10 +112,7 @@ public class TourDatabase {
 
 	public static boolean							IS_POST_UPDATE_019_to_020					= false;
 
-	private static final String						PERSISTENCE_UNIT_NAME						= "tourdatabase";										//$NON-NLS-1$
-
-	private static final String						DERBY_CLIENT_DRIVER							= "org.apache.derby.jdbc.ClientDriver";				//$NON-NLS-1$
-	private static final String						DERBY_URL									= "jdbc:derby://localhost:1527/tourbook;create=true";	//$NON-NLS-1$
+	private static final String						PERSISTENCE_UNIT_NAME						= "tourdatabase";							//$NON-NLS-1$
 
 	private static final int						MAX_TRIES_TO_PING_SERVER					= 10;
 
@@ -120,38 +120,38 @@ public class TourDatabase {
 	 * !!! database tables, names are set to uppercase otherwise conn.getMetaData().getColumns()
 	 * would not work !!!
 	 */
-	public static final String						TABLE_SCHEMA								= "USER";												//$NON-NLS-1$
-	private static final String						TABLE_DB_VERSION							= "DBVERSION";											// "DbVersion";			//$NON-NLS-1$
-	public static final String						TABLE_TOUR_BIKE								= "TOURBIKE";											//"TourBike";			//$NON-NLS-1$
-	public static final String						TABLE_TOUR_COMPARED							= "TOURCOMPARED";										// "TourCompared";		//$NON-NLS-1$
-	public static final String						TABLE_TOUR_DATA								= "TOURDATA";											// "TourData";			//$NON-NLS-1$
-	public static final String						TABLE_TOUR_MARKER							= "TOURMARKER";										// "TourMarker";			//$NON-NLS-1$
-	public static final String						TABLE_TOUR_WAYPOINT							= "TOURWAYPOINT";										// "TourWayPoint";		//$NON-NLS-1$
-	public static final String						TABLE_TOUR_PERSON							= "TOURPERSON";										// "TourPerson";			//$NON-NLS-1$
-	public static final String						TABLE_TOUR_PERSON_HRZONE					= "TOURPERSONHRZONE";									// "TourPersonHRZone";			//$NON-NLS-1$
-	public static final String						TABLE_TOUR_REFERENCE						= "TOURREFERENCE";										// "TourReference";		//$NON-NLS-1$
-	public static final String						TABLE_TOUR_TAG								= "TOURTAG";											// "TourTag";			//$NON-NLS-1$
-	public static final String						TABLE_TOUR_TAG_CATEGORY						= "TOURTAGCATEGORY";									// "TourTagCategory";	//$NON-NLS-1$
-	public static final String						TABLE_TOUR_TYPE								= "TOURTYPE";											// "TourType";			//$NON-NLS-1$
+	public static final String						TABLE_SCHEMA								= "USER";									//$NON-NLS-1$
+	private static final String						TABLE_DB_VERSION							= "DBVERSION";								// "DbVersion";			//$NON-NLS-1$
+	public static final String						TABLE_TOUR_BIKE								= "TOURBIKE";								//"TourBike";			//$NON-NLS-1$
+	public static final String						TABLE_TOUR_COMPARED							= "TOURCOMPARED";							// "TourCompared";		//$NON-NLS-1$
+	public static final String						TABLE_TOUR_DATA								= "TOURDATA";								// "TourData";			//$NON-NLS-1$
+	public static final String						TABLE_TOUR_MARKER							= "TOURMARKER";							// "TourMarker";			//$NON-NLS-1$
+	public static final String						TABLE_TOUR_WAYPOINT							= "TOURWAYPOINT";							// "TourWayPoint";		//$NON-NLS-1$
+	public static final String						TABLE_TOUR_PERSON							= "TOURPERSON";							// "TourPerson";			//$NON-NLS-1$
+	public static final String						TABLE_TOUR_PERSON_HRZONE					= "TOURPERSONHRZONE";						// "TourPersonHRZone";			//$NON-NLS-1$
+	public static final String						TABLE_TOUR_REFERENCE						= "TOURREFERENCE";							// "TourReference";		//$NON-NLS-1$
+	public static final String						TABLE_TOUR_TAG								= "TOURTAG";								// "TourTag";			//$NON-NLS-1$
+	public static final String						TABLE_TOUR_TAG_CATEGORY						= "TOURTAGCATEGORY";						// "TourTagCategory";	//$NON-NLS-1$
+	public static final String						TABLE_TOUR_TYPE								= "TOURTYPE";								// "TourType";			//$NON-NLS-1$
 //
 //  tour category is disabled since version 1.6
 //
 //	public static final String						TABLE_TOUR_CATEGORY							= "TOURCATEGORY";										// "TourCategory";		//$NON-NLS-1$
 
 	public static final String						JOINTABLE_TOURDATA__TOURTAG					= (TABLE_TOUR_DATA
-																										+ "_" + TABLE_TOUR_TAG);						//$NON-NLS-1$
+																										+ "_" + TABLE_TOUR_TAG);			//$NON-NLS-1$
 	public static final String						JOINTABLE_TOURDATA__TOURMARKER				= (TABLE_TOUR_DATA
-																										+ "_" + TABLE_TOUR_MARKER);					//$NON-NLS-1$
+																										+ "_" + TABLE_TOUR_MARKER);		//$NON-NLS-1$
 	public static final String						JOINTABLE_TOURDATA__TOURWAYPOINT			= (TABLE_TOUR_DATA
-																										+ "_" + TABLE_TOUR_WAYPOINT);					//$NON-NLS-1$
+																										+ "_" + TABLE_TOUR_WAYPOINT);		//$NON-NLS-1$
 	public static final String						JOINTABLE_TOURDATA__TOURREFERENCE			= (TABLE_TOUR_DATA
-																										+ "_" + TABLE_TOUR_REFERENCE);					//$NON-NLS-1$
+																										+ "_" + TABLE_TOUR_REFERENCE);		//$NON-NLS-1$
 	public static final String						JOINTABLE_TOURTAGCATEGORY_TOURTAG			= (TABLE_TOUR_TAG_CATEGORY
-																										+ "_" + TABLE_TOUR_TAG);						//$NON-NLS-1$
+																										+ "_" + TABLE_TOUR_TAG);			//$NON-NLS-1$
 	public static final String						JOINTABLE_TOURTAGCATEGORY_TOURTAGCATEGORY	= (TABLE_TOUR_TAG_CATEGORY
-																										+ "_" + TABLE_TOUR_TAG_CATEGORY);				//$NON-NLS-1$
+																										+ "_" + TABLE_TOUR_TAG_CATEGORY);	//$NON-NLS-1$
 	public static final String						JOINTABLE_TOURPERSON__TOURPERSON_HRZONE		= (TABLE_TOUR_PERSON
-																										+ "_" + TABLE_TOUR_PERSON_HRZONE);				//$NON-NLS-1$
+																										+ "_" + TABLE_TOUR_PERSON_HRZONE);	//$NON-NLS-1$
 //	public static final String						JOINTABLE_TOURCATEGORY__TOURDATA			= (TABLE_TOUR_CATEGORY
 //																									+ "_" + TABLE_TOUR_DATA);						//$NON-NLS-1$
 	/**
@@ -160,10 +160,6 @@ public class TourDatabase {
 	public static final int							ENTITY_IS_NOT_SAVED							= -1;
 
 	private static volatile TourDatabase			_instance;
-
-	private static NetworkServerControl				_server;
-	private static volatile EntityManagerFactory	_emFactory;
-	private static volatile ComboPooledDataSource	_pooledDataSource;
 
 	private static ArrayList<TourType>				_activeTourTypes;
 
@@ -180,6 +176,10 @@ public class TourDatabase {
 	private static TreeSet<String>					_dbTourEndPlace;
 	private static TreeSet<String>					_dbTourMarkerNames;
 
+	private static final IPreferenceStore			_prefStore									= TourbookPlugin
+																										.getDefault()
+																										.getPreferenceStore();
+
 	private boolean									_isTableChecked;
 	private boolean									_isVersionChecked;
 
@@ -189,7 +189,7 @@ public class TourDatabase {
 	private final String							_databasePath								= (Platform
 																										.getInstanceLocation()
 																										.getURL()
-																										.getPath() + "derby-database");				//$NON-NLS-1$
+																										.getPath() + "derby-database");	//$NON-NLS-1$
 
 	private boolean									_isSQLUpdateError							= false;
 
@@ -197,6 +197,15 @@ public class TourDatabase {
 	 * Database version before a db update is performed
 	 */
 	private int										_dbVersionBeforeUpdate;
+
+	private static String							DERBY_DRIVER_CLASS;
+	private static String							DERBY_URL;
+
+	private boolean									_isDerbyEmbedded;
+	private static NetworkServerControl				_server;
+
+	private static volatile EntityManagerFactory	_emFactory;
+	private static volatile ComboPooledDataSource	_pooledDataSource;
 
 	{
 		// set storage location for the database
@@ -209,7 +218,25 @@ public class TourDatabase {
 
 	private static final Object						DB_LOCK										= new Object();
 
-	private TourDatabase() {}
+	private TourDatabase() {
+
+		_isDerbyEmbedded = _prefStore.getBoolean(ITourbookPreferences.TOUR_DATABASE_IS_DERBY_EMBEDDED);
+
+		if (_isDerbyEmbedded) {
+
+			// use embedded server
+
+			DERBY_DRIVER_CLASS = "org.apache.derby.jdbc.EmbeddedDriver"; //$NON-NLS-1$
+			DERBY_URL = "jdbc:derby:tourbook;create=true"; //$NON-NLS-1$
+
+		} else {
+
+			// use network server
+
+			DERBY_DRIVER_CLASS = "org.apache.derby.jdbc.ClientDriver"; //$NON-NLS-1$
+			DERBY_URL = "jdbc:derby://localhost:1527/tourbook;create=true"; //$NON-NLS-1$
+		}
+	}
 
 	/**
 	 * removes all tour tags which are loaded from the database so the next time they will be
@@ -339,7 +366,7 @@ public class TourDatabase {
 						break;
 					}
 
-////					// debug test
+////				// debug test
 //					if (tourCounter[0] > 0) {
 //						break;
 //					}
@@ -719,7 +746,7 @@ public class TourDatabase {
 						_pooledDataSource = new ComboPooledDataSource();
 
 						//loads the jdbc driver
-						_pooledDataSource.setDriverClass(DERBY_CLIENT_DRIVER);
+						_pooledDataSource.setDriverClass(DERBY_DRIVER_CLASS);
 						_pooledDataSource.setJdbcUrl(DERBY_URL);
 						_pooledDataSource.setUser(TABLE_SCHEMA);
 						_pooledDataSource.setPassword(TABLE_SCHEMA);
@@ -1637,6 +1664,10 @@ public class TourDatabase {
 	 */
 	private void checkServer() throws Throwable {
 
+		if (_isDerbyEmbedded) {
+			return;
+		}
+
 		// when the server is started, nothing is to do here
 		if (_server != null) {
 			return;
@@ -1644,7 +1675,7 @@ public class TourDatabase {
 
 		// check if the derby driver can be loaded
 		try {
-			Class.forName(DERBY_CLIENT_DRIVER);
+			Class.forName(DERBY_DRIVER_CLASS);
 		} catch (final ClassNotFoundException e) {
 			StatusUtil.showStatus(e.getMessage(), e);
 			return;
@@ -2940,24 +2971,11 @@ public class TourDatabase {
 	private synchronized void getEntityManagerCreate() {
 
 		try {
-			final IRunnableWithProgress runnableWithProgress = new IRunnableWithProgress() {
-				@Override
-				public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
-					try {
-						checkServer();
-					} catch (final Throwable e) {
-						return;
-					}
+			final Map<String, Object> configOverrides = new HashMap<String, Object>();
 
-					checkTable(monitor);
-					checkVersion(monitor);
-
-					monitor.subTask(Messages.Database_Monitor_persistent_service_task);
-
-					_emFactory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
-				}
-			};
+			configOverrides.put("hibernate.connection.url", DERBY_URL);
+			configOverrides.put("hibernate.connection.driver_class", DERBY_DRIVER_CLASS);
 
 			final MyTourbookSplashHandler splashHandler = TourbookPlugin.getSplashHandler();
 
@@ -2971,10 +2989,29 @@ public class TourDatabase {
 				checkTable(null);
 				checkVersion(null);
 
-				_emFactory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
+				_emFactory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME, configOverrides);
 
 			} else {
-				runnableWithProgress.run(splashHandler.getBundleProgressMonitor());
+
+				new IRunnableWithProgress() {
+					@Override
+					public void run(final IProgressMonitor monitor) throws InvocationTargetException,
+							InterruptedException {
+
+						try {
+							checkServer();
+						} catch (final Throwable e) {
+							return;
+						}
+
+						checkTable(monitor);
+						checkVersion(monitor);
+
+						monitor.subTask(Messages.Database_Monitor_persistent_service_task);
+
+						_emFactory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME, configOverrides);
+					}
+				}.run(splashHandler.getBundleProgressMonitor());
 			}
 
 		} catch (final InvocationTargetException e) {

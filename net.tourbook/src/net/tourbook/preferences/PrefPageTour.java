@@ -30,6 +30,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -49,7 +50,7 @@ public class PrefPageTour extends PreferencePage implements IWorkbenchPreference
 
 	private final IPreferenceStore	_prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
 
-	private boolean					_isModified	= false;
+//	private boolean					_isModified			= false;
 
 	/*
 	 * UI tools
@@ -63,6 +64,9 @@ public class PrefPageTour extends PreferencePage implements IWorkbenchPreference
 	 * UI controls
 	 */
 	private Spinner					_spinnerTourCacheSize;
+
+	private Button					_rdoDbSystemEmbedded;
+	private Button					_rdoDbSystemServer;
 
 	public PrefPageTour() {
 //		noDefaultAndApplyButton();
@@ -87,13 +91,31 @@ public class PrefPageTour extends PreferencePage implements IWorkbenchPreference
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.fillDefaults().spacing(5, 15).applyTo(container);
 		{
-			createUI10Tagging(container);
+			createUI10_TourDB(container);
+			createUI20_TourCache(container);
 		}
 
 		return container;
 	}
 
-	private void createUI10Tagging(final Composite parent) {
+	private void createUI10_TourDB(final Composite parent) {
+
+		final Group group = new Group(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
+		group.setText(Messages.Pref_Tour_Group_TourDB);
+		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
+		{
+			_rdoDbSystemEmbedded = new Button(group, SWT.RADIO);
+			_rdoDbSystemEmbedded.setText(Messages.Pref_TourDb_Radio_DbSystem_Embedded);
+			_rdoDbSystemEmbedded.setToolTipText(Messages.Pref_TourDb_Radio_DbSystem_Embedded_Tooltip);
+
+			_rdoDbSystemServer = new Button(group, SWT.RADIO);
+			_rdoDbSystemServer.setText(Messages.Pref_TourDb_Radio_DbSystem_Server);
+			_rdoDbSystemServer.setToolTipText(Messages.Pref_TourDb_Radio_DbSystem_Server_Tooltip);
+		}
+	}
+
+	private void createUI20_TourCache(final Composite parent) {
 
 		final int verticalIndent = 20;
 
@@ -154,7 +176,6 @@ public class PrefPageTour extends PreferencePage implements IWorkbenchPreference
 		_defaultSelectionAdapter = new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
-				onChangeProperty();
 				enableControls();
 			}
 		};
@@ -163,16 +184,8 @@ public class PrefPageTour extends PreferencePage implements IWorkbenchPreference
 			@Override
 			public void mouseScrolled(final MouseEvent event) {
 				UI.adjustSpinnerValueOnMouseScroll(event);
-				onChangeProperty();
 			}
 		};
-	}
-
-	/**
-	 * Property was changed, fire a property change event
-	 */
-	private void onChangeProperty() {
-		_isModified = true;
 	}
 
 	@Override
@@ -186,10 +199,12 @@ public class PrefPageTour extends PreferencePage implements IWorkbenchPreference
 	@Override
 	protected void performDefaults() {
 
-		_isModified = true;
-
 		_spinnerTourCacheSize.setSelection(//
 				_prefStore.getDefaultInt(ITourbookPreferences.TOUR_CACHE_SIZE));
+
+		final boolean isEmbedded = _prefStore.getDefaultBoolean(ITourbookPreferences.TOUR_DATABASE_IS_DERBY_EMBEDDED);
+		_rdoDbSystemEmbedded.setSelection(isEmbedded);
+		_rdoDbSystemServer.setSelection(!isEmbedded);
 
 		super.performDefaults();
 
@@ -200,39 +215,62 @@ public class PrefPageTour extends PreferencePage implements IWorkbenchPreference
 	public boolean performOk() {
 
 		final int oldCacheSize = _prefStore.getInt(ITourbookPreferences.TOUR_CACHE_SIZE);
+		final boolean oldIsEmbedded = _prefStore.getBoolean(ITourbookPreferences.TOUR_DATABASE_IS_DERBY_EMBEDDED);
 
 		saveState();
 
-		final boolean isOK = super.performOk();
+		boolean isRestart = false;
 
 		final int newCacheSize = _prefStore.getInt(ITourbookPreferences.TOUR_CACHE_SIZE);
-
-		if (isOK && _isModified) {
-			_isModified = false;
-		}
+		final boolean newIsEmbedded = _prefStore.getBoolean(ITourbookPreferences.TOUR_DATABASE_IS_DERBY_EMBEDDED);
 
 		if (newCacheSize != oldCacheSize) {
+
+			// tour cache size is modified
+
 			if (MessageDialog.openQuestion(
 					Display.getDefault().getActiveShell(),
 					Messages.Pref_Tour_Dialog_TourCacheIsModified_Title,
 					Messages.Pref_Tour_Dialog_TourCacheIsModified_Message)) {
 
-				Display.getCurrent().asyncExec(new Runnable() {
-					@Override
-					public void run() {
-						PlatformUI.getWorkbench().restart();
-					}
-				});
+				isRestart = true;
 			}
 		}
 
-		return isOK;
+		if (isRestart == false && oldIsEmbedded != newIsEmbedded) {
+
+			// db system is modified
+
+			if (MessageDialog.openQuestion(
+					Display.getDefault().getActiveShell(),
+					Messages.Pref_TourDb_Dialog_TourDbSystemIsModified_Title,
+					Messages.Pref_TourDb_Dialog_TourDbSystemIsModified_Message)) {
+
+				isRestart = true;
+			}
+		}
+
+		if (isRestart) {
+
+			Display.getCurrent().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					PlatformUI.getWorkbench().restart();
+				}
+			});
+		}
+
+		return true;
 	}
 
 	private void restoreState() {
 
-		_spinnerTourCacheSize.setSelection(//
-				_prefStore.getInt(ITourbookPreferences.TOUR_CACHE_SIZE));
+		_spinnerTourCacheSize.setSelection(_prefStore.getInt(ITourbookPreferences.TOUR_CACHE_SIZE));
+
+		// tour db system
+		final boolean isEmbedded = _prefStore.getBoolean(ITourbookPreferences.TOUR_DATABASE_IS_DERBY_EMBEDDED);
+		_rdoDbSystemEmbedded.setSelection(isEmbedded);
+		_rdoDbSystemServer.setSelection(!isEmbedded);
 
 	}
 
@@ -241,6 +279,10 @@ public class PrefPageTour extends PreferencePage implements IWorkbenchPreference
 		_prefStore.setValue(//
 				ITourbookPreferences.TOUR_CACHE_SIZE,
 				_spinnerTourCacheSize.getSelection());
+
+		_prefStore.setValue(//
+				ITourbookPreferences.TOUR_DATABASE_IS_DERBY_EMBEDDED,
+				_rdoDbSystemEmbedded.getSelection());
 
 	}
 }

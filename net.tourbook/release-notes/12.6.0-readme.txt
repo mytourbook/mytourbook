@@ -1,15 +1,56 @@
-Version: 12.?.0                                         ? 2012 
- 
+Version: 12.6.0                                           21. June 2012 
 
- 
-Used resources from:
-:pserver:anonymous@dev.eclipse.org:/cvsroot/technology
-http://svn.apache.org/repos/asf/commons/proper/sanselan
- 
- 
-PENDENZEN
 
-- document portable version by setting data directory http://mytourbook.sourceforge.net/mytourbook/index.php/download-install/data-directory
-- Exception Handling dokumentieren, external request
-- Ansicht "Touren Import" dokumentieren, ist z.Z. in http://mytourbook.sourceforge.net/mytourbook/index.php/documentation/get-tours/save-tours
+New 
 
+* internet can be accessed with a proxy, provided by Meinhard Ritscher 
+
+
+ExperimentalFeature 
+
+* show photos in the map 
+
+The focal point of this feature is to show photos from a tour in the 
+map, it is not planned to replace other sophisticated photo management 
+tools 
+
+Until now, the main focus for implementing this feature was the image 
+gallery, to display a selected image in the map, was by far the easiest 
+task until now, see roadmap for planned features 
+
+This feature currently supports only the English language 
+
+
+Improvements 
+
+* type-ahead for tour marker labels 
+
+* improved performance for all type-ahead lists, e.g. tour title 
+
+* improved usability by using keyboard shortcuts 
+
+* better resonse time when tours are displayed in the map, especially 
+when multiple tours are displayed (tours in the map are now being 
+displayed after a map tile has been painted and not after ALL tiles are 
+painted) 
+
+
+Other modifications 
+
+* moved Error Log into Help menu 
+
+
+Fixed Bugs 
+
+* gpx export: enclosed <time> and <bounds> with <metadata>, provided by 
+markxy (sourceforge user) 
+
+* OS X with Apple mouse: create marker/reference tour in the tour chart 
+with the "right" mouse button 
+
+* HR zone statistics have not displayed tours 
+
+
+System 
+
+* Eclipse 3.8 M6
