@@ -17,6 +17,7 @@ package net.tourbook.photo;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.jface.viewers.TreeViewer;
 
@@ -39,11 +40,12 @@ public class TVIFolderFolder extends TVIFolder {
 	 */
 	private int					_fileCounter;
 
-	private boolean				_isFolderChecked;
-
-//	private static int			_allCounter;
+	private boolean				_isFolderLoaded;
 
 	private final FileFilter	_folderFilter;
+
+	AtomicBoolean				isInWaitingQueue	= new AtomicBoolean();
+
 	{
 		_folderFilter = new FileFilter() {
 			@Override
@@ -61,19 +63,6 @@ public class TVIFolderFolder extends TVIFolder {
 					// count files
 					_fileCounter++;
 				}
-
-// this MUST be run in another thread because currently it is running in the UI thread and will not update the UI !!!
-//
-//				_allCounter++;
-//
-//				// update UI that files are retrieved from the filesystem
-//				if (_allCounter % 500 == 0) {
-//
-//					_picDirFolder.updateUI_RetrievedFileFolder(
-//							_treeItemFolder.getAbsolutePath(),
-//							_folderCounter,
-//							_fileCounter);
-//				}
 
 				return false;
 			}
@@ -99,7 +88,7 @@ public class TVIFolderFolder extends TVIFolder {
 		_folderCounter = 0;
 		_fileCounter = 0;
 
-		_isFolderChecked = false;
+		_isFolderLoaded = false;
 		_folderChildren = null;
 
 		super.clearChildren();
@@ -108,7 +97,7 @@ public class TVIFolderFolder extends TVIFolder {
 	@Override
 	protected void fetchChildren() {
 
-		if (_isFolderChecked == false) {
+		if (_isFolderLoaded == false) {
 			// read folder files
 			readFolderList();
 		}
@@ -127,7 +116,7 @@ public class TVIFolderFolder extends TVIFolder {
 
 	int getFileCounter() {
 
-		if (_isFolderChecked == false) {
+		if (_isFolderLoaded == false) {
 			readFolderList();
 		}
 
@@ -136,7 +125,7 @@ public class TVIFolderFolder extends TVIFolder {
 
 	public int getFolderCounter() {
 
-		if (_isFolderChecked == false) {
+		if (_isFolderLoaded == false) {
 			readFolderList();
 		}
 
@@ -146,18 +135,22 @@ public class TVIFolderFolder extends TVIFolder {
 	@Override
 	public boolean hasChildren() {
 
-		if (_isFolderChecked == false) {
+		if (_isFolderLoaded == false) {
 			readFolderList();
 		}
 
 		return _folderChildren == null ? false : _folderChildren.length > 0;
 	}
 
+	boolean isFolderLoaded() {
+		return _isFolderLoaded;
+	}
+
 	private void readFolderList() {
 
 		_folderChildren = _treeItemFolder.listFiles(_folderFilter);
 
-		_isFolderChecked = true;
+		_isFolderLoaded = true;
 	}
 
 	@Override

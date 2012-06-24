@@ -17,6 +17,10 @@ package net.tourbook.photo;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.photo.manager.PhotoImageCache;
@@ -83,53 +87,85 @@ import org.eclipse.ui.progress.UIJob;
  */
 class PicDirFolder {
 
-	static String								WIN_PROGRAMFILES						= System.getenv("programfiles");			//$NON-NLS-1$
-	static String								FILE_SEPARATOR							= System
-																								.getProperty("file.separator");	//$NON-NLS-1$
+	static String											WIN_PROGRAMFILES						= System
+																											.getenv("programfiles");			//$NON-NLS-1$
 
-	private static final String					STATE_SELECTED_FOLDER					= "STATE_SELECTED_FOLDER";					//$NON-NLS-1$
-	private static final String					STATE_IS_SINGLE_CLICK_EXPAND			= "STATE_IS_SINGLE_CLICK_EXPAND";			//$NON-NLS-1$
-	private static final String					STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS	= "STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS"; //$NON-NLS-1$
+	static String											FILE_SEPARATOR							= System
+																											.getProperty("file.separator");	//$NON-NLS-1$
+	private static final String								STATE_SELECTED_FOLDER					= "STATE_SELECTED_FOLDER";					//$NON-NLS-1$
 
-	private final IPreferenceStore				_prefStore								= TourbookPlugin.getDefault() //
-																								.getPreferenceStore();
+	private static final String								STATE_IS_SINGLE_CLICK_EXPAND			= "STATE_IS_SINGLE_CLICK_EXPAND";			//$NON-NLS-1$
+	private static final String								STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS	= "STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS"; //$NON-NLS-1$
 
-//	private PicDirView							_picDirView;
-	private PicDirImages						_picDirImages;
+	private static final LinkedBlockingDeque<FolderLoader>	_folderWaitingQueue						= new LinkedBlockingDeque<FolderLoader>();
 
-	private long								_expandRunnableCounter;
-	private boolean								_isExpandingSelection;
+	/**
+	 * This executer is running only in one thread because accessing the file system with multiple
+	 * thread is slowing it down.
+	 */
+	private static ThreadPoolExecutor						_folderExecutor;
 
-	private boolean								_isBehaviourAutoExpandCollapse;
-	private boolean								_isBehaviourSingleExpandedOthersCollapse;
-	private boolean								_isStateShowFileFolderInFolderItem;
+	private final IPreferenceStore							_prefStore								= TourbookPlugin
+																											.getDefault()
+																											//
+																											.getPreferenceStore();
 
+	private PicDirImages									_picDirImages;
+
+	private long											_expandRunnableCounter;
+
+	private boolean											_isExpandingSelection;
+	private boolean											_isBehaviourAutoExpandCollapse;
+
+	private boolean											_isBehaviourSingleExpandedOthersCollapse;
+	private boolean											_isStateShowFileFolderInFolderItem;
 	/**
 	 * Is true when the mouse click is for the context menu
 	 */
-	private boolean								_isMouseContextMenu;
-	private boolean								_doAutoCollapseExpand;
-	private boolean								_isFromNavigationHistory;
+	private boolean											_isMouseContextMenu;
 
-	private TVIFolderRoot						_rootItem;
-	private TVIFolderFolder						_selectedTVIFolder;
-	private File								_selectedFolder;
+	private boolean											_doAutoCollapseExpand;
+	private boolean											_isFromNavigationHistory;
+	private TVIFolderRoot									_rootItem;
 
-	private ActionRefreshFolder					_actionRefreshFolder;
-	private ActionRunExternalAppTitle			_actionRunExternalAppTitle;
-	private ActionRunExternalApp				_actionRunExternalAppDefault;
-	private ActionRunExternalApp				_actionRunExternalApp1;
-	private ActionRunExternalApp				_actionRunExternalApp2;
-	private ActionRunExternalApp				_actionRunExternalApp3;
-	private ActionPreferences					_actionPreferences;
-	private ActionSingleClickExpand				_actionAutoExpandCollapse;
-	private ActionSingleExpandCollapseOthers	_actionSingleExpandCollapseOthers;
+	private TVIFolderFolder									_selectedTVIFolder;
+	private File											_selectedFolder;
+	private ActionRefreshFolder								_actionRefreshFolder;
+
+	private ActionRunExternalAppTitle						_actionRunExternalAppTitle;
+	private ActionRunExternalApp							_actionRunExternalAppDefault;
+	private ActionRunExternalApp							_actionRunExternalApp1;
+	private ActionRunExternalApp							_actionRunExternalApp2;
+	private ActionRunExternalApp							_actionRunExternalApp3;
+	private ActionPreferences								_actionPreferences;
+	private ActionSingleClickExpand							_actionAutoExpandCollapse;
+	private ActionSingleExpandCollapseOthers				_actionSingleExpandCollapseOthers;
 
 	/*
 	 * UI controls
 	 */
-	private Display								_display;
-	private TreeViewer							_folderViewer;
+	private Display											_display;
+
+	private TreeViewer										_folderViewer;
+
+	static {
+
+		final ThreadFactory threadFactoryFolder = new ThreadFactory() {
+
+			public Thread newThread(final Runnable r) {
+
+				final String threadName = "LoadingFolder"; //$NON-NLS-1$
+
+				final Thread thread = new Thread(r, threadName);
+
+				thread.setPriority(Thread.MIN_PRIORITY);
+				thread.setDaemon(true);
+
+				return thread;
+			}
+		};
+		_folderExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(1, threadFactoryFolder);
+	}
 
 	private class ActionRunExternalAppTitle extends Action {
 
@@ -192,10 +228,43 @@ class PicDirFolder {
 		}
 
 		public boolean hasChildren(final Object element) {
-			return ((TreeViewerItem) element).hasChildren();
+
+			boolean hasChildren = false;
+
+			if (element instanceof TVIFolderFolder) {
+				final TVIFolderFolder tviFolder = (TVIFolderFolder) element;
+
+				if (tviFolder.isFolderLoaded()) {
+
+					hasChildren = tviFolder.hasChildren();
+				} else {
+
+					putInWaitingQueue(tviFolder, false);
+
+					hasChildren = true;
+				}
+
+			} else {
+				final TreeViewerItem treeViewerItem = (TreeViewerItem) element;
+
+				hasChildren = treeViewerItem.hasChildren();
+			}
+
+			return hasChildren;
 		}
 
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
+	}
+
+	private class FolderLoader {
+
+		TVIFolderFolder	loaderFolderItem;
+		boolean			isExpandFolder;
+
+		FolderLoader(final TVIFolderFolder folderItem, final boolean isExpandFolder) {
+			this.loaderFolderItem = folderItem;
+			this.isExpandFolder = isExpandFolder;
+		}
 	}
 
 	PicDirFolder(final PicDirView picDirView, final PicDirImages picDirImages) {
@@ -297,12 +366,8 @@ class PicDirFolder {
 		String commands[] = null;
 		if (UI.IS_WIN) {
 
-			final String[] commandsWin = {
-//					"cmd.exe", "/c", //$NON-NLS-1$ //$NON-NLS-2$
-					"\"" + extApp + "\"", //$NON-NLS-1$ //$NON-NLS-2$
-					"\"" + folder + "\""
-//					folder //
-			};
+			final String[] commandsWin = { "\"" + extApp + "\"", //$NON-NLS-1$ //$NON-NLS-2$
+					"\"" + folder + "\"" };
 
 			commands = commandsWin;
 
@@ -326,15 +391,7 @@ class PicDirFolder {
 			try {
 
 				// log command
-				StringBuilder sb = new StringBuilder();
-//				int counter = 1;
-//				for (final String cmd : commands) {
-//					sb.append(Integer.toString(counter++) + ": |" + cmd + "| "); //$NON-NLS-1$ //$NON-NLS-2$
-//				}
-//				StatusUtil.log(sb.toString());
-
-				// log command
-				sb = new StringBuilder();
+				final StringBuilder sb = new StringBuilder();
 				for (final String cmd : commands) {
 					sb.append(cmd + " "); //$NON-NLS-1$
 				}
@@ -453,7 +510,7 @@ class PicDirFolder {
 				// expand/collapse current item
 				final Object selection = ((IStructuredSelection) _folderViewer.getSelection()).getFirstElement();
 
-				final TreeViewerItem treeItem = (TreeViewerItem) selection;
+				final TVIFolderFolder treeItem = (TVIFolderFolder) selection;
 
 				expandCollapseFolder(treeItem);
 			}
@@ -490,19 +547,27 @@ class PicDirFolder {
 
 					if (_isStateShowFileFolderInFolderItem) {
 
-						// force that file list is loaded and number of files is available
-						folderItem.hasChildren();
+						if (folderItem.isFolderLoaded()) {
 
-						final int folderCounter = folderItem.getFolderCounter();
-						if (folderCounter > 0) {
-							styledString.append(UI.SPACE2);
-							styledString.append(Integer.toString(folderCounter), UI.PHOTO_FOLDER_STYLER);
-						}
+							final int folderCounter = folderItem.getFolderCounter();
+							if (folderCounter > 0) {
+								styledString.append(UI.SPACE2);
+								styledString.append(Integer.toString(folderCounter), UI.PHOTO_FOLDER_STYLER);
+							}
 
-						final int fileCounter = folderItem.getFileCounter();
-						if (fileCounter > 0) {
-							styledString.append(UI.SPACE2);
-							styledString.append(Integer.toString(fileCounter), UI.PHOTO_FILE_STYLER);
+							final int fileCounter = folderItem.getFileCounter();
+							if (fileCounter > 0) {
+								styledString.append(UI.SPACE2);
+								styledString.append(Integer.toString(fileCounter), UI.PHOTO_FILE_STYLER);
+							}
+
+						} else {
+
+							// force that file list is loaded and number of files is available
+
+							putInWaitingQueue(folderItem, false);
+
+							styledString.append(UI.SPACE2 + "loading...", UI.PHOTO_FOLDER_STYLER);
 						}
 					}
 
@@ -547,14 +612,21 @@ class PicDirFolder {
 		_actionAutoExpandCollapse.setEnabled(_isBehaviourSingleExpandedOthersCollapse == false);
 	}
 
-	private void expandCollapseFolder(final TreeViewerItem treeItem) {
+	private void expandCollapseFolder(final TVIFolderFolder treeItem) {
 
 		if (_folderViewer.getExpandedState(treeItem)) {
+
 			_folderViewer.collapseToLevel(treeItem, 1);
+
 		} else {
 
-			if (treeItem.hasChildren()) {
+			if (treeItem.isFolderLoaded()) {
+
 				_folderViewer.expandToLevel(treeItem, 1);
+
+			} else {
+
+				putInWaitingQueue(treeItem, true);
 			}
 		}
 	}
@@ -883,6 +955,56 @@ class PicDirFolder {
 		displayFolderImages(selectedFolderItem, isFromNavigationHistory, false);
 	}
 
+	private void putInWaitingQueue(final TVIFolderFolder queueFolderItem, final boolean isExpandFolder) {
+
+		// get and set queue state
+		if (queueFolderItem.isInWaitingQueue.getAndSet(true)) {
+			// folder is already in waiting queue
+			return;
+		}
+
+		_folderWaitingQueue.add(new FolderLoader(queueFolderItem, isExpandFolder));
+
+		final Runnable executorTask = new Runnable() {
+			public void run() {
+
+				// get last added loader item
+				final FolderLoader folderLoader = _folderWaitingQueue.pollFirst();
+
+				if (folderLoader != null) {
+
+					final TVIFolderFolder loaderFolderItem = folderLoader.loaderFolderItem;
+
+					// load folder children
+					loaderFolderItem.hasChildren();
+
+					final int queueSize = _folderWaitingQueue.size();
+
+					// update UI
+					_display.syncExec(new Runnable() {
+						public void run() {
+
+							if (folderLoader.isExpandFolder) {
+								_folderViewer.expandToLevel(loaderFolderItem, 1);
+							} else {
+								_folderViewer.refresh(loaderFolderItem);
+							}
+
+							_picDirImages.updateUI_StatusMessage(NLS.bind(
+									"Loading Folder: {0}",
+									queueSize));
+
+							// reset queue state
+							loaderFolderItem.isInWaitingQueue.set(false);
+						}
+					});
+				}
+			}
+		};
+		_folderExecutor.submit(executorTask);
+
+	}
+
 	private void restoreFolder(final String restoreFolderName) {
 
 		BusyIndicator.showWhile(_display, new Runnable() {
@@ -1106,10 +1228,6 @@ class PicDirFolder {
 		tree.setBackground(bgColor);
 
 		_picDirImages.updateColors(fgColor, bgColor, selectionFgColor, noFocusSelectionFgColor, isRestore);
-	}
-
-	void updateUI_RetrievedFileFolder(final String folderName, final int folderCounter, final int fileCounter) {
-		_picDirImages.updateUI_RetrievedFileFolder(folderName, folderCounter, fileCounter);
 	}
 
 }

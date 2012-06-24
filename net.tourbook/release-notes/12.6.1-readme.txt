@@ -12,6 +12,10 @@ preferences)
 
 Improvements 
 
+* statusline displays a message how many folders are queued to be loaded 
+in the photo directory 
+
+
 
 
 Other modifications 

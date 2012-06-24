@@ -2439,21 +2439,6 @@ public class PicDirImages implements IItemHovereredListener {
 				_prefStore.getString(ITourbookPreferences.PHOTO_VIEWER_IMAGE_FRAMEWORK)));
 	}
 
-	void updateUI_RetrievedFileFolder(final String folderName, final int folderCounter, final int fileCounter) {
-
-// this is currently not working !!! it must be implemented in another thread
-
-//		setStatusMessage(NLS.bind("Retrieving Folders: {0}  Files: {1}  in {2}", //
-//				new Object[] { folderCounter, fileCounter, folderName }));
-//
-//		_lblStatusLine.update();
-//
-//		// flush event queue to update statusline because this method is running in the UI thread
-//		while (_display.readAndDispatch()) {
-//			;
-//		}
-	}
-
 	void updateUI_StatusMessage(final String message) {
 
 		if (message.length() == 0) {
