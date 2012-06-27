@@ -458,6 +458,9 @@ public class ThumbnailStore {
 			StatusUtil.logInfo(NLS.bind("Thumbnail folder \"{0}\" is not available, it will be created now", //$NON-NLS-1$
 					tnFolderFile.getAbsolutePath()));
 
+			String errorMsgCannotCreateFolder = NLS.bind("Thumbnail folder \"{0}\" cannot be created", //$NON-NLS-1$
+					tnFolderFile.getAbsolutePath());
+
 			// try to create thumbnail folder
 			try {
 
@@ -465,12 +468,11 @@ public class ThumbnailStore {
 				if (isCreated) {
 					StatusUtil.logInfo(NLS.bind("Thumbnail folder \"{0}\" created", tnFolderFile.getAbsolutePath())); //$NON-NLS-1$
 				} else {
-					throw new Exception();
+					StatusUtil.showStatus(errorMsgCannotCreateFolder);
 				}
 
 			} catch (final Exception e) {
-				throw new RuntimeException(NLS.bind("Thumbnail folder \"{0}\" cannot be created", //$NON-NLS-1$
-						tnFolderFile.getAbsolutePath()), e);
+				throw new RuntimeException(errorMsgCannotCreateFolder, e);
 			}
 		}
 
@@ -479,6 +481,9 @@ public class ThumbnailStore {
 		final File tnFolderFileUnique = tnFolderPath.toFile();
 		if (tnFolderFileUnique.exists() == false || tnFolderFileUnique.isDirectory() == false) {
 
+			String errorMsgCannotCreateFolder = NLS.bind("Thumbnail folder \"{0}\" cannot be created", //$NON-NLS-1$
+					tnFolderFileUnique.getAbsolutePath());
+
 			// try to create thumbnail unique folder
 			try {
 				final boolean isCreated = tnFolderFileUnique.mkdirs();
@@ -486,11 +491,10 @@ public class ThumbnailStore {
 					StatusUtil.logInfo(NLS.bind("Thumbnail folder \"{0}\" created", //$NON-NLS-1$
 							tnFolderFileUnique.getAbsolutePath()));
 				} else {
-					throw new Exception();
+					StatusUtil.showStatus(errorMsgCannotCreateFolder);
 				}
 			} catch (final Exception e) {
-				throw new RuntimeException(NLS.bind("Thumbnail folder \"{0}\" cannot be created", //$NON-NLS-1$
-						tnFolderFileUnique.getAbsolutePath()), e);
+				throw new RuntimeException(errorMsgCannotCreateFolder, e);
 			}
 		}
 

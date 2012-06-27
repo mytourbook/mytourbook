@@ -33,6 +33,7 @@ import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.importdata.RawDataManager;
+import net.tourbook.photo.PhotoStructuredSelection;
 import net.tourbook.photo.PhotoToolTipProvider;
 import net.tourbook.photo.manager.Photo;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -1755,6 +1756,10 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 			enableActions();
 
+		} else if (selection instanceof PhotoStructuredSelection) {
+
+			paintPhotos((PhotoStructuredSelection) selection);
+
 		} else if (selection instanceof PointOfInterest) {
 
 			_isTour = false;
@@ -1796,10 +1801,6 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 				final TourData tourData = TourManager.getInstance().getTourData(
 						compareResultItem.getComparedTourData().getTourId());
 				paintTours20One(tourData, false, true);
-
-			} else if (firstElement instanceof Photo) {
-
-				paintPhotos(structuredSelection);
 
 			} else if (firstElement instanceof TourWayPoint) {
 
@@ -1864,11 +1865,11 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void paintPhotos(final StructuredSelection structuredSelection) {
+	private void paintPhotos(final PhotoStructuredSelection selection) {
 
 		_photoList.clear();
 
-		final List<?> photoList = structuredSelection.toList();
+		final List<?> photoList = selection.toList();
 		_photoList.addAll((Collection<? extends Photo>) photoList);
 
 		_tourPainterConfig.setPhotos(_photoList);

@@ -881,7 +881,7 @@ public class Map extends Canvas {
 	 * @param clientArea
 	 * @return returns a new created image
 	 */
-	private Image createImage(final Display display, final Image image, final Rectangle clientArea) {
+	private Image createMapImage(final Display display, final Image image, final Rectangle clientArea) {
 
 		if (image != null) {
 			image.dispose();
@@ -1906,29 +1906,29 @@ public class Map extends Canvas {
 			return;
 		}
 
-		final long start = System.nanoTime();
+//		final long start = System.nanoTime();
 		// TODO remove SYSTEM.OUT.PRINTLN
 
 		// Draw the map
-		GC gc = null;
+		GC gcMapImage = null;
 		try {
 
 			// check or create map image
 			final Image image = _mapImage;
 			if ((image == null) || image.isDisposed() || (canReuseImage(image, _clientArea) == false)) {
-				_mapImage = createImage(_display, image, _clientArea);
+				_mapImage = createMapImage(_display, image, _clientArea);
 			}
 
-			gc = new GC(_mapImage);
+			gcMapImage = new GC(_mapImage);
 			{
-				paint_30_Tiles(gc);
+				paint_30_Tiles(gcMapImage);
 
 				if (_isLegendVisible && _mapLegend != null) {
-					paint_40_Legend(gc);
+					paint_40_Legend(gcMapImage);
 				}
 
 				if (_isScaleVisible) {
-					paint_50_Scale(gc);
+					paint_50_Scale(gcMapImage);
 				}
 
 //				if (_tourToolTip != null) {
@@ -1944,8 +1944,8 @@ public class Map extends Canvas {
 			_mapImage.dispose();
 
 		} finally {
-			if (gc != null) {
-				gc.dispose();
+			if (gcMapImage != null) {
+				gcMapImage.dispose();
 			}
 		}
 
@@ -1963,9 +1963,9 @@ public class Map extends Canvas {
 	/**
 	 * Draw all visible tiles into the map viewport
 	 * 
-	 * @param gc
+	 * @param gcMapImage
 	 */
-	private void paint_30_Tiles(final GC gc) {
+	private void paint_30_Tiles(final GC gcMapImage) {
 
 		for (int tilePosX = _tilePosMinX; tilePosX <= _tilePosMaxX; tilePosX++) {
 			for (int tilePosY = _tilePosMinY; tilePosY <= _tilePosMaxY; tilePosY++) {
@@ -1988,12 +1988,12 @@ public class Map extends Canvas {
 
 					if (isTileOnMap(tilePosX, tilePosY)) {
 
-						paintTile(gc, tilePosX, tilePosY, devTileViewport);
+						paintTile(gcMapImage, tilePosX, tilePosY, devTileViewport);
 
 					} else {
 
-						gc.setBackground(_defaultBackgroundColor);
-						gc.fillRectangle(devTileViewport.x, devTileViewport.y, _tilePixelSize, _tilePixelSize);
+						gcMapImage.setBackground(_defaultBackgroundColor);
+						gcMapImage.fillRectangle(devTileViewport.x, devTileViewport.y, _tilePixelSize, _tilePixelSize);
 					}
 				}
 			}
@@ -2708,6 +2708,13 @@ public class Map extends Canvas {
 
 		final Image overlayImage = new Image(_display, transparentImageData);
 		final GC gc1Part = new GC(overlayImage);
+		
+		/*
+		 * Ubuntu 12.04 fails, when background is not filled, it draws a black background
+		 */
+		gc1Part.setBackground(_transparentColor);
+		gc1Part.fillRectangle(overlayImage.getBounds());
+		
 		{
 			// paint all overlays for the current tile
 			for (final MapPainter overlayPainter : _overlays) {
@@ -2744,7 +2751,7 @@ public class Map extends Canvas {
 		}
 	}
 
-	private void paintTile(	final GC gc,
+	private void paintTile(	final GC gcMapImage,
 							final int tilePositionX,
 							final int tilePositionY,
 							final Rectangle devTileViewport) {
@@ -2755,27 +2762,27 @@ public class Map extends Canvas {
 		final Image tileImage = tile.getCheckedMapImage();
 		if (tileImage != null) {
 
-			// map image is available and valid
+			// tile map image is available and valid
 
-			gc.drawImage(tileImage, devTileViewport.x, devTileViewport.y);
+			gcMapImage.drawImage(tileImage, devTileViewport.x, devTileViewport.y);
 
 		} else {
-			paintTile10_Image(gc, tile, devTileViewport);
+			paintTile10_Image(gcMapImage, tile, devTileViewport);
 		}
 
 		if (_isDrawOverlays) {
-			paintTile20_Overlay(gc, tile, devTileViewport);
+			paintTile20_Overlay(gcMapImage, tile, devTileViewport);
 		}
 
 		if (_isShowTileInfo || _isShowTileBorder) {
-			paintTile30_Info(gc, tile, devTileViewport);
+			paintTile30_Info(gcMapImage, tile, devTileViewport);
 		}
 	}
 
 	/**
 	 * draw the tile map image
 	 */
-	private void paintTile10_Image(final GC gc, final Tile tile, final Rectangle devTileViewport) {
+	private void paintTile10_Image(final GC gcMapImage, final Tile tile, final Rectangle devTileViewport) {
 
 		if (tile.isLoadingError()) {
 
@@ -2784,10 +2791,10 @@ public class Map extends Canvas {
 			final Image errorImage = _mp.getErrorImage();
 			final Rectangle imageBounds = errorImage.getBounds();
 
-			gc.setBackground(_display.getSystemColor(SWT.COLOR_GRAY));
-			gc.fillRectangle(devTileViewport.x, devTileViewport.y, imageBounds.width, imageBounds.height);
+			gcMapImage.setBackground(_display.getSystemColor(SWT.COLOR_GRAY));
+			gcMapImage.fillRectangle(devTileViewport.x, devTileViewport.y, imageBounds.width, imageBounds.height);
 
-			paintTileInfoError(gc, devTileViewport, tile);
+			paintTileInfoError(gcMapImage, devTileViewport, tile);
 
 			return;
 		}
@@ -2796,9 +2803,9 @@ public class Map extends Canvas {
 
 			//map image could not be loaded from offline file
 
-			gc.drawImage(_mp.getErrorImage(), devTileViewport.x, devTileViewport.y);
+			gcMapImage.drawImage(_mp.getErrorImage(), devTileViewport.x, devTileViewport.y);
 
-			paintTileInfoError(gc, devTileViewport, tile);
+			paintTileInfoError(gcMapImage, devTileViewport, tile);
 
 			return;
 		}
@@ -2826,7 +2833,7 @@ public class Map extends Canvas {
 				 * offline image is not availabe, show loading... message
 				 */
 
-				gc.drawImage(_mp.getLoadingImage(), devTileViewport.x, devTileViewport.y);
+				gcMapImage.drawImage(_mp.getLoadingImage(), devTileViewport.x, devTileViewport.y);
 
 //				gc.setForeground(_display.getSystemColor(SWT.COLOR_BLACK));
 //				gc.drawString(Messages.geoclipse_extensions_loading, devTileViewport.x, devTileViewport.y, true);
@@ -2837,12 +2844,12 @@ public class Map extends Canvas {
 	/**
 	 * Draw overlay image when it's available or request the image
 	 * 
-	 * @param gc
+	 * @param gcMapImage
 	 * @param tile
 	 * @param devTileViewport
 	 *            Position of the tile
 	 */
-	private void paintTile20_Overlay(final GC gc, final Tile tile, final Rectangle devTileViewport) {
+	private void paintTile20_Overlay(final GC gcMapImage, final Tile tile, final Rectangle devTileViewport) {
 
 		/*
 		 * Priority 1: draw overlay image
@@ -2886,7 +2893,7 @@ public class Map extends Canvas {
 		// draw overlay image
 		if ((drawingImage != null) && (drawingImage.isDisposed() == false)) {
 			try {
-				gc.drawImage(drawingImage, devTileViewport.x, devTileViewport.y);
+				gcMapImage.drawImage(drawingImage, devTileViewport.x, devTileViewport.y);
 			} catch (final Exception e) {
 
 				/*

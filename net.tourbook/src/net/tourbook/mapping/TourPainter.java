@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -553,7 +553,7 @@ public class TourPainter extends MapPainter {
 	}
 
 	@Override
-	protected boolean doPaint(final GC gc, final Map map, final Tile tile, final int parts) {
+	protected boolean doPaint(final GC gcTile, final Map map, final Tile tile, final int parts) {
 
 		final ArrayList<TourData> tourDataList = _tourPaintConfig.getTourData();
 		final ArrayList<Photo> photoList = _tourPaintConfig.getPhotos();
@@ -561,6 +561,7 @@ public class TourPainter extends MapPainter {
 		if (tourDataList.size() == 0 && photoList.size() == 0) {
 			return false;
 		}
+			
 
 		boolean isContentInTile = false;
 
@@ -584,7 +585,7 @@ public class TourPainter extends MapPainter {
 
 			setDataSerie(tourData);
 
-			final boolean isDrawTourInTile = drawTour10InTile(gc, map, tile, tourData, parts);
+			final boolean isDrawTourInTile = drawTour10InTile(gcTile, map, tile, tourData, parts);
 
 			isContentInTile = isContentInTile || isDrawTourInTile;
 
@@ -612,7 +613,7 @@ public class TourPainter extends MapPainter {
 
 				// draw end marker first
 				if (drawStaticMarker(
-						gc,
+						gcTile,
 						map,
 						tile,
 						latitudeSerie[latitudeSerie.length - 1],
@@ -625,7 +626,7 @@ public class TourPainter extends MapPainter {
 
 				// draw start marker above the end marker
 				if (drawStaticMarker(//
-						gc,
+						gcTile,
 						map,
 						tile,
 						latitudeSerie[0],
@@ -680,7 +681,7 @@ public class TourPainter extends MapPainter {
 
 							// draw tour marker
 							if (drawTourMarker(
-									gc,
+									gcTile,
 									map,
 									tile,
 									latitudeSerie[serieIndex],
@@ -728,7 +729,7 @@ public class TourPainter extends MapPainter {
 
 							final Point twpWorldPixel = allWayPointWorldPixel.get(tourWayPoint.hashCode());
 
-							if (drawTourWayPoint(gc, map, tile, tourWayPoint, twpWorldPixel, parts)) {
+							if (drawTourWayPoint(gcTile, map, tile, tourWayPoint, twpWorldPixel, parts)) {
 								wayPointCounter++;
 							}
 						}
@@ -757,7 +758,7 @@ public class TourPainter extends MapPainter {
 					continue;
 				}
 
-				if (drawPhoto(gc, map, tile, photo, photoWorldPixel, parts)) {
+				if (drawPhoto(gcTile, map, tile, photo, photoWorldPixel, parts)) {
 					photoCounter++;
 				}
 			}
@@ -768,7 +769,7 @@ public class TourPainter extends MapPainter {
 		return isContentInTile;
 	}
 
-	private boolean drawPhoto(	final GC gc,
+	private boolean drawPhoto(	final GC gcTile,
 								final Map map,
 								final Tile tile,
 								final Photo photo,
@@ -815,7 +816,7 @@ public class TourPainter extends MapPainter {
 			devX += devPartOffset;
 			devY += devPartOffset;
 
-			gc.drawImage(image, //
+			gcTile.drawImage(image, //
 					0,
 					0,
 					imageSize.width,
@@ -827,28 +828,15 @@ public class TourPainter extends MapPainter {
 					photoWidth,
 					photoHeight);
 
-//			gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-//			gc.fillRectangle(devX, devY, photoWidth, photoHeight);
-
-			gc.setForeground(_bgColor);
-			gc.setLineWidth(1);
-			gc.drawRectangle(devX, devY, photoWidth, photoHeight);
-
-//			tile.addTourWayPointBounds(//
-//					twp,
-//					new Rectangle(
-//							devX - devPartOffset,
-//							devY - devPartOffset,
-//							_twpImageBounds.width,
-//							_twpImageBounds.height),
-//					zoomLevel,
-//					parts);
+			gcTile.setForeground(_bgColor);
+			gcTile.setLineWidth(1);
+			gcTile.drawRectangle(devX, devY, photoWidth, photoHeight);
 		}
 
 		return isPhotoInTile;
 	}
 
-	private boolean drawStaticMarker(	final GC gc,
+	private boolean drawStaticMarker(	final GC gcTile,
 										final Map map,
 										final Tile tile,
 										final double latitude,
@@ -885,7 +873,7 @@ public class TourPainter extends MapPainter {
 			final int markerWidth2 = markerWidth / 2;
 			final int markerHeight = bounds.height;
 
-			gc.drawImage(markerImage, //
+			gcTile.drawImage(markerImage, //
 					devMarkerPosX - markerWidth2 + devPartOffset,
 					devMarkerPosY - markerHeight + devPartOffset);
 		}
@@ -893,7 +881,7 @@ public class TourPainter extends MapPainter {
 		return isMarkerInTile;
 	}
 
-	private boolean drawTour10InTile(	final GC gc,
+	private boolean drawTour10InTile(	final GC gcTile,
 										final Map map,
 										final Tile tile,
 										final TourData tourData,
@@ -935,10 +923,10 @@ public class TourPainter extends MapPainter {
 					projectionId);
 		}
 
-		final Color systemColorBlue = gc.getDevice().getSystemColor(SWT.COLOR_BLUE);
+		final Color systemColorBlue = gcTile.getDevice().getSystemColor(SWT.COLOR_BLUE);
 
-		gc.setForeground(systemColorBlue);
-		gc.setBackground(systemColorBlue);
+		gcTile.setForeground(systemColorBlue);
+		gcTile.setBackground(systemColorBlue);
 
 		int lastInsideIndex = -99;
 		boolean isBorder;
@@ -972,7 +960,7 @@ public class TourPainter extends MapPainter {
 
 			_lineWidth2 = _lineWidth / 2;
 
-			gc.setLineWidth(_lineWidth);
+			gcTile.setLineWidth(_lineWidth);
 
 			for (int serieIndex = 0; serieIndex < longitudeSerie.length; serieIndex++) {
 
@@ -1019,7 +1007,7 @@ public class TourPainter extends MapPainter {
 
 							color = getTourColor(tourData, serieIndex, isBorder, true);
 
-							drawTour20Line(gc, //
+							drawTour20Line(gcTile, //
 									devFromWithOffsetX,
 									devFromWithOffsetY,
 									devToWithOffsetX,
@@ -1039,7 +1027,7 @@ public class TourPainter extends MapPainter {
 						 * the last inside to the first outside position
 						 */
 
-						drawTour20Line(gc, //
+						drawTour20Line(gcTile, //
 								devFromWithOffsetX,
 								devFromWithOffsetY,
 								devToWithOffsetX,
@@ -1076,9 +1064,9 @@ public class TourPainter extends MapPainter {
 							final Color color = getTourColor(tourData, serieIndex, isBorder, false);
 
 							if (_prefIsDrawSquare) {
-								drawTour30Square(gc, devX, devY, color);
+								drawTour30Square(gcTile, devX, devY, color);
 							} else {
-								drawTour40Dot(gc, devX, devY, color);
+								drawTour40Dot(gcTile, devX, devY, color);
 							}
 
 							// set previous pixel
@@ -1137,7 +1125,7 @@ public class TourPainter extends MapPainter {
 	}
 
 	/**
-	 * @param gc
+	 * @param gcTile
 	 * @param map
 	 * @param tile
 	 * @param latitude
@@ -1146,7 +1134,7 @@ public class TourPainter extends MapPainter {
 	 * @param parts
 	 * @return Returns <code>true</code> when marker has been painted
 	 */
-	private boolean drawTourMarker(	final GC gc,
+	private boolean drawTourMarker(	final GC gcTile,
 									final Map map,
 									final Tile tile,
 									final double latitude,
@@ -1177,7 +1165,7 @@ public class TourPainter extends MapPainter {
 			 * create and cache marker bounds
 			 */
 
-			final org.eclipse.swt.graphics.Point labelExtent = gc.textExtent(tourMarker.getLabel());
+			final org.eclipse.swt.graphics.Point labelExtent = gcTile.textExtent(tourMarker.getLabel());
 
 			final int bannerWidth = labelExtent.x + 2 * MARKER_MARGIN + 1;
 			final int bannerHeight = labelExtent.y + 2 * MARKER_MARGIN;
@@ -1196,7 +1184,7 @@ public class TourPainter extends MapPainter {
 			int devX;
 			int devY;
 
-			final Image tourMarkerImage = drawTourMarkerImage(gc.getDevice(), tourMarker.getLabel(), markerBounds);
+			final Image tourMarkerImage = drawTourMarkerImage(gcTile.getDevice(), tourMarker.getLabel(), markerBounds);
 			{
 				devX = devMarkerPosX - markerBounds.width / 2;
 				devY = devMarkerPosY - markerBounds.height;
@@ -1204,7 +1192,7 @@ public class TourPainter extends MapPainter {
 				devX += devPartOffset;
 				devY += devPartOffset;
 
-				gc.drawImage(tourMarkerImage, devX, devY);
+				gcTile.drawImage(tourMarkerImage, devX, devY);
 			}
 			tourMarkerImage.dispose();
 
@@ -1294,7 +1282,7 @@ public class TourPainter extends MapPainter {
 	}
 
 	/**
-	 * @param gc
+	 * @param gcTile
 	 * @param map
 	 * @param tile
 	 * @param twp
@@ -1302,7 +1290,7 @@ public class TourPainter extends MapPainter {
 	 * @param parts
 	 * @return Returns <code>true</code> when way point has been painted
 	 */
-	private boolean drawTourWayPoint(	final GC gc,
+	private boolean drawTourWayPoint(	final GC gcTile,
 										final Map map,
 										final Tile tile,
 										final TourWayPoint twp,
@@ -1332,7 +1320,7 @@ public class TourPainter extends MapPainter {
 			devX += devPartOffset;
 			devY += devPartOffset;
 
-			gc.drawImage(_twpImage, devX, devY);
+			gcTile.drawImage(_twpImage, devX, devY);
 
 //			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 //			gc.setLineWidth(1);

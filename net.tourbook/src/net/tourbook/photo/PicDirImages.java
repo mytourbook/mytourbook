@@ -1708,7 +1708,7 @@ public class PicDirImages implements IItemHovereredListener {
 			}
 		}
 
-		_picDirView.setSelection(new StructuredSelection(photos));
+		_picDirView.setSelection(new PhotoStructuredSelection(photos));
 	}
 
 	private void onSelectThumbnailSize(final int newImageSize) {
