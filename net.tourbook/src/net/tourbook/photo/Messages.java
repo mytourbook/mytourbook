@@ -107,6 +107,12 @@ public class Messages extends NLS {
 	public static String		Pic_Dir_StatusLabel_RestoringFolder;
 	public static String		Pic_Dir_StatusLabel_SelectedImages;
 
+	public static String	Pic_Dir_StatusLable_LoadingFolder;
+
+	public static String	Pic_Dir_StatusLable_LoadingFolder_FolderIsNotAvailable;
+
+	public static String	Pic_Dir_StatusLable_LoadingFolder_InFolderTree;
+
 	public static String		PrefPage_Photo_Cache_Button_GetNumberOfImages;
 	public static String		PrefPage_Photo_Cache_Dialog_MaxHandle_CreatedImagesBeforeError;
 	public static String		PrefPage_Photo_Cache_Dialog_MaxHandle_NoError;

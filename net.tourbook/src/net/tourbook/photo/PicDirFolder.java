@@ -239,7 +239,7 @@ class PicDirFolder {
 					hasChildren = tviFolder.hasChildren();
 				} else {
 
-					putInWaitingQueue(tviFolder, false);
+					putFolderInWaitingQueue(tviFolder, false);
 
 					hasChildren = true;
 				}
@@ -367,7 +367,7 @@ class PicDirFolder {
 		if (UI.IS_WIN) {
 
 			final String[] commandsWin = { "\"" + extApp + "\"", //$NON-NLS-1$ //$NON-NLS-2$
-					"\"" + folder + "\"" };
+					"\"" + folder + "\"" }; //$NON-NLS-1$ //$NON-NLS-2$
 
 			commands = commandsWin;
 
@@ -565,9 +565,9 @@ class PicDirFolder {
 
 							// force that file list is loaded and number of files is available
 
-							putInWaitingQueue(folderItem, false);
+							putFolderInWaitingQueue(folderItem, false);
 
-							styledString.append(UI.SPACE2 + "loading...", UI.PHOTO_FOLDER_STYLER);
+							styledString.append(UI.SPACE2 + Messages.Pic_Dir_StatusLable_LoadingFolder_InFolderTree, UI.PHOTO_FOLDER_STYLER);
 						}
 					}
 
@@ -626,7 +626,7 @@ class PicDirFolder {
 
 			} else {
 
-				putInWaitingQueue(treeItem, true);
+				putFolderInWaitingQueue(treeItem, true);
 			}
 		}
 	}
@@ -955,7 +955,7 @@ class PicDirFolder {
 		displayFolderImages(selectedFolderItem, isFromNavigationHistory, false);
 	}
 
-	private void putInWaitingQueue(final TVIFolderFolder queueFolderItem, final boolean isExpandFolder) {
+	private void putFolderInWaitingQueue(final TVIFolderFolder queueFolderItem, final boolean isExpandFolder) {
 
 		// get and set queue state
 		if (queueFolderItem.isInWaitingQueue.getAndSet(true)) {
@@ -978,21 +978,30 @@ class PicDirFolder {
 					// load folder children
 					loaderFolderItem.hasChildren();
 
+					// must be outside of the UI thread that the number is correct
 					final int queueSize = _folderWaitingQueue.size();
 
 					// update UI
 					_display.syncExec(new Runnable() {
 						public void run() {
 
+							if (_folderViewer.getTree().isDisposed()) {
+								return;
+							}
+
 							if (folderLoader.isExpandFolder) {
 								_folderViewer.expandToLevel(loaderFolderItem, 1);
 							} else {
+
+								/*
+								 * update structural changes, also the triangle to expand/collapse,
+								 * an update(...) is not sufficient because this will not remove the
+								 * triangle when not necessary
+								 */
 								_folderViewer.refresh(loaderFolderItem);
 							}
 
-							_picDirImages.updateUI_StatusMessage(NLS.bind(
-									"Loading Folder: {0}",
-									queueSize));
+							_picDirImages.updateUI_StatusMessage(NLS.bind(Messages.Pic_Dir_StatusLable_LoadingFolder, queueSize));
 
 							// reset queue state
 							loaderFolderItem.isInWaitingQueue.set(false);
@@ -1003,26 +1012,6 @@ class PicDirFolder {
 		};
 		_folderExecutor.submit(executorTask);
 
-	}
-
-	private void restoreFolder(final String restoreFolderName) {
-
-		BusyIndicator.showWhile(_display, new Runnable() {
-			public void run() {
-
-				// set root item
-				_rootItem = new TVIFolderRoot(PicDirFolder.this, _folderViewer, getRootsSorted());
-
-				_folderViewer.setInput(new Object());
-
-				_selectedFolder = null;
-				_selectedTVIFolder = null;
-
-				_picDirImages.showRestoreFolder(restoreFolderName);
-
-				selectFolder(restoreFolderName, true, false);
-			}
-		});
 	}
 
 	void restoreState(final IDialogSettings state) {
@@ -1049,7 +1038,7 @@ class PicDirFolder {
 
 				final String previousSelectedFolder = Util.getStateString(state, STATE_SELECTED_FOLDER, null);
 
-				restoreFolder(previousSelectedFolder);
+				restoreStateFolder(previousSelectedFolder);
 
 				return Status.OK_STATUS;
 			}
@@ -1057,6 +1046,37 @@ class PicDirFolder {
 
 		folderJob.setSystem(true);
 		folderJob.schedule();
+	}
+
+	private void restoreStateFolder(final String restoreFolderName) {
+
+		BusyIndicator.showWhile(_display, new Runnable() {
+			public void run() {
+
+				// set root item
+				_rootItem = new TVIFolderRoot(PicDirFolder.this, _folderViewer, getRootsSorted());
+
+				_folderViewer.setInput(new Object());
+
+				_selectedFolder = null;
+				_selectedTVIFolder = null;
+
+				_picDirImages.showRestoreFolder(restoreFolderName);
+
+//				/*
+//				 * first select only the root item because there is an effect, that the restored
+//				 * folder is expanded and ms later the last device is displayed multiple times (for
+//				 * each root entry)
+//				 */
+				selectFolder(restoreFolderName, true, false, false);
+
+//				_display.asyncExec(new Runnable() {
+//					public void run() {
+//						selectFolder(restoreFolderName, true, false, false);
+//					}
+//				});
+			}
+		});
 	}
 
 	void saveState(final IDialogSettings state) {
@@ -1076,11 +1096,13 @@ class PicDirFolder {
 	 * @param isFromNavigationHistory
 	 *            Set <code>true</code> when the folder was selected from the navigations history
 	 *            which prevents that the naviation history is updated.
+	 * @param isRootItem
 	 * @return Return <code>false</code> when the folder which should be selected is not available
 	 */
 	boolean selectFolder(	final String requestedFolderName,
 							final boolean isMoveUpHierarchyWhenFolderIsInvalid,
-							final boolean isFromNavigationHistory) {
+							final boolean isFromNavigationHistory,
+							final boolean isRootItem) {
 
 		_isFromNavigationHistory = isFromNavigationHistory;
 
@@ -1119,7 +1141,7 @@ class PicDirFolder {
 
 			// restored folder is not available
 
-			_picDirImages.updateUI_StatusMessage(NLS.bind("Folder is not available: {0}", requestedFolderName));
+			_picDirImages.updateUI_StatusMessage(NLS.bind(Messages.Pic_Dir_StatusLable_LoadingFolder_FolderIsNotAvailable, requestedFolderName));
 		}
 
 		if (selectedFolder == null) {
@@ -1190,6 +1212,11 @@ class PicDirFolder {
 
 			if (isPathSegmentAvailable == false) {
 				// requested path is not available, select partial path in the viewer
+				break;
+			}
+
+			if (isRootItem) {
+				// read only the root item
 				break;
 			}
 		}
