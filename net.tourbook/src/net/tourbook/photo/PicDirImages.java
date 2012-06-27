@@ -577,7 +577,7 @@ public class PicDirImages implements IItemHovereredListener {
 			public void run() {
 
 				final String prevFolderPathName = _folderHistory.get(_selectedHistoryIndex);
-				final boolean isFolderAvailable = _picDirFolder.selectFolder(prevFolderPathName, false, true);
+				final boolean isFolderAvailable = _picDirFolder.selectFolder(prevFolderPathName, false, true, false);
 
 				if (isFolderAvailable == false) {
 					removeInvalidFolder(prevFolderPathName);
@@ -610,7 +610,7 @@ public class PicDirImages implements IItemHovereredListener {
 		BusyIndicator.showWhile(_display, new Runnable() {
 			public void run() {
 				final String prevFolderPathName = _folderHistory.get(_selectedHistoryIndex);
-				final boolean isFolderAvailable = _picDirFolder.selectFolder(prevFolderPathName, false, true);
+				final boolean isFolderAvailable = _picDirFolder.selectFolder(prevFolderPathName, false, true, false);
 
 				if (isFolderAvailable == false) {
 					removeInvalidFolder(prevFolderPathName);
@@ -1678,7 +1678,7 @@ public class PicDirImages implements IItemHovereredListener {
 		BusyIndicator.showWhile(_display, new Runnable() {
 			public void run() {
 
-				final boolean isFolderAvailable = _picDirFolder.selectFolder(selectedFolder, false, false);
+				final boolean isFolderAvailable = _picDirFolder.selectFolder(selectedFolder, false, false, false);
 
 				if (isFolderAvailable == false) {
 					removeInvalidFolder(selectedFolder);
