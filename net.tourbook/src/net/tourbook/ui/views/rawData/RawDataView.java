@@ -132,31 +132,33 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class RawDataView extends ViewPart implements ITourProviderAll, ITourViewer3 {
 
-	public static final String				ID									= "net.tourbook.views.rawData.RawDataView"; //$NON-NLS-1$
+	public static final String				ID										= "net.tourbook.views.rawData.RawDataView"; //$NON-NLS-1$
 
-	public static final int					COLUMN_DATE							= 0;
-	public static final int					COLUMN_TITLE						= 1;
-	public static final int					COLUMN_DATA_FORMAT					= 2;
-	public static final int					COLUMN_FILE_NAME					= 3;
+	public static final int					COLUMN_DATE								= 0;
+	public static final int					COLUMN_TITLE							= 1;
+	public static final int					COLUMN_DATA_FORMAT						= 2;
+	public static final int					COLUMN_FILE_NAME						= 3;
 
-	private static final String				STATE_IMPORTED_FILENAMES			= "importedFilenames";						//$NON-NLS-1$
-	private static final String				STATE_SELECTED_TOUR_INDICES			= "SelectedTourIndices";					//$NON-NLS-1$
+	private static final String				STATE_IMPORTED_FILENAMES				= "importedFilenames";						//$NON-NLS-1$
+	private static final String				STATE_SELECTED_TOUR_INDICES				= "SelectedTourIndices";					//$NON-NLS-1$
 
-	private static final String				STATE_IS_MERGE_TRACKS				= "isMergeTracks";							//$NON-NLS-1$
-	private static final String				STATE_IS_CHECKSUM_VALIDATION		= "isChecksumValidation";					//$NON-NLS-1$
-	private static final String				STATE_IS_CREATE_TOUR_ID_WITH_TIME	= "isCreateTourIdWithTime";				//$NON-NLS-1$
+	private static final String				STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED	= "STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED"; //$NON-NLS-1$
+	private static final String				STATE_IS_MERGE_TRACKS					= "isMergeTracks";							//$NON-NLS-1$
+	private static final String				STATE_IS_CHECKSUM_VALIDATION			= "isChecksumValidation";					//$NON-NLS-1$
+	private static final String				STATE_IS_CREATE_TOUR_ID_WITH_TIME		= "isCreateTourIdWithTime";				//$NON-NLS-1$
 
-	public static final String				IMAGE_DATA_TRANSFER					= "IMAGE_DATA_TRANSFER";					//$NON-NLS-1$
-	public static final String				IMAGE_DATA_TRANSFER_DIRECT			= "IMAGE_DATA_TRANSFER_DIRECT";			//$NON-NLS-1$
-	public static final String				IMAGE_IMPORT						= "IMAGE_IMPORT";							//$NON-NLS-1$
+	public static final String				IMAGE_DATA_TRANSFER						= "IMAGE_DATA_TRANSFER";					//$NON-NLS-1$
+	public static final String				IMAGE_DATA_TRANSFER_DIRECT				= "IMAGE_DATA_TRANSFER_DIRECT";			//$NON-NLS-1$
+	public static final String				IMAGE_IMPORT							= "IMAGE_IMPORT";							//$NON-NLS-1$
 
-	private final IPreferenceStore			_prefStore							= TourbookPlugin.getDefault()//
-																						.getPreferenceStore();
+	private final IPreferenceStore			_prefStore								= TourbookPlugin.getDefault()//
+																							.getPreferenceStore();
 
-	private final IDialogSettings			_state								= TourbookPlugin.getDefault()//
-																						.getDialogSettingsSection(ID);
+	private final IDialogSettings			_state									= TourbookPlugin.getDefault()//
+																							.getDialogSettingsSection(
+																									ID);
 
-	private RawDataManager					_rawDataMgr							= RawDataManager.getInstance();
+	private RawDataManager					_rawDataMgr								= RawDataManager.getInstance();
 
 	private PostSelectionProvider			_postSelectionProvider;
 	private IPartListener2					_partListener;
@@ -167,23 +169,23 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	protected TourPerson					_activePerson;
 	protected TourPerson					_newActivePerson;
 
-	protected boolean						_isPartVisible						= false;
-	protected boolean						_isViewerPersonDataDirty			= false;
+	protected boolean						_isPartVisible							= false;
+	protected boolean						_isViewerPersonDataDirty				= false;
 
 	private ColumnManager					_columnManager;
 
-	private final Calendar					_calendar							= GregorianCalendar.getInstance();
+	private final Calendar					_calendar								= GregorianCalendar.getInstance();
 
-	private final DateFormat				_dateFormatter						= DateFormat
-																						.getDateInstance(DateFormat.SHORT);
-	private final DateFormat				_timeFormatter						= DateFormat
-																						.getTimeInstance(DateFormat.SHORT);
-	private final DateFormat				_durationFormatter					= DateFormat.getTimeInstance(
-																						DateFormat.SHORT,
-																						Locale.GERMAN);
+	private final DateFormat				_dateFormatter							= DateFormat
+																							.getDateInstance(DateFormat.SHORT);
+	private final DateFormat				_timeFormatter							= DateFormat
+																							.getTimeInstance(DateFormat.SHORT);
+	private final DateFormat				_durationFormatter						= DateFormat.getTimeInstance(
+																							DateFormat.SHORT,
+																							Locale.GERMAN);
 
-	private final NumberFormat				_nf1								= NumberFormat.getNumberInstance();
-	private final NumberFormat				_nf3								= NumberFormat.getNumberInstance();
+	private final NumberFormat				_nf1									= NumberFormat.getNumberInstance();
+	private final NumberFormat				_nf3									= NumberFormat.getNumberInstance();
 	{
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
@@ -197,7 +199,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private boolean							_isToolTipInTags;
 
 	private TagMenuManager					_tagMenuMgr;
-	private TourDoubleClickState			_tourDoubleClickState				= new TourDoubleClickState();
+	private TourDoubleClickState			_tourDoubleClickState					= new TourDoubleClickState();
 
 	/*
 	 * resources
@@ -242,6 +244,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private ActionSetTourTypeMenu			_actionSetTourType;
 
 	// view actions
+	private ActionRemoveToursWhenClosed		_actionRemoveToursWhenClosed;
 	private ActionAdjustYear				_actionAdjustImportedYear;
 	private ActionCreateTourIdWithTime		_actionCreateTourIdWithTime;
 	private ActionDisableChecksumValidation	_actionDisableChecksumValidation;
@@ -582,6 +585,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_actionClearView = new ActionClearView(this);
 
 		// view menu
+		_actionRemoveToursWhenClosed = new ActionRemoveToursWhenClosed();
 		_actionAdjustImportedYear = new ActionAdjustYear(this);
 		_actionCreateTourIdWithTime = new ActionCreateTourIdWithTime(this);
 		_actionDisableChecksumValidation = new ActionDisableChecksumValidation(this);
@@ -1684,6 +1688,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		 */
 		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 
+		menuMgr.add(_actionRemoveToursWhenClosed);
+
+		menuMgr.add(new Separator());
 		menuMgr.add(_actionMergeGPXTours);
 		menuMgr.add(_actionCreateTourIdWithTime);
 		menuMgr.add(_actionDisableChecksumValidation);
@@ -2025,6 +2032,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private void restoreState() {
 
+		_actionRemoveToursWhenClosed.setChecked(Util.getStateBoolean(
+				_state,
+				STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED,
+				true));
+
 		// restore: set merge tracks status before the tours are imported
 		final boolean isMergeTracks = _state.getBoolean(STATE_IS_MERGE_TRACKS);
 		_actionMergeGPXTours.setChecked(isMergeTracks);
@@ -2057,9 +2069,19 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			return;
 		}
 
-		// save imported file names
-		final HashSet<String> importedFiles = _rawDataMgr.getImportedFiles();
-		_state.put(STATE_IMPORTED_FILENAMES, importedFiles.toArray(new String[importedFiles.size()]));
+		/*
+		 * save imported file names
+		 */
+		final boolean isRemoveToursWhenClosed = _actionRemoveToursWhenClosed.isChecked();
+		String[] stateImportedFiles;
+		if (isRemoveToursWhenClosed) {
+			stateImportedFiles = new String[] {};
+		} else {
+			final HashSet<String> importedFiles = _rawDataMgr.getImportedFiles();
+			stateImportedFiles = importedFiles.toArray(new String[importedFiles.size()]);
+		}
+		_state.put(STATE_IMPORTED_FILENAMES, stateImportedFiles);
+		_state.put(STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED, isRemoveToursWhenClosed);
 
 		// keep selected tours
 		Util.setState(_state, STATE_SELECTED_TOUR_INDICES, table.getSelectionIndices());

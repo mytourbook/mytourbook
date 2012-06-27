@@ -1,5 +1,11 @@
 Version: 12.6.1                                           2?. June 2012 
 
+Important !!!
+
+New behaviour in the import view: All tours will be removed (NOT 
+deleted) from this view when view or application is closed. The old 
+behaviour can be activated in the view menu by unchecking: "Remove all tours from tour import view when view or application is closed" 
+
 
 New 
 
