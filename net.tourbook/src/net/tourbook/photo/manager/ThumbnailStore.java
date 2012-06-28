@@ -196,7 +196,7 @@ public class ThumbnailStore {
 		if (storeFile.isFile()) {
 			final boolean isDeleted = storeFile.delete();
 			if (isDeleted == false) {
-				StatusUtil.log(NLS.bind("cannot delete file: {0}", storeFilePath));
+				StatusUtil.log(NLS.bind("cannot delete file: {0}", storeFilePath)); //$NON-NLS-1$
 			}
 		}
 	}

@@ -148,7 +148,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 //	private Rectangle _calendarFirstWeekRectangle;
 //	private Rectangle _calendarLastWeekRectangle;
 
-	private String								_refText				= "Tour12";
+	private String								_refText				= "Tour12"; //$NON-NLS-1$
 	private boolean								_tinyLayout				= false;
 
 	private boolean								_showDayNumberInTinyView	= false;
@@ -550,7 +550,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 
 		if (_scrollDebug) {
-			System.out.println("Drawing year: " + _dt.getYear() + " week: " + _dt.getWeekOfWeekyear());
+			System.out.println("Drawing year: " + _dt.getYear() + " week: " + _dt.getWeekOfWeekyear()); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		if (_image != null && !_image.isDisposed()) {
@@ -1017,7 +1017,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		if (_tinyLayout) {
 			if (dt.minusDays(1).getMonthOfYear() != dt.plusDays(6).getMonthOfYear()) { // a new month started on this week
 				gc.setClipping(new Rectangle(rec.x, rec.y, rec.width, 4 * rec.height)); // clipp to the room left of this month
-				text = dt.plusDays(6).toString("MMM");
+				text = dt.plusDays(6).toString("MMM"); //$NON-NLS-1$
 				if (rec.width < (2 * _refTextExtent.x / 3)) {
 					text = text.substring(0, 1);
 				}
@@ -1025,7 +1025,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				gc.setClipping(_nullRec);
 			}
 		} else {
-			gc.drawText("" + dt.getWeekOfWeekyear(), rec.x + 4, rec.y + 2);
+			gc.drawText("" + dt.getWeekOfWeekyear(), rec.x + 4, rec.y + 2);//$NON-NLS-1$
 		}
 		gc.setFont(normalFont);
 
@@ -1065,8 +1065,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				extent = gc.stringExtent(text);
 				xx = xr - extent.x;
 				if (extent.x > maxLength) {
-					if (doClip && text.contains(" ")) {
-						text = text.substring(0, text.lastIndexOf(" "));
+					if (doClip && text.contains(UI.SPACE)) {
+						text = text.substring(0, text.lastIndexOf(UI.SPACE));
 						xx = xr - gc.stringExtent(text).x;
 					} else {
 						xx = xl;
@@ -1561,7 +1561,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		// sb.setPageIncrement(getNumWeeks());
 
 		if (_scrollDebug) {
-			System.out.println("SbarStart: " + scrollBarStart().getWeekOfWeekyear());
+			System.out.println("SbarStart: " + scrollBarStart().getWeekOfWeekyear()); //$NON-NLS-1$
 			System.out.println("SbarShift: " + _scrollBarShift + " - Selected Week: " + selection); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 

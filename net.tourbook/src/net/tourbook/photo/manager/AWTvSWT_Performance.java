@@ -285,7 +285,7 @@ public class AWTvSWT_Performance {
 //				awtSource.getWidth(),
 //				awtSource.getHeight() / 2,
 //				awtSource.getType());
-		System.out.println("AWT load: " + (System.currentTimeMillis() - start));
+		System.out.println("AWT load: " + (System.currentTimeMillis() - start)); //$NON-NLS-1$
 
 		start = System.currentTimeMillis();
 		final Image swtSource = new Image(Display.getDefault(), args[0]);
@@ -293,7 +293,7 @@ public class AWTvSWT_Performance {
 //				Display.getDefault(),
 //				swtSource.getBounds().width,
 //				swtSource.getBounds().height / 2);
-		System.out.println("SWT load: " + (System.currentTimeMillis() - start));
+		System.out.println("SWT load: " + (System.currentTimeMillis() - start)); //$NON-NLS-1$
 
 		// run AWT performance test
 		final long awtStartTime = System.currentTimeMillis();
@@ -302,7 +302,7 @@ public class AWTvSWT_Performance {
 			convertToSWT(awtSource);
 		}
 		final long awtEndTime = System.currentTimeMillis();
-		System.out.println("convertToSWT: " + (awtEndTime - awtStartTime) /* / runs */);
+		System.out.println("convertToSWT: " + (awtEndTime - awtStartTime) /* / runs */); //$NON-NLS-1$
 
 		// run SWT performance test
 		final long swtStartTime = System.currentTimeMillis();
@@ -311,6 +311,6 @@ public class AWTvSWT_Performance {
 //			convertToAWT(swtSource.getImageData());
 		}
 		final long swtEndTime = System.currentTimeMillis();
-		System.out.println("convertToAWT: " + (swtEndTime - swtStartTime) /* / runs */);
+		System.out.println("convertToAWT: " + (swtEndTime - swtStartTime) /* / runs */); //$NON-NLS-1$
 	}
 }

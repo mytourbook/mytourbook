@@ -498,7 +498,7 @@ public class TourDatabase {
 	public static TreeSet<String> getAllTourMarkerNames() {
 
 		if (_dbTourMarkerNames == null) {
-			_dbTourMarkerNames = getDistinctValues(TourDatabase.TABLE_TOUR_MARKER, "label"); // $NON-NLS-1$
+			_dbTourMarkerNames = getDistinctValues(TourDatabase.TABLE_TOUR_MARKER, "label"); //$NON-NLS-1$
 		}
 
 		return _dbTourMarkerNames;
@@ -514,7 +514,7 @@ public class TourDatabase {
 	public static TreeSet<String> getAllTourPlaceEnds() {
 
 		if (_dbTourEndPlace == null) {
-			_dbTourEndPlace = getDistinctValues(TourDatabase.TABLE_TOUR_DATA, "tourEndPlace"); // $NON-NLS-1$
+			_dbTourEndPlace = getDistinctValues(TourDatabase.TABLE_TOUR_DATA, "tourEndPlace"); //$NON-NLS-1$
 		}
 
 		return _dbTourEndPlace;
@@ -530,7 +530,7 @@ public class TourDatabase {
 	public static TreeSet<String> getAllTourPlaceStarts() {
 
 		if (_dbTourStartPlace == null) {
-			_dbTourStartPlace = getDistinctValues(TourDatabase.TABLE_TOUR_DATA, "tourStartPlace"); // $NON-NLS-1$
+			_dbTourStartPlace = getDistinctValues(TourDatabase.TABLE_TOUR_DATA, "tourStartPlace"); //$NON-NLS-1$
 		}
 
 		return _dbTourStartPlace;
@@ -586,7 +586,7 @@ public class TourDatabase {
 	public static TreeSet<String> getAllTourTitles() {
 
 		if (_dbTourTitles == null) {
-			_dbTourTitles = getDistinctValues(TourDatabase.TABLE_TOUR_DATA, "tourTitle"); // $NON-NLS-1$
+			_dbTourTitles = getDistinctValues(TourDatabase.TABLE_TOUR_DATA, "tourTitle"); //$NON-NLS-1$
 		}
 
 		return _dbTourTitles;
@@ -2974,8 +2974,8 @@ public class TourDatabase {
 
 			final Map<String, Object> configOverrides = new HashMap<String, Object>();
 
-			configOverrides.put("hibernate.connection.url", DERBY_URL);
-			configOverrides.put("hibernate.connection.driver_class", DERBY_DRIVER_CLASS);
+			configOverrides.put("hibernate.connection.url", DERBY_URL); //$NON-NLS-1$
+			configOverrides.put("hibernate.connection.driver_class", DERBY_DRIVER_CLASS); //$NON-NLS-1$
 
 			final MyTourbookSplashHandler splashHandler = TourbookPlugin.getSplashHandler();
 

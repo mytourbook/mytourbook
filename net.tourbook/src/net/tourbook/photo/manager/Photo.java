@@ -22,6 +22,7 @@ import java.util.List;
 
 import net.tourbook.photo.gallery.MT20.RendererHelper;
 import net.tourbook.util.StatusUtil;
+import net.tourbook.util.UI;
 import net.tourbook.util.Util;
 
 import org.apache.commons.imaging.Imaging;
@@ -293,9 +294,9 @@ public class Photo {
 
 		final StringBuilder sb = new StringBuilder();
 
-		sb.append("Thumb:" + _photoLoadingStateThumb);
-		sb.append("\tHQ:" + _photoLoadingStateHQ);
-		sb.append("\tOriginal:" + _photoLoadingStateOriginal);
+		sb.append("Thumb:" + _photoLoadingStateThumb); //$NON-NLS-1$
+		sb.append("\tHQ:" + _photoLoadingStateHQ); //$NON-NLS-1$
+		sb.append("\tOriginal:" + _photoLoadingStateOriginal); //$NON-NLS-1$
 
 		return sb.toString();
 	}
@@ -447,7 +448,7 @@ public class Photo {
 						final byte firstByte = byteArrayValue[0];
 						if (firstByte == 0x55) {
 
-							valueString = new String(valueBytes, "UTF-16");
+							valueString = new String(valueBytes, UI.UTF_16);
 
 						} else {
 
@@ -923,7 +924,7 @@ public class Photo {
 //				: _orientation == 3 ? "180" //
 //						: _orientation == 6 ? "90" : "0";
 
-		return ""
+		return "" //$NON-NLS-1$
 //				+"Photo " //
 				+ (_photoWrapper.imageFileName)
 //				+ (_exifDateTime == null ? "-no date-" : "\t" + _exifDateTime)

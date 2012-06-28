@@ -65,7 +65,7 @@ public class PhotoWrapper implements IGalleryCustomData {
 
 		imageFileSize = imageFile.length();
 
-		final int dotPos = imageFileName.lastIndexOf(".");
+		final int dotPos = imageFileName.lastIndexOf(UI.SYMBOL_DOT);
 		imageFileExt = dotPos > 0 ? imageFileName.substring(dotPos + 1).toLowerCase() : UI.EMPTY_STRING;
 
 		// initially sort by file date until exif data are loaded
@@ -80,7 +80,7 @@ public class PhotoWrapper implements IGalleryCustomData {
 	@Override
 	public String toString() {
 
-		return (imageFileLastModified + "  ") + imageFileName;
+		return (imageFileLastModified + "  ") + imageFileName; //$NON-NLS-1$
 
 //		return photo.toString();
 	}

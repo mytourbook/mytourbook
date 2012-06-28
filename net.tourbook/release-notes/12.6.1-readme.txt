@@ -4,7 +4,9 @@ Important !!!
 
 New behaviour in the import view: All tours will be removed (NOT 
 deleted) from this view when view or application is closed. The old 
-behaviour can be activated in the view menu by unchecking: "Remove all tours from tour import view when view or application is closed" 
+behaviour can be activated in the view menu by unchecking: "Remove all 
+tours from tour import view when view or application is closed" 
+
 
 
 New 
@@ -18,8 +20,9 @@ preferences)
 
 Improvements 
 
-* statusline displays a message how many folders are queued to be loaded 
-in the photo directory 
+* statusline displays a message how many folders has to be loaded in the 
+photo directory 
+
 
 
 
@@ -29,6 +32,10 @@ Other modifications
 
 
 Fixed Bugs 
+
+* black background color in a map tile which contains a tour/photo and 
+simple drawing method was used, this bug occured in newer Linux 
+distributions 
 
 
 

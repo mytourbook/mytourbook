@@ -223,7 +223,7 @@ public class SWT2Dutil {
 			}
 
 		} catch (final Exception e) {
-			System.out.println("cannot convert AWT into SWT: " + imageFilePath + "\n");
+			System.out.println("cannot convert AWT into SWT: " + imageFilePath + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 			e.printStackTrace();
 		}
 

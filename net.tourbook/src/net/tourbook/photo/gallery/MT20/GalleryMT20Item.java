@@ -64,13 +64,13 @@ public class GalleryMT20Item {
 
 	@Override
 	public String toString() {
-		return ""
+		return "" //$NON-NLS-1$
 //				"GalleryMT20Item"
-				+ (" 			x=" + viewPortX)
-				+ ("\ty=" + viewPortY)
-				+ ("\t" + width)
-				+ ("x" + height)
-				+ (" " + customData)
+				+ (" 			x=" + viewPortX) //$NON-NLS-1$
+				+ ("\ty=" + viewPortY) //$NON-NLS-1$
+				+ ("\t" + width) //$NON-NLS-1$
+				+ ("x" + height) //$NON-NLS-1$
+				+ (" " + customData) //$NON-NLS-1$
 //
 		;
 	}

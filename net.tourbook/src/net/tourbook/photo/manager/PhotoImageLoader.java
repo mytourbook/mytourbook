@@ -124,7 +124,7 @@ public class PhotoImageLoader {
 		try {
 
 			// get temp file name
-			final File tempFile = File.createTempFile("prefix", "");
+			final File tempFile = File.createTempFile("prefix", UI.EMPTY_STRING);//$NON-NLS-1$
 			tempFilename = tempFile.getName();
 			tempFile.delete();
 
@@ -385,8 +385,8 @@ public class PhotoImageLoader {
 
 				if (storeImage == null) {
 
-					String message = "Image \"{0}\" cannot be loaded and an exception did not occure.\n"
-							+ "The image file is available but it's possible that SWT.ERROR_NO_HANDLES occured";
+					String message = "Image \"{0}\" cannot be loaded and an exception did not occure.\n" //$NON-NLS-1$
+							+ "The image file is available but it's possible that SWT.ERROR_NO_HANDLES occured"; //$NON-NLS-1$
 
 					System.out.println(UI.timeStamp() + NLS.bind(message, imageStoreFilePath));
 
@@ -406,7 +406,7 @@ public class PhotoImageLoader {
 
 						if (storeImage == null) {
 
-							message = "Image cannot be loaded again with SWT, even when disposing the image cache: \"{0}\" ";
+							message = "Image cannot be loaded again with SWT, even when disposing the image cache: \"{0}\" "; //$NON-NLS-1$
 
 							System.out.println(UI.timeStamp() + NLS.bind(message, imageStoreFilePath));
 						}
@@ -480,7 +480,7 @@ public class PhotoImageLoader {
 			if (hqImage == null) {
 
 				System.out.println(NLS.bind(//
-						UI.timeStamp() + "image == NULL when loading with {0}: \"{1}\"",
+						UI.timeStamp() + "image == NULL when loading with {0}: \"{1}\"", //$NON-NLS-1$
 						_imageFramework.toUpperCase(),
 						_photo.getPhotoWrapper().imageFilePathName));
 
@@ -504,7 +504,7 @@ public class PhotoImageLoader {
 
 						if (hqImage == null) {
 							System.out.println(NLS.bind(//
-									UI.timeStamp() + "image == NULL when loading with SWT: \"{0}\"",
+									UI.timeStamp() + "image == NULL when loading with SWT: \"{0}\"", //$NON-NLS-1$
 									_photo.getPhotoWrapper().imageFilePathName));
 						}
 					}
@@ -775,15 +775,14 @@ public class PhotoImageLoader {
 
 		final long end = System.currentTimeMillis() - start;
 
-		System.out.println(UI.timeStamp()
-				+ "SWT: "
-				+ (Thread.currentThread().getName() + " " + _photo.getPhotoWrapper().imageFileName)
-				+ ("\ttotal: " + end)
-				+ ("\tload: " + endHqLoad)
-				+ ("\tresizeHQ: " + endResizeHQ)
-				+ ("\tsaveHQ: " + endSaveHQ)
-				+ ("\tresizeThumb: " + endResizeThumb)
-				+ ("\tsaveThumb: " + endSaveThumb));
+		System.out.println(UI.timeStamp() + "SWT: " //$NON-NLS-1$
+				+ (Thread.currentThread().getName() + " " + _photo.getPhotoWrapper().imageFileName) //$NON-NLS-1$
+				+ ("\ttotal: " + end) //$NON-NLS-1$
+				+ ("\tload: " + endHqLoad) //$NON-NLS-1$
+				+ ("\tresizeHQ: " + endResizeHQ) //$NON-NLS-1$
+				+ ("\tsaveHQ: " + endSaveHQ) //$NON-NLS-1$
+				+ ("\tresizeThumb: " + endResizeThumb) //$NON-NLS-1$
+				+ ("\tsaveThumb: " + endSaveThumb)); //$NON-NLS-1$
 
 		return requestedSWTImage;
 	}
@@ -1098,15 +1097,14 @@ public class PhotoImageLoader {
 
 		final long end = System.currentTimeMillis() - start;
 
-		System.out.println(UI.timeStamp()
-				+ "AWT: "
-				+ (Thread.currentThread().getName() + " " + photoWrapper.imageFileName)
-				+ ("\ttotal: " + end)
-				+ ("\tload: " + endHqLoad)
-				+ ("\tresizeHQ: " + endResizeHQ)
-				+ ("\tsaveHQ: " + endSaveHQ)
-				+ ("\tresizeThumb: " + endResizeThumb)
-				+ ("\tsaveThumb: " + endSaveThumb)
+		System.out.println(UI.timeStamp() + "AWT: " //$NON-NLS-1$
+				+ (Thread.currentThread().getName() + " " + photoWrapper.imageFileName) //$NON-NLS-1$
+				+ ("\ttotal: " + end) //$NON-NLS-1$
+				+ ("\tload: " + endHqLoad) //$NON-NLS-1$
+				+ ("\tresizeHQ: " + endResizeHQ) //$NON-NLS-1$
+				+ ("\tsaveHQ: " + endSaveHQ) //$NON-NLS-1$
+				+ ("\tresizeThumb: " + endResizeThumb) //$NON-NLS-1$
+				+ ("\tsaveThumb: " + endSaveThumb) //$NON-NLS-1$
 		//
 				);
 
@@ -1283,15 +1281,14 @@ public class PhotoImageLoader {
 
 			final long end = System.currentTimeMillis() - start;
 
-			System.out.println(UI.timeStamp()
-					+ "SWT: "
+			System.out.println(UI.timeStamp() + "SWT: " //$NON-NLS-1$
 					+ Thread.currentThread().getName()
-					+ " "
+					+ " " //$NON-NLS-1$
 					+ photoWrapper.imageFileName
-					+ ("\ttotal: " + end)
-					+ ("\tload1: " + endOriginalLoad1)
-					+ ("\tload2: " + endOriginalLoad2)
-					+ ("\trotate: " + endRotate)
+					+ ("\ttotal: " + end) //$NON-NLS-1$
+					+ ("\tload1: " + endOriginalLoad1) //$NON-NLS-1$
+					+ ("\tload2: " + endOriginalLoad2) //$NON-NLS-1$
+					+ ("\trotate: " + endRotate) //$NON-NLS-1$
 			//
 					);
 

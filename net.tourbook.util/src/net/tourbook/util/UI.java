@@ -76,9 +76,10 @@ public class UI {
 	public static final String	NEW_LINE2				= "\n\n";																	//$NON-NLS-1$
 
 	public static final String	UTF_8					= "UTF-8";																	//$NON-NLS-1$
+	public static final String	UTF_16					= "UTF-16";																//$NON-NLS-1$
 	public static final String	ISO_8859_1				= "ISO-8859-1";															//$NON-NLS-1$
 
-	public static final Charset	UTF8_CHARSET			= Charset.forName("UTF-8");
+	public static final Charset	UTF8_CHARSET			= Charset.forName("UTF-8"); //$NON-NLS-1$
 
 	public static void addSashColorHandler(final Sash sash) {
 

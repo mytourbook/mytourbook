@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
-import net.tourbook.application.TourbookPlugin;
-
 import org.eclipse.jface.action.Action;
 
 public class ActionNavigateShowHistory extends Action {
@@ -29,10 +27,6 @@ public class ActionNavigateShowHistory extends Action {
 
 		// this action is currently not visible, only the short cut is used
 
-		setToolTipText("show history");
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(net.tourbook.Messages.Image__Forward_Nav));
-
-//		setId(ACTION_ID);
 		setActionDefinitionId(ACTION_ID);
 
 		picDirView.getViewSite().getActionBars().setGlobalActionHandler(ACTION_ID, this);

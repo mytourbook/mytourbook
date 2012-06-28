@@ -52,11 +52,11 @@ public final class Timestamp implements Comparable<Timestamp> {
 	private long							milliseconds;
 	private long							nanoseconds;
 
-	private final static SimpleDateFormat	formatFull				= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-	private final static SimpleDateFormat	formatDateTimeSeconds	= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	private final static SimpleDateFormat	formatDateTime			= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
-	private final static SimpleDateFormat	formatDate				= new SimpleDateFormat("yyyy-MM-dd");
-	private final static SimpleDateFormat	formatLog				= new SimpleDateFormat("HH:mm:ss.SSS ");
+	private final static SimpleDateFormat	formatFull				= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS"); //$NON-NLS-1$
+	private final static SimpleDateFormat	formatDateTimeSeconds	= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); //$NON-NLS-1$
+	private final static SimpleDateFormat	formatDateTime			= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm"); //$NON-NLS-1$
+	private final static SimpleDateFormat	formatDate				= new SimpleDateFormat("yyyy-MM-dd"); //$NON-NLS-1$
+	private final static SimpleDateFormat	formatLog				= new SimpleDateFormat("HH:mm:ss.SSS "); //$NON-NLS-1$
 
 	public enum Format {
 		/** Format to ISO with "YYYY-MM-DD". */
@@ -300,7 +300,7 @@ public final class Timestamp implements Comparable<Timestamp> {
 //			}
 //		}
 
-		sb.append("'" + nanoseconds / 100000);
+		sb.append("'" + nanoseconds / 100000); //$NON-NLS-1$
 
 		return sb.toString();
 	}

@@ -101,8 +101,8 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	private String								STATE_WEEK_SUMMARY_FORMATTER_INDEX_		= "WeekSummaryFormatterIndex";					//$NON-NLS-1$
 	private String								STATE_TOUR_INFO_TEXT_COLOR			= "TourInfoUseTextColor";						//$NON-NLS-1$
 	private String								STATE_TOUR_INFO_BLACK_TEXT_HIGHLIGHT	= "TourInfoUseBlackTextHightlight";			//$NON-NLS-1$
-	private String								STATE_SHOW_DAY_NUMBER_IN_TINY_LAYOUT	= "ShowDayNumberInTinyView";
-	private String								STATE_USE_LINE_COLOR_FOR_WEEK_SUMMARY	= "UseLineColorForWeekSummary";
+	private String								STATE_SHOW_DAY_NUMBER_IN_TINY_LAYOUT	= "ShowDayNumberInTinyView"; //$NON-NLS-1$
+	private String								STATE_USE_LINE_COLOR_FOR_WEEK_SUMMARY	= "UseLineColorForWeekSummary"; //$NON-NLS-1$
 
 	private Action								_forward, _back;
 	private Action								_zoomIn, _zoomOut;
@@ -153,7 +153,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 								NLS.bind(Messages.Calendar_View_Format_Distance, UI.UNIT_LABEL_DISTANCE),
 								distance).toString();
 					} else {
-						return "-";
+						return UI.DASH;
 					}
 				}
 			},
@@ -168,7 +168,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 								data.drivingTime / 3600,
 								(data.drivingTime % 3600) / 60).toString();
 					} else {
-						return "-";
+						return UI.DASH;
 					}
 				}
 			},
@@ -179,9 +179,9 @@ public class CalendarView extends ViewPart implements ITourProvider {
 				String format(final CalendarTourData data) {
 					if (data.altitude > 0) {
 						final long alt = (long) (data.altitude / UI.UNIT_VALUE_ALTITUDE);
-						return alt + " " + UI.UNIT_LABEL_ALTITUDE;
+						return alt + UI.SPACE + UI.UNIT_LABEL_ALTITUDE;
 					} else {
-						return "-";
+						return UI.DASH;
 					}
 				}
 			},
@@ -195,7 +195,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 								NLS.bind(Messages.Calendar_View_Format_Speed, UI.UNIT_LABEL_SPEED),
 								data.distance == 0 ? 0 : data.distance / (data.recordingTime / 3.6f)).toString();
 					} else {
-						return "-";
+						return UI.DASH;
 					}
 				}
 			},
@@ -213,7 +213,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 								pace / 60,
 								pace % 60).toString();
 					} else {
-						return "-";
+						return UI.DASH;
 					}
 				}
 			},
@@ -228,7 +228,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 								data.recordingTime / 3600,
 								(data.recordingTime % 3600) / 60).toString();
 					} else {
-						return "-";
+						return UI.DASH;
 					}
 				}
 			},
@@ -261,7 +261,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 						return data.tourTitle;
 					} else if (data.tourDescription != null && data.tourDescription.length() > 1) {
 						// for now we are only supporting one line descriptions
-						return data.tourDescription.replace("\r\n", " ").replace("\n", " ");
+						return data.tourDescription.replace("\r\n", UI.SPACE).replace("\n", UI.SPACE); //$NON-NLS-1$ //$NON-NLS-2$
 					} else {
 						return UI.EMPTY_STRING;
 					}
@@ -281,7 +281,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 				public String format(final CalendarTourData data) {
 					if (data.tourDescription != null && data.tourDescription.length() > 1) {
 						// for now we are only supporting one line descriptions
-						return data.tourDescription.replace("\r\n", " ").replace("\n", " ");
+						return data.tourDescription.replace("\r\n", UI.SPACE).replace("\n", UI.SPACE); //$NON-NLS-1$ //$NON-NLS-2$
 					} else if (data.tourTitle != null && data.tourTitle.length() > 1) {
 						return data.tourTitle;
 					} else {
@@ -607,13 +607,13 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		ColorDefinition	cd;
 		String name;
 
+		WeekSummaryFormatter(final String colorName) {
+			cd = new GraphColorProvider().getGraphColorDefinition(colorName);
+		}
+
 		WeekSummaryFormatter(final String colorName, final String name) {
 			this(colorName);
 			this.name = name;
-		}
-
-		WeekSummaryFormatter(final String colorName) {
-			cd = new GraphColorProvider().getGraphColorDefinition(colorName);
 		}
 
 		abstract String format(CalendarTourData data);

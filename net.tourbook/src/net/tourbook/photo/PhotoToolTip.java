@@ -77,8 +77,8 @@ public class PhotoToolTip extends ToolTip {
 
 	private int						_defaultTextWidthPixel;
 
-	private final DateTimeFormatter	_dtFormatter		= DateTimeFormat.forStyle("ML");
-	private final DateTimeFormatter	_dtWeekday			= DateTimeFormat.forPattern("E");
+	private final DateTimeFormatter	_dtFormatter		= DateTimeFormat.forStyle("ML");	//$NON-NLS-1$
+	private final DateTimeFormatter	_dtWeekday			= DateTimeFormat.forPattern("E");	//$NON-NLS-1$
 
 	private final NumberFormat		_nfMByte			= NumberFormat.getNumberInstance();
 	{
@@ -164,7 +164,7 @@ public class PhotoToolTip extends ToolTip {
 					// dimension
 					label = new Label(containerHeader, SWT.NONE);
 					GridDataFactory.fillDefaults().grab(true, false).align(SWT.END, SWT.FILL).applyTo(label);
-					label.setText(imageWidth + " x " + _photo.getImageHeight());
+					label.setText(imageWidth + " x " + _photo.getImageHeight()); //$NON-NLS-1$
 				}
 			}
 
@@ -214,10 +214,9 @@ public class PhotoToolTip extends ToolTip {
 
 			if (isExifDate) {
 
-				createUI_MetadataLine(
-						container,
-						"Date:",
-						_dtWeekday.print(exifDateTime) + UI.SPACE2 + _dtFormatter.print(exifDateTime));
+				createUI_MetadataLine(container, Messages.Photo_ToolTip_Date, _dtWeekday.print(exifDateTime)
+						+ UI.SPACE2
+						+ _dtFormatter.print(exifDateTime));
 
 				// display modified date only when it differs from the exif/original date
 
@@ -240,10 +239,9 @@ public class PhotoToolTip extends ToolTip {
 			}
 
 			if (isDrawModified) {
-				createUI_MetadataLine(
-						container,
-						"Modified:",
-						_dtWeekday.print(imageFileDateTime) + "  " + _dtFormatter.print(imageFileDateTime));
+				createUI_MetadataLine(container, //
+						Messages.Photo_ToolTip_Modified,
+						_dtWeekday.print(imageFileDateTime) + UI.SPACE2 + _dtFormatter.print(imageFileDateTime));
 			}
 
 			/*
@@ -258,20 +256,20 @@ public class PhotoToolTip extends ToolTip {
 							+ (degreeDirectionInt + UI.SPACE + net.tourbook.ui.UI.SYMBOL_DEGREE);
 
 			createUI_MetadataLine2(container, //
-					"Size:",
+					Messages.Photo_ToolTip_Size,
 					_nfMByte.format(_photoWrapper.imageFileSize / 1024.0 / 1024.0) + UI.SPACE2 + UI.UNIT_MBYTES,
 					imageDirection);
 
 			if (isTitle) {
-				createUI_MetadataLine(container, "Title:", metaData.objectName);
+				createUI_MetadataLine(container, Messages.Photo_ToolTip_Title, metaData.objectName);
 			}
 
 			if (isDescription) {
-				createUI_MetadataLine(container, "Description:", metaData.captionAbstract);
+				createUI_MetadataLine(container, Messages.Photo_ToolTip_Description, metaData.captionAbstract);
 			}
 
 			if (isModel) {
-				createUI_MetadataLine(container, "Model:", metaData.model);
+				createUI_MetadataLine(container, Messages.Photo_ToolTip_Model, metaData.model);
 			}
 		}
 	}

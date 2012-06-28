@@ -78,15 +78,13 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	private static final String				TAG_GPX_DATA_INDEX			= "gpxdata:index";									//$NON-NLS-1$
 	private static final String				TAG_GPX_DATA_START_TIME		= "gpxdata:startTime";								//$NON-NLS-1$
 	private static final String				TAG_GPX_DATA_ELAPSED_TIME	= "gpxdata:elapsedTime";							//$NON-NLS-1$
-	private static final String				TAG_GPX_DATA_START_POINT	= "gpxdata:startPoint";								//$NON-NLS-1$
+	private static final String				TAG_GPX_DATA_START_POINT	= "gpxdata:startPoint";							//$NON-NLS-1$
 	private static final String				TAG_GPX_DATA_END_POINT		= "gpxdata:endPoint";								//$NON-NLS-1$
-
-
 
 	// Extension element for temperature, heart rate, cadence
 	private static final String				TAG_EXT_CAD					= "gpxtpx:cad";									//$NON-NLS-1$
 	private static final String				TAG_EXT_HR					= "gpxtpx:hr";										//$NON-NLS-1$
-	private static final String				TAG_EXT_HR_1				= "gpxdata:hr";										//$NON-NLS-1$	
+	private static final String				TAG_EXT_HR_1				= "gpxdata:hr";									//$NON-NLS-1$
 	private static final String				TAG_EXT_TEMP				= "gpxtpx:atemp";									//$NON-NLS-1$
 	private static final String				TAG_EXT_DISTANCE			= "gpxdata:distance";								//$NON-NLS-1$
 
@@ -140,7 +138,6 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	private boolean							_isInGpxDataEndPoint		= false;
 	private boolean							_isInGpxDataDistance		= false;
 
-
 	/*
 	 * wap points
 	 */
@@ -189,8 +186,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 		public String	index;
 		public long		absoluteTime;
-		public double 	latitude;
-		public double 	longitude;
+		public double	latitude;
+		public double	longitude;
 		public String	elapsedTime;
 		public float	distance;
 	}
@@ -233,6 +230,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 				|| _isInGpxDataStartTime
 				|| _isInGpxDataElapsedTime
 				|| _isInGpxDataDistance
+		//
 		) {
 
 			_characters.append(chars, startIndex, length);
@@ -525,6 +523,15 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 	}
 
+	private void finalizeLap() {
+
+		if (_gpxDataLap == null) {
+			return;
+		}
+
+		_gpxDataList.add(_gpxDataLap);
+	}
+
 	private void finalizeTour() {
 
 		if (_timeDataList.size() == 0) {
@@ -534,7 +541,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 		// insert Laps into _timeDataList
 		insertLapData();
-		
+
 		final TimeData firstTimeData = _timeDataList.get(0);
 
 		// create data object for each tour
@@ -710,16 +717,6 @@ public class GPX_SAX_Handler extends DefaultHandler {
 		_wpt = null;
 	}
 
-	private void finalizeLap() {
-		
-		if (_gpxDataLap == null) {
-			return;
-		}
-
-		_gpxDataList.add(_gpxDataLap);	
-	}
-
-	
 	private double getDoubleValue(final String textValue) {
 
 		try {
@@ -766,6 +763,62 @@ public class GPX_SAX_Handler extends DefaultHandler {
 		_absoluteDistance = 0;
 		_prevTimeSlice = null;
 		_trkName = null;
+	}
+
+	private void insertLapData() {
+
+		float absoluteDistance = 0;
+		boolean needsSort = false;
+
+		for (final GPXDataLap lap : _gpxDataList) {
+
+			boolean found = false;
+			absoluteDistance += lap.distance;
+
+			for (final TimeData timeData : _timeDataList) {
+
+				if ((lap.latitude == timeData.latitude) && (lap.longitude == timeData.longitude)) {
+
+					/* timeslice already exists */
+					timeData.marker = 1;
+					timeData.markerLabel = NLS.bind(Messages.Marker_Label_Lap, Integer.parseInt(lap.index) + 1);
+
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				/* create new timeSlice with Lap Data */
+				final TimeData timeSlice = new TimeData();
+				timeSlice.absoluteTime = lap.absoluteTime + Integer.parseInt(lap.elapsedTime) * 1000;
+				timeSlice.latitude = lap.latitude;
+				timeSlice.longitude = lap.longitude;
+				timeSlice.marker = 1;
+				timeSlice.markerLabel = NLS.bind(Messages.Marker_Label_Lap, Integer.parseInt(lap.index) + 1);
+				timeSlice.absoluteDistance = absoluteDistance;
+
+				_timeDataList.add(timeSlice);
+				needsSort = true;
+			}
+
+		}
+
+		if (needsSort) {
+			/* sort the _timeDataList */
+			Collections.sort(_timeDataList, new Comparator<TimeData>() {
+				public int compare(final TimeData td1, final TimeData td2) {
+					if (td1.absoluteTime < td2.absoluteTime) {
+						return -1;
+					}
+					if (td1.absoluteTime > td2.absoluteTime) {
+						return 1;
+					}
+
+					return 0;
+				}
+			});
+		}
+
 	}
 
 	/**
@@ -1018,60 +1071,5 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 			}
 		}
-	}
-	
-	private void insertLapData() {
-		
-		float absoluteDistance = 0;
-		boolean needsSort = false;
-		
-		for(GPXDataLap lap: _gpxDataList){
-			
-			boolean found = false;
-			absoluteDistance += lap.distance;
-			
-			for(TimeData timeData: _timeDataList) {
-				
-				if ((lap.latitude == timeData.latitude) && (lap.longitude == timeData.longitude)) {
-					
-					/* timeslice already exists */		
-					timeData.marker = 1;
-					timeData.markerLabel = "Lap " + (Integer.parseInt(lap.index)+1);
-					
-					found = true;	
-					break;	
-				} 				
-			}
-			if (!found){
-				/* create new timeSlice with Lap Data */
-				TimeData timeSlice = new TimeData();
-				timeSlice.absoluteTime = lap.absoluteTime + Integer.parseInt(lap.elapsedTime)*1000;
-				timeSlice.latitude = lap.latitude;
-				timeSlice.longitude = lap.longitude;
-				timeSlice.marker = 1;
-				timeSlice.markerLabel = "Lap " + (Integer.parseInt(lap.index)+1);
-				timeSlice.absoluteDistance = absoluteDistance;
-				
-				
-				_timeDataList.add(timeSlice);
-				needsSort = true;
-			}
-		
-		}
-		
-		if (needsSort){
-			/* sort the _timeDataList */
-			Collections.sort(_timeDataList, new Comparator<TimeData>() {
-			    public int compare(TimeData td1, TimeData td2) {
-			        if (td1.absoluteTime < td2.absoluteTime) 
-			        	return -1;
-			        if (td1.absoluteTime > td2.absoluteTime) 
-			        	return 1;
-			        
-			        return 0;
-			    }
-			});
-		}
-		
 	}
 }

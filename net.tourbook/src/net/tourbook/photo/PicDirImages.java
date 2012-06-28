@@ -59,7 +59,6 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -165,12 +164,6 @@ public class PicDirImages implements IItemHovereredListener {
 	 * Manages the worker's thread
 	 */
 	private final Runnable										_workerRunnable;
-
-	/**
-	 *
-	 */
-	public static final Comparator<File>						NATURAL_SORT					= new SortNatural<File>(
-																										true);
 
 	/**
 	 *

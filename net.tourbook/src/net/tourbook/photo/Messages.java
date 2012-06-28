@@ -8,6 +8,7 @@ public class Messages extends NLS {
 
 	public static String		Action_Photo_OpenPrefPage_FullsizeViewer;
 	public static String		Action_Photo_OpenPrefPage_Gallery;
+	public static String		Action_Photo_ShowNavigationHistory_Tooltip;
 
 	public static String		App__PhotoShell_Title;
 
@@ -49,6 +50,13 @@ public class Messages extends NLS {
 	public static String		Image__PhotoSortByDate;
 	public static String		Image__PhotoSortByName;
 	public static String		Image__PhotoTooltip;
+
+	public static String		Photo_ToolTip_Date;
+	public static String		Photo_ToolTip_Description;
+	public static String		Photo_ToolTip_Model;
+	public static String		Photo_ToolTip_Modified;
+	public static String		Photo_ToolTip_Size;
+	public static String		Photo_ToolTip_Title;
 
 	public static String		Pic_Dir_Action_AutoExpandCollapse;
 	public static String		Pic_Dir_Action_ClearHistory;
@@ -107,11 +115,9 @@ public class Messages extends NLS {
 	public static String		Pic_Dir_StatusLabel_RestoringFolder;
 	public static String		Pic_Dir_StatusLabel_SelectedImages;
 
-	public static String	Pic_Dir_StatusLable_LoadingFolder;
-
-	public static String	Pic_Dir_StatusLable_LoadingFolder_FolderIsNotAvailable;
-
-	public static String	Pic_Dir_StatusLable_LoadingFolder_InFolderTree;
+	public static String		Pic_Dir_StatusLable_LoadingFolder;
+	public static String		Pic_Dir_StatusLable_LoadingFolder_FolderIsNotAvailable;
+	public static String		Pic_Dir_StatusLable_LoadingFolder_InFolderTree;
 
 	public static String		PrefPage_Photo_Cache_Button_GetNumberOfImages;
 	public static String		PrefPage_Photo_Cache_Dialog_MaxHandle_CreatedImagesBeforeError;
