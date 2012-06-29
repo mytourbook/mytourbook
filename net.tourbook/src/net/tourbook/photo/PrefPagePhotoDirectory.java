@@ -70,8 +70,6 @@ public class PrefPagePhotoDirectory extends FieldEditorPreferencePage implements
 	private Label					_lblFileColor;
 	private Label					_lblFolderColor;
 
-	private Button					_rdoImageSystemSWT;
-	private Button					_rdoImageSystemAWT;
 	private Button					_chkIsHighImageQuality;
 	private Spinner					_spinnerTextMinThumbSize;
 	private Spinner					_spinnerImageBorderSize;
@@ -329,7 +327,6 @@ public class PrefPagePhotoDirectory extends FieldEditorPreferencePage implements
 		GridLayoutFactory.swtDefaults().applyTo(group);
 		group.setText(Messages.PrefPage_Photo_ExtViewer_Group_ImageQuality);
 		{
-			createUI_22_ImageFramework(group);
 			createUI_24_HQImageSize(group);
 			createUI_26_DisplayImageQuality(group);
 		}
@@ -339,31 +336,6 @@ public class PrefPagePhotoDirectory extends FieldEditorPreferencePage implements
 		gl.numColumns = 2;
 		gl.marginHeight = 5;
 		gl.marginWidth = 5;
-	}
-
-	private void createUI_22_ImageFramework(final Composite parent) {
-
-		// label
-		final Label label = new Label(parent, SWT.NONE);
-		label.setText(Messages.PrefPage_Photo_Viewer_Label_ImageFramework);
-
-		// radio
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-		{
-			_rdoImageSystemSWT = new Button(container, SWT.RADIO);
-			_rdoImageSystemSWT.setText(Messages.PrefPage_Photo_Viewer_Radio_ImageFramework_SWT);
-			_rdoImageSystemSWT.setToolTipText(Messages.PrefPage_Photo_Viewer_Radio_ImageFramework_SWT_Tooltip);
-			_rdoImageSystemSWT.addSelectionListener(_imageQualitySelectionListener);
-
-			_rdoImageSystemAWT = new Button(container, SWT.RADIO);
-			_rdoImageSystemAWT.setText(Messages.PrefPage_Photo_Viewer_Radio_ImageFramework_AWT);
-			_rdoImageSystemAWT.setToolTipText(Messages.PrefPage_Photo_Viewer_Radio_ImageFramework_AWT_Tooltip);
-			_rdoImageSystemAWT.addSelectionListener(_imageQualitySelectionListener);
-		}
-
 	}
 
 	private void createUI_24_HQImageSize(final Composite parent) {
@@ -485,9 +457,8 @@ public class PrefPagePhotoDirectory extends FieldEditorPreferencePage implements
 
 			_isImageQualityModified = false;
 
-			final String imageFramework = _prefStore.getString(ITourbookPreferences.PHOTO_VIEWER_IMAGE_FRAMEWORK);
 			final int hqImageSize = PhotoLoadManager.HQ_IMAGE_SIZES[_comboHQImageSize.getSelectionIndex()];
-			PhotoLoadManager.setFromPrefStore(imageFramework, hqImageSize);
+			PhotoLoadManager.setFromPrefStore(hqImageSize);
 
 			getPreferenceStore().setValue(
 					ITourbookPreferences.PHOTO_VIEWER_PREF_EVENT_IMAGE_QUALITY_IS_MODIFIED,
@@ -576,14 +547,6 @@ public class PrefPagePhotoDirectory extends FieldEditorPreferencePage implements
 				_prefStore.getDefaultInt(ITourbookPreferences.PHOTO_VIEWER_IMAGE_BORDER_SIZE));
 
 		/*
-		 * image framework
-		 */
-		final boolean isSWT = _prefStore.getDefaultString(ITourbookPreferences.PHOTO_VIEWER_IMAGE_FRAMEWORK)//
-				.equals(PhotoLoadManager.IMAGE_FRAMEWORK_SWT);
-		_rdoImageSystemSWT.setSelection(isSWT);
-		_rdoImageSystemAWT.setSelection(!isSWT);
-
-		/*
 		 * hq image size
 		 */
 		final int hqImageSize = _prefStore.getDefaultInt(ITourbookPreferences.PHOTO_VIEWER_HQ_IMAGE_SIZE);
@@ -662,14 +625,6 @@ public class PrefPagePhotoDirectory extends FieldEditorPreferencePage implements
 				_prefStore.getInt(ITourbookPreferences.PHOTO_VIEWER_IMAGE_BORDER_SIZE));
 
 		/*
-		 * image framework
-		 */
-		final String imageFramework = _prefStore.getString(ITourbookPreferences.PHOTO_VIEWER_IMAGE_FRAMEWORK);
-		final boolean isSWT = imageFramework.equals(PhotoLoadManager.IMAGE_FRAMEWORK_SWT);
-		_rdoImageSystemSWT.setSelection(isSWT);
-		_rdoImageSystemAWT.setSelection(!isSWT);
-
-		/*
 		 * HQ image size
 		 */
 		final int hqImageSize = _prefStore.getInt(ITourbookPreferences.PHOTO_VIEWER_HQ_IMAGE_SIZE);
@@ -678,10 +633,6 @@ public class PrefPagePhotoDirectory extends FieldEditorPreferencePage implements
 	}
 
 	private void saveState() {
-
-		_prefStore.setValue(ITourbookPreferences.PHOTO_VIEWER_IMAGE_FRAMEWORK, _rdoImageSystemSWT.getSelection()
-				? PhotoLoadManager.IMAGE_FRAMEWORK_SWT
-				: PhotoLoadManager.IMAGE_FRAMEWORK_AWT);
 
 		_prefStore.setValue(ITourbookPreferences.PHOTO_VIEWER_IS_SHOW_IMAGE_WITH_HIGH_QUALITY, //
 				_chkIsHighImageQuality.getSelection());

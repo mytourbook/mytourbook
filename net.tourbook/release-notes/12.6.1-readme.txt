@@ -11,17 +11,17 @@ tours from tour import view when view or application is closed"
 
 New 
 
- * use embedded SQL server instead of network based server to store tour 
-data, the application startup is now 2 sec faster (this is now the 
-default setting, using the network sql server can be activated in the 
+ * the embedded SQL server is used instead of the network based server, 
+the application startup is now 2 sec faster (this setup is now the 
+default, using the network sql server can be activated in the 
 preferences) 
 
 
 
 Improvements 
 
-* statusline displays a message how many folders has to be loaded in the 
-photo directory 
+* better info, why the cursor is waiting when a folder is selected (the statusline displays a message how many folders needs to be loaded in the 
+photo directory)
 
 
 

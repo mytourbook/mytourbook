@@ -535,9 +535,12 @@ public class PhotoLoadManager {
 		photo.setLoadingState(PhotoLoadingState.UNDEFINED, imageQuality);
 	}
 
-	public static void setFromPrefStore(final String imageFramework, final int hqImageSize) {
-		_imageFramework = imageFramework;
+	public static void setFromPrefStore(final int hqImageSize) {
 		_hqImageSize = hqImageSize;
+	}
+
+	public static void setFromPrefStore(final String imageFramework) {
+		_imageFramework = imageFramework;
 	}
 
 	/**

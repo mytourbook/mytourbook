@@ -142,6 +142,8 @@ public class Messages extends NLS {
 	public static String		PrefPage_Photo_FullsizeViewer_Checkbox_Preview_Tooltip;
 	public static String		PrefPage_Photo_FullsizeViewer_Checkbox_ShowLoadingMessage;
 	public static String		PrefPage_Photo_FullsizeViewer_Checkbox_ShowLoadingMessage_Tooltip;
+	public static String		PrefPage_Photo_System_Checkbox_IsRotateImageAutomatically;
+	public static String		PrefPage_Photo_System_Checkbox_IsRotateImageAutomatically_Tooltip;
 	public static String		PrefPage_Photo_ThumbStore_Button_CleanupAll;
 	public static String		PrefPage_Photo_ThumbStore_Button_CleanupAll_Tooltip;
 	public static String		PrefPage_Photo_ThumbStore_Button_CleanupNow;
@@ -175,6 +177,8 @@ public class Messages extends NLS {
 	public static String		PrefPage_Photo_Viewer_Label_HQThumbnailSize;
 	public static String		PrefPage_Photo_Viewer_Label_HQThumbnailSize_Tooltip;
 	public static String		PrefPage_Photo_Viewer_Label_ImageFramework;
+
+	public static String	PrefPage_Photo_Viewer_Label_ImageFramework_Tooltip;
 	public static String		PrefPage_Photo_Viewer_Label_MinSizeBorder;
 	public static String		PrefPage_Photo_Viewer_Label_MinSizeBorder_Tooltip;
 	public static String		PrefPage_Photo_Viewer_Label_MinSizeText;

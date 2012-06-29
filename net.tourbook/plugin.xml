@@ -333,9 +333,8 @@
 			name="%PrefPage_Photo_PhotoViewer">
 		</page>
 
-		<page
+		<page id="net.tourbook.preferences.PrefPagePhotoSystemID"
 			class="net.tourbook.photo.PrefPagePhotoSystem"
-			id="net.tourbook.preferences.PrefPagePhotoSystemID"
 			category="net.tourbook.preferences.PrefPagePhotoID"
 			name="%PrefPage_Photo_Sytem">
 		</page>

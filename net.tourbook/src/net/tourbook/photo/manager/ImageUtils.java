@@ -19,8 +19,13 @@ import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.UI;
 
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -36,42 +41,26 @@ import org.imgscalr.Scalr.Rotation;
  */
 public class ImageUtils {
 
-//	public static int getBestQuality(final Photo photo, final int width, final int height, final int maxDef) {
-//
-//		final int imageQuality = PhotoManager.IMAGE_QUALITY_EXIF_THUMB_160;
-//
-//		for (int qualityIndex = PhotoManager.IMAGE_QUALITY_EXIF_THUMB_160; qualityIndex <= maxDef; qualityIndex++) {
-//
-//			if (qualityIndex < PhotoManager.IMAGE_QUALITY_ORIGINAL) {
-//
-//				final int qualitySize = PhotoManager.IMAGE_SIZES[qualityIndex];
-//
-//				if (qualitySize > width || qualitySize > height) {
-//					return imageQuality;
-//				}
-//			}
-//		}
-//
-//		return imageQuality;
-//	}
+	private static IPreferenceStore	_prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
 
-// ORIGINAL
-//
-//	public static int getBestDefinition(IMedia media, int width, int height, int maxDef) {
-//		int def = IConstants.IMAGE_THUMB;
-//
-//		for (int i = IConstants.IMAGE_THUMB; i <= maxDef; i++) {
-//			if (media.hasImage(i)) {
-//				def = i;
-//			}
-//
-//			if (i < IConstants.IMAGE_ORIGINAL)
-//				if (IConstants.IMAGE_WIDTH[i] > width || IConstants.IMAGE_HEIGHT[i] > height)
-//					return def;
-//
-//		}
-//		return def;
-//	}
+	private static boolean			_isRotateImageAutomatically;
+
+	static {
+
+		final IPropertyChangeListener _prefChangeListener = new IPropertyChangeListener() {
+			@Override
+			public void propertyChange(final PropertyChangeEvent event) {
+
+				final String property = event.getProperty();
+
+				if (property.equals(ITourbookPreferences.PHOTO_SYSTEM_IS_ROTATE_IMAGE_AUTOMATICALLY)) {
+					_isRotateImageAutomatically = (Boolean) event.getNewValue();
+				}
+			}
+		};
+
+		_prefStore.addPropertyChangeListener(_prefChangeListener);
+	}
 
 	public static double getBestRatio(final int originalX, final int originalY, final int maxX, final int maxY) {
 
@@ -136,7 +125,7 @@ public class ImageUtils {
 												final int newHeight,
 												final int antialias,
 												final int interpolation,
-												final Rotation rotation) {
+												final Rotation exifRotation) {
 
 		if (srcImage == null) {
 			return null;
@@ -154,9 +143,14 @@ public class ImageUtils {
 		int imgWidth = newWidth;
 		int imgHeight = newHeight;
 
-		if (UI.IS_OSX == false) {
+		// OSX is rotating the image automatically
+		boolean isNoAutoRotate = UI.IS_OSX == false;
 
-			if (rotation == Rotation.CW_90 || rotation == Rotation.CW_270) {
+		isNoAutoRotate |= _isRotateImageAutomatically == false;
+
+		if (isNoAutoRotate) {
+
+			if (exifRotation == Rotation.CW_90 || exifRotation == Rotation.CW_270) {
 				// swap width/height
 				imgWidth = newHeight;
 				imgHeight = newWidth;
@@ -177,9 +171,7 @@ public class ImageUtils {
 			int destX = 0;
 			int destY = 0;
 
-			if (rotation != null && UI.IS_OSX == false) {
-
-				// OSX is rotating the image automatically
+			if (exifRotation != null && isNoAutoRotate) {
 
 				final int imgWidth2 = imgWidth / 2;
 				final int imgHeight2 = imgHeight / 2;
@@ -187,14 +179,14 @@ public class ImageUtils {
 				transformation = new Transform(display);
 				transformation.translate(imgWidth2, imgHeight2);
 
-				if (rotation == Rotation.CW_90) {
+				if (exifRotation == Rotation.CW_90) {
 
 					transformation.rotate(90);
 
 					destX = -imgHeight2;
 					destY = -imgWidth2;
 
-				} else if (rotation == Rotation.CW_180) {
+				} else if (exifRotation == Rotation.CW_180) {
 
 					// this case is not yet tested
 
@@ -203,7 +195,7 @@ public class ImageUtils {
 					destX = -imgWidth2;
 					destY = -imgHeight2;
 
-				} else if (rotation == Rotation.CW_270) {
+				} else if (exifRotation == Rotation.CW_270) {
 
 					transformation.rotate(270);
 

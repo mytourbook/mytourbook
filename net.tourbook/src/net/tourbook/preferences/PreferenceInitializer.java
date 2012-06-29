@@ -414,6 +414,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.PHOTO_FULLSIZE_VIEWER_IS_SHOW_LOADING_MESSAGE, true);
 		store.setDefault(ITourbookPreferences.PHOTO_FULLSIZE_VIEWER_IS_SHOW_HQ_IMAGE, false);
 
+		store.setDefault(ITourbookPreferences.PHOTO_SYSTEM_IS_ROTATE_IMAGE_AUTOMATICALLY, true);
+
 		/*
 		 * external photo viewer
 		 */

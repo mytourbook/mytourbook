@@ -26,7 +26,6 @@ public interface ITourbookPreferences {
 
 	public static final String	GENERAL_NOTES										= "GENERAL_NOTES";											//$NON-NLS-1$
 
-
 	/*
 	 * system
 	 */
@@ -356,5 +355,7 @@ public interface ITourbookPreferences {
 	public static final String	PHOTO_FULLSIZE_VIEWER_IS_SHOW_HQ_IMAGE				= "PHOTO_FULLSIZE_VIEWER_IS_SHOW_HQ_IMAGE";				//$NON-NLS-1$
 
 	public static final String	PHOTO_ORIGINAL_IMAGE_CACHE_SIZE						= "PHOTO_ORIGINAL_IMAGE_CACHE_SIZE";						//$NON-NLS-1$
+
+	public static final String	PHOTO_SYSTEM_IS_ROTATE_IMAGE_AUTOMATICALLY			= "PHOTO_SYSTEM_IS_ROTATE_IMAGE_AUTOMATICALLY";			//$NON-NLS-1$
 
 }
