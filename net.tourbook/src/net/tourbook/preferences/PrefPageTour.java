@@ -102,7 +102,7 @@ public class PrefPageTour extends PreferencePage implements IWorkbenchPreference
 
 		final Group group = new Group(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
-		group.setText(Messages.Pref_Tour_Group_TourDB);
+		group.setText(Messages.Pref_TourDb_Group_TourDB);
 		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
 		{
 			_rdoDbSystemEmbedded = new Button(group, SWT.RADIO);

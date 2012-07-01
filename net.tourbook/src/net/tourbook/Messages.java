@@ -964,12 +964,13 @@ public class Messages extends NLS {
 	public static String		Pref_Tour_Dialog_TourCacheIsModified_Message;
 	public static String		Pref_Tour_Dialog_TourCacheIsModified_Title;
 	public static String		Pref_Tour_Group_TourCache;
-	public static String		Pref_Tour_Group_TourDB;
 	public static String		Pref_Tour_Label_TourCacheSize;
 	public static String		Pref_Tour_Label_TourCacheSize_Info;
 
 	public static String		Pref_TourDb_Dialog_TourDbSystemIsModified_Message;
 	public static String		Pref_TourDb_Dialog_TourDbSystemIsModified_Title;
+
+	public static String	Pref_TourDb_Group_TourDB;
 	public static String		Pref_TourDb_Radio_DbSystem_Embedded;
 	public static String		Pref_TourDb_Radio_DbSystem_Embedded_Tooltip;
 	public static String		Pref_TourDb_Radio_DbSystem_Server;

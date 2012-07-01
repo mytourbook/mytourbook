@@ -8,14 +8,8 @@ public class Messages extends NLS {
 
 	public static String		Action_Photo_OpenPrefPage_FullsizeViewer;
 	public static String		Action_Photo_OpenPrefPage_Gallery;
-	public static String		Action_Photo_ShowNavigationHistory_Tooltip;
 
 	public static String		App__PhotoShell_Title;
-
-	public static String		App_JobName_PicDirImages_FilteringGalleryImages;
-	public static String		App_JobName_PicDirImages_UpdateUIWhenLoadingImages;
-	public static String		App_JobName_PicDirImages_UpdateUIWithFilteredGalleryImages;
-	public static String		App_JobName_RetrievingFolderImageFiles;
 
 	public static String		App_Unit_Pixel;
 
@@ -61,8 +55,10 @@ public class Messages extends NLS {
 	public static String		Pic_Dir_Action_AutoExpandCollapse;
 	public static String		Pic_Dir_Action_ClearHistory;
 	public static String		Pic_Dir_Action_DefineExternalApp;
-	public static String		Pic_Dir_Action_NavigateHistoryBackward;
-	public static String		Pic_Dir_Action_NavigateHistoryForward;
+	public static String	Pic_Dir_Action_NavigateHistoryBackward_Tooltip;
+
+	public static String	Pic_Dir_Action_NavigateHistoryForward_Tooltip;
+
 	public static String		Pic_Dir_Action_PhotoFilterGPS;
 	public static String		Pic_Dir_Action_PhotoFilterGPSTooltip;
 	public static String		Pic_Dir_Action_PhotoFilterNoGPS;

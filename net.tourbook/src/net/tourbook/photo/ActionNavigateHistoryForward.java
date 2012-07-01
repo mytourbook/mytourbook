@@ -27,10 +27,9 @@ public class ActionNavigateHistoryForward extends Action {
 
 	public ActionNavigateHistoryForward(final PicDirImages picDirImages, final PicDirView picDirView) {
 
-		setToolTipText(Messages.Pic_Dir_Action_NavigateHistoryForward);
+		setToolTipText(Messages.Pic_Dir_Action_NavigateHistoryForward_Tooltip);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(net.tourbook.Messages.Image__Forward_Nav));
 
-//		setId(ACTION_ID);
 		setActionDefinitionId(ACTION_ID);
 
 		picDirView.getViewSite().getActionBars().setGlobalActionHandler(ACTION_ID, this);

@@ -1111,7 +1111,7 @@ public class PicDirImages implements IItemHovereredListener {
 
 	private void jobFilter_10_Create() {
 
-		_jobFilter = new Job(Messages.App_JobName_PicDirImages_FilteringGalleryImages) {
+		_jobFilter = new Job("PicDirImages: Filtering images") {//$NON-NLS-1$
 
 			@Override
 			protected IStatus run(final IProgressMonitor monitor) {
@@ -1474,7 +1474,7 @@ public class PicDirImages implements IItemHovereredListener {
 
 	private void jobUIFilter_10_Create() {
 
-		_jobUIFilter = new UIJob(Messages.App_JobName_PicDirImages_UpdateUIWithFilteredGalleryImages) {
+		_jobUIFilter = new UIJob("PicDirImages: Update UI with filtered gallery images") { //$NON-NLS-1$
 
 			@Override
 			public IStatus runInUIThread(final IProgressMonitor monitor) {
@@ -1540,7 +1540,7 @@ public class PicDirImages implements IItemHovereredListener {
 
 	private void jobUILoading_10_Create() {
 
-		_jobUILoading = new UIJob(Messages.App_JobName_PicDirImages_UpdateUIWhenLoadingImages) {
+		_jobUILoading = new UIJob("PicDirImages: Update UI when loading images") {//$NON-NLS-1$
 
 			@Override
 			public IStatus runInUIThread(final IProgressMonitor monitor) {
@@ -2627,7 +2627,7 @@ public class PicDirImages implements IItemHovereredListener {
 		}
 
 		if (_workerThread == null) {
-			_workerThread = new Thread(_workerRunnable, Messages.App_JobName_RetrievingFolderImageFiles);
+			_workerThread = new Thread(_workerRunnable, "PicDirImages: Retrieving folder image files");//$NON-NLS-1$
 			_workerThread.start();
 		}
 	}
