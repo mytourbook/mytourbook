@@ -240,7 +240,7 @@ public class PhotoToolTip extends ToolTip {
 
 			if (isDrawModified) {
 				createUI_MetadataLine(container, //
-						Messages.Photo_ToolTip_Modified,
+						isExifDate ? Messages.Photo_ToolTip_Modified : Messages.Photo_ToolTip_Date,
 						_dtWeekday.print(imageFileDateTime) + UI.SPACE2 + _dtFormatter.print(imageFileDateTime));
 			}
 
