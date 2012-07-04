@@ -567,7 +567,9 @@ class PicDirFolder {
 
 							putFolderInWaitingQueue(folderItem, false);
 
-							styledString.append(UI.SPACE2 + Messages.Pic_Dir_StatusLable_LoadingFolder_InFolderTree, UI.PHOTO_FOLDER_STYLER);
+							styledString.append(
+									UI.SPACE2 + Messages.Pic_Dir_StatusLable_LoadingFolder_InFolderTree,
+									UI.PHOTO_FOLDER_STYLER);
 						}
 					}
 
@@ -1001,7 +1003,13 @@ class PicDirFolder {
 								_folderViewer.refresh(loaderFolderItem);
 							}
 
-							_picDirImages.updateUI_StatusMessage(NLS.bind(Messages.Pic_Dir_StatusLable_LoadingFolder, queueSize));
+							String statusMessage;
+							if (queueSize == 0) {
+								statusMessage = UI.EMPTY_STRING;
+							} else {
+								statusMessage = NLS.bind(Messages.Pic_Dir_StatusLable_LoadingFolder, queueSize);
+							}
+							_picDirImages.updateUI_StatusMessage(statusMessage);
 
 							// reset queue state
 							loaderFolderItem.isInWaitingQueue.set(false);
@@ -1141,7 +1149,9 @@ class PicDirFolder {
 
 			// restored folder is not available
 
-			_picDirImages.updateUI_StatusMessage(NLS.bind(Messages.Pic_Dir_StatusLable_LoadingFolder_FolderIsNotAvailable, requestedFolderName));
+			_picDirImages.updateUI_StatusMessage(NLS.bind(
+					Messages.Pic_Dir_StatusLable_LoadingFolder_FolderIsNotAvailable,
+					requestedFolderName));
 		}
 
 		if (selectedFolder == null) {
