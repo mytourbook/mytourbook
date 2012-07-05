@@ -1937,18 +1937,24 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			}
 		}
 
-		if (tourIds.size() > 0) {
+		ISelection selection;
+		if (tourIds.size() == 0) {
+
+			// fire selection that nothing is selected
+
+			selection = new SelectionTourIds(new ArrayList<Long>());
+
+		} else {
 
 			// keep selected tour id's
 			_selectedTourIds.clear();
 			_selectedTourIds.addAll(tourIds.keySet());
 
-			final ISelection selection = tourIds.size() == 1
-					? new SelectionTourId(_selectedTourIds.get(0))
-					: new SelectionTourIds(_selectedTourIds);
+			selection = tourIds.size() == 1 ? new SelectionTourId(_selectedTourIds.get(0)) : new SelectionTourIds(
+					_selectedTourIds);
 
-			_postSelectionProvider.setSelection(selection);
 		}
+		_postSelectionProvider.setSelection(selection);
 
 		enableActions();
 	}

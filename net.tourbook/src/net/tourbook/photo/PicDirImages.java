@@ -31,6 +31,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.photo.gallery.MT20.FullSizeViewer;
 import net.tourbook.photo.gallery.MT20.GalleryMT20;
 import net.tourbook.photo.gallery.MT20.GalleryMT20Item;
+import net.tourbook.photo.gallery.MT20.IGalleryContextMenuProvider;
 import net.tourbook.photo.gallery.MT20.IGalleryCustomData;
 import net.tourbook.photo.gallery.MT20.IItemHovereredListener;
 import net.tourbook.photo.manager.GallerySorting;
@@ -96,7 +97,7 @@ import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
  * org.apache.commons.sanselan
  * </pre>
  */
-public class PicDirImages implements IItemHovereredListener {
+public class PicDirImages implements IItemHovereredListener, IGalleryContextMenuProvider {
 
 	private static final int									IMAGE_INDICATOR_SIZE			= 16;
 
@@ -115,6 +116,7 @@ public class PicDirImages implements IItemHovereredListener {
 	private static final String									STATE_GALLERY_POSITION_VALUE	= "STATE_GALLERY_POSITION_VALUE";	//$NON-NLS-1$
 	private static final String									STATE_IMAGE_SORTING				= "STATE_IMAGE_SORTING";			//$NON-NLS-1$
 	private static final String									STATE_IS_SHOW_ONLY_PHOTOS		= "STATE_IS_SHOW_ONLY_PHOTOS";		//$NON-NLS-1$
+	private static final String									STATE_SELECTED_ITEMS			= "STATE_SELECTED_ITEMS";			//$NON-NLS-1$
 
 	private static final String									DEFAULT_GALLERY_FONT			= "arial,sans-serif";				//$NON-NLS-1$
 
@@ -218,6 +220,7 @@ public class PicDirImages implements IItemHovereredListener {
 	private ActionClearNavigationHistory						_actionClearNavigationHistory;
 	private ActionRemoveInvalidFoldersFromHistory				_actionRemoveInvalidFoldersFromHistory;
 	private ActionToggleFolderGallery							_actionToggleFolderGallery;
+	private ActionMergePhotosWithTours							_actionMergePhotosWithTours;
 
 	/**
 	 * Is <code>true</code> when folders and gallery photos are displayed, is <code>false</code>
@@ -235,6 +238,8 @@ public class PicDirImages implements IItemHovereredListener {
 	 * keep gallery position for each used folder
 	 */
 	private LinkedHashMap<String, Double>						_galleryPositions;
+
+	private int[]												_restoredSelection;
 
 	/**
 	 * Cache for exif meta data, key is file path
@@ -544,6 +549,37 @@ public class PicDirImages implements IItemHovereredListener {
 		_actionNavigateForward.setEnabled(false);
 	}
 
+	void actionMergePhotosWithTours() {
+
+		final Collection<GalleryMT20Item> gallerySelection = _gallery.getSelection();
+		final ArrayList<Long> selectedTours = _picDirView.getSelectedTours();
+
+		System.out.println("photos: " + gallerySelection.size() + "\ttours: " + selectedTours.size());
+		// TODO remove SYSTEM.OUT.PRINTLN
+
+		/*
+		 * check if a photo is selected
+		 */
+		if (gallerySelection.size() == 0) {
+			MessageDialog.openInformation(
+					_gallery.getShell(),
+					Messages.Pic_Dir_Dialog_MergePhotosWithTours_Title,
+					Messages.Pic_Dir_Dialog_NoSelectedImages_Message);
+			return;
+		}
+
+		/*
+		 * check if a tour is selected
+		 */
+		if (selectedTours.size() == 0) {
+			MessageDialog.openInformation(
+					_gallery.getShell(),
+					Messages.Pic_Dir_Dialog_MergePhotosWithTours_Title,
+					Messages.Pic_Dir_Dialog_NoSelectedTours_Message);
+			return;
+		}
+	}
+
 	void actionNavigateBackward() {
 
 		final int historySize = _folderHistory.size();
@@ -648,6 +684,8 @@ public class PicDirImages implements IItemHovereredListener {
 		_actionRemoveInvalidFoldersFromHistory = new ActionRemoveInvalidFoldersFromHistory(this);
 
 		_actionToggleFolderGallery = new ActionToggleFolderGallery(this);
+
+		_actionMergePhotosWithTours = new ActionMergePhotosWithTours(this);
 	}
 
 	/**
@@ -911,6 +949,8 @@ public class PicDirImages implements IItemHovereredListener {
 			}
 		});
 
+		_gallery.setContextMenuProvider(this);
+
 		_fullSizeViewer = _gallery.getFullsizeViewer();
 
 		// set photo renderer which paints the image but also starts the image loading
@@ -993,6 +1033,13 @@ public class PicDirImages implements IItemHovereredListener {
 
 		_actionNavigateBackward.setEnabled(false);
 		_actionNavigateForward.setEnabled(false);
+	}
+
+	@Override
+	public void fillContextMenu(final IMenuManager menuMgr) {
+
+		menuMgr.add(_actionMergePhotosWithTours);
+
 	}
 
 	/**
@@ -1945,6 +1992,8 @@ public class PicDirImages implements IItemHovereredListener {
 			}
 		}
 
+		_restoredSelection = Util.getState(state, STATE_SELECTED_ITEMS, null);
+
 		enableControls();
 	}
 
@@ -1984,6 +2033,8 @@ public class PicDirImages implements IItemHovereredListener {
 			state.put(STATE_GALLERY_POSITION_VALUE, positionValues);
 		}
 
+		Util.setState(state, STATE_SELECTED_ITEMS, _gallery.getSelectionIndex());
+
 		_gallery.saveState(state);
 	}
 
@@ -1994,6 +2045,10 @@ public class PicDirImages implements IItemHovereredListener {
 	 */
 	void setFilter(final ImageFilter currentImageFilter) {
 		_currentImageFilter = currentImageFilter;
+	}
+
+	void setFocus() {
+		_gallery.setFocus();
 	}
 
 	void setSorting(final GallerySorting gallerySorting) {
@@ -2552,7 +2607,9 @@ public class PicDirImages implements IItemHovereredListener {
 					/*
 					 * initialize and update gallery with new items
 					 */
-					_gallery.setupItems(0, oldPosition == null ? 0 : oldPosition);
+					_gallery.setupItems(0, oldPosition == null ? 0 : oldPosition, _restoredSelection);
+
+					_restoredSelection = null;
 
 					/*
 					 * update status info

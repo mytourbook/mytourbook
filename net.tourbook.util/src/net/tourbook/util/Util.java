@@ -328,6 +328,38 @@ public class Util {
 		return sb.toString();
 	}
 
+	public static int[] getState(final IDialogSettings state, final String key, final int[] defaultValue) {
+
+		final String[] stringValues = state.getArray(key);
+
+		if (stringValues == null) {
+			return defaultValue;
+		}
+
+		final ArrayList<Integer> intValues = new ArrayList<Integer>();
+
+		for (final String stringValue : stringValues) {
+
+			try {
+
+				final int intValue = Integer.parseInt(stringValue);
+
+				intValues.add(intValue);
+
+			} catch (final NumberFormatException e) {
+				// just ignore
+			}
+		}
+
+		int intIndex = 0;
+		final int[] intintValues = new int[intValues.size()];
+		for (final Integer intValue : intValues) {
+			intintValues[intIndex++] = intValue;
+		}
+
+		return intintValues;
+	}
+
 	/**
 	 * @param state
 	 * @param key
@@ -706,7 +738,7 @@ public class Util {
 	}
 
 	/**
-	 * Set the state for an integer array
+	 * Set the state for an integer array, integer values are converted into string value.
 	 * 
 	 * @param state
 	 * @param stateKey

@@ -63,8 +63,7 @@ import org.eclipse.swt.widgets.ScrollBar;
 
 /**
  * This gallery has it's origin in http://www.eclipse.org/nebula/widgets/gallery/gallery.php but it
- * has been modified in many areas, like grouping has been removed, filtering and sorting has been
- * added.
+ * has been modified in many areas, grouping has been removed, filtering and sorting has been added.
  */
 public abstract class GalleryMT20 extends Canvas {
 
@@ -143,7 +142,7 @@ public abstract class GalleryMT20 extends Canvas {
 	private RedrawTimer							_redrawTimer			= new RedrawTimer();
 
 	/**
-	 * Contains gallery items which had been created, not all gallery items must have been created,
+	 * Contains gallery items which has been created, not all gallery items must have been created,
 	 * they are virtual.
 	 */
 	private HashMap<String, GalleryMT20Item>	_createdGalleryItems	= new HashMap<String, GalleryMT20Item>();
@@ -163,6 +162,7 @@ public abstract class GalleryMT20 extends Canvas {
 	 * Contains gallery items which are currently be selected in the UI.
 	 */
 	private HashMap<String, GalleryMT20Item>	_selectedItems			= new HashMap<String, GalleryMT20Item>();
+	private int[]								_initialSelectedItems;
 
 	/**
 	 * Selection bit flags. Each 'int' contains flags for 32 items. It contains selection flags for
@@ -247,6 +247,8 @@ public abstract class GalleryMT20 extends Canvas {
 	 * Is <code>true</code> when gallery has currently the focus.
 	 */
 	private boolean								_isFocusActive;
+
+	private IGalleryContextMenuProvider			_customContextMenuProvider;
 
 	private class RedrawTimer implements Runnable {
 		public void run() {
@@ -598,6 +600,10 @@ public abstract class GalleryMT20 extends Canvas {
 
 	private void fillContextMenu(final IMenuManager menuMgr) {
 
+		if (_customContextMenuProvider != null) {
+			_customContextMenuProvider.fillContextMenu(menuMgr);
+		}
+
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionGalleryPrefPage);
 	}
@@ -719,6 +725,10 @@ public abstract class GalleryMT20 extends Canvas {
 		return indexes;
 	}
 
+	public IGalleryContextMenuProvider getContextMenuProvider() {
+		return _customContextMenuProvider;
+	}
+
 	public HashMap<String, GalleryMT20Item> getCreatedGalleryItems() {
 		return _createdGalleryItems;
 	}
@@ -727,12 +737,12 @@ public abstract class GalleryMT20 extends Canvas {
 	 * Initializes a gallery item which can be used to set data into the item. This method is called
 	 * before a gallery item is painted.
 	 * 
-	 * @param virtualIndex
+	 * @param itemIndex
 	 *            Index within the gallery items, these are the gallery items which the gallery can
 	 *            display.
 	 * @return
 	 */
-	public abstract IGalleryCustomData getCustomData(final int virtualIndex);
+	public abstract IGalleryCustomData getCustomData(final int itemIndex);
 
 	public FullSizeViewer getFullsizeViewer() {
 		return _fullSizeViewer;
@@ -770,24 +780,24 @@ public abstract class GalleryMT20 extends Canvas {
 	}
 
 	/**
-	 * @param virtualIndex
+	 * @param itemIndex
 	 * @return Returns initialized gallery item from the given gallery position or <code>null</code>
 	 *         when the index is out of scope.
 	 */
-	private GalleryMT20Item getInitializedItem(final int virtualIndex) {
+	private GalleryMT20Item getInitializedItem(final int itemIndex) {
 
-		if (virtualIndex < 0 || virtualIndex >= _virtualGalleryItems.length) {
+		if (itemIndex < 0 || itemIndex >= _virtualGalleryItems.length) {
 			// index is out of scope
 			return null;
 		}
 
-		GalleryMT20Item galleryItem = _virtualGalleryItems[virtualIndex];
+		GalleryMT20Item galleryItem = _virtualGalleryItems[itemIndex];
 
 		if (galleryItem == null) {
 
 			galleryItem = new GalleryMT20Item(this);
 
-			final IGalleryCustomData customData = getCustomData(virtualIndex);
+			final IGalleryCustomData customData = getCustomData(itemIndex);
 
 			if (customData != null) {
 
@@ -796,7 +806,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 				_createdGalleryItems.put(galleryItem.uniqueItemID, galleryItem);
 
-				_virtualGalleryItems[virtualIndex] = galleryItem;
+				_virtualGalleryItems[itemIndex] = galleryItem;
 			}
 		}
 
@@ -860,10 +870,6 @@ public abstract class GalleryMT20 extends Canvas {
 		return _itemRatio;
 	}
 
-	public int getItemWidth() {
-		return _itemWidth;
-	}
-
 //	private GalleryMT20Item getNextItem_OLD(final int keyCode) {
 //
 //		if (_lastSingleClick == null) {
@@ -925,6 +931,10 @@ public abstract class GalleryMT20 extends Canvas {
 //		return null;
 //	}
 
+	public int getItemWidth() {
+		return _itemWidth;
+	}
+
 	public int getNumberOfHorizontalImages() {
 		return _gridHorizItems;
 	}
@@ -949,6 +959,37 @@ public abstract class GalleryMT20 extends Canvas {
 	 */
 	public Collection<GalleryMT20Item> getSelection() {
 		return _selectedItems.values();
+	}
+
+	public int[] getSelectionIndex() {
+
+		final int selectedItemsSize = _selectedItems.size();
+
+		if (_selectionFlags == null || selectedItemsSize == 0) {
+			return new int[0];
+		}
+
+		final int[] selectedIndex = new int[selectedItemsSize];
+		int selectionIndex = 0;
+		int itemIndex = 0;
+
+		if (_selectionFlags != null) {
+			for (final int flags : _selectionFlags) {
+
+				for (int falgIndex = 0; falgIndex < 32; falgIndex++) {
+
+					final boolean isSelected = flags != 0 && (flags & 1 << (itemIndex & 0x1f)) != 0;
+
+					if (isSelected) {
+						selectedIndex[selectionIndex++] = itemIndex;
+					}
+
+					itemIndex++;
+				}
+			}
+		}
+
+		return selectedIndex;
 	}
 
 	/**
@@ -1806,6 +1847,13 @@ public abstract class GalleryMT20 extends Canvas {
 
 		try {
 
+			if (_initialSelectedItems != null) {
+				for (final int itemIndex : _initialSelectedItems) {
+					selectionAdd(itemIndex);
+				}
+				_initialSelectedItems = null;
+			}
+
 			final Rectangle clippingArea = gc.getClipping();
 
 			if (isLowQualityPainting) {
@@ -2042,23 +2090,23 @@ public abstract class GalleryMT20 extends Canvas {
 		}
 
 		// Divide position by 32 to get selection bloc for this item.
-		final int n = itemIndex >> 5;
+		final int flagIndex = itemIndex >> 5;
 		if (_selectionFlags == null) {
 			// Create selectionFlag array
 			// Add 31 before dividing by 32 to ensure at least one 'int' is
 			// created if size < 32.
 			_selectionFlags = new int[(_virtualGalleryItems.length + 31) >> 5];
 
-		} else if (n >= _selectionFlags.length) {
+		} else if (flagIndex >= _selectionFlags.length) {
 
 			// Expand selectionArray
 			final int[] oldFlags = _selectionFlags;
-			_selectionFlags = new int[n + 1];
+			_selectionFlags = new int[flagIndex + 1];
 			System.arraycopy(oldFlags, 0, _selectionFlags, 0, oldFlags.length);
 		}
 
 		// Get flag position in the 32 bit block and ensure is selected.
-		_selectionFlags[n] |= 1 << (itemIndex & 0x1f);
+		_selectionFlags[flagIndex] |= 1 << (itemIndex & 0x1f);
 
 		final GalleryMT20Item galleryItem = getInitializedItem(itemIndex);
 
@@ -2274,6 +2322,10 @@ public abstract class GalleryMT20 extends Canvas {
 		_fullSizeViewer.setColors(fgColor, bgColor);
 	}
 
+	public void setContextMenuProvider(final IGalleryContextMenuProvider _customContextMenuProvider) {
+		this._customContextMenuProvider = _customContextMenuProvider;
+	}
+
 	@Override
 	public boolean setFocus() {
 		return true;
@@ -2403,8 +2455,13 @@ public abstract class GalleryMT20 extends Canvas {
 	 * @param galleryPosition
 	 *            Gallery position where the gallery should be used to display gallery items, or
 	 *            <code>null</code> when position is not set.
+	 * @param selectedItems
+	 *            Items which should be selected or <code>null</code> when nothing should be
+	 *            selected.
 	 */
-	public void setupItems(final int numberOfItems, final Double galleryPosition) {
+	public void setupItems(final int numberOfItems, final Double galleryPosition, final int[] selectedItems) {
+
+		_initialSelectedItems = selectedItems;
 
 		// create empty (null) gallery items
 		_createdGalleryItems.clear();
