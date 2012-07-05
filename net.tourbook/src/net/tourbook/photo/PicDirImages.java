@@ -76,6 +76,7 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
@@ -220,7 +221,7 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 	private ActionClearNavigationHistory						_actionClearNavigationHistory;
 	private ActionRemoveInvalidFoldersFromHistory				_actionRemoveInvalidFoldersFromHistory;
 	private ActionToggleFolderGallery							_actionToggleFolderGallery;
-	private ActionMergePhotosWithTours							_actionMergePhotosWithTours;
+	private ActionMergeGalleryPhotosWithTours					_actionMergePhotosWithTours;
 
 	/**
 	 * Is <code>true</code> when folders and gallery photos are displayed, is <code>false</code>
@@ -386,6 +387,7 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 
 			// keep exif metadata
 			final PhotoImageMetadata metadata = __photo.getImageMetaDataRaw();
+
 			if (metadata != null) {
 				_exifCache.put(__photo.getPhotoWrapper().imageFilePathName, metadata);
 			}
@@ -551,7 +553,8 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 
 	void actionMergePhotosWithTours() {
 
-		final Collection<GalleryMT20Item> gallerySelection = _gallery.getSelection();
+		final Collection<GalleryMT20Item> gallerySelection = getSelectedAndExifLoadedImages(false);
+
 		final ArrayList<Long> selectedTours = _picDirView.getSelectedTours();
 
 		System.out.println("photos: " + gallerySelection.size() + "\ttours: " + selectedTours.size());
@@ -685,7 +688,7 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 
 		_actionToggleFolderGallery = new ActionToggleFolderGallery(this);
 
-		_actionMergePhotosWithTours = new ActionMergePhotosWithTours(this);
+		_actionMergePhotosWithTours = new ActionMergeGalleryPhotosWithTours(this);
 	}
 
 	/**
@@ -762,6 +765,7 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 
 		createActions();
 		fillToolbars();
+
 	}
 
 	void createUI_05(final Composite parent) {
@@ -787,6 +791,9 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 		_photoTooltip = new PhotoToolTip(_gallery);
 		_photoTooltip.setHideOnMouseMove(true);
 		_gallery.addItemHoveredListener(this);
+
+		// force that the 1st tab is in the gallery
+		container.setTabList(new Control[] { _pageBook, _containerActionBar });
 	}
 
 	private void createUI_10_ActionBar(final Composite parent) {
@@ -1086,6 +1093,29 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 
 	private Comparator<PhotoWrapper> getCurrentComparator() {
 		return _currentSorting == GallerySorting.FILE_NAME ? SORT_BY_FILE_NAME : SORT_BY_FILE_DATE;
+	}
+
+	Collection<GalleryMT20Item> getGallerySelection() {
+		return _gallery.getSelection();
+	}
+
+	Collection<GalleryMT20Item> getSelectedAndExifLoadedImages(final boolean isGetAllImages) {
+		
+		Collection<GalleryMT20Item> gallerySelection;
+		if (isGetAllImages) {
+			
+			final GalleryMT20Item[] galleryItems = _gallery.getAllVirtualItems();
+			
+			f
+			
+		} else {
+
+			gallerySelection = _gallery.getSelection();
+		}
+		
+		
+		
+		return gallerySelection;
 	}
 
 	/**
@@ -1804,7 +1834,7 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 
 		if (photoImageMetadata != null) {
 
-			photo.setImageMetadata(photoImageMetadata);
+			photo.updateImageMetadata(photoImageMetadata);
 
 			return true;
 		}
@@ -2048,7 +2078,7 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 	}
 
 	void setFocus() {
-		_gallery.setFocus();
+//		_gallery.setFocus();
 	}
 
 	void setSorting(final GallerySorting gallerySorting) {
@@ -2159,7 +2189,7 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 			return;
 		}
 
-		final GalleryMT20Item[] virtualGalleryItems = _gallery.getVirtualItems();
+		final GalleryMT20Item[] virtualGalleryItems = _gallery.getAllVirtualItems();
 		final int virtualSize = virtualGalleryItems.length;
 
 		if (virtualSize == 0) {

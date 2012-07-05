@@ -17,20 +17,20 @@ package net.tourbook.photo;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionMergePhotosWithTours extends Action {
+public class ActionMergeFolderPhotosWithTours extends Action {
 
-	private PicDirImages	_picDirImages;
+	private PicDirFolder	_picDirFolder;
 
-	public ActionMergePhotosWithTours(final PicDirImages picDirImages) {
+	public ActionMergeFolderPhotosWithTours(final PicDirFolder picDirFolder) {
 
 		super(Messages.Pic_Dir_Action_MergePhotosWithTours, AS_PUSH_BUTTON);
 
-		_picDirImages = picDirImages;
+		_picDirFolder = picDirFolder;
 
 	}
 
 	@Override
 	public void run() {
-		_picDirImages.actionMergePhotosWithTours();
+		_picDirFolder.actionMergePhotosWithTours();
 	}
 }

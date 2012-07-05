@@ -623,7 +623,7 @@ public class Photo {
 
 			final PhotoImageMetadata photoImageMetadata = createPhotoMetadata(imageFileMetadata);
 
-			setImageMetadata(photoImageMetadata);
+			updateImageMetadata(photoImageMetadata);
 		}
 
 		return imageFileMetadata;
@@ -817,59 +817,6 @@ public class Photo {
 		_gpsAreaInfo = gpsAreaInfo;
 	}
 
-	public void setImageMetadata(final PhotoImageMetadata photoImageMetadata) {
-
-		_photoImageMetadata = photoImageMetadata;
-
-		_exifDateTime = photoImageMetadata.exifDateTime;
-		_imageFileDateTime = photoImageMetadata.fileDateTime;
-
-		_imageWidth = photoImageMetadata.imageWidth;
-		_imageHeight = photoImageMetadata.imageHeight;
-
-		_orientation = photoImageMetadata.orientation;
-
-		_imageDirection = photoImageMetadata.imageDirection;
-		_altitude = photoImageMetadata.altitude;
-
-		_latitude = photoImageMetadata.latitude;
-		_longitude = photoImageMetadata.longitude;
-
-		_gpsAreaInfo = photoImageMetadata.gpsAreaInfo;
-
-		// rotate image, swap with and height
-		if (_imageWidth != Integer.MIN_VALUE && _imageHeight != Integer.MIN_VALUE) {
-
-			if (_orientation > 1) {
-
-				// see here http://www.impulseadventure.com/photo/exif-orientation.html
-
-				if (_orientation == 6 || _orientation == 8) {
-
-					// camera is rotated to the left or right by 90 degree
-
-					final int imageWidth = _imageWidth;
-
-					_imageWidth = _imageHeight;
-					_imageHeight = imageWidth;
-				}
-			}
-		}
-
-		setMapImageSize();
-
-		/*
-		 * set state if gps data are available, this state is used for filtering the photos and to
-		 * indicate that exif data are loaded
-		 */
-		_photoWrapper.gpsState = _latitude == Double.MIN_VALUE || _longitude == Double.MIN_VALUE ? 0 : 1;
-
-		// sort by exif date when available
-		if (_exifDateTime != null) {
-			_photoWrapper.imageSortingTime = _exifDateTime.getMillis();
-		}
-	}
-
 	public void setLatitude(final double latitude) {
 		_latitude = latitude;
 	}
@@ -933,6 +880,59 @@ public class Photo {
 //				+ (_latitude == Double.MIN_VALUE ? "\t-no GPS-" : "\t" + _latitude + " - " + _longitude)
 		//
 		;
+	}
+
+	public void updateImageMetadata(final PhotoImageMetadata photoImageMetadata) {
+
+		_photoImageMetadata = photoImageMetadata;
+
+		_exifDateTime = photoImageMetadata.exifDateTime;
+		_imageFileDateTime = photoImageMetadata.fileDateTime;
+
+		_imageWidth = photoImageMetadata.imageWidth;
+		_imageHeight = photoImageMetadata.imageHeight;
+
+		_orientation = photoImageMetadata.orientation;
+
+		_imageDirection = photoImageMetadata.imageDirection;
+		_altitude = photoImageMetadata.altitude;
+
+		_latitude = photoImageMetadata.latitude;
+		_longitude = photoImageMetadata.longitude;
+
+		_gpsAreaInfo = photoImageMetadata.gpsAreaInfo;
+
+		// rotate image, swap with and height
+		if (_imageWidth != Integer.MIN_VALUE && _imageHeight != Integer.MIN_VALUE) {
+
+			if (_orientation > 1) {
+
+				// see here http://www.impulseadventure.com/photo/exif-orientation.html
+
+				if (_orientation == 6 || _orientation == 8) {
+
+					// camera is rotated to the left or right by 90 degree
+
+					final int imageWidth = _imageWidth;
+
+					_imageWidth = _imageHeight;
+					_imageHeight = imageWidth;
+				}
+			}
+		}
+
+		setMapImageSize();
+
+		/*
+		 * set state if gps data are available, this state is used for filtering the photos and to
+		 * indicate that exif data are loaded
+		 */
+		_photoWrapper.gpsState = _latitude == Double.MIN_VALUE || _longitude == Double.MIN_VALUE ? 0 : 1;
+
+		// sort by exif date when available
+		if (_exifDateTime != null) {
+			_photoWrapper.imageSortingTime = _exifDateTime.getMillis();
+		}
 	}
 
 }

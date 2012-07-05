@@ -996,7 +996,7 @@ public abstract class GalleryMT20 extends Canvas {
 	 * @return Returns all virtual gallery items. These items can be <code>null</code> when they
 	 *         have not yet been displayed.
 	 */
-	public GalleryMT20Item[] getVirtualItems() {
+	public GalleryMT20Item[] getAllVirtualItems() {
 		return _virtualGalleryItems;
 	}
 
@@ -2475,7 +2475,7 @@ public abstract class GalleryMT20 extends Canvas {
 	}
 
 	/**
-	 * Set gallery items, which can be retrieved with {@link #getVirtualItems()}. With this get/set
+	 * Set gallery items, which can be retrieved with {@link #getAllVirtualItems()}. With this get/set
 	 * mechanism, the gallery items can be sorted.
 	 * 
 	 * @param virtualGalleryItems

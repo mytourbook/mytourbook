@@ -92,7 +92,14 @@ public class PicDirView extends ViewPart {
 	private PicDirFolder					_picDirFolder;
 	private PicDirImages					_picDirImages;
 
+	private boolean							_isShowFolderAndGallery;
+
 	private GallerySorting					_gallerySorting;
+
+	private int								_thumbnailSize;
+	private int								_textMinThumbSize;
+
+	private PhotoDateInfo					_photoDateInfo;
 
 	private ActionImageFilterGPS			_actionImageFilterGPS;
 	private ActionImageFilterNoGPS			_actionImageFilterNoGPS;
@@ -102,14 +109,6 @@ public class PicDirView extends ViewPart {
 	private ActionShowGPSAnnotations		_actionShowGPSAnnotation;
 	private ActionSortByFileDate			_actionSortFileByDate;
 	private ActionSortByFileName			_actionSortByFileName;
-
-	/*
-	 * UI controls
-	 */
-	private ViewerDetailForm				_containerMasterDetail;
-	private Composite						_containerFolder;
-	private Composite						_containerImages;
-
 	private ImageFilter						_currentImageFilter					= ImageFilter.NoFilter;
 
 	static {
@@ -124,10 +123,12 @@ public class PicDirView extends ViewPart {
 				TourbookPlugin.getImageDescriptor(Messages.Image__PhotoFilterNoGPS));
 	}
 
-	private int								_thumbnailSize;
-	private int								_textMinThumbSize;
-
-	private PhotoDateInfo					_photoDateInfo;
+	/*
+	 * UI controls
+	 */
+	private ViewerDetailForm				_containerMasterDetail;
+	private Composite						_containerFolder;
+	private Composite						_containerImages;
 
 	static int compareFiles(final File file1, final File file2) {
 
@@ -317,7 +318,11 @@ public class PicDirView extends ViewPart {
 
 		_partListener = new IPartListener2() {
 			@Override
-			public void partActivated(final IWorkbenchPartReference partRef) {}
+			public void partActivated(final IWorkbenchPartReference partRef) {
+				if (partRef.getPart(false) == PicDirView.this) {
+//					_picDirImages.setFocus();
+				}
+			}
 
 			@Override
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
@@ -733,11 +738,18 @@ public class PicDirView extends ViewPart {
 
 	@Override
 	public void setFocus() {
-		_picDirImages.setFocus();
-		_picDirFolder.getTree().setFocus();
+
+//		if (_isShowFolderAndGallery) {
+//			_picDirFolder.getTree().setFocus();
+//		} else {
+//		_picDirImages.setFocus();
+//		}
 	}
 
 	void setMaximizedControl(final boolean isShowFolderAndGallery) {
+
+		_isShowFolderAndGallery = isShowFolderAndGallery;
+
 		_containerMasterDetail.setMaximizedControl(isShowFolderAndGallery ? null : _containerImages);
 	}
 

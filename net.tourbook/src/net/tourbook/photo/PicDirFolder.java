@@ -17,12 +17,14 @@ package net.tourbook.photo;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.photo.gallery.MT20.GalleryMT20Item;
 import net.tourbook.photo.manager.PhotoImageCache;
 import net.tourbook.photo.manager.ThumbnailStore;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -43,6 +45,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.TreeColumnLayout;
@@ -130,8 +133,8 @@ class PicDirFolder {
 
 	private TVIFolderFolder									_selectedTVIFolder;
 	private File											_selectedFolder;
-	private ActionRefreshFolder								_actionRefreshFolder;
 
+	private ActionRefreshFolder								_actionRefreshFolder;
 	private ActionRunExternalAppTitle						_actionRunExternalAppTitle;
 	private ActionRunExternalApp							_actionRunExternalAppDefault;
 	private ActionRunExternalApp							_actionRunExternalApp1;
@@ -140,6 +143,7 @@ class PicDirFolder {
 	private ActionPreferences								_actionPreferences;
 	private ActionSingleClickExpand							_actionAutoExpandCollapse;
 	private ActionSingleExpandCollapseOthers				_actionSingleExpandCollapseOthers;
+	private ActionMergeFolderPhotosWithTours				_actionMergePhotosWithTours;
 
 	/*
 	 * UI controls
@@ -275,6 +279,38 @@ class PicDirFolder {
 	void actionAutoExpandCollapse() {
 		_isBehaviourAutoExpandCollapse = _actionAutoExpandCollapse.isChecked();
 		enableActions();
+	}
+
+	void actionMergePhotosWithTours() {
+
+		final Collection<GalleryMT20Item> gallerySelection = _picDirImages.getGallerySelection();
+		final ArrayList<Long> selectedTours = _picDirView.getSelectedTours();
+
+		System.out.println("photos: " + gallerySelection.size() + "\ttours: " + selectedTours.size());
+		// TODO remove SYSTEM.OUT.PRINTLN
+
+		/*
+		 * check if a photo is selected
+		 */
+		if (gallerySelection.size() == 0) {
+			MessageDialog.openInformation(
+					_display.getActiveShell(),
+					Messages.Pic_Dir_Dialog_MergePhotosWithTours_Title,
+					Messages.Pic_Dir_Dialog_NoSelectedImages_Message);
+			return;
+		}
+
+		/*
+		 * check if a tour is selected
+		 */
+		if (selectedTours.size() == 0) {
+			MessageDialog.openInformation(
+					_display.getActiveShell(),
+					Messages.Pic_Dir_Dialog_MergePhotosWithTours_Title,
+					Messages.Pic_Dir_Dialog_NoSelectedTours_Message);
+			return;
+		}
+
 	}
 
 	void actionRefreshFolder() {
@@ -612,6 +648,9 @@ class PicDirFolder {
 		 */
 
 		_actionAutoExpandCollapse.setEnabled(_isBehaviourSingleExpandedOthersCollapse == false);
+
+		_actionMergePhotosWithTours = new ActionMergeFolderPhotosWithTours(this);
+
 	}
 
 	private void expandCollapseFolder(final TVIFolderFolder treeItem) {
@@ -635,6 +674,9 @@ class PicDirFolder {
 
 	private void fillContextMenu(final IMenuManager menuMgr) {
 
+		menuMgr.add(_actionMergePhotosWithTours);
+
+		menuMgr.add(new Separator());
 		fillExternalApp(menuMgr);
 
 		menuMgr.add(new Separator());
