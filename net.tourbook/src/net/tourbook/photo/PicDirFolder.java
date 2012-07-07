@@ -27,6 +27,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.photo.gallery.MT20.GalleryMT20Item;
 import net.tourbook.photo.manager.PhotoImageCache;
 import net.tourbook.photo.manager.ThumbnailStore;
+import net.tourbook.photo.merge.PhotoMergeManager;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.TreeViewerItem;
 import net.tourbook.ui.UI;
@@ -113,6 +114,7 @@ class PicDirFolder {
 																											//
 																											.getPreferenceStore();
 
+	private PicDirView										_picDirView;
 	private PicDirImages									_picDirImages;
 
 	private long											_expandRunnableCounter;
@@ -272,7 +274,7 @@ class PicDirFolder {
 	}
 
 	PicDirFolder(final PicDirView picDirView, final PicDirImages picDirImages) {
-//		_picDirView = picDirView;
+		_picDirView = picDirView;
 		_picDirImages = picDirImages;
 	}
 
@@ -283,16 +285,18 @@ class PicDirFolder {
 
 	void actionMergePhotosWithTours() {
 
-		final Collection<GalleryMT20Item> gallerySelection = _picDirImages.getGallerySelection();
-		final ArrayList<Long> selectedTours = _picDirView.getSelectedTours();
+		final Collection<GalleryMT20Item> selectedPhotos = _picDirImages.getFolderImages(_selectedFolder, true);
 
-		System.out.println("photos: " + gallerySelection.size() + "\ttours: " + selectedTours.size());
-		// TODO remove SYSTEM.OUT.PRINTLN
+		if (selectedPhotos == null) {
+			return;
+		}
+
+		final ArrayList<Long> selectedTours = _picDirView.getSelectedTours();
 
 		/*
 		 * check if a photo is selected
 		 */
-		if (gallerySelection.size() == 0) {
+		if (selectedPhotos.size() == 0) {
 			MessageDialog.openInformation(
 					_display.getActiveShell(),
 					Messages.Pic_Dir_Dialog_MergePhotosWithTours_Title,
@@ -311,6 +315,7 @@ class PicDirFolder {
 			return;
 		}
 
+		PhotoMergeManager.openPhotoMergePerspective(selectedPhotos, selectedTours);
 	}
 
 	void actionRefreshFolder() {

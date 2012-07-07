@@ -276,6 +276,18 @@ public class PhotoLoadManager {
 		final Runnable executorTask = new Runnable() {
 			public void run() {
 
+//				// !!! slow down loading !!!
+//				try {
+//					Thread.sleep(1000);
+//				} catch (final InterruptedException e) {
+//					// TODO Auto-generated catch block
+//					// TODO Auto-generated catch block
+//					// TODO Auto-generated catch block
+//					// TODO Auto-generated catch block
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+
 				// get last added loader item
 				final PhotoExifLoader loadingItem = _waitingQueueExif.pollLast();
 

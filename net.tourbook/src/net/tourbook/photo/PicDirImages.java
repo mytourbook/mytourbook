@@ -17,6 +17,8 @@ package net.tourbook.photo;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.lang.reflect.InvocationTargetException;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -42,6 +44,7 @@ import net.tourbook.photo.manager.PhotoImageMetadata;
 import net.tourbook.photo.manager.PhotoLoadManager;
 import net.tourbook.photo.manager.PhotoWrapper;
 import net.tourbook.photo.manager.ThumbnailStore;
+import net.tourbook.photo.merge.PhotoMergeManager;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.util.StatusUtil;
 import net.tourbook.util.UI;
@@ -56,8 +59,10 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.osgi.util.NLS;
@@ -195,6 +200,11 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 	private File												_photoFolder;
 
 	/**
+	 * Folder which images should be displayed
+	 */
+	private File												_photoFolderWhichShouldBeDisplayed;
+
+	/**
 	 * Contains photo wrapper for ALL gallery items for the current photo folder
 	 */
 	private PhotoWrapper[]										_allPhotoWrapper;
@@ -202,8 +212,8 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 	/**
 	 * Contains filtered gallery items.
 	 * <p>
-	 * Only these items are displayed in the gallery, the {@link #_allPhotoWrapper} items contains
-	 * also hidden gallery items.
+	 * Only these items are displayed in the gallery, {@link #_allPhotoWrapper} items contains also
+	 * hidden gallery items.
 	 */
 	private PhotoWrapper[]										_sortedAndFilteredPhotoWrapper;
 
@@ -242,6 +252,13 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 
 	private int[]												_restoredSelection;
 
+	private final NumberFormat									_nf1							= NumberFormat
+																										.getNumberInstance();
+	{
+		_nf1.setMinimumFractionDigits(1);
+		_nf1.setMaximumFractionDigits(1);
+	}
+
 	/**
 	 * Cache for exif meta data, key is file path
 	 */
@@ -267,8 +284,6 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 	private Job													_jobUILoading;
 	private AtomicBoolean										_jobUILoadingIsScheduled		= new AtomicBoolean();
 	private int													_jobUILoadingDirtyCounter;
-
-//	private Collection<GalleryMT20Item>							_selectionBeforeImageFilter;
 
 	/*
 	 * UI resources
@@ -553,17 +568,14 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 
 	void actionMergePhotosWithTours() {
 
-		final Collection<GalleryMT20Item> gallerySelection = getSelectedAndExifLoadedImages(false);
+		final Collection<GalleryMT20Item> selectedPhotos = getFolderImages(_photoFolderWhichShouldBeDisplayed, false);
 
 		final ArrayList<Long> selectedTours = _picDirView.getSelectedTours();
-
-		System.out.println("photos: " + gallerySelection.size() + "\ttours: " + selectedTours.size());
-		// TODO remove SYSTEM.OUT.PRINTLN
 
 		/*
 		 * check if a photo is selected
 		 */
-		if (gallerySelection.size() == 0) {
+		if (selectedPhotos.size() == 0) {
 			MessageDialog.openInformation(
 					_gallery.getShell(),
 					Messages.Pic_Dir_Dialog_MergePhotosWithTours_Title,
@@ -581,6 +593,8 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 					Messages.Pic_Dir_Dialog_NoSelectedTours_Message);
 			return;
 		}
+
+		PhotoMergeManager.openPhotoMergePerspective(selectedPhotos, selectedTours);
 	}
 
 	void actionNavigateBackward() {
@@ -1086,8 +1100,6 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 		 */
 		deselectAll();
 
-//		_selectionBeforeImageFilter = _gallery.getSelection();
-
 		jobFilter_22_ScheduleSubsequent(0);
 	}
 
@@ -1095,27 +1107,45 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 		return _currentSorting == GallerySorting.FILE_NAME ? SORT_BY_FILE_NAME : SORT_BY_FILE_DATE;
 	}
 
-	Collection<GalleryMT20Item> getGallerySelection() {
-		return _gallery.getSelection();
-	}
+	/**
+	 * @param selectedFolder
+	 * @param isGetAllImages
+	 * @return Returns selected and loaded EXIF image data or <code>null</code> when canceled by the
+	 *         user.
+	 */
+	Collection<GalleryMT20Item> getFolderImages(final File selectedFolder, final boolean isGetAllImages) {
 
-	Collection<GalleryMT20Item> getSelectedAndExifLoadedImages(final boolean isGetAllImages) {
-		
+		final boolean isFolderFilesLoadedInitialValue = _photoFolder.getAbsolutePath().equals(
+				_photoFolderWhichShouldBeDisplayed.getAbsolutePath());
+
+		if (PhotoLoadManager.getExifQueueSize() > 0 || isFolderFilesLoadedInitialValue == false) {
+
+			if (isEXIFDataLoaded() == false) {
+				return null;
+			}
+		}
+
 		Collection<GalleryMT20Item> gallerySelection;
 		if (isGetAllImages) {
-			
+
 			final GalleryMT20Item[] galleryItems = _gallery.getAllVirtualItems();
-			
-			f
-			
+
+			gallerySelection = new ArrayList<GalleryMT20Item>(galleryItems.length);
+
+			for (final GalleryMT20Item galleryMT20Item : galleryItems) {
+				gallerySelection.add(galleryMT20Item);
+			}
+
 		} else {
 
 			gallerySelection = _gallery.getSelection();
 		}
-		
-		
-		
+
 		return gallerySelection;
+	}
+
+	Collection<GalleryMT20Item> getGallerySelection() {
+		return _gallery.getSelection();
 	}
 
 	/**
@@ -1184,6 +1214,91 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 		if (_isShowTooltip) {
 			_photoTooltip.show(hoveredItem);
 		}
+	}
+
+	private boolean isEXIFDataLoaded() {
+
+		final boolean isCanceled[] = new boolean[] { true };
+
+		try {
+
+			final IRunnableWithProgress runnable = new IRunnableWithProgress() {
+
+				@Override
+				public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+
+					final boolean isFolderFilesLoadedInitialValue = _photoFolder.getAbsolutePath().equals(
+							_photoFolderWhichShouldBeDisplayed.getAbsolutePath());
+
+					/*
+					 * ensure files for the requested folder are read from the filesystem
+					 */
+					if (isFolderFilesLoadedInitialValue == false) {
+
+						monitor.beginTask(NLS.bind(
+								Messages.Pic_Dir_Dialog_LoadingFolderFiles,
+								_photoFolderWhichShouldBeDisplayed), IProgressMonitor.UNKNOWN);
+
+						boolean isFolderFilesLoaded = isFolderFilesLoadedInitialValue;
+
+						while (isFolderFilesLoaded == false) {
+
+							/*
+							 * wait until files are loaded from the file system
+							 */
+							Thread.sleep(10);
+
+							isFolderFilesLoaded = _photoFolder.getAbsolutePath().equals(
+									_photoFolderWhichShouldBeDisplayed.getAbsolutePath());
+						}
+
+						/*
+						 * wait until the loading job has started otherwise it is possible that the
+						 * exif queue is checked before it is filled (this happened)
+						 */
+						Thread.sleep(100);
+					}
+
+					/*
+					 * ensure all image EXIF data are loaded
+					 */
+					final int allPhotoSize = _allPhotoWrapper.length;
+					monitor.beginTask(Messages.Pic_Dir_Dialog_LoadingEXIFData, IProgressMonitor.UNKNOWN);
+
+					int exifLoadingQueueSize = PhotoLoadManager.getExifQueueSize();
+
+					while (exifLoadingQueueSize > 0) {
+
+						Thread.sleep(100);
+
+						if (monitor.isCanceled()) {
+							isCanceled[0] = true;
+							return;
+						}
+
+						final int newExifLoadingQueueSize = PhotoLoadManager.getExifQueueSize();
+
+						final double _percent = (double) (allPhotoSize - exifLoadingQueueSize) / allPhotoSize * 100.0;
+
+						monitor.subTask(NLS.bind(Messages.Pic_Dir_Dialog_LoadingEXIFData_Subtask, new Object[] {
+								exifLoadingQueueSize,
+								allPhotoSize,
+								_nf1.format(_percent) }));
+
+						exifLoadingQueueSize = newExifLoadingQueueSize;
+					}
+				}
+			};
+
+			new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, true, runnable);
+
+		} catch (final InvocationTargetException e) {
+			StatusUtil.log(e);
+		} catch (final InterruptedException e) {
+			StatusUtil.log(e);
+		}
+
+		return isCanceled[0];
 	}
 
 	private void jobFilter_10_Create() {
@@ -2096,9 +2211,6 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 	 */
 	void showImages(final File imageFolder, final boolean isFromNavigationHistory, final boolean isReloadFolder) {
 
-		// prevent reselection
-//		_selectionBeforeImageFilter = null;
-
 		jobFilter_12_Stop();
 
 		PhotoLoadManager.stopImageLoading(true);
@@ -2127,6 +2239,8 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 		}
 
 		_pageBook.showPage(_pageLoading);
+
+		_photoFolderWhichShouldBeDisplayed = imageFolder;
 
 		workerUpdate(imageFolder, isReloadFolder);
 	}
@@ -2495,10 +2609,6 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 
 					// update gallery
 					_gallery.setVirtualItems(sortedGalleryItems);
-
-//					if (_selectionBeforeImageFilter != null) {
-//						_gallery.setSelection(_selectionBeforeImageFilter);
-//					}
 
 				} else {
 

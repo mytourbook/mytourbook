@@ -172,7 +172,13 @@
             icon="icons/tour-map-compare-result-perspective.gif"
             id="net.tourbook.perspective.CompareTours"
             name="%perspective_name_CompareTours"/>
+      <perspective
+            class="net.tourbook.application.PerspectiveFactoryPhoto"
+            icon="icons/photo-merge-perspective.png"
+            id="net.tourbook.perspective.MergePhotos"
+            name="%Perspective_Name_MergePhotos"/>
    </extension>
+   
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
 
@@ -189,6 +195,8 @@
                id="net.tourbook.perspective.RawData"/>
          <perspectiveShortcut
                id="net.tourbook.perspective.CompareTours"/>
+         <perspectiveShortcut
+               id="net.tourbook.perspective.MergePhotos"/>
       </perspectiveExtension>
 
    <!--
@@ -505,9 +513,7 @@
                commandId="net.tourbook.command.dbTool.consistencyCheck"
                label="%command_dbtool_consistency_check"
                mnemonic="%command_dbtool_consistency_check_mnemonic"
-               style="push"
-               >
-         </command>
+               style="push"/>
       </menuContribution>
 
 
@@ -521,8 +527,7 @@
 
          <separator
             name="net.tourbook.separator.TourDirectories"
-            visible="true">
-         </separator>
+            visible="true"/>
 
          <command
             commandId="command.net.tourbook.views.rawData.RawDataView"
@@ -538,8 +543,7 @@
                commandId="command.net.tourbook.views.calendar.CalendarView"
                icon="icons/calendar.png"
                label="%view_name_Calendar"
-               mnemonic="%view_name_Calendar_Mnemonic">
-         </command>
+               mnemonic="%view_name_Calendar_Mnemonic"/>
          <command
             commandId="command.net.tourbook.views.tourCatalog.TourCatalogView"
             icon="icons/tour-map.gif"
@@ -573,22 +577,19 @@
                icon="icons/tour-chart.gif"
                label="%command_view_selectedTour"
                mnemonic="%command_view_selectedTour_mnemonic"
-               tooltip="%command_view_selectedTour_tooltip">
-         </command>
+               tooltip="%command_view_selectedTour_tooltip"/>
          <command
                commandId="net.tourbook.command.tourDataEditor"
                icon="icons/tour-editor.gif"
                label="%command_view_tourEditor"
                mnemonic="%command_view_tourEditor_mnemonic"
-               tooltip="%command_view_tourEditor_tooltip">
-         </command>
+               tooltip="%command_view_tourEditor_tooltip"/>
          <command
                commandId="net.tourbook.mapping.command.tourMap"
                icon="icons/earth-globe-abstract.png"
                label="%command_tour_map_name"
                mnemonic="%command_tour_map_name_Mnemonic"
-               tooltip="%command_tour_map_name_tooltip">
-         </command>
+               tooltip="%command_tour_map_name_tooltip"/>
          <command
 	           commandId="command.net.tourbook.views.TourMarkerView"
                icon="icons/tour-marker.png"
@@ -612,16 +613,14 @@
                label="%command_tourChart_tool_graphAnalyzer"
                mnemonic="%command_tourChart_tool_graphAnalyzer_mnemonic"
                style="push"
-               tooltip="%command_tourChart_tool_graphAnalyzer_tooltip">
-         </command>
+               tooltip="%command_tourChart_tool_graphAnalyzer_tooltip"/>
          <command
                commandId="net.tourbook.command.tourChart.tool.tourSegmenter"
                icon="icons/tour-segmenter.gif"
                label="%command_tourChart_tool_tourSegmenter"
                mnemonic="%command_tourChart_tool_tourSegmenter_mnemonic"
                style="push"
-               tooltip="%command_tourChart_tool_tourSegmenter_tooltip">
-         </command>
+               tooltip="%command_tourChart_tool_tourSegmenter_tooltip"/>
          <command
                commandId="command.net.tourbook.training.Training"
                icon="icons/pulse-zones.png"
@@ -643,20 +642,17 @@
                label="%command_tourChart_tool_tourSegmenter"
                mnemonic="%command_tourChart_tool_tourSegmenter_mnemonic"
                style="push"
-               tooltip="%command_tourChart_tool_tourSegmenter_tooltip">
-         </command>
+               tooltip="%command_tourChart_tool_tourSegmenter_tooltip"/>
          <command
                commandId="net.tourbook.command.tourCompareWizard"
                icon="icons/tour-map-compare-wizard.png"
                label="%command_tourCompare_wizard"
-               mnemonic="%command_tourCompare_wizard_mnemonic">
-         </command>
+               mnemonic="%command_tourCompare_wizard_mnemonic"/>
          <command
                commandId="command.net.tourbook.ui.views.TourChartSmoothingView"
                icon="icons/smooth.png"
                label="%View_Name_TourChartSmoothing"
-               mnemonic="%View_Name_TourChartSmoothing_Mnemonic">
-         </command>
+               mnemonic="%View_Name_TourChartSmoothing_Mnemonic"/>
 
       </menuContribution>
 
@@ -671,41 +667,35 @@
                   icon="icons/tour-chart.gif"
                   label="%command_view_selectedTour"
                   mnemonic="%command_view_selectedTour_mnemonic"
-                  tooltip="%command_view_selectedTour_tooltip">
-            </command>
+                  tooltip="%command_view_selectedTour_tooltip"/>
             <command
                   commandId="net.tourbook.command.tourDataEditor"
                   icon="icons/tour-editor.gif"
                   label="%command_view_tourEditor"
                   mnemonic="%command_view_tourEditor_mnemonic"
-                  tooltip="%command_view_tourEditor_tooltip">
-            </command>
+                  tooltip="%command_view_tourEditor_tooltip"/>
             <command
                   commandId="net.tourbook.mapping.command.tourMap"
                   icon="icons/earth-globe-abstract.png"
                   label="%command_tour_map_name"
-                  tooltip="%command_tour_map_name_tooltip">
-            </command>
+                  tooltip="%command_tour_map_name_tooltip"/>
             <command
                   commandId="command.net.tourbook.views.tagViewID"
                   icon="icons/tour-tag.gif"
                   label="%command_tagging_name"
-                  tooltip="%command_tagging_name_tooltip">
-            </command>
+                  tooltip="%command_tagging_name_tooltip"/>
             <command
                   commandId="net.tourbook.command.tourChart.tool.graphAnalyzer"
                   icon="icons/chart-analyzer.gif"
                   label="%command_tourChart_tool_graphAnalyzer"
                   mnemonic="%command_tourChart_tool_graphAnalyzer_mnemonic"
                   style="push"
-                  tooltip="%command_tourChart_tool_graphAnalyzer_tooltip">
-            </command>
+                  tooltip="%command_tourChart_tool_graphAnalyzer_tooltip"/>
             <command
                   commandId="command.net.tourbook.photo.PicDirView"
                   icon="icons/photo-directory.png"
                   label="%View_Name_PhotoDirectory"
-                  mnemonic="%View_Name_PhotoDirectory_Mnemonic">
-            </command>
+                  mnemonic="%View_Name_PhotoDirectory_Mnemonic"/>
 
          </toolbar>
       </menuContribution>
@@ -1122,8 +1112,8 @@
 
       <category
             id="net.tourbook.category.tourList"
-            name="%view_category_tourDirectory">
-      </category>
+            name="%view_category_tourDirectory"/>
+            
 	      <view
 	            category="net.tourbook.category.tourList"
 	            class="net.tourbook.ui.views.rawData.RawDataView"
@@ -1165,14 +1155,6 @@
 	            icon="icons/statistics.gif"
 	            id="net.tourbook.views.StatisticView"
 	            name="%view_name_Statistics">
-	      </view>
-	      
-	      <view
-	            category="net.tourbook.category.tourList"
-	            class="net.tourbook.photo.PicDirView"
-	            icon="icons/photo-directory.png"
-	            id="net.tourbook.photo.PicDirView"
-	            name="%View_Name_PhotoDirectory">
 	      </view>
 
       <category
@@ -1296,6 +1278,28 @@
 	            id="net.tourbook.views.tourCatalog.yearStatisticView"
 	            name="%view_name_tourCatalog_statistics">
 	      </view>
+
+	      
+	<!--
+		Photo 
+	-->            
+
+		<category
+			id="net.tourbook.category.photo"
+			name="%View_Category_Photo"/>
+			      
+			<view
+				category="net.tourbook.category.photo"
+				class="net.tourbook.photo.PicDirView"
+				icon="icons/photo-directory.png"
+				id="net.tourbook.photo.PicDirView"
+				name="%View_Name_PhotoDirectory"/>
+			<view
+				category="net.tourbook.category.photo"
+				class="net.tourbook.photo.merge.PhotoMergeView"
+				icon="icons/photo-merge-view.png"
+				id="net.tourbook.photo.merge.PhotoMergeView.ID"
+				name="%View_Name_MergePhoto"/>
 
       <category
             id="net.tourbook.category.system"

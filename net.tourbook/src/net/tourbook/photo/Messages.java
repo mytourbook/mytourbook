@@ -91,6 +91,12 @@ public class Messages extends NLS {
 	public static String		Pic_Dir_Dialog_CleanupStoreImages_Message;
 	public static String		Pic_Dir_Dialog_CleanupStoreImages_Title;
 
+	public static String	Pic_Dir_Dialog_LoadingEXIFData;
+
+	public static String	Pic_Dir_Dialog_LoadingEXIFData_Subtask;
+
+	public static String	Pic_Dir_Dialog_LoadingFolderFiles;
+
 	public static String	Pic_Dir_Dialog_MergePhotosWithTours_Title;
 
 	public static String	Pic_Dir_Dialog_NoSelectedImages_Message;
