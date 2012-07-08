@@ -151,7 +151,7 @@ class SmoothingAlgorithmInitial implements ISmoothingAlgorithm {
 			TourManager.getInstance().clearTourDataCache();
 
 			// fire unique event for all changes
-			TourManager.fireEvent(TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED, null);
+			TourManager.fireEvent(TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED);
 		}
 	}
 

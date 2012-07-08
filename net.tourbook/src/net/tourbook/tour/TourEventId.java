@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.tour;
 
@@ -24,18 +24,18 @@ import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 public enum TourEventId {
 
 	/**
-	 * Properties for a tour have changed, property data contains {@link TourProperties} with the
-	 * modified {@link TourData}
+	 * Tours has been modified, event data contains the modified tours {@link TourData}
 	 */
 	TOUR_CHANGED,
 
 	/**
 	 * {@link TourData} has been modified, the UI must be updated by reloading {@link TourData}
 	 * <p>
-	 * When this property is fired, the {@link TourDataEditorView} must <b>NOT</b> be dirty. The
-	 * check method {@link UI#isTourEditorModified(TourData)} must return false.
+	 * When this event is fired, {@link TourDataEditorView} must <b>NOT</b> be dirty, this can be
+	 * checked with the method {@link UI#isTourEditorModified(TourData)}, it must return
+	 * <code>false</code>.
 	 * <p>
-	 * When a tour is modified, the event {@link #TOUR_PROPERTIES_CHANGED} must be fired
+	 * When a tour is modified, the event {@link #TOUR_CHANGED} must be fired
 	 */
 	UPDATE_UI,
 

@@ -213,7 +213,7 @@ public class TourChartPropertyView extends ViewPart {
 //		TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourChartPropertyView.this);
 
 		// fire unique event for all changes
-		TourManager.fireEvent(TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED, null);
+		TourManager.fireEvent(TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED);
 	}
 
 	private void restoreState() {

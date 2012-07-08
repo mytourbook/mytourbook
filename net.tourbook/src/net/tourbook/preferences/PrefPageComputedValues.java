@@ -963,7 +963,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 		TourManager.getInstance().removeAllToursFromCache();
 
 		// fire unique event for all changes
-		TourManager.fireEvent(TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED, null);
+		TourManager.fireEvent(TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED);
 	}
 
 	@Override

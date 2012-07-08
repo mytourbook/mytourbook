@@ -168,7 +168,7 @@ public class ActionRemoveComparedTours extends Action {
 		}
 
 		if (modifiedRefTours.size() > 0) {
-			TourManager.fireEvent(TourEventId.UPDATE_UI, new SelectionTourIds(modifiedRefTours));
+			TourManager.fireEventWithCustomData(TourEventId.UPDATE_UI, new SelectionTourIds(modifiedRefTours), null);
 		}
 
 		return true;

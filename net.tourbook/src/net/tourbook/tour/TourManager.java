@@ -383,26 +383,40 @@ public class TourManager {
 	}
 
 	public static void fireEvent(final TourEventId tourEventId) {
-		fireEvent(tourEventId, null);
+
+		final Object[] allListeners = _tourEventListeners.getListeners();
+		for (final Object listener : allListeners) {
+			((ITourEventListener) listener).tourChanged(null, tourEventId, null);
+		}
 	}
 
 	public static void fireEvent(final TourEventId tourEventId, final ArrayList<TourData> modifiedTours) {
 		fireEvent(tourEventId, new TourEvent(modifiedTours));
 	}
 
-	public static void fireEvent(final TourEventId tourEventId, final Object eventData) {
+	public static void fireEvent(final TourEventId tourEventId, final TourEvent tourEvent) {
 
 		final Object[] allListeners = _tourEventListeners.getListeners();
 		for (final Object listener : allListeners) {
-			((ITourEventListener) listener).tourChanged(null, tourEventId, eventData);
+			((ITourEventListener) listener).tourChanged(null, tourEventId, tourEvent);
 		}
 	}
 
-	public static void fireEvent(final TourEventId tourEventId, final Object eventData, final IWorkbenchPart part) {
+	public static void fireEvent(final TourEventId tourEventId, final TourEvent tourEvent, final IWorkbenchPart part) {
 
 		final Object[] allListeners = _tourEventListeners.getListeners();
 		for (final Object listener : allListeners) {
-			((ITourEventListener) listener).tourChanged(part, tourEventId, eventData);
+			((ITourEventListener) listener).tourChanged(part, tourEventId, tourEvent);
+		}
+	}
+
+	public static void fireEventWithCustomData(	final TourEventId tourEventId,
+												final Object customData,
+												final IWorkbenchPart part) {
+
+		final Object[] allListeners = _tourEventListeners.getListeners();
+		for (final Object listener : allListeners) {
+			((ITourEventListener) listener).tourChanged(part, tourEventId, customData);
 		}
 	}
 

@@ -1470,7 +1470,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		 * notify all views, it is not checked if the tour data editor is dirty because newly saved
 		 * tours can not be modified in the tour data editor
 		 */
-		TourManager.fireEvent(TourEventId.UPDATE_UI, new SelectionTourIds(savedToursIds));
+		TourManager.fireEventWithCustomData(TourEventId.UPDATE_UI, new SelectionTourIds(savedToursIds), this);
 	}
 
 	void enableActions() {

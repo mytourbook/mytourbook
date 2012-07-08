@@ -101,7 +101,10 @@ class ActionRenameRefTour extends Action {
 								final Long tourId = refTour.getTourData().getTourId();
 								TourManager.getInstance().removeTourFromCache(tourId);
 
-								TourManager.fireEvent(TourEventId.UPDATE_UI, new SelectionTourId(tourId));
+								TourManager.fireEventWithCustomData(
+										TourEventId.UPDATE_UI,
+										new SelectionTourId(tourId),
+										null);
 							}
 						});
 					}

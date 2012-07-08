@@ -351,7 +351,7 @@ public class CSVTourDataReader extends TourbookDevice {
 				if (isNewTag) {
 					display.syncExec(new Runnable() {
 						public void run() {
-							TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED, null);
+							TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED);
 						}
 					});
 				}

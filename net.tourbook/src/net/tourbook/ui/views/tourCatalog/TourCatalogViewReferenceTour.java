@@ -197,10 +197,9 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart implements I
 				final float refTourXMarkerValue = xValues[refTour.getEndValueIndex()]
 						- xValues[refTour.getStartValueIndex()];
 
-				TourManager.fireEvent(TourEventId.REFERENCE_TOUR_CHANGED, new TourPropertyRefTourChanged(
-						_tourChart,
-						refTour.getRefId(),
-						refTourXMarkerValue), TourCatalogViewReferenceTour.this);
+				TourManager.fireEventWithCustomData(TourEventId.REFERENCE_TOUR_CHANGED, //
+						new TourPropertyRefTourChanged(_tourChart, refTour.getRefId(), refTourXMarkerValue),
+						TourCatalogViewReferenceTour.this);
 
 				// set title
 				changedChartDataModel.setTitle(NLS.bind(

@@ -155,10 +155,10 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 						return;
 					}
 
-					final TourEvent tourProperties = (TourEvent) eventData;
+					final TourEvent tourEvent = (TourEvent) eventData;
 
 					// get modified tours
-					final ArrayList<TourData> modifiedTours = tourProperties.getModifiedTours();
+					final ArrayList<TourData> modifiedTours = tourEvent.getModifiedTours();
 					final long tourId = _tourData.getTourId();
 
 					// check if the tour in the editor was modified

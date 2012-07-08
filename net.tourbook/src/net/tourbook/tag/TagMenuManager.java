@@ -458,7 +458,7 @@ public class TagMenuManager {
 
 	/**
 	 * Add/remove tags
-	 *
+	 * 
 	 * @param isTourSelected
 	 *            Is <code>true</code> when at least one tour is selected
 	 * @param isOneTour
@@ -690,7 +690,7 @@ public class TagMenuManager {
 
 	/**
 	 * Save modified tours and notify tour provider
-	 *
+	 * 
 	 * @param modifiedTags
 	 * @param modifiedTours
 	 */
@@ -713,12 +713,14 @@ public class TagMenuManager {
 			}
 		}
 
-		TourManager.fireEvent(TourEventId.NOTIFY_TAG_VIEW, new ChangedTags(modifiedTags, modifiedTours, false));
+		TourManager.fireEventWithCustomData(TourEventId.NOTIFY_TAG_VIEW, //
+				new ChangedTags(modifiedTags, modifiedTours, false),
+				null);
 	}
 
 	/**
 	 * Set/Save for multiple tour tags
-	 *
+	 * 
 	 * @param modifiedTags
 	 * @param isAddMode
 	 */
@@ -774,7 +776,7 @@ public class TagMenuManager {
 
 	/**
 	 * Set/Save one tour tag
-	 *
+	 * 
 	 * @param tag
 	 * @param tourProvider
 	 * @param isAddMode

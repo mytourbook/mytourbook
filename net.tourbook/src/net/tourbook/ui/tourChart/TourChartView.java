@@ -354,7 +354,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 	private void fireSliderPosition() {
 		Display.getCurrent().asyncExec(new Runnable() {
 			public void run() {
-				TourManager.fireEvent(
+				TourManager.fireEventWithCustomData(
 						TourEventId.SLIDER_POSITION_CHANGED,
 						_tourChart.getChartInfo(),
 						TourChartView.this);

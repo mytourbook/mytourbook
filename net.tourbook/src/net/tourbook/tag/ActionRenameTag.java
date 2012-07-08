@@ -208,7 +208,7 @@ public class ActionRenameTag extends Action {
 				TourManager.getInstance().clearTourDataCache();
 
 				// fire modify event
-				TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED, null);
+				TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED);
 			}
 		});
 	}

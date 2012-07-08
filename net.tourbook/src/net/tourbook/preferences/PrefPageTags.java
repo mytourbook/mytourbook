@@ -599,7 +599,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 			TourManager.getInstance().clearTourDataCache();
 
 			// fire modify event
-			TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED, null);
+			TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED);
 		}
 	}
 

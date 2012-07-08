@@ -372,7 +372,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 	 */
 	private void fireChangeEvent(final int startIndex, final int endIndex, final float speed, final boolean isDataSaved) {
 
-		TourManager.fireEvent(TourEventId.COMPARE_TOUR_CHANGED, new TourPropertyCompareTourChanged(
+		TourManager.fireEventWithCustomData(TourEventId.COMPARE_TOUR_CHANGED, new TourPropertyCompareTourChanged(
 				_ctCompareId,
 				startIndex,
 				endIndex,
