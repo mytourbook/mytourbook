@@ -200,7 +200,7 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 	private File												_photoFolder;
 
 	/**
-	 * Folder which images should be displayed
+	 * Folder which images should be displayed in the gallery
 	 */
 	private File												_photoFolderWhichShouldBeDisplayed;
 
@@ -568,9 +568,7 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 
 	void actionMergePhotosWithTours() {
 
-		final Collection<GalleryMT20Item> selectedPhotos = getFolderImages(_photoFolderWhichShouldBeDisplayed, false);
-
-		final ArrayList<Long> selectedTours = _picDirView.getSelectedTours();
+		final ArrayList<PhotoWrapper> selectedPhotos = getLoadedExifImageData(_photoFolderWhichShouldBeDisplayed, false);
 
 		/*
 		 * check if a photo is selected
@@ -580,21 +578,9 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 					_gallery.getShell(),
 					Messages.Pic_Dir_Dialog_MergePhotosWithTours_Title,
 					Messages.Pic_Dir_Dialog_NoSelectedImages_Message);
-			return;
 		}
 
-		/*
-		 * check if a tour is selected
-		 */
-		if (selectedTours.size() == 0) {
-			MessageDialog.openInformation(
-					_gallery.getShell(),
-					Messages.Pic_Dir_Dialog_MergePhotosWithTours_Title,
-					Messages.Pic_Dir_Dialog_NoSelectedTours_Message);
-			return;
-		}
-
-		PhotoMergeManager.openPhotoMergePerspective(selectedPhotos, selectedTours);
+		PhotoMergeManager.openPhotoMergePerspective(selectedPhotos);
 	}
 
 	void actionNavigateBackward() {
@@ -1107,45 +1093,58 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 		return _currentSorting == GallerySorting.FILE_NAME ? SORT_BY_FILE_NAME : SORT_BY_FILE_DATE;
 	}
 
+	Collection<GalleryMT20Item> getGallerySelection() {
+		return _gallery.getSelection();
+	}
+
 	/**
 	 * @param selectedFolder
 	 * @param isGetAllImages
-	 * @return Returns selected and loaded EXIF image data or <code>null</code> when canceled by the
-	 *         user.
+	 * @return Returns photo data for the images in the requested folder or <code>null</code> when
+	 *         loading was canceled by the user.
 	 */
-	Collection<GalleryMT20Item> getFolderImages(final File selectedFolder, final boolean isGetAllImages) {
+	ArrayList<PhotoWrapper> getLoadedExifImageData(final File selectedFolder, final boolean isGetAllImages) {
 
-		final boolean isFolderFilesLoadedInitialValue = _photoFolder.getAbsolutePath().equals(
+		final boolean isFolderFilesLoaded = _photoFolder.getAbsolutePath().equals(
 				_photoFolderWhichShouldBeDisplayed.getAbsolutePath());
 
-		if (PhotoLoadManager.getExifQueueSize() > 0 || isFolderFilesLoadedInitialValue == false) {
+		if (PhotoLoadManager.getExifQueueSize() > 0 || isFolderFilesLoaded == false) {
 
 			if (isEXIFDataLoaded() == false) {
 				return null;
 			}
 		}
 
-		Collection<GalleryMT20Item> gallerySelection;
+		ArrayList<PhotoWrapper> photoList;
 		if (isGetAllImages) {
 
-			final GalleryMT20Item[] galleryItems = _gallery.getAllVirtualItems();
+			photoList = new ArrayList<PhotoWrapper>(_sortedAndFilteredPhotoWrapper.length);
 
-			gallerySelection = new ArrayList<GalleryMT20Item>(galleryItems.length);
-
-			for (final GalleryMT20Item galleryMT20Item : galleryItems) {
-				gallerySelection.add(galleryMT20Item);
+			for (final PhotoWrapper photoWrapper : _sortedAndFilteredPhotoWrapper) {
+				photoList.add(photoWrapper);
 			}
 
 		} else {
 
-			gallerySelection = _gallery.getSelection();
+			/*
+			 * convert gallery selection into a list with photos
+			 */
+
+			final Collection<GalleryMT20Item> galleryItems = _gallery.getSelection();
+
+			photoList = new ArrayList<PhotoWrapper>(galleryItems.size());
+
+			for (final GalleryMT20Item item : galleryItems) {
+
+				final IGalleryCustomData customData = item.customData;
+
+				if (customData instanceof PhotoWrapper) {
+					photoList.add((PhotoWrapper) customData);
+				}
+			}
 		}
 
-		return gallerySelection;
-	}
-
-	Collection<GalleryMT20Item> getGallerySelection() {
-		return _gallery.getSelection();
+		return photoList;
 	}
 
 	/**
@@ -1216,6 +1215,9 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 		}
 	}
 
+	/**
+	 * @return Returns <code>true</code> when EXIF data for all (not filtered) photos are loaded.
+	 */
 	private boolean isEXIFDataLoaded() {
 
 		final boolean isCanceled[] = new boolean[] { true };
@@ -1254,7 +1256,7 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 
 						/*
 						 * wait until the loading job has started otherwise it is possible that the
-						 * exif queue is checked before it is filled (this happened)
+						 * exif queue is empty and is checked before it is filled (this happened)
 						 */
 						Thread.sleep(100);
 					}
@@ -1276,8 +1278,9 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 							return;
 						}
 
-						final int newExifLoadingQueueSize = PhotoLoadManager.getExifQueueSize();
+						// show loading progress
 
+						final int newExifLoadingQueueSize = PhotoLoadManager.getExifQueueSize();
 						final double _percent = (double) (allPhotoSize - exifLoadingQueueSize) / allPhotoSize * 100.0;
 
 						monitor.subTask(NLS.bind(Messages.Pic_Dir_Dialog_LoadingEXIFData_Subtask, new Object[] {
@@ -1469,7 +1472,7 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 
 					// image is not yet loaded, it must be loaded to get the gps state
 
-					putImageInExifLoadingQueue(photoWrapper);
+					putInExifLoadingQueue(photoWrapper);
 				}
 
 				// check again, the gps state could have been cached and set
@@ -1520,7 +1523,7 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 				if (gpsState == -1) {
 
 					// image is not yet loaded, it must be loaded to get the gps state
-					putImageInExifLoadingQueue(photoWrapper);
+					putInExifLoadingQueue(photoWrapper);
 				}
 			}
 		}
@@ -1936,7 +1939,7 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 	 * @return Returns <code>true</code> when exif data is already available from the cache and must
 	 *         not be loaded.
 	 */
-	private boolean putImageInExifLoadingQueue(final PhotoWrapper photoWrapper) {
+	private boolean putInExifLoadingQueue(final PhotoWrapper photoWrapper) {
 
 		// create photo which is used to draw the photo image
 		Photo photo = photoWrapper.photo;

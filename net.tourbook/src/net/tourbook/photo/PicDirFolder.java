@@ -17,15 +17,14 @@ package net.tourbook.photo;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.photo.gallery.MT20.GalleryMT20Item;
 import net.tourbook.photo.manager.PhotoImageCache;
+import net.tourbook.photo.manager.PhotoWrapper;
 import net.tourbook.photo.manager.ThumbnailStore;
 import net.tourbook.photo.merge.PhotoMergeManager;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -285,13 +284,11 @@ class PicDirFolder {
 
 	void actionMergePhotosWithTours() {
 
-		final Collection<GalleryMT20Item> selectedPhotos = _picDirImages.getFolderImages(_selectedFolder, true);
+		final ArrayList<PhotoWrapper> selectedPhotos = _picDirImages.getLoadedExifImageData(_selectedFolder, true);
 
 		if (selectedPhotos == null) {
 			return;
 		}
-
-		final ArrayList<Long> selectedTours = _picDirView.getSelectedTours();
 
 		/*
 		 * check if a photo is selected
@@ -300,22 +297,10 @@ class PicDirFolder {
 			MessageDialog.openInformation(
 					_display.getActiveShell(),
 					Messages.Pic_Dir_Dialog_MergePhotosWithTours_Title,
-					Messages.Pic_Dir_Dialog_NoSelectedImages_Message);
-			return;
+					NLS.bind(Messages.Pic_Dir_Dialog_NoSelectedImagesInFolder_Message, _selectedFolder));
 		}
 
-		/*
-		 * check if a tour is selected
-		 */
-		if (selectedTours.size() == 0) {
-			MessageDialog.openInformation(
-					_display.getActiveShell(),
-					Messages.Pic_Dir_Dialog_MergePhotosWithTours_Title,
-					Messages.Pic_Dir_Dialog_NoSelectedTours_Message);
-			return;
-		}
-
-		PhotoMergeManager.openPhotoMergePerspective(selectedPhotos, selectedTours);
+		PhotoMergeManager.openPhotoMergePerspective(selectedPhotos);
 	}
 
 	void actionRefreshFolder() {

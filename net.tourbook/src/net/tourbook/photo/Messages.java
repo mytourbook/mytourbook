@@ -45,6 +45,12 @@ public class Messages extends NLS {
 	public static String		Image__PhotoSortByName;
 	public static String		Image__PhotoTooltip;
 
+	public static String	Photo_Merge_Label_SelectedPhotoDate;
+
+	public static String	Photo_Merge_Label_SelectedPhotoDates;
+
+	public static String	Photo_Merge_Label_SelectedPhotoDates_Tooltip;
+
 	public static String		Photo_ToolTip_Date;
 	public static String		Photo_ToolTip_Description;
 	public static String		Photo_ToolTip_Model;
@@ -56,10 +62,10 @@ public class Messages extends NLS {
 	public static String		Pic_Dir_Action_ClearHistory;
 	public static String		Pic_Dir_Action_DefineExternalApp;
 
-	public static String	Pic_Dir_Action_MergePhotosWithTours;
-	public static String	Pic_Dir_Action_NavigateHistoryBackward_Tooltip;
+	public static String		Pic_Dir_Action_MergePhotosWithTours;
+	public static String		Pic_Dir_Action_NavigateHistoryBackward_Tooltip;
 
-	public static String	Pic_Dir_Action_NavigateHistoryForward_Tooltip;
+	public static String		Pic_Dir_Action_NavigateHistoryForward_Tooltip;
 
 	public static String		Pic_Dir_Action_PhotoFilterGPS;
 	public static String		Pic_Dir_Action_PhotoFilterGPSTooltip;
@@ -90,18 +96,13 @@ public class Messages extends NLS {
 	public static String		Pic_Dir_Dialog_CleanupStoreImages_KeepImages;
 	public static String		Pic_Dir_Dialog_CleanupStoreImages_Message;
 	public static String		Pic_Dir_Dialog_CleanupStoreImages_Title;
+	public static String		Pic_Dir_Dialog_LoadingEXIFData;
+	public static String		Pic_Dir_Dialog_LoadingEXIFData_Subtask;
+	public static String		Pic_Dir_Dialog_LoadingFolderFiles;
+	public static String		Pic_Dir_Dialog_MergePhotosWithTours_Title;
+	public static String		Pic_Dir_Dialog_NoSelectedImages_Message;
 
-	public static String	Pic_Dir_Dialog_LoadingEXIFData;
-
-	public static String	Pic_Dir_Dialog_LoadingEXIFData_Subtask;
-
-	public static String	Pic_Dir_Dialog_LoadingFolderFiles;
-
-	public static String	Pic_Dir_Dialog_MergePhotosWithTours_Title;
-
-	public static String	Pic_Dir_Dialog_NoSelectedImages_Message;
-
-	public static String	Pic_Dir_Dialog_NoSelectedTours_Message;
+	public static String	Pic_Dir_Dialog_NoSelectedImagesInFolder_Message;
 	public static String		Pic_Dir_ImageSizeIndicator_Tooltip;
 	public static String		Pic_Dir_Label_ExternalApp;
 	public static String		Pic_Dir_Label_ImageLoadingFailed;
@@ -122,9 +123,10 @@ public class Messages extends NLS {
 	public static String		Pic_Dir_StatusLabel_nImagesAreHiddenByFilter;
 	public static String		Pic_Dir_StatusLabel_NoFolder;
 	public static String		Pic_Dir_StatusLabel_NoImagesInFolder;
+	public static String		Pic_Dir_StatusLabel_NoSelectedPhoto;
+	public static String		Pic_Dir_StatusLabel_NoTourIsAvailable;
 	public static String		Pic_Dir_StatusLabel_RestoringFolder;
 	public static String		Pic_Dir_StatusLabel_SelectedImages;
-
 	public static String		Pic_Dir_StatusLable_LoadingFolder;
 	public static String		Pic_Dir_StatusLable_LoadingFolder_FolderIsNotAvailable;
 	public static String		Pic_Dir_StatusLable_LoadingFolder_InFolderTree;
@@ -188,7 +190,7 @@ public class Messages extends NLS {
 	public static String		PrefPage_Photo_Viewer_Label_HQThumbnailSize_Tooltip;
 	public static String		PrefPage_Photo_Viewer_Label_ImageFramework;
 
-	public static String	PrefPage_Photo_Viewer_Label_ImageFramework_Tooltip;
+	public static String		PrefPage_Photo_Viewer_Label_ImageFramework_Tooltip;
 	public static String		PrefPage_Photo_Viewer_Label_MinSizeBorder;
 	public static String		PrefPage_Photo_Viewer_Label_MinSizeBorder_Tooltip;
 	public static String		PrefPage_Photo_Viewer_Label_MinSizeText;

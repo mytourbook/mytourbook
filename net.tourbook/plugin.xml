@@ -1281,7 +1281,7 @@
 
 	      
 	<!--
-		Photo 
+		Photo   Photo   Photo   Photo   Photo   Photo   Photo   Photo   Photo   Photo   
 	-->            
 
 		<category
@@ -1296,10 +1296,10 @@
 				name="%View_Name_PhotoDirectory"/>
 			<view
 				category="net.tourbook.category.photo"
-				class="net.tourbook.photo.merge.PhotoMergeView"
+				class="net.tourbook.photo.merge.PhotoMergeTourView"
 				icon="icons/photo-merge-view.png"
-				id="net.tourbook.photo.merge.PhotoMergeView.ID"
-				name="%View_Name_MergePhoto"/>
+				id="net.tourbook.photo.merge.PhotoMergeTourView.ID"
+				name="%View_Name_PhotoMergeTour"/>
 
       <category
             id="net.tourbook.category.system"

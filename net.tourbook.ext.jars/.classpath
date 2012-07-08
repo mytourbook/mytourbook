@@ -3,7 +3,7 @@
 	<classpathentry exported="true" kind="lib" path="org.apache.commons.imaging-0.97-r1335943-2012-05-09.jar"/>
 	<classpathentry exported="true" kind="lib" path="imgscalr-lib-4.2.jar" sourcepath="C:/E/java-resources/imgscalr/imgscalr-lib-4.2/imgscalr-lib-4.2-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="concurrentlinkedhashmap-lru-1.2.jar" sourcepath="C:/DAT/ws/com.googlecode.concurrentlinkedhashmap/src/java"/>
-	<classpathentry exported="true" kind="lib" path="joda-time-2.1.jar" sourcepath="C:/E/java-resources/joda-time/joda-time-2.1-dist/joda-time-2.1/joda-time-2.1-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="joda-time-2.1.jar" sourcepath="C:/E/java-resources/org.joda.time/joda-time-2.1-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="trove-3.0.2.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="jar:file:/C:/E/java-resources/trove/trove-3.0.2.zip!/3.0.2/javadocs"/>

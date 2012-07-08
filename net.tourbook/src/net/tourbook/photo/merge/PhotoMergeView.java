@@ -15,7 +15,11 @@
  *******************************************************************************/
 package net.tourbook.photo.merge;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.photo.gallery.MT20.GalleryMT20Item;
 import net.tourbook.util.PostSelectionProvider;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -160,4 +164,9 @@ public class PhotoMergeView extends ViewPart {
 
 	@Override
 	public void setFocus() {}
+
+	void updateUI(final Collection<GalleryMT20Item> selectedImages, final ArrayList<Long> selectedTours) {
+		// TODO Auto-generated method stub
+
+	}
 }

@@ -21,7 +21,7 @@ import net.tourbook.photo.gallery.MT20.IGalleryCustomData;
 import net.tourbook.ui.UI;
 
 /**
- * Wrapper for a photo image file, sorting and filtering attributes and the {@link Photo} itself.
+ * Wrapper for a photo image file, it's used to sort and filter {@link Photo}s.
  */
 public class PhotoWrapper implements IGalleryCustomData {
 

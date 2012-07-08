@@ -16,20 +16,11 @@
 package net.tourbook.photo;
 
 import java.io.File;
-import java.util.ArrayList;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.data.TourData;
 import net.tourbook.photo.manager.GallerySorting;
 import net.tourbook.photo.manager.ThumbnailStore;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.ITourEventListener;
-import net.tourbook.tour.SelectionDeletedTours;
-import net.tourbook.tour.SelectionTourData;
-import net.tourbook.tour.SelectionTourId;
-import net.tourbook.tour.SelectionTourIds;
-import net.tourbook.tour.TourEventId;
-import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.ViewerDetailForm;
 import net.tourbook.util.PostSelectionProvider;
@@ -45,14 +36,11 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Sash;
 import org.eclipse.ui.IPartListener2;
-import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 
@@ -77,22 +65,13 @@ public class PicDirView extends ViewPart {
 																								"PhotoDirectoryView");		//$NON-NLS-1$
 	private static final IPreferenceStore	_prefStore							= TourbookPlugin.getDefault()//
 																						.getPreferenceStore();
-	private boolean							_isPartVisible;
-
 	private IPartListener2					_partListener;
 	private IPropertyChangeListener			_prefChangeListener;
-	private ITourEventListener				_tourEventListener;
-	private ISelectionListener				_postSelectionListener;
 
 	private PostSelectionProvider			_postSelectionProvider;
-	private ISelection						_selectionWhenHidden;
-
-	private ArrayList<Long>					_selectedTourIds					= new ArrayList<Long>();
 
 	private PicDirFolder					_picDirFolder;
 	private PicDirImages					_picDirImages;
-
-	private boolean							_isShowFolderAndGallery;
 
 	private GallerySorting					_gallerySorting;
 
@@ -318,11 +297,7 @@ public class PicDirView extends ViewPart {
 
 		_partListener = new IPartListener2() {
 			@Override
-			public void partActivated(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == PicDirView.this) {
-//					_picDirImages.setFocus();
-				}
-			}
+			public void partActivated(final IWorkbenchPartReference partRef) {}
 
 			@Override
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
@@ -338,11 +313,7 @@ public class PicDirView extends ViewPart {
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
 			@Override
-			public void partHidden(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == PicDirView.this) {
-					_isPartVisible = false;
-				}
-			}
+			public void partHidden(final IWorkbenchPartReference partRef) {}
 
 			@Override
 			public void partInputChanged(final IWorkbenchPartReference partRef) {}
@@ -351,19 +322,7 @@ public class PicDirView extends ViewPart {
 			public void partOpened(final IWorkbenchPartReference partRef) {}
 
 			@Override
-			public void partVisible(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == PicDirView.this) {
-
-					_isPartVisible = true;
-
-					if (_selectionWhenHidden != null) {
-
-						onSelectionChanged(_selectionWhenHidden);
-
-						_selectionWhenHidden = null;
-					}
-				}
-			}
+			public void partVisible(final IWorkbenchPartReference partRef) {}
 		};
 		getViewSite().getPage().addPartListener(_partListener);
 	}
@@ -388,38 +347,6 @@ public class PicDirView extends ViewPart {
 		_prefStore.addPropertyChangeListener(_prefChangeListener);
 	}
 
-	/**
-	 * listen for events when a tour is selected
-	 */
-	private void addSelectionListener() {
-
-		_postSelectionListener = new ISelectionListener() {
-			@Override
-			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
-				onSelectionChanged(selection);
-			}
-		};
-		getSite().getPage().addPostSelectionListener(_postSelectionListener);
-	}
-
-	private void addTourEventListener() {
-
-		_tourEventListener = new ITourEventListener() {
-			@Override
-			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
-
-				if (part == PicDirView.this) {
-					return;
-				}
-
-				if (eventId == TourEventId.UPDATE_UI || eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
-					_selectedTourIds.clear();
-				}
-			}
-		};
-
-		TourManager.getInstance().addTourEventListener(_tourEventListener);
-	}
 
 	private void createActions() {
 
@@ -446,8 +373,6 @@ public class PicDirView extends ViewPart {
 
 		addPartListener();
 		addPrefListener();
-		addSelectionListener();
-		addTourEventListener();
 
 		// set selection provider
 		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider());
@@ -459,21 +384,7 @@ public class PicDirView extends ViewPart {
 		 */
 		parent.getDisplay().asyncExec(new Runnable() {
 			public void run() {
-
 				restoreState();
-
-				if (_selectedTourIds.size() == 0) {
-
-					// try to get selected tours
-
-					final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
-					if (selectedTours != null) {
-
-						for (final TourData tourData : selectedTours) {
-							_selectedTourIds.add(tourData.getTourId());
-						}
-					}
-				}
 			}
 		});
 	}
@@ -520,9 +431,6 @@ public class PicDirView extends ViewPart {
 	public void dispose() {
 
 		getViewSite().getPage().removePartListener(_partListener);
-		getViewSite().getPage().removePostSelectionListener(_postSelectionListener);
-
-		TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
 		_prefStore.removePropertyChangeListener(_prefChangeListener);
 
@@ -568,10 +476,6 @@ public class PicDirView extends ViewPart {
 		_picDirImages.fillViewMenu(menuMgr);
 	}
 
-	ArrayList<Long> getSelectedTours() {
-		return _selectedTourIds;
-	}
-
 	private void onPartClose() {
 
 		// close images first, this will stop loading images
@@ -580,58 +484,6 @@ public class PicDirView extends ViewPart {
 		ThumbnailStore.cleanupStoreFiles(false, false);
 
 		saveState();
-	}
-
-	private void onSelectionChanged(final ISelection selection) {
-
-		if (_isPartVisible == false) {
-
-			if (selection instanceof SelectionTourData
-					|| selection instanceof SelectionTourId
-					|| selection instanceof SelectionTourIds) {
-
-				// keep only selected tours
-				_selectionWhenHidden = selection;
-			}
-			return;
-		}
-
-		if (selection instanceof SelectionTourData) {
-
-			_selectedTourIds.clear();
-
-			final SelectionTourData selectionTourData = (SelectionTourData) selection;
-			final TourData tourData = selectionTourData.getTourData();
-
-			if (tourData != null) {
-				_selectedTourIds.add(tourData.getTourId());
-			}
-
-		} else if (selection instanceof SelectionTourId) {
-
-			_selectedTourIds.clear();
-
-			final SelectionTourId tourIdSelection = (SelectionTourId) selection;
-			final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
-
-			if (tourData != null) {
-				_selectedTourIds.add(tourData.getTourId());
-			}
-
-		} else if (selection instanceof SelectionTourIds) {
-
-			// paint all selected tours
-
-			final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
-
-			_selectedTourIds.clear();
-			_selectedTourIds.addAll(tourIds);
-
-		} else if (selection instanceof SelectionDeletedTours) {
-
-			_selectedTourIds.clear();
-		}
-
 	}
 
 	private void restoreState() {
@@ -738,18 +590,10 @@ public class PicDirView extends ViewPart {
 
 	@Override
 	public void setFocus() {
-
-//		if (_isShowFolderAndGallery) {
-//			_picDirFolder.getTree().setFocus();
-//		} else {
-//		_picDirImages.setFocus();
-//		}
+//		_picDirFolder.getTree().setFocus();
 	}
 
 	void setMaximizedControl(final boolean isShowFolderAndGallery) {
-
-		_isShowFolderAndGallery = isShowFolderAndGallery;
-
 		_containerMasterDetail.setMaximizedControl(isShowFolderAndGallery ? null : _containerImages);
 	}
 
