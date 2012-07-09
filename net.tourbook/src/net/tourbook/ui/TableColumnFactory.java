@@ -833,7 +833,7 @@ public abstract class TableColumnFactory {
 			colDef.setColumnLabel(Messages.ColumnFactory_time_label);
 			colDef.setColumnHeader(Messages.ColumnFactory_time);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_time_tooltip);
-			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(13));
 
 			return colDef;
 		};

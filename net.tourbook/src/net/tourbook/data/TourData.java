@@ -161,6 +161,19 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	// ############################################# DATE #############################################
 
+//	+ "	TourStartTime				BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
+//	+ "	TourEndTime					BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
+
+	/**
+	 * Tour start time
+	 */
+	private long											tourStartTime;
+
+	/**
+	 * Tour end time
+	 */
+	private long											tourEndTime;
+
 	/**
 	 * year of tour start
 	 */

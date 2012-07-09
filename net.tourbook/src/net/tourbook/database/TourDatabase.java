@@ -90,8 +90,9 @@ public class TourDatabase {
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int						TOURBOOK_DB_VERSION							= 21;
+	private static final int						TOURBOOK_DB_VERSION							= 22;
 
+//	private static final int						TOURBOOK_DB_VERSION							= 22;	// 12.9.0   ???
 //	private static final int						TOURBOOK_DB_VERSION							= 21;	// 12.1.1
 //	private static final int						TOURBOOK_DB_VERSION							= 20;	// 12.1
 //	private static final int						TOURBOOK_DB_VERSION							= 19;	// 11.8
@@ -2300,6 +2301,13 @@ public class TourDatabase {
 				//
 				// version 21 end ---------
 
+				// version 22 start  -  12.9.0
+				//
+				+ "	TourStartTime				BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
+				+ "	TourEndTime					BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
+				//
+				// version 22 end ---------
+
 				+ "	serieData					BLOB 							\n" //$NON-NLS-1$
 
 				+ ")"; //														//$NON-NLS-1$
@@ -3257,6 +3265,18 @@ public class TourDatabase {
 				currentDbVersion = newVersion = updateDbDesign_020_to_021(conn, monitor);
 
 				updateDbVersionNumber(conn, newVersion);
+			}
+
+			/*
+			 * 22
+			 */
+			if (currentDbVersion == 21) {
+
+				currentDbVersion = newVersion = updateDbDesign_021_to_022(conn, monitor);
+
+				updateDbVersionNumber(conn, newVersion);
+
+				updateDbDesign_021_to_022_PostUpdate(conn, monitor);
 			}
 
 		} catch (final SQLException e) {
@@ -4263,6 +4283,121 @@ public class TourDatabase {
 		logDbUpdateEnd(newDbVersion);
 
 		return newDbVersion;
+	}
+
+	private int updateDbDesign_021_to_022(final Connection conn, final IProgressMonitor monitor) throws SQLException {
+
+		final int newDbVersion = 22;
+
+		logDbUpdateStart(newDbVersion);
+
+		if (monitor != null) {
+			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, newDbVersion));
+		}
+
+		final Statement stmt = conn.createStatement();
+		{
+//			TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA
+//			//
+//			// version 22 start  -  12.9.0
+//			//
+//			+ "	TourStartTime				BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
+//			+ "	TourEndTime					BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
+//			//
+//			// version 22 end ---------
+//			//
+//			TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA
+
+			String sql;
+
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN TourStartTime		BIGINT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+			exec(stmt, sql);
+
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN TourEndTime		BIGINT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+			exec(stmt, sql);
+		}
+		stmt.close();
+
+		logDbUpdateEnd(newDbVersion);
+
+		return newDbVersion;
+	}
+
+	/**
+	 * Set tour start/end time from the tour date and duration
+	 * 
+	 * @param conn
+	 * @param monitor
+	 * @throws SQLException
+	 */
+	private void updateDbDesign_021_to_022_PostUpdate(final Connection conn, final IProgressMonitor monitor)
+			throws SQLException {
+
+		final PreparedStatement stmtSelect = conn.prepareStatement(//
+				//
+				"SELECT" //									//$NON-NLS-1$
+							//
+						+ " StartYear," // 					// 1 //$NON-NLS-1$
+						+ " StartMonth," // 				// 2 //$NON-NLS-1$
+						+ " StartDay," // 					// 3 //$NON-NLS-1$
+						+ " StartHour," // 					// 4 //$NON-NLS-1$
+						+ " StartMinute," // 				// 5 //$NON-NLS-1$
+						+ " StartSecond," // 				// 6 //$NON-NLS-1$
+						+ " tourRecordingTime" // 			// 7 //$NON-NLS-1$
+						//
+						+ " FROM " + TABLE_TOUR_DATA //		//$NON-NLS-1$
+						+ " WHERE TourId=?" //				$NON-NLS-1$ //$NON-NLS-1$
+				);
+
+		final PreparedStatement stmtUpdate = conn.prepareStatement(//
+				//
+				"UPDATE " + TABLE_TOUR_DATA //				//$NON-NLS-1$
+						//
+						+ " SET" //							//$NON-NLS-1$
+						//
+						+ " TourStartTime=?," //			// 1 //$NON-NLS-1$
+						+ " TourEndTime=?" //			// 2 //$NON-NLS-1$
+						//
+						+ " WHERE tourId=?"); //			// 3 //$NON-NLS-1$
+
+		int tourIndex = 1;
+		final ArrayList<Long> tourList = getAllTourIds();
+
+		// loop: all tours
+		for (final Long tourId : tourList) {
+
+			if (monitor != null) {
+				monitor.subTask(NLS.bind(//
+						Messages.Tour_Database_PostUpdate021_SetTourStartEndTime,
+						new Object[] { tourIndex++, tourList.size() }));
+			}
+
+			// get tour date for 1 tour
+			stmtSelect.setLong(1, tourId);
+			final ResultSet result = stmtSelect.executeQuery();
+
+			while (result.next()) {
+
+				// get date from database
+				final short dbYear = result.getShort(1);
+				final short dbMonth = result.getShort(2);
+				final short dbDay = result.getShort(3);
+				final short dbHour = result.getShort(4);
+				final short dbMinute = result.getShort(5);
+				final short dbSecond = result.getShort(6);
+
+				final int recordingTime = result.getInt(7);
+
+				final DateTime dtStart = new DateTime(dbYear, dbMonth, dbDay, dbHour, dbMinute, dbSecond);
+				final DateTime dtEnd = dtStart.plusSeconds(recordingTime);
+
+				// update tour start/end in the database
+				stmtUpdate.setLong(1, dtStart.getMillis());
+				stmtUpdate.setLong(2, dtEnd.getMillis());
+				stmtUpdate.setLong(3, tourId);
+				stmtUpdate.executeUpdate();
+			}
+		}
 	}
 
 	private void updateDbVersionNumber(final Connection conn, final int newVersion) throws SQLException {

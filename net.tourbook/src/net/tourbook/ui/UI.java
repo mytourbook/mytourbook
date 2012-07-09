@@ -1268,8 +1268,6 @@ public class UI {
 
 			e = e.getNextException();
 		}
-
-		StatusUtil.log(e);
 	}
 
 	public static void showSQLException(final SQLException e, final String sqlStatement) {

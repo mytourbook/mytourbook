@@ -185,7 +185,7 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 	 */
 	private Comparator<PhotoWrapper>							_currentComparator;
 	private GallerySorting										_currentSorting;
-	private GallerySorting										_initialSorting;
+//	private GallerySorting										_initialSorting;
 
 	private PicDirView											_picDirView;
 
@@ -1115,36 +1115,45 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 			}
 		}
 
-		ArrayList<PhotoWrapper> photoList;
+		PhotoWrapper[] sortedPhotoWrapper;
+
 		if (isGetAllImages) {
 
-			photoList = new ArrayList<PhotoWrapper>(_sortedAndFilteredPhotoWrapper.length);
+			// get all filtered photos
 
-			for (final PhotoWrapper photoWrapper : _sortedAndFilteredPhotoWrapper) {
-				photoList.add(photoWrapper);
-			}
+			sortedPhotoWrapper = _sortedAndFilteredPhotoWrapper.clone();
 
 		} else {
 
-			/*
-			 * convert gallery selection into a list with photos
-			 */
+			// get all selected photos
 
 			final Collection<GalleryMT20Item> galleryItems = _gallery.getSelection();
 
-			photoList = new ArrayList<PhotoWrapper>(galleryItems.size());
+			sortedPhotoWrapper = new PhotoWrapper[galleryItems.size()];
+
+			int itemIndex = 0;
 
 			for (final GalleryMT20Item item : galleryItems) {
 
 				final IGalleryCustomData customData = item.customData;
 
 				if (customData instanceof PhotoWrapper) {
-					photoList.add((PhotoWrapper) customData);
+					sortedPhotoWrapper[itemIndex++] = (PhotoWrapper) customData;
 				}
 			}
+
 		}
 
-		return photoList;
+		// sort photos by date/time
+		Arrays.sort(sortedPhotoWrapper, SORT_BY_FILE_DATE);
+
+		final ArrayList<PhotoWrapper> sortedPhotos = new ArrayList<PhotoWrapper>(sortedPhotoWrapper.length);
+
+		for (final PhotoWrapper photoWrapper : sortedPhotoWrapper) {
+			sortedPhotos.add(photoWrapper);
+		}
+
+		return sortedPhotos;
 	}
 
 	/**
@@ -2712,7 +2721,7 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 				_currentComparator = getCurrentComparator();
 
 				// keep initial sorting algorithm
-				_initialSorting = _currentSorting;
+//				_initialSorting = _currentSorting;
 
 				Arrays.sort(newPhotoWrapper, _currentComparator);
 			}

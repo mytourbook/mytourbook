@@ -16,9 +16,9 @@
 package net.tourbook.photo.merge;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
@@ -29,9 +29,11 @@ import net.tourbook.photo.Messages;
 import net.tourbook.photo.manager.PhotoWrapper;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionModifyColumns;
@@ -67,8 +69,10 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -93,7 +97,7 @@ public class PhotoMergeTourView extends ViewPart implements ITourProvider, ITour
 	private final IPreferenceStore	_prefStore		= TourbookPlugin.getDefault().getPreferenceStore();
 
 	private final IDialogSettings	_state			= TourbookPlugin.getDefault().getDialogSettingsSection(ID);
-	private ArrayList<MergedTour>	_tourList		= new ArrayList<MergedTour>();
+	private ArrayList<MergeTour>	_tourList		= new ArrayList<MergeTour>();
 
 	private PostSelectionProvider	_postSelectionProvider;
 
@@ -145,20 +149,20 @@ public class PhotoMergeTourView extends ViewPart implements ITourProvider, ITour
 		@Override
 		public int compare(final Viewer viewer, final Object e1, final Object e2) {
 
-			final MergedTour wp1 = (MergedTour) e1;
-			final MergedTour wp2 = (MergedTour) e2;
+			final MergeTour mt1 = (MergeTour) e1;
+			final MergeTour mt2 = (MergeTour) e2;
 
 			/*
 			 * sort by time
 			 */
-			final long wp1Time = wp1.time;
-			final long wp2Time = wp2.time;
+			final long mt1Time = mt1.tourStartTime;
+			final long mt2Time = mt2.tourStartTime;
 
-			if (wp1Time != 0 && wp2Time != 0) {
-				return wp1Time > wp2Time ? 1 : -1;
+			if (mt1Time != 0 && mt2Time != 0) {
+				return mt1Time > mt2Time ? 1 : -1;
 			}
 
-			return wp1Time != 0 ? 1 : -1;
+			return mt1Time != 0 ? 1 : -1;
 		}
 	}
 
@@ -171,12 +175,6 @@ public class PhotoMergeTourView extends ViewPart implements ITourProvider, ITour
 		}
 
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
-	}
-
-	private class MergedTour {
-
-		private long	time;
-
 	}
 
 	public PhotoMergeTourView() {
@@ -455,7 +453,7 @@ public class PhotoMergeTourView extends ViewPart implements ITourProvider, ITour
 			public void selectionChanged(final SelectionChangedEvent event) {
 				final StructuredSelection selection = (StructuredSelection) event.getSelection();
 				if (selection != null) {
-					fireWaypointPosition(selection);
+					onSelectTour(selection);
 				}
 			}
 		});
@@ -481,14 +479,16 @@ public class PhotoMergeTourView extends ViewPart implements ITourProvider, ITour
 
 	private void defineAllColumns(final Composite parent) {
 
-		defineColumnTime();
-		defineColumnDate();
+		defineColumn_TourTypeImage();
+		defineColumn_TourStartDate();
+		defineColumn_TourStartTime();
+		defineColumn_TourTypeText();
 	}
 
 	/**
-	 * column: date/time
+	 * column: tour start date
 	 */
-	private void defineColumnDate() {
+	private void defineColumn_TourStartDate() {
 
 		final ColumnDefinition colDef = TableColumnFactory.TOUR_DATE.createColumn(_columnManager, _pc);
 		colDef.setCanModifyVisibility(false);
@@ -497,8 +497,8 @@ public class PhotoMergeTourView extends ViewPart implements ITourProvider, ITour
 			@Override
 			public void update(final ViewerCell cell) {
 
-				final MergedTour mergedTour = (MergedTour) cell.getElement();
-				final long time = mergedTour.time;
+				final MergeTour mergedTour = (MergeTour) cell.getElement();
+				final long time = mergedTour.tourStartTime;
 
 				cell.setText(time == 0 ? UI.EMPTY_STRING : _dateFormatter.print(time));
 			}
@@ -506,21 +506,67 @@ public class PhotoMergeTourView extends ViewPart implements ITourProvider, ITour
 	}
 
 	/**
-	 * column: time
+	 * column: tour start time
 	 */
-	private void defineColumnTime() {
+	private void defineColumn_TourStartTime() {
 
-		final ColumnDefinition colDef = TableColumnFactory.TOUR_TIME.createColumn(_columnManager, _pc);
+		final ColumnDefinition colDef = TableColumnFactory.TOUR_START_TIME.createColumn(_columnManager, _pc);
 		colDef.setCanModifyVisibility(false);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 
-				final MergedTour mergedTour = (MergedTour) cell.getElement();
-				final long time = mergedTour.time;
+				final MergeTour mergedTour = (MergeTour) cell.getElement();
+				final long time = mergedTour.tourStartTime;
 
 				cell.setText(time == 0 ? UI.EMPTY_STRING : _timeFormatter.print(time));
+			}
+		});
+	}
+
+	/**
+	 * column: tour type image
+	 */
+	private void defineColumn_TourTypeImage() {
+
+		final ColumnDefinition colDef = TableColumnFactory.TOUR_TYPE.createColumn(_columnManager, _pc);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final Object element = cell.getElement();
+				if (element instanceof MergeTour) {
+
+					final long tourTypeId = ((MergeTour) element).tourTypeId;
+					final Image tourTypeImage = UI.getInstance().getTourTypeImage(tourTypeId);
+
+					/*
+					 * when a tour type image is modified, it will keep the same image resource only
+					 * the content is modified but in the rawDataView the modified image is not
+					 * displayed compared with the tourBookView which displays the correct image
+					 */
+					cell.setImage(tourTypeImage);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: tour type text
+	 */
+	private void defineColumn_TourTypeText() {
+
+		final ColumnDefinition colDef = TableColumnFactory.TOUR_TYPE_TEXT.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final Object element = cell.getElement();
+				if (element instanceof MergeTour) {
+
+					final long tourTypeId = ((MergeTour) element).tourTypeId;
+					cell.setText(UI.getInstance().getTourTypeLabel(tourTypeId));
+				}
 			}
 		});
 	}
@@ -569,13 +615,6 @@ public class PhotoMergeTourView extends ViewPart implements ITourProvider, ITour
 		menuMgr.add(_actionModifyColumns);
 	}
 
-	/**
-	 * fire waypoint position
-	 */
-	private void fireWaypointPosition(final StructuredSelection selection) {
-		_postSelectionProvider.setSelection(selection);
-	}
-
 	@Override
 	public ColumnManager getColumnManager() {
 		return _columnManager;
@@ -591,53 +630,75 @@ public class PhotoMergeTourView extends ViewPart implements ITourProvider, ITour
 		return _tourViewer;
 	}
 
-	private ArrayList<Long> loadTours() {
+	private void loadToursFromDb(final ArrayList<PhotoWrapper> selectedPhotos) {
+
+		BusyIndicator.showWhile(_pageBook.getDisplay(), new Runnable() {
+			public void run() {
+				loadToursFromDb_Runnable(selectedPhotos);
+			}
+		});
+	}
+
+	private void loadToursFromDb_Runnable(final ArrayList<PhotoWrapper> selectedPhotos) {
 
 		final DateTime dtStart = new DateTime(_photoStartDate).minusDays(1);
 		final DateTime dtEnd = new DateTime(_photoEndDate).plusDays(1);
+
+		final SQLFilter sqlFilter = new SQLFilter();
 
 		final String sqlString = "" //
 
 				+ "SELECT " //$NON-NLS-1$
 
-				+ " TourId," //					1 //$NON-NLS-1$
-				+ " StartYear," //				2 //$NON-NLS-1$
-				+ " StartMonth," //				3 //$NON-NLS-1$
-				+ " StartDay," //				4 //$NON-NLS-1$
-				+ " StartHour," //				5 //$NON-NLS-1$
-				+ " StartMinute," //			6 //$NON-NLS-1$
-				+ " TourRecordingTime" //		7 //$NON-NLS-1$
+				+ " TourId," //						1 //$NON-NLS-1$
+				+ " TourStartTime," //				2 //$NON-NLS-1$
+				+ " TourEndTime," //				3 //$NON-NLS-1$
+				+ " TourType_TypeId" //			4 //$NON-NLS-1$
 
 				+ UI.NEW_LINE
 
 				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE) //$NON-NLS-1$
 
 				+ " WHERE"
-				+ (" StartYear >= " + dtStart.getYear())
-				+ (" AND StartMonth >= " + dtStart.getMonthOfYear())
-				+ (" AND StartDay >= " + dtStart.getDayOfMonth())
-				+ (" AND StartHour >= " + dtStart.getHourOfDay())
-				+ (" AND StartMinute >= " + dtStart.getMinuteOfHour())
-				+ ""
+				+ (" TourStartTime >= " + dtStart.getMillis())
+				+ (" AND TourEndTime <= " + dtEnd.getMillis())
+				+ sqlFilter.getWhereClause()
 
 				+ UI.NEW_LINE
 
-				+ (" ORDER BY StartYear, StartMonth, StartDay, StartHour, StartMinute");
+				+ (" ORDER BY TourStartTime");
 
-		final ArrayList<Long> tourIds = new ArrayList<Long>();
+		final ArrayList<MergeTour> allMergeTours = new ArrayList<MergeTour>();
 
 		Connection conn = null;
-		Statement stmt = null;
+		PreparedStatement stmt = null;
 
 		try {
 
-			conn = TourDatabase.getInstance().getConnection();
-			stmt = conn.createStatement();
+//			conn = TourDatabase.getInstance().getConnection();
+//			stmt = conn.createStatement();
 
-			final ResultSet result = stmt.executeQuery(sqlString);
+			conn = TourDatabase.getInstance().getConnection();
+			stmt = conn.prepareStatement(sqlString);
+			sqlFilter.setParameters(stmt, 1);
+
+			final ResultSet result = stmt.executeQuery();
 
 			while (result.next()) {
-				tourIds.add(result.getLong(1));
+
+				final MergeTour mergeTour = new MergeTour();
+
+				mergeTour.tourId = result.getLong(1);
+
+				mergeTour.setTourStartTime(result.getLong(2));
+				mergeTour.setTourEndTime(result.getLong(3));
+
+				final Object dbTourTypeId = result.getObject(4);
+				mergeTour.tourTypeId = (dbTourTypeId == null ? //
+						TourDatabase.ENTITY_IS_NOT_SAVED
+						: (Long) dbTourTypeId);
+
+				allMergeTours.add(mergeTour);
 			}
 
 		} catch (final SQLException e) {
@@ -645,14 +706,53 @@ public class PhotoMergeTourView extends ViewPart implements ITourProvider, ITour
 		} finally {
 			Util.sqlClose(stmt);
 			TourDatabase.closeConnection(conn);
-
 		}
 
-		return tourIds;
+		/*
+		 * remove all tours which do not contain any photos
+		 */
+		final ArrayList<MergeTour> photoMergeTours = new ArrayList<MergeTour>();
+
+		for (final MergeTour mergeTour : allMergeTours) {
+
+			final long tourStart = mergeTour.tourStartTime;
+			final long tourEnd = mergeTour.tourEndTime;
+
+			for (final PhotoWrapper photoWrapper : selectedPhotos) {
+
+				final long imageTime = photoWrapper.imageSortingTime;
+
+				if (imageTime >= tourStart && imageTime <= tourEnd) {
+
+					// current tour contains current photo
+
+					photoMergeTours.add(mergeTour);
+
+					break;
+				}
+			}
+		}
+
+		_tourList = photoMergeTours;
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
 
+	}
+
+	/**
+	 * fire selected tour
+	 */
+	private void onSelectTour(final StructuredSelection selection) {
+
+		final Object firstElement = selection.getFirstElement();
+		if (firstElement instanceof MergeTour) {
+
+			final MergeTour mergeTour = (MergeTour) firstElement;
+			final ISelection tourSelection = new SelectionTourId(mergeTour.tourId);
+
+			_postSelectionProvider.setSelection(tourSelection);
+		}
 	}
 
 	@Override
@@ -708,6 +808,9 @@ public class PhotoMergeTourView extends ViewPart implements ITourProvider, ITour
 
 		_pageBook.showPage(_pageViewer);
 
+		/*
+		 * get photo start/end date
+		 */
 		_photoStartDate = selectedPhotos.get(0).imageSortingTime;
 		_photoEndDate = _photoStartDate;
 
@@ -722,6 +825,9 @@ public class PhotoMergeTourView extends ViewPart implements ITourProvider, ITour
 			}
 		}
 
+		/*
+		 * update status line
+		 */
 		if (_photoStartDate == _photoEndDate) {
 
 			_labelPhotoDates.setText(NLS.bind(
@@ -735,9 +841,11 @@ public class PhotoMergeTourView extends ViewPart implements ITourProvider, ITour
 					_dtFormatter.print(_photoStartDate),
 					_dtFormatter.print(_photoEndDate)));
 		}
-
+		// ensure text is wrapped when necessary
 		_viewerContainer.layout();
 
-		loadTours();
+		loadToursFromDb(selectedPhotos);
+
+		_tourViewer.setInput(new Object[0]);
 	}
 }

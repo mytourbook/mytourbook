@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,8 +23,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourPerson;
 
 /**
- * The {@link SQLFilter} provides a where clause and sets the statement parameters for the selected
- * person and tour type
+ * The filter provides a sql WHERE which contains the selected person and tour type.
  */
 public class SQLFilter {
 
@@ -79,7 +78,7 @@ public class SQLFilter {
 	 * 
 	 * @param statement
 	 * @param startIndex
-	 *            the first parameter is 1
+	 *            Sets the parameter start index, the first parameter is 1
 	 * @throws SQLException
 	 */
 	public void setParameters(final PreparedStatement statement, final int startIndex) throws SQLException {
