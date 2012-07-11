@@ -24,7 +24,6 @@ public class Messages extends NLS {
 	public static String		Action_configure_columns;
 	public static String		Action_configure_columns_tooltip;
 
-
 	public static String		ColumnFactory_altitude_computed_difference_tooltip;
 	public static String		ColumnFactory_altitude_difference_label;
 	public static String		ColumnFactory_altitude_difference_tooltip;
@@ -178,6 +177,8 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_Diff_Header;
 	public static String		ColumnFactory_Id_Label;
 	public static String		ColumnFactory_Id_Tooltip;
+	public static String		ColumnFactory_NumberOfPhotos_Label;
+	public static String		ColumnFactory_NumberOfPhotos_Tooltip;
 	public static String		ColumnFactory_restpulse_label;
 	public static String		ColumnFactory_restpulse;
 	public static String		ColumnFactory_restpulse_tooltip;
@@ -196,8 +197,29 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_Tour_WeekDay_Tooltip;
 	public static String		ColumnFactory_TourDistanceDiff_Label;
 	public static String		ColumnFactory_TourDistanceDiff_Tooltip;
+	public static String	ColumnFactory_TourDurationTime_Header;
+
+	public static String	ColumnFactory_TourDurationTime_Label;
+
+	public static String	ColumnFactory_TourDurationTime_Tooltip;
+
+	public static String		ColumnFactory_TourEndDate_Header;
+	public static String		ColumnFactory_TourEndDate_Label;
+	public static String		ColumnFactory_TourEndDate_Tooltip;
+	public static String		ColumnFactory_TourEndTime_Header;
+	public static String		ColumnFactory_TourEndTime_Label;
+	public static String		ColumnFactory_TourEndTime_Tooltip;
 	public static String		ColumnFactory_TourPerson;
 	public static String		ColumnFactory_TourPerson_Tooltip;
+	public static String		ColumnFactory_TourStartDate_Header;
+	public static String		ColumnFactory_TourStartDate_Label;
+	public static String		ColumnFactory_TourStartDate_Tooltip;
+	public static String	ColumnFactory_TourStartTime_Header;
+
+	public static String	ColumnFactory_TourStartTime_Label;
+
+	public static String	ColumnFactory_TourStartTime_Tooltip;
+
 	public static String		ColumnFactory_TourTimeDiff_Header;
 	public static String		ColumnFactory_TourTimeDiff_Label;
 	public static String		ColumnFactory_TourTimeDiff_Tooltip;

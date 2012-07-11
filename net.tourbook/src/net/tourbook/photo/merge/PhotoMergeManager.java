@@ -42,7 +42,7 @@ public class PhotoMergeManager {
 				workbench.showPerspective(PerspectiveFactoryPhoto.PERSPECTIVE_ID, window);
 
 				// show photo merge tour view
-				final PhotoMergeTourView view = (PhotoMergeTourView) Util.showView(PhotoMergeTourView.ID);
+				final PhotosAndToursView view = (PhotosAndToursView) Util.showView(PhotosAndToursView.ID);
 
 				if (view != null) {
 					view.updateUI(selectedPhotos);

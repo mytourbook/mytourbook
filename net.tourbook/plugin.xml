@@ -1296,10 +1296,16 @@
 				name="%View_Name_PhotoDirectory"/>
 			<view
 				category="net.tourbook.category.photo"
-				class="net.tourbook.photo.merge.PhotoMergeTourView"
-				icon="icons/photo-merge-view.png"
-				id="net.tourbook.photo.merge.PhotoMergeTourView.ID"
-				name="%View_Name_PhotoMergeTour"/>
+				class="net.tourbook.photo.merge.PhotosAndToursView"
+				icon="icons/photo-and-tours-view.png"
+				id="net.tourbook.photo.merge.PhotosAndToursView.ID"
+				name="%View_Name_PhotosAndTours"/>
+			<view
+				category="net.tourbook.category.photo"
+				class="net.tourbook.photo.TourPhotosView"
+				icon="icons/photo-tour-photos.png"
+				id="net.tourbook.photo.merge.TourPhotosView.ID"
+				name="%View_Name_PhotoTourPhotos"/>
 
       <category
             id="net.tourbook.category.system"

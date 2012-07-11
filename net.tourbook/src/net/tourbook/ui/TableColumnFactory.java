@@ -21,7 +21,6 @@ import net.tourbook.data.TourData;
 import net.tourbook.util.ColumnDefinition;
 import net.tourbook.util.ColumnManager;
 import net.tourbook.util.TableColumnDefinition;
-import net.tourbook.util.TreeColumnDefinition;
 
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.viewers.CellLabelProvider;
@@ -610,6 +609,22 @@ public abstract class TableColumnFactory {
 		};
 	};
 
+	public static final TableColumnFactory NUMBER_OF_PHOTOS = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "numberOfPhotos", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_NumberOfPhotos_Label);
+			colDef.setColumnHeader(Messages.ColumnFactory_NumberOfPhotos_Label);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_NumberOfPhotos_Tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
+
+			return colDef;
+		};
+	};
+
 	public static final TableColumnFactory PACE = new TableColumnFactory() {
 		
 		@Override
@@ -735,7 +750,7 @@ public abstract class TableColumnFactory {
 		@Override
 		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
-			String header = Messages.ColumnFactory_Diff_Header
+			final String header = Messages.ColumnFactory_Diff_Header
 					+ UI.SPACE
 					+ UI.UNIT_LABEL_SPEED;
 			
@@ -823,16 +838,77 @@ public abstract class TableColumnFactory {
 		};
 	};
 
+	public static final TableColumnFactory TOUR_DURATION_TIME = new TableColumnFactory() {
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "TourDurationTime", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_TourDurationTime_Label);
+			colDef.setColumnHeader(Messages.ColumnFactory_TourDurationTime_Header);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_TourDurationTime_Tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
+			
+			return colDef;
+		};
+	};
+	
+	public static final TableColumnFactory TOUR_END_DATE = new TableColumnFactory() {
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "TourEndDate", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_TourEndDate_Label);
+			colDef.setColumnHeader(Messages.ColumnFactory_TourEndDate_Header);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_TourEndDate_Tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
+			
+			return colDef;
+		};
+	};
+	
+	public static final TableColumnFactory TOUR_END_TIME = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "TourEndTime", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_TourEndTime_Label);
+			colDef.setColumnHeader(Messages.ColumnFactory_TourEndTime_Header);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_TourEndTime_Tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(13));
+			
+			return colDef;
+		};
+	};
+	
+	public static final TableColumnFactory TOUR_START_DATE = new TableColumnFactory() {
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "TourStartDate", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_TourStartDate_Label);
+			colDef.setColumnHeader(Messages.ColumnFactory_TourStartDate_Header);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_TourStartDate_Tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
+			
+			return colDef;
+		};
+	};
+	
 	public static final TableColumnFactory TOUR_START_TIME = new TableColumnFactory() {
 		
 		@Override
 		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
-			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "startTime", SWT.TRAIL); //$NON-NLS-1$
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "TourStartTime", SWT.TRAIL); //$NON-NLS-1$
 		
-			colDef.setColumnLabel(Messages.ColumnFactory_time_label);
-			colDef.setColumnHeader(Messages.ColumnFactory_time);
-			colDef.setColumnToolTipText(Messages.ColumnFactory_time_tooltip);
+			colDef.setColumnLabel(Messages.ColumnFactory_TourStartTime_Label);
+			colDef.setColumnHeader(Messages.ColumnFactory_TourStartTime_Header);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_TourStartTime_Tooltip);
 			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(13));
 
 			return colDef;
@@ -895,7 +971,7 @@ public abstract class TableColumnFactory {
 		@Override
 		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
-			String header = Messages.ColumnFactory_Diff_Header
+			final String header = Messages.ColumnFactory_Diff_Header
 					+ UI.SPACE
 					+ UI.UNIT_LABEL_DISTANCE;
 

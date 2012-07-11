@@ -16,24 +16,65 @@
 package net.tourbook.photo.merge;
 
 import org.joda.time.DateTime;
+import org.joda.time.Period;
+import org.joda.time.PeriodType;
 
 public class MergeTour {
 
-	long		tourId;
-	long		tourTypeId;
+	private static PeriodType	_tourPeriodTemplate	= PeriodType.yearMonthDayTime()
+													// hide these components
+															.withMonthsRemoved()
+															.withMinutesRemoved()
+															.withSecondsRemoved()
+															.withMillisRemoved();
 
-	long		tourStartTime;
-	long		tourEndTime;
+	boolean						isDummyTour;
 
-	DateTime	tourStartDateTime;
-	DateTime	tourEndDateTime;
+	long						tourId				= Long.MIN_VALUE;
+	long						tourTypeId			= -1;
 
-	void setTourEndTime(final long time) {
+	long						tourStartTime;
+
+	/**
+	 * Tour end time is {@link Long#MAX_VALUE} when not yet set.
+	 */
+	long						tourEndTime			= Long.MAX_VALUE;
+
+	DateTime					tourStartDateTime;
+	DateTime					tourEndDateTime;
+	Period						tourPeriod;
+
+	int							numberOfPhotos;
+
+	/**
+	 * Constructor for a real tour.
+	 */
+	MergeTour() {}
+
+	/**
+	 * Constructor for a dummy tour.
+	 * 
+	 * @param notUsed
+	 */
+	MergeTour(final Object notUsed) {
+		isDummyTour = true;
+	}
+
+	void setTourEndTime(long time) {
+
+		// ensure that a time difference of at least 1 second is set for a tour
+		if (time < (tourStartTime + 1000)) {
+			time = tourStartTime + 1000;
+		}
+
 		tourEndTime = time;
 		tourEndDateTime = new DateTime(time);
+
+		tourPeriod = new Period(tourStartTime, tourEndTime, _tourPeriodTemplate);
 	}
 
 	void setTourStartTime(final long time) {
+
 		tourStartTime = time;
 		tourStartDateTime = new DateTime(time);
 	}
