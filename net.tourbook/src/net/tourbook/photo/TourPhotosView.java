@@ -163,7 +163,7 @@ public class TourPhotosView extends ViewPart {
 		{
 			final Label label = new Label(container, SWT.NONE);
 			GridDataFactory.fillDefaults().applyTo(label);
-			label.setText("it works!!!");
+			label.setText("it works!!! with also in ireland2");
 		}
 	}
 
