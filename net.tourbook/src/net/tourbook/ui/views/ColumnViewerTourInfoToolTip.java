@@ -17,14 +17,14 @@ package net.tourbook.ui.views;
 
 import java.util.ArrayList;
 
+import net.tourbook.common.util.ITourToolTipProvider;
+import net.tourbook.common.util.ToolTip;
+import net.tourbook.common.util.TourToolTip;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourInfoUI;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.UI;
-import net.tourbook.util.ITourToolTipProvider;
-import net.tourbook.util.ToolTip;
-import net.tourbook.util.TourToolTip;
 
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;

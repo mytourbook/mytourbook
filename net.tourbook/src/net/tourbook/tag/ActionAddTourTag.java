@@ -23,15 +23,15 @@ import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.util.AdvancedMenuForActions;
+import net.tourbook.common.util.IAdvancedMenuForActions;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.action.ActionOpenPrefDialog;
-import net.tourbook.util.AdvancedMenuForActions;
-import net.tourbook.util.IAdvancedMenuForActions;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;

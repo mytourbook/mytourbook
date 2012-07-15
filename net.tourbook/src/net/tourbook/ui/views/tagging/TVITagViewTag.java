@@ -26,11 +26,11 @@ import java.util.HashMap;
 
 import javax.persistence.EntityManager;
 
+import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.SQLFilter;
-import net.tourbook.ui.TreeViewerItem;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.viewers.TreeViewer;

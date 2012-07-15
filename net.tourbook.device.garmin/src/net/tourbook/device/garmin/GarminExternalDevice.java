@@ -36,11 +36,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TimeZone;
 
+import net.tourbook.common.util.MtMath;
 import net.tourbook.ext.velocity.VelocityService;
 import net.tourbook.importdata.DataTransferWizard;
 import net.tourbook.importdata.ExternalDevice;
 import net.tourbook.importdata.RawDataManager;
-import net.tourbook.util.MtMath;
 
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;

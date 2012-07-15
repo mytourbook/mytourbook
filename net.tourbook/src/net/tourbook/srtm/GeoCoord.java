@@ -21,7 +21,7 @@ package net.tourbook.srtm;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.tourbook.util.UI;
+import net.tourbook.common.UI;
 
 public class GeoCoord {
 

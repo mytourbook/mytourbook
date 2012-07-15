@@ -205,7 +205,7 @@ public class SRTMProfile {
 			{
 				gc.setTransform(transform);
 				gc.setForeground(color);
-				gc.drawText(net.tourbook.util.UI.EMPTY_STRING + elev, 0, 0, true);
+				gc.drawText(net.tourbook.common.UI.EMPTY_STRING + elev, 0, 0, true);
 			}
 			color.dispose();
 		}

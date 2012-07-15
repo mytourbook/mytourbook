@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.views;
 
-import net.tourbook.util.Util;
+import net.tourbook.common.util.Util;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;

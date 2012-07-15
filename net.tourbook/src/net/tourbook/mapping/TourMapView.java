@@ -30,12 +30,15 @@ import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.colors.ColorDefinition;
 import net.tourbook.colors.GraphColorProvider;
+import net.tourbook.common.map.GeoPosition;
+import net.tourbook.common.util.ITourToolTipProvider;
+import net.tourbook.common.util.TourToolTip;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.importdata.RawDataManager;
+import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoStructuredSelection;
-import net.tourbook.photo.PhotoToolTipProvider;
-import net.tourbook.photo.manager.Photo;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceMap;
 import net.tourbook.srtm.IPreferences;
@@ -54,9 +57,6 @@ import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
-import net.tourbook.util.ITourToolTipProvider;
-import net.tourbook.util.TourToolTip;
-import net.tourbook.util.Util;
 
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -101,7 +101,6 @@ import de.byteholder.geoclipse.map.event.MapPositionEvent;
 import de.byteholder.geoclipse.map.event.ZoomEvent;
 import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.geoclipse.mapprovider.MapProviderManager;
-import de.byteholder.gpx.GeoPosition;
 import de.byteholder.gpx.PointOfInterest;
 
 /**
@@ -200,7 +199,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 	private TourInfoToolTipProvider					_tourInfoToolTipProvider			= new TourInfoToolTipProvider();
 	private ITourToolTipProvider					_wayPointToolTipProvider			= new WayPointToolTipProvider();
-	private ITourToolTipProvider					_photoToolTipProvider				= new PhotoToolTipProvider();
+//	private ITourToolTipProvider					_photoToolTipProvider				= new PhotoToolTipProvider();
 
 	private String									_poiName;
 	private GeoPosition								_poiPosition;
@@ -2220,7 +2219,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		/*
 		 * photo
 		 */
-		_tourToolTip.addToolTipProvider(_photoToolTipProvider);
+//		_tourToolTip.addToolTipProvider(_photoToolTipProvider);
 
 		// checkbox: show scale
 		final boolean isScaleVisible = Util.getStateBoolean(settings, MEMENTO_SHOW_SCALE_IN_MAP, true);

@@ -28,9 +28,10 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
+import net.tourbook.common.map.GeoPosition;
+
 import org.w3c.dom.Document;
 
-import de.byteholder.gpx.GeoPosition;
 
 public class YahooGeoCoder implements GeoCoder {
 

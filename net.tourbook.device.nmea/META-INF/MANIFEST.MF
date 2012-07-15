@@ -10,5 +10,5 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: MyTourbook
-Import-Package: net.tourbook.device,
- net.tourbook.util
+Import-Package: net.tourbook.common.util,
+ net.tourbook.device

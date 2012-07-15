@@ -20,8 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.util.StringToArrayConverter;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.util.StringToArrayConverter;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;

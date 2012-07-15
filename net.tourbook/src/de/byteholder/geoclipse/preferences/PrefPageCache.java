@@ -19,7 +19,7 @@ import java.io.File;
 import java.text.NumberFormat;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.util.UI;
+import net.tourbook.common.UI;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;

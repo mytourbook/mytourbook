@@ -29,6 +29,7 @@ import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.IChartLayer;
 import net.tourbook.colors.GraphColorProvider;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
@@ -38,7 +39,6 @@ import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
-import net.tourbook.util.Util;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -84,8 +84,8 @@ public class ConconiChartView extends ViewPart {
 
 	private static final RGB		DEFAULT_RGB						= new RGB(0xd0, 0xd0, 0xd0);
 
-	private final boolean			_isOSX							= net.tourbook.util.UI.IS_OSX;
-	private final boolean			_isLinux						= net.tourbook.util.UI.IS_LINUX;
+	private final boolean			_isOSX							= net.tourbook.common.UI.IS_OSX;
+	private final boolean			_isLinux						= net.tourbook.common.UI.IS_LINUX;
 
 	private final IPreferenceStore	_prefStore						= TourbookPlugin.getDefault() //
 																			.getPreferenceStore();

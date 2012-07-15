@@ -16,7 +16,7 @@
 package net.tourbook.application;
 
 import net.tourbook.mapping.TourMapView;
-import net.tourbook.photo.merge.PhotoMergeView;
+import net.tourbook.photo.PhotoMergeView;
 
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;

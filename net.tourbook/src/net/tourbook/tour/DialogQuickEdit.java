@@ -24,13 +24,13 @@ import java.util.TreeSet;
 import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.data.IWeather;
+import net.tourbook.common.util.Util;
+import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
-import net.tourbook.util.Util;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -63,8 +63,8 @@ import org.eclipse.ui.forms.widgets.Section;
 
 public class DialogQuickEdit extends TitleAreaDialog {
 
-	private final boolean				_isOSX							= net.tourbook.util.UI.IS_OSX;
-	private final boolean				_isLinux						= net.tourbook.util.UI.IS_LINUX;				;
+	private final boolean				_isOSX							= net.tourbook.common.UI.IS_OSX;
+	private final boolean				_isLinux						= net.tourbook.common.UI.IS_LINUX;				;
 
 	private static final Calendar		_calendar						= GregorianCalendar.getInstance();
 	private static final DateFormat		_dateFormatter					= DateFormat.getDateInstance(DateFormat.FULL);
@@ -833,7 +833,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			_spinWindDirectionValue.setSelection(degree);
 		}
 
-		_comboWindDirectionText.select(UI.getCardinalDirectionTextIndex(degree));
+		_comboWindDirectionText.select(net.tourbook.common.UI.getCardinalDirectionTextIndex(degree));
 	}
 
 	private void onSelectWindSpeedText() {
@@ -888,7 +888,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
 		final int cloudIndex = _comboClouds.getSelectionIndex();
 		String cloudValue = IWeather.cloudIcon[cloudIndex];
-		if (cloudValue.equals(UI.IMAGE_EMPTY_16)) {
+		if (cloudValue.equals(net.tourbook.common.UI.IMAGE_EMPTY_16)) {
 			// replace invalid cloud key
 			cloudValue = UI.EMPTY_STRING;
 		}
@@ -930,7 +930,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			// wind direction
 			final int weatherWindDirDegree = _tourData.getWeatherWindDir();
 			_spinWindDirectionValue.setSelection(weatherWindDirDegree);
-			_comboWindDirectionText.select(UI.getCardinalDirectionTextIndex(weatherWindDirDegree));
+			_comboWindDirectionText.select(net.tourbook.common.UI.getCardinalDirectionTextIndex(weatherWindDirDegree));
 
 			// wind speed
 			final int windSpeed = _tourData.getWeatherWindSpeed();

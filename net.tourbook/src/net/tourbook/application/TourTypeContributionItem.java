@@ -16,14 +16,14 @@
 package net.tourbook.application;
 
 import net.tourbook.Messages;
+import net.tourbook.common.UI;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TourType;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourTypeFilterManager;
 import net.tourbook.ui.CustomControlContribution;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.TourTypeFilterSet;
-import net.tourbook.util.UI;
-import net.tourbook.util.Util;
 
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -322,14 +322,14 @@ public class TourTypeContributionItem extends CustomControlContribution {
 
 			@Override
 			public void menuHidden(final MenuEvent e) {
-				int a = 0;
-				a++;
+//				int a = 0;
+//				a++;
 			}
 
 			@Override
 			public void menuShown(final MenuEvent e) {
-				int a = 0;
-				a++;
+//				int a = 0;
+//				a++;
 			}
 		});
 

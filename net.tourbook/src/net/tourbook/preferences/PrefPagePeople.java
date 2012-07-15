@@ -25,6 +25,7 @@ import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.HrZoneContext;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
@@ -39,7 +40,6 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.training.DialogHRZones;
 import net.tourbook.training.TrainingManager;
 import net.tourbook.ui.UI;
-import net.tourbook.util.Util;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -146,8 +146,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		_nf2.setMaximumFractionDigits(2);
 	}
 
-	private final boolean				_isOSX						= net.tourbook.util.UI.IS_OSX;
-	private final boolean				_isLinux					= net.tourbook.util.UI.IS_LINUX;
+	private final boolean				_isOSX						= net.tourbook.common.UI.IS_OSX;
+	private final boolean				_isLinux					= net.tourbook.common.UI.IS_LINUX;
 
 	private SelectionListener			_defaultSelectionListener;
 	private ModifyListener				_defaultModifyListener;
@@ -1394,7 +1394,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			GridDataFactory.fillDefaults()//
 					.span(3, 1)
 //					.indent(0, 15)
-					.hint(UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
+					.hint(net.tourbook.common.UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
 					.applyTo(label);
 			label.setText(Messages.Pref_People_Label_DataTransfer);
 

@@ -26,7 +26,8 @@ import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.data.IWeather;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
@@ -36,8 +37,6 @@ import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.ui.views.rawData.RawDataView;
-import net.tourbook.util.StatusUtil;
-import net.tourbook.util.Util;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -56,15 +55,11 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.Bullet;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.SashForm;
-import org.eclipse.swt.custom.StyleRange;
-import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.GlyphMetrics;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.layout.GridData;
@@ -114,7 +109,6 @@ public class UI {
 	public static final String								BREAK_TIME_MARKER				= "x";											//$NON-NLS-1$
 
 	public static final char								TAB								= '\t';
-	public static final char								DOT								= '.';
 
 	/**
 	 * contains a new line
@@ -141,11 +135,6 @@ public class UI {
 
 	public static final int									DEFAULT_FIELD_WIDTH				= 40;
 	public static final int									FORM_FIRST_COLUMN_INDENT		= 16;
-
-	/**
-	 * layout hint for a description field
-	 */
-	public static final int									DEFAULT_DESCRIPTION_WIDTH		= 350;
 
 	public static final String								UTF_8							= "UTF-8";										//$NON-NLS-1$
 
@@ -253,14 +242,8 @@ public class UI {
 	public static String									UNIT_LABEL_DIRECTION			= "\u00B0";									//$NON-NLS-1$
 
 	private static final String								TOUR_TYPE_PREFIX				= "tourType";									//$NON-NLS-1$
-//	private static final String						WEATHER_CLOUDS_PREFIX			= "weatherClouds-";						//$NON-NLS-1$
 
 	public final static ImageRegistry						IMAGE_REGISTRY;
-
-	/*
-	 * image keys for images which are stored in the image registry
-	 */
-	public static final String								IMAGE_EMPTY_16					= "_empty16";									//$NON-NLS-1$
 
 	public static final String								IMAGE_TOUR_TYPE_FILTER			= "tourType-filter";							//$NON-NLS-1$
 	public static final String								IMAGE_TOUR_TYPE_FILTER_SYSTEM	= "tourType-filter-system";					//$NON-NLS-1$
@@ -296,8 +279,6 @@ public class UI {
 	public static Styler									TAG_STYLER;
 	public static Styler									TAG_CATEGORY_STYLER;
 	public static Styler									TAG_SUB_STYLER;
-	public static Styler									PHOTO_FOLDER_STYLER;
-	public static Styler									PHOTO_FILE_STYLER;
 
 	private final static HashMap<String, Image>				_imageCache						= new HashMap<String, Image>();
 	private final static HashMap<String, ImageDescriptor>	_imageCacheDescriptor			= new HashMap<String, ImageDescriptor>();
@@ -307,14 +288,11 @@ public class UI {
 
 		updateUnits();
 		setViewColorsFromPrefStore();
-		setPhotoColorsFromPrefStore();
 
 		/*
 		 * load images into the image registry
 		 */
 		IMAGE_REGISTRY = TourbookPlugin.getDefault().getImageRegistry();
-
-		IMAGE_REGISTRY.put(IMAGE_EMPTY_16, TourbookPlugin.getImageDescriptor(Messages.Image___Empty16));
 
 		// tour type images
 		IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER, //
@@ -330,38 +308,12 @@ public class UI {
 		IMAGE_REGISTRY.put(RawDataView.IMAGE_IMPORT,//
 				TourbookPlugin.getImageDescriptor(Messages.Image__RawData_Import));
 
-		// weather images
-		IMAGE_REGISTRY.put(IWeather.WEATHER_ID_CLEAR, //
-				TourbookPlugin.getImageDescriptor(Messages.Image__weather_sunny));
-		IMAGE_REGISTRY.put(IWeather.WEATHER_ID_PART_CLOUDS, //
-				TourbookPlugin.getImageDescriptor(Messages.Image__weather_cloudy));
-		IMAGE_REGISTRY.put(IWeather.WEATHER_ID_OVERCAST, //
-				TourbookPlugin.getImageDescriptor(Messages.Image__weather_clouds));
-		IMAGE_REGISTRY.put(IWeather.WEATHER_ID_LIGHTNING,//
-				TourbookPlugin.getImageDescriptor(Messages.Image__weather_lightning));
-		IMAGE_REGISTRY.put(IWeather.WEATHER_ID_RAIN,//
-				TourbookPlugin.getImageDescriptor(Messages.Image__weather_rain));
-		IMAGE_REGISTRY.put(IWeather.WEATHER_ID_SNOW,//
-				TourbookPlugin.getImageDescriptor(Messages.Image__weather_snow));
-		IMAGE_REGISTRY.put(IWeather.WEATHER_ID_SCATTERED_SHOWERS,//
-				TourbookPlugin.getImageDescriptor(Messages.Image__Weather_ScatteredShowers));
-		IMAGE_REGISTRY.put(IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT,//
-				TourbookPlugin.getImageDescriptor(Messages.Image__Weather_Severe));
-
 		/*
 		 * set tag styler
 		 */
 		TAG_CATEGORY_STYLER = StyledString.createColorRegistryStyler(VIEW_COLOR_CATEGORY, null);
 		TAG_STYLER = StyledString.createColorRegistryStyler(VIEW_COLOR_TITLE, null);
 		TAG_SUB_STYLER = StyledString.createColorRegistryStyler(VIEW_COLOR_SUB, null);
-
-		/*
-		 * set photo styler
-		 */
-		PHOTO_FOLDER_STYLER = StyledString.createColorRegistryStyler(
-				ITourbookPreferences.PHOTO_VIEWER_COLOR_FOLDER,
-				null);
-		PHOTO_FILE_STYLER = StyledString.createColorRegistryStyler(ITourbookPreferences.PHOTO_VIEWER_COLOR_FILE, null);
 	}
 
 	private UI() {}
@@ -590,71 +542,6 @@ public class UI {
 	}
 
 	/**
-	 * Display text as a bulleted list
-	 * 
-	 * @param parent
-	 * @param bulletText
-	 * @param startLine
-	 *            Line where bullets should be started, 0 is the first line
-	 * @param spanHorizontal
-	 * @param horizontalHint
-	 * @param backgroundColor
-	 *            background color or <code>null</code> when color should not be set
-	 * @return Returns the bulleted list as styled text
-	 */
-	public static StyledText createBullets(	final Composite parent,
-											final String bulletText,
-											final int startLine,
-											final int spanHorizontal,
-											final int horizontalHint,
-											final Color backgroundColor) {
-
-		StyledText styledText = null;
-
-		try {
-
-			final Composite container = new Composite(parent, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.grab(true, false)
-					.span(spanHorizontal, 1)
-					.hint(horizontalHint, SWT.DEFAULT)
-					.applyTo(container);
-			GridLayoutFactory.fillDefaults()//
-					.numColumns(1)
-					.margins(5, 5)
-					.applyTo(container);
-
-			container.setBackground(backgroundColor == null ? //
-					container.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND)
-					: backgroundColor);
-			{
-				final StyleRange style = new StyleRange();
-				style.metrics = new GlyphMetrics(0, 0, 10);
-
-				final Bullet bullet = new Bullet(style);
-				final int lineCount = Util.countCharacter(bulletText, '\n');
-
-				styledText = new StyledText(container, SWT.READ_ONLY | SWT.WRAP | SWT.MULTI);
-				GridDataFactory.fillDefaults().grab(true, false).applyTo(styledText);
-				styledText.setText(bulletText);
-
-				styledText.setLineBullet(startLine, lineCount, bullet);
-				styledText.setLineWrapIndent(startLine, lineCount, 10);
-
-				styledText.setBackground(backgroundColor == null ? //
-						container.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND)
-						: backgroundColor);
-			}
-
-		} catch (final Exception e) {
-			// ignore exception when there are less lines as required
-			StatusUtil.log(e);
-		}
-
-		return styledText;
-	}
-
-	/**
 	 * Creates a label which is wrapped and grabs the width.
 	 * 
 	 * @param formToolkit
@@ -812,28 +699,6 @@ public class UI {
 				.toString();
 	}
 
-	/**
-	 * @param degreeDirection
-	 * @return Returns cardinal direction
-	 */
-	public static String getCardinalDirectionText(final int degreeDirection) {
-
-		return IWeather.windDirectionText[getCardinalDirectionTextIndex(degreeDirection)];
-	}
-
-	/**
-	 * @param degreeDirection
-	 * @return Returns cardinal direction index for {@link IWeather#windDirectionText}
-	 */
-	public static int getCardinalDirectionTextIndex(final int degreeDirection) {
-
-		final float degree = (degreeDirection + 22.5f) / 45.0f;
-
-		final int directionIndex = ((int) degree) % 8;
-
-		return directionIndex;
-	}
-
 	public static ColumnPixelData getColumnPixelWidth(final PixelConverter pixelConverter, final int width) {
 		return new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(width), false);
 	}
@@ -911,7 +776,6 @@ public class UI {
 
 		return _dateFormatterShort;
 	}
-
 
 	/******************************************************************************
 	 * this method is copied from the following source and was adjusted
@@ -1183,32 +1047,6 @@ public class UI {
 		final GridData gd = new GridData();
 		gd.horizontalSpan = columns;
 		label.setLayoutData(gd);
-	}
-
-	/**
-	 * Set photo colors in the JFace color registry from the pref store
-	 */
-	public static void setPhotoColorsFromPrefStore() {
-
-		// pref store var cannot be set from a static field because it can be null !!!
-		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-
-		final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
-
-		colorRegistry.put(ITourbookPreferences.PHOTO_VIEWER_COLOR_FOREGROUND, //
-				PreferenceConverter.getColor(prefStore, ITourbookPreferences.PHOTO_VIEWER_COLOR_FOREGROUND));
-
-		colorRegistry.put(ITourbookPreferences.PHOTO_VIEWER_COLOR_BACKGROUND, //
-				PreferenceConverter.getColor(prefStore, ITourbookPreferences.PHOTO_VIEWER_COLOR_BACKGROUND));
-
-		colorRegistry.put(ITourbookPreferences.PHOTO_VIEWER_COLOR_SELECTION_FOREGROUND, //
-				PreferenceConverter.getColor(prefStore, ITourbookPreferences.PHOTO_VIEWER_COLOR_SELECTION_FOREGROUND));
-
-		colorRegistry.put(ITourbookPreferences.PHOTO_VIEWER_COLOR_FOLDER, //
-				PreferenceConverter.getColor(prefStore, ITourbookPreferences.PHOTO_VIEWER_COLOR_FOLDER));
-
-		colorRegistry.put(ITourbookPreferences.PHOTO_VIEWER_COLOR_FILE, //
-				PreferenceConverter.getColor(prefStore, ITourbookPreferences.PHOTO_VIEWER_COLOR_FILE));
 	}
 
 	/**

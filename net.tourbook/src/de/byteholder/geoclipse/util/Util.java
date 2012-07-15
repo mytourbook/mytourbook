@@ -3,7 +3,7 @@ package de.byteholder.geoclipse.util;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import net.tourbook.util.StatusUtil;
+import net.tourbook.common.util.StatusUtil;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.VerifyEvent;

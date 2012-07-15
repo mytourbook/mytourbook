@@ -17,12 +17,13 @@ package de.byteholder.geoclipse.poi;
 
 import java.util.ArrayList;
 
+import net.tourbook.common.map.GeoPosition;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import de.byteholder.geoclipse.map.UI;
-import de.byteholder.gpx.GeoPosition;
 import de.byteholder.gpx.PointOfInterest;
 
 public class GeoQuerySAXHandler extends DefaultHandler {

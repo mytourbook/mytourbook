@@ -18,8 +18,8 @@ package net.tourbook.ui.views.tourCatalog;
 import java.sql.Date;
 import java.util.ArrayList;
 
+import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.data.TourCompared;
-import net.tourbook.ui.TreeViewerItem;
 
 /**
  * Represents a compared tour (tree item) in the tour map viewer

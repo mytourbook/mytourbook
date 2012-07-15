@@ -17,7 +17,7 @@ package de.byteholder.geoclipse.mapprovider;
 
 import java.util.ArrayList;
 
-import net.tourbook.util.StatusUtil;
+import net.tourbook.common.util.StatusUtil;
 
 import org.eclipse.osgi.util.NLS;
 

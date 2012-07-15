@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.util.StatusUtil;
+import net.tourbook.common.util.StatusUtil;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;

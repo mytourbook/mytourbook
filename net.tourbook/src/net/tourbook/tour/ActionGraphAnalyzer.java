@@ -18,8 +18,8 @@ package net.tourbook.tour;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
+import net.tourbook.common.util.Util;
 import net.tourbook.ui.views.TourChartAnalyzerView;
-import net.tourbook.util.Util;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.IWorkbenchWindow;

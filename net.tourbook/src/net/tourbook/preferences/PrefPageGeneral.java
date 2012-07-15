@@ -24,8 +24,8 @@ import java.util.Calendar;
 import net.tourbook.Messages;
 import net.tourbook.application.MeasurementSystemContributionItem;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.preferences.BooleanFieldEditor2;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.BooleanFieldEditor2;
 import net.tourbook.ui.UI;
 
 import org.eclipse.core.runtime.IProgressMonitor;

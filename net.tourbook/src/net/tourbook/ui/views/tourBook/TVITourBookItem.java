@@ -21,9 +21,9 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourItem;
-import net.tourbook.ui.TreeViewerItem;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.preference.IPreferenceStore;

@@ -18,8 +18,8 @@ package net.tourbook.ui.views.tourBook;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.TreeViewerItem;
 
 public class TVITourBookTour extends TVITourBookItem {
 

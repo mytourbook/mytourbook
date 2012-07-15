@@ -21,13 +21,13 @@ import java.util.Set;
 
 import javax.persistence.EntityManager;
 
+import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tag.TVIPrefTag;
 import net.tourbook.tag.TVIPrefTagCategory;
 import net.tourbook.tag.TVIPrefTagRoot;
-import net.tourbook.ui.TreeViewerItem;
 
 import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.viewers.ISelection;

@@ -5,12 +5,13 @@ import java.io.File;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import net.tourbook.common.map.GeoPosition;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import de.byteholder.gpx.Document;
-import de.byteholder.gpx.GeoPosition;
 import de.byteholder.gpx.Track;
 import de.byteholder.gpx.TrackSegment;
 import de.byteholder.gpx.Waypoint;

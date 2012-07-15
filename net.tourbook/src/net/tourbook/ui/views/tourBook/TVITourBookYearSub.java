@@ -23,9 +23,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
 
+import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.SQLFilter;
-import net.tourbook.ui.TreeViewerItem;
 import net.tourbook.ui.UI;
 
 public class TVITourBookYearSub extends TVITourBookItem {

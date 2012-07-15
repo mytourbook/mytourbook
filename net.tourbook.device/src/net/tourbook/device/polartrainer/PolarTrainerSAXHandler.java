@@ -23,6 +23,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.tourbook.chart.ChartLabel;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -32,8 +34,6 @@ import net.tourbook.device.InvalidDeviceSAXException;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.preferences.TourTypeColorDefinition;
-import net.tourbook.util.StatusUtil;
-import net.tourbook.util.Util;
 
 import org.eclipse.osgi.util.NLS;
 import org.joda.time.DateTime;

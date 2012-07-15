@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.device.garmin;
 
-import net.tourbook.ui.BooleanFieldEditor2;
+import net.tourbook.common.preferences.BooleanFieldEditor2;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.layout.GridDataFactory;

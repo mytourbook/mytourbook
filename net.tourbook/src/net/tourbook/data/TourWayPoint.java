@@ -23,15 +23,15 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.map.GeoPosition;
+import net.tourbook.common.util.IHoveredArea;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.mapping.Messages;
-import net.tourbook.util.IHoveredArea;
-import net.tourbook.util.StatusUtil;
 
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 
-import de.byteholder.gpx.GeoPosition;
 
 @Entity
 public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea {

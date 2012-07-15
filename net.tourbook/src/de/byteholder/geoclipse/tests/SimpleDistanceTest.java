@@ -4,8 +4,8 @@
 package de.byteholder.geoclipse.tests;
 
 
+import net.tourbook.common.map.GeoPosition;
 import de.byteholder.geoclipse.util.GeoUtils;
-import de.byteholder.gpx.GeoPosition;
 
 /**
  * @author Michael Kanis

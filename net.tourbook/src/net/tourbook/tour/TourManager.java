@@ -30,6 +30,11 @@ import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ComputeChartValue;
 import net.tourbook.colors.GraphColorProvider;
+import net.tourbook.common.Activator;
+import net.tourbook.common.util.IExternalTourEvents;
+import net.tourbook.common.util.MtMath;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringToArrayConverter;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.database.MyTourbookException;
@@ -46,10 +51,6 @@ import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
 import net.tourbook.ui.views.TourChartAnalyzerInfo;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
-import net.tourbook.util.IExternalTourEvents;
-import net.tourbook.util.MtMath;
-import net.tourbook.util.StatusUtil;
-import net.tourbook.util.StringToArrayConverter;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
@@ -161,9 +162,9 @@ public class TourManager {
 			_tourDataCache = null;
 		}
 
-		final IPreferenceStore utilPrefStore = net.tourbook.util.Activator.getDefault().getPreferenceStore();
+		final IPreferenceStore commonPrefStore = Activator.getDefault().getPreferenceStore();
 
-		utilPrefStore.addPropertyChangeListener(new IPropertyChangeListener() {
+		commonPrefStore.addPropertyChangeListener(new IPropertyChangeListener() {
 			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 

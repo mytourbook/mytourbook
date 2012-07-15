@@ -16,7 +16,7 @@
 package net.tourbook.ui.action;
 
 import net.tourbook.Messages;
-import net.tourbook.util.ITourViewer;
+import net.tourbook.common.util.ITourViewer;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ColumnViewer;

@@ -22,6 +22,9 @@ import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourPerson;
@@ -34,11 +37,8 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.UI;
-import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
-import net.tourbook.util.StatusUtil;
-import net.tourbook.util.Util;
 
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -606,7 +606,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 			_linkTourType.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					net.tourbook.util.UI.openControlMenu(_linkTourType);
+					net.tourbook.common.UI.openControlMenu(_linkTourType);
 				}
 			});
 
@@ -625,7 +625,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 		_linkTag.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
-				net.tourbook.util.UI.openControlMenu(_linkTag);
+				net.tourbook.common.UI.openControlMenu(_linkTag);
 			}
 		});
 

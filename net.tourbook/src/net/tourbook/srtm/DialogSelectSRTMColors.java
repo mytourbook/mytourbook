@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.ui.ImageCanvas;
-import net.tourbook.util.UI;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -413,7 +413,7 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 				 */
 				_txtTilePath = new Text(nameContainer, SWT.BORDER);
 				GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtTilePath);
-				_txtTilePath.addVerifyListener(net.tourbook.util.UI.verifyFilenameInput());
+				_txtTilePath.addVerifyListener(net.tourbook.common.UI.verifyFilenameInput());
 				_txtTilePath.addModifyListener(new ModifyListener() {
 					public void modifyText(final ModifyEvent e) {
 						validateFields();

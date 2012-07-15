@@ -15,8 +15,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.locks.ReentrantLock;
 
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourWayPoint;
-import net.tourbook.util.StatusUtil;
 
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Device;

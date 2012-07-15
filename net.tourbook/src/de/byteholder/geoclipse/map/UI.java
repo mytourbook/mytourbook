@@ -2,7 +2,7 @@ package de.byteholder.geoclipse.map;
 
 import java.io.File;
 
-import net.tourbook.util.StatusUtil;
+import net.tourbook.common.util.StatusUtil;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -223,7 +223,7 @@ public class UI {
 
 		ImageData transparentImageData;
 
-		if (net.tourbook.util.UI.IS_OSX) {
+		if (net.tourbook.common.UI.IS_OSX) {
 
 			// OSX
 			transparentImageData = new ImageData(//
@@ -253,7 +253,7 @@ public class UI {
 
 	public static PaletteData getPaletteData() {
 
-		if (net.tourbook.util.UI.IS_OSX) {
+		if (net.tourbook.common.UI.IS_OSX) {
 
 			// OSX
 			return new PaletteData(0xff0000, 0xff00, 0xff);

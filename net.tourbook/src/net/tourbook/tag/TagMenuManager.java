@@ -25,6 +25,8 @@ import java.util.Set;
 import net.tourbook.Messages;
 import net.tourbook.application.ICommandIds;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.util.AdvancedMenuForActions;
+import net.tourbook.common.util.ToolTip;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.database.TourDatabase;
@@ -35,8 +37,6 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.UI;
-import net.tourbook.util.AdvancedMenuForActions;
-import net.tourbook.util.ToolTip;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;

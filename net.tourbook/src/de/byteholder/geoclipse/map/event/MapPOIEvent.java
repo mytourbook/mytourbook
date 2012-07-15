@@ -16,7 +16,7 @@
 
 package de.byteholder.geoclipse.map.event;
 
-import de.byteholder.gpx.GeoPosition;
+import net.tourbook.common.map.GeoPosition;
 
 public class MapPOIEvent {
 

@@ -3,8 +3,6 @@
 	<name>net.tourbook.device.nmea</name>
 	<comment></comment>
 	<projects>
-		<project>net.tourbook</project>
-		<project>net.tourbook.device</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

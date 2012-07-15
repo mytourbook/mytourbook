@@ -94,12 +94,12 @@ public class ApplicationVersion {
 
 		_versionSimple = UI.EMPTY_STRING
 				+ version.getMajor()
-				+ UI.DOT
+				+ UI.SYMBOL_DOT
 				+ version.getMinor()
-				+ UI.DOT
+				+ UI.SYMBOL_DOT
 				+ version.getMicro();
 
-		_versionFull = _versionSimple + UI.DOT + _qualifierText;
+		_versionFull = _versionSimple + UI.SYMBOL_DOT + _qualifierText;
 	}
 
 	public static String getDevelopmentId() {

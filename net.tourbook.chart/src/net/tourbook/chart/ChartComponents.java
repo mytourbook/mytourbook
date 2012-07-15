@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import net.tourbook.util.UI;
+import net.tourbook.common.UI;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;

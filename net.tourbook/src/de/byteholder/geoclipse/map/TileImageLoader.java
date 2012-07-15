@@ -22,8 +22,8 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.concurrent.LinkedBlockingDeque;
 
-import net.tourbook.util.StatusUtil;
-import net.tourbook.util.Util;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.Util;
 
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Image;

@@ -18,9 +18,9 @@ package net.tourbook.mapping;
 import java.util.ArrayList;
 import java.util.Set;
 
+import net.tourbook.common.map.GeoPosition;
 import net.tourbook.data.TourData;
-import net.tourbook.photo.manager.Photo;
-import de.byteholder.gpx.GeoPosition;
+import net.tourbook.photo.Photo;
 
 /**
  * Contains data which are needed to paint a tour into a map.

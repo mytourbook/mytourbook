@@ -27,6 +27,12 @@ import net.tourbook.algorithm.DPPoint;
 import net.tourbook.algorithm.DouglasPeuckerSimplifier;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.common.util.ArrayListToArray;
+import net.tourbook.common.util.ColumnDefinition;
+import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.ITourViewer;
+import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.AltitudeUpDownSegment;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -52,12 +58,6 @@ import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartView;
-import net.tourbook.util.ArrayListToArray;
-import net.tourbook.util.ColumnDefinition;
-import net.tourbook.util.ColumnManager;
-import net.tourbook.util.ITourViewer;
-import net.tourbook.util.PostSelectionProvider;
-import net.tourbook.util.Util;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
@@ -162,7 +162,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 																										.getDialogSettingsSection(
 																												ID);
 
-	private final boolean									_isOSX								= net.tourbook.util.UI.IS_OSX;
+	private final boolean									_isOSX								= net.tourbook.common.UI.IS_OSX;
 
 	private ColumnManager									_columnManager;
 

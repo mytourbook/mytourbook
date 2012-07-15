@@ -22,15 +22,15 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataXSerie;
+import net.tourbook.common.form.ViewerDetailForm;
+import net.tourbook.common.util.TableLayoutComposite;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.IReferenceTourProvider;
 import net.tourbook.ui.UI;
-import net.tourbook.ui.ViewerDetailForm;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
-import net.tourbook.util.TableLayoutComposite;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;

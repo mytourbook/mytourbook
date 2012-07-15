@@ -19,7 +19,7 @@ package net.tourbook.data;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
-import net.tourbook.util.StatusUtil;
+import net.tourbook.common.util.StatusUtil;
 
 /*
  * Author:	Wolfgang Schramm

@@ -22,14 +22,7 @@ public class Messages extends NLS {
 	private static final String	BUNDLE_NAME	= "net.tourbook.messages";							//$NON-NLS-1$
 
 	public static String		Action_ToolTip_Hide;
-
 	public static String		Action_ToolTip_SetDefaults;
-	public static String		Image__ArrowDown;
-	public static String		Image__ArrowUp;
-	public static String		Image__ZoomOut;
-	public static String		Image__ZoomIn;
-	public static String		Image__ZoomCentered;
-	public static String		Image__Synced;
 
 	public static String		Calendar_View_Action_Back;
 	public static String		Calendar_View_Action_Back_Tooltip;
@@ -73,6 +66,23 @@ public class Messages extends NLS {
 	public static String		Calendar_View_Format_Time;
 	public static String		Calendar_View_Format_Speed;
 	public static String		Calendar_View_Format_Pace;
+
+	public static String		ColumnFactory_Photo_Altitude;
+	public static String		ColumnFactory_Photo_Altitude_Tooltip;
+	public static String		ColumnFactory_Photo_Date;
+	public static String		ColumnFactory_Photo_Dimension;
+	public static String		ColumnFactory_Photo_ImageDirectionDegree_Header;
+	public static String		ColumnFactory_Photo_ImageDirectionDegree_Label;
+	public static String		ColumnFactory_Photo_ImageDirectionDegree_Tooltip;
+	public static String		ColumnFactory_Photo_ImageDirectionText_Label;
+	public static String		ColumnFactory_Photo_ImageDirectionText_Tooltip;
+	public static String		ColumnFactory_Photo_Location;
+	public static String		ColumnFactory_Photo_Name;
+	public static String		ColumnFactory_Photo_Orientation;
+	public static String		ColumnFactory_Photo_Orientation_Header;
+	public static String		ColumnFactory_Photo_Orientation_Tooltip;
+	public static String		ColumnFactory_Photo_OtherTags;
+	public static String		ColumnFactory_Photo_Time;
 
 	public static String		dialog_export_btn_export;
 	public static String		dialog_export_chk_camouflageSpeed;
@@ -519,7 +529,6 @@ public class Messages extends NLS {
 	public static String		Graph_Label_Altitude;
 	public static String		Graph_Label_Cadence;
 	public static String		Graph_Label_Cadence_unit;
-
 	public static String		Graph_Label_Distance;
 	public static String		Graph_Label_Gradiend_unit;
 	public static String		Graph_Label_Gradient;
@@ -577,13 +586,13 @@ public class Messages extends NLS {
 	public static String		HRMaxFormula_Name_HRmax_220_age;
 	public static String		HRMaxFormula_Name_Manual;
 
-	public static String		Image___Empty16;
 	public static String		Image__App_Cancel;
 	public static String		Image__App_OK;
 	public static String		Image__App_Trash;
+	public static String		Image__ArrowDown;
+	public static String		Image__ArrowUp;
 	public static String		Image__assignMergedTour;
 	public static String		Image__assignMergedTour_disabled;
-	public static String		Image__Backward_Nav;
 	public static String		Image__chart_analyzer;
 	public static String		Image__collapse_all;
 	public static String		Image__database;
@@ -600,7 +609,6 @@ public class Messages extends NLS {
 	public static String		Image__edit_tour_marker_new;
 	public static String		Image__edit_tour_marker_new_disabled;
 	public static String		Image__expand_all;
-	public static String		Image__Forward_Nav;
 	public static String		Image__graph_altimeter;
 	public static String		Image__graph_altitude;
 	public static String		Image__graph_cadence;
@@ -650,6 +658,7 @@ public class Messages extends NLS {
 	public static String		Image__synch_graph_bySize_disabled;
 	public static String		Image__synch_statistics;
 	public static String		Image__synch_statistics_Disabled;
+	public static String		Image__Synced;
 	public static String		Image__tag;
 	public static String		Image__tag_category;
 	public static String		Image__tag_root;
@@ -664,15 +673,10 @@ public class Messages extends NLS {
 	public static String		Image__undo_tour_type_filter;
 	public static String		Image__undo_tour_type_filter_system;
 	public static String		Image__view_compare_wizard;
-	public static String		Image__weather_sunny;
-	public static String		Image__weather_cloudy;
-	public static String		Image__weather_clouds;
-	public static String		Image__weather_lightning;
-	public static String		Image__weather_rain;
-	public static String		Image__weather_snow;
-	public static String		Image__Weather_ScatteredShowers;
-	public static String		Image__Weather_Severe;
 	public static String		Image__ZoomFitGraph;
+	public static String		Image__ZoomCentered;
+	public static String		Image__ZoomIn;
+	public static String		Image__ZoomOut;
 
 	public static String		image__merge_tours;
 
@@ -752,6 +756,10 @@ public class Messages extends NLS {
 	public static String		merge_tour_source_graph_temperature_tooltip;
 
 	public static String		NT001_DialogExtractTour_InvalidTourData;
+
+	public static String		Pic_Dir_StatusLabel_NoSelectedPhoto;
+
+	public static String		Pic_Dir_StatusLabel_NoTourIsAvailable;
 
 	public static String		Pref_App_Label_TourEditorIsModified;
 
@@ -1437,52 +1445,6 @@ public class Messages extends NLS {
 	public static String		UI_Label_TourIsNotSelected;
 
 	public static String		ui_tour_not_defined;
-
-	public static String		Weather_Clounds_Clouds;
-	public static String		Weather_Clounds_Clouny;
-	public static String		Weather_Clounds_IsNotDefined;
-	public static String		Weather_Clounds_Lightning;
-	public static String		Weather_Clounds_Rain;
-	public static String		Weather_Clounds_ScatteredShowers;
-	public static String		Weather_Clounds_SevereWeatherAlert;
-	public static String		Weather_Clounds_Snow;
-	public static String		Weather_Clounds_Sunny;
-
-	public static String		Weather_WindDirection_E;
-	public static String		Weather_WindDirection_N;
-	public static String		Weather_WindDirection_NE;
-	public static String		Weather_WindDirection_NW;
-	public static String		Weather_WindDirection_S;
-	public static String		Weather_WindDirection_SE;
-	public static String		Weather_WindDirection_SW;
-	public static String		Weather_WindDirection_W;
-
-	public static String		Weather_WindSpeed_Bft00;
-	public static String		Weather_WindSpeed_Bft00_Short;
-	public static String		Weather_WindSpeed_Bft01;
-	public static String		Weather_WindSpeed_Bft01_Short;
-	public static String		Weather_WindSpeed_Bft02;
-	public static String		Weather_WindSpeed_Bft02_Short;
-	public static String		Weather_WindSpeed_Bft03;
-	public static String		Weather_WindSpeed_Bft03_Short;
-	public static String		Weather_WindSpeed_Bft04;
-	public static String		Weather_WindSpeed_Bft04_Short;
-	public static String		Weather_WindSpeed_Bft05;
-	public static String		Weather_WindSpeed_Bft05_Short;
-	public static String		Weather_WindSpeed_Bft06;
-	public static String		Weather_WindSpeed_Bft06_Short;
-	public static String		Weather_WindSpeed_Bft07;
-	public static String		Weather_WindSpeed_Bft07_Short;
-	public static String		Weather_WindSpeed_Bft08;
-	public static String		Weather_WindSpeed_Bft08_Short;
-	public static String		Weather_WindSpeed_Bft09;
-	public static String		Weather_WindSpeed_Bft09_Short;
-	public static String		Weather_WindSpeed_Bft10;
-	public static String		Weather_WindSpeed_Bft10_Short;
-	public static String		Weather_WindSpeed_Bft11;
-	public static String		Weather_WindSpeed_Bft11_Short;
-	public static String		Weather_WindSpeed_Bft12;
-	public static String		Weather_WindSpeed_Bft12_Short;
 
 	public static String		Year_Statistic_Combo_LastYears_Tooltip;
 	public static String		Year_Statistic_Combo_NumberOfYears_Tooltip;

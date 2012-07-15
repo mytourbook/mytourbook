@@ -42,7 +42,14 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartLabel;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
-import net.tourbook.data.IWeather;
+import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.util.ColumnDefinition;
+import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.ITourViewer2;
+import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.Util;
+import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourPerson;
@@ -74,7 +81,6 @@ import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionExtractTour;
 import net.tourbook.ui.action.ActionModifyColumns;
-import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.action.ActionSplitTour;
 import net.tourbook.ui.tourChart.TourChart;
@@ -82,12 +88,6 @@ import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
-import net.tourbook.util.ColumnDefinition;
-import net.tourbook.util.ColumnManager;
-import net.tourbook.util.ITourViewer2;
-import net.tourbook.util.PostSelectionProvider;
-import net.tourbook.util.StatusUtil;
-import net.tourbook.util.Util;
 
 import org.eclipse.core.databinding.conversion.StringToNumberConverter;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -220,8 +220,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 																						.getDialogSettingsSection(//
 																								ID + ".marker");			//$NON-NLS-1$
 
-	private final boolean						_isOSX							= net.tourbook.util.UI.IS_OSX;
-	private final boolean						_isLinux						= net.tourbook.util.UI.IS_LINUX;
+	private final boolean						_isOSX							= net.tourbook.common.UI.IS_OSX;
+	private final boolean						_isLinux						= net.tourbook.common.UI.IS_LINUX;
 
 	private static final String					WIDGET_KEY						= "widgetKey";								//$NON-NLS-1$
 
@@ -1289,7 +1289,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		dialog.setFilterPath(_viewState.get(STATE_CSV_EXPORT_PATH));
 		dialog.setFilterExtensions(new String[] { CSV_FILE_EXTENSION });
-		dialog.setFileName(UI.format_yyyymmdd_hhmmss(_tourData) + UI.DOT + CSV_FILE_EXTENSION);
+		dialog.setFileName(UI.format_yyyymmdd_hhmmss(_tourData) + UI.SYMBOL_DOT + CSV_FILE_EXTENSION);
 
 		final String selectedFilePath = dialog.open();
 		if (selectedFilePath == null) {
@@ -3472,7 +3472,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_linkTag.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					net.tourbook.util.UI.openControlMenu(_linkTag);
+					net.tourbook.common.UI.openControlMenu(_linkTag);
 				}
 			});
 			_tk.adapt(_linkTag, true, true);
@@ -3498,7 +3498,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_linkTourType.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					net.tourbook.util.UI.openControlMenu(_linkTourType);
+					net.tourbook.common.UI.openControlMenu(_linkTourType);
 				}
 			});
 			_tk.adapt(_linkTourType, true, true);
@@ -6518,7 +6518,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			final int cloudIndex = _comboClouds.getSelectionIndex();
 			String cloudValue = IWeather.cloudIcon[cloudIndex];
-			if (cloudValue.equals(UI.IMAGE_EMPTY_16)) {
+			if (cloudValue.equals(net.tourbook.common.UI.IMAGE_EMPTY_16)) {
 				// replace invalid cloud key
 				cloudValue = UI.EMPTY_STRING;
 			}

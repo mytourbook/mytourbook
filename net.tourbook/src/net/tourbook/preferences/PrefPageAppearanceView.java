@@ -17,7 +17,7 @@ package net.tourbook.preferences;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.ui.BooleanFieldEditor2;
+import net.tourbook.common.preferences.BooleanFieldEditor2;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.layout.GridDataFactory;

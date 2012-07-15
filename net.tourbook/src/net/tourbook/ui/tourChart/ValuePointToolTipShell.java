@@ -16,7 +16,7 @@
 package net.tourbook.ui.tourChart;
 
 import net.tourbook.chart.ITooltipOwner;
-import net.tourbook.util.Util;
+import net.tourbook.common.util.Util;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.ColumnViewer;

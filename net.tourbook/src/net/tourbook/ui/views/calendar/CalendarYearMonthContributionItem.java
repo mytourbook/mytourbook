@@ -39,8 +39,8 @@ import org.joda.time.DateTimeConstants;
 
 public class CalendarYearMonthContributionItem extends ControlContribution {
 
-	private final boolean						_isOSX						= net.tourbook.util.UI.IS_OSX;
-	private final boolean						_isLinux					= net.tourbook.util.UI.IS_LINUX;
+	private final boolean						_isOSX						= net.tourbook.common.UI.IS_OSX;
+	private final boolean						_isLinux					= net.tourbook.common.UI.IS_LINUX;
 	
 	private Combo	_cboYear;
 	private Combo	_cboMonth;

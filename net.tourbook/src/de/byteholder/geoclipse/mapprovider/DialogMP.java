@@ -18,6 +18,7 @@ package de.byteholder.geoclipse.mapprovider;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.map.GeoPosition;
 
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -36,7 +37,6 @@ import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.Tile;
 import de.byteholder.geoclipse.map.UI;
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
-import de.byteholder.gpx.GeoPosition;
 
 public class DialogMP extends TitleAreaDialog {
 

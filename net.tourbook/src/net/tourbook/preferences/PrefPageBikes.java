@@ -18,11 +18,11 @@ package net.tourbook.preferences;
 import java.util.ArrayList;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.util.TableLayoutComposite;
 import net.tourbook.data.TourBike;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.InputFieldFloat;
 import net.tourbook.ui.UI;
-import net.tourbook.util.TableLayoutComposite;
 
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.viewers.ColumnWeightData;

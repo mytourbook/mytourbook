@@ -25,14 +25,14 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartLabel;
 import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.common.form.ViewerDetailForm;
+import net.tourbook.common.util.TableLayoutComposite;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.UI;
-import net.tourbook.ui.ViewerDetailForm;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
-import net.tourbook.util.TableLayoutComposite;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
@@ -352,7 +352,7 @@ public class DialogMarker extends TitleAreaDialog {
 
 				// sash
 				final Sash sash = new Sash(dlgContainer, SWT.VERTICAL);
-				net.tourbook.util.UI.addSashColorHandler(sash);
+				net.tourbook.common.UI.addSashColorHandler(sash);
 
 				// right part
 				final Composite markerDetailContainer = new Composite(dlgContainer, SWT.NONE);

@@ -15,8 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.views;
 
+import net.tourbook.common.util.Util;
 import net.tourbook.ui.views.calendar.CalendarView;
-import net.tourbook.util.Util;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;

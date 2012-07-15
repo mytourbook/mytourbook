@@ -45,8 +45,8 @@ public class PrefPageTour extends PreferencePage implements IWorkbenchPreference
 
 	public static final String		ID			= "net.tourbook.preferences.PrefPageTour";			//$NON-NLS-1$
 
-	private final boolean			_isOSX		= net.tourbook.util.UI.IS_OSX;
-	private final boolean			_isLinux	= net.tourbook.util.UI.IS_LINUX;
+	private final boolean			_isOSX		= net.tourbook.common.UI.IS_OSX;
+	private final boolean			_isLinux	= net.tourbook.common.UI.IS_LINUX;
 
 	private final IPreferenceStore	_prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
 

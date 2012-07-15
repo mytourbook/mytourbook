@@ -15,6 +15,8 @@ Export-Package: net.tourbook.device,
 Bundle-Vendor: MyTourbook
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: net.tourbook.chart,
- net.tourbook.util,
+ net.tourbook.common,
+ net.tourbook.common.util,
+ net.tourbook.common.weather,
  org.joda.time,
  org.joda.time.format

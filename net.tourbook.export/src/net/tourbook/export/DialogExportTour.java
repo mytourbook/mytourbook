@@ -38,6 +38,8 @@ import java.util.TimeZone;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourWayPoint;
@@ -47,8 +49,6 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.FileCollisionBehavior;
 import net.tourbook.ui.ImageComboLabel;
 import net.tourbook.ui.UI;
-import net.tourbook.util.StatusUtil;
-import net.tourbook.util.Util;
 
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
@@ -758,7 +758,7 @@ public class DialogExportTour extends TitleAreaDialog {
 			});
 			_txtCamouflageSpeed.addListener(SWT.Verify, new Listener() {
 				public void handleEvent(final Event e) {
-					net.tourbook.util.UI.verifyIntegerInput(e, false);
+					net.tourbook.common.UI.verifyIntegerInput(e, false);
 				}
 			});
 
@@ -918,7 +918,7 @@ public class DialogExportTour extends TitleAreaDialog {
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(_comboFile);
 			((GridData) _comboFile.getLayoutData()).widthHint = SIZING_TEXT_FIELD_WIDTH;
 			_comboFile.setVisibleItemCount(20);
-			_comboFile.addVerifyListener(net.tourbook.util.UI.verifyFilenameInput());
+			_comboFile.addVerifyListener(net.tourbook.common.UI.verifyFilenameInput());
 			_comboFile.addModifyListener(filePathModifyListener);
 			_comboFile.addSelectionListener(new SelectionAdapter() {
 				@Override
@@ -1829,7 +1829,7 @@ public class DialogExportTour extends TitleAreaDialog {
 		final boolean isEqualizeTimeEnabled = _chkCamouflageSpeed.getSelection();
 		if (isEqualizeTimeEnabled) {
 
-			if (net.tourbook.util.UI.verifyIntegerValue(_txtCamouflageSpeed.getText()) == false) {
+			if (net.tourbook.common.UI.verifyIntegerValue(_txtCamouflageSpeed.getText()) == false) {
 				setError(Messages.dialog_export_error_camouflageSpeedIsInvalid);
 				_txtCamouflageSpeed.setFocus();
 				return;

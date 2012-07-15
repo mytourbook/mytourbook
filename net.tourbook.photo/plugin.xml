@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension point="org.eclipse.core.runtime.preferences">
+         
+		<initializer class="net.tourbook.photo.internal.preferences.PreferenceInitializer"/>
+      
+   </extension>
+
+
+	<!-- COMMANDS -->
+	
+
+	<extension point="org.eclipse.ui.commands">
+
+		<command id="command.net.tourbook.photo.PicDirView"
+			name="%View_Name_PhotoDirectory"
+			defaultHandler="net.tourbook.photo.internal.ActionHandlerOpenViewPhotoDirectory"
+			/>
+		
+	</extension>
+	
+	<!-- MENUS -->
+	
+	<extension point="org.eclipse.ui.menus">
+	
+		<!-- locationURI="menu:views?before=defaultViews" -->
+		
+		<menuContribution 
+		
+			locationURI="menu:views?before=net.tourbook.separator.TourProperties"
+			>
+		            
+			<command commandId="command.net.tourbook.photo.PicDirView"
+				icon="icons/photo-directory.png"
+				label="%View_Name_PhotoDirectory"
+				mnemonic="%View_Name_PhotoDirectory_Mnemonic"/>
+		
+		</menuContribution>
+		
+		<menuContribution locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+
+			<toolbar id="net.tourbook.toolbars.tourViews">
+			
+				<command commandId="command.net.tourbook.photo.PicDirView"
+					icon="icons/photo-directory.png"
+					label="%View_Name_PhotoDirectory"
+					mnemonic="%View_Name_PhotoDirectory_Mnemonic"/>
+			
+			</toolbar>
+
+      </menuContribution>
+		
+	</extension>
+	
+	<!-- PREF PAGES   -->
+
+	<extension point="org.eclipse.ui.preferencePages">
+	
+		<!--
+			Photo
+		-->
+		<page
+			class="net.tourbook.photo.internal.preferences.PrefPagePhoto"
+			id="net.tourbook.preferences.PrefPagePhotoID"
+			name="%PrefPage_Photo">
+		</page>
+		
+			<page id="net.tourbook.preferences.PrefPagePhotoExternalAppID"
+				class="net.tourbook.photo.internal.preferences.PrefPagePhotoExternalApp"
+				category="net.tourbook.preferences.PrefPagePhotoID"
+				name="%PrefPage_Photo_PhotoExternalApp">
+			</page>
+	
+			<page id="net.tourbook.preferences.PrefPagePhotoFullsizeViewerID"
+				class="net.tourbook.photo.internal.preferences.PrefPagePhotoFullsizeViewer"
+				category="net.tourbook.preferences.PrefPagePhotoID"
+				name="%PrefPage_Photo_PhotoFullsizeViewer">
+			</page>
+			
+			<page id="net.tourbook.preferences.PrefPagePhotoDirectoryID"
+				class="net.tourbook.photo.internal.preferences.PrefPagePhotoDirectory"
+				category="net.tourbook.preferences.PrefPagePhotoID"
+				name="%PrefPage_Photo_PhotoViewer">
+			</page>
+	
+			<page id="net.tourbook.preferences.PrefPagePhotoSystemID"
+				class="net.tourbook.photo.internal.preferences.PrefPagePhotoSystem"
+				category="net.tourbook.preferences.PrefPagePhotoID"
+				name="%PrefPage_Photo_Sytem">
+			</page>
+			
+				<page id="net.tourbook.preferences.PrefPagePhotoImageCacheID"
+					class="net.tourbook.photo.internal.preferences.PrefPagePhotoImageCache"
+					category="net.tourbook.preferences.PrefPagePhotoSystemID"
+					name="%PrefPage_Photo_ImageCache">
+				</page>
+				
+				<page id="net.tourbook.preferences.PrefPagePhotoThumbnailStoreID"
+					class="net.tourbook.photo.internal.preferences.PrefPagePhotoThumbnailStore"
+					category="net.tourbook.preferences.PrefPagePhotoSystemID"
+					name="%PrefPage_Photo_ThumbnailStore">
+				</page>
+
+   </extension>
+
+	
+	
+	<extension point="org.eclipse.ui.views">
+	
+		<view
+			category="net.tourbook.category.photo"
+			class="net.tourbook.photo.PicDirView"
+			icon="icons/photo-directory.png"
+			id="net.tourbook.photo.PicDirView"
+			name="%View_Name_PhotoDirectory"/>
+	
+	
+	</extension>
+
+</plugin>

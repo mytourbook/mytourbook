@@ -17,7 +17,7 @@ package net.tourbook.chart;
 
 import java.util.HashMap;
 
-import net.tourbook.util.ITourToolTipProvider;
+import net.tourbook.common.util.ITourToolTipProvider;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.action.Action;

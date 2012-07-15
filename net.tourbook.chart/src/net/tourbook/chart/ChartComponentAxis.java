@@ -17,7 +17,7 @@ package net.tourbook.chart;
 
 import java.util.ArrayList;
 
-import net.tourbook.util.ITourToolTipProvider;
+import net.tourbook.common.util.ITourToolTipProvider;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;

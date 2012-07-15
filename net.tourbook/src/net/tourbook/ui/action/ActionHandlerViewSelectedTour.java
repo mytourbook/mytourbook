@@ -16,8 +16,8 @@
 package net.tourbook.ui.action;
 
 
+import net.tourbook.common.util.Util;
 import net.tourbook.ui.tourChart.TourChartView;
-import net.tourbook.util.Util;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;

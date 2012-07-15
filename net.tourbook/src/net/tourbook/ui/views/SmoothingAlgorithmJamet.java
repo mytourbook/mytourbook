@@ -17,11 +17,11 @@ package net.tourbook.ui.views;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageComputedValues;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
-import net.tourbook.util.Util;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -50,8 +50,8 @@ public class SmoothingAlgorithmJamet implements ISmoothingAlgorithm {
 
 	private final IPreferenceStore	_prefStore		= TourbookPlugin.getDefault().getPreferenceStore();
 
-	private final boolean			_isOSX			= net.tourbook.util.UI.IS_OSX;
-	private final boolean			_isLinux		= net.tourbook.util.UI.IS_LINUX;
+	private final boolean			_isOSX			= net.tourbook.common.UI.IS_OSX;
+	private final boolean			_isLinux		= net.tourbook.common.UI.IS_LINUX;
 
 	private int						_hintDefaultSpinnerWidth;
 

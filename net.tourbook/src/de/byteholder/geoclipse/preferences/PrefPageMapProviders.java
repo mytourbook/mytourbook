@@ -30,7 +30,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.util.StatusUtil;
+import net.tourbook.common.util.StatusUtil;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;

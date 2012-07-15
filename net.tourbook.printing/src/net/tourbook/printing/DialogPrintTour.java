@@ -316,7 +316,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(_comboFile);
 			((GridData) _comboFile.getLayoutData()).widthHint = SIZING_TEXT_FIELD_WIDTH;
 			_comboFile.setVisibleItemCount(20);
-			_comboFile.addVerifyListener(net.tourbook.util.UI.verifyFilenameInput());
+			_comboFile.addVerifyListener(net.tourbook.common.UI.verifyFilenameInput());
 			_comboFile.addModifyListener(filePathModifyListener);
 			_comboFile.addSelectionListener(new SelectionAdapter() {
 				@Override

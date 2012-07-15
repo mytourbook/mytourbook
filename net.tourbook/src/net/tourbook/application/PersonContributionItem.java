@@ -18,12 +18,12 @@ package net.tourbook.application;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
+import net.tourbook.common.UI;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.PersonManager;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.CustomControlContribution;
-import net.tourbook.util.StatusUtil;
-import net.tourbook.util.UI;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridLayoutFactory;

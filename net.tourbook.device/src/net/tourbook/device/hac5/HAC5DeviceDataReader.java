@@ -30,13 +30,13 @@ import java.util.Formatter;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.device.DeviceReaderTools;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
-import net.tourbook.util.StatusUtil;
 
 import org.eclipse.osgi.util.NLS;
 

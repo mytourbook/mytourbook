@@ -153,7 +153,7 @@ public class MeasurementSystemContributionItem extends CustomControlContribution
 
 	private Composite createUI(final Composite parent) {
 
-		if (net.tourbook.util.UI.IS_OSX) {
+		if (net.tourbook.common.UI.IS_OSX) {
 
 			return createUI10ComboBox(parent);
 

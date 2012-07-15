@@ -12,7 +12,7 @@
  *******************************************************************************/
 package net.tourbook.ui;
 
-import net.tourbook.util.HoveredAreaContext;
+import net.tourbook.common.util.HoveredAreaContext;
 
 public interface IInfoToolTipProvider {
 

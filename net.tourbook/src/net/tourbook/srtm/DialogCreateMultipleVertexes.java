@@ -20,7 +20,7 @@
 package net.tourbook.srtm;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.util.UI;
+import net.tourbook.common.UI;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;

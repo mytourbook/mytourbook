@@ -31,16 +31,16 @@ import net.tourbook.chart.ChartToolTipInfo;
 import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.colors.GraphColorProvider;
+import net.tourbook.common.util.ArrayListToArray;
+import net.tourbook.common.util.IToolTipHideListener;
+import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourInfoToolTipProvider;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
-import net.tourbook.util.ArrayListToArray;
-import net.tourbook.util.IToolTipHideListener;
-import net.tourbook.util.PostSelectionProvider;
-import net.tourbook.util.Util;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IToolBarManager;
@@ -73,8 +73,8 @@ public class YearStatisticView extends ViewPart {
 
 	public static final String					ID							= "net.tourbook.views.tourCatalog.yearStatisticView";	//$NON-NLS-1$
 
-	private final boolean						_isOSX						= net.tourbook.util.UI.IS_OSX;
-	private final boolean						_isLinux					= net.tourbook.util.UI.IS_LINUX;
+	private final boolean						_isOSX						= net.tourbook.common.UI.IS_OSX;
+	private final boolean						_isLinux					= net.tourbook.common.UI.IS_LINUX;
 
 	static final String							STATE_NUMBER_OF_YEARS		= "numberOfYearsToDisplay";							//$NON-NLS-1$
 

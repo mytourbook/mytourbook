@@ -23,6 +23,8 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.Date;
 
+import net.tourbook.common.map.GeoPosition;
+
 
 /**
  * A Waypoint represents a waypoint, point of interest, or named feature on a

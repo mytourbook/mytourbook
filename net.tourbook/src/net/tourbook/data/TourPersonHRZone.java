@@ -22,10 +22,10 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
+import net.tourbook.common.util.HSLColor;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.UI;
-import net.tourbook.util.HSLColor;
-import net.tourbook.util.StatusUtil;
 
 import org.eclipse.swt.graphics.RGB;
 

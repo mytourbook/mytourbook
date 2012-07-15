@@ -15,9 +15,10 @@
  *******************************************************************************/
 package de.byteholder.geoclipse.mapprovider;
 
+import net.tourbook.common.map.GeoPosition;
+
 import org.geotools.data.ows.Layer;
 
-import de.byteholder.gpx.GeoPosition;
 
 public class MtLayer implements Comparable<MtLayer>, Cloneable {
 

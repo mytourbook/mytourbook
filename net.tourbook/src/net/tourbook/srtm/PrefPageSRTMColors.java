@@ -34,10 +34,10 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.util.ColumnManager;
-import net.tourbook.util.ITourViewer;
-import net.tourbook.util.TableColumnDefinition;
-import net.tourbook.util.UI;
+import net.tourbook.common.UI;
+import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.ITourViewer;
+import net.tourbook.common.util.TableColumnDefinition;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;

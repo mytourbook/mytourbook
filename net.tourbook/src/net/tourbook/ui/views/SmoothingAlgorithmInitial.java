@@ -17,10 +17,12 @@ package net.tourbook.ui.views;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
+import net.tourbook.common.form.FormTools;
+import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.UI;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -92,7 +94,7 @@ class SmoothingAlgorithmInitial implements ISmoothingAlgorithm {
 			});
 			_spinnerSpeedMinTime.addMouseWheelListener(new MouseWheelListener() {
 				public void mouseScrolled(final MouseEvent event) {
-					UI.adjustSpinnerValueOnMouseScroll(event);
+					Util.adjustSpinnerValueOnMouseScroll(event);
 					onModifySpeed(true);
 				}
 			});
@@ -112,7 +114,7 @@ class SmoothingAlgorithmInitial implements ISmoothingAlgorithm {
 						.applyTo(label);
 
 				// hint bullets
-				UI.createBullets(container, //
+				FormTools.createBullets(container, //
 						Messages.compute_tourValueSpeed_label_description_Hints,
 						1,
 						3,

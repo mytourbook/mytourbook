@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog;
 
-import net.tourbook.ui.TreeViewerItem;
+import net.tourbook.common.util.TreeViewerItem;
 
 /**
  * Abstract class for items in the compare result view

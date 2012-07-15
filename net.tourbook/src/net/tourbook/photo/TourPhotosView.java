@@ -16,10 +16,10 @@
 package net.tourbook.photo;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
-import net.tourbook.util.PostSelectionProvider;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;

@@ -20,7 +20,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.util.IExternalTourEvents;
+import net.tourbook.common.Activator;
+import net.tourbook.common.util.IExternalTourEvents;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -373,7 +374,7 @@ public class PrefPageSRTM extends PreferencePage implements IWorkbenchPreference
 			ElevationSRTM3.clearElevationFileCache();
 
 			// fire event to clear the tour data cache which remove existing srtm data
-			net.tourbook.util.Activator
+			Activator
 					.getDefault()
 					.getPreferenceStore()
 					.setValue(IExternalTourEvents.CLEAR_TOURDATA_CACHE, Math.random());

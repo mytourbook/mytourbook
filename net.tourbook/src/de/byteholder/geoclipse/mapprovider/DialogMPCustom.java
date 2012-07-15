@@ -22,8 +22,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.ReentrantLock;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.util.StatusUtil;
-import net.tourbook.util.Util;
+import net.tourbook.common.map.GeoPosition;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.Util;
 
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
@@ -69,7 +70,6 @@ import de.byteholder.geoclipse.map.event.MapPositionEvent;
 import de.byteholder.geoclipse.map.event.TileEventId;
 import de.byteholder.geoclipse.preferences.PrefPageMapProviders;
 import de.byteholder.geoclipse.ui.ViewerDetailForm;
-import de.byteholder.gpx.GeoPosition;
 
 public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefaultActions {
 
@@ -444,7 +444,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 			// sash
 			final Sash sash = new Sash(container, SWT.VERTICAL);
-			net.tourbook.util.UI.addSashColorHandler(sash);
+			net.tourbook.common.UI.addSashColorHandler(sash);
 
 			// right part (map)
 			final Composite mapContainer = new Composite(container, SWT.NONE);

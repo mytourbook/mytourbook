@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.TimeZone;
 
 import net.tourbook.chart.ChartLabel;
+import net.tourbook.common.util.MtMath;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -31,8 +33,6 @@ import net.tourbook.data.TourWayPoint;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.ui.UI;
-import net.tourbook.util.MtMath;
-import net.tourbook.util.Util;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
@@ -518,7 +518,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 			}
 
 		} catch (final NumberFormatException e) {
-			net.tourbook.util.StatusUtil.showStatus(e);
+			net.tourbook.common.util.StatusUtil.showStatus(e);
 		}
 
 	}

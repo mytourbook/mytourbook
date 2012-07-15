@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.util.StringToArrayConverter;
+import net.tourbook.common.util.StringToArrayConverter;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;

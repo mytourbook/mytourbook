@@ -16,7 +16,7 @@
 package net.tourbook.statistics;
 
 import net.tourbook.chart.ChartComponents;
-import net.tourbook.util.TourToolTip;
+import net.tourbook.common.util.TourToolTip;
 
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Control;

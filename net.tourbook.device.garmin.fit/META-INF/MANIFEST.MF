@@ -9,7 +9,7 @@ Require-Bundle: org.eclipse.core.runtime,
  net.tourbook,
  net.tourbook.chart,
  net.tourbook.ext.jars,
- net.tourbook.util,
+ net.tourbook.common,
  net.tourbook.ext.jars.printing
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: MyTourbook

@@ -15,9 +15,9 @@
  *******************************************************************************/
 package net.tourbook.ui;
 
+import net.tourbook.common.util.Util;
 import net.tourbook.data.SplineData;
 import net.tourbook.math.CubicSpline;
-import net.tourbook.util.Util;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;

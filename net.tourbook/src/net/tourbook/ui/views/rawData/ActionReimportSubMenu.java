@@ -16,8 +16,8 @@
 package net.tourbook.ui.views.rawData;
 
 import net.tourbook.Messages;
+import net.tourbook.common.util.ITourViewer3;
 import net.tourbook.importdata.RawDataManager;
-import net.tourbook.util.ITourViewer3;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;

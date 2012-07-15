@@ -18,8 +18,8 @@ package net.tourbook.ui.views.tourCatalog;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.data.TourReference;
-import net.tourbook.ui.TreeViewerItem;
 
 /**
  * contains tree viewer items (TVI) for reference tours

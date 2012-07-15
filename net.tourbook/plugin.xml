@@ -314,51 +314,6 @@
       
 -->
 
-	<!--
-		Photo
-	-->
-	<page
-		class="net.tourbook.photo.PrefPagePhoto"
-		id="net.tourbook.preferences.PrefPagePhotoID"
-		name="%PrefPage_Photo">
-	</page>
-	
-		<page id="net.tourbook.preferences.PrefPagePhotoExternalAppID"
-			class="net.tourbook.photo.PrefPagePhotoExternalApp"
-			category="net.tourbook.preferences.PrefPagePhotoID"
-			name="%PrefPage_Photo_PhotoExternalApp">
-		</page>
-
-		<page id="net.tourbook.preferences.PrefPagePhotoFullsizeViewerID"
-			class="net.tourbook.photo.PrefPagePhotoFullsizeViewer"
-			category="net.tourbook.preferences.PrefPagePhotoID"
-			name="%PrefPage_Photo_PhotoFullsizeViewer">
-		</page>
-		
-		<page id="net.tourbook.preferences.PrefPagePhotoDirectoryID"
-			class="net.tourbook.photo.PrefPagePhotoDirectory"
-			category="net.tourbook.preferences.PrefPagePhotoID"
-			name="%PrefPage_Photo_PhotoViewer">
-		</page>
-
-		<page id="net.tourbook.preferences.PrefPagePhotoSystemID"
-			class="net.tourbook.photo.PrefPagePhotoSystem"
-			category="net.tourbook.preferences.PrefPagePhotoID"
-			name="%PrefPage_Photo_Sytem">
-		</page>
-		
-			<page id="net.tourbook.preferences.PrefPagePhotoImageCacheID"
-				class="net.tourbook.photo.PrefPagePhotoImageCache"
-				category="net.tourbook.preferences.PrefPagePhotoSystemID"
-				name="%PrefPage_Photo_ImageCache">
-			</page>
-			
-			<page id="net.tourbook.preferences.PrefPagePhotoThumbnailStoreID"
-				class="net.tourbook.photo.PrefPagePhotoThumbnailStore"
-				category="net.tourbook.preferences.PrefPagePhotoSystemID"
-				name="%PrefPage_Photo_ThumbnailStore">
-			</page>
-
 
 	<!--
 		People
@@ -529,43 +484,36 @@
             name="net.tourbook.separator.TourDirectories"
             visible="true"/>
 
-         <command
-            commandId="command.net.tourbook.views.rawData.RawDataView"
+         <command commandId="command.net.tourbook.views.rawData.RawDataView"
             icon="icons/rawdata.gif"
             label="%view_name_Data_Import"
             mnemonic="%view_name_Data_Import_Mnemonic"/>
-         <command
-            commandId="command.net.tourbook.views.tourListView"
+            
+         <command commandId="command.net.tourbook.views.tourListView"
             icon="icons/tour-list.gif"
             label="%view_name_Book"
             mnemonic="%view_name_Book_Mnemonic"/>
-         <command
-               commandId="command.net.tourbook.views.calendar.CalendarView"
+            
+         <command commandId="command.net.tourbook.views.calendar.CalendarView"
                icon="icons/calendar.png"
                label="%view_name_Calendar"
                mnemonic="%view_name_Calendar_Mnemonic"/>
-         <command
-            commandId="command.net.tourbook.views.tourCatalog.TourCatalogView"
+               
+         <command commandId="command.net.tourbook.views.tourCatalog.TourCatalogView"
             icon="icons/tour-map.gif"
             label="%view_name_tourCatalog"
             mnemonic="%view_name_tourCatalog_Mnemonic"/>
-	     <command
-            commandId="command.net.tourbook.views.tagViewID"
+            
+	     <command commandId="command.net.tourbook.views.tagViewID"
             icon="icons/tour-tag.gif"
             label="%command_tagging_name"
             mnemonic="%command_tagging_name_Mnemonic"
             tooltip="%command_tagging_name_tooltip"/>
-         <command
-            commandId="command.net.tourbook.views.StatisticView"
+            
+         <command commandId="command.net.tourbook.views.StatisticView"
             icon="icons/statistics.gif"
             label="%view_name_Statistics"
             mnemonic="%view_name_Statistics_Mnemonic"/>
-            
-         <command
-            	commandId="command.net.tourbook.photo.PicDirView"
-            	icon="icons/photo-directory.png"
-            	label="%View_Name_PhotoDirectory"
-            	mnemonic="%View_Name_PhotoDirectory_Mnemonic"/>
             
          <separator
             name="net.tourbook.separator.TourProperties"
@@ -691,11 +639,6 @@
                   mnemonic="%command_tourChart_tool_graphAnalyzer_mnemonic"
                   style="push"
                   tooltip="%command_tourChart_tool_graphAnalyzer_tooltip"/>
-            <command
-                  commandId="command.net.tourbook.photo.PicDirView"
-                  icon="icons/photo-directory.png"
-                  label="%View_Name_PhotoDirectory"
-                  mnemonic="%View_Name_PhotoDirectory_Mnemonic"/>
 
          </toolbar>
       </menuContribution>
@@ -819,9 +762,7 @@
 
    </extension>
 
-   <extension
-         point="org.eclipse.ui.commands">
-
+   <extension point="org.eclipse.ui.commands">
 
       <command
             id="command.net.tourbook.views.rawData.RawDataView"
@@ -834,12 +775,6 @@
             defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourBook"
             />
             
-      <command
-            id="command.net.tourbook.photo.PicDirView"
-            name="%View_Name_PhotoDirectory"
-            defaultHandler="net.tourbook.photo.ActionHandlerOpenViewPhotoDirectory"
-            />
-
       <command
             id="command.net.tourbook.views.tagViewID"
             name="%view_name_tagView"
@@ -1290,13 +1225,7 @@
 			      
 			<view
 				category="net.tourbook.category.photo"
-				class="net.tourbook.photo.PicDirView"
-				icon="icons/photo-directory.png"
-				id="net.tourbook.photo.PicDirView"
-				name="%View_Name_PhotoDirectory"/>
-			<view
-				category="net.tourbook.category.photo"
-				class="net.tourbook.photo.merge.PhotosAndToursView"
+				class="net.tourbook.photo.PhotosAndToursView"
 				icon="icons/photo-and-tours-view.png"
 				id="net.tourbook.photo.merge.PhotosAndToursView.ID"
 				name="%View_Name_PhotosAndTours"/>

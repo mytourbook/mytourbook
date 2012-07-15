@@ -19,7 +19,7 @@
 
 package de.byteholder.geoclipse.util;
 
-import de.byteholder.gpx.GeoPosition;
+import net.tourbook.common.map.GeoPosition;
 
 /**
  * @author Michael Kanis

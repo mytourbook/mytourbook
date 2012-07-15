@@ -17,8 +17,8 @@ package net.tourbook.preferences;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.util.Util;
 import net.tourbook.ui.UI;
-import net.tourbook.util.Util;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -359,7 +359,7 @@ public class PrefPageAppearanceMap extends FieldEditorPreferencePage implements 
 
 				if (oldValue.equals(TOUR_PAINT_METHOD_SIMPLE)
 						&& newValue.equals(TOUR_PAINT_METHOD_COMPLEX)
-						&& net.tourbook.util.UI.IS_OSX) {
+						&& net.tourbook.common.UI.IS_OSX) {
 
 					MessageDialog.openWarning(
 							getShell(),

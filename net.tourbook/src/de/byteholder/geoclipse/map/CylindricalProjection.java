@@ -5,8 +5,9 @@ import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
 
+import net.tourbook.common.map.GeoPosition;
+
 import de.byteholder.geoclipse.mapprovider.MP;
-import de.byteholder.gpx.GeoPosition;
 
 public class CylindricalProjection extends Projection {
 

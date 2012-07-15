@@ -24,7 +24,7 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.util.UI;
+import net.tourbook.common.UI;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;

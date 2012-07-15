@@ -26,13 +26,13 @@ import java.util.GregorianCalendar;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.util.StringToArrayConverter;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
-import net.tourbook.util.StringToArrayConverter;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -65,8 +65,8 @@ import org.eclipse.ui.part.PageBook;
 
 public class StatContainer extends Composite {
 
-	private final boolean						_isOSX						= net.tourbook.util.UI.IS_OSX;
-	private final boolean						_isLinux					= net.tourbook.util.UI.IS_LINUX;
+	private final boolean						_isOSX						= net.tourbook.common.UI.IS_OSX;
+	private final boolean						_isLinux					= net.tourbook.common.UI.IS_LINUX;
 
 	private static final String					STATE_SELECTED_STATISTIC	= "statistic.container.selected_statistic"; //$NON-NLS-1$
 	private static final String					STATE_SELECTED_YEAR			= "statistic.container.selected-year";		//$NON-NLS-1$

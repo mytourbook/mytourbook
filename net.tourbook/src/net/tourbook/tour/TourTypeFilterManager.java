@@ -32,12 +32,12 @@ import javax.xml.parsers.ParserConfigurationException;
 import net.tourbook.Messages;
 import net.tourbook.application.TourTypeContributionItem;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.TourTypeFilterSet;
-import net.tourbook.ui.action.ActionOpenPrefDialog;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;

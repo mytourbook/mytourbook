@@ -15,11 +15,11 @@
  *******************************************************************************/
 package net.tourbook.application;
 
+import net.tourbook.common.UI;
+import net.tourbook.common.util.Util;
 import net.tourbook.tour.TourTypeFilterManager;
 import net.tourbook.ui.CustomControlContribution;
 import net.tourbook.ui.TourTypeFilter;
-import net.tourbook.util.UI;
-import net.tourbook.util.Util;
 
 import org.eclipse.jface.action.ICoolBarManager;
 import org.eclipse.jface.action.IMenuListener;

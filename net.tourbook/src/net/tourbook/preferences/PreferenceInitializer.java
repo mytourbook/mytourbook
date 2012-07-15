@@ -21,14 +21,12 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.colors.ColorDefinition;
 import net.tourbook.colors.GraphColorProvider;
+import net.tourbook.common.util.StringToArrayConverter;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.photo.manager.PhotoLoadManager;
 import net.tourbook.tour.BreakTimeTool;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.ISmoothingAlgorithm;
-import net.tourbook.util.StringToArrayConverter;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -355,82 +353,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(
 				ITourbookPreferences.VIEW_DOUBLE_CLICK_ACTIONS,
 				PrefPageViews.VIEW_DOUBLE_CLICK_ACTION_QUICK_EDIT);
-
-		/*
-		 * photo
-		 */
-		store.setDefault(ITourbookPreferences.PHOTO_THUMBNAIL_STORE_IS_DEFAULT_LOCATION, true);
-		store.setDefault(ITourbookPreferences.PHOTO_THUMBNAIL_STORE_CUSTOM_LOCATION, UI.EMPTY_STRING);
-
-		store.setDefault(ITourbookPreferences.PHOTO_THUMBNAIL_STORE_IS_CLEANUP, false);
-		store.setDefault(ITourbookPreferences.PHOTO_THUMBNAIL_STORE_NUMBER_OF_DAYS_TO_KEEP_IMAGES, 90);
-		store.setDefault(ITourbookPreferences.PHOTO_THUMBNAIL_STORE_CLEANUP_PERIOD, 30);
-
-		store.setDefault(ITourbookPreferences.PHOTO_THUMBNAIL_IMAGE_CACHE_SIZE, 2000);
-		store.setDefault(ITourbookPreferences.PHOTO_ORIGINAL_IMAGE_CACHE_SIZE, 3);
-
-		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_IS_SHOW_FILE_FOLDER, true);
-
-		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_IS_SHOW_IMAGE_WITH_HIGH_QUALITY, true);
-		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_HIGH_QUALITY_IMAGE_MIN_SIZE, 50);
-		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_HQ_IMAGE_SIZE, PhotoLoadManager.IMAGE_SIZE_LARGE_DEFAULT);
-
-		PreferenceConverter.setDefault(store, ITourbookPreferences.PHOTO_VIEWER_COLOR_FOREGROUND, //
-				new RGB(0xf3, 0xf3, 0xf3));
-
-		PreferenceConverter.setDefault(store, ITourbookPreferences.PHOTO_VIEWER_COLOR_BACKGROUND, //
-				new RGB(0x33, 0x33, 0x33));
-
-		PreferenceConverter.setDefault(store, ITourbookPreferences.PHOTO_VIEWER_COLOR_SELECTION_FOREGROUND, //
-				new RGB(0xFF, 0x80, 0x33));
-
-		PreferenceConverter.setDefault(store, ITourbookPreferences.PHOTO_VIEWER_COLOR_FOLDER, //
-				new RGB(0xFF, 0x6A, 0x11));
-
-		PreferenceConverter.setDefault(store, ITourbookPreferences.PHOTO_VIEWER_COLOR_FILE, //
-				new RGB(0x55, 0xC8, 0xFF));
-
-		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_TEXT_MIN_THUMB_SIZE, 70);
-		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_IMAGE_BORDER_SIZE, 4);
-
-		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_FONT, //
-				UI.IS_OSX /*
-						 * this small font for OSX cannot be selected in the UI, but is smaller than
-						 * the fonts which can be selected
-						 */
-				? "1|sans-serif|9|0|"//$NON-NLS-1$
-						: "1|sans-serif|7|0|");//$NON-NLS-1$
-/////////////////////	  1|DejaVu Sans|6.75|0|WINDOWS|1|-9|0|0|0|400|0|0|0|0|3|2|1|34|DejaVu Sans
-
-		store.setDefault(ITourbookPreferences.PHOTO_VIEWER_IMAGE_FRAMEWORK, //
-				UI.IS_OSX //
-						? PhotoLoadManager.IMAGE_FRAMEWORK_SWT
-						//
-						// SWT is terrible when scolling large images on win & linux, osx is smoothly
-						//
-						: PhotoLoadManager.IMAGE_FRAMEWORK_AWT);
-
-		store.setDefault(ITourbookPreferences.PHOTO_FULLSIZE_VIEWER_IS_SHOW_PREVIEW, false);
-		store.setDefault(ITourbookPreferences.PHOTO_FULLSIZE_VIEWER_IS_SHOW_LOADING_MESSAGE, true);
-		store.setDefault(ITourbookPreferences.PHOTO_FULLSIZE_VIEWER_IS_SHOW_HQ_IMAGE, false);
-
-		store.setDefault(ITourbookPreferences.PHOTO_SYSTEM_IS_ROTATE_IMAGE_AUTOMATICALLY, false);
-
-		/*
-		 * external photo viewer
-		 */
-		if (UI.IS_WIN) {
-
-			store.setDefault(ITourbookPreferences.PHOTO_EXTERNAL_PHOTO_VIEWER_1, "explorer.exe"); //$NON-NLS-1$
-
-		} else if (UI.IS_OSX) {
-
-			store.setDefault(ITourbookPreferences.PHOTO_EXTERNAL_PHOTO_VIEWER_1, "Preview.app"); //$NON-NLS-1$
-			store.setDefault(ITourbookPreferences.PHOTO_EXTERNAL_PHOTO_VIEWER_2, "Finder.app"); //$NON-NLS-1$
-
-		} else if (UI.IS_LINUX) {
-			store.setDefault(ITourbookPreferences.PHOTO_EXTERNAL_PHOTO_VIEWER_1, "nautilus"); //$NON-NLS-1$
-		}
 
 	}
 }

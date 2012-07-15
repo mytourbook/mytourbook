@@ -17,9 +17,10 @@ package net.tourbook.mapping;
 
 import java.text.NumberFormat;
 
+import net.tourbook.common.map.GeoPosition;
+
 import org.eclipse.osgi.util.NLS;
 
-import de.byteholder.gpx.GeoPosition;
 
 public class MapInfoManager {
 

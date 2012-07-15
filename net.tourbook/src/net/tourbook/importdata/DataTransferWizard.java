@@ -21,8 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.util.Util;
 import net.tourbook.ui.views.rawData.RawDataView;
-import net.tourbook.util.Util;
 
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.Wizard;

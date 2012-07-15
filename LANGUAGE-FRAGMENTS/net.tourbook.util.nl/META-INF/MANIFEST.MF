@@ -4,5 +4,5 @@ Bundle-Name: Language support
 Bundle-SymbolicName: net.tourbook.util.nl;singleton:=true
 Bundle-Version: 12.6.1.qualifier
 Bundle-Vendor: MyTourbook
-Fragment-Host: net.tourbook.util
+Fragment-Host: net.tourbook.common
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

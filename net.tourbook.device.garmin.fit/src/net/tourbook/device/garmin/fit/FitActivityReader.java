@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.device.garmin.fit.listeners.ActivityMesgListenerImpl;
 import net.tourbook.device.garmin.fit.listeners.DeviceInfoMesgListenerImpl;
@@ -15,7 +16,6 @@ import net.tourbook.device.garmin.fit.listeners.SessionMesgListenerImpl;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
-import net.tourbook.util.StatusUtil;
 
 import org.apache.commons.io.IOUtils;
 

@@ -15,8 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
+import net.tourbook.common.util.ITourToolTipProvider;
 import net.tourbook.ui.ITourProvider;
-import net.tourbook.util.ITourToolTipProvider;
 
 public class ActionTourToolTipEditQuick extends ActionEditQuick {
 

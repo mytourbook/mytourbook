@@ -14,6 +14,8 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: %Bundle-Vendor.0
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: net.tourbook.util,
+Import-Package: net.tourbook.common,
+ net.tourbook.common.preferences,
+ net.tourbook.common.util,
  org.joda.time,
  org.joda.time.format

@@ -22,8 +22,9 @@ package de.byteholder.geoclipse.map;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 
+import net.tourbook.common.map.GeoPosition;
+
 import de.byteholder.geoclipse.mapprovider.MP;
-import de.byteholder.gpx.GeoPosition;
 
 /**
  * @author Joshua Marinacci

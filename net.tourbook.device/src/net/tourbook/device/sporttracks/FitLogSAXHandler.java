@@ -22,7 +22,9 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 import net.tourbook.chart.ChartLabel;
-import net.tourbook.data.IWeather;
+import net.tourbook.common.util.MtMath;
+import net.tourbook.common.util.Util;
+import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -32,8 +34,6 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.device.InvalidDeviceSAXException;
 import net.tourbook.device.Messages;
 import net.tourbook.preferences.TourTypeColorDefinition;
-import net.tourbook.util.MtMath;
-import net.tourbook.util.Util;
 
 import org.eclipse.osgi.util.NLS;
 import org.joda.time.DateTime;

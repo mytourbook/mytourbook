@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,7 +28,9 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.locks.ReentrantLock;
 
-import net.tourbook.util.StatusUtil;
+import net.tourbook.common.map.CommonMapProvider;
+import net.tourbook.common.map.GeoPosition;
+import net.tourbook.common.util.StatusUtil;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.ListenerList;
@@ -55,7 +57,6 @@ import de.byteholder.geoclipse.map.UI;
 import de.byteholder.geoclipse.map.event.ITileListener;
 import de.byteholder.geoclipse.map.event.TileEventId;
 import de.byteholder.geoclipse.util.Util;
-import de.byteholder.gpx.GeoPosition;
 
 /**
  * This is the base class for map providers (MP) which provides all data which are necessary to draw
@@ -63,7 +64,7 @@ import de.byteholder.gpx.GeoPosition;
  * <br>
  * This is a new implementation of the previous TileFactory class
  */
-public abstract class MP implements Cloneable, Comparable<Object> {
+public abstract class MP extends CommonMapProvider implements Cloneable, Comparable<Object> {
 
 	private static final int						TILE_CACHE_SIZE						= 2000;													//2000;
 	private static final int						ERROR_CACHE_SIZE					= 10000;													//10000;

@@ -21,7 +21,8 @@ package de.byteholder.geoclipse.util;
 
 import java.io.IOException;
 
-import de.byteholder.gpx.GeoPosition;
+import net.tourbook.common.map.GeoPosition;
+
 
 public interface GeoCoder {
 

@@ -7,7 +7,7 @@ Bundle-Activator: net.tourbook.ext.velocity.Activator
 Bundle-Vendor: MyTourbook
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- net.tourbook.util,
+ net.tourbook.common,
  net.tourbook.rxtx_2.2
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Eclipse-BuddyPolicy: registered

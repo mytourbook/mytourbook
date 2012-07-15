@@ -20,6 +20,8 @@ import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.form.FormTools;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.database.IComputeTourValues;
 import net.tourbook.database.TourDatabase;
@@ -29,7 +31,6 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.SmoothingUI;
-import net.tourbook.util.Util;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -326,7 +327,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 					.applyTo(label);
 			label.setText(Messages.compute_tourValueElevation_label_description);
 
-			UI.createBullets(container, //
+			FormTools.createBullets(container, //
 					Messages.compute_tourValueElevation_label_description_Hints,
 					1,
 					3,
@@ -422,7 +423,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			/*
 			 * hints
 			 */
-			UI.createBullets(container, //
+			FormTools.createBullets(container, //
 					Messages.Compute_BreakTime_Label_Hints,
 					1,
 					2,
@@ -1245,7 +1246,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 		// break method pages have different heights, enforce layout of the whole view part
 		_tabFolder.layout(true, true);
 
-		net.tourbook.util.UI.updateScrolledContent(_tabFolder);
+		net.tourbook.common.UI.updateScrolledContent(_tabFolder);
 	}
 
 }

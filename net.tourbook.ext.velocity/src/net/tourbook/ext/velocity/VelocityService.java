@@ -17,7 +17,7 @@ package net.tourbook.ext.velocity;
 
 import java.util.Properties;
 
-import net.tourbook.util.StatusUtil;
+import net.tourbook.common.util.StatusUtil;
 
 import org.apache.velocity.app.Velocity;
 

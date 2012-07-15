@@ -40,15 +40,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.map.GeoPosition;
+import net.tourbook.common.util.HoveredAreaContext;
+import net.tourbook.common.util.IToolTipHideListener;
+import net.tourbook.common.util.ITourToolTipProvider;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.TourToolTip;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.mapping.WayPointToolTipProvider;
 import net.tourbook.ui.IInfoToolTipProvider;
 import net.tourbook.ui.IMapToolTipProvider;
-import net.tourbook.util.HoveredAreaContext;
-import net.tourbook.util.IToolTipHideListener;
-import net.tourbook.util.ITourToolTipProvider;
-import net.tourbook.util.StatusUtil;
-import net.tourbook.util.TourToolTip;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -113,7 +114,6 @@ import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
 import de.byteholder.geoclipse.ui.TextWrapPainter;
-import de.byteholder.gpx.GeoPosition;
 
 public class Map extends Canvas {
 
@@ -222,7 +222,7 @@ public class Map extends Canvas {
 
 	private static RGB							MAP_TRANSPARENT_RGB;
 	{
-		MAP_TRANSPARENT_RGB = net.tourbook.util.UI.IS_OSX //
+		MAP_TRANSPARENT_RGB = net.tourbook.common.UI.IS_OSX //
 //				? new RGB(0x7e, 0x7f, 0x80)
 //				? new RGB(0xfe, 0x00, 0x00)
 				? new RGB(0xfe, 0xfe, 0xfe)

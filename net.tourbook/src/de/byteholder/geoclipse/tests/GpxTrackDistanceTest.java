@@ -6,12 +6,13 @@ import java.util.ArrayList;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import net.tourbook.common.map.GeoPosition;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import de.byteholder.geoclipse.util.GeoUtils;
-import de.byteholder.gpx.GeoPosition;
 
 /**
  * @author Michael Kanis

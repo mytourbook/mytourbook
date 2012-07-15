@@ -23,13 +23,13 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 
+import net.tourbook.common.util.ArrayListToArray;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
-import net.tourbook.util.ArrayListToArray;
 
 public class DataProviderTourHrZones extends DataProvider {
 

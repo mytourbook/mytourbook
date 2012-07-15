@@ -18,14 +18,14 @@ package net.tourbook.tour;
 import java.util.ArrayList;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.util.HoveredAreaContext;
+import net.tourbook.common.util.IHoveredArea;
+import net.tourbook.common.util.ITourToolTipProvider;
+import net.tourbook.common.util.TourToolTip;
 import net.tourbook.data.TourData;
 import net.tourbook.ui.IInfoToolTipProvider;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.Messages;
-import net.tourbook.util.HoveredAreaContext;
-import net.tourbook.util.IHoveredArea;
-import net.tourbook.util.ITourToolTipProvider;
-import net.tourbook.util.TourToolTip;
 
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.events.DisposeEvent;

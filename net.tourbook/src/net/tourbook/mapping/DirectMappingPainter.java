@@ -18,6 +18,7 @@ package net.tourbook.mapping;
 import java.util.List;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.map.GeoPosition;
 import net.tourbook.data.TourData;
 
 import org.eclipse.swt.SWT;
@@ -33,7 +34,6 @@ import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.MapLegend;
 import de.byteholder.geoclipse.map.MapPainter;
 import de.byteholder.geoclipse.mapprovider.MP;
-import de.byteholder.gpx.GeoPosition;
 
 public class DirectMappingPainter implements IDirectPainter {
 

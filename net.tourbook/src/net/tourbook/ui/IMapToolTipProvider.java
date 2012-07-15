@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui;
 
-import net.tourbook.util.HoveredAreaContext;
+import net.tourbook.common.util.HoveredAreaContext;
 
 import org.eclipse.swt.graphics.Rectangle;
 

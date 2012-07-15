@@ -37,8 +37,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.util.StatusUtil;
-import net.tourbook.util.StringToArrayConverter;
+import net.tourbook.common.map.GeoPosition;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringToArrayConverter;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -74,7 +75,6 @@ import de.byteholder.geoclipse.map.TileImageCache;
 import de.byteholder.geoclipse.map.UI;
 import de.byteholder.geoclipse.mapprovider.DialogMPCustom.PART_TYPE;
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
-import de.byteholder.gpx.GeoPosition;
 
 /**
  * this will manage all map providers
@@ -899,6 +899,10 @@ public class MapProviderManager {
 		}
 
 		return updatedWmsMapProvider;
+	}
+
+	public static boolean isInstanciated() {
+		return _instance != null;
 	}
 
 	/**

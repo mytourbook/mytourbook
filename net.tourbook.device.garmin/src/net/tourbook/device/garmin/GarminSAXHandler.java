@@ -24,13 +24,13 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import net.tourbook.common.UI;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.TourbookDevice;
-import net.tourbook.util.StatusUtil;
-import net.tourbook.util.UI;
-import net.tourbook.util.Util;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -614,7 +614,7 @@ public class GarminSAXHandler extends DefaultHandler {
 					? UI.EMPTY_STRING
 					: majorVersion + (minorVersion == null //
 							? UI.EMPTY_STRING
-							: UI.DOT + minorVersion));
+							: UI.SYMBOL_DOT + minorVersion));
 
 			// add new tour to other tours
 			_newlyImportedTours.put(tourId, tourData);

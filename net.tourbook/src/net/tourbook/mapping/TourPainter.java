@@ -24,15 +24,17 @@ import java.util.Set;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Util;
+import net.tourbook.common.map.GeoPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourWayPoint;
-import net.tourbook.photo.manager.ILoadCallBack;
-import net.tourbook.photo.manager.ImageQuality;
-import net.tourbook.photo.manager.Photo;
-import net.tourbook.photo.manager.PhotoImageCache;
-import net.tourbook.photo.manager.PhotoLoadManager;
-import net.tourbook.photo.manager.PhotoLoadingState;
+import net.tourbook.photo.ILoadCallBack;
+import net.tourbook.photo.IPhotoPreferences;
+import net.tourbook.photo.ImageQuality;
+import net.tourbook.photo.Photo;
+import net.tourbook.photo.PhotoImageCache;
+import net.tourbook.photo.PhotoLoadManager;
+import net.tourbook.photo.PhotoLoadingState;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceMap;
 import net.tourbook.ui.ColorCacheInt;
@@ -58,7 +60,6 @@ import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.MapPainter;
 import de.byteholder.geoclipse.map.Tile;
 import de.byteholder.geoclipse.mapprovider.MP;
-import de.byteholder.gpx.GeoPosition;
 
 /**
  * Paints a tour into the map
@@ -117,7 +118,7 @@ public class TourPainter extends MapPainter {
 	static {
 
 		final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
-		_bgColor = colorRegistry.get(ITourbookPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
+		_bgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
 
 		_tourPaintConfig = TourPainterConfiguration.getInstance();
 
@@ -155,7 +156,7 @@ public class TourPainter extends MapPainter {
 //		});
 	}
 
-	public class LoadCallbackImage implements ILoadCallBack {
+	private class LoadCallbackImage implements ILoadCallBack {
 
 		@Override
 		public void callBackImageIsLoaded(final boolean isUpdateUI) {
@@ -1426,7 +1427,7 @@ public class TourPainter extends MapPainter {
 
 				// the requested image is not available in the image cache -> image must be loaded
 
-				final ILoadCallBack imageLoadCallback = this.new LoadCallbackImage();
+				final ILoadCallBack imageLoadCallback = new LoadCallbackImage();
 
 				PhotoLoadManager.putImageInLoadingQueueThumbMap(photo, requestedImageQuality, imageLoadCallback);
 			}

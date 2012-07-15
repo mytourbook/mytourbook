@@ -19,9 +19,9 @@ import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.util.StringToArrayConverter;
 import net.tourbook.statistic.StatContainer;
 import net.tourbook.statistic.TourbookStatistic;
-import net.tourbook.util.StringToArrayConverter;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;

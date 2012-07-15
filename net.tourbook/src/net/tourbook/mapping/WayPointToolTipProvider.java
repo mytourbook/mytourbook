@@ -18,13 +18,13 @@ package net.tourbook.mapping;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
+import net.tourbook.common.util.HoveredAreaContext;
+import net.tourbook.common.util.ITourToolTipProvider;
+import net.tourbook.common.util.TourToolTip;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.ui.IMapToolTipProvider;
 import net.tourbook.ui.Messages;
 import net.tourbook.ui.UI;
-import net.tourbook.util.HoveredAreaContext;
-import net.tourbook.util.ITourToolTipProvider;
-import net.tourbook.util.TourToolTip;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;

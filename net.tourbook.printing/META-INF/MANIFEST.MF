@@ -8,7 +8,7 @@ Bundle-Vendor: MyTourbook
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  net.tourbook,
- net.tourbook.util,
+ net.tourbook.common,
  net.tourbook.ext.jars,
  net.tourbook.ext.jars.printing
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

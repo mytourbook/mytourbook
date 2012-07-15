@@ -8,9 +8,8 @@ Bundle-Vendor: MyTourbook
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.eclipse.core.expressions
+ org.eclipse.core.expressions,
+ net.tourbook.common
 Bundle-ActivationPolicy: lazy
 Export-Package: net.tourbook.chart
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: gnu.trove.list.array,
- net.tourbook.util
