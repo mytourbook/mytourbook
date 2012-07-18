@@ -26,10 +26,10 @@ import org.eclipse.jface.viewers.TreeViewer;
 public class TVIFolderFolder extends TVIFolder {
 
 	File						_treeItemFolder;
+
 	String						_folderName;
 
 	boolean						_isRootFolder;
-
 	private File[]				_folderChildren;
 
 	/**
@@ -46,7 +46,9 @@ public class TVIFolderFolder extends TVIFolder {
 
 	private final FileFilter	_folderFilter;
 
-	AtomicBoolean				isInWaitingQueue	= new AtomicBoolean();
+	AtomicBoolean				_isInWaitingQueue	= new AtomicBoolean();
+
+	FolderLoader				_folderLoader;
 
 	{
 		_folderFilter = new FileFilter() {
@@ -97,6 +99,28 @@ public class TVIFolderFolder extends TVIFolder {
 	}
 
 	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof TVIFolderFolder)) {
+			return false;
+		}
+		final TVIFolderFolder other = (TVIFolderFolder) obj;
+		if (_folderName == null) {
+			if (other._folderName != null) {
+				return false;
+			}
+		} else if (!_folderName.equals(other._folderName)) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
 	protected void fetchChildren() {
 
 		if (_isFolderLoaded == false) {
@@ -142,6 +166,14 @@ public class TVIFolderFolder extends TVIFolder {
 		}
 
 		return _folderChildren == null ? false : _folderChildren.length > 0;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((_folderName == null) ? 0 : _folderName.hashCode());
+		return result;
 	}
 
 	boolean isFolderLoaded() {

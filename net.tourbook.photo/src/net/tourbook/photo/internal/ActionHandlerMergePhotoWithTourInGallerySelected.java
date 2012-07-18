@@ -15,22 +15,25 @@
  *******************************************************************************/
 package net.tourbook.photo.internal;
 
-import org.eclipse.jface.action.Action;
+import net.tourbook.photo.PicDirView;
 
-public class ActionMergeGalleryPhotosWithTours extends Action {
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.handlers.HandlerUtil;
 
-	private PicDirImages	_picDirImages;
-
-	public ActionMergeGalleryPhotosWithTours(final PicDirImages picDirImages) {
-
-		super(Messages.Pic_Dir_Action_MergePhotosWithTours, AS_PUSH_BUTTON);
-
-		_picDirImages = picDirImages;
-
-	}
+public class ActionHandlerMergePhotoWithTourInGallerySelected extends AbstractHandler {
 
 	@Override
-	public void run() {
-		_picDirImages.actionMergePhotosWithTours();
+	public Object execute(final ExecutionEvent event) throws ExecutionException {
+
+		final IWorkbenchPart activePart = HandlerUtil.getActiveWorkbenchWindow(event).getActivePage().getActivePart();
+
+		if (activePart instanceof PicDirView) {
+			((PicDirView) activePart).actionMergePhotoWithTour(false);
+		}
+
+		return null;
 	}
 }

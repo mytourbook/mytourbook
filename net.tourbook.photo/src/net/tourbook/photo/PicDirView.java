@@ -42,6 +42,7 @@ import net.tourbook.photo.internal.ui.PhotoUI;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -49,7 +50,7 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Sash;
@@ -233,6 +234,28 @@ public class PicDirView extends ViewPart {
 		// update gallery
 
 		_picDirImages.filterGallery(_currentImageFilter);
+	}
+
+	public void actionMergePhotoWithTour(final boolean isAllImages) {
+
+		final ISelection selection = _picDirImages.getMergePhotoTourSelection(isAllImages);
+
+		// fire selection for the selected photos
+		if (selection != null) {
+
+			_postSelectionProvider.setSelection(selection);
+
+			/*
+			 * reset selection because this selection opens a perspective and it causes a runtime
+			 * exception when this selection is fired again, it causes really trouble !!!
+			 */
+			_postSelectionProvider.setSelection(new ISelection() {
+				@Override
+				public boolean isEmpty() {
+					return true;
+				}
+			});
+		}
 	}
 
 	public void actionShowPhotoInfo(final Action action) {
@@ -500,6 +523,11 @@ public class PicDirView extends ViewPart {
 		saveState();
 	}
 
+	public void registerContextMenu(final String menuId, final MenuManager menuMgr) {
+
+		getSite().registerContextMenu(menuId, menuMgr, _postSelectionProvider);
+	}
+
 	private void restoreState() {
 
 		_containerMasterDetail.setViewerWidth(Util.getStateInt(_state, STATE_TREE_WIDTH, 200));
@@ -611,8 +639,8 @@ public class PicDirView extends ViewPart {
 		_containerMasterDetail.setMaximizedControl(isShowFolderAndGallery ? null : _containerImages);
 	}
 
-	public void setSelection(final StructuredSelection structuredSelection) {
-		_postSelectionProvider.setSelection(structuredSelection);
+	public void setSelection(final ISelection selection) {
+		_postSelectionProvider.setSelection(selection);
 	}
 
 	public void setThumbnailSize(final int photoWidth) {

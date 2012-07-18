@@ -32,6 +32,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.photo.PhotosAndToursView;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
@@ -307,6 +308,10 @@ public class UI {
 				TourbookPlugin.getImageDescriptor(Messages.Image__RawData_TransferDirect));
 		IMAGE_REGISTRY.put(RawDataView.IMAGE_IMPORT,//
 				TourbookPlugin.getImageDescriptor(Messages.Image__RawData_Import));
+
+		// photo
+		IMAGE_REGISTRY.put(PhotosAndToursView.IMAGE_PIC_DIR_VIEW,//
+				TourbookPlugin.getImageDescriptor(Messages.Image__PhotoDirectoryView));
 
 		/*
 		 * set tag styler

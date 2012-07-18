@@ -38,7 +38,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.photo.Photo;
-import net.tourbook.photo.PhotoStructuredSelection;
+import net.tourbook.photo.PhotoSelection;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceMap;
 import net.tourbook.srtm.IPreferences;
@@ -1755,9 +1755,9 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 			enableActions();
 
-		} else if (selection instanceof PhotoStructuredSelection) {
+		} else if (selection instanceof PhotoSelection) {
 
-			paintPhotos((PhotoStructuredSelection) selection);
+			paintPhotos((PhotoSelection) selection);
 
 		} else if (selection instanceof PointOfInterest) {
 
@@ -1864,7 +1864,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void paintPhotos(final PhotoStructuredSelection selection) {
+	private void paintPhotos(final PhotoSelection selection) {
 
 		_photoList.clear();
 

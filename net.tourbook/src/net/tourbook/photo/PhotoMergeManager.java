@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
-import java.util.ArrayList;
-
 import net.tourbook.application.PerspectiveFactoryPhoto;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
@@ -29,7 +27,7 @@ import org.eclipse.ui.WorkbenchException;
 
 public class PhotoMergeManager {
 
-	public static void openPhotoMergePerspective(final ArrayList<PhotoWrapper> selectedPhotos) {
+	public static void openPhotoMergePerspective(final MergePhotoTourSelection photoMergeSelection) {
 
 		final IWorkbench workbench = PlatformUI.getWorkbench();
 		final IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
@@ -44,7 +42,7 @@ public class PhotoMergeManager {
 				final PhotosAndToursView view = (PhotosAndToursView) Util.showView(PhotosAndToursView.ID);
 
 				if (view != null) {
-					view.updateUI(selectedPhotos);
+					view.updateUI(photoMergeSelection);
 				}
 
 			} catch (final PartInitException e) {

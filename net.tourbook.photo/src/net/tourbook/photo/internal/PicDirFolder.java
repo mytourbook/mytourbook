@@ -28,7 +28,6 @@ import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.common.util.Util;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.PhotoImageCache;
-import net.tourbook.photo.PhotoWrapper;
 import net.tourbook.photo.PicDirView;
 import net.tourbook.photo.internal.manager.ThumbnailStore;
 import net.tourbook.photo.internal.preferences.PrefPagePhotoExternalApp;
@@ -46,7 +45,6 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.TreeColumnLayout;
@@ -91,16 +89,18 @@ import org.eclipse.ui.progress.UIJob;
  */
 public class PicDirFolder {
 
+	private static final String								MENU_ID_PIC_DIR_VIEW_IN_FOLDER			= "menu.net.tourbook.photo.PicDirView.InFolder";
+
 	static String											WIN_PROGRAMFILES						= System
-																											.getenv("programfiles");			//$NON-NLS-1$
+																											.getenv("programfiles");					//$NON-NLS-1$
 
 	static String											FILE_SEPARATOR							= System
-																											.getProperty("file.separator");	//$NON-NLS-1$
-	private static final String								STATE_SELECTED_FOLDER					= "STATE_SELECTED_FOLDER";					//$NON-NLS-1$
+																											.getProperty("file.separator");			//$NON-NLS-1$
 
-	private static final String								STATE_IS_SINGLE_CLICK_EXPAND			= "STATE_IS_SINGLE_CLICK_EXPAND";			//$NON-NLS-1$
-	private static final String								STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS	= "STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS"; //$NON-NLS-1$
+	private static final String								STATE_SELECTED_FOLDER					= "STATE_SELECTED_FOLDER";							//$NON-NLS-1$
+	private static final String								STATE_IS_SINGLE_CLICK_EXPAND			= "STATE_IS_SINGLE_CLICK_EXPAND";					//$NON-NLS-1$
 
+	private static final String								STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS	= "STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS";		//$NON-NLS-1$
 	private static final LinkedBlockingDeque<FolderLoader>	_folderWaitingQueue						= new LinkedBlockingDeque<FolderLoader>();
 
 	/**
@@ -120,22 +120,22 @@ public class PicDirFolder {
 
 	private boolean											_isExpandingSelection;
 	private boolean											_isBehaviourAutoExpandCollapse;
-
 	private boolean											_isBehaviourSingleExpandedOthersCollapse;
 	private boolean											_isStateShowFileFolderInFolderItem;
+
 	/**
 	 * Is true when the mouse click is for the context menu
 	 */
 	private boolean											_isMouseContextMenu;
-
 	private boolean											_doAutoCollapseExpand;
+
 	private boolean											_isFromNavigationHistory;
 	private TVIFolderRoot									_rootItem;
-
 	private TVIFolderFolder									_selectedTVIFolder;
-	private File											_selectedFolder;
 
+	private File											_selectedFolder;
 	private ActionRefreshFolder								_actionRefreshFolder;
+
 	private ActionRunExternalAppTitle						_actionRunExternalAppTitle;
 	private ActionRunExternalApp							_actionRunExternalAppDefault;
 	private ActionRunExternalApp							_actionRunExternalApp1;
@@ -144,8 +144,7 @@ public class PicDirFolder {
 	private ActionPreferences								_actionPreferences;
 	private ActionSingleClickExpand							_actionAutoExpandCollapse;
 	private ActionSingleExpandCollapseOthers				_actionSingleExpandCollapseOthers;
-	private ActionMergeFolderPhotosWithTours				_actionMergePhotosWithTours;
-
+//	private ActionMergeFolderPhotosWithTours				_actionMergePhotosWithTours;
 	/*
 	 * UI controls
 	 */
@@ -261,17 +260,6 @@ public class PicDirFolder {
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
-	private class FolderLoader {
-
-		TVIFolderFolder	loaderFolderItem;
-		boolean			isExpandFolder;
-
-		FolderLoader(final TVIFolderFolder folderItem, final boolean isExpandFolder) {
-			this.loaderFolderItem = folderItem;
-			this.isExpandFolder = isExpandFolder;
-		}
-	}
-
 	public PicDirFolder(final PicDirView picDirView, final PicDirImages picDirImages) {
 		_picDirView = picDirView;
 		_picDirImages = picDirImages;
@@ -280,27 +268,6 @@ public class PicDirFolder {
 	void actionAutoExpandCollapse() {
 		_isBehaviourAutoExpandCollapse = _actionAutoExpandCollapse.isChecked();
 		enableActions();
-	}
-
-	void actionMergePhotosWithTours() {
-
-		final ArrayList<PhotoWrapper> selectedPhotos = _picDirImages.getLoadedExifImageData(_selectedFolder, true);
-
-		if (selectedPhotos == null) {
-			return;
-		}
-
-		/*
-		 * check if a photo is selected
-		 */
-		if (selectedPhotos.size() == 0) {
-			MessageDialog.openInformation(
-					_display.getActiveShell(),
-					Messages.Pic_Dir_Dialog_MergePhotosWithTours_Title,
-					NLS.bind(Messages.Pic_Dir_Dialog_NoSelectedImagesInFolder_Message, _selectedFolder));
-		}
-
-//		PhotoMergeManager.openPhotoMergePerspective(selectedPhotos);
 	}
 
 	void actionRefreshFolder() {
@@ -469,6 +436,8 @@ public class PicDirFolder {
 		final Menu contextMenu = menuMgr.createContextMenu(tree);
 
 		tree.setMenu(contextMenu);
+
+		_picDirView.registerContextMenu(MENU_ID_PIC_DIR_VIEW_IN_FOLDER, menuMgr);
 	}
 
 	public void createUI(final Composite parent) {
@@ -639,7 +608,7 @@ public class PicDirFolder {
 
 		_actionAutoExpandCollapse.setEnabled(_isBehaviourSingleExpandedOthersCollapse == false);
 
-		_actionMergePhotosWithTours = new ActionMergeFolderPhotosWithTours(this);
+//		_actionMergePhotosWithTours = new ActionMergeFolderPhotosWithTours(this);
 
 	}
 
@@ -647,9 +616,15 @@ public class PicDirFolder {
 
 		if (_folderViewer.getExpandedState(treeItem)) {
 
+			// collapse folder
+
 			_folderViewer.collapseToLevel(treeItem, 1);
 
+			removeFolderFromWaitingQueue(treeItem);
+
 		} else {
+
+			// expand folder
 
 			if (treeItem.isFolderLoaded()) {
 
@@ -664,9 +639,8 @@ public class PicDirFolder {
 
 	private void fillContextMenu(final IMenuManager menuMgr) {
 
-		menuMgr.add(_actionMergePhotosWithTours);
+		menuMgr.add(new Separator(UI.MENU_SEPARATOR_ADDITIONS));
 
-		menuMgr.add(new Separator());
 		fillExternalApp(menuMgr);
 
 		menuMgr.add(new Separator());
@@ -994,12 +968,15 @@ public class PicDirFolder {
 	private void putFolderInWaitingQueue(final TVIFolderFolder queueFolderItem, final boolean isExpandFolder) {
 
 		// get and set queue state
-		if (queueFolderItem.isInWaitingQueue.getAndSet(true)) {
+		if (queueFolderItem._isInWaitingQueue.getAndSet(true)) {
 			// folder is already in waiting queue
 			return;
 		}
 
-		_folderWaitingQueue.add(new FolderLoader(queueFolderItem, isExpandFolder));
+		final FolderLoader treeFolderLoader = new FolderLoader(queueFolderItem, isExpandFolder);
+		queueFolderItem._folderLoader = treeFolderLoader;
+
+		_folderWaitingQueue.add(treeFolderLoader);
 
 		final Runnable executorTask = new Runnable() {
 			public void run() {
@@ -1046,7 +1023,8 @@ public class PicDirFolder {
 							_picDirImages.updateUI_StatusMessage(statusMessage);
 
 							// reset queue state
-							loaderFolderItem.isInWaitingQueue.set(false);
+							loaderFolderItem._isInWaitingQueue.set(false);
+							loaderFolderItem._folderLoader = null;
 						}
 					});
 				}
@@ -1054,6 +1032,38 @@ public class PicDirFolder {
 		};
 		_folderExecutor.submit(executorTask);
 
+	}
+
+	/**
+	 * this feature is not very simple to be implemented, stopped for implementing now 2012-07-18<br>
+	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
+	 * recursive <br>
+	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
+	 * 
+	 * @param queueFolderItem
+	 */
+	private void removeFolderFromWaitingQueue(final TVIFolderFolder queueFolderItem) {
+
+//		final FolderLoader folderLoader = queueFolderItem._folderLoader;
+//
+//		// get queue state
+//		if (queueFolderItem._isInWaitingQueue.getAndSet(false)) {
+//			_folderWaitingQueue.remove(folderLoader);
+//		}
+//		// ensure it's reset
+//		queueFolderItem._folderLoader = null;
+//
+//		final ArrayList<TreeViewerItem> folderChildren = queueFolderItem.getUnfetchedChildren();
+//		if (folderChildren == null) {
+//			return;
+//		}
+//
+//		// remove all folder children
+//		for (final TreeViewerItem treeViewerItem : folderChildren) {
+//			if (treeViewerItem instanceof TVIFolderFolder) {
+//				removeFolderFromWaitingQueue((TVIFolderFolder) treeViewerItem);
+//			}
+//		}
 	}
 
 	public void restoreState(final IDialogSettings state) {

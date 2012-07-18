@@ -16,7 +16,9 @@
 package net.tourbook.application;
 
 import net.tourbook.mapping.TourMapView;
-import net.tourbook.photo.PhotoMergeView;
+import net.tourbook.photo.PhotosAndToursView;
+import net.tourbook.photo.PicDirView;
+import net.tourbook.photo.TourPhotosView;
 
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
@@ -26,8 +28,9 @@ public class PerspectiveFactoryPhoto implements IPerspectiveFactory {
 
 	public static final String	PERSPECTIVE_ID			= "net.tourbook.perspective.MergePhotos";	//$NON-NLS-1$
 
-	private static final String	FOLDER_ID_PHOTO_MERGE	= "photoMerge";							//$NON-NLS-1$
-	private static final String	FOLDER_ID_MAP			= "photoMap";								//$NON-NLS-1$
+	private static final String	FOLDER_ID_PHOTO_MERGE	= "FOLDER_ID_PHOTO_MERGE";					//$NON-NLS-1$
+	private static final String	FOLDER_ID_PIC_DIR		= "FOLDER_ID_PIC_DIR";						//$NON-NLS-1$
+	private static final String	FOLDER_ID_MAP			= "FOLDER_ID_MAP";							//$NON-NLS-1$
 
 	public void createInitialLayout(final IPageLayout layout) {
 
@@ -41,7 +44,18 @@ public class PerspectiveFactoryPhoto implements IPerspectiveFactory {
 				0.6f,
 				IPageLayout.ID_EDITOR_AREA);
 
-		photoMergeFolder.addView(PhotoMergeView.ID);
+		photoMergeFolder.addView(PhotosAndToursView.ID);
+
+		//--------------------------------------------------------------------------------
+
+		final IFolderLayout picDirFolder = layout.createFolder(
+				FOLDER_ID_PIC_DIR,
+				IPageLayout.BOTTOM,
+				0.5f,
+				FOLDER_ID_PHOTO_MERGE);
+
+		picDirFolder.addView(PicDirView.ID);
+		picDirFolder.addView(TourPhotosView.ID);
 
 		//--------------------------------------------------------------------------------
 

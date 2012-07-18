@@ -81,9 +81,10 @@ public class Messages extends NLS {
 	public static String		Pic_Dir_Dialog_LoadingEXIFData;
 	public static String		Pic_Dir_Dialog_LoadingEXIFData_Subtask;
 	public static String		Pic_Dir_Dialog_LoadingFolderFiles;
-	public static String		Pic_Dir_Dialog_MergePhotosWithTours_Title;
-	public static String		Pic_Dir_Dialog_NoSelectedImages_Message;
-	public static String		Pic_Dir_Dialog_NoSelectedImagesInFolder_Message;
+	public static String		Pic_Dir_Dialog_MergePhotos_DialogInterrupted_Message;
+	public static String		Pic_Dir_Dialog_MergePhotos_NoSelectedImage_Message;
+	public static String		Pic_Dir_Dialog_MergePhotos_NoSelectedImagesInFolder_Message;
+	public static String		Pic_Dir_Dialog_MergePhotos_Title;
 	public static String		Pic_Dir_ImageSizeIndicator_Tooltip;
 	public static String		Pic_Dir_Label_ExternalApp;
 	public static String		Pic_Dir_Label_ImageLoadingFailed;

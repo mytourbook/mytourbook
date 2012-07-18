@@ -49,22 +49,21 @@ import org.epics.css.dal.Timestamp.Format;
 
 public class UI {
 
-	private static final char[]			INVALID_FILENAME_CHARS			= new char[] {
-			'\\',
-			'/',
-			':',
-			'*',
-			'?',
-			'"',
-			'<',
-			'>',
-			'|',														};
-
 	public static final String			EMPTY_STRING					= "";																		//$NON-NLS-1$
 	public static final String			SPACE							= " ";																		//$NON-NLS-1$
 	public static final String			SPACE2							= "  ";																	//$NON-NLS-1$
 	public static final String			SPACE4							= "    ";																	//$NON-NLS-1$
 	public static final String			STRING_0						= "0";																		//$NON-NLS-1$
+
+	/**
+	 * contains a new line
+	 */
+	public static final String			NEW_LINE						= "\n";																	//$NON-NLS-1$
+
+	/**
+	 * contains 2 new lines
+	 */
+	public static final String			NEW_LINE2						= "\n\n";																	//$NON-NLS-1$
 
 	public static final String			SYMBOL_AVERAGE					= "\u00f8";																//$NON-NLS-1$
 	public static final String			SYMBOL_AVERAGE_WITH_SPACE		= "\u00f8 ";																//$NON-NLS-1$
@@ -100,25 +99,28 @@ public class UI {
 	 */
 	public static final String			ELLIPSIS						= "...";																	//$NON-NLS-1$
 
+	private static final char[]			INVALID_FILENAME_CHARS			= new char[] {
+			'\\',
+			'/',
+			':',
+			'*',
+			'?',
+			'"',
+			'<',
+			'>',
+			'|',														};
+
 	public static final boolean			IS_LINUX						= "gtk".equals(SWT.getPlatform());											//$NON-NLS-1$
 	public static final boolean			IS_OSX							= "carbon".equals(SWT.getPlatform()) || "cocoa".equals(SWT.getPlatform());	//$NON-NLS-1$ //$NON-NLS-2$
 	public static final boolean			IS_WIN							= "win32".equals(SWT.getPlatform()) || "wpf".equals(SWT.getPlatform());	//$NON-NLS-1$ //$NON-NLS-2$
-
-	/**
-	 * contains a new line
-	 */
-	public static final String			NEW_LINE						= "\n";																	//$NON-NLS-1$
-
-	/**
-	 * contains 2 new lines
-	 */
-	public static final String			NEW_LINE2						= "\n\n";																	//$NON-NLS-1$
 
 	public static final String			UTF_8							= "UTF-8";																	//$NON-NLS-1$
 	public static final String			UTF_16							= "UTF-16";																//$NON-NLS-1$
 	public static final String			ISO_8859_1						= "ISO-8859-1";															//$NON-NLS-1$
 
 	public static final Charset			UTF8_CHARSET					= Charset.forName("UTF-8");												//$NON-NLS-1$
+
+	public static final String			MENU_SEPARATOR_ADDITIONS		= "additions";
 
 	/**
 	 * layout hint for a description field

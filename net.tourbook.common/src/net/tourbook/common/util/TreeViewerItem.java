@@ -110,27 +110,9 @@ public abstract class TreeViewerItem {
 		return _parentItem;
 	}
 
-//	/**
-//	 * @return Returns a sql string for the WHERE clause to select data only for the selected person
-//	 */
-//	public String getSQlTourPersonId() {
-//
-//		final TourPerson activePerson = TourbookPlugin.getActivePerson();
-//		final StringBuilder sb = new StringBuilder();
-//
-//		final long personId = activePerson == null ? -1 : activePerson.getPersonId();
-//		if (personId == -1) {
-//			// select all people
-//		} else {
-//			// select only one person
-//			sb.append(" AND tourPerson_personId = " + Long.toString(personId)); //$NON-NLS-1$
-//		}
-//		return sb.toString();
-//	}
-
 	/**
-	 * @return Returns a list with all fetched childrens of this tree item, it will return
-	 *         <code>null</code> when childrens are not yet fetched
+	 * @return Returns a list with all fetched children of this tree item or <code>null</code> when
+	 *         childrens are not yet fetched
 	 */
 	public ArrayList<TreeViewerItem> getUnfetchedChildren() {
 		return _children;

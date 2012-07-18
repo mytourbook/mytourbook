@@ -55,9 +55,9 @@ public class PhotoImageLoader {
 
 	private static String[]				awtImageFileSuffixes;
 
-	private Photo								_photo;
+	private Photo						_photo;
 
-	private ImageQuality						_requestedImageQuality;
+	private ImageQuality				_requestedImageQuality;
 	private String						_imageFramework;
 	private int							_hqImageSize;
 	private String						_requestedImageKey;
@@ -1705,7 +1705,5 @@ public class PhotoImageLoader {
 			_photo.setDimension(imageWidth, imageHeight);
 		}
 	}
-
-
 
 }

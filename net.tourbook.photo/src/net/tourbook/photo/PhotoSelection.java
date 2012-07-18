@@ -24,9 +24,9 @@ import org.eclipse.jface.viewers.StructuredSelection;
  * This class is used to identify photos in a structured selection and is needed to identify an
  * empty selection !!!.
  */
-public class PhotoStructuredSelection extends StructuredSelection {
+public class PhotoSelection extends StructuredSelection {
 
-	public PhotoStructuredSelection(ArrayList<Photo> photos) {
+	public PhotoSelection(ArrayList<Photo> photos) {
 		super(photos);
 	}
 

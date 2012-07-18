@@ -15,22 +15,43 @@
  *******************************************************************************/
 package net.tourbook.photo.internal;
 
-import org.eclipse.jface.action.Action;
+class FolderLoader {
 
-public class ActionMergeFolderPhotosWithTours extends Action {
+	TVIFolderFolder	loaderFolderItem;
+	boolean			isExpandFolder;
 
-	private PicDirFolder	_picDirFolder;
-
-	public ActionMergeFolderPhotosWithTours(final PicDirFolder picDirFolder) {
-
-		super(Messages.Pic_Dir_Action_MergePhotosWithTours, AS_PUSH_BUTTON);
-
-		_picDirFolder = picDirFolder;
-
+	FolderLoader(final TVIFolderFolder folderItem, final boolean isExpandFolder) {
+		this.loaderFolderItem = folderItem;
+		this.isExpandFolder = isExpandFolder;
 	}
 
 	@Override
-	public void run() {
-		_picDirFolder.actionMergePhotosWithTours();
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof FolderLoader)) {
+			return false;
+		}
+		final FolderLoader other = (FolderLoader) obj;
+		if (loaderFolderItem == null) {
+			if (other.loaderFolderItem != null) {
+				return false;
+			}
+		} else if (!loaderFolderItem.equals(other.loaderFolderItem)) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((loaderFolderItem == null) ? 0 : loaderFolderItem.hashCode());
+		return result;
 	}
 }

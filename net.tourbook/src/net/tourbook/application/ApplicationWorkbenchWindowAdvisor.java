@@ -29,6 +29,8 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.photo.MergePhotoTourSelection;
+import net.tourbook.photo.PhotoMergeManager;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPagePeople;
 import net.tourbook.proxy.DefaultProxySelector;
@@ -45,6 +47,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
@@ -55,6 +58,8 @@ import org.eclipse.ui.IPageListener;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPropertyListener;
+import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
@@ -363,6 +368,18 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		}
 	}
 
+	private void onPostSelectionChanged(final IWorkbenchPart part, final ISelection selection) {
+
+		// debug current selection
+		System.out.println("current post selection: "
+				+ selection.getClass().getSimpleName()
+				+ (" (" + selection.getClass().getCanonicalName() + ")"));
+
+		if (selection instanceof MergePhotoTourSelection) {
+			PhotoMergeManager.openPhotoMergePerspective((MergePhotoTourSelection) selection);
+		}
+	}
+
 	@Override
 	public void postWindowCreate() {
 
@@ -393,6 +410,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 				TourTypeMenuManager.restoreState();
 
 				loadPeopleData();
+				setupAppSelectionListener();
 				setupProxy();
 			}
 		});
@@ -455,6 +473,25 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	@Override
 	public IStatus restoreState(final IMemento memento) {
 		return super.restoreState(memento);
+	}
+
+	private void setupAppSelectionListener() {
+
+		final IWorkbenchWindowConfigurer wc = getWindowConfigurer();
+//		wc.getWorkbenchConfigurer().getWorkbench().get
+		final IWorkbenchWindow win = wc.getWindow();
+//		IWorkbench wb = win.getWorkbench();
+
+//		win.getSelectionService().
+
+		final ISelectionService selectionService = win.getSelectionService();
+
+		selectionService.addPostSelectionListener(new ISelectionListener() {
+			@Override
+			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
+				onPostSelectionChanged(part, selection);
+			}
+		});
 	}
 
 	private void setupImages() {

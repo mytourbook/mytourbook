@@ -18,6 +18,20 @@
 			name="%View_Name_PhotoDirectory"
 			defaultHandler="net.tourbook.photo.internal.ActionHandlerOpenViewPhotoDirectory"
 			/>
+
+		<command id="command.net.tourbook.photo.MergePhotoWithTourInFolder"
+			name="%Action_PhotoDirectory_MergePhotoWithTour"
+			defaultHandler="net.tourbook.photo.internal.ActionHandlerMergePhotoWithTourInFolder"
+			/>
+		
+		<command id="command.net.tourbook.photo.MergePhotoWithTourInGallerySelected"
+			name="%Action_PhotoDirectory_MergePhotoWithTourInGallerySelected"
+			defaultHandler="net.tourbook.photo.internal.ActionHandlerMergePhotoWithTourInGallerySelected"
+			/>
+		<command id="command.net.tourbook.photo.MergePhotoWithTourInGalleryAll"
+			name="%Action_PhotoDirectory_MergePhotoWithTourInGalleryAll"
+			defaultHandler="net.tourbook.photo.internal.ActionHandlerMergePhotoWithTourInGalleryAll"
+			/>
 		
 	</extension>
 	
@@ -25,17 +39,32 @@
 	
 	<extension point="org.eclipse.ui.menus">
 	
-		<!-- locationURI="menu:views?before=defaultViews" -->
-		
-		<menuContribution 
-		
-			locationURI="menu:views?before=net.tourbook.separator.TourProperties"
-			>
+		<menuContribution locationURI="menu:views?before=net.tourbook.separator.TourProperties" >
 		            
 			<command commandId="command.net.tourbook.photo.PicDirView"
 				icon="icons/photo-directory.png"
 				label="%View_Name_PhotoDirectory"
 				mnemonic="%View_Name_PhotoDirectory_Mnemonic"/>
+		
+		</menuContribution>
+
+		<menuContribution locationURI="popup:menu.net.tourbook.photo.PicDirView.InFolder?before=additions" >
+		            
+			<command commandId="command.net.tourbook.photo.MergePhotoWithTourInFolder"
+				label="%Action_PhotoDirectory_MergePhotoWithTour"
+				mnemonic="%Action_PhotoDirectory_MergePhotoWithTour_Mnemonic"/>
+		
+		</menuContribution>
+
+		<menuContribution locationURI="popup:menu.net.tourbook.photo.PicDirView.InGallery?before=additions" >
+		            
+			<command commandId="command.net.tourbook.photo.MergePhotoWithTourInGallerySelected"
+				label="%Action_PhotoDirectory_MergePhotoWithTourInGallerySelected"
+				mnemonic="%Action_PhotoDirectory_MergePhotoWithTourInGallerySelected_Mnemonic"/>
+		            
+			<command commandId="command.net.tourbook.photo.MergePhotoWithTourInGalleryAll"
+				label="%Action_PhotoDirectory_MergePhotoWithTourInGalleryAll"
+				mnemonic="%Action_PhotoDirectory_MergePhotoWithTourInGalleryAll_Mnemonic"/>
 		
 		</menuContribution>
 		

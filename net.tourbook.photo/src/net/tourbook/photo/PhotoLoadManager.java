@@ -277,9 +277,9 @@ public class PhotoLoadManager {
 		final Runnable executorTask = new Runnable() {
 			public void run() {
 
-//				// !!! slow down loading !!!
+//				// !!! slow down loading for debugging !!!
 //				try {
-//					Thread.sleep(1000);
+//					Thread.sleep(500);
 //				} catch (final InterruptedException e) {
 //					// TODO Auto-generated catch block
 //					// TODO Auto-generated catch block

@@ -635,6 +635,8 @@ public class Messages extends NLS {
 	public static String		Image__link;
 	public static String		Image__MyTourbook16;
 	public static String		Image__options;
+	public static String	Image__PhotoDirectoryView;
+
 	public static String		Image__PulseZones;
 	public static String		Image__PulseZones_Disabled;
 	public static String		Image__quick_edit;
@@ -757,9 +759,11 @@ public class Messages extends NLS {
 
 	public static String		NT001_DialogExtractTour_InvalidTourData;
 
-	public static String		Pic_Dir_StatusLabel_NoSelectedPhoto;
+	public static String	Photos_AndTours_Label_NoSelectedPhoto;
 
-	public static String		Pic_Dir_StatusLabel_NoTourIsAvailable;
+	public static String	Photos_AndTours_Label_NoTourIsAvailable;
+
+	public static String	Photos_AndTours_Link_PhotoDirectory;
 
 	public static String		Pref_App_Label_TourEditorIsModified;
 

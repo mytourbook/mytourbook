@@ -250,6 +250,11 @@ public abstract class GalleryMT20 extends Canvas {
 
 	private IGalleryContextMenuProvider			_customContextMenuProvider;
 
+	/**
+	 * Menu manager for the gallery context menu.
+	 */
+	private MenuManager							_contextMenuMgr;
+
 	private class RedrawTimer implements Runnable {
 		public void run() {
 
@@ -547,18 +552,18 @@ public abstract class GalleryMT20 extends Canvas {
 	 */
 	private void createContextMenu() {
 
-		final MenuManager menuMgr = new MenuManager();
+		_contextMenuMgr = new MenuManager();
 
-		menuMgr.setRemoveAllWhenShown(true);
+		_contextMenuMgr.setRemoveAllWhenShown(true);
 
-		menuMgr.addMenuListener(new IMenuListener() {
+		_contextMenuMgr.addMenuListener(new IMenuListener() {
 			@Override
 			public void menuAboutToShow(final IMenuManager menuMgr) {
 				fillContextMenu(menuMgr);
 			}
 		});
 
-		setMenu(menuMgr.createContextMenu(this));
+		setMenu(_contextMenuMgr.createContextMenu(this));
 	}
 
 	/**
@@ -733,6 +738,10 @@ public abstract class GalleryMT20 extends Canvas {
 		return indexes;
 	}
 
+	public MenuManager getContextMenuManager() {
+		return _contextMenuMgr;
+	}
+
 	public IGalleryContextMenuProvider getContextMenuProvider() {
 		return _customContextMenuProvider;
 	}
@@ -821,56 +830,6 @@ public abstract class GalleryMT20 extends Canvas {
 		return galleryItem;
 	}
 
-	/**
-	 * Get item virtual index at pixel position
-	 * 
-	 * @param coords
-	 * @return Returns gallery item index in {@link #_virtualGalleryItems} or <code> <0</code> when
-	 *         item is not available.
-	 */
-	public int getItemIndexFromPosition(final int viewPortX, final int viewPortY) {
-
-		if (_isVertical) {
-
-			if (_clientArea.contains(viewPortX, viewPortY) == false) {
-				// mouse is outside of the gallery
-				return -1;
-			}
-
-			final int contentPosX = viewPortX - _itemCenterOffsetX;
-			final int contentPosY = _galleryPosition + viewPortY;
-
-			final int indexX = contentPosX / _itemWidth;
-			final int indexY = contentPosY / _itemHeight;
-
-			// ckeck if mouse click is outside of the gallery horizontal items
-			if (indexX >= _gridHorizItems) {
-				return -1;
-			}
-
-			// ckeck if mouse click is outside of the gallery vertical items
-			if (indexY >= _gridVertItems) {
-				return -1;
-			}
-
-			final int itemIndex = indexY * _gridHorizItems + indexX;
-
-			// ensure array bounds
-			final int maxItems = _virtualGalleryItems.length;
-			if (itemIndex >= maxItems) {
-				return -1;
-			}
-
-			return itemIndex;
-
-		} else {
-
-			// is not yet implemented
-		}
-
-		return -1;
-	}
-
 //	private GalleryMT20Item getNextItem_OLD(final int keyCode) {
 //
 //		if (_lastSingleClick == null) {
@@ -931,6 +890,56 @@ public abstract class GalleryMT20 extends Canvas {
 //
 //		return null;
 //	}
+
+	/**
+	 * Get item virtual index at pixel position
+	 * 
+	 * @param coords
+	 * @return Returns gallery item index in {@link #_virtualGalleryItems} or <code> <0</code> when
+	 *         item is not available.
+	 */
+	public int getItemIndexFromPosition(final int viewPortX, final int viewPortY) {
+
+		if (_isVertical) {
+
+			if (_clientArea.contains(viewPortX, viewPortY) == false) {
+				// mouse is outside of the gallery
+				return -1;
+			}
+
+			final int contentPosX = viewPortX - _itemCenterOffsetX;
+			final int contentPosY = _galleryPosition + viewPortY;
+
+			final int indexX = contentPosX / _itemWidth;
+			final int indexY = contentPosY / _itemHeight;
+
+			// ckeck if mouse click is outside of the gallery horizontal items
+			if (indexX >= _gridHorizItems) {
+				return -1;
+			}
+
+			// ckeck if mouse click is outside of the gallery vertical items
+			if (indexY >= _gridVertItems) {
+				return -1;
+			}
+
+			final int itemIndex = indexY * _gridHorizItems + indexX;
+
+			// ensure array bounds
+			final int maxItems = _virtualGalleryItems.length;
+			if (itemIndex >= maxItems) {
+				return -1;
+			}
+
+			return itemIndex;
+
+		} else {
+
+			// is not yet implemented
+		}
+
+		return -1;
+	}
 
 	/**
 	 * @return Returns ratio with: width / height
@@ -2322,8 +2331,8 @@ public abstract class GalleryMT20 extends Canvas {
 		_fullSizeViewer.setColors(fgColor, bgColor);
 	}
 
-	public void setContextMenuProvider(final IGalleryContextMenuProvider _customContextMenuProvider) {
-		this._customContextMenuProvider = _customContextMenuProvider;
+	public void setContextMenuProvider(final IGalleryContextMenuProvider customContextMenuProvider) {
+		_customContextMenuProvider = customContextMenuProvider;
 	}
 
 	@Override
@@ -2475,8 +2484,8 @@ public abstract class GalleryMT20 extends Canvas {
 	}
 
 	/**
-	 * Set gallery items, which can be retrieved with {@link #getAllVirtualItems()}. With this get/set
-	 * mechanism, the gallery items can be sorted.
+	 * Set gallery items, which can be retrieved with {@link #getAllVirtualItems()}. With this
+	 * get/set mechanism, the gallery items can be sorted.
 	 * 
 	 * @param virtualGalleryItems
 	 */

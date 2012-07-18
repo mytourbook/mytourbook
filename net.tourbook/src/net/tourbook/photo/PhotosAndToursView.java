@@ -68,13 +68,17 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IPartListener2;
@@ -94,6 +98,8 @@ import org.joda.time.format.PeriodFormatterBuilder;
 public class PhotosAndToursView extends ViewPart implements ITourProvider, ITourViewer {
 
 	public static final String		ID					= "net.tourbook.photo.merge.PhotosAndToursView.ID";		//$NON-NLS-1$
+
+	public static final String		IMAGE_PIC_DIR_VIEW	= "IMAGE_PIC_DIR_VIEW";									//$NON-NLS-1$
 
 	private final IPreferenceStore	_prefStore			= TourbookPlugin.getDefault().getPreferenceStore();
 
@@ -408,17 +414,10 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 			GridLayoutFactory.swtDefaults().numColumns(1).applyTo(_pageNoTour);
 			{
 				final Label label = new Label(_pageNoTour, SWT.WRAP);
-				label.setText(Messages.Pic_Dir_StatusLabel_NoTourIsAvailable);
+				label.setText(Messages.Photos_AndTours_Label_NoTourIsAvailable);
 			}
 
-			_pageNoImage = new Composite(_pageBook, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(_pageNoImage);
-			GridLayoutFactory.swtDefaults().numColumns(1).applyTo(_pageNoImage);
-			{
-				final Label label = new Label(_pageNoImage, SWT.WRAP);
-				label.setText(Messages.Pic_Dir_StatusLabel_NoSelectedPhoto);
-				GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
-			}
+			_pageNoImage = createUI_90_PageNoImage(_pageBook);
 		}
 	}
 
@@ -432,18 +431,6 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 			createUI_50_TourViewer(_viewerContainer);
 		}
 	}
-
-//	private void createUI_40_Header(final Composite parent) {
-//
-//		final Composite container = new Composite(parent, SWT.NONE);
-//		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-//		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-//		{
-//			_labelPhotoDates = new Label(container, SWT.WRAP);
-//			GridDataFactory.fillDefaults().grab(true, false).applyTo(_labelPhotoDates);
-//			_labelPhotoDates.setToolTipText(Messages.Photo_Merge_Label_SelectedPhotoDates_Tooltip);
-//		}
-//	}
 
 	private void createUI_50_TourViewer(final Composite parent) {
 
@@ -484,6 +471,48 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 		});
 
 		createUI_99_ContextMenu();
+	}
+
+	private Composite createUI_90_PageNoImage(final Composite parent) {
+
+		final int defaultWidth = 200;
+
+		final Composite page = new Composite(parent, SWT.NONE);
+		GridLayoutFactory.fillDefaults().applyTo(page);
+		{
+			final Composite container = new Composite(page, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+			GridLayoutFactory.swtDefaults().numColumns(2).applyTo(container);
+			{
+				final Label label = new Label(container, SWT.WRAP);
+				label.setText(Messages.Photos_AndTours_Label_NoSelectedPhoto);
+				GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(label);
+
+				/*
+				 * link: import
+				 */
+				final CLabel iconPicDirView = new CLabel(container, SWT.NONE);
+				GridDataFactory.fillDefaults().indent(0, 10).applyTo(iconPicDirView);
+				iconPicDirView.setImage(UI.IMAGE_REGISTRY.get(IMAGE_PIC_DIR_VIEW));
+
+				final Link linkImport = new Link(container, SWT.NONE);
+				GridDataFactory.fillDefaults()//
+						.hint(defaultWidth, SWT.DEFAULT)
+						.align(SWT.FILL, SWT.CENTER)
+						.grab(true, false)
+						.indent(0, 10)
+						.applyTo(linkImport);
+				linkImport.setText(Messages.Photos_AndTours_Link_PhotoDirectory);
+				linkImport.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						Util.showView(PicDirView.ID);
+					}
+				});
+			}
+		}
+
+		return page;
 	}
 
 	/**
@@ -1106,5 +1135,9 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 		_tourViewer.setInput(new Object[0]);
 
 		_pageBook.showPage(_pageViewer);
+	}
+
+	void updateUI(final MergePhotoTourSelection photoMergeSelection) {
+		updateUI(photoMergeSelection.selectedPhotos);
 	}
 }

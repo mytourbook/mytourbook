@@ -34,10 +34,11 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.photo.ILoadCallBack;
 import net.tourbook.photo.IPhotoPreferences;
+import net.tourbook.photo.MergePhotoTourSelection;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoImageCache;
 import net.tourbook.photo.PhotoLoadManager;
-import net.tourbook.photo.PhotoStructuredSelection;
+import net.tourbook.photo.PhotoSelection;
 import net.tourbook.photo.PhotoWrapper;
 import net.tourbook.photo.PicDirView;
 import net.tourbook.photo.internal.gallery.MT20.FullSizeViewer;
@@ -56,6 +57,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -65,6 +67,7 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -105,26 +108,28 @@ import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
  */
 public class PicDirImages implements IItemHovereredListener, IGalleryContextMenuProvider {
 
+	private static final String									MENU_ID_PIC_DIR_VIEW_IN_GALLERY	= "menu.net.tourbook.photo.PicDirView.InGallery";	//$NON-NLS-1$
+
 	private static final int									IMAGE_INDICATOR_SIZE			= 16;
 
-	private static final int									DELAY_JOB_SUBSEQUENT_FILTER		= 500;								// ms
-	private static final long									DELAY_JOB_UI_FILTER				= 200;								// ms
-	private static final long									DELAY_JOB_UI_LOADING			= 200;								// ms
+	private static final int									DELAY_JOB_SUBSEQUENT_FILTER		= 500;												// ms
+	private static final long									DELAY_JOB_UI_FILTER				= 200;												// ms
+	private static final long									DELAY_JOB_UI_LOADING			= 200;												// ms
 
 	private static final int									MAX_HISTORY_ENTRIES				= 500;
 
-	public static final int										MIN_GALLERY_ITEM_WIDTH			= 10;								// pixel
-	public static final int										MAX_GALLERY_ITEM_WIDTH			= 2000;							// pixel
+	public static final int										MIN_GALLERY_ITEM_WIDTH			= 10;												// pixel
+	public static final int										MAX_GALLERY_ITEM_WIDTH			= 2000;											// pixel
 
-	private static final String									STATE_FOLDER_HISTORY			= "STATE_FOLDER_HISTORY";			//$NON-NLS-1$
-	private static final String									STATE_THUMB_IMAGE_SIZE			= "STATE_THUMB_IMAGE_SIZE";		//$NON-NLS-1$
-	private static final String									STATE_GALLERY_POSITION_FOLDER	= "STATE_GALLERY_POSITION_FOLDER";	//$NON-NLS-1$
-	private static final String									STATE_GALLERY_POSITION_VALUE	= "STATE_GALLERY_POSITION_VALUE";	//$NON-NLS-1$
-	private static final String									STATE_IMAGE_SORTING				= "STATE_IMAGE_SORTING";			//$NON-NLS-1$
-	private static final String									STATE_IS_SHOW_ONLY_PHOTOS		= "STATE_IS_SHOW_ONLY_PHOTOS";		//$NON-NLS-1$
-	private static final String									STATE_SELECTED_ITEMS			= "STATE_SELECTED_ITEMS";			//$NON-NLS-1$
+	private static final String									STATE_FOLDER_HISTORY			= "STATE_FOLDER_HISTORY";							//$NON-NLS-1$
+	private static final String									STATE_THUMB_IMAGE_SIZE			= "STATE_THUMB_IMAGE_SIZE";						//$NON-NLS-1$
+	private static final String									STATE_GALLERY_POSITION_FOLDER	= "STATE_GALLERY_POSITION_FOLDER";					//$NON-NLS-1$
+	private static final String									STATE_GALLERY_POSITION_VALUE	= "STATE_GALLERY_POSITION_VALUE";					//$NON-NLS-1$
+	private static final String									STATE_IMAGE_SORTING				= "STATE_IMAGE_SORTING";							//$NON-NLS-1$
+	private static final String									STATE_IS_SHOW_ONLY_PHOTOS		= "STATE_IS_SHOW_ONLY_PHOTOS";						//$NON-NLS-1$
+	private static final String									STATE_SELECTED_ITEMS			= "STATE_SELECTED_ITEMS";							//$NON-NLS-1$
 
-	private static final String									DEFAULT_GALLERY_FONT			= "arial,sans-serif";				//$NON-NLS-1$
+	private static final String									DEFAULT_GALLERY_FONT			= "arial,sans-serif";								//$NON-NLS-1$
 
 	private final IPreferenceStore								_prefStore						= Activator
 																										.getDefault()
@@ -231,7 +236,7 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 	private ActionClearNavigationHistory						_actionClearNavigationHistory;
 	private ActionRemoveInvalidFoldersFromHistory				_actionRemoveInvalidFoldersFromHistory;
 	private ActionToggleFolderGallery							_actionToggleFolderGallery;
-	private ActionMergeGalleryPhotosWithTours					_actionMergePhotosWithTours;
+//	private ActionMergeGalleryPhotosWithTours					_actionMergePhotosWithTours;
 
 	/**
 	 * Is <code>true</code> when folders and gallery photos are displayed, is <code>false</code>
@@ -566,23 +571,6 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 		_actionNavigateForward.setEnabled(false);
 	}
 
-	void actionMergePhotosWithTours() {
-
-		final ArrayList<PhotoWrapper> selectedPhotos = getLoadedExifImageData(_photoFolderWhichShouldBeDisplayed, false);
-
-		/*
-		 * check if a photo is selected
-		 */
-		if (selectedPhotos.size() == 0) {
-			MessageDialog.openInformation(
-					_gallery.getShell(),
-					Messages.Pic_Dir_Dialog_MergePhotosWithTours_Title,
-					Messages.Pic_Dir_Dialog_NoSelectedImages_Message);
-		}
-
-//		PhotoMergeManager.openPhotoMergePerspective(selectedPhotos);
-	}
-
 	void actionNavigateBackward() {
 
 		final int historySize = _folderHistory.size();
@@ -688,7 +676,7 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 
 		_actionToggleFolderGallery = new ActionToggleFolderGallery(this);
 
-		_actionMergePhotosWithTours = new ActionMergeGalleryPhotosWithTours(this);
+//		_actionMergePhotosWithTours = new ActionMergeGalleryPhotosWithTours(this);
 	}
 
 	/**
@@ -751,6 +739,27 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 			StatusUtil.log("This font cannot be created: \"" + prefGalleryFont + "\"");//$NON-NLS-1$ //$NON-NLS-2$
 			_galleryFont = new Font(_display, DEFAULT_GALLERY_FONT, 7, SWT.NORMAL);
 		}
+	}
+
+	/**
+	 * @return Returns a selection with all selected photos.
+	 */
+	private PhotoSelection createPhotoSelection() {
+
+		final Collection<GalleryMT20Item> allItems = _gallery.getSelection();
+
+		final ArrayList<Photo> photos = new ArrayList<Photo>();
+
+		for (final GalleryMT20Item item : allItems) {
+
+			final IGalleryCustomData customData = item.customData;
+
+			if (customData instanceof PhotoWrapper) {
+				photos.add(((PhotoWrapper) customData).photo);
+			}
+		}
+
+		return new PhotoSelection(photos);
 	}
 
 	public void createUI(final PicDirFolder picDirFolder, final Composite parent) {
@@ -957,6 +966,7 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 		});
 
 		_gallery.setContextMenuProvider(this);
+		_picDirView.registerContextMenu(MENU_ID_PIC_DIR_VIEW_IN_GALLERY, _gallery.getContextMenuManager());
 
 		_fullSizeViewer = _gallery.getFullsizeViewer();
 
@@ -1045,7 +1055,9 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 	@Override
 	public void fillContextMenu(final IMenuManager menuMgr) {
 
-		menuMgr.add(_actionMergePhotosWithTours);
+		menuMgr.add(new Separator(UI.MENU_SEPARATOR_ADDITIONS));
+
+//		menuMgr.add(_actionMergePhotosWithTours);
 
 	}
 
@@ -1103,13 +1115,16 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 	 * @return Returns photo data for the images in the requested folder or <code>null</code> when
 	 *         loading was canceled by the user.
 	 */
-	ArrayList<PhotoWrapper> getLoadedExifImageData(final File selectedFolder, final boolean isGetAllImages) {
+	private ArrayList<PhotoWrapper> getLoadedExifImageData(final File selectedFolder, final boolean isGetAllImages) {
 
 		final boolean isFolderFilesLoaded = _photoFolder.getAbsolutePath().equals(
 				_photoFolderWhichShouldBeDisplayed.getAbsolutePath());
 
 		if (PhotoLoadManager.getExifQueueSize() > 0 || isFolderFilesLoaded == false) {
 
+			/*
+			 * wait until all image exif data are loaded
+			 */
 			if (isEXIFDataLoaded() == false) {
 				return null;
 			}
@@ -1154,6 +1169,49 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 		}
 
 		return sortedPhotos;
+	}
+
+	public ISelection getMergePhotoTourSelection(final boolean isAllImages) {
+
+		final ArrayList<PhotoWrapper> loadedExifData = getLoadedExifImageData(
+				_photoFolderWhichShouldBeDisplayed,
+				isAllImages);
+
+		if (loadedExifData == null) {
+
+			MessageDialog.openInformation(
+					_display.getActiveShell(),
+					Messages.Pic_Dir_Dialog_MergePhotos_Title,
+					Messages.Pic_Dir_Dialog_MergePhotos_DialogInterrupted_Message);
+
+			return null;
+		}
+
+		/*
+		 * check if a photo is selected
+		 */
+		if (loadedExifData.size() == 0) {
+
+			if (isAllImages) {
+
+				MessageDialog.openInformation(
+						_display.getActiveShell(),
+						Messages.Pic_Dir_Dialog_MergePhotos_Title,
+						NLS.bind(Messages.Pic_Dir_Dialog_MergePhotos_NoSelectedImagesInFolder_Message,//
+								_photoFolderWhichShouldBeDisplayed.getAbsolutePath()));
+
+			} else {
+
+				MessageDialog.openInformation(
+						_display.getActiveShell(),
+						Messages.Pic_Dir_Dialog_MergePhotos_Title,
+						Messages.Pic_Dir_Dialog_MergePhotos_NoSelectedImage_Message);
+			}
+
+			return null;
+		}
+
+		return new MergePhotoTourSelection(loadedExifData);
 	}
 
 	/**
@@ -1229,7 +1287,7 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 	 */
 	private boolean isEXIFDataLoaded() {
 
-		final boolean isCanceled[] = new boolean[] { true };
+		final boolean isLoaded[] = new boolean[] { true };
 
 		try {
 
@@ -1283,7 +1341,7 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 						Thread.sleep(100);
 
 						if (monitor.isCanceled()) {
-							isCanceled[0] = true;
+							isLoaded[0] = false;
 							return;
 						}
 
@@ -1310,7 +1368,7 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 			StatusUtil.log(e);
 		}
 
-		return isCanceled[0];
+		return isLoaded[0];
 	}
 
 	private void jobFilter_10_Create() {
@@ -1889,23 +1947,8 @@ public class PicDirImages implements IItemHovereredListener, IGalleryContextMenu
 		// show default message
 		updateUI_StatusMessage(UI.EMPTY_STRING);
 
-		/*
-		 * fire selection
-		 */
-		final Collection<GalleryMT20Item> allItems = _gallery.getSelection();
-
-		final ArrayList<Photo> photos = new ArrayList<Photo>();
-
-		for (final GalleryMT20Item item : allItems) {
-
-			final IGalleryCustomData customData = item.customData;
-
-			if (customData instanceof PhotoWrapper) {
-				photos.add(((PhotoWrapper) customData).photo);
-			}
-		}
-
-		_picDirView.setSelection(new PhotoStructuredSelection(photos));
+		// fire selection
+		_picDirView.setSelection(createPhotoSelection());
 	}
 
 	private void onSelectThumbnailSize(final int newImageSize) {
