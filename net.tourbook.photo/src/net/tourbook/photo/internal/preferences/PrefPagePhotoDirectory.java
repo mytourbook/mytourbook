@@ -18,10 +18,10 @@ package net.tourbook.photo.internal.preferences;
 import net.tourbook.common.preferences.BooleanFieldEditor2;
 import net.tourbook.common.util.Util;
 import net.tourbook.photo.IPhotoPreferences;
+import net.tourbook.photo.PhotoGallery;
 import net.tourbook.photo.PhotoLoadManager;
 import net.tourbook.photo.internal.Activator;
 import net.tourbook.photo.internal.Messages;
-import net.tourbook.photo.internal.PicDirImages;
 import net.tourbook.photo.internal.ui.PhotoUI;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -300,8 +300,8 @@ public class PrefPagePhotoDirectory extends FieldEditorPreferencePage implements
 					.align(SWT.BEGINNING, SWT.FILL)
 					.hint(convertWidthInCharsToPixels(5), SWT.DEFAULT)
 					.applyTo(_spinnerTextMinThumbSize);
-			_spinnerTextMinThumbSize.setMinimum(PicDirImages.MIN_GALLERY_ITEM_WIDTH);
-			_spinnerTextMinThumbSize.setMaximum(PicDirImages.MAX_GALLERY_ITEM_WIDTH);
+			_spinnerTextMinThumbSize.setMinimum(PhotoGallery.MIN_GALLERY_ITEM_WIDTH);
+			_spinnerTextMinThumbSize.setMaximum(PhotoGallery.MAX_GALLERY_ITEM_WIDTH);
 			_spinnerTextMinThumbSize.setToolTipText(Messages.PrefPage_Photo_Viewer_Label_MinSizeText_Tooltip);
 
 			_spinnerTextMinThumbSize.addSelectionListener(_viewerUISelectionListener);
@@ -414,8 +414,8 @@ public class PrefPagePhotoDirectory extends FieldEditorPreferencePage implements
 			GridDataFactory.fillDefaults() //
 					.align(SWT.BEGINNING, SWT.FILL)
 					.applyTo(_spinnerThumbSize);
-			_spinnerThumbSize.setMinimum(PicDirImages.MIN_GALLERY_ITEM_WIDTH);
-			_spinnerThumbSize.setMaximum(PicDirImages.MAX_GALLERY_ITEM_WIDTH);
+			_spinnerThumbSize.setMinimum(PhotoGallery.MIN_GALLERY_ITEM_WIDTH);
+			_spinnerThumbSize.setMaximum(PhotoGallery.MAX_GALLERY_ITEM_WIDTH);
 			_spinnerThumbSize.setToolTipText(Messages.PrefPage_Photo_Viewer_Label_HQThumbnailSize_Tooltip);
 
 			_spinnerThumbSize.addSelectionListener(_viewerUISelectionListener);

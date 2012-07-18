@@ -18,11 +18,14 @@ package net.tourbook.photo.internal.manager;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileFilter;
 
 import net.tourbook.common.UI;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.internal.Activator;
 
+import org.apache.commons.imaging.Imaging;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -60,6 +63,38 @@ public class ImageUtils {
 		};
 
 		_prefStore.addPropertyChangeListener(_prefChangeListener);
+	}
+
+	public static FileFilter createImageFileFilter() {
+
+		return new FileFilter() {
+			@Override
+			public boolean accept(final File pathname) {
+
+				if (pathname.isDirectory()) {
+					return false;
+				}
+
+				if (pathname.isHidden()) {
+					return false;
+				}
+
+				final String name = pathname.getName();
+				if (name == null || name.length() == 0) {
+					return false;
+				}
+
+				if (name.startsWith(".")) { //$NON-NLS-1$
+					return false;
+				}
+
+				if (Imaging.hasImageFileExtension(pathname)) {
+					return true;
+				}
+
+				return false;
+			}
+		};
 	}
 
 	public static double getBestRatio(final int originalX, final int originalY, final int maxX, final int maxY) {

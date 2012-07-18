@@ -56,7 +56,7 @@
 		
 		</menuContribution>
 
-		<menuContribution locationURI="popup:menu.net.tourbook.photo.PicDirView.InGallery?before=additions" >
+		<menuContribution locationURI="popup:menu.net.tourbook.photo.photoGallery?before=additions" >
 		            
 			<command commandId="command.net.tourbook.photo.MergePhotoWithTourInGallerySelected"
 				label="%Action_PhotoDirectory_MergePhotoWithTourInGallerySelected"

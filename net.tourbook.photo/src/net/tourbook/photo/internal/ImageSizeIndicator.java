@@ -64,7 +64,7 @@ public class ImageSizeIndicator extends Canvas {
 		gc.fillRectangle(margin, margin, width - margin2, height - margin2);
 	}
 
-	void setIndicator(final boolean isHqImage) {
+	public void setIndicator(final boolean isHqImage) {
 		_isHqImage = isHqImage;
 		redraw();
 	}

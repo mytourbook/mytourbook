@@ -16,6 +16,7 @@
 package net.tourbook.photo.internal;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -29,6 +30,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.PhotoImageCache;
 import net.tourbook.photo.PicDirView;
+import net.tourbook.photo.internal.manager.ImageUtils;
 import net.tourbook.photo.internal.manager.ThumbnailStore;
 import net.tourbook.photo.internal.preferences.PrefPagePhotoExternalApp;
 import net.tourbook.photo.internal.ui.PhotoUI;
@@ -133,6 +135,9 @@ public class PicDirFolder {
 	private TVIFolderRoot									_rootItem;
 	private TVIFolderFolder									_selectedTVIFolder;
 
+	private FileFilter										_imageFileFilter						= ImageUtils
+																											.createImageFileFilter();
+
 	private File											_selectedFolder;
 	private ActionRefreshFolder								_actionRefreshFolder;
 
@@ -144,7 +149,7 @@ public class PicDirFolder {
 	private ActionPreferences								_actionPreferences;
 	private ActionSingleClickExpand							_actionAutoExpandCollapse;
 	private ActionSingleExpandCollapseOthers				_actionSingleExpandCollapseOthers;
-//	private ActionMergeFolderPhotosWithTours				_actionMergePhotosWithTours;
+
 	/*
 	 * UI controls
 	 */
@@ -309,7 +314,7 @@ public class PicDirFolder {
 
 					// delete store files
 					final File folder = new File(folderPath);
-					final File[] imageFiles = folder.listFiles(_picDirImages._fileFilter);
+					final File[] imageFiles = folder.listFiles(_imageFileFilter);
 					ThumbnailStore.cleanupStoreFiles(imageFiles);
 
 					// update images and force folder reload

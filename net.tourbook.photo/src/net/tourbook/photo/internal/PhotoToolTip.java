@@ -547,7 +547,7 @@ public class PhotoToolTip extends ToolTip {
 		}
 	}
 
-	void reset() {
+	public void reset() {
 
 		_currentHoveredGalleryItem = null;
 		_photoWrapper = null;
@@ -556,7 +556,7 @@ public class PhotoToolTip extends ToolTip {
 		hide();
 	}
 
-	void setImageSize(final int photoImageSize) {
+	public void setImageSize(final int photoImageSize) {
 		_galleryImageSize = photoImageSize;
 	}
 
@@ -570,7 +570,7 @@ public class PhotoToolTip extends ToolTip {
 		return _photo != null;
 	}
 
-	void show(final GalleryMT20Item hoveredItem) {
+	public void show(final GalleryMT20Item hoveredItem) {
 
 		if (hoveredItem == _currentHoveredGalleryItem) {
 			// nothing has changed

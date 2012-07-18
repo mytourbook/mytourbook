@@ -452,7 +452,7 @@ public class PicDirView extends ViewPart {
 			GridLayoutFactory.fillDefaults().applyTo(_containerImages);
 //			_containerImages.setLayout(new FillLayout());
 			{
-				_picDirImages.createUI(_picDirFolder, _containerImages);
+				_picDirImages.createUI(_containerImages, _picDirFolder);
 			}
 
 			// master/detail form
@@ -516,7 +516,7 @@ public class PicDirView extends ViewPart {
 	private void onPartClose() {
 
 		// close images first, this will stop loading images
-		_picDirImages.onClose();
+		_picDirImages.dispose();
 
 		ThumbnailStore.cleanupStoreFiles(false, false);
 
