@@ -1,4 +1,4 @@
-Version: 12.9.0                                      1?. September 2012 
+Version: 12.9.0                                           ?. Octover 2012 
 
 
 
@@ -24,6 +24,11 @@ Other modifications
 Fixed Bugs 
 
 * 
+
+
+Development
+
+* restructured plugins: removed net.tourbook.util, added net.tourbook.common
 
 
 System 

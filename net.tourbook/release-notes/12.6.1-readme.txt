@@ -1,44 +1,36 @@
-Version: 12.6.1                                           1?. July 2012 
+Version: 12.6.1                                           17. July 2012 
 
-Important !!!
+
+Important !!! 
 
 New behaviour in the import view: All tours will be removed (NOT 
-deleted) from this view when view or application is closed. The old 
-behaviour can be activated in the view menu by unchecking: "Remove all 
-tours from tour import view when view or application is closed" 
-
-
-
-New 
-
- * the embedded SQL server is used instead of the network based server, 
-the application startup is now 2 sec faster (this setup is now the 
-default, using the network sql server can be activated in the 
-preferences) 
-
+deleted) from this view, when this view or the application is closed. 
+The old behaviour can be activated in the view menu by unchecking: 
+"Remove all tours from this view when it is closed" 
 
 
 Improvements 
 
-* better info, why the cursor is waiting when a folder is selected (the statusline displays a message how many folders needs to be loaded in the 
-photo directory)
+* using embedded SQL server instead of network based server, the 
+application startup is 2 sec faster This setup is now the default, using 
+the network SQL server can be activated in the preferences General/Tour 
 
-
-
-
-
-Other modifications 
-
+* better info what's being loaded in photo directory Statusline displays 
+a message how many folders are being loaded and each folder displays a 
+loading... text 
 
 
 Fixed Bugs 
 
-* black background color in a map tile which contains a tour/photo and 
-simple drawing method was used, this bug occured in newer Linux 
-distributions 
+* Linux: black background color was painted in a map tile instead of the 
+map image when it contained a tour or photo, this bug occured when 
+simple painting method was used 
 
+* OS X: it happend that a portrait image is displayed as landscape 
+image, this wrong rotation can be disabled in the preferences 
+Photo/System 
 
 
 System 
 
-* Eclipse 3.8
+* Eclipse 3.8 
