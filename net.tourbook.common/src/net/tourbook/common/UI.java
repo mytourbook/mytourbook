@@ -131,6 +131,7 @@ public class UI {
 	 * image keys for images which are stored in the image registry
 	 */
 	public static final String			IMAGE_EMPTY_16					= "_empty16";																//$NON-NLS-1$
+	public static final String			IMAGE_CONFIGURE_COLUMNS			= "IMAGE_CONFIGURE_COLUMNS";												//$NON-NLS-1$
 
 	public final static ImageRegistry	IMAGE_REGISTRY;
 
@@ -139,6 +140,7 @@ public class UI {
 		IMAGE_REGISTRY = Activator.getDefault().getImageRegistry();
 
 		IMAGE_REGISTRY.put(IMAGE_EMPTY_16, Activator.getImageDescriptor(Messages.Image___Empty16));
+		IMAGE_REGISTRY.put(IMAGE_CONFIGURE_COLUMNS, Activator.getImageDescriptor(Messages.Image__ConfigureColumns));
 
 		// weather images
 		IMAGE_REGISTRY.put(IWeather.WEATHER_ID_CLEAR, //

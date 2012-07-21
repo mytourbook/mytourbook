@@ -18,7 +18,6 @@ package net.tourbook.statistics;
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Formatter;
 import java.util.GregorianCalendar;
 
 import net.tourbook.application.TourbookPlugin;
@@ -204,7 +203,7 @@ public abstract class StatisticWeek extends YearStatistic {
 		titleFormat.append(Messages.tourtime_info_week);
 		titleFormat.append(UI.NEW_LINE);
 
-		final String toolTipTitle = new Formatter().format(titleFormat.toString(),//
+		final String toolTipTitle = String.format(titleFormat.toString(),//
 				tourTypeName,
 				weekOfYear,
 				weekYear
@@ -230,7 +229,7 @@ public abstract class StatisticWeek extends YearStatistic {
 		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_break_time);
 
-		final String toolTipLabel = new Formatter().format(toolTipFormat.toString(), //
+		final String toolTipLabel = String.format(toolTipFormat.toString(), //
 				//
 				beginDate,
 				endDate,

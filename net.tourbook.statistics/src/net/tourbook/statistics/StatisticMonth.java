@@ -20,7 +20,6 @@ import java.text.DateFormat;
 import java.text.FieldPosition;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Formatter;
 import java.util.GregorianCalendar;
 
 import net.tourbook.application.TourbookPlugin;
@@ -172,7 +171,7 @@ public abstract class StatisticMonth extends YearStatistic {
 			titleString.append(tourTypeName);
 		}
 
-		final String toolTipTitle = new Formatter().format(Messages.tourtime_info_date_month, //
+		final String toolTipTitle = String.format(Messages.tourtime_info_date_month, //
 				titleString.toString(),
 				monthStringBuffer.substring(monthPosition.getBeginIndex(), monthPosition.getEndIndex()),
 				calendar.get(Calendar.YEAR)
@@ -195,7 +194,7 @@ public abstract class StatisticMonth extends YearStatistic {
 		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_break_time);
 
-		final String toolTipLabel = new Formatter().format(toolTipFormat.toString(), //
+		final String toolTipLabel = String.format(toolTipFormat.toString(), //
 				//
 				_tourMonthData.distanceHigh[serieIndex][valueIndex] / 1000,
 				UI.UNIT_LABEL_DISTANCE,

@@ -23,9 +23,10 @@ import net.tourbook.photo.IPhotoGalleryProvider;
 import net.tourbook.photo.PhotoGallery;
 import net.tourbook.photo.PhotoSelection;
 import net.tourbook.photo.PicDirView;
-import net.tourbook.photo.internal.manager.GallerySorting;
 
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IStatusLineManager;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -216,7 +217,7 @@ public class PicDirImages implements IPhotoGalleryProvider {
 		_display = parent.getDisplay();
 		_picDirFolder = picDirFolder;
 
-		_photoGallery = new PhotoGallery(parent, this);
+		_photoGallery = new PhotoGallery(parent, SWT.V_SCROLL | SWT.MULTI, this);
 
 		createUI_16_ComboHistory(_photoGallery.getCustomActionBar());
 
@@ -313,16 +314,18 @@ public class PicDirImages implements IPhotoGalleryProvider {
 		menuMgr.add(_actionClearNavigationHistory);
 	}
 
-	public void filterGallery(final ImageFilter currentImageFilter) {
-		_photoGallery.filterGallery(currentImageFilter);
-	}
-
 	public ISelection getMergePhotoTourSelection(final boolean isAllImages) {
 		return _photoGallery.getMergePhotoTourSelection(isAllImages);
 	}
 
-	public int getThumbnailSize() {
-		return _photoGallery.getThumbnailSize();
+	@Override
+	public IStatusLineManager getStatusLineManager() {
+		return null;
+	}
+
+	@Override
+	public IToolBarManager getToolBarManager() {
+		return _picDirView.getViewSite().getActionBars().getToolBarManager();
 	}
 
 	public void handlePrefStoreModifications(final PropertyChangeEvent event) {
@@ -460,22 +463,9 @@ public class PicDirImages implements IPhotoGalleryProvider {
 		_photoGallery.saveState(state);
 	}
 
-	public void setFilter(final ImageFilter currentImageFilter) {
-		_photoGallery.setFilter(currentImageFilter);
-	}
-
 	@Override
 	public void setSelection(final PhotoSelection photoSelection) {
 		_picDirView.setSelection(photoSelection);
-	}
-
-	public void setSorting(final GallerySorting gallerySorting) {
-		_photoGallery.setSorting(gallerySorting);
-	}
-
-	@Override
-	public void setThumbnailSize(final int imageSize) {
-		_picDirView.setThumbnailSize(imageSize);
 	}
 
 	void showImages(final File imageFolder, final boolean isFromNavigationHistory, final boolean isReloadFolder) {
@@ -491,20 +481,8 @@ public class PicDirImages implements IPhotoGalleryProvider {
 		}
 	}
 
-	public void showInfo(	final boolean isShowPhotoName,
-							final PhotoDateInfo photoDateInfo,
-							final boolean isShowAnnotations,
-							final boolean isShowTooltip) {
-
-		_photoGallery.showInfo(isShowPhotoName, photoDateInfo, isShowAnnotations, isShowTooltip);
-	}
-
 	void showRestoreFolder(final String restoreFolderName) {
 		_photoGallery.showRestoreFolder(restoreFolderName);
-	}
-
-	public void sortGallery(final GallerySorting gallerySorting) {
-		_photoGallery.sortGallery(gallerySorting);
 	}
 
 	void updateColors(	final Color fgColor,
@@ -519,6 +497,10 @@ public class PicDirImages implements IPhotoGalleryProvider {
 
 		_comboHistory.setForeground(fgColor);
 		_comboHistory.setBackground(bgColor);
+	}
+
+	public void updateFromPrefStore() {
+		_photoGallery.updateFromPrefStore();
 	}
 
 	private void updateHistory(final String newFolderPathName) {

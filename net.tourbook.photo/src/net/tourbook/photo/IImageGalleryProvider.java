@@ -15,27 +15,8 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
-import org.eclipse.jface.action.IStatusLineManager;
-import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.action.MenuManager;
+public interface IImageGalleryProvider {
 
-public interface IPhotoGalleryProvider {
-
-	IStatusLineManager getStatusLineManager();
-
-	/**
-	 * @return Returns toolbar manager where the gallery actions (for sorting/filtering) should be
-	 *         displayed.
-	 */
-	IToolBarManager getToolBarManager();
-
-	void registerContextMenu(String menuId, MenuManager menuManager);
-
-	/**
-	 * {@link PhotoSelection} contains currently selected photos.
-	 * 
-	 * @param photoSelection
-	 */
-	void setSelection(PhotoSelection photoSelection);
+	public void setThumbnailSize(int imageSize);
 
 }

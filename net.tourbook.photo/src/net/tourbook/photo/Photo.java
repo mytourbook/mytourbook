@@ -89,7 +89,7 @@ public class Photo {
 	private double							_latitude				= Double.MIN_VALUE;
 	private double							_longitude				= Double.MIN_VALUE;
 
-	private GeoPosition						_geoPosition;
+//	private GeoPosition						_geoPosition;
 	private String							_gpsAreaInfo;
 
 	private double							_imageDirection			= Double.MIN_VALUE;
@@ -643,6 +643,9 @@ public class Photo {
 		return _imageWidth;
 	}
 
+	/**
+	 * @return Returns latitude or {@link Double#MIN_VALUE} when not set
+	 */
 	public double getLatitude() {
 		return _latitude;
 	}

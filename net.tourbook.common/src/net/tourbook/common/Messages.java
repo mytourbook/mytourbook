@@ -22,6 +22,7 @@ public class Messages extends NLS {
 	private static final String	BUNDLE_NAME	= "net.tourbook.common.messages";	//$NON-NLS-1$
 
 	public static String		Image___Empty16;
+	public static String		Image__ConfigureColumns;
 	public static String		Image__options;
 	public static String		Image__weather_sunny;
 	public static String		Image__weather_cloudy;

@@ -17,7 +17,6 @@ package net.tourbook.tour;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Formatter;
 import java.util.Set;
 
 import net.tourbook.common.util.ITourToolTipProvider;
@@ -61,8 +60,6 @@ public class TourInfoUI {
 	private Color						_bgColor;
 	private Color						_fgColor;
 	private Font						_boldFont;
-
-	private Formatter					_uiFormatter			= new Formatter();
 
 	private final DateTimeFormatter		_dateFormatter			= DateTimeFormat.fullDate();
 	private final DateTimeFormatter		_timeFormatter			= DateTimeFormat.shortTime();
@@ -866,51 +863,49 @@ public class TourInfoUI {
 				0);
 
 		final DateTime dtTourEnd = new DateTime(dtTourStart).plusSeconds(recordingTime);
-
-		_lblDate.setText(_uiFormatter.format(//
+		_lblDate.setText(String.format(//
 				Messages.Tour_Tooltip_Format_DateWeekTime,
 				_dateFormatter.print(dtTourStart.getMillis()),
 				_timeFormatter.print(dtTourStart.getMillis()),
 				_timeFormatter.print(dtTourEnd.getMillis()),
-				dtTourStart.getWeekOfWeekyear())//
-				.toString());
+				dtTourStart.getWeekOfWeekyear()));
 
-		_lblRecordingTime.setText(_uiFormatter.format(
+		_lblRecordingTime.setText(String.format(
 				Messages.Tour_Tooltip_Format_Date,
 				recordingTime / 3600,
 				(recordingTime % 3600) / 60,
 				(recordingTime % 3600) % 60)//
-				.toString());
+				);
 
-		_lblMovingTime.setText(_uiFormatter.format(
+		_lblMovingTime.setText(String.format(
 				Messages.Tour_Tooltip_Format_Date,
 				movingTime / 3600,
 				(movingTime % 3600) / 60,
 				(movingTime % 3600) % 60)//
-				.toString());
+				);
 
-		_lblBreakTime.setText(_uiFormatter.format(
+		_lblBreakTime.setText(String.format(
 				Messages.Tour_Tooltip_Format_Date,
 				breakTime / 3600,
 				(breakTime % 3600) / 60,
 				(breakTime % 3600) % 60)//
-				.toString());
+				);
 
 		int windSpeed = _tourData.getWeatherWindSpeed();
 		windSpeed = (int) (windSpeed / UI.UNIT_VALUE_DISTANCE);
 
 		_lblWindSpeed.setText(Integer.toString(windSpeed));
-		_lblWindSpeedUnit.setText(_uiFormatter.format(
+		_lblWindSpeedUnit.setText(String.format(
 				Messages.Tour_Tooltip_Format_WindSpeedUnit,
 				UI.UNIT_LABEL_SPEED,
-				IWeather.windSpeedTextShort[getWindSpeedTextIndex(windSpeed)]).toString());
+				IWeather.windSpeedTextShort[getWindSpeedTextIndex(windSpeed)]));
 
 		// wind direction
 		final int weatherWindDirDegree = _tourData.getWeatherWindDir();
 		_lblWindDirection.setText(Integer.toString(weatherWindDirDegree));
-		_lblWindDirectionUnit.setText(_uiFormatter.format(
+		_lblWindDirectionUnit.setText(String.format(
 				Messages.Tour_Tooltip_Format_WindDirectionUnit,
-				IWeather.windDirectionText[getWindDirectionTextIndex(weatherWindDirDegree)]).toString());
+				IWeather.windDirectionText[getWindDirectionTextIndex(weatherWindDirDegree)]));
 
 		// temperature
 		float temperature = _tourData.getAvgTemperature();
@@ -945,11 +940,11 @@ public class TourInfoUI {
 		_lblAvgSpeedUnit.setText(UI.UNIT_LABEL_SPEED);
 
 		final int pace = (int) (distance == 0 ? 0 : (movingTime * 1000 / distance));
-		_lblAvgPace.setText(_uiFormatter.format(//
+		_lblAvgPace.setText(String.format(//
 				Messages.Tour_Tooltip_Format_Pace,
 				pace / 60,
 				pace % 60)//
-				.toString());
+				);
 		_lblAvgPaceUnit.setText(UI.UNIT_LABEL_PACE);
 
 		// avg pulse

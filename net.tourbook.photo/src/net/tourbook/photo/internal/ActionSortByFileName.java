@@ -15,19 +15,19 @@
  *******************************************************************************/
 package net.tourbook.photo.internal;
 
-import net.tourbook.photo.PicDirView;
+import net.tourbook.photo.PhotoGallery;
 
 import org.eclipse.jface.action.Action;
 
 public class ActionSortByFileName extends Action {
 
-	private PicDirView	_picDirView;
+	private PhotoGallery	_photoGallery;
 
-	public ActionSortByFileName(final PicDirView picDirView) {
+	public ActionSortByFileName(final PhotoGallery photoGallery) {
 
 		super(Messages.Pic_Dir_Action_SortByName, AS_CHECK_BOX);
 
-		_picDirView = picDirView;
+		_photoGallery = photoGallery;
 
 		setToolTipText(Messages.Pic_Dir_Action_SortByName_Tooltip);
 
@@ -36,6 +36,6 @@ public class ActionSortByFileName extends Action {
 
 	@Override
 	public void run() {
-		_picDirView.actionSortByName();
+		_photoGallery.actionSortByName();
 	}
 }

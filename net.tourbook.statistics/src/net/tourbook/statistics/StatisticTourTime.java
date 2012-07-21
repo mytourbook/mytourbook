@@ -18,7 +18,6 @@ package net.tourbook.statistics;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Formatter;
 import java.util.GregorianCalendar;
 
 import net.tourbook.application.TourbookPlugin;
@@ -305,7 +304,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 			toolTipFormat.append(Messages.tourtime_info_description_text);
 		}
 
-		final String toolTipLabel = new Formatter().format(toolTipFormat.toString(),
+		final String toolTipLabel = String.format(toolTipFormat.toString(),
 		//
 				beginDate,
 				_tourTimeData.weekValues[valueIndex],

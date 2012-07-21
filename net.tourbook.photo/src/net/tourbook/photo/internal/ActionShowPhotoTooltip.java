@@ -15,19 +15,19 @@
  *******************************************************************************/
 package net.tourbook.photo.internal;
 
-import net.tourbook.photo.PicDirView;
+import net.tourbook.photo.PhotoGallery;
 
 import org.eclipse.jface.action.Action;
 
 public class ActionShowPhotoTooltip extends Action {
 
-	private PicDirView	_picDirView;
+	private PhotoGallery	_photoGallery;
 
-	public ActionShowPhotoTooltip(final PicDirView picDirView) {
+	public ActionShowPhotoTooltip(final PhotoGallery photoGallery) {
 
 		super(Messages.Pic_Dir_Action_ShowPhotoTooltip, AS_CHECK_BOX);
 
-		_picDirView = picDirView;
+		_photoGallery = photoGallery;
 
 		setToolTipText(Messages.Pic_Dir_Action_ShowPhotoTooltip_Tooltip);
 
@@ -36,6 +36,6 @@ public class ActionShowPhotoTooltip extends Action {
 
 	@Override
 	public void run() {
-		_picDirView.actionShowPhotoInfo(this);
+		_photoGallery.actionShowPhotoInfo(this);
 	}
 }

@@ -42,7 +42,7 @@ public class PhotoMergeManager {
 				final PhotosAndToursView view = (PhotosAndToursView) Util.showView(PhotosAndToursView.ID);
 
 				if (view != null) {
-					view.updateUI(photoMergeSelection);
+					view.updatePhotosAndTours(photoMergeSelection);
 				}
 
 			} catch (final PartInitException e) {

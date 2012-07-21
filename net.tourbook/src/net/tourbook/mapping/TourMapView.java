@@ -17,10 +17,8 @@ package net.tourbook.mapping;
 
 import java.awt.Point;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import net.tourbook.application.TourbookPlugin;
@@ -37,8 +35,9 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.importdata.RawDataManager;
-import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoSelection;
+import net.tourbook.photo.PhotoWrapper;
+import net.tourbook.photo.TourPhotoSelection;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceMap;
 import net.tourbook.srtm.IPreferences;
@@ -178,7 +177,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	/**
 	 * photos which are displayed in the map
 	 */
-	private final ArrayList<Photo>					_photoList							= new ArrayList<Photo>();
+	private final ArrayList<PhotoWrapper>			_photoList							= new ArrayList<PhotoWrapper>();
 
 	private boolean									_isMapSynchedWithTour;
 	private boolean									_isMapSynchedWithSlider;
@@ -1755,10 +1754,6 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 			enableActions();
 
-		} else if (selection instanceof PhotoSelection) {
-
-			paintPhotos((PhotoSelection) selection);
-
 		} else if (selection instanceof PointOfInterest) {
 
 			_isTour = false;
@@ -1810,6 +1805,10 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 			enableActions();
 
+		} else if (selection instanceof PhotoSelection) {
+
+			paintPhotos(((PhotoSelection) selection).photoWrapperList);
+
 		} else if (selection instanceof SelectionTourCatalogView) {
 
 			// show reference tour
@@ -1825,6 +1824,15 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 				enableActions();
 			}
+		}
+
+		/*
+		 * must be checked separately because SelectionTourId is superclass of TourPhotoSelection
+		 */
+		if (selection instanceof TourPhotoSelection) {
+
+			paintPhotos(((TourPhotoSelection) selection).mergeTour.tourPhotos);
+
 		}
 
 	}
@@ -1863,17 +1871,15 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		_map.paint();
 	}
 
-	@SuppressWarnings("unchecked")
-	private void paintPhotos(final PhotoSelection selection) {
+	private void paintPhotos(final ArrayList<PhotoWrapper> photoWrapperList) {
 
 		_photoList.clear();
 
-		final List<?> photoList = selection.toList();
-		_photoList.addAll((Collection<? extends Photo>) photoList);
+		_photoList.addAll(photoWrapperList);
 
 		_tourPainterConfig.setPhotos(_photoList);
 
-		_map.setOverlayKey(Integer.toString(photoList.hashCode()));
+		_map.setOverlayKey(Integer.toString(photoWrapperList.hashCode()));
 		_map.disposeOverlayImageCache();
 
 		_map.paint();

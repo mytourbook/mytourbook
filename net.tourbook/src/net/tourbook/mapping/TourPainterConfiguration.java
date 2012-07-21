@@ -20,7 +20,7 @@ import java.util.Set;
 
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.data.TourData;
-import net.tourbook.photo.Photo;
+import net.tourbook.photo.PhotoWrapper;
 
 /**
  * Contains data which are needed to paint a tour into a map.
@@ -30,7 +30,7 @@ public class TourPainterConfiguration {
 	private static TourPainterConfiguration	_instance;
 
 	private final ArrayList<TourData>		_tourDataList	= new ArrayList<TourData>();
-	private final ArrayList<Photo>			_photoList		= new ArrayList<Photo>();
+	private final ArrayList<PhotoWrapper>	_photoWrapper	= new ArrayList<PhotoWrapper>();
 
 	/**
 	 * contains the upper left and lower right position for a tour
@@ -61,8 +61,8 @@ public class TourPainterConfiguration {
 		return _legendProvider;
 	}
 
-	public ArrayList<Photo> getPhotos() {
-		return _photoList;
+	public ArrayList<PhotoWrapper> getPhotos() {
+		return _photoWrapper;
 	}
 
 	public int getSynchTourZoomLevel() {
@@ -89,14 +89,14 @@ public class TourPainterConfiguration {
 		}
 	}
 
-	public void setPhotos(final ArrayList<Photo> photoList) {
+	public void setPhotos(final ArrayList<PhotoWrapper> photoWrapper) {
 
-		_photoList.clear();
+		_photoWrapper.clear();
 
-		if (photoList != null) {
+		if (photoWrapper != null) {
 
 			isShowPhoto = true;
-			_photoList.addAll(photoList);
+			_photoWrapper.addAll(photoWrapper);
 
 		} else {
 

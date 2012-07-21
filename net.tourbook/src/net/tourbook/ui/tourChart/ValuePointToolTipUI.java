@@ -17,7 +17,6 @@ package net.tourbook.ui.tourChart;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Formatter;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -1293,7 +1292,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 
 			final long pace = (long) _tourData.getPaceSerieSeconds()[valueIndex];
 
-			_lblPace.setText(new Formatter().format(//
+			_lblPace.setText(String.format(//
 					Messages.Tooltip_ValuePoint_Format_Pace,
 					pace / 60,
 					pace % 60)//

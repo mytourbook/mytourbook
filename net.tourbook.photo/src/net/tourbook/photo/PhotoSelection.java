@@ -17,17 +17,23 @@ package net.tourbook.photo;
 
 import java.util.ArrayList;
 
-
-import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.ISelection;
 
 /**
  * This class is used to identify photos in a structured selection and is needed to identify an
  * empty selection !!!.
  */
-public class PhotoSelection extends StructuredSelection {
+public class PhotoSelection implements ISelection {
 
-	public PhotoSelection(ArrayList<Photo> photos) {
-		super(photos);
+	public ArrayList<PhotoWrapper>	photoWrapperList;
+
+	public PhotoSelection(final ArrayList<PhotoWrapper> photoWrapper) {
+		photoWrapperList = photoWrapper;
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return false;
 	}
 
 }

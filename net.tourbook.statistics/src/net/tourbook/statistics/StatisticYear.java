@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.statistics;
 
-import java.util.Formatter;
-
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.BarChartMinMaxKeeper;
 import net.tourbook.chart.Chart;
@@ -130,7 +128,7 @@ public abstract class StatisticYear extends YearStatistic {
 		titleString.append(Messages.tourtime_info_date_year);
 		titleString.append(UI.NEW_LINE);
 
-		final String toolTipTitle = new Formatter().format(titleString.toString(), oldestYear + valueIndex).toString();
+		final String toolTipTitle = String.format(titleString.toString(), oldestYear + valueIndex).toString();
 
 		/*
 		 * tool tip: label
@@ -147,7 +145,7 @@ public abstract class StatisticYear extends YearStatistic {
 		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_break_time);
 
-		final String toolTipLabel = new Formatter().format(toolTipFormat.toString(), //
+		final String toolTipLabel = String.format(toolTipFormat.toString(), //
 				//
 				//
 				(int) _tourYearData.distanceHigh[serieIndex][valueIndex],

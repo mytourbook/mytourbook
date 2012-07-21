@@ -32,10 +32,6 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.ITourEventListener;
-import net.tourbook.tour.SelectionTourId;
-import net.tourbook.tour.TourEventId;
-import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TableColumnFactory;
@@ -105,14 +101,13 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 
 	private final IDialogSettings	_state				= TourbookPlugin.getDefault().getDialogSettingsSection(ID);
 
-	private ArrayList<MergeTour>	_tourList			= new ArrayList<MergeTour>();
-	private ArrayList<PhotoWrapper>	_selectedPhotos		= new ArrayList<PhotoWrapper>();
+	private ArrayList<MergeTour>	_allMergeTours		= new ArrayList<MergeTour>();
+	private ArrayList<PhotoWrapper>	_allPhotos			= new ArrayList<PhotoWrapper>();
 
 	private PostSelectionProvider	_postSelectionProvider;
 
 	private ISelectionListener		_postSelectionListener;
 	private IPropertyChangeListener	_prefChangeListener;
-	private ITourEventListener		_tourPropertyListener;
 	private IPartListener2			_partListener;
 	private PixelConverter			_pc;
 
@@ -125,21 +120,14 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 	 */
 	private float					_unitValueAltitude;
 
-	private final DateTimeFormatter	_dtFormatter		= DateTimeFormat.forStyle("SS");							//$NON-NLS-1$
-
 	private final PeriodFormatter	_durationFormatter	= new PeriodFormatterBuilder()
 																.appendYears()
 																.appendSuffix("y ", "y ") //$NON-NLS-1$ //$NON-NLS-2$
-//																.appendMonths()
-//																.appendSuffix("m ", " m ")
 																.appendDays()
 																.appendSuffix("d ", "d ") //$NON-NLS-1$ //$NON-NLS-2$
 																.appendHours()
 																.appendSuffix("h ", "h ") //$NON-NLS-1$ //$NON-NLS-2$
 																.toFormatter();
-
-//	private final PeriodFormatter	_durationFormatter	= new PeriodFormatterBuilder().toFormatter();
-//	private final PeriodFormatter	_durationFormatter	= new PeriodFormatter(null, null);
 
 	private final DateTimeFormatter	_dateFormatter		= DateTimeFormat.shortDate();
 	private final DateTimeFormatter	_timeFormatter		= DateTimeFormat.mediumTime();
@@ -191,7 +179,7 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 		public void dispose() {}
 
 		public Object[] getElements(final Object inputElement) {
-			return _tourList.toArray();
+			return _allMergeTours.toArray();
 		}
 
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
@@ -249,7 +237,7 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 
 				} else if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
 
-					updateUI(_selectedPhotos);
+					updateUI(_allPhotos);
 
 				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
@@ -285,47 +273,10 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 		getViewSite().getPage().addPostSelectionListener(_postSelectionListener);
 	}
 
-	private void addTourEventListener() {
-
-		_tourPropertyListener = new ITourEventListener() {
-			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
-
-				if ((_tourList.size() == 0) || (part == PhotosAndToursView.this)) {
-					return;
-				}
-
-				if (eventId == TourEventId.TOUR_CHANGED || eventId == TourEventId.UPDATE_UI) {
-
-					// check if a tour must be updated
-
-//					if (containsTourIds(eventData, _tourList) == false) {
-//
-//						// reload tours
-//						loadPhotoTours();
-//
-//						_tourViewer.setInput(new Object[0]);
-//
-//						// removed old tour data from the selection provider
-//						_postSelectionProvider.clearSelection();
-//
-//					} else {
-//						clearView();
-//					}
-
-				} else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
-
-					clearView();
-				}
-			}
-		};
-
-		TourManager.getInstance().addTourEventListener(_tourPropertyListener);
-	}
-
 	private void clearView() {
 
-		_tourList.clear();
-		_selectedPhotos.clear();
+		_allMergeTours.clear();
+		_allPhotos.clear();
 
 		_tourViewer.setInput(new Object[0]);
 
@@ -376,10 +327,7 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 		createContextMenu();
 		fillToolbar();
 
-//		_actionEditTourWaypoints = new ActionOpenMarkerDialog(this, true);
-
 		addSelectionListener();
-		addTourEventListener();
 		addPrefListener();
 		addPartListener();
 
@@ -388,13 +336,6 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 
 		// show default page
 		_pageBook.showPage(_pageNoImage);
-
-		// show marker from last selection
-		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
-
-		if (_tourList.size() == 0) {
-//			showTourFromTourProvider();
-		}
 	}
 
 	private void createUI(final Composite parent) {
@@ -529,11 +470,13 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 
 		defineColumn_TourTypeImage();
 		defineColumn_NumberOfPhotos();
+		defineColumn_NumberOfGPSPhotos();
+		defineColumn_NumberOfNoGPSPhotos();
 		defineColumn_TourStartDate();
+		defineColumn_DurationTime();
 		defineColumn_TourStartTime();
 		defineColumn_TourEndDate();
 		defineColumn_TourEndTime();
-		defineColumn_DurationTime();
 		defineColumn_TourTypeText();
 	}
 
@@ -543,7 +486,6 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 	private void defineColumn_DurationTime() {
 
 		final ColumnDefinition colDef = TableColumnFactory.TOUR_DURATION_TIME.createColumn(_columnManager, _pc);
-
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -564,20 +506,58 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 	}
 
 	/**
-	 * column: tour start date
+	 * column: number of photos which contain gps data
 	 */
-	private void defineColumn_NumberOfPhotos() {
+	private void defineColumn_NumberOfGPSPhotos() {
 
-		final ColumnDefinition colDef = TableColumnFactory.NUMBER_OF_PHOTOS.createColumn(_columnManager, _pc);
-		colDef.setCanModifyVisibility(false);
+		final ColumnDefinition colDef = TableColumnFactory.NUMBER_OF_GPS_PHOTOS.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 
 				final MergeTour mergedTour = (MergeTour) cell.getElement();
+				final int numberOfGPSPhotos = mergedTour.numberOfGPSPhotos;
 
-				cell.setText(Long.toString(mergedTour.numberOfPhotos));
+				cell.setText(numberOfGPSPhotos == 0 ? UI.EMPTY_STRING : Long.toString(numberOfGPSPhotos));
+			}
+		});
+	}
+
+	/**
+	 * column: number of photos which contain gps data
+	 */
+	private void defineColumn_NumberOfNoGPSPhotos() {
+
+		final ColumnDefinition colDef = TableColumnFactory.NUMBER_OF_NO_GPS_PHOTOS.createColumn(_columnManager, _pc);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final MergeTour mergedTour = (MergeTour) cell.getElement();
+				final int numberOfNoGPSPhotos = mergedTour.numberOfNoGPSPhotos;
+
+				cell.setText(numberOfNoGPSPhotos == 0 ? UI.EMPTY_STRING : Long.toString(numberOfNoGPSPhotos));
+			}
+		});
+	}
+
+	/**
+	 * column: number of photos
+	 */
+	private void defineColumn_NumberOfPhotos() {
+
+		final ColumnDefinition colDef = TableColumnFactory.NUMBER_OF_PHOTOS.createColumn(_columnManager, _pc);
+//		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final MergeTour mergedTour = (MergeTour) cell.getElement();
+				final int numberOfPhotos = mergedTour.numberOfPhotos;
+
+				cell.setText(numberOfPhotos == 0 ? UI.EMPTY_STRING : Long.toString(numberOfPhotos));
 			}
 		});
 	}
@@ -589,7 +569,7 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 
 		final ColumnDefinition colDef = TableColumnFactory.TOUR_END_DATE.createColumn(_columnManager, _pc);
 //		colDef.setCanModifyVisibility(false);
-		colDef.setIsDefaultColumn();
+//		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -722,7 +702,6 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 
 		final IWorkbenchPage page = getViewSite().getPage();
 
-		TourManager.getInstance().removeTourEventListener(_tourPropertyListener);
 		page.removePostSelectionListener(_postSelectionListener);
 		page.removePartListener(_partListener);
 
@@ -825,38 +804,18 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 		return _tourViewer;
 	}
 
-	/**
-	 * Keep current merge tour when it contains photos.
-	 * 
-	 * @param currentMergeTour
-	 * @param imageTime
-	 */
-	private void keepMergeTour(final MergeTour currentMergeTour, final long imageTime) {
-
-		if (currentMergeTour.numberOfPhotos > 0) {
-
-			// tour contains photos
-
-			if (currentMergeTour.isDummyTour) {
-				currentMergeTour.setTourEndTime(imageTime);
-			}
-
-			_tourList.add(currentMergeTour);
-		}
-	}
-
 	private void loadToursFromDb(	final ArrayList<PhotoWrapper> selectedPhotos,
 									final long photoStartDate,
 									final long photoEndDate) {
 
 		BusyIndicator.showWhile(_pageBook.getDisplay(), new Runnable() {
 			public void run() {
-				loadToursFromDb_Runnable(selectedPhotos, photoStartDate, photoEndDate);
+				loadToursFromDb_10_Runnable(selectedPhotos, photoStartDate, photoEndDate);
 			}
 		});
 	}
 
-	private void loadToursFromDb_Runnable(	final ArrayList<PhotoWrapper> selectedPhotos,
+	private void loadToursFromDb_10_Runnable(	final ArrayList<PhotoWrapper> selectedPhotos,
 											final long photoStartDate,
 											final long photoEndDate) {
 
@@ -929,7 +888,6 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 		 * which do not contain any photos
 		 */
 		MergeTour currentMergeTour = null;
-//		long mergeTourStart;
 		long mergeTourEnd;
 		boolean isDummyTour = false;
 
@@ -964,7 +922,7 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 		isDummyTour = currentMergeTour.isDummyTour;
 		long imageTime = 0;
 
-		_tourList.clear();
+		_allMergeTours.clear();
 		final int tourIndexStart[] = new int[] { 0 };
 
 		// loop: all photos
@@ -985,7 +943,7 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 
 					// find/create tour for the current image
 
-					keepMergeTour(currentMergeTour, imageTime);
+					loadToursFromDb_20_KeepMergeTour(currentMergeTour, imageTime);
 
 					currentMergeTour = getNextMergeTour(allMergeTours, tourIndexStart, imageTime);
 
@@ -1007,7 +965,7 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 
 					// it's a new real tour, setup new real merge tour
 
-					keepMergeTour(currentMergeTour, imageTime);
+					loadToursFromDb_20_KeepMergeTour(currentMergeTour, imageTime);
 
 					currentMergeTour = nextMergeTour;
 
@@ -1016,10 +974,40 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 				}
 			}
 
+			currentMergeTour.tourPhotos.add(photoWrapper);
+
 			currentMergeTour.numberOfPhotos++;
+
+			// set number of GPS/No GPS photos
+			final double latitude = photoWrapper.photo.getLatitude();
+			if (latitude == Double.MIN_VALUE) {
+				currentMergeTour.numberOfNoGPSPhotos++;
+			} else {
+				currentMergeTour.numberOfGPSPhotos++;
+			}
 		}
 
-		keepMergeTour(currentMergeTour, imageTime);
+		loadToursFromDb_20_KeepMergeTour(currentMergeTour, imageTime);
+	}
+
+	/**
+	 * Keep current merge tour when it contains photos.
+	 * 
+	 * @param currentMergeTour
+	 * @param imageTime
+	 */
+	private void loadToursFromDb_20_KeepMergeTour(final MergeTour currentMergeTour, final long imageTime) {
+
+		if (currentMergeTour.numberOfPhotos > 0) {
+
+			// tour contains photos
+
+			if (currentMergeTour.isDummyTour) {
+				currentMergeTour.setTourEndTime(imageTime);
+			}
+
+			_allMergeTours.add(currentMergeTour);
+		}
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
@@ -1027,7 +1015,7 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 	}
 
 	/**
-	 * fire selected tour
+	 * Fire selected tour
 	 */
 	private void onSelectTour(final StructuredSelection selection) {
 
@@ -1035,7 +1023,7 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 		if (firstElement instanceof MergeTour) {
 
 			final MergeTour mergeTour = (MergeTour) firstElement;
-			final ISelection tourSelection = new SelectionTourId(mergeTour.tourId);
+			final ISelection tourSelection = new TourPhotoSelection(mergeTour);
 
 			_postSelectionProvider.setSelection(tourSelection);
 		}
@@ -1085,14 +1073,18 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 		_unitValueAltitude = UI.UNIT_VALUE_ALTITUDE;
 	}
 
-	void updateUI(final ArrayList<PhotoWrapper> selectedPhotos) {
+	void updatePhotosAndTours(final MergePhotoTourSelection photoMergeSelection) {
+		updateUI(photoMergeSelection.selectedPhotos);
+	}
+
+	private void updateUI(final ArrayList<PhotoWrapper> selectedPhotos) {
 
 		if (selectedPhotos.size() == 0) {
 			clearView();
 			return;
 		}
 
-		_selectedPhotos = selectedPhotos;
+		_allPhotos = selectedPhotos;
 
 		/*
 		 * get photo start/end date
@@ -1111,33 +1103,15 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 			}
 		}
 
-//		/*
-//		 * update status line
-//		 */
-//		if (_photoStartDate == _photoEndDate) {
-//
-//			_labelPhotoDates.setText(NLS.bind(
-//					Messages.Photo_Merge_Label_SelectedPhotoDate,
-//					_dtFormatter.print(_photoStartDate)));
-//
-//		} else {
-//
-//			_labelPhotoDates.setText(NLS.bind(
-//					Messages.Photo_Merge_Label_SelectedPhotoDates,
-//					_dtFormatter.print(_photoStartDate),
-//					_dtFormatter.print(_photoEndDate)));
-//		}
-//		// ensure text is wrapped when necessary
-//		_viewerContainer.layout();
-
 		loadToursFromDb(selectedPhotos, photoStartDate, photoEndDate);
+
+		_pageBook.showPage(_pageViewer);
 
 		_tourViewer.setInput(new Object[0]);
 
-		_pageBook.showPage(_pageViewer);
-	}
-
-	void updateUI(final MergePhotoTourSelection photoMergeSelection) {
-		updateUI(photoMergeSelection.selectedPhotos);
+		// select first tour
+		if (_allMergeTours.size() > 0) {
+			_tourViewer.setSelection(new StructuredSelection(_allMergeTours.get(0)), true);
+		}
 	}
 }

@@ -19,9 +19,9 @@ import java.text.NumberFormat;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.photo.ImageGallery;
 import net.tourbook.photo.ImageQuality;
 import net.tourbook.photo.Photo;
-import net.tourbook.photo.PhotoGallery;
 import net.tourbook.photo.PhotoImageCache;
 import net.tourbook.photo.PhotoLoadManager;
 import net.tourbook.photo.PhotoLoadingState;
@@ -104,7 +104,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	private boolean						_isShowDateInfo;
 	private PhotoDateInfo				_photoDateInfo;
 
-	private PhotoGallery				_photoGallery;
+	private ImageGallery				_imageGallery;
 	private GalleryMT20					_galleryMT;
 
 	private int							_gridBorder				= 1;
@@ -168,8 +168,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	 */
 	private Color						_fullsizeBgColor		= Display.getCurrent().getSystemColor(SWT.COLOR_BLACK);
 
-	private Color						_fgColor;
-	private Color						_bgColor;
+	private Color						_fgColor				= Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
+	private Color						_bgColor				= Display.getCurrent().getSystemColor(SWT.COLOR_RED);
 	private Color						_selectionFgColor;
 	private Color						_noFocusSelectionFgColor;
 
@@ -188,9 +188,9 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		_gpsImageHeight = bounds.height;
 	}
 
-	public PhotoRenderer(final GalleryMT20 galleryMT20, final PhotoGallery photoGallery) {
+	public PhotoRenderer(final GalleryMT20 galleryMT20, final ImageGallery imageGallery) {
 		_galleryMT = galleryMT20;
-		_photoGallery = photoGallery;
+		_imageGallery = imageGallery;
 	}
 
 	@Override
@@ -264,7 +264,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 				// the requested image is not available in the image cache -> image must be loaded
 
-				final LoadCallbackImage imageLoadCallback = new LoadCallbackImage(_photoGallery, galleryItem);
+				final LoadCallbackImage imageLoadCallback = new LoadCallbackImage(_imageGallery, galleryItem);
 
 				PhotoLoadManager.putImageInLoadingQueueThumbGallery(
 						galleryItem,
@@ -753,7 +753,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 				 * the requested image is not available in the image cache -> image must be loaded
 				 * but is delayed that the status text is immediatedly be displayed, it
 				 */
-				_fullsizeImageLoadCallback = new LoadCallbackOriginalImage(_photoGallery, galleryItem, photo);
+				_fullsizeImageLoadCallback = new LoadCallbackOriginalImage(_imageGallery, galleryItem, photo);
 
 				/*
 				 * get thumb image

@@ -184,7 +184,7 @@ public class Util {
 				FORMAT_0F
 				: Integer.toString(precision) + 'f';
 
-		return new Formatter().format(format, divValue).toString();
+		return String.format(format, divValue).toString();
 	}
 
 	public static String formatValue(final float value, final int unitType, final float divisor, boolean isShowSeconds) {

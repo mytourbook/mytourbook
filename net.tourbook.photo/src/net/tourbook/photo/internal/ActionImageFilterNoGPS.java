@@ -17,26 +17,26 @@ package net.tourbook.photo.internal;
 
 
 import net.tourbook.common.UI;
-import net.tourbook.photo.PicDirView;
+import net.tourbook.photo.PhotoGallery;
 
 import org.eclipse.jface.action.Action;
 
 public class ActionImageFilterNoGPS extends Action {
 
-	private PicDirView	_picDirView;
+	private PhotoGallery	_photoGallery;
 
-	public ActionImageFilterNoGPS(final PicDirView picDirView) {
+	public ActionImageFilterNoGPS(final PhotoGallery photoGallery) {
 
 		super(Messages.Pic_Dir_Action_PhotoFilterNoGPS, AS_CHECK_BOX);
 
 		setToolTipText(Messages.Pic_Dir_Action_PhotoFilterNoGPS_Tooltip);
-		setImageDescriptor(UI.IMAGE_REGISTRY.getDescriptor(PicDirView.IMAGE_PHOTO_FILTER_NO_GPS));
+		setImageDescriptor(UI.IMAGE_REGISTRY.getDescriptor(PhotoGallery.IMAGE_PHOTO_FILTER_NO_GPS));
 
-		_picDirView = picDirView;
+		_photoGallery = photoGallery;
 	}
 
 	@Override
 	public void run() {
-		_picDirView.actionImageFilter(this);
+		_photoGallery.actionImageFilter(this);
 	}
 }

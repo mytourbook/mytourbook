@@ -17,6 +17,8 @@ package net.tourbook.common.util;
 
 import java.util.ArrayList;
 
+import net.tourbook.common.UI;
+
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.AbstractColumnLayout;
 import org.eclipse.jface.viewers.CellLabelProvider;
@@ -220,7 +222,7 @@ public class ColumnManager {
 		 */
 		itemName = new MenuItem(headerContextMenu, SWT.PUSH);
 		itemName.setText(Messages.Action_App_ConfigureColumns);
-//		itemName.setImage(image)
+		itemName.setImage(UI.IMAGE_REGISTRY.get(UI.IMAGE_CONFIGURE_COLUMNS));
 		itemName.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(final Event event) {
 				openColumnDialog();

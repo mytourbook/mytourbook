@@ -58,13 +58,13 @@
 
 		<menuContribution locationURI="popup:menu.net.tourbook.photo.photoGallery?before=additions" >
 		            
-			<command commandId="command.net.tourbook.photo.MergePhotoWithTourInGallerySelected"
-				label="%Action_PhotoDirectory_MergePhotoWithTourInGallerySelected"
-				mnemonic="%Action_PhotoDirectory_MergePhotoWithTourInGallerySelected_Mnemonic"/>
-		            
 			<command commandId="command.net.tourbook.photo.MergePhotoWithTourInGalleryAll"
 				label="%Action_PhotoDirectory_MergePhotoWithTourInGalleryAll"
 				mnemonic="%Action_PhotoDirectory_MergePhotoWithTourInGalleryAll_Mnemonic"/>
+		            
+			<command commandId="command.net.tourbook.photo.MergePhotoWithTourInGallerySelected"
+				label="%Action_PhotoDirectory_MergePhotoWithTourInGallerySelected"
+				mnemonic="%Action_PhotoDirectory_MergePhotoWithTourInGallerySelected_Mnemonic"/>
 		
 		</menuContribution>
 		

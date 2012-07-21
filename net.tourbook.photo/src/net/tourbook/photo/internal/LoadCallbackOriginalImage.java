@@ -16,8 +16,8 @@
 package net.tourbook.photo.internal;
 
 import net.tourbook.photo.ILoadCallBack;
+import net.tourbook.photo.ImageGallery;
 import net.tourbook.photo.Photo;
-import net.tourbook.photo.PhotoGallery;
 import net.tourbook.photo.internal.gallery.MT20.FullSizeViewer;
 import net.tourbook.photo.internal.gallery.MT20.GalleryMT20Item;
 import net.tourbook.photo.internal.manager.PhotoImageMetadata;
@@ -29,13 +29,15 @@ class LoadCallbackOriginalImage implements ILoadCallBack {
 	/**
 	 * 
 	 */
-	private final PhotoGallery	_photoGallery;
+	private final ImageGallery	_imageGallery;
 	private GalleryMT20Item		_galleryItem;
 	private Photo				_photo;
 
-	public LoadCallbackOriginalImage(final PhotoGallery photoGallery, final GalleryMT20Item galleryItem, final Photo photo) {
+	public LoadCallbackOriginalImage(	final ImageGallery imageGallery,
+										final GalleryMT20Item galleryItem,
+										final Photo photo) {
 
-		_photoGallery = photoGallery;
+		_imageGallery = imageGallery;
 		_galleryItem = galleryItem;
 		_photo = photo;
 	}
@@ -46,10 +48,10 @@ class LoadCallbackOriginalImage implements ILoadCallBack {
 		// keep exif metadata
 		final PhotoImageMetadata metadata = _photo.getImageMetaDataRaw();
 		if (metadata != null) {
-			_photoGallery.putInExifCache(_photo.getPhotoWrapper().imageFilePathName, metadata);
+			_imageGallery.putInExifCache(_photo.getPhotoWrapper().imageFilePathName, metadata);
 		}
 
-		final FullSizeViewer fullSizeViewer = _photoGallery.getFullSizeViewer();
+		final FullSizeViewer fullSizeViewer = _imageGallery.getFullSizeViewer();
 
 		if (fullSizeViewer.getCurrentItem() != _galleryItem) {
 			// another gallery item is displayed
@@ -60,7 +62,7 @@ class LoadCallbackOriginalImage implements ILoadCallBack {
 
 			public void run() {
 
-				if (_photoGallery.isDisposed()) {
+				if (_imageGallery.isDisposed()) {
 					return;
 				}
 

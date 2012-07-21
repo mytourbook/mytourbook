@@ -609,6 +609,38 @@ public abstract class TableColumnFactory {
 		};
 	};
 
+	public static final TableColumnFactory NUMBER_OF_GPS_PHOTOS = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "numberOfGPSPhotos", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_NumberOfGPSPhotos_Label);
+			colDef.setColumnHeader(Messages.ColumnFactory_NumberOfGPSPhotos_Header);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_NumberOfGPSPhotos_Tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
+			
+			return colDef;
+		};
+	};
+	
+	public static final TableColumnFactory NUMBER_OF_NO_GPS_PHOTOS = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "numberOfNoGPSPhotos", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_NumberOfNoGPSPhotos_Label);
+			colDef.setColumnHeader(Messages.ColumnFactory_NumberOfNoGPSPhotos_Header);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_NumberOfNoGPSPhotos_Tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
+			
+			return colDef;
+		};
+	};
+
 	public static final TableColumnFactory NUMBER_OF_PHOTOS = new TableColumnFactory() {
 		
 		@Override
@@ -620,7 +652,7 @@ public abstract class TableColumnFactory {
 			colDef.setColumnHeader(Messages.ColumnFactory_NumberOfPhotos_Label);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_NumberOfPhotos_Tooltip);
 			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
-
+			
 			return colDef;
 		};
 	};

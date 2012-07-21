@@ -18,7 +18,6 @@ package net.tourbook.ui.views.tourCatalog;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Formatter;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -360,9 +359,9 @@ public class YearStatisticView extends ViewPart {
 		toolTipFormat.append(Messages.tourCatalog_view_tooltip_speed);
 		toolTipFormat.append(UI.NEW_LINE);
 
-		final String toolTipLabel = new Formatter().format(
+		final String toolTipLabel = String.format(//
 				toolTipFormat.toString(),
-				_nf1.format(_tourSpeed.get(valueIndex))).toString();
+				_nf1.format(_tourSpeed.get(valueIndex)));
 
 		final ChartToolTipInfo toolTipInfo = new ChartToolTipInfo();
 		toolTipInfo.setTitle(_dtFormatter.format(tourDate.toDate()));

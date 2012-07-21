@@ -773,7 +773,7 @@ public class PicDirFolder {
 //		}
 	}
 
-	Tree getTree() {
+	public Tree getTree() {
 		return _folderViewer.getTree();
 	}
 

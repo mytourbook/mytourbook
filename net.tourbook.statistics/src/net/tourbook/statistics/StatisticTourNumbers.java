@@ -16,7 +16,6 @@
 package net.tourbook.statistics;
 
 import java.util.ArrayList;
-import java.util.Formatter;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.BarChartMinMaxKeeper;
@@ -326,7 +325,7 @@ public class StatisticTourNumbers extends YearStatistic {
 					infoText.append(UI.NEW_LINE);
 					infoText.append(Messages.numbers_info_altitude_total);
 
-					toolTipLabel = new Formatter().format(
+					toolTipLabel = String.format(
 							infoText.toString(),
 							_statAltitudeUnits[valueIndex],
 							UI.UNIT_LABEL_ALTITUDE,
@@ -341,7 +340,7 @@ public class StatisticTourNumbers extends YearStatistic {
 					infoText.append(UI.NEW_LINE);
 					infoText.append(Messages.numbers_info_altitude_total);
 
-					toolTipLabel = new Formatter().format(
+					toolTipLabel = String.format(
 							infoText.toString(),
 							_statAltitudeUnits[valueIndex - 1],
 							UI.UNIT_LABEL_ALTITUDE,
@@ -355,7 +354,7 @@ public class StatisticTourNumbers extends YearStatistic {
 					infoText.append(UI.NEW_LINE);
 					infoText.append(Messages.numbers_info_altitude_total);
 
-					toolTipLabel = new Formatter().format(
+					toolTipLabel = String.format(
 							infoText.toString(),
 							_statAltitudeUnits[valueIndex - 1],
 							_statAltitudeUnits[valueIndex],
@@ -389,7 +388,7 @@ public class StatisticTourNumbers extends YearStatistic {
 					sb.append(UI.NEW_LINE);
 					sb.append(Messages.numbers_info_distance_total);
 
-					toolTipLabel = new Formatter().format(
+					toolTipLabel = String.format(
 							sb.toString(),
 							_statDistanceUnits[valueIndex],
 							UI.UNIT_LABEL_DISTANCE,
@@ -403,7 +402,7 @@ public class StatisticTourNumbers extends YearStatistic {
 					sb.append(UI.NEW_LINE);
 					sb.append(Messages.numbers_info_distance_total);
 
-					toolTipLabel = new Formatter().format(
+					toolTipLabel = String.format(
 							sb.toString(),
 							_statDistanceUnits[valueIndex - 1],
 							UI.UNIT_LABEL_DISTANCE,
@@ -416,7 +415,7 @@ public class StatisticTourNumbers extends YearStatistic {
 					sb.append(UI.NEW_LINE);
 					sb.append(Messages.numbers_info_distance_total);
 
-					toolTipLabel = new Formatter().format(
+					toolTipLabel = String.format(
 							sb.toString(),
 							_statDistanceUnits[valueIndex - 1],
 							_statDistanceUnits[valueIndex],
@@ -448,7 +447,7 @@ public class StatisticTourNumbers extends YearStatistic {
 					toolTipFormat.append(UI.NEW_LINE);
 					toolTipFormat.append(Messages.numbers_info_time_total);
 
-					toolTipLabel = new Formatter().format(
+					toolTipLabel = String.format(
 							toolTipFormat.toString(),
 							Util.formatValue(_statTimeUnits[valueIndex], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
 							_statTimeCounterHigh[serieIndex][valueIndex],
@@ -462,7 +461,7 @@ public class StatisticTourNumbers extends YearStatistic {
 					toolTipFormat.append(UI.NEW_LINE);
 					toolTipFormat.append(Messages.numbers_info_time_total);
 
-					toolTipLabel = new Formatter().format(
+					toolTipLabel = String.format(
 							toolTipFormat.toString(),
 							Util.formatValue(_statTimeUnits[valueIndex - 1], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
 							_statTimeCounterHigh[serieIndex][valueIndex],
@@ -475,7 +474,7 @@ public class StatisticTourNumbers extends YearStatistic {
 					toolTipFormat.append(UI.NEW_LINE);
 					toolTipFormat.append(Messages.numbers_info_time_total);
 
-					toolTipLabel = new Formatter().format(
+					toolTipLabel = String.format(
 							toolTipFormat.toString(),
 							Util.formatValue(_statTimeUnits[valueIndex - 1], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
 							Util.formatValue(_statTimeUnits[valueIndex], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),

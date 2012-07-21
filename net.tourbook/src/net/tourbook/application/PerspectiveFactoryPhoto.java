@@ -19,6 +19,7 @@ import net.tourbook.mapping.TourMapView;
 import net.tourbook.photo.PhotosAndToursView;
 import net.tourbook.photo.PicDirView;
 import net.tourbook.photo.TourPhotosView;
+import net.tourbook.ui.tourChart.TourChartView;
 
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
@@ -29,8 +30,9 @@ public class PerspectiveFactoryPhoto implements IPerspectiveFactory {
 	public static final String	PERSPECTIVE_ID			= "net.tourbook.perspective.MergePhotos";	//$NON-NLS-1$
 
 	private static final String	FOLDER_ID_PHOTO_MERGE	= "FOLDER_ID_PHOTO_MERGE";					//$NON-NLS-1$
-	private static final String	FOLDER_ID_PIC_DIR		= "FOLDER_ID_PIC_DIR";						//$NON-NLS-1$
+	private static final String	FOLDER_ID_TOUR_PHOTO	= "FOLDER_ID_TOUR_PHOTO";					//$NON-NLS-1$
 	private static final String	FOLDER_ID_MAP			= "FOLDER_ID_MAP";							//$NON-NLS-1$
+	private static final String	FOLDER_ID_TOUR_CHART	= "FOLDER_ID_TOUR_CHART";					//$NON-NLS-1$
 
 	public void createInitialLayout(final IPageLayout layout) {
 
@@ -38,32 +40,38 @@ public class PerspectiveFactoryPhoto implements IPerspectiveFactory {
 
 		//--------------------------------------------------------------------------------
 
-		final IFolderLayout photoMergeFolder = layout.createFolder(
-				FOLDER_ID_PHOTO_MERGE,
-				IPageLayout.LEFT,
-				0.6f,
+		final IFolderLayout photoMergeFolder = layout.createFolder(FOLDER_ID_PHOTO_MERGE,//
+				IPageLayout.RIGHT,
+				0.3f,
 				IPageLayout.ID_EDITOR_AREA);
 
+		photoMergeFolder.addView(PicDirView.ID);
 		photoMergeFolder.addView(PhotosAndToursView.ID);
 
 		//--------------------------------------------------------------------------------
 
-		final IFolderLayout picDirFolder = layout.createFolder(
-				FOLDER_ID_PIC_DIR,
+		final IFolderLayout tourChartFolder = layout.createFolder(FOLDER_ID_TOUR_CHART, //
 				IPageLayout.BOTTOM,
 				0.5f,
 				FOLDER_ID_PHOTO_MERGE);
 
-		picDirFolder.addView(PicDirView.ID);
-		picDirFolder.addView(TourPhotosView.ID);
+		tourChartFolder.addView(TourChartView.ID);
 
 		//--------------------------------------------------------------------------------
 
-		final IFolderLayout mapFolder = layout.createFolder(
-				FOLDER_ID_MAP,
-				IPageLayout.TOP,
-				0.7f,
-				IPageLayout.ID_EDITOR_AREA);
+		final IFolderLayout tourPhotoFolder = layout.createFolder(FOLDER_ID_TOUR_PHOTO,//
+				IPageLayout.BOTTOM,
+				0.5f,
+				FOLDER_ID_TOUR_CHART);
+
+		tourPhotoFolder.addView(TourPhotosView.ID);
+
+		//--------------------------------------------------------------------------------
+
+		final IFolderLayout mapFolder = layout.createFolder(FOLDER_ID_MAP, //
+				IPageLayout.RIGHT,
+				0.5f,
+				FOLDER_ID_PHOTO_MERGE);
 
 		mapFolder.addView(TourMapView.ID);
 	}

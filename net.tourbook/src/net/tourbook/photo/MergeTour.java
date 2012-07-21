@@ -15,36 +15,45 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
+import java.util.ArrayList;
+
 import org.joda.time.DateTime;
 import org.joda.time.Period;
 import org.joda.time.PeriodType;
 
 public class MergeTour {
 
-	private static PeriodType	_tourPeriodTemplate	= PeriodType.yearMonthDayTime()
-													// hide these components
-															.withMonthsRemoved()
-															.withMinutesRemoved()
-															.withSecondsRemoved()
-															.withMillisRemoved();
+	private static PeriodType		_tourPeriodTemplate	= PeriodType.yearMonthDayTime()
+														// hide these components
+																.withMonthsRemoved()
+																.withMinutesRemoved()
+																.withSecondsRemoved()
+																.withMillisRemoved();
 
-	boolean						isDummyTour;
+	boolean							isDummyTour;
 
-	long						tourId				= Long.MIN_VALUE;
-	long						tourTypeId			= -1;
+	long							tourId				= Long.MIN_VALUE;
+	long							tourTypeId			= -1;
 
-	long						tourStartTime;
+	long							tourStartTime;
 
 	/**
 	 * Tour end time is {@link Long#MAX_VALUE} when not yet set.
 	 */
-	long						tourEndTime			= Long.MAX_VALUE;
+	long							tourEndTime			= Long.MAX_VALUE;
 
-	DateTime					tourStartDateTime;
-	DateTime					tourEndDateTime;
-	Period						tourPeriod;
+	DateTime						tourStartDateTime;
+	DateTime						tourEndDateTime;
+	Period							tourPeriod;
 
-	int							numberOfPhotos;
+	int								numberOfPhotos;
+	int								numberOfGPSPhotos;
+	int								numberOfNoGPSPhotos;
+
+	/**
+	 * Contains all photos for this tour.
+	 */
+	public ArrayList<PhotoWrapper>	tourPhotos			= new ArrayList<PhotoWrapper>();
 
 	/**
 	 * Constructor for a real tour.
