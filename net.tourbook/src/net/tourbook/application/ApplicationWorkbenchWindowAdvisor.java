@@ -426,7 +426,9 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		configurer.setShowPerspectiveBar(true);
 		configurer.setShowCoolBar(true);
 		configurer.setShowProgressIndicator(true);
-		configurer.setShowStatusLine(false);
+
+// status line shows photo selection and loading state
+//		configurer.setShowStatusLine(false);
 
 		configurer.setTitle(_appTitle);
 

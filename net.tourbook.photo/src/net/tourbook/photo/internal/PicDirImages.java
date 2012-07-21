@@ -320,7 +320,7 @@ public class PicDirImages implements IPhotoGalleryProvider {
 
 	@Override
 	public IStatusLineManager getStatusLineManager() {
-		return null;
+		return _picDirView.getViewSite().getActionBars().getStatusLineManager();
 	}
 
 	@Override

@@ -56,6 +56,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -69,7 +70,6 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -279,12 +279,10 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 	private Spinner												_spinnerThumbSize;
 
 	private GalleryImplementation								_gallery;
-	private CLabel												_lblStatusLine;
 
 	private PageBook											_pageBook;
 	private Label												_lblLoading;
 	private Composite											_pageLoading;
-	private Composite											_containerStatusLine;
 
 	private Composite											_pageGalleryInfo;
 	private Label												_lblGalleryInfo;
@@ -507,8 +505,6 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 				createUI_30_PageLoading(_pageBook);
 				createUI_40_PageGalleryInfo(_pageBook);
 			}
-
-			createUI_50_StatusLine(container);
 		}
 
 		_photoTooltip = new PhotoToolTip(_gallery);
@@ -669,22 +665,6 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 			GridDataFactory.fillDefaults()//
 					.grab(true, false)
 					.applyTo(_lblGalleryInfo);
-		}
-	}
-
-	private void createUI_50_StatusLine(final Composite parent) {
-
-		_containerStatusLine = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(_containerStatusLine);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(_containerStatusLine);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-		{
-			/*
-			 * label: info
-			 */
-			_lblStatusLine = new CLabel(_containerStatusLine, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblStatusLine);
-
 		}
 	}
 
@@ -1836,6 +1816,15 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		_currentSorting = gallerySorting;
 	}
 
+	private void setStatusMessage(final String message) {
+
+		final IStatusLineManager statusLineManager = _photoGalleryProvider.getStatusLineManager();
+
+		if (statusLineManager != null) {
+			statusLineManager.setMessage(message);
+		}
+	}
+
 	/**
 	 * Display images for a list of {@link PhotoWrapper}.
 	 * 
@@ -2025,20 +2014,6 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 
 		_pageLoading.setBackground(bgColor);
 
-		if (initUI) {
-//			_gallery.redraw();
-//			_gallery.update();
-		}
-
-		/*
-		 * status line
-		 */
-		_containerStatusLine.setForeground(fgColor);
-		_containerStatusLine.setBackground(bgColor);
-
-		_lblStatusLine.setForeground(fgColor);
-		_lblStatusLine.setBackground(bgColor);
-
 		/*
 		 * loading page
 		 */
@@ -2213,9 +2188,9 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 	public void updateUI_StatusMessage(final String message) {
 
 		if (message.length() == 0) {
-			_lblStatusLine.setText(getStatusDefaultMessage());
+			setStatusMessage(getStatusDefaultMessage());
 		} else {
-			_lblStatusLine.setText(message);
+			setStatusMessage(message);
 		}
 	}
 
@@ -2229,9 +2204,9 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 				}
 
 				if (message.length() == 0) {
-					_lblStatusLine.setText(getStatusDefaultMessage());
+					setStatusMessage(getStatusDefaultMessage());
 				} else {
-					_lblStatusLine.setText(message);
+					setStatusMessage(message);
 				}
 			}
 		});
@@ -2256,7 +2231,7 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 						return;
 					}
 
-					_lblStatusLine.setText(UI.EMPTY_STRING);
+					setStatusMessage(UI.EMPTY_STRING);
 				}
 			});
 
@@ -2355,7 +2330,7 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 						Messages.Pic_Dir_Status_Loaded,
 						new Object[] { Long.toString(timeDiff), Integer.toString(_allPhotoWrapper.length) });
 
-				_lblStatusLine.setText(timeDiffText);
+				setStatusMessage(timeDiffText);
 			}
 		});
 

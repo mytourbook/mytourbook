@@ -1105,9 +1105,9 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 
 		loadToursFromDb(selectedPhotos, photoStartDate, photoEndDate);
 
-		_pageBook.showPage(_pageViewer);
-
 		_tourViewer.setInput(new Object[0]);
+
+		_pageBook.showPage(_pageViewer);
 
 		// select first tour
 		if (_allMergeTours.size() > 0) {
