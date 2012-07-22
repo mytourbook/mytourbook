@@ -17,6 +17,7 @@ package net.tourbook.photo;
 
 import java.util.ArrayList;
 
+import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.tour.ITourEventListener;
@@ -67,6 +68,8 @@ public class TourPhotosView extends ViewPart implements IPhotoGalleryProvider {
 	 * contains selection which was set when the part is hidden
 	 */
 	private ISelection				_selectionWhenHidden;
+
+	private ISelection				_currentPhotoSelection;
 
 	private PhotoGallery			_photoGallery;
 
@@ -210,6 +213,8 @@ public class TourPhotosView extends ViewPart implements IPhotoGalleryProvider {
 		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 		{
 			_photoGallery = new PhotoGallery(container, SWT.H_SCROLL | SWT.MULTI, this);
+
+			_photoGallery.setDefaultStatusMessage(Messages.Tour_Photos_Label_StatusMessage_NoTourWithPhotos);
 		}
 	}
 
@@ -251,11 +256,17 @@ public class TourPhotosView extends ViewPart implements IPhotoGalleryProvider {
 
 		if (selection instanceof TourPhotoSelection) {
 
+			if (_currentPhotoSelection == selection) {
+				// prevent setting the same selection again
+				return;
+			}
+
+			_currentPhotoSelection = selection;
+
 			final TourPhotoSelection tourPhotoSelection = (TourPhotoSelection) selection;
 
 			updateUI(tourPhotoSelection);
 		}
-
 	}
 
 	@Override
@@ -302,9 +313,15 @@ public class TourPhotosView extends ViewPart implements IPhotoGalleryProvider {
 
 	private void updateUI(final TourPhotoSelection tourPhotoSelection) {
 
-		final ArrayList<PhotoWrapper> photoWrapperList = tourPhotoSelection.mergeTour.tourPhotos;
+		final MergeTour mergeTour = tourPhotoSelection.mergeTour;
+		final ArrayList<PhotoWrapper> photoWrapperList = mergeTour.tourPhotos;
 
-		_photoGallery.showImages(photoWrapperList);
+		final long tourId = mergeTour.tourId;
+
+		final String galleryPositionKey = tourId == Long.MIN_VALUE //
+				? Long.toString(mergeTour.tourStartTime)
+				: Long.toString(tourId);
+
+		_photoGallery.showImages(photoWrapperList, galleryPositionKey);
 	}
-
 }

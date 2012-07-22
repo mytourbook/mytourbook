@@ -23,6 +23,7 @@ import net.tourbook.photo.IPhotoGalleryProvider;
 import net.tourbook.photo.PhotoGallery;
 import net.tourbook.photo.PhotoSelection;
 import net.tourbook.photo.PicDirView;
+import net.tourbook.photo.internal.gallery.GalleryActionBar;
 
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IStatusLineManager;
@@ -219,7 +220,10 @@ public class PicDirImages implements IPhotoGalleryProvider {
 
 		_photoGallery = new PhotoGallery(parent, SWT.V_SCROLL | SWT.MULTI, this);
 
-		createUI_16_ComboHistory(_photoGallery.getCustomActionBar());
+		final GalleryActionBar galleryActionBar = _photoGallery.getActionBar();
+		if (galleryActionBar != null) {
+			createUI_16_ComboHistory(galleryActionBar.getCustomContainer());
+		}
 
 		createActions();
 
@@ -299,7 +303,7 @@ public class PicDirImages implements IPhotoGalleryProvider {
 	 */
 	private void fillGalleryToolbars() {
 
-		final ToolBarManager tbm = new ToolBarManager(_photoGallery.getToolbar());
+		final ToolBarManager tbm = new ToolBarManager(_photoGallery.getActionBar().getToolbar());
 
 		tbm.add(_actionToggleFolderGallery);
 		tbm.add(_actionNavigateBackward);
@@ -497,10 +501,6 @@ public class PicDirImages implements IPhotoGalleryProvider {
 
 		_comboHistory.setForeground(fgColor);
 		_comboHistory.setBackground(bgColor);
-	}
-
-	public void updateFromPrefStore() {
-		_photoGallery.updateFromPrefStore();
 	}
 
 	private void updateHistory(final String newFolderPathName) {

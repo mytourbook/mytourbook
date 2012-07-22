@@ -1177,6 +1177,8 @@ public class Messages extends NLS {
 	public static String		Tour_Marker_Position_vertical_chart_bottom;
 	public static String		Tour_Marker_Position_vertical_chart_top;
 
+	public static String	Tour_Photos_Label_StatusMessage_NoTourWithPhotos;
+
 	public static String		Tour_Segmenter_Label_default_tolerance;
 	public static String		Tour_Segmenter_Label_no_chart;
 	public static String		Tour_Segmenter_Label_tolerance;

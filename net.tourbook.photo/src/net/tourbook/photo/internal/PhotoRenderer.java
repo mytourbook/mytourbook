@@ -437,7 +437,9 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 						+ " it's potentially this bug: https://bugs.eclipse.org/bugs/show_bug.cgi?id=375845"); //$NON-NLS-1$
 
 				// ensure image is valid after reloading
-				photoImage.dispose();
+//				photoImage.dispose();
+
+				PhotoImageCache.disposeAll();
 
 				return false;
 			}

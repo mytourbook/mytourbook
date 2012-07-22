@@ -35,10 +35,9 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Composite;
 
-public class PhotoGallery extends ImageGallery implements IImageGalleryProvider {
+public class PhotoGallery extends ImageGallery {
 
 	private static final String				STATE_GALLERY_SORTING				= "STATE_GALLERY_SORTING";					//$NON-NLS-1$
 	private static final String				STATE_IMAGE_FILTER					= "STATE_IMAGE_FILTER";					//$NON-NLS-1$
@@ -51,8 +50,8 @@ public class PhotoGallery extends ImageGallery implements IImageGalleryProvider 
 	public static final String				IMAGE_PHOTO_FILTER_GPS				= "IMAGE_PHOTO_FILTER_GPS";				//$NON-NLS-1$
 	public static final String				IMAGE_PHOTO_FILTER_NO_GPS			= "IMAGE_PHOTO_FILTER_NO_GPS";				//$NON-NLS-1$
 
-	private static final IPreferenceStore	_prefStore							= Activator.getDefault()//
-																						.getPreferenceStore();
+//	private static final IPreferenceStore	_prefStore							= Activator.getDefault()//
+//																						.getPreferenceStore();
 
 	private static final IDialogSettings	_state								= Activator.getDefault()//
 																						.getDialogSettingsSection(
@@ -72,8 +71,8 @@ public class PhotoGallery extends ImageGallery implements IImageGalleryProvider 
 	private ImageFilter						_currentImageFilter					= ImageFilter.NoFilter;
 	private GallerySorting					_gallerySorting;
 
-	private int								_thumbnailSize;
-	private int								_textMinThumbSize;
+//	private int								_thumbnailSize;
+//	private int								_textMinThumbSize;
 
 	static {
 		UI.IMAGE_REGISTRY.put(
@@ -90,9 +89,6 @@ public class PhotoGallery extends ImageGallery implements IImageGalleryProvider 
 	public PhotoGallery(final Composite parent, final int style, final IPhotoGalleryProvider photoGalleryProvider) {
 
 		super(parent, style, photoGalleryProvider);
-
-		// image gallery provider cannot be set in the constructor
-		setImageGalleryProvider(this);
 
 		createActions();
 		fillActionBars();
@@ -209,10 +205,10 @@ public class PhotoGallery extends ImageGallery implements IImageGalleryProvider 
 
 	private void enableActions() {
 
-		final boolean isEnableGalleryText = _thumbnailSize >= _textMinThumbSize;
-
-		_actionShowPhotoName.setEnabled(isEnableGalleryText);
-		_actionShowPhotoDate.setEnabled(isEnableGalleryText);
+//		final boolean isEnableGalleryText = _thumbnailSize >= _textMinThumbSize;
+//
+//		_actionShowPhotoName.setEnabled(isEnableGalleryText);
+//		_actionShowPhotoDate.setEnabled(isEnableGalleryText);
 	}
 
 	/**
@@ -299,12 +295,6 @@ public class PhotoGallery extends ImageGallery implements IImageGalleryProvider 
 
 		super.restoreState(state);
 
-		/*
-		 * the thumbnail size enables/disables actions
-		 */
-		_thumbnailSize = getThumbnailSize();
-		_textMinThumbSize = _prefStore.getInt(IPhotoPreferences.PHOTO_VIEWER_TEXT_MIN_THUMB_SIZE);
-
 		enableActions();
 
 	}
@@ -329,17 +319,4 @@ public class PhotoGallery extends ImageGallery implements IImageGalleryProvider 
 		super.saveState(state);
 	}
 
-	public void setThumbnailSize(final int photoWidth) {
-
-		_thumbnailSize = photoWidth;
-
-		enableActions();
-	}
-
-	public void updateFromPrefStore() {
-
-		_textMinThumbSize = _prefStore.getInt(IPhotoPreferences.PHOTO_VIEWER_TEXT_MIN_THUMB_SIZE);
-
-		enableActions();
-	}
 }

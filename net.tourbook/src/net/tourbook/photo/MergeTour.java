@@ -32,6 +32,9 @@ public class MergeTour {
 
 	boolean							isDummyTour;
 
+	/**
+	 * Contains tour id when it's a real tour, otherwise it contains {@link Long#MIN_VALUE}.
+	 */
 	long							tourId				= Long.MIN_VALUE;
 	long							tourTypeId			= -1;
 

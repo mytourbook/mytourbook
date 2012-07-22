@@ -70,6 +70,7 @@ public abstract class GalleryMT20 extends Canvas {
 	private static final int					GALLERY_ITEM_MIN_SIZE	= 10;
 
 	private boolean								_isVertical;
+	private boolean								_isHorizontal;
 
 	private boolean								_isMultiSelection;
 	private boolean								_isGalleryMoved;
@@ -287,6 +288,8 @@ public abstract class GalleryMT20 extends Canvas {
 //		super(parent, style | SWT.NO_MERGE_PAINTS);
 
 		_isVertical = (style & SWT.V_SCROLL) > 0;
+		_isHorizontal = !_isVertical;
+
 		_isMultiSelection = (style & SWT.MULTI) > 0;
 
 		_clientArea = getClientArea();
@@ -423,10 +426,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 			@Override
 			public void controlResized(final ControlEvent event) {
-
-				_clientArea = getClientArea();
-
-				updateGallery(true);
+				onResize();
 			}
 		});
 
@@ -475,7 +475,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 				@Override
 				public void widgetSelected(final SelectionEvent event) {
-					if (!_isVertical) {
+					if (_isHorizontal) {
 						onScrollHorizontal();
 					}
 				}
@@ -830,67 +830,6 @@ public abstract class GalleryMT20 extends Canvas {
 		return galleryItem;
 	}
 
-//	private GalleryMT20Item getNextItem_OLD(final int keyCode) {
-//
-//		if (_lastSingleClick == null) {
-//
-//			// nothing is selected, select first item
-//
-//			final GalleryMT20Item firstItem = getInitializedItem(0);
-//
-//			_lastSingleClick = firstItem;
-//
-//			return firstItem;
-//		}
-//
-//		// Handle HOME and END
-//		switch (keyCode) {
-//		case SWT.HOME:
-//			return getInitializedItem(0);
-//
-//		case SWT.END:
-//			return getInitializedItem(_virtualGalleryItems.length - 1);
-//		}
-//
-//		// Handle arrows and page up / down
-//		if (_isVertical) {
-//
-//			final int maxVisibleRows = Math.max((_clientArea.height / _itemHeight) - 1, 1);
-//
-////			switch (keyCode) {
-////			case SWT.ARROW_LEFT:
-////				next = goLeft(group, pos);
-////				break;
-////
-////			case SWT.ARROW_RIGHT:
-////				next = goRight(group, pos);
-////				break;
-////
-////			case SWT.ARROW_UP:
-////				next = goUp(group, pos, hCount, 1);
-////				break;
-////
-////			case SWT.ARROW_DOWN:
-////				next = goDown(group, pos, hCount, 1);
-////				break;
-////
-////			case SWT.PAGE_UP:
-////				next = goUp(group, pos, hCount, Math.max(maxVisibleRows - 1, 1));
-////				break;
-////
-////			case SWT.PAGE_DOWN:
-////				next = goDown(group, pos, hCount, Math.max(maxVisibleRows - 1, 1));
-////				break;
-////			}
-//
-//		} else {
-//
-//			// is not yet implemented
-//		}
-//
-//		return null;
-//	}
-
 	/**
 	 * Get item virtual index at pixel position
 	 * 
@@ -900,45 +839,51 @@ public abstract class GalleryMT20 extends Canvas {
 	 */
 	public int getItemIndexFromPosition(final int viewPortX, final int viewPortY) {
 
+		if (_clientArea.contains(viewPortX, viewPortY) == false) {
+			// mouse is outside of the gallery
+			return -1;
+		}
+
+		int contentPosX;
+		int contentPosY;
+
 		if (_isVertical) {
 
-			if (_clientArea.contains(viewPortX, viewPortY) == false) {
-				// mouse is outside of the gallery
-				return -1;
-			}
+			// vertical gallery
 
-			final int contentPosX = viewPortX - _itemCenterOffsetX;
-			final int contentPosY = _galleryPosition + viewPortY;
-
-			final int indexX = contentPosX / _itemWidth;
-			final int indexY = contentPosY / _itemHeight;
-
-			// ckeck if mouse click is outside of the gallery horizontal items
-			if (indexX >= _gridHorizItems) {
-				return -1;
-			}
-
-			// ckeck if mouse click is outside of the gallery vertical items
-			if (indexY >= _gridVertItems) {
-				return -1;
-			}
-
-			final int itemIndex = indexY * _gridHorizItems + indexX;
-
-			// ensure array bounds
-			final int maxItems = _virtualGalleryItems.length;
-			if (itemIndex >= maxItems) {
-				return -1;
-			}
-
-			return itemIndex;
+			contentPosX = viewPortX - _itemCenterOffsetX;
+			contentPosY = _galleryPosition + viewPortY;
 
 		} else {
 
-			// is not yet implemented
+			// horizontal gallery
+
+			contentPosX = _galleryPosition + viewPortX;
+			contentPosY = viewPortY;// - _itemCenterOffsetX;
 		}
 
-		return -1;
+		final int indexX = contentPosX / _itemWidth;
+		final int indexY = contentPosY / _itemHeight;
+
+		// ckeck if mouse click is outside of the gallery horizontal items
+		if (indexX >= _gridHorizItems) {
+			return -1;
+		}
+
+		// ckeck if mouse click is outside of the gallery vertical items
+		if (indexY >= _gridVertItems) {
+			return -1;
+		}
+
+		final int itemIndex = indexY * _gridHorizItems + indexX;
+
+		// ensure array bounds
+		final int maxItems = _virtualGalleryItems.length;
+		if (itemIndex >= maxItems) {
+			return -1;
+		}
+
+		return itemIndex;
 	}
 
 	/**
@@ -1952,18 +1897,63 @@ public abstract class GalleryMT20 extends Canvas {
 //		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
+	private void onResize() {
+
+		_clientArea = getClientArea();
+
+		if (_clientArea.width == 0 || _clientArea.height == 0) {
+
+			// UI is not yet initialized
+
+		} else {
+
+			/*
+			 * set item height for horizontal galleries because it contains only 1 row with all
+			 * images, these galleries cannot be zoomed so this is the only point where the size is
+			 * set
+			 */
+			if (_isHorizontal) {
+
+				_itemHeight = _clientArea.height;
+				_itemWidth = (int) (_itemHeight * _itemRatio);
+			}
+		}
+
+		updateGallery(true);
+	}
+
 	private void onScrollHorizontal() {
 
 		// reset position when position is modified manually
 		_defaultGalleryPositionRatio = null;
 
 		final int areaWidth = _clientArea.width;
+
 		if (_contentVirtualWidth > areaWidth) {
 
-			// image is higher than client area
+			// content is larger than visible client area
 
-			final int barSelection = getHorizontalBar().getSelection();
-			scroll(_galleryPosition - barSelection, 0, 0, 0, areaWidth, _clientArea.height, false);
+			final ScrollBar hBar = getHorizontalBar();
+
+			final int barSelection = hBar.getSelection();
+			final int destX = _galleryPosition - barSelection;
+
+// this is not working :-((
+//
+//			if (_isMouseWheel) {
+//				/*
+//				 * mouse wheel in the client area and NOT in the scrollbar has caused this scolling
+//				 * event, accelerate scrolling
+//				 */
+////				destX *= 10;
+//
+////				hBar.setSelection(_galleryPosition - destX);
+//
+//				_isMouseWheel = false;
+//			}
+
+			scroll(destX, 0, 0, 0, areaWidth, _clientArea.height, false);
+
 			_galleryPosition = barSelection;
 
 		} else {
@@ -1971,6 +1961,8 @@ public abstract class GalleryMT20 extends Canvas {
 		}
 
 		_clientAreaItemsIndices = getAreaItemsIndices(_clientArea);
+
+		hideTooltip();
 	}
 
 	private void onScrollVertical(final SelectionEvent event) {
@@ -2048,7 +2040,6 @@ public abstract class GalleryMT20 extends Canvas {
 		_clientAreaItemsIndices = getAreaItemsIndices(_clientArea);
 
 		hideTooltip();
-//		fireItemHoverEvent();
 	}
 
 	public void restoreState(final IDialogSettings state) {
@@ -2114,10 +2105,15 @@ public abstract class GalleryMT20 extends Canvas {
 			System.arraycopy(oldFlags, 0, _selectionFlags, 0, oldFlags.length);
 		}
 
+		final GalleryMT20Item galleryItem = getInitializedItem(itemIndex);
+
+		if (galleryItem == null) {
+			// happened during development but should not happen
+			return;
+		}
+
 		// Get flag position in the 32 bit block and ensure is selected.
 		_selectionFlags[flagIndex] |= 1 << (itemIndex & 0x1f);
-
-		final GalleryMT20Item galleryItem = getInitializedItem(itemIndex);
 
 		_lastSelectedItem = galleryItem;
 		_lastSelectedItemIndex = itemIndex;
@@ -2607,7 +2603,10 @@ public abstract class GalleryMT20 extends Canvas {
 
 		} else {
 
+			// compute new content width/height
 			updateStructuralValues(isKeepLocation);
+
+			// ensure scrollbars are correctly displayed/hidden
 			updateScrollBars();
 
 			_clientAreaItemsIndices = getAreaItemsIndices(_clientArea);
@@ -2662,7 +2661,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 		} else {
 
-			// not yet fully implemented
+			// horizontal gallery
 
 			viewPortX = galleryVirtualPosX - _galleryPosition;
 			viewPortY = galleryVirtualPosY;
@@ -2782,14 +2781,21 @@ public abstract class GalleryMT20 extends Canvas {
 			// horizontal
 
 			if (isKeepLocation && _contentVirtualWidth > 0) {
-				oldPosition = (float) (_galleryPosition + 0.5 * clientAreaWidth) / _contentVirtualWidth;
+				oldPosition = (_galleryPosition + 0.5 * clientAreaWidth) / _contentVirtualWidth;
 			}
 
 			_contentVirtualWidth = _gridHorizItems * _itemWidth;
 			_contentVirtualHeight = clientAreaHeight;
 
-			if (isKeepLocation) {
-				_galleryPosition = (int) (_contentVirtualWidth * oldPosition - 0.5 * clientAreaWidth);
+			if (_defaultGalleryPositionRatio != null) {
+
+				_galleryPosition = (int) (_contentVirtualWidth * _defaultGalleryPositionRatio);
+
+			} else {
+
+				if (oldPosition != -1) {
+					_galleryPosition = (int) (_contentVirtualWidth * oldPosition - 0.5 * clientAreaWidth);
+				}
 			}
 		}
 
@@ -2831,7 +2837,15 @@ public abstract class GalleryMT20 extends Canvas {
 		}
 	}
 
+	/**
+	 * @param newZoomedSize
+	 * @return Returns new item size or <code>-1</code> when gallery is not zoomed.
+	 */
 	public int zoomGallery(int newZoomedSize) {
+
+		if (_isHorizontal) {
+			return -1;
+		}
 
 		if (newZoomedSize < GALLERY_ITEM_MIN_SIZE) {
 			newZoomedSize = GALLERY_ITEM_MIN_SIZE;
@@ -2925,6 +2939,10 @@ public abstract class GalleryMT20 extends Canvas {
 								final boolean isZoomIn,
 								final boolean isShiftKey,
 								final boolean isCtrlKey) {
+
+		if (_isHorizontal) {
+			return;
+		}
 
 		if (_mouseMovePosition == null) {
 			return;
@@ -3095,12 +3113,6 @@ public abstract class GalleryMT20 extends Canvas {
 
 			// is not yet implemented
 		}
-
-//		// compute new content width/height
-//		updateStructuralValues(true);
-//
-//		// ensure scrollbars are correctly displayed/hidden
-//		updateScrollBars();
 
 		updateGallery(true, centerSelectedItem());
 

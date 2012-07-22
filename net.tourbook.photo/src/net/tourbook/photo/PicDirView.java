@@ -220,10 +220,6 @@ public class PicDirView extends ViewPart {
 
 				final String property = event.getProperty();
 
-				if (property.equals(IPhotoPreferences.PHOTO_VIEWER_PREF_EVENT_IMAGE_VIEWER_UI_IS_MODIFIED)) {
-					_picDirImages.updateFromPrefStore();
-				}
-
 				_picDirFolder.handlePrefStoreModifications(event);
 				_picDirImages.handlePrefStoreModifications(event);
 			}

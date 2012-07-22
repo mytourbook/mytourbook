@@ -34,11 +34,11 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.photo.internal.Activator;
 import net.tourbook.photo.internal.ImageFilter;
-import net.tourbook.photo.internal.ImageSizeIndicator;
 import net.tourbook.photo.internal.Messages;
 import net.tourbook.photo.internal.PhotoDateInfo;
 import net.tourbook.photo.internal.PhotoRenderer;
 import net.tourbook.photo.internal.PhotoToolTip;
+import net.tourbook.photo.internal.gallery.GalleryActionBar;
 import net.tourbook.photo.internal.gallery.MT20.FullSizeViewer;
 import net.tourbook.photo.internal.gallery.MT20.GalleryMT20;
 import net.tourbook.photo.internal.gallery.MT20.GalleryMT20Item;
@@ -70,21 +70,14 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Spinner;
-import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.progress.UIJob;
 
@@ -104,8 +97,6 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 
 	private static final String									MENU_ID_PHOTO_GALLERY			= "menu.net.tourbook.photo.photoGallery";	//$NON-NLS-1$
 
-	private static final int									IMAGE_INDICATOR_SIZE			= 16;
-
 	private static final int									DELAY_JOB_SUBSEQUENT_FILTER		= 500;										// ms
 	private static final long									DELAY_JOB_UI_FILTER				= 200;										// ms
 	private static final long									DELAY_JOB_UI_LOADING			= 200;										// ms
@@ -113,8 +104,8 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 	public static final int										MIN_GALLERY_ITEM_WIDTH			= 10;										// pixel
 	public static final int										MAX_GALLERY_ITEM_WIDTH			= 2000;									// pixel
 
-	private static final String									STATE_THUMB_IMAGE_SIZE			= "STATE_THUMB_IMAGE_SIZE";				//$NON-NLS-1$
-	private static final String									STATE_GALLERY_POSITION_FOLDER	= "STATE_GALLERY_POSITION_FOLDER";			//$NON-NLS-1$
+	public static final String									STATE_THUMB_IMAGE_SIZE			= "STATE_THUMB_IMAGE_SIZE";				//$NON-NLS-1$
+	private static final String									STATE_GALLERY_POSITION_KEY		= "STATE_GALLERY_POSITION_KEY";			//$NON-NLS-1$
 	private static final String									STATE_GALLERY_POSITION_VALUE	= "STATE_GALLERY_POSITION_VALUE";			//$NON-NLS-1$
 	private static final String									STATE_IMAGE_SORTING				= "STATE_IMAGE_SORTING";					//$NON-NLS-1$
 	private static final String									STATE_SELECTED_ITEMS			= "STATE_SELECTED_ITEMS";					//$NON-NLS-1$
@@ -168,6 +159,29 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 	 */
 	private final Runnable										_workerRunnable;
 
+	/*
+	 * image loading/filtering
+	 */
+	private ImageFilter											_currentImageFilter;
+
+	private boolean												_filterJob1stRun;
+	private boolean												_filterJobIsCanceled;
+
+	private ReentrantLock										JOB_LOCK						= new ReentrantLock();
+	private Job													_jobFilter;
+	private AtomicBoolean										_jobFilterIsSubsequentScheduled	= new AtomicBoolean();
+	private int													_jobFilterDirtyCounter;
+
+	private UIJob												_jobUIFilter;
+	private AtomicBoolean										_jobUIFilterJobIsScheduled		= new AtomicBoolean();
+	private int													_jobUIFilterDirtyCounter;
+	private PhotoWrapper[]										_jobUIFilterPhotoWrapper;
+
+	private int													_currentExifRunId;
+
+	private Job													_jobUILoading;
+	private AtomicBoolean										_jobUILoadingIsScheduled		= new AtomicBoolean();
+	private int													_jobUILoadingDirtyCounter;
 	/**
 	 *
 	 */
@@ -202,9 +216,13 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 	private PhotoWrapper[]										_allPhotoWrapper;
 
 	protected IPhotoGalleryProvider								_photoGalleryProvider;
-	private IImageGalleryProvider								_imageGalleryProvider;
 
 	private int													_galleryStyle;
+
+	/**
+	 * By default action bar is displayed for a vertical gallery layout.
+	 */
+	private boolean												_isActionBar;
 
 	/**
 	 * Contains filtered gallery items.
@@ -226,6 +244,10 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 	 * keep gallery position for each used folder
 	 */
 	private LinkedHashMap<String, Double>						_galleryPositions;
+	private String												_newGalleryPositionKey;
+	private String												_currentGalleryPositionKey;
+
+	private String												_defaultStatusMessage			= UI.EMPTY_STRING;
 
 	private int[]												_restoredSelection;
 
@@ -241,27 +263,6 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 	 */
 	private ConcurrentLinkedHashMap<String, PhotoImageMetadata>	_exifCache;
 
-	private ImageFilter											_currentImageFilter;
-
-	private boolean												_filterJob1stRun;
-	private boolean												_filterJobIsCanceled;
-
-	private ReentrantLock										JOB_LOCK						= new ReentrantLock();
-	private Job													_jobFilter;
-	private AtomicBoolean										_jobFilterIsSubsequentScheduled	= new AtomicBoolean();
-	private int													_jobFilterDirtyCounter;
-
-	private UIJob												_jobUIFilter;
-	private AtomicBoolean										_jobUIFilterJobIsScheduled		= new AtomicBoolean();
-	private int													_jobUIFilterDirtyCounter;
-	private PhotoWrapper[]										_jobUIFilterPhotoWrapper;
-
-	private int													_currentExifRunId;
-
-	private Job													_jobUILoading;
-	private AtomicBoolean										_jobUILoadingIsScheduled		= new AtomicBoolean();
-	private int													_jobUILoadingDirtyCounter;
-
 	/*
 	 * UI resources
 	 */
@@ -273,21 +274,15 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 	private Display												_display;
 	private Composite											_uiContainer;
 
-	private Composite											_containerActionBar;
-	private Composite											_customActionBarContainer;
-	private ToolBar												_toolbar;
-	private Spinner												_spinnerThumbSize;
-
 	private GalleryImplementation								_gallery;
+	private GalleryActionBar									_galleryActionBar;
 
 	private PageBook											_pageBook;
-	private Label												_lblLoading;
-	private Composite											_pageLoading;
+	private Label												_lblDefaultPage;
+	private Composite											_pageDefault;
 
 	private Composite											_pageGalleryInfo;
 	private Label												_lblGalleryInfo;
-
-	private ImageSizeIndicator									_canvasImageSizeIndicator;
 
 	{
 		_galleryPositions = new LinkedHashMap<String, Double>(100, 0.75f, true);
@@ -426,6 +421,8 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		_galleryStyle = style;
 		_photoGalleryProvider = photoGalleryProvider;
 
+		_isActionBar = (style & SWT.V_SCROLL) > 0;
+
 		jobFilter_10_Create();
 		jobUIFilter_10_Create();
 		jobUILoading_10_Create();
@@ -496,13 +493,15 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, 0).applyTo(container);
 //		container.setBackground(_display.getSystemColor(SWT.COLOR_RED));
 		{
-			createUI_10_ActionBar(container);
+			if (_isActionBar) {
+				_galleryActionBar = new GalleryActionBar(container, this);
+			}
 
 			_pageBook = new PageBook(container, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBook);
 			{
 				createUI_20_PageGallery(_pageBook);
-				createUI_30_PageLoading(_pageBook);
+				createUI_30_PageDefault(_pageBook);
 				createUI_40_PageGalleryInfo(_pageBook);
 			}
 		}
@@ -512,80 +511,9 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		_gallery.addItemHoveredListener(this);
 
 		// force that the 1st tab is in the gallery
-		container.setTabList(new Control[] { _pageBook, _containerActionBar });
-	}
-
-	private void createUI_10_ActionBar(final Composite parent) {
-
-		_containerActionBar = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(_containerActionBar);
-		GridLayoutFactory.fillDefaults()//
-				.numColumns(5)
-				.extendedMargins(0, 2, 2, 2)
-				.spacing(3, 0)
-				.applyTo(_containerActionBar);
-		{
-			/*
-			 * toolbar actions
-			 */
-			_toolbar = new ToolBar(_containerActionBar, SWT.FLAT);
-			GridDataFactory.fillDefaults()//
-					.align(SWT.BEGINNING, SWT.CENTER)
-					.applyTo(_toolbar);
-
-			createUI_16_CustomActionBar(_containerActionBar);
-			createUI_17_ImageSize(_containerActionBar);
-			createUI_18_ImageSizeIndicator(_containerActionBar);
-		}
-	}
-
-	private void createUI_16_CustomActionBar(final Composite parent) {
-
-		_customActionBarContainer = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(_customActionBarContainer);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(_customActionBarContainer);
-	}
-
-	/**
-	 * spinner: thumb size
-	 */
-	private void createUI_17_ImageSize(final Composite parent) {
-
-		_spinnerThumbSize = new Spinner(parent, SWT.BORDER);
-		GridDataFactory.fillDefaults() //
-				.align(SWT.BEGINNING, SWT.FILL)
-				.applyTo(_spinnerThumbSize);
-		_spinnerThumbSize.setMinimum(MIN_GALLERY_ITEM_WIDTH);
-		_spinnerThumbSize.setMaximum(MAX_GALLERY_ITEM_WIDTH);
-		_spinnerThumbSize.setIncrement(1);
-		_spinnerThumbSize.setPageIncrement(50);
-		_spinnerThumbSize.setToolTipText(UI.IS_OSX
-				? Messages.Pic_Dir_Spinner_ThumbnailSize_Tooltip_OSX
-				: Messages.Pic_Dir_Spinner_ThumbnailSize_Tooltip);
-		_spinnerThumbSize.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onSelectThumbnailSize(_spinnerThumbSize.getSelection());
-			}
-		});
-		_spinnerThumbSize.addMouseWheelListener(new MouseWheelListener() {
-			public void mouseScrolled(final MouseEvent event) {
-				Util.adjustSpinnerValueOnMouseScroll(event);
-				onSelectThumbnailSize(_spinnerThumbSize.getSelection());
-			}
-		});
-	}
-
-	/**
-	 * canvas: image size indicator
-	 */
-	private void createUI_18_ImageSizeIndicator(final Composite parent) {
-
-		_canvasImageSizeIndicator = new ImageSizeIndicator(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.hint(IMAGE_INDICATOR_SIZE, IMAGE_INDICATOR_SIZE)
-				.align(SWT.CENTER, SWT.CENTER)
-				.applyTo(_canvasImageSizeIndicator);
+//		if (_isActionBar) {
+//			container.setTabList(new Control[] { _pageBook, _containerActionBar });
+//		}
 	}
 
 	/**
@@ -635,20 +563,19 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		_gallery.setItemRenderer(_photoRenderer);
 	}
 
-	private void createUI_30_PageLoading(final PageBook parent) {
+	private void createUI_30_PageDefault(final PageBook parent) {
 
-		_pageLoading = new Composite(parent, SWT.NONE);
-//		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		_pageDefault = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.fillDefaults()//
 				.numColumns(1)
 				.margins(5, 5)
-				.applyTo(_pageLoading);
+				.applyTo(_pageDefault);
 		{
-			_lblLoading = new Label(_pageLoading, SWT.WRAP);
+			_lblDefaultPage = new Label(_pageDefault, SWT.WRAP);
 			GridDataFactory.fillDefaults()//
 					.grab(true, true)
 					.align(SWT.FILL, SWT.FILL)
-					.applyTo(_lblLoading);
+					.applyTo(_lblDefaultPage);
 		}
 	}
 
@@ -740,12 +667,43 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		jobFilter_22_ScheduleSubsequent(0);
 	}
 
-	private Comparator<PhotoWrapper> getCurrentComparator() {
-		return _currentSorting == GallerySorting.FILE_NAME ? SORT_BY_FILE_NAME : SORT_BY_FILE_DATE;
+	public GalleryActionBar getActionBar() {
+		return _galleryActionBar;
 	}
 
-	public Composite getCustomActionBar() {
-		return _customActionBarContainer;
+	/**
+	 * Preserves gallery positions for different gallery contents.
+	 * 
+	 * @return
+	 */
+	private double getCachedGalleryPosition() {
+
+		double galleryPosition = 0;
+
+		if (_currentGalleryPositionKey != null) {
+
+			// keep current gallery position
+			_galleryPositions.put(_currentGalleryPositionKey, _gallery.getGalleryPosition());
+		}
+
+		if (_newGalleryPositionKey != null) {
+
+			// get old gallery position
+			final Double oldPosition = _galleryPositions.get(_newGalleryPositionKey);
+
+			_currentGalleryPositionKey = _newGalleryPositionKey;
+
+			/*
+			 * initialize and update gallery with new items
+			 */
+			galleryPosition = oldPosition == null ? 0 : oldPosition;
+		}
+
+		return galleryPosition;
+	}
+
+	private Comparator<PhotoWrapper> getCurrentComparator() {
+		return _currentSorting == GallerySorting.FILE_NAME ? SORT_BY_FILE_NAME : SORT_BY_FILE_DATE;
 	}
 
 	public FullSizeViewer getFullSizeViewer() {
@@ -883,16 +841,12 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 	private String getStatusDefaultMessage() {
 
 		final Collection<GalleryMT20Item> allSelectedPhoto = _gallery.getSelection();
+		final int allPhotoSize = allSelectedPhoto.size();
 
-		return NLS.bind(Messages.Pic_Dir_StatusLabel_SelectedImages, allSelectedPhoto.size());
-	}
-
-	public int getThumbnailSize() {
-		return _spinnerThumbSize.getSelection();
-	}
-
-	public ToolBar getToolbar() {
-		return _toolbar;
+		return allPhotoSize == 0 //
+				// hide status message when nothing is selected
+				? UI.EMPTY_STRING
+				: NLS.bind(Messages.Pic_Dir_StatusLabel_SelectedImages, allPhotoSize);
 	}
 
 	public void handlePrefStoreModifications(final PropertyChangeEvent event) {
@@ -922,7 +876,9 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 
 					_gallery.updateGallery(false, _gallery.getGalleryPosition());
 
-					updateUI_ImageIndicatorTooltip();
+					if (_isActionBar) {
+						_galleryActionBar.updateUI_ImageIndicatorTooltip();
+					}
 				}
 			});
 
@@ -1580,40 +1536,6 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		_photoGalleryProvider.setSelection(createPhotoSelection());
 	}
 
-	private void onSelectThumbnailSize(final int newImageSize) {
-
-		int newGalleryItemSize = newImageSize + _photoBorderSize;
-
-		if (newGalleryItemSize == _prevGalleryItemSize) {
-			// nothing has changed
-			return;
-		}
-
-		final int prevGalleryItemSize = _gallery.getItemWidth();
-
-		// update gallery
-		final int adjustedItemSize = _gallery.zoomGallery(newGalleryItemSize);
-
-		if (adjustedItemSize == prevGalleryItemSize) {
-			// nothing has changed
-			return;
-		}
-
-		PhotoLoadManager.stopImageLoading(false);
-
-		if (adjustedItemSize != newGalleryItemSize) {
-
-			/*
-			 * size has been modified, this case can occure when the gallery is switching the
-			 * scrollbars on/off depending on the content
-			 */
-
-			newGalleryItemSize = adjustedItemSize;
-		}
-
-		updateUI_AfterZoomInOut(newGalleryItemSize);
-	}
-
 	public void putInExifCache(final String imageFilePathName, final PhotoImageMetadata metadata) {
 		_exifCache.put(imageFilePathName, metadata);
 	}
@@ -1701,8 +1623,6 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		// pref store settings
 		updateUI_FromPrefStore(false);
 
-		updateUI_ImageIndicatorTooltip();
-
 		/**
 		 * !!! very important !!!
 		 * <p>
@@ -1711,9 +1631,9 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		 */
 		_pageBook.showPage(_gallery);
 
-		// show loading page until a folder is selected
-		_lblLoading.setText(Messages.Pic_Dir_Label_ReadingFolders);
-		_pageBook.showPage(_pageLoading);
+		// show default page
+		_lblDefaultPage.setText(_defaultStatusMessage);
+		_pageBook.showPage(_pageDefault);
 
 		/**
 		 * set thumbnail size after gallery client area is set
@@ -1722,29 +1642,32 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 				state,
 				STATE_THUMB_IMAGE_SIZE,
 				PhotoLoadManager.IMAGE_SIZE_THUMBNAIL);
-		_spinnerThumbSize.setSelection(stateThumbSize);
+
+		if (_isActionBar) {
+			_galleryActionBar.restoreState(state, stateThumbSize);
+		}
 
 		// restore thumbnail image size
-		onSelectThumbnailSize(stateThumbSize);
+		setThumbnailSize(stateThumbSize);
 
 		/*
-		 * gallery folder image positions
+		 * gallery folder/tour image positions
 		 */
-		final String[] positionFolders = state.getArray(STATE_GALLERY_POSITION_FOLDER);
+		final String[] positionKeys = state.getArray(STATE_GALLERY_POSITION_KEY);
 		final String[] positionValues = state.getArray(STATE_GALLERY_POSITION_VALUE);
-		if (positionFolders != null && positionValues != null) {
+		if (positionKeys != null && positionValues != null) {
 
 			// ensure same size
-			if (positionFolders.length == positionValues.length) {
+			if (positionKeys.length == positionValues.length) {
 
-				for (int positionIndex = 0; positionIndex < positionFolders.length; positionIndex++) {
+				for (int positionIndex = 0; positionIndex < positionKeys.length; positionIndex++) {
 
 					final String positionValueString = positionValues[positionIndex];
 
 					try {
 						final Double positionValue = Double.parseDouble(positionValueString);
 
-						_galleryPositions.put(positionFolders[positionIndex], positionValue);
+						_galleryPositions.put(positionKeys[positionIndex], positionValue);
 
 					} catch (final Exception e) {
 						// ignore
@@ -1763,34 +1686,37 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		state.put(STATE_IMAGE_SORTING, _currentSorting.name());
 
 		/*
-		 * gallery positions for each folder
+		 * gallery positions
 		 */
-
-		// get current position
-		if (_photoFolder != null) {
-			_galleryPositions.put(_photoFolder.getAbsolutePath(), _gallery.getGalleryPosition());
+		if (_currentGalleryPositionKey != null) {
+			// preserve current position
+			_galleryPositions.put(_currentGalleryPositionKey, _gallery.getGalleryPosition());
 		}
 
-		final Set<String> positionFolders = _galleryPositions.keySet();
-		final int positionSize = positionFolders.size();
+		final Set<String> positionKeys = _galleryPositions.keySet();
+		final int positionSize = positionKeys.size();
 
 		if (positionSize > 0) {
 
-			final String[] positionFolderArray = positionFolders.toArray(new String[positionSize]);
+			final String[] positionKeyArray = positionKeys.toArray(new String[positionSize]);
 			final String[] positionValues = new String[positionSize];
 
-			for (int positionIndex = 0; positionIndex < positionFolderArray.length; positionIndex++) {
-				final String positionKey = positionFolderArray[positionIndex];
+			for (int positionIndex = 0; positionIndex < positionKeyArray.length; positionIndex++) {
+				final String positionKey = positionKeyArray[positionIndex];
 				positionValues[positionIndex] = _galleryPositions.get(positionKey).toString();
 			}
 
-			state.put(STATE_GALLERY_POSITION_FOLDER, positionFolderArray);
+			state.put(STATE_GALLERY_POSITION_KEY, positionKeyArray);
 			state.put(STATE_GALLERY_POSITION_VALUE, positionValues);
 		}
 
 		Util.setState(state, STATE_SELECTED_ITEMS, _gallery.getSelectionIndex());
 
 		_gallery.saveState(state);
+	}
+
+	public void setDefaultStatusMessage(final String message) {
+		_defaultStatusMessage = message;
 	}
 
 	/**
@@ -1804,10 +1730,6 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 
 	public void setFocus() {
 //		_gallery.setFocus();
-	}
-
-	void setImageGalleryProvider(final IImageGalleryProvider imageGalleryProvider) {
-		_imageGalleryProvider = imageGalleryProvider;
 	}
 
 	public void setSorting(final GallerySorting gallerySorting) {
@@ -1825,12 +1747,48 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		}
 	}
 
+	public void setThumbnailSize(final int newImageSize) {
+
+		int newGalleryItemSize = newImageSize + _photoBorderSize;
+
+		if (newGalleryItemSize == _prevGalleryItemSize) {
+			// nothing has changed
+			return;
+		}
+
+		final int prevGalleryItemSize = _gallery.getItemWidth();
+
+		// update gallery
+		final int adjustedItemSize = _gallery.zoomGallery(newGalleryItemSize);
+
+		if (adjustedItemSize == -1 || adjustedItemSize == prevGalleryItemSize) {
+			// nothing has changed
+			return;
+		}
+
+		PhotoLoadManager.stopImageLoading(false);
+
+		if (adjustedItemSize != newGalleryItemSize) {
+
+			/*
+			 * size has been modified, this case can occure when the gallery is switching the
+			 * scrollbars on/off depending on the content
+			 */
+
+			newGalleryItemSize = adjustedItemSize;
+		}
+
+		updateUI_AfterZoomInOut(newGalleryItemSize);
+	}
+
 	/**
 	 * Display images for a list of {@link PhotoWrapper}.
 	 * 
 	 * @param photoWrapperList
+	 * @param galleryPositionKey
+	 *            Contains a unique key to keep gallery position for different contents
 	 */
-	public void showImages(final ArrayList<PhotoWrapper> photoWrapperList) {
+	public void showImages(final ArrayList<PhotoWrapper> photoWrapperList, final String galleryPositionKey) {
 
 		jobFilter_12_Stop();
 
@@ -1847,14 +1805,15 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		//
 		//////////////////////////////////////////
 
-//		_lblLoading.setText(Messages.Pic_Dir_Label_ReadingFolders);
+		_lblDefaultPage.setText(_defaultStatusMessage);
+		_pageBook.showPage(_pageDefault);
 
-		_pageBook.showPage(_pageLoading);
-
-		// images are not loaded from a folder, photo wrapper are already available
+		// images are not loaded from a folder, photo wrappers are already available
 		_photoFolder = null;
 
-		workerExecute_DisplayImages(photoWrapperList.toArray(new PhotoWrapper[photoWrapperList.size()]), null);
+		_newGalleryPositionKey = galleryPositionKey;
+
+		workerExecute_DisplayImages(photoWrapperList.toArray(new PhotoWrapper[photoWrapperList.size()]));
 	}
 
 	/**
@@ -1881,13 +1840,12 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		//////////////////////////////////////////
 
 		if (imageFolder == null) {
-			_lblLoading.setText(Messages.Pic_Dir_Label_ReadingFolders);
+			_lblDefaultPage.setText(Messages.Pic_Dir_Label_ReadingFolders);
 		} else {
 
-			_lblLoading.setText(NLS.bind(Messages.Pic_Dir_Label_Loading, imageFolder.getAbsolutePath()));
+			_lblDefaultPage.setText(NLS.bind(Messages.Pic_Dir_Label_Loading, imageFolder.getAbsolutePath()));
 		}
-
-		_pageBook.showPage(_pageLoading);
+		_pageBook.showPage(_pageDefault);
 
 		_photoFolderWhichShouldBeDisplayed = imageFolder;
 
@@ -1918,12 +1876,12 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 	public void showRestoreFolder(final String restoreFolderName) {
 
 		if (restoreFolderName == null) {
-			_lblLoading.setText(Messages.Pic_Dir_StatusLabel_NoFolder);
+			_lblDefaultPage.setText(Messages.Pic_Dir_StatusLabel_NoFolder);
 		} else {
-			_lblLoading.setText(NLS.bind(Messages.Pic_Dir_StatusLabel_RestoringFolder, restoreFolderName));
+			_lblDefaultPage.setText(NLS.bind(Messages.Pic_Dir_StatusLabel_RestoringFolder, restoreFolderName));
 		}
 
-		_pageBook.showPage(_pageLoading);
+		_pageBook.showPage(_pageDefault);
 	}
 
 	public void sortGallery(final GallerySorting gallerySorting) {
@@ -1991,18 +1949,8 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		 * set color in action bar only for Linux & Windows, setting color in OSX looks not very
 		 * good
 		 */
-		if (UI.IS_OSX == false) {
-
-			_containerActionBar.setForeground(fgColor);
-			_containerActionBar.setBackground(bgColor);
-			_toolbar.setForeground(fgColor);
-			_toolbar.setBackground(bgColor);
-
-			_spinnerThumbSize.setForeground(fgColor);
-			_spinnerThumbSize.setBackground(bgColor);
-
-			_canvasImageSizeIndicator.setForeground(fgColor);
-			_canvasImageSizeIndicator.setBackground(bgColor);
+		if (UI.IS_OSX == false && _isActionBar) {
+			_galleryActionBar.updateColors(fgColor, bgColor);
 		}
 
 		/*
@@ -2012,13 +1960,13 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 
 		_photoRenderer.setColors(fgColor, bgColor, selectionFgColor, noFocusSelectionFgColor);
 
-		_pageLoading.setBackground(bgColor);
+		_pageDefault.setBackground(bgColor);
 
 		/*
 		 * loading page
 		 */
-		_lblLoading.setForeground(fgColor);
-		_lblLoading.setBackground(bgColor);
+		_lblDefaultPage.setForeground(fgColor);
+		_lblDefaultPage.setBackground(bgColor);
 
 		/*
 		 * page: folder info
@@ -2039,13 +1987,11 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 
 			_photoImageSize = imageSize;
 
-			_spinnerThumbSize.setSelection(imageSize);
 			_prevGalleryItemSize = galleryItemSize;
 
-			final boolean isHqImage = imageSize > PhotoLoadManager.IMAGE_SIZE_THUMBNAIL;
-			_canvasImageSizeIndicator.setIndicator(isHqImage);
-
-			_imageGalleryProvider.setThumbnailSize(imageSize);
+			if (_isActionBar) {
+				_galleryActionBar.updateUI_AfterZoomInOut(imageSize);
+			}
 
 			_photoTooltip.setImageSize(_photoImageSize);
 			_photoTooltip.reset();
@@ -2178,13 +2124,6 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		});
 	}
 
-	private void updateUI_ImageIndicatorTooltip() {
-
-		_canvasImageSizeIndicator.setToolTipText(NLS.bind(
-				Messages.Pic_Dir_ImageSizeIndicator_Tooltip,
-				_prefStore.getString(IPhotoPreferences.PHOTO_VIEWER_IMAGE_FRAMEWORK)));
-	}
-
 	public void updateUI_StatusMessage(final String message) {
 
 		if (message.length() == 0) {
@@ -2277,15 +2216,17 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 				return;
 			}
 
-			final File prevPhotoFolder = _photoFolder;
+			if (_photoFolder != null) {
+				_newGalleryPositionKey = _photoFolder.getAbsolutePath();
+			}
 
 			_photoFolder = _workerStateDir;
 
-			workerExecute_DisplayImages(newPhotoWrapper, prevPhotoFolder);
+			workerExecute_DisplayImages(newPhotoWrapper);
 		}
 	}
 
-	private void workerExecute_DisplayImages(final PhotoWrapper[] newPhotoWrapper, final File prevPhotoFolder) {
+	private void workerExecute_DisplayImages(final PhotoWrapper[] newPhotoWrapper) {
 
 		_allPhotoWrapper = newPhotoWrapper;
 
@@ -2300,23 +2241,7 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 				// initialize tooltip for a new folder
 				_photoTooltip.reset();
 
-				double galleryPosition = 0;
-
-				if (_photoFolder != null) {
-
-					// keep current gallery position
-					if (prevPhotoFolder != null) {
-						_galleryPositions.put(prevPhotoFolder.getAbsolutePath(), _gallery.getGalleryPosition());
-					}
-
-					// get old gallery position
-					final Double oldPosition = _galleryPositions.get(_photoFolder.getAbsolutePath());
-
-					/*
-					 * initialize and update gallery with new items
-					 */
-					galleryPosition = oldPosition == null ? 0 : oldPosition;
-				}
+				final double galleryPosition = getCachedGalleryPosition();
 
 				_gallery.setupItems(0, galleryPosition, _restoredSelection);
 
