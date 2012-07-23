@@ -127,6 +127,8 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 
 	private String					category				= UI.EMPTY_STRING;
 
+	private int						isMarkerVisible;
+
 	/**
 	 * visibleType is used to show the marker with different visible effects (color)
 	 */
@@ -380,6 +382,10 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		return result;
 	}
 
+	public boolean isMarkerVisible() {
+		return isMarkerVisible == 1;
+	}
+
 	/**
 	 * restore marker data from a marker backup
 	 * 
@@ -457,6 +463,10 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	 */
 	public void setMarkerBounds(final Rectangle markerBounds) {
 		_markerBounds = markerBounds;
+	}
+
+	public void setMarkerVisible(final boolean isMarkerVisible) {
+		this.isMarkerVisible = isMarkerVisible ? 1 : 0;
 	}
 
 	public void setSerieIndex(final int serieIndex) {

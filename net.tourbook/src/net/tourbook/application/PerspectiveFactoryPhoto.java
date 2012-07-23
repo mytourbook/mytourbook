@@ -50,21 +50,21 @@ public class PerspectiveFactoryPhoto implements IPerspectiveFactory {
 
 		//--------------------------------------------------------------------------------
 
-		final IFolderLayout tourChartFolder = layout.createFolder(FOLDER_ID_TOUR_CHART, //
+		final IFolderLayout tourPhotoFolder = layout.createFolder(FOLDER_ID_TOUR_PHOTO,//
 				IPageLayout.BOTTOM,
-				0.5f,
+				0.85f,
 				FOLDER_ID_PHOTO_MERGE);
 
-		tourChartFolder.addView(TourChartView.ID);
+		tourPhotoFolder.addView(TourPhotosView.ID);
 
 		//--------------------------------------------------------------------------------
 
-		final IFolderLayout tourPhotoFolder = layout.createFolder(FOLDER_ID_TOUR_PHOTO,//
+		final IFolderLayout tourChartFolder = layout.createFolder(FOLDER_ID_TOUR_CHART, //
 				IPageLayout.BOTTOM,
-				0.5f,
-				FOLDER_ID_TOUR_CHART);
+				0.7f,
+				FOLDER_ID_PHOTO_MERGE);
 
-		tourPhotoFolder.addView(TourPhotosView.ID);
+		tourChartFolder.addView(TourChartView.ID);
 
 		//--------------------------------------------------------------------------------
 

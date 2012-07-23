@@ -866,6 +866,11 @@ public class TourChart extends Chart {
 
 		for (final TourMarker tourMarker : tourMarkerList) {
 
+			if (tourMarker.isMarkerVisible() == false) {
+				// skip marker
+				continue;
+			}
+
 			final ChartLabel chartLabel = new ChartLabel();
 
 			final int markerIndex = Math.min(tourMarker.getSerieIndex(), xAxisSerie.length - 1);
@@ -1158,8 +1163,8 @@ public class TourChart extends Chart {
 	 */
 	private void fireTourChartSelection() {
 		final Object[] listeners = _selectionListeners.getListeners();
-		for (int i = 0; i < listeners.length; ++i) {
-			final ITourChartSelectionListener listener = (ITourChartSelectionListener) listeners[i];
+		for (final Object listener2 : listeners) {
+			final ITourChartSelectionListener listener = (ITourChartSelectionListener) listener2;
 			SafeRunnable.run(new SafeRunnable() {
 				public void run() {
 					listener.selectedTourChart(new SelectionTourChart(TourChart.this));
@@ -1176,8 +1181,8 @@ public class TourChart extends Chart {
 	private void fireXAxisSelection(final boolean showTimeOnXAxis) {
 
 		final Object[] listeners = _xAxisSelectionListener.getListeners();
-		for (int i = 0; i < listeners.length; ++i) {
-			final IXAxisSelectionListener listener = (IXAxisSelectionListener) listeners[i];
+		for (final Object listener2 : listeners) {
+			final IXAxisSelectionListener listener = (IXAxisSelectionListener) listener2;
 			listener.selectionChanged(showTimeOnXAxis);
 		}
 	}

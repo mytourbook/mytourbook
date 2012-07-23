@@ -673,8 +673,8 @@ public class TourPainter extends MapPainter {
 
 						for (final TourMarker tourMarker : sortedMarkers) {
 
-							if (tourMarker.getLabel().length() == 0) {
-								// skip empty marker
+							// skip marker when hidden or not set
+							if (tourMarker.isMarkerVisible() == false || tourMarker.getLabel().length() == 0) {
 								continue;
 							}
 

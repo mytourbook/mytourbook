@@ -2356,6 +2356,12 @@ public class TourDatabase {
 				//
 				// Version 20 - end
 
+				// Version 22 - begin
+				//
+				+ "	IsMarkerVisible				INTEGER DEFAULT 1, 				\n" //$NON-NLS-1$
+				//
+				// Version 22 - end
+
 				+ "	serieIndex 					INTEGER NOT NULL,				\n" //$NON-NLS-1$
 				+ "	type 						INTEGER NOT NULL,				\n" //$NON-NLS-1$
 				+ "	visualPosition				INTEGER NOT NULL,				\n" //$NON-NLS-1$
@@ -4306,7 +4312,6 @@ public class TourDatabase {
 //			//
 //			// version 22 end ---------
 //			//
-//			TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA
 
 			String sql;
 
@@ -4314,6 +4319,17 @@ public class TourDatabase {
 			exec(stmt, sql);
 
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN TourEndTime		BIGINT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+			exec(stmt, sql);
+
+//			TOURMARKER	TOURMARKER	TOURMARKER	TOURMARKER	TOURMARKER	TOURMARKER	TOURMARKER	TOURMARKER
+//
+//			// Version 22 - begin
+//			//
+//			+ "	IsMarkerVisible				INTEGER DEFAULT 0, 				\n" //$NON-NLS-1$
+//			//
+//			// Version 22 - end
+
+			sql = "ALTER TABLE " + TABLE_TOUR_MARKER + " ADD COLUMN IsMarkerVisible		INTEGER DEFAULT 1"; //$NON-NLS-1$ //$NON-NLS-2$
 			exec(stmt, sql);
 		}
 		stmt.close();

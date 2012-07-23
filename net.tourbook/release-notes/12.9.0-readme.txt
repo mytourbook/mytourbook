@@ -11,7 +11,7 @@ New
 
 Improvements 
 
-* 
+* set tour marker visibility (can be used when doing a screenshot to hide awkward markers)
 
 
 

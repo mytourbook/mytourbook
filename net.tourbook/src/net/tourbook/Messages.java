@@ -302,6 +302,10 @@ public class Messages extends NLS {
 	public static String		App_Dialog_FirstStartupTip_Message;
 	public static String		App_Dialog_FirstStartupTip_Title;
 
+	public static String	App_Label_BooleanNo;
+
+	public static String	App_Label_BooleanYes;
+
 	public static String		App_Label_H_MM;
 	public static String		App_Label_ISO8601;
 	public static String		App_Label_max;
@@ -503,8 +507,16 @@ public class Messages extends NLS {
 
 	public static String		Dlg_TourMarker_Button_delete;
 	public static String		Dlg_TourMarker_Button_delete_tooltip;
+
+	public static String	Dlg_TourMarker_Button_HideAllMarker;
+
+	public static String	Dlg_TourMarker_Button_HideAllMarker_Tooltip;
 	public static String		Dlg_TourMarker_Button_reset_offset;
 	public static String		Dlg_TourMarker_Button_reset_offset_tooltip;
+
+	public static String	Dlg_TourMarker_Button_ShowAllMarker;
+
+	public static String	Dlg_TourMarker_Button_ShowAllMarker_Tooltip;
 	public static String		Dlg_TourMarker_Button_undo;
 	public static String		Dlg_TourMarker_Button_undo_tooltip;
 	public static String		Dlg_TourMarker_Dlg_Message;
@@ -1159,6 +1171,10 @@ public class Messages extends NLS {
 
 	public static String		Tour_Marker_Column_horizontal_offset;
 	public static String		Tour_Marker_Column_horizontal_offset_tooltip;
+
+	public static String	Tour_Marker_Column_IsVisible;
+
+	public static String	Tour_Marker_Column_IsVisible_Tooltip;
 	public static String		Tour_Marker_Column_km_tooltip;
 	public static String		Tour_Marker_Column_remark;
 	public static String		Tour_Marker_Column_time;
