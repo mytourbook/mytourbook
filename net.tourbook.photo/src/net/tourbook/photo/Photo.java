@@ -700,6 +700,10 @@ public class Photo {
 		return _orientation;
 	}
 
+	/**
+	 * @return Return date/time for the image. First EXIF date is returned, when not available,
+	 *         image file date/time is returned.
+	 */
 	public DateTime getOriginalDateTime() {
 		return _exifDateTime != null ? _exifDateTime : _imageFileDateTime;
 	}

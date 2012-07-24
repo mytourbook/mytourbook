@@ -237,6 +237,8 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 
 				} else if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
 
+					// app filter is modified
+
 					updateUI(_allPhotos);
 
 				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {

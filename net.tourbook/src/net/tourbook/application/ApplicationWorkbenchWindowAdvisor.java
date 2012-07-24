@@ -371,7 +371,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	private void onPostSelectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
 		// debug current selection
-		System.out.println("current post selection: "
+		System.out.println(System.nanoTime()
+				+ " current post selection: "
 				+ selection.getClass().getSimpleName()
 				+ (" (" + selection.getClass().getCanonicalName() + ")"));
 

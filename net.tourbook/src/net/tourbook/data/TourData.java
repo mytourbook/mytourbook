@@ -67,6 +67,7 @@ import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.math.Smooth;
+import net.tourbook.photo.MergeTour;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageComputedValues;
 import net.tourbook.srtm.ElevationSRTM3;
@@ -609,7 +610,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * {@link #startSecond}.
 	 * <p>
 	 * The array {@link #timeSerie} is <code>null</code> for a manually created tour, it is
-	 * <b>always</b> set when tour is from a device or imported file.
+	 * <b>always</b> set when tour is from a device or an imported file.
 	 * <p>
 	 * This field has a copy in {@link #timeSerieFloat}.
 	 */
@@ -963,6 +964,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	@Transient
 	private float[]											timeSerieFloat;
+
+	/**
+	 * Contains data from a merge tour which contains photos
+	 */
+	@Transient
+	public MergeTour										mergeTour;
 
 	public TourData() {}
 
@@ -5955,5 +5962,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			tourMarker.updateDatabase_019_to_020();
 		}
 	}
+
 
 }

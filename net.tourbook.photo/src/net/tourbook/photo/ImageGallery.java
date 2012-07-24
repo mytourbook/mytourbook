@@ -717,8 +717,8 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 	/**
 	 * @param selectedFolder
 	 * @param isGetAllImages
-	 * @return Returns photo data for the images in the requested folder or <code>null</code> when
-	 *         loading was canceled by the user.
+	 * @return Returns photo data for the images in the requested folder, sorted by date/time or
+	 *         <code>null</code> when loading was canceled by the user.
 	 */
 	private ArrayList<PhotoWrapper> getLoadedExifImageData(final File selectedFolder, final boolean isGetAllImages) {
 

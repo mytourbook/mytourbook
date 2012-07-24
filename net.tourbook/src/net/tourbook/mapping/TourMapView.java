@@ -1663,6 +1663,10 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 			paintTours20One(tourData, false, true);
 
+			if (selection instanceof TourPhotoSelection) {
+				paintPhotos(((TourPhotoSelection) selection).mergeTour.tourPhotos);
+			}
+
 			enableActions();
 
 		} else if (selection instanceof SelectionTourIds) {
@@ -1825,16 +1829,6 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 				enableActions();
 			}
 		}
-
-		/*
-		 * must be checked separately because SelectionTourId is superclass of TourPhotoSelection
-		 */
-		if (selection instanceof TourPhotoSelection) {
-
-			paintPhotos(((TourPhotoSelection) selection).mergeTour.tourPhotos);
-
-		}
-
 	}
 
 	private void paintEntireTour() {

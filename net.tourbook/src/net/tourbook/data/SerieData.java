@@ -28,30 +28,30 @@ public class SerieData implements Serializable {
 
 	private static final long	serialVersionUID	= 1L;
 
-	public int					timeSerie[];
+	public int[]				timeSerie;
 
-	public float				distanceSerie20[];
-	public float				altitudeSerie20[];
-	public float				cadenceSerie20[];
-	public float				pulseSerie20[];
-	public float				temperatureSerie20[];
-	public float				speedSerie20[];
-	public float				powerSerie20[];
+	public float[]				distanceSerie20;
+	public float[]				altitudeSerie20;
+	public float[]				cadenceSerie20;
+	public float[]				pulseSerie20;
+	public float[]				temperatureSerie20;
+	public float[]				speedSerie20;
+	public float[]				powerSerie20;
 
-	public double				longitude[];
-	public double				latitude[];
+	public double[]				longitude;
+	public double[]				latitude;
 
 	/*
 	 * these data series cannot be removed because they are needed to convert from int to float in
 	 * db version 20
 	 */
-	public int					distanceSerie[];
-	public int					altitudeSerie[];
-	public int					cadenceSerie[];
-	public int					pulseSerie[];
-	public int					temperatureSerie[];
-	public int					speedSerie[];
-	public int					powerSerie[];
+	public int[]				distanceSerie;
+	public int[]				altitudeSerie;
+	public int[]				cadenceSerie;
+	public int[]				pulseSerie;
+	public int[]				temperatureSerie;
+	public int[]				speedSerie;
+	public int[]				powerSerie;
 
-	public int					deviceMarker[];
+	public int[]				deviceMarker;
 }

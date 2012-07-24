@@ -38,6 +38,8 @@ import net.tourbook.common.util.IToolTipHideListener;
 import net.tourbook.common.util.TourToolTip;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
+import net.tourbook.photo.MergeTour;
+import net.tourbook.photo.PhotoWrapper;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceTourChart;
 import net.tourbook.tour.IDataModelListener;
@@ -154,6 +156,7 @@ public class TourChart extends Chart {
 	private ChartSegmentLayer				_layerSegment;
 	private ChartSegmentValueLayer			_layerSegmentValue;
 	private ChartLayer2ndAltiSerie			_layer2ndAltiSerie;
+	private ChartLayerPhoto					_layerPhoto;
 	private I2ndAltiLayer					_layer2ndAlti;
 	private IFillPainter					_hrZonePainter;
 
@@ -822,16 +825,7 @@ public class TourChart extends Chart {
 		_actionProxies.put(getProxyId(graphId), new TCActionProxy(commandId, action));
 	}
 
-	private void createHrZonePainter() {
-
-		if (_tourChartConfig.isHrZoneDisplayed) {
-			_hrZonePainter = new HrZonePainter();
-		} else {
-			_hrZonePainter = null;
-		}
-	}
-
-	private void createLayer2ndAlti() {
+	private void createLayer_2ndAlti() {
 
 		if (_is2ndAltiLayerVisible && (_layer2ndAlti != null)) {
 			_layer2ndAltiSerie = _layer2ndAlti.create2ndAltiLayer();
@@ -848,7 +842,7 @@ public class TourChart extends Chart {
 	 *            {@link TourChartConfiguration#isShowTourMarker} determines if the markers are
 	 *            drawn or not.
 	 */
-	private void createLayerMarker(final boolean isMarkerVisibleEnforced) {
+	private void createLayer_Marker(final boolean isMarkerVisibleEnforced) {
 
 		if (isMarkerVisibleEnforced == false && _tourChartConfig.isShowTourMarker == false) {
 			return;
@@ -890,10 +884,137 @@ public class TourChart extends Chart {
 		}
 	}
 
+	private void createLayer_Photo() {
+
+		if (_tourChartConfig.isShowPhotos == false) {
+			return;
+		}
+
+		final MergeTour mergeTour = _tourData.mergeTour;
+
+		if (mergeTour == null) {
+			// no photos are available for this tour
+			return;
+		}
+
+		final ArrayList<PhotoWrapper> tourPhotos = mergeTour.tourPhotos;
+		final int numberOfPhotos = tourPhotos.size();
+		if (numberOfPhotos == 0) {
+			// no photos are available for this tour
+			return;
+		}
+
+		/*
+		 * at least 1 photo is available
+		 */
+
+		final ArrayList<ChartPhoto> chartPhotos = new ArrayList<ChartPhoto>();
+
+		_layerPhoto = new ChartLayerPhoto(chartPhotos);
+
+		final long tourStart = _tourData.getStartDateTime().getMillis() / 1000;
+		final int[] timeSerie = _tourData.timeSerie;
+		final int numberOfTimeSlices = timeSerie.length;
+
+		/*
+		 * set photos for tours which has max 1 value point
+		 */
+		if (timeSerie == null || numberOfTimeSlices <= 1) {
+			for (final PhotoWrapper photoWrapper : tourPhotos) {
+				chartPhotos.add(new ChartPhoto(photoWrapper.photo, 0, 0));
+			}
+			return;
+		}
+
+		/*
+		 * set photos for tours which has more than 1 value point
+		 */
+
+		// set value serie for the x-axis
+		final float[] xAxisSerie = _tourChartConfig.isShowTimeOnXAxis //
+				? _tourData.getTimeSerieFloat()
+				: _tourData.getDistanceSerie();
+
+		long timeSliceEnd = tourStart + (long) (timeSerie[1] / 2.0);
+
+		int photoIndex = 0;
+		int timeIndex = 0;
+		PhotoWrapper photoWrapper = tourPhotos.get(photoIndex);
+
+		while (true) {
+
+			// check if a photo is in the current time slice
+			while (true) {
+
+				final long photoTime = photoWrapper.imageSortingTime / 1000;
+
+				if (photoTime <= timeSliceEnd) {
+
+					// photo is available in the current time slice
+
+					chartPhotos.add(new ChartPhoto(photoWrapper.photo, xAxisSerie[timeIndex], timeIndex));
+
+					photoIndex++;
+
+				} else {
+
+					// advance to the next time slice
+
+					break;
+				}
+
+				if (photoIndex < numberOfPhotos) {
+					photoWrapper = tourPhotos.get(photoIndex);
+				} else {
+					break;
+				}
+			}
+
+			if (photoIndex >= numberOfPhotos) {
+				// no more photos
+				break;
+			}
+
+			/*
+			 * photos are still available
+			 */
+
+			timeIndex++;
+
+			if (timeIndex >= numberOfTimeSlices - 1) {
+
+				/*
+				 * end of tour is reached but there are still photos available, set remaining photos
+				 * at the end of the tour
+				 */
+
+				while (true) {
+
+					chartPhotos.add(new ChartPhoto(photoWrapper.photo, xAxisSerie[numberOfTimeSlices - 1], timeIndex));
+
+					photoIndex++;
+
+					if (photoIndex < numberOfPhotos) {
+						photoWrapper = tourPhotos.get(photoIndex);
+					} else {
+						break;
+					}
+				}
+
+			} else {
+
+				final int valuePointTime = timeSerie[timeIndex];
+				final int sliceDuration = timeSerie[timeIndex + 1] - valuePointTime;
+
+				timeSliceEnd = tourStart + valuePointTime + (sliceDuration / 2);
+			}
+		}
+	}
+
 	/**
 	 * Creates the layers from the segmented tour data
 	 */
-	private void createLayerSegment() {
+	private void createLayer_Segment() {
 
 		if (_tourData == null) {
 			return;
@@ -936,6 +1057,15 @@ public class TourChart extends Chart {
 
 		// draw the graph lighter that the segments are more visible
 		setGraphAlpha(0.5);
+	}
+
+	private void createPainter_HrZone() {
+
+		if (_tourChartConfig.isHrZoneDisplayed) {
+			_hrZonePainter = new HrZonePainter();
+		} else {
+			_hrZonePainter = null;
+		}
 	}
 
 	/**
@@ -1358,6 +1488,14 @@ public class TourChart extends Chart {
 		final ArrayList<IChartLayer> customFgLayers = new ArrayList<IChartLayer>();
 
 		/*
+		 * photo layer
+		 */
+		// show label layer only for ONE visible graph
+		if ((_layerPhoto != null) && (yData == yDataWithLabels)) {
+			customFgLayers.add(_layerPhoto);
+		}
+
+		/*
 		 * marker layer
 		 */
 		// show label layer only for ONE visible graph
@@ -1622,7 +1760,7 @@ public class TourChart extends Chart {
 		_is2ndAltiLayerVisible = isLayerVisible;
 		_layer2ndAlti = alti2ndLayerProvider;
 
-		createLayer2ndAlti();
+		createLayer_2ndAlti();
 
 		setGraphData();
 		updateCustomLayers();
@@ -1636,7 +1774,7 @@ public class TourChart extends Chart {
 	public void updateLayerMarker(final boolean isLayerVisible) {
 
 		if (isLayerVisible) {
-			createLayerMarker(true);
+			createLayer_Marker(true);
 		} else {
 			_layerMarker = null;
 		}
@@ -1657,7 +1795,7 @@ public class TourChart extends Chart {
 		_isSegmentLayerVisible = isLayerVisible;
 
 		if (isLayerVisible) {
-			createLayerSegment();
+			createLayer_Segment();
 		} else {
 			_layerSegment = null;
 			_layerSegmentValue = null;
@@ -1773,10 +1911,12 @@ public class TourChart extends Chart {
 			_chartDataModelListener.dataModelChanged(newChartDataModel);
 		}
 
-		createLayerSegment();
-		createLayerMarker(false);
-		createLayer2ndAlti();
-		createHrZonePainter();
+		createLayer_Segment();
+		createLayer_Marker(false);
+		createLayer_2ndAlti();
+		createLayer_Photo();
+
+		createPainter_HrZone();
 
 		setGraphData();
 

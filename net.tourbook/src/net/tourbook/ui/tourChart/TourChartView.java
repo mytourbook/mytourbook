@@ -26,6 +26,8 @@ import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.data.TourData;
+import net.tourbook.photo.MergeTour;
+import net.tourbook.photo.TourPhotoSelection;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.IDataModelListener;
 import net.tourbook.tour.ITourEventListener;
@@ -91,6 +93,8 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 	private Label					_pageNoChart;
 
 	private TourChart				_tourChart;
+
+	private MergeTour				_mergeTour;
 
 	private void addPartListener() {
 		_partListener = new IPartListener2() {
@@ -380,6 +384,8 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 	private void onSelectionChanged(final ISelection selection) {
 
+		_mergeTour = null;
+
 		if (selection instanceof SelectionTourData) {
 
 			final TourData selectionTourData = ((SelectionTourData) selection).getTourData();
@@ -405,6 +411,10 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 			final SelectionTourId selectionTourId = (SelectionTourId) selection;
 			final Long tourId = selectionTourId.getTourId();
+
+			if (selection instanceof TourPhotoSelection) {
+				_mergeTour = ((TourPhotoSelection) selection).mergeTour;
+			}
 
 			updateChart(tourId);
 
@@ -556,6 +566,8 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 		TourManager.getInstance().setActiveTourChart(_tourChart);
 
 		_pageBook.showPage(_tourChart);
+
+		_tourData.mergeTour = _mergeTour;
 
 		_tourChart.updateTourChart(_tourData, _tourChartConfig, false);
 

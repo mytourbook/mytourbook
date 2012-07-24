@@ -120,6 +120,8 @@ public class TourChartConfiguration {
 	 */
 	public String					hrZoneStyle				= TourChart.COMMAND_ID_HR_ZONE_STYLE_GRAPH_TOP;
 
+	public boolean					isShowPhotos			= true;											;
+
 	/**
 	 * @param keepMinMaxValues
 	 *            set <code>true</code> to keep min/max values when tour data will change

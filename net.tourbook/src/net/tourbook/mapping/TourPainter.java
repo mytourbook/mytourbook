@@ -116,46 +116,6 @@ public class TourPainter extends MapPainter {
 	private static Image					_twpImage;
 
 	private final static ColorCacheInt		_colorCache			= new ColorCacheInt();
-	static {
-
-		final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
-		_bgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
-
-		_tourPaintConfig = TourPainterConfiguration.getInstance();
-
-		/**
-		 * this code optimizes the performance by reading from the pref store which is not very
-		 * efficient
-		 */
-		getTourPainterSettings();
-
-		// create pref listener
-		_prefChangeListener = new IPropertyChangeListener() {
-			@Override
-			public void propertyChange(final PropertyChangeEvent event) {
-				final String property = event.getProperty();
-
-				// test if the color or statistic data have changed
-				if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
-					getTourPainterSettings();
-				}
-			}
-		};
-
-		// add pref listener
-		_prefStore.addPropertyChangeListener(_prefChangeListener);
-
-		// remove pre listener
-		/*
-		 * this listener is never removed
-		 */
-
-//		container.addDisposeListener(new DisposeListener() {
-//			public void widgetDisposed(final DisposeEvent e) {
-//				TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(_prefChangeListener);
-//			}
-//		});
-	}
 
 	private class LoadCallbackImage implements ILoadCallBack {
 
@@ -175,6 +135,8 @@ public class TourPainter extends MapPainter {
 		 * extension point but setting the instance in the constructor is not valid according to
 		 * FindBugs
 		 */
+
+		init();
 	}
 
 	/**
@@ -521,6 +483,40 @@ public class TourPainter extends MapPainter {
 		_prefLineWidth = prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH);
 		_prefWithBorder = prefStore.getBoolean(ITourbookPreferences.MAP_LAYOUT_PAINT_WITH_BORDER);
 		_prefBorderWidth = prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_BORDER_WIDTH);
+	}
+
+	private static void init() {
+
+		if (_bgColor != null) {
+			return;
+		}
+
+		final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
+		_bgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
+
+		_tourPaintConfig = TourPainterConfiguration.getInstance();
+
+		/**
+		 * this code optimizes the performance by reading from the pref store which is not very
+		 * efficient
+		 */
+		getTourPainterSettings();
+
+		// create pref listener
+		_prefChangeListener = new IPropertyChangeListener() {
+			@Override
+			public void propertyChange(final PropertyChangeEvent event) {
+				final String property = event.getProperty();
+
+				// test if the color or statistic data have changed
+				if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
+					getTourPainterSettings();
+				}
+			}
+		};
+
+		// add pref listener
+		_prefStore.addPropertyChangeListener(_prefChangeListener);
 	}
 
 	private void createImages() {
