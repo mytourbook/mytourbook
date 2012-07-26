@@ -26,7 +26,6 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Formatter;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 
@@ -55,6 +54,13 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 	private static final int	RECORD_LENGTH			= 0x10;
 
 	private GregorianCalendar	_fileDate;
+
+	private class StartBlock {
+		public int	month;
+		public int	day;
+		public int	hour;
+		public int	minute;
+	}
 
 	// plugin constructor
 	public HAC5DeviceDataReader() {}
@@ -92,11 +98,11 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 		final GregorianCalendar fileDate = new GregorianCalendar();
 		fileDate.setTime(new Date(lastModified));
 
-		return new Formatter().format(
+		return String.format(
 				net.tourbook.Messages.Format_rawdata_file_yyyy_mm_dd + fileExtension,
 				(short) fileDate.get(Calendar.YEAR),
 				(short) fileDate.get(Calendar.MONTH) + 1,
-				(short) fileDate.get(Calendar.DAY_OF_MONTH)).toString();
+				(short) fileDate.get(Calendar.DAY_OF_MONTH));
 	}
 
 	@Override
@@ -191,8 +197,8 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 		final HAC5DeviceData hac5DeviceData = new HAC5DeviceData();
 
 		boolean isFirstTour = true;
-		short firstTourDay = 1;
-		short firstTourMonth = 1;
+		int firstTourDay = 1;
+		int firstTourMonth = 1;
 
 		try {
 			final File fileRaw = new File(importFilePath);
@@ -207,12 +213,12 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 			_fileDate = new GregorianCalendar();
 			_fileDate.setTime(new Date(lastModified));
 
-			short tourYear = (short) _fileDate.get(Calendar.YEAR);
+			int tourYear = _fileDate.get(Calendar.YEAR);
 			if (importYear != -1) {
-				tourYear = (short) importYear;
+				tourYear = importYear;
 			}
 
-			short lastTourMonth = -1;
+			int lastTourMonth = -1;
 
 			// read device data
 			hac5DeviceData.readFromFile(file);
@@ -268,14 +274,14 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 				/*
 				 * save AA record data
 				 */
-				readAARecord(recordBuffer, tourData);
+				final StartBlock startBlock = readAARecord(recordBuffer, tourData);
 
 				/*
 				 * calculate year of the tour
 				 */
 				if (lastTourMonth == -1) {
 					// set initial tour month
-					lastTourMonth = tourData.getStartMonth();
+					lastTourMonth = startBlock.month;
 				}
 
 				/*
@@ -283,20 +289,25 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 				 * current tour is higher than from the last tour, we assume to have data from the
 				 * previous year
 				 */
-				if (tourData.getStartMonth() > lastTourMonth) {
+				if (startBlock.month > lastTourMonth) {
 					tourYear--;
 				}
-				lastTourMonth = tourData.getStartMonth();
+				lastTourMonth = startBlock.month;
 
-				tourData.setStartYear(tourYear);
-
+				tourData.setStartDateTime(
+						tourYear,
+						startBlock.month,
+						startBlock.day,
+						startBlock.hour,
+						startBlock.minute,
+						0);
 				/*
 				 * get date from the last tour
 				 */
 				if (isFirstTour) {
 					isFirstTour = false;
-					firstTourDay = tourData.getStartDay();
-					firstTourMonth = tourData.getStartMonth();
+					firstTourDay = startBlock.day;
+					firstTourMonth = startBlock.month;
 				}
 
 				/*
@@ -470,8 +481,6 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 
 					tourData.setDeviceId(deviceId);
 					tourData.setDeviceName(visibleName);
-
-					tourData.setWeek(tourData.getStartYear(), tourData.getStartMonth(), tourData.getStartDay());
 				}
 
 				// dump DD block
@@ -529,8 +538,8 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 
 		if (returnValue) {
 			deviceData.transferYear = (short) _fileDate.get(Calendar.YEAR);
-			deviceData.transferMonth = firstTourMonth;
-			deviceData.transferDay = firstTourDay;
+			deviceData.transferMonth = (short) firstTourMonth;
+			deviceData.transferDay = (short) firstTourDay;
 		}
 
 		return returnValue;
@@ -539,8 +548,9 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 	/**
 	 * @param buffer
 	 * @param tourData
+	 * @return
 	 */
-	private void readAARecord(final byte[] buffer, final TourData tourData) {
+	private StartBlock readAARecord(final byte[] buffer, final TourData tourData) {
 
 		// 00 1 0xAA
 		//
@@ -584,14 +594,17 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 
 		tourData.setDeviceTimeInterval((short) timeInterval);
 
-		tourData.setStartMinute(buffer[4]);
-		tourData.setStartHour(buffer[5]);
-		tourData.setStartDay(buffer[6]);
-		tourData.setStartMonth(buffer[7]);
+		final StartBlock startBlock = new StartBlock();
+		startBlock.minute = buffer[4];
+		startBlock.hour = buffer[5];
+		startBlock.day = buffer[6];
+		startBlock.month = buffer[7];
 
 		tourData.setStartDistance((int) DeviceReaderTools.get4ByteData(buffer, 8));
 		tourData.setStartAltitude((short) DeviceReaderTools.get2ByteData(buffer, 12));
 		tourData.setStartPulse((short) (buffer[14] & 0xff));
+
+		return startBlock;
 	}
 
 	private void readDDRecord(final byte[] buffer, final TourData tourData) {

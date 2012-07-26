@@ -17,9 +17,7 @@ package net.tourbook.tour;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Set;
 
 import net.tourbook.Messages;
@@ -482,15 +480,7 @@ public class TourManager {
 	}
 
 	public static String getTourDateFull(final TourData tourData) {
-
-		final Calendar calendar = GregorianCalendar.getInstance();
-
-		calendar.set(//
-				tourData.getStartYear(),
-				tourData.getStartMonth() - 1,
-				tourData.getStartDay());
-
-		return UI.DateFormatterFull.format(calendar.getTime());
+		return UI.DateFormatterFull.format(tourData.getStartDateTime().getMillis());
 	}
 
 	private static String getTourDateLong(final Date date) {
@@ -506,14 +496,7 @@ public class TourManager {
 			return UI.EMPTY_STRING;
 		}
 
-		final Calendar calendar = GregorianCalendar.getInstance();
-
-		calendar.set(//
-				tourData.getStartYear(),
-				tourData.getStartMonth() - 1,
-				tourData.getStartDay());
-
-		return UI.DateFormatterShort.format(calendar.getTime());
+		return UI.DateFormatterShort.format(tourData.getStartDateTime().getMillis());
 	}
 
 	/**
@@ -555,18 +538,7 @@ public class TourManager {
 	 * @return returns the date of this tour
 	 */
 	public static String getTourTimeShort(final TourData tourData) {
-
-		final Calendar calendar = GregorianCalendar.getInstance();
-
-		calendar.set(//
-				tourData.getStartYear(),
-				tourData.getStartMonth() - 1,
-				tourData.getStartDay(),
-				tourData.getStartHour(),
-				tourData.getStartMinute(),
-				tourData.getStartSecond());
-
-		return UI.TimeFormatterShort.format(calendar.getTime());
+		return UI.TimeFormatterShort.format(tourData.getStartDateTime().getMillis());
 	}
 
 	public static String getTourTitle(final Date date) {
@@ -1751,9 +1723,16 @@ public class TourManager {
 			 * when time is displayed, the x-axis can show the start time starting from 0 or from
 			 * the current time of the day
 			 */
-			final int startTime = tourChartConfig.isShowStartTime ? //
-					(tourData.getStartHour() * 3600) + (tourData.getStartMinute() * 60)
-					: 0;
+			final int startTime;
+			if (tourChartConfig.isShowStartTime) {
+
+				final DateTime start = tourData.getStartDateTime();
+
+				startTime = (start.getHourOfDay() * 3600) + (start.getMinuteOfHour() * 60);
+
+			} else {
+				startTime = 0;
+			}
 
 			xDataTime.setStartValue(startTime);
 

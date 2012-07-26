@@ -140,14 +140,17 @@ public class CiclotourTextDataReader extends TourbookDevice {
 		// but if we are really lucky, the user did not change the filename
 		// format,
 		// and we at least get the correct date. Time info is lost.
-		final Calendar cal = this.deriveDateFromFile(file);
+		final Calendar cal = deriveDateFromFile(file);
 
-		tourData.setStartDay((short) cal.get(Calendar.DATE));
-		tourData.setStartMonth((short) cal.get(Calendar.MONTH));
-		tourData.setStartYear((short) cal.get(Calendar.YEAR));
+		tourData.setStartDateTime(
+				cal.get(Calendar.YEAR),
+				cal.get(Calendar.MONTH) + 1,
+				cal.get(Calendar.DAY_OF_MONTH),
+				0,
+				0,
+				0);
 
 		StringTokenizer tokenizer = null;
-
 		String tokenLine;
 
 		final ArrayList<TimeData> timeDataList = new ArrayList<TimeData>();

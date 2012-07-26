@@ -156,8 +156,9 @@ public class CRPDataReader extends TourbookDevice {
 			// tour start time
 			final String tourStartTime = tokenLine.nextToken();
 			final int tourHour = Integer.parseInt(tourStartTime.substring(0, 2));
-			final int tourMin = tourStartTime.length() > 5 ? Integer.parseInt(tourStartTime.substring(3, 5)) : Integer
-					.parseInt(tourStartTime.substring(3));
+			final int tourMin = tourStartTime.length() > 5 //
+					? Integer.parseInt(tourStartTime.substring(3, 5))
+					: Integer.parseInt(tourStartTime.substring(3));
 
 			// recording time
 			final String tourRecTimeSt = tokenLine.nextToken();
@@ -212,6 +213,8 @@ public class CRPDataReader extends TourbookDevice {
 			 */
 			final TourData tourData = new TourData();
 
+			tourData.setStartDateTime(tourYear, tourMonth, tourDay, tourHour, tourMin, 0);
+
 			tourData.setTourTitle(tourName);
 			tourData.setTourDescription(tourDesc);
 
@@ -219,12 +222,6 @@ public class CRPDataReader extends TourbookDevice {
 			tourData.setDeviceModeName(getDeviceModeName(tourMode));
 
 			tourData.setDeviceTimeInterval((short) interval);
-
-			tourData.setStartMinute((short) tourMin);
-			tourData.setStartHour((short) tourHour);
-			tourData.setStartDay((short) tourDay);
-			tourData.setStartMonth((short) tourMonth);
-			tourData.setStartYear((short) tourYear);
 
 			tourData.importRawDataFile = importFilePath;
 			tourData.setTourImportFilePath(importFilePath);
@@ -384,8 +381,6 @@ public class CRPDataReader extends TourbookDevice {
 
 				tourData.setDeviceId(deviceId);
 				tourData.setDeviceName(visibleName);
-
-				tourData.setWeek(tourData.getStartYear(), tourData.getStartMonth(), tourData.getStartDay());
 			}
 
 			returnValue = true;

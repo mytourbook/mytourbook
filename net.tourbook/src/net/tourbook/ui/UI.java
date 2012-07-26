@@ -78,6 +78,7 @@ import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -693,14 +694,16 @@ public class UI {
 
 		_formatterSB.setLength(0);
 
+		final DateTime dt = tourData.getStartDateTime();
+
 		return _formatter.format(//
 				Messages.Format_yyyymmdd_hhmmss,
-				tourData.getStartYear(),
-				tourData.getStartMonth(),
-				tourData.getStartDay(),
-				tourData.getStartHour(),
-				tourData.getStartMinute(),
-				tourData.getStartSecond())//
+				dt.getYear(),
+				dt.getMonthOfYear(),
+				dt.getDayOfMonth(),
+				dt.getHourOfDay(),
+				dt.getMinuteOfHour(),
+				dt.getSecondOfMinute())//
 				.toString();
 	}
 

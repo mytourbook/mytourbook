@@ -76,7 +76,6 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
-import org.joda.time.DateTime;
 
 public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2, I2ndAltiLayer {
 
@@ -222,23 +221,8 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 		 * synchronize start time
 		 */
 
-		final long sourceStartTime = new DateTime(
-				_sourceTour.getStartYear(),
-				_sourceTour.getStartMonth(),
-				_sourceTour.getStartDay(),
-				_sourceTour.getStartHour(),
-				_sourceTour.getStartMinute(),
-				_sourceTour.getStartSecond(),
-				0).getMillis();
-
-		final long targetStartTime = new DateTime(
-				_targetTour.getStartYear(),
-				_targetTour.getStartMonth(),
-				_targetTour.getStartDay(),
-				_targetTour.getStartHour(),
-				_targetTour.getStartMinute(),
-				_targetTour.getStartSecond(),
-				0).getMillis();
+		final long sourceStartTime = _sourceTour.getTourStartTime();
+		final long targetStartTime = _targetTour.getTourStartTime();
 
 		_tourStartTimeSynchOffset = (int) ((sourceStartTime - targetStartTime) / 1000);
 

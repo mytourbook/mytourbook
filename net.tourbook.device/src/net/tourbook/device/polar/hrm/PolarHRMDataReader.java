@@ -463,15 +463,7 @@ public class PolarHRMDataReader extends TourbookDevice {
 				_sectionParams.startSecond,
 				0);
 
-		tourData.setStartHour((short) dtTourStart.getHourOfDay());
-		tourData.setStartMinute((short) dtTourStart.getMinuteOfHour());
-		tourData.setStartSecond((short) dtTourStart.getSecondOfMinute());
-
-		tourData.setStartYear((short) dtTourStart.getYear());
-		tourData.setStartMonth((short) dtTourStart.getMonthOfYear());
-		tourData.setStartDay((short) dtTourStart.getDayOfMonth());
-
-		tourData.setWeek(dtTourStart);
+		tourData.setStartDateTime(dtTourStart);
 
 		tourData.setDeviceTimeInterval((short) _sectionParams.mtInterval);
 

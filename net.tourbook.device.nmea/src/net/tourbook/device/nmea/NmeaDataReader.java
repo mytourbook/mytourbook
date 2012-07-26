@@ -264,14 +264,13 @@ public class NmeaDataReader extends TourbookDevice {
 		 */
 		_calendar.setTimeInMillis(_timeDataList.get(0).absoluteTime);
 
-		tourData.setStartHour((short) _calendar.get(Calendar.HOUR_OF_DAY));
-		tourData.setStartMinute((short) _calendar.get(Calendar.MINUTE));
-		tourData.setStartSecond((short) _calendar.get(Calendar.SECOND));
-
-		tourData.setStartYear((short) _calendar.get(Calendar.YEAR));
-		tourData.setStartMonth((short) (_calendar.get(Calendar.MONTH) + 1));
-		tourData.setStartDay((short) _calendar.get(Calendar.DAY_OF_MONTH));
-		tourData.setWeek(tourData.getStartYear(), tourData.getStartMonth(), tourData.getStartDay());
+		tourData.setStartDateTime(
+				_calendar.get(Calendar.YEAR),
+				_calendar.get(Calendar.MONTH) + 1,
+				_calendar.get(Calendar.DAY_OF_MONTH),
+				_calendar.get(Calendar.HOUR_OF_DAY),
+				_calendar.get(Calendar.MINUTE),
+				_calendar.get(Calendar.SECOND));
 
 		tourData.setDeviceTimeInterval((short) -1);
 		tourData.importRawDataFile = _importFilePath;

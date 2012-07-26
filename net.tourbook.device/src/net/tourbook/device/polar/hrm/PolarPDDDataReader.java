@@ -111,15 +111,7 @@ public class PolarPDDDataReader extends TourbookDevice {
 		/*
 		 * set tour start date/time
 		 */
-		exerciseData.setStartHour((short) _currentExercise.startTime.getHourOfDay());
-		exerciseData.setStartMinute((short) _currentExercise.startTime.getMinuteOfHour());
-		exerciseData.setStartSecond((short) _currentExercise.startTime.getSecondOfMinute());
-
-		exerciseData.setStartYear((short) _currentExercise.startTime.getYear());
-		exerciseData.setStartMonth((short) _currentExercise.startTime.getMonthOfYear());
-		exerciseData.setStartDay((short) _currentExercise.startTime.getDayOfMonth());
-
-		exerciseData.setWeek(_currentExercise.startTime);
+		exerciseData.setStartDateTime(_currentExercise.startTime);
 
 		exerciseData.importRawDataFile = _importFilePath;
 		exerciseData.setTourImportFilePath(_importFilePath);

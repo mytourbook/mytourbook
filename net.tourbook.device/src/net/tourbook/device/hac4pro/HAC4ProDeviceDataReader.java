@@ -31,7 +31,6 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Formatter;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 
@@ -55,6 +54,13 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 	private static final int	OFFSET_TOUR_DATA_END	= 0x10000;
 
 	private GregorianCalendar	fFileDate;
+
+	private class StartBlock {
+		public int	month;
+		public int	day;
+		public int	hour;
+		public int	minute;
+	}
 
 	// plugin constructor
 	public HAC4ProDeviceDataReader() {}
@@ -127,11 +133,11 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 		final GregorianCalendar fileDate = new GregorianCalendar();
 		fileDate.setTime(new Date(lastModified));
 
-		return new Formatter().format(
+		return String.format(
 				net.tourbook.Messages.Format_rawdata_file_yyyy_mm_dd + fileExtension,
 				(short) fileDate.get(Calendar.YEAR),
 				(short) fileDate.get(Calendar.MONTH) + 1,
-				(short) fileDate.get(Calendar.DAY_OF_MONTH)).toString();
+				(short) fileDate.get(Calendar.DAY_OF_MONTH));
 	}
 
 	@Override
@@ -280,8 +286,8 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 			fFileDate = new GregorianCalendar();
 			fFileDate.setTime(new Date(lastModified));
 
-			short tourYear = (short) fFileDate.get(Calendar.YEAR);
-			short lastTourMonth = -1;
+			int tourYear = fFileDate.get(Calendar.YEAR);
+			int lastTourMonth = -1;
 
 			// read device data
 			hac4ProDeviceData.readFromFile(file);
@@ -338,14 +344,14 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 				/*
 				 * save AA record data
 				 */
-				readAARecord(recordBuffer, tourData);
+				final StartBlock startBlock = readAARecord(recordBuffer, tourData);
 
 				/*
 				 * calculate year of the tour
 				 */
 				if (lastTourMonth == -1) {
 					// set initial tour month
-					lastTourMonth = tourData.getStartMonth();
+					lastTourMonth = startBlock.month;
 				}
 
 				/*
@@ -353,12 +359,18 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 				 * current tour is higher than from the last tour, we assume to have data from the
 				 * previous year
 				 */
-				if (tourData.getStartMonth() > lastTourMonth) {
+				if (startBlock.month > lastTourMonth) {
 					tourYear--;
 				}
-				lastTourMonth = tourData.getStartMonth();
+				lastTourMonth = startBlock.month;
 
-				tourData.setStartYear(tourYear);
+				tourData.setStartDateTime(
+						tourYear,
+						startBlock.month,
+						startBlock.day,
+						startBlock.hour,
+						startBlock.minute,
+						0);
 
 				/*
 				 * read/save BB records
@@ -533,8 +545,6 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 
 					tourData.setDeviceId(deviceId);
 					tourData.setDeviceName(visibleName);
-
-					tourData.setWeek(tourData.getStartYear(), tourData.getStartMonth(), tourData.getStartDay());
 				}
 
 				// dump DD block
@@ -596,8 +606,9 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 	/**
 	 * @param buffer
 	 * @param tourData
+	 * @return
 	 */
-	private void readAARecord(final byte[] buffer, final TourData tourData) {
+	private StartBlock readAARecord(final byte[] buffer, final TourData tourData) {
 
 		// 00 1 0xAA
 		//
@@ -627,6 +638,7 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 		//
 		// 15 1 ? 0xFF
 
+
 		final byte byteValue = buffer[1];
 
 		int timeInterval = byteValue & 0x0F;
@@ -640,14 +652,17 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 
 		tourData.setDeviceTimeInterval((short) timeInterval);
 
-		tourData.setStartMinute((short) DeviceReaderTools.convert1ByteBCD(buffer, 4));
-		tourData.setStartHour((short) DeviceReaderTools.convert1ByteBCD(buffer, 5));
-		tourData.setStartDay((short) DeviceReaderTools.convert1ByteBCD(buffer, 6));
-		tourData.setStartMonth((short) DeviceReaderTools.convert1ByteBCD(buffer, 7));
+		final StartBlock startBlock = new StartBlock();
+		startBlock.minute = DeviceReaderTools.convert1ByteBCD(buffer, 4);
+		startBlock.hour = DeviceReaderTools.convert1ByteBCD(buffer, 5);
+		startBlock.day = DeviceReaderTools.convert1ByteBCD(buffer, 6);
+		startBlock.month = DeviceReaderTools.convert1ByteBCD(buffer, 7);
 
 		tourData.setStartDistance((int) DeviceReaderTools.get4ByteData(buffer, 8));
 		tourData.setStartAltitude((short) DeviceReaderTools.get2ByteData(buffer, 12));
 		tourData.setStartPulse((short) (buffer[14] & 0xff));
+
+		return startBlock;
 	}
 
 	/**

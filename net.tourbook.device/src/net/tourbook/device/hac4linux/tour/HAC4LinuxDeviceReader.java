@@ -340,15 +340,25 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 					if (fields[0].equals("Title")) { //$NON-NLS-1$
 						tourData.setTourTitle(fields[1]);
 					}
+
+					int tourYear = 0;
+					int tourMonth = 0;
+					int tourDay = 0;
+					int tourHour = 0;
+					int tourMinute = 0;
+
 					if (fields[0].equals("Date")) {//"dd.MM.yyyy" //$NON-NLS-1$
-						tourData.setStartYear(Short.parseShort(fields[1].substring(6)));
-						tourData.setStartMonth(Short.parseShort(fields[1].substring(3, 5)));
-						tourData.setStartDay(Short.parseShort(fields[1].substring(0, 2)));
+						tourYear = (Short.parseShort(fields[1].substring(6)));
+						tourMonth = (Short.parseShort(fields[1].substring(3, 5)));
+						tourDay = (Short.parseShort(fields[1].substring(0, 2)));
 					}
 					if (fields[0].equals("Time")) {//"hh:mm:ss.00" //$NON-NLS-1$
-						tourData.setStartHour(Short.parseShort(fields[1].substring(0, 2)));
-						tourData.setStartMinute(Short.parseShort(fields[1].substring(3, 5)));
+						tourHour = (Short.parseShort(fields[1].substring(0, 2)));
+						tourMinute = (Short.parseShort(fields[1].substring(3, 5)));
 					}
+
+					tourData.setStartDateTime(tourYear, tourMonth, tourDay, tourHour, tourMinute, 0);
+
 					if (fields[0].equals("Mode")) { //$NON-NLS-1$
 						modeId = Short.parseShort(fields[1]);
 						tourData.setDeviceMode(modeId);
@@ -590,8 +600,6 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 
 				tourData.setDeviceId(deviceId);
 				tourData.setDeviceName(visibleName);
-
-				tourData.setWeek(tourData.getStartYear(), tourData.getStartMonth(), tourData.getStartDay());
 			}
 
 		} catch (final FileNotFoundException e) {

@@ -222,7 +222,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
 	/**
 	 * Split or extract a tour
-	 *
+	 * 
 	 * @param parentShell
 	 * @param tourData
 	 * @param extractStartIndex
@@ -563,7 +563,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
 	/**
 	 * tour type & tags
-	 *
+	 * 
 	 * @param defaultSelectionAdapter
 	 */
 	private void createUI30TypeTags(final Composite parent) {
@@ -954,14 +954,13 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 		/*
 		 * set target tour data
 		 */
-		_tourDataTarget.setStartYear((short) extractedTourStart.getYear());
-		_tourDataTarget.setStartMonth((short) extractedTourStart.getMonthOfYear());
-		_tourDataTarget.setStartDay((short) extractedTourStart.getDayOfMonth());
-		_tourDataTarget.setStartHour((short) extractedTourStart.getHourOfDay());
-		_tourDataTarget.setStartMinute((short) extractedTourStart.getMinuteOfHour());
-		_tourDataTarget.setStartSecond((short) extractedTourStart.getSecondOfMinute());
-
-		_tourDataTarget.setWeek(extractedTourStart);
+		_tourDataTarget.setStartDateTime(
+				extractedTourStart.getYear(),
+				extractedTourStart.getMonthOfYear(),
+				extractedTourStart.getDayOfMonth(),
+				extractedTourStart.getHourOfDay(),
+				extractedTourStart.getMinuteOfHour(),
+				extractedTourStart.getSecondOfMinute());
 
 		// tour id must be created after the tour date/time is set
 		_tourDataTarget.createTourId();
@@ -1252,14 +1251,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 		 * update UI from selected tours
 		 */
 
-		final DateTime tourStartTime = new DateTime(
-				_tourDataSource.getStartYear(),
-				_tourDataSource.getStartMonth(),
-				_tourDataSource.getStartDay(),
-				_tourDataSource.getStartHour(),
-				_tourDataSource.getStartMinute(),
-				_tourDataSource.getStartSecond(),
-				0);
+		final DateTime tourStartTime = _tourDataSource.getStartDateTime();
 
 		int relativeExtractedStartTime = 0;
 

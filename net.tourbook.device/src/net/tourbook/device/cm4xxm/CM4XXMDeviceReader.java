@@ -29,7 +29,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
-import java.util.Formatter;
 import java.util.HashMap;
 
 import net.tourbook.data.DataUtil;
@@ -50,10 +49,16 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 	private static final int	OFFSET_DATA_START	= 765;
 	private static final int	OFFSET_LAST_RECORD	= 81920;
 	private static final int	OFFSET_CHECKSUM_POS	= 81925;
-
 	private static final int	CM4XXM_DATA_SIZE	= 81930;
 
 	private static final int	HARDWARE_ID_CM4XXM	= 0xb723;
+
+	private class StartBlock {
+		public int	month;
+		public int	day;
+		public int	hour;
+		public int	minute;
+	}
 
 	/**
 	 * constructor is used when the plugin is loaded
@@ -92,11 +97,11 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 			}
 		}
 
-		return new Formatter().format(
+		return String.format(
 				net.tourbook.Messages.Format_rawdata_file_yyyy_mm_dd + fileExtension,
 				cm4xxDeviceData.transferYear,
 				cm4xxDeviceData.transferMonth,
-				cm4xxDeviceData.transferDay).toString();
+				cm4xxDeviceData.transferDay);
 	}
 
 	@Override
@@ -196,8 +201,8 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 			 * because the tour year is not available we calculate it from the transfer year, this
 			 * might be not correct but there is no other way to get the year
 			 */
-			short tourYear = cm4xxmDeviceData.transferYear;
-			short lastTourMonth = 0;
+			int tourYear = cm4xxmDeviceData.transferYear;
+			int lastTourMonth = 0;
 
 			/*
 			 * move file pointer to the DD record of the last tour and read "offset AA record" of
@@ -241,7 +246,7 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 				tourData.importRawDataFile = importFilePath;
 				tourData.setTourImportFilePath(importFilePath);
 
-				readStartBlock(fileRawData, tourData);
+				final StartBlock startBlock = readStartBlock(fileRawData, tourData);
 
 				/*
 				 * add device data to the tour, the last tour is the first which is read from the
@@ -267,19 +272,25 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 				 */
 
 				// set initial tour month if not yet done
-				lastTourMonth = (lastTourMonth == 0) ? tourData.getStartMonth() : lastTourMonth;
+				lastTourMonth = (lastTourMonth == 0) ? startBlock.month : lastTourMonth;
 
 				/*
 				 * because we read the tours in decending order (last tour first), we check if the
 				 * month of the current tour is higher than from the last tour, if this is the case,
 				 * we assume to have data from the previous year
 				 */
-				if (tourData.getStartMonth() > lastTourMonth) {
+				if (startBlock.month > lastTourMonth) {
 					tourYear--;
 				}
-				lastTourMonth = tourData.getStartMonth();
+				lastTourMonth = startBlock.month;
 
-				tourData.setStartYear(tourYear);
+				tourData.setStartDateTime(
+						tourYear,
+						startBlock.month,
+						startBlock.day,
+						startBlock.hour,
+						startBlock.minute,
+						0);
 
 				// create time list
 				final ArrayList<TimeData> timeDataList = new ArrayList<TimeData>();
@@ -467,8 +478,6 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 					final Short profileId = Short.valueOf(tourData.getDeviceTourType(), 16);
 					tourData.setDeviceMode(profileId);
 					tourData.setDeviceModeName(getDeviceModeName(profileId));
-
-					tourData.setWeek(tourData.getStartYear(), tourData.getStartMonth(), tourData.getStartDay());
 				}
 
 				/*
@@ -547,7 +556,9 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 		return true;
 	}
 
-	private void readStartBlock(final RandomAccessFile file, final TourData tourData) throws IOException {
+	private StartBlock readStartBlock(final RandomAccessFile file, final TourData tourData) throws IOException {
+
+		final StartBlock startBlock = new StartBlock();
 
 		final byte[] buffer = new byte[5];
 
@@ -557,12 +568,12 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 		tourData.offsetDDRecord = DataUtil.readFileOffset(file, buffer);
 
 		file.read(buffer);
-		tourData.setStartHour(Short.parseShort(new String(buffer, 0, 2)));
-		tourData.setStartMinute(Short.parseShort(new String(buffer, 2, 2)));
+		startBlock.hour = Short.parseShort(new String(buffer, 0, 2));
+		startBlock.minute = Short.parseShort(new String(buffer, 2, 2));
 
 		file.read(buffer);
-		tourData.setStartMonth(Short.parseShort(new String(buffer, 0, 2)));
-		tourData.setStartDay(Short.parseShort(new String(buffer, 2, 2)));
+		startBlock.month = Short.parseShort(new String(buffer, 0, 2));
+		startBlock.day = Short.parseShort(new String(buffer, 2, 2));
 
 		file.read(buffer);
 		tourData.setStartDistance(Integer.parseInt(new String(buffer, 0, 4), 16));
@@ -575,6 +586,8 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 
 		file.read(buffer);
 		tourData.setStartPulse((short) Integer.parseInt(new String(buffer, 0, 4), 16));
+
+		return startBlock;
 	}
 
 	public final int readSummary(final byte[] buffer) throws IOException {

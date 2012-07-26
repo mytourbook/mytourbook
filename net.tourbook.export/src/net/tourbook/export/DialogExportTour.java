@@ -832,14 +832,7 @@ public class DialogExportTour extends TitleAreaDialog {
 				final int startTime = timeSerie[_tourStartIndex];
 				final int endTime = timeSerie[_tourEndIndex];
 
-				final DateTime dtTour = new DateTime(
-						tourData.getStartYear(),
-						tourData.getStartMonth(),
-						tourData.getStartDay(),
-						tourData.getStartHour(),
-						tourData.getStartMinute(),
-						tourData.getStartSecond(),
-						0);
+				final DateTime dtTour = tourData.getStartDateTime();
 
 				final String uiStartTime = _timeFormatter.format(dtTour.plusSeconds(startTime).toDate());
 				final String uiEndTime = _timeFormatter.format(dtTour.plusSeconds(endTime).toDate());
@@ -1750,14 +1743,7 @@ public class DialogExportTour extends TitleAreaDialog {
 
 			// display the start date/time
 
-			final DateTime dtTour = new DateTime(
-					minTourData.getStartYear(),
-					minTourData.getStartMonth(),
-					minTourData.getStartDay(),
-					minTourData.getStartHour(),
-					minTourData.getStartMinute(),
-					minTourData.getStartSecond(),
-					0);
+			final DateTime dtTour = minTourData.getStartDateTime();
 
 			// adjust start time
 			final int startTime = minTourData.timeSerie[_tourStartIndex];

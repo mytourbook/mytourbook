@@ -60,6 +60,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
+import org.joda.time.DateTime;
 
 public class DialogQuickEdit extends TitleAreaDialog {
 
@@ -161,12 +162,14 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
 		setTitle(Messages.dialog_quick_edit_dialog_area_title);
 
+		final DateTime tourStart = _tourData.getStartDateTime();
+
 		_calendar.set(//
-				_tourData.getStartYear(),
-				_tourData.getStartMonth() - 1,
-				_tourData.getStartDay(),
-				_tourData.getStartHour(),
-				_tourData.getStartMinute());
+				tourStart.getYear(),
+				tourStart.getMonthOfYear() - 1,
+				tourStart.getDayOfMonth(),
+				tourStart.getHourOfDay(),
+				tourStart.getMinuteOfDay());
 
 		setMessage(_dateFormatter.format(_calendar.getTime()) + "  " + _timeFormatter.format(_calendar.getTime())); //$NON-NLS-1$
 	}

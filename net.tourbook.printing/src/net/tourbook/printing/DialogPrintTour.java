@@ -101,7 +101,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 	private static final DateFormat			_timeFormatter				= DateFormat.getTimeInstance(DateFormat.MEDIUM);
 	private static final NumberFormat		_numberFormatter			= NumberFormat.getNumberInstance();
 
-	private static final String				PDF_FILE_EXTENSION			= "pdf"; //$NON-NLS-1$
+	private static final String				PDF_FILE_EXTENSION			= "pdf";											//$NON-NLS-1$
 
 	private static String					_dlgDefaultMessage;
 
@@ -590,8 +590,9 @@ public class DialogPrintTour extends TitleAreaDialog {
 							public void run() {
 
 								// display printed filepath
-								_lblPrintFilePath.setText(NLS.bind(Messages.Dialog_Print_Lbl_PdfFilePath, filePath
-										.toOSString()));
+								_lblPrintFilePath.setText(NLS.bind(
+										Messages.Dialog_Print_Lbl_PdfFilePath,
+										filePath.toOSString()));
 
 								// !!! force label update !!!
 								_lblPrintFilePath.update();
@@ -797,21 +798,18 @@ public class DialogPrintTour extends TitleAreaDialog {
 
 			// display the start date/time
 
-			final DateTime dtTour = new DateTime(minTourData.getStartYear(), minTourData.getStartMonth(), minTourData
-					.getStartDay(), minTourData.getStartHour(), minTourData.getStartMinute(), minTourData
-					.getStartSecond(), 0);
+			final DateTime dtTour = minTourData.getStartDateTime();
 
 			final int startTime = minTourData.timeSerie[_tourStartIndex];
 			final DateTime tourTime = dtTour.plusSeconds(startTime);
 
-			_comboFile.setText(UI
-					.format_yyyymmdd_hhmmss(
-							tourTime.getYear(),
-							tourTime.getMonthOfYear(),
-							tourTime.getDayOfMonth(),
-							tourTime.getHourOfDay(),
-							tourTime.getMinuteOfHour(),
-							tourTime.getSecondOfMinute()));
+			_comboFile.setText(UI.format_yyyymmdd_hhmmss(
+					tourTime.getYear(),
+					tourTime.getMonthOfYear(),
+					tourTime.getDayOfMonth(),
+					tourTime.getHourOfDay(),
+					tourTime.getMinuteOfHour(),
+					tourTime.getSecondOfMinute()));
 		} else {
 
 			// display the tour date/time

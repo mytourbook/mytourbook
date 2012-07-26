@@ -182,12 +182,16 @@ public class TurDeviceReader extends TourbookDevice {
 //			tourData.setDeviceTravelTime(Long.parseLong(turDeviceData.deviceTime));
 //			tourData.setDeviceWeight(Integer.parseInt(turDeviceData.bikeWeight));
 
-			tourData.setStartHour(Short.parseShort(turDeviceData.tourStartTime.substring(0, 2)));
-			tourData.setStartMinute(Short.parseShort(turDeviceData.tourStartTime.substring(3, 5)));
+			final String tourDate = turDeviceData.tourStartDate;
+			final String tourTime = turDeviceData.tourStartTime;
 
-			tourData.setStartYear(Short.parseShort(turDeviceData.tourStartDate.substring(6)));
-			tourData.setStartMonth(Short.parseShort(turDeviceData.tourStartDate.substring(3, 5)));
-			tourData.setStartDay(Short.parseShort(turDeviceData.tourStartDate.substring(0, 2)));
+			tourData.setStartDateTime(
+					Short.parseShort(tourDate.substring(6)),
+					Short.parseShort(tourDate.substring(3, 5)),
+					Short.parseShort(tourDate.substring(0, 2)),
+					Short.parseShort(tourTime.substring(0, 2)),
+					Short.parseShort(tourTime.substring(3, 5)),
+					0);
 
 			tourData.setStartDistance(Integer.parseInt(turDeviceData.deviceDistance));
 			tourData.setTourDescription(turDeviceData.tourDescription);
@@ -385,8 +389,6 @@ public class TurDeviceReader extends TourbookDevice {
 
 				tourData.setDeviceId(deviceId);
 				tourData.setDeviceName(visibleName);
-
-				tourData.setWeek(tourData.getStartYear(), tourData.getStartMonth(), tourData.getStartDay());
 			}
 
 		} catch (final FileNotFoundException e) {

@@ -166,6 +166,7 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 			// start time
 			final int tourHour = Integer.parseInt(fileName.substring(17, 19));
 			final int tourMin = Integer.parseInt(fileName.substring(20, 22));
+			final int tourSec = Integer.parseInt(fileName.substring(23, 25));
 
 			String title = fileName.substring(44);
 			title = title.substring(0, title.length() - 4);
@@ -175,17 +176,13 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 			 */
 			final TourData tourData = new TourData();
 
+			tourData.setStartDateTime(tourYear, tourMonth, tourDay, tourHour, tourMin, tourSec);
+
 			tourData.setTourTitle(title);
 			tourData.setTourDescription(fileName);
 
 			tourData.setDeviceMode((short) 0);
 			tourData.setDeviceTimeInterval((short) -1);
-
-			tourData.setStartMinute((short) tourMin);
-			tourData.setStartHour((short) tourHour);
-			tourData.setStartDay((short) tourDay);
-			tourData.setStartMonth((short) tourMonth);
-			tourData.setStartYear((short) tourYear);
 
 			tourData.importRawDataFile = importFilePath;
 			tourData.setTourImportFilePath(importFilePath);
@@ -276,8 +273,6 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 
 				tourData.setDeviceId(deviceId);
 				tourData.setDeviceName(visibleName);
-
-				tourData.setWeek(tourData.getStartYear(), tourData.getStartMonth(), tourData.getStartDay());
 			}
 
 			returnValue = true;
@@ -297,7 +292,6 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 
 		return returnValue;
 	}
-
 
 	/**
 	 * checks if the data file has a valid .crp data format

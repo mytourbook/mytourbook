@@ -561,15 +561,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 			dtTourStart = new DateTime(firstTimeData.absoluteTime);
 		}
 
-		tourData.setStartYear((short) dtTourStart.getYear());
-		tourData.setStartMonth((short) dtTourStart.getMonthOfYear());
-		tourData.setStartDay((short) dtTourStart.getDayOfMonth());
-
-		tourData.setStartHour((short) dtTourStart.getHourOfDay());
-		tourData.setStartMinute((short) dtTourStart.getMinuteOfHour());
-		tourData.setStartSecond((short) dtTourStart.getSecondOfMinute());
-
-		tourData.setWeek(tourData.getStartYear(), tourData.getStartMonth(), tourData.getStartDay());
+		tourData.setStartDateTime(dtTourStart);
 
 		tourData.setDeviceTimeInterval((short) -1);
 

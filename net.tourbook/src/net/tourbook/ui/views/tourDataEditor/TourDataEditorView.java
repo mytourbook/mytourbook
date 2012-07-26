@@ -1237,17 +1237,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		/*
 		 * set tour start date/time
 		 */
-		_calendar.setTimeInMillis(System.currentTimeMillis());
-
-		tourData.setStartHour((short) _calendar.get(Calendar.HOUR_OF_DAY));
-		tourData.setStartMinute((short) _calendar.get(Calendar.MINUTE));
-		tourData.setStartSecond((short) _calendar.get(Calendar.SECOND));
-
-		tourData.setStartYear((short) _calendar.get(Calendar.YEAR));
-		tourData.setStartMonth((short) (_calendar.get(Calendar.MONTH) + 1));
-		tourData.setStartDay((short) _calendar.get(Calendar.DAY_OF_MONTH));
-
-		tourData.setWeek(tourData.getStartYear(), tourData.getStartMonth(), tourData.getStartDay());
+		tourData.setStartDateTime(new org.joda.time.DateTime());
 
 		// tour id must be created after the tour date/time is set
 		tourData.createTourId();
@@ -5021,9 +5011,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_latitudeEditingSupport.setDataSerie(_serieLatitude);
 		_longitudeEditingSupport.setDataSerie(_serieLongitude);
 
-		_tourStartDayTime = (_tourData.getStartHour() * 3600)
-				+ (_tourData.getStartMinute() * 60)
-				+ _tourData.getStartSecond();
+		final org.joda.time.DateTime start = _tourData.getStartDateTime();
+
+		_tourStartDayTime = (start.getHourOfDay() * 3600) //
+				+ (start.getMinuteOfHour() * 60)
+				+ start.getSecondOfMinute();
 
 		if (_isManualTour == false) {
 
@@ -6532,14 +6524,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				_tourData.setAvgTemperature(temperature);
 			}
 
-			_tourData.setStartYear((short) _dtTourDate.getYear());
-			_tourData.setStartMonth((short) (_dtTourDate.getMonth() + 1));
-			_tourData.setStartDay((short) _dtTourDate.getDay());
-			_tourData.setWeek(_tourData.getStartYear(), _tourData.getStartMonth(), _tourData.getStartDay());
-
-			_tourData.setStartHour((short) _dtStartTime.getHours());
-			_tourData.setStartMinute((short) _dtStartTime.getMinutes());
-			_tourData.setStartSecond((short) _dtStartTime.getSeconds());
+			_tourData.setStartDateTime(
+					_dtTourDate.getYear(),
+					_dtTourDate.getMonth() + 1,
+					_dtTourDate.getDay(),
+					_dtStartTime.getHours(),
+					_dtStartTime.getMinutes(),
+					_dtStartTime.getSeconds());
 
 			if (_isDistManuallyModified) {
 				/*
@@ -6896,11 +6887,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_spinTemperature.setDigits(1);
 		_spinTemperature.setSelection(Math.round(avgTemperature * 10));
 
-		// tour date
-		_dtTourDate.setDate(_tourData.getStartYear(), _tourData.getStartMonth() - 1, _tourData.getStartDay());
-
-		// start time
-		_dtStartTime.setTime(_tourData.getStartHour(), _tourData.getStartMinute(), _tourData.getStartSecond());
+		// set start date/time
+		final org.joda.time.DateTime start = _tourData.getStartDateTime();
+		_dtTourDate.setDate(start.getYear(), start.getMonthOfYear() - 1, start.getDayOfMonth());
+		_dtStartTime.setTime(start.getHourOfDay(), start.getMinuteOfHour(), start.getSecondOfMinute());
 
 		// tour distance
 		final float tourDistance = _tourData.getTourDistance();
@@ -7163,35 +7153,18 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_timePaused.setTime(pausedTime / 3600, ((pausedTime % 3600) / 60), ((pausedTime % 3600) % 60));
 	}
 
+	/**
+	 * Update title of the view with the modified date/time
+	 */
 	private void updateUITitle() {
 
-		updateUITitle(
+		_calendar.set(
 				_dtTourDate.getYear(),
 				_dtTourDate.getMonth(),
 				_dtTourDate.getDay(),
 				_dtStartTime.getHours(),
 				_dtStartTime.getMinutes(),
 				_dtStartTime.getSeconds());
-	}
-
-	/**
-	 * update title of the view with the modified date/time
-	 * 
-	 * @param tourYear
-	 * @param tourMonth
-	 * @param tourDay
-	 * @param hour
-	 * @param minute
-	 * @param seconds
-	 */
-	private void updateUITitle(	final int tourYear,
-								final int tourMonth,
-								final int tourDay,
-								final int hour,
-								final int minute,
-								final int seconds) {
-
-		_calendar.set(tourYear, tourMonth, tourDay, hour, minute, seconds);
 
 		updateUITitleAsynch(TourManager.getTourTitle(_calendar.getTime()));
 	}

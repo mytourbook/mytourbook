@@ -20,8 +20,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 
 import javax.persistence.EntityManager;
@@ -181,11 +179,8 @@ public class TourCompareManager {
 		comparedTour.setTourId(tourData.getTourId());
 		comparedTour.setRefTourId(comparedTourItem.refTour.getRefId());
 
-		final Calendar calendar = GregorianCalendar.getInstance();
-		calendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData.getStartDay());
-
-		comparedTour.setTourDate(calendar.getTimeInMillis());
-		comparedTour.setStartYear(tourData.getStartYear());
+		comparedTour.setTourDate(tourData.getTourStartTime());
+		comparedTour.setStartYear(tourData.getStartDateTime().getYear());
 
 		final float speed = TourManager.computeTourSpeed(
 				tourData,

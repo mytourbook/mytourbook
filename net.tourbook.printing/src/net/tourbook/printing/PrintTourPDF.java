@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Formatter;
 
 import javax.xml.transform.Result;
 import javax.xml.transform.Transformer;
@@ -64,25 +63,15 @@ public class PrintTourPDF extends PrintTourExtension {
 	 */
 	private String formatStartDate(final TourData _tourData) {
 
-		final DateTime dtTourStart = new DateTime(//
-				_tourData.getStartYear(),
-				_tourData.getStartMonth(),
-				_tourData.getStartDay(),
-				_tourData.getStartHour(),
-				_tourData.getStartMinute(),
-				_tourData.getStartSecond(),
-				0);
+		final DateTime dtTourStart = _tourData.getStartDateTime();
+		final DateTime dtTourEnd = dtTourStart.plusSeconds(_tourData.getTourRecordingTime());
 
-		final int recordingTime = _tourData.getTourRecordingTime();
-		final DateTime dtTourEnd = new DateTime(dtTourStart).plusSeconds(recordingTime);
-
-		return new Formatter().format(//
+		return String.format(
 				Messages.Tour_Tooltip_Format_DateWeekTime,
 				_dateFormatter.print(dtTourStart.getMillis()),
 				_timeFormatter.print(dtTourStart.getMillis()),
 				_timeFormatter.print(dtTourEnd.getMillis()),
-				dtTourStart.getWeekOfWeekyear())//
-				.toString();
+				dtTourStart.getWeekOfWeekyear());
 	}
 
 	/**

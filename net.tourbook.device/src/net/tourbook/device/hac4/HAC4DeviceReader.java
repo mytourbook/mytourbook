@@ -52,6 +52,13 @@ public class HAC4DeviceReader extends TourbookDevice {
 
 	private static final int	HAC4_DATA_SIZE			= 81930;
 
+	private class StartBlock {
+		public short	month;
+		public short	day;
+		public short	hour;
+		public short	minute;
+	}
+
 	/**
 	 * constructor is used when the plugin is loaded
 	 */
@@ -246,7 +253,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 				tourData.importRawDataFile = importFilePath;
 				tourData.setTourImportFilePath(importFilePath);
 
-				readStartBlock(fileRawData, tourData);
+				final StartBlock startBlock = readStartBlock(fileRawData, tourData);
 
 				/*
 				 * add device data to the tour, the last tour is the first which is read from the
@@ -272,19 +279,25 @@ public class HAC4DeviceReader extends TourbookDevice {
 				 */
 
 				// set initial tour month if not yet done
-				lastTourMonth = (lastTourMonth == 0) ? tourData.getStartMonth() : lastTourMonth;
+				lastTourMonth = (lastTourMonth == 0) ? startBlock.month : lastTourMonth;
 
 				/*
 				 * because we read the tours in decending order (last tour first), we check if the
 				 * month of the current tour is higher than from the last tour, if this is the case,
 				 * we assume to have data from the previous year
 				 */
-				if (tourData.getStartMonth() > lastTourMonth) {
+				if (startBlock.month > lastTourMonth) {
 					tourYear--;
 				}
-				lastTourMonth = tourData.getStartMonth();
+				lastTourMonth = startBlock.month;
 
-				tourData.setStartYear(tourYear);
+				tourData.setStartDateTime(
+						tourYear,
+						startBlock.month,
+						startBlock.day,
+						startBlock.hour,
+						startBlock.minute,
+						0);
 
 				// tourData.dumpData();
 				// out.println("Offset AA Record: " + iOffsetAARecord);
@@ -481,8 +494,6 @@ public class HAC4DeviceReader extends TourbookDevice {
 					final Short profileId = Short.valueOf(tourData.getDeviceTourType(), 16);
 					tourData.setDeviceMode(profileId);
 					tourData.setDeviceModeName(getDeviceModeName(profileId));
-
-					tourData.setWeek(tourData.getStartYear(), tourData.getStartMonth(), tourData.getStartDay());
 				}
 
 				// tourData.dumpTourTotal();
@@ -564,7 +575,9 @@ public class HAC4DeviceReader extends TourbookDevice {
 		return true;
 	}
 
-	private void readStartBlock(final RandomAccessFile file, final TourData tourData) throws IOException {
+	private StartBlock readStartBlock(final RandomAccessFile file, final TourData tourData) throws IOException {
+
+		final StartBlock startBlock = new StartBlock();
 
 		final byte[] buffer = new byte[5];
 
@@ -574,12 +587,12 @@ public class HAC4DeviceReader extends TourbookDevice {
 		tourData.offsetDDRecord = DataUtil.readFileOffset(file, buffer);
 
 		file.read(buffer);
-		tourData.setStartHour(Short.parseShort(new String(buffer, 0, 2)));
-		tourData.setStartMinute(Short.parseShort(new String(buffer, 2, 2)));
+		startBlock.hour = Short.parseShort(new String(buffer, 0, 2));
+		startBlock.minute = Short.parseShort(new String(buffer, 2, 2));
 
 		file.read(buffer);
-		tourData.setStartMonth(Short.parseShort(new String(buffer, 0, 2)));
-		tourData.setStartDay(Short.parseShort(new String(buffer, 2, 2)));
+		startBlock.month = Short.parseShort(new String(buffer, 0, 2));
+		startBlock.day = Short.parseShort(new String(buffer, 2, 2));
 
 		file.read(buffer);
 		tourData.setStartDistance(Integer.parseInt(new String(buffer, 0, 4), 16));
@@ -592,6 +605,8 @@ public class HAC4DeviceReader extends TourbookDevice {
 
 		file.read(buffer);
 		tourData.setStartPulse((short) Integer.parseInt(new String(buffer, 0, 4), 16));
+
+		return startBlock;
 	}
 
 	public final int readSummary(final byte[] buffer) throws IOException {

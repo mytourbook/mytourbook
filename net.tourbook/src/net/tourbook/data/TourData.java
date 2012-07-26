@@ -163,16 +163,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	// ############################################# DATE #############################################
 
-//	+ "	TourStartTime				BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
-//	+ "	TourEndTime					BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
-
 	/**
-	 * Tour start time
+	 * Tour start time in ms
 	 */
 	private long											tourStartTime;
 
 	/**
-	 * Tour end time
+	 * Tour end time in ms, this value should be {@link #tourStartTime} + {@link #tourEndTime}
 	 */
 	private long											tourEndTime;
 
@@ -3176,6 +3173,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 		tourDistance = isDistance ? distanceSerie[serieSize - 1] : 0;
 		tourRecordingTime = (int) recordingTime;
+		setTourEndTime();
 
 		/*
 		 * create marker after all other data are setup
@@ -3392,11 +3390,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			 * this is the default implementation to create a tour id, but on the 5.5.2007 a
 			 * NumberFormatException occured so the calculation for the tour id was adjusted
 			 */
-			tourIdKey = Short.toString(getStartYear())
-					+ Short.toString(getStartMonth())
-					+ Short.toString(getStartDay())
-					+ Short.toString(getStartHour())
-					+ Short.toString(getStartMinute())
+			tourIdKey = Short.toString(startYear)
+					+ Short.toString(startMonth)
+					+ Short.toString(startDay)
+					+ Short.toString(startHour)
+					+ Short.toString(startMinute)
 					//
 					+ uniqueKeySuffix;
 
@@ -3409,11 +3407,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			 */
 			try {
 
-				tourIdKey = Short.toString(getStartYear())
-						+ Short.toString(getStartMonth())
-						+ Short.toString(getStartDay())
-						+ Short.toString(getStartHour())
-						+ Short.toString(getStartMinute())
+				tourIdKey = Short.toString(startYear)
+						+ Short.toString(startMonth)
+						+ Short.toString(startDay)
+						+ Short.toString(startHour)
+						+ Short.toString(startMinute)
 						//
 						+ uniqueKeySuffix.substring(0, Math.min(5, uniqueKeySuffix.length()));
 
@@ -3421,7 +3419,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 			} catch (final NumberFormatException e2) {
 
-				// this case happened when getStartMonth() had a wrong value
+				// this case happened when startMonth had a wrong value
 
 				tourId = Long.valueOf(new DateTime().getMillis());
 			}
@@ -3710,8 +3708,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		out.println("TOUR DATA"); //$NON-NLS-1$
 		out.println("----------------------------------------------------"); //$NON-NLS-1$
 // out.println("Typ: " + getDeviceTourType()); //$NON-NLS-1$
-		out.println("Date:			" + getStartDay() + "." + getStartMonth() + "." + getStartYear()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		out.println("Time:			" + getStartHour() + ":" + getStartMinute()); //$NON-NLS-1$ //$NON-NLS-2$
+		out.println("Date:			" + startDay + "." + startMonth + "." + startYear); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		out.println("Time:			" + startHour + ":" + startMinute); //$NON-NLS-1$ //$NON-NLS-2$
 		out.println("Total distance:		" + getStartDistance()); //$NON-NLS-1$
 		// out.println("Distance: " + getDistance());
 		out.println("Altitude:		" + getStartAltitude()); //$NON-NLS-1$
@@ -4513,35 +4511,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return _dateTimeStart;
 	}
 
-	public short getStartDay() {
-		return startDay;
-	}
-
 	public float getStartDistance() {
 		return startDistance;
 	}
 
-	public short getStartHour() {
-		return startHour;
-	}
-
-	public short getStartMinute() {
-		return startMinute;
-	}
-
-	/**
-	 * @return Returns the month for the tour start in the range 1...12
-	 */
-	public short getStartMonth() {
-		return startMonth;
-	}
-
 	public short getStartPulse() {
 		return startPulse;
-	}
-
-	public int getStartSecond() {
-		return startSecond;
 	}
 
 	/**
@@ -4550,10 +4525,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public int getStartTimeOfDay() {
 		return (startHour * 3600) + (startMinute * 60) + startSecond;
 
-	}
-
-	public short getStartYear() {
-		return startYear;
 	}
 
 	/**
@@ -4666,6 +4637,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	}
 
 	/**
+	 * @return Returns tour end time in ms, this value should be {@link #tourStartTime} +
+	 *         {@link #tourRecordingTime}
+	 */
+	public long getTourEndTime() {
+		return tourEndTime;
+	}
+
+	/**
 	 * @return Returns the unique key in the database for this {@link TourData} entity
 	 */
 	public Long getTourId() {
@@ -4747,6 +4726,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	public String getTourStartPlace() {
 		return tourStartPlace == null ? UI.EMPTY_STRING : tourStartPlace;
+	}
+
+	/**
+	 * @return Returns tour start time in ms
+	 */
+	public long getTourStartTime() {
+		return tourStartTime;
 	}
 
 	/**
@@ -4842,13 +4828,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	@Override
 	public int hashCode() {
+
 		int result = 17;
 
-		result = 37 * result + this.getStartYear();
-		result = 37 * result + this.getStartMonth();
-		result = 37 * result + this.getStartDay();
-		result = 37 * result + this.getStartHour();
-		result = 37 * result + this.getStartMinute();
+		result = 37 * result + startYear;
+		result = 37 * result + startMonth;
+		result = 37 * result + startDay;
+		result = 37 * result + startHour;
+		result = 37 * result + startMinute;
 		result = 37 * result + (int) this.getTourDistance();
 		result = 37 * result + this.getTourRecordingTime();
 
@@ -5359,9 +5346,64 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		this.startAltitude = startAltitude;
 	}
 
-	public void setStartDay(final short startDay) {
-		_dateTimeStart = null;
-		this.startDay = startDay;
+	public void setStartDateTime(final DateTime start) {
+
+		_dateTimeStart = start;
+		tourStartTime = _dateTimeStart.getMillis();
+
+		startYear = (short) start.getYear();
+		startMonth = (short) start.getMonthOfYear();
+		startDay = (short) start.getDayOfMonth();
+		startHour = (short) start.getHourOfDay();
+		startMinute = (short) start.getMinuteOfHour();
+		startSecond = start.getSecondOfMinute();
+
+		setWeek(_dateTimeStart);
+	}
+
+	/**
+	 * Set tour start date/time and week.
+	 * 
+	 * @param tourStartYear
+	 * @param tourStartMonth
+	 *            1...12
+	 * @param tourStartDay
+	 * @param tourStartHour
+	 * @param tourStartMinute
+	 * @param tourStartSecond
+	 */
+	public void setStartDateTime(	final int tourStartYear,
+									final int tourStartMonth,
+									final int tourStartDay,
+									final int tourStartHour,
+									final int tourStartMinute,
+									final int tourStartSecond) {
+
+		_dateTimeStart = new DateTime(
+				tourStartYear,
+				tourStartMonth,
+				tourStartDay,
+				tourStartHour,
+				tourStartMinute,
+				tourStartSecond,
+				0);
+		tourStartTime = _dateTimeStart.getMillis();
+
+		if (tourStartMonth < 1 || tourStartMonth > 12) {
+			StatusUtil.log(new Exception("Month is invalid: " + tourStartMonth)); //$NON-NLS-1$
+			startMonth = 1;
+		} else {
+			startMonth = (short) tourStartMonth;
+		}
+
+		startYear = (short) tourStartYear;
+//		startMonth = tourStartMonth;
+		startDay = (short) tourStartDay;
+		startHour = (short) tourStartHour;
+		startMinute = (short) tourStartMinute;
+		startSecond = tourStartSecond;
+
+		setWeek(_dateTimeStart);
 	}
 
 	/**
@@ -5373,42 +5415,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		this.startDistance = startDistance;
 	}
 
-	public void setStartHour(final short startHour) {
-		_dateTimeStart = null;
-		this.startHour = startHour;
-	}
-
-	public void setStartMinute(final short startMinute) {
-		_dateTimeStart = null;
-		this.startMinute = startMinute;
-	}
-
-	/**
-	 * Sets the month for the tour start in the range 1...12
-	 */
-	public void setStartMonth(final short startMonth) {
-		_dateTimeStart = null;
-
-		if (startMonth < 1 || startMonth > 12) {
-			StatusUtil.log(new Exception("Month is invalid: " + startMonth)); //$NON-NLS-1$
-			this.startMonth = 1;
-		} else {
-			this.startMonth = startMonth;
-		}
-	}
-
 	public void setStartPulse(final short startPulse) {
 		this.startPulse = startPulse;
-	}
-
-	public void setStartSecond(final int startSecond) {
-		_dateTimeStart = null;
-		this.startSecond = startSecond;
-	}
-
-	public void setStartYear(final short startYear) {
-		_dateTimeStart = null;
-		this.startYear = startYear;
 	}
 
 	public void setTimeSerieFloat(final float[] timeSerieFloat) {
@@ -5456,6 +5464,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		this.tourEndPlace = tourEndPlace;
 	}
 
+	private void setTourEndTime() {
+		tourEndTime = tourStartTime + tourRecordingTime;
+	}
+
 	/**
 	 * Sets the file path for the imported file, this is displayed in the {@link TourDataEditorView}
 	 * 
@@ -5492,7 +5504,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * @param tourRecordingTime
 	 */
 	public void setTourRecordingTime(final int tourRecordingTime) {
+
 		this.tourRecordingTime = tourRecordingTime;
+
+		setTourEndTime();
 	}
 
 	/**
@@ -5797,7 +5812,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		this.weatherWindSpd = weatherWindSpeed;
 	}
 
-	public void setWeek(final DateTime dt) {
+	private void setWeek(final DateTime dt) {
 
 		final int firstDayOfWeek = _prefStore.getInt(ITourbookPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
 		final int minimalDaysInFirstWeek = _prefStore.getInt(ITourbookPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK);
@@ -5806,26 +5821,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		_calendar.setMinimalDaysInFirstWeek(minimalDaysInFirstWeek);
 
 		_calendar.set(dt.getYear(), dt.getMonthOfYear() - 1, dt.getDayOfMonth());
-
-		startWeek = (short) _calendar.get(Calendar.WEEK_OF_YEAR);
-		startWeekYear = (short) Util.getYearForWeek(_calendar);
-	}
-
-	/**
-	 * @param year
-	 * @param month
-	 *            month starts with 1
-	 * @param tourDay
-	 */
-	public void setWeek(final short year, final short month, final short tourDay) {
-
-		final int firstDayOfWeek = _prefStore.getInt(ITourbookPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
-		final int minimalDaysInFirstWeek = _prefStore.getInt(ITourbookPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK);
-
-		_calendar.setFirstDayOfWeek(firstDayOfWeek);
-		_calendar.setMinimalDaysInFirstWeek(minimalDaysInFirstWeek);
-
-		_calendar.set(year, month - 1, tourDay);
 
 		startWeek = (short) _calendar.get(Calendar.WEEK_OF_YEAR);
 		startWeekYear = (short) Util.getYearForWeek(_calendar);

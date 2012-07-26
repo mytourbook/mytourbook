@@ -64,6 +64,14 @@ public class CSVTourDataReader extends TourbookDevice {
 	private static final String	CSV_TOKEN_SEPARATOR	= ";";																													//$NON-NLS-1$
 	private static final String	CSV_TAG_SEPARATOR	= ",";																													//$NON-NLS-1$
 
+	private class DateTimeData {
+		public int	year;
+		public int	month;
+		public int	day;
+		public int	hour;
+		public int	minute;
+	}
+
 	// plugin constructor
 	public CSVTourDataReader() {}
 
@@ -104,16 +112,12 @@ public class CSVTourDataReader extends TourbookDevice {
 		return false;
 	}
 
-	private void parseDate(final TourData tourData, final String nextToken) {
+	private void parseDate(final DateTimeData dateTime, final String nextToken) {
 
 		// Date (yyyy-mm-dd)
-		final int tourYear = Integer.parseInt(nextToken.substring(0, 4));
-		final int tourMonth = Integer.parseInt(nextToken.substring(5, 7));
-		final int tourDay = Integer.parseInt(nextToken.substring(8, 10));
-
-		tourData.setStartDay((short) tourDay);
-		tourData.setStartMonth((short) tourMonth);
-		tourData.setStartYear((short) tourYear);
+		dateTime.year = Integer.parseInt(nextToken.substring(0, 4));
+		dateTime.month = Integer.parseInt(nextToken.substring(5, 7));
+		dateTime.day = Integer.parseInt(nextToken.substring(8, 10));
 	}
 
 	/**
@@ -192,14 +196,11 @@ public class CSVTourDataReader extends TourbookDevice {
 
 	}
 
-	private void parseTime(final TourData tourData, final String nextToken) {
+	private void parseTime(final DateTimeData dateTime, final String nextToken) {
 
 		// Time (hh-mm)
-		final int tourHour = Integer.parseInt(nextToken.substring(0, 2));
-		final int tourMin = Integer.parseInt(nextToken.substring(3, 5));
-
-		tourData.setStartMinute((short) tourMin);
-		tourData.setStartHour((short) tourHour);
+		dateTime.hour = Integer.parseInt(nextToken.substring(0, 2));
+		dateTime.minute = Integer.parseInt(nextToken.substring(3, 5));
 	}
 
 	/**
@@ -287,14 +288,23 @@ public class CSVTourDataReader extends TourbookDevice {
 
 				try {
 
+					final DateTimeData dateTime = new DateTimeData();
+
 					/*
 					 * The split method is used because the Tokenizer ignores empty tokens !!!
 					 */
 
 					final String[] allToken = tokenLine.split(CSV_TOKEN_SEPARATOR);
 
-					parseDate(tourData, allToken[0]);//							1 Date (yyyy-mm-dd);
-					parseTime(tourData, allToken[1]);//							2 Time (hh-mm);
+					parseDate(dateTime, allToken[0]);//							1 Date (yyyy-mm-dd);
+					parseTime(dateTime, allToken[1]);//							2 Time (hh-mm);
+					tourData.setStartDateTime(
+							dateTime.year,
+							dateTime.month,
+							dateTime.day,
+							dateTime.hour,
+							dateTime.minute,
+							0);
 
 					duration = Integer.parseInt(allToken[2]); //				3 Duration (sec);
 					tourData.setTourRecordingTime(duration);
@@ -329,8 +339,6 @@ public class CSVTourDataReader extends TourbookDevice {
 
 						tourData.setDeviceId(deviceId);
 						tourData.setDeviceName(visibleName);
-
-						tourData.setWeek(tourData.getStartYear(), tourData.getStartMonth(), tourData.getStartDay());
 
 						returnValue = true;
 					}

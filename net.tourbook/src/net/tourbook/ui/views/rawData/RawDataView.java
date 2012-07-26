@@ -1019,8 +1019,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 				final TourData tourData = (TourData) cell.getElement();
 
-				_calendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData.getStartDay());
-				cell.setText(_dateFormatter.format(_calendar.getTime()));
+				cell.setText(_dateFormatter.format(tourData.getTourStartTime()));
 			}
 		});
 
@@ -1259,9 +1258,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			public void update(final ViewerCell cell) {
 
 				final TourData tourData = (TourData) cell.getElement();
-				_calendar.set(0, 0, 0, tourData.getStartHour(), tourData.getStartMinute(), 0);
 
-				cell.setText(_timeFormatter.format(_calendar.getTime()));
+				cell.setText(_timeFormatter.format(tourData.getTourStartTime()));
 			}
 		});
 
@@ -1547,14 +1545,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		// action: merge tour ... into ...
 		if (isOneSelectedNotDeleteTour) {
-
-			final Calendar calendar = GregorianCalendar.getInstance();
-			calendar.set(
-					firstValidTour.getStartYear(),
-					firstValidTour.getStartMonth() - 1,
-					firstValidTour.getStartDay(),
-					firstValidTour.getStartHour(),
-					firstValidTour.getStartMinute());
 
 			final StringBuilder sb = new StringBuilder().append(UI.EMPTY_STRING)//
 					.append(TourManager.getTourDateShort(firstValidTour))

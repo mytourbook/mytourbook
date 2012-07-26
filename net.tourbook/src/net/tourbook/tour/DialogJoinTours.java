@@ -552,7 +552,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
 	/**
 	 * tour type & tags
-	 *
+	 * 
 	 * @param defaultSelectionAdapter
 	 */
 	private void createUI30TypeTags(final Composite parent) {
@@ -1005,14 +1005,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 			/*
 			 * set tour time
 			 */
-			final DateTime tourStartTime = new DateTime(
-					tourTourData.getStartYear(),
-					tourTourData.getStartMonth(),
-					tourTourData.getStartDay(),
-					tourTourData.getStartHour(),
-					tourTourData.getStartMinute(),
-					tourTourData.getStartSecond(),
-					0);
+			final DateTime tourStartTime = tourTourData.getStartDateTime();
 
 			if (isFirstTour) {
 
@@ -1306,14 +1299,13 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 		/*
 		 * setup tour data
 		 */
-		_joinedTourData.setStartHour((short) joinedTourStart.getHourOfDay());
-		_joinedTourData.setStartMinute((short) joinedTourStart.getMinuteOfHour());
-		_joinedTourData.setStartSecond((short) joinedTourStart.getSecondOfMinute());
-		_joinedTourData.setStartYear((short) joinedTourStart.getYear());
-		_joinedTourData.setStartMonth((short) joinedTourStart.getMonthOfYear());
-		_joinedTourData.setStartDay((short) joinedTourStart.getDayOfMonth());
-
-		_joinedTourData.setWeek(joinedTourStart);
+		_joinedTourData.setStartDateTime(
+				joinedTourStart.getYear(),
+				joinedTourStart.getMonthOfYear(),
+				joinedTourStart.getDayOfMonth(),
+				joinedTourStart.getHourOfDay(),
+				joinedTourStart.getMinuteOfHour(),
+				joinedTourStart.getSecondOfMinute());
 
 		// tour id must be created after the tour date/time is set
 		_joinedTourData.createTourId();
@@ -1489,8 +1481,17 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
 		// date/time
 		final TourData firstTour = _selectedTours.get(0);
-		_dtTourDate.setDate(firstTour.getStartYear(), firstTour.getStartMonth() - 1, firstTour.getStartDay());
-		_dtTourTime.setTime(firstTour.getStartHour(), firstTour.getStartMinute(), firstTour.getStartSecond());
+		final DateTime firstTourStart = firstTour.getStartDateTime();
+
+		_dtTourDate.setDate(
+				firstTourStart.getYear(),
+				firstTourStart.getMonthOfYear() - 1,
+				firstTourStart.getDayOfMonth());
+
+		_dtTourTime.setTime(
+				firstTourStart.getHourOfDay(),
+				firstTourStart.getMinuteOfHour(),
+				firstTourStart.getSecondOfMinute());
 
 		/*
 		 * fill person combo and reselect previous person
@@ -1591,7 +1592,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
 	/**
 	 * updates marker which requires that the tour date/time control is set
-	 *
+	 * 
 	 * @param isRestoreState
 	 */
 	private void updateUIMarker(final boolean isRestoreState) {

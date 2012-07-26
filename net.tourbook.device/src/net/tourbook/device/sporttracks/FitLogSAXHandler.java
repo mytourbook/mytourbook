@@ -246,17 +246,8 @@ public class FitLogSAXHandler extends DefaultHandler {
 //			// this case can occure when a tour do not have a track
 //			tourDateTime = _currentActivity.tourStartTime;
 //		}
-		final DateTime tourStartTime = _currentActivity.tourStartTime;
 
-		tourData.setStartHour((short) tourStartTime.getHourOfDay());
-		tourData.setStartMinute((short) tourStartTime.getMinuteOfHour());
-		tourData.setStartSecond((short) tourStartTime.getSecondOfMinute());
-
-		tourData.setStartYear((short) tourStartTime.getYear());
-		tourData.setStartMonth((short) tourStartTime.getMonthOfYear());
-		tourData.setStartDay((short) tourStartTime.getDayOfMonth());
-
-		tourData.setWeek(tourStartTime);
+		tourData.setStartDateTime(_currentActivity.tourStartTime);
 
 		tourData.setTourTitle(_currentActivity.name);
 		tourData.setTourDescription(_currentActivity.notes);
