@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.photo.internal.manager;
 
+import net.tourbook.photo.PhotoImageMetadata;
+
 import org.eclipse.swt.graphics.Image;
 
 /**

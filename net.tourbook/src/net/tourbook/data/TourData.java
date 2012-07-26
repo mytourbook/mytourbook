@@ -772,6 +772,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	/*
 	 * GPS data
 	 */
+	/**
+	 * Contains tour latitude data or <code>null</code> when GPS data are not available.
+	 */
 	@Transient
 	public double[]											latitudeSerie;
 
@@ -5962,6 +5965,5 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			tourMarker.updateDatabase_019_to_020();
 		}
 	}
-
 
 }

@@ -771,11 +771,23 @@ public class Messages extends NLS {
 
 	public static String		NT001_DialogExtractTour_InvalidTourData;
 
+	public static String	Photos_AndTours_Label_AdjustTime;
+
+	public static String	Photos_AndTours_Label_AdjustTimeTooltip;
+
+	public static String	Photos_AndTours_Label_NoCamera;
+
 	public static String	Photos_AndTours_Label_NoSelectedPhoto;
 
 	public static String	Photos_AndTours_Label_NoTourIsAvailable;
 
 	public static String	Photos_AndTours_Link_PhotoDirectory;
+
+	public static String	Photos_AndTours_Spinner_AdjustHours_Tooltip;
+
+	public static String	Photos_AndTours_Spinner_AdjustMinutes_Tooltip;
+
+	public static String	Photos_AndTours_Spinner_AdjustSeconds_Tooltip;
 
 	public static String		Pref_App_Label_TourEditorIsModified;
 
@@ -1465,6 +1477,12 @@ public class Messages extends NLS {
 	public static String		UI_Label_no_chart_is_selected;
 	public static String		UI_Label_PersonIsRequired;
 	public static String		UI_Label_TourIsNotSelected;
+
+	public static String	Unit_Label_Hour;
+
+	public static String	Unit_Label_Minute;
+
+	public static String	Unit_Label_Second;
 
 	public static String		ui_tour_not_defined;
 

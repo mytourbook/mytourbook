@@ -23,7 +23,6 @@ import java.util.concurrent.Executors;
 
 import net.tourbook.photo.internal.Activator;
 import net.tourbook.photo.internal.manager.ImageCacheWrapper;
-import net.tourbook.photo.internal.manager.PhotoImageMetadata;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.graphics.Image;

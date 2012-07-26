@@ -31,6 +31,7 @@ import net.tourbook.photo.ILoadCallBack;
 import net.tourbook.photo.ImageQuality;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoImageCache;
+import net.tourbook.photo.PhotoImageMetadata;
 import net.tourbook.photo.PhotoLoadManager;
 import net.tourbook.photo.PhotoLoadingState;
 import net.tourbook.photo.PhotoWrapper;

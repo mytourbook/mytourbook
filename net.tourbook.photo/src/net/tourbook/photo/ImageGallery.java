@@ -47,7 +47,6 @@ import net.tourbook.photo.internal.gallery.MT20.IGalleryCustomData;
 import net.tourbook.photo.internal.gallery.MT20.IItemHovereredListener;
 import net.tourbook.photo.internal.manager.GallerySorting;
 import net.tourbook.photo.internal.manager.ImageUtils;
-import net.tourbook.photo.internal.manager.PhotoImageMetadata;
 import net.tourbook.photo.internal.manager.ThumbnailStore;
 import net.tourbook.photo.internal.ui.PhotoUI;
 

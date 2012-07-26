@@ -904,6 +904,12 @@ public class TourChart extends Chart {
 			return;
 		}
 
+		final int[] timeSerie = _tourData.timeSerie;
+		if (timeSerie == null) {
+			// this is a manually created tour
+			return;
+		}
+
 		/*
 		 * at least 1 photo is available
 		 */
@@ -913,7 +919,6 @@ public class TourChart extends Chart {
 		_layerPhoto = new ChartLayerPhoto(chartPhotos);
 
 		final long tourStart = _tourData.getStartDateTime().getMillis() / 1000;
-		final int[] timeSerie = _tourData.timeSerie;
 		final int numberOfTimeSlices = timeSerie.length;
 
 		/*
@@ -946,7 +951,16 @@ public class TourChart extends Chart {
 			// check if a photo is in the current time slice
 			while (true) {
 
-				final long photoTime = photoWrapper.imageSortingTime / 1000;
+				final long imageAdjustedTime = photoWrapper.adjustedTime;
+				long imageTime = 0;
+
+				if (imageAdjustedTime != Long.MIN_VALUE) {
+					imageTime = imageAdjustedTime;
+				} else {
+					imageTime = photoWrapper.imageSortingTime;
+				}
+
+				final long photoTime = imageTime / 1000;
 
 				if (photoTime <= timeSliceEnd) {
 

@@ -404,7 +404,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 			final SelectionTourIds selectionTourId = (SelectionTourIds) selection;
 			final ArrayList<Long> tourIds = selectionTourId.getTourIds();
 			if (tourIds != null && tourIds.size() > 0) {
-				updateChart(tourIds.get(0));
+				updateChart(tourIds.get(0), false);
 			}
 
 		} else if (selection instanceof SelectionTourId) {
@@ -416,7 +416,8 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 				_mergeTour = ((TourPhotoSelection) selection).mergeTour;
 			}
 
-			updateChart(tourId);
+			// force update when photo selection occured
+			updateChart(tourId, _mergeTour != null);
 
 		} else if (selection instanceof SelectionChartInfo) {
 
@@ -476,7 +477,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 			final Object firstElement = ((StructuredSelection) selection).getFirstElement();
 			if (firstElement instanceof TVICatalogComparedTour) {
 
-				updateChart(((TVICatalogComparedTour) firstElement).getTourId());
+				updateChart(((TVICatalogComparedTour) firstElement).getTourId(), false);
 
 			} else if (firstElement instanceof TVICompareResultComparedTour) {
 
@@ -492,7 +493,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 			final TVICatalogRefTourItem refItem = tourCatalogSelection.getRefItem();
 			if (refItem != null) {
-				updateChart(refItem.getTourId());
+				updateChart(refItem.getTourId(), false);
 			}
 
 		} else if (selection instanceof SelectionDeletedTours) {
@@ -575,9 +576,9 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 		setTitleToolTip(TourManager.getTourDateShort(_tourData));
 	}
 
-	private void updateChart(final long tourId) {
+	private void updateChart(final long tourId, final boolean isForceUpdate) {
 
-		if (_tourData != null && _tourData.getTourId() == tourId) {
+		if (_tourData != null && isForceUpdate == false && _tourData.getTourId() == tourId) {
 			// optimize
 			return;
 		}

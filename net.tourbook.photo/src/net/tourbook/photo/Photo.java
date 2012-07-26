@@ -26,7 +26,6 @@ import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.photo.internal.gallery.MT20.RendererHelper;
-import net.tourbook.photo.internal.manager.PhotoImageMetadata;
 
 import org.apache.commons.imaging.Imaging;
 import org.apache.commons.imaging.ImagingConstants;
@@ -61,6 +60,8 @@ public class Photo {
 	 */
 	private DateTime						_imageFileDateTime;
 	private DateTime						_exifDateTime;
+
+//	private long							_adjustedTime;
 
 	/**
 	 * <pre>
@@ -323,6 +324,10 @@ public class Photo {
 		return true;
 	}
 
+//	public long getAdjustedTime() {
+//		return _adjustedTime;
+//	}
+
 	public double getAltitude() {
 		return _altitude;
 	}
@@ -480,20 +485,6 @@ public class Photo {
 		return defaultValue;
 	}
 
-	private String getExifValueString(final JpegImageMetadata jpegMetadata, final TagInfo tagInfo) {
-
-		try {
-			final TiffField field = jpegMetadata.findEXIFValueWithExactMatch(tagInfo);
-			if (field != null) {
-				return field.getStringValue();
-			}
-		} catch (final Exception e) {
-			// ignore
-		}
-
-		return null;
-	}
-
 //	/**
 //	 * @return Returns geo position or <code>null</code> when latitude/longitude is not available
 //	 */
@@ -510,6 +501,20 @@ public class Photo {
 //
 //		return _geoPosition;
 //	}
+
+	private String getExifValueString(final JpegImageMetadata jpegMetadata, final TagInfo tagInfo) {
+
+		try {
+			final TiffField field = jpegMetadata.findEXIFValueWithExactMatch(tagInfo);
+			if (field != null) {
+				return field.getStringValue();
+			}
+		} catch (final Exception e) {
+			// ignore
+		}
+
+		return null;
+	}
 
 	public String getGpsAreaInfo() {
 		return _gpsAreaInfo;
@@ -630,7 +635,7 @@ public class Photo {
 	}
 
 	/**
-	 * @return Returns image meta data or <code>null</code> when not loaded
+	 * @return Returns image meta data or <code>null</code> when not loaded or not available.
 	 */
 	public PhotoImageMetadata getImageMetaDataRaw() {
 		return _photoImageMetadata;
@@ -808,6 +813,16 @@ public class Photo {
 		return _isLoadingError;
 	}
 
+	/**
+	 * Set time when photo was taken + time adjustments, e.g. wrong time zone, wrong time is set in
+	 * the camera.
+	 * 
+	 * @param adjustedTime
+	 */
+//	public void setAdjustedTime(final long adjustedTime) {
+//		_adjustedTime = adjustedTime;
+//	}
+
 	public void setAltitude(final double altitude) {
 		_altitude = altitude;
 	}
@@ -941,5 +956,6 @@ public class Photo {
 			_photoWrapper.imageSortingTime = _exifDateTime.getMillis();
 		}
 	}
+
 
 }

@@ -23,6 +23,7 @@ import net.tourbook.photo.ImageGallery;
 import net.tourbook.photo.ImageQuality;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoImageCache;
+import net.tourbook.photo.PhotoImageMetadata;
 import net.tourbook.photo.PhotoLoadManager;
 import net.tourbook.photo.PhotoLoadingState;
 import net.tourbook.photo.PhotoWrapper;
@@ -33,7 +34,6 @@ import net.tourbook.photo.internal.gallery.MT20.GalleryMT20Item;
 import net.tourbook.photo.internal.gallery.MT20.PaintingResult;
 import net.tourbook.photo.internal.gallery.MT20.RendererHelper;
 import net.tourbook.photo.internal.gallery.MT20.ZoomState;
-import net.tourbook.photo.internal.manager.PhotoImageMetadata;
 
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;

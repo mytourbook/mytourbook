@@ -38,11 +38,15 @@ public class PhotoWrapper implements IGalleryCustomData {
 	 * Last modified in GMT
 	 */
 	public long		imageFileLastModified;
-
 	/**
 	 * Time in ms
 	 */
 	public long		imageSortingTime;
+
+	/**
+	 * Time in ms when not {@link Long#MIN_VALUE}
+	 */
+	public long		adjustedTime	= Long.MIN_VALUE;
 
 	public long		imageFileSize;
 
@@ -57,7 +61,7 @@ public class PhotoWrapper implements IGalleryCustomData {
 	 *  1 photo contains GPS data
 	 * </pre>
 	 */
-	public int		gpsState	= -1;
+	public int		gpsState		= -1;
 
 	public PhotoWrapper(final File file) {
 

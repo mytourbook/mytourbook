@@ -16,6 +16,7 @@
 package net.tourbook.photo;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.joda.time.DateTime;
 import org.joda.time.Period;
@@ -53,6 +54,9 @@ public class MergeTour {
 	int								numberOfGPSPhotos;
 	int								numberOfNoGPSPhotos;
 
+	HashMap<String, Camera>			cameras				= new HashMap<String, Camera>();
+	Camera[]						cameraList;
+
 	/**
 	 * Contains all photos for this tour.
 	 */
@@ -70,6 +74,32 @@ public class MergeTour {
 	 */
 	MergeTour(final Object notUsed) {
 		isDummyTour = true;
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof MergeTour)) {
+			return false;
+		}
+		final MergeTour other = (MergeTour) obj;
+		if (tourId != other.tourId) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (tourId ^ (tourId >>> 32));
+		return result;
 	}
 
 	void setTourEndTime(long time) {

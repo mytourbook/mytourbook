@@ -18,9 +18,9 @@ package net.tourbook.photo.internal;
 import net.tourbook.photo.ILoadCallBack;
 import net.tourbook.photo.ImageGallery;
 import net.tourbook.photo.Photo;
+import net.tourbook.photo.PhotoImageMetadata;
 import net.tourbook.photo.internal.gallery.MT20.FullSizeViewer;
 import net.tourbook.photo.internal.gallery.MT20.GalleryMT20Item;
-import net.tourbook.photo.internal.manager.PhotoImageMetadata;
 
 import org.eclipse.swt.widgets.Display;
 

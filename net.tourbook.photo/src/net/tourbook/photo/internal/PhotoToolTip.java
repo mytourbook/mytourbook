@@ -23,12 +23,12 @@ import net.tourbook.common.util.ToolTip;
 import net.tourbook.photo.ImageQuality;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoImageCache;
+import net.tourbook.photo.PhotoImageMetadata;
 import net.tourbook.photo.PhotoLoadManager;
 import net.tourbook.photo.PhotoWrapper;
 import net.tourbook.photo.internal.gallery.MT20.GalleryMT20;
 import net.tourbook.photo.internal.gallery.MT20.GalleryMT20Item;
 import net.tourbook.photo.internal.gallery.MT20.RendererHelper;
-import net.tourbook.photo.internal.manager.PhotoImageMetadata;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
