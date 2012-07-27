@@ -1019,7 +1019,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 				final TourData tourData = (TourData) cell.getElement();
 
-				cell.setText(_dateFormatter.format(tourData.getTourStartTime()));
+				cell.setText(_dateFormatter.format(tourData.getTourStartTimeMS()));
 			}
 		});
 
@@ -1259,7 +1259,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 				final TourData tourData = (TourData) cell.getElement();
 
-				cell.setText(_timeFormatter.format(tourData.getTourStartTime()));
+				cell.setText(_timeFormatter.format(tourData.getTourStartTimeMS()));
 			}
 		});
 

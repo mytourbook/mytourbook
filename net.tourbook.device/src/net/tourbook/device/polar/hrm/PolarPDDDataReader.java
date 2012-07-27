@@ -111,7 +111,7 @@ public class PolarPDDDataReader extends TourbookDevice {
 		/*
 		 * set tour start date/time
 		 */
-		exerciseData.setStartDateTime(_currentExercise.startTime);
+		exerciseData.setTourStartTime(_currentExercise.startTime);
 
 		exerciseData.importRawDataFile = _importFilePath;
 		exerciseData.setTourImportFilePath(_importFilePath);

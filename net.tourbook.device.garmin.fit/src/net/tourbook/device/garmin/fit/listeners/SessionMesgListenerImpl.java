@@ -31,17 +31,9 @@ public class SessionMesgListenerImpl extends AbstractMesgListener implements Ses
 			throw new FitActivityReaderException("Missing session start date"); //$NON-NLS-1$
 		}
 
-		final org.joda.time.DateTime tourDataStartTime = new org.joda.time.DateTime(startTime.getDate());
-
 		final TourData tourData = getTourData();
 
-		tourData.setStartDateTime(
-				tourDataStartTime.getYear(),
-				tourDataStartTime.getMonthOfYear(),
-				tourDataStartTime.getDayOfMonth(),
-				tourDataStartTime.getHourOfDay(),
-				tourDataStartTime.getMinuteOfHour(),
-				tourDataStartTime.getSecondOfMinute());
+		tourData.setTourStartTime(new org.joda.time.DateTime(startTime.getDate()));
 
 		final Sport sport = mesg.getSport();
 		if (sport != null) {

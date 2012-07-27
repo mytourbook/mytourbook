@@ -59,10 +59,10 @@ public class DeviceImportSorter extends ViewerSorter {
 		case RawDataView.COLUMN_FILE_NAME:
 
 			// sort by file name
-			if (tourData1.importRawDataFile == null||tourData2.importRawDataFile==null) {
+			if (tourData1.importRawDataFile == null || tourData2.importRawDataFile == null) {
 				break;
 			}
-			
+
 			result = tourData1.importRawDataFile.compareTo(tourData2.importRawDataFile);
 
 			if (result == 0) {
@@ -91,18 +91,10 @@ public class DeviceImportSorter extends ViewerSorter {
 
 	private int compareDateTime(final TourData tourData1, final TourData tourData2) {
 
-		int result;
+		final long start1 = tourData1.getTourStartTimeMS();
+		final long start2 = tourData2.getTourStartTimeMS();
 
-		// sort on date
-		result = (tourData1.getStartYear() * 10000 + tourData1.getStartMonth() * 100 + tourData1.getStartDay())
-				- (tourData2.getStartYear() * 10000 + tourData2.getStartMonth() * 100 + tourData2.getStartDay());
-
-		// sort on time if date is the same
-		if (result == 0) {
-			result = (tourData1.getStartHour() * 100 + tourData1.getStartMinute())
-					- (tourData2.getStartHour() * 100 + tourData2.getStartMinute());
-		}
-		return result;
+		return start1 > start2 ? 1 : -1;
 	}
 
 	/**

@@ -213,7 +213,7 @@ public class CRPDataReader extends TourbookDevice {
 			 */
 			final TourData tourData = new TourData();
 
-			tourData.setStartDateTime(tourYear, tourMonth, tourDay, tourHour, tourMin, 0);
+			tourData.setTourStartTime(tourYear, tourMonth, tourDay, tourHour, tourMin, 0);
 
 			tourData.setTourTitle(tourName);
 			tourData.setTourDescription(tourDesc);

@@ -298,7 +298,7 @@ public class CSVTourDataReader extends TourbookDevice {
 
 					parseDate(dateTime, allToken[0]);//							1 Date (yyyy-mm-dd);
 					parseTime(dateTime, allToken[1]);//							2 Time (hh-mm);
-					tourData.setStartDateTime(
+					tourData.setTourStartTime(
 							dateTime.year,
 							dateTime.month,
 							dateTime.day,

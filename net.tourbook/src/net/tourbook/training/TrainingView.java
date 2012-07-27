@@ -1177,7 +1177,7 @@ public class TrainingView extends ViewPart {
 				_currentPerson.getHrMaxFormula(),
 				_currentPerson.getMaxPulse(),
 				_currentPerson.getBirthDayWithDefault(),
-				_tourData.getStartDateTime());
+				_tourData.getTourStartTime());
 
 		updateUI40HrZoneChart(zoneMinMaxBpm);
 		updateUI42HrZoneData(zoneMinMaxBpm);

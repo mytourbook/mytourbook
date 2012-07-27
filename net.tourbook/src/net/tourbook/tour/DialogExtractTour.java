@@ -954,13 +954,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 		/*
 		 * set target tour data
 		 */
-		_tourDataTarget.setStartDateTime(
-				extractedTourStart.getYear(),
-				extractedTourStart.getMonthOfYear(),
-				extractedTourStart.getDayOfMonth(),
-				extractedTourStart.getHourOfDay(),
-				extractedTourStart.getMinuteOfHour(),
-				extractedTourStart.getSecondOfMinute());
+		_tourDataTarget.setTourStartTime(extractedTourStart);
 
 		// tour id must be created after the tour date/time is set
 		_tourDataTarget.createTourId();
@@ -1251,7 +1245,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 		 * update UI from selected tours
 		 */
 
-		final DateTime tourStartTime = _tourDataSource.getStartDateTime();
+		final DateTime tourStartTime = _tourDataSource.getTourStartTime();
 
 		int relativeExtractedStartTime = 0;
 

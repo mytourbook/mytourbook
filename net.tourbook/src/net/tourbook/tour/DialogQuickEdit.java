@@ -162,14 +162,14 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
 		setTitle(Messages.dialog_quick_edit_dialog_area_title);
 
-		final DateTime tourStart = _tourData.getStartDateTime();
+		final DateTime tourStart = _tourData.getTourStartTime();
 
 		_calendar.set(//
 				tourStart.getYear(),
 				tourStart.getMonthOfYear() - 1,
 				tourStart.getDayOfMonth(),
 				tourStart.getHourOfDay(),
-				tourStart.getMinuteOfDay());
+				tourStart.getMinuteOfHour());
 
 		setMessage(_dateFormatter.format(_calendar.getTime()) + "  " + _timeFormatter.format(_calendar.getTime())); //$NON-NLS-1$
 	}

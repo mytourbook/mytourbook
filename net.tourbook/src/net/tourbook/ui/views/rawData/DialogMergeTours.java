@@ -221,8 +221,8 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 		 * synchronize start time
 		 */
 
-		final long sourceStartTime = _sourceTour.getTourStartTime();
-		final long targetStartTime = _targetTour.getTourStartTime();
+		final long sourceStartTime = _sourceTour.getTourStartTimeMS();
+		final long targetStartTime = _targetTour.getTourStartTimeMS();
 
 		_tourStartTimeSynchOffset = (int) ((sourceStartTime - targetStartTime) / 1000);
 

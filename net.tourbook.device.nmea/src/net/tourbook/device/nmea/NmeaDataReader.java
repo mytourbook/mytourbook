@@ -264,7 +264,7 @@ public class NmeaDataReader extends TourbookDevice {
 		 */
 		_calendar.setTimeInMillis(_timeDataList.get(0).absoluteTime);
 
-		tourData.setStartDateTime(
+		tourData.setTourStartTime(
 				_calendar.get(Calendar.YEAR),
 				_calendar.get(Calendar.MONTH) + 1,
 				_calendar.get(Calendar.DAY_OF_MONTH),

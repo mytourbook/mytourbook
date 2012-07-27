@@ -179,8 +179,8 @@ public class TourCompareManager {
 		comparedTour.setTourId(tourData.getTourId());
 		comparedTour.setRefTourId(comparedTourItem.refTour.getRefId());
 
-		comparedTour.setTourDate(tourData.getTourStartTime());
-		comparedTour.setStartYear(tourData.getStartDateTime().getYear());
+		comparedTour.setTourDate(tourData.getTourStartTimeMS());
+		comparedTour.setStartYear(tourData.getTourStartTime().getYear());
 
 		final float speed = TourManager.computeTourSpeed(
 				tourData,

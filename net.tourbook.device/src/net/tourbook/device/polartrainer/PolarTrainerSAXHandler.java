@@ -380,7 +380,7 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
 		/*
 		 * set tour start date/time
 		 */
-		tourData.setStartDateTime(_currentExercise.tourStart);
+		tourData.setTourStartTime(_currentExercise.tourStart);
 
 		tourData.setDeviceTimeInterval(_currentExercise.timeInterval);
 

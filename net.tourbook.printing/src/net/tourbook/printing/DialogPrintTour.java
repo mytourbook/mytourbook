@@ -798,7 +798,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 
 			// display the start date/time
 
-			final DateTime dtTour = minTourData.getStartDateTime();
+			final DateTime dtTour = minTourData.getTourStartTime();
 
 			final int startTime = minTourData.timeSerie[_tourStartIndex];
 			final DateTime tourTime = dtTour.plusSeconds(startTime);

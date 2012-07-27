@@ -1005,7 +1005,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 			/*
 			 * set tour time
 			 */
-			final DateTime tourStartTime = tourTourData.getStartDateTime();
+			final DateTime tourStartTime = tourTourData.getTourStartTime();
 
 			if (isFirstTour) {
 
@@ -1299,13 +1299,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 		/*
 		 * setup tour data
 		 */
-		_joinedTourData.setStartDateTime(
-				joinedTourStart.getYear(),
-				joinedTourStart.getMonthOfYear(),
-				joinedTourStart.getDayOfMonth(),
-				joinedTourStart.getHourOfDay(),
-				joinedTourStart.getMinuteOfHour(),
-				joinedTourStart.getSecondOfMinute());
+		_joinedTourData.setTourStartTime(joinedTourStart);
 
 		// tour id must be created after the tour date/time is set
 		_joinedTourData.createTourId();
@@ -1481,7 +1475,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
 		// date/time
 		final TourData firstTour = _selectedTours.get(0);
-		final DateTime firstTourStart = firstTour.getStartDateTime();
+		final DateTime firstTourStart = firstTour.getTourStartTime();
 
 		_dtTourDate.setDate(
 				firstTourStart.getYear(),

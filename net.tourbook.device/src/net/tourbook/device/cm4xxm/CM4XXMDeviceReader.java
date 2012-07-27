@@ -284,7 +284,7 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 				}
 				lastTourMonth = startBlock.month;
 
-				tourData.setStartDateTime(
+				tourData.setTourStartTime(
 						tourYear,
 						startBlock.month,
 						startBlock.day,

@@ -63,7 +63,7 @@ public class PrintTourPDF extends PrintTourExtension {
 	 */
 	private String formatStartDate(final TourData _tourData) {
 
-		final DateTime dtTourStart = _tourData.getStartDateTime();
+		final DateTime dtTourStart = _tourData.getTourStartTime();
 		final DateTime dtTourEnd = dtTourStart.plusSeconds(_tourData.getTourRecordingTime());
 
 		return String.format(

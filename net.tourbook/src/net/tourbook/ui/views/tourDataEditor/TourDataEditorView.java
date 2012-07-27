@@ -1237,7 +1237,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		/*
 		 * set tour start date/time
 		 */
-		tourData.setStartDateTime(new org.joda.time.DateTime());
+		tourData.setTourStartTime(new org.joda.time.DateTime());
 
 		// tour id must be created after the tour date/time is set
 		tourData.createTourId();
@@ -5011,7 +5011,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_latitudeEditingSupport.setDataSerie(_serieLatitude);
 		_longitudeEditingSupport.setDataSerie(_serieLongitude);
 
-		final org.joda.time.DateTime start = _tourData.getStartDateTime();
+		final org.joda.time.DateTime start = _tourData.getTourStartTime();
 
 		_tourStartDayTime = (start.getHourOfDay() * 3600) //
 				+ (start.getMinuteOfHour() * 60)
@@ -6524,7 +6524,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				_tourData.setAvgTemperature(temperature);
 			}
 
-			_tourData.setStartDateTime(
+			_tourData.setTourStartTime(
 					_dtTourDate.getYear(),
 					_dtTourDate.getMonth() + 1,
 					_dtTourDate.getDay(),
@@ -6888,7 +6888,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_spinTemperature.setSelection(Math.round(avgTemperature * 10));
 
 		// set start date/time
-		final org.joda.time.DateTime start = _tourData.getStartDateTime();
+		final org.joda.time.DateTime start = _tourData.getTourStartTime();
 		_dtTourDate.setDate(start.getYear(), start.getMonthOfYear() - 1, start.getDayOfMonth());
 		_dtStartTime.setTime(start.getHourOfDay(), start.getMinuteOfHour(), start.getSecondOfMinute());
 

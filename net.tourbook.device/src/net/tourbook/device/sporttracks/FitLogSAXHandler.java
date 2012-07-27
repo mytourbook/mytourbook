@@ -247,7 +247,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 //			tourDateTime = _currentActivity.tourStartTime;
 //		}
 
-		tourData.setStartDateTime(_currentActivity.tourStartTime);
+		tourData.setTourStartTime(_currentActivity.tourStartTime);
 
 		tourData.setTourTitle(_currentActivity.name);
 		tourData.setTourDescription(_currentActivity.notes);

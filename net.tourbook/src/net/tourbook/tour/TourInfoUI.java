@@ -853,7 +853,7 @@ public class TourInfoUI {
 		final int movingTime = _tourData.getTourDrivingTime();
 		final int breakTime = recordingTime - movingTime;
 
-		final DateTime dtTourStart = _tourData.getStartDateTime();
+		final DateTime dtTourStart = _tourData.getTourStartTime();
 
 		final DateTime dtTourEnd = new DateTime(dtTourStart).plusSeconds(recordingTime);
 		_lblDate.setText(String.format(//

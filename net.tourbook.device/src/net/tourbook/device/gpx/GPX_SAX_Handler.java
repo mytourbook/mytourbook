@@ -561,7 +561,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 			dtTourStart = new DateTime(firstTimeData.absoluteTime);
 		}
 
-		tourData.setStartDateTime(dtTourStart);
+		tourData.setTourStartTime(dtTourStart);
 
 		tourData.setDeviceTimeInterval((short) -1);
 

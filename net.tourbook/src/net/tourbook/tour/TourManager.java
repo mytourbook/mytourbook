@@ -480,7 +480,7 @@ public class TourManager {
 	}
 
 	public static String getTourDateFull(final TourData tourData) {
-		return UI.DateFormatterFull.format(tourData.getStartDateTime().getMillis());
+		return UI.DateFormatterFull.format(tourData.getTourStartTimeMS());
 	}
 
 	private static String getTourDateLong(final Date date) {
@@ -496,7 +496,7 @@ public class TourManager {
 			return UI.EMPTY_STRING;
 		}
 
-		return UI.DateFormatterShort.format(tourData.getStartDateTime().getMillis());
+		return UI.DateFormatterShort.format(tourData.getTourStartTimeMS());
 	}
 
 	/**
@@ -504,7 +504,7 @@ public class TourManager {
 	 */
 	public static DateTime getTourDateTime(final TourData tourData) {
 
-		return tourData.getStartDateTime();
+		return tourData.getTourStartTime();
 //
 //		return new DateTime(//
 //				tourData.getStartYear(),
@@ -527,7 +527,7 @@ public class TourManager {
 	}
 
 	public static String getTourDateTimeShort(final TourData tourData) {
-		return UI.DTFormatterShort.print(tourData.getStartDateTime());
+		return UI.DTFormatterShort.print(tourData.getTourStartTime());
 	}
 
 	private static String getTourTimeShort(final Date date) {
@@ -538,7 +538,7 @@ public class TourManager {
 	 * @return returns the date of this tour
 	 */
 	public static String getTourTimeShort(final TourData tourData) {
-		return UI.TimeFormatterShort.format(tourData.getStartDateTime().getMillis());
+		return UI.TimeFormatterShort.format(tourData.getTourStartTimeMS());
 	}
 
 	public static String getTourTitle(final Date date) {
@@ -1726,9 +1726,9 @@ public class TourManager {
 			final int startTime;
 			if (tourChartConfig.isShowStartTime) {
 
-				final DateTime start = tourData.getStartDateTime();
+				final DateTime start = tourData.getTourStartTime();
 
-				startTime = (start.getHourOfDay() * 3600) + (start.getMinuteOfHour() * 60);
+				startTime = (start.getHourOfDay() * 3600) + (start.getMinuteOfHour() * 60) + start.getSecondOfMinute();
 
 			} else {
 				startTime = 0;

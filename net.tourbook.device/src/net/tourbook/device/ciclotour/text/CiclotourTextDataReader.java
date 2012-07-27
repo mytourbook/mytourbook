@@ -142,7 +142,7 @@ public class CiclotourTextDataReader extends TourbookDevice {
 		// and we at least get the correct date. Time info is lost.
 		final Calendar cal = deriveDateFromFile(file);
 
-		tourData.setStartDateTime(
+		tourData.setTourStartTime(
 				cal.get(Calendar.YEAR),
 				cal.get(Calendar.MONTH) + 1,
 				cal.get(Calendar.DAY_OF_MONTH),

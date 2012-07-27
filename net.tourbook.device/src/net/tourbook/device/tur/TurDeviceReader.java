@@ -185,7 +185,7 @@ public class TurDeviceReader extends TourbookDevice {
 			final String tourDate = turDeviceData.tourStartDate;
 			final String tourTime = turDeviceData.tourStartTime;
 
-			tourData.setStartDateTime(
+			tourData.setTourStartTime(
 					Short.parseShort(tourDate.substring(6)),
 					Short.parseShort(tourDate.substring(3, 5)),
 					Short.parseShort(tourDate.substring(0, 2)),

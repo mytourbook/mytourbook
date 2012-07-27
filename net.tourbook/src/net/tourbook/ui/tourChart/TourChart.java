@@ -918,7 +918,7 @@ public class TourChart extends Chart {
 
 		_layerPhoto = new ChartLayerPhoto(chartPhotos);
 
-		final long tourStart = _tourData.getStartDateTime().getMillis() / 1000;
+		final long tourStart = _tourData.getTourStartTime().getMillis() / 1000;
 		final int numberOfTimeSlices = timeSerie.length;
 
 		/*

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,57 +16,46 @@
 
 package net.tourbook.ui.views.rawData;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-
 import net.tourbook.data.TourData;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.joda.time.DateTime;
 
 /**
  * Merge a tour into another tour
  */
 public class ActionMergeInto extends Action {
 
-	private TourData	fFromTourData;
-	private TourData	fIntoTourData;
+	private TourData	_fromTourData;
+	private TourData	_intoTourData;
 
-	private RawDataView	fRawDataView;
+	private RawDataView	_rawDataView;
 
 	public ActionMergeInto(final TourData mergeFromTour, final TourData mergeIntoTour, final RawDataView rawDataView) {
 
 		super(UI.EMPTY_STRING, AS_CHECK_BOX);
 
-		fFromTourData = mergeFromTour;
-		fIntoTourData = mergeIntoTour;
-		fRawDataView = rawDataView;
+		_fromTourData = mergeFromTour;
+		_intoTourData = mergeIntoTour;
+		_rawDataView = rawDataView;
 
 		/*
 		 * set menu text
 		 */
-		final Calendar calendar = GregorianCalendar.getInstance();
-		final DateTime tourStart = mergeIntoTour.getStartDateTime();
-		calendar.set(
-				tourStart.getYear(),
-				tourStart.getMonthOfYear() - 1,
-				tourStart.getDayOfMonth(),
-				tourStart.getHourOfDay(),
-				tourStart.getMinuteOfDay());
+		final long start = mergeIntoTour.getTourStartTimeMS();
 
 		final StringBuilder sb = new StringBuilder().append(UI.EMPTY_STRING)//
-				.append(UI.getFormatterDateShort().format(calendar.getTime()))
+				.append(UI.getFormatterDateShort().format(start))
 				.append(UI.DASH_WITH_DOUBLE_SPACE)
-				.append(UI.getFormatterTimeShort().format(calendar.getTime()))
+				.append(UI.getFormatterTimeShort().format(start))
 				.append(UI.DASH_WITH_DOUBLE_SPACE)
 				.append(mergeIntoTour.getDeviceName());
 
 		setText(sb.toString());
 
 		// show database icon
-		setImageDescriptor(ImageDescriptor.createFromImage(fRawDataView.getDbImage(fIntoTourData)));
+		setImageDescriptor(ImageDescriptor.createFromImage(_rawDataView.getDbImage(_intoTourData)));
 
 		// check menu item when the from tour is merge into the into tour
 		final Long mergeIntoTourId = mergeFromTour.getMergeTargetTourId();
@@ -77,7 +66,7 @@ public class ActionMergeInto extends Action {
 
 	@Override
 	public void run() {
-		fRawDataView.actionMergeTours(fFromTourData, fIntoTourData);
+		_rawDataView.actionMergeTours(_fromTourData, _intoTourData);
 	}
 
 }

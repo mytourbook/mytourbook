@@ -348,16 +348,16 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 					int tourMinute = 0;
 
 					if (fields[0].equals("Date")) {//"dd.MM.yyyy" //$NON-NLS-1$
-						tourYear = (Short.parseShort(fields[1].substring(6)));
-						tourMonth = (Short.parseShort(fields[1].substring(3, 5)));
 						tourDay = (Short.parseShort(fields[1].substring(0, 2)));
+						tourMonth = (Short.parseShort(fields[1].substring(3, 5)));
+						tourYear = (Short.parseShort(fields[1].substring(6)));
 					}
 					if (fields[0].equals("Time")) {//"hh:mm:ss.00" //$NON-NLS-1$
 						tourHour = (Short.parseShort(fields[1].substring(0, 2)));
 						tourMinute = (Short.parseShort(fields[1].substring(3, 5)));
 					}
 
-					tourData.setStartDateTime(tourYear, tourMonth, tourDay, tourHour, tourMinute, 0);
+					tourData.setTourStartTime(tourYear, tourMonth, tourDay, tourHour, tourMinute, 0);
 
 					if (fields[0].equals("Mode")) { //$NON-NLS-1$
 						modeId = Short.parseShort(fields[1]);

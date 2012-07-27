@@ -535,7 +535,7 @@ public class GarminSAXHandler extends DefaultHandler {
 		 * set tour start date/time
 		 */
 		adjustTourStart();
-		tourData.setStartDateTime(new DateTime(_dtList.get(0).absoluteTime));
+		tourData.setTourStartTime(new DateTime(_dtList.get(0).absoluteTime));
 
 		tourData.setIsDistanceFromSensor(_isDistanceFromSensor);
 		tourData.setDeviceTimeInterval((short) -1);

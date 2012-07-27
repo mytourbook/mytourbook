@@ -294,7 +294,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 				}
 				lastTourMonth = startBlock.month;
 
-				tourData.setStartDateTime(
+				tourData.setTourStartTime(
 						tourYear,
 						startBlock.month,
 						startBlock.day,

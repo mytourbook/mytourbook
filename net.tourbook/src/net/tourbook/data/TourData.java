@@ -165,11 +165,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	/**
 	 * Tour start time in ms
+	 * 
+	 * @since DB version 22
 	 */
 	private long											tourStartTime;
 
 	/**
 	 * Tour end time in ms, this value should be {@link #tourStartTime} + {@link #tourEndTime}
+	 * 
+	 * @since DB version 22
 	 */
 	private long											tourEndTime;
 
@@ -1178,10 +1182,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		_tourWorldPosition.clear();
 	}
 
-	/*
-	 * Set default sort method (non-Javadoc)
-	 * @see java.lang.Comparable#compareTo(java.lang.Object)
-	 */
 	@Override
 	public int compareTo(final Object obj) {
 
@@ -1189,19 +1189,23 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 			final TourData otherTourData = (TourData) obj;
 
-			return startYear < otherTourData.startYear ? -1 : startYear == otherTourData.startYear
-					? startMonth < otherTourData.startMonth ? -1 : startMonth == otherTourData.startMonth
-							? startDay < otherTourData.startDay ? -1 : startDay == otherTourData.startDay
-									? startHour < otherTourData.startHour ? -1 : startHour == otherTourData.startHour
-											? startMinute < otherTourData.startMinute
-													? -1
-													: startSecond == otherTourData.startSecond //
-															? 0
-															: 1 //
-											: 1 //
-									: 1 //
-							: 1 //
-					: 1;
+			final long tourStartTime2 = otherTourData.tourStartTime;
+
+			return tourStartTime > tourStartTime2 ? 1 : tourStartTime < tourStartTime2 ? -1 : 0;
+
+//			return startYear < otherTourData.startYear ? -1 : startYear == otherTourData.startYear
+//					? startMonth < otherTourData.startMonth ? -1 : startMonth == otherTourData.startMonth
+//							? startDay < otherTourData.startDay ? -1 : startDay == otherTourData.startDay
+//									? startHour < otherTourData.startHour ? -1 : startHour == otherTourData.startHour
+//											? startMinute < otherTourData.startMinute
+//													? -1
+//													: startSecond == otherTourData.startSecond //
+//															? 0
+//															: 1 //
+//											: 1 //
+//									: 1 //
+//							: 1 //
+//					: 1;
 		}
 
 		return 0;
@@ -2011,7 +2015,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 				tourPerson.getHrMaxFormula(),
 				tourPerson.getMaxPulse(),
 				tourPerson.getBirthDayWithDefault(),
-				getStartDateTime());
+				getTourStartTime());
 
 		if (_hrZoneContext == null) {
 			// hr zones are not defined
@@ -3173,7 +3177,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 		tourDistance = isDistance ? distanceSerie[serieSize - 1] : 0;
 		tourRecordingTime = (int) recordingTime;
-		setTourEndTime();
+		setTourEndTimeMS();
 
 		/*
 		 * create marker after all other data are setup
@@ -4499,18 +4503,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return startAltitude;
 	}
 
-	/**
-	 * @return Returns date/time for the tour start
-	 */
-	public DateTime getStartDateTime() {
-
-		if (_dateTimeStart == null) {
-			_dateTimeStart = new DateTime(startYear, startMonth, startDay, startHour, startMinute, startSecond, 0);
-		}
-
-		return _dateTimeStart;
-	}
-
 	public float getStartDistance() {
 		return startDistance;
 	}
@@ -4640,7 +4632,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * @return Returns tour end time in ms, this value should be {@link #tourStartTime} +
 	 *         {@link #tourRecordingTime}
 	 */
-	public long getTourEndTime() {
+	public long getTourEndTimeMS() {
 		return tourEndTime;
 	}
 
@@ -4729,9 +4721,21 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	}
 
 	/**
-	 * @return Returns tour start time in ms
+	 * @return Returns date/time for the tour start
 	 */
-	public long getTourStartTime() {
+	public DateTime getTourStartTime() {
+
+		if (_dateTimeStart == null) {
+			_dateTimeStart = new DateTime(tourStartTime);
+		}
+
+		return _dateTimeStart;
+	}
+
+	/**
+	 * @return Returns tour start time in milliseconds since 1970-01-01T00:00:00Z
+	 */
+	public long getTourStartTimeMS() {
 		return tourStartTime;
 	}
 
@@ -5346,66 +5350,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		this.startAltitude = startAltitude;
 	}
 
-	public void setStartDateTime(final DateTime start) {
-
-		_dateTimeStart = start;
-		tourStartTime = _dateTimeStart.getMillis();
-
-		startYear = (short) start.getYear();
-		startMonth = (short) start.getMonthOfYear();
-		startDay = (short) start.getDayOfMonth();
-		startHour = (short) start.getHourOfDay();
-		startMinute = (short) start.getMinuteOfHour();
-		startSecond = start.getSecondOfMinute();
-
-		setWeek(_dateTimeStart);
-	}
-
-	/**
-	 * Set tour start date/time and week.
-	 * 
-	 * @param tourStartYear
-	 * @param tourStartMonth
-	 *            1...12
-	 * @param tourStartDay
-	 * @param tourStartHour
-	 * @param tourStartMinute
-	 * @param tourStartSecond
-	 */
-	public void setStartDateTime(	final int tourStartYear,
-									final int tourStartMonth,
-									final int tourStartDay,
-									final int tourStartHour,
-									final int tourStartMinute,
-									final int tourStartSecond) {
-
-		_dateTimeStart = new DateTime(
-				tourStartYear,
-				tourStartMonth,
-				tourStartDay,
-				tourStartHour,
-				tourStartMinute,
-				tourStartSecond,
-				0);
-		tourStartTime = _dateTimeStart.getMillis();
-
-		if (tourStartMonth < 1 || tourStartMonth > 12) {
-			StatusUtil.log(new Exception("Month is invalid: " + tourStartMonth)); //$NON-NLS-1$
-			startMonth = 1;
-		} else {
-			startMonth = (short) tourStartMonth;
-		}
-
-		startYear = (short) tourStartYear;
-//		startMonth = tourStartMonth;
-		startDay = (short) tourStartDay;
-		startHour = (short) tourStartHour;
-		startMinute = (short) tourStartMinute;
-		startSecond = tourStartSecond;
-
-		setWeek(_dateTimeStart);
-	}
-
 	/**
 	 * Odometer value, this is the distance which the device is accumulating
 	 * 
@@ -5464,8 +5408,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		this.tourEndPlace = tourEndPlace;
 	}
 
-	private void setTourEndTime() {
-		tourEndTime = tourStartTime + tourRecordingTime;
+	private void setTourEndTimeMS() {
+		tourEndTime = tourStartTime + (tourRecordingTime * 1000);
 	}
 
 	/**
@@ -5507,7 +5451,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 		this.tourRecordingTime = tourRecordingTime;
 
-		setTourEndTime();
+		setTourEndTimeMS();
 	}
 
 	/**
@@ -5516,6 +5460,66 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	public void setTourStartPlace(final String tourStartPlace) {
 		this.tourStartPlace = tourStartPlace;
+	}
+
+	public void setTourStartTime(final DateTime start) {
+
+		_dateTimeStart = start;
+		tourStartTime = _dateTimeStart.getMillis();
+
+		startYear = (short) start.getYear();
+		startMonth = (short) start.getMonthOfYear();
+		startDay = (short) start.getDayOfMonth();
+		startHour = (short) start.getHourOfDay();
+		startMinute = (short) start.getMinuteOfHour();
+		startSecond = start.getSecondOfMinute();
+
+		setWeek(_dateTimeStart);
+	}
+
+	/**
+	 * Set tour start date/time and week.
+	 * 
+	 * @param tourStartYear
+	 * @param tourStartMonth
+	 *            1...12
+	 * @param tourStartDay
+	 * @param tourStartHour
+	 * @param tourStartMinute
+	 * @param tourStartSecond
+	 */
+	public void setTourStartTime(	final int tourStartYear,
+									final int tourStartMonth,
+									final int tourStartDay,
+									final int tourStartHour,
+									final int tourStartMinute,
+									final int tourStartSecond) {
+
+		_dateTimeStart = new DateTime(
+				tourStartYear,
+				tourStartMonth,
+				tourStartDay,
+				tourStartHour,
+				tourStartMinute,
+				tourStartSecond,
+				0);
+		tourStartTime = _dateTimeStart.getMillis();
+
+		if (tourStartMonth < 1 || tourStartMonth > 12) {
+			StatusUtil.log(new Exception("Month is invalid: " + tourStartMonth)); //$NON-NLS-1$
+			startMonth = 1;
+		} else {
+			startMonth = (short) tourStartMonth;
+		}
+
+		startYear = (short) tourStartYear;
+//		startMonth = tourStartMonth;
+		startDay = (short) tourStartDay;
+		startHour = (short) tourStartHour;
+		startMinute = (short) tourStartMinute;
+		startSecond = tourStartSecond;
+
+		setWeek(_dateTimeStart);
 	}
 
 	public void setTourTags(final Set<TourTag> tourTags) {

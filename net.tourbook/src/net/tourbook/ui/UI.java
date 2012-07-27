@@ -694,7 +694,7 @@ public class UI {
 
 		_formatterSB.setLength(0);
 
-		final DateTime dt = tourData.getStartDateTime();
+		final DateTime dt = tourData.getTourStartTime();
 
 		return _formatter.format(//
 				Messages.Format_yyyymmdd_hhmmss,
