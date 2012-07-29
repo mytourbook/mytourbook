@@ -155,7 +155,7 @@ public class TourPerson implements Comparable<Object> {
 	private DateTime							_birthDay;
 
 	/**
-	 * Key is the age of the person
+	 * Cached HR zones, key is the age of the person
 	 */
 	@Transient
 	private HashMap<Integer, HrZoneContext>		_hrZoneMinMaxBpm			= new HashMap<Integer, HrZoneContext>();
@@ -377,8 +377,8 @@ public class TourPerson implements Comparable<Object> {
 		final int hrMax = getHrMax(hrMaxFormulaKey, hrMaxPulse, age);
 		final int zoneSize = hrZones.size();
 
-		final int[] zoneMinBmps = new int[zoneSize];
-		final int[] zoneMaxBmps = new int[zoneSize];
+		final float[] zoneMinBmps = new float[zoneSize];
+		final float[] zoneMaxBmps = new float[zoneSize];
 
 		final ArrayList<TourPersonHRZone> hrZonesList = new ArrayList<TourPersonHRZone>(hrZones);
 		Collections.sort(hrZonesList);
@@ -403,8 +403,8 @@ public class TourPerson implements Comparable<Object> {
 				minBpm = prevMaxBpm + 1;
 			}
 
-			zoneMinBmps[zoneIndex] = minBpm;
-			zoneMaxBmps[zoneIndex] = maxBpm;
+			zoneMinBmps[zoneIndex] = minBpm - 0.5f;
+			zoneMaxBmps[zoneIndex] = maxBpm + 0.5f;
 
 			prevMaxBpm = maxBpm;
 		}
