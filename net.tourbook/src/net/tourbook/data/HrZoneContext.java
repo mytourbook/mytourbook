@@ -23,8 +23,8 @@ public class HrZoneContext {
 	public int		age;
 	public int		hrMax;
 
-	public int[]	zoneMinBpm;
-	public int[]	zoneMaxBpm;
+	public float[]	zoneMinBpm;
+	public float[]	zoneMaxBpm;
 
 	/**
 	 * Set HR zones, age and max HR
@@ -34,7 +34,7 @@ public class HrZoneContext {
 	 * @param age
 	 * @param hrMax
 	 */
-	public HrZoneContext(final int[] zoneMinBpm, final int[] zoneMaxBpm, final int age, final int hrMax) {
+	public HrZoneContext(final float[] zoneMinBpm, final float[] zoneMaxBpm, final int age, final int hrMax) {
 
 		this.zoneMinBpm = zoneMinBpm;
 		this.zoneMaxBpm = zoneMaxBpm;

@@ -172,7 +172,7 @@ public class TrainingManager {
 
 	public static int getZoneIndex(final HrZoneContext hrZoneContext, final float pulse) {
 
-		final int[] zoneMinBpm = hrZoneContext.zoneMinBpm;
+		final float[] zoneMinBpm = hrZoneContext.zoneMinBpm;
 		int zoneIndex = 0;
 
 		for (int checkedIndex = 0; checkedIndex < zoneMinBpm.length; checkedIndex++) {

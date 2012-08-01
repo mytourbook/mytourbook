@@ -340,6 +340,14 @@ public class TrainingView extends ViewPart {
 					if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
 						updateUI20(modifiedTours.get(0));
 					}
+				} else if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
+
+					if (_tourData != null) {
+
+						_tourData.clearComputedSeries();
+
+						updateUI20(_tourData);
+					}
 				}
 			}
 		};
@@ -1188,7 +1196,7 @@ public class TrainingView extends ViewPart {
 
 	private void updateUI40HrZoneChart(final HrZoneContext zoneMinMaxBpm) {
 
-		final float[] pulseSerie = _tourData.pulseSerie;
+		final float[] pulseSerie = _tourData.getPulseSmoothedSerie();
 		final int[] timeSerie = _tourData.timeSerie;
 		final boolean[] breakTimeSerie = _tourData.getBreakTimeSerie();
 		final int timeSerieSize = timeSerie.length;
@@ -1243,8 +1251,8 @@ public class TrainingView extends ViewPart {
 
 		final int[] colorIndex = new int[timeSerieSize];
 
-		final int[] zoneMinBpm = zoneMinMaxBpm.zoneMinBpm;
-		final int[] zoneMaxBpm = zoneMinMaxBpm.zoneMaxBpm;
+		final float[] zoneMinBpm = zoneMinMaxBpm.zoneMinBpm;
+		final float[] zoneMaxBpm = zoneMinMaxBpm.zoneMaxBpm;
 
 		for (int pulseIndex = 0; pulseIndex < pulseRange; pulseIndex++) {
 
@@ -1404,11 +1412,12 @@ public class TrainingView extends ViewPart {
 					? Messages.App_Label_max
 					: Integer.toString(zoneMaxValue);
 
-			final int zoneMinBpm = zoneContext.zoneMinBpm[tourZoneIndex];
-			final int zoneMaxBmp = zoneContext.zoneMaxBpm[tourZoneIndex];
+			final float zoneMinBpm = zoneContext.zoneMinBpm[tourZoneIndex];
+			final float zoneMaxBmp = zoneContext.zoneMaxBpm[tourZoneIndex];
+
 			final String zoneMaxBpmText = zoneMaxBmp == Integer.MAX_VALUE //
 					? Messages.App_Label_max
-					: Integer.toString(zoneMaxBmp);
+					: Integer.toString((int) zoneMaxBmp);
 
 			final int ageYears = zoneContext.age;
 			final String ageText = UI.SPACE + ageYears + UI.SPACE2 + Messages.Pref_People_Label_Years;
@@ -1430,7 +1439,7 @@ public class TrainingView extends ViewPart {
 					+ UI.SYMBOL_EQUAL
 					+ UI.SPACE
 					//
-					+ zoneMinBpm
+					+ Integer.toString((int) zoneMinBpm)
 					+ UI.DASH
 					+ zoneMaxBpmText
 					+ UI.SPACE
@@ -1456,7 +1465,7 @@ public class TrainingView extends ViewPart {
 			_lblHrZonePercent[tourZoneIndex].setToolTipText(hrZoneTooltip);
 
 			// bpm values
-			_lblTourMinMaxValue[tourZoneIndex].setText(zoneMinBpm + UI.DASH + zoneMaxBpmText);
+			_lblTourMinMaxValue[tourZoneIndex].setText(((int) zoneMinBpm) + UI.DASH + zoneMaxBpmText);
 			_lblTourMinMaxValue[tourZoneIndex].setToolTipText(hrZoneTooltip);
 
 			_lblTourMinMaxHours[tourZoneIndex].setText(UI.format_hh_mm((long) (zoneTime + 30)).toString());

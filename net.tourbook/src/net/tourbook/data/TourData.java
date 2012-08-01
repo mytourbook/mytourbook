@@ -330,6 +330,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	/**
 	 * Time for all HR zones are contained in {@link #hrZone0} ... {@link #hrZone9}. Each tour can
 	 * have up to 10 HR zones, when HR zone value is <code>-1</code> then this zone is not set.
+	 * <p>
+	 * These values are used in the statistic views.
 	 */
 	private int												hrZone0								= -1;												// db-version 16
 	private int												hrZone1								= -1;												// db-version 16
@@ -680,7 +682,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public float[]											pulseSerie;
 
 	@Transient
-	public float[]											pulseSerieSmoothed;
+	private float[]											pulseSerieSmoothed;
 
 	/**
 	 * Contains <code>true</code> or <code>false</code> for each time slice of the whole tour.
@@ -2032,7 +2034,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			getBreakTime();
 		}
 
-		final int zoneSize = _hrZoneContext.zoneMinBpm.length;
+		final float[] zoneMinBpm = _hrZoneContext.zoneMinBpm;
+		final float[] zoneMaxBpm = _hrZoneContext.zoneMaxBpm;
+
+		final int zoneSize = zoneMinBpm.length;
 		final int[] hrZones = new int[zoneSize];
 		int prevTime = 0;
 
@@ -2059,15 +2064,25 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 				}
 			}
 
-			for (int zoneIndex = 0; zoneIndex < zoneSize; zoneIndex++) {
+			boolean isZoneAvailable = false;
+			int zoneIndex = 0;
 
-				final int minValue = _hrZoneContext.zoneMinBpm[zoneIndex];
-				final int maxValue = _hrZoneContext.zoneMaxBpm[zoneIndex];
+			for (; zoneIndex < zoneSize; zoneIndex++) {
+
+				final float minValue = zoneMinBpm[zoneIndex];
+				final float maxValue = zoneMaxBpm[zoneIndex];
 
 				if (pulse >= minValue && pulse <= maxValue) {
 					hrZones[zoneIndex] += timeDiff;
+					isZoneAvailable = true;
 					break;
 				}
+			}
+
+			if (isZoneAvailable == false) {
+				@SuppressWarnings("unused")
+				int a = 0;
+				a++;
 			}
 		}
 
