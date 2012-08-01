@@ -316,7 +316,8 @@ public class Util {
 				unit = //
 						//
 //				unit >= 120 ? 360 : //
-				unit >= 60 ? 360 : //
+				unit >= 360 ? 3600 : //
+						unit >= 60 ? 360 : //
 //								unit >= 30 ? 60 : //
 						unit >= 15 ? 60 : //
 //												unit >= 12 ? 12 : //
@@ -342,22 +343,24 @@ public class Util {
 
 				unit = //
 						//
-				unit >= 120 ? 600 : //
-						unit >= 60 ? 300 : //
-//							unit >= 30 ? 60 : //
-//									unit >= 20 ? 60 : //
-								unit >= 10 ? 60 : //
-										unit >= 5 ? 20 : //
-												unit >= 2 ? 10 : //
-														10;
+				unit >= 720 ? 3600 : //
+						unit >= 240 ? 720 : //
+								unit >= 120 ? 240 : //
+										unit >= 24 ? 120 : //
+												10;
+//				unit = //
+//						//
+//				unit >= 120 ? 600 : //
+//						unit >= 60 ? 300 : //
+////							unit >= 30 ? 60 : //
+////									unit >= 20 ? 60 : //
+//								unit >= 10 ? 60 : //
+//										unit >= 5 ? 20 : //
+//												unit >= 2 ? 10 : //
+//														10;
 			} else {
 
-//				unit > 120 ? 120 : //
-//					unit > 60 ? 60 : //
-//							unit > 30 ? 30 : //
-//									unit > 15 ? 15 : //
-//											unit > 10 ? 10 : //
-//													5;
+				// multiplier < 1 hour (3600 sec)
 
 				unit = //
 						//
@@ -566,14 +569,6 @@ public class Util {
 //			System.out.println(unit + "\t" + (System.nanoTime() / 1000000));
 //			 TODO remove SYSTEM.OUT.PRINTLN
 
-//			unit = unit > 120 ? 120 : //
-//					unit > 60 ? 60 : //
-//							unit > 30 ? 30 : //
-//									unit > 20 ? 20 : //
-//											unit > 10 ? 10 : //
-//													unit > 5 ? 5 : //
-//															unit > 2 ? 2 : 1;
-
 			if (multiplier >= 3600) {
 
 				unit = //
@@ -617,11 +612,19 @@ public class Util {
 
 					unit = //
 							//
-					unit > 1000 ? 1000 : //
-							unit > 500 ? 500 : //
-									unit > 100 ? 100 : //
-											unit > 50 ? 50 : //
+					unit > 720 ? 720 : //
+							unit > 240 ? 240 : //
+									unit > 120 ? 120 : //
+											unit > 24 ? 24 : //
 													10;
+//					unit = //
+//							//
+//					unit > 1000 ? 1000 : //
+//							unit > 500 ? 500 : //
+//									unit > 100 ? 100 : //
+//											unit > 50 ? 50 : //
+//													10;
+
 				} else {
 
 					// multiplier < 1 hour (3600 sec)
@@ -666,29 +669,6 @@ public class Util {
 //		// TODO remove SYSTEM.OUT.PRINTLN
 
 		return (long) unit;
-	}
-
-	public static float roundTimeValue__OLD(final float unitValue, final boolean is24HourFormatting) {
-
-		float unit = unitValue;
-		int multiplier = 1;
-
-		while (unit > 120) {
-			multiplier *= 60;
-			unit /= 60;
-		}
-
-		unit = unit > 120 ? 120 : //
-				unit > 60 ? 60 : //
-						unit > 30 ? 30 : //
-								unit > 20 ? 20 : //
-										unit > 10 ? 10 : //
-												unit > 5 ? 5 : //
-														unit > 2 ? 2 : //
-																1;
-		unit *= multiplier;
-
-		return unit;
 	}
 
 	/**

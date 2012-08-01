@@ -52,7 +52,7 @@ import org.joda.time.Duration;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-public class PhotoToolTip extends ToolTip {
+public class GalleryPhotoToolTip extends ToolTip {
 
 	private static final int		DEFAULT_TEXT_WIDTH	= 50;
 
@@ -101,7 +101,7 @@ public class PhotoToolTip extends ToolTip {
 
 	private Label					_labelError;
 
-	public PhotoToolTip(final GalleryMT20 control) {
+	public GalleryPhotoToolTip(final GalleryMT20 control) {
 
 		super(control, NO_RECREATE, false);
 

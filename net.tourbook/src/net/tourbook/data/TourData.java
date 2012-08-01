@@ -975,6 +975,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	@Transient
 	public MergeTour										mergeTour;
 
+	/**
+	 * 
+	 */
+	@Transient
+	public boolean											isDummyTour;
+
 	public TourData() {}
 
 	/**
@@ -2837,6 +2843,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 
 		return floatDataSerie;
+	}
+
+	public void createDummyTour() {
+
+		/*
+		 * tour id is not necessary but to prevent many adjustment to the existing code, tour id is
+		 * set but I'm not sure if this works :-(
+		 */
+		tourId = System.nanoTime();
+
+		isDummyTour = true;
 	}
 
 	private void createSRTMDataSerie() {
@@ -5465,6 +5482,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public void setTourStartTime(final DateTime start) {
 
 		_dateTimeStart = start;
+
 		tourStartTime = _dateTimeStart.getMillis();
 
 		startYear = (short) start.getYear();

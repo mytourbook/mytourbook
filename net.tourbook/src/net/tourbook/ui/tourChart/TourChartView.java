@@ -21,6 +21,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
+import net.tourbook.chart.IHoveredListener;
 import net.tourbook.chart.ISliderMoveListener;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
@@ -52,6 +53,7 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -70,7 +72,7 @@ import org.eclipse.ui.part.ViewPart;
 /**
  * Shows the selected tour in a chart
  */
-public class TourChartView extends ViewPart implements ITourChartViewer {
+public class TourChartView extends ViewPart implements ITourChartViewer, IHoveredListener {
 
 	public static final String		ID			= "net.tourbook.views.TourChartView";	//$NON-NLS-1$
 
@@ -334,6 +336,8 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 				_postSelectionProvider.setSelection(chartInfoSelection);
 			}
 		});
+
+		_tourChart.setHoveredValuePointListener(this);
 	}
 
 	@Override
@@ -382,6 +386,23 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 		return _tourChart;
 	}
 
+	@Override
+	public void hoveredValue(final int hoveredValueIndex, final Point hoveredValueDevPosition) {
+
+		if (_tourData == null) {
+			return;
+		}
+
+		final MergeTour mergeTour = _tourData.mergeTour;
+		if (mergeTour == null) {
+			return;
+		}
+
+
+//		System.out.println("hoveredValue index: " + hoveredValueIndex + "\tdev pos: " + hoveredValueDevPosition);
+//		// TODO remove SYSTEM.OUT.PRINTLN
+	}
+
 	private void onSelectionChanged(final ISelection selection) {
 
 		_mergeTour = null;
@@ -413,11 +434,19 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 			final Long tourId = selectionTourId.getTourId();
 
 			if (selection instanceof TourPhotoSelection) {
+
 				_mergeTour = ((TourPhotoSelection) selection).mergeTour;
+
+				if (_mergeTour.isDummyTour()) {
+					final TourData dummyTourData = _mergeTour.getDummyTourData();
+					updateChart(dummyTourData);
+				}
 			}
 
+			final boolean isForceUpdate = _mergeTour != null;
+
 			// force update when photo selection occured
-			updateChart(tourId, _mergeTour != null);
+			updateChart(tourId, isForceUpdate);
 
 		} else if (selection instanceof SelectionChartInfo) {
 

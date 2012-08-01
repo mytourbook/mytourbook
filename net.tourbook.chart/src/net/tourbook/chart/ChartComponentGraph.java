@@ -1639,7 +1639,7 @@ public class ChartComponentGraph extends Canvas {
 //				valuePointToolTip.hide();
 			} else {
 
-				final Point hoveredLinePosition = getAndCheckHoveredLinePosition();
+				final Point hoveredLinePosition = getHoveredValueDevPosition();
 
 				valuePointToolTip.setValueIndex(
 						_hoveredLineValueIndex,
@@ -3482,6 +3482,8 @@ public class ChartComponentGraph extends Canvas {
 			return;
 		}
 
+//		final long start = System.nanoTime();
+
 		// the slider image is the same size as the graph image
 		final Rectangle graphImageRect = _chartImage30Custom.getBounds();
 
@@ -3520,9 +3522,6 @@ public class ChartComponentGraph extends Canvas {
 			 */
 			gcOverlay.fillRectangle(graphImageRect);
 			gcOverlay.drawImage(_chartImage30Custom, 0, 0);
-
-//			System.out.println("40 <- 30\tdrawSync400OverlayImage");
-//			// TODO remove SYSTEM.OUT.PRINTLN
 
 			/*
 			 * draw x/y-sliders
@@ -3563,6 +3562,9 @@ public class ChartComponentGraph extends Canvas {
 		gcOverlay.dispose();
 
 		_isOverlayDirty = false;
+
+//		System.out.println("time\t" + ((float) (System.nanoTime() - start) / 1000000) + " ms");
+//		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 	/**
@@ -4293,6 +4295,10 @@ public class ChartComponentGraph extends Canvas {
 					devOffsetPoint * 2,
 					devOffsetPoint * 2);
 
+//			// draw hovered rectangle
+//			gcOverlay.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+//			gcOverlay.drawRectangle(hoveredRectangle);
+
 			// move to next graph
 			graphIndex++;
 		}
@@ -4308,7 +4314,49 @@ public class ChartComponentGraph extends Canvas {
 		}
 	}
 
-	private Point getAndCheckHoveredLinePosition() {
+	/**
+	 * @param rgb
+	 * @return Returns the color from the color cache, the color must not be disposed this is done
+	 *         when the cache is disposed
+	 */
+	private Color getColor(final RGB rgb) {
+
+// !!! this is a performance bottleneck !!!
+//		final String colorKey = rgb.toString();
+
+		final String colorKey = Integer.toString(rgb.hashCode());
+		final Color color = _colorCache.get(colorKey);
+
+		if (color == null) {
+			return _colorCache.getColor(colorKey, rgb);
+		} else {
+			return color;
+		}
+	}
+
+	/**
+	 * @return Returns the viewport (visible width) of the chart graph
+	 */
+	private int getDevVisibleChartWidth() {
+		return _chartComponents.getDevVisibleChartWidth();
+	}
+
+	/**
+	 * @return Returns the visible height of the chart graph
+	 */
+	private int getDevVisibleGraphHeight() {
+		return _chartComponents.getDevVisibleChartHeight();
+	}
+
+	double getGraphZoomRatio() {
+		return _graphZoomRatio;
+	}
+
+	int getHoveredLineValueIndex() {
+		return _hoveredLineValueIndex;
+	}
+
+	private Point getHoveredValueDevPosition() {
 
 		final Point[] lineDevPositions = _lineDevPositions.get(0);
 		Point lineDevPos = lineDevPositions[_hoveredLineValueIndex];
@@ -4358,48 +4406,6 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		return lineDevPos;
-	}
-
-	/**
-	 * @param rgb
-	 * @return Returns the color from the color cache, the color must not be disposed this is done
-	 *         when the cache is disposed
-	 */
-	private Color getColor(final RGB rgb) {
-
-// !!! this is a performance bottleneck !!!
-//		final String colorKey = rgb.toString();
-
-		final String colorKey = Integer.toString(rgb.hashCode());
-		final Color color = _colorCache.get(colorKey);
-
-		if (color == null) {
-			return _colorCache.getColor(colorKey, rgb);
-		} else {
-			return color;
-		}
-	}
-
-	/**
-	 * @return Returns the viewport (visible width) of the chart graph
-	 */
-	private int getDevVisibleChartWidth() {
-		return _chartComponents.getDevVisibleChartWidth();
-	}
-
-	/**
-	 * @return Returns the visible height of the chart graph
-	 */
-	private int getDevVisibleGraphHeight() {
-		return _chartComponents.getDevVisibleChartHeight();
-	}
-
-	double getGraphZoomRatio() {
-		return _graphZoomRatio;
-	}
-
-	int getHoveredLineValueIndex() {
-		return _hoveredLineValueIndex;
 	}
 
 	/**
@@ -4624,7 +4630,8 @@ public class ChartComponentGraph extends Canvas {
 	}
 
 	/**
-	 * Check if mouse has moved over a line value.
+	 * Check if mouse has moved over a line value and sets {@link #_hoveredLineValueIndex} to the
+	 * value index or <code>-1</code> when focus rectangle is not hit.
 	 * 
 	 * @return
 	 */
@@ -5514,26 +5521,29 @@ public class ChartComponentGraph extends Canvas {
 			}
 		}
 
-		if (_isHoveredLineVisible && isLineHovered()) {
+		if (_isHoveredLineVisible || _chart._hoveredValuePointListener != null) {
 
-			if (valuePointToolTip != null) {
+			isLineHovered();
 
-				final Point hoveredLinePosition = getAndCheckHoveredLinePosition();
+			final Point hoveredValueDevPosition = getHoveredValueDevPosition();
 
-				valuePointToolTip.setValueIndex(
-						_hoveredLineValueIndex,
-						_devXMouseMove,
-						_devYMouseMove,
-						hoveredLinePosition,
-						_graphZoomRatio);
+			if (_isHoveredLineVisible) {
+
+				if (valuePointToolTip != null) {
+
+					valuePointToolTip.setValueIndex(
+							_hoveredLineValueIndex,
+							_devXMouseMove,
+							_devYMouseMove,
+							hoveredValueDevPosition,
+							_graphZoomRatio);
+				}
+
+				isRedraw = true;
 			}
 
-			isRedraw = true;
-
-		} else {
-
-			if (valuePointToolTip != null) {
-//				valuePointToolTip.hide();
+			if (_chart._hoveredValuePointListener != null) {
+				_chart._hoveredValuePointListener.hoveredValue(_hoveredLineValueIndex, hoveredValueDevPosition);
 			}
 		}
 

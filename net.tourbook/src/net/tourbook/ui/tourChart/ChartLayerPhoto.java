@@ -63,7 +63,8 @@ public class ChartLayerPhoto implements IChartLayer {
 
 		gc.setBackground(display.getSystemColor(SWT.COLOR_DARK_GRAY));
 
-		gc.setLineWidth(4);
+		final int lineWidth = 4;
+		gc.setLineWidth(lineWidth);
 		gc.setAntialias(SWT.ON);
 
 		for (final ChartPhoto chartPhoto : _chartPhotos) {
@@ -78,7 +79,7 @@ public class ChartLayerPhoto implements IChartLayer {
 			final int photoIconWidth2 = photoIconWidth / 2;
 
 			int devXPhoto = devXValue;
-			int devYPhoto = devYValue;
+			int devYPhoto = devYValue - photoIconWidth - 20;
 
 			gc.setForeground(display.getSystemColor(SWT.COLOR_DARK_GRAY));
 
@@ -86,24 +87,24 @@ public class ChartLayerPhoto implements IChartLayer {
 			final int devXImageOffset = chart.getXXDevViewPortLeftBorder();
 			if (devXImageOffset == 0 && devXPhoto < 0) {
 				devXPhoto = 0;
-				gc.setForeground(display.getSystemColor(SWT.COLOR_MAGENTA));
+//				gc.setForeground(display.getSystemColor(SWT.COLOR_MAGENTA));
 			}
 
 			// don't draw the photo marker after the chart
 			if (devXPhoto + photoIconWidth > devGraphWidth) {
 				devXPhoto = devGraphWidth - photoIconWidth;
-				gc.setForeground(display.getSystemColor(SWT.COLOR_MAGENTA));
+//				gc.setForeground(display.getSystemColor(SWT.COLOR_MAGENTA));
 			}
 
 			// force photo marker to be not below the bottom
 			if (devYPhoto + photoIconWidth > devYBottom) {
-				devYPhoto = devYBottom - photoIconWidth;
+				devYPhoto = devYBottom - photoIconWidth - lineWidth;
 //				gc.setForeground(display.getSystemColor(SWT.COLOR_MAGENTA));
 			}
 
 			// force photo marker to be not above the top
 			if (devYPhoto < devYTop) {
-				devYPhoto = devYTop;
+				devYPhoto = devYTop + lineWidth;
 //				gc.setForeground(display.getSystemColor(SWT.COLOR_MAGENTA));
 			}
 

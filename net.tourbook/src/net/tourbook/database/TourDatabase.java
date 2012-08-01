@@ -1367,6 +1367,13 @@ public class TourDatabase {
 		}
 
 		/*
+		 * dummy tour cannot be deleted
+		 */
+		if (tourData.isDummyTour) {
+			return null;
+		}
+
+		/*
 		 * prevent saving a tour when a person is not set, this check is for internal use that all
 		 * data are valid
 		 */

@@ -96,6 +96,8 @@ public class Chart extends ViewForm {
 	 */
 	IChartListener						_draggingListenerXMarker;
 
+	IHoveredListener					_hoveredValuePointListener;
+
 	/**
 	 * when set to <code>true</code> the toolbar is within the chart control, otherwise the toolbar
 	 * is outsite of the chart
@@ -547,8 +549,8 @@ public class Chart extends ViewForm {
 		_barSelectionValueIndex = valueIndex;
 
 		final Object[] listeners = _barSelectionListeners.getListeners();
-		for (int i = 0; i < listeners.length; ++i) {
-			final IBarSelectionListener listener = (IBarSelectionListener) listeners[i];
+		for (final Object listener2 : listeners) {
+			final IBarSelectionListener listener = (IBarSelectionListener) listener2;
 			SafeRunnable.run(new SafeRunnable() {
 				public void run() {
 					listener.selectionChanged(serieIndex, valueIndex);
@@ -563,8 +565,8 @@ public class Chart extends ViewForm {
 		_barSelectionValueIndex = valueIndex;
 
 		final Object[] listeners = _barDoubleClickListeners.getListeners();
-		for (int i = 0; i < listeners.length; ++i) {
-			final IBarSelectionListener listener = (IBarSelectionListener) listeners[i];
+		for (final Object listener2 : listeners) {
+			final IBarSelectionListener listener = (IBarSelectionListener) listener2;
 			SafeRunnable.run(new SafeRunnable() {
 				public void run() {
 					listener.selectionChanged(serieIndex, valueIndex);
@@ -576,9 +578,7 @@ public class Chart extends ViewForm {
 	private void fireChartMouseEvent(final ChartMouseEvent mouseEvent) {
 
 		final Object[] listeners = _mouseListener.getListeners();
-		for (int i = 0; i < listeners.length; ++i) {
-
-			final Object listener = listeners[i];
+		for (final Object listener : listeners) {
 
 			switch (mouseEvent.type) {
 			case Chart.MouseMove:
@@ -610,8 +610,8 @@ public class Chart extends ViewForm {
 	void fireDoubleClick() {
 
 		final Object[] listeners = _doubleClickListeners.getListeners();
-		for (int i = 0; i < listeners.length; ++i) {
-			final Listener listener = (Listener) listeners[i];
+		for (final Object listener2 : listeners) {
+			final Listener listener = (Listener) listener2;
 			SafeRunnable.run(new SafeRunnable() {
 				public void run() {
 					listener.handleEvent(null);
@@ -623,8 +623,8 @@ public class Chart extends ViewForm {
 	void fireFocusEvent() {
 
 		final Object[] listeners = _focusListeners.getListeners();
-		for (int i = 0; i < listeners.length; ++i) {
-			final Listener listener = (Listener) listeners[i];
+		for (final Object listener2 : listeners) {
+			final Listener listener = (Listener) listener2;
 			SafeRunnable.run(new SafeRunnable() {
 				public void run() {
 					listener.handleEvent(new Event());
@@ -638,8 +638,8 @@ public class Chart extends ViewForm {
 		final SelectionChartInfo chartInfo = createChartInfo();
 
 		final Object[] listeners = _sliderMoveListeners.getListeners();
-		for (int i = 0; i < listeners.length; ++i) {
-			final ISliderMoveListener listener = (ISliderMoveListener) listeners[i];
+		for (final Object listener2 : listeners) {
+			final ISliderMoveListener listener = (ISliderMoveListener) listener2;
 			SafeRunnable.run(new SafeRunnable() {
 				public void run() {
 					listener.sliderMoved(chartInfo);
@@ -688,8 +688,8 @@ public class Chart extends ViewForm {
 		return createChartInfo();
 	}
 
-	public int getXXDevViewPortLeftBorder() {
-		return _chartComponents.getChartComponentGraph().getXXDevViewPortLeftBorder();
+	public IHoveredListener getHoveredValuePointListener() {
+		return _hoveredValuePointListener;
 	}
 
 	/**
@@ -793,6 +793,10 @@ public class Chart extends ViewForm {
 		return new SelectionChartXSliderPosition(this, chartGraph.getLeftSlider().getValuesIndex(), chartGraph
 				.getRightSlider()
 				.getValuesIndex());
+	}
+
+	public int getXXDevViewPortLeftBorder() {
+		return _chartComponents.getChartComponentGraph().getXXDevViewPortLeftBorder();
 	}
 
 	protected void handleTooltipMouseEvent(final Event event, final Point mouseDisplayPosition) {
@@ -1059,6 +1063,10 @@ public class Chart extends ViewForm {
 		isShowVerticalGridLines = isVGridVisible;
 
 		_chartComponents.onResize();
+	}
+
+	public void setHoveredValuePointListener(final IHoveredListener hoveredValuePointListener) {
+		_hoveredValuePointListener = hoveredValuePointListener;
 	}
 
 	/**
