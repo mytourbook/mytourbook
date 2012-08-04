@@ -49,29 +49,30 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourPhotosView extends ViewPart implements IPhotoGalleryProvider {
 
-	public static final String		ID			= "net.tourbook.photo.merge.TourPhotosView.ID";			//$NON-NLS-1$
+	public static final String				ID			= "net.tourbook.photo.merge.TourPhotosView.ID";	//$NON-NLS-1$
 
-	private final IPreferenceStore	_prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
+	private final IPreferenceStore			_prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
 
-	private final IDialogSettings	_state		= TourbookPlugin.getDefault().getDialogSettingsSection(ID);
+	private static final IDialogSettings	_state		= TourbookPlugin.getDefault()//
+																.getDialogSettingsSection(ID);
 
-	private PostSelectionProvider	_postSelectionProvider;
+	private PostSelectionProvider			_postSelectionProvider;
 
-	private ISelectionListener		_postSelectionListener;
-	private IPropertyChangeListener	_prefChangeListener;
-	private ITourEventListener		_tourPropertyListener;
-	private IPartListener2			_partListener;
+	private ISelectionListener				_postSelectionListener;
+	private IPropertyChangeListener			_prefChangeListener;
+	private ITourEventListener				_tourPropertyListener;
+	private IPartListener2					_partListener;
 
-	private boolean					_isPartVisible;
+	private boolean							_isPartVisible;
 
 	/**
 	 * contains selection which was set when the part is hidden
 	 */
-	private ISelection				_selectionWhenHidden;
+	private ISelection						_selectionWhenHidden;
 
-	private ISelection				_currentPhotoSelection;
+	private ISelection						_currentPhotoSelection;
 
-	private PhotoGallery			_photoGallery;
+	private PhotoGallery					_photoGallery;
 
 	/*
 	 * UI controls
@@ -322,6 +323,6 @@ public class TourPhotosView extends ViewPart implements IPhotoGalleryProvider {
 				? Long.toString(mergeTour.tourStartTime)
 				: Long.toString(tourId);
 
-		_photoGallery.showImages(photoWrapperList, galleryPositionKey);
+		_photoGallery.showImages(photoWrapperList, galleryPositionKey + " TourPhotosView", true);//$NON-NLS-1$
 	}
 }

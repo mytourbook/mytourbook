@@ -1414,6 +1414,10 @@ public class ChartComponents extends Composite {
 		gc.dispose();
 	}
 
+	int getYAxisWidthLeft() {
+		return getAxisLeft().getSize().x;
+	}
+
 	/**
 	 * Resize handler for all components, computes the chart when the chart data or the client area
 	 * has changed or when the chart was zoomed

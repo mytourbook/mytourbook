@@ -553,6 +553,8 @@ public class TourPainter extends MapPainter {
 	@Override
 	protected boolean doPaint(final GC gcTile, final Map map, final Tile tile, final int parts) {
 
+		init();
+
 		final ArrayList<TourData> tourDataList = _tourPaintConfig.getTourData();
 		final ArrayList<PhotoWrapper> photoList = _tourPaintConfig.getPhotos();
 

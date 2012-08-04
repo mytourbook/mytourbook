@@ -80,7 +80,7 @@ public abstract class ToolTip {
 
 	private Object						currentArea;
 
-	private boolean						_hideOnMouseMove;
+	private boolean						_isHideOnMouseMove;
 
 	private class TooltipHideListener implements Listener {
 
@@ -94,7 +94,7 @@ public abstract class ToolTip {
 				switch (event.type) {
 				case SWT.MouseMove:
 
-					if (_hideOnMouseMove) {
+					if (_isHideOnMouseMove) {
 						hide();
 					}
 					break;
@@ -104,10 +104,13 @@ public abstract class ToolTip {
 						toolTipHide(shell, event);
 					}
 					break;
+
 				case SWT.MouseExit:
+
 					/*
 					 * Give some insets to ensure we get exit informations from a wider area ;-)
 					 */
+
 					/**
 					 * !!! this adjustment do not work on Linux because the tooltip gets hidden when
 					 * the mouse tries to mover over the tooltip <br>
@@ -383,7 +386,7 @@ public abstract class ToolTip {
 	}
 
 	public boolean isHideOnMouseMove() {
-		return _hideOnMouseMove;
+		return _isHideOnMouseMove;
 	}
 
 	/**
@@ -470,8 +473,8 @@ public abstract class ToolTip {
 		this.hideOnMouseDown = hideOnMouseDown;
 	}
 
-	public void setHideOnMouseMove(final boolean hideOnMouseMove) {
-		_hideOnMouseMove = hideOnMouseMove;
+	public void setHideOnMouseMove(final boolean isHideOnMouseMove) {
+		_isHideOnMouseMove = isHideOnMouseMove;
 	}
 
 	/**

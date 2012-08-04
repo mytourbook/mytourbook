@@ -90,8 +90,8 @@ public class GalleryPhotoToolTip extends ToolTip {
 	/*
 	 * UI resources
 	 */
-	private Color					_bgColor;
-	private Color					_fgColor;
+//	private Color					_bgColor;
+//	private Color					_fgColor;
 //	private Font					_boldFont;
 
 	private Image					_photoImage;
@@ -127,9 +127,6 @@ public class GalleryPhotoToolTip extends ToolTip {
 		/*
 		 * set colors for all controls
 		 */
-		_bgColor = _gallery.getBackground();
-		_fgColor = _gallery.getForeground();
-
 		updateUI_colors(parent);
 
 		return container;
@@ -509,8 +506,8 @@ public class GalleryPhotoToolTip extends ToolTip {
 //
 //		_bgColor = display.getSystemColor(SWT.COLOR_INFO_BACKGROUND);
 //		_fgColor = display.getSystemColor(SWT.COLOR_INFO_FOREGROUND);
-		_bgColor = _gallery.getBackground();
-		_fgColor = _gallery.getForeground();
+//		_bgColor = _gallery.getBackground();
+//		_fgColor = _gallery.getForeground();
 
 //		_boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
@@ -613,8 +610,11 @@ public class GalleryPhotoToolTip extends ToolTip {
 
 	private void updateUI_colors(final Control child) {
 
-		child.setBackground(_bgColor);
-		child.setForeground(_fgColor);
+		final Color bgColor = _gallery.getBackground();
+		final Color fgColor = _gallery.getForeground();
+
+		child.setBackground(bgColor);
+		child.setForeground(fgColor);
 
 		if (child instanceof Composite) {
 			final Control[] children = ((Composite) child).getChildren();

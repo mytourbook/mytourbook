@@ -51,7 +51,7 @@ public class ValuePointToolTipMenuManager {
 	static final int					VALUE_ID_CHART_ZOOM_FACTOR					= 1 << 14;
 
 	static final String					STATE_VALUE_POINT_TOOLTIP_VISIBLE_GRAPHS	= "ValuePoint_ToolTip_VisibleGraphs";		//$NON-NLS-1$
-	static final String					STATE_VALUE_POINT_TOOLTIP_ORIENTATION		= "ValuePoint_ToolTip_Orientation";				//$NON-NLS-1$
+	static final String					STATE_VALUE_POINT_TOOLTIP_ORIENTATION		= "ValuePoint_ToolTip_Orientation";		//$NON-NLS-1$
 
 	static final int					DEFAULT_GRAPHS								= VALUE_ID_TIME_SLICES
 																							| VALUE_ID_TIME_DURATION
@@ -583,9 +583,8 @@ public class ValuePointToolTipMenuManager {
 	 * 
 	 * @param event
 	 * @param tourData
-	 * @param isHorizontal
 	 * @param allVisibleValueIds
-	 * @param state
+	 * @param isHorizontal
 	 */
 	void openToolTipMenu(	final Event event,
 							final TourData tourData,

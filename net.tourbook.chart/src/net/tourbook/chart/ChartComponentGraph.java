@@ -998,6 +998,7 @@ public class ChartComponentGraph extends Canvas {
 				actionSelectBars();
 
 				_hoveredBarToolTip.toolTip20Hide();
+				hideValuePointTooltip();
 
 				// get cursor location relativ to this graph canvas
 				final Point devMouse = ChartComponentGraph.this.toControl(getDisplay().getCursorLocation());
@@ -4519,6 +4520,16 @@ public class ChartComponentGraph extends Canvas {
 		}
 	}
 
+	private void hideValuePointTooltip() {
+
+		final IHoveredListener hoveredValuePointListener = _chart.getHoveredValuePointListener();
+		if (hoveredValuePointListener != null) {
+
+			// hide value point tooltip
+			hoveredValuePointListener.hideTooltip();
+		}
+	}
+
 	/**
 	 * check if mouse has moved over a bar
 	 * 
@@ -5093,6 +5104,8 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private void onMouseDown(final MouseEvent event) {
 
+		hideValuePointTooltip();
+
 		// zoom out to show the whole chart with the button on the left side
 		if (event.button == 4) {
 			_chart.onExecuteZoomFitGraph();
@@ -5286,6 +5299,8 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	void onMouseDownAxis(final MouseEvent event) {
 
+		hideValuePointTooltip();
+
 		if (_xSliderDragged != null) {
 
 			// stop dragging the slider
@@ -5383,6 +5398,7 @@ public class ChartComponentGraph extends Canvas {
 		_devYMouseMove = devYMouse;
 
 		boolean isRedraw = false;
+		boolean canShowTooltip = false;
 
 		if (_isXSliderVisible && _xSliderDragged != null) {
 
@@ -5508,6 +5524,8 @@ public class ChartComponentGraph extends Canvas {
 
 				// cursor is already set
 
+				canShowTooltip = true;
+
 			} else if (isBarHit(devXMouse, devYMouse)) {
 
 				_isHoveredBarDirty = true;
@@ -5517,6 +5535,8 @@ public class ChartComponentGraph extends Canvas {
 
 			} else {
 
+				canShowTooltip = true;
+
 				setCursorStyle(devYMouse);
 			}
 		}
@@ -5525,25 +5545,33 @@ public class ChartComponentGraph extends Canvas {
 
 			isLineHovered();
 
-			final Point hoveredValueDevPosition = getHoveredValueDevPosition();
+			if (_hoveredLineValueIndex != -1) {
 
-			if (_isHoveredLineVisible) {
+				final Point devHoveredValueDevPosition = getHoveredValueDevPosition();
 
-				if (valuePointToolTip != null) {
+				if (_isHoveredLineVisible) {
 
-					valuePointToolTip.setValueIndex(
-							_hoveredLineValueIndex,
-							_devXMouseMove,
-							_devYMouseMove,
-							hoveredValueDevPosition,
-							_graphZoomRatio);
+					if (valuePointToolTip != null) {
+
+						valuePointToolTip.setValueIndex(
+								_hoveredLineValueIndex,
+								_devXMouseMove,
+								_devYMouseMove,
+								devHoveredValueDevPosition,
+								_graphZoomRatio);
+					}
+
+					isRedraw = true;
 				}
 
-				isRedraw = true;
-			}
+				if (_chart._hoveredValuePointListener != null && canShowTooltip) {
 
-			if (_chart._hoveredValuePointListener != null) {
-				_chart._hoveredValuePointListener.hoveredValue(_hoveredLineValueIndex, hoveredValueDevPosition);
+					_chart._hoveredValuePointListener.hoveredValue(
+							_hoveredLineValueIndex,
+							devHoveredValueDevPosition,
+							_devXMouseMove,
+							_devYMouseMove);
+				}
 			}
 		}
 
@@ -5873,6 +5901,8 @@ public class ChartComponentGraph extends Canvas {
 		} else {
 
 			// mouse mode: zoom chart
+
+			hideValuePointTooltip();
 
 			final boolean isCtrl = (event.stateMask & SWT.CONTROL) != 0;
 			final boolean isShift = (event.stateMask & SWT.SHIFT) != 0;

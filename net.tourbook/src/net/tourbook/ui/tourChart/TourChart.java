@@ -32,6 +32,7 @@ import net.tourbook.chart.ChartMarkerLayer;
 import net.tourbook.chart.ChartYDataMinMaxKeeper;
 import net.tourbook.chart.IChartLayer;
 import net.tourbook.chart.IFillPainter;
+import net.tourbook.chart.IHoveredListener;
 import net.tourbook.chart.ITooltipOwner;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.util.IToolTipHideListener;
@@ -100,7 +101,6 @@ public class TourChart extends Chart {
 	public static final String				COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER		= "net.tourbook.command.tourChart.canAutoZoomToSlider";		//$NON-NLS-1$
 	public static final String				COMMAND_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED	= "net.tourbook.command.tourChart.canMoveSlidersWhenZoomed";	//$NON-NLS-1$
 	public static final String				COMMAND_ID_EDIT_CHART_PREFERENCES		= "net.tourbook.command_EditChartPreferences";					//$NON-NLS-1$
-
 	public static final String				COMMAND_ID_X_AXIS_DISTANCE				= "net.tourbook.command.tourChart.xAxisDistance";				//$NON-NLS-1$
 	public static final String				COMMAND_ID_X_AXIS_TIME					= "net.tourbook.command.tourChart.xAxisTime";					//$NON-NLS-1$
 
@@ -123,49 +123,90 @@ public class TourChart extends Chart {
 
 	private final IPreferenceStore			_prefStore								= TourbookPlugin.getDefault() //
 																							.getPreferenceStore();
+
 	private final IDialogSettings			_state									= TourbookPlugin.getDefault()//
 																							.getDialogSettingsSection(
 																									ID);
-
 	private TourData						_tourData;
-	private TourChartConfiguration			_tourChartConfig;
 
+	private TourChartConfiguration			_tourChartConfig;
 	private final boolean					_isShowActions;
 
 	private Map<String, TCActionProxy>		_actionProxies;
+
 	private final TCActionHandlerManager	_tcActionHandlerManager					= TCActionHandlerManager
 																							.getInstance();
-
 	/**
 	 * datamodel listener is called when the chart data is created
 	 */
 	private IDataModelListener				_chartDataModelListener;
+
 	private final ListenerList				_selectionListeners						= new ListenerList();
 	private final ListenerList				_xAxisSelectionListener					= new ListenerList();
 	private IPropertyChangeListener			_prefChangeListener;
-
 	private boolean							_isSegmentLayerVisible					= false;
-	private boolean							_is2ndAltiLayerVisible					= false;
 
+	private boolean							_is2ndAltiLayerVisible					= false;
 	private boolean							_isMouseModeSet;
 
 	/*
 	 * UI controls
 	 */
 	private ChartMarkerLayer				_layerMarker;
+
 	private ChartSegmentLayer				_layerSegment;
 	private ChartSegmentValueLayer			_layerSegmentValue;
 	private ChartLayer2ndAltiSerie			_layer2ndAltiSerie;
 	private ChartLayerPhoto					_layerPhoto;
 	private I2ndAltiLayer					_layer2ndAlti;
 	private IFillPainter					_hrZonePainter;
-
 	private ActionChartOptions				_actionOptions;
 
 	private TourToolTip						_tourToolTip;
-	private TourInfoToolTipProvider			_tourInfoToolTipProvider;
 
+	private TourInfoToolTipProvider			_tourInfoToolTipProvider;
 	private ValuePointToolTipUI				_valuePointToolTip;
+
+	private ChartPhotoToolTip				_photoTooltip;
+
+	public class HoveredListener implements IHoveredListener {
+
+		@Override
+		public void hideTooltip() {
+
+			if (_photoTooltip != null) {
+				_photoTooltip.hide();
+			}
+		}
+
+		@Override
+		public void hoveredValue(	final int hoveredValueIndex,
+									final Point devHoveredValue,
+									final int devXMouseMove,
+									final int devYMouseMove) {
+
+			if (_tourData == null) {
+				return;
+			}
+
+			if (_tourChartConfig.isShowPhotos == false) {
+				return;
+			}
+
+			// check if photos are available
+			final MergeTour mergeTour = _tourData.mergeTour;
+			if (mergeTour == null) {
+				return;
+			}
+
+			final ChartLayerPhoto photoLayer = getPhotoLayer();
+			if (photoLayer == null) {
+				return;
+			}
+
+			_photoTooltip.show(photoLayer, hoveredValueIndex, devHoveredValue, devXMouseMove, devYMouseMove);
+		}
+	}
 
 	public TourChart(final Composite parent, final int style, final boolean isShowActions) {
 
@@ -239,6 +280,10 @@ public class TourChart extends Chart {
 			}
 		};
 		setValuePointToolTipProvider(_valuePointToolTip = new ValuePointToolTipUI(tooltipOwner, _state));
+
+		_photoTooltip = new ChartPhotoToolTip(this);
+
+		setHoveredValuePointListener(new HoveredListener());
 	}
 
 	public void actionCanAutoMoveSliders(final boolean isItemChecked) {
@@ -926,7 +971,7 @@ public class TourChart extends Chart {
 		 */
 		if (timeSerie == null || numberOfTimeSlices <= 1) {
 			for (final PhotoWrapper photoWrapper : tourPhotos) {
-				chartPhotos.add(new ChartPhoto(photoWrapper.photo, 0, 0));
+				chartPhotos.add(new ChartPhoto(photoWrapper, 0, 0));
 			}
 			return;
 		}
@@ -966,7 +1011,7 @@ public class TourChart extends Chart {
 
 					// photo is available in the current time slice
 
-					chartPhotos.add(new ChartPhoto(photoWrapper.photo, xAxisSerie[timeIndex], timeIndex));
+					chartPhotos.add(new ChartPhoto(photoWrapper, xAxisSerie[timeIndex], timeIndex));
 
 					photoIndex++;
 
@@ -1004,7 +1049,7 @@ public class TourChart extends Chart {
 
 				while (true) {
 
-					chartPhotos.add(new ChartPhoto(photoWrapper.photo, xAxisSerie[numberOfTimeSlices - 1], timeIndex));
+					chartPhotos.add(new ChartPhoto(photoWrapper, xAxisSerie[numberOfTimeSlices - 1], timeIndex));
 
 					photoIndex++;
 
@@ -1335,6 +1380,10 @@ public class TourChart extends Chart {
 		return _actionProxies;
 	}
 
+	ChartLayerPhoto getPhotoLayer() {
+		return _layerPhoto;
+	}
+
 	/**
 	 * Converts the graph Id into a proxy Id
 	 * 
@@ -1380,8 +1429,16 @@ public class TourChart extends Chart {
 		_xAxisSelectionListener.remove(listener);
 	}
 
+	void restoreState() {
+		
+		_photoTooltip.restoreState(_state);
+	}
+
 	void saveState() {
+
 		_valuePointToolTip.saveState();
+
+		_photoTooltip.saveState(_state);
 	}
 
 	/**
@@ -1504,8 +1561,8 @@ public class TourChart extends Chart {
 		/*
 		 * photo layer
 		 */
-		// show label layer only for ONE visible graph
-		if ((_layerPhoto != null) && (yData == yDataWithLabels)) {
+		// show photo layer only for ONE visible graph
+		if (_layerPhoto != null && _tourChartConfig.isShowPhotos == true && yData == yDataWithLabels) {
 			customFgLayers.add(_layerPhoto);
 		}
 
@@ -1513,7 +1570,7 @@ public class TourChart extends Chart {
 		 * marker layer
 		 */
 		// show label layer only for ONE visible graph
-		if ((_layerMarker != null) && (yData == yDataWithLabels)) {
+		if (_layerMarker != null && yData == yDataWithLabels) {
 			customFgLayers.add(_layerMarker);
 		}
 

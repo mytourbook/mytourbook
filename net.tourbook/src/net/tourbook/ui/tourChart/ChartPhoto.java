@@ -15,27 +15,32 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
-import net.tourbook.photo.Photo;
+import net.tourbook.photo.PhotoWrapper;
 
 public class ChartPhoto {
 
-	public Photo	photo;
+	public PhotoWrapper	photoWrapper;
 
 	/**
 	 * Value on the x-axis
 	 */
 	public float	xValue;
+
+	/**
+	 * Index in the data serie where a photo occures, there can be multiple photos at the same
+	 * position.
+	 */
 	public int		serieIndex;
 
 	/**
-	 * @param photo
+	 * @param photoWrapper
 	 * @param xValue
 	 *            Value on the x-axis
 	 * @param serieIndex
 	 */
-	public ChartPhoto(final Photo photo, final float xValue, final int serieIndex) {
+	public ChartPhoto(final PhotoWrapper photoWrapper, final float xValue, final int serieIndex) {
 
-		this.photo = photo;
+		this.photoWrapper = photoWrapper;
 		this.xValue = xValue;
 		this.serieIndex = serieIndex;
 	}

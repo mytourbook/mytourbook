@@ -130,14 +130,11 @@ public class MergeTour {
 
 		final ArrayList<TimeData> dtList = new ArrayList<TimeData>();
 
-//		final float absoluteDistance = 0;
-
 		for (final long timeSliceTime : _dummyTimeSerie.toArray()) {
 
 			final TimeData timeData = new TimeData();
 
 			timeData.absoluteTime = timeSliceTime;
-//			timeData.absoluteDistance = absoluteDistance++;
 			timeData.absoluteAltitude = 1.0f;
 
 			dtList.add(timeData);

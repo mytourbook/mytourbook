@@ -50,12 +50,9 @@ public class PhotoGallery extends ImageGallery {
 	public static final String				IMAGE_PHOTO_FILTER_GPS				= "IMAGE_PHOTO_FILTER_GPS";				//$NON-NLS-1$
 	public static final String				IMAGE_PHOTO_FILTER_NO_GPS			= "IMAGE_PHOTO_FILTER_NO_GPS";				//$NON-NLS-1$
 
-//	private static final IPreferenceStore	_prefStore							= Activator.getDefault()//
-//																						.getPreferenceStore();
-
-	private static final IDialogSettings	_state								= Activator.getDefault()//
-																						.getDialogSettingsSection(
-																								"PhotoGallery");			//$NON-NLS-1$
+//	private static final IDialogSettings	_state								= Activator.getDefault()//
+//																						.getDialogSettingsSection(
+//																								"PhotoGallery");			//$NON-NLS-1$
 
 	private PhotoDateInfo					_photoDateInfo;
 
@@ -245,7 +242,7 @@ public class PhotoGallery extends ImageGallery {
 		/*
 		 * image filter
 		 */
-		final String prefImageFilter = Util.getStateString(_state, STATE_IMAGE_FILTER, ImageFilter.NoFilter.name());
+		final String prefImageFilter = Util.getStateString(state, STATE_IMAGE_FILTER, ImageFilter.NoFilter.name());
 		try {
 			_currentImageFilter = ImageFilter.valueOf(prefImageFilter);
 		} catch (final Exception e) {
@@ -258,16 +255,16 @@ public class PhotoGallery extends ImageGallery {
 		 * photo date / time / name / tooltip / annotation
 		 */
 		final PhotoDateInfo photoDateDefault = PhotoDateInfo.NoDateTime;
-		final String prefDateInfo = Util.getStateString(_state, STATE_PHOTO_INFO_DATE, photoDateDefault.name());
+		final String prefDateInfo = Util.getStateString(state, STATE_PHOTO_INFO_DATE, photoDateDefault.name());
 		try {
 			_photoDateInfo = PhotoDateInfo.valueOf(prefDateInfo);
 		} catch (final Exception e) {
 			_photoDateInfo = photoDateDefault;
 		}
 
-		final boolean isShowPhotoName = Util.getStateBoolean(_state, STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY, false);
-		final boolean isShowTooltip = Util.getStateBoolean(_state, STATE_IS_SHOW_PHOTO_TOOLTIP, true);
-		final boolean isShowPhotoAnnotations = Util.getStateBoolean(_state, //
+		final boolean isShowPhotoName = Util.getStateBoolean(state, STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY, false);
+		final boolean isShowTooltip = Util.getStateBoolean(state, STATE_IS_SHOW_PHOTO_TOOLTIP, true);
+		final boolean isShowPhotoAnnotations = Util.getStateBoolean(state, //
 				STATE_IS_SHOW_PHOTO_GPS_ANNOTATION,
 				true);
 
@@ -281,7 +278,7 @@ public class PhotoGallery extends ImageGallery {
 		/*
 		 * gallery sorting
 		 */
-		final String prefSorting = Util.getStateString(_state, STATE_GALLERY_SORTING, GallerySorting.FILE_DATE.name());
+		final String prefSorting = Util.getStateString(state, STATE_GALLERY_SORTING, GallerySorting.FILE_DATE.name());
 		try {
 			_gallerySorting = GallerySorting.valueOf(prefSorting);
 		} catch (final Exception e) {
@@ -305,16 +302,16 @@ public class PhotoGallery extends ImageGallery {
 		/*
 		 * gallery sorting
 		 */
-		_state.put(STATE_GALLERY_SORTING, _actionSortFileByDate.isChecked()
+		state.put(STATE_GALLERY_SORTING, _actionSortFileByDate.isChecked()
 				? GallerySorting.FILE_DATE.name()
 				: GallerySorting.FILE_NAME.name());
 
-		_state.put(STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY, _actionShowPhotoName.isChecked());
-		_state.put(STATE_IS_SHOW_PHOTO_TOOLTIP, _actionShowPhotoTooltip.isChecked());
-		_state.put(STATE_IS_SHOW_PHOTO_GPS_ANNOTATION, _actionShowGPSAnnotation.isChecked());
+		state.put(STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY, _actionShowPhotoName.isChecked());
+		state.put(STATE_IS_SHOW_PHOTO_TOOLTIP, _actionShowPhotoTooltip.isChecked());
+		state.put(STATE_IS_SHOW_PHOTO_GPS_ANNOTATION, _actionShowGPSAnnotation.isChecked());
 
-		_state.put(STATE_PHOTO_INFO_DATE, _photoDateInfo.name());
-		_state.put(STATE_IMAGE_FILTER, _currentImageFilter.name());
+		state.put(STATE_PHOTO_INFO_DATE, _photoDateInfo.name());
+		state.put(STATE_IMAGE_FILTER, _currentImageFilter.name());
 
 		super.saveState(state);
 	}

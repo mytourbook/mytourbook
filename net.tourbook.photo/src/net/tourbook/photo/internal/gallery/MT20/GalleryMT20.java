@@ -87,7 +87,7 @@ public abstract class GalleryMT20 extends Canvas {
 	 * This is the saved and restored position. The gallery will be positioned here, until the user
 	 * has scrolled or navigated the gallery.
 	 */
-	private Double								_defaultGalleryPositionRatio;
+	private Double								_forcedGalleryPosition;
 
 	/**
 	 * When <code>true</code> images are painted in higher quality but must be larger than the high
@@ -798,8 +798,8 @@ public abstract class GalleryMT20 extends Canvas {
 
 	/**
 	 * @param itemIndex
-	 * @return Returns initialized gallery item from the given gallery position or <code>null</code>
-	 *         when the index is out of scope.
+	 * @return Returns gallery item (which has been initialized with custom data) from the given
+	 *         gallery position or <code>null</code> when the index is out of scope.
 	 */
 	private GalleryMT20Item getInitializedItem(final int itemIndex) {
 
@@ -1306,7 +1306,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 		// reset position when position is modified manually
 		if (isResetPosition) {
-			_defaultGalleryPositionRatio = null;
+			_forcedGalleryPosition = null;
 			hideTooltip();
 		}
 	}
@@ -1771,7 +1771,7 @@ public abstract class GalleryMT20 extends Canvas {
 		}
 
 		// reset position when position is modified manually
-		_defaultGalleryPositionRatio = null;
+		_forcedGalleryPosition = null;
 	}
 
 	private void onPaint(final GC gc) {
@@ -1925,7 +1925,7 @@ public abstract class GalleryMT20 extends Canvas {
 	private void onScrollHorizontal() {
 
 		// reset position when position is modified manually
-		_defaultGalleryPositionRatio = null;
+		_forcedGalleryPosition = null;
 
 		final int areaWidth = _clientArea.width;
 
@@ -2016,7 +2016,7 @@ public abstract class GalleryMT20 extends Canvas {
 	private void onScrollVertical_10() {
 
 		// reset position when position is modified manually
-		_defaultGalleryPositionRatio = null;
+		_forcedGalleryPosition = null;
 
 		final int areaHeight = _clientArea.height;
 
@@ -2485,7 +2485,7 @@ public abstract class GalleryMT20 extends Canvas {
 	 * 
 	 * @param virtualGalleryItems
 	 */
-	public void setVirtualItems(GalleryMT20Item[] virtualGalleryItems) {
+	public void setVirtualItems(GalleryMT20Item[] virtualGalleryItems, final Double galleryPosition) {
 
 		// prevent NPE
 		if (virtualGalleryItems == null) {
@@ -2494,7 +2494,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 		_virtualGalleryItems = virtualGalleryItems;
 
-		updateGallery(true);
+		updateGallery(true, galleryPosition);
 	}
 
 	/**
@@ -2588,13 +2588,13 @@ public abstract class GalleryMT20 extends Canvas {
 	/**
 	 * @param isKeepLocation
 	 *            Keeps gallery position when <code>true</code>, otherwise position will be reset.
-	 * @param defaultPositionRatio
+	 * @param forcedPositionRatio
 	 */
-	public void updateGallery(final boolean isKeepLocation, final Double defaultPositionRatio) {
+	public void updateGallery(final boolean isKeepLocation, final Double forcedPositionRatio) {
 
 		// !!! prevent setting it to NULL, especially when the UI is not initialized !!!
-		if (defaultPositionRatio != null) {
-			_defaultGalleryPositionRatio = defaultPositionRatio;
+		if (forcedPositionRatio != null) {
+			_forcedGalleryPosition = forcedPositionRatio;
 		}
 
 		if (_clientArea.width == 0 || _clientArea.height == 0) {
@@ -2765,9 +2765,9 @@ public abstract class GalleryMT20 extends Canvas {
 			_contentVirtualWidth = clientAreaWidth;
 			_contentVirtualHeight = _gridVertItems * _itemHeight;
 
-			if (_defaultGalleryPositionRatio != null) {
+			if (_forcedGalleryPosition != null) {
 
-				_galleryPosition = (int) (_contentVirtualHeight * _defaultGalleryPositionRatio);
+				_galleryPosition = (int) (_contentVirtualHeight * _forcedGalleryPosition);
 
 			} else {
 
@@ -2787,9 +2787,9 @@ public abstract class GalleryMT20 extends Canvas {
 			_contentVirtualWidth = _gridHorizItems * _itemWidth;
 			_contentVirtualHeight = clientAreaHeight;
 
-			if (_defaultGalleryPositionRatio != null) {
+			if (_forcedGalleryPosition != null) {
 
-				_galleryPosition = (int) (_contentVirtualWidth * _defaultGalleryPositionRatio);
+				_galleryPosition = (int) (_contentVirtualWidth * _forcedGalleryPosition);
 
 			} else {
 

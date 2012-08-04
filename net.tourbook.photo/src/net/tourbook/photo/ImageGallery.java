@@ -33,11 +33,11 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.photo.internal.Activator;
+import net.tourbook.photo.internal.GalleryPhotoToolTip;
 import net.tourbook.photo.internal.ImageFilter;
 import net.tourbook.photo.internal.Messages;
 import net.tourbook.photo.internal.PhotoDateInfo;
 import net.tourbook.photo.internal.PhotoRenderer;
-import net.tourbook.photo.internal.GalleryPhotoToolTip;
 import net.tourbook.photo.internal.gallery.GalleryActionBar;
 import net.tourbook.photo.internal.gallery.MT20.FullSizeViewer;
 import net.tourbook.photo.internal.gallery.MT20.GalleryMT20;
@@ -93,6 +93,11 @@ import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
  * </pre>
  */
 public abstract class ImageGallery implements IItemHovereredListener, IGalleryContextMenuProvider {
+
+	/**
+	 * Number of gallery positions which are cached
+	 */
+	private static final int									MAX_GALLERY_POSITIONS			= 100;
 
 	private static final String									MENU_ID_PHOTO_GALLERY			= "menu.net.tourbook.photo.photoGallery";	//$NON-NLS-1$
 
@@ -197,7 +202,7 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 	private PhotoRenderer										_photoRenderer;
 
 	private FullSizeViewer										_fullSizeViewer;
-	private GalleryPhotoToolTip										_photoTooltip;
+	private GalleryPhotoToolTip									_photoTooltip;
 
 	/**
 	 * Folder which images are currently be displayed
@@ -273,7 +278,7 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 	private Display												_display;
 	private Composite											_uiContainer;
 
-	private GalleryImplementation								_gallery;
+	private GalleryImplementation								_galleryMT20;
 	private GalleryActionBar									_galleryActionBar;
 
 	private PageBook											_pageBook;
@@ -284,7 +289,7 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 	private Label												_lblGalleryInfo;
 
 	{
-		_galleryPositions = new LinkedHashMap<String, Double>(100, 0.75f, true);
+		_galleryPositions = new LinkedHashMap<String, Double>(MAX_GALLERY_POSITIONS, 0.75f, true);
 
 		_exifCache = new ConcurrentLinkedHashMap.Builder<String, PhotoImageMetadata>()//
 				.maximumWeightedCapacity(20000)
@@ -459,7 +464,7 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 	 */
 	private PhotoSelection createPhotoSelection() {
 
-		final Collection<GalleryMT20Item> allItems = _gallery.getSelection();
+		final Collection<GalleryMT20Item> allItems = _galleryMT20.getSelection();
 
 		final ArrayList<PhotoWrapper> photos = new ArrayList<PhotoWrapper>();
 
@@ -505,9 +510,9 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 			}
 		}
 
-		_photoTooltip = new GalleryPhotoToolTip(_gallery);
+		_photoTooltip = new GalleryPhotoToolTip(_galleryMT20);
 		_photoTooltip.setHideOnMouseMove(true);
-		_gallery.addItemHoveredListener(this);
+		_galleryMT20.addItemHoveredListener(this);
 
 		// force that the 1st tab is in the gallery
 //		if (_isActionBar) {
@@ -520,16 +525,16 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 	 */
 	private void createUI_20_PageGallery(final Composite parent) {
 
-		_gallery = new GalleryImplementation(parent, _galleryStyle);
+		_galleryMT20 = new GalleryImplementation(parent, _galleryStyle);
 
-		_gallery.setHigherQualityDelay(200);
+		_galleryMT20.setHigherQualityDelay(200);
 //		_gallery.setAntialias(SWT.OFF);
 //		_gallery.setInterpolation(SWT.LOW);
-		_gallery.setAntialias(SWT.ON);
-		_gallery.setInterpolation(SWT.HIGH);
-		_gallery.setItemMinMaxSize(MIN_GALLERY_ITEM_WIDTH, MAX_GALLERY_ITEM_WIDTH);
+		_galleryMT20.setAntialias(SWT.ON);
+		_galleryMT20.setInterpolation(SWT.HIGH);
+		_galleryMT20.setItemMinMaxSize(MIN_GALLERY_ITEM_WIDTH, MAX_GALLERY_ITEM_WIDTH);
 
-		_gallery.addListener(SWT.Modify, new Listener() {
+		_galleryMT20.addListener(SWT.Modify, new Listener() {
 
 			// a modify event is fired when gallery is zoomed in/out
 
@@ -541,7 +546,7 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 			}
 		});
 
-		_gallery.addListener(SWT.Selection, new Listener() {
+		_galleryMT20.addListener(SWT.Selection, new Listener() {
 
 			// a gallery item is selected/deselected
 
@@ -551,15 +556,15 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 			}
 		});
 
-		_gallery.setContextMenuProvider(this);
-		_photoGalleryProvider.registerContextMenu(MENU_ID_PHOTO_GALLERY, _gallery.getContextMenuManager());
+		_galleryMT20.setContextMenuProvider(this);
+		_photoGalleryProvider.registerContextMenu(MENU_ID_PHOTO_GALLERY, _galleryMT20.getContextMenuManager());
 
-		_fullSizeViewer = _gallery.getFullsizeViewer();
+		_fullSizeViewer = _galleryMT20.getFullsizeViewer();
 
 		// set photo renderer which paints the image but also starts the image loading
-		_photoRenderer = new PhotoRenderer(_gallery, this);
+		_photoRenderer = new PhotoRenderer(_galleryMT20, this);
 
-		_gallery.setItemRenderer(_photoRenderer);
+		_galleryMT20.setItemRenderer(_photoRenderer);
 	}
 
 	private void createUI_30_PageDefault(final PageBook parent) {
@@ -596,7 +601,7 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 
 	private void deselectAll() {
 
-		_gallery.deselectAll();
+		_galleryMT20.deselectAll();
 
 		// update UI
 		onSelectPhoto();
@@ -679,22 +684,19 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 
 		double galleryPosition = 0;
 
+		// keep current gallery position
 		if (_currentGalleryPositionKey != null) {
-
-			// keep current gallery position
-			_galleryPositions.put(_currentGalleryPositionKey, _gallery.getGalleryPosition());
+			_galleryPositions.put(_currentGalleryPositionKey, _galleryMT20.getGalleryPosition());
 		}
 
+		// get old position
 		if (_newGalleryPositionKey != null) {
+
+			_currentGalleryPositionKey = _newGalleryPositionKey;
 
 			// get old gallery position
 			final Double oldPosition = _galleryPositions.get(_newGalleryPositionKey);
 
-			_currentGalleryPositionKey = _newGalleryPositionKey;
-
-			/*
-			 * initialize and update gallery with new items
-			 */
 			galleryPosition = oldPosition == null ? 0 : oldPosition;
 		}
 
@@ -710,7 +712,7 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 	}
 
 	public Collection<GalleryMT20Item> getGallerySelection() {
-		return _gallery.getSelection();
+		return _galleryMT20.getSelection();
 	}
 
 	/**
@@ -746,7 +748,7 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 
 			// get all selected photos
 
-			final Collection<GalleryMT20Item> galleryItems = _gallery.getSelection();
+			final Collection<GalleryMT20Item> galleryItems = _galleryMT20.getSelection();
 
 			sortedPhotoWrapper = new PhotoWrapper[galleryItems.size()];
 
@@ -839,7 +841,7 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 	 */
 	private String getStatusDefaultMessage() {
 
-		final Collection<GalleryMT20Item> allSelectedPhoto = _gallery.getSelection();
+		final Collection<GalleryMT20Item> allSelectedPhoto = _galleryMT20.getSelection();
 		final int allPhotoSize = allSelectedPhoto.size();
 
 		return allPhotoSize == 0 //
@@ -873,7 +875,7 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 						disposeAndDeleteAllImages();
 					}
 
-					_gallery.updateGallery(false, _gallery.getGalleryPosition());
+					_galleryMT20.updateGallery(false, _galleryMT20.getGalleryPosition());
 
 					if (_isActionBar) {
 						_galleryActionBar.updateUI_ImageIndicatorTooltip();
@@ -903,7 +905,7 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 	}
 
 	public boolean isDisposed() {
-		return _gallery.isDisposed();
+		return _galleryMT20.isDisposed();
 	}
 
 	/**
@@ -1236,7 +1238,7 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		 * gallery MUST be updated even when no images are displayed because images from the
 		 * previous folder are still displayed
 		 */
-		updateUI_GalleryItems(newFilteredWrapper);
+		updateUI_GalleryItems(newFilteredWrapper, null);
 
 		if (_jobFilterDirtyCounter > currentDirtyCounter) {
 
@@ -1416,7 +1418,7 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 
 		final int currentDirtyCounter = _jobUIFilterDirtyCounter;
 
-		updateUI_GalleryItems(uiUpdatePhotoWrapper);
+		updateUI_GalleryItems(uiUpdatePhotoWrapper, null);
 
 		if (_jobUIFilterDirtyCounter > currentDirtyCounter) {
 			// UI is dirty again
@@ -1573,7 +1575,7 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 								final int width,
 								final int height,
 								final boolean all) {
-		_gallery.redraw(viewPortX, viewPortY, width, height, all);
+		_galleryMT20.redraw(viewPortX, viewPortY, width, height, all);
 	}
 
 	/**
@@ -1603,7 +1605,7 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 
 	public void restoreState(final IDialogSettings state) {
 
-		_gallery.restoreState(state);
+		_galleryMT20.restoreState(state);
 
 		// set font
 		onModifyFont();
@@ -1628,11 +1630,11 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		 * show gallery to initialize client area, otherwise the width is 0 until the page is
 		 * displayed in a later step
 		 */
-		_pageBook.showPage(_gallery);
+		showPageBookPage(_galleryMT20);
 
 		// show default page
 		_lblDefaultPage.setText(_defaultStatusMessage);
-		_pageBook.showPage(_pageDefault);
+		showPageBookPage(_pageDefault);
 
 		/**
 		 * set thumbnail size after gallery client area is set
@@ -1685,11 +1687,14 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		state.put(STATE_IMAGE_SORTING, _currentSorting.name());
 
 		/*
-		 * gallery positions
+		 * keep gallery positions
 		 */
+
+		// preserve current gallery position
 		if (_currentGalleryPositionKey != null) {
-			// preserve current position
-			_galleryPositions.put(_currentGalleryPositionKey, _gallery.getGalleryPosition());
+			_galleryPositions.put(_currentGalleryPositionKey, _galleryMT20.getGalleryPosition());
+		} else if (_newGalleryPositionKey != null) {
+			_galleryPositions.put(_newGalleryPositionKey, _galleryMT20.getGalleryPosition());
 		}
 
 		final Set<String> positionKeys = _galleryPositions.keySet();
@@ -1701,17 +1706,23 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 			final String[] positionValues = new String[positionSize];
 
 			for (int positionIndex = 0; positionIndex < positionKeyArray.length; positionIndex++) {
+
 				final String positionKey = positionKeyArray[positionIndex];
 				positionValues[positionIndex] = _galleryPositions.get(positionKey).toString();
+
+				// limit positions to max
+				if (positionIndex > MAX_GALLERY_POSITIONS) {
+					break;
+				}
 			}
 
 			state.put(STATE_GALLERY_POSITION_KEY, positionKeyArray);
 			state.put(STATE_GALLERY_POSITION_VALUE, positionValues);
 		}
 
-		Util.setState(state, STATE_SELECTED_ITEMS, _gallery.getSelectionIndex());
+		Util.setState(state, STATE_SELECTED_ITEMS, _galleryMT20.getSelectionIndex());
 
-		_gallery.saveState(state);
+		_galleryMT20.saveState(state);
 	}
 
 	public void setDefaultStatusMessage(final String message) {
@@ -1755,10 +1766,10 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 			return;
 		}
 
-		final int prevGalleryItemSize = _gallery.getItemWidth();
+		final int prevGalleryItemSize = _galleryMT20.getItemWidth();
 
 		// update gallery
-		final int adjustedItemSize = _gallery.zoomGallery(newGalleryItemSize);
+		final int adjustedItemSize = _galleryMT20.zoomGallery(newGalleryItemSize);
 
 		if (adjustedItemSize == -1 || adjustedItemSize == prevGalleryItemSize) {
 			// nothing has changed
@@ -1780,6 +1791,43 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		updateUI_AfterZoomInOut(newGalleryItemSize);
 	}
 
+	public void showImages(final ArrayList<PhotoWrapper> photoWrapperList, final String galleryPositionKey) {
+
+		jobFilter_12_Stop();
+		PhotoLoadManager.stopImageLoading(true);
+
+		//////////////////////////////////////////
+		//
+		// MUST BE REMOVED, IS ONLY FOR TESTING
+		//
+//		disposeAndDeleteAllImages();
+//		PhotoLoadManager.removeInvalidImageFiles();
+		//
+		// MUST BE REMOVED, IS ONLY FOR TESTING
+		//
+		//////////////////////////////////////////
+
+		// images are not loaded from a folder, photo wrappers are already available
+		_photoFolder = null;
+
+		_newGalleryPositionKey = galleryPositionKey;
+
+		// initialize tooltip for a new folder
+		_photoTooltip.reset();
+
+		_allPhotoWrapper = photoWrapperList.toArray(new PhotoWrapper[photoWrapperList.size()]);
+
+		final double galleryPosition = getCachedGalleryPosition();
+
+		updateUI_GalleryItems(_allPhotoWrapper, galleryPosition);
+
+//		/*
+//		 * start filter always, even when no filter is set because it is loading exif data which is
+//		 * used to sort images correctly by exif date (when available) and not by file date
+//		 */
+//		jobFilter_20_Schedule1st();
+	}
+
 	/**
 	 * Display images for a list of {@link PhotoWrapper}.
 	 * 
@@ -1787,7 +1835,9 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 	 * @param galleryPositionKey
 	 *            Contains a unique key to keep gallery position for different contents
 	 */
-	public void showImages(final ArrayList<PhotoWrapper> photoWrapperList, final String galleryPositionKey) {
+	public void showImages(	final ArrayList<PhotoWrapper> photoWrapperList,
+							final String galleryPositionKey,
+							final boolean isShowDefaultMessage) {
 
 		jobFilter_12_Stop();
 
@@ -1804,8 +1854,10 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		//
 		//////////////////////////////////////////
 
-		_lblDefaultPage.setText(_defaultStatusMessage);
-		_pageBook.showPage(_pageDefault);
+		if (isShowDefaultMessage) {
+			_lblDefaultPage.setText(_defaultStatusMessage);
+			showPageBookPage(_pageDefault);
+		}
 
 		// images are not loaded from a folder, photo wrappers are already available
 		_photoFolder = null;
@@ -1844,7 +1896,7 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 
 			_lblDefaultPage.setText(NLS.bind(Messages.Pic_Dir_Label_Loading, imageFolder.getAbsolutePath()));
 		}
-		_pageBook.showPage(_pageDefault);
+		showPageBookPage(_pageDefault);
 
 		_photoFolderWhichShouldBeDisplayed = imageFolder;
 
@@ -1869,7 +1921,11 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		// reset tooltip, otherwise it could be displayed if it should not
 		_photoTooltip.reset();
 
-		_gallery.redraw();
+		_galleryMT20.redraw();
+	}
+
+	private void showPageBookPage(final Composite page) {
+		_pageBook.showPage(page);
 	}
 
 	public void showRestoreFolder(final String restoreFolderName) {
@@ -1880,7 +1936,7 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 			_lblDefaultPage.setText(NLS.bind(Messages.Pic_Dir_StatusLabel_RestoringFolder, restoreFolderName));
 		}
 
-		_pageBook.showPage(_pageDefault);
+		showPageBookPage(_pageDefault);
 	}
 
 	public void sortGallery(final GallerySorting gallerySorting) {
@@ -1915,7 +1971,7 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 			return;
 		}
 
-		final GalleryMT20Item[] virtualGalleryItems = _gallery.getAllVirtualItems();
+		final GalleryMT20Item[] virtualGalleryItems = _galleryMT20.getAllVirtualItems();
 		final int virtualSize = virtualGalleryItems.length;
 
 		if (virtualSize == 0) {
@@ -1926,7 +1982,7 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		// sort photos with new sorting algorithm
 		Arrays.sort(_sortedAndFilteredPhotoWrapper, getCurrentComparator());
 
-		updateUI_GalleryItems(_sortedAndFilteredPhotoWrapper);
+		updateUI_GalleryItems(_sortedAndFilteredPhotoWrapper, null);
 	}
 
 	/**
@@ -1955,7 +2011,7 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		/*
 		 * gallery
 		 */
-		_gallery.setColors(fgColor, bgColor);
+		_galleryMT20.setColors(fgColor, bgColor);
 
 		_photoRenderer.setColors(fgColor, bgColor, selectionFgColor, noFocusSelectionFgColor);
 
@@ -2008,7 +2064,7 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		final int hqMinSize = _prefStore.getInt(//
 				IPhotoPreferences.PHOTO_VIEWER_HIGH_QUALITY_IMAGE_MIN_SIZE);
 
-		_gallery.setImageQuality(isShowHighQuality, hqMinSize);
+		_galleryMT20.setImageQuality(isShowHighQuality, hqMinSize);
 
 		/*
 		 * text minimum thumb size
@@ -2027,11 +2083,11 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		_display.syncExec(new Runnable() {
 			public void run() {
 
-				if (_gallery.isDisposed()) {
+				if (_galleryMT20.isDisposed()) {
 					return;
 				}
 
-				_pageBook.showPage(_pageGalleryInfo);
+				showPageBookPage(_pageGalleryInfo);
 
 				final int imageCount = _allPhotoWrapper.length;
 
@@ -2072,12 +2128,17 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		});
 	}
 
-	/*
-	 * set gallery items into a list according to the new sorting/filtering
+	/**
+	 * Set gallery items into a list according to the new sorting/filtering
+	 * 
+	 * @param filteredAndSortedWrapper
+	 * @param galleryPosition
+	 *            When <code>null</code> the old position is preserved, otherwise images at a new
+	 *            position are displayed.
 	 */
-	private void updateUI_GalleryItems(final PhotoWrapper[] filteredAndSortedWrapper) {
+	private void updateUI_GalleryItems(final PhotoWrapper[] filteredAndSortedWrapper, final Double galleryPosition) {
 
-		final HashMap<String, GalleryMT20Item> existingGalleryItems = _gallery.getCreatedGalleryItems();
+		final HashMap<String, GalleryMT20Item> existingGalleryItems = _galleryMT20.getCreatedGalleryItems();
 
 		final int wrapperSize = filteredAndSortedWrapper.length;
 		final GalleryMT20Item[] sortedGalleryItems = new GalleryMT20Item[wrapperSize];
@@ -2100,7 +2161,7 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		_display.syncExec(new Runnable() {
 			public void run() {
 
-				if (_gallery.isDisposed()) {
+				if (_galleryMT20.isDisposed()) {
 					return;
 				}
 
@@ -2108,10 +2169,10 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 
 					// gallery items are available
 
-					_pageBook.showPage(_gallery);
+					showPageBookPage(_galleryMT20);
 
 					// update gallery
-					_gallery.setVirtualItems(sortedGalleryItems);
+					_galleryMT20.setVirtualItems(sortedGalleryItems, galleryPosition);
 
 				} else {
 
@@ -2137,7 +2198,7 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		_display.asyncExec(new Runnable() {
 			public void run() {
 
-				if (_gallery.isDisposed()) {
+				if (_galleryMT20.isDisposed()) {
 					return;
 				}
 
@@ -2215,11 +2276,11 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 				return;
 			}
 
+			_photoFolder = _workerStateDir;
+
 			if (_photoFolder != null) {
 				_newGalleryPositionKey = _photoFolder.getAbsolutePath();
 			}
-
-			_photoFolder = _workerStateDir;
 
 			workerExecute_DisplayImages(newPhotoWrapper);
 		}
@@ -2242,7 +2303,7 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 
 				final double galleryPosition = getCachedGalleryPosition();
 
-				_gallery.setupItems(0, galleryPosition, _restoredSelection);
+				_galleryMT20.setupItems(0, galleryPosition, _restoredSelection);
 
 				_restoredSelection = null;
 

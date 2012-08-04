@@ -300,22 +300,9 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 	@Override
 	protected Composite createToolTipContentArea(final Event event, final Composite parent) {
 
-		Composite shell;
-
-//		if (_tourData == null || _tourData.timeSerie == null || _tourData.timeSerie.length == 0) {
-//
-//			// there are no data available
-//
-//			shell = createUI999NoData(parent);
-//
-//		} else {
-
-		// tour data is available
-
 		createActions();
 
-		shell = createUI(parent);
-//		}
+		final Composite shell = createUI(parent);
 
 		return shell;
 	}

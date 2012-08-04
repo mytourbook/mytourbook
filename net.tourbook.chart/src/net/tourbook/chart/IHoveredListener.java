@@ -23,11 +23,18 @@ import org.eclipse.swt.graphics.Point;
 public interface IHoveredListener {
 
 	/**
+	 * Hide value point tooltip because chart has been modified (zoomed in/ou)
+	 */
+	void hideTooltip();
+
+	/**
 	 * Event is fired when mouse is moved over a line graph value point.
 	 * 
 	 * @param hoveredValueIndex
-	 * @param hoveredValueDevPosition
+	 * @param devHoveredValue
+	 * @param devYMouseMove
+	 * @param devXMouseMove
 	 */
-	void hoveredValue(int hoveredValueIndex, Point hoveredValueDevPosition);
+	void hoveredValue(int hoveredValueIndex, Point devHoveredValue, int devXMouseMove, int devYMouseMove);
 
 }

@@ -692,6 +692,10 @@ public class Chart extends ViewForm {
 		return _hoveredValuePointListener;
 	}
 
+	public int getLeftAxisWidth() {
+		return _chartComponents.getYAxisWidthLeft();
+	}
+
 	/**
 	 * @return Returns the left slider
 	 */

@@ -21,7 +21,6 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
-import net.tourbook.chart.IHoveredListener;
 import net.tourbook.chart.ISliderMoveListener;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
@@ -53,7 +52,6 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -72,7 +70,7 @@ import org.eclipse.ui.part.ViewPart;
 /**
  * Shows the selected tour in a chart
  */
-public class TourChartView extends ViewPart implements ITourChartViewer, IHoveredListener {
+public class TourChartView extends ViewPart implements ITourChartViewer {
 
 	public static final String		ID			= "net.tourbook.views.TourChartView";	//$NON-NLS-1$
 
@@ -81,6 +79,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IHovere
 
 	private TourChartConfiguration	_tourChartConfig;
 	private TourData				_tourData;
+	private MergeTour				_mergeTour;
 
 	private PostSelectionProvider	_postSelectionProvider;
 	private ISelectionListener		_postSelectionListener;
@@ -95,8 +94,6 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IHovere
 	private Label					_pageNoChart;
 
 	private TourChart				_tourChart;
-
-	private MergeTour				_mergeTour;
 
 	private void addPartListener() {
 		_partListener = new IPartListener2() {
@@ -336,8 +333,6 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IHovere
 				_postSelectionProvider.setSelection(chartInfoSelection);
 			}
 		});
-
-		_tourChart.setHoveredValuePointListener(this);
 	}
 
 	@Override
@@ -384,23 +379,6 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IHovere
 
 	public TourChart getTourChart() {
 		return _tourChart;
-	}
-
-	@Override
-	public void hoveredValue(final int hoveredValueIndex, final Point hoveredValueDevPosition) {
-
-		if (_tourData == null) {
-			return;
-		}
-
-		final MergeTour mergeTour = _tourData.mergeTour;
-		if (mergeTour == null) {
-			return;
-		}
-
-
-//		System.out.println("hoveredValue index: " + hoveredValueIndex + "\tdev pos: " + hoveredValueDevPosition);
-//		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 	private void onSelectionChanged(final ISelection selection) {

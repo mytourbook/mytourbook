@@ -38,6 +38,7 @@ public class PhotoWrapper implements IGalleryCustomData {
 	 * Last modified in GMT
 	 */
 	public long		imageFileLastModified;
+
 	/**
 	 * Time in ms
 	 */

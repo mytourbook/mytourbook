@@ -423,11 +423,11 @@ public abstract class ValuePointToolTipShell {
 	 * 
 	 * @param event
 	 *            the event that triggered the activation of the tooltip
-	 * @param parent
+	 * @param shell
 	 *            the parent of the content area
 	 * @return the content area created
 	 */
-	protected abstract Composite createToolTipContentArea(Event event, Composite parent);
+	protected abstract Composite createToolTipContentArea(Event event, Composite shell);
 
 	/**
 	 * @param tipSize
@@ -788,10 +788,10 @@ public abstract class ValuePointToolTipShell {
 
 			if (isTTDragged) {
 
-				if (screenDefaultLocation.y > 1100) {
-					int a = 0;
-					a++;
-				}
+//				if (screenDefaultLocation.y > 1100) {
+//					int a = 0;
+//					a++;
+//				}
 
 				// ensure that the dragged tooltip is within the screen border
 				final Point screenNewLocation = fixupDisplayBounds(
