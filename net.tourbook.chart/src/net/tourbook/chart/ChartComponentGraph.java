@@ -5398,7 +5398,7 @@ public class ChartComponentGraph extends Canvas {
 		_devYMouseMove = devYMouse;
 
 		boolean isRedraw = false;
-		boolean canShowTooltip = false;
+		boolean canShowHoveredTooltip = false;
 
 		if (_isXSliderVisible && _xSliderDragged != null) {
 
@@ -5496,6 +5496,8 @@ public class ChartComponentGraph extends Canvas {
 				// set cursor
 				setCursor(_cursorResizeLeftRight);
 
+				canShowHoveredTooltip = true;
+
 			} else if (_mouseOverXSlider != null) {
 
 				// mouse has left the x-slider
@@ -5503,6 +5505,8 @@ public class ChartComponentGraph extends Canvas {
 				_mouseOverXSlider = null;
 				_isSliderDirty = true;
 				isRedraw = true;
+
+				canShowHoveredTooltip = true;
 
 			} else if (_isYSliderVisible && isYSliderHit(devXMouse, devYMouse) != null) {
 
@@ -5516,6 +5520,8 @@ public class ChartComponentGraph extends Canvas {
 				_isSliderDirty = true;
 				isRedraw = true;
 
+				canShowHoveredTooltip = true;
+
 			} else if (_chart._draggingListenerXMarker != null && isSynchMarkerHit(devXMouse)) {
 
 				setCursor(_cursorDragged);
@@ -5524,7 +5530,7 @@ public class ChartComponentGraph extends Canvas {
 
 				// cursor is already set
 
-				canShowTooltip = true;
+				canShowHoveredTooltip = true;
 
 			} else if (isBarHit(devXMouse, devYMouse)) {
 
@@ -5535,7 +5541,7 @@ public class ChartComponentGraph extends Canvas {
 
 			} else {
 
-				canShowTooltip = true;
+				canShowHoveredTooltip = true;
 
 				setCursorStyle(devYMouse);
 			}
@@ -5564,7 +5570,7 @@ public class ChartComponentGraph extends Canvas {
 					isRedraw = true;
 				}
 
-				if (_chart._hoveredValuePointListener != null && canShowTooltip) {
+				if (_chart._hoveredValuePointListener != null && canShowHoveredTooltip) {
 
 					_chart._hoveredValuePointListener.hoveredValue(
 							_hoveredLineValueIndex,

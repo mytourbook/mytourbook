@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -84,6 +84,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchPartSite;
 
 /**
@@ -168,6 +169,76 @@ public class TourChart extends Chart {
 	private ValuePointToolTipUI				_valuePointToolTip;
 
 	private ChartPhotoToolTip				_photoTooltip;
+	private ControlListener					_ttControlListener						= new ControlListener();
+
+	/**
+	 * This listener is added to ALL widgets within the tooltip shell.
+	 */
+	private class ControlListener implements Listener {
+
+		TourChart	__tourChart	= TourChart.this;
+
+		public void handleEvent(final Event event) {
+
+			if (__tourChart.isDisposed()) {
+				return;
+			}
+
+			if (event.widget instanceof Control) {
+
+				switch (event.type) {
+				case SWT.MouseExit:
+
+					// check if photo tooltip is displayed
+					final Shell photoTTShell = _photoTooltip.getShell();
+					if (photoTTShell == null || photoTTShell.isDisposed()) {
+						return;
+					}
+
+					boolean isHide = false;
+
+					// check what is hovered with the mouse after the MouseExit event is fired, can be null
+					final Control hoveredControl = __tourChart.getDisplay().getCursorControl();
+
+					if (hoveredControl == null) {
+
+						isHide = true;
+
+					} else {
+
+						/*
+						 * check if the hovered control is the owner control, if not, hide the
+						 * tooltip
+						 */
+						Control parent = hoveredControl;
+
+						while (true) {
+
+							if (parent == photoTTShell) {
+								// mouse is over the photo tooltip
+								break;
+							}
+
+							parent = parent.getParent();
+
+							if (parent == null) {
+								// mouse has left the tourchart and the photo tooltip
+								isHide = true;
+								break;
+							}
+						}
+
+					}
+
+					if (isHide) {
+						_photoTooltip.hide();
+					}
+
+					break;
+				}
+			}
+		}
+	}
 
 	public class HoveredListener implements IHoveredListener {
 
@@ -214,6 +285,24 @@ public class TourChart extends Chart {
 
 		_isShowActions = isShowActions;
 
+		/*
+		 * when the focus is changed, fire a tour chart selection, this is neccesarry to update the
+		 * tour markers when a tour chart got the focus
+		 */
+		addFocusListener(new Listener() {
+			public void handleEvent(final Event event) {
+				fireTourChartSelection();
+			}
+		});
+
+		addDisposeListener(new DisposeListener() {
+			public void widgetDisposed(final DisposeEvent e) {
+				onDispose();
+			}
+		});
+
+		addControlListener(this);
+
 		addPrefListeners();
 
 		/*
@@ -230,22 +319,6 @@ public class TourChart extends Chart {
 		isShowVerticalGridLines = _prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES);
 
 		setShowMouseMode();
-
-		/*
-		 * when the focus is changed, fire a tour chart selection, this is neccesarry to update the
-		 * tour markers when a tour chart got the focus
-		 */
-		addFocusListener(new Listener() {
-			public void handleEvent(final Event event) {
-				fireTourChartSelection();
-			}
-		});
-
-		addDisposeListener(new DisposeListener() {
-			public void widgetDisposed(final DisposeEvent e) {
-				onDispose();
-			}
-		});
 
 		/*
 		 * setup tour info icon into the left axis
@@ -267,7 +340,7 @@ public class TourChart extends Chart {
 		/*
 		 * setup value point tooltip
 		 */
-		final ITooltipOwner tooltipOwner = new ITooltipOwner() {
+		final ITooltipOwner vpToolTipOwner = new ITooltipOwner() {
 
 			@Override
 			public Control getControl() {
@@ -279,7 +352,7 @@ public class TourChart extends Chart {
 				handleTooltipMouseEvent(event, mouseDisplayPosition);
 			}
 		};
-		setValuePointToolTipProvider(_valuePointToolTip = new ValuePointToolTipUI(tooltipOwner, _state));
+		setValuePointToolTipProvider(_valuePointToolTip = new ValuePointToolTipUI(vpToolTipOwner, _state));
 
 		_photoTooltip = new ChartPhotoToolTip(this);
 
@@ -508,6 +581,27 @@ public class TourChart extends Chart {
 
 			// update the action handlers in the chart
 			updateChartActionHandlers();
+		}
+	}
+
+	/**
+	 * ########################### Recursive #########################################<br>
+	 * <p>
+	 * Add listener to all controls within the tour chart
+	 * <p>
+	 * ########################### Recursive #########################################<br>
+	 * 
+	 * @param control
+	 */
+	private void addControlListener(final Control control) {
+
+		control.addListener(SWT.MouseExit, _ttControlListener);
+
+		if (control instanceof Composite) {
+			final Control[] children = ((Composite) control).getChildren();
+			for (final Control child : children) {
+				addControlListener(child);
+			}
 		}
 	}
 
@@ -1409,10 +1503,19 @@ public class TourChart extends Chart {
 		_valuePointToolTip.hide();
 	}
 
+	public void partIsDeactivated() {
+
+		// hide photo tooltip
+		_photoTooltip.hide();
+	}
+
 	public void partIsHidden() {
 
-		// hide tool tip
+		// hide value point tooltip
 		_valuePointToolTip.setShellVisible(false);
+
+		// hide photo tooltip
+		_photoTooltip.hide();
 	}
 
 	public void partIsVisible() {
@@ -1430,7 +1533,7 @@ public class TourChart extends Chart {
 	}
 
 	void restoreState() {
-		
+
 		_photoTooltip.restoreState(_state);
 	}
 

@@ -23,6 +23,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Shell;
 
 /**
  * Photo tooltip for a tour chart.
@@ -107,6 +108,10 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 		return _tourChart.toDisplay(ttPosX, ttPosY);
 	}
 
+	Shell getShell() {
+		return getToolTipShell();
+	}
+
 	@Override
 	public void incrementHideCounter() {
 		_hideCounter++;
@@ -177,9 +182,6 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 			}
 		}
 
-		System.out.println("show\t" + _hoveredPhotos.size() + "  hidecounter " + _hideCounter);
-		// TODO remove SYSTEM.OUT.PRINTLN
-
 		if (_hoveredPhotos.size() == 0) {
 
 			_hideCounter++;
@@ -191,5 +193,6 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 			showPhotoToolTip(devPositionHoveredValue);
 		}
 	}
+
 
 }

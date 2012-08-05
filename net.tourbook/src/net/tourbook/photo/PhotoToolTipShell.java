@@ -15,12 +15,14 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
+import net.tourbook.common.util.Util;
+
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
@@ -35,95 +37,59 @@ import org.eclipse.swt.widgets.Shell;
 /**
  * Part of this tooltip is copied from {@link ToolTip}.
  */
-public abstract class PhotoToolTipShell {
+public abstract class PhotoToolTipShell implements IExternalGalleryMouseListener {
 
 	private Shell					_ttShell;
 
 	private Object					_currentArea;
 	private Control					_ownerControl;
-	private OwnerShellListener		_ownerShellListener;
 
 	private OwnerControlListener	_ownerControlListener;
-	private TooltipShellListener	_ttShellListener	= new TooltipShellListener();
+	private OwnerShellListener		_ownerShellListener;
 
-	int								chartMarginTop;
-	int								chartMarginBottom;
+	private TooltipShellListener	_ttShellListener;
+	private ToolTipControlListener	_ttControlListener;
+
+	private boolean					_isShellResized;
+
+	private int						_mouseDownX;
+	private int						_mouseDownY;
 
 	private Display					_display;
 
+	/*
+	 * UI resources
+	 */
+	private Cursor					_cursor_NE_SW;
+	private Cursor					_cursor_NW_SE;
+
+	private ImageGallery			_imageGallery;
+
 	private class OwnerControlListener implements Listener {
 		public void handleEvent(final Event event) {
-
-			switch (event.type) {
-			case SWT.Dispose:
-				toolTipHide(_ttShell, event);
-				break;
-
-			case SWT.Resize:
-				onResizeOwner(event);
-			}
+			onOwnerControlEvent(event);
 		}
 	}
 
 	private final class OwnerShellListener implements Listener {
 		public void handleEvent(final Event event) {
-
-			if (_ownerControl == null || _ownerControl.isDisposed()) {
-				return;
-			}
-
-			switch (event.type) {
-			case SWT.Deactivate:
-
-				_display.asyncExec(new Runnable() {
-
-					public void run() {
-
-						// hide tooltip when another shell is activated
-
-						if (_display.getActiveShell() != _ttShell) {
-							toolTipHide(_ttShell, event);
-						}
-					}
-				});
-				break;
-
-			case SWT.Move:
-				onMoveOwner(event);
-				break;
-			}
+			onOwnerShellEvent(event);
 		}
 	}
 
+	/**
+	 * This listener is added to ALL widgets within the tooltip shell.
+	 */
+	private class ToolTipControlListener implements Listener {
+		public void handleEvent(final Event event) {
+			onTTControlEvent(event);
+		}
+
+	}
+
 	private final class TooltipShellListener implements Listener {
-		public void handleEvent(final Event e) {
-
-			if (_ttShell != null && !_ttShell.isDisposed() && _ownerControl != null && !_ownerControl.isDisposed()) {
-
-				_display.asyncExec(new Runnable() {
-
-					public void run() {
-
-						// hide tooltip when another shell is activated
-
-						// check again
-						if (_ttShell == null
-								|| _ttShell.isDisposed()
-								|| _ownerControl == null
-								|| _ownerControl.isDisposed()) {
-							return;
-						}
-
-						if (_ownerControl.getShell() == _ttShell.getDisplay().getActiveShell()) {
-
-							// don't hide when main window is active
-							return;
-						}
-
-						toolTipHide(_ttShell, null);
-					}
-				});
-			}
+		public void handleEvent(final Event event) {
+			onTTShellEvent(event);
 		}
 	}
 
@@ -139,27 +105,37 @@ public abstract class PhotoToolTipShell {
 		_ownerControl = ownerControl;
 		_display = _ownerControl.getDisplay();
 
-		_ownerControl.addDisposeListener(new DisposeListener() {
-			public void widgetDisposed(final DisposeEvent e) {
-				onDispose();
-			}
-		});
+		_ttControlListener = new ToolTipControlListener();
+		_ttShellListener = new TooltipShellListener();
 
 		_ownerControlListener = new OwnerControlListener();
 		_ownerShellListener = new OwnerShellListener();
 
-		addOwnerControlListener();
+		ownerControlAddListener();
 	}
 
 	/**
-	 * Activate tooltip support for this control
+	 * ########################### Recursive #########################################<br>
+	 * <p>
+	 * Add listener to all controls within the tooltip
+	 * <p>
+	 * ########################### Recursive #########################################<br>
+	 * 
+	 * @param control
 	 */
-	private void addOwnerControlListener() {
+	private void addToolTipControlListener(final Control control) {
 
-		removeOwnerControlListener();
+		control.addListener(SWT.MouseDown, _ttControlListener);
+		control.addListener(SWT.MouseUp, _ttControlListener);
+		control.addListener(SWT.MouseMove, _ttControlListener);
+		control.addListener(SWT.MouseExit, _ttControlListener);
 
-		_ownerControl.addListener(SWT.Dispose, _ownerControlListener);
-		_ownerControl.addListener(SWT.Resize, _ownerControlListener);
+		if (control instanceof Composite) {
+			final Control[] children = ((Composite) control).getChildren();
+			for (final Control child : children) {
+				addToolTipControlListener(child);
+			}
+		}
 	}
 
 	/**
@@ -250,35 +226,293 @@ public abstract class PhotoToolTipShell {
 		toolTipHide(_ttShell, null);
 	}
 
-	protected void onDispose() {
-		removeOwnerControlListener();
+	@Override
+	public boolean isMouseEventHandledExternally(final int eventType, final MouseEvent mouseEvent) {
+
+		if (_ttShell == null || _ttShell.isDisposed()) {
+			return false;
+		}
+
+		final Rectangle shellBounds = _ttShell.getBounds();
+		final int shellX = shellBounds.x;
+		final int shellY = shellBounds.y;
+		final int shellWidth = shellBounds.width;
+		final int shellHeight = shellBounds.height;
+
+		final Point mousePos = _ttShell.toControl(_display.getCursorLocation());
+
+		Cursor cursor = null;
+		final int resizeBox = 30;
+
+		final int mouseX = mousePos.x;
+		final int mouseY = mousePos.y;
+
+		boolean isLeft = false;
+
+		// check if mouse is within the resize box
+		if (mouseX < resizeBox && mouseY < resizeBox) {
+
+			// mouse is in the top left resize box
+
+			cursor = _cursor_NW_SE;
+			isLeft = true;
+
+		} else if (mouseX > (shellWidth - resizeBox) && mouseY < resizeBox) {
+
+			// mouse is in the top right resize box
+
+			cursor = _cursor_NE_SW;
+		}
+
+		boolean isHandled;
+
+		if (cursor == null) {
+			isHandled = false;
+		} else {
+			isHandled = true;
+
+			switch (eventType) {
+			case SWT.MouseDown:
+
+				_isShellResized = true;
+
+				_mouseDownX = mouseX;
+				_mouseDownY = mouseY;
+
+				System.out.println("tt mouse down\t");
+				// TODO remove SYSTEM.OUT.PRINTLN
+
+				break;
+
+			case SWT.MouseUp:
+
+				if (_isShellResized) {
+
+					_isShellResized = false;
+				}
+
+				break;
+
+			case SWT.MouseMove:
+
+				if (_isShellResized) {
+
+					if (isLeft) {
+
+						final int diffX = _mouseDownX - mouseX;
+						final int diffY = _mouseDownY - mouseY;
+
+						final int newShellX = shellX - diffX;
+						final int newShellY = shellY - diffY;
+						final int newShellWidth = shellWidth + diffX;
+						final int newShellHeight = shellHeight + diffY;
+
+						_ttShell.setLocation(newShellX, newShellY);
+						_ttShell.setSize(newShellWidth, newShellHeight);
+					}
+				}
+
+				break;
+			}
+		}
+
+		/*
+		 * shell could be hidden
+		 */
+		if (_ttShell != null && !_ttShell.isDisposed()) {
+			_ttShell.setCursor(cursor);
+		}
+
+		return isHandled;
 	}
 
-	/**
-	 * The owner shell has been moved, adjust tooltip shell that it moves also with the owner
-	 * control but preserves the display border.
-	 */
-	private void onMoveOwner(final Event event) {
+	private void onOwnerControlEvent(final Event event) {
+
+		if (_ownerControl == null || _ownerControl.isDisposed()) {
+			return;
+		}
+
+		switch (event.type) {
+		case SWT.Dispose:
+
+			toolTipHide(_ttShell, event);
+			ownerControlsRemoveListener();
+
+			break;
+
+		case SWT.Resize:
+			setTTShellLocation();
+			break;
+		}
+	}
+
+	private void onOwnerShellEvent(final Event event) {
 
 		if (_ttShell == null || _ttShell.isDisposed()) {
 			return;
 		}
 
-//		setTTShellLocation(false, false, false, false);
+		switch (event.type) {
+		case SWT.Deactivate:
+
+			_display.asyncExec(new Runnable() {
+
+				public void run() {
+
+					// hide tooltip when another shell is activated
+
+					if (_display.getActiveShell() != _ttShell) {
+						toolTipHide(_ttShell, event);
+					}
+				}
+			});
+			break;
+
+		case SWT.Move:
+			setTTShellLocation();
+			break;
+		}
 	}
 
-	/**
-	 * Owner control is resized.
-	 * 
-	 * @param event
-	 */
-	private void onResizeOwner(final Event event) {
+	private void onTTControlEvent(final Event event) {
 
 		if (_ttShell == null || _ttShell.isDisposed()) {
 			return;
 		}
 
-//		setTTShellLocation(false, false, false, false);
+		switch (event.type) {
+		case SWT.MouseExit:
+
+			boolean isHide = false;
+
+			// control which is hovered with the mouse after the exit, can be null
+			final Control hoveredExitControl = _display.getCursorControl();
+
+			if (hoveredExitControl == null) {
+
+				isHide = true;
+
+			} else {
+
+				/*
+				 * check if the hovered control is the owner control, if not, hide the tooltip
+				 */
+				Control hoveredExitParent = hoveredExitControl;
+				final Control hoveredToolTip = _imageGallery.getGalleryToolTipShell();
+
+				// move up child-parent hierarchy until shell is reached
+				while (true) {
+
+					if (hoveredExitParent == _ownerControl) {
+						// mouse is over the owner control
+						break;
+					}
+
+					if (hoveredToolTip != null && hoveredExitParent == hoveredToolTip) {
+						// mouse is over the owner tooltip control
+						break;
+					}
+
+					hoveredExitParent = hoveredExitParent.getParent();
+
+					if (hoveredExitParent == null) {
+						// mouse has left the tooltip and the owner control
+						isHide = true;
+						break;
+					}
+				}
+
+			}
+
+			if (isHide) {
+				toolTipHide(_ttShell, event);
+			}
+
+			break;
+		}
+	}
+
+	private void onTTShellEvent(final Event event) {
+
+		switch (event.type) {
+		case SWT.Deactivate:
+
+			if (_ttShell != null && !_ttShell.isDisposed() && _ownerControl != null && !_ownerControl.isDisposed()) {
+
+				_display.asyncExec(new Runnable() {
+
+					public void run() {
+
+						// hide tooltip when another shell is activated
+
+						// check again
+						if (_ttShell == null
+								|| _ttShell.isDisposed()
+								|| _ownerControl == null
+								|| _ownerControl.isDisposed()) {
+							return;
+						}
+
+						if (_ownerControl.getShell() == _ttShell.getDisplay().getActiveShell()) {
+
+							// don't hide when main window is active
+							return;
+						}
+
+						toolTipHide(_ttShell, null);
+					}
+				});
+			}
+
+			break;
+
+		case SWT.Dispose:
+
+			_cursor_NE_SW = (Cursor) Util.disposeResource(_cursor_NE_SW);
+			_cursor_NW_SE = (Cursor) Util.disposeResource(_cursor_NW_SE);
+
+			break;
+
+		}
+
+	}
+
+	/**
+	 * Activate tooltip support for this control
+	 */
+	private void ownerControlAddListener() {
+
+		ownerControlsRemoveListener();
+
+		_ownerControl.addListener(SWT.Dispose, _ownerControlListener);
+//		_ownerControl.addListener(SWT.MouseEnter, _ownerControlListener);
+		_ownerControl.addListener(SWT.Resize, _ownerControlListener);
+	}
+
+	/**
+	 * Deactivate tooltip support for the underlying control
+	 */
+	private void ownerControlsRemoveListener() {
+
+		_ownerControl.removeListener(SWT.Dispose, _ownerControlListener);
+//		_ownerControl.removeListener(SWT.MouseEnter, _ownerControlListener);
+		_ownerControl.removeListener(SWT.Resize, _ownerControlListener);
+	}
+
+	private void ownerShellAddListener() {
+
+		final Shell ownerShell = _ownerControl.getShell();
+
+		ownerShell.addListener(SWT.Deactivate, _ownerShellListener);
+		ownerShell.addListener(SWT.Move, _ownerShellListener);
+	}
+
+	private void ownerShellRemoveListener() {
+
+		final Shell ownerShell = _ownerControl.getShell();
+
+		ownerShell.removeListener(SWT.Deactivate, _ownerShellListener);
+		ownerShell.removeListener(SWT.Move, _ownerShellListener);
 	}
 
 	private void passOnEvent(final Shell tip, final Event event) {
@@ -293,22 +527,13 @@ public abstract class PhotoToolTipShell {
 	}
 
 	/**
-	 * Deactivate tooltip support for the underlying control
+	 * Set image gallery, this is done, after {@link #createToolTipContentArea(Event, Composite)} is
+	 * executed.
+	 * 
+	 * @param imageGallery
 	 */
-	private void removeOwnerControlListener() {
-
-		_ownerControl.removeListener(SWT.Dispose, _ownerControlListener);
-		_ownerControl.removeListener(SWT.Resize, _ownerControlListener);
-	}
-
-
-	protected void setShellVisible(final boolean isVisible) {
-
-		if (_ttShell == null || _ttShell.isDisposed()) {
-			return;
-		}
-
-		_ttShell.setVisible(isVisible);
+	protected void setImageGallery(final ImageGallery imageGallery) {
+		_imageGallery = imageGallery;
 	}
 
 	protected void setTTShellLocation() {
@@ -379,8 +604,9 @@ public abstract class PhotoToolTipShell {
 	 * 
 	 * @param location
 	 *            the location relative to the control the tooltip is shown
+	 * @return
 	 */
-	public void show(final Point location) {
+	public boolean show(final Point location) {
 
 		/*
 		 * show tooltip only when this is the active shell, this check is necessary that when a tour
@@ -388,7 +614,7 @@ public abstract class PhotoToolTipShell {
 		 * the tour chart view is also displayed
 		 */
 		if (_display.getActiveShell() != _ownerControl.getShell() || _ownerControl.isVisible() == false) {
-			return;
+			return false;
 		}
 
 		final Event event = new Event();
@@ -397,7 +623,9 @@ public abstract class PhotoToolTipShell {
 		event.widget = _ownerControl;
 
 		toolTipCreate(event);
-	};
+
+		return true;
+	}
 
 	private void toolTipCreate(final Event event) {
 
@@ -425,9 +653,9 @@ public abstract class PhotoToolTipShell {
 
 		if (shouldHideToolTip(event)) {
 
-			final Shell ownerShell = _ownerControl.getShell();
-			ownerShell.removeListener(SWT.Deactivate, _ownerShellListener);
-			ownerShell.removeListener(SWT.Move, _ownerShellListener);
+			// hide tooltip definitively
+
+			ownerShellRemoveListener();
 
 			_currentArea = null;
 
@@ -451,10 +679,14 @@ public abstract class PhotoToolTipShell {
 
 		// close tooltip if user selects outside of the shell
 		_ttShell.addListener(SWT.Deactivate, _ttShellListener);
+		_ttShell.addListener(SWT.Dispose, _ttShellListener);
 
-		final Shell ownerShell = _ownerControl.getShell();
-		ownerShell.addListener(SWT.Deactivate, _ownerShellListener);
-		ownerShell.addListener(SWT.Move, _ownerShellListener);
+		ownerShellAddListener();
+
+		_cursor_NE_SW = new Cursor(_display, SWT.CURSOR_SIZENESW);
+		_cursor_NW_SE = new Cursor(_display, SWT.CURSOR_SIZENWSE);
+
+		_isShellResized = false;
 
 		toolTipShow(event);
 	}
@@ -466,6 +698,10 @@ public abstract class PhotoToolTipShell {
 			_currentArea = getToolTipArea(event);
 
 			createToolTipContentArea(event, _ttShell);
+
+			addToolTipControlListener(_ttShell);
+
+			_imageGallery.setExternalMouseListener(this);
 
 			_ttShell.pack();
 

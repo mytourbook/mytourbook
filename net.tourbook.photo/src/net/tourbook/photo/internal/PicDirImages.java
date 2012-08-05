@@ -288,10 +288,6 @@ public class PicDirImages implements IPhotoGalleryProvider {
 		});
 	}
 
-	public void dispose() {
-		_photoGallery.dispose();
-	}
-
 	private void enableControls() {
 
 		_actionNavigateBackward.setEnabled(false);
@@ -487,6 +483,10 @@ public class PicDirImages implements IPhotoGalleryProvider {
 
 	void showRestoreFolder(final String restoreFolderName) {
 		_photoGallery.showRestoreFolder(restoreFolderName);
+	}
+
+	public void stopLoadingImages() {
+		_photoGallery.stopLoadingImages();
 	}
 
 	void updateColors(	final Color fgColor,

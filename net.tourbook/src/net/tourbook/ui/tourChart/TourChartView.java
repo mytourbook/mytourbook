@@ -104,7 +104,11 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 			public void partClosed(final IWorkbenchPartReference partRef) {}
 
-			public void partDeactivated(final IWorkbenchPartReference partRef) {}
+			public void partDeactivated(final IWorkbenchPartReference partRef) {
+
+				// ensure that at each part deactivation the photo tooltip gets hidden
+				_tourChart.partIsDeactivated();
+			}
 
 			public void partHidden(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourChartView.this) {

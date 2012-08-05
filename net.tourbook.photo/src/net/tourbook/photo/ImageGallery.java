@@ -69,10 +69,13 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
@@ -432,6 +435,18 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		jobUILoading_10_Create();
 
 		createUI(parent);
+
+		parent.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(final DisposeEvent e) {
+
+				if (_galleryFont != null) {
+					_galleryFont.dispose();
+				}
+
+				stopLoadingImages();
+			}
+		});
 	}
 
 	private void createGalleryFont() {
@@ -513,11 +528,6 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		_photoTooltip = new GalleryPhotoToolTip(_galleryMT20);
 		_photoTooltip.setHideOnMouseMove(true);
 		_galleryMT20.addItemHoveredListener(this);
-
-		// force that the 1st tab is in the gallery
-//		if (_isActionBar) {
-//			container.setTabList(new Control[] { _pageBook, _containerActionBar });
-//		}
 	}
 
 	/**
@@ -607,30 +617,6 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		onSelectPhoto();
 	}
 
-	public void dispose() {
-
-		// stop jobs
-		jobFilter_12_Stop();
-
-		if (_galleryFont != null) {
-			_galleryFont.dispose();
-		}
-
-		PhotoLoadManager.stopImageLoading(true);
-
-		//////////////////////////////////////////
-		//
-		// MUST BE REMOVED, IS ONLY FOR TESTING
-		//
-//		PhotoImageCache.dispose();
-		//
-		// MUST BE REMOVED, IS ONLY FOR TESTING
-		//
-		//////////////////////////////////////////
-
-		workerStop();
-	}
-
 	/**
 	 * Disposes and deletes all thumb images.
 	 */
@@ -713,6 +699,10 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 
 	public Collection<GalleryMT20Item> getGallerySelection() {
 		return _galleryMT20.getSelection();
+	}
+
+	public Control getGalleryToolTipShell() {
+		return _photoTooltip.getToolTipShell();
 	}
 
 	/**
@@ -1729,6 +1719,10 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		_defaultStatusMessage = message;
 	}
 
+	public void setExternalMouseListener(final IExternalGalleryMouseListener externalGalleryMouseListener) {
+		_galleryMT20.setExternalMouseListener(externalGalleryMouseListener);
+	}
+
 	/**
 	 * This is called when a filter button is pressed.
 	 * 
@@ -1983,6 +1977,16 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		Arrays.sort(_sortedAndFilteredPhotoWrapper, getCurrentComparator());
 
 		updateUI_GalleryItems(_sortedAndFilteredPhotoWrapper, null);
+	}
+
+	public void stopLoadingImages() {
+
+		// stop jobs
+		jobFilter_12_Stop();
+
+		PhotoLoadManager.stopImageLoading(true);
+
+		workerStop();
 	}
 
 	/**

@@ -316,8 +316,8 @@ public class PicDirView extends ViewPart {
 
 	private void onPartClose() {
 
-		// close images first, this will stop loading images
-		_picDirImages.dispose();
+		// also stop loading images
+		_picDirImages.stopLoadingImages();
 
 		ThumbnailStore.cleanupStoreFiles(false, false);
 

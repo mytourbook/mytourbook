@@ -25,7 +25,6 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
@@ -35,7 +34,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -55,14 +53,12 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 	private PhotoToolTipImageGallery		_imageGallery;
 
-	private PixelConverter					_pc;
 	private Color							_fgColor;
 	private Color							_bgColor;
 
 	/*
 	 * UI controls
 	 */
-	private Label							_lblNumberOfPhotos;
 
 	private final class PhotoGalleryProvider implements IPhotoGalleryProvider {
 		@Override
@@ -89,7 +85,6 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 										final PhotoGalleryProvider photoGalleryProvider) {
 			super(parent, style, photoGalleryProvider);
 		}
-
 	}
 
 	public PhotoToolTipUI(final Control ownerControl) {
@@ -107,6 +102,8 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		updateUI_Colors(shell);
 
 		_imageGallery.showInfo(false, null, true, true);
+
+		super.setImageGallery(_imageGallery);
 
 		return container;
 	}
@@ -129,8 +126,8 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
 //				.hint(SWT.DEFAULT, 150)
-//				.hint(330, 150)
-				.hint(1000, 70)
+				.hint(330, 100)
+//				.hint(1000, 70)
 				.grab(true, true)
 				.applyTo(container);
 		GridLayoutFactory.fillDefaults()//
@@ -149,39 +146,11 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 	}
 
-	private void createUI_50_Info(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.fillDefaults()//
-				.extendedMargins(5, 5, 5, 5)
-				.spacing(3, 1)
-				.numColumns(2)
-				.applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_CYAN));
-		{
-
-			// label: hovered photos
-			final Label label = new Label(container, SWT.NONE);
-			GridDataFactory.fillDefaults().applyTo(label);
-			label.setText("Hovered photos:");
-
-			// label: number of photos
-			_lblNumberOfPhotos = new Label(container, SWT.NONE);
-			GridDataFactory.fillDefaults() //
-					.hint(_pc.convertWidthInCharsToPixels(5), SWT.DEFAULT)
-					.applyTo(_lblNumberOfPhotos);
-		}
-	}
-
 	public abstract int getHideCounter();
 
 	public abstract ArrayList<ChartPhoto> getHoveredPhotos();
 
-	@Override
-	protected Point getLocation(final Point size, final Event event) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+
 
 	@Override
 	protected Object getToolTipArea(final Event event) {
@@ -195,20 +164,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 	private void initUI(final Control control) {
 
-		_pc = new PixelConverter(control);
-//		_defaultTextWidthPixel = pc.convertWidthInCharsToPixels(DEFAULT_TEXT_WIDTH);
-	}
-
-	@Override
-	protected void onDispose() {
-
-		// check if tooltip UI is created
-		if (_imageGallery != null) {
-
-			_imageGallery.dispose();
-		}
-
-		super.onDispose();
+//		_pc = new PixelConverter(control);
 	}
 
 	protected void restoreState(final IDialogSettings state) {
@@ -246,8 +202,11 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		final Shell ttShell = getToolTipShell();
 		if (ttShell == null || ttShell.isDisposed()) {
 
+			if (show(devPositionHoveredValue) == false) {
+				return;
+			}
+
 			isNewImages = true;
-			show(devPositionHoveredValue);
 
 		} else {
 
@@ -274,8 +233,6 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 	 */
 	private void updateUI(final boolean isNewImages) {
 
-//		_lblNumberOfPhotos.setText(Integer.toString(_hoveredPhotos.size()));
-
 		/*
 		 * display photo images
 		 */
@@ -301,10 +258,6 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		_fgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND);
 		_bgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
 		final Color selectionFgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_SELECTION_FOREGROUND);
-
-//		if (_labelError != null && _labelError.isDisposed() == false) {
-//			_labelError.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-//		}
 
 		final Color noFocusSelectionFgColor = Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND);
 

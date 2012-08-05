@@ -149,7 +149,7 @@ public abstract class ToolTip {
 			case SWT.MouseDown:
 			case SWT.MouseMove:
 			case SWT.MouseWheel:
-				toolTipHide(CURRENT_TOOLTIP, event);
+				toolTipHide(getShell(), event);
 				break;
 			case SWT.MouseHover:
 				toolTipCreate(event);
@@ -158,13 +158,13 @@ public abstract class ToolTip {
 				/*
 				 * Check if the mouse exit happened because we move over the tooltip
 				 */
-				if (CURRENT_TOOLTIP != null && !CURRENT_TOOLTIP.isDisposed()) {
-					if (CURRENT_TOOLTIP.getBounds().contains(control.toDisplay(event.x, event.y))) {
+				if (getShell() != null && !getShell().isDisposed()) {
+					if (getShell().getBounds().contains(control.toDisplay(event.x, event.y))) {
 						break;
 					}
 				}
 
-				toolTipHide(CURRENT_TOOLTIP, event);
+				toolTipHide(getShell(), event);
 				break;
 			}
 		}
@@ -205,25 +205,40 @@ public abstract class ToolTip {
 		this.listener = new ToolTipOwnerControlListener();
 		this.shellListener = new Listener() {
 			public void handleEvent(final Event event) {
-				if (ToolTip.this.control != null && !ToolTip.this.control.isDisposed()) {
-					ToolTip.this.control.getDisplay().asyncExec(new Runnable() {
 
-						public void run() {
-							// Check if the new active shell is the tooltip
-							// itself
-							if (ToolTip.this.control.getDisplay().getActiveShell() != CURRENT_TOOLTIP) {
-								toolTipHide(CURRENT_TOOLTIP, event);
-							}
+				final Control ttControl = ToolTip.this.control;
+
+				if (ttControl == null || ttControl.isDisposed()) {
+					return;
+				}
+
+				ttControl.getDisplay().asyncExec(new Runnable() {
+
+					public void run() {
+
+						// check again, NPE has occured during debugging
+
+						if (ttControl == null || ttControl.isDisposed()) {
+							return;
 						}
 
-					});
-				}
+						// Check if the new active shell is the tooltip itself
+						if (ttControl.getDisplay().getActiveShell() != CURRENT_TOOLTIP) {
+							toolTipHide(CURRENT_TOOLTIP, event);
+						}
+					}
+
+				});
 			}
 		};
 
 		if (!manualActivation) {
 			activate();
 		}
+	}
+
+	public static void xxxsetCURRENT_TOOLTIP(final Shell cURRENT_TOOLTIP) {
+		CURRENT_TOOLTIP = cURRENT_TOOLTIP;
 	}
 
 	/**
@@ -350,6 +365,18 @@ public abstract class ToolTip {
 	 */
 	public Point getLocation(final Point tipSize, final Event event) {
 		return control.toDisplay(event.x + xShift, event.y + yShift);
+	}
+
+	/**
+	 * @return Returns shell for this tooltip or <code>null</code> when tooltip is hidden.
+	 */
+	protected Shell getShell() {
+
+		if (CURRENT_TOOLTIP == null || CURRENT_TOOLTIP.isDisposed()) {
+			return null;
+		}
+
+		return CURRENT_TOOLTIP;
 	}
 
 	/**

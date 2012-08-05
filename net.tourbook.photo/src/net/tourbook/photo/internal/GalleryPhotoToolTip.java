@@ -47,6 +47,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.format.DateTimeFormat;
@@ -498,6 +499,13 @@ public class GalleryPhotoToolTip extends ToolTip {
 		}
 
 		return _gallery.toDisplay(ttPosX, ttPosY);
+	}
+
+	/**
+	 * @return Returns {@link Shell} for this tooltip or null when tooltip is hidden.
+	 */
+	public Shell getToolTipShell() {
+		return getShell();
 	}
 
 	private void initUI(final Control control) {

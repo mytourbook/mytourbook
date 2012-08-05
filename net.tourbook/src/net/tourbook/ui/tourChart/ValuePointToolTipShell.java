@@ -64,8 +64,8 @@ public abstract class ValuePointToolTipShell {
 
 	private Object								_currentArea;
 	private Control								_ownerControl;
-	private OwnerShellListener					_ownerShellListener;
 
+	private OwnerShellListener					_ownerShellListener;
 	private OwnerControlListener				_ownerControlListener;
 	private TooltipListener						_ttListener							= new TooltipListener();
 	private TooltipShellListener				_ttShellListener					= new TooltipShellListener();
@@ -284,7 +284,6 @@ public abstract class ValuePointToolTipShell {
 						_ttShell.setCursor(null);
 					}
 				}
-
 			}
 		}
 	}
