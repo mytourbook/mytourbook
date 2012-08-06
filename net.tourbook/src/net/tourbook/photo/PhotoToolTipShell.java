@@ -17,6 +17,7 @@ package net.tourbook.photo;
 
 import net.tourbook.common.util.Util;
 
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.window.ToolTip;
@@ -39,6 +40,12 @@ import org.eclipse.swt.widgets.Shell;
  */
 public abstract class PhotoToolTipShell implements IExternalGalleryMouseListener {
 
+	private static final String		STATE_PHOTO_TOOL_TIP_WIDTH	= "STATE_PHOTO_TOOL_TIP_WIDTH";	//$NON-NLS-1$
+	private static final String		STATE_PHOTO_TOOL_TIP_HEIGHT	= "STATE_PHOTO_TOOL_TIP_HEIGHT";	//$NON-NLS-1$
+
+	private static final int		MIN_SHELL_HEIGHT			= 20;
+	private static final int		MIN_SHELL_WIDTH				= 100;
+
 	private Shell					_ttShell;
 
 	private Object					_currentArea;
@@ -54,6 +61,9 @@ public abstract class PhotoToolTipShell implements IExternalGalleryMouseListener
 
 	private int						_mouseDownX;
 	private int						_mouseDownY;
+
+	protected int					_shellWidth					= 300;
+	protected int					_shellHeight				= 120;
 
 	private Display					_display;
 
@@ -129,6 +139,7 @@ public abstract class PhotoToolTipShell implements IExternalGalleryMouseListener
 		control.addListener(SWT.MouseUp, _ttControlListener);
 		control.addListener(SWT.MouseMove, _ttControlListener);
 		control.addListener(SWT.MouseExit, _ttControlListener);
+		control.addListener(SWT.MouseEnter, _ttControlListener);
 
 		if (control instanceof Composite) {
 			final Control[] children = ((Composite) control).getChildren();
@@ -151,49 +162,55 @@ public abstract class PhotoToolTipShell implements IExternalGalleryMouseListener
 
 	private Point fixupDisplayBounds(final Point tipSize, final Point location) {
 
-		Rectangle bounds;
+		final Rectangle displayBounds = getDisplayBounds(location);
 		final Point rightBounds = new Point(tipSize.x + location.x, tipSize.y + location.y);
 
-		final Monitor[] ms = _ownerControl.getDisplay().getMonitors();
+		if (!(displayBounds.contains(location) && displayBounds.contains(rightBounds))) {
+			if (rightBounds.x > displayBounds.x + displayBounds.width) {
+				location.x -= rightBounds.x - (displayBounds.x + displayBounds.width);
+			}
 
-		if (ms.length > 1) {
+			if (rightBounds.y > displayBounds.y + displayBounds.height) {
+				location.y -= rightBounds.y - (displayBounds.y + displayBounds.height);
+			}
+
+			if (location.x < displayBounds.x) {
+				location.x = displayBounds.x;
+			}
+
+			if (location.y < displayBounds.y) {
+				location.y = displayBounds.y;
+			}
+		}
+
+		return location;
+	}
+
+	private Rectangle getDisplayBounds(final Point location) {
+
+		Rectangle displayBounds;
+		final Monitor[] allMonitors = _ownerControl.getDisplay().getMonitors();
+
+		if (allMonitors.length > 1) {
 			// By default present in the monitor of the control
-			bounds = _ownerControl.getMonitor().getBounds();
+			displayBounds = _ownerControl.getMonitor().getBounds();
 			final Point p = new Point(location.x, location.y);
 
 			// Search on which monitor the event occurred
 			Rectangle tmp;
-			for (final Monitor element : ms) {
+			for (final Monitor element : allMonitors) {
 				tmp = element.getBounds();
 				if (tmp.contains(p)) {
-					bounds = tmp;
+					displayBounds = tmp;
 					break;
 				}
 			}
 
 		} else {
-			bounds = _ownerControl.getDisplay().getBounds();
+			displayBounds = _ownerControl.getDisplay().getBounds();
 		}
 
-		if (!(bounds.contains(location) && bounds.contains(rightBounds))) {
-			if (rightBounds.x > bounds.x + bounds.width) {
-				location.x -= rightBounds.x - (bounds.x + bounds.width);
-			}
-
-			if (rightBounds.y > bounds.y + bounds.height) {
-				location.y -= rightBounds.y - (bounds.y + bounds.height);
-			}
-
-			if (location.x < bounds.x) {
-				location.x = bounds.x;
-			}
-
-			if (location.y < bounds.y) {
-				location.y = bounds.y;
-			}
-		}
-
-		return location;
+		return displayBounds;
 	}
 
 	protected abstract Point getLocation(Point size, Event event);
@@ -279,9 +296,6 @@ public abstract class PhotoToolTipShell implements IExternalGalleryMouseListener
 				_mouseDownX = mouseX;
 				_mouseDownY = mouseY;
 
-				System.out.println("tt mouse down\t");
-				// TODO remove SYSTEM.OUT.PRINTLN
-
 				break;
 
 			case SWT.MouseUp:
@@ -304,11 +318,37 @@ public abstract class PhotoToolTipShell implements IExternalGalleryMouseListener
 
 						final int newShellX = shellX - diffX;
 						final int newShellY = shellY - diffY;
-						final int newShellWidth = shellWidth + diffX;
-						final int newShellHeight = shellHeight + diffY;
+						int newShellWidth = shellWidth + diffX;
+						int newShellHeight = shellHeight + diffY;
 
-						_ttShell.setLocation(newShellX, newShellY);
-						_ttShell.setSize(newShellWidth, newShellHeight);
+						Point newShellLocation = new Point(newShellX, newShellY);
+
+						final Rectangle displayBounds = getDisplayBounds(newShellLocation);
+
+						// ensure tooltip is not too large
+						final double maxHeight = displayBounds.height * 0.8;
+						final double maxWidth = displayBounds.width * 0.95;
+
+						if (newShellHeight > maxHeight) {
+							newShellHeight = (int) maxHeight;
+						} else if (newShellHeight < MIN_SHELL_HEIGHT) {
+							newShellHeight = MIN_SHELL_HEIGHT;
+						}
+
+						if (newShellWidth > maxWidth) {
+							newShellWidth = (int) maxWidth;
+						} else if (newShellWidth < MIN_SHELL_WIDTH) {
+							newShellWidth = MIN_SHELL_WIDTH;
+						}
+
+						final Point size = new Point(newShellWidth, newShellHeight);
+
+						newShellLocation = fixupDisplayBounds(size, newShellLocation);
+
+						_ttShell.setBounds(newShellLocation.x, newShellLocation.y, newShellWidth, newShellHeight);
+
+						_shellWidth = newShellWidth;
+						_shellHeight = newShellHeight;
 					}
 				}
 
@@ -381,11 +421,18 @@ public abstract class PhotoToolTipShell implements IExternalGalleryMouseListener
 		}
 
 		switch (event.type) {
+		case SWT.MouseEnter:
+
+//			System.out.println(UI.timeStamp() + " Photo TT\tEnter\t" + event.widget);
+//			// TODO remove SYSTEM.OUT.PRINTLN
+
+			break;
+
 		case SWT.MouseExit:
 
 			boolean isHide = false;
 
-			// control which is hovered with the mouse after the exit, can be null
+			// get control which is hovered with the mouse after the exit, can be null
 			final Control hoveredExitControl = _display.getCursorControl();
 
 			if (hoveredExitControl == null) {
@@ -400,8 +447,16 @@ public abstract class PhotoToolTipShell implements IExternalGalleryMouseListener
 				Control hoveredExitParent = hoveredExitControl;
 				final Control hoveredToolTip = _imageGallery.getGalleryToolTipShell();
 
+//				System.out.println(UI.timeStamp() + " Photo TT\tExit\t" + hoveredExitParent);
+//				// TODO remove SYSTEM.OUT.PRINTLN
+
 				// move up child-parent hierarchy until shell is reached
 				while (true) {
+
+					if (hoveredExitParent == _ttShell) {
+						// mouse is hovering in this tooltip
+						break;
+					}
 
 					if (hoveredExitParent == _ownerControl) {
 						// mouse is over the owner control
@@ -524,6 +579,18 @@ public abstract class PhotoToolTipShell implements IExternalGalleryMouseListener
 			// the following was left in order to fix bug 298770 with minimal change. In 3.7, the complete method should be removed.
 			tip.close();
 		}
+	}
+
+	protected void restoreState(final IDialogSettings state) {
+
+		_shellWidth = Util.getStateInt(state, STATE_PHOTO_TOOL_TIP_WIDTH, 300);
+		_shellHeight = Util.getStateInt(state, STATE_PHOTO_TOOL_TIP_HEIGHT, 120);
+	}
+
+	protected void saveState(final IDialogSettings state) {
+
+		state.put(STATE_PHOTO_TOOL_TIP_WIDTH, _shellWidth);
+		state.put(STATE_PHOTO_TOOL_TIP_HEIGHT, _shellHeight);
 	}
 
 	/**

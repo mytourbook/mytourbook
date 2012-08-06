@@ -34,6 +34,7 @@ import net.tourbook.chart.IChartLayer;
 import net.tourbook.chart.IFillPainter;
 import net.tourbook.chart.IHoveredListener;
 import net.tourbook.chart.ITooltipOwner;
+import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.util.IToolTipHideListener;
 import net.tourbook.common.util.TourToolTip;
@@ -48,7 +49,6 @@ import net.tourbook.tour.ITourChartSelectionListener;
 import net.tourbook.tour.SelectionTourChart;
 import net.tourbook.tour.TourInfoToolTipProvider;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.action.ActionCanAutoZoomToSlider;
 import net.tourbook.ui.tourChart.action.ActionCanMoveSlidersWhenZoomed;
 import net.tourbook.ui.tourChart.action.ActionChartOptions;
@@ -187,6 +187,13 @@ public class TourChart extends Chart {
 			if (event.widget instanceof Control) {
 
 				switch (event.type) {
+				case SWT.MouseEnter:
+
+//					System.out.println(UI.timeStamp() + " TourChart\tEnter\t" + event.widget);
+//					// TODO remove SYSTEM.OUT.PRINTLN
+
+					break;
+
 				case SWT.MouseExit:
 
 					// check if photo tooltip is displayed
@@ -199,6 +206,9 @@ public class TourChart extends Chart {
 
 					// check what is hovered with the mouse after the MouseExit event is fired, can be null
 					final Control hoveredControl = __tourChart.getDisplay().getCursorControl();
+
+//					System.out.println(UI.timeStamp() + " TourChart\tExit\t" + hoveredControl);
+//					// TODO remove SYSTEM.OUT.PRINTLN
 
 					if (hoveredControl == null) {
 
@@ -596,6 +606,7 @@ public class TourChart extends Chart {
 	private void addControlListener(final Control control) {
 
 		control.addListener(SWT.MouseExit, _ttControlListener);
+		control.addListener(SWT.MouseEnter, _ttControlListener);
 
 		if (control instanceof Composite) {
 			final Control[] children = ((Composite) control).getChildren();

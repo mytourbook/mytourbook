@@ -297,6 +297,8 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 		// set this view part as selection provider
 		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider());
 
+		restoreState();
+
 		showTour();
 	}
 
@@ -511,6 +513,11 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 			clearView();
 		}
+	}
+
+	private void restoreState() {
+
+		_tourChart.restoreState();
 	}
 
 	private void saveState() {

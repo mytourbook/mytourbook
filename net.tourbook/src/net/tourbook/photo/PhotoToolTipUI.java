@@ -126,15 +126,15 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
 //				.hint(SWT.DEFAULT, 150)
-				.hint(330, 100)
+				.hint(super._shellWidth, super._shellHeight)
 //				.hint(1000, 70)
 				.grab(true, true)
 				.applyTo(container);
 		GridLayoutFactory.fillDefaults()//
 				.numColumns(1)
-				.extendedMargins(1, 1, 0, 0)
+				.extendedMargins(1, 1, 1, 1)
 				.applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
 			_imageGallery = new PhotoToolTipImageGallery(
 					container,
@@ -143,14 +143,11 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 			_imageGallery.showInfo(false, null, true, true);
 		}
-
 	}
 
 	public abstract int getHideCounter();
 
 	public abstract ArrayList<ChartPhoto> getHoveredPhotos();
-
-
 
 	@Override
 	protected Object getToolTipArea(final Event event) {
@@ -167,13 +164,18 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 //		_pc = new PixelConverter(control);
 	}
 
+	@Override
 	protected void restoreState(final IDialogSettings state) {
 
-		_imageGallery.restoreState(state);
+//		_imageGallery.restoreState(state);
+
+		super.restoreState(state);
 	}
 
+	@Override
 	protected void saveState(final IDialogSettings state) {
 
+		super.saveState(state);
 	}
 
 	@Override
@@ -257,6 +259,8 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
 		_fgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND);
 		_bgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
+//		_fgColor = Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA);
+//		_bgColor = Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW);
 		final Color selectionFgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_SELECTION_FOREGROUND);
 
 		final Color noFocusSelectionFgColor = Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND);
