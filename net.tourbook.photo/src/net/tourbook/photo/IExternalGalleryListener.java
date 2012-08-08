@@ -16,8 +16,10 @@
 package net.tourbook.photo;
 
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Rectangle;
 
-public interface IExternalGalleryMouseListener {
+public interface IExternalGalleryListener {
 
 	/**
 	 * @param eventType
@@ -27,5 +29,14 @@ public interface IExternalGalleryMouseListener {
 	 *         mouse events are skipped.
 	 */
 	boolean isMouseEventHandledExternally(int eventType, MouseEvent mouseEvent);
+
+	/**
+	 * Can be used to paint on the {@link GC} after all other paints are done.
+	 * 
+	 * @param gc
+	 * @param clippingArea
+	 * @param clientArea
+	 */
+	void onPaintAfter(GC gc, Rectangle clippingArea, Rectangle clientArea);
 
 }

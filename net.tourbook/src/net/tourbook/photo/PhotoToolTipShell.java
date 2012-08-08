@@ -18,12 +18,14 @@ package net.tourbook.photo;
 import net.tourbook.common.util.Util;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Cursor;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
@@ -38,13 +40,20 @@ import org.eclipse.swt.widgets.Shell;
 /**
  * Part of this tooltip is copied from {@link ToolTip}.
  */
-public abstract class PhotoToolTipShell implements IExternalGalleryMouseListener {
+public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 
-	private static final String		STATE_PHOTO_TOOL_TIP_WIDTH	= "STATE_PHOTO_TOOL_TIP_WIDTH";	//$NON-NLS-1$
-	private static final String		STATE_PHOTO_TOOL_TIP_HEIGHT	= "STATE_PHOTO_TOOL_TIP_HEIGHT";	//$NON-NLS-1$
+	private static final int		RESIZE_BOX_SIZE						= 10;
 
-	private static final int		MIN_SHELL_HEIGHT			= 20;
-	private static final int		MIN_SHELL_WIDTH				= 100;
+	private static final String		STATE_PHOTO_TOOL_IS_HORIZONTAL		= "STATE_PHOTO_TOOL_IS_HORIZONTAL";	//$NON-NLS-1$
+	private static final String		STATE_PHOTO_HORIZ_TOOL_TIP_WIDTH	= "STATE_PHOTO_HORIZ_TOOL_TIP_WIDTH";	//$NON-NLS-1$
+	private static final String		STATE_PHOTO_HORIZ_TOOL_TIP_HEIGHT	= "STATE_PHOTO_HORIZ_TOOL_TIP_HEIGHT";	//$NON-NLS-1$
+	private static final String		STATE_PHOTO_VERT_TOOL_TIP_WIDTH		= "STATE_PHOTO_VERT_TOOL_TIP_WIDTH";	//$NON-NLS-1$
+	private static final String		STATE_PHOTO_VERT_TOOL_TIP_HEIGHT	= "STATE_PHOTO_VERT_TOOL_TIP_HEIGHT";	//$NON-NLS-1$
+
+	private static final int		MIN_SHELL_HORIZ_HEIGHT				= 60;
+	private static final int		MIN_SHELL_HORIZ_WIDTH				= 100;
+	private static final int		MIN_SHELL_VERT_HEIGHT				= 150;
+	private static final int		MIN_SHELL_VERT_WIDTH				= 100;
 
 	private Shell					_ttShell;
 
@@ -58,12 +67,17 @@ public abstract class PhotoToolTipShell implements IExternalGalleryMouseListener
 	private ToolTipControlListener	_ttControlListener;
 
 	private boolean					_isShellResized;
+	private boolean					_isHitLeftResizeBox;
+	private int						_resizeBoxPixel;
 
 	private int						_mouseDownX;
 	private int						_mouseDownY;
 
-	protected int					_shellWidth					= 300;
-	protected int					_shellHeight				= 120;
+	private boolean					_isHorizontalGallery;
+	private int						_shellHorizWidth					= MIN_SHELL_HORIZ_WIDTH;
+	private int						_shellHorizHeight					= MIN_SHELL_HORIZ_HEIGHT;
+	private int						_shellVertWidth						= MIN_SHELL_VERT_WIDTH;
+	private int						_shellVertHeight					= MIN_SHELL_VERT_HEIGHT;
 
 	private Display					_display;
 
@@ -122,6 +136,8 @@ public abstract class PhotoToolTipShell implements IExternalGalleryMouseListener
 		_ownerShellListener = new OwnerShellListener();
 
 		ownerControlAddListener();
+
+		initUI(ownerControl);
 	}
 
 	/**
@@ -163,15 +179,17 @@ public abstract class PhotoToolTipShell implements IExternalGalleryMouseListener
 	private Point fixupDisplayBounds(final Point tipSize, final Point location) {
 
 		final Rectangle displayBounds = getDisplayBounds(location);
-		final Point rightBounds = new Point(tipSize.x + location.x, tipSize.y + location.y);
+		final Point rightBottomBounds = new Point(tipSize.x + location.x, tipSize.y + location.y);
 
-		if (!(displayBounds.contains(location) && displayBounds.contains(rightBounds))) {
-			if (rightBounds.x > displayBounds.x + displayBounds.width) {
-				location.x -= rightBounds.x - (displayBounds.x + displayBounds.width);
+		if (!(displayBounds.contains(location) && displayBounds.contains(rightBottomBounds))) {
+
+			if (rightBottomBounds.x > displayBounds.x + displayBounds.width) {
+				location.x -= rightBottomBounds.x - (displayBounds.x + displayBounds.width);
 			}
 
-			if (rightBounds.y > displayBounds.y + displayBounds.height) {
-				location.y -= rightBounds.y - (displayBounds.y + displayBounds.height);
+			if (rightBottomBounds.y > displayBounds.y + displayBounds.height) {
+// ignore when tt is below the bottom, force the user to resize the tt
+//				location.y -= rightBottomBounds.y - (displayBounds.y + displayBounds.height);
 			}
 
 			if (location.x < displayBounds.x) {
@@ -213,7 +231,15 @@ public abstract class PhotoToolTipShell implements IExternalGalleryMouseListener
 		return displayBounds;
 	}
 
-	protected abstract Point getLocation(Point size, Event event);
+	protected abstract Point getLocation(Point size);
+
+	Point getShellSize() {
+		if (_isHorizontalGallery) {
+			return new Point(_shellHorizWidth, _shellHorizHeight);
+		} else {
+			return new Point(_shellVertWidth, _shellVertHeight);
+		}
+	}
 
 	/**
 	 * This method is called to check for which area the tooltip is created/hidden for. In case of
@@ -243,6 +269,17 @@ public abstract class PhotoToolTipShell implements IExternalGalleryMouseListener
 		toolTipHide(_ttShell, null);
 	}
 
+	private void initUI(final Control ownerControl) {
+
+		final PixelConverter pc = new PixelConverter(ownerControl);
+
+		_resizeBoxPixel = pc.convertWidthInCharsToPixels(RESIZE_BOX_SIZE);
+	}
+
+	boolean isHorizontalGallery() {
+		return _isHorizontalGallery;
+	}
+
 	@Override
 	public boolean isMouseEventHandledExternally(final int eventType, final MouseEvent mouseEvent) {
 
@@ -259,100 +296,119 @@ public abstract class PhotoToolTipShell implements IExternalGalleryMouseListener
 		final Point mousePos = _ttShell.toControl(_display.getCursorLocation());
 
 		Cursor cursor = null;
-		final int resizeBox = 30;
 
 		final int mouseX = mousePos.x;
 		final int mouseY = mousePos.y;
 
-		boolean isLeft = false;
+		_isHitLeftResizeBox = false;
 
 		// check if mouse is within the resize box
-		if (mouseX < resizeBox && mouseY < resizeBox) {
+		if (mouseX < _resizeBoxPixel && mouseY < _resizeBoxPixel) {
 
 			// mouse is in the top left resize box
 
 			cursor = _cursor_NW_SE;
-			isLeft = true;
+			_isHitLeftResizeBox = true;
 
-		} else if (mouseX > (shellWidth - resizeBox) && mouseY < resizeBox) {
+		} else if (mouseX > (shellWidth - _resizeBoxPixel) && mouseY < _resizeBoxPixel) {
 
 			// mouse is in the top right resize box
 
 			cursor = _cursor_NE_SW;
 		}
 
+		final boolean isHitResizeBox = cursor != null;
 		boolean isHandled;
 
-		if (cursor == null) {
-			isHandled = false;
-		} else {
+		if (eventType == SWT.MouseMove && _isShellResized) {
+
+			// mouse is moved and shell is still resizing
+
 			isHandled = true;
 
-			switch (eventType) {
-			case SWT.MouseDown:
+			final int diffX = _mouseDownX - mouseX;
+			final int diffY = _mouseDownY - mouseY;
 
-				_isShellResized = true;
+//			System.out.println("diffX " + diffX + "\tdiffY " + diffY);
+//			// TODO remove SYSTEM.OUT.PRINTLN
 
-				_mouseDownX = mouseX;
-				_mouseDownY = mouseY;
+			final int newShellX = shellX - diffX;
+			final int newShellY = shellY - diffY;
+			int newShellWidth = shellWidth + diffX;
+			int newShellHeight = shellHeight + diffY;
 
-				break;
+			Point newShellLocation = new Point(newShellX, newShellY);
 
-			case SWT.MouseUp:
+			final Rectangle displayBounds = getDisplayBounds(newShellLocation);
 
-				if (_isShellResized) {
+			// ensure tooltip is not too large
+			final double maxHeight = displayBounds.height * 0.8;
+			final double maxWidth = displayBounds.width * 0.95;
 
-					_isShellResized = false;
-				}
+			if (newShellHeight > maxHeight) {
+				newShellHeight = (int) maxHeight;
+			} else if (newShellHeight < MIN_SHELL_HORIZ_HEIGHT) {
+				newShellHeight = MIN_SHELL_HORIZ_HEIGHT;
+			}
 
-				break;
+			if (newShellWidth > maxWidth) {
+				newShellWidth = (int) maxWidth;
+			} else if (newShellWidth < MIN_SHELL_HORIZ_WIDTH) {
+				newShellWidth = MIN_SHELL_HORIZ_WIDTH;
+			}
 
-			case SWT.MouseMove:
+			final Point size = new Point(newShellWidth, newShellHeight);
 
-				if (_isShellResized) {
+			newShellLocation = fixupDisplayBounds(size, newShellLocation);
 
-					if (isLeft) {
+			_ttShell.setBounds(newShellLocation.x, newShellLocation.y, newShellWidth, newShellHeight);
 
-						final int diffX = _mouseDownX - mouseX;
-						final int diffY = _mouseDownY - mouseY;
+			if (_isHorizontalGallery) {
+				_shellHorizWidth = newShellWidth;
+				_shellHorizHeight = newShellHeight;
+			} else {
+				_shellVertWidth = newShellWidth;
+				_shellVertHeight = newShellHeight;
+			}
 
-						final int newShellX = shellX - diffX;
-						final int newShellY = shellY - diffY;
-						int newShellWidth = shellWidth + diffX;
-						int newShellHeight = shellHeight + diffY;
+		} else {
 
-						Point newShellLocation = new Point(newShellX, newShellY);
+			if (isHitResizeBox == false) {
 
-						final Rectangle displayBounds = getDisplayBounds(newShellLocation);
+				// mouse is not in the resizebox, do not handle mouse event externally
 
-						// ensure tooltip is not too large
-						final double maxHeight = displayBounds.height * 0.8;
-						final double maxWidth = displayBounds.width * 0.95;
+				isHandled = false;
 
-						if (newShellHeight > maxHeight) {
-							newShellHeight = (int) maxHeight;
-						} else if (newShellHeight < MIN_SHELL_HEIGHT) {
-							newShellHeight = MIN_SHELL_HEIGHT;
-						}
+			} else {
 
-						if (newShellWidth > maxWidth) {
-							newShellWidth = (int) maxWidth;
-						} else if (newShellWidth < MIN_SHELL_WIDTH) {
-							newShellWidth = MIN_SHELL_WIDTH;
-						}
+				// mouse is within the resizebox, handle mouse event externally
 
-						final Point size = new Point(newShellWidth, newShellHeight);
+				isHandled = true;
 
-						newShellLocation = fixupDisplayBounds(size, newShellLocation);
+				switch (eventType) {
+				case SWT.MouseDown:
 
-						_ttShell.setBounds(newShellLocation.x, newShellLocation.y, newShellWidth, newShellHeight);
+					if (_isShellResized) {
 
-						_shellWidth = newShellWidth;
-						_shellHeight = newShellHeight;
+						// disable shell resize
+
+						_isShellResized = false;
+
+					} else {
+
+						// enable shell resize
+
+						_isShellResized = true;
+
+						_mouseDownX = mouseX;
+						_mouseDownY = mouseY;
 					}
-				}
 
-				break;
+					break;
+
+				case SWT.MouseUp:
+					break;
+				}
 			}
 		}
 
@@ -376,6 +432,7 @@ public abstract class PhotoToolTipShell implements IExternalGalleryMouseListener
 		case SWT.Dispose:
 
 			toolTipHide(_ttShell, event);
+
 			ownerControlsRemoveListener();
 
 			break;
@@ -414,6 +471,33 @@ public abstract class PhotoToolTipShell implements IExternalGalleryMouseListener
 		}
 	}
 
+	@Override
+	public void onPaintAfter(final GC gc, final Rectangle clippingArea, final Rectangle clientArea) {
+
+		if (_isShellResized == false) {
+			return;
+		}
+
+		/*
+		 * shell is resized, paint marker
+		 */
+
+		if (_isHitLeftResizeBox) {
+
+			gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+			gc.fillRectangle(0, 0, _resizeBoxPixel, _resizeBoxPixel);
+
+		} else {
+
+			gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+			gc.fillRectangle(clientArea.width - _resizeBoxPixel, 0, _resizeBoxPixel, _resizeBoxPixel);
+		}
+
+//		System.out.println("gc " + gc.getClipping() + "\tclip " + clippingArea + "\tclient " + clientArea);
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
+	}
+
 	private void onTTControlEvent(final Event event) {
 
 		if (_ttShell == null || _ttShell.isDisposed()) {
@@ -429,6 +513,13 @@ public abstract class PhotoToolTipShell implements IExternalGalleryMouseListener
 			break;
 
 		case SWT.MouseExit:
+
+			if (_isShellResized) {
+
+				// shell is currently being resized, continue resizing until resizing is finished
+
+				return;
+			}
 
 			boolean isHide = false;
 
@@ -446,9 +537,6 @@ public abstract class PhotoToolTipShell implements IExternalGalleryMouseListener
 				 */
 				Control hoveredExitParent = hoveredExitControl;
 				final Control hoveredToolTip = _imageGallery.getGalleryToolTipShell();
-
-//				System.out.println(UI.timeStamp() + " Photo TT\tExit\t" + hoveredExitParent);
-//				// TODO remove SYSTEM.OUT.PRINTLN
 
 				// move up child-parent hierarchy until shell is reached
 				while (true) {
@@ -583,14 +671,48 @@ public abstract class PhotoToolTipShell implements IExternalGalleryMouseListener
 
 	protected void restoreState(final IDialogSettings state) {
 
-		_shellWidth = Util.getStateInt(state, STATE_PHOTO_TOOL_TIP_WIDTH, 300);
-		_shellHeight = Util.getStateInt(state, STATE_PHOTO_TOOL_TIP_HEIGHT, 120);
+//		_isHorizontalGallery = Util.getStateBoolean(state, STATE_PHOTO_TOOL_IS_HORIZONTAL, true);
+		_isHorizontalGallery = true;
+
+		/*
+		 * get horizontal gallery values
+		 */
+		_shellHorizWidth = Util.getStateInt(state, STATE_PHOTO_HORIZ_TOOL_TIP_WIDTH, 300);
+		_shellHorizHeight = Util.getStateInt(state, STATE_PHOTO_HORIZ_TOOL_TIP_HEIGHT, 150);
+
+		// ensure min values
+		if (_shellHorizWidth < MIN_SHELL_HORIZ_WIDTH) {
+			_shellHorizWidth = MIN_SHELL_HORIZ_WIDTH;
+		}
+
+		if (_shellHorizHeight < MIN_SHELL_HORIZ_HEIGHT) {
+			_shellHorizHeight = MIN_SHELL_HORIZ_HEIGHT;
+		}
+
+		/*
+		 * get vertical gallery values
+		 */
+		_shellVertWidth = Util.getStateInt(state, STATE_PHOTO_VERT_TOOL_TIP_WIDTH, 400);
+		_shellVertHeight = Util.getStateInt(state, STATE_PHOTO_VERT_TOOL_TIP_HEIGHT, 250);
+
+		// ensure min values
+		if (_shellVertWidth < MIN_SHELL_VERT_WIDTH) {
+			_shellVertWidth = MIN_SHELL_VERT_WIDTH;
+		}
+
+		if (_shellVertHeight < MIN_SHELL_VERT_HEIGHT) {
+			_shellVertHeight = MIN_SHELL_VERT_HEIGHT;
+		}
 	}
 
 	protected void saveState(final IDialogSettings state) {
 
-		state.put(STATE_PHOTO_TOOL_TIP_WIDTH, _shellWidth);
-		state.put(STATE_PHOTO_TOOL_TIP_HEIGHT, _shellHeight);
+		state.put(STATE_PHOTO_TOOL_IS_HORIZONTAL, _isHorizontalGallery);
+
+		state.put(STATE_PHOTO_HORIZ_TOOL_TIP_WIDTH, _shellHorizWidth);
+		state.put(STATE_PHOTO_HORIZ_TOOL_TIP_HEIGHT, _shellHorizHeight);
+		state.put(STATE_PHOTO_VERT_TOOL_TIP_WIDTH, _shellVertWidth);
+		state.put(STATE_PHOTO_VERT_TOOL_TIP_HEIGHT, _shellVertHeight);
 	}
 
 	/**
@@ -610,7 +732,7 @@ public abstract class PhotoToolTipShell implements IExternalGalleryMouseListener
 		}
 
 		final Point size = _ttShell.getSize();
-		final Point location = fixupDisplayBounds(size, getLocation(size, null));
+		final Point location = fixupDisplayBounds(size, getLocation(size));
 
 		_ttShell.setLocation(location);
 		_ttShell.setVisible(true);
@@ -731,6 +853,8 @@ public abstract class PhotoToolTipShell implements IExternalGalleryMouseListener
 			ttShell.dispose();
 			_ttShell = null;
 
+			_isShellResized = false;
+
 			return;
 		}
 	}
@@ -753,6 +877,7 @@ public abstract class PhotoToolTipShell implements IExternalGalleryMouseListener
 		_cursor_NE_SW = new Cursor(_display, SWT.CURSOR_SIZENESW);
 		_cursor_NW_SE = new Cursor(_display, SWT.CURSOR_SIZENWSE);
 
+		// initialize resize behaviour
 		_isShellResized = false;
 
 		toolTipShow(event);
@@ -773,7 +898,7 @@ public abstract class PhotoToolTipShell implements IExternalGalleryMouseListener
 			_ttShell.pack();
 
 			final Point size = _ttShell.getSize();
-			final Point location = fixupDisplayBounds(size, getLocation(size, event));
+			final Point location = fixupDisplayBounds(size, getLocation(size));
 			_ttShell.setLocation(location);
 
 			_ttShell.setVisible(true);

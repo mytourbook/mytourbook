@@ -18,12 +18,12 @@ package net.tourbook.photo.internal;
 import java.io.File;
 import java.util.ArrayList;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 import net.tourbook.photo.IPhotoGalleryProvider;
 import net.tourbook.photo.PhotoGallery;
 import net.tourbook.photo.PhotoSelection;
 import net.tourbook.photo.PicDirView;
-import net.tourbook.photo.internal.gallery.GalleryActionBar;
 
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IStatusLineManager;
@@ -32,6 +32,7 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
@@ -46,6 +47,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.ToolBar;
 
 /**
  */
@@ -83,6 +85,7 @@ public class PicDirImages implements IPhotoGalleryProvider {
 	private Display									_display;
 
 	private Combo									_comboHistory;
+	private ToolBar									_galleryToolbar;
 	private PhotoGallery							_photoGallery;
 
 	public PicDirImages(final PicDirView picDirView) {
@@ -218,22 +221,50 @@ public class PicDirImages implements IPhotoGalleryProvider {
 		_display = parent.getDisplay();
 		_picDirFolder = picDirFolder;
 
-		_photoGallery = new PhotoGallery(parent, SWT.V_SCROLL | SWT.MULTI, this);
+		_photoGallery = new PhotoGallery();
 
-		final GalleryActionBar galleryActionBar = _photoGallery.getActionBar();
-		if (galleryActionBar != null) {
-			createUI_16_ComboHistory(galleryActionBar.getCustomContainer());
-		}
+		_photoGallery.setShowActionBar(true, true);
+		_photoGallery.createUI(parent, SWT.V_SCROLL | SWT.MULTI, this);
 
 		createActions();
 
-		fillGalleryToolbars();
+		final Composite galleryActionBarContainer = _photoGallery.getCustomActionBarContainer();
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(galleryActionBarContainer);
+//		galleryActionBarContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+		{
+			createUI_20_GalleryToolbars(galleryActionBarContainer);
+			createUI_30_ComboHistory(galleryActionBarContainer);
+		}
+	}
+
+	/**
+	 * fill gallery actionbar
+	 * 
+	 * @param galleryActionBarContainer
+	 */
+	private void createUI_20_GalleryToolbars(final Composite galleryActionBarContainer) {
+
+		/*
+		 * toolbar actions
+		 */
+		_galleryToolbar = new ToolBar(galleryActionBarContainer, SWT.FLAT);
+		GridDataFactory.fillDefaults()//
+				.align(SWT.BEGINNING, SWT.CENTER)
+				.applyTo(_galleryToolbar);
+
+		final ToolBarManager tbm = new ToolBarManager(_galleryToolbar);
+
+		tbm.add(_actionToggleFolderGallery);
+		tbm.add(_actionNavigateBackward);
+		tbm.add(_actionNavigateForward);
+
+		tbm.update(true);
 	}
 
 	/**
 	 * combo: path history
 	 */
-	private void createUI_16_ComboHistory(final Composite parent) {
+	private void createUI_30_ComboHistory(final Composite parent) {
 
 		_comboHistory = new Combo(parent, SWT.SIMPLE | SWT.DROP_DOWN);
 		GridDataFactory.fillDefaults()//
@@ -292,20 +323,6 @@ public class PicDirImages implements IPhotoGalleryProvider {
 
 		_actionNavigateBackward.setEnabled(false);
 		_actionNavigateForward.setEnabled(false);
-	}
-
-	/**
-	 * fill gallery actionbar
-	 */
-	private void fillGalleryToolbars() {
-
-		final ToolBarManager tbm = new ToolBarManager(_photoGallery.getActionBar().getToolbar());
-
-		tbm.add(_actionToggleFolderGallery);
-		tbm.add(_actionNavigateBackward);
-		tbm.add(_actionNavigateForward);
-
-		tbm.update(true);
 	}
 
 	public void fillViewMenu(final IMenuManager menuMgr) {
@@ -499,8 +516,19 @@ public class PicDirImages implements IPhotoGalleryProvider {
 
 		// combobox list entries are almost invisible when colors are set on osx
 
-		_comboHistory.setForeground(fgColor);
-		_comboHistory.setBackground(bgColor);
+
+		/*
+		 * set color in action bar only for Linux & Windows, setting color in OSX looks not very
+		 * good
+		 */
+		if (UI.IS_OSX == false) {
+
+			_comboHistory.setForeground(fgColor);
+			_comboHistory.setBackground(bgColor);
+
+			_galleryToolbar.setForeground(fgColor);
+			_galleryToolbar.setBackground(bgColor);
+		}
 	}
 
 	private void updateHistory(final String newFolderPathName) {

@@ -213,7 +213,8 @@ public class TourPhotosView extends ViewPart implements IPhotoGalleryProvider {
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 		{
-			_photoGallery = new PhotoGallery(container, SWT.H_SCROLL | SWT.MULTI, this);
+			_photoGallery = new PhotoGallery();
+			_photoGallery.createGallery(container, SWT.H_SCROLL | SWT.MULTI, this);
 
 			_photoGallery.setDefaultStatusMessage(Messages.Tour_Photos_Label_StatusMessage_NoTourWithPhotos);
 		}

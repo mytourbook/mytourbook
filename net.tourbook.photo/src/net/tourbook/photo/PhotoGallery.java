@@ -39,34 +39,34 @@ import org.eclipse.swt.widgets.Composite;
 
 public class PhotoGallery extends ImageGallery {
 
-	private static final String				STATE_GALLERY_SORTING				= "STATE_GALLERY_SORTING";					//$NON-NLS-1$
-	private static final String				STATE_IMAGE_FILTER					= "STATE_IMAGE_FILTER";					//$NON-NLS-1$
-	private static final String				STATE_PHOTO_INFO_DATE				= "STATE_PHOTO_INFO_DATE";					//$NON-NLS-1$
-	private static final String				STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY	= "STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY";	//$NON-NLS-1$
-	private static final String				STATE_IS_SHOW_PHOTO_GPS_ANNOTATION	= "STATE_IS_SHOW_PHOTO_GPS_ANNOTATION";	//$NON-NLS-1$
-	private static final String				STATE_IS_SHOW_PHOTO_TOOLTIP			= "STATE_IS_SHOW_PHOTO_TOOLTIP";			//$NON-NLS-1$
+	private static final String			STATE_GALLERY_SORTING				= "STATE_GALLERY_SORTING";					//$NON-NLS-1$
+	private static final String			STATE_IMAGE_FILTER					= "STATE_IMAGE_FILTER";					//$NON-NLS-1$
+	private static final String			STATE_PHOTO_INFO_DATE				= "STATE_PHOTO_INFO_DATE";					//$NON-NLS-1$
+	private static final String			STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY	= "STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY";	//$NON-NLS-1$
+	private static final String			STATE_IS_SHOW_PHOTO_GPS_ANNOTATION	= "STATE_IS_SHOW_PHOTO_GPS_ANNOTATION";	//$NON-NLS-1$
+	private static final String			STATE_IS_SHOW_PHOTO_TOOLTIP			= "STATE_IS_SHOW_PHOTO_TOOLTIP";			//$NON-NLS-1$
 
-	static final String						IMAGE_PHOTO_FILTER_NO_FILTER		= "IMAGE_PHOTO_FILTER_NO_FILTER";			//$NON-NLS-1$
-	public static final String				IMAGE_PHOTO_FILTER_GPS				= "IMAGE_PHOTO_FILTER_GPS";				//$NON-NLS-1$
-	public static final String				IMAGE_PHOTO_FILTER_NO_GPS			= "IMAGE_PHOTO_FILTER_NO_GPS";				//$NON-NLS-1$
+	static final String					IMAGE_PHOTO_FILTER_NO_FILTER		= "IMAGE_PHOTO_FILTER_NO_FILTER";			//$NON-NLS-1$
+	public static final String			IMAGE_PHOTO_FILTER_GPS				= "IMAGE_PHOTO_FILTER_GPS";				//$NON-NLS-1$
+	public static final String			IMAGE_PHOTO_FILTER_NO_GPS			= "IMAGE_PHOTO_FILTER_NO_GPS";				//$NON-NLS-1$
 
 //	private static final IDialogSettings	_state								= Activator.getDefault()//
 //																						.getDialogSettingsSection(
 //																								"PhotoGallery");			//$NON-NLS-1$
 
-	private PhotoDateInfo					_photoDateInfo;
+	private PhotoDateInfo				_photoDateInfo;
 
-	private ActionImageFilterGPS			_actionImageFilterGPS;
-	private ActionImageFilterNoGPS			_actionImageFilterNoGPS;
-	private ActionShowPhotoName				_actionShowPhotoName;
-	private ActionShowPhotoDate				_actionShowPhotoDate;
-	private ActionShowPhotoTooltip			_actionShowPhotoTooltip;
-	private ActionShowGPSAnnotations		_actionShowGPSAnnotation;
-	private ActionSortByFileDate			_actionSortFileByDate;
-	private ActionSortByFileName			_actionSortByFileName;
+	private ActionImageFilterGPS		_actionImageFilterGPS;
+	private ActionImageFilterNoGPS		_actionImageFilterNoGPS;
+	private ActionShowPhotoName			_actionShowPhotoName;
+	private ActionShowPhotoDate			_actionShowPhotoDate;
+	private ActionShowPhotoTooltip		_actionShowPhotoTooltip;
+	private ActionShowGPSAnnotations	_actionShowGPSAnnotation;
+	private ActionSortByFileDate		_actionSortFileByDate;
+	private ActionSortByFileName		_actionSortByFileName;
 
-	private ImageFilter						_currentImageFilter					= ImageFilter.NoFilter;
-	private GallerySorting					_gallerySorting;
+	private ImageFilter					_currentImageFilter					= ImageFilter.NoFilter;
+	private GallerySorting				_gallerySorting;
 
 //	private int								_thumbnailSize;
 //	private int								_textMinThumbSize;
@@ -81,14 +81,6 @@ public class PhotoGallery extends ImageGallery {
 		UI.IMAGE_REGISTRY.put(//
 				IMAGE_PHOTO_FILTER_NO_GPS,
 				Activator.getImageDescriptor(Messages.Image__PhotoFilterNoGPS));
-	}
-
-	public PhotoGallery(final Composite parent, final int style, final IPhotoGalleryProvider photoGalleryProvider) {
-
-		super(parent, style, photoGalleryProvider);
-
-		createActions();
-		fillActionBars();
 	}
 
 	public void actionImageFilter(final Action actionImageFilter) {
@@ -198,6 +190,14 @@ public class PhotoGallery extends ImageGallery {
 
 		_actionSortByFileName = new ActionSortByFileName(this);
 		_actionSortFileByDate = new ActionSortByFileDate(this);
+	}
+
+	public void createUI(final Composite parent, final int style, final IPhotoGalleryProvider photoGalleryProvider) {
+
+		super.createGallery(parent, style, photoGalleryProvider);
+
+		createActions();
+		fillActionBars();
 	}
 
 	private void enableActions() {

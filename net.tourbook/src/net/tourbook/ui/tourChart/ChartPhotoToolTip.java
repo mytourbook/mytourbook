@@ -21,8 +21,6 @@ import net.tourbook.photo.PhotoToolTipUI;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -68,12 +66,14 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 	}
 
 	@Override
-	public Point getLocation(final Point tipSize, final Event event) {
+	public Point getLocation(final Point tipSize) {
 
-		final int margin = 10;
+		final int chartHeight = _tourChart.getBounds().height;
+		final int chartMarginTop = _tourChart.getMarginTop();
+		final Point chartDisplay = _tourChart.toDisplay(0, 0);
 
 		final int itemPosX = _tourChart.getLeftAxisWidth() + _devXHoveredPhoto;
-		final int itemPosY = _devYHoveredPhoto;
+//		final int itemPosY = _devYHoveredPhoto;
 
 		final int tipWidth = tipSize.x;
 		final int tipHeight = tipSize.y;
@@ -82,30 +82,16 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 		// center tooltip horizontally
 		final int ttPosX = itemPosX - tipWidth2;
 
-		int ttPosY = itemPosY - tipHeight - margin;
+		// set vertical position at the top of the upper most graph
+		final int ttPosY = -tipHeight + chartMarginTop;
 
-		// check chart bottom
-		final int chartHeight = _tourChart.getBounds().height;
-		if (ttPosY > chartHeight) {
-			// tooltip is below the gallery bottom
-			ttPosY = chartHeight + margin;
+		final Point ttLocation = _tourChart.toDisplay(ttPosX, ttPosY);
+
+		if (ttLocation.y < 0) {
+			ttLocation.y = chartDisplay.y + chartHeight;
 		}
 
-		// check display height
-		final Rectangle displayBounds = _tourChart.getDisplay().getBounds();
-		final Point chartDisplay = _tourChart.toDisplay(0, 0);
-
-		if (chartDisplay.y + ttPosY + tipHeight > displayBounds.height) {
-			ttPosY = itemPosY - tipHeight - margin;
-		}
-
-		// check display top
-		final int aboveChart = -tipHeight - margin;
-		if (ttPosY < aboveChart) {
-			ttPosY = aboveChart;
-		}
-
-		return _tourChart.toDisplay(ttPosX, ttPosY);
+		return ttLocation;
 	}
 
 	Shell getShell() {
@@ -140,10 +126,16 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 						final int devXMouseMove,
 						final int devYMouseMove) {
 
+		final Point[] photoPositions = photoLayer.getPhotoPositions();
+
+		if (photoPositions == null) {
+			// photo positions are not initialized
+			return;
+		}
+
 		_hoveredPhotos.clear();
 
 		final ArrayList<ChartPhoto> chartPhotos = photoLayer.getChartPhotos();
-		final Point[] photoPositions = photoLayer.getPhotoPositions();
 
 		final int hoveredXPos = devXMouseMove;
 
@@ -193,6 +185,5 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 			showPhotoToolTip(devPositionHoveredValue);
 		}
 	}
-
 
 }

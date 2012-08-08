@@ -83,7 +83,8 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		public PhotoToolTipImageGallery(final Composite parent,
 										final int style,
 										final PhotoGalleryProvider photoGalleryProvider) {
-			super(parent, style, photoGalleryProvider);
+
+			super.createGallery(parent, style, photoGalleryProvider);
 		}
 	}
 
@@ -123,10 +124,12 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 	private void createUI_10_Gallery(final Composite parent) {
 
+		final Point shellSize = super.getShellSize();
+
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
 //				.hint(SWT.DEFAULT, 150)
-				.hint(super._shellWidth, super._shellHeight)
+				.hint(shellSize.x, shellSize.y)
 //				.hint(1000, 70)
 				.grab(true, true)
 				.applyTo(container);
@@ -136,10 +139,13 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 				.applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
-			_imageGallery = new PhotoToolTipImageGallery(
-					container,
-					SWT.H_SCROLL | SWT.MULTI,
-					new PhotoGalleryProvider());
+			final boolean isHorizGallery = super.isHorizontalGallery();
+
+			final int galleryStyle = isHorizGallery ? //
+					SWT.H_SCROLL | SWT.MULTI
+					: SWT.V_SCROLL | SWT.MULTI;
+
+			_imageGallery = new PhotoToolTipImageGallery(container, galleryStyle, new PhotoGalleryProvider());
 
 			_imageGallery.showInfo(false, null, true, true);
 		}

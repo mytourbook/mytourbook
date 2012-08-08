@@ -21,7 +21,7 @@ import java.util.HashMap;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.util.StatusUtil;
-import net.tourbook.photo.IExternalGalleryMouseListener;
+import net.tourbook.photo.IExternalGalleryListener;
 import net.tourbook.photo.internal.Messages;
 import net.tourbook.photo.internal.preferences.PrefPagePhotoDirectory;
 
@@ -257,7 +257,7 @@ public abstract class GalleryMT20 extends Canvas {
 	 */
 	private MenuManager							_contextMenuMgr;
 
-	private IExternalGalleryMouseListener		_externalGalleryMouseListener;
+	private IExternalGalleryListener			_externalGalleryListener;
 
 	private class RedrawTimer implements Runnable {
 		public void run() {
@@ -1534,8 +1534,9 @@ public abstract class GalleryMT20 extends Canvas {
 
 	private void onMouseDown(final MouseEvent mouseEvent) {
 
-		if (_externalGalleryMouseListener != null) {
-			if (_externalGalleryMouseListener.isMouseEventHandledExternally(SWT.MouseDown, mouseEvent)) {
+		if (_externalGalleryListener != null) {
+			if (_externalGalleryListener.isMouseEventHandledExternally(SWT.MouseDown, mouseEvent)) {
+				redraw();
 				return;
 			}
 		}
@@ -1666,8 +1667,9 @@ public abstract class GalleryMT20 extends Canvas {
 
 	private void onMouseMove(final MouseEvent mouseEvent) {
 
-		if (_externalGalleryMouseListener != null) {
-			if (_externalGalleryMouseListener.isMouseEventHandledExternally(SWT.MouseMove, mouseEvent)) {
+		if (_externalGalleryListener != null) {
+			if (_externalGalleryListener.isMouseEventHandledExternally(SWT.MouseMove, mouseEvent)) {
+				redraw();
 				return;
 			}
 		}
@@ -1714,8 +1716,9 @@ public abstract class GalleryMT20 extends Canvas {
 
 	private void onMouseUp(final MouseEvent mouseEvent) {
 
-		if (_externalGalleryMouseListener != null) {
-			if (_externalGalleryMouseListener.isMouseEventHandledExternally(SWT.MouseUp, mouseEvent)) {
+		if (_externalGalleryListener != null) {
+			if (_externalGalleryListener.isMouseEventHandledExternally(SWT.MouseUp, mouseEvent)) {
+				redraw();
 				return;
 			}
 		}
@@ -1820,6 +1823,8 @@ public abstract class GalleryMT20 extends Canvas {
 		// reset state
 		_isGalleryMoved = false;
 
+		Rectangle clippingArea = null;
+
 		try {
 
 			if (_initialSelectedItems != null) {
@@ -1829,7 +1834,7 @@ public abstract class GalleryMT20 extends Canvas {
 				_initialSelectedItems = null;
 			}
 
-			final Rectangle clippingArea = gc.getClipping();
+			clippingArea = gc.getClipping();
 
 			if (isLowQualityPainting) {
 				gc.setAntialias(SWT.OFF);
@@ -1909,6 +1914,10 @@ public abstract class GalleryMT20 extends Canvas {
 				// execution (doesn't run twice)
 				getDisplay().timerExec(_higherQualityDelay, _redrawTimer);
 			}
+		}
+
+		if (_externalGalleryListener != null) {
+			_externalGalleryListener.onPaintAfter(gc, clippingArea, _clientArea);
 		}
 
 //		final float timeDiff = (float) (System.nanoTime() - start) / 1000000;
@@ -2352,8 +2361,8 @@ public abstract class GalleryMT20 extends Canvas {
 		_customContextMenuProvider = customContextMenuProvider;
 	}
 
-	public void setExternalMouseListener(final IExternalGalleryMouseListener externalGalleryMouseListener) {
-		_externalGalleryMouseListener = externalGalleryMouseListener;
+	public void setExternalMouseListener(final IExternalGalleryListener externalGalleryMouseListener) {
+		_externalGalleryListener = externalGalleryMouseListener;
 	}
 
 	@Override

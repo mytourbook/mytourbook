@@ -78,7 +78,7 @@ public class Chart extends ViewForm {
 	private final ListenerList			_doubleClickListeners				= new ListenerList();
 	private final ListenerList			_mouseListener						= new ListenerList();
 
-	ChartComponents						_chartComponents;
+	private ChartComponents				_chartComponents;
 
 	private Chart						_synchedChart;
 
@@ -701,6 +701,14 @@ public class Chart extends ViewForm {
 	 */
 	public ChartXSlider getLeftSlider() {
 		return _chartComponents.getChartComponentGraph().getLeftSlider();
+	}
+
+	/**
+	 * @return Returns margin between the upper most graph and the top. This can include the chart
+	 *         title height and/or horizontal slider label height.
+	 */
+	public int getMarginTop() {
+		return _chartComponents.getDevChartMarginTop();
 	}
 
 	public String getMouseMode() {

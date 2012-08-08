@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.photo.internal.gallery;
+package net.tourbook.photo.internal;
 
 import net.tourbook.common.Activator;
 import net.tourbook.common.UI;
@@ -21,8 +21,6 @@ import net.tourbook.common.util.Util;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.ImageGallery;
 import net.tourbook.photo.PhotoLoadManager;
-import net.tourbook.photo.internal.ImageSizeIndicator;
-import net.tourbook.photo.internal.Messages;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -37,7 +35,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Spinner;
-import org.eclipse.swt.widgets.ToolBar;
 
 public class GalleryActionBar {
 
@@ -47,57 +44,83 @@ public class GalleryActionBar {
 
 	private ImageGallery					_imageGallery;
 
+	private boolean							_isShowThumbsize;
+	private boolean							_isShowCustomActionBar;
+
 	/*
 	 * UI controls
 	 */
 	private Composite						_containerActionBar;
-	private Composite						_customActionBarContainer;
-	private ToolBar							_toolbar;
+	private Composite						_containerCustomActionBar;
+
 	private Spinner							_spinnerThumbSize;
 	private ImageSizeIndicator				_canvasImageSizeIndicator;
 
-	public GalleryActionBar(final Composite parent, final ImageGallery imageGallery) {
+
+	public GalleryActionBar(final Composite parent,
+							final ImageGallery imageGallery,
+							final boolean isShowThumbsize,
+							final boolean isShowCustomActionBar) {
 
 		_imageGallery = imageGallery;
 
-		createUI_10_ActionBar(parent);
+		_isShowThumbsize = isShowThumbsize;
+		_isShowCustomActionBar = isShowCustomActionBar;
+
+		if (isShowThumbsize || isShowCustomActionBar) {
+			createUI_10_ActionBar(parent);
+		}
 	}
 
 	private void createUI_10_ActionBar(final Composite parent) {
 
+		int columns = 0;
+
+		if (_isShowCustomActionBar) {
+			columns++;
+		}
+		if (_isShowThumbsize) {
+			columns++;
+		}
+
 		_containerActionBar = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(_containerActionBar);
 		GridLayoutFactory.fillDefaults()//
-				.numColumns(5)
-				.extendedMargins(0, 2, 2, 2)
+				.numColumns(columns)
+				.extendedMargins(2, 2, 2, 2)
 				.spacing(3, 0)
 				.applyTo(_containerActionBar);
+//		containerActionBar.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
 			/*
-			 * toolbar actions
+			 * custom action bar container
 			 */
-			_toolbar = new ToolBar(_containerActionBar, SWT.FLAT);
-			GridDataFactory.fillDefaults()//
-					.align(SWT.BEGINNING, SWT.CENTER)
-					.applyTo(_toolbar);
+			if (_isShowCustomActionBar) {
+				_containerCustomActionBar = new Composite(_containerActionBar, SWT.NONE);
+				GridDataFactory.fillDefaults().grab(true, false).applyTo(_containerCustomActionBar);
+//				_containerCustomActionBar.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+			}
 
-			createUI_16_CustomActionBar(_containerActionBar);
-			createUI_17_ImageSize(_containerActionBar);
-			createUI_18_ImageSizeIndicator(_containerActionBar);
+			/*
+			 * thumb size
+			 */
+			if (_isShowThumbsize) {
+				final Composite container = new Composite(_containerActionBar, SWT.NONE);
+				GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+				GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+//				container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+				{
+					createUI_20_ImageSize(container);
+					createUI_30_ImageSizeIndicator(container);
+				}
+			}
 		}
-	}
-
-	private void createUI_16_CustomActionBar(final Composite parent) {
-
-		_customActionBarContainer = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(_customActionBarContainer);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(_customActionBarContainer);
 	}
 
 	/**
 	 * spinner: thumb size
 	 */
-	private void createUI_17_ImageSize(final Composite parent) {
+	private void createUI_20_ImageSize(final Composite parent) {
 
 		_spinnerThumbSize = new Spinner(parent, SWT.BORDER);
 		GridDataFactory.fillDefaults() //
@@ -127,7 +150,7 @@ public class GalleryActionBar {
 	/**
 	 * canvas: image size indicator
 	 */
-	private void createUI_18_ImageSizeIndicator(final Composite parent) {
+	private void createUI_30_ImageSizeIndicator(final Composite parent) {
 
 		_canvasImageSizeIndicator = new ImageSizeIndicator(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
@@ -137,52 +160,65 @@ public class GalleryActionBar {
 	}
 
 	public Composite getCustomContainer() {
-		return _customActionBarContainer;
+		return _containerCustomActionBar;
 	}
 
 	public int getThumbnailSize() {
 		return _spinnerThumbSize.getSelection();
 	}
 
-	public ToolBar getToolbar() {
-		return _toolbar;
-	}
-
 	public void restoreState(final IDialogSettings state, final int stateThumbSize) {
 
-		updateUI_ImageIndicatorTooltip();
+		if (_isShowThumbsize) {
 
-		_spinnerThumbSize.setSelection(stateThumbSize);
+			updateUI_ImageIndicatorTooltip();
+
+			_spinnerThumbSize.setSelection(stateThumbSize);
+		}
 	}
 
 	public void updateColors(final Color fgColor, final Color bgColor) {
 
-		_containerActionBar.setForeground(fgColor);
-		_containerActionBar.setBackground(bgColor);
+		if (_isShowCustomActionBar || _isShowThumbsize) {
+			_containerActionBar.setForeground(fgColor);
+			_containerActionBar.setBackground(bgColor);
+		}
 
-		_toolbar.setForeground(fgColor);
-		_toolbar.setBackground(bgColor);
+		if (_isShowCustomActionBar) {
 
-		_spinnerThumbSize.setForeground(fgColor);
-		_spinnerThumbSize.setBackground(bgColor);
+			_containerCustomActionBar.setForeground(fgColor);
+			_containerCustomActionBar.setBackground(bgColor);
+		}
 
-		_canvasImageSizeIndicator.setForeground(fgColor);
-		_canvasImageSizeIndicator.setBackground(bgColor);
+		if (_isShowThumbsize) {
+
+			_spinnerThumbSize.setForeground(fgColor);
+			_spinnerThumbSize.setBackground(bgColor);
+
+			_canvasImageSizeIndicator.setForeground(fgColor);
+			_canvasImageSizeIndicator.setBackground(bgColor);
+		}
 	}
 
 	public void updateUI_AfterZoomInOut(final int imageSize) {
 
-		_spinnerThumbSize.setSelection(imageSize);
+		if (_isShowThumbsize) {
 
-		final boolean isHqImage = imageSize > PhotoLoadManager.IMAGE_SIZE_THUMBNAIL;
+			_spinnerThumbSize.setSelection(imageSize);
 
-		_canvasImageSizeIndicator.setIndicator(isHqImage);
+			final boolean isHqImage = imageSize > PhotoLoadManager.IMAGE_SIZE_THUMBNAIL;
+
+			_canvasImageSizeIndicator.setIndicator(isHqImage);
+		}
 	}
 
 	public void updateUI_ImageIndicatorTooltip() {
 
-		_canvasImageSizeIndicator.setToolTipText(NLS.bind(
-				Messages.Pic_Dir_ImageSizeIndicator_Tooltip,
-				_prefStore.getString(IPhotoPreferences.PHOTO_VIEWER_IMAGE_FRAMEWORK)));
+		if (_isShowThumbsize) {
+
+			_canvasImageSizeIndicator.setToolTipText(NLS.bind(
+					Messages.Pic_Dir_ImageSizeIndicator_Tooltip,
+					_prefStore.getString(IPhotoPreferences.PHOTO_VIEWER_IMAGE_FRAMEWORK)));
+		}
 	}
 }

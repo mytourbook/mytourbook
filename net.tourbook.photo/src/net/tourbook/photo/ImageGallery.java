@@ -33,12 +33,12 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.photo.internal.Activator;
+import net.tourbook.photo.internal.GalleryActionBar;
 import net.tourbook.photo.internal.GalleryPhotoToolTip;
 import net.tourbook.photo.internal.ImageFilter;
 import net.tourbook.photo.internal.Messages;
 import net.tourbook.photo.internal.PhotoDateInfo;
 import net.tourbook.photo.internal.PhotoRenderer;
-import net.tourbook.photo.internal.gallery.GalleryActionBar;
 import net.tourbook.photo.internal.gallery.MT20.FullSizeViewer;
 import net.tourbook.photo.internal.gallery.MT20.GalleryMT20;
 import net.tourbook.photo.internal.gallery.MT20.GalleryMT20Item;
@@ -105,18 +105,18 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 	private static final String									MENU_ID_PHOTO_GALLERY			= "menu.net.tourbook.photo.photoGallery";	//$NON-NLS-1$
 
 	private static final int									DELAY_JOB_SUBSEQUENT_FILTER		= 500;										// ms
+
 	private static final long									DELAY_JOB_UI_FILTER				= 200;										// ms
 	private static final long									DELAY_JOB_UI_LOADING			= 200;										// ms
-
 	public static final int										MIN_GALLERY_ITEM_WIDTH			= 10;										// pixel
-	public static final int										MAX_GALLERY_ITEM_WIDTH			= 2000;									// pixel
 
+	public static final int										MAX_GALLERY_ITEM_WIDTH			= 2000;									// pixel
 	public static final String									STATE_THUMB_IMAGE_SIZE			= "STATE_THUMB_IMAGE_SIZE";				//$NON-NLS-1$
+
 	private static final String									STATE_GALLERY_POSITION_KEY		= "STATE_GALLERY_POSITION_KEY";			//$NON-NLS-1$
 	private static final String									STATE_GALLERY_POSITION_VALUE	= "STATE_GALLERY_POSITION_VALUE";			//$NON-NLS-1$
 	private static final String									STATE_IMAGE_SORTING				= "STATE_IMAGE_SORTING";					//$NON-NLS-1$
 	private static final String									STATE_SELECTED_ITEMS			= "STATE_SELECTED_ITEMS";					//$NON-NLS-1$
-
 	private static final String									DEFAULT_GALLERY_FONT			= "arial,sans-serif";						//$NON-NLS-1$
 
 	private final IPreferenceStore								_prefStore						= Activator
@@ -172,21 +172,22 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 	private ImageFilter											_currentImageFilter;
 
 	private boolean												_filterJob1stRun;
-	private boolean												_filterJobIsCanceled;
 
+	private boolean												_filterJobIsCanceled;
 	private ReentrantLock										JOB_LOCK						= new ReentrantLock();
+
 	private Job													_jobFilter;
 	private AtomicBoolean										_jobFilterIsSubsequentScheduled	= new AtomicBoolean();
 	private int													_jobFilterDirtyCounter;
-
 	private UIJob												_jobUIFilter;
+
 	private AtomicBoolean										_jobUIFilterJobIsScheduled		= new AtomicBoolean();
 	private int													_jobUIFilterDirtyCounter;
 	private PhotoWrapper[]										_jobUIFilterPhotoWrapper;
-
 	private int													_currentExifRunId;
 
 	private Job													_jobUILoading;
+
 	private AtomicBoolean										_jobUILoadingIsScheduled		= new AtomicBoolean();
 	private int													_jobUILoadingDirtyCounter;
 	/**
@@ -194,19 +195,18 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 	 */
 	public static Comparator<PhotoWrapper>						SORT_BY_FILE_DATE;
 	public static Comparator<PhotoWrapper>						SORT_BY_FILE_NAME;
-
 	/**
 	 * Contains current gallery sorting id: {@link PicDirView#GALLERY_SORTING_BY_DATE} or
 	 * {@link PicDirView#GALLERY_SORTING_BY_NAME}
 	 */
 	private Comparator<PhotoWrapper>							_currentComparator;
-	private GallerySorting										_currentSorting;
 
+	private GallerySorting										_currentSorting;
 	private PhotoRenderer										_photoRenderer;
 
 	private FullSizeViewer										_fullSizeViewer;
-	private GalleryPhotoToolTip									_photoTooltip;
 
+	private GalleryPhotoToolTip									_photoTooltip;
 	/**
 	 * Folder which images are currently be displayed
 	 */
@@ -227,9 +227,11 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 	private int													_galleryStyle;
 
 	/**
-	 * By default action bar is displayed for a vertical gallery layout.
+	 * By default action bar is displayed.
 	 */
-	private boolean												_isActionBar;
+	private boolean												_isShowActionBar;
+	private boolean												_isShowCustomActionBar;
+	private boolean												_isShowThumbsize;
 
 	/**
 	 * Contains filtered gallery items.
@@ -242,29 +244,29 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 	FileFilter													_fileFilter;
 
 	private int													_prevGalleryItemSize			= -1;
+
 	private int													_photoImageSize;
 	private int													_photoBorderSize;
-
 	private boolean												_isShowTooltip;
 
 	/**
 	 * keep gallery position for each used folder
 	 */
 	private LinkedHashMap<String, Double>						_galleryPositions;
+
 	private String												_newGalleryPositionKey;
 	private String												_currentGalleryPositionKey;
-
 	private String												_defaultStatusMessage			= UI.EMPTY_STRING;
 
 	private int[]												_restoredSelection;
 
 	private final NumberFormat									_nf1							= NumberFormat
 																										.getNumberInstance();
+
 	{
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
 	}
-
 	/**
 	 * Cache for exif meta data, key is file path
 	 */
@@ -279,16 +281,17 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 	 * UI controls
 	 */
 	private Display												_display;
+
 	private Composite											_uiContainer;
-
 	private GalleryImplementation								_galleryMT20;
-	private GalleryActionBar									_galleryActionBar;
 
+	private GalleryActionBar									_galleryActionBar;
 	private PageBook											_pageBook;
+
 	private Label												_lblDefaultPage;
 	private Composite											_pageDefault;
-
 	private Composite											_pageGalleryInfo;
+
 	private Label												_lblGalleryInfo;
 
 	{
@@ -421,14 +424,12 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		}
 	}
 
-	public ImageGallery(final Composite parent, final int style, final IPhotoGalleryProvider photoGalleryProvider) {
+	public void createGallery(final Composite parent, final int style, final IPhotoGalleryProvider photoGalleryProvider) {
 
 		PhotoUI.init();
 
 		_galleryStyle = style;
 		_photoGalleryProvider = photoGalleryProvider;
-
-		_isActionBar = (style & SWT.V_SCROLL) > 0;
 
 		jobFilter_10_Create();
 		jobUIFilter_10_Create();
@@ -512,8 +513,8 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, 0).applyTo(container);
 //		container.setBackground(_display.getSystemColor(SWT.COLOR_RED));
 		{
-			if (_isActionBar) {
-				_galleryActionBar = new GalleryActionBar(container, this);
+			if (_isShowActionBar) {
+				_galleryActionBar = new GalleryActionBar(container, this, _isShowThumbsize, _isShowCustomActionBar);
 			}
 
 			_pageBook = new PageBook(container, SWT.NONE);
@@ -657,10 +658,6 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		jobFilter_22_ScheduleSubsequent(0);
 	}
 
-	public GalleryActionBar getActionBar() {
-		return _galleryActionBar;
-	}
-
 	/**
 	 * Preserves gallery positions for different gallery contents.
 	 * 
@@ -692,6 +689,22 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 	private Comparator<PhotoWrapper> getCurrentComparator() {
 		return _currentSorting == GallerySorting.FILE_NAME ? SORT_BY_FILE_NAME : SORT_BY_FILE_DATE;
 	}
+
+	/**
+	 * @return Returns gallery action bar container. {@link #setShowActionBar(boolean)} must be
+	 *         called with the parameter <code>true</code> that the action bar is created.
+	 */
+	public Composite getCustomActionBarContainer() {
+		return _galleryActionBar.getCustomContainer();
+	}
+
+//	/**
+//	 * @return Returns custom gallery toolbar. {@link #setShowActionBar(boolean)} must be called
+//	 *         with the parameter <code>true</code> that the action bar is created.
+//	 */
+//	public ToolBar getCustomToolbar() {
+//		return _galleryActionBar.getToolbar();
+//	}
 
 	public FullSizeViewer getFullSizeViewer() {
 		return _fullSizeViewer;
@@ -867,7 +880,7 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 
 					_galleryMT20.updateGallery(false, _galleryMT20.getGalleryPosition());
 
-					if (_isActionBar) {
+					if (_isShowActionBar) {
 						_galleryActionBar.updateUI_ImageIndicatorTooltip();
 					}
 				}
@@ -1634,7 +1647,7 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 				STATE_THUMB_IMAGE_SIZE,
 				PhotoLoadManager.IMAGE_SIZE_THUMBNAIL);
 
-		if (_isActionBar) {
+		if (_isShowActionBar) {
 			_galleryActionBar.restoreState(state, stateThumbSize);
 		}
 
@@ -1719,7 +1732,7 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		_defaultStatusMessage = message;
 	}
 
-	public void setExternalMouseListener(final IExternalGalleryMouseListener externalGalleryMouseListener) {
+	public void setExternalMouseListener(final IExternalGalleryListener externalGalleryMouseListener) {
 		_galleryMT20.setExternalMouseListener(externalGalleryMouseListener);
 	}
 
@@ -1734,6 +1747,27 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 
 	public void setFocus() {
 //		_gallery.setFocus();
+	}
+
+	/**
+	 * Actionbar can be set visible/hidden, This method <b>must</b> be called before
+	 * {@link #createGallery()} is called.
+	 * 
+	 * @param isShowActionBar
+	 */
+	public void setShowActionBar(final boolean isShowActionBar, final boolean isShowCustomActionBar) {
+		_isShowActionBar = isShowActionBar;
+		_isShowCustomActionBar = isShowCustomActionBar;
+	}
+
+	/**
+	 * Thumbnail size combobox can be set visible/hidden, This method <b>must</b> be called before
+	 * {@link #createGallery()} is called.
+	 * 
+	 * @param isShowThumbSize
+	 */
+	public void setShowThumbnailSize(final boolean isShowThumbSize) {
+		_isShowThumbsize = isShowThumbSize;
 	}
 
 	public void setSorting(final GallerySorting gallerySorting) {
@@ -2008,7 +2042,7 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		 * set color in action bar only for Linux & Windows, setting color in OSX looks not very
 		 * good
 		 */
-		if (UI.IS_OSX == false && _isActionBar) {
+		if (UI.IS_OSX == false && _isShowActionBar) {
 			_galleryActionBar.updateColors(fgColor, bgColor);
 		}
 
@@ -2048,7 +2082,7 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 
 			_prevGalleryItemSize = galleryItemSize;
 
-			if (_isActionBar) {
+			if (_isShowActionBar) {
 				_galleryActionBar.updateUI_AfterZoomInOut(imageSize);
 			}
 
