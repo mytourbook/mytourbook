@@ -50,10 +50,11 @@ public abstract class ToolTip {
 
 	private ToolTipOwnerControlListener	listener;
 
-	private HashMap						data;
+	private HashMap<String, Object>		data;
 
 	// Ensure that only one tooltip is active in time
-	private static Shell				CURRENT_TOOLTIP;
+//	private static Shell				CURRENT_TOOLTIP;
+	private Shell						CURRENT_TOOLTIP;
 
 	/**
 	 * Recreate the tooltip on every mouse move
@@ -235,10 +236,6 @@ public abstract class ToolTip {
 		if (!manualActivation) {
 			activate();
 		}
-	}
-
-	public static void xxxsetCURRENT_TOOLTIP(final Shell cURRENT_TOOLTIP) {
-		CURRENT_TOOLTIP = cURRENT_TOOLTIP;
 	}
 
 	/**

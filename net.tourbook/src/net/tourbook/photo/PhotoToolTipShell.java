@@ -44,7 +44,6 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 
 	private static final int		RESIZE_BOX_SIZE						= 10;
 
-	private static final String		STATE_PHOTO_TOOL_IS_HORIZONTAL		= "STATE_PHOTO_TOOL_IS_HORIZONTAL";	//$NON-NLS-1$
 	private static final String		STATE_PHOTO_HORIZ_TOOL_TIP_WIDTH	= "STATE_PHOTO_HORIZ_TOOL_TIP_WIDTH";	//$NON-NLS-1$
 	private static final String		STATE_PHOTO_HORIZ_TOOL_TIP_HEIGHT	= "STATE_PHOTO_HORIZ_TOOL_TIP_HEIGHT";	//$NON-NLS-1$
 	private static final String		STATE_PHOTO_VERT_TOOL_TIP_WIDTH		= "STATE_PHOTO_VERT_TOOL_TIP_WIDTH";	//$NON-NLS-1$
@@ -73,7 +72,6 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 	private int						_mouseDownX;
 	private int						_mouseDownY;
 
-	private boolean					_isHorizontalGallery;
 	private int						_shellHorizWidth					= MIN_SHELL_HORIZ_WIDTH;
 	private int						_shellHorizHeight					= MIN_SHELL_HORIZ_HEIGHT;
 	private int						_shellVertWidth						= MIN_SHELL_VERT_WIDTH;
@@ -234,10 +232,10 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 	protected abstract Point getLocation(Point size);
 
 	Point getShellSize() {
-		if (_isHorizontalGallery) {
-			return new Point(_shellHorizWidth, _shellHorizHeight);
-		} else {
+		if (isVerticalGallery()) {
 			return new Point(_shellVertWidth, _shellVertHeight);
+		} else {
+			return new Point(_shellHorizWidth, _shellHorizHeight);
 		}
 	}
 
@@ -274,10 +272,6 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 		final PixelConverter pc = new PixelConverter(ownerControl);
 
 		_resizeBoxPixel = pc.convertWidthInCharsToPixels(RESIZE_BOX_SIZE);
-	}
-
-	boolean isHorizontalGallery() {
-		return _isHorizontalGallery;
 	}
 
 	@Override
@@ -363,12 +357,12 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 
 			_ttShell.setBounds(newShellLocation.x, newShellLocation.y, newShellWidth, newShellHeight);
 
-			if (_isHorizontalGallery) {
-				_shellHorizWidth = newShellWidth;
-				_shellHorizHeight = newShellHeight;
-			} else {
+			if (isVerticalGallery()) {
 				_shellVertWidth = newShellWidth;
 				_shellVertHeight = newShellHeight;
+			} else {
+				_shellHorizWidth = newShellWidth;
+				_shellHorizHeight = newShellHeight;
 			}
 
 		} else {
@@ -421,6 +415,8 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 
 		return isHandled;
 	}
+
+	abstract boolean isVerticalGallery();
 
 	private void onOwnerControlEvent(final Event event) {
 
@@ -671,9 +667,6 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 
 	protected void restoreState(final IDialogSettings state) {
 
-//		_isHorizontalGallery = Util.getStateBoolean(state, STATE_PHOTO_TOOL_IS_HORIZONTAL, true);
-		_isHorizontalGallery = true;
-
 		/*
 		 * get horizontal gallery values
 		 */
@@ -706,8 +699,6 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 	}
 
 	protected void saveState(final IDialogSettings state) {
-
-		state.put(STATE_PHOTO_TOOL_IS_HORIZONTAL, _isHorizontalGallery);
 
 		state.put(STATE_PHOTO_HORIZ_TOOL_TIP_WIDTH, _shellHorizWidth);
 		state.put(STATE_PHOTO_HORIZ_TOOL_TIP_HEIGHT, _shellHorizHeight);
@@ -811,20 +802,20 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 		event.y = location.y;
 		event.widget = _ownerControl;
 
-		toolTipCreate(event);
+		toolTipCreateShell(event);
 
 		return true;
 	}
 
-	private void toolTipCreate(final Event event) {
+	private void toolTipCreateShell(final Event event) {
 
 		if (shouldCreateToolTip(event)) {
 
 			final Shell shell = new Shell(_ownerControl.getShell(), //
 					SWT.ON_TOP //
-//							| SWT.TOOL
+							| SWT.TOOL
 							| SWT.NO_FOCUS
-							| SWT.NO_TRIM
+//							| SWT.NO_TRIM
 			//
 			);
 

@@ -95,7 +95,7 @@ import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
  * org.apache.commons.sanselan
  * </pre>
  */
-public abstract class ImageGallery implements IItemHovereredListener, IGalleryContextMenuProvider {
+public class ImageGallery implements IItemHovereredListener, IGalleryContextMenuProvider {
 
 	/**
 	 * Number of gallery positions which are cached
@@ -226,10 +226,6 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 
 	private int													_galleryStyle;
 
-	/**
-	 * By default action bar is displayed.
-	 */
-	private boolean												_isShowActionBar;
 	private boolean												_isShowCustomActionBar;
 	private boolean												_isShowThumbsize;
 
@@ -424,7 +420,34 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		}
 	}
 
-	public void createGallery(final Composite parent, final int style, final IPhotoGalleryProvider photoGalleryProvider) {
+	private void createGalleryFont() {
+
+		if (_galleryFont != null) {
+			_galleryFont.dispose();
+		}
+
+		final String prefGalleryFont = _prefStore.getString(IPhotoPreferences.PHOTO_VIEWER_FONT);
+		if (prefGalleryFont.length() > 0) {
+			try {
+
+//				System.out.println(UI.timeStamp() + "setting gallery font: " + prefGalleryFont); //$NON-NLS-1$
+
+				_galleryFont = new Font(_display, new FontData(prefGalleryFont));
+
+			} catch (final Exception e) {
+				// ignore
+			}
+		}
+
+		if (_galleryFont == null) {
+			StatusUtil.log("This font cannot be created: \"" + prefGalleryFont + "\"");//$NON-NLS-1$ //$NON-NLS-2$
+			_galleryFont = new Font(_display, DEFAULT_GALLERY_FONT, 7, SWT.NORMAL);
+		}
+	}
+
+	public void createImageGallery(	final Composite parent,
+									final int style,
+									final IPhotoGalleryProvider photoGalleryProvider) {
 
 		PhotoUI.init();
 
@@ -448,31 +471,6 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 				stopLoadingImages();
 			}
 		});
-	}
-
-	private void createGalleryFont() {
-
-		if (_galleryFont != null) {
-			_galleryFont.dispose();
-		}
-
-		final String prefGalleryFont = _prefStore.getString(IPhotoPreferences.PHOTO_VIEWER_FONT);
-		if (prefGalleryFont.length() > 0) {
-			try {
-
-				System.out.println(UI.timeStamp() + "setting gallery font: " + prefGalleryFont); //$NON-NLS-1$
-
-				_galleryFont = new Font(_display, new FontData(prefGalleryFont));
-
-			} catch (final Exception e) {
-				// ignore
-			}
-		}
-
-		if (_galleryFont == null) {
-			StatusUtil.log("This font cannot be created: \"" + prefGalleryFont + "\"");//$NON-NLS-1$ //$NON-NLS-2$
-			_galleryFont = new Font(_display, DEFAULT_GALLERY_FONT, 7, SWT.NORMAL);
-		}
 	}
 
 	/**
@@ -513,7 +511,7 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, 0).applyTo(container);
 //		container.setBackground(_display.getSystemColor(SWT.COLOR_RED));
 		{
-			if (_isShowActionBar) {
+			if (_isShowThumbsize || _isShowCustomActionBar) {
 				_galleryActionBar = new GalleryActionBar(container, this, _isShowThumbsize, _isShowCustomActionBar);
 			}
 
@@ -568,6 +566,7 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		});
 
 		_galleryMT20.setContextMenuProvider(this);
+
 		_photoGalleryProvider.registerContextMenu(MENU_ID_PHOTO_GALLERY, _galleryMT20.getContextMenuManager());
 
 		_fullSizeViewer = _galleryMT20.getFullsizeViewer();
@@ -697,14 +696,6 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 	public Composite getCustomActionBarContainer() {
 		return _galleryActionBar.getCustomContainer();
 	}
-
-//	/**
-//	 * @return Returns custom gallery toolbar. {@link #setShowActionBar(boolean)} must be called
-//	 *         with the parameter <code>true</code> that the action bar is created.
-//	 */
-//	public ToolBar getCustomToolbar() {
-//		return _galleryActionBar.getToolbar();
-//	}
 
 	public FullSizeViewer getFullSizeViewer() {
 		return _fullSizeViewer;
@@ -880,7 +871,7 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 
 					_galleryMT20.updateGallery(false, _galleryMT20.getGalleryPosition());
 
-					if (_isShowActionBar) {
+					if (_galleryActionBar != null) {
 						_galleryActionBar.updateUI_ImageIndicatorTooltip();
 					}
 				}
@@ -1647,12 +1638,12 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 				STATE_THUMB_IMAGE_SIZE,
 				PhotoLoadManager.IMAGE_SIZE_THUMBNAIL);
 
-		if (_isShowActionBar) {
+		if (_galleryActionBar != null) {
 			_galleryActionBar.restoreState(state, stateThumbSize);
 		}
 
 		// restore thumbnail image size
-		setThumbnailSize(stateThumbSize);
+		setThumbnailSizeRestore(stateThumbSize);
 
 		/*
 		 * gallery folder/tour image positions
@@ -1750,24 +1741,22 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 	}
 
 	/**
-	 * Actionbar can be set visible/hidden, This method <b>must</b> be called before
-	 * {@link #createGallery()} is called.
-	 * 
-	 * @param isShowActionBar
+	 * A custom actionbar can be displayed, by default it is hidden. The actionbar can be retrieved
+	 * with {@link #getCustomActionBarContainer()}.
+	 * <p>
+	 * This method <b>must</b> be called before
+	 * {@link #createImageGallery(Composite, int, IPhotoGalleryProvider)} is called.
 	 */
-	public void setShowActionBar(final boolean isShowActionBar, final boolean isShowCustomActionBar) {
-		_isShowActionBar = isShowActionBar;
-		_isShowCustomActionBar = isShowCustomActionBar;
+	public void setShowActionBar() {
+		_isShowCustomActionBar = true;
 	}
 
 	/**
-	 * Thumbnail size combobox can be set visible/hidden, This method <b>must</b> be called before
-	 * {@link #createGallery()} is called.
-	 * 
-	 * @param isShowThumbSize
+	 * Thumbnail size combobox can be displayed, by default it is hidden, This method <b>must</b> be
+	 * called before {@link #createImageGallery(Composite, int, IPhotoGalleryProvider)} is called.
 	 */
-	public void setShowThumbnailSize(final boolean isShowThumbSize) {
-		_isShowThumbsize = isShowThumbSize;
+	public void setShowThumbnailSize() {
+		_isShowThumbsize = true;
 	}
 
 	public void setSorting(final GallerySorting gallerySorting) {
@@ -1797,7 +1786,7 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		final int prevGalleryItemSize = _galleryMT20.getItemWidth();
 
 		// update gallery
-		final int adjustedItemSize = _galleryMT20.zoomGallery(newGalleryItemSize);
+		final int adjustedItemSize = _galleryMT20.zoomGallery(newGalleryItemSize, false);
 
 		if (adjustedItemSize == -1 || adjustedItemSize == prevGalleryItemSize) {
 			// nothing has changed
@@ -1817,6 +1806,31 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		}
 
 		updateUI_AfterZoomInOut(newGalleryItemSize);
+	}
+
+	private void setThumbnailSizeRestore(final int thumbSize) {
+
+		PhotoLoadManager.stopImageLoading(false);
+
+		_prevGalleryItemSize = -1;
+
+		int requestedItemSize = thumbSize + _photoBorderSize;
+
+		// update gallery
+		final int adjustedItemSize = _galleryMT20.zoomGallery(requestedItemSize, true);
+
+		// check if size has been modified when zoomed in/out
+		if (adjustedItemSize != requestedItemSize) {
+
+			/*
+			 * size has been modified, this case can occure when the gallery is switching the
+			 * scrollbars on/off depending on the content
+			 */
+
+			requestedItemSize = adjustedItemSize;
+		}
+
+		updateUI_AfterZoomInOut(requestedItemSize);
 	}
 
 	public void showImages(final ArrayList<PhotoWrapper> photoWrapperList, final String galleryPositionKey) {
@@ -2042,7 +2056,7 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 		 * set color in action bar only for Linux & Windows, setting color in OSX looks not very
 		 * good
 		 */
-		if (UI.IS_OSX == false && _isShowActionBar) {
+		if (UI.IS_OSX == false && _galleryActionBar != null) {
 			_galleryActionBar.updateColors(fgColor, bgColor);
 		}
 
@@ -2082,11 +2096,11 @@ public abstract class ImageGallery implements IItemHovereredListener, IGalleryCo
 
 			_prevGalleryItemSize = galleryItemSize;
 
-			if (_isShowActionBar) {
+			if (_galleryActionBar != null) {
 				_galleryActionBar.updateUI_AfterZoomInOut(imageSize);
 			}
 
-			_photoTooltip.setImageSize(_photoImageSize);
+			_photoTooltip.setGalleryImageSize(_photoImageSize);
 			_photoTooltip.reset();
 		}
 	}

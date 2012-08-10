@@ -223,8 +223,10 @@ public class PicDirImages implements IPhotoGalleryProvider {
 
 		_photoGallery = new PhotoGallery();
 
-		_photoGallery.setShowActionBar(true, true);
-		_photoGallery.createUI(parent, SWT.V_SCROLL | SWT.MULTI, this);
+		_photoGallery.setShowActionBar();
+		_photoGallery.setShowThumbnailSize();
+
+		_photoGallery.createPhotoGallery(parent, SWT.V_SCROLL | SWT.MULTI, this);
 
 		createActions();
 
@@ -515,7 +517,6 @@ public class PicDirImages implements IPhotoGalleryProvider {
 		_photoGallery.updateColors(fgColor, bgColor, selectionFgColor, noFocusSelectionFgColor, isRestore);
 
 		// combobox list entries are almost invisible when colors are set on osx
-
 
 		/*
 		 * set color in action bar only for Linux & Windows, setting color in OSX looks not very

@@ -146,7 +146,7 @@ public class GalleryPhotoToolTip extends ToolTip {
 				.spacing(3, 1)
 				.numColumns(1)
 				.applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 		{
 			final Composite containerHeader = new Composite(container, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(containerHeader);
@@ -561,7 +561,7 @@ public class GalleryPhotoToolTip extends ToolTip {
 		hide();
 	}
 
-	public void setImageSize(final int photoImageSize) {
+	public void setGalleryImageSize(final int photoImageSize) {
 		_galleryImageSize = photoImageSize;
 	}
 

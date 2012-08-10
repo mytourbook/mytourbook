@@ -34,6 +34,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Spinner;
 
 public class GalleryActionBar {
@@ -55,7 +56,6 @@ public class GalleryActionBar {
 
 	private Spinner							_spinnerThumbSize;
 	private ImageSizeIndicator				_canvasImageSizeIndicator;
-
 
 	public GalleryActionBar(final Composite parent,
 							final ImageGallery imageGallery,
@@ -90,7 +90,7 @@ public class GalleryActionBar {
 				.extendedMargins(2, 2, 2, 2)
 				.spacing(3, 0)
 				.applyTo(_containerActionBar);
-//		containerActionBar.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+//		_containerActionBar.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
 			/*
 			 * custom action bar container
@@ -98,6 +98,8 @@ public class GalleryActionBar {
 			if (_isShowCustomActionBar) {
 				_containerCustomActionBar = new Composite(_containerActionBar, SWT.NONE);
 				GridDataFactory.fillDefaults().grab(true, false).applyTo(_containerCustomActionBar);
+				GridLayoutFactory.fillDefaults().applyTo(_containerCustomActionBar);
+
 //				_containerCustomActionBar.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 			}
 
@@ -106,7 +108,7 @@ public class GalleryActionBar {
 			 */
 			if (_isShowThumbsize) {
 				final Composite container = new Composite(_containerActionBar, SWT.NONE);
-				GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+				GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
 				GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 //				container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 				{
@@ -179,24 +181,43 @@ public class GalleryActionBar {
 
 	public void updateColors(final Color fgColor, final Color bgColor) {
 
-		if (_isShowCustomActionBar || _isShowThumbsize) {
-			_containerActionBar.setForeground(fgColor);
-			_containerActionBar.setBackground(bgColor);
+		if (_containerActionBar == null) {
+			// actions are not created
+			return;
 		}
 
-		if (_isShowCustomActionBar) {
-
-			_containerCustomActionBar.setForeground(fgColor);
-			_containerCustomActionBar.setBackground(bgColor);
+		/*
+		 * set color in action bar only for Linux & Windows, setting color in OSX looks not very
+		 * good
+		 */
+		if (UI.IS_OSX) {
+			return;
 		}
 
-		if (_isShowThumbsize) {
+		updateColors_Children(_containerActionBar, fgColor, bgColor);
+	}
 
-			_spinnerThumbSize.setForeground(fgColor);
-			_spinnerThumbSize.setBackground(bgColor);
+	/**
+	 * ######################### recursive ###################### <br>
+	 * 
+	 * @param parent
+	 * @param fgColor
+	 * @param bgColor
+	 */
+	private void updateColors_Children(final Composite parent, final Color fgColor, final Color bgColor) {
 
-			_canvasImageSizeIndicator.setForeground(fgColor);
-			_canvasImageSizeIndicator.setBackground(bgColor);
+		parent.setForeground(fgColor);
+		parent.setBackground(bgColor);
+
+		final Control[] children = parent.getChildren();
+		if (children == null) {
+			return;
+		}
+
+		for (final Control childControl : children) {
+			if (childControl instanceof Composite) {
+				updateColors_Children((Composite) childControl, fgColor, bgColor);
+			}
 		}
 	}
 

@@ -560,6 +560,7 @@ public class PhotoLoadManager {
 	 * Remove all items in the image loading queue.
 	 * 
 	 * @param isClearExifQueue
+	 *            EXIF loading queue is cleared when <code>true</code>
 	 */
 	public synchronized static void stopImageLoading(final boolean isClearExifQueue) {
 

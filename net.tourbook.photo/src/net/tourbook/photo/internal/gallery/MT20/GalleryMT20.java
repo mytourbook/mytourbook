@@ -2409,11 +2409,17 @@ public abstract class GalleryMT20 extends Canvas {
 	 */
 	private Point setGridSize_10(final int visibleSize, final int itemSize) {
 
+		int numberOfVirtualItems;
 		if (_virtualGalleryItems == null || _virtualGalleryItems.length == 0) {
-			return new Point(1, 1);
-		}
 
-		final int numberOfVirtualItems = _virtualGalleryItems.length;
+			final int oneRowItems = visibleSize / itemSize;
+
+			numberOfVirtualItems = oneRowItems;
+
+		} else {
+
+			numberOfVirtualItems = _virtualGalleryItems.length;
+		}
 
 		int x = visibleSize / itemSize;
 		int y = 0;
@@ -2873,9 +2879,12 @@ public abstract class GalleryMT20 extends Canvas {
 
 	/**
 	 * @param newZoomedSize
+	 * @param isInitializeGallery
+	 *            When <code>true</code> the gallery is not yet initialized, grid and item width is
+	 *            not yet set.
 	 * @return Returns new item size or <code>-1</code> when gallery is not zoomed.
 	 */
-	public int zoomGallery(int newZoomedSize) {
+	public int zoomGallery(int newZoomedSize, final boolean isInitializeGallery) {
 
 		if (_isHorizontal) {
 			return -1;
@@ -2885,30 +2894,58 @@ public abstract class GalleryMT20 extends Canvas {
 			newZoomedSize = GALLERY_ITEM_MIN_SIZE;
 		}
 
-		int prevNumberOfImages = _gridHorizItems;
+		// ensure client area is set
+		int clientAreaWidth = _clientArea.width;
+		if (clientAreaWidth == 0) {
 
-		// get default values when not yet set
-		if (prevNumberOfImages < 1) {
+			_clientArea = getClientArea();
+
+			clientAreaWidth = _clientArea.width;
+		}
+
+		int prevNumberOfImages;
+		boolean isCheckWidth = false;
+
+		if (isInitializeGallery) {
+
+			prevNumberOfImages = clientAreaWidth / newZoomedSize;
+
+			_itemWidth = newZoomedSize;
+
+			isCheckWidth = true;
+
+		} else {
+
+			prevNumberOfImages = _gridHorizItems;
+
+			// get default values when not yet set
+			if (prevNumberOfImages < 1) {
+
+				/*
+				 * set default values for item width and number of images
+				 */
+
+				_itemWidth = newZoomedSize - 1;
+
+				isCheckWidth = true;
+			}
+		}
+
+		if (isCheckWidth) {
 
 			/*
-			 * set default values for item width and number of images
+			 * ensure item width is not too small
 			 */
-
-			_itemWidth = newZoomedSize - 1;
 
 			if (_itemWidth < 5) {
 				_itemWidth = 5;
 			}
 
-			if (_clientArea.width == 0) {
-				_clientArea = getClientArea();
-			}
-
-			prevNumberOfImages = _clientArea.width / _itemWidth;
+			prevNumberOfImages = clientAreaWidth / _itemWidth;
 
 			if (prevNumberOfImages < 1) {
 				prevNumberOfImages = 5;
-				_itemWidth = _clientArea.width / prevNumberOfImages;
+				_itemWidth = clientAreaWidth / prevNumberOfImages;
 			}
 		}
 
@@ -2917,36 +2954,39 @@ public abstract class GalleryMT20 extends Canvas {
 
 		final boolean isZoomIn = newZoomedSize > _itemWidth;
 
-		if (isZoomIn) {
+		if (isInitializeGallery == false) {
 
-			// zoom IN
+			if (isZoomIn) {
 
-			if (prevNumberOfImages <= 2) {
+				// zoom IN
 
-				// number of photos is already 1, only increase photo width
+				if (prevNumberOfImages <= 2) {
 
-			} else {
+					// number of photos is already 1, only increase photo width
 
-				// less images in a row
+				} else {
 
-				stateNumberOfImages = prevNumberOfImages - 1;
-			}
+					// less images in a row
 
-		} else {
-
-			// zoom OUT
-
-			// more images in a row
-
-			if (prevNumberOfImages == 1) {
-
-				// number of photos is already 1, only increase photo width
+					stateNumberOfImages = prevNumberOfImages - 1;
+				}
 
 			} else {
 
-				// less images in a row
+				// zoom OUT
 
-				stateNumberOfImages = prevNumberOfImages + 1;
+				// more images in a row
+
+				if (prevNumberOfImages == 1) {
+
+					// number of photos is already 1, only increase photo width
+
+				} else {
+
+					// less images in a row
+
+					stateNumberOfImages = prevNumberOfImages + 1;
+				}
 			}
 		}
 
@@ -2956,7 +2996,11 @@ public abstract class GalleryMT20 extends Canvas {
 		hideTooltip();
 
 		// update gallery
-		final int newItemSize = zoomGallerySetItemSize(stateNumberOfImages, newZoomedSize, isZoomIn);
+		final int newItemSize = zoomGallerySetItemSize(
+				stateNumberOfImages,
+				newZoomedSize,
+				isZoomIn,
+				isInitializeGallery);
 
 		notifyZoomListener(_itemWidth, _itemHeight);
 
@@ -3000,7 +3044,7 @@ public abstract class GalleryMT20 extends Canvas {
 			return;
 		}
 
-		zoomGallery(newZoomedSize);
+		zoomGallery(newZoomedSize, false);
 	}
 
 	/**
@@ -3011,15 +3055,16 @@ public abstract class GalleryMT20 extends Canvas {
 	 *            requested item size
 	 * @param requestedItemSize
 	 * @param isZoomIn
+	 * @param isInitializeGallery
 	 * @return Returns the size which has been set. This value can differ from the requested item
 	 *         size when a scrollbar needs to be displayed.
 	 */
 	private int zoomGallerySetItemSize(	final int requestedNumberOfImages,
 										final int requestedItemSize,
-										final boolean isZoomIn) {
+										final boolean isZoomIn,
+										final boolean isInitializeGallery) {
 
 		final boolean isForceNumberOfImages = requestedNumberOfImages != -1;
-		boolean isForceWidth = false;
 
 		int numberOfImages = requestedNumberOfImages;
 		final int oldItemWidth = _itemWidth;
@@ -3028,15 +3073,18 @@ public abstract class GalleryMT20 extends Canvas {
 
 			int newItemWidth = _clientArea.width / requestedNumberOfImages;
 
-			// ensure width is not the same
-			if (newItemWidth == _itemWidth) {
+			if (isInitializeGallery == false) {
 
-				// size has not changed, this occures by small images
+				// initialize is not zooming !!!
 
-				newItemWidth = isZoomIn ? _itemWidth + 1 : _itemWidth - 1;
-				numberOfImages = _clientArea.width / newItemWidth;
+				// ensure width is not the same
+				if (newItemWidth == _itemWidth) {
 
-				isForceWidth = true;
+					// size has not changed, this occures by small images
+
+					newItemWidth = isZoomIn ? _itemWidth + 1 : _itemWidth - 1;
+					numberOfImages = _clientArea.width / newItemWidth;
+				}
 			}
 
 			_itemWidth = newItemWidth;
@@ -3103,18 +3151,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 							int newItemWidthWithScrollbar = _itemWidth;
 
-							if (isForceWidth) {
-
-//								int itemWidthWithScrollbar = areaWidthWithScrollbar / numberOfImages;
-//
-//								if (itemWidthWithScrollbar != _itemWidth) {
-//
-//									// size is different, this occures by small images
-//
-//									newItemWidthWithScrollbar = _itemWidth;
-//								}
-
-							} else if (isForceNumberOfImages) {
+							if (isForceNumberOfImages) {
 
 								newItemWidthWithScrollbar = areaWidthWithScrollbar / requestedNumberOfImages;
 

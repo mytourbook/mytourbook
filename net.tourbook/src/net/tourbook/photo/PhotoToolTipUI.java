@@ -17,17 +17,24 @@ package net.tourbook.photo;
 
 import java.util.ArrayList;
 
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.util.Util;
 import net.tourbook.ui.tourChart.ChartPhoto;
 
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
@@ -35,6 +42,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.ToolBar;
 
 /**
  * Photo tooltip UI for a tour chart or map or something unknown
@@ -44,14 +52,20 @@ import org.eclipse.swt.widgets.Shell;
 
 public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
+	private static final String				STATE_PHOTO_GALLERY_IS_VERTICAL	= "STATE_PHOTO_GALLERY_IS_VERTICAL";	//$NON-NLS-1$
+
+	private IDialogSettings					_state;
 	private ArrayList<ChartPhoto>			_hoveredPhotos;
 
 	private int								_hoveredPhotosHash;
 	private int								_displayedPhotosHash;
 
-	private final ArrayList<PhotoWrapper>	_photoWrapperList	= new ArrayList<PhotoWrapper>();
+	private final ArrayList<PhotoWrapper>	_photoWrapperList				= new ArrayList<PhotoWrapper>();
 
-	private PhotoToolTipImageGallery		_imageGallery;
+	private ToggleGalleryOrientation		_actionToggleGalleryOrientation;
+
+	private boolean							_isVerticalGallery;
+	private Point							_devPositionHoveredValue;
 
 	private Color							_fgColor;
 	private Color							_bgColor;
@@ -59,6 +73,9 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 	/*
 	 * UI controls
 	 */
+	private Composite						_galleryContainer;
+	private ImageGallery					_imageGallery;
+	private ToolBar							_toolbarControl;
 
 	private final class PhotoGalleryProvider implements IPhotoGalleryProvider {
 		@Override
@@ -78,13 +95,24 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		public void setSelection(final PhotoSelection photoSelection) {}
 	}
 
-	public class PhotoToolTipImageGallery extends ImageGallery {
+	private class ToggleGalleryOrientation extends Action {
 
-		public PhotoToolTipImageGallery(final Composite parent,
-										final int style,
-										final PhotoGalleryProvider photoGalleryProvider) {
+		public ToggleGalleryOrientation() {
+			super(null, Action.AS_PUSH_BUTTON);
+		}
 
-			super.createGallery(parent, style, photoGalleryProvider);
+		@Override
+		public void run() {
+
+			if (_isVerticalGallery) {}
+		final xxx	_imageGallery.saveState(_state);
+
+			// toggle gallery
+			_isVerticalGallery = !_isVerticalGallery;
+
+			updateUI_ToogleAction();
+
+			reopenTooltip();
 		}
 	}
 
@@ -93,6 +121,13 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		super(ownerControl);
 
 		initUI(ownerControl);
+
+		createActions();
+	}
+
+	private void createActions() {
+
+		_actionToggleGalleryOrientation = new ToggleGalleryOrientation();
 	}
 
 	@Override
@@ -100,9 +135,17 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 		final Composite container = createUI(shell);
 
-		updateUI_Colors(shell);
+		shell.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(final DisposeEvent e) {
 
-		_imageGallery.showInfo(false, null, true, true);
+				// keep gallery state, the gallery can be reopened very often
+
+				_imageGallery.saveState(_state);
+			}
+		});
+
+		updateUI_Colors(shell);
 
 		super.setImageGallery(_imageGallery);
 
@@ -111,44 +154,75 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 	private Composite createUI(final Composite parent) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.fillDefaults().numColumns(1).spacing(2, 2).applyTo(container);
+		final Composite shellContainer = new Composite(parent, SWT.NONE);
+		GridLayoutFactory.fillDefaults().numColumns(1).spacing(2, 2).applyTo(shellContainer);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
-//			createUI_50_Info(container);
-			createUI_10_Gallery(container);
+			createUI_10_Gallery(shellContainer);
 		}
 
-		return container;
+		return shellContainer;
 	}
 
 	private void createUI_10_Gallery(final Composite parent) {
 
 		final Point shellSize = super.getShellSize();
 
-		final Composite container = new Composite(parent, SWT.NONE);
+		_galleryContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
-//				.hint(SWT.DEFAULT, 150)
 				.hint(shellSize.x, shellSize.y)
-//				.hint(1000, 70)
 				.grab(true, true)
-				.applyTo(container);
+				.applyTo(_galleryContainer);
 		GridLayoutFactory.fillDefaults()//
 				.numColumns(1)
-				.extendedMargins(1, 1, 1, 1)
-				.applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+//				.margins(10, 10)
+				.extendedMargins(0, 0, 0, 20)
+				.applyTo(_galleryContainer);
+		_galleryContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
-			final boolean isHorizGallery = super.isHorizontalGallery();
+			_imageGallery = new ImageGallery();
 
-			final int galleryStyle = isHorizGallery ? //
-					SWT.H_SCROLL | SWT.MULTI
-					: SWT.V_SCROLL | SWT.MULTI;
+			_imageGallery.setShowActionBar();
 
-			_imageGallery = new PhotoToolTipImageGallery(container, galleryStyle, new PhotoGalleryProvider());
+			if (_isVerticalGallery) {
+				_imageGallery.setShowThumbnailSize();
+			}
+
+			final int galleryStyle = _isVerticalGallery ? //
+					SWT.V_SCROLL // | SWT.MULTI
+					: SWT.H_SCROLL // | SWT.MULTI
+			;
+
+			_imageGallery.createImageGallery(_galleryContainer, galleryStyle, new PhotoGalleryProvider());
 
 			_imageGallery.showInfo(false, null, true, true);
+
+			createUI_20_ActionBar(_imageGallery.getCustomActionBarContainer());
 		}
+	}
+
+	private void createUI_20_ActionBar(final Composite parent) {
+
+		GridLayoutFactory.fillDefaults().applyTo(parent);
+
+		/*
+		 * create toolbar
+		 */
+		_toolbarControl = new ToolBar(parent, SWT.FLAT);
+		GridDataFactory.fillDefaults()//
+				.grab(true, false)
+				.align(SWT.BEGINNING, SWT.BEGINNING)
+				.applyTo(_toolbarControl);
+		_toolbarControl.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+
+		/*
+		 * fill toolbar
+		 */
+		final ToolBarManager tbm = new ToolBarManager(_toolbarControl);
+
+		tbm.add(_actionToggleGalleryOrientation);
+
+		tbm.update(true);
 	}
 
 	public abstract int getHideCounter();
@@ -171,15 +245,37 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 	}
 
 	@Override
+	boolean isVerticalGallery() {
+		return _isVerticalGallery;
+	}
+
+	private void reopenTooltip() {
+
+		// hide and recreate tooltip
+
+		hide();
+
+//		show(new Point(0, 0));
+
+		showPhotoToolTip(_devPositionHoveredValue);
+	}
+
+	@Override
 	protected void restoreState(final IDialogSettings state) {
 
-//		_imageGallery.restoreState(state);
+		_state = state;
+
+		_isVerticalGallery = Util.getStateBoolean(state, STATE_PHOTO_GALLERY_IS_VERTICAL, true);
+
+		updateUI_ToogleAction();
 
 		super.restoreState(state);
 	}
 
 	@Override
 	protected void saveState(final IDialogSettings state) {
+
+		state.put(STATE_PHOTO_GALLERY_IS_VERTICAL, _isVerticalGallery);
 
 		super.saveState(state);
 	}
@@ -200,6 +296,9 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 	protected void showPhotoToolTip(final Point devPositionHoveredValue) {
 
+		// keep position for reopening the tooltip
+		_devPositionHoveredValue = devPositionHoveredValue;
+
 		final boolean isPhotoHovered = _hoveredPhotos != null && _hoveredPhotos.size() > 0;
 		_hoveredPhotosHash = isPhotoHovered ? _hoveredPhotos.hashCode() : 0;
 
@@ -210,9 +309,19 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		final Shell ttShell = getToolTipShell();
 		if (ttShell == null || ttShell.isDisposed()) {
 
+			// create tooltip shell
+
 			if (show(devPositionHoveredValue) == false) {
 				return;
 			}
+
+			/*
+			 * restore MUST be done after the shell is created, otherwise clientArea() can return 0
+			 * values
+			 */
+			_imageGallery.restoreState(_state);
+
+			_imageGallery.showInfo(false, null, true, true);
 
 			isNewImages = true;
 
@@ -271,9 +380,12 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 		final Color noFocusSelectionFgColor = Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND);
 
+		_galleryContainer.setForeground(_fgColor);
+		_galleryContainer.setBackground(_bgColor);
+
 		_imageGallery.updateColors(_fgColor, _bgColor, selectionFgColor, noFocusSelectionFgColor, true);
 
-		updateUI_Colors_ChildColors(parent);
+//		updateUI_Colors_ChildColors(parent);
 	}
 
 	/**
@@ -296,6 +408,26 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 					updateUI_Colors_ChildColors(element);
 				}
 			}
+		}
+	}
+
+	private void updateUI_ToogleAction() {
+
+		if (_isVerticalGallery) {
+
+			_actionToggleGalleryOrientation.setToolTipText(//
+					Messages.Photo_Tooltip_Action_ToggleGalleryHorizontal_ToolTip);
+
+			_actionToggleGalleryOrientation.setImageDescriptor(//
+					TourbookPlugin.getImageDescriptor(Messages.Image__PhotoGalleryHorizontal));
+
+		} else {
+
+			_actionToggleGalleryOrientation.setToolTipText(//
+					Messages.Photo_Tooltip_Action_ToggleGalleryVertical_ToolTip);
+
+			_actionToggleGalleryOrientation.setImageDescriptor(//
+					TourbookPlugin.getImageDescriptor(Messages.Image__PhotoGalleryVertical));
 		}
 	}
 }

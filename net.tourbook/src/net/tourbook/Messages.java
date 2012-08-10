@@ -302,10 +302,8 @@ public class Messages extends NLS {
 	public static String		App_Dialog_FirstStartupTip_Message;
 	public static String		App_Dialog_FirstStartupTip_Title;
 
-	public static String	App_Label_BooleanNo;
-
-	public static String	App_Label_BooleanYes;
-
+	public static String		App_Label_BooleanNo;
+	public static String		App_Label_BooleanYes;
 	public static String		App_Label_H_MM;
 	public static String		App_Label_ISO8601;
 	public static String		App_Label_max;
@@ -507,16 +505,12 @@ public class Messages extends NLS {
 
 	public static String		Dlg_TourMarker_Button_delete;
 	public static String		Dlg_TourMarker_Button_delete_tooltip;
-
-	public static String	Dlg_TourMarker_Button_HideAllMarker;
-
-	public static String	Dlg_TourMarker_Button_HideAllMarker_Tooltip;
+	public static String		Dlg_TourMarker_Button_HideAllMarker;
+	public static String		Dlg_TourMarker_Button_HideAllMarker_Tooltip;
 	public static String		Dlg_TourMarker_Button_reset_offset;
 	public static String		Dlg_TourMarker_Button_reset_offset_tooltip;
-
-	public static String	Dlg_TourMarker_Button_ShowAllMarker;
-
-	public static String	Dlg_TourMarker_Button_ShowAllMarker_Tooltip;
+	public static String		Dlg_TourMarker_Button_ShowAllMarker;
+	public static String		Dlg_TourMarker_Button_ShowAllMarker_Tooltip;
 	public static String		Dlg_TourMarker_Button_undo;
 	public static String		Dlg_TourMarker_Button_undo_tooltip;
 	public static String		Dlg_TourMarker_Dlg_Message;
@@ -647,7 +641,10 @@ public class Messages extends NLS {
 	public static String		Image__link;
 	public static String		Image__MyTourbook16;
 	public static String		Image__options;
-	public static String	Image__PhotoDirectoryView;
+	public static String		Image__PhotoDirectoryView;
+	public static String	Image__PhotoGalleryHorizontal;
+
+	public static String	Image__PhotoGalleryVertical;
 
 	public static String		Image__PulseZones;
 	public static String		Image__PulseZones_Disabled;
@@ -771,23 +768,19 @@ public class Messages extends NLS {
 
 	public static String		NT001_DialogExtractTour_InvalidTourData;
 
-	public static String	Photos_AndTours_Label_AdjustTime;
+	public static String	Photo_Tooltip_Action_ToggleGalleryHorizontal_ToolTip;
 
-	public static String	Photos_AndTours_Label_AdjustTimeTooltip;
+	public static String	Photo_Tooltip_Action_ToggleGalleryVertical_ToolTip;
 
-	public static String	Photos_AndTours_Label_NoCamera;
-
-	public static String	Photos_AndTours_Label_NoSelectedPhoto;
-
-	public static String	Photos_AndTours_Label_NoTourIsAvailable;
-
-	public static String	Photos_AndTours_Link_PhotoDirectory;
-
-	public static String	Photos_AndTours_Spinner_AdjustHours_Tooltip;
-
-	public static String	Photos_AndTours_Spinner_AdjustMinutes_Tooltip;
-
-	public static String	Photos_AndTours_Spinner_AdjustSeconds_Tooltip;
+	public static String		Photos_AndTours_Label_AdjustTime;
+	public static String		Photos_AndTours_Label_AdjustTimeTooltip;
+	public static String		Photos_AndTours_Label_NoCamera;
+	public static String		Photos_AndTours_Label_NoSelectedPhoto;
+	public static String		Photos_AndTours_Label_NoTourIsAvailable;
+	public static String		Photos_AndTours_Link_PhotoDirectory;
+	public static String		Photos_AndTours_Spinner_AdjustHours_Tooltip;
+	public static String		Photos_AndTours_Spinner_AdjustMinutes_Tooltip;
+	public static String		Photos_AndTours_Spinner_AdjustSeconds_Tooltip;
 
 	public static String		Pref_App_Label_TourEditorIsModified;
 
@@ -1183,10 +1176,8 @@ public class Messages extends NLS {
 
 	public static String		Tour_Marker_Column_horizontal_offset;
 	public static String		Tour_Marker_Column_horizontal_offset_tooltip;
-
-	public static String	Tour_Marker_Column_IsVisible;
-
-	public static String	Tour_Marker_Column_IsVisible_Tooltip;
+	public static String		Tour_Marker_Column_IsVisible;
+	public static String		Tour_Marker_Column_IsVisible_Tooltip;
 	public static String		Tour_Marker_Column_km_tooltip;
 	public static String		Tour_Marker_Column_remark;
 	public static String		Tour_Marker_Column_time;
@@ -1205,7 +1196,7 @@ public class Messages extends NLS {
 	public static String		Tour_Marker_Position_vertical_chart_bottom;
 	public static String		Tour_Marker_Position_vertical_chart_top;
 
-	public static String	Tour_Photos_Label_StatusMessage_NoTourWithPhotos;
+	public static String		Tour_Photos_Label_StatusMessage_NoTourWithPhotos;
 
 	public static String		Tour_Segmenter_Label_default_tolerance;
 	public static String		Tour_Segmenter_Label_no_chart;
@@ -1477,12 +1468,9 @@ public class Messages extends NLS {
 	public static String		UI_Label_no_chart_is_selected;
 	public static String		UI_Label_PersonIsRequired;
 	public static String		UI_Label_TourIsNotSelected;
-
-	public static String	Unit_Label_Hour;
-
-	public static String	Unit_Label_Minute;
-
-	public static String	Unit_Label_Second;
+	public static String		Unit_Label_Hour;
+	public static String		Unit_Label_Minute;
+	public static String		Unit_Label_Second;
 
 	public static String		ui_tour_not_defined;
 
