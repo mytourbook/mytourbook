@@ -1676,7 +1676,15 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 	public void saveState(final IDialogSettings state) {
 
-		state.put(STATE_THUMB_IMAGE_SIZE, _photoImageSize);
+		if (_galleryMT20.isVertical()) {
+
+			/*
+			 * image size is only used in a vertical gallery, horizontal gallery is using the
+			 * clientarea height to get the image size
+			 */
+
+			state.put(STATE_THUMB_IMAGE_SIZE, _photoImageSize);
+		}
 
 		state.put(STATE_IMAGE_SORTING, _currentSorting.name());
 

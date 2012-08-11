@@ -1090,6 +1090,10 @@ public abstract class GalleryMT20 extends Canvas {
 		return false;
 	}
 
+	public boolean isVertical() {
+		return _isVertical;
+	}
+
 	/**
 	 * Navigate items for the full size viewer.
 	 * 
@@ -2411,6 +2415,8 @@ public abstract class GalleryMT20 extends Canvas {
 
 		int numberOfVirtualItems;
 		if (_virtualGalleryItems == null || _virtualGalleryItems.length == 0) {
+
+			// virtual items are not yet set, get number of images in 1 row
 
 			final int oneRowItems = visibleSize / itemSize;
 

@@ -104,8 +104,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		@Override
 		public void run() {
 
-			if (_isVerticalGallery) {}
-		final xxx	_imageGallery.saveState(_state);
+			_imageGallery.saveState(_state);
 
 			// toggle gallery
 			_isVerticalGallery = !_isVerticalGallery;
@@ -254,8 +253,6 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		// hide and recreate tooltip
 
 		hide();
-
-//		show(new Point(0, 0));
 
 		showPhotoToolTip(_devPositionHoveredValue);
 	}

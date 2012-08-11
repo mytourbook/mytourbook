@@ -42,6 +42,16 @@ import org.eclipse.swt.widgets.Shell;
  */
 public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 
+	/**
+	 * how long each tick is when fading in (in ms)
+	 */
+	private static final int		FADE_TIMER							= 50;
+
+	/**
+	 * how many tick steps we use when fading out
+	 */
+	private static final int		FADE_OUT_STEP						= 8;
+
 	private static final int		RESIZE_BOX_SIZE						= 10;
 
 	private static final String		STATE_PHOTO_HORIZ_TOOL_TIP_WIDTH	= "STATE_PHOTO_HORIZ_TOOL_TIP_WIDTH";	//$NON-NLS-1$
@@ -174,6 +184,47 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 	 */
 	protected abstract Composite createToolTipContentArea(Event event, Composite shell);
 
+	/**
+	 * The original code has been found here:
+	 * http://hexapixel.com/2009/06/30/creating-a-notification-popup-widget
+	 * 
+	 * @param shell
+	 */
+	private void fadeOut(final Shell shell) {
+
+		final Runnable run = new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					if (shell == null || shell.isDisposed()) {
+						return;
+					}
+
+					int cur = shell.getAlpha();
+					cur -= FADE_OUT_STEP;
+
+					if (cur <= 0) {
+
+						shell.setAlpha(0);
+						shell.dispose();
+
+						return;
+					}
+
+					shell.setAlpha(cur);
+
+					Display.getDefault().timerExec(FADE_TIMER, this);
+
+				} catch (final Exception err) {
+					err.printStackTrace();
+				}
+			}
+		};
+
+		Display.getDefault().timerExec(FADE_TIMER, run);
+	}
+
 	private Point fixupDisplayBounds(final Point tipSize, final Point location) {
 
 		final Rectangle displayBounds = getDisplayBounds(location);
@@ -264,7 +315,7 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 	 * Hide the currently active tool tip
 	 */
 	public void hide() {
-		toolTipHide(_ttShell, null);
+		toolTipHide(null);
 	}
 
 	private void initUI(final Control ownerControl) {
@@ -427,7 +478,7 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 		switch (event.type) {
 		case SWT.Dispose:
 
-			toolTipHide(_ttShell, event);
+			toolTipHide(event);
 
 			ownerControlsRemoveListener();
 
@@ -455,7 +506,7 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 					// hide tooltip when another shell is activated
 
 					if (_display.getActiveShell() != _ttShell) {
-						toolTipHide(_ttShell, event);
+						toolTipHide(event);
 					}
 				}
 			});
@@ -564,7 +615,7 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 			}
 
 			if (isHide) {
-				toolTipHide(_ttShell, event);
+				toolTipHide(event);
 			}
 
 			break;
@@ -598,7 +649,7 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 							return;
 						}
 
-						toolTipHide(_ttShell, null);
+						toolTipHide(event);
 					}
 				});
 			}
@@ -655,11 +706,13 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 	}
 
 	private void passOnEvent(final Shell tip, final Event event) {
+
 		if (_ownerControl != null
 				&& !_ownerControl.isDisposed()
 				&& event != null
 				&& event.widget != _ownerControl
 				&& event.type == SWT.MouseDown) {
+
 			// the following was left in order to fix bug 298770 with minimal change. In 3.7, the complete method should be removed.
 			tip.close();
 		}
@@ -762,6 +815,9 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 	 */
 	private boolean shouldHideToolTip(final Event event) {
 
+		System.out.println("shouldHideToolTip\t");
+		// TODO remove SYSTEM.OUT.PRINTLN
+
 		if (event != null && event.type == SWT.MouseMove) {
 
 			final Object ttArea = getToolTipArea(event);
@@ -825,9 +881,9 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 		}
 	}
 
-	private void toolTipHide(final Shell ttShell, final Event event) {
+	private void toolTipHide(final Event event) {
 
-		if (ttShell == null || ttShell.isDisposed()) {
+		if (_ttShell == null || _ttShell.isDisposed()) {
 			return;
 		}
 
@@ -839,9 +895,9 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 
 			_currentArea = null;
 
-			passOnEvent(ttShell, event);
+			passOnEvent(_ttShell, event);
 
-			ttShell.dispose();
+			_ttShell.dispose();
 			_ttShell = null;
 
 			_isShellResized = false;
@@ -854,7 +910,7 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 
 		// Ensure that only one Tooltip is shown in time
 		if (_ttShell != null) {
-			toolTipHide(_ttShell, null);
+			toolTipHide(event);
 		}
 
 		_ttShell = shell;
