@@ -179,6 +179,16 @@ public class GalleryActionBar {
 		}
 	}
 
+	public void setThumbnailSizeVisibility(final boolean isVisible) {
+
+		if (_isShowThumbsize) {
+
+			_spinnerThumbSize.setVisible(isVisible);
+
+			_containerActionBar.layout(true, true);
+		}
+	}
+
 	public void updateColors(final Color fgColor, final Color bgColor) {
 
 		if (_containerActionBar == null) {

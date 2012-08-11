@@ -285,7 +285,7 @@ public class TourChart extends Chart {
 				return;
 			}
 
-			_photoTooltip.show(photoLayer, hoveredValueIndex, devHoveredValue, devXMouseMove, devYMouseMove);
+			_photoTooltip.showChartPhotoToolTip(photoLayer, hoveredValueIndex, devHoveredValue, devXMouseMove, devYMouseMove);
 		}
 	}
 

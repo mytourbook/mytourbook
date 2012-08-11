@@ -62,7 +62,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 	private final ArrayList<PhotoWrapper>	_photoWrapperList				= new ArrayList<PhotoWrapper>();
 
-	private ToggleGalleryOrientation		_actionToggleGalleryOrientation;
+	private ActionToggleGalleryOrientation	_actionToggleGalleryOrientation;
 
 	private boolean							_isVerticalGallery;
 	private Point							_devPositionHoveredValue;
@@ -76,6 +76,26 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 	private Composite						_galleryContainer;
 	private ImageGallery					_imageGallery;
 	private ToolBar							_toolbarControl;
+
+	private class ActionToggleGalleryOrientation extends Action {
+
+		public ActionToggleGalleryOrientation() {
+			super(null, Action.AS_PUSH_BUTTON);
+		}
+
+		@Override
+		public void run() {
+
+			_imageGallery.saveState(_state);
+
+			// toggle gallery
+			_isVerticalGallery = !_isVerticalGallery;
+
+			updateUI_ToogleAction();
+
+			_imageGallery.setVertical(_isVerticalGallery);
+		}
+	}
 
 	private final class PhotoGalleryProvider implements IPhotoGalleryProvider {
 		@Override
@@ -95,26 +115,6 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		public void setSelection(final PhotoSelection photoSelection) {}
 	}
 
-	private class ToggleGalleryOrientation extends Action {
-
-		public ToggleGalleryOrientation() {
-			super(null, Action.AS_PUSH_BUTTON);
-		}
-
-		@Override
-		public void run() {
-
-			_imageGallery.saveState(_state);
-
-			// toggle gallery
-			_isVerticalGallery = !_isVerticalGallery;
-
-			updateUI_ToogleAction();
-
-			reopenTooltip();
-		}
-	}
-
 	public PhotoToolTipUI(final Control ownerControl) {
 
 		super(ownerControl);
@@ -126,7 +126,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 	private void createActions() {
 
-		_actionToggleGalleryOrientation = new ToggleGalleryOrientation();
+		_actionToggleGalleryOrientation = new ActionToggleGalleryOrientation();
 	}
 
 	@Override
@@ -183,16 +183,16 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 			_imageGallery.setShowActionBar();
 
-			if (_isVerticalGallery) {
-				_imageGallery.setShowThumbnailSize();
-			}
+//			if (_isVerticalGallery) {
+//			}
+			_imageGallery.setShowThumbnailSize();
 
 			final int galleryStyle = _isVerticalGallery ? //
 					SWT.V_SCROLL // | SWT.MULTI
 					: SWT.H_SCROLL // | SWT.MULTI
 			;
 
-			_imageGallery.createImageGallery(_galleryContainer, galleryStyle, new PhotoGalleryProvider());
+			_imageGallery.createImageGallery(_galleryContainer, galleryStyle, new PhotoGalleryProvider(), true);
 
 			_imageGallery.showInfo(false, null, true, true);
 
@@ -224,19 +224,19 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		tbm.update(true);
 	}
 
-	public abstract int getHideCounter();
+//	public abstract int getHideCounter();
 
 	public abstract ArrayList<ChartPhoto> getHoveredPhotos();
 
-	@Override
-	protected Object getToolTipArea(final Event event) {
+//	@Override
+//	protected Object getToolTipArea(final Event event) {
+//
+//		final int hideCounter = getHideCounter();
+//
+//		return hideCounter;
+//	}
 
-		final int hideCounter = getHideCounter();
-
-		return hideCounter;
-	}
-
-	public abstract void incrementHideCounter();
+//	public abstract void incrementHideCounter();
 
 	private void initUI(final Control control) {
 
@@ -246,15 +246,6 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 	@Override
 	boolean isVerticalGallery() {
 		return _isVerticalGallery;
-	}
-
-	private void reopenTooltip() {
-
-		// hide and recreate tooltip
-
-		hide();
-
-		showPhotoToolTip(_devPositionHoveredValue);
 	}
 
 	@Override
@@ -282,9 +273,9 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 		_hoveredPhotos = getHoveredPhotos();
 
-		if (super.shouldCreateToolTip(event) == false) {
-			return false;
-		}
+//		if (super.shouldCreateToolTip(event) == false) {
+//			return false;
+//		}
 
 		final boolean isPhotoHovered = _hoveredPhotos != null && _hoveredPhotos.size() > 0;
 
@@ -300,7 +291,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		_hoveredPhotosHash = isPhotoHovered ? _hoveredPhotos.hashCode() : 0;
 
 		/*
-		 * show/locate shell
+		 * show/move shell
 		 */
 		boolean isNewImages;
 		final Shell ttShell = getToolTipShell();
@@ -308,7 +299,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 			// create tooltip shell
 
-			if (show(devPositionHoveredValue) == false) {
+			if (createShell(devPositionHoveredValue) == false) {
 				return;
 			}
 

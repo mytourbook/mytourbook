@@ -1925,9 +1925,9 @@ public abstract class GalleryMT20 extends Canvas {
 		}
 
 //		final float timeDiff = (float) (System.nanoTime() - start) / 1000000;
-//		if (timeDiff > 500) {
-//			System.out.println("onPaint:\t" + timeDiff + " ms\t");
-//		}
+////		if (timeDiff > 500) {
+//		System.out.println("onPaint:\t" + timeDiff + " ms\t");
+////		}
 //		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
@@ -2525,6 +2525,14 @@ public abstract class GalleryMT20 extends Canvas {
 		updateGallery(false, galleryPosition);
 	}
 
+	public void setVertical(final boolean isVerticalGallery) {
+
+		_isVertical = isVerticalGallery;
+		_isHorizontal = !isVerticalGallery;
+
+		updateGallery(true);
+	}
+
 	/**
 	 * Set gallery items, which can be retrieved with {@link #getAllVirtualItems()}. With this
 	 * get/set mechanism, the gallery items can be sorted.
@@ -2634,13 +2642,14 @@ public abstract class GalleryMT20 extends Canvas {
 	/**
 	 * @param isKeepLocation
 	 *            Keeps gallery position when <code>true</code>, otherwise position will be reset.
-	 * @param forcedPositionRatio
+	 * @param forcedGalleryPosition
+	 *            Ratio for the gallery position when not <code>null</code>
 	 */
-	public void updateGallery(final boolean isKeepLocation, final Double forcedPositionRatio) {
+	public void updateGallery(final boolean isKeepLocation, final Double forcedGalleryPosition) {
 
 		// !!! prevent setting it to NULL, especially when the UI is not initialized !!!
-		if (forcedPositionRatio != null) {
-			_forcedGalleryPosition = forcedPositionRatio;
+		if (forcedGalleryPosition != null) {
+			_forcedGalleryPosition = forcedGalleryPosition;
 		}
 
 		if (_clientArea.width == 0 || _clientArea.height == 0) {

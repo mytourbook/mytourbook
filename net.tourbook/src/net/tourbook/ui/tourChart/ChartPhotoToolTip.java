@@ -41,7 +41,7 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 	 * can be displayed. This counter is used to not hide photo tooltip when number of photos
 	 * changes.
 	 */
-	private int						_hideCounter;
+//	private int						_hideCounter;
 
 	/*
 	 * UI controls
@@ -55,10 +55,10 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 		_tourChart = tourChart;
 	}
 
-	@Override
-	public int getHideCounter() {
-		return _hideCounter;
-	}
+//	@Override
+//	public int getHideCounter() {
+//		return _hideCounter;
+//	}
 
 	@Override
 	public ArrayList<ChartPhoto> getHoveredPhotos() {
@@ -98,14 +98,14 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 		return getToolTipShell();
 	}
 
-	@Override
-	public void incrementHideCounter() {
-		_hideCounter++;
-	}
+//	@Override
+//	public void incrementHideCounter() {
+//		_hideCounter++;
+//	}
 
 	private void reset() {
 
-		_hideCounter++;
+//		_hideCounter++;
 
 		hide();
 	}
@@ -120,11 +120,11 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 		super.saveState(state);
 	}
 
-	public void show(	final ChartLayerPhoto photoLayer,
-						final int hoveredValueIndex,
-						final Point devPositionHoveredValue,
-						final int devXMouseMove,
-						final int devYMouseMove) {
+	public void showChartPhotoToolTip(	final ChartLayerPhoto photoLayer,
+										final int hoveredValueIndex,
+										final Point devPositionHoveredValue,
+										final int devXMouseMove,
+										final int devYMouseMove) {
 
 		final Point[] photoPositions = photoLayer.getPhotoPositions();
 
@@ -176,7 +176,7 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 
 		if (_hoveredPhotos.size() == 0) {
 
-			_hideCounter++;
+//			_hideCounter++;
 
 			reset();
 

@@ -445,14 +445,24 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		}
 	}
 
+	/**
+	 * @param parent
+	 * @param style
+	 * @param photoGalleryProvider
+	 * @param isMultiOrientation
+	 *            When <code>true</code>, orientation can be changed with
+	 *            {@link #setVertical(boolean)}.
+	 */
 	public void createImageGallery(	final Composite parent,
 									final int style,
-									final IPhotoGalleryProvider photoGalleryProvider) {
+									final IPhotoGalleryProvider photoGalleryProvider,
+									final boolean isMultiOrientation) {
 
 		PhotoUI.init();
 
 		_galleryStyle = style;
 		_photoGalleryProvider = photoGalleryProvider;
+		_isMultiOrientation = isMultiOrientation;
 
 		jobFilter_10_Create();
 		jobUIFilter_10_Create();
@@ -1839,6 +1849,13 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		}
 
 		updateUI_AfterZoomInOut(requestedItemSize);
+	}
+
+	public void setVertical(final boolean isVerticalGallery) {
+
+		_galleryActionBar.setThumbnailSizeVisibility(isVerticalGallery);
+
+		_galleryMT20.setVertical(isVerticalGallery);
 	}
 
 	public void showImages(final ArrayList<PhotoWrapper> photoWrapperList, final String galleryPositionKey) {
