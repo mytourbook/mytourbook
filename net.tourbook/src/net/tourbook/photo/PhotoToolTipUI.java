@@ -37,6 +37,7 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -65,7 +66,6 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 	private ActionToggleGalleryOrientation	_actionToggleGalleryOrientation;
 
 	private boolean							_isVerticalGallery;
-	private Point							_devPositionHoveredValue;
 
 	private Color							_fgColor;
 	private Color							_bgColor;
@@ -85,15 +85,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 		@Override
 		public void run() {
-
-			_imageGallery.saveState(_state);
-
-			// toggle gallery
-			_isVerticalGallery = !_isVerticalGallery;
-
-			updateUI_ToogleAction();
-
-			_imageGallery.setVertical(_isVerticalGallery);
+			onToggleVH();
 		}
 	}
 
@@ -174,27 +166,24 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 				.applyTo(_galleryContainer);
 		GridLayoutFactory.fillDefaults()//
 				.numColumns(1)
-//				.margins(10, 10)
 				.extendedMargins(0, 0, 0, 20)
 				.applyTo(_galleryContainer);
-		_galleryContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+//		_galleryContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
 			_imageGallery = new ImageGallery();
 
 			_imageGallery.setShowActionBar();
 
-//			if (_isVerticalGallery) {
-//			}
 			_imageGallery.setShowThumbnailSize();
 
-			final int galleryStyle = _isVerticalGallery ? //
-					SWT.V_SCROLL // | SWT.MULTI
-					: SWT.H_SCROLL // | SWT.MULTI
-			;
+//			final int galleryStyle = _isVerticalGallery ? //
+//					SWT.V_SCROLL // | SWT.MULTI
+//					: SWT.H_SCROLL // | SWT.MULTI
+//					;
 
-			_imageGallery.createImageGallery(_galleryContainer, galleryStyle, new PhotoGalleryProvider(), true);
+			final int galleryStyle = SWT.V_SCROLL | SWT.H_SCROLL;
 
-			_imageGallery.showInfo(false, null, true, true);
+			_imageGallery.createImageGallery(_galleryContainer, galleryStyle, new PhotoGalleryProvider());
 
 			createUI_20_ActionBar(_imageGallery.getCustomActionBarContainer());
 		}
@@ -248,6 +237,37 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		return _isVerticalGallery;
 	}
 
+	private void onToggleVH() {
+
+		// keep state for current orientation
+		_imageGallery.saveState(_state);
+
+		// toggle gallery
+		_isVerticalGallery = !_isVerticalGallery;
+
+		updateUI_ToogleAction();
+
+		/*
+		 * set tooltip shell to the correct size, each orientation has it's own size
+		 */
+		final Point shellSize = getShellSize();
+
+		// set size in layout data
+		final GridData gd = (GridData) _galleryContainer.getLayoutData();
+		gd.widthHint = shellSize.x;
+		gd.heightHint = shellSize.y;
+
+		// relayout shell
+		getToolTipShell().pack(true);
+
+		// show shell at default location
+		showAtDefaultLocation();
+
+		setIsShellToggle();
+
+		_imageGallery.setVertical(_isVerticalGallery);
+	}
+
 	@Override
 	protected void restoreState(final IDialogSettings state) {
 
@@ -284,10 +304,8 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 	protected void showPhotoToolTip(final Point devPositionHoveredValue) {
 
-		// keep position for reopening the tooltip
-		_devPositionHoveredValue = devPositionHoveredValue;
-
 		final boolean isPhotoHovered = _hoveredPhotos != null && _hoveredPhotos.size() > 0;
+
 		_hoveredPhotosHash = isPhotoHovered ? _hoveredPhotos.hashCode() : 0;
 
 		/*
@@ -308,6 +326,8 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 			 * values
 			 */
 			_imageGallery.restoreState(_state);
+
+			_imageGallery.setVertical(_isVerticalGallery);
 
 			_imageGallery.showInfo(false, null, true, true);
 
@@ -376,28 +396,28 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 //		updateUI_Colors_ChildColors(parent);
 	}
 
-	/**
-	 * !!! This is recursive !!!
-	 * 
-	 * @param child
-	 */
-	private void updateUI_Colors_ChildColors(final Control child) {
-
-		child.setBackground(_bgColor);
-		child.setForeground(_fgColor);
-
-		if (child instanceof Composite) {
-
-			final Control[] children = ((Composite) child).getChildren();
-
-			for (final Control element : children) {
-
-				if (element != null && element.isDisposed() == false) {
-					updateUI_Colors_ChildColors(element);
-				}
-			}
-		}
-	}
+//	/**
+//	 * !!! This is recursive !!!
+//	 *
+//	 * @param child
+//	 */
+//	private void updateUI_Colors_ChildColors(final Control child) {
+//
+//		child.setBackground(_bgColor);
+//		child.setForeground(_fgColor);
+//
+//		if (child instanceof Composite) {
+//
+//			final Control[] children = ((Composite) child).getChildren();
+//
+//			for (final Control element : children) {
+//
+//				if (element != null && element.isDisposed() == false) {
+//					updateUI_Colors_ChildColors(element);
+//				}
+//			}
+//		}
+//	}
 
 	private void updateUI_ToogleAction() {
 

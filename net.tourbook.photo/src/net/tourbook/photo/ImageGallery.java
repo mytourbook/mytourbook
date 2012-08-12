@@ -95,6 +95,9 @@ import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
  * org.apache.commons.sanselan
  * </pre>
  */
+/**
+ * @author 081647
+ */
 public class ImageGallery implements IItemHovereredListener, IGalleryContextMenuProvider {
 
 	/**
@@ -239,10 +242,17 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 	FileFilter													_fileFilter;
 
-	private int													_prevGalleryItemSize			= -1;
-
+	/**
+	 * Photo image size without border
+	 */
 	private int													_photoImageSize;
 	private int													_photoBorderSize;
+
+	/**
+	 * When not <code>-1</code>, the vertical gallery is not yet fully restored.
+	 */
+//	private int													_verticalRestoreThumbSize		= -1;
+
 	private boolean												_isShowTooltip;
 
 	/**
@@ -455,14 +465,13 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	 */
 	public void createImageGallery(	final Composite parent,
 									final int style,
-									final IPhotoGalleryProvider photoGalleryProvider,
-									final boolean isMultiOrientation) {
+									final IPhotoGalleryProvider photoGalleryProvider) {
 
 		PhotoUI.init();
 
 		_galleryStyle = style;
 		_photoGalleryProvider = photoGalleryProvider;
-		_isMultiOrientation = isMultiOrientation;
+//		_isMultiOrientation = isMultiOrientation;
 
 		jobFilter_10_Create();
 		jobUIFilter_10_Create();
@@ -892,7 +901,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 			updateUI_FromPrefStore(true);
 
-			updateUI_AfterZoomInOut(_prevGalleryItemSize);
+			updateUI_AfterZoomInOut(_galleryMT20.getItemWidth());
 
 		} else if (property.equals(IPhotoPreferences.PHOTO_VIEWER_FONT)) {
 
@@ -1640,7 +1649,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		_lblDefaultPage.setText(_defaultStatusMessage);
 		showPageBookPage(_pageDefault);
 
-		/**
+		/*
 		 * set thumbnail size after gallery client area is set
 		 */
 		final int stateThumbSize = Util.getStateInt(
@@ -1648,8 +1657,10 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 				STATE_THUMB_IMAGE_SIZE,
 				PhotoLoadManager.IMAGE_SIZE_THUMBNAIL);
 
+		// restore gallery action bar
 		if (_galleryActionBar != null) {
 			_galleryActionBar.restoreState(state, stateThumbSize);
+			_galleryActionBar.setThumbnailSizeVisibility(_galleryMT20.isVertical());
 		}
 
 		// restore thumbnail image size
@@ -1792,11 +1803,17 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		}
 	}
 
+	/**
+	 * Setting thumbnail size is done in the gallery action bar, this can be done only for a
+	 * vertical gallery.
+	 * 
+	 * @param newImageSize
+	 */
 	public void setThumbnailSize(final int newImageSize) {
 
 		int newGalleryItemSize = newImageSize + _photoBorderSize;
 
-		if (newGalleryItemSize == _prevGalleryItemSize) {
+		if (newGalleryItemSize == _galleryMT20.getItemWidth()) {
 			// nothing has changed
 			return;
 		}
@@ -1830,8 +1847,6 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 		PhotoLoadManager.stopImageLoading(false);
 
-		_prevGalleryItemSize = -1;
-
 		int requestedItemSize = thumbSize + _photoBorderSize;
 
 		// update gallery
@@ -1852,6 +1867,13 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	}
 
 	public void setVertical(final boolean isVerticalGallery) {
+
+		if (isVerticalGallery) {
+
+			final int verticalWidth = _galleryMT20.getVerticalItemWidth();
+
+			updateUI_AfterZoomInOut(verticalWidth);
+		}
 
 		_galleryActionBar.setThumbnailSizeVisibility(isVerticalGallery);
 
@@ -2109,20 +2131,22 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		_lblGalleryInfo.setBackground(bgColor);
 	}
 
-	private void updateUI_AfterZoomInOut(final int galleryItemSize) {
+	/**
+	 * @param galleryItemSizeWithBorder
+	 *            Image size with border
+	 */
+	private void updateUI_AfterZoomInOut(final int galleryItemSizeWithBorder) {
 
-		final int imageSize = galleryItemSize - _photoBorderSize;
+		final int imageSizeWithoutBorder = galleryItemSizeWithBorder - _photoBorderSize;
 
-		if (imageSize != _photoImageSize) {
+		if (imageSizeWithoutBorder != _photoImageSize) {
 
 			// image size has changed
 
-			_photoImageSize = imageSize;
-
-			_prevGalleryItemSize = galleryItemSize;
+			_photoImageSize = imageSizeWithoutBorder;
 
 			if (_galleryActionBar != null) {
-				_galleryActionBar.updateUI_AfterZoomInOut(imageSize);
+				_galleryActionBar.updateUI_AfterZoomInOut(imageSizeWithoutBorder);
 			}
 
 			_photoTooltip.setGalleryImageSize(_photoImageSize);

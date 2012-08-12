@@ -184,6 +184,7 @@ public class GalleryActionBar {
 		if (_isShowThumbsize) {
 
 			_spinnerThumbSize.setVisible(isVisible);
+			_canvasImageSizeIndicator.setVisible(isVisible);
 
 			_containerActionBar.layout(true, true);
 		}

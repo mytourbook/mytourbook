@@ -46,17 +46,19 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 	/**
 	 * how long each tick is when fading out (in ms)
 	 */
-	private static final int		FADE_TIME							= 10;
+	private static final int		FADE_TIME_INTERVAL					= 10;
 
 	/**
-	 * how many tick steps we use when fading out
+	 * Number of steps when fading out
 	 */
-	private static final int		FADE_OUT_STEPS						= 0xff / 20;
+	private static final int		FADE_OUT_STEPS						= 30;
 
 	/**
-	 * how many tick steps we use when fading in
+	 * Number of steps when fading in
 	 */
-	private static final int		FADE_IN_STEPS						= 0xff / 10;
+	private static final int		FADE_IN_STEPS						= 20;
+
+	private static final int		MOVE_STEPS							= 20;
 
 	private static final int		RESIZE_BOX_SIZE						= 10;
 
@@ -72,7 +74,6 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 
 	private Shell					_ttShell;
 
-//	private Object					_currentArea;
 	private Control					_ownerControl;
 
 	private OwnerControlListener	_ownerControlListener;
@@ -81,11 +82,15 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 	private TooltipShellListener	_ttShellListener;
 	private ToolTipControlListener	_ttControlListener;
 
+	private boolean					_isShellToggled;
 	private boolean					_isShellResized;
 	private boolean					_isHitLeftResizeBox;
 	private int						_resizeBoxPixel;
 	private boolean					_isShellFadingOut;
 	private boolean					_isShellFadingIn;
+	private Point					_shellStartLocation;
+	private Point					_shellEndLocation;
+	private int						_animationStepCounter;
 
 	private int						_mouseDownX;
 	private int						_mouseDownY;
@@ -97,7 +102,7 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 
 	private Display					_display;
 
-	private final Runnable			_fadeTimer;
+	private final AnimationTimer	_animationTimer;
 
 	/*
 	 * UI resources
@@ -107,53 +112,10 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 
 	private ImageGallery			_imageGallery;
 
-	private final class FadeTimer implements Runnable {
+	private final class AnimationTimer implements Runnable {
 		@Override
 		public void run() {
-			try {
-
-				if (_ttShell == null || _ttShell.isDisposed() || _ttShell.isVisible() == false) {
-					return;
-				}
-
-				final int currentAlpha = _ttShell.getAlpha();
-				int newAlpha = 0xff;
-
-				if (_isShellFadingIn) {
-
-					newAlpha = currentAlpha + FADE_IN_STEPS;
-
-					if (newAlpha >= 0xff) {
-
-						_ttShell.setAlpha(0xff);
-
-						_isShellFadingIn = false;
-
-						return;
-					}
-
-				} else if (_isShellFadingOut) {
-
-					newAlpha = currentAlpha - FADE_OUT_STEPS;
-
-					if (newAlpha <= 0) {
-
-						_ttShell.setAlpha(0);
-						_ttShell.setVisible(false);
-
-						_isShellFadingOut = false;
-
-						return;
-					}
-				}
-
-				_ttShell.setAlpha(newAlpha);
-
-				_display.timerExec(FADE_TIME, this);
-
-			} catch (final Exception err) {
-				StatusUtil.log(err);
-			}
+			animation20_Runnable();
 		}
 	}
 
@@ -203,7 +165,7 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 		_ownerControlListener = new OwnerControlListener();
 		_ownerShellListener = new OwnerShellListener();
 
-		_fadeTimer = new FadeTimer();
+		_animationTimer = new AnimationTimer();
 
 		ownerControlAddListener();
 
@@ -232,6 +194,131 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 			for (final Control child : children) {
 				addToolTipControlListener(child);
 			}
+		}
+	}
+
+	private void animation10_Start() {
+
+		// fading out has no movement
+
+		if (_isShellFadingIn) {
+
+			// set fading in location
+
+			final Point size = _ttShell.getSize();
+
+			_shellEndLocation = fixupDisplayBounds(size, getLocation(size));
+
+			if (_ttShell.isVisible()) {
+
+				// shell is already visible, move from the current position to the target position
+
+				_shellStartLocation = _ttShell.getLocation();
+
+			} else {
+
+				// shell is not visible, set position directly without moving animation, do only fading animation
+
+				_shellStartLocation = _shellEndLocation;
+
+				_ttShell.setLocation(_shellStartLocation);
+
+				_ttShell.setVisible(true);
+			}
+
+			_animationStepCounter = 0;
+		}
+
+		_display.timerExec(FADE_TIME_INTERVAL, _animationTimer);
+	}
+
+	private void animation20_Runnable() {
+
+		try {
+
+			if (_ttShell == null || _ttShell.isDisposed() || _ttShell.isVisible() == false) {
+				return;
+			}
+
+			final int currentAlpha = _ttShell.getAlpha();
+			int newAlpha = 0xff;
+
+			if (_isShellFadingIn) {
+
+				final int shellStartX = _shellStartLocation.x;
+				final int shellStartY = _shellStartLocation.y;
+				final int shellEndX = _shellEndLocation.x;
+				final int shellEndY = _shellEndLocation.y;
+
+				final Point shellCurrentLocation = _ttShell.getLocation();
+
+				final boolean isInTarget = shellCurrentLocation.x == shellEndX && shellCurrentLocation.y == shellEndY;
+
+				final int diffAlpha = 0xff / FADE_IN_STEPS;
+
+				newAlpha = currentAlpha + diffAlpha;
+				if (newAlpha > 0xff) {
+					newAlpha = 0xff;
+				}
+
+				if (isInTarget && newAlpha == 0xff) {
+
+					// target is reached and fully visible, stop animation
+
+					_ttShell.setAlpha(0xff);
+
+					_isShellFadingIn = false;
+
+					return;
+
+				} else {
+
+					// move to target
+
+					_animationStepCounter++;
+
+					final int diffX = shellStartX - shellEndX;
+					final int diffY = shellStartY - shellEndY;
+
+					final double moveX = (double) diffX / MOVE_STEPS * _animationStepCounter;
+					final double moveY = (double) diffY / MOVE_STEPS * _animationStepCounter;
+
+					final int shellCurrentX = (int) (shellStartX - moveX);
+					final int shellCurrentY = (int) (shellStartY - moveY);
+
+//					System.out.println(("startX " + shellStartX)
+//							+ ("  endX " + shellEndX)
+//							+ ("  currX " + shellCurrentX)
+//							+ ("  counter " + _animationStepCounter)
+//							+ ("  moveX " + moveX));
+//					// TODO remove SYSTEM.OUT.PRINTLN
+
+					_ttShell.setLocation(new Point(shellCurrentX, shellCurrentY));
+				}
+
+			} else if (_isShellFadingOut) {
+
+				final int alphaDiff = 0xff / FADE_OUT_STEPS;
+
+				newAlpha = currentAlpha - alphaDiff;
+
+				if (newAlpha <= 0) {
+
+					_ttShell.setAlpha(0);
+					_ttShell.setVisible(false);
+
+					_isShellFadingOut = false;
+
+					return;
+				}
+			}
+
+			_ttShell.setAlpha(newAlpha);
+
+			_display.timerExec(FADE_TIME_INTERVAL, _animationTimer);
+
+		} catch (final Exception err) {
+			StatusUtil.log(err);
 		}
 	}
 
@@ -287,8 +374,6 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 
 		// initialize resize behaviour
 		_isShellResized = false;
-
-//		_currentArea = getToolTipArea(event);
 
 		createToolTipContentArea(event, _ttShell);
 
@@ -611,6 +696,7 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 	public void onPaintAfter(final GC gc, final Rectangle clippingArea, final Rectangle clientArea) {
 
 		if (_isShellResized == false) {
+			// shell is not resized, do normal behaviour
 			return;
 		}
 
@@ -629,8 +715,8 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 			gc.fillRectangle(clientArea.width - _resizeBoxPixel, 0, _resizeBoxPixel, _resizeBoxPixel);
 		}
 
-		System.out.println("gc " + gc.getClipping() + "\tclip " + clippingArea + "\tclient " + clientArea);
-		// TODO remove SYSTEM.OUT.PRINTLN
+//		System.out.println("gc " + gc.getClipping() + "\tclip " + clippingArea + "\tclient " + clientArea);
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 	}
 
@@ -653,6 +739,15 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 			if (_isShellResized) {
 
 				// shell is currently being resized, continue resizing until resizing is finished
+
+				return;
+			}
+
+			if (_isShellToggled) {
+
+				// do this only once
+
+				_isShellToggled = false;
 
 				return;
 			}
@@ -858,6 +953,10 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 		_imageGallery = imageGallery;
 	}
 
+	protected void setIsShellToggle() {
+		_isShellToggled = true;
+	}
+
 	protected void setTTShellLocation() {
 
 		if (_ttShell == null || _ttShell.isDisposed()) {
@@ -868,6 +967,14 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 	}
 
 	protected abstract boolean shouldCreateToolTip(Event event);
+
+	protected void showAtDefaultLocation() {
+
+		final Point size = _ttShell.getSize();
+		final Point fixedLocation = fixupDisplayBounds(size, getLocation(size));
+
+		_ttShell.setLocation(fixedLocation);
+	}
 
 	private void ttDispose(final Event event) {
 
@@ -898,51 +1005,29 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 			return;
 		}
 
-		if (_isShellFadingIn) {
-
-			// stop shell fading
-
-			_display.timerExec(-1, _fadeTimer);
-
-			_isShellFadingIn = false;
-		}
-
-//		passOnEvent(_ttShell, event);
-
 		// shell is not yet fading out
 
+		_isShellFadingIn = false;
 		_isShellFadingOut = true;
 
-		_display.timerExec(FADE_TIME, _fadeTimer);
+		animation10_Start();
 	}
 
 	private void ttShow() {
-
-		if (_isShellFadingOut) {
-
-			// stop shell fading
-
-			_display.timerExec(-1, _fadeTimer);
-
-			_isShellFadingOut = false;
-		}
-
-		final Point size = _ttShell.getSize();
-		final Point fixedLocation = fixupDisplayBounds(size, getLocation(size));
-
-		_ttShell.setLocation(fixedLocation);
 
 		if (_isShellFadingIn) {
 			// shell is already fading in, nothing more to do
 			return;
 		}
 
+//		System.out.println("ttShow\t");
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
 		// shell is not yet fading in
 
 		_isShellFadingIn = true;
+		_isShellFadingOut = false;
 
-		_ttShell.setVisible(true);
-
-		_display.timerExec(FADE_TIME, _fadeTimer);
+		animation10_Start();
 	}
 }

@@ -181,6 +181,12 @@ public abstract class GalleryMT20 extends Canvas {
 	private int									_itemWidth				= 80;
 
 	private int									_itemHeight				= (int) (_itemWidth / _itemRatio);
+
+	/**
+	 * Item width when gallery orientation is vertical
+	 */
+	private int									_verticalItemWidth;
+
 	/**
 	 * @return Contains minimum gallery item width or <code>-1</code> when value is not set.
 	 */
@@ -896,6 +902,9 @@ public abstract class GalleryMT20 extends Canvas {
 		return _itemRatio;
 	}
 
+	/**
+	 * @return Returns width for one gallery item, height is computed with the {@link #_itemRatio}.
+	 */
 	public int getItemWidth() {
 		return _itemWidth;
 	}
@@ -955,6 +964,10 @@ public abstract class GalleryMT20 extends Canvas {
 		}
 
 		return selectedIndex;
+	}
+
+	public int getVerticalItemWidth() {
+		return _verticalItemWidth;
 	}
 
 	/**
@@ -2530,7 +2543,32 @@ public abstract class GalleryMT20 extends Canvas {
 		_isVertical = isVerticalGallery;
 		_isHorizontal = !isVerticalGallery;
 
-		updateGallery(true);
+		if (isVerticalGallery) {
+
+			// gallery is vertical
+
+			final ScrollBar hBar = getHorizontalBar();
+			if (hBar != null) {
+				hBar.setVisible(false);
+			}
+
+			// reset to the last vertical width
+
+			_itemWidth = _verticalItemWidth;
+			_itemHeight = (int) (_itemWidth / _itemRatio);
+
+		} else {
+
+			// gallery is horizontal
+
+			final ScrollBar vBar = getVerticalBar();
+			if (vBar != null) {
+				vBar.setVisible(false);
+			}
+		}
+
+		// this will also set horizontal image height
+		onResize();
 	}
 
 	/**
@@ -2902,6 +2940,11 @@ public abstract class GalleryMT20 extends Canvas {
 	public int zoomGallery(int newZoomedSize, final boolean isInitializeGallery) {
 
 		if (_isHorizontal) {
+
+			if (isInitializeGallery) {
+				_verticalItemWidth = newZoomedSize;
+			}
+
 			return -1;
 		}
 
@@ -3200,9 +3243,12 @@ public abstract class GalleryMT20 extends Canvas {
 			// is not yet implemented
 		}
 
+		if (_isVertical) {
+			_verticalItemWidth = _itemWidth;
+		}
+
 		updateGallery(true, centerSelectedItem());
 
 		return _itemWidth;
 	}
-
 }
