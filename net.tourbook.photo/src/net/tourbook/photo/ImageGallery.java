@@ -1909,12 +1909,6 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		final double galleryPosition = getCachedGalleryPosition();
 
 		updateUI_GalleryItems(_allPhotoWrapper, galleryPosition);
-
-//		/*
-//		 * start filter always, even when no filter is set because it is loading exif data which is
-//		 * used to sort images correctly by exif date (when available) and not by file date
-//		 */
-//		jobFilter_20_Schedule1st();
 	}
 
 	/**
@@ -1929,7 +1923,6 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 							final boolean isShowDefaultMessage) {
 
 		jobFilter_12_Stop();
-
 		PhotoLoadManager.stopImageLoading(true);
 
 		//////////////////////////////////////////

@@ -20,8 +20,6 @@ import net.tourbook.common.util.Util;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.PixelConverter;
-import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
@@ -51,7 +49,11 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 	/**
 	 * Number of steps when fading out
 	 */
-	private static final int		FADE_OUT_STEPS						= 30;
+	private static final int		FADE_OUT_STEPS						= 40;
+	/**
+	 * Number of steps when fading out
+	 */
+	private static final int		FADE_OUT_DELAY_STEPS				= 30;
 
 	/**
 	 * Number of steps when fading in
@@ -59,6 +61,8 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 	private static final int		FADE_IN_STEPS						= 20;
 
 	private static final int		MOVE_STEPS							= 20;
+
+	private static final int		ALPHA_OPAQUE						= 0xff;
 
 	private static final int		RESIZE_BOX_SIZE						= 10;
 
@@ -79,18 +83,21 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 	private OwnerControlListener	_ownerControlListener;
 	private OwnerShellListener		_ownerShellListener;
 
-	private TooltipShellListener	_ttShellListener;
+	private ToolTipShellListener	_ttShellListener;
 	private ToolTipControlListener	_ttControlListener;
 
 	private boolean					_isShellToggled;
 	private boolean					_isShellResized;
 	private boolean					_isHitLeftResizeBox;
 	private int						_resizeBoxPixel;
+
 	private boolean					_isShellFadingOut;
 	private boolean					_isShellFadingIn;
 	private Point					_shellStartLocation;
 	private Point					_shellEndLocation;
 	private int						_animationStepCounter;
+	private int						_fadeOutDelayCounter;
+	private boolean					_isShellMovingEnabled;
 
 	private int						_mouseDownX;
 	private int						_mouseDownY;
@@ -141,7 +148,7 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 
 	}
 
-	private final class TooltipShellListener implements Listener {
+	private final class ToolTipShellListener implements Listener {
 		public void handleEvent(final Event event) {
 			onTTShellEvent(event);
 		}
@@ -160,7 +167,7 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 		_display = _ownerControl.getDisplay();
 
 		_ttControlListener = new ToolTipControlListener();
-		_ttShellListener = new TooltipShellListener();
+		_ttShellListener = new ToolTipShellListener();
 
 		_ownerControlListener = new OwnerControlListener();
 		_ownerShellListener = new OwnerShellListener();
@@ -197,6 +204,13 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 		}
 	}
 
+	/**
+	 * This is called after the shell and content area are created.
+	 * 
+	 * @param shell
+	 */
+	protected abstract void afterCreateShell(Shell shell);
+
 	private void animation10_Start() {
 
 		// fading out has no movement
@@ -227,7 +241,14 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 			}
 
 			_animationStepCounter = 0;
+
 		}
+		if (_isShellFadingOut) {
+
+			_fadeOutDelayCounter = 0;
+		}
+
+		_isShellMovingEnabled = true;
 
 		_display.timerExec(FADE_TIME_INTERVAL, _animationTimer);
 	}
@@ -241,7 +262,7 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 			}
 
 			final int currentAlpha = _ttShell.getAlpha();
-			int newAlpha = 0xff;
+			int newAlpha = ALPHA_OPAQUE;
 
 			if (_isShellFadingIn) {
 
@@ -254,18 +275,18 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 
 				final boolean isInTarget = shellCurrentLocation.x == shellEndX && shellCurrentLocation.y == shellEndY;
 
-				final int diffAlpha = 0xff / FADE_IN_STEPS;
+				final int diffAlpha = ALPHA_OPAQUE / FADE_IN_STEPS;
 
 				newAlpha = currentAlpha + diffAlpha;
-				if (newAlpha > 0xff) {
-					newAlpha = 0xff;
+				if (newAlpha > ALPHA_OPAQUE) {
+					newAlpha = ALPHA_OPAQUE;
 				}
 
-				if (isInTarget && newAlpha == 0xff) {
+				if (isInTarget && newAlpha == ALPHA_OPAQUE) {
 
 					// target is reached and fully visible, stop animation
 
-					_ttShell.setAlpha(0xff);
+					_ttShell.setAlpha(ALPHA_OPAQUE);
 
 					_isShellFadingIn = false;
 
@@ -286,23 +307,33 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 					final int shellCurrentX = (int) (shellStartX - moveX);
 					final int shellCurrentY = (int) (shellStartY - moveY);
 
-//					System.out.println(("startX " + shellStartX)
-//							+ ("  endX " + shellEndX)
-//							+ ("  currX " + shellCurrentX)
-//							+ ("  counter " + _animationStepCounter)
-//							+ ("  moveX " + moveX));
-//					// TODO remove SYSTEM.OUT.PRINTLN
+					if (_isShellMovingEnabled) {
 
-					_ttShell.setLocation(new Point(shellCurrentX, shellCurrentY));
+						// when mouse is over this tooltip the shell is not moved
+
+						_ttShell.setLocation(new Point(shellCurrentX, shellCurrentY));
+					}
+
 				}
 
 			} else if (_isShellFadingOut) {
 
-				final int alphaDiff = 0xff / FADE_OUT_STEPS;
+				if (_fadeOutDelayCounter++ < FADE_OUT_DELAY_STEPS) {
+
+					// delay fade out
+
+					_display.timerExec(FADE_TIME_INTERVAL, _animationTimer);
+
+					return;
+				}
+
+				final int alphaDiff = ALPHA_OPAQUE / FADE_OUT_STEPS;
 
 				newAlpha = currentAlpha - alphaDiff;
 
 				if (newAlpha <= 0) {
+
+					// shell is not visible any more, hide it now
 
 					_ttShell.setAlpha(0);
 					_ttShell.setVisible(false);
@@ -323,41 +354,21 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 	}
 
 	/**
-	 * Start up the tooltip programmatically
+	 * Create a shell but do not display it
 	 * 
-	 * @param location
-	 *            the location relative to the control the tooltip is shown
-	 * @return
+	 * @return Returns <code>true</code> when shell is created.
 	 */
-	public boolean createShell(final Point location) {
-
-		/*
-		 * show tooltip only when this is the active shell, this check is necessary that when a tour
-		 * chart is opened in a dialog (e.g. adjust altitude) that a hidden tour chart tooltip in
-		 * the tour chart view is also displayed
-		 */
-		if (_display.getActiveShell() != _ownerControl.getShell() || _ownerControl.isVisible() == false) {
-			return false;
-		}
+	private void createShell() {
 
 		if (_ttShell != null && !_ttShell.isDisposed()) {
-			return true;
-		}
-
-		final Event event = new Event();
-		event.x = location.x;
-		event.y = location.y;
-		event.widget = _ownerControl;
-
-		if (shouldCreateToolTip(event) == false) {
-			return false;
+			return;
 		}
 
 		_ttShell = new Shell(_ownerControl.getShell(), //
 				SWT.ON_TOP //
-//						| SWT.TOOL
+						| SWT.TOOL
 						| SWT.NO_FOCUS
-//							| SWT.NO_TRIM
+//						| SWT.RESIZE
 		//
 		);
 
@@ -375,7 +386,7 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 		// initialize resize behaviour
 		_isShellResized = false;
 
-		createToolTipContentArea(event, _ttShell);
+		createToolTipContentArea(_ttShell);
 
 		addToolTipControlListener(_ttShell);
 
@@ -383,21 +394,17 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 
 		_ttShell.pack();
 
-		ttShow();
-
-		return true;
+		afterCreateShell(_ttShell);
 	}
 
 	/**
 	 * Creates the content area of the the tooltip.
 	 * 
-	 * @param event
-	 *            the event that triggered the activation of the tooltip
 	 * @param shell
 	 *            the parent of the content area
 	 * @return the content area created
 	 */
-	protected abstract Composite createToolTipContentArea(Event event, Composite shell);
+	protected abstract Composite createToolTipContentArea(Composite shell);
 
 	private Point fixupDisplayBounds(final Point tipSize, final Point location) {
 
@@ -462,23 +469,6 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 		} else {
 			return new Point(_shellHorizWidth, _shellHorizHeight);
 		}
-	}
-
-	/**
-	 * This method is called to check for which area the tooltip is created/hidden for. In case of
-	 * {@link #NO_RECREATE} this is used to decide if the tooltip is hidden recreated.
-	 * <code>By the default it is the widget the tooltip is created for but could be any object. To decide if
-	 * the area changed the {@link Object#equals(Object)} method is used.</code>
-	 * 
-	 * @param event
-	 *            the event
-	 * @return the area responsible for the tooltip creation or <code>null</code> this could be any
-	 *         object describing the area (e.g. the {@link Control} onto which the tooltip is bound
-	 *         to, a part of this area e.g. for {@link ColumnViewer} this could be a
-	 *         {@link ViewerCell})
-	 */
-	protected Object getToolTipArea(final Event event) {
-		return _ownerControl;
 	}
 
 	protected Shell getToolTipShell() {
@@ -659,7 +649,8 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 			break;
 
 		case SWT.Resize:
-			setTTShellLocation();
+
+			showShellWhenVisible();
 			break;
 		}
 	}
@@ -687,7 +678,8 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 			break;
 
 		case SWT.Move:
-			setTTShellLocation();
+
+			showShellWhenVisible();
 			break;
 		}
 	}
@@ -720,6 +712,8 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 
 	}
 
+	protected abstract void onStartHide();
+
 	private void onTTControlEvent(final Event event) {
 
 		if (_ttShell == null || _ttShell.isDisposed()) {
@@ -729,8 +723,10 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 		switch (event.type) {
 		case SWT.MouseEnter:
 
-//			System.out.println(UI.timeStamp() + " Photo TT\tEnter\t" + event.widget);
-//			// TODO remove SYSTEM.OUT.PRINTLN
+			// stop animation
+			if (_isShellFadingIn || _isShellFadingOut) {
+				_isShellMovingEnabled = false;
+			}
 
 			break;
 
@@ -755,9 +751,9 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 			boolean isHide = false;
 
 			// get control which is hovered with the mouse after the exit, can be null
-			final Control hoveredExitControl = _display.getCursorControl();
+			final Control hoveredControl = _display.getCursorControl();
 
-			if (hoveredExitControl == null) {
+			if (hoveredControl == null) {
 
 				isHide = true;
 
@@ -766,36 +762,78 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 				/*
 				 * check if the hovered control is the owner control, if not, hide the tooltip
 				 */
-				Control hoveredExitParent = hoveredExitControl;
-				final Control hoveredToolTip = _imageGallery.getGalleryToolTipShell();
+				Control hoveredParent = hoveredControl;
+//				final Control hoveredToolTip = _imageGallery.getGalleryToolTipShell();
 
 				// move up child-parent hierarchy until shell is reached
 				while (true) {
 
-					if (hoveredExitParent == _ttShell) {
+					if (hoveredParent == _ttShell) {
 						// mouse is hovering in this tooltip
 						break;
 					}
 
-					if (hoveredExitParent == _ownerControl) {
+					if (hoveredParent == _ownerControl) {
+
 						// mouse is over the owner control
+
 						break;
 					}
 
-					if (hoveredToolTip != null && hoveredExitParent == hoveredToolTip) {
-						// mouse is over the owner tooltip control
-						break;
-					}
+//					if (hoveredToolTip != null && hoveredParent == hoveredToolTip) {
+//
+//						// mouse is over the owner tooltip control
+//
+//						System.out.println(System.nanoTime() + " exit 2 " + hoveredParent);
+//						// TODO remove SYSTEM.OUT.PRINTLN
+//
+//						break;
+//					}
 
-					hoveredExitParent = hoveredExitParent.getParent();
+					hoveredParent = hoveredParent.getParent();
 
-					if (hoveredExitParent == null) {
+					if (hoveredParent == null) {
+
 						// mouse has left the tooltip and the owner control
+
 						isHide = true;
 						break;
 					}
 				}
 
+				if (isHide == false) {
+
+					/*
+					 * check tooltip area as it is done in the original code because the current
+					 * tooltip shell check is not working always (often but sometimes) correctly
+					 */
+
+					/**
+					 * !!! this adjustment do not work on Linux because the tooltip gets hidden when
+					 * the mouse tries to mover over the tooltip <br>
+					 * <br>
+					 * it seems to work on windows and linux with margin 1, when set to 0 the
+					 * tooltip do sometime not be poped up again and the i-icons is not deaktivated<br>
+					 * wolfgang 2010-07-23
+					 */
+
+					final Rectangle ttShellRect = _ttShell.getBounds();
+					final int margin = 1;
+
+					ttShellRect.x += margin;
+					ttShellRect.y += margin;
+					ttShellRect.width -= 2 * margin;
+					ttShellRect.height -= 2 * margin;
+
+					final Point cursorLocation = _display.getCursorLocation();
+
+					if (!ttShellRect.contains(cursorLocation)) {
+
+						// mouse is not within the tooltip shell rectangle
+
+						isHide = true;
+					}
+				}
 			}
 
 			if (isHide) {
@@ -859,7 +897,6 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 		ownerControlsRemoveListener();
 
 		_ownerControl.addListener(SWT.Dispose, _ownerControlListener);
-//		_ownerControl.addListener(SWT.MouseEnter, _ownerControlListener);
 		_ownerControl.addListener(SWT.Resize, _ownerControlListener);
 	}
 
@@ -869,7 +906,6 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 	private void ownerControlsRemoveListener() {
 
 		_ownerControl.removeListener(SWT.Dispose, _ownerControlListener);
-//		_ownerControl.removeListener(SWT.MouseEnter, _ownerControlListener);
 		_ownerControl.removeListener(SWT.Resize, _ownerControlListener);
 	}
 
@@ -957,23 +993,43 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 		_isShellToggled = true;
 	}
 
-	protected void setTTShellLocation() {
+	protected void showAtDefaultLocation() {
 
 		if (_ttShell == null || _ttShell.isDisposed()) {
 			return;
 		}
 
-		ttShow();
-	}
-
-	protected abstract boolean shouldCreateToolTip(Event event);
-
-	protected void showAtDefaultLocation() {
-
 		final Point size = _ttShell.getSize();
 		final Point fixedLocation = fixupDisplayBounds(size, getLocation(size));
 
 		_ttShell.setLocation(fixedLocation);
+	}
+
+	protected boolean showShell() {
+
+		/*
+		 * show tooltip only when this is the active shell, this check is necessary that when a tour
+		 * chart is opened in a dialog (e.g. adjust altitude) that a hidden tour chart tooltip in
+		 * the tour chart view is also displayed
+		 */
+//		if (_display.getActiveShell() != _ownerControl.getShell() || _ownerControl.isVisible() == false) {
+//			return false;
+//		}
+
+		createShell();
+
+		ttShow();
+
+		return true;
+	}
+
+	private void showShellWhenVisible() {
+
+		if (_ttShell == null || _ttShell.isDisposed() || _ttShell.isVisible() == false) {
+			return;
+		}
+
+		ttShow();
 	}
 
 	private void ttDispose(final Event event) {
@@ -996,12 +1052,15 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 
 	private void ttHide(final Event event) {
 
+		onStartHide();
+
 		if (_ttShell == null || _ttShell.isDisposed() || _ttShell.isVisible() == false) {
 			return;
 		}
 
 		if (_isShellFadingOut) {
-			// shell fading is currently be active
+
+			// shell is already fading out
 			return;
 		}
 
@@ -1014,14 +1073,6 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 	}
 
 	private void ttShow() {
-
-		if (_isShellFadingIn) {
-			// shell is already fading in, nothing more to do
-			return;
-		}
-
-//		System.out.println("ttShow\t");
-//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		// shell is not yet fading in
 

@@ -35,12 +35,12 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 	private int						_devXHoveredPhoto;
 	private int						_devYHoveredPhoto;
 
-	/**
-	 * This counter is incremented when 0 photos can be displayed with the hovered mouse. Counter is
-	 * not incremented when subsequent different number of photos can be displayed until 0 photos
-	 * can be displayed. This counter is used to not hide photo tooltip when number of photos
-	 * changes.
-	 */
+//	/**
+//	 * This counter is incremented when 0 photos can be displayed with the hovered mouse. Counter is
+//	 * not incremented when subsequent different number of photos can be displayed until 0 photos
+//	 * can be displayed. This counter is used to not hide photo tooltip when number of photos
+//	 * changes.
+//	 */
 //	private int						_hideCounter;
 
 	/*
@@ -53,16 +53,6 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 		super(tourChart);
 
 		_tourChart = tourChart;
-	}
-
-//	@Override
-//	public int getHideCounter() {
-//		return _hideCounter;
-//	}
-
-	@Override
-	public ArrayList<ChartPhoto> getHoveredPhotos() {
-		return _hoveredPhotos;
 	}
 
 	@Override
@@ -96,18 +86,6 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 
 	Shell getShell() {
 		return getToolTipShell();
-	}
-
-//	@Override
-//	public void incrementHideCounter() {
-//		_hideCounter++;
-//	}
-
-	private void reset() {
-
-//		_hideCounter++;
-
-		hide();
 	}
 
 	@Override
@@ -176,13 +154,11 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 
 		if (_hoveredPhotos.size() == 0) {
 
-//			_hideCounter++;
-
-			reset();
+			hide();
 
 		} else {
 
-			showPhotoToolTip(devPositionHoveredValue);
+			showPhotoToolTip(_hoveredPhotos);
 		}
 	}
 

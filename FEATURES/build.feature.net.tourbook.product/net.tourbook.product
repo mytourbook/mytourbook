@@ -31,7 +31,7 @@
       location="net.tourbook"
       startupProgressRect="5,131,390,10"
       startupMessageRect="5,116,390,15"
-      startupForegroundColor="BBCBFF" />
+      startupForegroundColor="FFFFFF" />
    <launcher name="mytourbook">
       <linux icon="/net.tourbook/icons/application/linux/tourbook48-32.xpm"/>
       <macosx icon="/net.tourbook/icons/application/mac/tourbook128.icns"/>

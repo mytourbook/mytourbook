@@ -45,13 +45,13 @@ public class MyTourbookSplashHandler extends BasicSplashHandler {
 
 		String progressRectString = null;
 		String messageRectString = null;
-		String foregroundColorString = null;
+//		String foregroundColorString = null;
 
 		final IProduct product = Platform.getProduct();
 		if (product != null) {
 			progressRectString = product.getProperty(IProductConstants.STARTUP_PROGRESS_RECT);
 			messageRectString = product.getProperty(IProductConstants.STARTUP_MESSAGE_RECT);
-			foregroundColorString = product.getProperty(IProductConstants.STARTUP_FOREGROUND_COLOR);
+//			foregroundColorString = product.getProperty(IProductConstants.STARTUP_FOREGROUND_COLOR);
 		}
 
 		// set progressbar position
@@ -77,7 +77,9 @@ public class MyTourbookSplashHandler extends BasicSplashHandler {
 //			// production color, debug is not using this color
 //			foregroundColorInteger = 0x2d84f6;
 //		}
-		foregroundColorInteger = 0x2a7ce7; //0x2d84f6;
+//		foregroundColorInteger = 0x2d84f6;
+//		foregroundColorInteger = 0x2a7ce7;
+		foregroundColorInteger = 0xffffff;
 
 		setForeground(new RGB(
 				(foregroundColorInteger & 0xFF0000) >> 16,

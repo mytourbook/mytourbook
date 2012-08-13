@@ -41,7 +41,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 
@@ -56,9 +55,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 	private static final String				STATE_PHOTO_GALLERY_IS_VERTICAL	= "STATE_PHOTO_GALLERY_IS_VERTICAL";	//$NON-NLS-1$
 
 	private IDialogSettings					_state;
-	private ArrayList<ChartPhoto>			_hoveredPhotos;
 
-	private int								_hoveredPhotosHash;
 	private int								_displayedPhotosHash;
 
 	private final ArrayList<PhotoWrapper>	_photoWrapperList				= new ArrayList<PhotoWrapper>();
@@ -111,9 +108,30 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 		super(ownerControl);
 
-		initUI(ownerControl);
-
 		createActions();
+	}
+
+	@Override
+	protected void afterCreateShell(final Shell shell) {
+
+		/*
+		 * restore MUST be done after the shell is created, otherwise clientArea() can return 0
+		 * values
+		 */
+		_imageGallery.restoreState(_state);
+
+		// set gallery orientation
+		_imageGallery.setVertical(_isVerticalGallery);
+
+		_imageGallery.showInfo(false, null, true, true);
+
+		shell.addDisposeListener(new DisposeListener() {
+
+			@Override
+			public void widgetDisposed(final DisposeEvent e) {
+				_imageGallery.saveState(_state);
+			}
+		});
 	}
 
 	private void createActions() {
@@ -122,19 +140,19 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 	}
 
 	@Override
-	protected Composite createToolTipContentArea(final Event event, final Composite shell) {
+	protected Composite createToolTipContentArea(final Composite shell) {
 
 		final Composite container = createUI(shell);
 
-		shell.addDisposeListener(new DisposeListener() {
-			@Override
-			public void widgetDisposed(final DisposeEvent e) {
-
-				// keep gallery state, the gallery can be reopened very often
-
-				_imageGallery.saveState(_state);
-			}
-		});
+//		shell.addDisposeListener(new DisposeListener() {
+//			@Override
+//			public void widgetDisposed(final DisposeEvent e) {
+//
+//				// keep gallery state, the gallery can be reopened very often
+//
+//				_imageGallery.saveState(_state);
+//			}
+//		});
 
 		updateUI_Colors(shell);
 
@@ -213,28 +231,17 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		tbm.update(true);
 	}
 
-//	public abstract int getHideCounter();
-
-	public abstract ArrayList<ChartPhoto> getHoveredPhotos();
-
-//	@Override
-//	protected Object getToolTipArea(final Event event) {
-//
-//		final int hideCounter = getHideCounter();
-//
-//		return hideCounter;
-//	}
-
-//	public abstract void incrementHideCounter();
-
-	private void initUI(final Control control) {
-
-//		_pc = new PixelConverter(control);
-	}
-
 	@Override
 	boolean isVerticalGallery() {
 		return _isVerticalGallery;
+	}
+
+	@Override
+	protected void onStartHide() {
+
+		// force to show the same images
+
+		_displayedPhotosHash = Integer.MIN_VALUE;
 	}
 
 	private void onToggleVH() {
@@ -288,93 +295,36 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		super.saveState(state);
 	}
 
-	@Override
-	protected boolean shouldCreateToolTip(final Event event) {
+	protected void showPhotoToolTip(final ArrayList<ChartPhoto> hoveredPhotos) {
 
-		_hoveredPhotos = getHoveredPhotos();
+		final boolean isPhotoHovered = hoveredPhotos != null && hoveredPhotos.size() > 0;
 
-//		if (super.shouldCreateToolTip(event) == false) {
-//			return false;
-//		}
+		final int hoveredPhotosHash = isPhotoHovered ? hoveredPhotos.hashCode() : 0;
 
-		final boolean isPhotoHovered = _hoveredPhotos != null && _hoveredPhotos.size() > 0;
-
-		return isPhotoHovered;
-	}
-
-	protected void showPhotoToolTip(final Point devPositionHoveredValue) {
-
-		final boolean isPhotoHovered = _hoveredPhotos != null && _hoveredPhotos.size() > 0;
-
-		_hoveredPhotosHash = isPhotoHovered ? _hoveredPhotos.hashCode() : 0;
-
-		/*
-		 * show/move shell
-		 */
-		boolean isNewImages;
-		final Shell ttShell = getToolTipShell();
-		if (ttShell == null || ttShell.isDisposed()) {
-
-			// create tooltip shell
-
-			if (createShell(devPositionHoveredValue) == false) {
-				return;
-			}
-
-			/*
-			 * restore MUST be done after the shell is created, otherwise clientArea() can return 0
-			 * values
-			 */
-			_imageGallery.restoreState(_state);
-
-			_imageGallery.setVertical(_isVerticalGallery);
-
-			_imageGallery.showInfo(false, null, true, true);
-
-			isNewImages = true;
-
-		} else {
-
-			isNewImages = false;
-
-			// move tooltip
-			setTTShellLocation();
-
-			// check if new images should be displayed
-			if (_displayedPhotosHash == _hoveredPhotosHash) {
-				return;
-			}
+		// check if new images should be displayed
+		if (_displayedPhotosHash == hoveredPhotosHash) {
+			return;
 		}
 
-		updateUI(isNewImages);
+		_displayedPhotosHash = hoveredPhotosHash;
 
-		_displayedPhotosHash = _hoveredPhotosHash;
-	}
-
-	/**
-	 * update UI
-	 * 
-	 * @param isNewImages
-	 */
-	private void updateUI(final boolean isNewImages) {
+		// display shell
+		if (showShell() == false) {
+			return;
+		}
 
 		/*
 		 * display photo images
 		 */
 		// create list containing all images
 		_photoWrapperList.clear();
-		for (final ChartPhoto chartPhoto : _hoveredPhotos) {
+		for (final ChartPhoto chartPhoto : hoveredPhotos) {
 			_photoWrapperList.add(chartPhoto.photoWrapper);
 		}
 
-		final String galleryPositionKey = _hoveredPhotosHash + "_PhotoToolTipUI";//$NON-NLS-1$
+		final String galleryPositionKey = hoveredPhotosHash + "_PhotoToolTipUI";//$NON-NLS-1$
 
-		if (isNewImages) {
-			_imageGallery.showImages(_photoWrapperList, galleryPositionKey, false);
-		} else {
-			// do not hide already displayed images
-			_imageGallery.showImages(_photoWrapperList, galleryPositionKey);
-		}
+		_imageGallery.showImages(_photoWrapperList, galleryPositionKey);
 	}
 
 	private void updateUI_Colors(final Composite parent) {
