@@ -129,6 +129,11 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 			@Override
 			public void widgetDisposed(final DisposeEvent e) {
+
+				if (_imageGallery.isDisposed()) {
+					// this happens by multiple shells
+					return;
+				}
 				_imageGallery.saveState(_state);
 			}
 		});
