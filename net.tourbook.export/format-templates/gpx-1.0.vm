@@ -11,7 +11,7 @@
 	http://www.garmin.com/xmlschemas/TrackPointExtension/v1 http://www.garmin.com/xmlschemas/TrackPointExtensionv1.xsd"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<metadata>	
-		<time>$dateformatter.format($creation_date)</time>
+		<time>$dateformatter.format($starttime)</time>
 		<bounds minlat="$min_latitude" minlon="$min_longitude" maxlat="$max_latitude" maxlon="$max_longitude"/>
 	</metadata>
 ##
