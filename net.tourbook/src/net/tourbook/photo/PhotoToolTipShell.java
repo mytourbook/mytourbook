@@ -20,15 +20,18 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.graphics.Cursor;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -36,11 +39,12 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.part.PageBook;
 
 /**
  * Part of this tooltip is copied from {@link ToolTip}.
  */
-public abstract class PhotoToolTipShell implements IExternalGalleryListener {
+public abstract class PhotoToolTipShell {
 
 	/**
 	 * how long each tick is when fading out (in ms)
@@ -51,8 +55,9 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 	 * Number of steps when fading out
 	 */
 	private static final int		FADE_OUT_STEPS						= 40;
+
 	/**
-	 * Number of steps when fading out
+	 * Number of steps before fading out
 	 */
 	private static final int		FADE_OUT_DELAY_STEPS				= 30;
 
@@ -64,8 +69,6 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 	private static final int		MOVE_STEPS							= 20;
 
 	private static final int		ALPHA_OPAQUE						= 0xff;
-
-	private static final int		RESIZE_BOX_SIZE						= 10;
 
 	private static final String		STATE_PHOTO_HORIZ_TOOL_TIP_WIDTH	= "STATE_PHOTO_HORIZ_TOOL_TIP_WIDTH";	//$NON-NLS-1$
 	private static final String		STATE_PHOTO_HORIZ_TOOL_TIP_HEIGHT	= "STATE_PHOTO_HORIZ_TOOL_TIP_HEIGHT";	//$NON-NLS-1$
@@ -84,9 +87,6 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 	private ToolTipControlListener	_ttControlListener;
 
 	private boolean					_isShellToggled;
-	private boolean					_isShellResized;
-	private boolean					_isHitLeftResizeBox;
-	private int						_resizeBoxPixel;
 
 	private boolean					_isShellFadingOut;
 	private boolean					_isShellFadingIn;
@@ -96,13 +96,12 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 	private int						_fadeOutDelayCounter;
 	private boolean					_isShellMovingEnabled;
 
-	private int						_mouseDownX;
-	private int						_mouseDownY;
-
 	private int						_shellHorizWidth					= MIN_SHELL_HORIZ_WIDTH;
 	private int						_shellHorizHeight					= MIN_SHELL_HORIZ_HEIGHT;
 	private int						_shellVertWidth						= MIN_SHELL_VERT_WIDTH;
 	private int						_shellVertHeight					= MIN_SHELL_VERT_HEIGHT;
+	private int						_shellTrimWidth;
+	private int						_shellTrimHeight;
 
 	private final AnimationTimer	_animationTimer;
 
@@ -110,17 +109,26 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 	 * UI resources
 	 */
 	private Display					_display;
-	private Cursor					_cursor_NE_SW;
-	private Cursor					_cursor_NW_SE;
 
 	private ImageGallery			_imageGallery;
 
-	private Composite				_ttShellContainer;
-	private Shell					_ttShellCurrent;
-	private Shell					_ttShellWithResize;
-	private Shell					_ttShellNoResize;
+	private Composite				_ttContentArea;
+	/**
+	 * Tooltip shell which is currently be visible
+	 */
+	private Shell					_visibleShell;
+	private Shell					_shellWithResize;
+	private Shell					_shellNoResize;
 
 	private Control					_ownerControl;
+
+	private PageBook				_resizeShellBook;
+	private Composite				_resizeShellPageShell;
+	private Composite				_resizeShellPageTempImage;
+
+	private Image					_shellImage;
+
+	private boolean					_isInShellResize;
 
 	private final class AnimationTimer implements Runnable {
 		@Override
@@ -218,7 +226,7 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 
 		final int a = 1;
 
-		if (a == 0) {
+		if (a == 1) {
 			animation10_Start_Simple();
 		} else {
 			animation10_StartKomplex();
@@ -230,19 +238,43 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 
 		if (_isShellFadingIn) {
 
-			final Point size = _ttShellCurrent.getSize();
+			// show tool tip
 
-			final Point location = fixupDisplayBounds(size, getLocation(size));
+			final Point size = getShellSize();
 
-			_ttShellCurrent.setLocation(location);
+			final Point defaultLocation = getLocation(size);
+
+			final Point shellLocation = fixupDisplayBounds(size, defaultLocation);
+
+//			System.out.println(UI.timeStampNano()
+//					+ " size: "
+//					+ size
+//					+ "  default: "
+//					+ defaultLocation
+//					+ "  shell: "
+//					+ shellLocation);
+////			 final TODO remove final SYSTEM.OUT.PRINTLN
+
+			_visibleShell.setLocation(shellLocation);
+
+			if (_visibleShell == _shellNoResize) {
+				/*
+				 * NoResize shell size is not set during resize event because the shell is empty and
+				 * size is set to 2,2
+				 */
+				_shellNoResize.setSize(size);
+//				_shellNoResize.pack();
+			}
 
 			reparentShellWithNoResize();
 
-			_ttShellCurrent.setVisible(true);
+			_visibleShell.setVisible(true);
 
 		} else {
 
-			_ttShellCurrent.setVisible(false);
+			// hide tooltip
+
+			_visibleShell.setVisible(false);
 		}
 	}
 
@@ -254,15 +286,15 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 
 			// set fading in location
 
-			final Point size = _ttShellCurrent.getSize();
+			final Point size = _visibleShell.getSize();
 
 			_shellEndLocation = fixupDisplayBounds(size, getLocation(size));
 
-			if (_ttShellCurrent.isVisible()) {
+			if (_visibleShell.isVisible()) {
 
 				// shell is already visible, move from the current position to the target position
 
-				_shellStartLocation = _ttShellCurrent.getLocation();
+				_shellStartLocation = _visibleShell.getLocation();
 
 			} else {
 
@@ -270,11 +302,11 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 
 				_shellStartLocation = _shellEndLocation;
 
-				_ttShellCurrent.setLocation(_shellStartLocation);
+				_visibleShell.setLocation(_shellStartLocation);
 
 				reparentShellWithNoResize();
 
-				_ttShellCurrent.setVisible(true);
+				_visibleShell.setVisible(true);
 			}
 
 			_animationStepCounter = 0;
@@ -295,16 +327,16 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 
 		try {
 
-			if (_ttShellCurrent == null || _ttShellCurrent.isDisposed()) {
+			if (_visibleShell == null || _visibleShell.isDisposed()) {
 				return;
 			}
 
-			final boolean isShellHidden = _ttShellCurrent.isVisible() == false;
+			final boolean isShellHidden = _visibleShell.isVisible() == false;
 			if (isShellHidden) {
 				return;
 			}
 
-			final int currentAlpha = _ttShellCurrent.getAlpha();
+			final int currentAlpha = _visibleShell.getAlpha();
 			int newAlpha = ALPHA_OPAQUE;
 
 			if (_isShellFadingIn) {
@@ -314,7 +346,7 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 				final int shellEndX = _shellEndLocation.x;
 				final int shellEndY = _shellEndLocation.y;
 
-				final Point shellCurrentLocation = _ttShellCurrent.getLocation();
+				final Point shellCurrentLocation = _visibleShell.getLocation();
 
 				final boolean isInTarget = shellCurrentLocation.x == shellEndX && shellCurrentLocation.y == shellEndY;
 
@@ -329,7 +361,7 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 
 					// target is reached and fully visible, stop animation
 
-					_ttShellCurrent.setAlpha(ALPHA_OPAQUE);
+					_visibleShell.setAlpha(ALPHA_OPAQUE);
 
 					_isShellFadingIn = false;
 
@@ -354,7 +386,7 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 
 						// when mouse is over this tooltip the shell is not moved
 
-						_ttShellCurrent.setLocation(new Point(shellCurrentX, shellCurrentY));
+						_visibleShell.setLocation(new Point(shellCurrentX, shellCurrentY));
 					}
 
 				}
@@ -378,8 +410,8 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 
 					// shell is not visible any more, hide it now
 
-					_ttShellCurrent.setAlpha(0);
-					_ttShellCurrent.setVisible(false);
+					_visibleShell.setAlpha(0);
+					_visibleShell.setVisible(false);
 
 					_isShellFadingOut = false;
 
@@ -387,7 +419,7 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 				}
 			}
 
-			_ttShellCurrent.setAlpha(newAlpha);
+			_visibleShell.setAlpha(newAlpha);
 
 			_display.timerExec(FADE_TIME_INTERVAL, _animationTimer);
 
@@ -397,51 +429,69 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 	}
 
 	/**
+	 * Creates the content area of the the tooltip.
+	 * 
+	 * @param parent
+	 *            the parent of the content area
+	 * @return the content area created
+	 */
+	protected abstract Composite createToolTipContentArea(Composite parent);
+
+	/**
 	 * Create a shell but do not display it
 	 * 
 	 * @return Returns <code>true</code> when shell is created.
 	 */
-	private void createShell() {
+	private void createUI() {
 
-		if (_ttShellCurrent != null && !_ttShellCurrent.isDisposed()) {
+		if (_visibleShell != null && !_visibleShell.isDisposed()) {
 			// shell is already created
 			return;
 		}
 
-		_cursor_NE_SW = new Cursor(_display, SWT.CURSOR_SIZENESW);
-		_cursor_NW_SE = new Cursor(_display, SWT.CURSOR_SIZENWSE);
-
-		// initialize resize behaviour
-		_isShellResized = false;
-
-		_ttShellWithResize = createShell(_ownerControl.getShell(), //
+		/*
+		 * resize shell
+		 */
+		_shellWithResize = createUI_10_Shell(_ownerControl.getShell(), //
 				SWT.ON_TOP //
 //						| SWT.TOOL
 						| SWT.RESIZE
 						| SWT.NO_FOCUS);
+		_shellWithResize.addControlListener(new ControlAdapter() {
+			@Override
+			public void controlResized(final ControlEvent e) {
+				onTTShellResize(e);
+			}
+		});
+		{
+			_resizeShellBook = new PageBook(_shellWithResize, SWT.NONE);
+			_resizeShellPageShell = createUI_40_ResizePageShell(_resizeShellBook);
+			_resizeShellPageTempImage = createUI_50_ResizePageImage(_resizeShellBook);
+		}
 
-		_ttShellNoResize = createShell(_ownerControl.getShell(), //
+		/*
+		 * no resize shell
+		 */
+		_shellNoResize = createUI_10_Shell(_ownerControl.getShell(), //
 				SWT.ON_TOP //
 //						| SWT.TOOL
 						| SWT.NO_FOCUS);
 
-		_ttShellCurrent = _ttShellNoResize;
+		_visibleShell = _shellNoResize;
 
 		ownerShellAddListener();
 
 		// create UI
-		_ttShellContainer = createToolTipContentArea(_ttShellCurrent);
+		_ttContentArea = createToolTipContentArea(_visibleShell);
 
-		addToolTipControlListener(_ttShellCurrent);
+		addToolTipControlListener(_visibleShell);
 
-		_imageGallery.setExternalMouseListener(this);
+		_visibleShell.pack();
 
-		_ttShellCurrent.pack();
-
-		afterCreateShell(_ttShellCurrent);
+		afterCreateShell(_visibleShell);
 	}
 
-	private Shell createShell(final Shell parent, final int style) {
+	private Shell createUI_10_Shell(final Shell parent, final int style) {
 
 		final Shell shell = new Shell(parent, style);
 
@@ -451,17 +501,46 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 
 		shell.setLayout(new FillLayout());
 
+		shell.setSize(getShellSize());
+
 		return shell;
 	}
 
-	/**
-	 * Creates the content area of the the tooltip.
-	 * 
-	 * @param shell
-	 *            the parent of the content area
-	 * @return the content area created
-	 */
-	protected abstract Composite createToolTipContentArea(Composite shell);
+	private Composite createUI_40_ResizePageShell(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		container.setLayout(new FillLayout());
+
+		return container;
+	}
+
+	private Composite createUI_50_ResizePageImage(final Composite parent) {
+
+		final Canvas resizeCanvas = new Canvas(//
+				parent,
+//				SWT.NO_BACKGROUND | SWT.NO_REDRAW_RESIZE//
+				SWT.NONE //
+		);
+
+		resizeCanvas.setLayout(new FillLayout());
+
+		resizeCanvas.addPaintListener(new PaintListener() {
+			@Override
+			public void paintControl(final PaintEvent e) {
+				onPaintResizeShellImage(e);
+			}
+		});
+
+		return resizeCanvas;
+	}
+
+	private void delay() {
+		try {
+			Thread.sleep(500);
+		} catch (final InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
 
 	private Point fixupDisplayBounds(final Point tipSize, final Point location) {
 
@@ -518,6 +597,13 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 		return displayBounds;
 	}
 
+	/**
+	 * Get tooltip location.
+	 * 
+	 * @param size
+	 *            Tooltip size
+	 * @return Returns location relative to the device.
+	 */
 	protected abstract Point getLocation(Point size);
 
 	Point getShellSize() {
@@ -529,7 +615,7 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 	}
 
 	protected Shell getToolTipShell() {
-		return _ttShellCurrent;
+		return _visibleShell;
 	}
 
 	/**
@@ -541,151 +627,8 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 
 	private void initUI(final Control ownerControl) {
 
-		final PixelConverter pc = new PixelConverter(ownerControl);
+//		final PixelConverter pc = new PixelConverter(ownerControl);
 
-		_resizeBoxPixel = pc.convertWidthInCharsToPixels(RESIZE_BOX_SIZE);
-	}
-
-	@Override
-	public boolean isMouseEventHandledExternally(final int eventType, final MouseEvent mouseEvent) {
-
-		if (_ttShellCurrent == null || _ttShellCurrent.isDisposed()) {
-			return false;
-		}
-
-		final Rectangle shellBounds = _ttShellCurrent.getBounds();
-		final int shellX = shellBounds.x;
-		final int shellY = shellBounds.y;
-		final int shellWidth = shellBounds.width;
-		final int shellHeight = shellBounds.height;
-
-		final Point mousePos = _ttShellCurrent.toControl(_display.getCursorLocation());
-
-		Cursor cursor = null;
-
-		final int mouseX = mousePos.x;
-		final int mouseY = mousePos.y;
-
-		_isHitLeftResizeBox = false;
-
-		// check if mouse is within the resize box
-		if (mouseX < _resizeBoxPixel && mouseY < _resizeBoxPixel) {
-
-			// mouse is in the top left resize box
-
-			cursor = _cursor_NW_SE;
-			_isHitLeftResizeBox = true;
-
-		} else if (mouseX > (shellWidth - _resizeBoxPixel) && mouseY < _resizeBoxPixel) {
-
-			// mouse is in the top right resize box
-
-			cursor = _cursor_NE_SW;
-		}
-
-		final boolean isHitResizeBox = cursor != null;
-		boolean isHandled;
-
-		if (eventType == SWT.MouseMove && _isShellResized) {
-
-			// mouse is moved and shell is still resizing
-
-			isHandled = true;
-
-			final int diffX = _mouseDownX - mouseX;
-			final int diffY = _mouseDownY - mouseY;
-
-//			System.out.println("diffX " + diffX + "\tdiffY " + diffY);
-//			// TODO remove SYSTEM.OUT.PRINTLN
-
-			final int newShellX = shellX - diffX;
-			final int newShellY = shellY - diffY;
-			int newShellWidth = shellWidth + diffX;
-			int newShellHeight = shellHeight + diffY;
-
-			Point newShellLocation = new Point(newShellX, newShellY);
-
-			final Rectangle displayBounds = getDisplayBounds(newShellLocation);
-
-			// ensure tooltip is not too large
-			final double maxHeight = displayBounds.height * 0.8;
-			final double maxWidth = displayBounds.width * 0.95;
-
-			if (newShellHeight > maxHeight) {
-				newShellHeight = (int) maxHeight;
-			} else if (newShellHeight < MIN_SHELL_HORIZ_HEIGHT) {
-				newShellHeight = MIN_SHELL_HORIZ_HEIGHT;
-			}
-
-			if (newShellWidth > maxWidth) {
-				newShellWidth = (int) maxWidth;
-			} else if (newShellWidth < MIN_SHELL_HORIZ_WIDTH) {
-				newShellWidth = MIN_SHELL_HORIZ_WIDTH;
-			}
-
-			final Point size = new Point(newShellWidth, newShellHeight);
-
-			newShellLocation = fixupDisplayBounds(size, newShellLocation);
-
-			_ttShellCurrent.setBounds(newShellLocation.x, newShellLocation.y, newShellWidth, newShellHeight);
-
-			if (isVerticalGallery()) {
-				_shellVertWidth = newShellWidth;
-				_shellVertHeight = newShellHeight;
-			} else {
-				_shellHorizWidth = newShellWidth;
-				_shellHorizHeight = newShellHeight;
-			}
-
-		} else {
-
-			if (isHitResizeBox == false) {
-
-				// mouse is not in the resizebox, do not handle mouse event externally
-
-				isHandled = false;
-
-			} else {
-
-				// mouse is within the resizebox, handle mouse event externally
-
-				isHandled = true;
-
-				switch (eventType) {
-				case SWT.MouseDown:
-
-					if (_isShellResized) {
-
-						// disable shell resize
-
-						_isShellResized = false;
-
-					} else {
-
-						// enable shell resize
-
-						_isShellResized = true;
-
-						_mouseDownX = mouseX;
-						_mouseDownY = mouseY;
-					}
-
-					break;
-
-				case SWT.MouseUp:
-					break;
-				}
-			}
-		}
-
-		/*
-		 * shell could be hidden
-		 */
-		if (_ttShellCurrent != null && !_ttShellCurrent.isDisposed()) {
-			_ttShellCurrent.setCursor(cursor);
-		}
-
-		return isHandled;
 	}
 
 	abstract boolean isVerticalGallery();
@@ -714,7 +657,7 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 
 	private void onOwnerShellEvent(final Event event) {
 
-		if (_ttShellCurrent == null || _ttShellCurrent.isDisposed()) {
+		if (_visibleShell == null || _visibleShell.isDisposed()) {
 			return;
 		}
 
@@ -727,7 +670,7 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 
 					// hide tooltip when another shell is activated
 
-					if (_display.getActiveShell() != _ttShellCurrent) {
+					if (_display.getActiveShell() != _visibleShell) {
 						ttHide(event);
 					}
 				}
@@ -741,39 +684,22 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 		}
 	}
 
-	@Override
-	public void onPaintAfter(final GC gc, final Rectangle clippingArea, final Rectangle clientArea) {
+	private void onPaintResizeShellImage(final PaintEvent event) {
 
-		if (_isShellResized == false) {
-			// shell is not resized, do normal behaviour
-			return;
-		}
+		final GC gc = event.gc;
 
-		/*
-		 * shell is resized, paint marker
-		 */
+//		final Rectangle bounds = gc.getClipping();
+//		gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+//		gc.fillRectangle(bounds);
 
-		if (_isHitLeftResizeBox) {
-
-			gc.setBackground(_display.getSystemColor(SWT.COLOR_GREEN));
-			gc.fillRectangle(0, 0, _resizeBoxPixel, _resizeBoxPixel);
-
-		} else {
-
-			gc.setBackground(_display.getSystemColor(SWT.COLOR_BLUE));
-			gc.fillRectangle(clientArea.width - _resizeBoxPixel, 0, _resizeBoxPixel, _resizeBoxPixel);
-		}
-
-//		System.out.println("gc " + gc.getClipping() + "\tclip " + clippingArea + "\tclient " + clientArea);
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
+		gc.drawImage(_shellImage, 0, 0);
 	}
 
 	protected abstract void onStartHide();
 
 	private void onTTControlEvent(final Event event) {
 
-		if (_ttShellCurrent == null || _ttShellCurrent.isDisposed()) {
+		if (_visibleShell == null || _visibleShell.isDisposed()) {
 			return;
 		}
 
@@ -799,13 +725,6 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 
 	private void onTTControlExit(final Event event) {
 
-		if (_isShellResized) {
-
-			// shell is currently being resized, continue resizing until resizing is finished
-
-			return;
-		}
-
 		if (_isShellToggled) {
 
 			// do this only once
@@ -822,8 +741,8 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 
 		if (hoveredControl == null) {
 
-			System.out.println(UI.timeStampNano() + " exit 0");
-			// TODO remove SYSTEM.OUT.PRINTLN
+//			System.out.println(UI.timeStampNano() + " exit 0");
+//			// TODO remove SYSTEM.OUT.PRINTLN
 
 			isHide = true;
 
@@ -840,14 +759,14 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 			// move up child-parent hierarchy until shell is reached
 			while (true) {
 
-				if (hoveredParent == _ttShellCurrent) {
+				if (hoveredParent == _visibleShell) {
 
 					// mouse is hovering in this tooltip
 
 					isKeepVisible = true;
 
-					System.out.println(UI.timeStampNano() + " exit 1");
-					// TODO remove SYSTEM.OUT.PRINTLN
+//					System.out.println(UI.timeStampNano() + " exit 1");
+//					// TODO remove SYSTEM.OUT.PRINTLN
 
 					break;
 				}
@@ -858,8 +777,8 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 
 					isKeepVisible = true;
 
-					System.out.println(UI.timeStampNano() + " exit 2");
-					// TODO remove SYSTEM.OUT.PRINTLN
+//					System.out.println(UI.timeStampNano() + " exit 2");
+//					// TODO remove SYSTEM.OUT.PRINTLN
 
 					break;
 				}
@@ -880,8 +799,8 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 
 					// mouse has left the tooltip and the owner control
 
-					System.out.println(UI.timeStampNano() + " exit 3");
-					// TODO remove SYSTEM.OUT.PRINTLN
+//					System.out.println(UI.timeStampNano() + " exit 3");
+//					// TODO remove SYSTEM.OUT.PRINTLN
 
 					isHide = true;
 					break;
@@ -904,7 +823,7 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 				 * wolfgang 2010-07-23
 				 */
 
-				final Rectangle ttShellRect = _ttShellCurrent.getBounds();
+				final Rectangle ttShellRect = _visibleShell.getBounds();
 				final int margin = 1;
 
 				ttShellRect.x += margin;
@@ -918,8 +837,8 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 
 					// mouse is not within the tooltip shell rectangle
 
-					System.out.println(UI.timeStampNano() + " exit 4");
-					// TODO remove SYSTEM.OUT.PRINTLN
+//					System.out.println(UI.timeStampNano() + " exit 4");
+//					// TODO remove SYSTEM.OUT.PRINTLN
 
 					isHide = true;
 
@@ -939,8 +858,8 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 		switch (event.type) {
 		case SWT.Deactivate:
 
-			if (_ttShellCurrent != null
-					&& !_ttShellCurrent.isDisposed()
+			if (_visibleShell != null
+					&& !_visibleShell.isDisposed()
 					&& _ownerControl != null
 					&& !_ownerControl.isDisposed()) {
 
@@ -951,14 +870,14 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 						// hide tooltip when another shell is activated
 
 						// check again
-						if (_ttShellCurrent == null
-								|| _ttShellCurrent.isDisposed()
+						if (_visibleShell == null
+								|| _visibleShell.isDisposed()
 								|| _ownerControl == null
 								|| _ownerControl.isDisposed()) {
 							return;
 						}
 
-						if (_ownerControl.getShell() == _ttShellCurrent.getDisplay().getActiveShell()) {
+						if (_ownerControl.getShell() == _visibleShell.getDisplay().getActiveShell()) {
 
 							// don't hide when main window is active
 							return;
@@ -973,13 +892,71 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 
 		case SWT.Dispose:
 
-			_cursor_NE_SW = (Cursor) Util.disposeResource(_cursor_NE_SW);
-			_cursor_NW_SE = (Cursor) Util.disposeResource(_cursor_NW_SE);
-
 			break;
 
 		}
 
+	}
+
+	private void onTTShellResize(final ControlEvent event) {
+
+		if (_isInShellResize) {
+			return;
+		}
+
+		System.out.println(UI.timeStampNano() + " onTTShellResize()");
+		// TODO remove SYSTEM.OUT.PRINTLN
+
+		final Rectangle shellBounds = _shellWithResize.getBounds();
+		final Rectangle shellClientArea = _shellWithResize.getClientArea();
+
+		_shellTrimWidth = (shellBounds.width - shellClientArea.width) / 2;
+		_shellTrimHeight = (shellBounds.height - shellClientArea.height) / 2;
+
+		int newShellWidth = shellClientArea.width;
+		int newShellHeight = shellClientArea.height;
+
+		final Point newShellLocation = _shellWithResize.getLocation();
+
+		final Rectangle displayBounds = getDisplayBounds(newShellLocation);
+
+		// ensure tooltip is not too large
+		final double maxHeight = displayBounds.height * 0.8;
+		final double maxWidth = displayBounds.width * 0.95;
+
+		boolean isResizeAdjusted = false;
+
+		if (newShellHeight > maxHeight) {
+			newShellHeight = (int) maxHeight;
+			isResizeAdjusted = true;
+		} else if (newShellHeight < MIN_SHELL_HORIZ_HEIGHT) {
+			newShellHeight = MIN_SHELL_HORIZ_HEIGHT;
+			isResizeAdjusted = true;
+		}
+
+		if (newShellWidth > maxWidth) {
+			newShellWidth = (int) maxWidth;
+			isResizeAdjusted = true;
+		} else if (newShellWidth < MIN_SHELL_HORIZ_WIDTH) {
+			newShellWidth = MIN_SHELL_HORIZ_WIDTH;
+			isResizeAdjusted = true;
+		}
+
+		if (isVerticalGallery()) {
+			_shellVertWidth = newShellWidth;
+			_shellVertHeight = newShellHeight;
+		} else {
+			_shellHorizWidth = newShellWidth;
+			_shellHorizHeight = newShellHeight;
+		}
+
+		if (isResizeAdjusted) {
+			_isInShellResize = true;
+			{
+				_shellWithResize.setSize(newShellWidth, newShellHeight);
+			}
+			_isInShellResize = false;
+		}
 	}
 
 	/**
@@ -1059,72 +1036,109 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 	/**
 	 * Reparent shell
 	 * 
-	 * @param newShell
+	 * @param newReparentedShell
 	 * @param offsetX
 	 */
-	private void reparentShell(final Shell newShell) {
+	private void reparentShell(final Shell newReparentedShell) {
 
-		System.out.println(UI.timeStampNano() + " reparentShell");
-		// TODO remove SYSTEM.OUT.PRINTLN
+		final Shell prevShell = _visibleShell;
 
-		final Shell previousShell = _ttShellCurrent;
+		removeToolTipControlListener(prevShell);
 
-		removeToolTipControlListener(previousShell);
+		final Rectangle prevShellBounds = prevShell.getBounds();
 
-		final Rectangle currentShellBounds = previousShell.getBounds();
+		_visibleShell = newReparentedShell;
 
-		_ttShellCurrent = newShell;
+		if (newReparentedShell == _shellWithResize) {
 
-		newShell.setVisible(true);
-		newShell.setBounds(currentShellBounds);
-		newShell.setAlpha(0xff);
-//		newShell.moveAbove(null);
+			// setup resize shell
 
-		// reparent UI container
-		_ttShellContainer.setParent(newShell);
-		previousShell.setAlpha(0);
+			/*
+			 * copy no resize shell image into the resize shell, to prevent flickering
+			 */
+			_shellImage = new Image(_display, prevShellBounds);
 
-		addToolTipControlListener(newShell);
+			final GC gc = new GC(_shellNoResize);
+			gc.copyArea(_shellImage, 0, 0);
+			gc.dispose();
 
-		newShell.pack();
+			_resizeShellBook.showPage(_resizeShellPageTempImage);
 
-		if (newShell == _ttShellNoResize) {
-			System.out.println("\tShow: No Resize");
-			// TODO remove SYSTEM.OUT.PRINTLN
+			_shellWithResize.setLocation(//
+					prevShellBounds.x - _shellTrimWidth,
+					prevShellBounds.y - _shellTrimHeight//
+			);
+
+			_shellWithResize.setAlpha(0x0);
+
+			_shellWithResize.setVisible(true);
+
+			_shellWithResize.setAlpha(0xff);
+
+			prevShell.setAlpha(0);
+
+			// reparent UI container
+			_ttContentArea.setParent(_resizeShellPageShell);
+
+			_resizeShellBook.showPage(_resizeShellPageShell);
+
+			_shellImage.dispose();
+
 		} else {
-			System.out.println("\tShow: Resize");
-			// TODO remove SYSTEM.OUT.PRINTLN
-		}
-		if (previousShell == _ttShellNoResize) {
-			System.out.println("\tHide: No Resize");
-			// TODO remove SYSTEM.OUT.PRINTLN
-		} else {
-			System.out.println("\tHide: Resize");
-			// TODO remove SYSTEM.OUT.PRINTLN
+
+			// setup no resize shell
+
+			_shellNoResize.setVisible(true);
+
+			_shellNoResize.setLocation(//
+					prevShellBounds.x - _shellTrimWidth - 0,
+					prevShellBounds.y - _shellTrimHeight - 0 //
+			);
+
+
+			_shellNoResize.setAlpha(0xff);
+//			newShell.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+
+			// reparent UI container
+			_ttContentArea.setParent(_shellNoResize);
+
+			prevShell.setAlpha(0);
+
+			_shellNoResize.setSize(getShellSize());
+			_shellNoResize.pack();
 		}
 
 		// hide previous shell
-		previousShell.setVisible(false);
+		prevShell.setVisible(false);
+
+		addToolTipControlListener(newReparentedShell);
 	}
 
 	private void reparentShellWithNoResize() {
 
-		if (_ttShellCurrent == _ttShellNoResize) {
+		System.out.println(UI.timeStampNano() + " reparentShell NoResize: " + (_visibleShell == _shellNoResize));
+		// TODO remove SYSTEM.OUT.PRINTLN
+
+		if (_visibleShell == _shellNoResize) {
 			// shell with no resize is visible
+
 			return;
 		}
 
-		reparentShell(_ttShellNoResize);
+		reparentShell(_shellNoResize);
 	}
 
 	private void reparentShellWithResize() {
 
-		if (_ttShellCurrent == _ttShellWithResize) {
+		System.out.println(UI.timeStampNano() + " reparentShell WithResize: " + (_visibleShell == _shellNoResize));
+		// TODO remove SYSTEM.OUT.PRINTLN
+
+		if (_visibleShell == _shellWithResize) {
 			// shell with resize is visible
 			return;
 		}
 
-		reparentShell(_ttShellWithResize);
+		reparentShell(_shellWithResize);
 	}
 
 	protected void restoreState(final IDialogSettings state) {
@@ -1184,14 +1198,14 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 
 	protected void showAtDefaultLocation() {
 
-		if (_ttShellCurrent == null || _ttShellCurrent.isDisposed()) {
+		if (_visibleShell == null || _visibleShell.isDisposed()) {
 			return;
 		}
 
-		final Point size = _ttShellCurrent.getSize();
+		final Point size = _visibleShell.getSize();
 		final Point fixedLocation = fixupDisplayBounds(size, getLocation(size));
 
-		_ttShellCurrent.setLocation(fixedLocation);
+		_visibleShell.setLocation(fixedLocation);
 	}
 
 	protected boolean showShell() {
@@ -1205,7 +1219,7 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 //			return false;
 //		}
 
-		createShell();
+		createUI();
 
 		ttShow();
 
@@ -1214,7 +1228,7 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 
 	private void showShellWhenVisible() {
 
-		if (_ttShellCurrent == null || _ttShellCurrent.isDisposed() || _ttShellCurrent.isVisible() == false) {
+		if (_visibleShell == null || _visibleShell.isDisposed() || _visibleShell.isVisible() == false) {
 			return;
 		}
 
@@ -1223,7 +1237,7 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 
 	private void ttDispose(final Event event) {
 
-		if (_ttShellCurrent == null || _ttShellCurrent.isDisposed()) {
+		if (_visibleShell == null || _visibleShell.isDisposed()) {
 			return;
 		}
 
@@ -1231,20 +1245,20 @@ public abstract class PhotoToolTipShell implements IExternalGalleryListener {
 
 		ownerShellRemoveListener();
 
-		passOnEvent(_ttShellWithResize, event);
-		_ttShellWithResize.dispose();
-		_ttShellWithResize = null;
+		passOnEvent(_shellWithResize, event);
+		_shellWithResize.dispose();
+		_shellWithResize = null;
 
-		passOnEvent(_ttShellNoResize, event);
-		_ttShellNoResize.dispose();
-		_ttShellNoResize = null;
+		passOnEvent(_shellNoResize, event);
+		_shellNoResize.dispose();
+		_shellNoResize = null;
 	}
 
 	private void ttHide(final Event event) {
 
 		onStartHide();
 
-		if (_ttShellCurrent == null || _ttShellCurrent.isDisposed() || _ttShellCurrent.isVisible() == false) {
+		if (_visibleShell == null || _visibleShell.isDisposed() || _visibleShell.isVisible() == false) {
 			return;
 		}
 

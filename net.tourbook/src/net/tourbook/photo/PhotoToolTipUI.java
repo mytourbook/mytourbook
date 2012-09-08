@@ -145,9 +145,9 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 	}
 
 	@Override
-	protected Composite createToolTipContentArea(final Composite shell) {
+	protected Composite createToolTipContentArea(final Composite parent) {
 
-		final Composite container = createUI(shell);
+		final Composite container = createUI(parent);
 
 //		shell.addDisposeListener(new DisposeListener() {
 //			@Override
@@ -159,7 +159,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 //			}
 //		});
 
-		updateUI_Colors(shell);
+		updateUI_Colors(parent);
 
 		super.setImageGallery(_imageGallery);
 

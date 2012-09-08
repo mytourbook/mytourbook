@@ -1,5 +1,8 @@
 Version: 12.9.0                                           ?. October 2012 
 
+TODO
+
+* 13.08.2012 18:16	Stefan Rado		MyTourbook - Pausenzeiten
 
 
 
