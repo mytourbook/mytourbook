@@ -83,12 +83,14 @@ public class GalleryActionBar {
 			columns++;
 		}
 
+		final int hSpacing = 3;
+
 		_containerActionBar = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(_containerActionBar);
 		GridLayoutFactory.fillDefaults()//
 				.numColumns(columns)
 				.extendedMargins(2, 2, 2, 2)
-				.spacing(3, 0)
+				.spacing(hSpacing, 0)
 				.applyTo(_containerActionBar);
 //		_containerActionBar.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
@@ -109,8 +111,8 @@ public class GalleryActionBar {
 			if (_isShowThumbsize) {
 				final Composite container = new Composite(_containerActionBar, SWT.NONE);
 				GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
-				GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-//				container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+				GridLayoutFactory.fillDefaults().numColumns(2).spacing(hSpacing, 0).applyTo(container);
+//				container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 				{
 					createUI_20_ImageSize(container);
 					createUI_30_ImageSizeIndicator(container);
@@ -156,8 +158,8 @@ public class GalleryActionBar {
 
 		_canvasImageSizeIndicator = new ImageSizeIndicator(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
-				.hint(IMAGE_INDICATOR_SIZE, IMAGE_INDICATOR_SIZE)
-				.align(SWT.CENTER, SWT.CENTER)
+				.hint(8, _spinnerThumbSize.getSize().y)
+//				.align(SWT.CENTER, SWT.CENTER)
 				.applyTo(_canvasImageSizeIndicator);
 	}
 

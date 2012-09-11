@@ -170,7 +170,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 		final Composite shellContainer = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.fillDefaults().numColumns(1).spacing(2, 2).applyTo(shellContainer);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+		shellContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
 			createUI_10_Gallery(shellContainer);
 		}
@@ -180,18 +180,15 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 	private void createUI_10_Gallery(final Composite parent) {
 
-		final Point shellSize = super.getShellSize();
-
 		_galleryContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
-				.hint(shellSize.x, shellSize.y)
 				.grab(true, true)
 				.applyTo(_galleryContainer);
 		GridLayoutFactory.fillDefaults()//
 				.numColumns(1)
-				.extendedMargins(0, 0, 0, 20)
+				.extendedMargins(0, 0, 0, 0)
 				.applyTo(_galleryContainer);
-//		_galleryContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+		_galleryContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
 			_imageGallery = new ImageGallery();
 
@@ -224,7 +221,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 				.grab(true, false)
 				.align(SWT.BEGINNING, SWT.BEGINNING)
 				.applyTo(_toolbarControl);
-		_toolbarControl.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+//		_toolbarControl.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
 		/*
 		 * fill toolbar
@@ -234,6 +231,14 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		tbm.add(_actionToggleGalleryOrientation);
 
 		tbm.update(true);
+	}
+
+	private void delay() {
+		try {
+			Thread.sleep(500);
+		} catch (final InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -262,12 +267,12 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		/*
 		 * set tooltip shell to the correct size, each orientation has it's own size
 		 */
-		final Point shellSize = getShellSize();
+		final Point contentSize = getContentSize();
 
 		// set size in layout data
 		final GridData gd = (GridData) _galleryContainer.getLayoutData();
-		gd.widthHint = shellSize.x;
-		gd.heightHint = shellSize.y;
+		gd.widthHint = contentSize.x;
+		gd.heightHint = contentSize.y;
 
 		// relayout shell
 		getToolTipShell().pack(true);
@@ -329,6 +334,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 		final String galleryPositionKey = hoveredPhotosHash + "_PhotoToolTipUI";//$NON-NLS-1$
 
+		
 		_imageGallery.showImages(_photoWrapperList, galleryPositionKey);
 	}
 

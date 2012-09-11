@@ -628,6 +628,14 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		}
 	}
 
+	private void delay() {
+		try {
+			Thread.sleep(500);
+		} catch (final InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
 	private void deselectAll() {
 
 		_galleryMT20.deselectAll();

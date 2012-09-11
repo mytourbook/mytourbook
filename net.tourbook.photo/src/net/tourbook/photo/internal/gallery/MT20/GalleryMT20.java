@@ -575,6 +575,14 @@ public abstract class GalleryMT20 extends Canvas {
 		setMenu(_contextMenuMgr.createContextMenu(this));
 	}
 
+	private void delay() {
+		try {
+			Thread.sleep(300);
+		} catch (final InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
 	/**
 	 * Deselects all items.
 	 */
@@ -1819,6 +1827,12 @@ public abstract class GalleryMT20 extends Canvas {
 
 //		final long start = System.nanoTime();
 
+		/**
+		 * After many hours I discovered, that the gallery background is not painted (with win7) in
+		 * the background color after the shell is hidden and displayed again (in a tooltip),
+		 * sometime it is painted, sometimes it isn't.
+		 */
+
 		// is true when image can not be painted with high quality
 		final boolean isSmallerThanHQMinSize = _itemWidth < _highQualityMinSize;
 
@@ -1939,7 +1953,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 //		final float timeDiff = (float) (System.nanoTime() - start) / 1000000;
 ////		if (timeDiff > 500) {
-//		System.out.println("onPaint:\t" + timeDiff + " ms\t");
+//		System.out.println(UI.timeStampNano() + " onPaint: " + timeDiff + " ms\t");
 ////		}
 //		// TODO remove SYSTEM.OUT.PRINTLN
 	}

@@ -772,6 +772,10 @@ public class Messages extends NLS {
 
 	public static String	Photo_Tooltip_Action_ToggleGalleryVertical_ToolTip;
 
+	public static String	Photo_Tooltip_Label_ShellNoResize;
+
+	public static String	Photo_Tooltip_Label_ShellWithResize;
+
 	public static String		Photos_AndTours_Label_AdjustTime;
 	public static String		Photos_AndTours_Label_AdjustTimeTooltip;
 	public static String		Photos_AndTours_Label_NoCamera;
