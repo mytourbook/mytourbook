@@ -86,24 +86,24 @@ public abstract class PhotoToolTipShell {
 
 	private ToolTipShellListener	_ttShellListener;
 	private ToolTipControlListener	_ttControlListener;
+	private ToolTipDisplayListener	_ttDisplayListener;
 
 	private boolean					_isShellToggled;
-
 	private boolean					_isShellFadingOut;
 	private boolean					_isShellFadingIn;
+
 	private Point					_shellStartLocation;
 	private Point					_shellEndLocation;
 	private int						_animationStepCounter;
 	private int						_fadeOutDelayCounter;
 	private boolean					_isShellMovingEnabled;
-
 	private int						_horizContentWidth					= MIN_SHELL_HORIZ_WIDTH;
+
 	private int						_horizContentHeight					= MIN_SHELL_HORIZ_HEIGHT;
 	private int						_vertContentWidth					= MIN_SHELL_VERT_WIDTH;
 	private int						_vertContentHeight					= MIN_SHELL_VERT_HEIGHT;
 	private int						_shellTrimWidth;
 	private int						_shellTrimHeight;
-
 	private final AnimationTimer	_animationTimer;
 
 	/*
@@ -114,19 +114,19 @@ public abstract class PhotoToolTipShell {
 	private ImageGallery			_imageGallery;
 
 	private Composite				_ttContentArea;
+
 	/**
 	 * Tooltip shell which is currently be visible
 	 */
 	private Shell					_visibleShell;
 	private Shell					_shellWithResize;
 	private Shell					_shellNoResize;
-
 	private Control					_ownerControl;
 
 	private PageBook				_resizeShellBook;
+
 	private Composite				_resizeShellPageShell;
 	private Composite				_resizeShellPageTempImage;
-
 	private Image					_shellTempImage;
 
 	private boolean					_isInShellResize;
@@ -160,6 +160,17 @@ public abstract class PhotoToolTipShell {
 
 	}
 
+	public class ToolTipDisplayListener implements Listener {
+		public void handleEvent(final Event event) {
+
+			switch (event.type) {
+			case SWT.MouseMove:
+				onTTDisplayMouseMove(event);
+				break;
+			}
+		}
+	}
+
 	private final class ToolTipShellListener implements Listener {
 		public void handleEvent(final Event event) {
 			onTTShellEvent(event);
@@ -180,6 +191,7 @@ public abstract class PhotoToolTipShell {
 
 		_ttControlListener = new ToolTipControlListener();
 		_ttShellListener = new ToolTipShellListener();
+		_ttDisplayListener = new ToolTipDisplayListener();
 
 		_ownerControlListener = new OwnerControlListener();
 		_ownerShellListener = new OwnerShellListener();
@@ -189,32 +201,6 @@ public abstract class PhotoToolTipShell {
 		ownerControlAddListener();
 
 		initUI(ownerControl);
-	}
-
-	/**
-	 * ########################### Recursive #########################################<br>
-	 * <p>
-	 * Add listener to all controls within the tooltip
-	 * <p>
-	 * ########################### Recursive #########################################<br>
-	 * 
-	 * @param control
-	 */
-	private void addToolTipControlListener(final Control control) {
-
-		control.addListener(SWT.MouseDown, _ttControlListener);
-		control.addListener(SWT.MouseUp, _ttControlListener);
-		control.addListener(SWT.MouseMove, _ttControlListener);
-		control.addListener(SWT.MouseExit, _ttControlListener);
-		control.addListener(SWT.MouseHover, _ttControlListener);
-		control.addListener(SWT.MouseEnter, _ttControlListener);
-
-		if (control instanceof Composite) {
-			final Control[] children = ((Composite) control).getChildren();
-			for (final Control child : children) {
-				addToolTipControlListener(child);
-			}
-		}
 	}
 
 	/**
@@ -265,13 +251,13 @@ public abstract class PhotoToolTipShell {
 
 			_shellNoResize.setAlpha(0xff);
 
-			_visibleShell.setVisible(true);
+			setShellVisible(true);
 
 		} else {
 
 			// hide tooltip
 
-			_visibleShell.setVisible(false);
+			setShellVisible(false);
 		}
 	}
 
@@ -303,7 +289,7 @@ public abstract class PhotoToolTipShell {
 
 				reparentShell(_shellNoResize);
 
-				_visibleShell.setVisible(true);
+				setShellVisible(true);
 			}
 
 			_animationStepCounter = 0;
@@ -408,7 +394,7 @@ public abstract class PhotoToolTipShell {
 					// shell is not visible any more, hide it now
 
 					_visibleShell.setAlpha(0);
-					_visibleShell.setVisible(false);
+					setShellVisible(false);
 
 					_isShellFadingOut = false;
 
@@ -494,7 +480,7 @@ public abstract class PhotoToolTipShell {
 		// create UI
 		_ttContentArea = createToolTipContentArea(_visibleShell);
 
-		addToolTipControlListener(_visibleShell);
+		ttControlsAddListener(_visibleShell);
 
 		afterCreateShell(_visibleShell);
 	}
@@ -508,7 +494,6 @@ public abstract class PhotoToolTipShell {
 		// hide tooltip if user selects outside of the shell
 		shell.addListener(SWT.Deactivate, _ttShellListener);
 		shell.addListener(SWT.Dispose, _ttShellListener);
-		shell.addListener(SWT.MouseExit, _ttShellListener);
 
 		shell.setLayout(new FillLayout());
 
@@ -665,6 +650,7 @@ public abstract class PhotoToolTipShell {
 		case SWT.Resize:
 
 			showShellWhenVisible();
+
 			break;
 		}
 	}
@@ -729,32 +715,25 @@ public abstract class PhotoToolTipShell {
 
 			break;
 
-		case SWT.MouseHover:
-
-			System.out.println(UI.timeStampNano() + " mouseHover\t");
-			// TODO remove SYSTEM.OUT.PRINTLN
-
 		case SWT.MouseExit:
 
-			onTTControlExit(event);
+			if (_isShellToggled) {
+
+				// do this only once
+
+				_isShellToggled = false;
+			}
 
 			break;
 		}
 	}
 
-	private void onTTControlExit(final Event event) {
+	private void onTTDisplayMouseMove(final Event event) {
 
-		System.out.println(UI.timeStampNano() + " onExit\t" + event.widget); //$NON-NLS-1$
-		// TODO remove SYSTEM.OUT.PRINTLN
-
-		if (_isShellToggled) {
-
-			// do this only once
-
-			_isShellToggled = false;
-
-			return;
-		}
+		/*
+		 * check tooltip area as it is done in the original code because the current tooltip shell
+		 * check is not working always (often but sometimes) correctly
+		 */
 
 		/**
 		 * !!! this adjustment do not work on Linux because the tooltip gets hidden when the mouse
@@ -766,12 +745,12 @@ public abstract class PhotoToolTipShell {
 		 */
 
 		final Rectangle ttShellRect = _visibleShell.getBounds();
-		final int margin = 1;
+		final int margin = 10;
 
-		ttShellRect.x += margin;
-		ttShellRect.y += margin;
-		ttShellRect.width -= 2 * margin;
-		ttShellRect.height -= 2 * margin;
+		ttShellRect.x -= margin;
+		ttShellRect.y -= margin;
+		ttShellRect.width += 2 * margin;
+		ttShellRect.height += 2 * margin;
 
 		final Point cursorLocation = _display.getCursorLocation();
 
@@ -779,28 +758,13 @@ public abstract class PhotoToolTipShell {
 
 			// mouse is not within the tooltip shell rectangle
 
-			System.out.println(UI.timeStampNano() + "\texit4 "); //$NON-NLS-1$
-			// TODO remove SYSTEM.OUT.PRINTLN
+			reparentShell(_shellNoResize);
 
 			ttHide(event);
-
-		} else {
-
-			System.out.println(UI.timeStampNano() + "\tno exit "); //$NON-NLS-1$
-			// TODO remove SYSTEM.OUT.PRINTLN
 		}
 	}
 
-	private void onTTControlExit_OLD(final Event event) {
-
-		if (_isShellToggled) {
-
-			// do this only once
-
-			_isShellToggled = false;
-
-			return;
-		}
+	private void onTTDisplayMouseMove_OLD(final Event event) {
 
 		boolean isHide = false;
 
@@ -833,8 +797,8 @@ public abstract class PhotoToolTipShell {
 
 					isKeepVisible = true;
 
-//					System.out.println(UI.timeStampNano() + " exit 1");
-//					// TODO remove SYSTEM.OUT.PRINTLN
+					System.out.println(UI.timeStampNano() + " exit 1 no hide");
+					// TODO remove SYSTEM.OUT.PRINTLN
 
 					break;
 				}
@@ -845,21 +809,11 @@ public abstract class PhotoToolTipShell {
 
 					isKeepVisible = true;
 
-//					System.out.println(UI.timeStampNano() + " exit 2");
-//					// TODO remove SYSTEM.OUT.PRINTLN
+					System.out.println(UI.timeStampNano() + " exit 2 no hide");
+					// TODO remove SYSTEM.OUT.PRINTLN
 
 					break;
 				}
-
-//				if (hoveredToolTip != null && hoveredParent == hoveredToolTip) {
-//
-//					// mouse is over the owner tooltip control
-//
-//					System.out.println(System.nanoTime() + " exit 2 " + hoveredParent);
-//					// TODO remove SYSTEM.OUT.PRINTLN
-//
-//					break;
-//				}
 
 				hoveredParent = hoveredParent.getParent();
 
@@ -867,57 +821,61 @@ public abstract class PhotoToolTipShell {
 
 					// mouse has left the tooltip and the owner control
 
-//					System.out.println(UI.timeStampNano() + " exit 3");
-//					// TODO remove SYSTEM.OUT.PRINTLN
+					System.out.println(UI.timeStampNano() + " exit 3 hide");
+					// TODO remove SYSTEM.OUT.PRINTLN
 
 					isHide = true;
 					break;
 				}
 			}
 
-			if (isKeepVisible == false && isHide == false) {
-
-				/*
-				 * check tooltip area as it is done in the original code because the current tooltip
-				 * shell check is not working always (often but sometimes) correctly
-				 */
-
-				/**
-				 * !!! this adjustment do not work on Linux because the tooltip gets hidden when the
-				 * mouse tries to mover over the tooltip <br>
-				 * <br>
-				 * it seems to work on windows and linux with margin 1, when set to 0 the tooltip do
-				 * sometime not be poped up again and the i-icons is not deaktivated<br>
-				 * wolfgang 2010-07-23
-				 */
-
-				final Rectangle ttShellRect = _visibleShell.getBounds();
-				final int margin = 1;
-
-				ttShellRect.x += margin;
-				ttShellRect.y += margin;
-				ttShellRect.width -= 2 * margin;
-				ttShellRect.height -= 2 * margin;
-
-				final Point cursorLocation = _display.getCursorLocation();
-
-				if (!ttShellRect.contains(cursorLocation)) {
-
-					// mouse is not within the tooltip shell rectangle
-
-//					System.out.println(UI.timeStampNano() + " exit 4");
+//			if (isKeepVisible == false && isHide == false) {
+//
+//				/*
+//				 * check tooltip area as it is done in the original code because the current tooltip
+//				 * shell check is not working always (often but sometimes) correctly
+//				 */
+//
+//				/**
+//				 * !!! this adjustment do not work on Linux because the tooltip gets hidden when the
+//				 * mouse tries to mover over the tooltip <br>
+//				 * <br>
+//				 * it seems to work on windows and linux with margin 1, when set to 0 the tooltip do
+//				 * sometime not be poped up again and the i-icons is not deaktivated<br>
+//				 * wolfgang 2010-07-23
+//				 */
+//
+//				final Rectangle ttShellRect = _visibleShell.getBounds();
+//				final int margin = 5;
+//
+//				ttShellRect.x -= margin;
+//				ttShellRect.y -= margin;
+//				ttShellRect.width += 2 * margin;
+//				ttShellRect.height += 2 * margin;
+//
+//				final Point cursorLocation = _display.getCursorLocation();
+//
+//				if (!ttShellRect.contains(cursorLocation)) {
+//
+//					// mouse is not within the tooltip shell rectangle
+//
+//					System.out.println(UI.timeStampNano() + "\texit 4 hide"); //$NON-NLS-1$
 //					// TODO remove SYSTEM.OUT.PRINTLN
-
-					isHide = true;
-
-					reparentShell(_shellNoResize);
-				}
-			}
+//
+//					isHide = true;
+//
+//				} else {
+//
+//					System.out.println(UI.timeStampNano() + "\texit 4 no hide"); //$NON-NLS-1$
+//					// TODO remove SYSTEM.OUT.PRINTLN
+//				}
+//			}
 		}
 
 		if (isHide) {
 			ttHide(event);
 		}
+
 	}
 
 	private void onTTShellEvent(final Event event) {
@@ -955,14 +913,6 @@ public abstract class PhotoToolTipShell {
 				});
 			}
 
-			break;
-
-		case SWT.MouseExit:
-
-			System.out.println(UI.timeStampNano() + " shell exit\t"); //$NON-NLS-1$
-			// TODO remove SYSTEM.OUT.PRINTLN
-
-			ttHide(event);
 			break;
 
 		case SWT.Dispose:
@@ -1080,31 +1030,6 @@ public abstract class PhotoToolTipShell {
 	}
 
 	/**
-	 * ########################### Recursive #########################################<br>
-	 * <p>
-	 * Removes listener from all controls within the tooltip
-	 * <p>
-	 * ########################### Recursive #########################################<br>
-	 * 
-	 * @param control
-	 */
-	private void removeToolTipControlListener(final Control control) {
-
-		control.removeListener(SWT.MouseDown, _ttControlListener);
-		control.removeListener(SWT.MouseUp, _ttControlListener);
-		control.removeListener(SWT.MouseMove, _ttControlListener);
-		control.removeListener(SWT.MouseExit, _ttControlListener);
-		control.removeListener(SWT.MouseEnter, _ttControlListener);
-
-		if (control instanceof Composite) {
-			final Control[] children = ((Composite) control).getChildren();
-			for (final Control child : children) {
-				removeToolTipControlListener(child);
-			}
-		}
-	}
-
-	/**
 	 * Reparent shell
 	 * 
 	 * @param newReparentedShell
@@ -1119,7 +1044,7 @@ public abstract class PhotoToolTipShell {
 
 		final Shell prevShell = _visibleShell;
 
-		removeToolTipControlListener(prevShell);
+		ttControlsRemoveListener(prevShell);
 
 		final Rectangle prevShellBounds = prevShell.getBounds();
 
@@ -1191,7 +1116,7 @@ public abstract class PhotoToolTipShell {
 		// hide previous shell
 		prevShell.setVisible(false);
 
-		addToolTipControlListener(newReparentedShell);
+		ttControlsAddListener(newReparentedShell);
 	}
 
 	protected void restoreState(final IDialogSettings state) {
@@ -1249,6 +1174,17 @@ public abstract class PhotoToolTipShell {
 		_isShellToggled = true;
 	}
 
+	private void setShellVisible(final boolean isVisible) {
+
+		_visibleShell.setVisible(isVisible);
+
+		if (isVisible) {
+			ttDisplayAddListener();
+		} else {
+			ttDisplayRemoveListener();
+		}
+	}
+
 	protected void showAtDefaultLocation() {
 
 		if (_visibleShell == null || _visibleShell.isDisposed()) {
@@ -1288,6 +1224,66 @@ public abstract class PhotoToolTipShell {
 		ttShow();
 	}
 
+	/**
+	 * ########################### Recursive #########################################<br>
+	 * <p>
+	 * Add listener to all controls within the tooltip
+	 * <p>
+	 * ########################### Recursive #########################################<br>
+	 * 
+	 * @param control
+	 */
+	private void ttControlsAddListener(final Control control) {
+
+		control.addListener(SWT.MouseDown, _ttControlListener);
+		control.addListener(SWT.MouseUp, _ttControlListener);
+		control.addListener(SWT.MouseMove, _ttControlListener);
+		control.addListener(SWT.MouseExit, _ttControlListener);
+		control.addListener(SWT.MouseEnter, _ttControlListener);
+
+		if (control instanceof Composite) {
+			final Control[] children = ((Composite) control).getChildren();
+			for (final Control child : children) {
+				ttControlsAddListener(child);
+			}
+		}
+	}
+
+	/**
+	 * ########################### Recursive #########################################<br>
+	 * <p>
+	 * Removes listener from all controls within the tooltip
+	 * <p>
+	 * ########################### Recursive #########################################<br>
+	 * 
+	 * @param control
+	 */
+	private void ttControlsRemoveListener(final Control control) {
+
+		control.removeListener(SWT.MouseDown, _ttControlListener);
+		control.removeListener(SWT.MouseUp, _ttControlListener);
+		control.removeListener(SWT.MouseMove, _ttControlListener);
+		control.removeListener(SWT.MouseExit, _ttControlListener);
+		control.removeListener(SWT.MouseEnter, _ttControlListener);
+
+		if (control instanceof Composite) {
+			final Control[] children = ((Composite) control).getChildren();
+			for (final Control child : children) {
+				ttControlsRemoveListener(child);
+			}
+		}
+	}
+
+	private void ttDisplayAddListener() {
+
+		_display.addFilter(SWT.MouseMove, _ttDisplayListener);
+	}
+
+	private void ttDisplayRemoveListener() {
+
+		_display.removeFilter(SWT.MouseMove, _ttDisplayListener);
+	}
+
 	private void ttDispose(final Event event) {
 
 		if (_visibleShell == null || _visibleShell.isDisposed()) {
@@ -1297,6 +1293,7 @@ public abstract class PhotoToolTipShell {
 		// hide tooltip definitively
 
 		ownerShellRemoveListener();
+		ttDisplayRemoveListener();
 
 		passOnEvent(_shellWithResize, event);
 		_shellWithResize.dispose();
