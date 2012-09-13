@@ -25,14 +25,9 @@ import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -40,7 +35,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.part.PageBook;
 
 /**
  * Part of this tooltip is copied from {@link ToolTip}.
@@ -72,39 +66,40 @@ public abstract class PhotoToolTipShell {
 	private static final int		ALPHA_OPAQUE						= 0xff;
 
 	private static final String		STATE_PHOTO_HORIZ_TOOL_TIP_WIDTH	= "STATE_PHOTO_HORIZ_TOOL_TIP_WIDTH";	//$NON-NLS-1$
+
 	private static final String		STATE_PHOTO_HORIZ_TOOL_TIP_HEIGHT	= "STATE_PHOTO_HORIZ_TOOL_TIP_HEIGHT";	//$NON-NLS-1$
 	private static final String		STATE_PHOTO_VERT_TOOL_TIP_WIDTH		= "STATE_PHOTO_VERT_TOOL_TIP_WIDTH";	//$NON-NLS-1$
 	private static final String		STATE_PHOTO_VERT_TOOL_TIP_HEIGHT	= "STATE_PHOTO_VERT_TOOL_TIP_HEIGHT";	//$NON-NLS-1$
-
 	private static final int		MIN_SHELL_HORIZ_HEIGHT				= 60;
+
 	private static final int		MIN_SHELL_HORIZ_WIDTH				= 100;
 	private static final int		MIN_SHELL_VERT_HEIGHT				= 150;
 	private static final int		MIN_SHELL_VERT_WIDTH				= 100;
-
 	private OwnerControlListener	_ownerControlListener;
-	private OwnerShellListener		_ownerShellListener;
 
+	private OwnerShellListener		_ownerShellListener;
 	private ToolTipShellListener	_ttShellListener;
+
 	private ToolTipControlListener	_ttControlListener;
 	private ToolTipDisplayListener	_ttDisplayListener;
-
 	private boolean					_isShellToggled;
+
 	private boolean					_isShellFadingOut;
 	private boolean					_isShellFadingIn;
-
 	private Point					_shellStartLocation;
+
 	private Point					_shellEndLocation;
 	private int						_animationStepCounter;
 	private int						_fadeOutDelayCounter;
 	private boolean					_isShellMovingEnabled;
-	private int						_horizContentWidth					= MIN_SHELL_HORIZ_WIDTH;
 
+	private int						_horizContentWidth					= MIN_SHELL_HORIZ_WIDTH;
 	private int						_horizContentHeight					= MIN_SHELL_HORIZ_HEIGHT;
 	private int						_vertContentWidth					= MIN_SHELL_VERT_WIDTH;
 	private int						_vertContentHeight					= MIN_SHELL_VERT_HEIGHT;
-	private int						_shellTrimWidth;
-	private int						_shellTrimHeight;
+
 	private final AnimationTimer	_animationTimer;
+	private boolean					_isInShellResize;
 
 	/*
 	 * UI resources
@@ -119,17 +114,10 @@ public abstract class PhotoToolTipShell {
 	 * Tooltip shell which is currently be visible
 	 */
 	private Shell					_visibleShell;
-	private Shell					_shellWithResize;
-	private Shell					_shellNoResize;
+
+	private RRShell					_rrShellWithResize;
+	private RRShell					_rrShellNoResize;
 	private Control					_ownerControl;
-
-	private PageBook				_resizeShellBook;
-
-	private Composite				_resizeShellPageShell;
-	private Composite				_resizeShellPageTempImage;
-	private Image					_shellTempImage;
-
-	private boolean					_isInShellResize;
 
 	private final class AnimationTimer implements Runnable {
 		@Override
@@ -160,7 +148,7 @@ public abstract class PhotoToolTipShell {
 
 	}
 
-	public class ToolTipDisplayListener implements Listener {
+	private class ToolTipDisplayListener implements Listener {
 		public void handleEvent(final Event event) {
 
 			switch (event.type) {
@@ -241,15 +229,15 @@ public abstract class PhotoToolTipShell {
 			 * NoResize shell size is not set during resize event because the shell is empty and
 			 * size is set to 2,2
 			 */
-			_shellNoResize.setSize(size);
+			_rrShellNoResize.setSize(size);
 //			_shellNoResize.pack();
 //			_shellNoResize.layout();
 
 //			}
 
-			reparentShell(_shellNoResize);
+			reparentShell(_rrShellNoResize);
 
-			_shellNoResize.setAlpha(0xff);
+			_rrShellNoResize.setAlpha(0xff);
 
 			setShellVisible(true);
 
@@ -287,7 +275,7 @@ public abstract class PhotoToolTipShell {
 
 				_visibleShell.setLocation(_shellStartLocation);
 
-				reparentShell(_shellNoResize);
+				reparentShell(_rrShellNoResize);
 
 				setShellVisible(true);
 			}
@@ -435,45 +423,44 @@ public abstract class PhotoToolTipShell {
 		/*
 		 * resize shell
 		 */
-		_shellWithResize = createUI_10_Shell(_ownerControl.getShell(), //
+		_rrShellWithResize.createUI(createUI_10_Shell(_ownerControl.getShell(), //
 				SWT.ON_TOP //
 //						| SWT.TOOL
 						| SWT.RESIZE
 						| SWT.NO_FOCUS,
-				Messages.Photo_Tooltip_Label_ShellWithResize);
-		_shellWithResize.addControlListener(new ControlAdapter() {
+				Messages.Photo_Tooltip_Label_ShellWithResize));
+
+		_rrShellWithResize.getShell().addControlListener(new ControlAdapter() {
 			@Override
 			public void controlResized(final ControlEvent e) {
 				onTTShellResize(e);
 			}
 		});
-		{
-			_resizeShellBook = new PageBook(_shellWithResize, SWT.NONE);
-			_resizeShellPageShell = createUI_40_ResizePageShell(_resizeShellBook);
-			_resizeShellPageTempImage = createUI_50_ResizePageShellImage(_resizeShellBook);
-		}
 
 		/*
 		 * no resize shell
 		 */
-		_shellNoResize = createUI_10_Shell(_ownerControl.getShell(), //
+		_rrShellNoResize.createUI(createUI_10_Shell(_ownerControl.getShell(), //
 				SWT.ON_TOP //
 //						| SWT.TOOL
 						| SWT.NO_FOCUS,
-				Messages.Photo_Tooltip_Label_ShellNoResize);
+				Messages.Photo_Tooltip_Label_ShellNoResize));
 
-		_visibleShell = _shellNoResize;
+		_visibleShell = _rrShellNoResize.getShell();
 
 		final Point contentSize = getContentSize();
 		final int contentWidth = contentSize.x;
 		final int contentHeight = contentSize.y;
 
-		final Rectangle contentWithTrim = _shellWithResize.computeTrim(0, 0, contentWidth, contentHeight);
+		final Rectangle contentWithTrim = _rrShellWithResize.getShell().computeTrim(0, 0, contentWidth, contentHeight);
 
-		_shellTrimWidth = (contentWithTrim.width - contentWidth) / 2;
+		final int _shellTrimWidth = (contentWithTrim.width - contentWidth) / 2;
 		_shellTrimHeight = (contentWithTrim.height - contentHeight) / 2;
 
-		_shellWithResize.setSize(contentWithTrim.width, contentWithTrim.height);
+		_rrShellNoResize.setTrimSize(false, _shellTrimWidth, _shellTrimHeight);
+		_rrShellWithResize.setTrimSize(true, _shellTrimWidth, _shellTrimHeight);
+
+		_rrShellWithResize.setSize(contentWithTrim.width, contentWithTrim.height);
 
 		ownerShellAddListener();
 
@@ -500,34 +487,6 @@ public abstract class PhotoToolTipShell {
 		shell.setSize(getContentSize());
 
 		return shell;
-	}
-
-	private Composite createUI_40_ResizePageShell(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		container.setLayout(new FillLayout());
-
-		return container;
-	}
-
-	private Composite createUI_50_ResizePageShellImage(final Composite parent) {
-
-		final Canvas resizeCanvas = new Canvas(//
-				parent,
-//				SWT.NO_BACKGROUND | SWT.NO_REDRAW_RESIZE//
-				SWT.NONE //
-		);
-
-		resizeCanvas.setLayout(new FillLayout());
-
-		resizeCanvas.addPaintListener(new PaintListener() {
-			@Override
-			public void paintControl(final PaintEvent e) {
-				onPaintResizeShellImage(e);
-			}
-		});
-
-		return resizeCanvas;
 	}
 
 	private void delay() {
@@ -684,17 +643,6 @@ public abstract class PhotoToolTipShell {
 		}
 	}
 
-	private void onPaintResizeShellImage(final PaintEvent event) {
-
-		final GC gc = event.gc;
-
-//		final Rectangle bounds = gc.getClipping();
-//		gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
-//		gc.fillRectangle(bounds);
-
-		gc.drawImage(_shellTempImage, 0, 0);
-	}
-
 	protected abstract void onStartHide();
 
 	private void onTTControlEvent(final Event event) {
@@ -711,7 +659,7 @@ public abstract class PhotoToolTipShell {
 				_isShellMovingEnabled = false;
 			}
 
-			reparentShell(_shellWithResize);
+			reparentShell(_rrShellWithResize);
 
 			break;
 
@@ -758,7 +706,7 @@ public abstract class PhotoToolTipShell {
 
 			// mouse is not within the tooltip shell rectangle
 
-			reparentShell(_shellNoResize);
+			reparentShell(_rrShellNoResize);
 
 			ttHide(event);
 		}
@@ -932,12 +880,14 @@ public abstract class PhotoToolTipShell {
 		System.out.println(UI.timeStampNano() + " onTTShellResize()"); //$NON-NLS-1$
 		// TODO remove SYSTEM.OUT.PRINTLN
 
-		final Rectangle shellClientArea = _shellWithResize.getClientArea();
+		final Shell resizeShell = _rrShellWithResize.getShell();
+
+		final Rectangle shellClientArea = resizeShell.getClientArea();
 
 		int newContentWidth = shellClientArea.width;
 		int newContentHeight = shellClientArea.height;
 
-		final Point newShellLocation = _shellWithResize.getLocation();
+		final Point newShellLocation = resizeShell.getLocation();
 
 		final Rectangle displayBounds = getDisplayBounds(newShellLocation);
 
@@ -974,7 +924,7 @@ public abstract class PhotoToolTipShell {
 		if (isResizeAdjusted) {
 			_isInShellResize = true;
 			{
-				_shellWithResize.setSize(newContentWidth, newContentHeight);
+				_rrShellWithResize.setSize(newContentWidth, newContentHeight);
 			}
 			_isInShellResize = false;
 		}
@@ -1035,9 +985,9 @@ public abstract class PhotoToolTipShell {
 	 * @param newReparentedShell
 	 *            Shell which should be used to display {@link #_ttContentArea}.
 	 */
-	private void reparentShell(final Shell newReparentedShell) {
+	private void reparentShell(final RRShell newReparentedShell) {
 
-		if (_visibleShell == newReparentedShell) {
+		if (_visibleShell == newReparentedShell.getShell()) {
 			// shell is already visible
 			return;
 		}
@@ -1046,69 +996,35 @@ public abstract class PhotoToolTipShell {
 
 		ttControlsRemoveListener(prevShell);
 
-		final Rectangle prevShellBounds = prevShell.getBounds();
+		_visibleShell = newReparentedShell.getShell();
 
-		_visibleShell = newReparentedShell;
-
-		if (newReparentedShell == _shellWithResize) {
+		if (newReparentedShell == _rrShellWithResize) {
 
 			// setup resize shell
 
-			/*
-			 * copy NoResize shell image into the resize shell, to prevent flickering
-			 */
-			_shellTempImage = new Image(_display, prevShellBounds);
-
-			final GC gc = new GC(_shellNoResize);
-			gc.copyArea(_shellTempImage, 0, 0);
-			gc.dispose();
-
-//			delay();
-
-			_resizeShellBook.showPage(_resizeShellPageTempImage);
-
-			_shellWithResize.setLocation(//
-					prevShellBounds.x - _shellTrimWidth,
-					prevShellBounds.y - _shellTrimHeight//
-			);
-
-			_shellWithResize.setAlpha(0x0);
-
-			/*
-			 * this will paint the shell image before reparenting takes place
-			 */
-			_shellWithResize.setVisible(true);
-
-			_shellWithResize.setAlpha(0xff);
-
-			prevShell.setAlpha(0);
-
-			// reparent UI container
-			_ttContentArea.setParent(_resizeShellPageShell);
-
-			_resizeShellBook.showPage(_resizeShellPageShell);
-
-			_shellTempImage.dispose();
+			_rrShellWithResize.reparentFromShell(_rrShellNoResize, _ttContentArea);
 
 		} else {
 
 			// setup no resize shell
 
-			final int currentAlpha = _shellNoResize.getAlpha();
-			_shellNoResize.setAlpha(0x0);
+			final Rectangle prevShellBounds = prevShell.getBounds();
 
-			_shellNoResize.setVisible(true);
+			final int currentAlpha = _rrShellNoResize.getAlpha();
+			_rrShellNoResize.setAlpha(0x0);
 
-			_shellNoResize.setLocation(//
+			_rrShellNoResize.setVisible(true);
+
+			_rrShellNoResize.setLocation(//
 					prevShellBounds.x - _shellTrimWidth - 0,
 					prevShellBounds.y - _shellTrimHeight - 0 //
 			);
-			_shellNoResize.setSize(getContentSize());
+			_rrShellNoResize.setSize(getContentSize());
 
 			// reparent UI container
-			_ttContentArea.setParent(_shellNoResize);
+			_ttContentArea.setParent(_rrShellNoResize);
 
-			_shellNoResize.setAlpha(currentAlpha);
+			_rrShellNoResize.setAlpha(currentAlpha);
 
 			prevShell.setAlpha(0);
 		}
@@ -1295,13 +1211,11 @@ public abstract class PhotoToolTipShell {
 		ownerShellRemoveListener();
 		ttDisplayRemoveListener();
 
-		passOnEvent(_shellWithResize, event);
-		_shellWithResize.dispose();
-		_shellWithResize = null;
+		passOnEvent(_rrShellWithResize.getShell(), event);
+		_rrShellWithResize.dispose();
 
-		passOnEvent(_shellNoResize, event);
-		_shellNoResize.dispose();
-		_shellNoResize = null;
+		passOnEvent(_rrShellNoResize.getShell(), event);
+		_rrShellNoResize.dispose();
 	}
 
 	private void ttHide(final Event event) {
