@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
-import net.tourbook.common.UI;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
@@ -61,33 +59,36 @@ abstract class AbstractRRShell {
 		_isResizeable = isResizeable;
 
 		_shell = new Shell(parentShell, style);
+		_shell.setLayout(new FillLayout());
 
 		_shell.setText(shellTitle);
-		_shell.setLayout(new FillLayout());
-		_shell.setSize(getContentSize());
 
 		setTrimSize();
 
-//		_shell.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+		setContentSize(getContentSize());
+
+		_shell.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 
 		_shellBook = new PageBook(_shell, SWT.NONE);
 		{
-			_pageShell = createUI_10_ResizePageShell(_shellBook);
-			_pageReparentableImage = createUI_20_ResizePageShellImage(_shellBook);
+			_pageShell = createUI_10_PageShellContent(_shellBook);
+			_pageReparentableImage = createUI_20_PageShellImage(_shellBook);
 		}
+
+		_shellBook.showPage(_pageShell);
 	}
 
-	private Composite createUI_10_ResizePageShell(final Composite parent) {
+	private Composite createUI_10_PageShellContent(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		container.setLayout(new FillLayout());
 
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
 		return container;
 	}
 
-	private Composite createUI_20_ResizePageShellImage(final Composite parent) {
+	private Composite createUI_20_PageShellImage(final Composite parent) {
 
 		final Canvas resizeCanvas = new Canvas(//
 				parent,
@@ -97,7 +98,7 @@ abstract class AbstractRRShell {
 
 		resizeCanvas.setLayout(new FillLayout());
 
-//		resizeCanvas.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_CYAN));
+		resizeCanvas.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_CYAN));
 
 		resizeCanvas.addPaintListener(new PaintListener() {
 			@Override
@@ -129,7 +130,31 @@ abstract class AbstractRRShell {
 		return _shell;
 	}
 
+	public Point getShellLocation(final Point contentLocation) {
+
+		final int shellX = contentLocation.x - _shellTrimWidth;
+		final int shellY = contentLocation.y - _shellTrimHeight;
+
+		return new Point(shellX, shellY);
+	}
+
+	public Composite getShellPage() {
+		return _pageShell;
+	}
+
+	public Point getShellSize(final Point contentSize) {
+
+		final int shellWidth = contentSize.x + _shellTrimWidth * 2;
+		final int shellHeight = contentSize.y + _shellTrimHeight * 2;
+
+		return new Point(shellWidth, shellHeight);
+	}
+
 	private void onPaintShellImage(final PaintEvent event) {
+
+		if (_otherShellImage == null || _otherShellImage.isDisposed()) {
+			return;
+		}
 
 		final GC gc = event.gc;
 
@@ -170,9 +195,10 @@ abstract class AbstractRRShell {
 
 			/*
 			 * set size ONLY for the shell without resize, size for shell with resize is set by the
-			 * user by resizing the window
+			 * user by resizing the window, when size is not set, the shell is empty and default
+			 * size is 2x2
 			 */
-			_shell.setSize(getContentSize());
+			setContentSize(getContentSize());
 		}
 
 		_shell.setAlpha(0x0);
@@ -198,20 +224,16 @@ abstract class AbstractRRShell {
 		_shell.setAlpha(alpha);
 	}
 
-	public void setSize(final int width, final int height) {
+	public void setContentSize(final int width, final int height) {
 
-		_shell.setSize(width, height);
+		final int shellWidth = width + _shellTrimWidth * 2;
+		final int shellHeight = height + _shellTrimHeight * 2;
 
-		System.out.println(UI.timeStampNano() + " setSize 1\t" + width + " x " + height);
-		// TODO remove SYSTEM.OUT.PRINTLN
+		_shell.setSize(shellWidth, shellHeight);
 	}
 
-	public void setSize(final Point size) {
-
-		_shell.setSize(size);
-
-		System.out.println(UI.timeStampNano() + " setSize 2\t" + size);
-		// TODO remove SYSTEM.OUT.PRINTLN
+	private void setContentSize(final Point size) {
+		setContentSize(size.x, size.y);
 	}
 
 	private void setTrimSize() {
@@ -222,9 +244,6 @@ abstract class AbstractRRShell {
 		final int contentHeight = contentSize.y;
 
 		final Rectangle contentWithTrim = _shell.computeTrim(0, 0, contentWidth, contentHeight);
-
-		System.out.println(UI.timeStampNano() + " shell trim " + contentWithTrim);
-		// TODO remove SYSTEM.OUT.PRINTLN
 
 		final int shellTrimWidth = contentWithTrim.width - contentWidth;
 		final int shellTrimHeight = contentWithTrim.height - contentHeight;

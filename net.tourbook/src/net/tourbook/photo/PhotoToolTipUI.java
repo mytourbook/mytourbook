@@ -64,9 +64,6 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 	private boolean							_isVerticalGallery;
 
-	private Color							_fgColor;
-	private Color							_bgColor;
-
 	/*
 	 * UI controls
 	 */
@@ -334,51 +331,26 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 		final String galleryPositionKey = hoveredPhotosHash + "_PhotoToolTipUI";//$NON-NLS-1$
 
-		
 		_imageGallery.showImages(_photoWrapperList, galleryPositionKey);
 	}
 
 	private void updateUI_Colors(final Composite parent) {
 
 		final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
-		_fgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND);
-		_bgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
-//		_fgColor = Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA);
-//		_bgColor = Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW);
-		final Color selectionFgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_SELECTION_FOREGROUND);
+		final Color fgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND);
+		final Color bgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
 
+//		final Color fgColor = Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA);
+//		final Color bgColor = Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW);
+
+		final Color selectionFgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_SELECTION_FOREGROUND);
 		final Color noFocusSelectionFgColor = Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND);
 
-		_galleryContainer.setForeground(_fgColor);
-		_galleryContainer.setBackground(_bgColor);
+		_galleryContainer.setForeground(fgColor);
+		_galleryContainer.setBackground(bgColor);
 
-		_imageGallery.updateColors(_fgColor, _bgColor, selectionFgColor, noFocusSelectionFgColor, true);
-
-//		updateUI_Colors_ChildColors(parent);
+		_imageGallery.updateColors(fgColor, bgColor, selectionFgColor, noFocusSelectionFgColor, true);
 	}
-
-//	/**
-//	 * !!! This is recursive !!!
-//	 *
-//	 * @param child
-//	 */
-//	private void updateUI_Colors_ChildColors(final Control child) {
-//
-//		child.setBackground(_bgColor);
-//		child.setForeground(_fgColor);
-//
-//		if (child instanceof Composite) {
-//
-//			final Control[] children = ((Composite) child).getChildren();
-//
-//			for (final Control element : children) {
-//
-//				if (element != null && element.isDisposed() == false) {
-//					updateUI_Colors_ChildColors(element);
-//				}
-//			}
-//		}
-//	}
 
 	private void updateUI_ToogleAction() {
 

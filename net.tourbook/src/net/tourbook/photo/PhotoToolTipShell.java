@@ -75,31 +75,46 @@ public abstract class PhotoToolTipShell {
 
 	private static final int		MIN_SHELL_VERT_HEIGHT				= 150;
 	private static final int		MIN_SHELL_VERT_WIDTH				= 100;
+
 	private OwnerControlListener	_ownerControlListener;
 	private OwnerShellListener		_ownerShellListener;
-
 	private ToolTipShellListener	_ttShellListener;
 	private ToolTipControlListener	_ttControlListener;
-
 	private ToolTipDisplayListener	_ttDisplayListener;
+
 	private boolean					_isShellToggled;
+
+	/**
+	 * Is <code>true</code> when shell is fading out, otherwise <code>false</code>.
+	 */
 	private boolean					_isShellFadingOut;
 
+	/**
+	 * Is <code>true</code> when shell is fading in, otherwise <code>false</code>.
+	 */
 	private boolean					_isShellFadingIn;
+
 	private Point					_shellStartLocation;
 	private Point					_shellEndLocation;
 
 	private int						_animationStepCounter;
 	private int						_fadeOutDelayCounter;
 	private boolean					_isShellMovingEnabled;
-	private int						_horizContentWidth					= MIN_SHELL_HORIZ_WIDTH;
 
+	private int						_horizContentWidth					= MIN_SHELL_HORIZ_WIDTH;
 	private int						_horizContentHeight					= MIN_SHELL_HORIZ_HEIGHT;
 	private int						_vertContentWidth					= MIN_SHELL_VERT_WIDTH;
 	private int						_vertContentHeight					= MIN_SHELL_VERT_HEIGHT;
+
 	private final AnimationTimer	_animationTimer;
 
 	private boolean					_isInShellResize;
+	private boolean					_isKeepToolTipOpen;
+
+	private AbstractRRShell			_visibleRRShell;
+	private AbstractRRShell			_rrShellWithResize;
+	private AbstractRRShell			_rrShellNoResize;
+
 	/*
 	 * UI resources
 	 */
@@ -114,9 +129,6 @@ public abstract class PhotoToolTipShell {
 	 */
 	private Shell					_visibleShell;
 
-	private AbstractRRShell			_rrShellWithResize;
-
-	private AbstractRRShell			_rrShellNoResize;
 	private Control					_ownerControl;
 
 	private final class AnimationTimer implements Runnable {
@@ -212,9 +224,9 @@ public abstract class PhotoToolTipShell {
 
 	private void animation10_Start() {
 
-		final int a = 1;
+		final int a = 0;
 
-		if (a == 0) {
+		if (a == 1) {
 			animation10_Start_Simple();
 		} else {
 			animation10_StartKomplex();
@@ -236,17 +248,6 @@ public abstract class PhotoToolTipShell {
 
 			_visibleShell.setLocation(shellLocation);
 
-//			if (_visibleShell == _shellNoResize) {
-			/*
-			 * NoResize shell size is not set during resize event because the shell is empty and
-			 * size is set to 2,2
-			 */
-//			_rrShellNoResize.setSize(size);
-//			_shellNoResize.pack();
-//			_shellNoResize.layout();
-
-//			}
-
 			reparentShell(_rrShellNoResize);
 
 			_rrShellNoResize.setAlpha(0xff);
@@ -265,40 +266,65 @@ public abstract class PhotoToolTipShell {
 
 		// fading out has no movement
 
-		if (_isShellFadingIn) {
+		if (_isKeepToolTipOpen) {
 
-			// set fading in location
+			_isKeepToolTipOpen = false;
 
-			final Point size = _visibleShell.getSize();
+			final Point shellCurrentLocation = _visibleShell.getLocation();
 
-			_shellEndLocation = fixupDisplayBounds(size, getLocation(size));
+			_shellStartLocation = _shellEndLocation = shellCurrentLocation;
 
-			if (_visibleShell.isVisible()) {
-
-				// shell is already visible, move from the current position to the target position
-
-				_shellStartLocation = _visibleShell.getLocation();
-
-			} else {
-
-				// shell is not visible, set position directly without moving animation, do only fading animation
-
-				_shellStartLocation = _shellEndLocation;
-
-				_visibleShell.setLocation(_shellStartLocation);
-
-				reparentShell(_rrShellNoResize);
-
-				setShellVisible(true);
-			}
+			_isShellFadingIn = true;
+			_isShellFadingOut = false;
 
 			_animationStepCounter = 0;
 
-		}
+		} else {
 
-		if (_isShellFadingOut) {
+			if (_isShellFadingIn) {
 
-			_fadeOutDelayCounter = 0;
+				// set fading in location
+
+				final Point contentSize = _visibleRRShell.getContentSize();
+
+				final Point contentLocation = getLocation(contentSize);
+
+				final Point shellSize = _visibleRRShell.getShellSize(contentSize);
+				final Point shellLocation = _visibleRRShell.getShellLocation(contentLocation);
+
+				System.out.println(UI.timeStampNano() + " size: " + contentSize + "  ttLocation: " + contentLocation);
+				// TODO remove SYSTEM.OUT.PRINTLN
+
+				_shellEndLocation = fixupDisplayBounds(shellSize, shellLocation);
+
+				if (_visibleShell.isVisible()) {
+
+					// shell is already visible, move from the current position to the target position
+
+					System.out.println(UI.timeStampNano() + " shell is visible\t");
+					// TODO remove SYSTEM.OUT.PRINTLN
+
+					_shellStartLocation = _visibleShell.getLocation();
+
+				} else {
+
+					// shell is not visible, set position directly without moving animation, do only fading animation
+
+					_shellStartLocation = _shellEndLocation;
+
+					_visibleShell.setLocation(_shellStartLocation);
+
+					reparentShell(_rrShellNoResize);
+
+					setShellVisible(true);
+				}
+
+				_animationStepCounter = 0;
+			}
+
+			if (_isShellFadingOut) {
+				_fadeOutDelayCounter = 0;
+			}
 		}
 
 		_isShellMovingEnabled = true;
@@ -371,7 +397,6 @@ public abstract class PhotoToolTipShell {
 
 						_visibleShell.setLocation(new Point(shellCurrentX, shellCurrentY));
 					}
-
 				}
 
 			} else if (_isShellFadingOut) {
@@ -394,6 +419,8 @@ public abstract class PhotoToolTipShell {
 					// shell is not visible any more, hide it now
 
 					_visibleShell.setAlpha(0);
+
+					// hide shell
 					setShellVisible(false);
 
 					_isShellFadingOut = false;
@@ -465,12 +492,15 @@ public abstract class PhotoToolTipShell {
 
 		ttShellAddListener(_rrShellNoResize.getShell());
 
-		_visibleShell = _rrShellNoResize.getShell();
+		setVisibleShell(_rrShellNoResize);
+
+		// set initial alpha
+		_visibleShell.setAlpha(0x0);
 
 		ownerShellAddListener();
 
 		// create UI
-		_ttContentArea = createToolTipContentArea(_visibleShell);
+		_ttContentArea = createToolTipContentArea(_rrShellNoResize.getShellPage());
 
 		ttControlsAddListener(_visibleShell);
 
@@ -666,10 +696,72 @@ public abstract class PhotoToolTipShell {
 
 	private void onTTDisplayMouseMove(final Event event) {
 
-		/*
-		 * check tooltip area as it is done in the original code because the current tooltip shell
-		 * check is not working always (often but sometimes) correctly
-		 */
+		if (_visibleShell == null || _visibleShell.isDisposed()) {
+			return;
+		}
+
+		boolean isHide = false;
+		boolean isKeepVisible = false;
+
+		// get control which is hovered with the mouse after the exit, can be null
+		final Control hoveredControl = _display.getCursorControl();
+
+		if (hoveredControl == null) {
+
+//			System.out.println(UI.timeStampNano() + " exit 0 hide");
+//			// TODO remove SYSTEM.OUT.PRINTLN
+
+			isHide = true;
+
+		} else {
+
+			/*
+			 * check if the hovered control is the owner control, if not, hide the tooltip
+			 */
+			Control hoveredParent = hoveredControl;
+
+			// move up child-parent hierarchy until shell is reached
+			while (true) {
+
+				if (hoveredParent == _visibleShell) {
+
+					// mouse is hovering in this tooltip
+
+					isKeepVisible = true;
+
+//					System.out.println(UI.timeStampNano() + " exit 1 no hide");
+//					// TODO remove SYSTEM.OUT.PRINTLN
+
+					break;
+				}
+
+				if (hoveredParent == _ownerControl) {
+
+					// mouse is hovering the owner control
+
+					isKeepVisible = true;
+
+//					System.out.println(UI.timeStampNano() + " exit 2 no hide");
+//					// TODO remove SYSTEM.OUT.PRINTLN
+
+					break;
+				}
+
+				hoveredParent = hoveredParent.getParent();
+
+				if (hoveredParent == null) {
+
+					// mouse has left the tooltip and the owner control
+
+//					System.out.println(UI.timeStampNano() + " exit 3 hide");
+//					// TODO remove SYSTEM.OUT.PRINTLN
+
+					isHide = true;
+
+					break;
+				}
+			}
+		}
 
 		/**
 		 * !!! this adjustment do not work on Linux because the tooltip gets hidden when the mouse
@@ -690,128 +782,33 @@ public abstract class PhotoToolTipShell {
 
 		final Point cursorLocation = _display.getCursorLocation();
 
-		if (!ttShellRect.contains(cursorLocation)) {
+		final boolean isInTooltip = ttShellRect.contains(cursorLocation);
 
-			// mouse is not within the tooltip shell rectangle
+		if (!isInTooltip) {
+
+			// mouse is not within the tooltip shell rectangle, reparent to NoResize shell
 
 			reparentShell(_rrShellNoResize);
-
-			ttHide(event);
 		}
-	}
 
-	private void onTTDisplayMouseMove_OLD(final Event event) {
-
-		boolean isHide = false;
-
-		// get control which is hovered with the mouse after the exit, can be null
-		final Control hoveredControl = _display.getCursorControl();
-
-		if (hoveredControl == null) {
-
-//			System.out.println(UI.timeStampNano() + " exit 0");
-//			// TODO remove SYSTEM.OUT.PRINTLN
-
+		if (isKeepVisible == false && isHide == false && isInTooltip == false) {
 			isHide = true;
-
-		} else {
-
-			/*
-			 * check if the hovered control is the owner control, if not, hide the tooltip
-			 */
-			Control hoveredParent = hoveredControl;
-//				final Control hoveredToolTip = _imageGallery.getGalleryToolTipShell();
-
-			boolean isKeepVisible = false;
-
-			// move up child-parent hierarchy until shell is reached
-			while (true) {
-
-				if (hoveredParent == _visibleShell) {
-
-					// mouse is hovering in this tooltip
-
-					isKeepVisible = true;
-
-					System.out.println(UI.timeStampNano() + " exit 1 no hide");
-					// TODO remove SYSTEM.OUT.PRINTLN
-
-					break;
-				}
-
-				if (hoveredParent == _ownerControl) {
-
-					// mouse is over the owner control
-
-					isKeepVisible = true;
-
-					System.out.println(UI.timeStampNano() + " exit 2 no hide");
-					// TODO remove SYSTEM.OUT.PRINTLN
-
-					break;
-				}
-
-				hoveredParent = hoveredParent.getParent();
-
-				if (hoveredParent == null) {
-
-					// mouse has left the tooltip and the owner control
-
-					System.out.println(UI.timeStampNano() + " exit 3 hide");
-					// TODO remove SYSTEM.OUT.PRINTLN
-
-					isHide = true;
-					break;
-				}
-			}
-
-//			if (isKeepVisible == false && isHide == false) {
-//
-//				/*
-//				 * check tooltip area as it is done in the original code because the current tooltip
-//				 * shell check is not working always (often but sometimes) correctly
-//				 */
-//
-//				/**
-//				 * !!! this adjustment do not work on Linux because the tooltip gets hidden when the
-//				 * mouse tries to mover over the tooltip <br>
-//				 * <br>
-//				 * it seems to work on windows and linux with margin 1, when set to 0 the tooltip do
-//				 * sometime not be poped up again and the i-icons is not deaktivated<br>
-//				 * wolfgang 2010-07-23
-//				 */
-//
-//				final Rectangle ttShellRect = _visibleShell.getBounds();
-//				final int margin = 5;
-//
-//				ttShellRect.x -= margin;
-//				ttShellRect.y -= margin;
-//				ttShellRect.width += 2 * margin;
-//				ttShellRect.height += 2 * margin;
-//
-//				final Point cursorLocation = _display.getCursorLocation();
-//
-//				if (!ttShellRect.contains(cursorLocation)) {
-//
-//					// mouse is not within the tooltip shell rectangle
-//
-//					System.out.println(UI.timeStampNano() + "\texit 4 hide"); //$NON-NLS-1$
-//					// TODO remove SYSTEM.OUT.PRINTLN
-//
-//					isHide = true;
-//
-//				} else {
-//
-//					System.out.println(UI.timeStampNano() + "\texit 4 no hide"); //$NON-NLS-1$
-//					// TODO remove SYSTEM.OUT.PRINTLN
-//				}
-//			}
 		}
 
-		if (isHide) {
+		if (isInTooltip && _isShellFadingOut) {
+
+			// don't hide when mouse is hovering hiding tooltip
+
+			_isKeepToolTipOpen = true;
+
+			ttShow();
+
+		} else if (isHide) {
+
+			// hide definitively
+
 			ttHide(event);
 		}
-
 	}
 
 	private void onTTShellEvent(final Event event) {
@@ -865,25 +862,19 @@ public abstract class PhotoToolTipShell {
 			return;
 		}
 
-		System.out.println(UI.timeStampNano() + " onTTShellResize()"); //$NON-NLS-1$
-		// TODO remove SYSTEM.OUT.PRINTLN
-
 		final Shell resizeShell = _rrShellWithResize.getShell();
-
-		final Rectangle shellClientArea = resizeShell.getClientArea();
-
-		int newContentWidth = shellClientArea.width;
-		int newContentHeight = shellClientArea.height;
-
-		final Point newShellLocation = resizeShell.getLocation();
-
-		final Rectangle displayBounds = getDisplayBounds(newShellLocation);
+		final Point shellLocation = resizeShell.getLocation();
 
 		// ensure tooltip is not too large
+		final Rectangle displayBounds = getDisplayBounds(shellLocation);
 		final double maxHeight = displayBounds.height * 0.8;
 		final double maxWidth = displayBounds.width * 0.95;
 
 		boolean isResizeAdjusted = false;
+
+		final Rectangle clientArea = resizeShell.getClientArea();
+		int newContentWidth = clientArea.width;
+		int newContentHeight = clientArea.height;
 
 		if (newContentHeight > maxHeight) {
 			newContentHeight = (int) maxHeight;
@@ -912,7 +903,7 @@ public abstract class PhotoToolTipShell {
 		if (isResizeAdjusted) {
 			_isInShellResize = true;
 			{
-				_rrShellWithResize.setSize(newContentWidth, newContentHeight);
+				_rrShellWithResize.setContentSize(newContentWidth, newContentHeight);
 			}
 			_isInShellResize = false;
 		}
@@ -984,7 +975,7 @@ public abstract class PhotoToolTipShell {
 
 		ttControlsRemoveListener(prevShell);
 
-		_visibleShell = newReparentedShell.getShell();
+		setVisibleShell(newReparentedShell);
 
 		if (newReparentedShell == _rrShellWithResize) {
 
@@ -997,26 +988,6 @@ public abstract class PhotoToolTipShell {
 			// setup no resize shell
 
 			_rrShellNoResize.reparentFromOtherShell(_rrShellWithResize, _ttContentArea);
-
-//			final Rectangle prevShellBounds = prevShell.getBounds();
-//
-//			final int currentAlpha = _rrShellNoResize.getAlpha();
-//			_rrShellNoResize.setAlpha(0x0);
-//
-//			_rrShellNoResize.setVisible(true);
-//
-//			_rrShellNoResize.setLocation(//
-//					prevShellBounds.x - _shellTrimWidth - 0,
-//					prevShellBounds.y - _shellTrimHeight - 0 //
-//			);
-//			_rrShellNoResize.setSize(getContentSize());
-//
-//			// reparent UI container
-//			_ttContentArea.setParent(_rrShellNoResize);
-//
-//			_rrShellNoResize.setAlpha(currentAlpha);
-//
-//			prevShell.setAlpha(0);
 		}
 
 		// hide previous shell
@@ -1089,6 +1060,17 @@ public abstract class PhotoToolTipShell {
 		} else {
 			ttDisplayRemoveListener();
 		}
+	}
+
+	/**
+	 * Set shell which is currently be visible.
+	 * 
+	 * @param rrShell
+	 */
+	private void setVisibleShell(final AbstractRRShell rrShell) {
+
+		_visibleRRShell = rrShell;
+		_visibleShell = rrShell.getShell();
 	}
 
 	protected void showAtDefaultLocation() {
@@ -1210,8 +1192,6 @@ public abstract class PhotoToolTipShell {
 
 	private void ttHide(final Event event) {
 
-		onStartHide();
-
 		if (_visibleShell == null || _visibleShell.isDisposed() || _visibleShell.isVisible() == false) {
 			return;
 		}
@@ -1226,6 +1206,8 @@ public abstract class PhotoToolTipShell {
 
 		_isShellFadingIn = false;
 		_isShellFadingOut = true;
+
+		onStartHide();
 
 		animation10_Start();
 	}
