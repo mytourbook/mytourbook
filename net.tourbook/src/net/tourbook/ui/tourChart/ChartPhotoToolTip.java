@@ -56,10 +56,10 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 	}
 
 	@Override
-	public Point getLocation(final Point tipSize) {
+	public Point getContentLocation(final Point tipSize) {
 
 		final int chartHeight = _tourChart.getBounds().height;
-		final int chartMarginTop = _tourChart.getMarginTop();
+//		final int chartMarginTop = _tourChart.getMarginTop();
 		final Point chartDisplay = _tourChart.toDisplay(0, 0);
 
 		final int itemPosX = _tourChart.getLeftAxisWidth() + _devXHoveredPhoto;
@@ -73,7 +73,7 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 		final int ttPosX = itemPosX - tipWidth2;
 
 		// set vertical position at the top of the upper most graph
-		final int ttPosY = -tipHeight + chartMarginTop;
+		final int ttPosY = -tipHeight;//+ chartMarginTop;
 
 		final Point ttLocation = _tourChart.toDisplay(ttPosX, ttPosY);
 

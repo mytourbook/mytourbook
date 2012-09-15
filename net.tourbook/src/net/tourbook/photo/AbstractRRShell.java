@@ -18,6 +18,7 @@ package net.tourbook.photo;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -67,7 +68,7 @@ abstract class AbstractRRShell {
 
 		setContentSize(getContentSize());
 
-		_shell.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+//		_shell.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 
 		_shellBook = new PageBook(_shell, SWT.NONE);
 		{
@@ -83,7 +84,7 @@ abstract class AbstractRRShell {
 		final Composite container = new Composite(parent, SWT.NONE);
 		container.setLayout(new FillLayout());
 
-		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
 		return container;
 	}
@@ -98,7 +99,7 @@ abstract class AbstractRRShell {
 
 		resizeCanvas.setLayout(new FillLayout());
 
-		resizeCanvas.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_CYAN));
+//		resizeCanvas.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_CYAN));
 
 		resizeCanvas.addPaintListener(new PaintListener() {
 			@Override
@@ -150,6 +151,14 @@ abstract class AbstractRRShell {
 		return new Point(shellWidth, shellHeight);
 	}
 
+	public int getShellTrimHeight() {
+		return _shellTrimHeight;
+	}
+
+	public int getShellTrimWidth() {
+		return _shellTrimWidth;
+	}
+
 	private void onPaintShellImage(final PaintEvent event) {
 
 		if (_otherShellImage == null || _otherShellImage.isDisposed()) {
@@ -169,7 +178,7 @@ abstract class AbstractRRShell {
 
 		final Shell otherShell = otherRRShell.getShell();
 
-		final Rectangle otherBounds = otherShell.getBounds();
+		final Rectangle otherShellBounds = otherShell.getBounds();
 		final Rectangle otherClientAreaBounds = otherShell.getClientArea();
 
 		/*
@@ -183,13 +192,16 @@ abstract class AbstractRRShell {
 
 		_shellBook.showPage(_pageReparentableImage);
 
-		final int shellOffsetX = _shellTrimWidth - otherRRShell._shellTrimWidth;
-		final int shellOffsetY = _shellTrimHeight - otherRRShell._shellTrimHeight;
+		/*
+		 * set shell position with new trim size so that the shell content is not moving
+		 */
+		final int trimDiffX = _shellTrimWidth - otherRRShell._shellTrimWidth;
+		final int trimDiffY = _shellTrimHeight - otherRRShell._shellTrimHeight;
 
-		_shell.setLocation(//
-				otherBounds.x - shellOffsetX,
-				otherBounds.y - shellOffsetY//
-		);
+		final int shellX = otherShellBounds.x - trimDiffX;
+		final int shellY = otherShellBounds.y - trimDiffY;
+
+		_shell.setLocation(shellX, shellY);
 
 		if (_isResizeable == false) {
 
@@ -236,6 +248,10 @@ abstract class AbstractRRShell {
 		setContentSize(size.x, size.y);
 	}
 
+	public void setShellLocation(final int x, final int y, final int flag) {
+		_shell.setLocation(x, y);
+	}
+
 	private void setTrimSize() {
 
 		final Point contentSize = getContentSize();
@@ -250,6 +266,19 @@ abstract class AbstractRRShell {
 
 		_shellTrimWidth = shellTrimWidth / 2;
 		_shellTrimHeight = shellTrimHeight / 2;
+	}
+
+	@Override
+	public String toString() {
+		return ("_isResizeable=" + _isResizeable)
+				+ ("\tTrimWidth=" + _shellTrimWidth)
+				+ ("\tTrimHeight=" + _shellTrimHeight)
+				+ ("\t_shell=" + _shell.getText());
+	}
+
+	public void updateColors(final Color fgColor, final Color bgColor) {
+
+		_shell.setBackground(bgColor);
 	}
 
 }

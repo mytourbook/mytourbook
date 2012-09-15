@@ -146,16 +146,6 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 		final Composite container = createUI(parent);
 
-//		shell.addDisposeListener(new DisposeListener() {
-//			@Override
-//			public void widgetDisposed(final DisposeEvent e) {
-//
-//				// keep gallery state, the gallery can be reopened very often
-//
-//				_imageGallery.saveState(_state);
-//			}
-//		});
-
 		updateUI_Colors(parent);
 
 		super.setImageGallery(_imageGallery);

@@ -16,15 +16,17 @@
 package net.tourbook.photo;
 
 import net.tourbook.Messages;
-import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.resource.ColorRegistry;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
@@ -53,12 +55,12 @@ public abstract class PhotoToolTipShell {
 	/**
 	 * Number of steps when fading out
 	 */
-	private static final int		FADE_OUT_STEPS						= 40;
+	private static final int		FADE_OUT_STEPS						= 20;
 
 	/**
 	 * Number of steps before fading out
 	 */
-	private static final int		FADE_OUT_DELAY_STEPS				= 30;
+	private static final int		FADE_OUT_DELAY_STEPS				= 20;
 
 	private static final int		MOVE_STEPS							= 20;
 
@@ -97,8 +99,12 @@ public abstract class PhotoToolTipShell {
 	private Point					_shellStartLocation;
 	private Point					_shellEndLocation;
 
-	private int						_animationStepCounter;
+	private int						_animationMoveCounter;
 	private int						_fadeOutDelayCounter;
+
+	/**
+	 * When mouse is over this tooltip the shell is not moved
+	 */
 	private boolean					_isShellMovingEnabled;
 
 	private int						_horizContentWidth					= MIN_SHELL_HORIZ_WIDTH;
@@ -242,11 +248,11 @@ public abstract class PhotoToolTipShell {
 
 			final Point size = getContentSize();
 
-			final Point defaultLocation = getLocation(size);
+			final Point defaultLocation = getContentLocation(size);
 
 			final Point shellLocation = fixupDisplayBounds(size, defaultLocation);
 
-			_visibleShell.setLocation(shellLocation);
+			_visibleRRShell.setShellLocation(shellLocation.x, shellLocation.y, 1);
 
 			reparentShell(_rrShellNoResize);
 
@@ -264,9 +270,9 @@ public abstract class PhotoToolTipShell {
 
 	private void animation10_StartKomplex() {
 
-		// fading out has no movement
-
 		if (_isKeepToolTipOpen) {
+
+			// hiding has started, stop it and keep tooltip open
 
 			_isKeepToolTipOpen = false;
 
@@ -277,7 +283,7 @@ public abstract class PhotoToolTipShell {
 			_isShellFadingIn = true;
 			_isShellFadingOut = false;
 
-			_animationStepCounter = 0;
+			_animationMoveCounter = 0;
 
 		} else {
 
@@ -286,23 +292,16 @@ public abstract class PhotoToolTipShell {
 				// set fading in location
 
 				final Point contentSize = _visibleRRShell.getContentSize();
-
-				final Point contentLocation = getLocation(contentSize);
+				final Point contentLocation = getContentLocation(contentSize);
 
 				final Point shellSize = _visibleRRShell.getShellSize(contentSize);
 				final Point shellLocation = _visibleRRShell.getShellLocation(contentLocation);
-
-				System.out.println(UI.timeStampNano() + " size: " + contentSize + "  ttLocation: " + contentLocation);
-				// TODO remove SYSTEM.OUT.PRINTLN
 
 				_shellEndLocation = fixupDisplayBounds(shellSize, shellLocation);
 
 				if (_visibleShell.isVisible()) {
 
 					// shell is already visible, move from the current position to the target position
-
-					System.out.println(UI.timeStampNano() + " shell is visible\t");
-					// TODO remove SYSTEM.OUT.PRINTLN
 
 					_shellStartLocation = _visibleShell.getLocation();
 
@@ -312,17 +311,19 @@ public abstract class PhotoToolTipShell {
 
 					_shellStartLocation = _shellEndLocation;
 
-					_visibleShell.setLocation(_shellStartLocation);
+					_visibleRRShell.setShellLocation(_shellStartLocation.x, _shellStartLocation.y, 2);
 
 					reparentShell(_rrShellNoResize);
 
 					setShellVisible(true);
 				}
 
-				_animationStepCounter = 0;
-			}
+				_animationMoveCounter = 0;
 
-			if (_isShellFadingOut) {
+			} else if (_isShellFadingOut) {
+
+				// fading out has no movement
+
 				_fadeOutDelayCounter = 0;
 			}
 		}
@@ -378,24 +379,22 @@ public abstract class PhotoToolTipShell {
 
 				} else {
 
-					// move to target
+					_animationMoveCounter++;
 
-					_animationStepCounter++;
+					if (_isShellMovingEnabled && isInTarget == false) {
 
-					final int diffX = shellStartX - shellEndX;
-					final int diffY = shellStartY - shellEndY;
+						// move to target
 
-					final double moveX = (double) diffX / MOVE_STEPS * _animationStepCounter;
-					final double moveY = (double) diffY / MOVE_STEPS * _animationStepCounter;
+						final int diffX = shellStartX - shellEndX;
+						final int diffY = shellStartY - shellEndY;
 
-					final int shellCurrentX = (int) (shellStartX - moveX);
-					final int shellCurrentY = (int) (shellStartY - moveY);
+						final double moveX = (double) diffX / MOVE_STEPS * _animationMoveCounter;
+						final double moveY = (double) diffY / MOVE_STEPS * _animationMoveCounter;
 
-					if (_isShellMovingEnabled) {
+						final int shellCurrentX = (int) (shellStartX - moveX);
+						final int shellCurrentY = (int) (shellStartY - moveY);
 
-						// when mouse is over this tooltip the shell is not moved
-
-						_visibleShell.setLocation(new Point(shellCurrentX, shellCurrentY));
+						_visibleRRShell.setShellLocation(shellCurrentX, shellCurrentY, 3);
 					}
 				}
 
@@ -504,6 +503,8 @@ public abstract class PhotoToolTipShell {
 
 		ttControlsAddListener(_visibleShell);
 
+		updateUI_Colors();
+
 		afterCreateShell(_visibleShell);
 	}
 
@@ -544,6 +545,15 @@ public abstract class PhotoToolTipShell {
 	}
 
 	/**
+	 * Get tooltip location.
+	 * 
+	 * @param size
+	 *            Tooltip size
+	 * @return Returns location relative to the device.
+	 */
+	protected abstract Point getContentLocation(Point size);
+
+	/**
 	 * @return Returns size of the tooltip content
 	 */
 	Point getContentSize() {
@@ -580,15 +590,6 @@ public abstract class PhotoToolTipShell {
 
 		return displayBounds;
 	}
-
-	/**
-	 * Get tooltip location.
-	 * 
-	 * @param size
-	 *            Tooltip size
-	 * @return Returns location relative to the device.
-	 */
-	protected abstract Point getLocation(Point size);
 
 	protected Shell getToolTipShell() {
 		return _visibleShell;
@@ -977,11 +978,17 @@ public abstract class PhotoToolTipShell {
 
 		setVisibleShell(newReparentedShell);
 
+		int trimDiffX = _rrShellWithResize.getShellTrimWidth() - _rrShellNoResize.getShellTrimWidth();
+		int trimDiffY = _rrShellWithResize.getShellTrimHeight() - _rrShellNoResize.getShellTrimHeight();
+
 		if (newReparentedShell == _rrShellWithResize) {
 
 			// setup resize shell
 
 			_rrShellWithResize.reparentFromOtherShell(_rrShellNoResize, _ttContentArea);
+
+			trimDiffX -= trimDiffX;
+			trimDiffY -= trimDiffY;
 
 		} else {
 
@@ -994,6 +1001,25 @@ public abstract class PhotoToolTipShell {
 		prevShell.setVisible(false);
 
 		ttControlsAddListener(newReparentedShell.getShell());
+
+		final boolean isShellMoving = _isShellFadingIn && _isKeepToolTipOpen == false;
+		if (isShellMoving) {
+
+			/*
+			 * adjust shell positions because the reparent shell contains another trim size, it took
+			 * me 2 whole days to finally fix this problem and find a solution but now the shell
+			 * reparenting is smoothly
+			 */
+
+			final int shellStartX = _shellStartLocation.x + trimDiffX;
+			final int shellStartY = _shellStartLocation.y + trimDiffY;
+
+			final int shellEndX = _shellEndLocation.x + trimDiffX;
+			final int shellEndY = _shellEndLocation.y + trimDiffY;
+
+			_shellStartLocation = new Point(shellStartX, shellStartY);
+			_shellEndLocation = new Point(shellEndX, shellEndY);
+		}
 	}
 
 	protected void restoreState(final IDialogSettings state) {
@@ -1080,9 +1106,9 @@ public abstract class PhotoToolTipShell {
 		}
 
 		final Point size = _visibleShell.getSize();
-		final Point fixedLocation = fixupDisplayBounds(size, getLocation(size));
+		final Point fixedLocation = fixupDisplayBounds(size, getContentLocation(size));
 
-		_visibleShell.setLocation(fixedLocation);
+		_visibleRRShell.setShellLocation(fixedLocation.x, fixedLocation.y, 4);
 	}
 
 	protected boolean showShell() {
@@ -1226,5 +1252,15 @@ public abstract class PhotoToolTipShell {
 		_isShellFadingOut = false;
 
 		animation10_Start();
+	}
+
+	private void updateUI_Colors() {
+
+		final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
+		final Color fgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND);
+		final Color bgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
+
+		_rrShellNoResize.updateColors(fgColor, bgColor);
+		_rrShellWithResize.updateColors(fgColor, bgColor);
 	}
 }
