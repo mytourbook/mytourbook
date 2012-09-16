@@ -16,7 +16,6 @@
 package net.tourbook.photo;
 
 import net.tourbook.Messages;
-import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 
@@ -336,7 +335,7 @@ public abstract class PhotoToolTipShell {
 
 	private void animation20_Runnable() {
 
-//		final long start = System.currentTimeMillis();
+		final long start = System.currentTimeMillis();
 
 		try {
 
@@ -349,94 +348,124 @@ public abstract class PhotoToolTipShell {
 				return;
 			}
 
-			final int currentAlpha = _visibleShell.getAlpha();
-			int newAlpha = ALPHA_OPAQUE;
+			/*
+			 * endAlpha will be the final fadeIn/fadeOut value when the animation stops
+			 */
+			int finalFadeAlpha = -1;
 
-			if (_isShellFadingIn) {
+			int currentAlpha = _visibleShell.getAlpha();
+			boolean isLoopBreak = false;
 
-				final int shellStartX = _shellStartLocation.x;
-				final int shellStartY = _shellStartLocation.y;
-				final int shellEndX = _shellEndLocation.x;
-				final int shellEndY = _shellEndLocation.y;
+			while (true) {
 
-				final Point shellCurrentLocation = _visibleShell.getLocation();
+				int newAlpha = -1;
 
-				final boolean isInTarget = shellCurrentLocation.x == shellEndX && shellCurrentLocation.y == shellEndY;
+				if (_isShellFadingIn) {
 
-				final int diffAlpha = ALPHA_OPAQUE / FADE_IN_STEPS;
+					final int shellStartX = _shellStartLocation.x;
+					final int shellStartY = _shellStartLocation.y;
+					final int shellEndX = _shellEndLocation.x;
+					final int shellEndY = _shellEndLocation.y;
 
-				newAlpha = currentAlpha + diffAlpha;
-				if (newAlpha > ALPHA_OPAQUE) {
-					newAlpha = ALPHA_OPAQUE;
-				}
+					final Point shellCurrentLocation = _visibleShell.getLocation();
 
-				if (isInTarget && newAlpha == ALPHA_OPAQUE) {
+					final boolean isInTarget = shellCurrentLocation.x == shellEndX
+							&& shellCurrentLocation.y == shellEndY;
 
-					// target is reached and fully visible, stop animation
+					final int diffAlpha = ALPHA_OPAQUE / FADE_IN_STEPS;
 
-					_visibleShell.setAlpha(ALPHA_OPAQUE);
+					newAlpha = currentAlpha + diffAlpha;
+					if (newAlpha > ALPHA_OPAQUE) {
+						newAlpha = ALPHA_OPAQUE;
+					}
+					finalFadeAlpha = ALPHA_OPAQUE;
 
-					_isShellFadingIn = false;
+					if (isInTarget && newAlpha == ALPHA_OPAQUE) {
 
-					return;
+						// target is reached and fully visible, stop animation
 
-				} else {
+						_visibleShell.setAlpha(ALPHA_OPAQUE);
 
-					_animationMoveCounter++;
+						_isShellFadingIn = false;
 
-					if (_isShellMovingEnabled && isInTarget == false) {
+						return;
 
-						// move to target
+					} else {
 
-						final int diffX = shellStartX - shellEndX;
-						final int diffY = shellStartY - shellEndY;
+						_animationMoveCounter++;
 
-						final double moveX = (double) diffX / MOVE_STEPS * _animationMoveCounter;
-						final double moveY = (double) diffY / MOVE_STEPS * _animationMoveCounter;
+						if (_isShellMovingEnabled && isInTarget == false) {
 
-						final int shellCurrentX = (int) (shellStartX - moveX);
-						final int shellCurrentY = (int) (shellStartY - moveY);
+							// move to target
 
-						_visibleRRShell.setShellLocation(shellCurrentX, shellCurrentY, 3);
+							final int diffX = shellStartX - shellEndX;
+							final int diffY = shellStartY - shellEndY;
+
+							final double moveX = (double) diffX / MOVE_STEPS * _animationMoveCounter;
+							final double moveY = (double) diffY / MOVE_STEPS * _animationMoveCounter;
+
+							final int shellCurrentX = (int) (shellStartX - moveX);
+							final int shellCurrentY = (int) (shellStartY - moveY);
+
+							_visibleRRShell.setShellLocation(shellCurrentX, shellCurrentY, 3);
+						}
+					}
+
+				} else if (_isShellFadingOut) {
+
+					if (_fadeOutDelayCounter++ < FADE_OUT_DELAY_STEPS) {
+
+						// delay fade out
+
+						_display.timerExec(FADE_TIME_INTERVAL, _animationTimer);
+
+						return;
+					}
+
+					final int alphaDiff = ALPHA_OPAQUE / FADE_OUT_STEPS;
+
+					newAlpha = currentAlpha - alphaDiff;
+					finalFadeAlpha = 0;
+
+					if (newAlpha <= 0) {
+
+						// shell is not visible any more, hide it now
+
+						_visibleShell.setAlpha(0);
+
+						// hide shell
+						setShellVisible(false);
+
+						_isShellFadingOut = false;
+
+						return;
 					}
 				}
 
-			} else if (_isShellFadingOut) {
+				_visibleShell.setAlpha(newAlpha);
 
-				if (_fadeOutDelayCounter++ < FADE_OUT_DELAY_STEPS) {
+				if (_visibleShell.getAlpha() != newAlpha) {
 
-					// delay fade out
+					// platform do not support shell alpha
+
+					if (isLoopBreak) {
+						break;
+					}
+
+					// loop only once
+					isLoopBreak = true;
+
+					currentAlpha = finalFadeAlpha;
+
+					continue;
+
+				} else {
 
 					_display.timerExec(FADE_TIME_INTERVAL, _animationTimer);
 
-					return;
-				}
-
-				final int alphaDiff = ALPHA_OPAQUE / FADE_OUT_STEPS;
-
-				newAlpha = currentAlpha - alphaDiff;
-
-				if (newAlpha <= 0) {
-
-					// shell is not visible any more, hide it now
-
-					_visibleShell.setAlpha(0);
-
-					// hide shell
-					setShellVisible(false);
-
-					_isShellFadingOut = false;
-
-					return;
+					break;
 				}
 			}
-
-			_visibleShell.setAlpha(newAlpha);
-
-			_display.timerExec(FADE_TIME_INTERVAL, _animationTimer);
-
-//			System.out.println(UI.timeStampNano() + " time\t" + (System.currentTimeMillis() - start) + " ms");
-//			// TODO remove SYSTEM.OUT.PRINTLN
 
 		} catch (final Exception err) {
 			StatusUtil.log(err);
@@ -715,8 +744,8 @@ public abstract class PhotoToolTipShell {
 
 		if (hoveredControl == null) {
 
-			System.out.println(UI.timeStampNano() + " exit 0 hide");
-			// TODO remove SYSTEM.OUT.PRINTLN
+//			System.out.println(UI.timeStampNano() + " exit 0 hide");
+//			// TODO remove SYSTEM.OUT.PRINTLN
 
 			isHide = true;
 
@@ -736,8 +765,8 @@ public abstract class PhotoToolTipShell {
 
 					isKeepVisible = true;
 
-					System.out.println(UI.timeStampNano() + " exit 1 no hide");
-					// TODO remove SYSTEM.OUT.PRINTLN
+//					System.out.println(UI.timeStampNano() + " exit 1 no hide");
+//					// TODO remove SYSTEM.OUT.PRINTLN
 
 					break;
 				}
@@ -748,8 +777,8 @@ public abstract class PhotoToolTipShell {
 
 					isKeepVisible = true;
 
-					System.out.println(UI.timeStampNano() + " exit 2 no hide");
-					// TODO remove SYSTEM.OUT.PRINTLN
+//					System.out.println(UI.timeStampNano() + " exit 2 no hide");
+//					// TODO remove SYSTEM.OUT.PRINTLN
 
 					break;
 				}
@@ -760,8 +789,8 @@ public abstract class PhotoToolTipShell {
 
 					// mouse has left the tooltip and the owner control
 
-					System.out.println(UI.timeStampNano() + " exit 3 hide");
-					// TODO remove SYSTEM.OUT.PRINTLN
+//					System.out.println(UI.timeStampNano() + " exit 3 hide");
+//					// TODO remove SYSTEM.OUT.PRINTLN
 
 					isHide = true;
 
