@@ -16,6 +16,7 @@
 package net.tourbook.photo;
 
 import net.tourbook.Messages;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 
@@ -45,12 +46,12 @@ public abstract class PhotoToolTipShell {
 	/**
 	 * how long each tick is when fading out (in ms)
 	 */
-	private static final int		FADE_TIME_INTERVAL					= 10;
+	private static final int		FADE_TIME_INTERVAL					= 1;
 
 	/**
 	 * Number of steps when fading in
 	 */
-	private static final int		FADE_IN_STEPS						= 20;
+	private static final int		FADE_IN_STEPS						= 10;
 
 	/**
 	 * Number of steps when fading out
@@ -60,9 +61,9 @@ public abstract class PhotoToolTipShell {
 	/**
 	 * Number of steps before fading out
 	 */
-	private static final int		FADE_OUT_DELAY_STEPS				= 20;
+	private static final int		FADE_OUT_DELAY_STEPS				= 30;
 
-	private static final int		MOVE_STEPS							= 20;
+	private static final int		MOVE_STEPS							= 10;
 
 	private static final int		ALPHA_OPAQUE						= 0xff;
 
@@ -335,6 +336,8 @@ public abstract class PhotoToolTipShell {
 
 	private void animation20_Runnable() {
 
+//		final long start = System.currentTimeMillis();
+
 		try {
 
 			if (_visibleShell == null || _visibleShell.isDisposed()) {
@@ -431,6 +434,9 @@ public abstract class PhotoToolTipShell {
 			_visibleShell.setAlpha(newAlpha);
 
 			_display.timerExec(FADE_TIME_INTERVAL, _animationTimer);
+
+//			System.out.println(UI.timeStampNano() + " time\t" + (System.currentTimeMillis() - start) + " ms");
+//			// TODO remove SYSTEM.OUT.PRINTLN
 
 		} catch (final Exception err) {
 			StatusUtil.log(err);
@@ -709,8 +715,8 @@ public abstract class PhotoToolTipShell {
 
 		if (hoveredControl == null) {
 
-//			System.out.println(UI.timeStampNano() + " exit 0 hide");
-//			// TODO remove SYSTEM.OUT.PRINTLN
+			System.out.println(UI.timeStampNano() + " exit 0 hide");
+			// TODO remove SYSTEM.OUT.PRINTLN
 
 			isHide = true;
 
@@ -730,8 +736,8 @@ public abstract class PhotoToolTipShell {
 
 					isKeepVisible = true;
 
-//					System.out.println(UI.timeStampNano() + " exit 1 no hide");
-//					// TODO remove SYSTEM.OUT.PRINTLN
+					System.out.println(UI.timeStampNano() + " exit 1 no hide");
+					// TODO remove SYSTEM.OUT.PRINTLN
 
 					break;
 				}
@@ -742,8 +748,8 @@ public abstract class PhotoToolTipShell {
 
 					isKeepVisible = true;
 
-//					System.out.println(UI.timeStampNano() + " exit 2 no hide");
-//					// TODO remove SYSTEM.OUT.PRINTLN
+					System.out.println(UI.timeStampNano() + " exit 2 no hide");
+					// TODO remove SYSTEM.OUT.PRINTLN
 
 					break;
 				}
@@ -754,8 +760,8 @@ public abstract class PhotoToolTipShell {
 
 					// mouse has left the tooltip and the owner control
 
-//					System.out.println(UI.timeStampNano() + " exit 3 hide");
-//					// TODO remove SYSTEM.OUT.PRINTLN
+					System.out.println(UI.timeStampNano() + " exit 3 hide");
+					// TODO remove SYSTEM.OUT.PRINTLN
 
 					isHide = true;
 

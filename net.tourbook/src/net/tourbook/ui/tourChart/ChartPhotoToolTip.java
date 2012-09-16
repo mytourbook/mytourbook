@@ -73,7 +73,7 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 		final int ttPosX = itemPosX - tipWidth2;
 
 		// set vertical position at the top of the upper most graph
-		final int ttPosY = -tipHeight;//+ chartMarginTop;
+		final int ttPosY = -tipHeight - 0;//+ chartMarginTop;
 
 		final Point ttLocation = _tourChart.toDisplay(ttPosX, ttPosY);
 
