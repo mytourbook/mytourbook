@@ -372,7 +372,7 @@ public class TourManager {
 		tourChartConfig.isSRTMDataVisible = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SRTM_VISIBLE);
 
 		tourChartConfig.isShowTourMarker = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_MARKER_VISIBLE);
-		tourChartConfig.isShowPhotos = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_PHOTO_VISIBLE);
+		tourChartConfig.isShowTourPhotos = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_TOUR_PHOTO_VISIBLE);
 
 		tourChartConfig.isShowBreaktimeValues = _prefStore.getBoolean(//
 				ITourbookPreferences.GRAPH_IS_BREAKTIME_VALUES_VISIBLE);

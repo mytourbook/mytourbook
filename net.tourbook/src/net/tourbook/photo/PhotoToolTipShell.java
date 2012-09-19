@@ -16,6 +16,7 @@
 package net.tourbook.photo;
 
 import net.tourbook.Messages;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 
@@ -43,9 +44,9 @@ import org.eclipse.swt.widgets.Shell;
 public abstract class PhotoToolTipShell {
 
 	/**
-	 * how long each tick is when fading out (in ms)
+	 * how long each tick is when fading in/out (in ms)
 	 */
-	private static final int		FADE_TIME_INTERVAL					= 1;
+	private static final int		FADE_TIME_INTERVAL					= UI.IS_OSX ? 1 : 10;
 
 	/**
 	 * Number of steps when fading in
@@ -55,12 +56,12 @@ public abstract class PhotoToolTipShell {
 	/**
 	 * Number of steps when fading out
 	 */
-	private static final int		FADE_OUT_STEPS						= 20;
+	private static final int		FADE_OUT_STEPS						= 10;
 
 	/**
 	 * Number of steps before fading out
 	 */
-	private static final int		FADE_OUT_DELAY_STEPS				= 30;
+	private static final int		FADE_OUT_DELAY_STEPS				= 40;
 
 	private static final int		MOVE_STEPS							= 10;
 
@@ -248,7 +249,7 @@ public abstract class PhotoToolTipShell {
 
 			final Point size = getContentSize();
 
-			final Point defaultLocation = getContentLocation(size);
+			final Point defaultLocation = getToolTipLocation(size);
 
 			final Point shellLocation = fixupDisplayBounds(size, defaultLocation);
 
@@ -292,7 +293,7 @@ public abstract class PhotoToolTipShell {
 				// set fading in location
 
 				final Point contentSize = _visibleRRShell.getContentSize();
-				final Point contentLocation = getContentLocation(contentSize);
+				final Point contentLocation = getToolTipLocation(contentSize);
 
 				final Point shellSize = _visibleRRShell.getShellSize(contentSize);
 				final Point shellLocation = _visibleRRShell.getShellLocation(contentLocation);
@@ -586,7 +587,7 @@ public abstract class PhotoToolTipShell {
 	 *            Tooltip size
 	 * @return Returns location relative to the device.
 	 */
-	protected abstract Point getContentLocation(Point size);
+	protected abstract Point getToolTipLocation(Point size);
 
 	/**
 	 * @return Returns size of the tooltip content
@@ -1141,7 +1142,7 @@ public abstract class PhotoToolTipShell {
 		}
 
 		final Point size = _visibleShell.getSize();
-		final Point fixedLocation = fixupDisplayBounds(size, getContentLocation(size));
+		final Point fixedLocation = fixupDisplayBounds(size, getToolTipLocation(size));
 
 		_visibleRRShell.setShellLocation(fixedLocation.x, fixedLocation.y, 4);
 	}

@@ -76,6 +76,7 @@ public class ActionChartOptions extends Action implements IMenuCreator {
 		final Map<String, TCActionProxy> actionProxies = _tourChart.getActionProxies();
 
 		addItem(actionProxies.get(TourChart.COMMAND_ID_IS_SHOW_TOUR_MARKER).getAction());
+		addItem(actionProxies.get(TourChart.COMMAND_ID_IS_SHOW_TOUR_PHOTOS).getAction());
 		addItem(actionProxies.get(TourChart.COMMAND_ID_IS_SHOW_BREAKTIME_VALUES).getAction());
 		addItem(actionProxies.get(TourChart.COMMAND_ID_IS_SHOW_START_TIME).getAction());
 		addItem(actionProxies.get(TourChart.COMMAND_ID_IS_SHOW_SRTM_DATA).getAction());

@@ -55,10 +55,14 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 		_tourChart = tourChart;
 	}
 
-	@Override
-	public Point getContentLocation(final Point tipSize) {
+	Shell getShell() {
+		return getToolTipShell();
+	}
 
-		final int chartHeight = _tourChart.getBounds().height;
+	@Override
+	public Point getToolTipLocation(final Point tipSize) {
+
+		final int chartHeight = _tourChart.getSize().y;
 //		final int chartMarginTop = _tourChart.getMarginTop();
 		final Point chartDisplay = _tourChart.toDisplay(0, 0);
 
@@ -84,10 +88,6 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 		return ttLocation;
 	}
 
-	Shell getShell() {
-		return getToolTipShell();
-	}
-
 	@Override
 	protected void restoreState(final IDialogSettings state) {
 		super.restoreState(state);
@@ -104,7 +104,7 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 										final int devXMouseMove,
 										final int devYMouseMove) {
 
-		final Point[] photoPositions = photoLayer.getPhotoPositions();
+		final ArrayList<PhotoGroup> photoPositions = photoLayer.getPhotoPositions();
 
 		if (photoPositions == null) {
 			// photo positions are not initialized
@@ -125,32 +125,32 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 		_devXHoveredPhoto = Integer.MAX_VALUE;
 		_devYHoveredPhoto = Integer.MAX_VALUE;
 
-		// get all photos which are visible for the hovered value point and beside it
-		for (int photoIndex = 0; photoIndex < photoPositions.length; photoIndex++) {
-
-			final Point photoPos = photoPositions[photoIndex];
-			if (photoPos == null) {
-				// photo is not visible
-				continue;
-			}
-
-			final int photoPosX = photoPos.x;
-
-			if (photoPosX > hoveredXPosLeft && photoPosX < hoveredXPosRight) {
-
-				// photo is within current hovered area
-
-				final ChartPhoto chartPhoto = chartPhotos.get(photoIndex);
-
-				// position tooltip above all posible photos
-				if (photoPos.y < _devYHoveredPhoto) {
-					_devXHoveredPhoto = photoPos.x;
-					_devYHoveredPhoto = photoPos.y;
-				}
-
-				_hoveredPhotos.add(chartPhoto);
-			}
-		}
+//		// get all photos which are visible for the hovered value point and beside it
+//		for (int photoIndex = 0; photoIndex < photoPositions.length; photoIndex++) {
+//
+//			final Point photoPos = photoPositions[photoIndex];
+//			if (photoPos == null) {
+//				// photo is not visible
+//				continue;
+//			}
+//
+//			final int photoPosX = photoPos.x;
+//
+//			if (photoPosX > hoveredXPosLeft && photoPosX < hoveredXPosRight) {
+//
+//				// photo is within current hovered area
+//
+//				final ChartPhoto chartPhoto = chartPhotos.get(photoIndex);
+//
+//				// position tooltip above all posible photos
+//				if (photoPos.y < _devYHoveredPhoto) {
+//					_devXHoveredPhoto = photoPos.x;
+//					_devYHoveredPhoto = photoPos.y;
+//				}
+//
+//				_hoveredPhotos.add(chartPhoto);
+//			}
+//		}
 
 		if (_hoveredPhotos.size() == 0) {
 

@@ -299,6 +299,7 @@ public class ChartComponentGraph extends Canvas {
 
 	private boolean						_isHoveredLineVisible			= false;
 	private int							_hoveredLineValueIndex			= -1;
+
 	private ArrayList<Rectangle[]>		_lineFocusRectangles			= new ArrayList<Rectangle[]>();
 	private ArrayList<Point[]>			_lineDevPositions				= new ArrayList<Point[]>();
 
@@ -1634,21 +1635,16 @@ public class ChartComponentGraph extends Canvas {
 			graphIndex++;
 		}
 
-		if (valuePointToolTip != null) {
+		if (valuePointToolTip != null && _hoveredLineValueIndex != -1) {
 
-			if (_hoveredLineValueIndex == -1) {
-//				valuePointToolTip.hide();
-			} else {
+			final Point hoveredLinePosition = getHoveredValueDevPosition();
 
-				final Point hoveredLinePosition = getHoveredValueDevPosition();
-
-				valuePointToolTip.setValueIndex(
-						_hoveredLineValueIndex,
-						_devXMouseMove,
-						_devYMouseMove,
-						hoveredLinePosition,
-						_graphZoomRatio);
-			}
+			valuePointToolTip.setValueIndex(
+					_hoveredLineValueIndex,
+					_devXMouseMove,
+					_devYMouseMove,
+					hoveredLinePosition,
+					_graphZoomRatio);
 		}
 	}
 
@@ -5547,7 +5543,9 @@ public class ChartComponentGraph extends Canvas {
 			}
 		}
 
-		if (_isHoveredLineVisible || _chart._hoveredValuePointListener != null) {
+		final IHoveredListener hoveredValuePointListener = _chart._hoveredValuePointListener;
+
+		if (_isHoveredLineVisible || hoveredValuePointListener != null) {
 
 			isLineHovered();
 
@@ -5570,9 +5568,9 @@ public class ChartComponentGraph extends Canvas {
 					isRedraw = true;
 				}
 
-				if (_chart._hoveredValuePointListener != null && canShowHoveredTooltip) {
+				if (hoveredValuePointListener != null && canShowHoveredTooltip) {
 
-					_chart._hoveredValuePointListener.hoveredValue(
+					hoveredValuePointListener.hoveredValue(
 							_hoveredLineValueIndex,
 							devHoveredValueDevPosition,
 							_devXMouseMove,

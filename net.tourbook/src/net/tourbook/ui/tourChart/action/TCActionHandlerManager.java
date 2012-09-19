@@ -110,16 +110,16 @@ public class TCActionHandlerManager {
 		_actionHandlers.put(TourChart.COMMAND_ID_X_AXIS_TIME, new ActionHandlerXAxisTime());
 		_actionHandlers.put(TourChart.COMMAND_ID_X_AXIS_DISTANCE, new ActionHandlerXAxisDistance());
 
+		_actionHandlers.put(TourChart.COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER, new ActionHandlerCanAutoZoomToSlider());
+		_actionHandlers.put(TourChart.COMMAND_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED,//
+				new ActionHandlerCanMoveSlidersWhenZoomed());
+		_actionHandlers.put(TourChart.COMMAND_ID_EDIT_CHART_PREFERENCES, new ActionHandlerEditCharPreferences());
 		_actionHandlers.put(TourChart.COMMAND_ID_IS_SHOW_START_TIME, new ActionHandlerShowStartTime());
 		_actionHandlers.put(TourChart.COMMAND_ID_IS_SHOW_SRTM_DATA, new ActionHandlerShowSRTMData());
 		_actionHandlers.put(TourChart.COMMAND_ID_IS_SHOW_TOUR_MARKER, new ActionHandlerShowTourMarker());
 		_actionHandlers.put(TourChart.COMMAND_ID_IS_SHOW_BREAKTIME_VALUES, new ActionHandlerShowBreaktimeValues());
 		_actionHandlers.put(TourChart.COMMAND_ID_IS_SHOW_VALUEPOINT_TOOLTIP, new ActionHandlerShowValuePointToolTip());
-		_actionHandlers.put(TourChart.COMMAND_ID_EDIT_CHART_PREFERENCES, new ActionHandlerEditCharPreferences());
-		_actionHandlers.put(TourChart.COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER, new ActionHandlerCanAutoZoomToSlider());
-		_actionHandlers.put(
-				TourChart.COMMAND_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED,
-				new ActionHandlerCanMoveSlidersWhenZoomed());
+		_actionHandlers.put(TourChart.COMMAND_ID_IS_SHOW_TOUR_PHOTOS, new ActionHandlerTourPhotos());
 
 		setupHandlers();
 	}

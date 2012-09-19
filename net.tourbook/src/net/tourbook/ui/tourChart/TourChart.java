@@ -60,6 +60,7 @@ import net.tourbook.ui.tourChart.action.ActionShowSRTMData;
 import net.tourbook.ui.tourChart.action.ActionShowStartTime;
 import net.tourbook.ui.tourChart.action.ActionShowTourMarker;
 import net.tourbook.ui.tourChart.action.ActionShowValuePointToolTip;
+import net.tourbook.ui.tourChart.action.ActionTourPhotos;
 import net.tourbook.ui.tourChart.action.ActionXAxisDistance;
 import net.tourbook.ui.tourChart.action.ActionXAxisTime;
 import net.tourbook.ui.tourChart.action.TCActionHandler;
@@ -94,16 +95,17 @@ public class TourChart extends Chart {
 
 	private static final String				ID										= "net.tourbook.ui.tourChart";									//$NON-NLS-1$
 
-	public static final String				COMMAND_ID_IS_SHOW_START_TIME			= "net.tourbook.command.tourChart.isShowStartTime";			//$NON-NLS-1$
-	public static final String				COMMAND_ID_IS_SHOW_SRTM_DATA			= "net.tourbook.command.tourChart.isShowSRTMData";				//$NON-NLS-1$
-	public static final String				COMMAND_ID_IS_SHOW_TOUR_MARKER			= "net.tourbook.command_TourChart_IsShowTourMarker";			//$NON-NLS-1$
-	public static final String				COMMAND_ID_IS_SHOW_BREAKTIME_VALUES		= "net.tourbook.command_TourChart_IsShowBreaktimeValues";		//$NON-NLS-1$
-	public static final String				COMMAND_ID_IS_SHOW_VALUEPOINT_TOOLTIP	= "net.tourbook.command_TourChart_IsShowValuePointToolTip";	//$NON-NLS-1$
 	public static final String				COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER		= "net.tourbook.command.tourChart.canAutoZoomToSlider";		//$NON-NLS-1$
 	public static final String				COMMAND_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED	= "net.tourbook.command.tourChart.canMoveSlidersWhenZoomed";	//$NON-NLS-1$
 	public static final String				COMMAND_ID_EDIT_CHART_PREFERENCES		= "net.tourbook.command_EditChartPreferences";					//$NON-NLS-1$
+	public static final String				COMMAND_ID_IS_SHOW_BREAKTIME_VALUES		= "net.tourbook.command_TourChart_IsShowBreaktimeValues";		//$NON-NLS-1$
+	public static final String				COMMAND_ID_IS_SHOW_SRTM_DATA			= "net.tourbook.command.tourChart.isShowSRTMData";				//$NON-NLS-1$
+	public static final String				COMMAND_ID_IS_SHOW_START_TIME			= "net.tourbook.command.tourChart.isShowStartTime";			//$NON-NLS-1$
+	public static final String				COMMAND_ID_IS_SHOW_TOUR_MARKER			= "net.tourbook.command_TourChart_IsShowTourMarker";			//$NON-NLS-1$
+	public static final String				COMMAND_ID_IS_SHOW_VALUEPOINT_TOOLTIP	= "net.tourbook.command_TourChart_IsShowValuePointToolTip";	//$NON-NLS-1$
 	public static final String				COMMAND_ID_X_AXIS_DISTANCE				= "net.tourbook.command.tourChart.xAxisDistance";				//$NON-NLS-1$
 	public static final String				COMMAND_ID_X_AXIS_TIME					= "net.tourbook.command.tourChart.xAxisTime";					//$NON-NLS-1$
+	public static final String				COMMAND_ID_IS_SHOW_TOUR_PHOTOS					= "COMMAND_ID_TOUR_PHOTOS";									//$NON-NLS-1$
 
 	public static final String				COMMAND_ID_GRAPH_ALTITUDE				= "net.tourbook.command.graph.altitude";						//$NON-NLS-1$
 	public static final String				COMMAND_ID_GRAPH_SPEED					= "net.tourbook.command.graph.speed";							//$NON-NLS-1$
@@ -270,7 +272,7 @@ public class TourChart extends Chart {
 				return;
 			}
 
-			if (_tourChartConfig.isShowPhotos == false) {
+			if (_tourChartConfig.isShowTourPhotos == false) {
 				return;
 			}
 
@@ -285,7 +287,12 @@ public class TourChart extends Chart {
 				return;
 			}
 
-			_photoTooltip.showChartPhotoToolTip(photoLayer, hoveredValueIndex, devHoveredValue, devXMouseMove, devYMouseMove);
+			_photoTooltip.showChartPhotoToolTip(
+					photoLayer,
+					hoveredValueIndex,
+					devHoveredValue,
+					devXMouseMove,
+					devYMouseMove);
 		}
 	}
 
@@ -495,6 +502,16 @@ public class TourChart extends Chart {
 		updateLayerMarker(isItemChecked);
 
 		setCommandChecked(COMMAND_ID_IS_SHOW_TOUR_MARKER, isItemChecked);
+	}
+
+	public void actionShowTourPhotos(final boolean isItemChecked) {
+
+		_prefStore.setValue(ITourbookPreferences.GRAPH_IS_TOUR_PHOTO_VISIBLE, isItemChecked);
+
+		_tourChartConfig.isShowTourPhotos = isItemChecked;
+		updateTourChart(true);
+		
+		setCommandChecked(COMMAND_ID_IS_SHOW_TOUR_PHOTOS, isItemChecked);
 	}
 
 	public void actionShowValuePointToolTip(final Boolean isItemChecked) {
@@ -771,6 +788,12 @@ public class TourChart extends Chart {
 		String cmdId;
 		final boolean useInternalActionBar = useInternalActionBar();
 
+		cmdId = COMMAND_ID_IS_SHOW_TOUR_PHOTOS;
+		_actionProxies.put(cmdId, //
+				new TCActionProxy(cmdId, useInternalActionBar ? //
+						new ActionTourPhotos(this)
+						: null));
+
 		cmdId = COMMAND_ID_HR_ZONE_DROPDOWN_MENU;
 		_actionProxies.put(cmdId, //
 				new TCActionProxy(cmdId, useInternalActionBar ? //
@@ -1036,7 +1059,7 @@ public class TourChart extends Chart {
 
 	private void createLayer_Photo() {
 
-		if (_tourChartConfig.isShowPhotos == false) {
+		if (_tourChartConfig.isShowTourPhotos == false) {
 			return;
 		}
 
@@ -1325,6 +1348,13 @@ public class TourChart extends Chart {
 		proxy.setChecked(_tourChartConfig.isShowTourMarker);
 
 		/*
+		 * Tour photos
+		 */
+		proxy = _actionProxies.get(COMMAND_ID_IS_SHOW_TOUR_PHOTOS);
+		proxy.setEnabled(true);
+		proxy.setChecked(_tourChartConfig.isShowTourPhotos);
+
+		/*
 		 * Breaktime values
 		 */
 		proxy = _actionProxies.get(COMMAND_ID_IS_SHOW_BREAKTIME_VALUES);
@@ -1441,6 +1471,7 @@ public class TourChart extends Chart {
 		tbm.add(_actionProxies.get(getProxyId(TourManager.GRAPH_CADENCE)).getAction());
 
 		tbm.add(_actionProxies.get(COMMAND_ID_HR_ZONE_DROPDOWN_MENU).getAction());
+		tbm.add(_actionProxies.get(COMMAND_ID_IS_SHOW_TOUR_PHOTOS).getAction());
 
 		tbm.add(new Separator());
 		tbm.add(_actionProxies.get(COMMAND_ID_X_AXIS_TIME).getAction());
@@ -1676,7 +1707,7 @@ public class TourChart extends Chart {
 		 * photo layer
 		 */
 		// show photo layer only for ONE visible graph
-		if (_layerPhoto != null && _tourChartConfig.isShowPhotos == true && yData == yDataWithLabels) {
+		if (_layerPhoto != null && _tourChartConfig.isShowTourPhotos == true && yData == yDataWithLabels) {
 			customFgLayers.add(_layerPhoto);
 		}
 

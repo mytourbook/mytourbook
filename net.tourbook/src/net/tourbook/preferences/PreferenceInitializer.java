@@ -149,7 +149,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
 		// is marker/photo visible
 		store.setDefault(ITourbookPreferences.GRAPH_IS_MARKER_VISIBLE, true);
-		store.setDefault(ITourbookPreferences.GRAPH_IS_PHOTO_VISIBLE, true);
+		store.setDefault(ITourbookPreferences.GRAPH_IS_TOUR_PHOTO_VISIBLE, true);
 
 		// define which unit is shown on the x-axis
 		store.setDefault(ITourbookPreferences.GRAPH_X_AXIS, TourManager.X_AXIS_DISTANCE);

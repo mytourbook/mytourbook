@@ -642,9 +642,13 @@ public class Messages extends NLS {
 	public static String		Image__MyTourbook16;
 	public static String		Image__options;
 	public static String		Image__PhotoDirectoryView;
-	public static String	Image__PhotoGalleryHorizontal;
+	public static String		Image__PhotoGalleryHorizontal;
 
-	public static String	Image__PhotoGalleryVertical;
+	public static String		Image__PhotoGalleryVertical;
+
+	public static String	Image__PhotoPhotos;
+
+	public static String	Image__PhotoTourPhotos;
 
 	public static String		Image__PulseZones;
 	public static String		Image__PulseZones_Disabled;
@@ -768,13 +772,13 @@ public class Messages extends NLS {
 
 	public static String		NT001_DialogExtractTour_InvalidTourData;
 
-	public static String	Photo_Tooltip_Action_ToggleGalleryHorizontal_ToolTip;
+	public static String		Photo_Tooltip_Action_ToggleGalleryHorizontal_ToolTip;
 
-	public static String	Photo_Tooltip_Action_ToggleGalleryVertical_ToolTip;
+	public static String		Photo_Tooltip_Action_ToggleGalleryVertical_ToolTip;
 
-	public static String	Photo_Tooltip_Label_ShellNoResize;
+	public static String		Photo_Tooltip_Label_ShellNoResize;
 
-	public static String	Photo_Tooltip_Label_ShellWithResize;
+	public static String		Photo_Tooltip_Label_ShellWithResize;
 
 	public static String		Photos_AndTours_Label_AdjustTime;
 	public static String		Photos_AndTours_Label_AdjustTimeTooltip;
@@ -1126,6 +1130,7 @@ public class Messages extends NLS {
 	public static String		Tour_Action_ShowBreaktimeValues;
 	public static String		Tour_Action_ShowHrZones_Tooltip;
 	public static String		Tour_Action_ShowTourMarker;
+	public static String		Tour_Action_TourPhotos;
 	public static String		Tour_Action_ValuePointToolTip_IsVisible;
 
 	public static String		Tour_Book_Action_delete_selected_tours;
