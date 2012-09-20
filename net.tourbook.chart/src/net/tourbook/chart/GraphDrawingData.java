@@ -60,13 +60,15 @@ public class GraphDrawingData {
 	 * List with all unit labels and positions for the y axis
 	 */
 	private ArrayList<ChartUnit>	_yUnits					= new ArrayList<ChartUnit>();
-	// scaling from graph value to device value
-	private float					_scaleX;
 
+	/**
+	 * scaling from graph value to device value
+	 */
+	private float					_scaleX;
 	private float					_scaleY;
 
 	/**
-	 * scaling the the x unit
+	 * scaling of the x unit
 	 */
 	private float					_scaleUnitX				= Float.MIN_VALUE;
 
@@ -101,7 +103,7 @@ public class GraphDrawingData {
 
 	private boolean[]				_isDrawUnits			= null;
 
-	ChartDrawingData				chartDrawingData;
+	private ChartDrawingData				chartDrawingData;
 
 	public GraphDrawingData(final ChartDrawingData chartDrawingData, final int chartType) {
 		this.chartDrawingData = chartDrawingData;
@@ -135,6 +137,10 @@ public class GraphDrawingData {
 	 */
 	public int getBarRectangleWidth() {
 		return _barRectangleWidth;
+	}
+
+	public ChartDrawingData getChartDrawingData() {
+		return chartDrawingData;
 	}
 
 	public int getChartType() {
@@ -425,5 +431,6 @@ public class GraphDrawingData {
 	public void setYSliderHitRect(final Rectangle[] sliderHitRect) {
 		_ySliderHitRect = sliderHitRect;
 	}
+
 
 }

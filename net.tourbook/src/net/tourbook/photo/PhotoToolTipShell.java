@@ -61,7 +61,7 @@ public abstract class PhotoToolTipShell {
 	/**
 	 * Number of steps before fading out
 	 */
-	private static final int		FADE_OUT_DELAY_STEPS				= 40;
+	private static final int		FADE_OUT_DELAY_STEPS				= 20;
 
 	private static final int		MOVE_STEPS							= 10;
 
@@ -581,15 +581,6 @@ public abstract class PhotoToolTipShell {
 	}
 
 	/**
-	 * Get tooltip location.
-	 * 
-	 * @param size
-	 *            Tooltip size
-	 * @return Returns location relative to the device.
-	 */
-	protected abstract Point getToolTipLocation(Point size);
-
-	/**
 	 * @return Returns size of the tooltip content
 	 */
 	Point getContentSize() {
@@ -626,6 +617,15 @@ public abstract class PhotoToolTipShell {
 
 		return displayBounds;
 	}
+
+	/**
+	 * Get tooltip location.
+	 * 
+	 * @param size
+	 *            Tooltip size
+	 * @return Returns location relative to the device.
+	 */
+	protected abstract Point getToolTipLocation(Point size);
 
 	protected Shell getToolTipShell() {
 		return _visibleShell;

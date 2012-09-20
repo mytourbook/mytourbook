@@ -105,7 +105,7 @@ public class TourChart extends Chart {
 	public static final String				COMMAND_ID_IS_SHOW_VALUEPOINT_TOOLTIP	= "net.tourbook.command_TourChart_IsShowValuePointToolTip";	//$NON-NLS-1$
 	public static final String				COMMAND_ID_X_AXIS_DISTANCE				= "net.tourbook.command.tourChart.xAxisDistance";				//$NON-NLS-1$
 	public static final String				COMMAND_ID_X_AXIS_TIME					= "net.tourbook.command.tourChart.xAxisTime";					//$NON-NLS-1$
-	public static final String				COMMAND_ID_IS_SHOW_TOUR_PHOTOS					= "COMMAND_ID_TOUR_PHOTOS";									//$NON-NLS-1$
+	public static final String				COMMAND_ID_IS_SHOW_TOUR_PHOTOS			= "COMMAND_ID_TOUR_PHOTOS";									//$NON-NLS-1$
 
 	public static final String				COMMAND_ID_GRAPH_ALTITUDE				= "net.tourbook.command.graph.altitude";						//$NON-NLS-1$
 	public static final String				COMMAND_ID_GRAPH_SPEED					= "net.tourbook.command.graph.speed";							//$NON-NLS-1$
@@ -172,6 +172,8 @@ public class TourChart extends Chart {
 
 	private ChartPhotoToolTip				_photoTooltip;
 	private ControlListener					_ttControlListener						= new ControlListener();
+
+	private ChartPhotoOverlay				_photoOverlay							= new ChartPhotoOverlay();
 
 	/**
 	 * This listener is added to ALL widgets within the tooltip shell.
@@ -510,7 +512,7 @@ public class TourChart extends Chart {
 
 		_tourChartConfig.isShowTourPhotos = isItemChecked;
 		updateTourChart(true);
-		
+
 		setCommandChecked(COMMAND_ID_IS_SHOW_TOUR_PHOTOS, isItemChecked);
 	}
 
@@ -1059,6 +1061,9 @@ public class TourChart extends Chart {
 
 	private void createLayer_Photo() {
 
+		// reset layer
+		_photoOverlay.setPhotoLayer(null);
+
 		if (_tourChartConfig.isShowTourPhotos == false) {
 			return;
 		}
@@ -1090,6 +1095,10 @@ public class TourChart extends Chart {
 		final ArrayList<ChartPhoto> chartPhotos = new ArrayList<ChartPhoto>();
 
 		_layerPhoto = new ChartLayerPhoto(chartPhotos);
+
+		setCustomOverlay(_photoOverlay);
+
+		_photoOverlay.setPhotoLayer(_layerPhoto);
 
 		final long tourStart = _tourData.getTourStartTime().getMillis() / 1000;
 		final int numberOfTimeSlices = timeSerie.length;
@@ -1703,13 +1712,9 @@ public class TourChart extends Chart {
 
 		final ArrayList<IChartLayer> customFgLayers = new ArrayList<IChartLayer>();
 
-		/*
-		 * photo layer
+		/**
+		 * Sequence of the graph layer is the z-order, last added layer is on the top
 		 */
-		// show photo layer only for ONE visible graph
-		if (_layerPhoto != null && _tourChartConfig.isShowTourPhotos == true && yData == yDataWithLabels) {
-			customFgLayers.add(_layerPhoto);
-		}
 
 		/*
 		 * marker layer
@@ -1717,6 +1722,14 @@ public class TourChart extends Chart {
 		// show label layer only for ONE visible graph
 		if (_layerMarker != null && yData == yDataWithLabels) {
 			customFgLayers.add(_layerMarker);
+		}
+
+		/*
+		 * photo layer
+		 */
+		// show photo layer only for ONE visible graph
+		if (_layerPhoto != null && _tourChartConfig.isShowTourPhotos == true && yData == yDataWithLabels) {
+			customFgLayers.add(_layerPhoto);
 		}
 
 		/*

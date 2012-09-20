@@ -28,6 +28,8 @@ public class ChartDrawingData {
 	int									devSliderBarHeight;
 	int									devXAxisHeight;
 
+	public int							devDevVisibleChartWidth;
+
 	ChartDrawingData(final ArrayList<GraphDrawingData> graphDrawingData) {
 
 		this.graphDrawingData = graphDrawingData;

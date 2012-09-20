@@ -388,10 +388,10 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	Rectangle							_clientArea;
 
-//	/**
-//	 * Time when the chart was painted the last time
-//	 */
-//	private long						_lastChartDrawingTime;
+	/**
+	 * Is <code>true</code> when custom overlays needs to be painted
+	 */
+	private boolean						_isCustomOverlayDirty;
 
 	/**
 	 * Constructor
@@ -485,7 +485,7 @@ public class ChartComponentGraph extends Canvas {
 			public void paintControl(final PaintEvent event) {
 
 				if (_isChartDragged) {
-					drawSync020DraggedChart(event.gc);
+					drawSync_020_DraggedChart(event.gc);
 				} else {
 
 //					final long start = System.nanoTime();
@@ -493,7 +493,7 @@ public class ChartComponentGraph extends Canvas {
 //					System.out.println("onPaint\tstart\t");
 //					// TODO remove SYSTEM.OUT.PRINTLN
 
-					drawSync000onPaint(event.gc);
+					drawSync_000_onPaint(event.gc);
 
 //					System.out.println("onPaint\tend\t" + (((double) System.nanoTime() - start) / 1000000) + "ms");
 //					System.out.println();
@@ -1527,7 +1527,7 @@ public class ChartComponentGraph extends Canvas {
 			} else {
 
 				// an error was set in the chart data model
-				drawSyncBg999ErrorMessage(gcChart);
+				drawSyncBg_999_ErrorMessage(gcChart);
 			}
 		}
 		gcChart.dispose();
@@ -1543,8 +1543,6 @@ public class ChartComponentGraph extends Canvas {
 		_isOverlayDirty = true;
 
 		redraw();
-
-//		_lastChartDrawingTime = System.currentTimeMillis();
 
 //		final long endTime = System.nanoTime();
 //		System.out.println("drawAsync100: "
@@ -3261,7 +3259,7 @@ public class ChartComponentGraph extends Canvas {
 	 * 
 	 * @param gc
 	 */
-	private void drawSync000onPaint(final GC gc) {
+	private void drawSync_000_onPaint(final GC gc) {
 
 		if (_graphDrawingData == null || _graphDrawingData.size() == 0) {
 
@@ -3269,7 +3267,7 @@ public class ChartComponentGraph extends Canvas {
 			gc.setBackground(_chart.getBackgroundColor());
 			gc.fillRectangle(_clientArea);
 
-			drawSyncBg999ErrorMessage(gc);
+			drawSyncBg_999_ErrorMessage(gc);
 
 			return;
 		}
@@ -3288,7 +3286,7 @@ public class ChartComponentGraph extends Canvas {
 				 * paint dragged chart until the chart is recomputed
 				 */
 				if (_isPaintDraggedImage) {
-					drawSync020DraggedChart(gc);
+					drawSync_020_DraggedChart(gc);
 					return;
 				}
 
@@ -3297,7 +3295,7 @@ public class ChartComponentGraph extends Canvas {
 				 */
 				if (_chartImage20Chart != null) {
 
-					final Image image = drawSync010ImageChart(gc);
+					final Image image = drawSync_010_ImageChart(gc);
 					if (image == null) {
 						return;
 					}
@@ -3341,12 +3339,12 @@ public class ChartComponentGraph extends Canvas {
 //				// TODO remove SYSTEM.OUT.PRINTLN
 			}
 
-			drawSync300Image30Custom();
-			drawSync010ImageChart(gc);
+			drawSync_300_Image30Custom();
+			drawSync_010_ImageChart(gc);
 		}
 	}
 
-	private Image drawSync010ImageChart(final GC gc) {
+	private Image drawSync_010_ImageChart(final GC gc) {
 
 		final boolean isOverlayImageVisible = _isXSliderVisible
 				|| _isYSliderVisible
@@ -3356,7 +3354,7 @@ public class ChartComponentGraph extends Canvas {
 
 		if (isOverlayImageVisible) {
 
-			drawSync400OverlayImage();
+			drawSync_400_OverlayImage();
 
 			if (_chartImage40Overlay != null) {
 //				System.out.println("gc <- 40\tdrawSync010ImageChart");
@@ -3378,7 +3376,7 @@ public class ChartComponentGraph extends Canvas {
 		}
 	}
 
-	private void drawSync020DraggedChart(final GC gc) {
+	private void drawSync_020_DraggedChart(final GC gc) {
 
 		if (_draggedChartDraggedPos == null) {
 			return;
@@ -3415,7 +3413,7 @@ public class ChartComponentGraph extends Canvas {
 	/**
 	 * Draws custom foreground layers on top of the graphs.
 	 */
-	private void drawSync300Image30Custom() {
+	private void drawSync_300_Image30Custom() {
 
 		// the layer image has the same size as the graph image
 		final Rectangle chartRect = _chartImage20Chart.getBounds();
@@ -3473,7 +3471,7 @@ public class ChartComponentGraph extends Canvas {
 	 * Draws the overlays into the graph (fg layer image) slider image which contains the custom
 	 * layer image
 	 */
-	private void drawSync400OverlayImage() {
+	private void drawSync_400_OverlayImage() {
 
 		if (_chartImage30Custom == null) {
 			return;
@@ -3490,6 +3488,7 @@ public class ChartComponentGraph extends Canvas {
 				&& _isSelectionDirty == false
 				&& _isHoveredBarDirty == false
 				&& _hoveredLineValueIndex == -1
+				&& _isCustomOverlayDirty == false
 				&& _chartImage40Overlay != null) {
 
 			final Rectangle oldBounds = _chartImage40Overlay.getBounds();
@@ -3528,31 +3527,35 @@ public class ChartComponentGraph extends Canvas {
 				createXSliderLabel(gcOverlay, _xSliderOnBottom);
 				updateXSliderYPosition();
 
-				drawSync410XSlider(gcOverlay, _xSliderOnBottom);
-				drawSync410XSlider(gcOverlay, _xSliderOnTop);
+				drawSync_410_XSlider(gcOverlay, _xSliderOnBottom);
+				drawSync_410_XSlider(gcOverlay, _xSliderOnTop);
 			}
 			if (_isYSliderVisible) {
-				drawSync420YSliders(gcOverlay);
+				drawSync_420_YSliders(gcOverlay);
 			}
 			_isSliderDirty = false;
 
 			if (_isXMarkerMoved) {
-				drawSync430XMarker(gcOverlay);
+				drawSync_430_XMarker(gcOverlay);
 			}
 
 			if (_isSelectionVisible) {
-				drawSync440Selection(gcOverlay);
+				drawSync_440_Selection(gcOverlay);
 			}
 
 			if (_isHoveredBarDirty) {
-				drawSync450HoveredBar(gcOverlay);
+				drawSync_450_HoveredBar(gcOverlay);
 				_isHoveredBarDirty = false;
 			}
 
 			if (_hoveredLineValueIndex != -1 && _lineDevPositions.size() > 0) {
 
 				// hovered lines are set -> draw it
-				drawSync460HoveredLine(gcOverlay);
+				drawSync_460_HoveredLine(gcOverlay);
+			}
+
+			if (_isCustomOverlayDirty) {
+				drawSync_470_CustomOverlay(gcOverlay);
 			}
 
 		}
@@ -3568,7 +3571,7 @@ public class ChartComponentGraph extends Canvas {
 	 * @param gcGraph
 	 * @param slider
 	 */
-	private void drawSync410XSlider(final GC gcGraph, final ChartXSlider slider) {
+	private void drawSync_410_XSlider(final GC gcGraph, final ChartXSlider slider) {
 
 		final Display display = getDisplay();
 
@@ -3677,7 +3680,7 @@ public class ChartComponentGraph extends Canvas {
 	 * 
 	 * @param gcGraph
 	 */
-	private void drawSync420YSliders(final GC gcGraph) {
+	private void drawSync_420_YSliders(final GC gcGraph) {
 
 		if (_hitYSlider == null) {
 			return;
@@ -3771,7 +3774,7 @@ public class ChartComponentGraph extends Canvas {
 		colorTxt.dispose();
 	}
 
-	private void drawSync430XMarker(final GC gc) {
+	private void drawSync_430_XMarker(final GC gc) {
 
 		final Display display = getDisplay();
 		final Color colorXMarker = new Color(display, 255, 153, 0);
@@ -3911,7 +3914,7 @@ public class ChartComponentGraph extends Canvas {
 		colorXMarker.dispose();
 	}
 
-	private void drawSync440Selection(final GC gc) {
+	private void drawSync_440_Selection(final GC gc) {
 
 		_isSelectionDirty = false;
 
@@ -3925,7 +3928,7 @@ public class ChartComponentGraph extends Canvas {
 				break;
 
 			case ChartDataModel.CHART_TYPE_BAR:
-				drawSync442BarSelection(gc, drawingData);
+				drawSync_442_BarSelection(gc, drawingData);
 				break;
 
 			default:
@@ -3934,7 +3937,7 @@ public class ChartComponentGraph extends Canvas {
 		}
 	}
 
-	private void drawSync442BarSelection(final GC gc, final GraphDrawingData drawingData) {
+	private void drawSync_442_BarSelection(final GC gc, final GraphDrawingData drawingData) {
 
 		// check if multiple bars are selected
 		boolean drawSelection = false;
@@ -4100,7 +4103,7 @@ public class ChartComponentGraph extends Canvas {
 		}
 	}
 
-	private void drawSync450HoveredBar(final GC gcOverlay) {
+	private void drawSync_450_HoveredBar(final GC gcOverlay) {
 
 		// check if hovered bar is disabled
 		if (_hoveredBarSerieIndex == -1) {
@@ -4201,7 +4204,7 @@ public class ChartComponentGraph extends Canvas {
 		gcOverlay.setAlpha(0xff);
 	}
 
-	private void drawSync460HoveredLine(final GC gcOverlay) {
+	private void drawSync_460_HoveredLine(final GC gcOverlay) {
 
 		int graphIndex = 0;
 
@@ -4303,7 +4306,14 @@ public class ChartComponentGraph extends Canvas {
 		gcOverlay.setAntialias(SWT.OFF);
 	}
 
-	private void drawSyncBg999ErrorMessage(final GC gc) {
+	private void drawSync_470_CustomOverlay(final GC gcOverlay) {
+
+		if (_isCustomOverlayDirty) {
+			_chart.getCustomOverlay().draw(gcOverlay);
+		}
+	}
+
+	private void drawSyncBg_999_ErrorMessage(final GC gc) {
 
 		final String errorMessage = _chartComponents.errorMessage;
 		if (errorMessage != null) {
@@ -4458,6 +4468,10 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	int getXXDevViewPortLeftBorder() {
 		return _xxDevViewPortLeftBorder;
+	}
+
+	public double getZoomRatio() {
+		return _graphZoomRatio;
 	}
 
 	private void handleChartResizeForSliders() {
@@ -5458,6 +5472,8 @@ public class ChartComponentGraph extends Canvas {
 
 		} else if (_isXMarkerMoved) {
 
+			// X-Marker is dragged
+
 			_devXMarkerDraggedPos = devXMouse;
 
 			_isSliderDirty = true;
@@ -5577,6 +5593,10 @@ public class ChartComponentGraph extends Canvas {
 							_devYMouseMove);
 				}
 			}
+		}
+
+		if (_isCustomOverlayDirty = _chart.isCustomOverlayDirty(devXMouse, devYMouse)) {
+			isRedraw = true;
 		}
 
 		if (isRedraw) {
@@ -7113,4 +7133,5 @@ public class ChartComponentGraph extends Canvas {
 
 		_chart.enableActions();
 	}
+
 }

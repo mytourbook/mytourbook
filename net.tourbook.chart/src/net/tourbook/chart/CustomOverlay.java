@@ -13,34 +13,24 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-/**
- * @author Wolfgang Schramm Created: 16.9.2012
- */
-package net.tourbook.ui.tourChart;
+package net.tourbook.chart;
 
-import java.util.ArrayList;
+import org.eclipse.swt.graphics.GC;
 
-import org.eclipse.swt.graphics.Point;
+public interface CustomOverlay {
 
-public class PhotoGroup {
+	/**
+	 * Draws into the chart overlay, this event can happen at each mouse move event.
+	 * 
+	 * @param gcOverlay
+	 */
+	public void draw(GC gcOverlay);
 
-	ArrayList<Integer>	photoIndex	= new ArrayList<Integer>();
-
-	Point				groupCenterPosition;
-
-	int					hGridStart;
-	int					hGridEnd;
-
-	int					paintedGroupDevX;
-	int					paintedGroupDevY;
-	int					paintedTextDevX;
-	int					paintedTextDevY;
-	int					paintedGroupTextWidth;
-	int					paintedGroupTextHeight;
-	String				paintedGroupText;
-
-	void addPhoto(final int positionIndex) {
-		photoIndex.add(positionIndex);
-	}
+	/**
+	 * @param devXMouse
+	 * @param devYMouse
+	 * @return Returns <code>true</code> when the custom overlay must be painted.
+	 */
+	public boolean onMouseMove(int devXMouse, int devYMouse);
 
 }

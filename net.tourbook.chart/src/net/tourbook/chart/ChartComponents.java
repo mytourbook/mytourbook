@@ -331,6 +331,7 @@ public class ChartComponents extends Composite {
 		chartDrawingData.devXTitelBarHeight = _devXTitleBarHeight;
 		chartDrawingData.devSliderBarHeight = _devSliderBarHeight;
 		chartDrawingData.devXAxisHeight = _devXAxisHeight;
+		chartDrawingData.devDevVisibleChartWidth = getDevVisibleChartWidth();
 
 		return chartDrawingData;
 	}

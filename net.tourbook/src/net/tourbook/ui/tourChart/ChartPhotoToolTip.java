@@ -104,9 +104,9 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 										final int devXMouseMove,
 										final int devYMouseMove) {
 
-		final ArrayList<PhotoGroup> photoPositions = photoLayer.getPhotoPositions();
+		final ArrayList<PhotoGroup> photoGroups = photoLayer.getPhotoPositions();
 
-		if (photoPositions == null) {
+		if (photoGroups == null) {
 			// photo positions are not initialized
 			return;
 		}
@@ -117,40 +117,29 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 
 		final int hoveredXPos = devXMouseMove;
 
-		final int positionMargin = 20;
-
-		final int hoveredXPosLeft = hoveredXPos - positionMargin;
-		final int hoveredXPosRight = hoveredXPos + positionMargin;
-
 		_devXHoveredPhoto = Integer.MAX_VALUE;
 		_devYHoveredPhoto = Integer.MAX_VALUE;
 
-//		// get all photos which are visible for the hovered value point and beside it
-//		for (int photoIndex = 0; photoIndex < photoPositions.length; photoIndex++) {
-//
-//			final Point photoPos = photoPositions[photoIndex];
-//			if (photoPos == null) {
-//				// photo is not visible
-//				continue;
-//			}
-//
-//			final int photoPosX = photoPos.x;
-//
-//			if (photoPosX > hoveredXPosLeft && photoPosX < hoveredXPosRight) {
-//
-//				// photo is within current hovered area
-//
-//				final ChartPhoto chartPhoto = chartPhotos.get(photoIndex);
-//
-//				// position tooltip above all posible photos
-//				if (photoPos.y < _devYHoveredPhoto) {
-//					_devXHoveredPhoto = photoPos.x;
-//					_devYHoveredPhoto = photoPos.y;
-//				}
-//
-//				_hoveredPhotos.add(chartPhoto);
-//			}
-//		}
+		for (final PhotoGroup photoGroup : photoGroups) {
+
+			if (hoveredXPos >= photoGroup.hGridStart && hoveredXPos <= photoGroup.hGridEnd) {
+
+				// photo is within current hovered area
+
+				final ArrayList<Integer> photoPosition = photoGroup.photoIndex;
+
+				for (final int photoIndex : photoPosition) {
+
+					final ChartPhoto chartPhoto = chartPhotos.get(photoIndex);
+
+					_hoveredPhotos.add(chartPhoto);
+				}
+
+				// set tooltip position
+				_devXHoveredPhoto = photoGroup.groupCenterPosition.x;
+				_devYHoveredPhoto = photoGroup.groupCenterPosition.y;
+			}
+		}
 
 		if (_hoveredPhotos.size() == 0) {
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -77,6 +77,8 @@ public class Chart extends ViewForm {
 	private final ListenerList			_sliderMoveListeners				= new ListenerList();
 	private final ListenerList			_doubleClickListeners				= new ListenerList();
 	private final ListenerList			_mouseListener						= new ListenerList();
+
+	private CustomOverlay				_customOverlay;
 
 	private ChartComponents				_chartComponents;
 
@@ -688,6 +690,10 @@ public class Chart extends ViewForm {
 		return createChartInfo();
 	}
 
+	public CustomOverlay getCustomOverlay() {
+		return _customOverlay;
+	}
+
 	public IHoveredListener getHoveredValuePointListener() {
 		return _hoveredValuePointListener;
 	}
@@ -813,6 +819,15 @@ public class Chart extends ViewForm {
 
 	protected void handleTooltipMouseEvent(final Event event, final Point mouseDisplayPosition) {
 		_chartComponents.getChartComponentGraph().handleTooltipMouseEvent(event, mouseDisplayPosition);
+	}
+
+	boolean isCustomOverlayDirty(final int devXMouse, final int devYMouse) {
+
+		if (_customOverlay != null) {
+			return _customOverlay.onMouseMove(devXMouse, devYMouse);
+		}
+
+		return false;
 	}
 
 	boolean isMouseDownExternalPre(final int devXMouse, final int devYMouse) {
@@ -1011,6 +1026,10 @@ public class Chart extends ViewForm {
 
 		_chartContextProvider = chartContextProvider;
 		_isFirstContextMenu = isFirstContextMenu;
+	}
+
+	public void setCustomOverlay(final CustomOverlay _customOverlay) {
+		this._customOverlay = _customOverlay;
 	}
 
 	protected void setDataModel(final ChartDataModel chartDataModel) {
@@ -1325,7 +1344,7 @@ public class Chart extends ViewForm {
 	}
 
 	/**
-	 * Updates only the custom layers which performce much faster than a chart update.
+	 * Updates only the custom layers which performance is much faster than a chart update.
 	 */
 	public void updateCustomLayers() {
 		_chartComponents.updateCustomLayers();
