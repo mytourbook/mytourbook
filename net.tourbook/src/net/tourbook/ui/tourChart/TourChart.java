@@ -23,6 +23,8 @@ import java.util.Map;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
+import net.tourbook.chart.ChartComponentAxis;
+import net.tourbook.chart.ChartComponents;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataYSerie;
@@ -79,6 +81,7 @@ import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
@@ -174,6 +177,7 @@ public class TourChart extends Chart {
 	private ControlListener					_ttControlListener						= new ControlListener();
 
 	private ChartPhotoOverlay				_photoOverlay							= new ChartPhotoOverlay();
+	private Color							_photoOverlayBGColor;
 
 	/**
 	 * This listener is added to ALL widgets within the tooltip shell.
@@ -224,12 +228,22 @@ public class TourChart extends Chart {
 						 * check if the hovered control is the owner control, if not, hide the
 						 * tooltip
 						 */
+
+						final ChartComponents chartComponents = getChartComponents();
+						final ChartComponentAxis axisLeft = chartComponents.getAxisLeft();
+						final ChartComponentAxis axisRight = chartComponents.getAxisRight();
+
 						Control parent = hoveredControl;
 
 						while (true) {
 
 							if (parent == photoTTShell) {
 								// mouse is over the photo tooltip
+								break;
+							}
+
+							if (parent == axisLeft || parent == axisRight) {
+								// mouse is hovering the y axis
 								break;
 							}
 
@@ -289,12 +303,7 @@ public class TourChart extends Chart {
 				return;
 			}
 
-			_photoTooltip.showChartPhotoToolTip(
-					photoLayer,
-					hoveredValueIndex,
-					devHoveredValue,
-					devXMouseMove,
-					devYMouseMove);
+			_photoTooltip.showChartPhotoToolTip(photoLayer, devHoveredValue, devXMouseMove, devYMouseMove);
 		}
 	}
 
@@ -323,6 +332,10 @@ public class TourChart extends Chart {
 		addControlListener(this);
 
 		addPrefListeners();
+
+//		_photoOverlayBGColor = new Color(getDisplay(), new RGB(0xFF, 0x6F, 0x00));
+		_photoOverlayBGColor = new Color(getDisplay(), new RGB(0xFF, 0x80, 0x33));
+		_photoOverlay.setBackgroundColor(_photoOverlayBGColor);
 
 		/*
 		 * set values from pref store
@@ -375,7 +388,9 @@ public class TourChart extends Chart {
 
 		_photoTooltip = new ChartPhotoToolTip(this);
 
-		setHoveredValuePointListener(new HoveredListener());
+//		_photoOverlay.setPhotoToolTip(_photoTooltip);
+
+		setHoveredListener(new HoveredListener());
 	}
 
 	public void actionCanAutoMoveSliders(final boolean isItemChecked) {
@@ -1094,7 +1109,7 @@ public class TourChart extends Chart {
 
 		final ArrayList<ChartPhoto> chartPhotos = new ArrayList<ChartPhoto>();
 
-		_layerPhoto = new ChartLayerPhoto(chartPhotos);
+		_layerPhoto = new ChartLayerPhoto(chartPhotos, _photoOverlay, _photoOverlayBGColor);
 
 		setCustomOverlay(_photoOverlay);
 
@@ -1550,6 +1565,8 @@ public class TourChart extends Chart {
 	private void onDispose() {
 
 		_prefStore.removePropertyChangeListener(_prefChangeListener);
+
+		_photoOverlayBGColor.dispose();
 
 		_valuePointToolTip.hide();
 	}

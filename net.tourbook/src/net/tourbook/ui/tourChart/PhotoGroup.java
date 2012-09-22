@@ -35,6 +35,7 @@ public class PhotoGroup {
 	int					paintedGroupDevY;
 	int					paintedTextDevX;
 	int					paintedTextDevY;
+
 	int					paintedGroupTextWidth;
 	int					paintedGroupTextHeight;
 	String				paintedGroupText;
@@ -43,4 +44,12 @@ public class PhotoGroup {
 		photoIndex.add(positionIndex);
 	}
 
+	@Override
+	public String toString() {
+		return "PhotoGroup ["
+				+ ("hGridStart=" + hGridStart + ", ")
+				+ ("hGridEnd=" + hGridEnd + ", ")
+				+ ("paintedGroupText=" + paintedGroupText)
+				+ "]";
+	}
 }

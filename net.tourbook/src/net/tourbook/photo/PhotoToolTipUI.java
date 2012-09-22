@@ -19,6 +19,7 @@ import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 import net.tourbook.ui.tourChart.ChartPhoto;
 
@@ -41,6 +42,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 
@@ -63,13 +65,16 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 	private ActionToggleGalleryOrientation	_actionToggleGalleryOrientation;
 
 	private boolean							_isVerticalGallery;
+	private ToolBarManager					_galleryToolbarManager;
 
 	/*
 	 * UI controls
 	 */
 	private Composite						_galleryContainer;
-	private ImageGallery					_imageGallery;
-	private ToolBar							_toolbarControl;
+	private PhotoGallery					_photoGallery;
+
+	private ToolBar							_ttToolbarControl;
+	private ToolBar							_galleryToolbarControl;
 
 	private class ActionToggleGalleryOrientation extends Action {
 
@@ -84,6 +89,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 	}
 
 	private final class PhotoGalleryProvider implements IPhotoGalleryProvider {
+
 		@Override
 		public IStatusLineManager getStatusLineManager() {
 			return null;
@@ -91,7 +97,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 		@Override
 		public IToolBarManager getToolBarManager() {
-			return null;
+			return _galleryToolbarManager;
 		}
 
 		@Override
@@ -115,23 +121,28 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		 * restore MUST be done after the shell is created, otherwise clientArea() can return 0
 		 * values
 		 */
-		_imageGallery.restoreState(_state);
+		_photoGallery.restoreState(_state);
 
 		// set gallery orientation
-		_imageGallery.setVertical(_isVerticalGallery);
+		_photoGallery.setVertical(_isVerticalGallery);
 
-		_imageGallery.showInfo(false, null, true, true);
+
+		/**
+		 * Prevent to open pref dialog, when it's opened it would close this tooltip and the pref
+		 * dialog is hidden -->> APP IS FREEZING !!!
+		 */
+		_photoGallery.setShowOtherShellActions(false);
 
 		shell.addDisposeListener(new DisposeListener() {
 
 			@Override
 			public void widgetDisposed(final DisposeEvent e) {
 
-				if (_imageGallery.isDisposed()) {
+				if (_photoGallery.isDisposed()) {
 					// this happens by multiple shells
 					return;
 				}
-				_imageGallery.saveState(_state);
+				_photoGallery.saveState(_state);
 			}
 		});
 	}
@@ -148,7 +159,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 		updateUI_Colors(parent);
 
-		super.setImageGallery(_imageGallery);
+		super.setImageGallery(_photoGallery);
 
 		return container;
 	}
@@ -177,22 +188,36 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 				.applyTo(_galleryContainer);
 		_galleryContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
-			_imageGallery = new ImageGallery();
+//			_photoGallery = new PhotoGallery();
+//
+//			_photoGallery.setShowActionBar();
+//
+//			_photoGallery.setShowThumbnailSize();
+//
+//			final int galleryStyle = SWT.V_SCROLL | SWT.H_SCROLL;
+//
+//			_photoGallery.createImageGallery(_galleryContainer, galleryStyle, new PhotoGalleryProvider());
 
-			_imageGallery.setShowActionBar();
+			_photoGallery = new PhotoGallery();
 
-			_imageGallery.setShowThumbnailSize();
+			_photoGallery.setShowActionBar();
+			_photoGallery.setShowThumbnailSize();
 
-//			final int galleryStyle = _isVerticalGallery ? //
-//					SWT.V_SCROLL // | SWT.MULTI
-//					: SWT.H_SCROLL // | SWT.MULTI
-//					;
 
-			final int galleryStyle = SWT.V_SCROLL | SWT.H_SCROLL;
+			_photoGallery.createPhotoGallery(
+					_galleryContainer,
+					SWT.V_SCROLL | SWT.H_SCROLL | SWT.MULTI,
+					new PhotoGalleryProvider());
 
-			_imageGallery.createImageGallery(_galleryContainer, galleryStyle, new PhotoGalleryProvider());
+			_photoGallery.setDefaultStatusMessage(Messages.Tour_Photos_Label_StatusMessage_NoTourWithPhotos);
 
-			createUI_20_ActionBar(_imageGallery.getCustomActionBarContainer());
+			createUI_20_ActionBar(_photoGallery.getCustomActionBarContainer());
+
+			fillActionBar();
+
+			// must be called after the custom action bar is created
+			_photoGallery.createActionBar();
+			_galleryToolbarManager.update(false);
 		}
 	}
 
@@ -200,24 +225,36 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 		GridLayoutFactory.fillDefaults().applyTo(parent);
 
-		/*
-		 * create toolbar
-		 */
-		_toolbarControl = new ToolBar(parent, SWT.FLAT);
-		GridDataFactory.fillDefaults()//
-				.grab(true, false)
-				.align(SWT.BEGINNING, SWT.BEGINNING)
-				.applyTo(_toolbarControl);
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+		{
+
+			/*
+			 * create toolbar
+			 */
+			_ttToolbarControl = new ToolBar(container, SWT.FLAT);
+			GridDataFactory.fillDefaults()//
+					.applyTo(_ttToolbarControl);
 //		_toolbarControl.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
-		/*
-		 * fill toolbar
-		 */
-		final ToolBarManager tbm = new ToolBarManager(_toolbarControl);
+			/*
+			 * spacer
+			 */
+			final Label label = new Label(container, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
+			label.setText(UI.EMPTY_STRING);
 
-		tbm.add(_actionToggleGalleryOrientation);
+			/*
+			 * create gallery toolbar
+			 */
+			_galleryToolbarControl = new ToolBar(container, SWT.FLAT);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.END, SWT.FILL)
+					.applyTo(_galleryToolbarControl);
 
-		tbm.update(true);
+			_galleryToolbarManager = new ToolBarManager(_galleryToolbarControl);
+		}
 	}
 
 	private void delay() {
@@ -226,6 +263,18 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private void fillActionBar() {
+
+		/*
+		 * fill toolbar
+		 */
+		final ToolBarManager ttToolbarManager = new ToolBarManager(_ttToolbarControl);
+
+		ttToolbarManager.add(_actionToggleGalleryOrientation);
+
+		ttToolbarManager.update(true);
 	}
 
 	@Override
@@ -244,7 +293,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 	private void onToggleVH() {
 
 		// keep state for current orientation
-		_imageGallery.saveState(_state);
+		_photoGallery.saveState(_state);
 
 		// toggle gallery
 		_isVerticalGallery = !_isVerticalGallery;
@@ -269,7 +318,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 		setIsShellToggle();
 
-		_imageGallery.setVertical(_isVerticalGallery);
+		_photoGallery.setVertical(_isVerticalGallery);
 	}
 
 	@Override
@@ -321,7 +370,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 		final String galleryPositionKey = hoveredPhotosHash + "_PhotoToolTipUI";//$NON-NLS-1$
 
-		_imageGallery.showImages(_photoWrapperList, galleryPositionKey);
+		_photoGallery.showImages(_photoWrapperList, galleryPositionKey);
 	}
 
 	private void updateUI_Colors(final Composite parent) {
@@ -339,7 +388,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		_galleryContainer.setForeground(fgColor);
 		_galleryContainer.setBackground(bgColor);
 
-		_imageGallery.updateColors(fgColor, bgColor, selectionFgColor, noFocusSelectionFgColor, true);
+		_photoGallery.updateColors(fgColor, bgColor, selectionFgColor, noFocusSelectionFgColor, true);
 	}
 
 	private void updateUI_ToogleAction() {

@@ -46,7 +46,7 @@ public abstract class PhotoToolTipShell {
 	/**
 	 * how long each tick is when fading in/out (in ms)
 	 */
-	private static final int		FADE_TIME_INTERVAL					= UI.IS_OSX ? 1 : 10;
+	private static final int		FADE_TIME_INTERVAL					= UI.IS_OSX ? 10 : 1;
 
 	/**
 	 * Number of steps when fading in

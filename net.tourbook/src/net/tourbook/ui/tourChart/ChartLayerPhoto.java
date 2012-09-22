@@ -26,6 +26,7 @@ import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IChartLayer;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -33,19 +34,27 @@ import org.eclipse.swt.widgets.Display;
 
 public class ChartLayerPhoto implements IChartLayer {
 
+	private static final int		PHOTO_ICON_WIDTH		= 4;
+
 	private static final int		GROUP_HORIZONTAL_WIDTH	= 40;
 
 	private ArrayList<PhotoGroup>	_photoGroups			= new ArrayList<PhotoGroup>();
-
 	private ArrayList<ChartPhoto>	_chartPhotos;
 
-	public ChartLayerPhoto(final ArrayList<ChartPhoto> chartPhotos) {
+	private Point[]					_photoPositions;
+
+	private ChartPhotoOverlay		_photoOverlay;
+	private Color					_photoOverlayBGColor;
+
+	public ChartLayerPhoto(	final ArrayList<ChartPhoto> chartPhotos,
+							final ChartPhotoOverlay photoOverlay,
+							final Color photoOverlayBGColor) {
 		_chartPhotos = chartPhotos;
+		_photoOverlay = photoOverlay;
+		_photoOverlayBGColor = photoOverlayBGColor;
 	}
 
-	private void createGroupedPhotos(	final Point[] photoPositions,
-										final int devGraphImageOffset,
-										final GraphDrawingData graphDrawingData) {
+	private void createGroupedPhotos(final int devGraphImageOffset, final GraphDrawingData graphDrawingData) {
 
 		_photoGroups.clear();
 
@@ -70,9 +79,9 @@ public class ChartLayerPhoto implements IChartLayer {
 
 		PhotoGroup groupPhoto = null;
 
-		for (int positionIndex = 0; positionIndex < photoPositions.length; positionIndex++) {
+		for (int positionIndex = 0; positionIndex < _photoPositions.length; positionIndex++) {
 
-			final Point photoPosition = photoPositions[positionIndex];
+			final Point photoPosition = _photoPositions[positionIndex];
 
 			if (photoPosition == null) {
 				// photo is not in the graph viewport
@@ -127,7 +136,7 @@ public class ChartLayerPhoto implements IChartLayer {
 		 */
 		for (final PhotoGroup photoGroup : _photoGroups) {
 
-			final Point firstPosition = photoPositions[photoGroup.photoIndex.get(0)];
+			final Point firstPosition = _photoPositions[photoGroup.photoIndex.get(0)];
 
 			int minX = firstPosition.x;
 			int minY = firstPosition.y;
@@ -136,7 +145,7 @@ public class ChartLayerPhoto implements IChartLayer {
 
 			for (final int photoIndex : photoGroup.photoIndex) {
 
-				final Point photoPosition = photoPositions[photoIndex];
+				final Point photoPosition = _photoPositions[photoIndex];
 
 				final int photoPosX = photoPosition.x;
 				final int photoPosY = photoPosition.y;
@@ -182,12 +191,10 @@ public class ChartLayerPhoto implements IChartLayer {
 		final int lineWidth = 2;
 		int photoIndex = 0;
 
-		gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY));
-
 		/*
-		 * get all photo positions within the graph viewport (clientarea)
+		 * get all photo positions within the graph viewport (client area)
 		 */
-		final Point[] photoPositions = new Point[_chartPhotos.size()];
+		_photoPositions = new Point[_chartPhotos.size()];
 
 		for (final ChartPhoto chartPhoto : _chartPhotos) {
 
@@ -197,7 +204,7 @@ public class ChartLayerPhoto implements IChartLayer {
 			final int devXValue = (int) (chartPhoto.xValue * scaleX) - devGraphImageOffset;
 			final int devYValue = devYBottom - devYGraph;
 
-			final int photoIconWidth = 4;
+			final int photoIconWidth = PHOTO_ICON_WIDTH;
 			final int photoIconWidth2 = photoIconWidth / 2;
 
 			final int devXPhoto = devXValue;
@@ -206,7 +213,7 @@ public class ChartLayerPhoto implements IChartLayer {
 			// check if photo is visible
 			if (devXPhoto + photoIconWidth2 < 0 || devXPhoto - photoIconWidth2 > devGraphWidth) {
 
-				photoPositions[photoIndex++] = null;
+				_photoPositions[photoIndex++] = null;
 
 				continue;
 			}
@@ -237,18 +244,11 @@ public class ChartLayerPhoto implements IChartLayer {
 			}
 
 			// keep photo position which is used when tooltip is displayed
-			photoPositions[photoIndex++] = new Point(devXPhoto, devYPhoto);
-
-			// debug: draw photo at original position
-			gc.fillRectangle(//
-					devXPhoto - photoIconWidth2 / 2,
-					devYPhoto,
-					photoIconWidth,
-					photoIconWidth);
+			_photoPositions[photoIndex++] = new Point(devXPhoto, devYPhoto);
 		}
 
 		// convert all photo positions into grouped photo positions
-		createGroupedPhotos(photoPositions, devGraphImageOffset, drawingData);
+		createGroupedPhotos(devGraphImageOffset, drawingData);
 
 		gc.setClipping(0, devYTop, devGraphWidth, devGraphHeight);
 		gc.setAntialias(SWT.ON);
@@ -272,10 +272,11 @@ public class ChartLayerPhoto implements IChartLayer {
 			/*
 			 * ensure that group text do no overlap another group
 			 */
+			final int gridBorder = 1;
 			if (groupX + groupTextWidth >= photoGroup.hGridEnd) {
-				groupX = photoGroup.hGridEnd - groupTextWidth - 2;
+				groupX = photoGroup.hGridEnd - groupTextWidth - gridBorder;
 			} else if (groupX <= photoGroup.hGridStart) {
-				groupX = photoGroup.hGridStart + 2;
+				groupX = photoGroup.hGridStart + gridBorder;
 			}
 
 			final int textX = groupX + 3;
@@ -313,6 +314,20 @@ public class ChartLayerPhoto implements IChartLayer {
 
 	void drawGroup(final GC gc, final PhotoGroup photoGroup) {
 
+		// draw photo icon
+		for (final int photoIndex : photoGroup.photoIndex) {
+
+			final Point photoPosition = _photoPositions[photoIndex];
+			final int devXPhoto = photoPosition.x;
+			final int devYPhoto = photoPosition.y;
+
+			gc.fillRectangle(//
+					devXPhoto - (PHOTO_ICON_WIDTH / 2 / 2),
+					devYPhoto,
+					PHOTO_ICON_WIDTH,
+					PHOTO_ICON_WIDTH);
+		}
+
 		// draw group
 		gc.fillRoundRectangle(
 				photoGroup.paintedGroupDevX,
@@ -324,7 +339,6 @@ public class ChartLayerPhoto implements IChartLayer {
 
 		// draw text
 		gc.drawText(photoGroup.paintedGroupText, photoGroup.paintedTextDevX, photoGroup.paintedTextDevY, true);
-
 	}
 
 	ArrayList<ChartPhoto> getChartPhotos() {

@@ -179,6 +179,14 @@ public class PhotoGallery extends ImageGallery {
 		sortGallery(_gallerySorting);
 	}
 
+	/**
+	 * Creates action bar with default actions.
+	 */
+	public void createActionBar() {
+		createActions();
+		fillActionBars();
+	}
+
 	private void createActions() {
 
 		_actionImageFilterGPS = new ActionImageFilterGPS(this);
@@ -199,9 +207,6 @@ public class PhotoGallery extends ImageGallery {
 									final IPhotoGalleryProvider photoGalleryProvider) {
 
 		super.createImageGallery(parent, style, photoGalleryProvider);
-
-		createActions();
-		fillActionBars();
 	}
 
 	private void enableActions() {
@@ -319,5 +324,6 @@ public class PhotoGallery extends ImageGallery {
 
 		super.saveState(state);
 	}
+
 
 }

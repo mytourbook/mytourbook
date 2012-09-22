@@ -24,13 +24,22 @@ public interface CustomOverlay {
 	 * 
 	 * @param gcOverlay
 	 */
-	public void draw(GC gcOverlay);
+	public boolean draw(GC gcOverlay);
+
+//	/**
+//	 * @return Returns <code>true</code> when the overlay should be hidden, e.g. when the mouse has
+//	 *         exited the chart.
+//	 */
+//	public boolean isHideOverlay();
 
 	/**
 	 * @param devXMouse
+	 *            Mouse horizontal position or {@link Integer#MIN_VALUE} when mouse position is not
+	 *            available.
 	 * @param devYMouse
+	 *            Mouse vertical position or {@link Integer#MIN_VALUE} when mouse position is not
+	 *            available.
 	 * @return Returns <code>true</code> when the custom overlay must be painted.
 	 */
 	public boolean onMouseMove(int devXMouse, int devYMouse);
-
 }

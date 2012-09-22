@@ -1337,11 +1337,11 @@ public class ChartComponents extends Composite {
 		drawingData.setXUnitTextPos(GraphDrawingData.X_UNIT_TEXT_POS_CENTER);
 	}
 
-	ChartComponentAxis getAxisLeft() {
+	public ChartComponentAxis getAxisLeft() {
 		return componentAxisLeft;
 	}
 
-	ChartComponentAxis getAxisRight() {
+	public ChartComponentAxis getAxisRight() {
 		return componentAxisRight;
 	}
 

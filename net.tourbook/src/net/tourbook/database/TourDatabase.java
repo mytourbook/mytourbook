@@ -1367,7 +1367,7 @@ public class TourDatabase {
 		}
 
 		/*
-		 * dummy tour cannot be deleted
+		 * dummy tour cannot be saved
 		 */
 		if (tourData.isDummyTour) {
 			return null;

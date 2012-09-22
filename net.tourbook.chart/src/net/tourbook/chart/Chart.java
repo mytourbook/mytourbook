@@ -98,7 +98,7 @@ public class Chart extends ViewForm {
 	 */
 	IChartListener						_draggingListenerXMarker;
 
-	IHoveredListener					_hoveredValuePointListener;
+	IHoveredListener					_hoveredListener;
 
 	/**
 	 * when set to <code>true</code> the toolbar is within the chart control, otherwise the toolbar
@@ -694,8 +694,8 @@ public class Chart extends ViewForm {
 		return _customOverlay;
 	}
 
-	public IHoveredListener getHoveredValuePointListener() {
-		return _hoveredValuePointListener;
+	public IHoveredListener getHoveredListener() {
+		return _hoveredListener;
 	}
 
 	public int getLeftAxisWidth() {
@@ -1028,8 +1028,8 @@ public class Chart extends ViewForm {
 		_isFirstContextMenu = isFirstContextMenu;
 	}
 
-	public void setCustomOverlay(final CustomOverlay _customOverlay) {
-		this._customOverlay = _customOverlay;
+	public void setCustomOverlay(final CustomOverlay customOverlay) {
+		_customOverlay = customOverlay;
 	}
 
 	protected void setDataModel(final ChartDataModel chartDataModel) {
@@ -1096,8 +1096,8 @@ public class Chart extends ViewForm {
 		_chartComponents.onResize();
 	}
 
-	public void setHoveredValuePointListener(final IHoveredListener hoveredValuePointListener) {
-		_hoveredValuePointListener = hoveredValuePointListener;
+	protected void setHoveredListener(final IHoveredListener hoveredValuePointListener) {
+		_hoveredListener = hoveredValuePointListener;
 	}
 
 	/**

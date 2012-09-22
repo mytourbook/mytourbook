@@ -68,7 +68,7 @@ import org.eclipse.swt.widgets.ScrollBar;
  */
 public abstract class GalleryMT20 extends Canvas {
 
-	private static final int					GALLERY_ITEM_MIN_SIZE	= 10;
+	private static final int					GALLERY_ITEM_MIN_SIZE		= 10;
 
 	private boolean								_isVertical;
 	private boolean								_isHorizontal;
@@ -80,7 +80,7 @@ public abstract class GalleryMT20 extends Canvas {
 	 * Current gallery top/left position (this is also the scroll bar position). Can be used by
 	 * renderer during paint.
 	 */
-	private int									_galleryPosition		= 0;
+	private int									_galleryPosition			= 0;
 
 	private int									_prevGalleryPosition;
 
@@ -105,22 +105,22 @@ public abstract class GalleryMT20 extends Canvas {
 	/**
 	 * Image quality : interpolation
 	 */
-	private int									_interpolation			= SWT.HIGH;
+	private int									_interpolation				= SWT.HIGH;
 
 	/**
 	 * Image quality : antialias
 	 */
-	private int									_antialias				= SWT.ON;
+	private int									_antialias					= SWT.ON;
 
 	/**
 	 * Width for the whole gallery
 	 */
-	private int									_contentVirtualWidth	= 0;
+	private int									_contentVirtualWidth		= 0;
 
 	/**
 	 * Height for the whole gallery
 	 */
-	private int									_contentVirtualHeight	= 0;
+	private int									_contentVirtualHeight		= 0;
 
 	private int									_prevViewportWidth;
 
@@ -129,7 +129,7 @@ public abstract class GalleryMT20 extends Canvas {
 	private int									_prevContentWidth;
 	private AbstractGalleryMT20ItemRenderer		_itemRenderer;
 
-	private final ListenerList					_hoveredListeners		= new ListenerList(ListenerList.IDENTITY);
+	private final ListenerList					_hoveredListeners			= new ListenerList(ListenerList.IDENTITY);
 
 	/**
 	 * Cached client area
@@ -141,13 +141,13 @@ public abstract class GalleryMT20 extends Canvas {
 	private ControlAdapter						_parentControlListener;
 
 	private int									_higherQualityDelay;
-	private RedrawTimer							_redrawTimer			= new RedrawTimer();
+	private RedrawTimer							_redrawTimer				= new RedrawTimer();
 
 	/**
 	 * Contains gallery items which has been created, not all gallery items must have been created,
 	 * they are virtual.
 	 */
-	private HashMap<String, GalleryMT20Item>	_createdGalleryItems	= new HashMap<String, GalleryMT20Item>();
+	private HashMap<String, GalleryMT20Item>	_createdGalleryItems		= new HashMap<String, GalleryMT20Item>();
 
 	private GalleryMT20Item[]					_virtualGalleryItems;
 
@@ -163,24 +163,24 @@ public abstract class GalleryMT20 extends Canvas {
 	/**
 	 * Contains gallery items which are currently be selected in the UI.
 	 */
-	private HashMap<String, GalleryMT20Item>	_selectedItems			= new HashMap<String, GalleryMT20Item>();
+	private HashMap<String, GalleryMT20Item>	_selectedItems				= new HashMap<String, GalleryMT20Item>();
 	private int[]								_initialSelectedItems;
 
 	/**
 	 * Selection bit flags. Each 'int' contains flags for 32 items. It contains selection flags for
 	 * all virtual items.
 	 */
-	private int[]								_selectionFlags			= null;
+	private int[]								_selectionFlags				= null;
 
 	/**
 	 * Default image ratio between image width/height. It is the average between 4000x3000 (1.3333)
 	 * and 5184x3456 (1.5)
 	 */
-	private double								_itemRatio				= 15.0 / 10;								//((4.0 / 3.0) + (15.0 / 10.0)) / 2;
+	private double								_itemRatio					= 15.0 / 10;								//((4.0 / 3.0) + (15.0 / 10.0)) / 2;
 
-	private int									_itemWidth				= 80;
+	private int									_itemWidth					= 80;
 
-	private int									_itemHeight				= (int) (_itemWidth / _itemRatio);
+	private int									_itemHeight					= (int) (_itemWidth / _itemRatio);
 
 	/**
 	 * Item width when gallery orientation is vertical
@@ -190,11 +190,11 @@ public abstract class GalleryMT20 extends Canvas {
 	/**
 	 * @return Contains minimum gallery item width or <code>-1</code> when value is not set.
 	 */
-	private int									_minItemWidth			= -1;
+	private int									_minItemWidth				= -1;
 	/**
 	 * @return Contains maximum gallery item width or <code>-1</code> when value is not set.
 	 */
-	private int									_maxItemWidth			= -1;
+	private int									_maxItemWidth				= -1;
 
 	/**
 	 * Number of horizontal items for all virtual gallery item.
@@ -232,7 +232,7 @@ public abstract class GalleryMT20 extends Canvas {
 	 * where we have to select all items between the previous and the current item and keyboard
 	 * navigation.
 	 */
-	private int									_lastSingleClick		= -1;
+	private int									_lastSingleClick			= -1;
 
 	/**
 	 * Gallery item which was selected at last
@@ -264,6 +264,11 @@ public abstract class GalleryMT20 extends Canvas {
 	private MenuManager							_contextMenuMgr;
 
 	private IExternalGalleryListener			_externalGalleryListener;
+
+	/**
+	 * When <code>true</code> other shell actions are displayed.
+	 */
+	private boolean								_isShowOtherShellActions	= true;
 
 	private class RedrawTimer implements Runnable {
 		public void run() {
@@ -626,8 +631,11 @@ public abstract class GalleryMT20 extends Canvas {
 			_customContextMenuProvider.fillContextMenu(menuMgr);
 		}
 
-		menuMgr.add(new Separator());
-		menuMgr.add(_actionGalleryPrefPage);
+		if (_isShowOtherShellActions) {
+
+			menuMgr.add(new Separator());
+			menuMgr.add(_actionGalleryPrefPage);
+		}
 	}
 
 	private void fireItemHoverEvent(final int mouseX, final int mouseY) {
@@ -2495,6 +2503,10 @@ public abstract class GalleryMT20 extends Canvas {
 	 */
 	public void setInterpolation(final int interpolation) {
 		_interpolation = interpolation;
+	}
+
+	public void setIsShowOtherShellActions(final boolean isShowOtherShellActions) {
+		_isShowOtherShellActions = isShowOtherShellActions;
 	}
 
 	public void setItemMinMaxSize(final int minItemSize, final int maxItemSize) {

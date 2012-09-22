@@ -99,7 +99,6 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 	}
 
 	public void showChartPhotoToolTip(	final ChartLayerPhoto photoLayer,
-										final int hoveredValueIndex,
 										final Point devPositionHoveredValue,
 										final int devXMouseMove,
 										final int devYMouseMove) {

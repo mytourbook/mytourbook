@@ -230,6 +230,8 @@ public class PicDirImages implements IPhotoGalleryProvider {
 
 		createActions();
 
+		_photoGallery.createActionBar();
+
 		final Composite galleryActionBarContainer = _photoGallery.getCustomActionBarContainer();
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(galleryActionBarContainer);
 //		galleryActionBarContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
@@ -524,11 +526,11 @@ public class PicDirImages implements IPhotoGalleryProvider {
 		 */
 		if (UI.IS_OSX == false) {
 
-			_comboHistory.setForeground(fgColor);
-			_comboHistory.setBackground(bgColor);
-
-			_galleryToolbar.setForeground(fgColor);
-			_galleryToolbar.setBackground(bgColor);
+//			_comboHistory.setForeground(fgColor);
+//			_comboHistory.setBackground(bgColor);
+//
+//			_galleryToolbar.setForeground(fgColor);
+//			_galleryToolbar.setBackground(bgColor);
 		}
 	}
 

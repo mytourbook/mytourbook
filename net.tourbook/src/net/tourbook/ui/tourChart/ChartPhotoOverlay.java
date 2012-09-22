@@ -18,6 +18,7 @@ package net.tourbook.ui.tourChart;
 import net.tourbook.chart.CustomOverlay;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.GC;
 
@@ -26,41 +27,57 @@ public class ChartPhotoOverlay implements CustomOverlay {
 	private ChartLayerPhoto	_photoLayer;
 	private PhotoGroup		_hoveredPhotoGroup;
 
+	private Color			_bgColor;
+	private int				_devXMouse;
+
 	@Override
-	public void draw(final GC gcOverlay) {
+	public boolean draw(final GC gcOverlay) {
 
 		if (_photoLayer == null || _hoveredPhotoGroup == null) {
-			return;
+			return false;
 		}
 
 		final Device display = gcOverlay.getDevice();
 		gcOverlay.setForeground(display.getSystemColor(SWT.COLOR_WHITE));
-		gcOverlay.setBackground(display.getSystemColor(SWT.COLOR_RED));
+		gcOverlay.setBackground(_bgColor);
 
 		_photoLayer.drawGroup(gcOverlay, _hoveredPhotoGroup);
+
+		return true;
+	}
+
+	PhotoGroup getHoveredPhotoGroup() {
+
+		// find photo group which is hovered with the mouse
+		for (final PhotoGroup photoGroup : _photoLayer.getPhotoGroups()) {
+
+			if (_devXMouse >= photoGroup.hGridStart && _devXMouse <= photoGroup.hGridEnd) {
+				return photoGroup;
+			}
+		}
+
+		return null;
 	}
 
 	@Override
 	public boolean onMouseMove(final int devXMouse, final int devYMouse) {
 
+		// reset ALLWAYS
+		_hoveredPhotoGroup = null;
+
 		if (_photoLayer == null) {
 			return false;
 		}
 
-		_hoveredPhotoGroup = null;
+		_devXMouse = devXMouse;
 
-		// find photo group which is hovered with the mouse
-		for (final PhotoGroup photoGroup : _photoLayer.getPhotoGroups()) {
+		_hoveredPhotoGroup = getHoveredPhotoGroup();
 
-			if (devXMouse >= photoGroup.hGridStart && devXMouse <= photoGroup.hGridEnd) {
+		return _hoveredPhotoGroup != null;
+	}
 
-				_hoveredPhotoGroup = photoGroup;
-
-				return true;
-			}
-		}
-
-		return false;
+	public void setBackgroundColor(final Color bgColor) {
+		_bgColor = bgColor;
 	}
 
 	public void setPhotoLayer(final ChartLayerPhoto photoLayer) {

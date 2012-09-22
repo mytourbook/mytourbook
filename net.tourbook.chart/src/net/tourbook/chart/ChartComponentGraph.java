@@ -394,6 +394,11 @@ public class ChartComponentGraph extends Canvas {
 	private boolean						_isCustomOverlayDirty;
 
 	/**
+	 * After a resize the custom overlay must be recomputed
+	 */
+	private int							_isCustomOverlayInvalid;
+
+	/**
 	 * Constructor
 	 * 
 	 * @param parent
@@ -999,7 +1004,7 @@ public class ChartComponentGraph extends Canvas {
 				actionSelectBars();
 
 				_hoveredBarToolTip.toolTip20Hide();
-				hideValuePointTooltip();
+				hideTooltip();
 
 				// get cursor location relativ to this graph canvas
 				final Point devMouse = ChartComponentGraph.this.toControl(getDisplay().getCursorLocation());
@@ -1298,7 +1303,7 @@ public class ChartComponentGraph extends Canvas {
 						}
 					}
 
-					doAutoScroll10RunnableScrollGraph(this, AUTO_SCROLL_INTERVAL, devMouseOffset);
+					doAutoScroll_10_RunnableScrollGraph(this, AUTO_SCROLL_INTERVAL, devMouseOffset);
 
 				} else {
 
@@ -1327,15 +1332,15 @@ public class ChartComponentGraph extends Canvas {
 						}
 					}
 
-					doAutoScroll20RunnableMoveSlider(this, AUTO_SCROLL_INTERVAL, devMouseOffset);
+					doAutoScroll_20_RunnableMoveSlider(this, AUTO_SCROLL_INTERVAL, devMouseOffset);
 				}
 			}
 		});
 	}
 
-	private void doAutoScroll10RunnableScrollGraph(	final Runnable runnable,
-													final int autoScrollInterval,
-													final int devMouseOffset) {
+	private void doAutoScroll_10_RunnableScrollGraph(	final Runnable runnable,
+														final int autoScrollInterval,
+														final int devMouseOffset) {
 
 		final int xxDevNewPosition = _xxDevViewPortLeftBorder + devMouseOffset;
 
@@ -1353,9 +1358,11 @@ public class ChartComponentGraph extends Canvas {
 		} else {
 			_isAutoScroll = false;
 		}
+
+		doAutoScroll_30_UpdateHoveredListener();
 	}
 
-	private void doAutoScroll20RunnableMoveSlider(	final Runnable runnable,
+	private void doAutoScroll_20_RunnableMoveSlider(final Runnable runnable,
 													final int autoScrollInterval,
 													final int devMouseOffset) {
 
@@ -1383,6 +1390,41 @@ public class ChartComponentGraph extends Canvas {
 			getDisplay().timerExec(autoScrollInterval, runnable);
 		} else {
 			_isAutoScroll = false;
+		}
+	}
+
+	private void doAutoScroll_30_UpdateHoveredListener() {
+
+		final IHoveredListener hoveredListener = _chart._hoveredListener;
+
+		if (_isHoveredLineVisible || hoveredListener != null) {
+
+			final int hoveredLineValueIndexBACKUP = _hoveredLineValueIndex;
+
+			isLineHovered();
+
+
+			if (_hoveredLineValueIndex != -1) {
+
+				final Point devHoveredValueDevPosition = getHoveredValueDevPosition();
+
+				if (hoveredListener != null) {
+
+					/**
+					 * this is very tricky:
+					 * <p>
+					 * the last mouse move position is used
+					 */
+
+					hoveredListener.hoveredValue(
+							_hoveredLineValueIndex,
+							devHoveredValueDevPosition,
+							_devXMouseMove,
+							_devYMouseMove);
+				}
+			}
+
+			_hoveredLineValueIndex = hoveredLineValueIndexBACKUP;
 		}
 	}
 
@@ -1545,7 +1587,8 @@ public class ChartComponentGraph extends Canvas {
 		redraw();
 
 //		final long endTime = System.nanoTime();
-//		System.out.println("drawAsync100: "
+//		System.out.println(UI.timeStampNano()
+//				+ " drawAsync100: "
 //				+ (((double) endTime - startTime) / 1000000)
 //				+ " ms   #:"
 //				+ _drawAsyncCounter[0]);
@@ -3261,6 +3304,12 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private void drawSync_000_onPaint(final GC gc) {
 
+//		final long startTime = System.nanoTime();
+//		// TODO remove SYSTEM.OUT.PRINTLN
+//
+//		System.out.println(UI.timeStampNano() + " drawSync_000_onPaint: START");
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
 		if (_graphDrawingData == null || _graphDrawingData.size() == 0) {
 
 			// fill the image area when there is no graphic
@@ -3342,6 +3391,16 @@ public class ChartComponentGraph extends Canvas {
 			drawSync_300_Image30Custom();
 			drawSync_010_ImageChart(gc);
 		}
+
+//		final long endTime = System.nanoTime();
+//		System.out.println(UI.timeStampNano()
+//				+ " drawSync_000_onPaint: END  "
+//				+ (((double) endTime - startTime) / 1000000)
+//				+ " ms   #:"
+//				+ _drawAsyncCounter[0]);
+//		System.out.println(UI.timeStampNano() + " \t");
+//		System.out.println(UI.timeStampNano() + " \t");
+//		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 	private Image drawSync_010_ImageChart(final GC gc) {
@@ -4308,6 +4367,23 @@ public class ChartComponentGraph extends Canvas {
 
 	private void drawSync_470_CustomOverlay(final GC gcOverlay) {
 
+		/*
+		 * custom overlay must be checked 2x because it is fired 2 times before the photo groups are
+		 * set correctly
+		 */
+
+		if (_isCustomOverlayInvalid == 99) {
+			_isCustomOverlayInvalid = 1;
+			return;
+		}
+
+		if (_isCustomOverlayInvalid == 1) {
+			_isCustomOverlayInvalid = 0;
+
+			// check if a custom overlay needs to be painted
+			_isCustomOverlayDirty = _chart.isCustomOverlayDirty(_devXMouseMove, _devYMouseMove);
+		}
+
 		if (_isCustomOverlayDirty) {
 			_chart.getCustomOverlay().draw(gcOverlay);
 		}
@@ -4530,13 +4606,13 @@ public class ChartComponentGraph extends Canvas {
 		}
 	}
 
-	private void hideValuePointTooltip() {
+	private void hideTooltip() {
 
-		final IHoveredListener hoveredValuePointListener = _chart.getHoveredValuePointListener();
-		if (hoveredValuePointListener != null) {
+		final IHoveredListener hoveredListener = _chart.getHoveredListener();
+		if (hoveredListener != null) {
 
 			// hide value point tooltip
-			hoveredValuePointListener.hideTooltip();
+			hoveredListener.hideTooltip();
 		}
 	}
 
@@ -5114,7 +5190,7 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private void onMouseDown(final MouseEvent event) {
 
-		hideValuePointTooltip();
+		hideTooltip();
 
 		// zoom out to show the whole chart with the button on the left side
 		if (event.button == 4) {
@@ -5309,7 +5385,7 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	void onMouseDownAxis(final MouseEvent event) {
 
-		hideValuePointTooltip();
+		hideTooltip();
 
 		if (_xSliderDragged != null) {
 
@@ -5347,6 +5423,8 @@ public class ChartComponentGraph extends Canvas {
 
 		_hoveredBarToolTip.toolTip20Hide();
 
+		boolean isRedraw = false;
+
 		if (_isAutoScroll) {
 			// stop autoscrolling
 			_isAutoScroll = false;
@@ -5358,7 +5436,8 @@ public class ChartComponentGraph extends Canvas {
 				_hitYSlider = null;
 
 				_isSliderDirty = true;
-				redraw();
+
+				isRedraw = true;
 			}
 		}
 
@@ -5366,10 +5445,15 @@ public class ChartComponentGraph extends Canvas {
 			// mouse left the x-slider
 			_mouseOverXSlider = null;
 			_isSliderDirty = true;
-			redraw();
+
+			isRedraw = true;
 		}
 
 		setCursorStyle(event.y);
+
+		if (isRedraw) {
+			redraw();
+		}
 	}
 
 	/**
@@ -5559,9 +5643,9 @@ public class ChartComponentGraph extends Canvas {
 			}
 		}
 
-		final IHoveredListener hoveredValuePointListener = _chart._hoveredValuePointListener;
+		final IHoveredListener hoveredListener = _chart._hoveredListener;
 
-		if (_isHoveredLineVisible || hoveredValuePointListener != null) {
+		if (_isHoveredLineVisible || hoveredListener != null) {
 
 			isLineHovered();
 
@@ -5584,9 +5668,9 @@ public class ChartComponentGraph extends Canvas {
 					isRedraw = true;
 				}
 
-				if (hoveredValuePointListener != null && canShowHoveredTooltip) {
+				if (hoveredListener != null && canShowHoveredTooltip) {
 
-					hoveredValuePointListener.hoveredValue(
+					hoveredListener.hoveredValue(
 							_hoveredLineValueIndex,
 							devHoveredValueDevPosition,
 							_devXMouseMove,
@@ -5595,7 +5679,8 @@ public class ChartComponentGraph extends Canvas {
 			}
 		}
 
-		if (_isCustomOverlayDirty = _chart.isCustomOverlayDirty(devXMouse, devYMouse)) {
+		// check if custom overlay is dirty (e.g mouse can have hovered photo group)
+		if (_isCustomOverlayDirty = _chart.isCustomOverlayDirty(_devXMouseMove, _devYMouseMove)) {
 			isRedraw = true;
 		}
 
@@ -5926,7 +6011,7 @@ public class ChartComponentGraph extends Canvas {
 
 			// mouse mode: zoom chart
 
-			hideValuePointTooltip();
+//			hideTooltip();
 
 			final boolean isCtrl = (event.stateMask & SWT.CONTROL) != 0;
 			final boolean isShift = (event.stateMask & SWT.SHIFT) != 0;
@@ -6635,6 +6720,10 @@ public class ChartComponentGraph extends Canvas {
 		final int marginBottom = _chartComponents.getDevChartMarginBottom();
 
 		valuePointToolTip.setChartMargins(marginTop, marginBottom);
+
+		// update custom overlay
+		_isCustomOverlayDirty = true;
+		_isCustomOverlayInvalid = 99;
 	}
 
 	void updateCustomLayers() {

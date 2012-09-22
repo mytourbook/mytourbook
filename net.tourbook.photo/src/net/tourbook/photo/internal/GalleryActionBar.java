@@ -33,6 +33,7 @@ import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Spinner;
@@ -54,6 +55,7 @@ public class GalleryActionBar {
 	private Composite						_containerActionBar;
 	private Composite						_containerCustomActionBar;
 
+	private Composite						_containerImageSize;
 	private Spinner							_spinnerThumbSize;
 	private ImageSizeIndicator				_canvasImageSizeIndicator;
 
@@ -109,13 +111,13 @@ public class GalleryActionBar {
 			 * thumb size
 			 */
 			if (_isShowThumbsize) {
-				final Composite container = new Composite(_containerActionBar, SWT.NONE);
-				GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
-				GridLayoutFactory.fillDefaults().numColumns(2).spacing(hSpacing, 0).applyTo(container);
+				_containerImageSize = new Composite(_containerActionBar, SWT.NONE);
+				GridDataFactory.fillDefaults().grab(false, false).applyTo(_containerImageSize);
+				GridLayoutFactory.fillDefaults().numColumns(2).spacing(hSpacing, 0).applyTo(_containerImageSize);
 //				container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 				{
-					createUI_20_ImageSize(container);
-					createUI_30_ImageSizeIndicator(container);
+					createUI_20_ImageSize(_containerImageSize);
+					createUI_30_ImageSizeIndicator(_containerImageSize);
 				}
 			}
 		}
@@ -185,6 +187,10 @@ public class GalleryActionBar {
 
 		if (_isShowThumbsize) {
 
+			final GridData gd = (GridData) _containerImageSize.getLayoutData();
+			gd.widthHint = isVisible ? SWT.DEFAULT : 0;
+
+			_containerImageSize.setVisible(isVisible);
 			_spinnerThumbSize.setVisible(isVisible);
 			_canvasImageSizeIndicator.setVisible(isVisible);
 

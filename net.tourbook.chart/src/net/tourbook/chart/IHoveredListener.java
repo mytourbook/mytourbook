@@ -23,7 +23,7 @@ import org.eclipse.swt.graphics.Point;
 public interface IHoveredListener {
 
 	/**
-	 * Hide value point tooltip because chart has been modified (zoomed in/ou)
+	 * Hide tooltip because chart has been modified (zoomed in/out)
 	 */
 	void hideTooltip();
 

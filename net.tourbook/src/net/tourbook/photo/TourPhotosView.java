@@ -216,6 +216,7 @@ public class TourPhotosView extends ViewPart implements IPhotoGalleryProvider {
 			_photoGallery = new PhotoGallery();
 
 			_photoGallery.createPhotoGallery(container, SWT.H_SCROLL | SWT.MULTI, this);
+			_photoGallery.createActionBar();
 
 			_photoGallery.setDefaultStatusMessage(Messages.Tour_Photos_Label_StatusMessage_NoTourWithPhotos);
 		}

@@ -528,7 +528,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, 0).applyTo(container);
-//		container.setBackground(_display.getSystemColor(SWT.COLOR_RED));
+		container.setBackground(_display.getSystemColor(SWT.COLOR_RED));
 		{
 			if (_isShowThumbsize || _isShowCustomActionBar) {
 				_galleryActionBar = new GalleryActionBar(container, this, _isShowThumbsize, _isShowCustomActionBar);
@@ -1789,6 +1789,14 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	}
 
 	/**
+	 * Prevent to open pref dialog, when it's opened it would close this tooltip and the pref dialog
+	 * is hidden -->> APP IS FREEZING !!!
+	 */
+	public void setShowOtherShellActions(final boolean _isShowOtherShellActions) {
+		_galleryMT20.setIsShowOtherShellActions(_isShowOtherShellActions);
+	}
+
+	/**
 	 * Thumbnail size combobox can be displayed, by default it is hidden, This method <b>must</b> be
 	 * called before {@link #createImageGallery(Composite, int, IPhotoGalleryProvider)} is called.
 	 */
@@ -2105,7 +2113,8 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		 * good
 		 */
 		if (UI.IS_OSX == false && _galleryActionBar != null) {
-			_galleryActionBar.updateColors(fgColor, bgColor);
+// looks ugli with a custom toolbar manager
+//			_galleryActionBar.updateColors(fgColor, bgColor);
 		}
 
 		/*

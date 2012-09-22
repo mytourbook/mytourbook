@@ -44,6 +44,9 @@ public class MergeTour {
 	long							tourId				= Long.MIN_VALUE;
 	long							tourTypeId			= -1;
 
+	/**
+	 * Tour start time in ms
+	 */
 	long							tourStartTime;
 
 	/**
@@ -51,8 +54,7 @@ public class MergeTour {
 	 */
 	long							tourEndTime			= Long.MAX_VALUE;
 
-	DateTime						tourStartDateTime;
-	DateTime						tourEndDateTime;
+	private DateTime				tourStartDateTime;
 	Period							tourPeriod;
 
 	int								numberOfPhotos;
@@ -108,6 +110,16 @@ public class MergeTour {
 		_dummyTimeSerie.add(photoTime);
 	}
 
+	private void addTimeSlice(final ArrayList<TimeData> dtList, final long timeSliceTime) {
+
+		final TimeData timeData = new TimeData();
+
+		timeData.absoluteTime = timeSliceTime;
+		timeData.absoluteAltitude = 1.0f;
+
+		dtList.add(timeData);
+	}
+
 	@Override
 	public boolean equals(final Object obj) {
 		if (this == obj) {
@@ -130,15 +142,52 @@ public class MergeTour {
 
 		final ArrayList<TimeData> dtList = new ArrayList<TimeData>();
 
-		for (final long timeSliceTime : _dummyTimeSerie.toArray()) {
+		final long[] dummyTimeSerie = _dummyTimeSerie.toArray();
 
-			final TimeData timeData = new TimeData();
+		final long tourStart = dummyTimeSerie[0];
+		final long tourEnd = dummyTimeSerie[dummyTimeSerie.length - 1];
 
-			timeData.absoluteTime = timeSliceTime;
-			timeData.absoluteAltitude = 1.0f;
+		if (dummyTimeSerie.length == 1) {
 
-			dtList.add(timeData);
+			// only 1 point is visible
+
+			tourStartTime = tourStart - 1000;
+			tourEndTime = tourStart + 1000;
+
+		} else {
+
+			// set offset to 5% tour time
+
+			final long timeDiff = tourEnd - tourStart;
+			final long timeOffset = (long) (timeDiff * 0.05);
+
+			tourStartTime = tourStart - timeOffset;
+			tourEndTime = tourEnd + timeOffset;
 		}
+
+		/*
+		 * adjust start and end that the dummy tour do not start at the chart border
+		 */
+
+		// update adjusted start
+		tourStartDateTime = new DateTime(tourStartTime);
+
+		/*
+		 * set tour start time line before first time slice
+		 */
+		addTimeSlice(dtList, tourStartTime);
+
+		/*
+		 * create time data list for all time slices which contains photos
+		 */
+		for (final long timeSliceTime : dummyTimeSerie) {
+			addTimeSlice(dtList, timeSliceTime);
+		}
+
+		/*
+		 * set tour end time after the last time slice
+		 */
+		addTimeSlice(dtList, tourEndTime);
 
 		_dummyTourData.setTourStartTime(tourStartDateTime);
 		_dummyTourData.createTimeSeries(dtList, false);
@@ -168,13 +217,13 @@ public class MergeTour {
 		}
 
 		tourEndTime = endTime;
-		tourEndDateTime = new DateTime(endTime);
-
-		tourPeriod = new Period(tourStartTime, tourEndTime, _tourPeriodTemplate);
 
 		if (isDummyTour) {
 			finalizeDummyTour();
 		}
+
+		// set tour period AFTER dummy tour is finalized
+		tourPeriod = new Period(tourStartTime, tourEndTime, _tourPeriodTemplate);
 	}
 
 	private void setTourStartTime(final long time) {
