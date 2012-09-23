@@ -33,28 +33,35 @@
 		</delete>
 
 		<!-- 
-			German: unzip archive: mt-de.zip 
+			DE - GERMAN: unzip archive: mt-de.zip 
 		-->
 		<antcall target="unzip-archive-for-one-language">
 			<param name="archive-language" value="de" />
 		</antcall>
 
 		<!-- 
-			French: unzip archive: mt-fr.zip 
+			ES - SPAIN: unzip archive: mt-es.zip 
+		-->
+		<antcall target="unzip-archive-for-one-language">
+			<param name="archive-language" value="es" />
+		</antcall>
+
+		<!-- 
+			FR - French: unzip archive: mt-fr.zip 
 		-->
 		<antcall target="unzip-archive-for-one-language">
 			<param name="archive-language" value="fr" />
 		</antcall>
 
 		<!-- 
-			Italian: unzip archive: mt-it.zip 
+			IT - Italian: unzip archive: mt-it.zip 
 		-->
 		<antcall target="unzip-archive-for-one-language">
 			<param name="archive-language" value="it" />
 		</antcall>
 
 		<!-- 
-			Dutch: unzip archive: mt-nl.zip 
+			NL - Dutch: unzip archive: mt-nl.zip 
 		-->
 		<antcall target="unzip-archive-for-one-language">
 			<param name="archive-language" value="nl" />
