@@ -1,4 +1,4 @@
-Version: 12.9.0                                           ?. October 2012 
+Version: 12.?.0                                           ?. October 2012 
 
 TODO
 
@@ -8,7 +8,7 @@ TODO
 
 New 
 
-* 
+* spanish translation, provided by Pedro Merino Laso
 
 
 
