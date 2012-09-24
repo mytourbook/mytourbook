@@ -20,6 +20,18 @@
   <defs
      id="defs2987">
     <linearGradient
+       inkscape:collect="always"
+       id="linearGradient4085">
+      <stop
+         style="stop-color:#f70b0b;stop-opacity:1;"
+         offset="0"
+         id="stop4087" />
+      <stop
+         style="stop-color:#f70b0b;stop-opacity:0;"
+         offset="1"
+         id="stop4089" />
+    </linearGradient>
+    <linearGradient
        id="linearGradient5160">
       <stop
          id="stop5162"
@@ -1317,6 +1329,48 @@
        id="radialGradient3245"
        xlink:href="#linearGradient3765-4-1-4"
        inkscape:collect="always" />
+    <linearGradient
+       id="linearGradient3765-4-1-8-3-3-0-7">
+      <stop
+         style="stop-color:#828282;stop-opacity:1;"
+         offset="0"
+         id="stop3788-9-6-8-1-89-26-4" />
+      <stop
+         style="stop-color:#2a2a2a;stop-opacity:1;"
+         offset="1"
+         id="stop3769-4-8-2-9-3-0-0" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient3765-4-1-8-3-4-4-1-4">
+      <stop
+         style="stop-color:#828282;stop-opacity:1;"
+         offset="0"
+         id="stop3788-9-6-8-1-8-6-1-8" />
+      <stop
+         style="stop-color:#2a2a2a;stop-opacity:1;"
+         offset="1"
+         id="stop3769-4-8-2-9-6-06-1-8" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient3765-4-1-8-3-4-9-1-3-4">
+      <stop
+         style="stop-color:#828282;stop-opacity:1;"
+         offset="0"
+         id="stop3788-9-6-8-1-8-0-8-00-5" />
+      <stop
+         style="stop-color:#2a2a2a;stop-opacity:1;"
+         offset="1"
+         id="stop3769-4-8-2-9-6-0-4-4-5" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4085"
+       id="linearGradient4091"
+       x1="199.58789"
+       y1="44.362156"
+       x2="206.41211"
+       y2="44.362156"
+       gradientUnits="userSpaceOnUse" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -1325,15 +1379,15 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="8.073678"
-     inkscape:cx="178.22264"
-     inkscape:cy="923.2693"
+     inkscape:zoom="14.579515"
+     inkscape:cx="182.80599"
+     inkscape:cy="996.29591"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
-     inkscape:window-width="1364"
+     inkscape:window-width="1367"
      inkscape:window-height="882"
-     inkscape:window-x="68"
+     inkscape:window-x="65"
      inkscape:window-y="-8"
      inkscape:window-maximized="1">
     <inkscape:grid
@@ -1523,12 +1577,12 @@
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <rect
-       style="opacity:0.98999999000000005;fill:#ffffff;fill-opacity:1;stroke:none"
+       style="opacity:0.98999999000000005;fill:#ffffff;fill-opacity:0;stroke:none"
        id="rect4151"
        width="16"
        height="16"
-       x="185"
-       y="47.362183"
+       x="155"
+       y="36.354546"
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\photo-gallery-vertical.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
@@ -1536,13 +1590,14 @@
        id="g4256"
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\photo-gallery-vertical.png"
        inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90">
+       inkscape:export-ydpi="90"
+       transform="translate(-30,-11.007642)">
       <path
          inkscape:export-ydpi="90"
          inkscape:export-xdpi="90"
          inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\photo-tour-photos-view.png"
          transform="matrix(0.76842597,0,0,0.76842591,116.9206,19.652113)"
-         d="m 95,39.862183 a 2.5,2.5 0 1 1 -5,0 2.5,2.5 0 1 1 5,0 z"
+         d="m 95,39.862183 c 0,1.380711 -1.119288,2.5 -2.5,2.5 -1.380712,0 -2.5,-1.119289 -2.5,-2.5 0,-1.380712 1.119288,-2.5 2.5,-2.5 1.380712,0 2.5,1.119288 2.5,2.5 z"
          sodipodi:ry="2.5"
          sodipodi:rx="2.5"
          sodipodi:cy="39.862183"
@@ -1555,7 +1610,7 @@
          inkscape:export-xdpi="90"
          inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\photo-tour-photos-view.png"
          transform="matrix(0.76842597,0,0,0.76842591,121.9206,19.652113)"
-         d="m 95,39.862183 a 2.5,2.5 0 1 1 -5,0 2.5,2.5 0 1 1 5,0 z"
+         d="m 95,39.862183 c 0,1.380711 -1.119288,2.5 -2.5,2.5 -1.380712,0 -2.5,-1.119289 -2.5,-2.5 0,-1.380712 1.119288,-2.5 2.5,-2.5 1.380712,0 2.5,1.119288 2.5,2.5 z"
          sodipodi:ry="2.5"
          sodipodi:rx="2.5"
          sodipodi:cy="39.862183"
@@ -1568,7 +1623,7 @@
          inkscape:export-xdpi="90"
          inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\photo-tour-photos-view.png"
          transform="matrix(0.76842597,0,0,0.76842591,126.9206,19.652113)"
-         d="m 95,39.862183 a 2.5,2.5 0 1 1 -5,0 2.5,2.5 0 1 1 5,0 z"
+         d="m 95,39.862183 c 0,1.380711 -1.119288,2.5 -2.5,2.5 -1.380712,0 -2.5,-1.119289 -2.5,-2.5 0,-1.380712 1.119288,-2.5 2.5,-2.5 1.380712,0 2.5,1.119288 2.5,2.5 z"
          sodipodi:ry="2.5"
          sodipodi:rx="2.5"
          sodipodi:cy="39.862183"
@@ -1578,7 +1633,7 @@
          sodipodi:type="arc" />
     </g>
     <g
-       transform="translate(-2.0865058e-6,5.0000357)"
+       transform="translate(-30.000002,-6.0076072)"
        id="g4256-9"
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\photo-gallery-vertical.png"
        inkscape:export-xdpi="90"
@@ -1624,7 +1679,7 @@
          sodipodi:type="arc" />
     </g>
     <g
-       transform="translate(-2.225e-6,10)"
+       transform="translate(-30.000002,-1.0076432)"
        id="g4256-9-6"
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\photo-gallery-vertical.png"
        inkscape:export-xdpi="90"
@@ -1670,17 +1725,17 @@
          sodipodi:type="arc" />
     </g>
     <rect
-       style="opacity:0.98999999000000005;fill:#ffffff;stroke:none;fill-opacity:1"
+       style="opacity:0.98999999000000005;fill:#ffffff;fill-opacity:0;stroke:none"
        id="rect4151-0"
        width="16"
        height="16"
-       x="205"
-       y="47.362148"
+       x="175"
+       y="36.354511"
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\photo-gallery-horizontal.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <g
-       transform="translate(19.999998,5.0000004)"
+       transform="translate(-10.000002,-6.0076432)"
        id="g4256-9-7"
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\photo-gallery-horizontal.png"
        inkscape:export-xdpi="90"
@@ -1738,5 +1793,31 @@
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\photo-photos.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
+    <rect
+       style="opacity:0.98999999000000005;fill:none;fill-opacity:0.47872337999999998;stroke:none"
+       id="rect4151-0-1"
+       width="16"
+       height="16"
+       x="195"
+       y="36.362156"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\app-close.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:7.07305336000000030px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#383838;fill-opacity:1;stroke:#767676;stroke-width:0.20000000000000001;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;font-family:Sans;stroke-linejoin:round;stroke-linecap:round"
+       x="154.22369"
+       y="60.486351"
+       id="text4081"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\app-close.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       transform="scale(1.289976,0.77520822)"><tspan
+         sodipodi:role="line"
+         id="tspan4083"
+         x="154.22369"
+         y="60.486351"
+         style="font-size:12.57431698000000100px;fill:#383838;fill-opacity:1;stroke:#767676;stroke-width:0.20000000000000001;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-linejoin:round;stroke-linecap:round">x</tspan></text>
   </g>
 </svg>

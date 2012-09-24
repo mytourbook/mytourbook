@@ -27,6 +27,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -36,7 +37,12 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseMoveListener;
+import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -63,9 +69,14 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 	private final ArrayList<PhotoWrapper>	_photoWrapperList				= new ArrayList<PhotoWrapper>();
 
 	private ActionToggleGalleryOrientation	_actionToggleGalleryOrientation;
+	private ActionCloseToolTip				_actionCloseToolTip;
 
 	private boolean							_isVerticalGallery;
 	private ToolBarManager					_galleryToolbarManager;
+
+	private boolean							_isShellDragged;
+	private int								_devXMousedown;
+	private int								_devYMousedown;
 
 	/*
 	 * UI controls
@@ -73,8 +84,28 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 	private Composite						_galleryContainer;
 	private PhotoGallery					_photoGallery;
 
-	private ToolBar							_ttToolbarControl;
+	private ToolBar							_ttToolbarControlExit;
 	private ToolBar							_galleryToolbarControl;
+	private Label							_labelResizer;
+
+	private Cursor							_cursorResize;
+	private Cursor							_cursorHand;
+
+	private class ActionCloseToolTip extends Action {
+
+		public ActionCloseToolTip() {
+
+			super(null, Action.AS_PUSH_BUTTON);
+
+			setToolTipText(Messages.App_Action_Close_ToolTip);
+			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Close));
+		}
+
+		@Override
+		public void run() {
+			actionCloseToolTip();
+		}
+	}
 
 	private class ActionToggleGalleryOrientation extends Action {
 
@@ -84,7 +115,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 		@Override
 		public void run() {
-			onToggleVH();
+			actionToggleVH();
 		}
 	}
 
@@ -111,7 +142,52 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 		super(ownerControl);
 
+		_cursorResize = new Cursor(ownerControl.getDisplay(), SWT.CURSOR_SIZEALL);
+		_cursorHand = new Cursor(ownerControl.getDisplay(), SWT.CURSOR_HAND);
+
+		ownerControl.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(final DisposeEvent e) {
+				onDispose();
+			}
+		});
+
 		createActions();
+	}
+
+	private void actionCloseToolTip() {
+		ttHide();
+	}
+
+	private void actionToggleVH() {
+
+		// keep state for current orientation
+		_photoGallery.saveState(_state);
+
+		// toggle gallery
+		_isVerticalGallery = !_isVerticalGallery;
+
+		updateUI_ToogleAction();
+
+		/*
+		 * set tooltip shell to the correct size, each orientation has it's own size
+		 */
+		final Point contentSize = getContentSize();
+
+		// set size in layout data
+		final GridData gd = (GridData) _galleryContainer.getLayoutData();
+		gd.widthHint = contentSize.x;
+		gd.heightHint = contentSize.y;
+
+		// relayout shell
+		getToolTipShell().pack(true);
+
+		// show shell at default location
+		showAtDefaultLocation();
+
+		setIsShellToggle();
+
+		_photoGallery.setVertical(_isVerticalGallery);
 	}
 
 	@Override
@@ -125,7 +201,6 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 		// set gallery orientation
 		_photoGallery.setVertical(_isVerticalGallery);
-
 
 		/**
 		 * Prevent to open pref dialog, when it's opened it would close this tooltip and the pref
@@ -150,6 +225,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 	private void createActions() {
 
 		_actionToggleGalleryOrientation = new ActionToggleGalleryOrientation();
+		_actionCloseToolTip = new ActionCloseToolTip();
 	}
 
 	@Override
@@ -188,21 +264,10 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 				.applyTo(_galleryContainer);
 		_galleryContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
-//			_photoGallery = new PhotoGallery();
-//
-//			_photoGallery.setShowActionBar();
-//
-//			_photoGallery.setShowThumbnailSize();
-//
-//			final int galleryStyle = SWT.V_SCROLL | SWT.H_SCROLL;
-//
-//			_photoGallery.createImageGallery(_galleryContainer, galleryStyle, new PhotoGalleryProvider());
-
 			_photoGallery = new PhotoGallery();
 
 			_photoGallery.setShowActionBar();
 			_photoGallery.setShowThumbnailSize();
-
 
 			_photoGallery.createPhotoGallery(
 					_galleryContainer,
@@ -231,19 +296,63 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		{
 
 			/*
-			 * create toolbar
+			 * create toolbar for the exit button
 			 */
-			_ttToolbarControl = new ToolBar(container, SWT.FLAT);
+			_ttToolbarControlExit = new ToolBar(container, SWT.FLAT);
 			GridDataFactory.fillDefaults()//
-					.applyTo(_ttToolbarControl);
+					.applyTo(_ttToolbarControlExit);
 //		_toolbarControl.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
 			/*
 			 * spacer
 			 */
-			final Label label = new Label(container, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
-			label.setText(UI.EMPTY_STRING);
+			_labelResizer = new Label(container, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.grab(true, false)
+					.hint(20, SWT.DEFAULT)
+					.applyTo(_labelResizer);
+			_labelResizer.setText(UI.EMPTY_STRING);
+			_labelResizer.setToolTipText(Messages.Photo_Tooltip_Action_MoveToolTip_ToolTip);
+//			label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+			_labelResizer.addMouseTrackListener(new MouseTrackListener() {
+
+				@Override
+				public void mouseEnter(final MouseEvent e) {
+
+//					final Color bgColor = JFaceResources.getColorRegistry()//
+//							.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
+//
+//					_labelResizer.setBackground(bgColor);
+
+					_labelResizer.setCursor(_cursorHand);
+				}
+
+				@Override
+				public void mouseExit(final MouseEvent e) {
+//					_labelResizer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+				}
+
+				@Override
+				public void mouseHover(final MouseEvent e) {}
+			});
+
+			_labelResizer.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseDown(final MouseEvent e) {
+					onMouseDown(e);
+				}
+
+				@Override
+				public void mouseUp(final MouseEvent e) {
+					onMouseUp(e);
+				}
+			});
+			_labelResizer.addMouseMoveListener(new MouseMoveListener() {
+				@Override
+				public void mouseMove(final MouseEvent e) {
+					onMouseMove(e);
+				}
+			});
 
 			/*
 			 * create gallery toolbar
@@ -252,8 +361,6 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 			GridDataFactory.fillDefaults()//
 					.align(SWT.END, SWT.FILL)
 					.applyTo(_galleryToolbarControl);
-
-			_galleryToolbarManager = new ToolBarManager(_galleryToolbarControl);
 		}
 	}
 
@@ -268,13 +375,34 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 	private void fillActionBar() {
 
 		/*
-		 * fill toolbar
+		 * fill exit toolbar
 		 */
-		final ToolBarManager ttToolbarManager = new ToolBarManager(_ttToolbarControl);
+		final ToolBarManager exitToolbarManager = new ToolBarManager(_ttToolbarControlExit);
 
-		ttToolbarManager.add(_actionToggleGalleryOrientation);
+		exitToolbarManager.add(_actionCloseToolTip);
+		exitToolbarManager.update(true);
 
-		ttToolbarManager.update(true);
+		/*
+		 * fill gallery toolbar
+		 */
+		_galleryToolbarManager = new ToolBarManager(_galleryToolbarControl);
+
+		_galleryToolbarManager.add(_actionToggleGalleryOrientation);
+		_galleryToolbarManager.add(new Separator());
+	}
+
+	@Override
+	protected boolean isHideToolTip() {
+
+		if (_isShellDragged) {
+			return false;
+		}
+
+		// force to show the same images
+
+		_displayedPhotosHash = Integer.MIN_VALUE;
+
+		return true;
 	}
 
 	@Override
@@ -282,43 +410,45 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		return _isVerticalGallery;
 	}
 
-	@Override
-	protected void onStartHide() {
+	private void onDispose() {
 
-		// force to show the same images
-
-		_displayedPhotosHash = Integer.MIN_VALUE;
+		_cursorResize.dispose();
+		_cursorHand.dispose();
 	}
 
-	private void onToggleVH() {
+	private void onMouseDown(final MouseEvent e) {
 
-		// keep state for current orientation
-		_photoGallery.saveState(_state);
+		_isShellDragged = true;
 
-		// toggle gallery
-		_isVerticalGallery = !_isVerticalGallery;
+		_devXMousedown = e.x;
+		_devYMousedown = e.y;
 
-		updateUI_ToogleAction();
+		_labelResizer.setCursor(_cursorResize);
+	}
 
-		/*
-		 * set tooltip shell to the correct size, each orientation has it's own size
-		 */
-		final Point contentSize = getContentSize();
+	private void onMouseMove(final MouseEvent e) {
 
-		// set size in layout data
-		final GridData gd = (GridData) _galleryContainer.getLayoutData();
-		gd.widthHint = contentSize.x;
-		gd.heightHint = contentSize.y;
+		if (_isShellDragged) {
 
-		// relayout shell
-		getToolTipShell().pack(true);
+			// shell is dragged
 
-		// show shell at default location
-		showAtDefaultLocation();
+			final int diffX = _devXMousedown - e.x;
+			final int diffY = _devYMousedown - e.y;
 
-		setIsShellToggle();
+			setShellLocation(diffX, diffY);
+		}
+	}
 
-		_photoGallery.setVertical(_isVerticalGallery);
+	private void onMouseUp(final MouseEvent e) {
+
+		if (_isShellDragged) {
+
+			// shell is dragged with the mouse, stop dragging
+
+			_isShellDragged = false;
+
+			_labelResizer.setCursor(null);
+		}
 	}
 
 	@Override

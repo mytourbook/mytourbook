@@ -336,16 +336,11 @@ public abstract class PhotoToolTipShell {
 
 	private void animation20_Runnable() {
 
-		final long start = System.currentTimeMillis();
+//		final long start = System.currentTimeMillis();
 
 		try {
 
-			if (_visibleShell == null || _visibleShell.isDisposed()) {
-				return;
-			}
-
-			final boolean isShellHidden = _visibleShell.isVisible() == false;
-			if (isShellHidden) {
+			if (_visibleShell == null || _visibleShell.isDisposed() || _visibleShell.isVisible() == false) {
 				return;
 			}
 
@@ -644,6 +639,12 @@ public abstract class PhotoToolTipShell {
 
 	}
 
+	/**
+	 * @return Returns <code>true</code> to hide tooltip, <code>false</code> will not hide the
+	 *         tooltip.
+	 */
+	protected abstract boolean isHideToolTip();
+
 	abstract boolean isVerticalGallery();
 
 	private void onOwnerControlEvent(final Event event) {
@@ -698,8 +699,6 @@ public abstract class PhotoToolTipShell {
 		}
 	}
 
-	protected abstract void onStartHide();
-
 	private void onTTControlEvent(final Event event) {
 
 		if (_visibleShell == null || _visibleShell.isDisposed()) {
@@ -734,6 +733,11 @@ public abstract class PhotoToolTipShell {
 	private void onTTDisplayMouseMove(final Event event) {
 
 		if (_visibleShell == null || _visibleShell.isDisposed()) {
+			return;
+		}
+
+		if (isHideToolTip() == false) {
+			// is false when tooltip is dragged with the mouse
 			return;
 		}
 
@@ -1113,6 +1117,18 @@ public abstract class PhotoToolTipShell {
 		_isShellToggled = true;
 	}
 
+	void setShellLocation(final int diffX, final int diffY) {
+
+		final Rectangle shellBounds = _visibleShell.getBounds();
+
+		final Point size = new Point(shellBounds.width, shellBounds.height);
+		final Point newShellLocation = new Point(shellBounds.x - diffX, shellBounds.y - diffY);
+
+		final Point fixedLocation = fixupDisplayBounds(size, newShellLocation);
+
+		_visibleRRShell.setShellLocation(fixedLocation.x, fixedLocation.y, 4);
+	}
+
 	private void setShellVisible(final boolean isVisible) {
 
 		_visibleShell.setVisible(isVisible);
@@ -1252,9 +1268,27 @@ public abstract class PhotoToolTipShell {
 		_rrShellNoResize.dispose();
 	}
 
+	/**
+	 * Hide current shell immediatedly without animation.
+	 */
+	void ttHide() {
+
+		_visibleShell.setAlpha(0);
+
+		// hide shell
+		setShellVisible(false);
+
+		_isShellFadingOut = false;
+		_isShellFadingOut = false;
+	}
+
 	private void ttHide(final Event event) {
 
 		if (_visibleShell == null || _visibleShell.isDisposed() || _visibleShell.isVisible() == false) {
+			return;
+		}
+
+		if (isHideToolTip() == false) {
 			return;
 		}
 
@@ -1268,8 +1302,6 @@ public abstract class PhotoToolTipShell {
 
 		_isShellFadingIn = false;
 		_isShellFadingOut = true;
-
-		onStartHide();
 
 		animation10_Start();
 	}
