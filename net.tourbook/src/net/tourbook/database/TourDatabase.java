@@ -203,6 +203,7 @@ public class TourDatabase {
 	private static String							DERBY_URL;
 
 	private boolean									_isDerbyEmbedded;
+
 	private static NetworkServerControl				_server;
 
 	private static volatile EntityManagerFactory	_emFactory;
@@ -914,32 +915,6 @@ public class TourDatabase {
 
 		return sb.toString();
 	}
-
-//	/**
-//	 * @return Returns all tour people in the db sorted by last/first name
-//	 */
-//	@SuppressWarnings("unchecked")
-//	public static ArrayList<TourPerson> getTourPeople() {
-//
-//		ArrayList<TourPerson> tourPeople = new ArrayList<TourPerson>();
-//
-//		final EntityManager em = TourDatabase.getInstance().getEntityManager();
-//
-//		if (em != null) {
-//
-//			final Query emQuery = em.createQuery(//
-//					//
-//					"SELECT TourPerson" //$NON-NLS-1$
-//							+ (" FROM TourPerson AS TourPerson") //$NON-NLS-1$
-//							+ (" ORDER BY TourPerson.lastName, TourPerson.firstName")); //$NON-NLS-1$
-//
-//			tourPeople = (ArrayList<TourPerson>) emQuery.getResultList();
-//
-//			em.close();
-//		}
-//
-//		return tourPeople;
-//	}
 
 	/**
 	 * @return Returns all tour types in the db sorted by name
@@ -1983,44 +1958,6 @@ public class TourDatabase {
 
 		return true;
 	}
-
-//	/**
-//	 * create table {@link #TABLE_TOUR_CATEGORY}
-//	 *
-//	 * @param stmt
-//	 * @throws SQLException
-//	 */
-//	private void createTableTourCategory(final Statement stmt) throws SQLException {
-//
-//		// CREATE TABLE TourCategory
-//		stmt.execute("" //$NON-NLS-1$
-//				+ ("CREATE TABLE " + TABLE_TOUR_CATEGORY) //$NON-NLS-1$
-//				+ "(" //$NON-NLS-1$
-//				+ "categoryId 					BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1)," //$NON-NLS-1$
-//				+ (TABLE_TOUR_DATA + "tourId	BIGINT,") //$NON-NLS-1$
-//				+ "category 					VARCHAR(100)" //$NON-NLS-1$
-//				+ ")"); //$NON-NLS-1$
-//
-//		// ALTER TABLE TourCategory ADD CONSTRAINT TourCategory_pk PRIMARY KEY (categoryId);
-//		stmt.execute("" //$NON-NLS-1$
-//				+ ("ALTER TABLE " + TABLE_TOUR_CATEGORY) //$NON-NLS-1$
-//				+ (" ADD CONSTRAINT " + (TABLE_TOUR_CATEGORY + "_pk ")) //$NON-NLS-1$ //$NON-NLS-2$
-//				+ (" PRIMARY KEY (categoryId)")); //$NON-NLS-1$
-//
-//		// CREATE TABLE TourCategory_TourData
-//		stmt.execute("" //$NON-NLS-1$
-//				+ ("CREATE TABLE " + JOINTABLE_TOURCATEGORY__TOURDATA) //$NON-NLS-1$
-//				+ "(" //$NON-NLS-1$
-//				+ (TABLE_TOUR_DATA + "_tourId			BIGINT NOT NULL,") //$NON-NLS-1$
-//				+ (TABLE_TOUR_CATEGORY + "_categoryId	BIGINT NOT NULL") //$NON-NLS-1$
-//				+ ")"); //$NON-NLS-1$
-//
-//		// ALTER TABLE TourCategory_TourData ADD CONSTRAINT TourCategory_TourData_pk PRIMARY KEY (tourCategory_categoryId);
-//		stmt.execute("" //$NON-NLS-1$
-//				+ ("ALTER TABLE " + JOINTABLE_TOURCATEGORY__TOURDATA) //$NON-NLS-1$
-//				+ (" ADD CONSTRAINT " + JOINTABLE_TOURCATEGORY__TOURDATA + "_pk") //$NON-NLS-1$ //$NON-NLS-2$
-//				+ (" PRIMARY KEY (" + TABLE_TOUR_CATEGORY + "_categoryId)")); //$NON-NLS-1$ //$NON-NLS-2$
-//	}
 
 	/**
 	 * Create index for {@link TourData} will dramatically improve performance *
@@ -3145,6 +3082,7 @@ public class TourDatabase {
 		boolean isPostUpdate11 = false;
 		boolean isPostUpdate13 = false;
 		boolean isPostUpdate20 = false;
+		boolean isPostUpdate22 = false;
 
 		int newVersion = currentDbVersion;
 		final int oldVersion = currentDbVersion;
@@ -3245,13 +3183,31 @@ public class TourDatabase {
 			}
 
 			/*
+			 * 21
+			 */
+			if (currentDbVersion == 20) {
+				currentDbVersion = newVersion = updateDbDesign_020_to_021(conn, monitor);
+			}
+
+			/*
+			 * 22
+			 */
+			if (currentDbVersion == 21) {
+				currentDbVersion = newVersion = updateDbDesign_021_to_022(conn, monitor);
+				isPostUpdate22 = true;
+			}
+
+			/*
 			 * update version number
 			 */
 			updateDbVersionNumber(conn, newVersion);
 
 			/**
-			 * do the post update after the version number is updated because the post update uses
-			 * connections which is checking the version number
+			 * Do post update after the version number is updated because the post update uses
+			 * connections and entitymanager which is checking the version number.
+			 * <p>
+			 * Also the data structure must be updated otherwise the entity manager fails because
+			 * the data structure in the programm code MUST be the same in the database.
 			 */
 			if (isPostUpdate5) {
 				TourDatabase.computeComputedValuesForAllTours(monitor);
@@ -3269,26 +3225,7 @@ public class TourDatabase {
 			if (isPostUpdate20) {
 				updateDbDesign_019_to_020_PostUpdate(conn, monitor);
 			}
-
-			/*
-			 * 21
-			 */
-			if (currentDbVersion == 20) {
-
-				currentDbVersion = newVersion = updateDbDesign_020_to_021(conn, monitor);
-
-				updateDbVersionNumber(conn, newVersion);
-			}
-
-			/*
-			 * 22
-			 */
-			if (currentDbVersion == 21) {
-
-				currentDbVersion = newVersion = updateDbDesign_021_to_022(conn, monitor);
-
-				updateDbVersionNumber(conn, newVersion);
-
+			if (isPostUpdate22) {
 				updateDbDesign_021_to_022_PostUpdate(conn, monitor);
 			}
 

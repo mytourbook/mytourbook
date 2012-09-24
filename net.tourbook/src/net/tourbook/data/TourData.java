@@ -5946,10 +5946,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		 * cleanup dataseries because dataseries has been saved before version 1.3.0 even when no
 		 * data are available
 		 */
-		cleanupDataSeries();
+// this DO NOT WORK because time serie is not set !!!!
+//		cleanupDataSeries();
 
 		final SerieData serieData19 = serieData;
 		final SerieData serieData20 = new SerieData();
+
 		serieData20.timeSerie = serieData19.timeSerie;
 
 		serieData20.altitudeSerie20 = convertDataSeries(serieData19.altitudeSerie, 0);
@@ -5970,12 +5972,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		/*
 		 * don't convert computed data series
 		 */
-		if (isSpeedSerieFromDevice) {
+
+		if (serieData19.speedSerie != null) {
+			isSpeedSerieFromDevice = true;
 			serieData20.speedSerie20 = convertDataSeries(serieData19.speedSerie, 10);
 		}
 		serieData20.speedSerie = null;
 
-		if (isPowerSerieFromDevice) {
+		if (serieData19.powerSerie != null) {
+			isPowerSerieFromDevice = true;
 			serieData20.powerSerie20 = convertDataSeries(serieData19.powerSerie, 0);
 		}
 		serieData20.powerSerie = null;

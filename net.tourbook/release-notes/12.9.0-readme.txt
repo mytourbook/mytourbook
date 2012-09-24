@@ -24,9 +24,10 @@ Other modifications
 *
 
 
+
 Fixed Bugs 
 
-* 
+* just detected (24.9.2012), that power & speed series from a device are not transferred correctly when upgrading version 11.8 to 12.1. This bug has been fixed, when version 12.1 or later is not yet used, the data transfer is now done correctly. However when version 12.1 or later is already use, the tours be deleted and reimported. This bug mainly occures for tours which are recorded from an ergometer because it is recording power & speed.
 
 
 Development
