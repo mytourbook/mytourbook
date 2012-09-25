@@ -1737,6 +1737,9 @@ public class TourManager {
 
 			xDataTime.setStartValue(startTime);
 
+			// set date/time when x-axis starts
+			xDataTime.setStartDateTime(tourData.getTourStartTime());
+
 		} else {
 
 			// distance is available and is displayed on the x axis

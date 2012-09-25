@@ -156,7 +156,7 @@ public class MergeTour {
 
 		} else {
 
-			// set offset to 5% tour time
+			// add additional 5% tour time that the tour do not start/end at the chart border
 
 			final long timeDiff = tourEnd - tourStart;
 			final long timeOffset = (long) (timeDiff * 0.05);

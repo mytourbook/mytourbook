@@ -68,8 +68,8 @@ public class ChartSegmentLayer implements IChartLayer {
 
 		final float graphYBottom = drawingData.getGraphYBottom();
 		final float[] yValues = drawingData.getYData().getHighValues()[0];
-		final float scaleX = drawingData.getScaleX();
-		final float scaleY = drawingData.getScaleY();
+		final double scaleX = drawingData.getScaleX();
+		final double scaleY = drawingData.getScaleY();
 
 		final Color colorLine = new Color(display, getLineColor());
 		Point lastPoint = null;

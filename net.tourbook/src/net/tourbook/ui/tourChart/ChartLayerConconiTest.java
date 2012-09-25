@@ -33,8 +33,8 @@ import org.eclipse.swt.widgets.Display;
 
 public class ChartLayerConconiTest implements IChartLayer {
 
-	private float	_scaleX;
-	private float	_scaleY;
+	private double	_scaleX;
+	private double	_scaleY;
 	private int		_devYBottom;
 	private float	_graphYBottom;
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,8 @@
  * Author: Wolfgang Schramm Created: 21.06.2005
  */
 package net.tourbook.chart;
+
+import org.joda.time.DateTime;
 
 /**
  * Contains data values for the x-axis
@@ -54,7 +56,7 @@ public class ChartDataXSerie extends ChartDataSerie {
 
 	/**
 	 * Scaling for the x-axis which is computed with {@link Math#pow(double, double)} when this
-	 * value is <code>!= 1</code>
+	 * value is <code>!= 1</code>. Extended scaling is used in the conconi view.
 	 */
 	private double			_scalingFactor			= 1;
 	private double			_scalingMaxValue		= 1;
@@ -64,6 +66,11 @@ public class ChartDataXSerie extends ChartDataSerie {
 	 * can be <code>null</code> to disable this feature.
 	 */
 	public boolean[]		_noLine;
+
+	/**
+	 * X-axis start Date/Time
+	 */
+	private DateTime		_startDateTime;
 
 	public ChartDataXSerie(final float[] values) {
 		setMinMaxValues(new float[][] { values });
@@ -99,6 +106,13 @@ public class ChartDataXSerie extends ChartDataSerie {
 
 	public double getScalingMaxValue() {
 		return _scalingMaxValue;
+	}
+
+	/**
+	 * @return Returns x-axis start date/time or <code>null</code> when not available.
+	 */
+	public DateTime getStartDateTime() {
+		return _startDateTime;
 	}
 
 	/**
@@ -148,6 +162,13 @@ public class ChartDataXSerie extends ChartDataSerie {
 	public void setScalingFactors(final double scalingFactor, final double scalingMaxValue) {
 		_scalingFactor = scalingFactor;
 		_scalingMaxValue = scalingMaxValue;
+	}
+
+	/**
+	 * @param dateTime
+	 */
+	public void setStartDateTime(final DateTime dateTime) {
+		_startDateTime = dateTime;
 	}
 
 	/**

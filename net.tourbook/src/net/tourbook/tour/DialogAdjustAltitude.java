@@ -652,8 +652,8 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		final SplineDrawingData drawingData = _chartLayer2ndAltiSerie.getDrawingData();
 
-		final float scaleX = drawingData.scaleX;
-		final float scaleY = drawingData.scaleY;
+		final double scaleX = drawingData.scaleX;
+		final double scaleY = drawingData.scaleY;
 
 		float devX = drawingData.devGraphValueXOffset + mouseDownDevPositionX;
 		final float devY = drawingData.devY0Spline - mouseDownDevPositionY;
@@ -661,7 +661,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		final float graphXMin = 0;
 		final float graphXMax = _sliderXAxisValue;
 
-		float graphX = devX / scaleX;
+		float graphX = (float) (devX / scaleX);
 
 		// check min/max value
 		if (graphX <= graphXMin || graphX >= graphXMax) {
@@ -701,8 +701,8 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		System.arraycopy(oldXMinValues, 0, newXMinValues, 0, oldLength);
 		System.arraycopy(oldXMaxValues, 0, newXMaxValues, 0, oldLength);
 
-		final float dev1X = graphXMax * scaleX;
-		final float dev1Y = _altiDiff * scaleY;
+		final float dev1X = (float) (graphXMax * scaleX);
+		final float dev1Y = (float) (_altiDiff * scaleY);
 
 		/*
 		 * creat a new points
@@ -729,7 +729,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 				final float posY = dev1Y == 0 ? 0 : devY / dev1Y;
 
 				devX = dev1X / (pointIndex + 1);
-				graphX = devX / scaleX;
+				graphX = (float) (devX / scaleX);
 
 				final int splineIndex = oldLength + pointIndex;
 				newIsPointMovable[splineIndex] = true;
@@ -762,8 +762,8 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		final boolean isPointMovable = _splineData.isPointMovable[_pointHitIndex];
 
 		final SplineDrawingData drawingData = _chartLayer2ndAltiSerie.getDrawingData();
-		final float scaleX = drawingData.scaleX;
-		final float scaleY = drawingData.scaleY;
+		final double scaleX = drawingData.scaleX;
+		final double scaleY = drawingData.scaleY;
 
 		float devX = drawingData.devGraphValueXOffset + mouseEvent.devXMouse;
 		final float devY = drawingData.devY0Spline - mouseEvent.devYMouse;
@@ -771,7 +771,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		final double graphXMin = _splineData.graphXMinValues[_pointHitIndex];
 		final double graphXMax = _splineData.graphXMaxValues[_pointHitIndex];
 
-		float graphX = devX / scaleX;
+		float graphX = (float) (devX / scaleX);
 
 		_canDeletePoint = false;
 
@@ -798,13 +798,13 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		/*
 		 * set new relative position
 		 */
-		devX = graphX * scaleX;
+		devX = (float) (graphX * scaleX);
 
 		final float graph1X = _sliderXAxisValue;
 		final float graph1Y = _altiDiff;
 
-		final float dev1X = graph1X * scaleX;
-		final float dev1Y = graph1Y * scaleY;
+		final float dev1X = (float) (graph1X * scaleX);
+		final float dev1Y = (float) (graph1Y * scaleY);
 
 		if (isPointMovable) {
 			// horizontal move is allowed
@@ -1714,9 +1714,9 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		final SplineDrawingData drawingData = _chartLayer2ndAltiSerie.getDrawingData();
 
-		final float scaleX = drawingData.scaleX;
+		final double scaleX = drawingData.scaleX;
 		final float devX = drawingData.devGraphValueXOffset + mouseDownDevPositionX;
-		final float graphX = devX / scaleX;
+		final float graphX = (float) (devX / scaleX);
 
 		final float graphXMin = 0;
 		final float graphXMax = _sliderXAxisValue;

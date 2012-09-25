@@ -32,6 +32,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 /**
  * Chart widget which represents the chart ui The chart consists of these components
@@ -69,7 +72,8 @@ public class ChartComponents extends Composite {
 	 */
 	static final int			CHART_MIN_WIDTH					= 5;
 	static final int			CHART_MIN_HEIGHT				= 5;
-	static final int			CHART_MAX_WIDTH					= 10000000;						// 10'000'000
+//																									// 2'147'483'647
+	static final int			CHART_MAX_WIDTH					= 1000000000;						// 1'000'000'000
 	static final int			CHART_MAX_HEIGHT				= 10000;
 
 	static final int			SLIDER_BAR_HEIGHT				= 10;
@@ -77,6 +81,9 @@ public class ChartComponents extends Composite {
 	static final int			MARGIN_TOP_WITH_TITLE			= 5;
 	static final int			MARGIN_TOP_WITHOUT_TITLE		= 10;
 
+	/**
+	 * Number of seconds in one day.
+	 */
 	private static final int	DAY_IN_SECONDS					= 24 * 60 * 60;
 
 	private final Chart			_chart;
@@ -241,29 +248,6 @@ public class ChartComponents extends Composite {
 				onResize();
 			}
 		});
-
-//		fComponentGraph.addListener(SWT.Traverse, new Listener() {
-//			public void handleEvent(final Event event) {
-//
-//				switch (event.detail) {
-//				case SWT.TRAVERSE_RETURN:
-//				case SWT.TRAVERSE_ESCAPE:
-//				case SWT.TRAVERSE_TAB_NEXT:
-//				case SWT.TRAVERSE_TAB_PREVIOUS:
-//				case SWT.TRAVERSE_PAGE_NEXT:
-//				case SWT.TRAVERSE_PAGE_PREVIOUS:
-//					event.doit = true;
-//					break;
-//				}
-//			}
-//		});
-//
-//		fComponentGraph.addListener(SWT.KeyDown, new Listener() {
-//			public void handleEvent(final Event event) {
-//				handleLeftRightEvent(event);
-//			}
-//		});
-
 	}
 
 	/**
@@ -348,7 +332,8 @@ public class ChartComponents extends Composite {
 		final float xStartValue = xData.getStartValue();
 
 		final int devVirtualGraphWidth = componentGraph.getXXDevGraphWidth();
-		final float scaleX = ((float) devVirtualGraphWidth - 1) / graphMaxValue;
+
+		final double scaleX = ((double) devVirtualGraphWidth - 1) / graphMaxValue;
 
 		drawingData.devVirtualGraphWidth = devVirtualGraphWidth;
 		drawingData.setScaleX(scaleX);
@@ -425,6 +410,16 @@ public class ChartComponents extends Composite {
 			final int valueDivisor = xData.getValueDivisor();
 			int loopCounter = 0;
 
+			/**
+			 * This implementation do NOT support extended scaling (logarithmic scaling)
+			 */
+			final double scalingFactor = xData.getScalingFactor();
+			final boolean isNormalScaling = scalingFactor == 1.0;
+			final boolean extendedScaling = isNormalScaling == false;
+
+			final int devValueLeftBorder = componentGraph._xxDevViewPortLeftBorder;
+			final int devValueRightBorder = devValueLeftBorder + getDevVisibleChartWidth();
+
 			/*
 			 * increase by one unit that the right side of the chart is drawing a unit, in some
 			 * cases this didn't occured
@@ -436,10 +431,15 @@ public class ChartComponents extends Composite {
 			final double graphMinRemainder = graphMinVisibleValue % graphUnit;
 			graphMinVisibleValue = graphMinVisibleValue - graphMinRemainder;
 
-			graphMinVisibleValue = Util.roundFloatToUnit(graphMinVisibleValue, graphUnit, true);
-			graphMaxVisibleValue = Util.roundFloatToUnit(graphMaxVisibleValue, graphUnit, false);
+			graphMinVisibleValue = Util.roundValueToUnit(graphMinVisibleValue, graphUnit, true);
+			graphMaxVisibleValue = Util.roundValueToUnit(graphMaxVisibleValue, graphUnit, false);
+
+			// calendar formatting displays day/month/year
+			final boolean isCalendarFormatting = (graphMaxVisibleValue - graphMinVisibleValue) > DAY_IN_SECONDS;
 
 			double graphValue = graphMinVisibleValue;
+			final DateTime xStartDateTime = xData.getStartDateTime();
+			final DateTimeFormatter shortDateFormatter = DateTimeFormat.shortDate();
 
 			while (graphValue <= graphMaxVisibleValue) {
 
@@ -447,30 +447,64 @@ public class ChartComponents extends Composite {
 				final double unitPos = graphValue - unitOffset;
 				double unitLabelValue = unitPos + xStartValue;
 
+				boolean isValueAdjusted = false;
+
 				if ((unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_SECOND //
 						|| unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_OPTIONAL_SECOND)
-						&& xStartValue > 0) {
+						&& xStartValue > 0
+
+						// show 24 hour clock only when a tour is not larger than 1 day
+						&& isCalendarFormatting == false) {
 
 					/*
 					 * x-axis shows day time, start with 0:00 at midnight
 					 */
 
+					isValueAdjusted = true;
+
 					unitLabelValue = unitLabelValue % DAY_IN_SECONDS;
 				}
 
-				final String unitLabel = Util.formatValue((float) unitLabelValue, unitType, valueDivisor, true);
+				final double devUnitLabelValue = unitLabelValue * scaleX;
 
-				final boolean isMajorValue = graphValue % majorValue == 0;
-
-				unitList.add(new ChartUnit((float) graphValue, unitLabel, isMajorValue));
-
-				// check for an infinity loop
-				if (graphValue == graphMaxValue || loopCounter++ > 10000) {
+				if (isNormalScaling && devUnitLabelValue > devValueRightBorder) {
+					// exclude trailing units, these are units after the right border
 					break;
 				}
 
+				if ((isNormalScaling && devUnitLabelValue >= devValueLeftBorder) || extendedScaling) {
+
+					String unitLabel = null;
+					if (isCalendarFormatting
+							&& isValueAdjusted == false
+							&& unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_OPTIONAL_SECOND) {
+
+						if (xStartDateTime != null) {
+
+							final DateTime xGraphStart = xStartDateTime.plusSeconds((int) unitLabelValue);
+
+							unitLabel = shortDateFormatter.print(xGraphStart);
+//							unitLabel = Util.formatDateTime();
+						}
+					}
+
+					if (unitLabel == null) {
+						// use default formatting
+						unitLabel = Util.formatValue((float) unitLabelValue, unitType, valueDivisor, true);
+					}
+
+					final boolean isMajorValue = graphValue % majorValue == 0;
+
+					unitList.add(new ChartUnit((float) graphValue, unitLabel, isMajorValue));
+
+					// check for an infinity loop
+					if (graphValue == graphMaxValue || loopCounter++ > 10000) {
+						break;
+					}
+				}
+
 				graphValue += graphUnit;
-				graphValue = Util.roundFloatToUnit(graphValue, graphUnit, false);
+				graphValue = Util.roundValueToUnit(graphValue, graphUnit, false);
 			}
 
 			break;
@@ -1215,7 +1249,7 @@ public class ChartComponents extends Composite {
 		drawingData.setBarRectangleWidth(Math.max(0, (devGraphWidth / allDaysInAllYears)));
 		drawingData.setXUnitTextPos(GraphDrawingData.X_UNIT_TEXT_POS_CENTER);
 
-		drawingData.setScaleX((float) devGraphWidth / allDaysInAllYears);
+		drawingData.setScaleX((double) devGraphWidth / allDaysInAllYears);
 	}
 
 	private void createXValuesMonth(final GraphDrawingData drawingData,
@@ -1225,7 +1259,7 @@ public class ChartComponents extends Composite {
 		final ChartDataXSerie xData = drawingData.getXData();
 
 		final int allUnitsSize = xData._highValues[0].length;
-		final float scaleX = (float) devGraphWidth / allUnitsSize;
+		final double scaleX = (double) devGraphWidth / allUnitsSize;
 		drawingData.setScaleX(scaleX);
 
 		final int numberOfYears = xData.getChartSegments().segmentTitle.length;
@@ -1233,7 +1267,7 @@ public class ChartComponents extends Composite {
 		createMonthEqualUnits(drawingData, units, devGraphWidth, allUnitsSize, numberOfYears);
 
 		// compute the width and position of the rectangles
-		final float monthWidth = Math.max(0, (scaleX) - 1);
+		final float monthWidth = (float) Math.max(0, (scaleX) - 1);
 		final float barWidth = Math.max(0, (monthWidth * 0.90f));
 
 		drawingData.setBarRectangleWidth((int) barWidth);
@@ -1271,8 +1305,8 @@ public class ChartComponents extends Composite {
 		drawingData.setBarPosition(GraphDrawingData.BAR_POS_CENTER);
 		drawingData.setXUnitTextPos(GraphDrawingData.X_UNIT_TEXT_POS_CENTER);
 
-		drawingData.setScaleX((float) devGraphWidth / allWeeks);
-		drawingData.setScaleUnitX((float) devGraphWidth / allDaysInAllYears);
+		drawingData.setScaleX((double) devGraphWidth / allWeeks);
+		drawingData.setScaleUnitX((double) devGraphWidth / allDaysInAllYears);
 
 	}
 
@@ -1287,7 +1321,7 @@ public class ChartComponents extends Composite {
 		final int[] yearValues = chartSegments.years;
 
 		final int yearCounter = xData._highValues[0].length;
-		final float scaleX = (float) devGraphWidth / yearCounter;
+		final double scaleX = (double) devGraphWidth / yearCounter;
 		drawingData.setScaleX(scaleX);
 
 		// create year units

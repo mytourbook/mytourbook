@@ -64,13 +64,13 @@ public class GraphDrawingData {
 	/**
 	 * scaling from graph value to device value
 	 */
-	private float					_scaleX;
-	private float					_scaleY;
+	private double					_scaleX;
+	private double					_scaleY;
 
 	/**
 	 * scaling of the x unit
 	 */
-	private float					_scaleUnitX				= Float.MIN_VALUE;
+	private double					_scaleUnitX				= Double.MIN_VALUE;
 
 	// graph position
 	private int						_devYTop;
@@ -103,7 +103,7 @@ public class GraphDrawingData {
 
 	private boolean[]				_isDrawUnits			= null;
 
-	private ChartDrawingData				chartDrawingData;
+	private ChartDrawingData		chartDrawingData;
 
 	public GraphDrawingData(final ChartDrawingData chartDrawingData, final int chartType) {
 		this.chartDrawingData = chartDrawingData;
@@ -201,15 +201,15 @@ public class GraphDrawingData {
 		return _graphYTop;
 	}
 
-	public float getScaleUnitX() {
+	public double getScaleUnitX() {
 		return _scaleUnitX;
 	}
 
-	public float getScaleX() {
+	public double getScaleX() {
 		return _scaleX;
 	}
 
-	public float getScaleY() {
+	public double getScaleY() {
 		return _scaleY;
 	}
 
@@ -369,7 +369,7 @@ public class GraphDrawingData {
 	 * 
 	 * @param scaleXUnit
 	 */
-	public void setScaleUnitX(final float scaleXUnit) {
+	public void setScaleUnitX(final double scaleXUnit) {
 		_scaleUnitX = scaleXUnit;
 	}
 
@@ -378,11 +378,11 @@ public class GraphDrawingData {
 	 * 
 	 * @param scaleX
 	 */
-	public void setScaleX(final float scaleX) {
+	public void setScaleX(final double scaleX) {
 		_scaleX = scaleX;
 	}
 
-	public void setScaleY(final float scaleY) {
+	public void setScaleY(final double scaleY) {
 		_scaleY = scaleY;
 	}
 
@@ -431,6 +431,5 @@ public class GraphDrawingData {
 	public void setYSliderHitRect(final Rectangle[] sliderHitRect) {
 		_ySliderHitRect = sliderHitRect;
 	}
-
 
 }

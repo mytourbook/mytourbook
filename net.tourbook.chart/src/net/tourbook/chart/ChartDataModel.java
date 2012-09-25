@@ -180,6 +180,9 @@ public class ChartDataModel {
 	 */
 	public void resetMinMaxValues() {
 
+		_xData._visibleMinValue = _xData._originalMinValue;
+		_xData._visibleMaxValue = _xData._originalMaxValue;
+
 		for (final ChartDataYSerie ySerie : _yData) {
 			ySerie._visibleMinValue = ySerie.getOriginalMinValue();
 			ySerie._visibleMaxValue = ySerie.getOriginalMaxValue();

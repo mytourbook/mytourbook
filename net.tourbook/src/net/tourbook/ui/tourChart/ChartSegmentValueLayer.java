@@ -73,8 +73,8 @@ public class ChartSegmentValueLayer implements IChartLayer {
 		final float[] segmentValues = (float[]) segmentValuesObject;
 
 		final int valueDivisor = yData.getValueDivisor();
-		final float scaleX = drawingData.getScaleX();
-		final float scaleY = drawingData.getScaleY();
+		final double scaleX = drawingData.getScaleX();
+		final double scaleY = drawingData.getScaleY();
 
 		final Color lineColor = new Color(display, lineColorRGB);
 

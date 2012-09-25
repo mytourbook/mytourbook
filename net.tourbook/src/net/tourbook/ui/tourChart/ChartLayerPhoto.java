@@ -43,15 +43,15 @@ public class ChartLayerPhoto implements IChartLayer {
 
 	private Point[]					_photoPositions;
 
-	private ChartPhotoOverlay		_photoOverlay;
-	private Color					_photoOverlayBGColor;
+//	private ChartPhotoOverlay		_photoOverlay;
+//	private Color					_photoOverlayBGColor;
 
 	public ChartLayerPhoto(	final ArrayList<ChartPhoto> chartPhotos,
 							final ChartPhotoOverlay photoOverlay,
 							final Color photoOverlayBGColor) {
 		_chartPhotos = chartPhotos;
-		_photoOverlay = photoOverlay;
-		_photoOverlayBGColor = photoOverlayBGColor;
+//		_photoOverlay = photoOverlay;
+//		_photoOverlayBGColor = photoOverlayBGColor;
 	}
 
 	private void createGroupedPhotos(final int devGraphImageOffset, final GraphDrawingData graphDrawingData) {
@@ -185,8 +185,8 @@ public class ChartLayerPhoto implements IChartLayer {
 
 		final float graphYBottom = drawingData.getGraphYBottom();
 		final float[] yValues = drawingData.getYData().getHighValues()[0];
-		final float scaleX = drawingData.getScaleX();
-		final float scaleY = drawingData.getScaleY();
+		final double scaleX = drawingData.getScaleX();
+		final double scaleY = drawingData.getScaleY();
 
 		final int lineWidth = 2;
 		int photoIndex = 0;

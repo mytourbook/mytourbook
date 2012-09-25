@@ -241,7 +241,7 @@ public class ChartComponentAxis extends Canvas {
 			final ArrayList<ChartUnit> yUnits = drawingData.getYUnits();
 			final int unitListSize = yUnits.size();
 
-			final float scaleY = drawingData.getScaleY();
+			final double scaleY = drawingData.getScaleY();
 			final ChartDataYSerie yData = drawingData.getYData();
 
 			final String title = yData.getYTitle();
@@ -304,7 +304,7 @@ public class ChartComponentAxis extends Canvas {
 			for (final ChartUnit yUnit : yUnits) {
 
 				final float unitValue = yUnit.value;
-				final float devYUnit = ((unitValue - graphYBottom) * scaleY) + .5f;
+				final float devYUnit = (float) (((unitValue - graphYBottom) * scaleY) + .5);
 
 				if (isBottomUp || unitListSize == 1) {
 					devY = devYBottom - (int) devYUnit;

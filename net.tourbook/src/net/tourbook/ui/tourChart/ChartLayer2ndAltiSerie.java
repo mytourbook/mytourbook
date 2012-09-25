@@ -50,8 +50,8 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 	private int						_graphXValueOffset;
 	private int						_xxDevViewPortLeftBorder;
 	private int						_devY0Spline;
-	private float					_scaleX;
-	private float					_scaleY;
+	private double					_scaleX;
+	private double					_scaleY;
 
 	private final NumberFormat		_nf3	= NumberFormat.getNumberInstance();
 	{
@@ -119,7 +119,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		 * convert all diff values into positive values
 		 */
 		float diffValues[] = null;
-		float scaleValueDiff = _scaleY;
+		double scaleValueDiff = _scaleY;
 		if (isDiffValues) {
 
 			int valueIndex = 0;
@@ -138,7 +138,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		}
 
 		// position for the x-axis line in the graph
-		final float devY0 = devYBottom + (_scaleY * graphYBottom);
+		final float devY0 = (float) (devYBottom + (_scaleY * graphYBottom));
 
 		final int startIndex = 0;
 		final int endIndex = xValues.length;
@@ -166,7 +166,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 //			}
 
 			graphXValue = xValues[xValueIndex] - _graphXValueOffset;
-			final float devX = graphXValue * _scaleX;
+			final float devX = (float) (graphXValue * _scaleX);
 			final int devXInt = (int) devX;
 
 			/*
@@ -174,7 +174,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 			 */
 			if (isAdjustedValues) {
 
-				final float devYAdjustedValue = yAdjustedSerie[xValueIndex] * _scaleY;
+				final float devYAdjustedValue = (float) (yAdjustedSerie[xValueIndex] * _scaleY);
 				final float devYAdjusted = devY0 - devYAdjustedValue;
 
 				if (xValueIndex == startIndex) {
@@ -205,7 +205,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 			if (is2ndYValues) {
 
 				graphYValue2nd = yValues2ndSerie[xValueIndex];
-				final float devYValue2nd = graphYValue2nd * _scaleY;
+				final float devYValue2nd = (float) (graphYValue2nd * _scaleY);
 
 				final float devY2nd = devY0 - devYValue2nd;
 
@@ -227,7 +227,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 			if (isDiffValues) {
 
 				final float graphValueDiff = (diffValues[xValueIndex]);
-				final float devLayerValueDiff = graphValueDiff * scaleValueDiff;
+				final float devLayerValueDiff = (float) (graphValueDiff * scaleValueDiff);
 				final float devYDiff = devYBottom - devLayerValueDiff;
 
 				if (xValueIndex == startIndex) {

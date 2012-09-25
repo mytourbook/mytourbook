@@ -451,62 +451,6 @@ public class Util {
 	}
 
 	/**
-	 * Round floating value by removing the trailing part, which causes problem when creating units.
-	 * For the value 200.00004 the .00004 part will be removed
-	 * 
-	 * @param graphMinVisibleValue
-	 * @param graphUnit
-	 * @return
-	 */
-	public static double roundFloatToUnit(	final double graphMinVisibleValue,
-											final double graphUnit,
-											final boolean isMinValue) {
-
-		if (graphUnit < 1) {
-
-			if (graphMinVisibleValue < 0) {
-
-				final double gvDiv1 = graphMinVisibleValue / graphUnit;
-				final int gvDiv2 = (int) (gvDiv1 - 0.5f);
-				final double gvDiv3 = gvDiv2 * graphUnit;
-
-				return gvDiv3;
-
-			} else {
-
-				final double gvDiv1 = graphMinVisibleValue / graphUnit;
-				final int gvDiv2 = (int) (gvDiv1 + (isMinValue ? -0.5f : 0.5f));
-				final double gvDiv3 = gvDiv2 * graphUnit;
-
-				return gvDiv3;
-			}
-
-		} else {
-
-			// graphUnit >= 1
-
-			if (graphMinVisibleValue < 0) {
-
-				final double gvDiv1 = graphMinVisibleValue * graphUnit;
-				final long gvDiv2 = (long) (gvDiv1 + (isMinValue ? -0.5f : 0.5f));
-				final double gvDiv3 = gvDiv2 / graphUnit;
-
-				return gvDiv3;
-
-			} else {
-
-				// graphValue >= 0
-
-				final double gvDiv1 = graphMinVisibleValue * graphUnit;
-				final long gvDiv2 = (long) (gvDiv1 + 0.5f);
-				final double gvDiv3 = gvDiv2 / graphUnit;
-
-				return gvDiv3;
-			}
-		}
-	}
-
-	/**
 	 * Round floating value to an inverse long value.
 	 * 
 	 * @param graphValue
@@ -669,6 +613,62 @@ public class Util {
 //		// TODO remove SYSTEM.OUT.PRINTLN
 
 		return (long) unit;
+	}
+
+	/**
+	 * Round floating value by removing the trailing part, which causes problem when creating units.
+	 * For the value 200.00004 the .00004 part will be removed
+	 * 
+	 * @param graphValue
+	 * @param graphUnit
+	 * @return
+	 */
+	public static double roundValueToUnit(	final double graphValue,
+											final double graphUnit,
+											final boolean isMinValue) {
+
+		if (graphUnit < 1) {
+
+			if (graphValue < 0) {
+
+				final double gvDiv1 = graphValue / graphUnit;
+				final int gvDiv2 = (int) (gvDiv1 - 0.5f);
+				final double gvDiv3 = gvDiv2 * graphUnit;
+
+				return gvDiv3;
+
+			} else {
+
+				final double gvDiv1 = graphValue / graphUnit;
+				final int gvDiv2 = (int) (gvDiv1 + (isMinValue ? -0.5f : 0.5f));
+				final double gvDiv3 = gvDiv2 * graphUnit;
+
+				return gvDiv3;
+			}
+
+		} else {
+
+			// graphUnit >= 1
+
+			if (graphValue < 0) {
+
+				final double gvDiv1 = graphValue * graphUnit;
+				final long gvDiv2 = (long) (gvDiv1 + (isMinValue ? -0.5f : 0.5f));
+				final double gvDiv3 = gvDiv2 / graphUnit;
+
+				return gvDiv3;
+
+			} else {
+
+				// graphValue >= 0
+
+				final double gvDiv1 = graphValue * graphUnit;
+				final long gvDiv2 = (long) (gvDiv1 + 0.5f);
+				final double gvDiv3 = gvDiv2 / graphUnit;
+
+				return gvDiv3;
+			}
+		}
 	}
 
 	/**
