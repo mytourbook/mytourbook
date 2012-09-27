@@ -131,6 +131,16 @@ abstract class AbstractRRShell {
 		return _shell;
 	}
 
+	public Point getShellContentLocation() {
+
+		final Point shellLocation = _shell.getLocation();
+
+		final int shellX = shellLocation.x + _shellTrimWidth;
+		final int shellY = shellLocation.y + _shellTrimHeight;
+
+		return new Point(shellX, shellY);
+	}
+
 	public Point getShellLocation(final Point contentLocation) {
 
 		final int shellX = contentLocation.x - _shellTrimWidth;

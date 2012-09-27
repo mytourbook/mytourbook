@@ -99,8 +99,8 @@ public class PhotoLoadManager {
 
 		System.out.println(UI.timeStamp() + "Number of processors: " + availableProcessors); //$NON-NLS-1$
 
-		int processors = availableProcessors - 0; // 1 processor for HQ loading
-		processors = Math.max(processors, 1);
+		int numberOfProcessors = availableProcessors - 0; // 1 processor for HQ loading
+		numberOfProcessors = Math.max(numberOfProcessors, 1);
 
 		final ThreadFactory threadFactoryExif = new ThreadFactory() {
 
@@ -170,9 +170,8 @@ public class PhotoLoadManager {
 			}
 		};
 
-		_executorExif = (ThreadPoolExecutor) Executors.newFixedThreadPool(processors, threadFactoryExif);
-		_executorThumb = (ThreadPoolExecutor) Executors.newFixedThreadPool(processors, threadFactoryThumb);
-
+		_executorExif = (ThreadPoolExecutor) Executors.newFixedThreadPool(numberOfProcessors, threadFactoryExif);
+		_executorThumb = (ThreadPoolExecutor) Executors.newFixedThreadPool(numberOfProcessors, threadFactoryThumb);
 		_executorHQ = (ThreadPoolExecutor) Executors.newFixedThreadPool(1, threadFactoryHQ);
 		_executorOriginal = (ThreadPoolExecutor) Executors.newFixedThreadPool(1, threadFactoryOriginal);
 	}

@@ -68,29 +68,30 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 	private final ArrayList<PhotoWrapper>	_photoWrapperList				= new ArrayList<PhotoWrapper>();
 
-	private ActionToggleGalleryOrientation	_actionToggleGalleryOrientation;
 	private ActionCloseToolTip				_actionCloseToolTip;
 
+	private ActionPinToolTip				_actionPinToolTip;
+	private ActionToggleGalleryOrientation	_actionToggleGalleryOrientation;
 	private boolean							_isVerticalGallery;
-	private ToolBarManager					_galleryToolbarManager;
 
+	private ToolBarManager					_galleryToolbarManager;
 	private boolean							_isShellDragged;
+
 	private int								_devXMousedown;
 	private int								_devYMousedown;
-
 	/*
 	 * UI controls
 	 */
 	private Composite						_galleryContainer;
+
 	private PhotoGallery					_photoGallery;
-
 	private ToolBar							_ttToolbarControlExit;
+
 	private ToolBar							_galleryToolbarControl;
-	private Label							_labelResizer;
-
+	private Label							_labelDragToolTip;
 	private Cursor							_cursorResize;
-	private Cursor							_cursorHand;
 
+	private Cursor							_cursorHand;
 	private class ActionCloseToolTip extends Action {
 
 		public ActionCloseToolTip() {
@@ -104,6 +105,22 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		@Override
 		public void run() {
 			actionCloseToolTip();
+		}
+	}
+
+	private class ActionPinToolTip extends Action {
+
+		public ActionPinToolTip() {
+
+			super(null, Action.AS_CHECK_BOX);
+
+			setToolTipText(Messages.Photo_Tooltip_Action_PinToolTip_ToolTip);
+			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Pin));
+		}
+
+		@Override
+		public void run() {
+			actionPinToolTip(_actionPinToolTip.isChecked());
 		}
 	}
 
@@ -224,6 +241,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 	private void createActions() {
 
+		_actionPinToolTip = new ActionPinToolTip();
 		_actionToggleGalleryOrientation = new ActionToggleGalleryOrientation();
 		_actionCloseToolTip = new ActionCloseToolTip();
 	}
@@ -306,37 +324,29 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 			/*
 			 * spacer
 			 */
-			_labelResizer = new Label(container, SWT.NONE);
+			_labelDragToolTip = new Label(container, SWT.NONE);
 			GridDataFactory.fillDefaults()//
 					.grab(true, false)
 					.hint(20, SWT.DEFAULT)
-					.applyTo(_labelResizer);
-			_labelResizer.setText(UI.EMPTY_STRING);
-			_labelResizer.setToolTipText(Messages.Photo_Tooltip_Action_MoveToolTip_ToolTip);
+					.applyTo(_labelDragToolTip);
+			_labelDragToolTip.setText(UI.EMPTY_STRING);
+			_labelDragToolTip.setToolTipText(Messages.Photo_Tooltip_Action_MoveToolTip_ToolTip);
 //			label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-			_labelResizer.addMouseTrackListener(new MouseTrackListener() {
+			_labelDragToolTip.addMouseTrackListener(new MouseTrackListener() {
 
 				@Override
 				public void mouseEnter(final MouseEvent e) {
-
-//					final Color bgColor = JFaceResources.getColorRegistry()//
-//							.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
-//
-//					_labelResizer.setBackground(bgColor);
-
-					_labelResizer.setCursor(_cursorHand);
+					_labelDragToolTip.setCursor(_cursorHand);
 				}
 
 				@Override
-				public void mouseExit(final MouseEvent e) {
-//					_labelResizer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-				}
+				public void mouseExit(final MouseEvent e) {}
 
 				@Override
 				public void mouseHover(final MouseEvent e) {}
 			});
 
-			_labelResizer.addMouseListener(new MouseAdapter() {
+			_labelDragToolTip.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseDown(final MouseEvent e) {
 					onMouseDown(e);
@@ -347,7 +357,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 					onMouseUp(e);
 				}
 			});
-			_labelResizer.addMouseMoveListener(new MouseMoveListener() {
+			_labelDragToolTip.addMouseMoveListener(new MouseMoveListener() {
 				@Override
 				public void mouseMove(final MouseEvent e) {
 					onMouseMove(e);
@@ -380,6 +390,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		final ToolBarManager exitToolbarManager = new ToolBarManager(_ttToolbarControlExit);
 
 		exitToolbarManager.add(_actionCloseToolTip);
+		exitToolbarManager.add(_actionPinToolTip);
 		exitToolbarManager.update(true);
 
 		/*
@@ -389,20 +400,6 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 		_galleryToolbarManager.add(_actionToggleGalleryOrientation);
 		_galleryToolbarManager.add(new Separator());
-	}
-
-	@Override
-	protected boolean isHideToolTip() {
-
-		if (_isShellDragged) {
-			return false;
-		}
-
-		// force to show the same images
-
-		_displayedPhotosHash = Integer.MIN_VALUE;
-
-		return true;
 	}
 
 	@Override
@@ -423,7 +420,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		_devXMousedown = e.x;
 		_devYMousedown = e.y;
 
-		_labelResizer.setCursor(_cursorResize);
+		_labelDragToolTip.setCursor(_cursorResize);
 	}
 
 	private void onMouseMove(final MouseEvent e) {
@@ -447,8 +444,24 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 			_isShellDragged = false;
 
-			_labelResizer.setCursor(null);
+			_labelDragToolTip.setCursor(null);
+
+			setToolTipPinnedLocation();
 		}
+	}
+
+	@Override
+	protected boolean requestHideToolTip() {
+
+		if (_isShellDragged) {
+			return false;
+		}
+
+		// force to show the same images
+
+		_displayedPhotosHash = Integer.MIN_VALUE;
+
+		return true;
 	}
 
 	@Override
@@ -469,6 +482,11 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		state.put(STATE_PHOTO_GALLERY_IS_VERTICAL, _isVerticalGallery);
 
 		super.saveState(state);
+	}
+
+	@Override
+	void setToolTipPinned(final boolean isToolTipPinned) {
+		_actionPinToolTip.setChecked(isToolTipPinned);
 	}
 
 	protected void showPhotoToolTip(final ArrayList<ChartPhoto> hoveredPhotos) {
@@ -502,6 +520,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 		_photoGallery.showImages(_photoWrapperList, galleryPositionKey);
 	}
+
 
 	private void updateUI_Colors(final Composite parent) {
 

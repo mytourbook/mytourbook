@@ -5502,6 +5502,8 @@ public class ChartComponentGraph extends Canvas {
 
 			// x-slider is dragged
 
+			canShowHoveredTooltip = true;
+
 			// keep position of the slider line
 			_devXDraggedXSliderLine = devXMouse;
 

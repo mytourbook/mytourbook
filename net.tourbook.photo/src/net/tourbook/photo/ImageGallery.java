@@ -395,6 +395,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 			return photoWrapper;
 		}
+
 	}
 
 	private class LoadCallbackExif implements ILoadCallBack {

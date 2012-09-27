@@ -267,7 +267,7 @@ public class Messages extends NLS {
 	public static String		App_Action_About;
 	public static String		App_Action_Cancel;
 
-	public static String	App_Action_Close_ToolTip;
+	public static String		App_Action_Close_ToolTip;
 	public static String		App_Action_edit_tour;
 	public static String		App_Action_ExtractTour;
 	public static String		App_Action_JoinTours;
@@ -595,8 +595,7 @@ public class Messages extends NLS {
 	public static String		HRMaxFormula_Name_Manual;
 
 	public static String		Image__App_Cancel;
-
-	public static String	Image__App_Close;
+	public static String		Image__App_Close;
 	public static String		Image__App_OK;
 	public static String		Image__App_Trash;
 	public static String		Image__ArrowDown;
@@ -647,13 +646,11 @@ public class Messages extends NLS {
 	public static String		Image__options;
 	public static String		Image__PhotoDirectoryView;
 	public static String		Image__PhotoGalleryHorizontal;
-
 	public static String		Image__PhotoGalleryVertical;
+	public static String		Image__PhotoPhotos;
+	public static String		Image__PhotoTourPhotos;
 
-	public static String	Image__PhotoPhotos;
-
-	public static String	Image__PhotoTourPhotos;
-
+	public static String	Image__Pin;
 	public static String		Image__PulseZones;
 	public static String		Image__PulseZones_Disabled;
 	public static String		Image__quick_edit;
@@ -776,7 +773,9 @@ public class Messages extends NLS {
 
 	public static String		NT001_DialogExtractTour_InvalidTourData;
 
-	public static String	Photo_Tooltip_Action_MoveToolTip_ToolTip;
+	public static String		Photo_Tooltip_Action_MoveToolTip_ToolTip;
+
+	public static String	Photo_Tooltip_Action_PinToolTip_ToolTip;
 
 	public static String		Photo_Tooltip_Action_ToggleGalleryHorizontal_ToolTip;
 

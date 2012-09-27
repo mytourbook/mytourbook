@@ -277,7 +277,10 @@ public abstract class GalleryMT20 extends Canvas {
 				return;
 			}
 
-			redraw();
+//			System.out.println(UI.timeStampNano() + " RedrawTimer\t");
+//			// TODO remove SYSTEM.OUT.PRINTLN
+
+			redrawGallery();
 		}
 	}
 
@@ -295,7 +298,10 @@ public abstract class GalleryMT20 extends Canvas {
 	public GalleryMT20(final Composite parent, final int style) {
 
 //		super(parent, style);
-		super(parent, style | SWT.DOUBLE_BUFFERED);
+//		super(parent, style | SWT.DOUBLE_BUFFERED);
+		super(parent, style | SWT.DOUBLE_BUFFERED | SWT.NO_BACKGROUND);
+//		super(parent, style | SWT.DOUBLE_BUFFERED | SWT.NO_MERGE_PAINTS);
+//		super(parent, style | SWT.DOUBLE_BUFFERED | SWT.NO_BACKGROUND | SWT.NO_MERGE_PAINTS);
 //		super(parent, style | SWT.NO_BACKGROUND);
 //		super(parent, style | SWT.NO_BACKGROUND | SWT.NO_REDRAW_RESIZE);
 //		super(parent, style | SWT.DOUBLE_BUFFERED | SWT.NO_BACKGROUND | SWT.NO_REDRAW_RESIZE);
@@ -595,7 +601,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 		deselectAll(false);
 
-		redraw();
+		redrawGallery();
 	}
 
 	/**
@@ -1305,13 +1311,13 @@ public abstract class GalleryMT20 extends Canvas {
 //			}
 //		}
 
-		redraw();
+		redrawGallery();
 	}
 
 	private void onFocusLost(final FocusEvent event) {
 
 		_isFocusActive = false;
-		redraw();
+		redrawGallery();
 	}
 
 	/**
@@ -1569,7 +1575,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 		if (_externalGalleryListener != null) {
 			if (_externalGalleryListener.isMouseEventHandledExternally(SWT.MouseDown, mouseEvent)) {
-				redraw();
+				redrawGallery();
 				return;
 			}
 		}
@@ -1591,7 +1597,7 @@ public abstract class GalleryMT20 extends Canvas {
 				// mouse is clicked beside an item
 
 				deselectAll(true);
-				redraw();
+				redrawGallery();
 
 				_isMouseClickHandled = true;
 				_lastSingleClick = -1;
@@ -1644,7 +1650,7 @@ public abstract class GalleryMT20 extends Canvas {
 				selectItemAndNotify(itemIndex, true, true);
 				_lastSingleClick = itemIndex;
 
-				redraw();
+				redrawGallery();
 
 				_isMouseClickHandled = true;
 			}
@@ -1659,7 +1665,7 @@ public abstract class GalleryMT20 extends Canvas {
 				selectItemAndNotify(itemIndex, true, _lastSingleClick != itemIndex);
 				_lastSingleClick = itemIndex;
 			}
-			redraw();
+			redrawGallery();
 		}
 	}
 
@@ -1695,14 +1701,14 @@ public abstract class GalleryMT20 extends Canvas {
 
 		notifySelectionListeners(getInitializedItem(virtualLast), virtualLast, false);
 
-		redraw();
+		redrawGallery();
 	}
 
 	private void onMouseMove(final MouseEvent mouseEvent) {
 
 		if (_externalGalleryListener != null) {
 			if (_externalGalleryListener.isMouseEventHandledExternally(SWT.MouseMove, mouseEvent)) {
-				redraw();
+				redrawGallery();
 				return;
 			}
 		}
@@ -1751,7 +1757,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 		if (_externalGalleryListener != null) {
 			if (_externalGalleryListener.isMouseEventHandledExternally(SWT.MouseUp, mouseEvent)) {
-				redraw();
+				redrawGallery();
 				return;
 			}
 		}
@@ -1874,6 +1880,7 @@ public abstract class GalleryMT20 extends Canvas {
 			}
 
 			clippingArea = gc.getClipping();
+			gc.fillRectangle(clippingArea);
 
 			if (isLowQualityPainting) {
 				gc.setAntialias(SWT.OFF);
@@ -1961,7 +1968,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 //		final float timeDiff = (float) (System.nanoTime() - start) / 1000000;
 ////		if (timeDiff > 500) {
-//		System.out.println(UI.timeStampNano() + " onPaint: " + timeDiff + " ms\t");
+//		System.out.println(UI.timeStampNano() + " \tonPaint:\t" + timeDiff + " ms\t");
 ////		}
 //		// TODO remove SYSTEM.OUT.PRINTLN
 	}
@@ -2111,6 +2118,14 @@ public abstract class GalleryMT20 extends Canvas {
 		hideTooltip();
 	}
 
+	private void redrawGallery() {
+
+//		System.out.println(UI.timeStampNano() + " redrawGallery\t");
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
+		redraw();
+	}
+
 	public void restoreState(final IDialogSettings state) {
 
 		_fullSizeViewer.restoreState(state);
@@ -2135,7 +2150,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 		notifySelectionListeners(getInitializedItem(0), 0, false);
 
-		redraw();
+		redrawGallery();
 	}
 
 	/**
@@ -2491,7 +2506,7 @@ public abstract class GalleryMT20 extends Canvas {
 		_isShowHighQuality = isShowHighQuality;
 		_highQualityMinSize = hqMinSize;
 
-		redraw();
+		redrawGallery();
 	}
 
 	/**
@@ -2526,8 +2541,9 @@ public abstract class GalleryMT20 extends Canvas {
 
 		_fullSizeViewer.setItemRenderer(itemRenderer);
 
-		redraw();
+		redrawGallery();
 	}
+
 
 	public void setSelection(final Collection<GalleryMT20Item> selection) {
 
@@ -2692,7 +2708,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 		updateScrollBars();
 
-		redraw();
+		redrawGallery();
 	}
 
 	/**
@@ -2732,7 +2748,7 @@ public abstract class GalleryMT20 extends Canvas {
 		}
 
 		// start a paint event
-		redraw();
+		redrawGallery();
 	}
 
 	/**

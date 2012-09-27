@@ -1454,6 +1454,9 @@ public class PhotoImageLoader {
 
 				// 2. get image from thumbnail image in the EXIF data
 
+//  debug (delay) image loading
+//				Thread.sleep(500);
+
 				final IPath storeThumbImageFilePath = ThumbnailStore.getStoreImagePath(_photo, ImageQuality.THUMB);
 
 				final Image exifThumbnail = loadImageFromEXIFThumbnail(storeThumbImageFilePath);
