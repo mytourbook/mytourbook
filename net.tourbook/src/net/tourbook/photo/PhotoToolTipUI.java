@@ -92,6 +92,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 	private Cursor							_cursorResize;
 
 	private Cursor							_cursorHand;
+
 	private class ActionCloseToolTip extends Action {
 
 		public ActionCloseToolTip() {
@@ -237,6 +238,14 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 				_photoGallery.saveState(_state);
 			}
 		});
+	}
+
+	@Override
+	void beforeHideToolTip() {
+
+		// force to show the same images
+
+		_displayedPhotosHash = Integer.MIN_VALUE;
 	}
 
 	private void createActions() {
@@ -403,6 +412,11 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 	}
 
 	@Override
+	protected boolean isToolTipDragged() {
+		return _isShellDragged;
+	}
+
+	@Override
 	boolean isVerticalGallery() {
 		return _isVerticalGallery;
 	}
@@ -451,20 +465,6 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 	}
 
 	@Override
-	protected boolean requestHideToolTip() {
-
-		if (_isShellDragged) {
-			return false;
-		}
-
-		// force to show the same images
-
-		_displayedPhotosHash = Integer.MIN_VALUE;
-
-		return true;
-	}
-
-	@Override
 	protected void restoreState(final IDialogSettings state) {
 
 		_state = state;
@@ -495,7 +495,10 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 		final int hoveredPhotosHash = isPhotoHovered ? hoveredPhotos.hashCode() : 0;
 
-		// check if new images should be displayed
+		/**
+		 * check if new images should be displayed, this check is VERY IMPORTANT otherwise this can
+		 * be a performance hog
+		 */
 		if (_displayedPhotosHash == hoveredPhotosHash) {
 			return;
 		}
@@ -520,7 +523,6 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 		_photoGallery.showImages(_photoWrapperList, galleryPositionKey);
 	}
-
 
 	private void updateUI_Colors(final Composite parent) {
 

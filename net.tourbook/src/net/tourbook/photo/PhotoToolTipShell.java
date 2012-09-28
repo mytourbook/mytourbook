@@ -63,7 +63,7 @@ public abstract class PhotoToolTipShell {
 	 */
 	private static final int		FADE_OUT_DELAY_STEPS						= 20;
 
-	private static final int		MOVE_TIME									= 500;
+	private static final int		MOVE_STEPS									= 20;
 
 	private static final int		ALPHA_OPAQUE								= 0xff;
 
@@ -124,8 +124,9 @@ public abstract class PhotoToolTipShell {
 	private int						_vertPinLocationY;
 
 	private final AnimationTimer	_animationTimer;
-	private long					_animationStart;
-	private long					_currentAnimationTime;
+	private int						_animationMoveCounter;
+//	private long					_animationStart;
+//	private long					_currentAnimationTime;
 
 	private boolean					_isInShellResize;
 	private boolean					_isKeepToolTipOpen;
@@ -334,6 +335,10 @@ public abstract class PhotoToolTipShell {
 				if (shellEndLocation.x == _shellEndLocation.x && isShellVisible) {
 
 					// shell is already fading in with the correct location
+
+//					System.out.println(UI.timeStampNano() + " is in END location\t");
+//					// TODO remove SYSTEM.OUT.PRINTLN
+
 					return;
 				}
 
@@ -367,23 +372,21 @@ public abstract class PhotoToolTipShell {
 			}
 		}
 
-		_display.timerExec(FADE_TIME_INTERVAL, _animationTimer);
-		_animationStart = System.currentTimeMillis();
+//		System.out.println(UI.timeStampNano() + " animation10_StartKomplex\t" );
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
-		System.out.println(UI.timeStampNano() + " animation10_StartKomplex\t" + _shellEndLocation.x);
-		// TODO remove SYSTEM.OUT.PRINTLN
+		// start animation now
+		_animationMoveCounter = 0;
+		animation20_Runnable();
 	}
 
 	private void animation20_Runnable() {
 
-		final long start = System.nanoTime();
+//		final long start = System.nanoTime();
 
 		if (_visibleShell == null || _visibleShell.isDisposed() || _visibleShell.isVisible() == false) {
 			return;
 		}
-
-		_currentAnimationTime = System.currentTimeMillis();
-		final double animationElapsedTimeDiff = _currentAnimationTime - _animationStart;
 
 		try {
 			/*
@@ -393,6 +396,8 @@ public abstract class PhotoToolTipShell {
 
 			int currentAlpha = _visibleShell.getAlpha();
 			boolean isLoopBreak = false;
+
+			_animationMoveCounter++;
 
 			while (true) {
 
@@ -422,8 +427,6 @@ public abstract class PhotoToolTipShell {
 
 						// target is reached and fully visible, stop animation
 
-//						_visibleShell.setAlpha(ALPHA_OPAQUE);
-
 						_isShellFadingIn = false;
 
 						return;
@@ -437,11 +440,8 @@ public abstract class PhotoToolTipShell {
 							final int diffX = shellStartX - shellEndX;
 							final int diffY = shellStartY - shellEndY;
 
-							double moveTimeDiff = animationElapsedTimeDiff / MOVE_TIME;
-							moveTimeDiff = moveTimeDiff > 1 ? 1 : moveTimeDiff;
-
-							final double moveX = diffX * moveTimeDiff;
-							final double moveY = diffY * moveTimeDiff;
+							final double moveX = (double) diffX / MOVE_STEPS * _animationMoveCounter;
+							final double moveY = (double) diffY / MOVE_STEPS * _animationMoveCounter;
 
 							final int shellCurrentX = (int) (shellStartX - moveX);
 							final int shellCurrentY = (int) (shellStartY - moveY);
@@ -520,16 +520,17 @@ public abstract class PhotoToolTipShell {
 			StatusUtil.log(err);
 		} finally {
 
-			final float timeDiff = (float) (System.nanoTime() - start) / 1000000;
-			System.out.println(UI.timeStampNano()
-					+ " animation20_Runnable:\t"
-					+ timeDiff
-					+ " ms\t"
-					+ animationElapsedTimeDiff
-					+ " ms");
-			// TODO remove SYSTEM.OUT.PRINTLN
+//			final float timeDiff = (float) (System.nanoTime() - start) / 1000000;
+//			System.out.println(UI.timeStampNano()
+//					+ " animation20_Runnable:\t"
+//					+ timeDiff
+//					+ " ms\t"
+//					+ " ms");
+//			// TODO remove SYSTEM.OUT.PRINTLN
 		}
 	}
+
+	abstract void beforeHideToolTip();
 
 	/**
 	 * Creates the content area of the the tooltip.
@@ -705,6 +706,12 @@ public abstract class PhotoToolTipShell {
 
 	}
 
+	/**
+	 * @return Returns <code>true</code> to hide tooltip, <code>false</code> will not hide the
+	 *         tooltip.
+	 */
+	protected abstract boolean isToolTipDragged();
+
 	abstract boolean isVerticalGallery();
 
 	private void onOwnerControlEvent(final Event event) {
@@ -799,8 +806,8 @@ public abstract class PhotoToolTipShell {
 			return;
 		}
 
-		if (requestHideToolTip() == false) {
-			// is false when tooltip is dragged with the mouse
+		if (isToolTipDragged()) {
+			// is true when tooltip is dragged with the mouse
 			return;
 		}
 
@@ -1128,12 +1135,6 @@ public abstract class PhotoToolTipShell {
 		}
 	}
 
-	/**
-	 * @return Returns <code>true</code> to hide tooltip, <code>false</code> will not hide the
-	 *         tooltip.
-	 */
-	protected abstract boolean requestHideToolTip();
-
 	protected void restoreState(final IDialogSettings state) {
 
 		/*
@@ -1292,6 +1293,13 @@ public abstract class PhotoToolTipShell {
 		return true;
 	}
 
+//	/**
+//	 * @param isAutoMoved
+//	 *            Is <code>true</code> when tooltip is auto moved, otherwise it is
+//	 *            <code>false</code>.
+//	 */
+//	abstract void toolTipIsAutoMoved(boolean isAutoMoved);
+
 	private void showShellWhenVisible() {
 
 		if (_visibleShell == null || _visibleShell.isDisposed() || _visibleShell.isVisible() == false) {
@@ -1300,13 +1308,6 @@ public abstract class PhotoToolTipShell {
 
 		ttShow();
 	}
-
-//	/**
-//	 * @param isAutoMoved
-//	 *            Is <code>true</code> when tooltip is auto moved, otherwise it is
-//	 *            <code>false</code>.
-//	 */
-//	abstract void toolTipIsAutoMoved(boolean isAutoMoved);
 
 	/**
 	 * ########################### Recursive #########################################<br>
@@ -1418,9 +1419,7 @@ public abstract class PhotoToolTipShell {
 			return;
 		}
 
-		if (requestHideToolTip() == false) {
-			return;
-		}
+		beforeHideToolTip();
 
 		if (_isShellFadingOut) {
 

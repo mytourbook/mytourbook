@@ -5671,6 +5671,10 @@ public class ChartComponentGraph extends Canvas {
 								_graphZoomRatio);
 					}
 
+					/*
+					 * this redraw is necessary otherwise a hovered photo displayed as none hovered
+					 * when mouse is not hovering a photo
+					 */
 					isRedraw = true;
 				}
 
