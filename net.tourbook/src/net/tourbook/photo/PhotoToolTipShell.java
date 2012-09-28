@@ -125,8 +125,6 @@ public abstract class PhotoToolTipShell {
 
 	private final AnimationTimer	_animationTimer;
 	private int						_animationMoveCounter;
-//	private long					_animationStart;
-//	private long					_currentAnimationTime;
 
 	private boolean					_isInShellResize;
 	private boolean					_isKeepToolTipOpen;
