@@ -34,6 +34,7 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 
 	private int						_devXHoveredPhoto;
 	private int						_devYHoveredPhoto;
+	private int						_devXGridCenterX;
 
 //	/**
 //	 * This counter is incremented when 0 photos can be displayed with the hovered mouse. Counter is
@@ -66,7 +67,11 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 //		final int chartMarginTop = _tourChart.getMarginTop();
 		final Point chartDisplay = _tourChart.toDisplay(0, 0);
 
-		final int itemPosX = _tourChart.getLeftAxisWidth() + _devXHoveredPhoto;
+		/*
+		 * use grid center that the tooltip is NOT jumping when the graph is autoscrolling, the
+		 * right border is sometimes still jumping :-(
+		 */
+		final int itemPosX = _tourChart.getLeftAxisWidth() + _devXGridCenterX;
 //		final int itemPosY = _devYHoveredPhoto;
 
 		final int tipWidth = tipSize.x;
@@ -137,6 +142,7 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 				// set tooltip position
 				_devXHoveredPhoto = photoGroup.groupCenterPosition.x;
 				_devYHoveredPhoto = photoGroup.groupCenterPosition.y;
+				_devXGridCenterX = photoGroup.hGridStart + (ChartLayerPhoto.GROUP_HORIZONTAL_WIDTH / 2);
 			}
 		}
 

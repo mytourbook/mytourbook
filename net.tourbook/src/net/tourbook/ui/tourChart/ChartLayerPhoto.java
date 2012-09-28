@@ -36,7 +36,7 @@ public class ChartLayerPhoto implements IChartLayer {
 
 	private static final int		PHOTO_ICON_WIDTH		= 4;
 
-	private static final int		GROUP_HORIZONTAL_WIDTH	= 40;
+	static final int				GROUP_HORIZONTAL_WIDTH	= 40;
 
 	private ArrayList<PhotoGroup>	_photoGroups			= new ArrayList<PhotoGroup>();
 	private ArrayList<ChartPhoto>	_chartPhotos;
@@ -173,23 +173,42 @@ public class ChartLayerPhoto implements IChartLayer {
 	/**
 	 * Draw photos into the current graph.
 	 */
-	public void draw(final GC gc, final GraphDrawingData drawingData, final Chart chart) {
+	public void draw(final GC gc, final GraphDrawingData graphDrawingData, final Chart chart) {
 
 		final Display display = Display.getCurrent();
 
-		final int devYTop = drawingData.getDevYTop();
-		final int devYBottom = drawingData.getDevYBottom();
+		final int devYTop = graphDrawingData.getDevYTop();
+		final int devYBottom = graphDrawingData.getDevYBottom();
 		final int devGraphImageOffset = chart.getXXDevViewPortLeftBorder();
-		final int devGraphHeight = drawingData.devGraphHeight;
-		final int devGraphWidth = drawingData.devVirtualGraphWidth;
+		final int devGraphHeight = graphDrawingData.devGraphHeight;
+		final int devGraphWidth = graphDrawingData.devVirtualGraphWidth;
 
-		final float graphYBottom = drawingData.getGraphYBottom();
-		final float[] yValues = drawingData.getYData().getHighValues()[0];
-		final double scaleX = drawingData.getScaleX();
-		final double scaleY = drawingData.getScaleY();
+		final float graphYBottom = graphDrawingData.getGraphYBottom();
+		final float[] yValues = graphDrawingData.getYData().getHighValues()[0];
+		final double scaleX = graphDrawingData.getScaleX();
+		final double scaleY = graphDrawingData.getScaleY();
 
 		final int lineWidth = 2;
 		int photoIndex = 0;
+
+		final ChartDrawingData chartDrawingData = graphDrawingData.getChartDrawingData();
+		final int devVisibleChartWidth = chartDrawingData.devDevVisibleChartWidth;
+		final int devVirtualGraphWidth = graphDrawingData.devVirtualGraphWidth;
+		final double zoomRatio = (double) devVirtualGraphWidth / devVisibleChartWidth;
+
+		// adjust group with to zoom ratia
+		double groupWidth = GROUP_HORIZONTAL_WIDTH * zoomRatio;
+
+		// ensure a group is not too large
+		while (groupWidth > GROUP_HORIZONTAL_WIDTH * 2) {
+			groupWidth /= 2;
+		}
+
+		/*
+		 * ensure the groups always starts at the same position, otherwise a group can contain
+		 * different number of photo when graph is zoomed in and horizontally moved
+		 */
+		final double groupHGrid = -devGraphImageOffset % groupWidth;
 
 		/*
 		 * get all photo positions within the graph viewport (client area)
@@ -204,36 +223,28 @@ public class ChartLayerPhoto implements IChartLayer {
 			final int devXValue = (int) (chartPhoto.xValue * scaleX) - devGraphImageOffset;
 			final int devYValue = devYBottom - devYGraph;
 
-			final int photoIconWidth = PHOTO_ICON_WIDTH;
-			final int photoIconWidth2 = photoIconWidth / 2;
-
 			final int devXPhoto = devXValue;
-			int devYPhoto = devYValue - photoIconWidth - 2;
+			int devYPhoto = devYValue - PHOTO_ICON_WIDTH - 2;
 
 			// check if photo is visible
-			if (devXPhoto + photoIconWidth2 < 0 || devXPhoto - photoIconWidth2 > devGraphWidth) {
+			if (devXPhoto < groupHGrid) {
 
-				_photoPositions[photoIndex++] = null;
+				// skip invisible photos
+
+				photoIndex++;
 
 				continue;
 			}
 
-			// don't draw the photo marker before the chart
-			final int devXImageOffset = chart.getXXDevViewPortLeftBorder();
-			if (devXImageOffset == 0 && devXPhoto < photoIconWidth) {
-//				devXPhoto = photoIconWidth - lineWidth;
-//				gc.setForeground(display.getSystemColor(SWT.COLOR_MAGENTA));
-			}
+			// check if photo to the right of the right border
+			if (devXPhoto > devGraphWidth) {
 
-			// don't draw the photo marker after the chart
-			if (devXPhoto + photoIconWidth > devGraphWidth) {
-//				devXPhoto = devGraphWidth - photoIconWidth + lineWidth;
-//				gc.setForeground(display.getSystemColor(SWT.COLOR_MAGENTA));
+				break;
 			}
 
 			// force photo marker to be not below the bottom
-			if (devYPhoto + photoIconWidth > devYBottom) {
-				devYPhoto = devYBottom - photoIconWidth;
+			if (devYPhoto + PHOTO_ICON_WIDTH > devYBottom) {
+				devYPhoto = devYBottom - PHOTO_ICON_WIDTH;
 //				gc.setForeground(display.getSystemColor(SWT.COLOR_MAGENTA));
 			}
 
@@ -248,7 +259,7 @@ public class ChartLayerPhoto implements IChartLayer {
 		}
 
 		// convert all photo positions into grouped photo positions
-		createGroupedPhotos(devGraphImageOffset, drawingData);
+		createGroupedPhotos(devGraphImageOffset, graphDrawingData);
 
 		gc.setClipping(0, devYTop, devGraphWidth, devGraphHeight);
 		gc.setAntialias(SWT.ON);
