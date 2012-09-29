@@ -229,8 +229,6 @@ public abstract class PhotoToolTipShell {
 		_animationTimer = new AnimationTimer();
 
 		ownerControlAddListener();
-
-		initUI(ownerControl);
 	}
 
 	protected void actionPinToolTip(final boolean isPinned) {
@@ -698,11 +696,6 @@ public abstract class PhotoToolTipShell {
 		ttHide(null);
 	}
 
-	private void initUI(final Control ownerControl) {
-
-//		final PixelConverter pc = new PixelConverter(ownerControl);
-
-	}
 
 	/**
 	 * @return Returns <code>true</code> to hide tooltip, <code>false</code> will not hide the

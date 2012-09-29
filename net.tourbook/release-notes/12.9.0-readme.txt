@@ -1,4 +1,4 @@
-Version: 12.?.0                                           ?. October 2012 
+Version: 12.?.0                                           ?. December 2012 
 
 TODO
 
@@ -9,6 +9,8 @@ TODO
 New 
 
 * spanish translation, provided by Pedro Merino Laso
+* show tour photos in the tour chart
+  - show hovered photos in a photo tooltip
 
 
 
@@ -37,4 +39,4 @@ Development
 
 System 
 
-* 
+* Eclipse 3.8.1

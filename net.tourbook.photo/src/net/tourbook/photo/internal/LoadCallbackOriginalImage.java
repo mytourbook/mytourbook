@@ -19,7 +19,7 @@ import net.tourbook.photo.ILoadCallBack;
 import net.tourbook.photo.ImageGallery;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoImageMetadata;
-import net.tourbook.photo.internal.gallery.MT20.FullSizeViewer;
+import net.tourbook.photo.internal.gallery.MT20.FullScreenImageViewer;
 import net.tourbook.photo.internal.gallery.MT20.GalleryMT20Item;
 
 import org.eclipse.swt.widgets.Display;
@@ -51,7 +51,7 @@ class LoadCallbackOriginalImage implements ILoadCallBack {
 			_imageGallery.putInExifCache(_photo.getPhotoWrapper().imageFilePathName, metadata);
 		}
 
-		final FullSizeViewer fullSizeViewer = _imageGallery.getFullSizeViewer();
+		final FullScreenImageViewer fullSizeViewer = _imageGallery.getFullSizeViewer();
 
 		if (fullSizeViewer.getCurrentItem() != _galleryItem) {
 			// another gallery item is displayed

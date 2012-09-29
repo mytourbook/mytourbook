@@ -21,9 +21,9 @@ import org.eclipse.jface.action.Action;
 
 public class ActionShowHQImage extends Action {
 
-	private FullSizeViewer	_fullSizeViewer;
+	private FullScreenImageViewer	_fullSizeViewer;
 
-	public ActionShowHQImage(final FullSizeViewer fullSizeViewer) {
+	public ActionShowHQImage(final FullScreenImageViewer fullSizeViewer) {
 
 		super(Messages.PrefPage_Photo_FullsizeViewer_Checkbox_HQImage, AS_CHECK_BOX);
 

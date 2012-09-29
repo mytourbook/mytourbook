@@ -32,6 +32,8 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseEvent;
@@ -40,6 +42,8 @@ import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Font;
@@ -53,7 +57,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 
-public class FullSizeViewer {
+public class FullScreenImageViewer {
 
 	private static final int				TIME_BEFORE_CURSOR_GETS_HIDDEN			= 500;
 	private static final int				TIME_BEFORE_WAITING_CURSOR_IS_DISPLAYED	= 200;
@@ -68,9 +72,10 @@ public class FullSizeViewer {
 																							.getPreferenceStore();
 
 	private GalleryMT20						_gallery;
+	private GalleryMT20Item					_galleryItem;
 	private AbstractGalleryMT20ItemRenderer	_itemRenderer;
 
-	private GalleryMT20Item					_galleryItem;
+	private FullScreenPhotoGallery			_fullScreenGallery;
 
 	private int								_monitorWidth;
 	private int								_monitorHeight;
@@ -108,9 +113,9 @@ public class FullSizeViewer {
 
 	private Cursor							_cursorWait;
 	private Cursor							_cursorHidden;
-//	private Cursor							_cursorNotImplemented;
 
 	private Font							_font;
+	private IDialogSettings					_state;
 
 	private class TimerSleepCursor implements Runnable {
 		public void run() {
@@ -137,9 +142,9 @@ public class FullSizeViewer {
 		}
 	}
 
-	public FullSizeViewer() {}
+//	public FullScreenImageViewer() {}
 
-	public FullSizeViewer(final GalleryMT20 gallery, final AbstractGalleryMT20ItemRenderer itemRenderer) {
+	public FullScreenImageViewer(final GalleryMT20 gallery, final AbstractGalleryMT20ItemRenderer itemRenderer) {
 
 		_gallery = gallery;
 
@@ -173,6 +178,40 @@ public class FullSizeViewer {
 		updateUI();
 	}
 
+	private void addShellListener() {
+
+		_shell.addFocusListener(new FocusListener() {
+
+			@Override
+			public void focusGained(final FocusEvent e) {
+				_fullScreenGallery.onFocusGained();
+			}
+
+			@Override
+			public void focusLost(final FocusEvent e) {}
+		});
+
+		_shell.addShellListener(new ShellListener() {
+
+			@Override
+			public void shellActivated(final ShellEvent e) {
+				_fullScreenGallery.onFocusGained();
+			}
+
+			@Override
+			public void shellClosed(final ShellEvent e) {}
+
+			@Override
+			public void shellDeactivated(final ShellEvent e) {}
+
+			@Override
+			public void shellDeiconified(final ShellEvent e) {}
+
+			@Override
+			public void shellIconified(final ShellEvent e) {}
+		});
+	}
+
 	void close() {
 
 		// prevent that an old image is displayed
@@ -199,6 +238,22 @@ public class FullSizeViewer {
 		_actionShowHQImage = new ActionShowHQImage(this);
 	}
 
+	private Menu createContextMenu(final Composite parent) {
+
+		final MenuManager menuMgr = new MenuManager();
+
+		menuMgr.setRemoveAllWhenShown(true);
+
+		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
+			public void menuAboutToShow(final IMenuManager menuMgr) {
+				fillContextMenu(menuMgr);
+			}
+		});
+
+		return menuMgr.createContextMenu(parent);
+	}
+
 	private void createUI() {
 
 //		_shell = new Shell(SWT.NO_TRIM | SWT.ON_TOP);
@@ -208,22 +263,38 @@ public class FullSizeViewer {
 //		_shell.setBackground(_bgColor);
 		_shell.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
 
-		updateBounds();
+		addShellListener();
+
+		setBounds();
 
 		_shell.setLayout(new FillLayout());
 
-		_shellImage = new Image[] { //
-//				TourbookPlugin.getImageDescriptor(Messages.Image__PhotoFullsizeShellImage16).createImage(),
-		Activator.getImageDescriptor(Messages.Image__PhotoFullsizeShellImage128).createImage() //
-		};
+		_shellImage = new Image[] { Activator
+				.getImageDescriptor(Messages.Image__PhotoFullsizeShellImage128)
+				.createImage() };
 		_shell.setImages(_shellImage);
+
+		createUI_10_Canvas(_shell);
+		createUI_20_Gallery(_shell);
+
+		_cursorHidden = UI.createHiddenCursor();
+		_cursorWait = new Cursor(_shell.getDisplay(), SWT.CURSOR_WAIT);
+
+		_shell.setFullScreen(true);
+		_shell.setVisible(true);
+		_shell.setActive();
+
+		_shell.open();
+	}
+
+	private void createUI_10_Canvas(final Shell parent) {
 
 		/*
 		 * SWT.NO_BACKGROUND can cause that other content which is drawn in another window can be
 		 * displayed, e.g the gallery content was painted at the top of the canvas
 		 */
-//		_canvas = new Canvas(_shell, SWT.DOUBLE_BUFFERED | SWT.NO_BACKGROUND);
-		_canvas = new Canvas(_shell, SWT.DOUBLE_BUFFERED);
+//		_canvas = new Canvas(parent, SWT.DOUBLE_BUFFERED | SWT.NO_BACKGROUND);
+		_canvas = new Canvas(parent, SWT.DOUBLE_BUFFERED);
 
 		_canvas.setForeground(_fgColor);
 //		_canvas.setBackground(_bgColor);
@@ -280,37 +351,14 @@ public class FullSizeViewer {
 			}
 		});
 
-		_canvas.setMenu(createUI_ContextMenu(_canvas));
-
-//		final Image cursorImage = Activator.getImageDescriptor(Messages.Image__CursorNotImplemented).createImage();
-////		_cursorNotImplemented = new Cursor(_shell.getDisplay(), cursorImage.getImageData(), 0, 0);
-//
-//		cursorImage.dispose();
-
-		_cursorHidden = UI.createHiddenCursor();
-		_cursorWait = new Cursor(_shell.getDisplay(), SWT.CURSOR_WAIT);
-
-		_shell.setFullScreen(true);
-		_shell.setVisible(true);
-		_shell.setActive();
-
-		_shell.open();
+		_canvas.setMenu(createContextMenu(_canvas));
 	}
 
-	private Menu createUI_ContextMenu(final Composite parent) {
+	private void createUI_20_Gallery(final Shell shell) {
 
-		final MenuManager menuMgr = new MenuManager();
+		_fullScreenGallery = new FullScreenPhotoGallery(shell,_gallery);
 
-		menuMgr.setRemoveAllWhenShown(true);
-
-		menuMgr.addMenuListener(new IMenuListener() {
-			@Override
-			public void menuAboutToShow(final IMenuManager menuMgr) {
-				fillContextMenu(menuMgr);
-			}
-		});
-
-		return menuMgr.createContextMenu(parent);
+		_fullScreenGallery.restoreState(_state);
 	}
 
 	private void fillContextMenu(final IMenuManager menuMgr) {
@@ -350,7 +398,6 @@ public class FullSizeViewer {
 
 		_cursorHidden.dispose();
 		_cursorWait.dispose();
-//		_cursorNotImplemented.dispose();
 
 		for (final Image image : _shellImage) {
 			image.dispose();
@@ -428,10 +475,16 @@ public class FullSizeViewer {
 
 	private void onMouseMove(final MouseEvent mouseEvent) {
 
-//		_canvas.setCursor(_cursorNotImplemented);
-		_canvas.setCursor(null);
+		if (_fullScreenGallery.showImages(mouseEvent)) {
 
-		sleepCursor();
+			// photo gallery is displayed
+
+		} else {
+
+			_canvas.setCursor(null);
+
+			sleepCursor();
+		}
 	}
 
 	private void onMouseWheel(final MouseEvent mouseEvent) {
@@ -506,6 +559,8 @@ public class FullSizeViewer {
 
 	void restoreState(final IDialogSettings state) {
 
+		_state = state;
+
 		final ZoomState defaultZoom = ZoomState.FIT_WINDOW;
 		final String stateValue = Util.getStateString(state, STATE_FULL_SIZE_VIEWER_ZOOM_STATE, defaultZoom.name());
 		try {
@@ -527,6 +582,25 @@ public class FullSizeViewer {
 	void saveState(final IDialogSettings state) {
 
 		state.put(STATE_FULL_SIZE_VIEWER_ZOOM_STATE, _zoomState.name());
+
+		if (_fullScreenGallery != null) {
+
+			_fullScreenGallery.saveState(state);
+		}
+	}
+
+	private void setBounds() {
+
+		final Rectangle monitorBounds = Display.getDefault().getPrimaryMonitor().getBounds();
+
+//		final double partialFullsize = 1;
+		final double partialFullsize = 0.8;
+
+		_monitorWidth = (int) (monitorBounds.width * partialFullsize);
+		_monitorHeight = (int) (monitorBounds.height * partialFullsize);
+
+//		_shell.setBounds(monitorBounds);
+		_shell.setBounds(200, 20, _monitorWidth, _monitorHeight);
 	}
 
 	void setColors(final Color fgColor, final Color bgColor) {
@@ -607,20 +681,6 @@ public class FullSizeViewer {
 		// execution (doesn't run twice)
 		_shell.getDisplay().timerExec(TIME_BEFORE_CURSOR_GETS_HIDDEN, _timerSleepCursor);
 
-	}
-
-	private void updateBounds() {
-
-		final Rectangle monitorBounds = Display.getDefault().getPrimaryMonitor().getBounds();
-
-		final double partialFullsize = 1;
-//		final double partialFullsize = 0.8;
-
-		_monitorWidth = (int) (monitorBounds.width * partialFullsize);
-		_monitorHeight = (int) (monitorBounds.height * partialFullsize);
-
-		_shell.setBounds(monitorBounds);
-//		_shell.setBounds(100, 10, _monitorWidth, _monitorHeight);
 	}
 
 	/**

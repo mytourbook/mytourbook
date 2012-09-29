@@ -21,9 +21,9 @@ import org.eclipse.jface.action.Action;
 
 public class ActionShowThumbPreview extends Action {
 
-	private FullSizeViewer	_fullSizeViewer;
+	private FullScreenImageViewer	_fullSizeViewer;
 
-	public ActionShowThumbPreview(final FullSizeViewer fullSizeViewer) {
+	public ActionShowThumbPreview(final FullScreenImageViewer fullSizeViewer) {
 
 		super(Messages.PrefPage_Photo_FullsizeViewer_Checkbox_Preview, AS_CHECK_BOX);
 

@@ -39,7 +39,7 @@ import net.tourbook.photo.internal.ImageFilter;
 import net.tourbook.photo.internal.Messages;
 import net.tourbook.photo.internal.PhotoDateInfo;
 import net.tourbook.photo.internal.PhotoRenderer;
-import net.tourbook.photo.internal.gallery.MT20.FullSizeViewer;
+import net.tourbook.photo.internal.gallery.MT20.FullScreenImageViewer;
 import net.tourbook.photo.internal.gallery.MT20.GalleryMT20;
 import net.tourbook.photo.internal.gallery.MT20.GalleryMT20Item;
 import net.tourbook.photo.internal.gallery.MT20.IGalleryContextMenuProvider;
@@ -207,7 +207,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	private GallerySorting										_currentSorting;
 	private PhotoRenderer										_photoRenderer;
 
-	private FullSizeViewer										_fullSizeViewer;
+	private FullScreenImageViewer								_fullSizeViewer;
 
 	private GalleryPhotoToolTip									_photoTooltip;
 	/**
@@ -483,12 +483,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		parent.addDisposeListener(new DisposeListener() {
 			@Override
 			public void widgetDisposed(final DisposeEvent e) {
-
-				if (_galleryFont != null) {
-					_galleryFont.dispose();
-				}
-
-				stopLoadingImages();
+				onDispose();
 			}
 		});
 	}
@@ -725,7 +720,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		return _galleryActionBar.getCustomContainer();
 	}
 
-	public FullSizeViewer getFullSizeViewer() {
+	public FullScreenImageViewer getFullSizeViewer() {
 		return _fullSizeViewer;
 	}
 
@@ -1541,6 +1536,15 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 			jobUILoading_21_ScheduleWithoutRunCheck();
 		}
+	}
+
+	private void onDispose() {
+
+		if (_galleryFont != null) {
+			_galleryFont.dispose();
+		}
+
+		stopLoadingImages();
 	}
 
 	private void onModifyFont() {

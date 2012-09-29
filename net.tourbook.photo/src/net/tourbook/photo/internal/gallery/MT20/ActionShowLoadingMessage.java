@@ -21,9 +21,9 @@ import org.eclipse.jface.action.Action;
 
 public class ActionShowLoadingMessage extends Action {
 
-	private FullSizeViewer	_fullSizeViewer;
+	private FullScreenImageViewer	_fullSizeViewer;
 
-	public ActionShowLoadingMessage(final FullSizeViewer fullSizeViewer) {
+	public ActionShowLoadingMessage(final FullScreenImageViewer fullSizeViewer) {
 
 		super(Messages.PrefPage_Photo_FullsizeViewer_Checkbox_ShowLoadingMessage, AS_CHECK_BOX);
 

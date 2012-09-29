@@ -225,8 +225,6 @@ public class TourPhotosView extends ViewPart implements IPhotoGalleryProvider {
 	@Override
 	public void dispose() {
 
-		_photoGallery.stopLoadingImages();
-
 		final IWorkbenchPage page = getViewSite().getPage();
 
 		TourManager.getInstance().removeTourEventListener(_tourPropertyListener);

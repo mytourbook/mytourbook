@@ -247,7 +247,7 @@ public abstract class GalleryMT20 extends Canvas {
 	 */
 	private boolean								_prevKeyIsShift;
 
-	private FullSizeViewer						_fullSizeViewer;
+	private FullScreenImageViewer				_fullSizeViewer;
 
 	private ActionOpenPrefDialog				_actionGalleryPrefPage;
 
@@ -333,7 +333,7 @@ public abstract class GalleryMT20 extends Canvas {
 		_itemRenderer = new DefaultGalleryMT20ItemRenderer();
 
 		// set fullsize viewer
-		_fullSizeViewer = new FullSizeViewer(this, _itemRenderer);
+		_fullSizeViewer = new FullScreenImageViewer(this, _itemRenderer);
 
 		updateGallery(false);
 	}
@@ -792,7 +792,7 @@ public abstract class GalleryMT20 extends Canvas {
 	 */
 	public abstract IGalleryCustomData getCustomData(final int itemIndex);
 
-	public FullSizeViewer getFullsizeViewer() {
+	public FullScreenImageViewer getFullsizeViewer() {
 		return _fullSizeViewer;
 	}
 
@@ -2543,7 +2543,6 @@ public abstract class GalleryMT20 extends Canvas {
 
 		redrawGallery();
 	}
-
 
 	public void setSelection(final Collection<GalleryMT20Item> selection) {
 
