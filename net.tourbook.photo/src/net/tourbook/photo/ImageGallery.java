@@ -98,7 +98,7 @@ import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 /**
  * @author 081647
  */
-public class ImageGallery implements IItemHovereredListener, IGalleryContextMenuProvider {
+public class ImageGallery implements IItemHovereredListener, IGalleryContextMenuProvider, IPhotoProvider {
 
 	/**
 	 * Number of gallery positions which are cached
@@ -221,7 +221,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	private File												_photoFolderWhichShouldBeDisplayed;
 
 	/**
-	 * Contains photo wrapper for ALL gallery items for the current photo folder
+	 * Contains photo wrapper for <b>ALL</b> gallery items including <b>HIDDEN</b> items
 	 */
 	private PhotoWrapper[]										_allPhotoWrapper;
 
@@ -395,7 +395,6 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 			return photoWrapper;
 		}
-
 	}
 
 	private class LoadCallbackExif implements ILoadCallBack {
@@ -506,7 +505,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 			}
 		}
 
-		return new PhotoSelection(photos);
+		return new PhotoSelection(photos, allItems);
 	}
 
 	private void createUI(final Composite parent) {
@@ -585,6 +584,9 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		_photoGalleryProvider.registerContextMenu(MENU_ID_PHOTO_GALLERY, _galleryMT20.getContextMenuManager());
 
 		_fullSizeViewer = _galleryMT20.getFullsizeViewer();
+
+		// allow the gallery to get access to the photo wrapper
+		_galleryMT20.setPhotoProvider(this);
 
 		// set photo renderer which paints the image but also starts the image loading
 		_photoRenderer = new PhotoRenderer(_galleryMT20, this);
@@ -849,6 +851,13 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	 */
 	public File getPhotoFolder() {
 		return _photoFolder;
+	}
+
+	@Override
+	public PhotoWrapper[] getSortedAndFilteredPhotoWrapper() {
+
+		return _sortedAndFilteredPhotoWrapper;
+
 	}
 
 	/**
@@ -1903,33 +1912,9 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 	public void showImages(final ArrayList<PhotoWrapper> photoWrapperList, final String galleryPositionKey) {
 
-		jobFilter_12_Stop();
-		PhotoLoadManager.stopImageLoading(true);
+		final PhotoWrapper[] photoWrapper = photoWrapperList.toArray(new PhotoWrapper[photoWrapperList.size()]);
 
-		//////////////////////////////////////////
-		//
-		// MUST BE REMOVED, IS ONLY FOR TESTING
-		//
-//		disposeAndDeleteAllImages();
-//		PhotoLoadManager.removeInvalidImageFiles();
-		//
-		// MUST BE REMOVED, IS ONLY FOR TESTING
-		//
-		//////////////////////////////////////////
-
-		// images are not loaded from a folder, photo wrappers are already available
-		_photoFolder = null;
-
-		_newGalleryPositionKey = galleryPositionKey;
-
-		// initialize tooltip for a new folder
-		_photoTooltip.reset();
-
-		_allPhotoWrapper = photoWrapperList.toArray(new PhotoWrapper[photoWrapperList.size()]);
-
-		final double galleryPosition = getCachedGalleryPosition();
-
-		updateUI_GalleryItems(_allPhotoWrapper, galleryPosition);
+		showImages(photoWrapper, galleryPositionKey);
 	}
 
 	/**
@@ -2006,6 +1991,37 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		workerUpdate(imageFolder, isReloadFolder);
 	}
 
+	public void showImages(final PhotoWrapper[] photoWrapper, final String galleryPositionKey) {
+
+		jobFilter_12_Stop();
+		PhotoLoadManager.stopImageLoading(true);
+
+		//////////////////////////////////////////
+		//
+		// MUST BE REMOVED, IS ONLY FOR TESTING
+		//
+//		disposeAndDeleteAllImages();
+//		PhotoLoadManager.removeInvalidImageFiles();
+		//
+		// MUST BE REMOVED, IS ONLY FOR TESTING
+		//
+		//////////////////////////////////////////
+
+		// images are not loaded from a folder, photo wrappers are already available
+		_photoFolder = null;
+
+		_newGalleryPositionKey = galleryPositionKey;
+
+		// initialize tooltip for a new folder
+		_photoTooltip.reset();
+
+		_allPhotoWrapper = photoWrapper;
+
+		final double galleryPosition = getCachedGalleryPosition();
+
+		updateUI_GalleryItems(_allPhotoWrapper, galleryPosition);
+	}
+
 	/**
 	 * @param isShowPhotoName
 	 * @param photoDateInfo
@@ -2025,6 +2041,10 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		_photoTooltip.reset();
 
 		_galleryMT20.redraw();
+	}
+
+	public void showItem(final int itemIndex) {
+		_galleryMT20.showItem(itemIndex);
 	}
 
 	private void showPageBookPage(final Composite page) {

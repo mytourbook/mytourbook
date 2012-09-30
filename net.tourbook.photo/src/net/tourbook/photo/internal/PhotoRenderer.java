@@ -776,20 +776,22 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 			}
 		}
 
+		Rectangle clippingArea = null;
 		if (_isFullsizeImageAvailable
 				|| (_fullsizePaintedImage != null && _fullsizePaintedImage.isDisposed() == false)
 				|| _isFullsizeLoadingError) {
 
 			// paint image, original or thumb
 
-			return new Rectangle(0, 0, monitorWidth, monitorHeight);
+			clippingArea = new Rectangle(0, 0, monitorWidth, monitorHeight);
 
 		} else if (_isShowFullsizeLoadingMessage) {
 
 			// paint status text
 
 			final int statusHeight = _fontHeight + 1;
-			return new Rectangle(0, monitorHeight - statusHeight, monitorWidth, statusHeight);
+
+			clippingArea = new Rectangle(0, monitorHeight - statusHeight, monitorWidth, statusHeight);
 		}
 
 		if (_fullsizeImageLoadCallback != null) {
@@ -804,8 +806,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 			_fullsizeImageLoadCallback = null;
 		}
 
-		// paint nothing
-		return null;
+		// paint clipping area or nothing
+		return clippingArea;
 	}
 
 	private void drawPhotoDateName(	final GC gc,

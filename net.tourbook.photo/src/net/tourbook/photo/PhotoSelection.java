@@ -16,6 +16,9 @@
 package net.tourbook.photo;
 
 import java.util.ArrayList;
+import java.util.Collection;
+
+import net.tourbook.photo.internal.gallery.MT20.GalleryMT20Item;
 
 import org.eclipse.jface.viewers.ISelection;
 
@@ -25,15 +28,26 @@ import org.eclipse.jface.viewers.ISelection;
  */
 public class PhotoSelection implements ISelection {
 
-	public ArrayList<PhotoWrapper>	photoWrapperList;
+	public ArrayList<PhotoWrapper>		photoWrapperList;
+	public Collection<GalleryMT20Item>	allGalleryItems;
 
-	public PhotoSelection(final ArrayList<PhotoWrapper> photoWrapper) {
+	public PhotoSelection(final ArrayList<PhotoWrapper> photoWrapper, final Collection<GalleryMT20Item> allGalleryItems) {
 		photoWrapperList = photoWrapper;
+		this.allGalleryItems = allGalleryItems;
 	}
 
 	@Override
 	public boolean isEmpty() {
 		return false;
+	}
+
+	@Override
+	public String toString() {
+		final int maxLen = 5;
+		return "PhotoSelection [photoWrapperList="
+				+ (photoWrapperList != null
+						? photoWrapperList.subList(0, Math.min(photoWrapperList.size(), maxLen))
+						: null) + "]";
 	}
 
 }

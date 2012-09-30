@@ -325,4 +325,5 @@ public class PhotoGallery extends ImageGallery {
 		super.saveState(state);
 	}
 
+
 }

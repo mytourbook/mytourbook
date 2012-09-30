@@ -15,10 +15,13 @@
  *******************************************************************************/
 package net.tourbook.photo.internal.gallery.MT20;
 
+import java.util.Collection;
+
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.util.Util;
 import net.tourbook.photo.IPhotoPreferences;
+import net.tourbook.photo.PhotoSelection;
 import net.tourbook.photo.internal.Activator;
 import net.tourbook.photo.internal.Messages;
 import net.tourbook.photo.internal.preferences.PrefPagePhotoFullsizeViewer;
@@ -72,8 +75,9 @@ public class FullScreenImageViewer {
 																							.getPreferenceStore();
 
 	private GalleryMT20						_gallery;
-	private GalleryMT20Item					_galleryItem;
 	private AbstractGalleryMT20ItemRenderer	_itemRenderer;
+	private GalleryMT20Item					_displayedGalleryItem;
+	private int								_displayedItemIndex;
 
 	private FullScreenPhotoGallery			_fullScreenGallery;
 
@@ -223,7 +227,7 @@ public class FullScreenImageViewer {
 			_shell = null;
 
 			_gallery.onCloseFullsizeViewer();
-			_galleryItem = null;
+			_displayedGalleryItem = null;
 		}
 	}
 
@@ -273,9 +277,10 @@ public class FullScreenImageViewer {
 				.getImageDescriptor(Messages.Image__PhotoFullsizeShellImage128)
 				.createImage() };
 		_shell.setImages(_shellImage);
-
-		createUI_10_Canvas(_shell);
-		createUI_20_Gallery(_shell);
+		{
+			createUI_10_Canvas(_shell);
+			createUI_20_FullScreenGallery(_shell);
+		}
 
 		_cursorHidden = UI.createHiddenCursor();
 		_cursorWait = new Cursor(_shell.getDisplay(), SWT.CURSOR_WAIT);
@@ -354,9 +359,9 @@ public class FullScreenImageViewer {
 		_canvas.setMenu(createContextMenu(_canvas));
 	}
 
-	private void createUI_20_Gallery(final Shell shell) {
+	private void createUI_20_FullScreenGallery(final Shell shell) {
 
-		_fullScreenGallery = new FullScreenPhotoGallery(shell,_gallery);
+		_fullScreenGallery = new FullScreenPhotoGallery(shell, _gallery, this);
 
 		_fullScreenGallery.restoreState(_state);
 	}
@@ -372,7 +377,7 @@ public class FullScreenImageViewer {
 	}
 
 	public GalleryMT20Item getCurrentItem() {
-		return _galleryItem;
+		return _displayedGalleryItem;
 	}
 
 	private boolean isViewerInitialized() {
@@ -386,7 +391,7 @@ public class FullScreenImageViewer {
 			return false;
 		}
 
-		if (_galleryItem == null) {
+		if (_displayedGalleryItem == null) {
 			// can happen after close event (it did)
 			return false;
 		}
@@ -471,11 +476,14 @@ public class FullScreenImageViewer {
 
 	private void onMouseDown(final MouseEvent mouseEvent) {
 
+		System.out.println(UI.timeStampNano() + " FullScreen: onMouseDown\t");
+		// TODO remove SYSTEM.OUT.PRINTLN
+
 	}
 
 	private void onMouseMove(final MouseEvent mouseEvent) {
 
-		if (_fullScreenGallery.showImages(mouseEvent)) {
+		if (_fullScreenGallery.showImages(mouseEvent, _displayedItemIndex)) {
 
 			// photo gallery is displayed
 
@@ -522,7 +530,7 @@ public class FullScreenImageViewer {
 
 		final PaintingResult paintingResult = _itemRenderer.drawFullSize(
 				gc,
-				_galleryItem,
+				_displayedGalleryItem,
 				_monitorWidth,
 				_monitorHeight,
 				_zoomState,
@@ -582,11 +590,6 @@ public class FullScreenImageViewer {
 	void saveState(final IDialogSettings state) {
 
 		state.put(STATE_FULL_SIZE_VIEWER_ZOOM_STATE, _zoomState.name());
-
-		if (_fullScreenGallery != null) {
-
-			_fullScreenGallery.saveState(state);
-		}
 	}
 
 	private void setBounds() {
@@ -594,13 +597,14 @@ public class FullScreenImageViewer {
 		final Rectangle monitorBounds = Display.getDefault().getPrimaryMonitor().getBounds();
 
 //		final double partialFullsize = 1;
-		final double partialFullsize = 0.8;
+		final double partialFullsize = 0.2;
 
 		_monitorWidth = (int) (monitorBounds.width * partialFullsize);
 		_monitorHeight = (int) (monitorBounds.height * partialFullsize);
 
 //		_shell.setBounds(monitorBounds);
-		_shell.setBounds(200, 20, _monitorWidth, _monitorHeight);
+//		_shell.setBounds(200, 20, _monitorWidth, _monitorHeight);
+		_shell.setBounds(500, 500, _monitorWidth, _monitorHeight);
 	}
 
 	void setColors(final Color fgColor, final Color bgColor) {
@@ -651,15 +655,30 @@ public class FullScreenImageViewer {
 		_itemRenderer.setPrefSettings(isShowPreview, isShowLoadingMessage, isShowHQImage);
 	}
 
-	void showImage(final GalleryMT20Item galleryItem) {
+	void setSelection(final PhotoSelection photoSelection) {
 
-		_galleryItem = galleryItem;
+		// get indices for the selected items
+		final int[] selectionIndices = _gallery.getSelectionIndex();
+
+		// get first item
+		final Collection<GalleryMT20Item> allItems = photoSelection.allGalleryItems;
+		final GalleryMT20Item firstItem = allItems.iterator().next();
+
+		showImage(firstItem, selectionIndices[0], false);
+	}
+
+	void showImage(final GalleryMT20Item galleryItem, final int itemIndex, final boolean isActivateShell) {
+
+		_displayedGalleryItem = galleryItem;
+		_displayedItemIndex = itemIndex;
 
 		if (updateUI() == false) {
 			return;
 		}
 
-		_shell.setActive();
+		if (isActivateShell) {
+			_shell.setActive();
+		}
 	}
 
 	/**
@@ -690,7 +709,7 @@ public class FullScreenImageViewer {
 	 */
 	public boolean updateUI() {
 
-		if (_galleryItem == null) {
+		if (_displayedGalleryItem == null) {
 			// there is nothing which can be displayed
 			return false;
 		}
@@ -710,7 +729,7 @@ public class FullScreenImageViewer {
 		 */
 		final Rectangle clippingArea = _itemRenderer.drawFullSizeSetContext(//
 				_shell,
-				_galleryItem,
+				_displayedGalleryItem,
 				_monitorWidth,
 				_monitorHeight);
 

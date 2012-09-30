@@ -22,6 +22,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.photo.IExternalGalleryListener;
+import net.tourbook.photo.IPhotoProvider;
 import net.tourbook.photo.internal.Messages;
 import net.tourbook.photo.internal.preferences.PrefPagePhotoDirectory;
 
@@ -247,7 +248,7 @@ public abstract class GalleryMT20 extends Canvas {
 	 */
 	private boolean								_prevKeyIsShift;
 
-	private FullScreenImageViewer				_fullSizeViewer;
+	private FullScreenImageViewer				_fullScreenImageViewer;
 
 	private ActionOpenPrefDialog				_actionGalleryPrefPage;
 
@@ -269,6 +270,8 @@ public abstract class GalleryMT20 extends Canvas {
 	 * When <code>true</code> other shell actions are displayed.
 	 */
 	private boolean								_isShowOtherShellActions	= true;
+
+	private IPhotoProvider						_photoProvider;
 
 	private class RedrawTimer implements Runnable {
 		public void run() {
@@ -333,7 +336,7 @@ public abstract class GalleryMT20 extends Canvas {
 		_itemRenderer = new DefaultGalleryMT20ItemRenderer();
 
 		// set fullsize viewer
-		_fullSizeViewer = new FullScreenImageViewer(this, _itemRenderer);
+		_fullScreenImageViewer = new FullScreenImageViewer(this, _itemRenderer);
 
 		updateGallery(false);
 	}
@@ -793,7 +796,7 @@ public abstract class GalleryMT20 extends Canvas {
 	public abstract IGalleryCustomData getCustomData(final int itemIndex);
 
 	public FullScreenImageViewer getFullsizeViewer() {
-		return _fullSizeViewer;
+		return _fullScreenImageViewer;
 	}
 
 	/**
@@ -933,6 +936,10 @@ public abstract class GalleryMT20 extends Canvas {
 
 	public int getNumberOfHorizontalImages() {
 		return _gridHorizItems;
+	}
+
+	public IPhotoProvider getPhotoProvider() {
+		return _photoProvider;
 	}
 
 	public int getScrollBarIncrement() {
@@ -1289,7 +1296,7 @@ public abstract class GalleryMT20 extends Canvas {
 			_parent.removeControlListener(_parentControlListener);
 		}
 
-		_fullSizeViewer.close();
+		_fullScreenImageViewer.close();
 	}
 
 	private void onFocusGained(final FocusEvent event) {
@@ -1839,7 +1846,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 	private void onPaint(final GC gc) {
 
-//		final long start = System.nanoTime();
+		final long start = System.nanoTime();
 
 		/**
 		 * After many hours I discovered, that the gallery background is not painted (with win7) in
@@ -1966,11 +1973,11 @@ public abstract class GalleryMT20 extends Canvas {
 			_externalGalleryListener.onPaintAfter(gc, clippingArea, _clientArea);
 		}
 
-//		final float timeDiff = (float) (System.nanoTime() - start) / 1000000;
-////		if (timeDiff > 500) {
-//		System.out.println(UI.timeStampNano() + " \tonPaint:\t" + timeDiff + " ms\t");
-////		}
-//		// TODO remove SYSTEM.OUT.PRINTLN
+		final float timeDiff = (float) (System.nanoTime() - start) / 1000000;
+//		if (timeDiff > 500) {
+		System.out.println(UI.timeStampNano() + " \tonPaint:\t" + timeDiff + " ms\t");
+//		}
+		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 	private void onResize() {
@@ -2128,12 +2135,12 @@ public abstract class GalleryMT20 extends Canvas {
 
 	public void restoreState(final IDialogSettings state) {
 
-		_fullSizeViewer.restoreState(state);
+		_fullScreenImageViewer.restoreState(state);
 	}
 
 	public void saveState(final IDialogSettings state) {
 
-		_fullSizeViewer.saveState(state);
+		_fullScreenImageViewer.saveState(state);
 	}
 
 	private void selectAll() {
@@ -2408,7 +2415,7 @@ public abstract class GalleryMT20 extends Canvas {
 		setForeground(fgColor);
 		setBackground(bgColor);
 
-		_fullSizeViewer.setColors(fgColor, bgColor);
+		_fullScreenImageViewer.setColors(fgColor, bgColor);
 	}
 
 	public void setContextMenuProvider(final IGalleryContextMenuProvider customContextMenuProvider) {
@@ -2427,7 +2434,7 @@ public abstract class GalleryMT20 extends Canvas {
 	@Override
 	public void setFont(final Font font) {
 
-		_fullSizeViewer.setFont(font);
+		_fullScreenImageViewer.setFont(font);
 
 		super.setFont(font);
 	}
@@ -2539,16 +2546,20 @@ public abstract class GalleryMT20 extends Canvas {
 
 		_itemRenderer = itemRenderer;
 
-		_fullSizeViewer.setItemRenderer(itemRenderer);
+		_fullScreenImageViewer.setItemRenderer(itemRenderer);
 
 		redrawGallery();
 	}
 
-	public void setSelection(final Collection<GalleryMT20Item> selection) {
-
-		// IS NOT YET IMPLEMENTED
-
+	public void setPhotoProvider(final IPhotoProvider photoProvider) {
+		_photoProvider = photoProvider;
 	}
+
+//	public void setSelection(final Collection<GalleryMT20Item> selection) {
+//
+//		// IS NOT YET IMPLEMENTED
+//
+//	}
 
 	/**
 	 * Set number of items in the gallery, the items itself are created when they are displayed.
@@ -2640,7 +2651,7 @@ public abstract class GalleryMT20 extends Canvas {
 		final GalleryMT20Item initializedItem = getInitializedItem(itemIndex);
 
 		if (initializedItem != null) {
-			_fullSizeViewer.showImage(initializedItem);
+			_fullScreenImageViewer.showImage(initializedItem, itemIndex, true);
 		}
 	}
 
@@ -2649,7 +2660,7 @@ public abstract class GalleryMT20 extends Canvas {
 	 * 
 	 * @param itemIndex
 	 */
-	private void showItem(final int itemIndex) {
+	public void showItem(final int itemIndex) {
 
 		if (itemIndex < 0 || itemIndex >= _virtualGalleryItems.length) {
 			// index is out of scope
@@ -2691,15 +2702,20 @@ public abstract class GalleryMT20 extends Canvas {
 
 		} else {
 
+			// horizontal gallery
+
 			final int visibleWidth = _clientArea.width;
 
 			final int column = itemIndex / _gridVertItems;
-			final int itemX = column * _itemWidth;
+			final int virtualItemX = column * _itemWidth;
 
-			if (itemX < _galleryPosition) {
-				_galleryPosition = itemX;
-			} else if (_galleryPosition + visibleWidth < itemX + _itemWidth) {
-				_galleryPosition = itemX + _itemWidth - visibleWidth;
+			if (virtualItemX < _galleryPosition) {
+
+				_galleryPosition = virtualItemX - (visibleWidth / 2 - _itemWidth / 2);
+
+			} else if (_galleryPosition + visibleWidth < virtualItemX + _itemWidth) {
+
+				_galleryPosition = virtualItemX - (visibleWidth / 2 - _itemWidth / 2);
 			}
 		}
 
