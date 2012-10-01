@@ -30,10 +30,14 @@ public class PhotoSelection implements ISelection {
 
 	public ArrayList<PhotoWrapper>		photoWrapperList;
 	public Collection<GalleryMT20Item>	allGalleryItems;
+	public int[]						selectionIndices;
 
-	public PhotoSelection(final ArrayList<PhotoWrapper> photoWrapper, final Collection<GalleryMT20Item> allGalleryItems) {
+	public PhotoSelection(	final ArrayList<PhotoWrapper> photoWrapper,
+							final Collection<GalleryMT20Item> allGalleryItems,
+							final int[] selectionIndices) {
 		photoWrapperList = photoWrapper;
 		this.allGalleryItems = allGalleryItems;
+		this.selectionIndices = selectionIndices;
 	}
 
 	@Override

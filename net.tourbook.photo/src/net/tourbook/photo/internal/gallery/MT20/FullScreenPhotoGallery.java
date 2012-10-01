@@ -34,7 +34,8 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
@@ -48,8 +49,6 @@ import org.eclipse.swt.widgets.Shell;
 public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 
 	private static final int		GALLERY_HEIGHT	= 150;
-
-	private boolean					_isVisibleWhenLostFocus;
 
 	private ControlAnimation		_photoGalleryAnimation;
 
@@ -105,7 +104,7 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 
 		private int					_fadeAlpha;
 
-		public ControlAnimation(final Shell shell) {
+		public ControlAnimation(final Shell shell, final Control control) {
 
 			_shell = shell;
 			_display = shell.getDisplay();
@@ -166,6 +165,7 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 				_shell.setAlpha(newAlpha);
 
 				if (isVisible == false) {
+
 					_shell.setVisible(true);
 					_shell.setActive();
 				}
@@ -241,17 +241,17 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 		}
 	}
 
-	public FullScreenPhotoGallery(	final Shell fullScreenshell,
-									final GalleryMT20 galleryMT20,
+	public FullScreenPhotoGallery(	final Shell fullScreenShell,
+									final GalleryMT20 sourceGallery,
 									final FullScreenImageViewer fullScreenImageViewer) {
 
-		_fullScreenShell = fullScreenshell;
-		_sourceGallery = galleryMT20;
+		_fullScreenShell = fullScreenShell;
+		_sourceGallery = sourceGallery;
 		_fullScreenImageViewer = fullScreenImageViewer;
 
 		createUI();
 
-		_photoGalleryAnimation = new ControlAnimation(_galleryShell);
+		_photoGalleryAnimation = new ControlAnimation(_galleryShell, _photoGallery.getGallery());
 
 		_allControlsListener = new AllControlsListener();
 		allControlsAddListener(_galleryShell);
@@ -297,19 +297,46 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 
 		final Rectangle fsShellSize = _fullScreenShell.getBounds();
 
-		_galleryShell.setBounds(fsShellSize.x + 200, fsShellSize.y, fsShellSize.width, GALLERY_HEIGHT);
+		_galleryShell.setBounds(fsShellSize.x, fsShellSize.y, fsShellSize.width, GALLERY_HEIGHT);
 		_galleryShell.setLayout(new FillLayout());
 
 		_galleryShell.addFocusListener(new FocusListener() {
 
 			@Override
 			public void focusGained(final FocusEvent e) {
-				onFocusGained();
+				System.out.println(UI.timeStampNano() + " focusGained\t");
+				// TODO remove SYSTEM.OUT.PRINTLN
+
 			}
 
 			@Override
 			public void focusLost(final FocusEvent e) {
-				onFocusLost(e);
+				System.out.println(UI.timeStampNano() + " onFocusLost\t");
+				// TODO remove SYSTEM.OUT.PRINTLN
+
+//				hideGallery();
+			}
+		});
+
+		_galleryShell.addShellListener(new ShellListener() {
+
+			@Override
+			public void shellActivated(final ShellEvent e) {}
+
+			@Override
+			public void shellClosed(final ShellEvent e) {}
+
+			@Override
+			public void shellDeactivated(final ShellEvent e) {
+				hideGallery();
+			}
+
+			@Override
+			public void shellDeiconified(final ShellEvent e) {}
+
+			@Override
+			public void shellIconified(final ShellEvent e) {
+				hideGallery();
 			}
 		});
 
@@ -322,6 +349,12 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 
 		_photoGallery.createPhotoGallery(parent, SWT.H_SCROLL, this);
 		_photoGallery.createActionBar();
+
+		/*
+		 * set fullscreen image viewer in the photo gallery to the fullscreen image viewer in the
+		 * source gallery, this is a bit a a hack
+		 */
+		_photoGallery.setFullScreenImageViewer(_sourceGallery.getFullScreenImageViewer());
 	}
 
 	@Override
@@ -334,20 +367,23 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 		return null;
 	}
 
-	private void hide() {
+	private void hideGallery() {
 
 		if (_galleryShell == null || _galleryShell.isVisible() == false) {
 			return;
 		}
 
-		_galleryShell.setVisible(false);
+		_photoGallery.stopLoadingImages();
+
+		_photoGalleryAnimation.fadeOut();
 	}
 
 	private void onAllControlsEvent(final Event event) {
 
 		if (event.keyCode == SWT.ESC) {
-			// hide full screen viewer
-			_fullScreenImageViewer.close();
+
+			// hide full screen gallery
+			hideGallery();
 		}
 	}
 
@@ -359,27 +395,6 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 
 			_galleryShell.close();
 		}
-	}
-
-	void onFocusGained() {
-
-//		if (_isVisibleWhenLostFocus) {
-//			show();
-//		}
-//
-//		_isVisibleWhenLostFocus = false;
-	}
-
-	private void onFocusLost(final FocusEvent e) {
-
-//		final boolean isVisible = _galleryShell.isVisible();
-//
-//		if (isVisible) {
-//
-////			_isVisibleWhenLostFocus = isVisible;
-//
-//			hide();
-//		}
 	}
 
 	@Override
@@ -404,7 +419,30 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 		_fullScreenImageViewer.setSelection(photoSelection);
 	}
 
-	private void show() {
+	boolean showImages(final int mouseY, final int displayedItemIndex) {
+
+//		if (mouseEvent.y == 0) {
+		if (mouseY < GALLERY_HEIGHT) {
+
+			// show gallery
+
+			_displayedItemIndex = displayedItemIndex;
+
+			showImages_10_InGallery();
+
+			return true;
+
+		} else {
+
+			// hide gallery
+
+			hideGallery();
+
+			return false;
+		}
+	}
+
+	private void showImages_10_InGallery() {
 
 		final IPhotoProvider photoProvider = _sourceGallery.getPhotoProvider();
 		final PhotoWrapper[] photoWrapper = photoProvider.getSortedAndFilteredPhotoWrapper();
@@ -412,7 +450,7 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 		final int photosHash = photoWrapper.hashCode();
 		final String galleryPositionKey = photosHash + "_FullScreenPhotoGallery";//$NON-NLS-1$
 
-		/*
+		/**
 		 * !!! gallery shell must be visible before any gallery methods are called, otherwise the
 		 * gallery is hidden and not fully initialized !!!!
 		 */
@@ -433,41 +471,8 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 			_photoGallery.showImages(photoWrapper, galleryPositionKey);
 		}
 
-//		_galleryShell.getDisplay().timerExec(200, new Runnable() {
-//			public void run() {
-//
-				// show photo in the gallery which is displayed in the full screen viewer
-				_photoGallery.showItem(_displayedItemIndex);
-//			}
-//		});
-	}
-
-	boolean showImages(final MouseEvent mouseEvent, final int displayedItemIndex) {
-
-//		if (mouseEvent.y == 0) {
-		if (mouseEvent.y < GALLERY_HEIGHT) {
-
-			// show gallery
-
-			_displayedItemIndex = displayedItemIndex;
-
-			show();
-
-			return true;
-
-		} else {
-
-			// hide gallery
-
-			if (_galleryShell != null && _galleryShell.isVisible()) {
-
-				_photoGallery.stopLoadingImages();
-
-				_photoGalleryAnimation.fadeOut();
-			}
-
-			return false;
-		}
+		// show photo in the gallery which is displayed in the full screen viewer
+		_photoGallery.selectItem(_displayedItemIndex, true);
 	}
 
 	private void updateColors(final boolean isRestore) {

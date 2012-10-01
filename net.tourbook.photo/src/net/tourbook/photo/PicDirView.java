@@ -36,6 +36,7 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Sash;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbenchPartReference;
@@ -342,6 +343,11 @@ public class PicDirView extends ViewPart {
 
 		// 2.
 		_picDirFolder.restoreState(_state);
+
+		setFocus();
+
+		// set focus
+//		getViewSite().getPage().activate(this);
 	}
 
 	private void saveState() {
@@ -360,7 +366,15 @@ public class PicDirView extends ViewPart {
 
 	@Override
 	public void setFocus() {
-		_picDirFolder.getTree().setFocus();
+
+		// 1st set focus to the gallery when it is maximized
+		final Control maximizedControl = _containerMasterDetail.getMaximizedControl();
+
+		if (maximizedControl == _containerImages) {
+			_picDirImages.setFocus();
+		} else {
+			_picDirFolder.getTree().setFocus();
+		}
 	}
 
 	public void setMaximizedControl(final boolean isShowFolderAndGallery) {

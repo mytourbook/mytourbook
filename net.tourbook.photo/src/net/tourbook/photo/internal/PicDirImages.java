@@ -484,6 +484,10 @@ public class PicDirImages implements IPhotoGalleryProvider {
 		_photoGallery.saveState(state);
 	}
 
+	public void setFocus() {
+		_photoGallery.setFocus();
+	}
+
 	@Override
 	public void setSelection(final PhotoSelection photoSelection) {
 		_picDirView.setSelection(photoSelection);

@@ -13,6 +13,8 @@ public class Messages extends NLS {
 
 	public static String		App_Unit_Pixel;
 
+	public static String	FullScreenImageViewer_KeyCharacter_ShowPhotoGallery;
+
 	public static String		Image__Backward_Nav;
 	public static String		Image__CursorNotImplemented;
 	public static String		Image__delete;

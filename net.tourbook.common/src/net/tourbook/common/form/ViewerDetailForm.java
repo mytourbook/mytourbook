@@ -121,6 +121,13 @@ public class ViewerDetailForm {
 		});
 	}
 
+	/**
+	 * @return Returns maximized control or <code>null</code> when nothing is maximazied.
+	 */
+	public Control getMaximizedControl() {
+		return _maximizedControl;
+	}
+
 	public int getViewerWidth() {
 		return _sashWidth == null ? MINIMUM_WIDTH : _sashWidth;
 	}

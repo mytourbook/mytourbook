@@ -51,7 +51,7 @@ class LoadCallbackOriginalImage implements ILoadCallBack {
 			_imageGallery.putInExifCache(_photo.getPhotoWrapper().imageFilePathName, metadata);
 		}
 
-		final FullScreenImageViewer fullSizeViewer = _imageGallery.getFullSizeViewer();
+		final FullScreenImageViewer fullSizeViewer = _imageGallery.getFullScreenImageViewer();
 
 		if (fullSizeViewer.getCurrentItem() != _galleryItem) {
 			// another gallery item is displayed

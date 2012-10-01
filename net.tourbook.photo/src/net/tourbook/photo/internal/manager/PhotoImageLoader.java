@@ -298,7 +298,7 @@ public class PhotoImageLoader {
 					if (swtThumbnailImage == null) {
 
 						System.out.println(NLS.bind( //
-								UI.timeStamp() + "EXIF image \"{0}\" cannot be created", //$NON-NLS-1$
+								UI.timeStampNano() + " EXIF image \"{0}\" cannot be created", //$NON-NLS-1$
 								storeImageFilePath));
 					}
 				}
@@ -404,7 +404,7 @@ public class PhotoImageLoader {
 					String message = "Image \"{0}\" cannot be loaded and an exception did not occure.\n" //$NON-NLS-1$
 							+ "The image file is available but it's possible that SWT.ERROR_NO_HANDLES occured"; //$NON-NLS-1$
 
-					System.out.println(UI.timeStamp() + NLS.bind(message, imageStoreFilePath));
+					System.out.println(UI.timeStampNano() + NLS.bind(message, imageStoreFilePath));
 
 					PhotoImageCache.disposeThumbs(null);
 
@@ -424,7 +424,7 @@ public class PhotoImageLoader {
 
 							message = "Image cannot be loaded again with SWT, even when disposing the image cache: \"{0}\" "; //$NON-NLS-1$
 
-							System.out.println(UI.timeStamp() + NLS.bind(message, imageStoreFilePath));
+							System.out.println(UI.timeStampNano() + NLS.bind(message, imageStoreFilePath));
 						}
 					}
 				}
@@ -496,7 +496,7 @@ public class PhotoImageLoader {
 			if (hqImage == null) {
 
 				System.out.println(NLS.bind(//
-						UI.timeStamp() + "image == NULL when loading with {0}: \"{1}\"", //$NON-NLS-1$
+						UI.timeStampNano() + " image == NULL when loading with {0}: \"{1}\"", //$NON-NLS-1$
 						_imageFramework.toUpperCase(),
 						_photo.getPhotoWrapper().imageFilePathName));
 
@@ -520,7 +520,7 @@ public class PhotoImageLoader {
 
 						if (hqImage == null) {
 							System.out.println(NLS.bind(//
-									UI.timeStamp() + "image == NULL when loading with SWT: \"{0}\"", //$NON-NLS-1$
+									UI.timeStampNano() + " image == NULL when loading with SWT: \"{0}\"", //$NON-NLS-1$
 									_photo.getPhotoWrapper().imageFilePathName));
 						}
 					}
@@ -583,7 +583,7 @@ public class PhotoImageLoader {
 			if (originalImage == null) {
 
 				System.out.println(NLS.bind( //
-						UI.timeStamp() + "SWT: image \"{0}\" cannot be loaded, will load with AWT", //$NON-NLS-1$
+						UI.timeStampNano() + " SWT: image \"{0}\" cannot be loaded, will load with AWT", //$NON-NLS-1$
 						originalImagePathName));
 
 				/**
@@ -791,7 +791,7 @@ public class PhotoImageLoader {
 
 		final long end = System.currentTimeMillis() - start;
 
-		System.out.println(UI.timeStamp() + "SWT: " //$NON-NLS-1$
+		System.out.println(UI.timeStampNano() + " SWT: " //$NON-NLS-1$
 				+ (Thread.currentThread().getName() + " " + _photo.getPhotoWrapper().imageFileName) //$NON-NLS-1$
 				+ ("\ttotal: " + end) //$NON-NLS-1$
 				+ ("\tload: " + endHqLoad) //$NON-NLS-1$
@@ -848,7 +848,7 @@ public class PhotoImageLoader {
 			if (awtOriginalImage == null) {
 
 				System.out.println(NLS.bind(//
-						UI.timeStamp() + "AWT: image \"{0}\" cannot be loaded, will load with SWT", //$NON-NLS-1$
+						UI.timeStampNano() + " AWT: image \"{0}\" cannot be loaded, will load with SWT", //$NON-NLS-1$
 						originalImagePathName));
 
 				return loadImageHQ_10_WithSWT();
@@ -1113,7 +1113,7 @@ public class PhotoImageLoader {
 
 		final long end = System.currentTimeMillis() - start;
 
-		System.out.println(UI.timeStamp() + "AWT: " //$NON-NLS-1$
+		System.out.println(UI.timeStampNano() + " AWT: " //$NON-NLS-1$
 				+ (Thread.currentThread().getName() + " " + photoWrapper.imageFileName) //$NON-NLS-1$
 				+ ("\ttotal: " + end) //$NON-NLS-1$
 				+ ("\tload: " + endHqLoad) //$NON-NLS-1$
@@ -1189,7 +1189,7 @@ public class PhotoImageLoader {
 					 */
 
 					System.out.println(NLS.bind( //
-							UI.timeStamp() + "SWT: image \"{0}\" cannot be loaded (2)", //$NON-NLS-1$
+							UI.timeStampNano() + " SWT: image \"{0}\" cannot be loaded (2)", //$NON-NLS-1$
 							originalImagePathName));
 
 					/**
@@ -1225,7 +1225,7 @@ public class PhotoImageLoader {
 
 						if (swtImage == null) {
 							System.out.println(NLS.bind( //
-									UI.timeStamp() + "SWT: image \"{0}\" cannot be loaded (4)", //$NON-NLS-1$
+									UI.timeStampNano() + " SWT: image \"{0}\" cannot be loaded (4)", //$NON-NLS-1$
 									originalImagePathName));
 						}
 					}
@@ -1297,7 +1297,7 @@ public class PhotoImageLoader {
 
 			final long end = System.currentTimeMillis() - start;
 
-			System.out.println(UI.timeStamp() + "SWT: " //$NON-NLS-1$
+			System.out.println(UI.timeStampNano() + " SWT: " //$NON-NLS-1$
 					+ Thread.currentThread().getName()
 					+ " " //$NON-NLS-1$
 					+ photoWrapper.imageFileName

@@ -381,7 +381,7 @@ public class PhotoLoadManager {
 					}
 
 					// check if this image is still displayed
-					final GalleryMT20Item currentFullsizeItem = gallery.getFullsizeViewer().getCurrentItem();
+					final GalleryMT20Item currentFullsizeItem = gallery.getFullScreenImageViewer().getCurrentItem();
 
 					if (currentFullsizeItem != requestedItem) {
 

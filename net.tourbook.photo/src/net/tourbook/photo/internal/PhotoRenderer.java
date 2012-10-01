@@ -776,22 +776,55 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 			}
 		}
 
-		Rectangle clippingArea = null;
+//		Rectangle clippingArea = null;
+//		if (_isFullsizeImageAvailable
+//				|| (_fullsizePaintedImage != null && _fullsizePaintedImage.isDisposed() == false)
+//				|| _isFullsizeLoadingError) {
+//
+//			// paint image, original or thumb
+//
+//			clippingArea = new Rectangle(0, 0, monitorWidth, monitorHeight);
+//
+//		} else if (_isShowFullsizeLoadingMessage) {
+//
+//			// paint status text
+//
+//			final int statusHeight = _fontHeight + 1;
+//
+//			clippingArea = new Rectangle(0, monitorHeight - statusHeight, monitorWidth, statusHeight);
+//		}
+//
+//		if (_fullsizeImageLoadCallback != null) {
+//
+//			/*
+//			 * an image loading is done at the end of the paint event, but a redraw is not fired
+//			 * when reaching this point -> load image now
+//			 */
+//
+//			PhotoLoadManager.putImageInLoadingQueueOriginal(galleryItem, photo, _fullsizeImageLoadCallback);
+//
+//			_fullsizeImageLoadCallback = null;
+//		}
+//
+//		// paint clipping area or nothing
+//		return clippingArea;
+
+// ORIGINAL
+//
 		if (_isFullsizeImageAvailable
 				|| (_fullsizePaintedImage != null && _fullsizePaintedImage.isDisposed() == false)
 				|| _isFullsizeLoadingError) {
 
 			// paint image, original or thumb
 
-			clippingArea = new Rectangle(0, 0, monitorWidth, monitorHeight);
+			return new Rectangle(0, 0, monitorWidth, monitorHeight);
 
 		} else if (_isShowFullsizeLoadingMessage) {
 
 			// paint status text
 
 			final int statusHeight = _fontHeight + 1;
-
-			clippingArea = new Rectangle(0, monitorHeight - statusHeight, monitorWidth, statusHeight);
+			return new Rectangle(0, monitorHeight - statusHeight, monitorWidth, statusHeight);
 		}
 
 		if (_fullsizeImageLoadCallback != null) {
@@ -806,8 +839,9 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 			_fullsizeImageLoadCallback = null;
 		}
 
-		// paint clipping area or nothing
-		return clippingArea;
+		// paint nothing
+		return null;
+
 	}
 
 	private void drawPhotoDateName(	final GC gc,

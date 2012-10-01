@@ -207,7 +207,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	private GallerySorting										_currentSorting;
 	private PhotoRenderer										_photoRenderer;
 
-	private FullScreenImageViewer								_fullSizeViewer;
+	private FullScreenImageViewer								_fullScreenImageViewer;
 
 	private GalleryPhotoToolTip									_photoTooltip;
 	/**
@@ -493,7 +493,6 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	private PhotoSelection createPhotoSelection() {
 
 		final Collection<GalleryMT20Item> allItems = _galleryMT20.getSelection();
-
 		final ArrayList<PhotoWrapper> photos = new ArrayList<PhotoWrapper>();
 
 		for (final GalleryMT20Item item : allItems) {
@@ -505,7 +504,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 			}
 		}
 
-		return new PhotoSelection(photos, allItems);
+		return new PhotoSelection(photos, allItems, _galleryMT20.getSelectionIndex());
 	}
 
 	private void createUI(final Composite parent) {
@@ -583,7 +582,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 		_photoGalleryProvider.registerContextMenu(MENU_ID_PHOTO_GALLERY, _galleryMT20.getContextMenuManager());
 
-		_fullSizeViewer = _galleryMT20.getFullsizeViewer();
+		_fullScreenImageViewer = _galleryMT20.getFullScreenImageViewer();
 
 		// allow the gallery to get access to the photo wrapper
 		_galleryMT20.setPhotoProvider(this);
@@ -722,8 +721,12 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		return _galleryActionBar.getCustomContainer();
 	}
 
-	public FullScreenImageViewer getFullSizeViewer() {
-		return _fullSizeViewer;
+	public FullScreenImageViewer getFullScreenImageViewer() {
+		return _fullScreenImageViewer;
+	}
+
+	public Control getGallery() {
+		return _galleryMT20;
 	}
 
 	public Collection<GalleryMT20Item> getGallerySelection() {
@@ -1770,6 +1773,10 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		_galleryMT20.saveState(state);
 	}
 
+	public void selectItem(final int itemIndex, final boolean isSetFocus) {
+		_galleryMT20.selectItem(itemIndex, isSetFocus);
+	}
+
 	public void setDefaultStatusMessage(final String message) {
 		_defaultStatusMessage = message;
 	}
@@ -1788,7 +1795,13 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	}
 
 	public void setFocus() {
-//		_gallery.setFocus();
+		_galleryMT20.setFocus();
+	}
+
+	public void setFullScreenImageViewer(final FullScreenImageViewer fullScreenImageViewer) {
+
+		_fullScreenImageViewer = fullScreenImageViewer;
+		_galleryMT20.setFullScreenImageViewer(fullScreenImageViewer);
 	}
 
 	/**
@@ -2042,7 +2055,6 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 		_galleryMT20.redraw();
 	}
-
 	public void showItem(final int itemIndex) {
 		_galleryMT20.showItem(itemIndex);
 	}
@@ -2211,7 +2223,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		// get update border size
 		_photoBorderSize = _photoRenderer.getBorderSize();
 
-		_fullSizeViewer.setPrefSettings(isUpdateUI);
+		_fullScreenImageViewer.setPrefSettings(isUpdateUI);
 	}
 
 	private void updateUI_GalleryInfo() {

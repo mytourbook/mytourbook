@@ -74,7 +74,7 @@ public class FullScreenImageViewer {
 																							.getDefault()
 																							.getPreferenceStore();
 
-	private GalleryMT20						_gallery;
+	private GalleryMT20						_sourceGallery;
 	private AbstractGalleryMT20ItemRenderer	_itemRenderer;
 	private GalleryMT20Item					_displayedGalleryItem;
 	private int								_displayedItemIndex;
@@ -150,7 +150,7 @@ public class FullScreenImageViewer {
 
 	public FullScreenImageViewer(final GalleryMT20 gallery, final AbstractGalleryMT20ItemRenderer itemRenderer) {
 
-		_gallery = gallery;
+		_sourceGallery = gallery;
 
 		_itemRenderer = itemRenderer;
 
@@ -187,9 +187,7 @@ public class FullScreenImageViewer {
 		_shell.addFocusListener(new FocusListener() {
 
 			@Override
-			public void focusGained(final FocusEvent e) {
-				_fullScreenGallery.onFocusGained();
-			}
+			public void focusGained(final FocusEvent e) {}
 
 			@Override
 			public void focusLost(final FocusEvent e) {}
@@ -198,9 +196,7 @@ public class FullScreenImageViewer {
 		_shell.addShellListener(new ShellListener() {
 
 			@Override
-			public void shellActivated(final ShellEvent e) {
-				_fullScreenGallery.onFocusGained();
-			}
+			public void shellActivated(final ShellEvent e) {}
 
 			@Override
 			public void shellClosed(final ShellEvent e) {}
@@ -226,7 +222,7 @@ public class FullScreenImageViewer {
 			_shell.dispose();
 			_shell = null;
 
-			_gallery.onCloseFullsizeViewer();
+			_sourceGallery.onCloseFullsizeViewer();
 			_displayedGalleryItem = null;
 		}
 	}
@@ -361,7 +357,7 @@ public class FullScreenImageViewer {
 
 	private void createUI_20_FullScreenGallery(final Shell shell) {
 
-		_fullScreenGallery = new FullScreenPhotoGallery(shell, _gallery, this);
+		_fullScreenGallery = new FullScreenPhotoGallery(shell, _sourceGallery, this);
 
 		_fullScreenGallery.restoreState(_state);
 	}
@@ -422,26 +418,34 @@ public class FullScreenImageViewer {
 		case SWT.ARROW_LEFT:
 		case SWT.ARROW_UP:
 
-			_gallery.navigateItem(-1);
+			_sourceGallery.navigateItem(-1);
 
 			break;
 
 		case SWT.ARROW_DOWN:
 		case SWT.ARROW_RIGHT:
 
-			_gallery.navigateItem(1);
+			_sourceGallery.navigateItem(1);
 
 			break;
 
 		case SWT.HOME:
 
-			_gallery.navigateItem(Integer.MIN_VALUE);
+			_sourceGallery.navigateItem(Integer.MIN_VALUE);
 			break;
 
 		case SWT.END:
 
-			_gallery.navigateItem(Integer.MAX_VALUE);
+			_sourceGallery.navigateItem(Integer.MAX_VALUE);
 			break;
+		}
+
+		final char keyCharacterShowPhotoGallery = Messages.FullScreenImageViewer_KeyCharacter_ShowPhotoGallery
+				.charAt(0);
+
+		if (keyEvent.character == keyCharacterShowPhotoGallery) {
+
+			showPhotoGallery(0);
 		}
 
 		switch (keyEvent.character) {
@@ -476,14 +480,13 @@ public class FullScreenImageViewer {
 
 	private void onMouseDown(final MouseEvent mouseEvent) {
 
-		System.out.println(UI.timeStampNano() + " FullScreen: onMouseDown\t");
-		// TODO remove SYSTEM.OUT.PRINTLN
-
 	}
 
 	private void onMouseMove(final MouseEvent mouseEvent) {
 
-		if (_fullScreenGallery.showImages(mouseEvent, _displayedItemIndex)) {
+		final int mouseY = mouseEvent.y;
+
+		if (showPhotoGallery(mouseY)) {
 
 			// photo gallery is displayed
 
@@ -516,7 +519,7 @@ public class FullScreenImageViewer {
 
 			// select next/previous image
 
-			_gallery.navigateItem(isDown ? -1 : 1);
+			_sourceGallery.navigateItem(isDown ? -1 : 1);
 		}
 	}
 
@@ -526,8 +529,6 @@ public class FullScreenImageViewer {
 			return;
 		}
 
-		final long start = System.currentTimeMillis();
-
 		final PaintingResult paintingResult = _itemRenderer.drawFullSize(
 				gc,
 				_displayedGalleryItem,
@@ -535,8 +536,6 @@ public class FullScreenImageViewer {
 				_monitorHeight,
 				_zoomState,
 				_zoomFactor);
-
-		System.out.println(UI.timeStamp() + "draw fullsize image " + (System.currentTimeMillis() - start) + " ms"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		if (paintingResult == null) {
 			return;
@@ -597,14 +596,15 @@ public class FullScreenImageViewer {
 		final Rectangle monitorBounds = Display.getDefault().getPrimaryMonitor().getBounds();
 
 //		final double partialFullsize = 1;
-		final double partialFullsize = 0.2;
+		final double partialFullsize = 0.6;
+//		final double partialFullsize = 0.2;
 
 		_monitorWidth = (int) (monitorBounds.width * partialFullsize);
 		_monitorHeight = (int) (monitorBounds.height * partialFullsize);
 
 //		_shell.setBounds(monitorBounds);
-//		_shell.setBounds(200, 20, _monitorWidth, _monitorHeight);
-		_shell.setBounds(500, 500, _monitorWidth, _monitorHeight);
+//		_shell.setBounds(500, 500, _monitorWidth, _monitorHeight);
+		_shell.setBounds(200, 20, _monitorWidth, _monitorHeight);
 	}
 
 	void setColors(final Color fgColor, final Color bgColor) {
@@ -657,14 +657,18 @@ public class FullScreenImageViewer {
 
 	void setSelection(final PhotoSelection photoSelection) {
 
-		// get indices for the selected items
-		final int[] selectionIndices = _gallery.getSelectionIndex();
-
 		// get first item
 		final Collection<GalleryMT20Item> allItems = photoSelection.allGalleryItems;
 		final GalleryMT20Item firstItem = allItems.iterator().next();
+		final int itemIndex = photoSelection.selectionIndices[0];
 
-		showImage(firstItem, selectionIndices[0], false);
+		/*
+		 * sync selected item index in the source gallery with the full screen photo gallery, this
+		 * is necessary that keyboard navigation has the correct index
+		 */
+		_sourceGallery.setSelectedItemIndex(itemIndex);
+
+		showImage(firstItem, itemIndex, false);
 	}
 
 	void showImage(final GalleryMT20Item galleryItem, final int itemIndex, final boolean isActivateShell) {
@@ -679,6 +683,10 @@ public class FullScreenImageViewer {
 		if (isActivateShell) {
 			_shell.setActive();
 		}
+	}
+
+	private boolean showPhotoGallery(final int mouseY) {
+		return _fullScreenGallery.showImages(mouseY, _displayedItemIndex);
 	}
 
 	/**

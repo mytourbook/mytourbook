@@ -60,6 +60,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.ScrollBar;
 
@@ -249,6 +250,7 @@ public abstract class GalleryMT20 extends Canvas {
 	private boolean								_prevKeyIsShift;
 
 	private FullScreenImageViewer				_fullScreenImageViewer;
+	private FullScreenImageViewer				_externalFullScreenImageViewer;
 
 	private ActionOpenPrefDialog				_actionGalleryPrefPage;
 
@@ -784,6 +786,13 @@ public abstract class GalleryMT20 extends Canvas {
 		return _createdGalleryItems;
 	}
 
+	private FullScreenImageViewer getCurrentFullScreenImageViewer() {
+
+		return _externalFullScreenImageViewer != null ? //
+				_externalFullScreenImageViewer
+				: _fullScreenImageViewer;
+	}
+
 	/**
 	 * Initializes a gallery item which can be used to set data into the item. This method is called
 	 * before a gallery item is painted.
@@ -795,8 +804,12 @@ public abstract class GalleryMT20 extends Canvas {
 	 */
 	public abstract IGalleryCustomData getCustomData(final int itemIndex);
 
-	public FullScreenImageViewer getFullsizeViewer() {
-		return _fullScreenImageViewer;
+	public FullScreenImageViewer getFullScreenImageViewer() {
+		return getCurrentFullScreenImageViewer();
+	}
+
+	public Control getGallery() {
+		return this;
 	}
 
 	/**
@@ -1212,7 +1225,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 			// index has changed
 
-			showFullsizeImage(_lastSelectedItemIndex);
+			showFullScreenImage(_lastSelectedItemIndex);
 		}
 	}
 
@@ -1303,27 +1316,13 @@ public abstract class GalleryMT20 extends Canvas {
 
 		_isFocusActive = true;
 
-//		if (_lastSelectedItem == null) {
-//
-//			// nothing is selected, select item in the center
-//
-//			int itemIndexFromPosition = getItemIndexFromPosition(_clientArea.width / 2, _clientArea.height / 2);
-//
-//			if (itemIndexFromPosition < 0) {
-//				itemIndexFromPosition = getItemIndexFromPosition(0, 0);
-//			}
-//
-//			if (itemIndexFromPosition >= 0) {
-//				selectItemSingle(itemIndexFromPosition, true, true);
-//			}
-//		}
-
 		redrawGallery();
 	}
 
 	private void onFocusLost(final FocusEvent event) {
 
 		_isFocusActive = false;
+
 		redrawGallery();
 	}
 
@@ -1441,7 +1440,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 		case ' ':
 
-			showFullsizeImage(_lastSelectedItemIndex);
+			showFullScreenImage(_lastSelectedItemIndex);
 
 			return false;
 		}
@@ -1550,7 +1549,7 @@ public abstract class GalleryMT20 extends Canvas {
 			return true;
 
 		case SWT.CR:
-			showFullsizeImage(_lastSelectedItemIndex);
+			showFullScreenImage(_lastSelectedItemIndex);
 
 			return false;
 		}
@@ -1570,7 +1569,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 		if (item != null) {
 
-			showFullsizeImage(itemIndex);
+			showFullScreenImage(itemIndex);
 
 //			notifySelectionListeners(item, itemIndex, true);
 		}
@@ -1846,7 +1845,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 	private void onPaint(final GC gc) {
 
-		final long start = System.nanoTime();
+//		final long start = System.nanoTime();
 
 		/**
 		 * After many hours I discovered, that the gallery background is not painted (with win7) in
@@ -1973,10 +1972,10 @@ public abstract class GalleryMT20 extends Canvas {
 			_externalGalleryListener.onPaintAfter(gc, clippingArea, _clientArea);
 		}
 
-		final float timeDiff = (float) (System.nanoTime() - start) / 1000000;
-//		if (timeDiff > 500) {
-		System.out.println(UI.timeStampNano() + " \tonPaint:\t" + timeDiff + " ms\t");
-//		}
+//		final float timeDiff = (float) (System.nanoTime() - start) / 1000000;
+////		if (timeDiff > 500) {
+//		System.out.println(UI.timeStampNano() + " \tonPaint:\t" + timeDiff + " ms\t");
+////		}
 		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
@@ -2127,9 +2126,6 @@ public abstract class GalleryMT20 extends Canvas {
 
 	private void redrawGallery() {
 
-//		System.out.println(UI.timeStampNano() + " redrawGallery\t");
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
 		redraw();
 	}
 
@@ -2226,6 +2222,21 @@ public abstract class GalleryMT20 extends Canvas {
 		final GalleryMT20Item item = getInitializedItem(itemIndex);
 
 		_selectedItems.remove(item.uniqueItemID);
+	}
+
+	public void selectItem(final int itemIndex, final boolean isSetFocus) {
+
+		if (isSetFocus) {
+			setFocus();
+		}
+
+		deselectAll(false);
+
+		selectItemAndNotify(itemIndex, true, false);
+
+		_lastSingleClick = itemIndex;
+
+		showItem(itemIndex);
 	}
 
 	private boolean selectItem_Next(final boolean isMultiSelection) {
@@ -2428,7 +2439,23 @@ public abstract class GalleryMT20 extends Canvas {
 
 	@Override
 	public boolean setFocus() {
-		return true;
+
+		boolean isFocus = false;
+
+		// check if the chart has the focus
+		final boolean isFocusControl = isFocusControl();
+		if (isFocusControl) {
+			isFocus = true;
+		} else {
+
+			final boolean isForceFocus = forceFocus();
+
+			if (isForceFocus) {
+				isFocus = true;
+			}
+		}
+
+		return isFocus;
 	}
 
 	@Override
@@ -2437,6 +2464,10 @@ public abstract class GalleryMT20 extends Canvas {
 		_fullScreenImageViewer.setFont(font);
 
 		super.setFont(font);
+	}
+
+	public void setFullScreenImageViewer(final FullScreenImageViewer fullScreenImageViewer) {
+		_externalFullScreenImageViewer = fullScreenImageViewer;
 	}
 
 	/**
@@ -2561,6 +2592,11 @@ public abstract class GalleryMT20 extends Canvas {
 //
 //	}
 
+	public void setSelectedItemIndex(final int itemIndex) {
+
+		navigateItem_10(itemIndex);
+	}
+
 	/**
 	 * Set number of items in the gallery, the items itself are created when they are displayed.
 	 * <p>
@@ -2646,12 +2682,12 @@ public abstract class GalleryMT20 extends Canvas {
 	 * 
 	 * @param itemIndex
 	 */
-	private void showFullsizeImage(final int itemIndex) {
+	private void showFullScreenImage(final int itemIndex) {
 
 		final GalleryMT20Item initializedItem = getInitializedItem(itemIndex);
 
 		if (initializedItem != null) {
-			_fullScreenImageViewer.showImage(initializedItem, itemIndex, true);
+			getCurrentFullScreenImageViewer().showImage(initializedItem, itemIndex, true);
 		}
 	}
 
@@ -2704,18 +2740,32 @@ public abstract class GalleryMT20 extends Canvas {
 
 			// horizontal gallery
 
+			/*
+			 * this will center the image but the gallery is jumping when selecting with keyboard
+			 */
+//			final int visibleWidth = _clientArea.width;
+//
+//			final int column = itemIndex / _gridVertItems;
+//			final int virtualItemX = column * _itemWidth;
+//
+//			if (virtualItemX < _galleryPosition) {
+//
+//				_galleryPosition = virtualItemX - (visibleWidth / 2 - _itemWidth / 2);
+//
+//			} else if (_galleryPosition + visibleWidth < virtualItemX + _itemWidth) {
+//
+//				_galleryPosition = virtualItemX - (visibleWidth / 2 - _itemWidth / 2);
+//			}
+
 			final int visibleWidth = _clientArea.width;
 
 			final int column = itemIndex / _gridVertItems;
-			final int virtualItemX = column * _itemWidth;
+			final int itemX = column * _itemWidth;
 
-			if (virtualItemX < _galleryPosition) {
-
-				_galleryPosition = virtualItemX - (visibleWidth / 2 - _itemWidth / 2);
-
-			} else if (_galleryPosition + visibleWidth < virtualItemX + _itemWidth) {
-
-				_galleryPosition = virtualItemX - (visibleWidth / 2 - _itemWidth / 2);
+			if (itemX < _galleryPosition) {
+				_galleryPosition = itemX;
+			} else if (_galleryPosition + visibleWidth < itemX + _itemWidth) {
+				_galleryPosition = itemX + _itemWidth - visibleWidth;
 			}
 		}
 
