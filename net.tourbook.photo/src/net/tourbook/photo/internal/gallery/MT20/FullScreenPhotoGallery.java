@@ -276,7 +276,7 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 	 * Add listener to all controls
 	 * <p>
 	 * ########################### Recursive #########################################<br>
-	 * 
+	 *
 	 * @param control
 	 */
 	private void allControlsAddListener(final Control control) {
@@ -376,6 +376,8 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 		_photoGallery.stopLoadingImages();
 
 		_photoGalleryAnimation.fadeOut();
+
+		_fullScreenImageViewer.activate();
 	}
 
 	private void onAllControlsEvent(final Event event) {

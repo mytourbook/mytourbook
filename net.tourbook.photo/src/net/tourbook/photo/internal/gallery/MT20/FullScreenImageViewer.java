@@ -182,6 +182,10 @@ public class FullScreenImageViewer {
 		updateUI();
 	}
 
+	void activate() {
+		_shell.setActive();
+	}
+
 	private void addShellListener() {
 
 		_shell.addFocusListener(new FocusListener() {
@@ -595,16 +599,16 @@ public class FullScreenImageViewer {
 
 		final Rectangle monitorBounds = Display.getDefault().getPrimaryMonitor().getBounds();
 
-//		final double partialFullsize = 1;
-		final double partialFullsize = 0.6;
+		final double partialFullsize = 1;
+//		final double partialFullsize = 0.6;
 //		final double partialFullsize = 0.2;
 
 		_monitorWidth = (int) (monitorBounds.width * partialFullsize);
 		_monitorHeight = (int) (monitorBounds.height * partialFullsize);
 
-//		_shell.setBounds(monitorBounds);
+		_shell.setBounds(monitorBounds);
 //		_shell.setBounds(500, 500, _monitorWidth, _monitorHeight);
-		_shell.setBounds(200, 20, _monitorWidth, _monitorHeight);
+//		_shell.setBounds(200, 20, _monitorWidth, _monitorHeight);
 	}
 
 	void setColors(final Color fgColor, final Color bgColor) {
@@ -712,7 +716,7 @@ public class FullScreenImageViewer {
 
 	/**
 	 * Update canvas by starting a redraw
-	 * 
+	 *
 	 * @return
 	 */
 	public boolean updateUI() {
