@@ -16,39 +16,53 @@
 package net.tourbook.photo.internal.gallery.MT20;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.util.Util;
 import net.tourbook.photo.IPhotoGalleryProvider;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.IPhotoProvider;
 import net.tourbook.photo.PhotoGallery;
 import net.tourbook.photo.PhotoSelection;
 import net.tourbook.photo.PhotoWrapper;
+import net.tourbook.photo.internal.Messages;
 
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseWheelListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Spinner;
+import org.eclipse.swt.widgets.ToolBar;
 
 public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 
-	private static final int		GALLERY_HEIGHT	= 150;
+	private static final int		GALLERY_HEIGHT							= 150;
+
+	private static final String		STATE_FULL_SCREEN_PHOTO_GALLERY_HEIGHT	= "STATE_FULL_SCREEN_PHOTO_GALLERY_HEIGHT"; //$NON-NLS-1$
 
 	private ControlAnimation		_photoGalleryAnimation;
 
@@ -56,15 +70,27 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 
 	private AllControlsListener		_allControlsListener;
 
-	private Shell					_fullScreenShell;
-	private Shell					_galleryShell;
-
 	private GalleryMT20				_sourceGallery;
 	private PhotoGallery			_photoGallery;
 	private FullScreenImageViewer	_fullScreenImageViewer;
 
 	private int						_displayedPhotosHash;
 	private int						_displayedItemIndex;
+
+	private ToolBarManager			_galleryToolbarManager;
+
+	/*
+	 * UI controls
+	 */
+	private Shell					_fullScreenShell;
+	private Shell					_galleryShell;
+
+	private ToolBar					_galleryToolbarControl;
+	private Spinner					_spinnerResizeImage;
+
+	private Control					_galleryContainer;
+
+//	private Control					_photoGalleryControl;
 
 	/**
 	 * This listener is added to ALL widgets within the tooltip shell.
@@ -150,6 +176,10 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 		@Override
 		public void run() {
 
+			if (_shell == null || _shell.isDisposed()) {
+				return;
+			}
+
 			final boolean isVisible = _shell.isVisible();
 
 			if (_isFadeIn) {
@@ -165,7 +195,6 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 				_shell.setAlpha(newAlpha);
 
 				if (isVisible == false) {
-
 					_shell.setVisible(true);
 					_shell.setActive();
 				}
@@ -254,7 +283,7 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 		_photoGalleryAnimation = new ControlAnimation(_galleryShell, _photoGallery.getGallery());
 
 		_allControlsListener = new AllControlsListener();
-		allControlsAddListener(_galleryShell);
+		addListenerToAllControls(_galleryShell);
 
 		addFullScreenListener();
 	}
@@ -276,45 +305,31 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 	 * Add listener to all controls
 	 * <p>
 	 * ########################### Recursive #########################################<br>
-	 *
+	 * 
 	 * @param control
 	 */
-	private void allControlsAddListener(final Control control) {
+	private void addListenerToAllControls(final Control control) {
 
 		control.addListener(SWT.KeyDown, _allControlsListener);
 
 		if (control instanceof Composite) {
 			final Control[] children = ((Composite) control).getChildren();
 			for (final Control child : children) {
-				allControlsAddListener(child);
+				addListenerToAllControls(child);
 			}
 		}
 	}
 
-	private void createUI() {
+	private void addShellListener() {
 
-		_galleryShell = new Shell(SWT.NO_TRIM | SWT.ON_TOP);
-
-		final Rectangle fsShellSize = _fullScreenShell.getBounds();
-
-		_galleryShell.setBounds(fsShellSize.x, fsShellSize.y, fsShellSize.width, GALLERY_HEIGHT);
-		_galleryShell.setLayout(new FillLayout());
-
-		_galleryShell.addFocusListener(new FocusListener() {
+		_galleryShell.addControlListener(new ControlListener() {
 
 			@Override
-			public void focusGained(final FocusEvent e) {
-				System.out.println(UI.timeStampNano() + " focusGained\t");
-				// TODO remove SYSTEM.OUT.PRINTLN
-
-			}
+			public void controlMoved(final ControlEvent e) {}
 
 			@Override
-			public void focusLost(final FocusEvent e) {
-				System.out.println(UI.timeStampNano() + " onFocusLost\t");
-				// TODO remove SYSTEM.OUT.PRINTLN
-
-//				hideGallery();
+			public void controlResized(final ControlEvent e) {
+				onResize(e);
 			}
 		});
 
@@ -339,22 +354,112 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 				hideGallery();
 			}
 		});
+	}
+
+	private void createUI() {
+
+		_galleryShell = new Shell(SWT.NO_TRIM | SWT.ON_TOP);
+
+		final Rectangle fsShellSize = _fullScreenShell.getBounds();
+
+		_galleryShell.setBounds(fsShellSize.x, fsShellSize.y, fsShellSize.width, GALLERY_HEIGHT);
+//		_galleryShell.setLayout(new FillLayout());
+		GridLayoutFactory.fillDefaults().spacing(0, 10).applyTo(_galleryShell);
+		_galleryShell.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+
+		addShellListener();
 
 		createUI_10_Gallery(_galleryShell);
 	}
 
 	private void createUI_10_Gallery(final Shell parent) {
 
-		_photoGallery = new PhotoGallery();
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+		{
 
-		_photoGallery.createPhotoGallery(parent, SWT.H_SCROLL, this);
-		_photoGallery.createActionBar();
+			_photoGallery = new PhotoGallery();
+
+			_photoGallery.hideActionSorting();
+			_photoGallery.hideActionFiltering();
+			_photoGallery.setShowActionBar();
+
+			_photoGallery.createPhotoGallery(container, SWT.H_SCROLL, this);
+
+//		_photoGallery.setDefaultStatusMessage(Messages.Tour_Photos_Label_StatusMessage_NoTourWithPhotos);
+
+			createUI_20_ActionBar(_photoGallery.getCustomActionBarContainer());
+		}
+
+		fillActionBar();
 
 		/*
 		 * set fullscreen image viewer in the photo gallery to the fullscreen image viewer in the
 		 * source gallery, this is a bit a a hack
 		 */
 		_photoGallery.setFullScreenImageViewer(_sourceGallery.getFullScreenImageViewer());
+
+		_galleryContainer = _photoGallery.getGalleryContainer();
+	}
+
+	private void createUI_20_ActionBar(final Composite parent) {
+
+		GridLayoutFactory.fillDefaults().applyTo(parent);
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+		{
+			/*
+			 * create gallery toolbar
+			 */
+			_galleryToolbarControl = new ToolBar(container, SWT.FLAT);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.END, SWT.FILL)
+					.grab(true, false)
+					.applyTo(_galleryToolbarControl);
+
+			/*
+			 * spinner: resize image
+			 */
+			_spinnerResizeImage = new Spinner(container, SWT.BORDER);
+			GridDataFactory.fillDefaults() //
+					.applyTo(_spinnerResizeImage);
+			_spinnerResizeImage.setMinimum(40);
+			_spinnerResizeImage.setMaximum(400);
+			_spinnerResizeImage.setToolTipText(Messages.FullScreen_ImageViewer_Spinner_ResizeImage_Tooltip);
+
+			_spinnerResizeImage.addSelectionListener(new SelectionAdapter() {
+
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onSelectResizeImage();
+				}
+			});
+			_spinnerResizeImage.addMouseWheelListener(new MouseWheelListener() {
+				public void mouseScrolled(final MouseEvent event) {
+					Util.adjustSpinnerValueOnMouseScroll(event);
+					onSelectResizeImage();
+				}
+			});
+
+		}
+	}
+
+	private void fillActionBar() {
+
+		/*
+		 * fill gallery toolbar
+		 */
+		_galleryToolbarManager = new ToolBarManager(_galleryToolbarControl);
+
+		// must be called after the custom action bar is created
+		_photoGallery.createActionBar();
+
+		_galleryToolbarManager.update(false);
 	}
 
 	@Override
@@ -364,7 +469,7 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 
 	@Override
 	public IToolBarManager getToolBarManager() {
-		return null;
+		return _galleryToolbarManager;
 	}
 
 	private void hideGallery() {
@@ -382,10 +487,23 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 
 	private void onAllControlsEvent(final Event event) {
 
-		if (event.keyCode == SWT.ESC) {
+		final int keyCode = event.keyCode;
+
+		if (keyCode == SWT.ESC) {
 
 			// hide full screen gallery
 			hideGallery();
+
+		} else {
+
+			final char keyCharacterShowPhotoGallery = Messages.FullScreenImageViewer_KeyCharacter_ShowPhotoGallery
+					.charAt(0);
+
+			if (event.character == keyCharacterShowPhotoGallery) {
+
+				// hide with the same key as opening full screen gallery
+				hideGallery();
+			}
 		}
 	}
 
@@ -399,12 +517,36 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 		}
 	}
 
+	private void onResize(final ControlEvent e) {
+
+//		final Point shellSize = _galleryShell.getSize();
+//		final Point gallerySize = _photoGallery.getGallery().getSize();
+//
+//		final int trimX = shellSize.y - gallerySize.y;
+//
+//		System.out.println(UI.timeStampNano()
+//				+ " onResize()\ttrim: "
+//				+ trimX
+//				+ "  shell: "
+//				+ shellSize.y
+//				+ "  gallery: "
+//				+ gallerySize.y);
+	}
+
+	private void onSelectResizeImage() {
+
+		setGallerySize(_spinnerResizeImage.getSelection());
+	}
+
 	@Override
 	public void registerContextMenu(final String menuId, final MenuManager menuManager) {}
 
 	void restoreState(final IDialogSettings state) {
 
 		_state = state;
+
+		final int imageSize = Util.getStateInt(state, STATE_FULL_SCREEN_PHOTO_GALLERY_HEIGHT, GALLERY_HEIGHT);
+		_spinnerResizeImage.setSelection(imageSize);
 
 		updateColors(true);
 
@@ -413,12 +555,29 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 
 	void saveState() {
 
+		_state.put(STATE_FULL_SCREEN_PHOTO_GALLERY_HEIGHT, _spinnerResizeImage.getSelection());
+
 		_photoGallery.saveState(_state);
+	}
+
+	/**
+	 * Set shell size from gallery size.
+	 * 
+	 * @param imageSize
+	 */
+	private void setGallerySize(final int imageSize) {
+
+		final Point shellSize = _galleryShell.getSize();
+		final Point gallerySize = _photoGallery.getGallery().getSize();
+
+		final int trimX = shellSize.y - gallerySize.y;
+
+		_galleryShell.setSize(shellSize.x, trimX + imageSize);
 	}
 
 	@Override
 	public void setSelection(final PhotoSelection photoSelection) {
-		_fullScreenImageViewer.setSelection(photoSelection);
+		_fullScreenImageViewer.showImage(photoSelection);
 	}
 
 	boolean showImages(final int mouseY, final int displayedItemIndex) {
@@ -469,6 +628,26 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 		if (_displayedPhotosHash != photosHash) {
 
 			_displayedPhotosHash = photosHash;
+
+			final Control gallery = _photoGallery.getGallery();
+
+			final Point gallerySize = gallery.getSize();
+
+			if (gallerySize.x == 0) {
+
+				/**
+				 * setting size is a bit tricky, I found no other way
+				 */
+
+				// height must be set with the layout
+				final GridData gd = (GridData) _galleryContainer.getLayoutData();
+				gd.heightHint = _spinnerResizeImage.getSelection();
+
+				// with must be set from the shell size
+				gd.widthHint = _galleryShell.getSize().x;
+
+				_galleryShell.pack(true);
+			}
 
 			_photoGallery.showImages(photoWrapper, galleryPositionKey);
 		}

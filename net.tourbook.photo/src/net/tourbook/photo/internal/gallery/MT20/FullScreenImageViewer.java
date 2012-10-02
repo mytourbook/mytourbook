@@ -63,6 +63,7 @@ import org.eclipse.swt.widgets.Shell;
 public class FullScreenImageViewer {
 
 	private static final int				TIME_BEFORE_CURSOR_GETS_HIDDEN			= 500;
+	private static final int				TIME_BEFORE_SHOW_IMAGE					= UI.IS_OSX ? 100 : 500;
 	private static final int				TIME_BEFORE_WAITING_CURSOR_IS_DISPLAYED	= 200;
 
 	private static final String				STATE_FULL_SIZE_VIEWER_ZOOM_STATE		= "STATE_FULL_SIZE_VIEWER_ZOOM_STATE";	//$NON-NLS-1$
@@ -80,6 +81,7 @@ public class FullScreenImageViewer {
 	private int								_displayedItemIndex;
 
 	private FullScreenPhotoGallery			_fullScreenGallery;
+	private PhotoSelection					_delayedPhotoSelection;
 
 	private int								_monitorWidth;
 	private int								_monitorHeight;
@@ -92,6 +94,7 @@ public class FullScreenImageViewer {
 	private double							_zoomFactor;
 
 	private TimerWaitCursor					_timerWaitingCursor						= new TimerWaitCursor();
+	private TimerShowImageDelayed			_timerShowImageDelayed					= new TimerShowImageDelayed();
 	private TimerSleepCursor				_timerSleepCursor						= new TimerSleepCursor();
 
 	private boolean							_isShowWaitCursor;
@@ -120,6 +123,17 @@ public class FullScreenImageViewer {
 
 	private Font							_font;
 	private IDialogSettings					_state;
+
+	private class TimerShowImageDelayed implements Runnable {
+		public void run() {
+
+			if (_shell == null || _shell.isDisposed()) {
+				return;
+			}
+
+			showImage_Delayed();
+		}
+	}
 
 	private class TimerSleepCursor implements Runnable {
 		public void run() {
@@ -607,8 +621,8 @@ public class FullScreenImageViewer {
 		_monitorHeight = (int) (monitorBounds.height * partialFullsize);
 
 		_shell.setBounds(monitorBounds);
-//		_shell.setBounds(500, 500, _monitorWidth, _monitorHeight);
 //		_shell.setBounds(200, 20, _monitorWidth, _monitorHeight);
+//		_shell.setBounds(500, 500, _monitorWidth, _monitorHeight);
 	}
 
 	void setColors(final Color fgColor, final Color bgColor) {
@@ -659,22 +673,6 @@ public class FullScreenImageViewer {
 		_itemRenderer.setPrefSettings(isShowPreview, isShowLoadingMessage, isShowHQImage);
 	}
 
-	void setSelection(final PhotoSelection photoSelection) {
-
-		// get first item
-		final Collection<GalleryMT20Item> allItems = photoSelection.allGalleryItems;
-		final GalleryMT20Item firstItem = allItems.iterator().next();
-		final int itemIndex = photoSelection.selectionIndices[0];
-
-		/*
-		 * sync selected item index in the source gallery with the full screen photo gallery, this
-		 * is necessary that keyboard navigation has the correct index
-		 */
-		_sourceGallery.setSelectedItemIndex(itemIndex);
-
-		showImage(firstItem, itemIndex, false);
-	}
-
 	void showImage(final GalleryMT20Item galleryItem, final int itemIndex, final boolean isActivateShell) {
 
 		_displayedGalleryItem = galleryItem;
@@ -687,6 +685,38 @@ public class FullScreenImageViewer {
 		if (isActivateShell) {
 			_shell.setActive();
 		}
+	}
+
+	void showImage(final PhotoSelection photoSelection) {
+
+		_delayedPhotoSelection = photoSelection;
+
+		/*
+		 * delay fullsize image opening because it is very CPU intensive on win7+linux, however not
+		 * on osx
+		 */
+		_shell.getDisplay().timerExec(TIME_BEFORE_SHOW_IMAGE, _timerShowImageDelayed);
+	}
+
+	private void showImage_Delayed() {
+
+		// get first item
+		final Collection<GalleryMT20Item> allItems = _delayedPhotoSelection.allGalleryItems;
+
+		if (allItems.size() == 0) {
+			return;
+		}
+
+		final GalleryMT20Item firstItem = allItems.iterator().next();
+		final int itemIndex = _delayedPhotoSelection.selectionIndices[0];
+
+		/*
+		 * sync selected item index in the source gallery with the full screen photo gallery, this
+		 * is necessary that keyboard navigation has the correct index
+		 */
+		_sourceGallery.setSelectedItemIndex(itemIndex);
+
+		showImage(firstItem, itemIndex, false);
 	}
 
 	private boolean showPhotoGallery(final int mouseY) {
@@ -716,7 +746,7 @@ public class FullScreenImageViewer {
 
 	/**
 	 * Update canvas by starting a redraw
-	 *
+	 * 
 	 * @return
 	 */
 	public boolean updateUI() {

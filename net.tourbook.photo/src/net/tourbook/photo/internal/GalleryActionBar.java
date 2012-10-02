@@ -40,8 +40,6 @@ import org.eclipse.swt.widgets.Spinner;
 
 public class GalleryActionBar {
 
-	private static final int				IMAGE_INDICATOR_SIZE	= 16;
-
 	private static final IPreferenceStore	_prefStore				= Activator.getDefault().getPreferenceStore();
 
 	private ImageGallery					_imageGallery;

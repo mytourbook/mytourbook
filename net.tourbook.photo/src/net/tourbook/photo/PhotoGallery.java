@@ -52,12 +52,10 @@ public class PhotoGallery extends ImageGallery {
 	public static final String			IMAGE_PHOTO_FILTER_NO_GPS			= "IMAGE_PHOTO_FILTER_NO_GPS";				//$NON-NLS-1$
 	private PhotoDateInfo				_photoDateInfo;
 
-//	private static final IDialogSettings	_state								= Activator.getDefault()//
-//																						.getDialogSettingsSection(
-//																								"PhotoGallery");			//$NON-NLS-1$
+	private boolean						_isShowActionFiltering				= true;
+	private boolean						_isShowActionSorting				= true;
 
 	private ActionImageFilterGPS		_actionImageFilterGPS;
-
 	private ActionImageFilterNoGPS		_actionImageFilterNoGPS;
 	private ActionShowPhotoName			_actionShowPhotoName;
 	private ActionShowPhotoDate			_actionShowPhotoDate;
@@ -68,6 +66,7 @@ public class PhotoGallery extends ImageGallery {
 	private ImageFilter					_currentImageFilter					= ImageFilter.NoFilter;
 
 	private GallerySorting				_gallerySorting;
+
 	static {
 		UI.IMAGE_REGISTRY.put(
 				IMAGE_PHOTO_FILTER_NO_FILTER,
@@ -236,13 +235,25 @@ public class PhotoGallery extends ImageGallery {
 		tbm.add(_actionShowPhotoTooltip);
 		tbm.add(_actionShowGPSAnnotation);
 
-		tbm.add(new Separator());
-		tbm.add(_actionImageFilterGPS);
-		tbm.add(_actionImageFilterNoGPS);
+		if (_isShowActionFiltering) {
+			tbm.add(new Separator());
+			tbm.add(_actionImageFilterGPS);
+			tbm.add(_actionImageFilterNoGPS);
+		}
 
-		tbm.add(new Separator());
-		tbm.add(_actionSortFileByDate);
-		tbm.add(_actionSortByFileName);
+		if (_isShowActionSorting) {
+			tbm.add(new Separator());
+			tbm.add(_actionSortFileByDate);
+			tbm.add(_actionSortByFileName);
+		}
+	}
+
+	public void hideActionFiltering() {
+		_isShowActionFiltering = false;
+	}
+
+	public void hideActionSorting() {
+		_isShowActionSorting = false;
 	}
 
 	@Override

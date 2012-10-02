@@ -522,7 +522,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, 0).applyTo(container);
-		container.setBackground(_display.getSystemColor(SWT.COLOR_RED));
+//		container.setBackground(_display.getSystemColor(SWT.COLOR_RED));
 		{
 			if (_isShowThumbsize || _isShowCustomActionBar) {
 				_galleryActionBar = new GalleryActionBar(container, this, _isShowThumbsize, _isShowCustomActionBar);
@@ -592,7 +592,6 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 		_galleryMT20.setItemRenderer(_photoRenderer);
 	}
-
 	private void createUI_30_PageDefault(final PageBook parent) {
 
 		_pageDefault = new Composite(parent, SWT.NONE);
@@ -727,6 +726,10 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 	public Control getGallery() {
 		return _galleryMT20;
+	}
+
+	public Control getGalleryContainer() {
+		return _pageBook;
 	}
 
 	public Collection<GalleryMT20Item> getGallerySelection() {
@@ -2055,6 +2058,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 		_galleryMT20.redraw();
 	}
+
 	public void showItem(final int itemIndex) {
 		_galleryMT20.showItem(itemIndex);
 	}
