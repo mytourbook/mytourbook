@@ -365,7 +365,7 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 		_galleryShell.setBounds(fsShellSize.x, fsShellSize.y, fsShellSize.width, GALLERY_HEIGHT);
 //		_galleryShell.setLayout(new FillLayout());
 		GridLayoutFactory.fillDefaults().spacing(0, 10).applyTo(_galleryShell);
-		_galleryShell.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+//		_galleryShell.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 
 		addShellListener();
 
@@ -377,7 +377,7 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
 
 			_photoGallery = new PhotoGallery();

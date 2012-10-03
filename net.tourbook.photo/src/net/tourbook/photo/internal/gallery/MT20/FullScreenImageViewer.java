@@ -614,14 +614,14 @@ public class FullScreenImageViewer {
 		final Rectangle monitorBounds = Display.getDefault().getPrimaryMonitor().getBounds();
 
 		final double partialFullsize = 1;
-//		final double partialFullsize = 0.6;
+//		final double partialFullsize = 0.8;
 //		final double partialFullsize = 0.2;
 
 		_monitorWidth = (int) (monitorBounds.width * partialFullsize);
 		_monitorHeight = (int) (monitorBounds.height * partialFullsize);
 
 		_shell.setBounds(monitorBounds);
-//		_shell.setBounds(200, 20, _monitorWidth, _monitorHeight);
+//		_shell.setBounds(200, 30, _monitorWidth, _monitorHeight);
 //		_shell.setBounds(500, 500, _monitorWidth, _monitorHeight);
 	}
 

@@ -120,12 +120,16 @@ public abstract class GalleryMT20 extends Canvas {
 	private int									_contentVirtualWidth		= 0;
 
 	/**
+	 * Width for the
+	 */
+	private int									_contentVirtualWidthScrollbar;
+
+	/**
 	 * Height for the whole gallery
 	 */
 	private int									_contentVirtualHeight		= 0;
 
 	private int									_prevViewportWidth;
-
 	private int									_prevViewportHeight;
 	private int									_prevContentHeight;
 	private int									_prevContentWidth;
@@ -1996,6 +2000,9 @@ public abstract class GalleryMT20 extends Canvas {
 			 */
 			if (_isHorizontal) {
 
+//				System.out.println(UI.timeStampNano() + " onResize\t_clientArea.height: " + _clientArea.height);
+//				// TODO remove SYSTEM.OUT.PRINTLN
+
 				_itemHeight = _clientArea.height;
 				_itemWidth = (int) (_itemHeight * _itemRatio);
 			}
@@ -2740,7 +2747,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 			// horizontal gallery
 
-			/*
+			/**
 			 * this will center the image but the gallery is jumping when selecting with keyboard
 			 */
 //			final int visibleWidth = _clientArea.width;
@@ -2882,27 +2889,67 @@ public abstract class GalleryMT20 extends Canvas {
 	private void updateScrollBars() {
 
 		if (_isVertical) {
-			updateScrollBarsProperties(getVerticalBar(), _clientArea.height, _contentVirtualHeight);
+			updateScrollBarsPropertiesVertical();
 		} else {
-			updateScrollBarsProperties(getHorizontalBar(), _clientArea.width, _contentVirtualWidth);
+			updateScrollBarsPropertiesHorizontal();
 		}
 	}
 
 	/**
 	 * Move the scrollbar to reflect the current visible items position.
-	 * 
-	 * @param bar
-	 *            - the scroll bar to move
-	 * @param clientAreaSize
-	 *            - Client (visible) area size
-	 * @param contentSize
-	 *            - Total Size
 	 */
-	private void updateScrollBarsProperties(final ScrollBar bar, final int clientAreaSize, final int contentSize) {
+	private void updateScrollBarsPropertiesHorizontal() {
+
+		final ScrollBar bar = getHorizontalBar();
 
 		if (bar == null) {
 			return;
 		}
+
+		final int areaWidth = _clientArea.width;
+		final int contentWidth = _contentVirtualWidthScrollbar;
+
+		bar.setMinimum(0);
+		bar.setMaximum(contentWidth);
+		bar.setPageIncrement(areaWidth);
+		bar.setThumb(areaWidth);
+
+		bar.setIncrement(16);
+
+		if (contentWidth > areaWidth) {
+
+			// show scrollbar
+
+			bar.setEnabled(true);
+			bar.setVisible(true);
+			bar.setSelection(_galleryPosition);
+
+			// Ensure that translate has a valid value.
+			validateGalleryPosition();
+
+		} else {
+
+			// hide scrollbar
+
+			bar.setEnabled(false);
+			bar.setVisible(false);
+			bar.setSelection(0);
+			_galleryPosition = 0;
+		}
+	}
+
+	/**
+	 * Move the scrollbar to reflect the current visible items position.
+	 */
+	private void updateScrollBarsPropertiesVertical() {
+
+		final ScrollBar bar = getVerticalBar();
+		if (bar == null) {
+			return;
+		}
+
+		final int clientAreaSize = _clientArea.height;
+		final int contentSize = _contentVirtualHeight;
 
 		bar.setMinimum(0);
 		bar.setMaximum(contentSize);
@@ -2980,12 +3027,64 @@ public abstract class GalleryMT20 extends Canvas {
 
 			// horizontal
 
+			// get old position
 			if (isKeepLocation && _contentVirtualWidth > 0) {
 				oldPosition = (_galleryPosition + 0.5 * clientAreaWidth) / _contentVirtualWidth;
 			}
 
-			_contentVirtualWidth = _gridHorizItems * _itemWidth;
-			_contentVirtualHeight = clientAreaHeight;
+			final ScrollBar bar = getHorizontalBar();
+			if (bar == null) {
+
+				// horizontal scrollbar is not available
+
+				_contentVirtualWidth = _gridHorizItems * _itemWidth;
+				_contentVirtualHeight = clientAreaHeight;
+				_contentVirtualWidthScrollbar = _contentVirtualWidth;
+
+			} else {
+
+				// horizontal scrollbar is available
+
+				final int contentWidth = _gridHorizItems * _itemWidth;
+
+				if (contentWidth <= clientAreaWidth) {
+
+					_contentVirtualWidth = contentWidth;
+					_contentVirtualWidthScrollbar = _contentVirtualWidth;
+					_contentVirtualWidthScrollbar = _contentVirtualWidth;
+
+				} else {
+
+					/*
+					 * content do not fit in the client area, scrollbar is displayed when image do
+					 * not fit in the visible client area
+					 */
+
+					final int barHeight = bar.getSize().y;
+					final int receiverHeight = getSize().y;
+
+					_itemHeight = receiverHeight - barHeight;
+					_itemWidth = (int) (_itemHeight * _itemRatio);
+
+					_contentVirtualWidth = _gridHorizItems * _itemWidth;
+					_contentVirtualHeight = _itemHeight;
+
+					if (_contentVirtualWidth <= clientAreaWidth) {
+
+						_itemWidth = clientAreaWidth / _gridHorizItems;
+						_itemHeight = (int) (_itemWidth / _itemRatio);
+
+						_contentVirtualWidth = _gridHorizItems * _itemWidth;
+						_contentVirtualHeight = _itemHeight;
+
+						_contentVirtualWidthScrollbar = _contentVirtualWidth;
+
+					} else {
+
+						_contentVirtualWidthScrollbar = _contentVirtualWidth;
+					}
+				}
+			}
 
 			if (_forcedGalleryPosition != null) {
 
