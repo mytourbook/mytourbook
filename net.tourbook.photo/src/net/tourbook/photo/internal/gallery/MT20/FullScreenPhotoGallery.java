@@ -60,7 +60,9 @@ import org.eclipse.swt.widgets.ToolBar;
 
 public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 
-	private static final int		GALLERY_HEIGHT							= 150;
+	private static final int		GALLERY_DEFAULT_HEIGHT					= 150;
+	private static final int		GALLERY_MIN_IMAGE_SIZE					= 40;
+	private static final int		GALLERY_MAX_IMAGE_SIZE					= 1000;
 
 	private static final String		STATE_FULL_SCREEN_PHOTO_GALLERY_HEIGHT	= "STATE_FULL_SCREEN_PHOTO_GALLERY_HEIGHT"; //$NON-NLS-1$
 
@@ -362,7 +364,7 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 
 		final Rectangle fsShellSize = _fullScreenShell.getBounds();
 
-		_galleryShell.setBounds(fsShellSize.x, fsShellSize.y, fsShellSize.width, GALLERY_HEIGHT);
+		_galleryShell.setBounds(fsShellSize.x, fsShellSize.y, fsShellSize.width, GALLERY_DEFAULT_HEIGHT);
 //		_galleryShell.setLayout(new FillLayout());
 		GridLayoutFactory.fillDefaults().spacing(0, 10).applyTo(_galleryShell);
 //		_galleryShell.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
@@ -428,8 +430,8 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 			_spinnerResizeImage = new Spinner(container, SWT.BORDER);
 			GridDataFactory.fillDefaults() //
 					.applyTo(_spinnerResizeImage);
-			_spinnerResizeImage.setMinimum(40);
-			_spinnerResizeImage.setMaximum(400);
+			_spinnerResizeImage.setMinimum(GALLERY_MIN_IMAGE_SIZE);
+			_spinnerResizeImage.setMaximum(GALLERY_MAX_IMAGE_SIZE);
 			_spinnerResizeImage.setToolTipText(Messages.FullScreen_ImageViewer_Spinner_ResizeImage_Tooltip);
 
 			_spinnerResizeImage.addSelectionListener(new SelectionAdapter() {
@@ -545,7 +547,7 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 
 		_state = state;
 
-		final int imageSize = Util.getStateInt(state, STATE_FULL_SCREEN_PHOTO_GALLERY_HEIGHT, GALLERY_HEIGHT);
+		final int imageSize = Util.getStateInt(state, STATE_FULL_SCREEN_PHOTO_GALLERY_HEIGHT, GALLERY_DEFAULT_HEIGHT);
 		_spinnerResizeImage.setSelection(imageSize);
 
 		updateColors(true);
@@ -582,8 +584,8 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 
 	boolean showImages(final int mouseY, final int displayedItemIndex) {
 
-//		if (mouseEvent.y == 0) {
-		if (mouseY < GALLERY_HEIGHT) {
+		if (mouseY == 0) {
+//		if (mouseY < GALLERY_HEIGHT) {
 
 			// show gallery
 

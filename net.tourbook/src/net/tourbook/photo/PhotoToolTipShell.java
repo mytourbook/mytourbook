@@ -46,108 +46,108 @@ public abstract class PhotoToolTipShell {
 	/**
 	 * how long each tick is when fading in/out (in ms)
 	 */
-	private static final int		FADE_TIME_INTERVAL							= UI.IS_OSX ? 10 : 10;
+	private static final int			FADE_TIME_INTERVAL							= UI.IS_OSX ? 10 : 10;
 
 	/**
 	 * Number of steps when fading in
 	 */
-	private static final int		FADE_IN_STEPS								= 10;
+	private static final int			FADE_IN_STEPS								= 10;
 
 	/**
 	 * Number of steps when fading out
 	 */
-	private static final int		FADE_OUT_STEPS								= 10;
+	private static final int			FADE_OUT_STEPS								= 10;
 
 	/**
 	 * Number of steps before fading out
 	 */
-	private static final int		FADE_OUT_DELAY_STEPS						= 20;
+	private static final int			FADE_OUT_DELAY_STEPS						= 20;
 
-	private static final int		MOVE_STEPS									= 20;
+	private static final int			MOVE_STEPS									= 20;
 
-	private static final int		ALPHA_OPAQUE								= 0xff;
+	private static final int			ALPHA_OPAQUE								= 0xff;
 
-	private static final String		STATE_PHOTO_HORIZ_TOOL_TIP_WIDTH			= "STATE_PHOTO_HORIZ_TOOL_TIP_WIDTH";			//$NON-NLS-1$
-	private static final String		STATE_PHOTO_HORIZ_TOOL_TIP_HEIGHT			= "STATE_PHOTO_HORIZ_TOOL_TIP_HEIGHT";			//$NON-NLS-1$
-	private static final String		STATE_PHOTO_VERT_TOOL_TIP_WIDTH				= "STATE_PHOTO_VERT_TOOL_TIP_WIDTH";			//$NON-NLS-1$
-	private static final String		STATE_PHOTO_VERT_TOOL_TIP_HEIGHT			= "STATE_PHOTO_VERT_TOOL_TIP_HEIGHT";			//$NON-NLS-1$
+	private static final String			STATE_PHOTO_HORIZ_TOOL_TIP_WIDTH			= "STATE_PHOTO_HORIZ_TOOL_TIP_WIDTH";			//$NON-NLS-1$
+	private static final String			STATE_PHOTO_HORIZ_TOOL_TIP_HEIGHT			= "STATE_PHOTO_HORIZ_TOOL_TIP_HEIGHT";			//$NON-NLS-1$
+	private static final String			STATE_PHOTO_VERT_TOOL_TIP_WIDTH				= "STATE_PHOTO_VERT_TOOL_TIP_WIDTH";			//$NON-NLS-1$
+	private static final String			STATE_PHOTO_VERT_TOOL_TIP_HEIGHT			= "STATE_PHOTO_VERT_TOOL_TIP_HEIGHT";			//$NON-NLS-1$
 
-	private static final String		STATE_PHOTO_IS_TOOL_TIP_PINNED				= "STATE_PHOTO_IS_TOOL_TIP_PINNED";			//$NON-NLS-1$
-	private static final String		STATE_PHOTO_HORIZ_TOOL_TIP_PIN_LOCATION_X	= "STATE_PHOTO_HORIZ_TOOL_TIP_PIN_LOCATION_X";	//$NON-NLS-1$
-	private static final String		STATE_PHOTO_HORIZ_TOOL_TIP_PIN_LOCATION_Y	= "STATE_PHOTO_HORIZ_TOOL_TIP_PIN_LOCATION_Y";	//$NON-NLS-1$
-	private static final String		STATE_PHOTO_VERT_TOOL_TIP_PIN_LOCATION_X	= "STATE_PHOTO_VERT_TOOL_TIP_PIN_LOCATION_X";	//$NON-NLS-1$
-	private static final String		STATE_PHOTO_VERT_TOOL_TIP_PIN_LOCATION_Y	= "STATE_PHOTO_VERT_TOOL_TIP_PIN_LOCATION_Y";	//$NON-NLS-1$
+	private static final String			STATE_PHOTO_IS_TOOL_TIP_PINNED				= "STATE_PHOTO_IS_TOOL_TIP_PINNED";			//$NON-NLS-1$
+	private static final String			STATE_PHOTO_HORIZ_TOOL_TIP_PIN_LOCATION_X	= "STATE_PHOTO_HORIZ_TOOL_TIP_PIN_LOCATION_X";	//$NON-NLS-1$
+	private static final String			STATE_PHOTO_HORIZ_TOOL_TIP_PIN_LOCATION_Y	= "STATE_PHOTO_HORIZ_TOOL_TIP_PIN_LOCATION_Y";	//$NON-NLS-1$
+	private static final String			STATE_PHOTO_VERT_TOOL_TIP_PIN_LOCATION_X	= "STATE_PHOTO_VERT_TOOL_TIP_PIN_LOCATION_X";	//$NON-NLS-1$
+	private static final String			STATE_PHOTO_VERT_TOOL_TIP_PIN_LOCATION_Y	= "STATE_PHOTO_VERT_TOOL_TIP_PIN_LOCATION_Y";	//$NON-NLS-1$
 
-	private static final int		MIN_SHELL_HORIZ_WIDTH						= 100;
-	private static final int		MIN_SHELL_HORIZ_HEIGHT						= 60;
-	private static final int		MIN_SHELL_VERT_WIDTH						= 100;
-	private static final int		MIN_SHELL_VERT_HEIGHT						= 150;
+	private static final int			MIN_SHELL_HORIZ_WIDTH						= 100;
+	private static final int			MIN_SHELL_HORIZ_HEIGHT						= 60;
+	private static final int			MIN_SHELL_VERT_WIDTH						= 100;
+	private static final int			MIN_SHELL_VERT_HEIGHT						= 150;
 
-	private OwnerControlListener	_ownerControlListener;
-	private OwnerShellListener		_ownerShellListener;
-	private ToolTipShellListener	_ttShellListener;
-	private ToolTipControlListener	_ttControlListener;
-	private ToolTipDisplayListener	_ttDisplayListener;
+	private OwnerControlListener		_ownerControlListener;
+	private OwnerShellListener			_ownerShellListener;
+	private ToolTipShellListener		_ttShellListener;
+	private ToolTipAllControlsListener	_ttAllControlsListener;
+	private ToolTipDisplayListener		_ttDisplayListener;
 
 	/**
 	 * Keep track of added display listener that no more than <b>1</b> is set.
 	 */
-	private boolean					_isDisplayListenerSet;
+	private boolean						_isDisplayListenerSet;
 
-	private boolean					_isShellToggled;
+	private boolean						_isShellToggled;
 
 	/**
 	 * Is <code>true</code> when shell is fading out, otherwise <code>false</code>.
 	 */
-	private boolean					_isShellFadingOut;
+	private boolean						_isShellFadingOut;
 
 	/**
 	 * Is <code>true</code> when shell is fading in, otherwise <code>false</code>.
 	 */
-	private boolean					_isShellFadingIn;
+	private boolean						_isShellFadingIn;
 
-	private boolean					_isToolTipPinned;
+	private boolean						_isToolTipPinned;
 
-	private Point					_shellStartLocation;
-	private Point					_shellEndLocation							= new Point(0, 0);
+	private Point						_shellStartLocation;
+	private Point						_shellEndLocation							= new Point(0, 0);
 
-	private int						_fadeOutDelayCounter;
+	private int							_fadeOutDelayCounter;
 
-	private int						_horizContentWidth							= MIN_SHELL_HORIZ_WIDTH;
-	private int						_horizContentHeight							= MIN_SHELL_HORIZ_HEIGHT;
-	private int						_vertContentWidth							= MIN_SHELL_VERT_WIDTH;
-	private int						_vertContentHeight							= MIN_SHELL_VERT_HEIGHT;
+	private int							_horizContentWidth							= MIN_SHELL_HORIZ_WIDTH;
+	private int							_horizContentHeight							= MIN_SHELL_HORIZ_HEIGHT;
+	private int							_vertContentWidth							= MIN_SHELL_VERT_WIDTH;
+	private int							_vertContentHeight							= MIN_SHELL_VERT_HEIGHT;
 
-	private int						_horizPinLocationX;
-	private int						_horizPinLocationY;
-	private int						_vertPinLocationX;
-	private int						_vertPinLocationY;
+	private int							_horizPinLocationX;
+	private int							_horizPinLocationY;
+	private int							_vertPinLocationX;
+	private int							_vertPinLocationY;
 
-	private final AnimationTimer	_animationTimer;
-	private int						_animationMoveCounter;
+	private final AnimationTimer		_animationTimer;
+	private int							_animationMoveCounter;
 
-	private boolean					_isInShellResize;
-	private boolean					_isKeepToolTipOpen;
+	private boolean						_isInShellResize;
+	private boolean						_isKeepToolTipOpen;
 
-	private AbstractRRShell			_visibleRRShell;
-	private AbstractRRShell			_rrShellWithResize;
-	private AbstractRRShell			_rrShellNoResize;
+	private AbstractRRShell				_visibleRRShell;
+	private AbstractRRShell				_rrShellWithResize;
+	private AbstractRRShell				_rrShellNoResize;
 
 	/*
 	 * UI resources
 	 */
-	private Display					_display;
+	private Display						_display;
 
-	private ImageGallery			_imageGallery;
+	private ImageGallery				_imageGallery;
 
-	private Composite				_ttContentArea;
+	private Composite					_ttContentArea;
 
 	/**
 	 * Tooltip shell which is currently be visible
 	 */
-	private Shell					_visibleShell;
+	private Shell						_visibleShell;
 
-	private Control					_ownerControl;
+	private Control						_ownerControl;
 
 	private final class AnimationTimer implements Runnable {
 		@Override
@@ -183,9 +183,9 @@ public abstract class PhotoToolTipShell {
 	/**
 	 * This listener is added to ALL widgets within the tooltip shell.
 	 */
-	private class ToolTipControlListener implements Listener {
+	private class ToolTipAllControlsListener implements Listener {
 		public void handleEvent(final Event event) {
-			onTTControlEvent(event);
+			onTTAllControlsEvent(event);
 		}
 
 	}
@@ -219,7 +219,7 @@ public abstract class PhotoToolTipShell {
 		_ownerControl = ownerControl;
 		_display = _ownerControl.getDisplay();
 
-		_ttControlListener = new ToolTipControlListener();
+		_ttAllControlsListener = new ToolTipAllControlsListener();
 		_ttShellListener = new ToolTipShellListener();
 		_ttDisplayListener = new ToolTipDisplayListener();
 
@@ -592,7 +592,7 @@ public abstract class PhotoToolTipShell {
 		// create UI
 		_ttContentArea = createToolTipContentArea(_rrShellNoResize.getShellPage());
 
-		ttControlsAddListener(_visibleShell);
+		ttAllControlsAddListener(_visibleShell);
 
 		updateUI_Colors();
 
@@ -696,7 +696,6 @@ public abstract class PhotoToolTipShell {
 		ttHide(null);
 	}
 
-
 	/**
 	 * @return Returns <code>true</code> to hide tooltip, <code>false</code> will not hide the
 	 *         tooltip.
@@ -757,13 +756,21 @@ public abstract class PhotoToolTipShell {
 		}
 	}
 
-	private void onTTControlEvent(final Event event) {
+	private void onTTAllControlsEvent(final Event event) {
 
 		if (_visibleShell == null || _visibleShell.isDisposed()) {
 			return;
 		}
 
 		switch (event.type) {
+		case SWT.KeyDown:
+
+			if (event.keyCode == SWT.ESC) {
+				hide();
+			}
+
+			break;
+
 		case SWT.MouseEnter:
 
 			// stop animation
@@ -1078,7 +1085,7 @@ public abstract class PhotoToolTipShell {
 
 		final Shell prevShell = _visibleShell;
 
-		ttControlsRemoveListener(prevShell);
+		ttAllControlsRemoveListener(prevShell);
 
 		setCurrentVisibleShell(newReparentedShell);
 
@@ -1104,7 +1111,7 @@ public abstract class PhotoToolTipShell {
 		// hide previous shell
 		prevShell.setVisible(false);
 
-		ttControlsAddListener(newReparentedShell.getShell());
+		ttAllControlsAddListener(newReparentedShell.getShell());
 
 		final boolean isShellMoving = _isShellFadingIn && _isKeepToolTipOpen == false;
 		if (isShellMoving) {
@@ -1309,18 +1316,20 @@ public abstract class PhotoToolTipShell {
 	 * 
 	 * @param control
 	 */
-	private void ttControlsAddListener(final Control control) {
+	private void ttAllControlsAddListener(final Control control) {
 
-		control.addListener(SWT.MouseDown, _ttControlListener);
-		control.addListener(SWT.MouseUp, _ttControlListener);
-		control.addListener(SWT.MouseMove, _ttControlListener);
-		control.addListener(SWT.MouseExit, _ttControlListener);
-		control.addListener(SWT.MouseEnter, _ttControlListener);
+		control.addListener(SWT.KeyDown, _ttAllControlsListener);
+
+		control.addListener(SWT.MouseDown, _ttAllControlsListener);
+		control.addListener(SWT.MouseUp, _ttAllControlsListener);
+		control.addListener(SWT.MouseMove, _ttAllControlsListener);
+		control.addListener(SWT.MouseExit, _ttAllControlsListener);
+		control.addListener(SWT.MouseEnter, _ttAllControlsListener);
 
 		if (control instanceof Composite) {
 			final Control[] children = ((Composite) control).getChildren();
 			for (final Control child : children) {
-				ttControlsAddListener(child);
+				ttAllControlsAddListener(child);
 			}
 		}
 	}
@@ -1334,18 +1343,20 @@ public abstract class PhotoToolTipShell {
 	 * 
 	 * @param control
 	 */
-	private void ttControlsRemoveListener(final Control control) {
+	private void ttAllControlsRemoveListener(final Control control) {
 
-		control.removeListener(SWT.MouseDown, _ttControlListener);
-		control.removeListener(SWT.MouseUp, _ttControlListener);
-		control.removeListener(SWT.MouseMove, _ttControlListener);
-		control.removeListener(SWT.MouseExit, _ttControlListener);
-		control.removeListener(SWT.MouseEnter, _ttControlListener);
+		control.removeListener(SWT.KeyDown, _ttAllControlsListener);
+
+		control.removeListener(SWT.MouseDown, _ttAllControlsListener);
+		control.removeListener(SWT.MouseUp, _ttAllControlsListener);
+		control.removeListener(SWT.MouseMove, _ttAllControlsListener);
+		control.removeListener(SWT.MouseExit, _ttAllControlsListener);
+		control.removeListener(SWT.MouseEnter, _ttAllControlsListener);
 
 		if (control instanceof Composite) {
 			final Control[] children = ((Composite) control).getChildren();
 			for (final Control child : children) {
-				ttControlsRemoveListener(child);
+				ttAllControlsRemoveListener(child);
 			}
 		}
 	}
