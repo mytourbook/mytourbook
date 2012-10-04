@@ -51,7 +51,7 @@ public abstract class PhotoToolTipShell {
 	/**
 	 * Number of steps when fading in
 	 */
-	private static final int			FADE_IN_STEPS								= 10;
+	private static final int			FADE_IN_STEPS								= 11;
 
 	/**
 	 * Number of steps when fading out
