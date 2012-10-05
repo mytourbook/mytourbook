@@ -17,6 +17,7 @@ package net.tourbook.photo;
 
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
+import net.tourbook.common.tooltip.AbstractRRShell;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 
@@ -175,7 +176,7 @@ public abstract class PhotoToolTipShell {
 		}
 
 		@Override
-		protected Point getContentSize() {
+		public Point getContentSize() {
 			return PhotoToolTipShell.this.getContentSize();
 		}
 	}

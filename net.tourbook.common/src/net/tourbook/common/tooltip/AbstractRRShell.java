@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.photo;
+package net.tourbook.common.tooltip;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
@@ -33,7 +33,7 @@ import org.eclipse.ui.part.PageBook;
 /**
  * Reparented Resize Shell
  */
-abstract class AbstractRRShell {
+public abstract class AbstractRRShell {
 
 	private boolean		_isResizeable;
 
@@ -111,21 +111,13 @@ abstract class AbstractRRShell {
 		return resizeCanvas;
 	}
 
-	private void delay() {
-		try {
-			Thread.sleep(500);
-		} catch (final InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
-
 	public void dispose() {
 
 		_shell.dispose();
 		_shell = null;
 	}
 
-	protected abstract Point getContentSize();
+	public abstract Point getContentSize();
 
 	public Shell getShell() {
 		return _shell;

@@ -1763,6 +1763,10 @@ public abstract class GalleryMT20 extends Canvas {
 		}
 	}
 
+	public void onMouseMoveExternal(final MouseEvent mouseEvent) {
+		onMouseMove(mouseEvent);
+	}
+
 	private void onMouseUp(final MouseEvent mouseEvent) {
 
 		if (_externalGalleryListener != null) {
@@ -2589,15 +2593,15 @@ public abstract class GalleryMT20 extends Canvas {
 		redrawGallery();
 	}
 
-	public void setPhotoProvider(final IPhotoProvider photoProvider) {
-		_photoProvider = photoProvider;
-	}
-
 //	public void setSelection(final Collection<GalleryMT20Item> selection) {
 //
 //		// IS NOT YET IMPLEMENTED
 //
 //	}
+
+	public void setPhotoProvider(final IPhotoProvider photoProvider) {
+		_photoProvider = photoProvider;
+	}
 
 	public void setSelectedItemIndex(final int itemIndex) {
 

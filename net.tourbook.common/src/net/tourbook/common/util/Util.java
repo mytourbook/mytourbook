@@ -292,6 +292,14 @@ public class Util {
 		return backup;
 	}
 
+	public static void delayThread(final int delayTime) {
+		try {
+			Thread.sleep(delayTime);
+		} catch (final InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
 	public static Resource disposeResource(final Resource resource) {
 		if (resource != null && !resource.isDisposed()) {
 			resource.dispose();

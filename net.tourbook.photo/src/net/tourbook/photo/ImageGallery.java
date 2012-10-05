@@ -34,7 +34,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.photo.internal.Activator;
 import net.tourbook.photo.internal.GalleryActionBar;
-import net.tourbook.photo.internal.GalleryPhotoToolTip;
+import net.tourbook.photo.internal.GalleryPhotoToolTip2;
 import net.tourbook.photo.internal.ImageFilter;
 import net.tourbook.photo.internal.Messages;
 import net.tourbook.photo.internal.PhotoDateInfo;
@@ -209,7 +209,9 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 	private FullScreenImageViewer								_fullScreenImageViewer;
 
-	private GalleryPhotoToolTip									_photoTooltip;
+//	private GalleryPhotoToolTip									_photoTooltip;
+	private GalleryPhotoToolTip2								_photoTooltip2;
+
 	/**
 	 * Folder which images are currently be displayed
 	 */
@@ -537,8 +539,9 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 			}
 		}
 
-		_photoTooltip = new GalleryPhotoToolTip(_galleryMT20);
-		_photoTooltip.setHideOnMouseMove(true);
+		_photoTooltip2 = new GalleryPhotoToolTip2(_galleryMT20);
+		_photoTooltip2.setReceiveMouseMoveEvent(true);
+
 		_galleryMT20.addItemHoveredListener(this);
 	}
 
@@ -592,6 +595,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 		_galleryMT20.setItemRenderer(_photoRenderer);
 	}
+
 	private void createUI_30_PageDefault(final PageBook parent) {
 
 		_pageDefault = new Composite(parent, SWT.NONE);
@@ -621,14 +625,6 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 			GridDataFactory.fillDefaults()//
 					.grab(true, false)
 					.applyTo(_lblGalleryInfo);
-		}
-	}
-
-	private void delay() {
-		try {
-			Thread.sleep(500);
-		} catch (final InterruptedException e) {
-			e.printStackTrace();
 		}
 	}
 
@@ -734,10 +730,6 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 	public Collection<GalleryMT20Item> getGallerySelection() {
 		return _galleryMT20.getSelection();
-	}
-
-	public Control getGalleryToolTipShell() {
-		return _photoTooltip.getToolTipShell();
 	}
 
 	/**
@@ -932,7 +924,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	public void hoveredItem(final GalleryMT20Item hoveredItem) {
 
 		if (_isShowTooltip) {
-			_photoTooltip.show(hoveredItem);
+			_photoTooltip2.show(hoveredItem);
 		}
 	}
 
@@ -2029,7 +2021,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		_newGalleryPositionKey = galleryPositionKey;
 
 		// initialize tooltip for a new folder
-		_photoTooltip.reset();
+		_photoTooltip2.reset(true);
 
 		_allPhotoWrapper = photoWrapper;
 
@@ -2054,7 +2046,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		_isShowTooltip = isShowTooltip;
 
 		// reset tooltip, otherwise it could be displayed if it should not
-		_photoTooltip.reset();
+		_photoTooltip2.reset(true);
 
 		_galleryMT20.redraw();
 	}
@@ -2200,8 +2192,8 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 				_galleryActionBar.updateUI_AfterZoomInOut(imageSizeWithoutBorder);
 			}
 
-			_photoTooltip.setGalleryImageSize(_photoImageSize);
-			_photoTooltip.reset();
+			_photoTooltip2.setGalleryImageSize(_photoImageSize);
+			_photoTooltip2.reset(true);
 		}
 	}
 
@@ -2451,7 +2443,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 				}
 
 				// initialize tooltip for a new folder
-				_photoTooltip.reset();
+				_photoTooltip2.reset(true);
 
 				final double galleryPosition = getCachedGalleryPosition();
 
