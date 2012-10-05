@@ -307,7 +307,7 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 	 * Add listener to all controls
 	 * <p>
 	 * ########################### Recursive #########################################<br>
-	 * 
+	 *
 	 * @param control
 	 */
 	private void addListenerToAllControls(final Control control) {
@@ -432,7 +432,9 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 					.applyTo(_spinnerResizeImage);
 			_spinnerResizeImage.setMinimum(GALLERY_MIN_IMAGE_SIZE);
 			_spinnerResizeImage.setMaximum(GALLERY_MAX_IMAGE_SIZE);
-			_spinnerResizeImage.setToolTipText(Messages.FullScreen_ImageViewer_Spinner_ResizeImage_Tooltip);
+			_spinnerResizeImage.setToolTipText(UI.IS_OSX
+					? Messages.FullScreen_ImageViewer_Spinner_ResizeImage_Tooltip_OSX
+					: Messages.FullScreen_ImageViewer_Spinner_ResizeImage_Tooltip);
 
 			_spinnerResizeImage.addSelectionListener(new SelectionAdapter() {
 
@@ -564,7 +566,7 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 
 	/**
 	 * Set shell size from gallery size.
-	 * 
+	 *
 	 * @param imageSize
 	 */
 	private void setGallerySize(final int imageSize) {

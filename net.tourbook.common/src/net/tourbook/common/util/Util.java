@@ -69,8 +69,7 @@ public class Util {
 	public static int adjustScaleValueOnMouseScroll(final MouseEvent event) {
 
 		// accelerate with Ctrl + Shift key
-		int accelerator = (event.stateMask & SWT.CONTROL) != 0 ? 10 : 1;
-		accelerator *= (event.stateMask & SWT.SHIFT) != 0 ? 5 : 1;
+		final int accelerator = getKeyAccelerator(event);
 
 		final Scale scale = (Scale) event.widget;
 		final int newValueDiff = event.count > 0 ? accelerator : -accelerator;
@@ -80,9 +79,7 @@ public class Util {
 
 	public static void adjustSpinnerValueOnMouseScroll(final MouseEvent event) {
 
-		// accelerate with Ctrl + Shift key
-		int accelerator = (event.stateMask & SWT.CONTROL) != 0 ? 10 : 1;
-		accelerator *= (event.stateMask & SWT.SHIFT) != 0 ? 5 : 1;
+		final int accelerator = getKeyAccelerator(event);
 
 		final Spinner spinner = (Spinner) event.widget;
 		final int newValue = ((event.count > 0 ? 1 : -1) * accelerator);
@@ -217,7 +214,7 @@ public class Util {
 
 	/**
 	 * Creates a {@link DateTime} from the number: YYYYMMDDhhmmss
-	 * 
+	 *
 	 * @param yyyymmddhhmmss
 	 * @return
 	 */
@@ -235,7 +232,7 @@ public class Util {
 
 	/**
 	 * creates a double array backup
-	 * 
+	 *
 	 * @param original
 	 * @return Returns a copy of a <code>double[]</code> or <code>null</code> when the original data
 	 *         is <code>null</code>.
@@ -255,7 +252,7 @@ public class Util {
 
 	/**
 	 * creates a float array backup
-	 * 
+	 *
 	 * @param original
 	 * @return Returns a copy of a <code>float[]</code> or <code>null</code> when the original data
 	 *         is <code>null</code>.
@@ -275,7 +272,7 @@ public class Util {
 
 	/**
 	 * creates a int array backup
-	 * 
+	 *
 	 * @param original
 	 * @return the backup array or <code>null</code> when the original data is <code>null</code>
 	 */
@@ -309,6 +306,28 @@ public class Util {
 
 	public static String encodeSpace(final String urlString) {
 		return urlString.replaceAll(URL_SPACE, URL_SPACE_REPLACEMENT);
+	}
+
+	private static int getKeyAccelerator(final MouseEvent event) {
+
+		boolean isCtrlKey;
+		boolean isShiftKey;
+
+		if (UI.IS_OSX) {
+			isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
+			isShiftKey = (event.stateMask & SWT.MOD3) > 0;
+//			isAltKey = (event.stateMask & SWT.MOD3) > 0;
+		} else {
+			isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
+			isShiftKey = (event.stateMask & SWT.MOD2) > 0;
+//			isAltKey = (event.stateMask & SWT.MOD3) > 0;
+		}
+
+		// accelerate with Ctrl + Shift key
+		int accelerator = isCtrlKey ? 10 : 1;
+		accelerator *= isShiftKey ? 5 : 1;
+
+		return accelerator;
 	}
 
 	public static int getNumberOfDigits(int number) {
@@ -496,7 +515,7 @@ public class Util {
 
 	/**
 	 * Remove duplicate items from a list and add a new item.
-	 * 
+	 *
 	 * @param allItems
 	 * @param newItem
 	 * @param maxItems
@@ -527,7 +546,7 @@ public class Util {
 
 	/**
 	 * found here: http://www.odi.ch/prog/design/datetime.php
-	 * 
+	 *
 	 * @param cal
 	 * @return
 	 */
@@ -591,7 +610,7 @@ public class Util {
 
 	/**
 	 * Parses SAX attribute
-	 * 
+	 *
 	 * @param attributes
 	 * @param attributeName
 	 * @return Returns double value or {@link Double#MIN_VALUE} when attribute is not available or
@@ -612,7 +631,7 @@ public class Util {
 
 	/**
 	 * Parses SAX attribute
-	 * 
+	 *
 	 * @param attributes
 	 * @param attributeName
 	 * @return Returns float value or {@link Float#MIN_VALUE} when attribute is not available or
@@ -633,7 +652,7 @@ public class Util {
 
 	/**
 	 * Parses SAX attribute
-	 * 
+	 *
 	 * @param attributes
 	 * @param attributeName
 	 * @return Returns integer value or {@link Integer#MIN_VALUE} when attribute is not available or
@@ -654,7 +673,7 @@ public class Util {
 
 	/**
 	 * Parses SAX attribute
-	 * 
+	 *
 	 * @param attributes
 	 * @param attributeName
 	 * @return Returns integer value or 0 when attribute is not available or cannot be parsed.
@@ -674,7 +693,7 @@ public class Util {
 
 	/**
 	 * Parses SAX attribute
-	 * 
+	 *
 	 * @param attributes
 	 * @param attributeName
 	 * @return Returns long value or {@link Long#MIN_VALUE} when attribute is not available or
@@ -695,7 +714,7 @@ public class Util {
 
 	/**
 	 * Selects an item in the combo box which is retrieved from a state.
-	 * 
+	 *
 	 * @param state
 	 * @param stateKey
 	 * @param comboStates
@@ -726,7 +745,7 @@ public class Util {
 	/**
 	 * Selects a text item in the combo box. When text item is not available, the first item is
 	 * selected
-	 * 
+	 *
 	 * @param combo
 	 * @param comboItems
 	 * @param selectedItem
@@ -749,7 +768,7 @@ public class Util {
 
 	/**
 	 * Set the state for an integer array, integer values are converted into string value.
-	 * 
+	 *
 	 * @param state
 	 * @param stateKey
 	 * @param intValues
@@ -784,7 +803,7 @@ public class Util {
 
 	/**
 	 * Open view and activate it
-	 * 
+	 *
 	 * @param viewId
 	 * @return
 	 * @throws PartInitException
@@ -819,7 +838,7 @@ public class Util {
 
 	/**
 	 * Open view and do not activate it
-	 * 
+	 *
 	 * @param viewId
 	 * @return
 	 * @throws PartInitException
@@ -866,7 +885,7 @@ public class Util {
 	/**
 	 * This method encodes the url, removes the spaces from the url and replaces the same with
 	 * <code>"%20"</code>. This method is required to fix Bug 77840.
-	 * 
+	 *
 	 * @since 3.0.2
 	 */
 	private static String urlEncodeForSpaces(final char[] input) {

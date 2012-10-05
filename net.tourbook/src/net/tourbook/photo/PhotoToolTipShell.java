@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -47,12 +47,12 @@ public abstract class PhotoToolTipShell {
 	/**
 	 * how long each tick is when fading in/out (in ms)
 	 */
-	private static final int			FADE_TIME_INTERVAL							= UI.IS_OSX ? 10 : 10;
+	private static final int			FADE_TIME_INTERVAL							= UI.IS_OSX ? 1 : 10;
 
 	/**
 	 * Number of steps when fading in
 	 */
-	private static final int			FADE_IN_STEPS								= 11;
+	private static final int			FADE_IN_STEPS								= 10;
 
 	/**
 	 * Number of steps when fading out
@@ -210,7 +210,7 @@ public abstract class PhotoToolTipShell {
 
 	/**
 	 * Create new instance which add TooltipSupport to the widget
-	 * 
+	 *
 	 * @param state
 	 * @param ownerControl
 	 *            the control on whose action the tooltip is shown
@@ -243,7 +243,7 @@ public abstract class PhotoToolTipShell {
 
 	/**
 	 * This is called after the shell and content area are created.
-	 * 
+	 *
 	 * @param shell
 	 */
 	protected abstract void afterCreateShell(Shell shell);
@@ -531,7 +531,7 @@ public abstract class PhotoToolTipShell {
 
 	/**
 	 * Creates the content area of the the tooltip.
-	 * 
+	 *
 	 * @param parent
 	 *            the parent of the content area
 	 * @return the content area created
@@ -540,7 +540,7 @@ public abstract class PhotoToolTipShell {
 
 	/**
 	 * Create a shell but do not display it
-	 * 
+	 *
 	 * @return Returns <code>true</code> when shell is created.
 	 */
 	private void createUI() {
@@ -676,7 +676,7 @@ public abstract class PhotoToolTipShell {
 
 	/**
 	 * Get tooltip location.
-	 * 
+	 *
 	 * @param size
 	 *            Tooltip size
 	 * @return Returns location relative to the device.
@@ -1073,7 +1073,7 @@ public abstract class PhotoToolTipShell {
 
 	/**
 	 * Reparent shell
-	 * 
+	 *
 	 * @param newReparentedShell
 	 *            Shell which should be used to display {@link #_ttContentArea}.
 	 */
@@ -1195,7 +1195,7 @@ public abstract class PhotoToolTipShell {
 
 	/**
 	 * Set shell which is currently be visible.
-	 * 
+	 *
 	 * @param rrShell
 	 */
 	private void setCurrentVisibleShell(final AbstractRRShell rrShell) {
@@ -1207,7 +1207,7 @@ public abstract class PhotoToolTipShell {
 	/**
 	 * Set image gallery, this is done, after {@link #createToolTipContentArea(Event, Composite)} is
 	 * executed.
-	 * 
+	 *
 	 * @param imageGallery
 	 */
 	protected void setImageGallery(final ImageGallery imageGallery) {
@@ -1314,7 +1314,7 @@ public abstract class PhotoToolTipShell {
 	 * Add listener to all controls within the tooltip
 	 * <p>
 	 * ########################### Recursive #########################################<br>
-	 * 
+	 *
 	 * @param control
 	 */
 	private void ttAllControlsAddListener(final Control control) {
@@ -1341,7 +1341,7 @@ public abstract class PhotoToolTipShell {
 	 * Removes listener from all controls within the tooltip
 	 * <p>
 	 * ########################### Recursive #########################################<br>
-	 * 
+	 *
 	 * @param control
 	 */
 	private void ttAllControlsRemoveListener(final Control control) {
