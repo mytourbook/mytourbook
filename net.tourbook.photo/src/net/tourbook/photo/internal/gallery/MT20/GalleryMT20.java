@@ -1991,7 +1991,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 		_clientArea = getClientArea();
 
-		if (_clientArea.width == 0 || _clientArea.height == 0) {
+		if (_clientArea.width <= 1 || _clientArea.height <= 1) {
 
 			// UI is not yet initialized
 
@@ -2003,9 +2003,6 @@ public abstract class GalleryMT20 extends Canvas {
 			 * set
 			 */
 			if (_isHorizontal) {
-
-//				System.out.println(UI.timeStampNano() + " onResize\t_clientArea.height: " + _clientArea.height);
-//				// TODO remove SYSTEM.OUT.PRINTLN
 
 				_itemHeight = _clientArea.height;
 				_itemWidth = (int) (_itemHeight * _itemRatio);
@@ -2808,7 +2805,7 @@ public abstract class GalleryMT20 extends Canvas {
 			_forcedGalleryPosition = forcedGalleryPosition;
 		}
 
-		if (_clientArea.width == 0 || _clientArea.height == 0) {
+		if (_clientArea.width <= 1 || _clientArea.height <= 1) {
 
 			// UI is not yet initialized
 
