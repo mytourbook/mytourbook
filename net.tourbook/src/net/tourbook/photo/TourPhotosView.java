@@ -49,7 +49,7 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourPhotosView extends ViewPart implements IPhotoGalleryProvider {
 
-	public static final String				ID			= "net.tourbook.photo.merge.TourPhotosView.ID";	//$NON-NLS-1$
+	public static final String				ID			= "net.tourbook.photo.TourPhotosView.ID";			//$NON-NLS-1$
 
 	private final IPreferenceStore			_prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
 

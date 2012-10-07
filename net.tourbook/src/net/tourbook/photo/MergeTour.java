@@ -54,6 +54,9 @@ public class MergeTour {
 	 */
 	long							tourEndTime			= Long.MAX_VALUE;
 
+	long							historyStartTime;
+	long							historyEndTime;
+
 	private DateTime				tourStartDateTime;
 	Period							tourPeriod;
 
@@ -154,6 +157,9 @@ public class MergeTour {
 			tourStartTime = tourStart - 1000;
 			tourEndTime = tourStart + 1000;
 
+			historyStartTime = tourStartTime;
+			historyEndTime = tourEndTime;
+
 		} else {
 
 			// add additional 5% tour time that the tour do not start/end at the chart border
@@ -217,6 +223,7 @@ public class MergeTour {
 		}
 
 		tourEndTime = endTime;
+		historyEndTime = endTime;
 
 		if (isDummyTour) {
 			finalizeDummyTour();
@@ -230,6 +237,8 @@ public class MergeTour {
 
 		tourStartTime = time;
 		tourStartDateTime = new DateTime(time);
+
+		historyStartTime = time;
 	}
 
 }

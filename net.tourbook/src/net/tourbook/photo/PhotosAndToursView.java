@@ -212,8 +212,8 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 			/*
 			 * sort by time
 			 */
-			final long mt1Time = mt1.tourStartTime;
-			final long mt2Time = mt2.tourStartTime;
+			final long mt1Time = mt1.historyStartTime;
+			final long mt2Time = mt2.historyStartTime;
 
 			if (mt1Time != 0 && mt2Time != 0) {
 				return mt1Time > mt2Time ? 1 : -1;
@@ -977,7 +977,7 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 			public void update(final ViewerCell cell) {
 
 				final MergeTour mergedTour = (MergeTour) cell.getElement();
-				final long time = mergedTour.tourEndTime;
+				final long time = mergedTour.historyEndTime;
 
 				cell.setText(time == 0 ? UI.EMPTY_STRING : _dateFormatter.print(time));
 			}
@@ -995,7 +995,7 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 			public void update(final ViewerCell cell) {
 
 				final MergeTour mergedTour = (MergeTour) cell.getElement();
-				final long time = mergedTour.tourEndTime;
+				final long time = mergedTour.historyEndTime;
 
 				cell.setText(time == 0 ? UI.EMPTY_STRING : _timeFormatter.print(time));
 			}
@@ -1015,7 +1015,7 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 			public void update(final ViewerCell cell) {
 
 				final MergeTour mergedTour = (MergeTour) cell.getElement();
-				final long time = mergedTour.tourStartTime;
+				final long time = mergedTour.historyStartTime;
 
 				cell.setText(time == 0 ? UI.EMPTY_STRING : _dateFormatter.print(time));
 			}
@@ -1033,7 +1033,7 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 			public void update(final ViewerCell cell) {
 
 				final MergeTour mergedTour = (MergeTour) cell.getElement();
-				final long time = mergedTour.tourStartTime;
+				final long time = mergedTour.historyStartTime;
 
 				cell.setText(time == 0 ? UI.EMPTY_STRING : _timeFormatter.print(time));
 			}
