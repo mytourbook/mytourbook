@@ -36,6 +36,8 @@ import net.tourbook.chart.IChartLayer;
 import net.tourbook.chart.IFillPainter;
 import net.tourbook.chart.IHoveredListener;
 import net.tourbook.chart.ITooltipOwner;
+import net.tourbook.colors.ColorDefinition;
+import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.util.IToolTipHideListener;
@@ -333,8 +335,9 @@ public class TourChart extends Chart {
 
 		addPrefListeners();
 
-//		_photoOverlayBGColor = new Color(getDisplay(), new RGB(0xFF, 0x6F, 0x00));
-		_photoOverlayBGColor = new Color(getDisplay(), new RGB(0xFF, 0x80, 0x33));
+		final ColorDefinition colorDefinition = GraphColorProvider.getInstance()//
+				.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_HISTORY);
+		_photoOverlayBGColor = new Color(getDisplay(), colorDefinition.getLineColor());
 		_photoOverlay.setBackgroundColor(_photoOverlayBGColor);
 
 		/*
@@ -1707,6 +1710,8 @@ public class TourChart extends Chart {
 		setGraphDataLayers(TourManager.CUSTOM_DATA_ALTIMETER, _tourData.segmentSerieAltitudeUpH, yDataWithLabels);
 		setGraphDataLayers(TourManager.CUSTOM_DATA_TEMPERATURE, null, yDataWithLabels);
 		setGraphDataLayers(TourManager.CUSTOM_DATA_CADENCE, null, yDataWithLabels);
+
+		setGraphDataLayers(TourManager.CUSTOM_DATA_HISTORY, null, null);
 	}
 
 	/**
@@ -1745,7 +1750,10 @@ public class TourChart extends Chart {
 		 * photo layer
 		 */
 		// show photo layer only for ONE visible graph
-		if (_layerPhoto != null && _tourChartConfig.isShowTourPhotos == true && yData == yDataWithLabels) {
+		if (_layerPhoto != null
+				&& _tourChartConfig.isShowTourPhotos == true
+				&& (yData == yDataWithLabels || dataModel.getChartType() == ChartDataModel.CHART_TYPE_HISTORY)) {
+
 			customFgLayers.add(_layerPhoto);
 		}
 

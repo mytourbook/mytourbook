@@ -34,7 +34,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.photo.internal.Activator;
 import net.tourbook.photo.internal.GalleryActionBar;
-import net.tourbook.photo.internal.GalleryPhotoToolTip2;
+import net.tourbook.photo.internal.GalleryPhotoToolTip;
 import net.tourbook.photo.internal.ImageFilter;
 import net.tourbook.photo.internal.Messages;
 import net.tourbook.photo.internal.PhotoDateInfo;
@@ -80,6 +80,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.progress.UIJob;
 
@@ -209,8 +210,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 	private FullScreenImageViewer								_fullScreenImageViewer;
 
-//	private GalleryPhotoToolTip									_photoTooltip;
-	private GalleryPhotoToolTip2								_photoTooltip2;
+	private GalleryPhotoToolTip									_photoGalleryTooltip;
 
 	/**
 	 * Folder which images are currently be displayed
@@ -539,8 +539,8 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 			}
 		}
 
-		_photoTooltip2 = new GalleryPhotoToolTip2(_galleryMT20);
-		_photoTooltip2.setReceiveMouseMoveEvent(true);
+		_photoGalleryTooltip = new GalleryPhotoToolTip(_galleryMT20);
+		_photoGalleryTooltip.setReceiveMouseMoveEvent(true);
 
 		_galleryMT20.addItemHoveredListener(this);
 	}
@@ -924,7 +924,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	public void hoveredItem(final GalleryMT20Item hoveredItem) {
 
 		if (_isShowTooltip) {
-			_photoTooltip2.show(hoveredItem);
+			_photoGalleryTooltip.show(hoveredItem);
 		}
 	}
 
@@ -1561,6 +1561,10 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		_photoRenderer.setFont(_galleryFont);
 	}
 
+	public void onReparentShell(final Shell reparentedShell) {
+		_photoGalleryTooltip.onReparentShell(reparentedShell);
+	}
+
 	private void onSelectPhoto() {
 
 		// show default message
@@ -2020,8 +2024,8 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 		_newGalleryPositionKey = galleryPositionKey;
 
-		// initialize tooltip for a new folder
-		_photoTooltip2.reset(true);
+		// initialize tooltip for new images
+		_photoGalleryTooltip.reset(true);
 
 		_allPhotoWrapper = photoWrapper;
 
@@ -2046,7 +2050,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		_isShowTooltip = isShowTooltip;
 
 		// reset tooltip, otherwise it could be displayed if it should not
-		_photoTooltip2.reset(true);
+		_photoGalleryTooltip.reset(true);
 
 		_galleryMT20.redraw();
 	}
@@ -2192,8 +2196,8 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 				_galleryActionBar.updateUI_AfterZoomInOut(imageSizeWithoutBorder);
 			}
 
-			_photoTooltip2.setGalleryImageSize(_photoImageSize);
-			_photoTooltip2.reset(true);
+			_photoGalleryTooltip.setGalleryImageSize(_photoImageSize);
+			_photoGalleryTooltip.reset(true);
 		}
 	}
 
@@ -2443,7 +2447,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 				}
 
 				// initialize tooltip for a new folder
-				_photoTooltip2.reset(true);
+				_photoGalleryTooltip.reset(true);
 
 				final double galleryPosition = getCachedGalleryPosition();
 

@@ -32,8 +32,6 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 
 	private ArrayList<ChartPhoto>	_hoveredPhotos	= new ArrayList<ChartPhoto>();
 
-	private int						_devXHoveredPhoto;
-	private int						_devYHoveredPhoto;
 	private int						_devXGridCenterX;
 
 //	/**
@@ -121,9 +119,6 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 
 		final int hoveredXPos = devXMouseMove;
 
-		_devXHoveredPhoto = Integer.MAX_VALUE;
-		_devYHoveredPhoto = Integer.MAX_VALUE;
-
 		for (final PhotoGroup photoGroup : photoGroups) {
 
 			if (hoveredXPos >= photoGroup.hGridStart && hoveredXPos <= photoGroup.hGridEnd) {
@@ -140,8 +135,6 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 				}
 
 				// set tooltip position
-				_devXHoveredPhoto = photoGroup.groupCenterPosition.x;
-				_devYHoveredPhoto = photoGroup.groupCenterPosition.y;
 				_devXGridCenterX = photoGroup.hGridStart + (ChartLayerPhoto.GROUP_HORIZONTAL_WIDTH / 2);
 			}
 		}
@@ -155,5 +148,6 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 			showPhotoToolTip(_hoveredPhotos);
 		}
 	}
+
 
 }

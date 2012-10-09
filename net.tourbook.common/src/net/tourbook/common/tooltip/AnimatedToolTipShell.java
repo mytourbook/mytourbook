@@ -312,6 +312,8 @@ public abstract class AnimatedToolTipShell {
 
 				_shell.setLocation(_shellStartLocation.x, _shellStartLocation.y);
 
+				_shell.setAlpha(0);
+
 				setShellVisible(true);
 			}
 
@@ -686,6 +688,20 @@ public abstract class AnimatedToolTipShell {
 			showShellWhenVisible();
 			break;
 		}
+	}
+
+	public void onReparentShell(final Shell reparentedShell) {
+
+		/*
+		 * reparenting a shells parent which is a shell do NOT work
+		 */
+
+		if (_shell != null && _shell.isDisposed() == false && _shell.isVisible()) {
+			_shell.setVisible(false);
+		}
+
+		// stop animation
+		_isShellFadingIn = _isShellFadingOut = false;
 	}
 
 	private void onTTAllControlsEvent(final Event event) {

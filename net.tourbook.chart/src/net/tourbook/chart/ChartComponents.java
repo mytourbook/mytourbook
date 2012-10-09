@@ -554,20 +554,24 @@ public class ChartComponents extends Composite {
 
 		if (unitType == ChartDataSerie.AXIS_UNIT_NUMBER) {
 
-			createDrawingDataYValues10Numbers(drawingData, graphCount, currentGraph);
+			createDrawingDataYValues_10_Numbers(drawingData, graphCount, currentGraph);
 
 		} else if (unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE
 				|| unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H
 				|| unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_SECOND
 				|| unitType == ChartDataSerie.AXIS_UNIT_MINUTE_SECOND) {
 
-			createDrawingDataYValues20Time(drawingData, graphCount, currentGraph);
+			createDrawingDataYValues_20_Time(drawingData, graphCount, currentGraph);
+
+		} else if (unitType == ChartDataSerie.AXIS_UNIT_HISTORY) {
+
+			createDrawingDataYValues_30_History(drawingData, graphCount, currentGraph);
 		}
 	}
 
-	private void createDrawingDataYValues10Numbers(	final GraphDrawingData drawingData,
-													final int graphCount,
-													final int currentGraph) {
+	private void createDrawingDataYValues_10_Numbers(	final GraphDrawingData drawingData,
+														final int graphCount,
+														final int currentGraph) {
 
 		final ChartDataYSerie yData = drawingData.getYData();
 		final int unitType = yData.getAxisUnit();
@@ -769,9 +773,9 @@ public class ChartComponents extends Composite {
 		}
 	}
 
-	private void createDrawingDataYValues20Time(final GraphDrawingData drawingData,
-												final int graphCount,
-												final int currentGraph) {
+	private void createDrawingDataYValues_20_Time(	final GraphDrawingData drawingData,
+													final int graphCount,
+													final int currentGraph) {
 
 		final ChartDataYSerie yData = drawingData.getYData();
 
@@ -938,6 +942,170 @@ public class ChartComponents extends Composite {
 			unitList.add(new ChartUnit(graphMaxValue, Util.EMPTY_STRING));
 		}
 
+	}
+
+	private void createDrawingDataYValues_30_History(	final GraphDrawingData drawingData,
+														final int graphCount,
+														final int currentGraph) {
+
+		final ChartDataYSerie yData = drawingData.getYData();
+
+		// height of one chart graph including the slider bar
+		final int devChartHeight = getDevChartHeightWithoutTrim();
+
+		int devGraphHeight = devChartHeight;
+
+		/*
+		 * adjust graph device height for stacked graphs, a gap is between two graphs
+		 */
+		if (_chartDataModel.isStackedChart() && graphCount > 1) {
+			final int devGraphHeightSpace = devGraphHeight - (_chartsVerticalDistance * (graphCount - 1));
+			devGraphHeight = (devGraphHeightSpace / graphCount);
+		}
+
+		// enforce minimum chart height
+		devGraphHeight = Math.max(devGraphHeight, CHART_MIN_HEIGHT);
+
+		// remove slider bar from graph height
+		devGraphHeight -= _devSliderBarHeight;
+
+		/*
+		 * all variables starting with graph... contain data values from the graph which are not
+		 * scaled to the device
+		 */
+
+		final float graphMinValue = yData.getVisibleMinValue();
+		final float graphMaxValue = yData.getVisibleMaxValue();
+
+		final float defaultValueRange = graphMaxValue > 0
+				? (graphMaxValue - graphMinValue)
+				: -(graphMinValue - graphMaxValue);
+
+		/*
+		 * calculate the number of units which will be visible by dividing the available height by
+		 * the minimum size which one unit should have in pixels
+		 */
+		final int defaultUnitCount = devGraphHeight / _chart.gridVerticalDistance;
+
+		// defaultUnitValue is the number in data values for one unit
+		final float defaultUnitValue = defaultValueRange / Math.max(1, defaultUnitCount);
+
+		// round the unit
+		final double graphUnit = Util.roundDecimalValue(defaultUnitValue);
+
+		/*
+		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		 * The scaled unit with long min/max values is used because arithmetic with floating point
+		 * values fails. BigDecimal is necessary otherwise the scaledUnit can be wrong !!!
+		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		 */
+		final long valueScaling = Util.getValueScaling(graphUnit);
+
+		final BigDecimal bigGraphUnit = new BigDecimal(Double.valueOf(graphUnit));
+		final BigDecimal bigValueScaling = new BigDecimal(valueScaling);
+		final BigDecimal bigScaledUnit = bigGraphUnit.multiply(bigValueScaling);
+
+		final long scaledUnit = bigScaledUnit.longValue();
+
+		long scaledMinValue = (long) (graphMinValue * valueScaling);
+		long scaledMaxValue = (long) (graphMaxValue * valueScaling);
+
+		/*
+		 * adjustedYValue is set when the y-slider has been moved
+		 */
+		boolean isMinAdjusted = false;
+		boolean isMaxAdjusted = false;
+		final float adjustedYValue = yData.adjustedYValue;
+		final boolean isMinMaxAdjusted = adjustedYValue != Float.MIN_VALUE;
+
+		if (isMinMaxAdjusted) {
+
+			final long scaledAdjustedYValue = (long) (adjustedYValue * valueScaling);
+
+			isMinAdjusted = scaledAdjustedYValue == scaledMinValue;
+			isMaxAdjusted = scaledAdjustedYValue == scaledMaxValue;
+		}
+
+		/*
+		 * adjust min value, decrease min value when it does not fit to unit borders
+		 */
+		float adjustMinValue = 0;
+		final long minRemainder = scaledMinValue % scaledUnit;
+		if (minRemainder != 0 && scaledMinValue < 0) {
+			adjustMinValue = scaledUnit;
+		}
+		final long adjustedScaledMinValue = (long) ((scaledMinValue - adjustMinValue) / scaledUnit) * scaledUnit;
+
+		/*
+		 * ensure that min value is not at the bottom of the graph, except values which start at 0
+		 */
+		if (isMinMaxAdjusted == false && scaledMinValue == adjustedScaledMinValue && scaledMinValue != 0) {
+			scaledMinValue = adjustedScaledMinValue - scaledUnit;
+		} else if (isMinMaxAdjusted && isMinAdjusted) {
+			scaledMinValue = adjustedScaledMinValue;// - scaledUnit;
+		} else {
+			scaledMinValue = adjustedScaledMinValue;
+		}
+
+		/*
+		 * adjust max value, increase the max value when it does not fit to unit borders
+		 */
+		float adjustMaxValue = 0;
+		final long maxRemainder = scaledMaxValue % scaledUnit;
+		if (maxRemainder != 0) {
+			adjustMaxValue = scaledUnit;
+		}
+		final long adjustedScaledMaxValue = ((long) ((scaledMaxValue + adjustMaxValue) / scaledUnit) * scaledUnit);
+
+		// ensure that max value is not at the top of the graph
+		if (isMinMaxAdjusted == false && scaledMaxValue == adjustedScaledMaxValue) {
+			scaledMaxValue = adjustedScaledMaxValue + scaledUnit;
+		} else if (isMinMaxAdjusted && isMaxAdjusted) {
+			scaledMaxValue = adjustedScaledMaxValue;// + scaledUnit;
+		} else {
+			scaledMaxValue = adjustedScaledMaxValue;
+		}
+
+		/*
+		 * check that max is larger than min
+		 */
+		if (scaledMinValue == scaledMaxValue) {
+
+			scaledMinValue = scaledMinValue - scaledUnit;
+			scaledMaxValue = scaledMaxValue + scaledUnit;
+
+		} else if (scaledMinValue > scaledMaxValue) {
+			/*
+			 * this case can happen when the min value is set in the pref dialog, this is more a
+			 * hack than a good solution
+			 */
+			scaledMinValue = scaledMaxValue - (2 * scaledUnit);
+		}
+
+		// calculate the vertical device offset
+		int devYTop = _devMarginTop + _devXTitleBarHeight;
+
+		if (_chartDataModel.isStackedChart()) {
+			// each chart has its own drawing rectangle which are stacked on
+			// top of each other
+			devYTop += (currentGraph * (devGraphHeight + _devSliderBarHeight))
+					+ ((currentGraph - 1) * _chartsVerticalDistance);
+
+		} else {
+			// all charts are drawn on the same rectangle
+			devYTop += devGraphHeight;
+		}
+
+//		drawingData.setScaleY(graphScaleY);
+
+		drawingData.setDevYBottom(devYTop);
+		drawingData.setDevYTop(devYTop - devGraphHeight);
+
+		drawingData.setGraphYBottom((float) scaledMinValue / valueScaling);
+		drawingData.setGraphYTop((float) scaledMaxValue / valueScaling);
+
+		drawingData.devGraphHeight = devGraphHeight;
+		drawingData.setDevSliderHeight(0);
 	}
 
 	private void createMonthEqualUnits(	final GraphDrawingData drawingData,

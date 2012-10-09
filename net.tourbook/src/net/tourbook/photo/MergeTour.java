@@ -118,7 +118,7 @@ public class MergeTour {
 		final TimeData timeData = new TimeData();
 
 		timeData.absoluteTime = timeSliceTime;
-		timeData.absoluteAltitude = 1.0f;
+//		timeData.absoluteAltitude = 1.0f;
 
 		dtList.add(timeData);
 	}
@@ -165,7 +165,7 @@ public class MergeTour {
 			// add additional 5% tour time that the tour do not start/end at the chart border
 
 			final long timeDiff = tourEnd - tourStart;
-			final long timeOffset = (long) (timeDiff * 0.05);
+			final long timeOffset = (long) (timeDiff * 0.02);
 
 			tourStartTime = tourStart - timeOffset;
 			tourEndTime = tourEnd + timeOffset;

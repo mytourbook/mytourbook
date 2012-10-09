@@ -239,7 +239,7 @@ public class ChartComponentAxis extends Canvas {
 		for (final GraphDrawingData drawingData : _graphDrawingData) {
 
 			final ArrayList<ChartUnit> yUnits = drawingData.getYUnits();
-			final int unitListSize = yUnits.size();
+			final int numberOfUnits = yUnits.size();
 
 			final double scaleY = drawingData.getScaleY();
 			final ChartDataYSerie yData = drawingData.getYData();
@@ -306,7 +306,7 @@ public class ChartComponentAxis extends Canvas {
 				final float unitValue = yUnit.value;
 				final float devYUnit = (float) (((unitValue - graphYBottom) * scaleY) + .5);
 
-				if (isBottomUp || unitListSize == 1) {
+				if (isBottomUp || numberOfUnits == 1) {
 					devY = devYBottom - (int) devYUnit;
 				} else {
 					devY = devYTop + (int) devYUnit;
@@ -337,9 +337,13 @@ public class ChartComponentAxis extends Canvas {
 				}
 			}
 
-			// draw the unit line
-			gc.setForeground(display.getSystemColor(SWT.COLOR_DARK_GRAY));
-			gc.drawLine(devX, devYBottom, devX, devYTop);
+			if (numberOfUnits > 0) {
+
+				// draw unit line only when units are available
+
+				gc.setForeground(display.getSystemColor(SWT.COLOR_DARK_GRAY));
+				gc.drawLine(devX, devYBottom, devX, devYTop);
+			}
 		}
 	}
 

@@ -29,6 +29,7 @@ public class ChartDataModel {
 	public static final int				CHART_TYPE_BAR				= 20;
 	public static final int				CHART_TYPE_LINE_WITH_BARS	= 30;
 	public static final int				CHART_TYPE_XY_SCATTER		= 40;
+	public static final int				CHART_TYPE_HISTORY			= 50;
 
 	public static final String			BAR_TOOLTIP_INFO_PROVIDER	= "BarToolTipInfoProvider";		//$NON-NLS-1$
 	public static final String			BAR_CONTEXT_PROVIDER		= "BarContextProvider";			//$NON-NLS-1$
@@ -199,6 +200,10 @@ public class ChartDataModel {
 
 	public void setChartMinWidth(final int chartMinWidth) {
 		_chartMinWidth = chartMinWidth;
+	}
+
+	public void setChartType(final int chartType) {
+		_chartType = chartType;
 	}
 
 	/**

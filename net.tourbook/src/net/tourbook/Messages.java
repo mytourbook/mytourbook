@@ -542,6 +542,8 @@ public class Messages extends NLS {
 	public static String		Graph_Label_Gradient;
 	public static String		Graph_Label_Heartbeat;
 	public static String		Graph_Label_Heartbeat_unit;
+
+	public static String	Graph_Label_History;
 	public static String		Graph_Label_Pace;
 	public static String		Graph_Label_Power;
 	public static String		Graph_Label_Power_unit;

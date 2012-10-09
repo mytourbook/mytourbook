@@ -21,6 +21,7 @@ package net.tourbook.ui.tourChart;
 import java.util.ArrayList;
 
 import net.tourbook.chart.Chart;
+import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDrawingData;
 import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IChartLayer;
@@ -188,6 +189,8 @@ public class ChartLayerPhoto implements IChartLayer {
 		final double scaleX = graphDrawingData.getScaleX();
 		final double scaleY = graphDrawingData.getScaleY();
 
+		final boolean isHistory = graphDrawingData.getChartType() == ChartDataModel.CHART_TYPE_HISTORY;
+
 		final int lineWidth = 2;
 		int photoIndex = 0;
 
@@ -217,14 +220,8 @@ public class ChartLayerPhoto implements IChartLayer {
 
 		for (final ChartPhoto chartPhoto : _chartPhotos) {
 
-			final float yValue = yValues[chartPhoto.serieIndex];
-			final int devYGraph = (int) ((yValue - graphYBottom) * scaleY);
-
 			final int devXValue = (int) (chartPhoto.xValue * scaleX) - devGraphImageOffset;
-			final int devYValue = devYBottom - devYGraph;
-
 			final int devXPhoto = devXValue;
-			int devYPhoto = devYValue - PHOTO_ICON_WIDTH - 2;
 
 			// check if photo is visible
 			if (devXPhoto < groupHGrid) {
@@ -242,16 +239,30 @@ public class ChartLayerPhoto implements IChartLayer {
 				break;
 			}
 
-			// force photo marker to be not below the bottom
-			if (devYPhoto + PHOTO_ICON_WIDTH > devYBottom) {
-				devYPhoto = devYBottom - PHOTO_ICON_WIDTH;
-//				gc.setForeground(display.getSystemColor(SWT.COLOR_MAGENTA));
-			}
+			int devYPhoto;
+			if (isHistory) {
 
-			// force photo marker to be not above the top
-			if (devYPhoto < devYTop) {
-				devYPhoto = devYTop + lineWidth;
+				final int devYHeight = devYBottom - devYTop;
+				devYPhoto = devYBottom - devYHeight / 2;
+
+			} else {
+
+				final float yValue = yValues[chartPhoto.serieIndex];
+				final int devYGraph = (int) ((yValue - graphYBottom) * scaleY);
+				final int devYValue = devYBottom - devYGraph;
+				devYPhoto = devYValue - PHOTO_ICON_WIDTH - 2;
+
+				// force photo marker to be not below the bottom
+				if (devYPhoto + PHOTO_ICON_WIDTH > devYBottom) {
+					devYPhoto = devYBottom - PHOTO_ICON_WIDTH;
 //				gc.setForeground(display.getSystemColor(SWT.COLOR_MAGENTA));
+				}
+
+				// force photo marker to be not above the top
+				if (devYPhoto < devYTop) {
+					devYPhoto = devYTop + lineWidth;
+//				gc.setForeground(display.getSystemColor(SWT.COLOR_MAGENTA));
+				}
 			}
 
 			// keep photo position which is used when tooltip is displayed

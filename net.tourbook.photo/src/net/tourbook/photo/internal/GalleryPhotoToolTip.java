@@ -18,8 +18,8 @@ package net.tourbook.photo.internal;
 import java.text.NumberFormat;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.tooltip.AnimatedToolTipShell;
 import net.tourbook.common.util.StatusUtil;
-import net.tourbook.common.util.ToolTip;
 import net.tourbook.photo.ImageQuality;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoImageCache;
@@ -32,8 +32,8 @@ import net.tourbook.photo.internal.gallery.MT20.RendererHelper;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
@@ -45,14 +45,16 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-public class GalleryPhotoToolTip extends ToolTip {
+/**
+ * created: 4.10.2012
+ */
+public class GalleryPhotoToolTip extends AnimatedToolTipShell {
 
 	private static final int		DEFAULT_TEXT_WIDTH	= 50;
 
@@ -90,10 +92,6 @@ public class GalleryPhotoToolTip extends ToolTip {
 	/*
 	 * UI resources
 	 */
-//	private Color					_bgColor;
-//	private Color					_fgColor;
-//	private Font					_boldFont;
-
 	private Image					_photoImage;
 
 	private Canvas					_canvas;
@@ -101,22 +99,25 @@ public class GalleryPhotoToolTip extends ToolTip {
 
 	private Label					_labelError;
 
-	public GalleryPhotoToolTip(final GalleryMT20 control) {
+	public GalleryPhotoToolTip(final GalleryMT20 gallery) {
 
-		super(control, NO_RECREATE, false);
+		super(gallery);
 
-		_gallery = control;
-
-		initUI(control);
+		_gallery = gallery;
 	}
 
 	@Override
-	protected void afterHideToolTip(final Event event) {
-		reset();
+	protected void beforeHideToolTip() {
+		reset(false);
 	}
 
 	@Override
-	protected Composite createToolTipContentArea(final Event event, final Composite parent) {
+	protected boolean canShowToolTip() {
+		return _photo != null;
+	}
+
+	@Override
+	protected Composite createToolTipContentArea(final Composite parent) {
 
 		if (_photo == null) {
 			return null;
@@ -124,9 +125,7 @@ public class GalleryPhotoToolTip extends ToolTip {
 
 		final Composite container = createUI(parent);
 
-		/*
-		 * set colors for all controls
-		 */
+		// set colors for all controls
 		updateUI_colors(parent);
 
 		return container;
@@ -134,7 +133,7 @@ public class GalleryPhotoToolTip extends ToolTip {
 
 	private Composite createUI(final Composite parent) {
 
-		parent.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+//		parent.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
 		final int imageWidth = _photo.getImageWidth();
 		final boolean isImageLoaded = imageWidth != Integer.MIN_VALUE;
@@ -145,7 +144,7 @@ public class GalleryPhotoToolTip extends ToolTip {
 				.spacing(3, 1)
 				.numColumns(1)
 				.applyTo(container);
-		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 		{
 			final Composite containerHeader = new Composite(container, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(containerHeader);
@@ -428,7 +427,7 @@ public class GalleryPhotoToolTip extends ToolTip {
 				.numColumns(1)
 				.extendedMargins(0, 0, 5, 5)
 				.applyTo(_canvasContainer);
-		_canvasContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//		_canvasContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
 			_canvas = new Canvas(_canvasContainer, SWT.NONE);
 			GridDataFactory.fillDefaults()//
@@ -449,7 +448,7 @@ public class GalleryPhotoToolTip extends ToolTip {
 	}
 
 	@Override
-	public Point getLocation(final Point tipSize, final Event event) {
+	public Point getToolTipLocation(final Point tipSize) {
 
 		if (_currentHoveredGalleryItem.imagePaintedWidth == -1) {
 
@@ -500,19 +499,10 @@ public class GalleryPhotoToolTip extends ToolTip {
 		return _gallery.toDisplay(ttPosX, ttPosY);
 	}
 
-	private void initUI(final Control control) {
+	@Override
+	protected void onMouseMoveInToolTip(final MouseEvent mouseEvent) {
 
-//		final Display display = control.getDisplay();
-//
-//		_bgColor = display.getSystemColor(SWT.COLOR_INFO_BACKGROUND);
-//		_fgColor = display.getSystemColor(SWT.COLOR_INFO_FOREGROUND);
-//		_bgColor = _gallery.getBackground();
-//		_fgColor = _gallery.getForeground();
-
-//		_boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
-
-		final PixelConverter pc = new PixelConverter(control);
-		_defaultTextWidthPixel = pc.convertWidthInCharsToPixels(DEFAULT_TEXT_WIDTH);
+		_gallery.onMouseMoveExternal(mouseEvent);
 	}
 
 	private void onPaintImage(final PaintEvent event) {
@@ -544,27 +534,19 @@ public class GalleryPhotoToolTip extends ToolTip {
 		}
 	}
 
-	public void reset() {
+	public void reset(final boolean isHide) {
 
 		_currentHoveredGalleryItem = null;
 		_photoWrapper = null;
 		_photo = null;
 
-		hide();
+		if (isHide) {
+			hide();
+		}
 	}
 
 	public void setGalleryImageSize(final int photoImageSize) {
 		_galleryImageSize = photoImageSize;
-	}
-
-	@Override
-	protected boolean shouldCreateToolTip(final Event event) {
-
-		if (super.shouldCreateToolTip(event) == false) {
-			return false;
-		}
-
-		return _photo != null;
 	}
 
 	public void show(final GalleryMT20Item hoveredItem) {
@@ -574,36 +556,35 @@ public class GalleryPhotoToolTip extends ToolTip {
 			return;
 		}
 
+//		System.out.println(UI.timeStampNano() + " show " + hoveredItem + "   " + _currentHoveredGalleryItem);
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
 		if (hoveredItem == null) {
 
 			// hide tooltip
 
-			reset();
+			reset(true);
 
 		} else {
 
 			// another item is hovered, show tooltip
 
 			if (_currentHoveredGalleryItem != null) {
-				reset();
+				reset(true);
 			}
 
 			_photoWrapper = (PhotoWrapper) hoveredItem.customData;
 
 			if (_photoWrapper == null) {
 
-				reset();
+				reset(true);
 
 			} else {
 
 				_currentHoveredGalleryItem = hoveredItem;
 				_photo = _photoWrapper.photo;
 
-				final Point location = new Point(//
-						hoveredItem.viewPortX,
-						hoveredItem.viewPortY + hoveredItem.height);
-
-				show(location);
+				showToolTip();
 			}
 		}
 	}

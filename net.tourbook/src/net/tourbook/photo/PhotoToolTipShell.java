@@ -139,8 +139,6 @@ public abstract class PhotoToolTipShell {
 	 */
 	private Display						_display;
 
-	private ImageGallery				_imageGallery;
-
 	private Composite					_ttContentArea;
 
 	/**
@@ -210,7 +208,7 @@ public abstract class PhotoToolTipShell {
 
 	/**
 	 * Create new instance which add TooltipSupport to the widget
-	 *
+	 * 
 	 * @param state
 	 * @param ownerControl
 	 *            the control on whose action the tooltip is shown
@@ -243,7 +241,7 @@ public abstract class PhotoToolTipShell {
 
 	/**
 	 * This is called after the shell and content area are created.
-	 *
+	 * 
 	 * @param shell
 	 */
 	protected abstract void afterCreateShell(Shell shell);
@@ -531,7 +529,7 @@ public abstract class PhotoToolTipShell {
 
 	/**
 	 * Creates the content area of the the tooltip.
-	 *
+	 * 
 	 * @param parent
 	 *            the parent of the content area
 	 * @return the content area created
@@ -540,7 +538,7 @@ public abstract class PhotoToolTipShell {
 
 	/**
 	 * Create a shell but do not display it
-	 *
+	 * 
 	 * @return Returns <code>true</code> when shell is created.
 	 */
 	private void createUI() {
@@ -598,14 +596,6 @@ public abstract class PhotoToolTipShell {
 		updateUI_Colors();
 
 		afterCreateShell(_visibleShell);
-	}
-
-	private void delay() {
-		try {
-			Thread.sleep(500);
-		} catch (final InterruptedException e) {
-			e.printStackTrace();
-		}
 	}
 
 	private Point fixupDisplayBounds(final Point tipSize, final Point location) {
@@ -676,7 +666,7 @@ public abstract class PhotoToolTipShell {
 
 	/**
 	 * Get tooltip location.
-	 *
+	 * 
 	 * @param size
 	 *            Tooltip size
 	 * @return Returns location relative to the device.
@@ -756,6 +746,8 @@ public abstract class PhotoToolTipShell {
 			break;
 		}
 	}
+
+	protected abstract void onReparentShell(Shell reparentedShell) ;
 
 	private void onTTAllControlsEvent(final Event event) {
 
@@ -1073,7 +1065,7 @@ public abstract class PhotoToolTipShell {
 
 	/**
 	 * Reparent shell
-	 *
+	 * 
 	 * @param newReparentedShell
 	 *            Shell which should be used to display {@link #_ttContentArea}.
 	 */
@@ -1085,6 +1077,7 @@ public abstract class PhotoToolTipShell {
 		}
 
 		final Shell prevShell = _visibleShell;
+		Shell reparentedShell;
 
 		ttAllControlsRemoveListener(prevShell);
 
@@ -1099,6 +1092,8 @@ public abstract class PhotoToolTipShell {
 
 			_rrShellWithResize.reparentFromOtherShell(_rrShellNoResize, _ttContentArea);
 
+			reparentedShell = _rrShellWithResize.getShell();
+
 			trimDiffX -= trimDiffX;
 			trimDiffY -= trimDiffY;
 
@@ -1107,7 +1102,11 @@ public abstract class PhotoToolTipShell {
 			// setup no resize shell
 
 			_rrShellNoResize.reparentFromOtherShell(_rrShellWithResize, _ttContentArea);
+
+			reparentedShell = _rrShellNoResize.getShell();
 		}
+
+		onReparentShell(reparentedShell);
 
 		// hide previous shell
 		prevShell.setVisible(false);
@@ -1195,7 +1194,7 @@ public abstract class PhotoToolTipShell {
 
 	/**
 	 * Set shell which is currently be visible.
-	 *
+	 * 
 	 * @param rrShell
 	 */
 	private void setCurrentVisibleShell(final AbstractRRShell rrShell) {
@@ -1204,15 +1203,15 @@ public abstract class PhotoToolTipShell {
 		_visibleShell = rrShell.getShell();
 	}
 
-	/**
-	 * Set image gallery, this is done, after {@link #createToolTipContentArea(Event, Composite)} is
-	 * executed.
-	 *
-	 * @param imageGallery
-	 */
-	protected void setImageGallery(final ImageGallery imageGallery) {
-		_imageGallery = imageGallery;
-	}
+//	/**
+//	 * Set image gallery, this is done, after {@link #createToolTipContentArea(Event, Composite)} is
+//	 * executed.
+//	 *
+//	 * @param imageGallery
+//	 */
+//	protected void setImageGallery(final ImageGallery imageGallery) {
+//		_imageGallery = imageGallery;
+//	}
 
 	protected void setIsShellToggle() {
 		_isShellToggled = true;
@@ -1314,7 +1313,7 @@ public abstract class PhotoToolTipShell {
 	 * Add listener to all controls within the tooltip
 	 * <p>
 	 * ########################### Recursive #########################################<br>
-	 *
+	 * 
 	 * @param control
 	 */
 	private void ttAllControlsAddListener(final Control control) {
@@ -1341,7 +1340,7 @@ public abstract class PhotoToolTipShell {
 	 * Removes listener from all controls within the tooltip
 	 * <p>
 	 * ########################### Recursive #########################################<br>
-	 *
+	 * 
 	 * @param control
 	 */
 	private void ttAllControlsRemoveListener(final Control control) {

@@ -285,7 +285,9 @@ public class ChartDataYSerie extends ChartDataSerie {
 	void setMinMaxValues(final float[][] valueSeries) {
 
 		if (valueSeries == null || valueSeries.length == 0 || valueSeries[0] == null || valueSeries[0].length == 0) {
+
 			_highValues = new float[0][0];
+
 			_visibleMaxValue = _visibleMinValue = 0;
 			_originalMaxValue = _originalMinValue = 0;
 
@@ -298,7 +300,8 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 			if (_chartType == ChartDataModel.CHART_TYPE_LINE
 					|| _chartType == ChartDataModel.CHART_TYPE_LINE_WITH_BARS
-					|| _chartType == ChartDataModel.CHART_TYPE_XY_SCATTER) {
+					|| _chartType == ChartDataModel.CHART_TYPE_XY_SCATTER
+					|| _chartType == ChartDataModel.CHART_TYPE_HISTORY) {
 
 				super.setMinMaxValues(valueSeries);
 

@@ -1456,7 +1456,7 @@ public class ChartComponentGraph extends Canvas {
 	 * 
 	 * @return Return <code>true</code> when the graph was painted directly and not in async mode
 	 */
-	private boolean drawAsync100StartPainting() {
+	private boolean drawAsync_100_StartPainting() {
 
 //		// get time when the redraw of the may is requested
 //		final long requestedRedrawTime = System.currentTimeMillis();
@@ -1487,7 +1487,7 @@ public class ChartComponentGraph extends Canvas {
 					return;
 				}
 
-				drawAsync101DoPainting();
+				drawAsync_101_DoPainting();
 			}
 		});
 //		}
@@ -1495,7 +1495,7 @@ public class ChartComponentGraph extends Canvas {
 		return false;
 	}
 
-	private void drawAsync101DoPainting() {
+	private void drawAsync_101_DoPainting() {
 
 //		final long startTime = System.nanoTime();
 //		// TODO remove SYSTEM.OUT.PRINTLN
@@ -1569,7 +1569,7 @@ public class ChartComponentGraph extends Canvas {
 
 			if (_chartComponents.errorMessage == null) {
 
-				drawAsync110GraphImage(gcChart, gcGraph);
+				drawAsync_110_GraphImage(gcChart, gcGraph);
 
 			} else {
 
@@ -1607,7 +1607,7 @@ public class ChartComponentGraph extends Canvas {
 	 * @param gcChart
 	 * @param gcGraph
 	 */
-	private void drawAsync110GraphImage(final GC gcChart, final GC gcGraph) {
+	private void drawAsync_110_GraphImage(final GC gcChart, final GC gcGraph) {
 
 		int graphIndex = 0;
 		final int lastGraphIndex = _graphDrawingData.size() - 1;
@@ -1629,40 +1629,42 @@ public class ChartComponentGraph extends Canvas {
 			final int chartType = drawingData.getChartType();
 
 			if (graphIndex == 0) {
-				drawAsync200XTitle(gcChart, drawingData);
+				drawAsync_200_XTitle(gcChart, drawingData);
 			}
 
-			drawAsync150Segments(gcGraph, drawingData);
+			drawAsync_150_Segments(gcGraph, drawingData);
 
 			if (graphIndex == lastGraphIndex) {
 				// draw the unit label and unit tick for the last graph
-				drawAsync210XUnitsAndVGrid(gcChart, gcGraph, drawingData, true);
+				drawAsync_210_XUnitsAndVGrid(gcChart, gcGraph, drawingData, true);
 			} else {
-				drawAsync210XUnitsAndVGrid(gcChart, gcGraph, drawingData, false);
+				drawAsync_210_XUnitsAndVGrid(gcChart, gcGraph, drawingData, false);
 			}
 
 			// draw only the horizontal grid
-			drawAsync220XAsisHGrid(gcGraph, drawingData, false);
-
-			if (chartType == ChartDataModel.CHART_TYPE_LINE || chartType == ChartDataModel.CHART_TYPE_LINE) {}
+			drawAsync_220_XAsisHGrid(gcGraph, drawingData, false);
 
 			// draw units and grid on the x and y axis
 			switch (chartType) {
 			case ChartDataModel.CHART_TYPE_LINE:
-				drawAsync500LineGraph(gcGraph, drawingData);
-				drawAsync520RangeMarker(gcGraph, drawingData);
+				drawAsync_500_LineGraph(gcGraph, drawingData);
+				drawAsync_520_RangeMarker(gcGraph, drawingData);
 				break;
 
 			case ChartDataModel.CHART_TYPE_BAR:
-				drawAsync530BarGraph(gcGraph, drawingData);
+				drawAsync_530_BarGraph(gcGraph, drawingData);
 				break;
 
 			case ChartDataModel.CHART_TYPE_LINE_WITH_BARS:
-				drawAsync540LineWithBarGraph(gcGraph, drawingData);
+				drawAsync_540_LineWithBarGraph(gcGraph, drawingData);
 				break;
 
 			case ChartDataModel.CHART_TYPE_XY_SCATTER:
-				drawAsync550XYScatter(gcGraph, drawingData);
+				drawAsync_550_XYScatter(gcGraph, drawingData);
+				break;
+
+			case ChartDataModel.CHART_TYPE_HISTORY:
+				drawAsync_600_History(gcGraph, drawingData);
 				break;
 
 			default:
@@ -1670,7 +1672,7 @@ public class ChartComponentGraph extends Canvas {
 			}
 
 			// draw only the x-axis, this is drawn lately because the graph can overwrite it
-			drawAsync220XAsisHGrid(gcGraph, drawingData, true);
+			drawAsync_220_XAsisHGrid(gcGraph, drawingData, true);
 
 			// draw graph image into the chart image
 			gcChart.drawImage(_chartImage10Graphs, 0, drawingData.getDevYTop());
@@ -1694,7 +1696,7 @@ public class ChartComponentGraph extends Canvas {
 		}
 	}
 
-	private void drawAsync150Segments(final GC gc, final GraphDrawingData drawingData) {
+	private void drawAsync_150_Segments(final GC gc, final GraphDrawingData drawingData) {
 
 		final ChartSegments chartSegments = drawingData.getXData().getChartSegments();
 
@@ -1742,7 +1744,7 @@ public class ChartComponentGraph extends Canvas {
 		alternateColor.dispose();
 	}
 
-	private void drawAsync200XTitle(final GC gc, final GraphDrawingData drawingData) {
+	private void drawAsync_200_XTitle(final GC gc, final GraphDrawingData drawingData) {
 
 		final ChartSegments chartSegments = drawingData.getXData().getChartSegments();
 		final int devYTitle = _chartDrawingData.devMarginTop;
@@ -1827,10 +1829,10 @@ public class ChartComponentGraph extends Canvas {
 	 *            <code>true</code> indicate to draws the unit tick and unit label additional to the
 	 *            unit grid line
 	 */
-	private void drawAsync210XUnitsAndVGrid(final GC gcChart,
-											final GC gcGraph,
-											final GraphDrawingData drawingData,
-											final boolean isDrawUnit) {
+	private void drawAsync_210_XUnitsAndVGrid(	final GC gcChart,
+												final GC gcGraph,
+												final GraphDrawingData drawingData,
+												final boolean isDrawUnit) {
 
 		final Display display = getDisplay();
 
@@ -2055,9 +2057,9 @@ public class ChartComponentGraph extends Canvas {
 	 * @param drawingData
 	 * @param isDrawOnlyXAsis
 	 */
-	private void drawAsync220XAsisHGrid(final GC gcGraph,
-										final GraphDrawingData drawingData,
-										final boolean isDrawOnlyXAsis) {
+	private void drawAsync_220_XAsisHGrid(	final GC gcGraph,
+											final GraphDrawingData drawingData,
+											final boolean isDrawOnlyXAsis) {
 
 		final Display display = getDisplay();
 
@@ -2131,7 +2133,7 @@ public class ChartComponentGraph extends Canvas {
 		}
 	}
 
-	private void drawAsync500LineGraph(final GC gcGraph, final GraphDrawingData graphDrawingData) {
+	private void drawAsync_500_LineGraph(final GC gcGraph, final GraphDrawingData graphDrawingData) {
 
 		final ChartDataXSerie xData = graphDrawingData.getXData();
 		final ChartDataYSerie yData = graphDrawingData.getYData();
@@ -2168,7 +2170,7 @@ public class ChartComponentGraph extends Canvas {
 			graphLineAlpha = graphLineAlpha < 0 ? 0 : graphLineAlpha > 255 ? 255 : graphLineAlpha;
 			graphFillingAlpha = graphFillingAlpha < 0 ? 0 : graphFillingAlpha > 255 ? 255 : graphFillingAlpha;
 
-			drawAsync510LineGraphSegment(
+			drawAsync_510_LineGraphSegment(
 					gcGraph,
 					graphDrawingData,
 					0,
@@ -2188,7 +2190,7 @@ public class ChartComponentGraph extends Canvas {
 			final int noneMarkerFillingAlpha = (int) (_chart.graphTransparencyFilling * 0.5);
 
 			// draw the x-marker
-			drawAsync510LineGraphSegment(
+			drawAsync_510_LineGraphSegment(
 					gcGraph,
 					graphDrawingData,
 					xData.getSynchMarkerStartIndex(),
@@ -2201,7 +2203,7 @@ public class ChartComponentGraph extends Canvas {
 					graphValueOffset);
 
 			// draw segment before the marker
-			drawAsync510LineGraphSegment(
+			drawAsync_510_LineGraphSegment(
 					gcGraph,
 					graphDrawingData,
 					0,
@@ -2214,7 +2216,7 @@ public class ChartComponentGraph extends Canvas {
 					graphValueOffset);
 
 			// draw segment after the marker
-			drawAsync510LineGraphSegment(
+			drawAsync_510_LineGraphSegment(
 					gcGraph,
 					graphDrawingData,
 					xData.getSynchMarkerEndIndex() - 0,
@@ -2241,7 +2243,7 @@ public class ChartComponentGraph extends Canvas {
 	 * @param rgbBgBright
 	 * @param graphValueOffset
 	 */
-	private void drawAsync510LineGraphSegment(	final GC gcSegment,
+	private void drawAsync_510_LineGraphSegment(final GC gcSegment,
 												final GraphDrawingData graphDrawingData,
 												final int startIndex,
 												final int endIndex,
@@ -2289,13 +2291,13 @@ public class ChartComponentGraph extends Canvas {
 		final double scaleX = graphDrawingData.getScaleX();
 		final double scaleY = graphDrawingData.getScaleY();
 
-		final boolean isShowSkippedValues = _chartDrawingData.chartDataModel.isNoLinesValuesDisplayed();
 		final Display display = getDisplay();
 
 		// path is scaled in device pixel
 		final Path path = new Path(display);
 		final Path path2 = isPath2 ? new Path(display) : null;
 
+		final boolean isShowSkippedValues = _chartDrawingData.chartDataModel.isNoLinesValuesDisplayed();
 		final ArrayList<Point> skippedValues = new ArrayList<Point>();
 
 		final int devGraphHeight = graphDrawingData.devGraphHeight;
@@ -2766,7 +2768,7 @@ public class ChartComponentGraph extends Canvas {
 		gcSegment.setAntialias(SWT.OFF);
 	}
 
-	private void drawAsync520RangeMarker(final GC gc, final GraphDrawingData drawingData) {
+	private void drawAsync_520_RangeMarker(final GC gc, final GraphDrawingData drawingData) {
 
 		final ChartDataXSerie xData = drawingData.getXData();
 		final ChartDataYSerie yData = drawingData.getYData();
@@ -2804,7 +2806,7 @@ public class ChartComponentGraph extends Canvas {
 		for (final int markerStartIndex : startIndex) {
 
 			// draw range marker
-			drawAsync510LineGraphSegment(gc, //
+			drawAsync_510_LineGraphSegment(gc, //
 					drawingData,
 					markerStartIndex,
 					endIndex[runningIndex] + 1,
@@ -2826,7 +2828,7 @@ public class ChartComponentGraph extends Canvas {
 	 * @param gcGraph
 	 * @param drawingData
 	 */
-	private void drawAsync530BarGraph(final GC gcGraph, final GraphDrawingData drawingData) {
+	private void drawAsync_530_BarGraph(final GC gcGraph, final GraphDrawingData drawingData) {
 
 		// get the chart data
 		final ChartDataXSerie xData = drawingData.getXData();
@@ -3077,7 +3079,7 @@ public class ChartComponentGraph extends Canvas {
 	 * @param gc
 	 * @param drawingData
 	 */
-	private void drawAsync540LineWithBarGraph(final GC gc, final GraphDrawingData drawingData) {
+	private void drawAsync_540_LineWithBarGraph(final GC gc, final GraphDrawingData drawingData) {
 
 		// get the chart data
 		final ChartDataXSerie xData = drawingData.getXData();
@@ -3223,7 +3225,7 @@ public class ChartComponentGraph extends Canvas {
 	 * @param gc
 	 * @param drawingData
 	 */
-	private void drawAsync550XYScatter(final GC gc, final GraphDrawingData drawingData) {
+	private void drawAsync_550_XYScatter(final GC gc, final GraphDrawingData drawingData) {
 
 		// get chart data
 		final ChartDataXSerie xData = drawingData.getXData();
@@ -3293,6 +3295,176 @@ public class ChartComponentGraph extends Canvas {
 		gc.setAntialias(SWT.OFF);
 	}
 
+	private void drawAsync_600_History(final GC gcGraph, final GraphDrawingData graphDrawingData) {
+
+		final ChartDataXSerie xData = graphDrawingData.getXData();
+
+		final float xValues[] = xData.getHighValues()[0];
+		final int serieSize = xValues.length;
+
+		// setup hovered positions
+		_lineFocusRectangles.add(new Rectangle[serieSize]);
+		_lineDevPositions.add(new Point[serieSize]);
+		_isHoveredLineVisible = true;
+
+		// check array bounds
+		final int xValueLength = xValues.length;
+		if (0 >= xValueLength) {
+			return;
+		}
+
+		// get top/bottom border values of the graph
+		final int devGraphHeight = getDevVisibleGraphHeight();
+
+		final double scaleX = graphDrawingData.getScaleX();
+
+		final Rectangle[] lineFocusRectangles = _lineFocusRectangles.get(_lineFocusRectangles.size() - 1);
+		final Point[] lineDevPositions = _lineDevPositions.get(_lineDevPositions.size() - 1);
+		Rectangle prevLineRect = null;
+
+		final float graphValueOffset = (float) (Math.max(0, _xxDevViewPortLeftBorder) / scaleX);
+		final float graphXStart = xValues[0] - graphValueOffset;
+		float devXPrev = (float) (graphXStart * scaleX);
+
+		final Rectangle chartRectangle = gcGraph.getClipping();
+		final int devXVisibleWidth = chartRectangle.width;
+
+		boolean isDrawFirstPoint = true;
+
+		final int lastIndex = serieSize - 1;
+
+		int valueIndexFirstPoint = 0;
+		int prevValueIndex = 0;
+
+		/*
+		 * set the hovered index only ONCE because when autoscrolling is done to the right side this
+		 * can cause that the last value is used for the hovered index instead of the previous
+		 * before the last
+		 */
+		boolean isSetHoveredIndex = false;
+
+		/*
+		 * draw the lines into the paths
+		 */
+		for (int valueIndex = 0; valueIndex < serieSize; valueIndex++) {
+
+			final float graphX = xValues[valueIndex] - graphValueOffset;
+			final float devX = (float) (graphX * scaleX);
+
+			// check if position is horizontal visible
+			if (devX < 0) {
+
+				// keep current position which is used as the painting starting point
+
+				devXPrev = devX;
+
+				valueIndexFirstPoint = valueIndex;
+				prevValueIndex = valueIndex;
+
+				continue;
+			}
+
+			/*
+			 * draw first point
+			 */
+			if (isDrawFirstPoint) {
+
+				// move to the first point
+
+				isDrawFirstPoint = false;
+
+				// set first point before devX==0 that the first line is not visible but correctly painted
+				final float devXFirstPoint = devXPrev;
+
+				/*
+				 * set line hover positions for the first point
+				 */
+				final int devXRect = (int) devXFirstPoint;
+
+				final Rectangle currentRect = new Rectangle(devXRect, 0, 1, devGraphHeight);
+				final Point currentPoint = new Point(devXRect, 0);
+
+				lineDevPositions[valueIndexFirstPoint] = currentPoint;
+				lineFocusRectangles[valueIndexFirstPoint] = currentRect;
+
+				prevLineRect = currentRect;
+			}
+
+			/*
+			 * draw line to current point
+			 */
+			if ((int) devX != (int) devXPrev) {
+
+				// optimization: draw only ONE line for the current x-position
+				// but draw to the 0 line otherwise it's possible that a triangle is painted
+
+				/*
+				 * set line hover positions
+				 */
+				final float devXDiff = (devX - devXPrev) / 2;
+				final int devXDiffWidth = devXDiff < 1 ? 1 : (int) (devXDiff + 0.5);
+				final int devXRect = (int) (devX - devXDiffWidth);
+
+				// add the right part of the rectangle width into the previous rectangle
+				prevLineRect.width += devXDiffWidth + 1;
+
+				// check if hovered line is hit, this check is an inline for .contains(...)
+				if (isSetHoveredIndex == false && prevLineRect.contains(_devXMouseMove, _devYMouseMove)) {
+					_hoveredLineValueIndex = prevValueIndex;
+					isSetHoveredIndex = true;
+				}
+
+				final Rectangle currentRect = new Rectangle(devXRect, 0, devXDiffWidth + 1, devGraphHeight);
+				final Point currentPoint = new Point((int) devX, 0);
+
+				lineDevPositions[valueIndex] = currentPoint;
+				lineFocusRectangles[valueIndex] = currentRect;
+
+				prevLineRect = currentRect;
+			}
+
+			/*
+			 * draw last point
+			 */
+			if (valueIndex == lastIndex || //
+
+					// check if last visible position + 1 is reached
+					devX > devXVisibleWidth) {
+
+				/*
+				 * set line rectangle
+				 */
+				final float devXDiff = (devX - devXPrev) / 2;
+				final int devXDiffWidth = devXDiff < 1 ? 1 : (int) (devXDiff + 0.5);
+				final int devXRect = (int) (devX - devXDiffWidth);
+
+				// set right part of the rectangle width into the previous rectangle
+				prevLineRect.width += devXDiffWidth;
+
+				// check if hovered line is hit, this check is an inline for .contains(...)
+				if (isSetHoveredIndex == false && prevLineRect.contains(_devXMouseMove, _devYMouseMove)) {
+					_hoveredLineValueIndex = valueIndex;
+					isSetHoveredIndex = true;
+				}
+
+				final Rectangle lastRect = new Rectangle(devXRect, 0, devXDiffWidth + 1, devGraphHeight);
+				final Point lastPoint = new Point((int) devX, 0);
+
+				lineDevPositions[valueIndex] = lastPoint;
+				lineFocusRectangles[valueIndex] = lastRect;
+
+				if (isSetHoveredIndex == false && lastRect.contains(_devXMouseMove, _devYMouseMove)) {
+					_hoveredLineValueIndex = valueIndex;
+				}
+
+				break;
+			}
+
+			devXPrev = devX;
+			prevValueIndex = valueIndex;
+		}
+	}
+
 	/**
 	 * Paint event handler
 	 * 
@@ -3332,7 +3504,7 @@ public class ChartComponentGraph extends Canvas {
 
 			// draw chart
 
-			isPaintedDirectly = drawAsync100StartPainting();
+			isPaintedDirectly = drawAsync_100_StartPainting();
 
 			if (isPaintedDirectly == false) {
 

@@ -78,17 +78,18 @@ public class TourManager {
 	public static final String				CUSTOM_DATA_TOUR_DATA					= "tourData";					//$NON-NLS-1$
 	public static final String				CUSTOM_DATA_TOUR_CHART_CONFIGURATION	= "tourChartConfig";			//$NON-NLS-1$
 
-	public static final String				CUSTOM_DATA_TIME						= "time";						//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_DISTANCE					= "distance";					//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_ALTIMETER					= "altimeter";					//$NON-NLS-1$
 	public static final String				CUSTOM_DATA_ALTITUDE					= "altitude";					//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_SPEED						= "speed";						//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_CADENCE						= "cadence";					//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_DISTANCE					= "distance";					//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_GRADIENT					= "gradient";					//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_HISTORY						= "history";					//$NON-NLS-1$
 	public static final String				CUSTOM_DATA_PACE						= "pace";						//$NON-NLS-1$
 	public static final String				CUSTOM_DATA_POWER						= "power";						//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_GRADIENT					= "gradient";					//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_ALTIMETER					= "altimeter";					//$NON-NLS-1$
 	public static final String				CUSTOM_DATA_PULSE						= "pulse";						//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_SPEED						= "speed";						//$NON-NLS-1$
 	public static final String				CUSTOM_DATA_TEMPERATURE					= "temperature";				//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_CADENCE						= "cadence";					//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_TIME						= "time";						//$NON-NLS-1$
 
 	public static final String				CUSTOM_DATA_SEGMENT_VALUES				= "segmentValues";				//$NON-NLS-1$
 	public static final String				CUSTOM_DATA_ANALYZER_INFO				= "analyzerInfo";				//$NON-NLS-1$
@@ -149,8 +150,6 @@ public class TourManager {
 	 */
 	private TourChart						_activeTourChart;
 
-//	private ChartInfoPainter				_chartInfoPainter						= new ChartInfoPainter();
-
 	private TourManager() {
 
 		final int cacheSize = _prefStore.getInt(ITourbookPreferences.TOUR_CACHE_SIZE);
@@ -159,6 +158,8 @@ public class TourManager {
 		} else {
 			_tourDataCache = null;
 		}
+
+		createAvgCallbacks();
 
 		final IPreferenceStore commonPrefStore = Activator.getDefault().getPreferenceStore();
 
@@ -1651,13 +1652,11 @@ public class TourManager {
 														final TourChartConfiguration tourChartConfig,
 														final boolean hasPropertyChanged) {
 
-		// check if avg callbacks are created
-		if (_computeSpeedAvg == null) {
-			createAvgCallbacks();
-		}
-
 		final ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_LINE);
 
+		/*
+		 * TIME SERIE is a MUST data serie
+		 */
 		if (tourData.timeSerie == null || tourData.timeSerie.length == 0) {
 			return chartDataModel;
 		}
@@ -2146,6 +2145,24 @@ public class TourManager {
 			}
 		}
 
+		if (chartDataModel.getYData().isEmpty()) {
+
+			// history do not have any y-data
+
+			chartDataModel.setChartType(ChartDataModel.CHART_TYPE_HISTORY);
+
+			final float[] historySerie = new float[tourData.timeSerie.length];
+
+			final ChartDataYSerie yDataHistory = createChartDataSerie(historySerie, ChartDataModel.CHART_TYPE_HISTORY);
+			yDataHistory.setAxisUnit(ChartDataSerie.AXIS_UNIT_HISTORY);
+
+			setGraphColor(_prefStore, yDataHistory, GraphColorProvider.PREF_GRAPH_HISTORY);
+
+			chartDataModel.addXyData(yDataHistory);
+			chartDataModel.addYData(yDataHistory);
+			chartDataModel.setCustomData(CUSTOM_DATA_HISTORY, yDataHistory);
+		}
+
 		chartDataModel.setShowNoLineValues(tourChartConfig.isShowBreaktimeValues);
 
 		chartDataModel.setCustomData(CUSTOM_DATA_TIME, xDataTime);
@@ -2161,11 +2178,14 @@ public class TourManager {
 
 	private ChartDataYSerie createChartDataSerie(final float[] dataSerie, final int chartType) {
 
-		if (chartType == 0 || chartType == ChartDataModel.CHART_TYPE_LINE) {
-			return new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE, dataSerie);
+		if (chartType == ChartDataModel.CHART_TYPE_LINE_WITH_BARS) {
+			return new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE_WITH_BARS, dataSerie);
 
 		} else {
-			return new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE_WITH_BARS, dataSerie);
+
+			return new ChartDataYSerie(chartType == 0
+					? ChartDataModel.CHART_TYPE_LINE
+					: ChartDataModel.CHART_TYPE_HISTORY, dataSerie);
 		}
 	}
 

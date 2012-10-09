@@ -123,7 +123,7 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 	private ArrayList<PhotoWrapper>					_allPhotos			= new ArrayList<PhotoWrapper>();
 
 	private DateTime								_allPhotoStartDate;
-	private DateTime								_allPhotoEndDate;
+
 	/**
 	 * Contains all cameras used in all tours, key is the camera name.
 	 */
@@ -644,32 +644,55 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 
 	private void createUI_40_Header(final Composite parent) {
 
-		final int hIndent = 8;
-
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(8).margins(2, 2).spacing(2, 0).applyTo(container);
+		GridLayoutFactory.fillDefaults()//
+				.numColumns(3)
+				.margins(2, 2)
+				.applyTo(container);
 		{
 			/*
-			 * label: hours
+			 * label: adjust time
 			 */
-			Label label = new Label(container, SWT.NONE);
+			final Label label = new Label(container, SWT.NONE);
 			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
 			label.setText(Messages.Photos_AndTours_Label_AdjustTime);
 			label.setToolTipText(Messages.Photos_AndTours_Label_AdjustTimeTooltip);
 
+			createUI_42_AdjustTime(container);
+
+			/*
+			 * combo: camera
+			 */
+			_comboCamera = new Combo(container, SWT.READ_ONLY);
+			GridDataFactory.fillDefaults().applyTo(_comboCamera);
+			_comboCamera.setVisibleItemCount(33);
+			_comboCamera.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onSelectCamera();
+				}
+			});
+		}
+	}
+
+	private void createUI_42_AdjustTime(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(3).spacing(0, 0).applyTo(container);
+		{
 			/*
 			 * spinner: adjust hours
 			 */
 			_spinnerHours = new Spinner(container, SWT.BORDER);
 			GridDataFactory.fillDefaults() //
-					.indent(hIndent, 0)
 					.applyTo(_spinnerHours);
 			_spinnerHours.setMinimum(-999);
 			_spinnerHours.setMaximum(999);
 			_spinnerHours.setIncrement(1);
 			_spinnerHours.setPageIncrement(24);
-//			_spinnerHours.setToolTipText(Messages.Photos_AndTours_Spinner_AdjustHours_Tooltip);
+			_spinnerHours.setToolTipText(Messages.Photos_AndTours_Spinner_AdjustHours_Tooltip);
 			_spinnerHours.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
@@ -685,24 +708,16 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 			});
 
 			/*
-			 * label: hours
-			 */
-			label = new Label(container, SWT.NONE);
-			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-			label.setText(Messages.Unit_Label_Hour);
-
-			/*
 			 * spinner: adjust minutes
 			 */
 			_spinnerMinutes = new Spinner(container, SWT.BORDER);
 			GridDataFactory.fillDefaults() //
-					.indent(hIndent, 0)
 					.applyTo(_spinnerMinutes);
 			_spinnerMinutes.setMinimum(-99);
 			_spinnerMinutes.setMaximum(99);
 			_spinnerMinutes.setIncrement(1);
-			_spinnerMinutes.setPageIncrement(hIndent);
-//			_spinnerMinutes.setToolTipText(Messages.Photos_AndTours_Spinner_AdjustMinutes_Tooltip);
+			_spinnerMinutes.setPageIncrement(10);
+			_spinnerMinutes.setToolTipText(Messages.Photos_AndTours_Spinner_AdjustMinutes_Tooltip);
 			_spinnerMinutes.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
@@ -718,24 +733,16 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 			});
 
 			/*
-			 * label: minutes
-			 */
-			label = new Label(container, SWT.NONE);
-			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-			label.setText(Messages.Unit_Label_Minute);
-
-			/*
 			 * spinner: adjust seconds
 			 */
 			_spinnerSeconds = new Spinner(container, SWT.BORDER);
 			GridDataFactory.fillDefaults() //
-					.indent(hIndent, 0)
 					.applyTo(_spinnerSeconds);
 			_spinnerSeconds.setMinimum(-99);
 			_spinnerSeconds.setMaximum(99);
 			_spinnerSeconds.setIncrement(1);
-			_spinnerSeconds.setPageIncrement(hIndent);
-//			_spinnerSeconds.setToolTipText(Messages.Photos_AndTours_Spinner_AdjustSeconds_Tooltip);
+			_spinnerSeconds.setPageIncrement(10);
+			_spinnerSeconds.setToolTipText(Messages.Photos_AndTours_Spinner_AdjustSeconds_Tooltip);
 			_spinnerSeconds.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
@@ -747,28 +754,6 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 				public void mouseScrolled(final MouseEvent event) {
 					Util.adjustSpinnerValueOnMouseScroll(event);
 					onSelectTimeAdjustment();
-				}
-			});
-
-			/*
-			 * label: minutes
-			 */
-			label = new Label(container, SWT.NONE);
-			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-			label.setText(Messages.Unit_Label_Second);
-
-			/*
-			 * combo: camera
-			 */
-			_comboCamera = new Combo(container, SWT.READ_ONLY);
-			GridDataFactory.fillDefaults()//
-					.indent(20, 0)
-					.applyTo(_comboCamera);
-			_comboCamera.setVisibleItemCount(33);
-			_comboCamera.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onSelectCamera();
 				}
 			});
 		}
@@ -1198,6 +1183,19 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 		return camera;
 	}
 
+	private Camera getSelectedCamera() {
+
+		final int cameraIndex = _comboCamera.getSelectionIndex();
+		if (cameraIndex == -1) {
+			return null;
+		}
+
+		final Camera[] cameras = _selectedMergeTour.cameraList;
+		final Camera camera = cameras[cameraIndex];
+
+		return camera;
+	}
+
 	public ArrayList<TourData> getSelectedTours() {
 //		return _tourList;
 		return new ArrayList<TourData>();
@@ -1279,8 +1277,31 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 	}
 
 	private void onSelectCamera() {
-		// TODO Auto-generated method stub
 
+		final Camera camera = getSelectedCamera();
+		if (camera == null) {
+			return;
+		}
+
+		// update UI
+
+		final long timeAdjustment = camera.timeAdjustment / 1000;
+
+//		timeAdjustment = (hours * 60 * 60 * 1000) + (minutes * 60 * 1000) + (seconds * 1000);
+
+//		_formatter.format(//
+//				Messages.Format_hhmmss,
+//				(time / 3600),
+//				((time % 3600) / 60),
+//				((time % 3600) % 60)).toString()
+
+		final int hours = (int) (timeAdjustment / 3600);
+		final int minutes = (int) ((timeAdjustment % 3600) / 60);
+		final int seconds = (int) ((timeAdjustment % 3600) % 60);
+
+		_spinnerHours.setSelection(hours);
+		_spinnerMinutes.setSelection(minutes);
+		_spinnerSeconds.setSelection(seconds);
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
@@ -1294,13 +1315,10 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 			return;
 		}
 
-		final int cameraIndex = _comboCamera.getSelectionIndex();
-		if (cameraIndex == -1) {
+		final Camera camera = getSelectedCamera();
+		if (camera == null) {
 			return;
 		}
-
-		final Camera[] cameras = _selectedMergeTour.cameraList;
-		final Camera camera = cameras[cameraIndex];
 
 		camera.setTimeAdjustment(
 				_spinnerHours.getSelection(),
@@ -1453,7 +1471,6 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 		}
 
 		_allPhotoStartDate = new DateTime(allDbTourStartDate);
-		_allPhotoEndDate = new DateTime(allDbTourEndDate);
 
 		loadToursFromDb(allDbTourStartDate, allDbTourEndDate);
 

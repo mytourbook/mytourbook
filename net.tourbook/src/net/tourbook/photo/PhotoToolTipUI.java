@@ -79,6 +79,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 	private int								_devXMousedown;
 	private int								_devYMousedown;
+
 	/*
 	 * UI controls
 	 */
@@ -262,7 +263,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 		updateUI_Colors(parent);
 
-		super.setImageGallery(_photoGallery);
+//		super.setImageGallery(_photoGallery);
 
 		return container;
 	}
@@ -462,6 +463,11 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 			setToolTipPinnedLocation();
 		}
+	}
+
+	@Override
+	protected void onReparentShell(final Shell reparentedShell) {
+		_photoGallery.onReparentShell(reparentedShell);
 	}
 
 	@Override

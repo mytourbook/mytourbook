@@ -738,9 +738,6 @@ public class Chart extends ViewForm {
 		case ChartDataModel.CHART_TYPE_BAR:
 			return new SelectionBarChart(_barSelectionSerieIndex, _barSelectionValueIndex);
 
-		case ChartDataModel.CHART_TYPE_LINE:
-			break;
-
 		default:
 			break;
 		}
@@ -1294,16 +1291,23 @@ public class Chart extends ViewForm {
 							final boolean isResetSelection,
 							final boolean isShowAllData) {
 
-		if (chartDataModel == null || (chartDataModel != null && chartDataModel.getYData().isEmpty())) {
+		if (chartDataModel == null || //
+				(chartDataModel != null //
+						&& chartDataModel.getYData().isEmpty() //
+
+				// history do not have Y values
+				&& chartDataModel.getChartType() != ChartDataModel.CHART_TYPE_HISTORY) //
+		) {
 
 			final ChartDataModel emptyModel = new ChartDataModel(ChartDataModel.CHART_TYPE_LINE);
 
 			if (chartDataModel != null) {
 				String errorMessage = chartDataModel.getErrorMessage();
 				if (errorMessage == null) {
+
 					/*
-					 * error message is disabled because it confuses the user because it is
-					 * displayed when a graph is not displayed but another graph could be selected
+					 * display error message that the user is not confuses when a graph is not
+					 * displayed
 					 */
 					errorMessage = Messages.Error_Message_001_Default;
 				}

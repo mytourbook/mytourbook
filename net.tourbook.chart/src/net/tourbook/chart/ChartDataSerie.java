@@ -27,6 +27,7 @@ public abstract class ChartDataSerie {
 	public static final int			AXIS_UNIT_HOUR_MINUTE_SECOND			= 22;
 	public static final int			AXIS_UNIT_MINUTE_SECOND					= 23;
 	public static final int			AXIS_UNIT_HOUR_MINUTE_OPTIONAL_SECOND	= 24;
+	public static final int			AXIS_UNIT_HISTORY						= 25;
 
 	public static final int			X_AXIS_UNIT_MONTH						= 30;
 	public static final int			X_AXIS_UNIT_DAY							= 40;
@@ -63,7 +64,7 @@ public abstract class ChartDataSerie {
 	protected float					_visibleMinValue;
 
 	/**
-	 * unit which is drawn on the x-axis
+	 * Unit which is drawn on the x or y axis
 	 */
 	private int						_axisUnit								= AXIS_UNIT_NUMBER;
 
@@ -237,10 +238,13 @@ public abstract class ChartDataSerie {
 	void setMinMaxValues(final float[][] valueSeries) {
 
 		if (valueSeries == null || valueSeries.length == 0 || valueSeries[0] == null || valueSeries[0].length == 0) {
-			_visibleMaxValue = _visibleMinValue = 0;
-			_originalMaxValue = _originalMinValue = 0;
+
 			_highValues = new float[1][2];
 			_lowValues = new float[1][2];
+
+			_visibleMaxValue = _visibleMinValue = 0;
+			_originalMaxValue = _originalMinValue = 0;
+
 		} else {
 
 			_highValues = valueSeries;
