@@ -194,6 +194,7 @@ public class GalleryPhotoToolTip extends AnimatedToolTipShell {
 	private void createUI_Metadata(final Composite parent, final PhotoImageMetadata metaData) {
 
 		final DateTime exifDateTime = _photo.getExifDateTime();
+		final DateTime imageFileDateTime = _photo.getImageFileDateTime();
 
 		final boolean isTitle = metaData.objectName != null;
 		final boolean isDescription = metaData.captionAbstract != null;
@@ -205,14 +206,13 @@ public class GalleryPhotoToolTip extends AnimatedToolTipShell {
 		GridLayoutFactory.fillDefaults().spacing(5, 1).numColumns(2).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
-			final DateTime imageFileDateTime = _photo.getImageFileDateTime();
-			boolean isDrawModified = true;
+			boolean isDrawFileDate = true;
 
 			if (isExifDate) {
 
-				createUI_MetadataLine(container, Messages.Photo_ToolTip_Date, _dtWeekday.print(exifDateTime)
-						+ UI.SPACE2
-						+ _dtFormatter.print(exifDateTime));
+				createUI_MetadataLine(container, //
+						Messages.Photo_ToolTip_ExifDate,
+						_dtWeekday.print(exifDateTime) + UI.SPACE2 + _dtFormatter.print(exifDateTime));
 
 				// display modified date only when it differs from the exif/original date
 
@@ -220,10 +220,10 @@ public class GalleryPhotoToolTip extends AnimatedToolTipShell {
 				final long durationMills = duration.getMillis();
 
 				/*
-				 * sometimes the differenz is 1 second but it does not make sense to display it
+				 * sometimes the difference is 1 second but it does not make sense to display it
 				 */
 				if (Math.abs(durationMills) <= 2000) {
-					isDrawModified = false;
+					isDrawFileDate = false;
 				}
 
 //				final LocalDateTime exifLocal = exifDateTime.toLocalDateTime();
@@ -234,9 +234,9 @@ public class GalleryPhotoToolTip extends AnimatedToolTipShell {
 //				// TODO remove SYSTEM.OUT.PRINTLN
 			}
 
-			if (isDrawModified) {
+			if (isDrawFileDate) {
 				createUI_MetadataLine(container, //
-						isExifDate ? Messages.Photo_ToolTip_Modified : Messages.Photo_ToolTip_Date,
+						Messages.Photo_ToolTip_FileDate,
 						_dtWeekday.print(imageFileDateTime) + UI.SPACE2 + _dtFormatter.print(imageFileDateTime));
 			}
 

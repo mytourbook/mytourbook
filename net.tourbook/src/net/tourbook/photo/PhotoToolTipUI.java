@@ -277,6 +277,14 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 			createUI_10_Gallery(shellContainer);
 		}
 
+		createUI_20_ActionBar(_photoGallery.getCustomActionBarContainer());
+
+		fillActionBar();
+
+		// must be called after the custom action bar is created
+		_photoGallery.createActionBar();
+		_galleryToolbarManager.update(false);
+
 		return shellContainer;
 	}
 
@@ -294,7 +302,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		{
 			_photoGallery = new PhotoGallery();
 
-			_photoGallery.setShowActionBar();
+			_photoGallery.setShowCustomActionBar();
 			_photoGallery.setShowThumbnailSize();
 
 			_photoGallery.createPhotoGallery(
@@ -303,14 +311,6 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 					new PhotoGalleryProvider());
 
 			_photoGallery.setDefaultStatusMessage(Messages.Tour_Photos_Label_StatusMessage_NoTourWithPhotos);
-
-			createUI_20_ActionBar(_photoGallery.getCustomActionBarContainer());
-
-			fillActionBar();
-
-			// must be called after the custom action bar is created
-			_photoGallery.createActionBar();
-			_galleryToolbarManager.update(false);
 		}
 	}
 
@@ -322,7 +322,6 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 		{
-
 			/*
 			 * create toolbar for the exit button
 			 */
@@ -381,14 +380,6 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 			GridDataFactory.fillDefaults()//
 					.align(SWT.END, SWT.FILL)
 					.applyTo(_galleryToolbarControl);
-		}
-	}
-
-	private void delay() {
-		try {
-			Thread.sleep(500);
-		} catch (final InterruptedException e) {
-			e.printStackTrace();
 		}
 	}
 
@@ -553,7 +544,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		if (_isVerticalGallery) {
 
 			_actionToggleGalleryOrientation.setToolTipText(//
-					Messages.Photo_Tooltip_Action_ToggleGalleryHorizontal_ToolTip);
+					Messages.Photo_Gallery_Action_ToggleGalleryHorizontal_ToolTip);
 
 			_actionToggleGalleryOrientation.setImageDescriptor(//
 					TourbookPlugin.getImageDescriptor(Messages.Image__PhotoGalleryHorizontal));
@@ -561,7 +552,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		} else {
 
 			_actionToggleGalleryOrientation.setToolTipText(//
-					Messages.Photo_Tooltip_Action_ToggleGalleryVertical_ToolTip);
+					Messages.Photo_Gallery_Action_ToggleGalleryVertical_ToolTip);
 
 			_actionToggleGalleryOrientation.setImageDescriptor(//
 					TourbookPlugin.getImageDescriptor(Messages.Image__PhotoGalleryVertical));

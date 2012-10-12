@@ -183,6 +183,7 @@ public class ChartLayerPhoto implements IChartLayer {
 		final int devGraphImageOffset = chart.getXXDevViewPortLeftBorder();
 		final int devGraphHeight = graphDrawingData.devGraphHeight;
 		final int devGraphWidth = graphDrawingData.devVirtualGraphWidth;
+//		final int devGraphHeight = devYBottom - devYTop;
 
 		final float graphYBottom = graphDrawingData.getGraphYBottom();
 		final float[] yValues = graphDrawingData.getYData().getHighValues()[0];
@@ -242,8 +243,7 @@ public class ChartLayerPhoto implements IChartLayer {
 			int devYPhoto;
 			if (isHistory) {
 
-				final int devYHeight = devYBottom - devYTop;
-				devYPhoto = devYBottom - devYHeight / 2;
+				devYPhoto = devYBottom - (devGraphHeight / 3);
 
 			} else {
 
@@ -255,13 +255,11 @@ public class ChartLayerPhoto implements IChartLayer {
 				// force photo marker to be not below the bottom
 				if (devYPhoto + PHOTO_ICON_WIDTH > devYBottom) {
 					devYPhoto = devYBottom - PHOTO_ICON_WIDTH;
-//				gc.setForeground(display.getSystemColor(SWT.COLOR_MAGENTA));
 				}
 
 				// force photo marker to be not above the top
 				if (devYPhoto < devYTop) {
 					devYPhoto = devYTop + lineWidth;
-//				gc.setForeground(display.getSystemColor(SWT.COLOR_MAGENTA));
 				}
 			}
 
@@ -284,12 +282,9 @@ public class ChartLayerPhoto implements IChartLayer {
 			final int textWidth = textSize.x;
 			final int textHeight = textSize.y;
 
-			final int posY = devYTop;
-
 			final int groupTextWidth = textWidth + 4;
 			final int groupTextHeight = textHeight - 2;
 			int groupX = photoGroup.groupCenterPosition.x - (groupTextWidth / 2);
-			final int groupY = posY + lineWidth;
 
 			/*
 			 * ensure that group text do no overlap another group
@@ -302,7 +297,14 @@ public class ChartLayerPhoto implements IChartLayer {
 			}
 
 			final int textX = groupX + 3;
-			final int textY = posY - 1 + lineWidth;
+
+			int groupY;
+			if (isHistory) {
+				groupY = devYTop + (devGraphHeight / 3);//+ lineWidth;
+			} else {
+				groupY = devYTop + lineWidth;
+			}
+			final int textY = groupY - 1;
 
 			/*
 			 * keep painted positions which is used when group is hovered and painted with another

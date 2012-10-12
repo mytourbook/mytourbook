@@ -40,7 +40,7 @@ import org.eclipse.swt.widgets.Spinner;
 
 public class GalleryActionBar {
 
-	private static final IPreferenceStore	_prefStore				= Activator.getDefault().getPreferenceStore();
+	private static final IPreferenceStore	_prefStore	= Activator.getDefault().getPreferenceStore();
 
 	private ImageGallery					_imageGallery;
 
@@ -92,7 +92,7 @@ public class GalleryActionBar {
 				.extendedMargins(2, 2, 2, 2)
 				.spacing(hSpacing, 0)
 				.applyTo(_containerActionBar);
-//		_containerActionBar.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+//		_containerActionBar.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_CYAN));
 		{
 			/*
 			 * custom action bar container
@@ -102,7 +102,7 @@ public class GalleryActionBar {
 				GridDataFactory.fillDefaults().grab(true, false).applyTo(_containerCustomActionBar);
 				GridLayoutFactory.fillDefaults().applyTo(_containerCustomActionBar);
 
-//				_containerCustomActionBar.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//				_containerCustomActionBar.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_MAGENTA));
 			}
 
 			/*

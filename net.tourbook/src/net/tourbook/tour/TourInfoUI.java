@@ -62,7 +62,7 @@ public class TourInfoUI {
 	private Font						_boldFont;
 
 	private final DateTimeFormatter		_dateFormatter			= DateTimeFormat.fullDate();
-	private final DateTimeFormatter		_timeFormatter			= DateTimeFormat.shortTime();
+	private final DateTimeFormatter		_timeFormatter			= DateTimeFormat.mediumTime();
 	private final DateTimeFormatter		_dtFormatter			= DateTimeFormat.mediumDateTime();
 	private final NumberFormat			_nf1					= NumberFormat.getInstance();
 	private final NumberFormat			_nf3					= NumberFormat.getInstance();

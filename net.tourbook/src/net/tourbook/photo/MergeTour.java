@@ -26,72 +26,75 @@ import net.tourbook.data.TourData;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
 import org.joda.time.PeriodType;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 public class MergeTour {
 
-	private static PeriodType		_tourPeriodTemplate	= PeriodType.yearMonthDayTime()
-														// hide these components
-																.withMonthsRemoved()
-																.withMinutesRemoved()
-																.withSecondsRemoved()
-																.withMillisRemoved();
+	private static PeriodType				_tourPeriodTemplate	= PeriodType.yearMonthDayTime()
+																// hide these components
+																//	.withMonthsRemoved()
+																		.withMinutesRemoved()
+																		.withSecondsRemoved()
+																		.withMillisRemoved();
 
-	private boolean					isDummyTour;
+	private static final DateTimeFormatter	_dtFormatter		= DateTimeFormat.forStyle("SL");	//$NON-NLS-1$
+
+	private boolean							isHistoryTour;
 
 	/**
 	 * Contains tour id when it's a real tour, otherwise it contains {@link Long#MIN_VALUE}.
 	 */
-	long							tourId				= Long.MIN_VALUE;
-	long							tourTypeId			= -1;
+	long									tourId				= Long.MIN_VALUE;
+	long									tourTypeId			= -1;
 
 	/**
 	 * Tour start time in ms
 	 */
-	long							tourStartTime;
+	long									tourStartTime;
 
 	/**
-	 * Tour end time is {@link Long#MAX_VALUE} when not yet set.
+	 * Tour end time in ms.
 	 */
-	long							tourEndTime			= Long.MAX_VALUE;
+	long									tourEndTime			= Long.MAX_VALUE;
 
-	long							historyStartTime;
-	long							historyEndTime;
+	long									historyStartTime;
+	long									historyEndTime;
 
-	private DateTime				tourStartDateTime;
-	Period							tourPeriod;
+	private DateTime						tourStartDateTime;
+	Period									tourPeriod;
 
-	int								numberOfPhotos;
-	int								numberOfGPSPhotos;
-	int								numberOfNoGPSPhotos;
+	int										numberOfPhotos;
+	int										numberOfGPSPhotos;
+	int										numberOfNoGPSPhotos;
 
-	HashMap<String, Camera>			cameras				= new HashMap<String, Camera>();
-	Camera[]						cameraList;
+	HashMap<String, Camera>					cameras				= new HashMap<String, Camera>();
+	Camera[]								cameraList;
 
 	/**
 	 * Contains all photos for this tour.
 	 */
-	public ArrayList<PhotoWrapper>	tourPhotos			= new ArrayList<PhotoWrapper>();
+	public ArrayList<PhotoWrapper>			tourPhotos			= new ArrayList<PhotoWrapper>();
 
-	private TourData				_dummyTourData;
-
-	private TLongArrayList			_dummyTimeSerie;
+	private TourData						_historyTourData;
+	private TLongArrayList					_historyTimeSerie;
 
 	/**
-	 * Constructor for a dummy tour.
+	 * Constructor for a history tour.
 	 * 
 	 * @param notUsed
 	 */
 	MergeTour(final long tourStartTime) {
 
-		isDummyTour = true;
+		isHistoryTour = true;
 
 		setTourStartTime(tourStartTime);
 
-		_dummyTourData = new TourData();
-		_dummyTourData.createDummyTour();
+		_historyTourData = new TourData();
+		_historyTourData.setupHistoryTour();
 
-		_dummyTimeSerie = new TLongArrayList();
-		_dummyTimeSerie.add(tourStartTime);
+		_historyTimeSerie = new TLongArrayList();
+		_historyTimeSerie.add(tourStartTime);
 	}
 
 	/**
@@ -110,7 +113,7 @@ public class MergeTour {
 	}
 
 	void addPhotoTime(final long photoTime) {
-		_dummyTimeSerie.add(photoTime);
+		_historyTimeSerie.add(photoTime);
 	}
 
 	private void addTimeSlice(final ArrayList<TimeData> dtList, final long timeSliceTime) {
@@ -141,66 +144,66 @@ public class MergeTour {
 		return true;
 	}
 
-	private void finalizeDummyTour() {
+	private void finalizeHistoryTour() {
 
-		final ArrayList<TimeData> dtList = new ArrayList<TimeData>();
+		final long[] historyTimeSerie = _historyTimeSerie.toArray();
 
-		final long[] dummyTimeSerie = _dummyTimeSerie.toArray();
+		final long tourStart = historyTimeSerie[0];
+		final long tourEnd = historyTimeSerie[historyTimeSerie.length - 1];
 
-		final long tourStart = dummyTimeSerie[0];
-		final long tourEnd = dummyTimeSerie[dummyTimeSerie.length - 1];
+		historyStartTime = tourStartTime = tourStart;
+		historyEndTime = tourEndTime = tourEnd;
 
-		if (dummyTimeSerie.length == 1) {
+		if (historyTimeSerie.length == 1) {
 
 			// only 1 point is visible
 
 			tourStartTime = tourStart - 1000;
 			tourEndTime = tourStart + 1000;
 
-			historyStartTime = tourStartTime;
-			historyEndTime = tourEndTime;
-
 		} else {
 
 			// add additional 5% tour time that the tour do not start/end at the chart border
 
 			final long timeDiff = tourEnd - tourStart;
-			final long timeOffset = (long) (timeDiff * 0.02);
+			final long timeOffset = (long) (timeDiff * 0.03);
 
 			tourStartTime = tourStart - timeOffset;
 			tourEndTime = tourEnd + timeOffset;
 		}
 
-		/*
-		 * adjust start and end that the dummy tour do not start at the chart border
-		 */
-
 		// update adjusted start
 		tourStartDateTime = new DateTime(tourStartTime);
 
 		/*
+		 * adjust start and end that the dummy tour do not start at the chart border
+		 */
+
+		final ArrayList<TimeData> timeSlices = new ArrayList<TimeData>();
+
+		/*
 		 * set tour start time line before first time slice
 		 */
-		addTimeSlice(dtList, tourStartTime);
+		addTimeSlice(timeSlices, tourStartTime);
 
 		/*
 		 * create time data list for all time slices which contains photos
 		 */
-		for (final long timeSliceTime : dummyTimeSerie) {
-			addTimeSlice(dtList, timeSliceTime);
+		for (final long timeSliceTime : historyTimeSerie) {
+			addTimeSlice(timeSlices, timeSliceTime);
 		}
 
 		/*
 		 * set tour end time after the last time slice
 		 */
-		addTimeSlice(dtList, tourEndTime);
+		addTimeSlice(timeSlices, tourEndTime);
 
-		_dummyTourData.setTourStartTime(tourStartDateTime);
-		_dummyTourData.createTimeSeries(dtList, false);
+		_historyTourData.setTourStartTime(tourStartDateTime);
+		_historyTourData.createTimeSeries(timeSlices, false);
 	}
 
-	public TourData getDummyTourData() {
-		return _dummyTourData;
+	public TourData getHistoryTourData() {
+		return _historyTourData;
 	}
 
 	@Override
@@ -211,25 +214,19 @@ public class MergeTour {
 		return result;
 	}
 
-	public boolean isDummyTour() {
-		return isDummyTour;
+	public boolean isHistoryTour() {
+		return isHistoryTour;
 	}
 
-	void setTourEndTime(long endTime) {
-
-		// ensure that a time difference of at least 1 second is set for a tour
-		if (endTime < (tourStartTime + 1000)) {
-			endTime = tourStartTime + 1000;
-		}
+	void setTourEndTime(final long endTime) {
 
 		tourEndTime = endTime;
-		historyEndTime = endTime;
 
-		if (isDummyTour) {
-			finalizeDummyTour();
+		if (isHistoryTour) {
+			finalizeHistoryTour();
 		}
 
-		// set tour period AFTER dummy tour is finalized
+		// set tour period AFTER history tour is finalized
 		tourPeriod = new Period(tourStartTime, tourEndTime, _tourPeriodTemplate);
 	}
 
@@ -237,8 +234,17 @@ public class MergeTour {
 
 		tourStartTime = time;
 		tourStartDateTime = new DateTime(time);
+	}
 
-		historyStartTime = time;
+	@Override
+	public String toString() {
+		return "MergeTour "
+				+ ("\ttourStart=" + _dtFormatter.print(tourStartTime))
+				+ ("\ttourEnd=" + _dtFormatter.print(tourEndTime))
+				+ ("\tisHistory=" + isHistoryTour)
+				+ ("\ttourId=" + tourId)
+		//
+		;
 	}
 
 }

@@ -20,13 +20,17 @@ import java.util.ArrayList;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.common.util.Util;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.UI;
 
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -40,21 +44,30 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
-public class TourPhotosView extends ViewPart implements IPhotoGalleryProvider {
+public class TourPhotosView extends ViewPart {
 
-	public static final String				ID			= "net.tourbook.photo.TourPhotosView.ID";			//$NON-NLS-1$
+	public static final String				ID								= "net.tourbook.photo.TourPhotosView.ID";	//$NON-NLS-1$
 
-	private final IPreferenceStore			_prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
+	private static final String				STATE_PHOTO_GALLERY_IS_VERTICAL	= "STATE_PHOTO_GALLERY_IS_VERTICAL";		//$NON-NLS-1$
 
-	private static final IDialogSettings	_state		= TourbookPlugin.getDefault()//
-																.getDialogSettingsSection(ID);
+	private final IPreferenceStore			_prefStore						= TourbookPlugin
+																					.getDefault()
+																					.getPreferenceStore();
+	private static final IDialogSettings	_state							= TourbookPlugin.getDefault()//
+																					.getDialogSettingsSection(ID);
+
+	private final DateTimeFormatter			_dtFormatter					= DateTimeFormat.forStyle("SL");			//$NON-NLS-1$
 
 	private PostSelectionProvider			_postSelectionProvider;
 
@@ -65,6 +78,8 @@ public class TourPhotosView extends ViewPart implements IPhotoGalleryProvider {
 
 	private boolean							_isPartVisible;
 
+	private ActionToggleGalleryOrientation	_actionToggleGalleryOrientation;
+
 	/**
 	 * contains selection which was set when the part is hidden
 	 */
@@ -74,12 +89,72 @@ public class TourPhotosView extends ViewPart implements IPhotoGalleryProvider {
 
 	private PhotoGallery					_photoGallery;
 
+	private boolean							_isVerticalGallery;
+	public IToolBarManager					_galleryToolbarManager;
+
 	/*
 	 * UI controls
 	 */
+	private ToolBar							_toolbarLeft;
+	private Label							_labelTitle;
+
+	private class ActionToggleGalleryOrientation extends Action {
+
+		public ActionToggleGalleryOrientation() {
+
+			super(null, Action.AS_PUSH_BUTTON);
+
+			/**
+			 * VERY IMPORTANT
+			 * <p>
+			 * an image must be set in the constructor, otherwise the button is small when only ONE
+			 * action is in the toolbar
+			 */
+			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__PhotoGalleryHorizontal));
+		}
+
+		@Override
+		public void run() {
+			actionToggleVH();
+		}
+	}
+
+	private final class PhotoGalleryProvider implements IPhotoGalleryProvider {
+
+		@Override
+		public IStatusLineManager getStatusLineManager() {
+			return getViewSite().getActionBars().getStatusLineManager();
+		}
+
+		@Override
+		public IToolBarManager getToolBarManager() {
+			return getViewSite().getActionBars().getToolBarManager();
+		}
+
+		@Override
+		public void registerContextMenu(final String menuId, final MenuManager menuManager) {}
+
+		@Override
+		public void setSelection(final PhotoSelection photoSelection) {
+			_postSelectionProvider.setSelection(photoSelection);
+		}
+	}
 
 	public TourPhotosView() {
 		super();
+	}
+
+	private void actionToggleVH() {
+
+		// keep state for current orientation
+		_photoGallery.saveState(_state);
+
+		// toggle gallery
+		_isVerticalGallery = !_isVerticalGallery;
+
+		updateUI_ToogleAction();
+
+		_photoGallery.setVertical(_isVerticalGallery);
 	}
 
 	private void addPartListener() {
@@ -191,10 +266,18 @@ public class TourPhotosView extends ViewPart implements IPhotoGalleryProvider {
 
 	}
 
+	private void createActions() {
+
+		_actionToggleGalleryOrientation = new ActionToggleGalleryOrientation();
+	}
+
 	@Override
 	public void createPartControl(final Composite parent) {
 
 		createUI(parent);
+
+		createActions();
+		fillActionBar();
 
 		addSelectionListener();
 		addTourEventListener();
@@ -209,16 +292,65 @@ public class TourPhotosView extends ViewPart implements IPhotoGalleryProvider {
 
 	private void createUI(final Composite parent) {
 
+		createUI_10_Gallery(parent);
+		createUI_20_ActionBar(_photoGallery.getCustomActionBarContainer());
+
+		// must be called after the custom action bar is created
+		_photoGallery.createActionBar();
+	}
+
+	private void createUI_10_Gallery(final Composite parent) {
+
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 		{
 			_photoGallery = new PhotoGallery();
 
-			_photoGallery.createPhotoGallery(container, SWT.H_SCROLL | SWT.MULTI, this);
-			_photoGallery.createActionBar();
+			_photoGallery.setShowCustomActionBar();
+			_photoGallery.setShowThumbnailSize();
+
+			_photoGallery.createPhotoGallery(
+					container,
+					SWT.V_SCROLL | SWT.H_SCROLL | SWT.MULTI,
+					new PhotoGalleryProvider());
 
 			_photoGallery.setDefaultStatusMessage(Messages.Tour_Photos_Label_StatusMessage_NoTourWithPhotos);
+		}
+	}
+
+	private void createUI_20_ActionBar(final Composite parent) {
+
+		GridLayoutFactory.fillDefaults().applyTo(parent);
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.grab(true, true)
+				.align(SWT.FILL, SWT.CENTER)
+				.applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+		{
+			/*
+			 * label: title
+			 */
+			_labelTitle = new Label(container, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.grab(true, true)
+					.align(SWT.FILL, SWT.CENTER)
+//					.hint(20, SWT.DEFAULT)
+					.applyTo(_labelTitle);
+//			_labelTitle.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+
+			/*
+			 * create toolbar for the buttons on the left side
+			 */
+			_toolbarLeft = new ToolBar(container, SWT.FLAT);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.FILL, SWT.CENTER)
+//					.grab(false, true)
+					.applyTo(_toolbarLeft);
+//			_toolbarLeft.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 		}
 	}
 
@@ -236,14 +368,16 @@ public class TourPhotosView extends ViewPart implements IPhotoGalleryProvider {
 		super.dispose();
 	}
 
-	@Override
-	public IStatusLineManager getStatusLineManager() {
-		return getViewSite().getActionBars().getStatusLineManager();
-	}
+	private void fillActionBar() {
 
-	@Override
-	public IToolBarManager getToolBarManager() {
-		return getViewSite().getActionBars().getToolBarManager();
+		/*
+		 * fill gallery toolbar
+		 */
+		_galleryToolbarManager = new ToolBarManager(_toolbarLeft);
+
+		_galleryToolbarManager.add(_actionToggleGalleryOrientation);
+
+		_galleryToolbarManager.update(true);
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
@@ -271,19 +405,22 @@ public class TourPhotosView extends ViewPart implements IPhotoGalleryProvider {
 		}
 	}
 
-	@Override
-	public void registerContextMenu(final String menuId, final MenuManager menuManager) {
-//		getSite().registerContextMenu(menuId, menuManager, _postSelectionProvider);
-	}
-
 	private void restoreState() {
 
 		updateColors(true);
 
 		_photoGallery.restoreState(_state);
+
+		// set gallery orientation
+		_isVerticalGallery = Util.getStateBoolean(_state, STATE_PHOTO_GALLERY_IS_VERTICAL, true);
+		_photoGallery.setVertical(_isVerticalGallery);
+
+		updateUI_ToogleAction();
 	}
 
 	private void saveState() {
+
+		_state.put(STATE_PHOTO_GALLERY_IS_VERTICAL, _isVerticalGallery);
 
 		_photoGallery.saveState(_state);
 	}
@@ -291,11 +428,6 @@ public class TourPhotosView extends ViewPart implements IPhotoGalleryProvider {
 	@Override
 	public void setFocus() {
 
-	}
-
-	@Override
-	public void setSelection(final PhotoSelection photoSelection) {
-		_postSelectionProvider.setSelection(photoSelection);
 	}
 
 	private void updateColors(final boolean isRestore) {
@@ -315,7 +447,10 @@ public class TourPhotosView extends ViewPart implements IPhotoGalleryProvider {
 
 	private void updateUI(final TourPhotoSelection tourPhotoSelection) {
 
-		final MergeTour mergeTour = tourPhotoSelection.mergeTour;
+		/*
+		 * update photo gallery
+		 */
+		final MergeTour mergeTour = tourPhotoSelection.mergedTour;
 		final ArrayList<PhotoWrapper> photoWrapperList = mergeTour.tourPhotos;
 
 		final long tourId = mergeTour.tourId;
@@ -325,5 +460,39 @@ public class TourPhotosView extends ViewPart implements IPhotoGalleryProvider {
 				: Long.toString(tourId);
 
 		_photoGallery.showImages(photoWrapperList, galleryPositionKey + " TourPhotosView", true);//$NON-NLS-1$
+
+		/*
+		 * set title
+		 */
+		final int size = photoWrapperList.size();
+		if (size == 1) {
+			_labelTitle.setText(_dtFormatter.print(mergeTour.tourStartTime));
+		} else if (size > 1) {
+			_labelTitle.setText(_dtFormatter.print(mergeTour.tourStartTime)
+					+ UI.DASH_WITH_DOUBLE_SPACE
+					+ _dtFormatter.print(mergeTour.tourEndTime));
+		} else {
+			_labelTitle.setText(UI.EMPTY_STRING);
+		}
+	}
+
+	private void updateUI_ToogleAction() {
+
+		if (_isVerticalGallery) {
+
+			_actionToggleGalleryOrientation.setToolTipText(//
+					Messages.Photo_Gallery_Action_ToggleGalleryHorizontal_ToolTip);
+
+			_actionToggleGalleryOrientation.setImageDescriptor(//
+					TourbookPlugin.getImageDescriptor(Messages.Image__PhotoGalleryHorizontal));
+
+		} else {
+
+			_actionToggleGalleryOrientation.setToolTipText(//
+					Messages.Photo_Gallery_Action_ToggleGalleryVertical_ToolTip);
+
+			_actionToggleGalleryOrientation.setImageDescriptor(//
+					TourbookPlugin.getImageDescriptor(Messages.Image__PhotoGalleryVertical));
+		}
 	}
 }

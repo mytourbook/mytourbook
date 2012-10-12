@@ -386,7 +386,7 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 
 			_photoGallery.hideActionSorting();
 			_photoGallery.hideActionFiltering();
-			_photoGallery.setShowActionBar();
+			_photoGallery.setShowCustomActionBar();
 
 			_photoGallery.createPhotoGallery(container, SWT.H_SCROLL, this);
 

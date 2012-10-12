@@ -88,13 +88,6 @@ public class ChartXSlider {
 	}
 
 	/**
-	 * @return Returns the slider line position in the graph
-	 */
-	public int getXXDevSliderLinePos() {
-		return _xxDevSliderLinePos;
-	}
-
-	/**
 	 * @return Returns the devXClickOffset.
 	 */
 	int getDevXClickOffset() {
@@ -140,6 +133,13 @@ public class ChartXSlider {
 
 	public float getValueX() {
 		return _xAxisValue;
+	}
+
+	/**
+	 * @return Returns the slider line position in the graph
+	 */
+	public int getXXDevSliderLinePos() {
+		return _xxDevSliderLinePos;
 	}
 
 	/**
@@ -211,7 +211,7 @@ public class ChartXSlider {
 
 		if (isAdjustPositionRatio) {
 
-			_positionRatio = (float) newXXDevSliderLinePos / (_xxDevFullyGraphWidth - 0);
+			_positionRatio = (double) newXXDevSliderLinePos / (_xxDevFullyGraphWidth - 0);
 
 			// enforce max value
 			_positionRatio = Math.min(_positionRatio, 1);

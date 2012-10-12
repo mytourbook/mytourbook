@@ -357,38 +357,6 @@ public class Util {
 		return sb.toString();
 	}
 
-	public static int[] getState(final IDialogSettings state, final String key, final int[] defaultValue) {
-
-		final String[] stringValues = state.getArray(key);
-
-		if (stringValues == null) {
-			return defaultValue;
-		}
-
-		final ArrayList<Integer> intValues = new ArrayList<Integer>();
-
-		for (final String stringValue : stringValues) {
-
-			try {
-
-				final int intValue = Integer.parseInt(stringValue);
-
-				intValues.add(intValue);
-
-			} catch (final NumberFormatException e) {
-				// just ignore
-			}
-		}
-
-		int intIndex = 0;
-		final int[] intintValues = new int[intValues.size()];
-		for (final Integer intValue : intValues) {
-			intintValues[intIndex++] = intValue;
-		}
-
-		return intintValues;
-	}
-
 	/**
 	 * @param state
 	 * @param key
@@ -484,6 +452,38 @@ public class Util {
 		}
 	}
 
+	public static int[] getStateIntArray(final IDialogSettings state, final String key, final int[] defaultValue) {
+
+		final String[] stringValues = state.getArray(key);
+
+		if (stringValues == null) {
+			return defaultValue;
+		}
+
+		final ArrayList<Integer> intValues = new ArrayList<Integer>();
+
+		for (final String stringValue : stringValues) {
+
+			try {
+
+				final int intValue = Integer.parseInt(stringValue);
+
+				intValues.add(intValue);
+
+			} catch (final NumberFormatException e) {
+				// just ignore
+			}
+		}
+
+		int intIndex = 0;
+		final int[] intintValues = new int[intValues.size()];
+		for (final Integer intValue : intValues) {
+			intintValues[intIndex++] = intValue;
+		}
+
+		return intintValues;
+	}
+
 	/**
 	 * @param state
 	 * @param key
@@ -497,6 +497,38 @@ public class Util {
 		} catch (final NumberFormatException e) {
 			return defaultValue;
 		}
+	}
+
+	public static long[] getStateLongArray(final IDialogSettings state, final String key, final long[] defaultValue) {
+
+		final String[] stringValues = state.getArray(key);
+
+		if (stringValues == null) {
+			return defaultValue;
+		}
+
+		final ArrayList<Long> longValues = new ArrayList<Long>();
+
+		for (final String stringValue : stringValues) {
+
+			try {
+
+				final long longValue = Long.parseLong(stringValue);
+
+				longValues.add(longValue);
+
+			} catch (final NumberFormatException e) {
+				// just ignore
+			}
+		}
+
+		int intIndex = 0;
+		final long[] longlongValues = new long[longValues.size()];
+		for (final Long longValue : longValues) {
+			longlongValues[intIndex++] = longValue;
+		}
+
+		return longlongValues;
 	}
 
 	/**
@@ -776,8 +808,20 @@ public class Util {
 	public static void setState(final IDialogSettings state, final String stateKey, final int[] intValues) {
 
 		final String[] stateIndices = new String[intValues.length];
+
 		for (int index = 0; index < intValues.length; index++) {
 			stateIndices[index] = Integer.toString(intValues[index]);
+		}
+
+		state.put(stateKey, stateIndices);
+	}
+
+	public static void setState(final IDialogSettings state, final String stateKey, final long[] values) {
+		
+		final String[] stateIndices = new String[values.length];
+
+		for (int index = 0; index < values.length; index++) {
+			stateIndices[index] = Long.toString(values[index]);
 		}
 
 		state.put(stateKey, stateIndices);

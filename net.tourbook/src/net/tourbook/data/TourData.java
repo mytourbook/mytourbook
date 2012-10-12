@@ -608,9 +608,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private TourBike										tourBike;
 
 	/**
-	 * Contains time in seconds relativ to the tour start which is defined in: {@link #startYear},
-	 * {@link #startMonth}, {@link #startDay}, {@link #startHour}, {@link #startMinute} and
-	 * {@link #startSecond}.
+	 * Contains time in <b>seconds</b> relativ to the tour start which is defined in:
+	 * {@link #startYear}, {@link #startMonth}, {@link #startDay}, {@link #startHour},
+	 * {@link #startMinute} and {@link #startSecond}.
 	 * <p>
 	 * The array {@link #timeSerie} is <code>null</code> for a manually created tour, it is
 	 * <b>always</b> set when tour is from a device or an imported file.
@@ -981,7 +981,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * 
 	 */
 	@Transient
-	public boolean											isDummyTour;
+	public boolean											isHistoryTour;
 
 	public TourData() {}
 
@@ -2858,17 +2858,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 
 		return floatDataSerie;
-	}
-
-	public void createDummyTour() {
-
-		/*
-		 * tour id is not necessary but to prevent many adjustment to the existing code, tour id is
-		 * set but I'm not sure if this works :-(
-		 */
-		tourId = System.nanoTime();
-
-		isDummyTour = true;
 	}
 
 	private void createSRTMDataSerie() {
@@ -5685,6 +5674,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 
 		return isAvailable;
+	}
+
+	public void setupHistoryTour() {
+
+		/*
+		 * tour id is not necessary but to prevent many adjustment to the existing code, tour id is
+		 * set but I'm not sure if this works :-(
+		 */
+		tourId = System.nanoTime();
+
+		isHistoryTour = true;
 	}
 
 	private boolean setupLatLonStartingValues(final TimeData[] timeDataSerie) {

@@ -29,6 +29,7 @@ import java.util.HashMap;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
@@ -41,7 +42,6 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TableColumnFactory;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionModifyColumns;
 
 import org.eclipse.jface.action.IMenuListener;
@@ -103,31 +103,35 @@ import org.joda.time.format.PeriodFormatterBuilder;
 
 public class PhotosAndToursView extends ViewPart implements ITourProvider, ITourViewer {
 
-	public static final String						ID					= "net.tourbook.photo.merge.PhotosAndToursView.ID"; //$NON-NLS-1$
+	public static final String						ID								= "net.tourbook.photo.merge.PhotosAndToursView.ID"; //$NON-NLS-1$
 
-	public static final String						IMAGE_PIC_DIR_VIEW	= "IMAGE_PIC_DIR_VIEW";							//$NON-NLS-1$
+	private static final String						STATE_CAMERA_ADJUSTMENT_NAME	= "STATE_CAMERA_ADJUSTMENT_NAME";					//$NON-NLS-1$
+	private static final String						STATE_CAMERA_ADJUSTMENT_TIME	= "STATE_CAMERA_ADJUSTMENT_TIME";					//$NON-NLS-1$
 
-	private static final String						CAMERA_UNKNOWN_KEY	= "CAMERA_UNKNOWN_KEY";							//$NON-NLS-1$
+	public static final String						IMAGE_PIC_DIR_VIEW				= "IMAGE_PIC_DIR_VIEW";							//$NON-NLS-1$
 
-	private final IPreferenceStore					_prefStore			= TourbookPlugin
-																				.getDefault()
-																				.getPreferenceStore();
+	private static final String						CAMERA_UNKNOWN_KEY				= "CAMERA_UNKNOWN_KEY";							//$NON-NLS-1$
 
-	private final IDialogSettings					_state				= TourbookPlugin
-																				.getDefault()
-																				.getDialogSettingsSection(ID);
+	private final IPreferenceStore					_prefStore						= TourbookPlugin
+																							.getDefault()
+																							.getPreferenceStore();
 
-	private ArrayList<MergeTour>					_allDbTours			= new ArrayList<MergeTour>();
+	private final IDialogSettings					_state							= TourbookPlugin
+																							.getDefault()
+																							.getDialogSettingsSection(
+																									ID);
 
-	private ArrayList<MergeTour>					_allMergeTours		= new ArrayList<MergeTour>();
-	private ArrayList<PhotoWrapper>					_allPhotos			= new ArrayList<PhotoWrapper>();
+	private ArrayList<MergeTour>					_allDbTours						= new ArrayList<MergeTour>();
+
+	private ArrayList<MergeTour>					_allMergeTours					= new ArrayList<MergeTour>();
+	private ArrayList<PhotoWrapper>					_allPhotos						= new ArrayList<PhotoWrapper>();
 
 	private DateTime								_allPhotoStartDate;
 
 	/**
 	 * Contains all cameras used in all tours, key is the camera name.
 	 */
-	private HashMap<String, Camera>					_allCameras			= new HashMap<String, Camera>();
+	private HashMap<String, Camera>					_allCameras						= new HashMap<String, Camera>();
 
 	/**
 	 * Merge tour which is currently selected in the merge tour viewer.
@@ -149,19 +153,21 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 	 */
 //	private float									_unitValueAltitude;
 
-	private final PeriodFormatter					_durationFormatter	= new PeriodFormatterBuilder()
-																				.appendYears()
-																				.appendSuffix("y ", "y ") //$NON-NLS-1$ //$NON-NLS-2$
-																				.appendDays()
-																				.appendSuffix("d ", "d ") //$NON-NLS-1$ //$NON-NLS-2$
-																				.appendHours()
-																				.appendSuffix("h ", "h ") //$NON-NLS-1$ //$NON-NLS-2$
-																				.toFormatter();
+	private final PeriodFormatter					_durationFormatter				= new PeriodFormatterBuilder()
+																							.appendYears()
+																							.appendSuffix("y ", "y ") //$NON-NLS-1$ //$NON-NLS-2$
+																							.appendMonths()
+																							.appendSuffix("m ", "m ") //$NON-NLS-1$ //$NON-NLS-2$
+																							.appendDays()
+																							.appendSuffix("d ", "d ") //$NON-NLS-1$ //$NON-NLS-2$
+																							.appendHours()
+																							.appendSuffix("h ", "h ") //$NON-NLS-1$ //$NON-NLS-2$
+																							.toFormatter();
 
-	private final DateTimeFormatter					_dateFormatter		= DateTimeFormat.shortDate();
-	private final DateTimeFormatter					_timeFormatter		= DateTimeFormat.mediumTime();
+	private final DateTimeFormatter					_dateFormatter					= DateTimeFormat.shortDate();
+	private final DateTimeFormatter					_timeFormatter					= DateTimeFormat.mediumTime();
 
-	private final NumberFormat						_nf_1_1				= NumberFormat.getNumberInstance();
+	private final NumberFormat						_nf_1_1							= NumberFormat.getNumberInstance();
 	{
 		_nf_1_1.setMinimumFractionDigits(1);
 		_nf_1_1.setMaximumFractionDigits(1);
@@ -212,8 +218,8 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 			/*
 			 * sort by time
 			 */
-			final long mt1Time = mt1.historyStartTime;
-			final long mt2Time = mt2.historyStartTime;
+			final long mt1Time = mt1.tourStartTime;
+			final long mt2Time = mt2.tourStartTime;
 
 			if (mt1Time != 0 && mt2Time != 0) {
 				return mt1Time > mt2Time ? 1 : -1;
@@ -371,7 +377,7 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 
 		MergeTour currentMergeTour = null;
 		long realTourEnd;
-		boolean isDummyTour = false;
+		boolean isHistoryTour = false;
 
 		if (_allDbTours.size() > 0) {
 
@@ -399,7 +405,8 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 		}
 
 		realTourEnd = currentMergeTour.tourEndTime;
-		isDummyTour = currentMergeTour.isDummyTour();
+		isHistoryTour = currentMergeTour.isHistoryTour();
+
 		long photoTime = 0;
 
 		_allMergeTours.clear();
@@ -419,7 +426,7 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 			boolean isSetupNewTour = false;
 
 			// first check real tours
-			if (isDummyTour == false) {
+			if (isHistoryTour == false) {
 
 				// current merge tour is a real tour
 
@@ -458,7 +465,7 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 
 				final MergeTour nextMergeTour = createMergeTours_GetNextDbTour(tourIndexStart, photoTime);
 
-				if (nextMergeTour.isDummyTour()) {
+				if (nextMergeTour.isHistoryTour()) {
 
 					// it's again a dummy tour, put photo into current dummy tour
 
@@ -479,9 +486,9 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 			if (isSetupNewTour) {
 
 				realTourEnd = currentMergeTour.tourEndTime;
-				isDummyTour = currentMergeTour.isDummyTour();
+				isHistoryTour = currentMergeTour.isHistoryTour();
 
-				if (currentMergeTour.isDummyTour() == false) {
+				if (currentMergeTour.isHistoryTour() == false) {
 
 					currentTourData = TourManager.getInstance().getTourData(currentMergeTour.tourId);
 					isTourWithGPS = currentTourData.latitudeSerie != null;
@@ -522,7 +529,7 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 		}
 
 		// set tour end time
-		if (currentMergeTour.isDummyTour()) {
+		if (currentMergeTour.isHistoryTour()) {
 			currentMergeTour.setTourEndTime(imageTime);
 		}
 
@@ -597,6 +604,8 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 		addSelectionListener();
 		addPrefListener();
 		addPartListener();
+
+		restoreState();
 
 		enableControls();
 
@@ -1046,7 +1055,7 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 
 					} else {
 
-						final Image tourTypeImage = UI.getInstance().getTourTypeImage(tourTypeId);
+						final Image tourTypeImage = net.tourbook.ui.UI.getInstance().getTourTypeImage(tourTypeId);
 
 						/*
 						 * when a tour type image is modified, it will keep the same image resource
@@ -1077,7 +1086,7 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 					if (tourTypeId == -1) {
 						cell.setText(UI.EMPTY_STRING);
 					} else {
-						cell.setText(UI.getInstance().getTourTypeLabel(tourTypeId));
+						cell.setText(net.tourbook.ui.UI.getInstance().getTourTypeLabel(tourTypeId));
 					}
 				}
 			}
@@ -1267,13 +1276,22 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 			}
 
 		} catch (final SQLException e) {
-			UI.showSQLException(e);
+			net.tourbook.ui.UI.showSQLException(e);
 		} finally {
 			Util.sqlClose(stmt);
 			TourDatabase.closeConnection(conn);
 		}
 
 		createMergeTours();
+
+//		System.out.println(UI.timeStampNano() + " \t");
+//		System.out.println(UI.timeStampNano() + " \t");
+//
+//		for (final MergeTour mergeTour : _allMergeTours) {
+//			System.out.println(UI.timeStampNano() + " \t" + mergeTour);
+//			// TODO remove SYSTEM.OUT.PRINTLN
+//		}
+
 	}
 
 	private void onSelectCamera() {
@@ -1370,6 +1388,27 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 		_tourViewer.setInput(new Object[0]);
 	}
 
+	private void restoreState() {
+
+		final String[] cameraNames = _state.getArray(STATE_CAMERA_ADJUSTMENT_NAME);
+		final long[] adjustments = Util.getStateLongArray(_state, STATE_CAMERA_ADJUSTMENT_TIME, null);
+
+		if (cameraNames != null && adjustments != null && cameraNames.length == adjustments.length) {
+
+			// it seems that the values are OK, create cameras with time adjustmens
+
+			for (int index = 0; index < cameraNames.length; index++) {
+
+				final String cameraName = cameraNames[index];
+
+				final Camera camera = new Camera(cameraName);
+				camera.timeAdjustment = adjustments[index];
+
+				_allCameras.put(cameraName, camera);
+			}
+		}
+	}
+
 	private void saveState() {
 
 		// check if UI is disposed
@@ -1378,13 +1417,30 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 			return;
 		}
 
+		/*
+		 * camera time adjustment
+		 */
+		final int size = _allCameras.size();
+
+		final String[] cameras = new String[size];
+		final long[] adjustment = new long[size];
+
+		int index = 0;
+		for (final Camera camera : _allCameras.values()) {
+			cameras[index] = camera.cameraName;
+			adjustment[index] = camera.timeAdjustment;
+			index++;
+		}
+		_state.put(STATE_CAMERA_ADJUSTMENT_NAME, cameras);
+		Util.setState(_state, STATE_CAMERA_ADJUSTMENT_TIME, adjustment);
+
 		_columnManager.saveState(_state);
 	}
 
 	private void selectTour(final MergeTour mergeTour) {
 
 		MergeTour selectedTour;
-		if (mergeTour == null || mergeTour.isDummyTour()) {
+		if (mergeTour == null || mergeTour.isHistoryTour()) {
 			// select first tour
 			selectedTour = _allMergeTours.get(0);
 		} else {
@@ -1506,7 +1562,12 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 
 		for (final Camera camera : mergeTour.cameraList) {
 
-			_comboCamera.add(camera.cameraName);
+			final Camera existingCamera = _allCameras.get(camera.cameraName);
+			if (existingCamera != null && camera.cameraName.equals(existingCamera.cameraName)) {
+				_comboCamera.add(existingCamera.cameraName);
+			} else {
+				_comboCamera.add(camera.cameraName);
+			}
 
 			// get index for the last selected camera
 			if (cameraComboIndex == -1 && currentSelectedCamera != null && currentSelectedCamera.equals(camera)) {
@@ -1518,5 +1579,8 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 
 		// select previous camera
 		_comboCamera.select(cameraComboIndex == -1 ? 0 : cameraComboIndex);
+
+		// update camera time adjustment spinner
+		onSelectCamera();
 	}
 }

@@ -79,7 +79,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 	private TourChartConfiguration	_tourChartConfig;
 	private TourData				_tourData;
-	private MergeTour				_mergeTour;
+	private MergeTour				_mergedTour;
 
 	private PostSelectionProvider	_postSelectionProvider;
 	private ISelectionListener		_postSelectionListener;
@@ -389,7 +389,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 	private void onSelectionChanged(final ISelection selection) {
 
-		_mergeTour = null;
+		_mergedTour = null;
 
 		if (selection instanceof SelectionTourData) {
 
@@ -419,15 +419,14 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 			if (selection instanceof TourPhotoSelection) {
 
-				_mergeTour = ((TourPhotoSelection) selection).mergeTour;
+				_mergedTour = ((TourPhotoSelection) selection).mergedTour;
 
-				if (_mergeTour.isDummyTour()) {
-					final TourData dummyTourData = _mergeTour.getDummyTourData();
-					updateChart(dummyTourData);
+				if (_mergedTour.isHistoryTour()) {
+					updateChart(_mergedTour.getHistoryTourData());
 				}
 			}
 
-			final boolean isForceUpdate = _mergeTour != null;
+			final boolean isForceUpdate = _mergedTour != null;
 
 			// force update when photo selection occured
 			updateChart(tourId, isForceUpdate);
@@ -586,7 +585,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 		_pageBook.showPage(_tourChart);
 
-		_tourData.mergeTour = _mergeTour;
+		_tourData.mergeTour = _mergedTour;
 
 		_tourChart.updateTourChart(_tourData, _tourChartConfig, false);
 

@@ -775,13 +775,13 @@ public class Messages extends NLS {
 
 	public static String		NT001_DialogExtractTour_InvalidTourData;
 
+	public static String	Photo_Gallery_Action_ToggleGalleryHorizontal_ToolTip;
+
+	public static String	Photo_Gallery_Action_ToggleGalleryVertical_ToolTip;
+
 	public static String		Photo_Tooltip_Action_MoveToolTip_ToolTip;
 
 	public static String	Photo_Tooltip_Action_PinToolTip_ToolTip;
-
-	public static String		Photo_Tooltip_Action_ToggleGalleryHorizontal_ToolTip;
-
-	public static String		Photo_Tooltip_Action_ToggleGalleryVertical_ToolTip;
 
 	public static String		Photo_Tooltip_Label_ShellNoResize;
 

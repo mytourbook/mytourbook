@@ -549,28 +549,6 @@ public class TourManager {
 				+ getTourTimeShort(date);
 	}
 
-//	/**
-//	 * Check if a person is selected in the app toolbar. An error message will be displayed when a
-//	 * person is not selected.
-//	 *
-//	 * @return Returns <code>true</code> when a person is selected otherwise <code>false</code>
-//	 */
-//	public static boolean isPersonSelected() {
-//
-//		final TourPerson activePerson = TourbookPlugin.getActivePerson();
-//
-//		if (activePerson == null) {
-//			MessageDialog.openInformation(
-//					Display.getCurrent().getActiveShell(),
-//					Messages.Tour_Person_Dialog_GetSelectedPerson_Title,
-//					Messages.Tour_Person_Dialog_GetSelectedPerson_Message);
-//
-//			return false;
-//		}
-//
-//		return true;
-//	}
-
 	/**
 	 * @return returns the title of this tour
 	 */
@@ -2151,9 +2129,15 @@ public class TourManager {
 
 			chartDataModel.setChartType(ChartDataModel.CHART_TYPE_HISTORY);
 
+			xDataTime.setAxisUnit(ChartDataSerie.X_AXIS_UNIT_HISTORY);
+
+			// set date/time when x-axis starts
+			xDataTime.setStartDateTime(tourData.getTourStartTime());
+
 			final float[] historySerie = new float[tourData.timeSerie.length];
 
 			final ChartDataYSerie yDataHistory = createChartDataSerie(historySerie, ChartDataModel.CHART_TYPE_HISTORY);
+
 			yDataHistory.setAxisUnit(ChartDataSerie.AXIS_UNIT_HISTORY);
 
 			setGraphColor(_prefStore, yDataHistory, GraphColorProvider.PREF_GRAPH_HISTORY);

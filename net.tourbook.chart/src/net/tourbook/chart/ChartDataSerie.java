@@ -34,6 +34,7 @@ public abstract class ChartDataSerie {
 	public static final int			X_AXIS_UNIT_YEAR						= 50;
 	public static final int			X_AXIS_UNIT_WEEK						= 100;
 	public static final int			X_AXIS_UNIT_NUMBER_CENTER				= 101;
+	public static final int			X_AXIS_UNIT_HISTORY						= 102;
 
 	/**
 	 * Default color, when default color is not set

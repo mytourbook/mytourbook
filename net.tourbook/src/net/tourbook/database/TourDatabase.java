@@ -1342,9 +1342,9 @@ public class TourDatabase {
 		}
 
 		/*
-		 * dummy tour cannot be saved
+		 * history tour cannot be saved
 		 */
-		if (tourData.isDummyTour) {
+		if (tourData.isHistoryTour) {
 			return null;
 		}
 

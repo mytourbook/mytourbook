@@ -319,9 +319,9 @@ public class Util {
 				unit >= 360 ? 3600 : //
 						unit >= 60 ? 360 : //
 //								unit >= 30 ? 60 : //
-						unit >= 15 ? 60 : //
+								unit >= 15 ? 60 : //
 //												unit >= 12 ? 12 : //
-								12;
+										12;
 
 			} else {
 
@@ -623,9 +623,7 @@ public class Util {
 	 * @param graphUnit
 	 * @return
 	 */
-	public static double roundValueToUnit(	final double graphValue,
-											final double graphUnit,
-											final boolean isMinValue) {
+	public static double roundValueToUnit(final double graphValue, final double graphUnit, final boolean isMinValue) {
 
 		if (graphUnit < 1) {
 

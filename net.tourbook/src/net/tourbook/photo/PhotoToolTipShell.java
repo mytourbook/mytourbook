@@ -52,7 +52,7 @@ public abstract class PhotoToolTipShell {
 	/**
 	 * Number of steps when fading in
 	 */
-	private static final int			FADE_IN_STEPS								= 10;
+	private static final int			FADE_IN_STEPS								= 20;
 
 	/**
 	 * Number of steps when fading out
@@ -747,7 +747,7 @@ public abstract class PhotoToolTipShell {
 		}
 	}
 
-	protected abstract void onReparentShell(Shell reparentedShell) ;
+	protected abstract void onReparentShell(Shell reparentedShell);
 
 	private void onTTAllControlsEvent(final Event event) {
 
@@ -1202,16 +1202,6 @@ public abstract class PhotoToolTipShell {
 		_visibleRRShell = rrShell;
 		_visibleShell = rrShell.getShell();
 	}
-
-//	/**
-//	 * Set image gallery, this is done, after {@link #createToolTipContentArea(Event, Composite)} is
-//	 * executed.
-//	 *
-//	 * @param imageGallery
-//	 */
-//	protected void setImageGallery(final ImageGallery imageGallery) {
-//		_imageGallery = imageGallery;
-//	}
 
 	protected void setIsShellToggle() {
 		_isShellToggled = true;

@@ -223,7 +223,7 @@ public class PicDirImages implements IPhotoGalleryProvider {
 
 		_photoGallery = new PhotoGallery();
 
-		_photoGallery.setShowActionBar();
+		_photoGallery.setShowCustomActionBar();
 		_photoGallery.setShowThumbnailSize();
 
 		_photoGallery.createPhotoGallery(parent, SWT.V_SCROLL | SWT.MULTI, this);

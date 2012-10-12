@@ -54,7 +54,7 @@ public class PrefPagePhotoDirectory extends FieldEditorPreferencePage implements
 	public static final String		ID				= "net.tourbook.preferences.PrefPagePhotoDirectoryID";	//$NON-NLS-1$
 
 	private static final int		BORDER_MIN_SIZE	= 0;
-	private static final int		BORDER_MAX_SIZE	= 20;
+	private static final int		BORDER_MAX_SIZE	= 50;
 
 	private final IPreferenceStore	_prefStore		= Activator.getDefault().getPreferenceStore();
 

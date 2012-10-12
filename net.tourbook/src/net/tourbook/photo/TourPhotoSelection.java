@@ -19,13 +19,13 @@ import net.tourbook.tour.SelectionTourId;
 
 public class TourPhotoSelection extends SelectionTourId {
 
-	public MergeTour	mergeTour;
+	public MergeTour	mergedTour;
 
 	public TourPhotoSelection(final MergeTour mergeTour) {
 
 		super(mergeTour.tourId);
 
-		this.mergeTour = mergeTour;
+		mergedTour = mergeTour;
 	}
 
 }

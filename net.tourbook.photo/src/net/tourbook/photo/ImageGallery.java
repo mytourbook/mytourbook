@@ -461,9 +461,6 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	 * @param parent
 	 * @param style
 	 * @param photoGalleryProvider
-	 * @param isMultiOrientation
-	 *            When <code>true</code>, orientation can be changed with
-	 *            {@link #setVertical(boolean)}.
 	 */
 	public void createImageGallery(	final Composite parent,
 									final int style,
@@ -473,7 +470,6 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 		_galleryStyle = style;
 		_photoGalleryProvider = photoGalleryProvider;
-//		_isMultiOrientation = isMultiOrientation;
 
 		jobFilter_10_Create();
 		jobUIFilter_10_Create();
@@ -524,7 +520,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, 0).applyTo(container);
-//		container.setBackground(_display.getSystemColor(SWT.COLOR_RED));
+//		container.setBackground(_display.getSystemColor(SWT.COLOR_DARK_RED));
 		{
 			if (_isShowThumbsize || _isShowCustomActionBar) {
 				_galleryActionBar = new GalleryActionBar(container, this, _isShowThumbsize, _isShowCustomActionBar);
@@ -1716,7 +1712,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 			}
 		}
 
-		_restoredSelection = Util.getState(state, STATE_SELECTED_ITEMS, null);
+		_restoredSelection = Util.getStateIntArray(state, STATE_SELECTED_ITEMS, null);
 	}
 
 	public void saveState(final IDialogSettings state) {
@@ -1810,7 +1806,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	 * This method <b>must</b> be called before
 	 * {@link #createImageGallery(Composite, int, IPhotoGalleryProvider)} is called.
 	 */
-	public void setShowActionBar() {
+	public void setShowCustomActionBar() {
 		_isShowCustomActionBar = true;
 	}
 

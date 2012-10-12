@@ -1664,7 +1664,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 			paintTours20One(tourData, false, true);
 
 			if (selection instanceof TourPhotoSelection) {
-				paintPhotos(((TourPhotoSelection) selection).mergeTour.tourPhotos);
+				paintPhotos(((TourPhotoSelection) selection).mergedTour.tourPhotos);
 			}
 
 			enableActions();
