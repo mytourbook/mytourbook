@@ -588,7 +588,12 @@ public class TourChart extends Chart {
 			final boolean isShowStartTime = !_tourChartConfig.isShowStartTime;
 
 			_tourChartConfig.isShowStartTime = isShowStartTime;
-			updateTourChart(true);
+
+			/**
+			 * keepMinMaxValues must be set to false, that a deeply zoomed in chart can display
+			 * x-axis units
+			 */
+			updateTourChart(false);
 
 			setCommandChecked(COMMAND_ID_IS_SHOW_START_TIME, isShowStartTime);
 

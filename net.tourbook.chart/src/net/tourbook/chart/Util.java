@@ -496,22 +496,12 @@ public class Util {
 		float unit = defaultUnitValue;
 		int multiplier = 1;
 
-//		System.out.println();
-//		System.out.println("roundTimeValue");
-//		System.out.println(unit);
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
 		if (is24HourFormatting) {
 
 			while (unit > 120) {
 				multiplier *= 60;
 				unit /= 60;
 			}
-
-//			System.out.println();
-//			System.out.println();
-//			System.out.println(unit + "\t" + (System.nanoTime() / 1000000));
-//			 TODO remove SYSTEM.OUT.PRINTLN
 
 			if (multiplier >= 3600) {
 

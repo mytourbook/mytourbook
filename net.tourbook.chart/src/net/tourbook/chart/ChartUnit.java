@@ -22,10 +22,11 @@ package net.tourbook.chart;
 
 public class ChartUnit {
 
-	float	value;
-	String	valueLabel;
+	public float	value;
 
-	boolean	isMajorValue	= false;
+	public String	valueLabel;
+
+	boolean			isMajorValue	= false;
 
 	public ChartUnit(final float value, final String valueLabel) {
 		this.value = value;
@@ -40,10 +41,11 @@ public class ChartUnit {
 
 	@Override
 	public String toString() {
-		return "ChartUnit ["
+		return "\nChartUnit ["
 				+ ("value=" + value + ", ")
 				+ ("valueLabel=" + valueLabel + ", ")
 				+ ("isMajorValue=" + isMajorValue)
-				+ "]"; //$NON-NLS-1$
+				+ "]";
+//				+ "\n";
 	}
 }

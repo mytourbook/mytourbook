@@ -103,8 +103,8 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 	 */
 	private ChartSegments createChartSegments(final TourDataTime tourDataTime) {
 
-		final int segmentStart[] = new int[_numberOfYears];
-		final int segmentEnd[] = new int[_numberOfYears];
+		final long segmentStart[] = new long[_numberOfYears];
+		final long segmentEnd[] = new long[_numberOfYears];
 		final String[] segmentTitle = new String[_numberOfYears];
 
 		final int[] allYearDays = tourDataTime.yearDays;

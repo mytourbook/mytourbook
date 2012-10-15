@@ -150,8 +150,8 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 	 */
 	ChartSegments createChartSegments(final TourDataDay tourTimeData) {
 
-		final int segmentStart[] = new int[_numberOfYears];
-		final int segmentEnd[] = new int[_numberOfYears];
+		final long segmentStart[] = new long[_numberOfYears];
+		final long segmentEnd[] = new long[_numberOfYears];
 		final String[] segmentTitle = new String[_numberOfYears];
 
 		final int[] allYearDays = tourTimeData.yearDays;

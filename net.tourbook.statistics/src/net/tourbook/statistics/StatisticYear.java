@@ -69,8 +69,8 @@ public abstract class StatisticYear extends YearStatistic {
 
 		final int yearCounter = tourDataYear.altitudeHigh[0].length;
 
-		final int segmentStart[] = new int[_numberOfYears];
-		final int segmentEnd[] = new int[_numberOfYears];
+		final long segmentStart[] = new long[_numberOfYears];
+		final long segmentEnd[] = new long[_numberOfYears];
 		final String[] segmentTitle = new String[_numberOfYears];
 
 		final int oldestYear = _currentYear - _numberOfYears + 1;

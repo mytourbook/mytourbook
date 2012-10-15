@@ -221,8 +221,8 @@ public class ChartLayerPhoto implements IChartLayer {
 
 		for (final ChartPhoto chartPhoto : _chartPhotos) {
 
-			final int devXValue = (int) (chartPhoto.xValue * scaleX) - devGraphImageOffset;
-			final int devXPhoto = devXValue;
+			final double devXPhotoValue = chartPhoto.xValue * scaleX;
+			final int devXPhoto = (int) devXPhotoValue - devGraphImageOffset;
 
 			// check if photo is visible
 			if (devXPhoto < groupHGrid) {
@@ -234,9 +234,8 @@ public class ChartLayerPhoto implements IChartLayer {
 				continue;
 			}
 
-			// check if photo to the right of the right border
-			if (devXPhoto > devGraphWidth) {
-
+			// check if photo is to the right of the right border
+			if (devXPhoto > devVisibleChartWidth) {
 				break;
 			}
 
@@ -300,7 +299,7 @@ public class ChartLayerPhoto implements IChartLayer {
 
 			int groupY;
 			if (isHistory) {
-				groupY = devYTop + (devGraphHeight / 3);//+ lineWidth;
+				groupY = devYTop + (devGraphHeight / 3) - groupTextHeight / 2;
 			} else {
 				groupY = devYTop + lineWidth;
 			}
@@ -338,6 +337,9 @@ public class ChartLayerPhoto implements IChartLayer {
 
 	void drawGroup(final GC gc, final PhotoGroup photoGroup) {
 
+		int prevDevYPhoto = Integer.MIN_VALUE;
+		int prevDevXPhoto = Integer.MIN_VALUE;
+
 		// draw photo icon
 		for (final int photoIndex : photoGroup.photoIndex) {
 
@@ -345,11 +347,19 @@ public class ChartLayerPhoto implements IChartLayer {
 			final int devXPhoto = photoPosition.x;
 			final int devYPhoto = photoPosition.y;
 
+			// optimize painting
+			if (devXPhoto == prevDevXPhoto && devYPhoto == prevDevYPhoto) {
+				continue;
+			}
+
 			gc.fillRectangle(//
 					devXPhoto - (PHOTO_ICON_WIDTH / 2 / 2),
 					devYPhoto,
 					PHOTO_ICON_WIDTH,
 					PHOTO_ICON_WIDTH);
+
+			prevDevXPhoto = devXPhoto;
+			prevDevYPhoto = devYPhoto;
 		}
 
 		// draw group

@@ -86,8 +86,8 @@ public abstract class StatisticWeek extends YearStatistic {
 	 */
 	ChartSegments createChartSegments() {
 
-		final int segmentStart[] = new int[_statNumberOfYears];
-		final int segmentEnd[] = new int[_statNumberOfYears];
+		final long segmentStart[] = new long[_statNumberOfYears];
+		final long segmentEnd[] = new long[_statNumberOfYears];
 		final String[] segmentTitle = new String[_statNumberOfYears];
 
 		final int oldestYear = _statYoungestYear - _statNumberOfYears + 1;

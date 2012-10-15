@@ -283,8 +283,8 @@ public class YearStatisticView extends ViewPart {
 	 */
 	ChartSegments createChartSegments() {
 
-		final int segmentStart[] = new int[_numberOfYears];
-		final int segmentEnd[] = new int[_numberOfYears];
+		final long segmentStart[] = new long[_numberOfYears];
+		final long segmentEnd[] = new long[_numberOfYears];
 		final String[] segmentTitle = new String[_numberOfYears];
 
 		final int firstYear = getFirstYear();

@@ -1632,7 +1632,7 @@ public class ChartComponentGraph extends Canvas {
 				drawAsync_200_XTitle(gcChart, drawingData);
 			}
 
-			drawAsync_150_Segments(gcGraph, drawingData);
+			drawAsync_150_SegmentBackground(gcGraph, drawingData);
 
 			if (graphIndex == lastGraphIndex) {
 				// draw the unit label and unit tick for the last graph
@@ -1696,11 +1696,17 @@ public class ChartComponentGraph extends Canvas {
 		}
 	}
 
-	private void drawAsync_150_Segments(final GC gc, final GraphDrawingData drawingData) {
+	/**
+	 * Draw segment background
+	 * 
+	 * @param gc
+	 * @param drawingData
+	 */
+	private void drawAsync_150_SegmentBackground(final GC gc, final GraphDrawingData drawingData) {
 
 		final ChartSegments chartSegments = drawingData.getXData().getChartSegments();
 
-		if (chartSegments == null) {
+		if (chartSegments == null || chartSegments.isDrawSegmentBackground == false) {
 			return;
 		}
 
@@ -1709,8 +1715,8 @@ public class ChartComponentGraph extends Canvas {
 
 		final double scaleX = drawingData.getScaleX();
 
-		final int[] startValues = chartSegments.valueStart;
-		final int[] endValues = chartSegments.valueEnd;
+		final long[] startValues = chartSegments.valueStart;
+		final long[] endValues = chartSegments.valueEnd;
 
 		if (startValues == null || endValues == null) {
 			return;
@@ -1724,8 +1730,8 @@ public class ChartComponentGraph extends Canvas {
 
 				// draw segment background color for every second segment
 
-				final int startValue = startValues[segmentIndex];
-				final int endValue = endValues[segmentIndex];
+				final long startValue = startValues[segmentIndex];
+				final long endValue = endValues[segmentIndex];
 
 				final int devXValueStart = (int) (scaleX * startValue) - _xxDevViewPortLeftBorder;
 
@@ -1779,8 +1785,8 @@ public class ChartComponentGraph extends Canvas {
 
 			final double scaleX = drawingData.getScaleX();
 
-			final int[] valueStart = chartSegments.valueStart;
-			final int[] valueEnd = chartSegments.valueEnd;
+			final long[] valueStart = chartSegments.valueStart;
+			final long[] valueEnd = chartSegments.valueEnd;
 			final String[] segmentTitles = chartSegments.segmentTitle;
 
 			if (valueStart != null && valueEnd != null && segmentTitles != null) {
@@ -1795,11 +1801,13 @@ public class ChartComponentGraph extends Canvas {
 
 						final int devXSegmentStart = (int) (scaleX * valueStart[segmentIndex])
 								- _xxDevViewPortLeftBorder;
+
 						final int devXSegmentEnd = (int) (scaleX * (valueEnd[segmentIndex] + 1))
 								- _xxDevViewPortLeftBorder;
 
 						final int devXSegmentLength = devXSegmentEnd - devXSegmentStart;
 						final int devXSegmentCenter = devXSegmentEnd - (devXSegmentLength / 2);
+
 						final int devXTitleCenter = gc.textExtent(segmentTitle).x / 2;
 
 						final int devX = devXSegmentCenter - devXTitleCenter;
@@ -1859,9 +1867,36 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		// get distance between two units
-		final float devUnitWidth = (float) (xUnits.size() > 1 //
-				? ((xUnits.get(1).value * scaleX) - (xUnits.get(0).value * scaleX))
-				: 0);
+		float devUnitWidth = 0;
+		if (xUnits.size() > 1) {
+
+			// find the first 2 units which contains a value
+
+			float prevUnitValue = Float.MIN_VALUE;
+			boolean isUnitDiff = false;
+
+			for (final ChartUnit xUnit : xUnits) {
+
+				if (isUnitDiff && prevUnitValue != Float.MIN_VALUE) {
+
+					devUnitWidth = (float) ((xUnit.value * scaleX) - (prevUnitValue * scaleX));
+					break;
+				}
+
+				if (xUnit.value != 0) {
+
+					if (prevUnitValue == xUnit.value) {
+						isUnitDiff = false;
+					} else {
+
+						if (prevUnitValue != Float.MIN_VALUE) {
+							isUnitDiff = true;
+						}
+						prevUnitValue = xUnit.value;
+					}
+				}
+			}
+		}
 
 		int unitCounter = 0;
 		final int devVisibleChartWidth = getDevVisibleChartWidth();
@@ -7008,7 +7043,7 @@ public class ChartComponentGraph extends Canvas {
 	}
 
 	/**
-	 * sets the min/max values for the y-axis that the visible area will be filled with the chart
+	 * Set min/max values for the x/y-axis that the visible area will be filled with the chart
 	 */
 	void updateVisibleMinMaxValues() {
 
@@ -7044,11 +7079,14 @@ public class ChartComponentGraph extends Canvas {
 		 */
 		int xValueIndexLeft = 0;
 		for (int serieIndex = 0; serieIndex < xValues.length; serieIndex++) {
+
 			final float xValue = xValues[serieIndex];
+
 			if (xValue == valueLeftBorder) {
 				xValueIndexLeft = serieIndex;
 				break;
 			}
+
 			if (xValue > valueLeftBorder) {
 				xValueIndexLeft = serieIndex == 0 ? //
 						0
