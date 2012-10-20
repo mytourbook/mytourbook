@@ -35,7 +35,7 @@ import org.eclipse.swt.widgets.Display;
 
 public class ChartLayerPhoto implements IChartLayer {
 
-	private static final int		PHOTO_ICON_WIDTH		= 4;
+	private static final int		PHOTO_ICON_WIDTH		= 3;
 
 	static final int				GROUP_HORIZONTAL_WIDTH	= 40;
 
@@ -221,7 +221,7 @@ public class ChartLayerPhoto implements IChartLayer {
 
 		for (final ChartPhoto chartPhoto : _chartPhotos) {
 
-			final double devXPhotoValue = chartPhoto.xValue * scaleX;
+			final double devXPhotoValue = scaleX * chartPhoto.xValue;
 			final int devXPhoto = (int) devXPhotoValue - devGraphImageOffset;
 
 			// check if photo is visible
@@ -320,7 +320,7 @@ public class ChartLayerPhoto implements IChartLayer {
 			gc.setBackground(display.getSystemColor(SWT.COLOR_DARK_GRAY));
 			gc.setForeground(display.getSystemColor(SWT.COLOR_WHITE));
 
-			drawGroup(gc, photoGroup);
+			drawPhotoAndGroup(gc, photoGroup);
 
 //			// debug: draw grid
 //			gc.setLineWidth(1);
@@ -335,7 +335,7 @@ public class ChartLayerPhoto implements IChartLayer {
 		gc.setLineWidth(1);
 	}
 
-	void drawGroup(final GC gc, final PhotoGroup photoGroup) {
+	void drawPhotoAndGroup(final GC gc, final PhotoGroup photoGroup) {
 
 		int prevDevYPhoto = Integer.MIN_VALUE;
 		int prevDevXPhoto = Integer.MIN_VALUE;
@@ -353,7 +353,7 @@ public class ChartLayerPhoto implements IChartLayer {
 			}
 
 			gc.fillRectangle(//
-					devXPhoto - (PHOTO_ICON_WIDTH / 2 / 2),
+					devXPhoto - (PHOTO_ICON_WIDTH / 2),
 					devYPhoto,
 					PHOTO_ICON_WIDTH,
 					PHOTO_ICON_WIDTH);

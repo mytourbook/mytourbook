@@ -55,12 +55,17 @@ public class ChartDataXSerie extends ChartDataSerie {
 	private ChartSegments	_chartSegments;
 
 	/**
+	 * Contains information how to draw the title for a history chart
+	 */
+	private HistoryTitle	_historyTitle;
+
+	/**
 	 * Scaling for the x-axis which is computed with {@link Math#pow(double, double)} when this
 	 * value is <code>!= 1</code>. Extended scaling is used in the conconi view.
 	 */
 	private double			_scalingFactor			= 1;
-	private double			_scalingMaxValue		= 1;
 
+	private double			_scalingMaxValue		= 1;
 	/**
 	 * Defines <code>true</code> or <code>false</code> if a line should be drawn for a value point,
 	 * can be <code>null</code> to disable this feature.
@@ -76,12 +81,17 @@ public class ChartDataXSerie extends ChartDataSerie {
 		setMinMaxValues(new float[][] { values });
 	}
 
+
 	public ChartDataXSerie(final float[][] values) {
 		setMinMaxValues(values);
 	}
 
 	public ChartSegments getChartSegments() {
 		return _chartSegments;
+	}
+
+	public HistoryTitle getHistoryTitle() {
+		return _historyTitle;
 	}
 
 	public boolean[] getNoLine() {
@@ -138,6 +148,10 @@ public class ChartDataXSerie extends ChartDataSerie {
 
 	public void setChartSegments(final ChartSegments chartSegments) {
 		_chartSegments = chartSegments;
+	}
+
+	public void setHistoryTitle(final HistoryTitle historyTitle) {
+		_historyTitle = historyTitle;
 	}
 
 	@Override

@@ -487,6 +487,31 @@ public class Util {
 	}
 
 	/**
+	 * Round number of units to a 'month suitable' format.
+	 * 
+	 * @param defaultUnitValue
+	 * @return
+	 */
+	public static int roundMonthUnits(final int defaultUnitValue) {
+
+		float unit = defaultUnitValue;
+
+		while (unit > 144) {
+			unit /= 12;
+		}
+
+		unit = //
+				//
+		unit >= 12 ? 12 : //
+				unit >= 6 ? 6 : //
+						unit >= 4 ? 4 : //
+								unit > 3 ? 3 : //
+										unit > 2 ? 2 : //
+												1;
+		return (int) unit;
+	}
+
+	/**
 	 * @param defaultUnitValue
 	 * @param is24HourFormatting
 	 * @return Returns minUnitValue rounded to the number 60/30/20/10/5/2/1

@@ -41,7 +41,7 @@ public class ChartPhotoOverlay implements CustomOverlay {
 		gcOverlay.setForeground(display.getSystemColor(SWT.COLOR_WHITE));
 		gcOverlay.setBackground(_bgColor);
 
-		_photoLayer.drawGroup(gcOverlay, _hoveredPhotoGroup);
+		_photoLayer.drawPhotoAndGroup(gcOverlay, _hoveredPhotoGroup);
 
 		return true;
 	}

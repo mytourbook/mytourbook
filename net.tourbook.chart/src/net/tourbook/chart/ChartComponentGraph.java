@@ -1548,7 +1548,8 @@ public class ChartComponentGraph extends Canvas {
 		 * The graph image is only a part where ONE single graph is painted without any title or
 		 * unit tick/values
 		 */
-		final int devGraphHeight = _graphDrawingData.get(0).devGraphHeight;
+		final GraphDrawingData graphDrawingData = _graphDrawingData.get(0);
+		final int devGraphHeight = graphDrawingData.devGraphHeight;
 		final Rectangle graphImageRect = new Rectangle(0, 0, //
 				devNewImageWidth,
 				devGraphHeight < 1 ? 1 : devGraphHeight + 1); // ensure valid height
@@ -1564,7 +1565,18 @@ public class ChartComponentGraph extends Canvas {
 			gcChart.setFont(_chart.getFont());
 
 			// fill background
-			gcChart.setBackground(_chart.getBackgroundColor());
+
+			if (graphDrawingData.getChartType() == ChartDataModel.CHART_TYPE_HISTORY) {
+
+				final Color historyColor = new Color(gcChart.getDevice(), 0xf0, 0xf0, 0xf0);
+				{
+					gcChart.setBackground(historyColor);
+				}
+				historyColor.dispose();
+
+			} else {
+				gcChart.setBackground(_chart.getBackgroundColor());
+			}
 			gcChart.fillRectangle(_chartImage20Chart.getBounds());
 
 			if (_chartComponents.errorMessage == null) {
@@ -1753,34 +1765,66 @@ public class ChartComponentGraph extends Canvas {
 	private void drawAsync_200_XTitle(final GC gc, final GraphDrawingData drawingData) {
 
 		final ChartSegments chartSegments = drawingData.getXData().getChartSegments();
+		final HistoryTitle historyTitle = drawingData.getXData().getHistoryTitle();
+
 		final int devYTitle = _chartDrawingData.devMarginTop;
 
 		final int devGraphWidth = _chartComponents.getDevVisibleChartWidth();
 
-		if (chartSegments == null) {
+		if (historyTitle != null) {
 
 			/*
-			 * draw default title, center within the chart
+			 * draw title for each history top segment
 			 */
 
-			final String title = drawingData.getXTitle();
+			final double scaleX = drawingData.getScaleX();
 
-			if (title == null || title.length() == 0) {
-				return;
+			final ArrayList<Long> graphStartValues = historyTitle.graphStart;
+			final ArrayList<Long> graphEndValues = historyTitle.graphEnd;
+			final ArrayList<String> titleTextList = historyTitle.titleText;
+
+			if (graphStartValues != null && graphEndValues != null && titleTextList != null) {
+
+				int devXChartTitleEnd = -1;
+
+				for (int graphIndex = 0; graphIndex < graphStartValues.size(); graphIndex++) {
+
+					final String titleText = titleTextList.get(graphIndex);
+					final long graphStart = graphStartValues.get(graphIndex);
+					final long graphEnd = graphEndValues.get(graphIndex);
+
+					final int devXSegmentStart = (int) (scaleX * graphStart) - _xxDevViewPortLeftBorder;
+					final int devXSegmentEnd = (int) (scaleX * graphEnd) - _xxDevViewPortLeftBorder;
+
+					final int devXSegmentLength = devXSegmentEnd - devXSegmentStart;
+					final int devXSegmentCenter = devXSegmentStart + (devXSegmentLength / 2);
+
+					final int devXTitleCenter = gc.textExtent(titleText).x / 2;
+
+					final int devX = devXSegmentCenter - devXTitleCenter;
+
+					if (devX <= devXChartTitleEnd) {
+						// skip title when it overlaps the previous title
+						continue;
+					}
+
+					gc.drawText(titleText, devX, devYTitle, false);
+
+					devXChartTitleEnd = devXSegmentCenter + devXTitleCenter + 3;
+
+//					// debug: draw segments
+//					final int devYBottom = drawingData.devGraphHeight;
+//					gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+//					gc.drawLine(devXSegmentStart, 0, devXSegmentStart, devYBottom);
+//					gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//					gc.drawLine(devXSegmentEnd - 1, 0, devXSegmentEnd, devYBottom);
+				}
 			}
 
-			final int titleWidth = gc.textExtent(title).x;
-			final int devXTitle = (devGraphWidth / 2) - (titleWidth / 2);
-
-			gc.drawText(title, //
-					devXTitle < 0 ? 0 : devXTitle,
-					devYTitle,
-					true);
-
-		} else {
+		} else if (chartSegments != null) {
 
 			/*
-			 * draw title for each segment
+			 * draw title for each chart segment
 			 */
 
 			final double scaleX = drawingData.getScaleX();
@@ -1823,6 +1867,27 @@ public class ChartComponentGraph extends Canvas {
 					}
 				}
 			}
+
+		} else {
+
+			/*
+			 * draw default title, center within the chart
+			 */
+
+			final String title = drawingData.getXTitle();
+
+			if (title == null || title.length() == 0) {
+				return;
+			}
+
+			final int titleWidth = gc.textExtent(title).x;
+			final int devXTitle = (devGraphWidth / 2) - (titleWidth / 2);
+
+			gc.drawText(title, //
+					devXTitle < 0 ? 0 : devXTitle,
+					devYTitle,
+					true);
+
 		}
 
 	}
@@ -1832,70 +1897,40 @@ public class ChartComponentGraph extends Canvas {
 	 * 
 	 * @param gcChart
 	 * @param gcGraph
-	 * @param drawingData
+	 * @param graphDrawingData
 	 * @param isDrawUnit
 	 *            <code>true</code> indicate to draws the unit tick and unit label additional to the
 	 *            unit grid line
 	 */
 	private void drawAsync_210_XUnitsAndVGrid(	final GC gcChart,
 												final GC gcGraph,
-												final GraphDrawingData drawingData,
+												final GraphDrawingData graphDrawingData,
 												final boolean isDrawUnit) {
 
 		final Display display = getDisplay();
 
-		final ArrayList<ChartUnit> xUnits = drawingData.getXUnits();
+		final ArrayList<ChartUnit> xUnits = graphDrawingData.getXUnits();
 
-		final ChartDataXSerie xData = drawingData.getXData();
-		final int devYBottom = drawingData.getDevYBottom();
-		final int xUnitTextPos = drawingData.getXUnitTextPos();
-		double scaleX = drawingData.getScaleX();
-		final boolean isXUnitOverlapChecked = drawingData.isXUnitOverlapChecked();
-		final boolean isDrawVerticalGrid = _chart.isShowVerticalGridLines;
-		final boolean[] isDrawUnits = drawingData.isDrawUnits();
+		final ChartDataXSerie xData = graphDrawingData.getXData();
+		final int devYBottom = graphDrawingData.getDevYBottom();
+		final int xUnitTextPos = graphDrawingData.getXUnitTextPos();
+		double scaleX = graphDrawingData.getScaleX();
 
-		final double devGraphWidth = drawingData.devVirtualGraphWidth;
+		final boolean isHistory = graphDrawingData.getChartType() == ChartDataModel.CHART_TYPE_HISTORY;
+		final boolean isDrawVerticalGrid = _chart.isShowVerticalGridLines || isHistory;
+		final boolean[] isDrawUnits = graphDrawingData.isDrawUnits();
+		final boolean isXUnitOverlapChecked = graphDrawingData.isXUnitOverlapChecked();
+
+		final double devGraphWidth = graphDrawingData.devVirtualGraphWidth;
 		final double scalingFactor = xData.getScalingFactor();
 		final double scalingMaxValue = xData.getScalingMaxValue();
 		final boolean isExtendedScaling = scalingFactor != 1.0;
 		final double extScaleX = ((devGraphWidth - 1) / Math.pow(scalingMaxValue, scalingFactor));
 
 		// check if the x-units has a special scaling
-		final double scaleUnitX = drawingData.getScaleUnitX();
+		final double scaleUnitX = graphDrawingData.getScaleUnitX();
 		if (scaleUnitX != Double.MIN_VALUE) {
 			scaleX = scaleUnitX;
-		}
-
-		// get distance between two units
-		float devUnitWidth = 0;
-		if (xUnits.size() > 1) {
-
-			// find the first 2 units which contains a value
-
-			float prevUnitValue = Float.MIN_VALUE;
-			boolean isUnitDiff = false;
-
-			for (final ChartUnit xUnit : xUnits) {
-
-				if (isUnitDiff && prevUnitValue != Float.MIN_VALUE) {
-
-					devUnitWidth = (float) ((xUnit.value * scaleX) - (prevUnitValue * scaleX));
-					break;
-				}
-
-				if (xUnit.value != 0) {
-
-					if (prevUnitValue == xUnit.value) {
-						isUnitDiff = false;
-					} else {
-
-						if (prevUnitValue != Float.MIN_VALUE) {
-							isUnitDiff = true;
-						}
-						prevUnitValue = xUnit.value;
-					}
-				}
-			}
 		}
 
 		int unitCounter = 0;
@@ -1904,31 +1939,72 @@ public class ChartComponentGraph extends Canvas {
 		boolean isFirstUnit = true;
 		int devXLastUnitRightPosition = -1;
 
-		final String unitLabel = drawingData.getXData().getUnitLabel();
+		final String unitLabel = graphDrawingData.getXData().getUnitLabel();
 		final int devUnitLabelWidth = gcChart.textExtent(unitLabel).x;
 
 		gcChart.setForeground(display.getSystemColor(SWT.COLOR_DARK_GRAY));
 		gcGraph.setForeground(_gridColor);
 
-		for (final ChartUnit xUnit : xUnits) {
+		final int xUnitSize = xUnits.size();
+		int devNextXUnitTick = Integer.MIN_VALUE;
+		int devUnitWidth = 0;
+		ChartUnit nextXUnit = null;
 
-			// get dev x-position for the unit tick
+		for (int unitIndex = 0; unitIndex < xUnitSize; unitIndex++) {
+
+			/*
+			 * get unit tick position and the width to the next unit tick
+			 */
 			int devXUnitTick;
-			if (isExtendedScaling) {
+			ChartUnit xUnit = null;
+			if (nextXUnit != null) {
 
-				// extended scaling
-				final double scaledUnitValue = ((Math.pow(xUnit.value, scalingFactor)) * extScaleX);
-				devXUnitTick = (int) (scaledUnitValue);
+				xUnit = nextXUnit;
+
+				devXUnitTick = devNextXUnitTick;
 
 			} else {
-				// scale with devXOffset
-				devXUnitTick = (int) (xUnit.value * scaleX) - _xxDevViewPortLeftBorder;
+
+				// this is the first unit
+
+				xUnit = xUnits.get(unitIndex);
+
+				// get dev x-position for the unit tick
+				if (isExtendedScaling) {
+
+					// extended scaling
+					final double scaledUnitValue = ((Math.pow(xUnit.value, scalingFactor)) * extScaleX);
+					devXUnitTick = (int) (scaledUnitValue);
+
+				} else {
+					// scale with devXOffset
+					devXUnitTick = (int) (scaleX * xUnit.value) - _xxDevViewPortLeftBorder;
+				}
+			}
+
+			if (unitIndex < xUnitSize - 1) {
+
+				nextXUnit = xUnits.get(unitIndex + 1);
+
+				// get dev x-position for the unit tick
+				if (isExtendedScaling) {
+
+					// extended scaling
+					final double scaledUnitValue = ((Math.pow(nextXUnit.value, scalingFactor)) * extScaleX);
+					devNextXUnitTick = (int) (scaledUnitValue);
+
+				} else {
+					// scale with devXOffset
+					devNextXUnitTick = (int) (scaleX * nextXUnit.value) - _xxDevViewPortLeftBorder;
+				}
+
+				devUnitWidth = devNextXUnitTick - devXUnitTick;
 			}
 
 			/*
 			 * skip units which are outside of the visible area
 			 */
-			if (devXUnitTick < 0) {
+			if (devXUnitTick < 0 && devNextXUnitTick < 0) {
 				continue;
 			}
 			if (devXUnitTick > devVisibleChartWidth) {
@@ -1963,7 +2039,7 @@ public class ChartComponentGraph extends Canvas {
 						 * draw unit value BETWEEN two units
 						 */
 
-						final int devXUnitCenter = ((int) devUnitWidth - devUnitValueWidth) / 2;
+						final int devXUnitCenter = (devUnitWidth - devUnitValueWidth) / 2;
 						int devXUnitLabelPosition = devXUnitTick + devXUnitCenter;
 
 						if (devXUnitLabelPosition < 0) {
@@ -2077,7 +2153,7 @@ public class ChartComponentGraph extends Canvas {
 					gcGraph.setLineDash(DOT_DASHES);
 					gcGraph.setForeground(_gridColor);
 				}
-				gcGraph.drawLine(devXUnitTick, 0, devXUnitTick, drawingData.devGraphHeight);
+				gcGraph.drawLine(devXUnitTick, 0, devXUnitTick, graphDrawingData.devGraphHeight);
 
 			}
 
