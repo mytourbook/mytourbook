@@ -1635,7 +1635,10 @@ public class TourManager {
 		/*
 		 * TIME SERIE is a MUST data serie
 		 */
-		if (tourData.timeSerie == null || tourData.timeSerie.length == 0) {
+		final boolean isTimeSerie = tourData.timeSerie == null || tourData.timeSerie.length == 0;
+		final boolean isHistorySerie = tourData.timeSerieHistory == null || tourData.timeSerieHistory.length == 0;
+
+		if (isTimeSerie == false && isHistorySerie == false) {
 			return chartDataModel;
 		}
 
@@ -2134,7 +2137,7 @@ public class TourManager {
 			// set date/time when x-axis starts
 			xDataTime.setStartDateTime(tourData.getTourStartTime());
 
-			final float[] historySerie = new float[tourData.timeSerie.length];
+			final float[] historySerie = new float[tourData.timeSerieHistory.length];
 
 			final ChartDataYSerie yDataHistory = createChartDataSerie(historySerie, ChartDataModel.CHART_TYPE_HISTORY);
 

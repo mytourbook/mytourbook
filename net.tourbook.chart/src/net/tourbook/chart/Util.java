@@ -385,6 +385,36 @@ public class Util {
 		return unit;
 	}
 
+	public static long getMajorYearValue(final long graphUnit) {
+
+		double unit = graphUnit;
+		int multiplier = 1;
+
+		while (unit > 1000) {
+			multiplier *= 10;
+			unit /= 10;
+		}
+
+		unit = graphUnit / multiplier;
+
+		unit = //
+		unit == 1000 ? 5000 : //
+				unit == 500 ? 1000 : //
+						unit == 200 ? 1000 : //
+								unit == 100 ? 500 : //
+										unit == 50 ? 200 : //
+												unit == 20 ? 100 : //
+														unit == 10 ? 50 : //
+																unit == 5 ? 20 : //
+																		unit == 2 ? 10 : //
+																				unit == 1 ? 5 : //
+																						1;
+
+		unit *= multiplier;
+
+		return (long) unit;
+	}
+
 	public static long getValueScaling(final double graphUnit) {
 
 		if (graphUnit > 1 || graphUnit < 1) {
@@ -505,8 +535,8 @@ public class Util {
 		unit >= 12 ? 12 : //
 				unit >= 6 ? 6 : //
 						unit >= 4 ? 4 : //
-								unit > 3 ? 3 : //
-										unit > 2 ? 2 : //
+								unit >= 3 ? 3 : //
+										unit >= 2 ? 2 : //
 												1;
 		return (int) unit;
 	}
@@ -682,6 +712,28 @@ public class Util {
 				return gvDiv3;
 			}
 		}
+	}
+
+	public static int roundYearUnits(final long graphDefaultUnit) {
+
+		float unit = graphDefaultUnit;
+		int multiplier = 1;
+
+		while (unit > 20) {
+			multiplier *= 10;
+			unit /= 10;
+		}
+
+		unit = //
+				//
+		unit >= 10 ? 10 : //
+				unit >= 5 ? 5 : //
+						unit >= 2 ? 2 : //
+								1;
+
+		unit *= multiplier;
+
+		return (int) unit;
 	}
 
 	/**

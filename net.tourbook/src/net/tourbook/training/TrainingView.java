@@ -1376,7 +1376,7 @@ public class TrainingView extends ViewPart {
 
 		final int personZoneSize = _personHrZones.size();
 		final int[] tourHrZoneTimes = _tourData.getHrZones();
-		final int drivingTime = _tourData.getTourDrivingTime();
+		final long drivingTime = _tourData.getTourDrivingTime();
 
 		_tourHrZonePercent = new double[personZoneSize];
 

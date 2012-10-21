@@ -407,7 +407,8 @@ public class GraphDrawingData {
 	}
 
 	/**
-	 * set the position of the unit text, this can be X_UNIT_TEXT_POS_LEFT or X_UNIT_TEXT_POS_CENTER
+	 * Set the position of the unit text, this can be {@link #X_UNIT_TEXT_POS_LEFT} or
+	 * {@link #X_UNIT_TEXT_POS_CENTER}, default is {@link #X_UNIT_TEXT_POS_LEFT}.
 	 * 
 	 * @param unitTextPos
 	 *            The xUnitTextPos to set.

@@ -1106,7 +1106,12 @@ public class TourChart extends Chart {
 		}
 
 		final int[] timeSerie = _tourData.timeSerie;
-		if (timeSerie == null) {
+		final long[] historySerie = _tourData.timeSerieHistory;
+
+		final boolean isTimeSerie = timeSerie != null;
+		final boolean isHistorySerie = historySerie != null;
+
+		if (isTimeSerie == false && isHistorySerie == false) {
 			// this is a manually created tour
 			return;
 		}
@@ -1124,12 +1129,12 @@ public class TourChart extends Chart {
 		_photoOverlay.setPhotoLayer(_layerPhoto);
 
 		final long tourStart = _tourData.getTourStartTime().getMillis() / 1000;
-		final int numberOfTimeSlices = timeSerie.length;
+		final int numberOfTimeSlices = isTimeSerie ? timeSerie.length : historySerie.length;
 
 		/*
 		 * set photos for tours which has max 1 value point
 		 */
-		if (timeSerie == null || numberOfTimeSlices <= 1) {
+		if (numberOfTimeSlices <= 1) {
 			for (final PhotoWrapper photoWrapper : tourPhotos) {
 				chartPhotos.add(new ChartPhoto(photoWrapper, 0, 0));
 			}
@@ -1145,7 +1150,12 @@ public class TourChart extends Chart {
 				? _tourData.getTimeSerieFloat()
 				: _tourData.getDistanceSerie();
 
-		long timeSliceEnd = tourStart + (long) (timeSerie[1] / 2.0);
+		long timeSliceEnd;
+		if (isTimeSerie) {
+			timeSliceEnd = tourStart + (long) (timeSerie[1] / 2.0);
+		} else {
+			timeSliceEnd = tourStart + (long) (historySerie[1] / 2.0);
+		}
 
 		int photoIndex = 0;
 		int timeIndex = 0;
@@ -1222,8 +1232,15 @@ public class TourChart extends Chart {
 
 			} else {
 
-				final int valuePointTime = timeSerie[timeIndex];
-				final int sliceDuration = timeSerie[timeIndex + 1] - valuePointTime;
+				long valuePointTime;
+				long sliceDuration;
+				if (isTimeSerie) {
+					valuePointTime = timeSerie[timeIndex];
+					sliceDuration = timeSerie[timeIndex + 1] - valuePointTime;
+				} else {
+					valuePointTime = historySerie[timeIndex];
+					sliceDuration = historySerie[timeIndex + 1] - valuePointTime;
+				}
 
 				timeSliceEnd = tourStart + valuePointTime + (sliceDuration / 2);
 			}

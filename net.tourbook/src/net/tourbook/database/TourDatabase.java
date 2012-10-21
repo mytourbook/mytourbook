@@ -92,7 +92,7 @@ public class TourDatabase {
 	 */
 	private static final int						TOURBOOK_DB_VERSION							= 22;
 
-//	private static final int						TOURBOOK_DB_VERSION							= 22;	// 12.9.0   ???
+//	private static final int						TOURBOOK_DB_VERSION							= 22;	// 12.12.0   ???
 //	private static final int						TOURBOOK_DB_VERSION							= 21;	// 12.1.1
 //	private static final int						TOURBOOK_DB_VERSION							= 20;	// 12.1
 //	private static final int						TOURBOOK_DB_VERSION							= 19;	// 11.8
@@ -2085,8 +2085,11 @@ public class TourDatabase {
 				+ "	startPulse 				SMALLINT NOT NULL,						\n" //$NON-NLS-1$
 				+ "	dpTolerance 			SMALLINT NOT NULL,						\n" //$NON-NLS-1$
 				+ "	tourDistance 			INTEGER NOT NULL,						\n" //$NON-NLS-1$
-				+ "	tourRecordingTime 		INTEGER NOT NULL,						\n" //$NON-NLS-1$
-				+ "	tourDrivingTime 		INTEGER NOT NULL,						\n" //$NON-NLS-1$
+
+// replaced with BIGINT values in version 22
+//				+ "	tourRecordingTime 		INTEGER NOT NULL,						\n" //$NON-NLS-1$
+//				+ "	tourDrivingTime 		INTEGER NOT NULL,						\n" //$NON-NLS-1$
+
 				+ "	tourAltUp 				INTEGER NOT NULL,						\n" //$NON-NLS-1$
 				+ "	tourAltDown 			INTEGER NOT NULL,						\n" //$NON-NLS-1$
 
@@ -2108,12 +2111,13 @@ public class TourDatabase {
 				// version 4 start
 
 				// from markus
-// replaced with float values in version 21
+// replaced with FLOAT values in version 21
 //				+ "	maxAltitude				INTEGER,								\n" //$NON-NLS-1$
 //				+ "	maxPulse				INTEGER,								\n" //$NON-NLS-1$
 //				+ "	avgPulse				INTEGER,								\n" //$NON-NLS-1$
 //				+ "	avgCadence				INTEGER,								\n" //$NON-NLS-1$
 //				+ "	avgTemperature			INTEGER,								\n" //$NON-NLS-1$
+
 				+ "	maxSpeed				FLOAT,									\n" //$NON-NLS-1$
 				+ ("	tourTitle			" + varCharKomma(TourData.DB_LENGTH_TOUR_TITLE)) //$NON-NLS-1$
 
@@ -2245,10 +2249,13 @@ public class TourDatabase {
 				//
 				// version 21 end ---------
 
-				// version 22 start  -  12.9.0
+				// version 22 start  -  12.12.0
 				//
 				+ "	TourStartTime				BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
 				+ "	TourEndTime					BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
+
+				+ "	TourRecordingTime 			BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
+				+ "	TourDrivingTime 			BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
 				//
 				// version 22 end ---------
 
@@ -4248,14 +4255,15 @@ public class TourDatabase {
 		final Statement stmt = conn.createStatement();
 		{
 //			TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA
-//			//
-//			// version 22 start  -  12.9.0
+//			// version 22 start  -  12.12.0
 //			//
 //			+ "	TourStartTime				BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
 //			+ "	TourEndTime					BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
-//			//
-//			// version 22 end ---------
-//			//
+//
+//			+ "	TourRecordingTime 			BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
+//			+ "	TourDrivingTime 			BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
+			//
+			// version 22 end ---------
 
 			String sql;
 
@@ -4264,6 +4272,15 @@ public class TourDatabase {
 
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN TourEndTime		BIGINT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
 			exec(stmt, sql);
+
+			/*
+			 * modify columns
+			 */
+			int no = 0;
+			final int max = 2;
+
+			modifyColumnType(TABLE_TOUR_DATA, "TourRecordingTime", "BIGINT DEFAULT 0", stmt, monitor, ++no, max); //			//$NON-NLS-1$ //$NON-NLS-2$
+			modifyColumnType(TABLE_TOUR_DATA, "TourDrivingTime", "BIGINT DEFAULT 0", stmt, monitor, ++no, max); //				//$NON-NLS-1$ //$NON-NLS-2$
 
 //			TOURMARKER	TOURMARKER	TOURMARKER	TOURMARKER	TOURMARKER	TOURMARKER	TOURMARKER	TOURMARKER
 //
@@ -4346,10 +4363,10 @@ public class TourDatabase {
 				final short dbMinute = result.getShort(5);
 				final short dbSecond = result.getShort(6);
 
-				final int recordingTime = result.getInt(7);
+				final long recordingTime = result.getLong(7);
 
 				final DateTime dtStart = new DateTime(dbYear, dbMonth, dbDay, dbHour, dbMinute, dbSecond);
-				final DateTime dtEnd = dtStart.plusSeconds(recordingTime);
+				final DateTime dtEnd = dtStart.plus(recordingTime * 1000);
 
 				// update tour start/end in the database
 				stmtUpdate.setLong(1, dtStart.getMillis());

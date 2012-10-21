@@ -559,7 +559,7 @@ public class GarminSAXHandler extends DefaultHandler {
 			 * export and import found a wrong tour when exporting was done with camouflage speed ->
 			 * this will result in a NEW tour
 			 */
-			final int tourRecordingTime = tourData.getTourRecordingTime();
+			final int tourRecordingTime = (int) tourData.getTourRecordingTime();
 
 			if (distanceSerie == null) {
 				uniqueKey = Integer.toString(tourRecordingTime);

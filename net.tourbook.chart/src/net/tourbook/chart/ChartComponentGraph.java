@@ -1277,9 +1277,13 @@ public class ChartComponentGraph extends Canvas {
 
 				if (_devXAutoScrollMousePosition != Integer.MIN_VALUE) {
 
+					boolean isLeft;
+
 					if (_devXAutoScrollMousePosition < 0) {
 
 						// autoscroll the graph to the left
+
+						isLeft = true;
 
 						if (_xxDevViewPortLeftBorder == 0) {
 
@@ -1298,6 +1302,8 @@ public class ChartComponentGraph extends Canvas {
 
 						// autoscroll the graph to the right
 
+						isLeft = false;
+
 						final int devXAutoScrollMousePositionRelative = _devXAutoScrollMousePosition
 								- getDevVisibleChartWidth();
 
@@ -1309,7 +1315,7 @@ public class ChartComponentGraph extends Canvas {
 						}
 					}
 
-					doAutoScroll_10_RunnableScrollGraph(this, AUTO_SCROLL_INTERVAL, devMouseOffset);
+					doAutoScroll_10_RunnableScrollGraph(this, AUTO_SCROLL_INTERVAL, devMouseOffset, isLeft);
 
 				} else {
 
@@ -1346,7 +1352,8 @@ public class ChartComponentGraph extends Canvas {
 
 	private void doAutoScroll_10_RunnableScrollGraph(	final Runnable runnable,
 														final int autoScrollInterval,
-														final int devMouseOffset) {
+														final int devMouseOffset,
+														final boolean isLeft) {
 
 		final int xxDevNewPosition = _xxDevViewPortLeftBorder + devMouseOffset;
 
@@ -1354,9 +1361,14 @@ public class ChartComponentGraph extends Canvas {
 		setChartPosition(xxDevNewPosition);
 
 		// check if scrolling can be redone
-		final boolean isRepeatScrollingLeft = _xxDevViewPortLeftBorder > 1;
-		final boolean isRepeatScrollingRight = xxDevNewPosition < _xxDevGraphWidth;
-		final boolean isRepeatScrolling = isRepeatScrollingLeft || isRepeatScrollingRight;
+		final int devXRightBorder = _xxDevGraphWidth - getDevVisibleChartWidth();
+
+		boolean isRepeatScrolling;
+		if (isLeft) {
+			isRepeatScrolling = _xxDevViewPortLeftBorder > 1;
+		} else {
+			isRepeatScrolling = xxDevNewPosition < devXRightBorder;
+		}
 
 		// start scrolling again when the bounds have not been reached
 		if (isRepeatScrolling) {
@@ -1762,14 +1774,14 @@ public class ChartComponentGraph extends Canvas {
 		alternateColor.dispose();
 	}
 
-	private void drawAsync_200_XTitle(final GC gc, final GraphDrawingData drawingData) {
+	private void drawAsync_200_XTitle(final GC gc, final GraphDrawingData graphDrawingData) {
 
-		final ChartSegments chartSegments = drawingData.getXData().getChartSegments();
-		final HistoryTitle historyTitle = drawingData.getXData().getHistoryTitle();
+		final ChartSegments chartSegments = graphDrawingData.getXData().getChartSegments();
+		final HistoryTitle historyTitle = graphDrawingData.getXData().getHistoryTitle();
 
 		final int devYTitle = _chartDrawingData.devMarginTop;
 
-		final int devGraphWidth = _chartComponents.getDevVisibleChartWidth();
+		final int devGraphWidth = getDevVisibleChartWidth();
 
 		if (historyTitle != null) {
 
@@ -1777,7 +1789,7 @@ public class ChartComponentGraph extends Canvas {
 			 * draw title for each history top segment
 			 */
 
-			final double scaleX = drawingData.getScaleX();
+			final double scaleX = graphDrawingData.getScaleX();
 
 			final ArrayList<Long> graphStartValues = historyTitle.graphStart;
 			final ArrayList<Long> graphEndValues = historyTitle.graphEnd;
@@ -1785,7 +1797,7 @@ public class ChartComponentGraph extends Canvas {
 
 			if (graphStartValues != null && graphEndValues != null && titleTextList != null) {
 
-				int devXChartTitleEnd = -1;
+				final int xUnitTextPos = graphDrawingData.getXUnitTextPos();
 
 				for (int graphIndex = 0; graphIndex < graphStartValues.size(); graphIndex++) {
 
@@ -1800,20 +1812,24 @@ public class ChartComponentGraph extends Canvas {
 					final int devXSegmentCenter = devXSegmentStart + (devXSegmentLength / 2);
 
 					final int devXTitleCenter = gc.textExtent(titleText).x / 2;
+					int devX;
+					if (xUnitTextPos == GraphDrawingData.X_UNIT_TEXT_POS_CENTER) {
 
-					final int devX = devXSegmentCenter - devXTitleCenter;
+						// draw between 2 units
 
-					if (devX <= devXChartTitleEnd) {
-						// skip title when it overlaps the previous title
-						continue;
+						devX = devXSegmentCenter - devXTitleCenter;
+
+					} else {
+
+						// draw in the center of the tick
+
+						devX = devXSegmentStart - devXTitleCenter;
 					}
 
 					gc.drawText(titleText, devX, devYTitle, false);
 
-					devXChartTitleEnd = devXSegmentCenter + devXTitleCenter + 3;
-
 //					// debug: draw segments
-//					final int devYBottom = drawingData.devGraphHeight;
+//					final int devYBottom = graphDrawingData.devGraphHeight;
 //					gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 //					gc.drawLine(devXSegmentStart, 0, devXSegmentStart, devYBottom);
 //					gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
@@ -1827,7 +1843,7 @@ public class ChartComponentGraph extends Canvas {
 			 * draw title for each chart segment
 			 */
 
-			final double scaleX = drawingData.getScaleX();
+			final double scaleX = graphDrawingData.getScaleX();
 
 			final long[] valueStart = chartSegments.valueStart;
 			final long[] valueEnd = chartSegments.valueEnd;
@@ -1874,7 +1890,7 @@ public class ChartComponentGraph extends Canvas {
 			 * draw default title, center within the chart
 			 */
 
-			final String title = drawingData.getXTitle();
+			final String title = graphDrawingData.getXTitle();
 
 			if (title == null || title.length() == 0) {
 				return;

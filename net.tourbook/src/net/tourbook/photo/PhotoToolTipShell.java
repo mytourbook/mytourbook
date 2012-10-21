@@ -447,9 +447,9 @@ public abstract class PhotoToolTipShell {
 
 				} else if (_isShellFadingOut) {
 
-					if (_fadeOutDelayCounter++ < FADE_OUT_DELAY_STEPS) {
+					if (currentAlpha == 0xff && _fadeOutDelayCounter++ < FADE_OUT_DELAY_STEPS) {
 
-						// delay fade out
+						// delay fade out only when shell is fully visible
 
 						_display.timerExec(FADE_TIME_INTERVAL, _animationTimer);
 

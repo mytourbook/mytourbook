@@ -849,13 +849,13 @@ public class TourInfoUI {
 		/*
 		 * column: left
 		 */
-		final int recordingTime = _tourData.getTourRecordingTime();
-		final int movingTime = _tourData.getTourDrivingTime();
-		final int breakTime = recordingTime - movingTime;
+		final long recordingTime = _tourData.getTourRecordingTime();
+		final long movingTime = _tourData.getTourDrivingTime();
+		final long breakTime = recordingTime - movingTime;
 
 		final DateTime dtTourStart = _tourData.getTourStartTime();
+		final DateTime dtTourEnd = dtTourStart.plus(recordingTime * 1000);
 
-		final DateTime dtTourEnd = new DateTime(dtTourStart).plusSeconds(recordingTime);
 		_lblDate.setText(String.format(//
 				Messages.Tour_Tooltip_Format_DateWeekTime,
 				_dateFormatter.print(dtTourStart.getMillis()),

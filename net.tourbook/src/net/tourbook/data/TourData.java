@@ -228,15 +228,19 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	/**
 	 * Total recording time in seconds
+	 * 
+	 * @since Is long since db version 22, before it was int
 	 */
 	@XmlElement
-	private int												tourRecordingTime;
+	private long											tourRecordingTime;
 
 	/**
 	 * Total driving/moving time in seconds
+	 * 
+	 * @since Is long since db version 22, before it was int
 	 */
 	@XmlElement
-	private int												tourDrivingTime;
+	private long											tourDrivingTime;
 
 	// ############################################# DISTANCE #############################################
 
@@ -982,6 +986,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	@Transient
 	public boolean											isHistoryTour;
+
+	/**
+	 * Time serie for history dates, {@link Long} is used instead of {@link Integer} which is used
+	 * in {@link #timeSerie} but has a limit of about 67 years {@link Integer#MAX_VALUE}.
+	 */
+	@Transient
+	public long[]											timeSerieHistory;
 
 	public TourData() {}
 
@@ -2860,6 +2871,54 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return floatDataSerie;
 	}
 
+	public void createHistoryTimeSerie(final ArrayList<HistoryData> historySlices) {
+
+		final int serieSize = historySlices.size();
+		if (serieSize == 0) {
+			return;
+		}
+
+		final HistoryData[] timeDataSerie = historySlices.toArray(new HistoryData[serieSize]);
+
+		/*
+		 * time serie is always available, except when tours are created manually
+		 */
+		timeSerieHistory = new long[serieSize];
+
+		// time is in seconds relative to the tour start
+		long recordingTime = 0;
+
+		long tourStartTime = 0;
+
+		// convert data from the tour format into interger[] arrays
+		for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
+
+			final HistoryData timeData = timeDataSerie[serieIndex];
+
+			final long absoluteTime = timeData.absoluteTime;
+
+			if (serieIndex == 0) {
+
+				// 1st trackpoint
+
+				timeSerieHistory[serieIndex] = 0;
+				tourStartTime = absoluteTime;
+
+			} else {
+
+				// 1..Nth trackpoint
+
+				recordingTime = (absoluteTime - tourStartTime) / 1000;
+				timeSerieHistory[serieIndex] = (recordingTime);
+
+			}
+		}
+
+		tourRecordingTime = recordingTime;
+
+		setTourEndTimeMS();
+	}
+
 	private void createSRTMDataSerie() {
 
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
@@ -3197,7 +3256,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		createTimeSeries10DataCompleting();
 
 		tourDistance = isDistance ? distanceSerie[serieSize - 1] : 0;
-		tourRecordingTime = (int) recordingTime;
+		tourRecordingTime = recordingTime;
 		setTourEndTimeMS();
 
 		/*
@@ -4595,7 +4654,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	public float[] getTimeSerieFloat() {
 
-		if (timeSerie == null) {
+		if (timeSerie == null && timeSerieHistory == null) {
 			return null;
 		}
 
@@ -4603,10 +4662,21 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			return timeSerieFloat;
 		}
 
-		timeSerieFloat = new float[timeSerie.length];
+		if (timeSerie != null) {
 
-		for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
-			timeSerieFloat[serieIndex] = timeSerie[serieIndex];
+			timeSerieFloat = new float[timeSerie.length];
+
+			for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
+				timeSerieFloat[serieIndex] = timeSerie[serieIndex];
+			}
+
+		} else if (timeSerieHistory != null) {
+
+			timeSerieFloat = new float[timeSerieHistory.length];
+
+			for (int serieIndex = 0; serieIndex < timeSerieHistory.length; serieIndex++) {
+				timeSerieFloat[serieIndex] = timeSerieHistory[serieIndex];
+			}
 		}
 
 		return timeSerieFloat;
@@ -4638,7 +4708,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return tourDistance;
 	}
 
-	public int getTourDrivingTime() {
+	public long getTourDrivingTime() {
 		return tourDrivingTime;
 	}
 
@@ -4726,7 +4796,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	/**
 	 * @return Returns total recording time in seconds
 	 */
-	public int getTourRecordingTime() {
+	public long getTourRecordingTime() {
 		return tourRecordingTime;
 	}
 
@@ -4862,7 +4932,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		result = 37 * result + startHour;
 		result = 37 * result + startMinute;
 		result = 37 * result + (int) this.getTourDistance();
-		result = 37 * result + this.getTourRecordingTime();
+		result = 37 * result + (int) this.getTourRecordingTime();
 
 		return result;
 	}
@@ -5468,7 +5538,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * 
 	 * @param tourRecordingTime
 	 */
-	public void setTourRecordingTime(final int tourRecordingTime) {
+	public void setTourRecordingTime(final long tourRecordingTime) {
 
 		this.tourRecordingTime = tourRecordingTime;
 

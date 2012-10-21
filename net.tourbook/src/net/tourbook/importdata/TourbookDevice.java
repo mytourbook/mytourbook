@@ -128,7 +128,7 @@ public abstract class TourbookDevice implements IRawDataReader {
 			 * export and import found a wrong tour when exporting was done with camouflage speed ->
 			 * this resulted in a NEW tour
 			 */
-			final int tourRecordingTime = tourData.getTourRecordingTime();
+			final int tourRecordingTime = (int) tourData.getTourRecordingTime();
 
 			if (distanceSerie == null) {
 				uniqueKey = Integer.toString(tourRecordingTime);

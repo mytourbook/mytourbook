@@ -6909,8 +6909,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_txtAltitudeDown.setText(Integer.toString((int) (altitudeDown / _unitValueAltitude)));
 
 		// tour time's
-		final int recordingTime = _tourData.getTourRecordingTime();
-		final int drivingTime = _tourData.getTourDrivingTime();
+		final int recordingTime = (int) _tourData.getTourRecordingTime();
+		final int drivingTime = (int) _tourData.getTourDrivingTime();
 		final int pausedTime = recordingTime - drivingTime;
 
 		_timeRecording.setTime(recordingTime);

@@ -846,10 +846,10 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 			public boolean computeTourValues(final TourData oldTourData) {
 
-				final int tourRecordingTime = oldTourData.getTourRecordingTime();
+				final int tourRecordingTime = (int) oldTourData.getTourRecordingTime();
 
 				// get old break time
-				final int tourDrivingTime = oldTourData.getTourDrivingTime();
+				final int tourDrivingTime = (int) oldTourData.getTourDrivingTime();
 				oldBreakTime[0] += tourRecordingTime - tourDrivingTime;
 
 				// force the break time to be recomputed with the current values which are already store in the pref store
@@ -874,10 +874,10 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 				if (savedTourData != null) {
 
 					// get new value
-					final int tourRecordingTime = savedTourData.getTourRecordingTime();
+					final int tourRecordingTime = (int) savedTourData.getTourRecordingTime();
 
 					// get old break time
-					final int tourDrivingTime = savedTourData.getTourDrivingTime();
+					final int tourDrivingTime = (int) savedTourData.getTourDrivingTime();
 					newBreakTime[0] += tourRecordingTime - tourDrivingTime;
 
 					subTaskText = NLS.bind(Messages.Compute_BreakTime_ForAllTour_Job_SubTask,//

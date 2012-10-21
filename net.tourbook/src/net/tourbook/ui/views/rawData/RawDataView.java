@@ -927,7 +927,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				final TourData tourData = (TourData) cell.getElement();
 
 				final float tourDistance = tourData.getTourDistance();
-				final int drivingTime = tourData.getTourDrivingTime();
+				final long drivingTime = tourData.getTourDrivingTime();
 
 				final float pace = tourDistance == 0 ? //
 						0
@@ -950,7 +950,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			public void update(final ViewerCell cell) {
 				final TourData tourData = ((TourData) cell.getElement());
 				final float tourDistance = tourData.getTourDistance();
-				final int drivingTime = tourData.getTourDrivingTime();
+				final long drivingTime = tourData.getTourDrivingTime();
 				if (drivingTime != 0) {
 
 					cell.setText(_nf1.format(tourDistance / drivingTime * 3.6 / UI.UNIT_VALUE_DISTANCE));
@@ -1089,7 +1089,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			@Override
 			public void update(final ViewerCell cell) {
 
-				final int drivingTime = ((TourData) cell.getElement()).getTourDrivingTime();
+				final int drivingTime = (int) ((TourData) cell.getElement()).getTourDrivingTime();
 
 				if (drivingTime != 0) {
 					_calendar
@@ -1170,7 +1170,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			@Override
 			public void update(final ViewerCell cell) {
 
-				final int recordingTime = ((TourData) cell.getElement()).getTourRecordingTime();
+				final int recordingTime = (int) ((TourData) cell.getElement()).getTourRecordingTime();
 
 				if (recordingTime != 0) {
 					_calendar.set(

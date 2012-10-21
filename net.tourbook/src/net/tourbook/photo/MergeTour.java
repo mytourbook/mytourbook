@@ -20,7 +20,7 @@ import gnu.trove.list.array.TLongArrayList;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import net.tourbook.data.TimeData;
+import net.tourbook.data.HistoryData;
 import net.tourbook.data.TourData;
 
 import org.joda.time.DateTime;
@@ -116,14 +116,13 @@ public class MergeTour {
 		_historyTimeSerie.add(photoTime);
 	}
 
-	private void addTimeSlice(final ArrayList<TimeData> dtList, final long timeSliceTime) {
+	private void addTimeSlice(final ArrayList<HistoryData> historyList, final long timeSliceTime) {
 
-		final TimeData timeData = new TimeData();
+		final HistoryData historyData = new HistoryData();
 
-		timeData.absoluteTime = timeSliceTime;
-//		timeData.absoluteAltitude = 1.0f;
+		historyData.absoluteTime = timeSliceTime;
 
-		dtList.add(timeData);
+		historyList.add(historyData);
 	}
 
 	@Override
@@ -163,7 +162,7 @@ public class MergeTour {
 
 		} else {
 
-			// add additional 5% tour time that the tour do not start/end at the chart border
+			// add additional 3% tour time that the tour do not start/end at the chart border
 
 			final long timeDiff = tourEnd - tourStart;
 			final long timeOffset = (long) (timeDiff * 0.03);
@@ -179,27 +178,27 @@ public class MergeTour {
 		 * adjust start and end that the dummy tour do not start at the chart border
 		 */
 
-		final ArrayList<TimeData> timeSlices = new ArrayList<TimeData>();
+		final ArrayList<HistoryData> historySlices = new ArrayList<HistoryData>();
 
 		/*
 		 * set tour start time line before first time slice
 		 */
-		addTimeSlice(timeSlices, tourStartTime);
+		addTimeSlice(historySlices, tourStartTime);
 
 		/*
 		 * create time data list for all time slices which contains photos
 		 */
 		for (final long timeSliceTime : historyTimeSerie) {
-			addTimeSlice(timeSlices, timeSliceTime);
+			addTimeSlice(historySlices, timeSliceTime);
 		}
 
 		/*
 		 * set tour end time after the last time slice
 		 */
-		addTimeSlice(timeSlices, tourEndTime);
+		addTimeSlice(historySlices, tourEndTime);
 
 		_historyTourData.setTourStartTime(tourStartDateTime);
-		_historyTourData.createTimeSeries(timeSlices, false);
+		_historyTourData.createHistoryTimeSerie(historySlices);
 	}
 
 	public TourData getHistoryTourData() {
