@@ -145,6 +145,28 @@ public class Util {
 				(timeAbsolute % 3600) % 60).toString();
 	}
 
+	public static String format_hh_mm_ss_Optional(final long value) {
+
+		boolean isShowSeconds = true;
+		final int seconds = (int) ((value % 3600) % 60);
+
+		if (isShowSeconds && seconds == 0) {
+			isShowSeconds = false;
+		}
+
+		String valueText;
+		if (isShowSeconds) {
+
+			// show seconds only when they are available
+
+			valueText = format_hh_mm_ss(value);
+		} else {
+			valueText = format_hh_mm(value);
+		}
+
+		return valueText;
+	}
+
 	public static String format_mm_ss(final long time) {
 
 		_sbFormatter.setLength(0);
@@ -286,6 +308,36 @@ public class Util {
 		return unit;
 	}
 
+	public static long getMajorSimpleNumberValue(final long graphUnit) {
+
+		double unit = graphUnit;
+		int multiplier = 1;
+
+		while (unit > 1000) {
+			multiplier *= 10;
+			unit /= 10;
+		}
+
+		unit = graphUnit / multiplier;
+
+		unit = //
+		unit == 1000 ? 5000 : //
+				unit == 500 ? 1000 : //
+						unit == 200 ? 1000 : //
+								unit == 100 ? 500 : //
+										unit == 50 ? 200 : //
+												unit == 20 ? 100 : //
+														unit == 10 ? 50 : //
+																unit == 5 ? 20 : //
+																		unit == 2 ? 10 : //
+																				unit == 1 ? 5 : //
+																						1;
+
+		unit *= multiplier;
+
+		return (long) unit;
+	}
+
 	/**
 	 * @param unitValue
 	 * @param is24HourFormatting
@@ -328,6 +380,7 @@ public class Util {
 				unit = //
 						//
 				unit >= 120 ? 720 : //
+//				unit >= 120 ? 1440 : //
 //						unit >= 60 ? 360 : //
 						unit >= 30 ? 360 : //
 								unit >= 15 ? 120 : //
@@ -385,34 +438,52 @@ public class Util {
 		return unit;
 	}
 
-	public static long getMajorYearValue(final long graphUnit) {
+	/**
+	 * @param unitValue
+	 * @param is24HourFormatting
+	 * @return Returns minUnitValue rounded to the number 60/30/20/10/5/2/1
+	 */
+	public static long getMajorTimeValue24(final long unitValue) {
 
-		double unit = graphUnit;
+		double unit = unitValue;
 		int multiplier = 1;
 
-		while (unit > 1000) {
-			multiplier *= 10;
-			unit /= 10;
+		while (unit > 240) {
+			multiplier *= 60;
+			unit /= 60;
 		}
 
-		unit = graphUnit / multiplier;
+		if (multiplier >= 3600) {
 
-		unit = //
-		unit == 1000 ? 5000 : //
-				unit == 500 ? 1000 : //
-						unit == 200 ? 1000 : //
-								unit == 100 ? 500 : //
-										unit == 50 ? 200 : //
-												unit == 20 ? 100 : //
-														unit == 10 ? 50 : //
-																unit == 5 ? 20 : //
-																		unit == 2 ? 10 : //
-																				unit == 1 ? 5 : //
-																						1;
+			unit = //
+					//
+			unit >= 6 ? 24 : //
+					unit >= 1 ? 6 : //
+							1;
 
-		unit *= multiplier;
+		} else {
 
-		return (long) unit;
+			unit = //
+					//
+			unit >= 60 ? 360 : //
+					unit >= 30 ? 120 : //
+							unit >= 10 ? 60 : //
+									unit >= 5 ? 30 : //
+											unit >= 2 ? 10 : //
+													5;
+		}
+
+		final double majorUnit = unit * multiplier;
+
+//		System.out.println(UI.timeStampNano()
+//				+ ("\tunitValue " + unitValue)
+//				+ ("\tunit " + unit)
+//				+ ("\tmultiplier " + multiplier)
+//				+ ("\tmajorUnit " + majorUnit)
+//				+ "\n");
+//// TODO remove SYSTEM.OUT.PRINTLN
+
+		return (long) majorUnit;
 	}
 
 	public static long getValueScaling(final double graphUnit) {
@@ -539,6 +610,82 @@ public class Util {
 										unit >= 2 ? 2 : //
 												1;
 		return (int) unit;
+	}
+
+	public static int roundSimpleNumberUnits(final long graphDefaultUnit) {
+
+		float unit = graphDefaultUnit;
+		int multiplier = 1;
+
+		while (unit > 20) {
+			multiplier *= 10;
+			unit /= 10;
+		}
+
+		unit = //
+				//
+		unit >= 10 ? 10 : //
+				unit >= 5 ? 5 : //
+						unit >= 2 ? 2 : //
+								1;
+
+		unit *= multiplier;
+
+		return (int) unit;
+	}
+
+	/**
+	 * @param defaultUnitValue
+	 * @return Returns unit rounded to the number 60/30/20/10/5/2/1
+	 */
+	public static long roundTime24h(final long defaultUnitValue) {
+
+		float unit = defaultUnitValue;
+		int multiplier = 1;
+
+		while (unit > 120) {
+			multiplier *= 60;
+			unit /= 60;
+		}
+
+		if (multiplier >= 3600) {
+
+			// > 1h
+
+			unit = //
+					//
+			unit >= 24 ? 48 : //
+					unit >= 12 ? 24 : //
+							unit >= 6 ? 12 : //
+									unit >= 3 ? 6 : //
+											unit >= 2 ? 2 : //
+													1;
+
+		} else {
+
+			// <  1h
+
+			unit = //
+					//
+			unit >= 120 ? 240 : //
+					unit >= 60 ? 120 : //
+							unit >= 30 ? 60 : //
+									unit >= 15 ? 30 : //
+											unit >= 10 ? 15 : //
+													unit >= 5 ? 10 : //
+															unit >= 2 ? 5 : //
+																	1;
+		}
+
+//		System.out.println(UI.timeStampNano()
+//				+ ("\tdefaultUnitValue " + defaultUnitValue)
+//				+ ("\tunit " + unit)
+//				+ ("\tmultiplier " + multiplier));
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
+		unit *= multiplier;
+
+		return (long) unit;
 	}
 
 	/**
@@ -712,28 +859,6 @@ public class Util {
 				return gvDiv3;
 			}
 		}
-	}
-
-	public static int roundYearUnits(final long graphDefaultUnit) {
-
-		float unit = graphDefaultUnit;
-		int multiplier = 1;
-
-		while (unit > 20) {
-			multiplier *= 10;
-			unit /= 10;
-		}
-
-		unit = //
-				//
-		unit >= 10 ? 10 : //
-				unit >= 5 ? 5 : //
-						unit >= 2 ? 2 : //
-								1;
-
-		unit *= multiplier;
-
-		return (int) unit;
 	}
 
 	/**

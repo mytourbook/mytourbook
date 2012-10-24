@@ -55,6 +55,7 @@ public class GraphDrawingData {
 	 */
 	private ArrayList<ChartUnit>	_xUnits					= new ArrayList<ChartUnit>();
 	private int						_xUnitTextPos			= X_UNIT_TEXT_POS_LEFT;
+	private int						_titleTextPosition		= X_UNIT_TEXT_POS_LEFT;
 
 	/**
 	 * List with all unit labels and positions for the y axis
@@ -100,6 +101,7 @@ public class GraphDrawingData {
 	private String					_errorMessage;
 
 	private boolean					_isXUnitOverlapChecked	= false;
+	private boolean					_isCheckUnitBorderOverlap	= true;
 
 	private boolean[]				_isDrawUnits			= null;
 
@@ -213,6 +215,10 @@ public class GraphDrawingData {
 		return _scaleY;
 	}
 
+	public int getTitleTextPosition() {
+		return _titleTextPosition;
+	}
+
 	/**
 	 * @return Returns the xData.
 	 */
@@ -264,6 +270,10 @@ public class GraphDrawingData {
 	 */
 	public ArrayList<ChartUnit> getYUnits() {
 		return _yUnits;
+	}
+
+	public boolean isCheckUnitBorderOverlap() {
+		return _isCheckUnitBorderOverlap;
 	}
 
 	/**
@@ -356,6 +366,10 @@ public class GraphDrawingData {
 		_graphYTop = graphYTop;
 	}
 
+	public void setIsCheckUnitBorderOverlap(final boolean isCheckUnitBorderOverlap) {
+		_isCheckUnitBorderOverlap = isCheckUnitBorderOverlap;
+	}
+
 	public void setIsDrawUnit(final boolean[] isDrawUnits) {
 		_isDrawUnits = isDrawUnits;
 	}
@@ -384,6 +398,16 @@ public class GraphDrawingData {
 
 	public void setScaleY(final double scaleY) {
 		_scaleY = scaleY;
+	}
+
+	/**
+	 * Set the position of the title text, this can be {@link #X_UNIT_TEXT_POS_LEFT} or
+	 * {@link #X_UNIT_TEXT_POS_CENTER}, default is {@link #X_UNIT_TEXT_POS_LEFT}.
+	 * 
+	 * @param titleTextPosition
+	 */
+	public void setTitleTextPos(final int titleTextPosition) {
+		_titleTextPosition = titleTextPosition;
 	}
 
 	/**
@@ -432,5 +456,4 @@ public class GraphDrawingData {
 	public void setYSliderHitRect(final Rectangle[] sliderHitRect) {
 		_ySliderHitRect = sliderHitRect;
 	}
-
 }

@@ -1116,6 +1116,13 @@ public class TourChart extends Chart {
 			return;
 		}
 
+		if (isTimeSerie == false && isHistorySerie) {
+			// hide x slider
+			setShowSlider(false);
+		} else {
+			setShowSlider(true);
+		}
+
 		/*
 		 * at least 1 photo is available
 		 */

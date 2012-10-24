@@ -377,7 +377,7 @@ public class ChartComponentAxis extends Canvas {
 
 	private void onMouseWheel(final Event event) {
 
-		_componentGraph.onMouseWheel(event);
+		_componentGraph.onMouseWheel(event, true, _isLeft);
 
 		/*
 		 * display tour tool tip when mouse is hovered over the tour info icon in the statistics and

@@ -23,12 +23,14 @@ Improvements
 * set tour marker visibility (can be used when doing a screenshot to hide awkward markers)
 
 
+Different behaviour:
+
+* UPDATE DOCU: TOUR CHART autoscrolling in the tour chart can be done only, when the mouse vertical position is below the horizontal x-axis of the lower graph (when multiple graphs are displayed)
 
 
 Other modifications 
 
 *
-
 
 
 Fixed Bugs 

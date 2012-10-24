@@ -41,11 +41,11 @@ public class ChartUnit {
 
 	@Override
 	public String toString() {
-		return "\nChartUnit ["
-				+ ("value=" + value + ", ")
-				+ ("valueLabel=" + valueLabel + ", ")
-				+ ("isMajorValue=" + isMajorValue)
-				+ "]";
-//				+ "\n";
+		return "\tChartUnit"
+				+ (" value=" + value + ", ")
+				+ ("\tvalueLabel=" + valueLabel + ", ")
+				+ ("\tisMajorValue=" + isMajorValue)
+//
+		;
 	}
 }
