@@ -1117,7 +1117,7 @@ public class TourChart extends Chart {
 		}
 
 		if (isTimeSerie == false && isHistorySerie) {
-			// hide x slider
+			// hide x slider in history chart
 			setShowSlider(false);
 		} else {
 			setShowSlider(true);
@@ -1153,9 +1153,15 @@ public class TourChart extends Chart {
 		 */
 
 		// set value serie for the x-axis
-		final float[] xAxisSerie = _tourChartConfig.isShowTimeOnXAxis //
-				? _tourData.getTimeSerieFloat()
-				: _tourData.getDistanceSerie();
+		float[] xAxisSerieFloat = null;
+		double[] xAxisSerieDouble = null;
+		if (isHistorySerie) {
+			xAxisSerieDouble = _tourData.getTimeSerieDouble();
+		} else {
+			xAxisSerieFloat = _tourChartConfig.isShowTimeOnXAxis //
+					? _tourData.getTimeSerieFloat()
+					: _tourData.getDistanceSerie();
+		}
 
 		long timeSliceEnd;
 		if (isTimeSerie) {
@@ -1165,8 +1171,11 @@ public class TourChart extends Chart {
 		}
 
 		int photoIndex = 0;
-		int timeIndex = 0;
 		PhotoWrapper photoWrapper = tourPhotos.get(photoIndex);
+
+		// tour time serie, fit photos into a tour
+
+		int timeIndex = 0;
 
 		while (true) {
 
@@ -1188,7 +1197,13 @@ public class TourChart extends Chart {
 
 					// photo is available in the current time slice
 
-					chartPhotos.add(new ChartPhoto(photoWrapper, xAxisSerie[timeIndex], timeIndex));
+					double xValue;
+					if (isHistorySerie) {
+						xValue = xAxisSerieDouble[timeIndex];
+					} else {
+						xValue = xAxisSerieFloat[timeIndex];
+					}
+					chartPhotos.add(new ChartPhoto(photoWrapper, xValue, timeIndex));
 
 					photoIndex++;
 
@@ -1215,6 +1230,7 @@ public class TourChart extends Chart {
 			 * photos are still available
 			 */
 
+			// advance to the next time slice on the x-axis
 			timeIndex++;
 
 			if (timeIndex >= numberOfTimeSlices - 1) {
@@ -1226,7 +1242,13 @@ public class TourChart extends Chart {
 
 				while (true) {
 
-					chartPhotos.add(new ChartPhoto(photoWrapper, xAxisSerie[numberOfTimeSlices - 1], timeIndex));
+					double xValue;
+					if (isHistorySerie) {
+						xValue = xAxisSerieDouble[numberOfTimeSlices - 1];
+					} else {
+						xValue = xAxisSerieFloat[numberOfTimeSlices - 1];
+					}
+					chartPhotos.add(new ChartPhoto(photoWrapper, xValue, timeIndex));
 
 					photoIndex++;
 

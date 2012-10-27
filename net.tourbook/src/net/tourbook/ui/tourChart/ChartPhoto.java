@@ -24,13 +24,13 @@ public class ChartPhoto {
 	/**
 	 * Value on the x-axis
 	 */
-	public float	xValue;
+	public double		xValue;
 
 	/**
 	 * Index in the data serie where a photo occures, there can be multiple photos at the same
 	 * position.
 	 */
-	public int		serieIndex;
+	public int			serieIndex;
 
 	/**
 	 * @param photoWrapper
@@ -38,11 +38,22 @@ public class ChartPhoto {
 	 *            Value on the x-axis
 	 * @param serieIndex
 	 */
-	public ChartPhoto(final PhotoWrapper photoWrapper, final float xValue, final int serieIndex) {
+	public ChartPhoto(final PhotoWrapper photoWrapper, final double xValue, final int serieIndex) {
 
 		this.photoWrapper = photoWrapper;
 		this.xValue = xValue;
 		this.serieIndex = serieIndex;
+	}
+
+	@Override
+	public String toString() {
+		return "ChartPhoto xValue="
+				+ xValue
+				+ "{)}, serieIndex="
+				+ serieIndex
+				+ "{)}, photoWrapper="
+				+ photoWrapper
+				;
 	}
 
 }

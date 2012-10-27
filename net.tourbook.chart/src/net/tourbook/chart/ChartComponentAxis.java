@@ -303,8 +303,8 @@ public class ChartComponentAxis extends Canvas {
 			// loop: all units
 			for (final ChartUnit yUnit : yUnits) {
 
-				final float unitValue = yUnit.value;
-				final float devYUnit = (float) (((unitValue - graphYBottom) * scaleY) + .5);
+				final double unitValue = yUnit.value;
+				final double devYUnit = (((unitValue - graphYBottom) * scaleY) + .5);
 
 				if (isBottomUp || numberOfUnits == 1) {
 					devY = devYBottom - (int) devYUnit;

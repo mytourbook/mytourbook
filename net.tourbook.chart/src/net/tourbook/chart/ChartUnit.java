@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,21 +22,21 @@ package net.tourbook.chart;
 
 public class ChartUnit {
 
-	public float	value;
+	public double	value;
 
 	public String	valueLabel;
 
 	boolean			isMajorValue	= false;
 
-	public ChartUnit(final float value, final String valueLabel) {
-		this.value = value;
-		this.valueLabel = valueLabel;
-	}
-
-	public ChartUnit(final float value, final String valueLabel, final boolean isMajorValue) {
+	public ChartUnit(final double value, final String valueLabel, final boolean isMajorValue) {
 		this.value = value;
 		this.valueLabel = valueLabel;
 		this.isMajorValue = isMajorValue;
+	}
+
+	public ChartUnit(final float value, final String valueLabel) {
+		this.value = value;
+		this.valueLabel = valueLabel;
 	}
 
 	@Override

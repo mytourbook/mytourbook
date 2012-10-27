@@ -67,4 +67,9 @@ public class Camera implements Comparable<Camera> {
 		timeAdjustment = (hours * 60 * 60 * 1000) + (minutes * 60 * 1000) + (seconds * 1000);
 	}
 
+	@Override
+	public String toString() {
+		return "Camera [cameraName=" + cameraName + "{)}, timeAdjustment=" + timeAdjustment + "]";
+	}
+
 }

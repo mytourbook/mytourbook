@@ -2209,8 +2209,8 @@ public class ChartComponentGraph extends Canvas {
 		// loop: all units
 		for (final ChartUnit yUnit : yUnits) {
 
-			final float unitValue = yUnit.value;
-			final float devYUnit = (float) (((unitValue - graphYBottom) * scaleY) + 0.5f);
+			final double unitValue = yUnit.value;
+			final double devYUnit = (((unitValue - graphYBottom) * scaleY) + 0.5);
 
 			if (isBottomUp || unitListSize == 1) {
 				devY = devYBottom - (int) devYUnit;

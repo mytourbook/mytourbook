@@ -994,6 +994,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	@Transient
 	public long[]											timeSerieHistory;
 
+	/**
+	 * Time in double precicion that x-axis values are displayed at the correct position, this is no
+	 * the case when max chart pixels are 1000000000
+	 */
+	@Transient
+	private double[]										timeSerieHistoryDouble;
+
 	public TourData() {}
 
 	/**
@@ -4647,6 +4654,24 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	@XmlElement
 	public String getTest() {
 		return "jokl"; //$NON-NLS-1$
+	}
+
+	public double[] getTimeSerieDouble() {
+
+		if (timeSerieHistory == null) {
+			return null;
+		}
+
+		if (timeSerieHistoryDouble == null) {
+
+			timeSerieHistoryDouble = new double[timeSerieHistory.length];
+
+			for (int serieIndex = 0; serieIndex < timeSerieHistory.length; serieIndex++) {
+				timeSerieHistoryDouble[serieIndex] = timeSerieHistory[serieIndex];
+			}
+		}
+
+		return timeSerieHistoryDouble;
 	}
 
 	/**

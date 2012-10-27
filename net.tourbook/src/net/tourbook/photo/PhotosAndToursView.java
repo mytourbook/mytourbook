@@ -1557,12 +1557,15 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 
 		_comboCamera.removeAll();
 
-		final int cameraIndex = 0;
+
+		final Camera[] cameraList = mergeTour.cameraList;
 		int cameraComboIndex = -1;
 
-		for (final Camera camera : mergeTour.cameraList) {
+		for (int cameraIndex = 0; cameraIndex < cameraList.length; cameraIndex++) {
 
+			final Camera camera = cameraList[cameraIndex];
 			final Camera existingCamera = _allCameras.get(camera.cameraName);
+
 			if (existingCamera != null && camera.cameraName.equals(existingCamera.cameraName)) {
 				_comboCamera.add(existingCamera.cameraName);
 			} else {
@@ -1570,7 +1573,9 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 			}
 
 			// get index for the last selected camera
-			if (cameraComboIndex == -1 && currentSelectedCamera != null && currentSelectedCamera.equals(camera)) {
+			if (cameraComboIndex == -1
+					&& currentSelectedCamera != null
+					&& currentSelectedCamera.equals(camera.cameraName)) {
 				cameraComboIndex = cameraIndex;
 			}
 		}

@@ -94,7 +94,6 @@ public class MergeTour {
 		_historyTourData.setupHistoryTour();
 
 		_historyTimeSerie = new TLongArrayList();
-		_historyTimeSerie.add(tourStartTime);
 	}
 
 	/**
@@ -165,7 +164,11 @@ public class MergeTour {
 			// add additional 3% tour time that the tour do not start/end at the chart border
 
 			final long timeDiff = tourEnd - tourStart;
-			final long timeOffset = (long) (timeDiff * 0.03);
+
+			/**
+			 * very important: round to 0 ms
+			 */
+			final long timeOffset = (long) (timeDiff * 0.03) / 1000 * 1000;
 
 			tourStartTime = tourStart - timeOffset;
 			tourEndTime = tourEnd + timeOffset;
