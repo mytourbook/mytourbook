@@ -776,6 +776,24 @@ public class RawDataManager {
 					oldTourData.temperatureSerie = reimportedTourData.temperatureSerie;
 					oldTourData.timeSerie = reimportedTourData.timeSerie;
 
+					/*
+					 * get speed/power data when it's from the device
+					 */
+					final boolean isTourPower = reimportedTourData.isPowerSerieFromDevice();
+					if (isTourPower) {
+						final float[] powerSerie = reimportedTourData.getPowerSerie();
+						if (powerSerie != null) {
+							oldTourData.setPowerSerie(powerSerie);
+						}
+					}
+					final boolean isTourSpeed = reimportedTourData.isSpeedSerieFromDevice();
+					if (isTourSpeed) {
+						final float[] speedSerie = reimportedTourData.getSpeedSerieFromDevice();
+						if (speedSerie != null) {
+							oldTourData.setSpeedSerie(speedSerie);
+						}
+					}
+
 					oldTourData.setCalories(reimportedTourData.getCalories());
 				}
 
