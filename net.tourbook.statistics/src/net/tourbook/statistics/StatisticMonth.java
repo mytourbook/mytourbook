@@ -124,13 +124,13 @@ public abstract class StatisticMonth extends YearStatistic {
 		_chart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
 	}
 
-	float[] createMonthData(final TourDataMonth tourMonthData) {
+	double[] createMonthData(final TourDataMonth tourMonthData) {
 
 		/*
 		 * create segments for each year
 		 */
 		final int monthCounter = tourMonthData.altitudeHigh[0].length;
-		final float[] allMonths = new float[monthCounter];
+		final double[] allMonths = new double[monthCounter];
 
 		// get start/end and title for each segment
 		for (int monthIndex = 0; monthIndex < monthCounter; monthIndex++) {
@@ -227,6 +227,7 @@ public abstract class StatisticMonth extends YearStatistic {
 	}
 
 	void createXDataMonths(final ChartDataModel chartDataModel) {
+
 		// set the x-axis
 		final ChartDataXSerie xData = new ChartDataXSerie(createMonthData(_tourMonthData));
 		xData.setAxisUnit(ChartDataXSerie.X_AXIS_UNIT_MONTH);

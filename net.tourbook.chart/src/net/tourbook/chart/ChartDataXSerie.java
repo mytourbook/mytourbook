@@ -26,11 +26,14 @@ import org.joda.time.DateTime;
  */
 public class ChartDataXSerie extends ChartDataSerie {
 
+	double[][]				_lowValuesDouble;
+	double[][]				_highValuesDouble;
+
 	/**
 	 * start value for the serie data, this is use to set the start point for time data to the
 	 * starting time
 	 */
-	private float			_startValue				= 0;
+	private double			_startValue				= 0;
 
 	/**
 	 * index in the x-data at which the graph is painted in the marker color, <code>-1</code>
@@ -77,17 +80,23 @@ public class ChartDataXSerie extends ChartDataSerie {
 	 */
 	private DateTime		_startDateTime;
 
-	public ChartDataXSerie(final float[] values) {
-		setMinMaxValues(new float[][] { values });
+	public ChartDataXSerie(final double[] values) {
+		setMinMaxValues(new double[][] { values });
 	}
 
-
-	public ChartDataXSerie(final float[][] values) {
+	public ChartDataXSerie(final double[][] values) {
 		setMinMaxValues(values);
 	}
 
 	public ChartSegments getChartSegments() {
 		return _chartSegments;
+	}
+
+	/**
+	 * @return returns the value array
+	 */
+	public double[][] getHighValuesDouble() {
+		return _highValuesDouble;
 	}
 
 	public HistoryTitle getHistoryTitle() {
@@ -128,7 +137,7 @@ public class ChartDataXSerie extends ChartDataSerie {
 	/**
 	 * @return Returns the startValue.
 	 */
-	public float getStartValue() {
+	public double getStartValue() {
 		return _startValue;
 	}
 
@@ -154,8 +163,53 @@ public class ChartDataXSerie extends ChartDataSerie {
 		_historyTitle = historyTitle;
 	}
 
-	@Override
-	void setMinMaxValues(final float[][] lowValues, final float[][] highValues) {}
+	private void setMinMaxValues(final double[][] valueSeries) {
+
+		if (valueSeries == null || valueSeries.length == 0 || valueSeries[0] == null || valueSeries[0].length == 0) {
+
+			_highValuesDouble = new double[1][2];
+			_lowValuesDouble = new double[1][2];
+
+			_visibleMaxValue = _visibleMinValue = 0;
+			_originalMaxValue = _originalMinValue = 0;
+
+		} else {
+
+			_highValuesDouble = valueSeries;
+
+			// set initial min/max value
+			_visibleMaxValue = _visibleMinValue = valueSeries[0][0];
+
+			// calculate min/max highValues
+			for (final double[] valueSerie : valueSeries) {
+
+				if (valueSerie == null) {
+					continue;
+				}
+
+				for (final double value : valueSerie) {
+					_visibleMaxValue = (_visibleMaxValue >= value) ? _visibleMaxValue : value;
+					_visibleMinValue = (_visibleMinValue <= value) ? _visibleMinValue : value;
+				}
+			}
+
+			/*
+			 * force the min/max values to have not the same value this is necessary to display a
+			 * visible line in the chart
+			 */
+			if (_visibleMinValue == _visibleMaxValue) {
+
+				_visibleMaxValue++;
+
+				if (_visibleMinValue > 0) {
+					_visibleMinValue--;
+				}
+			}
+
+			_originalMinValue = _visibleMinValue;
+			_originalMaxValue = _visibleMaxValue;
+		}
+	}
 
 	public void setNoLine(final boolean[] noLineSerie) {
 		_noLine = noLineSerie;
@@ -189,7 +243,7 @@ public class ChartDataXSerie extends ChartDataSerie {
 	 * @param startValue
 	 *            The startValue to set.
 	 */
-	public void setStartValue(final float startValue) {
+	public void setStartValue(final double startValue) {
 		_startValue = startValue;
 	}
 

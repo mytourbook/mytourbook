@@ -20,7 +20,7 @@ public interface IChartListener {
 	/**
 	 * @return Returns the value difference between the left and right border of the x-marker
 	 */
-	float getXMarkerValueDiff();
+	double getXMarkerValueDiff();
 
 	/**
 	 * this method is called when the x-marker was move, the parameter contain the new value index

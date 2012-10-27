@@ -41,7 +41,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 	 * contains tour which is displayed in the chart
 	 */
 	private TourData				_tourData;
-	private float[]					_xDataSerie;
+	private double[]				_xDataSerie;
 	private TourChartConfiguration	_tourChartConfig;
 	private SplineData				_splineData;
 
@@ -60,7 +60,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 	}
 
 	public ChartLayer2ndAltiSerie(	final TourData tourData,
-									final float[] xDataSerie,
+									final double[] xDataSerie,
 									final TourChartConfiguration tourChartConfig,
 									final SplineData splineData) {
 
@@ -74,7 +74,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 
 	public void draw(final GC gc, final GraphDrawingData drawingData, final Chart chart) {
 
-		final float[] xValues = _xDataSerie;
+		final double[] xValues = _xDataSerie;
 
 		final float[] yValues2ndSerie = _tourData.dataSerie2ndAlti;
 		final float[] yDiffTo2ndSerie = _tourData.dataSerieDiffTo2ndAlti;
@@ -147,8 +147,8 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		final Rectangle graphRect = new Rectangle(0, devYTop, devChartWidth, devGraphHeight);
 
 		// get initial dev X
-		float graphXValue = xValues[startIndex] - _graphXValueOffset;
-		int devPrevXInt = (int) (graphXValue * _scaleX);
+		double graphXValue = xValues[startIndex] - _graphXValueOffset;
+		int devPrevXInt = (int) (_scaleX * graphXValue);
 
 		float graphYValue2nd;
 		if (is2ndYValues) {
@@ -166,7 +166,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 //			}
 
 			graphXValue = xValues[xValueIndex] - _graphXValueOffset;
-			final float devX = (float) (graphXValue * _scaleX);
+			final float devX = (float) (_scaleX * graphXValue);
 			final int devXInt = (int) devX;
 
 			/*
@@ -174,7 +174,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 			 */
 			if (isAdjustedValues) {
 
-				final float devYAdjustedValue = (float) (yAdjustedSerie[xValueIndex] * _scaleY);
+				final float devYAdjustedValue = (float) (_scaleY * yAdjustedSerie[xValueIndex]);
 				final float devYAdjusted = devY0 - devYAdjustedValue;
 
 				if (xValueIndex == startIndex) {
@@ -205,8 +205,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 			if (is2ndYValues) {
 
 				graphYValue2nd = yValues2ndSerie[xValueIndex];
-				final float devYValue2nd = (float) (graphYValue2nd * _scaleY);
-
+				final float devYValue2nd = (float) (_scaleY * graphYValue2nd);
 				final float devY2nd = devY0 - devYValue2nd;
 
 				if (xValueIndex == startIndex) {
@@ -294,16 +293,16 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 
 			gc.setForeground(splineColor);
 
-			int devXPrev = (int) ((xValues[0] - _graphXValueOffset) * _scaleX);
-			int devYPrev = (int) (ySplineSerie[0] * _scaleY);
+			int devXPrev = (int) (_scaleX * (xValues[0] - _graphXValueOffset));
+			int devYPrev = (int) (_scaleY * ySplineSerie[0]);
 
 			for (int xIndex = 1; xIndex < xValues.length; xIndex++) {
 
-				final float graphX = xValues[xIndex] - _graphXValueOffset;
+				final double graphX = xValues[xIndex] - _graphXValueOffset;
 				final float graphY = ySplineSerie[xIndex];
 
-				final int devX = (int) (graphX * _scaleX);
-				final int devY = (int) (graphY * _scaleY);
+				final int devX = (int) (_scaleX * graphX);
+				final int devY = (int) (_scaleY * graphY);
 
 				if (!(devX == devXPrev && devY == devYPrev)) {
 					gc.drawLine(devXPrev, _devY0Spline - devYPrev, devX, _devY0Spline - devY);
@@ -356,7 +355,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 				final double graphX = graphXSplineValues[pointIndex] - _graphXValueOffset;
 				final double graphY = graphYSplineValues[pointIndex];
 
-				int devPointX = (int) (graphX * _scaleX);
+				int devPointX = (int) (_scaleX * graphX);
 				final int devPointY = (int) (graphY * scaleValueDiff);
 
 				/*
@@ -423,11 +422,11 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 
 			for (final int serieIndex : graphSerieIndex) {
 
-				final float graphX = xValues[serieIndex] - _graphXValueOffset;
+				final double graphX = xValues[serieIndex] - _graphXValueOffset;
 				final float graphY = yAdjustedSerie[serieIndex];
 
-				final int devX = (int) (graphX * _scaleX);
-				final int devY = (int) (devY0 - (graphY * _scaleY));
+				final int devX = (int) (_scaleX * graphX);
+				final int devY = (int) (devY0 - (_scaleY * graphY));
 
 				gc.fillOval(devX - 2, devY - 2, 5, 5);
 

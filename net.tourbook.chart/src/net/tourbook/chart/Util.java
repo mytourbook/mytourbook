@@ -521,7 +521,7 @@ public class Util {
 	 * @param unitValue
 	 * @return Returns unit value rounded to the number of 50/20/10/5/2/1
 	 */
-	public static double roundDecimalValue(final float unitValue) {
+	public static double roundDecimalValue(final double unitValue) {
 
 		double unit = unitValue;
 		int multiplier = 1;

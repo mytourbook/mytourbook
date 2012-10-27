@@ -263,10 +263,10 @@ public abstract class StatisticWeek extends YearStatistic {
 		return toolTipInfo;
 	}
 
-	private float[] createWeekData() {
+	private double[] createWeekData() {
 
 		final int weekCounter = _tourWeekData.altitudeHigh[0].length;
-		final float allWeeks[] = new float[weekCounter];
+		final double allWeeks[] = new double[weekCounter];
 
 		for (int weekIndex = 0; weekIndex < weekCounter; weekIndex++) {
 			allWeeks[weekIndex] = weekIndex;

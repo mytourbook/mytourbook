@@ -647,9 +647,9 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 			return null;
 		}
 
-		final float[] xDataSerie = _tourChartConfig.isShowTimeOnXAxis ? //
-				_targetTour.getTimeSerieFloat()
-				: _targetTour.getDistanceSerie();
+		final double[] xDataSerie = _tourChartConfig.isShowTimeOnXAxis ? //
+				_targetTour.getTimeSerieDouble()
+				: _targetTour.getDistanceSerieDouble();
 
 		return new ChartLayer2ndAltiSerie(layerTourData, xDataSerie, _tourChartConfig, null);
 	}

@@ -136,8 +136,8 @@ public class TrainingView extends ViewPart {
 	private ActionShowAllPulseValues	_actionShowAllPulseValues;
 	private ActionSynchChartScale		_actionSynchVerticalChartScaling;
 
-	private float						_pulseStart;
-	private float[]						_xSeriePulse;
+	private double						_pulseStart;
+	private double[]					_xSeriePulse;
 
 	private ArrayList<TourPersonHRZone>	_personHrZones							= new ArrayList<TourPersonHRZone>();
 	private final BarChartMinMaxKeeper	_minMaxKeeper							= new BarChartMinMaxKeeper();
@@ -1246,7 +1246,7 @@ public class TrainingView extends ViewPart {
 		 */
 		final int pulseRange = (int) (maxPulse - _pulseStart + 1);
 
-		_xSeriePulse = new float[pulseRange];
+		_xSeriePulse = new double[pulseRange];
 		final float[] ySeriePulseTime = new float[pulseRange];
 
 		final int[] colorIndex = new int[timeSerieSize];
@@ -1265,7 +1265,7 @@ public class TrainingView extends ViewPart {
 				final float minValue = zoneMinBpm[zoneIndex];
 				final float maxValue = zoneMaxBpm[zoneIndex];
 
-				final float pulse = _pulseStart + pulseIndex;
+				final double pulse = _pulseStart + pulseIndex;
 
 				if (pulse >= minValue && pulse <= maxValue) {
 

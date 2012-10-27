@@ -635,7 +635,8 @@ public class StatisticTourNumbers extends YearStatistic {
 		final ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
 
 		// set the x-axis
-		final ChartDataXSerie xData = new ChartDataXSerie(net.tourbook.common.util.Util.convertIntToFloat(_statAltitudeUnits));
+		final ChartDataXSerie xData = new ChartDataXSerie(
+				net.tourbook.common.util.Util.convertIntToDouble(_statAltitudeUnits));
 		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_NUMBER);
 		xData.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
 		chartDataModel.setXData(xData);
@@ -697,7 +698,8 @@ public class StatisticTourNumbers extends YearStatistic {
 		final ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
 
 		// set the x-axis
-		final ChartDataXSerie xData = new ChartDataXSerie(net.tourbook.common.util.Util.convertIntToFloat(_statDistanceUnits));
+		final ChartDataXSerie xData = new ChartDataXSerie(
+				net.tourbook.common.util.Util.convertIntToDouble(_statDistanceUnits));
 		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_NUMBER);
 		xData.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
 		chartDataModel.setXData(xData);
@@ -810,7 +812,8 @@ public class StatisticTourNumbers extends YearStatistic {
 		final ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
 
 		// set the x-axis
-		final ChartDataXSerie xData = new ChartDataXSerie(net.tourbook.common.util.Util.convertIntToFloat(_statTimeUnits));
+		final ChartDataXSerie xData = new ChartDataXSerie(
+				net.tourbook.common.util.Util.convertIntToDouble(_statTimeUnits));
 		xData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
 		xData.setUnitLabel(UI.UNIT_LABEL_TIME);
 		chartDataModel.setXData(xData);

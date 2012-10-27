@@ -144,15 +144,23 @@ public class MergeTour {
 
 	private void finalizeHistoryTour() {
 
+		if (_historyTimeSerie.size() == 0) {
+
+			// only the tour start exists from the constructor, create 1 time slice
+
+			_historyTimeSerie.add(tourStartTime);
+		}
+
 		final long[] historyTimeSerie = _historyTimeSerie.toArray();
+		final int timeSerieLength = historyTimeSerie.length;
 
 		final long tourStart = historyTimeSerie[0];
-		final long tourEnd = historyTimeSerie[historyTimeSerie.length - 1];
+		final long tourEnd = historyTimeSerie[timeSerieLength - 1];
 
 		historyStartTime = tourStartTime = tourStart;
 		historyEndTime = tourEndTime = tourEnd;
 
-		if (historyTimeSerie.length == 1) {
+		if (timeSerieLength == 1) {
 
 			// only 1 point is visible
 

@@ -16,7 +16,6 @@
 package net.tourbook.ui.tourChart;
 
 import gnu.trove.list.array.TDoubleArrayList;
-import gnu.trove.list.array.TFloatArrayList;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -260,8 +259,8 @@ public class ConconiChartView extends ViewPart {
 				_prefStore,
 				prefGraphName + GraphColorProvider.PREF_COLOR_BRIGHT);
 
-		final float[][] powerSerie = new float[validDataLength][];
-		final float[][] pulseSerie = new float[validDataLength][];
+		final double[][] powerSerie = new double[validDataLength][];
+		final double[][] pulseSerie = new double[validDataLength][];
 		final RGB[] rgbLine = new RGB[validDataLength];
 		final RGB[] rgbDark = new RGB[validDataLength];
 		final RGB[] rgbBright = new RGB[validDataLength];
@@ -287,8 +286,8 @@ public class ConconiChartView extends ViewPart {
 					&& tourPulseSerie != null
 					&& tourPulseSerie.length != 0) {
 
-				final TFloatArrayList maxXValues = new TFloatArrayList();
-				final TFloatArrayList maxYValues = new TFloatArrayList();
+				final TDoubleArrayList maxXValues = new TDoubleArrayList();
+				final TDoubleArrayList maxYValues = new TDoubleArrayList();
 
 				float lastMaxY = Float.MIN_VALUE;
 				float currentXValue = tourPowerSerie[0];
@@ -361,8 +360,8 @@ public class ConconiChartView extends ViewPart {
 		 * swap last tour with marked tour that the marked tour is painted at last to be not covered
 		 * by other tours
 		 */
-		final float[] markedPowerSerie = powerSerie[markedIndex];
-		final float[] markedPulseSerie = pulseSerie[markedIndex];
+		final double[] markedPowerSerie = powerSerie[markedIndex];
+		final double[] markedPulseSerie = pulseSerie[markedIndex];
 		final RGB markedRgbLine = rgbLine[markedIndex];
 		final RGB markedRgbDark = rgbDark[markedIndex];
 		final RGB markedRgbBright = rgbBright[markedIndex];
@@ -387,9 +386,14 @@ public class ConconiChartView extends ViewPart {
 		xDataPower.setUnitLabel(Messages.Graph_Label_Power_unit);
 
 		/*
+		 * double is not yet supported for the y-axis
+		 */
+		final float[][] pulseSerieFloat = Util.convertDoubleToFloat(pulseSerie);
+
+		/*
 		 * pulse
 		 */
-		_yDataPulse = new ChartDataYSerie(ChartDataModel.CHART_TYPE_XY_SCATTER, pulseSerie);
+		_yDataPulse = new ChartDataYSerie(ChartDataModel.CHART_TYPE_XY_SCATTER, pulseSerieFloat);
 		_yDataPulse.setYTitle(Messages.Graph_Label_Heartbeat);
 		_yDataPulse.setUnitLabel(Messages.Graph_Label_Heartbeat_unit);
 		_yDataPulse.setDefaultRGB(rgbPrefLine);
@@ -429,24 +433,24 @@ public class ConconiChartView extends ViewPart {
 		return chartDataModel;
 	}
 
-	private ConconiData createConconiData(final float[] xValues, final float[] yValues) {
+	private ConconiData createConconiData(final double[] powerSerie, final double[] pulseSerie) {
 
 		final TDoubleArrayList maxXValues = new TDoubleArrayList();
 		final TDoubleArrayList maxYValues = new TDoubleArrayList();
 
-		float lastMaxY = Float.MIN_VALUE;
-		float currentXValue = xValues[0];
+		double lastMaxY = Double.MIN_VALUE;
+		double currentXValue = powerSerie[0];
 
 		// loop: all values in the current serie
-		for (int valueIndex = 0; valueIndex < xValues.length; valueIndex++) {
+		for (int valueIndex = 0; valueIndex < powerSerie.length; valueIndex++) {
 
 			// check array bounds
-			if (valueIndex >= yValues.length) {
+			if (valueIndex >= pulseSerie.length) {
 				break;
 			}
 
-			final float xValue = xValues[valueIndex];
-			final float yValue = yValues[valueIndex];
+			final double xValue = powerSerie[valueIndex];
+			final double yValue = pulseSerie[valueIndex];
 
 			if (xValue == currentXValue) {
 

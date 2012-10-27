@@ -186,7 +186,7 @@ public class ChartLayerPhoto implements IChartLayer {
 //		final int devGraphHeight = devYBottom - devYTop;
 
 		final float graphYBottom = graphDrawingData.getGraphYBottom();
-		final float[] yValues = graphDrawingData.getYData().getHighValues()[0];
+		final float[] yValues = graphDrawingData.getYData().getHighValuesFloat()[0];
 		final double scaleX = graphDrawingData.getScaleX();
 		final double scaleY = graphDrawingData.getScaleY();
 

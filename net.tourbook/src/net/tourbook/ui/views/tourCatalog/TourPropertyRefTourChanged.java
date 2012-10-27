@@ -21,7 +21,7 @@ public class TourPropertyRefTourChanged {
 
 	long		refId;
 
-	float		xMarkerValue;
+	double		xMarkerValue;
 
 	TourChart	refTourChart;
 
@@ -33,7 +33,7 @@ public class TourPropertyRefTourChanged {
 	 * @param refTourXMarkerValue
 	 *            value difference in the reference tour
 	 */
-	public TourPropertyRefTourChanged(final TourChart refTourChart, final long refId, final float refTourXMarkerValue) {
+	public TourPropertyRefTourChanged(final TourChart refTourChart, final long refId, final double refTourXMarkerValue) {
 
 		this.refTourChart = refTourChart;
 		this.refId = refId;

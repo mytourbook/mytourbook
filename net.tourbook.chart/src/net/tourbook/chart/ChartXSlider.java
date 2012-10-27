@@ -63,7 +63,7 @@ public class ChartXSlider {
 	/**
 	 * Value of the slider at the x axis
 	 */
-	private float							_xAxisValue;
+	private double							_xAxisValue;
 
 	/**
 	 * labelList contains a slider label for each graph
@@ -131,7 +131,7 @@ public class ChartXSlider {
 		return _valuesIndex;
 	}
 
-	public float getValueX() {
+	public double getValueX() {
 		return _xAxisValue;
 	}
 
@@ -262,8 +262,8 @@ public class ChartXSlider {
 		_valuesIndex = valueIndex;
 	}
 
-	void setValueX(final float sliderValueX) {
-		_xAxisValue = sliderValueX;
+	void setValueX(final double xDataValues) {
+		_xAxisValue = xDataValues;
 	}
 
 }

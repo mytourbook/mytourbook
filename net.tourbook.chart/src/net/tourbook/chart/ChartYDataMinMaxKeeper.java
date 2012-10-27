@@ -23,16 +23,16 @@ public class ChartYDataMinMaxKeeper {
 	/**
 	 * min/max values for the y-axis data
 	 */
-	private HashMap<Integer, Float>	_minValues	= null;
-	private HashMap<Integer, Float>	_maxValues	= null;
+	private HashMap<Integer, Double>	_minValues	= null;
+	private HashMap<Integer, Double>	_maxValues	= null;
 
 	public ChartYDataMinMaxKeeper() {}
 
-	HashMap<Integer, Float> getMaxValues() {
+	HashMap<Integer, Double> getMaxValues() {
 		return _maxValues;
 	}
 
-	HashMap<Integer, Float> getMinValues() {
+	HashMap<Integer, Double> getMinValues() {
 		return _minValues;
 	}
 
@@ -54,19 +54,21 @@ public class ChartYDataMinMaxKeeper {
 
 		final ArrayList<ChartDataSerie> xyData = chartDataModel.getXyData();
 
-		_minValues = new HashMap<Integer, Float>();
-		_maxValues = new HashMap<Integer, Float>();
+		_minValues = new HashMap<Integer, Double>();
+		_maxValues = new HashMap<Integer, Double>();
 
 		// loop: save min/max values for all data series
 		for (final ChartDataSerie chartData : xyData) {
+
 			if (chartData instanceof ChartDataYSerie) {
+
 				final ChartDataYSerie yData = (ChartDataYSerie) chartData;
 
 				final Integer yDataInfo = (Integer) yData.getCustomData(ChartDataYSerie.YDATA_INFO);
 
 				if (yDataInfo != null) {
-					final float visibleMinValue = yData.getVisibleMinValue();
-					float visibleMaxValue = yData.getVisibleMaxValue();
+					final double visibleMinValue = yData.getVisibleMinValue();
+					double visibleMaxValue = yData.getVisibleMaxValue();
 
 					// prevent setting to the same value,
 					if (visibleMinValue == visibleMaxValue) {
@@ -98,18 +100,19 @@ public class ChartYDataMinMaxKeeper {
 		// loop: restore min/max values for all data series
 		for (final ChartDataSerie chartData : xyData) {
 			if (chartData instanceof ChartDataYSerie) {
+
 				final ChartDataYSerie yData = (ChartDataYSerie) chartData;
 
 				final Integer yDataInfo = (Integer) yData.getCustomData(ChartDataYSerie.YDATA_INFO);
 
 				if (yDataInfo != null) {
 
-					final Float minValue = _minValues.get(yDataInfo);
+					final Double minValue = _minValues.get(yDataInfo);
 					if (minValue != null) {
 						yData.setVisibleMinValue(minValue);
 					}
 
-					final Float maxValue = _maxValues.get(yDataInfo);
+					final Double maxValue = _maxValues.get(yDataInfo);
 					if (maxValue != null) {
 						yData.setVisibleMaxValue(maxValue);
 					}

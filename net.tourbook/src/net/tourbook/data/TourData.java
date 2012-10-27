@@ -640,10 +640,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public float[]											distanceSerie;
 
 	/**
+	 * Distance values with double type to display it on the x-axis
+	 */
+	@Transient
+	private double[]										distanceSerieDouble;
+
+	/**
 	 * contains the absolute distance in miles/1000 (imperial system)
 	 */
 	@Transient
-	private float[]											distanceSerieImperial;
+	private double[]										distanceSerieDoubleImperial;
 
 	/**
 	 * contains the absolute altitude in m (metric system)
@@ -973,7 +979,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * Copy of {@link #timeSerie} with floating type, this is used for the chart x-axis.
 	 */
 	@Transient
-	private float[]											timeSerieFloat;
+	private double[]										timeSerieDouble;
 
 	/**
 	 * Contains data from a merge tour which contains photos
@@ -1176,7 +1182,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			powerSerie = null;
 		}
 
-		timeSerieFloat = null;
+		timeSerieDouble = null;
+		distanceSerieDouble = null;
+		distanceSerieDoubleImperial = null;
+
 		breakTimeSerie = null;
 
 		pulseSerieSmoothed = null;
@@ -4164,37 +4173,47 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * @return Returns the distance data serie for the current measurement system, this can be
 	 *         metric or imperial
 	 */
-	public float[] getDistanceSerie() {
+	public double[] getDistanceSerieDouble() {
 
 		if (distanceSerie == null) {
 			return null;
 		}
 
-		float[] serie;
+		double[] serie;
 
 		final float unitValueDistance = UI.UNIT_VALUE_DISTANCE;
 
-		if (unitValueDistance != 1) {
-
-			// use imperial system
-
-			if (distanceSerieImperial == null) {
-
-				// compute imperial data
-
-				distanceSerieImperial = new float[distanceSerie.length];
-
-				for (int valueIndex = 0; valueIndex < distanceSerie.length; valueIndex++) {
-					distanceSerieImperial[valueIndex] = distanceSerie[valueIndex] / unitValueDistance;
-				}
-			}
-			serie = distanceSerieImperial;
-
-		} else {
+		if (unitValueDistance == 1) {
 
 			// use metric system
 
-			serie = distanceSerie;
+			if (distanceSerieDouble == null) {
+
+				distanceSerieDouble = new double[distanceSerie.length];
+
+				for (int valueIndex = 0; valueIndex < distanceSerie.length; valueIndex++) {
+					distanceSerieDouble[valueIndex] = distanceSerie[valueIndex];
+				}
+			}
+
+			serie = distanceSerieDouble;
+
+		} else {
+
+			// use imperial system
+
+			if (distanceSerieDoubleImperial == null) {
+
+				// compute imperial data
+
+				distanceSerieDoubleImperial = new double[distanceSerie.length];
+
+				for (int valueIndex = 0; valueIndex < distanceSerie.length; valueIndex++) {
+					distanceSerieDoubleImperial[valueIndex] = distanceSerie[valueIndex] / unitValueDistance;
+				}
+			}
+
+			serie = distanceSerieDoubleImperial;
 		}
 
 		return serie;
@@ -4651,60 +4670,60 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return serie;
 	}
 
+//	public double[] getTimeSerieDouble() {
+//
+//		if (timeSerieHistory == null) {
+//			return null;
+//		}
+//
+//		if (timeSerieHistoryDouble == null) {
+//
+//			timeSerieHistoryDouble = new double[timeSerieHistory.length];
+//
+//			for (int serieIndex = 0; serieIndex < timeSerieHistory.length; serieIndex++) {
+//				timeSerieHistoryDouble[serieIndex] = timeSerieHistory[serieIndex];
+//			}
+//		}
+//
+//		return timeSerieHistoryDouble;
+//	}
+
 	@XmlElement
 	public String getTest() {
 		return "jokl"; //$NON-NLS-1$
 	}
 
-	public double[] getTimeSerieDouble() {
-
-		if (timeSerieHistory == null) {
-			return null;
-		}
-
-		if (timeSerieHistoryDouble == null) {
-
-			timeSerieHistoryDouble = new double[timeSerieHistory.length];
-
-			for (int serieIndex = 0; serieIndex < timeSerieHistory.length; serieIndex++) {
-				timeSerieHistoryDouble[serieIndex] = timeSerieHistory[serieIndex];
-			}
-		}
-
-		return timeSerieHistoryDouble;
-	}
-
 	/**
 	 * @return Returns time data serie in floating points which is used for drawing charts.
 	 */
-	public float[] getTimeSerieFloat() {
+	public double[] getTimeSerieDouble() {
+
+		if (timeSerieDouble != null) {
+			return timeSerieDouble;
+		}
 
 		if (timeSerie == null && timeSerieHistory == null) {
 			return null;
 		}
 
-		if (timeSerieFloat != null) {
-			return timeSerieFloat;
-		}
-
 		if (timeSerie != null) {
 
-			timeSerieFloat = new float[timeSerie.length];
+			timeSerieDouble = new double[timeSerie.length];
 
 			for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
-				timeSerieFloat[serieIndex] = timeSerie[serieIndex];
+				timeSerieDouble[serieIndex] = timeSerie[serieIndex];
 			}
 
 		} else if (timeSerieHistory != null) {
 
-			timeSerieFloat = new float[timeSerieHistory.length];
+			timeSerieDouble = new double[timeSerieHistory.length];
 
 			for (int serieIndex = 0; serieIndex < timeSerieHistory.length; serieIndex++) {
-				timeSerieFloat[serieIndex] = timeSerieHistory[serieIndex];
+				timeSerieDouble[serieIndex] = timeSerieHistory[serieIndex];
 			}
 		}
 
-		return timeSerieFloat;
+		return timeSerieDouble;
 	}
 
 	public int getTourAltDown() {
@@ -5479,8 +5498,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		this.startPulse = startPulse;
 	}
 
-	public void setTimeSerieFloat(final float[] timeSerieFloat) {
-		this.timeSerieFloat = timeSerieFloat;
+	public void setTimeSerieDouble(final double[] timeSerieDouble) {
+		this.timeSerieDouble = timeSerieDouble;
 	}
 
 	public void setTourAltDown(final float tourAltDown) {

@@ -29,7 +29,7 @@ public class TourDataDay {
 	int[]							monthValues;
 	int[]							weekValues;
 	private int[]					_doyValues;
-	private float[]					_doyValuesFloat;
+	private double[]				_doyValuesDouble;
 
 	int[]							years;
 	int[]							yearDays;
@@ -64,8 +64,8 @@ public class TourDataDay {
 		return _doyValues;
 	}
 
-	public float[] getDoyValuesFloat() {
-		return _doyValuesFloat;
+	public double[] getDoyValuesDouble() {
+		return _doyValuesDouble;
 	}
 
 	public float[] getTimeHighFloat() {
@@ -79,10 +79,10 @@ public class TourDataDay {
 	public void setDoyValues(final int[] doyValues) {
 
 		_doyValues = doyValues;
-		_doyValuesFloat = new float[doyValues.length];
+		_doyValuesDouble = new double[doyValues.length];
 
 		for (int valueIndex = 0; valueIndex < doyValues.length; valueIndex++) {
-			_doyValuesFloat[valueIndex] = doyValues[valueIndex];
+			_doyValuesDouble[valueIndex] = doyValues[valueIndex];
 		}
 	}
 

@@ -193,8 +193,8 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart implements I
 				xData.setSynchMarkerValueIndex(refTour.getStartValueIndex(), refTour.getEndValueIndex());
 
 				// set the value difference of the synch marker
-				final float[] xValues = xData.getHighValues()[0];
-				final float refTourXMarkerValue = xValues[refTour.getEndValueIndex()]
+				final double[] xValues = xData.getHighValuesDouble()[0];
+				final double refTourXMarkerValue = xValues[refTour.getEndValueIndex()]
 						- xValues[refTour.getStartValueIndex()];
 
 				TourManager.fireEventWithCustomData(TourEventId.REFERENCE_TOUR_CHANGED, //

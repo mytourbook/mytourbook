@@ -23,6 +23,14 @@ import java.util.ArrayList;
 public class ChartDataYSerie extends ChartDataSerie {
 
 	/**
+	 * contains the values for the chart, highValues contains the upper value, lowValues the lower
+	 * value. When lowValues is null then the low values is set to 0
+	 */
+	float[][]						_lowValuesFloat;
+
+	float[][]						_highValuesFloat;
+
+	/**
 	 * the bars has only a low and high value
 	 */
 	public static final int			BAR_LAYOUT_SINGLE_SERIE		= 1;
@@ -179,9 +187,19 @@ public class ChartDataYSerie extends ChartDataSerie {
 		return _graphFillMethod;
 	}
 
-//	public int getDisabledLineToNext() {
-//		return _disabledLineToNext;
-//	}
+	/**
+	 * @return returns the value array
+	 */
+	public float[][] getHighValuesFloat() {
+		return _highValuesFloat;
+	}
+
+	/**
+	 * @return Returns the lowValues.
+	 */
+	public float[][] getLowValuesFloat() {
+		return _lowValuesFloat;
+	}
 
 	/**
 	 * @return Returns the format how the slider label will be formatted, which can be <br>
@@ -191,6 +209,10 @@ public class ChartDataYSerie extends ChartDataSerie {
 	public int getSliderLabelFormat() {
 		return _sliderLabelFormat;
 	}
+
+//	public int getDisabledLineToNext() {
+//		return _disabledLineToNext;
+//	}
 
 	public String getXTitle() {
 		return null;
@@ -240,11 +262,14 @@ public class ChartDataYSerie extends ChartDataSerie {
 	 */
 	public void setAllValueColors(final int colorIndexValue) {
 
-		if (_highValues == null || _highValues.length == 0 || _highValues[0] == null || _highValues[0].length == 0) {
+		if (_highValuesFloat == null
+				|| _highValuesFloat.length == 0
+				|| _highValuesFloat[0] == null
+				|| _highValuesFloat[0].length == 0) {
 			return;
 		}
 
-		_colorIndex = new int[1][_highValues[0].length];
+		_colorIndex = new int[1][_highValuesFloat[0].length];
 
 		final int[] colorIndex0 = _colorIndex[0];
 
@@ -281,19 +306,18 @@ public class ChartDataYSerie extends ChartDataSerie {
 		_graphFillMethod = fillMethod;
 	}
 
-	@Override
-	void setMinMaxValues(final float[][] valueSeries) {
+	private void setMinMaxValues(final float[][] valueSeries) {
 
 		if (valueSeries == null || valueSeries.length == 0 || valueSeries[0] == null || valueSeries[0].length == 0) {
 
-			_highValues = new float[0][0];
+			_highValuesFloat = new float[0][0];
 
 			_visibleMaxValue = _visibleMinValue = 0;
 			_originalMaxValue = _originalMinValue = 0;
 
 		} else {
 
-			_highValues = valueSeries;
+			_highValuesFloat = valueSeries;
 
 			// set initial min/max value
 			_visibleMaxValue = _visibleMinValue = valueSeries[0][0];
@@ -303,7 +327,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 					|| _chartType == ChartDataModel.CHART_TYPE_XY_SCATTER
 					|| _chartType == ChartDataModel.CHART_TYPE_HISTORY) {
 
-				super.setMinMaxValues(valueSeries);
+				setMinMaxValuesLine(valueSeries);
 
 			} else if (_chartType == ChartDataModel.CHART_TYPE_BAR) {
 
@@ -332,9 +356,9 @@ public class ChartDataYSerie extends ChartDataSerie {
 							final float outerValue = valuesOuter[valueIndex];
 							final float outerValueWithMax = serieMax[valueIndex] + outerValue;
 
-							serieMax[valueIndex] = (_visibleMaxValue >= outerValueWithMax)
+							serieMax[valueIndex] = (float) ((_visibleMaxValue >= outerValueWithMax)
 									? _visibleMaxValue
-									: outerValueWithMax;
+									: outerValueWithMax);
 
 							_visibleMinValue = (_visibleMinValue <= outerValue) ? _visibleMinValue : outerValue;
 						}
@@ -355,7 +379,6 @@ public class ChartDataYSerie extends ChartDataSerie {
 		}
 	}
 
-	@Override
 	void setMinMaxValues(final float[][] lowValues, final float[][] highValues) {
 
 		if (lowValues == null || lowValues.length == 0 || lowValues[0] == null || lowValues[0].length == 0
@@ -365,14 +388,14 @@ public class ChartDataYSerie extends ChartDataSerie {
 			_visibleMaxValue = _visibleMinValue = 0;
 			_originalMaxValue = _originalMinValue = 0;
 
-			_lowValues = new float[1][2];
-			_highValues = new float[1][2];
+			_lowValuesFloat = new float[1][2];
+			_highValuesFloat = new float[1][2];
 
 		} else {
 
-			_lowValues = lowValues;
-			_highValues = highValues;
-			_colorIndex = new int[_highValues.length][_highValues[0].length];
+			_lowValuesFloat = lowValues;
+			_highValuesFloat = highValues;
+			_colorIndex = new int[_highValuesFloat.length][_highValuesFloat[0].length];
 
 			// set initial min/max value
 			_visibleMinValue = lowValues[0][0];
@@ -422,6 +445,54 @@ public class ChartDataYSerie extends ChartDataSerie {
 					for (final float value : serieData) {
 						_visibleMinValue = (_visibleMinValue <= value) ? _visibleMinValue : value;
 					}
+				}
+			}
+
+			_originalMinValue = _visibleMinValue;
+			_originalMaxValue = _visibleMaxValue;
+		}
+	}
+
+	private void setMinMaxValuesLine(final float[][] valueSeries) {
+
+		if (valueSeries == null || valueSeries.length == 0 || valueSeries[0] == null || valueSeries[0].length == 0) {
+
+			_highValuesFloat = new float[1][2];
+			_lowValuesFloat = new float[1][2];
+
+			_visibleMaxValue = _visibleMinValue = 0;
+			_originalMaxValue = _originalMinValue = 0;
+
+		} else {
+
+			_highValuesFloat = valueSeries;
+
+			// set initial min/max value
+			_visibleMaxValue = _visibleMinValue = valueSeries[0][0];
+
+			// calculate min/max highValues
+			for (final float[] valueSerie : valueSeries) {
+
+				if (valueSerie == null) {
+					continue;
+				}
+
+				for (final float value : valueSerie) {
+					_visibleMaxValue = (_visibleMaxValue >= value) ? _visibleMaxValue : value;
+					_visibleMinValue = (_visibleMinValue <= value) ? _visibleMinValue : value;
+				}
+			}
+
+			/*
+			 * force the min/max values to have not the same value this is necessary to display a
+			 * visible line in the chart
+			 */
+			if (_visibleMinValue == _visibleMaxValue) {
+
+				_visibleMaxValue++;
+
+				if (_visibleMinValue > 0) {
+					_visibleMinValue--;
 				}
 			}
 

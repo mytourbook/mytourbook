@@ -23,8 +23,8 @@ public class BarChartMinMaxKeeper {
 	/**
 	 * min/max values for the y-axis data
 	 */
-	private HashMap<Integer, Float>	_minValues	= new HashMap<Integer, Float>();
-	private HashMap<Integer, Float>	_maxValues	= new HashMap<Integer, Float>();
+	private HashMap<Integer, Double>	_minValues	= new HashMap<Integer, Double>();
+	private HashMap<Integer, Double>	_maxValues	= new HashMap<Integer, Double>();
 
 	public void resetMinMax() {
 		_minValues.clear();
@@ -59,11 +59,11 @@ public class BarChartMinMaxKeeper {
 		/*
 		 * set/restore min/max values
 		 */
-		final float minValue = yData.getOriginalMinValue();
-		final float maxValue = yData.getOriginalMaxValue();
+		final double minValue = yData.getOriginalMinValue();
+		final double maxValue = yData.getOriginalMaxValue();
 
-		Float keeperMinValue = _minValues.get(yDataId);
-		Float keeperMaxValue = _maxValues.get(yDataId);
+		Double keeperMinValue = _minValues.get(yDataId);
+		Double keeperMaxValue = _maxValues.get(yDataId);
 
 		if (keeperMinValue == null) {
 

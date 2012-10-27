@@ -35,8 +35,8 @@ Other modifications
 
 Fixed Bugs 
 
-* just detected (24.9.2012), that power & speed series from a device are not transferred correctly when upgrading version 11.8 to 12.1. This bug has been fixed, when version 12.1 or later is not yet used, the data transfer is done now correctly. However when version 12.1 or later is already use, the tours be deleted and reimported. This bug mainly occures for tours which are recorded from an ergometer because it is recording power & speed.
-????? CAN REIMPORT TIME SLICES FIX THE ERROR ????? 
+* just detected (24.9.2012), that power & speed series from a device are not transferred correctly when upgrading version 11.8 to 12.1, values are too small. This bug has been fixed, when version 12.1 or later is not yet used, the data transfer is done now correctly. However when version 12.1 or later is already use, the tour data must be reimported. This can be done in the import view with this action in the context menu: Tour Reimport/All Time Slice Values. This bug mainly occures for tours which are recorded from an ergometer because it is recording power & speed.
+
 
 Development
 

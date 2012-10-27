@@ -672,7 +672,10 @@ public class TourManager {
 			removeTimeSlicesTimeAndDistance(tourData, firstIndex, lastIndex);
 		}
 
-		float[] floatSerie = tourData.altitudeSerie;
+		float[] floatSerie;
+		double[] doubleSerie;
+
+		floatSerie = tourData.altitudeSerie;
 		if (floatSerie != null) {
 			tourData.altitudeSerie = removeTimeSlicesFloat(floatSerie, firstIndex, lastIndex);
 		}
@@ -702,11 +705,11 @@ public class TourManager {
 
 			tourData.timeSerie = removeTimeSlicesInteger(intSerie, firstIndex, lastIndex);
 
-			floatSerie = tourData.getTimeSerieFloat();
-			tourData.setTimeSerieFloat(removeTimeSlicesFloat(floatSerie, firstIndex, lastIndex));
+			doubleSerie = tourData.getTimeSerieDouble();
+			tourData.setTimeSerieDouble(removeTimeSlicesDouble(doubleSerie, firstIndex, lastIndex));
 		}
 
-		double[] doubleSerie = tourData.latitudeSerie;
+		doubleSerie = tourData.latitudeSerie;
 		if (doubleSerie != null) {
 			tourData.latitudeSerie = removeTimeSlicesDouble(doubleSerie, firstIndex, lastIndex);
 		}
@@ -1302,7 +1305,7 @@ public class TourManager {
 		final float[] speedSerie = tourData.getSpeedSerie();
 		final float[] paceSerie = tourData.getPaceSerie();
 		final float[] altimeterSerie = tourData.getAltimeterSerie();
-		final float[] distanceSerie = tourData.getDistanceSerie();
+		final double[] distanceSerie = tourData.getDistanceSerieDouble();
 
 		if ((timeSerie == null || timeSerie.length == 0)
 				|| speedSerie == null
@@ -1352,7 +1355,7 @@ public class TourManager {
 				final int sliceIndexMax = ((0 >= sliceIndex) ? 0 : sliceIndex);
 				sliceIndex = (sliceIndexMax <= serieLengthLast) ? sliceIndexMax : serieLengthLast;
 
-				final float distance = distanceSerie[sliceIndex] - distanceSerie[serieIndex];
+				final double distance = distanceSerie[sliceIndex] - distanceSerie[serieIndex];
 
 				if (distance == 0) {
 					altimeterSerie[serieIndex] = 0;
@@ -1379,7 +1382,7 @@ public class TourManager {
 				int lowIndex = ((0 >= serieIndexPrev) ? 0 : serieIndexPrev);
 
 				int timeDiff = timeSerie[serieIndex] - timeSerie[lowIndex];
-				float distDiff = 0;
+				double distDiff = 0;
 
 				while (timeDiff < clippingTime) {
 
@@ -1427,9 +1430,9 @@ public class TourManager {
 					return 0;
 				}
 
-				final float[] timeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_TIME)))
-						.getHighValues()[0];
-				final float[] distanceValues = ((ChartDataSerie) (customDataDistance)).getHighValues()[0];
+				final double[] timeValues = ((ChartDataXSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_TIME)))
+						.getHighValuesDouble()[0];
+				final double[] distanceValues = ((ChartDataXSerie) (customDataDistance)).getHighValuesDouble()[0];
 				if (timeValues == null) {
 					return 0;
 				}
@@ -1443,10 +1446,10 @@ public class TourManager {
 					}
 				}
 
-				final float leftDistance = distanceValues[valueIndexLeft];
-				final float rightDistance = distanceValues[valueIndexRight];
-				final int leftTime = (int) timeValues[valueIndexLeft];
-				final int rightTime = (int) timeValues[valueIndexRight];
+				final double leftDistance = distanceValues[valueIndexLeft];
+				final double rightDistance = distanceValues[valueIndexRight];
+				final double leftTime = timeValues[valueIndexLeft];
+				final double rightTime = timeValues[valueIndexRight];
 
 				if (leftTime == rightTime) {
 
@@ -1455,16 +1458,15 @@ public class TourManager {
 
 				} else {
 
-					final float time = Math.max(
+					final double time = Math.max(
 							0,
 							rightTime - leftTime - tourData.getBreakTime(valueIndexLeft, valueIndexRight));
-					final float distance = rightDistance - leftDistance;
 
-					final float speed = distance / time * 3.6f;
+					final double distance = rightDistance - leftDistance;
+					final double speed = distance / time * 3.6;
 
-					return speed;
+					return (float) speed;
 				}
-
 			}
 		};
 
@@ -1481,9 +1483,9 @@ public class TourManager {
 					return 0;
 				}
 
-				final float[] timeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_TIME)))
-						.getHighValues()[0];
-				final float[] distanceValues = ((ChartDataSerie) (customDataDistance)).getHighValues()[0];
+				final double[] timeValues = ((ChartDataXSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_TIME)))
+						.getHighValuesDouble()[0];
+				final double[] distanceValues = ((ChartDataXSerie) (customDataDistance)).getHighValuesDouble()[0];
 				if (timeValues == null) {
 					return 0;
 				}
@@ -1497,10 +1499,10 @@ public class TourManager {
 					}
 				}
 
-				final float leftDistance = distanceValues[valueIndexLeft];
-				final float rightDistance = distanceValues[valueIndexRight];
-				final int leftTime = (int) timeValues[valueIndexLeft];
-				final int rightTime = (int) timeValues[valueIndexRight];
+				final double leftDistance = distanceValues[valueIndexLeft];
+				final double rightDistance = distanceValues[valueIndexRight];
+				final double leftTime = timeValues[valueIndexLeft];
+				final double rightTime = timeValues[valueIndexRight];
 
 				if (leftTime == rightTime) {
 
@@ -1509,15 +1511,15 @@ public class TourManager {
 
 				} else {
 
-					final float time = Math.max(
+					final double time = Math.max(
 							0,
 							rightTime - leftTime - tourData.getBreakTime(valueIndexLeft, valueIndexRight));
-					final float distance = rightDistance - leftDistance;
+					final double distance = rightDistance - leftDistance;
 
 					if (distance == 0) {
 						return 0;
 					} else {
-						return time * 1000 / distance;
+						return (float) (time * 1000 / distance);
 					}
 				}
 			}
@@ -1536,12 +1538,13 @@ public class TourManager {
 					return 0;
 				}
 
-				final float[] altitudeValues = ((ChartDataSerie) (customDataAltitude)).getHighValues()[0];
-				final float[] timeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_TIME)))
-						.getHighValues()[0];
+				final double[] timeValues = ((ChartDataXSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_TIME)))
+						.getHighValuesDouble()[0];
 				if (timeValues == null) {
 					return 0;
 				}
+
+				final float[] altitudeValues = ((ChartDataYSerie) (customDataAltitude)).getHighValuesFloat()[0];
 
 				TourData tourData = null;
 				final Object tourId = chartModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
@@ -1554,8 +1557,8 @@ public class TourManager {
 
 				final float leftAltitude = altitudeValues[valueIndexLeft];
 				final float rightAltitude = altitudeValues[valueIndexRight];
-				final int leftTime = (int) timeValues[valueIndexLeft];
-				final int rightTime = (int) timeValues[valueIndexRight];
+				final double leftTime = timeValues[valueIndexLeft];
+				final double rightTime = timeValues[valueIndexRight];
 
 				if (leftTime == rightTime) {
 
@@ -1564,11 +1567,11 @@ public class TourManager {
 
 				} else {
 
-					final float time = Math.max(
+					final double time = Math.max(
 							0,
 							rightTime - leftTime - tourData.getBreakTime(valueIndexLeft, valueIndexRight));
 
-					return (((rightAltitude - leftAltitude) / time) * 3600);
+					return (float) (((rightAltitude - leftAltitude) / time) * 3600);
 				}
 			}
 		};
@@ -1587,19 +1590,19 @@ public class TourManager {
 					return 0;
 				}
 
-				final float[] altitudeValues = ((ChartDataSerie) (customDataAltitude)).getHighValues()[0];
-				final float[] distanceValues = ((ChartDataSerie) (customDataDistance)).getHighValues()[0];
+				final float[] altitudeValues = ((ChartDataYSerie) (customDataAltitude)).getHighValuesFloat()[0];
+				final double[] distanceValues = ((ChartDataXSerie) (customDataDistance)).getHighValuesDouble()[0];
 
 				final float leftAltitude = altitudeValues[valueIndexLeft];
 				final float rightAltitude = altitudeValues[valueIndexRight];
-				final float leftDistance = distanceValues[valueIndexLeft];
-				final float rightDistance = distanceValues[valueIndexRight];
+				final double leftDistance = distanceValues[valueIndexLeft];
+				final double rightDistance = distanceValues[valueIndexRight];
 
 				if (leftDistance == rightDistance) {
 					// left and right slider are at the same position
 					return 0;
 				} else {
-					return ((rightAltitude - leftAltitude)) / (rightDistance - leftDistance) * 100;
+					return (float) (((rightAltitude - leftAltitude)) / (rightDistance - leftDistance) * 100);
 				}
 			}
 		};
@@ -1635,8 +1638,8 @@ public class TourManager {
 		/*
 		 * TIME SERIE is a MUST data serie
 		 */
-		final boolean isTimeSerie = tourData.timeSerie == null || tourData.timeSerie.length == 0;
-		final boolean isHistorySerie = tourData.timeSerieHistory == null || tourData.timeSerieHistory.length == 0;
+		final boolean isTimeSerie = tourData.timeSerie != null && tourData.timeSerie.length > 0;
+		final boolean isHistorySerie = tourData.timeSerieHistory != null && tourData.timeSerieHistory.length > 0;
 
 		if (isTimeSerie == false && isHistorySerie == false) {
 			return chartDataModel;
@@ -1655,7 +1658,7 @@ public class TourManager {
 		 * distance
 		 */
 
-		final float[] distanceSerie = tourData.getDistanceSerie();
+		final double[] distanceSerie = tourData.getDistanceSerieDouble();
 		ChartDataXSerie xDataDistance = null;
 		if (distanceSerie != null) {
 			xDataDistance = new ChartDataXSerie(distanceSerie);
@@ -1668,7 +1671,7 @@ public class TourManager {
 		/*
 		 * time
 		 */
-		final ChartDataXSerie xDataTime = new ChartDataXSerie(tourData.getTimeSerieFloat());
+		final ChartDataXSerie xDataTime = new ChartDataXSerie(tourData.getTimeSerieDouble());
 		xDataTime.setLabel(Messages.tour_editor_label_time);
 		xDataTime.setUnitLabel(Messages.tour_editor_label_time_unit);
 		xDataTime.setDefaultRGB(new RGB(0, 0, 0));
@@ -2126,7 +2129,7 @@ public class TourManager {
 			}
 		}
 
-		if (chartDataModel.getYData().isEmpty()) {
+		if (isHistorySerie) {
 
 			// history do not have any y-data
 

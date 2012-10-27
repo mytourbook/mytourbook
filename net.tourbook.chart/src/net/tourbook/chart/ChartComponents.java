@@ -366,13 +366,13 @@ public class ChartComponents extends Composite {
 
 		final ChartDataXSerie xData = drawingData.getXData();
 
-		final float graphMaxValue = xData.getOriginalMaxValue();
+		final double graphMaxValue = xData.getOriginalMaxValue();
 		final int devVirtualGraphWidth = componentGraph.getXXDevGraphWidth();
 
 		drawingData.devVirtualGraphWidth = devVirtualGraphWidth;
 
 //		final double scaleX = ((double) devVirtualGraphWidth - 1) / graphMaxValue;
-		final double scaleX = ((double) devVirtualGraphWidth) / graphMaxValue;
+		final double scaleX = (devVirtualGraphWidth) / graphMaxValue;
 		drawingData.setScaleX(scaleX);
 
 		/*
@@ -382,7 +382,7 @@ public class ChartComponents extends Composite {
 		final int defaultUnitCount = devVirtualGraphWidth / _chart.gridHorizontalDistance;
 
 		// unit raw value (not yet rounded) is the number in data values for one unit
-		final float graphDefaultUnit = graphMaxValue / Math.max(1, defaultUnitCount);
+		final double graphDefaultUnit = graphMaxValue / Math.max(1, defaultUnitCount);
 
 		final int unitType = xData.getAxisUnit();
 		switch (unitType) {
@@ -445,7 +445,7 @@ public class ChartComponents extends Composite {
 			 */
 
 			// get the unitOffset when a startValue is set
-			final float xStartValue = xData.getStartValue();
+			final double xStartValue = xData.getStartValue();
 			double unitOffset = 0;
 			if (xStartValue != 0) {
 				unitOffset = xStartValue % graphUnit;
@@ -514,7 +514,7 @@ public class ChartComponents extends Composite {
 		 */
 		if (_chartDataModel.getChartType() == ChartDataModel.CHART_TYPE_BAR) {
 
-			final float[] highValues = xData.getHighValues()[0];
+			final double[] highValues = xData.getHighValuesDouble()[0];
 
 			if (unitType == ChartDataSerie.AXIS_UNIT_NUMBER || unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE) {
 
@@ -553,13 +553,13 @@ public class ChartComponents extends Composite {
 		drawingData.setScaleX((double) devVirtualGraphWidth / allDaysInAllYears);
 	}
 
-	private void createDrawingData_X_History(final GraphDrawingData graphDrawingData, final float graphDefaultUnitF) {
+	private void createDrawingData_X_History(final GraphDrawingData graphDrawingData, final double graphDefaultUnitD) {
 
 		final ChartDataXSerie xData = graphDrawingData.getXData();
 		final double scaleX = graphDrawingData.getScaleX();
 
 		final long graphMaxValue = (long) xData.getOriginalMaxValue();
-		final long graphDefaultUnit = (long) graphDefaultUnitF;
+		final long graphDefaultUnit = (long) graphDefaultUnitD;
 
 		// get start time without mills
 		final DateTime tourStartTime = xData.getStartDateTime().minus(xData.getStartDateTime().getMillisOfSecond());
@@ -1166,7 +1166,7 @@ public class ChartComponents extends Composite {
 
 		final ChartDataXSerie xData = drawingData.getXData();
 
-		final int allUnitsSize = xData._highValues[0].length;
+		final int allUnitsSize = xData._highValuesDouble[0].length;
 		final int devVirtualGraphWidth = componentGraph.getXXDevGraphWidth();
 		final double scaleX = (double) devVirtualGraphWidth / allUnitsSize;
 		drawingData.setScaleX(scaleX);
@@ -1190,7 +1190,7 @@ public class ChartComponents extends Composite {
 		final ChartDataXSerie xData = drawingData.getXData();
 		final int devVirtualGraphWidth = componentGraph.getXXDevGraphWidth();
 
-		final float[] xValues = xData.getHighValues()[0];
+		final double[] xValues = xData.getHighValuesDouble()[0];
 		final int allWeeks = xValues.length;
 		final float devWeekWidth = devVirtualGraphWidth / allWeeks;
 
@@ -1227,7 +1227,7 @@ public class ChartComponents extends Composite {
 		final int[] yearValues = chartSegments.years;
 		final int devVirtualGraphWidth = componentGraph.getXXDevGraphWidth();
 
-		final int yearCounter = xData._highValues[0].length;
+		final int yearCounter = xData._highValuesDouble[0].length;
 		final double scaleX = (double) devVirtualGraphWidth / yearCounter;
 		drawingData.setScaleX(scaleX);
 
@@ -1253,7 +1253,7 @@ public class ChartComponents extends Composite {
 
 		case ChartDataYSerie.BAR_LAYOUT_BESIDE:
 
-			final int serieCount = yData.getHighValues().length;
+			final int serieCount = yData.getHighValuesFloat().length;
 
 			// the bar's width is 75% of the width for a month
 			barWidth = (int) Math.max(0, yearWidth * 0.9f);
@@ -1382,10 +1382,10 @@ public class ChartComponents extends Composite {
 		 * scaled to the device
 		 */
 
-		final float graphMinValue = yData.getVisibleMinValue();
-		final float graphMaxValue = yData.getVisibleMaxValue();
+		final double graphMinValue = yData.getVisibleMinValue();
+		final double graphMaxValue = yData.getVisibleMaxValue();
 
-		final float defaultValueRange = graphMaxValue > 0
+		final double defaultValueRange = graphMaxValue > 0
 				? (graphMaxValue - graphMinValue)
 				: -(graphMinValue - graphMaxValue);
 
@@ -1396,7 +1396,7 @@ public class ChartComponents extends Composite {
 		final int defaultUnitCount = devGraphHeight / _chart.gridVerticalDistance;
 
 		// defaultUnitValue is the number in data values for one unit
-		final float defaultUnitValue = defaultValueRange / Math.max(1, defaultUnitCount);
+		final double defaultUnitValue = defaultValueRange / Math.max(1, defaultUnitCount);
 
 		// round the unit
 		final double graphUnit = Util.roundDecimalValue(defaultUnitValue);
@@ -2050,17 +2050,17 @@ public class ChartComponents extends Composite {
 		 * create synch configuration data
 		 */
 
-		final float[] xValues = xData.getHighValues()[0];
-		final float markerStartValue = xValues[Math.min(markerValueIndexStart, xValues.length - 1)];
-		final float markerEndValue = xValues[Math.min(markerValueIndexEnd, xValues.length - 1)];
+		final double[] xValues = xData.getHighValuesDouble()[0];
+		final double markerStartValue = xValues[Math.min(markerValueIndexStart, xValues.length - 1)];
+		final double markerEndValue = xValues[Math.min(markerValueIndexEnd, xValues.length - 1)];
 
-		final float valueDiff = markerEndValue - markerStartValue;
-		final float lastValue = xValues[xValues.length - 1];
+		final double valueDiff = markerEndValue - markerStartValue;
+		final double lastValue = xValues[xValues.length - 1];
 
 		final float devVirtualGraphImageWidth = componentGraph.getXXDevGraphWidth();
 		final float devGraphImageXOffset = componentGraph.getXXDevViewPortLeftBorder();
 
-		final float devOneValueSlice = devVirtualGraphImageWidth / lastValue;
+		final double devOneValueSlice = devVirtualGraphImageWidth / lastValue;
 
 		final float devMarkerWidth = (int) (valueDiff * devOneValueSlice);
 		final float devMarkerStartPos = (int) (markerStartValue * devOneValueSlice);
@@ -2377,17 +2377,17 @@ public class ChartComponents extends Composite {
 		// set min/max values from the source synched chart into this chart
 		_synchConfigSrc.getYDataMinMaxKeeper().setMinMaxValues(_chartDataModel);
 
-		final float[] xValues = xData.getHighValues()[0];
-		final float markerValueStart = xValues[markerStartIndex];
+		final double[] xValues = xData.getHighValuesDouble()[0];
+		final double markerValueStart = xValues[markerStartIndex];
 
-		final float valueDiff = xValues[markerEndIndex] - markerValueStart;
-		final float valueLast = xValues[xValues.length - 1];
+		final double valueDiff = xValues[markerEndIndex] - markerValueStart;
+		final double valueLast = xValues[xValues.length - 1];
 
 		final int devVisibleChartWidth = getDevVisibleChartWidth();
 
-		final float xxDevGraphWidth;
+		final double xxDevGraphWidth;
 		final int xxDevViewPortOffset;
-		final float graphZoomRatio;
+		final double graphZoomRatio;
 
 		switch (_chart._synchMode) {
 		case Chart.SYNCH_MODE_BY_SCALE:
@@ -2398,12 +2398,12 @@ public class ChartComponents extends Composite {
 
 			// virtual graph width
 			final float devMarkerWidth = devVisibleChartWidth * markerWidthRatio;
-			final float devOneValueSlice = devMarkerWidth / valueDiff;
+			final double devOneValueSlice = devMarkerWidth / valueDiff;
 			xxDevGraphWidth = devOneValueSlice * valueLast;
 
 			// graph offset
 			final float devMarkerOffset = devVisibleChartWidth * markerOffsetRatio;
-			final float devMarkerStart = devOneValueSlice * markerValueStart;
+			final double devMarkerStart = devOneValueSlice * markerValueStart;
 			xxDevViewPortOffset = (int) (devMarkerStart - devMarkerOffset);
 
 			// zoom ratio
@@ -2466,7 +2466,7 @@ public class ChartComponents extends Composite {
 		final int slider1ValueIndex = sliderPosition.getLeftSliderValueIndex();
 		final int slider2ValueIndex = sliderPosition.getRightSliderValueIndex();
 
-		final float[] xValues = _chartDataModel.getXData()._highValues[0];
+		final double[] xValues = _chartDataModel.getXData()._highValuesDouble[0];
 		final boolean isCenterSliderPosition = sliderPosition.isCenterSliderPosition();
 
 		// move left slider

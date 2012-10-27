@@ -252,10 +252,10 @@ public abstract class StatisticYear extends YearStatistic {
 		chartDataModel.addYData(yData);
 	}
 
-	private float[] createYearData(final TourDataYear tourDataYear) {
+	private double[] createYearData(final TourDataYear tourDataYear) {
 
 		final int yearCounter = tourDataYear.altitudeHigh[0].length;
-		final float allYears[] = new float[yearCounter];
+		final double allYears[] = new double[yearCounter];
 
 		for (int yearIndex = 0; yearIndex < yearCounter; yearIndex++) {
 			allYears[yearIndex] = yearIndex;

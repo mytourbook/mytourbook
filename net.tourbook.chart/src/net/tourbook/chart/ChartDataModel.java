@@ -145,7 +145,7 @@ public class ChartDataModel {
 
 		// create a fail save data series if none is set
 		if (_xData == null) {
-			_xData = new ChartDataXSerie(new float[0]);
+			_xData = new ChartDataXSerie(new double[0]);
 		}
 		return _xData;
 	}

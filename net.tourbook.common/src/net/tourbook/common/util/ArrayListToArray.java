@@ -20,6 +20,24 @@ import java.util.ArrayList;
 public class ArrayListToArray {
 
 	/**
+	 * Converts an Integer array list into an doublearray
+	 * 
+	 * @param list
+	 * @return
+	 */
+	final public static double[] integerToDouble(final ArrayList<Integer> list) {
+		
+		final double[] returnArray = new double[list.size()];
+		int valueIndex = 0;
+		
+		for (final Integer value : list) {
+			returnArray[valueIndex++] = value;
+		}
+		
+		return returnArray;
+	}
+
+	/**
 	 * Converts an Integer array list into an float array
 	 * 
 	 * @param list

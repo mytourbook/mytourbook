@@ -819,7 +819,7 @@ public class YearStatisticView extends ViewPart {
 
 		final ChartDataModel chartModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
 
-		final ChartDataXSerie xData = new ChartDataXSerie(ArrayListToArray.integerToFloat(_DOYValues));
+		final ChartDataXSerie xData = new ChartDataXSerie(ArrayListToArray.integerToDouble(_DOYValues));
 		xData.setAxisUnit(ChartDataXSerie.X_AXIS_UNIT_DAY);
 		xData.setChartSegments(createChartSegments());
 		chartModel.setXData(xData);
@@ -835,8 +835,8 @@ public class YearStatisticView extends ViewPart {
 		 * set/restore min/max values
 		 */
 		final TVICatalogRefTourItem refItem = _currentRefItem;
-		final float minValue = yData.getVisibleMinValue();
-		final float maxValue = yData.getVisibleMaxValue();
+		final float minValue = (float) yData.getVisibleMinValue();
+		final float maxValue = (float) yData.getVisibleMaxValue();
 
 		final float dataMinValue = minValue;// - (minValue / 100);
 		final float dataMaxValue = maxValue;// + (maxValue / 100);

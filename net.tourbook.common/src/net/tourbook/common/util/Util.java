@@ -118,6 +118,44 @@ public class Util {
 		return buf.toString();
 	}
 
+	public static float[][] convertDoubleToFloat(final double[][] doubleSeries) {
+
+		final float[][] floatSeries = new float[doubleSeries.length][];
+
+		for (int serieIndex = 0; serieIndex < doubleSeries.length; serieIndex++) {
+
+			final double[] doubleValues = doubleSeries[serieIndex];
+			if (doubleValues != null) {
+
+				final float[] floatSerie = floatSeries[serieIndex] = new float[doubleValues.length];
+
+				for (int floatIndex = 0; floatIndex < floatSerie.length; floatIndex++) {
+					floatSeries[serieIndex][floatIndex] = (float) doubleValues[floatIndex];
+				}
+			}
+		}
+		return floatSeries;
+	}
+
+	public static double[] convertIntToDouble(final int[] intValues) {
+
+		if (intValues == null) {
+			return null;
+		}
+
+		if (intValues.length == 0) {
+			return new double[0];
+		}
+
+		final double[] doubleValues = new double[intValues.length];
+
+		for (int valueIndex = 0; valueIndex < intValues.length; valueIndex++) {
+			doubleValues[valueIndex] = intValues[valueIndex];
+		}
+
+		return doubleValues;
+	}
+
 	public static float[] convertIntToFloat(final int[] intValues) {
 
 		if (intValues == null) {
@@ -214,7 +252,7 @@ public class Util {
 
 	/**
 	 * Creates a {@link DateTime} from the number: YYYYMMDDhhmmss
-	 *
+	 * 
 	 * @param yyyymmddhhmmss
 	 * @return
 	 */
@@ -232,7 +270,7 @@ public class Util {
 
 	/**
 	 * creates a double array backup
-	 *
+	 * 
 	 * @param original
 	 * @return Returns a copy of a <code>double[]</code> or <code>null</code> when the original data
 	 *         is <code>null</code>.
@@ -252,7 +290,7 @@ public class Util {
 
 	/**
 	 * creates a float array backup
-	 *
+	 * 
 	 * @param original
 	 * @return Returns a copy of a <code>float[]</code> or <code>null</code> when the original data
 	 *         is <code>null</code>.
@@ -272,7 +310,7 @@ public class Util {
 
 	/**
 	 * creates a int array backup
-	 *
+	 * 
 	 * @param original
 	 * @return the backup array or <code>null</code> when the original data is <code>null</code>
 	 */
@@ -547,7 +585,7 @@ public class Util {
 
 	/**
 	 * Remove duplicate items from a list and add a new item.
-	 *
+	 * 
 	 * @param allItems
 	 * @param newItem
 	 * @param maxItems
@@ -578,7 +616,7 @@ public class Util {
 
 	/**
 	 * found here: http://www.odi.ch/prog/design/datetime.php
-	 *
+	 * 
 	 * @param cal
 	 * @return
 	 */
@@ -642,7 +680,7 @@ public class Util {
 
 	/**
 	 * Parses SAX attribute
-	 *
+	 * 
 	 * @param attributes
 	 * @param attributeName
 	 * @return Returns double value or {@link Double#MIN_VALUE} when attribute is not available or
@@ -663,7 +701,7 @@ public class Util {
 
 	/**
 	 * Parses SAX attribute
-	 *
+	 * 
 	 * @param attributes
 	 * @param attributeName
 	 * @return Returns float value or {@link Float#MIN_VALUE} when attribute is not available or
@@ -684,7 +722,7 @@ public class Util {
 
 	/**
 	 * Parses SAX attribute
-	 *
+	 * 
 	 * @param attributes
 	 * @param attributeName
 	 * @return Returns integer value or {@link Integer#MIN_VALUE} when attribute is not available or
@@ -705,7 +743,7 @@ public class Util {
 
 	/**
 	 * Parses SAX attribute
-	 *
+	 * 
 	 * @param attributes
 	 * @param attributeName
 	 * @return Returns integer value or 0 when attribute is not available or cannot be parsed.
@@ -725,7 +763,7 @@ public class Util {
 
 	/**
 	 * Parses SAX attribute
-	 *
+	 * 
 	 * @param attributes
 	 * @param attributeName
 	 * @return Returns long value or {@link Long#MIN_VALUE} when attribute is not available or
@@ -746,7 +784,7 @@ public class Util {
 
 	/**
 	 * Selects an item in the combo box which is retrieved from a state.
-	 *
+	 * 
 	 * @param state
 	 * @param stateKey
 	 * @param comboStates
@@ -777,7 +815,7 @@ public class Util {
 	/**
 	 * Selects a text item in the combo box. When text item is not available, the first item is
 	 * selected
-	 *
+	 * 
 	 * @param combo
 	 * @param comboItems
 	 * @param selectedItem
@@ -800,7 +838,7 @@ public class Util {
 
 	/**
 	 * Set the state for an integer array, integer values are converted into string value.
-	 *
+	 * 
 	 * @param state
 	 * @param stateKey
 	 * @param intValues
@@ -817,7 +855,7 @@ public class Util {
 	}
 
 	public static void setState(final IDialogSettings state, final String stateKey, final long[] values) {
-		
+
 		final String[] stateIndices = new String[values.length];
 
 		for (int index = 0; index < values.length; index++) {
@@ -847,7 +885,7 @@ public class Util {
 
 	/**
 	 * Open view and activate it
-	 *
+	 * 
 	 * @param viewId
 	 * @return
 	 * @throws PartInitException
@@ -882,7 +920,7 @@ public class Util {
 
 	/**
 	 * Open view and do not activate it
-	 *
+	 * 
 	 * @param viewId
 	 * @return
 	 * @throws PartInitException
@@ -929,7 +967,7 @@ public class Util {
 	/**
 	 * This method encodes the url, removes the spaces from the url and replaces the same with
 	 * <code>"%20"</code>. This method is required to fix Bug 77840.
-	 *
+	 * 
 	 * @since 3.0.2
 	 */
 	private static String urlEncodeForSpaces(final char[] input) {

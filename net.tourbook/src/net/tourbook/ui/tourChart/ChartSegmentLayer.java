@@ -67,7 +67,7 @@ public class ChartSegmentLayer implements IChartLayer {
 		final int devGraphHeight = drawingData.devGraphHeight;
 
 		final float graphYBottom = drawingData.getGraphYBottom();
-		final float[] yValues = drawingData.getYData().getHighValues()[0];
+		final float[] yValues = drawingData.getYData().getHighValuesFloat()[0];
 		final double scaleX = drawingData.getScaleX();
 		final double scaleY = drawingData.getScaleY();
 

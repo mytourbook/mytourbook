@@ -147,13 +147,13 @@ public class StatisticMonthHrZone extends YearStatistic {
 //		};
 	}
 
-	private float[] createMonthData(final TourDataMonthHrZones monthData) {
+	private double[] createMonthData(final TourDataMonthHrZones monthData) {
 
 		/*
 		 * create segments for each year
 		 */
 		final int monthCounter = monthData.hrZoneValues[0].length;
-		final float allMonths[] = new float[monthCounter];
+		final double allMonths[] = new double[monthCounter];
 
 		// get start/end and title for each segment
 		for (int monthIndex = 0; monthIndex < monthCounter; monthIndex++) {

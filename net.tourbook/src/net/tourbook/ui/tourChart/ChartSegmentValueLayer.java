@@ -38,7 +38,7 @@ public class ChartSegmentValueLayer implements IChartLayer {
 
 	private TourData	_tourData;
 
-	private float[]		_xDataSerie;
+	private double[]	_xDataSerie;
 
 	/**
 	 * Draws the marker(s) for the current graph config
@@ -86,7 +86,7 @@ public class ChartSegmentValueLayer implements IChartLayer {
 			final int devXOffset = (int) (_xDataSerie[serieIndex] * scaleX) - devGraphImageXOffset;
 
 			final float graphYValue = segmentValues[segmentIndex] * valueDivisor;
-			final int devYGraph = (int) ((graphYValue - graphYBottom) * scaleY);
+			final int devYGraph = (int) (scaleY * (graphYValue - graphYBottom));
 			int devYMarker = devYBottom - devYGraph;
 
 			// don't draw over the graph borders
@@ -130,7 +130,7 @@ public class ChartSegmentValueLayer implements IChartLayer {
 		_tourData = tourData;
 	}
 
-	public void setXDataSerie(final float[] dataSerie) {
+	public void setXDataSerie(final double[] dataSerie) {
 		_xDataSerie = dataSerie;
 	}
 }

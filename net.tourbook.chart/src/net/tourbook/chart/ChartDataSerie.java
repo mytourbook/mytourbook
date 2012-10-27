@@ -42,14 +42,6 @@ public abstract class ChartDataSerie {
 	private static RGB				DEFAULT_DEFAULT_RGB						= new RGB(0xFF, 0xA5, 0xCB);
 
 	/**
-	 * contains the values for the chart, highValues contains the upper value, lowValues the lower
-	 * value. When lowValues is null then the low values is set to 0
-	 */
-	float[][]						_lowValues;
-
-	float[][]						_highValues;
-
-	/**
 	 * divisor for highValues
 	 */
 	private int						_valueDivisor							= 1;
@@ -57,12 +49,22 @@ public abstract class ChartDataSerie {
 	/**
 	 * max value which is used to draw the chart
 	 */
-	protected float					_visibleMaxValue;
+	protected double				_visibleMaxValue;
 
 	/**
 	 * min value which is used to draw the chart
 	 */
-	protected float					_visibleMinValue;
+	protected double				_visibleMinValue;
+
+	/**
+	 * minimum value found in the provided values
+	 */
+	double							_originalMinValue;
+
+	/**
+	 * maximum value found in the provided values
+	 */
+	double							_originalMaxValue;
 
 	/**
 	 * Unit which is drawn on the x or y axis
@@ -85,16 +87,6 @@ public abstract class ChartDataSerie {
 	private RGB						_rgbDark[]								= new RGB[] { new RGB(0, 0, 255) };
 	private RGB						_rgbLine[]								= new RGB[] { new RGB(0, 255, 0) };
 	private RGB						_rgbText[]								= new RGB[] { new RGB(0, 0, 0) };
-
-	/**
-	 * minimum value found in the provided values
-	 */
-	float							_originalMinValue;
-
-	/**
-	 * maximum value found in the provided values
-	 */
-	float							_originalMaxValue;
 
 	private RGB						_defaultRGB;
 
@@ -136,29 +128,15 @@ public abstract class ChartDataSerie {
 		return _defaultRGB;
 	}
 
-	/**
-	 * @return returns the value array
-	 */
-	public float[][] getHighValues() {
-		return _highValues;
-	}
-
 	public String getLabel() {
 		return _label;
 	}
 
-	/**
-	 * @return Returns the lowValues.
-	 */
-	public float[][] getLowValues() {
-		return _lowValues;
-	}
-
-	public float getOriginalMaxValue() {
+	public double getOriginalMaxValue() {
 		return _originalMaxValue;
 	}
 
-	public float getOriginalMinValue() {
+	public double getOriginalMinValue() {
 		return _originalMinValue;
 	}
 
@@ -192,14 +170,14 @@ public abstract class ChartDataSerie {
 	/**
 	 * @return returns the maximum value in the data serie
 	 */
-	public float getVisibleMaxValue() {
+	public double getVisibleMaxValue() {
 		return _visibleMaxValue;
 	}
 
 	/**
 	 * @return returns the minimum value in the data serie
 	 */
-	public float getVisibleMinValue() {
+	public double getVisibleMinValue() {
 		return _visibleMinValue;
 	}
 
@@ -236,56 +214,6 @@ public abstract class ChartDataSerie {
 		_label = label;
 	}
 
-	void setMinMaxValues(final float[][] valueSeries) {
-
-		if (valueSeries == null || valueSeries.length == 0 || valueSeries[0] == null || valueSeries[0].length == 0) {
-
-			_highValues = new float[1][2];
-			_lowValues = new float[1][2];
-
-			_visibleMaxValue = _visibleMinValue = 0;
-			_originalMaxValue = _originalMinValue = 0;
-
-		} else {
-
-			_highValues = valueSeries;
-
-			// set initial min/max value
-			_visibleMaxValue = _visibleMinValue = valueSeries[0][0];
-
-			// calculate min/max highValues
-			for (final float[] valueSerie : valueSeries) {
-
-				if (valueSerie == null) {
-					continue;
-				}
-
-				for (final float value : valueSerie) {
-					_visibleMaxValue = (_visibleMaxValue >= value) ? _visibleMaxValue : value;
-					_visibleMinValue = (_visibleMinValue <= value) ? _visibleMinValue : value;
-				}
-			}
-
-			/*
-			 * force the min/max values to have not the same value this is necessary to display a
-			 * visible line in the chart
-			 */
-			if (_visibleMinValue == _visibleMaxValue) {
-
-				_visibleMaxValue++;
-
-				if (_visibleMinValue > 0) {
-					_visibleMinValue--;
-				}
-			}
-
-			_originalMinValue = _visibleMinValue;
-			_originalMaxValue = _visibleMaxValue;
-		}
-	}
-
-	abstract void setMinMaxValues(float[][] lowValues, float[][] highValues);
-
 	public void setRgbBright(final RGB[] rgbBright) {
 		_rgbBright = rgbBright;
 	}
@@ -314,20 +242,20 @@ public abstract class ChartDataSerie {
 		_valueDivisor = valueDivisor;
 	}
 
-	public void setVisibleMaxValue(final float maxValue) {
+	public void setVisibleMaxValue(final double maxValue) {
 		_visibleMaxValue = maxValue;
 	}
 
-	public void setVisibleMaxValue(final float maxValue, final boolean forceValue) {
+	public void setVisibleMaxValue(final double maxValue, final boolean forceValue) {
 		_visibleMaxValue = maxValue > _visibleMinValue ? maxValue : _visibleMinValue * _valueDivisor;
 		_isForceMaxValue = forceValue;
 	}
 
-	public void setVisibleMinValue(final float minValue) {
+	public void setVisibleMinValue(final double minValue) {
 		_visibleMinValue = minValue;
 	}
 
-	public void setVisibleMinValue(final float minValue, final boolean forceValue) {
+	public void setVisibleMinValue(final double minValue, final boolean forceValue) {
 		_visibleMinValue = minValue;
 		_isForceMinValue = forceValue;
 	}

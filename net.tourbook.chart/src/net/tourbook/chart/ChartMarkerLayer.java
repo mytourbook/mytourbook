@@ -71,7 +71,7 @@ public class ChartMarkerLayer implements IChartLayer {
 		final int devGraphWidth = drawingData.devVirtualGraphWidth;
 
 		final float graphYBottom = drawingData.getGraphYBottom();
-		final float[] yValues = drawingData.getYData().getHighValues()[0];
+		final float[] yValues = drawingData.getYData().getHighValuesFloat()[0];
 		final double scaleX = drawingData.getScaleX();
 		final double scaleY = drawingData.getScaleY();
 

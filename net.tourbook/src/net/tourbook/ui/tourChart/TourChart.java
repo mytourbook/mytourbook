@@ -1047,9 +1047,9 @@ public class TourChart extends Chart {
 		}
 
 		// set data serie for the x-axis
-		final float[] xAxisSerie = _tourChartConfig.isShowTimeOnXAxis ? //
-				_tourData.getTimeSerieFloat()
-				: _tourData.getDistanceSerie();
+		final double[] xAxisSerie = _tourChartConfig.isShowTimeOnXAxis ? //
+				_tourData.getTimeSerieDouble()
+				: _tourData.getDistanceSerieDouble();
 
 		_layerMarker = new ChartMarkerLayer();
 		_layerMarker.setLineColor(new RGB(50, 100, 10));
@@ -1153,15 +1153,10 @@ public class TourChart extends Chart {
 		 */
 
 		// set value serie for the x-axis
-		float[] xAxisSerieFloat = null;
 		double[] xAxisSerieDouble = null;
-		if (isHistorySerie) {
-			xAxisSerieDouble = _tourData.getTimeSerieDouble();
-		} else {
-			xAxisSerieFloat = _tourChartConfig.isShowTimeOnXAxis //
-					? _tourData.getTimeSerieFloat()
-					: _tourData.getDistanceSerie();
-		}
+		xAxisSerieDouble = _tourChartConfig.isShowTimeOnXAxis //
+				? _tourData.getTimeSerieDouble()
+				: _tourData.getDistanceSerieDouble();
 
 		long timeSliceEnd;
 		if (isTimeSerie) {
@@ -1201,7 +1196,7 @@ public class TourChart extends Chart {
 					if (isHistorySerie) {
 						xValue = xAxisSerieDouble[timeIndex];
 					} else {
-						xValue = xAxisSerieFloat[timeIndex];
+						xValue = xAxisSerieDouble[timeIndex];
 					}
 					chartPhotos.add(new ChartPhoto(photoWrapper, xValue, timeIndex));
 
@@ -1246,7 +1241,7 @@ public class TourChart extends Chart {
 					if (isHistorySerie) {
 						xValue = xAxisSerieDouble[numberOfTimeSlices - 1];
 					} else {
-						xValue = xAxisSerieFloat[numberOfTimeSlices - 1];
+						xValue = xAxisSerieDouble[numberOfTimeSlices - 1];
 					}
 					chartPhotos.add(new ChartPhoto(photoWrapper, xValue, timeIndex));
 
@@ -1292,9 +1287,9 @@ public class TourChart extends Chart {
 			return;
 		}
 
-		final float[] xDataSerie = _tourChartConfig.isShowTimeOnXAxis ? //
-				_tourData.getTimeSerieFloat()
-				: _tourData.getDistanceSerie();
+		final double[] xDataSerie = _tourChartConfig.isShowTimeOnXAxis ? //
+				_tourData.getTimeSerieDouble()
+				: _tourData.getDistanceSerieDouble();
 
 		/*
 		 * create segment layer

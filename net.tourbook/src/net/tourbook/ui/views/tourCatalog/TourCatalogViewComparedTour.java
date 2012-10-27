@@ -72,7 +72,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 	private long								_refTourRefId	= -1;
 	private TourChart							_refTourTourChart;
 
-	private float								_refTourXMarkerValueDifference;
+	private double								_refTourXMarkerValueDifference;
 
 	/*
 	 * CT ... (c)ompared (t)our which is displayed in this view
@@ -289,7 +289,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 		_tourChart.addXMarkerDraggingListener(new IChartListener() {
 
-			public float getXMarkerValueDiff() {
+			public double getXMarkerValueDiff() {
 				return _refTourXMarkerValueDifference;
 			}
 

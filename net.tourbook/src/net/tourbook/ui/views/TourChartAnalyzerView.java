@@ -737,7 +737,13 @@ public class TourChartAnalyzerView extends ViewPart {
 			final int unitType = serieData.getAxisUnit();
 			final int valueDivisor = serieData.getValueDivisor();
 
-			final float[] values = serieData.getHighValues()[0];
+			float[] values = null;
+			if (serieData instanceof ChartDataYSerie) {
+
+				final ChartDataYSerie yData = (ChartDataYSerie) serieData;
+				values = yData.getHighValuesFloat()[0];
+			}
+
 			if (values == null) {
 				break;
 			}
