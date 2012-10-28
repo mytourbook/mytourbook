@@ -328,7 +328,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 			_ttToolbarControlExit = new ToolBar(container, SWT.FLAT);
 			GridDataFactory.fillDefaults()//
 					.applyTo(_ttToolbarControlExit);
-//		_toolbarControl.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+//			_ttToolbarControlExit.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
 			/*
 			 * spacer
@@ -336,11 +336,11 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 			_labelDragToolTip = new Label(container, SWT.NONE);
 			GridDataFactory.fillDefaults()//
 					.grab(true, false)
-					.hint(20, SWT.DEFAULT)
+					.hint(50, SWT.DEFAULT)
 					.applyTo(_labelDragToolTip);
 			_labelDragToolTip.setText(UI.EMPTY_STRING);
 			_labelDragToolTip.setToolTipText(Messages.Photo_Tooltip_Action_MoveToolTip_ToolTip);
-//			label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//			_labelDragToolTip.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 			_labelDragToolTip.addMouseTrackListener(new MouseTrackListener() {
 
 				@Override

@@ -17,9 +17,7 @@ package net.tourbook.ui.tourChart;
 
 public class SplineDrawingData {
 
-	public int		graphXValueOffset;
-
-	public int		devGraphValueXOffset;
+	public long		devGraphValueXOffset;
 	public int		devY0Spline;
 
 	public double	scaleX;

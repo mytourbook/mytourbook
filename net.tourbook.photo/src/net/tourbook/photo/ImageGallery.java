@@ -96,9 +96,6 @@ import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
  * org.apache.commons.sanselan
  * </pre>
  */
-/**
- * @author 081647
- */
 public class ImageGallery implements IItemHovereredListener, IGalleryContextMenuProvider, IPhotoProvider {
 
 	/**
@@ -197,7 +194,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	/**
 	 *
 	 */
-	public static Comparator<PhotoWrapper>						SORT_BY_FILE_DATE;
+	public static Comparator<PhotoWrapper>						SORT_BY_IMAGE_DATE;
 	public static Comparator<PhotoWrapper>						SORT_BY_FILE_NAME;
 	/**
 	 * Contains current gallery sorting id: {@link PicDirView#GALLERY_SORTING_BY_DATE} or
@@ -345,7 +342,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 			}
 		};
 
-		SORT_BY_FILE_DATE = new Comparator<PhotoWrapper>() {
+		SORT_BY_IMAGE_DATE = new Comparator<PhotoWrapper>() {
 			@Override
 			public int compare(final PhotoWrapper wrapper1, final PhotoWrapper wrapper2) {
 
@@ -701,7 +698,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	}
 
 	private Comparator<PhotoWrapper> getCurrentComparator() {
-		return _currentSorting == GallerySorting.FILE_NAME ? SORT_BY_FILE_NAME : SORT_BY_FILE_DATE;
+		return _currentSorting == GallerySorting.FILE_NAME ? SORT_BY_FILE_NAME : SORT_BY_IMAGE_DATE;
 	}
 
 	/**
@@ -779,7 +776,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		}
 
 		// sort photos by date/time
-		Arrays.sort(sortedPhotoWrapper, SORT_BY_FILE_DATE);
+		Arrays.sort(sortedPhotoWrapper, SORT_BY_IMAGE_DATE);
 
 		final ArrayList<PhotoWrapper> sortedPhotos = new ArrayList<PhotoWrapper>(sortedPhotoWrapper.length);
 
@@ -1814,8 +1811,8 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	 * Prevent to open pref dialog, when it's opened it would close this tooltip and the pref dialog
 	 * is hidden -->> APP IS FREEZING !!!
 	 */
-	public void setShowOtherShellActions(final boolean _isShowOtherShellActions) {
-		_galleryMT20.setIsShowOtherShellActions(_isShowOtherShellActions);
+	public void setShowOtherShellActions(final boolean isShowOtherShellActions) {
+		_galleryMT20.setIsShowOtherShellActions(isShowOtherShellActions);
 	}
 
 	/**

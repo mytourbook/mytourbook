@@ -810,7 +810,7 @@ public class Chart extends ViewForm {
 				.getValuesIndex());
 	}
 
-	public int getXXDevViewPortLeftBorder() {
+	public long getXXDevViewPortLeftBorder() {
 		return _chartComponents.getChartComponentGraph().getXXDevViewPortLeftBorder();
 	}
 

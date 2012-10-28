@@ -390,7 +390,13 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 
 			_photoGallery.createPhotoGallery(container, SWT.H_SCROLL, this);
 
-//		_photoGallery.setDefaultStatusMessage(Messages.Tour_Photos_Label_StatusMessage_NoTourWithPhotos);
+//			_photoGallery.setDefaultStatusMessage(Messages.Tour_Photos_Label_StatusMessage_NoTourWithPhotos);
+
+			/**
+			 * Prevent to open pref dialog, when it's opened it would close this tooltip and the
+			 * pref dialog is hidden -->> APP IS FREEZING !!!
+			 */
+			_photoGallery.setShowOtherShellActions(false);
 
 			createUI_20_ActionBar(_photoGallery.getCustomActionBarContainer());
 		}

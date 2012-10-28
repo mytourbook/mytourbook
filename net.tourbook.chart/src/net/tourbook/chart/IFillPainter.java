@@ -22,7 +22,7 @@ public interface IFillPainter {
 	public void draw(	GC gcGraph,
 						GraphDrawingData graphDrawingData,
 						Chart chart,
-						int[] devXPositions,
+						long[] devXPositions,
 						int valueIndexFirstPoint,
 						int valueIndexLastPoint);
 

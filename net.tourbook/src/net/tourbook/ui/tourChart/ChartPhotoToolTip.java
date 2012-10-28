@@ -17,6 +17,7 @@ package net.tourbook.ui.tourChart;
 
 import java.util.ArrayList;
 
+import net.tourbook.common.PointLong;
 import net.tourbook.photo.PhotoToolTipUI;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -102,9 +103,10 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 	}
 
 	public void showChartPhotoToolTip(	final ChartLayerPhoto photoLayer,
-										final Point devPositionHoveredValue,
+										final PointLong devHoveredValue,
 										final int devXMouseMove,
 										final int devYMouseMove) {
+
 
 		final ArrayList<PhotoGroup> photoGroups = photoLayer.getPhotoPositions();
 

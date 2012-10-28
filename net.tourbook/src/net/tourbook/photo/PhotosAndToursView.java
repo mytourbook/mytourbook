@@ -1206,7 +1206,6 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 	}
 
 	public ArrayList<TourData> getSelectedTours() {
-//		return _tourList;
 		return new ArrayList<TourData>();
 	}
 

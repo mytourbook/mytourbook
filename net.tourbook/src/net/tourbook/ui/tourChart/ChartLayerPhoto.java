@@ -55,13 +55,13 @@ public class ChartLayerPhoto implements IChartLayer {
 //		_photoOverlayBGColor = photoOverlayBGColor;
 	}
 
-	private void createGroupedPhotos(final int devGraphImageOffset, final GraphDrawingData graphDrawingData) {
+	private void createGroupedPhotos(final long devGraphImageOffset, final GraphDrawingData graphDrawingData) {
 
 		_photoGroups.clear();
 
 		final ChartDrawingData chartDrawingData = graphDrawingData.getChartDrawingData();
 		final int devVisibleChartWidth = chartDrawingData.devDevVisibleChartWidth;
-		final int devVirtualGraphWidth = graphDrawingData.devVirtualGraphWidth;
+		final long devVirtualGraphWidth = graphDrawingData.devVirtualGraphWidth;
 		final double zoomRatio = (double) devVirtualGraphWidth / devVisibleChartWidth;
 
 		// adjust group with to zoom ratia
@@ -180,10 +180,8 @@ public class ChartLayerPhoto implements IChartLayer {
 
 		final int devYTop = graphDrawingData.getDevYTop();
 		final int devYBottom = graphDrawingData.getDevYBottom();
-		final int devGraphImageOffset = chart.getXXDevViewPortLeftBorder();
+		final long devGraphImageOffset = chart.getXXDevViewPortLeftBorder();
 		final int devGraphHeight = graphDrawingData.devGraphHeight;
-		final int devGraphWidth = graphDrawingData.devVirtualGraphWidth;
-//		final int devGraphHeight = devYBottom - devYTop;
 
 		final float graphYBottom = graphDrawingData.getGraphYBottom();
 		final float[] yValues = graphDrawingData.getYData().getHighValuesFloat()[0];
@@ -197,7 +195,7 @@ public class ChartLayerPhoto implements IChartLayer {
 
 		final ChartDrawingData chartDrawingData = graphDrawingData.getChartDrawingData();
 		final int devVisibleChartWidth = chartDrawingData.devDevVisibleChartWidth;
-		final int devVirtualGraphWidth = graphDrawingData.devVirtualGraphWidth;
+		final long devVirtualGraphWidth = graphDrawingData.devVirtualGraphWidth;
 		final double zoomRatio = (double) devVirtualGraphWidth / devVisibleChartWidth;
 
 		// adjust group with to zoom ratia
@@ -222,7 +220,7 @@ public class ChartLayerPhoto implements IChartLayer {
 		for (final ChartPhoto chartPhoto : _chartPhotos) {
 
 			final double devXPhotoValue = scaleX * chartPhoto.xValue;
-			final int devXPhoto = (int) devXPhotoValue - devGraphImageOffset;
+			final int devXPhoto = (int) (devXPhotoValue - devGraphImageOffset);
 
 			// check if photo is visible
 			if (devXPhoto < groupHGrid) {
@@ -269,7 +267,7 @@ public class ChartLayerPhoto implements IChartLayer {
 		// convert all photo positions into grouped photo positions
 		createGroupedPhotos(devGraphImageOffset, graphDrawingData);
 
-		gc.setClipping(0, devYTop, devGraphWidth, devGraphHeight);
+		gc.setClipping(0, devYTop, devVisibleChartWidth, devGraphHeight);
 		gc.setAntialias(SWT.ON);
 
 		for (final PhotoGroup photoGroup : _photoGroups) {

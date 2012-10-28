@@ -16,6 +16,7 @@
 package net.tourbook.ui.tourChart;
 
 import net.tourbook.chart.ITooltipOwner;
+import net.tourbook.common.PointLong;
 import net.tourbook.common.util.Util;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -91,7 +92,7 @@ public abstract class ValuePointToolTipShell {
 	 * Position where the hovered value is painted in the chart, the position is relative to the
 	 * client.
 	 */
-	private Point								_ownerValueDevPosition				= new Point(0, 0);
+	private PointLong							_ownerValueDevPosition				= new PointLong(0, 0);
 
 	int											chartMarginTop;
 	int											chartMarginBottom;
@@ -571,7 +572,7 @@ public abstract class ValuePointToolTipShell {
 		 * get the tt vertical position
 		 */
 		// value point position
-		final int devYValuePoint = _ownerControl.toDisplay(0, _ownerValueDevPosition.y).y;
+		final int devYValuePoint = _ownerControl.toDisplay(0, (int) _ownerValueDevPosition.y).y;
 
 		final Rectangle scrTTBounds = _ttShell.getBounds();
 		final int srcTTTop = scrTTBounds.y;
@@ -763,7 +764,9 @@ public abstract class ValuePointToolTipShell {
 		final int screenEdgeTop = screenOwnerTop + chartMarginTop;
 		final int screenEdgeBottom = screenOwnerBotton - ttHeight - chartMarginBottom;
 
-		final Point screenValuePoint = _ownerControl.toDisplay(_ownerValueDevPosition.x, _ownerValueDevPosition.y);
+		final Point screenValuePoint = _ownerControl.toDisplay(
+				(int) _ownerValueDevPosition.x,
+				(int) _ownerValueDevPosition.y);
 		final int screenValuePointTop = screenValuePoint.y;
 
 		boolean isSetLocation = isSetDefaultLocation;
@@ -972,12 +975,12 @@ public abstract class ValuePointToolTipShell {
 	 * @param devYMouseMove
 	 * @param valueDevPosition
 	 */
-	void setTTShellLocation(final int devXMouseMove, final int devYMouseMove, final Point valueDevPosition) {
+	void setTTShellLocation(final int devXMouseMove, final int devYMouseMove, final PointLong valueDevPosition) {
 
 		_devXOwnerMouseMove = devXMouseMove;
 
 		if (valueDevPosition == null) {
-			_ownerValueDevPosition = new Point(0, 0);
+			_ownerValueDevPosition = new PointLong(0, 0);
 		} else {
 			_ownerValueDevPosition = valueDevPosition;
 		}

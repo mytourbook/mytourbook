@@ -25,11 +25,11 @@ import org.eclipse.swt.graphics.Rectangle;
 public class GraphDrawingData {
 
 	// position for the x-axis unit text
-	protected static final int		X_UNIT_TEXT_POS_LEFT	= 0;
-	protected static final int		X_UNIT_TEXT_POS_CENTER	= 1;
+	protected static final int		X_UNIT_TEXT_POS_LEFT		= 0;
+	protected static final int		X_UNIT_TEXT_POS_CENTER		= 1;
 
-	public static final int			BAR_POS_LEFT			= 0;
-	public static final int			BAR_POS_CENTER			= 1;
+	public static final int			BAR_POS_LEFT				= 0;
+	public static final int			BAR_POS_CENTER				= 1;
 //	public static final int			BAR_POS_CENTER_UNIT_TICK	= 2;							// center bar in the unit tick
 
 	private ChartDataXSerie			_xData;
@@ -53,14 +53,14 @@ public class GraphDrawingData {
 	/**
 	 * Contains all unit labels and their positions for the x axis
 	 */
-	private ArrayList<ChartUnit>	_xUnits					= new ArrayList<ChartUnit>();
-	private int						_xUnitTextPos			= X_UNIT_TEXT_POS_LEFT;
-	private int						_titleTextPosition		= X_UNIT_TEXT_POS_LEFT;
+	private ArrayList<ChartUnit>	_xUnits						= new ArrayList<ChartUnit>();
+	private int						_xUnitTextPos				= X_UNIT_TEXT_POS_LEFT;
+	private int						_titleTextPosition			= X_UNIT_TEXT_POS_LEFT;
 
 	/**
 	 * List with all unit labels and positions for the y axis
 	 */
-	private ArrayList<ChartUnit>	_yUnits					= new ArrayList<ChartUnit>();
+	private ArrayList<ChartUnit>	_yUnits						= new ArrayList<ChartUnit>();
 
 	/**
 	 * scaling from graph value to device value
@@ -71,7 +71,7 @@ public class GraphDrawingData {
 	/**
 	 * scaling of the x unit
 	 */
-	private double					_scaleUnitX				= Double.MIN_VALUE;
+	private double					_scaleUnitX					= Double.MIN_VALUE;
 
 	// graph position
 	private int						_devYTop;
@@ -80,7 +80,7 @@ public class GraphDrawingData {
 	/**
 	 * virtual graph width in dev (pixel) units
 	 */
-	public int						devVirtualGraphWidth;
+	public long						devVirtualGraphWidth;
 	/**
 	 * graph height in dev (pixel) units, each graph has the same height
 	 */
@@ -95,15 +95,15 @@ public class GraphDrawingData {
 
 	private float					_graphYTop;
 
-	private int						_barPosition			= BAR_POS_LEFT;
+	private int						_barPosition				= BAR_POS_LEFT;
 	private int						_chartType;
 
 	private String					_errorMessage;
 
-	private boolean					_isXUnitOverlapChecked	= false;
+	private boolean					_isXUnitOverlapChecked		= false;
 	private boolean					_isCheckUnitBorderOverlap	= true;
 
-	private boolean[]				_isDrawUnits			= null;
+	private boolean[]				_isDrawUnits				= null;
 
 	private ChartDrawingData		chartDrawingData;
 

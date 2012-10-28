@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
+import java.util.ArrayList;
+
 import net.tourbook.chart.CustomOverlay;
 
 import org.eclipse.swt.SWT;
@@ -48,8 +50,10 @@ public class ChartPhotoOverlay implements CustomOverlay {
 
 	PhotoGroup getHoveredPhotoGroup() {
 
+		final ArrayList<PhotoGroup> photoGroups = _photoLayer.getPhotoGroups();
+
 		// find photo group which is hovered with the mouse
-		for (final PhotoGroup photoGroup : _photoLayer.getPhotoGroups()) {
+		for (final PhotoGroup photoGroup : photoGroups) {
 
 			if (_devXMouse >= photoGroup.hGridStart && _devXMouse <= photoGroup.hGridEnd) {
 				return photoGroup;

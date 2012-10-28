@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -66,9 +66,9 @@ public class ChartMarkerLayer implements IChartLayer {
 
 		final int devYTop = drawingData.getDevYTop();
 		final int devYBottom = drawingData.getDevYBottom();
-		final int devGraphImageOffset = chart.getXXDevViewPortLeftBorder();
+		final long devGraphImageOffset = chart.getXXDevViewPortLeftBorder();
 		final int devGraphHeight = drawingData.devGraphHeight;
-		final int devGraphWidth = drawingData.devVirtualGraphWidth;
+		final long devGraphWidth = drawingData.devVirtualGraphWidth;
 
 		final float graphYBottom = drawingData.getGraphYBottom();
 		final float[] yValues = drawingData.getYData().getHighValuesFloat()[0];
@@ -77,14 +77,14 @@ public class ChartMarkerLayer implements IChartLayer {
 
 		final Color colorLine = new Color(display, getLineColor());
 
-		gc.setClipping(0, devYTop, devGraphWidth, devGraphHeight);
+		gc.setClipping(0, devYTop, gc.getClipping().width, devGraphHeight);
 
 		for (final ChartLabel chartMarker : _chartLabels) {
 
 			final float yValue = yValues[chartMarker.serieIndex];
 			final int devYGraph = (int) ((yValue - graphYBottom) * scaleY) - 0;
 
-			int devXMarker = (int) (chartMarker.graphX * scaleX) - devGraphImageOffset;
+			int devXMarker = (int) (chartMarker.graphX * scaleX - devGraphImageOffset);
 			int devYMarker = devYBottom - devYGraph;
 
 			final int visualPosition = chartMarker.visualPosition;
@@ -202,7 +202,7 @@ public class ChartMarkerLayer implements IChartLayer {
 					devXMarker -= labelHeight;
 
 					// don't draw the marker before the chart
-					final int devXImageOffset = chart.getXXDevViewPortLeftBorder();
+					final long devXImageOffset = chart.getXXDevViewPortLeftBorder();
 					if (devXImageOffset == 0 && devXMarker < 0) {
 						devXMarker = 0;
 					}
@@ -237,13 +237,13 @@ public class ChartMarkerLayer implements IChartLayer {
 					 */
 
 					// don't draw the marker before the chart
-					final int devXImageOffset = chart.getXXDevViewPortLeftBorder();
+					final long devXImageOffset = chart.getXXDevViewPortLeftBorder();
 					if (devXImageOffset == 0 && devXMarker < 0) {
 						devXMarker = 0;
 					}
 
 					if (devXMarker + labelWidth > devGraphWidth) {
-						devXMarker = devGraphWidth - labelWidth;
+						devXMarker = (int) (devGraphWidth - labelWidth);
 					}
 
 					// force label to be not below the bottom

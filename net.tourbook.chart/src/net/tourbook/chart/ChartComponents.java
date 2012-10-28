@@ -76,7 +76,8 @@ public class ChartComponents extends Composite {
 	static final int				CHART_MIN_HEIGHT			= 5;
 
 //	static final int				CHART_MAX_WIDTH				= Integer.MAX_VALUE;				// 2'147'483'647
-	static final int				CHART_MAX_WIDTH				= 1000000000;						// 1'000'000'000
+//	static final int				CHART_MAX_WIDTH				= 1000000000;						// 1'000'000'000
+	static final long				CHART_MAX_WIDTH				= 1000000000000L;					// 1'000'000'000'000
 //																									//   308'333'095
 	static final int				CHART_MAX_HEIGHT			= 10000;
 
@@ -367,7 +368,7 @@ public class ChartComponents extends Composite {
 		final ChartDataXSerie xData = drawingData.getXData();
 
 		final double graphMaxValue = xData.getOriginalMaxValue();
-		final int devVirtualGraphWidth = componentGraph.getXXDevGraphWidth();
+		final long devVirtualGraphWidth = componentGraph.getXXDevGraphWidth();
 
 		drawingData.devVirtualGraphWidth = devVirtualGraphWidth;
 
@@ -379,7 +380,7 @@ public class ChartComponents extends Composite {
 		 * calculate the number of units which will be visible by dividing the visible length by the
 		 * minimum size which one unit should have in pixels
 		 */
-		final int defaultUnitCount = devVirtualGraphWidth / _chart.gridHorizontalDistance;
+		final long defaultUnitCount = devVirtualGraphWidth / _chart.gridHorizontalDistance;
 
 		// unit raw value (not yet rounded) is the number in data values for one unit
 		final double graphDefaultUnit = graphMaxValue / Math.max(1, defaultUnitCount);
@@ -495,7 +496,7 @@ public class ChartComponents extends Composite {
 
 				final boolean isMajorValue = unitLabelValue % majorValue == 0;
 
-				xUnits.add(new ChartUnit((float) unitPos, unitLabel, isMajorValue));
+				xUnits.add(new ChartUnit(unitPos, unitLabel, isMajorValue));
 
 				// check for an infinity loop
 				if (graphValue == graphMaxValue || loopCounter++ > 10000) {
@@ -518,7 +519,7 @@ public class ChartComponents extends Composite {
 
 			if (unitType == ChartDataSerie.AXIS_UNIT_NUMBER || unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE) {
 
-				final int barWidth = (devVirtualGraphWidth / highValues.length) / 2;
+				final int barWidth = (int) ((devVirtualGraphWidth / highValues.length) / 2);
 
 				drawingData.setBarRectangleWidth(Math.max(0, barWidth));
 				drawingData.setBarPosition(GraphDrawingData.BAR_POS_CENTER);
@@ -541,13 +542,13 @@ public class ChartComponents extends Composite {
 	private void createDrawingData_X_Day(final GraphDrawingData drawingData) {
 
 		final ChartSegments chartSegments = drawingData.getXData().getChartSegments();
-		final int devVirtualGraphWidth = componentGraph.getXXDevGraphWidth();
+		final long devVirtualGraphWidth = componentGraph.getXXDevGraphWidth();
 
 		createMonthUnequalUnits(drawingData, devVirtualGraphWidth, chartSegments.years, chartSegments.yearDays);
 
 		// compute the width of the rectangles
 		final int allDaysInAllYears = chartSegments.allValues;
-		drawingData.setBarRectangleWidth(Math.max(0, (devVirtualGraphWidth / allDaysInAllYears)));
+		drawingData.setBarRectangleWidth((int) Math.max(0, (devVirtualGraphWidth / allDaysInAllYears)));
 		drawingData.setXUnitTextPos(GraphDrawingData.X_UNIT_TEXT_POS_CENTER);
 
 		drawingData.setScaleX((double) devVirtualGraphWidth / allDaysInAllYears);
@@ -629,20 +630,13 @@ public class ChartComponents extends Composite {
 		xData.setUnitLabel(UI.EMPTY_STRING);
 
 		final double devGraphXOffset = componentGraph.getXXDevViewPortLeftBorder();
-		final int devVirtualGraphWidth = componentGraph.getXXDevGraphWidth();
+		final long devVirtualGraphWidth = componentGraph.getXXDevGraphWidth();
 		final int devVisibleWidth = getDevVisibleChartWidth();
-
-		System.out.println(UI.timeStampNano() + " devVirtualGraphWidth " + devVirtualGraphWidth);
-		// TODO remove SYSTEM.OUT.PRINTLN
 
 		final long graphLeftBorder = (long) (devGraphXOffset / scaleX);
 		final long graphRightBorder = (long) ((devGraphXOffset + devVisibleWidth) / scaleX);
 
 		final ArrayList<ChartUnit> xUnits = graphDrawingData.getXUnits();
-
-		/*
-		 * create units for year/month
-		 */
 
 		final ArrayList<Long> titleValueStart = historyTitle.graphStart = new ArrayList<Long>();
 		final ArrayList<Long> titleValueEnd = historyTitle.graphEnd = new ArrayList<Long>();
@@ -1011,7 +1005,7 @@ public class ChartComponents extends Composite {
 			 * create units for day/seconds
 			 */
 
-			System.out.println(UI.timeStampNano() + "\tday/seconds");
+			System.out.println(UI.timeStampNano() + " day/seconds");
 			// TODO remove SYSTEM.OUT.PRINTLN
 
 			graphDrawingData.setTitleTextPos(GraphDrawingData.X_UNIT_TEXT_POS_CENTER);
@@ -1021,22 +1015,22 @@ public class ChartComponents extends Composite {
 			final long majorValue = Util.getMajorTimeValue24(graphUnit);
 
 			final int startSeconds = tourStartTime.secondOfDay().get();
-			final long startUnitOffset = startSeconds % graphUnit;
+			long startUnitOffset = startSeconds % graphUnit;
 
 			// decrease min value when it does not fit to unit borders, !!! VERY IMPORTANT !!!
-			final long graphMinRemainder = graphLeftBorder % graphUnit;
-			final long graphValueStart = graphLeftBorder - graphMinRemainder;
+//			final long graphMinRemainder = graphLeftBorder % graphUnit;
+			long graphValueStart = graphLeftBorder - graphLeftBorder % graphUnit;
 
 			final long graphMaxVisibleValue = graphRightBorder + graphUnit;
 
-			System.out.println(UI.timeStampNano()
-					+ (" graphUnit " + graphUnit)
-					+ ("\ttourStartTime " + tourStartTime)
-					+ ("\tstartSeconds " + startSeconds)
-					+ ("\tstartUnitOffset " + startUnitOffset)
-			//
-					);
-			// TODO remove SYSTEM.OUT.PRINTLN
+//			System.out.println(UI.timeStampNano()
+//					+ (" graphUnit " + graphUnit)
+//					+ ("\ttourStartTime " + tourStartTime)
+//					+ ("\tstartSeconds " + startSeconds)
+//					+ ("\tstartUnitOffset " + startUnitOffset)
+//			//
+//					);
+//			// TODO remove SYSTEM.OUT.PRINTLN
 
 			long graphValue = graphValueStart;
 			while (graphValue <= graphMaxVisibleValue) {
@@ -1060,87 +1054,89 @@ public class ChartComponents extends Composite {
 			 * create title units
 			 */
 			{
-				final DateTime graphTime = tourStartTime.plus(graphLeftBorder * 1000 + 1000);
 
-				final int graphSecondsOfDay = graphTime.getSecondOfDay();
-				final DateTime graphNextDay = graphTime.plus((DAY_IN_SECONDS - graphSecondsOfDay) * 1000);
+				final DateTime timeLeftBorder = tourStartTime.plus(graphLeftBorder * 1000);
+
+				final int leftBorderSecondsOfDay = timeLeftBorder.getSecondOfDay();
+				final DateTime timeNextDay = timeLeftBorder.plus((DAY_IN_SECONDS - leftBorderSecondsOfDay) * 1000);
+				final DateTime timeFirstDay = timeNextDay.minus(DAY_IN_SECONDS * 1000);
 
 				System.out.println(UI.timeStampNano());
-				System.out.println(UI.timeStampNano() + " tourStartTime " + tourStartTime);
-				System.out.println(UI.timeStampNano() + " graphTime     " + graphTime);
-				System.out.println(UI.timeStampNano() + " graphNextDay  " + graphNextDay);
+				System.out.println(UI.timeStampNano() + " tourStartTime  " + tourStartTime);
+				System.out.println(UI.timeStampNano() + " timeLeftBorder " + timeLeftBorder);
+				System.out.println(UI.timeStampNano() + " timeFirstDay   " + timeFirstDay);
+				System.out.println(UI.timeStampNano() + " timeNextDay    " + timeNextDay);
 				System.out.println(UI.timeStampNano());
 				// TODO remove SYSTEM.OUT.PRINTLN
-
-				final String dayTitle = _dtFormatter.print(graphTime);
 
 				// get number of repeated labels for one day
-				final int devUnitWidth = (int) (scaleX * DAY_IN_SECONDS);
-				int repeatsForOneDays = (int) (devUnitWidth / devTitleVisibleUnit);
-				if (repeatsForOneDays == 0) {
-					repeatsForOneDays = 1;
+				final long dev1DayWidth = (long) (scaleX * DAY_IN_SECONDS);
+//				long repeatsForOneDays =  (long) (dev1DayWidth / devTitleVisibleUnit);
+				long repeatsForOneDay = dev1DayWidth / _devAllMonthLabelWidth;
+				if (repeatsForOneDay == 0) {
+					repeatsForOneDay = 1;
 				}
-				final int devUnitRepeatWidth = devUnitWidth / repeatsForOneDays;
-				final long graphRepeatedUnit = (long) (devUnitRepeatWidth / scaleX);
+//				final double devUnitRepeatWidth = (double) dev1DayWidth / repeatsForOneDays;
+//				final double graphRepeatedUnit = devUnitRepeatWidth / scaleX;
 
-				System.out.println(UI.timeStampNano()
-						+ " repeatsForOneDays "
-						+ repeatsForOneDays
-						+ ("\tdevUnitRepeatWidth " + devUnitRepeatWidth));
-				// TODO remove SYSTEM.OUT.PRINTLN
+				final long graphTitleRemainder = graphLeftBorder % DAY_IN_SECONDS;
+				final long graphTitleLeftBorderDay = graphLeftBorder - graphTitleRemainder;
 
+//				if (repeatsForOneDays > 1) {
+//
+//					// more than 1 title for 1 day, advance start value to the left border
+//
+//					while (graphTitleValue < graphLeftBorder) {
+//						graphTitleValue += graphRepeatedUnit;
+//					}
+//
+//					graphTitleValue -= graphRepeatedUnit;
+//				}
+
+//				System.out.println(UI.timeStampNano()
+//						+ " repeatsForOneDays "
+//						+ repeatsForOneDays
+//						+ ("\tdevUnitRepeatWidth " + devUnitRepeatWidth)
+//						+ ("\tdev1DayWidth " + dev1DayWidth)
+//						+ ("\tgraphLeftBorder " + graphLeftBorder)
+//						+ ("\tgraphTitleValue " + graphValue)
+//				//
+//						);
+//				// TODO remove SYSTEM.OUT.PRINTLN
+
+				startUnitOffset = startSeconds % DAY_IN_SECONDS;
+
+				graphValueStart = graphLeftBorder - graphLeftBorder % DAY_IN_SECONDS;
 				graphValue = graphValueStart;
+
 				while (graphValue <= graphMaxVisibleValue) {
 
-					final long devValue = (long) ((graphValue * scaleX) - devGraphXOffset);
+					final long unitValueAdjusted = graphValue - startUnitOffset;
 
-					System.out.println(UI.timeStampNano() + " graphValue " + graphValue + ("\tdevValue " + devValue));
+					final long graphDay = tourStartTime.getMillis() + graphValue * 1000;
+
+					final String dayTitle = _dtFormatter.print(graphDay);
+
+					titleValueStart.add(unitValueAdjusted);
+					titleValueEnd.add(unitValueAdjusted + DAY_IN_SECONDS - 1);
+
+					titleText.add(dayTitle);
+
+					if (repeatsForOneDay == 1) {
+
+						// 1 title for 1 day
+
+					} else {
+
+						// more than 1 title for 1 day
+
+					}
+
+					System.out.println(UI.timeStampNano() + " graphDay " + graphDay);
 					// TODO remove SYSTEM.OUT.PRINTLN
 
-					graphValue += graphUnit;
+					graphValue += DAY_IN_SECONDS;
 				}
-
-//				// ensure array size is big enough (*2)
-//				final int[] dayStarts = new int[repeatedDays * 2];
-//				final int[] dayEnds = new int[repeatedDays * 2];
-//				final int repeatedDayUnit = monthDays / repeatedDays;
-//
-//				int dayStartEnd = 0;
-//				int repeatIndex = 0;
-//
-//				final int dayUnits = monthDays;
-//
-//				for (int dayIndex = 0; dayIndex < dayUnits; dayIndex++) {
-//
-//					if (dayIndex % repeatedDayUnit == 0) {
-//
-//						if (repeatIndex > 0) {
-//							dayEnds[repeatIndex - 1] = dayStartEnd;
-//						}
-//
-//						dayStarts[repeatIndex] = dayStartEnd;
-//
-//						repeatIndex++;
-//					}
-//
-//					dayStartEnd += 1;
-//				}
-//				dayEnds[repeatIndex - 1] = dayStartEnd;
-//
-//				for (int repeatIndex2 = 0; repeatIndex2 < dayStarts.length; repeatIndex2++) {
-//
-//					final int dayStart = dayStarts[repeatIndex2];
-//					final int dayEnd = dayEnds[repeatIndex2];
-//
-//					// skip invalid entries
-//					if (dayStart == 0 && dayEnd == 0) {
-//						break;
-//					}
-//
-//					titleValueStart.add(graphValue + dayStart * DAY_IN_SECONDS + DAY_IN_SECONDS);
-//					titleValueEnd.add(graphValue + dayEnd * DAY_IN_SECONDS + DAY_IN_SECONDS);
-//					titleText.add(dayTitle);
-//				}
 			}
 		}
 
@@ -1149,17 +1145,17 @@ public class ChartComponents extends Composite {
 //			// TODO remove SYSTEM.OUT.PRINTLN
 //		}
 
-//		for (int unitIndex = 0; unitIndex < titleText.size(); unitIndex++) {
-//
-//			System.out.println(UI.timeStampNano()
-//					+ "\t"
-//					+ titleText.get(unitIndex)
-//					+ "\t"
-//					+ titleValueStart.get(unitIndex)
-//					+ "\t"
-//					+ titleValueEnd.get(unitIndex));
-//			// TODO remove SYSTEM.OUT.PRINTLN
-//		}
+		for (int unitIndex = 0; unitIndex < titleText.size(); unitIndex++) {
+
+			System.out.println(UI.timeStampNano()
+					+ "\t"
+					+ titleText.get(unitIndex)
+					+ "\t"
+					+ titleValueStart.get(unitIndex)
+					+ "\t"
+					+ titleValueEnd.get(unitIndex));
+			// TODO remove SYSTEM.OUT.PRINTLN
+		}
 	}
 
 	private void createDrawingData_X_Month(final GraphDrawingData drawingData) {
@@ -1167,7 +1163,7 @@ public class ChartComponents extends Composite {
 		final ChartDataXSerie xData = drawingData.getXData();
 
 		final int allUnitsSize = xData._highValuesDouble[0].length;
-		final int devVirtualGraphWidth = componentGraph.getXXDevGraphWidth();
+		final long devVirtualGraphWidth = componentGraph.getXXDevGraphWidth();
 		final double scaleX = (double) devVirtualGraphWidth / allUnitsSize;
 		drawingData.setScaleX(scaleX);
 
@@ -1188,7 +1184,7 @@ public class ChartComponents extends Composite {
 	private void createDrawingData_X_Week(final GraphDrawingData drawingData) {
 
 		final ChartDataXSerie xData = drawingData.getXData();
-		final int devVirtualGraphWidth = componentGraph.getXXDevGraphWidth();
+		final long devVirtualGraphWidth = componentGraph.getXXDevGraphWidth();
 
 		final double[] xValues = xData.getHighValuesDouble()[0];
 		final int allWeeks = xValues.length;
@@ -1225,7 +1221,7 @@ public class ChartComponents extends Composite {
 
 		final ChartSegments chartSegments = drawingData.getXData().getChartSegments();
 		final int[] yearValues = chartSegments.years;
-		final int devVirtualGraphWidth = componentGraph.getXXDevGraphWidth();
+		final long devVirtualGraphWidth = componentGraph.getXXDevGraphWidth();
 
 		final int yearCounter = xData._highValuesDouble[0].length;
 		final double scaleX = (double) devVirtualGraphWidth / yearCounter;
@@ -1798,7 +1794,7 @@ public class ChartComponents extends Composite {
 	}
 
 	private void createMonthEqualUnits(	final GraphDrawingData drawingData,
-										final int devGraphWidth,
+										final long devGraphWidth,
 										final int allUnitsSize,
 										final int numberOfYears) {
 
@@ -1808,7 +1804,7 @@ public class ChartComponents extends Composite {
 		/*
 		 * create month labels depending on the available width for a unit
 		 */
-		final int devYearWidth = devGraphWidth / numberOfYears;
+		final int devYearWidth = (int) (devGraphWidth / numberOfYears);
 		if (devYearWidth >= _devAllMonthLabelWidth) {
 
 			// all month labels can be displayed
@@ -1885,7 +1881,7 @@ public class ChartComponents extends Composite {
 	 *            Number of days in one year
 	 */
 	private void createMonthUnequalUnits(	final GraphDrawingData drawingData,
-											final int devGraphWidth,
+											final long devGraphWidth,
 											final int[] years,
 											final int[] yearDays) {
 
@@ -1924,7 +1920,7 @@ public class ChartComponents extends Composite {
 		/*
 		 * create month labels depending on the available width for a unit
 		 */
-		final int devYearWidth = devGraphWidth / numberOfYears;
+		final int devYearWidth = (int) (devGraphWidth / numberOfYears);
 		if (devYearWidth >= _devAllMonthLabelWidth) {
 
 			// all month labels can be displayed

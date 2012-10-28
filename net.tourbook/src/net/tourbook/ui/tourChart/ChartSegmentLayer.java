@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -63,7 +63,7 @@ public class ChartSegmentLayer implements IChartLayer {
 
 		final int devYTop = drawingData.getDevYTop();
 		final int devYBottom = drawingData.getDevYBottom();
-		final int devGraphImageOffset = chart.getXXDevViewPortLeftBorder();
+		final long devGraphImageOffset = chart.getXXDevViewPortLeftBorder();
 		final int devGraphHeight = drawingData.devGraphHeight;
 
 		final float graphYBottom = drawingData.getGraphYBottom();
@@ -76,7 +76,7 @@ public class ChartSegmentLayer implements IChartLayer {
 
 		for (final ChartMarker chartMarker : _chartMarkers) {
 
-			final int devXOffset = (int) (chartMarker.graphX * scaleX) - devGraphImageOffset;
+			final int devXOffset = (int) (chartMarker.graphX * scaleX - devGraphImageOffset);
 
 			final int yValueIndex = Math.min(yValues.length - 1, chartMarker.serieIndex);
 			final float yValue = yValues[yValueIndex];

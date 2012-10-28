@@ -82,7 +82,7 @@ public abstract class PhotoToolTipShell {
 	private static final int			MIN_SHELL_HORIZ_WIDTH						= 100;
 	private static final int			MIN_SHELL_HORIZ_HEIGHT						= 60;
 	private static final int			MIN_SHELL_VERT_WIDTH						= 100;
-	private static final int			MIN_SHELL_VERT_HEIGHT						= 150;
+	private static final int			MIN_SHELL_VERT_HEIGHT						= 60;
 
 	private OwnerControlListener		_ownerControlListener;
 	private OwnerShellListener			_ownerShellListener;

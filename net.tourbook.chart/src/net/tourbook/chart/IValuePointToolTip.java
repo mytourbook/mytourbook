@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,7 +15,8 @@
  *******************************************************************************/
 package net.tourbook.chart;
 
-import org.eclipse.swt.graphics.Point;
+import net.tourbook.common.PointLong;
+
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -56,7 +57,7 @@ public interface IValuePointToolTip {
 	void setValueIndex(	int valueIndex,
 						int devXMouseMove,
 						int devYMouseMove,
-						Point valueDevPosition,
+						PointLong valueDevPosition,
 						double chartZoomFactor);
 
 }

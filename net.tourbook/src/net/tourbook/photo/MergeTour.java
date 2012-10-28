@@ -119,7 +119,7 @@ public class MergeTour {
 
 		final HistoryData historyData = new HistoryData();
 
-		historyData.absoluteTime = timeSliceTime;
+		historyData.absoluteTime = timeSliceTime / 1000 * 1000;
 
 		historyList.add(historyData);
 	}
@@ -242,7 +242,7 @@ public class MergeTour {
 
 	private void setTourStartTime(final long time) {
 
-		tourStartTime = time;
+		tourStartTime = time / 1000 * 1000;
 		tourStartDateTime = new DateTime(time);
 	}
 
@@ -250,6 +250,7 @@ public class MergeTour {
 	public String toString() {
 		return "MergeTour "
 				+ ("\ttourStart=" + _dtFormatter.print(tourStartTime))
+				+ ("\ttourStart=" + tourStartTime)
 				+ ("\ttourEnd=" + _dtFormatter.print(tourEndTime))
 				+ ("\tisHistory=" + isHistoryTour)
 				+ ("\ttourId=" + tourId)

@@ -59,7 +59,7 @@ public class ChartSegmentValueLayer implements IChartLayer {
 
 		final int devYTop = drawingData.getDevYTop();
 		final int devYBottom = drawingData.getDevYBottom();
-		final int devGraphImageXOffset = chart.getXXDevViewPortLeftBorder();
+		final long devGraphImageXOffset = chart.getXXDevViewPortLeftBorder();
 
 		final float graphYBottom = drawingData.getGraphYBottom();
 
@@ -83,7 +83,7 @@ public class ChartSegmentValueLayer implements IChartLayer {
 		for (int segmentIndex = 0; segmentIndex < segmentSerie.length; segmentIndex++) {
 
 			final int serieIndex = segmentSerie[segmentIndex];
-			final int devXOffset = (int) (_xDataSerie[serieIndex] * scaleX) - devGraphImageXOffset;
+			final int devXOffset = (int) (_xDataSerie[serieIndex] * scaleX - devGraphImageXOffset);
 
 			final float graphYValue = segmentValues[segmentIndex] * valueDivisor;
 			final int devYGraph = (int) (scaleY * (graphYValue - graphYBottom));

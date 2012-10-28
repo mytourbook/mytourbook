@@ -179,6 +179,10 @@ public class PicDirView extends ViewPart {
 		}
 	}
 
+	public void actionRefreshFolder() {
+		_picDirFolder.actionRefreshFolder();
+	}
+
 	private void addPartListener() {
 
 		_partListener = new IPartListener2() {

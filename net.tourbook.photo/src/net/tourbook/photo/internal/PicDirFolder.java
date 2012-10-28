@@ -275,7 +275,7 @@ public class PicDirFolder {
 		enableActions();
 	}
 
-	void actionRefreshFolder() {
+	public void actionRefreshFolder() {
 
 		if (_selectedTVIFolder == null) {
 			return;

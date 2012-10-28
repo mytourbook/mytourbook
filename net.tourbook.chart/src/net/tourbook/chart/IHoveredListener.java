@@ -18,7 +18,7 @@
  */
 package net.tourbook.chart;
 
-import org.eclipse.swt.graphics.Point;
+import net.tourbook.common.PointLong;
 
 public interface IHoveredListener {
 
@@ -35,6 +35,6 @@ public interface IHoveredListener {
 	 * @param devYMouseMove
 	 * @param devXMouseMove
 	 */
-	void hoveredValue(int hoveredValueIndex, Point devHoveredValue, int devXMouseMove, int devYMouseMove);
+	void hoveredValue(int hoveredValueIndex, PointLong devHoveredValue, int devXMouseMove, int devYMouseMove);
 
 }

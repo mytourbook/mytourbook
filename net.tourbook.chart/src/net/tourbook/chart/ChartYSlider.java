@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,7 +18,7 @@
  */
 package net.tourbook.chart;
 
-import org.eclipse.swt.graphics.Rectangle;
+import net.tourbook.common.RectangleLong;
 
 public class ChartYSlider {
 
@@ -36,7 +36,7 @@ public class ChartYSlider {
 	/**
 	 * rectangle where the slider can be hit
 	 */
-	private Rectangle			_hitRectangle			= new Rectangle(0, 0, 0, sliderHitLineHeight);
+	private RectangleLong		_hitRectangle			= new RectangleLong(0, 0, 0, sliderHitLineHeight);
 
 	/**
 	 * y position for the slider line
@@ -74,7 +74,7 @@ public class ChartYSlider {
 	/**
 	 * @return Returns the hitRectangle.
 	 */
-	public Rectangle getHitRectangle() {
+	public RectangleLong getHitRectangle() {
 		return _hitRectangle;
 	}
 

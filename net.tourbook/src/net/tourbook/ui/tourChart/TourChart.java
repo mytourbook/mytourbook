@@ -38,6 +38,7 @@ import net.tourbook.chart.IHoveredListener;
 import net.tourbook.chart.ITooltipOwner;
 import net.tourbook.colors.ColorDefinition;
 import net.tourbook.colors.GraphColorProvider;
+import net.tourbook.common.PointLong;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.util.IToolTipHideListener;
@@ -282,7 +283,7 @@ public class TourChart extends Chart {
 
 		@Override
 		public void hoveredValue(	final int hoveredValueIndex,
-									final Point devHoveredValue,
+									final PointLong devHoveredValue,
 									final int devXMouseMove,
 									final int devYMouseMove) {
 
@@ -1153,8 +1154,8 @@ public class TourChart extends Chart {
 		 */
 
 		// set value serie for the x-axis
-		double[] xAxisSerieDouble = null;
-		xAxisSerieDouble = _tourChartConfig.isShowTimeOnXAxis //
+		double[] xAxisSerie = null;
+		xAxisSerie = _tourChartConfig.isShowTimeOnXAxis //
 				? _tourData.getTimeSerieDouble()
 				: _tourData.getDistanceSerieDouble();
 
@@ -1192,12 +1193,8 @@ public class TourChart extends Chart {
 
 					// photo is available in the current time slice
 
-					double xValue;
-					if (isHistorySerie) {
-						xValue = xAxisSerieDouble[timeIndex];
-					} else {
-						xValue = xAxisSerieDouble[timeIndex];
-					}
+					final double xValue = xAxisSerie[timeIndex];
+
 					chartPhotos.add(new ChartPhoto(photoWrapper, xValue, timeIndex));
 
 					photoIndex++;
@@ -1237,12 +1234,7 @@ public class TourChart extends Chart {
 
 				while (true) {
 
-					double xValue;
-					if (isHistorySerie) {
-						xValue = xAxisSerieDouble[numberOfTimeSlices - 1];
-					} else {
-						xValue = xAxisSerieDouble[numberOfTimeSlices - 1];
-					}
+					final double xValue = xAxisSerie[numberOfTimeSlices - 1];
 					chartPhotos.add(new ChartPhoto(photoWrapper, xValue, timeIndex));
 
 					photoIndex++;

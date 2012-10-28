@@ -24,6 +24,7 @@ import net.tourbook.chart.ColorCache;
 import net.tourbook.chart.ITooltipOwner;
 import net.tourbook.chart.IValuePointToolTip;
 import net.tourbook.colors.GraphColorProvider;
+import net.tourbook.common.PointLong;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -1047,7 +1048,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 	public void setValueIndex(	final int valueIndex,
 								final int devXMouseMove,
 								final int devYMouseMove,
-								final Point valueDevPosition,
+								final PointLong valueDevPosition,
 								final double chartZoomFactor) {
 
 		if (_tourData == null || _isToolTipVisible == false) {

@@ -2131,7 +2131,6 @@ public class TourManager {
 
 		if (isHistorySerie) {
 
-			// history do not have any y-data
 
 			chartDataModel.setChartType(ChartDataModel.CHART_TYPE_HISTORY);
 
@@ -2140,9 +2139,9 @@ public class TourManager {
 			// set date/time when x-axis starts
 			xDataTime.setStartDateTime(tourData.getTourStartTime());
 
-			final float[] historySerie = new float[tourData.timeSerieHistory.length];
-
-			final ChartDataYSerie yDataHistory = createChartDataSerie(historySerie, ChartDataModel.CHART_TYPE_HISTORY);
+			// history do not have any y-data, create dummy values
+			final float[] yHistorySerie = new float[tourData.timeSerieHistory.length];
+			final ChartDataYSerie yDataHistory = createChartDataSerie(yHistorySerie, ChartDataModel.CHART_TYPE_HISTORY);
 
 			yDataHistory.setAxisUnit(ChartDataSerie.AXIS_UNIT_HISTORY);
 

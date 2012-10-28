@@ -62,7 +62,7 @@ public class HrZonePainter implements IFillPainter {
 	public void draw(	final GC gcGraph,
 						final GraphDrawingData graphDrawingData,
 						final Chart chart,
-						final int[] devXPositions,
+						final long[] devXPositions,
 						final int valueIndexFirstPoint,
 						final int valueIndexLastPoint) {
 
@@ -73,7 +73,7 @@ public class HrZonePainter implements IFillPainter {
 	private void drawHorizontal(final GC gcGraph,
 								final GraphDrawingData graphDrawingData,
 								final Chart chart,
-								final int[] devXPositions,
+								final long[] devXPositions,
 								final int valueIndexFirstPoint,
 								final int valueIndexLastPoint) {
 
@@ -130,15 +130,15 @@ public class HrZonePainter implements IFillPainter {
 
 		final int devCanvasHeight = graphDrawingData.devGraphHeight;
 
-		final int devXPrev = devXPositions[valueIndexFirstPoint];
-		int devXHrStart = devXPositions[valueIndexFirstPoint];
+		final long devXPrev = devXPositions[valueIndexFirstPoint];
+		long devXHrStart = devXPositions[valueIndexFirstPoint];
 
 		final HrZoneContext hrZoneContext = tourData.getHrZoneContext();
 		int prevZoneIndex = TrainingManager.getZoneIndex(hrZoneContext, pulseSerie[valueIndexFirstPoint]);
 
 		for (int valueIndex = valueIndexFirstPoint + 1; valueIndex <= valueIndexLastPoint; valueIndex++) {
 
-			final int devXCurrent = devXPositions[valueIndex];
+			final long devXCurrent = devXPositions[valueIndex];
 			final boolean isLastIndex = valueIndex == valueIndexLastPoint;
 
 			// ignore same position even when the HR zone has changed
@@ -152,7 +152,7 @@ public class HrZonePainter implements IFillPainter {
 				continue;
 			}
 
-			final int devWidth = devXCurrent - devXHrStart;
+			final int devWidth = (int) (devXCurrent - devXHrStart);
 
 			if (isBgColor) {
 				gcGraph.setBackground(_hrZoneColors[prevZoneIndex]);
@@ -161,9 +161,9 @@ public class HrZonePainter implements IFillPainter {
 			}
 
 			if (isGradient) {
-				gcGraph.fillGradientRectangle(devXHrStart, 0, devWidth, devCanvasHeight, true);
+				gcGraph.fillGradientRectangle((int) devXHrStart, 0, devWidth, devCanvasHeight, true);
 			} else {
-				gcGraph.fillRectangle(devXHrStart, 0, devWidth, devCanvasHeight);
+				gcGraph.fillRectangle((int) devXHrStart, 0, devWidth, devCanvasHeight);
 			}
 
 			// set start for the next HR zone

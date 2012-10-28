@@ -47,8 +47,8 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 
 	private Rectangle[]				_spPointRects;
 
-	private int						_graphXValueOffset;
-	private int						_xxDevViewPortLeftBorder;
+	private double					_graphXValueOffset;
+	private long					_xxDevViewPortLeftBorder;
 	private int						_devY0Spline;
 	private double					_scaleX;
 	private double					_scaleY;
@@ -98,7 +98,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 
 		// get the horizontal offset for the graph
 		_xxDevViewPortLeftBorder = chart.getXXDevViewPortLeftBorder();
-		_graphXValueOffset = (int) (Math.max(0, _xxDevViewPortLeftBorder) / _scaleX);
+		_graphXValueOffset = (Math.max(0, _xxDevViewPortLeftBorder) / _scaleX);
 
 		final Display display = Display.getCurrent();
 
@@ -463,7 +463,6 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		// create drawing data
 		final SplineDrawingData drawingData = new SplineDrawingData();
 
-		drawingData.graphXValueOffset = _graphXValueOffset;
 		drawingData.devY0Spline = _devY0Spline;
 		drawingData.scaleX = _scaleX;
 		drawingData.scaleY = _scaleY;

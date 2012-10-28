@@ -32,6 +32,11 @@
 			name="%Action_PhotoDirectory_MergePhotoWithTourInGalleryAll"
 			defaultHandler="net.tourbook.photo.internal.ActionHandlerMergePhotoWithTourInGalleryAll"
 			/>
+
+		<command id="command.net.tourbook.photo.RefreshFolder"
+			name="%Action_PhotoDirectory_RefreshFolder"
+			defaultHandler="net.tourbook.photo.internal.ActionHandlerRefreshFolder"
+			/>
 		
 	</extension>
 	
@@ -65,6 +70,17 @@
 			<command commandId="command.net.tourbook.photo.MergePhotoWithTourInGallerySelected"
 				label="%Action_PhotoDirectory_MergePhotoWithTourInGallerySelected"
 				mnemonic="%Action_PhotoDirectory_MergePhotoWithTourInGallerySelected_Mnemonic"/>
+				
+			<separator
+				name="net.tourbook.photo.separator1"
+				visible="true">
+			</separator>
+
+			<command
+         commandId="command.net.tourbook.photo.RefreshFolder"
+         icon="icons/refresh.gif"
+         label="%Action_PhotoDirectory_RefreshFolder"
+         mnemonic="%Action_PhotoDirectory_RefreshFolder_Mnemonic"/>
 		
 		</menuContribution>
 		
