@@ -28,6 +28,31 @@ Different behaviour:
 * UPDATE DOCU: TOUR CHART autoscrolling in the tour chart can be done only, when the mouse vertical position is below the horizontal x-axis of the lower graph (when multiple graphs are displayed)
 
 
+Odd things:
+
+* 6 minutes and 32 seconds are skipped in the German time zone at 1 April 1893
+
+see also here: http://timeanddate.com/worldclock/clockchange.html?n=37&year=1893
+
+
+When local standard time was about to reach
+Saturday, 1 April 1893, 00:00:00 clocks were turned forward 0:06:32 hours to
+Saturday, 1 April 1893, 00:06:32 local standard time instead
+
+Seconds before and after the time change forward
+Local Date				Local Time				DST	UTC				Time
+													Offset			Zone
+							
+
+Friday, 31 March 1893	23:59:57				No	UTC+0:53:28h	LMT
+						23:59:58				No	UTC+0:53:28h	LMT
+						23:59:59				No	UTC+0:53:28h	LMT
+
+Saturday, 1 April 1893	00:00:00 -> 00:06:32	No	UTC+1h			CET
+						00:06:33				No	UTC+1h			CET
+						00:06:34				No	UTC+1h			CET
+
+
 Other modifications 
 
 *

@@ -1380,4 +1380,8 @@ public class Chart extends ViewForm {
 		return _useInternalActionBar;
 	}
 
+	public void zoomOut() {
+		onExecuteZoomFitGraph();
+	}
+
 }

@@ -348,18 +348,10 @@ public class Util {
 		long unit = unitValue;
 		int multiplier = 1;
 
-//		System.out.println();
-//		System.out.println("getMajorTimeValue");
-//		System.out.println(unit + "\ttime: " + System.currentTimeMillis());
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
 		while (unit > 240) {
 			multiplier *= 60;
 			unit /= 60;
 		}
-
-//		System.out.println(unit + "\t");
-//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		if (is24HourFormatting) {
 
@@ -367,12 +359,9 @@ public class Util {
 
 				unit = //
 						//
-//				unit >= 120 ? 360 : //
 				unit >= 360 ? 3600 : //
 						unit >= 60 ? 360 : //
-//								unit >= 30 ? 60 : //
 								unit >= 15 ? 60 : //
-//												unit >= 12 ? 12 : //
 										12;
 
 			} else {
@@ -380,8 +369,6 @@ public class Util {
 				unit = //
 						//
 				unit >= 120 ? 720 : //
-//				unit >= 120 ? 1440 : //
-//						unit >= 60 ? 360 : //
 						unit >= 30 ? 360 : //
 								unit >= 15 ? 120 : //
 										unit >= 10 ? 60 : //
@@ -401,16 +388,6 @@ public class Util {
 								unit >= 120 ? 240 : //
 										unit >= 24 ? 120 : //
 												10;
-//				unit = //
-//						//
-//				unit >= 120 ? 600 : //
-//						unit >= 60 ? 300 : //
-////							unit >= 30 ? 60 : //
-////									unit >= 20 ? 60 : //
-//								unit >= 10 ? 60 : //
-//										unit >= 5 ? 20 : //
-//												unit >= 2 ? 10 : //
-//														10;
 			} else {
 
 				// multiplier < 1 hour (3600 sec)
@@ -427,63 +404,65 @@ public class Util {
 			}
 		}
 
-//		System.out.println(unit + "\tmultiplier: " + multiplier);
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
 		unit *= multiplier;
-
-//		System.out.println(unit + "\t");
-//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		return unit;
 	}
 
 	/**
-	 * @param unitValue
+	 * @param defaultUnitValue
 	 * @param is24HourFormatting
 	 * @return Returns minUnitValue rounded to the number 60/30/20/10/5/2/1
 	 */
-	public static long getMajorTimeValue24(final long unitValue) {
+	public static long getMajorTimeValue24(final long defaultUnitValue) {
 
-		double unit = unitValue;
+		double unit = defaultUnitValue;
 		int multiplier = 1;
 
-		while (unit > 240) {
-			multiplier *= 60;
-			unit /= 60;
+		while (unit > 3600) {
+			multiplier *= 3600;
+			unit /= 3600;
 		}
+
+		double unitRounded = unit;
 
 		if (multiplier >= 3600) {
 
-			unit = //
-					//
-			unit >= 6 ? 24 : //
-					unit >= 1 ? 6 : //
-							1;
+			unitRounded = //
+			//
+			unitRounded >= 6 ? 24 : //
+					unitRounded >= 2 ? 12 : //
+							unitRounded >= 1 ? 6 : //
+									1;
 
 		} else {
 
-			unit = //
-					//
-			unit >= 60 ? 360 : //
-					unit >= 30 ? 120 : //
-							unit >= 10 ? 60 : //
-									unit >= 5 ? 30 : //
-											unit >= 2 ? 10 : //
-													5;
+			unitRounded = //
+			//
+			unitRounded >= 3600 ? 3600 * 6 : unitRounded >= 1800 ? 3600 * 3 : unitRounded >= 1200 ? 7200 : //
+					unitRounded >= 600 ? 3600 : //
+							unitRounded >= 300 ? 1800 : //
+									unitRounded >= 120 ? 600 : //
+											unitRounded >= 60 ? 300 : //
+													unitRounded >= 30 ? 180 : //
+															unitRounded >= 20 ? 60 : //
+																	unitRounded >= 10 ? 30 : //
+																			unitRounded >= 5 ? 20 : //
+																					unitRounded >= 2 ? 10 : //
+																							5;
 		}
 
-		final double majorUnit = unit * multiplier;
+		final long unitFinal = (long) (unitRounded * multiplier);
 
-//		System.out.println(UI.timeStampNano()
-//				+ ("\tunitValue " + unitValue)
-//				+ ("\tunit " + unit)
-//				+ ("\tmultiplier " + multiplier)
-//				+ ("\tmajorUnit " + majorUnit)
-//				+ "\n");
-//// TODO remove SYSTEM.OUT.PRINTLN
+//		System.out.println(UI.timeStampNano());
+//		System.out.println(UI.timeStampNano() + ("\tdefaultUnitValue\t" + defaultUnitValue));
+//		System.out.println(UI.timeStampNano() + ("\tunit\t\t\t" + unit));
+//		System.out.println(UI.timeStampNano() + ("\tunitRounded\t\t" + unitRounded));
+//		System.out.println(UI.timeStampNano() + ("\tunitFinal\t\t" + unitFinal));
+//		System.out.println(UI.timeStampNano() + ("\tmultiplier\t\t" + multiplier));
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
-		return (long) majorUnit;
+		return unitFinal;
 	}
 
 	public static long getValueScaling(final double graphUnit) {
@@ -643,49 +622,57 @@ public class Util {
 		float unit = defaultUnitValue;
 		int multiplier = 1;
 
-		while (unit > 120) {
-			multiplier *= 60;
-			unit /= 60;
+		while (unit > 3600) {
+			multiplier *= 3600;
+			unit /= 3600;
 		}
+
+		float unitRounded = unit;
 
 		if (multiplier >= 3600) {
 
 			// > 1h
 
-			unit = //
-					//
-			unit >= 24 ? 48 : //
-					unit >= 12 ? 24 : //
-							unit >= 6 ? 12 : //
-									unit >= 3 ? 6 : //
-											unit >= 2 ? 2 : //
+			unitRounded = //
+							//
+			unitRounded >= 24 ? 48 : //
+					unitRounded >= 12 ? 24 : //
+							unitRounded >= 6 ? 12 : //
+									unitRounded >= 3 ? 6 : //
+											unitRounded >= 2 ? 2 : //
 													1;
 
 		} else {
 
 			// <  1h
 
-			unit = //
-					//
-			unit >= 120 ? 240 : //
-					unit >= 60 ? 120 : //
-							unit >= 30 ? 60 : //
-									unit >= 15 ? 30 : //
-											unit >= 10 ? 15 : //
-													unit >= 5 ? 10 : //
-															unit >= 2 ? 5 : //
-																	1;
+			unitRounded = //
+							//
+			unitRounded >= 1800 ? 1800 : //
+					unitRounded >= 1200 ? 1200 : //
+							unitRounded >= 600 ? 600 : //
+									unitRounded >= 240 ? 300 : //
+											unitRounded >= 120 ? 120 : //
+													unitRounded >= 60 ? 60 : //
+															unitRounded >= 30 ? 30 : //
+																	unitRounded >= 10 ? 20 : //
+																			unitRounded >= 5 ? 10 : //
+																					unitRounded >= 2 ? 5 : //
+																							unitRounded > 1 ? 2 : //
+																									1;
 		}
 
-//		System.out.println(UI.timeStampNano()
-//				+ ("\tdefaultUnitValue " + defaultUnitValue)
-//				+ ("\tunit " + unit)
-//				+ ("\tmultiplier " + multiplier));
+		final long unitFinal = (long) (unitRounded * multiplier);
+
+//		System.out.println(UI.timeStampNano());
+//		System.out.println(UI.timeStampNano() + ("\tdefaultUnitValue\t" + defaultUnitValue));
+//		System.out.println(UI.timeStampNano() + ("\tunit\t\t\t" + unit));
+//		System.out.println(UI.timeStampNano() + ("\tunitRounded\t\t" + unitRounded));
+//		System.out.println(UI.timeStampNano() + ("\tunitFinal\t\t" + unitFinal));
+//		System.out.println(UI.timeStampNano() + ("\tmultiplier\t\t" + multiplier));
 //		// TODO remove SYSTEM.OUT.PRINTLN
 
-		unit *= multiplier;
-
-		return (long) unit;
+		return unitFinal;
 	}
 
 	/**
@@ -796,13 +783,7 @@ public class Util {
 			}
 		}
 
-//		System.out.println(unit + "\tmultiplier: " + multiplier);
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
 		unit *= multiplier;
-
-//		System.out.println(unit + "\t");
-//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		return (long) unit;
 	}

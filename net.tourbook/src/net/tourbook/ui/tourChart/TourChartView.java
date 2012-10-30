@@ -422,7 +422,11 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 				_mergedTour = ((TourPhotoSelection) selection).mergedTour;
 
 				if (_mergedTour.isHistoryTour()) {
+
 					updateChart(_mergedTour.getHistoryTourData());
+
+// each view selection fires the zoom out -> this is very horrorable
+//					_tourChart.zoomOut();
 				}
 			}
 

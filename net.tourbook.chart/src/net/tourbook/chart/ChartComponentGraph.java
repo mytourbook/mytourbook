@@ -1800,7 +1800,7 @@ public class ChartComponentGraph extends Canvas {
 			final ArrayList<Long> graphEndValues = historyTitle.graphEnd;
 			final ArrayList<String> titleTextList = historyTitle.titleText;
 
-			if (graphStartValues != null && graphEndValues != null && titleTextList != null) {
+			if (graphStartValues != null && titleTextList != null) {
 
 				final int xUnitTextPos = graphDrawingData.getTitleTextPosition();
 
@@ -1810,11 +1810,11 @@ public class ChartComponentGraph extends Canvas {
 					final long graphStart = graphStartValues.get(graphIndex);
 					final long graphEnd = graphEndValues.get(graphIndex);
 
-					final int devXSegmentStart = (int) (scaleX * graphStart - _xxDevViewPortLeftBorder);
-					final int devXSegmentEnd = (int) (scaleX * graphEnd - _xxDevViewPortLeftBorder);
+					final double devXSegmentStart = (scaleX * graphStart - _xxDevViewPortLeftBorder);
+					final double devXSegmentEnd = ((scaleX * graphEnd - _xxDevViewPortLeftBorder)) - 1.0;
 
-					final int devXSegmentLength = devXSegmentEnd - devXSegmentStart;
-					final int devXSegmentCenter = devXSegmentStart + (devXSegmentLength / 2);
+					final double devXSegmentLength = devXSegmentEnd - devXSegmentStart;
+					final double devXSegmentCenter = devXSegmentStart + (devXSegmentLength / 2);
 
 					final int devXTitleCenter = gc.textExtent(titleText).x / 2;
 					int devX;
@@ -1822,23 +1822,25 @@ public class ChartComponentGraph extends Canvas {
 
 						// draw between 2 units
 
-						devX = devXSegmentCenter - devXTitleCenter;
+						devX = (int) (devXSegmentCenter - devXTitleCenter);
 
 					} else {
 
 						// draw in the center of the tick
 
-						devX = devXSegmentStart - devXTitleCenter;
+						devX = (int) (devXSegmentStart - devXTitleCenter);
 					}
 
 					gc.drawText(titleText, devX, devYTitle, false);
 
 //					// debug: draw segments
 //					final int devYBottom = graphDrawingData.devGraphHeight;
+//
 //					gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-//					gc.drawLine(devXSegmentStart, 0, devXSegmentStart, devYBottom);
+//					gc.drawLine((int) devXSegmentStart, 0, (int) devXSegmentStart, devYBottom);
+//
 //					gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-//					gc.drawLine(devXSegmentEnd - 1, 0, devXSegmentEnd, devYBottom);
+//					gc.drawLine((int) devXSegmentEnd, 0, (int) devXSegmentEnd, devYBottom);
 				}
 			}
 

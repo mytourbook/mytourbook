@@ -637,10 +637,23 @@ public class ChartComponents extends Composite {
 		final long graphRightBorder = (long) ((devGraphXOffset + devVisibleWidth) / scaleX);
 
 		final ArrayList<ChartUnit> xUnits = graphDrawingData.getXUnits();
+		final ArrayList<ChartUnit> xUnitTitles = new ArrayList<ChartUnit>();
 
 		final ArrayList<Long> titleValueStart = historyTitle.graphStart = new ArrayList<Long>();
 		final ArrayList<Long> titleValueEnd = historyTitle.graphEnd = new ArrayList<Long>();
 		final ArrayList<String> titleText = historyTitle.titleText = new ArrayList<String>();
+
+		final DateTime graphTime = tourStartTime.plus(graphLeftBorder * 1000 + 1000);
+
+		final int graphSecondsOfDay = graphTime.getSecondOfDay();
+		final DateTime graphNextDay = graphTime.plus((DAY_IN_SECONDS - graphSecondsOfDay) * 1000);
+
+		System.out.println(UI.timeStampNano());
+		System.out.println(UI.timeStampNano() + " tourStartTime " + tourStartTime);
+		System.out.println(UI.timeStampNano() + " graphTime     " + graphTime);
+		System.out.println(UI.timeStampNano() + " graphNextDay  " + graphNextDay);
+		System.out.println(UI.timeStampNano());
+		// TODO remove SYSTEM.OUT.PRINTLN
 
 		if (isYearRounded) {
 
@@ -1012,27 +1025,17 @@ public class ChartComponents extends Composite {
 			graphDrawingData.setXUnitTextPos(GraphDrawingData.X_UNIT_TEXT_POS_LEFT);
 
 			final long graphUnit = Util.roundTime24h(graphDefaultUnit);
-			final long majorValue = Util.getMajorTimeValue24(graphUnit);
+			final long majorUnit = Util.getMajorTimeValue24(graphUnit);
 
 			final int startSeconds = tourStartTime.secondOfDay().get();
-			long startUnitOffset = startSeconds % graphUnit;
+			final long startUnitOffset = startSeconds % graphUnit;
 
 			// decrease min value when it does not fit to unit borders, !!! VERY IMPORTANT !!!
-//			final long graphMinRemainder = graphLeftBorder % graphUnit;
-			long graphValueStart = graphLeftBorder - graphLeftBorder % graphUnit;
+			final long graphValueStart = graphLeftBorder - graphLeftBorder % graphUnit;
 
 			final long graphMaxVisibleValue = graphRightBorder + graphUnit;
-
-//			System.out.println(UI.timeStampNano()
-//					+ (" graphUnit " + graphUnit)
-//					+ ("\ttourStartTime " + tourStartTime)
-//					+ ("\tstartSeconds " + startSeconds)
-//					+ ("\tstartUnitOffset " + startUnitOffset)
-//			//
-//					);
-//			// TODO remove SYSTEM.OUT.PRINTLN
-
 			long graphValue = graphValueStart;
+
 			while (graphValue <= graphMaxVisibleValue) {
 
 				// create unit value/label
@@ -1043,7 +1046,7 @@ public class ChartComponents extends Composite {
 
 				final String unitLabel = Util.format_hh_mm_ss_Optional(unitValue);
 
-				final boolean isMajorValue = unitValue % majorValue == 0;
+				final boolean isMajorValue = unitValue % majorUnit == 0;
 
 				xUnits.add(new ChartUnit(unitValueAdjusted, unitLabel, isMajorValue));
 
@@ -1051,91 +1054,66 @@ public class ChartComponents extends Composite {
 			}
 
 			/*
+			 * create dummy units before and after the real units that the title is displayed also
+			 * at the border, title is displayed between major units
+			 */
+
+			final int numberOfSmallUnits = (int) (majorUnit / graphUnit);
+			long titleUnitStart = (long) xUnits.get(0).value;
+
+			for (int unitIndex = numberOfSmallUnits; unitIndex > 0; unitIndex--) {
+
+				final long unitValueAdjusted = titleUnitStart - (graphUnit * unitIndex);// - startSeconds;
+
+				final long unitValue = (unitValueAdjusted + startSeconds) % DAY_IN_SECONDS;
+				final boolean isMajorValue = unitValue % majorUnit == 0;
+
+				final String unitLabel = Util.format_hh_mm_ss_Optional(unitValue);
+
+				xUnitTitles.add(new ChartUnit(unitValueAdjusted, unitLabel, isMajorValue));
+			}
+
+			xUnitTitles.addAll(xUnits);
+
+			titleUnitStart = (long) xUnitTitles.get(xUnitTitles.size() - 1).value;
+
+			for (int unitIndex = 1; unitIndex < numberOfSmallUnits * 1; unitIndex++) {
+
+				final long unitValueAdjusted = titleUnitStart + (graphUnit * unitIndex);// + startSeconds;
+
+				final long unitValue = (unitValueAdjusted + startSeconds) % DAY_IN_SECONDS;
+				final boolean isMajorValue = unitValue % majorUnit == 0;
+
+				final String unitLabel = Util.format_hh_mm_ss_Optional(unitValue);
+
+				xUnitTitles.add(new ChartUnit(unitValueAdjusted, unitLabel, isMajorValue));
+			}
+
+			/*
 			 * create title units
 			 */
-			{
+			long prevGraphUnitValue = Long.MIN_VALUE;
 
-				final DateTime timeLeftBorder = tourStartTime.plus(graphLeftBorder * 1000);
+			for (int unitIndex = 0; unitIndex < xUnitTitles.size(); unitIndex++) {
 
-				final int leftBorderSecondsOfDay = timeLeftBorder.getSecondOfDay();
-				final DateTime timeNextDay = timeLeftBorder.plus((DAY_IN_SECONDS - leftBorderSecondsOfDay) * 1000);
-				final DateTime timeFirstDay = timeNextDay.minus(DAY_IN_SECONDS * 1000);
+				final ChartUnit chartUnit = xUnitTitles.get(unitIndex);
+				if (chartUnit.isMajorValue) {
 
-				System.out.println(UI.timeStampNano());
-				System.out.println(UI.timeStampNano() + " tourStartTime  " + tourStartTime);
-				System.out.println(UI.timeStampNano() + " timeLeftBorder " + timeLeftBorder);
-				System.out.println(UI.timeStampNano() + " timeFirstDay   " + timeFirstDay);
-				System.out.println(UI.timeStampNano() + " timeNextDay    " + timeNextDay);
-				System.out.println(UI.timeStampNano());
-				// TODO remove SYSTEM.OUT.PRINTLN
+					final long currentGraphUnitValue = (long) chartUnit.value;
 
-				// get number of repeated labels for one day
-				final long dev1DayWidth = (long) (scaleX * DAY_IN_SECONDS);
-//				long repeatsForOneDays =  (long) (dev1DayWidth / devTitleVisibleUnit);
-				long repeatsForOneDay = dev1DayWidth / _devAllMonthLabelWidth;
-				if (repeatsForOneDay == 0) {
-					repeatsForOneDay = 1;
-				}
-//				final double devUnitRepeatWidth = (double) dev1DayWidth / repeatsForOneDays;
-//				final double graphRepeatedUnit = devUnitRepeatWidth / scaleX;
+					if (prevGraphUnitValue != Long.MIN_VALUE) {
 
-				final long graphTitleRemainder = graphLeftBorder % DAY_IN_SECONDS;
-				final long graphTitleLeftBorderDay = graphLeftBorder - graphTitleRemainder;
+						titleValueStart.add(prevGraphUnitValue);
+						titleValueEnd.add(currentGraphUnitValue - 1);
 
-//				if (repeatsForOneDays > 1) {
-//
-//					// more than 1 title for 1 day, advance start value to the left border
-//
-//					while (graphTitleValue < graphLeftBorder) {
-//						graphTitleValue += graphRepeatedUnit;
-//					}
-//
-//					graphTitleValue -= graphRepeatedUnit;
-//				}
+						final long graphDay = tourStartTime.getMillis() + prevGraphUnitValue * 1000;
 
-//				System.out.println(UI.timeStampNano()
-//						+ " repeatsForOneDays "
-//						+ repeatsForOneDays
-//						+ ("\tdevUnitRepeatWidth " + devUnitRepeatWidth)
-//						+ ("\tdev1DayWidth " + dev1DayWidth)
-//						+ ("\tgraphLeftBorder " + graphLeftBorder)
-//						+ ("\tgraphTitleValue " + graphValue)
-//				//
-//						);
-//				// TODO remove SYSTEM.OUT.PRINTLN
+						final String dayTitle = _dtFormatter.print(graphDay);
 
-				startUnitOffset = startSeconds % DAY_IN_SECONDS;
-
-				graphValueStart = graphLeftBorder - graphLeftBorder % DAY_IN_SECONDS;
-				graphValue = graphValueStart;
-
-				while (graphValue <= graphMaxVisibleValue) {
-
-					final long unitValueAdjusted = graphValue - startUnitOffset;
-
-					final long graphDay = tourStartTime.getMillis() + graphValue * 1000;
-
-					final String dayTitle = _dtFormatter.print(graphDay);
-
-					titleValueStart.add(unitValueAdjusted);
-					titleValueEnd.add(unitValueAdjusted + DAY_IN_SECONDS - 1);
-
-					titleText.add(dayTitle);
-
-					if (repeatsForOneDay == 1) {
-
-						// 1 title for 1 day
-
-					} else {
-
-						// more than 1 title for 1 day
-
+						titleText.add(dayTitle);
 					}
 
-					System.out.println(UI.timeStampNano() + " graphDay " + graphDay);
-					// TODO remove SYSTEM.OUT.PRINTLN
-
-					graphValue += DAY_IN_SECONDS;
+					prevGraphUnitValue = currentGraphUnitValue;
 				}
 			}
 		}
@@ -1144,18 +1122,26 @@ public class ChartComponents extends Composite {
 //			System.out.println(UI.timeStampNano() + " \t" + xUnit);
 //			// TODO remove SYSTEM.OUT.PRINTLN
 //		}
-
-		for (int unitIndex = 0; unitIndex < titleText.size(); unitIndex++) {
-
-			System.out.println(UI.timeStampNano()
-					+ "\t"
-					+ titleText.get(unitIndex)
-					+ "\t"
-					+ titleValueStart.get(unitIndex)
-					+ "\t"
-					+ titleValueEnd.get(unitIndex));
-			// TODO remove SYSTEM.OUT.PRINTLN
-		}
+//
+//		System.out.println(UI.timeStampNano() + " \t");
+//
+//		for (final ChartUnit xUnit : xUnitTitles) {
+//			System.out.println(UI.timeStampNano() + " \t" + xUnit);
+//			// TODO remove SYSTEM.OUT.PRINTLN
+//		}
+//
+//		for (int unitIndex = 0; unitIndex < titleText.size(); unitIndex++) {
+//
+//			System.out.println(UI.timeStampNano()
+//					+ ("\t" + titleText.get(unitIndex))
+//					+ ("\t" + (long) ((long) (titleValueStart.get(unitIndex) * scaleX) - devGraphXOffset))
+//					+ ("\t" + (long) ((long) (titleValueEnd.get(unitIndex) * scaleX) - devGraphXOffset))
+//					+ ("\t" + titleValueStart.get(unitIndex))
+//					+ ("\t" + titleValueEnd.get(unitIndex))
+//			//
+//					);
+//			// TODO remove SYSTEM.OUT.PRINTLN
+//		}
 	}
 
 	private void createDrawingData_X_Month(final GraphDrawingData drawingData) {
