@@ -35,8 +35,6 @@ import org.eclipse.swt.widgets.Event;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.PeriodFormatter;
-import org.joda.time.format.PeriodFormatterBuilder;
 
 /**
  * Chart widget which represents the chart ui The chart consists of these components
@@ -200,21 +198,6 @@ public class ChartComponents extends Composite {
 	 * this error message is displayed instead of the chart when it's not <code>null</code>
 	 */
 	String							errorMessage;
-
-	private final PeriodFormatter	_durationFormatter			= new PeriodFormatterBuilder()
-																		.appendYears()
-																		.appendSuffix(" Y ", " Ys ") //$NON-NLS-1$ //$NON-NLS-2$
-																		.appendMonths()
-																		.appendSuffix(" M ", " Ms ") //$NON-NLS-1$ //$NON-NLS-2$
-																		.appendDays()
-																		.appendSuffix(" D ", " Ds ") //$NON-NLS-1$ //$NON-NLS-2$
-																		.appendHours()
-																		.appendSuffix(" hour ", " hours ") //$NON-NLS-1$ //$NON-NLS-2$
-																		.appendMinutes()
-																		.appendSuffix(" min ", " mins ") //$NON-NLS-1$ //$NON-NLS-2$
-																		.appendSeconds()
-																		.appendSuffix(" sec ", " secs ") //$NON-NLS-1$ //$NON-NLS-2$
-																		.toFormatter();
 
 	private final DateTimeFormatter	_dtFormatter				= DateTimeFormat.forStyle("M-");	//$NON-NLS-1$
 
@@ -576,9 +559,9 @@ public class ChartComponents extends Composite {
 		final double dev1Year = scaleX * YEAR_IN_SECONDS;
 		final double dev1Month = scaleX * MONTH_IN_SECONDS;
 
-		System.out.println(UI.timeStampNano() + " \t");
-		System.out.println(UI.timeStampNano() + " createDrawingData_X_History\t" + " start: " + tourStartTime);
-		// TODO remove SYSTEM.OUT.PRINTLN
+//		System.out.println(UI.timeStampNano() + " \t");
+//		System.out.println(UI.timeStampNano() + " createDrawingData_X_History\t" + " start: " + tourStartTime);
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		final double devTitleVisibleUnit = _devAllMonthLabelWidth * 1.2;
 
@@ -630,7 +613,6 @@ public class ChartComponents extends Composite {
 		xData.setUnitLabel(UI.EMPTY_STRING);
 
 		final double devGraphXOffset = componentGraph.getXXDevViewPortLeftBorder();
-		final long devVirtualGraphWidth = componentGraph.getXXDevGraphWidth();
 		final int devVisibleWidth = getDevVisibleChartWidth();
 
 		final long graphLeftBorder = (long) (devGraphXOffset / scaleX);
@@ -643,17 +625,24 @@ public class ChartComponents extends Composite {
 		final ArrayList<Long> titleValueEnd = historyTitle.graphEnd = new ArrayList<Long>();
 		final ArrayList<String> titleText = historyTitle.titleText = new ArrayList<String>();
 
-		final DateTime graphTime = tourStartTime.plus(graphLeftBorder * 1000 + 1000);
+		final boolean isTimeSerieWithTimeZoneAdjustment = xData.isTimeSerieWithTimeZoneAdjustment();
 
-		final int graphSecondsOfDay = graphTime.getSecondOfDay();
-		final DateTime graphNextDay = graphTime.plus((DAY_IN_SECONDS - graphSecondsOfDay) * 1000);
-
-		System.out.println(UI.timeStampNano());
-		System.out.println(UI.timeStampNano() + " tourStartTime " + tourStartTime);
-		System.out.println(UI.timeStampNano() + " graphTime     " + graphTime);
-		System.out.println(UI.timeStampNano() + " graphNextDay  " + graphNextDay);
-		System.out.println(UI.timeStampNano());
-		// TODO remove SYSTEM.OUT.PRINTLN
+//		DateTime graphTime = tourStartTime.plus(graphLeftBorder * 1000);
+//		if (isTimeSerieWithTimeZoneAdjustment) {
+//			if (graphTime.getMillis() > UI.beforeCET) {
+//				graphTime = graphTime.minus(UI.BERLIN_HISTORY_ADJUSTMENT * 1000);
+//			}
+//		}
+//
+////		final int graphSecondsOfDay = graphTime.getSecondOfDay();
+////		final DateTime graphNextDay = graphTime.plus((DAY_IN_SECONDS - graphSecondsOfDay) * 1000);
+//
+//		System.out.println(UI.timeStampNano());
+//		System.out.println(UI.timeStampNano() + " tourStartTime " + tourStartTime);
+//		System.out.println(UI.timeStampNano() + " graphTime     " + graphTime);
+////		System.out.println(UI.timeStampNano() + " graphNextDay  " + graphNextDay);
+//		System.out.println(UI.timeStampNano());
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		if (isYearRounded) {
 
@@ -661,8 +650,8 @@ public class ChartComponents extends Composite {
 			 * create units for rounded years
 			 */
 
-			System.out.println(UI.timeStampNano() + "\trounded years\t");
-			// TODO remove SYSTEM.OUT.PRINTLN
+//			System.out.println(UI.timeStampNano() + "\trounded years\t");
+//			// TODO remove SYSTEM.OUT.PRINTLN
 
 			graphDrawingData.setXUnitTextPos(GraphDrawingData.X_UNIT_TEXT_POS_LEFT);
 
@@ -741,8 +730,8 @@ public class ChartComponents extends Composite {
 			 * create units for year/month
 			 */
 
-			System.out.println(UI.timeStampNano() + "\tyear/month\t");
-			// TODO remove SYSTEM.OUT.PRINTLN
+//			System.out.println(UI.timeStampNano() + "\tyear/month\t");
+//			// TODO remove SYSTEM.OUT.PRINTLN
 
 			graphDrawingData.setTitleTextPos(GraphDrawingData.X_UNIT_TEXT_POS_CENTER);
 			graphDrawingData.setXUnitTextPos(GraphDrawingData.X_UNIT_TEXT_POS_CENTER);
@@ -874,8 +863,8 @@ public class ChartComponents extends Composite {
 			 * create units for month/day
 			 */
 
-			System.out.println(UI.timeStampNano() + "\tmonth/day");
-			// TODO remove SYSTEM.OUT.PRINTLN
+//			System.out.println(UI.timeStampNano() + "\tmonth/day");
+//			// TODO remove SYSTEM.OUT.PRINTLN
 
 			graphDrawingData.setTitleTextPos(GraphDrawingData.X_UNIT_TEXT_POS_CENTER);
 
@@ -1018,8 +1007,8 @@ public class ChartComponents extends Composite {
 			 * create units for day/seconds
 			 */
 
-			System.out.println(UI.timeStampNano() + " day/seconds");
-			// TODO remove SYSTEM.OUT.PRINTLN
+//			System.out.println(UI.timeStampNano() + " day/seconds");
+//			// TODO remove SYSTEM.OUT.PRINTLN
 
 			graphDrawingData.setTitleTextPos(GraphDrawingData.X_UNIT_TEXT_POS_CENTER);
 			graphDrawingData.setXUnitTextPos(GraphDrawingData.X_UNIT_TEXT_POS_LEFT);
@@ -1036,6 +1025,9 @@ public class ChartComponents extends Composite {
 			final long graphMaxVisibleValue = graphRightBorder + graphUnit;
 			long graphValue = graphValueStart;
 
+			/*
+			 * create x-axis units
+			 */
 			while (graphValue <= graphMaxVisibleValue) {
 
 				// create unit value/label
@@ -1063,7 +1055,7 @@ public class ChartComponents extends Composite {
 
 			for (int unitIndex = numberOfSmallUnits; unitIndex > 0; unitIndex--) {
 
-				final long unitValueAdjusted = titleUnitStart - (graphUnit * unitIndex);// - startSeconds;
+				final long unitValueAdjusted = titleUnitStart - (graphUnit * unitIndex);
 
 				final long unitValue = (unitValueAdjusted + startSeconds) % DAY_IN_SECONDS;
 				final boolean isMajorValue = unitValue % majorUnit == 0;
@@ -1079,7 +1071,7 @@ public class ChartComponents extends Composite {
 
 			for (int unitIndex = 1; unitIndex < numberOfSmallUnits * 1; unitIndex++) {
 
-				final long unitValueAdjusted = titleUnitStart + (graphUnit * unitIndex);// + startSeconds;
+				final long unitValueAdjusted = titleUnitStart + (graphUnit * unitIndex);
 
 				final long unitValue = (unitValueAdjusted + startSeconds) % DAY_IN_SECONDS;
 				final boolean isMajorValue = unitValue % majorUnit == 0;
@@ -1106,7 +1098,14 @@ public class ChartComponents extends Composite {
 						titleValueStart.add(prevGraphUnitValue);
 						titleValueEnd.add(currentGraphUnitValue - 1);
 
-						final long graphDay = tourStartTime.getMillis() + prevGraphUnitValue * 1000;
+						long graphDay = tourStartTime.getMillis() + prevGraphUnitValue * 1000;
+
+						if (isTimeSerieWithTimeZoneAdjustment) {
+
+							if (graphDay > UI.beforeCET) {
+								graphDay -= UI.BERLIN_HISTORY_ADJUSTMENT * 1000;
+							}
+						}
 
 						final String dayTitle = _dtFormatter.print(graphDay);
 
@@ -1118,12 +1117,13 @@ public class ChartComponents extends Composite {
 			}
 		}
 
+//		System.out.println(UI.timeStampNano() + " \t");
+//
 //		for (final ChartUnit xUnit : xUnits) {
 //			System.out.println(UI.timeStampNano() + " \t" + xUnit);
 //			// TODO remove SYSTEM.OUT.PRINTLN
 //		}
 //
-//		System.out.println(UI.timeStampNano() + " \t");
 //
 //		for (final ChartUnit xUnit : xUnitTitles) {
 //			System.out.println(UI.timeStampNano() + " \t" + xUnit);

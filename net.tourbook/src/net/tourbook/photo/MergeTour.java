@@ -94,6 +94,7 @@ public class MergeTour {
 		_historyTourData.setupHistoryTour();
 
 		_historyTimeSerie = new TLongArrayList();
+		_historyTimeSerie.add(tourStartTime);
 	}
 
 	/**
@@ -199,8 +200,17 @@ public class MergeTour {
 		/*
 		 * create time data list for all time slices which contains photos
 		 */
+		long prevTimeSliceTime = Long.MIN_VALUE;
 		for (final long timeSliceTime : historyTimeSerie) {
+
+			// skip duplicates
+			if (timeSliceTime == prevTimeSliceTime) {
+				continue;
+			}
+
 			addTimeSlice(historySlices, timeSliceTime);
+
+			prevTimeSliceTime = timeSliceTime;
 		}
 
 		/*

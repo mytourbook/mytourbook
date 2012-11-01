@@ -80,6 +80,8 @@ public class ChartDataXSerie extends ChartDataSerie {
 	 */
 	private DateTime		_startDateTime;
 
+	private boolean			_timeSerieWithTimeZoneAdjustment;
+
 	public ChartDataXSerie(final double[] values) {
 		setMinMaxValues(new double[][] { values });
 	}
@@ -155,12 +157,20 @@ public class ChartDataXSerie extends ChartDataSerie {
 		return _synchMarkerStartIndex;
 	}
 
+	public boolean isTimeSerieWithTimeZoneAdjustment() {
+		return _timeSerieWithTimeZoneAdjustment;
+	}
+
 	public void setChartSegments(final ChartSegments chartSegments) {
 		_chartSegments = chartSegments;
 	}
 
 	public void setHistoryTitle(final HistoryTitle historyTitle) {
 		_historyTitle = historyTitle;
+	}
+
+	public void setIsTimeSerieWithTimeZoneAdjustment(final boolean timeSerieWithTimeZoneAdjustment) {
+		_timeSerieWithTimeZoneAdjustment = timeSerieWithTimeZoneAdjustment;
 	}
 
 	private void setMinMaxValues(final double[][] valueSeries) {
@@ -262,5 +272,9 @@ public class ChartDataXSerie extends ChartDataSerie {
 	@Override
 	public String toString() {
 		return "[ChartDataXSerie]";//$NON-NLS-1$
+	}
+
+	public void xxxset_timeSerieWithCETAdjustment(final boolean _timeSerieWithCETAdjustment) {
+		this._timeSerieWithTimeZoneAdjustment = _timeSerieWithCETAdjustment;
 	}
 }

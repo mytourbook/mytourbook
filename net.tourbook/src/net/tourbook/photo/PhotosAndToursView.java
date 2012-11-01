@@ -148,11 +148,6 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 	private ActionModifyColumns						_actionModifyColumns;
 	private ColumnManager							_columnManager;
 
-	/*
-	 * measurement unit values
-	 */
-//	private float									_unitValueAltitude;
-
 	private final PeriodFormatter					_durationFormatter				= new PeriodFormatterBuilder()
 																							.appendYears()
 																							.appendSuffix("y ", "y ") //$NON-NLS-1$ //$NON-NLS-2$
@@ -895,7 +890,6 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 					cell.setText(UI.EMPTY_STRING);
 				} else {
 					cell.setText(period.toString(_durationFormatter));
-//					cell.setText(period.toString());
 				}
 			}
 		});

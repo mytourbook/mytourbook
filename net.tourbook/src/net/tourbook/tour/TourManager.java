@@ -1671,7 +1671,7 @@ public class TourManager {
 		/*
 		 * time
 		 */
-		final ChartDataXSerie xDataTime = new ChartDataXSerie(tourData.getTimeSerieDouble());
+		final ChartDataXSerie xDataTime = new ChartDataXSerie(tourData.getTimeSerieWithTimeZoneAdjusted());
 		xDataTime.setLabel(Messages.tour_editor_label_time);
 		xDataTime.setUnitLabel(Messages.tour_editor_label_time_unit);
 		xDataTime.setDefaultRGB(new RGB(0, 0, 0));
@@ -1703,25 +1703,22 @@ public class TourManager {
 				chartDataModel.addXyData(xDataDistance);
 			}
 
+			final DateTime tourStartTime = tourData.getTourStartTime();
+
+			// set date/time when x-axis starts
+			xDataTime.setStartDateTime(tourStartTime);
+
 			/*
 			 * when time is displayed, the x-axis can show the start time starting from 0 or from
 			 * the current time of the day
 			 */
-			final int startTime;
-			if (tourChartConfig.isShowStartTime) {
+			final int tourTimeOfDay = (tourStartTime.getHourOfDay() * 3600)
+					+ (tourStartTime.getMinuteOfHour() * 60)
+					+ tourStartTime.getSecondOfMinute();
 
-				final DateTime start = tourData.getTourStartTime();
+			xDataTime.setStartValue(tourChartConfig.isShowStartTime ? tourTimeOfDay : 0);
 
-				startTime = (start.getHourOfDay() * 3600) + (start.getMinuteOfHour() * 60) + start.getSecondOfMinute();
-
-			} else {
-				startTime = 0;
-			}
-
-			xDataTime.setStartValue(startTime);
-
-			// set date/time when x-axis starts
-			xDataTime.setStartDateTime(tourData.getTourStartTime());
+			xDataTime.setIsTimeSerieWithTimeZoneAdjustment(tourData.isTimeSerieWithTimeZoneAdjustment());
 
 		} else {
 
@@ -2130,7 +2127,6 @@ public class TourManager {
 		}
 
 		if (isHistorySerie) {
-
 
 			chartDataModel.setChartType(ChartDataModel.CHART_TYPE_HISTORY);
 

@@ -46,6 +46,8 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Sash;
 import org.epics.css.dal.Timestamp;
 import org.epics.css.dal.Timestamp.Format;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 public class UI {
 
@@ -126,6 +128,19 @@ public class UI {
 	 * layout hint for a description field
 	 */
 	public static final int				DEFAULT_DESCRIPTION_WIDTH		= 350;
+
+	/*
+	 * SET_FORMATTING_OFF
+	 */
+	public	static final long beforeCET		= new DateTime(1893, 4, 1, 0, 0, 0, DateTimeZone.UTC).getMillis();
+	public	static final long afterCETBegin	= new DateTime(1893, 4, 1, 0, 6, 32, DateTimeZone.UTC).getMillis();
+	/*
+	 * SET_FORMATTING_ON
+	 */
+
+	public static final int				BERLIN_HISTORY_ADJUSTMENT		= 6 * 60 + 32;
+
+	public static final int				DAY_IN_SECONDS					= 24 * 60 * 60;
 
 	/*
 	 * image keys for images which are stored in the image registry

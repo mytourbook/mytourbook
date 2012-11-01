@@ -87,6 +87,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 import org.hibernate.annotations.Cascade;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 /**
  * Tour data contains all data for a tour (except markers), an entity will be saved in the database
@@ -164,14 +165,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	// ############################################# DATE #############################################
 
 	/**
-	 * Tour start time in ms
+	 * Tour start time in milliseconds since 1970-01-01T00:00:00Z
 	 * 
 	 * @since DB version 22
 	 */
 	private long											tourStartTime;
 
 	/**
-	 * Tour end time in ms, this value should be {@link #tourStartTime} + {@link #tourEndTime}
+	 * Tour end time in milliseconds since 1970-01-01T00:00:00Z
 	 * 
 	 * @since DB version 22
 	 */
@@ -1001,11 +1002,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public long[]											timeSerieHistory;
 
 	/**
-	 * Time in double precicion that x-axis values are displayed at the correct position, this is no
-	 * the case when max chart pixels are 1000000000
+	 * Time in double precicion that x-axis values are displayed at the correct position, this is
+	 * not the case when max chart pixels is 1'000'000'000 with floating point.
 	 */
 	@Transient
 	private double[]										timeSerieHistoryDouble;
+
+	/**
+	 * Contains adjusted time serie when tour is overlapping 1. April 1893. There was a time shift
+	 * of 6:32 minutes when CET (Central European Time) was born.
+	 */
+	@Transient
+	private double[]										timeSerieWithTimeZoneAdjustment;
 
 	public TourData() {}
 
@@ -1183,6 +1191,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 
 		timeSerieDouble = null;
+		timeSerieWithTimeZoneAdjustment = null;
 		distanceSerieDouble = null;
 		distanceSerieDoubleImperial = null;
 
@@ -4726,6 +4735,68 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return timeSerieDouble;
 	}
 
+	/**
+	 * @return Returns time data serie in floating points which is used for drawing charts. Time
+	 *         serie is adjusted to the time shift 6:32 when CET (central european time) started at
+	 *         1. April 1893.
+	 */
+	public double[] getTimeSerieWithTimeZoneAdjusted() {
+
+		if (timeSerieWithTimeZoneAdjustment != null) {
+			return timeSerieWithTimeZoneAdjustment;
+		}
+
+		if (timeSerie == null && timeSerieHistory == null) {
+			return null;
+		}
+
+		final DateTime tourStartDefaultZone = getTourStartTime();
+		final int utcZoneOffset = tourStartDefaultZone.getZone().getOffset(tourStartDefaultZone.getMillis());
+
+		final long tourStartUTC = tourStartDefaultZone.getMillis() + utcZoneOffset;
+		final long tourEnd = tourEndTime;
+
+		final DateTimeZone defaultZone = DateTimeZone.getDefault();
+
+		if (defaultZone.getID().equals("Europe/Berlin")) {
+
+			if (tourStartUTC < net.tourbook.common.UI.beforeCET && tourEnd > net.tourbook.common.UI.afterCETBegin) {
+
+				// tour overlaps CET begin
+
+				if (timeSerie != null) {
+
+					timeSerieWithTimeZoneAdjustment = new double[timeSerie.length];
+
+					for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
+						timeSerieWithTimeZoneAdjustment[serieIndex] = timeSerie[serieIndex];
+					}
+
+				} else if (timeSerieHistory != null) {
+
+					timeSerieWithTimeZoneAdjustment = new double[timeSerieHistory.length];
+
+					for (int serieIndex = 0; serieIndex < timeSerieHistory.length; serieIndex++) {
+
+						long historyTimeSlice = timeSerieHistory[serieIndex];
+
+						final long absoluteUTCTime = tourStartUTC + historyTimeSlice * 1000;
+
+						if (absoluteUTCTime > net.tourbook.common.UI.beforeCET) {
+							historyTimeSlice += net.tourbook.common.UI.BERLIN_HISTORY_ADJUSTMENT;
+						}
+
+						timeSerieWithTimeZoneAdjustment[serieIndex] = historyTimeSlice;
+					}
+				}
+
+				return timeSerieWithTimeZoneAdjustment;
+			}
+		}
+
+		return getTimeSerieDouble();
+	}
+
 	public int getTourAltDown() {
 		return tourAltDown;
 	}
@@ -5071,6 +5142,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		} else {
 			return true;
 		}
+	}
+
+	public boolean isTimeSerieWithTimeZoneAdjustment() {
+
+		if (timeSerieWithTimeZoneAdjustment == null) {
+			// build time serie with time zone dataserie
+			getTimeSerieWithTimeZoneAdjusted();
+		}
+
+		return timeSerieWithTimeZoneAdjustment != null;
 	}
 
 	public boolean isTourImportFilePathAvailable() {

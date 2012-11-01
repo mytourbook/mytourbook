@@ -1156,7 +1156,7 @@ public class TourChart extends Chart {
 		// set value serie for the x-axis
 		double[] xAxisSerie = null;
 		xAxisSerie = _tourChartConfig.isShowTimeOnXAxis //
-				? _tourData.getTimeSerieDouble()
+				? _tourData.getTimeSerieWithTimeZoneAdjusted()
 				: _tourData.getDistanceSerieDouble();
 
 		long timeSliceEnd;

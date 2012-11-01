@@ -49,8 +49,12 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.joda.time.DateTime;
+import org.joda.time.Period;
+import org.joda.time.PeriodType;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.PeriodFormatter;
+import org.joda.time.format.PeriodFormatterBuilder;
 
 public class TourInfoUI {
 
@@ -63,7 +67,11 @@ public class TourInfoUI {
 
 	private final DateTimeFormatter		_dateFormatter			= DateTimeFormat.fullDate();
 	private final DateTimeFormatter		_timeFormatter			= DateTimeFormat.mediumTime();
-	private final DateTimeFormatter		_dtFormatter			= DateTimeFormat.mediumDateTime();
+	private final DateTimeFormatter		_dtFormatterCreated		= DateTimeFormat.mediumDateTime();
+
+	private final DateTimeFormatter		_dtHistoryFormatter		= DateTimeFormat.forStyle("FM");	//$NON-NLS-1$
+//	private final DateTimeFormatter		_dtWeekday				= DateTimeFormat.forPattern("E");	//$NON-NLS-1$
+
 	private final NumberFormat			_nf1					= NumberFormat.getInstance();
 	private final NumberFormat			_nf3					= NumberFormat.getInstance();
 
@@ -73,6 +81,23 @@ public class TourInfoUI {
 		_nf3.setMinimumFractionDigits(3);
 		_nf3.setMaximumFractionDigits(3);
 	}
+
+	private static PeriodType			_tourPeriodTemplate		= PeriodType.yearMonthDayTime()
+																// hide these components
+																		.withMinutesRemoved()
+																		.withSecondsRemoved()
+																		.withMillisRemoved();
+
+	private final PeriodFormatter		_durationFormatter		= new PeriodFormatterBuilder()
+																		.appendYears()
+																		.appendSuffix("y ", "y ") //$NON-NLS-1$ //$NON-NLS-2$
+																		.appendMonths()
+																		.appendSuffix("m ", "m ") //$NON-NLS-1$ //$NON-NLS-2$
+																		.appendDays()
+																		.appendSuffix("d ", "d ") //$NON-NLS-1$ //$NON-NLS-2$
+																		.appendHours()
+																		.appendSuffix("h ", "h ") //$NON-NLS-1$ //$NON-NLS-2$
+																		.toFormatter();
 
 	private boolean						_hasTourType;
 	private boolean						_hasWeather;
@@ -106,6 +131,9 @@ public class TourInfoUI {
 	private Label						_lblRecordingTime;
 	private Label						_lblMovingTime;
 	private Label						_lblBreakTime;
+	private Label						_lblRecordingTimeHour;
+	private Label						_lblMovingTimeHour;
+	private Label						_lblBreakTimeHour;
 
 	private Label						_lblWindSpeed;
 	private Label						_lblWindSpeedUnit;
@@ -338,10 +366,10 @@ public class TourInfoUI {
 			_lblRecordingTime = createUILabelValue(container, SWT.TRAIL);
 			_secondColumnControls.add(_lblRecordingTime);
 
-			label = createUILabel(container, Messages.Tour_Tooltip_Label_Hour);
+			_lblRecordingTimeHour = createUILabel(container, Messages.Tour_Tooltip_Label_Hour);
 
 			// force this column to take the rest of the space
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblRecordingTimeHour);
 
 			/*
 			 * moving time
@@ -352,7 +380,7 @@ public class TourInfoUI {
 			_lblMovingTime = createUILabelValue(container, SWT.TRAIL);
 			_secondColumnControls.add(_lblMovingTime);
 
-			createUILabel(container, Messages.Tour_Tooltip_Label_Hour);
+			_lblMovingTimeHour = createUILabel(container, Messages.Tour_Tooltip_Label_Hour);
 
 			/*
 			 * break time
@@ -363,7 +391,7 @@ public class TourInfoUI {
 			_lblBreakTime = createUILabelValue(container, SWT.TRAIL);
 			_secondColumnControls.add(_lblBreakTime);
 
-			createUILabel(container, Messages.Tour_Tooltip_Label_Hour);
+			_lblBreakTimeHour = createUILabel(container, Messages.Tour_Tooltip_Label_Hour);
 
 			// ----------------- spacer ----------------
 			label = createUILabel(container, null);
@@ -677,8 +705,7 @@ public class TourInfoUI {
 				createUILabel(containerCreated, Messages.Tour_Tooltip_Label_DateTimeCreated);
 
 				_lblDateTimeCreatedValue = createUILabelValue(containerCreated, SWT.LEAD);
-				GridDataFactory.fillDefaults()//
-						.applyTo(_lblDateTimeCreatedValue);
+				GridDataFactory.fillDefaults().applyTo(_lblDateTimeCreatedValue);
 			}
 
 			final Composite containerModified = new Composite(container, SWT.NONE);
@@ -856,33 +883,65 @@ public class TourInfoUI {
 		final DateTime dtTourStart = _tourData.getTourStartTime();
 		final DateTime dtTourEnd = dtTourStart.plus(recordingTime * 1000);
 
-		_lblDate.setText(String.format(//
-				Messages.Tour_Tooltip_Format_DateWeekTime,
-				_dateFormatter.print(dtTourStart.getMillis()),
-				_timeFormatter.print(dtTourStart.getMillis()),
-				_timeFormatter.print(dtTourEnd.getMillis()),
-				dtTourStart.getWeekOfWeekyear()));
+		final boolean isHistory = recordingTime < net.tourbook.common.UI.DAY_IN_SECONDS;
 
-		_lblRecordingTime.setText(String.format(
-				Messages.Tour_Tooltip_Format_Date,
-				recordingTime / 3600,
-				(recordingTime % 3600) / 60,
-				(recordingTime % 3600) % 60)//
-				);
+		if (isHistory) {
 
-		_lblMovingTime.setText(String.format(
-				Messages.Tour_Tooltip_Format_Date,
-				movingTime / 3600,
-				(movingTime % 3600) / 60,
-				(movingTime % 3600) % 60)//
-				);
+			// < 1 day
 
-		_lblBreakTime.setText(String.format(
-				Messages.Tour_Tooltip_Format_Date,
-				breakTime / 3600,
-				(breakTime % 3600) / 60,
-				(breakTime % 3600) % 60)//
-				);
+			_lblDate.setText(String.format(//
+					Messages.Tour_Tooltip_Format_DateWeekTime,
+					_dateFormatter.print(dtTourStart.getMillis()),
+					_timeFormatter.print(dtTourStart.getMillis()),
+					_timeFormatter.print(dtTourEnd.getMillis()),
+					dtTourStart.getWeekOfWeekyear()));
+
+			_lblRecordingTimeHour.setVisible(true);
+			_lblMovingTimeHour.setVisible(true);
+			_lblBreakTimeHour.setVisible(true);
+
+			_lblRecordingTime.setText(String.format(
+					Messages.Tour_Tooltip_Format_Date,
+					recordingTime / 3600,
+					(recordingTime % 3600) / 60,
+					(recordingTime % 3600) % 60)//
+					);
+
+			_lblMovingTime.setText(String.format(
+					Messages.Tour_Tooltip_Format_Date,
+					movingTime / 3600,
+					(movingTime % 3600) / 60,
+					(movingTime % 3600) % 60)//
+					);
+
+			_lblBreakTime.setText(String.format(
+					Messages.Tour_Tooltip_Format_Date,
+					breakTime / 3600,
+					(breakTime % 3600) / 60,
+					(breakTime % 3600) % 60)//
+					);
+
+		} else {
+
+			// > 1 day
+
+			_lblDate.setText(String.format(//
+					Messages.Tour_Tooltip_Format_HistoryDateTime,
+					_dtHistoryFormatter.print(dtTourStart.getMillis()),
+					_dtHistoryFormatter.print(dtTourEnd.getMillis())
+			//
+					));
+
+			_lblRecordingTimeHour.setVisible(false);
+			_lblMovingTimeHour.setVisible(false);
+			_lblBreakTimeHour.setVisible(false);
+
+			final Period tourPeriod = new Period(dtTourStart, dtTourEnd, _tourPeriodTemplate);
+
+			_lblRecordingTime.setText(tourPeriod.toString(_durationFormatter));
+			_lblMovingTime.setText(UI.EMPTY_STRING);
+			_lblBreakTime.setText(UI.EMPTY_STRING);
+		}
 
 		int windSpeed = _tourData.getWeatherWindSpeed();
 		windSpeed = (int) (windSpeed / UI.UNIT_VALUE_DISTANCE);
@@ -960,7 +1019,7 @@ public class TourInfoUI {
 
 			_lblDateTimeCreatedValue.setText(_uiDtCreated == null ? //
 					UI.EMPTY_STRING
-					: _dtFormatter.print(_uiDtCreated.getMillis()));
+					: _dtFormatterCreated.print(_uiDtCreated.getMillis()));
 		}
 
 		// date/time modified
@@ -968,7 +1027,7 @@ public class TourInfoUI {
 
 			_lblDateTimeModifiedValue.setText(_uiDtModified == null ? //
 					UI.EMPTY_STRING
-					: _dtFormatter.print(_uiDtModified.getMillis()));
+					: _dtFormatterCreated.print(_uiDtModified.getMillis()));
 		}
 	}
 }
