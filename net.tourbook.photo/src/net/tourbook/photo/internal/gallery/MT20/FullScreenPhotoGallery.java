@@ -91,8 +91,7 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 	private Spinner					_spinnerResizeImage;
 
 	private Control					_galleryContainer;
-
-//	private Control					_photoGalleryControl;
+	private Composite				_containerFooter;
 
 	/**
 	 * This listener is added to ALL widgets within the tooltip shell.
@@ -307,7 +306,7 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 	 * Add listener to all controls
 	 * <p>
 	 * ########################### Recursive #########################################<br>
-	 *
+	 * 
 	 * @param control
 	 */
 	private void addListenerToAllControls(final Control control) {
@@ -378,8 +377,8 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+		GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, 0).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 		{
 
 			_photoGallery = new PhotoGallery();
@@ -399,6 +398,8 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 			_photoGallery.setShowOtherShellActions(false);
 
 			createUI_20_ActionBar(_photoGallery.getCustomActionBarContainer());
+
+			createUI_30_Footer(container);
 		}
 
 		fillActionBar();
@@ -457,6 +458,24 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 			});
 
 		}
+	}
+
+	private void createUI_30_Footer(final Composite parent) {
+
+		_containerFooter = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(_containerFooter);
+		GridLayoutFactory.fillDefaults()//
+				.numColumns(1)
+				.spacing(0, 0)
+				.extendedMargins(0, 0, 5, 0)
+				.applyTo(_containerFooter);
+//		_containerFooter.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+		{
+//			final Label label = new Label(_containerFooter, SWT.NONE);
+//			GridDataFactory.fillDefaults().applyTo(label);
+//			label.setText("Madlkfjasljdfasjdflasf");
+		}
+
 	}
 
 	private void fillActionBar() {
@@ -572,7 +591,7 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 
 	/**
 	 * Set shell size from gallery size.
-	 *
+	 * 
 	 * @param imageSize
 	 */
 	private void setGallerySize(final int imageSize) {
@@ -675,10 +694,9 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 
 		final Color noFocusSelectionFgColor = Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND);
 
-//		tree.setForeground(fgColor);
-//		tree.setBackground(bgColor);
-
 		_photoGallery.updateColors(fgColor, bgColor, selectionFgColor, noFocusSelectionFgColor, isRestore);
+
+		_containerFooter.setBackground(bgColor);
 	}
 
 }

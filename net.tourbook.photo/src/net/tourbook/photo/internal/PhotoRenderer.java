@@ -50,7 +50,6 @@ import org.imgscalr.Scalr.Rotation;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeFormatterBuilder;
 
 /**
  * Paint image in the gallery canvas.
@@ -68,36 +67,39 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 	private int							_fontHeight				= -1;
 
-//	private final DateTimeFormatter	_dtFormatter					= DateTimeFormat.forStyle("SM");
-	private final DateTimeFormatter		_dtFormatterDateTime	= new DateTimeFormatterBuilder()
-																		.appendYear(4, 4)
-																		.appendLiteral('-')
-																		.appendMonthOfYear(2)
-																		.appendLiteral('-')
-																		.appendDayOfMonth(2)
-																		.appendLiteral(' ')
-																		.appendHourOfDay(2)
-																		.appendLiteral(':')
-																		.appendMinuteOfHour(2)
-																		.appendLiteral(':')
-																		.appendSecondOfMinute(2)
-																		.toFormatter();
+	private final DateTimeFormatter		_dtFormatterDate		= DateTimeFormat.forStyle("S-");
+	private final DateTimeFormatter		_dtFormatterTime		= DateTimeFormat.forStyle("-F");
+	private final DateTimeFormatter		_dtFormatterDateTime	= DateTimeFormat.forStyle("SM");
 
-	private final DateTimeFormatter		_dtFormatterTime		= new DateTimeFormatterBuilder()
-																		.appendHourOfDay(2)
-																		.appendLiteral(':')
-																		.appendMinuteOfHour(2)
-																		.appendLiteral(':')
-																		.appendSecondOfMinute(2)
-																		.toFormatter();
-
-	private final DateTimeFormatter		_dtFormatterDate		= new DateTimeFormatterBuilder()
-																		.appendYear(4, 4)
-																		.appendLiteral('-')
-																		.appendMonthOfYear(2)
-																		.appendLiteral('-')
-																		.appendDayOfMonth(2)
-																		.toFormatter();
+//	private final DateTimeFormatter		_dtFormatterDateTime	= new DateTimeFormatterBuilder()
+//																		.appendYear(4, 4)
+//																		.appendLiteral('-')
+//																		.appendMonthOfYear(2)
+//																		.appendLiteral('-')
+//																		.appendDayOfMonth(2)
+//																		.appendLiteral(' ')
+//																		.appendHourOfDay(2)
+//																		.appendLiteral(':')
+//																		.appendMinuteOfHour(2)
+//																		.appendLiteral(':')
+//																		.appendSecondOfMinute(2)
+//																		.toFormatter();
+//
+//	private final DateTimeFormatter		_dtFormatterTime		= new DateTimeFormatterBuilder()
+//																		.appendHourOfDay(2)
+//																		.appendLiteral(':')
+//																		.appendMinuteOfHour(2)
+//																		.appendLiteral(':')
+//																		.appendSecondOfMinute(2)
+//																		.toFormatter();
+//
+//	private final DateTimeFormatter		_dtFormatterDate		= new DateTimeFormatterBuilder()
+//																		.appendYear(4, 4)
+//																		.appendLiteral('-')
+//																		.appendMonthOfYear(2)
+//																		.appendLiteral('-')
+//																		.appendDayOfMonth(2)
+//																		.toFormatter();
 
 	private boolean						_isShowPhotoName;
 	private boolean						_isShowAnnotations;

@@ -797,6 +797,8 @@ public class Messages extends NLS {
 	public static String		Photos_AndTours_Spinner_AdjustMinutes_Tooltip;
 	public static String		Photos_AndTours_Spinner_AdjustSeconds_Tooltip;
 
+	public static String	PhotosAndToursView_Photos_AndTours_Label_DurationLess1Hour;
+
 	public static String		Pref_App_Label_TourEditorIsModified;
 
 	public static String		Pref_Appearance_Button_ResetAllToggleDialogs;

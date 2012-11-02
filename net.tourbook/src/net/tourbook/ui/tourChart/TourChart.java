@@ -296,7 +296,7 @@ public class TourChart extends Chart {
 			}
 
 			// check if photos are available
-			final MergeTour mergeTour = _tourData.mergeTour;
+			final MergeTour mergeTour = _tourData.mergedTour;
 			if (mergeTour == null) {
 				return;
 			}
@@ -1087,12 +1087,13 @@ public class TourChart extends Chart {
 
 		// reset layer
 		_photoOverlay.setPhotoLayer(null);
+		_layerPhoto = null;
 
 		if (_tourChartConfig.isShowTourPhotos == false) {
 			return;
 		}
 
-		final MergeTour mergeTour = _tourData.mergeTour;
+		final MergeTour mergeTour = _tourData.mergedTour;
 
 		if (mergeTour == null) {
 			// no photos are available for this tour
@@ -1130,7 +1131,7 @@ public class TourChart extends Chart {
 
 		final ArrayList<ChartPhoto> chartPhotos = new ArrayList<ChartPhoto>();
 
-		_layerPhoto = new ChartLayerPhoto(chartPhotos, _photoOverlay, _photoOverlayBGColor);
+		_layerPhoto = new ChartLayerPhoto(chartPhotos);
 
 		setCustomOverlay(_photoOverlay);
 
@@ -1184,7 +1185,7 @@ public class TourChart extends Chart {
 				if (imageAdjustedTime != Long.MIN_VALUE) {
 					imageTime = imageAdjustedTime;
 				} else {
-					imageTime = photoWrapper.imageSortingTime;
+					imageTime = photoWrapper.imageUTCTime;
 				}
 
 				final long photoTime = imageTime / 1000;

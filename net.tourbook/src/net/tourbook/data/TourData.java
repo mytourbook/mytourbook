@@ -152,8 +152,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 																										.getDefault()
 																										.getPreferenceStore();
 
+	/**
+	 * This instance is static, otherwise each TourData creation creates a new instance which can
+	 * occure very often.
+	 */
 	@Transient
-	private final Calendar									_calendar							= GregorianCalendar
+	private static final Calendar							_calendar							= GregorianCalendar
 																										.getInstance();
 
 	/**
@@ -983,10 +987,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private double[]										timeSerieDouble;
 
 	/**
-	 * Contains data from a merge tour which contains photos
+	 * Contains data from a merged tour which contains photos
 	 */
 	@Transient
-	public MergeTour										mergeTour;
+	public MergeTour										mergedTour;
 
 	/**
 	 * 
@@ -5873,10 +5877,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	public void setupHistoryTour() {
 
-		/*
-		 * tour id is not necessary but to prevent many adjustment to the existing code, tour id is
-		 * set but I'm not sure if this works :-(
-		 */
+		// each tourData requires a tour id to identify it in equals();
 		tourId = System.nanoTime();
 
 		isHistoryTour = true;

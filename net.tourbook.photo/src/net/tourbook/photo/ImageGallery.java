@@ -351,7 +351,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 					return 0;
 				}
 
-				final long diff = wrapper1.imageSortingTime - wrapper2.imageSortingTime;
+				final long diff = wrapper1.imageUTCTime - wrapper2.imageUTCTime;
 
 				return diff < 0 ? -1 : diff > 0 ? 1 : 0;
 			}

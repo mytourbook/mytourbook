@@ -61,8 +61,6 @@ public class Photo {
 	private DateTime						_imageFileDateTime;
 	private DateTime						_exifDateTime;
 
-//	private long							_adjustedTime;
-
 	/**
 	 * <pre>
 	 * Orientation
@@ -90,7 +88,6 @@ public class Photo {
 	private double							_latitude				= Double.MIN_VALUE;
 	private double							_longitude				= Double.MIN_VALUE;
 
-//	private GeoPosition						_geoPosition;
 	private String							_gpsAreaInfo;
 
 	private double							_imageDirection			= Double.MIN_VALUE;
@@ -324,10 +321,6 @@ public class Photo {
 		return true;
 	}
 
-//	public long getAdjustedTime() {
-//		return _adjustedTime;
-//	}
-
 	public double getAltitude() {
 		return _altitude;
 	}
@@ -366,11 +359,11 @@ public class Photo {
 
 		try {
 
-			final TiffField originalDate = jpegMetadata.findEXIFValueWithExactMatch(//
+			final TiffField exifDate = jpegMetadata.findEXIFValueWithExactMatch(//
 					ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL);
 
-			if (originalDate != null) {
-				return _dtParser.parseDateTime(originalDate.getStringValue());
+			if (exifDate != null) {
+				return _dtParser.parseDateTime(exifDate.getStringValue());
 			}
 
 			final TiffField tiffDate = jpegMetadata.findEXIFValueWithExactMatch(TiffTagConstants.TIFF_TAG_DATE_TIME);
@@ -484,23 +477,6 @@ public class Photo {
 
 		return defaultValue;
 	}
-
-//	/**
-//	 * @return Returns geo position or <code>null</code> when latitude/longitude is not available
-//	 */
-//	public GeoPosition getGeoPosition() {
-//
-//		if (_geoPosition == null) {
-//
-//			if (_latitude == Double.MIN_VALUE || _longitude == Double.MIN_VALUE) {
-//				return null;
-//			} else {
-//				_geoPosition = new GeoPosition(_latitude, _longitude);
-//			}
-//		}
-//
-//		return _geoPosition;
-//	}
 
 	private String getExifValueString(final JpegImageMetadata jpegMetadata, final TagInfo tagInfo) {
 
@@ -721,10 +697,10 @@ public class Photo {
 
 		try {
 
-			final TiffField originalDate = tiffMetadata.findField(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL, true);
+			final TiffField exifDate = tiffMetadata.findField(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL, true);
 
-			if (originalDate != null) {
-				return _dtParser.parseDateTime(originalDate.getStringValue());
+			if (exifDate != null) {
+				return _dtParser.parseDateTime(exifDate.getStringValue());
 			}
 
 			final TiffField date = tiffMetadata.findField(TiffTagConstants.TIFF_TAG_DATE_TIME, true);
@@ -812,16 +788,6 @@ public class Photo {
 	public boolean isLoadingError() {
 		return _isLoadingError;
 	}
-
-	/**
-	 * Set time when photo was taken + time adjustments, e.g. wrong time zone, wrong time is set in
-	 * the camera.
-	 * 
-	 * @param adjustedTime
-	 */
-//	public void setAdjustedTime(final long adjustedTime) {
-//		_adjustedTime = adjustedTime;
-//	}
 
 	public void setAltitude(final double altitude) {
 		_altitude = altitude;
@@ -953,9 +919,12 @@ public class Photo {
 
 		// sort by exif date when available
 		if (_exifDateTime != null) {
-			_photoWrapper.imageSortingTime = _exifDateTime.getMillis();
+
+			final long exifUTCMills = _exifDateTime.getMillis();
+
+			_photoWrapper.imageUTCTime = exifUTCMills;
+//			_photoWrapper.imageUTCZoneOffset = DateTimeZone.getDefault().getOffset(exifUTCMills);
 		}
 	}
-
 
 }

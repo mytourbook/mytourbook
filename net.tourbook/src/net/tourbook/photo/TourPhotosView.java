@@ -453,11 +453,7 @@ public class TourPhotosView extends ViewPart {
 		final MergeTour mergeTour = tourPhotoSelection.mergedTour;
 		final ArrayList<PhotoWrapper> photoWrapperList = mergeTour.tourPhotos;
 
-		final long tourId = mergeTour.tourId;
-
-		final String galleryPositionKey = tourId == Long.MIN_VALUE //
-				? Long.toString(mergeTour.tourStartTime)
-				: Long.toString(tourId);
+		final String galleryPositionKey = Long.toString(mergeTour.mergeId);
 
 		_photoGallery.showImages(photoWrapperList, galleryPositionKey + " TourPhotosView", true);//$NON-NLS-1$
 

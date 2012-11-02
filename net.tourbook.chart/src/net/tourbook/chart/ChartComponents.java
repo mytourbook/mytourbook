@@ -933,11 +933,7 @@ public class ChartComponents extends Composite {
 						int dayStartEnd = 0;
 						int repeatIndex = 0;
 
-						// limit to 28 that it do not write over the month border
-//						final int dayUnits = repeatedDayUnit == 1 ? monthDays : 28;
-						final int dayUnits = monthDays;
-
-						for (int dayIndex = 0; dayIndex < dayUnits; dayIndex++) {
+						for (int dayIndex = 0; dayIndex < monthDays; dayIndex++) {
 
 							if (dayIndex % repeatedDayUnit == 0) {
 
@@ -1049,7 +1045,6 @@ public class ChartComponents extends Composite {
 			 * create dummy units before and after the real units that the title is displayed also
 			 * at the border, title is displayed between major units
 			 */
-
 			final int numberOfSmallUnits = (int) (majorUnit / graphUnit);
 			long titleUnitStart = (long) xUnits.get(0).value;
 

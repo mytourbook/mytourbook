@@ -18,7 +18,6 @@ package net.tourbook.photo;
 import gnu.trove.list.array.TLongArrayList;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import net.tourbook.data.HistoryData;
 import net.tourbook.data.TourData;
@@ -31,22 +30,23 @@ import org.joda.time.format.DateTimeFormatter;
 
 public class MergeTour {
 
-	private static PeriodType				_tourPeriodTemplate	= PeriodType.yearMonthDayTime()
+	private static final PeriodType			_tourPeriodTemplate	= PeriodType.yearMonthDayTime()
 																// hide these components
-																//	.withMonthsRemoved()
 																		.withMinutesRemoved()
 																		.withSecondsRemoved()
 																		.withMillisRemoved();
 
 	private static final DateTimeFormatter	_dtFormatter		= DateTimeFormat.forStyle("SL");	//$NON-NLS-1$
 
-	private boolean							isHistoryTour;
+	boolean									isHistoryTour;
 
 	/**
 	 * Contains tour id when it's a real tour, otherwise it contains {@link Long#MIN_VALUE}.
 	 */
 	long									tourId				= Long.MIN_VALUE;
 	long									tourTypeId			= -1;
+
+	long									mergeId;
 
 	/**
 	 * Tour start time in ms
@@ -56,10 +56,10 @@ public class MergeTour {
 	/**
 	 * Tour end time in ms.
 	 */
-	long									tourEndTime			= Long.MAX_VALUE;
+	long									tourEndTime;
 
-	long									historyStartTime;
-	long									historyEndTime;
+	long									historyStartTime	= Long.MIN_VALUE;
+	long									historyEndTime		= Long.MIN_VALUE;
 
 	private DateTime						tourStartDateTime;
 	Period									tourPeriod;
@@ -67,9 +67,6 @@ public class MergeTour {
 	int										numberOfPhotos;
 	int										numberOfGPSPhotos;
 	int										numberOfNoGPSPhotos;
-
-	HashMap<String, Camera>					cameras				= new HashMap<String, Camera>();
-	Camera[]								cameraList;
 
 	/**
 	 * Contains all photos for this tour.
@@ -87,6 +84,8 @@ public class MergeTour {
 	MergeTour(final long tourStartTime) {
 
 		isHistoryTour = true;
+
+		mergeId = System.nanoTime();
 
 		setTourStartTime(tourStartTime);
 
@@ -107,6 +106,8 @@ public class MergeTour {
 	MergeTour(final long tourId, final long tourStartTime, final long tourEndTime) {
 
 		this.tourId = tourId;
+
+		mergeId = tourId;
 
 		setTourStartTime(tourStartTime);
 		setTourEndTime(tourEndTime);
@@ -137,7 +138,7 @@ public class MergeTour {
 			return false;
 		}
 		final MergeTour other = (MergeTour) obj;
-		if (tourId != other.tourId) {
+		if (mergeId != other.mergeId) {
 			return false;
 		}
 		return true;
@@ -230,7 +231,7 @@ public class MergeTour {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + (int) (tourId ^ (tourId >>> 32));
+		result = prime * result + (int) (mergeId ^ (mergeId >>> 32));
 		return result;
 	}
 
@@ -252,6 +253,7 @@ public class MergeTour {
 
 	private void setTourStartTime(final long time) {
 
+		// remove milliseconds
 		tourStartTime = time / 1000 * 1000;
 		tourStartDateTime = new DateTime(time);
 	}
@@ -263,7 +265,7 @@ public class MergeTour {
 				+ ("\ttourStart=" + tourStartTime)
 				+ ("\ttourEnd=" + _dtFormatter.print(tourEndTime))
 				+ ("\tisHistory=" + isHistoryTour)
-				+ ("\ttourId=" + tourId)
+				+ ("\tmergeId=" + mergeId)
 		//
 		;
 	}

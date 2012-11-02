@@ -589,7 +589,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 		_pageBook.showPage(_tourChart);
 
-		_tourData.mergeTour = _mergedTour;
+		_tourData.mergedTour = _mergedTour;
 
 		_tourChart.updateTourChart(_tourData, _tourChartConfig, false);
 

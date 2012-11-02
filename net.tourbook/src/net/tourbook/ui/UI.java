@@ -134,6 +134,7 @@ public class UI {
 	public static final String								VIEW_COLOR_TOUR					= "view.color.tour";							//$NON-NLS-1$
 	public static final String								VIEW_COLOR_BG_SEGMENTER_UP		= "view.colorBG.segmenterUp";					//$NON-NLS-1$
 	public static final String								VIEW_COLOR_BG_SEGMENTER_DOWN	= "view.colorBG.segmenterDown";				//$NON-NLS-1$
+	public static final String								VIEW_COLOR_BG_HISTORY_TOUR		= "VIEW_COLOR_BG_HISTORY_TOUR";				//$NON-NLS-1$
 
 	public static final int									DEFAULT_FIELD_WIDTH				= 40;
 	public static final int									FORM_FIRST_COLUMN_INDENT		= 16;
@@ -1082,6 +1083,9 @@ public class UI {
 				PreferenceConverter.getColor(prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_BG_SEGMENTER_UP));
 		colorRegistry.put(VIEW_COLOR_BG_SEGMENTER_DOWN, //
 				PreferenceConverter.getColor(prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_BG_SEGMENTER_DOWN));
+
+		colorRegistry.put(VIEW_COLOR_BG_HISTORY_TOUR, //
+				PreferenceConverter.getColor(prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_BG_HISTORY_TOUR));
 	}
 
 	public static GridData setWidth(final Control control, final int width) {

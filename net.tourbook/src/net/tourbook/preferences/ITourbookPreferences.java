@@ -203,6 +203,7 @@ public interface ITourbookPreferences {
 	public static final String	VIEW_LAYOUT_COLOR_TOUR						= "view.layout.color.tour";								//$NON-NLS-1$
 	public static final String	VIEW_LAYOUT_COLOR_BG_SEGMENTER_UP			= "view.layout.colorBg.segmenterUp";						//$NON-NLS-1$
 	public static final String	VIEW_LAYOUT_COLOR_BG_SEGMENTER_DOWN			= "view.layout.colorBg.segmenterDown";						//$NON-NLS-1$
+	public static final String	VIEW_LAYOUT_COLOR_BG_HISTORY_TOUR			= "VIEW_LAYOUT_COLOR_BG_HISTORY_TOUR";						//$NON-NLS-1$
 
 	public static final String	VIEW_LAYOUT_RECORDING_TIME_FORMAT			= "view.layout.recording-time-format";						//$NON-NLS-1$
 	public static final String	VIEW_LAYOUT_DRIVING_TIME_FORMAT				= "view.layout.driving-time-format";						//$NON-NLS-1$
@@ -315,4 +316,5 @@ public interface ITourbookPreferences {
 	 * Value point tool tip
 	 */
 	public static final String	VALUE_POINT_TOOL_TIP_IS_VISIBLE				= "VALUE_POINT_TOOL_TIP_IS_VISIBLE";						//$NON-NLS-1$
+
 }

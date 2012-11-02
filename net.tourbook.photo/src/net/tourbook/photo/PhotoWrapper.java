@@ -25,6 +25,8 @@ import net.tourbook.photo.internal.gallery.MT20.IGalleryCustomData;
  */
 public class PhotoWrapper implements IGalleryCustomData {
 
+	public Photo	photo;
+
 	/**
 	 * Photo image file
 	 */
@@ -40,18 +42,27 @@ public class PhotoWrapper implements IGalleryCustomData {
 	public long		imageFileLastModified;
 
 	/**
-	 * Time in ms
+	 * Time in milliseconds
 	 */
-	public long		imageSortingTime;
+	public long		imageUTCTime;
 
 	/**
-	 * Time in ms when not {@link Long#MIN_VALUE}
+	 * Offset in milliseconds from {@link #imageUTCTime} which is in UTC and the local time
+	 */
+//	public int		imageUTCZoneOffset;
+
+	/**
+	 * Time in ms (or {@link Long#MIN_VALUE} when not set) when photo was taken + time adjustments,
+	 * e.g. wrong time zone, wrong time is set in the camera.
 	 */
 	public long		adjustedTime	= Long.MIN_VALUE;
 
 	public long		imageFileSize;
 
-	public Photo	photo;
+	/**
+	 * Camera which is used to take this photo, is <code>null</code> when not yet set.
+	 */
+	public Camera	camera;
 
 	/**
 	 * GPS has three states:
@@ -63,6 +74,7 @@ public class PhotoWrapper implements IGalleryCustomData {
 	 * </pre>
 	 */
 	public int		gpsState		= -1;
+
 
 	public PhotoWrapper(final File file) {
 
@@ -78,7 +90,7 @@ public class PhotoWrapper implements IGalleryCustomData {
 		imageFileExt = dotPos > 0 ? imageFileName.substring(dotPos + 1).toLowerCase() : UI.EMPTY_STRING;
 
 		// initially sort by file date until exif data are loaded
-		imageSortingTime = imageFileLastModified;
+		imageUTCTime = imageFileLastModified;
 	}
 
 	@Override

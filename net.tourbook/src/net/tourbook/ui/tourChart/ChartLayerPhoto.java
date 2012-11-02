@@ -27,7 +27,6 @@ import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IChartLayer;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -44,15 +43,8 @@ public class ChartLayerPhoto implements IChartLayer {
 
 	private Point[]					_photoPositions;
 
-//	private ChartPhotoOverlay		_photoOverlay;
-//	private Color					_photoOverlayBGColor;
-
-	public ChartLayerPhoto(	final ArrayList<ChartPhoto> chartPhotos,
-							final ChartPhotoOverlay photoOverlay,
-							final Color photoOverlayBGColor) {
+	public ChartLayerPhoto(final ArrayList<ChartPhoto> chartPhotos) {
 		_chartPhotos = chartPhotos;
-//		_photoOverlay = photoOverlay;
-//		_photoOverlayBGColor = photoOverlayBGColor;
 	}
 
 	private void createGroupedPhotos(final long devGraphImageOffset, final GraphDrawingData graphDrawingData) {
@@ -244,7 +236,11 @@ public class ChartLayerPhoto implements IChartLayer {
 
 			} else {
 
-				final float yValue = yValues[chartPhoto.serieIndex];
+				final int serieIndex = chartPhoto.serieIndex;
+
+				// check bounds
+
+				final float yValue = yValues[serieIndex];
 				final int devYGraph = (int) ((yValue - graphYBottom) * scaleY);
 				final int devYValue = devYBottom - devYGraph;
 				devYPhoto = devYValue - PHOTO_ICON_WIDTH - 2;
