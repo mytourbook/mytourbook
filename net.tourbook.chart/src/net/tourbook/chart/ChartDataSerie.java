@@ -47,14 +47,14 @@ public abstract class ChartDataSerie {
 	private int						_valueDivisor							= 1;
 
 	/**
-	 * max value which is used to draw the chart
-	 */
-	protected double				_visibleMaxValue;
-
-	/**
 	 * min value which is used to draw the chart
 	 */
 	protected double				_visibleMinValue;
+
+	/**
+	 * max value which is used to draw the chart
+	 */
+	protected double				_visibleMaxValue;
 
 	/**
 	 * minimum value found in the provided values

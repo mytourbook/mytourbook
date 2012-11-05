@@ -97,6 +97,7 @@ public class Photo {
 																			.forPattern("yyyy:MM:dd HH:mm:ss") //$NON-NLS-1$
 //																			.withZone(DateTimeZone.UTC)
 																	;
+	private static final DateTimeFormatter	_dtFormatter			= DateTimeFormat.forStyle("SL");	//$NON-NLS-1$
 
 	/**
 	 * caches the world positions for the photo lat/long values for each zoom level
@@ -363,7 +364,16 @@ public class Photo {
 					ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL);
 
 			if (exifDate != null) {
-				return _dtParser.parseDateTime(exifDate.getStringValue());
+
+				final DateTime parsedExifDateTime = _dtParser.parseDateTime(exifDate.getStringValue());
+
+//				System.out.println((exifDate.getValueDescription())
+//						+ ("\t" + parsedExifDateTime)
+//						+ ("\t" + parsedExifDateTime.toDateTime(DateTimeZone.UTC))
+//						+ ("\t" + _dtFormatter.print(parsedExifDateTime)));
+//				// TODO remove SYSTEM.OUT.PRINTLN
+
+				return parsedExifDateTime;
 			}
 
 			final TiffField tiffDate = jpegMetadata.findEXIFValueWithExactMatch(TiffTagConstants.TIFF_TAG_DATE_TIME);

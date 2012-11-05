@@ -173,15 +173,28 @@ public class MergeTour {
 
 			// add additional 3% tour time that the tour do not start/end at the chart border
 
-			final long timeDiff = tourEnd - tourStart;
+			final double timeDiff = tourEnd - tourStart;
 
 			/**
 			 * very important: round to 0 ms
 			 */
-			final long timeOffset = (long) (timeDiff * 0.03) / 1000 * 1000;
+			long timeOffset = ((long) (timeDiff * 0.03) / 1000) * 1000;
+
+			// ensure there is a time difference
+			if (timeOffset == 0) {
+				timeOffset = 1000;
+			}
 
 			tourStartTime = tourStart - timeOffset;
 			tourEndTime = tourEnd + timeOffset;
+
+			// ensure an offset is set
+			if (tourStartTime == tourStart) {
+				tourStartTime -= 1000;
+			}
+			if (tourEndTime == tourEnd) {
+				tourEndTime += 10 * 1000;
+			}
 		}
 
 		// update adjusted start

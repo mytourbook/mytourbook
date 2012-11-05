@@ -314,6 +314,8 @@ public class UI {
 		// photo
 		IMAGE_REGISTRY.put(PhotosAndToursView.IMAGE_PIC_DIR_VIEW,//
 				TourbookPlugin.getImageDescriptor(Messages.Image__PhotoDirectoryView));
+		IMAGE_REGISTRY.put(PhotosAndToursView.IMAGE_PHOTO_PHOTO,//
+				TourbookPlugin.getImageDescriptor(Messages.Image__PhotoPhotos));
 
 		/*
 		 * set tag styler
