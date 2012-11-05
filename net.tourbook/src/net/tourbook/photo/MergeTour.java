@@ -56,7 +56,7 @@ public class MergeTour {
 	/**
 	 * Tour end time in ms.
 	 */
-	long									tourEndTime;
+	long									tourEndTime			= Long.MIN_VALUE;
 
 	long									historyStartTime	= Long.MIN_VALUE;
 	long									historyEndTime		= Long.MIN_VALUE;
@@ -180,21 +180,13 @@ public class MergeTour {
 			 */
 			long timeOffset = ((long) (timeDiff * 0.03) / 1000) * 1000;
 
-			// ensure there is a time difference
+			// ensure there is a time difference of 1 second
 			if (timeOffset == 0) {
 				timeOffset = 1000;
 			}
 
 			tourStartTime = tourStart - timeOffset;
 			tourEndTime = tourEnd + timeOffset;
-
-			// ensure an offset is set
-			if (tourStartTime == tourStart) {
-				tourStartTime -= 1000;
-			}
-			if (tourEndTime == tourEnd) {
-				tourEndTime += 10 * 1000;
-			}
 		}
 
 		// update adjusted start

@@ -38,7 +38,6 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TableColumnFactory;
@@ -96,7 +95,6 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.joda.time.Period;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -130,7 +128,6 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 	private ArrayList<MergeTour>					_allMergeTours					= new ArrayList<MergeTour>();
 
 	private ArrayList<PhotoWrapper>					_allPhotos						= new ArrayList<PhotoWrapper>();
-	private DateTime								_allPhotoStartDate;
 
 	/**
 	 * Contains all cameras which are every used, key is the camera name.
@@ -153,7 +150,6 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 	private MergeTour								_selectedMergeTour;
 
 	private PostSelectionProvider					_postSelectionProvider;
-
 	private ISelectionListener						_postSelectionListener;
 
 	private IPropertyChangeListener					_prefChangeListener;
@@ -183,11 +179,11 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 
 	private final DateTimeFormatter					_timeFormatter					= DateTimeFormat.mediumTime();
 	private final NumberFormat						_nf_1_1							= NumberFormat.getNumberInstance();
-
 	{
 		_nf_1_1.setMinimumFractionDigits(1);
 		_nf_1_1.setMaximumFractionDigits(1);
 	}
+
 	private final Comparator<? super PhotoWrapper>	_adjustTimeComparator;
 
 	/**
@@ -199,11 +195,8 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 	 * UI controls
 	 */
 	private PageBook								_pageBook;
-
 	private Composite								_pageNoTour;
-
 	private Composite								_pageNoImage;
-
 	private Composite								_pageViewer;
 
 	private Composite								_viewerContainer;
@@ -457,63 +450,27 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 	 */
 	private void createMergeTours() {
 
-		/*
-		 * Get/Create first merge tour
-		 */
-		MergeTour currentMergeTour = null;
-		if (_allDbTours.size() > 0) {
-
-			// real tours are available
-
-			final MergeTour firstTour = _allDbTours.get(0);
-
-			if (_allPhotoStartDate.isBefore(firstTour.tourStartTime)) {
-
-				// first photo is before the first tour, create dummy tour
-
-			} else {
-
-				// first tour starts before the first photo
-
-				currentMergeTour = firstTour;
-			}
-		} else {
-
-			// there are no tours, create dummy tour
-		}
-
-		if (currentMergeTour == null) {
-
-			final long tourStartUTC = _allPhotoStartDate.getMillis();
-			final int tourStartUTCZoneOffset = DateTimeZone.getDefault().getOffset(tourStartUTC);
-
-			currentMergeTour = new MergeTour(tourStartUTC + tourStartUTCZoneOffset);
-		}
+		MergeTour currentMergeTour = createMergeTours_10_GetFirst();
 
 		long realTourEnd = currentMergeTour.tourEndTime;
-		boolean isDbTour = currentMergeTour.isHistoryTour == false;
-
-		long photoTime = 0;
+		boolean isRealTour = currentMergeTour.isHistoryTour == false;
 
 		_allMergeTours.clear();
 		_selectedMergeTour = null;
 
-		TourData currentTourData = null;
-		boolean isTourWithGPS = false;
-
+		long photoTime = 0;
 		final int tourIndexStart[] = new int[] { 0 };
 
 		// loop: all photos
 		for (final PhotoWrapper photoWrapper : _allPhotos) {
 
 			final Photo photo = photoWrapper.photo;
-
 			photoTime = photoWrapper.adjustedTime;
 
 			boolean isSetupNewTour = false;
 
 			// first check real tours
-			if (isDbTour) {
+			if (isRealTour) {
 
 				// current merge tour is a real tour
 
@@ -521,23 +478,13 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 
 					// current tour contains current image
 
-					if (isTourWithGPS) {
-
-						final double latitude = photo.getLatitude();
-						if (latitude == Double.MIN_VALUE) {
-
-							// gps position is not available, set position from current tour
-
-						}
-					}
-
 				} else {
 
 					// current photo do not fit into current tour, find/create tour for the current image
 
-					createMergeTours_FinalizeCurrentMergeTour(currentMergeTour, photoTime);
+					createMergeTours_30_FinalizeCurrentMergeTour(currentMergeTour, photoTime);
 
-					currentMergeTour = createMergeTours_GetNextDbTour(tourIndexStart, photoTime);
+					currentMergeTour = createMergeTours_20_GetNextDbTour(tourIndexStart, photoTime);
 
 					isSetupNewTour = true;
 				}
@@ -546,7 +493,7 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 
 				// current merge tour is a dummy tour
 
-				final MergeTour nextMergeTour = createMergeTours_GetNextDbTour(tourIndexStart, photoTime);
+				final MergeTour nextMergeTour = createMergeTours_20_GetNextDbTour(tourIndexStart, photoTime);
 
 				if (nextMergeTour.isHistoryTour) {
 
@@ -558,7 +505,7 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 
 					// it's a new real tour, setup a new merge tour (real or dummy)
 
-					createMergeTours_FinalizeCurrentMergeTour(currentMergeTour, photoTime);
+					createMergeTours_30_FinalizeCurrentMergeTour(currentMergeTour, photoTime);
 
 					currentMergeTour = nextMergeTour;
 
@@ -567,23 +514,14 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 			}
 
 			if (isSetupNewTour) {
-
 				realTourEnd = currentMergeTour.tourEndTime;
-				isDbTour = currentMergeTour.isHistoryTour == false;
-
-				if (isDbTour) {
-
-					// it's a real tour
-
-					currentTourData = TourManager.getInstance().getTourData(currentMergeTour.tourId);
-					isTourWithGPS = currentTourData.latitudeSerie != null;
-				}
+				isRealTour = currentMergeTour.isHistoryTour == false;
 			}
 
 			currentMergeTour.tourPhotos.add(photoWrapper);
-
 			currentMergeTour.numberOfPhotos++;
 
+			// set camera into the photo
 			setCamera(photo);
 
 			// set number of GPS/No GPS photos
@@ -595,7 +533,7 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 			}
 		}
 
-		createMergeTours_FinalizeCurrentMergeTour(currentMergeTour, photoTime);
+		createMergeTours_30_FinalizeCurrentMergeTour(currentMergeTour, photoTime);
 
 		updateUI_Cameras(null);
 
@@ -609,27 +547,49 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 	}
 
 	/**
-	 * Keep current merge tour when it contains photos.
-	 * 
-	 * @param currentMergeTour
-	 * @param imageTime
+	 * Get/Create first merge tour
 	 */
-	private void createMergeTours_FinalizeCurrentMergeTour(final MergeTour currentMergeTour, final long imageTime) {
+	private MergeTour createMergeTours_10_GetFirst() {
 
-		// keep only tours which contain photos
-		if (currentMergeTour.numberOfPhotos == 0 && _isShowToursOnlyWithPhotos) {
-			return;
+		MergeTour currentMergeTour = null;
+
+		if (_allDbTours.size() > 0) {
+
+			// real tours are available
+
+			final MergeTour firstTour = _allDbTours.get(0);
+			final PhotoWrapper firstPhotoWrapper = _allPhotos.get(0);
+
+			final DateTime firstPhotoTime = new DateTime(firstPhotoWrapper.adjustedTime);
+			if (firstPhotoTime.isBefore(firstTour.tourStartTime)) {
+
+				// first photo is before the first tour, create dummy tour
+
+			} else {
+
+				// first tour starts before the first photo
+
+				currentMergeTour = firstTour;
+			}
+		} else {
+
+			// there are no real tours, create dummy tour
 		}
 
-		// set tour end time
-		if (currentMergeTour.isHistoryTour) {
-			currentMergeTour.setTourEndTime(imageTime);
+		if (currentMergeTour == null) {
+
+			// 1st tour is a history tour
+
+			final long tourStartUTC = _allPhotos.get(0).adjustedTime;
+//			final int tourStartUTCZoneOffset = DateTimeZone.getDefault().getOffset(tourStartUTC);
+
+			currentMergeTour = new MergeTour(tourStartUTC + tourStartUTC);
 		}
 
-		_allMergeTours.add(currentMergeTour);
+		return currentMergeTour;
 	}
 
-	private MergeTour createMergeTours_GetNextDbTour(final int[] tourIndexStart, final long imageTime) {
+	private MergeTour createMergeTours_20_GetNextDbTour(final int[] tourIndexStart, final long imageTime) {
 
 		MergeTour newMergeTour = null;
 
@@ -694,6 +654,27 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 		}
 
 		return newMergeTour;
+	}
+
+	/**
+	 * Keep current merge tour when it contains photos.
+	 * 
+	 * @param currentMergeTour
+	 * @param imageTime
+	 */
+	private void createMergeTours_30_FinalizeCurrentMergeTour(final MergeTour currentMergeTour, final long imageTime) {
+
+		// keep only tours which contain photos
+		if (currentMergeTour.numberOfPhotos == 0 && _isShowToursOnlyWithPhotos) {
+			return;
+		}
+
+		// set tour end time
+		if (currentMergeTour.isHistoryTour) {
+			currentMergeTour.setTourEndTime(imageTime);
+		}
+
+		_allMergeTours.add(currentMergeTour);
 	}
 
 	@Override
@@ -1762,7 +1743,7 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 			/*
 			 * get date for 1st and last photo
 			 */
-			long startDateForAllDbTours = _allPhotos.get(0).imageUTCTime;
+			long startDateForAllDbTours = _allPhotos.get(0).adjustedTime;
 			long endDateForAllDbTours = startDateForAllDbTours;
 
 			for (final PhotoWrapper photoWrapper : _allPhotos) {
@@ -1779,8 +1760,6 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 			// adjust by 5 days that time adjustments are covered
 			startDateForAllDbTours -= 5 * UI.DAY_IN_SECONDS * 1000;
 			endDateForAllDbTours += 5 * UI.DAY_IN_SECONDS * 1000;
-
-			_allPhotoStartDate = new DateTime(startDateForAllDbTours);
 
 			loadToursFromDb(startDateForAllDbTours, endDateForAllDbTours);
 

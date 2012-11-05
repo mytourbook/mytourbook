@@ -872,6 +872,7 @@ public class Photo {
 		return "" //$NON-NLS-1$
 //				+"Photo " //
 				+ (_photoWrapper.imageFileName)
+				+ ("\t_exifDateTime " + new DateTime(_exifDateTime).toString())
 //				+ (_exifDateTime == null ? "-no date-" : "\t" + _exifDateTime)
 //				+ ("\trotate:" + rotateDegree)
 //				+ (_imageWidth == Integer.MIN_VALUE ? "-no size-" : "\t" + _imageWidth + "x" + _imageHeight)

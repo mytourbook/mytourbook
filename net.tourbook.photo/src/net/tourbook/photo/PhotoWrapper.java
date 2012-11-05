@@ -20,6 +20,8 @@ import java.io.File;
 import net.tourbook.common.UI;
 import net.tourbook.photo.internal.gallery.MT20.IGalleryCustomData;
 
+import org.joda.time.DateTime;
+
 /**
  * Wrapper for a photo image file, it's used to sort and filter {@link Photo}s.
  */
@@ -101,7 +103,7 @@ public class PhotoWrapper implements IGalleryCustomData {
 	@Override
 	public String toString() {
 
-		return (imageFileLastModified + "  ") + imageFileName; //$NON-NLS-1$
+		return (imageFileLastModified + "  ") + imageFileName + ("\tadjustedTime " + new DateTime(adjustedTime)); //$NON-NLS-1$
 
 //		return photo.toString();
 	}
