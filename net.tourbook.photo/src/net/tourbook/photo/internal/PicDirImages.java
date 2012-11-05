@@ -17,6 +17,7 @@ package net.tourbook.photo.internal;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
@@ -75,6 +76,7 @@ public class PicDirImages implements IPhotoGalleryProvider {
 	private ActionNavigateHistoryForward			_actionNavigateForward;
 	private ActionClearNavigationHistory			_actionClearNavigationHistory;
 	private ActionRemoveInvalidFoldersFromHistory	_actionRemoveInvalidFoldersFromHistory;
+	private ActionSortFolderHistory					_actionSortFolderHistory;
 	private ActionToggleFolderGallery				_actionToggleFolderGallery;
 
 	private PicDirView								_picDirView;
@@ -195,6 +197,39 @@ public class PicDirImages implements IPhotoGalleryProvider {
 		_comboHistory.setListVisible(true);
 	}
 
+	void actionSortFolderHistory() {
+
+		final int selectedIndex = _comboHistory.getSelectionIndex();
+		String selectedFolder = null;
+
+		if (selectedIndex != -1) {
+			selectedFolder = _comboHistory.getItem(selectedIndex);
+		}
+
+		Collections.sort(_folderHistory);
+
+		_comboHistory.removeAll();
+
+		int newSelectedIndex = -1;
+
+		for (int folderIndex = 0; folderIndex < _folderHistory.size(); folderIndex++) {
+
+			final String folder = _folderHistory.get(folderIndex);
+
+			if (newSelectedIndex == -1 && folder.equals(selectedFolder)) {
+				newSelectedIndex = folderIndex;
+			}
+
+			_comboHistory.add(folder);
+		}
+
+		if (selectedIndex == -1) {
+			_comboHistory.select(0);
+		} else {
+			_comboHistory.select(newSelectedIndex);
+		}
+	}
+
 	void actionToggleFolderGallery() {
 
 		_isShowOnlyPhotos = _isShowOnlyPhotos ? false : true;
@@ -212,6 +247,7 @@ public class PicDirImages implements IPhotoGalleryProvider {
 
 		_actionClearNavigationHistory = new ActionClearNavigationHistory(this);
 		_actionRemoveInvalidFoldersFromHistory = new ActionRemoveInvalidFoldersFromHistory(this);
+		_actionSortFolderHistory = new ActionSortFolderHistory(this);
 
 		_actionToggleFolderGallery = new ActionToggleFolderGallery(this);
 	}
@@ -331,6 +367,7 @@ public class PicDirImages implements IPhotoGalleryProvider {
 
 	public void fillViewMenu(final IMenuManager menuMgr) {
 
+		menuMgr.add(_actionSortFolderHistory);
 		menuMgr.add(_actionRemoveInvalidFoldersFromHistory);
 		menuMgr.add(_actionClearNavigationHistory);
 	}

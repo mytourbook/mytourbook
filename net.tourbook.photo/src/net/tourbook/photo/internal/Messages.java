@@ -78,6 +78,8 @@ public class Messages extends NLS {
 	public static String		Pic_Dir_Action_SortByDate_Tooltip;
 	public static String		Pic_Dir_Action_SortByName;
 	public static String		Pic_Dir_Action_SortByName_Tooltip;
+
+	public static String	Pic_Dir_Action_SortFolderHistory;
 	public static String		Pic_Dir_Action_ToggleFolderGallery;
 	public static String		Pic_Dir_Action_ToggleFolderGallery_OnlyPhotos;
 	public static String		Pic_Dir_Action_ToggleFolderGallery_OnlyPhotos_Tooltip;

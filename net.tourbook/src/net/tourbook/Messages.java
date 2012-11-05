@@ -21,6 +21,8 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.messages";							//$NON-NLS-1$
 
+	public static String	Action_PhotosAndTours_FilterPhotos_Tooltip;
+
 	public static String		Action_ToolTip_Hide;
 	public static String		Action_ToolTip_SetDefaults;
 
@@ -543,7 +545,7 @@ public class Messages extends NLS {
 	public static String		Graph_Label_Heartbeat;
 	public static String		Graph_Label_Heartbeat_unit;
 
-	public static String	Graph_Label_History;
+	public static String		Graph_Label_History;
 	public static String		Graph_Label_Pace;
 	public static String		Graph_Label_Power;
 	public static String		Graph_Label_Power_unit;
@@ -646,13 +648,13 @@ public class Messages extends NLS {
 	public static String		Image__link;
 	public static String		Image__MyTourbook16;
 	public static String		Image__options;
+	public static String		Image__Photo_FilterPhotos;
 	public static String		Image__PhotoDirectoryView;
 	public static String		Image__PhotoGalleryHorizontal;
 	public static String		Image__PhotoGalleryVertical;
 	public static String		Image__PhotoPhotos;
 	public static String		Image__PhotoTourPhotos;
-
-	public static String	Image__Pin;
+	public static String		Image__Pin;
 	public static String		Image__PulseZones;
 	public static String		Image__PulseZones_Disabled;
 	public static String		Image__quick_edit;
@@ -775,16 +777,12 @@ public class Messages extends NLS {
 
 	public static String		NT001_DialogExtractTour_InvalidTourData;
 
-	public static String	Photo_Gallery_Action_ToggleGalleryHorizontal_ToolTip;
-
-	public static String	Photo_Gallery_Action_ToggleGalleryVertical_ToolTip;
+	public static String		Photo_Gallery_Action_ToggleGalleryHorizontal_ToolTip;
+	public static String		Photo_Gallery_Action_ToggleGalleryVertical_ToolTip;
 
 	public static String		Photo_Tooltip_Action_MoveToolTip_ToolTip;
-
-	public static String	Photo_Tooltip_Action_PinToolTip_ToolTip;
-
+	public static String		Photo_Tooltip_Action_PinToolTip_ToolTip;
 	public static String		Photo_Tooltip_Label_ShellNoResize;
-
 	public static String		Photo_Tooltip_Label_ShellWithResize;
 
 	public static String		Photos_AndTours_Label_AdjustTime;
@@ -796,8 +794,7 @@ public class Messages extends NLS {
 	public static String		Photos_AndTours_Spinner_AdjustHours_Tooltip;
 	public static String		Photos_AndTours_Spinner_AdjustMinutes_Tooltip;
 	public static String		Photos_AndTours_Spinner_AdjustSeconds_Tooltip;
-
-	public static String	PhotosAndToursView_Photos_AndTours_Label_DurationLess1Hour;
+	public static String		PhotosAndToursView_Photos_AndTours_Label_DurationLess1Hour;
 
 	public static String		Pref_App_Label_TourEditorIsModified;
 
