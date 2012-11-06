@@ -461,15 +461,20 @@ public class TourPhotosView extends ViewPart {
 		 * set title
 		 */
 		final int size = photoWrapperList.size();
+		String labelText;
+
 		if (size == 1) {
-			_labelTitle.setText(_dtFormatter.print(mergeTour.tourStartTime));
+			labelText = _dtFormatter.print(mergeTour.tourStartTime);
 		} else if (size > 1) {
-			_labelTitle.setText(_dtFormatter.print(mergeTour.tourStartTime)
+			labelText = _dtFormatter.print(mergeTour.tourStartTime)
 					+ UI.DASH_WITH_DOUBLE_SPACE
-					+ _dtFormatter.print(mergeTour.tourEndTime));
+					+ _dtFormatter.print(mergeTour.tourEndTime);
 		} else {
-			_labelTitle.setText(UI.EMPTY_STRING);
+			labelText = UI.EMPTY_STRING;
 		}
+
+		_labelTitle.setText(labelText);
+		_labelTitle.setToolTipText(labelText);
 	}
 
 	private void updateUI_ToogleAction() {

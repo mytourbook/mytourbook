@@ -338,6 +338,11 @@ public class ChartLayerPhoto implements IChartLayer {
 		for (final int photoIndex : photoGroup.photoIndex) {
 
 			final Point photoPosition = _photoPositions[photoIndex];
+			if (photoPosition == null) {
+				// this happened
+				break;
+			}
+
 			final int devXPhoto = photoPosition.x;
 			final int devYPhoto = photoPosition.y;
 

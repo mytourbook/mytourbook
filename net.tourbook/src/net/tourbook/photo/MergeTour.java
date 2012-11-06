@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
-import gnu.trove.list.array.TLongArrayList;
-
 import java.util.ArrayList;
 
 import net.tourbook.data.HistoryData;
@@ -64,7 +62,6 @@ public class MergeTour {
 	private DateTime						tourStartDateTime;
 	Period									tourPeriod;
 
-	int										numberOfPhotos;
 	int										numberOfGPSPhotos;
 	int										numberOfNoGPSPhotos;
 
@@ -74,7 +71,6 @@ public class MergeTour {
 	public ArrayList<PhotoWrapper>			tourPhotos			= new ArrayList<PhotoWrapper>();
 
 	private TourData						_historyTourData;
-	private TLongArrayList					_historyTimeSerie;
 
 	/**
 	 * Constructor for a history tour.
@@ -91,9 +87,6 @@ public class MergeTour {
 
 		_historyTourData = new TourData();
 		_historyTourData.setupHistoryTour();
-
-		_historyTimeSerie = new TLongArrayList();
-		_historyTimeSerie.add(tourStartTime);
 	}
 
 	/**
@@ -111,10 +104,6 @@ public class MergeTour {
 
 		setTourStartTime(tourStartTime);
 		setTourEndTime(tourEndTime);
-	}
-
-	void addPhotoTime(final long photoTime) {
-		_historyTimeSerie.add(photoTime);
 	}
 
 	private void addTimeSlice(final ArrayList<HistoryData> historyList, final long timeSliceTime) {
@@ -146,21 +135,18 @@ public class MergeTour {
 
 	private void finalizeHistoryTour() {
 
-		if (_historyTimeSerie.size() == 0) {
+		final int timeSerieLength = tourPhotos.size();
+		final long[] historyTimeSerie = new long[timeSerieLength];
 
-			// only the tour start exists from the constructor, create 1 time slice
-
-			_historyTimeSerie.add(tourStartTime);
+		for (int photoIndex = 0; photoIndex < timeSerieLength; photoIndex++) {
+			historyTimeSerie[photoIndex] = tourPhotos.get(photoIndex).adjustedTime;
 		}
-
-		final long[] historyTimeSerie = _historyTimeSerie.toArray();
-		final int timeSerieLength = historyTimeSerie.length;
 
 		final long tourStart = historyTimeSerie[0];
 		final long tourEnd = historyTimeSerie[timeSerieLength - 1];
 
-		historyStartTime = tourStartTime = tourStart;
-		historyEndTime = tourEndTime = tourEnd;
+		historyStartTime = tourStart;
+		historyEndTime = tourEnd;
 
 		if (timeSerieLength == 1) {
 
@@ -246,10 +232,23 @@ public class MergeTour {
 
 	void setTourEndTime(final long endTime) {
 
-		tourEndTime = endTime;
-
 		if (isHistoryTour) {
+
+			final int photosSize = tourPhotos.size();
+
+			if (photosSize == 0) {
+				// there are no photos in this history tour, THIS SHOULD NOT HAPPEN FOR A HISTORY TOUR
+				tourEndTime = tourStartTime;
+			} else {
+				// get time from last photo
+				tourEndTime = tourPhotos.get(photosSize - 1).adjustedTime;
+			}
+
 			finalizeHistoryTour();
+
+		} else {
+
+			tourEndTime = endTime;
 		}
 
 		// set tour period AFTER history tour is finalized
@@ -266,11 +265,14 @@ public class MergeTour {
 	@Override
 	public String toString() {
 		return "MergeTour "
-				+ ("\ttourStart=" + _dtFormatter.print(tourStartTime))
-				+ ("\ttourStart=" + tourStartTime)
-				+ ("\ttourEnd=" + _dtFormatter.print(tourEndTime))
-				+ ("\tisHistory=" + isHistoryTour)
+				+ ("\n\ttourStart=\t\t\t" + tourStartTime)
+				+ ("\n\ttourStart=\t\t\t" + _dtFormatter.print(tourStartTime))
+				+ ("\n\ttourEnd=\t\t\t" + _dtFormatter.print(tourEndTime))
+				+ ("\n\thistoryStartTime=\t" + _dtFormatter.print(historyStartTime))
+				+ ("\n\thistoryEndTime=\t\t" + _dtFormatter.print(historyEndTime))
+				+ ("\n\tisHistory=" + isHistoryTour)
 				+ ("\tmergeId=" + mergeId)
+				+ ("\n")
 		//
 		;
 	}

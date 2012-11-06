@@ -1089,6 +1089,9 @@ public class TourChart extends Chart {
 		_photoOverlay.setPhotoLayer(null);
 		_layerPhoto = null;
 
+		// ensure sliders are displayed for real tours
+		setShowSlider(true);
+
 		if (_tourChartConfig.isShowTourPhotos == false) {
 			return;
 		}

@@ -176,7 +176,6 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 																							.toFormatter();
 
 	private final DateTimeFormatter					_dateFormatter					= DateTimeFormat.shortDate();
-
 	private final DateTimeFormatter					_timeFormatter					= DateTimeFormat.mediumTime();
 	private final NumberFormat						_nf_1_1							= NumberFormat.getNumberInstance();
 	{
@@ -242,46 +241,6 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 			return mt1Time != 0 ? 1 : -1;
 		}
 	}
-
-//	public class ContentComparer implements IElementComparer {
-//
-//		@Override
-//		public boolean equals(final Object a, final Object b) {
-//
-//			if (a == b) {
-//				return true;
-//			}
-//
-//			if (b == null) {
-//				return false;
-//			}
-//
-//			if (!(b instanceof MergeTour)) {
-//				return false;
-//			}
-//
-//			final MergeTour tourA = (MergeTour) a;
-//			final MergeTour tourB = (MergeTour) b;
-//
-//			if (tourA.tourId != tourB.tourId) {
-//				return false;
-//			}
-//
-//			return true;
-//		}
-//
-//		@Override
-//		public int hashCode(final Object element) {
-//
-//			final MergeTour tourA = (MergeTour) element;
-//
-//			final int prime = 31;
-//			int result = 1;
-//			result = prime * result + (int) (tourA.tourId ^ (tourA.tourId >>> 32));
-//
-//			return result;
-//		}
-//	}
 
 	private class ContentProvider implements IStructuredContentProvider {
 
@@ -452,14 +411,14 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 
 		MergeTour currentMergeTour = createMergeTours_10_GetFirst();
 
-		long realTourEnd = currentMergeTour.tourEndTime;
-		boolean isRealTour = currentMergeTour.isHistoryTour == false;
-
 		_allMergeTours.clear();
 		_selectedMergeTour = null;
 
+		final int numberOfRealTours = _allDbTours.size();
+		long nextDbTourStartTime = numberOfRealTours > 0 ? _allDbTours.get(0).tourStartTime : Long.MIN_VALUE;
+
+		int tourIndex = 0;
 		long photoTime = 0;
-		final int tourIndexStart[] = new int[] { 0 };
 
 		// loop: all photos
 		for (final PhotoWrapper photoWrapper : _allPhotos) {
@@ -467,59 +426,90 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 			final Photo photo = photoWrapper.photo;
 			photoTime = photoWrapper.adjustedTime;
 
-			boolean isSetupNewTour = false;
+			// check if current photo can be put into current merge tour
+			if (currentMergeTour.isHistoryTour == false && photoTime <= currentMergeTour.tourEndTime) {
 
-			// first check real tours
-			if (isRealTour) {
+				// current photo can be put into current real tour
 
-				// current merge tour is a real tour
+			} else if (currentMergeTour.isHistoryTour && photoTime < nextDbTourStartTime) {
 
-				if (photoTime <= realTourEnd) {
-
-					// current tour contains current image
-
-				} else {
-
-					// current photo do not fit into current tour, find/create tour for the current image
-
-					createMergeTours_30_FinalizeCurrentMergeTour(currentMergeTour, photoTime);
-
-					currentMergeTour = createMergeTours_20_GetNextDbTour(tourIndexStart, photoTime);
-
-					isSetupNewTour = true;
-				}
+				// current photo can be put into current history tour
 
 			} else {
 
-				// current merge tour is a dummy tour
+				// current photo do not fit into current merge tour
 
-				final MergeTour nextMergeTour = createMergeTours_20_GetNextDbTour(tourIndexStart, photoTime);
+				// finalize current merge tour
+				createMergeTours_30_FinalizeCurrentMergeTour(currentMergeTour);
 
-				if (nextMergeTour.isHistoryTour) {
+				currentMergeTour = null;
 
-					// it's again a dummy tour, put photo into current dummy tour
+				/*
+				 * create/get new merge tour
+				 */
+				if (tourIndex >= numberOfRealTours) {
 
-					currentMergeTour.addPhotoTime(photoTime);
+					/*
+					 * there are no further tours which can contain photos, put remaining photos
+					 * into a history tour
+					 */
+
+					nextDbTourStartTime = Long.MAX_VALUE;
+					currentMergeTour = new MergeTour(photoTime);
 
 				} else {
 
-					// it's a new real tour, setup a new merge tour (real or dummy)
+					for (; tourIndex < numberOfRealTours; tourIndex++) {
 
-					createMergeTours_30_FinalizeCurrentMergeTour(currentMergeTour, photoTime);
+						final MergeTour dbMergeTour = _allDbTours.get(tourIndex);
 
-					currentMergeTour = nextMergeTour;
+						final long dbTourStart = dbMergeTour.tourStartTime;
+						final long dbTourEnd = dbMergeTour.tourEndTime;
 
-					isSetupNewTour = true;
+						if (photoTime < dbTourStart) {
+
+							// image time is before the next tour start, create history tour
+
+							currentMergeTour = new MergeTour(photoTime);
+
+							nextDbTourStartTime = dbTourStart;
+
+							break;
+						}
+
+						if (photoTime >= dbTourStart && photoTime <= dbTourEnd) {
+
+							// current photo can be put into current tour
+
+							currentMergeTour = dbMergeTour;
+
+							break;
+						}
+
+						// current tour do not contain any images
+
+						if (_isShowToursOnlyWithPhotos == false) {
+
+							// tours without photos are displayed
+
+							createMergeTours_40_AddTour(dbMergeTour);
+						}
+
+						// get start time for the next tour
+						if (tourIndex + 1 < numberOfRealTours) {
+							nextDbTourStartTime = _allDbTours.get(tourIndex + 1).tourStartTime;
+						} else {
+							nextDbTourStartTime = Long.MAX_VALUE;
+						}
+					}
+				}
+
+				if (currentMergeTour == null) {
+					currentMergeTour = new MergeTour(photoTime);
 				}
 			}
 
-			if (isSetupNewTour) {
-				realTourEnd = currentMergeTour.tourEndTime;
-				isRealTour = currentMergeTour.isHistoryTour == false;
-			}
-
 			currentMergeTour.tourPhotos.add(photoWrapper);
-			currentMergeTour.numberOfPhotos++;
 
 			// set camera into the photo
 			setCamera(photo);
@@ -533,7 +523,9 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 			}
 		}
 
-		createMergeTours_30_FinalizeCurrentMergeTour(currentMergeTour, photoTime);
+		createMergeTours_30_FinalizeCurrentMergeTour(currentMergeTour);
+
+		createMergeTours_50_MergeHistoryTours();
 
 		updateUI_Cameras(null);
 
@@ -589,92 +581,80 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 		return currentMergeTour;
 	}
 
-	private MergeTour createMergeTours_20_GetNextDbTour(final int[] tourIndexStart, final long imageTime) {
-
-		MergeTour newMergeTour = null;
-
-		// loop: all remaining tours from database
-		int tourIndex = tourIndexStart[0];
-		for (; tourIndex < _allDbTours.size(); tourIndex++) {
-
-			final MergeTour dbMergeTour = _allDbTours.get(tourIndex);
-
-			final long dbTourStart = dbMergeTour.tourStartTime;
-			final long dbTourEnd = dbMergeTour.tourEndTime;
-
-			if (imageTime < dbTourStart) {
-
-				// image time is before the next tour start, create dummy tour
-
-				newMergeTour = new MergeTour(imageTime);
-
-				break;
-			}
-
-			if (imageTime >= dbTourStart && imageTime <= dbTourEnd) {
-
-				// current tour contains current photo
-
-				newMergeTour = dbMergeTour;
-
-				break;
-			}
-
-			// current tour do not contain any images
-			if (_isShowToursOnlyWithPhotos == false) {
-
-				// tours without photos are displayed
-
-				final int allMergeTourSize = _allMergeTours.size();
-				boolean isAddMergeTour = true;
-				if (allMergeTourSize > 0) {
-
-					// check if this tour is already added, this algorithm to add tours is a little bit complex
-
-					final MergeTour prevTour = _allMergeTours.get(allMergeTourSize - 1);
-					if (prevTour.equals(dbMergeTour)) {
-						isAddMergeTour = false;
-					}
-				}
-
-				if (isAddMergeTour) {
-					_allMergeTours.add(dbMergeTour);
-				}
-			}
-		}
-
-		// update start index
-		tourIndexStart[0] = tourIndex;
-
-		if (newMergeTour == null) {
-
-			// create dummy tour
-
-			newMergeTour = new MergeTour(imageTime);
-		}
-
-		return newMergeTour;
-	}
-
 	/**
 	 * Keep current merge tour when it contains photos.
 	 * 
 	 * @param currentMergeTour
-	 * @param imageTime
 	 */
-	private void createMergeTours_30_FinalizeCurrentMergeTour(final MergeTour currentMergeTour, final long imageTime) {
+	private void createMergeTours_30_FinalizeCurrentMergeTour(final MergeTour currentMergeTour) {
 
 		// keep only tours which contain photos
-		if (currentMergeTour.numberOfPhotos == 0 && _isShowToursOnlyWithPhotos) {
+		final boolean isNoPhotos = currentMergeTour.tourPhotos.size() == 0;
+
+		if (isNoPhotos && currentMergeTour.isHistoryTour || isNoPhotos && _isShowToursOnlyWithPhotos) {
 			return;
 		}
 
 		// set tour end time
 		if (currentMergeTour.isHistoryTour) {
-			currentMergeTour.setTourEndTime(imageTime);
+			currentMergeTour.setTourEndTime(Long.MAX_VALUE);
 		}
 
-		_allMergeTours.add(currentMergeTour);
+		createMergeTours_40_AddTour(currentMergeTour);
+	}
+
+	private void createMergeTours_40_AddTour(final MergeTour mergeTour) {
+
+		boolean isAddMergeTour = true;
+		final int numberOfMergeTours = _allMergeTours.size();
+
+		if (numberOfMergeTours > 0) {
+
+			// check if this tour is already added, this algorithm to add tours is a little bit complex
+
+			final MergeTour prevTour = _allMergeTours.get(numberOfMergeTours - 1);
+			if (prevTour.equals(mergeTour)) {
+				isAddMergeTour = false;
+			}
+		}
+
+		if (isAddMergeTour) {
+			_allMergeTours.add(mergeTour);
+		}
+	}
+
+	/**
+	 * History tours can occure multiple times in sequence, when tours between history tours do not
+	 * contain photos. This will merge multiple history tours into one.
+	 */
+	private void createMergeTours_50_MergeHistoryTours() {
+
+		if (_allMergeTours.size() == 0) {
+			return;
+		}
+
+		boolean isHistoryMulti = false;
+		boolean isHistory = _allMergeTours.get(0).isHistoryTour;
+
+		for (int mergeIndex = 1; mergeIndex < _allMergeTours.size(); mergeIndex++) {
+			final MergeTour mergeTour = _allMergeTours.get(mergeIndex);
+			if (mergeTour.isHistoryTour == isHistory) {
+				// 2 subsequent tours contains history tours
+				isHistoryMulti = true;
+				break;
+			}
+
+			isHistory = mergeTour.isHistoryTour;
+		}
+
+		System.out.println(UI.timeStampNano() + " is multi history " + isHistoryMulti);
+		// TODO remove SYSTEM.OUT.PRINTLN
+
+		if (isHistoryMulti == false) {
+			// there is nothing to merge
+			return;
+		}
+
 	}
 
 	@Override
@@ -881,8 +861,7 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 
 		_tourViewer.setUseHashlookup(true);
 		_tourViewer.setContentProvider(new ContentProvider());
-		_tourViewer.setComparator(new ContentComparator());
-//		_tourViewer.setComparer(new ContentComparer());
+//		_tourViewer.setComparator(new ContentComparator());
 
 		_tourViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(final SelectionChangedEvent event) {
@@ -1056,7 +1035,7 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 			public void update(final ViewerCell cell) {
 
 				final MergeTour mergedTour = (MergeTour) cell.getElement();
-				final int numberOfPhotos = mergedTour.numberOfPhotos;
+				final int numberOfPhotos = mergedTour.tourPhotos.size();
 
 				cell.setText(numberOfPhotos == 0 ? UI.EMPTY_STRING : Long.toString(numberOfPhotos));
 
@@ -1771,7 +1750,6 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 
 				mergeDbTour.tourPhotos.clear();
 
-				mergeDbTour.numberOfPhotos = 0;
 				mergeDbTour.numberOfGPSPhotos = 0;
 				mergeDbTour.numberOfNoGPSPhotos = 0;
 			}
