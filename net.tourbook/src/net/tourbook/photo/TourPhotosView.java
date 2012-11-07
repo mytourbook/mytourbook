@@ -315,7 +315,8 @@ public class TourPhotosView extends ViewPart {
 					SWT.V_SCROLL | SWT.H_SCROLL | SWT.MULTI,
 					new PhotoGalleryProvider());
 
-			_photoGallery.setDefaultStatusMessage(Messages.Tour_Photos_Label_StatusMessage_NoTourWithPhotos);
+//			_photoGallery.setDefaultStatusMessage(Messages.Tour_Photos_Label_StatusMessage_NoTourWithPhotos);
+//			_photoGallery.setDefaultStatusMessage(UI.EMPTY_STRING);
 		}
 	}
 

@@ -21,7 +21,8 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.messages";							//$NON-NLS-1$
 
-	public static String	Action_PhotosAndTours_FilterPhotos_Tooltip;
+	public static String		Action_PhotosAndTours_FilterNoTours_Tooltip;
+	public static String		Action_PhotosAndTours_FilterPhotos_Tooltip;
 
 	public static String		Action_ToolTip_Hide;
 	public static String		Action_ToolTip_SetDefaults;
@@ -648,7 +649,10 @@ public class Messages extends NLS {
 	public static String		Image__link;
 	public static String		Image__MyTourbook16;
 	public static String		Image__options;
+	public static String		Image__Photo_FilterNo;
+	public static String		Image__Photo_FilterNoTours;
 	public static String		Image__Photo_FilterPhotos;
+	public static String		Image__Photo_FilterPhotos_Disabled;
 	public static String		Image__PhotoDirectoryView;
 	public static String		Image__PhotoGalleryHorizontal;
 	public static String		Image__PhotoGalleryVertical;

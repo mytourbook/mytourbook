@@ -135,6 +135,9 @@ public class MergeTour {
 
 	private void finalizeHistoryTour() {
 
+		/*
+		 * create time data serie
+		 */
 		final int timeSerieLength = tourPhotos.size();
 		final long[] historyTimeSerie = new long[timeSerieLength];
 

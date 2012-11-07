@@ -20,25 +20,24 @@ import net.tourbook.application.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionFilterPhotos extends Action {
+public class ActionFilterNoTours extends Action {
 
 	private PhotosAndToursView	_photosAndToursView;
 
-	public ActionFilterPhotos(final PhotosAndToursView photosAndToursView) {
+	public ActionFilterNoTours(final PhotosAndToursView photosAndToursView) {
 
 		super(null, AS_CHECK_BOX);
 
 		_photosAndToursView = photosAndToursView;
 
-		setToolTipText(Messages.Action_PhotosAndTours_FilterPhotos_Tooltip);
+		setToolTipText(Messages.Action_PhotosAndTours_FilterNoTours_Tooltip);
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Photo_FilterPhotos));
-		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Photo_FilterPhotos_Disabled));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Photo_FilterNoTours));
 	}
 
 	@Override
 	public void run() {
-		_photosAndToursView.actionFilterPhotos();
+		_photosAndToursView.actionFilterNoTours();
 	}
 
 }

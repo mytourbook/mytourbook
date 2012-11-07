@@ -109,6 +109,7 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 	private static final String						STATE_CAMERA_ADJUSTMENT_TIME	= "STATE_CAMERA_ADJUSTMENT_TIME";					//$NON-NLS-1$
 	private static final String						STATE_SELECTED_CAMERA_NAME		= "STATE_SELECTED_CAMERA_NAME";					//$NON-NLS-1$
 	private static final String						STATE_FILTER_PHOTOS				= "STATE_FILTER_PHOTOS";							//$NON-NLS-1$
+	private static final String						STATE_FILTER_NO_TOURS			= "STATE_FILTER_NO_TOURS";							//$NON-NLS-1$
 
 	public static final String						IMAGE_PIC_DIR_VIEW				= "IMAGE_PIC_DIR_VIEW";							//$NON-NLS-1$
 	public static final String						IMAGE_PHOTO_PHOTO				= "IMAGE_PHOTO_PHOTO";								//$NON-NLS-1$
@@ -158,8 +159,9 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 	private PixelConverter							_pc;
 	private ColumnManager							_columnManager;
 
-	private ActionModifyColumns						_actionModifyColumns;
 	private ActionFilterPhotos						_actionFilterPhotos;
+	private ActionFilterNoTours						_actionFilterNoTours;
+	private ActionModifyColumns						_actionModifyColumns;
 
 	private Connection								_sqlConnection;
 	private PreparedStatement						_sqlStatement;
@@ -189,6 +191,7 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 	 * When <code>true</code>, only tours with photos are displayed.
 	 */
 	private boolean									_isShowToursOnlyWithPhotos		= true;
+	private boolean									_isFilterNoTours;
 
 	/*
 	 * UI controls
@@ -255,6 +258,15 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 
 	public PhotosAndToursView() {
 		super();
+	}
+
+	void actionFilterNoTours() {
+
+		_isFilterNoTours = _actionFilterNoTours.isChecked();
+
+		updateUI(_selectedMergeTour, false);
+
+		enableControls();
 	}
 
 	void actionFilterPhotos() {
@@ -381,6 +393,7 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 
 		_actionModifyColumns = new ActionModifyColumns(this);
 		_actionFilterPhotos = new ActionFilterPhotos(this);
+		_actionFilterNoTours = new ActionFilterNoTours(this);
 	}
 
 	/**
@@ -409,7 +422,7 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 	 */
 	private void createMergeTours() {
 
-		MergeTour currentMergeTour = createMergeTours_10_GetFirst();
+		MergeTour currentMergeTour = createMergeTours_10_GetFirstTour();
 
 		_allMergeTours.clear();
 		_selectedMergeTour = null;
@@ -455,7 +468,6 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 					 */
 
 					nextDbTourStartTime = Long.MAX_VALUE;
-					currentMergeTour = new MergeTour(photoTime);
 
 				} else {
 
@@ -469,8 +481,6 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 						if (photoTime < dbTourStart) {
 
 							// image time is before the next tour start, create history tour
-
-							currentMergeTour = new MergeTour(photoTime);
 
 							nextDbTourStartTime = dbTourStart;
 
@@ -505,6 +515,9 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 				}
 
 				if (currentMergeTour == null) {
+
+					// create history tour
+
 					currentMergeTour = new MergeTour(photoTime);
 				}
 			}
@@ -525,9 +538,7 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 
 		createMergeTours_30_FinalizeCurrentMergeTour(currentMergeTour);
 
-		createMergeTours_50_MergeHistoryTours();
-
-		updateUI_Cameras(null);
+		createMergeTours_60_MergeHistoryTours();
 
 //		System.out.println(UI.timeStampNano() + " \t");
 //		System.out.println(UI.timeStampNano() + " \t");
@@ -541,7 +552,7 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 	/**
 	 * Get/Create first merge tour
 	 */
-	private MergeTour createMergeTours_10_GetFirst() {
+	private MergeTour createMergeTours_10_GetFirstTour() {
 
 		MergeTour currentMergeTour = null;
 
@@ -575,7 +586,7 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 			final long tourStartUTC = _allPhotos.get(0).adjustedTime;
 //			final int tourStartUTCZoneOffset = DateTimeZone.getDefault().getOffset(tourStartUTC);
 
-			currentMergeTour = new MergeTour(tourStartUTC + tourStartUTC);
+			currentMergeTour = new MergeTour(tourStartUTC);
 		}
 
 		return currentMergeTour;
@@ -627,34 +638,114 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 	 * History tours can occure multiple times in sequence, when tours between history tours do not
 	 * contain photos. This will merge multiple history tours into one.
 	 */
-	private void createMergeTours_50_MergeHistoryTours() {
+	private void createMergeTours_60_MergeHistoryTours() {
 
 		if (_allMergeTours.size() == 0) {
 			return;
 		}
 
-		boolean isHistoryMulti = false;
-		boolean isHistory = _allMergeTours.get(0).isHistoryTour;
+		boolean isSubsequentHistory = false;
+		boolean isHistory = false;
 
-		for (int mergeIndex = 1; mergeIndex < _allMergeTours.size(); mergeIndex++) {
-			final MergeTour mergeTour = _allMergeTours.get(mergeIndex);
-			if (mergeTour.isHistoryTour == isHistory) {
-				// 2 subsequent tours contains history tours
-				isHistoryMulti = true;
+		for (final MergeTour mergeTour : _allMergeTours) {
+
+			if (isHistory && mergeTour.isHistoryTour == isHistory) {
+
+				// 2 subsequent tours contains the same tour type
+				isSubsequentHistory = true;
 				break;
 			}
 
 			isHistory = mergeTour.isHistoryTour;
 		}
 
-		System.out.println(UI.timeStampNano() + " is multi history " + isHistoryMulti);
-		// TODO remove SYSTEM.OUT.PRINTLN
-
-		if (isHistoryMulti == false) {
+		if (isSubsequentHistory == false) {
 			// there is nothing to merge
 			return;
 		}
 
+		final ArrayList<MergeTour> mergedMergeTours = new ArrayList<MergeTour>();
+		MergeTour prevHistoryTour = null;
+
+		for (final MergeTour mergeTour : _allMergeTours) {
+
+			final boolean isHistoryTour = mergeTour.isHistoryTour;
+
+			if (isHistoryTour && prevHistoryTour == null) {
+
+				// first history tour
+
+				prevHistoryTour = mergeTour;
+
+				continue;
+			}
+
+			if (isHistoryTour && prevHistoryTour != null) {
+
+				// this is a subsequent history tour, it is merged into previous history tour
+
+				prevHistoryTour.tourPhotos.addAll(mergeTour.tourPhotos);
+				prevHistoryTour.numberOfGPSPhotos += mergeTour.numberOfGPSPhotos;
+				prevHistoryTour.numberOfNoGPSPhotos += mergeTour.numberOfNoGPSPhotos;
+
+				continue;
+			}
+
+			if (isHistoryTour == false && prevHistoryTour != null) {
+
+				// this is a real tour, finalize previous history tour
+
+				prevHistoryTour.setTourEndTime(Long.MAX_VALUE);
+				mergedMergeTours.add(prevHistoryTour);
+			}
+
+			prevHistoryTour = null;
+
+			// this is a real tour
+
+			mergedMergeTours.add(mergeTour);
+		}
+
+		if (prevHistoryTour != null) {
+
+			// finalize previous history tour
+			prevHistoryTour.setTourEndTime(Long.MAX_VALUE);
+			mergedMergeTours.add(prevHistoryTour);
+		}
+
+		_allMergeTours.clear();
+		_allMergeTours.addAll(mergedMergeTours);
+	}
+
+	private void createMergeTours_90_FilterNoTours() {
+
+		_allMergeTours.clear();
+		_selectedMergeTour = null;
+
+		final MergeTour historyTour = new MergeTour(_allPhotos.get(0).adjustedTime);
+		historyTour.tourPhotos.addAll(_allPhotos);
+
+		for (final PhotoWrapper photoWrapper : _allPhotos) {
+
+			final Photo photo = photoWrapper.photo;
+
+			// set camera into the photo
+			setCamera(photo);
+
+			// set number of GPS/No GPS photos
+			final double latitude = photo.getLatitude();
+			if (latitude == Double.MIN_VALUE) {
+				historyTour.numberOfNoGPSPhotos++;
+			} else {
+				historyTour.numberOfGPSPhotos++;
+			}
+		}
+
+		// finalize history tour
+		historyTour.setTourEndTime(Long.MAX_VALUE);
+
+		_allMergeTours.clear();
+		_allMergeTours.add(historyTour);
 	}
 
 	@Override
@@ -861,7 +952,7 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 
 		_tourViewer.setUseHashlookup(true);
 		_tourViewer.setContentProvider(new ContentProvider());
-//		_tourViewer.setComparator(new ContentComparator());
+		_tourViewer.setComparator(new ContentComparator());
 
 		_tourViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(final SelectionChangedEvent event) {
@@ -1226,6 +1317,10 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 		_comboCamera.setEnabled(isTourAvailable);
 		_spinnerHours.setEnabled(isTourAvailable);
 		_spinnerMinutes.setEnabled(isTourAvailable);
+		_spinnerSeconds.setEnabled(isTourAvailable);
+
+		final boolean isPhotoFilter = _actionFilterNoTours.isChecked() == false;
+		_actionFilterPhotos.setEnabled(isPhotoFilter);
 	}
 
 	private void fillContextMenu(final IMenuManager menuMgr) {
@@ -1262,6 +1357,7 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 		 */
 		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
+		tbm.add(_actionFilterNoTours);
 		tbm.add(_actionFilterPhotos);
 		tbm.add(new Separator());
 	}
@@ -1461,7 +1557,10 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 	private void restoreState() {
 
 		// photo filter
+		_isFilterNoTours = Util.getStateBoolean(_state, STATE_FILTER_NO_TOURS, true);
 		_isShowToursOnlyWithPhotos = Util.getStateBoolean(_state, STATE_FILTER_PHOTOS, true);
+
+		_actionFilterNoTours.setChecked(_isFilterNoTours);
 		_actionFilterPhotos.setChecked(_isShowToursOnlyWithPhotos);
 
 		/*
@@ -1529,6 +1628,7 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 
 		// photo filter
 		_state.put(STATE_FILTER_PHOTOS, _actionFilterPhotos.isChecked());
+		_state.put(STATE_FILTER_NO_TOURS, _actionFilterNoTours.isChecked());
 
 		_columnManager.saveState(_state);
 	}
@@ -1567,33 +1667,65 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 		// check if tour is selected
 		if (newSelection == null || newSelection.isEmpty()) {
 
-			final long requestedStartTime = requestedTour.isHistoryTour
-					? requestedTour.historyStartTime
-					: requestedTour.tourStartTime;
-			final long requestedEndTime = requestedTour.isHistoryTour //
-					? requestedTour.historyEndTime
-					: requestedTour.tourEndTime;
+			MergeTour mergeTourSelection = null;
 
-			final long requestedTime = requestedStartTime + ((requestedEndTime - requestedStartTime) / 2);
+			final ArrayList<PhotoWrapper> tourPhotos = requestedTour.tourPhotos;
+			if (tourPhotos.size() > 0) {
 
-			for (final MergeTour mergeTour : _allMergeTours) {
+				// get tour for the first photo
 
-				final long mergeStartTime = mergeTour.isHistoryTour
-						? mergeTour.historyStartTime
-						: mergeTour.tourStartTime;
-				final long mergeEndTime = mergeTour.isHistoryTour //
-						? mergeTour.historyEndTime
-						: mergeTour.tourEndTime;
+				final long tourPhotoTime = tourPhotos.get(0).imageUTCTime;
 
-				final boolean isIntersects = requestedTime > mergeStartTime && requestedTime < mergeEndTime;
+				for (final MergeTour mergeTour : _allMergeTours) {
 
-				if (isIntersects) {
+					final long mergeStartTime = mergeTour.isHistoryTour
+							? mergeTour.historyStartTime
+							: mergeTour.tourStartTime;
+					final long mergeEndTime = mergeTour.isHistoryTour //
+							? mergeTour.historyEndTime
+							: mergeTour.tourEndTime;
 
-					_tourViewer.setSelection(new StructuredSelection(mergeTour), false);
-					newSelection = _tourViewer.getSelection();
-
-					break;
+					if (tourPhotoTime >= mergeStartTime && tourPhotoTime <= mergeEndTime) {
+						mergeTourSelection = mergeTour;
+						break;
+					}
 				}
+
+			} else {
+
+				// get tour by checking intersection
+
+				final long requestedStartTime = requestedTour.isHistoryTour
+						? requestedTour.historyStartTime
+						: requestedTour.tourStartTime;
+				final long requestedEndTime = requestedTour.isHistoryTour //
+						? requestedTour.historyEndTime
+						: requestedTour.tourEndTime;
+
+				final long requestedTime = requestedStartTime + ((requestedEndTime - requestedStartTime) / 2);
+
+				for (final MergeTour mergeTour : _allMergeTours) {
+
+					final long mergeStartTime = mergeTour.isHistoryTour
+							? mergeTour.historyStartTime
+							: mergeTour.tourStartTime;
+					final long mergeEndTime = mergeTour.isHistoryTour //
+							? mergeTour.historyEndTime
+							: mergeTour.tourEndTime;
+
+					final boolean isIntersects = requestedTime > mergeStartTime && requestedTime < mergeEndTime;
+
+					if (isIntersects) {
+						mergeTourSelection = mergeTour;
+						break;
+					}
+				}
+			}
+
+			if (mergeTourSelection != null) {
+
+				_tourViewer.setSelection(new StructuredSelection(mergeTourSelection), false);
+				newSelection = _tourViewer.getSelection();
 			}
 		}
 
@@ -1755,7 +1887,13 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 			}
 		}
 
-		createMergeTours();
+		if (_isFilterNoTours) {
+			createMergeTours_90_FilterNoTours();
+		} else {
+			createMergeTours();
+		}
+
+		updateUI_Cameras(null);
 
 		_tourViewer.setInput(new Object[0]);
 

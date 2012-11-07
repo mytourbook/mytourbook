@@ -13,11 +13,9 @@ public class Messages extends NLS {
 
 	public static String		App_Unit_Pixel;
 
-	public static String	FullScreen_ImageViewer_Spinner_ResizeImage_Tooltip;
-
-	public static String	FullScreen_ImageViewer_Spinner_ResizeImage_Tooltip_OSX;
-
-	public static String	FullScreenImageViewer_KeyCharacter_ShowPhotoGallery;
+	public static String		FullScreen_ImageViewer_Spinner_ResizeImage_Tooltip;
+	public static String		FullScreen_ImageViewer_Spinner_ResizeImage_Tooltip_OSX;
+	public static String		FullScreenImageViewer_KeyCharacter_ShowPhotoGallery;
 
 	public static String		Image__Backward_Nav;
 	public static String		Image__CursorNotImplemented;
@@ -43,10 +41,8 @@ public class Messages extends NLS {
 	public static String		Photo_Merge_Label_SelectedPhotoDates_Tooltip;
 
 	public static String		Photo_ToolTip_Description;
-
-	public static String	Photo_ToolTip_ExifDate;
-
-	public static String	Photo_ToolTip_FileDate;
+	public static String		Photo_ToolTip_ExifDate;
+	public static String		Photo_ToolTip_FileDate;
 	public static String		Photo_ToolTip_Model;
 	public static String		Photo_ToolTip_Size;
 	public static String		Photo_ToolTip_Title;
@@ -78,8 +74,7 @@ public class Messages extends NLS {
 	public static String		Pic_Dir_Action_SortByDate_Tooltip;
 	public static String		Pic_Dir_Action_SortByName;
 	public static String		Pic_Dir_Action_SortByName_Tooltip;
-
-	public static String	Pic_Dir_Action_SortFolderHistory;
+	public static String		Pic_Dir_Action_SortFolderHistory;
 	public static String		Pic_Dir_Action_ToggleFolderGallery;
 	public static String		Pic_Dir_Action_ToggleFolderGallery_OnlyPhotos;
 	public static String		Pic_Dir_Action_ToggleFolderGallery_OnlyPhotos_Tooltip;
@@ -114,6 +109,8 @@ public class Messages extends NLS {
 	public static String		Pic_Dir_StatusLabel_LoadingThumbExif;
 	public static String		Pic_Dir_StatusLabel_nImagesAreHiddenByFilter;
 	public static String		Pic_Dir_StatusLabel_NoFolder;
+	public static String	Pic_Dir_StatusLabel_NoImages;
+
 	public static String		Pic_Dir_StatusLabel_NoImagesInFolder;
 	public static String		Pic_Dir_StatusLabel_RestoringFolder;
 	public static String		Pic_Dir_StatusLabel_SelectedImages;
