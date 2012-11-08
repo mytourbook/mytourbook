@@ -24,6 +24,8 @@ public class Messages extends NLS {
 	public static String		Action_PhotosAndTours_FilterNoTours_Tooltip;
 	public static String		Action_PhotosAndTours_FilterPhotos_Tooltip;
 
+	public static String	Action_PhotosAndTours_SetGPSIntoPhotos;
+
 	public static String		Action_ToolTip_Hide;
 	public static String		Action_ToolTip_SetDefaults;
 
@@ -784,6 +786,8 @@ public class Messages extends NLS {
 	public static String		Photo_Gallery_Action_ToggleGalleryHorizontal_ToolTip;
 	public static String		Photo_Gallery_Action_ToggleGalleryVertical_ToolTip;
 
+	public static String	Photo_Gallery_Label_NoTourWithPhoto;
+
 	public static String		Photo_Tooltip_Action_MoveToolTip_ToolTip;
 	public static String		Photo_Tooltip_Action_PinToolTip_ToolTip;
 	public static String		Photo_Tooltip_Label_ShellNoResize;
@@ -1214,8 +1218,6 @@ public class Messages extends NLS {
 	public static String		Tour_Marker_Position_vertical_below;
 	public static String		Tour_Marker_Position_vertical_chart_bottom;
 	public static String		Tour_Marker_Position_vertical_chart_top;
-
-	public static String		Tour_Photos_Label_StatusMessage_NoTourWithPhotos;
 
 	public static String		Tour_Segmenter_Label_default_tolerance;
 	public static String		Tour_Segmenter_Label_no_chart;

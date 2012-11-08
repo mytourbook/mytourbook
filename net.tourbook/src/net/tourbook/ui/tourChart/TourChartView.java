@@ -546,36 +546,32 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
 
 		if (_tourData == null) {
-			showTourFromTourProvider();
+
+			_pageBook.showPage(_pageNoChart);
+			
+			// a tour is not displayed, find a tour provider which provides a tour
+			Display.getCurrent().asyncExec(new Runnable() {
+				public void run() {
+			
+					// validate widget
+					if (_pageBook.isDisposed()) {
+						return;
+					}
+			
+					/*
+					 * check if tour was set from a selection provider
+					 */
+					if (_tourData != null) {
+						return;
+					}
+			
+					final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
+					if (selectedTours != null && selectedTours.size() > 0) {
+						updateChart(selectedTours.get(0));
+					}
+				}
+			});
 		}
-	}
-
-	private void showTourFromTourProvider() {
-
-		_pageBook.showPage(_pageNoChart);
-
-		// a tour is not displayed, find a tour provider which provides a tour
-		Display.getCurrent().asyncExec(new Runnable() {
-			public void run() {
-
-				// validate widget
-				if (_pageBook.isDisposed()) {
-					return;
-				}
-
-				/*
-				 * check if tour was set from a selection provider
-				 */
-				if (_tourData != null) {
-					return;
-				}
-
-				final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
-				if (selectedTours != null && selectedTours.size() > 0) {
-					updateChart(selectedTours.get(0));
-				}
-			}
-		});
 	}
 
 	private void updateChart() {

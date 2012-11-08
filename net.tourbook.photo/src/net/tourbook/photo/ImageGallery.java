@@ -2234,7 +2234,11 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 				if (imageCount == 0) {
 
-					_lblGalleryInfo.setText(Messages.Pic_Dir_StatusLabel_NoImages);
+					if (_defaultStatusMessage.length() > 0) {
+						_lblGalleryInfo.setText(_defaultStatusMessage);
+					} else {
+						_lblGalleryInfo.setText(Messages.Pic_Dir_StatusLabel_NoImages);
+					}
 
 				} else {
 

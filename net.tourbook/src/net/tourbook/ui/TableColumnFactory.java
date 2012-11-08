@@ -839,6 +839,21 @@ public abstract class TableColumnFactory {
 			return colDef;
 		};
 	};
+
+	public static final TableColumnFactory	TOUR_CAMERA	= new TableColumnFactory() {
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "tourCamera", SWT.LEAD); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_TourCamera_Label);
+			colDef.setColumnHeader(Messages.ColumnFactory_TourCamera_Label);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_TourCamera_Label_Tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
+			
+			return colDef;
+		};
+	};
 	
 	public static final TableColumnFactory TOUR_DATE = new TableColumnFactory() {
 		

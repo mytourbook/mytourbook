@@ -73,6 +73,11 @@ public class MergeTour {
 	private TourData						_historyTourData;
 
 	/**
+	 * Contains names for all cameras which are used to take pictures for the current tour.
+	 */
+	String									tourCameras;
+
+	/**
 	 * Constructor for a history tour.
 	 * 
 	 * @param notUsed

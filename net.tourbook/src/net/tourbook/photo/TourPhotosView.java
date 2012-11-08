@@ -288,6 +288,8 @@ public class TourPhotosView extends ViewPart {
 
 		// this part is a selection provider
 		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider());
+
+		showTour();
 	}
 
 	private void createUI(final Composite parent) {
@@ -315,8 +317,7 @@ public class TourPhotosView extends ViewPart {
 					SWT.V_SCROLL | SWT.H_SCROLL | SWT.MULTI,
 					new PhotoGalleryProvider());
 
-//			_photoGallery.setDefaultStatusMessage(Messages.Tour_Photos_Label_StatusMessage_NoTourWithPhotos);
-//			_photoGallery.setDefaultStatusMessage(UI.EMPTY_STRING);
+			_photoGallery.setDefaultStatusMessage(Messages.Photo_Gallery_Label_NoTourWithPhoto);
 		}
 	}
 
@@ -429,6 +430,37 @@ public class TourPhotosView extends ViewPart {
 	@Override
 	public void setFocus() {
 
+	}
+
+	private void showTour() {
+
+		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
+
+//		if (_currentPhotoSelection == null) {
+//
+//			// a tour is not displayed, find a tour provider which provides a tour
+//			Display.getCurrent().asyncExec(new Runnable() {
+//				public void run() {
+//
+//					// validate widget
+//					if (_photoGallery.isDisposed()) {
+//						return;
+//					}
+//
+//					/*
+//					 * check if tour was set from a selection provider
+//					 */
+//					if (_currentPhotoSelection != null) {
+//						return;
+//					}
+//
+//					final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
+//					if (selectedTours != null && selectedTours.size() > 0) {
+//						updateUI(selectedTours.get(0));
+//					}
+//				}
+//			});
+//		}
 	}
 
 	private void updateColors(final boolean isRestore) {
