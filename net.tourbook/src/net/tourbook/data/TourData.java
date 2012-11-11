@@ -530,7 +530,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	private int												conconiDeflection;
 
-	// ############################################# UNUSED FIELDS #############################################
+	// ############################################# UNUSED FIELDS START #############################################
 	/**
 	 * ssss distance msw
 	 * <p>
@@ -557,13 +557,20 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	@SuppressWarnings("unused")
 	private int												deviceWeight;
 
-	// ############################################# UNUSED FIELDS #############################################
+	// ############################################# UNUSED FIELDS END #############################################
 
 	/**
 	 * data series for time, altitude,...
 	 */
 	@Basic(optional = false)
 	private SerieData										serieData;
+
+	/**
+	 * Photo
+	 */
+	@OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
+	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
+	private Set<TourPhoto>									tourPhotos							= new HashSet<TourPhoto>();
 
 	/**
 	 * Tour marker
@@ -4910,6 +4917,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	public TourPerson getTourPerson() {
 		return tourPerson;
+	}
+
+	public Set<TourPhoto> getTourPhotos() {
+		return tourPhotos;
 	}
 
 	/**

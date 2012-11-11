@@ -99,7 +99,7 @@ public class Photo {
 																			.forPattern("yyyy:MM:dd HH:mm:ss") //$NON-NLS-1$
 //																			.withZone(DateTimeZone.UTC)
 																	;
-	private static final DateTimeFormatter	_dtFormatter			= DateTimeFormat.forStyle("SL");	//$NON-NLS-1$
+//	private static final DateTimeFormatter	_dtFormatter			= DateTimeFormat.forStyle("SL");	//$NON-NLS-1$
 
 	/**
 	 * caches the world positions for the photo lat/long values for each zoom level
@@ -946,17 +946,18 @@ public class Photo {
 		 * set state if gps data are available, this state is used for filtering the photos and to
 		 * indicate that exif data are loaded
 		 */
-		final boolean isNoGPS = _latitude == Double.MIN_VALUE || _longitude == Double.MIN_VALUE;
+		final boolean isGPS = _latitude != Double.MIN_VALUE && _longitude != Double.MIN_VALUE;
 
-		_photoWrapper.isGPS = !isNoGPS;
-		_photoWrapper.gpsState = isNoGPS ? 0 : 1;
+		_photoWrapper.isGPS = isGPS;
+		_photoWrapper.isExifGps = isGPS;
+		_photoWrapper.gpsState = isGPS ? 0 : 1;
 
 		// sort by exif date when available
 		if (_exifDateTime != null) {
 
 			final long exifUTCMills = _exifDateTime.getMillis();
 
-			_photoWrapper.imageUTCTime = exifUTCMills;
+			_photoWrapper.imageExifTime = exifUTCMills;
 //			_photoWrapper.imageUTCZoneOffset = DateTimeZone.getDefault().getOffset(exifUTCMills);
 		}
 	}

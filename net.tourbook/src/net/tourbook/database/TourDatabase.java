@@ -54,6 +54,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourPersonHRZone;
+import net.tourbook.data.TourPhoto;
 import net.tourbook.data.TourReference;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
@@ -123,6 +124,7 @@ public class TourDatabase {
 	 */
 	public static final String						TABLE_SCHEMA								= "USER";									//$NON-NLS-1$
 	private static final String						TABLE_DB_VERSION							= "DBVERSION";								// "DbVersion";			//$NON-NLS-1$
+	public static final String						TABLE_TOUR_PHOTO							= "TOURPHOTO";								//"TourBike";			//$NON-NLS-1$
 	public static final String						TABLE_TOUR_BIKE								= "TOURBIKE";								//"TourBike";			//$NON-NLS-1$
 	public static final String						TABLE_TOUR_COMPARED							= "TOURCOMPARED";							// "TourCompared";		//$NON-NLS-1$
 	public static final String						TABLE_TOUR_DATA								= "TOURDATA";								// "TourData";			//$NON-NLS-1$
@@ -134,15 +136,13 @@ public class TourDatabase {
 	public static final String						TABLE_TOUR_TAG								= "TOURTAG";								// "TourTag";			//$NON-NLS-1$
 	public static final String						TABLE_TOUR_TAG_CATEGORY						= "TOURTAGCATEGORY";						// "TourTagCategory";	//$NON-NLS-1$
 	public static final String						TABLE_TOUR_TYPE								= "TOURTYPE";								// "TourType";			//$NON-NLS-1$
-//
-//  tour category is disabled since version 1.6
-//
-//	public static final String						TABLE_TOUR_CATEGORY							= "TOURCATEGORY";										// "TourCategory";		//$NON-NLS-1$
 
 	public static final String						JOINTABLE_TOURDATA__TOURTAG					= (TABLE_TOUR_DATA
 																										+ "_" + TABLE_TOUR_TAG);			//$NON-NLS-1$
 	public static final String						JOINTABLE_TOURDATA__TOURMARKER				= (TABLE_TOUR_DATA
 																										+ "_" + TABLE_TOUR_MARKER);		//$NON-NLS-1$
+	public static final String						JOINTABLE_TOURDATA__TOURPHOTO				= (TABLE_TOUR_DATA
+																										+ "_" + TABLE_TOUR_PHOTO);			//$NON-NLS-1$
 	public static final String						JOINTABLE_TOURDATA__TOURWAYPOINT			= (TABLE_TOUR_DATA
 																										+ "_" + TABLE_TOUR_WAYPOINT);		//$NON-NLS-1$
 	public static final String						JOINTABLE_TOURDATA__TOURREFERENCE			= (TABLE_TOUR_DATA
@@ -153,8 +153,6 @@ public class TourDatabase {
 																										+ "_" + TABLE_TOUR_TAG_CATEGORY);	//$NON-NLS-1$
 	public static final String						JOINTABLE_TOURPERSON__TOURPERSON_HRZONE		= (TABLE_TOUR_PERSON
 																										+ "_" + TABLE_TOUR_PERSON_HRZONE);	//$NON-NLS-1$
-//	public static final String						JOINTABLE_TOURCATEGORY__TOURDATA			= (TABLE_TOUR_CATEGORY
-//																									+ "_" + TABLE_TOUR_DATA);						//$NON-NLS-1$
 	/**
 	 * contains <code>-1</code> which is the Id for a not saved entity
 	 */
@@ -1135,6 +1133,15 @@ public class TourDatabase {
 			prepStmt.close();
 
 			/*
+			 * tour photo
+			 */
+			sql = "DELETE FROM " + JOINTABLE_TOURDATA__TOURPHOTO + sqlWhereTourDataTourId; //$NON-NLS-1$
+			prepStmt = conn.prepareStatement(sql);
+			prepStmt.setLong(1, tourId);
+			prepStmt.execute();
+			prepStmt.close();
+
+			/*
 			 * tour way point
 			 */
 			sql = "DELETE FROM " + TABLE_TOUR_WAYPOINT + sqlWhereTourDataTourId; //$NON-NLS-1$
@@ -1842,6 +1849,7 @@ public class TourDatabase {
 				createTableTourPersonHRZone(stmt);
 				createTableTourType(stmt);
 				createTableTourMarker(stmt);
+				createTableTourPhoto(stmt);
 				createTableTourReference(stmt);
 				createTableTourCompared(stmt);
 				createTableTourBike(stmt);
@@ -2480,6 +2488,73 @@ public class TourDatabase {
 		sql = "ALTER TABLE " + JOINTABLE_TOURPERSON__TOURPERSON_HRZONE + "						\n" //$NON-NLS-1$ //$NON-NLS-2$
 				+ "	ADD CONSTRAINT " + JOINTABLE_TOURPERSON__TOURPERSON_HRZONE + "_pk			\n" //$NON-NLS-1$ //$NON-NLS-2$
 				+ "	PRIMARY KEY (" + TABLE_TOUR_PERSON + "_personId)"; //							//$NON-NLS-1$ //$NON-NLS-2$
+
+		exec(stmt, sql);
+	}
+
+	/**
+	 * create table {@link #TABLE_TOUR_MARKER}
+	 * 
+	 * @param stmt
+	 * @throws SQLException
+	 */
+	private void createTableTourPhoto(final Statement stmt) throws SQLException {
+
+		String sql;
+
+		/*
+		 * CREATE TABLE TourPhoto
+		 */
+
+		sql = "CREATE TABLE " + TABLE_TOUR_PHOTO //								//$NON-NLS-1$
+				+ "(															\n" //$NON-NLS-1$
+
+				//
+				+ "	photoId 					BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1),\n" //$NON-NLS-1$
+				//
+				+ "	" + (TABLE_TOUR_DATA + "_tourId	BIGINT,						\n") //$NON-NLS-1$ //$NON-NLS-2$
+				//
+				+ ("	imageFileName			" + varCharKomma(TourPhoto.DB_LENGTH_FILE_PATH)) //$NON-NLS-1$
+				+ ("	imageFileExt			" + varCharKomma(TourPhoto.DB_LENGTH_FILE_PATH)) //$NON-NLS-1$
+				+ ("	imageFilePathName		" + varCharKomma(TourPhoto.DB_LENGTH_FILE_PATH)) //$NON-NLS-1$
+				//
+				+ "	imageExifTime				BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
+				+ "	imageFileLastModified		BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
+				//
+				+ "	isGeoFromPhoto				INT DEFAULT 0,					\n" //$NON-NLS-1$
+				+ "	latitude 					DOUBLE DEFAULT 0,				\n" //$NON-NLS-1$
+				+ "	longitude 					DOUBLE DEFAULT 0				\n" //$NON-NLS-1$
+				//
+				+ ")"; //															//$NON-NLS-1$
+
+		exec(stmt, sql);
+
+		/*
+		 * ALTER TABLE TourPhoto ADD CONSTRAINT TourPhoto_pk PRIMARY KEY (photoId);
+		 */
+		sql = "ALTER TABLE " + TABLE_TOUR_PHOTO + "							\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	ADD CONSTRAINT " + TABLE_TOUR_PHOTO + "_pk					\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	PRIMARY KEY (photoId)"; //										//$NON-NLS-1$
+
+		exec(stmt, sql);
+
+		sql = "CREATE TABLE " + JOINTABLE_TOURDATA__TOURPHOTO //							//$NON-NLS-1$
+				+ "(																	\n" //$NON-NLS-1$
+				//
+				+ ("	" + TABLE_TOUR_DATA + "_tourId			BIGINT NOT NULL,		\n")//$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	" + TABLE_TOUR_PHOTO + "_photoId		BIGINT NOT NULL			\n")//$NON-NLS-1$ //$NON-NLS-2$
+				//
+				+ ")"; //																//$NON-NLS-1$
+
+		exec(stmt, sql);
+
+		/*
+		 * ALTER TABLE TourData_TourPhoto ADD CONSTRAINT TourData_TourPhoto_pk PRIMARY KEY
+		 * (TourData_tourId);
+		 */
+		sql = "ALTER TABLE " + JOINTABLE_TOURDATA__TOURPHOTO + "				\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	ADD CONSTRAINT " + JOINTABLE_TOURDATA__TOURPHOTO + "_pk		\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	PRIMARY KEY (" + TABLE_TOUR_DATA + "_tourId)"; //				//$NON-NLS-1$ //$NON-NLS-2$
 
 		exec(stmt, sql);
 	}
@@ -4254,6 +4329,9 @@ public class TourDatabase {
 
 		final Statement stmt = conn.createStatement();
 		{
+
+			createTableTourPhoto(stmt);
+
 //			TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA
 //			// version 22 start  -  12.12.0
 //			//

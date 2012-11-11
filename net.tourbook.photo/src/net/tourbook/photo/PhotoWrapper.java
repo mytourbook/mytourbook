@@ -36,6 +36,10 @@ public class PhotoWrapper implements IGalleryCustomData {
 
 	public String	imageFileName;
 	public String	imageFileExt;
+
+	/**
+	 * File path name is the unique key for a photowrapper.
+	 */
 	public String	imageFilePathName;
 
 	/**
@@ -44,9 +48,10 @@ public class PhotoWrapper implements IGalleryCustomData {
 	public long		imageFileLastModified;
 
 	/**
-	 * Time in milliseconds
+	 * Exif time in milliseconds, when not available, the last modified time of the image file is
+	 * used.
 	 */
-	public long		imageUTCTime;
+	public long		imageExifTime;
 
 	/**
 	 * Offset in milliseconds from {@link #imageUTCTime} which is in UTC and the local time
@@ -82,6 +87,11 @@ public class PhotoWrapper implements IGalleryCustomData {
 	 */
 	public boolean	isGPS;
 
+	/**
+	 * Is <code>true</code> when geo coordinates origin is in the photo EXIF data.
+	 */
+	public boolean	isExifGps;
+
 	public PhotoWrapper(final File file) {
 
 		imageFile = file;
@@ -96,7 +106,7 @@ public class PhotoWrapper implements IGalleryCustomData {
 		imageFileExt = dotPos > 0 ? imageFileName.substring(dotPos + 1).toLowerCase() : UI.EMPTY_STRING;
 
 		// initially sort by file date until exif data are loaded
-		imageUTCTime = imageFileLastModified;
+		imageExifTime = imageFileLastModified;
 	}
 
 	@Override

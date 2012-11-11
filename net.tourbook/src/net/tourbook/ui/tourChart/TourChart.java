@@ -1188,7 +1188,7 @@ public class TourChart extends Chart {
 				if (imageAdjustedTime != Long.MIN_VALUE) {
 					imageTime = imageAdjustedTime;
 				} else {
-					imageTime = photoWrapper.imageUTCTime;
+					imageTime = photoWrapper.imageExifTime;
 				}
 
 				final long photoTime = imageTime / 1000;

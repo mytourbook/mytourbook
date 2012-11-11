@@ -136,13 +136,6 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	private int						_visibleType;
 
 	/**
-	 * unique id for manually created markers because the {@link #markerId} is 0 when the marker is
-	 * not persisted
-	 */
-	@Transient
-	private long					_createId				= 0;
-
-	/**
 	 * Contains <b>width</b> and <b>height</b> of the marker image.
 	 * <p>
 	 * <b>x</b> and <b>y</b> contain the width and height of the marker banner which is the marker
@@ -150,6 +143,13 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	 */
 	@Transient
 	private Rectangle				_markerBounds;
+
+	/**
+	 * unique id for manually created markers because the {@link #markerId} is 0 when the marker is
+	 * not persisted
+	 */
+	@Transient
+	private long					_createId				= 0;
 
 	/**
 	 * manually created marker or imported marker create a unique id to identify them, saved marker
@@ -253,11 +253,6 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		return true;
 	}
 
-//	public void setCreateId() {
-//		markerId = TourDatabase.ENTITY_IS_NOT_SAVED;
-//		_createId = ++_createCounter;
-//	}
-
 	/**
 	 * !!!!!!!!!!!!!!!!!<br>
 	 * serieIndex is not used for equals or hashcode because this is modified when markers are
@@ -334,10 +329,6 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		return _markerBounds;
 	}
 
-	public long getMarkerId() {
-		return markerId;
-	}
-
 	/**
 	 * @return Returns position of this marker in the data serie
 	 */
@@ -347,10 +338,6 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 
 	public int getTime() {
 		return time;
-	}
-
-	public TourData getTourData() {
-		return tourData;
 	}
 
 	public int getType() {
