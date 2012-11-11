@@ -30,7 +30,7 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.photo.MergePhotoTourSelection;
-import net.tourbook.photo.PhotoMergeManager;
+import net.tourbook.photo.PhotoManager;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPagePeople;
 import net.tourbook.proxy.DefaultProxySelector;
@@ -377,7 +377,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 //				+ (" (" + selection.getClass().getCanonicalName() + ")"));
 
 		if (selection instanceof MergePhotoTourSelection) {
-			PhotoMergeManager.openPhotoMergePerspective((MergePhotoTourSelection) selection);
+			PhotoManager.openPhotoMergePerspective((MergePhotoTourSelection) selection);
 		}
 	}
 

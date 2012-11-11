@@ -191,8 +191,6 @@ public class PhotoImageCache {
 
 			photoImage = cacheWrapper.image;
 
-			final long start = System.currentTimeMillis();
-
 			/*
 			 * ensure image and metadata are set in the photo
 			 */
@@ -234,25 +232,22 @@ public class PhotoImageCache {
 	 */
 	public static void putImage(final String imageKey,
 								final Image image,
-								final PhotoImageMetadata imageMetadata,
 								final int imageWidth,
 								final int imageHeight,
 								final String originalImagePathName) {
 
-		putImageInCache(_imageCache, imageKey, image, imageMetadata, imageWidth, imageHeight, originalImagePathName);
+		putImageInCache(_imageCache, imageKey, image, imageWidth, imageHeight, originalImagePathName);
 	}
 
 	private static void putImageInCache(final ConcurrentLinkedHashMap<String, ImageCacheWrapper> imageCache,
 										final String imageKey,
 										final Image image,
-										final PhotoImageMetadata imageMetadata,
 										final int imageWidth,
 										final int imageHeight,
 										final String originalImagePathName) {
 
 		final ImageCacheWrapper imageCacheWrapper = new ImageCacheWrapper(
 				image,
-				imageMetadata,
 				imageWidth,
 				imageHeight,
 				originalImagePathName,
@@ -281,19 +276,11 @@ public class PhotoImageCache {
 	 */
 	public static void putImageOriginal(final String imageKey,
 										final Image image,
-										final PhotoImageMetadata imageMetadata,
 										final int imageWidth,
 										final int imageHeight,
 										final String originalImagePathName) {
 
-		putImageInCache(
-				_imageCacheOriginal,
-				imageKey,
-				image,
-				imageMetadata,
-				imageWidth,
-				imageHeight,
-				originalImagePathName);
+		putImageInCache(_imageCacheOriginal, imageKey, image, imageWidth, imageHeight, originalImagePathName);
 	}
 
 	public static void setOriginalImageCacheSize(final int newCacheSize) {

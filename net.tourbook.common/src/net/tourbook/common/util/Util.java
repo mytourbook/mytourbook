@@ -335,6 +335,23 @@ public class Util {
 		}
 	}
 
+	public static void deleteTempFile(final File tempFile) {
+
+		if (tempFile == null || tempFile.exists() == false) {
+			return;
+		}
+
+		try {
+
+			if (tempFile.delete() == false) {
+				StatusUtil.log(String.format("Temp file cannot be deleted: %s", tempFile.getAbsolutePath())); //$NON-NLS-1$
+			}
+
+		} catch (final SecurityException e) {
+			StatusUtil.showStatus(String.format("Temp file cannot be deleted: %s", tempFile.getAbsolutePath())); //$NON-NLS-1$
+		}
+	}
+
 	public static Resource disposeResource(final Resource resource) {
 		if (resource != null && !resource.isDisposed()) {
 			resource.dispose();

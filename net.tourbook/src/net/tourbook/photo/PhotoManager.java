@@ -19,13 +19,28 @@ import net.tourbook.application.PerspectiveFactoryPhoto;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 
-public class PhotoMergeManager {
+public class PhotoManager {
+
+	private static final ListenerList	_photoEventListeners	= new ListenerList(ListenerList.IDENTITY);
+
+	public static void addPhotoEventListener(final IPhotoEventListener listener) {
+		_photoEventListeners.add(listener);
+	}
+
+	public static void fireEvent(final PhotoEventId photoEventId, final Object data) {
+
+		final Object[] allListeners = _photoEventListeners.getListeners();
+		for (final Object listener : allListeners) {
+			((IPhotoEventListener) listener).photoEvent(photoEventId, data);
+		}
+	}
 
 	public static void openPhotoMergePerspective(final MergePhotoTourSelection photoMergeSelection) {
 
@@ -50,6 +65,12 @@ public class PhotoMergeManager {
 			} catch (final WorkbenchException e) {
 				StatusUtil.showStatus(e);
 			}
+		}
+	}
+
+	public static void removePhotoEventListener(final IPhotoEventListener listener) {
+		if (listener != null) {
+			_photoEventListeners.remove(listener);
 		}
 	}
 }

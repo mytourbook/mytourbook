@@ -45,6 +45,7 @@ import net.tourbook.photo.internal.gallery.MT20.GalleryMT20Item;
 import net.tourbook.photo.internal.gallery.MT20.IGalleryContextMenuProvider;
 import net.tourbook.photo.internal.gallery.MT20.IGalleryCustomData;
 import net.tourbook.photo.internal.gallery.MT20.IItemHovereredListener;
+import net.tourbook.photo.internal.manager.ExifCache;
 import net.tourbook.photo.internal.manager.GallerySorting;
 import net.tourbook.photo.internal.manager.ImageUtils;
 import net.tourbook.photo.internal.manager.ThumbnailStore;
@@ -84,8 +85,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.progress.UIJob;
 
-import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
-
 /**
  * This class is a compilation from different source codes:
  * 
@@ -101,28 +100,27 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	/**
 	 * Number of gallery positions which are cached
 	 */
-	private static final int									MAX_GALLERY_POSITIONS			= 100;
+	private static final int				MAX_GALLERY_POSITIONS			= 100;
 
-	private static final String									MENU_ID_PHOTO_GALLERY			= "menu.net.tourbook.photo.photoGallery";	//$NON-NLS-1$
+	private static final String				MENU_ID_PHOTO_GALLERY			= "menu.net.tourbook.photo.photoGallery";	//$NON-NLS-1$
 
-	private static final int									DELAY_JOB_SUBSEQUENT_FILTER		= 500;										// ms
+	private static final int				DELAY_JOB_SUBSEQUENT_FILTER		= 500;										// ms
+	private static final long				DELAY_JOB_UI_FILTER				= 200;										// ms
+	private static final long				DELAY_JOB_UI_LOADING			= 200;										// ms
 
-	private static final long									DELAY_JOB_UI_FILTER				= 200;										// ms
-	private static final long									DELAY_JOB_UI_LOADING			= 200;										// ms
-	public static final int										MIN_GALLERY_ITEM_WIDTH			= 10;										// pixel
+	public static final int					MIN_GALLERY_ITEM_WIDTH			= 10;										// pixel
+	public static final int					MAX_GALLERY_ITEM_WIDTH			= 2000;									// pixel
 
-	public static final int										MAX_GALLERY_ITEM_WIDTH			= 2000;									// pixel
-	public static final String									STATE_THUMB_IMAGE_SIZE			= "STATE_THUMB_IMAGE_SIZE";				//$NON-NLS-1$
+	public static final String				STATE_THUMB_IMAGE_SIZE			= "STATE_THUMB_IMAGE_SIZE";				//$NON-NLS-1$
+	private static final String				STATE_GALLERY_POSITION_KEY		= "STATE_GALLERY_POSITION_KEY";			//$NON-NLS-1$
+	private static final String				STATE_GALLERY_POSITION_VALUE	= "STATE_GALLERY_POSITION_VALUE";			//$NON-NLS-1$
+	private static final String				STATE_IMAGE_SORTING				= "STATE_IMAGE_SORTING";					//$NON-NLS-1$
+	private static final String				STATE_SELECTED_ITEMS			= "STATE_SELECTED_ITEMS";					//$NON-NLS-1$
+	private static final String				DEFAULT_GALLERY_FONT			= "arial,sans-serif";						//$NON-NLS-1$
 
-	private static final String									STATE_GALLERY_POSITION_KEY		= "STATE_GALLERY_POSITION_KEY";			//$NON-NLS-1$
-	private static final String									STATE_GALLERY_POSITION_VALUE	= "STATE_GALLERY_POSITION_VALUE";			//$NON-NLS-1$
-	private static final String									STATE_IMAGE_SORTING				= "STATE_IMAGE_SORTING";					//$NON-NLS-1$
-	private static final String									STATE_SELECTED_ITEMS			= "STATE_SELECTED_ITEMS";					//$NON-NLS-1$
-	private static final String									DEFAULT_GALLERY_FONT			= "arial,sans-serif";						//$NON-NLS-1$
-
-	private final IPreferenceStore								_prefStore						= Activator
-																										.getDefault()
-																										.getPreferenceStore();
+	private final IPreferenceStore			_prefStore						= Activator
+																					.getDefault()
+																					.getPreferenceStore();
 
 	/*
 	 * worker thread management
@@ -130,106 +128,106 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	/**
 	 * Worker start time
 	 */
-	private long												_workerStart;
+	private long							_workerStart;
 
 	/**
 	 * Lock for all worker control data and state
 	 */
-	private final Object										_workerLock						= new Object();
+	private final Object					_workerLock						= new Object();
 
 	/**
 	 * The worker's thread
 	 */
-	private volatile Thread										_workerThread					= null;
+	private volatile Thread					_workerThread					= null;
 
 	/**
 	 * True if the worker must exit on completion of the current cycle
 	 */
-	private volatile boolean									_workerStopped					= false;
+	private volatile boolean				_workerStopped					= false;
 
 	/**
 	 * True if the worker must cancel its operations prematurely perhaps due to a state update
 	 */
-	private volatile boolean									_workerCancelled				= false;
+	private volatile boolean				_workerCancelled				= false;
 
 	/**
 	 * Worker state information -- this is what gets synchronized by an update
 	 */
-	private volatile File										_workerStateDir					= null;
+	private volatile File					_workerStateDir					= null;
 
 	/**
 	 * State information to use for the next cycle
 	 */
-	private volatile File										_workerNextFolder				= null;
+	private volatile File					_workerNextFolder				= null;
 
 	/**
 	 * Manages the worker's thread
 	 */
-	private final Runnable										_workerRunnable;
+	private final Runnable					_workerRunnable;
 
 	/*
 	 * image loading/filtering
 	 */
-	private ImageFilter											_currentImageFilter;
+	private ImageFilter						_currentImageFilter;
 
-	private boolean												_filterJob1stRun;
+	private boolean							_filterJob1stRun;
+	private boolean							_filterJobIsCanceled;
 
-	private boolean												_filterJobIsCanceled;
-	private ReentrantLock										JOB_LOCK						= new ReentrantLock();
+	private ReentrantLock					JOB_LOCK						= new ReentrantLock();
+	private Job								_jobFilter;
 
-	private Job													_jobFilter;
-	private AtomicBoolean										_jobFilterIsSubsequentScheduled	= new AtomicBoolean();
-	private int													_jobFilterDirtyCounter;
-	private UIJob												_jobUIFilter;
+	private AtomicBoolean					_jobFilterIsSubsequentScheduled	= new AtomicBoolean();
+	private int								_jobFilterDirtyCounter;
 
-	private AtomicBoolean										_jobUIFilterJobIsScheduled		= new AtomicBoolean();
-	private int													_jobUIFilterDirtyCounter;
-	private PhotoWrapper[]										_jobUIFilterPhotoWrapper;
-	private int													_currentExifRunId;
+	private UIJob							_jobUIFilter;
+	private AtomicBoolean					_jobUIFilterJobIsScheduled		= new AtomicBoolean();
+	private int								_jobUIFilterDirtyCounter;
+	private PhotoWrapper[]					_jobUIFilterPhotoWrapper;
 
-	private Job													_jobUILoading;
+	private Job								_jobUILoading;
+	private AtomicBoolean					_jobUILoadingIsScheduled		= new AtomicBoolean();
+	private int								_jobUILoadingDirtyCounter;
 
-	private AtomicBoolean										_jobUILoadingIsScheduled		= new AtomicBoolean();
-	private int													_jobUILoadingDirtyCounter;
+	private int								_currentExifRunId;
+
 	/**
 	 *
 	 */
-	public static Comparator<PhotoWrapper>						SORT_BY_IMAGE_DATE;
-	public static Comparator<PhotoWrapper>						SORT_BY_FILE_NAME;
+	public Comparator<PhotoWrapper>			SORT_BY_IMAGE_DATE;
+	public Comparator<PhotoWrapper>			SORT_BY_FILE_NAME;
 	/**
 	 * Contains current gallery sorting id: {@link PicDirView#GALLERY_SORTING_BY_DATE} or
 	 * {@link PicDirView#GALLERY_SORTING_BY_NAME}
 	 */
-	private Comparator<PhotoWrapper>							_currentComparator;
+	private Comparator<PhotoWrapper>		_currentComparator;
+	private GallerySorting					_currentSorting;
 
-	private GallerySorting										_currentSorting;
-	private PhotoRenderer										_photoRenderer;
+	private PhotoRenderer					_photoRenderer;
+	private FullScreenImageViewer			_fullScreenImageViewer;
 
-	private FullScreenImageViewer								_fullScreenImageViewer;
-
-	private GalleryPhotoToolTip									_photoGalleryTooltip;
+	private GalleryPhotoToolTip				_photoGalleryTooltip;
 
 	/**
 	 * Folder which images are currently be displayed
 	 */
-	private File												_photoFolder;
+	private File							_photoFolder;
 
 	/**
 	 * Folder which images should be displayed in the gallery
 	 */
-	private File												_photoFolderWhichShouldBeDisplayed;
+	private File							_photoFolderWhichShouldBeDisplayed;
+
+	protected IPhotoGalleryProvider			_photoGalleryProvider;
+
+	private int								_galleryStyle;
+
+	private boolean							_isShowCustomActionBar;
+	private boolean							_isShowThumbsize;
 
 	/**
 	 * Contains photo wrapper for <b>ALL</b> gallery items including <b>HIDDEN</b> items
 	 */
-	private PhotoWrapper[]										_allPhotoWrapper;
-
-	protected IPhotoGalleryProvider								_photoGalleryProvider;
-
-	private int													_galleryStyle;
-
-	private boolean												_isShowCustomActionBar;
-	private boolean												_isShowThumbsize;
+	private PhotoWrapper[]					_allPhotoWrapper;
 
 	/**
 	 * Contains filtered gallery items.
@@ -237,74 +235,65 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	 * Only these items are displayed in the gallery, {@link #_allPhotoWrapper} items contains also
 	 * hidden gallery items.
 	 */
-	private PhotoWrapper[]										_sortedAndFilteredPhotoWrapper;
+	private PhotoWrapper[]					_sortedAndFilteredPhotoWrapper;
 
-	FileFilter													_fileFilter;
+	FileFilter								_fileFilter;
 
 	/**
 	 * Photo image size without border
 	 */
-	private int													_photoImageSize;
-	private int													_photoBorderSize;
+	private int								_photoImageSize;
+
+	private int								_photoBorderSize;
 
 	/**
 	 * When not <code>-1</code>, the vertical gallery is not yet fully restored.
 	 */
 //	private int													_verticalRestoreThumbSize		= -1;
 
-	private boolean												_isShowTooltip;
+	private boolean							_isShowTooltip;
 
 	/**
 	 * keep gallery position for each used folder
 	 */
-	private LinkedHashMap<String, Double>						_galleryPositions;
+	private LinkedHashMap<String, Double>	_galleryPositions;
 
-	private String												_newGalleryPositionKey;
-	private String												_currentGalleryPositionKey;
-	private String												_defaultStatusMessage			= UI.EMPTY_STRING;
+	private String							_newGalleryPositionKey;
 
-	private int[]												_restoredSelection;
+	private String							_currentGalleryPositionKey;
+	private String							_defaultStatusMessage			= UI.EMPTY_STRING;
+	private int[]							_restoredSelection;
 
-	private final NumberFormat									_nf1							= NumberFormat
-																										.getNumberInstance();
-
+	private final NumberFormat				_nf1							= NumberFormat.getNumberInstance();
 	{
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
 	}
-	/**
-	 * Cache for exif meta data, key is file path
-	 */
-	private ConcurrentLinkedHashMap<String, PhotoImageMetadata>	_exifCache;
 
 	/*
 	 * UI resources
 	 */
-	private Font												_galleryFont;
+	private Font							_galleryFont;
 
 	/*
 	 * UI controls
 	 */
-	private Display												_display;
+	private Display							_display;
 
-	private Composite											_uiContainer;
-	private GalleryImplementation								_galleryMT20;
+	private Composite						_uiContainer;
 
-	private GalleryActionBar									_galleryActionBar;
-	private PageBook											_pageBook;
+	private GalleryImplementation			_galleryMT20;
+	private GalleryActionBar				_galleryActionBar;
 
-	private Label												_lblDefaultPage;
-	private Composite											_pageDefault;
-	private Composite											_pageGalleryInfo;
+	private PageBook						_pageBook;
+	private Label							_lblDefaultPage;
 
-	private Label												_lblGalleryInfo;
+	private Composite						_pageDefault;
+	private Composite						_pageGalleryInfo;
+	private Label							_lblGalleryInfo;
 
 	{
 		_galleryPositions = new LinkedHashMap<String, Double>(MAX_GALLERY_POSITIONS, 0.75f, true);
-
-		_exifCache = new ConcurrentLinkedHashMap.Builder<String, PhotoImageMetadata>()//
-				.maximumWeightedCapacity(20000)
-				.build();
 
 		_workerRunnable = new Runnable() {
 			public void run() {
@@ -414,7 +403,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 			final PhotoImageMetadata metadata = __photo.getImageMetaDataRaw();
 
 			if (metadata != null) {
-				_exifCache.put(__photo.getPhotoWrapper().imageFilePathName, metadata);
+				ExifCache.put(__photo.getPhotoWrapper().imageFilePathName, metadata);
 			}
 
 			if (__runId != _currentExifRunId) {
@@ -428,6 +417,8 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 			jobUILoading_20_Schedule();
 		}
 	}
+
+//	private ImageGallery() {}
 
 	private void createGalleryFont() {
 
@@ -639,7 +630,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 		PhotoImageCache.disposeAll();
 
-		_exifCache.clear();
+		ExifCache.clear();
 	}
 
 	@Override
@@ -1567,10 +1558,6 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		_photoGalleryProvider.setSelection(createPhotoSelection());
 	}
 
-	public void putInExifCache(final String imageFilePathName, final PhotoImageMetadata metadata) {
-		_exifCache.put(imageFilePathName, metadata);
-	}
-
 	/**
 	 * Get gps state and exif data
 	 * 
@@ -1586,7 +1573,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 			photo = photoWrapper.photo = new Photo(photoWrapper);
 		}
 
-		final PhotoImageMetadata photoImageMetadata = _exifCache.get(photoWrapper.imageFilePathName);
+		final PhotoImageMetadata photoImageMetadata = ExifCache.get(photoWrapper.imageFilePathName);
 
 		if (photoImageMetadata != null) {
 
@@ -1606,21 +1593,6 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 								final int height,
 								final boolean all) {
 		_galleryMT20.redraw(viewPortX, viewPortY, width, height, all);
-	}
-
-	/**
-	 * Remove all cached metadata which starts with the folder path.
-	 * 
-	 * @param folderPath
-	 */
-	public void removeCachedExifData(final String folderPath) {
-
-		// remove cached exif data
-		for (final String cachedPath : _exifCache.keySet()) {
-			if (cachedPath.startsWith(folderPath)) {
-				_exifCache.remove(cachedPath);
-			}
-		}
 	}
 
 	public void restoreInfo(final boolean isShowPhotoName,
@@ -2172,6 +2144,39 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	}
 
 	/**
+	 * Update geo position for all {@link PhotoWrapper} contained in photoWrapperList.
+	 * 
+	 * @param photoWrapperList
+	 */
+	public void updateGPSPosition(final ArrayList<?> photoWrapperList) {
+
+		for (final PhotoWrapper galleryPhotoWrapper : _allPhotoWrapper) {
+
+			final String galleryImageFilePathName = galleryPhotoWrapper.imageFilePathName;
+
+			for (final Object object : (ArrayList<?>) photoWrapperList) {
+
+				if (object instanceof PhotoWrapper) {
+					final PhotoWrapper updatedPhotoWrapper = (PhotoWrapper) object;
+
+					if (galleryImageFilePathName.equals(updatedPhotoWrapper.imageFilePathName)) {
+
+						final Photo updatedPhoto = updatedPhotoWrapper.photo;
+
+						galleryPhotoWrapper.photo.setGeoPosition(
+								updatedPhoto.getLatitude(),
+								updatedPhoto.getLongitude());
+
+						break;
+					}
+				}
+			}
+		}
+
+		_galleryMT20.redraw();
+	}
+
+	/**
 	 * @param galleryItemSizeWithBorder
 	 *            Image size with border
 	 */
@@ -2409,10 +2414,6 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 				 * sort wrappers with currently selected comparator
 				 */
 				_currentComparator = getCurrentComparator();
-
-				// keep initial sorting algorithm
-//				_initialSorting = _currentSorting;
-
 				Arrays.sort(newPhotoWrapper, _currentComparator);
 			}
 

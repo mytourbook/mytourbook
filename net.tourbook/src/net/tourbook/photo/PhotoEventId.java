@@ -13,36 +13,13 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.photo.internal.manager;
+package net.tourbook.photo;
 
-import org.eclipse.swt.graphics.Image;
+public enum PhotoEventId {
 
-/**
- * This wrapper tries to store a minimum of data
- */
-public class ImageCacheWrapper {
-
-	public String	imageKey;
-
-	public Image	image;
-
-	public int		imageWidth;
-	public int		imageHeight;
-
-	public String	originalImagePathName;
-
-	public ImageCacheWrapper(	final Image image,
-								final int imageWidth,
-								final int imageHeight,
-								final String originalImagePathName,
-								final String imageKey) {
-		this.image = image;
-
-		this.imageWidth = imageWidth;
-		this.imageHeight = imageHeight;
-
-		this.originalImagePathName = originalImagePathName;
-		this.imageKey = imageKey;
-	}
+	/**
+	 * Event data contains photos which gps coordinates has been updated.
+	 */
+	GPS_DATA_IS_UPDATED
 
 }

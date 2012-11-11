@@ -72,6 +72,7 @@ public class TourPhotosView extends ViewPart {
 	private PostSelectionProvider			_postSelectionProvider;
 
 	private ISelectionListener				_postSelectionListener;
+	private IPhotoEventListener				_photoEventListener;
 	private IPropertyChangeListener			_prefChangeListener;
 	private ITourEventListener				_tourPropertyListener;
 	private IPartListener2					_partListener;
@@ -207,6 +208,19 @@ public class TourPhotosView extends ViewPart {
 		getViewSite().getPage().addPartListener(_partListener);
 	}
 
+	private void addPhotoEventListener() {
+
+		_photoEventListener = new IPhotoEventListener() {
+
+			@Override
+			public void photoEvent(final PhotoEventId photoEventId, final Object data) {
+				onPhotoEvent(photoEventId, data);
+			}
+		};
+
+		PhotoManager.addPhotoEventListener(_photoEventListener);
+	}
+
 	private void addPrefListener() {
 
 		_prefChangeListener = new IPropertyChangeListener() {
@@ -281,6 +295,7 @@ public class TourPhotosView extends ViewPart {
 
 		addSelectionListener();
 		addTourEventListener();
+		addPhotoEventListener();
 		addPrefListener();
 		addPartListener();
 
@@ -365,6 +380,8 @@ public class TourPhotosView extends ViewPart {
 		page.removePostSelectionListener(_postSelectionListener);
 		page.removePartListener(_partListener);
 
+		PhotoManager.removePhotoEventListener(_photoEventListener);
+
 		_prefStore.removePropertyChangeListener(_prefChangeListener);
 
 		super.dispose();
@@ -380,6 +397,16 @@ public class TourPhotosView extends ViewPart {
 		_galleryToolbarManager.add(_actionToggleGalleryOrientation);
 
 		_galleryToolbarManager.update(true);
+	}
+
+	private void onPhotoEvent(final PhotoEventId photoEventId, final Object data) {
+
+		if (photoEventId == PhotoEventId.GPS_DATA_IS_UPDATED) {
+
+			if (data instanceof ArrayList) {
+				_photoGallery.updateGPSPosition((ArrayList<?>) data);
+			}
+		}
 	}
 
 	private void onSelectionChanged(final ISelection selection) {

@@ -77,6 +77,10 @@ public class PhotoWrapper implements IGalleryCustomData {
 	 */
 	public int		gpsState		= -1;
 
+	/**
+	 * Is <code>true</code> when this photo contains geo coordinates.
+	 */
+	public boolean	isGPS;
 
 	public PhotoWrapper(final File file) {
 

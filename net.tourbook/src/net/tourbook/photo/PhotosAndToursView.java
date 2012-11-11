@@ -31,6 +31,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -39,6 +40,7 @@ import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
@@ -54,15 +56,17 @@ import org.apache.commons.imaging.ImageWriteException;
 import org.apache.commons.imaging.Imaging;
 import org.apache.commons.imaging.common.IImageMetadata;
 import org.apache.commons.imaging.formats.jpeg.JpegImageMetadata;
-import org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter;
 import org.apache.commons.imaging.formats.tiff.TiffImageMetadata;
 import org.apache.commons.imaging.formats.tiff.write.TiffOutputSet;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
@@ -82,6 +86,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.custom.CLabel;
@@ -127,6 +132,8 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 
 	private static final String						CAMERA_UNKNOWN_KEY				= "CAMERA_UNKNOWN_KEY";							//$NON-NLS-1$
 
+	private static final String						TEMP_FILE_PREFIX_ORIG			= "_orig_";										//$NON-NLS-1$
+
 	private final IPreferenceStore					_prefStore						= TourbookPlugin
 																							.getDefault()
 																							.getPreferenceStore();
@@ -160,6 +167,7 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 	 * Merge tour which is currently selected in the merge tour viewer.
 	 */
 	private MergeTour								_selectedMergeTour;
+	private List<?>									_selectedMergeTours;
 
 	private PostSelectionProvider					_postSelectionProvider;
 	private ISelectionListener						_postSelectionListener;
@@ -290,10 +298,225 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 
 	void actionSetTourGPSIntoPhotos() {
 
-		for (final PhotoWrapper photoWrapper : _selectedMergeTour.tourPhotos) {
+		final ArrayList<PhotoWrapper> updatedPhotos = new ArrayList<PhotoWrapper>();
 
-			final File imageFile = photoWrapper.imageFile;
+		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+			public void run() {
 
+				for (final Object element : _selectedMergeTours) {
+
+					if (element instanceof MergeTour) {
+
+						final MergeTour mergeTour = (MergeTour) element;
+
+						actionSetTourGPSIntoPhotos_Runnable(mergeTour, updatedPhotos);
+
+						/*
+						 * update number of photos
+						 */
+						mergeTour.numberOfGPSPhotos = 0;
+						mergeTour.numberOfNoGPSPhotos = 0;
+						for (final PhotoWrapper photoWrapper : mergeTour.tourPhotos) {
+
+							final Photo photo = photoWrapper.photo;
+
+							// set number of GPS/No GPS photos
+							final double latitude = photo.getLatitude();
+							if (latitude == Double.MIN_VALUE) {
+								mergeTour.numberOfNoGPSPhotos++;
+							} else {
+								mergeTour.numberOfGPSPhotos++;
+							}
+						}
+
+						// update UI with new number of GPS photos
+						_tourViewer.update(mergeTour, null);
+					}
+				}
+
+				Photo.updateExifGeoPosition(updatedPhotos);
+			}
+		});
+
+		// fire update event
+		PhotoManager.fireEvent(PhotoEventId.GPS_DATA_IS_UPDATED, updatedPhotos);
+	}
+
+	private void actionSetTourGPSIntoPhotos_Runnable(	final MergeTour mergeTour,
+														final ArrayList<PhotoWrapper> updatedPhotos) {
+
+		final TourData tourData = TourManager.getInstance().getTourData(mergeTour.tourId);
+
+		final double[] latitudeSerie = tourData.latitudeSerie;
+		final double[] longitudeSerie = tourData.longitudeSerie;
+
+		final ArrayList<PhotoWrapper> tourPhotos = mergeTour.tourPhotos;
+		final int numberOfPhotos = tourPhotos.size();
+		if (numberOfPhotos == 0) {
+			// no photos are available for this tour
+			return;
+		}
+
+		final int[] timeSerie = tourData.timeSerie;
+		final long[] historySerie = tourData.timeSerieHistory;
+
+		final boolean isTimeSerie = timeSerie != null;
+		final boolean isHistorySerie = historySerie != null;
+
+		if (isTimeSerie == false && isHistorySerie == false) {
+			// this is a manually created tour
+			return;
+		}
+
+		/*
+		 * at least 1 photo is available
+		 */
+
+		final long tourStart = tourData.getTourStartTime().getMillis() / 1000;
+		final int numberOfTimeSlices = isTimeSerie ? timeSerie.length : historySerie.length;
+
+		/*
+		 * set photos for tours which has more than 1 value point
+		 */
+
+		long timeSliceEnd;
+		if (isTimeSerie) {
+			timeSliceEnd = tourStart + (long) (timeSerie[1] / 2.0);
+		} else {
+			timeSliceEnd = tourStart + (long) (historySerie[1] / 2.0);
+		}
+
+		int photoIndex = 0;
+		PhotoWrapper photoWrapper = tourPhotos.get(photoIndex);
+
+		// tour time serie, fit photos into a tour
+
+		int timeIndex = 0;
+
+		final boolean[] isReadOnlyMessageDisplayed = { false };
+
+		while (true) {
+
+			// check if a photo is in the current time slice
+			while (true) {
+
+				final long imageAdjustedTime = photoWrapper.adjustedTime;
+				long imageTime = 0;
+
+				if (imageAdjustedTime != Long.MIN_VALUE) {
+					imageTime = imageAdjustedTime;
+				} else {
+					imageTime = photoWrapper.imageUTCTime;
+				}
+
+				final long photoTime = imageTime / 1000;
+
+				if (photoTime <= timeSliceEnd) {
+
+					// photo is available in the current time slice
+
+					final double latitude = latitudeSerie[timeIndex];
+					final double longitude = longitudeSerie[timeIndex];
+
+					final int returnState = setExifGPSTag_IntoDB(
+							photoWrapper.imageFile,
+							latitude,
+							longitude,
+							isReadOnlyMessageDisplayed);
+					if (returnState == 1) {
+
+						// geo position is set in the image file
+
+						photoWrapper.photo.setGeoPosition(latitude, longitude);
+
+						updatedPhotos.add(photoWrapper);
+
+					} else if (returnState == -1) {
+						// there was a serious problem
+						return;
+					}
+
+					photoIndex++;
+
+				} else {
+
+					// advance to the next time slice
+
+					break;
+				}
+
+				if (photoIndex < numberOfPhotos) {
+					photoWrapper = tourPhotos.get(photoIndex);
+				} else {
+					break;
+				}
+			}
+
+			if (photoIndex >= numberOfPhotos) {
+				// no more photos
+				break;
+			}
+
+			/*
+			 * photos are still available
+			 */
+
+			// advance to the next time slice on the x-axis
+			timeIndex++;
+
+			if (timeIndex >= numberOfTimeSlices - 1) {
+
+				/*
+				 * end of tour is reached but there are still photos available, set remaining photos
+				 * at the end of the tour
+				 */
+
+				while (true) {
+
+					final double latitude = latitudeSerie[timeIndex];
+					final double longitude = longitudeSerie[timeIndex];
+
+					final int returnState = setExifGPSTag_IntoDB(
+							photoWrapper.imageFile,
+							latitude,
+							longitude,
+							isReadOnlyMessageDisplayed);
+					if (returnState == 1) {
+
+						// geo position is set in the image file
+
+						photoWrapper.photo.setGeoPosition(latitude, longitude);
+
+						updatedPhotos.add(photoWrapper);
+					} else if (returnState == -1) {
+						// there was a serious problem
+						return;
+					}
+
+					photoIndex++;
+
+					if (photoIndex < numberOfPhotos) {
+						photoWrapper = tourPhotos.get(photoIndex);
+					} else {
+						break;
+					}
+				}
+
+			} else {
+
+				long valuePointTime;
+				long sliceDuration;
+
+				if (isTimeSerie) {
+					valuePointTime = timeSerie[timeIndex];
+					sliceDuration = timeSerie[timeIndex + 1] - valuePointTime;
+				} else {
+					valuePointTime = historySerie[timeIndex];
+					sliceDuration = historySerie[timeIndex + 1] - valuePointTime;
+				}
+
+				timeSliceEnd = tourStart + valuePointTime + (sliceDuration / 2);
+			}
 		}
 	}
 
@@ -389,6 +612,7 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 		_allMergeTours.clear();
 		_allPhotos.clear();
 		_selectedMergeTour = null;
+		_selectedMergeTours = null;
 
 		_tourViewer.setInput(new Object[0]);
 
@@ -438,8 +662,6 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 
 		table.setMenu(tableContextMenu);
 
-//		getSite().registerContextMenu(menuMgr, _tourViewer);
-
 		_columnManager.createHeaderContextMenu(table, tableContextMenu);
 	}
 
@@ -453,6 +675,7 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 
 		_allMergeTours.clear();
 		_selectedMergeTour = null;
+		_selectedMergeTours = null;
 
 		final HashMap<String, String> tourCameras = new HashMap<String, String>();
 
@@ -571,14 +794,6 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 		createMergeTours_30_FinalizeCurrentMergeTour(currentMergeTour, tourCameras);
 
 		createMergeTours_60_MergeHistoryTours();
-
-//		System.out.println(UI.timeStampNano() + " \t");
-//		System.out.println(UI.timeStampNano() + " \t");
-//
-//		for (final MergeTour mergeTour : _allMergeTours) {
-//			System.out.println(UI.timeStampNano() + " \t" + mergeTour);
-//			// TODO remove SYSTEM.OUT.PRINTLN
-//		}
 	}
 
 	/**
@@ -757,6 +972,7 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 
 		_allMergeTours.clear();
 		_selectedMergeTour = null;
+		_selectedMergeTours = null;
 
 		final HashMap<String, String> tourCameras = new HashMap<String, String>();
 
@@ -1448,8 +1664,6 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 
 	private void loadToursFromDb_Runnable(final long allDbTourStartDate, final long allDbTourEndDate) {
 
-//		final long start = System.currentTimeMillis();
-
 		final SQLFilter sqlFilter = new SQLFilter();
 
 		final String sqlString = "" // //$NON-NLS-1$
@@ -1507,10 +1721,6 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 		} finally {
 			closeConnection();
 		}
-
-//		System.out.println(UI.timeStampNano() + " loadToursFromDb_Runnable\t");
-//		System.out.println(UI.timeStampNano() + " time\t" + (System.currentTimeMillis() - start) + " ms");
-//		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 	private void onSelectCamera() {
@@ -1523,14 +1733,6 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 		// update UI
 
 		final long timeAdjustment = camera.timeAdjustment / 1000;
-
-//		timeAdjustment = (hours * 60 * 60 * 1000) + (minutes * 60 * 1000) + (seconds * 1000);
-
-//		_formatter.format(//
-//				Messages.Format_hhmmss,
-//				(time / 3600),
-//				((time % 3600) / 60),
-//				((time % 3600) % 60)).toString()
 
 		final int hours = (int) (timeAdjustment / 3600);
 		final int minutes = (int) ((timeAdjustment % 3600) / 60);
@@ -1574,7 +1776,13 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 
 			final MergeTour mergeTour = (MergeTour) firstElement;
 
+			if (_selectedMergeTour != null && _selectedMergeTour.equals(mergeTour)) {
+				// currently selected tour is already selected
+				return;
+			}
+
 			_selectedMergeTour = mergeTour;
+			_selectedMergeTours = selection.toList();
 
 			enableControls();
 
@@ -1854,22 +2062,197 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 	}
 
 	/**
+	 * @param originalJpegImageFile
+	 * @param latitude
+	 * @param longitude
+	 * @return Returns
+	 * 
+	 *         <pre>
+	 * -1 when <b>SERIOUS</b> error occured
+	 *  0 when image file is read only
+	 *  1 when geo coordinates are written into the image file
+	 * </pre>
+	 */
+	private int setExifGPSTag_IntoDB(	final File imageFile,
+										final double latitude,
+										final double longitude,
+										final boolean[] isReadOnlyMessageDisplayed) {
+
+		return 0;
+	}
+
+	/**
+	 * @param originalJpegImageFile
+	 * @param latitude
+	 * @param longitude
+	 * @return Returns
+	 * 
+	 *         <pre>
+	 * -1 when <b>SERIOUS</b> error occured
+	 *  0 when image file is read only
+	 *  1 when geo coordinates are written into the image file
+	 * </pre>
+	 */
+	private int setExifGPSTag_IntoImageFile(final File originalJpegImageFile,
+											final double latitude,
+											final double longitude,
+											final boolean[] isReadOnlyMessageDisplayed) {
+
+		if (originalJpegImageFile.canWrite() == false) {
+
+			if (isReadOnlyMessageDisplayed[0] == false) {
+
+				isReadOnlyMessageDisplayed[0] = true;
+
+				MessageDialog.openError(_pageBook.getShell(), //
+						Messages.Photos_AndTours_Dialog_ImageIsReadOnly_Title,
+						NLS.bind(
+								Messages.Photos_AndTours_Dialog_ImageIsReadOnly_Message,
+								originalJpegImageFile.getAbsolutePath()));
+			}
+
+			return 0;
+		}
+
+		File gpsTempFile = null;
+
+		final IPath originalFilePathName = new Path(originalJpegImageFile.getAbsolutePath());
+		final String originalFileNameWithoutExt = originalFilePathName.removeFileExtension().lastSegment();
+
+		final File originalFilePath = originalFilePathName.removeLastSegments(1).toFile();
+		File renamedOriginalFile = null;
+
+		try {
+
+			boolean returnState = false;
+
+			try {
+
+				gpsTempFile = File.createTempFile(//
+						originalFileNameWithoutExt + UI.SYMBOL_UNDERSCORE,
+						UI.SYMBOL_DOT + originalFilePathName.getFileExtension(),
+						originalFilePath);
+
+				setExifGPSTag_IntoImageFile_WithExifRewriter(originalJpegImageFile, gpsTempFile, latitude, longitude);
+
+				returnState = true;
+
+			} catch (final ImageReadException e) {
+				StatusUtil.log(e);
+			} catch (final ImageWriteException e) {
+				StatusUtil.log(e);
+			} catch (final IOException e) {
+				StatusUtil.log(e);
+			}
+
+			if (returnState == false) {
+				return -1;
+			}
+
+			/*
+			 * replace original file with gps file
+			 */
+
+			try {
+
+				/*
+				 * rename original file into a temp file
+				 */
+				final String nanoString = Long.toString(System.nanoTime());
+				final String nanoTime = nanoString.substring(nanoString.length() - 4);
+
+				renamedOriginalFile = File.createTempFile(//
+						originalFileNameWithoutExt + TEMP_FILE_PREFIX_ORIG + nanoTime,
+						UI.SYMBOL_DOT + originalFilePathName.getFileExtension(),
+						originalFilePath);
+
+				final String renamedOriginalFileName = renamedOriginalFile.getAbsolutePath();
+
+				Util.deleteTempFile(renamedOriginalFile);
+
+				boolean isRenamed = originalJpegImageFile.renameTo(new File(renamedOriginalFileName));
+
+				if (isRenamed == false) {
+
+					// original file cannot be renamed
+					MessageDialog.openError(_pageBook.getShell(), //
+							Messages.Photos_AndTours_ErrorDialog_Title,
+							NLS.bind(
+									Messages.Photos_AndTours_ErrorDialog_OriginalImageFileCannotBeRenamed,
+									originalFilePathName.toOSString(),
+									renamedOriginalFileName));
+					return -1;
+				}
+
+				/*
+				 * rename gps temp file into original file
+				 */
+				isRenamed = gpsTempFile.renameTo(originalFilePathName.toFile());
+
+				if (isRenamed == false) {
+
+					// gps file cannot be renamed to original file
+					MessageDialog.openError(_pageBook.getShell(), //
+							Messages.Photos_AndTours_ErrorDialog_Title,
+							NLS.bind(
+									Messages.Photos_AndTours_ErrorDialog_SeriousProblemRenamingOriginalImageFile,
+									originalFilePathName.toOSString(),
+									renamedOriginalFile.getAbsolutePath()));
+
+					/*
+					 * prevent of deleting renamed original file because the original file is
+					 * renamed into this
+					 */
+					renamedOriginalFile = null;
+
+					return -1;
+				}
+
+				if (renamedOriginalFile.delete() == false) {
+
+					MessageDialog.openError(_pageBook.getShell(), //
+							Messages.Photos_AndTours_ErrorDialog_Title,
+							NLS.bind(
+									Messages.Photos_AndTours_ErrorDialog_RenamedOriginalFileCannotBeDeleted,
+									originalFilePathName.toOSString(),
+									renamedOriginalFile.getAbsolutePath()));
+				}
+
+			} catch (final IOException e) {
+				StatusUtil.log(e);
+			}
+
+		} finally {
+
+			Util.deleteTempFile(gpsTempFile);
+		}
+
+		return 1;
+	}
+
+	/**
 	 * This example illustrates how to set the GPS values in JPEG EXIF metadata.
 	 * 
 	 * @param jpegImageFile
 	 *            A source image file.
-	 * @param dst
+	 * @param destinationFile
 	 *            The output file.
+	 * @param latitude
+	 * @param longitude
 	 * @throws IOException
 	 * @throws ImageReadException
 	 * @throws ImageWriteException
 	 */
-	public void setExifGPSTag(final File jpegImageFile, final File dst) throws IOException, ImageReadException, ImageWriteException {
-		
+	private void setExifGPSTag_IntoImageFile_WithExifRewriter(	final File jpegImageFile,
+																final File destinationFile,
+																final double latitude,
+																final double longitude) throws IOException,
+			ImageReadException, ImageWriteException {
+
 		OutputStream os = null;
-		
+
 		try {
-		
+
 			TiffOutputSet outputSet = null;
 
 			// note that metadata might be null if no metadata is found.
@@ -1905,17 +2288,33 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 				// Example of how to add/update GPS info to output set.
 
 				// New York City
-				final double longitude = -74.0; // 74 degrees W (in Degrees East)
-				final double latitude = 40 + 43 / 60.0; // 40 degrees N (in Degrees
+//				final double longitude = -74.0; // 74 degrees W (in Degrees East)
+//				final double latitude = 40 + 43 / 60.0; // 40 degrees N (in Degrees
 				// North)
 
 				outputSet.setGPSInDegrees(longitude, latitude);
 			}
 
-			os = new FileOutputStream(dst);
+			os = new FileOutputStream(destinationFile);
 			os = new BufferedOutputStream(os);
 
-			new ExifRewriter().updateExifMetadataLossless(jpegImageFile, os, outputSet);
+			/**
+			 * the lossless method causes an exception after 3 times writing the image file,
+			 * therefore the lossy method is used
+			 * 
+			 * <pre>
+			 * 
+			 * org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter$ExifOverflowException: APP1 Segment is too long: 65564
+			 * 	at org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter.writeSegmentsReplacingExif(ExifRewriter.java:552)
+			 * 	at org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter.updateExifMetadataLossless(ExifRewriter.java:393)
+			 * 	at org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter.updateExifMetadataLossless(ExifRewriter.java:293)
+			 * 	at net.tourbook.photo.PhotosAndToursView.setExifGPSTag_IntoPhoto(PhotosAndToursView.java:2309)
+			 * 	at net.tourbook.photo.PhotosAndToursView.setExifGPSTag(PhotosAndToursView.java:2141)
+			 * 
+			 * </pre>
+			 */
+//			new ExifRewriter().updateExifMetadataLossless(jpegImageFile, os, outputSet);
+//			new ExifRewriter().updateExifMetadataLossy(jpegImageFile, os, outputSet);
 
 			os.close();
 			os = null;
@@ -2037,6 +2436,8 @@ public class PhotosAndToursView extends ViewPart implements ITourProvider, ITour
 
 				mergeDbTour.numberOfGPSPhotos = 0;
 				mergeDbTour.numberOfNoGPSPhotos = 0;
+
+				mergeDbTour.tourCameras = UI.EMPTY_STRING;
 			}
 		}
 

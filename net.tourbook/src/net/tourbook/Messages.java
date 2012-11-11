@@ -793,6 +793,18 @@ public class Messages extends NLS {
 	public static String		Photo_Tooltip_Label_ShellNoResize;
 	public static String		Photo_Tooltip_Label_ShellWithResize;
 
+	public static String	Photos_AndTours_Dialog_ImageIsReadOnly_Message;
+
+	public static String	Photos_AndTours_Dialog_ImageIsReadOnly_Title;
+
+	public static String	Photos_AndTours_ErrorDialog_OriginalImageFileCannotBeRenamed;
+
+	public static String	Photos_AndTours_ErrorDialog_RenamedOriginalFileCannotBeDeleted;
+
+	public static String	Photos_AndTours_ErrorDialog_SeriousProblemRenamingOriginalImageFile;
+
+	public static String	Photos_AndTours_ErrorDialog_Title;
+
 	public static String		Photos_AndTours_Label_AdjustTime;
 	public static String		Photos_AndTours_Label_AdjustTimeTooltip;
 	public static String		Photos_AndTours_Label_NoCamera;

@@ -16,6 +16,7 @@
 package net.tourbook.photo;
 
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +27,7 @@ import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.photo.internal.gallery.MT20.RendererHelper;
+import net.tourbook.photo.internal.manager.ExifCache;
 
 import org.apache.commons.imaging.Imaging;
 import org.apache.commons.imaging.ImagingConstants;
@@ -174,6 +176,24 @@ public class Photo {
 
 	public static String getImageKeyThumb(final String imageFilePathName) {
 		return Util.computeMD5(imageFilePathName + "_Thumb");//$NON-NLS-1$
+	}
+
+	/**
+	 * Update geo position in the cached exif metadata.
+	 * 
+	 * @param updatedPhotos
+	 */
+	public static void updateExifGeoPosition(final ArrayList<PhotoWrapper> updatedPhotos) {
+
+		for (final PhotoWrapper photoWrapper : updatedPhotos) {
+
+			final PhotoImageMetadata imageMetadata = ExifCache.get(photoWrapper.imageFilePathName);
+			if (imageMetadata != null) {
+
+				imageMetadata.latitude = photoWrapper.photo.getLatitude();
+				imageMetadata.longitude = photoWrapper.photo.getLongitude();
+			}
+		}
 	}
 
 	/**
@@ -582,7 +602,7 @@ public class Photo {
 			 * read metadata WITH thumbnail image info, this is the default when the pamameter is
 			 * ommitted
 			 */
-			final HashMap<Object, Object> params = new HashMap<Object, Object>();
+			final HashMap<String, Object> params = new HashMap<String, Object>();
 			params.put(ImagingConstants.PARAM_KEY_READ_THUMBNAILS, isReadThumbnail);
 
 //			final long start = System.currentTimeMillis();
@@ -811,12 +831,16 @@ public class Photo {
 		setMapImageSize();
 	}
 
-	public void setGpsAreaInfo(final String gpsAreaInfo) {
-		_gpsAreaInfo = gpsAreaInfo;
+	public void setGeoPosition(final double latitude, final double longitude) {
+
+		_latitude = latitude;
+		_longitude = longitude;
+
+		_photoWrapper.isGPS = true;
 	}
 
-	public void setLatitude(final double latitude) {
-		_latitude = latitude;
+	public void setGpsAreaInfo(final String gpsAreaInfo) {
+		_gpsAreaInfo = gpsAreaInfo;
 	}
 
 	public void setLoadingState(final PhotoLoadingState photoLoadingState, final ImageQuality imageQuality) {
@@ -836,10 +860,6 @@ public class Photo {
 //		System.out
 //				.println("set state\t" + imageQuality + "\t" + photoLoadingState + "\t" + _photoWrapper.imageFileName);
 //		// TODO remove SYSTEM.OUT.PRINTLN
-	}
-
-	public void setLongitude(final double longitude) {
-		_longitude = longitude;
 	}
 
 	private void setMapImageSize() {
@@ -926,7 +946,10 @@ public class Photo {
 		 * set state if gps data are available, this state is used for filtering the photos and to
 		 * indicate that exif data are loaded
 		 */
-		_photoWrapper.gpsState = _latitude == Double.MIN_VALUE || _longitude == Double.MIN_VALUE ? 0 : 1;
+		final boolean isNoGPS = _latitude == Double.MIN_VALUE || _longitude == Double.MIN_VALUE;
+
+		_photoWrapper.isGPS = !isNoGPS;
+		_photoWrapper.gpsState = isNoGPS ? 0 : 1;
 
 		// sort by exif date when available
 		if (_exifDateTime != null) {
@@ -937,5 +960,4 @@ public class Photo {
 //			_photoWrapper.imageUTCZoneOffset = DateTimeZone.getDefault().getOffset(exifUTCMills);
 		}
 	}
-
 }

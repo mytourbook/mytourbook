@@ -79,9 +79,6 @@ public class PhotoGallery extends ImageGallery {
 				Activator.getImageDescriptor(Messages.Image__PhotoFilterNoGPS));
 	}
 
-//	private int								_thumbnailSize;
-//	private int								_textMinThumbSize;
-
 	public PhotoGallery() {}
 
 	public void actionImageFilter(final Action actionImageFilter) {
@@ -335,5 +332,4 @@ public class PhotoGallery extends ImageGallery {
 
 		super.saveState(state);
 	}
-
 }

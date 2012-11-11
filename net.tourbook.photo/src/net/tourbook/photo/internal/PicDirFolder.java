@@ -30,6 +30,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.PhotoImageCache;
 import net.tourbook.photo.PicDirView;
+import net.tourbook.photo.internal.manager.ExifCache;
 import net.tourbook.photo.internal.manager.ImageUtils;
 import net.tourbook.photo.internal.manager.ThumbnailStore;
 import net.tourbook.photo.internal.preferences.PrefPagePhotoExternalApp;
@@ -305,9 +306,9 @@ public class PicDirFolder {
 					// update folder viewer
 					_folderViewer.refresh(_selectedTVIFolder);
 
+					// remove cached metadata for this folder
 					final String folderPath = _selectedTVIFolder._treeItemFolder.getAbsolutePath();
-
-					_picDirImages.removeCachedExifData(folderPath);
+					ExifCache.remove(folderPath);
 
 					// remove cached images
 					PhotoImageCache.disposePath(folderPath);

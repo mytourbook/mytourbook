@@ -359,7 +359,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		}
 
 		// annotations are drawn in the bottom right corner of the image
-		if (_isShowAnnotations && photoWrapper.gpsState == 1) {
+		if (_isShowAnnotations && photoWrapper.isGPS) {
 			gc.drawImage(_gpsImage, //
 					_paintedDestX + _paintedDestWidth - _gpsImageWidth,
 					_paintedDestY + _paintedDestHeight - _gpsImageHeight);

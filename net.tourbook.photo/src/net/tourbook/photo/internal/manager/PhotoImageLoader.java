@@ -347,7 +347,6 @@ public class PhotoImageLoader {
 				PhotoImageCache.putImage(
 						imageKey,
 						loadedExifImage,
-						_photo.getImageMetaData(),
 						_photo.getImageWidth(),
 						_photo.getImageHeight(),
 						originalImagePathName);
@@ -775,11 +774,13 @@ public class PhotoImageLoader {
 
 		if (requestedSWTImage != null) {
 
+			// ensure metadata are loaded
+			_photo.getImageMetaData();
+
 			// keep requested image in cache
 			PhotoImageCache.putImage(
 					_requestedImageKey,
 					requestedSWTImage,
-					_photo.getImageMetaData(),
 					_photo.getImageWidth(),
 					_photo.getImageHeight(),
 					originalImagePathName);
@@ -1096,11 +1097,13 @@ public class PhotoImageLoader {
 
 			if (requestedSWTImage != null) {
 
+				// ensure metadata are loaded
+				_photo.getImageMetaData();
+
 				// keep requested image in cache
 				PhotoImageCache.putImage(
 						_requestedImageKey,
 						requestedSWTImage,
-						_photo.getImageMetaData(),
 						_photo.getImageWidth(),
 						_photo.getImageHeight(),
 						originalImagePathName);
@@ -1280,7 +1283,6 @@ public class PhotoImageLoader {
 				PhotoImageCache.putImageOriginal(
 						_requestedImageKey,
 						swtImage,
-						imageMetaData,
 						imageWidth,
 						imageHeight,
 						originalImagePathName);
@@ -1490,8 +1492,8 @@ public class PhotoImageLoader {
 
 				final String originalImagePathName = _photo.getPhotoWrapper().imageFilePathName;
 
-				// get/set metadata if available
-				final PhotoImageMetadata imageMetaData = _photo.getImageMetaData();
+				// ensure metadata are loaded
+				_photo.getImageMetaData();
 
 				int imageWidth = _photo.getImageWidth();
 				int imageHeight = _photo.getImageHeight();
@@ -1509,13 +1511,7 @@ public class PhotoImageLoader {
 					updateImageSize(imageWidth, imageHeight);
 				}
 
-				PhotoImageCache.putImage(
-						imageKey,
-						loadedExifImage,
-						imageMetaData,
-						imageWidth,
-						imageHeight,
-						originalImagePathName);
+				PhotoImageCache.putImage(imageKey, loadedExifImage, imageWidth, imageHeight, originalImagePathName);
 			}
 
 			/*

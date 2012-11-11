@@ -411,10 +411,6 @@ public class PicDirImages implements IPhotoGalleryProvider {
 		_picDirView.registerContextMenu(menuId, menuManager);
 	}
 
-	void removeCachedExifData(final String folderPath) {
-		_photoGallery.removeCachedExifData(folderPath);
-	}
-
 	private void removeInvalidFolder(final String invalidFolderPathName) {
 
 		// search invalid folder in history
