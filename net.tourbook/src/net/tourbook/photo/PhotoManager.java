@@ -42,7 +42,7 @@ public class PhotoManager {
 		}
 	}
 
-	public static void openPhotoMergePerspective(final MergePhotoTourSelection photoMergeSelection) {
+	public static void openPhotoMergePerspective(final PhotoWrapperSelection photoMergeSelection) {
 
 		final IWorkbench workbench = PlatformUI.getWorkbench();
 		final IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();

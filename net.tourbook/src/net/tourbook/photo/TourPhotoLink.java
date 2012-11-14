@@ -26,7 +26,7 @@ import org.joda.time.PeriodType;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-public class MergeTour {
+public class TourPhotoLink {
 
 	private static final PeriodType			_tourPeriodTemplate	= PeriodType.yearMonthDayTime()
 																// hide these components
@@ -82,7 +82,7 @@ public class MergeTour {
 	 * 
 	 * @param notUsed
 	 */
-	MergeTour(final long tourStartTime) {
+	TourPhotoLink(final long tourStartTime) {
 
 		isHistoryTour = true;
 
@@ -101,7 +101,7 @@ public class MergeTour {
 	 * @param tourStartTime
 	 * @param tourId
 	 */
-	MergeTour(final long tourId, final long tourStartTime, final long tourEndTime) {
+	TourPhotoLink(final long tourId, final long tourStartTime, final long tourEndTime) {
 
 		this.tourId = tourId;
 
@@ -128,10 +128,10 @@ public class MergeTour {
 		if (obj == null) {
 			return false;
 		}
-		if (!(obj instanceof MergeTour)) {
+		if (!(obj instanceof TourPhotoLink)) {
 			return false;
 		}
-		final MergeTour other = (MergeTour) obj;
+		final TourPhotoLink other = (TourPhotoLink) obj;
 		if (mergeId != other.mergeId) {
 			return false;
 		}

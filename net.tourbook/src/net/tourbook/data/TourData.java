@@ -67,7 +67,7 @@ import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.math.Smooth;
-import net.tourbook.photo.MergeTour;
+import net.tourbook.photo.TourPhotoLink;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageComputedValues;
 import net.tourbook.srtm.ElevationSRTM3;
@@ -997,7 +997,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * Contains data from a merged tour which contains photos
 	 */
 	@Transient
-	public MergeTour										mergedTour;
+	public TourPhotoLink										mergedTour;
 
 	/**
 	 * 

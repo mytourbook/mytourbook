@@ -779,13 +779,20 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	}
 
 	/**
-	 * Creates a {@link MergePhotoTourSelection}
+	 * @return Returns folder which is currently displayed.
+	 */
+	public File getPhotoFolder() {
+		return _photoFolder;
+	}
+
+	/**
+	 * Creates a {@link PhotoWrapperSelection}
 	 * 
 	 * @param isAllImages
-	 * @return Returns a {@link MergePhotoTourSelection} for selected or all images or
+	 * @return Returns a {@link PhotoWrapperSelection} for selected or all images or
 	 *         <code>null</code> null when loading EXIF data was canceled by the user.
 	 */
-	public ISelection getMergePhotoTourSelection(final boolean isAllImages) {
+	public ISelection getPhotoSelection(final boolean isAllImages) {
 
 		final ArrayList<PhotoWrapper> loadedExifData = getLoadedExifImageData(
 				_photoFolderWhichShouldBeDisplayed,
@@ -795,8 +802,8 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 			MessageDialog.openInformation(
 					_display.getActiveShell(),
-					Messages.Pic_Dir_Dialog_MergePhotos_Title,
-					Messages.Pic_Dir_Dialog_MergePhotos_DialogInterrupted_Message);
+					Messages.Pic_Dir_Dialog_LinkPhotos_Title,
+					Messages.Pic_Dir_Dialog_LinkPhotos_DialogInterrupted_Message);
 
 			return null;
 		}
@@ -810,29 +817,22 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 				MessageDialog.openInformation(
 						_display.getActiveShell(),
-						Messages.Pic_Dir_Dialog_MergePhotos_Title,
-						NLS.bind(Messages.Pic_Dir_Dialog_MergePhotos_NoSelectedImagesInFolder_Message,//
+						Messages.Pic_Dir_Dialog_LinkPhotos_Title,
+						NLS.bind(Messages.Pic_Dir_Dialog_LinkPhotos_NoSelectedImagesInFolder_Message,//
 								_photoFolderWhichShouldBeDisplayed.getAbsolutePath()));
 
 			} else {
 
 				MessageDialog.openInformation(
 						_display.getActiveShell(),
-						Messages.Pic_Dir_Dialog_MergePhotos_Title,
-						Messages.Pic_Dir_Dialog_MergePhotos_NoSelectedImage_Message);
+						Messages.Pic_Dir_Dialog_LinkPhotos_Title,
+						Messages.Pic_Dir_Dialog_LinkPhotos_NoSelectedImage_Message);
 			}
 
 			return null;
 		}
 
-		return new MergePhotoTourSelection(loadedExifData);
-	}
-
-	/**
-	 * @return Returns folder which is currently displayed.
-	 */
-	public File getPhotoFolder() {
-		return _photoFolder;
+		return new PhotoWrapperSelection(loadedExifData);
 	}
 
 	@Override
@@ -1167,9 +1167,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 					return;
 				}
 
-				int gpsState = photoWrapper.gpsState;
-
-				if (gpsState == -1) {
+				if (photoWrapper.isExifLoaded == false) {
 
 					// image is not yet loaded, it must be loaded to get the gps state
 
@@ -1177,12 +1175,12 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 				}
 
 				// check again, the gps state could have been cached and set
-				gpsState = photoWrapper.gpsState;
+				if (photoWrapper.isExifLoaded) {
 
-				if (gpsState != -1) {
+					final boolean isPhotoWithGps = photoWrapper.isPhotoWithGps;
 
 					if (isGPSFilter) {
-						if (gpsState == 1) {
+						if (isPhotoWithGps) {
 
 							tempFilteredWrapper[filterIndex] = _allPhotoWrapper[wrapperIndex];
 
@@ -1191,7 +1189,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 					} else if (isNoGPSFilter) {
 
-						if (gpsState == 0) {
+						if (!isPhotoWithGps) {
 
 							tempFilteredWrapper[filterIndex] = _allPhotoWrapper[wrapperIndex];
 
@@ -1219,9 +1217,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 					return;
 				}
 
-				final int gpsState = photoWrapper.gpsState;
-
-				if (gpsState == -1) {
+				if (photoWrapper.isExifLoaded == false) {
 
 					// image is not yet loaded, it must be loaded to get the gps state
 					putInExifLoadingQueue(photoWrapper);
@@ -1298,23 +1294,26 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 					return;
 				}
 
-				final int gpsState = photoWrapper.gpsState;
+				if (photoWrapper.isExifLoaded) {
 
-				if (isGPSFilter) {
-					if (gpsState == 1) {
+					final boolean isPhotoWithGps = photoWrapper.isPhotoWithGps;
 
-						tempFilteredWrapper[filterIndex] = _allPhotoWrapper[wrapperIndex];
+					if (isGPSFilter) {
+						if (isPhotoWithGps) {
 
-						filterIndex++;
-					}
+							tempFilteredWrapper[filterIndex] = _allPhotoWrapper[wrapperIndex];
 
-				} else if (isNoGPSFilter) {
+							filterIndex++;
+						}
 
-					if (gpsState == 0) {
+					} else if (isNoGPSFilter) {
 
-						tempFilteredWrapper[filterIndex] = _allPhotoWrapper[wrapperIndex];
+						if (!isPhotoWithGps) {
 
-						filterIndex++;
+							tempFilteredWrapper[filterIndex] = _allPhotoWrapper[wrapperIndex];
+
+							filterIndex++;
+						}
 					}
 				}
 

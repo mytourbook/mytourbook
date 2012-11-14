@@ -1999,6 +1999,24 @@ public class TourDatabase {
 	}
 
 	/**
+	 * Create index for {@link TourPhoto}, it will dramatically improve performance.
+	 * 
+	 * @param stmt
+	 * @throws SQLException
+	 * @since Db version 22
+	 */
+	private void createIndexTourPhoto(final Statement stmt) throws SQLException {
+
+		String sql;
+
+		/*
+		 * CREATE INDEX imageFilePathName
+		 */
+		sql = "CREATE INDEX ImageFilePathName ON " + TABLE_TOUR_PHOTO + " (imageFilePathName)"; //$NON-NLS-1$ //$NON-NLS-2$
+		exec(stmt, sql);
+	}
+
+	/**
 	 * create table {@link #TABLE_TOUR_BIKE}
 	 * 
 	 * @param stmt
@@ -2516,10 +2534,12 @@ public class TourDatabase {
 				//
 				+ ("	imageFileName			" + varCharKomma(TourPhoto.DB_LENGTH_FILE_PATH)) //$NON-NLS-1$
 				+ ("	imageFileExt			" + varCharKomma(TourPhoto.DB_LENGTH_FILE_PATH)) //$NON-NLS-1$
+				+ ("	imageFilePath			" + varCharKomma(TourPhoto.DB_LENGTH_FILE_PATH)) //$NON-NLS-1$
 				+ ("	imageFilePathName		" + varCharKomma(TourPhoto.DB_LENGTH_FILE_PATH)) //$NON-NLS-1$
 				//
 				+ "	imageExifTime				BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
 				+ "	imageFileLastModified		BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
+				+ "	adjustedTime				BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
 				//
 				+ "	isGeoFromPhoto				INT DEFAULT 0,					\n" //$NON-NLS-1$
 				+ "	latitude 					DOUBLE DEFAULT 0,				\n" //$NON-NLS-1$
@@ -2557,6 +2577,8 @@ public class TourDatabase {
 				+ "	PRIMARY KEY (" + TABLE_TOUR_DATA + "_tourId)"; //				//$NON-NLS-1$ //$NON-NLS-2$
 
 		exec(stmt, sql);
+
+		createIndexTourPhoto(stmt);
 	}
 
 	/**

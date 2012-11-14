@@ -159,7 +159,7 @@ public class PicDirView extends ViewPart {
 
 	public void actionMergePhotoWithTour(final boolean isAllImages) {
 
-		final ISelection selection = _picDirImages.getMergePhotoTourSelection(isAllImages);
+		final ISelection selection = _picDirImages.getPhotoSelection(isAllImages);
 
 		// fire selection for the selected photos
 		if (selection != null) {

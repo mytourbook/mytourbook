@@ -58,7 +58,6 @@ public class TourPhoto {
 	 */
 	private String			imageFilePath;
 
-	@Transient
 	private String			imageFilePathName;
 
 	/**
@@ -71,6 +70,11 @@ public class TourPhoto {
 	 * Last modified in GMT
 	 */
 	private long			imageFileLastModified;
+
+	/**
+	 * 
+	 */
+	private long			adjustedTime;
 
 	/**
 	 * <code>0</code> geo position is from a tour<br>
@@ -105,16 +109,19 @@ public class TourPhoto {
 
 		this.tourData = tourData;
 
-		final IPath filePath = new Path(imageFile.getAbsolutePath());
+		final String filePathName = imageFile.getAbsolutePath();
+		final IPath filePath = new Path(filePathName);
 
 		final String fileExtension = filePath.getFileExtension();
 
 		imageFileName = filePath.lastSegment();
 		imageFileExt = fileExtension == null ? UI.EMPTY_STRING : fileExtension;
 		imageFilePath = filePath.removeLastSegments(1).toOSString();
+		imageFilePathName = filePathName;
 
 		imageFileLastModified = imageFile.lastModified();
 		imageExifTime = photoExifTime;
+		adjustedTime = photoExifTime;
 	}
 
 	@Override
@@ -149,12 +156,20 @@ public class TourPhoto {
 		return true;
 	}
 
+	public long getAdjustedTime() {
+		return adjustedTime;
+	}
+
 	public long getImageExifTime() {
 		return imageExifTime;
 	}
 
 	public String getImageFileExt() {
 		return imageFileExt;
+	}
+
+	public long getImageFileLastModified() {
+		return imageFileLastModified;
 	}
 
 	public String getImageFileName() {
@@ -169,11 +184,6 @@ public class TourPhoto {
 	 * @return Returns the full filepathname
 	 */
 	public String getImageFilePathName() {
-
-		if (imageFilePathName == null) {
-			imageFilePathName = new Path(imageFilePath).append(imageFileName).toOSString();
-		}
-
 		return imageFilePathName;
 	}
 
@@ -200,6 +210,10 @@ public class TourPhoto {
 
 	public boolean isGeoFromTour() {
 		return isGeoFromPhoto == 0;
+	}
+
+	public void setAdjustedTime(final long adjustedTime) {
+		this.adjustedTime = adjustedTime;
 	}
 
 	public void setGeoLocation(final double latitude, final double longitude) {

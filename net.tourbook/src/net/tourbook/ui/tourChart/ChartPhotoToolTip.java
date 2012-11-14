@@ -80,8 +80,18 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 		// center tooltip horizontally
 		final int ttPosX = itemPosX - tipWidth2;
 
-		// set vertical position at the top of the upper most graph
-		final int ttPosY = -tipHeight - 0;//+ chartMarginTop;
+		final int ttChartLocation = super.getTooltipLocation();
+
+		int ttPosY;
+		if (ttChartLocation == 1) {
+
+			// set vertical position at the top of the upper most graph
+			ttPosY = -tipHeight - 0;//+ chartMarginTop;
+		} else {
+
+			// set vertical position at the bottom
+			ttPosY = chartHeight;
+		}
 
 		final Point ttLocation = _tourChart.toDisplay(ttPosX, ttPosY);
 
@@ -106,7 +116,6 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 										final PointLong devHoveredValue,
 										final int devXMouseMove,
 										final int devYMouseMove) {
-
 
 		final ArrayList<PhotoGroup> photoGroups = photoLayer.getPhotoPositions();
 
@@ -150,6 +159,5 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 			showPhotoToolTip(_hoveredPhotos);
 		}
 	}
-
 
 }

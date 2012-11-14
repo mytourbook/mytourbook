@@ -20,7 +20,7 @@
 			/>
 
 		<command id="command.net.tourbook.photo.MergePhotoWithTourInFolder"
-			name="%Action_PhotoDirectory_MergePhotoWithTour"
+			name="%Action_PhotoDirectory_MergePhotoWithTourInFolder"
 			defaultHandler="net.tourbook.photo.internal.ActionHandlerMergePhotoWithTourInFolder"
 			/>
 		
@@ -56,8 +56,8 @@
 		<menuContribution locationURI="popup:menu.net.tourbook.photo.PicDirView.InFolder?before=additions" >
 		            
 			<command commandId="command.net.tourbook.photo.MergePhotoWithTourInFolder"
-				label="%Action_PhotoDirectory_MergePhotoWithTour"
-				mnemonic="%Action_PhotoDirectory_MergePhotoWithTour_Mnemonic"/>
+				label="%Action_PhotoDirectory_MergePhotoWithTourInFolder"
+				mnemonic="%Action_PhotoDirectory_MergePhotoWithTourInFolder_Mnemonic"/>
 		
 		</menuContribution>
 

@@ -67,9 +67,9 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 	private int							_fontHeight				= -1;
 
-	private final DateTimeFormatter		_dtFormatterDate		= DateTimeFormat.forStyle("S-");
+	private final DateTimeFormatter		_dtFormatterDate		= DateTimeFormat.forStyle("M-");
 	private final DateTimeFormatter		_dtFormatterTime		= DateTimeFormat.forStyle("-F");
-	private final DateTimeFormatter		_dtFormatterDateTime	= DateTimeFormat.forStyle("SM");
+	private final DateTimeFormatter		_dtFormatterDateTime	= DateTimeFormat.forStyle("MM");
 
 //	private final DateTimeFormatter		_dtFormatterDateTime	= new DateTimeFormatterBuilder()
 //																		.appendYear(4, 4)
@@ -359,7 +359,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		}
 
 		// annotations are drawn in the bottom right corner of the image
-		if (_isShowAnnotations && photoWrapper.isGPS) {
+		if (_isShowAnnotations && photoWrapper.isPhotoWithGps) {
 			gc.drawImage(_gpsImage, //
 					_paintedDestX + _paintedDestWidth - _gpsImageWidth,
 					_paintedDestY + _paintedDestHeight - _gpsImageHeight);

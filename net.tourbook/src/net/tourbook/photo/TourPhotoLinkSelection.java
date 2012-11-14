@@ -15,17 +15,19 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
-import net.tourbook.tour.SelectionTourId;
+import java.util.ArrayList;
 
-public class TourPhotoSelection extends SelectionTourId {
+import net.tourbook.tour.SelectionTourIds;
 
-	public MergeTour	mergedTour;
+public class TourPhotoLinkSelection extends SelectionTourIds {
 
-	public TourPhotoSelection(final MergeTour mergeTour) {
+	public ArrayList<TourPhotoLink>	tourPhotoLinks;
 
-		super(mergeTour.tourId);
+	public TourPhotoLinkSelection(final ArrayList<TourPhotoLink> tourPhotoLinks, final ArrayList<Long> tourIds) {
 
-		mergedTour = mergeTour;
+		super(tourIds);
+
+		this.tourPhotoLinks = tourPhotoLinks;
 	}
 
 }

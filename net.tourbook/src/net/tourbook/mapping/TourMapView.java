@@ -37,7 +37,8 @@ import net.tourbook.data.TourWayPoint;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.photo.PhotoSelection;
 import net.tourbook.photo.PhotoWrapper;
-import net.tourbook.photo.TourPhotoSelection;
+import net.tourbook.photo.TourPhotoLink;
+import net.tourbook.photo.TourPhotoLinkSelection;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceMap;
 import net.tourbook.srtm.IPreferences;
@@ -381,7 +382,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	}
 
 	void actionSetShowTourInMap() {
-		paintTours10All();
+		paintTours_10_All();
 	}
 
 	void actionSetShowTourMarkerInMap() {
@@ -462,7 +463,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 			final TourData firstTourData = _tourDataList.get(0);
 
-			paintTours20One(firstTourData, false, true);
+			paintTours_20_One(firstTourData, false, true);
 			setMapToSliderBounds(firstTourData);
 		}
 	}
@@ -477,10 +478,13 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 		if (_isMapSynchedWithTour) {
 
+//			// remove prevous positions
+//			TourManager.getInstance().resetMapPositions();
+
 			_actionShowTourInMap.setChecked(true);
 			_map.setShowOverlays(true);
 
-			paintTours20One(_tourDataList.get(0), true, true);
+			paintTours_20_One(_tourDataList.get(0), true, true);
 
 		} else {
 
@@ -861,41 +865,6 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		_actionReloadFailedMapImages = new ActionReloadFailedMapImages(this);
 		_actionDimMap = new ActionDimMap(this);
 		_actionManageProvider = new ActionManageMapProviders(this);
-
-		/*
-		 * fill view toolbar
-		 */
-		final IToolBarManager viewTbm = getViewSite().getActionBars().getToolBarManager();
-
-		viewTbm.add(_actionTourColorAltitude);
-		viewTbm.add(_actionTourColorPulse);
-		viewTbm.add(_actionTourColorSpeed);
-		viewTbm.add(_actionTourColorPace);
-		viewTbm.add(_actionTourColorGradient);
-		viewTbm.add(_actionTourColorHrZone);
-		viewTbm.add(new Separator());
-
-		viewTbm.add(_actionShowTourInMap);
-		viewTbm.add(_actionZoomShowEntireTour);
-		viewTbm.add(_actionSynchWithTour);
-		viewTbm.add(_actionSynchWithSlider);
-		viewTbm.add(new Separator());
-
-		viewTbm.add(_actionSelectMapProvider);
-		viewTbm.add(new Separator());
-
-		viewTbm.add(_actionZoomCentered);
-		viewTbm.add(_actionZoomIn);
-		viewTbm.add(_actionZoomOut);
-		viewTbm.add(_actionZoomShowAll);
-		viewTbm.add(_actionShowPOI);
-
-		/*
-		 * fill view menu
-		 */
-		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
-
-		fillMapMenu(menuMgr);
 	}
 
 	/**
@@ -1347,6 +1316,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		createActions();
 		createLegendProviders();
 
+		fillActionBars();
 		enableActions();
 
 		addPartListener();
@@ -1496,6 +1466,44 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		}
 	}
 
+	private void fillActionBars() {
+
+		/*
+		 * fill view toolbar
+		 */
+		final IToolBarManager viewTbm = getViewSite().getActionBars().getToolBarManager();
+
+		viewTbm.add(_actionTourColorAltitude);
+		viewTbm.add(_actionTourColorPulse);
+		viewTbm.add(_actionTourColorSpeed);
+		viewTbm.add(_actionTourColorPace);
+		viewTbm.add(_actionTourColorGradient);
+		viewTbm.add(_actionTourColorHrZone);
+		viewTbm.add(new Separator());
+
+		viewTbm.add(_actionShowTourInMap);
+		viewTbm.add(_actionZoomShowEntireTour);
+		viewTbm.add(_actionSynchWithTour);
+		viewTbm.add(_actionSynchWithSlider);
+		viewTbm.add(new Separator());
+
+		viewTbm.add(_actionSelectMapProvider);
+		viewTbm.add(new Separator());
+
+		viewTbm.add(_actionZoomCentered);
+		viewTbm.add(_actionZoomIn);
+		viewTbm.add(_actionZoomOut);
+		viewTbm.add(_actionZoomShowAll);
+		viewTbm.add(_actionShowPOI);
+
+		/*
+		 * fill view menu
+		 */
+		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
+
+		fillMapMenu(menuMgr);
+	}
+
 	@Override
 	public void fillContextMenu(final IMenuManager menuMgr) {
 		fillMapMenu(menuMgr);
@@ -1578,14 +1586,9 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		double maxLongitude = longitudeSerie[0];
 
 		for (int serieIndex = 0; serieIndex < latitudeSerie.length; serieIndex++) {
+
 			final double latitude = latitudeSerie[serieIndex];
 			final double longitude = longitudeSerie[serieIndex];
-
-//			minLatitude = Math.min(minLatitude, latitude);
-//			maxLatitude = Math.max(maxLatitude, latitude);
-//
-//			minLongitude = Math.min(minLongitude, longitude);
-//			maxLongitude = Math.max(maxLongitude, longitude);
 
 			minLatitude = latitude < minLatitude ? latitude : minLatitude;
 			maxLatitude = latitude > maxLatitude ? latitude : maxLatitude;
@@ -1652,7 +1655,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 			final SelectionTourData selectionTourData = (SelectionTourData) selection;
 			final TourData tourData = selectionTourData.getTourData();
 
-			paintTours20One(tourData, selectionTourData.isForceRedraw(), true);
+			paintTours_20_One(tourData, selectionTourData.isForceRedraw(), true);
 
 			enableActions();
 
@@ -1661,11 +1664,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 			final SelectionTourId tourIdSelection = (SelectionTourId) selection;
 			final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
 
-			paintTours20One(tourData, false, true);
-
-			if (selection instanceof TourPhotoSelection) {
-				paintPhotos(((TourPhotoSelection) selection).mergedTour.tourPhotos);
-			}
+			paintTours_20_One(tourData, false, true);
 
 			enableActions();
 
@@ -1678,9 +1677,24 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 				return;
 			}
 
-			paintTours(tourIds);
+			if (tourIds.size() == 1) {
 
-			enableActions(true);
+				// only 1 tour is displayed, synch with this tour !!!
+
+				final TourData tourData = TourManager.getInstance().getTourData(tourIds.get(0));
+
+				paintTours_20_One(tourData, false, true);
+				paintPhotoSelection(selection);
+
+				enableActions();
+
+			} else {
+
+				paintTours(tourIds);
+				paintPhotoSelection(selection);
+
+				enableActions(true);
+			}
 
 		} else if (selection instanceof SelectionChartInfo) {
 
@@ -1791,14 +1805,14 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 				final long tourId = comparedTour.getTourId();
 
 				final TourData tourData = TourManager.getInstance().getTourData(tourId);
-				paintTours20One(tourData, false, true);
+				paintTours_20_One(tourData, false, true);
 
 			} else if (firstElement instanceof TVICompareResultComparedTour) {
 
 				final TVICompareResultComparedTour compareResultItem = (TVICompareResultComparedTour) firstElement;
 				final TourData tourData = TourManager.getInstance().getTourData(
 						compareResultItem.getComparedTourData().getTourId());
-				paintTours20One(tourData, false, true);
+				paintTours_20_One(tourData, false, true);
 
 			} else if (firstElement instanceof TourWayPoint) {
 
@@ -1824,7 +1838,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 				final TourData tourData = TourManager.getInstance().getTourData(refItem.getTourId());
 
-				paintTours20One(tourData, false, true);
+				paintTours_20_One(tourData, false, true);
 
 				enableActions();
 			}
@@ -1856,6 +1870,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 				_actionShowSliderInLegend.isChecked());
 
 		final Set<GeoPosition> tourBounds = getTourBounds(firstTourData);
+
 		_tourPainterConfig.setTourBounds(tourBounds);
 
 		_map.setShowOverlays(_actionShowTourInMap.isChecked());
@@ -1879,6 +1894,20 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		_map.paint();
 
 //		_map.setPhoto(structuredSelection);
+	}
+
+	private void paintPhotoSelection(final ISelection selection) {
+
+		if (selection instanceof TourPhotoLinkSelection) {
+
+			final ArrayList<PhotoWrapper> allPhotoWrapper = new ArrayList<PhotoWrapper>();
+
+			for (final TourPhotoLink tourPhotoLink : ((TourPhotoLinkSelection) selection).tourPhotoLinks) {
+				allPhotoWrapper.addAll(tourPhotoLink.tourPhotos);
+			}
+
+			paintPhotos(allPhotoWrapper);
+		}
 	}
 
 	private void paintTours(final ArrayList<Long> tourIdList) {
@@ -1931,7 +1960,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		});
 	}
 
-	private void paintTours10All() {
+	private void paintTours_10_All() {
 
 		if (_tourDataList.size() == 0) {
 			_tourInfoToolTipProvider.setTourData(null);
@@ -1945,11 +1974,11 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 			// multiple tours are displayed
 
-			paintTours30Multiple();
+			paintTours_30_Multiple();
 			enableActions(true);
 
 		} else {
-			paintTours20One(_tourDataList.get(0), true, false);
+			paintTours_20_One(_tourDataList.get(0), true, false);
 			enableActions();
 		}
 	}
@@ -1962,7 +1991,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	 * @param isSynchronized
 	 *            when <code>true</code>, map will be synchronized
 	 */
-	private void paintTours20One(final TourData tourData, final boolean forceRedraw, final boolean isSynchronized) {
+	private void paintTours_20_One(final TourData tourData, final boolean forceRedraw, final boolean isSynchronized) {
 
 		if (isPaintDataValid(tourData) == false) {
 			showDefaultMap();
@@ -2069,7 +2098,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	/**
 	 * paints the tours which are set in {@link #_tourDataList}
 	 */
-	private void paintTours30Multiple() {
+	private void paintTours_30_Multiple() {
 
 		_isTour = true;
 
@@ -2153,7 +2182,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 		_map.disposeOverlayImageCache();
 
-		paintTours10All();
+		paintTours_10_All();
 
 		_map.paint();
 	}
@@ -2572,7 +2601,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 					_tourDataList.clear();
 					_tourDataList.addAll(tourDataList);
 
-					paintTours10All();
+					paintTours_10_All();
 				}
 			}
 		});

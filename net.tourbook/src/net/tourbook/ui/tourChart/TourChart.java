@@ -45,7 +45,7 @@ import net.tourbook.common.util.IToolTipHideListener;
 import net.tourbook.common.util.TourToolTip;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
-import net.tourbook.photo.MergeTour;
+import net.tourbook.photo.TourPhotoLink;
 import net.tourbook.photo.PhotoWrapper;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceTourChart;
@@ -296,7 +296,7 @@ public class TourChart extends Chart {
 			}
 
 			// check if photos are available
-			final MergeTour mergeTour = _tourData.mergedTour;
+			final TourPhotoLink mergeTour = _tourData.mergedTour;
 			if (mergeTour == null) {
 				return;
 			}
@@ -1096,7 +1096,7 @@ public class TourChart extends Chart {
 			return;
 		}
 
-		final MergeTour mergeTour = _tourData.mergedTour;
+		final TourPhotoLink mergeTour = _tourData.mergedTour;
 
 		if (mergeTour == null) {
 			// no photos are available for this tour

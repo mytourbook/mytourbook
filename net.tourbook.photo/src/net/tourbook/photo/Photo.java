@@ -836,7 +836,7 @@ public class Photo {
 		_latitude = latitude;
 		_longitude = longitude;
 
-		_photoWrapper.isGPS = true;
+		_photoWrapper.isPhotoWithGps = true;
 	}
 
 	public void setGpsAreaInfo(final String gpsAreaInfo) {
@@ -942,15 +942,16 @@ public class Photo {
 
 		setMapImageSize();
 
+		_photoWrapper.isExifLoaded = true;
+
 		/*
 		 * set state if gps data are available, this state is used for filtering the photos and to
 		 * indicate that exif data are loaded
 		 */
 		final boolean isGPS = _latitude != Double.MIN_VALUE && _longitude != Double.MIN_VALUE;
 
-		_photoWrapper.isGPS = isGPS;
-		_photoWrapper.isExifGps = isGPS;
-		_photoWrapper.gpsState = isGPS ? 0 : 1;
+		_photoWrapper.isPhotoWithGps = isGPS;
+		_photoWrapper.isExifWithGps = isGPS;
 
 		// sort by exif date when available
 		if (_exifDateTime != null) {

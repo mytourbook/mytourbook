@@ -413,13 +413,13 @@ public class TourPhotosView extends ViewPart {
 
 		if (_isPartVisible == false) {
 
-			if (selection instanceof TourPhotoSelection) {
+			if (selection instanceof TourPhotoLinkSelection) {
 				_selectionWhenHidden = selection;
 			}
 			return;
 		}
 
-		if (selection instanceof TourPhotoSelection) {
+		if (selection instanceof TourPhotoLinkSelection) {
 
 			if (_currentPhotoSelection == selection) {
 				// prevent setting the same selection again
@@ -428,7 +428,7 @@ public class TourPhotosView extends ViewPart {
 
 			_currentPhotoSelection = selection;
 
-			final TourPhotoSelection tourPhotoSelection = (TourPhotoSelection) selection;
+			final TourPhotoLinkSelection tourPhotoSelection = (TourPhotoLinkSelection) selection;
 
 			updateUI(tourPhotoSelection);
 		}
@@ -505,30 +505,46 @@ public class TourPhotosView extends ViewPart {
 		_photoGallery.updateColors(fgColor, bgColor, selectionFgColor, noFocusSelectionFgColor, isRestore);
 	}
 
-	private void updateUI(final TourPhotoSelection tourPhotoSelection) {
+	private void updateUI(final TourPhotoLinkSelection tourPhotoSelection) {
 
 		/*
 		 * update photo gallery
 		 */
-		final MergeTour mergeTour = tourPhotoSelection.mergedTour;
-		final ArrayList<PhotoWrapper> photoWrapperList = mergeTour.tourPhotos;
+		final ArrayList<TourPhotoLink> tourPhotoLinks = tourPhotoSelection.tourPhotoLinks;
+		final ArrayList<PhotoWrapper> allPhotoWrapper = new ArrayList<PhotoWrapper>();
+		long galleryPositionKey = 0;
+		long startTime = Long.MAX_VALUE;
+		long endTime = Long.MIN_VALUE;
 
-		final String galleryPositionKey = Long.toString(mergeTour.mergeId);
+		for (final TourPhotoLink tourPhotoLink : tourPhotoLinks) {
 
-		_photoGallery.showImages(photoWrapperList, galleryPositionKey + " TourPhotosView", true);//$NON-NLS-1$
+			allPhotoWrapper.addAll(tourPhotoLink.tourPhotos);
+
+			galleryPositionKey += tourPhotoLink.mergeId;
+
+			final long tourStartTime = tourPhotoLink.tourStartTime;
+			final long tourEndTime = tourPhotoLink.tourEndTime;
+
+			if (tourStartTime < startTime) {
+				startTime = tourStartTime;
+			}
+			if (tourEndTime > endTime) {
+				endTime = tourEndTime;
+			}
+		}
+
+		_photoGallery.showImages(allPhotoWrapper, Long.toString(galleryPositionKey) + " TourPhotosView", true);//$NON-NLS-1$
 
 		/*
 		 * set title
 		 */
-		final int size = photoWrapperList.size();
+		final int size = allPhotoWrapper.size();
 		String labelText;
 
 		if (size == 1) {
-			labelText = _dtFormatter.print(mergeTour.tourStartTime);
+			labelText = _dtFormatter.print(startTime);
 		} else if (size > 1) {
-			labelText = _dtFormatter.print(mergeTour.tourStartTime)
-					+ UI.DASH_WITH_DOUBLE_SPACE
-					+ _dtFormatter.print(mergeTour.tourEndTime);
+			labelText = _dtFormatter.print(startTime) + UI.DASH_WITH_DOUBLE_SPACE + _dtFormatter.print(endTime);
 		} else {
 			labelText = UI.EMPTY_STRING;
 		}

@@ -176,7 +176,7 @@
             class="net.tourbook.application.PerspectiveFactoryPhoto"
             icon="icons/photo-merge-perspective.png"
             id="net.tourbook.perspective.MergePhotos"
-            name="%Perspective_Name_MergePhotos"/>
+            name="%Perspective_Name_ToursAndPhotos"/>
    </extension>
    
    <extension
@@ -1243,7 +1243,7 @@
 				category="net.tourbook.category.photo"
 				class="net.tourbook.photo.PhotosAndToursView"
 				icon="icons/photo-and-tours-view.png"
-				id="net.tourbook.photo.merge.PhotosAndToursView.ID"
+				id="net.tourbook.photo.PhotosAndToursView.ID"
 				name="%View_Name_PhotosAndTours"/>
 			<view
 				category="net.tourbook.category.photo"

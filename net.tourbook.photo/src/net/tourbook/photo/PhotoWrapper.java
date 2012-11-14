@@ -72,25 +72,24 @@ public class PhotoWrapper implements IGalleryCustomData {
 	public Camera	camera;
 
 	/**
-	 * GPS has three states:
-	 * 
-	 * <pre>
-	 * -1 state is not yet set, EXIF data are not yet loaded
-	 *  0 photo do not contain GPS data
-	 *  1 photo contains GPS data
-	 * </pre>
+	 * Is <code>true</code> when photo exif data are loaded.
 	 */
-	public int		gpsState		= -1;
+	public boolean	isExifLoaded;
 
 	/**
 	 * Is <code>true</code> when this photo contains geo coordinates.
 	 */
-	public boolean	isGPS;
+	public boolean	isPhotoWithGps;
 
 	/**
 	 * Is <code>true</code> when geo coordinates origin is in the photo EXIF data.
 	 */
-	public boolean	isExifGps;
+	public boolean	isExifWithGps;
+
+	/**
+	 * Is <code>true</code> when adjusted time is used to set geo position.
+	 */
+	public boolean	isGpsSetFromTour;
 
 	public PhotoWrapper(final File file) {
 

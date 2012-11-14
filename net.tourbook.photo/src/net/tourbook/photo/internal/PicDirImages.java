@@ -311,7 +311,7 @@ public class PicDirImages implements IPhotoGalleryProvider {
 				.grab(true, false)
 				.align(SWT.FILL, SWT.CENTER)
 				.applyTo(_comboHistory);
-		_comboHistory.setVisibleItemCount(30);
+		_comboHistory.setVisibleItemCount(60);
 
 		_comboHistory.addMouseListener(new MouseListener() {
 
@@ -372,8 +372,8 @@ public class PicDirImages implements IPhotoGalleryProvider {
 		menuMgr.add(_actionClearNavigationHistory);
 	}
 
-	public ISelection getMergePhotoTourSelection(final boolean isAllImages) {
-		return _photoGallery.getMergePhotoTourSelection(isAllImages);
+	public ISelection getPhotoSelection(final boolean isAllImages) {
+		return _photoGallery.getPhotoSelection(isAllImages);
 	}
 
 	@Override

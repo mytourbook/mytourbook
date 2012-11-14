@@ -19,14 +19,14 @@ import java.util.ArrayList;
 
 import org.eclipse.jface.viewers.ISelection;
 
-public class MergePhotoTourSelection implements ISelection {
+public class PhotoWrapperSelection implements ISelection {
 
 	/**
 	 * Contains photos sorted by date/time
 	 */
 	public ArrayList<PhotoWrapper>	selectedPhotos;
 
-	public MergePhotoTourSelection(final ArrayList<PhotoWrapper> selectedPhotos) {
+	public PhotoWrapperSelection(final ArrayList<PhotoWrapper> selectedPhotos) {
 		this.selectedPhotos = selectedPhotos;
 	}
 

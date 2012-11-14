@@ -57,14 +57,14 @@ public abstract class PhotoToolTipShell {
 	/**
 	 * Number of steps when fading out
 	 */
-	private static final int			FADE_OUT_STEPS								= 10;
+	private static final int			FADE_OUT_STEPS								= 20;
 
 	/**
 	 * Number of steps before fading out
 	 */
 	private static final int			FADE_OUT_DELAY_STEPS						= 20;
 
-	private static final int			MOVE_STEPS									= 20;
+	private static final int			MOVE_STEPS									= 30;
 
 	private static final int			ALPHA_OPAQUE								= 0xff;
 
@@ -129,6 +129,7 @@ public abstract class PhotoToolTipShell {
 
 	private boolean						_isInShellResize;
 	private boolean						_isKeepToolTipOpen;
+	private boolean						_isDoNotStopAnimation;
 
 	private AbstractRRShell				_visibleRRShell;
 	private AbstractRRShell				_rrShellWithResize;
@@ -383,6 +384,9 @@ public abstract class PhotoToolTipShell {
 			return;
 		}
 
+//		System.out.println(UI.timeStampNano() + " animation20_Runnable " + _isShellFadingIn + "  " + _isShellFadingOut);
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
 		try {
 			/*
 			 * endAlpha will be the final fadeIn/fadeOut value when the animation stops
@@ -598,6 +602,10 @@ public abstract class PhotoToolTipShell {
 		afterCreateShell(_visibleShell);
 	}
 
+	void doNotStopAnimation() {
+		_isDoNotStopAnimation = true;
+	}
+
 	private Point fixupDisplayBounds(final Point tipSize, final Point location) {
 
 		final Rectangle displayBounds = getDisplayBounds(location);
@@ -766,10 +774,15 @@ public abstract class PhotoToolTipShell {
 
 		case SWT.MouseEnter:
 
-			// stop animation
-			if (_isShellFadingIn || _isShellFadingOut) {
+			if (_isDoNotStopAnimation == false) {
 
-				_isShellFadingIn = _isShellFadingOut = false;
+				if (_isShellFadingIn || _isShellFadingOut) {
+
+					// stop animation
+
+					_isShellFadingIn = false;
+					_isShellFadingOut = false;
+				}
 			}
 
 			reparentShell(_rrShellWithResize);
@@ -1263,6 +1276,13 @@ public abstract class PhotoToolTipShell {
 		_visibleRRShell.setShellLocation(fixedLocation.x, fixedLocation.y, 4);
 	}
 
+//	/**
+//	 * @param isAutoMoved
+//	 *            Is <code>true</code> when tooltip is auto moved, otherwise it is
+//	 *            <code>false</code>.
+//	 */
+//	abstract void toolTipIsAutoMoved(boolean isAutoMoved);
+
 	protected boolean showShell() {
 
 		/*
@@ -1280,13 +1300,6 @@ public abstract class PhotoToolTipShell {
 
 		return true;
 	}
-
-//	/**
-//	 * @param isAutoMoved
-//	 *            Is <code>true</code> when tooltip is auto moved, otherwise it is
-//	 *            <code>false</code>.
-//	 */
-//	abstract void toolTipIsAutoMoved(boolean isAutoMoved);
 
 	private void showShellWhenVisible() {
 
@@ -1401,8 +1414,10 @@ public abstract class PhotoToolTipShell {
 		// hide shell
 		setShellVisible(false);
 
+		_isShellFadingIn = false;
 		_isShellFadingOut = false;
-		_isShellFadingOut = false;
+
+		_isDoNotStopAnimation = false;
 	}
 
 	private void ttHide(final Event event) {
@@ -1412,6 +1427,8 @@ public abstract class PhotoToolTipShell {
 		}
 
 		beforeHideToolTip();
+
+		_isDoNotStopAnimation = false;
 
 		if (_isShellFadingOut) {
 

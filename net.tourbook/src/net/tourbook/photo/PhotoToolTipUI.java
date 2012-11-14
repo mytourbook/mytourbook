@@ -61,6 +61,7 @@ import org.eclipse.swt.widgets.ToolBar;
 public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 	private static final String				STATE_PHOTO_GALLERY_IS_VERTICAL	= "STATE_PHOTO_GALLERY_IS_VERTICAL";	//$NON-NLS-1$
+	private static final String				STATE_TOOL_TIP_LOCATION			= "STATE_TOOL_TIP_LOCATION";			//$NON-NLS-1$
 
 	private IDialogSettings					_state;
 
@@ -69,13 +70,21 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 	private final ArrayList<PhotoWrapper>	_photoWrapperList				= new ArrayList<PhotoWrapper>();
 
 	private ActionCloseToolTip				_actionCloseToolTip;
-
 	private ActionPinToolTip				_actionPinToolTip;
 	private ActionToggleGalleryOrientation	_actionToggleGalleryOrientation;
-	private boolean							_isVerticalGallery;
+	private ActionToolTipLocationUpDown		_actionToolTipLocation;
 
 	private ToolBarManager					_galleryToolbarManager;
+	private boolean							_isVerticalGallery;
 	private boolean							_isShellDragged;
+
+	/**
+	 * <pre>
+	 * 1 ... above tour chart
+	 * 0 ... below tour chart
+	 * </pre>
+	 */
+	private int								_toolTipLocationUpDown;
 
 	private int								_devXMousedown;
 	private int								_devYMousedown;
@@ -135,6 +144,22 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		@Override
 		public void run() {
 			actionToggleVH();
+		}
+	}
+
+	private class ActionToolTipLocationUpDown extends Action {
+
+		public ActionToolTipLocationUpDown() {
+
+			super(null, Action.AS_PUSH_BUTTON);
+
+			setToolTipText(Messages.App_Action_ToolTipLocation_AboveTourChart_Tooltip);
+			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowDown));
+		}
+
+		@Override
+		public void run() {
+			actionToolTipLocation();
 		}
 	}
 
@@ -209,6 +234,17 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		_photoGallery.setVertical(_isVerticalGallery);
 	}
 
+	private void actionToolTipLocation() {
+
+		_toolTipLocationUpDown = _toolTipLocationUpDown == 1 ? 0 : 1;
+
+		updateUI_ToolTipLocation();
+
+		super.doNotStopAnimation();
+
+		showShell();
+	}
+
 	@Override
 	protected void afterCreateShell(final Shell shell) {
 
@@ -254,6 +290,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		_actionPinToolTip = new ActionPinToolTip();
 		_actionToggleGalleryOrientation = new ActionToggleGalleryOrientation();
 		_actionCloseToolTip = new ActionCloseToolTip();
+		_actionToolTipLocation = new ActionToolTipLocationUpDown();
 	}
 
 	@Override
@@ -262,8 +299,6 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		final Composite container = createUI(parent);
 
 		updateUI_Colors(parent);
-
-//		super.setImageGallery(_photoGallery);
 
 		return container;
 	}
@@ -392,6 +427,8 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 		exitToolbarManager.add(_actionCloseToolTip);
 		exitToolbarManager.add(_actionPinToolTip);
+		exitToolbarManager.add(_actionToolTipLocation);
+
 		exitToolbarManager.update(true);
 
 		/*
@@ -401,6 +438,16 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 		_galleryToolbarManager.add(_actionToggleGalleryOrientation);
 		_galleryToolbarManager.add(new Separator());
+	}
+
+	/**
+	 * @return Returns current tooltip location
+	 *         <p>
+	 *         1 ... above tour chart<br>
+	 *         0 ... below tour chart
+	 */
+	protected int getTooltipLocation() {
+		return _toolTipLocationUpDown;
 	}
 
 	@Override
@@ -467,8 +514,10 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		_state = state;
 
 		_isVerticalGallery = Util.getStateBoolean(state, STATE_PHOTO_GALLERY_IS_VERTICAL, true);
+		_toolTipLocationUpDown = Util.getStateInt(state, STATE_TOOL_TIP_LOCATION, 1);
 
 		updateUI_ToogleAction();
+		updateUI_ToolTipLocation();
 
 		super.restoreState(state);
 	}
@@ -477,6 +526,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 	protected void saveState(final IDialogSettings state) {
 
 		state.put(STATE_PHOTO_GALLERY_IS_VERTICAL, _isVerticalGallery);
+		state.put(STATE_TOOL_TIP_LOCATION, _toolTipLocationUpDown);
 
 		super.saveState(state);
 	}
@@ -556,6 +606,24 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 			_actionToggleGalleryOrientation.setImageDescriptor(//
 					TourbookPlugin.getImageDescriptor(Messages.Image__PhotoGalleryVertical));
+		}
+	}
+
+	private void updateUI_ToolTipLocation() {
+
+		if (_toolTipLocationUpDown == 1) {
+
+			// above tour chart
+
+			_actionToolTipLocation.setToolTipText(Messages.App_Action_ToolTipLocation_BelowTourChart_Tooltip);
+			_actionToolTipLocation.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowUp));
+
+		} else {
+
+			// below tour chart
+
+			_actionToolTipLocation.setToolTipText(Messages.App_Action_ToolTipLocation_AboveTourChart_Tooltip);
+			_actionToolTipLocation.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowDown));
 		}
 	}
 }

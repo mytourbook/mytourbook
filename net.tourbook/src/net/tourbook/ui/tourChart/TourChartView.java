@@ -26,8 +26,8 @@ import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.data.TourData;
-import net.tourbook.photo.MergeTour;
-import net.tourbook.photo.TourPhotoSelection;
+import net.tourbook.photo.TourPhotoLink;
+import net.tourbook.photo.TourPhotoLinkSelection;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.IDataModelListener;
 import net.tourbook.tour.ITourEventListener;
@@ -79,7 +79,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 	private TourChartConfiguration	_tourChartConfig;
 	private TourData				_tourData;
-	private MergeTour				_mergedTour;
+	private TourPhotoLink			_tourPhotoLink;
 
 	private PostSelectionProvider	_postSelectionProvider;
 	private ISelectionListener		_postSelectionListener;
@@ -389,7 +389,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 	private void onSelectionChanged(final ISelection selection) {
 
-		_mergedTour = null;
+		_tourPhotoLink = null;
 
 		if (selection instanceof SelectionTourData) {
 
@@ -404,36 +404,21 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 				updateChart(selectionTourData);
 			}
 
-		} else if (selection instanceof SelectionTourIds) {
-
-			final SelectionTourIds selectionTourId = (SelectionTourIds) selection;
-			final ArrayList<Long> tourIds = selectionTourId.getTourIds();
-			if (tourIds != null && tourIds.size() > 0) {
-				updateChart(tourIds.get(0), false);
-			}
-
 		} else if (selection instanceof SelectionTourId) {
 
 			final SelectionTourId selectionTourId = (SelectionTourId) selection;
 			final Long tourId = selectionTourId.getTourId();
 
-			if (selection instanceof TourPhotoSelection) {
+			updateChart(tourId, false);
 
-				_mergedTour = ((TourPhotoSelection) selection).mergedTour;
+		} else if (selection instanceof SelectionTourIds) {
 
-				if (_mergedTour.isHistoryTour()) {
+			// only 1 tour can be displayed in the tour chart
 
-					updateChart(_mergedTour.getHistoryTourData());
+			final SelectionTourIds selectionTourId = (SelectionTourIds) selection;
+			final ArrayList<Long> tourIds = selectionTourId.getTourIds();
 
-// each view selection fires the zoom out -> this is very horrorable
-//					_tourChart.zoomOut();
-				}
-			}
-
-			final boolean isForceUpdate = _mergedTour != null;
-
-			// force update when photo selection occured
-			updateChart(tourId, isForceUpdate);
+			onSelectionChanged_TourWithPhoto(selection, tourIds);
 
 		} else if (selection instanceof SelectionChartInfo) {
 
@@ -518,6 +503,39 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 		}
 	}
 
+	private void onSelectionChanged_TourWithPhoto(final ISelection selection, final ArrayList<Long> tourIds) {
+
+		boolean isChartPainted = false;
+		if (selection instanceof TourPhotoLinkSelection) {
+
+			final ArrayList<TourPhotoLink> tourPhotoLinks = ((TourPhotoLinkSelection) selection).tourPhotoLinks;
+
+			if (tourPhotoLinks.size() > 0) {
+
+				_tourPhotoLink = tourPhotoLinks.get(0);
+
+				if (_tourPhotoLink.isHistoryTour()) {
+
+					// paint history tour
+
+					updateChart(_tourPhotoLink.getHistoryTourData());
+
+					isChartPainted = true;
+				}
+			}
+		}
+
+		if (isChartPainted == false && tourIds != null && tourIds.size() > 0) {
+
+			// paint regular tour
+
+			final boolean isForceUpdate = _tourPhotoLink != null;
+
+			// force update when photo selection occured
+			updateChart(tourIds.get(0), isForceUpdate);
+		}
+	}
+
 	private void restoreState() {
 
 		_tourChart.restoreState();
@@ -548,23 +566,23 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 		if (_tourData == null) {
 
 			_pageBook.showPage(_pageNoChart);
-			
+
 			// a tour is not displayed, find a tour provider which provides a tour
 			Display.getCurrent().asyncExec(new Runnable() {
 				public void run() {
-			
+
 					// validate widget
 					if (_pageBook.isDisposed()) {
 						return;
 					}
-			
+
 					/*
 					 * check if tour was set from a selection provider
 					 */
 					if (_tourData != null) {
 						return;
 					}
-			
+
 					final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
 					if (selectedTours != null && selectedTours.size() > 0) {
 						updateChart(selectedTours.get(0));
@@ -585,7 +603,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 		_pageBook.showPage(_tourChart);
 
-		_tourData.mergedTour = _mergedTour;
+		_tourData.mergedTour = _tourPhotoLink;
 
 		_tourChart.updateTourChart(_tourData, _tourChartConfig, false);
 

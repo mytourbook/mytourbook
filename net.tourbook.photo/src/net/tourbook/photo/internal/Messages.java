@@ -18,7 +18,6 @@ public class Messages extends NLS {
 	public static String		FullScreenImageViewer_KeyCharacter_ShowPhotoGallery;
 
 	public static String		Image__Backward_Nav;
-	public static String		Image__CursorNotImplemented;
 	public static String		Image__delete;
 	public static String		Image__Forward_Nav;
 	public static String		Image__PhotoAnnotationGPS;
@@ -36,10 +35,6 @@ public class Messages extends NLS {
 	public static String		Image__PhotoTooltip;
 	public static String		Image__refresh;
 
-	public static String		Photo_Merge_Label_SelectedPhotoDate;
-	public static String		Photo_Merge_Label_SelectedPhotoDates;
-	public static String		Photo_Merge_Label_SelectedPhotoDates_Tooltip;
-
 	public static String		Photo_ToolTip_Description;
 	public static String		Photo_ToolTip_ExifDate;
 	public static String		Photo_ToolTip_FileDate;
@@ -50,7 +45,6 @@ public class Messages extends NLS {
 	public static String		Pic_Dir_Action_AutoExpandCollapse;
 	public static String		Pic_Dir_Action_ClearHistory;
 	public static String		Pic_Dir_Action_DefineExternalApp;
-	public static String		Pic_Dir_Action_MergePhotosWithTours;
 	public static String		Pic_Dir_Action_NavigateHistoryBackward_Tooltip;
 	public static String		Pic_Dir_Action_NavigateHistoryForward_Tooltip;
 	public static String		Pic_Dir_Action_PhotoFilterGPS;
@@ -83,13 +77,13 @@ public class Messages extends NLS {
 	public static String		Pic_Dir_Dialog_CleanupStoreImages_KeepImages;
 	public static String		Pic_Dir_Dialog_CleanupStoreImages_Message;
 	public static String		Pic_Dir_Dialog_CleanupStoreImages_Title;
+	public static String		Pic_Dir_Dialog_LinkPhotos_DialogInterrupted_Message;
+	public static String		Pic_Dir_Dialog_LinkPhotos_NoSelectedImage_Message;
+	public static String		Pic_Dir_Dialog_LinkPhotos_NoSelectedImagesInFolder_Message;
+	public static String		Pic_Dir_Dialog_LinkPhotos_Title;
 	public static String		Pic_Dir_Dialog_LoadingEXIFData;
 	public static String		Pic_Dir_Dialog_LoadingEXIFData_Subtask;
 	public static String		Pic_Dir_Dialog_LoadingFolderFiles;
-	public static String		Pic_Dir_Dialog_MergePhotos_DialogInterrupted_Message;
-	public static String		Pic_Dir_Dialog_MergePhotos_NoSelectedImage_Message;
-	public static String		Pic_Dir_Dialog_MergePhotos_NoSelectedImagesInFolder_Message;
-	public static String		Pic_Dir_Dialog_MergePhotos_Title;
 	public static String		Pic_Dir_ImageSizeIndicator_Tooltip;
 	public static String		Pic_Dir_Label_ExternalApp;
 	public static String		Pic_Dir_Label_ImageLoadingFailed;
@@ -109,9 +103,7 @@ public class Messages extends NLS {
 	public static String		Pic_Dir_StatusLabel_LoadingThumbExif;
 	public static String		Pic_Dir_StatusLabel_nImagesAreHiddenByFilter;
 	public static String		Pic_Dir_StatusLabel_NoFolder;
-	public static String	Pic_Dir_StatusLabel_NoImages;
-
-	public static String		Pic_Dir_StatusLabel_NoImagesInFolder;
+	public static String		Pic_Dir_StatusLabel_NoImages;
 	public static String		Pic_Dir_StatusLabel_RestoringFolder;
 	public static String		Pic_Dir_StatusLabel_SelectedImages;
 	public static String		Pic_Dir_StatusLable_LoadingFolder;
