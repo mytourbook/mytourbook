@@ -241,6 +241,14 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 			return;
 		}
 
+//		if (photoWrapper.imageFileName.equals("IMG_1115.JPG")) {
+//			int a = 0;
+//
+//			final int size1 = PhotoLoadManager.getImageQueueSize();
+//
+//			a++;
+//		}
+
 		final Photo photo = photoWrapper.photo;
 
 		final ImageQuality requestedImageQuality = itemImageWidth <= PhotoLoadManager.IMAGE_SIZE_THUMBNAIL

@@ -564,6 +564,8 @@ public abstract class GalleryMT20 extends Canvas {
 		} else {
 
 			// not yet implemented
+
+			galleryPositionRatio = (double) _lastSelectedItemIndex / _gridHorizItems;
 		}
 
 		return galleryPositionRatio;
@@ -2232,11 +2234,9 @@ public abstract class GalleryMT20 extends Canvas {
 		_selectedItems.remove(item.uniqueItemID);
 	}
 
-	public void selectItem(final int itemIndex, final boolean isSetFocus) {
+	public void selectItem(final int itemIndex) {
 
-		if (isSetFocus) {
-			setFocus();
-		}
+		setFocus();
 
 		deselectAll(false);
 

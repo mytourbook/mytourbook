@@ -67,7 +67,7 @@ public class SQLFilter {
 	}
 
 	/**
-	 * @return Returns the where clause to filter the tour types
+	 * @return Returns the WHERE clause to filter tours by person and tour types
 	 */
 	public String getWhereClause() {
 		return _sqlWhereClause;

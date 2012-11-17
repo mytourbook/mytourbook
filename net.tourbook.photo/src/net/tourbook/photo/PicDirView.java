@@ -26,7 +26,9 @@ import net.tourbook.photo.internal.PicDirImages;
 import net.tourbook.photo.internal.manager.ThumbnailStore;
 
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -44,14 +46,17 @@ import org.eclipse.ui.part.ViewPart;
 
 public class PicDirView extends ViewPart {
 
-	static public final String				ID					= "net.tourbook.photo.PicDirView";							//$NON-NLS-1$
+	static public final String				ID									= "net.tourbook.photo.PicDirView";		//$NON-NLS-1$
 
-	private static final String				STATE_TREE_WIDTH	= "STATE_TREE_WIDTH";										//$NON-NLS-1$
+	private static final String				SEPARATOR_ID_PIC_DIR_VIEW_TOOL_BAR	= "PicDirViewToolBar";
 
-	private static final IDialogSettings	_state				= Activator.getDefault()//
-																		.getDialogSettingsSection("PhotoDirectoryView");	//$NON-NLS-1$
-	private static final IPreferenceStore	_prefStore			= Activator.getDefault()//
-																		.getPreferenceStore();
+	private static final String				STATE_TREE_WIDTH					= "STATE_TREE_WIDTH";					//$NON-NLS-1$
+
+	private static final IDialogSettings	_state								= Activator.getDefault()//
+																						.getDialogSettingsSection(
+																								"PhotoDirectoryView");	//$NON-NLS-1$
+	private static final IPreferenceStore	_prefStore							= Activator.getDefault()//
+																						.getPreferenceStore();
 	private IPartListener2					_partListener;
 	private IPropertyChangeListener			_prefChangeListener;
 
@@ -59,6 +64,8 @@ public class PicDirView extends ViewPart {
 
 	private PicDirFolder					_picDirFolder;
 	private PicDirImages					_picDirImages;
+
+	private ISelectionConverter				_selectionConverter;
 
 	/*
 	 * UI controls
@@ -157,7 +164,7 @@ public class PicDirView extends ViewPart {
 		sortBlock(files, 0, files.length - 1, new File[files.length]);
 	}
 
-	public void actionMergePhotoWithTour(final boolean isAllImages) {
+	public void actionLinkPhotoWithTour(final boolean isAllImages) {
 
 		final ISelection selection = _picDirImages.getPhotoSelection(isAllImages);
 
@@ -223,8 +230,6 @@ public class PicDirView extends ViewPart {
 			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 
-				final String property = event.getProperty();
-
 				_picDirFolder.handlePrefStoreModifications(event);
 				_picDirImages.handlePrefStoreModifications(event);
 			}
@@ -235,6 +240,8 @@ public class PicDirView extends ViewPart {
 
 	@Override
 	public void createPartControl(final Composite parent) {
+
+		fillActionBarsBeforeUI();
 
 		createUI(parent);
 
@@ -307,7 +314,7 @@ public class PicDirView extends ViewPart {
 	}
 
 	/**
-	 * fill view toolbar
+	 * fill view menu
 	 */
 	private void fillActionBars() {
 
@@ -317,6 +324,25 @@ public class PicDirView extends ViewPart {
 		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 
 		_picDirImages.fillViewMenu(menuMgr);
+	}
+
+	/**
+	 * fill view toolbar
+	 */
+	private void fillActionBarsBeforeUI() {
+
+		final IToolBarManager tbmMgr = getViewSite().getActionBars().getToolBarManager();
+
+		tbmMgr.add(new Separator(SEPARATOR_ID_PIC_DIR_VIEW_TOOL_BAR));
+	}
+
+	public void fireCurrentSelection() {
+
+		_postSelectionProvider.setSelection(_picDirImages.getPhotoSelection(false));
+	}
+
+	public ISelection getSelectedPhotos() {
+		return _picDirImages.getPhotoSelection(false);
 	}
 
 	private void onPartClose() {
@@ -385,8 +411,22 @@ public class PicDirView extends ViewPart {
 		_containerMasterDetail.setMaximizedControl(isShowFolderAndGallery ? null : _containerImages);
 	}
 
-	public void setSelection(final ISelection selection) {
+	public void setSelection(ISelection selection) {
+
+		if (_selectionConverter != null) {
+
+			/*
+			 * convert default selection into a selection from the selection type provider, it
+			 * mainly converts into another type, that the new type is fired instead of the old
+			 */
+			selection = _selectionConverter.convertSelection(selection);
+		}
+
 		_postSelectionProvider.setSelection(selection);
+	}
+
+	public void setSelectionConverter(final ISelectionConverter selectionConverter) {
+		_selectionConverter = selectionConverter;
 	}
 
 }

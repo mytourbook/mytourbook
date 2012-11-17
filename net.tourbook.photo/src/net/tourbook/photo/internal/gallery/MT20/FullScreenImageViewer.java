@@ -701,7 +701,7 @@ public class FullScreenImageViewer {
 	private void showImage_Delayed() {
 
 		// get first item
-		final Collection<GalleryMT20Item> allItems = _delayedPhotoSelection.allGalleryItems;
+		final Collection<GalleryMT20Item> allItems = _delayedPhotoSelection.galleryItems;
 
 		if (allItems.size() == 0) {
 			return;

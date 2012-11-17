@@ -16,8 +16,8 @@
 package net.tourbook.application;
 
 import net.tourbook.mapping.TourMapView;
-import net.tourbook.photo.PhotosAndToursView;
 import net.tourbook.photo.PicDirView;
+import net.tourbook.photo.TourPhotoLinkView;
 import net.tourbook.photo.TourPhotosView;
 import net.tourbook.ui.tourChart.TourChartView;
 
@@ -27,12 +27,13 @@ import org.eclipse.ui.IPerspectiveFactory;
 
 public class PerspectiveFactoryPhoto implements IPerspectiveFactory {
 
-	public static final String	PERSPECTIVE_ID			= "net.tourbook.perspective.MergePhotos";	//$NON-NLS-1$
+	public static final String	PERSPECTIVE_ID			= "net.tourbook.perspective.TourPhotoLinks";	//$NON-NLS-1$
 
-	private static final String	FOLDER_ID_PHOTO_MERGE	= "FOLDER_ID_PHOTO_MERGE";					//$NON-NLS-1$
-	private static final String	FOLDER_ID_TOUR_PHOTO	= "FOLDER_ID_TOUR_PHOTO";					//$NON-NLS-1$
-	private static final String	FOLDER_ID_MAP			= "FOLDER_ID_MAP";							//$NON-NLS-1$
-	private static final String	FOLDER_ID_TOUR_CHART	= "FOLDER_ID_TOUR_CHART";					//$NON-NLS-1$
+	private static final String	FOLDER_MAP				= "FOLDER_MAP";								//$NON-NLS-1$
+	private static final String	FOLDER_PHOTO_GALLERY	= "FOLDER_PHOTO_GALLERY";						//$NON-NLS-1$
+	private static final String	FOLDER_TOUR_CHART		= "FOLDER_TOUR_CHART";							//$NON-NLS-1$
+	private static final String	FOLDER_TOUR_PHOTO		= "FOLDER_TOUR_PHOTO";							//$NON-NLS-1$
+	private static final String	FOLDER_TOUR_PHOTO_LINKS	= "FOLDER_TOUR_PHOTO_LINKS";					//$NON-NLS-1$
 
 	public void createInitialLayout(final IPageLayout layout) {
 
@@ -40,40 +41,48 @@ public class PerspectiveFactoryPhoto implements IPerspectiveFactory {
 
 		//--------------------------------------------------------------------------------
 
-		final IFolderLayout photoMergeFolder = layout.createFolder(FOLDER_ID_PHOTO_MERGE,//
-				IPageLayout.RIGHT,
-				0.3f,
-				IPageLayout.ID_EDITOR_AREA);
-
-		photoMergeFolder.addView(PicDirView.ID);
-		photoMergeFolder.addView(PhotosAndToursView.ID);
-
-		//--------------------------------------------------------------------------------
-
-		final IFolderLayout tourPhotoFolder = layout.createFolder(FOLDER_ID_TOUR_PHOTO,//
+		final IFolderLayout folderTourPhoto = layout.createFolder(FOLDER_TOUR_PHOTO,//
 				IPageLayout.BOTTOM,
 				0.85f,
-				FOLDER_ID_PHOTO_MERGE);
+				IPageLayout.ID_EDITOR_AREA);
 
-		tourPhotoFolder.addView(TourPhotosView.ID);
+		folderTourPhoto.addView(TourPhotosView.ID);
 
 		//--------------------------------------------------------------------------------
 
-		final IFolderLayout tourChartFolder = layout.createFolder(FOLDER_ID_TOUR_CHART, //
+		final IFolderLayout folterPicDir = layout.createFolder(FOLDER_PHOTO_GALLERY,//
+				IPageLayout.RIGHT,
+				0.5f,
+				IPageLayout.ID_EDITOR_AREA);
+
+		folterPicDir.addView(PicDirView.ID);
+
+		//--------------------------------------------------------------------------------
+
+		final IFolderLayout folderMap = layout.createFolder(FOLDER_MAP, //
+				IPageLayout.RIGHT,
+				0.5f,
+				FOLDER_PHOTO_GALLERY);
+
+		folderMap.addView(TourMapView.ID);
+
+		//--------------------------------------------------------------------------------
+
+		final IFolderLayout tourChartFolder = layout.createFolder(FOLDER_TOUR_CHART, //
 				IPageLayout.BOTTOM,
-				0.7f,
-				FOLDER_ID_PHOTO_MERGE);
+				0.6f,
+				FOLDER_MAP);
 
 		tourChartFolder.addView(TourChartView.ID);
 
 		//--------------------------------------------------------------------------------
 
-		final IFolderLayout mapFolder = layout.createFolder(FOLDER_ID_MAP, //
-				IPageLayout.RIGHT,
+		final IFolderLayout folderLink = layout.createFolder(FOLDER_TOUR_PHOTO_LINKS,//
+				IPageLayout.BOTTOM,
 				0.5f,
-				FOLDER_ID_PHOTO_MERGE);
+				FOLDER_PHOTO_GALLERY);
 
-		mapFolder.addView(TourMapView.ID);
+		folderLink.addView(TourPhotoLinkView.ID);
 	}
 
 }

@@ -1825,7 +1825,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 		} else if (selection instanceof PhotoSelection) {
 
-			paintPhotos(((PhotoSelection) selection).photoWrapperList);
+			paintPhotos(((PhotoSelection) selection).photoWrappers);
 
 		} else if (selection instanceof SelectionTourCatalogView) {
 

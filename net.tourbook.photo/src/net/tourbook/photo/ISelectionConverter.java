@@ -15,30 +15,10 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
+import org.eclipse.jface.viewers.ISelection;
 
-import org.eclipse.jface.action.Action;
+public interface ISelectionConverter {
 
-public class ActionFilterPhotos extends Action {
-
-	private TourPhotoLinkView	_photosAndToursView;
-
-	public ActionFilterPhotos(final TourPhotoLinkView photosAndToursView) {
-
-		super(null, AS_CHECK_BOX);
-
-		_photosAndToursView = photosAndToursView;
-
-		setToolTipText(Messages.Action_PhotosAndTours_FilterPhotos_Tooltip);
-
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Photo_FilterPhotos));
-		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Photo_FilterPhotos_Disabled));
-	}
-
-	@Override
-	public void run() {
-		_photosAndToursView.actionFilterPhotos();
-	}
+	ISelection convertSelection(ISelection selection);
 
 }

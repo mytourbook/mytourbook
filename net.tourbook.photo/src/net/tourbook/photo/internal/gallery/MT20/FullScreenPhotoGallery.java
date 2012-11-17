@@ -389,8 +389,6 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 
 			_photoGallery.createPhotoGallery(container, SWT.H_SCROLL, this);
 
-//			_photoGallery.setDefaultStatusMessage(Messages.Tour_Photos_Label_StatusMessage_NoTourWithPhotos);
-
 			/**
 			 * Prevent to open pref dialog, when it's opened it would close this tooltip and the
 			 * pref dialog is hidden -->> APP IS FREEZING !!!
@@ -612,7 +610,6 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 	boolean showImages(final int mouseY, final int displayedItemIndex) {
 
 		if (mouseY == 0) {
-//		if (mouseY < GALLERY_HEIGHT) {
 
 			// show gallery
 
@@ -682,7 +679,7 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 		}
 
 		// show photo in the gallery which is displayed in the full screen viewer
-		_photoGallery.selectItem(_displayedItemIndex, true);
+		_photoGallery.selectItem(_displayedItemIndex, galleryPositionKey);
 	}
 
 	private void updateColors(final boolean isRestore) {

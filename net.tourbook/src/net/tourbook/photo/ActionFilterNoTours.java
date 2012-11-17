@@ -22,9 +22,9 @@ import org.eclipse.jface.action.Action;
 
 public class ActionFilterNoTours extends Action {
 
-	private PhotosAndToursView	_photosAndToursView;
+	private TourPhotoLinkView	_photosAndToursView;
 
-	public ActionFilterNoTours(final PhotosAndToursView photosAndToursView) {
+	public ActionFilterNoTours(final TourPhotoLinkView photosAndToursView) {
 
 		super(null, AS_CHECK_BOX);
 

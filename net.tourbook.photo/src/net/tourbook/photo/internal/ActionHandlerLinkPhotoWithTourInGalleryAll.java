@@ -1,44 +1,39 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.photo;
+package net.tourbook.photo.internal;
 
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
+import net.tourbook.photo.PicDirView;
 
-import org.eclipse.jface.action.Action;
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.handlers.HandlerUtil;
 
-public class ActionFilterPhotos extends Action {
-
-	private TourPhotoLinkView	_photosAndToursView;
-
-	public ActionFilterPhotos(final TourPhotoLinkView photosAndToursView) {
-
-		super(null, AS_CHECK_BOX);
-
-		_photosAndToursView = photosAndToursView;
-
-		setToolTipText(Messages.Action_PhotosAndTours_FilterPhotos_Tooltip);
-
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Photo_FilterPhotos));
-		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Photo_FilterPhotos_Disabled));
-	}
+public class ActionHandlerLinkPhotoWithTourInGalleryAll extends AbstractHandler {
 
 	@Override
-	public void run() {
-		_photosAndToursView.actionFilterPhotos();
-	}
+	public Object execute(final ExecutionEvent event) throws ExecutionException {
 
+		final IWorkbenchPart activePart = HandlerUtil.getActiveWorkbenchWindow(event).getActivePage().getActivePart();
+
+		if (activePart instanceof PicDirView) {
+			((PicDirView) activePart).actionLinkPhotoWithTour(true);
+		}
+
+		return null;
+	}
 }

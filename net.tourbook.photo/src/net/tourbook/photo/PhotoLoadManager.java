@@ -22,6 +22,8 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
@@ -85,6 +87,13 @@ public class PhotoLoadManager {
 
 	private static String										_imageFramework;
 	private static int											_hqImageSize;
+
+	private static final ReentrantLock							QUEUE_LOCK						= new ReentrantLock();
+
+	private static final ReentrantReadWriteLock					rwl								= new ReentrantReadWriteLock(
+																										true);
+	private static ReentrantReadWriteLock.ReadLock				readlock						= rwl.readLock();
+	private static ReentrantReadWriteLock.WriteLock				writelock						= rwl.writeLock();
 
 	static {
 
@@ -432,8 +441,23 @@ public class PhotoLoadManager {
 				_hqImageSize,
 				imageLoadCallback));
 
+		// set state, ensure queue is not
+		photo.setLoadingState(PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE, imageQuality);
+
 		final Runnable executorTask = new Runnable() {
 			public void run() {
+
+				// !!! slow down loading for debugging !!!
+				try {
+					Thread.sleep(100);
+				} catch (final InterruptedException e) {
+					// TODO Auto-generated catch block
+					// TODO Auto-generated catch block
+					// TODO Auto-generated catch block
+					// TODO Auto-generated catch block
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
 				// get last added loader item
 				final PhotoImageLoader loadingItem = _waitingQueueThumb.pollFirst();
@@ -563,14 +587,17 @@ public class PhotoLoadManager {
 	 */
 	public synchronized static void stopImageLoading(final boolean isClearExifQueue) {
 
-		Object[] waitingQueueItems = clearWaitingQueue(_waitingQueueThumb, _executorThumb);
-		resetLoadingState(waitingQueueItems);
+//		System.out.println(UI.timeStampNano() + " stopImageLoading\tthread:" + Thread.currentThread().getName());
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
-		waitingQueueItems = clearWaitingQueue(_waitingQueueHQ, _executorHQ);
-		resetLoadingState(waitingQueueItems);
+		final Object[] thumbWaitingQueueItems = clearWaitingQueue(_waitingQueueThumb, _executorThumb);
+		resetLoadingState(thumbWaitingQueueItems);
 
-		waitingQueueItems = clearWaitingQueue(_waitingQueueOriginal, _executorOriginal);
-		resetLoadingState(waitingQueueItems);
+		final Object[] hqWaitingQueueItems = clearWaitingQueue(_waitingQueueHQ, _executorHQ);
+		resetLoadingState(hqWaitingQueueItems);
+
+		final Object[] originalWaitingQueueItems = clearWaitingQueue(_waitingQueueOriginal, _executorOriginal);
+		resetLoadingState(originalWaitingQueueItems);
 
 		if (isClearExifQueue) {
 			clearExifLoadingQueue();

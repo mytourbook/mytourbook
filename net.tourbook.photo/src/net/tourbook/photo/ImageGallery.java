@@ -674,6 +674,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 			_galleryPositions.put(_currentGalleryPositionKey, _galleryMT20.getGalleryPosition());
 		}
 
+
 		// get old position
 		if (_newGalleryPositionKey != null) {
 
@@ -683,7 +684,13 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 			final Double oldPosition = _galleryPositions.get(_newGalleryPositionKey);
 
 			galleryPosition = oldPosition == null ? 0 : oldPosition;
+
+//			System.out.println(UI.timeStampNano() + " get old position " + oldPosition);
+//			// TODO remove SYSTEM.OUT.PRINTLN
 		}
+
+//		System.out.println(UI.timeStampNano() + " getCachedGalleryPosition() " + galleryPosition);
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		return galleryPosition;
 	}
@@ -1736,8 +1743,19 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		_galleryMT20.saveState(state);
 	}
 
-	public void selectItem(final int itemIndex, final boolean isSetFocus) {
-		_galleryMT20.selectItem(itemIndex, isSetFocus);
+	public void selectItem(final int itemIndex, final String galleryPositionKey) {
+
+		_galleryMT20.selectItem(itemIndex);
+
+//		// ensure to keep position, this has not worked in the full screen gallery when image was resized
+////		_currentGalleryPositionKey = galleryPositionKey;
+////		_newGalleryPositionKey = galleryPositionKey;
+//
+//		final double currentGalleryPosition = _galleryMT20.getGalleryPosition();
+////		_galleryPositions.put(galleryPositionKey, currentGalleryPosition);
+//
+//		System.out.println(UI.timeStampNano() + " selectItem()\t" + galleryPositionKey + "\t" + currentGalleryPosition);
+//		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 	public void setDefaultStatusMessage(final String message) {
@@ -1968,6 +1986,9 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	}
 
 	public void showImages(final PhotoWrapper[] photoWrapper, final String galleryPositionKey) {
+
+//		System.out.println(UI.timeStampNano() + " showImages() " + galleryPositionKey);
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		jobFilter_12_Stop();
 		PhotoLoadManager.stopImageLoading(true);

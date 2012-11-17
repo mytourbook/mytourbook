@@ -28,16 +28,17 @@ import org.eclipse.jface.viewers.ISelection;
  */
 public class PhotoSelection implements ISelection {
 
-	public ArrayList<PhotoWrapper>		photoWrapperList;
-	public Collection<GalleryMT20Item>	allGalleryItems;
+	public ArrayList<PhotoWrapper>		photoWrappers;
+	public Collection<GalleryMT20Item>	galleryItems;
 	public int[]						selectionIndices;
 
 	public PhotoSelection(	final ArrayList<PhotoWrapper> photoWrapper,
 							final Collection<GalleryMT20Item> allGalleryItems,
-							final int[] selectionIndices) {
-		photoWrapperList = photoWrapper;
-		this.allGalleryItems = allGalleryItems;
-		this.selectionIndices = selectionIndices;
+							final int[] allSelectionIndices) {
+
+		photoWrappers = photoWrapper;
+		galleryItems = allGalleryItems;
+		selectionIndices = allSelectionIndices;
 	}
 
 	@Override
@@ -47,11 +48,12 @@ public class PhotoSelection implements ISelection {
 
 	@Override
 	public String toString() {
+
 		final int maxLen = 5;
+
 		return "PhotoSelection [photoWrapperList="
-				+ (photoWrapperList != null
-						? photoWrapperList.subList(0, Math.min(photoWrapperList.size(), maxLen))
-						: null) + "]";
+				+ (photoWrappers != null ? photoWrappers.subList(0, Math.min(photoWrappers.size(), maxLen)) : null)
+				+ "]";
 	}
 
 }

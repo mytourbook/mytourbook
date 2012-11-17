@@ -1975,7 +1975,7 @@ public class TourDatabase {
 	 * @param stmt
 	 * @throws SQLException
 	 */
-	private void createIndexTourData(final Statement stmt) throws SQLException {
+	private void createIndexTourData_005(final Statement stmt) throws SQLException {
 
 		String sql;
 
@@ -1999,13 +1999,38 @@ public class TourDatabase {
 	}
 
 	/**
+	 * Create index for {@link TourData} will dramatically improve performance *
+	 * <p>
+	 * 
+	 * @param stmt
+	 * @throws SQLException
+	 * @since db version 22
+	 */
+	private void createIndexTourData_022(final Statement stmt) throws SQLException {
+
+		String sql;
+
+		/*
+		 * CREATE INDEX TourStartTime
+		 */
+		sql = "CREATE INDEX TourStartTime" + " ON " + TABLE_TOUR_DATA + " (TourStartTime)"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		exec(stmt, sql);
+
+		/*
+		 * CREATE INDEX TourEndTime
+		 */
+		sql = "CREATE INDEX TourEndTime" + " ON " + TABLE_TOUR_DATA + " (TourEndTime)"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		exec(stmt, sql);
+	}
+
+	/**
 	 * Create index for {@link TourPhoto}, it will dramatically improve performance.
 	 * 
 	 * @param stmt
 	 * @throws SQLException
 	 * @since Db version 22
 	 */
-	private void createIndexTourPhoto(final Statement stmt) throws SQLException {
+	private void createIndexTourPhoto_022(final Statement stmt) throws SQLException {
 
 		String sql;
 
@@ -2300,7 +2325,8 @@ public class TourDatabase {
 
 		exec(stmt, sql);
 
-		createIndexTourData(stmt);
+		createIndexTourData_005(stmt);
+		createIndexTourData_022(stmt);
 	}
 
 	/**
@@ -2578,7 +2604,7 @@ public class TourDatabase {
 
 		exec(stmt, sql);
 
-		createIndexTourPhoto(stmt);
+		createIndexTourPhoto_022(stmt);
 	}
 
 	/**
@@ -3504,7 +3530,7 @@ public class TourDatabase {
 		{
 			createTableTourTag(stmt);
 			createTableTourTagCategory(stmt);
-			createIndexTourData(stmt);
+			createIndexTourData_005(stmt);
 		}
 		stmt.close();
 
@@ -4382,6 +4408,8 @@ public class TourDatabase {
 			modifyColumnType(TABLE_TOUR_DATA, "TourRecordingTime", "BIGINT DEFAULT 0", stmt, monitor, ++no, max); //			//$NON-NLS-1$ //$NON-NLS-2$
 			modifyColumnType(TABLE_TOUR_DATA, "TourDrivingTime", "BIGINT DEFAULT 0", stmt, monitor, ++no, max); //				//$NON-NLS-1$ //$NON-NLS-2$
 
+			createIndexTourData_022(stmt);
+
 //			TOURMARKER	TOURMARKER	TOURMARKER	TOURMARKER	TOURMARKER	TOURMARKER	TOURMARKER	TOURMARKER
 //
 //			// Version 22 - begin
@@ -4392,6 +4420,7 @@ public class TourDatabase {
 
 			sql = "ALTER TABLE " + TABLE_TOUR_MARKER + " ADD COLUMN IsMarkerVisible		INTEGER DEFAULT 1"; //$NON-NLS-1$ //$NON-NLS-2$
 			exec(stmt, sql);
+
 		}
 		stmt.close();
 

@@ -29,8 +29,8 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.photo.PhotoWrapperSelection;
 import net.tourbook.photo.PhotoManager;
+import net.tourbook.photo.PhotoWrapperSelection;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPagePeople;
 import net.tourbook.proxy.DefaultProxySelector;
@@ -93,6 +93,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	private final ApplicationWorkbenchAdvisor	_wbAdvisor;
 
 	private IPropertyListener					_partPropertyListener;
+
+//	private boolean								_isViewOpening;
 
 	private static IPreferenceStore				_prefStore		= TourbookPlugin.getDefault().getPreferenceStore();
 
@@ -370,14 +372,36 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 	private void onPostSelectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
-//		// debug current selection
-//		System.out.println(net.tourbook.common.UI.timeStampNano()
-//				+ " current post selection: "
+		// debug current selection
+		System.out.println(net.tourbook.common.UI.timeStampNano()
+				+ " WbWAdvisor - current post selection: "
 //				+ selection.getClass().getSimpleName()
-//				+ (" (" + selection.getClass().getCanonicalName() + ")"));
+				+ (" (" + selection.getClass().getCanonicalName() + ")  ")
+				+ selection);
 
 		if (selection instanceof PhotoWrapperSelection) {
-			PhotoManager.openPhotoMergePerspective((PhotoWrapperSelection) selection);
+
+//			if (_isViewOpening == false) {
+//
+//				/**
+//				 * prevent runtime exception
+//				 * <p>
+//				 * Prevented recursive attempt to activate part
+//				 * net.tourbook.photo.PhotosAndToursView.ID while still in the middle of activating
+//				 * part net.tourbook.photo.PicDirView
+//				 */
+//
+//				_isViewOpening = true;
+//
+
+			Display.getCurrent().asyncExec(new Runnable() {
+				public void run() {
+					PhotoManager.openPhotoMergePerspective((PhotoWrapperSelection) selection);
+				}
+			});
+//
+//				_isViewOpening = false;
+//			}
 		}
 	}
 

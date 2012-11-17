@@ -21,16 +21,16 @@
 
 		<command id="command.net.tourbook.photo.MergePhotoWithTourInFolder"
 			name="%Action_PhotoDirectory_MergePhotoWithTourInFolder"
-			defaultHandler="net.tourbook.photo.internal.ActionHandlerMergePhotoWithTourInFolder"
+			defaultHandler="net.tourbook.photo.internal.ActionHandlerLinkPhotoWithTourInFolder"
 			/>
 		
 		<command id="command.net.tourbook.photo.MergePhotoWithTourInGallerySelected"
 			name="%Action_PhotoDirectory_MergePhotoWithTourInGallerySelected"
-			defaultHandler="net.tourbook.photo.internal.ActionHandlerMergePhotoWithTourInGallerySelected"
+			defaultHandler="net.tourbook.photo.internal.ActionHandlerLinkPhotoWithTourInGallerySelected"
 			/>
 		<command id="command.net.tourbook.photo.MergePhotoWithTourInGalleryAll"
 			name="%Action_PhotoDirectory_MergePhotoWithTourInGalleryAll"
-			defaultHandler="net.tourbook.photo.internal.ActionHandlerMergePhotoWithTourInGalleryAll"
+			defaultHandler="net.tourbook.photo.internal.ActionHandlerLinkPhotoWithTourInGalleryAll"
 			/>
 
 		<command id="command.net.tourbook.photo.RefreshFolder"

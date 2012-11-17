@@ -101,6 +101,9 @@ public class PhotoImageLoader {
 							final int hqImageSize,
 							final ILoadCallBack loadCallBack) {
 
+//		System.out.println(UI.timeStampNano() + " PhotoImageLoader\tthread:" + Thread.currentThread().getName());
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
 		_display = display;
 		_photo = photo;
 		_requestedImageQuality = imageQuality;

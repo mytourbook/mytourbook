@@ -344,8 +344,6 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 					_galleryContainer,
 					SWT.V_SCROLL | SWT.H_SCROLL | SWT.MULTI,
 					new PhotoGalleryProvider());
-
-//			_photoGallery.setDefaultStatusMessage(Messages.Tour_Photos_Label_StatusMessage_NoTourWithPhotos);
 		}
 	}
 

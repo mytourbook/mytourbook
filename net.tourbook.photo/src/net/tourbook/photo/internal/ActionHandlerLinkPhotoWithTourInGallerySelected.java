@@ -23,7 +23,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-public class ActionHandlerMergePhotoWithTourInFolder extends AbstractHandler {
+public class ActionHandlerLinkPhotoWithTourInGallerySelected extends AbstractHandler {
 
 	@Override
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
@@ -31,7 +31,7 @@ public class ActionHandlerMergePhotoWithTourInFolder extends AbstractHandler {
 		final IWorkbenchPart activePart = HandlerUtil.getActiveWorkbenchWindow(event).getActivePage().getActivePart();
 
 		if (activePart instanceof PicDirView) {
-			((PicDirView) activePart).actionMergePhotoWithTour(true);
+			((PicDirView) activePart).actionLinkPhotoWithTour(false);
 		}
 
 		return null;

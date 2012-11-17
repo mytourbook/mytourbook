@@ -21,9 +21,9 @@ import org.eclipse.jface.action.Action;
 
 public class ActionSetTourGPSIntoPhotos extends Action {
 
-	private PhotosAndToursView	_photosAndToursView;
+	private TourPhotoLinkView	_photosAndToursView;
 
-	public ActionSetTourGPSIntoPhotos(final PhotosAndToursView photosAndToursView) {
+	public ActionSetTourGPSIntoPhotos(final TourPhotoLinkView photosAndToursView) {
 
 		setText(Messages.Action_PhotosAndTours_SetGPSIntoPhotos);
 

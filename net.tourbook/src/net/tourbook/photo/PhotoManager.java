@@ -42,7 +42,7 @@ public class PhotoManager {
 		}
 	}
 
-	public static void openPhotoMergePerspective(final PhotoWrapperSelection photoMergeSelection) {
+	public static void openPhotoMergePerspective(final PhotoWrapperSelection photoWrapperSelection) {
 
 		final IWorkbench workbench = PlatformUI.getWorkbench();
 		final IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
@@ -50,14 +50,14 @@ public class PhotoManager {
 		if (window != null) {
 			try {
 
-				// show photo merge perspective
+				// show tour photo link perspective
 				workbench.showPerspective(PerspectiveFactoryPhoto.PERSPECTIVE_ID, window);
 
-				// show photo merge tour view
-				final PhotosAndToursView view = (PhotosAndToursView) Util.showView(PhotosAndToursView.ID);
+				// show tour photo link view
+				final TourPhotoLinkView view = (TourPhotoLinkView) Util.showView(TourPhotoLinkView.ID);
 
 				if (view != null) {
-					view.updatePhotosAndTours(photoMergeSelection);
+					view.updatePhotosAndTours(photoWrapperSelection.selectedPhotos);
 				}
 
 			} catch (final PartInitException e) {

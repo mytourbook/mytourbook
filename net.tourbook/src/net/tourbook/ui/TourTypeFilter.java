@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -244,30 +244,32 @@ public class TourTypeFilter {
 			final Object[] tourTypes = _tourTypeSet.getTourTypes();
 
 			if (tourTypes.length == 0) {
+
 				// select nothing
+
 				sqlWhereClause = " AND 1=0"; //$NON-NLS-1$
 
 			} else {
 
 				// select all tours were the tour type is defined in the tour type list
 
-				int itemIndex = 0;
+				boolean isFirst = true;
 				final StringBuilder sb = new StringBuilder();
 
 				for (final Object item : tourTypes) {
 
-					if (itemIndex > 0) {
-						sb.append(" OR "); //$NON-NLS-1$
+					if (isFirst) {
+						isFirst = false;
+						sb.append(" ?"); //$NON-NLS-1$
+					} else {
+
+						sb.append("\n, ?"); //$NON-NLS-1$
 					}
 
-					sb.append(" TourData.tourType_typeId=?"); //$NON-NLS-1$
-
 					sqlTourTypes.add(((TourType) item).getTypeId());
-
-					itemIndex++;
 				}
 
-				sqlWhereClause = " AND (" + sb.toString() + ") \n"; //$NON-NLS-1$ //$NON-NLS-2$
+				sqlWhereClause = " AND TourData.tourType_typeId IN (" + sb.toString() + ") \n"; //$NON-NLS-1$ //$NON-NLS-2$
 			}
 
 			break;
