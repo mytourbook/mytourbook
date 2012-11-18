@@ -55,7 +55,7 @@ import org.eclipse.ui.part.ViewPart;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-public class TourPhotosView extends ViewPart {
+public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
 	public static final String				ID								= "net.tourbook.photo.TourPhotosView.ID";	//$NON-NLS-1$
 
@@ -72,7 +72,6 @@ public class TourPhotosView extends ViewPart {
 	private PostSelectionProvider			_postSelectionProvider;
 
 	private ISelectionListener				_postSelectionListener;
-	private IPhotoEventListener				_photoEventListener;
 	private IPropertyChangeListener			_prefChangeListener;
 	private ITourEventListener				_tourPropertyListener;
 	private IPartListener2					_partListener;
@@ -84,7 +83,7 @@ public class TourPhotosView extends ViewPart {
 	/**
 	 * contains selection which was set when the part is hidden
 	 */
-	private ISelection						_selectionWhenHidden;
+	private TourPhotoLinkSelection			_selectionWhenHidden;
 
 	private ISelection						_currentPhotoSelection;
 
@@ -198,7 +197,7 @@ public class TourPhotosView extends ViewPart {
 
 					if (_selectionWhenHidden != null) {
 
-						onSelectionChanged(_selectionWhenHidden);
+						updateUI(_selectionWhenHidden);
 
 						_selectionWhenHidden = null;
 					}
@@ -206,19 +205,6 @@ public class TourPhotosView extends ViewPart {
 			}
 		};
 		getViewSite().getPage().addPartListener(_partListener);
-	}
-
-	private void addPhotoEventListener() {
-
-		_photoEventListener = new IPhotoEventListener() {
-
-			@Override
-			public void photoEvent(final PhotoEventId photoEventId, final Object data) {
-				onPhotoEvent(photoEventId, data);
-			}
-		};
-
-		PhotoManager.addPhotoEventListener(_photoEventListener);
 	}
 
 	private void addPrefListener() {
@@ -295,9 +281,9 @@ public class TourPhotosView extends ViewPart {
 
 		addSelectionListener();
 		addTourEventListener();
-		addPhotoEventListener();
 		addPrefListener();
 		addPartListener();
+		PhotoManager.addPhotoEventListener(this);
 
 		restoreState();
 
@@ -376,11 +362,11 @@ public class TourPhotosView extends ViewPart {
 
 		final IWorkbenchPage page = getViewSite().getPage();
 
-		TourManager.getInstance().removeTourEventListener(_tourPropertyListener);
 		page.removePostSelectionListener(_postSelectionListener);
 		page.removePartListener(_partListener);
 
-		PhotoManager.removePhotoEventListener(_photoEventListener);
+		TourManager.getInstance().removeTourEventListener(_tourPropertyListener);
+		PhotoManager.removePhotoEventListener(this);
 
 		_prefStore.removePropertyChangeListener(_prefChangeListener);
 
@@ -399,38 +385,47 @@ public class TourPhotosView extends ViewPart {
 		_galleryToolbarManager.update(true);
 	}
 
-	private void onPhotoEvent(final PhotoEventId photoEventId, final Object data) {
+	private void onSelectionChanged(final ISelection selection) {
+
+//		if (selection instanceof TourPhotoLinkSelection) {
+//
+//			if (_currentPhotoSelection == selection) {
+//				// prevent setting the same selection again
+//				return;
+//			}
+//
+//			_currentPhotoSelection = selection;
+//
+//			final TourPhotoLinkSelection tourPhotoSelection = (TourPhotoLinkSelection) selection;
+//
+//			updateUI(tourPhotoSelection);
+//		}
+	}
+
+	@Override
+	public void photoEvent(final PhotoEventId photoEventId, final Object data) {
 
 		if (photoEventId == PhotoEventId.GPS_DATA_IS_UPDATED) {
 
 			if (data instanceof ArrayList) {
 				_photoGallery.updateGPSPosition((ArrayList<?>) data);
 			}
-		}
-	}
 
-	private void onSelectionChanged(final ISelection selection) {
+		} else if (photoEventId == PhotoEventId.PHOTO_SELECTION) {
 
-		if (_isPartVisible == false) {
+			if (data instanceof TourPhotoLinkSelection) {
 
-			if (selection instanceof TourPhotoLinkSelection) {
-				_selectionWhenHidden = selection;
+				final TourPhotoLinkSelection linkSelection = (TourPhotoLinkSelection) data;
+
+				if (_isPartVisible == false) {
+
+					_selectionWhenHidden = linkSelection;
+
+				} else {
+
+					updateUI(linkSelection);
+				}
 			}
-			return;
-		}
-
-		if (selection instanceof TourPhotoLinkSelection) {
-
-			if (_currentPhotoSelection == selection) {
-				// prevent setting the same selection again
-				return;
-			}
-
-			_currentPhotoSelection = selection;
-
-			final TourPhotoLinkSelection tourPhotoSelection = (TourPhotoLinkSelection) selection;
-
-			updateUI(tourPhotoSelection);
 		}
 	}
 

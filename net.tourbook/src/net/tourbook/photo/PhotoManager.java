@@ -42,7 +42,7 @@ public class PhotoManager {
 		}
 	}
 
-	public static void openPhotoMergePerspective(final PhotoWrapperSelection photoWrapperSelection) {
+	public static void openPhotoMergePerspective(final PhotosWithExifSelection photoWrapperSelection) {
 
 		final IWorkbench workbench = PlatformUI.getWorkbench();
 		final IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
@@ -57,7 +57,7 @@ public class PhotoManager {
 				final TourPhotoLinkView view = (TourPhotoLinkView) Util.showView(TourPhotoLinkView.ID);
 
 				if (view != null) {
-					view.updatePhotosAndTours(photoWrapperSelection.selectedPhotos);
+					view.updatePhotosAndTours(photoWrapperSelection.photos);
 				}
 
 			} catch (final PartInitException e) {

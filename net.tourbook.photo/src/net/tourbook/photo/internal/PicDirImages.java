@@ -372,8 +372,8 @@ public class PicDirImages implements IPhotoGalleryProvider {
 		menuMgr.add(_actionClearNavigationHistory);
 	}
 
-	public ISelection getPhotoSelection(final boolean isAllImages) {
-		return _photoGallery.getPhotoSelection(isAllImages);
+	public ISelection getSelectedPhotosWithExif(final boolean isAllImages) {
+		return _photoGallery.getSelectedPhotosWithExif(isAllImages);
 	}
 
 	@Override

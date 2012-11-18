@@ -447,17 +447,17 @@ public class PhotoLoadManager {
 		final Runnable executorTask = new Runnable() {
 			public void run() {
 
-				// !!! slow down loading for debugging !!!
-				try {
-					Thread.sleep(100);
-				} catch (final InterruptedException e) {
-					// TODO Auto-generated catch block
-					// TODO Auto-generated catch block
-					// TODO Auto-generated catch block
-					// TODO Auto-generated catch block
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+//				// !!! slow down loading for debugging !!!
+//				try {
+//					Thread.sleep(100);
+//				} catch (final InterruptedException e) {
+//					// TODO Auto-generated catch block
+//					// TODO Auto-generated catch block
+//					// TODO Auto-generated catch block
+//					// TODO Auto-generated catch block
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
 
 				// get last added loader item
 				final PhotoImageLoader loadingItem = _waitingQueueThumb.pollFirst();

@@ -26,6 +26,9 @@ import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.data.TourData;
+import net.tourbook.photo.IPhotoEventListener;
+import net.tourbook.photo.PhotoEventId;
+import net.tourbook.photo.PhotoManager;
 import net.tourbook.photo.TourPhotoLink;
 import net.tourbook.photo.TourPhotoLinkSelection;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -70,7 +73,7 @@ import org.eclipse.ui.part.ViewPart;
 /**
  * Shows the selected tour in a chart
  */
-public class TourChartView extends ViewPart implements ITourChartViewer {
+public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoEventListener {
 
 	public static final String		ID			= "net.tourbook.views.TourChartView";	//$NON-NLS-1$
 
@@ -295,6 +298,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 		addPrefListener();
 		addTourEventListener();
 		addPartListener();
+		PhotoManager.addPhotoEventListener(this);
 
 		// set this view part as selection provider
 		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider());
@@ -350,6 +354,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 		getViewSite().getPage().removePartListener(_partListener);
 
 		TourManager.getInstance().removeTourEventListener(_tourEventListener);
+		PhotoManager.removePhotoEventListener(this);
 
 		_prefStore.removePropertyChangeListener(_prefChangeListener);
 
@@ -418,7 +423,35 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 			final SelectionTourIds selectionTourId = (SelectionTourIds) selection;
 			final ArrayList<Long> tourIds = selectionTourId.getTourIds();
 
-			onSelectionChanged_TourWithPhoto(selection, tourIds);
+			boolean isChartPainted = false;
+			if (selection instanceof TourPhotoLinkSelection) {
+
+				final ArrayList<TourPhotoLink> tourPhotoLinks = ((TourPhotoLinkSelection) selection).tourPhotoLinks;
+
+				if (tourPhotoLinks.size() > 0) {
+
+					_tourPhotoLink = tourPhotoLinks.get(0);
+
+					if (_tourPhotoLink.isHistoryTour()) {
+
+						// paint history tour
+
+						updateChart(_tourPhotoLink.getHistoryTourData());
+
+						isChartPainted = true;
+					}
+				}
+			}
+
+			if (isChartPainted == false && tourIds != null && tourIds.size() > 0) {
+
+				// paint regular tour
+
+				final boolean isForceUpdate = _tourPhotoLink != null;
+
+				// force update when photo selection occured
+				updateChart(tourIds.get(0), isForceUpdate);
+			}
 
 		} else if (selection instanceof SelectionChartInfo) {
 
@@ -503,36 +536,15 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 		}
 	}
 
-	private void onSelectionChanged_TourWithPhoto(final ISelection selection, final ArrayList<Long> tourIds) {
+	@Override
+	public void photoEvent(final PhotoEventId photoEventId, final Object data) {
 
-		boolean isChartPainted = false;
-		if (selection instanceof TourPhotoLinkSelection) {
+		if (photoEventId == PhotoEventId.PHOTO_SELECTION && data instanceof TourPhotoLinkSelection) {
 
-			final ArrayList<TourPhotoLink> tourPhotoLinks = ((TourPhotoLinkSelection) selection).tourPhotoLinks;
+			final TourPhotoLinkSelection linkSelection = (TourPhotoLinkSelection) data;
 
-			if (tourPhotoLinks.size() > 0) {
-
-				_tourPhotoLink = tourPhotoLinks.get(0);
-
-				if (_tourPhotoLink.isHistoryTour()) {
-
-					// paint history tour
-
-					updateChart(_tourPhotoLink.getHistoryTourData());
-
-					isChartPainted = true;
-				}
-			}
-		}
-
-		if (isChartPainted == false && tourIds != null && tourIds.size() > 0) {
-
-			// paint regular tour
-
-			final boolean isForceUpdate = _tourPhotoLink != null;
-
-			// force update when photo selection occured
-			updateChart(tourIds.get(0), isForceUpdate);
+//			onSelectionChanged_TourWithPhoto(linkSelection, linkSelection.getTourIds());
+			onSelectionChanged(linkSelection);
 		}
 	}
 

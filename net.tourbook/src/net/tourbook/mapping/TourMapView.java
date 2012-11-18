@@ -35,6 +35,9 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.importdata.RawDataManager;
+import net.tourbook.photo.IPhotoEventListener;
+import net.tourbook.photo.PhotoEventId;
+import net.tourbook.photo.PhotoManager;
 import net.tourbook.photo.PhotoSelection;
 import net.tourbook.photo.PhotoWrapper;
 import net.tourbook.photo.TourPhotoLink;
@@ -107,7 +110,7 @@ import de.byteholder.gpx.PointOfInterest;
  * @author Wolfgang Schramm
  * @since 1.3.0
  */
-public class TourMapView extends ViewPart implements IMapContextProvider {
+public class TourMapView extends ViewPart implements IMapContextProvider, IPhotoEventListener {
 
 	public static final String						ID									= "net.tourbook.mapping.mappingViewID";	//$NON-NLS-1$
 
@@ -164,9 +167,9 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	 */
 	private ISelection								_selectionWhenHidden;
 
+	private IPartListener2							_partListener;
 	private ISelectionListener						_postSelectionListener;
 	private IPropertyChangeListener					_prefChangeListener;
-	private IPartListener2							_partListener;
 	private ITourEventListener						_tourEventListener;
 
 	/**
@@ -1324,6 +1327,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		addSelectionListener();
 		addTourEventListener();
 		addMapListener();
+		PhotoManager.addPhotoEventListener(this);
 
 		// register overlays which draw the tour
 		GeoclipseExtensions.registerOverlays(_map);
@@ -1374,6 +1378,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		getViewSite().getPage().removePartListener(_partListener);
 
 		TourManager.getInstance().removeTourEventListener(_tourEventListener);
+		PhotoManager.removePhotoEventListener(this);
 
 		_prefStore.removePropertyChangeListener(_prefChangeListener);
 
@@ -1900,9 +1905,11 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 		if (selection instanceof TourPhotoLinkSelection) {
 
+			final TourPhotoLinkSelection linkSelection = (TourPhotoLinkSelection) selection;
+
 			final ArrayList<PhotoWrapper> allPhotoWrapper = new ArrayList<PhotoWrapper>();
 
-			for (final TourPhotoLink tourPhotoLink : ((TourPhotoLinkSelection) selection).tourPhotoLinks) {
+			for (final TourPhotoLink tourPhotoLink : linkSelection.tourPhotoLinks) {
 				allPhotoWrapper.addAll(tourPhotoLink.tourPhotos);
 			}
 
@@ -2171,6 +2178,14 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		} else {
 
 			_map.redraw();
+		}
+	}
+
+	@Override
+	public void photoEvent(final PhotoEventId photoEventId, final Object data) {
+
+		if (photoEventId == PhotoEventId.PHOTO_SELECTION && data instanceof TourPhotoLinkSelection) {
+			onSelectionChanged((TourPhotoLinkSelection) data);
 		}
 	}
 

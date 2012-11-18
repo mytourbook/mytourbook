@@ -63,11 +63,11 @@ public class ActionHandlerSyncPhotoWithTour extends AbstractHandler {
 
 				// sync photo with tour
 
-				final ISelection selectedPhotos = picDirView.getSelectedPhotos();
+				final ISelection selectedPhotos = picDirView.getSelectedPhotosWithExif();
 
-				if (selectedPhotos instanceof PhotoWrapperSelection) {
+				if (selectedPhotos instanceof PhotosWithExifSelection) {
 
-					final PhotoWrapperSelection photoWrapperSelection = (PhotoWrapperSelection) selectedPhotos;
+					final PhotosWithExifSelection photoWithExifSelection = (PhotosWithExifSelection) selectedPhotos;
 
 					final IWorkbenchPage activePage = HandlerUtil.getActiveWorkbenchWindow(event).getActivePage();
 					final IViewReference linkViewRef = activePage.findViewReference(TourPhotoLinkView.ID);
@@ -76,7 +76,7 @@ public class ActionHandlerSyncPhotoWithTour extends AbstractHandler {
 
 						// this perspective do not contains the link view, open link view in a new perspective
 
-						PhotoManager.openPhotoMergePerspective(photoWrapperSelection);
+						PhotoManager.openPhotoMergePerspective(photoWithExifSelection);
 
 					} else {
 
@@ -86,11 +86,11 @@ public class ActionHandlerSyncPhotoWithTour extends AbstractHandler {
 
 						if (view != null) {
 
-							view.updatePhotosAndTours(photoWrapperSelection.selectedPhotos);
+							view.updatePhotosAndTours(photoWithExifSelection.photos);
 
 						} else {
 
-							PhotoManager.openPhotoMergePerspective(photoWrapperSelection);
+							PhotoManager.openPhotoMergePerspective(photoWithExifSelection);
 						}
 					}
 				}

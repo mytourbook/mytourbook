@@ -19,20 +19,23 @@ import java.util.ArrayList;
 
 import org.eclipse.jface.viewers.ISelection;
 
-public class PhotoWrapperSelection implements ISelection {
+/**
+ * This selection contains photos which EXIF data are loaded.
+ */
+public class PhotosWithExifSelection implements ISelection {
 
 	/**
-	 * Contains photos sorted by date/time
+	 * Contains photos sorted by date/time, EXIF data are loaded for the photos.
 	 */
-	public ArrayList<PhotoWrapper>	selectedPhotos;
+	public ArrayList<PhotoWrapper>	photos;
 
-	public PhotoWrapperSelection(final ArrayList<PhotoWrapper> selectedPhotos) {
-		this.selectedPhotos = selectedPhotos;
+	public PhotosWithExifSelection(final ArrayList<PhotoWrapper> selectedPhotos) {
+		this.photos = selectedPhotos;
 	}
 
 	@Override
 	public boolean isEmpty() {
-		return selectedPhotos.size() == 0;
+		return photos.size() == 0;
 	}
 
 }

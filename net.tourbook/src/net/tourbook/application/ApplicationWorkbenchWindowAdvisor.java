@@ -30,7 +30,7 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.photo.PhotoManager;
-import net.tourbook.photo.PhotoWrapperSelection;
+import net.tourbook.photo.PhotosWithExifSelection;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPagePeople;
 import net.tourbook.proxy.DefaultProxySelector;
@@ -373,13 +373,12 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	private void onPostSelectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
 		// debug current selection
-		System.out.println(net.tourbook.common.UI.timeStampNano()
-				+ " WbWAdvisor - current post selection: "
+		System.out.println(net.tourbook.common.UI.timeStampNano() + " WbWAdvisor - current post selection: "
 //				+ selection.getClass().getSimpleName()
 				+ (" (" + selection.getClass().getCanonicalName() + ")  ")
 				+ selection);
 
-		if (selection instanceof PhotoWrapperSelection) {
+		if (selection instanceof PhotosWithExifSelection) {
 
 //			if (_isViewOpening == false) {
 //
@@ -396,7 +395,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 			Display.getCurrent().asyncExec(new Runnable() {
 				public void run() {
-					PhotoManager.openPhotoMergePerspective((PhotoWrapperSelection) selection);
+					PhotoManager.openPhotoMergePerspective((PhotosWithExifSelection) selection);
 				}
 			});
 //
@@ -504,14 +503,10 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 	private void setupAppSelectionListener() {
 
-		final IWorkbenchWindowConfigurer wc = getWindowConfigurer();
-//		wc.getWorkbenchConfigurer().getWorkbench().get
-		final IWorkbenchWindow win = wc.getWindow();
-//		IWorkbench wb = win.getWorkbench();
-
-//		win.getSelectionService().
-
-		final ISelectionService selectionService = win.getSelectionService();
+		final ISelectionService selectionService = PlatformUI
+				.getWorkbench()
+				.getActiveWorkbenchWindow()
+				.getSelectionService();
 
 		selectionService.addPostSelectionListener(new ISelectionListener() {
 			@Override

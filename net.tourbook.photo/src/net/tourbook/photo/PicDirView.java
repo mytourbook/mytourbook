@@ -166,7 +166,7 @@ public class PicDirView extends ViewPart {
 
 	public void actionLinkPhotoWithTour(final boolean isAllImages) {
 
-		final ISelection selection = _picDirImages.getPhotoSelection(isAllImages);
+		final ISelection selection = _picDirImages.getSelectedPhotosWithExif(isAllImages);
 
 		// fire selection for the selected photos
 		if (selection != null) {
@@ -337,12 +337,11 @@ public class PicDirView extends ViewPart {
 	}
 
 	public void fireCurrentSelection() {
-
-		_postSelectionProvider.setSelection(_picDirImages.getPhotoSelection(false));
+		_postSelectionProvider.setSelection(_picDirImages.getSelectedPhotosWithExif(false));
 	}
 
-	public ISelection getSelectedPhotos() {
-		return _picDirImages.getPhotoSelection(false);
+	public ISelection getSelectedPhotosWithExif() {
+		return _picDirImages.getSelectedPhotosWithExif(false);
 	}
 
 	private void onPartClose() {

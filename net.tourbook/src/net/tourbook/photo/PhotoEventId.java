@@ -20,6 +20,11 @@ public enum PhotoEventId {
 	/**
 	 * Event data contains photos which gps coordinates has been updated.
 	 */
-	GPS_DATA_IS_UPDATED
+	GPS_DATA_IS_UPDATED,
+
+	/**
+	 * Event data contain a {@link TourPhotoLinkSelection2}
+	 */
+	PHOTO_SELECTION
 
 }

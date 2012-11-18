@@ -493,6 +493,53 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		return new PhotoSelection(photos, allItems, _galleryMT20.getSelectionIndex());
 	}
 
+	/**
+	 * @param isAllImages
+	 * @return
+	 */
+	private PhotosWithExifSelection createPhotoSelectionWithExif(final boolean isAllImages) {
+
+		final ArrayList<PhotoWrapper> loadedExifData = getLoadedExifImageData(
+				_photoFolderWhichShouldBeDisplayed,
+				isAllImages);
+
+		if (loadedExifData == null) {
+
+			MessageDialog.openInformation(
+					_display.getActiveShell(),
+					Messages.Pic_Dir_Dialog_LinkPhotos_Title,
+					Messages.Pic_Dir_Dialog_LinkPhotos_DialogInterrupted_Message);
+
+			return null;
+		}
+
+		/*
+		 * check if a photo is selected
+		 */
+		if (loadedExifData.size() == 0) {
+
+			if (isAllImages) {
+
+				MessageDialog.openInformation(
+						_display.getActiveShell(),
+						Messages.Pic_Dir_Dialog_LinkPhotos_Title,
+						NLS.bind(Messages.Pic_Dir_Dialog_LinkPhotos_NoSelectedImagesInFolder_Message,//
+								_photoFolderWhichShouldBeDisplayed.getAbsolutePath()));
+
+			} else {
+
+				MessageDialog.openInformation(
+						_display.getActiveShell(),
+						Messages.Pic_Dir_Dialog_LinkPhotos_Title,
+						Messages.Pic_Dir_Dialog_LinkPhotos_NoSelectedImage_Message);
+			}
+
+			return null;
+		}
+
+		return new PhotosWithExifSelection(loadedExifData);
+	}
+
 	private void createUI(final Composite parent) {
 
 		_uiContainer = parent;
@@ -674,7 +721,6 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 			_galleryPositions.put(_currentGalleryPositionKey, _galleryMT20.getGalleryPosition());
 		}
 
-
 		// get old position
 		if (_newGalleryPositionKey != null) {
 
@@ -793,53 +839,15 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	}
 
 	/**
-	 * Creates a {@link PhotoWrapperSelection}
+	 * Creates a {@link PhotosWithExifSelection}
 	 * 
 	 * @param isAllImages
-	 * @return Returns a {@link PhotoWrapperSelection} for selected or all images or
-	 *         <code>null</code> null when loading EXIF data was canceled by the user.
+	 * @return Returns a {@link ISelection} for selected or all images or <code>null</code> null
+	 *         when loading EXIF data was canceled by the user.
 	 */
-	public ISelection getPhotoSelection(final boolean isAllImages) {
+	public ISelection getSelectedPhotosWithExif(final boolean isAllImages) {
 
-		final ArrayList<PhotoWrapper> loadedExifData = getLoadedExifImageData(
-				_photoFolderWhichShouldBeDisplayed,
-				isAllImages);
-
-		if (loadedExifData == null) {
-
-			MessageDialog.openInformation(
-					_display.getActiveShell(),
-					Messages.Pic_Dir_Dialog_LinkPhotos_Title,
-					Messages.Pic_Dir_Dialog_LinkPhotos_DialogInterrupted_Message);
-
-			return null;
-		}
-
-		/*
-		 * check if a photo is selected
-		 */
-		if (loadedExifData.size() == 0) {
-
-			if (isAllImages) {
-
-				MessageDialog.openInformation(
-						_display.getActiveShell(),
-						Messages.Pic_Dir_Dialog_LinkPhotos_Title,
-						NLS.bind(Messages.Pic_Dir_Dialog_LinkPhotos_NoSelectedImagesInFolder_Message,//
-								_photoFolderWhichShouldBeDisplayed.getAbsolutePath()));
-
-			} else {
-
-				MessageDialog.openInformation(
-						_display.getActiveShell(),
-						Messages.Pic_Dir_Dialog_LinkPhotos_Title,
-						Messages.Pic_Dir_Dialog_LinkPhotos_NoSelectedImage_Message);
-			}
-
-			return null;
-		}
-
-		return new PhotoWrapperSelection(loadedExifData);
+		return createPhotoSelectionWithExif(isAllImages);
 	}
 
 	@Override

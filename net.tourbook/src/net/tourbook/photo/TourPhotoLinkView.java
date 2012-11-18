@@ -40,7 +40,6 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
-import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -82,10 +81,8 @@ import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -113,6 +110,8 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
@@ -185,9 +184,9 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private List<TourPhotoLink>						_selectedTourPhotoLinksWithGps		= new ArrayList<TourPhotoLink>();
 
-	private PostSelectionProvider					_postSelectionProvider;
-	private ISelectionListener						_postSelectionListener;
+	private TourPhotoLinkSelection					_tourPhotoLinkSelection;
 
+	private ISelectionListener						_postSelectionListener;
 	private IPropertyChangeListener					_prefChangeListener;
 	private IPartListener2							_partListener;
 
@@ -403,7 +402,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 		// force that selection is fired
 		_selectedTourPhotoLinks.clear();
 
-		onSelectTour((StructuredSelection) _tourViewer.getSelection(), true);
+		onSelectTour(((StructuredSelection) _tourViewer.getSelection()).toArray(), true);
 	}
 
 	private void actionSetTourGPSIntoPhotos_10(	final TourPhotoLink tourPhotoLink,
@@ -677,10 +676,9 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 		_allPhotos.clear();
 		_selectedTourPhotoLinks.clear();
 		_selectedTourPhotoLinksWithGps.clear();
+		_tourPhotoLinkSelection = null;
 
 		_tourViewer.setInput(new Object[0]);
-
-		_postSelectionProvider.clearSelection();
 
 		_pageBook.showPage(_pageNoImage);
 	}
@@ -758,9 +756,6 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 				.getWorkbench()
 				.getActiveWorkbenchWindow()
 				.getService(ICommandService.class));
-
-		// this part is a selection provider
-		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider());
 
 		// show default page
 		_pageBook.showPage(_pageNoImage);
@@ -1299,9 +1294,9 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 		_tourViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(final SelectionChangedEvent event) {
-				final StructuredSelection selection = (StructuredSelection) event.getSelection();
-				if (selection != null) {
-					onSelectTour(selection, true);
+				final ISelection eventSelection = event.getSelection();
+				if (eventSelection instanceof StructuredSelection) {
+					onSelectTour(((StructuredSelection) eventSelection).toArray(), true);
 				}
 			}
 		});
@@ -1897,30 +1892,28 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 		if (selection instanceof SyncSelection) {
 
 			final ISelection originalSelection = ((SyncSelection) selection).getSelection();
-			if (originalSelection instanceof StructuredSelection) {
-				final StructuredSelection structuredSelection = (StructuredSelection) originalSelection;
 
-				if (originalSelection instanceof PhotoSelection) {
+			if (originalSelection instanceof PhotoSelection) {
 
-					updatePhotosAndTours(((PhotoSelection) originalSelection).photoWrappers);
+				updatePhotosAndTours(((PhotoSelection) originalSelection).photoWrappers);
+
+				final IWorkbenchPage activePage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+
+				// ensure link view is opened
+				for (final IViewReference viewRef : activePage.getViewReferences()) {
+					if (viewRef.getId().equals(TourPhotoLinkView.ID)) {
+						final IViewPart viewPart = viewRef.getView(false);
+						if (viewPart == null) {
+							Util.showViewNotActive(TourPhotoLinkView.ID);
+						}
+					}
+				}
+
+				if (_tourPhotoLinkSelection != null) {
 
 					_pageBook.getDisplay().asyncExec(new Runnable() {
 						public void run() {
-
-							final ISelectionProvider selectionProvider = PlatformUI
-									.getWorkbench()
-									.getActiveWorkbenchWindow()
-									.getActivePage()
-									.getActivePart()
-									.getSite()
-									.getSelectionProvider();
-
-							if (selectionProvider instanceof IPostSelectionProvider) {
-
-								final ISelection tourSelection = onSelectTour(structuredSelection, false);
-
-								((IPostSelectionProvider) selectionProvider).setSelection(tourSelection);
-							}
+							PhotoManager.fireEvent(PhotoEventId.PHOTO_SELECTION, _tourPhotoLinkSelection);
 						}
 					});
 				}
@@ -1960,38 +1953,24 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 		updateUI(_selectedTourPhotoLinks, false);
 	}
 
-//	public boolean test(final Object receiver, final String property, final Object[] args, final Object expectedValue) {
-//
-//		if (receiver instanceof IServiceLocator && args.length == 1 && args[0] instanceof String) {
-//			final IServiceLocator locator = (IServiceLocator) receiver;
-//
-//			if (TOGGLE_PROPERTY_NAME.equals(property)) {
-//				final String commandId = args[0].toString();
-//
-//				final ICommandService commandService = (ICommandService) locator.getService(ICommandService.class);
-//				final Command command = commandService.getCommand(commandId);
-//				final State state = command.getState(RegistryToggleState.STATE_ID);
-//
-//				if (state != null) {
-//					return state.getValue().equals(expectedValue);
-//				}
-//			}
-//		}
-//		return false;
-//	}
-
 	/**
-	 * @return Returns selection for the selected tours.
+	 * Creates a {@link TourPhotoLinkSelection}
+	 * 
+	 * @param allElements
+	 *            All elements of type {@link TourPhotoLink}
+	 * @param isFireSelection
 	 */
-	private ISelection onSelectTour(final StructuredSelection selection, final boolean isFireSelection) {
+	private void onSelectTour(final Object[] allElements, final boolean isFireSelection) {
 
 		// get all real tours with geo positions
 		_selectedTourPhotoLinksWithGps.clear();
+
+		// contains tour id's for all real tours
 		final ArrayList<Long> selectedTourIds = new ArrayList<Long>();
 
 		final ArrayList<TourPhotoLink> selectedLinks = new ArrayList<TourPhotoLink>();
 
-		for (final Object element : selection.toArray()) {
+		for (final Object element : allElements) {
 
 			if (element instanceof TourPhotoLink) {
 
@@ -2018,7 +1997,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 		if (_selectedTourPhotoLinks.equals(selectedLinks)) {
 			// currently selected tour is already selected and selection is fired
-			return null;
+			return;
 		}
 
 		_selectedTourPhotoLinks.clear();
@@ -2027,13 +2006,11 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 		enableControls();
 
 		// create tour selection
-		final ISelection tourSelection = new TourPhotoLinkSelection(_selectedTourPhotoLinks, selectedTourIds);
+		_tourPhotoLinkSelection = new TourPhotoLinkSelection(_selectedTourPhotoLinks, selectedTourIds);
 
 		if (isFireSelection) {
-			_postSelectionProvider.setSelection(tourSelection);
+			PhotoManager.fireEvent(PhotoEventId.PHOTO_SELECTION, _tourPhotoLinkSelection);
 		}
-
-		return tourSelection;
 	}
 
 	@Override
