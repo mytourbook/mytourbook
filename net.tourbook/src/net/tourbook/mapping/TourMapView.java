@@ -16,6 +16,7 @@
 package net.tourbook.mapping;
 
 import java.awt.Point;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,6 +31,7 @@ import net.tourbook.colors.ColorDefinition;
 import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.util.ITourToolTipProvider;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TourToolTip;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -61,11 +63,14 @@ import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -73,8 +78,8 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.graphics.Color;
@@ -230,6 +235,9 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 	private final MapInfoManager					_mapInfoManager						= MapInfoManager.getInstance();
 	private final TourPainterConfiguration			_tourPainterConfig					= TourPainterConfiguration
 																								.getInstance();
+	private int										_tourIdHash;
+	private int										_tourDataHash;
+	private long									_tourHashOverlayKey;
 
 	/*
 	 * UI controls
@@ -1919,52 +1927,116 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 	private void paintTours(final ArrayList<Long> tourIdList) {
 
-		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-			@Override
-			public void run() {
+		_isTour = true;
 
-				_isTour = true;
+		// force single tour to be repainted
+		_previousTourData = null;
 
-				// force single tour to be repainted
-				_previousTourData = null;
+		_directMappingPainter.disablePaintContext();
 
-				_directMappingPainter.disablePaintContext();
+		final boolean isShowTour = _actionShowTourInMap.isChecked();
+		_map.setShowOverlays(isShowTour);
+		_map.setShowLegend(isShowTour && _actionShowLegendInMap.isChecked());
 
-				final boolean isShowTour = _actionShowTourInMap.isChecked();
-				_map.setShowOverlays(isShowTour);
-				_map.setShowLegend(isShowTour && _actionShowLegendInMap.isChecked());
+		long newOverlayKey = _tourHashOverlayKey;
 
-				/*
-				 * create a unique overlay key for the selected tours
-				 */
-				long newOverlayKey = 0;
-				_tourDataList.clear();
-				for (final Long tourId : tourIdList) {
+		if (tourIdList.hashCode() != _tourIdHash || _tourDataList.hashCode() != _tourDataHash) {
 
-					final TourData tourData = TourManager.getInstance().getTourData(tourId);
-					if (isPaintDataValid(tourData)) {
-						// keep tour data for each tour id
-						_tourDataList.add(tourData);
-						newOverlayKey += tourData.getTourId();
+			// tour data needs to be loaded
+
+			_tourDataList.clear();
+
+			newOverlayKey = paintTours_05_GetTourData(tourIdList);
+
+			_tourIdHash = tourIdList.hashCode();
+			_tourDataHash = _tourDataList.hashCode();
+			_tourHashOverlayKey = newOverlayKey;
+		}
+
+		_tourPainterConfig.setTourDataList(_tourDataList);
+		_tourPainterConfig.setPhotos(_photoList);
+
+		_tourInfoToolTipProvider.setTourDataList(_tourDataList);
+
+		if (_previousOverlayKey != newOverlayKey) {
+
+			_previousOverlayKey = newOverlayKey;
+
+			_map.setOverlayKey(Long.toString(newOverlayKey));
+			_map.disposeOverlayImageCache();
+		}
+
+		createLegendImage(_tourPainterConfig.getLegendProvider());
+
+		_map.paint();
+	}
+
+	private long paintTours_05_GetTourData(final ArrayList<Long> tourIdList) {
+
+		// create a unique overlay key for the selected tours
+		final long newOverlayKey[] = { 0 };
+
+		if (tourIdList.size() > 200) {
+
+			try {
+
+				final IRunnableWithProgress saveRunnable = new IRunnableWithProgress() {
+					@Override
+					public void run(final IProgressMonitor monitor) throws InvocationTargetException,
+							InterruptedException {
+
+						int loadCounter = 0;
+						final int idSize = tourIdList.size();
+
+						monitor.beginTask(Messages.Tour_Data_LoadTourData_Monitor, idSize);
+
+						for (final Long tourId : tourIdList) {
+
+							monitor.subTask(NLS.bind(
+									Messages.Tour_Data_LoadTourData_Monitor_SubTask,
+									++loadCounter,
+									idSize));
+
+							if (monitor.isCanceled()) {
+								break;
+							}
+
+							final TourData tourData = TourManager.getInstance().getTourData(tourId);
+							if (isPaintDataValid(tourData)) {
+
+								// keep tour data for each tour id
+								_tourDataList.add(tourData);
+								newOverlayKey[0] += tourData.getTourId();
+							}
+
+							monitor.worked(1);
+						}
 					}
-				}
-				_tourPainterConfig.setTourDataList(_tourDataList);
-				_tourPainterConfig.setPhotos(_photoList);
+				};
 
-				_tourInfoToolTipProvider.setTourDataList(_tourDataList);
+				new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, true, saveRunnable);
 
-				if (_previousOverlayKey != newOverlayKey) {
-
-					_previousOverlayKey = newOverlayKey;
-
-					_map.setOverlayKey(Long.toString(newOverlayKey));
-					_map.disposeOverlayImageCache();
-				}
-
-				createLegendImage(_tourPainterConfig.getLegendProvider());
-				_map.paint();
+			} catch (final InvocationTargetException e) {
+				StatusUtil.showStatus(e);
+			} catch (final InterruptedException e) {
+				StatusUtil.showStatus(e);
 			}
-		});
+
+		} else {
+
+			for (final Long tourId : tourIdList) {
+
+				final TourData tourData = TourManager.getInstance().getTourData(tourId);
+				if (isPaintDataValid(tourData)) {
+
+					// keep tour data for each tour id
+					_tourDataList.add(tourData);
+					newOverlayKey[0] += tourData.getTourId();
+				}
+			}
+		}
+
+		return newOverlayKey[0];
 	}
 
 	private void paintTours_10_All() {

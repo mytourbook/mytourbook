@@ -1798,6 +1798,9 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 			final long cameraTimeAdjustment = photoWrapper.camera.timeAdjustment;
 
 			photoWrapper.adjustedTime = utcTime + cameraTimeAdjustment;
+
+			// force that the position are updated
+			photoWrapper.photo.resetWorldPosition();
 		}
 
 		Collections.sort(_allPhotos, _adjustTimeComparator);

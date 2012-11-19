@@ -157,6 +157,10 @@ public class Messages extends NLS {
 
 	public static String		Tour_Action_ShowHrZones_Tooltip;
 
+	public static String	Tour_Data_LoadTourData_Monitor;
+
+	public static String	Tour_Data_LoadTourData_Monitor_SubTask;
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

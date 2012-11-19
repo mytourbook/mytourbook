@@ -843,6 +843,10 @@ public class Photo {
 		return _isLoadingError;
 	}
 
+	public void resetWorldPosition() {
+		_worldPosition.clear();
+	}
+
 	public void setAltitude(final double altitude) {
 		_altitude = altitude;
 	}
