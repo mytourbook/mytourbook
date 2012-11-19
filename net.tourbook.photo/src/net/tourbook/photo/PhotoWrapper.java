@@ -84,12 +84,12 @@ public class PhotoWrapper implements IGalleryCustomData {
 	/**
 	 * Is <code>true</code> when geo coordinates origin is in the photo EXIF data.
 	 */
-	public boolean	isExifWithGps;
+	public boolean	isGeoFromExif;
 
-	/**
-	 * Is <code>true</code> when adjusted time is used to set geo position.
-	 */
-	public boolean	isGpsSetFromTour;
+//	/**
+//	 * Is <code>true</code> when adjusted time is used to set geo position.
+//	 */
+//	public boolean	isGpsSetFromTour;
 
 	public PhotoWrapper(final File file) {
 

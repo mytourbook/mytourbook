@@ -168,22 +168,7 @@ public class PicDirView extends ViewPart {
 
 		final ISelection selection = _picDirImages.getSelectedPhotosWithExif(isAllImages);
 
-		// fire selection for the selected photos
-		if (selection != null) {
-
-			_postSelectionProvider.setSelection(selection);
-
-			/*
-			 * reset selection because this selection opens a perspective and it causes a runtime
-			 * exception when this selection is fired again, it causes really trouble !!!
-			 */
-			_postSelectionProvider.setSelection(new ISelection() {
-				@Override
-				public boolean isEmpty() {
-					return true;
-				}
-			});
-		}
+		fireSelectionOnlyOnce(selection);
 	}
 
 	public void actionRefreshFolder() {
@@ -337,7 +322,30 @@ public class PicDirView extends ViewPart {
 	}
 
 	public void fireCurrentSelection() {
-		_postSelectionProvider.setSelection(_picDirImages.getSelectedPhotosWithExif(false));
+
+		final ISelection selectedPhotosWithExif = _picDirImages.getSelectedPhotosWithExif(false);
+
+		fireSelectionOnlyOnce(selectedPhotosWithExif);
+	}
+
+	private void fireSelectionOnlyOnce(final ISelection selection) {
+
+		// fire selection for the selected photos
+		if (selection != null) {
+
+			_postSelectionProvider.setSelection(selection);
+
+//			/*
+//			 * reset selection because this selection opens a perspective and it causes a runtime
+//			 * exception when this selection is fired again, it causes really trouble !!!
+//			 */
+//			_postSelectionProvider.setSelection(new ISelection() {
+//				@Override
+//				public boolean isEmpty() {
+//					return true;
+//				}
+//			});
+		}
 	}
 
 	public ISelection getSelectedPhotosWithExif() {
@@ -421,7 +429,7 @@ public class PicDirView extends ViewPart {
 			selection = _selectionConverter.convertSelection(selection);
 		}
 
-		_postSelectionProvider.setSelection(selection);
+		fireSelectionOnlyOnce(selection);
 	}
 
 	public void setSelectionConverter(final ISelectionConverter selectionConverter) {

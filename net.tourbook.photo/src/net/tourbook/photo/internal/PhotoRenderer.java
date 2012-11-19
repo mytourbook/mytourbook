@@ -58,18 +58,19 @@ import org.joda.time.format.DateTimeFormatter;
  */
 public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
-	private static final String			PHOTO_ANNOTATION_GPS	= "PHOTO_ANNOTATION_GPS";								//$NON-NLS-1$
+	private static final String			PHOTO_ANNOTATION_EXIF_GPS	= "PHOTO_ANNOTATION_GPS";					//$NON-NLS-1$
+	private static final String			PHOTO_ANNOTATION_TOUR_GPS	= "PHOTO_ANNOTATION_TOUR_GPS";				//$NON-NLS-1$
 
 	/**
 	 * this value has been evaluated by some test
 	 */
-	private int							_textMinThumbSize		= 50;
+	private int							_textMinThumbSize			= 50;
 
-	private int							_fontHeight				= -1;
+	private int							_fontHeight					= -1;
 
-	private final DateTimeFormatter		_dtFormatterDate		= DateTimeFormat.forStyle("M-");
-	private final DateTimeFormatter		_dtFormatterTime		= DateTimeFormat.forStyle("-F");
-	private final DateTimeFormatter		_dtFormatterDateTime	= DateTimeFormat.forStyle("MM");
+	private final DateTimeFormatter		_dtFormatterDate			= DateTimeFormat.forStyle("M-");			//$NON-NLS-1$
+	private final DateTimeFormatter		_dtFormatterTime			= DateTimeFormat.forStyle("-F");			//$NON-NLS-1$
+	private final DateTimeFormatter		_dtFormatterDateTime		= DateTimeFormat.forStyle("MM");			//$NON-NLS-1$
 
 //	private final DateTimeFormatter		_dtFormatterDateTime	= new DateTimeFormatterBuilder()
 //																		.appendYear(4, 4)
@@ -109,8 +110,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	private ImageGallery				_imageGallery;
 	private GalleryMT20					_galleryMT;
 
-	private int							_gridBorder				= 1;
-	private int							_imageBorder			= 5;
+	private int							_gridBorder					= 1;
+	private int							_imageBorder				= 5;
 
 	/**
 	 * photo dimension without grid border but including image border
@@ -131,7 +132,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	/**
 	 * Width for the painted image or <code>-1</code> when not initialized.
 	 */
-	private int							_paintedDestWidth		= -1;
+	private int							_paintedDestWidth			= -1;
 	private int							_paintedDestHeight;
 
 	private boolean						_isShowFullsizeHQImage;
@@ -151,9 +152,9 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	private boolean						_isFullsizeImageAvailable;
 	private boolean						_isFullsizeLoadingError;
 
-	private final DateTimeFormatter		_dtFormatter			= DateTimeFormat.forStyle("ML");						//$NON-NLS-1$
-	private final DateTimeFormatter		_dtWeekday				= DateTimeFormat.forPattern("E");						//$NON-NLS-1$
-	private final NumberFormat			_nfMByte				= NumberFormat.getNumberInstance();
+	private final DateTimeFormatter		_dtFormatter				= DateTimeFormat.forStyle("ML");			//$NON-NLS-1$
+	private final DateTimeFormatter		_dtWeekday					= DateTimeFormat.forPattern("E");			//$NON-NLS-1$
+	private final NumberFormat			_nfMByte					= NumberFormat.getNumberInstance();
 	{
 		_nfMByte.setMinimumFractionDigits(3);
 		_nfMByte.setMaximumFractionDigits(3);
@@ -168,24 +169,34 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	/*
 	 * UI resources
 	 */
-	private Color						_fullsizeBgColor		= Display.getCurrent().getSystemColor(SWT.COLOR_BLACK);
-
-	private Color						_fgColor				= Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
-	private Color						_bgColor				= Display.getCurrent().getSystemColor(SWT.COLOR_RED);
+	private Color						_fullsizeBgColor			= Display.getCurrent()//
+																			.getSystemColor(SWT.COLOR_BLACK);
+	private Color						_fgColor					= Display.getCurrent()//
+																			.getSystemColor(SWT.COLOR_WHITE);
+	private Color						_bgColor					= Display.getCurrent()//
+																			.getSystemColor(SWT.COLOR_RED);
 	private Color						_selectionFgColor;
 	private Color						_noFocusSelectionFgColor;
 
-	private static Image				_gpsImage;
+	private static Image				_exifGpsImage;
+	private static Image				_tourGpsImage;
+
 	private static int					_gpsImageWidth;
 	private static int					_gpsImageHeight;
 
 	static {
 
-		UI.IMAGE_REGISTRY.put(PHOTO_ANNOTATION_GPS, Activator.getImageDescriptor(Messages.Image__PhotoAnnotationGPS));
+		UI.IMAGE_REGISTRY.put(PHOTO_ANNOTATION_EXIF_GPS, //
+				Activator.getImageDescriptor(Messages.Image__PhotoAnnotationExifGPS));
 
-		_gpsImage = UI.IMAGE_REGISTRY.get(PHOTO_ANNOTATION_GPS);
+		UI.IMAGE_REGISTRY.put(PHOTO_ANNOTATION_TOUR_GPS,//
+				Activator.getImageDescriptor(Messages.Image__PhotoAnnotationTourGPS));
 
-		final Rectangle bounds = _gpsImage.getBounds();
+		_exifGpsImage = UI.IMAGE_REGISTRY.get(PHOTO_ANNOTATION_EXIF_GPS);
+		_tourGpsImage = UI.IMAGE_REGISTRY.get(PHOTO_ANNOTATION_TOUR_GPS);
+
+		final Rectangle bounds = _exifGpsImage.getBounds();
+		_tourGpsImage.getBounds();
 		_gpsImageWidth = bounds.width;
 		_gpsImageHeight = bounds.height;
 	}
@@ -368,7 +379,10 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 		// annotations are drawn in the bottom right corner of the image
 		if (_isShowAnnotations && photoWrapper.isPhotoWithGps) {
-			gc.drawImage(_gpsImage, //
+
+			final Image image = photoWrapper.isGeoFromExif ? _exifGpsImage : _tourGpsImage;
+
+			gc.drawImage(image, //
 					_paintedDestX + _paintedDestWidth - _gpsImageWidth,
 					_paintedDestY + _paintedDestHeight - _gpsImageHeight);
 		}

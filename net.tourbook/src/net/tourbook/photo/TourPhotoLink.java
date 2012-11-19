@@ -44,7 +44,10 @@ public class TourPhotoLink {
 	long									tourId				= Long.MIN_VALUE;
 	long									tourTypeId			= -1;
 
-	long									mergeId;
+	/**
+	 * Unique id for this link.
+	 */
+	long									linkId;
 
 	/**
 	 * Tour start time in ms
@@ -86,7 +89,7 @@ public class TourPhotoLink {
 
 		isHistoryTour = true;
 
-		mergeId = System.nanoTime();
+		linkId = System.nanoTime();
 
 		setTourStartTime(tourStartTime);
 
@@ -105,7 +108,7 @@ public class TourPhotoLink {
 
 		this.tourId = tourId;
 
-		mergeId = tourId;
+		linkId = tourId;
 
 		setTourStartTime(tourStartTime);
 		setTourEndTime(tourEndTime);
@@ -132,7 +135,7 @@ public class TourPhotoLink {
 			return false;
 		}
 		final TourPhotoLink other = (TourPhotoLink) obj;
-		if (mergeId != other.mergeId) {
+		if (linkId != other.linkId) {
 			return false;
 		}
 		return true;
@@ -230,7 +233,7 @@ public class TourPhotoLink {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + (int) (mergeId ^ (mergeId >>> 32));
+		result = prime * result + (int) (linkId ^ (linkId >>> 32));
 		return result;
 	}
 
@@ -272,14 +275,14 @@ public class TourPhotoLink {
 
 	@Override
 	public String toString() {
-		return "MergeTour "
-				+ ("\n\ttourStart=\t\t\t" + tourStartTime)
-				+ ("\n\ttourStart=\t\t\t" + _dtFormatter.print(tourStartTime))
-				+ ("\n\ttourEnd=\t\t\t" + _dtFormatter.print(tourEndTime))
+		return "TourPhotoLink "
+//				+ ("\n\ttourStart=\t\t" + tourStartTime)
+				+ ("\n\ttourStart=\t\t" + _dtFormatter.print(tourStartTime))
+//				+ ("\n\ttourEnd=\t\t" + _dtFormatter.print(tourEndTime))
 				+ ("\n\thistoryStartTime=\t" + _dtFormatter.print(historyStartTime))
-				+ ("\n\thistoryEndTime=\t\t" + _dtFormatter.print(historyEndTime))
+//				+ ("\n\thistoryEndTime=\t\t" + _dtFormatter.print(historyEndTime))
 				+ ("\n\tisHistory=" + isHistoryTour)
-				+ ("\tmergeId=" + mergeId)
+				+ ("\tlinkId=" + linkId)
 				+ ("\n")
 		//
 		;

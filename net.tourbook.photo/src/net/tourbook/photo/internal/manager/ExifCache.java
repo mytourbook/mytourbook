@@ -15,10 +15,7 @@
  *******************************************************************************/
 package net.tourbook.photo.internal.manager;
 
-import java.util.ArrayList;
-
 import net.tourbook.photo.PhotoImageMetadata;
-import net.tourbook.photo.PhotoWrapper;
 
 import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 
@@ -63,21 +60,21 @@ public class ExifCache {
 		}
 	}
 
-	/**
-	 * Update geo position in the cached exif data.
-	 * 
-	 * @param updatedPhotos
-	 */
-	public static void updateGPSPosition(final ArrayList<PhotoWrapper> updatedPhotos) {
-
-		for (final PhotoWrapper photoWrapper : updatedPhotos) {
-
-			final PhotoImageMetadata imageMetadata = _exifCache.get(photoWrapper.imageFilePathName);
-			if (imageMetadata != null) {
-
-				imageMetadata.latitude = photoWrapper.photo.getLatitude();
-				imageMetadata.longitude = photoWrapper.photo.getLongitude();
-			}
-		}
-	}
+//	/**
+//	 * Update geo position in the cached exif data.
+//	 *
+//	 * @param updatedPhotos
+//	 */
+//	public static void updateGPSPosition(final ArrayList<PhotoWrapper> updatedPhotos) {
+//
+//		for (final PhotoWrapper photoWrapper : updatedPhotos) {
+//
+//			final PhotoImageMetadata imageMetadata = _exifCache.get(photoWrapper.imageFilePathName);
+//			if (imageMetadata != null) {
+//
+//				imageMetadata.latitude = photoWrapper.photo.getLatitude();
+//				imageMetadata.longitude = photoWrapper.photo.getLongitude();
+//			}
+//		}
+//	}
 }

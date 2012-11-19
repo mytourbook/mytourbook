@@ -22,7 +22,6 @@ import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.State;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbench;
@@ -49,9 +48,9 @@ public class ActionHandlerSyncPhotoWithTour extends AbstractHandler {
 
 		_isSyncPhotoWithTour = !HandlerUtil.toggleCommandState(event.getCommand());
 
-		System.out.println(UI.timeStampNano() + " _isSyncPhotoWithTour " + _isSyncPhotoWithTour);
-		// TODO remove SYSTEM.OUT.PRINTLN
-
+//		System.out.println(UI.timeStampNano() + " _isSyncPhotoWithTour " + _isSyncPhotoWithTour);
+//		// TODO remove SYSTEM.OUT.PRINTLN
+//
 		final IWorkbenchPart activePart = HandlerUtil.getActivePart(event);
 		if (activePart instanceof PicDirView) {
 
@@ -59,47 +58,47 @@ public class ActionHandlerSyncPhotoWithTour extends AbstractHandler {
 
 			picDirView.setSelectionConverter(_isSyncPhotoWithTour ? _syncSelectionProvider : null);
 
-			if (_isSyncPhotoWithTour) {
-
-				// sync photo with tour
-
-				final ISelection selectedPhotos = picDirView.getSelectedPhotosWithExif();
-
-				if (selectedPhotos instanceof PhotosWithExifSelection) {
-
-					final PhotosWithExifSelection photoWithExifSelection = (PhotosWithExifSelection) selectedPhotos;
-
-					final IWorkbenchPage activePage = HandlerUtil.getActiveWorkbenchWindow(event).getActivePage();
-					final IViewReference linkViewRef = activePage.findViewReference(TourPhotoLinkView.ID);
-
-					if (linkViewRef == null) {
-
-						// this perspective do not contains the link view, open link view in a new perspective
-
-						PhotoManager.openPhotoMergePerspective(photoWithExifSelection);
-
-					} else {
-
-						// open link view in current perspective
-
-						final TourPhotoLinkView view = (TourPhotoLinkView) linkViewRef.getView(true);
-
-						if (view != null) {
-
-							view.updatePhotosAndTours(photoWithExifSelection.photos);
-
-						} else {
-
-							PhotoManager.openPhotoMergePerspective(photoWithExifSelection);
-						}
-					}
-				}
-			} else {
-
-				// don't create tour photo links when sync is disabled
-
-				picDirView.fireCurrentSelection();
-			}
+//			if (_isSyncPhotoWithTour) {
+//
+//				// sync photo with tour
+//
+//				final ISelection selectedPhotos = picDirView.getSelectedPhotosWithExif();
+//
+//				if (selectedPhotos instanceof PhotosWithExifSelection) {
+//
+//					final PhotosWithExifSelection photoWithExifSelection = (PhotosWithExifSelection) selectedPhotos;
+//
+//					final IWorkbenchPage activePage = HandlerUtil.getActiveWorkbenchWindow(event).getActivePage();
+//					final IViewReference linkViewRef = activePage.findViewReference(TourPhotoLinkView.ID);
+//
+//					if (linkViewRef == null) {
+//
+//						// this perspective do not contains the link view, open link view in a new perspective
+//
+//						PhotoManager.openPhotoMergePerspective(photoWithExifSelection);
+//
+//					} else {
+//
+//						// open link view in current perspective
+//
+//						final TourPhotoLinkView view = (TourPhotoLinkView) linkViewRef.getView(true);
+//
+//						if (view != null) {
+//
+//							view.updatePhotosAndTours(photoWithExifSelection.photos);
+//
+//						} else {
+//
+//							PhotoManager.openPhotoMergePerspective(photoWithExifSelection);
+//						}
+//					}
+//				}
+//			} else {
+//
+//				// don't create tour photo links when sync is disabled
+//
+//				picDirView.fireCurrentSelection();
+//			}
 		}
 
 		return null;
@@ -164,5 +163,9 @@ public class ActionHandlerSyncPhotoWithTour extends AbstractHandler {
 
 			picDirView.setSelectionConverter(_isSyncPhotoWithTour ? _syncSelectionProvider : null);
 		}
+
+		System.out.println(UI.timeStampNano() + " _isSyncPhotoWithTour " + _isSyncPhotoWithTour);
+		// TODO remove SYSTEM.OUT.PRINTLN
+
 	}
 }

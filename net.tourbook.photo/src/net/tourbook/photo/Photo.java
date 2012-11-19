@@ -16,7 +16,6 @@
 package net.tourbook.photo;
 
 import java.awt.Point;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +26,6 @@ import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.photo.internal.gallery.MT20.RendererHelper;
-import net.tourbook.photo.internal.manager.ExifCache;
 
 import org.apache.commons.imaging.Imaging;
 import org.apache.commons.imaging.ImagingConstants;
@@ -87,8 +85,16 @@ public class Photo {
 	private int								_imageWidth				= Integer.MIN_VALUE;
 	private int								_imageHeight			= Integer.MIN_VALUE;
 
-	private double							_latitude				= Double.MIN_VALUE;
-	private double							_longitude				= Double.MIN_VALUE;
+	/**
+	 * When <code>true</code>, EXIF geo is returned when available, otherwise tour geo is returned
+	 * when available. When requested geo is not available, the other is returned.
+	 */
+	private static boolean					_isGetExifGeo			= false;
+
+	private double							_exifLatitude			= Double.MIN_VALUE;
+	private double							_exifLongitude			= Double.MIN_VALUE;
+	private double							_tourLatitude			= Double.MIN_VALUE;
+	private double							_tourLongitude			= Double.MIN_VALUE;
 
 	private String							_gpsAreaInfo;
 
@@ -178,23 +184,23 @@ public class Photo {
 		return Util.computeMD5(imageFilePathName + "_Thumb");//$NON-NLS-1$
 	}
 
-	/**
-	 * Update geo position in the cached exif metadata.
-	 * 
-	 * @param updatedPhotos
-	 */
-	public static void updateExifGeoPosition(final ArrayList<PhotoWrapper> updatedPhotos) {
-
-		for (final PhotoWrapper photoWrapper : updatedPhotos) {
-
-			final PhotoImageMetadata imageMetadata = ExifCache.get(photoWrapper.imageFilePathName);
-			if (imageMetadata != null) {
-
-				imageMetadata.latitude = photoWrapper.photo.getLatitude();
-				imageMetadata.longitude = photoWrapper.photo.getLongitude();
-			}
-		}
-	}
+//	/**
+//	 * Update geo position in the cached exif metadata.
+//	 *
+//	 * @param updatedPhotos
+//	 */
+//	public static void updateExifGeoPosition(final ArrayList<PhotoWrapper> updatedPhotos) {
+//
+//		for (final PhotoWrapper photoWrapper : updatedPhotos) {
+//
+//			final PhotoImageMetadata imageMetadata = ExifCache.get(photoWrapper.imageFilePathName);
+//			if (imageMetadata != null) {
+//
+//				imageMetadata.latitude = photoWrapper.photo.getLatitude();
+//				imageMetadata.longitude = photoWrapper.photo.getLongitude();
+//			}
+//		}
+//	}
 
 	/**
 	 * Creates metadata from image metadata
@@ -658,7 +664,14 @@ public class Photo {
 	 * @return Returns latitude or {@link Double#MIN_VALUE} when not set
 	 */
 	public double getLatitude() {
-		return _latitude;
+
+		return _isGetExifGeo //
+				? _exifLatitude != Double.MIN_VALUE //
+						? _exifLatitude
+						: _tourLatitude
+				: _tourLatitude != Double.MIN_VALUE //
+						? _tourLatitude
+						: _exifLatitude;
 	}
 
 	/**
@@ -675,8 +688,18 @@ public class Photo {
 		}
 	}
 
+	/**
+	 * @return Returns longitude or {@link Double#MIN_VALUE} when not set
+	 */
 	public double getLongitude() {
-		return _longitude;
+
+		return _isGetExifGeo //
+				? _exifLongitude != Double.MIN_VALUE //
+						? _exifLongitude
+						: _tourLongitude
+				: _tourLongitude != Double.MIN_VALUE //
+						? _tourLongitude
+						: _exifLongitude;
 	}
 
 	/**
@@ -784,7 +807,8 @@ public class Photo {
 	 */
 	public Point getWorldPosition(final CommonMapProvider mapProvider, final String projectionId, final int zoomLevel) {
 
-		if (_latitude == Double.MIN_VALUE) {
+		final double latitude = getLatitude();
+		if (latitude == Double.MIN_VALUE) {
 			return null;
 		}
 
@@ -795,7 +819,7 @@ public class Photo {
 		if (worldPosition == null) {
 			// convert lat/long into world pixels which depends on the map projection
 
-			final GeoPosition photoGeoPosition = new GeoPosition(_latitude, _longitude);
+			final GeoPosition photoGeoPosition = new GeoPosition(latitude, getLongitude());
 
 			final Point geoToPixel = mapProvider.geoToPixel(photoGeoPosition, zoomLevel);
 
@@ -829,14 +853,6 @@ public class Photo {
 		_imageHeight = height;
 
 		setMapImageSize();
-	}
-
-	public void setGeoPosition(final double latitude, final double longitude) {
-
-		_latitude = latitude;
-		_longitude = longitude;
-
-		_photoWrapper.isPhotoWithGps = true;
 	}
 
 	public void setGpsAreaInfo(final String gpsAreaInfo) {
@@ -882,6 +898,14 @@ public class Photo {
 		PhotoLoadManager.putPhotoInThumbSaveErrorMap(_photoWrapper.imageFilePathName);
 	}
 
+	public void setTourGeoPosition(final double latitude, final double longitude) {
+
+		_tourLatitude = latitude;
+		_tourLongitude = longitude;
+
+		_photoWrapper.isPhotoWithGps = true;
+	}
+
 	@Override
 	public String toString() {
 
@@ -916,8 +940,8 @@ public class Photo {
 		_imageDirection = photoImageMetadata.imageDirection;
 		_altitude = photoImageMetadata.altitude;
 
-		_latitude = photoImageMetadata.latitude;
-		_longitude = photoImageMetadata.longitude;
+		_exifLatitude = photoImageMetadata.latitude;
+		_exifLongitude = photoImageMetadata.longitude;
 
 		_gpsAreaInfo = photoImageMetadata.gpsAreaInfo;
 
@@ -948,10 +972,10 @@ public class Photo {
 		 * set state if gps data are available, this state is used for filtering the photos and to
 		 * indicate that exif data are loaded
 		 */
-		final boolean isGPS = _latitude != Double.MIN_VALUE && _longitude != Double.MIN_VALUE;
+		final boolean isGPS = _exifLatitude != Double.MIN_VALUE && _exifLongitude != Double.MIN_VALUE;
 
 		_photoWrapper.isPhotoWithGps = isGPS;
-		_photoWrapper.isExifWithGps = isGPS;
+		_photoWrapper.isGeoFromExif = isGPS;
 
 		// sort by exif date when available
 		if (_exifDateTime != null) {

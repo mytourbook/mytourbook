@@ -1857,6 +1857,11 @@ public abstract class GalleryMT20 extends Canvas {
 
 //		final long start = System.nanoTime();
 
+		if (_virtualGalleryItems == null) {
+			// gallery is not initialized
+			return;
+		}
+
 		/**
 		 * After many hours I discovered, that the gallery background is not painted (with win7) in
 		 * the background color after the shell is hidden and displayed again (in a tooltip),

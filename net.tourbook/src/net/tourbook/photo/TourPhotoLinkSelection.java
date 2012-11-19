@@ -30,4 +30,14 @@ public class TourPhotoLinkSelection extends SelectionTourIds {
 		this.tourPhotoLinks = tourPhotoLinks;
 	}
 
+	@Override
+	public String toString() {
+		final int maxLen = 5;
+		return "TourPhotoLinkSelection "
+				+ "tourPhotoLinks="
+				+ (tourPhotoLinks != null ? tourPhotoLinks.subList(0, Math.min(tourPhotoLinks.size(), maxLen)) : null)
+		//
+		;
+	}
+
 }

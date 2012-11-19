@@ -264,6 +264,8 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	private String							_defaultStatusMessage			= UI.EMPTY_STRING;
 	private int[]							_restoredSelection;
 
+	private int[]							_delayCounter					= { 0 };
+
 	private final NumberFormat				_nf1							= NumberFormat.getNumberInstance();
 	{
 		_nf1.setMinimumFractionDigits(1);
@@ -846,7 +848,6 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	 *         when loading EXIF data was canceled by the user.
 	 */
 	public ISelection getSelectedPhotosWithExif(final boolean isAllImages) {
-
 		return createPhotoSelectionWithExif(isAllImages);
 	}
 
@@ -2053,7 +2054,35 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	}
 
 	private void showPageBookPage(final Composite page) {
-		_pageBook.showPage(page);
+
+		/*
+		 * delay showing the default page because it is flickering when an image is displayed again
+		 * within a few milliseconds
+		 */
+
+		_delayCounter[0]++;
+
+		if (page == _pageDefault || page == _pageGalleryInfo) {
+
+			_pageBook.getDisplay().timerExec(400, new Runnable() {
+
+				private int			__delayCounter	= _delayCounter[0];
+				private Composite	__page			= page;
+
+				public void run() {
+
+					// check if this still the same page which should be displayed
+					if (__delayCounter == _delayCounter[0]) {
+						_pageBook.showPage(__page);
+					}
+				}
+			});
+
+		} else {
+
+			_pageBook.showPage(page);
+		}
+
 	}
 
 	public void showRestoreFolder(final String restoreFolderName) {
@@ -2174,24 +2203,25 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	/**
 	 * Update geo position for all {@link PhotoWrapper} contained in photoWrapperList.
 	 * 
-	 * @param photoWrapperList
+	 * @param updatedPhotoWrapperList
 	 */
-	public void updateGPSPosition(final ArrayList<?> photoWrapperList) {
+	public void updateGPSPosition(final ArrayList<?> updatedPhotoWrapperList) {
 
 		for (final PhotoWrapper galleryPhotoWrapper : _allPhotoWrapper) {
 
 			final String galleryImageFilePathName = galleryPhotoWrapper.imageFilePathName;
 
-			for (final Object object : (ArrayList<?>) photoWrapperList) {
+			for (final Object object : (ArrayList<?>) updatedPhotoWrapperList) {
 
 				if (object instanceof PhotoWrapper) {
+
 					final PhotoWrapper updatedPhotoWrapper = (PhotoWrapper) object;
 
 					if (galleryImageFilePathName.equals(updatedPhotoWrapper.imageFilePathName)) {
 
 						final Photo updatedPhoto = updatedPhotoWrapper.photo;
 
-						galleryPhotoWrapper.photo.setGeoPosition(
+						galleryPhotoWrapper.photo.setTourGeoPosition(
 								updatedPhoto.getLatitude(),
 								updatedPhoto.getLongitude());
 

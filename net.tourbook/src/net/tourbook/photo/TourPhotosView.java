@@ -405,6 +405,13 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 	@Override
 	public void photoEvent(final PhotoEventId photoEventId, final Object data) {
 
+//		System.out.println(net.tourbook.common.UI.timeStampNano()
+//				+ " TourPhotosView::photoEvent\t"
+////				+ photoEventId
+////				+ "\t"
+//				+ data);
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
 		if (photoEventId == PhotoEventId.GPS_DATA_IS_UPDATED) {
 
 			if (data instanceof ArrayList) {
@@ -515,7 +522,7 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
 			allPhotoWrapper.addAll(tourPhotoLink.tourPhotos);
 
-			galleryPositionKey += tourPhotoLink.mergeId;
+			galleryPositionKey += tourPhotoLink.linkId;
 
 			final long tourStartTime = tourPhotoLink.tourStartTime;
 			final long tourEndTime = tourPhotoLink.tourEndTime;

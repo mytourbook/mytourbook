@@ -373,10 +373,13 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	private void onPostSelectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
 		// debug current selection
-		System.out.println(net.tourbook.common.UI.timeStampNano() + " WbWAdvisor - current post selection: "
-//				+ selection.getClass().getSimpleName()
-				+ (" (" + selection.getClass().getCanonicalName() + ")  ")
-				+ selection);
+//		System.out.println(net.tourbook.common.UI.timeStampNano() + " \t");
+//		System.out.println(net.tourbook.common.UI.timeStampNano() + " \t");
+
+//		System.out.println(net.tourbook.common.UI.timeStampNano() + " WbWAdvisor - current post selection: "
+////				+ selection.getClass().getSimpleName()
+//				+ (" (" + selection.getClass().getCanonicalName() + ")  ")
+//				+ selection);
 
 		if (selection instanceof PhotosWithExifSelection) {
 
@@ -432,9 +435,11 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 				TagMenuManager.restoreTagState();
 				TourTypeMenuManager.restoreState();
+				PhotoManager.restoreState();
 
 				loadPeopleData();
 				setupAppSelectionListener();
+
 				setupProxy();
 			}
 		});
@@ -479,10 +484,9 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	@Override
 	public boolean preWindowShellClose() {
 
-//		TourDatabase.getInstance().closeConnectionPool();
-
 		TagMenuManager.saveTagState();
 		TourTypeMenuManager.saveState();
+		PhotoManager.saveState();
 
 		return super.preWindowShellClose();
 	}
