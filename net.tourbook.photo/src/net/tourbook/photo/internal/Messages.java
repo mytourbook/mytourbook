@@ -20,9 +20,9 @@ public class Messages extends NLS {
 	public static String		Image__Backward_Nav;
 	public static String		Image__delete;
 	public static String		Image__Forward_Nav;
-	public static String	Image__PhotoAnnotationExifGPS;
+	public static String	Image__Photo_Action_ShowGPSAnnotation;
 
-	public static String		Image__PhotoAnnotationGPSAction;
+	public static String	Image__PhotoAnnotationExifGPS;
 
 	public static String	Image__PhotoAnnotationTourGPS;
 	public static String		Image__PhotoFilterGPS;

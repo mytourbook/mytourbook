@@ -44,7 +44,8 @@ public class TourPainterConfiguration {
 	boolean									isShowStartEndInMap;
 	boolean									isShowTourMarker;
 	boolean									isShowWayPoints;
-	boolean									isShowPhoto;
+	boolean									isPhotoVisible;
+	boolean									isTourVisible;
 
 	private TourPainterConfiguration() {}
 
@@ -83,25 +84,37 @@ public class TourPainterConfiguration {
 		return _tourDataList;
 	}
 
+	/**
+	 * Do not draw a tour
+	 * 
+	 * @param tourData
+	 */
+	public void resetTourData() {
+
+		_tourDataList.clear();
+		_tourDataList.add(null);
+	}
+
 	public void setLegendProvider(final ILegendProvider iLegendProvider) {
 		if (iLegendProvider != null) {
 			_legendProvider = iLegendProvider;
 		}
 	}
 
-	public void setPhotos(final ArrayList<PhotoWrapper> photoWrapper) {
+	/**
+	 * @param photoWrapper
+	 *            When <code>null</code>, photos are not displayed.
+	 * @param isShowPhoto
+	 */
+	public void setPhotos(final ArrayList<PhotoWrapper> photoWrapper, final boolean isShowPhoto) {
 
 		_photoWrapper.clear();
 
 		if (photoWrapper != null) {
-
-			isShowPhoto = true;
 			_photoWrapper.addAll(photoWrapper);
-
-		} else {
-
-			isShowPhoto = false;
 		}
+
+		isPhotoVisible = isShowPhoto && _photoWrapper.size() > 0;
 	}
 
 	public void setSynchTourZoomLevel(final int zoomLevel) {
@@ -113,28 +126,34 @@ public class TourPainterConfiguration {
 	}
 
 	/**
-	 * Set {@link TourData} which is used for the next painting or <code>null</code> to not draw the
-	 * tour
-	 * 
-	 * @param tourData
-	 */
-	public void setTourData(final TourData tourData) {
-
-		_tourDataList.clear();
-		_tourDataList.add(tourData);
-	}
-
-	/**
 	 * Sets {@link TourData} for all tours which are displayed
 	 * 
 	 * @param tourDataList
+	 * @param isShowTour
 	 */
-	public void setTourDataList(final ArrayList<TourData> tourDataList) {
+	public void setTourData(final ArrayList<TourData> tourDataList, final boolean isShowTour) {
 
 		_tourDataList.clear();
 
 		if (tourDataList != null) {
 			_tourDataList.addAll(tourDataList);
 		}
+
+		isTourVisible = isShowTour & _tourDataList.size() > 0;
+	}
+
+	/**
+	 * Set {@link TourData} which is used for the next painting or <code>null</code> to not draw the
+	 * tour
+	 * 
+	 * @param tourData
+	 * @param isShowTour
+	 */
+	public void setTourData(final TourData tourData, final boolean isShowTour) {
+
+		_tourDataList.clear();
+		_tourDataList.add(tourData);
+
+		isTourVisible = isShowTour & _tourDataList.size() > 0;
 	}
 }

@@ -4919,9 +4919,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return tourPerson;
 	}
 
-	public Set<TourPhoto> getTourPhotos() {
-		return tourPhotos;
-	}
+//	is currently disabled in version 12.12, will be used in further versions
+//
+//	public Set<TourPhoto> getTourPhotos() {
+//		return tourPhotos;
+//	}
 
 	/**
 	 * @return Returns total recording time in seconds

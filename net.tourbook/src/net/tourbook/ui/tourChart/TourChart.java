@@ -45,8 +45,8 @@ import net.tourbook.common.util.IToolTipHideListener;
 import net.tourbook.common.util.TourToolTip;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
-import net.tourbook.photo.TourPhotoLink;
 import net.tourbook.photo.PhotoWrapper;
+import net.tourbook.photo.TourPhotoLink;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceTourChart;
 import net.tourbook.tour.IDataModelListener;
@@ -150,11 +150,12 @@ public class TourChart extends Chart {
 	 */
 	private IDataModelListener				_chartDataModelListener;
 
-	private final ListenerList				_selectionListeners						= new ListenerList();
+	private final ListenerList				_tourChartListeners						= new ListenerList();
 	private final ListenerList				_xAxisSelectionListener					= new ListenerList();
 	private IPropertyChangeListener			_prefChangeListener;
+//	private PostSelectionProvider			_postSelectionProvider;
+	//
 	private boolean							_isSegmentLayerVisible					= false;
-
 	private boolean							_is2ndAltiLayerVisible					= false;
 	private boolean							_isMouseModeSet;
 
@@ -789,7 +790,7 @@ public class TourChart extends Chart {
 	}
 
 	public void addTourChartListener(final ITourChartSelectionListener listener) {
-		_selectionListeners.add(listener);
+		_tourChartListeners.add(listener);
 	}
 
 	public void addXAxisSelectionListener(final IXAxisSelectionListener listener) {
@@ -1556,7 +1557,7 @@ public class TourChart extends Chart {
 	 * fire a selection event for this tour chart
 	 */
 	private void fireTourChartSelection() {
-		final Object[] listeners = _selectionListeners.getListeners();
+		final Object[] listeners = _tourChartListeners.getListeners();
 		for (final Object listener2 : listeners) {
 			final ITourChartSelectionListener listener = (ITourChartSelectionListener) listener2;
 			SafeRunnable.run(new SafeRunnable() {
@@ -1638,7 +1639,7 @@ public class TourChart extends Chart {
 	}
 
 	public void removeTourChartListener(final ITourChartSelectionListener listener) {
-		_selectionListeners.remove(listener);
+		_tourChartListeners.remove(listener);
 	}
 
 	public void removeXAxisSelectionListener(final IXAxisSelectionListener listener) {

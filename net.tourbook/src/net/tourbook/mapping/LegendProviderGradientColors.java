@@ -325,70 +325,70 @@ public class LegendProviderGradientColors implements ILegendProviderGradientColo
 		}
 	}
 
-	/**
-	 * Set legend values from a dataserie
-	 * 
-	 * @param legendBounds
-	 * @param dataSerie
-	 * @param legendProvider
-	 * @param unitText
-	 */
-	public void setLegendColorValues(	final Rectangle legendBounds,
-										final float[] dataSerie,
-										final String unitText,
-										final LegendUnitFormat unitFormat) {
-
-		/*
-		 * get min/max value
-		 */
-		float minValue = 0;
-		float maxValue = 0;
-		for (int valueIndex = 0; valueIndex < dataSerie.length; valueIndex++) {
-			if (valueIndex == 0) {
-				minValue = dataSerie[0];
-				maxValue = dataSerie[0];
-			} else {
-				final float dataValue = dataSerie[valueIndex];
-				minValue = (minValue <= dataValue) ? minValue : dataValue;
-				maxValue = (maxValue >= dataValue) ? maxValue : dataValue;
-			}
-		}
-
-		if (_legendColor.isMinValueOverwrite && minValue < _legendColor.overwriteMinValue) {
-			minValue = _legendColor.overwriteMinValue;
-		}
-		if (_legendColor.isMaxValueOverwrite && maxValue > _legendColor.overwriteMaxValue) {
-			maxValue = _legendColor.overwriteMaxValue;
-		}
-
-		final List<Float> legendUnits = getLegendUnits(legendBounds, minValue, maxValue, unitFormat);
-		if (legendUnits.size() > 0) {
-
-			final Float legendMinValue = legendUnits.get(0);
-			final Float legendMaxValue = legendUnits.get(legendUnits.size() - 1);
-
-			_legendConfig.units = legendUnits;
-			_legendConfig.unitText = unitText;
-			_legendConfig.legendMinValue = legendMinValue;
-			_legendConfig.legendMaxValue = legendMaxValue;
-
-			/*
-			 * set color configuration, each tour has a different altitude config
-			 */
-
-			final float diffMinMax = legendMaxValue - legendMinValue;
-			final float diffMinMax2 = diffMinMax / 2;
-			final float diffMinMax10 = diffMinMax / 10;
-			final float midValueAbsolute = legendMinValue + diffMinMax2;
-
-			final ValueColor[] valueColors = _legendColor.valueColors;
-
-			valueColors[0].value = legendMinValue + diffMinMax10;
-			valueColors[1].value = legendMinValue + diffMinMax2 / 2;
-			valueColors[2].value = midValueAbsolute;
-			valueColors[3].value = legendMaxValue - diffMinMax2 / 2;
-			valueColors[4].value = legendMaxValue - diffMinMax10;
-		}
-	}
+//	/**
+//	 * Set legend values from a dataserie
+//	 *
+//	 * @param legendBounds
+//	 * @param dataSerie
+//	 * @param legendProvider
+//	 * @param unitText
+//	 */
+//	public void setLegendColorValues(	final Rectangle legendBounds,
+//										final float[] dataSerie,
+//										final String unitText,
+//										final LegendUnitFormat unitFormat) {
+//
+//		/*
+//		 * get min/max value
+//		 */
+//		float minValue = 0;
+//		float maxValue = 0;
+//		for (int valueIndex = 0; valueIndex < dataSerie.length; valueIndex++) {
+//			if (valueIndex == 0) {
+//				minValue = dataSerie[0];
+//				maxValue = dataSerie[0];
+//			} else {
+//				final float dataValue = dataSerie[valueIndex];
+//				minValue = (minValue <= dataValue) ? minValue : dataValue;
+//				maxValue = (maxValue >= dataValue) ? maxValue : dataValue;
+//			}
+//		}
+//
+//		if (_legendColor.isMinValueOverwrite && minValue < _legendColor.overwriteMinValue) {
+//			minValue = _legendColor.overwriteMinValue;
+//		}
+//		if (_legendColor.isMaxValueOverwrite && maxValue > _legendColor.overwriteMaxValue) {
+//			maxValue = _legendColor.overwriteMaxValue;
+//		}
+//
+//		final List<Float> legendUnits = getLegendUnits(legendBounds, minValue, maxValue, unitFormat);
+//		if (legendUnits.size() > 0) {
+//
+//			final Float legendMinValue = legendUnits.get(0);
+//			final Float legendMaxValue = legendUnits.get(legendUnits.size() - 1);
+//
+//			_legendConfig.units = legendUnits;
+//			_legendConfig.unitText = unitText;
+//			_legendConfig.legendMinValue = legendMinValue;
+//			_legendConfig.legendMaxValue = legendMaxValue;
+//
+//			/*
+//			 * set color configuration, each tour has a different altitude config
+//			 */
+//
+//			final float diffMinMax = legendMaxValue - legendMinValue;
+//			final float diffMinMax2 = diffMinMax / 2;
+//			final float diffMinMax10 = diffMinMax / 10;
+//			final float midValueAbsolute = legendMinValue + diffMinMax2;
+//
+//			final ValueColor[] valueColors = _legendColor.valueColors;
+//
+//			valueColors[0].value = legendMinValue + diffMinMax10;
+//			valueColors[1].value = legendMinValue + diffMinMax2 / 2;
+//			valueColors[2].value = midValueAbsolute;
+//			valueColors[3].value = legendMaxValue - diffMinMax2 / 2;
+//			valueColors[4].value = legendMaxValue - diffMinMax10;
+//		}
+//	}
 
 }

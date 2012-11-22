@@ -179,7 +179,9 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		public void registerContextMenu(final String menuId, final MenuManager menuManager) {}
 
 		@Override
-		public void setSelection(final PhotoSelection photoSelection) {}
+		public void setSelection(final PhotoSelection photoSelection) {
+			onSelectPhoto(photoSelection);
+		}
 	}
 
 	public PhotoToolTipUI(final Control ownerControl) {
@@ -505,6 +507,8 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 	protected void onReparentShell(final Shell reparentedShell) {
 		_photoGallery.onReparentShell(reparentedShell);
 	}
+
+	protected abstract void onSelectPhoto(final PhotoSelection photoSelection);
 
 	@Override
 	protected void restoreState(final IDialogSettings state) {

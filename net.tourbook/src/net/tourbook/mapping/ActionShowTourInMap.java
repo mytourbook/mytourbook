@@ -37,7 +37,7 @@ public class ActionShowTourInMap extends Action {
 
 	@Override
 	public void run() {
-		fMapView.actionSetShowTourInMap();
+		fMapView.actionShowTour();
 	}
 
 }

@@ -31,7 +31,7 @@ public class ActionShowGPSAnnotations extends Action {
 
 		setToolTipText(Messages.Pic_Dir_Action_ShowPhotoAnnotations_Tooltip);
 
-		setImageDescriptor(Activator.getImageDescriptor(Messages.Image__PhotoAnnotationGPSAction));
+		setImageDescriptor(Activator.getImageDescriptor(Messages.Image__Photo_Action_ShowGPSAnnotation));
 	}
 
 	@Override

@@ -168,7 +168,7 @@ public class PicDirView extends ViewPart {
 
 		final ISelection selection = _picDirImages.getSelectedPhotosWithExif(isAllImages);
 
-		fireSelectionOnlyOnce(selection);
+		fireSelection(selection);
 	}
 
 	public void actionRefreshFolder() {
@@ -325,10 +325,10 @@ public class PicDirView extends ViewPart {
 
 		final ISelection selectedPhotosWithExif = _picDirImages.getSelectedPhotosWithExif(false);
 
-		fireSelectionOnlyOnce(selectedPhotosWithExif);
+		fireSelection(selectedPhotosWithExif);
 	}
 
-	private void fireSelectionOnlyOnce(final ISelection selection) {
+	private void fireSelection(final ISelection selection) {
 
 		// fire selection for the selected photos
 		if (selection != null) {
@@ -429,7 +429,7 @@ public class PicDirView extends ViewPart {
 			selection = _selectionConverter.convertSelection(selection);
 		}
 
-		fireSelectionOnlyOnce(selection);
+		fireSelection(selection);
 	}
 
 	public void setSelectionConverter(final ISelectionConverter selectionConverter) {

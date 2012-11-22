@@ -18,6 +18,9 @@ package net.tourbook.ui.tourChart;
 import java.util.ArrayList;
 
 import net.tourbook.common.PointLong;
+import net.tourbook.photo.PhotoEventId;
+import net.tourbook.photo.PhotoManager;
+import net.tourbook.photo.PhotoSelection;
 import net.tourbook.photo.PhotoToolTipUI;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -100,6 +103,11 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 		}
 
 		return ttLocation;
+	}
+
+	@Override
+	protected void onSelectPhoto(final PhotoSelection photoSelection) {
+		PhotoManager.fireEvent(PhotoEventId.PHOTO_SELECTION, photoSelection);
 	}
 
 	@Override

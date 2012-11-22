@@ -20,11 +20,11 @@ import net.tourbook.application.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionFilterNoTours extends Action {
+public class ActionFilterOneHistoryTour extends Action {
 
 	private TourPhotoLinkView	_photosAndToursView;
 
-	public ActionFilterNoTours(final TourPhotoLinkView photosAndToursView) {
+	public ActionFilterOneHistoryTour(final TourPhotoLinkView photosAndToursView) {
 
 		super(null, AS_CHECK_BOX);
 
@@ -37,7 +37,7 @@ public class ActionFilterNoTours extends Action {
 
 	@Override
 	public void run() {
-		_photosAndToursView.actionFilterNoTours();
+		_photosAndToursView.actionFilterOneHistoryTour();
 	}
 
 }

@@ -2021,6 +2021,8 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		// initialize tooltip for new images
 		_photoGalleryTooltip.reset(true);
 
+		_galleryMT20.deselectAll();
+
 		_allPhotoWrapper = photoWrapper;
 
 		final double galleryPosition = getCachedGalleryPosition();

@@ -15,6 +15,11 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -24,7 +29,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.application.PerspectiveFactoryPhoto;
@@ -33,15 +37,26 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
-import net.tourbook.data.TourPhoto;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.SQLFilter;
 
+import org.apache.commons.imaging.ImageReadException;
+import org.apache.commons.imaging.ImageWriteException;
+import org.apache.commons.imaging.Imaging;
+import org.apache.commons.imaging.common.IImageMetadata;
+import org.apache.commons.imaging.formats.jpeg.JpegImageMetadata;
+import org.apache.commons.imaging.formats.tiff.TiffImageMetadata;
+import org.apache.commons.imaging.formats.tiff.write.TiffOutputSet;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
@@ -56,10 +71,15 @@ public class PhotoManager {
 
 	private static final String				CAMERA_UNKNOWN_KEY				= "CAMERA_UNKNOWN_KEY";					//$NON-NLS-1$
 
+	private static final String				TEMP_FILE_PREFIX_ORIG			= "_orig_";								//$NON-NLS-1$
+
 	private static final IDialogSettings	_state							= TourbookPlugin.getDefault() //
 																					.getDialogSettingsSection(
 																							"PhotoManager");
 	private static PhotoManager				_instance;
+
+//	private boolean							_isOverwritePhotoGPS				= true;
+//	private boolean							_isAddPhotosToExistingTourPhotos	= false;
 
 	/**
 	 * Contains all cameras which are every used, key is the camera name.
@@ -74,6 +94,7 @@ public class PhotoManager {
 	private long							_sqlTourEnd						= Long.MIN_VALUE;
 
 	private ArrayList<TourPhotoLink>		_allDbTourPhotoLinks			= new ArrayList<TourPhotoLink>();
+	private ArrayList<TourPhotoLink>		_dbTourPhotoLinks				= new ArrayList<TourPhotoLink>();
 
 	public static void addPhotoEventListener(final IPhotoEventListener listener) {
 		_photoEventListeners.add(listener);
@@ -200,21 +221,23 @@ public class PhotoManager {
 	 * do not contain any photos
 	 * 
 	 * @param allPhotos
-	 * @param allTourPhotoLinks
+	 * @param visibleTourPhotoLinks
 	 * @param isShowToursOnlyWithPhotos
 	 * @param _allTourCameras
 	 */
 	void createTourPhotoLinks(	final ArrayList<PhotoWrapper> allPhotos,
-								final ArrayList<TourPhotoLink> allTourPhotoLinks,
-								final boolean isShowToursOnlyWithPhotos,
-								final HashMap<String, Camera> allTourCameras) {
+								final ArrayList<TourPhotoLink> visibleTourPhotoLinks,
+								final HashMap<String, Camera> allTourCameras,
+								final boolean isShowToursOnlyWithPhotos) {
+
+		loadToursFromDb(allPhotos);
 
 		TourPhotoLink currentTourPhotoLink = createTourPhotoLinks_10_GetFirstTour(allPhotos);
 
 		final HashMap<String, String> tourCameras = new HashMap<String, String>();
 
-		final int numberOfRealTours = _allDbTourPhotoLinks.size();
-		long nextDbTourStartTime = numberOfRealTours > 0 ? _allDbTourPhotoLinks.get(0).tourStartTime : Long.MIN_VALUE;
+		final int numberOfRealTours = _dbTourPhotoLinks.size();
+		long nextDbTourStartTime = numberOfRealTours > 0 ? _dbTourPhotoLinks.get(0).tourStartTime : Long.MIN_VALUE;
 
 		int tourIndex = 0;
 		long photoTime = 0;
@@ -242,7 +265,7 @@ public class PhotoManager {
 				createTourPhotoLinks_30_FinalizeCurrentTourPhotoLink(
 						currentTourPhotoLink,
 						tourCameras,
-						allTourPhotoLinks,
+						visibleTourPhotoLinks,
 						isShowToursOnlyWithPhotos);
 
 				currentTourPhotoLink = null;
@@ -264,7 +287,7 @@ public class PhotoManager {
 
 					for (; tourIndex < numberOfRealTours; tourIndex++) {
 
-						final TourPhotoLink dbTourPhotoLink = _allDbTourPhotoLinks.get(tourIndex);
+						final TourPhotoLink dbTourPhotoLink = _dbTourPhotoLinks.get(tourIndex);
 
 						final long dbTourStart = dbTourPhotoLink.tourStartTime;
 						final long dbTourEnd = dbTourPhotoLink.tourEndTime;
@@ -293,12 +316,12 @@ public class PhotoManager {
 
 							// tours without photos are displayed
 
-							createTourPhotoLinks_40_AddTour(dbTourPhotoLink, allTourPhotoLinks);
+							createTourPhotoLinks_40_AddTour(dbTourPhotoLink, visibleTourPhotoLinks);
 						}
 
 						// get start time for the next tour
 						if (tourIndex + 1 < numberOfRealTours) {
-							nextDbTourStartTime = _allDbTourPhotoLinks.get(tourIndex + 1).tourStartTime;
+							nextDbTourStartTime = _dbTourPhotoLinks.get(tourIndex + 1).tourStartTime;
 						} else {
 							nextDbTourStartTime = Long.MAX_VALUE;
 						}
@@ -332,17 +355,17 @@ public class PhotoManager {
 		createTourPhotoLinks_30_FinalizeCurrentTourPhotoLink(
 				currentTourPhotoLink,
 				tourCameras,
-				allTourPhotoLinks,
+				visibleTourPhotoLinks,
 				isShowToursOnlyWithPhotos);
 
-		createTourPhotoLinks_60_MergeHistoryTours(allTourPhotoLinks);
+		createTourPhotoLinks_60_MergeHistoryTours(visibleTourPhotoLinks);
 
 		/*
 		 * put tour GPS into photo
 		 */
 		final ArrayList<PhotoWrapper> updatedPhotos = new ArrayList<PhotoWrapper>();
 		final List<TourPhotoLink> tourPhotoLinksWithGps = new ArrayList<TourPhotoLink>();
-		for (final TourPhotoLink tourPhotoLink : allTourPhotoLinks) {
+		for (final TourPhotoLink tourPhotoLink : visibleTourPhotoLinks) {
 			if (tourPhotoLink.tourId != Long.MIN_VALUE) {
 				tourPhotoLinksWithGps.add(tourPhotoLink);
 			}
@@ -362,11 +385,11 @@ public class PhotoManager {
 
 		TourPhotoLink currentTourPhotoLink = null;
 
-		if (_allDbTourPhotoLinks.size() > 0) {
+		if (_dbTourPhotoLinks.size() > 0) {
 
 			// real tours are available
 
-			final TourPhotoLink firstTour = _allDbTourPhotoLinks.get(0);
+			final TourPhotoLink firstTour = _dbTourPhotoLinks.get(0);
 			final PhotoWrapper firstPhotoWrapper = allPhotos.get(0);
 
 			final DateTime firstPhotoTime = new DateTime(firstPhotoWrapper.adjustedTime);
@@ -534,9 +557,11 @@ public class PhotoManager {
 		allTourPhotoLinks.addAll(mergedLinks);
 	}
 
-	void createTourPhotoLinks_90_FilterNoTours(	final ArrayList<PhotoWrapper> allPhotos,
-												final ArrayList<TourPhotoLink> allTourPhotoLinks,
+	void createTourPhotoLinks_99_OneHistoryTour(final ArrayList<PhotoWrapper> allPhotos,
+												final ArrayList<TourPhotoLink> visibleTourPhotoLinks,
 												final HashMap<String, Camera> allTourCameras) {
+
+		loadToursFromDb(allPhotos);
 
 		final HashMap<String, String> tourCameras = new HashMap<String, String>();
 
@@ -566,58 +591,95 @@ public class PhotoManager {
 		// finalize history tour
 		historyTour.setTourEndTime(Long.MAX_VALUE);
 
-		allTourPhotoLinks.add(historyTour);
-	}
-
-	ArrayList<TourPhotoLink> getAllDbTourPhotoLinks() {
-		return _allDbTourPhotoLinks;
+		visibleTourPhotoLinks.add(historyTour);
 	}
 
 	/**
-	 * The loaded tours can be retrieved with {@link #getAllDbTourPhotoLinks()}
+	 * Loads tours from the database for all photos.
 	 * 
 	 * @param allPhotos
 	 * @return Returns <code>true</code> when tours are loaded from the database, <code>false</code>
 	 *         is returned when all photo time stamps are within the previously loaded tours.
 	 */
 
-	boolean loadToursFromDb(final ArrayList<PhotoWrapper> allPhotos) {
+	private void loadToursFromDb(final ArrayList<PhotoWrapper> allPhotos) {
 
 		/*
 		 * get date for 1st and last photo
 		 */
-		long photoStartDate = allPhotos.get(0).adjustedTime;
-		long photoEndDate = photoStartDate;
+		long firstPhotoTime = allPhotos.get(0).adjustedTime;
+		long lastPhotoTime = firstPhotoTime;
 
 		for (final PhotoWrapper photoWrapper : allPhotos) {
 
-			final long imageSortingTime = photoWrapper.imageExifTime;
+			final long imageTime = photoWrapper.adjustedTime;
 
-			if (imageSortingTime < photoStartDate) {
-				photoStartDate = imageSortingTime;
-			} else if (imageSortingTime > photoEndDate) {
-				photoEndDate = imageSortingTime;
+			if (imageTime < firstPhotoTime) {
+				firstPhotoTime = imageTime;
+			} else if (imageTime > lastPhotoTime) {
+				lastPhotoTime = imageTime;
 			}
+
+			photoWrapper.photo.resetTourGeoPosition();
 		}
 
 		// check if tours are already loaded
-		if (photoStartDate >= _sqlTourStart && photoEndDate <= _sqlTourEnd) {
+		if (firstPhotoTime >= _sqlTourStart && lastPhotoTime <= _sqlTourEnd) {
 
-			// photos are contained in the already loaded tours
-			return false;
+			// photos are contained in the already loaded tours, reset data for the 'old' links
+
+		} else {
+
+			// adjust by 5 days that time adjustments are covered
+			final long tourStartDate = firstPhotoTime - 5 * UI.DAY_IN_SECONDS * 1000;
+			final long tourEndDate = lastPhotoTime + 5 * UI.DAY_IN_SECONDS * 1000;
+
+			BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+				public void run() {
+					loadToursFromDb_Runnable(tourStartDate, tourEndDate);
+				}
+			});
 		}
 
-		// adjust by 5 days that time adjustments are covered
-		final long tourStartDate = photoStartDate - 5 * UI.DAY_IN_SECONDS * 1000;
-		final long tourEndDate = photoEndDate + 5 * UI.DAY_IN_SECONDS * 1000;
+		_dbTourPhotoLinks.clear();
+		boolean isFirstTour = true;
 
-		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-			public void run() {
-				loadToursFromDb_Runnable(tourStartDate, tourEndDate);
+		for (final TourPhotoLink tourPhotoLink : _allDbTourPhotoLinks) {
+
+			final long tourStart = tourPhotoLink.tourStartTime;
+			final long tourEnd = tourPhotoLink.tourEndTime;
+
+			if (isFirstTour) {
+
+				// check if this is the first tour
+
+				if (firstPhotoTime > tourEnd) {
+					continue;
+				} else {
+					// first tour is found
+					isFirstTour = false;
+				}
+
+			} else {
+
+				// subsequent tour
+
+				if (tourStart > lastPhotoTime) {
+					break;
+				}
 			}
-		});
 
-		return true;
+			tourPhotoLink.tourPhotos.clear();
+
+			tourPhotoLink.numberOfGPSPhotos = 0;
+			tourPhotoLink.numberOfNoGPSPhotos = 0;
+
+			tourPhotoLink.tourCameras = UI.EMPTY_STRING;
+
+			_dbTourPhotoLinks.add(tourPhotoLink);
+		}
+
+		return;
 	}
 
 	private void loadToursFromDb_Runnable(final long dbStartDate, final long dbEndDate) {
@@ -768,6 +830,256 @@ public class PhotoManager {
 		return camera;
 	}
 
+	/**
+	 * @param originalJpegImageFile
+	 * @param latitude
+	 * @param longitude
+	 * @return Returns
+	 * 
+	 *         <pre>
+	 * -1 when <b>SERIOUS</b> error occured
+	 *  0 when image file is read only
+	 *  1 when geo coordinates are written into the image file
+	 * </pre>
+	 */
+	private int setExifGPSTag_IntoImageFile(final File originalJpegImageFile,
+											final double latitude,
+											final double longitude,
+											final boolean[] isReadOnlyMessageDisplayed) {
+
+		final Shell activeShell = Display.getCurrent().getActiveShell();
+
+		if (originalJpegImageFile.canWrite() == false) {
+
+			if (isReadOnlyMessageDisplayed[0] == false) {
+
+				isReadOnlyMessageDisplayed[0] = true;
+
+				MessageDialog.openError(activeShell, //
+						Messages.Photos_AndTours_Dialog_ImageIsReadOnly_Title,
+						NLS.bind(
+								Messages.Photos_AndTours_Dialog_ImageIsReadOnly_Message,
+								originalJpegImageFile.getAbsolutePath()));
+			}
+
+			return 0;
+		}
+
+		File gpsTempFile = null;
+
+		final IPath originalFilePathName = new Path(originalJpegImageFile.getAbsolutePath());
+		final String originalFileNameWithoutExt = originalFilePathName.removeFileExtension().lastSegment();
+
+		final File originalFilePath = originalFilePathName.removeLastSegments(1).toFile();
+		File renamedOriginalFile = null;
+
+		try {
+
+			boolean returnState = false;
+
+			try {
+
+				gpsTempFile = File.createTempFile(//
+						originalFileNameWithoutExt + UI.SYMBOL_UNDERSCORE,
+						UI.SYMBOL_DOT + originalFilePathName.getFileExtension(),
+						originalFilePath);
+
+				setExifGPSTag_IntoImageFile_WithExifRewriter(originalJpegImageFile, gpsTempFile, latitude, longitude);
+
+				returnState = true;
+
+			} catch (final ImageReadException e) {
+				StatusUtil.log(e);
+			} catch (final ImageWriteException e) {
+				StatusUtil.log(e);
+			} catch (final IOException e) {
+				StatusUtil.log(e);
+			}
+
+			if (returnState == false) {
+				return -1;
+			}
+
+			/*
+			 * replace original file with gps file
+			 */
+
+			try {
+
+				/*
+				 * rename original file into a temp file
+				 */
+				final String nanoString = Long.toString(System.nanoTime());
+				final String nanoTime = nanoString.substring(nanoString.length() - 4);
+
+				renamedOriginalFile = File.createTempFile(//
+						originalFileNameWithoutExt + TEMP_FILE_PREFIX_ORIG + nanoTime,
+						UI.SYMBOL_DOT + originalFilePathName.getFileExtension(),
+						originalFilePath);
+
+				final String renamedOriginalFileName = renamedOriginalFile.getAbsolutePath();
+
+				Util.deleteTempFile(renamedOriginalFile);
+
+				boolean isRenamed = originalJpegImageFile.renameTo(new File(renamedOriginalFileName));
+
+				if (isRenamed == false) {
+
+					// original file cannot be renamed
+					MessageDialog.openError(activeShell, //
+							Messages.Photos_AndTours_ErrorDialog_Title,
+							NLS.bind(
+									Messages.Photos_AndTours_ErrorDialog_OriginalImageFileCannotBeRenamed,
+									originalFilePathName.toOSString(),
+									renamedOriginalFileName));
+					return -1;
+				}
+
+				/*
+				 * rename gps temp file into original file
+				 */
+				isRenamed = gpsTempFile.renameTo(originalFilePathName.toFile());
+
+				if (isRenamed == false) {
+
+					// gps file cannot be renamed to original file
+					MessageDialog.openError(activeShell, //
+							Messages.Photos_AndTours_ErrorDialog_Title,
+							NLS.bind(
+									Messages.Photos_AndTours_ErrorDialog_SeriousProblemRenamingOriginalImageFile,
+									originalFilePathName.toOSString(),
+									renamedOriginalFile.getAbsolutePath()));
+
+					/*
+					 * prevent of deleting renamed original file because the original file is
+					 * renamed into this
+					 */
+					renamedOriginalFile = null;
+
+					return -1;
+				}
+
+				if (renamedOriginalFile.delete() == false) {
+
+					MessageDialog.openError(activeShell, //
+							Messages.Photos_AndTours_ErrorDialog_Title,
+							NLS.bind(
+									Messages.Photos_AndTours_ErrorDialog_RenamedOriginalFileCannotBeDeleted,
+									originalFilePathName.toOSString(),
+									renamedOriginalFile.getAbsolutePath()));
+				}
+
+			} catch (final IOException e) {
+				StatusUtil.log(e);
+			}
+
+		} finally {
+
+			Util.deleteTempFile(gpsTempFile);
+		}
+
+		return 1;
+	}
+
+	/**
+	 * This example illustrates how to set the GPS values in JPEG EXIF metadata.
+	 * 
+	 * @param jpegImageFile
+	 *            A source image file.
+	 * @param destinationFile
+	 *            The output file.
+	 * @param latitude
+	 * @param longitude
+	 * @throws IOException
+	 * @throws ImageReadException
+	 * @throws ImageWriteException
+	 */
+	private void setExifGPSTag_IntoImageFile_WithExifRewriter(	final File jpegImageFile,
+																final File destinationFile,
+																final double latitude,
+																final double longitude) throws IOException,
+			ImageReadException, ImageWriteException {
+
+		OutputStream os = null;
+
+		try {
+
+			TiffOutputSet outputSet = null;
+
+			// note that metadata might be null if no metadata is found.
+			final IImageMetadata metadata = Imaging.getMetadata(jpegImageFile);
+			final JpegImageMetadata jpegMetadata = (JpegImageMetadata) metadata;
+
+			if (null != jpegMetadata) {
+
+				// note that exif might be null if no Exif metadata is found.
+				final TiffImageMetadata exif = jpegMetadata.getExif();
+
+				if (null != exif) {
+					// TiffImageMetadata class is immutable (read-only).
+					// TiffOutputSet class represents the Exif data to write.
+					//
+					// Usually, we want to update existing Exif metadata by
+					// changing
+					// the values of a few fields, or adding a field.
+					// In these cases, it is easiest to use getOutputSet() to
+					// start with a "copy" of the fields read from the image.
+					outputSet = exif.getOutputSet();
+				}
+			}
+
+			// if file does not contain any exif metadata, we create an empty
+			// set of exif metadata. Otherwise, we keep all of the other
+			// existing tags.
+			if (null == outputSet) {
+				outputSet = new TiffOutputSet();
+			}
+
+			{
+				// Example of how to add/update GPS info to output set.
+
+				// New York City
+//				final double longitude = -74.0; // 74 degrees W (in Degrees East)
+//				final double latitude = 40 + 43 / 60.0; // 40 degrees N (in Degrees
+				// North)
+
+				outputSet.setGPSInDegrees(longitude, latitude);
+			}
+
+			os = new FileOutputStream(destinationFile);
+			os = new BufferedOutputStream(os);
+
+			/**
+			 * the lossless method causes an exception after 3 times writing the image file,
+			 * therefore the lossy method is used
+			 * 
+			 * <pre>
+			 * 
+			 * org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter$ExifOverflowException: APP1 Segment is too long: 65564
+			 * 	at org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter.writeSegmentsReplacingExif(ExifRewriter.java:552)
+			 * 	at org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter.updateExifMetadataLossless(ExifRewriter.java:393)
+			 * 	at org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter.updateExifMetadataLossless(ExifRewriter.java:293)
+			 * 	at net.tourbook.photo.PhotosAndToursView.setExifGPSTag_IntoPhoto(PhotosAndToursView.java:2309)
+			 * 	at net.tourbook.photo.PhotosAndToursView.setExifGPSTag(PhotosAndToursView.java:2141)
+			 * 
+			 * </pre>
+			 */
+//			new ExifRewriter().updateExifMetadataLossless(jpegImageFile, os, outputSet);
+//			new ExifRewriter().updateExifMetadataLossy(jpegImageFile, os, outputSet);
+
+			os.close();
+			os = null;
+		} finally {
+			if (os != null) {
+				try {
+					os.close();
+				} catch (final IOException e) {
+
+				}
+			}
+		}
+	}
+
 	void setTourGpsIntoPhotos(	final ArrayList<PhotoWrapper> updatedPhotos,
 								final List<TourPhotoLink> tourPhotoLinksWithGps) {
 
@@ -825,20 +1137,20 @@ public class PhotoManager {
 		final long tourStart = tourData.getTourStartTime().getMillis() / 1000;
 		long timeSliceEnd = tourStart + (long) (timeSerie[1] / 2.0);
 
-		/*
-		 * get hashset for existing photos
-		 */
-		final Set<TourPhoto> tourPhotosSet = tourData.getTourPhotos();
-		final HashMap<String, TourPhoto> tourPhotosMap = new HashMap<String, TourPhoto>();
-		for (final TourPhoto tourPhoto : tourPhotosSet) {
-			tourPhotosMap.put(tourPhoto.getImageFilePathName(), tourPhoto);
-		}
-
-//		if (_isAddPhotosToExistingTourPhotos == false) {
-//
-		// previous photos will be replaced
-		tourPhotosSet.clear();
+//		/*
+//		 * get hashset for existing photos
+//		 */
+//		final Set<TourPhoto> tourPhotosSet = tourData.getTourPhotos();
+//		final HashMap<String, TourPhoto> tourPhotosMap = new HashMap<String, TourPhoto>();
+//		for (final TourPhoto tourPhoto : tourPhotosSet) {
+//			tourPhotosMap.put(tourPhoto.getImageFilePathName(), tourPhoto);
 //		}
+//
+////		if (_isAddPhotosToExistingTourPhotos == false) {
+////
+//		// previous photos will be replaced
+//		tourPhotosSet.clear();
+////		}
 
 		int timeIndex = 0;
 		int photoIndex = 0;
@@ -872,7 +1184,7 @@ public class PhotoManager {
 
 					setTourGPSIntoPhotos_20(
 							tourData,
-							tourPhotosSet,
+//							tourPhotosSet,
 							updatedPhotos,
 							photoWrapper,
 							tourLatitude,
@@ -920,7 +1232,7 @@ public class PhotoManager {
 
 					setTourGPSIntoPhotos_20(
 							tourData,
-							tourPhotosSet,
+//							tourPhotosSet,
 							updatedPhotos,
 							photoWrapper,
 							tourLatitude,
@@ -946,14 +1258,13 @@ public class PhotoManager {
 	}
 
 	private void setTourGPSIntoPhotos_20(	final TourData tourData,
-											final Set<TourPhoto> tourPhotosSet,
+//											final Set<TourPhoto> tourPhotosSet,
 											final ArrayList<PhotoWrapper> updatedPhotos,
 											final PhotoWrapper photoWrapper,
 											final double tourLatitude,
 											final double tourLongitude) {
 
-		final TourPhoto tourPhoto = new TourPhoto(tourData, photoWrapper.imageFile, photoWrapper.imageExifTime);
-
+//		final TourPhoto tourPhoto = new TourPhoto(tourData, photoWrapper.imageFile, photoWrapper.imageExifTime);
 
 		final Photo photo = photoWrapper.photo;
 
@@ -963,13 +1274,13 @@ public class PhotoManager {
 
 			// don't overwrite geo from EXIF, use GPS geo from photo wrapper
 
-			tourPhoto.setGeoLocation(photo.getLatitude(), photo.getLongitude());
+//			tourPhoto.setGeoLocation(photo.getLatitude(), photo.getLongitude());
 
 		} else {
 
 			// set gps from tour into the photo
 
-			tourPhoto.setGeoLocation(tourLatitude, tourLongitude);
+//			tourPhoto.setGeoLocation(tourLatitude, tourLongitude);
 
 			// update photo+photowrapper
 //			photoWrapper.isGpsSetFromTour = true;
@@ -978,7 +1289,7 @@ public class PhotoManager {
 			updatedPhotos.add(photoWrapper);
 		}
 
-		tourPhotosSet.add(tourPhoto);
+//		tourPhotosSet.add(tourPhoto);
 	}
 
 }

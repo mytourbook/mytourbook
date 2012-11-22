@@ -843,6 +843,14 @@ public class Photo {
 		return _isLoadingError;
 	}
 
+	public void resetTourGeoPosition() {
+
+		_tourLatitude = Double.MIN_VALUE;
+		_tourLongitude = Double.MIN_VALUE;
+
+		_photoWrapper.isPhotoWithGps = false;
+	}
+
 	public void resetWorldPosition() {
 		_worldPosition.clear();
 	}

@@ -32,7 +32,7 @@ public class ActionShowLegendInMap extends Action {
 
 	@Override
 	public void run() {
-		_mapView.actionSetShowLegendInMap();
+		_mapView.actionShowLegend();
 	}
 
 }

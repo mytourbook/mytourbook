@@ -30,8 +30,15 @@ public class Messages extends NLS {
 
 	public static String		Image__PulseZones_Disabled;
 
+	public static String	Image_Action_Map_SyncPhotoWithMap;
+
+	public static String	Image_Action_Map_SyncPhotoWithMap_Disabled;
+
 	public static String		Image_Action_POI;
 	public static String		Image_Action_POI_Disabled;
+	public static String	Image_Action_ShowAllPhotosInMap;
+
+	public static String		Image_Action_ShowPhotosInMap;
 	public static String		Image_Action_ShowSliderInMap;
 	public static String		Image_Action_ShowStartEndInMap;
 	public static String		Image_Action_TourWayPoint;
@@ -106,8 +113,14 @@ public class Messages extends NLS {
 	public static String		Map_Action_POI;
 	public static String		Map_Action_POI_Tooltip;
 	public static String		Map_Action_SetDefaultMapProviders;
+	public static String	Map_Action_ShowAllPhotos_Tooltip;
+
+	public static String	Map_Action_ShowPhotos_Tooltip;
+
 	public static String		Map_Action_ShowTourInfoInMap;
 	public static String		Map_Action_ShowWayPoints;
+
+	public static String	Map_Action_SyncPhotoWithMap_Tooltip;
 	public static String		Map_Action_ToggleMarker;
 
 	public static String		Map_Properties_ShowTileBorder;

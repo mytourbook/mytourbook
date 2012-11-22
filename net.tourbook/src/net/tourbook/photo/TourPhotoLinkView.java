@@ -15,11 +15,6 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,7 +30,6 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
-import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -44,24 +38,14 @@ import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.action.ActionModifyColumns;
 
-import org.apache.commons.imaging.ImageReadException;
-import org.apache.commons.imaging.ImageWriteException;
-import org.apache.commons.imaging.Imaging;
-import org.apache.commons.imaging.common.IImageMetadata;
-import org.apache.commons.imaging.formats.jpeg.JpegImageMetadata;
-import org.apache.commons.imaging.formats.tiff.TiffImageMetadata;
-import org.apache.commons.imaging.formats.tiff.write.TiffOutputSet;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.State;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
@@ -81,7 +65,6 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.custom.CLabel;
@@ -117,37 +100,35 @@ import org.joda.time.format.PeriodFormatterBuilder;
 
 public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourViewer {
 
-	public static final String						ID									= "net.tourbook.photo.PhotosAndToursView.ID";	//$NON-NLS-1$
+	public static final String						ID								= "net.tourbook.photo.PhotosAndToursView.ID";	//$NON-NLS-1$
 
-	private static final String						STATE_FILTER_NO_TOURS				= "STATE_FILTER_NO_TOURS";						//$NON-NLS-1$
-	private static final String						STATE_FILTER_PHOTOS					= "STATE_FILTER_PHOTOS";						//$NON-NLS-1$
-	private static final String						STATE_SELECTED_CAMERA_NAME			= "STATE_SELECTED_CAMERA_NAME";				//$NON-NLS-1$
-	private static final String						STATE_TIME_ADJUSTMENT_TOURS			= "STATE_TIME_ADJUSTMENT_TOURS";				//$NON-NLS-1$
+	private static final String						STATE_FILTER_NO_TOURS			= "STATE_FILTER_NO_TOURS";						//$NON-NLS-1$
+	private static final String						STATE_FILTER_PHOTOS				= "STATE_FILTER_PHOTOS";						//$NON-NLS-1$
+	private static final String						STATE_SELECTED_CAMERA_NAME		= "STATE_SELECTED_CAMERA_NAME";				//$NON-NLS-1$
+	private static final String						STATE_TIME_ADJUSTMENT_TOURS		= "STATE_TIME_ADJUSTMENT_TOURS";				//$NON-NLS-1$
 
-	public static final String						IMAGE_PIC_DIR_VIEW					= "IMAGE_PIC_DIR_VIEW";						//$NON-NLS-1$
-	public static final String						IMAGE_PHOTO_PHOTO					= "IMAGE_PHOTO_PHOTO";							//$NON-NLS-1$
+	public static final String						IMAGE_PIC_DIR_VIEW				= "IMAGE_PIC_DIR_VIEW";						//$NON-NLS-1$
+	public static final String						IMAGE_PHOTO_PHOTO				= "IMAGE_PHOTO_PHOTO";							//$NON-NLS-1$
 
-	private static final String						TEMP_FILE_PREFIX_ORIG				= "_orig_";									//$NON-NLS-1$
+	private final IPreferenceStore					_prefStore						= TourbookPlugin
+																							.getDefault()
+																							.getPreferenceStore();
 
-	private final IPreferenceStore					_prefStore							= TourbookPlugin
-																								.getDefault()
-																								.getPreferenceStore();
+	private final IDialogSettings					_state							= TourbookPlugin
+																							.getDefault()
+																							.getDialogSettingsSection(
+																									ID);
 
-	private final IDialogSettings					_state								= TourbookPlugin
-																								.getDefault()
-																								.getDialogSettingsSection(
-																										ID);
+	private static final PhotoManager				_photoMgr						= PhotoManager.getInstance();
 
-	private static final PhotoManager				_photoMgr							= PhotoManager.getInstance();
+	private ArrayList<TourPhotoLink>				_visibleTourPhotoLinks			= new ArrayList<TourPhotoLink>();
 
-	private ArrayList<TourPhotoLink>				_allTourPhotoLinks					= new ArrayList<TourPhotoLink>();
-
-	private ArrayList<PhotoWrapper>					_allPhotos							= new ArrayList<PhotoWrapper>();
+	private ArrayList<PhotoWrapper>					_allPhotos						= new ArrayList<PhotoWrapper>();
 
 	/**
 	 * Contains all cameras which are used in all displayed tours.
 	 */
-	private HashMap<String, Camera>					_allTourCameras						= new HashMap<String, Camera>();
+	private HashMap<String, Camera>					_allTourCameras					= new HashMap<String, Camera>();
 
 	/**
 	 * All cameras sorted by camera name
@@ -157,12 +138,12 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 	/**
 	 * Tour photo link which is currently selected in the tour viewer.
 	 */
-	private ArrayList<TourPhotoLink>				_selectedLinks						= new ArrayList<TourPhotoLink>();
+	private ArrayList<TourPhotoLink>				_selectedLinks					= new ArrayList<TourPhotoLink>();
 
 	/**
 	 * Contains only tour photo links with real tours and which contain geo positions.
 	 */
-	private List<TourPhotoLink>						_selectedTourPhotoLinksWithGps		= new ArrayList<TourPhotoLink>();
+	private List<TourPhotoLink>						_selectedTourPhotoLinksWithGps	= new ArrayList<TourPhotoLink>();
 
 	private TourPhotoLinkSelection					_tourPhotoLinkSelection;
 
@@ -174,33 +155,25 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 	private ColumnManager							_columnManager;
 
 	private ActionFilterPhotos						_actionFilterPhotos;
-	private ActionFilterNoTours						_actionFilterNoTours;
+	private ActionFilterOneHistoryTour				_actionFilterOneHistory;
 	private ActionModifyColumns						_actionModifyColumns;
 //	private ActionResetTimeAdjustment				_actionResetTimeAdjustment;
 	private ActionSetTourGPSIntoPhotos				_actionSetTourGPSIntoPhotos;
 
-//	private Connection								_sqlConnection;
-//	private PreparedStatement						_sqlStatement;
+	private final PeriodFormatter					_durationFormatter				= new PeriodFormatterBuilder()
+																							.appendYears()
+																							.appendSuffix("y ", "y ") //$NON-NLS-1$ //$NON-NLS-2$
+																							.appendMonths()
+																							.appendSuffix("m ", "m ") //$NON-NLS-1$ //$NON-NLS-2$
+																							.appendDays()
+																							.appendSuffix("d ", "d ") //$NON-NLS-1$ //$NON-NLS-2$
+																							.appendHours()
+																							.appendSuffix("h ", "h ") //$NON-NLS-1$ //$NON-NLS-2$
+																							.toFormatter();
 
-	private final PeriodFormatter					_durationFormatter					= new PeriodFormatterBuilder()
-																								.appendYears()
-																								.appendSuffix(
-																										"y ", "y ") //$NON-NLS-1$ //$NON-NLS-2$
-																								.appendMonths()
-																								.appendSuffix(
-																										"m ", "m ") //$NON-NLS-1$ //$NON-NLS-2$
-																								.appendDays()
-																								.appendSuffix(
-																										"d ", "d ") //$NON-NLS-1$ //$NON-NLS-2$
-																								.appendHours()
-																								.appendSuffix(
-																										"h ", "h ") //$NON-NLS-1$ //$NON-NLS-2$
-																								.toFormatter();
-
-	private final DateTimeFormatter					_dateFormatter						= DateTimeFormat.shortDate();
-	private final DateTimeFormatter					_timeFormatter						= DateTimeFormat.mediumTime();
-	private final NumberFormat						_nf_1_1								= NumberFormat
-																								.getNumberInstance();
+	private final DateTimeFormatter					_dateFormatter					= DateTimeFormat.shortDate();
+	private final DateTimeFormatter					_timeFormatter					= DateTimeFormat.mediumTime();
+	private final NumberFormat						_nf_1_1							= NumberFormat.getNumberInstance();
 	{
 		_nf_1_1.setMinimumFractionDigits(1);
 		_nf_1_1.setMaximumFractionDigits(1);
@@ -211,11 +184,8 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 	/**
 	 * When <code>true</code>, only tours with photos are displayed.
 	 */
-	private boolean									_isShowToursOnlyWithPhotos			= true;
-	private boolean									_isFilterNoTours;
-
-	private boolean									_isOverwritePhotoGPS				= true;
-	private boolean									_isAddPhotosToExistingTourPhotos	= false;
+	private boolean									_isShowToursOnlyWithPhotos		= true;
+	private boolean									_isFilterOneHistoryTour;
 
 	private ICommandService							_commandService;
 
@@ -292,7 +262,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 		public void dispose() {}
 
 		public Object[] getElements(final Object inputElement) {
-			return _allTourPhotoLinks.toArray();
+			return _visibleTourPhotoLinks.toArray();
 		}
 
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
@@ -302,9 +272,9 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 		super();
 	}
 
-	void actionFilterNoTours() {
+	void actionFilterOneHistoryTour() {
 
-		_isFilterNoTours = _actionFilterNoTours.isChecked();
+		_isFilterOneHistoryTour = _actionFilterOneHistory.isChecked();
 
 		updateUI(_selectedLinks, false, false);
 
@@ -453,7 +423,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 	private void clearView() {
 
-		_allTourPhotoLinks.clear();
+		_visibleTourPhotoLinks.clear();
 		_allPhotos.clear();
 		_selectedLinks.clear();
 		_selectedTourPhotoLinksWithGps.clear();
@@ -466,7 +436,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 	private void createActions() {
 
-		_actionFilterNoTours = new ActionFilterNoTours(this);
+		_actionFilterOneHistory = new ActionFilterOneHistoryTour(this);
 		_actionFilterPhotos = new ActionFilterPhotos(this);
 		_actionModifyColumns = new ActionModifyColumns(this);
 //		_actionResetTimeAdjustment = new ActionResetTimeAdjustment();
@@ -1088,7 +1058,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 	private void enableControls() {
 
 		final boolean isPhotoAvailable = _allPhotos.size() > 0;
-		final boolean isPhotoFilter = _actionFilterNoTours.isChecked() == false;
+		final boolean isPhotoFilter = _actionFilterOneHistory.isChecked() == false;
 		final boolean isTourWithGPS = _selectedTourPhotoLinksWithGps.size() > 0;
 
 		_comboCamera.setEnabled(isPhotoAvailable);
@@ -1096,7 +1066,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 		_spinnerMinutes.setEnabled(isPhotoAvailable);
 		_spinnerSeconds.setEnabled(isPhotoAvailable);
 
-		_actionFilterNoTours.setEnabled(isPhotoAvailable);
+		_actionFilterOneHistory.setEnabled(isPhotoAvailable);
 		_actionFilterPhotos.setEnabled(isPhotoAvailable && isPhotoFilter);
 
 //		_actionResetTimeAdjustment.setEnabled(isTourWithGPS);
@@ -1131,7 +1101,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
 		tbm.add(_actionFilterPhotos);
-		tbm.add(_actionFilterNoTours);
+		tbm.add(_actionFilterOneHistory);
 		tbm.add(new Separator());
 	}
 
@@ -1355,10 +1325,10 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 	private void restoreState() {
 
 		// photo filter
-		_isFilterNoTours = Util.getStateBoolean(_state, STATE_FILTER_NO_TOURS, true);
+		_isFilterOneHistoryTour = Util.getStateBoolean(_state, STATE_FILTER_NO_TOURS, true);
 		_isShowToursOnlyWithPhotos = Util.getStateBoolean(_state, STATE_FILTER_PHOTOS, true);
 
-		_actionFilterNoTours.setChecked(_isFilterNoTours);
+		_actionFilterOneHistory.setChecked(_isFilterOneHistoryTour);
 		_actionFilterPhotos.setChecked(_isShowToursOnlyWithPhotos);
 
 		/*
@@ -1400,7 +1370,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 		// photo filter
 		_state.put(STATE_FILTER_PHOTOS, _actionFilterPhotos.isChecked());
-		_state.put(STATE_FILTER_NO_TOURS, _actionFilterNoTours.isChecked());
+		_state.put(STATE_FILTER_NO_TOURS, _actionFilterOneHistory.isChecked());
 
 		_columnManager.saveState(_state);
 	}
@@ -1419,7 +1389,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 		if (prevTourPhotoLink == null) {
 
 			// select first tour
-			selectedTour = _allTourPhotoLinks.get(0);
+			selectedTour = _visibleTourPhotoLinks.get(0);
 
 		} else if (prevTourPhotoLink.isHistoryTour == false) {
 
@@ -1453,7 +1423,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 				final long tourPhotoTime = tourPhotos.get(0).adjustedTime;
 
-				for (final TourPhotoLink link : _allTourPhotoLinks) {
+				for (final TourPhotoLink link : _visibleTourPhotoLinks) {
 
 					final long linkStartTime = link.isHistoryTour //
 							? link.historyStartTime
@@ -1482,7 +1452,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 				final long requestedTime = requestedStartTime + ((requestedEndTime - requestedStartTime) / 2);
 
-				for (final TourPhotoLink link : _allTourPhotoLinks) {
+				for (final TourPhotoLink link : _visibleTourPhotoLinks) {
 
 					final long linkStartTime = link.isHistoryTour ? link.historyStartTime : link.tourStartTime;
 					final long linkEndTime = link.isHistoryTour //
@@ -1511,7 +1481,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 		if (newSelection == null || newSelection.isEmpty()) {
 
 			// previous selections failed, select first tour
-			final TourPhotoLink firstTour = _allTourPhotoLinks.get(0);
+			final TourPhotoLink firstTour = _visibleTourPhotoLinks.get(0);
 
 			_tourViewer.setSelection(new StructuredSelection(firstTour), true);
 		}
@@ -1528,254 +1498,6 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 //		} else {
 //			cell.setBackground(JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_BG_HISTORY_TOUR));
 //		}
-	}
-
-	/**
-	 * @param originalJpegImageFile
-	 * @param latitude
-	 * @param longitude
-	 * @return Returns
-	 * 
-	 *         <pre>
-	 * -1 when <b>SERIOUS</b> error occured
-	 *  0 when image file is read only
-	 *  1 when geo coordinates are written into the image file
-	 * </pre>
-	 */
-	private int setExifGPSTag_IntoImageFile(final File originalJpegImageFile,
-											final double latitude,
-											final double longitude,
-											final boolean[] isReadOnlyMessageDisplayed) {
-
-		if (originalJpegImageFile.canWrite() == false) {
-
-			if (isReadOnlyMessageDisplayed[0] == false) {
-
-				isReadOnlyMessageDisplayed[0] = true;
-
-				MessageDialog.openError(_pageBook.getShell(), //
-						Messages.Photos_AndTours_Dialog_ImageIsReadOnly_Title,
-						NLS.bind(
-								Messages.Photos_AndTours_Dialog_ImageIsReadOnly_Message,
-								originalJpegImageFile.getAbsolutePath()));
-			}
-
-			return 0;
-		}
-
-		File gpsTempFile = null;
-
-		final IPath originalFilePathName = new Path(originalJpegImageFile.getAbsolutePath());
-		final String originalFileNameWithoutExt = originalFilePathName.removeFileExtension().lastSegment();
-
-		final File originalFilePath = originalFilePathName.removeLastSegments(1).toFile();
-		File renamedOriginalFile = null;
-
-		try {
-
-			boolean returnState = false;
-
-			try {
-
-				gpsTempFile = File.createTempFile(//
-						originalFileNameWithoutExt + UI.SYMBOL_UNDERSCORE,
-						UI.SYMBOL_DOT + originalFilePathName.getFileExtension(),
-						originalFilePath);
-
-				setExifGPSTag_IntoImageFile_WithExifRewriter(originalJpegImageFile, gpsTempFile, latitude, longitude);
-
-				returnState = true;
-
-			} catch (final ImageReadException e) {
-				StatusUtil.log(e);
-			} catch (final ImageWriteException e) {
-				StatusUtil.log(e);
-			} catch (final IOException e) {
-				StatusUtil.log(e);
-			}
-
-			if (returnState == false) {
-				return -1;
-			}
-
-			/*
-			 * replace original file with gps file
-			 */
-
-			try {
-
-				/*
-				 * rename original file into a temp file
-				 */
-				final String nanoString = Long.toString(System.nanoTime());
-				final String nanoTime = nanoString.substring(nanoString.length() - 4);
-
-				renamedOriginalFile = File.createTempFile(//
-						originalFileNameWithoutExt + TEMP_FILE_PREFIX_ORIG + nanoTime,
-						UI.SYMBOL_DOT + originalFilePathName.getFileExtension(),
-						originalFilePath);
-
-				final String renamedOriginalFileName = renamedOriginalFile.getAbsolutePath();
-
-				Util.deleteTempFile(renamedOriginalFile);
-
-				boolean isRenamed = originalJpegImageFile.renameTo(new File(renamedOriginalFileName));
-
-				if (isRenamed == false) {
-
-					// original file cannot be renamed
-					MessageDialog.openError(_pageBook.getShell(), //
-							Messages.Photos_AndTours_ErrorDialog_Title,
-							NLS.bind(
-									Messages.Photos_AndTours_ErrorDialog_OriginalImageFileCannotBeRenamed,
-									originalFilePathName.toOSString(),
-									renamedOriginalFileName));
-					return -1;
-				}
-
-				/*
-				 * rename gps temp file into original file
-				 */
-				isRenamed = gpsTempFile.renameTo(originalFilePathName.toFile());
-
-				if (isRenamed == false) {
-
-					// gps file cannot be renamed to original file
-					MessageDialog.openError(_pageBook.getShell(), //
-							Messages.Photos_AndTours_ErrorDialog_Title,
-							NLS.bind(
-									Messages.Photos_AndTours_ErrorDialog_SeriousProblemRenamingOriginalImageFile,
-									originalFilePathName.toOSString(),
-									renamedOriginalFile.getAbsolutePath()));
-
-					/*
-					 * prevent of deleting renamed original file because the original file is
-					 * renamed into this
-					 */
-					renamedOriginalFile = null;
-
-					return -1;
-				}
-
-				if (renamedOriginalFile.delete() == false) {
-
-					MessageDialog.openError(_pageBook.getShell(), //
-							Messages.Photos_AndTours_ErrorDialog_Title,
-							NLS.bind(
-									Messages.Photos_AndTours_ErrorDialog_RenamedOriginalFileCannotBeDeleted,
-									originalFilePathName.toOSString(),
-									renamedOriginalFile.getAbsolutePath()));
-				}
-
-			} catch (final IOException e) {
-				StatusUtil.log(e);
-			}
-
-		} finally {
-
-			Util.deleteTempFile(gpsTempFile);
-		}
-
-		return 1;
-	}
-
-	/**
-	 * This example illustrates how to set the GPS values in JPEG EXIF metadata.
-	 * 
-	 * @param jpegImageFile
-	 *            A source image file.
-	 * @param destinationFile
-	 *            The output file.
-	 * @param latitude
-	 * @param longitude
-	 * @throws IOException
-	 * @throws ImageReadException
-	 * @throws ImageWriteException
-	 */
-	private void setExifGPSTag_IntoImageFile_WithExifRewriter(	final File jpegImageFile,
-																final File destinationFile,
-																final double latitude,
-																final double longitude) throws IOException,
-			ImageReadException, ImageWriteException {
-
-		OutputStream os = null;
-
-		try {
-
-			TiffOutputSet outputSet = null;
-
-			// note that metadata might be null if no metadata is found.
-			final IImageMetadata metadata = Imaging.getMetadata(jpegImageFile);
-			final JpegImageMetadata jpegMetadata = (JpegImageMetadata) metadata;
-
-			if (null != jpegMetadata) {
-
-				// note that exif might be null if no Exif metadata is found.
-				final TiffImageMetadata exif = jpegMetadata.getExif();
-
-				if (null != exif) {
-					// TiffImageMetadata class is immutable (read-only).
-					// TiffOutputSet class represents the Exif data to write.
-					//
-					// Usually, we want to update existing Exif metadata by
-					// changing
-					// the values of a few fields, or adding a field.
-					// In these cases, it is easiest to use getOutputSet() to
-					// start with a "copy" of the fields read from the image.
-					outputSet = exif.getOutputSet();
-				}
-			}
-
-			// if file does not contain any exif metadata, we create an empty
-			// set of exif metadata. Otherwise, we keep all of the other
-			// existing tags.
-			if (null == outputSet) {
-				outputSet = new TiffOutputSet();
-			}
-
-			{
-				// Example of how to add/update GPS info to output set.
-
-				// New York City
-//				final double longitude = -74.0; // 74 degrees W (in Degrees East)
-//				final double latitude = 40 + 43 / 60.0; // 40 degrees N (in Degrees
-				// North)
-
-				outputSet.setGPSInDegrees(longitude, latitude);
-			}
-
-			os = new FileOutputStream(destinationFile);
-			os = new BufferedOutputStream(os);
-
-			/**
-			 * the lossless method causes an exception after 3 times writing the image file,
-			 * therefore the lossy method is used
-			 * 
-			 * <pre>
-			 * 
-			 * org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter$ExifOverflowException: APP1 Segment is too long: 65564
-			 * 	at org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter.writeSegmentsReplacingExif(ExifRewriter.java:552)
-			 * 	at org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter.updateExifMetadataLossless(ExifRewriter.java:393)
-			 * 	at org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter.updateExifMetadataLossless(ExifRewriter.java:293)
-			 * 	at net.tourbook.photo.PhotosAndToursView.setExifGPSTag_IntoPhoto(PhotosAndToursView.java:2309)
-			 * 	at net.tourbook.photo.PhotosAndToursView.setExifGPSTag(PhotosAndToursView.java:2141)
-			 * 
-			 * </pre>
-			 */
-//			new ExifRewriter().updateExifMetadataLossless(jpegImageFile, os, outputSet);
-//			new ExifRewriter().updateExifMetadataLossy(jpegImageFile, os, outputSet);
-
-			os.close();
-			os = null;
-		} finally {
-			if (os != null) {
-				try {
-					os.close();
-				} catch (final IOException e) {
-
-				}
-			}
-		}
 	}
 
 	@Override
@@ -1851,38 +1573,15 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 		// this must be called BEFORE start/end date are set
 		setPhotoTimeAdjustment();
 
-		/*
-		 * get tours from db when start/end has changed
-		 */
-		boolean isLoaded = false;
-
-		if (isLoadToursFromDb) {
-			isLoaded = _photoMgr.loadToursFromDb(_allPhotos);
-		}
-
-		if (isLoaded == false) {
-
-			// reset data for the 'old' links
-
-			for (final TourPhotoLink tourPhotoLink : _photoMgr.getAllDbTourPhotoLinks()) {
-
-				tourPhotoLink.tourPhotos.clear();
-
-				tourPhotoLink.numberOfGPSPhotos = 0;
-				tourPhotoLink.numberOfNoGPSPhotos = 0;
-
-				tourPhotoLink.tourCameras = UI.EMPTY_STRING;
-			}
-		}
-
-		_allTourPhotoLinks.clear();
+		_visibleTourPhotoLinks.clear();
 		_selectedLinks.clear();
 		_selectedTourPhotoLinksWithGps.clear();
 
-		if (_isFilterNoTours) {
-			_photoMgr.createTourPhotoLinks_90_FilterNoTours(_allPhotos, _allTourPhotoLinks, _allTourCameras);
+		if (_isFilterOneHistoryTour) {
+			_photoMgr.createTourPhotoLinks_99_OneHistoryTour(_allPhotos, _visibleTourPhotoLinks, _allTourCameras);
 		} else {
-			_photoMgr.createTourPhotoLinks(_allPhotos, _allTourPhotoLinks, _isShowToursOnlyWithPhotos, _allTourCameras);
+			_photoMgr.createTourPhotoLinks(_allPhotos, _visibleTourPhotoLinks, _allTourCameras, //
+					_isShowToursOnlyWithPhotos);
 		}
 
 		updateUI_Cameras(null);
@@ -1893,13 +1592,13 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 		_pageBook.showPage(_pageViewer);
 
-		if (_allTourPhotoLinks.size() == 0) {
+		if (_visibleTourPhotoLinks.size() == 0) {
 			return;
 		}
 
 		if (isSelectAll) {
 
-			_tourViewer.setSelection(new StructuredSelection(_allTourPhotoLinks), false);
+			_tourViewer.setSelection(new StructuredSelection(_visibleTourPhotoLinks), false);
 
 		} else {
 

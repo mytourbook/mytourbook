@@ -68,8 +68,8 @@ import de.byteholder.geoclipse.mapprovider.MP;
 public class TourPainter extends MapPainter {
 
 	private static final int				MARKER_MARGIN		= 2;
-
 	private static final int				MARKER_POLE			= 16;
+
 	private final static IPreferenceStore	_prefStore			= TourbookPlugin.getDefault().getPreferenceStore();
 
 	private static IPropertyChangeListener	_prefChangeListener;
@@ -119,10 +119,20 @@ public class TourPainter extends MapPainter {
 
 	private class LoadCallbackImage implements ILoadCallBack {
 
+		private Map	__map;
+
+		public LoadCallbackImage(final Map map) {
+			__map = map;
+		}
+
 		@Override
 		public void callBackImageIsLoaded(final boolean isUpdateUI) {
-			// TODO Auto-generated method stub
 
+			if (isUpdateUI == false) {
+				return;
+			}
+
+			__map.paint();
 		}
 	}
 
@@ -568,25 +578,27 @@ public class TourPainter extends MapPainter {
 			createImages();
 		}
 
-		// first draw the tour, then the marker
-		for (final TourData tourData : tourDataList) {
+		// first draw the tour, then the marker and photos
+		if (_tourPaintConfig.isTourVisible) {
 
-			if (tourData == null) {
-				continue;
-			}
+			for (final TourData tourData : tourDataList) {
 
-			// check if position is available
-			final double[] latitudeSerie = tourData.latitudeSerie;
-			final double[] longitudeSerie = tourData.longitudeSerie;
-			if (latitudeSerie == null || longitudeSerie == null) {
-				continue;
-			}
+				if (tourData == null) {
+					continue;
+				}
 
-			setDataSerie(tourData);
+				// check if position is available
+				final double[] latitudeSerie = tourData.latitudeSerie;
+				final double[] longitudeSerie = tourData.longitudeSerie;
+				if (latitudeSerie == null || longitudeSerie == null) {
+					continue;
+				}
 
-			final boolean isDrawTourInTile = drawTour10InTile(gcTile, map, tile, tourData, parts);
+				setDataSerie(tourData);
 
-			isContentInTile = isContentInTile || isDrawTourInTile;
+				final boolean isDrawTourInTile = drawTour10InTile(gcTile, map, tile, tourData, parts);
+
+				isContentInTile = isContentInTile || isDrawTourInTile;
 
 //			/**
 //			 * DEBUG Start
@@ -604,40 +616,41 @@ public class TourPainter extends MapPainter {
 //			 * DEBUG End
 //			 */
 
-			// status if a marker is drawn
-			int staticMarkerCounter = 0;
+				// status if a marker is drawn
+				int staticMarkerCounter = 0;
 
-			// draw start/end marker
-			if (_tourPaintConfig.isShowStartEndInMap) {
+				// draw start/end marker
+				if (_tourPaintConfig.isShowStartEndInMap) {
 
-				// draw end marker first
-				if (drawStaticMarker(
-						gcTile,
-						map,
-						tile,
-						latitudeSerie[latitudeSerie.length - 1],
-						longitudeSerie[longitudeSerie.length - 1],
-						_tourEndMarker,
-						parts)) {
+					// draw end marker first
+					if (drawStaticMarker(
+							gcTile,
+							map,
+							tile,
+							latitudeSerie[latitudeSerie.length - 1],
+							longitudeSerie[longitudeSerie.length - 1],
+							_tourEndMarker,
+							parts)) {
 
-					staticMarkerCounter++;
+						staticMarkerCounter++;
+					}
+
+					// draw start marker above the end marker
+					if (drawStaticMarker(//
+							gcTile,
+							map,
+							tile,
+							latitudeSerie[0],
+							longitudeSerie[0],
+							_tourStartMarker,
+							parts)) {
+
+						staticMarkerCounter++;
+					}
 				}
 
-				// draw start marker above the end marker
-				if (drawStaticMarker(//
-						gcTile,
-						map,
-						tile,
-						latitudeSerie[0],
-						longitudeSerie[0],
-						_tourStartMarker,
-						parts)) {
-
-					staticMarkerCounter++;
-				}
+				isContentInTile = isContentInTile || staticMarkerCounter > 0;
 			}
-
-			isContentInTile = isContentInTile || staticMarkerCounter > 0;
 		}
 
 		if (_tourPaintConfig.isShowTourMarker || _tourPaintConfig.isShowWayPoints) {
@@ -739,7 +752,7 @@ public class TourPainter extends MapPainter {
 			}
 		}
 
-		if (_tourPaintConfig.isShowPhoto && photoList.size() > 0) {
+		if (_tourPaintConfig.isPhotoVisible && photoList.size() > 0) {
 
 			/*
 			 * world positions are cached to optimize performance
@@ -800,7 +813,7 @@ public class TourPainter extends MapPainter {
 //			final int zoomLevel = map.getZoom();
 			final int devPartOffset = ((parts - 1) / 2) * tileSize;
 
-			final Image image = getMapImage(photo);
+			final Image image = getMapImage(photo, map);
 
 			if (image == null) {
 				return false;
@@ -1406,7 +1419,7 @@ public class TourPainter extends MapPainter {
 		return valuePosition;
 	}
 
-	private Image getMapImage(final Photo photo) {
+	private Image getMapImage(final Photo photo, final Map map) {
 
 		Image mapImage = null;
 
@@ -1427,7 +1440,7 @@ public class TourPainter extends MapPainter {
 
 				// the requested image is not available in the image cache -> image must be loaded
 
-				final ILoadCallBack imageLoadCallback = new LoadCallbackImage();
+				final ILoadCallBack imageLoadCallback = new LoadCallbackImage(map);
 
 				PhotoLoadManager.putImageInLoadingQueueThumbMap(photo, requestedImageQuality, imageLoadCallback);
 			}
@@ -1591,30 +1604,36 @@ public class TourPainter extends MapPainter {
 		final int tileWorldPixelTop = tile.getY() * tileSize;
 		final int tileWorldPixelBottom = tileWorldPixelTop + tileSize;
 
-		if (isPaintingNeeded_Tours(
-				tourDataList,
-				mp,
-				mapZoomLevel,
-				projectionId,
-				tileWorldPixelLeft,
-				tileWorldPixelRight,
-				tileWorldPixelTop,
-				tileWorldPixelBottom)) {
+		if (_tourPaintConfig.isTourVisible && tourDataList.size() > 0) {
 
-			return true;
+			if (isPaintingNeeded_Tours(
+					tourDataList,
+					mp,
+					mapZoomLevel,
+					projectionId,
+					tileWorldPixelLeft,
+					tileWorldPixelRight,
+					tileWorldPixelTop,
+					tileWorldPixelBottom)) {
+
+				return true;
+			}
 		}
 
-		if (isPaintingNeeded_Photos(
-				photoList,
-				mp,
-				mapZoomLevel,
-				projectionId,
-				tileWorldPixelLeft,
-				tileWorldPixelRight,
-				tileWorldPixelTop,
-				tileWorldPixelBottom)) {
+		if (_tourPaintConfig.isPhotoVisible && photoList.size() > 0) {
 
-			return true;
+			if (isPaintingNeeded_Photos(
+					photoList,
+					mp,
+					mapZoomLevel,
+					projectionId,
+					tileWorldPixelLeft,
+					tileWorldPixelRight,
+					tileWorldPixelTop,
+					tileWorldPixelBottom)) {
+
+				return true;
+			}
 		}
 
 		return false;
@@ -1631,34 +1650,31 @@ public class TourPainter extends MapPainter {
 		/*
 		 * check photos
 		 */
-		if (_tourPaintConfig.isShowPhoto && photoList.size() > 0) {
+		for (final PhotoWrapper photoWrapper : photoList) {
 
-			for (final PhotoWrapper photoWrapper : photoList) {
+			final Photo photo = photoWrapper.photo;
 
-				final Photo photo = photoWrapper.photo;
+			final Point photoWorldPixel = photo.getWorldPosition(mp, projectionId, mapZoomLevel);
 
-				final Point photoWorldPixel = photo.getWorldPosition(mp, projectionId, mapZoomLevel);
+			if (photoWorldPixel == null) {
+				continue;
+			}
 
-				if (photoWorldPixel == null) {
-					continue;
-				}
+			final org.eclipse.swt.graphics.Point photoSize = photo.getMapImageSize();
+			if (photoSize == null) {
+				continue;
+			}
 
-				final org.eclipse.swt.graphics.Point photoSize = photo.getMapImageSize();
-				if (photoSize == null) {
-					continue;
-				}
+			final int tileSize = mp.getTileSize();
 
-				final int tileSize = mp.getTileSize();
+			// convert world position into tile position
+			final int devXPhoto = photoWorldPixel.x - tileWorldPixelLeft;
+			final int devYPhoto = photoWorldPixel.y - tileWorldPixelTop;
 
-				// convert world position into tile position
-				final int devXPhoto = photoWorldPixel.x - tileWorldPixelLeft;
-				final int devYPhoto = photoWorldPixel.y - tileWorldPixelTop;
+			final boolean isPhotoInTile = isPhotoInTile(photoSize, devXPhoto, devYPhoto, tileSize);
 
-				final boolean isPhotoInTile = isPhotoInTile(photoSize, devXPhoto, devYPhoto, tileSize);
-
-				if (isPhotoInTile) {
-					return true;
-				}
+			if (isPhotoInTile) {
+				return true;
 			}
 		}
 

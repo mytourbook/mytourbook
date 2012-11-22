@@ -38,6 +38,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.photo.IPhotoEventListener;
+import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoEventId;
 import net.tourbook.photo.PhotoManager;
 import net.tourbook.photo.PhotoSelection;
@@ -134,13 +135,15 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 	public static final int							TOUR_COLOR_PACE						= 50;
 	public static final int							TOUR_COLOR_HR_ZONE					= 60;
 
+	private static final String						STATE_IS_SHOW_TOUR_IN_MAP			= "STATE_IS_SHOW_TOUR_IN_MAP";				//$NON-NLS-1$
+	private static final String						STATE_IS_SHOW_PHOTO_IN_MAP			= "STATE_IS_SHOW_PHOTO_IN_MAP";			//$NON-NLS-1$
+	private static final String						STATE_IS_SHOW_LEGEND_IN_MAP			= "STATE_IS_SHOW_LEGEND_IN_MAP";			//$NON-NLS-1$
+	private static final String						STATE_SYNC_WITH_PHOTO				= "STATE_SYNC_WITH_PHOTO";					//$NON-NLS-1$
 	private static final String						MEMENTO_SHOW_START_END_IN_MAP		= "action.show-start-end-in-map";			//$NON-NLS-1$
 	private static final String						MEMENTO_SHOW_TOUR_MARKER			= "action.show-tour-marker";				//$NON-NLS-1$
 	private static final String						MEMENTO_SHOW_SLIDER_IN_MAP			= "action.show-slider-in-map";				//$NON-NLS-1$
 	private static final String						MEMENTO_SHOW_SLIDER_IN_LEGEND		= "action.show-slider-in-legend";			//$NON-NLS-1$
-	private static final String						MEMENTO_SHOW_LEGEND_IN_MAP			= "action.show-legend-in-map";				//$NON-NLS-1$
 	private static final String						MEMENTO_SHOW_SCALE_IN_MAP			= "action.show-scale-in-map";				//$NON-NLS-1$
-	private static final String						MEMENTO_SHOW_TOUR_IN_MAP			= "action.show-tour-in-map";				//$NON-NLS-1$
 	private static final String						MEMENTO_SHOW_TOUR_INFO_IN_MAP		= "action.show-tour-info-in-map";			//$NON-NLS-1$
 	private static final String						MEMENTO_SHOW_WAY_POINTS				= "action.show-way-points-in-map";			//$NON-NLS-1$
 	private static final String						MEMENTO_SYNCH_WITH_SELECTED_TOUR	= "action.synch-with-selected-tour";		//$NON-NLS-1$
@@ -164,6 +167,10 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 	private final IPreferenceStore					_prefStore							= TourbookPlugin
 																								.getDefault()
 																								.getPreferenceStore();
+	private final IDialogSettings					_state								= TourbookPlugin
+																								.getDefault()
+																								.getDialogSettingsSection(
+																										ID);
 
 	private boolean									_isPartVisible;
 
@@ -184,10 +191,15 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 	private TourData								_previousTourData;
 
 	/**
-	 * photos which are displayed in the map
+	 * contains photos which are displayed in the map
 	 */
 	private final ArrayList<PhotoWrapper>			_photoList							= new ArrayList<PhotoWrapper>();
 
+	private boolean									_isShowTour;
+	private boolean									_isShowPhoto;
+	private boolean									_isShowLegend;
+
+	private boolean									_isMapSynchedWithPhoto;
 	private boolean									_isMapSynchedWithTour;
 	private boolean									_isMapSynchedWithSlider;
 	private boolean									_isPositionCentered;
@@ -198,7 +210,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 	/**
 	 * when <code>true</code> a tour is painted, <code>false</code> a point of interrest is painted
 	 */
-	private boolean									_isTour;
+	private boolean									_isTourOrWayPoint;
 
 	/*
 	 * tool tips
@@ -254,11 +266,13 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 	private ActionDimMap							_actionDimMap;
 	private ActionManageMapProviders				_actionManageProvider;
 	private ActionReloadFailedMapImages				_actionReloadFailedMapImages;
-	private ActionSelectMapProvider					_actionSelectMapProvider;
 	private ActionSaveDefaultPosition				_actionSaveDefaultPosition;
+	private ActionSelectMapProvider					_actionSelectMapProvider;
 	private ActionSetDefaultPosition				_actionSetDefaultPosition;
-	private ActionShowPOI							_actionShowPOI;
+	private ActionShowAllPhotos						_actionShowAllPhotos;
 	private ActionShowLegendInMap					_actionShowLegendInMap;
+	private ActionShowPhotos						_actionShowPhotos;
+	private ActionShowPOI							_actionShowPOI;
 	private ActionShowScaleInMap					_actionShowScaleInMap;
 	private ActionShowSliderInMap					_actionShowSliderInMap;
 	private ActionShowSliderInLegend				_actionShowSliderInLegend;
@@ -267,15 +281,16 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 	private ActionShowTourInfoInMap					_actionShowTourInfoInMap;
 	private ActionShowTourMarker					_actionShowTourMarker;
 	private ActionShowWayPoints						_actionShowWayPoints;
-	private ActionSynchWithTour						_actionSynchWithTour;
+	private ActionSynchWithPhoto					_actionSynchWithPhoto;
 	private ActionSynchWithSlider					_actionSynchWithSlider;
+	private ActionSynchWithTour						_actionSynchWithTour;
 	private ActionSynchTourZoomLevel				_actionSynchTourZoomLevel;
 
 	private ActionZoomIn							_actionZoomIn;
 	private ActionZoomOut							_actionZoomOut;
 	private ActionZoomCentered						_actionZoomCentered;
 	private ActionZoomShowEntireEarth				_actionZoomShowAll;
-	private ActionZoomShowEntireTour				_actionZoomShowEntireTour;
+	private ActionZoomShowEntireTour				_actionShowEntireTour;
 
 	public TourMapView() {}
 
@@ -346,23 +361,6 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		_map.paint();
 	}
 
-	void actionSetShowLegendInMap() {
-
-		final boolean isLegendVisible = _actionShowLegendInMap.isChecked();
-
-		_map.setShowLegend(isLegendVisible);
-
-		_actionShowSliderInLegend.setEnabled(isLegendVisible);
-		if (isLegendVisible == false) {
-			_actionShowSliderInLegend.setChecked(false);
-		}
-
-		// update legend
-		actionShowSlider();
-
-		_map.paint();
-	}
-
 	void actionSetShowScaleInMap() {
 
 		final boolean isScaleVisible = _actionShowScaleInMap.isChecked();
@@ -390,10 +388,6 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		}
 
 		_map.paint();
-	}
-
-	void actionSetShowTourInMap() {
-		paintTours_10_All();
 	}
 
 	void actionSetShowTourMarkerInMap() {
@@ -435,6 +429,37 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		_isPositionCentered = _actionZoomCentered.isChecked();
 	}
 
+	void actionShowLegend() {
+
+		_isShowLegend = _actionShowLegendInMap.isChecked();
+
+		_map.setShowLegend(_isShowLegend);
+
+		_actionShowSliderInLegend.setEnabled(_isShowLegend);
+		if (_isShowLegend == false) {
+			_actionShowSliderInLegend.setChecked(false);
+		}
+
+		// update legend
+		actionShowSlider();
+
+		_map.paint();
+	}
+
+	void actionShowPhotos() {
+
+		_isShowPhoto = _actionShowPhotos.isChecked();
+
+		enableActions();
+
+		_tourPainterConfig.isPhotoVisible = _isShowPhoto;
+
+		_map.setOverlayKey(Integer.toString(_photoList.hashCode()));
+		_map.disposeOverlayImageCache();
+
+		_map.paint();
+	}
+
 	void actionShowSlider() {
 
 		if ((_tourDataList == null) || (_tourDataList.size() == 0)) {
@@ -444,7 +469,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		// repaint map
 		_directMappingPainter.setPaintContext(
 				_map,
-				_actionShowTourInMap.isChecked(),
+				_isShowTour,
 				_tourDataList.get(0),
 				_currentLeftSliderValueIndex,
 				_currentRightSliderValueIndex,
@@ -452,6 +477,30 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 				_actionShowSliderInLegend.isChecked());
 
 		_map.redraw();
+	}
+
+	void actionShowTour() {
+
+		_isShowTour = _actionShowTourInMap.isChecked();
+
+		paintTours_10_All();
+	}
+
+	/**
+	 * Sync map with photo
+	 */
+	void actionSynchWithPhoto() {
+
+		_isMapSynchedWithPhoto = _actionSynchWithPhoto.isChecked();
+
+		if (_isMapSynchedWithPhoto) {
+
+			centerPhotos(_photoList);
+
+			_map.paint();
+		}
+
+		enableActions();
 	}
 
 	void actionSynchWithSlider() {
@@ -515,6 +564,11 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		_map.setZoom(_map.getZoom() - 1);
 		centerTour();
 		_map.paint();
+	}
+
+	void actionZoomShowAllPhotos() {
+
+		centerPhotos(_photoList);
 	}
 
 	void actionZoomShowEntireMap() {
@@ -755,6 +809,38 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 	}
 
 	/**
+	 * Center photo in the map
+	 * 
+	 * @param allPhotoWrapper
+	 */
+	private void centerPhotos(final ArrayList<PhotoWrapper> allPhotoWrapper) {
+
+		final Set<GeoPosition> positionBounds = getPhotoBounds(allPhotoWrapper);
+		if (positionBounds == null) {
+			return;
+		}
+
+		final int zoom = _map.getZoom();
+
+		final Rectangle positionRect = getPositionRect(positionBounds, zoom);
+
+		final Point center = new Point(//
+				positionRect.x + positionRect.width / 2,
+				positionRect.y + positionRect.height / 2);
+
+		// ensure it is not zoomed too near
+		if (zoom > 15) {
+//			zoom = 15;
+		}
+
+		final GeoPosition geoPosition = _map.getMapProvider().pixelToGeo(center, zoom);
+
+		_map.setMapCenter(geoPosition);
+
+		setBoundsZoomLevel(positionBounds, false, 15);
+	}
+
+	/**
 	 * Center the tour in the map when action is enabled
 	 */
 	private void centerTour() {
@@ -764,7 +850,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 			final int zoom = _map.getZoom();
 
 			Set<GeoPosition> positionBounds = null;
-			if (_isTour) {
+			if (_isTourOrWayPoint) {
 				positionBounds = _tourPainterConfig.getTourBounds();
 				if (positionBounds == null) {
 					return;
@@ -795,12 +881,12 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		_tourDataList.clear();
 		_previousTourData = null;
 
-		_tourPainterConfig.setTourDataList(null);
-		_tourPainterConfig.setPhotos(null);
+		_tourPainterConfig.resetTourData();
+		_tourPainterConfig.setPhotos(null, false);
 
 		_tourInfoToolTipProvider.setTourData(null);
 
-		showDefaultMap();
+		showDefaultMap(false);
 	}
 
 	private void createActions() {
@@ -851,8 +937,9 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		_actionZoomOut = new ActionZoomOut(this);
 		_actionZoomCentered = new ActionZoomCentered(this);
 		_actionZoomShowAll = new ActionZoomShowEntireEarth(this);
-		_actionZoomShowEntireTour = new ActionZoomShowEntireTour(this);
+		_actionShowEntireTour = new ActionZoomShowEntireTour(this);
 
+		_actionSynchWithPhoto = new ActionSynchWithPhoto(this);
 		_actionSynchWithTour = new ActionSynchWithTour(this);
 		_actionSynchWithSlider = new ActionSynchWithSlider(this);
 		_actionSynchTourZoomLevel = new ActionSynchTourZoomLevel(this);
@@ -861,6 +948,8 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		_actionSetDefaultPosition = new ActionSetDefaultPosition(this);
 		_actionSaveDefaultPosition = new ActionSaveDefaultPosition(this);
 
+		_actionShowPhotos = new ActionShowPhotos(this);
+		_actionShowAllPhotos = new ActionShowAllPhotos(this);
 		_actionShowSliderInMap = new ActionShowSliderInMap(this);
 		_actionShowSliderInLegend = new ActionShowSliderInLegend(this);
 		_actionShowLegendInMap = new ActionShowLegendInMap(this);
@@ -889,7 +978,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 		// legend requires a tour with coordinates
 		if (legendProvider == null /* || isPaintDataValid(fTourData) == false */) {
-			showDefaultMap();
+			showDefaultMap(_isShowPhoto);
 			return;
 		}
 
@@ -989,7 +1078,13 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 				 */
 				for (final float dataValue : dataSerie) {
 
+					if (dataValue == Float.MIN_VALUE) {
+						// skip invalid values
+						continue;
+					}
+
 					if (setInitialValue) {
+
 						setInitialValue = false;
 						minValue = maxValue = dataValue;
 					}
@@ -1082,6 +1177,11 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 				 */
 				for (final float dataValue : dataSerie) {
 
+					if (dataValue == Float.MIN_VALUE) {
+						// skip invalid values
+						continue;
+					}
+
 					if (setInitialValue) {
 						setInitialValue = false;
 						minValue = maxValue = dataValue;
@@ -1127,6 +1227,11 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 				 */
 				for (final float dataValue : dataSerie) {
 
+					if (dataValue == Float.MIN_VALUE) {
+						// skip invalid values
+						continue;
+					}
+
 					if (setInitialValue) {
 						setInitialValue = false;
 						minValue = maxValue = dataValue;
@@ -1171,6 +1276,11 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 				 * get min/max values
 				 */
 				for (final float dataValue : dataSerie) {
+
+					if (dataValue == Float.MIN_VALUE) {
+						// skip invalid values
+						continue;
+					}
 
 					if (setInitialValue) {
 						setInitialValue = false;
@@ -1302,9 +1412,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 					return;
 				}
 
-				final boolean showTour = _actionShowTourInMap.isChecked();
-				final boolean showLegend = _actionShowLegendInMap.isChecked();
-				if ((_isTour == false) || (showTour == false) || (showLegend == false)) {
+				if ((_isTourOrWayPoint == false) || (_isShowTour == false) || (_isShowLegend == false)) {
 					return;
 				}
 
@@ -1399,38 +1507,43 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 	private void enableActions(final boolean isForceTourColor) {
 
-		final boolean isLegendVisible = _actionShowLegendInMap.isChecked();
-
 		_actionShowPOI.setEnabled(_poiPosition != null);
 
 		// update legend action
-		if (_isTour) {
+		if (_isTourOrWayPoint) {
 
-			_map.setShowLegend(isLegendVisible);
+			_map.setShowLegend(_isShowLegend);
 
-			if (isLegendVisible == false) {
+			if (_isShowLegend == false) {
 				_actionShowSliderInLegend.setChecked(false);
 			}
 		}
 
-		final boolean isMultipleTours = _tourDataList.size() > 1;
-		final boolean isOneTour = _isTour && (isMultipleTours == false);
+		/*
+		 * photo actions
+		 */
+		_actionShowAllPhotos.setEnabled(_isShowPhoto);
+		_actionSynchWithPhoto.setEnabled(_isShowPhoto);
 
 		/*
-		 * enable/disable tour actions
+		 * tour actions
 		 */
-		_actionZoomShowEntireTour.setEnabled(isOneTour);
+
+		final boolean isMultipleTours = _tourDataList.size() > 1 && _isShowTour;
+		final boolean isOneTour = _isTourOrWayPoint && (isMultipleTours == false) && _isShowTour;
+
+		_actionShowEntireTour.setEnabled(isOneTour);
 		_actionSynchTourZoomLevel.setEnabled(isOneTour);
-		_actionShowTourInMap.setEnabled(_isTour);
-		_actionSynchWithTour.setEnabled(isOneTour);
+		_actionShowTourInMap.setEnabled(_isTourOrWayPoint);
+		_actionSynchWithTour.setEnabled(isOneTour && _isMapSynchedWithPhoto == false);
 		_actionSynchWithSlider.setEnabled(isOneTour);
 
 		_actionShowStartEndInMap.setEnabled(isOneTour);
-		_actionShowTourMarker.setEnabled(_isTour);
-		_actionShowWayPoints.setEnabled(_isTour);
-		_actionShowLegendInMap.setEnabled(_isTour);
-		_actionShowSliderInMap.setEnabled(_isTour);
-		_actionShowSliderInLegend.setEnabled(_isTour && isLegendVisible);
+		_actionShowTourMarker.setEnabled(_isTourOrWayPoint);
+		_actionShowWayPoints.setEnabled(_isTourOrWayPoint);
+		_actionShowLegendInMap.setEnabled(_isTourOrWayPoint);
+		_actionShowSliderInMap.setEnabled(_isTourOrWayPoint);
+		_actionShowSliderInLegend.setEnabled(_isTourOrWayPoint && _isShowLegend);
 		_actionShowTourInfoInMap.setEnabled(isOneTour);
 
 		if (_tourDataList.size() == 0) {
@@ -1494,8 +1607,13 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		viewTbm.add(_actionTourColorHrZone);
 		viewTbm.add(new Separator());
 
+		viewTbm.add(_actionShowPhotos);
+		viewTbm.add(_actionShowAllPhotos);
+		viewTbm.add(_actionSynchWithPhoto);
+		viewTbm.add(new Separator());
+
 		viewTbm.add(_actionShowTourInMap);
-		viewTbm.add(_actionZoomShowEntireTour);
+		viewTbm.add(_actionShowEntireTour);
 		viewTbm.add(_actionSynchWithTour);
 		viewTbm.add(_actionSynchWithSlider);
 		viewTbm.add(new Separator());
@@ -1559,6 +1677,65 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 	public int getMapDimLevel() {
 		return _mapDimLevel;
+	}
+
+	/**
+	 * Calculate lat/lon bounds for all photos.
+	 * 
+	 * @param allPhotoWrapper
+	 * @return
+	 */
+	private Set<GeoPosition> getPhotoBounds(final ArrayList<PhotoWrapper> allPhotoWrapper) {
+
+		/*
+		 * get min/max longitude/latitude
+		 */
+		double minLatitude = 0;
+		double maxLatitude = 0;
+		double minLongitude = 0;
+		double maxLongitude = 0;
+
+		boolean isFirst = true;
+
+		for (final PhotoWrapper photoWrapper : allPhotoWrapper) {
+			if (photoWrapper.isPhotoWithGps) {
+
+				final Photo photo = photoWrapper.photo;
+				final double latitude = photo.getLatitude();
+				final double longitude = photo.getLongitude();
+
+				if (isFirst) {
+
+					isFirst = false;
+
+					minLatitude = maxLatitude = latitude;
+					minLongitude = maxLongitude = longitude;
+
+				} else {
+
+					minLatitude = latitude < minLatitude ? latitude : minLatitude;
+					maxLatitude = latitude > maxLatitude ? latitude : maxLatitude;
+
+					minLongitude = longitude < minLongitude ? longitude : minLongitude;
+					maxLongitude = longitude > maxLongitude ? longitude : maxLongitude;
+
+					if (minLatitude == 0) {
+						minLatitude = -180.0;
+					}
+				}
+			}
+		}
+
+		if (isFirst) {
+			// there are no photos with geo
+			return null;
+		}
+
+		final Set<GeoPosition> mapPositions = new HashSet<GeoPosition>();
+		mapPositions.add(new GeoPosition(minLatitude, minLongitude));
+		mapPositions.add(new GeoPosition(maxLatitude, maxLongitude));
+
+		return mapPositions;
 	}
 
 	private Rectangle getPositionRect(final Set<GeoPosition> positions, final int zoom) {
@@ -1651,6 +1828,9 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 	private void onSelectionChanged(final ISelection selection) {
 
+//		System.out.println(net.tourbook.common.UI.timeStampNano() + " onSelectionChanged\t" + selection);
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
 		if (_isPartVisible == false) {
 
 			if (selection instanceof SelectionTourData
@@ -1687,10 +1867,20 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 			final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
 			if (tourIds.size() == 0) {
-				return;
-			}
 
-			if (tourIds.size() == 1) {
+				// history tour (without tours) is displayed
+
+				final ArrayList<PhotoWrapper> allPhotoWrapper = paintPhotoSelection(selection);
+
+				if (allPhotoWrapper != null) {
+
+					centerPhotos(allPhotoWrapper);
+					showDefaultMap(true);
+
+					enableActions();
+				}
+
+			} else if (tourIds.size() == 1) {
 
 				// only 1 tour is displayed, synch with this tour !!!
 
@@ -1787,7 +1977,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 		} else if (selection instanceof PointOfInterest) {
 
-			_isTour = false;
+			_isTourOrWayPoint = false;
 
 			clearView();
 
@@ -1861,12 +2051,12 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 	private void paintEntireTour() {
 
 		if ((_tourDataList.size() == 0) || (isPaintDataValid(_tourDataList.get(0)) == false)) {
-			showDefaultMap();
+			showDefaultMap(_isShowPhoto);
 			return;
 		}
 
-		_tourPainterConfig.setTourDataList(_tourDataList);
-		_tourPainterConfig.setPhotos(_photoList);
+		_tourPainterConfig.setTourData(_tourDataList, _isShowTour);
+		_tourPainterConfig.setPhotos(_photoList, _isShowPhoto);
 
 		_tourInfoToolTipProvider.setTourDataList(_tourDataList);
 
@@ -1875,7 +2065,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		// set slider position
 		_directMappingPainter.setPaintContext(
 				_map,
-				_actionShowTourInMap.isChecked(),
+				_isShowTour,
 				firstTourData,
 				_currentLeftSliderValueIndex,
 				_currentRightSliderValueIndex,
@@ -1886,9 +2076,9 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 		_tourPainterConfig.setTourBounds(tourBounds);
 
-		_map.setShowOverlays(_actionShowTourInMap.isChecked());
+		_map.setShowOverlays(_isShowTour || _isShowPhoto);
 
-		setTourZoomLevel(tourBounds, false);
+		setBoundsZoomLevel(tourBounds, false);
 
 		_map.paint();
 	}
@@ -1896,20 +2086,27 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 	private void paintPhotos(final ArrayList<PhotoWrapper> photoWrapperList) {
 
 		_photoList.clear();
-
 		_photoList.addAll(photoWrapperList);
 
-		_tourPainterConfig.setPhotos(_photoList);
+		if (_isShowPhoto && _isMapSynchedWithPhoto) {
+			centerPhotos(_photoList);
+		}
 
-		_map.setOverlayKey(Integer.toString(photoWrapperList.hashCode()));
+		_tourPainterConfig.setPhotos(_photoList, _isShowPhoto);
+
+		_map.setShowOverlays(_isShowTour || _isShowPhoto);
+		_map.setOverlayKey(Integer.toString(_photoList.hashCode()));
 		_map.disposeOverlayImageCache();
 
 		_map.paint();
-
-//		_map.setPhoto(structuredSelection);
 	}
 
-	private void paintPhotoSelection(final ISelection selection) {
+	/**
+	 * @param selection
+	 * @return Returns a list which contains all photos, or <code>null</code> when photos are not
+	 *         contained in the selection.
+	 */
+	private ArrayList<PhotoWrapper> paintPhotoSelection(final ISelection selection) {
 
 		if (selection instanceof TourPhotoLinkSelection) {
 
@@ -1922,21 +2119,24 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 			}
 
 			paintPhotos(allPhotoWrapper);
+
+			return allPhotoWrapper;
 		}
+
+		return null;
 	}
 
 	private void paintTours(final ArrayList<Long> tourIdList) {
 
-		_isTour = true;
+		_isTourOrWayPoint = true;
 
 		// force single tour to be repainted
 		_previousTourData = null;
 
 		_directMappingPainter.disablePaintContext();
 
-		final boolean isShowTour = _actionShowTourInMap.isChecked();
-		_map.setShowOverlays(isShowTour);
-		_map.setShowLegend(isShowTour && _actionShowLegendInMap.isChecked());
+		_map.setShowOverlays(_isShowTour || _isShowPhoto);
+		_map.setShowLegend(_isShowTour && _isShowLegend);
 
 		long newOverlayKey = _tourHashOverlayKey;
 
@@ -1953,8 +2153,8 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 			_tourHashOverlayKey = newOverlayKey;
 		}
 
-		_tourPainterConfig.setTourDataList(_tourDataList);
-		_tourPainterConfig.setPhotos(_photoList);
+		_tourPainterConfig.setTourData(_tourDataList, _isShowTour);
+		_tourPainterConfig.setPhotos(_photoList, _isShowPhoto);
 
 		_tourInfoToolTipProvider.setTourDataList(_tourDataList);
 
@@ -2047,7 +2247,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		}
 
 		// show/hide legend
-		_map.setShowLegend(_actionShowTourInMap.isChecked());
+		_map.setShowLegend(_isShowTour);
 
 		if (_tourDataList.size() > 1) {
 
@@ -2072,13 +2272,12 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 	 */
 	private void paintTours_20_One(final TourData tourData, final boolean forceRedraw, final boolean isSynchronized) {
 
+		_isTourOrWayPoint = true;
+
 		if (isPaintDataValid(tourData) == false) {
-			showDefaultMap();
+			showDefaultMap(_isShowPhoto);
 			return;
 		}
-
-		_isTour = true;
-		final boolean isShowTour = _actionShowTourInMap.isChecked();
 
 		// prevent loading the same tour
 		if (forceRedraw == false) {
@@ -2098,7 +2297,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 			isNewTour = false;
 		}
 
-		_tourPainterConfig.setTourData(tourData);
+		_tourPainterConfig.setTourData(tourData, _isShowTour);
 
 		/*
 		 * set tour into tour data list, this is currently used to draw the legend, it's also used
@@ -2112,7 +2311,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		// set the paint context (slider position) for the direct mapping painter
 		_directMappingPainter.setPaintContext(
 				_map,
-				isShowTour,
+				_isShowTour,
 				tourData,
 				_currentLeftSliderValueIndex,
 				_currentRightSliderValueIndex,
@@ -2123,8 +2322,8 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		final Set<GeoPosition> tourBounds = getTourBounds(tourData);
 		_tourPainterConfig.setTourBounds(tourBounds);
 
-		_map.setShowOverlays(isShowTour);
-		_map.setShowLegend(isShowTour && _actionShowLegendInMap.isChecked());
+		_map.setShowOverlays(_isShowTour || _isShowPhoto);
+		_map.setShowLegend(_isShowTour && _isShowLegend);
 
 		/*
 		 * set position and zoom level for the tour
@@ -2146,7 +2345,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 			if (tourData.mapCenterPositionLatitude == Double.MIN_VALUE) {
 
 				// use default position for the tour
-				setTourZoomLevel(tourBounds, true);
+				setBoundsZoomLevel(tourBounds, true);
 
 			} else {
 
@@ -2179,21 +2378,20 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 	 */
 	private void paintTours_30_Multiple() {
 
-		_isTour = true;
+		_isTourOrWayPoint = true;
 
 		// force single tour to be repainted
 		_previousTourData = null;
 
-		_tourPainterConfig.setTourDataList(_tourDataList);
-		_tourPainterConfig.setPhotos(_photoList);
+		_tourPainterConfig.setTourData(_tourDataList, _isShowTour);
+		_tourPainterConfig.setPhotos(_photoList, _isShowPhoto);
 
 		_tourInfoToolTipProvider.setTourDataList(_tourDataList);
 
 		_directMappingPainter.disablePaintContext();
 
-		final boolean isShowTour = _actionShowTourInMap.isChecked();
-		_map.setShowOverlays(isShowTour);
-		_map.setShowLegend(isShowTour && _actionShowLegendInMap.isChecked());
+		_map.setShowOverlays(_isShowTour || _isShowPhoto);
+		_map.setShowLegend(_isShowTour && _isShowLegend);
 
 		// get overlay key for all tours which have valid tour data
 		long newOverlayKey = -1;
@@ -2222,19 +2420,20 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 									final int rightSliderValuesIndex,
 									final int selectedSliderIndex) {
 
+		_isTourOrWayPoint = true;
+
 		if (isPaintDataValid(tourData) == false) {
-			showDefaultMap();
+			showDefaultMap(_isShowPhoto);
 			return;
 		}
 
-		_isTour = true;
 		_currentLeftSliderValueIndex = leftSliderValuesIndex;
 		_currentRightSliderValueIndex = rightSliderValuesIndex;
 		_currentSelectedSliderValueIndex = selectedSliderIndex;
 
 		_directMappingPainter.setPaintContext(
 				_map,
-				_actionShowTourInMap.isChecked(),
+				_isShowTour,
 				tourData,
 				leftSliderValuesIndex,
 				rightSliderValuesIndex,
@@ -2256,8 +2455,16 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 	@Override
 	public void photoEvent(final PhotoEventId photoEventId, final Object data) {
 
-		if (photoEventId == PhotoEventId.PHOTO_SELECTION && data instanceof TourPhotoLinkSelection) {
-			onSelectionChanged((TourPhotoLinkSelection) data);
+		if (photoEventId == PhotoEventId.PHOTO_SELECTION) {
+
+			if (data instanceof TourPhotoLinkSelection) {
+
+				onSelectionChanged((TourPhotoLinkSelection) data);
+
+			} else if (data instanceof PhotoSelection) {
+
+				onSelectionChanged((PhotoSelection) data);
+			}
 		}
 	}
 
@@ -2276,90 +2483,87 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 	private void restoreState() {
 
-		final IDialogSettings settings = TourbookPlugin.getDefault().getDialogSettingsSection(ID);
-		String state = null;
+		// is show tour
+		_isShowTour = Util.getStateBoolean(_state, STATE_IS_SHOW_TOUR_IN_MAP, true);
+		_actionShowTourInMap.setChecked(_isShowTour);
+
+		// is show photo
+		_isShowPhoto = Util.getStateBoolean(_state, STATE_IS_SHOW_PHOTO_IN_MAP, true);
+		_actionShowPhotos.setChecked(_isShowPhoto);
+
+		// is show legend
+		_isShowLegend = Util.getStateBoolean(_state, STATE_IS_SHOW_LEGEND_IN_MAP, true);
+		_actionShowLegendInMap.setChecked(_isShowLegend);
+
+		// is sync with photo
+		_isMapSynchedWithPhoto = Util.getStateBoolean(_state, STATE_SYNC_WITH_PHOTO, true);
+		_actionSynchWithPhoto.setChecked(_isMapSynchedWithPhoto);
 
 		// checkbox: is tour centered
-		final boolean isTourCentered = settings.getBoolean(MEMENTO_ZOOM_CENTERED);
+		final boolean isTourCentered = _state.getBoolean(MEMENTO_ZOOM_CENTERED);
 		_actionZoomCentered.setChecked(isTourCentered);
 		_isPositionCentered = isTourCentered;
 
 		// checkbox: synch map with tour
-		final boolean isSynchTour = Util.getStateBoolean(settings, MEMENTO_SYNCH_WITH_SELECTED_TOUR, true);
+		final boolean isSynchTour = Util.getStateBoolean(_state, MEMENTO_SYNCH_WITH_SELECTED_TOUR, true);
 		_actionSynchWithTour.setChecked(isSynchTour);
 		_isMapSynchedWithTour = isSynchTour;
 
 		// ckeckbox: synch with tour chart slider
-		final boolean isSynchSlider = settings.getBoolean(MEMENTO_SYNCH_WITH_TOURCHART_SLIDER);
+		final boolean isSynchSlider = _state.getBoolean(MEMENTO_SYNCH_WITH_TOURCHART_SLIDER);
 		_actionSynchWithSlider.setChecked(isSynchSlider);
 		_isMapSynchedWithSlider = isSynchSlider;
 
-		// checkbox: show tour in map
-		final boolean isShowTour = Util.getStateBoolean(settings, MEMENTO_SHOW_TOUR_IN_MAP, true);
-		_actionShowTourInMap.setChecked(isShowTour);
-		_map.setShowOverlays(isShowTour);
-		_map.setShowLegend(isShowTour);
-
 		//
-		_actionSynchTourZoomLevel.setZoomLevel(Util.getStateInt(settings, MEMENTO_SYNCH_TOUR_ZOOM_LEVEL, 0));
-		_mapDimLevel = Util.getStateInt(settings, MEMENTO_MAP_DIM_LEVEL, -1);
+		_actionSynchTourZoomLevel.setZoomLevel(Util.getStateInt(_state, MEMENTO_SYNCH_TOUR_ZOOM_LEVEL, 0));
+		_mapDimLevel = Util.getStateInt(_state, MEMENTO_MAP_DIM_LEVEL, -1);
 
 		// checkbox: show start/end in map
-		_actionShowStartEndInMap.setChecked(settings.getBoolean(MEMENTO_SHOW_START_END_IN_MAP));
+		_actionShowStartEndInMap.setChecked(_state.getBoolean(MEMENTO_SHOW_START_END_IN_MAP));
 		_tourPainterConfig.isShowStartEndInMap = _actionShowStartEndInMap.isChecked();
 
-		// checkbox: show tour marker
-		state = settings.get(MEMENTO_SHOW_TOUR_MARKER);
-		_actionShowTourMarker.setChecked(state == null ? true : settings.getBoolean(MEMENTO_SHOW_TOUR_MARKER));
-		_tourPainterConfig.isShowTourMarker = _actionShowTourMarker.isChecked();
+		// show tour marker
+		final boolean isShowMarker = Util.getStateBoolean(_state, MEMENTO_SHOW_TOUR_MARKER, true);
+		_actionShowTourMarker.setChecked(isShowMarker);
+		_tourPainterConfig.isShowTourMarker = isShowMarker;
 
 		// checkbox: show way points
-		state = settings.get(MEMENTO_SHOW_WAY_POINTS);
-		_actionShowWayPoints.setChecked(state == null ? true : settings.getBoolean(MEMENTO_SHOW_WAY_POINTS));
-		final boolean isShowWayPoints = _actionShowWayPoints.isChecked();
+		final boolean isShowWayPoints = Util.getStateBoolean(_state, MEMENTO_SHOW_WAY_POINTS, true);
+		_actionShowWayPoints.setChecked(isShowWayPoints);
 		_tourPainterConfig.isShowWayPoints = isShowWayPoints;
 		if (isShowWayPoints) {
 			_tourToolTip.addToolTipProvider(_wayPointToolTipProvider);
 		}
 
-		// checkbox: show legend in map
-		_actionShowLegendInMap.setChecked(Util.getStateBoolean(settings, MEMENTO_SHOW_LEGEND_IN_MAP, true));
-
 		// checkbox: show tour info in map
-		final boolean isShowTourInfo = Util.getStateBoolean(settings, MEMENTO_SHOW_TOUR_INFO_IN_MAP, true);
+		final boolean isShowTourInfo = Util.getStateBoolean(_state, MEMENTO_SHOW_TOUR_INFO_IN_MAP, true);
 		_actionShowTourInfoInMap.setChecked(isShowTourInfo);
 		if (isShowTourInfo) {
 			_tourToolTip.addToolTipProvider(_tourInfoToolTipProvider);
 		}
 
-		/*
-		 * photo
-		 */
-//		_tourToolTip.addToolTipProvider(_photoToolTipProvider);
-
 		// checkbox: show scale
-		final boolean isScaleVisible = Util.getStateBoolean(settings, MEMENTO_SHOW_SCALE_IN_MAP, true);
+		final boolean isScaleVisible = Util.getStateBoolean(_state, MEMENTO_SHOW_SCALE_IN_MAP, true);
 		_actionShowScaleInMap.setChecked(isScaleVisible);
 		_map.setShowScale(isScaleVisible);
 
-		// other actions
-		state = settings.get(MEMENTO_SHOW_SLIDER_IN_MAP);
-		_actionShowSliderInMap.setChecked(state == null ? true : settings.getBoolean(MEMENTO_SHOW_SLIDER_IN_MAP));
+		// show slider
+		_actionShowSliderInMap.setChecked(Util.getStateBoolean(_state, MEMENTO_SHOW_SLIDER_IN_MAP, true));
 
-		_actionShowSliderInLegend.setChecked(settings.getBoolean(MEMENTO_SHOW_SLIDER_IN_LEGEND));
+		_actionShowSliderInLegend.setChecked(_state.getBoolean(MEMENTO_SHOW_SLIDER_IN_LEGEND));
 
 		// restore map provider by selecting the last used map factory
-		_actionSelectMapProvider.selectMapProvider(settings.get(MEMENTO_SELECTED_MAP_PROVIDER_ID));
+		_actionSelectMapProvider.selectMapProvider(_state.get(MEMENTO_SELECTED_MAP_PROVIDER_ID));
 
 		// default position
-		_defaultZoom = Util.getStateInt(settings, MEMENTO_DEFAULT_POSITION_ZOOM, 10);
+		_defaultZoom = Util.getStateInt(_state, MEMENTO_DEFAULT_POSITION_ZOOM, 10);
 		_defaultPosition = new GeoPosition(//
-				Util.getStateDouble(settings, MEMENTO_DEFAULT_POSITION_LATITUDE, 46.303074),
-				Util.getStateDouble(settings, MEMENTO_DEFAULT_POSITION_LONGITUDE, 7.526386));
+				Util.getStateDouble(_state, MEMENTO_DEFAULT_POSITION_LATITUDE, 46.303074),
+				Util.getStateDouble(_state, MEMENTO_DEFAULT_POSITION_LONGITUDE, 7.526386));
 
 		// tour color
 		try {
-			final Integer colorId = settings.getInt(MEMENTO_TOUR_COLOR_ID);
+			final Integer colorId = _state.getInt(MEMENTO_TOUR_COLOR_ID);
 
 			switch (colorId) {
 			case TOUR_COLOR_ALTITUDE:
@@ -2399,6 +2603,9 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 		// draw tour with default color
 
+		_map.setShowOverlays(_isShowTour || _isShowPhoto);
+		_map.setShowLegend(_isShowTour);
+
 		// check legend provider
 		if (_tourPainterConfig.getLegendProvider() == null) {
 
@@ -2429,42 +2636,44 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 	private void saveState() {
 
-		final IDialogSettings settings = TourbookPlugin.getDefault().getDialogSettingsSection(ID);
-
 		// save checked actions
-		settings.put(MEMENTO_ZOOM_CENTERED, _actionZoomCentered.isChecked());
-		settings.put(MEMENTO_SHOW_TOUR_IN_MAP, _actionShowTourInMap.isChecked());
-		settings.put(MEMENTO_SYNCH_WITH_SELECTED_TOUR, _actionSynchWithTour.isChecked());
-		settings.put(MEMENTO_SYNCH_WITH_TOURCHART_SLIDER, _actionSynchWithSlider.isChecked());
-		settings.put(MEMENTO_SYNCH_TOUR_ZOOM_LEVEL, _actionSynchTourZoomLevel.getZoomLevel());
+		_state.put(STATE_IS_SHOW_TOUR_IN_MAP, _isShowTour);
+		_state.put(STATE_IS_SHOW_PHOTO_IN_MAP, _isShowPhoto);
+		_state.put(STATE_IS_SHOW_LEGEND_IN_MAP, _isShowLegend);
 
-		settings.put(MEMENTO_MAP_DIM_LEVEL, _mapDimLevel);
+		_state.put(STATE_SYNC_WITH_PHOTO, _isMapSynchedWithPhoto);
 
-		settings.put(MEMENTO_SHOW_LEGEND_IN_MAP, _actionShowLegendInMap.isChecked());
-		settings.put(MEMENTO_SHOW_START_END_IN_MAP, _actionShowStartEndInMap.isChecked());
-		settings.put(MEMENTO_SHOW_SCALE_IN_MAP, _actionShowScaleInMap.isChecked());
-		settings.put(MEMENTO_SHOW_SLIDER_IN_MAP, _actionShowSliderInMap.isChecked());
-		settings.put(MEMENTO_SHOW_SLIDER_IN_LEGEND, _actionShowSliderInLegend.isChecked());
-		settings.put(MEMENTO_SHOW_TOUR_MARKER, _actionShowTourMarker.isChecked());
-		settings.put(MEMENTO_SHOW_TOUR_INFO_IN_MAP, _actionShowTourInfoInMap.isChecked());
-		settings.put(MEMENTO_SHOW_WAY_POINTS, _actionShowWayPoints.isChecked());
+		_state.put(MEMENTO_ZOOM_CENTERED, _actionZoomCentered.isChecked());
+		_state.put(MEMENTO_SYNCH_WITH_SELECTED_TOUR, _actionSynchWithTour.isChecked());
+		_state.put(MEMENTO_SYNCH_WITH_TOURCHART_SLIDER, _actionSynchWithSlider.isChecked());
+		_state.put(MEMENTO_SYNCH_TOUR_ZOOM_LEVEL, _actionSynchTourZoomLevel.getZoomLevel());
 
-		settings.put(MEMENTO_SELECTED_MAP_PROVIDER_ID, _actionSelectMapProvider.getSelectedMapProvider().getId());
+		_state.put(MEMENTO_MAP_DIM_LEVEL, _mapDimLevel);
+
+		_state.put(MEMENTO_SHOW_START_END_IN_MAP, _actionShowStartEndInMap.isChecked());
+		_state.put(MEMENTO_SHOW_SCALE_IN_MAP, _actionShowScaleInMap.isChecked());
+		_state.put(MEMENTO_SHOW_SLIDER_IN_MAP, _actionShowSliderInMap.isChecked());
+		_state.put(MEMENTO_SHOW_SLIDER_IN_LEGEND, _actionShowSliderInLegend.isChecked());
+		_state.put(MEMENTO_SHOW_TOUR_MARKER, _actionShowTourMarker.isChecked());
+		_state.put(MEMENTO_SHOW_TOUR_INFO_IN_MAP, _actionShowTourInfoInMap.isChecked());
+		_state.put(MEMENTO_SHOW_WAY_POINTS, _actionShowWayPoints.isChecked());
+
+		_state.put(MEMENTO_SELECTED_MAP_PROVIDER_ID, _actionSelectMapProvider.getSelectedMapProvider().getId());
 
 		if (_defaultPosition == null) {
 
 			final MP mapProvider = _map.getMapProvider();
 
-			settings.put(MEMENTO_DEFAULT_POSITION_ZOOM, mapProvider == null ? //
+			_state.put(MEMENTO_DEFAULT_POSITION_ZOOM, mapProvider == null ? //
 					_defaultZoom
 					: mapProvider.getMinimumZoomLevel());
 
-			settings.put(MEMENTO_DEFAULT_POSITION_LATITUDE, 0.0F);
-			settings.put(MEMENTO_DEFAULT_POSITION_LONGITUDE, 0.0F);
+			_state.put(MEMENTO_DEFAULT_POSITION_LATITUDE, 0.0F);
+			_state.put(MEMENTO_DEFAULT_POSITION_LONGITUDE, 0.0F);
 		} else {
-			settings.put(MEMENTO_DEFAULT_POSITION_ZOOM, _defaultZoom);
-			settings.put(MEMENTO_DEFAULT_POSITION_LATITUDE, (float) _defaultPosition.latitude);
-			settings.put(MEMENTO_DEFAULT_POSITION_LONGITUDE, (float) _defaultPosition.longitude);
+			_state.put(MEMENTO_DEFAULT_POSITION_ZOOM, _defaultZoom);
+			_state.put(MEMENTO_DEFAULT_POSITION_LATITUDE, (float) _defaultPosition.latitude);
+			_state.put(MEMENTO_DEFAULT_POSITION_LONGITUDE, (float) _defaultPosition.longitude);
 		}
 
 		// tour color
@@ -2487,7 +2696,76 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		} else {
 			colorId = TOUR_COLOR_ALTITUDE;
 		}
-		settings.put(MEMENTO_TOUR_COLOR_ID, colorId);
+		_state.put(MEMENTO_TOUR_COLOR_ID, colorId);
+	}
+
+	private void setBoundsZoomLevel(final Set<GeoPosition> tourBounds, final boolean isAdjustZoomLevel) {
+		setBoundsZoomLevel(tourBounds, isAdjustZoomLevel, -1);
+	}
+
+	/**
+	 * Calculates a zoom level so that all points in the specified set will be visible on screen.
+	 * This is useful if you have a bunch of points in an area like a city and you want to zoom out
+	 * so that the entire city and it's points are visible without panning.
+	 * 
+	 * @param positions
+	 *            A set of GeoPositions to calculate the new zoom from
+	 * @param adjustZoomLevel
+	 *            when <code>true</code> the zoom level will be adjusted to user settings
+	 */
+	private void setBoundsZoomLevel(final Set<GeoPosition> positions,
+									final boolean isAdjustZoomLevel,
+									final int minZoomLevel) {
+
+		if ((positions == null) || (positions.size() < 2)) {
+			return;
+		}
+
+		final MP mp = _map.getMapProvider();
+
+		final int maximumZoomLevel = mp.getMaximumZoomLevel();
+		int zoom = mp.getMinimumZoomLevel();
+
+		Rectangle positionRect = getPositionRect(positions, zoom);
+		Rectangle viewport = _map.getWorldPixelViewport();
+
+		// zoom in until the tour is larger than the viewport
+		while ((positionRect.width < viewport.width) && (positionRect.height < viewport.height)) {
+
+			// center position in the map
+			final Point center = new Point(//
+					positionRect.x + positionRect.width / 2,
+					positionRect.y + positionRect.height / 2);
+
+			_map.setMapCenter(mp.pixelToGeo(center, zoom));
+
+			zoom++;
+
+			// check zoom level
+			if (zoom >= maximumZoomLevel) {
+				break;
+			}
+			_map.setZoom(zoom);
+
+			positionRect = getPositionRect(positions, zoom);
+			viewport = _map.getWorldPixelViewport();
+		}
+
+		// the algorithm generated a larger zoom level as necessary
+		zoom--;
+
+		int adjustedZoomLevel = 0;
+//		if (minZoomLevel != -1 && zoom > minZoomLevel) {
+//
+//			zoom = minZoomLevel;
+//
+//		} else
+		if (isAdjustZoomLevel) {
+
+			adjustedZoomLevel = _tourPainterConfig.getSynchTourZoomLevel();
+		}
+
+		_map.setZoom(zoom + adjustedZoomLevel);
 	}
 
 	@Override
@@ -2538,98 +2816,20 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 	}
 
-	/**
-	 * Calculates a zoom level so that all points in the specified set will be visible on screen.
-	 * This is useful if you have a bunch of points in an area like a city and you want to zoom out
-	 * so that the entire city and it's points are visible without panning.
-	 * 
-	 * @param positions
-	 *            A set of GeoPositions to calculate the new zoom from
-	 * @param adjustZoomLevel
-	 *            when <code>true</code> the zoom level will be adjusted to user settings
-	 */
-	private void setTourZoomLevel(final Set<GeoPosition> positions, final boolean isAdjustZoomLevel) {
-
-		if ((positions == null) || (positions.size() < 2)) {
-			return;
-		}
-
-		final MP mp = _map.getMapProvider();
-
-		final int maximumZoomLevel = mp.getMaximumZoomLevel();
-		int zoom = mp.getMinimumZoomLevel();
-
-		Rectangle positionRect = getPositionRect(positions, zoom);
-		Rectangle viewport = _map.getWorldPixelViewport();
-
-//		// zoom until the tour is visible in the map
-//		while (!viewport.contains(positionRect)) {
-//
-//			// center position in the map
-//			final Point center = new Point(//
-//					positionRect.x + positionRect.width / 2,
-//					positionRect.y + positionRect.height / 2);
-//
-//			_map.setGeoCenterPosition(mp.pixelToGeo(center, zoom));
-//
-//			zoom++;
-//
-//			// check zoom level
-//			if (zoom >= maximumZoomLevel) {
-//				break;
-//			}
-//			_map.setZoom(zoom);
-//
-//			positionRect = getPositionRect(positions, zoom);
-//			viewport = _map.getMapPixelViewport();
-//		}
-
-		// zoom in until the tour is larger than the viewport
-		while ((positionRect.width < viewport.width) && (positionRect.height < viewport.height)) {
-
-			// center position in the map
-			final Point center = new Point(//
-					positionRect.x + positionRect.width / 2,
-					positionRect.y + positionRect.height / 2);
-
-			_map.setMapCenter(mp.pixelToGeo(center, zoom));
-
-			zoom++;
-
-			// check zoom level
-			if (zoom >= maximumZoomLevel) {
-				break;
-			}
-			_map.setZoom(zoom);
-
-			positionRect = getPositionRect(positions, zoom);
-			viewport = _map.getWorldPixelViewport();
-		}
-
-		// the algorithm generated a larger zoom level as necessary
-		zoom--;
-
-		int adjustedZoomLevel = 0;
-		if (isAdjustZoomLevel) {
-			adjustedZoomLevel = _tourPainterConfig.getSynchTourZoomLevel();
-		}
-
-		_map.setZoom(zoom + adjustedZoomLevel);
-	}
-
-	private void showDefaultMap() {
+	private void showDefaultMap(final boolean isShowOverlays) {
 
 		// disable tour actions in this view
-		_isTour = false;
+		_isTourOrWayPoint = false;
 
 		// disable tour data
 		_tourDataList.clear();
 		_previousTourData = null;
+		_tourPainterConfig.resetTourData();
 
 		// update direct painter to draw nothing
 		_directMappingPainter.setPaintContext(_map, false, null, 0, 0, false, false);
 
-		_map.setShowOverlays(false);
+		_map.setShowOverlays(isShowOverlays);
 		_map.setShowLegend(false);
 
 		_map.paint();

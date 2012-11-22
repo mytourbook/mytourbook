@@ -15,35 +15,31 @@
  *******************************************************************************/
 package net.tourbook.mapping;
 
-import org.eclipse.swt.graphics.Rectangle;
+import net.tourbook.application.TourbookPlugin;
 
-public interface ILegendProviderGradientColors extends ILegendProvider {
+import org.eclipse.jface.action.Action;
 
-	/**
-	 * @param graphValue
-	 * @return Returns the RGB value for a graph value.
-	 */
-	abstract int getColorValue(float graphValue);
+public class ActionSynchWithPhoto extends Action {
 
-	abstract LegendColor getLegendColor();
+	private TourMapView	_mapView;
 
-	abstract LegendConfig getLegendConfig();
+	public ActionSynchWithPhoto(final TourMapView mapView) {
 
-	/**
-	 * Set the colors for the legend, the values will not be changed
-	 * 
-	 * @param newLegendColor
-	 */
-	abstract void setLegendColorColors(LegendColor newLegendColor);
+		super(null, AS_CHECK_BOX);
 
-	abstract void setLegendColorValues(	Rectangle legendBounds,
-										float minValue,
-										float maxValue,
-										String unitText,
-										LegendUnitFormat unitFormat);
+		_mapView = mapView;
 
-//	abstract void setLegendColorValues(	Rectangle legendBounds,
-//										float[] dataSerie,
-//										String unitText,
-//										LegendUnitFormat unitFormat);
+		setToolTipText(Messages.Map_Action_SyncPhotoWithMap_Tooltip);
+
+		setImageDescriptor(TourbookPlugin//
+				.getImageDescriptor(Messages.Image_Action_Map_SyncPhotoWithMap));
+		setDisabledImageDescriptor(TourbookPlugin
+				.getImageDescriptor(Messages.Image_Action_Map_SyncPhotoWithMap_Disabled));
+	}
+
+	@Override
+	public void run() {
+		_mapView.actionSynchWithPhoto();
+	}
+
 }
