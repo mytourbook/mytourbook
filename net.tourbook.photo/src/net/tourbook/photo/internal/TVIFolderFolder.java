@@ -28,6 +28,7 @@ public class TVIFolderFolder extends TVIFolder {
 	File						_treeItemFolder;
 
 	String						_folderName;
+	private String				_folderPath;
 
 	boolean						_isRootFolder;
 	private File[]				_folderChildren;
@@ -84,6 +85,7 @@ public class TVIFolderFolder extends TVIFolder {
 
 		_isRootFolder = isRootFolder;
 		_folderName = _isRootFolder ? folder.getPath() : folder.getName();
+		_folderPath = folder.getAbsolutePath();
 	}
 
 	@Override
@@ -110,11 +112,11 @@ public class TVIFolderFolder extends TVIFolder {
 			return false;
 		}
 		final TVIFolderFolder other = (TVIFolderFolder) obj;
-		if (_folderName == null) {
-			if (other._folderName != null) {
+		if (_folderPath == null) {
+			if (other._folderPath != null) {
 				return false;
 			}
-		} else if (!_folderName.equals(other._folderName)) {
+		} else if (!_folderPath.equals(other._folderPath)) {
 			return false;
 		}
 		return true;
@@ -172,7 +174,7 @@ public class TVIFolderFolder extends TVIFolder {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((_folderName == null) ? 0 : _folderName.hashCode());
+		result = prime * result + ((_folderPath == null) ? 0 : _folderPath.hashCode());
 		return result;
 	}
 
