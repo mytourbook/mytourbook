@@ -837,7 +837,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 		_map.setMapCenter(geoPosition);
 
-		setBoundsZoomLevel(positionBounds, false, 15);
+		setBoundsZoomLevel(positionBounds, false);
 	}
 
 	/**
@@ -1436,7 +1436,6 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		createLegendProviders();
 
 		fillActionBars();
-		enableActions();
 
 		addPartListener();
 		addPrefListener();
@@ -1454,6 +1453,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 			public void run() {
 
 				restoreState();
+				enableActions();
 
 				if (_tourDataList.size() == 0) {
 					// a tour is not displayed, find a tour provider which provides a tour
@@ -1522,29 +1522,31 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		/*
 		 * photo actions
 		 */
-		_actionShowAllPhotos.setEnabled(_isShowPhoto);
-		_actionSynchWithPhoto.setEnabled(_isShowPhoto);
+		final boolean isPhotoAvailable = _photoList.size() > 0;
+
+//		_actionShowPhotos.setEnabled(isPhotoAvailable);
+		_actionShowAllPhotos.setEnabled(isPhotoAvailable && _isShowPhoto);
+		_actionSynchWithPhoto.setEnabled(isPhotoAvailable && _isShowPhoto);
 
 		/*
 		 * tour actions
 		 */
-
 		final boolean isMultipleTours = _tourDataList.size() > 1 && _isShowTour;
 		final boolean isOneTour = _isTourOrWayPoint && (isMultipleTours == false) && _isShowTour;
 
 		_actionShowEntireTour.setEnabled(isOneTour);
-		_actionSynchTourZoomLevel.setEnabled(isOneTour);
-		_actionShowTourInMap.setEnabled(_isTourOrWayPoint);
-		_actionSynchWithTour.setEnabled(isOneTour && _isMapSynchedWithPhoto == false);
-		_actionSynchWithSlider.setEnabled(isOneTour);
-
+		_actionShowLegendInMap.setEnabled(_isTourOrWayPoint);
+		_actionShowSliderInLegend.setEnabled(_isTourOrWayPoint && _isShowLegend);
+		_actionShowSliderInMap.setEnabled(_isTourOrWayPoint);
 		_actionShowStartEndInMap.setEnabled(isOneTour);
+		_actionShowTourInfoInMap.setEnabled(isOneTour);
+		_actionShowTourInMap.setEnabled(_isTourOrWayPoint);
 		_actionShowTourMarker.setEnabled(_isTourOrWayPoint);
 		_actionShowWayPoints.setEnabled(_isTourOrWayPoint);
-		_actionShowLegendInMap.setEnabled(_isTourOrWayPoint);
-		_actionShowSliderInMap.setEnabled(_isTourOrWayPoint);
-		_actionShowSliderInLegend.setEnabled(_isTourOrWayPoint && _isShowLegend);
-		_actionShowTourInfoInMap.setEnabled(isOneTour);
+
+		_actionSynchTourZoomLevel.setEnabled(isOneTour);
+		_actionSynchWithSlider.setEnabled(isOneTour);
+		_actionSynchWithTour.setEnabled(isOneTour && _isMapSynchedWithPhoto == false);
 
 		if (_tourDataList.size() == 0) {
 
@@ -1554,7 +1556,6 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 			_actionTourColorSpeed.setEnabled(false);
 			_actionTourColorPace.setEnabled(false);
 			_actionTourColorHrZone.setEnabled(false);
-//			_actionTourColorTourType.setEnabled(false);
 
 		} else if (isForceTourColor) {
 
@@ -1564,7 +1565,6 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 			_actionTourColorSpeed.setEnabled(true);
 			_actionTourColorPace.setEnabled(true);
 			_actionTourColorHrZone.setEnabled(true);
-//			_actionTourColorTourType.setEnabled(true);
 
 		} else if (isOneTour) {
 
@@ -1578,7 +1578,6 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 			_actionTourColorSpeed.setEnabled(oneTourData.getSpeedSerie() != null);
 			_actionTourColorPace.setEnabled(oneTourData.getPaceSerie() != null);
 			_actionTourColorHrZone.setEnabled(canShowHrZones);
-//			_actionTourColorTourType.setEnabled(true);
 
 		} else {
 
@@ -1588,7 +1587,6 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 			_actionTourColorSpeed.setEnabled(false);
 			_actionTourColorPace.setEnabled(false);
 			_actionTourColorHrZone.setEnabled(false);
-//			_actionTourColorTourType.setEnabled(false);
 		}
 	}
 
@@ -1828,8 +1826,8 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 	private void onSelectionChanged(final ISelection selection) {
 
-//		System.out.println(net.tourbook.common.UI.timeStampNano() + " onSelectionChanged\t" + selection);
-//		// TODO remove SYSTEM.OUT.PRINTLN
+		System.out.println(net.tourbook.common.UI.timeStampNano() + " onSelectionChanged\t" + selection);
+		// TODO remove SYSTEM.OUT.PRINTLN
 
 		if (_isPartVisible == false) {
 
@@ -2699,10 +2697,6 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		_state.put(MEMENTO_TOUR_COLOR_ID, colorId);
 	}
 
-	private void setBoundsZoomLevel(final Set<GeoPosition> tourBounds, final boolean isAdjustZoomLevel) {
-		setBoundsZoomLevel(tourBounds, isAdjustZoomLevel, -1);
-	}
-
 	/**
 	 * Calculates a zoom level so that all points in the specified set will be visible on screen.
 	 * This is useful if you have a bunch of points in an area like a city and you want to zoom out
@@ -2713,9 +2707,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 	 * @param adjustZoomLevel
 	 *            when <code>true</code> the zoom level will be adjusted to user settings
 	 */
-	private void setBoundsZoomLevel(final Set<GeoPosition> positions,
-									final boolean isAdjustZoomLevel,
-									final int minZoomLevel) {
+	private void setBoundsZoomLevel(final Set<GeoPosition> positions, final boolean isAdjustZoomLevel) {
 
 		if ((positions == null) || (positions.size() < 2)) {
 			return;
@@ -2755,13 +2747,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		zoom--;
 
 		int adjustedZoomLevel = 0;
-//		if (minZoomLevel != -1 && zoom > minZoomLevel) {
-//
-//			zoom = minZoomLevel;
-//
-//		} else
 		if (isAdjustZoomLevel) {
-
 			adjustedZoomLevel = _tourPainterConfig.getSynchTourZoomLevel();
 		}
 

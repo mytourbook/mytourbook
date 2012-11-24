@@ -57,7 +57,9 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -118,32 +120,6 @@ public class PhotoManager {
 		}
 
 		return _instance;
-	}
-
-	public static void openPhotoMergePerspective(final PhotosWithExifSelection photoWrapperSelection) {
-
-		final IWorkbench workbench = PlatformUI.getWorkbench();
-		final IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-
-		if (window != null) {
-			try {
-
-				// show tour photo link perspective
-				workbench.showPerspective(PerspectiveFactoryPhoto.PERSPECTIVE_ID, window);
-
-				// show tour photo link view
-				final TourPhotoLinkView view = (TourPhotoLinkView) Util.showView(TourPhotoLinkView.ID);
-
-				if (view != null) {
-					view.updatePhotosAndTours(photoWrapperSelection.photos, false);
-				}
-
-			} catch (final PartInitException e) {
-				StatusUtil.showStatus(e);
-			} catch (final WorkbenchException e) {
-				StatusUtil.showStatus(e);
-			}
-		}
 	}
 
 	public static void removePhotoEventListener(final IPhotoEventListener listener) {
@@ -592,6 +568,56 @@ public class PhotoManager {
 		historyTour.setTourEndTime(Long.MAX_VALUE);
 
 		visibleTourPhotoLinks.add(historyTour);
+	}
+
+	void linkPhotosWithTours(final PhotosWithExifSelection selectedPhotosWithExif) {
+
+		final IWorkbench wb = PlatformUI.getWorkbench();
+		final IWorkbenchWindow wbWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+
+		if (wbWindow != null) {
+			try {
+
+				TourPhotoLinkView linkView = null;
+
+				final IWorkbenchPage activePage = wbWindow.getActivePage();
+
+				final IViewPart linkViewPart = activePage.findView(TourPhotoLinkView.ID);
+
+				if (linkViewPart instanceof TourPhotoLinkView) {
+
+					// link view is available in the current perspective
+
+					linkView = (TourPhotoLinkView) linkViewPart;
+
+				} else {
+
+					final String currentPerspectiveId = activePage.getPerspective().getId();
+
+					if (currentPerspectiveId.equals(TourPhotoLinkView.ID)) {
+
+						// open link view in current perspective
+
+					} else {
+
+						// open link perspective
+
+						wb.showPerspective(PerspectiveFactoryPhoto.PERSPECTIVE_ID, wbWindow);
+					}
+
+					linkView = (TourPhotoLinkView) Util.showView(TourPhotoLinkView.ID, false);
+				}
+
+				if (linkView != null) {
+					linkView.updatePhotosAndTours(selectedPhotosWithExif.photos, false);
+				}
+
+			} catch (final PartInitException e) {
+				StatusUtil.showStatus(e);
+			} catch (final WorkbenchException e) {
+				StatusUtil.showStatus(e);
+			}
+		}
 	}
 
 	/**
@@ -1107,8 +1133,6 @@ public class PhotoManager {
 				}
 			}
 		}
-
-//		Photo.updateExifGeoPosition(updatedPhotos);
 	}
 
 	private void setTourGPSIntoPhotos_10(final TourPhotoLink tourPhotoLink, final ArrayList<PhotoWrapper> updatedPhotos) {
@@ -1182,8 +1206,7 @@ public class PhotoManager {
 					final double tourLatitude = latitudeSerie[timeIndex];
 					final double tourLongitude = longitudeSerie[timeIndex];
 
-					setTourGPSIntoPhotos_20(
-							tourData,
+					setTourGPSIntoPhotos_20(tourData,
 //							tourPhotosSet,
 							updatedPhotos,
 							photoWrapper,
@@ -1230,8 +1253,7 @@ public class PhotoManager {
 					final double tourLatitude = latitudeSerie[timeIndex];
 					final double tourLongitude = longitudeSerie[timeIndex];
 
-					setTourGPSIntoPhotos_20(
-							tourData,
+					setTourGPSIntoPhotos_20(tourData,
 //							tourPhotosSet,
 							updatedPhotos,
 							photoWrapper,
@@ -1257,7 +1279,7 @@ public class PhotoManager {
 		}
 	}
 
-	private void setTourGPSIntoPhotos_20(	final TourData tourData,
+	private void setTourGPSIntoPhotos_20(final TourData tourData,
 //											final Set<TourPhoto> tourPhotosSet,
 											final ArrayList<PhotoWrapper> updatedPhotos,
 											final PhotoWrapper photoWrapper,

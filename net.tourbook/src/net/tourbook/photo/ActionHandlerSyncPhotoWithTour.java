@@ -58,10 +58,16 @@ public class ActionHandlerSyncPhotoWithTour extends AbstractHandler {
 
 			picDirView.setSelectionConverter(_isSyncPhotoWithTour ? _syncSelectionProvider : null);
 
-//			if (_isSyncPhotoWithTour) {
-//
-//				// sync photo with tour
-//
+			if (_isSyncPhotoWithTour) {
+
+				// sync photo with tour
+
+				final PhotosWithExifSelection selectedPhotosWithExif = picDirView.getSelectedPhotosWithExif(false);
+
+				if (selectedPhotosWithExif != null) {
+					PhotoManager.getInstance().linkPhotosWithTours(selectedPhotosWithExif);
+				}
+
 //				final ISelection selectedPhotos = picDirView.getSelectedPhotosWithExif();
 //
 //				if (selectedPhotos instanceof PhotosWithExifSelection) {
@@ -93,12 +99,12 @@ public class ActionHandlerSyncPhotoWithTour extends AbstractHandler {
 //						}
 //					}
 //				}
-//			} else {
-//
-//				// don't create tour photo links when sync is disabled
-//
+			} else {
+
+				// don't create tour photo links when sync is disabled
+
 //				picDirView.fireCurrentSelection();
-//			}
+			}
 		}
 
 		return null;
@@ -137,6 +143,9 @@ public class ActionHandlerSyncPhotoWithTour extends AbstractHandler {
 			_isInitializedState = true;
 		}
 
+		/*
+		 * get PicDirView
+		 */
 		PicDirView picDirView = null;
 
 		for (final IWorkbenchWindow wbWindow : wb.getWorkbenchWindows()) {

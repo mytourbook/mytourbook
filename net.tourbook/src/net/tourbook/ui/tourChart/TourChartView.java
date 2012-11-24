@@ -368,10 +368,16 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 	private void fireSliderPosition() {
 		Display.getCurrent().asyncExec(new Runnable() {
 			public void run() {
-				TourManager.fireEventWithCustomData(
-						TourEventId.SLIDER_POSITION_CHANGED,
-						_tourChart.getChartInfo(),
-						TourChartView.this);
+
+				final SelectionChartInfo chartInfo = _tourChart.getChartInfo();
+
+				if (chartInfo != null) {
+
+					TourManager.fireEventWithCustomData(
+							TourEventId.SLIDER_POSITION_CHANGED,
+							chartInfo,
+							TourChartView.this);
+				}
 			}
 		});
 	}

@@ -24,6 +24,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.photo.IPhotoGalleryProvider;
 import net.tourbook.photo.PhotoGallery;
 import net.tourbook.photo.PhotoSelection;
+import net.tourbook.photo.PhotosWithExifSelection;
 import net.tourbook.photo.PicDirView;
 
 import org.eclipse.jface.action.IMenuManager;
@@ -35,7 +36,6 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.KeyAdapter;
@@ -372,7 +372,7 @@ public class PicDirImages implements IPhotoGalleryProvider {
 		menuMgr.add(_actionClearNavigationHistory);
 	}
 
-	public ISelection getSelectedPhotosWithExif(final boolean isAllImages) {
+	public PhotosWithExifSelection getSelectedPhotosWithExif(final boolean isAllImages) {
 		return _photoGallery.getSelectedPhotosWithExif(isAllImages);
 	}
 

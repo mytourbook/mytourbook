@@ -1385,7 +1385,7 @@ public class RawDataManager {
 			}
 
 			// show raw data view
-			return (RawDataView) Util.showView(RawDataView.ID);
+			return (RawDataView) Util.showView(RawDataView.ID, true);
 
 		} catch (final WorkbenchException e) {
 			StatusUtil.log(e);

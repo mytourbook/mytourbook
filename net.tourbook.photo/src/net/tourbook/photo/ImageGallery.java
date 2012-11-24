@@ -102,7 +102,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	 */
 	private static final int				MAX_GALLERY_POSITIONS			= 100;
 
-	private static final String				MENU_ID_PHOTO_GALLERY			= "menu.net.tourbook.photo.photoGallery";	//$NON-NLS-1$
+	private static final String				MENU_ID_PHOTO_GALLERY			= "menu.net.tourbook.photo.PhotoGallery";	//$NON-NLS-1$
 
 	private static final int				DELAY_JOB_SUBSEQUENT_FILTER		= 500;										// ms
 	private static final long				DELAY_JOB_UI_FILTER				= 200;										// ms
@@ -847,7 +847,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	 * @return Returns a {@link ISelection} for selected or all images or <code>null</code> null
 	 *         when loading EXIF data was canceled by the user.
 	 */
-	public ISelection getSelectedPhotosWithExif(final boolean isAllImages) {
+	public PhotosWithExifSelection getSelectedPhotosWithExif(final boolean isAllImages) {
 		return createPhotoSelectionWithExif(isAllImages);
 	}
 
@@ -1647,11 +1647,11 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		 * show gallery to initialize client area, otherwise the width is 0 until the page is
 		 * displayed in a later step
 		 */
-		showPageBookPage(_galleryMT20);
+		showPageBookPage(_galleryMT20, false);
 
 		// show default page
 		_lblDefaultPage.setText(_defaultStatusMessage);
-		showPageBookPage(_pageDefault);
+		showPageBookPage(_pageDefault, false);
 
 		/*
 		 * set thumbnail size after gallery client area is set
@@ -1947,7 +1947,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 		if (isShowDefaultMessage) {
 			_lblDefaultPage.setText(_defaultStatusMessage);
-			showPageBookPage(_pageDefault);
+			showPageBookPage(_pageDefault, true);
 		}
 
 		// images are not loaded from a folder, photo wrappers are already available
@@ -1987,7 +1987,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 			_lblDefaultPage.setText(NLS.bind(Messages.Pic_Dir_Label_Loading, imageFolder.getAbsolutePath()));
 		}
-		showPageBookPage(_pageDefault);
+		showPageBookPage(_pageDefault, true);
 
 		_photoFolderWhichShouldBeDisplayed = imageFolder;
 
@@ -2055,30 +2055,37 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		_galleryMT20.showItem(itemIndex);
 	}
 
-	private void showPageBookPage(final Composite page) {
+	private void showPageBookPage(final Composite page, final boolean isDelay) {
 
-		/*
-		 * delay showing the default page because it is flickering when an image is displayed again
-		 * within a few milliseconds
-		 */
+		if (isDelay) {
 
-		_delayCounter[0]++;
+			/*
+			 * delay showing the default page because it is flickering when an image is displayed
+			 * again within a few milliseconds
+			 */
 
-		if (page == _pageDefault || page == _pageGalleryInfo) {
+			_delayCounter[0]++;
 
-			_pageBook.getDisplay().timerExec(400, new Runnable() {
+			if (page == _pageDefault || page == _pageGalleryInfo) {
 
-				private int			__delayCounter	= _delayCounter[0];
-				private Composite	__page			= page;
+				_pageBook.getDisplay().timerExec(400, new Runnable() {
 
-				public void run() {
+					private int			__delayCounter	= _delayCounter[0];
+					private Composite	__page			= page;
 
-					// check if this still the same page which should be displayed
-					if (__delayCounter == _delayCounter[0]) {
-						_pageBook.showPage(__page);
+					public void run() {
+
+						// check if this still the same page which should be displayed
+						if (__delayCounter == _delayCounter[0]) {
+							_pageBook.showPage(__page);
+						}
 					}
-				}
-			});
+				});
+
+			} else {
+
+				_pageBook.showPage(page);
+			}
 
 		} else {
 
@@ -2095,7 +2102,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 			_lblDefaultPage.setText(NLS.bind(Messages.Pic_Dir_StatusLabel_RestoringFolder, restoreFolderName));
 		}
 
-		showPageBookPage(_pageDefault);
+		showPageBookPage(_pageDefault, true);
 	}
 
 	public void sortGallery(final GallerySorting gallerySorting) {
@@ -2293,7 +2300,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 					return;
 				}
 
-				showPageBookPage(_pageGalleryInfo);
+				showPageBookPage(_pageGalleryInfo, true);
 
 				final int imageCount = _allPhotoWrapper.length;
 
@@ -2379,7 +2386,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 					// gallery items are available
 
-					showPageBookPage(_galleryMT20);
+					showPageBookPage(_galleryMT20, true);
 
 					// update gallery
 					_galleryMT20.setVirtualItems(sortedGalleryItems, galleryPosition);

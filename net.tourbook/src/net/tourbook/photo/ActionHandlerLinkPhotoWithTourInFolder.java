@@ -13,9 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.photo.internal;
-
-import net.tourbook.photo.PicDirView;
+package net.tourbook.photo;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -23,7 +21,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-public class ActionHandlerLinkPhotoWithTourInGalleryAll extends AbstractHandler {
+public class ActionHandlerLinkPhotoWithTourInFolder extends AbstractHandler {
 
 	@Override
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
@@ -31,7 +29,12 @@ public class ActionHandlerLinkPhotoWithTourInGalleryAll extends AbstractHandler 
 		final IWorkbenchPart activePart = HandlerUtil.getActiveWorkbenchWindow(event).getActivePage().getActivePart();
 
 		if (activePart instanceof PicDirView) {
-			((PicDirView) activePart).actionLinkPhotoWithTour(true);
+
+			final PhotosWithExifSelection selectedPhotosWithExif = ((PicDirView) activePart).getSelectedPhotosWithExif(true);
+
+			if (selectedPhotosWithExif != null) {
+				PhotoManager.getInstance().linkPhotosWithTours(selectedPhotosWithExif);
+			}
 		}
 
 		return null;

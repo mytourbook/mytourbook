@@ -30,7 +30,6 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.photo.PhotoManager;
-import net.tourbook.photo.PhotosWithExifSelection;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPagePeople;
 import net.tourbook.proxy.DefaultProxySelector;
@@ -381,30 +380,30 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 //				+ (" (" + selection.getClass().getCanonicalName() + ")  ")
 //				+ selection);
 
-		if (selection instanceof PhotosWithExifSelection) {
-
-//			if (_isViewOpening == false) {
+//		if (selection instanceof PhotosWithExifSelection) {
 //
-//				/**
-//				 * prevent runtime exception
-//				 * <p>
-//				 * Prevented recursive attempt to activate part
-//				 * net.tourbook.photo.PhotosAndToursView.ID while still in the middle of activating
-//				 * part net.tourbook.photo.PicDirView
-//				 */
+////			if (_isViewOpening == false) {
+////
+////				/**
+////				 * prevent runtime exception
+////				 * <p>
+////				 * Prevented recursive attempt to activate part
+////				 * net.tourbook.photo.PhotosAndToursView.ID while still in the middle of activating
+////				 * part net.tourbook.photo.PicDirView
+////				 */
+////
+////				_isViewOpening = true;
+////
 //
-//				_isViewOpening = true;
-//
-
-			Display.getCurrent().asyncExec(new Runnable() {
-				public void run() {
-					PhotoManager.openPhotoMergePerspective((PhotosWithExifSelection) selection);
-				}
-			});
-//
-//				_isViewOpening = false;
-//			}
-		}
+//			Display.getCurrent().asyncExec(new Runnable() {
+//				public void run() {
+//					PhotoManager.openPhotoMergePerspective((PhotosWithExifSelection) selection);
+//				}
+//			});
+////
+////				_isViewOpening = false;
+////			}
+//		}
 	}
 
 	@Override

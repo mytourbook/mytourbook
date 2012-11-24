@@ -164,13 +164,6 @@ public class PicDirView extends ViewPart {
 		sortBlock(files, 0, files.length - 1, new File[files.length]);
 	}
 
-	public void actionLinkPhotoWithTour(final boolean isAllImages) {
-
-		final ISelection selection = _picDirImages.getSelectedPhotosWithExif(isAllImages);
-
-		fireSelection(selection);
-	}
-
 	public void actionRefreshFolder() {
 		_picDirFolder.actionRefreshFolder();
 	}
@@ -348,8 +341,17 @@ public class PicDirView extends ViewPart {
 		}
 	}
 
-	public ISelection getSelectedPhotosWithExif() {
-		return _picDirImages.getSelectedPhotosWithExif(false);
+	/**
+	 * Creates a {@link PhotosWithExifSelection}
+	 * 
+	 * @param isAllImages
+	 *            When <code>true</code>, all images which are displayed in the gallery are
+	 *            returned, otherwise the selected images.
+	 * @return Returns a {@link ISelection} for selected or all images or <code>null</code> null
+	 *         when loading EXIF data was canceled by the user.
+	 */
+	public PhotosWithExifSelection getSelectedPhotosWithExif(final boolean isAllImages) {
+		return _picDirImages.getSelectedPhotosWithExif(isAllImages);
 	}
 
 	private void onPartClose() {

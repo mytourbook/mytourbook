@@ -26,7 +26,7 @@ public class ActionHandlerOpenTourPhotosView extends AbstractHandler {
 
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 
-		Util.showView(TourPhotosView.ID);
+		Util.showView(TourPhotosView.ID, true);
 
 		return null;
 	}

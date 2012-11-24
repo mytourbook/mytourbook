@@ -901,13 +901,14 @@ public class Util {
 	}
 
 	/**
-	 * Open view and activate it
+	 * Open view
 	 * 
 	 * @param viewId
+	 * @param isActivateView
+	 *            View is activated when <code>true</code>, otherwise it is only visible.
 	 * @return
-	 * @throws PartInitException
 	 */
-	public static IViewPart showView(final String viewId) {
+	public static IViewPart showView(final String viewId, final boolean isActivateView) {
 
 		try {
 
@@ -926,42 +927,9 @@ public class Util {
 				return null;
 			}
 
-			return page.showView(viewId, null, IWorkbenchPage.VIEW_ACTIVATE);
+			final int activationMode = isActivateView ? IWorkbenchPage.VIEW_ACTIVATE : IWorkbenchPage.VIEW_VISIBLE;
 
-		} catch (final PartInitException e) {
-			StatusUtil.showStatus(e);
-		}
-
-		return null;
-	}
-
-	/**
-	 * Open view and do not activate it
-	 * 
-	 * @param viewId
-	 * @return
-	 * @throws PartInitException
-	 */
-	public static IViewPart showViewNotActive(final String viewId) {
-
-		try {
-
-			final IWorkbench wb = PlatformUI.getWorkbench();
-			if (wb == null) {
-				return null;
-			}
-
-			final IWorkbenchWindow wbWin = wb.getActiveWorkbenchWindow();
-			if (wbWin == null) {
-				return null;
-			}
-
-			final IWorkbenchPage page = wbWin.getActivePage();
-			if (page == null) {
-				return null;
-			}
-
-			return page.showView(viewId, null, IWorkbenchPage.VIEW_VISIBLE);
+			return page.showView(viewId, null, activationMode);
 
 		} catch (final PartInitException e) {
 			StatusUtil.showStatus(e);

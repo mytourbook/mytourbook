@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -158,7 +158,7 @@ public class DataTransferWizard extends Wizard {
 		rawDataManager.updateTourDataFromDb(null);
 
 		// show imported data in the raw data view
-		final RawDataView importView = (RawDataView) Util.showView(RawDataView.ID);
+		final RawDataView importView = (RawDataView) Util.showView(RawDataView.ID, true);
 
 		if (importView != null) {
 			importView.reloadViewer();

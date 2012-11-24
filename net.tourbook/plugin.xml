@@ -772,11 +772,35 @@
 	
 		<menuContribution locationURI="toolbar:net.tourbook.photo.PicDirView?before=PicDirViewToolBar">
 			<command
-         commandId="command.net.tourbook.PicDir.SyncPhotoWithTour"
-         icon="icons/photo-sync-tour.png"
-         style="toggle"
-         tooltip="%Command_PicDir_SyncPhotoWithTour_Tooltip">
-			</command>
+				commandId="command.net.tourbook.PicDir.SyncPhotoWithTour"
+				icon="icons/photo-sync-tour.png"
+				style="toggle"
+				tooltip="%Command_PicDir_SyncPhotoWithTour_Tooltip" />
+		</menuContribution>
+
+		<menuContribution locationURI="popup:menu.net.tourbook.photo.PicDirView.InFolder?before=additions" >
+		            
+			<command 
+				commandId="command.net.tourbook.photo.LinkPhotoWithTourInFolder"
+				label="%Action_PhotoDirectory_LinkPhotoWithTourInFolder"
+				mnemonic="%Action_PhotoDirectory_LinkPhotoWithTourInFolder_Mnemonic"/>
+		
+		</menuContribution>
+
+		<!--
+			PhotoGallery
+		-->
+
+		<menuContribution locationURI="popup:menu.net.tourbook.photo.PhotoGallery?before=separator.net.tourbook.photo.refresh" >
+		            
+			<command commandId="command.net.tourbook.photo.LinkPhotoWithTourInGalleryAll"
+				label="%Action_PhotoDirectory_LinkPhotoWithTourInGalleryAll"
+				mnemonic="%Action_PhotoDirectory_LinkPhotoWithTourInGalleryAll_Mnemonic"/>
+		            
+			<command commandId="command.net.tourbook.photo.LinkPhotoWithTourInGallerySelected"
+				label="%Action_PhotoDirectory_LinkPhotoWithTourInGallerySelected"
+				mnemonic="%Action_PhotoDirectory_LinkPhotoWithTourInGallerySelected_Mnemonic"/>
+			
 		</menuContribution>
 
    </extension>
@@ -1000,10 +1024,27 @@
 		-->            
 		
 		<command
+			id="command.net.tourbook.photo.LinkPhotoWithTourInFolder"
+			name="%Action_PhotoDirectory_LinkPhotoWithTourInFolder"
+			defaultHandler="net.tourbook.photo.ActionHandlerLinkPhotoWithTourInFolder"
+			/>
+		
+		<command
+			id="command.net.tourbook.photo.LinkPhotoWithTourInGallerySelected"
+			name="%Action_PhotoDirectory_LinkPhotoWithTourInGallerySelected"
+			defaultHandler="net.tourbook.photo.ActionHandlerLinkPhotoWithTourInGallerySelected"
+			/>
+		
+		<command id="command.net.tourbook.photo.LinkPhotoWithTourInGalleryAll"
+			name="%Action_PhotoDirectory_LinkPhotoWithTourInGalleryAll"
+			defaultHandler="net.tourbook.photo.ActionHandlerLinkPhotoWithTourInGalleryAll"
+			/>
+		
+		<command
 			id="command.net.tourbook.photo.TourPhotosView"
 			name="%View_Name_PhotoTourPhotos"
 			defaultHandler="net.tourbook.photo.ActionHandlerOpenTourPhotosView"
-		/>
+			/>
 		         
 		<command
 	        id="command.net.tourbook.PicDir.SyncPhotoWithTour"
@@ -1013,7 +1054,8 @@
 			<state
 				class="org.eclipse.ui.handlers.RegistryToggleState"
 				id="org.eclipse.ui.commands.toggleState">
-			</state> 
+			</state>
+			
 		</command>
             
 
@@ -1022,19 +1064,19 @@
 		-->            
 		         
 		<command
-		      id="net.tourbook.command.PicDir.ShowNaviationHistory"
-		      name="%Command_PicDir_ShowNaviationHistory">
-		</command>
+			id="net.tourbook.command.PicDir.ShowNaviationHistory"
+			name="%Command_PicDir_ShowNaviationHistory"
+			/>
 		
 		<command
-		      id="net.tourbook.command.PicDir.NavigateHistoryBackward"
-		      name="%Command_PicDir_History_Backward">
-		</command>
-		         
+			id="net.tourbook.command.PicDir.NavigateHistoryBackward"
+			name="%Command_PicDir_History_Backward"
+			/>
+		     
 		<command
-		      id="net.tourbook.command.PicDir.NavigateHistoryForward"
-		      name="%Command_PicDir_History_Forward">
-		</command>
+			id="net.tourbook.command.PicDir.NavigateHistoryForward"
+			name="%Command_PicDir_History_Forward"
+			/>
 	           
    </extension>
 

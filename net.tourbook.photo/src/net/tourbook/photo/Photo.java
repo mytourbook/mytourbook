@@ -848,7 +848,7 @@ public class Photo {
 		_tourLatitude = Double.MIN_VALUE;
 		_tourLongitude = Double.MIN_VALUE;
 
-		_photoWrapper.isPhotoWithGps = false;
+		_photoWrapper.isPhotoWithGps = _photoWrapper.isGeoFromExif;
 	}
 
 	public void resetWorldPosition() {

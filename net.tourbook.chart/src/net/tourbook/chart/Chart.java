@@ -412,7 +412,7 @@ public class Chart extends ViewForm {
 
 		final ChartComponentGraph chartComponentGraph = _chartComponents.getChartComponentGraph();
 
-		final boolean canZoomOut = chartComponentGraph.getGraphZoomRatio() > 1;
+		final boolean canZoomOut = chartComponentGraph.getZoomRatio() > 1;
 		final boolean canZoomIn = chartComponentGraph.getXXDevGraphWidth() < ChartComponents.CHART_MAX_WIDTH;
 
 		_chartActionProxies.get(COMMAND_ID_ZOOM_IN).setEnabled(canZoomIn);

@@ -73,7 +73,6 @@ import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -102,7 +101,6 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 	public static final String						ID								= "net.tourbook.photo.PhotosAndToursView.ID";	//$NON-NLS-1$
 
-	private static final String						STATE_FILTER_NO_TOURS			= "STATE_FILTER_NO_TOURS";						//$NON-NLS-1$
 	private static final String						STATE_FILTER_PHOTOS				= "STATE_FILTER_PHOTOS";						//$NON-NLS-1$
 	private static final String						STATE_SELECTED_CAMERA_NAME		= "STATE_SELECTED_CAMERA_NAME";				//$NON-NLS-1$
 	private static final String						STATE_TIME_ADJUSTMENT_TOURS		= "STATE_TIME_ADJUSTMENT_TOURS";				//$NON-NLS-1$
@@ -185,7 +183,12 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 	 * When <code>true</code>, only tours with photos are displayed.
 	 */
 	private boolean									_isShowToursOnlyWithPhotos		= true;
-	private boolean									_isFilterOneHistoryTour;
+
+	/**
+	 * It's dangerous when set to <code>true</code>, it will hide all tours which can confuses the
+	 * user, therefore this state is <b>NOT</b> saved.
+	 */
+	private boolean									_isFilterOneHistoryTour			= false;
 
 	private ICommandService							_commandService;
 
@@ -205,8 +208,8 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 	private Spinner									_spinnerMinutes;
 	private Spinner									_spinnerSeconds;
 
-	private Button									_rdoAdjustAllTours;
-	private Button									_rdoAdjustSelectedTours;
+//	private Button									_rdoAdjustAllTours;
+//	private Button									_rdoAdjustSelectedTours;
 
 	{
 		_adjustTimeComparator = new Comparator<PhotoWrapper>() {
@@ -536,7 +539,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.fillDefaults()//
-				.numColumns(2)
+				.numColumns(3)
 				.margins(2, 2)
 				.applyTo(container);
 		{
@@ -548,21 +551,21 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 			label.setText(Messages.Photos_AndTours_Label_AdjustTime);
 			label.setToolTipText(Messages.Photos_AndTours_Label_AdjustTime_Tooltip);
 
-			/*
-			 * radio: all/selected tours
-			 */
-			final Composite containerTours = new Composite(container, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(false, false).applyTo(containerTours);
-			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerTours);
-			{
-				_rdoAdjustAllTours = new Button(containerTours, SWT.RADIO);
-				_rdoAdjustAllTours.setText(Messages.Photos_AndTours_Radio_AdjustTime_AllTours);
-				_rdoAdjustAllTours.setToolTipText(Messages.Photos_AndTours_Radio_AdjustTime_AllTours_Tooltip);
-
-				_rdoAdjustSelectedTours = new Button(containerTours, SWT.RADIO);
-				_rdoAdjustSelectedTours.setText(Messages.Photos_AndTours_Radio_AdjustTime_SelectedTours);
-				_rdoAdjustSelectedTours.setToolTipText(Messages.Photos_AndTours_Radio_AdjustTime_SelectedTours_Tooltip);
-			}
+//			/*
+//			 * radio: all/selected tours
+//			 */
+//			final Composite containerTours = new Composite(container, SWT.NONE);
+//			GridDataFactory.fillDefaults().grab(false, false).applyTo(containerTours);
+//			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerTours);
+//			{
+//				_rdoAdjustAllTours = new Button(containerTours, SWT.RADIO);
+//				_rdoAdjustAllTours.setText(Messages.Photos_AndTours_Radio_AdjustTime_AllTours);
+//				_rdoAdjustAllTours.setToolTipText(Messages.Photos_AndTours_Radio_AdjustTime_AllTours_Tooltip);
+//
+//				_rdoAdjustSelectedTours = new Button(containerTours, SWT.RADIO);
+//				_rdoAdjustSelectedTours.setText(Messages.Photos_AndTours_Radio_AdjustTime_SelectedTours);
+//				_rdoAdjustSelectedTours.setToolTipText(Messages.Photos_AndTours_Radio_AdjustTime_SelectedTours_Tooltip);
+//			}
 
 			createUI_44_AdjustTime(container);
 
@@ -740,7 +743,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 				linkImport.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
-						Util.showView(PicDirView.ID);
+						Util.showView(PicDirView.ID, true);
 					}
 				});
 			}
@@ -1175,29 +1178,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 			final ISelection originalSelection = ((SyncSelection) selection).getSelection();
 
 			if (originalSelection instanceof PhotoSelection) {
-
 				updatePhotosAndTours(((PhotoSelection) originalSelection).photoWrappers, true);
-
-//				final IWorkbenchPage activePage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-//
-//				// ensure link view is opened
-//				for (final IViewReference viewRef : activePage.getViewReferences()) {
-//					if (viewRef.getId().equals(TourPhotoLinkView.ID)) {
-//						final IViewPart viewPart = viewRef.getView(false);
-//						if (viewPart == null) {
-//							Util.showViewNotActive(TourPhotoLinkView.ID);
-//						}
-//					}
-//				}
-//
-//				if (_tourPhotoLinkSelection != null) {
-//
-//					_pageBook.getDisplay().asyncExec(new Runnable() {
-//						public void run() {
-//							PhotoManager.fireEvent(PhotoEventId.PHOTO_SELECTION, _tourPhotoLinkSelection);
-//						}
-//					});
-//				}
 			}
 
 		} else if (selection instanceof PhotoSelection && part instanceof PicDirView) {
@@ -1325,18 +1306,17 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 	private void restoreState() {
 
 		// photo filter
-		_isFilterOneHistoryTour = Util.getStateBoolean(_state, STATE_FILTER_NO_TOURS, true);
 		_isShowToursOnlyWithPhotos = Util.getStateBoolean(_state, STATE_FILTER_PHOTOS, true);
 
 		_actionFilterOneHistory.setChecked(_isFilterOneHistoryTour);
 		_actionFilterPhotos.setChecked(_isShowToursOnlyWithPhotos);
 
-		/*
-		 * time adjustment all/selected tours
-		 */
-		final boolean isAllTours = Util.getStateBoolean(_state, STATE_TIME_ADJUSTMENT_TOURS, true);
-		_rdoAdjustAllTours.setSelection(isAllTours);
-		_rdoAdjustSelectedTours.setSelection(isAllTours == false);
+//		/*
+//		 * time adjustment all/selected tours
+//		 */
+//		final boolean isAllTours = Util.getStateBoolean(_state, STATE_TIME_ADJUSTMENT_TOURS, true);
+//		_rdoAdjustAllTours.setSelection(isAllTours);
+//		_rdoAdjustSelectedTours.setSelection(isAllTours == false);
 
 		final String prevCameraName = Util.getStateString(_state, STATE_SELECTED_CAMERA_NAME, null);
 		updateUI_Cameras(prevCameraName);
@@ -1350,10 +1330,10 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 			return;
 		}
 
-		/*
-		 * time adjustment all/selected tours
-		 */
-		_state.put(STATE_TIME_ADJUSTMENT_TOURS, _rdoAdjustAllTours.getSelection());
+//		/*
+//		 * time adjustment all/selected tours
+//		 */
+//		_state.put(STATE_TIME_ADJUSTMENT_TOURS, _rdoAdjustAllTours.getSelection());
 
 		/*
 		 * selected camera
@@ -1370,7 +1350,6 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 		// photo filter
 		_state.put(STATE_FILTER_PHOTOS, _actionFilterPhotos.isChecked());
-		_state.put(STATE_FILTER_NO_TOURS, _actionFilterOneHistory.isChecked());
 
 		_columnManager.saveState(_state);
 	}

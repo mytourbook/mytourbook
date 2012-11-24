@@ -54,7 +54,6 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourPersonHRZone;
-import net.tourbook.data.TourPhoto;
 import net.tourbook.data.TourReference;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
@@ -1843,23 +1842,23 @@ public class TourDatabase {
 
 				stmt = conn.createStatement();
 
-				createTableTourData(stmt);
+				createTable_TourData(stmt);
 
-				createTableTourPerson(stmt);
-				createTableTourPersonHRZone(stmt);
-				createTableTourType(stmt);
-				createTableTourMarker(stmt);
-				createTableTourPhoto(stmt);
-				createTableTourReference(stmt);
-				createTableTourCompared(stmt);
-				createTableTourBike(stmt);
+				createTable_TourPerson(stmt);
+				createTable_TourPersonHRZone(stmt);
+				createTable_TourType(stmt);
+				createTable_TourMarker(stmt);
+				createTable_TourPhoto(stmt);
+				createTable_TourReference(stmt);
+				createTable_TourCompared(stmt);
+				createTable_TourBike(stmt);
 
-				createTableVersion(stmt);
+				createTable_Version(stmt);
 
-				createTableTourTag(stmt);
-				createTableTourTagCategory(stmt);
+				createTable_TourTag(stmt);
+				createTable_TourTagCategory(stmt);
 
-				createTableTourWayPoint(stmt);
+				createTable_TourWayPoint(stmt);
 
 				_isTableChecked = true;
 
@@ -1975,7 +1974,7 @@ public class TourDatabase {
 	 * @param stmt
 	 * @throws SQLException
 	 */
-	private void createIndexTourData_005(final Statement stmt) throws SQLException {
+	private void createIndex_TourData_005(final Statement stmt) throws SQLException {
 
 		String sql;
 
@@ -2006,7 +2005,7 @@ public class TourDatabase {
 	 * @throws SQLException
 	 * @since db version 22
 	 */
-	private void createIndexTourData_022(final Statement stmt) throws SQLException {
+	private void createIndex_TourData_022(final Statement stmt) throws SQLException {
 
 		String sql;
 
@@ -2023,23 +2022,23 @@ public class TourDatabase {
 		exec(stmt, sql);
 	}
 
-	/**
-	 * Create index for {@link TourPhoto}, it will dramatically improve performance.
-	 * 
-	 * @param stmt
-	 * @throws SQLException
-	 * @since Db version 22
-	 */
-	private void createIndexTourPhoto_022(final Statement stmt) throws SQLException {
-
-		String sql;
-
-		/*
-		 * CREATE INDEX imageFilePathName
-		 */
-		sql = "CREATE INDEX ImageFilePathName ON " + TABLE_TOUR_PHOTO + " (imageFilePathName)"; //$NON-NLS-1$ //$NON-NLS-2$
-		exec(stmt, sql);
-	}
+//	/**
+//	 * Create index for {@link TourPhoto}, it will dramatically improve performance.
+//	 *
+//	 * @param stmt
+//	 * @throws SQLException
+//	 * @since Db version 22
+//	 */
+//	private void createIndexTourPhoto_022(final Statement stmt) throws SQLException {
+//
+//		String sql;
+//
+//		/*
+//		 * CREATE INDEX imageFilePathName
+//		 */
+//		sql = "CREATE INDEX ImageFilePathName ON " + TABLE_TOUR_PHOTO + " (imageFilePathName)"; //$NON-NLS-1$ //$NON-NLS-2$
+//		exec(stmt, sql);
+//	}
 
 	/**
 	 * create table {@link #TABLE_TOUR_BIKE}
@@ -2047,7 +2046,7 @@ public class TourDatabase {
 	 * @param stmt
 	 * @throws SQLException
 	 */
-	private void createTableTourBike(final Statement stmt) throws SQLException {
+	private void createTable_TourBike(final Statement stmt) throws SQLException {
 
 		String sql;
 
@@ -2085,7 +2084,7 @@ public class TourDatabase {
 	 * @param stmt
 	 * @throws SQLException
 	 */
-	private void createTableTourCompared(final Statement stmt) throws SQLException {
+	private void createTable_TourCompared(final Statement stmt) throws SQLException {
 
 		String sql;
 
@@ -2113,7 +2112,7 @@ public class TourDatabase {
 	 * @param stmt
 	 * @throws SQLException
 	 */
-	private void createTableTourData(final Statement stmt) throws SQLException {
+	private void createTable_TourData(final Statement stmt) throws SQLException {
 
 		String sql;
 
@@ -2325,8 +2324,8 @@ public class TourDatabase {
 
 		exec(stmt, sql);
 
-		createIndexTourData_005(stmt);
-		createIndexTourData_022(stmt);
+		createIndex_TourData_005(stmt);
+		createIndex_TourData_022(stmt);
 	}
 
 	/**
@@ -2335,7 +2334,7 @@ public class TourDatabase {
 	 * @param stmt
 	 * @throws SQLException
 	 */
-	private void createTableTourMarker(final Statement stmt) throws SQLException {
+	private void createTable_TourMarker(final Statement stmt) throws SQLException {
 
 		String sql;
 
@@ -2416,7 +2415,7 @@ public class TourDatabase {
 	 * @param stmt
 	 * @throws SQLException
 	 */
-	private void createTableTourPerson(final Statement stmt) throws SQLException {
+	private void createTable_TourPerson(final Statement stmt) throws SQLException {
 
 		String sql;
 
@@ -2473,7 +2472,7 @@ public class TourDatabase {
 	 * @param stmt
 	 * @throws SQLException
 	 */
-	private void createTableTourPersonHRZone(final Statement stmt) throws SQLException {
+	private void createTable_TourPersonHRZone(final Statement stmt) throws SQLException {
 
 		String sql;
 
@@ -2542,7 +2541,7 @@ public class TourDatabase {
 	 * @param stmt
 	 * @throws SQLException
 	 */
-	private void createTableTourPhoto(final Statement stmt) throws SQLException {
+	private void createTable_TourPhoto(final Statement stmt) throws SQLException {
 
 		String sql;
 
@@ -2554,22 +2553,24 @@ public class TourDatabase {
 				+ "(															\n" //$NON-NLS-1$
 
 				//
-				+ "	photoId 					BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1),\n" //$NON-NLS-1$
+				+ "	photoId 					BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1),	\n" //$NON-NLS-1$
 				//
-				+ "	" + (TABLE_TOUR_DATA + "_tourId	BIGINT,						\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	" + (TABLE_TOUR_DATA + "_tourId	BIGINT						\n") //$NON-NLS-1$ //$NON-NLS-2$
 				//
-				+ ("	imageFileName			" + varCharKomma(TourPhoto.DB_LENGTH_FILE_PATH)) //$NON-NLS-1$
-				+ ("	imageFileExt			" + varCharKomma(TourPhoto.DB_LENGTH_FILE_PATH)) //$NON-NLS-1$
-				+ ("	imageFilePath			" + varCharKomma(TourPhoto.DB_LENGTH_FILE_PATH)) //$NON-NLS-1$
-				+ ("	imageFilePathName		" + varCharKomma(TourPhoto.DB_LENGTH_FILE_PATH)) //$NON-NLS-1$
-				//
-				+ "	imageExifTime				BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
-				+ "	imageFileLastModified		BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
-				+ "	adjustedTime				BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
-				//
-				+ "	isGeoFromPhoto				INT DEFAULT 0,					\n" //$NON-NLS-1$
-				+ "	latitude 					DOUBLE DEFAULT 0,				\n" //$NON-NLS-1$
-				+ "	longitude 					DOUBLE DEFAULT 0				\n" //$NON-NLS-1$
+//				+ ("	imageFileName			" + varCharKomma(TourPhoto.DB_LENGTH_FILE_PATH)) //$NON-NLS-1$
+//				+ ("	imageFileExt			" + varCharKomma(TourPhoto.DB_LENGTH_FILE_PATH)) //$NON-NLS-1$
+//				+ ("	imageFilePath			" + varCharKomma(TourPhoto.DB_LENGTH_FILE_PATH)) //$NON-NLS-1$
+//				+ ("	imageFilePathName		" + varCharKomma(TourPhoto.DB_LENGTH_FILE_PATH)) //$NON-NLS-1$
+//				//
+//				+ "	imageExifTime				BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
+//				+ "	imageFileLastModified		BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
+//				+ "	adjustedTime				BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
+//				//
+//				+ "	isGeoFromPhoto				INT DEFAULT 0,					\n" //$NON-NLS-1$
+//				+ "	latitude 					DOUBLE DEFAULT 0,				\n" //$NON-NLS-1$
+//				+ "	longitude 					DOUBLE DEFAULT 0				\n" //$NON-NLS-1$
+//
+//		createIndexTourPhoto_022(stmt);
 				//
 				+ ")"; //															//$NON-NLS-1$
 
@@ -2603,8 +2604,6 @@ public class TourDatabase {
 				+ "	PRIMARY KEY (" + TABLE_TOUR_DATA + "_tourId)"; //				//$NON-NLS-1$ //$NON-NLS-2$
 
 		exec(stmt, sql);
-
-		createIndexTourPhoto_022(stmt);
 	}
 
 	/**
@@ -2613,7 +2612,7 @@ public class TourDatabase {
 	 * @param stmt
 	 * @throws SQLException
 	 */
-	private void createTableTourReference(final Statement stmt) throws SQLException {
+	private void createTable_TourReference(final Statement stmt) throws SQLException {
 
 		String sql;
 
@@ -2674,7 +2673,7 @@ public class TourDatabase {
 	 * @param stmt
 	 * @throws SQLException
 	 */
-	private void createTableTourTag(final Statement stmt) throws SQLException {
+	private void createTable_TourTag(final Statement stmt) throws SQLException {
 
 		String sql;
 
@@ -2748,7 +2747,7 @@ public class TourDatabase {
 	 * @param stmt
 	 * @throws SQLException
 	 */
-	private void createTableTourTagCategory(final Statement stmt) throws SQLException {
+	private void createTable_TourTagCategory(final Statement stmt) throws SQLException {
 
 		/*
 		 * creates the tables for the tour tag categories for VERSION 5
@@ -2855,7 +2854,7 @@ public class TourDatabase {
 	 * @param stmt
 	 * @throws SQLException
 	 */
-	private void createTableTourType(final Statement stmt) throws SQLException {
+	private void createTable_TourType(final Statement stmt) throws SQLException {
 
 		String sql;
 
@@ -2907,7 +2906,7 @@ public class TourDatabase {
 	 * @param stmt
 	 * @throws SQLException
 	 */
-	private void createTableTourWayPoint(final Statement stmt) throws SQLException {
+	private void createTable_TourWayPoint(final Statement stmt) throws SQLException {
 
 		String sql;
 
@@ -2972,7 +2971,7 @@ public class TourDatabase {
 	 * @param stmt
 	 * @throws SQLException
 	 */
-	private void createTableVersion(final Statement stmt) throws SQLException {
+	private void createTable_Version(final Statement stmt) throws SQLException {
 
 		String sql;
 
@@ -3528,9 +3527,9 @@ public class TourDatabase {
 
 		final Statement stmt = conn.createStatement();
 		{
-			createTableTourTag(stmt);
-			createTableTourTagCategory(stmt);
-			createIndexTourData_005(stmt);
+			createTable_TourTag(stmt);
+			createTable_TourTagCategory(stmt);
+			createIndex_TourData_005(stmt);
 		}
 		stmt.close();
 
@@ -3672,7 +3671,7 @@ public class TourDatabase {
 
 		final Statement stmt = conn.createStatement();
 		{
-			createTableTourWayPoint(stmt);
+			createTable_TourWayPoint(stmt);
 
 			/**
 			 * resize description column: ref derby docu page 24
@@ -3967,7 +3966,7 @@ public class TourDatabase {
 		final Statement stmt = conn.createStatement();
 		{
 
-			createTableTourPersonHRZone(stmt);
+			createTable_TourPersonHRZone(stmt);
 
 //		TOURPERSON TOURPERSON TOURPERSON TOURPERSON TOURPERSON TOURPERSON
 //
@@ -4378,7 +4377,7 @@ public class TourDatabase {
 		final Statement stmt = conn.createStatement();
 		{
 
-			createTableTourPhoto(stmt);
+			createTable_TourPhoto(stmt);
 
 //			TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA
 //			// version 22 start  -  12.12.0
@@ -4408,7 +4407,7 @@ public class TourDatabase {
 			modifyColumnType(TABLE_TOUR_DATA, "TourRecordingTime", "BIGINT DEFAULT 0", stmt, monitor, ++no, max); //			//$NON-NLS-1$ //$NON-NLS-2$
 			modifyColumnType(TABLE_TOUR_DATA, "TourDrivingTime", "BIGINT DEFAULT 0", stmt, monitor, ++no, max); //				//$NON-NLS-1$ //$NON-NLS-2$
 
-			createIndexTourData_022(stmt);
+			createIndex_TourData_022(stmt);
 
 //			TOURMARKER	TOURMARKER	TOURMARKER	TOURMARKER	TOURMARKER	TOURMARKER	TOURMARKER	TOURMARKER
 //

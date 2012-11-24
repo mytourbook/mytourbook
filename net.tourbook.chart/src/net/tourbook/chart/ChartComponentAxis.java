@@ -174,56 +174,12 @@ public class ChartComponentAxis extends Canvas {
 	}
 
 	/**
-	 * draw the chart on the axisImage
-	 */
-	private void drawAxisImage() {
-
-		final Rectangle axisRect = getClientArea();
-
-		if (axisRect.width <= 0 || axisRect.height <= 0) {
-			return;
-		}
-
-		// when the image is the same size as the new we will redraw it only if
-		// it is modified
-		if (!_isAxisModified && _axisImage != null) {
-
-			final Rectangle oldBounds = _axisImage.getBounds();
-
-			if (oldBounds.width == axisRect.width && oldBounds.height == axisRect.height) {
-				return;
-			}
-		}
-
-		if (Util.canReuseImage(_axisImage, axisRect) == false) {
-			_axisImage = Util.createImage(getDisplay(), _axisImage, axisRect);
-		}
-
-		// draw into the image
-		final GC gc = new GC(_axisImage);
-
-		gc.setBackground(_chart.getBackgroundColor());
-//		gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
-		gc.fillRectangle(_axisImage.getBounds());
-
-		drawYUnits(gc, axisRect);
-
-		if (_tourToolTipProvider != null) {
-			_tourToolTipProvider.paint(gc, axisRect);
-		}
-
-		gc.dispose();
-
-		_isAxisModified = false;
-	}
-
-	/**
 	 * draws unit label and ticks onto the y-axis
 	 * 
 	 * @param gc
 	 * @param graphRect
 	 */
-	private void drawYUnits(final GC gc, final Rectangle axisRect) {
+	private void draw_10_YUnits(final GC gc, final Rectangle axisRect) {
 
 		if (_graphDrawingData == null) {
 			return;
@@ -345,6 +301,61 @@ public class ChartComponentAxis extends Canvas {
 				gc.drawLine(devX, devYBottom, devX, devYTop);
 			}
 		}
+	}
+
+	private void draw_20_ZoomMarker(final GC gc, final Rectangle rect) {
+
+		final double zoomRatio = _componentGraph.getZoomRatio();
+		final double leftBorderRatio = _componentGraph.getZoomRatioLeftBorder();
+
+//		System.out.println(UI.timeStampNano() + " zoomRatio " + zoomRatio + "\tleftBorderRatio " + leftBorderRatio);
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
+	}
+
+	/**
+	 * draw the chart on the axisImage
+	 */
+	private void drawAxisImage() {
+
+		final Rectangle axisRect = getClientArea();
+
+		if (axisRect.width <= 0 || axisRect.height <= 0) {
+			return;
+		}
+
+		// when the image is the same size as the new we will redraw it only if
+		// it is modified
+		if (!_isAxisModified && _axisImage != null) {
+
+			final Rectangle oldBounds = _axisImage.getBounds();
+
+			if (oldBounds.width == axisRect.width && oldBounds.height == axisRect.height) {
+				return;
+			}
+		}
+
+		if (Util.canReuseImage(_axisImage, axisRect) == false) {
+			_axisImage = Util.createImage(getDisplay(), _axisImage, axisRect);
+		}
+
+		// draw into the image
+		final GC gc = new GC(_axisImage);
+
+		gc.setBackground(_chart.getBackgroundColor());
+//		gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+		gc.fillRectangle(_axisImage.getBounds());
+
+		draw_10_YUnits(gc, axisRect);
+		draw_20_ZoomMarker(gc, axisRect);
+
+		if (_tourToolTipProvider != null) {
+			_tourToolTipProvider.paint(gc, axisRect);
+		}
+
+		gc.dispose();
+
+		_isAxisModified = false;
 	}
 
 	public Rectangle getAxisClientArea() {

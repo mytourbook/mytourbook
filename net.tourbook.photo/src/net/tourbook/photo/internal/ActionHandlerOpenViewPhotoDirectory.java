@@ -26,7 +26,7 @@ public class ActionHandlerOpenViewPhotoDirectory extends AbstractHandler {
 
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 
-		Util.showView(PicDirView.ID);
+		Util.showView(PicDirView.ID, true);
 
 		return null;
 	}

@@ -4747,10 +4747,6 @@ public class ChartComponentGraph extends Canvas {
 		return _chartComponents.getDevVisibleChartHeight();
 	}
 
-	double getGraphZoomRatio() {
-		return _graphZoomRatio;
-	}
-
 	int getHoveredLineValueIndex() {
 		return _hoveredLineValueIndex;
 	}
@@ -4862,8 +4858,12 @@ public class ChartComponentGraph extends Canvas {
 		return _xxDevViewPortLeftBorder;
 	}
 
-	public double getZoomRatio() {
+	double getZoomRatio() {
 		return _graphZoomRatio;
+	}
+
+	double getZoomRatioLeftBorder() {
+		return _zoomRatioLeftBorder;
 	}
 
 	private void handleChartResizeForSliders() {

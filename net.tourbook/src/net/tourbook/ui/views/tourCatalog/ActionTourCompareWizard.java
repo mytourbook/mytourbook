@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -70,7 +70,7 @@ public class ActionTourCompareWizard extends Action {
 						workbench.showPerspective(PerspectiveFactoryCompareTours.PERSPECTIVE_ID, window);
 
 						// show tour compare view
-						Util.showView(TourCompareResultView.ID);
+						Util.showView(TourCompareResultView.ID, true);
 
 					} catch (final WorkbenchException e) {
 						e.printStackTrace();
