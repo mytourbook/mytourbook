@@ -48,6 +48,6 @@ public class DebugStream extends PrintStream {
 
 	private void showLocation() {
 		final StackTraceElement element = Thread.currentThread().getStackTrace()[3];
-		super.print(MessageFormat.format("({0}:{1, number,#}) : ", element.getFileName(), element.getLineNumber()));
+		super.print(MessageFormat.format("({0}:{1, number,#}) : ", element.getFileName(), element.getLineNumber())); //$NON-NLS-1$
 	}
 }

@@ -41,10 +41,10 @@ public class ChartUnit {
 
 	@Override
 	public String toString() {
-		return "\tChartUnit"
-				+ (" value=" + (long) value + ", ")
-				+ ("\tvalueLabel=" + valueLabel + ", ")
-				+ ("\tisMajorValue=" + isMajorValue)
+		return "\tChartUnit" //$NON-NLS-1$
+				+ (" value=" + (long) value + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("\tvalueLabel=" + valueLabel + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("\tisMajorValue=" + isMajorValue) //$NON-NLS-1$
 //
 		;
 	}

@@ -201,12 +201,8 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_Tour_WeekDay_Header;
 	public static String		ColumnFactory_Tour_WeekDay_Label;
 	public static String		ColumnFactory_Tour_WeekDay_Tooltip;
-
-	public static String	ColumnFactory_TourCamera_Label;
-
-	public static String	ColumnFactory_TourCamera_Label_Header;
-
-	public static String	ColumnFactory_TourCamera_Label_Tooltip;
+	public static String		ColumnFactory_TourCamera_Label;
+	public static String		ColumnFactory_TourCamera_Label_Tooltip;
 	public static String		ColumnFactory_TourDistanceDiff_Label;
 	public static String		ColumnFactory_TourDistanceDiff_Tooltip;
 	public static String		ColumnFactory_TourDurationTime_Header;
@@ -266,8 +262,7 @@ public class Messages extends NLS {
 
 	public static String		Tour_Tooltip_Format_Date;
 	public static String		Tour_Tooltip_Format_DateWeekTime;
-
-	public static String	Tour_Tooltip_Format_HistoryDateTime;
+	public static String		Tour_Tooltip_Format_HistoryDateTime;
 	public static String		Tour_Tooltip_Format_Pace;
 	public static String		Tour_Tooltip_Format_WindDirectionUnit;
 	public static String		Tour_Tooltip_Format_WindSpeedUnit;

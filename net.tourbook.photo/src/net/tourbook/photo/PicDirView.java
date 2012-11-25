@@ -48,7 +48,7 @@ public class PicDirView extends ViewPart {
 
 	static public final String				ID									= "net.tourbook.photo.PicDirView";		//$NON-NLS-1$
 
-	private static final String				SEPARATOR_ID_PIC_DIR_VIEW_TOOL_BAR	= "PicDirViewToolBar";
+	private static final String				SEPARATOR_ID_PIC_DIR_VIEW_TOOL_BAR	= "PicDirViewToolBar"; //$NON-NLS-1$
 
 	private static final String				STATE_TREE_WIDTH					= "STATE_TREE_WIDTH";					//$NON-NLS-1$
 

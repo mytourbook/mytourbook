@@ -275,15 +275,15 @@ public class TourPhotoLink {
 
 	@Override
 	public String toString() {
-		return "TourPhotoLink "
+		return "TourPhotoLink " //$NON-NLS-1$
 //				+ ("\n\ttourStart=\t\t" + tourStartTime)
-				+ ("\n\ttourStart=\t\t" + _dtFormatter.print(tourStartTime))
+				+ ("\n\ttourStart=\t\t" + _dtFormatter.print(tourStartTime)) //$NON-NLS-1$
 //				+ ("\n\ttourEnd=\t\t" + _dtFormatter.print(tourEndTime))
-				+ ("\n\thistoryStartTime=\t" + _dtFormatter.print(historyStartTime))
+				+ ("\n\thistoryStartTime=\t" + _dtFormatter.print(historyStartTime)) //$NON-NLS-1$
 //				+ ("\n\thistoryEndTime=\t\t" + _dtFormatter.print(historyEndTime))
-				+ ("\n\tisHistory=" + isHistoryTour)
-				+ ("\tlinkId=" + linkId)
-				+ ("\n")
+				+ ("\n\tisHistory=" + isHistoryTour) //$NON-NLS-1$
+				+ ("\tlinkId=" + linkId) //$NON-NLS-1$
+				+ ("\n") //$NON-NLS-1$
 		//
 		;
 	}

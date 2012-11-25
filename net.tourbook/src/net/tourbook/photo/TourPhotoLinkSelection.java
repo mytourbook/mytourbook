@@ -33,8 +33,8 @@ public class TourPhotoLinkSelection extends SelectionTourIds {
 	@Override
 	public String toString() {
 		final int maxLen = 5;
-		return "TourPhotoLinkSelection "
-				+ "tourPhotoLinks="
+		return "TourPhotoLinkSelection " //$NON-NLS-1$
+				+ "tourPhotoLinks=" //$NON-NLS-1$
 				+ (tourPhotoLinks != null ? tourPhotoLinks.subList(0, Math.min(tourPhotoLinks.size(), maxLen)) : null)
 		//
 		;

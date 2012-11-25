@@ -33,7 +33,7 @@ public class HistoryData {
 
 	@Override
 	public String toString() {
-		return "HistoryData [absoluteTime=" + absoluteTime + "]";
+		return "HistoryData [absoluteTime=" + absoluteTime + "]"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 }

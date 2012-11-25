@@ -40,7 +40,7 @@ public class SyncSelection implements ISelection, ISelectionConverter {
 
 	@Override
 	public String toString() {
-		return "SyncSelection [originalSelection=" + originalSelection + "]";
+		return "SyncSelection [originalSelection=" + originalSelection + "]"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 }

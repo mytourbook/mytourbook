@@ -77,7 +77,7 @@ public class PhotoManager {
 
 	private static final IDialogSettings	_state							= TourbookPlugin.getDefault() //
 																					.getDialogSettingsSection(
-																							"PhotoManager");
+																							"PhotoManager"); //$NON-NLS-1$
 	private static PhotoManager				_instance;
 
 //	private boolean							_isOverwritePhotoGPS				= true;

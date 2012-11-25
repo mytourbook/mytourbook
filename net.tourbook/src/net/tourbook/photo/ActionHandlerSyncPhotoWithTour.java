@@ -33,7 +33,7 @@ import org.eclipse.ui.handlers.RegistryToggleState;
 
 public class ActionHandlerSyncPhotoWithTour extends AbstractHandler {
 
-	static final String		COMMAND_ID				= "command.net.tourbook.PicDir.SyncPhotoWithTour";
+	static final String		COMMAND_ID				= "command.net.tourbook.PicDir.SyncPhotoWithTour"; //$NON-NLS-1$
 
 	private boolean			_isInitializedState;
 	private boolean			_isInitializedView;

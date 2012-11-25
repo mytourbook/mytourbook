@@ -92,7 +92,7 @@ import org.eclipse.ui.progress.UIJob;
  */
 public class PicDirFolder {
 
-	private static final String								MENU_ID_PIC_DIR_VIEW_IN_FOLDER			= "menu.net.tourbook.photo.PicDirView.InFolder";
+	private static final String								MENU_ID_PIC_DIR_VIEW_IN_FOLDER			= "menu.net.tourbook.photo.PicDirView.InFolder"; //$NON-NLS-1$
 
 	static String											WIN_PROGRAMFILES						= System
 																											.getenv("programfiles");					//$NON-NLS-1$

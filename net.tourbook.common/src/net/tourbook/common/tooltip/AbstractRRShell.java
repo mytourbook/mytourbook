@@ -272,10 +272,10 @@ public abstract class AbstractRRShell {
 
 	@Override
 	public String toString() {
-		return ("_isResizeable=" + _isResizeable)
-				+ ("\tTrimWidth=" + _shellTrimWidth)
-				+ ("\tTrimHeight=" + _shellTrimHeight)
-				+ ("\t_shell=" + _shell.getText());
+		return ("_isResizeable=" + _isResizeable) //$NON-NLS-1$
+				+ ("\tTrimWidth=" + _shellTrimWidth) //$NON-NLS-1$
+				+ ("\tTrimHeight=" + _shellTrimHeight) //$NON-NLS-1$
+				+ ("\t_shell=" + _shell.getText()); //$NON-NLS-1$
 	}
 
 	public void updateColors(final Color fgColor, final Color bgColor) {

@@ -124,7 +124,7 @@ public class UI {
 
 	public static final Charset			UTF8_CHARSET					= Charset.forName("UTF-8");												//$NON-NLS-1$
 
-	public static final String			MENU_SEPARATOR_ADDITIONS		= "additions";
+	public static final String			MENU_SEPARATOR_ADDITIONS		= "additions"; //$NON-NLS-1$
 
 	/**
 	 * layout hint for a description field

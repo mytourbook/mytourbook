@@ -51,9 +51,9 @@ public class PhotoSelection implements ISelection {
 
 		final int maxLen = 5;
 
-		return "PhotoSelection [photoWrapperList="
+		return "PhotoSelection [photoWrapperList=" //$NON-NLS-1$
 				+ (photoWrappers != null ? photoWrappers.subList(0, Math.min(photoWrappers.size(), maxLen)) : null)
-				+ "]";
+				+ "]"; //$NON-NLS-1$
 	}
 
 }

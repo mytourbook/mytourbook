@@ -69,7 +69,7 @@ public class Camera implements Comparable<Camera> {
 
 	@Override
 	public String toString() {
-		return "Camera [cameraName=" + cameraName + "{)}, timeAdjustment=" + timeAdjustment + "]";
+		return "Camera [cameraName=" + cameraName + "{)}, timeAdjustment=" + timeAdjustment + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 }

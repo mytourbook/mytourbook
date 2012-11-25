@@ -47,11 +47,11 @@ public class ChartPhoto {
 
 	@Override
 	public String toString() {
-		return "ChartPhoto xValue="
+		return "ChartPhoto xValue=" //$NON-NLS-1$
 				+ xValue
-				+ "{)}, serieIndex="
+				+ "{)}, serieIndex=" //$NON-NLS-1$
 				+ serieIndex
-				+ "{)}, photoWrapper="
+				+ "{)}, photoWrapper=" //$NON-NLS-1$
 				+ photoWrapper
 				;
 	}

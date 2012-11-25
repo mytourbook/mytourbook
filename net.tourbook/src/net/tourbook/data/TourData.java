@@ -114,6 +114,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public static final int									DB_LENGTH_WEATHER					= 1000;
 	public static final int									DB_LENGTH_WEATHER_CLOUDS			= 255;
 
+	private static final String								TIME_ZONE_ID_EUROPE_BERLIN			= "Europe/Berlin";									//$NON-NLS-1$
+
 	public static final int									MIN_TIMEINTERVAL_FOR_MAX_SPEED		= 20;
 
 	public static final float								MAX_BIKE_SPEED						= 120f;
@@ -997,7 +999,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * Contains data from a merged tour which contains photos
 	 */
 	@Transient
-	public TourPhotoLink										mergedTour;
+	public TourPhotoLink									mergedTour;
 
 	/**
 	 * 
@@ -4769,7 +4771,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 		final DateTimeZone defaultZone = DateTimeZone.getDefault();
 
-		if (defaultZone.getID().equals("Europe/Berlin")) {
+		if (defaultZone.getID().equals(TIME_ZONE_ID_EUROPE_BERLIN)) {
 
 			if (tourStartUTC < net.tourbook.common.UI.beforeCET && tourEnd > net.tourbook.common.UI.afterCETBegin) {
 

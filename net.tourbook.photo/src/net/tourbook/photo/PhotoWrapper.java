@@ -116,7 +116,7 @@ public class PhotoWrapper implements IGalleryCustomData {
 	@Override
 	public String toString() {
 
-		return (imageFileLastModified + "  ") + imageFileName + ("\tadjustedTime " + new DateTime(adjustedTime)); //$NON-NLS-1$
+		return (imageFileLastModified + "  ") + imageFileName + ("\tadjustedTime " + new DateTime(adjustedTime)); //$NON-NLS-1$ //$NON-NLS-2$
 
 //		return photo.toString();
 	}

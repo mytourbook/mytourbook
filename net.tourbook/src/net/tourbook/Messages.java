@@ -19,14 +19,11 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-	private static final String	BUNDLE_NAME	= "net.tourbook.messages";							//$NON-NLS-1$
+	private static final String	BUNDLE_NAME	= "net.tourbook.messages";									//$NON-NLS-1$
 
 	public static String		Action_PhotosAndTours_FilterNoTours_Tooltip;
 	public static String		Action_PhotosAndTours_FilterPhotos_Tooltip;
-
-	public static String	Action_PhotosAndTours_ResetTimeAdjustment;
-
-	public static String	Action_PhotosAndTours_SetGPSIntoPhotos;
+	public static String		Action_PhotosAndTours_SetGPSIntoPhotos;
 
 	public static String		Action_ToolTip_Hide;
 	public static String		Action_ToolTip_SetDefaults;
@@ -291,10 +288,8 @@ public class Messages extends NLS {
 	public static String		App_Action_Save;
 	public static String		App_Action_SetPerson;
 	public static String		App_Action_SplitTour;
-
-	public static String	App_Action_ToolTipLocation_AboveTourChart_Tooltip;
-
-	public static String	App_Action_ToolTipLocation_BelowTourChart_Tooltip;
+	public static String		App_Action_ToolTipLocation_AboveTourChart_Tooltip;
+	public static String		App_Action_ToolTipLocation_BelowTourChart_Tooltip;
 
 	public static String		App_measurement_imperial;
 	public static String		App_measurement_metric;
@@ -657,7 +652,6 @@ public class Messages extends NLS {
 	public static String		Image__link;
 	public static String		Image__MyTourbook16;
 	public static String		Image__options;
-	public static String		Image__Photo_FilterNo;
 	public static String		Image__Photo_FilterNoTours;
 	public static String		Image__Photo_FilterPhotos;
 	public static String		Image__Photo_FilterPhotos_Disabled;
@@ -665,7 +659,6 @@ public class Messages extends NLS {
 	public static String		Image__PhotoGalleryHorizontal;
 	public static String		Image__PhotoGalleryVertical;
 	public static String		Image__PhotoPhotos;
-	public static String		Image__PhotoTourPhotos;
 	public static String		Image__Pin;
 	public static String		Image__PulseZones;
 	public static String		Image__PulseZones_Disabled;
@@ -791,43 +784,26 @@ public class Messages extends NLS {
 
 	public static String		Photo_Gallery_Action_ToggleGalleryHorizontal_ToolTip;
 	public static String		Photo_Gallery_Action_ToggleGalleryVertical_ToolTip;
-
-	public static String	Photo_Gallery_Label_NoTourWithPhoto;
+	public static String		Photo_Gallery_Label_NoTourWithPhoto;
 
 	public static String		Photo_Tooltip_Action_MoveToolTip_ToolTip;
 	public static String		Photo_Tooltip_Action_PinToolTip_ToolTip;
 	public static String		Photo_Tooltip_Label_ShellNoResize;
 	public static String		Photo_Tooltip_Label_ShellWithResize;
 
-	public static String	Photos_AndTours_Combo_Camera_Tooltip;
-
-	public static String	Photos_AndTours_Dialog_ImageIsReadOnly_Message;
-
-	public static String	Photos_AndTours_Dialog_ImageIsReadOnly_Title;
-
-	public static String	Photos_AndTours_ErrorDialog_OriginalImageFileCannotBeRenamed;
-
-	public static String	Photos_AndTours_ErrorDialog_RenamedOriginalFileCannotBeDeleted;
-
-	public static String	Photos_AndTours_ErrorDialog_SeriousProblemRenamingOriginalImageFile;
-
-	public static String	Photos_AndTours_ErrorDialog_Title;
-
+	public static String		Photos_AndTours_Combo_Camera_Tooltip;
+	public static String		Photos_AndTours_Dialog_ImageIsReadOnly_Message;
+	public static String		Photos_AndTours_Dialog_ImageIsReadOnly_Title;
+	public static String		Photos_AndTours_ErrorDialog_OriginalImageFileCannotBeRenamed;
+	public static String		Photos_AndTours_ErrorDialog_RenamedOriginalFileCannotBeDeleted;
+	public static String		Photos_AndTours_ErrorDialog_SeriousProblemRenamingOriginalImageFile;
+	public static String		Photos_AndTours_ErrorDialog_Title;
 	public static String		Photos_AndTours_Label_AdjustTime;
-
-	public static String	Photos_AndTours_Label_AdjustTime_Tooltip;
+	public static String		Photos_AndTours_Label_AdjustTime_Tooltip;
 	public static String		Photos_AndTours_Label_NoCamera;
 	public static String		Photos_AndTours_Label_NoSelectedPhoto;
 	public static String		Photos_AndTours_Label_NoTourIsAvailable;
 	public static String		Photos_AndTours_Link_PhotoDirectory;
-
-	public static String	Photos_AndTours_Radio_AdjustTime_AllTours;
-
-	public static String	Photos_AndTours_Radio_AdjustTime_AllTours_Tooltip;
-
-	public static String	Photos_AndTours_Radio_AdjustTime_SelectedTours;
-
-	public static String	Photos_AndTours_Radio_AdjustTime_SelectedTours_Tooltip;
 	public static String		Photos_AndTours_Spinner_AdjustHours_Tooltip;
 	public static String		Photos_AndTours_Spinner_AdjustMinutes_Tooltip;
 	public static String		Photos_AndTours_Spinner_AdjustSeconds_Tooltip;
@@ -1518,9 +1494,6 @@ public class Messages extends NLS {
 	public static String		UI_Label_no_chart_is_selected;
 	public static String		UI_Label_PersonIsRequired;
 	public static String		UI_Label_TourIsNotSelected;
-	public static String		Unit_Label_Hour;
-	public static String		Unit_Label_Minute;
-	public static String		Unit_Label_Second;
 
 	public static String		ui_tour_not_defined;
 

@@ -46,10 +46,10 @@ public class PhotoGroup {
 
 	@Override
 	public String toString() {
-		return "PhotoGroup ["
-				+ ("hGridStart=" + hGridStart + ", ")
-				+ ("hGridEnd=" + hGridEnd + ", ")
-				+ ("paintedGroupText=" + paintedGroupText)
-				+ "]";
+		return "PhotoGroup [" //$NON-NLS-1$
+				+ ("hGridStart=" + hGridStart + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("hGridEnd=" + hGridEnd + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("paintedGroupText=" + paintedGroupText) //$NON-NLS-1$
+				+ "]"; //$NON-NLS-1$
 	}
 }
