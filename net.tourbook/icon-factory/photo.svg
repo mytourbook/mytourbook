@@ -22,15 +22,15 @@
     <linearGradient
        id="linearGradient6549">
       <stop
-         style="stop-color:#8b8b8b;stop-opacity:1;"
+         style="stop-color:#ff1717;stop-opacity:1;"
          offset="0"
          id="stop6551" />
       <stop
          id="stop6559"
          offset="0.50693375"
-         style="stop-color:#545454;stop-opacity:1;" />
+         style="stop-color:#c30000;stop-opacity:1;" />
       <stop
-         style="stop-color:#717171;stop-opacity:1;"
+         style="stop-color:#ff0101;stop-opacity:1;"
          offset="1"
          id="stop6553" />
     </linearGradient>
@@ -1395,7 +1395,7 @@
        fx="183"
        fy="97.362183"
        r="5"
-       gradientTransform="matrix(1,0,0,0.7999991,2,20.472528)"
+       gradientTransform="matrix(1,0,0,0.7999991,2,20.222531)"
        gradientUnits="userSpaceOnUse" />
     <radialGradient
        r="2.75"
@@ -1637,9 +1637,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="18.813867"
-     inkscape:cx="170.89505"
-     inkscape:cy="928.28955"
+     inkscape:zoom="26.606826"
+     inkscape:cx="189.02196"
+     inkscape:cy="952.45483"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -2103,13 +2103,13 @@
        sodipodi:rx="2.5"
        sodipodi:ry="2.5"
        d="m 95,39.862183 a 2.5,2.5 0 1 1 -5,0 2.5,2.5 0 1 1 5,0 z"
-       transform="matrix(0.9605324,0,0,0.9605324,99.12737,52.07871)"
+       transform="matrix(0.9605324,0,0,0.9605324,99.12737,51.178265)"
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\photo-filter-photos.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
-       style="fill:url(#radialGradient6557);fill-opacity:1;stroke:#545454;opacity:1;stroke-opacity:1;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none"
-       d="m 183,94.362192 4,4 0,3.999988 2,0 0,-3.999988 4,-4 z"
+       style="fill:url(#radialGradient6557);fill-opacity:1;stroke:#fe0000;stroke-width:0.50000000000000000;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 183,94.112195 4,4 0,3.999985 2,0 0,-3.999985 4,-4 z"
        id="path5771"
        inkscape:connector-curvature="0"
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\photo-filter-photos.png"

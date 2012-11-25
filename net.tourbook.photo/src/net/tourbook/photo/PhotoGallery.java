@@ -46,7 +46,6 @@ public class PhotoGallery extends ImageGallery {
 	private static final String			STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY	= "STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY";	//$NON-NLS-1$
 	private static final String			STATE_IS_SHOW_PHOTO_GPS_ANNOTATION	= "STATE_IS_SHOW_PHOTO_GPS_ANNOTATION";	//$NON-NLS-1$
 	private static final String			STATE_IS_SHOW_PHOTO_TOOLTIP			= "STATE_IS_SHOW_PHOTO_TOOLTIP";			//$NON-NLS-1$
-	static final String					IMAGE_PHOTO_FILTER_NO_FILTER		= "IMAGE_PHOTO_FILTER_NO_FILTER";			//$NON-NLS-1$
 
 	public static final String			IMAGE_PHOTO_FILTER_GPS				= "IMAGE_PHOTO_FILTER_GPS";				//$NON-NLS-1$
 	public static final String			IMAGE_PHOTO_FILTER_NO_GPS			= "IMAGE_PHOTO_FILTER_NO_GPS";				//$NON-NLS-1$
@@ -68,9 +67,6 @@ public class PhotoGallery extends ImageGallery {
 	private GallerySorting				_gallerySorting;
 
 	static {
-		UI.IMAGE_REGISTRY.put(
-				IMAGE_PHOTO_FILTER_NO_FILTER,
-				Activator.getImageDescriptor(Messages.Image__PhotoFilterNoFilter));
 		UI.IMAGE_REGISTRY.put(//
 				IMAGE_PHOTO_FILTER_GPS,
 				Activator.getImageDescriptor(Messages.Image__PhotoFilterGPS));
@@ -253,6 +249,8 @@ public class PhotoGallery extends ImageGallery {
 		_isShowActionSorting = false;
 	}
 
+
+
 	@Override
 	public void restoreState(final IDialogSettings state) {
 
@@ -303,11 +301,12 @@ public class PhotoGallery extends ImageGallery {
 		}
 		_actionSortFileByDate.setChecked(_gallerySorting == GallerySorting.FILE_DATE);
 		_actionSortByFileName.setChecked(_gallerySorting == GallerySorting.FILE_NAME);
+		
+		super.restoreState(state);
 
+		// !!! overwrite super settings !!!
 		setSorting(_gallerySorting);
 		setFilter(_currentImageFilter);
-
-		super.restoreState(state);
 
 		enableActions();
 

@@ -364,6 +364,10 @@ public class PicDirView extends ViewPart {
 		saveState();
 	}
 
+	public void refreshUI() {
+		_picDirImages.refreshUI();
+	}
+
 	public void registerContextMenu(final String menuId, final MenuManager menuMgr) {
 
 		getSite().registerContextMenu(menuId, menuMgr, _postSelectionProvider);

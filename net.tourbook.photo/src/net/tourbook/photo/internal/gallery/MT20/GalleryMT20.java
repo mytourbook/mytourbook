@@ -2013,6 +2013,8 @@ public abstract class GalleryMT20 extends Canvas {
 
 				_itemHeight = _clientArea.height;
 				_itemWidth = (int) (_itemHeight * _itemRatio);
+
+				notifyZoomListener(_itemWidth, _itemHeight);
 			}
 		}
 

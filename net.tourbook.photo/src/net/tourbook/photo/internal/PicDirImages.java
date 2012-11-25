@@ -406,6 +406,10 @@ public class PicDirImages implements IPhotoGalleryProvider {
 		});
 	}
 
+	public void refreshUI() {
+		_photoGallery.refreshUI();
+	}
+
 	@Override
 	public void registerContextMenu(final String menuId, final MenuManager menuManager) {
 		_picDirView.registerContextMenu(menuId, menuManager);

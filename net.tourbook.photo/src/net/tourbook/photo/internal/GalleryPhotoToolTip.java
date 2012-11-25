@@ -184,7 +184,7 @@ public class GalleryPhotoToolTip extends AnimatedToolTipShell {
 
 			// display thumb image only when the gallery image is smaller than the default thumb size
 //			if (_galleryImageSize < PhotoLoadManager.IMAGE_SIZE_THUMBNAIL) {
-			if (_galleryImageSize < 120) {
+			if (_galleryImageSize < 160) {
 				createUI_PhotoImage(container);
 			}
 		}

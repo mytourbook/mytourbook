@@ -83,9 +83,13 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IViewReference;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.RegistryToggleState;
@@ -279,7 +283,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 		_isFilterOneHistoryTour = _actionFilterOneHistory.isChecked();
 
-		updateUI(_selectedLinks, false, false);
+		updateUI(_selectedLinks, false);
 
 		enableControls();
 	}
@@ -288,7 +292,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 		_isShowToursOnlyWithPhotos = _actionFilterPhotos.isChecked();
 
-		updateUI(_selectedLinks, false, false);
+		updateUI(_selectedLinks, false);
 	}
 
 //	private void actionResetTimeAdjustment() {
@@ -388,7 +392,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 					// sql filter is dirty, force reloading cached start/end
 					_photoMgr.resetTourStartEnd();
 
-					updateUI(_selectedLinks, true, false);
+					updateUI(_selectedLinks, false);
 
 				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
@@ -1062,7 +1066,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 		final boolean isPhotoAvailable = _allPhotos.size() > 0;
 		final boolean isPhotoFilter = _actionFilterOneHistory.isChecked() == false;
-		final boolean isTourWithGPS = _selectedTourPhotoLinksWithGps.size() > 0;
+//		final boolean isTourWithGPS = _selectedTourPhotoLinksWithGps.size() > 0;
 
 		_comboCamera.setEnabled(isPhotoAvailable);
 		_spinnerHours.setEnabled(isPhotoAvailable);
@@ -1111,6 +1115,26 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 	@Override
 	public ColumnManager getColumnManager() {
 		return _columnManager;
+	}
+
+	private PicDirView getPicDirView(final IWorkbenchWindow wbWindow) {
+
+		final IWorkbenchPage wbPage = wbWindow.getActivePage();
+		if (wbPage != null) {
+
+			for (final IViewReference viewRef : wbPage.getViewReferences()) {
+
+				if (viewRef.getId().equals(PicDirView.ID)) {
+
+					final IViewPart viewPart = viewRef.getView(false);
+					if (viewPart instanceof PicDirView) {
+						return (PicDirView) viewPart;
+					}
+				}
+			}
+		}
+
+		return null;
 	}
 
 	private Camera getSelectedCamera() {
@@ -1178,7 +1202,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 			final ISelection originalSelection = ((SyncSelection) selection).getSelection();
 
 			if (originalSelection instanceof PhotoSelection) {
-				updatePhotosAndTours(((PhotoSelection) originalSelection).photoWrappers, true);
+				showPhotosAndTours(((PhotoSelection) originalSelection).photoWrappers);
 			}
 
 		} else if (selection instanceof PhotoSelection && part instanceof PicDirView) {
@@ -1195,7 +1219,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 			final boolean isSync = (Boolean) state.getValue();
 
 			if (isSync) {
-				updatePhotosAndTours(photoSelection.photoWrappers, true);
+				showPhotosAndTours(photoSelection.photoWrappers);
 			}
 		}
 	}
@@ -1217,7 +1241,8 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 				_spinnerMinutes.getSelection(),
 				_spinnerSeconds.getSelection());
 
-		updateUI(_selectedLinks, false, false);
+		updateUI(_selectedLinks, false);
+
 	}
 
 	/**
@@ -1509,13 +1534,14 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 	/**
 	 * @param tourPhotos
-	 * @param isSelectAll
-	 *            When <code>true</code>, all links will be selected in the link viewer.
 	 */
-	void updatePhotosAndTours(final ArrayList<PhotoWrapper> tourPhotos, final boolean isSelectAll) {
+	void showPhotosAndTours(final ArrayList<PhotoWrapper> tourPhotos) {
 
-		if (tourPhotos.size() == 0) {
+		final int numberOfPhotos = tourPhotos.size();
+
+		if (numberOfPhotos == 0) {
 			clearView();
+			enableControls();
 			return;
 		}
 
@@ -1531,12 +1557,47 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 			}
 		}
 
-		updateUI(null, true, isSelectAll);
+		if (numberOfPhotos > 100) {
+
+			BusyIndicator.showWhile(_pageBook.getDisplay(), new Runnable() {
+				public void run() {
+					updateUI(null, true);
+				}
+			});
+
+		} else {
+
+			updateUI(null, true);
+		}
 	}
 
-	private void updateUI(	final ArrayList<TourPhotoLink> tourPhotoLinks,
-							final boolean isLoadToursFromDb,
-							final boolean isSelectAll) {
+	/**
+	 * Update GPS annotation in the image gallery.
+	 */
+	private void updateAnnotationsInPicDirView() {
+
+		PicDirView picDirView = null;
+
+		final IWorkbench wb = PlatformUI.getWorkbench();
+
+		picDirView = getPicDirView(wb.getActiveWorkbenchWindow());
+
+		if (picDirView == null) {
+
+			for (final IWorkbenchWindow wbWindow : wb.getWorkbenchWindows()) {
+				picDirView = getPicDirView(wbWindow);
+				if (picDirView != null) {
+					break;
+				}
+			}
+		}
+
+		if (picDirView != null) {
+			picDirView.refreshUI();
+		}
+	}
+
+	private void updateUI(final ArrayList<TourPhotoLink> tourPhotoLinksWhichShouldBeSelected, final boolean isSelectAll) {
 
 		if (_allPhotos.size() == 0) {
 			// view is not fully initialized, this happend in the pref listener
@@ -1545,8 +1606,8 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 		// get previous selected tour
 		TourPhotoLink prevTourPhotoLink = null;
-		if (tourPhotoLinks != null && tourPhotoLinks.size() > 0) {
-			prevTourPhotoLink = tourPhotoLinks.get(0);
+		if (tourPhotoLinksWhichShouldBeSelected != null && tourPhotoLinksWhichShouldBeSelected.size() > 0) {
+			prevTourPhotoLink = tourPhotoLinksWhichShouldBeSelected.get(0);
 		}
 
 		// this must be called BEFORE start/end date are set
@@ -1557,19 +1618,28 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 		_selectedTourPhotoLinksWithGps.clear();
 
 		if (_isFilterOneHistoryTour) {
-			_photoMgr.createTourPhotoLinks_99_OneHistoryTour(_allPhotos, _visibleTourPhotoLinks, _allTourCameras);
+
+			_photoMgr.createTourPhotoLinks_99_OneHistoryTour(//
+					_allPhotos,
+					_visibleTourPhotoLinks,
+					_allTourCameras);
 		} else {
-			_photoMgr.createTourPhotoLinks(_allPhotos, _visibleTourPhotoLinks, _allTourCameras, //
+
+			_photoMgr.createTourPhotoLinks(//
+					_allPhotos,
+					_visibleTourPhotoLinks,
+					_allTourCameras,
 					_isShowToursOnlyWithPhotos);
 		}
 
 		updateUI_Cameras(null);
 
 		_tourViewer.setInput(new Object[0]);
+		_pageBook.showPage(_pageViewer);
 
 		enableControls();
 
-		_pageBook.showPage(_pageViewer);
+		updateAnnotationsInPicDirView();
 
 		if (_visibleTourPhotoLinks.size() == 0) {
 			return;

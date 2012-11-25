@@ -337,10 +337,11 @@ public class PhotoManager {
 		createTourPhotoLinks_60_MergeHistoryTours(visibleTourPhotoLinks);
 
 		/*
-		 * put tour GPS into photo
+		 * set tour GPS into photo
 		 */
 		final ArrayList<PhotoWrapper> updatedPhotos = new ArrayList<PhotoWrapper>();
 		final List<TourPhotoLink> tourPhotoLinksWithGps = new ArrayList<TourPhotoLink>();
+
 		for (final TourPhotoLink tourPhotoLink : visibleTourPhotoLinks) {
 			if (tourPhotoLink.tourId != Long.MIN_VALUE) {
 				tourPhotoLinksWithGps.add(tourPhotoLink);
@@ -609,7 +610,7 @@ public class PhotoManager {
 				}
 
 				if (linkView != null) {
-					linkView.updatePhotosAndTours(selectedPhotosWithExif.photos, false);
+					linkView.showPhotosAndTours(selectedPhotosWithExif.photos);
 				}
 
 			} catch (final PartInitException e) {
@@ -646,6 +647,10 @@ public class PhotoManager {
 				lastPhotoTime = imageTime;
 			}
 
+			/*
+			 * the adjusted time can set a new position, remove old positions which are not covered
+			 * by a tour anymore
+			 */
 			photoWrapper.photo.resetTourGeoPosition();
 		}
 

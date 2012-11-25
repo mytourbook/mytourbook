@@ -442,8 +442,8 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
 		_photoGallery.restoreState(_state);
 
-		// set gallery orientation
-		_isVerticalGallery = Util.getStateBoolean(_state, STATE_PHOTO_GALLERY_IS_VERTICAL, true);
+		// set gallery orientation, default is horizontal
+		_isVerticalGallery = Util.getStateBoolean(_state, STATE_PHOTO_GALLERY_IS_VERTICAL, false);
 		_photoGallery.setVertical(_isVerticalGallery);
 
 		updateUI_ToogleAction();

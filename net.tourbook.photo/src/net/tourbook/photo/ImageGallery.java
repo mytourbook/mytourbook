@@ -1608,6 +1608,10 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		_galleryMT20.redraw(viewPortX, viewPortY, width, height, all);
 	}
 
+	public void refreshUI() {
+		_galleryMT20.redraw();
+	}
+
 	public void restoreInfo(final boolean isShowPhotoName,
 							final PhotoDateInfo photoDateInfo,
 							final boolean isShowAnnotations,
@@ -2063,7 +2067,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 			if (page == _pageDefault || page == _pageGalleryInfo) {
 
-				_pageBook.getDisplay().timerExec(400, new Runnable() {
+				_pageBook.getDisplay().timerExec(100, new Runnable() {
 
 					private int			__delayCounter	= _delayCounter[0];
 					private Composite	__page			= page;
