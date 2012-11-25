@@ -50,6 +50,7 @@ public class ChartComponentAxis extends Canvas {
 
 	private Image						_axisImage;
 
+	private ChartDrawingData			_chartDrawingData;
 	private ArrayList<GraphDrawingData>	_graphDrawingData;
 
 	private boolean						_isAxisModified;
@@ -78,11 +79,23 @@ public class ChartComponentAxis extends Canvas {
 
 	private ChartComponentGraph			_componentGraph;
 
+	private Display						_display;
+	private Color						_moveMarkerColor;
+
 	ChartComponentAxis(final Chart chart, final Composite parent, final int style) {
 
 		super(parent, SWT.NO_BACKGROUND | SWT.DOUBLE_BUFFERED);
 
 		_chart = chart;
+
+		_moveMarkerColor = new Color(parent.getDisplay(), 0x8B, 0xC6, 0xFF);
+
+		addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(final DisposeEvent e) {
+				onDispose();
+			}
+		});
 
 		addPaintListener(new PaintListener() {
 			public void paintControl(final PaintEvent event) {
@@ -174,20 +187,118 @@ public class ChartComponentAxis extends Canvas {
 	}
 
 	/**
-	 * draws unit label and ticks onto the y-axis
-	 * 
-	 * @param gc
-	 * @param graphRect
+	 * draw the chart on the axisImage
 	 */
-	private void draw_10_YUnits(final GC gc, final Rectangle axisRect) {
+	private void draw_00_AxisImage() {
+
+		final Rectangle axisRect = getClientArea();
+
+		if (axisRect.width <= 0 || axisRect.height <= 0) {
+			return;
+		}
 
 		if (_graphDrawingData == null) {
 			return;
 		}
 
-		gc.setLineStyle(SWT.LINE_SOLID);
+		// when the image is the same size as the new we will redraw it only if
+		// it is modified
+		if (!_isAxisModified && _axisImage != null) {
 
-		final Display display = getDisplay();
+			final Rectangle oldBounds = _axisImage.getBounds();
+
+			if (oldBounds.width == axisRect.width && oldBounds.height == axisRect.height) {
+				return;
+			}
+		}
+
+		if (Util.canReuseImage(_axisImage, axisRect) == false) {
+			_axisImage = Util.createImage(getDisplay(), _axisImage, axisRect);
+		}
+
+		_display = getDisplay();
+
+		// draw into the image
+		final GC gc = new GC(_axisImage);
+		{
+			gc.setBackground(_chart.getBackgroundColor());
+//			gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+			gc.fillRectangle(_axisImage.getBounds());
+
+			draw_10_MoveMarker(gc, axisRect);
+			draw_20_YUnits(gc, axisRect);
+
+			if (_tourToolTipProvider != null) {
+				_tourToolTipProvider.paint(gc, axisRect);
+			}
+		}
+		gc.dispose();
+
+		_isAxisModified = false;
+	}
+
+	/**
+	 * The move markers in the tour chart axis shows, how far to the right or left a zoomed chart is
+	 * moved.
+	 * 
+	 * @param gc
+	 * @param rect
+	 */
+	private void draw_10_MoveMarker(final GC gc, final Rectangle rect) {
+
+		final double zoomRatio = _componentGraph.getZoomRatio();
+		if (zoomRatio == 1.0) {
+			// chart is not zoomed
+			return;
+		}
+
+		final long devVirtualWidth = _componentGraph.getXXDevGraphWidth();
+		final int devVisibleWidth = _chartDrawingData.devDevVisibleChartWidth;
+
+		final long devWidthWithoutVisible = devVirtualWidth - devVisibleWidth;
+		final long devLeftBorder = _componentGraph.getXXDevViewPortLeftBorder();
+		final double moveRatio = (double) devLeftBorder / devWidthWithoutVisible;
+
+		final int devAxisWidth = rect.width;
+		final int devAxisHeight = rect.height;
+
+		// this is the height between graph bottom and bottom of the x-axis unit label
+		final int devMarkerHeight = 6;
+		final int devYMarker = devAxisHeight - devMarkerHeight;
+
+		gc.setBackground(_moveMarkerColor);
+
+		if (_isLeft) {
+
+			final int devZoomMarkerWidth = (int) (devAxisWidth * moveRatio);
+
+			gc.fillRectangle(//
+					0,
+					devYMarker,
+					devZoomMarkerWidth,
+					devMarkerHeight);
+
+		} else {
+
+			final int devZoomMarkerWidth = (int) (devAxisWidth * (1.0 - moveRatio));
+
+			gc.fillRectangle(//
+					devAxisWidth - devZoomMarkerWidth,
+					devYMarker,
+					devZoomMarkerWidth,
+					devMarkerHeight);
+		}
+	}
+
+	/**
+	 * draws unit label and ticks onto the y-axis
+	 * 
+	 * @param gc
+	 * @param graphRect
+	 */
+	private void draw_20_YUnits(final GC gc, final Rectangle axisRect) {
+
+		gc.setLineStyle(SWT.LINE_SOLID);
 
 		final int devX = _isLeft ? axisRect.width - 1 : 0;
 
@@ -240,7 +351,7 @@ public class ChartComponentAxis extends Canvas {
 				final Color fgColor = new Color(Display.getCurrent(), yData.getDefaultRGB());
 				gc.setForeground(fgColor);
 
-				final Transform tr = new Transform(display);
+				final Transform tr = new Transform(_display);
 				{
 					tr.translate(xPos, yPos);
 					tr.rotate(-90f);
@@ -268,7 +379,7 @@ public class ChartComponentAxis extends Canvas {
 					devY = devYTop + (int) devYUnit;
 				}
 
-				gc.setForeground(display.getSystemColor(SWT.COLOR_DARK_GRAY));
+				gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_GRAY));
 
 				final String valueLabel = yUnit.valueLabel;
 
@@ -297,69 +408,21 @@ public class ChartComponentAxis extends Canvas {
 
 				// draw unit line only when units are available
 
-				gc.setForeground(display.getSystemColor(SWT.COLOR_DARK_GRAY));
+				gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_GRAY));
 				gc.drawLine(devX, devYBottom, devX, devYTop);
 			}
 		}
 	}
 
-	private void draw_20_ZoomMarker(final GC gc, final Rectangle rect) {
-
-		final double zoomRatio = _componentGraph.getZoomRatio();
-		final double leftBorderRatio = _componentGraph.getZoomRatioLeftBorder();
-
-//		System.out.println(UI.timeStampNano() + " zoomRatio " + zoomRatio + "\tleftBorderRatio " + leftBorderRatio);
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
-	}
-
-	/**
-	 * draw the chart on the axisImage
-	 */
-	private void drawAxisImage() {
-
-		final Rectangle axisRect = getClientArea();
-
-		if (axisRect.width <= 0 || axisRect.height <= 0) {
-			return;
-		}
-
-		// when the image is the same size as the new we will redraw it only if
-		// it is modified
-		if (!_isAxisModified && _axisImage != null) {
-
-			final Rectangle oldBounds = _axisImage.getBounds();
-
-			if (oldBounds.width == axisRect.width && oldBounds.height == axisRect.height) {
-				return;
-			}
-		}
-
-		if (Util.canReuseImage(_axisImage, axisRect) == false) {
-			_axisImage = Util.createImage(getDisplay(), _axisImage, axisRect);
-		}
-
-		// draw into the image
-		final GC gc = new GC(_axisImage);
-
-		gc.setBackground(_chart.getBackgroundColor());
-//		gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
-		gc.fillRectangle(_axisImage.getBounds());
-
-		draw_10_YUnits(gc, axisRect);
-		draw_20_ZoomMarker(gc, axisRect);
-
-		if (_tourToolTipProvider != null) {
-			_tourToolTipProvider.paint(gc, axisRect);
-		}
-
-		gc.dispose();
-
-		_isAxisModified = false;
-	}
-
 	public Rectangle getAxisClientArea() {
 		return _clientArea;
+	}
+
+	private void onDispose() {
+
+		if (_moveMarkerColor != null) {
+			_moveMarkerColor.dispose();
+		}
 	}
 
 	private void onMouseDown(final MouseEvent event) {
@@ -403,7 +466,7 @@ public class ChartComponentAxis extends Canvas {
 
 	private void onPaint(final GC gc) {
 
-		drawAxisImage();
+		draw_00_AxisImage();
 
 		gc.drawImage(_axisImage, 0, 0);
 	}
@@ -420,13 +483,14 @@ public class ChartComponentAxis extends Canvas {
 	/**
 	 * set a new configuration for the axis, this causes a recreation of the axis
 	 * 
-	 * @param _chartDrawingData
+	 * @param chartDrawingData
 	 * @param isLeft
 	 *            true if the axis is on the left side
 	 */
-	protected void setDrawingData(final ChartDrawingData _chartDrawingData, final boolean isLeft) {
+	protected void setDrawingData(final ChartDrawingData chartDrawingData, final boolean isLeft) {
 
-		_graphDrawingData = _chartDrawingData.graphDrawingData;
+		_chartDrawingData = chartDrawingData;
+		_graphDrawingData = chartDrawingData.graphDrawingData;
 		_isLeft = isLeft;
 
 		onResize();

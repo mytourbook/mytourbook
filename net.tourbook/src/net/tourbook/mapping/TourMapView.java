@@ -1826,8 +1826,8 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 	private void onSelectionChanged(final ISelection selection) {
 
-		System.out.println(net.tourbook.common.UI.timeStampNano() + " onSelectionChanged\t" + selection);
-		// TODO remove SYSTEM.OUT.PRINTLN
+//		System.out.println(net.tourbook.common.UI.timeStampNano() + " onSelectionChanged\t" + selection);
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		if (_isPartVisible == false) {
 

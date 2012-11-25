@@ -4,6 +4,11 @@ TODO
 
 * 13.08.2012 18:16	Stefan Rado		MyTourbook - Pausenzeiten
 
+VERY IMPORTANT
+When tour is not found, possible reasons can be:
+- selected tour person
+- selected tour type
+- is ONE history tour selected
 
 Photo News
 
@@ -21,6 +26,7 @@ Other News
 Improvements 
 
 * set tour marker visibility (can be used when doing a screenshot to hide awkward markers)
+* 2 markers in the tour chart axis shows how far to the right or left a zoomed chart is moved
 
 
 Different behaviour:
@@ -79,3 +85,5 @@ System
 email:
 
 next step, but not the final
+
+map image is not state of the art

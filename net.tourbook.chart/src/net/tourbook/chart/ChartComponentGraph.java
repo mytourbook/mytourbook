@@ -4736,7 +4736,7 @@ public class ChartComponentGraph extends Canvas {
 	/**
 	 * @return Returns the viewport (visible width) of the chart graph
 	 */
-	private int getDevVisibleChartWidth() {
+	int getDevVisibleChartWidth() {
 		return _chartComponents.getDevVisibleChartWidth();
 	}
 

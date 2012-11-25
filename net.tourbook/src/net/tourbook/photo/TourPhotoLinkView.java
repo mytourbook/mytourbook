@@ -156,7 +156,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 	private ActionFilterOneHistoryTour				_actionFilterOneHistory;
 	private ActionModifyColumns						_actionModifyColumns;
 //	private ActionResetTimeAdjustment				_actionResetTimeAdjustment;
-	private ActionSetTourGPSIntoPhotos				_actionSetTourGPSIntoPhotos;
+//	private ActionSetTourGPSIntoPhotos				_actionSetTourGPSIntoPhotos;
 
 	private final PeriodFormatter					_durationFormatter				= new PeriodFormatterBuilder()
 																							.appendYears()
@@ -443,7 +443,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 		_actionFilterPhotos = new ActionFilterPhotos(this);
 		_actionModifyColumns = new ActionModifyColumns(this);
 //		_actionResetTimeAdjustment = new ActionResetTimeAdjustment();
-		_actionSetTourGPSIntoPhotos = new ActionSetTourGPSIntoPhotos(this);
+//		_actionSetTourGPSIntoPhotos = new ActionSetTourGPSIntoPhotos(this);
 	}
 
 	/**
@@ -1073,18 +1073,18 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 		_actionFilterPhotos.setEnabled(isPhotoAvailable && isPhotoFilter);
 
 //		_actionResetTimeAdjustment.setEnabled(isTourWithGPS);
-
-		// is true when selected tour contains photos
-		_actionSetTourGPSIntoPhotos.setEnabled(isTourWithGPS
-
-		// it's too dangerous when all photos are contained in 1 tour
-//				&& _isFilterNoTours == false
-				);
+//
+//		// is true when selected tour contains photos
+//		_actionSetTourGPSIntoPhotos.setEnabled(isTourWithGPS
+//
+//		// it's too dangerous when all photos are contained in 1 tour
+////				&& _isFilterNoTours == false
+//				);
 	}
 
 	private void fillContextMenu(final IMenuManager menuMgr) {
 
-		menuMgr.add(_actionSetTourGPSIntoPhotos);
+//		menuMgr.add(_actionSetTourGPSIntoPhotos);
 //		menuMgr.add(_actionResetTimeAdjustment);
 	}
 
