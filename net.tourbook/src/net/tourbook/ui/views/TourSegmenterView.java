@@ -1480,7 +1480,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				GridDataFactory.fillDefaults()//
 						.applyTo(_spinnerBreakMinAvgSpeedAS);
 				_spinnerBreakMinAvgSpeedAS.setMinimum(0); // 0.0 km/h
-				_spinnerBreakMinAvgSpeedAS.setMaximum(100); // 10.0 km/h
+				_spinnerBreakMinAvgSpeedAS.setMaximum(PrefPageComputedValues.BREAK_MAX_SPEED_KM_H); // 10.0 km/h
 				_spinnerBreakMinAvgSpeedAS.setDigits(1);
 				_spinnerBreakMinAvgSpeedAS.addMouseWheelListener(new MouseWheelListener() {
 					public void mouseScrolled(final MouseEvent event) {
@@ -1508,7 +1508,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				GridDataFactory.fillDefaults()//
 						.applyTo(_spinnerBreakMinSliceSpeedAS);
 				_spinnerBreakMinSliceSpeedAS.setMinimum(0); // 0.0 km/h
-				_spinnerBreakMinSliceSpeedAS.setMaximum(100); // 10.0 km/h
+				_spinnerBreakMinSliceSpeedAS.setMaximum(PrefPageComputedValues.BREAK_MAX_SPEED_KM_H); // 10.0 km/h
 				_spinnerBreakMinSliceSpeedAS.setDigits(1);
 				_spinnerBreakMinSliceSpeedAS.addMouseWheelListener(new MouseWheelListener() {
 					public void mouseScrolled(final MouseEvent event) {
@@ -1573,7 +1573,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			_spinnerBreakMinAvgSpeed = new Spinner(container, SWT.BORDER);
 			GridDataFactory.fillDefaults().hint(_spinnerWidth, SWT.DEFAULT).applyTo(_spinnerBreakMinAvgSpeed);
 			_spinnerBreakMinAvgSpeed.setMinimum(0); // 0.0 km/h
-			_spinnerBreakMinAvgSpeed.setMaximum(100); // 10.0 km/h
+			_spinnerBreakMinAvgSpeed.setMaximum(PrefPageComputedValues.BREAK_MAX_SPEED_KM_H); // 10.0 km/h
 			_spinnerBreakMinAvgSpeed.setDigits(1);
 			_spinnerBreakMinAvgSpeed.addSelectionListener(new SelectionAdapter() {
 				@Override
@@ -1616,7 +1616,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			_spinnerBreakMinSliceSpeed = new Spinner(container, SWT.BORDER);
 			GridDataFactory.fillDefaults().hint(_spinnerWidth, SWT.DEFAULT).applyTo(_spinnerBreakMinSliceSpeed);
 			_spinnerBreakMinSliceSpeed.setMinimum(0); // 0.0 km/h
-			_spinnerBreakMinSliceSpeed.setMaximum(100); // 10.0 km/h
+			_spinnerBreakMinSliceSpeed.setMaximum(PrefPageComputedValues.BREAK_MAX_SPEED_KM_H); // 10.0 km/h
 			_spinnerBreakMinSliceSpeed.setDigits(1);
 			_spinnerBreakMinSliceSpeed.addSelectionListener(new SelectionAdapter() {
 				@Override

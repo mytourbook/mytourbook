@@ -125,6 +125,11 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 	private static final float			SPEED_DIGIT_VALUE					= 10.0f;
 
+	/**
+	 * 100 km/h is very high but it supports air planes which are slow on the ground
+	 */
+	public static final int				BREAK_MAX_SPEED_KM_H				= 1000;												// 100.0 km/h
+
 	private static final int			DEFAULT_DESCRIPTION_WIDTH			= 450;
 
 	private IPreferenceStore			_prefStore							= TourbookPlugin
@@ -484,7 +489,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 				GridDataFactory.fillDefaults()//
 						.applyTo(_spinnerBreakMinAvgSpeedAS);
 				_spinnerBreakMinAvgSpeedAS.setMinimum(0); // 0.0 km/h
-				_spinnerBreakMinAvgSpeedAS.setMaximum(100); // 10.0 km/h
+				_spinnerBreakMinAvgSpeedAS.setMaximum(BREAK_MAX_SPEED_KM_H); // 10.0 km/h
 				_spinnerBreakMinAvgSpeedAS.setDigits(1);
 				_spinnerBreakMinAvgSpeedAS.addSelectionListener(_selectionListener);
 				_spinnerBreakMinAvgSpeedAS.addMouseWheelListener(_spinnerMouseWheelListener);
@@ -508,7 +513,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 				GridDataFactory.fillDefaults()//
 						.applyTo(_spinnerBreakMinSliceSpeedAS);
 				_spinnerBreakMinSliceSpeedAS.setMinimum(0); // 0.0 km/h
-				_spinnerBreakMinSliceSpeedAS.setMaximum(100); // 10.0 km/h
+				_spinnerBreakMinSliceSpeedAS.setMaximum(BREAK_MAX_SPEED_KM_H); // 10.0 km/h
 				_spinnerBreakMinSliceSpeedAS.setDigits(1);
 				_spinnerBreakMinSliceSpeedAS.addSelectionListener(_selectionListener);
 				_spinnerBreakMinSliceSpeedAS.addMouseWheelListener(_spinnerMouseWheelListener);
@@ -578,7 +583,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			GridDataFactory.fillDefaults()//
 					.applyTo(_spinnerBreakMinAvgSpeed);
 			_spinnerBreakMinAvgSpeed.setMinimum(0); // 0.0 km/h
-			_spinnerBreakMinAvgSpeed.setMaximum(100); // 10.0 km/h
+			_spinnerBreakMinAvgSpeed.setMaximum(BREAK_MAX_SPEED_KM_H); // 10.0 km/h
 			_spinnerBreakMinAvgSpeed.setDigits(1);
 			_spinnerBreakMinAvgSpeed.addSelectionListener(_selectionListener);
 			_spinnerBreakMinAvgSpeed.addMouseWheelListener(_spinnerMouseWheelListener);
@@ -624,7 +629,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			GridDataFactory.fillDefaults()//
 					.applyTo(_spinnerBreakMinSliceSpeed);
 			_spinnerBreakMinSliceSpeed.setMinimum(0); // 0.0 km/h
-			_spinnerBreakMinSliceSpeed.setMaximum(100); // 10.0 km/h
+			_spinnerBreakMinSliceSpeed.setMaximum(BREAK_MAX_SPEED_KM_H); // 10.0 km/h
 			_spinnerBreakMinSliceSpeed.setDigits(1);
 			_spinnerBreakMinSliceSpeed.addSelectionListener(_selectionListener);
 			_spinnerBreakMinSliceSpeed.addMouseWheelListener(_spinnerMouseWheelListener);
