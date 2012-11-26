@@ -32,7 +32,10 @@ public class ActionFilterOneHistoryTour extends Action {
 
 		setToolTipText(Messages.Action_PhotosAndTours_FilterNoTours_Tooltip);
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Photo_FilterNoTours));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(//
+				Messages.Image__Photo_FilterOneHistoryTour));
+		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(//
+				Messages.Image__Photo_FilterOneHistoryTour_Disabled));
 	}
 
 	@Override

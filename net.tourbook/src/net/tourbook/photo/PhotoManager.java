@@ -77,7 +77,7 @@ public class PhotoManager {
 
 	private static final IDialogSettings	_state							= TourbookPlugin.getDefault() //
 																					.getDialogSettingsSection(
-																							"PhotoManager"); //$NON-NLS-1$
+																							"PhotoManager");			//$NON-NLS-1$
 	private static PhotoManager				_instance;
 
 //	private boolean							_isOverwritePhotoGPS				= true;
@@ -886,11 +886,13 @@ public class PhotoManager {
 
 				isReadOnlyMessageDisplayed[0] = true;
 
-				MessageDialog.openError(activeShell, //
-						Messages.Photos_AndTours_Dialog_ImageIsReadOnly_Title,
-						NLS.bind(
-								Messages.Photos_AndTours_Dialog_ImageIsReadOnly_Message,
-								originalJpegImageFile.getAbsolutePath()));
+				MessageDialog
+						.openError(activeShell, //
+								"Messages.Photos_AndTours_Dialog_ImageIsReadOnly_Title Set Geo Coordinates",
+								NLS
+										.bind(
+												"Messages.Photos_AndTours_Dialog_ImageIsReadOnly_Message The geo coordinates cannot be set into the image file\n\n{0}\n\nbecause the image file is readonly.\n\nFor subsequent image files which are readonly, this message will not be displayed.",
+												originalJpegImageFile.getAbsolutePath()));
 			}
 
 			return 0;
@@ -958,9 +960,8 @@ public class PhotoManager {
 
 					// original file cannot be renamed
 					MessageDialog.openError(activeShell, //
-							Messages.Photos_AndTours_ErrorDialog_Title,
-							NLS.bind(
-									Messages.Photos_AndTours_ErrorDialog_OriginalImageFileCannotBeRenamed,
+							"Messages.Photos_AndTours_ErrorDialog_Title", //$NON-NLS-1$
+							NLS.bind("The image file:\n\n{0}\n\ncannot be renamed into\n\n{1}", //$NON-NLS-1$
 									originalFilePathName.toOSString(),
 									renamedOriginalFileName));
 					return -1;
@@ -974,12 +975,14 @@ public class PhotoManager {
 				if (isRenamed == false) {
 
 					// gps file cannot be renamed to original file
-					MessageDialog.openError(activeShell, //
-							Messages.Photos_AndTours_ErrorDialog_Title,
-							NLS.bind(
-									Messages.Photos_AndTours_ErrorDialog_SeriousProblemRenamingOriginalImageFile,
-									originalFilePathName.toOSString(),
-									renamedOriginalFile.getAbsolutePath()));
+					MessageDialog
+							.openError(activeShell, //
+									"Messages.Photos_AndTours_ErrorDialog_Title", //$NON-NLS-1$
+									NLS
+											.bind(
+													"THERE IS A SERIOUS PROBLEM\n\nThe image file\n\n{0}\n\nwas renamed to\n\n{1}\n\nbut the task of setting the geo\n\n coordinates cannot be\n\n finished.", //$NON-NLS-1$
+													originalFilePathName.toOSString(),
+													renamedOriginalFile.getAbsolutePath()));
 
 					/*
 					 * prevent of deleting renamed original file because the original file is
@@ -993,9 +996,8 @@ public class PhotoManager {
 				if (renamedOriginalFile.delete() == false) {
 
 					MessageDialog.openError(activeShell, //
-							Messages.Photos_AndTours_ErrorDialog_Title,
-							NLS.bind(
-									Messages.Photos_AndTours_ErrorDialog_RenamedOriginalFileCannotBeDeleted,
+							"Messages.Photos_AndTours_ErrorDialog_Title", //$NON-NLS-1$
+							NLS.bind("The image file:\n\n{0}\n\nwhich was renamed into\n\n{1}\n\ncannot be deleted.", //$NON-NLS-1$
 									originalFilePathName.toOSString(),
 									renamedOriginalFile.getAbsolutePath()));
 				}

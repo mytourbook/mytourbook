@@ -173,7 +173,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 																							.appendSuffix("h ", "h ") //$NON-NLS-1$ //$NON-NLS-2$
 																							.toFormatter();
 
-	private final DateTimeFormatter					_dateFormatter					= DateTimeFormat.shortDate();
+	private final DateTimeFormatter					_dateFormatter					= DateTimeFormat.mediumDate();
 	private final DateTimeFormatter					_timeFormatter					= DateTimeFormat.mediumTime();
 	private final NumberFormat						_nf_1_1							= NumberFormat.getNumberInstance();
 	{
@@ -200,7 +200,6 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 	 * UI controls
 	 */
 	private PageBook								_pageBook;
-	private Composite								_pageNoTour;
 	private Composite								_pageNoImage;
 	private Composite								_pageViewer;
 
@@ -305,35 +304,35 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 //
 //		updateUI(_selectedLinks, false, false);
 //	}
-
-	void actionSetTourGPSIntoPhotos() {
-
-		if (TourManager.isTourEditorModified()) {
-			return;
-		}
-
-		final ArrayList<PhotoWrapper> updatedPhotos = new ArrayList<PhotoWrapper>();
-
-		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-			public void run() {
-
-				PhotoManager.getInstance().setTourGpsIntoPhotos(updatedPhotos, _selectedTourPhotoLinksWithGps);
-
-				// update UI with new number of GPS photos
-				for (final TourPhotoLink tourPhotoLink : _selectedTourPhotoLinksWithGps) {
-					_tourViewer.update(tourPhotoLink, null);
-				}
-			}
-		});
-
-		// fire update event
-		PhotoManager.fireEvent(PhotoEventId.GPS_DATA_IS_UPDATED, updatedPhotos);
-
-		// force that selection is fired
-		_selectedLinks.clear();
-
-		onSelectTour(((StructuredSelection) _tourViewer.getSelection()).toArray(), true);
-	}
+//
+//	void actionSetTourGPSIntoPhotos() {
+//
+//		if (TourManager.isTourEditorModified()) {
+//			return;
+//		}
+//
+//		final ArrayList<PhotoWrapper> updatedPhotos = new ArrayList<PhotoWrapper>();
+//
+//		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+//			public void run() {
+//
+//				PhotoManager.getInstance().setTourGpsIntoPhotos(updatedPhotos, _selectedTourPhotoLinksWithGps);
+//
+//				// update UI with new number of GPS photos
+//				for (final TourPhotoLink tourPhotoLink : _selectedTourPhotoLinksWithGps) {
+//					_tourViewer.update(tourPhotoLink, null);
+//				}
+//			}
+//		});
+//
+//		// fire update event
+//		PhotoManager.fireEvent(PhotoEventId.GPS_DATA_IS_UPDATED, updatedPhotos);
+//
+//		// force that selection is fired
+//		_selectedLinks.clear();
+//
+//		onSelectTour(((StructuredSelection) _tourViewer.getSelection()).toArray(), true);
+//	}
 
 	private void addPartListener() {
 		_partListener = new IPartListener2() {
@@ -513,14 +512,6 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 			_pageViewer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 			{
 				createUI_20_Tours(_pageViewer);
-			}
-
-			_pageNoTour = new Composite(_pageBook, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(_pageNoTour);
-			GridLayoutFactory.swtDefaults().numColumns(1).applyTo(_pageNoTour);
-			{
-				final Label label = new Label(_pageNoTour, SWT.WRAP);
-				label.setText(Messages.Photos_AndTours_Label_NoTourIsAvailable);
 			}
 
 			_pageNoImage = createUI_90_PageNoImage(_pageBook);
@@ -794,7 +785,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 				if (periodSum == 0) {
 					// < 1 h
-					cell.setText(Messages.PhotosAndToursView_Photos_AndTours_Label_DurationLess1Hour);
+					cell.setText(Messages.Photos_AndTours_Label_DurationLess1Hour);
 				} else {
 					// > 1 h
 					cell.setText(period.toString(_durationFormatter));
@@ -1036,11 +1027,18 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 				if (element instanceof TourPhotoLink) {
 
 					final TourPhotoLink link = (TourPhotoLink) element;
-					final long tourTypeId = link.tourTypeId;
-					if (tourTypeId == -1) {
-						cell.setText(UI.EMPTY_STRING);
+					if (link.isHistoryTour) {
+
+						cell.setText(Messages.Photos_AndTours_Label_HistoryTour);
+
 					} else {
-						cell.setText(net.tourbook.ui.UI.getInstance().getTourTypeLabel(tourTypeId));
+
+						final long tourTypeId = link.tourTypeId;
+						if (tourTypeId == -1) {
+							cell.setText(UI.EMPTY_STRING);
+						} else {
+							cell.setText(net.tourbook.ui.UI.getInstance().getTourTypeLabel(tourTypeId));
+						}
 					}
 
 					setBgColor(cell, link);

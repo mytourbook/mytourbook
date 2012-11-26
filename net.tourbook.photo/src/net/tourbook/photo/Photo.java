@@ -933,7 +933,7 @@ public class Photo {
 //				+ ("\trotate:" + rotateDegree)
 //				+ (_imageWidth == Integer.MIN_VALUE ? "-no size-" : "\t" + _imageWidth + "x" + _imageHeight)
 //				+ (_latitude == Double.MIN_VALUE ? "\t-no GPS-" : "\t" + _latitude + " - " + _longitude)
-		//
+				//
 		;
 	}
 
@@ -984,10 +984,11 @@ public class Photo {
 		 * set state if gps data are available, this state is used for filtering the photos and to
 		 * indicate that exif data are loaded
 		 */
-		final boolean isGPS = _exifLatitude != Double.MIN_VALUE && _exifLongitude != Double.MIN_VALUE;
+		final boolean isExifGPS = _exifLatitude != Double.MIN_VALUE;
+		final boolean isTourGPS = _tourLatitude != Double.MIN_VALUE;
 
-		_photoWrapper.isPhotoWithGps = isGPS;
-		_photoWrapper.isGeoFromExif = isGPS;
+		_photoWrapper.isGeoFromExif = isExifGPS;
+		_photoWrapper.isPhotoWithGps = isTourGPS || isExifGPS;
 
 		// sort by exif date when available
 		if (_exifDateTime != null) {

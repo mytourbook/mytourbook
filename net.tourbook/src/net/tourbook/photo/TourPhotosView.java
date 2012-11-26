@@ -67,7 +67,7 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 	private static final IDialogSettings	_state							= TourbookPlugin.getDefault()//
 																					.getDialogSettingsSection(ID);
 
-	private final DateTimeFormatter			_dtFormatter					= DateTimeFormat.forStyle("SL");			//$NON-NLS-1$
+	private final DateTimeFormatter			_dtFormatter					= DateTimeFormat.forStyle("ML");			//$NON-NLS-1$
 
 	private PostSelectionProvider			_postSelectionProvider;
 

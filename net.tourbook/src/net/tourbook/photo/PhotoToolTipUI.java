@@ -126,7 +126,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 			super(null, Action.AS_CHECK_BOX);
 
 			setToolTipText(Messages.Photo_Tooltip_Action_PinToolTip_ToolTip);
-			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Pin));
+			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Pin_Blue));
 		}
 
 		@Override

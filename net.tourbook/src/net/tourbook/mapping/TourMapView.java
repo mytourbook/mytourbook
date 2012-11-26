@@ -495,7 +495,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 		if (_isMapSynchedWithPhoto) {
 
-			centerPhotos(_photoList);
+			centerPhotos(_photoList, false);
 
 			_map.paint();
 		}
@@ -568,7 +568,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 	void actionZoomShowAllPhotos() {
 
-		centerPhotos(_photoList);
+		centerPhotos(_photoList, true);
 	}
 
 	void actionZoomShowEntireMap() {
@@ -812,8 +812,9 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 	 * Center photo in the map
 	 * 
 	 * @param allPhotoWrapper
+	 * @param isForceZooming
 	 */
-	private void centerPhotos(final ArrayList<PhotoWrapper> allPhotoWrapper) {
+	private void centerPhotos(final ArrayList<PhotoWrapper> allPhotoWrapper, final boolean isForceZooming) {
 
 		final Set<GeoPosition> positionBounds = getPhotoBounds(allPhotoWrapper);
 		if (positionBounds == null) {
@@ -828,16 +829,13 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 				positionRect.x + positionRect.width / 2,
 				positionRect.y + positionRect.height / 2);
 
-		// ensure it is not zoomed too near
-		if (zoom > 15) {
-//			zoom = 15;
-		}
-
 		final GeoPosition geoPosition = _map.getMapProvider().pixelToGeo(center, zoom);
 
 		_map.setMapCenter(geoPosition);
 
-		setBoundsZoomLevel(positionBounds, false);
+		if (isForceZooming) {
+			setBoundsZoomLevel(positionBounds, false);
+		}
 	}
 
 	/**
@@ -1872,7 +1870,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 				if (allPhotoWrapper != null) {
 
-					centerPhotos(allPhotoWrapper);
+					centerPhotos(allPhotoWrapper, false);
 					showDefaultMap(true);
 
 					enableActions();
@@ -2026,7 +2024,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 		} else if (selection instanceof PhotoSelection) {
 
-			paintPhotos(((PhotoSelection) selection).photoWrappers);
+			paintPhotos(((PhotoSelection) selection).photoWrappers, false);
 
 		} else if (selection instanceof SelectionTourCatalogView) {
 
@@ -2081,13 +2079,13 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		_map.paint();
 	}
 
-	private void paintPhotos(final ArrayList<PhotoWrapper> photoWrapperList) {
+	private void paintPhotos(final ArrayList<PhotoWrapper> photoWrapperList, final boolean isForceZooming) {
 
 		_photoList.clear();
 		_photoList.addAll(photoWrapperList);
 
-		if (_isShowPhoto && _isMapSynchedWithPhoto) {
-			centerPhotos(_photoList);
+		if (_isShowPhoto && (_isMapSynchedWithPhoto || isForceZooming)) {
+			centerPhotos(_photoList, isForceZooming);
 		}
 
 		_tourPainterConfig.setPhotos(_photoList, _isShowPhoto);
@@ -2116,7 +2114,9 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 				allPhotoWrapper.addAll(tourPhotoLink.tourPhotos);
 			}
 
-			paintPhotos(allPhotoWrapper);
+			final boolean isForceZooming = linkSelection.tourPhotoLinks.size() > 1;
+
+			paintPhotos(allPhotoWrapper, isForceZooming);
 
 			return allPhotoWrapper;
 		}

@@ -21,9 +21,14 @@ import org.osgi.framework.Version;
 
 public class ApplicationVersion {
 
-//	private static String	_subVersion	= "";	//$NON-NLS-1$
-	private static String	_subVersion	= "  ireland";	//$NON-NLS-1$
-//	private static String	_subVersion	= " BETA 1";	//$NON-NLS-1$
+//	private static final String	DEVELOPMENT_VERSION_TEXT	= "DEVELOPMENT";									//$NON-NLS-1$
+//	private static final String	DEV_WINDOW_TITLE			= UI.DASH_WITH_SPACE + DEVELOPMENT_VERSION_TEXT;
+	private static final String	DEVELOPMENT_VERSION_TEXT	= UI.EMPTY_STRING;
+	private static final String	DEV_WINDOW_TITLE			= UI.EMPTY_STRING;
+
+	private static String		_subVersion					= UI.EMPTY_STRING;
+//	private static String		_subVersion	= " ireland";	//$NON-NLS-1$
+//	private static String		_subVersion	= " BETA 1";	//$NON-NLS-1$
 
 // this is disabled because it contains redundant information and too much numbers which nobody needs
 // the version number is now used from the plugin version, see below
@@ -70,11 +75,11 @@ public class ApplicationVersion {
 //	public static final String	APP_BUILD_ID			= "1.2.0.v20071231";
 //	public static final String	APP_BUILD_ID			= "1.1.0.v20071107";
 
-	private static String	_versionFull;
-	private static String	_versionSimple;
-	private static String	_qualifierText;
+	private static String		_versionFull;
+	private static String		_versionSimple;
+	private static String		_qualifierText;
 
-	private static boolean	_isDev;
+	private static boolean		_isDev;
 
 	private static void createVersionText() {
 
@@ -86,7 +91,7 @@ public class ApplicationVersion {
 		_qualifierText = _isDev ? //
 				//
 				// this text is used to identify development versions
-				"DEVELOPMENT" //$NON-NLS-1$
+				DEVELOPMENT_VERSION_TEXT
 				//
 				: qualifier.substring(0, 8) + UI.DASH + qualifier.substring(8);
 
@@ -104,7 +109,7 @@ public class ApplicationVersion {
 
 	public static String getDevelopmentId() {
 
-		String id = _isDev ? " - DEVELOPMENT" : UI.EMPTY_STRING; //$NON-NLS-1$
+		String id = _isDev ? DEV_WINDOW_TITLE : UI.EMPTY_STRING;
 
 		id += _subVersion;
 
