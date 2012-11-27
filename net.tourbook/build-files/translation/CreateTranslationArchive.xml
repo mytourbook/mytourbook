@@ -6,8 +6,8 @@
 		create an archive which contains all projects with only the files which needs to be translated
 	-->
 
-	<property name="path-mt-trunk" value="../../../mytourbook" />
-	<property name="path-mt-trunk.nl" value="../../../mytourbook/LANGUAGE-FRAGMENTS" />
+	<property name="path-mt-trunk" value="../../../../mytourbook" />
+	<property name="path-mt-trunk.nl" value="../../../../mytourbook/LANGUAGE-FRAGMENTS" />
 
 	<property name="path-mt-translations" value="${path-mt-trunk}/net.tourbook/translations" />
 	<property name="path-mt-translations-temp" value="${path-mt-trunk}/../../mytourbook-TRANSLATIONS/temp/translations" />

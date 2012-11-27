@@ -37,6 +37,7 @@ Improvements
 
 * set tour marker visibility (can be used when doing a screenshot to hide awkward markers)
 * 2 markers in the tour chart axis shows how far to the right or left a zoomed chart is moved
+* feature request from Stefan Rado: support air planes when break time is calculated (increased minimum speed: 10 -> 100 km/h)
 
 
 Different behaviour:

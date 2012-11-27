@@ -6,7 +6,6 @@ Create Translation Archive
 	- set version number in "feature.net.tourbook.app"
 	- force feature version number into net.tourbook.* plugins
 
-	
 
 - switch to workspace "C:\DAT\ws_mt-NL-projects" 
 
@@ -30,6 +29,10 @@ Create Build
 requirements:
 - buckminster is installed to see better error messages
 
+- set version number in
+
+	- about.mappings
+	- net.tourbook.application.ApplicationVersion
 
 - switch to workspace "C:\DAT\ws_mt-with-GIT"
 	
