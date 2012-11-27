@@ -28,6 +28,7 @@ import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartSegments;
 import net.tourbook.chart.ChartToolTipInfo;
+import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.chart.SelectionBarChart;
@@ -532,7 +533,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 
 	private void updateChart(final long selectedTourId) {
 
-		final ChartDataModel chartModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
+		final ChartDataModel chartModel = new ChartDataModel(ChartType.BAR);
 
 		// set the x-axis
 		final ChartDataXSerie xData = new ChartDataXSerie(Util.convertIntToDouble(_tourTimeData.tourDOYValues));
@@ -543,7 +544,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 
 		// set the bar low/high data
 		final ChartDataYSerie yData = new ChartDataYSerie(
-				ChartDataModel.CHART_TYPE_BAR,
+				ChartType.BAR,
 				Util.convertIntToFloat(_tourTimeData.tourTimeStartValues),
 				Util.convertIntToFloat(_tourTimeData.tourTimeEndValues));
 		yData.setYTitle(Messages.LABEL_GRAPH_DAYTIME);

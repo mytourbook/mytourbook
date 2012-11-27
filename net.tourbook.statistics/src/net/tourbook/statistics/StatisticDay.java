@@ -29,6 +29,7 @@ import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartSegments;
 import net.tourbook.chart.ChartToolTipInfo;
+import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.chart.SelectionBarChart;
@@ -421,7 +422,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 	void createYDataAltitude(final ChartDataModel chartModel) {
 
 		final ChartDataYSerie yData = new ChartDataYSerie(
-				ChartDataModel.CHART_TYPE_BAR,
+				ChartType.BAR,
 				_tourDayData.altitudeLow,
 				_tourDayData.altitudeHigh);
 		yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
@@ -444,7 +445,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 	void createYDataDistance(final ChartDataModel chartModel) {
 
 		final ChartDataYSerie yData = new ChartDataYSerie(
-				ChartDataModel.CHART_TYPE_BAR,
+				ChartType.BAR,
 				_tourDayData.distanceLow,
 				_tourDayData.distanceHigh);
 		yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
@@ -467,7 +468,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 	 */
 	void createYDataDuration(final ChartDataModel chartModel) {
 		final ChartDataYSerie yData = new ChartDataYSerie(
-				ChartDataModel.CHART_TYPE_BAR,
+				ChartType.BAR,
 				_tourDayData.getTimeLowFloat(),
 				_tourDayData.getTimeHighFloat());
 		yData.setYTitle(Messages.LABEL_GRAPH_TIME);

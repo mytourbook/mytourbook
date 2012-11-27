@@ -27,6 +27,7 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
+import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.HrZoneContext;
@@ -1317,7 +1318,7 @@ public class TrainingView extends ViewPart {
 			}
 		}
 
-		final ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
+		final ChartDataModel chartDataModel = new ChartDataModel(ChartType.BAR);
 
 //		chartDataModel.setTitle(TourManager.getTourDateTimeFull(_tourData));
 		chartDataModel.setTitle(TourManager.getTourDateTimeShort(_tourData));
@@ -1339,7 +1340,7 @@ public class TrainingView extends ViewPart {
 		 * y-axis: time
 		 */
 		final ChartDataYSerie yData = new ChartDataYSerie(
-				ChartDataModel.CHART_TYPE_BAR,
+				ChartType.BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				new float[][] { new float[pulseRange] },
 				new float[][] { ySeriePulseTime });

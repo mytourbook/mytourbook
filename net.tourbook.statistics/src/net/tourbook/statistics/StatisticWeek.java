@@ -29,6 +29,7 @@ import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartSegments;
 import net.tourbook.chart.ChartToolTipInfo;
+import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.common.util.Util;
@@ -365,7 +366,7 @@ public abstract class StatisticWeek extends YearStatistic {
 
 		// altitude
 		final ChartDataYSerie yData = new ChartDataYSerie(
-				ChartDataModel.CHART_TYPE_BAR,
+				ChartType.BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				_tourWeekData.altitudeLow,
 				_tourWeekData.altitudeHigh);
@@ -387,7 +388,7 @@ public abstract class StatisticWeek extends YearStatistic {
 
 		// distance
 		final ChartDataYSerie yData = new ChartDataYSerie(
-				ChartDataModel.CHART_TYPE_BAR,
+				ChartType.BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				_tourWeekData.distanceLow,
 				_tourWeekData.distanceHigh);
@@ -410,7 +411,7 @@ public abstract class StatisticWeek extends YearStatistic {
 
 		// duration
 		final ChartDataYSerie yData = new ChartDataYSerie(
-				ChartDataModel.CHART_TYPE_BAR,
+				ChartType.BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				_tourWeekData.getTimeLowFloat(),
 				_tourWeekData.getTimeHighFloat());

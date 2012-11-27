@@ -26,6 +26,7 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
+import net.tourbook.chart.ChartType;
 import net.tourbook.chart.ComputeChartValue;
 import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.common.Activator;
@@ -1633,7 +1634,7 @@ public class TourManager {
 														final TourChartConfiguration tourChartConfig,
 														final boolean hasPropertyChanged) {
 
-		final ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_LINE);
+		final ChartDataModel chartDataModel = new ChartDataModel(ChartType.LINE);
 
 		/*
 		 * TIME SERIE is a MUST data serie
@@ -1737,7 +1738,15 @@ public class TourManager {
 		 */
 		xDataTime.setNoLine(tourData.getBreakTimeSerie());
 
-		final int chartType = _prefStore.getInt(ITourbookPreferences.GRAPH_PROPERTY_CHARTTYPE);
+
+		ChartType chartType;
+		final String chartTypeName = _prefStore.getString(ITourbookPreferences.GRAPH_PROPERTY_CHARTTYPE);
+		try {
+			chartType = ChartType.valueOf(ChartType.class, chartTypeName);
+		} catch (final Exception e) {
+			// set default value
+			chartType = ChartType.LINE;
+		}
 
 		// HR zones can be displayed when they are available
 		tourChartConfig.canShowHrZones = tourData.getNumberOfHrZones() > 0;
@@ -2128,7 +2137,7 @@ public class TourManager {
 
 		if (isHistorySerie) {
 
-			chartDataModel.setChartType(ChartDataModel.CHART_TYPE_HISTORY);
+			chartDataModel.setChartType(ChartType.HISTORY);
 
 			xDataTime.setAxisUnit(ChartDataSerie.X_AXIS_UNIT_HISTORY);
 
@@ -2137,7 +2146,7 @@ public class TourManager {
 
 			// history do not have any y-data, create dummy values
 			final float[] yHistorySerie = new float[tourData.timeSerieHistory.length];
-			final ChartDataYSerie yDataHistory = createChartDataSerie(yHistorySerie, ChartDataModel.CHART_TYPE_HISTORY);
+			final ChartDataYSerie yDataHistory = createChartDataSerie(yHistorySerie, ChartType.HISTORY);
 
 			yDataHistory.setAxisUnit(ChartDataSerie.AXIS_UNIT_HISTORY);
 
@@ -2161,26 +2170,12 @@ public class TourManager {
 		return chartDataModel;
 	}
 
-	private ChartDataYSerie createChartDataSerie(final float[] dataSerie, final int chartType) {
-
-		if (chartType == ChartDataModel.CHART_TYPE_LINE_WITH_BARS) {
-			return new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE_WITH_BARS, dataSerie);
-
-		} else {
-
-			return new ChartDataYSerie(chartType == 0
-					? ChartDataModel.CHART_TYPE_LINE
-					: ChartDataModel.CHART_TYPE_HISTORY, dataSerie);
-		}
+	private ChartDataYSerie createChartDataSerie(final float[] dataSerie, final ChartType chartType) {
+		return new ChartDataYSerie(chartType, dataSerie);
 	}
 
-	private ChartDataYSerie createChartDataSerie(final float[][] dataSerie, final int chartType) {
-
-		if (chartType == 0 || chartType == ChartDataModel.CHART_TYPE_LINE) {
-			return new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE, dataSerie);
-		} else {
-			return new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE_WITH_BARS, dataSerie);
-		}
+	private ChartDataYSerie createChartDataSerie(final float[][] dataSerie, final ChartType chartType) {
+		return new ChartDataYSerie(chartType, dataSerie);
 	}
 
 	public TourChart getActiveTourChart() {

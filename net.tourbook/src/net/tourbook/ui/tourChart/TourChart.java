@@ -31,6 +31,7 @@ import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartLabel;
 import net.tourbook.chart.ChartMarker;
 import net.tourbook.chart.ChartMarkerLayer;
+import net.tourbook.chart.ChartType;
 import net.tourbook.chart.ChartYDataMinMaxKeeper;
 import net.tourbook.chart.IChartLayer;
 import net.tourbook.chart.IFillPainter;
@@ -1795,7 +1796,7 @@ public class TourChart extends Chart {
 		// show photo layer only for ONE visible graph
 		if (_layerPhoto != null
 				&& _tourChartConfig.isShowTourPhotos == true
-				&& (yData == yDataWithLabels || dataModel.getChartType() == ChartDataModel.CHART_TYPE_HISTORY)) {
+				&& (yData == yDataWithLabels || dataModel.getChartType() == ChartType.HISTORY)) {
 
 			customFgLayers.add(_layerPhoto);
 		}

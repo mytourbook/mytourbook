@@ -27,6 +27,7 @@ import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartSegments;
 import net.tourbook.chart.ChartToolTipInfo;
+import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.colors.GraphColorProvider;
@@ -817,7 +818,7 @@ public class YearStatisticView extends ViewPart {
 			}
 		}
 
-		final ChartDataModel chartModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
+		final ChartDataModel chartModel = new ChartDataModel(ChartType.BAR);
 
 		final ChartDataXSerie xData = new ChartDataXSerie(ArrayListToArray.integerToDouble(_DOYValues));
 		xData.setAxisUnit(ChartDataXSerie.X_AXIS_UNIT_DAY);
@@ -825,9 +826,7 @@ public class YearStatisticView extends ViewPart {
 		chartModel.setXData(xData);
 
 		// set the bar low/high data
-		final ChartDataYSerie yData = new ChartDataYSerie(
-				ChartDataModel.CHART_TYPE_BAR,
-				ArrayListToArray.toFloat(_tourSpeed));
+		final ChartDataYSerie yData = new ChartDataYSerie(ChartType.BAR, ArrayListToArray.toFloat(_tourSpeed));
 
 		TourManager.setGraphColor(_prefStore, yData, GraphColorProvider.PREF_GRAPH_SPEED);
 

@@ -1583,7 +1583,7 @@ public class ChartComponentGraph extends Canvas {
 
 			// fill background
 
-			if (graphDrawingData.getChartType() == ChartDataModel.CHART_TYPE_HISTORY) {
+			if (graphDrawingData.getChartType() == ChartType.HISTORY) {
 
 				final Color historyColor = new Color(gcChart.getDevice(), 0xf0, 0xf0, 0xf0);
 				{
@@ -1655,8 +1655,6 @@ public class ChartComponentGraph extends Canvas {
 			gcGraph.setBackground(chartBackgroundColor);
 			gcGraph.fillRectangle(graphBounds);
 
-			final int chartType = drawingData.getChartType();
-
 			if (graphIndex == 0) {
 				drawAsync_200_XTitle(gcChart, drawingData);
 			}
@@ -1674,30 +1672,28 @@ public class ChartComponentGraph extends Canvas {
 			drawAsync_220_XAsisHGrid(gcGraph, drawingData, false);
 
 			// draw units and grid on the x and y axis
-			switch (chartType) {
-			case ChartDataModel.CHART_TYPE_LINE:
+			final ChartType chartType = drawingData.getChartType();
+
+			if (chartType == ChartType.LINE) {
+
 				drawAsync_500_LineGraph(gcGraph, drawingData);
 				drawAsync_520_RangeMarker(gcGraph, drawingData);
-				break;
 
-			case ChartDataModel.CHART_TYPE_BAR:
+			} else if (chartType == ChartType.BAR) {
+
 				drawAsync_530_BarGraph(gcGraph, drawingData);
-				break;
 
-			case ChartDataModel.CHART_TYPE_LINE_WITH_BARS:
+			} else if (chartType == ChartType.LINE_WITH_BARS) {
+
 				drawAsync_540_LineWithBarGraph(gcGraph, drawingData);
-				break;
 
-			case ChartDataModel.CHART_TYPE_XY_SCATTER:
+			} else if (chartType == ChartType.XY_SCATTER) {
+
 				drawAsync_550_XYScatter(gcGraph, drawingData);
-				break;
 
-			case ChartDataModel.CHART_TYPE_HISTORY:
+			} else if (chartType == ChartType.HISTORY) {
+
 				drawAsync_600_History(gcGraph, drawingData);
-				break;
-
-			default:
-				break;
 			}
 
 			// draw only the x-axis, this is drawn lately because the graph can overwrite it
@@ -1936,7 +1932,7 @@ public class ChartComponentGraph extends Canvas {
 		final int xUnitTextPos = graphDrawingData.getXUnitTextPos();
 		double scaleX = graphDrawingData.getScaleX();
 
-		final boolean isHistory = graphDrawingData.getChartType() == ChartDataModel.CHART_TYPE_HISTORY;
+		final boolean isHistory = graphDrawingData.getChartType() == ChartType.HISTORY;
 		final boolean isDrawVerticalGrid = _chart.isShowVerticalGridLines || isHistory;
 		final boolean[] isDrawUnits = graphDrawingData.isDrawUnits();
 		final boolean isXUnitOverlapChecked = graphDrawingData.isXUnitOverlapChecked();
@@ -4290,21 +4286,18 @@ public class ChartComponentGraph extends Canvas {
 
 		_isSelectionDirty = false;
 
-		final int chartType = _chart.getChartDataModel().getChartType();
+		final ChartType chartType = _chart.getChartDataModel().getChartType();
 
 		// loop: all graphs
 		for (final GraphDrawingData drawingData : _graphDrawingData) {
-			switch (chartType) {
-			case ChartDataModel.CHART_TYPE_LINE:
-				// drawLineSelection(gc, drawingData);
-				break;
 
-			case ChartDataModel.CHART_TYPE_BAR:
+			if (chartType == ChartType.LINE) {
+
+//				drawLineSelection(gc, drawingData);
+
+			} else if (chartType == ChartType.BAR) {
+
 				drawSync_442_BarSelection(gc, drawingData);
-				break;
-
-			default:
-				break;
 			}
 		}
 	}
@@ -4483,7 +4476,7 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		// draw only bar chars
-		if (_chart.getChartDataModel().getChartType() != ChartDataModel.CHART_TYPE_BAR) {
+		if (_chart.getChartDataModel().getChartType() != ChartType.BAR) {
 			return;
 		}
 
@@ -4586,7 +4579,7 @@ public class ChartComponentGraph extends Canvas {
 		for (final GraphDrawingData drawingData : _graphDrawingData) {
 
 			// draw only line graphs
-			if (_chart.getChartDataModel().getChartType() != ChartDataModel.CHART_TYPE_LINE) {
+			if (_chart.getChartDataModel().getChartType() != ChartType.LINE) {
 				continue;
 			}
 
@@ -5302,12 +5295,13 @@ public class ChartComponentGraph extends Canvas {
 
 	private void onKeyDown(final Event event) {
 
-		switch (_chart.getChartDataModel().getChartType()) {
-		case ChartDataModel.CHART_TYPE_BAR:
-			_chartComponents.selectBarItem(event);
-			break;
+		final ChartType chartType = _chart.getChartDataModel().getChartType();
 
-		case ChartDataModel.CHART_TYPE_LINE:
+		if (chartType == ChartType.BAR) {
+
+			_chartComponents.selectBarItem(event);
+
+		} else if (chartType == ChartType.LINE) {
 
 			switch (event.character) {
 			case '+':
@@ -5321,11 +5315,6 @@ public class ChartComponentGraph extends Canvas {
 			default:
 				onKeyDownMoveXSlider(event);
 			}
-
-			break;
-
-		default:
-			break;
 		}
 	}
 
@@ -6672,9 +6661,9 @@ public class ChartComponentGraph extends Canvas {
 			return;
 		}
 
-		final int chartType = chartDataModel.getChartType();
+		final ChartType chartType = chartDataModel.getChartType();
 
-		if (chartType == ChartDataModel.CHART_TYPE_LINE || chartType == ChartDataModel.CHART_TYPE_LINE_WITH_BARS) {
+		if (chartType == ChartType.LINE || chartType == ChartType.LINE_WITH_BARS) {
 
 			final boolean isMouseModeSlider = _chart.getMouseMode().equals(Chart.MOUSE_MODE_SLIDER);
 
@@ -6796,8 +6785,8 @@ public class ChartComponentGraph extends Canvas {
 
 		boolean isFocus = false;
 
-		switch (_chart.getChartDataModel().getChartType()) {
-		case ChartDataModel.CHART_TYPE_LINE:
+		final ChartType chartType = _chart.getChartDataModel().getChartType();
+		if (chartType == ChartType.LINE) {
 
 			if (_selectedXSlider == null) {
 				// set focus to the left slider when x-sliders are visible
@@ -6809,9 +6798,7 @@ public class ChartComponentGraph extends Canvas {
 				isFocus = true;
 			}
 
-			break;
-
-		case ChartDataModel.CHART_TYPE_BAR:
+		} else if (chartType == ChartType.BAR) {
 
 			if (_selectedBarItems == null || _selectedBarItems.length == 0) {
 
@@ -6849,10 +6836,7 @@ public class ChartComponentGraph extends Canvas {
 
 				redrawBarSelection();
 			}
-
 			isFocus = true;
-
-			break;
 		}
 
 		if (isFocus) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,22 +13,23 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
+package net.tourbook.chart;
 
-package net.tourbook.statistics;
+public enum ChartType {
 
-import net.tourbook.chart.ChartDataModel;
-import net.tourbook.chart.ChartType;
+//	public static final int				CHART_TYPE_LINE				= 10;
+//	public static final int				CHART_TYPE_BAR				= 20;
+//	public static final int				CHART_TYPE_LINE_WITH_BARS	= 30;
+//	public static final int				CHART_TYPE_XY_SCATTER		= 40;
+//	public static final int				CHART_TYPE_HISTORY			= 50;
 
-public class StatisticDayTourTime extends StatisticDay {
+	LINE,
 
-	@Override
-	ChartDataModel updateChart() {
+	BAR,
 
-		final ChartDataModel chartDataModel = new ChartDataModel(ChartType.BAR);
+	LINE_WITH_BARS,
 
-		createXDataDay(chartDataModel);
-		createYDataDuration(chartDataModel);
+	XY_SCATTER,
 
-		return chartDataModel;
-	}
+	HISTORY
 }

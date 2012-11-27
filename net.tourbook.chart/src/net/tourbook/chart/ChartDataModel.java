@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -25,16 +25,10 @@ import java.util.Map.Entry;
  */
 public class ChartDataModel {
 
-	public static final int				CHART_TYPE_LINE				= 10;
-	public static final int				CHART_TYPE_BAR				= 20;
-	public static final int				CHART_TYPE_LINE_WITH_BARS	= 30;
-	public static final int				CHART_TYPE_XY_SCATTER		= 40;
-	public static final int				CHART_TYPE_HISTORY			= 50;
-
 	public static final String			BAR_TOOLTIP_INFO_PROVIDER	= "BarToolTipInfoProvider";		//$NON-NLS-1$
 	public static final String			BAR_CONTEXT_PROVIDER		= "BarContextProvider";			//$NON-NLS-1$
 
-	private int							_chartType;
+	private ChartType					_chartType;
 
 	private ChartDataXSerie				_xData						= null;
 	private ChartDataXSerie				_xData2nd					= null;
@@ -85,7 +79,7 @@ public class ChartDataModel {
 
 //	private IChartInfoPainter			_chartInfoPainter;
 
-	public ChartDataModel(final int chartType) {
+	public ChartDataModel(final ChartType chartType) {
 		_chartType = chartType;
 	}
 
@@ -114,7 +108,7 @@ public class ChartDataModel {
 	/**
 	 * @return returns the charttype, this can be CHART_TYPE_LINE, CHART_TYPE_BAR
 	 */
-	public int getChartType() {
+	public ChartType getChartType() {
 		return _chartType;
 	}
 
@@ -202,7 +196,7 @@ public class ChartDataModel {
 		_chartMinWidth = chartMinWidth;
 	}
 
-	public void setChartType(final int chartType) {
+	public void setChartType(final ChartType chartType) {
 		_chartType = chartType;
 	}
 

@@ -496,7 +496,7 @@ public class ChartComponents extends Composite {
 		/*
 		 * configure bars in the bar charts
 		 */
-		if (_chartDataModel.getChartType() == ChartDataModel.CHART_TYPE_BAR) {
+		if (_chartDataModel.getChartType() == ChartType.BAR) {
 
 			final double[] highValues = xData.getHighValuesDouble()[0];
 
@@ -1595,7 +1595,7 @@ public class ChartComponents extends Composite {
 		graphMinValue = (int) ((int) ((graphMinValue - adjustMinValue) / graphUnit) * graphUnit);
 
 		// adjust the min value so that bar graphs start at the bottom of the chart
-		if (_chartDataModel.getChartType() == ChartDataModel.CHART_TYPE_BAR && _chart.getStartAtChartBottom()) {
+		if (_chartDataModel.getChartType() == ChartType.BAR && _chart.getStartAtChartBottom()) {
 			yData.setVisibleMinValue(graphMinValue);
 		}
 
@@ -2261,10 +2261,9 @@ public class ChartComponents extends Composite {
 		 * when data model has changed, update the visible y-values to use the full visible area for
 		 * drawing the chart
 		 */
-		final int chartType = _chartDataModel.getChartType();
+		final ChartType chartType = _chartDataModel.getChartType();
 		if (isShowAllData
-				&& (chartType == ChartDataModel.CHART_TYPE_LINE
-						|| chartType == ChartDataModel.CHART_TYPE_LINE_WITH_BARS || chartType == ChartDataModel.CHART_TYPE_HISTORY)) {
+				&& (chartType == ChartType.LINE || chartType == ChartType.LINE_WITH_BARS || chartType == ChartType.HISTORY)) {
 
 			componentGraph.updateVisibleMinMaxValues();
 		}

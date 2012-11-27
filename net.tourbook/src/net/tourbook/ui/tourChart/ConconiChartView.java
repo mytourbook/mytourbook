@@ -26,6 +26,7 @@ import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
+import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IChartLayer;
 import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.common.util.Util;
@@ -204,7 +205,7 @@ public class ConconiChartView extends ViewPart {
 		// reset data
 		_conconiDataForSelectedTour = null;
 
-		final ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_XY_SCATTER);
+		final ChartDataModel chartDataModel = new ChartDataModel(ChartType.XY_SCATTER);
 
 		final int serieLengthRaw = conconiTours.size();
 
@@ -393,7 +394,7 @@ public class ConconiChartView extends ViewPart {
 		/*
 		 * pulse
 		 */
-		_yDataPulse = new ChartDataYSerie(ChartDataModel.CHART_TYPE_XY_SCATTER, pulseSerieFloat);
+		_yDataPulse = new ChartDataYSerie(ChartType.XY_SCATTER, pulseSerieFloat);
 		_yDataPulse.setYTitle(Messages.Graph_Label_Heartbeat);
 		_yDataPulse.setUnitLabel(Messages.Graph_Label_Heartbeat_unit);
 		_yDataPulse.setDefaultRGB(rgbPrefLine);

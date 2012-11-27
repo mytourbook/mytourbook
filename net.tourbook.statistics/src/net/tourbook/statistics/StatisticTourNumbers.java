@@ -25,6 +25,7 @@ import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartToolTipInfo;
+import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.chart.Util;
 import net.tourbook.colors.GraphColorProvider;
@@ -632,7 +633,7 @@ public class StatisticTourNumbers extends YearStatistic {
 										final String unit,
 										final String title) {
 
-		final ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
+		final ChartDataModel chartDataModel = new ChartDataModel(ChartType.BAR);
 
 		// set the x-axis
 		final ChartDataXSerie xData = new ChartDataXSerie(
@@ -643,7 +644,7 @@ public class StatisticTourNumbers extends YearStatistic {
 
 		// y-axis: altitude
 		final ChartDataYSerie yData = new ChartDataYSerie(
-				ChartDataModel.CHART_TYPE_BAR,
+				ChartType.BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				net.tourbook.common.util.Util.convertIntToFloat(lowValues),
 				net.tourbook.common.util.Util.convertIntToFloat(highValues));
@@ -695,7 +696,7 @@ public class StatisticTourNumbers extends YearStatistic {
 										final String title,
 										final int valueDivisor) {
 
-		final ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
+		final ChartDataModel chartDataModel = new ChartDataModel(ChartType.BAR);
 
 		// set the x-axis
 		final ChartDataXSerie xData = new ChartDataXSerie(
@@ -706,7 +707,7 @@ public class StatisticTourNumbers extends YearStatistic {
 
 		// y-axis: distance
 		final ChartDataYSerie yData = new ChartDataYSerie(
-				ChartDataModel.CHART_TYPE_BAR,
+				ChartType.BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				net.tourbook.common.util.Util.convertIntToFloat(lowValues),
 				net.tourbook.common.util.Util.convertIntToFloat(highValues));
@@ -809,7 +810,7 @@ public class StatisticTourNumbers extends YearStatistic {
 									final String unit,
 									final String title) {
 
-		final ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
+		final ChartDataModel chartDataModel = new ChartDataModel(ChartType.BAR);
 
 		// set the x-axis
 		final ChartDataXSerie xData = new ChartDataXSerie(
@@ -820,7 +821,7 @@ public class StatisticTourNumbers extends YearStatistic {
 
 		// y-axis: altitude
 		final ChartDataYSerie yData = new ChartDataYSerie(
-				ChartDataModel.CHART_TYPE_BAR,
+				ChartType.BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				net.tourbook.common.util.Util.convertIntToFloat(lowValues),
 				net.tourbook.common.util.Util.convertIntToFloat(highValues));

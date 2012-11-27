@@ -105,7 +105,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 	private ChartYSlider			_ySlider2;
 
-	private final int				_chartType;
+	private final ChartType			_chartType;
 
 	/**
 	 * When this value is > 0 a line chart will not draw a line to the next value point when the
@@ -116,27 +116,27 @@ public class ChartDataYSerie extends ChartDataSerie {
 	 */
 //	private int						_disabledLineToNext;
 
-	public ChartDataYSerie(final int chartType, final float[] valueSerie) {
+	public ChartDataYSerie(final ChartType chartType, final float[] valueSerie) {
 		_chartType = chartType;
 		setMinMaxValues(new float[][] { valueSerie });
 	}
 
-	public ChartDataYSerie(final int chartType, final float[] lowValueSerie, final float[] highValueSerie) {
+	public ChartDataYSerie(final ChartType chartType, final float[] lowValueSerie, final float[] highValueSerie) {
 		_chartType = chartType;
 		setMinMaxValues(new float[][] { lowValueSerie }, new float[][] { highValueSerie });
 	}
 
-	public ChartDataYSerie(final int chartType, final float[][] valueSeries) {
+	public ChartDataYSerie(final ChartType chartType, final float[][] valueSeries) {
 		_chartType = chartType;
 		setMinMaxValues(valueSeries);
 	}
 
-	public ChartDataYSerie(final int chartType, final float[][] lowValueSeries, final float[][] highValueSeries) {
+	public ChartDataYSerie(final ChartType chartType, final float[][] lowValueSeries, final float[][] highValueSeries) {
 		_chartType = chartType;
 		setMinMaxValues(lowValueSeries, highValueSeries);
 	}
 
-	public ChartDataYSerie(	final int chartType,
+	public ChartDataYSerie(	final ChartType chartType,
 							final int chartLayout,
 							final float[][] lowValueSeries,
 							final float[][] highValueSeries) {
@@ -154,7 +154,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 		return _chartLayout;
 	}
 
-	public int getChartType() {
+	public ChartType getChartType() {
 		return _chartType;
 	}
 
@@ -322,14 +322,14 @@ public class ChartDataYSerie extends ChartDataSerie {
 			// set initial min/max value
 			_visibleMaxValue = _visibleMinValue = valueSeries[0][0];
 
-			if (_chartType == ChartDataModel.CHART_TYPE_LINE
-					|| _chartType == ChartDataModel.CHART_TYPE_LINE_WITH_BARS
-					|| _chartType == ChartDataModel.CHART_TYPE_XY_SCATTER
-					|| _chartType == ChartDataModel.CHART_TYPE_HISTORY) {
+			if (_chartType == ChartType.LINE
+					|| _chartType == ChartType.LINE_WITH_BARS
+					|| _chartType == ChartType.XY_SCATTER
+					|| _chartType == ChartType.HISTORY) {
 
 				setMinMaxValuesLine(valueSeries);
 
-			} else if (_chartType == ChartDataModel.CHART_TYPE_BAR) {
+			} else if (_chartType == ChartType.BAR) {
 
 				switch (_chartLayout) {
 				case ChartDataYSerie.BAR_LAYOUT_SINGLE_SERIE:
@@ -401,9 +401,9 @@ public class ChartDataYSerie extends ChartDataSerie {
 			_visibleMinValue = lowValues[0][0];
 			_visibleMaxValue = highValues[0][0];
 
-			if (_chartType == ChartDataModel.CHART_TYPE_LINE
-					|| (_chartType == ChartDataModel.CHART_TYPE_BAR && _chartLayout == ChartDataYSerie.BAR_LAYOUT_SINGLE_SERIE)
-					|| (_chartType == ChartDataModel.CHART_TYPE_BAR && _chartLayout == ChartDataYSerie.BAR_LAYOUT_BESIDE)) {
+			if (_chartType == ChartType.LINE
+					|| (_chartType == ChartType.BAR && _chartLayout == ChartDataYSerie.BAR_LAYOUT_SINGLE_SERIE)
+					|| (_chartType == ChartType.BAR && _chartLayout == ChartDataYSerie.BAR_LAYOUT_BESIDE)) {
 
 				// get the min/max values for all data
 				for (final float[] valueSerie : highValues) {
@@ -418,8 +418,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 					}
 				}
 
-			} else if (_chartType == ChartDataModel.CHART_TYPE_BAR
-					&& _chartLayout == ChartDataYSerie.BAR_LAYOUT_STACKED) {
+			} else if (_chartType == ChartType.BAR && _chartLayout == ChartDataYSerie.BAR_LAYOUT_STACKED) {
 
 				/*
 				 * calculate the max value

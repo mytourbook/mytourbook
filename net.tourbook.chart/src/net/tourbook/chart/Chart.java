@@ -454,7 +454,7 @@ public class Chart extends ViewForm {
 			_chartContextProvider.fillContextMenu(menuMgr, mouseDownDevPositionX, mouseDownDevPositionY);
 		}
 
-		if (_chartDataModel.getChartType() == ChartDataModel.CHART_TYPE_BAR) {
+		if (_chartDataModel.getChartType() == ChartType.BAR) {
 
 			/*
 			 * create menu for bar charts
@@ -534,7 +534,7 @@ public class Chart extends ViewForm {
 				tbm.add(_chartActionProxies.get(COMMAND_ID_ZOOM_IN).getAction());
 				tbm.add(_chartActionProxies.get(COMMAND_ID_ZOOM_OUT).getAction());
 
-				if (_chartDataModel.getChartType() != ChartDataModel.CHART_TYPE_BAR) {
+				if (_chartDataModel.getChartType() != ChartType.BAR) {
 					tbm.add(_chartActionProxies.get(COMMAND_ID_ZOOM_FIT_GRAPH).getAction());
 				}
 			}
@@ -734,12 +734,8 @@ public class Chart extends ViewForm {
 			return null;
 		}
 
-		switch (_chartDataModel.getChartType()) {
-		case ChartDataModel.CHART_TYPE_BAR:
+		if (_chartDataModel.getChartType() == ChartType.BAR) {
 			return new SelectionBarChart(_barSelectionSerieIndex, _barSelectionValueIndex);
-
-		default:
-			break;
 		}
 
 		return null;
@@ -1049,7 +1045,7 @@ public class Chart extends ViewForm {
 	 */
 	public void setErrorMessage(final String errorMessage) {
 
-		final ChartDataModel emptyModel = new ChartDataModel(ChartDataModel.CHART_TYPE_LINE);
+		final ChartDataModel emptyModel = new ChartDataModel(ChartType.LINE);
 
 		_chartComponents.setErrorMessage(errorMessage);
 
@@ -1296,10 +1292,10 @@ public class Chart extends ViewForm {
 						&& chartDataModel.getYData().isEmpty() //
 
 				// history do not have Y values
-				&& chartDataModel.getChartType() != ChartDataModel.CHART_TYPE_HISTORY) //
+				&& chartDataModel.getChartType() != ChartType.HISTORY) //
 		) {
 
-			final ChartDataModel emptyModel = new ChartDataModel(ChartDataModel.CHART_TYPE_LINE);
+			final ChartDataModel emptyModel = new ChartDataModel(ChartType.LINE);
 
 			if (chartDataModel != null) {
 				String errorMessage = chartDataModel.getErrorMessage();

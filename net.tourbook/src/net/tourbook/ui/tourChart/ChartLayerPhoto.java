@@ -21,8 +21,8 @@ package net.tourbook.ui.tourChart;
 import java.util.ArrayList;
 
 import net.tourbook.chart.Chart;
-import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDrawingData;
+import net.tourbook.chart.ChartType;
 import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IChartLayer;
 
@@ -180,7 +180,7 @@ public class ChartLayerPhoto implements IChartLayer {
 		final double scaleX = graphDrawingData.getScaleX();
 		final double scaleY = graphDrawingData.getScaleY();
 
-		final boolean isHistory = graphDrawingData.getChartType() == ChartDataModel.CHART_TYPE_HISTORY;
+		final boolean isHistory = graphDrawingData.getChartType() == ChartType.HISTORY;
 
 		final int lineWidth = 2;
 		int photoIndex = 0;

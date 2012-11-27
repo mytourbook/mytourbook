@@ -17,7 +17,7 @@ package net.tourbook.ui.views;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.chart.ChartDataModel;
+import net.tourbook.chart.ChartType;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
@@ -221,8 +221,8 @@ public class TourChartPropertyView extends ViewPart {
 		/*
 		 * chart type
 		 */
-		final int speedChartType = _prefStore.getInt(ITourbookPreferences.GRAPH_PROPERTY_CHARTTYPE);
-		if (speedChartType == 0 || speedChartType == ChartDataModel.CHART_TYPE_LINE) {
+		final String chartType = _prefStore.getString(ITourbookPreferences.GRAPH_PROPERTY_CHARTTYPE);
+		if (chartType.length() == 0 || chartType.equals(ChartType.LINE.name())) {
 			_rdoLineChartType.setSelection(true);
 		} else {
 			_rdoBarChartType.setSelection(true);
@@ -252,10 +252,11 @@ public class TourChartPropertyView extends ViewPart {
 		/*
 		 * chart type
 		 */
-		final int speedChartType = _rdoLineChartType.getSelection()
-				? ChartDataModel.CHART_TYPE_LINE
-				: ChartDataModel.CHART_TYPE_BAR;
-		_prefStore.setValue(ITourbookPreferences.GRAPH_PROPERTY_CHARTTYPE, speedChartType);
+		final ChartType chartType = _rdoLineChartType.getSelection()//
+				? ChartType.LINE
+				: ChartType.BAR;
+
+		_prefStore.setValue(ITourbookPreferences.GRAPH_PROPERTY_CHARTTYPE, chartType.name());
 
 		/*
 		 * clip time slices

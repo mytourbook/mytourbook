@@ -96,7 +96,7 @@ public class GraphDrawingData {
 	private float					_graphYTop;
 
 	private int						_barPosition				= BAR_POS_LEFT;
-	private int						_chartType;
+	private ChartType				_chartType;
 
 	private String					_errorMessage;
 
@@ -107,7 +107,7 @@ public class GraphDrawingData {
 
 	private ChartDrawingData		chartDrawingData;
 
-	public GraphDrawingData(final ChartDrawingData chartDrawingData, final int chartType) {
+	public GraphDrawingData(final ChartDrawingData chartDrawingData, final ChartType chartType) {
 		this.chartDrawingData = chartDrawingData;
 		_chartType = chartType;
 	}
@@ -145,7 +145,7 @@ public class GraphDrawingData {
 		return chartDrawingData;
 	}
 
-	public int getChartType() {
+	public ChartType getChartType() {
 		return _chartType;
 	}
 

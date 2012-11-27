@@ -31,6 +31,7 @@ import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartSegments;
 import net.tourbook.chart.ChartToolTipInfo;
+import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.data.TourPerson;
@@ -239,7 +240,7 @@ public abstract class StatisticMonth extends YearStatistic {
 	void createYDataAltitude(final ChartDataModel chartDataModel) {
 		// altitude
 		final ChartDataYSerie yData = new ChartDataYSerie(
-				ChartDataModel.CHART_TYPE_BAR,
+				ChartType.BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				_tourMonthData.altitudeLow,
 				_tourMonthData.altitudeHigh);
@@ -256,7 +257,7 @@ public abstract class StatisticMonth extends YearStatistic {
 	void createYDataDistance(final ChartDataModel chartDataModel) {
 		// distance
 		final ChartDataYSerie yData = new ChartDataYSerie(
-				ChartDataModel.CHART_TYPE_BAR,
+				ChartType.BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				_tourMonthData.distanceLow,
 				_tourMonthData.distanceHigh);
@@ -274,7 +275,7 @@ public abstract class StatisticMonth extends YearStatistic {
 	void createYDataTourTime(final ChartDataModel chartDataModel) {
 		// duration
 		final ChartDataYSerie yData = new ChartDataYSerie(
-				ChartDataModel.CHART_TYPE_BAR,
+				ChartType.BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				_tourMonthData.getTimeLowFloat(),
 				_tourMonthData.getTimeHighFloat());

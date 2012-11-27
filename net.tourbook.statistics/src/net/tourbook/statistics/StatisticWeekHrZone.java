@@ -28,6 +28,7 @@ import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartSegments;
+import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourPerson;
@@ -307,7 +308,7 @@ public class StatisticWeekHrZone extends YearStatistic {
 		}
 
 		final ChartDataYSerie yData = new ChartDataYSerie(//
-				ChartDataModel.CHART_TYPE_BAR,
+				ChartType.BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				hrZones0,
 				hrZoneValues);
@@ -580,7 +581,7 @@ public class StatisticWeekHrZone extends YearStatistic {
 		}
 
 		// create data model
-		final ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
+		final ChartDataModel chartDataModel = new ChartDataModel(ChartType.BAR);
 
 		createXDataWeek(chartDataModel);
 		createYDataHrZone(chartDataModel);
