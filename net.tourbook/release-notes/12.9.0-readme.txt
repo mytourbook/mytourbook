@@ -80,6 +80,12 @@ Fixed Bugs
 * just detected (24.9.2012), that power & speed series from a device are not transferred correctly when upgrading version 11.8 to 12.1, values are too small. This bug has been fixed, when version 12.1 or later is not yet used, the data transfer is done now correctly. However when version 12.1 or later is already use, the tour data must be reimported. This can be done in the import view with this action in the context menu: Tour Reimport/All Time Slice Values. This bug mainly occures for tours which are recorded from an ergometer because it is recording power & speed.
 
 
+Ubuntu Crash
+* mytourbook: /build/buildd/cairo-1.10.2/src/cairo-surface.c:637: cairo_surface_destroy: Assertion `((*&(&surface->ref_count)->ref_count) > 0)' failed.
+Aborted (core dumped)
+
+
+
 Development
 
 * restructured plugins: removed net.tourbook.util, added net.tourbook.common
