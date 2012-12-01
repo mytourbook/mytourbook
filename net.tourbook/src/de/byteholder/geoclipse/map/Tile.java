@@ -18,13 +18,11 @@ import java.util.concurrent.locks.ReentrantLock;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourWayPoint;
 
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Rectangle;
 
-import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.mapprovider.ImageDataResources;
 import de.byteholder.geoclipse.mapprovider.MP;
 
@@ -450,7 +448,8 @@ public class Tile extends Observable {
 		_childTileImageData = childImageData;
 
 		if (_parentTile == null) {
-			StatusUtil.log(NLS.bind(Messages.DBG057_MapProfile_NoParentTile, getTileKey()), new Exception());
+			// this happens often -> disabled log
+//			StatusUtil.log(NLS.bind(Messages.DBG057_MapProfile_NoParentTile, getTileKey()), new Exception());
 			return null;
 		}
 

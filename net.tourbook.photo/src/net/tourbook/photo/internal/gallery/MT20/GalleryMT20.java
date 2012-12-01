@@ -642,6 +642,13 @@ public abstract class GalleryMT20 extends Canvas {
 		}
 	}
 
+	private void ensureItemSize() {
+		if (_itemWidth == 0 || _itemHeight == 0) {
+			_itemWidth = 1;
+			_itemHeight = 1;
+		}
+	}
+
 	private void fillContextMenu(final IMenuManager menuMgr) {
 
 		if (_customContextMenuProvider != null) {
@@ -2014,11 +2021,13 @@ public abstract class GalleryMT20 extends Canvas {
 				_itemHeight = _clientArea.height;
 				_itemWidth = (int) (_itemHeight * _itemRatio);
 
+				ensureItemSize();
+
 				notifyZoomListener(_itemWidth, _itemHeight);
 			}
-		}
 
-		updateGallery(true);
+			updateGallery(true);
+		}
 	}
 
 	private void onScrollHorizontal() {
@@ -2499,6 +2508,8 @@ public abstract class GalleryMT20 extends Canvas {
 			_gridVertItems = vhNumbers.y;
 
 		} else {
+
+			ensureItemSize();
 
 			final Point vhNumbers = setGridSize_10(_clientArea.height, _itemHeight);
 
@@ -3074,6 +3085,8 @@ public abstract class GalleryMT20 extends Canvas {
 					_itemHeight = receiverHeight - barHeight;
 					_itemWidth = (int) (_itemHeight * _itemRatio);
 
+					ensureItemSize();
+
 					_contentVirtualWidth = _gridHorizItems * _itemWidth;
 					_contentVirtualHeight = _itemHeight;
 
@@ -3081,6 +3094,8 @@ public abstract class GalleryMT20 extends Canvas {
 
 						_itemWidth = clientAreaWidth / _gridHorizItems;
 						_itemHeight = (int) (_itemWidth / _itemRatio);
+
+						ensureItemSize();
 
 						_contentVirtualWidth = _gridHorizItems * _itemWidth;
 						_contentVirtualHeight = _itemHeight;

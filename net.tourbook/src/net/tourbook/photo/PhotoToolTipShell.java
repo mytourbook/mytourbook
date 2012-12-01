@@ -238,6 +238,8 @@ public abstract class PhotoToolTipShell {
 		if (isPinned) {
 			setToolTipPinnedLocation();
 		}
+
+		enableControls();
 	}
 
 	/**
@@ -287,6 +289,9 @@ public abstract class PhotoToolTipShell {
 	}
 
 	private void animation10_StartKomplex() {
+
+//		System.out.println(UI.timeStampNano() + " in " + _isShellFadingIn + ("\tout " + _isShellFadingOut));
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		if (_isKeepToolTipOpen) {
 
@@ -606,6 +611,8 @@ public abstract class PhotoToolTipShell {
 		_isDoNotStopAnimation = true;
 	}
 
+	protected abstract void enableControls();
+
 	private Point fixupDisplayBounds(final Point tipSize, final Point location) {
 
 		final Rectangle displayBounds = getDisplayBounds(location);
@@ -701,6 +708,10 @@ public abstract class PhotoToolTipShell {
 	 */
 	protected abstract boolean isToolTipDragged();
 
+	protected boolean isToolTipPinned() {
+		return _isToolTipPinned;
+	}
+
 	abstract boolean isVerticalGallery();
 
 	private void onOwnerControlEvent(final Event event) {
@@ -773,6 +784,9 @@ public abstract class PhotoToolTipShell {
 			break;
 
 		case SWT.MouseEnter:
+
+//			System.out.println(UI.timeStampNano() + " _isDoNotStopAnimation " + _isDoNotStopAnimation);
+//			// TODO remove SYSTEM.OUT.PRINTLN
 
 			if (_isDoNotStopAnimation == false) {
 
@@ -1262,7 +1276,21 @@ public abstract class PhotoToolTipShell {
 			_horizPinLocationX = contentLocation.x;
 			_horizPinLocationY = contentLocation.y;
 		}
+
+		/*
+		 * end location must be set that a new animation finds the correct position where it should
+		 * be moved
+		 */
+		_shellEndLocation.x = contentLocation.x;
+		_shellEndLocation.y = contentLocation.y;
 	}
+
+//	/**
+//	 * @param isAutoMoved
+//	 *            Is <code>true</code> when tooltip is auto moved, otherwise it is
+//	 *            <code>false</code>.
+//	 */
+//	abstract void toolTipIsAutoMoved(boolean isAutoMoved);
 
 	protected void showAtDefaultLocation() {
 
@@ -1275,13 +1303,6 @@ public abstract class PhotoToolTipShell {
 
 		_visibleRRShell.setShellLocation(fixedLocation.x, fixedLocation.y, 4);
 	}
-
-//	/**
-//	 * @param isAutoMoved
-//	 *            Is <code>true</code> when tooltip is auto moved, otherwise it is
-//	 *            <code>false</code>.
-//	 */
-//	abstract void toolTipIsAutoMoved(boolean isAutoMoved);
 
 	protected boolean showShell() {
 

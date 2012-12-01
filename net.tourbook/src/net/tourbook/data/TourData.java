@@ -59,6 +59,7 @@ import javax.xml.bind.annotation.XmlType;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ChartLabel;
+import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
@@ -83,7 +84,6 @@ import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 import org.hibernate.annotations.Cascade;
 import org.joda.time.DateTime;
@@ -809,10 +809,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public double[]											longitudeSerie;
 
 	/**
-	 * contains the bounds of the tour in latitude/longitude
+	 * Contains the bounds of the tour in latitude/longitude:
+	 * <p>
+	 * 1st item contains lat/lon minimum values<br>
+	 * 2nd item contains lat/lon maximum values<br>
 	 */
 	@Transient
-	public Rectangle										gpsBounds;
+	private GeoPosition[]									_gpsBounds;
 
 	/**
 	 * Index of the segmented data in the data series
@@ -891,18 +894,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	@Transient
 	public int												mapZoomLevel;
-
-	@Transient
-	public double											mapMinLatitude;
-
-	@Transient
-	public double											mapMaxLatitude;
-
-	@Transient
-	public double											mapMinLongitude;
-
-	@Transient
-	public double											mapMaxLongitude;
 
 	/**
 	 * caches the world positions for the tour lat/long values for each zoom level
@@ -1047,7 +1038,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		int sumPower = 0;
 		int sumSpeed = 0;
 
-		// get first valid latitude/longitude
+		double mapMinLatitude = 0;
+		double mapMaxLatitude = 0;
+		double mapMinLongitude = 0;
+		double mapMaxLongitude = 0;
+
+		// get FIRST VALID latitude/longitude
 		boolean isGPS = false;
 		if ((latitudeSerie != null) && (longitudeSerie != null)) {
 
@@ -1227,6 +1223,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 		srtmSerie = null;
 		srtmSerieImperial = null;
+
+		_gpsBounds = null;
 
 		_hrZones = null;
 		_hrZoneContext = null;
@@ -2052,6 +2050,44 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		computeAvgTemperature();
 
 		computeHrZones();
+	}
+
+	private GeoPosition[] computeGeoBounds() {
+
+		if ((latitudeSerie == null) || (longitudeSerie == null)) {
+			return null;
+		}
+
+		/*
+		 * get min/max longitude/latitude
+		 */
+
+		double minLatitude = latitudeSerie[0];
+		double maxLatitude = latitudeSerie[0];
+		double minLongitude = longitudeSerie[0];
+		double maxLongitude = longitudeSerie[0];
+
+		for (int serieIndex = 1; serieIndex < latitudeSerie.length; serieIndex++) {
+
+			final double latitude = latitudeSerie[serieIndex];
+			final double longitude = longitudeSerie[serieIndex];
+
+			minLatitude = latitude < minLatitude ? latitude : minLatitude;
+			maxLatitude = latitude > maxLatitude ? latitude : maxLatitude;
+
+			minLongitude = longitude < minLongitude ? longitude : minLongitude;
+			maxLongitude = longitude > maxLongitude ? longitude : maxLongitude;
+
+			if (minLatitude == 0) {
+				minLatitude = -180.0;
+			}
+		}
+
+		final GeoPosition[] gpsBounds = new GeoPosition[] {
+				new GeoPosition(minLatitude, minLongitude),
+				new GeoPosition(maxLatitude, maxLongitude) };
+
+		return gpsBounds;
 	}
 
 	/**
@@ -4246,6 +4282,24 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	}
 
 	/**
+	 * @return Returns bounds of the tour in latitude/longitude:
+	 *         <p>
+	 *         1st item contains lat/lon minimum values<br>
+	 *         2nd item contains lat/lon maximum values
+	 *         <p>
+	 *         Returns <code>null</code> when geo positions are not available.
+	 */
+
+	public GeoPosition[] getGeoBounds() {
+
+		if (_gpsBounds == null) {
+			_gpsBounds = computeGeoBounds();
+		}
+
+		return _gpsBounds;
+	}
+
+	/**
 	 * @return Returns the metric or imperial altimeter serie depending on the active measurement
 	 */
 	public float[] getGradientSerie() {
@@ -4639,6 +4693,24 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return startPulse;
 	}
 
+//	public double[] getTimeSerieDouble() {
+//
+//		if (timeSerieHistory == null) {
+//			return null;
+//		}
+//
+//		if (timeSerieHistoryDouble == null) {
+//
+//			timeSerieHistoryDouble = new double[timeSerieHistory.length];
+//
+//			for (int serieIndex = 0; serieIndex < timeSerieHistory.length; serieIndex++) {
+//				timeSerieHistoryDouble[serieIndex] = timeSerieHistory[serieIndex];
+//			}
+//		}
+//
+//		return timeSerieHistoryDouble;
+//	}
+
 	/**
 	 * @return Returns the tour start date time in seconds.
 	 */
@@ -4691,24 +4763,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 		return serie;
 	}
-
-//	public double[] getTimeSerieDouble() {
-//
-//		if (timeSerieHistory == null) {
-//			return null;
-//		}
-//
-//		if (timeSerieHistoryDouble == null) {
-//
-//			timeSerieHistoryDouble = new double[timeSerieHistory.length];
-//
-//			for (int serieIndex = 0; serieIndex < timeSerieHistory.length; serieIndex++) {
-//				timeSerieHistoryDouble[serieIndex] = timeSerieHistory[serieIndex];
-//			}
-//		}
-//
-//		return timeSerieHistoryDouble;
-//	}
 
 	@XmlElement
 	public String getTest() {
@@ -4894,6 +4948,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return tourMarkers;
 	}
 
+//	is currently disabled in version 12.12, will be used in further versions
+//
+//	public Set<TourPhoto> getTourPhotos() {
+//		return tourPhotos;
+//	}
+
 	public ArrayList<TourMarker> getTourMarkersSorted() {
 
 		if (_sortedMarkers != null) {
@@ -4920,12 +4980,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public TourPerson getTourPerson() {
 		return tourPerson;
 	}
-
-//	is currently disabled in version 12.12, will be used in further versions
-//
-//	public Set<TourPhoto> getTourPhotos() {
-//		return tourPhotos;
-//	}
 
 	/**
 	 * @return Returns total recording time in seconds

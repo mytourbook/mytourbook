@@ -250,6 +250,11 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 	@Override
 	protected void afterCreateShell(final Shell shell) {
 
+		if (_state == null) {
+			// this happened when testing
+			return;
+		}
+
 		/*
 		 * restore MUST be done after the shell is created, otherwise clientArea() can return 0
 		 * values
@@ -418,6 +423,12 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		}
 	}
 
+	@Override
+	protected void enableControls() {
+
+		_actionToolTipLocation.setEnabled(isToolTipPinned() == false);
+	}
+
 	private void fillActionBar() {
 
 		/*
@@ -522,6 +533,8 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		updateUI_ToolTipLocation();
 
 		super.restoreState(state);
+
+		enableControls();
 	}
 
 	@Override
