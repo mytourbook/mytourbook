@@ -1,0 +1,6 @@
+Version: 13.??.0                                           ?. ??? 2013 
+
+
+Detected Problems:
+
+- photo gallery in the tour marker dialog box it not correctly initialized, state is not set

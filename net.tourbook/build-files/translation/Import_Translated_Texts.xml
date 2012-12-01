@@ -5,8 +5,8 @@
 	<!--
 		extract language files from the archive into the trunk projects
 	-->
-	<property name="path-mt-trunk" value="../../../mytourbook" />
-	<property name="dat-ROOT" value="../../../.." />
+	<property name="path-mt-trunk" value="../../../../mytourbook" />
+	<property name="dat-ROOT" value="../../../../.." />
 
 	<!-- PRODUCTION TARGET
 	-->
@@ -80,7 +80,7 @@
 			
 			C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\build-files\create-translation-archive.xml
 		-->
-		<ant antfile="CreateTranslationArchive.xml" />
+		<ant antfile="Create_Translation_Archive.xml" />
 
 	</target>
 

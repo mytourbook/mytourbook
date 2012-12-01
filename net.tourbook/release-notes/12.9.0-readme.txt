@@ -1,8 +1,5 @@
 Version: 12.12.0                                           ?. December 2012 
 
-TODO
-
-* 13.08.2012 18:16	Stefan Rado		MyTourbook - Pausenzeiten
 
 VERY IMPORTANT - VERY IMPORTANT - VERY IMPORTANT - VERY IMPORTANT - VERY IMPORTANT
 
@@ -18,82 +15,6 @@ VERY IMPORTANT - VERY IMPORTANT - VERY IMPORTANT - VERY IMPORTANT - VERY IMPORTA
 
 TIPs
 Take a picture from a radio controlled watch, then it's easy to adjust time for taken photos because a GPS device has also a radio controlled time
-
-Photo News
-
-* show tour photos in the tour chart
-  - show hovered photos in a photo tooltip
-
-* in the full screen image viewer a photo gallery can be displayed for all available photos, just move mouse to the top of the screen
-
-
-Other News
-
-* when the tour chart is zoomed in, 2 markers shows how far the chart is moved to the right or left side
-* spanish translation, provided by Pedro Merino Laso
-
-
-Improvements 
-
-* set tour marker visibility (can be used when doing a screenshot to hide awkward markers)
-* 2 markers in the tour chart axis shows how far to the right or left a zoomed chart is moved
-* feature request from Stefan Rado: support air planes when break time is calculated (increased minimum speed: 10 -> 100 km/h)
-
-
-Different behaviour:
-
-* UPDATE DOCU: TOUR CHART autoscrolling in the tour chart can be done only, when the mouse vertical position is below the horizontal x-axis of the lower graph (when multiple graphs are displayed)
-
-
-Odd things:
-
-* 6 minutes and 32 seconds are skipped in the German time zone at 1 April 1893
-
-see also here: http://timeanddate.com/worldclock/clockchange.html?n=37&year=1893
-
-
-When local standard time was about to reach
-Saturday, 1 April 1893, 00:00:00 clocks were turned forward 0:06:32 hours to
-Saturday, 1 April 1893, 00:06:32 local standard time instead
-
-Seconds before and after the time change forward
-Local Date				Local Time				DST	UTC				Time
-													Offset			Zone
-							
-
-Friday, 31 March 1893	23:59:57				No	UTC+0:53:28h	LMT
-						23:59:58				No	UTC+0:53:28h	LMT
-						23:59:59				No	UTC+0:53:28h	LMT
-
-Saturday, 1 April 1893	00:00:00 -> 00:06:32	No	UTC+1h			CET
-						00:06:33				No	UTC+1h			CET
-						00:06:34				No	UTC+1h			CET
-
-
-Other modifications 
-
-*
-
-
-Fixed Bugs 
-
-* just detected (24.9.2012), that power & speed series from a device are not transferred correctly when upgrading version 11.8 to 12.1, values are too small. This bug has been fixed, when version 12.1 or later is not yet used, the data transfer is done now correctly. However when version 12.1 or later is already use, the tour data must be reimported. This can be done in the import view with this action in the context menu: Tour Reimport/All Time Slice Values. This bug mainly occures for tours which are recorded from an ergometer because it is recording power & speed.
-
-
-Ubuntu Crash
-* mytourbook: /build/buildd/cairo-1.10.2/src/cairo-surface.c:637: cairo_surface_destroy: Assertion `((*&(&surface->ref_count)->ref_count) > 0)' failed.
-Aborted (core dumped)
-
-
-
-Development
-
-* restructured plugins: removed net.tourbook.util, added net.tourbook.common
-
-
-System 
-
-* Eclipse 3.8.1
 
 
 
