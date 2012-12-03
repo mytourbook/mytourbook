@@ -212,12 +212,12 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 	private Composite								_viewerContainer;
 	private TableViewer								_tourViewer;
-	private Combo									_comboCamera;
 
+	private Label									_lblAdjustTime;
 	private Spinner									_spinnerHours;
 	private Spinner									_spinnerMinutes;
 	private Spinner									_spinnerSeconds;
-
+	private Combo									_comboCamera;
 
 //	private Button									_rdoAdjustAllTours;
 //	private Button									_rdoAdjustSelectedTours;
@@ -579,10 +579,10 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 			/*
 			 * label: adjust time
 			 */
-			final Label label = new Label(container, SWT.NONE);
-			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-			label.setText(Messages.Photos_AndTours_Label_AdjustTime);
-			label.setToolTipText(Messages.Photos_AndTours_Label_AdjustTime_Tooltip);
+			_lblAdjustTime = new Label(container, SWT.NONE);
+			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_lblAdjustTime);
+			_lblAdjustTime.setText(Messages.Photos_AndTours_Label_AdjustTime);
+			_lblAdjustTime.setToolTipText(Messages.Photos_AndTours_Label_AdjustTime_Tooltip);
 
 //			/*
 //			 * radio: all/selected tours
@@ -1101,16 +1101,19 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 	private void enableControls() {
 
 		final boolean isPhotoAvailable = _allPhotos.size() > 0;
-		final boolean isPhotoFilter = _actionFilterOneHistory.isChecked() == false;
+		final boolean isOneHistory = _actionFilterOneHistory.isChecked();
+		final boolean isNoHistory = !isOneHistory;
+		final boolean isPhotoFilter = isPhotoAvailable && isNoHistory;
 //		final boolean isTourWithGPS = _selectedTourPhotoLinksWithGps.size() > 0;
 
-		_comboCamera.setEnabled(isPhotoAvailable);
-		_spinnerHours.setEnabled(isPhotoAvailable);
-		_spinnerMinutes.setEnabled(isPhotoAvailable);
-		_spinnerSeconds.setEnabled(isPhotoAvailable);
+		_lblAdjustTime.setEnabled(isPhotoFilter);
+		_spinnerHours.setEnabled(isPhotoFilter);
+		_spinnerMinutes.setEnabled(isPhotoFilter);
+		_spinnerSeconds.setEnabled(isPhotoFilter);
+		_comboCamera.setEnabled(isPhotoFilter);
 
+		_actionFilterPhotos.setEnabled(isPhotoFilter);
 		_actionFilterOneHistory.setEnabled(isPhotoAvailable);
-		_actionFilterPhotos.setEnabled(isPhotoAvailable && isPhotoFilter);
 
 //		_actionResetTimeAdjustment.setEnabled(isTourWithGPS);
 //
@@ -1645,9 +1648,9 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 		}
 
 		// get previous selected tour
-		TourPhotoLink prevTourPhotoLink = null;
+		final TourPhotoLink prevTourPhotoLink[] = { null };
 		if (tourPhotoLinksWhichShouldBeSelected != null && tourPhotoLinksWhichShouldBeSelected.size() > 0) {
-			prevTourPhotoLink = tourPhotoLinksWhichShouldBeSelected.get(0);
+			prevTourPhotoLink[0] = tourPhotoLinksWhichShouldBeSelected.get(0);
 		}
 
 		// this must be called BEFORE start/end date are set
@@ -1674,21 +1677,26 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 		updateUI_Cameras(null);
 
-		_tourViewer.setInput(new Object[0]);
-		_pageBook.showPage(_pageViewer);
-
 		enableControls();
 
-		updateAnnotationsInPicDirView();
+		_pageBook.getDisplay().asyncExec(new Runnable() {
+			public void run() {
 
-		if (allLinksWhichShouldBeSelected != null && allLinksWhichShouldBeSelected.size() > 0) {
+				_tourViewer.setInput(new Object[0]);
+				_pageBook.showPage(_pageViewer);
 
-			_tourViewer.setSelection(new StructuredSelection(allLinksWhichShouldBeSelected), false);
+				updateAnnotationsInPicDirView();
 
-		} else {
+				if (allLinksWhichShouldBeSelected != null && allLinksWhichShouldBeSelected.size() > 0) {
 
-			selectTour(prevTourPhotoLink);
-		}
+					_tourViewer.setSelection(new StructuredSelection(allLinksWhichShouldBeSelected), true);
+
+				} else {
+
+					selectTour(prevTourPhotoLink[0]);
+				}
+			}
+		});
 	}
 
 	/**
