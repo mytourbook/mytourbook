@@ -1679,6 +1679,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 		enableControls();
 
+		// tour viewer update can be a longer task, update other UI element before
 		_pageBook.getDisplay().asyncExec(new Runnable() {
 			public void run() {
 
