@@ -203,6 +203,7 @@ public class PhotoLoadManager {
 		for (final Runnable runnable : taskQueue) {
 			final FutureTask<?> task = (FutureTask<?>) runnable;
 			task.cancel(false);
+
 		}
 
 		waitingQueue.clear();
@@ -433,23 +434,20 @@ public class PhotoLoadManager {
 		photo.setLoadingState(PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE, imageQuality);
 
 		// put image loading item into the waiting queue
-		_waitingQueueThumb.add(new PhotoImageLoader(
+		final PhotoImageLoader imageLoader = new PhotoImageLoader(
 				_display,
 				photo,
 				imageQuality,
 				_imageFramework,
 				_hqImageSize,
-				imageLoadCallback));
-
-		// set state, ensure queue is not
-		photo.setLoadingState(PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE, imageQuality);
+				imageLoadCallback);
 
 		final Runnable executorTask = new Runnable() {
 			public void run() {
 
 //				// !!! slow down loading for debugging !!!
 //				try {
-//					Thread.sleep(100);
+//					Thread.sleep(500);
 //				} catch (final InterruptedException e) {
 //					// TODO Auto-generated catch block
 //					// TODO Auto-generated catch block
@@ -489,10 +487,25 @@ public class PhotoLoadManager {
 									imageQuality,
 									imageLoadCallback);
 						}
+
+						/**
+						 * Check if loading state is reset, it happend VERY OFTEN that it was NOT
+						 * reset. It happened when zoomed in and scrolled, then some images are
+						 * never loaded until a folder refresh.
+						 */
+						final PhotoLoadingState photoLoadingState = photo.getLoadingState(imageQuality);
+						if (photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE) {
+
+							// image is NOT reset correctly
+
+							photo.setLoadingState(PhotoLoadingState.UNDEFINED, imageQuality);
+						}
 					}
 				}
 			}
 		};
+
+		_waitingQueueThumb.add(imageLoader);
 		_executorThumb.submit(executorTask);
 	}
 
