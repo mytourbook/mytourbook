@@ -22,8 +22,6 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
@@ -87,13 +85,6 @@ public class PhotoLoadManager {
 
 	private static String										_imageFramework;
 	private static int											_hqImageSize;
-
-	private static final ReentrantLock							QUEUE_LOCK						= new ReentrantLock();
-
-	private static final ReentrantReadWriteLock					rwl								= new ReentrantReadWriteLock(
-																										true);
-	private static ReentrantReadWriteLock.ReadLock				readlock						= rwl.readLock();
-	private static ReentrantReadWriteLock.WriteLock				writelock						= rwl.writeLock();
 
 	static {
 
@@ -183,6 +174,22 @@ public class PhotoLoadManager {
 		_executorThumb = (ThreadPoolExecutor) Executors.newFixedThreadPool(numberOfProcessors, threadFactoryThumb);
 		_executorHQ = (ThreadPoolExecutor) Executors.newFixedThreadPool(1, threadFactoryHQ);
 		_executorOriginal = (ThreadPoolExecutor) Executors.newFixedThreadPool(1, threadFactoryOriginal);
+	}
+
+	/**
+	 * Check if loading state is reset, it happend VERY OFTEN that it was NOT reset. It happened
+	 * when zoomed in and scrolled very quickly, then some images are never loaded until a folder
+	 * refresh.
+	 */
+	private static void checkLoadingState(final Photo photo, final ImageQuality imageQuality) {
+
+		final PhotoLoadingState photoLoadingState = photo.getLoadingState(imageQuality);
+		if (photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE) {
+
+			// image is NOT reset correctly
+
+			photo.setLoadingState(PhotoLoadingState.UNDEFINED, imageQuality);
+		}
 	}
 
 	public static void clearExifLoadingQueue() {
@@ -329,19 +336,22 @@ public class PhotoLoadManager {
 			public void run() {
 
 				// get last added loader itme
-				final PhotoImageLoader loadingItem = _waitingQueueHQ.pollFirst();
+				final PhotoImageLoader imageLoader = _waitingQueueHQ.pollFirst();
 
-				if (loadingItem != null) {
-
-					if (isImageVisible(galleryItem) == false) {
-
-						resetLoadingState(photo, imageQuality);
-
-						return;
-					}
-
-					loadingItem.loadImageHQ(_waitingQueueThumb, _waitingQueueExif);
+				if (imageLoader == null) {
+					return;
 				}
+
+				if (isImageVisible(galleryItem) == false) {
+
+					resetLoadingState(photo, imageQuality);
+
+					return;
+				}
+
+				imageLoader.loadImageHQ(_waitingQueueThumb, _waitingQueueExif);
+
+				checkLoadingState(photo, imageQuality);
 			}
 		};
 		_executorHQ.submit(executorTask);
@@ -356,14 +366,16 @@ public class PhotoLoadManager {
 														final Photo photo,
 														final ILoadCallBack imageLoadCallback) {
 
+		final ImageQuality imageQuality = ImageQuality.ORIGINAL;
+
 		// set state
-		photo.setLoadingState(PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE, ImageQuality.ORIGINAL);
+		photo.setLoadingState(PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE, imageQuality);
 
 		// set original image loading item into the waiting queue
 		_waitingQueueOriginal.add(new PhotoImageLoader(
 				_display,
 				photo,
-				ImageQuality.ORIGINAL,
+				imageQuality,
 				_imageFramework,
 				_hqImageSize,
 				imageLoadCallback));
@@ -415,11 +427,13 @@ public class PhotoLoadManager {
 					 * SWT exception even when the image is valid, potentially bug
 					 * https://bugs.eclipse.org/bugs/show_bug.cgi?id=375845
 					 */
-					|| photo.getLoadingState(ImageQuality.ORIGINAL) == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE) {
+					|| photo.getLoadingState(imageQuality) == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE) {
 
 						// reset state
-						resetLoadingState(photo, ImageQuality.ORIGINAL);
+						resetLoadingState(photo, imageQuality);
 					}
+
+					checkLoadingState(photo, imageQuality);
 				}
 			}
 		};
@@ -458,11 +472,13 @@ public class PhotoLoadManager {
 //				}
 
 				// get last added loader item
-				final PhotoImageLoader loadingItem = _waitingQueueThumb.pollFirst();
+				final PhotoImageLoader imageLoader = _waitingQueueThumb.pollFirst();
 
-				if (loadingItem != null) {
+				if (imageLoader == null) {
+					return;
+				}
 
-					final String errorKey = loadingItem.getPhoto().getPhotoWrapper().imageFilePathName;
+				final String errorKey = imageLoader.getPhoto().getPhotoWrapper().imageFilePathName;
 
 					if (_photoWithLoadingError.containsKey(errorKey)) {
 
@@ -477,7 +493,7 @@ public class PhotoLoadManager {
 							return;
 						}
 
-						if (loadingItem.loadImageThumb(_waitingQueueOriginal)) {
+					if (imageLoader.loadImageThumb(_waitingQueueOriginal)) {
 
 							// HQ image is requested
 
@@ -487,21 +503,9 @@ public class PhotoLoadManager {
 									imageQuality,
 									imageLoadCallback);
 						}
-
-						/**
-						 * Check if loading state is reset, it happend VERY OFTEN that it was NOT
-						 * reset. It happened when zoomed in and scrolled, then some images are
-						 * never loaded until a folder refresh.
-						 */
-						final PhotoLoadingState photoLoadingState = photo.getLoadingState(imageQuality);
-						if (photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE) {
-
-							// image is NOT reset correctly
-
-							photo.setLoadingState(PhotoLoadingState.UNDEFINED, imageQuality);
-						}
 					}
-				}
+
+				checkLoadingState(photo, imageQuality);
 			}
 		};
 
@@ -528,21 +532,24 @@ public class PhotoLoadManager {
 			public void run() {
 
 				// get last added loader item
-				final PhotoImageLoader loadingItem = _waitingQueueThumb.pollFirst();
+				final PhotoImageLoader imageLoader = _waitingQueueThumb.pollFirst();
 
-				if (loadingItem != null) {
-
-					final String errorKey = loadingItem.getPhoto().getPhotoWrapper().imageFilePathName;
-
-					if (_photoWithLoadingError.containsKey(errorKey)) {
-
-						photo.setLoadingState(PhotoLoadingState.IMAGE_IS_INVALID, imageQuality);
-
-					} else {
-
-						loadingItem.loadImageThumb(_waitingQueueOriginal);
-					}
+				if (imageLoader == null) {
+					return;
 				}
+
+				final String errorKey = imageLoader.getPhoto().getPhotoWrapper().imageFilePathName;
+
+				if (_photoWithLoadingError.containsKey(errorKey)) {
+
+					photo.setLoadingState(PhotoLoadingState.IMAGE_IS_INVALID, imageQuality);
+
+				} else {
+
+					imageLoader.loadImageThumb(_waitingQueueOriginal);
+				}
+
+				checkLoadingState(photo, imageQuality);
 			}
 		};
 		_executorThumb.submit(executorTask);
@@ -571,11 +578,9 @@ public class PhotoLoadManager {
 				continue;
 			}
 
-			final PhotoImageLoader photoImageLoaderItem = (PhotoImageLoader) waitingQueueItem;
+			final PhotoImageLoader imageLoader = (PhotoImageLoader) waitingQueueItem;
 
-			photoImageLoaderItem.getPhoto().setLoadingState(
-					PhotoLoadingState.UNDEFINED,
-					photoImageLoaderItem.getRequestedImageQuality());
+			imageLoader.getPhoto().setLoadingState(PhotoLoadingState.UNDEFINED, imageLoader.getRequestedImageQuality());
 		}
 	}
 
