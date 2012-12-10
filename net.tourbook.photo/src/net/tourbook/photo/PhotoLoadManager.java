@@ -392,7 +392,7 @@ public class PhotoLoadManager {
 					return;
 				}
 
-				boolean isReset = false;
+				boolean isResetState = false;
 
 				try {
 
@@ -409,7 +409,7 @@ public class PhotoLoadManager {
 
 						// another gallery item is displayed
 
-						isReset = true;
+						isResetState = true;
 
 					} else {
 
@@ -420,7 +420,7 @@ public class PhotoLoadManager {
 					StatusUtil.log(e);
 				} finally {
 
-					if (isReset
+					if (isResetState
 
 					/*
 					 * this error occured when drawing an image in the photo renderer, it caused an
@@ -432,8 +432,6 @@ public class PhotoLoadManager {
 						// reset state
 						resetLoadingState(photo, imageQuality);
 					}
-
-					checkLoadingState(photo, imageQuality);
 				}
 			}
 		};
@@ -480,32 +478,34 @@ public class PhotoLoadManager {
 
 				final String errorKey = imageLoader.getPhoto().getPhotoWrapper().imageFilePathName;
 
-					if (_photoWithLoadingError.containsKey(errorKey)) {
+				if (_photoWithLoadingError.containsKey(errorKey)) {
 
-						photo.setLoadingState(PhotoLoadingState.IMAGE_IS_INVALID, imageQuality);
+					photo.setLoadingState(PhotoLoadingState.IMAGE_IS_INVALID, imageQuality);
 
-					} else {
+				} else {
 
-						if (isImageVisible(galleryItem) == false) {
+					if (isImageVisible(galleryItem) == false) {
 
-							resetLoadingState(photo, imageQuality);
+						resetLoadingState(photo, imageQuality);
 
-							return;
-						}
+						return;
+					}
 
 					if (imageLoader.loadImageThumb(_waitingQueueOriginal)) {
 
-							// HQ image is requested
+						// HQ image is requested
 
-							PhotoLoadManager.putImageInLoadingQueueHQ(//
-									galleryItem,
-									photo,
-									imageQuality,
-									imageLoadCallback);
-						}
+						PhotoLoadManager.putImageInLoadingQueueHQ(//
+								galleryItem,
+								photo,
+								imageQuality,
+								imageLoadCallback);
+					} else {
+
+						checkLoadingState(photo, imageQuality);
 					}
+				}
 
-				checkLoadingState(photo, imageQuality);
 			}
 		};
 
