@@ -749,7 +749,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 		final int selectionIndex = _comboClouds.getSelectionIndex();
 
 		final String cloudKey = IWeather.cloudIcon[selectionIndex];
-		final Image cloundIcon = UI.IMAGE_REGISTRY.get(cloudKey);
+		final Image cloundIcon = net.tourbook.common.UI.IMAGE_REGISTRY.get(cloudKey);
 
 		_lblCloudIcon.setImage(cloundIcon);
 	}

@@ -971,7 +971,7 @@ public class TourInfoUI {
 		final String cloudText = IWeather.cloudText[weatherIndex];
 		final String cloudImageName = IWeather.cloudIcon[weatherIndex];
 
-		_lblClouds.setImage(UI.IMAGE_REGISTRY.get(cloudImageName));
+		_lblClouds.setImage(net.tourbook.common.UI.IMAGE_REGISTRY.get(cloudImageName));
 		_lblCloudsUnit.setText(cloudText.equals(IWeather.cloudIsNotDefined) ? UI.EMPTY_STRING : cloudText);
 
 		/*
