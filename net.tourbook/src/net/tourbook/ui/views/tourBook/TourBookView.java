@@ -1426,7 +1426,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 					cell.setText(UI.EMPTY_STRING);
 				} else {
 					//cell.setText(windClouds);
-					final Image img = UI.IMAGE_REGISTRY.get(windClouds);
+					final Image img = net.tourbook.common.UI.IMAGE_REGISTRY.get(windClouds);
 					if (img != null) {
 						cell.setImage(img);
 					} else {

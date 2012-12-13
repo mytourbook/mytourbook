@@ -1385,7 +1385,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				if (weatherCloudId == null) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					final Image img = UI.IMAGE_REGISTRY.get(weatherCloudId);
+					final Image img = net.tourbook.common.UI.IMAGE_REGISTRY.get(weatherCloudId);
 					if (img != null) {
 						cell.setImage(img);
 					} else {
