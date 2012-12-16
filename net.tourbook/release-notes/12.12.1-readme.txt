@@ -1,0 +1,8 @@
+Version: 12.12.1                                    12. December 2012 
+
+
+
+Fixed Bugs 	
+
+ * show weather icons again in various views and dialogs
+ 
