@@ -527,7 +527,17 @@ public class TourChart extends Chart {
 		setCommandChecked(COMMAND_ID_IS_SHOW_TOUR_MARKER, isItemChecked);
 	}
 
-	public void actionShowTourPhotos(final boolean isItemChecked) {
+	public void actionShowTourPhotos(final Object action, final boolean isItemChecked) {
+
+		if (action instanceof TCActionHandler) {
+
+			final TCActionHandler new_name = (TCActionHandler) action;
+
+		} else if (action instanceof Action) {
+
+			final Action new_name = (Action) action;
+
+		}
 
 		_prefStore.setValue(ITourbookPreferences.GRAPH_IS_TOUR_PHOTO_VISIBLE, isItemChecked);
 

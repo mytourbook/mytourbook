@@ -36,6 +36,6 @@ public class ActionTourPhotos extends Action {
 
 	@Override
 	public void run() {
-		_tourChart.actionShowTourPhotos(isChecked());
+		_tourChart.actionShowTourPhotos(this, isChecked());
 	}
 }

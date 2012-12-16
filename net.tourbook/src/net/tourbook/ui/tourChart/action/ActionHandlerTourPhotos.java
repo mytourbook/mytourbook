@@ -32,7 +32,7 @@ public class ActionHandlerTourPhotos extends TCActionHandler {
 		final Boolean isItemChecked = HandlerUtil.isItemChecked(execEvent);
 
 		if (isItemChecked != null) {
-			tourChart.actionShowTourPhotos(isItemChecked);
+			tourChart.actionShowTourPhotos(this, isItemChecked);
 		}
 
 		return null;
