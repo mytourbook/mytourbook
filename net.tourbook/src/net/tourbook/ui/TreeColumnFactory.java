@@ -472,6 +472,21 @@ public abstract class TreeColumnFactory {
 			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
 			return colDef;
+ 		};
+	};
+
+	public static final TreeColumnFactory TIME_SLICES = new TreeColumnFactory() {
+		@Override
+		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TimeSlices", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_NumberOfTimeSlices_Label);
+			colDef.setColumnHeader(Messages.ColumnFactory_NumberOfTimeSlices_Header);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_NumberOfTimeSlices_Tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+			
+			return colDef;
 		};
 	};
 

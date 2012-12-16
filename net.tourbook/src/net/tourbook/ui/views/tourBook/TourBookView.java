@@ -647,6 +647,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		defineColumnWeekNo();
 		defineColumnWeekYear();
 		defineColumnTimeInterval();
+//		defineColumnNumberOfTimeSlices();
 		defineColumnDeviceDistance();
 
 		defineColumnPerson();
@@ -1296,6 +1297,32 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			}
 		});
 	}
+
+//	/**
+//	 * column: number of time slices
+//	 */
+//
+//	private void defineColumnNumberOfTimeSlices() {
+//
+//		final TreeColumnDefinition colDef = TreeColumnFactory.TIME_SLICES.createColumn(_columnManager, _pc);
+//		colDef.setLabelProvider(new CellLabelProvider() {
+//			@Override
+//			public void update(final ViewerCell cell) {
+//				final Object element = cell.getElement();
+//				if (element instanceof TVITourBookTour) {
+//
+//					final short dbTimeSlices = ((TVITourBookTour) element).getColumnTimeSlices();
+//					if (dbTimeSlices == 0) {
+//						cell.setText(UI.EMPTY_STRING);
+//					} else {
+//						cell.setText(Long.toString(dbTimeSlices));
+//					}
+//
+//					setCellColor(cell, element);
+//				}
+//			}
+//		});
+//	}
 
 	/**
 	 * column: recording time (h)
