@@ -425,8 +425,6 @@ public class Map extends Canvas {
 
 	private TourToolTip							_tourToolTip;
 
-//	private PhotoToolTip						_photoToolTip;
-
 	/**
 	 * when <code>true</code> the loading... image is not displayed
 	 */
@@ -1777,13 +1775,13 @@ public class Map extends Canvas {
 //		final double totalTime = (System.nanoTime() - startTime) / 1000000.0;
 //		final double imageTimeD = imageTime / 1000000.0;
 //		System.out.println("" //
-//				+ ("fps: " + (1000 / totalTime)) //
-//				+ ("\ttotal: " + totalTime + "ms")
-//				+ ("\timage: " + imageTimeD + "ms\t")
+//				+ ("fps: " + Integer.toString((int) (1000 / totalTime))) //
+//				+ ("\ttotal: " + _nf3.format(totalTime) + "ms")
+//				+ ("\tno-image: " + _nf3.format((totalTime - imageTimeD)) + "ms")
+//				+ ("\timage: " + _nf3.format(imageTimeD) + "ms\t")
 //		//
 //				);
 //		// TODO remove SYSTEM.OUT.PRINTLN
-
 	}
 
 	private void onResize() {
@@ -1837,7 +1835,7 @@ public class Map extends Canvas {
 			updateViewPortData();
 		}
 
-		// get time when the redraw of the may is requested
+		// get time when the redraw is requested
 		final long requestedRedrawTime = System.currentTimeMillis();
 
 		if (requestedRedrawTime > _lastMapDrawTime + 100) {
@@ -1906,7 +1904,7 @@ public class Map extends Canvas {
 			return;
 		}
 
-//		final long start = System.nanoTime();
+		final long start = System.nanoTime();
 		// TODO remove SYSTEM.OUT.PRINTLN
 
 		// Draw the map
@@ -1930,10 +1928,6 @@ public class Map extends Canvas {
 				if (_isScaleVisible) {
 					paint_50_Scale(gcMapImage);
 				}
-
-//				if (_tourToolTip != null) {
-//					_tourToolTip.paint(gc, _clientArea);
-//				}
 			}
 
 		} catch (final Exception e) {
@@ -1949,11 +1943,12 @@ public class Map extends Canvas {
 			}
 		}
 
-//		System.out.println("paintMap() "
-//				+ ((int) (((System.nanoTime() - start) / 1000000)) + " ms\t")
-//				+ ((int) (1000f / ((System.nanoTime() - start) / 1000000)) + " fps") //
-//		);
-//		// TODO remove SYSTEM.OUT.PRINTLN
+		System.out.println(net.tourbook.common.UI.timeStamp()
+				+ " "
+				+ ((int) (((System.nanoTime() - start) / 1000000)) + " ms\t")
+				+ ((int) (1000f / ((System.nanoTime() - start) / 1000000)) + " fps") //
+		);
+		// TODO remove SYSTEM.OUT.PRINTLN
 
 		redraw();
 
@@ -2708,13 +2703,13 @@ public class Map extends Canvas {
 
 		final Image overlayImage = new Image(_display, transparentImageData);
 		final GC gc1Part = new GC(overlayImage);
-		
+
 		/*
 		 * Ubuntu 12.04 fails, when background is not filled, it draws a black background
 		 */
 		gc1Part.setBackground(_transparentColor);
 		gc1Part.fillRectangle(overlayImage.getBounds());
-		
+
 		{
 			// paint all overlays for the current tile
 			for (final MapPainter overlayPainter : _overlays) {
