@@ -92,7 +92,7 @@ import org.eclipse.ui.progress.UIJob;
  */
 public class PicDirFolder {
 
-	private static final String								MENU_ID_PIC_DIR_VIEW_IN_FOLDER			= "menu.net.tourbook.photo.PicDirView.InFolder"; //$NON-NLS-1$
+	private static final String								MENU_ID_PIC_DIR_VIEW_IN_FOLDER			= "menu.net.tourbook.photo.PicDirView.InFolder";	//$NON-NLS-1$
 
 	static String											WIN_PROGRAMFILES						= System
 																											.getenv("programfiles");					//$NON-NLS-1$
@@ -316,7 +316,9 @@ public class PicDirFolder {
 					// delete store files
 					final File folder = new File(folderPath);
 					final File[] imageFiles = folder.listFiles(_imageFileFilter);
-					ThumbnailStore.cleanupStoreFiles(imageFiles);
+					if (imageFiles != null) {
+						ThumbnailStore.cleanupStoreFiles(imageFiles);
+					}
 
 					// update images and force folder reload
 					displayFolderImages(_selectedTVIFolder, false, true);
