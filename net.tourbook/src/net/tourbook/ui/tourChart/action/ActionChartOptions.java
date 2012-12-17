@@ -73,21 +73,21 @@ public class ActionChartOptions extends Action implements IMenuCreator {
 
 		_menu = new Menu(parent);
 
-		final Map<String, TCActionProxy> actionProxies = _tourChart.getActionProxies();
+		final Map<String, Action> tourChartActions = _tourChart.getTourChartActions();
 
-		addItem(actionProxies.get(TourChart.COMMAND_ID_IS_SHOW_TOUR_MARKER).getAction());
-		addItem(actionProxies.get(TourChart.COMMAND_ID_IS_SHOW_TOUR_PHOTOS).getAction());
-		addItem(actionProxies.get(TourChart.COMMAND_ID_IS_SHOW_BREAKTIME_VALUES).getAction());
-		addItem(actionProxies.get(TourChart.COMMAND_ID_IS_SHOW_START_TIME).getAction());
-		addItem(actionProxies.get(TourChart.COMMAND_ID_IS_SHOW_SRTM_DATA).getAction());
-		addItem(actionProxies.get(TourChart.COMMAND_ID_IS_SHOW_VALUEPOINT_TOOLTIP).getAction());
-
-		(new Separator()).fill(_menu, -1);
-		addItem(actionProxies.get(TourChart.COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER).getAction());
-		addItem(actionProxies.get(TourChart.COMMAND_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED).getAction());
+		addItem(tourChartActions.get(TourChart.ACTION_ID_IS_SHOW_TOUR_MARKER));
+		addItem(tourChartActions.get(TourChart.ACTION_ID_IS_SHOW_TOUR_PHOTOS));
+		addItem(tourChartActions.get(TourChart.ACTION_ID_IS_SHOW_BREAKTIME_VALUES));
+		addItem(tourChartActions.get(TourChart.ACTION_ID_IS_SHOW_START_TIME));
+		addItem(tourChartActions.get(TourChart.ACTION_ID_IS_SHOW_SRTM_DATA));
+		addItem(tourChartActions.get(TourChart.ACTION_ID_IS_SHOW_VALUEPOINT_TOOLTIP));
 
 		(new Separator()).fill(_menu, -1);
-		addItem(actionProxies.get(TourChart.COMMAND_ID_EDIT_CHART_PREFERENCES).getAction());
+		addItem(tourChartActions.get(TourChart.ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER));
+		addItem(tourChartActions.get(TourChart.ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED));
+
+		(new Separator()).fill(_menu, -1);
+		addItem(tourChartActions.get(TourChart.ACTION_ID_EDIT_CHART_PREFERENCES));
 
 		return _menu;
 	}

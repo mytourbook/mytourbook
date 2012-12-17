@@ -69,11 +69,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 		// set the part listener
 		_partListener = new IPartListener2() {
 
-			public void partActivated(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == TourStatisticsView.this) {
-					_statContainer.activateActions(getSite());
-				}
-			}
+			public void partActivated(final IWorkbenchPartReference partRef) {}
 
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
@@ -83,11 +79,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 				}
 			}
 
-			public void partDeactivated(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == TourStatisticsView.this) {
-					_statContainer.deactivateActions(getSite());
-				}
-			}
+			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
 			public void partHidden(final IWorkbenchPartReference partRef) {}
 

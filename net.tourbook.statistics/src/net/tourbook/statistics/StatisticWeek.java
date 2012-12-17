@@ -44,7 +44,6 @@ import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IViewSite;
-import org.eclipse.ui.IWorkbenchPartSite;
 
 public abstract class StatisticWeek extends YearStatistic {
 
@@ -70,11 +69,6 @@ public abstract class StatisticWeek extends YearStatistic {
 	private int							_minimalDaysInFirstWeek;
 
 	private IChartInfoProvider			_chartInfoProvider;
-
-	@Override
-	public void activateActions(final IWorkbenchPartSite partSite) {
-		_chart.updateChartActionHandlers();
-	}
 
 	public boolean canTourBeVisible() {
 		return false;
@@ -428,9 +422,6 @@ public abstract class StatisticWeek extends YearStatistic {
 
 		chartDataModel.addYData(yData);
 	}
-
-	@Override
-	public void deactivateActions(final IWorkbenchPartSite partSite) {}
 
 	private void getPreferences() {
 

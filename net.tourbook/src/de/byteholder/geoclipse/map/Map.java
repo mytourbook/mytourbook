@@ -1904,8 +1904,8 @@ public class Map extends Canvas {
 			return;
 		}
 
-		final long start = System.nanoTime();
-		// TODO remove SYSTEM.OUT.PRINTLN
+//		final long start = System.nanoTime();
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		// Draw the map
 		GC gcMapImage = null;
@@ -1943,12 +1943,12 @@ public class Map extends Canvas {
 			}
 		}
 
-		System.out.println(net.tourbook.common.UI.timeStamp()
-				+ " "
-				+ ((int) (((System.nanoTime() - start) / 1000000)) + " ms\t")
-				+ ((int) (1000f / ((System.nanoTime() - start) / 1000000)) + " fps") //
-		);
-		// TODO remove SYSTEM.OUT.PRINTLN
+//		System.out.println(net.tourbook.common.UI.timeStamp()
+//				+ " "
+//				+ ((int) (((System.nanoTime() - start) / 1000000)) + " ms\t")
+//				+ ((int) (1000f / ((System.nanoTime() - start) / 1000000)) + " fps") //
+//		);
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		redraw();
 

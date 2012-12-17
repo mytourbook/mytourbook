@@ -62,7 +62,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchPartSite;
 
 public abstract class StatisticDay extends YearStatistic implements IBarSelectionProvider, ITourProvider {
 
@@ -94,11 +93,6 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 
 	private StatisticTourToolTip		_tourToolTip;
 	private TourInfoToolTipProvider		_tourInfoToolTipProvider	= new TourInfoToolTipProvider();
-
-	@Override
-	public void activateActions(final IWorkbenchPartSite partSite) {
-		_chart.updateChartActionHandlers();
-	}
 
 	private void addTourPropertyListener() {
 
@@ -484,9 +478,6 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 
 		chartModel.addYData(yData);
 	}
-
-	@Override
-	public void deactivateActions(final IWorkbenchPartSite partSite) {}
 
 	@Override
 	public void dispose() {

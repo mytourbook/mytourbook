@@ -38,7 +38,6 @@ import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IViewSite;
-import org.eclipse.ui.IWorkbenchPartSite;
 
 public abstract class StatisticYear extends YearStatistic {
 
@@ -56,11 +55,6 @@ public abstract class StatisticYear extends YearStatistic {
 	private TourDataYear				_tourYearData;
 
 	private boolean						_isSynchScaleEnabled;
-
-	@Override
-	public void activateActions(final IWorkbenchPartSite partSite) {
-		_chart.updateChartActionHandlers();
-	}
 
 	public boolean canTourBeVisible() {
 		return false;
@@ -264,9 +258,6 @@ public abstract class StatisticYear extends YearStatistic {
 
 		return allYears;
 	}
-
-	@Override
-	public void deactivateActions(final IWorkbenchPartSite partSite) {}
 
 	public void preferencesHasChanged() {
 		updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFilter, _currentYear, _numberOfYears, false));

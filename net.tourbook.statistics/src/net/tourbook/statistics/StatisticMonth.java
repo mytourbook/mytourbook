@@ -45,7 +45,6 @@ import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IViewSite;
-import org.eclipse.ui.IWorkbenchPartSite;
 
 public abstract class StatisticMonth extends YearStatistic {
 
@@ -64,11 +63,6 @@ public abstract class StatisticMonth extends YearStatistic {
 	private DateFormat					_dateFormatter	= DateFormat.getDateInstance(DateFormat.FULL);
 
 	private TourDataMonth				_tourMonthData;
-
-	@Override
-	public void activateActions(final IWorkbenchPartSite partSite) {
-		_chart.updateChartActionHandlers();
-	}
 
 	public boolean canTourBeVisible() {
 		return false;
@@ -288,9 +282,6 @@ public abstract class StatisticMonth extends YearStatistic {
 
 		chartDataModel.addYData(yData);
 	}
-
-	@Override
-	public void deactivateActions(final IWorkbenchPartSite partSite) {}
 
 	public void preferencesHasChanged() {
 		updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFilter, _currentYear, _numberOfYears, false));

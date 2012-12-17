@@ -47,7 +47,6 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewSite;
-import org.eclipse.ui.IWorkbenchPartSite;
 
 public class StatisticWeekHrZone extends YearStatistic {
 
@@ -83,11 +82,6 @@ public class StatisticWeekHrZone extends YearStatistic {
 
 	public StatisticWeekHrZone() {
 		super();
-	}
-
-	@Override
-	public void activateActions(final IWorkbenchPartSite partSite) {
-		_chart.updateChartActionHandlers();
 	}
 
 	/**
@@ -325,9 +319,6 @@ public class StatisticWeekHrZone extends YearStatistic {
 
 		chartDataModel.addYData(yData);
 	}
-
-	@Override
-	public void deactivateActions(final IWorkbenchPartSite partSite) {}
 
 	private void getPreferences() {
 

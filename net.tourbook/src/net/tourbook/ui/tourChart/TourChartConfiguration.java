@@ -118,7 +118,7 @@ public class TourChartConfiguration {
 	/**
 	 * Graph type which is used to draw the HR zone background.
 	 */
-	public String					hrZoneStyle				= TourChart.COMMAND_ID_HR_ZONE_STYLE_GRAPH_TOP;
+	public String					hrZoneStyle				= TourChart.ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP;
 
 	public boolean					isShowTourPhotos			= true;											;
 

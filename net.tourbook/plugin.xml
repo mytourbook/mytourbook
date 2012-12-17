@@ -868,71 +868,7 @@
             name="%View_Name_TourChartSmoothing"
             defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewChartSmoothing"
 	  		/>
-
-      <command
-            id="net.tourbook.command.graph.altitude"
-            categoryId="net.tourbook.command.category.tourEditor"
-            name="%command_graph_altitude">
-      </command>
-      <command
-            categoryId="net.tourbook.command.category.tourEditor"
-            id="net.tourbook.command.graph.pulse"
-            name="%command_graph_pulse">
-      </command>
-      <command
-            id="net.tourbook.command.graph.speed"
-            categoryId="net.tourbook.command.category.tourEditor"
-            name="%command_graph_speed">
-      </command>
-      <command
-            id="net.tourbook.command.graph.pace"
-            categoryId="net.tourbook.command.category.tourEditor"
-            name="%command_graph_pace">
-      </command>
-      <command
-            id="net.tourbook.command.graph.cadence"
-            categoryId="net.tourbook.command.category.tourEditor"
-            name="%command_graph_cadence">
-      </command>
-      <command
-            id="net.tourbook.command.graph.power"
-            categoryId="net.tourbook.command.category.tourEditor"
-            name="%command_graph_power">
-      </command>
-      <command
-            id="net.tourbook.command.graph.temperature"
-            categoryId="net.tourbook.command.category.tourEditor"
-            name="%command_graph_temperature">
-      </command>
-      <command
-            id="net.tourbook.command.graph.gradient"
-            categoryId="net.tourbook.command.category.tourEditor"
-            name="%command_graph_gradient">
-      </command>
-      <command
-            id="net.tourbook.command.graph.altimeter"
-            categoryId="net.tourbook.command.category.tourEditor"
-            name="%command_graph_altimeter">
-      </command>
-      <command
-            id="net.tourbook.command.tourChart.xAxisDistance"
-            categoryId="net.tourbook.command.category.tourEditor"
-            name="%command_tourChart_xAxisDistance">
-      </command>
-      <command
-            id="net.tourbook.command.openMarkerView"
-            categoryId="net.tourbook.command.category.tourEditor"
-            name="Open Markers">
-      </command>
-      <command
-            id="net.tourbook.command.tourChart.xAxisTime"
-            categoryId="net.tourbook.command.category.tourEditor"
-            name="%command_tourChart_xAxisTime">
-      </command>
-      <category
-            id="net.tourbook.command.category.tourEditor"
-            name="Tour Editor">
-      </category>
+      
       <command
             id="net.tourbook.command.tourChart.tool.adjustAltitude"
             name="%command_tourChart_tool_adjustAltitude">
@@ -947,32 +883,28 @@
       </command>
 
       <command
-            defaultHandler="net.tourbook.ui.action.ActionHandlerViewSelectedTour"
             id="net.tourbook.command.selectedTour"
+            defaultHandler="net.tourbook.ui.action.ActionHandlerViewSelectedTour"
             name="%command_view_selectedTour">
       </command>
       <command
-            defaultHandler="net.tourbook.importdata.ActionHandlerImportFromFile"
             id="net.tourbook.command.device.importFromFile"
+            defaultHandler="net.tourbook.importdata.ActionHandlerImportFromFile"
             name="%command_device_importFromFile">
       </command>
       <command
-            defaultHandler="net.tourbook.importdata.ActionHandlerImportFromDeviceDirect"
             id="net.tourbook.command.device.synchronize.direct"
+            defaultHandler="net.tourbook.importdata.ActionHandlerImportFromDeviceDirect"
             name="%command_device_synchronize_direct">
       </command>
       <command
-            defaultHandler="net.tourbook.importdata.ActionHandlerImportFromDevice"
             id="net.tourbook.command.device.synchronize"
+            defaultHandler="net.tourbook.importdata.ActionHandlerImportFromDevice"
             name="%command_device_synchronize_configured">
       </command>
       <command
             id="net.tourbook.command.tourChart.options"
             name="%command_tourChart_options">
-      </command>
-      <command
-            id="net.tourbook.command.tourChart.canAutoZoomToSlider"
-            name="%command_tourChart_canAutoZoomToSlider">
       </command>
 
       <command

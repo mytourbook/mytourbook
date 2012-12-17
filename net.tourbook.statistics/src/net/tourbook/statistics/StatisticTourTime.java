@@ -58,7 +58,6 @@ import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.IViewSite;
-import org.eclipse.ui.IWorkbenchPartSite;
 
 public class StatisticTourTime extends YearStatistic implements IBarSelectionProvider, ITourProvider {
 
@@ -84,15 +83,6 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 
 	private Long						_selectedTourId				= null;
 	private int							_currentMonth;
-
-	@Override
-	public void activateActions(final IWorkbenchPartSite partSite) {
-
-//		IContextService contextService = (IContextService) partSite.getService(IContextService.class);
-//		fContextBarChart = contextService.activateContext(Chart.CONTEXT_ID_BAR_CHART);
-//		net.tourbook.chart.context.isTourChart
-//		fChart.updateChartActionHandlers();
-	}
 
 	@Override
 	public boolean canSelectTour() {
@@ -365,13 +355,6 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 		toolTipInfo.setLabel(toolTipLabel);
 
 		return toolTipInfo;
-	}
-
-	@Override
-	public void deactivateActions(final IWorkbenchPartSite partSite) {
-
-//		IContextService contextService = (IContextService) partSite.getService(IContextService.class);
-//		contextService.deactivateContext(fContextBarChart);
 	}
 
 	public Integer getSelectedMonth() {

@@ -106,19 +106,19 @@ public class HrZonePainter implements IFillPainter {
 		boolean isBgColor = false;
 		final String hrZoneStyle = tourChartConfig.hrZoneStyle;
 
-		if (hrZoneStyle.equals(TourChart.COMMAND_ID_HR_ZONE_STYLE_GRAPH_TOP)) {
+		if (hrZoneStyle.equals(TourChart.ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP)) {
 			isGradient = true;
 			isWhite = false;
 			isBgColor = true;
-		} else if (hrZoneStyle.equals(TourChart.COMMAND_ID_HR_ZONE_STYLE_NO_GRADIENT)) {
+		} else if (hrZoneStyle.equals(TourChart.ACTION_ID_HR_ZONE_STYLE_NO_GRADIENT)) {
 			isGradient = false;
 			isWhite = false;
 			isBgColor = true;
-		} else if (hrZoneStyle.equals(TourChart.COMMAND_ID_HR_ZONE_STYLE_WHITE_TOP)) {
+		} else if (hrZoneStyle.equals(TourChart.ACTION_ID_HR_ZONE_STYLE_WHITE_TOP)) {
 			isGradient = true;
 			isWhite = true;
 			isBgColor = true;
-		} else if (hrZoneStyle.equals(TourChart.COMMAND_ID_HR_ZONE_STYLE_WHITE_BOTTOM)) {
+		} else if (hrZoneStyle.equals(TourChart.ACTION_ID_HR_ZONE_STYLE_WHITE_BOTTOM)) {
 			isGradient = true;
 			isWhite = true;
 			isBgColor = false;

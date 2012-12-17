@@ -15,20 +15,26 @@
  *******************************************************************************/
 package net.tourbook.chart;
 
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.jface.action.Action;
 
-public class ActionHandlerPartNext extends ActionHandler {
+public class ActionZoomFitGraph extends Action {
 
-	public ActionHandlerPartNext() {
-//		fCommandId = Chart.COMMAND_ID_PART_NEXT;
+	private Chart	fChart;
+
+	public ActionZoomFitGraph(Chart chart) {
+
+		fChart = chart;
+
+		setText(Messages.Action_zoom_fit_to_graph);
+		setToolTipText(Messages.Action_zoom_fit_to_graph_tooltip);
+
+		setImageDescriptor(Activator.getImageDescriptor(Messages.Image_zoom_fit_to_graph));
+		setDisabledImageDescriptor(Activator.getImageDescriptor(Messages.Image_zoom_fit_to_graph_disabled));
 	}
 
-	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {
-
-//		fChart.onExecutePartNext();
-
-		return null;
+	@Override
+	public void run() {
+		fChart.onExecuteZoomFitGraph();
 	}
 
 }

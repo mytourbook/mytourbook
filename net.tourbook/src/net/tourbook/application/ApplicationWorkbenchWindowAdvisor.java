@@ -523,31 +523,31 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 		final ImageRegistry imageRegistry = JFaceResources.getImageRegistry();
 
-		imageRegistry.put(TourChart.COMMAND_ID_GRAPH_ALTIMETER, //
+		imageRegistry.put(TourChart.ACTION_ID_GRAPH_ALTIMETER, //
 				TourbookPlugin.getImageDescriptor(Messages.Image__graph_altimeter));
 
-		imageRegistry.put(TourChart.COMMAND_ID_GRAPH_ALTITUDE, //
+		imageRegistry.put(TourChart.ACTION_ID_GRAPH_ALTITUDE, //
 				TourbookPlugin.getImageDescriptor(Messages.Image__graph_altitude));
 
-		imageRegistry.put(TourChart.COMMAND_ID_GRAPH_CADENCE, //
+		imageRegistry.put(TourChart.ACTION_ID_GRAPH_CADENCE, //
 				TourbookPlugin.getImageDescriptor(Messages.Image__graph_cadence));
 
-		imageRegistry.put(TourChart.COMMAND_ID_GRAPH_GRADIENT, //
+		imageRegistry.put(TourChart.ACTION_ID_GRAPH_GRADIENT, //
 				TourbookPlugin.getImageDescriptor(Messages.Image__graph_gradient));
 
-		imageRegistry.put(TourChart.COMMAND_ID_GRAPH_PACE, //
+		imageRegistry.put(TourChart.ACTION_ID_GRAPH_PACE, //
 				TourbookPlugin.getImageDescriptor(Messages.Image__graph_pace));
 
-		imageRegistry.put(TourChart.COMMAND_ID_GRAPH_POWER, //
+		imageRegistry.put(TourChart.ACTION_ID_GRAPH_POWER, //
 				TourbookPlugin.getImageDescriptor(Messages.Image__graph_power));
 
-		imageRegistry.put(TourChart.COMMAND_ID_GRAPH_PULSE, //
+		imageRegistry.put(TourChart.ACTION_ID_GRAPH_PULSE, //
 				TourbookPlugin.getImageDescriptor(Messages.Image__graph_heartbeat));
 
-		imageRegistry.put(TourChart.COMMAND_ID_GRAPH_SPEED, //
+		imageRegistry.put(TourChart.ACTION_ID_GRAPH_SPEED, //
 				TourbookPlugin.getImageDescriptor(Messages.Image__graph_speed));
 
-		imageRegistry.put(TourChart.COMMAND_ID_GRAPH_TEMPERATURE, //
+		imageRegistry.put(TourChart.ACTION_ID_GRAPH_TEMPERATURE, //
 				TourbookPlugin.getImageDescriptor(Messages.Image__graph_temperature));
 
 	}

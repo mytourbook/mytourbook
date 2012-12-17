@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,7 +19,6 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IViewSite;
-import org.eclipse.ui.IWorkbenchPartSite;
 
 /**
  * Plugin interface for statistics in MyTourbook
@@ -34,12 +33,6 @@ public abstract class TourbookStatistic {
 
 	private boolean		_isDataDirty;
 
-	/**
-	 * Activates the actions in the statistic
-	 * 
-	 * @param partSite
-	 */
-	public abstract void activateActions(IWorkbenchPartSite partSite);
 
 	public boolean canSelectDay() {
 		return false;
@@ -64,13 +57,6 @@ public abstract class TourbookStatistic {
 	public abstract void createControl(	Composite parent,
 										IViewSite viewSite,
 										IPostSelectionProvider postSelectionProvider);
-
-	/**
-	 * Deactivates the actions in the statistic
-	 * 
-	 * @param partSite
-	 */
-	public abstract void deactivateActions(IWorkbenchPartSite partSite);
 
 	/**
 	 * Disposes of the statistic

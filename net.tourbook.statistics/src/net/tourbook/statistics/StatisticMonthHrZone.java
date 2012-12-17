@@ -47,7 +47,6 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewSite;
-import org.eclipse.ui.IWorkbenchPartSite;
 
 public class StatisticMonthHrZone extends YearStatistic {
 
@@ -79,11 +78,6 @@ public class StatisticMonthHrZone extends YearStatistic {
 
 	public StatisticMonthHrZone() {
 		super();
-	}
-
-	@Override
-	public void activateActions(final IWorkbenchPartSite partSite) {
-		_chart.updateChartActionHandlers();
 	}
 
 	private ChartSegments createChartSegments(final TourDataMonthHrZones monthData) {
@@ -228,9 +222,6 @@ public class StatisticMonthHrZone extends YearStatistic {
 
 		chartDataModel.addYData(yData);
 	}
-
-	@Override
-	public void deactivateActions(final IWorkbenchPartSite partSite) {}
 
 	private void getPreferences() {
 

@@ -138,7 +138,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
 		// HR zone backbround
 		store.setDefault(ITourbookPreferences.GRAPH_IS_HR_ZONE_BACKGROUND_VISIBLE, false);
-		store.setDefault(ITourbookPreferences.GRAPH_HR_ZONE_STYLE, TourChart.COMMAND_ID_HR_ZONE_STYLE_GRAPH_TOP);
+		store.setDefault(ITourbookPreferences.GRAPH_HR_ZONE_STYLE, TourChart.ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP);
 
 		store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE, 0xFF);
 		store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING, 0x80);

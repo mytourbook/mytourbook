@@ -60,7 +60,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IViewSite;
-import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.part.PageBook;
 
 public class StatContainer extends Composite {
@@ -245,15 +244,6 @@ public class StatContainer extends Composite {
 		}
 	}
 
-	void activateActions(final IWorkbenchPartSite partSite) {
-
-		if (_activeStatistic == null) {
-			return;
-		}
-
-		_activeStatistic.activateActions(partSite);
-	}
-
 	private void createActions() {
 
 		_actionSynchChartScale = new ActionSynchChartScale(this);
@@ -378,12 +368,6 @@ public class StatContainer extends Composite {
 					.applyTo(_toolBar);
 
 			_tbm = new ToolBarManager(_toolBar);
-		}
-	}
-
-	void deactivateActions(final IWorkbenchPartSite partSite) {
-		if (_activeStatistic != null) {
-			_activeStatistic.deactivateActions(partSite);
 		}
 	}
 

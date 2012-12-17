@@ -79,15 +79,15 @@ public class ActionHrZoneDropDownMenu extends Action implements IMenuCreator {
 
 		_menu = new Menu(parent);
 
-		final Map<String, TCActionProxy> actionProxies = _tourChart.getActionProxies();
+		final Map<String, Action> actionProxies = _tourChart.getTourChartActions();
 
 		addItem(_actionTitle);
 
 		(new Separator()).fill(_menu, -1);
-		addItem(actionProxies.get(TourChart.COMMAND_ID_HR_ZONE_STYLE_NO_GRADIENT).getAction());
-		addItem(actionProxies.get(TourChart.COMMAND_ID_HR_ZONE_STYLE_WHITE_TOP).getAction());
-		addItem(actionProxies.get(TourChart.COMMAND_ID_HR_ZONE_STYLE_WHITE_BOTTOM).getAction());
-		addItem(actionProxies.get(TourChart.COMMAND_ID_HR_ZONE_STYLE_GRAPH_TOP).getAction());
+		addItem(actionProxies.get(TourChart.ACTION_ID_HR_ZONE_STYLE_NO_GRADIENT));
+		addItem(actionProxies.get(TourChart.ACTION_ID_HR_ZONE_STYLE_WHITE_TOP));
+		addItem(actionProxies.get(TourChart.ACTION_ID_HR_ZONE_STYLE_WHITE_BOTTOM));
+		addItem(actionProxies.get(TourChart.ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP));
 
 		return _menu;
 	}

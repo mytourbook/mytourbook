@@ -50,7 +50,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewSite;
-import org.eclipse.ui.IWorkbenchPartSite;
 
 public class StatisticTourNumbers extends YearStatistic {
 
@@ -118,9 +117,6 @@ public class StatisticTourNumbers extends YearStatistic {
 	private Chart						_chartAltitudeSum;
 
 	public StatisticTourNumbers() {}
-
-	@Override
-	public void activateActions(final IWorkbenchPartSite partSite) {}
 
 	void addPrefListener(final Composite container) {
 
@@ -537,9 +533,6 @@ public class StatisticTourNumbers extends YearStatistic {
 
 		return units.length - 1;
 	}
-
-	@Override
-	public void deactivateActions(final IWorkbenchPartSite partSite) {}
 
 	private void getPreferences() {
 

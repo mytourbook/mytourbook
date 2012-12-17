@@ -45,122 +45,112 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class Chart extends ViewForm {
 
-	static final String					COMMAND_ID_ZOOM_IN					= "net.tourbook.chart.command.zoomIn";				//$NON-NLS-1$
-	static final String					COMMAND_ID_ZOOM_IN_TO_SLIDER		= "net.tourbook.chart.command.zoomInToSlider";		//$NON-NLS-1$
-	static final String					COMMAND_ID_ZOOM_OUT					= "net.tourbook.chart.command.zoomOut";			//$NON-NLS-1$
-	static final String					COMMAND_ID_ZOOM_FIT_GRAPH			= "net.tourbook.chart.command.fitGraph";			//$NON-NLS-1$
+	private static final String		ACTION_ID_MOUSE_MODE				= "ACTION_ID_MOUSE_MODE";				//$NON-NLS-1$
+	private static final String		ACTION_ID_MOVE_LEFT_SLIDER_HERE		= "ACTION_ID_MOVE_LEFT_SLIDER_HERE";	//$NON-NLS-1$
+	private static final String		ACTION_ID_MOVE_RIGHT_SLIDER_HERE	= "ACTION_ID_MOVE_RIGHT_SLIDER_HERE";	//$NON-NLS-1$
+	private static final String		ACTION_ID_MOVE_SLIDERS_TO_BORDER	= "ACTION_ID_MOVE_SLIDERS_TO_BORDER";	//$NON-NLS-1$
+	private static final String		ACTION_ID_ZOOM_FIT_GRAPH			= "ACTION_ID_ZOOM_FIT_GRAPH";			//$NON-NLS-1$
+	private static final String		ACTION_ID_ZOOM_IN					= "ACTION_ID_ZOOM_IN";					//$NON-NLS-1$
+	private static final String		ACTION_ID_ZOOM_IN_TO_SLIDER			= "ACTION_ID_ZOOM_IN_TO_SLIDER";		//$NON-NLS-1$
+	private static final String		ACTION_ID_ZOOM_OUT					= "ACTION_ID_ZOOM_OUT";				//$NON-NLS-1$
 
-	static final String					COMMAND_ID_MOUSE_MODE				= "net.tourbook.chart.command.mouseMode";			//$NON-NLS-1$
+	static final int				NO_BAR_SELECTION					= -1;
 
-	private static final String			COMMAND_ID_MOVE_LEFT_SLIDER_HERE	= "net.tourbook.chart.command.moveLeftSliderHere";	//$NON-NLS-1$
-	private static final String			COMMAND_ID_MOVE_RIGHT_SLIDER_HERE	= "net.tourbook.chart.command.moveRightSliderHere"; //$NON-NLS-1$
-	private static final String			COMMAND_ID_MOVE_SLIDERS_TO_BORDER	= "net.tourbook.chart.command.moveSlidersToBorder"; //$NON-NLS-1$
+	public static final int			SYNCH_MODE_NO						= 0;
+	public static final int			SYNCH_MODE_BY_SCALE					= 1;
+	public static final int			SYNCH_MODE_BY_SIZE					= 2;
 
-	static final int					NO_BAR_SELECTION					= -1;
+	public static final String		MOUSE_MODE_SLIDER					= "slider";							//$NON-NLS-1$
+	public static final String		MOUSE_MODE_ZOOM						= "zoom";								//$NON-NLS-1$
 
-	public static final int				SYNCH_MODE_NO						= 0;
-	public static final int				SYNCH_MODE_BY_SCALE					= 1;
-	public static final int				SYNCH_MODE_BY_SIZE					= 2;
+	private static final int		MouseMove							= 10;
+	private static final int		MouseDownPre						= 20;
+//	private static final int		MouseDownPost						= 21;
+	private static final int		MouseUp								= 30;
+	private static final int		MouseDoubleClick					= 40;
 
-	public static final String			MOUSE_MODE_SLIDER					= "slider";										//$NON-NLS-1$
-	public static final String			MOUSE_MODE_ZOOM						= "zoom";											//$NON-NLS-1$
+	private final ListenerList		_focusListeners						= new ListenerList();
+	private final ListenerList		_barSelectionListeners				= new ListenerList();
+	private final ListenerList		_barDoubleClickListeners			= new ListenerList();
+	private final ListenerList		_sliderMoveListeners				= new ListenerList();
+	private final ListenerList		_doubleClickListeners				= new ListenerList();
+	private final ListenerList		_mouseListener						= new ListenerList();
 
-	private static final int			MouseMove							= 10;
-	private static final int			MouseDownPre						= 20;
-//	private static final int			MouseDownPost						= 21;
-	private static final int			MouseUp								= 30;
-	private static final int			MouseDoubleClick					= 40;
+	private CustomOverlay			_customOverlay;
 
-	private final ListenerList			_focusListeners						= new ListenerList();
-	private final ListenerList			_barSelectionListeners				= new ListenerList();
-	private final ListenerList			_barDoubleClickListeners			= new ListenerList();
-	private final ListenerList			_sliderMoveListeners				= new ListenerList();
-	private final ListenerList			_doubleClickListeners				= new ListenerList();
-	private final ListenerList			_mouseListener						= new ListenerList();
+	private ChartComponents			_chartComponents;
 
-	private CustomOverlay				_customOverlay;
+	private Chart					_synchedChart;
 
-	private ChartComponents				_chartComponents;
+	private ChartDataModel			_chartDataModel;
 
-	private Chart						_synchedChart;
+	private IToolBarManager			_toolbarMgr;
+	private IChartContextProvider	_chartContextProvider;
+	private boolean					_isShowZoomActions					= false;
 
-	private ChartDataModel				_chartDataModel;
-
-	private IToolBarManager				_toolbarMgr;
-	private IChartContextProvider		_chartContextProvider;
-	private boolean						_isShowZoomActions					= false;
-
-	private boolean						_isShowMouseMode					= false;
-	private Color						_backgroundColor;
+	private boolean					_isShowMouseMode					= false;
+	private Color					_backgroundColor;
 
 	/**
 	 * listener which is called when the x-marker was dragged
 	 */
-	IChartListener						_draggingListenerXMarker;
+	IChartListener					_draggingListenerXMarker;
 
-	IHoveredListener					_hoveredListener;
+	IHoveredListener				_hoveredListener;
 
-	/**
-	 * when set to <code>true</code> the toolbar is within the chart control, otherwise the toolbar
-	 * is outsite of the chart
-	 */
-	boolean								_useInternalActionBar				= true;
-	boolean								_useActionHandlers					= false;
+	private HashMap<String, Action>	_allChartActions;
+	private boolean					_isFillToolbar						= true;
+	private boolean					_isToolbarCreated;
 
-	private final ActionHandlerManager	_actionHandlerManager				= ActionHandlerManager.getInstance();
-	HashMap<String, ActionProxy>		_chartActionProxies;
-	private boolean						_isFillToolbar						= true;
-	private boolean						_isToolbarCreated;
+	private int						_barSelectionSerieIndex;
+	private int						_barSelectionValueIndex;
 
-	private int							_barSelectionSerieIndex;
-	private int							_barSelectionValueIndex;
-
-	int									_synchMode;
+	int								_synchMode;
 
 	/**
 	 * <code>true</code> to start the bar chart at the bottom of the chart
 	 */
-	private boolean						_isDrawBarChartAtBottom				= true;
+	private boolean					_isDrawBarChartAtBottom				= true;
 
 	/**
 	 * minimum width in pixel for one unit, this is only an approximate value because the pixel is
 	 * rounded up or down to fit a rounded unit
 	 */
-	protected int						gridVerticalDistance				= 30;
-	protected int						gridHorizontalDistance				= 70;
+	protected int					gridVerticalDistance				= 30;
+	protected int					gridHorizontalDistance				= 70;
 
-	protected boolean					isShowHorizontalGridLines			= false;
-	protected boolean					isShowVerticalGridLines				= false;
+	protected boolean				isShowHorizontalGridLines			= false;
+	protected boolean				isShowVerticalGridLines				= false;
 
 	/**
 	 * Transparency of the graph lines
 	 */
-	protected int						graphTransparencyLine				= 0xFF;
+	protected int					graphTransparencyLine				= 0xFF;
 
 	/**
 	 * Transparency of the graph fillings
 	 */
-	protected int						graphTransparencyFilling			= 0xE0;
+	protected int					graphTransparencyFilling			= 0xE0;
 
 	/**
 	 * The graph transparency can be adjusted with this value. This value is multiplied with the
 	 * {@link #graphTransparencyFilling} and {@link #graphTransparencyLine}.
 	 */
-	double								graphTransparencyAdjustment			= 1.0;
+	double							graphTransparencyAdjustment			= 1.0;
 
 	/**
 	 * Antialiasing for the graph, can be {@link SWT#ON} or {@link SWT#OFF}.
 	 */
-	protected int						graphAntialiasing					= SWT.OFF;
+	protected int					graphAntialiasing					= SWT.OFF;
 
 	/**
 	 * mouse behaviour:<br>
 	 * <br>
 	 * {@link #MOUSE_MODE_SLIDER} or {@link #MOUSE_MODE_ZOOM}
 	 */
-	private String						_mouseMode							= MOUSE_MODE_SLIDER;
+	private String					_mouseMode							= MOUSE_MODE_SLIDER;
 
-	private boolean						_isFirstContextMenu;
+	private boolean					_isFirstContextMenu;
 
 	/**
 	 * Chart widget
@@ -226,7 +216,7 @@ public class Chart extends ViewForm {
 	 */
 	private void createActions() {
 
-		createChartActionProxies();
+		createActions_10_ChartActions();
 
 		if (_isFillToolbar && _isToolbarCreated == false) {
 			_isToolbarCreated = true;
@@ -235,122 +225,35 @@ public class Chart extends ViewForm {
 	}
 
 	/**
-	 * Creates the handlers for the chart actions
+	 * Creates all chart actions
 	 */
-	public void createChartActionHandlers() {
-
-		// use the commands defined in plugin.xml
-		_useActionHandlers = true;
-
-		_actionHandlerManager.createActionHandlers();
-		createChartActionProxies();
-	}
-
-	/**
-	 * Creates action proxys for all chart actions
-	 */
-	private void createChartActionProxies() {
+	private void createActions_10_ChartActions() {
 
 		// create actions only once
-		if (_chartActionProxies != null) {
+		if (_allChartActions != null) {
 			return;
 		}
 
-		_chartActionProxies = new HashMap<String, ActionProxy>();
+		_allChartActions = new HashMap<String, Action>();
 
-		final boolean useInternalActionBar = useInternalActionBar();
-		Action action;
-		ActionProxy actionProxy;
-
-		/*
-		 * Action: zoom in
-		 */
-		if (useInternalActionBar) {
-			action = new ActionZoomIn(this);
-		} else {
-			action = null;
-		}
-		actionProxy = new ActionProxy(COMMAND_ID_ZOOM_IN, action);
-		_chartActionProxies.put(COMMAND_ID_ZOOM_IN, actionProxy);
-
-		/*
-		 * Action: zoom in to slider
-		 */
-		if (useInternalActionBar) {
-			action = new ActionZoomToSlider(this);
-		} else {
-			action = null;
-		}
-		actionProxy = new ActionProxy(COMMAND_ID_ZOOM_IN_TO_SLIDER, action);
-		_chartActionProxies.put(COMMAND_ID_ZOOM_IN_TO_SLIDER, actionProxy);
-
-		/*
-		 * Action: zoom out
-		 */
-		if (useInternalActionBar) {
-			action = new ActionZoomOut(this);
-		} else {
-			action = null;
-		}
-		actionProxy = new ActionProxy(COMMAND_ID_ZOOM_OUT, action);
-		_chartActionProxies.put(COMMAND_ID_ZOOM_OUT, actionProxy);
-
-		/*
-		 * Action: fit graph to window
-		 */
-		if (useInternalActionBar) {
-			action = new ActionFitGraph(this);
-		} else {
-			action = null;
-		}
-		actionProxy = new ActionProxy(COMMAND_ID_ZOOM_FIT_GRAPH, action);
-		_chartActionProxies.put(COMMAND_ID_ZOOM_FIT_GRAPH, actionProxy);
-
-		/*
-		 * Action: mouse moude
-		 */
-		if (useInternalActionBar) {
-			action = new ActionMouseMode(this);
-		} else {
-			action = null;
-		}
-		actionProxy = new ActionProxy(COMMAND_ID_MOUSE_MODE, action);
-		_chartActionProxies.put(COMMAND_ID_MOUSE_MODE, actionProxy);
-
-		/*
-		 * Action: move sliders when
-		 */
-		if (useInternalActionBar) {
-			action = new ActionMoveSlidersToBorder(this);
-		} else {
-			action = null;
-		}
-		actionProxy = new ActionProxy(COMMAND_ID_MOVE_SLIDERS_TO_BORDER, action);
-		_chartActionProxies.put(COMMAND_ID_MOVE_SLIDERS_TO_BORDER, actionProxy);
-
-		/*
-		 * Action: move left slider here
-		 */
-		if (useInternalActionBar) {
-			action = new ActionMoveLeftSliderHere(this);
-		} else {
-			action = null;
-		}
-		actionProxy = new ActionProxy(COMMAND_ID_MOVE_LEFT_SLIDER_HERE, action);
-		_chartActionProxies.put(COMMAND_ID_MOVE_LEFT_SLIDER_HERE, actionProxy);
-
-		/*
-		 * Action: move right slider here
-		 */
-		if (useInternalActionBar) {
-			action = new ActionMoveRightSliderHere(this);
-		} else {
-			action = null;
-		}
-		actionProxy = new ActionProxy(COMMAND_ID_MOVE_RIGHT_SLIDER_HERE, action);
-		_chartActionProxies.put(COMMAND_ID_MOVE_RIGHT_SLIDER_HERE, actionProxy);
+		_allChartActions.put(ACTION_ID_MOUSE_MODE, new ActionMouseMode(this));
+		_allChartActions.put(ACTION_ID_MOVE_LEFT_SLIDER_HERE, new ActionMoveLeftSliderHere(this));
+		_allChartActions.put(ACTION_ID_MOVE_RIGHT_SLIDER_HERE, new ActionMoveRightSliderHere(this));
+		_allChartActions.put(ACTION_ID_MOVE_SLIDERS_TO_BORDER, new ActionMoveSlidersToBorder(this));
+		_allChartActions.put(ACTION_ID_ZOOM_FIT_GRAPH, new ActionZoomFitGraph(this));
+		_allChartActions.put(ACTION_ID_ZOOM_IN, new ActionZoomIn(this));
+		_allChartActions.put(ACTION_ID_ZOOM_IN_TO_SLIDER, new ActionZoomToSlider(this));
+		_allChartActions.put(ACTION_ID_ZOOM_OUT, new ActionZoomOut(this));
 
 		enableActions();
+	}
+
+	/**
+	 * Creates the chart actions
+	 */
+	public void createChartActions() {
+
+		createActions_10_ChartActions();
 	}
 
 	/**
@@ -387,12 +290,11 @@ public class Chart extends ViewForm {
 	 */
 	private void disableAllActions() {
 
-		if (_chartActionProxies != null) {
+		if (_allChartActions != null) {
 
-			for (final ActionProxy actionProxy : _chartActionProxies.values()) {
-				actionProxy.setEnabled(false);
+			for (final Action action : _allChartActions.values()) {
+				action.setEnabled(false);
 			}
-			_actionHandlerManager.updateUIState();
 		}
 	}
 
@@ -406,7 +308,7 @@ public class Chart extends ViewForm {
 
 	void enableActions() {
 
-		if (_chartActionProxies == null) {
+		if (_allChartActions == null) {
 			return;
 		}
 
@@ -415,23 +317,19 @@ public class Chart extends ViewForm {
 		final boolean canZoomOut = chartComponentGraph.getZoomRatio() > 1;
 		final boolean canZoomIn = chartComponentGraph.getXXDevGraphWidth() < ChartComponents.CHART_MAX_WIDTH;
 
-		_chartActionProxies.get(COMMAND_ID_ZOOM_IN).setEnabled(canZoomIn);
-		_chartActionProxies.get(COMMAND_ID_ZOOM_OUT).setEnabled(canZoomOut);
+		_allChartActions.get(ACTION_ID_ZOOM_IN).setEnabled(canZoomIn);
+		_allChartActions.get(ACTION_ID_ZOOM_OUT).setEnabled(canZoomOut);
 
 		// zoom in to slider has no limits but when there are more than 10000 units, the units are not displayed
-		_chartActionProxies.get(COMMAND_ID_ZOOM_IN_TO_SLIDER).setEnabled(true);
+		_allChartActions.get(ACTION_ID_ZOOM_IN_TO_SLIDER).setEnabled(true);
 
 		// fit to graph is always enabled because the y-slider can change the chart
-		_chartActionProxies.get(COMMAND_ID_ZOOM_FIT_GRAPH).setEnabled(true);
+		_allChartActions.get(ACTION_ID_ZOOM_FIT_GRAPH).setEnabled(true);
 
-		_chartActionProxies.get(COMMAND_ID_MOUSE_MODE).setEnabled(true);
-		_chartActionProxies.get(COMMAND_ID_MOVE_LEFT_SLIDER_HERE).setEnabled(true);
-		_chartActionProxies.get(COMMAND_ID_MOVE_RIGHT_SLIDER_HERE).setEnabled(true);
-		_chartActionProxies.get(COMMAND_ID_MOVE_SLIDERS_TO_BORDER).setEnabled(true);
-
-		if (_useActionHandlers) {
-			_actionHandlerManager.updateUIState();
-		}
+		_allChartActions.get(ACTION_ID_MOUSE_MODE).setEnabled(true);
+		_allChartActions.get(ACTION_ID_MOVE_LEFT_SLIDER_HERE).setEnabled(true);
+		_allChartActions.get(ACTION_ID_MOVE_RIGHT_SLIDER_HERE).setEnabled(true);
+		_allChartActions.get(ACTION_ID_MOVE_SLIDERS_TO_BORDER).setEnabled(true);
 	}
 
 	void fillContextMenu(	final IMenuManager menuMgr,
@@ -442,7 +340,7 @@ public class Chart extends ViewForm {
 							final int mouseDownDevPositionX,
 							final int mouseDownDevPositionY) {
 
-		if (_chartActionProxies == null) {
+		if (_allChartActions == null) {
 			return;
 		}
 
@@ -475,7 +373,7 @@ public class Chart extends ViewForm {
 			 */
 
 			// set text for mouse wheel mode
-			final Action actionMouseMode = _chartActionProxies.get(COMMAND_ID_MOUSE_MODE).getAction();
+			final Action actionMouseMode = _allChartActions.get(ACTION_ID_MOUSE_MODE);
 			if (_mouseMode.equals(MOUSE_MODE_SLIDER)) {
 				// mouse mode: slider
 				actionMouseMode.setText(Messages.Action_mouse_mode_zoom);
@@ -494,10 +392,10 @@ public class Chart extends ViewForm {
 			if (_isShowZoomActions) {
 				menuMgr.add(new Separator());
 				menuMgr.add(actionMouseMode);
-				menuMgr.add(_chartActionProxies.get(COMMAND_ID_MOVE_LEFT_SLIDER_HERE).getAction());
-				menuMgr.add(_chartActionProxies.get(COMMAND_ID_MOVE_RIGHT_SLIDER_HERE).getAction());
-				menuMgr.add(_chartActionProxies.get(COMMAND_ID_MOVE_SLIDERS_TO_BORDER).getAction());
-				menuMgr.add(_chartActionProxies.get(COMMAND_ID_ZOOM_IN_TO_SLIDER).getAction());
+				menuMgr.add(_allChartActions.get(ACTION_ID_MOVE_LEFT_SLIDER_HERE));
+				menuMgr.add(_allChartActions.get(ACTION_ID_MOVE_RIGHT_SLIDER_HERE));
+				menuMgr.add(_allChartActions.get(ACTION_ID_MOVE_SLIDERS_TO_BORDER));
+				menuMgr.add(_allChartActions.get(ACTION_ID_ZOOM_IN_TO_SLIDER));
 			}
 		}
 
@@ -514,11 +412,11 @@ public class Chart extends ViewForm {
 	 */
 	public void fillToolbar(final boolean refreshToolbar) {
 
-		if (_chartActionProxies == null) {
+		if (_allChartActions == null) {
 			return;
 		}
 
-		if (_useInternalActionBar && (_isShowZoomActions || _isShowMouseMode)) {
+		if (_isShowZoomActions || _isShowMouseMode) {
 
 			// add the action to the toolbar
 			final IToolBarManager tbm = getToolBarManager();
@@ -528,14 +426,14 @@ public class Chart extends ViewForm {
 				tbm.add(new Separator());
 
 				if (_isShowMouseMode) {
-					tbm.add(_chartActionProxies.get(COMMAND_ID_MOUSE_MODE).getAction());
+					tbm.add(_allChartActions.get(ACTION_ID_MOUSE_MODE));
 				}
 
-				tbm.add(_chartActionProxies.get(COMMAND_ID_ZOOM_IN).getAction());
-				tbm.add(_chartActionProxies.get(COMMAND_ID_ZOOM_OUT).getAction());
+				tbm.add(_allChartActions.get(ACTION_ID_ZOOM_IN));
+				tbm.add(_allChartActions.get(ACTION_ID_ZOOM_OUT));
 
 				if (_chartDataModel.getChartType() != ChartType.BAR) {
-					tbm.add(_chartActionProxies.get(COMMAND_ID_ZOOM_FIT_GRAPH).getAction());
+					tbm.add(_allChartActions.get(ACTION_ID_ZOOM_FIT_GRAPH));
 				}
 			}
 
@@ -775,8 +673,6 @@ public class Chart extends ViewForm {
 
 			// create toolbar manager
 			_toolbarMgr = new ToolBarManager(toolBarControl);
-
-			_useInternalActionBar = true;
 		}
 
 		return _toolbarMgr;
@@ -991,18 +887,6 @@ public class Chart extends ViewForm {
 	 */
 	public void setCanAutoZoomToSlider(final boolean canZoomToSliderOnMouseUp) {
 		_chartComponents.getChartComponentGraph().setCanAutoZoomToSlider(canZoomToSliderOnMouseUp);
-	}
-
-	/**
-	 * Set the enable state for a command and update the UI
-	 */
-	public void setChartCommandEnabled(final String commandId, final boolean isEnabled) {
-
-		_chartActionProxies.get(commandId).setEnabled(isEnabled);
-
-		if (_useActionHandlers) {
-			_actionHandlerManager.getActionHandler(commandId).fireHandlerChanged();
-		}
 	}
 
 	public void setContextProvider(final IChartContextProvider chartContextProvider) {
@@ -1233,10 +1117,10 @@ public class Chart extends ViewForm {
 	 * @param isEnabled
 	 */
 	public void setZoomActionsEnabled(final boolean isEnabled) {
-		_chartActionProxies.get(COMMAND_ID_ZOOM_IN).setEnabled(isEnabled);
-		_chartActionProxies.get(COMMAND_ID_ZOOM_OUT).setEnabled(isEnabled);
-		_chartActionProxies.get(COMMAND_ID_ZOOM_FIT_GRAPH).setEnabled(isEnabled);
-		_actionHandlerManager.updateUIState();
+
+		_allChartActions.get(ACTION_ID_ZOOM_FIT_GRAPH).setEnabled(isEnabled);
+		_allChartActions.get(ACTION_ID_ZOOM_IN).setEnabled(isEnabled);
+		_allChartActions.get(ACTION_ID_ZOOM_OUT).setEnabled(isEnabled);
 	}
 
 	public void switchSlidersTo2ndXData() {
@@ -1337,13 +1221,6 @@ public class Chart extends ViewForm {
 	}
 
 	/**
-	 * Update all action handlers from their action proxy and update the UI state
-	 */
-	public void updateChartActionHandlers() {
-		_actionHandlerManager.updateActionHandlers(this);
-	}
-
-	/**
 	 * Updates only the custom layers which performance is much faster than a chart update.
 	 */
 	public void updateCustomLayers() {
@@ -1352,28 +1229,9 @@ public class Chart extends ViewForm {
 
 	private void updateMouseModeUIState() {
 
-		if (_chartActionProxies != null) {
-			_chartActionProxies.get(COMMAND_ID_MOUSE_MODE).setChecked(_mouseMode.equals(MOUSE_MODE_SLIDER));
+		if (_allChartActions != null) {
+			_allChartActions.get(ACTION_ID_MOUSE_MODE).setChecked(_mouseMode.equals(MOUSE_MODE_SLIDER));
 		}
-
-		if (_useActionHandlers) {
-			_actionHandlerManager.updateUIState();
-		}
-	}
-
-	/**
-	 * @return Returns <code>true</code> when action handlers are used for this chart
-	 */
-	public boolean useActionHandlers() {
-		return _useActionHandlers;
-	}
-
-	/**
-	 * @return Returns <code>true</code> when the internal action bar is used, returns
-	 *         <code>false</code> when the global action handler are used
-	 */
-	public boolean useInternalActionBar() {
-		return _useInternalActionBar;
 	}
 
 	public void zoomOut() {
