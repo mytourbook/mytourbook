@@ -120,7 +120,8 @@ public class TourChartConfiguration {
 	 */
 	public String					hrZoneStyle				= TourChart.ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP;
 
-	public boolean					isShowTourPhotos			= true;											;
+	public boolean					isShowTourPhotos		= true;											;
+	public boolean					isShowTourPhotoTooltip	= true;											;
 
 	/**
 	 * @param keepMinMaxValues

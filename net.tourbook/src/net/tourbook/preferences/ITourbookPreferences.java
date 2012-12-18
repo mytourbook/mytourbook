@@ -86,6 +86,7 @@ public interface ITourbookPreferences {
 	public static final String	GRAPH_IS_MARKER_VISIBLE						= "Graph_IsMarkerVisible";									//$NON-NLS-1$
 	public static final String	GRAPH_IS_BREAKTIME_VALUES_VISIBLE			= "Graph_IsBreaktimeVisible";								//$NON-NLS-1$
 	public static final String	GRAPH_IS_TOUR_PHOTO_VISIBLE					= "GRAPH_IS_TOUR_PHOTO_VISIBLE";							//$NON-NLS-1$
+	public static final String	GRAPH_IS_TOUR_PHOTO_TOOLTIP_VISIBLE			= "GRAPH_IS_TOUR_PHOTO_TOOLTIP_VISIBLE";					//$NON-NLS-1$
 
 	public static final String	GRAPH_MOUSE_MODE							= "graph.toggle-mouse";									//$NON-NLS-1$
 

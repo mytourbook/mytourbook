@@ -375,6 +375,8 @@ public class TourManager {
 
 		tourChartConfig.isShowTourMarker = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_MARKER_VISIBLE);
 		tourChartConfig.isShowTourPhotos = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_TOUR_PHOTO_VISIBLE);
+		tourChartConfig.isShowTourPhotoTooltip = _prefStore.getBoolean(//
+				ITourbookPreferences.GRAPH_IS_TOUR_PHOTO_TOOLTIP_VISIBLE);
 
 		tourChartConfig.isShowBreaktimeValues = _prefStore.getBoolean(//
 				ITourbookPreferences.GRAPH_IS_BREAKTIME_VALUES_VISIBLE);
@@ -1737,7 +1739,6 @@ public class TourManager {
 		 * days. This feature prevents to draw triangles between 2 value points
 		 */
 		xDataTime.setNoLine(tourData.getBreakTimeSerie());
-
 
 		ChartType chartType;
 		final String chartTypeName = _prefStore.getString(ITourbookPreferences.GRAPH_PROPERTY_CHARTTYPE);

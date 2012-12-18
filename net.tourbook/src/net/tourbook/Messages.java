@@ -658,6 +658,8 @@ public class Messages extends NLS {
 	public static String		Image__PhotoDirectoryView;
 	public static String		Image__PhotoGalleryHorizontal;
 	public static String		Image__PhotoGalleryVertical;
+
+	public static String	Image__PhotoImage;
 	public static String		Image__PhotoPhotos;
 	public static String		Image__Pin_Blue;
 	public static String		Image__PulseZones;
@@ -1145,6 +1147,10 @@ public class Messages extends NLS {
 	public static String		Tour_Action_ShowHrZones_Tooltip;
 	public static String		Tour_Action_ShowTourMarker;
 	public static String		Tour_Action_TourPhotos;
+
+	public static String	Tour_Action_TourPhotosWithoutTooltip;
+
+	public static String	Tour_Action_TourPhotosWithTooltip;
 	public static String		Tour_Action_ValuePointToolTip_IsVisible;
 
 	public static String		Tour_Book_Action_delete_selected_tours;

@@ -621,7 +621,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 		_pageBook.showPage(_tourChart);
 
-		_tourData.mergedTour = _tourPhotoLink;
+		_tourData.tourPhotoLink = _tourPhotoLink;
 
 		_tourChart.updateTourChart(_tourData, _tourChartConfig, false);
 

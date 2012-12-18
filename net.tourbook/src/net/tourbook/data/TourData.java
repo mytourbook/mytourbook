@@ -990,7 +990,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * Contains data from a merged tour which contains photos
 	 */
 	@Transient
-	public TourPhotoLink									mergedTour;
+	public TourPhotoLink									tourPhotoLink;
 
 	/**
 	 * 

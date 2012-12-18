@@ -76,6 +76,7 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.util.SafeRunnable;
@@ -96,36 +97,36 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class TourChart extends Chart {
 
-	private static final String		ID										= "net.tourbook.ui.tourChart";				//$NON-NLS-1$
+	private static final String		ID										= "net.tourbook.ui.tourChart";								//$NON-NLS-1$
 
-	public static final String		ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER		= "ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER";		//$NON-NLS-1$
-	public static final String		ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED	= "ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED"; //$NON-NLS-1$
-	public static final String		ACTION_ID_EDIT_CHART_PREFERENCES		= "ACTION_ID_EDIT_CHART_PREFERENCES";		//$NON-NLS-1$
-	public static final String		ACTION_ID_IS_SHOW_BREAKTIME_VALUES		= "ACTION_ID_IS_SHOW_BREAKTIME_VALUES";	//$NON-NLS-1$
-	public static final String		ACTION_ID_IS_SHOW_SRTM_DATA				= "ACTION_ID_IS_SHOW_SRTM_DATA";			//$NON-NLS-1$
-	public static final String		ACTION_ID_IS_SHOW_START_TIME			= "ACTION_ID_IS_SHOW_START_TIME";			//$NON-NLS-1$
-	public static final String		ACTION_ID_IS_SHOW_TOUR_MARKER			= "ACTION_ID_IS_SHOW_TOUR_MARKER";			//$NON-NLS-1$
-	public static final String		ACTION_ID_IS_SHOW_VALUEPOINT_TOOLTIP	= "ACTION_ID_IS_SHOW_VALUEPOINT_TOOLTIP";	//$NON-NLS-1$
-	public static final String		ACTION_ID_IS_SHOW_TOUR_PHOTOS			= "ACTION_ID_IS_SHOW_TOUR_PHOTOS";			//$NON-NLS-1$
-	public static final String		ACTION_ID_X_AXIS_DISTANCE				= "ACTION_ID_X_AXIS_DISTANCE";				//$NON-NLS-1$
-	public static final String		ACTION_ID_X_AXIS_TIME					= "ACTION_ID_X_AXIS_TIME";					//$NON-NLS-1$
+	public static final String		ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER		= "ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER";						//$NON-NLS-1$
+	public static final String		ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED	= "ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED";				//$NON-NLS-1$
+	public static final String		ACTION_ID_EDIT_CHART_PREFERENCES		= "ACTION_ID_EDIT_CHART_PREFERENCES";						//$NON-NLS-1$
+	public static final String		ACTION_ID_IS_SHOW_BREAKTIME_VALUES		= "ACTION_ID_IS_SHOW_BREAKTIME_VALUES";					//$NON-NLS-1$
+	public static final String		ACTION_ID_IS_SHOW_SRTM_DATA				= "ACTION_ID_IS_SHOW_SRTM_DATA";							//$NON-NLS-1$
+	public static final String		ACTION_ID_IS_SHOW_START_TIME			= "ACTION_ID_IS_SHOW_START_TIME";							//$NON-NLS-1$
+	public static final String		ACTION_ID_IS_SHOW_TOUR_MARKER			= "ACTION_ID_IS_SHOW_TOUR_MARKER";							//$NON-NLS-1$
+	public static final String		ACTION_ID_IS_SHOW_VALUEPOINT_TOOLTIP	= "ACTION_ID_IS_SHOW_VALUEPOINT_TOOLTIP";					//$NON-NLS-1$
+	public static final String		ACTION_ID_IS_SHOW_TOUR_PHOTOS			= "ACTION_ID_IS_SHOW_TOUR_PHOTOS";							//$NON-NLS-1$
+	public static final String		ACTION_ID_X_AXIS_DISTANCE				= "ACTION_ID_X_AXIS_DISTANCE";								//$NON-NLS-1$
+	public static final String		ACTION_ID_X_AXIS_TIME					= "ACTION_ID_X_AXIS_TIME";									//$NON-NLS-1$
 
-	public static final String		ACTION_ID_GRAPH_ALTIMETER				= "ACTION_ID_GRAPH_ALTIMETER";				//$NON-NLS-1$
-	public static final String		ACTION_ID_GRAPH_ALTITUDE				= "ACTION_ID_GRAPH_ALTITUDE";				//$NON-NLS-1$
-	public static final String		ACTION_ID_GRAPH_CADENCE					= "ACTION_ID_GRAPH_CADENCE";				//$NON-NLS-1$
-	public static final String		ACTION_ID_GRAPH_GRADIENT				= "ACTION_ID_GRAPH_GRADIENT";				//$NON-NLS-1$
-	public static final String		ACTION_ID_GRAPH_PACE					= "ACTION_ID_GRAPH_PACE";					//$NON-NLS-1$
-	public static final String		ACTION_ID_GRAPH_POWER					= "ACTION_ID_GRAPH_POWER";					//$NON-NLS-1$
-	public static final String		ACTION_ID_GRAPH_PULSE					= "ACTION_ID_GRAPH_PULSE";					//$NON-NLS-1$
-	public static final String		ACTION_ID_GRAPH_SPEED					= "ACTION_ID_GRAPH_SPEED";					//$NON-NLS-1$
-	public static final String		ACTION_ID_GRAPH_TEMPERATURE				= "ACTION_ID_GRAPH_TEMPERATURE";			//$NON-NLS-1$
-	public static final String		ACTION_ID_GRAPH_TOUR_COMPARE			= "ACTION_ID_GRAPH_TOUR_COMPARE";			//$NON-NLS-1$
+	public static final String		ACTION_ID_GRAPH_ALTIMETER				= "ACTION_ID_GRAPH_ALTIMETER";								//$NON-NLS-1$
+	public static final String		ACTION_ID_GRAPH_ALTITUDE				= "ACTION_ID_GRAPH_ALTITUDE";								//$NON-NLS-1$
+	public static final String		ACTION_ID_GRAPH_CADENCE					= "ACTION_ID_GRAPH_CADENCE";								//$NON-NLS-1$
+	public static final String		ACTION_ID_GRAPH_GRADIENT				= "ACTION_ID_GRAPH_GRADIENT";								//$NON-NLS-1$
+	public static final String		ACTION_ID_GRAPH_PACE					= "ACTION_ID_GRAPH_PACE";									//$NON-NLS-1$
+	public static final String		ACTION_ID_GRAPH_POWER					= "ACTION_ID_GRAPH_POWER";									//$NON-NLS-1$
+	public static final String		ACTION_ID_GRAPH_PULSE					= "ACTION_ID_GRAPH_PULSE";									//$NON-NLS-1$
+	public static final String		ACTION_ID_GRAPH_SPEED					= "ACTION_ID_GRAPH_SPEED";									//$NON-NLS-1$
+	public static final String		ACTION_ID_GRAPH_TEMPERATURE				= "ACTION_ID_GRAPH_TEMPERATURE";							//$NON-NLS-1$
+	public static final String		ACTION_ID_GRAPH_TOUR_COMPARE			= "ACTION_ID_GRAPH_TOUR_COMPARE";							//$NON-NLS-1$
 
-	public static final String		ACTION_ID_HR_ZONE_DROPDOWN_MENU			= "ACTION_ID_HR_ZONE_DROPDOWN_MENU";		//$NON-NLS-1$
-	public static final String		ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP		= "ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP";		//$NON-NLS-1$
-	public static final String		ACTION_ID_HR_ZONE_STYLE_NO_GRADIENT		= "ACTION_ID_HR_ZONE_STYLE_NO_GRADIENT";	//$NON-NLS-1$
-	public static final String		ACTION_ID_HR_ZONE_STYLE_WHITE_BOTTOM	= "ACTION_ID_HR_ZONE_STYLE_WHITE_BOTTOM";	//$NON-NLS-1$
-	public static final String		ACTION_ID_HR_ZONE_STYLE_WHITE_TOP		= "ACTION_ID_HR_ZONE_STYLE_WHITE_TOP";		//$NON-NLS-1$
+	public static final String		ACTION_ID_HR_ZONE_DROPDOWN_MENU			= "ACTION_ID_HR_ZONE_DROPDOWN_MENU";						//$NON-NLS-1$
+	public static final String		ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP		= "ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP";						//$NON-NLS-1$
+	public static final String		ACTION_ID_HR_ZONE_STYLE_NO_GRADIENT		= "ACTION_ID_HR_ZONE_STYLE_NO_GRADIENT";					//$NON-NLS-1$
+	public static final String		ACTION_ID_HR_ZONE_STYLE_WHITE_BOTTOM	= "ACTION_ID_HR_ZONE_STYLE_WHITE_BOTTOM";					//$NON-NLS-1$
+	public static final String		ACTION_ID_HR_ZONE_STYLE_WHITE_TOP		= "ACTION_ID_HR_ZONE_STYLE_WHITE_TOP";						//$NON-NLS-1$
 
 	private final IPreferenceStore	_prefStore								= TourbookPlugin.getDefault() //
 																					.getPreferenceStore();
@@ -152,6 +153,11 @@ public class TourChart extends Chart {
 	private boolean					_isSegmentLayerVisible					= false;
 	private boolean					_is2ndAltiLayerVisible					= false;
 	private boolean					_isMouseModeSet;
+
+	private ImageDescriptor			_imagePhoto								= TourbookPlugin
+																					.getImageDescriptor(Messages.Image__PhotoPhotos);
+	private ImageDescriptor			_imagePhotoTooltip						= TourbookPlugin
+																					.getImageDescriptor(Messages.Image__PhotoImage);
 
 	/*
 	 * UI controls
@@ -291,17 +297,18 @@ public class TourChart extends Chart {
 			}
 
 			// check if photos are available
-			final TourPhotoLink mergeTour = _tourData.mergedTour;
+			final TourPhotoLink mergeTour = _tourData.tourPhotoLink;
 			if (mergeTour == null) {
 				return;
 			}
 
-			final ChartLayerPhoto photoLayer = getPhotoLayer();
-			if (photoLayer == null) {
+			if (_layerPhoto == null) {
 				return;
 			}
 
-			_photoTooltip.showChartPhotoToolTip(photoLayer, devHoveredValue, devXMouseMove, devYMouseMove);
+			if (_tourChartConfig.isShowTourPhotoTooltip) {
+				_photoTooltip.showChartPhotoToolTip(_layerPhoto, devHoveredValue, devXMouseMove, devYMouseMove);
+			}
 		}
 	}
 
@@ -516,24 +523,36 @@ public class TourChart extends Chart {
 		setActionChecked(ACTION_ID_IS_SHOW_TOUR_MARKER, isItemChecked);
 	}
 
-	public void actionShowTourPhotos(final Object action, final boolean isItemChecked) {
+	public void actionShowTourPhotos() {
 
-//		if (action instanceof TCActionHandler) {
-//
-//			final TCActionHandler new_name = (TCActionHandler) action;
-//
-//		} else if (action instanceof Action) {
-//
-//			final Action new_name = (Action) action;
-//
-//		}
+		boolean isShowPhotos = _tourChartConfig.isShowTourPhotos;
+		boolean isShowTooltip = _tourChartConfig.isShowTourPhotoTooltip;
 
-		_prefStore.setValue(ITourbookPreferences.GRAPH_IS_TOUR_PHOTO_VISIBLE, isItemChecked);
+		if (isShowPhotos && isShowTooltip) {
 
-		_tourChartConfig.isShowTourPhotos = isItemChecked;
+			isShowPhotos = true;
+			isShowTooltip = false;
+
+		} else if (isShowPhotos) {
+
+			isShowPhotos = false;
+			isShowTooltip = false;
+
+		} else {
+
+			isShowPhotos = true;
+			isShowTooltip = true;
+		}
+
+		_tourChartConfig.isShowTourPhotos = isShowPhotos;
+		_tourChartConfig.isShowTourPhotoTooltip = isShowTooltip;
+
+		_prefStore.setValue(ITourbookPreferences.GRAPH_IS_TOUR_PHOTO_VISIBLE, isShowPhotos);
+		_prefStore.setValue(ITourbookPreferences.GRAPH_IS_TOUR_PHOTO_TOOLTIP_VISIBLE, isShowTooltip);
+
+		updateUI_PhotoAction();
+
 		updateTourChart(true);
-
-		setActionChecked(ACTION_ID_IS_SHOW_TOUR_PHOTOS, isItemChecked);
 	}
 
 	public void actionShowValuePointToolTip(final Boolean isItemChecked) {
@@ -851,7 +870,7 @@ public class TourChart extends Chart {
 			return;
 		}
 
-		final TourPhotoLink mergeTour = _tourData.mergedTour;
+		final TourPhotoLink mergeTour = _tourData.tourPhotoLink;
 
 		if (mergeTour == null) {
 			// no photos are available for this tour
@@ -1344,7 +1363,7 @@ public class TourChart extends Chart {
 		 */
 		tourAction = _allTourChartActions.get(ACTION_ID_IS_SHOW_TOUR_PHOTOS);
 		tourAction.setEnabled(true);
-		tourAction.setChecked(_tourChartConfig.isShowTourPhotos);
+		updateUI_PhotoAction();
 
 		/*
 		 * Breaktime values
@@ -1503,10 +1522,6 @@ public class TourChart extends Chart {
 		return "graphId." + Integer.toString(graphId); //$NON-NLS-1$
 	}
 
-	ChartLayerPhoto getPhotoLayer() {
-		return _layerPhoto;
-	}
-
 	public Map<String, Action> getTourChartActions() {
 		return _allTourChartActions;
 	}
@@ -1576,7 +1591,6 @@ public class TourChart extends Chart {
 	 * @param isItemChecked
 	 */
 	public void setActionChecked(final String commandId, final Boolean isItemChecked) {
-
 		_allTourChartActions.get(commandId).setChecked(isItemChecked);
 	}
 
@@ -2132,6 +2146,37 @@ public class TourChart extends Chart {
 		_valuePointToolTip.setTourData(_tourData);
 	}
 
+	private void updateUI_PhotoAction() {
+
+		String toolTip;
+		ImageDescriptor imageDescriptor;
+
+		final boolean isShowPhotos = _tourChartConfig.isShowTourPhotos;
+		final boolean isShowTooltip = _tourChartConfig.isShowTourPhotoTooltip;
+
+		if (isShowPhotos && isShowTooltip) {
+
+			toolTip = Messages.Tour_Action_TourPhotosWithTooltip;
+			imageDescriptor = _imagePhotoTooltip;
+
+		} else if (!isShowPhotos && !isShowTooltip) {
+
+			toolTip = Messages.Tour_Action_TourPhotos;
+			imageDescriptor = _imagePhoto;
+
+		} else {
+
+			toolTip = Messages.Tour_Action_TourPhotosWithoutTooltip;
+			imageDescriptor = _imagePhoto;
+		}
+
+		final Action action = _allTourChartActions.get(ACTION_ID_IS_SHOW_TOUR_PHOTOS);
+
+		action.setToolTipText(toolTip);
+		action.setImageDescriptor(imageDescriptor);
+		action.setChecked(isShowPhotos);
+	}
+
 	/**
 	 * Update UI check state, the chart decides if the scroll/auto zoom options are available
 	 */
@@ -2147,7 +2192,7 @@ public class TourChart extends Chart {
 	 * @param isEnabled
 	 */
 	private void updateZoomOptions(final boolean isEnabled) {
-		
+
 		setActionEnabled(ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER, isEnabled);
 		setActionEnabled(ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED, isEnabled);
 	}
