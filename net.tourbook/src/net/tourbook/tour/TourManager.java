@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1463,6 +1463,10 @@ public class TourManager {
 							0,
 							rightTime - leftTime - tourData.getBreakTime(valueIndexLeft, valueIndexRight));
 
+					if (time == 0) {
+						return 0;
+					}
+
 					final double distance = rightDistance - leftDistance;
 					final double speed = distance / time * 3.6;
 
@@ -1571,6 +1575,10 @@ public class TourManager {
 					final double time = Math.max(
 							0,
 							rightTime - leftTime - tourData.getBreakTime(valueIndexLeft, valueIndexRight));
+
+					if (time == 0) {
+						return 0;
+					}
 
 					return (float) (((rightAltitude - leftAltitude) / time) * 3600);
 				}

@@ -30,6 +30,8 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 	float[][]						_highValuesFloat;
 
+	private double[][]				_highValuesDouble;
+
 	/**
 	 * the bars has only a low and high value
 	 */
@@ -187,6 +189,39 @@ public class ChartDataYSerie extends ChartDataSerie {
 		return _graphFillMethod;
 	}
 
+	public double[][] getHighValuesDouble() {
+
+		if (_highValuesDouble != null) {
+			return _highValuesDouble;
+		}
+
+		if (_highValuesFloat == null || _highValuesFloat.length == 0) {
+			return null;
+		}
+
+		/*
+		 * convert float[][] -> double[][]
+		 */
+		_highValuesDouble = new double[_highValuesFloat.length][];
+
+		for (int index1 = 0; index1 < _highValuesFloat.length; index1++) {
+
+			final float[] values1 = _highValuesFloat[index1];
+
+			if (values1 == null || values1.length == 0) {
+				continue;
+			}
+
+			final double[] values2 = _highValuesDouble[index1] = new double[values1.length];
+
+			for (int index2 = 0; index2 < values2.length; index2++) {
+				values2[index2] = values1[index2];
+			}
+		}
+
+		return _highValuesDouble;
+	}
+
 	/**
 	 * @return returns the value array
 	 */
@@ -201,6 +236,10 @@ public class ChartDataYSerie extends ChartDataSerie {
 		return _lowValuesFloat;
 	}
 
+//	public int getDisabledLineToNext() {
+//		return _disabledLineToNext;
+//	}
+
 	/**
 	 * @return Returns the format how the slider label will be formatted, which can be <br>
 	 *         {@link #SLIDER_LABEL_FORMAT_DEFAULT}<br>
@@ -209,10 +248,6 @@ public class ChartDataYSerie extends ChartDataSerie {
 	public int getSliderLabelFormat() {
 		return _sliderLabelFormat;
 	}
-
-//	public int getDisabledLineToNext() {
-//		return _disabledLineToNext;
-//	}
 
 	public String getXTitle() {
 		return null;

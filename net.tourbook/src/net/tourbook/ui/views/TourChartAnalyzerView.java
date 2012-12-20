@@ -737,15 +737,22 @@ public class TourChartAnalyzerView extends ViewPart {
 			final int unitType = serieData.getAxisUnit();
 			final int valueDivisor = serieData.getValueDivisor();
 
-			float[] values = null;
+			double[] values = null;
 			if (serieData instanceof ChartDataYSerie) {
 
 				final ChartDataYSerie yData = (ChartDataYSerie) serieData;
-				values = yData.getHighValuesFloat()[0];
+
+				values = yData.getHighValuesDouble()[0];
+
+			} else if (serieData instanceof ChartDataXSerie) {
+
+				final ChartDataXSerie graphXData = (ChartDataXSerie) serieData;
+
+				values = graphXData.getHighValuesDouble()[0];
 			}
 
 			if (values == null) {
-				break;
+				continue;
 			}
 
 			final int endIndex = values.length - 1;
@@ -760,19 +767,19 @@ public class TourChartAnalyzerView extends ViewPart {
 			valuesIndexRight = Math.max(0, valuesIndexRight);
 
 			// values at the left/right slider
-			final float leftValue = values[valuesIndexLeft];
-			final float rightValue = values[valuesIndexRight];
+			final double leftValue = values[valuesIndexLeft];
+			final double rightValue = values[valuesIndexRight];
 
 			int dataIndex = valuesIndexLeft;
 			float avg = 0;
 			int avgDiv = 0;
-			float min = 0;
-			float max = 0;
+			double min = 0;
+			double max = 0;
 
 			// compute min/max/avg values
 			while (dataIndex <= valuesIndexRight) {
 
-				final float value = values[dataIndex];
+				final double value = values[dataIndex];
 
 				avg += value;
 				avgDiv++;
@@ -872,7 +879,7 @@ public class TourChartAnalyzerView extends ViewPart {
 //				outCounter++;
 			}
 
-			final float diffValue = rightValue - leftValue;
+			final double diffValue = rightValue - leftValue;
 			if (graphInfo.diffValue != diffValue) {
 				graphInfo.diffValue = diffValue;
 				graphInfo.lblDiff.setText(Util.formatValue(diffValue, unitType, valueDivisor, true) + UI.SPACE);

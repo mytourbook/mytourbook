@@ -209,7 +209,7 @@ public class Util {
 		return String.format(format, divValue).toString();
 	}
 
-	public static String formatValue(final float value, final int unitType, final float divisor, boolean isShowSeconds) {
+	public static String formatValue(final double value, final int unitType, final float divisor, boolean isShowSeconds) {
 
 		String valueText = EMPTY_STRING;
 
@@ -217,7 +217,7 @@ public class Util {
 		switch (unitType) {
 		case ChartDataSerie.AXIS_UNIT_NUMBER:
 		case ChartDataSerie.X_AXIS_UNIT_NUMBER_CENTER:
-			final float divValue = value / divisor;
+			final double divValue = value / divisor;
 			if (divValue % 1 == 0) {
 				valueText = _nf0.format(divValue);
 			} else {

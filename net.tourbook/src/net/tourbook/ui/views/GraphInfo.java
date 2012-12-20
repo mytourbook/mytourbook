@@ -42,14 +42,14 @@ class GraphInfo {
 	Label								lblAvg;
 	Label								lblDiff;
 
-	float								leftValue	= Float.MIN_VALUE;
-	float								rightValue	= Float.MIN_VALUE;
+	double								leftValue	= Double.MIN_VALUE;
+	double								rightValue	= Double.MIN_VALUE;
 
-	float								minValue	= Float.MIN_VALUE;
-	float								maxValue	= Float.MIN_VALUE;
+	double								minValue	= Double.MIN_VALUE;
+	double								maxValue	= Double.MIN_VALUE;
 
-	float								avgValue	= Float.MIN_VALUE;
-	float								diffValue	= Float.MIN_VALUE;
+	double								avgValue	= Double.MIN_VALUE;
+	double								diffValue	= Double.MIN_VALUE;
 
 	ChartDataSerie						_chartData;
 
