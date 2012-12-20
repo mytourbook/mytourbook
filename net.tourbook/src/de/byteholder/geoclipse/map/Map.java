@@ -232,7 +232,8 @@ public class Map extends Canvas {
 	}
 
 	/**
-	 * The zoom level. Normally a value between around 0 and 20.
+	 * Map zoom level which is currently be used to display tiles. Normally a value between around 0
+	 * and 20.
 	 */
 	private int									_mapZoomLevel								= 0;
 
@@ -551,7 +552,7 @@ public class Map extends Canvas {
 		if (prefStore.getBoolean(IMappingPreferences.OFFLINE_CACHE_USE_OFFLINE) == false) {
 
 			MessageDialog.openInformation(
-					Display.getCurrent().getActiveShell(),
+					_display.getActiveShell(),
 					Messages.Dialog_OfflineArea_Error,
 					Messages.Dialog_OfflineArea_Error_NoOffline);
 
@@ -562,7 +563,7 @@ public class Map extends Canvas {
 		if (OfflineLoadManager.isLoading()) {
 
 			MessageDialog.openInformation(
-					Display.getCurrent().getActiveShell(),
+					_display.getActiveShell(),
 					Messages.Dialog_OfflineArea_Error,
 					Messages.Dialog_OfflineArea_Error_IsLoading);
 
@@ -748,7 +749,7 @@ public class Map extends Canvas {
 				/*
 				 * run async to free the mouse cursor from the drop operation
 				 */
-				Display.getDefault().asyncExec(new Runnable() {
+				_display.asyncExec(new Runnable() {
 					@Override
 					public void run() {
 						onDropRunnable(event);
@@ -1741,6 +1742,8 @@ public class Map extends Canvas {
 
 			if (_directMapPainter != null) {
 
+				// is drawing sliders in map/legent
+
 				_directMapPainterContext.gc = gc;
 				_directMapPainterContext.viewport = _worldPixelTopLeftViewport;
 
@@ -1801,7 +1804,7 @@ public class Map extends Canvas {
 	private void openOfflineImageDialog() {
 
 		new DialogManageOfflineImages(
-				Display.getCurrent().getActiveShell(),
+				_display.getActiveShell(),
 				_mp,
 				_offlineWorldStart,
 				_offlineWorldEnd,
@@ -2160,8 +2163,8 @@ public class Map extends Canvas {
 		 */
 		if (_isSelectOfflineArea) {
 
-			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
-			gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+			gc.setForeground(_display.getSystemColor(SWT.COLOR_BLACK));
+			gc.setBackground(_display.getSystemColor(SWT.COLOR_YELLOW));
 
 			final StringBuilder sb = new StringBuilder();
 			sb.append(Messages.Offline_Area_Label_SelectInfo);
@@ -2277,7 +2280,7 @@ public class Map extends Canvas {
 		gc.setForeground(_display.getSystemColor(SWT.COLOR_WHITE));
 //		gc.drawRectangle(devX + 1, devY + 1, devWidth - 2, devHeight - 2);
 
-		gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_YELLOW));
+		gc.setBackground(_display.getSystemColor(SWT.COLOR_DARK_YELLOW));
 		gc.setAlpha(0x30);
 		gc.fillRectangle(devX + 1, devY + 1, devWidth - 2, devHeight - 2);
 		gc.setAlpha(0xff);
@@ -2426,7 +2429,7 @@ public class Map extends Canvas {
 						if (_isTourPaintMethodEnhanced) {
 							paintOverlay_30_PaintTileEnhanced(tile);
 						} else {
-							paintOverlay_40_PaintTileBasic(tile);
+							paintOverlay_22_PaintTileBasic(tile);
 						}
 
 						// allow to display painted overlays
@@ -2443,6 +2446,63 @@ public class Map extends Canvas {
 				}
 			}
 		});
+	}
+
+	/**
+	 * Paint the tour in basic mode
+	 * 
+	 * @param tile
+	 */
+	private void paintOverlay_22_PaintTileBasic(final Tile tile) {
+
+		boolean isOverlayPainted = false;
+
+		// create 1 part image/gc
+		final ImageData transparentImageData = UI.createTransparentImageData(_tilePixelSize);
+
+		final Image overlayImage = new Image(_display, transparentImageData);
+		final GC gc1Part = new GC(overlayImage);
+
+		/*
+		 * Ubuntu 12.04 fails, when background is not filled, it draws a black background
+		 */
+		gc1Part.setBackground(_transparentColor);
+		gc1Part.fillRectangle(overlayImage.getBounds());
+
+		{
+			// paint all overlays for the current tile
+			for (final MapPainter overlayPainter : _overlays) {
+
+				final boolean isPainted = overlayPainter.doPaint(gc1Part, Map.this, tile, 1);
+
+				isOverlayPainted = isOverlayPainted || isPainted;
+			}
+		}
+		gc1Part.dispose();
+
+		if (isOverlayPainted) {
+
+			// overlay is painted
+
+			final String overlayKey = getOverlayKey(tile, 0, 0, _mp.getProjection().getId());
+
+			tile.setOverlayImage(overlayImage);
+			_overlayImageCache.add(overlayKey, overlayImage);
+
+			// set tile state
+			tile.setOverlayImageState(OverlayImageState.TILE_HAS_CONTENT);
+			tile.incrementOverlayContent();
+
+			paint();
+
+		} else {
+
+			// image is not needed
+			overlayImage.dispose();
+
+			// set tile state
+			tile.setOverlayImageState(OverlayImageState.NO_IMAGE);
+		}
 	}
 
 	/**
@@ -2686,63 +2746,6 @@ public class Map extends Canvas {
 					_overlayImageCache.add(partImageKey, tileOverlayImage);
 				}
 			}
-		}
-	}
-
-	/**
-	 * Paint the tour in basic mode
-	 * 
-	 * @param tile
-	 */
-	private void paintOverlay_40_PaintTileBasic(final Tile tile) {
-
-		boolean isOverlayPainted = false;
-
-		// create 1 part image/gc
-		final ImageData transparentImageData = UI.createTransparentImageData(_tilePixelSize);
-
-		final Image overlayImage = new Image(_display, transparentImageData);
-		final GC gc1Part = new GC(overlayImage);
-
-		/*
-		 * Ubuntu 12.04 fails, when background is not filled, it draws a black background
-		 */
-		gc1Part.setBackground(_transparentColor);
-		gc1Part.fillRectangle(overlayImage.getBounds());
-
-		{
-			// paint all overlays for the current tile
-			for (final MapPainter overlayPainter : _overlays) {
-
-				final boolean isPainted = overlayPainter.doPaint(gc1Part, Map.this, tile, 1);
-
-				isOverlayPainted = isOverlayPainted || isPainted;
-			}
-		}
-		gc1Part.dispose();
-
-		if (isOverlayPainted) {
-
-			// overlay is painted
-
-			final String overlayKey = getOverlayKey(tile, 0, 0, _mp.getProjection().getId());
-
-			tile.setOverlayImage(overlayImage);
-			_overlayImageCache.add(overlayKey, overlayImage);
-
-			// set tile state
-			tile.setOverlayImageState(OverlayImageState.TILE_HAS_CONTENT);
-			tile.incrementOverlayContent();
-
-			paint();
-
-		} else {
-
-			// image is not needed
-			overlayImage.dispose();
-
-			// set tile state
-			tile.setOverlayImageState(OverlayImageState.NO_IMAGE);
 		}
 	}
 
@@ -4145,8 +4148,7 @@ public class Map extends Canvas {
 
 		if (_isPoiPositionInViewport = updatePoiImageDevPosition()) {
 
-			final Display display = Display.getCurrent();
-			final Point displayMouse = display.getCursorLocation();
+			final Point displayMouse = _display.getCursorLocation();
 			final Point devMouse = this.toControl(displayMouse);
 
 			final int devMouseX = devMouse.x;

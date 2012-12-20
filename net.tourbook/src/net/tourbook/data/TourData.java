@@ -532,6 +532,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	private int												conconiDeflection;
 
+	// ############################################# PHOTO  DATA #############################################
+
+	/**
+	 * Number of photos which are set in {@link #tourPhotos}
+	 */
+	private int												numberOfPhotos;
+
+	/**
+	 * Number of time slices in {@link #timeSerie}
+	 */
+	private int												numberOfTimeSlices;
+
 	// ############################################# UNUSED FIELDS START #############################################
 	/**
 	 * ssss distance msw
@@ -568,7 +580,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private SerieData										serieData;
 
 	/**
-	 * Photo
+	 * Photos for to this tour
 	 */
 	@OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
@@ -987,7 +999,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private double[]										timeSerieDouble;
 
 	/**
-	 * Contains data from a merged tour which contains photos
+	 * Contains photo data
 	 */
 	@Transient
 	public TourPhotoLink									tourPhotoLink;
@@ -4418,6 +4430,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return numberOfHrZones;
 	}
 
+	public int getNumberOfPhotos() {
+		return numberOfPhotos;
+	}
+
+	public int getNumberOfTimeSlices() {
+		return numberOfTimeSlices;
+	}
+
 	/**
 	 * @return Returns pace minute data serie in the current measurement system
 	 */
@@ -4685,14 +4705,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return startAltitude;
 	}
 
-	public float getStartDistance() {
-		return startDistance;
-	}
-
-	public short getStartPulse() {
-		return startPulse;
-	}
-
 //	public double[] getTimeSerieDouble() {
 //
 //		if (timeSerieHistory == null) {
@@ -4710,6 +4722,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 //
 //		return timeSerieHistoryDouble;
 //	}
+
+	public float getStartDistance() {
+		return startDistance;
+	}
+
+	public short getStartPulse() {
+		return startPulse;
+	}
 
 	/**
 	 * @return Returns the tour start date time in seconds.
@@ -4928,6 +4948,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 	}
 
+//	is currently disabled in version 12.12, will be used in further versions
+//
+//	public Set<TourPhoto> getTourPhotos() {
+//		return tourPhotos;
+//	}
+
 	/**
 	 * @return Returns the import file path or <code>null</code> when not available.
 	 */
@@ -4947,12 +4973,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public Set<TourMarker> getTourMarkers() {
 		return tourMarkers;
 	}
-
-//	is currently disabled in version 12.12, will be used in further versions
-//
-//	public Set<TourPhoto> getTourPhotos() {
-//		return tourPhotos;
-//	}
 
 	public ArrayList<TourMarker> getTourMarkersSorted() {
 
@@ -4979,6 +4999,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	public TourPerson getTourPerson() {
 		return tourPerson;
+	}
+
+	public Set<TourPhoto> getTourPhotos() {
+		return tourPhotos;
 	}
 
 	/**
@@ -5421,6 +5445,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 		serieData.latitude = latitudeSerie;
 		serieData.longitude = longitudeSerie;
+
+		/*
+		 * time serie size
+		 */
+		numberOfTimeSlices = timeSerie == null ? 0 : timeSerie.length;
+
+		/*
+		 * photo
+		 */
+		numberOfPhotos = tourPhotos.size();
 	}
 
 	public boolean replaceAltitudeWithSRTM() {

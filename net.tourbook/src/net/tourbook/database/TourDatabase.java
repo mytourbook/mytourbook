@@ -54,6 +54,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourPersonHRZone;
+import net.tourbook.data.TourPhoto;
 import net.tourbook.data.TourReference;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
@@ -90,8 +91,9 @@ public class TourDatabase {
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int						TOURBOOK_DB_VERSION							= 22;
+	private static final int						TOURBOOK_DB_VERSION							= 23;
 
+//	private static final int						TOURBOOK_DB_VERSION							= 23;	// 13.6.0   ???
 //	private static final int						TOURBOOK_DB_VERSION							= 22;	// 12.12.0   ???
 //	private static final int						TOURBOOK_DB_VERSION							= 21;	// 12.1.1
 //	private static final int						TOURBOOK_DB_VERSION							= 20;	// 12.1
@@ -2022,15 +2024,15 @@ public class TourDatabase {
 		exec(stmt, sql);
 	}
 
-//	/**
-//	 * Create index for {@link TourPhoto}, it will dramatically improve performance.
-//	 *
-//	 * @param stmt
-//	 * @throws SQLException
-//	 * @since Db version 22
-//	 */
-//	private void createIndexTourPhoto_022(final Statement stmt) throws SQLException {
-//
+	/**
+	 * Create index for {@link TourPhoto}, it will dramatically improve performance.
+	 * 
+	 * @param stmt
+	 * @throws SQLException
+	 * @since Db version 23
+	 */
+	private void createIndex_TourPhoto_023(final Statement stmt) throws SQLException {
+
 //		String sql;
 //
 //		/*
@@ -2038,7 +2040,7 @@ public class TourDatabase {
 //		 */
 //		sql = "CREATE INDEX ImageFilePathName ON " + TABLE_TOUR_PHOTO + " (imageFilePathName)"; //$NON-NLS-1$ //$NON-NLS-2$
 //		exec(stmt, sql);
-//	}
+	}
 
 	/**
 	 * create table {@link #TABLE_TOUR_BIKE}
@@ -2309,6 +2311,13 @@ public class TourDatabase {
 				//
 				// version 22 end ---------
 
+				// version 23 start  -  13.?
+				//
+				+ " numberOfTimeSlices			INTEGER DEFAULT 0,				\n" //$NON-NLS-1$
+				+ " numberOfPhotos				INTEGER DEFAULT 0,				\n" //$NON-NLS-1$
+				//
+				// version 23 end ---------
+
 				+ "	serieData					BLOB 							\n" //$NON-NLS-1$
 
 				+ ")"; //														//$NON-NLS-1$
@@ -2555,23 +2564,26 @@ public class TourDatabase {
 				//
 				+ "	photoId 					BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1),	\n" //$NON-NLS-1$
 				//
-				+ "	" + (TABLE_TOUR_DATA + "_tourId	BIGINT						\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	" + (TABLE_TOUR_DATA + "_tourId	BIGINT,						\n") //$NON-NLS-1$ //$NON-NLS-2$
 				//
-//				+ ("	imageFileName			" + varCharKomma(TourPhoto.DB_LENGTH_FILE_PATH)) //$NON-NLS-1$
-//				+ ("	imageFileExt			" + varCharKomma(TourPhoto.DB_LENGTH_FILE_PATH)) //$NON-NLS-1$
-//				+ ("	imageFilePath			" + varCharKomma(TourPhoto.DB_LENGTH_FILE_PATH)) //$NON-NLS-1$
-//				+ ("	imageFilePathName		" + varCharKomma(TourPhoto.DB_LENGTH_FILE_PATH)) //$NON-NLS-1$
-//				//
-//				+ "	imageExifTime				BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
-//				+ "	imageFileLastModified		BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
-//				+ "	adjustedTime				BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
-//				//
-//				+ "	isGeoFromPhoto				INT DEFAULT 0,					\n" //$NON-NLS-1$
-//				+ "	latitude 					DOUBLE DEFAULT 0,				\n" //$NON-NLS-1$
-//				+ "	longitude 					DOUBLE DEFAULT 0				\n" //$NON-NLS-1$
-//
-//		createIndexTourPhoto_022(stmt);
+
+				// version 23 start
 				//
+				+ ("	imageFileName			" + varCharKomma(TourPhoto.DB_LENGTH_FILE_PATH)) //$NON-NLS-1$
+				+ ("	imageFileExt			" + varCharKomma(TourPhoto.DB_LENGTH_FILE_PATH)) //$NON-NLS-1$
+				+ ("	imageFilePath			" + varCharKomma(TourPhoto.DB_LENGTH_FILE_PATH)) //$NON-NLS-1$
+				+ ("	imageFilePathName		" + varCharKomma(TourPhoto.DB_LENGTH_FILE_PATH)) //$NON-NLS-1$
+				//
+				+ "	imageExifTime				BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
+				+ "	imageFileLastModified		BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
+				+ "	adjustedTime				BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
+				//
+				+ "	isGeoFromPhoto				INT DEFAULT 0,					\n" //$NON-NLS-1$
+				+ "	latitude 					DOUBLE DEFAULT 0,				\n" //$NON-NLS-1$
+				+ "	longitude 					DOUBLE DEFAULT 0				\n" //$NON-NLS-1$
+				//
+				// version 23 end
+
 				+ ")"; //															//$NON-NLS-1$
 
 		exec(stmt, sql);
@@ -2604,6 +2616,8 @@ public class TourDatabase {
 				+ "	PRIMARY KEY (" + TABLE_TOUR_DATA + "_tourId)"; //				//$NON-NLS-1$ //$NON-NLS-2$
 
 		exec(stmt, sql);
+
+		createIndex_TourPhoto_023(stmt);
 	}
 
 	/**
@@ -3007,6 +3021,13 @@ public class TourDatabase {
 		stmt.execute(sql);
 	}
 
+	private void exec(final Statement stmt, final String[] sqlStatements) throws SQLException {
+
+		for (final String sql : sqlStatements) {
+			exec(stmt, sql);
+		}
+	}
+
 	private void execUpdate(final Statement stmt, final String sql) throws SQLException {
 
 		StatusUtil.log(sql);
@@ -3212,6 +3233,7 @@ public class TourDatabase {
 		boolean isPostUpdate13 = false;
 		boolean isPostUpdate20 = false;
 		boolean isPostUpdate22 = false;
+		boolean isPostUpdate23 = false;
 
 		int newVersion = currentDbVersion;
 		final int oldVersion = currentDbVersion;
@@ -3327,6 +3349,14 @@ public class TourDatabase {
 			}
 
 			/*
+			 * 23
+			 */
+			if (currentDbVersion == 22) {
+				currentDbVersion = newVersion = updateDbDesign_022_to_023(conn, monitor);
+				isPostUpdate23 = true;
+			}
+
+			/*
 			 * update version number
 			 */
 			updateDbVersionNumber(conn, newVersion);
@@ -3356,6 +3386,9 @@ public class TourDatabase {
 			}
 			if (isPostUpdate22) {
 				updateDbDesign_021_to_022_PostUpdate(conn, monitor);
+			}
+			if (isPostUpdate23) {
+				updateDbDesign_022_to_023_PostUpdate(conn, monitor);
 			}
 
 		} catch (final SQLException e) {
@@ -4502,6 +4535,130 @@ public class TourDatabase {
 				stmtUpdate.setLong(3, tourId);
 				stmtUpdate.executeUpdate();
 			}
+		}
+	}
+
+	private int updateDbDesign_022_to_023(final Connection conn, final IProgressMonitor monitor) throws SQLException {
+
+		final int newDbVersion = 23;
+
+		logDbUpdateStart(newDbVersion);
+
+		if (monitor != null) {
+			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, newDbVersion));
+		}
+
+		final Statement stmt = conn.createStatement();
+		{
+
+//
+//			TOUR_PHOTO	TOUR_PHOTO	TOUR_PHOTO	TOUR_PHOTO	TOUR_PHOTO	TOUR_PHOTO	TOUR_PHOTO	TOUR_PHOTO	TOUR_PHOTO
+//
+//			// version 23 start
+//			//
+//			+ ("	imageFileName			" + varCharKomma(TourPhoto.DB_LENGTH_FILE_PATH)) //$NON-NLS-1$
+//			+ ("	imageFileExt			" + varCharKomma(TourPhoto.DB_LENGTH_FILE_PATH)) //$NON-NLS-1$
+//			+ ("	imageFilePath			" + varCharKomma(TourPhoto.DB_LENGTH_FILE_PATH)) //$NON-NLS-1$
+//			+ ("	imageFilePathName		" + varCharKomma(TourPhoto.DB_LENGTH_FILE_PATH)) //$NON-NLS-1$
+//			//
+//			+ "	imageExifTime				BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
+//			+ "	imageFileLastModified		BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
+//			+ "	adjustedTime				BIGINT DEFAULT 0,					\n" //$NON-NLS-1$
+//			//
+//			+ "	isGeoFromPhoto				INT DEFAULT 0,					\n" //$NON-NLS-1$
+//			+ "	latitude 					DOUBLE DEFAULT 0,				\n" //$NON-NLS-1$
+//			+ "	longitude 					DOUBLE DEFAULT 0				\n" //$NON-NLS-1$
+//			//
+//			// version 23 end
+
+			final String sqlTourPhoto[] = {
+					//
+					"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	imageFileName		" + varCharNoKomma(TourPhoto.DB_LENGTH_FILE_PATH), //$NON-NLS-1$ //$NON-NLS-2$
+					"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	imageFileExt		" + varCharNoKomma(TourPhoto.DB_LENGTH_FILE_PATH), //$NON-NLS-1$ //$NON-NLS-2$
+					"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	imageFilePath		" + varCharNoKomma(TourPhoto.DB_LENGTH_FILE_PATH), //$NON-NLS-1$ //$NON-NLS-2$
+					"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	imageFilePathName	" + varCharNoKomma(TourPhoto.DB_LENGTH_FILE_PATH), //$NON-NLS-1$ //$NON-NLS-2$
+					//
+					"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	imageExifTime			BIGINT DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
+					"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	imageFileLastModified	BIGINT DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
+					"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	adjustedTime			BIGINT DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
+					//
+					"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	isGeoFromPhoto			INT DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
+					"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	latitude 				DOUBLE DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
+					"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	longitude 				DOUBLE DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
+			};
+
+			exec(stmt, sqlTourPhoto);
+
+//
+//			TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA
+//
+//			// version 23 start  -  13.?
+//			//
+//			+ " numberOfTimeSlices			INTEGER DEFAULT 0,				\n" //$NON-NLS-1$
+//			+ " numberOfPhotos				INTEGER DEFAULT 0,				\n" //$NON-NLS-1$
+//			//
+//			// version 23 end ---------
+
+			final String sqlTourData[] = {
+					//
+					"ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN	numberOfTimeSlices		INTEGER DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
+					"ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN	numberOfPhotos			INTEGER DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
+			//
+			};
+
+			exec(stmt, sqlTourData);
+
+		}
+		stmt.close();
+
+		logDbUpdateEnd(newDbVersion);
+
+		return newDbVersion;
+	}
+
+	/**
+	 * Set create date/time from the tour date
+	 * 
+	 * @param conn
+	 * @param monitor
+	 * @throws SQLException
+	 */
+	private void updateDbDesign_022_to_023_PostUpdate(final Connection conn, final IProgressMonitor monitor)
+			throws SQLException {
+
+		int tourIdx = 1;
+		final ArrayList<Long> tourList = getAllTourIds();
+
+		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+		try {
+
+			// loop: all tours
+			for (final Long tourId : tourList) {
+
+				if (monitor != null) {
+
+					monitor.subTask(NLS.bind(//
+							Messages.Tour_Database_PostUpdate023_SetTimeSliceNumbers,
+							new Object[] { tourIdx, tourList.size() }));
+
+					tourIdx++;
+				}
+
+				final TourData tourData = em.find(TourData.class, tourId);
+				if (tourData != null) {
+
+					// compute number of time slices
+					tourData.onPrePersist();
+
+					TourDatabase.saveEntity(tourData, tourId, TourData.class);
+				}
+			}
+
+		} catch (final Exception e) {
+			e.printStackTrace();
+		} finally {
+
+			em.close();
 		}
 	}
 

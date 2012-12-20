@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -32,6 +33,7 @@ import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourPhoto;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
@@ -46,6 +48,7 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
@@ -59,6 +62,7 @@ import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
@@ -107,7 +111,6 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 	private static final String						STATE_FILTER_PHOTOS					= "STATE_FILTER_PHOTOS";						//$NON-NLS-1$
 	private static final String						STATE_SELECTED_CAMERA_NAME			= "STATE_SELECTED_CAMERA_NAME";				//$NON-NLS-1$
-//	private static final String						STATE_TIME_ADJUSTMENT_TOURS			= "STATE_TIME_ADJUSTMENT_TOURS";				//$NON-NLS-1$
 
 	public static final String						IMAGE_PIC_DIR_VIEW					= "IMAGE_PIC_DIR_VIEW";						//$NON-NLS-1$
 	public static final String						IMAGE_PHOTO_PHOTO					= "IMAGE_PHOTO_PHOTO";							//$NON-NLS-1$
@@ -159,31 +162,27 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 	private ActionFilterPhotos						_actionFilterPhotos;
 	private ActionFilterOneHistoryTour				_actionFilterOneHistory;
 	private ActionModifyColumns						_actionModifyColumns;
-//	private ActionResetTimeAdjustment				_actionResetTimeAdjustment;
-//	private ActionSetTourGPSIntoPhotos				_actionSetTourGPSIntoPhotos;
-
-	private final PeriodFormatter					_durationFormatter					= new PeriodFormatterBuilder()
-																								.appendYears()
-																								.appendSuffix(
-																										"y ", "y ") //$NON-NLS-1$ //$NON-NLS-2$
-																								.appendMonths()
-																								.appendSuffix(
-																										"m ", "m ") //$NON-NLS-1$ //$NON-NLS-2$
-																								.appendDays()
-																								.appendSuffix(
-																										"d ", "d ") //$NON-NLS-1$ //$NON-NLS-2$
-																								.appendHours()
-																								.appendSuffix(
-																										"h ", "h ") //$NON-NLS-1$ //$NON-NLS-2$
-																								.toFormatter();
+	private ActionSavePhotosInTour					_actionSavePhotoInTour;
 
 	private final DateTimeFormatter					_dateFormatter						= DateTimeFormat.mediumDate();
 	private final DateTimeFormatter					_timeFormatter						= DateTimeFormat.mediumTime();
-	private final NumberFormat						_nf_1_1								= NumberFormat
-																								.getNumberInstance();
+	private final NumberFormat						_nf_1_1;
+	private final PeriodFormatter					_durationFormatter;
 	{
+		_nf_1_1 = NumberFormat.getNumberInstance();
 		_nf_1_1.setMinimumFractionDigits(1);
 		_nf_1_1.setMaximumFractionDigits(1);
+
+		_durationFormatter = new PeriodFormatterBuilder()//
+				.appendYears()
+				.appendSuffix("y ", "y ") //$NON-NLS-1$ //$NON-NLS-2$
+				.appendMonths()
+				.appendSuffix("m ", "m ") //$NON-NLS-1$ //$NON-NLS-2$
+				.appendDays()
+				.appendSuffix("d ", "d ") //$NON-NLS-1$ //$NON-NLS-2$
+				.appendHours()
+				.appendSuffix("h ", "h ") //$NON-NLS-1$ //$NON-NLS-2$
+				.toFormatter();
 	}
 
 	private final Comparator<? super PhotoWrapper>	_adjustTimeComparator;
@@ -332,45 +331,83 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 		updateUI(_selectedLinks, null);
 	}
 
-//	private void actionResetTimeAdjustment() {
-//
-//		for (final TourPhotoLink tourPhotoLink : _selectedLinks) {
-//			for (final PhotoWrapper photoWrapper : tourPhotoLink.tourPhotos) {
-//				photoWrapper.isGpsSetFromTour = false;
-//			}
-//		}
-//
-//		updateUI(_selectedLinks, false, false);
-//	}
-//
-//	void actionSetTourGPSIntoPhotos() {
-//
-//		if (TourManager.isTourEditorModified()) {
-//			return;
-//		}
-//
-//		final ArrayList<PhotoWrapper> updatedPhotos = new ArrayList<PhotoWrapper>();
-//
-//		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-//			public void run() {
-//
-//				PhotoManager.getInstance().setTourGpsIntoPhotos(updatedPhotos, _selectedTourPhotoLinksWithGps);
-//
-//				// update UI with new number of GPS photos
-//				for (final TourPhotoLink tourPhotoLink : _selectedTourPhotoLinksWithGps) {
-//					_tourViewer.update(tourPhotoLink, null);
-//				}
-//			}
-//		});
-//
-//		// fire update event
-//		PhotoManager.fireEvent(PhotoEventId.GPS_DATA_IS_UPDATED, updatedPhotos);
-//
-//		// force that selection is fired
-//		_selectedLinks.clear();
-//
-//		onSelectTour(((StructuredSelection) _tourViewer.getSelection()).toArray(), true);
-//	}
+	void actionSavePhotoInTour() {
+
+		if (TourManager.isTourEditorModified()) {
+			return;
+		}
+
+		final TourManager tourManager = TourManager.getInstance();
+
+		final ArrayList<TourData> modifiedTours = new ArrayList<TourData>();
+		final ArrayList<TourPhotoLink> modifiedLinks = new ArrayList<TourPhotoLink>();
+
+		final Object[] allSelectedLinks = ((IStructuredSelection) _tourViewer.getSelection()).toArray();
+
+		int historyTours = 0;
+
+		for (final Object linkElement : allSelectedLinks) {
+
+			if (linkElement instanceof TourPhotoLink) {
+
+				final TourPhotoLink photoLink = (TourPhotoLink) linkElement;
+				final boolean isRealTour = photoLink.tourId != Long.MIN_VALUE;
+
+				if (isRealTour) {
+
+					final ArrayList<PhotoWrapper> tourPhotoWrapper = photoLink.tourPhotos;
+
+					if (tourPhotoWrapper.size() > 0) {
+
+						final TourData tourData = tourManager.getTourData(photoLink.tourId);
+
+						if (tourData != null) {
+
+							final Set<TourPhoto> tourPhotos = tourData.getTourPhotos();
+
+							// remove previous photos
+							tourPhotos.clear();
+
+							for (final PhotoWrapper photoWrapper : tourPhotoWrapper) {
+								tourPhotos.add(new TourPhoto(tourData, photoWrapper));
+							}
+
+							modifiedTours.add(tourData);
+							modifiedLinks.add(photoLink);
+						}
+					}
+
+				} else {
+
+					historyTours++;
+				}
+			}
+		}
+
+		// show message that photos can be saved only in real tours
+		if (historyTours > 0) {
+
+			MessageDialog.openInformation(
+					Display.getCurrent().getActiveShell(),
+					Messages.Photos_AndTours_Dialog_CannotSaveHistoryTour_Title,
+					Messages.Photos_AndTours_Dialog_CannotSaveHistoryTour_Message);
+		}
+
+		TourManager.saveModifiedTours(modifiedTours);
+
+		// update viewer data
+		for (final TourPhotoLink photoLink : modifiedLinks) {
+
+			final TourData tourData = tourManager.getTourData(photoLink.tourId);
+
+			if (tourData != null) {
+				photoLink.numberOfTourPhotos = tourData.getNumberOfPhotos();
+			}
+		}
+
+		// update UI
+		_tourViewer.update(modifiedLinks.toArray(), null);
+	}
 
 	private void addPartListener() {
 		_partListener = new IPartListener2() {
@@ -483,8 +520,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 		_actionFilterOneHistory = new ActionFilterOneHistoryTour(this);
 		_actionFilterPhotos = new ActionFilterPhotos(this);
 		_actionModifyColumns = new ActionModifyColumns(this);
-//		_actionResetTimeAdjustment = new ActionResetTimeAdjustment();
-//		_actionSetTourGPSIntoPhotos = new ActionSetTourGPSIntoPhotos(this);
+		_actionSavePhotoInTour = new ActionSavePhotosInTour(this);
 	}
 
 	/**
@@ -726,7 +762,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 			public void selectionChanged(final SelectionChangedEvent event) {
 				final ISelection eventSelection = event.getSelection();
 				if (eventSelection instanceof StructuredSelection) {
-					onSelectTour(((StructuredSelection) eventSelection).toArray(), true);
+					onSelectTour(((StructuredSelection) eventSelection).toArray());
 				}
 			}
 		});
@@ -788,7 +824,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 	private void defineAllColumns(final Composite parent) {
 
 		defineColumn_TourTypeImage();
-		defineColumn_NumberOfPhotos();
+		defineColumn_NumberOfTourPhotos();
 		defineColumn_NumberOfGPSPhotos();
 		defineColumn_NumberOfNoGPSPhotos();
 		defineColumn_TourStartDate();
@@ -877,18 +913,18 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 	}
 
 	/**
-	 * column: number of photos
+	 * column: number of photos which are saved in the tour
 	 */
-	private void defineColumn_NumberOfPhotos() {
+	private void defineColumn_NumberOfTourPhotos() {
 
 		final ColumnDefinition colDef = TableColumnFactory.NUMBER_OF_PHOTOS.createColumn(_columnManager, _pc);
-//		colDef.setIsDefaultColumn();
+		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 
 				final TourPhotoLink link = (TourPhotoLink) cell.getElement();
-				final int numberOfPhotos = link.tourPhotos.size();
+				final int numberOfPhotos = link.numberOfTourPhotos;
 
 				cell.setText(numberOfPhotos == 0 ? UI.EMPTY_STRING : Long.toString(numberOfPhotos));
 
@@ -1104,7 +1140,6 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 		final boolean isOneHistory = _actionFilterOneHistory.isChecked();
 		final boolean isNoHistory = !isOneHistory;
 		final boolean isPhotoFilter = isPhotoAvailable && isNoHistory;
-//		final boolean isTourWithGPS = _selectedTourPhotoLinksWithGps.size() > 0;
 
 		_lblAdjustTime.setEnabled(isPhotoFilter);
 		_spinnerHours.setEnabled(isPhotoFilter);
@@ -1114,21 +1149,12 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 		_actionFilterPhotos.setEnabled(isPhotoFilter);
 		_actionFilterOneHistory.setEnabled(isPhotoAvailable);
-
-//		_actionResetTimeAdjustment.setEnabled(isTourWithGPS);
-//
-//		// is true when selected tour contains photos
-//		_actionSetTourGPSIntoPhotos.setEnabled(isTourWithGPS
-//
-//		// it's too dangerous when all photos are contained in 1 tour
-////				&& _isFilterNoTours == false
-//				);
+		_actionSavePhotoInTour.setEnabled(isPhotoAvailable);
 	}
 
 	private void fillContextMenu(final IMenuManager menuMgr) {
 
-//		menuMgr.add(_actionSetTourGPSIntoPhotos);
-//		menuMgr.add(_actionResetTimeAdjustment);
+		menuMgr.add(_actionSavePhotoInTour);
 	}
 
 	private void fillToolbar() {
@@ -1288,9 +1314,8 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 	 * 
 	 * @param allSelectedLinks
 	 *            All elements of type {@link TourPhotoLink}
-	 * @param isFireSelection
 	 */
-	private void onSelectTour(final Object[] allSelectedLinks, final boolean isFireSelection) {
+	private void onSelectTour(final Object[] allSelectedLinks) {
 
 		// get all real tours with geo positions
 		_selectedTourPhotoLinksWithGps.clear();
@@ -1338,9 +1363,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 		// create tour selection
 		_tourPhotoLinkSelection = new TourPhotoLinkSelection(_selectedLinks, selectedTourIds);
 
-		if (isFireSelection) {
-			PhotoManager.fireEvent(PhotoEventId.PHOTO_SELECTION, _tourPhotoLinkSelection);
-		}
+		PhotoManager.fireEvent(PhotoEventId.PHOTO_SELECTION, _tourPhotoLinkSelection);
 	}
 
 	@Override
@@ -1555,17 +1578,10 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 		for (final PhotoWrapper photoWrapper : _allPhotos) {
 
-//			if (photoWrapper.isGpsSetFromTour) {
-//
-//				// don't overwrite adjusted time when it's already used set geo position
-//
-//				continue;
-//			}
-
-			final long utcTime = photoWrapper.imageExifTime;
+			final long exifTime = photoWrapper.imageExifTime;
 			final long cameraTimeAdjustment = photoWrapper.camera.timeAdjustment;
 
-			photoWrapper.adjustedTime = utcTime + cameraTimeAdjustment;
+			photoWrapper.adjustedTime = exifTime + cameraTimeAdjustment;
 
 			// force that the position are updated
 			photoWrapper.photo.resetWorldPosition();

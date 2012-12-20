@@ -91,10 +91,14 @@ public class Photo {
 	 */
 	private static boolean					_isGetExifGeo			= false;
 
-	private double							_exifLatitude			= Double.MIN_VALUE;
-	private double							_exifLongitude			= Double.MIN_VALUE;
-	private double							_tourLatitude			= Double.MIN_VALUE;
-	private double							_tourLongitude			= Double.MIN_VALUE;
+	/**
+	 * Double.MIN_VALUE cannot be used, it cannot be saved in the database. 0 is the value when the
+	 * value is not set !!!
+	 */
+	private double							_exifLatitude			= 0;
+	private double							_exifLongitude			= 0;
+	private double							_tourLatitude			= 0;
+	private double							_tourLongitude			= 0;
 
 	private String							_gpsAreaInfo;
 
@@ -661,15 +665,18 @@ public class Photo {
 	}
 
 	/**
-	 * @return Returns latitude or {@link Double#MIN_VALUE} when not set
+	 * @return Returns latitude.
+	 *         <p>
+	 *         <b> Double.MIN_VALUE cannot be used, it cannot be saved in the database. 0 is the
+	 *         value when the value is not set !!! </b>
 	 */
 	public double getLatitude() {
 
 		return _isGetExifGeo //
-				? _exifLatitude != Double.MIN_VALUE //
+				? _exifLatitude != 0 //
 						? _exifLatitude
 						: _tourLatitude
-				: _tourLatitude != Double.MIN_VALUE //
+				: _tourLatitude != 0 //
 						? _tourLatitude
 						: _exifLatitude;
 	}
@@ -694,10 +701,10 @@ public class Photo {
 	public double getLongitude() {
 
 		return _isGetExifGeo //
-				? _exifLongitude != Double.MIN_VALUE //
+				? _exifLongitude != 0 //
 						? _exifLongitude
 						: _tourLongitude
-				: _tourLongitude != Double.MIN_VALUE //
+				: _tourLongitude != 0 //
 						? _tourLongitude
 						: _exifLongitude;
 	}
@@ -808,7 +815,7 @@ public class Photo {
 	public Point getWorldPosition(final CommonMapProvider mapProvider, final String projectionId, final int zoomLevel) {
 
 		final double latitude = getLatitude();
-		if (latitude == Double.MIN_VALUE) {
+		if (latitude == 0) {
 			return null;
 		}
 
@@ -845,8 +852,8 @@ public class Photo {
 
 	public void resetTourGeoPosition() {
 
-		_tourLatitude = Double.MIN_VALUE;
-		_tourLongitude = Double.MIN_VALUE;
+		_tourLatitude = 0;
+		_tourLongitude = 0;
 
 		_photoWrapper.isPhotoWithGps = _photoWrapper.isGeoFromExif;
 	}
@@ -932,7 +939,7 @@ public class Photo {
 //				+ (_exifDateTime == null ? "-no date-" : "\t" + _exifDateTime)
 //				+ ("\trotate:" + rotateDegree)
 //				+ (_imageWidth == Integer.MIN_VALUE ? "-no size-" : "\t" + _imageWidth + "x" + _imageHeight)
-//				+ (_latitude == Double.MIN_VALUE ? "\t-no GPS-" : "\t" + _latitude + " - " + _longitude)
+//				+ (_latitude == 0 ? "\t-no GPS-" : "\t" + _latitude + " - " + _longitude)
 				//
 		;
 	}
@@ -984,8 +991,8 @@ public class Photo {
 		 * set state if gps data are available, this state is used for filtering the photos and to
 		 * indicate that exif data are loaded
 		 */
-		final boolean isExifGPS = _exifLatitude != Double.MIN_VALUE;
-		final boolean isTourGPS = _tourLatitude != Double.MIN_VALUE;
+		final boolean isExifGPS = _exifLatitude != 0;
+		final boolean isTourGPS = _tourLatitude != 0;
 
 		_photoWrapper.isGeoFromExif = isExifGPS;
 		_photoWrapper.isPhotoWithGps = isTourGPS || isExifGPS;

@@ -618,6 +618,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		defineColumnTimeDriving();
 
 		defineColumnWeatherClouds();
+		defineColumnPhotos();
 		defineColumnTitle();
 		defineColumnTags();
 
@@ -646,8 +647,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		defineColumnWeekNo();
 		defineColumnWeekYear();
+
+		defineColumnTimeSlices();
 		defineColumnTimeInterval();
-//		defineColumnNumberOfTimeSlices();
 		defineColumnDeviceDistance();
 
 		defineColumnPerson();
@@ -1077,6 +1079,32 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	}
 
 	/**
+	 * column: number of photos
+	 */
+	private void defineColumnPhotos() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_PHOTOS.createColumn(_columnManager, _pc);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final Object element = cell.getElement();
+				if (element instanceof TVITourBookTour) {
+
+					final int numberOfPhotos = ((TVITourBookTour) element).colNumberOfPhotos;
+					if (numberOfPhotos == 0) {
+						cell.setText(UI.EMPTY_STRING);
+					} else {
+						cell.setText(Integer.toString(numberOfPhotos));
+					}
+
+					setCellColor(cell, element);
+				}
+			}
+		});
+	}
+
+	/**
 	 * column: rest pulse
 	 */
 	private void defineColumnRestPulse() {
@@ -1298,32 +1326,6 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		});
 	}
 
-//	/**
-//	 * column: number of time slices
-//	 */
-//
-//	private void defineColumnNumberOfTimeSlices() {
-//
-//		final TreeColumnDefinition colDef = TreeColumnFactory.TIME_SLICES.createColumn(_columnManager, _pc);
-//		colDef.setLabelProvider(new CellLabelProvider() {
-//			@Override
-//			public void update(final ViewerCell cell) {
-//				final Object element = cell.getElement();
-//				if (element instanceof TVITourBookTour) {
-//
-//					final short dbTimeSlices = ((TVITourBookTour) element).getColumnTimeSlices();
-//					if (dbTimeSlices == 0) {
-//						cell.setText(UI.EMPTY_STRING);
-//					} else {
-//						cell.setText(Long.toString(dbTimeSlices));
-//					}
-//
-//					setCellColor(cell, element);
-//				}
-//			}
-//		});
-//	}
-
 	/**
 	 * column: recording time (h)
 	 */
@@ -1345,6 +1347,31 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 					}
 				} else {
 					cell.setText(UI.format_hh_mm(recordingTime + 30).toString());
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * column: number of time slices
+	 */
+	private void defineColumnTimeSlices() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.TIME_SLICES.createColumn(_columnManager, _pc);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final int numberOfPhotos = ((TVITourBookItem) element).colNumberOfTimeSlices;
+
+				if (numberOfPhotos == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(Integer.toString(numberOfPhotos));
 				}
 
 				setCellColor(cell, element);

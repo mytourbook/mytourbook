@@ -19,10 +19,12 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-	private static final String	BUNDLE_NAME	= "net.tourbook.messages";									//$NON-NLS-1$
+	private static final String	BUNDLE_NAME	= "net.tourbook.messages";							//$NON-NLS-1$
 
 	public static String		Action_PhotosAndTours_FilterNoTours_Tooltip;
 	public static String		Action_PhotosAndTours_FilterPhotos_Tooltip;
+
+	public static String	Action_PhotosAndTours_SavePhotoInTour;
 
 	public static String		Action_ToolTip_Hide;
 	public static String		Action_ToolTip_SetDefaults;
@@ -659,7 +661,7 @@ public class Messages extends NLS {
 	public static String		Image__PhotoGalleryHorizontal;
 	public static String		Image__PhotoGalleryVertical;
 
-	public static String	Image__PhotoImage;
+	public static String		Image__PhotoImage;
 	public static String		Image__PhotoPhotos;
 	public static String		Image__Pin_Blue;
 	public static String		Image__PulseZones;
@@ -794,11 +796,15 @@ public class Messages extends NLS {
 	public static String		Photo_Tooltip_Label_ShellWithResize;
 
 	public static String		Photos_AndTours_Combo_Camera_Tooltip;
+	public static String	Photos_AndTours_Dialog_CannotSaveHistoryTour_Message;
+
+	public static String	Photos_AndTours_Dialog_CannotSaveHistoryTour_Title;
+
 	public static String		Photos_AndTours_Label_AdjustTime;
 	public static String		Photos_AndTours_Label_AdjustTime_Tooltip;
 	public static String		Photos_AndTours_Label_DurationLess1Hour;
 
-	public static String	Photos_AndTours_Label_HistoryTour;
+	public static String		Photos_AndTours_Label_HistoryTour;
 	public static String		Photos_AndTours_Label_NoCamera;
 	public static String		Photos_AndTours_Label_NoSelectedPhoto;
 	public static String		Photos_AndTours_Link_PhotoDirectory;
@@ -1147,10 +1153,8 @@ public class Messages extends NLS {
 	public static String		Tour_Action_ShowHrZones_Tooltip;
 	public static String		Tour_Action_ShowTourMarker;
 	public static String		Tour_Action_TourPhotos;
-
-	public static String	Tour_Action_TourPhotosWithoutTooltip;
-
-	public static String	Tour_Action_TourPhotosWithTooltip;
+	public static String		Tour_Action_TourPhotosWithoutTooltip;
+	public static String		Tour_Action_TourPhotosWithTooltip;
 	public static String		Tour_Action_ValuePointToolTip_IsVisible;
 
 	public static String		Tour_Book_Action_delete_selected_tours;
@@ -1176,6 +1180,8 @@ public class Messages extends NLS {
 	public static String		Tour_Database_PostUpdate011_SetTourCreateTime;
 	public static String		Tour_Database_PostUpdate020_ConvertIntToFloat;
 	public static String		Tour_Database_PostUpdate021_SetTourStartEndTime;
+
+	public static String	Tour_Database_PostUpdate023_SetTimeSliceNumbers;
 	public static String		Tour_Database_TourSaveError;
 	public static String		Tour_Database_update_tour;
 	public static String		Tour_Database_Update;

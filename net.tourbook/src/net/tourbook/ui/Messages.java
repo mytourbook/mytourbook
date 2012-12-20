@@ -183,13 +183,23 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_NumberOfNoGPSPhotos_Header;
 	public static String		ColumnFactory_NumberOfNoGPSPhotos_Label;
 	public static String		ColumnFactory_NumberOfNoGPSPhotos_Tooltip;
+	public static String	ColumnFactory_NumberOfPhotos_Header;
+
 	public static String		ColumnFactory_NumberOfPhotos_Label;
 	public static String		ColumnFactory_NumberOfPhotos_Tooltip;
+
+	public static String	ColumnFactory_NumberOfPhotos2_Tooltip;
 	public static String	ColumnFactory_NumberOfTimeSlices_Header;
 
 	public static String	ColumnFactory_NumberOfTimeSlices_Label;
 
 	public static String	ColumnFactory_NumberOfTimeSlices_Tooltip;
+
+	public static String	ColumnFactory_NumberOfTourPhotos_Header;
+
+	public static String	ColumnFactory_NumberOfTourPhotos_Label;
+
+	public static String	ColumnFactory_NumberOfTourPhotos_Tooltip;
 
 	public static String		ColumnFactory_restpulse_label;
 	public static String		ColumnFactory_restpulse;

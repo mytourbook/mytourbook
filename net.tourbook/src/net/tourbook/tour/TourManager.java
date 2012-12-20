@@ -577,8 +577,8 @@ public class TourManager {
 
 	/**
 	 * Checks if a tour in the {@link TourDataEditorView} is modified and shows the editor when it's
-	 * modified. A message dialog informs the user about the modified tour and the requested actions
-	 * cannot be done.
+	 * modified. A message dialog informs the user about the modified tour and that the requested
+	 * actions cannot be done.
 	 * 
 	 * @return Returns <code>true</code> when the tour is modified in the {@link TourDataEditorView}
 	 */
@@ -983,7 +983,7 @@ public class TourManager {
 
 	/**
 	 * Saves tours which have been modified and updates the tour data editor, fires a
-	 * {@link TourManager#TOUR_CHANGED} event.<br>
+	 * {@link TourEventId#TOUR_CHANGED} event.<br>
 	 * <br>
 	 * If a tour is openend in the {@link TourDataEditorView}, the tour will be saved only when the
 	 * tour is not dirty, if the tour is dirty, saving is not done. The change event is always
@@ -999,7 +999,7 @@ public class TourManager {
 
 	/**
 	 * Saves tours which have been modified and updates the tour data editor, fires a
-	 * {@link TourManager#TOUR_CHANGED} event.<br>
+	 * {@link TourEventId#TOUR_CHANGED} event.<br>
 	 * <br>
 	 * If a tour is openend in the {@link TourDataEditorView}, the tour will be saved only when the
 	 * tour is not dirty, if the tour is dirty, saving is not done.
@@ -1014,6 +1014,12 @@ public class TourManager {
 															final boolean canFireNotification) {
 
 		final ArrayList<TourData> savedTours = new ArrayList<TourData>();
+
+		if (modifiedTours.size() == 0) {
+			// there is nothing modified
+			return savedTours;
+		}
+
 		final TourData[] tourDataEditorSavedTour = { null };
 		final boolean[] doFireChangeEvent = { false };
 

@@ -297,8 +297,8 @@ public class TourChart extends Chart {
 			}
 
 			// check if photos are available
-			final TourPhotoLink mergeTour = _tourData.tourPhotoLink;
-			if (mergeTour == null) {
+			final TourPhotoLink tourPhotoLink = _tourData.tourPhotoLink;
+			if (tourPhotoLink == null) {
 				return;
 			}
 
@@ -870,14 +870,14 @@ public class TourChart extends Chart {
 			return;
 		}
 
-		final TourPhotoLink mergeTour = _tourData.tourPhotoLink;
+		final TourPhotoLink tourPhotoLink = _tourData.tourPhotoLink;
 
-		if (mergeTour == null) {
+		if (tourPhotoLink == null) {
 			// no photos are available for this tour
 			return;
 		}
 
-		final ArrayList<PhotoWrapper> tourPhotos = mergeTour.tourPhotos;
+		final ArrayList<PhotoWrapper> tourPhotos = tourPhotoLink.tourPhotos;
 		final int numberOfPhotos = tourPhotos.size();
 		if (numberOfPhotos == 0) {
 			// no photos are available for this tour

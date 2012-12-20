@@ -321,7 +321,7 @@ public class PhotoManager {
 
 			// set number of GPS/No GPS photos
 			final double latitude = photo.getLatitude();
-			if (latitude == Double.MIN_VALUE) {
+			if (latitude == 0) {
 				currentTourPhotoLink.numberOfNoGPSPhotos++;
 			} else {
 				currentTourPhotoLink.numberOfGPSPhotos++;
@@ -374,7 +374,7 @@ public class PhotoManager {
 
 			// set number of GPS/No GPS photos
 			final double latitude = photo.getLatitude();
-			if (latitude == Double.MIN_VALUE) {
+			if (latitude == 0) {
 				historyTour.numberOfNoGPSPhotos++;
 			} else {
 				historyTour.numberOfGPSPhotos++;
@@ -609,6 +609,12 @@ public class PhotoManager {
 				}
 
 				if (linkView != null) {
+
+					// show view but do not make it active
+					if (activePage.isPartVisible(linkViewPart) == false) {
+						activePage.showView(TourPhotoLinkView.ID, null, IWorkbenchPage.VIEW_VISIBLE);
+					}
+
 					linkView.showPhotosAndTours(selectedPhotosWithExif.photos);
 				}
 
@@ -731,10 +737,12 @@ public class PhotoManager {
 
 						+ "SELECT " //$NON-NLS-1$
 
-						+ " TourId," //						1 //$NON-NLS-1$
-						+ " TourStartTime," //				2 //$NON-NLS-1$
-						+ " TourEndTime," //				3 //$NON-NLS-1$
-						+ " TourType_TypeId" //				4 //$NON-NLS-1$
+						+ " TourId, " //					1 //$NON-NLS-1$
+						+ " TourStartTime, " //				2 //$NON-NLS-1$
+						+ " TourEndTime, " //				3 //$NON-NLS-1$
+						+ " TourType_TypeId, " //			4 //$NON-NLS-1$
+
+						+ " numberOfPhotos" //				5 //$NON-NLS-1$
 
 						+ UI.NEW_LINE
 
@@ -770,8 +778,13 @@ public class PhotoManager {
 				final long dbTourStart = result.getLong(2);
 				final long dbTourEnd = result.getLong(3);
 				final Object dbTourTypeId = result.getObject(4);
+				final int dbNumberOfPhotos = result.getInt(5);
 
-				final TourPhotoLink dbTourPhotoLink = new TourPhotoLink(dbTourId, dbTourStart, dbTourEnd);
+				final TourPhotoLink dbTourPhotoLink = new TourPhotoLink(
+						dbTourId,
+						dbTourStart,
+						dbTourEnd,
+						dbNumberOfPhotos);
 
 				dbTourPhotoLink.tourTypeId = (dbTourTypeId == null ? //
 						TourDatabase.ENTITY_IS_NOT_SAVED
@@ -1115,7 +1128,7 @@ public class PhotoManager {
 		}
 	}
 
-	void setTourGpsIntoPhotos(final List<TourPhotoLink> tourPhotoLinksWithGps) {
+	private void setTourGpsIntoPhotos(final List<TourPhotoLink> tourPhotoLinksWithGps) {
 
 		for (final TourPhotoLink tourPhotoLink : tourPhotoLinksWithGps) {
 
@@ -1134,7 +1147,7 @@ public class PhotoManager {
 
 				// set number of GPS/No GPS photos
 				final double latitude = photo.getLatitude();
-				if (latitude == Double.MIN_VALUE) {
+				if (latitude == 0) {
 					tourPhotoLink.numberOfNoGPSPhotos++;
 				} else {
 					tourPhotoLink.numberOfGPSPhotos++;

@@ -412,13 +412,15 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 //				+ data);
 //		// TODO remove SYSTEM.OUT.PRINTLN
 
-		if (photoEventId == PhotoEventId.GPS_DATA_IS_UPDATED) {
+//		if (photoEventId == PhotoEventId.GPS_DATA_IS_UPDATED) {
+//
+//			if (data instanceof ArrayList) {
+//				_photoGallery.updateGPSPosition((ArrayList<?>) data);
+//			}
+//
+//		} else 
 
-			if (data instanceof ArrayList) {
-				_photoGallery.updateGPSPosition((ArrayList<?>) data);
-			}
-
-		} else if (photoEventId == PhotoEventId.PHOTO_SELECTION) {
+		if (photoEventId == PhotoEventId.PHOTO_SELECTION) {
 
 			if (data instanceof TourPhotoLinkSelection) {
 

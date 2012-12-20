@@ -1,65 +1,38 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
- *
+ * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *
+ * 
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.photo;
 
-import org.joda.time.DateTime;
+import net.tourbook.Messages;
 
-/**
- * Metadata for the original photo image file.
- */
-public class PhotoImageMetadata {
+import org.eclipse.jface.action.Action;
 
-	/**
-	 * Last modified in GMT
-	 */
-	public DateTime	fileDateTime;
-	public DateTime	exifDateTime;
+public class ActionSavePhotosInTour extends Action {
 
-	public int		imageWidth		= Integer.MIN_VALUE;
-	public int		imageHeight		= Integer.MIN_VALUE;
+	private TourPhotoLinkView	_photosAndToursView;
 
-	public int		orientation		= 1;
+	public ActionSavePhotosInTour(final TourPhotoLinkView photosAndToursView) {
 
-	public double	imageDirection	= Double.MIN_VALUE;
+		super(Messages.Action_PhotosAndTours_SavePhotoInTour, AS_PUSH_BUTTON);
 
-	public double	altitude		= Double.MIN_VALUE;
+		_photosAndToursView = photosAndToursView;
+	}
 
-	/**
-	 * Double.MIN_VALUE cannot be used, it cannot be saved in the database. 0 is the value when the
-	 * value is not set !!!
-	 */
-	public double	latitude		= 0;
-	public double	longitude		= 0;
+	@Override
+	public void run() {
+		_photosAndToursView.actionSavePhotoInTour();
+	}
 
-	public String	gpsAreaInfo;
-
-	/**
-	 * Title
-	 */
-	public String	objectName;
-
-	/**
-	 * Description
-	 */
-	public String	captionAbstract;
-
-	/**
-	 * Camera or scanner name
-	 */
-	public String	model;
-
-	public PhotoImageMetadata() {}
 }

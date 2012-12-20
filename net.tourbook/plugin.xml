@@ -771,20 +771,22 @@
 		-->
 	
 		<menuContribution locationURI="toolbar:net.tourbook.photo.PicDirView?before=PicDirViewToolBar">
+		
 			<command
 				commandId="command.net.tourbook.PicDir.SyncPhotoWithTour"
 				icon="icons/photo-sync-tour.png"
 				style="toggle"
 				tooltip="%Command_PicDir_SyncPhotoWithTour_Tooltip" />
+				
 		</menuContribution>
 
 		<menuContribution locationURI="popup:menu.net.tourbook.photo.PicDirView.InFolder?before=additions" >
 		            
 			<command
-         commandId="command.net.tourbook.photo.LinkPhotoWithTourInFolder"
-         icon="icons/photo-link-photo-with-tour.png"
-         label="%Action_PhotoDirectory_LinkPhotoWithTourInFolder"
-         mnemonic="%Action_PhotoDirectory_LinkPhotoWithTourInFolder_Mnemonic"/>
+				commandId="command.net.tourbook.photo.LinkPhotoWithTourInFolder"
+				icon="icons/photo-link-photo-with-tour.png"
+				label="%Action_PhotoDirectory_LinkPhotoWithTourInFolder"
+				mnemonic="%Action_PhotoDirectory_LinkPhotoWithTourInFolder_Mnemonic"/>
 		
 		</menuContribution>
 
@@ -795,16 +797,16 @@
 		<menuContribution locationURI="popup:menu.net.tourbook.photo.PhotoGallery?before=separator.net.tourbook.photo.refresh" >
 		            
 			<command
-         commandId="command.net.tourbook.photo.LinkPhotoWithTourInGalleryAll"
-         icon="icons/photo-link-photo-with-tour.png"
-         label="%Action_PhotoDirectory_LinkPhotoWithTourInGalleryAll"
-         mnemonic="%Action_PhotoDirectory_LinkPhotoWithTourInGalleryAll_Mnemonic"/>
+				commandId="command.net.tourbook.photo.LinkPhotoWithTourInGalleryAll"
+				icon="icons/photo-link-photo-with-tour.png"
+				label="%Action_PhotoDirectory_LinkPhotoWithTourInGalleryAll"
+				mnemonic="%Action_PhotoDirectory_LinkPhotoWithTourInGalleryAll_Mnemonic"/>
 		            
 			<command
-         commandId="command.net.tourbook.photo.LinkPhotoWithTourInGallerySelected"
-         icon="icons/photo-link-photo-with-tour.png"
-         label="%Action_PhotoDirectory_LinkPhotoWithTourInGallerySelected"
-         mnemonic="%Action_PhotoDirectory_LinkPhotoWithTourInGallerySelected_Mnemonic"/>
+				commandId="command.net.tourbook.photo.LinkPhotoWithTourInGallerySelected"
+				icon="icons/photo-link-photo-with-tour.png"
+				label="%Action_PhotoDirectory_LinkPhotoWithTourInGallerySelected"
+				mnemonic="%Action_PhotoDirectory_LinkPhotoWithTourInGallerySelected_Mnemonic"/>
 			
 		</menuContribution>
 

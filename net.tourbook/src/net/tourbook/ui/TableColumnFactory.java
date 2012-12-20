@@ -646,11 +646,11 @@ public abstract class TableColumnFactory {
 		@Override
 		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
-			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "numberOfPhotos", SWT.TRAIL); //$NON-NLS-1$
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "numberOfTourPhotos", SWT.TRAIL); //$NON-NLS-1$
 			
-			colDef.setColumnLabel(Messages.ColumnFactory_NumberOfPhotos_Label);
-			colDef.setColumnHeader(Messages.ColumnFactory_NumberOfPhotos_Label);
-			colDef.setColumnToolTipText(Messages.ColumnFactory_NumberOfPhotos_Tooltip);
+			colDef.setColumnLabel(Messages.ColumnFactory_NumberOfTourPhotos_Label);
+			colDef.setColumnHeader(Messages.ColumnFactory_NumberOfTourPhotos_Header);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_NumberOfTourPhotos_Tooltip);
 			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
 			
 			return colDef;

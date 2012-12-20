@@ -30,88 +30,97 @@ import org.eclipse.jface.preference.IPreferenceStore;
 
 public abstract class TVITourBookItem extends TreeViewerItem implements ITourItem {
 
-	static final int		ITEM_TYPE_ROOT	= 0;
-	static final int		ITEM_TYPE_YEAR	= 20;
-	static final int		ITEM_TYPE_MONTH	= 30;
-	static final int		ITEM_TYPE_WEEK	= 40;
-	static final int		ITEM_TYPE_DAY	= 50;
-	static final int		ITEM_TYPE_TOUR	= 60;
+	static final int				ITEM_TYPE_ROOT	= 0;
+	static final int				ITEM_TYPE_YEAR	= 20;
+	static final int				ITEM_TYPE_MONTH	= 30;
+	static final int				ITEM_TYPE_WEEK	= 40;
+	static final int				ITEM_TYPE_DAY	= 50;
+	static final int				ITEM_TYPE_TOUR	= 60;
 
-	static final Calendar	calendar		= GregorianCalendar.getInstance();
+	static final Calendar			calendar		= GregorianCalendar.getInstance();
 	private final IPreferenceStore	prefStore		= TourbookPlugin.getDefault().getPreferenceStore();
 
-	static final String		SQL_SUM_COLUMNS	= UI.EMPTY_STRING
-											//
-													+ "SUM(TOURDISTANCE)," // 		1	//$NON-NLS-1$
-													+ "SUM(TOURRECORDINGTIME)," //	2	//$NON-NLS-1$
-													+ "SUM(TOURDRIVINGTIME)," //	3	//$NON-NLS-1$
-													+ "SUM(TOURALTUP)," //			4	//$NON-NLS-1$
-													+ "SUM(TOURALTDOWN)," //		5	//$NON-NLS-1$
-													+ "SUM(1)," //					6	//$NON-NLS-1$
-													//
-													+ "MAX(MAXSPEED)," //			7	//$NON-NLS-1$
-													+ "SUM(TOURDISTANCE)," //		8	//$NON-NLS-1$
-													+ "SUM(TOURDRIVINGTIME)," //	9	//$NON-NLS-1$
-													+ "MAX(MAXALTITUDE)," //		10	//$NON-NLS-1$
-													+ "MAX(MAXPULSE)," //			11	//$NON-NLS-1$
-													//
-													+ "AVG(AVGPULSE)," //			12	//$NON-NLS-1$
-													+ "AVG(AVGCADENCE)," //			13	//$NON-NLS-1$
-													+ "AVG(DOUBLE(AvgTemperature) / TemperatureScale)," //		14	//$NON-NLS-1$
+	static final String				SQL_SUM_COLUMNS;
 
-													+ "AVG(WEATHERWINDDIR)," //		15	//$NON-NLS-1$
-													+ "AVG(WEATHERWINDSPD)," //		16	//$NON-NLS-1$
-													+ "AVG(RESTPULSE)," //			17	//$NON-NLS-1$
+	static {
+		SQL_SUM_COLUMNS = UI.EMPTY_STRING
+		//
+				+ "SUM(TOURDISTANCE)," // 								1	//$NON-NLS-1$
+				+ "SUM(TOURRECORDINGTIME)," //							2	//$NON-NLS-1$
+				+ "SUM(TOURDRIVINGTIME)," //							3	//$NON-NLS-1$
+				+ "SUM(TOURALTUP)," //									4	//$NON-NLS-1$
+				+ "SUM(TOURALTDOWN)," //								5	//$NON-NLS-1$
+				+ "SUM(1)," //											6	//$NON-NLS-1$
+				//
+				+ "MAX(MAXSPEED)," //									7	//$NON-NLS-1$
+				+ "SUM(TOURDISTANCE)," //								8	//$NON-NLS-1$
+				+ "SUM(TOURDRIVINGTIME)," //							9	//$NON-NLS-1$
+				+ "MAX(MAXALTITUDE)," //								10	//$NON-NLS-1$
+				+ "MAX(MAXPULSE)," //									11	//$NON-NLS-1$
+				//
+				+ "AVG(AVGPULSE)," //									12	//$NON-NLS-1$
+				+ "AVG(AVGCADENCE)," //									13	//$NON-NLS-1$
+				+ "AVG(DOUBLE(AvgTemperature) / TemperatureScale)," //	14	//$NON-NLS-1$
 
-													+ "SUM(CALORIES)";			//	18	//$NON-NLS-1$
+				+ "AVG(WEATHERWINDDIR)," //								15	//$NON-NLS-1$
+				+ "AVG(WEATHERWINDSPD)," //								16	//$NON-NLS-1$
+				+ "AVG(RESTPULSE)," //									17	//$NON-NLS-1$
 
-	TourBookView			tourBookView;
+				+ "SUM(CALORIES)," //									18	//$NON-NLS-1$
+				+ "SUM(numberOfTimeSlices)," //							19	//$NON-NLS-1$
+				+ "SUM(numberOfPhotos)"; //								20	//$NON-NLS-1$
+	}
 
-	String					treeColumn;
+	TourBookView					tourBookView;
 
-	int						tourYear;
+	String							treeColumn;
+
+	int								tourYear;
 
 	/**
 	 * month starts with 1 for january
 	 */
 	int								tourMonth;
 	int								tourWeek;
-	int						tourYearSub;
-	int						tourDay;
+	int								tourYearSub;
+	int								tourDay;
 
-	long					colTourDate;
-	String					colTourTitle;
-	long					colPersonId;										// tourPerson_personId
+	long							colTourDate;
+	String							colTourTitle;
+	long							colPersonId;														// tourPerson_personId
 
-	long					colCounter;
-	long					colCalories;
-	long					colDistance;
+	long							colCounter;
+	long							colCalories;
+	long							colDistance;
 
-	long					colRecordingTime;
-	long					colDrivingTime;
-	long					colPausedTime;
+	long							colRecordingTime;
+	long							colDrivingTime;
+	long							colPausedTime;
 
-	long					colAltitudeUp;
-	long					colAltitudeDown;
+	long							colAltitudeUp;
+	long							colAltitudeDown;
 
-	float					colMaxSpeed;
-	long					colMaxAltitude;
-	long					colMaxPulse;
+	float							colMaxSpeed;
+	long							colMaxAltitude;
+	long							colMaxPulse;
 
-	float					colAvgSpeed;
-	float					colAvgPace;
-	long					colAvgPulse;
-	long					colAvgCadence;
-	float					colAvgTemperature;
+	float							colAvgSpeed;
+	float							colAvgPace;
+	long							colAvgPulse;
+	long							colAvgCadence;
+	float							colAvgTemperature;
 
-	int						colWindSpd;
-	int						colWindDir;
-	String					colClouds;
-	int						colRestPulse;
+	int								colWindSpd;
+	int								colWindDir;
+	String							colClouds;
+	int								colRestPulse;
 
-	int						colWeekNo;
-	int						colWeekDay;
-	int						colWeekYear;
+	int								colWeekNo;
+	int								colWeekDay;
+	int								colWeekYear;
+
+	int								colNumberOfTimeSlices;
+	int								colNumberOfPhotos;
 
 	TVITourBookItem(final TourBookView view) {
 		tourBookView = view;
@@ -152,6 +161,9 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 		colRestPulse = result.getInt(startIndex + 16);
 
 		colCalories = result.getLong(startIndex + 17);
+
+		colNumberOfTimeSlices = result.getInt(startIndex + 18);
+		colNumberOfPhotos = result.getInt(startIndex + 19);
 
 		colPausedTime = colRecordingTime - colDrivingTime;
 	}

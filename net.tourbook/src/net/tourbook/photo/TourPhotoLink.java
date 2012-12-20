@@ -70,6 +70,11 @@ public class TourPhotoLink {
 	int										numberOfNoGPSPhotos;
 
 	/**
+	 * Number of photos which are saved in a real tour.
+	 */
+	int										numberOfTourPhotos;
+
+	/**
 	 * Contains all photos for this tour.
 	 */
 	public ArrayList<PhotoWrapper>			tourPhotos			= new ArrayList<PhotoWrapper>();
@@ -104,8 +109,9 @@ public class TourPhotoLink {
 	 * @param tourEndTime
 	 * @param tourStartTime
 	 * @param tourId
+	 * @param dbNumberOfPhotos
 	 */
-	TourPhotoLink(final long tourId, final long tourStartTime, final long tourEndTime) {
+	TourPhotoLink(final long tourId, final long tourStartTime, final long tourEndTime, final int numberOfPhotos) {
 
 		this.tourId = tourId;
 
@@ -113,6 +119,8 @@ public class TourPhotoLink {
 
 		setTourStartTime(tourStartTime);
 		setTourEndTime(tourEndTime);
+
+		this.numberOfTourPhotos = numberOfPhotos;
 	}
 
 	private void addTimeSlice(final ArrayList<HistoryData> historyList, final long timeSliceTime) {

@@ -479,7 +479,7 @@ public abstract class TreeColumnFactory {
 		@Override
 		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
-			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TimeSlices", SWT.TRAIL); //$NON-NLS-1$
+			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "NumberOfTimeSlices", SWT.TRAIL); //$NON-NLS-1$
 			
 			colDef.setColumnLabel(Messages.ColumnFactory_NumberOfTimeSlices_Label);
 			colDef.setColumnHeader(Messages.ColumnFactory_NumberOfTimeSlices_Header);
@@ -489,7 +489,7 @@ public abstract class TreeColumnFactory {
 			return colDef;
 		};
 	};
-
+	
 	public static final TreeColumnFactory TITLE = new TreeColumnFactory() {
 		@Override
 		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
@@ -550,6 +550,21 @@ public abstract class TreeColumnFactory {
 		};
 	};
 
+	public static final TreeColumnFactory TOUR_PHOTOS = new TreeColumnFactory() {
+		@Override
+		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "NumberOfTourPhotos", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_NumberOfPhotos_Label);
+			colDef.setColumnHeader(Messages.ColumnFactory_NumberOfPhotos_Header);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_NumberOfPhotos2_Tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+			
+			return colDef;
+		};
+	};
+ 
 	public static final TreeColumnFactory TOUR_START_TIME = new TreeColumnFactory() {
 
 		@Override
