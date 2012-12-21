@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -363,7 +364,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 						if (tourData != null) {
 
-							final Set<TourPhoto> tourPhotos = tourData.getTourPhotos();
+							final Set<TourPhoto> tourPhotos = new HashSet<TourPhoto>();
 
 							// remove previous photos
 							tourPhotos.clear();
@@ -371,6 +372,8 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 							for (final PhotoWrapper photoWrapper : tourPhotoWrapper) {
 								tourPhotos.add(new TourPhoto(tourData, photoWrapper));
 							}
+
+							tourData.setTourPhotos(tourPhotos);
 
 							modifiedTours.add(tourData);
 							modifiedLinks.add(photoLink);

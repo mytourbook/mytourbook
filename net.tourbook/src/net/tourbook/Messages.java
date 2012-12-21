@@ -657,6 +657,10 @@ public class Messages extends NLS {
 	public static String		Image__Photo_FilterOneHistoryTour_Disabled;
 	public static String		Image__Photo_FilterPhotos;
 	public static String		Image__Photo_FilterPhotos_Disabled;
+
+	public static String	Image__Photo_FilterTourWithPhotos;
+
+	public static String	Image__Photo_FilterTourWithPhotos_Disabled;
 	public static String		Image__PhotoDirectoryView;
 	public static String		Image__PhotoGalleryHorizontal;
 	public static String		Image__PhotoGalleryVertical;

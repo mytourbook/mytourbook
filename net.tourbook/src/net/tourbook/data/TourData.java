@@ -68,6 +68,7 @@ import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.math.Smooth;
+import net.tourbook.photo.PhotoWrapper;
 import net.tourbook.photo.TourPhotoLink;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageComputedValues;
@@ -999,10 +1000,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private double[]										timeSerieDouble;
 
 	/**
-	 * Contains photo data
+	 * Contains photo data from a {@link TourPhotoLink}
 	 */
 	@Transient
 	public TourPhotoLink									tourPhotoLink;
+
+	/**
+	 * Contains photo data from a {@link PhotoWrapper}
+	 */
+	@Transient
+	private ArrayList<PhotoWrapper>							_tourPhotoWrapper;
 
 	/**
 	 * 
@@ -5006,6 +5013,30 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	}
 
 	/**
+	 * @return Returns <code>null</code> when tour do not contains photos, otherwise a list of
+	 *         {@link PhotoWrapper} is returned.
+	 */
+	public ArrayList<PhotoWrapper> getTourPhotoWrapper() {
+
+		if (tourPhotos.size() == 0) {
+			return null;
+		}
+
+		// photos are available in this tour
+
+		if (_tourPhotoWrapper == null) {
+			_tourPhotoWrapper = new ArrayList<PhotoWrapper>();
+		}
+
+		if (_tourPhotoWrapper.size() == 0) {
+
+			// photos are not yet set
+
+		}
+		return _tourPhotoWrapper;
+	}
+
+	/**
 	 * @return Returns total recording time in seconds
 	 */
 	public long getTourRecordingTime() {
@@ -5450,11 +5481,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		 * time serie size
 		 */
 		numberOfTimeSlices = timeSerie == null ? 0 : timeSerie.length;
-
-		/*
-		 * photo
-		 */
-		numberOfPhotos = tourPhotos.size();
 	}
 
 	public boolean replaceAltitudeWithSRTM() {
@@ -5763,6 +5789,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	public void setTourPerson(final TourPerson tourPerson) {
 		this.tourPerson = tourPerson;
+	}
+
+	public void setTourPhotos(final Set<TourPhoto> newTourPhotos) {
+
+		tourPhotos.addAll(newTourPhotos);
+		numberOfPhotos = tourPhotos.size();
+
+		_tourPhotoWrapper
 	}
 
 	/**

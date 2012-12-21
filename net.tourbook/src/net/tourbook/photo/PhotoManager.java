@@ -731,7 +731,7 @@ public class PhotoManager {
 
 			if (_sqlConnection == null) {
 
-				final SQLFilter sqlFilter = new SQLFilter();
+				final SQLFilter sqlFilter = new SQLFilter(false);
 
 				final String sql = UI.EMPTY_STRING //
 

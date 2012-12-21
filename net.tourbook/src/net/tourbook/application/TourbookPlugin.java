@@ -58,14 +58,13 @@ public class TourbookPlugin extends AbstractUIPlugin {
 	private static TourPerson				_activePerson;
 
 	private static TourTypeFilter			_activeTourTypeFilter;
+	private static boolean					_isPhotoFilterActive;
 
 	private static MyTourbookSplashHandler	_splashHandler;
 
 	private static BundleContext			_bundleContext;
 
 	private Version							_version;
-
-//	private ApplicationActionBarAdvisor		_applicationActionBarAdvisor;
 
 	/**
 	 * The constructor.
@@ -77,6 +76,14 @@ public class TourbookPlugin extends AbstractUIPlugin {
 	 */
 	public static TourPerson getActivePerson() {
 		return _activePerson;
+	}
+
+	/**
+	 * @return Returns <code>true</code> when the photo filter is active, this means, only tours are
+	 *         displayed which contains photos.
+	 */
+	public static boolean getActivePhotoFilter() {
+		return _isPhotoFilterActive;
 	}
 
 	/**
@@ -144,6 +151,10 @@ public class TourbookPlugin extends AbstractUIPlugin {
 		_activePerson = currentPerson;
 	}
 
+	public static void setActivePhotoFilter(final boolean isPhotoFilterActive) {
+		_isPhotoFilterActive = isPhotoFilterActive;
+	}
+
 	public static void setActiveTourTypeFilter(final TourTypeFilter tourTypeFilter) {
 		_activeTourTypeFilter = tourTypeFilter;
 		TourDatabase.updateActiveTourTypeList(tourTypeFilter);
@@ -152,10 +163,6 @@ public class TourbookPlugin extends AbstractUIPlugin {
 	public static void setSplashHandler(final MyTourbookSplashHandler splashHandler) {
 		_splashHandler = splashHandler;
 	}
-
-//	public ApplicationActionBarAdvisor getApplicationActionBarAdvisor() {
-//		return _applicationActionBarAdvisor;
-//	}
 
 	/**
 	 * @param sectionName
@@ -181,10 +188,6 @@ public class TourbookPlugin extends AbstractUIPlugin {
 	public void log(final String message, final Throwable exception) {
 		getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, 0, message, exception));
 	}
-
-//	public void setActionBarAdvisor(final ApplicationActionBarAdvisor applicationActionBarAdvisor) {
-//		_applicationActionBarAdvisor = applicationActionBarAdvisor;
-//	}
 
 	@Override
 	public void start(final BundleContext context) throws Exception {

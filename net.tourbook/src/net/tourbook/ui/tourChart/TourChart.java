@@ -872,13 +872,21 @@ public class TourChart extends Chart {
 
 		final TourPhotoLink tourPhotoLink = _tourData.tourPhotoLink;
 
-		if (tourPhotoLink == null) {
-			// no photos are available for this tour
-			return;
+		int numberOfPhotos;
+		ArrayList<PhotoWrapper> tourPhotos = null;
+
+		if (tourPhotoLink != null) {
+
+			tourPhotos = tourPhotoLink.tourPhotos;
+			numberOfPhotos = tourPhotos.size();
+
+		} else {
+
+			tourPhotos = _tourData.getTourPhotoWrapper();
+
+			numberOfPhotos = _tourData.getNumberOfPhotos();
 		}
 
-		final ArrayList<PhotoWrapper> tourPhotos = tourPhotoLink.tourPhotos;
-		final int numberOfPhotos = tourPhotos.size();
 		if (numberOfPhotos == 0) {
 			// no photos are available for this tour
 			return;

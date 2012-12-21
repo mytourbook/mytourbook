@@ -494,9 +494,16 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		// update the viewer
 		_rootItem = new TVITourBookRoot(this);
-		_tourViewer.setInput(this);
 
-		reselectTourViewer();
+		// delay loading, that the app filters are initialized
+		Display.getCurrent().asyncExec(new Runnable() {
+			public void run() {
+
+				_tourViewer.setInput(this);
+
+				reselectTourViewer();
+			}
+		});
 	}
 
 	private void createUI(final Composite parent) {

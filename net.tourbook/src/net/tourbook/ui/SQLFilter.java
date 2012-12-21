@@ -32,11 +32,19 @@ public class SQLFilter {
 	private ArrayList<Long>	_parameters		= new ArrayList<Long>();
 
 	public SQLFilter() {
+		this(true);
+	}
+
+	/**
+	 * @param isUsePhotoFilter
+	 *            When <code>false</code>, the photo filter is disabled.
+	 */
+	public SQLFilter(final boolean isUsePhotoFilter) {
 
 		final StringBuilder sb = new StringBuilder();
 
 		/*
-		 * get person filter
+		 * app filter: person
 		 */
 		final TourPerson activePerson = TourbookPlugin.getActivePerson();
 		if (activePerson == null) {
@@ -52,7 +60,15 @@ public class SQLFilter {
 		}
 
 		/*
-		 * get tour type filter
+		 * app filter: photo
+		 */
+		if (isUsePhotoFilter && TourbookPlugin.getActivePhotoFilter()) {
+
+			sb.append(" AND TourData.numberOfPhotos > 0"); //$NON-NLS-1$
+		}
+
+		/*
+		 * app filter: tour type
 		 */
 		final TourTypeFilter activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
 		if (activeTourTypeFilter != null) {

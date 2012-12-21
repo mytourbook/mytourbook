@@ -934,7 +934,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	 * @return Returns <code>true</code> when EXIF data for all (not filtered) photos are loaded.
 	 */
 	private boolean isEXIFDataLoaded() {
-
+x
 		final boolean isLoaded[] = new boolean[] { true };
 
 		try {
