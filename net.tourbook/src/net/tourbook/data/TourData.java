@@ -19,6 +19,7 @@ import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.EAGER;
 
 import java.awt.Point;
+import java.io.File;
 import java.io.PrintStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -1009,7 +1010,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * Contains photo data from a {@link PhotoWrapper}
 	 */
 	@Transient
-	private ArrayList<PhotoWrapper>							_tourPhotoWrapper;
+	private ArrayList<PhotoWrapper>							_tourPhotoWrapper					= new ArrayList<PhotoWrapper>();
 
 	/**
 	 * 
@@ -5024,15 +5025,29 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 		// photos are available in this tour
 
-		if (_tourPhotoWrapper == null) {
-			_tourPhotoWrapper = new ArrayList<PhotoWrapper>();
+		if (_tourPhotoWrapper.size() > 0) {
+			return _tourPhotoWrapper;
 		}
 
-		if (_tourPhotoWrapper.size() == 0) {
+		// photos are not yet set
 
-			// photos are not yet set
+		// create photo wrapper for all tour photos
+		for (final TourPhoto tourPhoto : tourPhotos) {
 
+			final File photoFile = new File(tourPhoto.getImageFilePathName());
+
+			final PhotoWrapper photoWrapper = new PhotoWrapper(photoFile);
+
+			photoWrapper.imageExifTime = tourPhoto.getImageExifTime();
+			photoWrapper.adjustedTime = tourPhoto.getAdjustedTime();
+			photoWrapper.isGeoFromExif = tourPhoto.isGeoFromPhoto();
+			photoWrapper.isPhotoWithGps = tourPhoto.getLatitude() != 0;
+//			photoWrapper=tourPhoto.;
+//			photoWrapper=tourPhoto.;
+
+			_tourPhotoWrapper.add(photoWrapper);
 		}
+
 		return _tourPhotoWrapper;
 	}
 
@@ -5796,7 +5811,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		tourPhotos.addAll(newTourPhotos);
 		numberOfPhotos = tourPhotos.size();
 
-		_tourPhotoWrapper
+//		_tourPhotoWrapper
 	}
 
 	/**

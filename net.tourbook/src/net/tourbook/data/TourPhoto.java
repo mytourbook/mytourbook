@@ -92,7 +92,7 @@ public class TourPhoto {
 
 	/**
 	 * Double.MIN_VALUE cannot be used, it cannot be saved in the database. 0 is the value when the
-	 * value is not set !!!
+	 * value is <b>NOT</b> set !!!
 	 */
 	private double			latitude			= 0;
 	private double			longitude			= 0;
@@ -215,6 +215,9 @@ public class TourPhoto {
 		return imageFilePathName;
 	}
 
+	/**
+	 * @return Returns 0 when latitude is <b>NOT</b> set.
+	 */
 	public double getLatitude() {
 		return latitude;
 	}
