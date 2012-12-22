@@ -84,6 +84,12 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 	private TourData				_tourData;
 	private TourPhotoLink			_tourPhotoLink;
 
+	/**
+	 * Chart update is forced, when previous selection was a photo link or current selection is a
+	 * photo link.
+	 */
+	private boolean					_isForceUpdate;
+
 	private PostSelectionProvider	_postSelectionProvider;
 	private ISelectionListener		_postSelectionListener;
 	private IPropertyChangeListener	_prefChangeListener;
@@ -400,6 +406,8 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 	private void onSelectionChanged(final ISelection selection) {
 
+		_isForceUpdate = _tourPhotoLink != null;
+
 		_tourPhotoLink = null;
 
 		if (selection instanceof SelectionTourData) {
@@ -420,7 +428,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 			final SelectionTourId selectionTourId = (SelectionTourId) selection;
 			final Long tourId = selectionTourId.getTourId();
 
-			updateChart(tourId, false);
+			updateChart(tourId);
 
 		} else if (selection instanceof SelectionTourIds) {
 
@@ -453,10 +461,10 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 				// paint regular tour
 
-				final boolean isForceUpdate = _tourPhotoLink != null;
+				// force update when photo link selection occured
+				_isForceUpdate = _tourPhotoLink != null;
 
-				// force update when photo selection occured
-				updateChart(tourIds.get(0), isForceUpdate);
+				updateChart(tourIds.get(0));
 			}
 
 		} else if (selection instanceof SelectionChartInfo) {
@@ -517,7 +525,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 			final Object firstElement = ((StructuredSelection) selection).getFirstElement();
 			if (firstElement instanceof TVICatalogComparedTour) {
 
-				updateChart(((TVICatalogComparedTour) firstElement).getTourId(), false);
+				updateChart(((TVICatalogComparedTour) firstElement).getTourId());
 
 			} else if (firstElement instanceof TVICompareResultComparedTour) {
 
@@ -533,7 +541,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 			final TVICatalogRefTourItem refItem = tourCatalogSelection.getRefItem();
 			if (refItem != null) {
-				updateChart(refItem.getTourId(), false);
+				updateChart(refItem.getTourId());
 			}
 
 		} else if (selection instanceof SelectionDeletedTours) {
@@ -629,9 +637,9 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 		setTitleToolTip(TourManager.getTourDateShort(_tourData));
 	}
 
-	private void updateChart(final long tourId, final boolean isForceUpdate) {
+	private void updateChart(final long tourId) {
 
-		if (_tourData != null && isForceUpdate == false && _tourData.getTourId() == tourId) {
+		if (_tourData != null && _tourData.getTourId() == tourId && _isForceUpdate == false) {
 			// optimize
 			return;
 		}

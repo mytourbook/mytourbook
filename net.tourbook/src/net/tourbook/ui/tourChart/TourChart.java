@@ -297,8 +297,7 @@ public class TourChart extends Chart {
 			}
 
 			// check if photos are available
-			final TourPhotoLink tourPhotoLink = _tourData.tourPhotoLink;
-			if (tourPhotoLink == null) {
+			if (_tourData.tourPhotoLink == null && _tourData.getNumberOfPhotos() == 0) {
 				return;
 			}
 

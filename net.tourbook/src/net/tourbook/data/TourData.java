@@ -5811,7 +5811,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		tourPhotos.addAll(newTourPhotos);
 		numberOfPhotos = tourPhotos.size();
 
-//		_tourPhotoWrapper
+//		a = 0;
 	}
 
 	/**
