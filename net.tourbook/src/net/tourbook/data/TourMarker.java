@@ -127,7 +127,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 
 	private String					category				= UI.EMPTY_STRING;
 
-	private int						isMarkerVisible;
+	private int						isMarkerVisible			= 1;
 
 	/**
 	 * visibleType is used to show the marker with different visible effects (color)
