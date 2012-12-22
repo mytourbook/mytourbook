@@ -1217,6 +1217,8 @@ public class Messages extends NLS {
 	public static String		Tour_Marker_Column_horizontal_offset_tooltip;
 	public static String		Tour_Marker_Column_IsVisible;
 	public static String		Tour_Marker_Column_IsVisible_Tooltip;
+
+	public static String	Tour_Marker_Column_IsVisibleNoEdit_Tooltip;
 	public static String		Tour_Marker_Column_km_tooltip;
 	public static String		Tour_Marker_Column_remark;
 	public static String		Tour_Marker_Column_time;

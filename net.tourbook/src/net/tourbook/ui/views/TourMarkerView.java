@@ -438,124 +438,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 
 		_markerViewer = new TableViewer(table);
 
-		/*
-		 * create columns
-		 */
-		TableViewerColumn tvc;
-		TableColumn tvcColumn;
-
-		// column: time
-		tvc = new TableViewerColumn(_markerViewer, SWT.TRAIL);
-		tvcColumn = tvc.getColumn();
-		tvcColumn.setText(Messages.Tour_Marker_Column_time);
-		tvc.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				cell.setText(UI.format_hh_mm_ss(((TourMarker) cell.getElement()).getTime()));
-			}
-		});
-		tableLayout.setColumnData(tvcColumn, new ColumnPixelData(_pc.convertWidthInCharsToPixels(12), false));
-
-		// column: distance km/mi
-		tvc = new TableViewerColumn(_markerViewer, SWT.TRAIL);
-		tvcColumn = tvc.getColumn();
-		tvcColumn.setText(UI.UNIT_LABEL_DISTANCE);
-		tvcColumn.setToolTipText(Messages.Tour_Marker_Column_km_tooltip);
-		tvc.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final TourMarker tourMarker = (TourMarker) cell.getElement();
-
-				final float markerDistance = tourMarker.getDistance();
-				if (markerDistance == -1) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(_nf_3_3.format(markerDistance / 1000 / UI.UNIT_VALUE_DISTANCE));
-				}
-
-				if (tourMarker.getType() == ChartLabel.MARKER_TYPE_DEVICE) {
-					cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-				}
-			}
-		});
-		tableLayout.setColumnData(tvcColumn, new ColumnPixelData(_pc.convertWidthInCharsToPixels(11), false));
-
-		if (_isShowDelta) {
-
-			// column: delta distance km/mi
-			tvc = new TableViewerColumn(_markerViewer, SWT.TRAIL);
-			tvcColumn = tvc.getColumn();
-			tvcColumn.setText(UI.SYMBOL_DIFFERENCE + UI.UNIT_LABEL_DISTANCE);
-			tvc.setLabelProvider(new CellLabelProvider() {
-				@Override
-				public void update(final ViewerCell cell) {
-
-					final TourMarker tourMarker = (TourMarker) cell.getElement();
-
-					final float markerDistance = tourMarker.getDistance();
-					if (markerDistance == -1) {
-						cell.setText(UI.EMPTY_STRING);
-					} else {
-						float prevDistance = 0;
-						final ViewerRow lastRow = cell.getViewerRow().getNeighbor(ViewerRow.ABOVE, false);
-						if (null != lastRow) {
-							prevDistance = ((TourMarker) lastRow.getElement()).getDistance();
-							prevDistance = prevDistance < 0 ? 0 : prevDistance;
-						}
-						cell.setText(_nf_3_3.format((markerDistance - prevDistance)
-								/ 1000
-								/ UI.UNIT_VALUE_DISTANCE));
-					}
-				}
-			});
-			tableLayout.setColumnData(tvcColumn, new ColumnPixelData(_pc.convertWidthInCharsToPixels(11), false));
-
-			// column: delta-time
-			tvc = new TableViewerColumn(_markerViewer, SWT.TRAIL);
-			tvcColumn = tvc.getColumn();
-			tvcColumn.setText(UI.SYMBOL_DIFFERENCE + Messages.Tour_Marker_Column_time);
-			tvc.setLabelProvider(new CellLabelProvider() {
-				@Override
-				public void update(final ViewerCell cell) {
-					final ViewerRow lastRow = cell.getViewerRow().getNeighbor(ViewerRow.ABOVE, false);
-					int lastTime = 0;
-					if (null != lastRow) {
-						lastTime = ((TourMarker) lastRow.getElement()).getTime();
-					}
-					cell.setText(UI.format_hh_mm_ss(((TourMarker) cell.getElement()).getTime() - lastTime));
-					final String text = ((TourMarker) cell.getElement()).getLabel();
-					if (text.endsWith(UI.SYMBOL_EXCLAMATION_POINT)) {
-						final Display display = Display.getCurrent();
-						if (null != display) {
-							cell.setForeground(display.getSystemColor(SWT.COLOR_RED));
-						}
-						if (null == _boldFont) {
-							final FontData fd = (cell.getFont().getFontData())[0];
-							fd.setStyle(SWT.BOLD);
-							_boldFont = new Font(Display.getCurrent(), fd);
-						}
-						cell.setFont(_boldFont);
-					}
-				}
-			});
-			tableLayout.setColumnData(tvcColumn, new ColumnPixelData(_pc.convertWidthInCharsToPixels(12), false));
-		}
-
-		// column: remark
-		tvc = new TableViewerColumn(_markerViewer, SWT.LEAD);
-		tvcColumn = tvc.getColumn();
-		tvcColumn.setText(Messages.Tour_Marker_Column_remark);
-		tvc.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final TourMarker tourMarker = (TourMarker) cell.getElement();
-
-				cell.setText(tourMarker.getLabel());
-			}
-		});
-		tableLayout.setColumnData(tvcColumn, new ColumnWeightData(50, true));
+		defineAllColumn(tableLayout);
 
 		/*
 		 * create table viewer
@@ -609,6 +492,190 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 		table.setMenu(menu);
 
 		getSite().registerContextMenu(menuMgr, _markerViewer);
+	}
+
+	private void defineAllColumn(final TableColumnLayout tableLayout) {
+		/*
+		 * create columns
+		 */
+
+		defineColumn_Time(tableLayout);
+		defineColumn_Distance(tableLayout);
+		if (_isShowDelta) {
+			defineColumn_DeltaDistance(tableLayout);
+			defineColumn_DeltaTime(tableLayout);
+		}
+
+		defineColumn_Label(tableLayout);
+		defineColumn_IsVisible(tableLayout);
+	}
+
+	/**
+	 * column: delta distance km/mi
+	 * 
+	 * @param tableLayout
+	 */
+	private void defineColumn_DeltaDistance(final TableColumnLayout tableLayout) {
+
+		final TableViewerColumn tvc = new TableViewerColumn(_markerViewer, SWT.TRAIL);
+		final TableColumn tvcColumn = tvc.getColumn();
+
+		tvcColumn.setText(UI.SYMBOL_DIFFERENCE + UI.UNIT_LABEL_DISTANCE);
+		tvc.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourMarker tourMarker = (TourMarker) cell.getElement();
+
+				final float markerDistance = tourMarker.getDistance();
+				if (markerDistance == -1) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					float prevDistance = 0;
+					final ViewerRow lastRow = cell.getViewerRow().getNeighbor(ViewerRow.ABOVE, false);
+					if (null != lastRow) {
+						prevDistance = ((TourMarker) lastRow.getElement()).getDistance();
+						prevDistance = prevDistance < 0 ? 0 : prevDistance;
+					}
+					cell.setText(_nf_3_3.format((markerDistance - prevDistance) / 1000 / UI.UNIT_VALUE_DISTANCE));
+				}
+			}
+		});
+		tableLayout.setColumnData(tvcColumn, new ColumnPixelData(_pc.convertWidthInCharsToPixels(11), false));
+	}
+
+	/**
+	 * column: delta-time
+	 * 
+	 * @param tableLayout
+	 */
+	private void defineColumn_DeltaTime(final TableColumnLayout tableLayout) {
+
+		final TableViewerColumn tvc = new TableViewerColumn(_markerViewer, SWT.TRAIL);
+		final TableColumn tvcColumn = tvc.getColumn();
+		tvcColumn.setText(UI.SYMBOL_DIFFERENCE + Messages.Tour_Marker_Column_time);
+		tvc.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final ViewerRow lastRow = cell.getViewerRow().getNeighbor(ViewerRow.ABOVE, false);
+				int lastTime = 0;
+				if (null != lastRow) {
+					lastTime = ((TourMarker) lastRow.getElement()).getTime();
+				}
+				cell.setText(UI.format_hh_mm_ss(((TourMarker) cell.getElement()).getTime() - lastTime));
+				final String text = ((TourMarker) cell.getElement()).getLabel();
+				if (text.endsWith(UI.SYMBOL_EXCLAMATION_POINT)) {
+					final Display display = Display.getCurrent();
+					if (null != display) {
+						cell.setForeground(display.getSystemColor(SWT.COLOR_RED));
+					}
+					if (null == _boldFont) {
+						final FontData fd = (cell.getFont().getFontData())[0];
+						fd.setStyle(SWT.BOLD);
+						_boldFont = new Font(Display.getCurrent(), fd);
+					}
+					cell.setFont(_boldFont);
+				}
+			}
+		});
+		tableLayout.setColumnData(tvcColumn, new ColumnPixelData(_pc.convertWidthInCharsToPixels(12), false));
+	}
+
+	/**
+	 * column: distance km/mi
+	 * 
+	 * @param tableLayout
+	 */
+	private void defineColumn_Distance(final TableColumnLayout tableLayout) {
+
+		final TableViewerColumn tvc = new TableViewerColumn(_markerViewer, SWT.TRAIL);
+		final TableColumn tvcColumn = tvc.getColumn();
+		tvcColumn.setText(UI.UNIT_LABEL_DISTANCE);
+		tvcColumn.setToolTipText(Messages.Tour_Marker_Column_km_tooltip);
+		tvc.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourMarker tourMarker = (TourMarker) cell.getElement();
+
+				final float markerDistance = tourMarker.getDistance();
+				if (markerDistance == -1) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(_nf_3_3.format(markerDistance / 1000 / UI.UNIT_VALUE_DISTANCE));
+				}
+
+				if (tourMarker.getType() == ChartLabel.MARKER_TYPE_DEVICE) {
+					cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+				}
+			}
+		});
+		tableLayout.setColumnData(tvcColumn, new ColumnPixelData(_pc.convertWidthInCharsToPixels(11), false));
+	}
+
+	/**
+	 * column: marker
+	 */
+	private void defineColumn_IsVisible(final TableColumnLayout tableLayout) {
+
+		final TableViewerColumn tvc = new TableViewerColumn(_markerViewer, SWT.LEAD);
+		final TableColumn tc = tvc.getColumn();
+
+		tc.setText(Messages.Tour_Marker_Column_IsVisible);
+		tc.setToolTipText(Messages.Tour_Marker_Column_IsVisibleNoEdit_Tooltip);
+
+		tvc.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourMarker tourMarker = (TourMarker) cell.getElement();
+				cell.setText(tourMarker.isMarkerVisible()
+						? Messages.App_Label_BooleanYes
+						: Messages.App_Label_BooleanNo);
+			}
+		});
+		tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(8), false));
+	}
+
+	/**
+	 * column: label
+	 * 
+	 * @param tableLayout
+	 */
+	private void defineColumn_Label(final TableColumnLayout tableLayout) {
+
+		final TableViewerColumn tvc = new TableViewerColumn(_markerViewer, SWT.LEAD);
+		final TableColumn tvcColumn = tvc.getColumn();
+		tvcColumn.setText(Messages.Tour_Marker_Column_remark);
+		tvc.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourMarker tourMarker = (TourMarker) cell.getElement();
+
+				cell.setText(tourMarker.getLabel());
+			}
+		});
+		tableLayout.setColumnData(tvcColumn, new ColumnWeightData(50, true));
+	}
+
+	/**
+	 * column: time
+	 * 
+	 * @param tableLayout
+	 */
+	private void defineColumn_Time(final TableColumnLayout tableLayout) {
+
+		final TableViewerColumn tvc = new TableViewerColumn(_markerViewer, SWT.TRAIL);
+		final TableColumn tvcColumn = tvc.getColumn();
+		tvcColumn.setText(Messages.Tour_Marker_Column_time);
+		tvc.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				cell.setText(UI.format_hh_mm_ss(((TourMarker) cell.getElement()).getTime()));
+			}
+		});
+		tableLayout.setColumnData(tvcColumn, new ColumnPixelData(_pc.convertWidthInCharsToPixels(12), false));
 	}
 
 	@Override
