@@ -20,9 +20,9 @@ import net.tourbook.common.util.Util;
 import net.tourbook.photo.IPhotoGalleryProvider;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.IPhotoProvider;
+import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoGallery;
 import net.tourbook.photo.PhotoSelection;
-import net.tourbook.photo.PhotoWrapper;
 import net.tourbook.photo.internal.Messages;
 
 import org.eclipse.jface.action.IStatusLineManager;
@@ -632,7 +632,7 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 	private void showImages_10_InGallery() {
 
 		final IPhotoProvider photoProvider = _sourceGallery.getPhotoProvider();
-		final PhotoWrapper[] photoWrapper = photoProvider.getSortedAndFilteredPhotoWrapper();
+		final Photo[] photoWrapper = photoProvider.getSortedAndFilteredPhotoWrapper();
 
 		final int photosHash = photoWrapper.hashCode();
 		final String galleryPositionKey = photosHash + "_FullScreenPhotoGallery";//$NON-NLS-1$

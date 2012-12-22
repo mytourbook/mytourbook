@@ -27,7 +27,6 @@ import javax.persistence.Transient;
 import net.tourbook.common.UI;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.photo.Photo;
-import net.tourbook.photo.PhotoWrapper;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -116,13 +115,13 @@ public class TourPhoto {
 	// constructor is required for hibernate
 	public TourPhoto() {}
 
-	public TourPhoto(final TourData tourData, final PhotoWrapper photoWrapper) {
+	public TourPhoto(final TourData tourData, final Photo photo) {
 
 		_createId = ++_createCounter;
 
 		this.tourData = tourData;
 
-		final File imageFile = photoWrapper.imageFile;
+		final File imageFile = photo.imageFile;
 
 		final String filePathName = imageFile.getAbsolutePath();
 		final IPath filePath = new Path(filePathName);
@@ -135,18 +134,16 @@ public class TourPhoto {
 		imageFilePathName = filePathName;
 
 		imageFileLastModified = imageFile.lastModified();
-		imageExifTime = photoWrapper.imageExifTime;
+		imageExifTime = photo.imageExifTime;
 
-		final long photoAdjustedTime = photoWrapper.adjustedTime;
+		final long photoAdjustedTime = photo.adjustedTime;
 		adjustedTime = photoAdjustedTime == Long.MIN_VALUE ? imageExifTime : photoAdjustedTime;
 
-		if (photoWrapper.isGeoFromExif) {
+		if (photo.isGeoFromExif) {
 			setIsGeoFromPhoto();
 		} else {
 			setIsGeoFromTour();
 		}
-
-		final Photo photo = photoWrapper.photo;
 
 		latitude = photo.getLatitude();
 		longitude = photo.getLongitude();

@@ -129,7 +129,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 	private ArrayList<TourPhotoLink>				_visibleTourPhotoLinks				= new ArrayList<TourPhotoLink>();
 
-	private ArrayList<PhotoWrapper>					_allPhotos							= new ArrayList<PhotoWrapper>();
+	private ArrayList<Photo>				_allPhotos							= new ArrayList<Photo>();
 
 	/**
 	 * Contains all cameras which are used in all displayed tours.
@@ -186,7 +186,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 				.toFormatter();
 	}
 
-	private final Comparator<? super PhotoWrapper>	_adjustTimeComparator;
+	private final Comparator<? super Photo>	_adjustTimeComparator;
 
 	/**
 	 * When <code>true</code>, only tours with photos are displayed.
@@ -223,10 +223,10 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 //	private Button									_rdoAdjustSelectedTours;
 
 	{
-		_adjustTimeComparator = new Comparator<PhotoWrapper>() {
+		_adjustTimeComparator = new Comparator<Photo>() {
 
 			@Override
-			public int compare(final PhotoWrapper wrapper1, final PhotoWrapper wrapper2) {
+			public int compare(final Photo wrapper1, final Photo wrapper2) {
 
 				final long diff = wrapper1.adjustedTime - wrapper2.adjustedTime;
 
@@ -356,7 +356,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 				if (isRealTour) {
 
-					final ArrayList<PhotoWrapper> tourPhotoWrapper = photoLink.tourPhotos;
+					final ArrayList<Photo> tourPhotoWrapper = photoLink.tourPhotos;
 
 					if (tourPhotoWrapper.size() > 0) {
 
@@ -369,7 +369,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 							// remove previous photos
 							tourPhotos.clear();
 
-							for (final PhotoWrapper photoWrapper : tourPhotoWrapper) {
+							for (final Photo photoWrapper : tourPhotoWrapper) {
 								tourPhotos.add(new TourPhoto(tourData, photoWrapper));
 							}
 
@@ -1488,7 +1488,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 			TourPhotoLink linkSelection = null;
 
-			final ArrayList<PhotoWrapper> tourPhotos = prevTourPhotoLink.tourPhotos;
+			final ArrayList<Photo> tourPhotos = prevTourPhotoLink.tourPhotos;
 			if (tourPhotos.size() > 0) {
 
 				// get tour for the first photo
@@ -1579,15 +1579,15 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 	private void setPhotoTimeAdjustment() {
 
-		for (final PhotoWrapper photoWrapper : _allPhotos) {
+		for (final Photo photo : _allPhotos) {
 
-			final long exifTime = photoWrapper.imageExifTime;
-			final long cameraTimeAdjustment = photoWrapper.camera.timeAdjustment;
+			final long exifTime = photo.imageExifTime;
+			final long cameraTimeAdjustment = photo.camera.timeAdjustment;
 
-			photoWrapper.adjustedTime = exifTime + cameraTimeAdjustment;
+			photo.adjustedTime = exifTime + cameraTimeAdjustment;
 
 			// force that the position are updated
-			photoWrapper.photo.resetWorldPosition();
+			photo.resetWorldPosition();
 		}
 
 		Collections.sort(_allPhotos, _adjustTimeComparator);
@@ -1596,7 +1596,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 	/**
 	 * @param tourPhotos
 	 */
-	void showPhotosAndTours(final ArrayList<PhotoWrapper> tourPhotos) {
+	void showPhotosAndTours(final ArrayList<Photo> tourPhotos) {
 
 		final int numberOfPhotos = tourPhotos.size();
 
@@ -1612,9 +1612,9 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 		_allTourCameras.clear();
 
 		// ensure camera is set in all photos
-		for (final PhotoWrapper photoWrapper : _allPhotos) {
-			if (photoWrapper.camera == null) {
-				_photoMgr.setCamera(photoWrapper.photo, _allTourCameras);
+		for (final Photo photo : _allPhotos) {
+			if (photo.camera == null) {
+				_photoMgr.setCamera(photo, _allTourCameras);
 			}
 		}
 

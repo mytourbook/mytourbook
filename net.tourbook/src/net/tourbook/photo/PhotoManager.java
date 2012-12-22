@@ -201,7 +201,7 @@ public class PhotoManager {
 	 * @param isShowToursOnlyWithPhotos
 	 * @param _allTourCameras
 	 */
-	void createTourPhotoLinks(	final ArrayList<PhotoWrapper> allPhotos,
+	void createTourPhotoLinks(	final ArrayList<Photo> allPhotos,
 								final ArrayList<TourPhotoLink> visibleTourPhotoLinks,
 								final HashMap<String, Camera> allTourCameras,
 								final boolean isShowToursOnlyWithPhotos) {
@@ -219,10 +219,9 @@ public class PhotoManager {
 		long photoTime = 0;
 
 		// loop: all photos
-		for (final PhotoWrapper photoWrapper : allPhotos) {
+		for (final Photo photo : allPhotos) {
 
-			final Photo photo = photoWrapper.photo;
-			photoTime = photoWrapper.adjustedTime;
+			photoTime = photo.adjustedTime;
 
 			// check if current photo can be put into current tour photo link
 			if (currentTourPhotoLink.isHistoryTour == false && photoTime <= currentTourPhotoLink.tourEndTime) {
@@ -312,7 +311,7 @@ public class PhotoManager {
 				}
 			}
 
-			currentTourPhotoLink.tourPhotos.add(photoWrapper);
+			currentTourPhotoLink.tourPhotos.add(photo);
 
 			// set camera into the photo
 			final Camera camera = setCamera(photo, allTourCameras);
@@ -352,7 +351,7 @@ public class PhotoManager {
 		}
 	}
 
-	void createTourPhotoLinks_01_OneHistoryTour(final ArrayList<PhotoWrapper> allPhotos,
+	void createTourPhotoLinks_01_OneHistoryTour(final ArrayList<Photo> allPhotos,
 												final ArrayList<TourPhotoLink> visibleTourPhotoLinks,
 												final HashMap<String, Camera> allTourCameras) {
 
@@ -363,9 +362,7 @@ public class PhotoManager {
 		final TourPhotoLink historyTour = new TourPhotoLink(allPhotos.get(0).adjustedTime);
 		historyTour.tourPhotos.addAll(allPhotos);
 
-		for (final PhotoWrapper photoWrapper : allPhotos) {
-
-			final Photo photo = photoWrapper.photo;
+		for (final Photo photo : allPhotos) {
 
 			// set camera into the photo
 			final Camera camera = setCamera(photo, allTourCameras);
@@ -394,7 +391,7 @@ public class PhotoManager {
 	 * 
 	 * @param allPhotos
 	 */
-	private TourPhotoLink createTourPhotoLinks_10_GetFirstTour(final ArrayList<PhotoWrapper> allPhotos) {
+	private TourPhotoLink createTourPhotoLinks_10_GetFirstTour(final ArrayList<Photo> allPhotos) {
 
 		TourPhotoLink currentTourPhotoLink = null;
 
@@ -403,7 +400,7 @@ public class PhotoManager {
 			// real tours are available
 
 			final TourPhotoLink firstTour = _dbTourPhotoLinks.get(0);
-			final PhotoWrapper firstPhotoWrapper = allPhotos.get(0);
+			final Photo firstPhotoWrapper = allPhotos.get(0);
 
 			final DateTime firstPhotoTime = new DateTime(firstPhotoWrapper.adjustedTime);
 			if (firstPhotoTime.isBefore(firstTour.tourStartTime)) {
@@ -635,7 +632,7 @@ public class PhotoManager {
 	 *         is returned when all photo time stamps are within the previously loaded tours.
 	 */
 
-	private void loadToursFromDb(final ArrayList<PhotoWrapper> allPhotos, final boolean isResetGeoPosition) {
+	private void loadToursFromDb(final ArrayList<Photo> allPhotos, final boolean isResetGeoPosition) {
 
 		/*
 		 * get date for 1st and last photo
@@ -643,9 +640,9 @@ public class PhotoManager {
 		long firstPhotoTime = allPhotos.get(0).adjustedTime;
 		long lastPhotoTime = firstPhotoTime;
 
-		for (final PhotoWrapper photoWrapper : allPhotos) {
+		for (final Photo photo : allPhotos) {
 
-			final long imageTime = photoWrapper.adjustedTime;
+			final long imageTime = photo.adjustedTime;
 
 			if (imageTime < firstPhotoTime) {
 				firstPhotoTime = imageTime;
@@ -658,7 +655,7 @@ public class PhotoManager {
 			 * by a tour anymore
 			 */
 			if (isResetGeoPosition) {
-				photoWrapper.photo.resetTourGeoPosition();
+				photo.resetTourGeoPosition();
 			}
 		}
 
@@ -871,7 +868,7 @@ public class PhotoManager {
 		}
 
 		allTourCameras.put(camera.cameraName, camera);
-		photo.getPhotoWrapper().camera = camera;
+		photo.camera = camera;
 
 		return camera;
 	}
@@ -1141,9 +1138,7 @@ public class PhotoManager {
 			tourPhotoLink.numberOfGPSPhotos = 0;
 			tourPhotoLink.numberOfNoGPSPhotos = 0;
 
-			for (final PhotoWrapper photoWrapper : tourPhotoLink.tourPhotos) {
-
-				final Photo photo = photoWrapper.photo;
+			for (final Photo photo : tourPhotoLink.tourPhotos) {
 
 				// set number of GPS/No GPS photos
 				final double latitude = photo.getLatitude();
@@ -1158,7 +1153,7 @@ public class PhotoManager {
 
 	private void setTourGPSIntoPhotos_10(final TourPhotoLink tourPhotoLink) {
 
-		final ArrayList<PhotoWrapper> allPhotoWrapper = tourPhotoLink.tourPhotos;
+		final ArrayList<Photo> allPhotoWrapper = tourPhotoLink.tourPhotos;
 
 		final int numberOfPhotos = allPhotoWrapper.size();
 		if (numberOfPhotos == 0) {
@@ -1201,7 +1196,7 @@ public class PhotoManager {
 		int photoIndex = 0;
 
 		// get first photo
-		PhotoWrapper photoWrapper = allPhotoWrapper.get(photoIndex);
+		Photo photoWrapper = allPhotoWrapper.get(photoIndex);
 
 		// loop: time serie
 		while (true) {
@@ -1300,15 +1295,13 @@ public class PhotoManager {
 
 	private void setTourGPSIntoPhotos_20(final TourData tourData,
 //											final Set<TourPhoto> tourPhotosSet,
-											final PhotoWrapper photoWrapper,
+											final Photo photo,
 											final double tourLatitude,
 											final double tourLongitude) {
 
 //		final TourPhoto tourPhoto = new TourPhoto(tourData, photoWrapper.imageFile, photoWrapper.imageExifTime);
 
-		final Photo photo = photoWrapper.photo;
-
-		if (photoWrapper.isGeoFromExif /* && _isOverwritePhotoGPS == false */) {
+		if (photo.isGeoFromExif /* && _isOverwritePhotoGPS == false */) {
 
 			// photo contains already EXIF GPS
 

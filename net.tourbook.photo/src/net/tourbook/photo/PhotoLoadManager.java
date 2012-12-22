@@ -476,7 +476,7 @@ public class PhotoLoadManager {
 					return;
 				}
 
-				final String errorKey = imageLoader.getPhoto().getPhotoWrapper().imageFilePathName;
+				final String errorKey = imageLoader.getPhoto().imageFilePathName;
 
 				if (_photoWithLoadingError.containsKey(errorKey)) {
 
@@ -538,7 +538,7 @@ public class PhotoLoadManager {
 					return;
 				}
 
-				final String errorKey = imageLoader.getPhoto().getPhotoWrapper().imageFilePathName;
+				final String errorKey = imageLoader.getPhoto().imageFilePathName;
 
 				if (_photoWithLoadingError.containsKey(errorKey)) {
 

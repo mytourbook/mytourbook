@@ -25,7 +25,6 @@ import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoImageCache;
 import net.tourbook.photo.PhotoImageMetadata;
 import net.tourbook.photo.PhotoLoadManager;
-import net.tourbook.photo.PhotoWrapper;
 import net.tourbook.photo.internal.gallery.MT20.GalleryMT20;
 import net.tourbook.photo.internal.gallery.MT20.GalleryMT20Item;
 import net.tourbook.photo.internal.gallery.MT20.RendererHelper;
@@ -60,7 +59,6 @@ public class GalleryPhotoToolTip extends AnimatedToolTipShell {
 
 	private GalleryMT20				_gallery;
 
-	private PhotoWrapper			_photoWrapper;
 	private Photo					_photo;
 
 	/**
@@ -154,7 +152,7 @@ public class GalleryPhotoToolTip extends AnimatedToolTipShell {
 				// image filename
 				Label label = new Label(containerHeader, SWT.NONE);
 				GridDataFactory.fillDefaults().applyTo(label);
-				label.setText(_photoWrapper.imageFileName);
+				label.setText(_photo.imageFileName);
 
 				if (isImageLoaded) {
 					// dimension
@@ -253,7 +251,7 @@ public class GalleryPhotoToolTip extends AnimatedToolTipShell {
 
 			createUI_MetadataLine2(container, //
 					Messages.Photo_ToolTip_Size,
-					_nfMByte.format(_photoWrapper.imageFileSize / 1024.0 / 1024.0) + UI.SPACE2 + UI.UNIT_MBYTES,
+					_nfMByte.format(_photo.imageFileSize / 1024.0 / 1024.0) + UI.SPACE2 + UI.UNIT_MBYTES,
 					imageDirection);
 
 			if (isTitle) {
@@ -537,7 +535,6 @@ public class GalleryPhotoToolTip extends AnimatedToolTipShell {
 	public void reset(final boolean isHide) {
 
 		_currentHoveredGalleryItem = null;
-		_photoWrapper = null;
 		_photo = null;
 
 		if (isHide) {
@@ -573,16 +570,15 @@ public class GalleryPhotoToolTip extends AnimatedToolTipShell {
 				reset(true);
 			}
 
-			_photoWrapper = (PhotoWrapper) hoveredItem.customData;
+			_photo = (Photo) hoveredItem.customData;
 
-			if (_photoWrapper == null) {
+			if (_photo == null) {
 
 				reset(true);
 
 			} else {
 
 				_currentHoveredGalleryItem = hoveredItem;
-				_photo = _photoWrapper.photo;
 
 				showToolTip();
 			}

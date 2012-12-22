@@ -17,6 +17,6 @@ package net.tourbook.photo;
 
 public interface IPhotoProvider {
 
-	public PhotoWrapper[] getSortedAndFilteredPhotoWrapper();
+	public Photo[] getSortedAndFilteredPhotoWrapper();
 
 }

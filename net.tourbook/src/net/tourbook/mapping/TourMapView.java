@@ -42,7 +42,6 @@ import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoEventId;
 import net.tourbook.photo.PhotoManager;
 import net.tourbook.photo.PhotoSelection;
-import net.tourbook.photo.PhotoWrapper;
 import net.tourbook.photo.TourPhotoLink;
 import net.tourbook.photo.TourPhotoLinkSelection;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -193,7 +192,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 	/**
 	 * contains photos which are displayed in the map
 	 */
-	private final ArrayList<PhotoWrapper>			_photoList							= new ArrayList<PhotoWrapper>();
+	private final ArrayList<Photo>					_photoList							= new ArrayList<Photo>();
 
 	private boolean									_isShowTour;
 	private boolean									_isShowPhoto;
@@ -814,7 +813,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 	 * @param allPhotoWrapper
 	 * @param isForceZooming
 	 */
-	private void centerPhotos(final ArrayList<PhotoWrapper> allPhotoWrapper, final boolean isForceZooming) {
+	private void centerPhotos(final ArrayList<Photo> allPhotoWrapper, final boolean isForceZooming) {
 
 		final Set<GeoPosition> positionBounds = getPhotoBounds(allPhotoWrapper);
 		if (positionBounds == null) {
@@ -1688,7 +1687,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 	 * @param allPhotoWrapper
 	 * @return
 	 */
-	private Set<GeoPosition> getPhotoBounds(final ArrayList<PhotoWrapper> allPhotoWrapper) {
+	private Set<GeoPosition> getPhotoBounds(final ArrayList<Photo> allPhotoWrapper) {
 
 		/*
 		 * get min/max longitude/latitude
@@ -1700,10 +1699,9 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 		boolean isFirst = true;
 
-		for (final PhotoWrapper photoWrapper : allPhotoWrapper) {
-			if (photoWrapper.isPhotoWithGps) {
+		for (final Photo photo : allPhotoWrapper) {
+			if (photo.isPhotoWithGps) {
 
-				final Photo photo = photoWrapper.photo;
 				final double latitude = photo.getLatitude();
 				final double longitude = photo.getLongitude();
 
@@ -1939,7 +1937,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 				// history tour (without tours) is displayed
 
-				final ArrayList<PhotoWrapper> allPhotoWrapper = paintPhotoSelection(selection);
+				final ArrayList<Photo> allPhotoWrapper = paintPhotoSelection(selection);
 
 				if (allPhotoWrapper != null) {
 
@@ -2220,7 +2218,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 //		_map.paint();
 //	}
 
-	private void paintPhotos(final ArrayList<PhotoWrapper> photoWrapperList, final boolean isForceZooming) {
+	private void paintPhotos(final ArrayList<Photo> photoWrapperList, final boolean isForceZooming) {
 
 		_photoList.clear();
 		_photoList.addAll(photoWrapperList);
@@ -2243,13 +2241,13 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 	 * @return Returns a list which contains all photos, or <code>null</code> when photos are not
 	 *         contained in the selection.
 	 */
-	private ArrayList<PhotoWrapper> paintPhotoSelection(final ISelection selection) {
+	private ArrayList<Photo> paintPhotoSelection(final ISelection selection) {
 
 		if (selection instanceof TourPhotoLinkSelection) {
 
 			final TourPhotoLinkSelection linkSelection = (TourPhotoLinkSelection) selection;
 
-			final ArrayList<PhotoWrapper> allPhotoWrapper = new ArrayList<PhotoWrapper>();
+			final ArrayList<Photo> allPhotoWrapper = new ArrayList<Photo>();
 
 			final ArrayList<TourPhotoLink> tourPhotoLinks = linkSelection.tourPhotoLinks;
 

@@ -20,7 +20,7 @@ import java.util.Set;
 
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.data.TourData;
-import net.tourbook.photo.PhotoWrapper;
+import net.tourbook.photo.Photo;
 
 /**
  * Contains data which are needed to paint a tour into a map.
@@ -30,7 +30,7 @@ public class TourPainterConfiguration {
 	private static TourPainterConfiguration	_instance;
 
 	private final ArrayList<TourData>		_tourDataList	= new ArrayList<TourData>();
-	private final ArrayList<PhotoWrapper>	_photoWrapper	= new ArrayList<PhotoWrapper>();
+	private final ArrayList<Photo>			_photoWrapper	= new ArrayList<Photo>();
 
 	/**
 	 * contains the upper left and lower right position for a tour
@@ -62,7 +62,7 @@ public class TourPainterConfiguration {
 		return _legendProvider;
 	}
 
-	public ArrayList<PhotoWrapper> getPhotos() {
+	public ArrayList<Photo> getPhotos() {
 		return _photoWrapper;
 	}
 
@@ -106,7 +106,7 @@ public class TourPainterConfiguration {
 	 *            When <code>null</code>, photos are not displayed.
 	 * @param isShowPhoto
 	 */
-	public void setPhotos(final ArrayList<PhotoWrapper> photoWrapper, final boolean isShowPhoto) {
+	public void setPhotos(final ArrayList<Photo> photoWrapper, final boolean isShowPhoto) {
 
 		_photoWrapper.clear();
 

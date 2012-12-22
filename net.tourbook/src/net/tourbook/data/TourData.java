@@ -69,7 +69,7 @@ import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.math.Smooth;
-import net.tourbook.photo.PhotoWrapper;
+import net.tourbook.photo.Photo;
 import net.tourbook.photo.TourPhotoLink;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageComputedValues;
@@ -1010,7 +1010,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * Contains photo data from a {@link PhotoWrapper}
 	 */
 	@Transient
-	private ArrayList<PhotoWrapper>							_tourPhotoWrapper					= new ArrayList<PhotoWrapper>();
+	private ArrayList<Photo>								_tourPhotoWrapper					= new ArrayList<Photo>();
 
 	/**
 	 * 
@@ -5017,7 +5017,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * @return Returns <code>null</code> when tour do not contains photos, otherwise a list of
 	 *         {@link PhotoWrapper} is returned.
 	 */
-	public ArrayList<PhotoWrapper> getTourPhotoWrapper() {
+	public ArrayList<Photo> getTourPhotoWrapper() {
 
 		if (tourPhotos.size() == 0) {
 			return null;
@@ -5036,7 +5036,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 			final File photoFile = new File(tourPhoto.getImageFilePathName());
 
-			final PhotoWrapper photoWrapper = new PhotoWrapper(photoFile);
+			final Photo photoWrapper = new Photo(photoFile);
 
 			photoWrapper.imageExifTime = tourPhoto.getImageExifTime();
 			photoWrapper.adjustedTime = tourPhoto.getAdjustedTime();

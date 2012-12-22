@@ -16,6 +16,7 @@
 package net.tourbook.photo;
 
 import java.awt.Point;
+import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +26,7 @@ import net.tourbook.common.map.CommonMapProvider;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
+import net.tourbook.photo.internal.gallery.MT20.IGalleryCustomData;
 import net.tourbook.photo.internal.gallery.MT20.RendererHelper;
 
 import org.apache.commons.imaging.Imaging;
@@ -47,11 +49,61 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-public class Photo {
-
-	private PhotoWrapper					_photoWrapper;
+public class Photo implements IGalleryCustomData {
 
 	private String							_uniqueId;
+
+	/**
+	 * Photo image file
+	 */
+	public File								imageFile;
+
+	public String							imageFileName;
+	public String							imageFileExt;
+
+	/**
+	 * File path name is the unique key for a photowrapper.
+	 */
+	public String							imageFilePathName;
+
+	/**
+	 * Last modified in GMT
+	 */
+	public long								imageFileLastModified;
+
+	/**
+	 * Exif time in milliseconds, when not available, the last modified time of the image file is
+	 * used.
+	 */
+	public long								imageExifTime;
+
+	/**
+	 * Time in ms (or {@link Long#MIN_VALUE} when not set) when photo was taken + time adjustments,
+	 * e.g. wrong time zone, wrong time is set in the camera.
+	 */
+	public long								adjustedTime			= Long.MIN_VALUE;
+
+	public long								imageFileSize;
+
+	/**
+	 * Camera which is used to take this photo, is <code>null</code> when not yet set.
+	 */
+	public Camera							camera;
+
+	/**
+	 * Is <code>true</code> when photo exif data are loaded.
+	 */
+	public boolean							isExifLoaded;
+
+	/**
+	 * Is <code>true</code> when this photo contains geo coordinates.
+	 */
+	public boolean							isPhotoWithGps;
+
+	/**
+	 * Is <code>true</code> when geo coordinates origin is in the photo EXIF data.
+	 */
+	public boolean							isGeoFromExif;
 
 	private PhotoImageMetadata				_photoImageMetadata;
 
@@ -158,11 +210,21 @@ public class Photo {
 	/**
 	 * @param galleryItemIndex
 	 */
-	public Photo(final PhotoWrapper photoWrapper) {
+	public Photo(final File file) {
 
-		_photoWrapper = photoWrapper;
+		imageFile = file;
 
-		final String imageFilePathName = photoWrapper.imageFilePathName;
+		imageFileName = imageFile.getName();
+		imageFilePathName = imageFile.getPath();
+		imageFileLastModified = imageFile.lastModified();
+
+		imageFileSize = imageFile.length();
+
+		final int dotPos = imageFileName.lastIndexOf(UI.SYMBOL_DOT);
+		imageFileExt = dotPos > 0 ? imageFileName.substring(dotPos + 1).toLowerCase() : UI.EMPTY_STRING;
+
+		// initially sort by file date until exif data are loaded
+		imageExifTime = imageFileLastModified;
 
 		_uniqueId = imageFilePathName;
 
@@ -187,24 +249,6 @@ public class Photo {
 	public static String getImageKeyThumb(final String imageFilePathName) {
 		return Util.computeMD5(imageFilePathName + "_Thumb");//$NON-NLS-1$
 	}
-
-//	/**
-//	 * Update geo position in the cached exif metadata.
-//	 *
-//	 * @param updatedPhotos
-//	 */
-//	public static void updateExifGeoPosition(final ArrayList<PhotoWrapper> updatedPhotos) {
-//
-//		for (final PhotoWrapper photoWrapper : updatedPhotos) {
-//
-//			final PhotoImageMetadata imageMetadata = ExifCache.get(photoWrapper.imageFilePathName);
-//			if (imageMetadata != null) {
-//
-//				imageMetadata.latitude = photoWrapper.photo.getLatitude();
-//				imageMetadata.longitude = photoWrapper.photo.getLongitude();
-//			}
-//		}
-//	}
 
 	/**
 	 * Creates metadata from image metadata
@@ -313,11 +357,29 @@ public class Photo {
 		}
 
 		// set file date time
-//		photoMetadata.fileDateTime = new DateTime(DateTimeZone.UTC).withMillis(_photoWrapper.imageFileLastModified);
-		photoMetadata.fileDateTime = new DateTime(_photoWrapper.imageFileLastModified);
+//		photoMetadata.fileDateTime = new DateTime(DateTimeZone.UTC).withMillis(imageFileLastModified);
+		photoMetadata.fileDateTime = new DateTime(imageFileLastModified);
 
 		return photoMetadata;
 	}
+
+//	/**
+//	 * Update geo position in the cached exif metadata.
+//	 *
+//	 * @param updatedPhotos
+//	 */
+//	public static void updateExifGeoPosition(final ArrayList<PhotoWrapper> updatedPhotos) {
+//
+//		for (final PhotoWrapper photoWrapper : updatedPhotos) {
+//
+//			final PhotoImageMetadata imageMetadata = ExifCache.get(photoWrapper.imageFilePathName);
+//			if (imageMetadata != null) {
+//
+//				imageMetadata.latitude = photoWrapper.photo.getLatitude();
+//				imageMetadata.longitude = photoWrapper.photo.getLongitude();
+//			}
+//		}
+//	}
 
 	public String dumpLoadingState() {
 
@@ -599,7 +661,7 @@ public class Photo {
 			return null;
 		}
 
-		if (PhotoLoadManager.isImageLoadingError(_photoWrapper.imageFilePathName)) {
+		if (PhotoLoadManager.isImageLoadingError(imageFilePathName)) {
 			// image could not be loaded previously
 			return null;
 		}
@@ -617,14 +679,14 @@ public class Photo {
 
 //			final long start = System.currentTimeMillis();
 
-			imageFileMetadata = Imaging.getMetadata(_photoWrapper.imageFile, params);
+			imageFileMetadata = Imaging.getMetadata(imageFile, params);
 
 //			System.out.println(UI.timeStamp()
 //					+ Thread.currentThread().getName()
 //					+ "read exif\t"
 //					+ ((System.currentTimeMillis() - start) + " ms")
 //					+ ("\tWithThumb: " + isReadThumbnail)
-//					+ ("\t" + _photoWrapper.imageFilePathName)
+//					+ ("\t" + imageFilePathName)
 //			//
 //					);
 //			// TODO remove SYSTEM.OUT.PRINTLN
@@ -636,9 +698,9 @@ public class Photo {
 
 			StatusUtil.log(NLS.bind(//
 					"Could not read metadata from image \"{0}\"", //$NON-NLS-1$
-					_photoWrapper.imageFile));
+					imageFile));
 
-			PhotoLoadManager.putPhotoInLoadingErrorMap(getPhotoWrapper().imageFilePathName);
+			PhotoLoadManager.putPhotoInLoadingErrorMap(imageFilePathName);
 
 		} finally {
 
@@ -749,10 +811,6 @@ public class Photo {
 		return _exifDateTime != null ? _exifDateTime : _imageFileDateTime;
 	}
 
-	public PhotoWrapper getPhotoWrapper() {
-		return _photoWrapper;
-	}
-
 	private DateTime getTiffValueDate(final TiffImageMetadata tiffMetadata) {
 
 		try {
@@ -805,6 +863,11 @@ public class Photo {
 		return null;
 	}
 
+	@Override
+	public String getUniqueId() {
+		return imageFilePathName;
+	}
+
 	/**
 	 * @param mapProvider
 	 * @param projectionId
@@ -855,7 +918,7 @@ public class Photo {
 		_tourLatitude = 0;
 		_tourLongitude = 0;
 
-		_photoWrapper.isPhotoWithGps = _photoWrapper.isGeoFromExif;
+		isPhotoWithGps = isGeoFromExif;
 	}
 
 	public void resetWorldPosition() {
@@ -893,7 +956,7 @@ public class Photo {
 		}
 //
 //		System.out
-//				.println("set state\t" + imageQuality + "\t" + photoLoadingState + "\t" + _photoWrapper.imageFileName);
+//				.println("set state\t" + imageQuality + "\t" + photoLoadingState + "\t" + imageFileName);
 //		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
@@ -914,7 +977,7 @@ public class Photo {
 	}
 
 	public void setThumbSaveError() {
-		PhotoLoadManager.putPhotoInThumbSaveErrorMap(_photoWrapper.imageFilePathName);
+		PhotoLoadManager.putPhotoInThumbSaveErrorMap(imageFilePathName);
 	}
 
 	public void setTourGeoPosition(final double latitude, final double longitude) {
@@ -922,7 +985,7 @@ public class Photo {
 		_tourLatitude = latitude;
 		_tourLongitude = longitude;
 
-		_photoWrapper.isPhotoWithGps = true;
+		isPhotoWithGps = true;
 	}
 
 	@Override
@@ -934,7 +997,7 @@ public class Photo {
 
 		return "" //$NON-NLS-1$
 //				+"Photo " //
-				+ (_photoWrapper.imageFileName)
+				+ (imageFileName)
 				+ ("\t_exifDateTime " + new DateTime(_exifDateTime).toString()) //$NON-NLS-1$
 //				+ (_exifDateTime == null ? "-no date-" : "\t" + _exifDateTime)
 //				+ ("\trotate:" + rotateDegree)
@@ -985,7 +1048,7 @@ public class Photo {
 
 		setMapImageSize();
 
-		_photoWrapper.isExifLoaded = true;
+		isExifLoaded = true;
 
 		/*
 		 * set state if gps data are available, this state is used for filtering the photos and to
@@ -994,16 +1057,16 @@ public class Photo {
 		final boolean isExifGPS = _exifLatitude != 0;
 		final boolean isTourGPS = _tourLatitude != 0;
 
-		_photoWrapper.isGeoFromExif = isExifGPS;
-		_photoWrapper.isPhotoWithGps = isTourGPS || isExifGPS;
+		isGeoFromExif = isExifGPS;
+		isPhotoWithGps = isTourGPS || isExifGPS;
 
 		// sort by exif date when available
 		if (_exifDateTime != null) {
 
 			final long exifUTCMills = _exifDateTime.getMillis();
 
-			_photoWrapper.imageExifTime = exifUTCMills;
-//			_photoWrapper.imageUTCZoneOffset = DateTimeZone.getDefault().getOffset(exifUTCMills);
+			imageExifTime = exifUTCMills;
+//			imageUTCZoneOffset = DateTimeZone.getDefault().getOffset(exifUTCMills);
 		}
 	}
 }

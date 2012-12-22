@@ -46,7 +46,7 @@ import net.tourbook.common.util.IToolTipHideListener;
 import net.tourbook.common.util.TourToolTip;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
-import net.tourbook.photo.PhotoWrapper;
+import net.tourbook.photo.Photo;
 import net.tourbook.photo.TourPhotoLink;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceTourChart;
@@ -872,7 +872,7 @@ public class TourChart extends Chart {
 
 		final TourPhotoLink tourPhotoLink = _tourData.tourPhotoLink;
 
-		ArrayList<PhotoWrapper> tourPhotos = null;
+		ArrayList<Photo> tourPhotos = null;
 
 		if (tourPhotoLink != null) {
 
@@ -931,7 +931,7 @@ public class TourChart extends Chart {
 		 * set photos for tours which has max 1 value point
 		 */
 		if (numberOfTimeSlices <= 1) {
-			for (final PhotoWrapper photoWrapper : tourPhotos) {
+			for (final Photo photoWrapper : tourPhotos) {
 				chartPhotos.add(new ChartPhoto(photoWrapper, 0, 0));
 			}
 			return;
@@ -955,7 +955,7 @@ public class TourChart extends Chart {
 		}
 
 		int photoIndex = 0;
-		PhotoWrapper photoWrapper = tourPhotos.get(photoIndex);
+		Photo photo = tourPhotos.get(photoIndex);
 
 		// tour time serie, fit photos into a tour
 
@@ -966,13 +966,13 @@ public class TourChart extends Chart {
 			// check if a photo is in the current time slice
 			while (true) {
 
-				final long imageAdjustedTime = photoWrapper.adjustedTime;
+				final long imageAdjustedTime = photo.adjustedTime;
 				long imageTime = 0;
 
 				if (imageAdjustedTime != Long.MIN_VALUE) {
 					imageTime = imageAdjustedTime;
 				} else {
-					imageTime = photoWrapper.imageExifTime;
+					imageTime = photo.imageExifTime;
 				}
 
 				final long photoTime = imageTime / 1000;
@@ -983,7 +983,7 @@ public class TourChart extends Chart {
 
 					final double xValue = xAxisSerie[timeIndex];
 
-					chartPhotos.add(new ChartPhoto(photoWrapper, xValue, timeIndex));
+					chartPhotos.add(new ChartPhoto(photo, xValue, timeIndex));
 
 					photoIndex++;
 
@@ -995,7 +995,7 @@ public class TourChart extends Chart {
 				}
 
 				if (photoIndex < numberOfPhotos) {
-					photoWrapper = tourPhotos.get(photoIndex);
+					photo = tourPhotos.get(photoIndex);
 				} else {
 					break;
 				}
@@ -1023,12 +1023,12 @@ public class TourChart extends Chart {
 				while (true) {
 
 					final double xValue = xAxisSerie[numberOfTimeSlices - 1];
-					chartPhotos.add(new ChartPhoto(photoWrapper, xValue, timeIndex));
+					chartPhotos.add(new ChartPhoto(photo, xValue, timeIndex));
 
 					photoIndex++;
 
 					if (photoIndex < numberOfPhotos) {
-						photoWrapper = tourPhotos.get(photoIndex);
+						photo = tourPhotos.get(photoIndex);
 					} else {
 						break;
 					}

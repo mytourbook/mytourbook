@@ -35,7 +35,6 @@ import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoImageCache;
 import net.tourbook.photo.PhotoLoadManager;
 import net.tourbook.photo.PhotoLoadingState;
-import net.tourbook.photo.PhotoWrapper;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceMap;
 import net.tourbook.ui.ColorCacheInt;
@@ -566,7 +565,7 @@ public class TourPainter extends MapPainter {
 		init();
 
 		final ArrayList<TourData> tourDataList = _tourPaintConfig.getTourData();
-		final ArrayList<PhotoWrapper> photoList = _tourPaintConfig.getPhotos();
+		final ArrayList<Photo> photoList = _tourPaintConfig.getPhotos();
 
 		if (tourDataList.size() == 0 && photoList.size() == 0) {
 			return false;
@@ -763,9 +762,7 @@ public class TourPainter extends MapPainter {
 
 			int photoCounter = 0;
 
-			for (final PhotoWrapper photoWrapper : photoList) {
-
-				final Photo photo = photoWrapper.photo;
+			for (final Photo photo : photoList) {
 
 				final Point photoWorldPixel = photo.getWorldPosition(mp, projectionId, mapZoomLevel);
 				if (photoWorldPixel == null) {
@@ -1582,7 +1579,7 @@ public class TourPainter extends MapPainter {
 	protected boolean isPaintingNeeded(final Map map, final Tile tile) {
 
 		final ArrayList<TourData> tourDataList = _tourPaintConfig.getTourData();
-		final ArrayList<PhotoWrapper> photoList = _tourPaintConfig.getPhotos();
+		final ArrayList<Photo> photoList = _tourPaintConfig.getPhotos();
 
 		if (tourDataList.size() == 0 && photoList.size() == 0) {
 			return false;
@@ -1639,7 +1636,7 @@ public class TourPainter extends MapPainter {
 		return false;
 	}
 
-	private boolean isPaintingNeeded_Photos(final ArrayList<PhotoWrapper> photoList,
+	private boolean isPaintingNeeded_Photos(final ArrayList<Photo> photoList,
 											final MP mp,
 											final int mapZoomLevel,
 											final String projectionId,
@@ -1650,9 +1647,7 @@ public class TourPainter extends MapPainter {
 		/*
 		 * check photos
 		 */
-		for (final PhotoWrapper photoWrapper : photoList) {
-
-			final Photo photo = photoWrapper.photo;
+		for (final Photo photo : photoList) {
 
 			final Point photoWorldPixel = photo.getWorldPosition(mp, projectionId, mapZoomLevel);
 

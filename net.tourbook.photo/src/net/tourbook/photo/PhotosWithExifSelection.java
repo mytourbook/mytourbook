@@ -27,10 +27,10 @@ public class PhotosWithExifSelection implements ISelection {
 	/**
 	 * Contains photos sorted by date/time, EXIF data are loaded for the photos.
 	 */
-	public ArrayList<PhotoWrapper>	photos;
+	public ArrayList<Photo>	photos;
 
-	public PhotosWithExifSelection(final ArrayList<PhotoWrapper> selectedPhotos) {
-		this.photos = selectedPhotos;
+	public PhotosWithExifSelection(final ArrayList<Photo> selectedPhotos) {
+		photos = selectedPhotos;
 	}
 
 	@Override

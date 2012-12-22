@@ -34,7 +34,6 @@ import net.tourbook.photo.PhotoImageCache;
 import net.tourbook.photo.PhotoImageMetadata;
 import net.tourbook.photo.PhotoLoadManager;
 import net.tourbook.photo.PhotoLoadingState;
-import net.tourbook.photo.PhotoWrapper;
 
 import org.apache.commons.imaging.ImageReadException;
 import org.apache.commons.imaging.common.IImageMetadata;
@@ -223,7 +222,7 @@ public class PhotoImageLoader {
 	 */
 	private boolean isAWTImageSupported() {
 
-		final String photoSuffix = _photo.getPhotoWrapper().imageFileExt;
+		final String photoSuffix = _photo.imageFileExt;
 
 		for (final String awtImageSuffix : awtImageFileSuffixes) {
 			if (photoSuffix.equals(awtImageSuffix)) {
@@ -279,7 +278,7 @@ public class PhotoImageLoader {
 					} catch (final Exception e) {
 						StatusUtil.log(NLS.bind(//
 								"Image \"{0}\" cannot be resized", //$NON-NLS-1$
-								_photo.getPhotoWrapper().imageFilePathName), e);
+								_photo.imageFilePathName), e);
 						return null;
 					}
 
@@ -345,7 +344,7 @@ public class PhotoImageLoader {
 
 				// cache loaded thumb, that the redraw finds the image
 
-				final String originalImagePathName = _photo.getPhotoWrapper().imageFilePathName;
+				final String originalImagePathName = _photo.imageFilePathName;
 
 				PhotoImageCache.putImage(
 						imageKey,
@@ -500,7 +499,7 @@ public class PhotoImageLoader {
 				System.out.println(NLS.bind(//
 						UI.timeStampNano() + " image == NULL when loading with {0}: \"{1}\"", //$NON-NLS-1$
 						_imageFramework.toUpperCase(),
-						_photo.getPhotoWrapper().imageFilePathName));
+						_photo.imageFilePathName));
 
 				if (_imageFramework.equals(PhotoLoadManager.IMAGE_FRAMEWORK_AWT)) {
 
@@ -523,7 +522,7 @@ public class PhotoImageLoader {
 						if (hqImage == null) {
 							System.out.println(NLS.bind(//
 									UI.timeStampNano() + " image == NULL when loading with SWT: \"{0}\"", //$NON-NLS-1$
-									_photo.getPhotoWrapper().imageFilePathName));
+									_photo.imageFilePathName));
 						}
 					}
 				}
@@ -565,7 +564,7 @@ public class PhotoImageLoader {
 		/*
 		 * load original image
 		 */
-		final String originalImagePathName = _photo.getPhotoWrapper().imageFilePathName;
+		final String originalImagePathName = _photo.imageFilePathName;
 		try {
 
 			final long startHqLoad = System.currentTimeMillis();
@@ -796,7 +795,7 @@ public class PhotoImageLoader {
 		final long end = System.currentTimeMillis() - start;
 
 		System.out.println(UI.timeStampNano() + " SWT: " //$NON-NLS-1$
-				+ (Thread.currentThread().getName() + " " + _photo.getPhotoWrapper().imageFileName) //$NON-NLS-1$
+				+ (Thread.currentThread().getName() + " " + _photo.imageFileName) //$NON-NLS-1$
 				+ ("\ttotal: " + end) //$NON-NLS-1$
 				+ ("\tload: " + endHqLoad) //$NON-NLS-1$
 				+ ("\tresizeHQ: " + endResizeHQ) //$NON-NLS-1$
@@ -812,8 +811,6 @@ public class PhotoImageLoader {
 		if (_recursiveCounter[0]++ > 2) {
 			return null;
 		}
-
-		final PhotoWrapper photoWrapper = _photo.getPhotoWrapper();
 
 		final long start = System.currentTimeMillis();
 		long endHqLoad = 0;
@@ -832,12 +829,12 @@ public class PhotoImageLoader {
 		 * load original image
 		 */
 		BufferedImage awtOriginalImage = null;
-		final String originalImagePathName = photoWrapper.imageFilePathName;
+		final String originalImagePathName = _photo.imageFilePathName;
 		try {
 
 			final long startHqLoad = System.currentTimeMillis();
 			{
-				awtOriginalImage = ImageIO.read(photoWrapper.imageFile);
+				awtOriginalImage = ImageIO.read(_photo.imageFile);
 
 				_trackedAWTImages.add(awtOriginalImage);
 			}
@@ -1120,7 +1117,7 @@ public class PhotoImageLoader {
 		final long end = System.currentTimeMillis() - start;
 
 		System.out.println(UI.timeStampNano() + " AWT: " //$NON-NLS-1$
-				+ (Thread.currentThread().getName() + " " + photoWrapper.imageFileName) //$NON-NLS-1$
+				+ (Thread.currentThread().getName() + " " + _photo.imageFileName) //$NON-NLS-1$
 				+ ("\ttotal: " + end) //$NON-NLS-1$
 				+ ("\tload: " + endHqLoad) //$NON-NLS-1$
 				+ ("\tresizeHQ: " + endResizeHQ) //$NON-NLS-1$
@@ -1159,11 +1156,9 @@ public class PhotoImageLoader {
 		 */
 		final PhotoImageMetadata imageMetaData = _photo.getImageMetaData();
 
-		final PhotoWrapper photoWrapper = _photo.getPhotoWrapper();
-
 		boolean isLoadingException = false;
 		Image swtImage = null;
-		final String originalImagePathName = photoWrapper.imageFilePathName;
+		final String originalImagePathName = _photo.imageFilePathName;
 
 		try {
 
@@ -1305,7 +1300,7 @@ public class PhotoImageLoader {
 			System.out.println(UI.timeStampNano() + " SWT: " //$NON-NLS-1$
 					+ Thread.currentThread().getName()
 					+ " " //$NON-NLS-1$
-					+ photoWrapper.imageFileName
+					+ _photo.imageFileName
 					+ ("\ttotal: " + end) //$NON-NLS-1$
 					+ ("\tload1: " + endOriginalLoad1) //$NON-NLS-1$
 					+ ("\tload2: " + endOriginalLoad2) //$NON-NLS-1$
@@ -1493,7 +1488,7 @@ public class PhotoImageLoader {
 			 */
 			if (isImageLoaded) {
 
-				final String originalImagePathName = _photo.getPhotoWrapper().imageFilePathName;
+				final String originalImagePathName = _photo.imageFilePathName;
 
 				// ensure metadata are loaded
 				_photo.getImageMetaData();
@@ -1548,7 +1543,7 @@ public class PhotoImageLoader {
 		// prevent loading the image again
 		_photo.setLoadingState(PhotoLoadingState.IMAGE_IS_INVALID, _requestedImageQuality);
 
-		PhotoLoadManager.putPhotoInLoadingErrorMap(_photo.getPhotoWrapper().imageFilePathName);
+		PhotoLoadManager.putPhotoInLoadingErrorMap(_photo.imageFilePathName);
 	}
 
 	private void setStateUndefined() {

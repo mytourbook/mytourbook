@@ -26,7 +26,6 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.ImageQuality;
 import net.tourbook.photo.Photo;
-import net.tourbook.photo.PhotoWrapper;
 import net.tourbook.photo.internal.Activator;
 import net.tourbook.photo.internal.Messages;
 
@@ -400,16 +399,14 @@ IPhotoPreferences.PHOTO_THUMBNAIL_STORE_LAST_CLEANUP_DATE_TIME,
 
 	static synchronized IPath getStoreImagePath(final Photo photo, final ImageQuality imageQuality) {
 
-		final PhotoWrapper photoWrapper = photo.getPhotoWrapper();
-
-		if (photoWrapper.imageFilePathName.startsWith(_storePath.toOSString())) {
+		if (photo.imageFilePathName.startsWith(_storePath.toOSString())) {
 
 			// photo image is already from the thumb store
 
-			return new Path(photoWrapper.imageFilePathName);
+			return new Path(photo.imageFilePathName);
 		}
 
-		final String rawImageFileName = photoWrapper.imageFileName;
+		final String rawImageFileName = photo.imageFileName;
 		final String imageKey = photo.getImageKey(imageQuality);
 
 		final IPath imageFilePath = getStoreImagePath(rawImageFileName, imageKey, imageQuality);

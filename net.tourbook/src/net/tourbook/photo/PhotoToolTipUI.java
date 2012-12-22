@@ -67,7 +67,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 	private int								_displayedPhotosHash;
 
-	private final ArrayList<PhotoWrapper>	_photoWrapperList				= new ArrayList<PhotoWrapper>();
+	private final ArrayList<Photo>			_photoWrapperList				= new ArrayList<Photo>();
 
 	private ActionCloseToolTip				_actionCloseToolTip;
 	private ActionPinToolTip				_actionPinToolTip;

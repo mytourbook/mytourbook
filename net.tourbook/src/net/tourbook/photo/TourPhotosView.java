@@ -418,7 +418,7 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 //				_photoGallery.updateGPSPosition((ArrayList<?>) data);
 //			}
 //
-//		} else 
+//		} else
 
 		if (photoEventId == PhotoEventId.PHOTO_SELECTION) {
 
@@ -515,7 +515,7 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 		 * update photo gallery
 		 */
 		final ArrayList<TourPhotoLink> tourPhotoLinks = tourPhotoSelection.tourPhotoLinks;
-		final ArrayList<PhotoWrapper> allPhotoWrapper = new ArrayList<PhotoWrapper>();
+		final ArrayList<Photo> allPhotoWrapper = new ArrayList<Photo>();
 		long galleryPositionKey = 0;
 		long startTime = Long.MAX_VALUE;
 		long endTime = Long.MIN_VALUE;

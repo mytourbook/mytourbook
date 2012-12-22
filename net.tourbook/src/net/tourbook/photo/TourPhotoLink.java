@@ -77,7 +77,7 @@ public class TourPhotoLink {
 	/**
 	 * Contains all photos for this tour.
 	 */
-	public ArrayList<PhotoWrapper>			tourPhotos			= new ArrayList<PhotoWrapper>();
+	public ArrayList<Photo>					tourPhotos			= new ArrayList<Photo>();
 
 	private TourData						_historyTourData;
 

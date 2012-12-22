@@ -49,7 +49,7 @@ class LoadCallbackOriginalImage implements ILoadCallBack {
 		// keep exif metadata
 		final PhotoImageMetadata metadata = _photo.getImageMetaDataRaw();
 		if (metadata != null) {
-			ExifCache.put(_photo.getPhotoWrapper().imageFilePathName, metadata);
+			ExifCache.put(_photo.imageFilePathName, metadata);
 		}
 
 		final FullScreenImageViewer fullSizeViewer = _imageGallery.getFullScreenImageViewer();

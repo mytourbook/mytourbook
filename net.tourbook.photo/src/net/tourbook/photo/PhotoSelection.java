@@ -28,11 +28,11 @@ import org.eclipse.jface.viewers.ISelection;
  */
 public class PhotoSelection implements ISelection {
 
-	public ArrayList<PhotoWrapper>		photoWrappers;
+	public ArrayList<Photo>				photoWrappers;
 	public Collection<GalleryMT20Item>	galleryItems;
 	public int[]						selectionIndices;
 
-	public PhotoSelection(	final ArrayList<PhotoWrapper> photoWrapper,
+	public PhotoSelection(	final ArrayList<Photo> photoWrapper,
 							final Collection<GalleryMT20Item> allGalleryItems,
 							final int[] allSelectionIndices) {
 
