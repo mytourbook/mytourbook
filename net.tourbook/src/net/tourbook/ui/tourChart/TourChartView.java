@@ -629,6 +629,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 		_pageBook.showPage(_tourChart);
 
+		// set or reset photo link
 		_tourData.tourPhotoLink = _tourPhotoLink;
 
 		_tourChart.updateTourChart(_tourData, _tourChartConfig, false);
@@ -644,7 +645,9 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 			return;
 		}
 
-		updateChart(TourManager.getInstance().getTourData(tourId));
+		final TourData tourData = TourManager.getInstance().getTourData(tourId);
+
+		updateChart(tourData);
 
 		fireSliderPosition();
 	}

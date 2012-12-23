@@ -51,67 +51,73 @@ import org.joda.time.format.DateTimeFormatter;
 
 public class Photo implements IGalleryCustomData {
 
-	private String							_uniqueId;
+	private String										_uniqueId;
+
+	private static final int							MAP_IMAGE_DEFAULT_WIDTH_HEIGHT	= 80;
+
+	private static final org.eclipse.swt.graphics.Point	MAP_IMAGE_DEFAULT_SIZE			= new org.eclipse.swt.graphics.Point(
+																								MAP_IMAGE_DEFAULT_WIDTH_HEIGHT,
+																								MAP_IMAGE_DEFAULT_WIDTH_HEIGHT);
 
 	/**
 	 * Photo image file
 	 */
-	public File								imageFile;
+	public File											imageFile;
 
-	public String							imageFileName;
-	public String							imageFileExt;
+	public String										imageFileName;
+	public String										imageFileExt;
 
 	/**
 	 * File path name is the unique key for a photowrapper.
 	 */
-	public String							imageFilePathName;
+	public String										imageFilePathName;
 
 	/**
 	 * Last modified in GMT
 	 */
-	public long								imageFileLastModified;
+	public long											imageFileLastModified;
 
 	/**
 	 * Exif time in milliseconds, when not available, the last modified time of the image file is
 	 * used.
 	 */
-	public long								imageExifTime;
+	public long											imageExifTime;
 
 	/**
 	 * Time in ms (or {@link Long#MIN_VALUE} when not set) when photo was taken + time adjustments,
 	 * e.g. wrong time zone, wrong time is set in the camera.
 	 */
-	public long								adjustedTime			= Long.MIN_VALUE;
+	public long											adjustedTime					= Long.MIN_VALUE;
 
-	public long								imageFileSize;
+	public long											imageFileSize;
 
 	/**
 	 * Camera which is used to take this photo, is <code>null</code> when not yet set.
 	 */
-	public Camera							camera;
+	public Camera										camera;
 
 	/**
 	 * Is <code>true</code> when photo exif data are loaded.
 	 */
-	public boolean							isExifLoaded;
+	public boolean										isExifLoaded;
 
 	/**
 	 * Is <code>true</code> when this photo contains geo coordinates.
 	 */
-	public boolean							isPhotoWithGps;
+	public boolean										isPhotoWithGps;
 
 	/**
 	 * Is <code>true</code> when geo coordinates origin is in the photo EXIF data.
 	 */
-	public boolean							isGeoFromExif;
+	public boolean										isGeoFromExif;
 
-	private PhotoImageMetadata				_photoImageMetadata;
+	private PhotoImageMetadata							_photoImageMetadata;
 
 	/**
 	 * Last modified in GMT
 	 */
-	private DateTime						_imageFileDateTime;
-	private DateTime						_exifDateTime;
+	private DateTime									_imageFileDateTime;
+	private DateTime									_exifDateTime;
 
 	/**
 	 * <pre>
@@ -132,35 +138,35 @@ public class Photo implements IGalleryCustomData {
 	 * Other        =     reserved
 	 * </pre>
 	 */
-	private int								_orientation			= 1;
+	private int											_orientation					= 1;
 
-	private int								_imageWidth				= Integer.MIN_VALUE;
-	private int								_imageHeight			= Integer.MIN_VALUE;
+	private int											_imageWidth						= Integer.MIN_VALUE;
+	private int											_imageHeight					= Integer.MIN_VALUE;
 
 	/**
 	 * When <code>true</code>, EXIF geo is returned when available, otherwise tour geo is returned
 	 * when available. When requested geo is not available, the other is returned.
 	 */
-	private static boolean					_isGetExifGeo			= false;
+	private static boolean								_isGetExifGeo					= false;
 
 	/**
 	 * Double.MIN_VALUE cannot be used, it cannot be saved in the database. 0 is the value when the
 	 * value is not set !!!
 	 */
-	private double							_exifLatitude			= 0;
-	private double							_exifLongitude			= 0;
-	private double							_tourLatitude			= 0;
-	private double							_tourLongitude			= 0;
+	private double										_exifLatitude					= 0;
+	private double										_exifLongitude					= 0;
+	private double										_tourLatitude					= 0;
+	private double										_tourLongitude					= 0;
 
-	private String							_gpsAreaInfo;
+	private String										_gpsAreaInfo;
 
-	private double							_imageDirection			= Double.MIN_VALUE;
-	private double							_altitude				= Double.MIN_VALUE;
+	private double										_imageDirection					= Double.MIN_VALUE;
+	private double										_altitude						= Double.MIN_VALUE;
 
-	private static final DateTimeFormatter	_dtParser				= DateTimeFormat//
-																			.forPattern("yyyy:MM:dd HH:mm:ss") //$NON-NLS-1$
+	private static final DateTimeFormatter				_dtParser						= DateTimeFormat//
+																								.forPattern("yyyy:MM:dd HH:mm:ss") //$NON-NLS-1$
 //																			.withZone(DateTimeZone.UTC)
-																	;
+																						;
 //	private static final DateTimeFormatter	_dtFormatter			= DateTimeFormat.forStyle("SL");	//$NON-NLS-1$
 
 	/**
@@ -168,27 +174,27 @@ public class Photo implements IGalleryCustomData {
 	 * <p>
 	 * key: projection id + zoom level
 	 */
-	private final HashMap<Integer, Point>	_worldPosition			= new HashMap<Integer, Point>();
+	private final HashMap<Integer, Point>				_worldPosition					= new HashMap<Integer, Point>();
 
 	/**
 	 * Contains image keys for each image quality which can be used to get images from an image
 	 * cache
 	 */
-	private String							_imageKeyThumb;
-	private String							_imageKeyHQ;
-	private String							_imageKeyOriginal;
+	private String										_imageKeyThumb;
+	private String										_imageKeyHQ;
+	private String										_imageKeyOriginal;
 
 	/**
 	 * This array keeps track of the loading state for the photo images and for different qualities
 	 */
-	private PhotoLoadingState				_photoLoadingStateThumb;
-	private PhotoLoadingState				_photoLoadingStateHQ;
-	private PhotoLoadingState				_photoLoadingStateOriginal;
+	private PhotoLoadingState							_photoLoadingStateThumb;
+	private PhotoLoadingState							_photoLoadingStateHQ;
+	private PhotoLoadingState							_photoLoadingStateOriginal;
 
 	/**
 	 * Is <code>true</code> when loading the image causes an error.
 	 */
-	private boolean							_isLoadingError;
+	private boolean										_isLoadingError;
 
 	/**
 	 * Exif thumb state
@@ -200,12 +206,12 @@ public class Photo implements IGalleryCustomData {
 	 * -1 exif thumb has not yet been retrieved
 	 * </pre>
 	 */
-	private int								_exifThumbImageState	= -1;
+	private int											_exifThumbImageState			= -1;
 
 	/**
 	 * Image size which is painted in the map
 	 */
-	private org.eclipse.swt.graphics.Point	_mapImageSize;
+	private org.eclipse.swt.graphics.Point				_mapImageSize					= MAP_IMAGE_DEFAULT_SIZE;
 
 	/**
 	 * @param galleryItemIndex
@@ -734,13 +740,21 @@ public class Photo implements IGalleryCustomData {
 	 */
 	public double getLatitude() {
 
-		return _isGetExifGeo //
-				? _exifLatitude != 0 //
-						? _exifLatitude
-						: _tourLatitude
-				: _tourLatitude != 0 //
-						? _tourLatitude
-						: _exifLatitude;
+		double latitude;
+
+		if (_isGetExifGeo) {
+
+			latitude = _exifLatitude != 0 //
+					? _exifLatitude
+					: _tourLatitude;
+		} else {
+
+			latitude = _tourLatitude != 0 //
+					? _tourLatitude
+					: _exifLatitude;
+		}
+
+		return latitude;
 	}
 
 	/**
@@ -758,17 +772,28 @@ public class Photo implements IGalleryCustomData {
 	}
 
 	/**
-	 * @return Returns longitude or {@link Double#MIN_VALUE} when not set
+	 * @return Returns longitude.
+	 *         <p>
+	 *         <b> Double.MIN_VALUE cannot be used, it cannot be saved in the database. 0 is the
+	 *         value when the value is not set !!! </b>
 	 */
 	public double getLongitude() {
 
-		return _isGetExifGeo //
-				? _exifLongitude != 0 //
-						? _exifLongitude
-						: _tourLongitude
-				: _tourLongitude != 0 //
-						? _tourLongitude
-						: _exifLongitude;
+		double longitude;
+
+		if (_isGetExifGeo) {
+
+			longitude = _exifLongitude != 0 //
+					? _exifLongitude
+					: _tourLongitude;
+		} else {
+
+			longitude = _tourLongitude != 0 //
+					? _tourLongitude
+					: _exifLongitude;
+		}
+
+		return longitude;
 	}
 
 	/**
@@ -962,7 +987,7 @@ public class Photo implements IGalleryCustomData {
 
 	private void setMapImageSize() {
 
-		final int imageCanvasWidth = 80;
+		final int imageCanvasWidth = MAP_IMAGE_DEFAULT_WIDTH_HEIGHT;
 		final int imageCanvasHeight = imageCanvasWidth;
 
 		_mapImageSize = RendererHelper.getBestSize(this, //

@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -49,7 +48,7 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
@@ -108,67 +107,66 @@ import org.joda.time.format.PeriodFormatterBuilder;
 
 public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourViewer {
 
-	public static final String						ID									= "net.tourbook.photo.PhotosAndToursView.ID";	//$NON-NLS-1$
+	public static final String			ID									= "net.tourbook.photo.PhotosAndToursView.ID";	//$NON-NLS-1$
 
-	private static final String						STATE_FILTER_PHOTOS					= "STATE_FILTER_PHOTOS";						//$NON-NLS-1$
-	private static final String						STATE_SELECTED_CAMERA_NAME			= "STATE_SELECTED_CAMERA_NAME";				//$NON-NLS-1$
+	private static final String			STATE_FILTER_PHOTOS					= "STATE_FILTER_PHOTOS";						//$NON-NLS-1$
+	private static final String			STATE_SELECTED_CAMERA_NAME			= "STATE_SELECTED_CAMERA_NAME";				//$NON-NLS-1$
 
-	public static final String						IMAGE_PIC_DIR_VIEW					= "IMAGE_PIC_DIR_VIEW";						//$NON-NLS-1$
-	public static final String						IMAGE_PHOTO_PHOTO					= "IMAGE_PHOTO_PHOTO";							//$NON-NLS-1$
+	public static final String			IMAGE_PIC_DIR_VIEW					= "IMAGE_PIC_DIR_VIEW";						//$NON-NLS-1$
+	public static final String			IMAGE_PHOTO_PHOTO					= "IMAGE_PHOTO_PHOTO";							//$NON-NLS-1$
 
-	private final IPreferenceStore					_prefStore							= TourbookPlugin
-																								.getDefault()
-																								.getPreferenceStore();
+	private final IPreferenceStore		_prefStore							= TourbookPlugin
+																					.getDefault()
+																					.getPreferenceStore();
 
-	private final IDialogSettings					_state								= TourbookPlugin
-																								.getDefault()
-																								.getDialogSettingsSection(
-																										ID);
+	private final IDialogSettings		_state								= TourbookPlugin
+																					.getDefault()
+																					.getDialogSettingsSection(ID);
 
-	private static final PhotoManager				_photoMgr							= PhotoManager.getInstance();
+	private static final PhotoManager	_photoMgr							= PhotoManager.getInstance();
 
-	private ArrayList<TourPhotoLink>				_visibleTourPhotoLinks				= new ArrayList<TourPhotoLink>();
+	private ArrayList<TourPhotoLink>	_visibleTourPhotoLinks				= new ArrayList<TourPhotoLink>();
 
-	private ArrayList<Photo>				_allPhotos							= new ArrayList<Photo>();
+	private ArrayList<Photo>			_allPhotos							= new ArrayList<Photo>();
 
 	/**
 	 * Contains all cameras which are used in all displayed tours.
 	 */
-	private HashMap<String, Camera>					_allTourCameras						= new HashMap<String, Camera>();
+	private HashMap<String, Camera>		_allTourCameras						= new HashMap<String, Camera>();
 
 	/**
 	 * All cameras sorted by camera name
 	 */
-	private Camera[]								_allTourCamerasSorted;
+	private Camera[]					_allTourCamerasSorted;
 
 	/**
 	 * Tour photo link which is currently selected in the tour viewer.
 	 */
-	private ArrayList<TourPhotoLink>				_selectedLinks						= new ArrayList<TourPhotoLink>();
+	private ArrayList<TourPhotoLink>	_selectedLinks						= new ArrayList<TourPhotoLink>();
 
 	/**
 	 * Contains only tour photo links with real tours and which contain geo positions.
 	 */
-	private List<TourPhotoLink>						_selectedTourPhotoLinksWithGps		= new ArrayList<TourPhotoLink>();
+	private List<TourPhotoLink>			_selectedTourPhotoLinksWithGps		= new ArrayList<TourPhotoLink>();
 
-	private TourPhotoLinkSelection					_tourPhotoLinkSelection;
+	private TourPhotoLinkSelection		_tourPhotoLinkSelection;
 
-	private ISelectionListener						_postSelectionListener;
-	private IPropertyChangeListener					_prefChangeListener;
-	private IPartListener2							_partListener;
+	private ISelectionListener			_postSelectionListener;
+	private IPropertyChangeListener		_prefChangeListener;
+	private IPartListener2				_partListener;
 
-	private PixelConverter							_pc;
-	private ColumnManager							_columnManager;
+	private PixelConverter				_pc;
+	private ColumnManager				_columnManager;
 
-	private ActionFilterPhotos						_actionFilterPhotos;
-	private ActionFilterOneHistoryTour				_actionFilterOneHistory;
-	private ActionModifyColumns						_actionModifyColumns;
-	private ActionSavePhotosInTour					_actionSavePhotoInTour;
+	private ActionFilterPhotos			_actionFilterPhotos;
+	private ActionFilterOneHistoryTour	_actionFilterOneHistory;
+	private ActionModifyColumns			_actionModifyColumns;
+	private ActionSavePhotosInTour		_actionSavePhotoInTour;
 
-	private final DateTimeFormatter					_dateFormatter						= DateTimeFormat.mediumDate();
-	private final DateTimeFormatter					_timeFormatter						= DateTimeFormat.mediumTime();
-	private final NumberFormat						_nf_1_1;
-	private final PeriodFormatter					_durationFormatter;
+	private final DateTimeFormatter		_dateFormatter						= DateTimeFormat.mediumDate();
+	private final DateTimeFormatter		_timeFormatter						= DateTimeFormat.mediumTime();
+	private final NumberFormat			_nf_1_1;
+	private final PeriodFormatter		_durationFormatter;
 	{
 		_nf_1_1 = NumberFormat.getNumberInstance();
 		_nf_1_1.setMinimumFractionDigits(1);
@@ -186,68 +184,36 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 				.toFormatter();
 	}
 
-	private final Comparator<? super Photo>	_adjustTimeComparator;
-
 	/**
 	 * When <code>true</code>, only tours with photos are displayed.
 	 */
-	private boolean									_isShowToursOnlyWithPhotos			= true;
+	private boolean						_isShowToursOnlyWithPhotos			= true;
 
 	/**
 	 * It's dangerous when set to <code>true</code>, it will hide all tours which can confuses the
 	 * user, therefore this state is <b>NOT</b> saved.
 	 */
-	private boolean									_isFilterOneHistoryTour				= false;
+	private boolean						_isFilterOneHistoryTour				= false;
 
-	private ArrayList<TourPhotoLink>				_selectionBackupBeforeOneHistory	= new ArrayList<TourPhotoLink>();
+	private ArrayList<TourPhotoLink>	_selectionBackupBeforeOneHistory	= new ArrayList<TourPhotoLink>();
 
-	private ICommandService							_commandService;
+	private ICommandService				_commandService;
 
 	/*
 	 * UI controls
 	 */
-	private PageBook								_pageBook;
-	private Composite								_pageNoImage;
-	private Composite								_pageViewer;
+	private PageBook					_pageBook;
+	private Composite					_pageNoImage;
+	private Composite					_pageViewer;
 
-	private Composite								_viewerContainer;
-	private TableViewer								_tourViewer;
+	private Composite					_viewerContainer;
+	private TableViewer					_tourViewer;
 
-	private Label									_lblAdjustTime;
-	private Spinner									_spinnerHours;
-	private Spinner									_spinnerMinutes;
-	private Spinner									_spinnerSeconds;
-	private Combo									_comboCamera;
-
-//	private Button									_rdoAdjustAllTours;
-//	private Button									_rdoAdjustSelectedTours;
-
-	{
-		_adjustTimeComparator = new Comparator<Photo>() {
-
-			@Override
-			public int compare(final Photo wrapper1, final Photo wrapper2) {
-
-				final long diff = wrapper1.adjustedTime - wrapper2.adjustedTime;
-
-				return diff < 0 ? -1 : diff > 0 ? 1 : 0;
-			}
-		};
-	}
-
-//	private class ActionResetTimeAdjustment extends Action {
-//
-//		public ActionResetTimeAdjustment() {
-//
-//			setText(Messages.Action_PhotosAndTours_ResetTimeAdjustment);
-//		}
-//
-//		@Override
-//		public void run() {
-//			actionResetTimeAdjustment();
-//		}
-//
-//	}
+	private Label						_lblAdjustTime;
+	private Spinner						_spinnerHours;
+	private Spinner						_spinnerMinutes;
+	private Spinner						_spinnerSeconds;
+	private Combo						_comboCamera;
 
 	private static class ContentComparator extends ViewerComparator {
 
@@ -343,11 +309,11 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 		final ArrayList<TourData> modifiedTours = new ArrayList<TourData>();
 		final ArrayList<TourPhotoLink> modifiedLinks = new ArrayList<TourPhotoLink>();
 
-		final Object[] allSelectedLinks = ((IStructuredSelection) _tourViewer.getSelection()).toArray();
+		final Object[] allSelectedPhotoLinks = ((IStructuredSelection) _tourViewer.getSelection()).toArray();
 
 		int historyTours = 0;
 
-		for (final Object linkElement : allSelectedLinks) {
+		for (final Object linkElement : allSelectedPhotoLinks) {
 
 			if (linkElement instanceof TourPhotoLink) {
 
@@ -356,7 +322,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 				if (isRealTour) {
 
-					final ArrayList<Photo> tourPhotoWrapper = photoLink.tourPhotos;
+					final ArrayList<Photo> tourPhotoWrapper = photoLink.linkPhotos;
 
 					if (tourPhotoWrapper.size() > 0) {
 
@@ -390,10 +356,23 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 		// show message that photos can be saved only in real tours
 		if (historyTours > 0) {
 
-			MessageDialog.openInformation(
-					Display.getCurrent().getActiveShell(),
-					Messages.Photos_AndTours_Dialog_CannotSaveHistoryTour_Title,
-					Messages.Photos_AndTours_Dialog_CannotSaveHistoryTour_Message);
+			if (_prefStore.getBoolean(ITourbookPreferences.TOGGLE_STATE_SHOW_HISTORY_TOUR_SAVE_WARNING) == false) {
+
+				final MessageDialogWithToggle dialog = MessageDialogWithToggle.openInformation(//
+						Display.getCurrent().getActiveShell(),
+						Messages.Photos_AndTours_Dialog_CannotSaveHistoryTour_Title,
+						Messages.Photos_AndTours_Dialog_CannotSaveHistoryTour_Message,
+						Messages.App_ToggleState_DoNotShowAgain,
+						false, // toggle default state
+						null,
+						null);
+
+				// save toggle state
+				_prefStore.setValue(
+						ITourbookPreferences.TOGGLE_STATE_SHOW_HISTORY_TOUR_SAVE_WARNING,
+						dialog.getToggleState());
+			}
+
 		}
 
 		TourManager.saveModifiedTours(modifiedTours);
@@ -404,7 +383,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 			final TourData tourData = tourManager.getTourData(photoLink.tourId);
 
 			if (tourData != null) {
-				photoLink.numberOfTourPhotos = tourData.getNumberOfPhotos();
+				photoLink.numberOfTourPhotos = tourData.getTourPhotos().size();
 			}
 		}
 
@@ -1270,7 +1249,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 			final ISelection originalSelection = ((SyncSelection) selection).getSelection();
 
 			if (originalSelection instanceof PhotoSelection) {
-				showPhotosAndTours(((PhotoSelection) originalSelection).photoWrappers);
+				showPhotosAndTours(((PhotoSelection) originalSelection).galleryPhotos);
 			}
 
 		} else if (selection instanceof PhotoSelection && part instanceof PicDirView) {
@@ -1287,7 +1266,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 			final boolean isSync = (Boolean) state.getValue();
 
 			if (isSync) {
-				showPhotosAndTours(photoSelection.photoWrappers);
+				showPhotosAndTours(photoSelection.galleryPhotos);
 			}
 		}
 	}
@@ -1342,7 +1321,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 					selectedTourIds.add(selectedLink.tourId);
 				}
 
-				if (isRealTour && selectedLink.tourPhotos.size() > 0) {
+				if (isRealTour && selectedLink.linkPhotos.size() > 0) {
 
 					final TourData tourData = TourManager.getInstance().getTourData(selectedLink.tourId);
 
@@ -1488,7 +1467,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 			TourPhotoLink linkSelection = null;
 
-			final ArrayList<Photo> tourPhotos = prevTourPhotoLink.tourPhotos;
+			final ArrayList<Photo> tourPhotos = prevTourPhotoLink.linkPhotos;
 			if (tourPhotos.size() > 0) {
 
 				// get tour for the first photo
@@ -1590,7 +1569,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 			photo.resetWorldPosition();
 		}
 
-		Collections.sort(_allPhotos, _adjustTimeComparator);
+		Collections.sort(_allPhotos, PhotoManager.AdjustTimeComparator);
 	}
 
 	/**

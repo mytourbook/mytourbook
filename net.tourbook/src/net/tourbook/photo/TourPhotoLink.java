@@ -77,7 +77,7 @@ public class TourPhotoLink {
 	/**
 	 * Contains all photos for this tour.
 	 */
-	public ArrayList<Photo>					tourPhotos			= new ArrayList<Photo>();
+	public ArrayList<Photo>					linkPhotos			= new ArrayList<Photo>();
 
 	private TourData						_historyTourData;
 
@@ -155,11 +155,11 @@ public class TourPhotoLink {
 		/*
 		 * create time data serie
 		 */
-		final int timeSerieLength = tourPhotos.size();
+		final int timeSerieLength = linkPhotos.size();
 		final long[] historyTimeSerie = new long[timeSerieLength];
 
 		for (int photoIndex = 0; photoIndex < timeSerieLength; photoIndex++) {
-			historyTimeSerie[photoIndex] = tourPhotos.get(photoIndex).adjustedTime;
+			historyTimeSerie[photoIndex] = linkPhotos.get(photoIndex).adjustedTime;
 		}
 
 		final long tourStart = historyTimeSerie[0];
@@ -254,14 +254,14 @@ public class TourPhotoLink {
 
 		if (isHistoryTour) {
 
-			final int photosSize = tourPhotos.size();
+			final int photosSize = linkPhotos.size();
 
 			if (photosSize == 0) {
 				// there are no photos in this history tour, THIS SHOULD NOT HAPPEN FOR A HISTORY TOUR
 				tourEndTime = tourStartTime;
 			} else {
 				// get time from last photo
-				tourEndTime = tourPhotos.get(photosSize - 1).adjustedTime;
+				tourEndTime = linkPhotos.get(photosSize - 1).adjustedTime;
 			}
 
 			finalizeHistoryTour();

@@ -27,6 +27,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -68,35 +69,52 @@ import org.joda.time.DateTime;
 
 public class PhotoManager {
 
-	private static final String				STATE_CAMERA_ADJUSTMENT_NAME	= "STATE_CAMERA_ADJUSTMENT_NAME";			//$NON-NLS-1$
-	private static final String				STATE_CAMERA_ADJUSTMENT_TIME	= "STATE_CAMERA_ADJUSTMENT_TIME";			//$NON-NLS-1$
+	private static final String						STATE_CAMERA_ADJUSTMENT_NAME	= "STATE_CAMERA_ADJUSTMENT_NAME";	//$NON-NLS-1$
+	private static final String						STATE_CAMERA_ADJUSTMENT_TIME	= "STATE_CAMERA_ADJUSTMENT_TIME";	//$NON-NLS-1$
 
-	private static final String				CAMERA_UNKNOWN_KEY				= "CAMERA_UNKNOWN_KEY";					//$NON-NLS-1$
+	private static final String						CAMERA_UNKNOWN_KEY				= "CAMERA_UNKNOWN_KEY";			//$NON-NLS-1$
 
-	private static final String				TEMP_FILE_PREFIX_ORIG			= "_orig_";								//$NON-NLS-1$
+	private static final String						TEMP_FILE_PREFIX_ORIG			= "_orig_";						//$NON-NLS-1$
 
-	private static final IDialogSettings	_state							= TourbookPlugin.getDefault() //
-																					.getDialogSettingsSection(
-																							"PhotoManager");			//$NON-NLS-1$
-	private static PhotoManager				_instance;
-
-//	private boolean							_isOverwritePhotoGPS				= true;
-//	private boolean							_isAddPhotosToExistingTourPhotos	= false;
+	private static final IDialogSettings			_state							= TourbookPlugin.getDefault() //
+																							.getDialogSettingsSection(
+																									"PhotoManager");	//$NON-NLS-1$
+	private static PhotoManager						_instance;
 
 	/**
 	 * Contains all cameras which are every used, key is the camera name.
 	 */
-	private static HashMap<String, Camera>	_allAvailableCameras			= new HashMap<String, Camera>();
+	private static HashMap<String, Camera>			_allAvailableCameras			= new HashMap<String, Camera>();
 
-	private static final ListenerList		_photoEventListeners			= new ListenerList(ListenerList.IDENTITY);
+	private static final ListenerList				_photoEventListeners			= new ListenerList(
+																							ListenerList.IDENTITY);
 
-	private Connection						_sqlConnection;
-	private PreparedStatement				_sqlStatement;
-	private long							_sqlTourStart					= Long.MAX_VALUE;
-	private long							_sqlTourEnd						= Long.MIN_VALUE;
+	private Connection								_sqlConnection;
+	private PreparedStatement						_sqlStatement;
+	private long									_sqlTourStart					= Long.MAX_VALUE;
+	private long									_sqlTourEnd						= Long.MIN_VALUE;
 
-	private ArrayList<TourPhotoLink>		_allDbTourPhotoLinks			= new ArrayList<TourPhotoLink>();
-	private ArrayList<TourPhotoLink>		_dbTourPhotoLinks				= new ArrayList<TourPhotoLink>();
+	private ArrayList<TourPhotoLink>				_allDbTourPhotoLinks			= new ArrayList<TourPhotoLink>();
+	private ArrayList<TourPhotoLink>				_dbTourPhotoLinks				= new ArrayList<TourPhotoLink>();
+
+	/**
+	 * Compares 2 photos by the adjusted time.
+	 */
+	public static final Comparator<? super Photo>	AdjustTimeComparator;
+
+	static {
+
+		AdjustTimeComparator = new Comparator<Photo>() {
+
+			@Override
+			public int compare(final Photo photo1, final Photo photo2) {
+
+				final long diff = photo1.adjustedTime - photo2.adjustedTime;
+
+				return diff < 0 ? -1 : diff > 0 ? 1 : 0;
+			}
+		};
+	}
 
 	public static void addPhotoEventListener(final IPhotoEventListener listener) {
 		_photoEventListeners.add(listener);
@@ -311,7 +329,7 @@ public class PhotoManager {
 				}
 			}
 
-			currentTourPhotoLink.tourPhotos.add(photo);
+			currentTourPhotoLink.linkPhotos.add(photo);
 
 			// set camera into the photo
 			final Camera camera = setCamera(photo, allTourCameras);
@@ -360,7 +378,7 @@ public class PhotoManager {
 		final HashMap<String, String> tourCameras = new HashMap<String, String>();
 
 		final TourPhotoLink historyTour = new TourPhotoLink(allPhotos.get(0).adjustedTime);
-		historyTour.tourPhotos.addAll(allPhotos);
+		historyTour.linkPhotos.addAll(allPhotos);
 
 		for (final Photo photo : allPhotos) {
 
@@ -445,7 +463,7 @@ public class PhotoManager {
 																		final boolean isShowToursOnlyWithPhotos) {
 
 		// keep only tours which contain photos
-		final boolean isNoPhotos = currentTourPhotoLink.tourPhotos.size() == 0;
+		final boolean isNoPhotos = currentTourPhotoLink.linkPhotos.size() == 0;
 
 		if (isNoPhotos && currentTourPhotoLink.isHistoryTour || isNoPhotos && isShowToursOnlyWithPhotos) {
 			return;
@@ -534,7 +552,7 @@ public class PhotoManager {
 
 				// this is a subsequent history tour, it is merged into previous history tour
 
-				prevHistoryTour.tourPhotos.addAll(tourPhotoLink.tourPhotos);
+				prevHistoryTour.linkPhotos.addAll(tourPhotoLink.linkPhotos);
 				prevHistoryTour.numberOfGPSPhotos += tourPhotoLink.numberOfGPSPhotos;
 				prevHistoryTour.numberOfNoGPSPhotos += tourPhotoLink.numberOfNoGPSPhotos;
 
@@ -705,7 +723,7 @@ public class PhotoManager {
 				}
 			}
 
-			tourPhotoLink.tourPhotos.clear();
+			tourPhotoLink.linkPhotos.clear();
 
 			tourPhotoLink.numberOfGPSPhotos = 0;
 			tourPhotoLink.numberOfNoGPSPhotos = 0;
@@ -1138,7 +1156,7 @@ public class PhotoManager {
 			tourPhotoLink.numberOfGPSPhotos = 0;
 			tourPhotoLink.numberOfNoGPSPhotos = 0;
 
-			for (final Photo photo : tourPhotoLink.tourPhotos) {
+			for (final Photo photo : tourPhotoLink.linkPhotos) {
 
 				// set number of GPS/No GPS photos
 				final double latitude = photo.getLatitude();
@@ -1153,7 +1171,7 @@ public class PhotoManager {
 
 	private void setTourGPSIntoPhotos_10(final TourPhotoLink tourPhotoLink) {
 
-		final ArrayList<Photo> allPhotoWrapper = tourPhotoLink.tourPhotos;
+		final ArrayList<Photo> allPhotoWrapper = tourPhotoLink.linkPhotos;
 
 		final int numberOfPhotos = allPhotoWrapper.size();
 		if (numberOfPhotos == 0) {

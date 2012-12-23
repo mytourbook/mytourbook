@@ -21,7 +21,10 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.Util;
+import net.tourbook.data.TourData;
 import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.SelectionTourId;
+import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
@@ -85,12 +88,15 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 	 */
 	private TourPhotoLinkSelection			_selectionWhenHidden;
 
-	private ISelection						_currentPhotoSelection;
-
 	private PhotoGallery					_photoGallery;
 
 	private boolean							_isVerticalGallery;
 	public IToolBarManager					_galleryToolbarManager;
+
+	private int								_galleryPositionKey;
+
+	private long							_photoStartTime;
+	private long							_photoEndTime;
 
 	/*
 	 * UI controls
@@ -197,7 +203,7 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
 					if (_selectionWhenHidden != null) {
 
-						updateUI(_selectionWhenHidden);
+						onSelectionChanged(_selectionWhenHidden);
 
 						_selectionWhenHidden = null;
 					}
@@ -385,21 +391,91 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 		_galleryToolbarManager.update(true);
 	}
 
+	private void getPhotos(final ArrayList<Photo> allPhotos, final TourData tourData) {
+
+		if (tourData == null) {
+			return;
+		}
+
+		final ArrayList<Photo> galleryPhotos = tourData.getGalleryPhotos();
+
+		allPhotos.addAll(galleryPhotos);
+
+		_galleryPositionKey += galleryPhotos.hashCode();
+
+		final int gallerySize = galleryPhotos.size();
+		if (gallerySize > 0) {
+
+			final long tourStartTime = galleryPhotos.get(0).adjustedTime;
+			final long tourEndTime = galleryPhotos.get(gallerySize - 1).adjustedTime;
+
+			if (tourStartTime < _photoStartTime) {
+				_photoStartTime = tourStartTime;
+			}
+			if (tourEndTime > _photoEndTime) {
+				_photoEndTime = tourEndTime;
+			}
+		}
+	}
+
 	private void onSelectionChanged(final ISelection selection) {
 
-//		if (selection instanceof TourPhotoLinkSelection) {
-//
-//			if (_currentPhotoSelection == selection) {
-//				// prevent setting the same selection again
-//				return;
-//			}
-//
-//			_currentPhotoSelection = selection;
-//
-//			final TourPhotoLinkSelection tourPhotoSelection = (TourPhotoLinkSelection) selection;
-//
-//			updateUI(tourPhotoSelection);
-//		}
+		final ArrayList<Photo> allPhotos = new ArrayList<Photo>();
+
+		_galleryPositionKey = 0;
+		_photoStartTime = Long.MAX_VALUE;
+		_photoEndTime = Long.MIN_VALUE;
+
+		if (selection instanceof TourPhotoLinkSelection) {
+
+			final TourPhotoLinkSelection tourPhotoSelection = (TourPhotoLinkSelection) selection;
+
+			final ArrayList<TourPhotoLink> photoLinks = tourPhotoSelection.tourPhotoLinks;
+
+			for (final TourPhotoLink photoLink : photoLinks) {
+
+				allPhotos.addAll(photoLink.linkPhotos);
+
+				_galleryPositionKey += photoLink.linkId;
+
+				final long tourStartTime = photoLink.tourStartTime;
+				final long tourEndTime = photoLink.tourEndTime;
+
+				if (tourStartTime < _photoStartTime) {
+					_photoStartTime = tourStartTime;
+				}
+				if (tourEndTime > _photoEndTime) {
+					_photoEndTime = tourEndTime;
+				}
+			}
+
+			updateUI(allPhotos);
+
+		} else if (selection instanceof SelectionTourId) {
+
+			final SelectionTourId tourIdSelection = (SelectionTourId) selection;
+			final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
+
+			getPhotos(allPhotos, tourData);
+
+			updateUI(allPhotos);
+
+		} else if (selection instanceof SelectionTourIds) {
+
+			// paint all selected tours
+
+			final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+
+			for (final Long tourId : tourIds) {
+
+				final TourData tourData = TourManager.getInstance().getTourData(tourId);
+
+				getPhotos(allPhotos, tourData);
+			}
+
+			updateUI(allPhotos);
+
+		}
 	}
 
 	@Override
@@ -432,7 +508,7 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
 				} else {
 
-					updateUI(linkSelection);
+					onSelectionChanged(linkSelection);
 				}
 			}
 		}
@@ -497,58 +573,36 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 	private void updateColors(final boolean isRestore) {
 
 		final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
+
 		final Color fgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND);
 		final Color bgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
 		final Color selectionFgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_SELECTION_FOREGROUND);
 
 		final Color noFocusSelectionFgColor = Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND);
 
-//		tree.setForeground(fgColor);
-//		tree.setBackground(bgColor);
-
 		_photoGallery.updateColors(fgColor, bgColor, selectionFgColor, noFocusSelectionFgColor, isRestore);
 	}
 
-	private void updateUI(final TourPhotoLinkSelection tourPhotoSelection) {
+	private void updateUI(final ArrayList<Photo> allPhotos) {
 
 		/*
 		 * update photo gallery
 		 */
-		final ArrayList<TourPhotoLink> tourPhotoLinks = tourPhotoSelection.tourPhotoLinks;
-		final ArrayList<Photo> allPhotoWrapper = new ArrayList<Photo>();
-		long galleryPositionKey = 0;
-		long startTime = Long.MAX_VALUE;
-		long endTime = Long.MIN_VALUE;
 
-		for (final TourPhotoLink tourPhotoLink : tourPhotoLinks) {
-
-			allPhotoWrapper.addAll(tourPhotoLink.tourPhotos);
-
-			galleryPositionKey += tourPhotoLink.linkId;
-
-			final long tourStartTime = tourPhotoLink.tourStartTime;
-			final long tourEndTime = tourPhotoLink.tourEndTime;
-
-			if (tourStartTime < startTime) {
-				startTime = tourStartTime;
-			}
-			if (tourEndTime > endTime) {
-				endTime = tourEndTime;
-			}
-		}
-
-		_photoGallery.showImages(allPhotoWrapper, Long.toString(galleryPositionKey) + " TourPhotosView", true);//$NON-NLS-1$
+		_photoGallery.showImages(allPhotos, Long.toString(_galleryPositionKey) + "_TourPhotosView", true);//$NON-NLS-1$
 
 		/*
 		 * set title
 		 */
-		final int size = allPhotoWrapper.size();
+		final int size = allPhotos.size();
 		String labelText;
 
 		if (size == 1) {
-			labelText = _dtFormatter.print(startTime);
+			labelText = _dtFormatter.print(_photoStartTime);
 		} else if (size > 1) {
-			labelText = _dtFormatter.print(startTime) + UI.DASH_WITH_DOUBLE_SPACE + _dtFormatter.print(endTime);
+			labelText = _dtFormatter.print(_photoStartTime)
+					+ UI.DASH_WITH_DOUBLE_SPACE
+					+ _dtFormatter.print(_photoEndTime);
 		} else {
 			labelText = UI.EMPTY_STRING;
 		}

@@ -1109,86 +1109,37 @@ public class TourDatabase {
 
 			final String sqlWhereTourDataTourId = " WHERE " + TABLE_TOUR_DATA + "_tourId=?"; //$NON-NLS-1$ //$NON-NLS-2$
 
-			/*
-			 * tour data
-			 */
-			sql = "DELETE FROM " + TABLE_TOUR_DATA + " WHERE tourId=?"; //$NON-NLS-1$ //$NON-NLS-2$
-			prepStmt = conn.prepareStatement(sql);
-			prepStmt.setLong(1, tourId);
-			prepStmt.execute();
-			prepStmt.close();
+			final String allSql[] = {
+					//
+					"DELETE FROM " + TABLE_TOUR_DATA + " WHERE tourId=?", //$NON-NLS-1$ //$NON-NLS-2$
+					//
+					"DELETE FROM " + TABLE_TOUR_MARKER + sqlWhereTourDataTourId, //$NON-NLS-1$
+					"DELETE FROM " + JOINTABLE_TOURDATA__TOURMARKER + sqlWhereTourDataTourId, //$NON-NLS-1$
+					//
+					"DELETE FROM " + TABLE_TOUR_PHOTO + sqlWhereTourDataTourId, //$NON-NLS-1$
+					"DELETE FROM " + JOINTABLE_TOURDATA__TOURPHOTO + sqlWhereTourDataTourId, //$NON-NLS-1$
+					//
+					"DELETE FROM " + TABLE_TOUR_WAYPOINT + sqlWhereTourDataTourId, //$NON-NLS-1$
+					"DELETE FROM " + JOINTABLE_TOURDATA__TOURWAYPOINT + sqlWhereTourDataTourId, //$NON-NLS-1$
+					//
+					"DELETE FROM " + TABLE_TOUR_REFERENCE + sqlWhereTourDataTourId, //$NON-NLS-1$
+					"DELETE FROM " + JOINTABLE_TOURDATA__TOURREFERENCE + sqlWhereTourDataTourId, //$NON-NLS-1$
+					//
+					"DELETE FROM " + JOINTABLE_TOURDATA__TOURTAG + sqlWhereTourDataTourId, //$NON-NLS-1$
+					//
+					"DELETE FROM " + TABLE_TOUR_COMPARED + " WHERE tourId=?", //$NON-NLS-1$ //$NON-NLS-2$
+			//
+			};
 
-			/*
-			 * tour marker
-			 */
-			sql = "DELETE FROM " + TABLE_TOUR_MARKER + sqlWhereTourDataTourId; //$NON-NLS-1$
-			prepStmt = conn.prepareStatement(sql);
-			prepStmt.setLong(1, tourId);
-			prepStmt.execute();
-			prepStmt.close();
+			for (final String sqlExec : allSql) {
 
-			sql = "DELETE FROM " + JOINTABLE_TOURDATA__TOURMARKER + sqlWhereTourDataTourId; //$NON-NLS-1$
-			prepStmt = conn.prepareStatement(sql);
-			prepStmt.setLong(1, tourId);
-			prepStmt.execute();
-			prepStmt.close();
+				sql = sqlExec;
 
-			/*
-			 * tour photo
-			 */
-			sql = "DELETE FROM " + JOINTABLE_TOURDATA__TOURPHOTO + sqlWhereTourDataTourId; //$NON-NLS-1$
-			prepStmt = conn.prepareStatement(sql);
-			prepStmt.setLong(1, tourId);
-			prepStmt.execute();
-			prepStmt.close();
-
-			/*
-			 * tour way point
-			 */
-			sql = "DELETE FROM " + TABLE_TOUR_WAYPOINT + sqlWhereTourDataTourId; //$NON-NLS-1$
-			prepStmt = conn.prepareStatement(sql);
-			prepStmt.setLong(1, tourId);
-			prepStmt.execute();
-			prepStmt.close();
-
-			sql = "DELETE FROM " + JOINTABLE_TOURDATA__TOURWAYPOINT + sqlWhereTourDataTourId; //$NON-NLS-1$
-			prepStmt = conn.prepareStatement(sql);
-			prepStmt.setLong(1, tourId);
-			prepStmt.execute();
-			prepStmt.close();
-
-			/*
-			 * reference tour
-			 */
-			sql = "DELETE FROM " + TABLE_TOUR_REFERENCE + sqlWhereTourDataTourId; //$NON-NLS-1$
-			prepStmt = conn.prepareStatement(sql);
-			prepStmt.setLong(1, tourId);
-			prepStmt.execute();
-			prepStmt.close();
-
-			sql = "DELETE FROM " + JOINTABLE_TOURDATA__TOURREFERENCE + sqlWhereTourDataTourId; //$NON-NLS-1$
-			prepStmt = conn.prepareStatement(sql);
-			prepStmt.setLong(1, tourId);
-			prepStmt.execute();
-			prepStmt.close();
-
-			/*
-			 * tour tags
-			 */
-			sql = "DELETE FROM " + JOINTABLE_TOURDATA__TOURTAG + sqlWhereTourDataTourId; //$NON-NLS-1$
-			prepStmt = conn.prepareStatement(sql);
-			prepStmt.setLong(1, tourId);
-			prepStmt.execute();
-			prepStmt.close();
-
-			/*
-			 * compared tour
-			 */
-			sql = "DELETE FROM " + TABLE_TOUR_COMPARED + " WHERE tourId=?"; //$NON-NLS-1$ //$NON-NLS-2$
-			prepStmt = conn.prepareStatement(sql);
-			prepStmt.setLong(1, tourId);
-			prepStmt.execute();
-			prepStmt.close();
+				prepStmt = conn.prepareStatement(sql);
+				prepStmt.setLong(1, tourId);
+				prepStmt.execute();
+				prepStmt.close();
+			}
 
 //			/*
 //			 * OLD unused table: tour category
@@ -1207,7 +1158,6 @@ public class TourDatabase {
 			System.out.println(sql);
 			UI.showSQLException(e);
 		} finally {
-
 			closeConnection(conn);
 		}
 	}

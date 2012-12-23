@@ -30,7 +30,7 @@ public class TourPainterConfiguration {
 	private static TourPainterConfiguration	_instance;
 
 	private final ArrayList<TourData>		_tourDataList	= new ArrayList<TourData>();
-	private final ArrayList<Photo>			_photoWrapper	= new ArrayList<Photo>();
+	private final ArrayList<Photo>			_photos			= new ArrayList<Photo>();
 
 	/**
 	 * contains the upper left and lower right position for a tour
@@ -63,7 +63,7 @@ public class TourPainterConfiguration {
 	}
 
 	public ArrayList<Photo> getPhotos() {
-		return _photoWrapper;
+		return _photos;
 	}
 
 	public int getSynchTourZoomLevel() {
@@ -102,19 +102,19 @@ public class TourPainterConfiguration {
 	}
 
 	/**
-	 * @param photoWrapper
+	 * @param allPhotos
 	 *            When <code>null</code>, photos are not displayed.
 	 * @param isShowPhoto
 	 */
-	public void setPhotos(final ArrayList<Photo> photoWrapper, final boolean isShowPhoto) {
+	public void setPhotos(final ArrayList<Photo> allPhotos, final boolean isShowPhoto) {
 
-		_photoWrapper.clear();
+		_photos.clear();
 
-		if (photoWrapper != null) {
-			_photoWrapper.addAll(photoWrapper);
+		if (allPhotos != null) {
+			_photos.addAll(allPhotos);
 		}
 
-		isPhotoVisible = isShowPhoto && _photoWrapper.size() > 0;
+		isPhotoVisible = isShowPhoto && _photos.size() > 0;
 	}
 
 	public void setSynchTourZoomLevel(final int zoomLevel) {

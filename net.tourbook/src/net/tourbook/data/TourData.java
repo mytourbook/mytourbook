@@ -70,6 +70,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.math.Smooth;
 import net.tourbook.photo.Photo;
+import net.tourbook.photo.PhotoManager;
 import net.tourbook.photo.TourPhotoLink;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageComputedValues;
@@ -537,8 +538,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	// ############################################# PHOTO  DATA #############################################
 
 	/**
-	 * Number of photos which are set in {@link #tourPhotos}
+	 * Number of photos which are set in {@link #tourPhotos}, this field is displayed only in views
+	 * or works as tour filter.
 	 */
+	@SuppressWarnings("unused")
 	private int												numberOfPhotos;
 
 	/**
@@ -582,7 +585,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private SerieData										serieData;
 
 	/**
-	 * Photos for to this tour
+	 * Photos for this tour
 	 */
 	@OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
@@ -1001,16 +1004,19 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private double[]										timeSerieDouble;
 
 	/**
-	 * Contains photo data from a {@link TourPhotoLink}
+	 * Contains photo data from a {@link TourPhotoLink}.
+	 * <p>
+	 * When this field is set, photos from this photo link are displayed otherwise the photos from
+	 * {@link #tourPhotos} are displayed.
 	 */
 	@Transient
 	public TourPhotoLink									tourPhotoLink;
 
 	/**
-	 * Contains photo data from a {@link PhotoWrapper}
+	 * Contains photos which are displayed in photo galleries.
 	 */
 	@Transient
-	private ArrayList<Photo>								_tourPhotoWrapper					= new ArrayList<Photo>();
+	private ArrayList<Photo>								_galleryPhotos						= new ArrayList<Photo>();
 
 	/**
 	 * 
@@ -4302,6 +4308,51 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	}
 
 	/**
+	 * @return Returns <code>null</code> when tour do not contains photos, otherwise a list of
+	 *         {@link Photo}'s is returned.
+	 */
+	public ArrayList<Photo> getGalleryPhotos() {
+
+		if (tourPhotos.size() == 0) {
+			return null;
+		}
+
+		// photos are available in this tour
+
+		if (_galleryPhotos.size() > 0) {
+
+			// photos are set
+			return _galleryPhotos;
+		}
+
+		// photos are not yet set
+
+		// create photo wrapper for all tour photos
+		for (final TourPhoto tourPhoto : tourPhotos) {
+
+			final File photoFile = new File(tourPhoto.getImageFilePathName());
+
+			final Photo galleryPhoto = new Photo(photoFile);
+
+			galleryPhoto.adjustedTime = tourPhoto.getAdjustedTime();
+			galleryPhoto.imageExifTime = tourPhoto.getImageExifTime();
+
+			final double latitude = tourPhoto.getLatitude();
+
+			galleryPhoto.isGeoFromExif = tourPhoto.isGeoFromPhoto();
+			galleryPhoto.isPhotoWithGps = latitude != 0;
+
+			galleryPhoto.setTourGeoPosition(latitude, tourPhoto.getLongitude());
+
+			_galleryPhotos.add(galleryPhoto);
+		}
+
+		Collections.sort(_galleryPhotos, PhotoManager.AdjustTimeComparator);
+
+		return _galleryPhotos;
+	}
+
+	/**
 	 * @return Returns bounds of the tour in latitude/longitude:
 	 *         <p>
 	 *         1st item contains lat/lon minimum values<br>
@@ -4436,10 +4487,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 
 		return numberOfHrZones;
-	}
-
-	public int getNumberOfPhotos() {
-		return numberOfPhotos;
 	}
 
 	public int getNumberOfTimeSlices() {
@@ -4709,10 +4756,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return new float[][] { srtmSerie, srtmSerieImperial };
 	}
 
-	public short getStartAltitude() {
-		return startAltitude;
-	}
-
 //	public double[] getTimeSerieDouble() {
 //
 //		if (timeSerieHistory == null) {
@@ -4730,6 +4773,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 //
 //		return timeSerieHistoryDouble;
 //	}
+
+	public short getStartAltitude() {
+		return startAltitude;
+	}
 
 	public float getStartDistance() {
 		return startDistance;
@@ -4944,6 +4991,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return tourId;
 	}
 
+//	is currently disabled in version 12.12, will be used in further versions
+//
+//	public Set<TourPhoto> getTourPhotos() {
+//		return tourPhotos;
+//	}
+
 	public String getTourImportFilePath() {
 		if ((tourImportFilePath == null) || (tourImportFilePath.length() == 0)) {
 			if (isManualTour()) {
@@ -4955,12 +5008,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			return tourImportFilePath;
 		}
 	}
-
-//	is currently disabled in version 12.12, will be used in further versions
-//
-//	public Set<TourPhoto> getTourPhotos() {
-//		return tourPhotos;
-//	}
 
 	/**
 	 * @return Returns the import file path or <code>null</code> when not available.
@@ -5009,46 +5056,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return tourPerson;
 	}
 
+	/**
+	 * @return Returns all {@link TourPhoto}'s which are saved in this tour.
+	 */
 	public Set<TourPhoto> getTourPhotos() {
 		return tourPhotos;
-	}
-
-	/**
-	 * @return Returns <code>null</code> when tour do not contains photos, otherwise a list of
-	 *         {@link PhotoWrapper} is returned.
-	 */
-	public ArrayList<Photo> getTourPhotoWrapper() {
-
-		if (tourPhotos.size() == 0) {
-			return null;
-		}
-
-		// photos are available in this tour
-
-		if (_tourPhotoWrapper.size() > 0) {
-			return _tourPhotoWrapper;
-		}
-
-		// photos are not yet set
-
-		// create photo wrapper for all tour photos
-		for (final TourPhoto tourPhoto : tourPhotos) {
-
-			final File photoFile = new File(tourPhoto.getImageFilePathName());
-
-			final Photo photoWrapper = new Photo(photoFile);
-
-			photoWrapper.imageExifTime = tourPhoto.getImageExifTime();
-			photoWrapper.adjustedTime = tourPhoto.getAdjustedTime();
-			photoWrapper.isGeoFromExif = tourPhoto.isGeoFromPhoto();
-			photoWrapper.isPhotoWithGps = tourPhoto.getLatitude() != 0;
-//			photoWrapper=tourPhoto.;
-//			photoWrapper=tourPhoto.;
-
-			_tourPhotoWrapper.add(photoWrapper);
-		}
-
-		return _tourPhotoWrapper;
 	}
 
 	/**
@@ -5808,10 +5820,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	public void setTourPhotos(final Set<TourPhoto> newTourPhotos) {
 
-		tourPhotos.addAll(newTourPhotos);
-		numberOfPhotos = tourPhotos.size();
+		// force photos to be recreated
+		_galleryPhotos.clear();
 
-//		a = 0;
+		tourPhotos.clear();
+		tourPhotos.addAll(newTourPhotos);
+
+		numberOfPhotos = tourPhotos.size();
 	}
 
 	/**

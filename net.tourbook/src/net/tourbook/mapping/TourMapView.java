@@ -184,15 +184,15 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 	private ITourEventListener						_tourEventListener;
 
 	/**
-	 * contains the tours which are displayed in the map
+	 * Contains all tours which are displayed in the map.
 	 */
-	private final ArrayList<TourData>				_tourDataList						= new ArrayList<TourData>();
+	private final ArrayList<TourData>				_allTourData						= new ArrayList<TourData>();
 	private TourData								_previousTourData;
 
 	/**
 	 * contains photos which are displayed in the map
 	 */
-	private final ArrayList<Photo>					_photoList							= new ArrayList<Photo>();
+	private final ArrayList<Photo>					_allPhotos							= new ArrayList<Photo>();
 
 	private boolean									_isShowTour;
 	private boolean									_isShowPhoto;
@@ -453,7 +453,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 		_tourPainterConfig.isPhotoVisible = _isShowPhoto;
 
-		_map.setOverlayKey(Integer.toString(_photoList.hashCode()));
+		_map.setOverlayKey(Integer.toString(_allPhotos.hashCode()));
 		_map.disposeOverlayImageCache();
 
 		_map.paint();
@@ -461,7 +461,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 	void actionShowSlider() {
 
-		if ((_tourDataList == null) || (_tourDataList.size() == 0)) {
+		if ((_allTourData == null) || (_allTourData.size() == 0)) {
 			return;
 		}
 
@@ -469,7 +469,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		_directMappingPainter.setPaintContext(
 				_map,
 				_isShowTour,
-				_tourDataList.get(0),
+				_allTourData.get(0),
 				_currentLeftSliderValueIndex,
 				_currentRightSliderValueIndex,
 				_actionShowSliderInMap.isChecked(),
@@ -494,7 +494,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 		if (_isMapSynchedWithPhoto) {
 
-			centerPhotos(_photoList, false);
+			centerPhotos(_allPhotos, false);
 
 			_map.paint();
 		}
@@ -504,7 +504,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 	void actionSynchWithSlider() {
 
-		if (_tourDataList.size() == 0) {
+		if (_allTourData.size() == 0) {
 			return;
 		}
 
@@ -520,7 +520,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 			_map.setShowOverlays(true);
 
-			final TourData firstTourData = _tourDataList.get(0);
+			final TourData firstTourData = _allTourData.get(0);
 
 			paintTours_20_One(firstTourData, false, true);
 			setMapToSliderBounds(firstTourData);
@@ -529,7 +529,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 	void actionSynchWithTour() {
 
-		if (_tourDataList.size() == 0) {
+		if (_allTourData.size() == 0) {
 			return;
 		}
 
@@ -543,7 +543,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 			_actionShowTourInMap.setChecked(true);
 			_map.setShowOverlays(true);
 
-			paintTours_20_One(_tourDataList.get(0), true, true);
+			paintTours_20_One(_allTourData.get(0), true, true);
 
 		} else {
 
@@ -567,7 +567,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 	void actionZoomShowAllPhotos() {
 
-		centerPhotos(_photoList, true);
+		centerPhotos(_allPhotos, true);
 	}
 
 	void actionZoomShowEntireMap() {
@@ -788,8 +788,8 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 					final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
 					if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
 
-						_tourDataList.clear();
-						_tourDataList.addAll(modifiedTours);
+						_allTourData.clear();
+						_allTourData.addAll(modifiedTours);
 
 						resetMap();
 					}
@@ -810,12 +810,12 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 	/**
 	 * Center photo in the map
 	 * 
-	 * @param allPhotoWrapper
+	 * @param allPhotos
 	 * @param isForceZooming
 	 */
-	private void centerPhotos(final ArrayList<Photo> allPhotoWrapper, final boolean isForceZooming) {
+	private void centerPhotos(final ArrayList<Photo> allPhotos, final boolean isForceZooming) {
 
-		final Set<GeoPosition> positionBounds = getPhotoBounds(allPhotoWrapper);
+		final Set<GeoPosition> positionBounds = getPhotoBounds(allPhotos);
 		if (positionBounds == null) {
 			return;
 		}
@@ -875,7 +875,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 	private void clearView() {
 
 		// disable tour data
-		_tourDataList.clear();
+		_allTourData.clear();
 		_previousTourData = null;
 
 		_tourPainterConfig.resetTourData();
@@ -1045,7 +1045,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 	private boolean createLegendImage10SetProviderValues(	final ILegendProviderGradientColors legendProvider,
 															final Rectangle legendBounds) {
 
-		if (_tourDataList.size() == 0) {
+		if (_allTourData.size() == 0) {
 			return false;
 		}
 
@@ -1063,7 +1063,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 			float maxValue = Float.MAX_VALUE;
 			boolean setInitialValue = true;
 
-			for (final TourData tourData : _tourDataList) {
+			for (final TourData tourData : _allTourData) {
 
 				final float[] dataSerie = tourData.getAltitudeSerie();
 				if ((dataSerie == null) || (dataSerie.length == 0)) {
@@ -1113,7 +1113,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 			maxValue = Float.MAX_VALUE;
 			setInitialValue = true;
 
-			for (final TourData tourData : _tourDataList) {
+			for (final TourData tourData : _allTourData) {
 
 				final float[] dataSerie = tourData.pulseSerie;
 				if ((dataSerie == null) || (dataSerie.length == 0)) {
@@ -1162,7 +1162,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 			maxValue = Float.MAX_VALUE;
 			setInitialValue = true;
 
-			for (final TourData tourData : _tourDataList) {
+			for (final TourData tourData : _allTourData) {
 
 				final float[] dataSerie = tourData.getSpeedSerie();
 				if ((dataSerie == null) || (dataSerie.length == 0)) {
@@ -1212,7 +1212,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 			maxValue = Float.MAX_VALUE;
 			setInitialValue = true;
 
-			for (final TourData tourData : _tourDataList) {
+			for (final TourData tourData : _allTourData) {
 
 				final float[] dataSerie = tourData.getPaceSerieSeconds();
 				if ((dataSerie == null) || (dataSerie.length == 0)) {
@@ -1262,7 +1262,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 			maxValue = Float.MAX_VALUE;
 			setInitialValue = true;
 
-			for (final TourData tourData : _tourDataList) {
+			for (final TourData tourData : _allTourData) {
 
 				final float[] dataSerie = tourData.getGradientSerie();
 				if ((dataSerie == null) || (dataSerie.length == 0)) {
@@ -1316,7 +1316,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 	private boolean createLegendImage20SetProviderValues(	final ILegendProviderDiscreteColors legendProvider,
 															final Rectangle legendImageBounds) {
 
-		if (_tourDataList.size() == 0) {
+		if (_allTourData.size() == 0) {
 			return false;
 		}
 
@@ -1327,7 +1327,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 			boolean isValidData = false;
 
-			for (final TourData tourData : _tourDataList) {
+			for (final TourData tourData : _allTourData) {
 
 				if (TrainingManager.isRequiredHrZoneDataAvailable(tourData) == false) {
 					continue;
@@ -1452,7 +1452,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 				restoreState();
 				enableActions();
 
-				if (_tourDataList.size() == 0) {
+				if (_allTourData.size() == 0) {
 					// a tour is not displayed, find a tour provider which provides a tour
 					showToursFromTourProvider();
 				} else {
@@ -1475,8 +1475,8 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 	@Override
 	public void dispose() {
 
-		_tourDataList.clear();
-		_photoList.clear();
+		_allTourData.clear();
+		_allPhotos.clear();
 
 		// dispose tilefactory resources
 
@@ -1516,7 +1516,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 			}
 		}
 
-		final boolean isPhotoAvailable = _photoList.size() > 0;
+		final boolean isPhotoAvailable = _allPhotos.size() > 0;
 		final boolean canShowPhoto = isPhotoAvailable && _isShowPhoto;
 
 		/*
@@ -1534,7 +1534,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		/*
 		 * tour actions
 		 */
-		final int numberOfTours = _tourDataList.size();
+		final int numberOfTours = _allTourData.size();
 		final boolean isMultipleTours = numberOfTours > 1 && _isShowTour;
 		final boolean isOneTour = _isTourOrWayPoint && (isMultipleTours == false) && _isShowTour;
 
@@ -1572,7 +1572,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 		} else if (isOneTour) {
 
-			final TourData oneTourData = _tourDataList.get(0);
+			final TourData oneTourData = _allTourData.get(0);
 			final boolean isPulse = oneTourData.pulseSerie != null;
 			final boolean canShowHrZones = oneTourData.getNumberOfHrZones() > 0 && isPulse;
 
@@ -1684,10 +1684,10 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 	/**
 	 * Calculate lat/lon bounds for all photos.
 	 * 
-	 * @param allPhotoWrapper
+	 * @param allPhotos
 	 * @return
 	 */
-	private Set<GeoPosition> getPhotoBounds(final ArrayList<Photo> allPhotoWrapper) {
+	private Set<GeoPosition> getPhotoBounds(final ArrayList<Photo> allPhotos) {
 
 		/*
 		 * get min/max longitude/latitude
@@ -1699,7 +1699,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 		boolean isFirst = true;
 
-		for (final Photo photo : allPhotoWrapper) {
+		for (final Photo photo : allPhotos) {
 			if (photo.isPhotoWithGps) {
 
 				final double latitude = photo.getLatitude();
@@ -1916,6 +1916,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 			final TourData tourData = selectionTourData.getTourData();
 
 			paintTours_20_One(tourData, selectionTourData.isForceRedraw(), true);
+			paintPhotoSelection(selection);
 
 			enableActions();
 
@@ -1925,6 +1926,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 			final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
 
 			paintTours_20_One(tourData, false, true);
+			paintPhotoSelection(selection);
 
 			enableActions();
 
@@ -1937,11 +1939,11 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 				// history tour (without tours) is displayed
 
-				final ArrayList<Photo> allPhotoWrapper = paintPhotoSelection(selection);
+				final ArrayList<Photo> allPhotos = paintPhotoSelection(selection);
 
-				if (allPhotoWrapper != null) {
+				if (allPhotos.size() > 0) {
 
-					centerPhotos(allPhotoWrapper, false);
+//					centerPhotos(allPhotos, false);
 					showDefaultMap(true);
 
 					enableActions();
@@ -1959,6 +1961,8 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 				enableActions();
 
 			} else {
+
+				// paint multiple tours
 
 				paintTours(tourIds);
 				paintPhotoSelection(selection);
@@ -2095,7 +2099,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 		} else if (selection instanceof PhotoSelection) {
 
-			paintPhotos(((PhotoSelection) selection).photoWrappers, false);
+			paintPhotos(((PhotoSelection) selection).galleryPhotos);
 
 		} else if (selection instanceof SelectionTourCatalogView) {
 
@@ -2119,7 +2123,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 		// get overlay key for all tours which have valid tour data
 		long newOverlayKey = -1;
-		for (final TourData tourData : _tourDataList) {
+		for (final TourData tourData : _allTourData) {
 
 			if (isPaintDataValid(tourData)) {
 				newOverlayKey += tourData.getTourId();
@@ -2135,12 +2139,12 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		// force single tour to be repainted
 		_previousTourData = null;
 
-		_tourPainterConfig.setTourData(_tourDataList, _isShowTour);
-		_tourPainterConfig.setPhotos(_photoList, _isShowPhoto);
+		_tourPainterConfig.setTourData(_allTourData, _isShowTour);
+		_tourPainterConfig.setPhotos(_allPhotos, _isShowPhoto);
 
-		_tourInfoToolTipProvider.setTourDataList(_tourDataList);
+		_tourInfoToolTipProvider.setTourDataList(_allTourData);
 
-//		final TourData firstTourData = _tourDataList.get(0);
+//		final TourData firstTourData = _allTourData.get(0);
 //
 //		// set slider position
 //		_directMappingPainter.setPaintContext(
@@ -2152,7 +2156,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 //				_actionShowSliderInMap.isChecked(),
 //				_actionShowSliderInLegend.isChecked());
 
-		final Set<GeoPosition> tourBounds = getTourBounds(_tourDataList);
+		final Set<GeoPosition> tourBounds = getTourBounds(_allTourData);
 
 		_tourPainterConfig.setTourBounds(tourBounds);
 
@@ -2176,61 +2180,31 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		_map.paint();
 	}
 
-//	/**
-//	 * paints the tours which are set in {@link #_tourDataList}
-//	 */
-//	private void paintEntireTour_Multiple() {
+	private void paintPhotos(final ArrayList<Photo> allPhotos) {
+
+		_allPhotos.clear();
+		_allPhotos.addAll(allPhotos);
+
+//		// dump tour photos
+//		System.out.println(net.tourbook.common.UI.timeStampNano() + " paintPhotos\t");
+//		// TODO remove SYSTEM.OUT.PRINTLN
 //
-////		_isTourOrWayPoint = true;
-////
-////		// force single tour to be repainted
-////		_previousTourData = null;
-////
-////		_tourPainterConfig.setTourData(_tourDataList, _isShowTour);
-////		_tourPainterConfig.setPhotos(_photoList, _isShowPhoto);
-////
-////		_tourInfoToolTipProvider.setTourDataList(_tourDataList);
-////
-////		_directMappingPainter.disablePaintContext();
-////
-////		_map.setShowOverlays(_isShowTour || _isShowPhoto);
-////		_map.setShowLegend(_isShowTour && _isShowLegend);
-////
-////		// get overlay key for all tours which have valid tour data
-////		long newOverlayKey = -1;
-////		for (final TourData tourData : _tourDataList) {
-////
-////			if (isPaintDataValid(tourData)) {
-////				newOverlayKey += tourData.getTourId();
-////			}
-////		}
-////
-////		if (_previousOverlayKey != newOverlayKey) {
-////
-////			_previousOverlayKey = newOverlayKey;
-////
-////			_map.setOverlayKey(Long.toString(newOverlayKey));
-////			_map.disposeOverlayImageCache();
-////		}
-////
-////		createLegendImage(_tourPainterConfig.getLegendProvider());
-//
-//		_map.paint();
-//	}
+//		for (final Photo photo : allPhotos) {
+//			System.out.println(net.tourbook.common.UI.timeStampNano()
+//					+ " "
+//					+ photo.imageFileName
+//					+ ("\t" + new DateTime(photo.adjustedTime)));
+//			// TODO remove SYSTEM.OUT.PRINTLN
+//		}
 
-	private void paintPhotos(final ArrayList<Photo> photoWrapperList, final boolean isForceZooming) {
-
-		_photoList.clear();
-		_photoList.addAll(photoWrapperList);
-
-		if (_isShowPhoto && (_isMapSynchedWithPhoto || isForceZooming)) {
-			centerPhotos(_photoList, isForceZooming);
+		if (_isShowPhoto && _isMapSynchedWithPhoto) {
+			centerPhotos(_allPhotos, false);
 		}
 
-		_tourPainterConfig.setPhotos(_photoList, _isShowPhoto);
+		_tourPainterConfig.setPhotos(_allPhotos, _isShowPhoto);
 
 		_map.setShowOverlays(_isShowTour || _isShowPhoto);
-		_map.setOverlayKey(Integer.toString(_photoList.hashCode()));
+		_map.setOverlayKey(Integer.toString(_allPhotos.hashCode()));
 		_map.disposeOverlayImageCache();
 
 		_map.paint();
@@ -2238,21 +2212,20 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 	/**
 	 * @param selection
-	 * @return Returns a list which contains all photos, or <code>null</code> when photos are not
-	 *         contained in the selection.
+	 * @return Returns a list which contains all photos.
 	 */
 	private ArrayList<Photo> paintPhotoSelection(final ISelection selection) {
+
+		final ArrayList<Photo> allPhotos = new ArrayList<Photo>();
 
 		if (selection instanceof TourPhotoLinkSelection) {
 
 			final TourPhotoLinkSelection linkSelection = (TourPhotoLinkSelection) selection;
 
-			final ArrayList<Photo> allPhotoWrapper = new ArrayList<Photo>();
-
 			final ArrayList<TourPhotoLink> tourPhotoLinks = linkSelection.tourPhotoLinks;
 
 			for (final TourPhotoLink tourPhotoLink : tourPhotoLinks) {
-				allPhotoWrapper.addAll(tourPhotoLink.tourPhotos);
+				allPhotos.addAll(tourPhotoLink.linkPhotos);
 			}
 
 			/*
@@ -2260,14 +2233,23 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 			 * selected
 			 */
 //			final boolean isForceZooming = tourPhotoLinks.size() > 1;
-			final boolean isForceZooming = false;
+//			final boolean isForceZooming = false;
 
-			paintPhotos(allPhotoWrapper, isForceZooming);
+		} else {
 
-			return allPhotoWrapper;
+			for (final TourData tourData : _allTourData) {
+
+				final ArrayList<Photo> galleryPhotos = tourData.getGalleryPhotos();
+
+				if (galleryPhotos != null) {
+					allPhotos.addAll(galleryPhotos);
+				}
+			}
 		}
 
-		return null;
+		paintPhotos(allPhotos);
+
+		return allPhotos;
 	}
 
 	private void paintTours(final ArrayList<Long> tourIdList) {
@@ -2284,23 +2266,23 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 		long newOverlayKey = _tourHashOverlayKey;
 
-		if (tourIdList.hashCode() != _tourIdHash || _tourDataList.hashCode() != _tourDataHash) {
+		if (tourIdList.hashCode() != _tourIdHash || _allTourData.hashCode() != _tourDataHash) {
 
 			// tour data needs to be loaded
 
-			_tourDataList.clear();
+			_allTourData.clear();
 
 			newOverlayKey = paintTours_05_GetTourData(tourIdList);
 
 			_tourIdHash = tourIdList.hashCode();
-			_tourDataHash = _tourDataList.hashCode();
+			_tourDataHash = _allTourData.hashCode();
 			_tourHashOverlayKey = newOverlayKey;
 		}
 
-		_tourPainterConfig.setTourData(_tourDataList, _isShowTour);
-		_tourPainterConfig.setPhotos(_photoList, _isShowPhoto);
+		_tourPainterConfig.setTourData(_allTourData, _isShowTour);
+		_tourPainterConfig.setPhotos(_allPhotos, _isShowPhoto);
 
-		_tourInfoToolTipProvider.setTourDataList(_tourDataList);
+		_tourInfoToolTipProvider.setTourDataList(_allTourData);
 
 		if (_previousOverlayKey != newOverlayKey) {
 
@@ -2349,7 +2331,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 							if (isPaintDataValid(tourData)) {
 
 								// keep tour data for each tour id
-								_tourDataList.add(tourData);
+								_allTourData.add(tourData);
 								newOverlayKey[0] += tourData.getTourId();
 							}
 
@@ -2374,7 +2356,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 				if (isPaintDataValid(tourData)) {
 
 					// keep tour data for each tour id
-					_tourDataList.add(tourData);
+					_allTourData.add(tourData);
 					newOverlayKey[0] += tourData.getTourId();
 				}
 			}
@@ -2385,7 +2367,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 	private void paintTours_10_All() {
 
-		if (_tourDataList.size() == 0) {
+		if (_allTourData.size() == 0) {
 			_tourInfoToolTipProvider.setTourData(null);
 			return;
 		}
@@ -2393,7 +2375,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		// show/hide legend
 		_map.setShowLegend(_isShowTour);
 
-		if (_tourDataList.size() > 1) {
+		if (_allTourData.size() > 1) {
 
 			// multiple tours are displayed
 
@@ -2401,7 +2383,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 			enableActions(true);
 
 		} else {
-			paintTours_20_One(_tourDataList.get(0), true, false);
+			paintTours_20_One(_allTourData.get(0), true, false);
 			enableActions();
 		}
 	}
@@ -2426,7 +2408,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		// prevent loading the same tour
 		if (forceRedraw == false) {
 
-			if ((_tourDataList.size() == 1) && (_tourDataList.get(0) == tourData)) {
+			if ((_allTourData.size() == 1) && (_allTourData.get(0) == tourData)) {
 				return;
 			}
 		}
@@ -2447,10 +2429,10 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		 * set tour into tour data list, this is currently used to draw the legend, it's also used
 		 * to figure out if multiple tours are selected
 		 */
-		_tourDataList.clear();
-		_tourDataList.add(tourData);
+		_allTourData.clear();
+		_allTourData.add(tourData);
 
-		_tourInfoToolTipProvider.setTourDataList(_tourDataList);
+		_tourInfoToolTipProvider.setTourDataList(_allTourData);
 
 		// set the paint context (slider position) for the direct mapping painter
 		_directMappingPainter.setPaintContext(
@@ -2518,7 +2500,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 	}
 
 	/**
-	 * paints the tours which are set in {@link #_tourDataList}
+	 * paints the tours which are set in {@link #_allTourData}
 	 */
 	private void paintTours_30_Multiple() {
 
@@ -2527,10 +2509,10 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		// force single tour to be repainted
 		_previousTourData = null;
 
-		_tourPainterConfig.setTourData(_tourDataList, _isShowTour);
-		_tourPainterConfig.setPhotos(_photoList, _isShowPhoto);
+		_tourPainterConfig.setTourData(_allTourData, _isShowTour);
+		_tourPainterConfig.setPhotos(_allPhotos, _isShowPhoto);
 
-		_tourInfoToolTipProvider.setTourDataList(_tourDataList);
+		_tourInfoToolTipProvider.setTourDataList(_allTourData);
 
 		_directMappingPainter.disablePaintContext();
 
@@ -2539,7 +2521,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 		// get overlay key for all tours which have valid tour data
 		long newOverlayKey = -1;
-		for (final TourData tourData : _tourDataList) {
+		for (final TourData tourData : _allTourData) {
 
 			if (isPaintDataValid(tourData)) {
 				newOverlayKey += tourData.getTourId();
@@ -2614,7 +2596,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 	private void resetMap() {
 
-		if (_tourDataList.size() == 0) {
+		if (_allTourData.size() == 0) {
 			return;
 		}
 
@@ -2954,7 +2936,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		_isTourOrWayPoint = false;
 
 		// disable tour data
-		_tourDataList.clear();
+		_allTourData.clear();
 		_previousTourData = null;
 		_tourPainterConfig.resetTourData();
 
@@ -3010,15 +2992,15 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 				/*
 				 * check if tour is set from a selection provider
 				 */
-				if (_tourDataList.size() > 0) {
+				if (_allTourData.size() > 0) {
 					return;
 				}
 
 				final ArrayList<TourData> tourDataList = TourManager.getSelectedTours();
 				if (tourDataList != null) {
 
-					_tourDataList.clear();
-					_tourDataList.addAll(tourDataList);
+					_allTourData.clear();
+					_allTourData.addAll(tourDataList);
 
 					paintTours_10_All();
 				}

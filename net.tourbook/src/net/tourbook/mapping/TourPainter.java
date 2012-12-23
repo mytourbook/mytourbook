@@ -787,11 +787,6 @@ public class TourPainter extends MapPainter {
 								final Point photoWorldPixel,
 								final int parts) {
 
-		final org.eclipse.swt.graphics.Point photoSize = photo.getMapImageSize();
-		if (photoSize == null) {
-			return false;
-		}
-
 		final MP mp = map.getMapProvider();
 		final int tileSize = mp.getTileSize();
 
@@ -803,6 +798,7 @@ public class TourPainter extends MapPainter {
 		final int devXPhoto = photoWorldPixel.x - tileWorldPixelX;
 		final int devYPhoto = photoWorldPixel.y - tilwWorldPixelY;
 
+		final org.eclipse.swt.graphics.Point photoSize = photo.getMapImageSize();
 		final boolean isPhotoInTile = isPhotoInTile(photoSize, devXPhoto, devYPhoto, tileSize);
 
 		if (isPhotoInTile) {
@@ -810,7 +806,7 @@ public class TourPainter extends MapPainter {
 //			final int zoomLevel = map.getZoom();
 			final int devPartOffset = ((parts - 1) / 2) * tileSize;
 
-			final Image image = getMapImage(photo, map);
+			final Image image = getPhotoImage(photo, map);
 
 			if (image == null) {
 				return false;
@@ -1416,9 +1412,9 @@ public class TourPainter extends MapPainter {
 		return valuePosition;
 	}
 
-	private Image getMapImage(final Photo photo, final Map map) {
+	private Image getPhotoImage(final Photo photo, final Map map) {
 
-		Image mapImage = null;
+		Image photoImage = null;
 
 		final ImageQuality requestedImageQuality = ImageQuality.THUMB;
 
@@ -1430,9 +1426,9 @@ public class TourPainter extends MapPainter {
 			// image is not yet loaded
 
 			// check if image is in the cache
-			mapImage = PhotoImageCache.getImage(photo, requestedImageQuality);
+			photoImage = PhotoImageCache.getImage(photo, requestedImageQuality);
 
-			if ((mapImage == null || mapImage.isDisposed())
+			if ((photoImage == null || photoImage.isDisposed())
 					&& photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
 
 				// the requested image is not available in the image cache -> image must be loaded
@@ -1443,7 +1439,7 @@ public class TourPainter extends MapPainter {
 			}
 		}
 
-		return mapImage;
+		return photoImage;
 	}
 
 	private Color getTourColor(	final TourData tourData,
@@ -1656,10 +1652,6 @@ public class TourPainter extends MapPainter {
 			}
 
 			final org.eclipse.swt.graphics.Point photoSize = photo.getMapImageSize();
-			if (photoSize == null) {
-				continue;
-			}
-
 			final int tileSize = mp.getTileSize();
 
 			// convert world position into tile position

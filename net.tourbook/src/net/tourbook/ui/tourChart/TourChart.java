@@ -297,7 +297,7 @@ public class TourChart extends Chart {
 			}
 
 			// check if photos are available
-			if (_tourData.tourPhotoLink == null && _tourData.getNumberOfPhotos() == 0) {
+			if (_tourData.tourPhotoLink == null && _tourData.getTourPhotos().size() == 0) {
 				return;
 			}
 
@@ -869,17 +869,16 @@ public class TourChart extends Chart {
 			return;
 		}
 
-		final TourPhotoLink tourPhotoLink = _tourData.tourPhotoLink;
-
 		ArrayList<Photo> tourPhotos = null;
 
+		final TourPhotoLink tourPhotoLink = _tourData.tourPhotoLink;
 		if (tourPhotoLink != null) {
 
-			tourPhotos = tourPhotoLink.tourPhotos;
+			tourPhotos = tourPhotoLink.linkPhotos;
 
 		} else {
 
-			tourPhotos = _tourData.getTourPhotoWrapper();
+			tourPhotos = _tourData.getGalleryPhotos();
 
 			if (tourPhotos == null) {
 				return;
@@ -892,6 +891,18 @@ public class TourChart extends Chart {
 			// no photos are available for this tour
 			return;
 		}
+
+//		// dump tour photos
+//		System.out.println(UI.timeStampNano() + " \t");
+//		// TODO remove SYSTEM.OUT.PRINTLN
+//
+//		for (final Photo photo : tourPhotos) {
+//			System.out.println(UI.timeStampNano()
+//					+ " "
+//					+ photo.imageFileName
+//					+ ("\t" + new DateTime(photo.adjustedTime)));
+//			// TODO remove SYSTEM.OUT.PRINTLN
+//		}
 
 		final int[] timeSerie = _tourData.timeSerie;
 		final long[] historySerie = _tourData.timeSerieHistory;
