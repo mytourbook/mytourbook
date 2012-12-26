@@ -212,7 +212,7 @@ public class TileImageCache {
 	 * @param tile
 	 * @return Returns image from offline image file or <code>null</code> when loading fails
 	 */
-	Image getOfflineTileImageData(final Tile tile) {
+	Image getOfflineImage(final Tile tile) {
 
 		if (_useOffLineCache == false) {
 			return null;

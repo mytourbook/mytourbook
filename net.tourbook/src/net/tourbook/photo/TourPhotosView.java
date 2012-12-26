@@ -64,11 +64,10 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
 	private static final String				STATE_PHOTO_GALLERY_IS_VERTICAL	= "STATE_PHOTO_GALLERY_IS_VERTICAL";		//$NON-NLS-1$
 
-	private final IPreferenceStore			_prefStore						= TourbookPlugin
-																					.getDefault()
-																					.getPreferenceStore();
 	private static final IDialogSettings	_state							= TourbookPlugin.getDefault()//
 																					.getDialogSettingsSection(ID);
+	private final IPreferenceStore			_prefStore						= TourbookPlugin.getDefault()//
+																					.getPreferenceStore();
 
 	private final DateTimeFormatter			_dtFormatter					= DateTimeFormat.forStyle("ML");			//$NON-NLS-1$
 
@@ -153,7 +152,7 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 	private void actionToggleVH() {
 
 		// keep state for current orientation
-		_photoGallery.saveState(_state);
+		_photoGallery.saveState();
 
 		// toggle gallery
 		_isVerticalGallery = !_isVerticalGallery;
@@ -314,7 +313,7 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 		{
-			_photoGallery = new PhotoGallery();
+			_photoGallery = new PhotoGallery(_state);
 
 			_photoGallery.setShowCustomActionBar();
 			_photoGallery.setShowThumbnailSize();
@@ -398,6 +397,10 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 		}
 
 		final ArrayList<Photo> galleryPhotos = tourData.getGalleryPhotos();
+
+		if (galleryPhotos == null) {
+			return;
+		}
 
 		allPhotos.addAll(galleryPhotos);
 
@@ -518,7 +521,7 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
 		updateColors(true);
 
-		_photoGallery.restoreState(_state);
+		_photoGallery.restoreState();
 
 		// set gallery orientation, default is horizontal
 		_isVerticalGallery = Util.getStateBoolean(_state, STATE_PHOTO_GALLERY_IS_VERTICAL, false);
@@ -531,7 +534,7 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
 		_state.put(STATE_PHOTO_GALLERY_IS_VERTICAL, _isVerticalGallery);
 
-		_photoGallery.saveState(_state);
+		_photoGallery.saveState();
 	}
 
 	@Override

@@ -59,6 +59,8 @@ public class PicDirImages implements IPhotoGalleryProvider {
 	private static final String						STATE_FOLDER_HISTORY		= "STATE_FOLDER_HISTORY";		//$NON-NLS-1$
 	private static final String						STATE_IS_SHOW_ONLY_PHOTOS	= "STATE_IS_SHOW_ONLY_PHOTOS";	//$NON-NLS-1$
 
+	private IDialogSettings							_state;
+
 	private int										_selectedHistoryIndex;
 	private ArrayList<String>						_folderHistory				= new ArrayList<String>();
 
@@ -90,9 +92,10 @@ public class PicDirImages implements IPhotoGalleryProvider {
 	private ToolBar									_galleryToolbar;
 	private PhotoGallery							_photoGallery;
 
-	public PicDirImages(final PicDirView picDirView) {
+	public PicDirImages(final PicDirView picDirView, final IDialogSettings state) {
 
 		_picDirView = picDirView;
+		_state = state;
 	}
 
 	void actionClearHistory() {
@@ -257,7 +260,7 @@ public class PicDirImages implements IPhotoGalleryProvider {
 		_display = parent.getDisplay();
 		_picDirFolder = picDirFolder;
 
-		_photoGallery = new PhotoGallery();
+		_photoGallery = new PhotoGallery(_state);
 
 		_photoGallery.setShowCustomActionBar();
 		_photoGallery.setShowThumbnailSize();
@@ -482,22 +485,15 @@ public class PicDirImages implements IPhotoGalleryProvider {
 		}
 	}
 
-	public void restoreInfo(final boolean isShowPhotoName,
-							final PhotoDateInfo photoDateInfo,
-							final boolean isShowPhotoAnnotations,
-							final boolean isShowTooltip) {
-		_photoGallery.restoreInfo(isShowPhotoName, photoDateInfo, isShowPhotoAnnotations, isShowTooltip);
-	}
+	public void restoreState() {
 
-	public void restoreState(final IDialogSettings state) {
-
-		_isShowOnlyPhotos = Util.getStateBoolean(state, STATE_IS_SHOW_ONLY_PHOTOS, true);
+		_isShowOnlyPhotos = Util.getStateBoolean(_state, STATE_IS_SHOW_ONLY_PHOTOS, true);
 		updateUI_Action_FolderGallery();
 
 		/*
 		 * history
 		 */
-		final String[] historyEntries = Util.getStateArray(state, STATE_FOLDER_HISTORY, null);
+		final String[] historyEntries = Util.getStateArray(_state, STATE_FOLDER_HISTORY, null);
 		if (historyEntries != null) {
 
 			// update history and combo
@@ -507,18 +503,18 @@ public class PicDirImages implements IPhotoGalleryProvider {
 			}
 		}
 
-		_photoGallery.restoreState(state);
+		_photoGallery.restoreState();
 
 		enableControls();
 	}
 
-	public void saveState(final IDialogSettings state) {
+	public void saveState() {
 
-		state.put(STATE_FOLDER_HISTORY, _folderHistory.toArray(new String[_folderHistory.size()]));
+		_state.put(STATE_FOLDER_HISTORY, _folderHistory.toArray(new String[_folderHistory.size()]));
 
-		state.put(STATE_IS_SHOW_ONLY_PHOTOS, _isShowOnlyPhotos);
+		_state.put(STATE_IS_SHOW_ONLY_PHOTOS, _isShowOnlyPhotos);
 
-		_photoGallery.saveState(state);
+		_photoGallery.saveState();
 	}
 
 	public void setFocus() {

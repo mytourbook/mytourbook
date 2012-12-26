@@ -184,9 +184,11 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		}
 	}
 
-	public PhotoToolTipUI(final Control ownerControl) {
+	public PhotoToolTipUI(final Control ownerControl, final IDialogSettings state) {
 
-		super(ownerControl);
+		super(ownerControl, state);
+
+		_state = state;
 
 		_cursorResize = new Cursor(ownerControl.getDisplay(), SWT.CURSOR_SIZEALL);
 		_cursorHand = new Cursor(ownerControl.getDisplay(), SWT.CURSOR_HAND);
@@ -208,7 +210,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 	private void actionToggleVH() {
 
 		// keep state for current orientation
-		_photoGallery.saveState(_state);
+		_photoGallery.saveState();
 
 		// toggle gallery
 		_isVerticalGallery = !_isVerticalGallery;
@@ -259,7 +261,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		 * restore MUST be done after the shell is created, otherwise clientArea() can return 0
 		 * values
 		 */
-		_photoGallery.restoreState(_state);
+		_photoGallery.restoreState();
 
 		// set gallery orientation
 		_photoGallery.setVertical(_isVerticalGallery);
@@ -279,7 +281,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 					// this happens by multiple shells
 					return;
 				}
-				_photoGallery.saveState(_state);
+				_photoGallery.saveState();
 			}
 		});
 	}
@@ -342,7 +344,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 				.applyTo(_galleryContainer);
 		_galleryContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
-			_photoGallery = new PhotoGallery();
+			_photoGallery = new PhotoGallery(_state);
 
 			_photoGallery.setShowCustomActionBar();
 			_photoGallery.setShowThumbnailSize();
@@ -522,28 +524,26 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 	protected abstract void onSelectPhoto(final PhotoSelection photoSelection);
 
 	@Override
-	protected void restoreState(final IDialogSettings state) {
+	protected void restoreState() {
 
-		_state = state;
-
-		_isVerticalGallery = Util.getStateBoolean(state, STATE_PHOTO_GALLERY_IS_VERTICAL, true);
-		_toolTipLocationUpDown = Util.getStateInt(state, STATE_TOOL_TIP_LOCATION, 1);
+		_isVerticalGallery = Util.getStateBoolean(_state, STATE_PHOTO_GALLERY_IS_VERTICAL, true);
+		_toolTipLocationUpDown = Util.getStateInt(_state, STATE_TOOL_TIP_LOCATION, 1);
 
 		updateUI_ToogleAction();
 		updateUI_ToolTipLocation();
 
-		super.restoreState(state);
+		super.restoreState();
 
 		enableControls();
 	}
 
 	@Override
-	protected void saveState(final IDialogSettings state) {
+	protected void saveState() {
 
-		state.put(STATE_PHOTO_GALLERY_IS_VERTICAL, _isVerticalGallery);
-		state.put(STATE_TOOL_TIP_LOCATION, _toolTipLocationUpDown);
+		_state.put(STATE_PHOTO_GALLERY_IS_VERTICAL, _isVerticalGallery);
+		_state.put(STATE_TOOL_TIP_LOCATION, _toolTipLocationUpDown);
 
-		super.saveState(state);
+		super.saveState();
 	}
 
 	@Override

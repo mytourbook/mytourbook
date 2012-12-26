@@ -128,11 +128,10 @@ public class TourChart extends Chart {
 	public static final String		ACTION_ID_HR_ZONE_STYLE_WHITE_BOTTOM	= "ACTION_ID_HR_ZONE_STYLE_WHITE_BOTTOM";					//$NON-NLS-1$
 	public static final String		ACTION_ID_HR_ZONE_STYLE_WHITE_TOP		= "ACTION_ID_HR_ZONE_STYLE_WHITE_TOP";						//$NON-NLS-1$
 
-	private final IPreferenceStore	_prefStore								= TourbookPlugin.getDefault() //
-																					.getPreferenceStore();
-
 	private final IDialogSettings	_state									= TourbookPlugin.getDefault()//
 																					.getDialogSettingsSection(ID);
+	private final IPreferenceStore	_prefStore								= TourbookPlugin.getDefault() //
+																					.getPreferenceStore();
 	private TourData				_tourData;
 
 	private TourChartConfiguration	_tourChartConfig;
@@ -391,7 +390,7 @@ public class TourChart extends Chart {
 		};
 		setValuePointToolTipProvider(_valuePointToolTip = new ValuePointToolTipUI(vpToolTipOwner, _state));
 
-		_photoTooltip = new ChartPhotoToolTip(this);
+		_photoTooltip = new ChartPhotoToolTip(this, _state);
 
 //		_photoOverlay.setPhotoToolTip(_photoTooltip);
 
@@ -1594,14 +1593,14 @@ public class TourChart extends Chart {
 
 	void restoreState() {
 
-		_photoTooltip.restoreState(_state);
+		_photoTooltip.restoreState();
 	}
 
 	void saveState() {
 
 		_valuePointToolTip.saveState();
 
-		_photoTooltip.saveState(_state);
+		_photoTooltip.saveState();
 	}
 
 	/**

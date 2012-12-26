@@ -84,6 +84,8 @@ public abstract class PhotoToolTipShell {
 	private static final int			MIN_SHELL_VERT_WIDTH						= 100;
 	private static final int			MIN_SHELL_VERT_HEIGHT						= 60;
 
+	private IDialogSettings				_state;
+
 	private OwnerControlListener		_ownerControlListener;
 	private OwnerShellListener			_ownerShellListener;
 	private ToolTipShellListener		_ttShellListener;
@@ -214,9 +216,11 @@ public abstract class PhotoToolTipShell {
 	 * @param ownerControl
 	 *            the control on whose action the tooltip is shown
 	 */
-	public PhotoToolTipShell(final Control ownerControl) {
+	public PhotoToolTipShell(final Control ownerControl, final IDialogSettings state) {
 
 		_ownerControl = ownerControl;
+		_state = state;
+
 		_display = _ownerControl.getDisplay();
 
 		_ttAllControlsListener = new ToolTipAllControlsListener();
@@ -1160,13 +1164,13 @@ public abstract class PhotoToolTipShell {
 		}
 	}
 
-	protected void restoreState(final IDialogSettings state) {
+	protected void restoreState() {
 
 		/*
 		 * get horizontal gallery values
 		 */
-		_horizContentWidth = Util.getStateInt(state, STATE_PHOTO_HORIZ_TOOL_TIP_WIDTH, 300);
-		_horizContentHeight = Util.getStateInt(state, STATE_PHOTO_HORIZ_TOOL_TIP_HEIGHT, 150);
+		_horizContentWidth = Util.getStateInt(_state, STATE_PHOTO_HORIZ_TOOL_TIP_WIDTH, 300);
+		_horizContentHeight = Util.getStateInt(_state, STATE_PHOTO_HORIZ_TOOL_TIP_HEIGHT, 150);
 
 		// ensure min values
 		if (_horizContentWidth < MIN_SHELL_HORIZ_WIDTH) {
@@ -1180,8 +1184,8 @@ public abstract class PhotoToolTipShell {
 		/*
 		 * get vertical gallery values
 		 */
-		_vertContentWidth = Util.getStateInt(state, STATE_PHOTO_VERT_TOOL_TIP_WIDTH, 400);
-		_vertContentHeight = Util.getStateInt(state, STATE_PHOTO_VERT_TOOL_TIP_HEIGHT, 250);
+		_vertContentWidth = Util.getStateInt(_state, STATE_PHOTO_VERT_TOOL_TIP_WIDTH, 400);
+		_vertContentHeight = Util.getStateInt(_state, STATE_PHOTO_VERT_TOOL_TIP_HEIGHT, 250);
 
 		// ensure min values
 		if (_vertContentWidth < MIN_SHELL_VERT_WIDTH) {
@@ -1195,28 +1199,28 @@ public abstract class PhotoToolTipShell {
 		/*
 		 * pinned locations
 		 */
-		_isToolTipPinned = Util.getStateBoolean(state, STATE_PHOTO_IS_TOOL_TIP_PINNED, false);
+		_isToolTipPinned = Util.getStateBoolean(_state, STATE_PHOTO_IS_TOOL_TIP_PINNED, false);
 		setToolTipPinned(_isToolTipPinned);
 
 		final int defaultPosition = 20;
-		_horizPinLocationX = Util.getStateInt(state, STATE_PHOTO_HORIZ_TOOL_TIP_PIN_LOCATION_X, defaultPosition);
-		_horizPinLocationY = Util.getStateInt(state, STATE_PHOTO_HORIZ_TOOL_TIP_PIN_LOCATION_Y, defaultPosition);
-		_vertPinLocationX = Util.getStateInt(state, STATE_PHOTO_VERT_TOOL_TIP_PIN_LOCATION_X, defaultPosition);
-		_vertPinLocationY = Util.getStateInt(state, STATE_PHOTO_VERT_TOOL_TIP_PIN_LOCATION_Y, defaultPosition);
+		_horizPinLocationX = Util.getStateInt(_state, STATE_PHOTO_HORIZ_TOOL_TIP_PIN_LOCATION_X, defaultPosition);
+		_horizPinLocationY = Util.getStateInt(_state, STATE_PHOTO_HORIZ_TOOL_TIP_PIN_LOCATION_Y, defaultPosition);
+		_vertPinLocationX = Util.getStateInt(_state, STATE_PHOTO_VERT_TOOL_TIP_PIN_LOCATION_X, defaultPosition);
+		_vertPinLocationY = Util.getStateInt(_state, STATE_PHOTO_VERT_TOOL_TIP_PIN_LOCATION_Y, defaultPosition);
 	}
 
-	protected void saveState(final IDialogSettings state) {
+	protected void saveState() {
 
-		state.put(STATE_PHOTO_HORIZ_TOOL_TIP_WIDTH, _horizContentWidth);
-		state.put(STATE_PHOTO_HORIZ_TOOL_TIP_HEIGHT, _horizContentHeight);
-		state.put(STATE_PHOTO_VERT_TOOL_TIP_WIDTH, _vertContentWidth);
-		state.put(STATE_PHOTO_VERT_TOOL_TIP_HEIGHT, _vertContentHeight);
+		_state.put(STATE_PHOTO_HORIZ_TOOL_TIP_WIDTH, _horizContentWidth);
+		_state.put(STATE_PHOTO_HORIZ_TOOL_TIP_HEIGHT, _horizContentHeight);
+		_state.put(STATE_PHOTO_VERT_TOOL_TIP_WIDTH, _vertContentWidth);
+		_state.put(STATE_PHOTO_VERT_TOOL_TIP_HEIGHT, _vertContentHeight);
 
-		state.put(STATE_PHOTO_IS_TOOL_TIP_PINNED, _isToolTipPinned);
-		state.put(STATE_PHOTO_HORIZ_TOOL_TIP_PIN_LOCATION_X, _horizPinLocationX);
-		state.put(STATE_PHOTO_HORIZ_TOOL_TIP_PIN_LOCATION_Y, _horizPinLocationY);
-		state.put(STATE_PHOTO_VERT_TOOL_TIP_PIN_LOCATION_X, _vertPinLocationX);
-		state.put(STATE_PHOTO_VERT_TOOL_TIP_PIN_LOCATION_Y, _vertPinLocationY);
+		_state.put(STATE_PHOTO_IS_TOOL_TIP_PINNED, _isToolTipPinned);
+		_state.put(STATE_PHOTO_HORIZ_TOOL_TIP_PIN_LOCATION_X, _horizPinLocationX);
+		_state.put(STATE_PHOTO_HORIZ_TOOL_TIP_PIN_LOCATION_Y, _horizPinLocationY);
+		_state.put(STATE_PHOTO_VERT_TOOL_TIP_PIN_LOCATION_X, _vertPinLocationX);
+		_state.put(STATE_PHOTO_VERT_TOOL_TIP_PIN_LOCATION_Y, _vertPinLocationY);
 	}
 
 	/**

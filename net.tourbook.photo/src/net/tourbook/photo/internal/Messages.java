@@ -13,6 +13,23 @@ public class Messages extends NLS {
 
 	public static String		App_Unit_Pixel;
 
+	public static String		ColumnFactory_Photo_Altitude;
+	public static String		ColumnFactory_Photo_Altitude_Tooltip;
+	public static String		ColumnFactory_Photo_Date;
+	public static String		ColumnFactory_Photo_Dimension;
+	public static String		ColumnFactory_Photo_ImageDirectionDegree_Header;
+	public static String		ColumnFactory_Photo_ImageDirectionDegree_Label;
+	public static String		ColumnFactory_Photo_ImageDirectionDegree_Tooltip;
+	public static String		ColumnFactory_Photo_ImageDirectionText_Label;
+	public static String		ColumnFactory_Photo_ImageDirectionText_Tooltip;
+	public static String		ColumnFactory_Photo_Location;
+	public static String		ColumnFactory_Photo_Name;
+	public static String		ColumnFactory_Photo_Orientation;
+	public static String		ColumnFactory_Photo_Orientation_Header;
+	public static String		ColumnFactory_Photo_Orientation_Tooltip;
+	public static String		ColumnFactory_Photo_OtherTags;
+	public static String		ColumnFactory_Photo_Time;
+
 	public static String		FullScreen_ImageViewer_Spinner_ResizeImage_Tooltip;
 	public static String		FullScreen_ImageViewer_Spinner_ResizeImage_Tooltip_OSX;
 	public static String		FullScreenImageViewer_KeyCharacter_ShowPhotoGallery;
@@ -33,7 +50,14 @@ public class Messages extends NLS {
 	public static String		Image__PhotoSortByDate;
 	public static String		Image__PhotoSortByName;
 	public static String		Image__PhotoTooltip;
+	public static String		Image__PotoGalleryTable;
+	public static String		Image__PotoGalleryThumbnail;
 	public static String		Image__refresh;
+
+	public static String		Photo_Gallery_Action_ShowPhotoGalleryTable;
+	public static String		Photo_Gallery_Action_ShowPhotoGalleryTable_Tooltip;
+	public static String		Photo_Gallery_Action_ShowPhotoGalleryThumbnail;
+	public static String		Photo_Gallery_Action_ShowPhotoGalleryThumbnail_Tooltip;
 
 	public static String		Photo_ToolTip_Description;
 	public static String		Photo_ToolTip_ExifDate;

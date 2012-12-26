@@ -245,8 +245,8 @@ public class PicDirView extends ViewPart {
 
 	private void createUI(final Composite parent) {
 
-		_picDirImages = new PicDirImages(this);
-		_picDirFolder = new PicDirFolder(this, _picDirImages);
+		_picDirImages = new PicDirImages(this, _state);
+		_picDirFolder = new PicDirFolder(this, _picDirImages, _state);
 
 		final Composite masterDetailContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(masterDetailContainer);
@@ -382,10 +382,10 @@ public class PicDirView extends ViewPart {
 		 * the folder and updates folder history
 		 */
 		// 1.
-		_picDirImages.restoreState(_state);
+		_picDirImages.restoreState();
 
 		// 2.
-		_picDirFolder.restoreState(_state);
+		_picDirFolder.restoreState();
 
 		setFocus();
 
@@ -403,8 +403,8 @@ public class PicDirView extends ViewPart {
 		// keep width of the dir folder view in the master detail container
 		_state.put(STATE_TREE_WIDTH, _containerMasterDetail.getViewerWidth());
 
-		_picDirFolder.saveState(_state);
-		_picDirImages.saveState(_state);
+		_picDirFolder.saveState();
+		_picDirImages.saveState();
 	}
 
 	@Override

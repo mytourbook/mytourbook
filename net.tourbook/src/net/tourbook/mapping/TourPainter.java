@@ -15,10 +15,11 @@
  *******************************************************************************/
 package net.tourbook.mapping;
 
+import gnu.trove.map.hash.TIntObjectHashMap;
+
 import java.awt.Point;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -35,6 +36,7 @@ import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoImageCache;
 import net.tourbook.photo.PhotoLoadManager;
 import net.tourbook.photo.PhotoLoadingState;
+import net.tourbook.photo.PhotoUI;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceMap;
 import net.tourbook.ui.ColorCacheInt;
@@ -500,6 +502,9 @@ public class TourPainter extends MapPainter {
 			return;
 		}
 
+		// ensure color registry is setup
+		PhotoUI.init();
+
 		final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
 		_bgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
 
@@ -580,6 +585,8 @@ public class TourPainter extends MapPainter {
 		// first draw the tour, then the marker and photos
 		if (_tourPaintConfig.isTourVisible) {
 
+			final Color systemColorBlue = gcTile.getDevice().getSystemColor(SWT.COLOR_BLUE);
+
 			for (final TourData tourData : tourDataList) {
 
 				if (tourData == null) {
@@ -595,25 +602,25 @@ public class TourPainter extends MapPainter {
 
 				setDataSerie(tourData);
 
-				final boolean isDrawTourInTile = drawTour10InTile(gcTile, map, tile, tourData, parts);
+				final boolean isDrawTourInTile = drawTour10InTile(gcTile, map, tile, tourData, parts, systemColorBlue);
 
 				isContentInTile = isContentInTile || isDrawTourInTile;
 
-//			/**
-//			 * DEBUG Start
-//			 */
-//			gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
-//			gc.fillRectangle(0, 0, 2, 50);
-//			gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-//			gc.fillRectangle(2, 0, 2, 50);
-//			gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
-//			gc.fillRectangle(4, 0, 2, 50);
-//			gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-//			gc.fillRectangle(6, 0, 2, 50);
-//			isTourInTile = true;
-//			/**
-//			 * DEBUG End
-//			 */
+//				/**
+//				 * DEBUG Start
+//				 */
+//				gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+//				gc.fillRectangle(0, 0, 2, 50);
+//				gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+//				gc.fillRectangle(2, 0, 2, 50);
+//				gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+//				gc.fillRectangle(4, 0, 2, 50);
+//				gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//				gc.fillRectangle(6, 0, 2, 50);
+//				isTourInTile = true;
+//				/**
+//				 * DEBUG End
+//				 */
 
 				// status if a marker is drawn
 				int staticMarkerCounter = 0;
@@ -650,6 +657,8 @@ public class TourPainter extends MapPainter {
 
 				isContentInTile = isContentInTile || staticMarkerCounter > 0;
 			}
+
+			_colorCache.dispose();
 		}
 
 		if (_tourPaintConfig.isShowTourMarker || _tourPaintConfig.isShowWayPoints) {
@@ -720,7 +729,7 @@ public class TourPainter extends MapPainter {
 						final String projectionId = mp.getProjection().getId();
 						final int mapZoomLevel = map.getZoom();
 
-						HashMap<Integer, Point> allWayPointWorldPixel = tourData.getWorldPositionForWayPoints(
+						TIntObjectHashMap<Point> allWayPointWorldPixel = tourData.getWorldPositionForWayPoints(
 								projectionId,
 								mapZoomLevel);
 
@@ -892,7 +901,8 @@ public class TourPainter extends MapPainter {
 										final Map map,
 										final Tile tile,
 										final TourData tourData,
-										final int parts) {
+										final int parts,
+										final Color systemColorBlue) {
 
 		boolean isTourInTile = false;
 
@@ -929,8 +939,6 @@ public class TourPainter extends MapPainter {
 					longitudeSerie,
 					projectionId);
 		}
-
-		final Color systemColorBlue = gcTile.getDevice().getSystemColor(SWT.COLOR_BLUE);
 
 		gcTile.setForeground(systemColorBlue);
 		gcTile.setBackground(systemColorBlue);
@@ -1084,8 +1092,6 @@ public class TourPainter extends MapPainter {
 				}
 			}
 		}
-
-		_colorCache.dispose();
 
 		return isTourInTile;
 	}
@@ -1510,14 +1516,14 @@ public class TourPainter extends MapPainter {
 		return tourWorldPixelPosAll;
 	}
 
-	private HashMap<Integer, Point> initWorldPixelWayPoint(	final TourData tourData,
+	private TIntObjectHashMap<Point> initWorldPixelWayPoint(final TourData tourData,
 															final Set<TourWayPoint> wayPoints,
 															final MP mp,
 															final String projectionId,
 															final int mapZoomLevel) {
 		// world pixels are not yet cached, create them now
 
-		final HashMap<Integer, Point> allWayPointWorldPixel = new HashMap<Integer, Point>();
+		final TIntObjectHashMap<Point> allWayPointWorldPixel = new TIntObjectHashMap<Point>();
 
 		for (final TourWayPoint twp : wayPoints) {
 
@@ -1736,7 +1742,7 @@ public class TourPainter extends MapPainter {
 			final Set<TourWayPoint> wayPoints = tourData.getTourWayPoints();
 			if (wayPoints.size() > 0) {
 
-				HashMap<Integer, Point> allWayPointWorldPixel = tourData.getWorldPositionForWayPoints(
+				TIntObjectHashMap<Point> allWayPointWorldPixel = tourData.getWorldPositionForWayPoints(
 						projectionId,
 						mapZoomLevel);
 

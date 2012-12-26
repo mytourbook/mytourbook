@@ -94,7 +94,7 @@ public class TileImageLoader implements Runnable {
 
 			// load image from offline cache
 			if (useOfflineImage) {
-				tileOfflineImage = tileImageCache.getOfflineTileImageData(tile);
+				tileOfflineImage = tileImageCache.getOfflineImage(tile);
 			}
 
 			if (tileOfflineImage == null) {

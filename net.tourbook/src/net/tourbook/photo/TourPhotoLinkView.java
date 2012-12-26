@@ -57,8 +57,6 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -746,12 +744,6 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 				if (eventSelection instanceof StructuredSelection) {
 					onSelectTour(((StructuredSelection) eventSelection).toArray());
 				}
-			}
-		});
-
-		_tourViewer.addDoubleClickListener(new IDoubleClickListener() {
-			public void doubleClick(final DoubleClickEvent event) {
-
 			}
 		});
 

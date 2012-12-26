@@ -72,23 +72,6 @@ public class Messages extends NLS {
 	public static String		Calendar_View_Format_Speed;
 	public static String		Calendar_View_Format_Pace;
 
-	public static String		ColumnFactory_Photo_Altitude;
-	public static String		ColumnFactory_Photo_Altitude_Tooltip;
-	public static String		ColumnFactory_Photo_Date;
-	public static String		ColumnFactory_Photo_Dimension;
-	public static String		ColumnFactory_Photo_ImageDirectionDegree_Header;
-	public static String		ColumnFactory_Photo_ImageDirectionDegree_Label;
-	public static String		ColumnFactory_Photo_ImageDirectionDegree_Tooltip;
-	public static String		ColumnFactory_Photo_ImageDirectionText_Label;
-	public static String		ColumnFactory_Photo_ImageDirectionText_Tooltip;
-	public static String		ColumnFactory_Photo_Location;
-	public static String		ColumnFactory_Photo_Name;
-	public static String		ColumnFactory_Photo_Orientation;
-	public static String		ColumnFactory_Photo_Orientation_Header;
-	public static String		ColumnFactory_Photo_Orientation_Tooltip;
-	public static String		ColumnFactory_Photo_OtherTags;
-	public static String		ColumnFactory_Photo_Time;
-
 	public static String		dialog_export_btn_export;
 	public static String		dialog_export_chk_camouflageSpeed;
 	public static String		dialog_export_chk_camouflageSpeed_tooltip;

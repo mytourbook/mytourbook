@@ -273,11 +273,13 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 
 	public FullScreenPhotoGallery(	final Shell fullScreenShell,
 									final GalleryMT20 sourceGallery,
-									final FullScreenImageViewer fullScreenImageViewer) {
+									final FullScreenImageViewer fullScreenImageViewer,
+									final IDialogSettings state) {
 
 		_fullScreenShell = fullScreenShell;
 		_sourceGallery = sourceGallery;
 		_fullScreenImageViewer = fullScreenImageViewer;
+		_state = state;
 
 		createUI();
 
@@ -381,7 +383,7 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 		{
 
-			_photoGallery = new PhotoGallery();
+			_photoGallery = new PhotoGallery(_state);
 
 			_photoGallery.hideActionSorting();
 			_photoGallery.hideActionFiltering();
@@ -568,23 +570,21 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 	@Override
 	public void registerContextMenu(final String menuId, final MenuManager menuManager) {}
 
-	void restoreState(final IDialogSettings state) {
+	void restoreState() {
 
-		_state = state;
-
-		final int imageSize = Util.getStateInt(state, STATE_FULL_SCREEN_PHOTO_GALLERY_HEIGHT, GALLERY_DEFAULT_HEIGHT);
+		final int imageSize = Util.getStateInt(_state, STATE_FULL_SCREEN_PHOTO_GALLERY_HEIGHT, GALLERY_DEFAULT_HEIGHT);
 		_spinnerResizeImage.setSelection(imageSize);
 
 		updateColors(true);
 
-		_photoGallery.restoreState(state);
+		_photoGallery.restoreState();
 	}
 
 	void saveState() {
 
 		_state.put(STATE_FULL_SCREEN_PHOTO_GALLERY_HEIGHT, _spinnerResizeImage.getSelection());
 
-		_photoGallery.saveState(_state);
+		_photoGallery.saveState();
 	}
 
 	/**

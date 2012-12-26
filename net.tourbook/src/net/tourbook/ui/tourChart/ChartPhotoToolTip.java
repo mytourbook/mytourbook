@@ -51,9 +51,9 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 	 */
 	private TourChart				_tourChart;
 
-	public ChartPhotoToolTip(final TourChart tourChart) {
+	public ChartPhotoToolTip(final TourChart tourChart, final IDialogSettings state) {
 
-		super(tourChart);
+		super(tourChart, state);
 
 		_tourChart = tourChart;
 	}
@@ -111,13 +111,13 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 	}
 
 	@Override
-	protected void restoreState(final IDialogSettings state) {
-		super.restoreState(state);
+	protected void restoreState() {
+		super.restoreState();
 	}
 
 	@Override
-	protected void saveState(final IDialogSettings state) {
-		super.saveState(state);
+	protected void saveState() {
+		super.saveState();
 	}
 
 	public void showChartPhotoToolTip(	final ChartLayerPhoto photoLayer,

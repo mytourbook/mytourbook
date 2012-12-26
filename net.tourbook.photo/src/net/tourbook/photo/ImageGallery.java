@@ -29,6 +29,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.util.ColumnDefinition;
+import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.LRUMap;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
@@ -39,6 +42,7 @@ import net.tourbook.photo.internal.ImageFilter;
 import net.tourbook.photo.internal.Messages;
 import net.tourbook.photo.internal.PhotoDateInfo;
 import net.tourbook.photo.internal.PhotoRenderer;
+import net.tourbook.photo.internal.TableColumnFactory;
 import net.tourbook.photo.internal.gallery.MT20.FullScreenImageViewer;
 import net.tourbook.photo.internal.gallery.MT20.GalleryMT20;
 import net.tourbook.photo.internal.gallery.MT20.GalleryMT20Item;
@@ -49,24 +53,35 @@ import net.tourbook.photo.internal.manager.ExifCache;
 import net.tourbook.photo.internal.manager.GallerySorting;
 import net.tourbook.photo.internal.manager.ImageUtils;
 import net.tourbook.photo.internal.manager.ThumbnailStore;
-import net.tourbook.photo.internal.ui.PhotoUI;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IStatusLineManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -81,9 +96,13 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.progress.UIJob;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 /**
  * This class is a compilation from different source codes:
@@ -95,7 +114,7 @@ import org.eclipse.ui.progress.UIJob;
  * org.apache.commons.sanselan
  * </pre>
  */
-public class ImageGallery implements IItemHovereredListener, IGalleryContextMenuProvider, IPhotoProvider {
+public class ImageGallery implements IItemHovereredListener, IGalleryContextMenuProvider, IPhotoProvider, ITourViewer {
 
 	/**
 	 * Number of gallery positions which are cached
@@ -116,8 +135,15 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	private static final String		STATE_GALLERY_POSITION_VALUE	= "STATE_GALLERY_POSITION_VALUE";				//$NON-NLS-1$
 	private static final String		STATE_IMAGE_SORTING				= "STATE_IMAGE_SORTING";						//$NON-NLS-1$
 	private static final String		STATE_SELECTED_ITEMS			= "STATE_SELECTED_ITEMS";						//$NON-NLS-1$
+
+	private static final String		STATE_ACTIVE_PAGE				= "STATE_ACTIVE_PAGE";							//$NON-NLS-1$
+
+	private static final int		PAGE_GALLERY					= 0;
+	private static final int		PAGE_TABLE_VIEWER				= 1;
+
 	private static final String		DEFAULT_GALLERY_FONT			= "arial,sans-serif";							//$NON-NLS-1$
 
+	private IDialogSettings			_state;
 	private final IPreferenceStore	_prefStore						= Activator.getDefault().getPreferenceStore();
 
 	/*
@@ -225,13 +251,13 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	/**
 	 * Contains photo wrapper for <b>ALL</b> gallery items including <b>HIDDEN</b> items
 	 */
-	private Photo[]					_allPhotoWrapper;
+	private Photo[]					_allPhotos;
 
 	/**
 	 * Contains filtered gallery items.
 	 * <p>
-	 * Only these items are displayed in the gallery, {@link #_allPhotoWrapper} items contains also
-	 * hidden gallery items.
+	 * Only these items are displayed in the gallery, {@link #_allPhotos} items contains also hidden
+	 * gallery items.
 	 */
 	private Photo[]					_sortedAndFilteredPhotoWrapper;
 
@@ -247,7 +273,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	/**
 	 * When not <code>-1</code>, the vertical gallery is not yet fully restored.
 	 */
-//	private int													_verticalRestoreThumbSize		= -1;
+//	private int						_verticalRestoreThumbSize		= -1;
 
 	private boolean					_isShowTooltip;
 
@@ -262,8 +288,16 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	private String					_defaultStatusMessage			= UI.EMPTY_STRING;
 	private int[]					_restoredSelection;
 
+	private int						_activePage;
+
+	private TableViewer				_photoViewer;
+	private ColumnManager			_columnManager;
+	private PixelConverter			_pc;
+
 	private int[]					_delayCounter					= { 0 };
 
+	private final DateTimeFormatter	_dateFormatter					= DateTimeFormat.mediumDate();
+	private final DateTimeFormatter	_timeFormatter					= DateTimeFormat.mediumTime();
 	private final NumberFormat		_nf1							= NumberFormat.getNumberInstance();
 	{
 		_nf1.setMinimumFractionDigits(1);
@@ -286,10 +320,11 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	private GalleryActionBar		_galleryActionBar;
 
 	private PageBook				_pageBook;
-	private Label					_lblDefaultPage;
-
 	private Composite				_pageDefault;
 	private Composite				_pageGalleryInfo;
+	private Composite				_viewerContainer;
+
+	private Label					_lblDefaultPage;
 	private Label					_lblGalleryInfo;
 
 	{
@@ -360,6 +395,17 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		};
 	}
 
+	private class ContentProvider implements IStructuredContentProvider {
+
+		public void dispose() {}
+
+		public Object[] getElements(final Object inputElement) {
+			return _sortedAndFilteredPhotoWrapper;
+		}
+
+		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
+	}
+
 	private class GalleryImplementation extends GalleryMT20 {
 
 		public GalleryImplementation(final Composite parent, final int style) {
@@ -418,7 +464,28 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		}
 	}
 
-//	private ImageGallery() {}
+	/**
+	 * create the views context menu
+	 */
+	private void createContextMenu() {
+
+		final MenuManager menuMgr = new MenuManager();
+
+		menuMgr.setRemoveAllWhenShown(true);
+
+		menuMgr.addMenuListener(new IMenuListener() {
+			public void menuAboutToShow(final IMenuManager menuMgr2) {
+				fillContextMenu(menuMgr2);
+			}
+		});
+
+		final Table table = _photoViewer.getTable();
+		final Menu tableContextMenu = menuMgr.createContextMenu(table);
+
+		table.setMenu(tableContextMenu);
+
+		_columnManager.createHeaderContextMenu(table, tableContextMenu);
+	}
 
 	private void createGalleryFont() {
 
@@ -449,6 +516,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	 * @param parent
 	 * @param style
 	 * @param photoGalleryProvider
+	 * @param state
 	 */
 	public void createImageGallery(	final Composite parent,
 									final int style,
@@ -458,6 +526,11 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 		_galleryStyle = style;
 		_photoGalleryProvider = photoGalleryProvider;
+
+		_pc = new PixelConverter(parent);
+
+		_columnManager = new ColumnManager(this, _state);
+		defineAllColumns(parent);
 
 		jobFilter_10_Create();
 		jobUIFilter_10_Create();
@@ -563,7 +636,8 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 			GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBook);
 			{
 				createUI_20_PageGallery(_pageBook);
-				createUI_30_PageDefault(_pageBook);
+				createUI_30_PageTable(_pageBook);
+				createUI_99_PageDefault(_pageBook);
 				createUI_40_PageGalleryInfo(_pageBook);
 			}
 		}
@@ -625,20 +699,44 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		_galleryMT20.setItemRenderer(_photoRenderer);
 	}
 
-	private void createUI_30_PageDefault(final PageBook parent) {
+	private void createUI_30_PageTable(final PageBook parent) {
 
-		_pageDefault = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.fillDefaults()//
-				.numColumns(1)
-				.margins(5, 5)
-				.applyTo(_pageDefault);
+		_viewerContainer = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_viewerContainer);
+		GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(_viewerContainer);
 		{
-			_lblDefaultPage = new Label(_pageDefault, SWT.WRAP);
-			GridDataFactory.fillDefaults()//
-					.grab(true, true)
-					.align(SWT.FILL, SWT.FILL)
-					.applyTo(_lblDefaultPage);
+			createUI_32_PhotoViewer(_viewerContainer);
 		}
+	}
+
+	private void createUI_32_PhotoViewer(final Composite parent) {
+
+		final Table table = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.MULTI);
+
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
+		table.setHeaderVisible(true);
+//		table.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+
+		/*
+		 * create table viewer
+		 */
+		_photoViewer = new TableViewer(table);
+		_columnManager.createColumns(_photoViewer);
+
+		_photoViewer.setUseHashlookup(true);
+		_photoViewer.setContentProvider(new ContentProvider());
+//		_photoViewer.setComparator(new ContentComparator());
+
+		_photoViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			public void selectionChanged(final SelectionChangedEvent event) {
+				final ISelection eventSelection = event.getSelection();
+				if (eventSelection instanceof StructuredSelection) {
+//					onSelectTour(((StructuredSelection) eventSelection).toArray());
+				}
+			}
+		});
+
+		createContextMenu();
 	}
 
 	private void createUI_40_PageGalleryInfo(final PageBook parent) {
@@ -655,6 +753,44 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 					.grab(true, false)
 					.applyTo(_lblGalleryInfo);
 		}
+	}
+
+	private void createUI_99_PageDefault(final PageBook parent) {
+
+		_pageDefault = new Composite(parent, SWT.NONE);
+		GridLayoutFactory.fillDefaults()//
+				.numColumns(1)
+				.margins(5, 5)
+				.applyTo(_pageDefault);
+		{
+			_lblDefaultPage = new Label(_pageDefault, SWT.WRAP);
+			GridDataFactory.fillDefaults()//
+					.grab(true, true)
+					.align(SWT.FILL, SWT.FILL)
+					.applyTo(_lblDefaultPage);
+		}
+	}
+
+	private void defineAllColumns(final Composite parent) {
+
+		defineColumn_PhotoExifTime();
+	}
+
+	/**
+	 * column: tour start time
+	 */
+	private void defineColumn_PhotoExifTime() {
+
+		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_TIME.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Photo photo = (Photo) cell.getElement();
+
+				cell.setText(_timeFormatter.print(photo.imageExifTime));
+			}
+		});
 	}
 
 	private void deselectAll() {
@@ -737,6 +873,11 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 //		// TODO remove SYSTEM.OUT.PRINTLN
 
 		return galleryPosition;
+	}
+
+	@Override
+	public ColumnManager getColumnManager() {
+		return _columnManager;
 	}
 
 	private Comparator<Photo> getCurrentComparator() {
@@ -870,6 +1011,11 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 				: NLS.bind(Messages.Pic_Dir_StatusLabel_SelectedImages, allPhotoSize);
 	}
 
+	@Override
+	public ColumnViewer getViewer() {
+		return _photoViewer;
+	}
+
 	public void handlePrefStoreModifications(final PropertyChangeEvent event) {
 
 		final String property = event.getProperty();
@@ -977,7 +1123,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 					/*
 					 * ensure all image EXIF data are loaded
 					 */
-					final int allPhotoSize = _allPhotoWrapper.length;
+					final int allPhotoSize = _allPhotos.length;
 					monitor.beginTask(Messages.Pic_Dir_Dialog_LoadingEXIFData, IProgressMonitor.UNKNOWN);
 
 					int exifLoadingQueueSize = PhotoLoadManager.getExifQueueSize();
@@ -1141,7 +1287,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 //		final long start = System.nanoTime();
 
-		if (_allPhotoWrapper.length == 0) {
+		if (_allPhotos.length == 0) {
 
 			// there are no images in the current folder,
 
@@ -1165,7 +1311,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 		if (isGPSFilter || isNoGPSFilter) {
 
-			final int numberOfWrapper = _allPhotoWrapper.length;
+			final int numberOfWrapper = _allPhotos.length;
 			final Photo[] tempFilteredWrapper = new Photo[numberOfWrapper];
 
 			// filterindex is incremented when the filter contains a gallery item
@@ -1173,7 +1319,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 			int wrapperIndex = 0;
 
 			// loop: all photos
-			for (final Photo photoWrapper : _allPhotoWrapper) {
+			for (final Photo photoWrapper : _allPhotos) {
 
 				if (_filterJobIsCanceled) {
 					return;
@@ -1194,7 +1340,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 					if (isGPSFilter) {
 						if (isPhotoWithGps) {
 
-							tempFilteredWrapper[filterIndex] = _allPhotoWrapper[wrapperIndex];
+							tempFilteredWrapper[filterIndex] = _allPhotos[wrapperIndex];
 
 							filterIndex++;
 						}
@@ -1203,7 +1349,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 						if (!isPhotoWithGps) {
 
-							tempFilteredWrapper[filterIndex] = _allPhotoWrapper[wrapperIndex];
+							tempFilteredWrapper[filterIndex] = _allPhotos[wrapperIndex];
 
 							filterIndex++;
 						}
@@ -1220,10 +1366,10 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 			// a filter is not set, display all images but load exif data which is necessary when sorting by date
 
-			newFilteredWrapper = Arrays.copyOf(_allPhotoWrapper, _allPhotoWrapper.length);
+			newFilteredWrapper = Arrays.copyOf(_allPhotos, _allPhotos.length);
 
 			// loop: all photos
-			for (final Photo photoWrapper : _allPhotoWrapper) {
+			for (final Photo photoWrapper : _allPhotos) {
 
 				if (_filterJobIsCanceled) {
 					return;
@@ -1292,7 +1438,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 		if (isGPSFilter || isNoGPSFilter) {
 
-			final int numberOfWrapper = _allPhotoWrapper.length;
+			final int numberOfWrapper = _allPhotos.length;
 			final Photo[] tempFilteredWrapper = new Photo[numberOfWrapper];
 
 			// filterindex is incremented when the filter contains a gallery item
@@ -1300,7 +1446,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 			int wrapperIndex = 0;
 
 			// loop: all photos
-			for (final Photo photoWrapper : _allPhotoWrapper) {
+			for (final Photo photoWrapper : _allPhotos) {
 
 				if (_filterJobIsCanceled) {
 					return;
@@ -1313,7 +1459,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 					if (isGPSFilter) {
 						if (isPhotoWithGps) {
 
-							tempFilteredWrapper[filterIndex] = _allPhotoWrapper[wrapperIndex];
+							tempFilteredWrapper[filterIndex] = _allPhotos[wrapperIndex];
 
 							filterIndex++;
 						}
@@ -1322,7 +1468,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 						if (!isPhotoWithGps) {
 
-							tempFilteredWrapper[filterIndex] = _allPhotoWrapper[wrapperIndex];
+							tempFilteredWrapper[filterIndex] = _allPhotos[wrapperIndex];
 
 							filterIndex++;
 						}
@@ -1339,7 +1485,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 			// a filter is not set, display all images but load exif data which is necessary when filtering by date
 
-			newFilteredWrapper = Arrays.copyOf(_allPhotoWrapper, _allPhotoWrapper.length);
+			newFilteredWrapper = Arrays.copyOf(_allPhotos, _allPhotos.length);
 		}
 
 		// check sorting
@@ -1591,6 +1737,24 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		return false;
 	}
 
+	@Override
+	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
+
+		_viewerContainer.setRedraw(false);
+		{
+			_photoViewer.getTable().dispose();
+
+			createUI_32_PhotoViewer(_viewerContainer);
+			_viewerContainer.layout();
+
+			// update the viewer
+			reloadViewer();
+		}
+		_viewerContainer.setRedraw(true);
+
+		return _photoViewer;
+	}
+
 	public void redrawGallery(	final int viewPortX,
 								final int viewPortY,
 								final int width,
@@ -1599,8 +1763,15 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		_galleryMT20.redraw(viewPortX, viewPortY, width, height, all);
 	}
 
+//	private ImageGallery() {}
+
 	public void refreshUI() {
 		_galleryMT20.redraw();
+	}
+
+	@Override
+	public void reloadViewer() {
+		_photoViewer.setInput(new Object[0]);
 	}
 
 	public void restoreInfo(final boolean isShowPhotoName,
@@ -1613,9 +1784,9 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		_isShowTooltip = isShowTooltip;
 	}
 
-	public void restoreState(final IDialogSettings state) {
+	void restoreState() {
 
-		_galleryMT20.restoreState(state);
+		_galleryMT20.restoreState(_state);
 
 		// set font
 		onModifyFont();
@@ -1624,7 +1795,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		 * gallery sorting
 		 */
 		final GallerySorting defaultSorting = GallerySorting.FILE_NAME;
-		final String stateValue = Util.getStateString(state, STATE_IMAGE_SORTING, defaultSorting.name());
+		final String stateValue = Util.getStateString(_state, STATE_IMAGE_SORTING, defaultSorting.name());
 		try {
 			_currentSorting = GallerySorting.valueOf(stateValue);
 		} catch (final Exception e) {
@@ -1650,13 +1821,13 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		 * set thumbnail size after gallery client area is set
 		 */
 		final int stateThumbSize = Util.getStateInt(
-				state,
+				_state,
 				STATE_THUMB_IMAGE_SIZE,
 				PhotoLoadManager.IMAGE_SIZE_THUMBNAIL);
 
 		// restore gallery action bar
 		if (_galleryActionBar != null) {
-			_galleryActionBar.restoreState(state, stateThumbSize);
+			_galleryActionBar.restoreState(_state, stateThumbSize);
 			_galleryActionBar.setThumbnailSizeVisibility(_galleryMT20.isVertical());
 		}
 
@@ -1666,8 +1837,8 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		/*
 		 * gallery folder/tour image positions
 		 */
-		final String[] positionKeys = state.getArray(STATE_GALLERY_POSITION_KEY);
-		final String[] positionValues = state.getArray(STATE_GALLERY_POSITION_VALUE);
+		final String[] positionKeys = _state.getArray(STATE_GALLERY_POSITION_KEY);
+		final String[] positionValues = _state.getArray(STATE_GALLERY_POSITION_VALUE);
 		if (positionKeys != null && positionValues != null) {
 
 			// ensure same size
@@ -1689,10 +1860,10 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 			}
 		}
 
-		_restoredSelection = Util.getStateIntArray(state, STATE_SELECTED_ITEMS, null);
+		_restoredSelection = Util.getStateIntArray(_state, STATE_SELECTED_ITEMS, null);
 	}
 
-	public void saveState(final IDialogSettings state) {
+	public void saveState() {
 
 		if (_galleryMT20.isVertical()) {
 
@@ -1701,10 +1872,10 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 			 * clientarea height to get the image size
 			 */
 
-			state.put(STATE_THUMB_IMAGE_SIZE, _photoImageSize);
+			_state.put(STATE_THUMB_IMAGE_SIZE, _photoImageSize);
 		}
 
-		state.put(STATE_IMAGE_SORTING, _currentSorting.name());
+		_state.put(STATE_IMAGE_SORTING, _currentSorting.name());
 
 		/*
 		 * keep gallery positions
@@ -1733,13 +1904,13 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 				positionValues[positionIndex] = _galleryPositions.get(positionKey).toString();
 			}
 
-			state.put(STATE_GALLERY_POSITION_KEY, positionKeyArray);
-			state.put(STATE_GALLERY_POSITION_VALUE, positionValues);
+			_state.put(STATE_GALLERY_POSITION_KEY, positionKeyArray);
+			_state.put(STATE_GALLERY_POSITION_VALUE, positionValues);
 		}
 
-		Util.setState(state, STATE_SELECTED_ITEMS, _galleryMT20.getSelectionIndex());
+		Util.setState(_state, STATE_SELECTED_ITEMS, _galleryMT20.getSelectionIndex());
 
-		_galleryMT20.saveState(state);
+		_galleryMT20.saveState(_state);
 	}
 
 	public void selectItem(final int itemIndex, final String galleryPositionKey) {
@@ -2013,11 +2184,11 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 		_galleryMT20.deselectAll();
 
-		_allPhotoWrapper = photoWrapper;
+		_allPhotos = photoWrapper;
 
 		final double galleryPosition = getCachedGalleryPosition();
 
-		updateUI_GalleryItems(_allPhotoWrapper, galleryPosition);
+		updateUI_GalleryItems(_allPhotos, galleryPosition);
 	}
 
 	/**
@@ -2026,10 +2197,10 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	 * @param isShowAnnotations
 	 * @param isShowTooltip
 	 */
-	public void showInfo(	final boolean isShowPhotoName,
-							final PhotoDateInfo photoDateInfo,
-							final boolean isShowAnnotations,
-							final boolean isShowTooltip) {
+	void showInfo(	final boolean isShowPhotoName,
+					final PhotoDateInfo photoDateInfo,
+					final boolean isShowAnnotations,
+					final boolean isShowTooltip) {
 
 		_photoRenderer.setShowLabels(isShowPhotoName, photoDateInfo, isShowAnnotations);
 
@@ -2122,7 +2293,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	 */
 	private void sortGallery_10_Runnable() {
 
-		if (_allPhotoWrapper == null || _allPhotoWrapper.length == 0) {
+		if (_allPhotos == null || _allPhotos.length == 0) {
 			// there are no files
 			return;
 		}
@@ -2206,7 +2377,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	 */
 	public void updateGPSPosition(final ArrayList<?> updatedPhotoList) {
 
-		for (final Photo galleryPhoto : _allPhotoWrapper) {
+		for (final Photo galleryPhoto : _allPhotos) {
 
 			final String galleryImageFilePathName = galleryPhoto.imageFilePathName;
 
@@ -2218,9 +2389,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 					if (galleryImageFilePathName.equals(updatedPhoto.imageFilePathName)) {
 
-						galleryPhoto.setTourGeoPosition(
-								updatedPhoto.getLatitude(),
-								updatedPhoto.getLongitude());
+						galleryPhoto.setTourGeoPosition(updatedPhoto.getLatitude(), updatedPhoto.getLongitude());
 
 						break;
 					}
@@ -2290,7 +2459,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 				showPageBookPage(_pageGalleryInfo, true);
 
-				final int imageCount = _allPhotoWrapper.length;
+				final int imageCount = _allPhotos.length;
 
 				if (imageCount == 0) {
 
@@ -2489,7 +2658,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 	private void workerExecute_DisplayImages(final Photo[] newPhotoWrapper) {
 
-		_allPhotoWrapper = newPhotoWrapper;
+		_allPhotos = newPhotoWrapper;
 
 		_display.syncExec(new Runnable() {
 			public void run() {
@@ -2514,7 +2683,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 				final long timeDiff = System.currentTimeMillis() - _workerStart;
 				final String timeDiffText = NLS.bind(
 						Messages.Pic_Dir_Status_Loaded,
-						new Object[] { Long.toString(timeDiff), Integer.toString(_allPhotoWrapper.length) });
+						new Object[] { Long.toString(timeDiff), Integer.toString(_allPhotos.length) });
 
 				setStatusMessage(timeDiffText);
 			}

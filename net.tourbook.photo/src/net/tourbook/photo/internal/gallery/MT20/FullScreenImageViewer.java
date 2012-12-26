@@ -375,9 +375,9 @@ public class FullScreenImageViewer {
 
 	private void createUI_20_FullScreenGallery(final Shell shell) {
 
-		_fullScreenGallery = new FullScreenPhotoGallery(shell, _sourceGallery, this);
+		_fullScreenGallery = new FullScreenPhotoGallery(shell, _sourceGallery, this, _state);
 
-		_fullScreenGallery.restoreState(_state);
+		_fullScreenGallery.restoreState();
 	}
 
 	private void fillContextMenu(final IMenuManager menuMgr) {

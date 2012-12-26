@@ -49,6 +49,8 @@ public class PhotoGallery extends ImageGallery {
 
 	public static final String			IMAGE_PHOTO_FILTER_GPS				= "IMAGE_PHOTO_FILTER_GPS";				//$NON-NLS-1$
 	public static final String			IMAGE_PHOTO_FILTER_NO_GPS			= "IMAGE_PHOTO_FILTER_NO_GPS";				//$NON-NLS-1$
+
+	private IDialogSettings				_state;
 	private PhotoDateInfo				_photoDateInfo;
 
 	private boolean						_isShowActionFiltering				= true;
@@ -75,7 +77,9 @@ public class PhotoGallery extends ImageGallery {
 				Activator.getImageDescriptor(Messages.Image__PhotoFilterNoGPS));
 	}
 
-	public PhotoGallery() {}
+	public PhotoGallery(final IDialogSettings state) {
+		_state = state;
+	}
 
 	public void actionImageFilter(final Action actionImageFilter) {
 
@@ -98,6 +102,11 @@ public class PhotoGallery extends ImageGallery {
 		// update gallery
 
 		filterGallery(_currentImageFilter);
+	}
+
+	public void actionShowPhotoGallery(final Action action) {
+		// TODO Auto-generated method stub
+
 	}
 
 	public void actionShowPhotoInfo(final Action action) {
@@ -249,15 +258,13 @@ public class PhotoGallery extends ImageGallery {
 		_isShowActionSorting = false;
 	}
 
-
-
 	@Override
-	public void restoreState(final IDialogSettings state) {
+	public void restoreState() {
 
 		/*
 		 * image filter
 		 */
-		final String prefImageFilter = Util.getStateString(state, STATE_IMAGE_FILTER, ImageFilter.NoFilter.name());
+		final String prefImageFilter = Util.getStateString(_state, STATE_IMAGE_FILTER, ImageFilter.NoFilter.name());
 		try {
 			_currentImageFilter = ImageFilter.valueOf(prefImageFilter);
 		} catch (final Exception e) {
@@ -270,16 +277,16 @@ public class PhotoGallery extends ImageGallery {
 		 * photo date / time / name / tooltip / annotation
 		 */
 		final PhotoDateInfo photoDateDefault = PhotoDateInfo.NoDateTime;
-		final String prefDateInfo = Util.getStateString(state, STATE_PHOTO_INFO_DATE, photoDateDefault.name());
+		final String prefDateInfo = Util.getStateString(_state, STATE_PHOTO_INFO_DATE, photoDateDefault.name());
 		try {
 			_photoDateInfo = PhotoDateInfo.valueOf(prefDateInfo);
 		} catch (final Exception e) {
 			_photoDateInfo = photoDateDefault;
 		}
 
-		final boolean isShowPhotoName = Util.getStateBoolean(state, STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY, false);
-		final boolean isShowTooltip = Util.getStateBoolean(state, STATE_IS_SHOW_PHOTO_TOOLTIP, true);
-		final boolean isShowPhotoAnnotations = Util.getStateBoolean(state, //
+		final boolean isShowPhotoName = Util.getStateBoolean(_state, STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY, false);
+		final boolean isShowTooltip = Util.getStateBoolean(_state, STATE_IS_SHOW_PHOTO_TOOLTIP, true);
+		final boolean isShowPhotoAnnotations = Util.getStateBoolean(_state, //
 				STATE_IS_SHOW_PHOTO_GPS_ANNOTATION,
 				true);
 
@@ -293,7 +300,7 @@ public class PhotoGallery extends ImageGallery {
 		/*
 		 * gallery sorting
 		 */
-		final String prefSorting = Util.getStateString(state, STATE_GALLERY_SORTING, GallerySorting.FILE_DATE.name());
+		final String prefSorting = Util.getStateString(_state, STATE_GALLERY_SORTING, GallerySorting.FILE_DATE.name());
 		try {
 			_gallerySorting = GallerySorting.valueOf(prefSorting);
 		} catch (final Exception e) {
@@ -301,8 +308,8 @@ public class PhotoGallery extends ImageGallery {
 		}
 		_actionSortFileByDate.setChecked(_gallerySorting == GallerySorting.FILE_DATE);
 		_actionSortByFileName.setChecked(_gallerySorting == GallerySorting.FILE_NAME);
-		
-		super.restoreState(state);
+
+		super.restoreState();
 
 		// !!! overwrite super settings !!!
 		setSorting(_gallerySorting);
@@ -313,22 +320,22 @@ public class PhotoGallery extends ImageGallery {
 	}
 
 	@Override
-	public void saveState(final IDialogSettings state) {
+	public void saveState() {
 
 		/*
 		 * gallery sorting
 		 */
-		state.put(STATE_GALLERY_SORTING, _actionSortFileByDate.isChecked()
+		_state.put(STATE_GALLERY_SORTING, _actionSortFileByDate.isChecked()
 				? GallerySorting.FILE_DATE.name()
 				: GallerySorting.FILE_NAME.name());
 
-		state.put(STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY, _actionShowPhotoName.isChecked());
-		state.put(STATE_IS_SHOW_PHOTO_TOOLTIP, _actionShowPhotoTooltip.isChecked());
-		state.put(STATE_IS_SHOW_PHOTO_GPS_ANNOTATION, _actionShowGPSAnnotation.isChecked());
+		_state.put(STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY, _actionShowPhotoName.isChecked());
+		_state.put(STATE_IS_SHOW_PHOTO_TOOLTIP, _actionShowPhotoTooltip.isChecked());
+		_state.put(STATE_IS_SHOW_PHOTO_GPS_ANNOTATION, _actionShowGPSAnnotation.isChecked());
 
-		state.put(STATE_PHOTO_INFO_DATE, _photoDateInfo.name());
-		state.put(STATE_IMAGE_FILTER, _currentImageFilter.name());
+		_state.put(STATE_PHOTO_INFO_DATE, _photoDateInfo.name());
+		_state.put(STATE_IMAGE_FILTER, _currentImageFilter.name());
 
-		super.saveState(state);
+		super.saveState();
 	}
 }

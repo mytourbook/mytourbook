@@ -29,12 +29,12 @@ import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.common.util.Util;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.PhotoImageCache;
+import net.tourbook.photo.PhotoUI;
 import net.tourbook.photo.PicDirView;
 import net.tourbook.photo.internal.manager.ExifCache;
 import net.tourbook.photo.internal.manager.ImageUtils;
 import net.tourbook.photo.internal.manager.ThumbnailStore;
 import net.tourbook.photo.internal.preferences.PrefPagePhotoExternalApp;
-import net.tourbook.photo.internal.ui.PhotoUI;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -112,6 +112,7 @@ public class PicDirFolder {
 	 */
 	private static ThreadPoolExecutor						_folderExecutor;
 
+	private IDialogSettings									_state;
 	private final IPreferenceStore							_prefStore								= Activator
 																											.getDefault()
 																											.getPreferenceStore();
@@ -266,9 +267,10 @@ public class PicDirFolder {
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
-	public PicDirFolder(final PicDirView picDirView, final PicDirImages picDirImages) {
+	public PicDirFolder(final PicDirView picDirView, final PicDirImages picDirImages, final IDialogSettings state) {
 		_picDirView = picDirView;
 		_picDirImages = picDirImages;
+		_state = state;
 	}
 
 	void actionAutoExpandCollapse() {
@@ -1074,13 +1076,13 @@ public class PicDirFolder {
 //		}
 	}
 
-	public void restoreState(final IDialogSettings state) {
+	public void restoreState() {
 
-		_isBehaviourAutoExpandCollapse = Util.getStateBoolean(state, STATE_IS_SINGLE_CLICK_EXPAND, false);
+		_isBehaviourAutoExpandCollapse = Util.getStateBoolean(_state, STATE_IS_SINGLE_CLICK_EXPAND, false);
 		_actionAutoExpandCollapse.setChecked(_isBehaviourAutoExpandCollapse);
 
 		_isBehaviourSingleExpandedOthersCollapse = Util.getStateBoolean(
-				state,
+				_state,
 				STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS,
 				false);
 		_actionSingleExpandCollapseOthers.setChecked(_isBehaviourSingleExpandedOthersCollapse);
@@ -1096,7 +1098,7 @@ public class PicDirFolder {
 			@Override
 			public IStatus runInUIThread(final IProgressMonitor monitor) {
 
-				final String previousSelectedFolder = Util.getStateString(state, STATE_SELECTED_FOLDER, null);
+				final String previousSelectedFolder = Util.getStateString(_state, STATE_SELECTED_FOLDER, null);
 
 				restoreStateFolder(previousSelectedFolder);
 
@@ -1139,15 +1141,15 @@ public class PicDirFolder {
 		});
 	}
 
-	public void saveState(final IDialogSettings state) {
+	public void saveState() {
 
 		// selected folder
 		if (_selectedFolder != null) {
-			state.put(STATE_SELECTED_FOLDER, _selectedFolder.getAbsolutePath());
+			_state.put(STATE_SELECTED_FOLDER, _selectedFolder.getAbsolutePath());
 		}
 
-		state.put(STATE_IS_SINGLE_CLICK_EXPAND, _actionAutoExpandCollapse.isChecked());
-		state.put(STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS, _actionSingleExpandCollapseOthers.isChecked());
+		_state.put(STATE_IS_SINGLE_CLICK_EXPAND, _actionAutoExpandCollapse.isChecked());
+		_state.put(STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS, _actionSingleExpandCollapseOthers.isChecked());
 	}
 
 	/**

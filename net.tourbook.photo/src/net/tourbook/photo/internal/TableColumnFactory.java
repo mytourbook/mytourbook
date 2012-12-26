@@ -13,13 +13,12 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.photo;
+package net.tourbook.photo.internal;
 
-import net.tourbook.Messages;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.TableColumnDefinition;
-import net.tourbook.ui.UI;
 
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.viewers.ColumnPixelData;
@@ -36,9 +35,9 @@ public abstract class TableColumnFactory {
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "photoAltitude", SWT.TRAIL); //$NON-NLS-1$
 			
 			colDef.setColumnLabel(Messages.ColumnFactory_Photo_Altitude);
-			colDef.setColumnHeader(UI.UNIT_LABEL_ALTITUDE);
+//			colDef.setColumnHeader(UI.UNIT_LABEL_ALTITUDE);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_Photo_Altitude_Tooltip);
-			colDef.setColumnUnit(UI.UNIT_LABEL_ALTITUDE);
+//			colDef.setColumnUnit(UI.UNIT_LABEL_ALTITUDE);
 			colDef.setDefaultColumnWidth(pixelWidth);
 			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
 			

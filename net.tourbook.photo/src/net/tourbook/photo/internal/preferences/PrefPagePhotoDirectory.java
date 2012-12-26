@@ -20,9 +20,9 @@ import net.tourbook.common.util.Util;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.PhotoGallery;
 import net.tourbook.photo.PhotoLoadManager;
+import net.tourbook.photo.PhotoUI;
 import net.tourbook.photo.internal.Activator;
 import net.tourbook.photo.internal.Messages;
-import net.tourbook.photo.internal.ui.PhotoUI;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;

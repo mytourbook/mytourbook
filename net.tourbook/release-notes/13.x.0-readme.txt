@@ -8,8 +8,14 @@ Detected Problems:
 
 Improvements
 
+
 Tour Chart
 
 * show/hide photo marker with/without photo tooltip
+
+
+Tour Map
+
+* 
 
 
