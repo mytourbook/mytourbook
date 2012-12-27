@@ -30,7 +30,9 @@ public class ChartPhotoOverlay implements CustomOverlay {
 	private PhotoGroup		_hoveredPhotoGroup;
 
 	private Color			_bgColor;
+
 	private int				_devXMouse;
+	private int				_devYMouse;
 
 	@Override
 	public boolean draw(final GC gcOverlay) {
@@ -43,7 +45,7 @@ public class ChartPhotoOverlay implements CustomOverlay {
 		gcOverlay.setForeground(display.getSystemColor(SWT.COLOR_WHITE));
 		gcOverlay.setBackground(_bgColor);
 
-		_photoLayer.drawPhotoAndGroup(gcOverlay, _hoveredPhotoGroup);
+		_photoLayer.draw_20_PhotoAndGroup(gcOverlay, _hoveredPhotoGroup, );
 
 		return true;
 	}
@@ -55,7 +57,15 @@ public class ChartPhotoOverlay implements CustomOverlay {
 		// find photo group which is hovered with the mouse
 		for (final PhotoGroup photoGroup : photoGroups) {
 
-			if (_devXMouse >= photoGroup.hGridStart && _devXMouse <= photoGroup.hGridEnd) {
+			final int devYHoverTop = photoGroup.paintedGroupDevY - 5;
+			final int devYHoverBottom = photoGroup.paintedGroupDevY + photoGroup.paintedGroupTextHeight + 5;
+
+			if (_devXMouse >= photoGroup.hGridStart
+					&& _devXMouse <= photoGroup.hGridEnd
+					&& _devYMouse >= devYHoverTop
+					&& _devYMouse <= devYHoverBottom
+			//
+			) {
 				return photoGroup;
 			}
 		}
@@ -74,6 +84,7 @@ public class ChartPhotoOverlay implements CustomOverlay {
 		}
 
 		_devXMouse = devXMouse;
+		_devYMouse = devYMouse;
 
 		_hoveredPhotoGroup = getHoveredPhotoGroup();
 

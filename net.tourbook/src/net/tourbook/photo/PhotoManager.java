@@ -757,7 +757,8 @@ public class PhotoManager {
 						+ " TourEndTime, " //				3 //$NON-NLS-1$
 						+ " TourType_TypeId, " //			4 //$NON-NLS-1$
 
-						+ " numberOfPhotos" //				5 //$NON-NLS-1$
+						+ " numberOfPhotos, " //			5 //$NON-NLS-1$
+						+ " photoTimeAdjustment " //		6 //$NON-NLS-1$
 
 						+ UI.NEW_LINE
 
@@ -794,12 +795,14 @@ public class PhotoManager {
 				final long dbTourEnd = result.getLong(3);
 				final Object dbTourTypeId = result.getObject(4);
 				final int dbNumberOfPhotos = result.getInt(5);
+				final int dbPhotoTimeAdjustment = result.getInt(6);
 
 				final TourPhotoLink dbTourPhotoLink = new TourPhotoLink(
 						dbTourId,
 						dbTourStart,
 						dbTourEnd,
-						dbNumberOfPhotos);
+						dbNumberOfPhotos,
+						dbPhotoTimeAdjustment);
 
 				dbTourPhotoLink.tourTypeId = (dbTourTypeId == null ? //
 						TourDatabase.ENTITY_IS_NOT_SAVED

@@ -125,7 +125,7 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 										final int devXMouseMove,
 										final int devYMouseMove) {
 
-		final ArrayList<PhotoGroup> photoGroups = photoLayer.getPhotoPositions();
+		final ArrayList<PhotoGroup> photoGroups = photoLayer.getPhotoGroups();
 
 		if (photoGroups == null) {
 			// photo positions are not initialized

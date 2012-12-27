@@ -75,6 +75,11 @@ public class TourPhotoLink {
 	int										numberOfTourPhotos;
 
 	/**
+	 * Adjusted time in seconds.
+	 */
+	int										photoTimeAdjustment;
+
+	/**
 	 * Contains all photos for this tour.
 	 */
 	public ArrayList<Photo>					linkPhotos			= new ArrayList<Photo>();
@@ -109,9 +114,14 @@ public class TourPhotoLink {
 	 * @param tourEndTime
 	 * @param tourStartTime
 	 * @param tourId
+	 * @param dbPhotoTimeAdjustment
 	 * @param dbNumberOfPhotos
 	 */
-	TourPhotoLink(final long tourId, final long tourStartTime, final long tourEndTime, final int numberOfPhotos) {
+	TourPhotoLink(	final long tourId,
+					final long tourStartTime,
+					final long tourEndTime,
+					final int numberOfPhotos,
+					final int dbPhotoTimeAdjustment) {
 
 		this.tourId = tourId;
 
@@ -121,6 +131,10 @@ public class TourPhotoLink {
 		setTourEndTime(tourEndTime);
 
 		this.numberOfTourPhotos = numberOfPhotos;
+
+		tourPeriod = new Period(tourStartTime, tourEndTime, _tourPeriodTemplate);
+
+		photoTimeAdjustment = dbPhotoTimeAdjustment;
 	}
 
 	private void addTimeSlice(final ArrayList<HistoryData> historyList, final long timeSliceTime) {

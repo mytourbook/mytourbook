@@ -185,6 +185,10 @@ public class TourPhoto {
 		return adjustedTime;
 	}
 
+	/**
+	 * @return Returns EXIF time in milliseconds, when not available, the last modified time of the
+	 *         image file is used.
+	 */
 	public long getImageExifTime() {
 		return imageExifTime;
 	}

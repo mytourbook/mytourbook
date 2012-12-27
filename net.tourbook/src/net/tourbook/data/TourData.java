@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -537,7 +537,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	// ############################################# PHOTO  DATA #############################################
 
 	/**
-	 * Number of photos which are set in {@link #tourPhotos}, this field is displayed only in views
+	 * Number of photos which are set in {@link #tourPhotos}. This field is displayed only in views
 	 * or works as tour filter.
 	 */
 	@SuppressWarnings("unused")
@@ -547,6 +547,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * Number of time slices in {@link #timeSerie}
 	 */
 	private int													numberOfTimeSlices;
+
+	/**
+	 * Time adjustment in seconds, this is an average value for all photos.
+	 */
+	private int													photoTimeAdjustment;
 
 	// ############################################# UNUSED FIELDS START #############################################
 	/**
@@ -2262,6 +2267,21 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		if (distanceSerie != null) {
 			computeSmoothedDataSeries();
 		}
+	}
+
+	private void computePhotoTimeAdjustment() {
+
+		long allPhotoTimeAdjustment = 0;
+		int photoCounter = 0;
+
+		for (final TourPhoto tourPhoto : tourPhotos) {
+
+			allPhotoTimeAdjustment += (tourPhoto.getAdjustedTime() - tourPhoto.getImageExifTime()) / 1000;
+
+			photoCounter++;
+		}
+
+		photoTimeAdjustment = photoCounter == 0 ? 0 : (int) (allPhotoTimeAdjustment / photoCounter);
 	}
 
 	private void computePulseSmoothed() {
@@ -4545,6 +4565,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 	}
 
+	public int getPhotoTimeAdjustment() {
+		return photoTimeAdjustment;
+	}
+
 	public float[] getPowerSerie() {
 
 		if ((powerSerie != null) || isPowerSerieFromDevice) {
@@ -4700,6 +4724,24 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return speedSerie;
 	}
 
+//	public double[] getTimeSerieDouble() {
+//
+//		if (timeSerieHistory == null) {
+//			return null;
+//		}
+//
+//		if (timeSerieHistoryDouble == null) {
+//
+//			timeSerieHistoryDouble = new double[timeSerieHistory.length];
+//
+//			for (int serieIndex = 0; serieIndex < timeSerieHistory.length; serieIndex++) {
+//				timeSerieHistoryDouble[serieIndex] = timeSerieHistory[serieIndex];
+//			}
+//		}
+//
+//		return timeSerieHistoryDouble;
+//	}
+
 	/**
 	 * @return Returns SRTM metric or imperial data serie depending on the active measurement or
 	 *         <code>null</code> when SRTM data serie is not available
@@ -4756,24 +4798,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 		return new float[][] { srtmSerie, srtmSerieImperial };
 	}
-
-//	public double[] getTimeSerieDouble() {
-//
-//		if (timeSerieHistory == null) {
-//			return null;
-//		}
-//
-//		if (timeSerieHistoryDouble == null) {
-//
-//			timeSerieHistoryDouble = new double[timeSerieHistory.length];
-//
-//			for (int serieIndex = 0; serieIndex < timeSerieHistory.length; serieIndex++) {
-//				timeSerieHistoryDouble[serieIndex] = timeSerieHistory[serieIndex];
-//			}
-//		}
-//
-//		return timeSerieHistoryDouble;
-//	}
 
 	public short getStartAltitude() {
 		return startAltitude;
@@ -4977,6 +5001,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return tourEndPlace == null ? UI.EMPTY_STRING : tourEndPlace;
 	}
 
+//	is currently disabled in version 12.12, will be used in further versions
+//
+//	public Set<TourPhoto> getTourPhotos() {
+//		return tourPhotos;
+//	}
+
 	/**
 	 * @return Returns tour end time in ms, this value should be {@link #tourStartTime} +
 	 *         {@link #tourRecordingTime}
@@ -4991,12 +5021,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public Long getTourId() {
 		return tourId;
 	}
-
-//	is currently disabled in version 12.12, will be used in further versions
-//
-//	public Set<TourPhoto> getTourPhotos() {
-//		return tourPhotos;
-//	}
 
 	public String getTourImportFilePath() {
 		if ((tourImportFilePath == null) || (tourImportFilePath.length() == 0)) {
@@ -5828,6 +5852,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		tourPhotos.addAll(newTourPhotos);
 
 		numberOfPhotos = tourPhotos.size();
+
+		computePhotoTimeAdjustment();
 	}
 
 	/**

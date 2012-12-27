@@ -2265,6 +2265,7 @@ public class TourDatabase {
 				//
 				+ " numberOfTimeSlices			INTEGER DEFAULT 0,				\n" //$NON-NLS-1$
 				+ " numberOfPhotos				INTEGER DEFAULT 0,				\n" //$NON-NLS-1$
+				+ " photoTimeAdjustment			INTEGER DEFAULT 0,				\n" //$NON-NLS-1$
 				//
 				// version 23 end ---------
 
@@ -4546,6 +4547,7 @@ public class TourDatabase {
 //			//
 //			+ " numberOfTimeSlices			INTEGER DEFAULT 0,				\n" //$NON-NLS-1$
 //			+ " numberOfPhotos				INTEGER DEFAULT 0,				\n" //$NON-NLS-1$
+//			+ " photoTimeAdjustment			INTEGER DEFAULT 0,				\n" //$NON-NLS-1$
 //			//
 //			// version 23 end ---------
 
@@ -4553,6 +4555,7 @@ public class TourDatabase {
 					//
 					"ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN	numberOfTimeSlices		INTEGER DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
 					"ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN	numberOfPhotos			INTEGER DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
+					"ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN	photoTimeAdjustment		INTEGER DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
 			//
 			};
 

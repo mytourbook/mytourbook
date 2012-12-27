@@ -163,8 +163,8 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 	private final DateTimeFormatter		_dateFormatter						= DateTimeFormat.mediumDate();
 	private final DateTimeFormatter		_timeFormatter						= DateTimeFormat.mediumTime();
-	private final NumberFormat			_nf_1_1;
 	private final PeriodFormatter		_durationFormatter;
+	private final NumberFormat			_nf_1_1;
 	{
 		_nf_1_1 = NumberFormat.getNumberInstance();
 		_nf_1_1.setMinimumFractionDigits(1);
@@ -334,7 +334,10 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 							tourPhotos.clear();
 
 							for (final Photo photoWrapper : tourPhotoWrapper) {
-								tourPhotos.add(new TourPhoto(tourData, photoWrapper));
+
+								final TourPhoto tourPhoto = new TourPhoto(tourData, photoWrapper);
+
+								tourPhotos.add(tourPhoto);
 							}
 
 							tourData.setTourPhotos(tourPhotos);
@@ -382,6 +385,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 			if (tourData != null) {
 				photoLink.numberOfTourPhotos = tourData.getTourPhotos().size();
+				photoLink.photoTimeAdjustment = tourData.getPhotoTimeAdjustment();
 			}
 		}
 
@@ -649,8 +653,8 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 			_spinnerHours = new Spinner(container, SWT.BORDER);
 			GridDataFactory.fillDefaults() //
 					.applyTo(_spinnerHours);
-			_spinnerHours.setMinimum(-99);
-			_spinnerHours.setMaximum(99);
+			_spinnerHours.setMinimum(-100);
+			_spinnerHours.setMaximum(100);
 			_spinnerHours.setIncrement(1);
 			_spinnerHours.setPageIncrement(24);
 			_spinnerHours.setToolTipText(Messages.Photos_AndTours_Spinner_AdjustHours_Tooltip);
@@ -674,8 +678,8 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 			_spinnerMinutes = new Spinner(container, SWT.BORDER);
 			GridDataFactory.fillDefaults() //
 					.applyTo(_spinnerMinutes);
-			_spinnerMinutes.setMinimum(-99);
-			_spinnerMinutes.setMaximum(99);
+			_spinnerMinutes.setMinimum(-100);
+			_spinnerMinutes.setMaximum(100);
 			_spinnerMinutes.setIncrement(1);
 			_spinnerMinutes.setPageIncrement(10);
 			_spinnerMinutes.setToolTipText(Messages.Photos_AndTours_Spinner_AdjustMinutes_Tooltip);
@@ -699,8 +703,8 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 			_spinnerSeconds = new Spinner(container, SWT.BORDER);
 			GridDataFactory.fillDefaults() //
 					.applyTo(_spinnerSeconds);
-			_spinnerSeconds.setMinimum(-99);
-			_spinnerSeconds.setMaximum(99);
+			_spinnerSeconds.setMinimum(-100);
+			_spinnerSeconds.setMaximum(100);
 			_spinnerSeconds.setIncrement(1);
 			_spinnerSeconds.setPageIncrement(10);
 			_spinnerSeconds.setToolTipText(Messages.Photos_AndTours_Spinner_AdjustSeconds_Tooltip);
@@ -799,6 +803,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 		defineColumn_TourTypeImage();
 		defineColumn_NumberOfTourPhotos();
+		defineColumn_PhotoTimeAdjustment();
 		defineColumn_NumberOfGPSPhotos();
 		defineColumn_NumberOfNoGPSPhotos();
 		defineColumn_TourStartDate();
@@ -900,7 +905,31 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 				final TourPhotoLink link = (TourPhotoLink) cell.getElement();
 				final int numberOfPhotos = link.numberOfTourPhotos;
 
-				cell.setText(numberOfPhotos == 0 ? UI.EMPTY_STRING : Long.toString(numberOfPhotos));
+				cell.setText(numberOfPhotos == 0 ? UI.EMPTY_STRING : Integer.toString(numberOfPhotos));
+
+				setBgColor(cell, link);
+			}
+		});
+	}
+
+	/**
+	 * column: number of photos which are saved in the tour
+	 */
+	private void defineColumn_PhotoTimeAdjustment() {
+
+		final ColumnDefinition colDef = TableColumnFactory.PHOTO_TIME_ADJUSTMENT.createColumn(_columnManager, _pc);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourPhotoLink link = (TourPhotoLink) cell.getElement();
+				final int numberOfTourPhotos = link.numberOfTourPhotos;
+				final int timeAdjustment = link.photoTimeAdjustment;
+
+				cell.setText(numberOfTourPhotos == 0 //
+						? UI.EMPTY_STRING
+						: net.tourbook.ui.UI.formatHhMmSs(timeAdjustment));
 
 				setBgColor(cell, link);
 			}

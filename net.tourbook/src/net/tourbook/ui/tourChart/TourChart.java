@@ -861,34 +861,74 @@ public class TourChart extends Chart {
 		_photoOverlay.setPhotoLayer(null);
 		_layerPhoto = null;
 
-		// ensure sliders are displayed for real tours
-		setShowSlider(true);
-
 		if (_tourChartConfig.isShowTourPhotos == false) {
 			return;
 		}
 
-		ArrayList<Photo> tourPhotos = null;
+		final int[] timeSerie = _tourData.timeSerie;
+		final long[] historySerie = _tourData.timeSerieHistory;
 
+		final boolean isTimeSerie = timeSerie != null;
+		final boolean isHistorySerie = historySerie != null;
+
+		if (isTimeSerie == false && isHistorySerie == false) {
+			// this is a manually created tour
+			return;
+		}
+
+		ArrayList<ChartPhoto> chartTourPhotos = null;
+		ArrayList<ChartPhoto> chartLinkPhotos = null;
+
+		/*
+		 * get link photos
+		 */
 		final TourPhotoLink tourPhotoLink = _tourData.tourPhotoLink;
 		if (tourPhotoLink != null) {
 
-			tourPhotos = tourPhotoLink.linkPhotos;
+			final ArrayList<Photo> srcLinkPhotos = tourPhotoLink.linkPhotos;
 
-		} else {
+			if (srcLinkPhotos.size() > 0) {
 
-			tourPhotos = _tourData.getGalleryPhotos();
+				chartLinkPhotos = new ArrayList<ChartPhoto>();
 
-			if (tourPhotos == null) {
-				return;
+				createLayer_Photo_GetSlicePosition(srcLinkPhotos, chartLinkPhotos);
 			}
 		}
 
-		final int numberOfPhotos = tourPhotos.size();
+		/*
+		 * get gallery photos
+		 */
+		final ArrayList<Photo> srcTourPhotos = _tourData.getGalleryPhotos();
+		if (srcTourPhotos != null && srcTourPhotos.size() > 0) {
 
-		if (numberOfPhotos == 0) {
-			// no photos are available for this tour
+			chartTourPhotos = new ArrayList<ChartPhoto>();
+
+			createLayer_Photo_GetSlicePosition(srcTourPhotos, chartTourPhotos);
+		}
+
+		if (chartTourPhotos == null && chartLinkPhotos == null) {
+			// there are no photos
 			return;
+		}
+
+		/*
+		 * at least 1 photo is available
+		 */
+
+		createLayer_Photo_GetSlicePosition(srcTourPhotos, chartTourPhotos);
+
+		_layerPhoto = new ChartLayerPhoto(chartTourPhotos, chartLinkPhotos);
+
+		setCustomOverlay(_photoOverlay);
+
+		_photoOverlay.setPhotoLayer(_layerPhoto);
+
+		if (isTimeSerie == false && isHistorySerie) {
+			// hide x slider in history chart
+			setShowSlider(false);
+		} else {
+			// ensure sliders are displayed for real tours
+			setShowSlider(true);
 		}
 
 //		// dump tour photos
@@ -902,36 +942,15 @@ public class TourChart extends Chart {
 //					+ ("\t" + new DateTime(photo.adjustedTime)));
 //			// TODO remove SYSTEM.OUT.PRINTLN
 //		}
+	}
+
+	private void createLayer_Photo_GetSlicePosition(final ArrayList<Photo> srcPhotos,
+													final ArrayList<ChartPhoto> chartPhotos) {
 
 		final int[] timeSerie = _tourData.timeSerie;
 		final long[] historySerie = _tourData.timeSerieHistory;
 
 		final boolean isTimeSerie = timeSerie != null;
-		final boolean isHistorySerie = historySerie != null;
-
-		if (isTimeSerie == false && isHistorySerie == false) {
-			// this is a manually created tour
-			return;
-		}
-
-		if (isTimeSerie == false && isHistorySerie) {
-			// hide x slider in history chart
-			setShowSlider(false);
-		} else {
-			setShowSlider(true);
-		}
-
-		/*
-		 * at least 1 photo is available
-		 */
-
-		final ArrayList<ChartPhoto> chartPhotos = new ArrayList<ChartPhoto>();
-
-		_layerPhoto = new ChartLayerPhoto(chartPhotos);
-
-		setCustomOverlay(_photoOverlay);
-
-		_photoOverlay.setPhotoLayer(_layerPhoto);
 
 		final long tourStart = _tourData.getTourStartTime().getMillis() / 1000;
 		final int numberOfTimeSlices = isTimeSerie ? timeSerie.length : historySerie.length;
@@ -940,8 +959,8 @@ public class TourChart extends Chart {
 		 * set photos for tours which has max 1 value point
 		 */
 		if (numberOfTimeSlices <= 1) {
-			for (final Photo photoWrapper : tourPhotos) {
-				chartPhotos.add(new ChartPhoto(photoWrapper, 0, 0));
+			for (final Photo photo : srcPhotos) {
+				chartPhotos.add(new ChartPhoto(photo, 0, 0));
 			}
 			return;
 		}
@@ -949,6 +968,7 @@ public class TourChart extends Chart {
 		/*
 		 * set photos for tours which has more than 1 value point
 		 */
+		final int numberOfPhotos = srcPhotos.size();
 
 		// set value serie for the x-axis
 		double[] xAxisSerie = null;
@@ -964,7 +984,7 @@ public class TourChart extends Chart {
 		}
 
 		int photoIndex = 0;
-		Photo photo = tourPhotos.get(photoIndex);
+		Photo photo = srcPhotos.get(photoIndex);
 
 		// tour time serie, fit photos into a tour
 
@@ -1004,7 +1024,7 @@ public class TourChart extends Chart {
 				}
 
 				if (photoIndex < numberOfPhotos) {
-					photo = tourPhotos.get(photoIndex);
+					photo = srcPhotos.get(photoIndex);
 				} else {
 					break;
 				}
@@ -1037,7 +1057,7 @@ public class TourChart extends Chart {
 					photoIndex++;
 
 					if (photoIndex < numberOfPhotos) {
-						photo = tourPhotos.get(photoIndex);
+						photo = srcPhotos.get(photoIndex);
 					} else {
 						break;
 					}

@@ -72,6 +72,8 @@ public abstract class GalleryMT20 extends Canvas {
 
 	private static final int					GALLERY_ITEM_MIN_SIZE		= 10;
 
+	private IDialogSettings						_state;
+
 	private boolean								_isVertical;
 	private boolean								_isHorizontal;
 
@@ -279,6 +281,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 	private IPhotoProvider						_photoProvider;
 
+
 	private class RedrawTimer implements Runnable {
 		public void run() {
 
@@ -303,8 +306,9 @@ public abstract class GalleryMT20 extends Canvas {
 	 *            if both V_SCROLL and H_SCROLL are specified, the gallery is in vertical mode by
 	 *            default. Mode can be changed afterward using setVertical<br/>
 	 *            SWT.MULTI allows only several items to be selected at the same time.
+	 * @param state
 	 */
-	public GalleryMT20(final Composite parent, final int style) {
+	public GalleryMT20(final Composite parent, final int style, final IDialogSettings state) {
 
 //		super(parent, style);
 //		super(parent, style | SWT.DOUBLE_BUFFERED);
@@ -320,6 +324,8 @@ public abstract class GalleryMT20 extends Canvas {
 		_isHorizontal = !_isVertical;
 
 		_isMultiSelection = (style & SWT.MULTI) > 0;
+
+		_state = state;
 
 		_clientArea = getClientArea();
 
@@ -342,7 +348,7 @@ public abstract class GalleryMT20 extends Canvas {
 		_itemRenderer = new DefaultGalleryMT20ItemRenderer();
 
 		// set fullsize viewer
-		_fullScreenImageViewer = new FullScreenImageViewer(this, _itemRenderer);
+		_fullScreenImageViewer = new FullScreenImageViewer(this, _itemRenderer, state);
 
 		updateGallery(false);
 	}
@@ -2155,14 +2161,14 @@ public abstract class GalleryMT20 extends Canvas {
 		redraw();
 	}
 
-	public void restoreState(final IDialogSettings state) {
+	public void restoreState() {
 
-		_fullScreenImageViewer.restoreState(state);
+		_fullScreenImageViewer.restoreState();
 	}
 
-	public void saveState(final IDialogSettings state) {
+	public void saveState() {
 
-		_fullScreenImageViewer.saveState(state);
+		_fullScreenImageViewer.saveState();
 	}
 
 	private void selectAll() {

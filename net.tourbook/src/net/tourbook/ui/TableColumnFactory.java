@@ -691,6 +691,22 @@ public abstract class TableColumnFactory {
 		};
 	};
 	
+	public static final TableColumnFactory PHOTO_TIME_ADJUSTMENT = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "photoTimeAdjustment", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_PhotoTimeAdjustment_Label);
+			colDef.setColumnHeader(Messages.ColumnFactory_PhotoTimeAdjustment_Header);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_PhotoTimeAdjustment_Tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
+			 
+			return colDef;
+		};
+	};
+	
 	public static final TableColumnFactory POWER = new TableColumnFactory() {
 		
 		@Override

@@ -62,23 +62,6 @@ public abstract class TableColumnFactory {
 		};
 	};
 	
-	public static final TableColumnFactory PHOTO_FILE_LOCATION = new TableColumnFactory() {
-		
-		@Override
-		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
-			
-			final int pixelWidth = pixelConverter.convertWidthInCharsToPixels(40);
-			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "photoFileLocation", SWT.LEAD); //$NON-NLS-1$
-			
-			colDef.setColumnLabel(Messages.ColumnFactory_Photo_Location);
-			colDef.setColumnHeader(Messages.ColumnFactory_Photo_Location);
-			colDef.setDefaultColumnWidth(pixelWidth);
-			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
-			
-			return colDef;
-		};
-	};
-	
 	public static final TableColumnFactory PHOTO_FILE_IMAGE_DIRECTION_DEGREE = new TableColumnFactory() {
 		
 		@Override
@@ -116,6 +99,55 @@ public abstract class TableColumnFactory {
 			return colDef;
 		};
 	};
+
+//	public static final TableColumnFactory LATITUDE = new TableColumnFactory() {
+//
+//		@Override
+//		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+//
+//			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "latitude", SWT.LEAD); //$NON-NLS-1$
+//
+//			colDef.setColumnLabel(Messages.ColumnFactory_latitude_label);
+//			colDef.setColumnHeader(Messages.ColumnFactory_latitude);
+//			colDef.setColumnToolTipText(Messages.ColumnFactory_latitude_tooltip);
+//			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(14));
+//
+//			return colDef;
+//		};
+//	};
+	
+	public static final TableColumnFactory PHOTO_FILE_LOCATION = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final int pixelWidth = pixelConverter.convertWidthInCharsToPixels(40);
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "photoFileLocation", SWT.LEAD); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_Photo_Location);
+			colDef.setColumnHeader(Messages.ColumnFactory_Photo_Location);
+			colDef.setDefaultColumnWidth(pixelWidth);
+			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
+			
+			return colDef;
+		};
+	};
+
+//	public static final TableColumnFactory LONGITUDE = new TableColumnFactory() {
+//
+//		@Override
+//		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+//
+//			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "longitude", SWT.LEAD); //$NON-NLS-1$
+//
+//			colDef.setColumnLabel(Messages.ColumnFactory_longitude_label);
+//			colDef.setColumnHeader(Messages.ColumnFactory_longitude);
+//			colDef.setColumnToolTipText(Messages.ColumnFactory_longitude_tooltip);
+//			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(14));
+//
+//			return colDef;
+//		};
+//	};
 
 	public static final TableColumnFactory PHOTO_FILE_NAME = new TableColumnFactory() {
 		

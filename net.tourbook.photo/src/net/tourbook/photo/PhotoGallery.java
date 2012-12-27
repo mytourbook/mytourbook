@@ -78,6 +78,9 @@ public class PhotoGallery extends ImageGallery {
 	}
 
 	public PhotoGallery(final IDialogSettings state) {
+
+		super(state);
+
 		_state = state;
 	}
 

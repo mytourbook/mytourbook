@@ -35,6 +35,7 @@ import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.LRUMap;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
+import net.tourbook.common.weather.IWeather;
 import net.tourbook.photo.internal.Activator;
 import net.tourbook.photo.internal.GalleryActionBar;
 import net.tourbook.photo.internal.GalleryPhotoToolTip;
@@ -408,8 +409,8 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 	private class GalleryImplementation extends GalleryMT20 {
 
-		public GalleryImplementation(final Composite parent, final int style) {
-			super(parent, style);
+		public GalleryImplementation(final Composite parent, final int style, final IDialogSettings state) {
+			super(parent, style, state);
 		}
 
 		@Override
@@ -462,6 +463,11 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 			jobFilter_22_ScheduleSubsequent(DELAY_JOB_SUBSEQUENT_FILTER);
 			jobUILoading_20_Schedule();
 		}
+	}
+
+	public ImageGallery(final IDialogSettings state) {
+
+		_state = state;
 	}
 
 	/**
@@ -530,7 +536,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		_pc = new PixelConverter(parent);
 
 		_columnManager = new ColumnManager(this, _state);
-		defineAllColumns(parent);
+		defineAllColumns();
 
 		jobFilter_10_Create();
 		jobUIFilter_10_Create();
@@ -653,7 +659,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	 */
 	private void createUI_20_PageGallery(final Composite parent) {
 
-		_galleryMT20 = new GalleryImplementation(parent, _galleryStyle);
+		_galleryMT20 = new GalleryImplementation(parent, _galleryStyle, _state);
 
 		_galleryMT20.setHigherQualityDelay(200);
 //		_gallery.setAntialias(SWT.OFF);
@@ -771,15 +777,110 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		}
 	}
 
-	private void defineAllColumns(final Composite parent) {
+	private void defineAllColumns() {
 
-		defineColumn_PhotoExifTime();
+		defineColumn_ImageFileName();
+		defineColumn_AdjustedDate();
+		defineColumn_AdjustedTime();
+		defineColumn_ExifTime();
+		defineColumn_Dimension();
+		defineColumn_Orientation();
+		defineColumn_ImageDirectionText();
+		defineColumn_ImageDirectionDegree();
+//		defineColumnAltitude();
+//		defineColumnLatitude();
+//		defineColumnLongitude();
+		defineColumn_Location();
 	}
+
+	/**
+	 * column: date
+	 */
+	private void defineColumn_AdjustedDate() {
+
+		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_DATE.createColumn(_columnManager, _pc);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Photo photo = (Photo) cell.getElement();
+
+				cell.setText(_dateFormatter.print(photo.adjustedTime));
+			}
+		});
+	}
+
+	/**
+	 * column: time
+	 */
+	private void defineColumn_AdjustedTime() {
+
+		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_TIME.createColumn(_columnManager, _pc);
+
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Photo photo = (Photo) cell.getElement();
+
+				cell.setText(_timeFormatter.print(photo.adjustedTime));
+			}
+		});
+	}
+
+	/**
+	 * column: width x height
+	 */
+	private void defineColumn_Dimension() {
+
+		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_DIMENSION.createColumn(_columnManager, _pc);
+
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Photo photo = (Photo) cell.getElement();
+				final int width = photo.getImageWidth();
+				final int height = photo.getImageHeight();
+				if (width == Integer.MIN_VALUE || height == Integer.MIN_VALUE) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(Integer.toString(width) + " x " + Integer.toString(height));
+				}
+			}
+		});
+	}
+
+//	/**
+//	 * column: altitude
+//	 */
+//	private void defineColumnAltitude() {
+//
+//		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_ALTITUDE.createColumn(_columnManager, _pc);
+//		colDef.setIsDefaultColumn();
+//		colDef.setLabelProvider(new CellLabelProvider() {
+//			@Override
+//			public void update(final ViewerCell cell) {
+//
+//				final Photo photo = (Photo) cell.getElement();
+//				final double altitude = photo.getAltitude();
+//
+//				if (altitude == Double.MIN_VALUE) {
+//					cell.setText(UI.EMPTY_STRING);
+//				} else {
+//					cell.setText(Integer.toString((int) (altitude / UI.UNIT_VALUE_ALTITUDE)));
+//				}
+//			}
+//		});
+//	}
 
 	/**
 	 * column: tour start time
 	 */
-	private void defineColumn_PhotoExifTime() {
+	private void defineColumn_ExifTime() {
 
 		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_TIME.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -789,6 +890,160 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 				final Photo photo = (Photo) cell.getElement();
 
 				cell.setText(_timeFormatter.print(photo.imageExifTime));
+			}
+		});
+	}
+
+	/**
+	 * column: image direction degree
+	 */
+	private void defineColumn_ImageDirectionDegree() {
+
+		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_IMAGE_DIRECTION_DEGREE//
+				.createColumn(_columnManager, _pc);
+
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Photo photo = (Photo) cell.getElement();
+				final double imageDirection = photo.getImageDirection();
+
+				if (imageDirection == Double.MIN_VALUE) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(Integer.toString((int) imageDirection));
+				}
+			}
+		});
+	}
+
+//	/**
+//	 * column: latitude
+//	 */
+//	private void defineColumnLatitude() {
+//
+//		final ColumnDefinition colDef = TableColumnFactory.LATITUDE.createColumn(_columnManager, _pc);
+//
+//		colDef.setIsDefaultColumn();
+//		colDef.setLabelProvider(new CellLabelProvider() {
+//			@Override
+//			public void update(final ViewerCell cell) {
+//
+//				final double latitude = ((Photo) cell.getElement()).getLatitude();
+//
+//				if (latitude == Double.MIN_VALUE) {
+//					cell.setText(UI.EMPTY_STRING);
+//				} else {
+//					cell.setText(_nf8.format(latitude));
+//				}
+//			}
+//		});
+//	}
+
+	/**
+	 * column: image direction degree
+	 */
+	private void defineColumn_ImageDirectionText() {
+
+		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_IMAGE_DIRECTION_TEXT//
+				.createColumn(_columnManager, _pc);
+
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Photo photo = (Photo) cell.getElement();
+				final double imageDirection = photo.getImageDirection();
+
+				if (imageDirection == Double.MIN_VALUE) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					final int imageDirectionInt = (int) imageDirection;
+					cell.setText(getDirectionText(imageDirectionInt));
+				}
+			}
+		});
+	}
+
+//	/**
+//	 * column: longitude
+//	 */
+//	private void defineColumnLongitude() {
+//
+//		final ColumnDefinition colDef = net.tourbook.ui.TableColumnFactory.LONGITUDE.createColumn(_columnManager, _pc);
+//
+//		colDef.setIsDefaultColumn();
+//		colDef.setLabelProvider(new CellLabelProvider() {
+//			@Override
+//			public void update(final ViewerCell cell) {
+//
+//				final double longitude = ((Photo) cell.getElement()).getLongitude();
+//
+//				if (longitude == Double.MIN_VALUE) {
+//					cell.setText(UI.EMPTY_STRING);
+//				} else {
+//					cell.setText(_nf8.format(longitude));
+//				}
+//			}
+//		});
+//	}
+
+	/**
+	 * column: name
+	 */
+	private void defineColumn_ImageFileName() {
+
+		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_NAME.createColumn(_columnManager, _pc);
+
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Photo photo = (Photo) cell.getElement();
+
+				cell.setText(photo.imageFileName);
+			}
+		});
+	}
+
+	/**
+	 * column: location
+	 */
+	private void defineColumn_Location() {
+
+		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_LOCATION.createColumn(_columnManager, _pc);
+
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Photo photo = (Photo) cell.getElement();
+
+				cell.setText(photo.getGpsAreaInfo());
+			}
+		});
+	}
+
+	/**
+	 * column: orientation
+	 */
+	private void defineColumn_Orientation() {
+
+		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_ORIENTATION.createColumn(_columnManager, _pc);
+
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Photo photo = (Photo) cell.getElement();
+
+				cell.setText(Integer.toString(photo.getOrientation()));
 			}
 		});
 	}
@@ -890,6 +1145,15 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	 */
 	public Composite getCustomActionBarContainer() {
 		return _galleryActionBar.getCustomContainer();
+	}
+
+	private String getDirectionText(final int degreeDirection) {
+
+		final float degree = (degreeDirection + 22.5f) / 45.0f;
+
+		final int directionIndex = ((int) degree) % 8;
+
+		return IWeather.windDirectionText[directionIndex];
 	}
 
 	public FullScreenImageViewer getFullScreenImageViewer() {
@@ -1786,7 +2050,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 	void restoreState() {
 
-		_galleryMT20.restoreState(_state);
+		_galleryMT20.restoreState();
 
 		// set font
 		onModifyFont();
@@ -1910,7 +2174,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 		Util.setState(_state, STATE_SELECTED_ITEMS, _galleryMT20.getSelectionIndex());
 
-		_galleryMT20.saveState(_state);
+		_galleryMT20.saveState();
 	}
 
 	public void selectItem(final int itemIndex, final String galleryPositionKey) {

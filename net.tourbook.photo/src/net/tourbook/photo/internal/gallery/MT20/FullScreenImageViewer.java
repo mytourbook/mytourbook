@@ -162,7 +162,11 @@ public class FullScreenImageViewer {
 
 //	public FullScreenImageViewer() {}
 
-	public FullScreenImageViewer(final GalleryMT20 gallery, final AbstractGalleryMT20ItemRenderer itemRenderer) {
+	public FullScreenImageViewer(	final GalleryMT20 gallery,
+									final AbstractGalleryMT20ItemRenderer itemRenderer,
+									final IDialogSettings state) {
+
+		_state = state;
 
 		_sourceGallery = gallery;
 
@@ -582,12 +586,10 @@ public class FullScreenImageViewer {
 		}
 	}
 
-	void restoreState(final IDialogSettings state) {
-
-		_state = state;
+	void restoreState() {
 
 		final ZoomState defaultZoom = ZoomState.FIT_WINDOW;
-		final String stateValue = Util.getStateString(state, STATE_FULL_SIZE_VIEWER_ZOOM_STATE, defaultZoom.name());
+		final String stateValue = Util.getStateString(_state, STATE_FULL_SIZE_VIEWER_ZOOM_STATE, defaultZoom.name());
 		try {
 			_zoomState = ZoomState.valueOf(stateValue);
 		} catch (final Exception e) {
@@ -604,9 +606,9 @@ public class FullScreenImageViewer {
 				IPhotoPreferences.PHOTO_FULLSIZE_VIEWER_IS_SHOW_LOADING_MESSAGE));
 	}
 
-	void saveState(final IDialogSettings state) {
+	void saveState() {
 
-		state.put(STATE_FULL_SIZE_VIEWER_ZOOM_STATE, _zoomState.name());
+		_state.put(STATE_FULL_SIZE_VIEWER_ZOOM_STATE, _zoomState.name());
 	}
 
 	private void setBounds() {

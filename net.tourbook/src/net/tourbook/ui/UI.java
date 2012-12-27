@@ -167,7 +167,8 @@ public class UI {
 
 	public static final String								SYMBOL_AVERAGE					= "\u00f8";									//$NON-NLS-1$
 	public static final String								SYMBOL_AVERAGE_WITH_SPACE		= "\u00f8 ";									//$NON-NLS-1$
-	public static final String								SYMBOL_DASH						= "\u2212";									//$NON-NLS-1$
+	public static final String								SYMBOL_DASH						= "-";											//$NON-NLS-1$
+//	public static final String								SYMBOL_DASH						= "\u2212";									//$NON-NLS-1$
 	public static final String								SYMBOL_DIFFERENCE				= "\u0394";									//$NON-NLS-1$
 	public static final String								SYMBOL_DIFFERENCE_WITH_SPACE	= "\u0394 ";									//$NON-NLS-1$
 	public static final String								SYMBOL_DOUBLE_HORIZONTAL		= "\u2550";									//$NON-NLS-1$
@@ -708,6 +709,53 @@ public class UI {
 				dt.getMinuteOfHour(),
 				dt.getSecondOfMinute())//
 				.toString();
+	}
+
+	/**
+	 * Hours are ignored when they are 0. An empty string is returned when time = <code>0</code>.
+	 * 
+	 * @param time
+	 *            Time in seconds.
+	 * @return
+	 */
+	public static String formatHhMmSs(long time) {
+
+		if (time == 0) {
+			return UI.EMPTY_STRING;
+		}
+
+		boolean isNegative = false;
+
+		if (time < 0) {
+			isNegative = true;
+			time = -time;
+		}
+
+		_formatterSB.setLength(0);
+
+		String timeText;
+		if (time >= 3600) {
+
+			// display hours
+
+			timeText = _formatter.format(//
+					Messages.Format_hhmmss,
+					(time / 3600),
+					((time % 3600) / 60),
+					((time % 3600) % 60)).toString();
+
+		} else {
+
+			// ignore hours
+
+			timeText = _formatter.format(//
+					Messages.Format_hhmm,
+					((time % 3600) / 60),
+					((time % 3600) % 60)).toString();
+
+		}
+
+		return isNegative ? UI.SYMBOL_DASH + timeText : timeText;
 	}
 
 	public static ColumnPixelData getColumnPixelWidth(final PixelConverter pixelConverter, final int width) {

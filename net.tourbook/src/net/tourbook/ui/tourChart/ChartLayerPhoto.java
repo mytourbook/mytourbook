@@ -38,18 +38,37 @@ public class ChartLayerPhoto implements IChartLayer {
 
 	static final int				GROUP_HORIZONTAL_WIDTH	= 40;
 
-	private ArrayList<PhotoGroup>	_photoGroups			= new ArrayList<PhotoGroup>();
-	private ArrayList<ChartPhoto>	_chartPhotos;
+	private ArrayList<ChartPhoto>	_tourChartPhotos		= new ArrayList<ChartPhoto>();
+	private ArrayList<PhotoGroup>	_tourPhotoGroups		= new ArrayList<PhotoGroup>();
+	private Point[]					_tourPhotoPositions;
 
-	private Point[]					_photoPositions;
+	private ArrayList<ChartPhoto>	_linkChartPhotos		= new ArrayList<ChartPhoto>();
+	private ArrayList<PhotoGroup>	_linkPhotoGroups		= new ArrayList<PhotoGroup>();
+	private Point[]					_linkPhotoPositions;
 
-	public ChartLayerPhoto(final ArrayList<ChartPhoto> chartPhotos) {
-		_chartPhotos = chartPhotos;
+	public ChartLayerPhoto(final ArrayList<ChartPhoto> chartTourPhotos, final ArrayList<ChartPhoto> chartLinkPhotos) {
+
+		_tourChartPhotos.clear();
+		_tourPhotoPositions = null;
+
+		_linkChartPhotos.clear();
+		_linkPhotoPositions = null;
+
+		if (chartTourPhotos != null) {
+			_tourChartPhotos.addAll(chartTourPhotos);
+		}
+
+		if (chartLinkPhotos != null) {
+			_linkChartPhotos.addAll(chartLinkPhotos);
+		}
 	}
 
-	private void createGroupedPhotos(final long devGraphImageOffset, final GraphDrawingData graphDrawingData) {
+	private void createGroupPositions(	final ArrayList<PhotoGroup> photoGroups,
+										final Point[] photoPositions,
+										final GraphDrawingData graphDrawingData,
+										final long devGraphImageOffset) {
 
-		_photoGroups.clear();
+		photoGroups.clear();
 
 		final ChartDrawingData chartDrawingData = graphDrawingData.getChartDrawingData();
 		final int devVisibleChartWidth = chartDrawingData.devDevVisibleChartWidth;
@@ -72,9 +91,9 @@ public class ChartLayerPhoto implements IChartLayer {
 
 		PhotoGroup groupPhoto = null;
 
-		for (int positionIndex = 0; positionIndex < _photoPositions.length; positionIndex++) {
+		for (int positionIndex = 0; positionIndex < photoPositions.length; positionIndex++) {
 
-			final Point photoPosition = _photoPositions[positionIndex];
+			final Point photoPosition = photoPositions[positionIndex];
 
 			if (photoPosition == null) {
 				// photo is not in the graph viewport
@@ -89,7 +108,7 @@ public class ChartLayerPhoto implements IChartLayer {
 
 				if (groupPhoto == null) {
 					groupPhoto = new PhotoGroup();
-					_photoGroups.add(groupPhoto);
+					photoGroups.add(groupPhoto);
 				}
 
 				// keep photo index within the group
@@ -114,7 +133,7 @@ public class ChartLayerPhoto implements IChartLayer {
 
 				// create next group
 				groupPhoto = new PhotoGroup();
-				_photoGroups.add(groupPhoto);
+				photoGroups.add(groupPhoto);
 
 				groupPhoto.hGridStart = (int) (groupHGrid - groupWidth + 1);
 				groupPhoto.hGridEnd = (int) groupHGrid;
@@ -127,9 +146,9 @@ public class ChartLayerPhoto implements IChartLayer {
 		/*
 		 * set position for the group average positions
 		 */
-		for (final PhotoGroup photoGroup : _photoGroups) {
+		for (final PhotoGroup photoGroup : photoGroups) {
 
-			final Point firstPosition = _photoPositions[photoGroup.photoIndex.get(0)];
+			final Point firstPosition = photoPositions[photoGroup.photoIndex.get(0)];
 
 			int minX = firstPosition.x;
 			int minY = firstPosition.y;
@@ -138,7 +157,7 @@ public class ChartLayerPhoto implements IChartLayer {
 
 			for (final int photoIndex : photoGroup.photoIndex) {
 
-				final Point photoPosition = _photoPositions[photoIndex];
+				final Point photoPosition = photoPositions[photoIndex];
 
 				final int photoPosX = photoPosition.x;
 				final int photoPosY = photoPosition.y;
@@ -164,52 +183,30 @@ public class ChartLayerPhoto implements IChartLayer {
 	}
 
 	/**
-	 * Draw photos into the current graph.
+	 * get all photo positions within the graph viewport (client area)
 	 */
-	public void draw(final GC gc, final GraphDrawingData graphDrawingData, final Chart chart) {
+	private void createPhotoPositions(	final ArrayList<ChartPhoto> chartPhotos,
+										final Point[] photoPositions,
+										final GraphDrawingData graphDrawingData,
+										final int devYTop,
+										final long devGraphImageOffset,
+										final int devGraphHeight,
+										final boolean isHistory,
+										final int lineWidth,
+										final int devVisibleChartWidth,
+										final double groupHGrid) {
 
-		final Display display = Display.getCurrent();
-
-		final int devYTop = graphDrawingData.getDevYTop();
-		final int devYBottom = graphDrawingData.getDevYBottom();
-		final long devGraphImageOffset = chart.getXXDevViewPortLeftBorder();
-		final int devGraphHeight = graphDrawingData.devGraphHeight;
-
-		final float graphYBottom = graphDrawingData.getGraphYBottom();
-		final float[] yValues = graphDrawingData.getYData().getHighValuesFloat()[0];
 		final double scaleX = graphDrawingData.getScaleX();
 		final double scaleY = graphDrawingData.getScaleY();
 
-		final boolean isHistory = graphDrawingData.getChartType() == ChartType.HISTORY;
+		final float graphYBottom = graphDrawingData.getGraphYBottom();
+		final float[] yValues = graphDrawingData.getYData().getHighValuesFloat()[0];
 
-		final int lineWidth = 2;
+		final int devYBottom = graphDrawingData.getDevYBottom();
+
 		int photoIndex = 0;
 
-		final ChartDrawingData chartDrawingData = graphDrawingData.getChartDrawingData();
-		final int devVisibleChartWidth = chartDrawingData.devDevVisibleChartWidth;
-		final long devVirtualGraphWidth = graphDrawingData.devVirtualGraphWidth;
-		final double zoomRatio = (double) devVirtualGraphWidth / devVisibleChartWidth;
-
-		// adjust group with to zoom ratia
-		double groupWidth = GROUP_HORIZONTAL_WIDTH * zoomRatio;
-
-		// ensure a group is not too large
-		while (groupWidth > GROUP_HORIZONTAL_WIDTH * 2) {
-			groupWidth /= 2;
-		}
-
-		/*
-		 * ensure the groups always starts at the same position, otherwise a group can contain
-		 * different number of photo when graph is zoomed in and horizontally moved
-		 */
-		final double groupHGrid = -devGraphImageOffset % groupWidth;
-
-		/*
-		 * get all photo positions within the graph viewport (client area)
-		 */
-		_photoPositions = new Point[_chartPhotos.size()];
-
-		for (final ChartPhoto chartPhoto : _chartPhotos) {
+		for (final ChartPhoto chartPhoto : chartPhotos) {
 
 			final double devXPhotoValue = scaleX * chartPhoto.xValue;
 			final int devXPhoto = (int) (devXPhotoValue - devGraphImageOffset);
@@ -257,16 +254,117 @@ public class ChartLayerPhoto implements IChartLayer {
 			}
 
 			// keep photo position which is used when tooltip is displayed
-			_photoPositions[photoIndex++] = new Point(devXPhoto, devYPhoto);
+			photoPositions[photoIndex++] = new Point(devXPhoto, devYPhoto);
+		}
+	}
+
+	/**
+	 * Draw photos into the current graph.
+	 */
+	public void draw(final GC gc, final GraphDrawingData graphDrawingData, final Chart chart) {
+
+		final Display display = Display.getCurrent();
+
+		final int devYTop = graphDrawingData.getDevYTop();
+		final long devGraphImageOffset = chart.getXXDevViewPortLeftBorder();
+		final int devGraphHeight = graphDrawingData.devGraphHeight;
+
+		final ChartDrawingData chartDrawingData = graphDrawingData.getChartDrawingData();
+		final int devVisibleChartWidth = chartDrawingData.devDevVisibleChartWidth;
+		final long devVirtualGraphWidth = graphDrawingData.devVirtualGraphWidth;
+		final double zoomRatio = (double) devVirtualGraphWidth / devVisibleChartWidth;
+
+		final boolean isHistory = graphDrawingData.getChartType() == ChartType.HISTORY;
+
+		final int lineWidth = 2;
+
+		// adjust group with to zoom ratio
+		double groupWidth = GROUP_HORIZONTAL_WIDTH * zoomRatio;
+
+		// ensure a group is not too large
+		while (groupWidth > GROUP_HORIZONTAL_WIDTH * 2) {
+			groupWidth /= 2;
 		}
 
-		// convert all photo positions into grouped photo positions
-		createGroupedPhotos(devGraphImageOffset, graphDrawingData);
+		/*
+		 * ensure the groups always starts at the same position, otherwise a group can contain
+		 * different number of photo when graph is zoomed in and horizontally moved
+		 */
+		final double groupHGrid = -devGraphImageOffset % groupWidth;
 
 		gc.setClipping(0, devYTop, devVisibleChartWidth, devGraphHeight);
 		gc.setAntialias(SWT.ON);
 
-		for (final PhotoGroup photoGroup : _photoGroups) {
+		if (_linkChartPhotos.size() > 0) {
+
+			_linkPhotoPositions = new Point[_linkChartPhotos.size()];
+
+			createPhotoPositions(_linkChartPhotos, _linkPhotoPositions,//
+					graphDrawingData,
+					devYTop,
+					devGraphImageOffset,
+					devGraphHeight,
+					isHistory,
+					lineWidth,
+					devVisibleChartWidth,
+					groupHGrid);
+
+			// convert all photo positions into grouped photo positions
+			createGroupPositions(_linkPhotoGroups, _linkPhotoPositions, //
+					graphDrawingData,
+					devGraphImageOffset);
+
+			draw_10(_linkPhotoGroups, _linkPhotoPositions, //
+					gc,
+					display,
+					devYTop,
+					devGraphHeight,
+					isHistory,
+					lineWidth);
+		}
+
+		if (_tourChartPhotos.size() > 0) {
+
+			_tourPhotoPositions = new Point[_tourChartPhotos.size()];
+
+			createPhotoPositions(_tourChartPhotos, _tourPhotoPositions,//
+					graphDrawingData,
+					devYTop,
+					devGraphImageOffset,
+					devGraphHeight,
+					isHistory,
+					lineWidth,
+					devVisibleChartWidth,
+					groupHGrid);
+
+			// convert all photo positions into grouped photo positions
+			createGroupPositions(_tourPhotoGroups, _tourPhotoPositions, //
+					graphDrawingData,
+					devGraphImageOffset);
+
+			draw_10(_tourPhotoGroups, _tourPhotoPositions, //
+					gc,
+					display,
+					devYTop,
+					devGraphHeight,
+					isHistory,
+					lineWidth);
+		}
+
+		gc.setClipping((Rectangle) null);
+		gc.setLineWidth(1);
+	}
+
+	private void draw_10(	final ArrayList<PhotoGroup> photoGroups,
+							final Point[] photoPositions,
+							final GC gc,
+							final Display display,
+							final int devYTop,
+							final int devGraphHeight,
+							final boolean isHistory,
+							final int lineWidth) {
+
+		for (final PhotoGroup photoGroup : photoGroups) {
 
 			final int numberOfPhotos = photoGroup.photoIndex.size();
 
@@ -314,7 +412,7 @@ public class ChartLayerPhoto implements IChartLayer {
 			gc.setBackground(display.getSystemColor(SWT.COLOR_DARK_GRAY));
 			gc.setForeground(display.getSystemColor(SWT.COLOR_WHITE));
 
-			drawPhotoAndGroup(gc, photoGroup);
+			drawPhotoAndGroup(gc, photoGroup, photoPositions);
 
 //			// debug: draw grid
 //			gc.setLineWidth(1);
@@ -324,12 +422,9 @@ public class ChartLayerPhoto implements IChartLayer {
 //			gc.setForeground(display.getSystemColor(SWT.COLOR_DARK_BLUE));
 //			gc.drawLine(photoGroup.hGridEnd, devYTop, photoGroup.hGridEnd, devYBottom);
 		}
-
-		gc.setClipping((Rectangle) null);
-		gc.setLineWidth(1);
 	}
 
-	void drawPhotoAndGroup(final GC gc, final PhotoGroup photoGroup) {
+	void drawPhotoAndGroup(final GC gc, final PhotoGroup photoGroup, final Point[] photoPositions) {
 
 		int prevDevYPhoto = Integer.MIN_VALUE;
 		int prevDevXPhoto = Integer.MIN_VALUE;
@@ -337,7 +432,7 @@ public class ChartLayerPhoto implements IChartLayer {
 		// draw photo icon
 		for (final int photoIndex : photoGroup.photoIndex) {
 
-			final Point photoPosition = _photoPositions[photoIndex];
+			final Point photoPosition = photoPositions[photoIndex];
 			if (photoPosition == null) {
 				// this happened
 				break;
@@ -375,19 +470,11 @@ public class ChartLayerPhoto implements IChartLayer {
 	}
 
 	ArrayList<ChartPhoto> getChartPhotos() {
-		return _chartPhotos;
+		return chartPhotos;
 	}
 
 	ArrayList<PhotoGroup> getPhotoGroups() {
-		return _photoGroups;
-	}
-
-	/**
-	 * @return Returns device position where the photos are painted, is <code>null</code> when photo
-	 *         is not visible in the graph.
-	 */
-	ArrayList<PhotoGroup> getPhotoPositions() {
-		return _photoGroups;
+		return photoGroups;
 	}
 
 }

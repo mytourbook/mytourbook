@@ -447,22 +447,25 @@ public class Tile extends Observable {
 
 		_childTileImageData = childImageData;
 
-		if (_parentTile == null) {
+		// create a copy because parent tile can be set to null
+		final Tile parentTile = _parentTile;
+
+		if (parentTile == null) {
 			// this happens often -> disabled log
 //			StatusUtil.log(NLS.bind(Messages.DBG057_MapProfile_NoParentTile, getTileKey()), new Exception());
 			return null;
 		}
 
-		final ArrayList<Tile> tileChildren = _parentTile.getChildren();
+		final ArrayList<Tile> tileChildren = parentTile.getChildren();
 		if (tileChildren != null) {
 
-			final ReentrantLock parentLock = _parentTile.PARENT_LOCK;
+			final ReentrantLock parentLock = parentTile.PARENT_LOCK;
 			parentLock.lock();
 			{
 				try {
 
 					// check if the parent is already created
-					final Image parentImage = _parentTile._mapImage;
+					final Image parentImage = parentTile._mapImage;
 					if ((parentImage != null) && !parentImage.isDisposed()) {
 						// parent image is already created
 						return new ParentImageStatus(null, false, false, false);
@@ -473,11 +476,11 @@ public class Tile extends Observable {
 					if (areAllChildrenLoaded(tileChildren)) {
 
 						// create parent image when all childs are loaded
-						final MP parentMp = _parentTile._mp;
+						final MP parentMp = parentTile._mp;
 						if (parentMp instanceof ITileChildrenCreator) {
 
 							final ParentImageStatus parentImageStatus = ((ITileChildrenCreator) parentMp)
-									.getParentImage(_parentTile);
+									.getParentImage(parentTile);
 
 							// prevent memory leaks: remove image data in the chilren tiles
 							for (final Tile childTile : tileChildren) {
@@ -992,13 +995,15 @@ public class Tile extends Observable {
 			_mapImage = null;
 		}
 
-		if (_parentTile != null) {
+		// create a copy because parent tile can be set to null
+		final Tile parentTile = _parentTile;
+
+		if (parentTile != null) {
 
 			// this is a child tile, set error into the parent tile
 
-			_parentTile.setChildLoadingError(this);
+			parentTile.setChildLoadingError(this);
 		}
-
 	}
 
 	/**

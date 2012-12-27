@@ -578,7 +578,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		// create list containing all images
 		_photoWrapperList.clear();
 		for (final ChartPhoto chartPhoto : hoveredPhotos) {
-			_photoWrapperList.add(chartPhoto.photoWrapper);
+			_photoWrapperList.add(chartPhoto.photo);
 		}
 
 		final String galleryPositionKey = hoveredPhotosHash + "_PhotoToolTipUI";//$NON-NLS-1$

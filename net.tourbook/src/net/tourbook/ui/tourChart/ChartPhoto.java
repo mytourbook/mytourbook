@@ -19,28 +19,28 @@ import net.tourbook.photo.Photo;
 
 public class ChartPhoto {
 
-	public Photo	photoWrapper;
+	public Photo	photo;
 
 	/**
 	 * Value on the x-axis
 	 */
-	public double		xValue;
+	public double	xValue;
 
 	/**
 	 * Index in the data serie where a photo occures, there can be multiple photos at the same
 	 * position.
 	 */
-	public int			serieIndex;
+	public int		serieIndex;
 
 	/**
-	 * @param photoWrapper
+	 * @param photo
 	 * @param xValue
 	 *            Value on the x-axis
 	 * @param serieIndex
 	 */
-	public ChartPhoto(final Photo photoWrapper, final double xValue, final int serieIndex) {
+	public ChartPhoto(final Photo photo, final double xValue, final int serieIndex) {
 
-		this.photoWrapper = photoWrapper;
+		this.photo = photo;
 		this.xValue = xValue;
 		this.serieIndex = serieIndex;
 	}
@@ -51,9 +51,8 @@ public class ChartPhoto {
 				+ xValue
 				+ "{)}, serieIndex=" //$NON-NLS-1$
 				+ serieIndex
-				+ "{)}, photoWrapper=" //$NON-NLS-1$
-				+ photoWrapper
-				;
+				+ "{)}, photo=" //$NON-NLS-1$
+				+ photo;
 	}
 
 }
