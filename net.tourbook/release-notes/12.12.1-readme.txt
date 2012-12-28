@@ -1,12 +1,24 @@
-Version: 12.12.1                                    31. December 2012 
+Version: 12.12.1                                    28. December 2012
 
 
+  
+Download	
 
-Fixed Bugs 	
+* not available
 
-* show weather icons again in various views and dialogs
+
+Installation	
+
+* install (5 MByte) from the update site, version 12.12.0 is required
+
+
+Fixed Bugs	
+
+* all weather icons disappeared
 
 * tour analyzer displayed nothing
+ 
+* new tour markers are hidden by default
+  -> the default is now set to be visible
+    (tour marker visibility is a new feature in 12.12.0)
 
-* new feature in 12.12.0 to set tour marker visibility was set to 
-invisible by default, default is now visible as in previous versions
