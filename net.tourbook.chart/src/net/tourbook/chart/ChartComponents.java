@@ -1738,7 +1738,13 @@ public class ChartComponents extends Composite {
 		}
 	}
 
-	private void createHistoryUnits(final int firstYear, final int lastYear) {
+	private void createHistoryUnits(final int firstYear, int lastYear) {
+
+		/*
+		 * add an additional year because at the year end, a history chart displays also the next
+		 * year which caused an outOfBound exception when testing this app at 28.12.2012
+		 */
+		lastYear += 1;
 
 		final int numberOfYears = lastYear - firstYear + 1;
 
