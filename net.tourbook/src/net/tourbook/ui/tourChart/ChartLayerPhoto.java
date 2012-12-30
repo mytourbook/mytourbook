@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,48 +34,36 @@ import org.eclipse.swt.widgets.Display;
 
 public class ChartLayerPhoto implements IChartLayer {
 
-	private static final int		PHOTO_ICON_WIDTH		= 3;
+	private static final int			PHOTO_ICON_SIZE			= 3;
+	private static final int			PHOTO_ICON_SPACING		= 2;
 
-	static final int				GROUP_HORIZONTAL_WIDTH	= 40;
+	static final int					GROUP_HORIZONTAL_WIDTH	= 40;
+	static final int					GROUP_Y_HIT_BORDER		= 5;
 
-	private ArrayList<ChartPhoto>	_tourChartPhotos		= new ArrayList<ChartPhoto>();
-	private ArrayList<PhotoGroup>	_tourPhotoGroups		= new ArrayList<PhotoGroup>();
-	private Point[]					_tourPhotoPositions;
+	private ArrayList<PhotoCategory>	_photoCategories;
 
-	private ArrayList<ChartPhoto>	_linkChartPhotos		= new ArrayList<ChartPhoto>();
-	private ArrayList<PhotoGroup>	_linkPhotoGroups		= new ArrayList<PhotoGroup>();
-	private Point[]					_linkPhotoPositions;
+	/**
+	 * Time when hovered photos are created.
+	 */
+	private long						_hoveredPhotosEventTime;
 
-	public ChartLayerPhoto(final ArrayList<ChartPhoto> chartTourPhotos, final ArrayList<ChartPhoto> chartLinkPhotos) {
+	private ArrayList<ChartPhoto>		_hoveredPhotos			= new ArrayList<ChartPhoto>();
+	private PhotoCategory				_hoveredCategory;
+	private PhotoPaintGroup				_hoveredGroup;
 
-		_tourChartPhotos.clear();
-		_tourPhotoPositions = null;
+	public ChartLayerPhoto(final ArrayList<PhotoCategory> photoCategories) {
 
-		_linkChartPhotos.clear();
-		_linkPhotoPositions = null;
-
-		if (chartTourPhotos != null) {
-			_tourChartPhotos.addAll(chartTourPhotos);
-		}
-
-		if (chartLinkPhotos != null) {
-			_linkChartPhotos.addAll(chartLinkPhotos);
-		}
+		_photoCategories = photoCategories;
 	}
 
-	private void createGroupPositions(	final ArrayList<PhotoGroup> photoGroups,
-										final Point[] photoPositions,
-										final GraphDrawingData graphDrawingData,
-										final long devGraphImageOffset) {
-
-		photoGroups.clear();
+	private void createGroupPositions(final GraphDrawingData graphDrawingData, final long devGraphImageOffset) {
 
 		final ChartDrawingData chartDrawingData = graphDrawingData.getChartDrawingData();
 		final int devVisibleChartWidth = chartDrawingData.devDevVisibleChartWidth;
 		final long devVirtualGraphWidth = graphDrawingData.devVirtualGraphWidth;
 		final double zoomRatio = (double) devVirtualGraphWidth / devVisibleChartWidth;
 
-		// adjust group with to zoom ratia
+		// adjust group with to zoom ratio
 		double groupWidth = GROUP_HORIZONTAL_WIDTH * zoomRatio;
 
 		// ensure a group is not too large
@@ -83,111 +71,226 @@ public class ChartLayerPhoto implements IChartLayer {
 			groupWidth /= 2;
 		}
 
-		/*
-		 * ensure the groups always starts at the same position, otherwise a group can contain
-		 * different number of photo when graph is zoomed in and horizontally moved
-		 */
-		double groupHGrid = -devGraphImageOffset % groupWidth;
+		for (final PhotoCategory photoCategorie : _photoCategories) {
 
-		PhotoGroup groupPhoto = null;
+			/*
+			 * ensure the groups always starts at the same position, otherwise a group can contain
+			 * different number of photo when graph is zoomed in and horizontally moved
+			 */
+			double groupHGrid = -devGraphImageOffset % groupWidth;
 
-		for (int positionIndex = 0; positionIndex < photoPositions.length; positionIndex++) {
+			final ArrayList<PhotoPaintGroup> paintGroups = photoCategorie.paintGroups;
+			paintGroups.clear();
 
-			final Point photoPosition = photoPositions[positionIndex];
+			final Point[] photoPositions = photoCategorie.photoPositions;
 
-			if (photoPosition == null) {
-				// photo is not in the graph viewport
-				continue;
-			}
+			PhotoPaintGroup paintGroup = null;
 
-			final int photoPosX = photoPosition.x;
+			for (int positionIndex = 0; positionIndex < photoPositions.length; positionIndex++) {
 
-			if (photoPosX <= groupHGrid) {
+				final Point photoPosition = photoPositions[positionIndex];
 
-				// current photo is in the current group
-
-				if (groupPhoto == null) {
-					groupPhoto = new PhotoGroup();
-					photoGroups.add(groupPhoto);
+				if (photoPosition == null) {
+					// photo is not in the graph viewport
+					continue;
 				}
-
-				// keep photo index within the group
-				groupPhoto.addPhoto(positionIndex);
-
-			} else {
-
-				// current photo is in the next group
-
-				// advance to the next group
-				groupHGrid += groupWidth;
-
-				// check if photo is within the next group
-				while (true) {
-
-					if (photoPosX <= groupHGrid) {
-						break;
-					}
-
-					groupHGrid += groupWidth;
-				}
-
-				// create next group
-				groupPhoto = new PhotoGroup();
-				photoGroups.add(groupPhoto);
-
-				groupPhoto.hGridStart = (int) (groupHGrid - groupWidth + 1);
-				groupPhoto.hGridEnd = (int) groupHGrid;
-
-				// keep photo index within the group
-				groupPhoto.addPhoto(positionIndex);
-			}
-		}
-
-		/*
-		 * set position for the group average positions
-		 */
-		for (final PhotoGroup photoGroup : photoGroups) {
-
-			final Point firstPosition = photoPositions[photoGroup.photoIndex.get(0)];
-
-			int minX = firstPosition.x;
-			int minY = firstPosition.y;
-			int maxX = minX;
-			int maxY = minY;
-
-			for (final int photoIndex : photoGroup.photoIndex) {
-
-				final Point photoPosition = photoPositions[photoIndex];
 
 				final int photoPosX = photoPosition.x;
-				final int photoPosY = photoPosition.y;
 
-				if (photoPosX < minX) {
-					minX = photoPosX;
-				} else if (photoPosX > maxX) {
-					maxX = photoPosX;
-				}
+				if (photoPosX <= groupHGrid) {
 
-				if (photoPosY < minY) {
-					minY = photoPosY;
-				} else if (photoPosY > maxY) {
-					maxY = photoPosY;
+					// current photo is in the current group
+
+					if (paintGroup == null) {
+						paintGroup = new PhotoPaintGroup();
+						paintGroups.add(paintGroup);
+					}
+
+					// keep photo index within the group
+					paintGroup.addPhoto(positionIndex);
+
+				} else {
+
+					// current photo is in the next group
+
+					// advance to the next group
+					groupHGrid += groupWidth;
+
+					// check if photo is within the next group
+					while (true) {
+
+						if (photoPosX <= groupHGrid) {
+							break;
+						}
+
+						groupHGrid += groupWidth;
+					}
+
+					// create next group
+					paintGroup = new PhotoPaintGroup();
+					paintGroups.add(paintGroup);
+
+					paintGroup.hGridStart = (int) (groupHGrid - groupWidth + 1);
+					paintGroup.hGridEnd = (int) groupHGrid;
+
+					// keep photo index within the group
+					paintGroup.addPhoto(positionIndex);
 				}
 			}
 
-			final int posX = minX + (maxX - minX) / 2;
-			final int posY = minY + (maxY - minY) / 2;
+			/*
+			 * set position for the group average positions
+			 */
+			for (final PhotoPaintGroup paintGroup2 : paintGroups) {
 
-			photoGroup.groupCenterPosition = new Point(posX, posY);
+				final ArrayList<Integer> photoIndizes = paintGroup2.photoIndex;
+
+				final Point firstPosition = photoPositions[photoIndizes.get(0)];
+
+				if (firstPosition == null) {
+					// photo is not in the graph viewport
+					continue;
+				}
+
+				int minX = firstPosition.x;
+				int minY = firstPosition.y;
+				int maxX = minX;
+				int maxY = minY;
+
+				for (final int photoIndex : photoIndizes) {
+
+					final Point photoPosition = photoPositions[photoIndex];
+
+					if (photoPosition == null) {
+						// photo is not in the graph viewport
+						continue;
+					}
+
+					final int photoPosX = photoPosition.x;
+					final int photoPosY = photoPosition.y;
+
+					if (photoPosX < minX) {
+						minX = photoPosX;
+					} else if (photoPosX > maxX) {
+						maxX = photoPosX;
+					}
+
+					if (photoPosY < minY) {
+						minY = photoPosY;
+					} else if (photoPosY > maxY) {
+						maxY = photoPosY;
+					}
+				}
+
+				final int posX = minX + (maxX - minX) / 2;
+				final int posY = minY + (maxY - minY) / 2;
+
+				paintGroup2.groupCenterPosition = new Point(posX, posY);
+			}
+		}
+	}
+
+	/**
+	 * create list with hovered hovered photos
+	 */
+	private void createHoveredPhotoList(final long eventTime, final int devXMouseMove, final int devYMouseMove) {
+
+		// initialize hovered photos
+		_hoveredPhotos.clear();
+		_hoveredPhotosEventTime = eventTime;
+
+		_hoveredCategory = null;
+		_hoveredGroup = null;
+
+		if (_photoCategories == null || _photoCategories.size() == 0) {
+			// photo positions are not initialized
+			return;
+		}
+
+		final int numberOfCategories = _photoCategories.size();
+		final boolean isSingleCategory = numberOfCategories == 1;
+
+		boolean isFound = false;
+
+		category:
+
+		for (int categoryIndex = 0; categoryIndex < _photoCategories.size(); categoryIndex++) {
+
+			final PhotoCategory photoCategory = _photoCategories.get(categoryIndex);
+
+			final boolean isLastCategory = categoryIndex == numberOfCategories - 1;
+
+			final ArrayList<ChartPhoto> chartPhotos = photoCategory.chartPhotos;
+
+			final int hoveredXPos = devXMouseMove;
+
+			for (final PhotoPaintGroup paintGroup : photoCategory.paintGroups) {
+
+				if (isSingleCategory) {
+
+					// when it's a single category, the whole chart height is checked if a group is hit
+
+					if (hoveredXPos >= paintGroup.hGridStart && hoveredXPos <= paintGroup.hGridEnd) {
+
+						// photo is within current hovered area
+
+						isFound = true;
+					}
+
+				} else {
+
+					final int devYHoverTop = paintGroup.paintedGroupDevY;
+					final int devYHoverBottom = paintGroup.paintedGroupDevY + paintGroup.paintedGroupHeight;
+
+					if (isLastCategory) {
+
+						// vertical hovering is allowed from the photo group down to the bottom
+
+						if (hoveredXPos >= paintGroup.hGridStart
+								&& hoveredXPos <= paintGroup.hGridEnd
+								&& devYMouseMove >= devYHoverTop) {
+
+							// photo is within current hovered area
+
+							isFound = true;
+						}
+
+					} else {
+
+						if (hoveredXPos >= paintGroup.hGridStart
+								&& hoveredXPos <= paintGroup.hGridEnd
+								&& devYMouseMove >= devYHoverTop
+								&& devYMouseMove <= devYHoverBottom) {
+
+							// photo is within current hovered area
+
+							isFound = true;
+						}
+					}
+				}
+
+				if (isFound) {
+
+					for (final int photoIndex : paintGroup.photoIndex) {
+
+						final ChartPhoto chartPhoto = chartPhotos.get(photoIndex);
+
+						_hoveredPhotos.add(chartPhoto);
+					}
+
+					_hoveredCategory = photoCategory;
+					_hoveredGroup = paintGroup;
+
+					break category;
+				}
+			}
 		}
 	}
 
 	/**
 	 * get all photo positions within the graph viewport (client area)
 	 */
-	private void createPhotoPositions(	final ArrayList<ChartPhoto> chartPhotos,
-										final Point[] photoPositions,
-										final GraphDrawingData graphDrawingData,
+	private void createPhotoPositions(	final GraphDrawingData graphDrawingData,
 										final int devYTop,
 										final long devGraphImageOffset,
 										final int devGraphHeight,
@@ -204,58 +307,73 @@ public class ChartLayerPhoto implements IChartLayer {
 
 		final int devYBottom = graphDrawingData.getDevYBottom();
 
-		int photoIndex = 0;
+		int yPhotoCategoryOffset = _photoCategories.size() * (PHOTO_ICON_SIZE + PHOTO_ICON_SPACING);
 
-		for (final ChartPhoto chartPhoto : chartPhotos) {
+		for (final PhotoCategory photoCategorie : _photoCategories) {
 
-			final double devXPhotoValue = scaleX * chartPhoto.xValue;
-			final int devXPhoto = (int) (devXPhotoValue - devGraphImageOffset);
+			yPhotoCategoryOffset -= PHOTO_ICON_SIZE + PHOTO_ICON_SPACING;
 
-			// check if photo is visible
-			if (devXPhoto < groupHGrid) {
+			final ArrayList<ChartPhoto> chartPhotos = photoCategorie.chartPhotos;
 
-				// skip invisible photos
+			int photoIndex = 0;
+			final Point[] photoPositions = photoCategorie.photoPositions = new Point[chartPhotos.size()];
 
-				photoIndex++;
+			for (final ChartPhoto chartPhoto : chartPhotos) {
 
-				continue;
-			}
+				final double devXPhotoValue = scaleX * chartPhoto.xValue;
+				final int devXPhoto = (int) (devXPhotoValue - devGraphImageOffset);
 
-			// check if photo is to the right of the right border
-			if (devXPhoto > devVisibleChartWidth) {
-				break;
-			}
+				// check if photo is visible
+				if (devXPhoto < groupHGrid) {
 
-			int devYPhoto;
-			if (isHistory) {
+					// skip invisible photos
 
-				devYPhoto = devYBottom - (devGraphHeight / 3);
+					photoIndex++;
 
-			} else {
-
-				final int serieIndex = chartPhoto.serieIndex;
-
-				// check bounds
-
-				final float yValue = yValues[serieIndex];
-				final int devYGraph = (int) ((yValue - graphYBottom) * scaleY);
-				final int devYValue = devYBottom - devYGraph;
-				devYPhoto = devYValue - PHOTO_ICON_WIDTH - 2;
-
-				// force photo marker to be not below the bottom
-				if (devYPhoto + PHOTO_ICON_WIDTH > devYBottom) {
-					devYPhoto = devYBottom - PHOTO_ICON_WIDTH;
+					continue;
 				}
 
-				// force photo marker to be not above the top
-				if (devYPhoto < devYTop) {
-					devYPhoto = devYTop + lineWidth;
+				// check if photo is to the right of the right border
+				if (devXPhoto > devVisibleChartWidth) {
+					break;
 				}
-			}
 
-			// keep photo position which is used when tooltip is displayed
-			photoPositions[photoIndex++] = new Point(devXPhoto, devYPhoto);
+				int devYPhoto;
+				if (isHistory) {
+
+					devYPhoto = devYBottom - (devGraphHeight / 3);
+
+					devYPhoto -= yPhotoCategoryOffset;
+
+				} else {
+
+					final int serieIndex = chartPhoto.serieIndex;
+
+					// check bounds
+
+					final float yValue = yValues[serieIndex];
+					final int devYGraph = (int) ((yValue - graphYBottom) * scaleY);
+					final int devYValue = devYBottom - devYGraph;
+
+					devYPhoto = devYValue - PHOTO_ICON_SIZE - 2;
+					devYPhoto -= yPhotoCategoryOffset;
+
+					// force photo marker to be not below the bottom
+					if (devYPhoto + PHOTO_ICON_SIZE > devYBottom) {
+						devYPhoto = devYBottom - PHOTO_ICON_SIZE;
+					}
+
+					// force photo marker to be not above the top
+					if (devYPhoto < devYTop) {
+						devYPhoto = devYTop + lineWidth;
+					}
+				}
+
+				// keep photo position which is used when tooltip is displayed
+				photoPositions[photoIndex++] = new Point(devXPhoto, devYPhoto);
+			}
 		}
+
 	}
 
 	/**
@@ -292,149 +410,143 @@ public class ChartLayerPhoto implements IChartLayer {
 		 */
 		final double groupHGrid = -devGraphImageOffset % groupWidth;
 
+		createPhotoPositions(
+				graphDrawingData,
+				devYTop,
+				devGraphImageOffset,
+				devGraphHeight,
+				isHistory,
+				lineWidth,
+				devVisibleChartWidth,
+				groupHGrid);
+
+		// convert all photo positions into grouped photo positions
+		createGroupPositions(//
+				graphDrawingData,
+				devGraphImageOffset);
+
 		gc.setClipping(0, devYTop, devVisibleChartWidth, devGraphHeight);
 		gc.setAntialias(SWT.ON);
 
-		if (_linkChartPhotos.size() > 0) {
-
-			_linkPhotoPositions = new Point[_linkChartPhotos.size()];
-
-			createPhotoPositions(_linkChartPhotos, _linkPhotoPositions,//
-					graphDrawingData,
-					devYTop,
-					devGraphImageOffset,
-					devGraphHeight,
-					isHistory,
-					lineWidth,
-					devVisibleChartWidth,
-					groupHGrid);
-
-			// convert all photo positions into grouped photo positions
-			createGroupPositions(_linkPhotoGroups, _linkPhotoPositions, //
-					graphDrawingData,
-					devGraphImageOffset);
-
-			draw_10(_linkPhotoGroups, _linkPhotoPositions, //
-					gc,
-					display,
-					devYTop,
-					devGraphHeight,
-					isHistory,
-					lineWidth);
-		}
-
-		if (_tourChartPhotos.size() > 0) {
-
-			_tourPhotoPositions = new Point[_tourChartPhotos.size()];
-
-			createPhotoPositions(_tourChartPhotos, _tourPhotoPositions,//
-					graphDrawingData,
-					devYTop,
-					devGraphImageOffset,
-					devGraphHeight,
-					isHistory,
-					lineWidth,
-					devVisibleChartWidth,
-					groupHGrid);
-
-			// convert all photo positions into grouped photo positions
-			createGroupPositions(_tourPhotoGroups, _tourPhotoPositions, //
-					graphDrawingData,
-					devGraphImageOffset);
-
-			draw_10(_tourPhotoGroups, _tourPhotoPositions, //
-					gc,
-					display,
-					devYTop,
-					devGraphHeight,
-					isHistory,
-					lineWidth);
-		}
+		draw_10( //
+				gc,
+				display,
+				devYTop,
+				devGraphHeight,
+				isHistory,
+				lineWidth);
 
 		gc.setClipping((Rectangle) null);
 		gc.setLineWidth(1);
 	}
 
-	private void draw_10(	final ArrayList<PhotoGroup> photoGroups,
-							final Point[] photoPositions,
-							final GC gc,
+	private void draw_10(	final GC gc,
 							final Display display,
 							final int devYTop,
 							final int devGraphHeight,
 							final boolean isHistory,
 							final int lineWidth) {
 
-		for (final PhotoGroup photoGroup : photoGroups) {
+		int groupHeightOffset = 0;
+		boolean isFirst = true;
 
-			final int numberOfPhotos = photoGroup.photoIndex.size();
+		for (final PhotoCategory photoCategory : _photoCategories) {
 
-			final String groupText = Integer.toString(numberOfPhotos);
-			final Point textSize = gc.textExtent(groupText);
-			final int textWidth = textSize.x;
-			final int textHeight = textSize.y;
+			boolean isSetGroupHeightOffset = false;
 
-			final int groupTextWidth = textWidth + 4;
-			final int groupTextHeight = textHeight - 2;
-			int groupX = photoGroup.groupCenterPosition.x - (groupTextWidth / 2);
+			for (final PhotoPaintGroup paintGroup : photoCategory.paintGroups) {
 
-			/*
-			 * ensure that group text do no overlap another group
-			 */
-			final int gridBorder = 1;
-			if (groupX + groupTextWidth >= photoGroup.hGridEnd) {
-				groupX = photoGroup.hGridEnd - groupTextWidth - gridBorder;
-			} else if (groupX <= photoGroup.hGridStart) {
-				groupX = photoGroup.hGridStart + gridBorder;
-			}
+				final int numberOfPhotos = paintGroup.photoIndex.size();
 
-			final int textX = groupX + 3;
+				final String groupText = Integer.toString(numberOfPhotos);
+				final Point textSize = gc.textExtent(groupText);
+				final int textWidth = textSize.x;
+				final int textHeight = textSize.y;
 
-			int groupY;
-			if (isHistory) {
-				groupY = devYTop + (devGraphHeight / 3) - groupTextHeight / 2;
-			} else {
-				groupY = devYTop + lineWidth;
-			}
-			final int textY = groupY - 1;
+				final int groupWidth = textWidth + 4;
+				final int groupHeight = textHeight - 2;
 
-			/*
-			 * keep painted positions which is used when group is hovered and painted with another
-			 * color
-			 */
-			photoGroup.paintedGroupDevX = groupX;
-			photoGroup.paintedGroupDevY = groupY;
-			photoGroup.paintedTextDevX = textX;
-			photoGroup.paintedTextDevY = textY;
-			photoGroup.paintedGroupTextWidth = groupTextWidth;
-			photoGroup.paintedGroupTextHeight = groupTextHeight;
-			photoGroup.paintedGroupText = groupText;
+				if (isFirst) {
+					isFirst = false;
+					isSetGroupHeightOffset = true;
+				}
 
-			gc.setBackground(display.getSystemColor(SWT.COLOR_DARK_GRAY));
-			gc.setForeground(display.getSystemColor(SWT.COLOR_WHITE));
+				if (isSetGroupHeightOffset == false) {
+					isSetGroupHeightOffset = true;
+					groupHeightOffset += groupHeight + PHOTO_ICON_SPACING;
+				}
 
-			drawPhotoAndGroup(gc, photoGroup, photoPositions);
+				int groupX = paintGroup.groupCenterPosition.x - (groupWidth / 2);
 
-//			// debug: draw grid
-//			gc.setLineWidth(1);
-//			gc.setForeground(display.getSystemColor(SWT.COLOR_RED));
-//			gc.drawLine(photoGroup.hGridStart, devYTop, photoGroup.hGridStart, devYBottom);
+				/*
+				 * ensure that group text do no overlap another group
+				 */
+				final int gridBorder = 1;
+				if (groupX + groupWidth >= paintGroup.hGridEnd) {
+					groupX = paintGroup.hGridEnd - groupWidth - gridBorder;
+				} else if (groupX <= paintGroup.hGridStart) {
+					groupX = paintGroup.hGridStart + gridBorder;
+				}
+
+				final int textX = groupX + 3;
+
+				int groupY;
+				if (isHistory) {
+					groupY = devYTop + (devGraphHeight / 3) - groupHeight / 2;
+				} else {
+					groupY = devYTop + lineWidth;
+				}
+
+				groupY += groupHeightOffset;
+
+				final int textY = groupY - 1;
+
+				/*
+				 * keep painted positions which is used when group is hovered and painted with
+				 * another color
+				 */
+				paintGroup.paintedGroupDevX = groupX;
+				paintGroup.paintedGroupDevY = groupY;
+				paintGroup.paintedTextDevX = textX;
+				paintGroup.paintedTextDevY = textY;
+				paintGroup.paintedGroupWidth = groupWidth;
+				paintGroup.paintedGroupHeight = groupHeight;
+				paintGroup.paintedGroupText = groupText;
+
+				gc.setBackground(display.getSystemColor(SWT.COLOR_DARK_GRAY));
+				gc.setForeground(display.getSystemColor(SWT.COLOR_WHITE));
+
+				drawPhotoAndGroup(gc, paintGroup, photoCategory);
+
+//				/*
+//				 * debug: draw grid
+//				 */
+//				final int yHitHeight = groupY + groupHeight;// + 2 * GROUP_Y_HIT_BORDER;
+//				gc.setLineWidth(1);
+//				gc.setForeground(display.getSystemColor(SWT.COLOR_RED));
+//				gc.drawLine(paintGroup.hGridStart, groupY, paintGroup.hGridStart, yHitHeight);
 //
-//			gc.setForeground(display.getSystemColor(SWT.COLOR_DARK_BLUE));
-//			gc.drawLine(photoGroup.hGridEnd, devYTop, photoGroup.hGridEnd, devYBottom);
+//				gc.setForeground(display.getSystemColor(SWT.COLOR_DARK_BLUE));
+//				gc.drawLine(paintGroup.hGridEnd, groupY, paintGroup.hGridEnd, yHitHeight);
+			}
 		}
+
 	}
 
-	void drawPhotoAndGroup(final GC gc, final PhotoGroup photoGroup, final Point[] photoPositions) {
+	void drawPhotoAndGroup(final GC gc, final PhotoPaintGroup paintGroup, final PhotoCategory photoCategory) {
+
+		final Point[] photoPositions = photoCategory.photoPositions;
 
 		int prevDevYPhoto = Integer.MIN_VALUE;
 		int prevDevXPhoto = Integer.MIN_VALUE;
 
 		// draw photo icon
-		for (final int photoIndex : photoGroup.photoIndex) {
+		for (final int photoIndex : paintGroup.photoIndex) {
 
 			final Point photoPosition = photoPositions[photoIndex];
+
 			if (photoPosition == null) {
-				// this happened
+				// this can happen for photo positions which are outside of the chart viewport
 				break;
 			}
 
@@ -447,10 +559,10 @@ public class ChartLayerPhoto implements IChartLayer {
 			}
 
 			gc.fillRectangle(//
-					devXPhoto - (PHOTO_ICON_WIDTH / 2),
+					devXPhoto - (PHOTO_ICON_SIZE / 2),
 					devYPhoto,
-					PHOTO_ICON_WIDTH,
-					PHOTO_ICON_WIDTH);
+					PHOTO_ICON_SIZE,
+					PHOTO_ICON_SIZE);
 
 			prevDevXPhoto = devXPhoto;
 			prevDevYPhoto = devYPhoto;
@@ -458,23 +570,48 @@ public class ChartLayerPhoto implements IChartLayer {
 
 		// draw group
 		gc.fillRoundRectangle(
-				photoGroup.paintedGroupDevX,
-				photoGroup.paintedGroupDevY,
-				photoGroup.paintedGroupTextWidth,
-				photoGroup.paintedGroupTextHeight,
+				paintGroup.paintedGroupDevX,
+				paintGroup.paintedGroupDevY,
+				paintGroup.paintedGroupWidth,
+				paintGroup.paintedGroupHeight,
 				6,
 				6);
 
 		// draw text
-		gc.drawText(photoGroup.paintedGroupText, photoGroup.paintedTextDevX, photoGroup.paintedTextDevY, true);
+		gc.drawText(paintGroup.paintedGroupText, paintGroup.paintedTextDevX, paintGroup.paintedTextDevY, true);
 	}
 
-	ArrayList<ChartPhoto> getChartPhotos() {
-		return chartPhotos;
+	PhotoCategory getHoveredCategory(final long eventTime, final int devXMouse, final int devYMouse) {
+
+		if (eventTime == _hoveredPhotosEventTime) {
+			return _hoveredCategory;
+		}
+
+		// list is dirty -> recreate hovered photos list
+		createHoveredPhotoList(eventTime, devXMouse, devYMouse);
+
+		return _hoveredCategory;
 	}
 
-	ArrayList<PhotoGroup> getPhotoGroups() {
-		return photoGroups;
+	PhotoPaintGroup getHoveredGroup() {
+		return _hoveredGroup;
+	}
+
+	/**
+	 * @param eventTime
+	 * @param devXMouseMove
+	 * @param devYMouseMove
+	 * @return Returns photos which are currently be hovered. 0 means no photo is hovered.
+	 */
+	ArrayList<ChartPhoto> getHoveredPhotos(final long eventTime, final int devXMouseMove, final int devYMouseMove) {
+
+		if (eventTime == _hoveredPhotosEventTime) {
+			return _hoveredPhotos;
+		}
+
+		createHoveredPhotoList(eventTime, devXMouseMove, devYMouseMove);
+
+		return _hoveredPhotos;
 	}
 
 }

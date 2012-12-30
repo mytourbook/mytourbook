@@ -710,10 +710,10 @@ public class Chart extends ViewForm {
 		_chartComponents.getChartComponentGraph().handleTooltipMouseEvent(event, mouseDisplayPosition);
 	}
 
-	boolean isCustomOverlayDirty(final int devXMouse, final int devYMouse) {
+	boolean isCustomOverlayDirty(final long eventTime, final int devXMouse, final int devYMouse) {
 
 		if (_customOverlay != null) {
-			return _customOverlay.onMouseMove(devXMouse, devYMouse);
+			return _customOverlay.onMouseMove(eventTime, devXMouse, devYMouse);
 		}
 
 		return false;

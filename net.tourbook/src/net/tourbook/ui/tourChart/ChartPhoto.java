@@ -19,18 +19,18 @@ import net.tourbook.photo.Photo;
 
 public class ChartPhoto {
 
-	public Photo	photo;
+	public final Photo	photo;
 
 	/**
 	 * Value on the x-axis
 	 */
-	public double	xValue;
+	public final double	xValue;
 
 	/**
 	 * Index in the data serie where a photo occures, there can be multiple photos at the same
 	 * position.
 	 */
-	public int		serieIndex;
+	public final int	serieIndex;
 
 	/**
 	 * @param photo
@@ -46,13 +46,44 @@ public class ChartPhoto {
 	}
 
 	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof ChartPhoto)) {
+			return false;
+		}
+		final ChartPhoto other = (ChartPhoto) obj;
+		if (photo == null) {
+			if (other.photo != null) {
+				return false;
+			}
+		} else if (!photo.equals(other.photo)) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((photo == null) ? 0 : photo.hashCode());
+		return result;
+	}
+
+	@Override
 	public String toString() {
-		return "ChartPhoto xValue=" //$NON-NLS-1$
-				+ xValue
-				+ "{)}, serieIndex=" //$NON-NLS-1$
-				+ serieIndex
-				+ "{)}, photo=" //$NON-NLS-1$
-				+ photo;
+		return "ChartPhoto ["
+				+ (" photo=" + photo + "{)},")
+				+ (" xValue=" + xValue + "{)},")
+				+ (" serieIndex=" + serieIndex)
+				+ "]"
+		//
+		;
 	}
 
 }

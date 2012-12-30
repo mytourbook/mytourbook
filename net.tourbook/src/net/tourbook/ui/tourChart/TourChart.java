@@ -37,7 +37,6 @@ import net.tourbook.chart.IChartLayer;
 import net.tourbook.chart.IFillPainter;
 import net.tourbook.chart.IHoveredListener;
 import net.tourbook.chart.ITooltipOwner;
-import net.tourbook.colors.ColorDefinition;
 import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.common.PointLong;
 import net.tourbook.common.UI;
@@ -180,7 +179,8 @@ public class TourChart extends Chart {
 	private ControlListener			_ttControlListener						= new ControlListener();
 
 	private ChartPhotoOverlay		_photoOverlay							= new ChartPhotoOverlay();
-	private Color					_photoOverlayBGColor;
+	private Color					_photoOverlayBGColorLink;
+	private Color					_photoOverlayBGColorTour;
 
 	/**
 	 * This listener is added to ALL widgets within the tooltip shell.
@@ -282,7 +282,8 @@ public class TourChart extends Chart {
 		}
 
 		@Override
-		public void hoveredValue(	final int hoveredValueIndex,
+		public void hoveredValue(	final long eventTime,
+									final int hoveredValueIndex,
 									final PointLong devHoveredValue,
 									final int devXMouseMove,
 									final int devYMouseMove) {
@@ -305,9 +306,15 @@ public class TourChart extends Chart {
 			}
 
 			if (_tourChartConfig.isShowTourPhotoTooltip) {
-				_photoTooltip.showChartPhotoToolTip(_layerPhoto, devHoveredValue, devXMouseMove, devYMouseMove);
+				_photoTooltip.showChartPhotoToolTip(
+						_layerPhoto,
+						eventTime,
+						devHoveredValue,
+						devXMouseMove,
+						devYMouseMove);
 			}
 		}
+
 	}
 
 	public TourChart(final Composite parent, final int style, final boolean isShowActions) {
@@ -336,10 +343,14 @@ public class TourChart extends Chart {
 
 		addPrefListeners();
 
-		final ColorDefinition colorDefinition = GraphColorProvider.getInstance()//
-				.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_HISTORY);
-		_photoOverlayBGColor = new Color(getDisplay(), colorDefinition.getLineColor());
-		_photoOverlay.setBackgroundColor(_photoOverlayBGColor);
+		final GraphColorProvider colorProvider = GraphColorProvider.getInstance();
+
+		_photoOverlayBGColorLink = new Color(getDisplay(), //
+				colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_HISTORY).getLineColor());
+		_photoOverlayBGColorTour = new Color(getDisplay(), //
+				colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_TOUR).getLineColor());
+
+		_photoOverlay.setBackgroundColor(_photoOverlayBGColorLink, _photoOverlayBGColorTour);
 
 		/*
 		 * set values from pref store
@@ -796,156 +807,13 @@ public class TourChart extends Chart {
 		_xAxisSelectionListener.add(listener);
 	}
 
-	private void createLayer_2ndAlti() {
-
-		if (_is2ndAltiLayerVisible && (_layer2ndAlti != null)) {
-			_layer2ndAltiSerie = _layer2ndAlti.create2ndAltiLayer();
-		} else {
-			_layer2ndAltiSerie = null;
-		}
-	}
-
 	/**
-	 * create the layer which displays the tour marker
+	 * Create chart photos, these are photos which contain the time slice position.
 	 * 
-	 * @param isMarkerVisibleEnforced
-	 *            When <code>true</code> the marker must be drawn, otherwise
-	 *            {@link TourChartConfiguration#isShowTourMarker} determines if the markers are
-	 *            drawn or not.
+	 * @param srcPhotos
+	 * @param chartPhotos
 	 */
-	private void createLayer_Marker(final boolean isMarkerVisibleEnforced) {
-
-		if (isMarkerVisibleEnforced == false && _tourChartConfig.isShowTourMarker == false) {
-			return;
-		}
-
-		// set data serie for the x-axis
-		final double[] xAxisSerie = _tourChartConfig.isShowTimeOnXAxis ? //
-				_tourData.getTimeSerieDouble()
-				: _tourData.getDistanceSerieDouble();
-
-		_layerMarker = new ChartMarkerLayer();
-		_layerMarker.setLineColor(new RGB(50, 100, 10));
-
-		final Collection<TourMarker> tourMarkerList = _tourData.getTourMarkers();
-
-		for (final TourMarker tourMarker : tourMarkerList) {
-
-			if (tourMarker.isMarkerVisible() == false) {
-				// skip marker
-				continue;
-			}
-
-			final ChartLabel chartLabel = new ChartLabel();
-
-			final int markerIndex = Math.min(tourMarker.getSerieIndex(), xAxisSerie.length - 1);
-
-			chartLabel.graphX = xAxisSerie[markerIndex];
-			chartLabel.serieIndex = markerIndex;
-
-			chartLabel.markerLabel = tourMarker.getLabel();
-			chartLabel.visualPosition = tourMarker.getVisualPosition();
-			chartLabel.type = tourMarker.getType();
-			chartLabel.visualType = tourMarker.getVisibleType();
-
-			chartLabel.labelXOffset = tourMarker.getLabelXOffset();
-			chartLabel.labelYOffset = tourMarker.getLabelYOffset();
-
-			_layerMarker.addLabel(chartLabel);
-		}
-	}
-
-	private void createLayer_Photo() {
-
-		// reset layer
-		_photoOverlay.setPhotoLayer(null);
-		_layerPhoto = null;
-
-		if (_tourChartConfig.isShowTourPhotos == false) {
-			return;
-		}
-
-		final int[] timeSerie = _tourData.timeSerie;
-		final long[] historySerie = _tourData.timeSerieHistory;
-
-		final boolean isTimeSerie = timeSerie != null;
-		final boolean isHistorySerie = historySerie != null;
-
-		if (isTimeSerie == false && isHistorySerie == false) {
-			// this is a manually created tour
-			return;
-		}
-
-		ArrayList<ChartPhoto> chartTourPhotos = null;
-		ArrayList<ChartPhoto> chartLinkPhotos = null;
-
-		/*
-		 * get link photos
-		 */
-		final TourPhotoLink tourPhotoLink = _tourData.tourPhotoLink;
-		if (tourPhotoLink != null) {
-
-			final ArrayList<Photo> srcLinkPhotos = tourPhotoLink.linkPhotos;
-
-			if (srcLinkPhotos.size() > 0) {
-
-				chartLinkPhotos = new ArrayList<ChartPhoto>();
-
-				createLayer_Photo_GetSlicePosition(srcLinkPhotos, chartLinkPhotos);
-			}
-		}
-
-		/*
-		 * get gallery photos
-		 */
-		final ArrayList<Photo> srcTourPhotos = _tourData.getGalleryPhotos();
-		if (srcTourPhotos != null && srcTourPhotos.size() > 0) {
-
-			chartTourPhotos = new ArrayList<ChartPhoto>();
-
-			createLayer_Photo_GetSlicePosition(srcTourPhotos, chartTourPhotos);
-		}
-
-		if (chartTourPhotos == null && chartLinkPhotos == null) {
-			// there are no photos
-			return;
-		}
-
-		/*
-		 * at least 1 photo is available
-		 */
-
-		createLayer_Photo_GetSlicePosition(srcTourPhotos, chartTourPhotos);
-
-		_layerPhoto = new ChartLayerPhoto(chartTourPhotos, chartLinkPhotos);
-
-		setCustomOverlay(_photoOverlay);
-
-		_photoOverlay.setPhotoLayer(_layerPhoto);
-
-		if (isTimeSerie == false && isHistorySerie) {
-			// hide x slider in history chart
-			setShowSlider(false);
-		} else {
-			// ensure sliders are displayed for real tours
-			setShowSlider(true);
-		}
-
-//		// dump tour photos
-//		System.out.println(UI.timeStampNano() + " \t");
-//		// TODO remove SYSTEM.OUT.PRINTLN
-//
-//		for (final Photo photo : tourPhotos) {
-//			System.out.println(UI.timeStampNano()
-//					+ " "
-//					+ photo.imageFileName
-//					+ ("\t" + new DateTime(photo.adjustedTime)));
-//			// TODO remove SYSTEM.OUT.PRINTLN
-//		}
-	}
-
-	private void createLayer_Photo_GetSlicePosition(final ArrayList<Photo> srcPhotos,
-													final ArrayList<ChartPhoto> chartPhotos) {
+	private void createChartPhotos(final ArrayList<Photo> srcPhotos, final ArrayList<ChartPhoto> chartPhotos) {
 
 		final int[] timeSerie = _tourData.timeSerie;
 		final long[] historySerie = _tourData.timeSerieHistory;
@@ -1078,6 +946,155 @@ public class TourChart extends Chart {
 				timeSliceEnd = tourStart + valuePointTime + (sliceDuration / 2);
 			}
 		}
+	}
+
+	private void createLayer_2ndAlti() {
+
+		if (_is2ndAltiLayerVisible && (_layer2ndAlti != null)) {
+			_layer2ndAltiSerie = _layer2ndAlti.create2ndAltiLayer();
+		} else {
+			_layer2ndAltiSerie = null;
+		}
+	}
+
+	/**
+	 * create the layer which displays the tour marker
+	 * 
+	 * @param isMarkerVisibleEnforced
+	 *            When <code>true</code> the marker must be drawn, otherwise
+	 *            {@link TourChartConfiguration#isShowTourMarker} determines if the markers are
+	 *            drawn or not.
+	 */
+	private void createLayer_Marker(final boolean isMarkerVisibleEnforced) {
+
+		if (isMarkerVisibleEnforced == false && _tourChartConfig.isShowTourMarker == false) {
+			return;
+		}
+
+		// set data serie for the x-axis
+		final double[] xAxisSerie = _tourChartConfig.isShowTimeOnXAxis ? //
+				_tourData.getTimeSerieDouble()
+				: _tourData.getDistanceSerieDouble();
+
+		_layerMarker = new ChartMarkerLayer();
+		_layerMarker.setLineColor(new RGB(50, 100, 10));
+
+		final Collection<TourMarker> tourMarkerList = _tourData.getTourMarkers();
+
+		for (final TourMarker tourMarker : tourMarkerList) {
+
+			if (tourMarker.isMarkerVisible() == false) {
+				// skip marker
+				continue;
+			}
+
+			final ChartLabel chartLabel = new ChartLabel();
+
+			final int markerIndex = Math.min(tourMarker.getSerieIndex(), xAxisSerie.length - 1);
+
+			chartLabel.graphX = xAxisSerie[markerIndex];
+			chartLabel.serieIndex = markerIndex;
+
+			chartLabel.markerLabel = tourMarker.getLabel();
+			chartLabel.visualPosition = tourMarker.getVisualPosition();
+			chartLabel.type = tourMarker.getType();
+			chartLabel.visualType = tourMarker.getVisibleType();
+
+			chartLabel.labelXOffset = tourMarker.getLabelXOffset();
+			chartLabel.labelYOffset = tourMarker.getLabelYOffset();
+
+			_layerMarker.addLabel(chartLabel);
+		}
+	}
+
+	private void createLayer_Photo() {
+
+		// reset photo layer
+		_photoOverlay.setPhotoLayer(null);
+		_layerPhoto = null;
+
+		if (_tourChartConfig.isShowTourPhotos == false) {
+			return;
+		}
+
+		final int[] timeSerie = _tourData.timeSerie;
+		final long[] historySerie = _tourData.timeSerieHistory;
+
+		final boolean isTimeSerie = timeSerie != null;
+		final boolean isHistorySerie = historySerie != null;
+
+		if (isTimeSerie == false && isHistorySerie == false) {
+			// this is a manually created tour
+			return;
+		}
+
+		final ArrayList<PhotoCategory> chartPhotoGroups = new ArrayList<PhotoCategory>();
+
+		/*
+		 * get saved photos
+		 */
+		final ArrayList<Photo> srcTourPhotos = _tourData.getGalleryPhotos();
+		if (srcTourPhotos != null && srcTourPhotos.size() > 0) {
+
+			final ArrayList<ChartPhoto> chartPhotos = new ArrayList<ChartPhoto>();
+			createChartPhotos(srcTourPhotos, chartPhotos);
+
+			final PhotoCategory chartPhotoGroup = new PhotoCategory(chartPhotos, ChartPhotoType.TOUR);
+			chartPhotoGroups.add(chartPhotoGroup);
+		}
+
+		/*
+		 * get link photos, they are painted below saved photos that the mouse hit area is larger
+		 */
+		final TourPhotoLink tourPhotoLink = _tourData.tourPhotoLink;
+		if (tourPhotoLink != null) {
+
+			final ArrayList<Photo> srcLinkPhotos = tourPhotoLink.linkPhotos;
+
+			if (srcLinkPhotos.size() > 0) {
+
+				final ArrayList<ChartPhoto> chartPhotos = new ArrayList<ChartPhoto>();
+				createChartPhotos(srcLinkPhotos, chartPhotos);
+
+				final PhotoCategory chartPhotoGroup = new PhotoCategory(chartPhotos, ChartPhotoType.LINK);
+				chartPhotoGroups.add(chartPhotoGroup);
+			}
+		}
+
+		if (chartPhotoGroups.size() == 0) {
+			// there are no photos
+			return;
+		}
+
+		/*
+		 * at least 1 photo is available
+		 */
+
+		_layerPhoto = new ChartLayerPhoto(chartPhotoGroups);
+
+		setCustomOverlay(_photoOverlay);
+
+		_photoOverlay.setPhotoLayer(_layerPhoto);
+
+		if (isTimeSerie == false && isHistorySerie) {
+			// hide x slider in history chart
+			setShowSlider(false);
+		} else {
+			// ensure sliders are displayed for real tours
+			setShowSlider(true);
+		}
+
+//		// dump tour photos
+//		System.out.println(UI.timeStampNano() + " \t");
+//		// TODO remove SYSTEM.OUT.PRINTLN
+//
+//		for (final Photo photo : tourPhotos) {
+//			System.out.println(UI.timeStampNano()
+//					+ " "
+//					+ photo.imageFileName
+//					+ ("\t" + new DateTime(photo.adjustedTime)));
+//			// TODO remove SYSTEM.OUT.PRINTLN
+//		}
 	}
 
 	/**
@@ -1577,7 +1594,8 @@ public class TourChart extends Chart {
 
 		_prefStore.removePropertyChangeListener(_prefChangeListener);
 
-		_photoOverlayBGColor.dispose();
+		_photoOverlayBGColorLink.dispose();
+		_photoOverlayBGColorTour.dispose();
 
 		_valuePointToolTip.hide();
 	}

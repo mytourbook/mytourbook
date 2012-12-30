@@ -161,7 +161,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 	private ActionModifyColumns			_actionModifyColumns;
 	private ActionSavePhotosInTour		_actionSavePhotoInTour;
 
-	private final DateTimeFormatter		_dateFormatter						= DateTimeFormat.mediumDate();
+	private final DateTimeFormatter		_dateFormatter						= DateTimeFormat.shortDate();
 	private final DateTimeFormatter		_timeFormatter						= DateTimeFormat.mediumTime();
 	private final PeriodFormatter		_durationFormatter;
 	private final NumberFormat			_nf_1_1;
@@ -1701,6 +1701,10 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 		// tour viewer update can be a longer task, update other UI element before
 		_pageBook.getDisplay().asyncExec(new Runnable() {
 			public void run() {
+
+				if (_tourViewer.getTable().isDisposed()) {
+					return;
+				}
 
 				_tourViewer.setInput(new Object[0]);
 				_pageBook.showPage(_pageViewer);

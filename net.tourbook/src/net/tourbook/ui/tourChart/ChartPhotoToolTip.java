@@ -34,22 +34,12 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class ChartPhotoToolTip extends PhotoToolTipUI {
 
-	private ArrayList<ChartPhoto>	_hoveredPhotos	= new ArrayList<ChartPhoto>();
-
-	private int						_devXGridCenterX;
-
-//	/**
-//	 * This counter is incremented when 0 photos can be displayed with the hovered mouse. Counter is
-//	 * not incremented when subsequent different number of photos can be displayed until 0 photos
-//	 * can be displayed. This counter is used to not hide photo tooltip when number of photos
-//	 * changes.
-//	 */
-//	private int						_hideCounter;
+	private int			_devXGridCenterX;
 
 	/*
 	 * UI controls
 	 */
-	private TourChart				_tourChart;
+	private TourChart	_tourChart;
 
 	public ChartPhotoToolTip(final TourChart tourChart, final IDialogSettings state) {
 
@@ -121,50 +111,29 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 	}
 
 	public void showChartPhotoToolTip(	final ChartLayerPhoto photoLayer,
+										final long eventTime,
 										final PointLong devHoveredValue,
 										final int devXMouseMove,
 										final int devYMouseMove) {
 
-		final ArrayList<PhotoGroup> photoGroups = photoLayer.getPhotoGroups();
+		final ArrayList<ChartPhoto> hoveredPhotos = photoLayer.getHoveredPhotos(//
+				eventTime,
+				devXMouseMove,
+				devYMouseMove);
 
-		if (photoGroups == null) {
-			// photo positions are not initialized
-			return;
-		}
-
-		_hoveredPhotos.clear();
-
-		final ArrayList<ChartPhoto> chartPhotos = photoLayer.getChartPhotos();
-
-		final int hoveredXPos = devXMouseMove;
-
-		for (final PhotoGroup photoGroup : photoGroups) {
-
-			if (hoveredXPos >= photoGroup.hGridStart && hoveredXPos <= photoGroup.hGridEnd) {
-
-				// photo is within current hovered area
-
-				final ArrayList<Integer> photoPosition = photoGroup.photoIndex;
-
-				for (final int photoIndex : photoPosition) {
-
-					final ChartPhoto chartPhoto = chartPhotos.get(photoIndex);
-
-					_hoveredPhotos.add(chartPhoto);
-				}
-
-				// set tooltip position
-				_devXGridCenterX = photoGroup.hGridStart + (ChartLayerPhoto.GROUP_HORIZONTAL_WIDTH / 2);
-			}
-		}
-
-		if (_hoveredPhotos.size() == 0) {
+		if (hoveredPhotos.size() == 0) {
 
 			hide();
 
 		} else {
 
-			showPhotoToolTip(_hoveredPhotos);
+			final PhotoPaintGroup photoGroup = photoLayer.getHoveredGroup();
+			
+			// set tooltip position
+			_devXGridCenterX = photoGroup.hGridStart + (ChartLayerPhoto.GROUP_HORIZONTAL_WIDTH / 2);
+
+			
+			showPhotoToolTip(hoveredPhotos);
 		}
 	}
 

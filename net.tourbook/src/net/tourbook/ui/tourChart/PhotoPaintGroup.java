@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,7 +22,7 @@ import java.util.ArrayList;
 
 import org.eclipse.swt.graphics.Point;
 
-public class PhotoGroup {
+public class PhotoPaintGroup {
 
 	ArrayList<Integer>	photoIndex	= new ArrayList<Integer>();
 
@@ -36,8 +36,9 @@ public class PhotoGroup {
 	int					paintedTextDevX;
 	int					paintedTextDevY;
 
-	int					paintedGroupTextWidth;
-	int					paintedGroupTextHeight;
+	int					paintedGroupWidth;
+	int					paintedGroupHeight;
+
 	String				paintedGroupText;
 
 	void addPhoto(final int positionIndex) {
@@ -46,7 +47,7 @@ public class PhotoGroup {
 
 	@Override
 	public String toString() {
-		return "PhotoGroup [" //$NON-NLS-1$
+		return "PhotoPaintGroup [" //$NON-NLS-1$
 				+ ("hGridStart=" + hGridStart + ", ") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("hGridEnd=" + hGridEnd + ", ") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("paintedGroupText=" + paintedGroupText) //$NON-NLS-1$

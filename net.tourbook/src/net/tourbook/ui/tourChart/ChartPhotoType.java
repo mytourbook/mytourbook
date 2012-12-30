@@ -13,28 +13,12 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.chart;
+package net.tourbook.ui.tourChart;
 
-import org.eclipse.swt.graphics.GC;
+public enum ChartPhotoType {
 
-public interface CustomOverlay {
+	TOUR,
 
-	/**
-	 * Draws into the chart overlay, this event can happen at each mouse move event.
-	 * 
-	 * @param gcOverlay
-	 */
-	public boolean draw(GC gcOverlay);
+	LINK
 
-	/**
-	 * @param eventTime
-	 * @param devXMouse
-	 *            Mouse horizontal position or {@link Integer#MIN_VALUE} when mouse position is not
-	 *            available.
-	 * @param devYMouse
-	 *            Mouse vertical position or {@link Integer#MIN_VALUE} when mouse position is not
-	 *            available.
-	 * @return Returns <code>true</code> when the custom overlay must be painted.
-	 */
-	public boolean onMouseMove(long eventTime, int devXMouse, int devYMouse);
 }

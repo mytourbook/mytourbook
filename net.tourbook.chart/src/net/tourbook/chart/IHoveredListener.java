@@ -29,12 +29,16 @@ public interface IHoveredListener {
 
 	/**
 	 * Event is fired when mouse is moved over a line graph value point.
-	 * 
+	 * @param eventTime
 	 * @param hoveredValueIndex
 	 * @param devHoveredValue
-	 * @param devYMouseMove
 	 * @param devXMouseMove
+	 * @param devYMouseMove
 	 */
-	void hoveredValue(int hoveredValueIndex, PointLong devHoveredValue, int devXMouseMove, int devYMouseMove);
+	void hoveredValue(	long eventTime,
+						int hoveredValueIndex,
+						PointLong devHoveredValue,
+						int devXMouseMove,
+						int devYMouseMove);
 
 }

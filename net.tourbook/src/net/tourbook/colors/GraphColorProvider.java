@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -59,6 +59,7 @@ public class GraphColorProvider {
 	public static final String				PREF_GRAPH_SPEED			= "speed";				//$NON-NLS-1$
 	public static final String				PREF_GRAPH_TEMPTERATURE		= "tempterature";		//$NON-NLS-1$
 	public static final String				PREF_GRAPH_TIME				= "duration";			//$NON-NLS-1$
+	public static final String				PREF_GRAPH_TOUR				= "tour";				//$NON-NLS-1$
 	public static final String				PREF_GRAPH_TOUR_COMPARE		= "tourCompare";		//$NON-NLS-1$
 
 	public static final String				PREF_COLOR_BRIGHT			= "bright";			//$NON-NLS-1$
@@ -255,6 +256,14 @@ public class GraphColorProvider {
 					new RGB(0xFF, 0x80, 0x33),
 					new RGB(0xFF, 0x80, 0x33),
 					new RGB(0xFF, 0x80, 0x33),
+					null),
+
+			new ColorDefinition(PREF_GRAPH_TOUR,//
+					Messages.Graph_Label_Tour,
+					new RGB(255, 255, 255),
+					new RGB(0x0d, 0xaa, 0xff),
+					new RGB(0x0d, 0xaa, 0xff),
+					new RGB(0x0d, 0xaa, 0xff),
 					null),
 
 			new ColorDefinition(PREF_GRAPH_DISTANCE,//

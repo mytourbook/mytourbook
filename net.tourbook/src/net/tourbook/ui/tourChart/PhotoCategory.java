@@ -13,28 +13,28 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.chart;
+package net.tourbook.ui.tourChart;
 
-import org.eclipse.swt.graphics.GC;
+import java.util.ArrayList;
 
-public interface CustomOverlay {
+import org.eclipse.swt.graphics.Point;
 
-	/**
-	 * Draws into the chart overlay, this event can happen at each mouse move event.
-	 * 
-	 * @param gcOverlay
-	 */
-	public boolean draw(GC gcOverlay);
+/**
+ * A photo category contains {@link ChartPhoto}'s for one {@link ChartPhotoType}.
+ */
+public class PhotoCategory {
 
-	/**
-	 * @param eventTime
-	 * @param devXMouse
-	 *            Mouse horizontal position or {@link Integer#MIN_VALUE} when mouse position is not
-	 *            available.
-	 * @param devYMouse
-	 *            Mouse vertical position or {@link Integer#MIN_VALUE} when mouse position is not
-	 *            available.
-	 * @return Returns <code>true</code> when the custom overlay must be painted.
-	 */
-	public boolean onMouseMove(long eventTime, int devXMouse, int devYMouse);
+	ArrayList<ChartPhoto>				chartPhotos;
+	final ChartPhotoType				photoType;
+
+	public ArrayList<PhotoPaintGroup>	paintGroups	= new ArrayList<PhotoPaintGroup>();
+
+	Point[]								photoPositions;
+
+	public PhotoCategory(final ArrayList<ChartPhoto> chartPhotos, final ChartPhotoType photoType) {
+
+		this.chartPhotos = chartPhotos;
+		this.photoType = photoType;
+	}
+
 }

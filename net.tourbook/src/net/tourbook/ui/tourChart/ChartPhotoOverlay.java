@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
-import java.util.ArrayList;
-
 import net.tourbook.chart.CustomOverlay;
 
 import org.eclipse.swt.SWT;
@@ -27,12 +25,12 @@ import org.eclipse.swt.graphics.GC;
 public class ChartPhotoOverlay implements CustomOverlay {
 
 	private ChartLayerPhoto	_photoLayer;
-	private PhotoGroup		_hoveredPhotoGroup;
 
-	private Color			_bgColor;
+	private PhotoPaintGroup	_hoveredPhotoGroup;
+	private PhotoCategory	_hoveredPhotoCategory;
 
-	private int				_devXMouse;
-	private int				_devYMouse;
+	private Color			_bgColorLink;
+	private Color			_bgColorTour;
 
 	@Override
 	public boolean draw(final GC gcOverlay) {
@@ -43,38 +41,20 @@ public class ChartPhotoOverlay implements CustomOverlay {
 
 		final Device display = gcOverlay.getDevice();
 		gcOverlay.setForeground(display.getSystemColor(SWT.COLOR_WHITE));
-		gcOverlay.setBackground(_bgColor);
 
-		_photoLayer.draw_20_PhotoAndGroup(gcOverlay, _hoveredPhotoGroup, );
+		if (_hoveredPhotoCategory.photoType == ChartPhotoType.LINK) {
+			gcOverlay.setBackground(_bgColorLink);
+		} else {
+			gcOverlay.setBackground(_bgColorTour);
+		}
+
+		_photoLayer.drawPhotoAndGroup(gcOverlay, _hoveredPhotoGroup, _hoveredPhotoCategory);
 
 		return true;
 	}
 
-	PhotoGroup getHoveredPhotoGroup() {
-
-		final ArrayList<PhotoGroup> photoGroups = _photoLayer.getPhotoGroups();
-
-		// find photo group which is hovered with the mouse
-		for (final PhotoGroup photoGroup : photoGroups) {
-
-			final int devYHoverTop = photoGroup.paintedGroupDevY - 5;
-			final int devYHoverBottom = photoGroup.paintedGroupDevY + photoGroup.paintedGroupTextHeight + 5;
-
-			if (_devXMouse >= photoGroup.hGridStart
-					&& _devXMouse <= photoGroup.hGridEnd
-					&& _devYMouse >= devYHoverTop
-					&& _devYMouse <= devYHoverBottom
-			//
-			) {
-				return photoGroup;
-			}
-		}
-
-		return null;
-	}
-
 	@Override
-	public boolean onMouseMove(final int devXMouse, final int devYMouse) {
+	public boolean onMouseMove(final long eventTime, final int devXMouse, final int devYMouse) {
 
 		// reset ALLWAYS
 		_hoveredPhotoGroup = null;
@@ -83,16 +63,15 @@ public class ChartPhotoOverlay implements CustomOverlay {
 			return false;
 		}
 
-		_devXMouse = devXMouse;
-		_devYMouse = devYMouse;
-
-		_hoveredPhotoGroup = getHoveredPhotoGroup();
+		_hoveredPhotoCategory = _photoLayer.getHoveredCategory(eventTime, devXMouse, devYMouse);
+		_hoveredPhotoGroup = _photoLayer.getHoveredGroup();
 
 		return _hoveredPhotoGroup != null;
 	}
 
-	public void setBackgroundColor(final Color bgColor) {
-		_bgColor = bgColor;
+	public void setBackgroundColor(final Color bgColorLink, final Color bgColorTour) {
+		_bgColorLink = bgColorLink;
+		_bgColorTour = bgColorTour;
 	}
 
 	public void setPhotoLayer(final ChartLayerPhoto photoLayer) {

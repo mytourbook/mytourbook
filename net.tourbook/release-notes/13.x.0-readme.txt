@@ -3,15 +3,26 @@ Version: 13.??.0                                           ?. ??? 2013
 
 Detected Problems:
 
-- photo gallery in the tour marker dialog box it not correctly initialized, state is not set
+* photo gallery in the tour marker dialog box it not correctly initialized, state is not set
+* tooltip flickering occures only with bad display drivers !!!
 
 
 Improvements
 
 
+Photos + Tours view
+
+* save photos in tour
+
+* show number of saved photos including time adjustment
+
+
 Tour Chart
 
-* show/hide photo marker with/without photo tooltip
+* show/hide photo markers with/without photo tooltip
+
+* show different photo markers for linked and saved photos 
+  !!! there is a different hovering algorithm !!!
 
 
 Tour Map

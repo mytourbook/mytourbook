@@ -619,7 +619,7 @@ public abstract class TableColumnFactory {
 			colDef.setColumnLabel(Messages.ColumnFactory_NumberOfGPSPhotos_Label);
 			colDef.setColumnHeader(Messages.ColumnFactory_NumberOfGPSPhotos_Header);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_NumberOfGPSPhotos_Tooltip);
-			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 			
 			return colDef;
 		};
@@ -635,7 +635,7 @@ public abstract class TableColumnFactory {
 			colDef.setColumnLabel(Messages.ColumnFactory_NumberOfNoGPSPhotos_Label);
 			colDef.setColumnHeader(Messages.ColumnFactory_NumberOfNoGPSPhotos_Header);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_NumberOfNoGPSPhotos_Tooltip);
-			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 			
 			return colDef;
 		};
@@ -651,7 +651,7 @@ public abstract class TableColumnFactory {
 			colDef.setColumnLabel(Messages.ColumnFactory_NumberOfTourPhotos_Label);
 			colDef.setColumnHeader(Messages.ColumnFactory_NumberOfTourPhotos_Header);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_NumberOfTourPhotos_Tooltip);
-			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 			
 			return colDef;
 		};
@@ -701,7 +701,7 @@ public abstract class TableColumnFactory {
 			colDef.setColumnLabel(Messages.ColumnFactory_PhotoTimeAdjustment_Label);
 			colDef.setColumnHeader(Messages.ColumnFactory_PhotoTimeAdjustment_Header);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_PhotoTimeAdjustment_Tooltip);
-			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(11)); // 9 ... 54
 			 
 			return colDef;
 		};
@@ -910,7 +910,7 @@ public abstract class TableColumnFactory {
 			colDef.setColumnLabel(Messages.ColumnFactory_TourDurationTime_Label);
 			colDef.setColumnHeader(Messages.ColumnFactory_TourDurationTime_Header);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_TourDurationTime_Tooltip);
-			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(15));
 			
 			return colDef;
 		};
@@ -925,7 +925,7 @@ public abstract class TableColumnFactory {
 			colDef.setColumnLabel(Messages.ColumnFactory_TourEndDate_Label);
 			colDef.setColumnHeader(Messages.ColumnFactory_TourEndDate_Header);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_TourEndDate_Tooltip);
-			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(14));
 			
 			return colDef;
 		};
@@ -941,7 +941,7 @@ public abstract class TableColumnFactory {
 			colDef.setColumnLabel(Messages.ColumnFactory_TourEndTime_Label);
 			colDef.setColumnHeader(Messages.ColumnFactory_TourEndTime_Header);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_TourEndTime_Tooltip);
-			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(13));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(14));
 			
 			return colDef;
 		};
@@ -956,7 +956,7 @@ public abstract class TableColumnFactory {
 			colDef.setColumnLabel(Messages.ColumnFactory_TourStartDate_Label);
 			colDef.setColumnHeader(Messages.ColumnFactory_TourStartDate_Header);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_TourStartDate_Tooltip);
-			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(14));
 			
 			return colDef;
 		};
@@ -972,7 +972,7 @@ public abstract class TableColumnFactory {
 			colDef.setColumnLabel(Messages.ColumnFactory_TourStartTime_Label);
 			colDef.setColumnHeader(Messages.ColumnFactory_TourStartTime_Header);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_TourStartTime_Tooltip);
-			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(13));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(14));
 
 			return colDef;
 		};

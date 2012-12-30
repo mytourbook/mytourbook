@@ -500,7 +500,7 @@ public class ChartComponentGraph extends Canvas {
 //					System.out.println("onPaint\tstart\t");
 //					// TODO remove SYSTEM.OUT.PRINTLN
 
-					drawSync_000_onPaint(event.gc);
+					drawSync_000_onPaint(event.gc, event.time & 0xFFFFFFFFL);
 
 //					System.out.println("onPaint\tend\t" + (((double) System.nanoTime() - start) / 1000000) + "ms");
 //					System.out.println();
@@ -523,7 +523,7 @@ public class ChartComponentGraph extends Canvas {
 		addMouseMoveListener(new MouseMoveListener() {
 			public void mouseMove(final MouseEvent e) {
 				if (_isGraphVisible) {
-					onMouseMove(e.x, e.y);
+					onMouseMove(e.time & 0xFFFFFFFFL, e.x, e.y);
 				}
 			}
 		});
@@ -1229,7 +1229,10 @@ public class ChartComponentGraph extends Canvas {
 		_colorCache.dispose();
 	}
 
-	private void doAutoScroll() {
+	/**
+	 * @param eventTime
+	 */
+	private void doAutoScroll(final long eventTime) {
 
 // this is not working the mouse can't sometime not be zoomed to the border, depending on the mouse speed
 //		/*
@@ -1320,7 +1323,7 @@ public class ChartComponentGraph extends Canvas {
 						}
 					}
 
-					doAutoScroll_10_RunnableScrollGraph(this, AUTO_SCROLL_INTERVAL, devMouseOffset, isLeft);
+					doAutoScroll_10_RunnableScrollGraph(this, AUTO_SCROLL_INTERVAL, devMouseOffset, isLeft, eventTime);
 
 				} else {
 
@@ -1358,7 +1361,8 @@ public class ChartComponentGraph extends Canvas {
 	private void doAutoScroll_10_RunnableScrollGraph(	final Runnable runnable,
 														final int autoScrollInterval,
 														final int devMouseOffset,
-														final boolean isLeft) {
+														final boolean isLeft,
+														final long eventTime) {
 
 		final long xxDevNewPosition = _xxDevViewPortLeftBorder + devMouseOffset;
 
@@ -1382,7 +1386,7 @@ public class ChartComponentGraph extends Canvas {
 			_isAutoScroll = false;
 		}
 
-		doAutoScroll_30_UpdateHoveredListener();
+		doAutoScroll_30_UpdateHoveredListener(eventTime);
 	}
 
 	private void doAutoScroll_20_RunnableMoveSlider(final Runnable runnable,
@@ -1416,7 +1420,7 @@ public class ChartComponentGraph extends Canvas {
 		}
 	}
 
-	private void doAutoScroll_30_UpdateHoveredListener() {
+	private void doAutoScroll_30_UpdateHoveredListener(final long eventTime) {
 
 		final IHoveredListener hoveredListener = _chart._hoveredListener;
 
@@ -1439,6 +1443,7 @@ public class ChartComponentGraph extends Canvas {
 					 */
 
 					hoveredListener.hoveredValue(
+							eventTime,
 							_hoveredLineValueIndex,
 							devHoveredValueDevPosition,
 							_devXMouseMove,
@@ -3611,8 +3616,9 @@ public class ChartComponentGraph extends Canvas {
 	 * </pre>
 	 * 
 	 * @param gc
+	 * @param eventTime
 	 */
-	private void drawSync_000_onPaint(final GC gc) {
+	private void drawSync_000_onPaint(final GC gc, final long eventTime) {
 
 //		final long startTime = System.nanoTime();
 //		// TODO remove SYSTEM.OUT.PRINTLN
@@ -3654,7 +3660,7 @@ public class ChartComponentGraph extends Canvas {
 				 */
 				if (_chartImage20Chart != null) {
 
-					final Image image = drawSync_010_ImageChart(gc);
+					final Image image = drawSync_010_ImageChart(gc, eventTime);
 					if (image == null) {
 						return;
 					}
@@ -3699,7 +3705,7 @@ public class ChartComponentGraph extends Canvas {
 			}
 
 			drawSync_300_Image30Custom();
-			drawSync_010_ImageChart(gc);
+			drawSync_010_ImageChart(gc, eventTime);
 		}
 
 //		final long endTime = System.nanoTime();
@@ -3713,7 +3719,7 @@ public class ChartComponentGraph extends Canvas {
 //		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
-	private Image drawSync_010_ImageChart(final GC gc) {
+	private Image drawSync_010_ImageChart(final GC gc, final long eventTime) {
 
 		final boolean isOverlayImageVisible = _isXSliderVisible
 				|| _isYSliderVisible
@@ -3723,7 +3729,7 @@ public class ChartComponentGraph extends Canvas {
 
 		if (isOverlayImageVisible) {
 
-			drawSync_400_OverlayImage();
+			drawSync_400_OverlayImage(eventTime);
 
 			if (_chartImage40Overlay != null) {
 //				System.out.println("gc <- 40\tdrawSync010ImageChart");
@@ -3839,8 +3845,10 @@ public class ChartComponentGraph extends Canvas {
 	/**
 	 * Draws the overlays into the graph (fg layer image) slider image which contains the custom
 	 * layer image
+	 * 
+	 * @param eventTime
 	 */
-	private void drawSync_400_OverlayImage() {
+	private void drawSync_400_OverlayImage(final long eventTime) {
 
 		if (_chartImage30Custom == null) {
 			return;
@@ -3924,7 +3932,7 @@ public class ChartComponentGraph extends Canvas {
 			}
 
 			if (_isCustomOverlayDirty) {
-				drawSync_470_CustomOverlay(gcOverlay);
+				drawSync_470_CustomOverlay(gcOverlay, eventTime);
 			}
 
 		}
@@ -4671,7 +4679,7 @@ public class ChartComponentGraph extends Canvas {
 		gcOverlay.setAntialias(SWT.OFF);
 	}
 
-	private void drawSync_470_CustomOverlay(final GC gcOverlay) {
+	private void drawSync_470_CustomOverlay(final GC gcOverlay, final long eventTime) {
 
 		/*
 		 * custom overlay must be checked 2x because it is fired 2 times before the photo groups are
@@ -4690,7 +4698,7 @@ public class ChartComponentGraph extends Canvas {
 			_isCustomOverlayInvalid = 0;
 
 			// check if a custom overlay needs to be painted
-			_isCustomOverlayDirty = _chart.isCustomOverlayDirty(_devXMouseMove, _devYMouseMove);
+			_isCustomOverlayDirty = _chart.isCustomOverlayDirty(eventTime, _devXMouseMove, _devYMouseMove);
 		}
 
 		if (_isCustomOverlayDirty) {
@@ -4887,7 +4895,7 @@ public class ChartComponentGraph extends Canvas {
 
 				_isAutoScroll = false;
 
-				onMouseMove(controlPos.x, controlPos.y);
+				onMouseMove(event.time & 0xFFFFFFFFL, controlPos.x, controlPos.y);
 
 			} else {
 				onMouseMoveAxis(new MouseEvent(event));
@@ -5789,9 +5797,10 @@ public class ChartComponentGraph extends Canvas {
 	/**
 	 * Mouse move event handler
 	 * 
-	 * @param event
+	 * @param eventTime
+	 * @param eventTime
 	 */
-	private void onMouseMove(final int devXMouse, final int devYMouse) {
+	private void onMouseMove(final long eventTime, final int devXMouse, final int devYMouse) {
 
 		_devXMouseMove = devXMouse;
 		_devYMouseMove = devYMouse;
@@ -5832,7 +5841,7 @@ public class ChartComponentGraph extends Canvas {
 				 * not yet done
 				 */
 				if (_isAutoScroll == false) {
-					doAutoScroll();
+					doAutoScroll(eventTime);
 				}
 			}
 
@@ -5982,6 +5991,7 @@ public class ChartComponentGraph extends Canvas {
 				if (hoveredListener != null && canShowHoveredTooltip) {
 
 					hoveredListener.hoveredValue(
+							eventTime,
 							_hoveredLineValueIndex,
 							devHoveredValueDevPosition,
 							_devXMouseMove,
@@ -5990,8 +6000,8 @@ public class ChartComponentGraph extends Canvas {
 			}
 		}
 
-		// check if custom overlay is dirty (e.g mouse can have hovered photo group)
-		if (_isCustomOverlayDirty = _chart.isCustomOverlayDirty(_devXMouseMove, _devYMouseMove)) {
+		// check if custom overlay is dirty (e.g mouse can have hovered a photo group)
+		if (_isCustomOverlayDirty = _chart.isCustomOverlayDirty(eventTime, _devXMouseMove, _devYMouseMove)) {
 			isRedraw = true;
 		}
 
@@ -6194,7 +6204,7 @@ public class ChartComponentGraph extends Canvas {
 
 		if (_isAutoScroll == false) {
 			// start scrolling when not yet done
-			doAutoScroll();
+			doAutoScroll(mouseEvent.time & 0xFFFFFFFFL);
 		}
 
 		return true;
