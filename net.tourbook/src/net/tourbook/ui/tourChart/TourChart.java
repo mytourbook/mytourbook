@@ -350,8 +350,6 @@ public class TourChart extends Chart {
 		_photoOverlayBGColorTour = new Color(getDisplay(), //
 				colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_TOUR).getLineColor());
 
-		_photoOverlay.setBackgroundColor(_photoOverlayBGColorLink, _photoOverlayBGColorTour);
-
 		/*
 		 * set values from pref store
 		 */
@@ -1071,6 +1069,7 @@ public class TourChart extends Chart {
 		 */
 
 		_layerPhoto = new ChartLayerPhoto(chartPhotoGroups);
+		_layerPhoto.setBackgroundColor(_photoOverlayBGColorLink, _photoOverlayBGColorTour);
 
 		setCustomOverlay(_photoOverlay);
 

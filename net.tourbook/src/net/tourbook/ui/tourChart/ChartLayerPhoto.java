@@ -27,6 +27,7 @@ import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IChartLayer;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -45,11 +46,15 @@ public class ChartLayerPhoto implements IChartLayer {
 	/**
 	 * Time when hovered photos are created.
 	 */
-	private long						_hoveredPhotosEventTime;
+	private long						_hoveredPhotoEventTime;
 
 	private ArrayList<ChartPhoto>		_hoveredPhotos			= new ArrayList<ChartPhoto>();
 	private PhotoCategory				_hoveredCategory;
 	private PhotoPaintGroup				_hoveredGroup;
+
+	private Color						_bgColorLink;
+	private Color						_bgColorTour;
+	private Display						_display;
 
 	public ChartLayerPhoto(final ArrayList<PhotoCategory> photoCategories) {
 
@@ -197,7 +202,7 @@ public class ChartLayerPhoto implements IChartLayer {
 
 		// initialize hovered photos
 		_hoveredPhotos.clear();
-		_hoveredPhotosEventTime = eventTime;
+		_hoveredPhotoEventTime = eventTime;
 
 		_hoveredCategory = null;
 		_hoveredGroup = null;
@@ -381,7 +386,7 @@ public class ChartLayerPhoto implements IChartLayer {
 	 */
 	public void draw(final GC gc, final GraphDrawingData graphDrawingData, final Chart chart) {
 
-		final Display display = Display.getCurrent();
+		_display = Display.getCurrent();
 
 		final int devYTop = graphDrawingData.getDevYTop();
 		final long devGraphImageOffset = chart.getXXDevViewPortLeftBorder();
@@ -430,7 +435,6 @@ public class ChartLayerPhoto implements IChartLayer {
 
 		draw_10( //
 				gc,
-				display,
 				devYTop,
 				devGraphHeight,
 				isHistory,
@@ -441,7 +445,6 @@ public class ChartLayerPhoto implements IChartLayer {
 	}
 
 	private void draw_10(	final GC gc,
-							final Display display,
 							final int devYTop,
 							final int devGraphHeight,
 							final boolean isHistory,
@@ -453,6 +456,12 @@ public class ChartLayerPhoto implements IChartLayer {
 		for (final PhotoCategory photoCategory : _photoCategories) {
 
 			boolean isSetGroupHeightOffset = false;
+
+			/*
+			 * set color depending on photo type and number of photo categories
+			 */
+			gc.setForeground(_display.getSystemColor(SWT.COLOR_WHITE));
+			gc.setBackground(getPhotoGroupBackgroundColor(photoCategory.photoType, false));
 
 			for (final PhotoPaintGroup paintGroup : photoCategory.paintGroups) {
 
@@ -512,9 +521,6 @@ public class ChartLayerPhoto implements IChartLayer {
 				paintGroup.paintedGroupWidth = groupWidth;
 				paintGroup.paintedGroupHeight = groupHeight;
 				paintGroup.paintedGroupText = groupText;
-
-				gc.setBackground(display.getSystemColor(SWT.COLOR_DARK_GRAY));
-				gc.setForeground(display.getSystemColor(SWT.COLOR_WHITE));
 
 				drawPhotoAndGroup(gc, paintGroup, photoCategory);
 
@@ -583,7 +589,7 @@ public class ChartLayerPhoto implements IChartLayer {
 
 	PhotoCategory getHoveredCategory(final long eventTime, final int devXMouse, final int devYMouse) {
 
-		if (eventTime == _hoveredPhotosEventTime) {
+		if (eventTime == _hoveredPhotoEventTime) {
 			return _hoveredCategory;
 		}
 
@@ -605,13 +611,52 @@ public class ChartLayerPhoto implements IChartLayer {
 	 */
 	ArrayList<ChartPhoto> getHoveredPhotos(final long eventTime, final int devXMouseMove, final int devYMouseMove) {
 
-		if (eventTime == _hoveredPhotosEventTime) {
+		if (eventTime == _hoveredPhotoEventTime) {
 			return _hoveredPhotos;
 		}
 
 		createHoveredPhotoList(eventTime, devXMouseMove, devYMouseMove);
 
 		return _hoveredPhotos;
+	}
+
+	Color getPhotoGroupBackgroundColor(final ChartPhotoType photoType, final boolean isHovered) {
+
+		if (_photoCategories.size() == 1) {
+
+			// only ONE category is available
+
+			if (isHovered) {
+
+				if (photoType == ChartPhotoType.LINK) {
+					return _bgColorLink;
+				} else {
+					return _bgColorTour;
+				}
+
+			} else {
+				return _display.getSystemColor(SWT.COLOR_DARK_GRAY);
+			}
+
+		} else {
+
+			if (isHovered) {
+
+				return _display.getSystemColor(SWT.COLOR_DARK_GRAY);
+
+			} else {
+				if (photoType == ChartPhotoType.LINK) {
+					return _bgColorLink;
+				} else {
+					return _bgColorTour;
+				}
+			}
+		}
+	}
+
+	public void setBackgroundColor(final Color bgColorLink, final Color bgColorTour) {
+		_bgColorLink = bgColorLink;
+		_bgColorTour = bgColorTour;
 	}
 
 }

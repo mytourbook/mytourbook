@@ -18,7 +18,6 @@ package net.tourbook.ui.tourChart;
 import net.tourbook.chart.CustomOverlay;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.GC;
 
@@ -29,9 +28,6 @@ public class ChartPhotoOverlay implements CustomOverlay {
 	private PhotoPaintGroup	_hoveredPhotoGroup;
 	private PhotoCategory	_hoveredPhotoCategory;
 
-	private Color			_bgColorLink;
-	private Color			_bgColorTour;
-
 	@Override
 	public boolean draw(final GC gcOverlay) {
 
@@ -40,13 +36,9 @@ public class ChartPhotoOverlay implements CustomOverlay {
 		}
 
 		final Device display = gcOverlay.getDevice();
-		gcOverlay.setForeground(display.getSystemColor(SWT.COLOR_WHITE));
 
-		if (_hoveredPhotoCategory.photoType == ChartPhotoType.LINK) {
-			gcOverlay.setBackground(_bgColorLink);
-		} else {
-			gcOverlay.setBackground(_bgColorTour);
-		}
+		gcOverlay.setForeground(display.getSystemColor(SWT.COLOR_WHITE));
+		gcOverlay.setBackground(_photoLayer.getPhotoGroupBackgroundColor(_hoveredPhotoCategory.photoType, true));
 
 		_photoLayer.drawPhotoAndGroup(gcOverlay, _hoveredPhotoGroup, _hoveredPhotoCategory);
 
@@ -67,11 +59,6 @@ public class ChartPhotoOverlay implements CustomOverlay {
 		_hoveredPhotoGroup = _photoLayer.getHoveredGroup();
 
 		return _hoveredPhotoGroup != null;
-	}
-
-	public void setBackgroundColor(final Color bgColorLink, final Color bgColorTour) {
-		_bgColorLink = bgColorLink;
-		_bgColorTour = bgColorTour;
 	}
 
 	public void setPhotoLayer(final ChartLayerPhoto photoLayer) {
