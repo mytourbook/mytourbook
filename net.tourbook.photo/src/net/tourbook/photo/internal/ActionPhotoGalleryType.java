@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,23 +19,22 @@ import net.tourbook.photo.PhotoGallery;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionPhotoGalleryThumbnail extends Action {
+public class ActionPhotoGalleryType extends Action {
 
 	private PhotoGallery	_photoGallery;
 
-	public ActionPhotoGalleryThumbnail(final PhotoGallery photoGallery) {
+	public ActionPhotoGalleryType(final PhotoGallery photoGallery) {
 
-		super(Messages.Photo_Gallery_Action_ShowPhotoGalleryThumbnail, AS_PUSH_BUTTON);
+		super(Messages.Photo_Gallery_Action_PhotoGalleryThumbnail, AS_PUSH_BUTTON);
 
 		_photoGallery = photoGallery;
 
-		setToolTipText(Messages.Photo_Gallery_Action_ShowPhotoGalleryThumbnail_Tooltip);
-
+		setToolTipText(Messages.Photo_Gallery_Action_PhotoGalleryThumbnail_Tooltip);
 		setImageDescriptor(Activator.getImageDescriptor(Messages.Image__PotoGalleryThumbnail));
 	}
 
 	@Override
 	public void run() {
-		_photoGallery.actionShowPhotoGallery(this);
+		_photoGallery.actionPhotoGalleryType();
 	}
 }

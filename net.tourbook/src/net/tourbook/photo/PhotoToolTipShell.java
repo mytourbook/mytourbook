@@ -541,6 +541,23 @@ public abstract class PhotoToolTipShell {
 	abstract void beforeHideToolTip();
 
 	/**
+	 * <b>VERY IMPORTANT</b>
+	 * <p>
+	 * Do not hide the tooltip when other shells (dialogs) are open, otherwise the app is blocked
+	 * and must be killed.
+	 * 
+	 * @return Returns <code>true</code> when shell can be closed, otherwise it CANNOT be closed.
+	 */
+	private boolean canCloseShell() {
+
+		if (_visibleShell == null) {
+			return true;
+		}
+
+		return _visibleShell.getShells().length == 0;
+	}
+
+	/**
 	 * Creates the content area of the the tooltip.
 	 * 
 	 * @param parent
@@ -825,6 +842,10 @@ public abstract class PhotoToolTipShell {
 //		final long start = System.nanoTime();
 
 		if (_visibleShell == null || _visibleShell.isDisposed() || _visibleShell.isVisible() == false) {
+			return;
+		}
+
+		if (canCloseShell() == false) {
 			return;
 		}
 
@@ -1137,6 +1158,7 @@ public abstract class PhotoToolTipShell {
 			reparentedShell = _rrShellNoResize.getShell();
 		}
 
+		// fire reparent event
 		onReparentShell(reparentedShell);
 
 		// hide previous shell
@@ -1266,6 +1288,13 @@ public abstract class PhotoToolTipShell {
 
 	abstract void setToolTipPinned(boolean isToolTipPinned);
 
+//	/**
+//	 * @param isAutoMoved
+//	 *            Is <code>true</code> when tooltip is auto moved, otherwise it is
+//	 *            <code>false</code>.
+//	 */
+//	abstract void toolTipIsAutoMoved(boolean isAutoMoved);
+
 	/**
 	 * Set location where the tooltip is pinned.
 	 */
@@ -1288,13 +1317,6 @@ public abstract class PhotoToolTipShell {
 		_shellEndLocation.x = contentLocation.x;
 		_shellEndLocation.y = contentLocation.y;
 	}
-
-//	/**
-//	 * @param isAutoMoved
-//	 *            Is <code>true</code> when tooltip is auto moved, otherwise it is
-//	 *            <code>false</code>.
-//	 */
-//	abstract void toolTipIsAutoMoved(boolean isAutoMoved);
 
 	protected void showAtDefaultLocation() {
 
@@ -1434,6 +1456,10 @@ public abstract class PhotoToolTipShell {
 	 */
 	void ttHide() {
 
+		if (canCloseShell() == false) {
+			return;
+		}
+
 		_visibleShell.setAlpha(0);
 
 		// hide shell
@@ -1448,6 +1474,10 @@ public abstract class PhotoToolTipShell {
 	private void ttHide(final Event event) {
 
 		if (_visibleShell == null || _visibleShell.isDisposed() || _visibleShell.isVisible() == false) {
+			return;
+		}
+
+		if (canCloseShell() == false) {
 			return;
 		}
 

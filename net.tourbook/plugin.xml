@@ -609,7 +609,7 @@
 		
 				<command
 			         commandId="command.net.tourbook.PhotoFilter"
-			         icon="icons/photo-filter-tour-with-photos.png" 
+			         icon="icons/tour-filter-tour-with-photos.png" 
 			         style="toggle"
 			         tooltip="%Action_PhotoFilter_Tooltip"/>
 		

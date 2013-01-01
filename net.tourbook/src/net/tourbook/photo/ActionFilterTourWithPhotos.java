@@ -20,11 +20,11 @@ import net.tourbook.application.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionFilterPhotos extends Action {
+public class ActionFilterTourWithPhotos extends Action {
 
 	private TourPhotoLinkView	_photosAndToursView;
 
-	public ActionFilterPhotos(final TourPhotoLinkView photosAndToursView) {
+	public ActionFilterTourWithPhotos(final TourPhotoLinkView photosAndToursView) {
 
 		super(null, AS_CHECK_BOX);
 

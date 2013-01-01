@@ -93,6 +93,11 @@ public class ColumnManager {
 	 */
 	private ColumnViewer						_columnViewer;
 
+	/**
+	 * Context menu listener
+	 */
+	private Listener							_menuDetectListener;
+
 	public ColumnManager(final ITourViewer tourViewer, final IDialogSettings viewState) {
 
 		_tourViewer = tourViewer;
@@ -149,10 +154,15 @@ public class ColumnManager {
 	 */
 	public void createHeaderContextMenu(final Table table, final Menu tableContextMenu) {
 
+		// remove old listener
+		if (_menuDetectListener != null) {
+			table.removeListener(SWT.MenuDetect, _menuDetectListener);
+		}
+
 		final Menu headerContextMenu = createHeaderContextMenuInternal(table, tableContextMenu);
 
 		// add the context menu to the table
-		table.addListener(SWT.MenuDetect, new Listener() {
+		_menuDetectListener = new Listener() {
 			public void handleEvent(final Event event) {
 
 				final Decorations shell = table.getShell();
@@ -160,11 +170,16 @@ public class ColumnManager {
 				final Point pt = display.map(null, table, new Point(event.x, event.y));
 				final Rectangle clientArea = table.getClientArea();
 
-				final boolean header = clientArea.y <= pt.y && pt.y < (clientArea.y + table.getHeaderHeight());
+				final boolean isTableHeaderHit = clientArea.y <= pt.y
+						&& pt.y < (clientArea.y + table.getHeaderHeight());
 
-				table.setMenu(header ? headerContextMenu : tableContextMenu);
+				final Menu contextMenu = isTableHeaderHit ? headerContextMenu : tableContextMenu;
+
+				table.setMenu(contextMenu);
 			}
-		});
+		};
+
+		table.addListener(SWT.MenuDetect, _menuDetectListener);
 	}
 
 	/**

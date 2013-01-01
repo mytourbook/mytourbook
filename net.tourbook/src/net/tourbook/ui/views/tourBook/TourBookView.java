@@ -1367,7 +1367,6 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private void defineColumnTimeSlices() {
 
 		final TreeColumnDefinition colDef = TreeColumnFactory.TIME_SLICES.createColumn(_columnManager, _pc);
-		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {

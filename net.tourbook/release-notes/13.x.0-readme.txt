@@ -17,16 +17,19 @@ Photos + Tours view
 * show number of saved photos including time adjustment
 
 
-Tour Chart
+Tour Chart view
 
 * show/hide photo markers with/without photo tooltip
 
 * show different photo markers for linked and saved photos 
-  !!! there is a different hovering algorithm !!!
+  !!! there is a different hovering algorithm for the mouse location and photo group background color !!!
 
 
-Tour Map
+Tour Map view
 
 * 
 
 
+All photo galleries
+
+* photo presentation can be displayed as an image gallery or as a list

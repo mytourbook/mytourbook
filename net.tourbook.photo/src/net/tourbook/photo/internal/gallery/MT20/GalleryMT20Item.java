@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -51,16 +51,16 @@ public class GalleryMT20Item {
 		this.gallery = galleryMT20;
 	}
 
-	/**
-	 * Set data for the gallery item and a unique key to identify it (e.g. for selection)
-	 * 
-	 * @param data
-	 * @param uniqueItemID
-	 */
-	void setCustomData(final IGalleryCustomData data, final String uniqueItemID) {
-		this.customData = data;
-		this.uniqueItemID = uniqueItemID;
-	}
+//	/**
+//	 * Set data for the gallery item and a unique key to identify it (e.g. for selection)
+//	 *
+//	 * @param data
+//	 * @param uniqueItemID
+//	 */
+//	void setCustomData(final IGalleryCustomData data, final String uniqueItemID) {
+//		this.customData = data;
+//		this.uniqueItemID = uniqueItemID;
+//	}
 
 	@Override
 	public String toString() {

@@ -19,6 +19,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 import net.tourbook.photo.internal.ActionImageFilterGPS;
 import net.tourbook.photo.internal.ActionImageFilterNoGPS;
+import net.tourbook.photo.internal.ActionPhotoGalleryType;
 import net.tourbook.photo.internal.ActionShowGPSAnnotations;
 import net.tourbook.photo.internal.ActionShowPhotoDate;
 import net.tourbook.photo.internal.ActionShowPhotoName;
@@ -26,6 +27,7 @@ import net.tourbook.photo.internal.ActionShowPhotoTooltip;
 import net.tourbook.photo.internal.ActionSortByFileDate;
 import net.tourbook.photo.internal.ActionSortByFileName;
 import net.tourbook.photo.internal.Activator;
+import net.tourbook.photo.internal.GalleryType;
 import net.tourbook.photo.internal.ImageFilter;
 import net.tourbook.photo.internal.Messages;
 import net.tourbook.photo.internal.PhotoDateInfo;
@@ -35,17 +37,18 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Composite;
 
 public class PhotoGallery extends ImageGallery {
 
 	private static final String			STATE_GALLERY_SORTING				= "STATE_GALLERY_SORTING";					//$NON-NLS-1$
-
+	private static final String			STATE_GALLERY_TYPE					= "STATE_GALLERY_TYPE";					//$NON-NLS-1$
 	private static final String			STATE_IMAGE_FILTER					= "STATE_IMAGE_FILTER";					//$NON-NLS-1$
-	private static final String			STATE_PHOTO_INFO_DATE				= "STATE_PHOTO_INFO_DATE";					//$NON-NLS-1$
-	private static final String			STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY	= "STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY";	//$NON-NLS-1$
 	private static final String			STATE_IS_SHOW_PHOTO_GPS_ANNOTATION	= "STATE_IS_SHOW_PHOTO_GPS_ANNOTATION";	//$NON-NLS-1$
+	private static final String			STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY	= "STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY";	//$NON-NLS-1$
 	private static final String			STATE_IS_SHOW_PHOTO_TOOLTIP			= "STATE_IS_SHOW_PHOTO_TOOLTIP";			//$NON-NLS-1$
+	private static final String			STATE_PHOTO_INFO_DATE				= "STATE_PHOTO_INFO_DATE";					//$NON-NLS-1$
 
 	public static final String			IMAGE_PHOTO_FILTER_GPS				= "IMAGE_PHOTO_FILTER_GPS";				//$NON-NLS-1$
 	public static final String			IMAGE_PHOTO_FILTER_NO_GPS			= "IMAGE_PHOTO_FILTER_NO_GPS";				//$NON-NLS-1$
@@ -58,15 +61,18 @@ public class PhotoGallery extends ImageGallery {
 
 	private ActionImageFilterGPS		_actionImageFilterGPS;
 	private ActionImageFilterNoGPS		_actionImageFilterNoGPS;
+	private ActionPhotoGalleryType		_actionPhotoGalleryType;
 	private ActionShowPhotoName			_actionShowPhotoName;
 	private ActionShowPhotoDate			_actionShowPhotoDate;
 	private ActionShowPhotoTooltip		_actionShowPhotoTooltip;
 	private ActionShowGPSAnnotations	_actionShowGPSAnnotation;
 	private ActionSortByFileDate		_actionSortFileByDate;
 	private ActionSortByFileName		_actionSortByFileName;
+
 	private ImageFilter					_currentImageFilter					= ImageFilter.NoFilter;
 
 	private GallerySorting				_gallerySorting;
+	private GalleryType					_galleryType;
 
 	static {
 		UI.IMAGE_REGISTRY.put(//
@@ -107,9 +113,19 @@ public class PhotoGallery extends ImageGallery {
 		filterGallery(_currentImageFilter);
 	}
 
-	public void actionShowPhotoGallery(final Action action) {
-		// TODO Auto-generated method stub
+	public void actionPhotoGalleryType() {
 
+		/*
+		 * toggle gallery type
+		 */
+		if (_galleryType == GalleryType.THUMBNAIL) {
+			_galleryType = GalleryType.DETAILS;
+		} else {
+			_galleryType = GalleryType.THUMBNAIL;
+		}
+		updateUI_GalleryType(_galleryType);
+
+		selectGalleryType(_galleryType);
 	}
 
 	public void actionShowPhotoInfo(final Action action) {
@@ -193,6 +209,8 @@ public class PhotoGallery extends ImageGallery {
 
 	private void createActions() {
 
+		_actionPhotoGalleryType = new ActionPhotoGalleryType(this);
+
 		_actionImageFilterGPS = new ActionImageFilterGPS(this);
 		_actionImageFilterNoGPS = new ActionImageFilterNoGPS(this);
 
@@ -235,6 +253,9 @@ public class PhotoGallery extends ImageGallery {
 			return;
 		}
 
+		tbm.add(_actionPhotoGalleryType);
+
+		tbm.add(new Separator());
 		tbm.add(_actionShowPhotoDate);
 		tbm.add(_actionShowPhotoName);
 		tbm.add(_actionShowPhotoTooltip);
@@ -312,6 +333,19 @@ public class PhotoGallery extends ImageGallery {
 		_actionSortFileByDate.setChecked(_gallerySorting == GallerySorting.FILE_DATE);
 		_actionSortByFileName.setChecked(_gallerySorting == GallerySorting.FILE_NAME);
 
+		/*
+		 * gallery type
+		 */
+		final String prefGalleryType = Util.getStateString(_state, STATE_GALLERY_TYPE, GalleryType.THUMBNAIL.name());
+		try {
+			_galleryType = GalleryType.valueOf(prefGalleryType);
+		} catch (final Exception e) {
+			// set default
+			_galleryType = GalleryType.THUMBNAIL;
+		}
+		updateUI_GalleryType(_galleryType);
+		selectGalleryType(_galleryType);
+
 		super.restoreState();
 
 		// !!! overwrite super settings !!!
@@ -319,18 +353,18 @@ public class PhotoGallery extends ImageGallery {
 		setFilter(_currentImageFilter);
 
 		enableActions();
-
 	}
 
 	@Override
 	public void saveState() {
 
-		/*
-		 * gallery sorting
-		 */
 		_state.put(STATE_GALLERY_SORTING, _actionSortFileByDate.isChecked()
 				? GallerySorting.FILE_DATE.name()
 				: GallerySorting.FILE_NAME.name());
+
+		_state.put(STATE_GALLERY_TYPE, _galleryType == GalleryType.DETAILS
+				? GalleryType.DETAILS.name()
+				: GalleryType.THUMBNAIL.name());
 
 		_state.put(STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY, _actionShowPhotoName.isChecked());
 		_state.put(STATE_IS_SHOW_PHOTO_TOOLTIP, _actionShowPhotoTooltip.isChecked());
@@ -340,5 +374,31 @@ public class PhotoGallery extends ImageGallery {
 		_state.put(STATE_IMAGE_FILTER, _currentImageFilter.name());
 
 		super.saveState();
+	}
+
+	private void updateUI_GalleryType(final GalleryType galleryType) {
+
+		String text;
+		String toolTipText;
+		ImageDescriptor imageDescriptor;
+
+		if (galleryType == GalleryType.DETAILS) {
+
+			text = Messages.Photo_Gallery_Action_PhotoGalleryThumbnail;
+			toolTipText = Messages.Photo_Gallery_Action_PhotoGalleryThumbnail_Tooltip;
+			imageDescriptor = Activator.getImageDescriptor(Messages.Image__PotoGalleryThumbnail);
+
+		} else {
+
+			// thumbnail view
+
+			text = Messages.Photo_Gallery_Action_ShowPhotoGalleryDetails;
+			toolTipText = Messages.Photo_Gallery_Action_ShowPhotoGalleryDetails_Tooltip;
+			imageDescriptor = Activator.getImageDescriptor(Messages.Image__PotoGalleryDetails);
+		}
+
+		_actionPhotoGalleryType.setText(text);
+		_actionPhotoGalleryType.setToolTipText(toolTipText);
+		_actionPhotoGalleryType.setImageDescriptor(imageDescriptor);
 	}
 }

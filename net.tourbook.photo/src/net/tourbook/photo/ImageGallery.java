@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -39,6 +39,7 @@ import net.tourbook.common.weather.IWeather;
 import net.tourbook.photo.internal.Activator;
 import net.tourbook.photo.internal.GalleryActionBar;
 import net.tourbook.photo.internal.GalleryPhotoToolTip;
+import net.tourbook.photo.internal.GalleryType;
 import net.tourbook.photo.internal.ImageFilter;
 import net.tourbook.photo.internal.Messages;
 import net.tourbook.photo.internal.PhotoDateInfo;
@@ -260,7 +261,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	 * Only these items are displayed in the gallery, {@link #_allPhotos} items contains also hidden
 	 * gallery items.
 	 */
-	private Photo[]					_sortedAndFilteredPhotoWrapper;
+	private Photo[]					_sortedAndFilteredPhotos;
 
 	FileFilter						_fileFilter;
 
@@ -289,7 +290,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	private String					_defaultStatusMessage			= UI.EMPTY_STRING;
 	private int[]					_restoredSelection;
 
-	private int						_activePage;
+	private GalleryType				_galleryType;
 
 	private TableViewer				_photoViewer;
 	private ColumnManager			_columnManager;
@@ -323,10 +324,13 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	private PageBook				_pageBook;
 	private Composite				_pageDefault;
 	private Composite				_pageGalleryInfo;
-	private Composite				_viewerContainer;
+	private Composite				_pageDetails;
 
 	private Label					_lblDefaultPage;
 	private Label					_lblGalleryInfo;
+
+	private GalleryMT20Item[]		_sortedGalleryItems;
+	private Double					_contentGalleryPosition;
 
 	{
 		_galleryPositions = new LRUMap<String, Double>(MAX_GALLERY_POSITIONS);
@@ -401,7 +405,14 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		public void dispose() {}
 
 		public Object[] getElements(final Object inputElement) {
-			return _sortedAndFilteredPhotoWrapper;
+
+//			return _sortedGalleryItems
+
+			if (_sortedAndFilteredPhotos == null) {
+				return new Photo[0];
+			}
+
+			return _sortedAndFilteredPhotos;
 		}
 
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
@@ -416,19 +427,13 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		@Override
 		public IGalleryCustomData getCustomData(final int filterIndex) {
 
-			if (filterIndex >= _sortedAndFilteredPhotoWrapper.length) {
+			if (filterIndex >= _sortedAndFilteredPhotos.length) {
 				return null;
 			}
 
-			final Photo photoWrapper = _sortedAndFilteredPhotoWrapper[filterIndex];
+			final Photo photo = _sortedAndFilteredPhotos[filterIndex];
 
-//			if (photoWrapper.photo == null) {
-//
-//				// create photo which is used to draw the photo image
-//				photoWrapper.photo = new Photo(photoWrapper);
-//			}
-
-			return photoWrapper;
+			return photo;
 		}
 	}
 
@@ -472,6 +477,8 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 	/**
 	 * create the views context menu
+	 * 
+	 * @param isRecreate
 	 */
 	private void createContextMenu() {
 
@@ -486,6 +493,17 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		});
 
 		final Table table = _photoViewer.getTable();
+
+//		if (isRecreate) {
+//
+//			/*
+//			 * when a tooltip is reparented, the context menu must be recreated otherwise an
+//			 * exception is thown that the menu shell has the wrong parent
+//			 */
+//
+//			menuMgr.dispose();
+//		}
+
 		final Menu tableContextMenu = menuMgr.createContextMenu(table);
 
 		table.setMenu(tableContextMenu);
@@ -642,7 +660,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 			GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBook);
 			{
 				createUI_20_PageGallery(_pageBook);
-				createUI_30_PageTable(_pageBook);
+				createUI_30_PageDetails(_pageBook);
 				createUI_99_PageDefault(_pageBook);
 				createUI_40_PageGalleryInfo(_pageBook);
 			}
@@ -705,13 +723,13 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		_galleryMT20.setItemRenderer(_photoRenderer);
 	}
 
-	private void createUI_30_PageTable(final PageBook parent) {
+	private void createUI_30_PageDetails(final PageBook parent) {
 
-		_viewerContainer = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(_viewerContainer);
-		GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(_viewerContainer);
+		_pageDetails = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageDetails);
+		GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(_pageDetails);
 		{
-			createUI_32_PhotoViewer(_viewerContainer);
+			createUI_32_PhotoViewer(_pageDetails);
 		}
 	}
 
@@ -1193,13 +1211,13 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 			}
 		}
 
-		Photo[] sortedPhotoWrapper;
+		Photo[] sortedPhotosArray;
 
 		if (isGetAllImages) {
 
 			// get all filtered photos
 
-			sortedPhotoWrapper = _sortedAndFilteredPhotoWrapper.clone();
+			sortedPhotosArray = _sortedAndFilteredPhotos.clone();
 
 		} else {
 
@@ -1207,7 +1225,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 			final Collection<GalleryMT20Item> galleryItems = _galleryMT20.getSelection();
 
-			sortedPhotoWrapper = new Photo[galleryItems.size()];
+			sortedPhotosArray = new Photo[galleryItems.size()];
 
 			int itemIndex = 0;
 
@@ -1216,18 +1234,18 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 				final IGalleryCustomData customData = item.customData;
 
 				if (customData instanceof Photo) {
-					sortedPhotoWrapper[itemIndex++] = (Photo) customData;
+					sortedPhotosArray[itemIndex++] = (Photo) customData;
 				}
 			}
 
 		}
 
 		// sort photos by date/time
-		Arrays.sort(sortedPhotoWrapper, SORT_BY_IMAGE_DATE);
+		Arrays.sort(sortedPhotosArray, SORT_BY_IMAGE_DATE);
 
-		final ArrayList<Photo> sortedPhotos = new ArrayList<Photo>(sortedPhotoWrapper.length);
+		final ArrayList<Photo> sortedPhotos = new ArrayList<Photo>(sortedPhotosArray.length);
 
-		for (final Photo photoWrapper : sortedPhotoWrapper) {
+		for (final Photo photoWrapper : sortedPhotosArray) {
 			sortedPhotos.add(photoWrapper);
 		}
 
@@ -1255,7 +1273,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	@Override
 	public Photo[] getSortedAndFilteredPhotoWrapper() {
 
-		return _sortedAndFilteredPhotoWrapper;
+		return _sortedAndFilteredPhotos;
 
 	}
 
@@ -1488,7 +1506,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 				// this is the initial run of the filter job
 				_filterJob1stRun = true;
 
-				_sortedAndFilteredPhotoWrapper = new Photo[0];
+				_sortedAndFilteredPhotos = new Photo[0];
 
 				_currentExifRunId++;
 
@@ -1967,7 +1985,14 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	}
 
 	public void onReparentShell(final Shell reparentedShell) {
+
 		_photoGalleryTooltip.onReparentShell(reparentedShell);
+
+		/*
+		 * when a tooltip is reparented, the context menu must be recreated otherwise an exception
+		 * is thown that the menu shell has the wrong parent
+		 */
+		createContextMenu();
 	}
 
 	private void onSelectPhoto() {
@@ -2004,17 +2029,17 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	@Override
 	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
-		_viewerContainer.setRedraw(false);
+		_pageDetails.setRedraw(false);
 		{
 			_photoViewer.getTable().dispose();
 
-			createUI_32_PhotoViewer(_viewerContainer);
-			_viewerContainer.layout();
+			createUI_32_PhotoViewer(_pageDetails);
+			_pageDetails.layout();
 
 			// update the viewer
 			reloadViewer();
 		}
-		_viewerContainer.setRedraw(true);
+		_pageDetails.setRedraw(true);
 
 		return _photoViewer;
 	}
@@ -2174,7 +2199,16 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 		Util.setState(_state, STATE_SELECTED_ITEMS, _galleryMT20.getSelectionIndex());
 
+		_columnManager.saveState(_state);
+
 		_galleryMT20.saveState();
+	}
+
+	void selectGalleryType(final GalleryType galleryType) {
+
+		_galleryType = galleryType;
+
+		showPageGalleryContent();
 	}
 
 	public void selectItem(final int itemIndex, final String galleryPositionKey) {
@@ -2519,6 +2553,28 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 	}
 
+	private void showPageGalleryContent() {
+
+		Composite galleryContent;
+
+		if (_galleryType == GalleryType.DETAILS) {
+
+			galleryContent = _pageDetails;
+
+			_photoViewer.setInput(new Object());
+
+		} else {
+
+			// default is thumnail gallery
+			galleryContent = _galleryMT20;
+
+			// update gallery
+			_galleryMT20.setVirtualItems(_sortedGalleryItems, _contentGalleryPosition);
+		}
+
+		showPageBookPage(galleryContent, true);
+	}
+
 	public void showRestoreFolder(final String restoreFolderName) {
 
 		if (restoreFolderName == null) {
@@ -2571,9 +2627,9 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		}
 
 		// sort photos with new sorting algorithm
-		Arrays.sort(_sortedAndFilteredPhotoWrapper, getCurrentComparator());
+		Arrays.sort(_sortedAndFilteredPhotos, getCurrentComparator());
 
-		updateUI_GalleryItems(_sortedAndFilteredPhotoWrapper, null);
+		updateUI_GalleryItems(_sortedAndFilteredPhotos, null);
 	}
 
 	public void stopLoadingImages() {
@@ -2747,7 +2803,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 					} else {
 
-						if (_sortedAndFilteredPhotoWrapper.length == 0) {
+						if (_sortedAndFilteredPhotos.length == 0) {
 
 							if (imageCount == 1) {
 								_lblGalleryInfo.setText(Messages.Pic_Dir_StatusLabel_1ImageIsHiddenByFilter);
@@ -2769,32 +2825,32 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	/**
 	 * Set gallery items into a list according to the new sorting/filtering
 	 * 
-	 * @param filteredAndSortedWrapper
+	 * @param filteredAndSortedPhotos
 	 * @param galleryPosition
 	 *            When <code>null</code> the old position is preserved, otherwise images at a new
 	 *            position are displayed.
 	 */
-	private void updateUI_GalleryItems(final Photo[] filteredAndSortedWrapper, final Double galleryPosition) {
+	private void updateUI_GalleryItems(final Photo[] filteredAndSortedPhotos, final Double galleryPosition) {
 
 		final HashMap<String, GalleryMT20Item> existingGalleryItems = _galleryMT20.getCreatedGalleryItems();
 
-		final int wrapperSize = filteredAndSortedWrapper.length;
+		final int wrapperSize = filteredAndSortedPhotos.length;
 		final GalleryMT20Item[] sortedGalleryItems = new GalleryMT20Item[wrapperSize];
 
 		// convert sorted photos into sorted gallery items
 		for (int itemIndex = 0; itemIndex < wrapperSize; itemIndex++) {
 
-			final Photo sortedPhotoWrapper = filteredAndSortedWrapper[itemIndex];
+			final Photo sortedPhotos = filteredAndSortedPhotos[itemIndex];
 
 			// get gallery item for the current photo
-			final GalleryMT20Item galleryItem = existingGalleryItems.get(sortedPhotoWrapper.imageFilePathName);
+			final GalleryMT20Item galleryItem = existingGalleryItems.get(sortedPhotos.imageFilePathName);
 
 			if (galleryItem != null) {
 				sortedGalleryItems[itemIndex] = galleryItem;
 			}
 		}
 
-		_sortedAndFilteredPhotoWrapper = filteredAndSortedWrapper;
+		_sortedAndFilteredPhotos = filteredAndSortedPhotos;
 
 		_display.syncExec(new Runnable() {
 			public void run() {
@@ -2807,10 +2863,10 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 					// gallery items are available
 
-					showPageBookPage(_galleryMT20, true);
+					_sortedGalleryItems = sortedGalleryItems;
+					_contentGalleryPosition = galleryPosition;
 
-					// update gallery
-					_galleryMT20.setVirtualItems(sortedGalleryItems, galleryPosition);
+					showPageGalleryContent();
 
 				} else {
 
