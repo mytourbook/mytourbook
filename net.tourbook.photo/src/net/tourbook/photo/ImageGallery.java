@@ -138,11 +138,6 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	private static final String		STATE_IMAGE_SORTING				= "STATE_IMAGE_SORTING";						//$NON-NLS-1$
 	private static final String		STATE_SELECTED_ITEMS			= "STATE_SELECTED_ITEMS";						//$NON-NLS-1$
 
-	private static final String		STATE_ACTIVE_PAGE				= "STATE_ACTIVE_PAGE";							//$NON-NLS-1$
-
-	private static final int		PAGE_GALLERY					= 0;
-	private static final int		PAGE_TABLE_VIEWER				= 1;
-
 	private static final String		DEFAULT_GALLERY_FONT			= "arial,sans-serif";							//$NON-NLS-1$
 
 	private IDialogSettings			_state;

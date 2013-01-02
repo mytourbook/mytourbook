@@ -253,7 +253,8 @@ public class PhotoGallery extends ImageGallery {
 			return;
 		}
 
-		tbm.add(_actionPhotoGalleryType);
+// disabled 2.1.2013: is not yet fully implemented, delayed for a later version
+//		tbm.add(_actionPhotoGalleryType);
 
 		tbm.add(new Separator());
 		tbm.add(_actionShowPhotoDate);
