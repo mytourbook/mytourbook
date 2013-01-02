@@ -217,12 +217,14 @@ public class PhotoManager {
 	 * @param allPhotos
 	 * @param visibleTourPhotoLinks
 	 * @param isShowToursOnlyWithPhotos
-	 * @param _allTourCameras
+	 * @param isShowToursWithoutSavedPhotos
+	 * @param allTourCameras
 	 */
 	void createTourPhotoLinks(	final ArrayList<Photo> allPhotos,
 								final ArrayList<TourPhotoLink> visibleTourPhotoLinks,
 								final HashMap<String, Camera> allTourCameras,
-								final boolean isShowToursOnlyWithPhotos) {
+								final boolean isShowToursOnlyWithPhotos,
+								final boolean isShowToursWithoutSavedPhotos) {
 
 		loadToursFromDb(allPhotos, true);
 
@@ -259,7 +261,8 @@ public class PhotoManager {
 						currentTourPhotoLink,
 						tourCameras,
 						visibleTourPhotoLinks,
-						isShowToursOnlyWithPhotos);
+						isShowToursOnlyWithPhotos,
+						isShowToursWithoutSavedPhotos);
 
 				currentTourPhotoLink = null;
 				tourCameras.clear();
@@ -305,7 +308,7 @@ public class PhotoManager {
 
 						// current tour do not contain any images
 
-						if (isShowToursOnlyWithPhotos == false) {
+						if (isShowToursOnlyWithPhotos == false && isShowToursWithoutSavedPhotos == false) {
 
 							// tours without photos are displayed
 
@@ -349,7 +352,8 @@ public class PhotoManager {
 				currentTourPhotoLink,
 				tourCameras,
 				visibleTourPhotoLinks,
-				isShowToursOnlyWithPhotos);
+				isShowToursOnlyWithPhotos,
+				isShowToursWithoutSavedPhotos);
 
 		createTourPhotoLinks_60_MergeHistoryTours(visibleTourPhotoLinks);
 
@@ -456,16 +460,30 @@ public class PhotoManager {
 	 * @param tourCameras
 	 * @param allTourPhotoLinks
 	 * @param isShowToursOnlyWithPhotos
+	 * @param isShowToursWithoutSavedPhotos
 	 */
 	private void createTourPhotoLinks_30_FinalizeCurrentTourPhotoLink(	final TourPhotoLink currentTourPhotoLink,
 																		final HashMap<String, String> tourCameras,
 																		final ArrayList<TourPhotoLink> allTourPhotoLinks,
-																		final boolean isShowToursOnlyWithPhotos) {
+																		final boolean isShowToursOnlyWithPhotos,
+																		final boolean isShowToursWithoutSavedPhotos) {
 
 		// keep only tours which contain photos
 		final boolean isNoPhotos = currentTourPhotoLink.linkPhotos.size() == 0;
+		final boolean isTourPhotos = currentTourPhotoLink.numberOfTourPhotos > 0;
 
-		if (isNoPhotos && currentTourPhotoLink.isHistoryTour || isNoPhotos && isShowToursOnlyWithPhotos) {
+		if (//
+			//
+			// exclude history tour without photos
+		(isNoPhotos && currentTourPhotoLink.isHistoryTour) //
+				//
+				// exclude real tours without photos
+				|| (isNoPhotos && isShowToursOnlyWithPhotos)
+				//
+				// exclude real tours with saved photos
+				|| (isTourPhotos && isShowToursWithoutSavedPhotos)
+		//
+		) {
 			return;
 		}
 

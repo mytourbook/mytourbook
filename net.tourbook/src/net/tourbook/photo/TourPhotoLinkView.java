@@ -259,8 +259,10 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 	}
 
 	void actionFilterNotSavedPhotos() {
-		// TODO Auto-generated method stub
 
+		_isShowToursWithoutSavedPhotos = _actionFilterTourWithoutSavedPhotos.isChecked();
+
+		updateUI(_selectedLinks, null);
 	}
 
 	void actionFilterOneHistoryTour() {
@@ -1164,8 +1166,8 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 		_spinnerSeconds.setEnabled(isPhotoFilter);
 		_comboCamera.setEnabled(isPhotoFilter);
 
+		_actionFilterTourWithPhotos.setEnabled(isPhotoFilter && _isShowToursWithoutSavedPhotos == false);
 		_actionFilterTourWithoutSavedPhotos.setEnabled(isPhotoFilter);
-		_actionFilterTourWithPhotos.setEnabled(isPhotoFilter);
 		_actionFilterOneHistory.setEnabled(isPhotoAvailable);
 		_actionSavePhotoInTour.setEnabled(isPhotoAvailable);
 	}
@@ -1698,7 +1700,8 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 					_allPhotos,
 					_visibleTourPhotoLinks,
 					_allTourCameras,
-					_isShowToursWithPhotos);
+					_isShowToursWithPhotos,
+					_isShowToursWithoutSavedPhotos);
 		}
 
 		updateUI_Cameras(null);

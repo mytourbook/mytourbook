@@ -130,7 +130,7 @@ public class TourPhotoLink {
 		setTourStartTime(tourStartTime);
 		setTourEndTime(tourEndTime);
 
-		this.numberOfTourPhotos = numberOfPhotos;
+		numberOfTourPhotos = numberOfPhotos;
 
 		tourPeriod = new Period(tourStartTime, tourEndTime, _tourPeriodTemplate);
 
