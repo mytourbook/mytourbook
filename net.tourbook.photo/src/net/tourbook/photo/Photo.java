@@ -111,6 +111,11 @@ public class Photo implements IGalleryCustomData {
 	 */
 	public boolean										isGeoFromExif;
 
+	/**
+	 * Rating with stars for this photo.
+	 */
+	public int											ratingStars;
+
 	private PhotoImageMetadata							_photoImageMetadata;
 
 	/**

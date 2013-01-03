@@ -244,6 +244,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 
 	private boolean					_isShowCustomActionBar;
 	private boolean					_isShowThumbsize;
+	private boolean					_isShowPhotoRatingStars;
 
 	/**
 	 * Contains photo wrapper for <b>ALL</b> gallery items including <b>HIDDEN</b> items
@@ -1345,6 +1346,10 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		if (_isShowTooltip) {
 			_photoGalleryTooltip.show(hoveredItem);
 		}
+
+		if (_isShowPhotoRatingStars) {
+//			a = 0;
+		}
 	}
 
 	public boolean isDisposed() {
@@ -2265,6 +2270,16 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	 */
 	public void setShowOtherShellActions(final boolean isShowOtherShellActions) {
 		_galleryMT20.setIsShowOtherShellActions(isShowOtherShellActions);
+	}
+
+	void setShowPhotoRatingStars(final boolean isVisible) {
+
+		_isShowPhotoRatingStars = isVisible;
+
+		_photoRenderer.setShowRatingStars(isVisible);
+
+		// redraw gallery with new settings
+		_galleryMT20.redraw();
 	}
 
 	/**

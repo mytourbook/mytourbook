@@ -137,6 +137,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	private boolean						_isShowFullsizeHQImage;
 	private boolean						_isShowFullsizePreview;
 	private boolean						_isShowFullsizeLoadingMessage;
+	private boolean						_isShowPhotoRatingStars;
 
 	private double						_imagePaintedZoomFactor;
 
@@ -1197,6 +1198,10 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		_isShowPhotoName = isShowPhotoName;
 		_isShowAnnotations = isShowAnnotations;
 
+	}
+
+	public void setShowRatingStars(final boolean isVisible) {
+		_isShowPhotoRatingStars = isVisible;
 	}
 
 	public void setTextMinThumbSize(final int textMinThumbSize) {

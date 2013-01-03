@@ -16,6 +16,8 @@ Photos + Tours view
 
 * show number of saved photos including time adjustment
 
+* new filter to show only tours which contain photos but the photos are not yet saved in the tour
+
 
 Tour Chart view
 
@@ -32,4 +34,6 @@ Tour Map view
 
 All photo galleries
 
-* photo presentation can be displayed as an image gallery or as a list
+* 
+
+

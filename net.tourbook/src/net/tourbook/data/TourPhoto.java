@@ -90,6 +90,11 @@ public class TourPhoto {
 	private int				isGeoFromPhoto;
 
 	/**
+	 * Rating for a photo, stars can be set from 0 to 5, 0 is no rating.
+	 */
+	private int				ratingStars;
+
+	/**
 	 * Double.MIN_VALUE cannot be used, it cannot be saved in the database. 0 is the value when the
 	 * value is <b>NOT</b> set !!!
 	 */
@@ -227,6 +232,10 @@ public class TourPhoto {
 		return longitude;
 	}
 
+	public int getRatingStars() {
+		return ratingStars;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -259,6 +268,10 @@ public class TourPhoto {
 
 	public void setIsGeoFromTour() {
 		isGeoFromPhoto = 1;
+	}
+
+	public void setRatingStars(final int ratingStars) {
+		this.ratingStars = ratingStars;
 	}
 
 	@Override

@@ -2529,6 +2529,8 @@ public class TourDatabase {
 				+ "	imageFileLastModified		BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
 				+ "	adjustedTime				BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
 				//
+				+ "	ratingStars					INT DEFAULT 0,					\n" //$NON-NLS-1$
+				//
 				+ "	isGeoFromPhoto				INT DEFAULT 0,					\n" //$NON-NLS-1$
 				+ "	latitude 					DOUBLE DEFAULT 0,				\n" //$NON-NLS-1$
 				+ "	longitude 					DOUBLE DEFAULT 0				\n" //$NON-NLS-1$
@@ -4516,6 +4518,8 @@ public class TourDatabase {
 //			+ "	imageFileLastModified		BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
 //			+ "	adjustedTime				BIGINT DEFAULT 0,					\n" //$NON-NLS-1$
 //			//
+//			+ "	ratingStars					INT DEFAULT 0,					\n" //$NON-NLS-1$
+//			//
 //			+ "	isGeoFromPhoto				INT DEFAULT 0,					\n" //$NON-NLS-1$
 //			+ "	latitude 					DOUBLE DEFAULT 0,				\n" //$NON-NLS-1$
 //			+ "	longitude 					DOUBLE DEFAULT 0				\n" //$NON-NLS-1$
@@ -4532,6 +4536,8 @@ public class TourDatabase {
 					"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	imageExifTime			BIGINT DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
 					"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	imageFileLastModified	BIGINT DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
 					"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	adjustedTime			BIGINT DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
+					//
+					"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	ratingStars				INT DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
 					//
 					"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	isGeoFromPhoto			INT DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
 					"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	latitude 				DOUBLE DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$

@@ -23,6 +23,7 @@ import net.tourbook.photo.internal.ActionPhotoGalleryType;
 import net.tourbook.photo.internal.ActionShowGPSAnnotations;
 import net.tourbook.photo.internal.ActionShowPhotoDate;
 import net.tourbook.photo.internal.ActionShowPhotoName;
+import net.tourbook.photo.internal.ActionShowPhotoRatingStars;
 import net.tourbook.photo.internal.ActionShowPhotoTooltip;
 import net.tourbook.photo.internal.ActionSortByFileDate;
 import net.tourbook.photo.internal.ActionSortByFileName;
@@ -47,6 +48,7 @@ public class PhotoGallery extends ImageGallery {
 	private static final String			STATE_IMAGE_FILTER					= "STATE_IMAGE_FILTER";					//$NON-NLS-1$
 	private static final String			STATE_IS_SHOW_PHOTO_GPS_ANNOTATION	= "STATE_IS_SHOW_PHOTO_GPS_ANNOTATION";	//$NON-NLS-1$
 	private static final String			STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY	= "STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY";	//$NON-NLS-1$
+	private static final String			STATE_IS_SHOW_PHOTO_RATING_STARS	= "STATE_IS_SHOW_PHOTO_RATING_STARS";		//$NON-NLS-1$
 	private static final String			STATE_IS_SHOW_PHOTO_TOOLTIP			= "STATE_IS_SHOW_PHOTO_TOOLTIP";			//$NON-NLS-1$
 	private static final String			STATE_PHOTO_INFO_DATE				= "STATE_PHOTO_INFO_DATE";					//$NON-NLS-1$
 
@@ -64,6 +66,7 @@ public class PhotoGallery extends ImageGallery {
 	private ActionPhotoGalleryType		_actionPhotoGalleryType;
 	private ActionShowPhotoName			_actionShowPhotoName;
 	private ActionShowPhotoDate			_actionShowPhotoDate;
+	private ActionShowPhotoRatingStars	_actionShowPhotoRatingStars;
 	private ActionShowPhotoTooltip		_actionShowPhotoTooltip;
 	private ActionShowGPSAnnotations	_actionShowGPSAnnotation;
 	private ActionSortByFileDate		_actionSortFileByDate;
@@ -169,6 +172,10 @@ public class PhotoGallery extends ImageGallery {
 				_actionShowPhotoTooltip.isChecked());
 	}
 
+	public void actionShowPhotoRatingStars() {
+		setShowPhotoRatingStars(_actionShowPhotoRatingStars.isChecked());
+	}
+
 	public void actionSortByDate() {
 
 		final boolean isChecked = _actionSortFileByDate.isChecked();
@@ -218,6 +225,7 @@ public class PhotoGallery extends ImageGallery {
 
 		_actionShowPhotoName = new ActionShowPhotoName(this);
 		_actionShowPhotoDate = new ActionShowPhotoDate(this);
+		_actionShowPhotoRatingStars = new ActionShowPhotoRatingStars(this);
 		_actionShowPhotoTooltip = new ActionShowPhotoTooltip(this);
 
 		_actionSortByFileName = new ActionSortByFileName(this);
@@ -257,6 +265,7 @@ public class PhotoGallery extends ImageGallery {
 //		tbm.add(_actionPhotoGalleryType);
 
 		tbm.add(new Separator());
+		tbm.add(_actionShowPhotoRatingStars);
 		tbm.add(_actionShowPhotoDate);
 		tbm.add(_actionShowPhotoName);
 		tbm.add(_actionShowPhotoTooltip);
@@ -310,17 +319,20 @@ public class PhotoGallery extends ImageGallery {
 		}
 
 		final boolean isShowPhotoName = Util.getStateBoolean(_state, STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY, false);
+		final boolean isShowPhotoRatingStars = Util.getStateBoolean(_state, STATE_IS_SHOW_PHOTO_RATING_STARS, false);
 		final boolean isShowTooltip = Util.getStateBoolean(_state, STATE_IS_SHOW_PHOTO_TOOLTIP, true);
 		final boolean isShowPhotoAnnotations = Util.getStateBoolean(_state, //
 				STATE_IS_SHOW_PHOTO_GPS_ANNOTATION,
 				true);
 
-		_actionShowPhotoName.setChecked(isShowPhotoName);
-		_actionShowPhotoDate.setChecked(_photoDateInfo != PhotoDateInfo.NoDateTime);
-		_actionShowPhotoTooltip.setChecked(isShowTooltip);
 		_actionShowGPSAnnotation.setChecked(isShowPhotoAnnotations);
+		_actionShowPhotoDate.setChecked(_photoDateInfo != PhotoDateInfo.NoDateTime);
+		_actionShowPhotoName.setChecked(isShowPhotoName);
+		_actionShowPhotoRatingStars.setChecked(isShowPhotoRatingStars);
+		_actionShowPhotoTooltip.setChecked(isShowTooltip);
 
 		restoreInfo(isShowPhotoName, _photoDateInfo, isShowPhotoAnnotations, isShowTooltip);
+		setShowPhotoRatingStars(isShowPhotoRatingStars);
 
 		/*
 		 * gallery sorting
@@ -367,9 +379,10 @@ public class PhotoGallery extends ImageGallery {
 				? GalleryType.DETAILS.name()
 				: GalleryType.THUMBNAIL.name());
 
-		_state.put(STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY, _actionShowPhotoName.isChecked());
-		_state.put(STATE_IS_SHOW_PHOTO_TOOLTIP, _actionShowPhotoTooltip.isChecked());
 		_state.put(STATE_IS_SHOW_PHOTO_GPS_ANNOTATION, _actionShowGPSAnnotation.isChecked());
+		_state.put(STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY, _actionShowPhotoName.isChecked());
+		_state.put(STATE_IS_SHOW_PHOTO_RATING_STARS, _actionShowPhotoRatingStars.isChecked());
+		_state.put(STATE_IS_SHOW_PHOTO_TOOLTIP, _actionShowPhotoTooltip.isChecked());
 
 		_state.put(STATE_PHOTO_INFO_DATE, _photoDateInfo.name());
 		_state.put(STATE_IMAGE_FILTER, _currentImageFilter.name());

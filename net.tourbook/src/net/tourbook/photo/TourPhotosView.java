@@ -390,6 +390,12 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 		_galleryToolbarManager.update(true);
 	}
 
+	/**
+	 * Get photos from tour photos.
+	 * 
+	 * @param allPhotos
+	 * @param tourData
+	 */
 	private void getPhotos(final ArrayList<Photo> allPhotos, final TourData tourData) {
 
 		if (tourData == null) {
@@ -477,7 +483,6 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 			}
 
 			updateUI(allPhotos);
-
 		}
 	}
 

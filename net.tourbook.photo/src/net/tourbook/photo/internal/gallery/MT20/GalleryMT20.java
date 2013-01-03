@@ -687,7 +687,7 @@ public abstract class GalleryMT20 extends Canvas {
 			}
 		}
 
-		// fire event to hover listener
+		// fire event to the hovered listener
 		final Object[] listeners = _hoveredListeners.getListeners();
 		for (final Object listener : listeners) {
 			((IItemHovereredListener) listener).hoveredItem(hoveredItem);
@@ -2004,7 +2004,7 @@ public abstract class GalleryMT20 extends Canvas {
 ////		if (timeDiff > 500) {
 //		System.out.println(UI.timeStampNano() + " \tonPaint:\t" + timeDiff + " ms\t");
 ////		}
-		// TODO remove SYSTEM.OUT.PRINTLN
+////		 TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 	private void onResize() {

@@ -4357,6 +4357,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 			galleryPhoto.adjustedTime = tourPhoto.getAdjustedTime();
 			galleryPhoto.imageExifTime = tourPhoto.getImageExifTime();
+			galleryPhoto.ratingStars = tourPhoto.getRatingStars();
 
 			final double latitude = tourPhoto.getLatitude();
 
