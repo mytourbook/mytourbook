@@ -46,6 +46,7 @@ import org.eclipse.swt.events.MenuDetectListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
+import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
@@ -137,7 +138,7 @@ public abstract class GalleryMT20 extends Canvas {
 	private int									_prevContentWidth;
 	private AbstractGalleryMT20ItemRenderer		_itemRenderer;
 
-	private final ListenerList					_hoveredListeners			= new ListenerList(ListenerList.IDENTITY);
+	private final ListenerList					_itemListeners				= new ListenerList(ListenerList.IDENTITY);
 
 	/**
 	 * Cached client area
@@ -281,6 +282,18 @@ public abstract class GalleryMT20 extends Canvas {
 
 	private IPhotoProvider						_photoProvider;
 
+	/**
+	 * Mouse X position within a gallery item, useful when item is hovered to get the exact
+	 * position.
+	 */
+	private int									_itemMouseX;
+	private int									_itemMouseY;
+
+	/**
+	 * Gallery item which is currently be hovered, can be <code>null</code> when an item is not
+	 * hovered.
+	 */
+	private GalleryMT20Item						_currentHoveredItem;
 
 	private class RedrawTimer implements Runnable {
 		public void run() {
@@ -380,8 +393,8 @@ public abstract class GalleryMT20 extends Canvas {
 		});
 	}
 
-	public void addItemHoveredListener(final IItemHovereredListener hoveredListener) {
-		_hoveredListeners.add(hoveredListener);
+	public void addItemListener(final IItemListener hoveredListener) {
+		_itemListeners.add(hoveredListener);
 	}
 
 	private void addKeyListeners() {
@@ -423,6 +436,20 @@ public abstract class GalleryMT20 extends Canvas {
 				onMouseUp(e);
 			}
 
+		});
+
+		addMouseTrackListener(new MouseTrackListener() {
+
+			@Override
+			public void mouseEnter(final MouseEvent e) {}
+
+			@Override
+			public void mouseExit(final MouseEvent e) {
+				onMouseExit(e);
+			}
+
+			@Override
+			public void mouseHover(final MouseEvent e) {}
 		});
 
 		addMouseMoveListener(new MouseMoveListener() {
@@ -668,6 +695,17 @@ public abstract class GalleryMT20 extends Canvas {
 		}
 	}
 
+	/**
+	 * fire exit event to the previous hovered item listener
+	 */
+	private void fireItemExitEvent() {
+
+		final Object[] listeners = _itemListeners.getListeners();
+		for (final Object listener : listeners) {
+			((IItemListener) listener).exitItem(_currentHoveredItem, _itemMouseX, _itemMouseY);
+		}
+	}
+
 	private void fireItemHoverEvent(final int mouseX, final int mouseY) {
 
 		GalleryMT20Item hoveredItem = null;
@@ -687,10 +725,16 @@ public abstract class GalleryMT20 extends Canvas {
 			}
 		}
 
+		if (_currentHoveredItem != null && _currentHoveredItem != hoveredItem) {
+			fireItemExitEvent();
+		}
+
+		_currentHoveredItem = hoveredItem;
+
 		// fire event to the hovered listener
-		final Object[] listeners = _hoveredListeners.getListeners();
+		final Object[] listeners = _itemListeners.getListeners();
 		for (final Object listener : listeners) {
-			((IItemHovereredListener) listener).hoveredItem(hoveredItem);
+			((IItemListener) listener).hoveredItem(hoveredItem, _itemMouseX, _itemMouseY);
 		}
 	}
 
@@ -747,8 +791,8 @@ public abstract class GalleryMT20 extends Canvas {
 //
 //			} else {
 
-			firstItem = firstLine * _gridHorizItems;
-			lastItem = (lastLine + 1) * _gridHorizItems;
+				firstItem = firstLine * _gridHorizItems;
+				lastItem = (lastLine + 1) * _gridHorizItems;
 //			}
 
 			// exit if no item selected
@@ -763,6 +807,8 @@ public abstract class GalleryMT20 extends Canvas {
 			}
 
 		} else {
+
+			// horizontal image gallery
 
 			int firstLine = (clipX + _galleryPosition) / _itemWidth;
 			if (firstLine < 0) {
@@ -905,6 +951,9 @@ public abstract class GalleryMT20 extends Canvas {
 	 */
 	public int getItemIndexFromPosition(final int viewPortX, final int viewPortY) {
 
+		_itemMouseX = -1;
+		_itemMouseY = -1;
+
 		if (_clientArea.contains(viewPortX, viewPortY) == false) {
 			// mouse is outside of the gallery
 			return -1;
@@ -948,6 +997,12 @@ public abstract class GalleryMT20 extends Canvas {
 		if (itemIndex >= maxItems) {
 			return -1;
 		}
+
+		_itemMouseX = contentPosX - indexX * _itemWidth;
+		_itemMouseY = contentPosY - indexY * _itemHeight;
+
+//		System.out.println(UI.timeStampNano() + " item x=" + _itemMouseX + "\ty=" + _itemMouseY);
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		return itemIndex;
 	}
@@ -1652,6 +1707,11 @@ public abstract class GalleryMT20 extends Canvas {
 		}
 	}
 
+	private void onMouseExit(final MouseEvent e) {
+
+		fireItemExitEvent();
+	}
+
 	private void onMouseHandleCtrlLeft(	final MouseEvent e,
 										final int itemIndex,
 										final boolean isMouseDownEvent,
@@ -1930,6 +1990,12 @@ public abstract class GalleryMT20 extends Canvas {
 
 				final int numberOfAreaItems = areaItemsIndices.length;
 				if (numberOfAreaItems > 0) {
+
+//					System.out.println(UI.timeStampNano()
+//							+ " clippingArea="
+//							+ clippingArea
+//							+ ("\titems=" + numberOfAreaItems));
+//					// TODO remove SYSTEM.OUT.PRINTLN
 
 					final int virtualLength = _virtualGalleryItems.length;
 

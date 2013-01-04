@@ -47,28 +47,23 @@ public class Messages extends NLS {
 	public static String		Image__PhotoFullsizeShellImage128;
 	public static String		Image__PhotoInfoDate;
 	public static String		Image__PhotoInfoName;
-
-	public static String	Image__PhotoRatingStars;
+	public static String		Image__PhotoRatingStar;
+	public static String		Image__PhotoRatingStarHovered;
+	public static String		Image__PhotoRatingStarNotHovered;
+	public static String		Image__PhotoRatingStars;
 	public static String		Image__PhotoSortByDate;
 	public static String		Image__PhotoSortByName;
 	public static String		Image__PhotoTooltip;
-	public static String	Image__PotoGalleryDetails;
-
-	public static String	Image__PotoGalleryThumbnail;
-
+	public static String		Image__PotoGalleryDetails;
+	public static String		Image__PotoGalleryThumbnail;
 	public static String		Image__refresh;
 
-	public static String	Photo_Gallery_Action_PhotoGalleryThumbnail;
-
-	public static String	Photo_Gallery_Action_PhotoGalleryThumbnail_Tooltip;
-
-	public static String	Photo_Gallery_Action_ShowPhotoGalleryDetails;
-
-	public static String	Photo_Gallery_Action_ShowPhotoGalleryDetails_Tooltip;
-
-	public static String	Photo_Gallery_Action_ShowPhotoRatingStars;
-
-	public static String	Photo_Gallery_Action_ShowPhotoRatingStars_Tooltip;
+	public static String		Photo_Gallery_Action_PhotoGalleryThumbnail;
+	public static String		Photo_Gallery_Action_PhotoGalleryThumbnail_Tooltip;
+	public static String		Photo_Gallery_Action_ShowPhotoGalleryDetails;
+	public static String		Photo_Gallery_Action_ShowPhotoGalleryDetails_Tooltip;
+	public static String		Photo_Gallery_Action_ShowPhotoRatingStars;
+	public static String		Photo_Gallery_Action_ShowPhotoRatingStars_Tooltip;
 
 	public static String		Photo_ToolTip_Description;
 	public static String		Photo_ToolTip_ExifDate;

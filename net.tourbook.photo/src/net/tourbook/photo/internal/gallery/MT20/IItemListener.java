@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,14 +15,30 @@
  *******************************************************************************/
 package net.tourbook.photo.internal.gallery.MT20;
 
-public interface IItemHovereredListener {
+public interface IItemListener {
+
+	/**
+	 * Mouse has hovered another gallery item.
+	 * 
+	 * @param exitHoveredItem
+	 *            Item which was previously hovered, can be <code>null</code>.
+	 * @param itemMouseY
+	 *            Mouse X position relative to the hovered item.
+	 * @param itemMouseX
+	 *            Mouse Y position relative to the hovered item.
+	 */
+	public void exitItem(GalleryMT20Item exitHoveredItem, int itemMouseX, int itemMouseY);
 
 	/**
 	 * Mouse has hovered a gallery item.
 	 * 
 	 * @param hoveredItem
 	 *            Hovered item or <code>null</code> when mouse has not hovered over a gallery item.
+	 * @param itemMouseY
+	 *            Mouse X position relative to the hovered item.
+	 * @param itemMouseX
+	 *            Mouse Y position relative to the hovered item.
 	 */
-	public void hoveredItem(GalleryMT20Item hoveredItem);
+	public void hoveredItem(GalleryMT20Item hoveredItem, int itemMouseX, int itemMouseY);
 
 }

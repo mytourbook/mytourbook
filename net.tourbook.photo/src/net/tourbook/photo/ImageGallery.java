@@ -50,7 +50,7 @@ import net.tourbook.photo.internal.gallery.MT20.GalleryMT20;
 import net.tourbook.photo.internal.gallery.MT20.GalleryMT20Item;
 import net.tourbook.photo.internal.gallery.MT20.IGalleryContextMenuProvider;
 import net.tourbook.photo.internal.gallery.MT20.IGalleryCustomData;
-import net.tourbook.photo.internal.gallery.MT20.IItemHovereredListener;
+import net.tourbook.photo.internal.gallery.MT20.IItemListener;
 import net.tourbook.photo.internal.manager.ExifCache;
 import net.tourbook.photo.internal.manager.GallerySorting;
 import net.tourbook.photo.internal.manager.ImageUtils;
@@ -116,7 +116,7 @@ import org.joda.time.format.DateTimeFormatter;
  * org.apache.commons.sanselan
  * </pre>
  */
-public class ImageGallery implements IItemHovereredListener, IGalleryContextMenuProvider, IPhotoProvider, ITourViewer {
+public class ImageGallery implements IItemListener, IGalleryContextMenuProvider, IPhotoProvider, ITourViewer {
 
 	/**
 	 * Number of gallery positions which are cached
@@ -665,7 +665,7 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		_photoGalleryTooltip = new GalleryPhotoToolTip(_galleryMT20);
 		_photoGalleryTooltip.setReceiveMouseMoveEvent(true);
 
-		_galleryMT20.addItemHoveredListener(this);
+		_galleryMT20.addItemListener(this);
 	}
 
 	/**
@@ -1084,6 +1084,26 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	}
 
 	@Override
+	public void exitItem(final GalleryMT20Item exitHoveredItem, final int itemMouseX, final int itemMouseY) {
+
+		if (_isShowPhotoRatingStars && exitHoveredItem != null) {
+
+//			System.out.println(UI.timeStampNano() + " exitHoveredItem " + exitHoveredItem);
+//			// TODO remove SYSTEM.OUT.PRINTLN
+
+			exitHoveredItem.hoveredStars = 0;
+			exitHoveredItem.isHovered = false;
+
+			_galleryMT20.redraw(
+					exitHoveredItem.viewPortX,
+					exitHoveredItem.viewPortY,
+					exitHoveredItem.width,
+					exitHoveredItem.height,
+					false);
+		}
+	}
+
+	@Override
 	public void fillContextMenu(final IMenuManager menuMgr) {
 
 		menuMgr.add(new Separator(UI.MENU_SEPARATOR_ADDITIONS));
@@ -1341,14 +1361,24 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 	}
 
 	@Override
-	public void hoveredItem(final GalleryMT20Item hoveredItem) {
+	public void hoveredItem(final GalleryMT20Item hoveredItem, final int itemMouseX, final int itemMouseY) {
 
 		if (_isShowTooltip) {
 			_photoGalleryTooltip.show(hoveredItem);
 		}
 
-		if (_isShowPhotoRatingStars) {
-//			a = 0;
+		if (_isShowPhotoRatingStars && hoveredItem != null) {
+
+			hoveredItem.isHovered = true;
+
+			_photoRenderer.itemIsHovered(hoveredItem, itemMouseX, itemMouseY);
+
+			_galleryMT20.redraw(
+					hoveredItem.viewPortX,
+					hoveredItem.viewPortY,
+					hoveredItem.width,
+					hoveredItem.height,
+					false);
 		}
 	}
 
@@ -2044,15 +2074,16 @@ public class ImageGallery implements IItemHovereredListener, IGalleryContextMenu
 		return _photoViewer;
 	}
 
+//	private ImageGallery() {}
+
 	public void redrawGallery(	final int viewPortX,
 								final int viewPortY,
 								final int width,
 								final int height,
 								final boolean all) {
+
 		_galleryMT20.redraw(viewPortX, viewPortY, width, height, all);
 	}
-
-//	private ImageGallery() {}
 
 	public void refreshUI() {
 		_galleryMT20.redraw();

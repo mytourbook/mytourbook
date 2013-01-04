@@ -57,19 +57,24 @@ import org.joda.time.format.DateTimeFormatter;
  */
 public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
-	private static final String			PHOTO_ANNOTATION_EXIF_GPS	= "PHOTO_ANNOTATION_GPS";					//$NON-NLS-1$
-	private static final String			PHOTO_ANNOTATION_TOUR_GPS	= "PHOTO_ANNOTATION_TOUR_GPS";				//$NON-NLS-1$
+	private static final String			PHOTO_ANNOTATION_EXIF_GPS		= "PHOTO_ANNOTATION_GPS";					//$NON-NLS-1$
+	private static final String			PHOTO_ANNOTATION_TOUR_GPS		= "PHOTO_ANNOTATION_TOUR_GPS";				//$NON-NLS-1$
+	private static final String			PHOTO_RATING_STAR				= "PHOTO_RATING_STAR";						//$NON-NLS-1$
+	private static final String			PHOTO_RATING_STAR_HOVERED		= "PHOTO_RATING_STAR_HOVERED";				//$NON-NLS-1$
+	private static final String			PHOTO_RATING_STAR_NOT_HOVERED	= "PHOTO_RATING_STAR_NOT_HOVERED";			//$NON-NLS-1$
+
+	private static final int			MAX_RATING_STARS				= 5;
 
 	/**
 	 * this value has been evaluated by some test
 	 */
-	private int							_textMinThumbSize			= 50;
+	private int							_textMinThumbSize				= 50;
 
-	private int							_fontHeight					= -1;
+	private int							_fontHeight						= -1;
 
-	private final DateTimeFormatter		_dtFormatterDate			= DateTimeFormat.forStyle("M-");			//$NON-NLS-1$
-	private final DateTimeFormatter		_dtFormatterTime			= DateTimeFormat.forStyle("-F");			//$NON-NLS-1$
-	private final DateTimeFormatter		_dtFormatterDateTime		= DateTimeFormat.forStyle("MM");			//$NON-NLS-1$
+	private final DateTimeFormatter		_dtFormatterDate				= DateTimeFormat.forStyle("M-");			//$NON-NLS-1$
+	private final DateTimeFormatter		_dtFormatterTime				= DateTimeFormat.forStyle("-F");			//$NON-NLS-1$
+	private final DateTimeFormatter		_dtFormatterDateTime			= DateTimeFormat.forStyle("MM");			//$NON-NLS-1$
 
 //	private final DateTimeFormatter		_dtFormatterDateTime	= new DateTimeFormatterBuilder()
 //																		.appendYear(4, 4)
@@ -109,14 +114,12 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	private ImageGallery				_imageGallery;
 	private GalleryMT20					_galleryMT;
 
-	private int							_gridBorder					= 1;
-	private int							_imageBorder				= 5;
+	private int							_gridBorder						= 1;
+	private int							_imageBorder					= 5;
 
 	/**
 	 * photo dimension without grid border but including image border
 	 */
-	private int							_photoX;
-	private int							_photoY;
 	private int							_photoWidth;
 	private int							_photoHeight;
 
@@ -131,7 +134,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	/**
 	 * Width for the painted image or <code>-1</code> when not initialized.
 	 */
-	private int							_paintedDestWidth			= -1;
+	private int							_paintedDestWidth				= -1;
 	private int							_paintedDestHeight;
 
 	private boolean						_isShowFullsizeHQImage;
@@ -144,6 +147,11 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	private int							_paintedImageWidth;
 	private int							_paintedImageHeight;
 
+	private static int					_gpsImageWidth;
+	private static int					_gpsImageHeight;
+	private static int					_ratingStarImageWidth;
+	private static int					_ratingStarImageHeight;
+
 	/*
 	 * full size context fields
 	 */
@@ -152,9 +160,9 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	private boolean						_isFullsizeImageAvailable;
 	private boolean						_isFullsizeLoadingError;
 
-	private final DateTimeFormatter		_dtFormatter				= DateTimeFormat.forStyle("ML");			//$NON-NLS-1$
-	private final DateTimeFormatter		_dtWeekday					= DateTimeFormat.forPattern("E");			//$NON-NLS-1$
-	private final NumberFormat			_nfMByte					= NumberFormat.getNumberInstance();
+	private final DateTimeFormatter		_dtFormatter					= DateTimeFormat.forStyle("ML");			//$NON-NLS-1$
+	private final DateTimeFormatter		_dtWeekday						= DateTimeFormat.forPattern("E");			//$NON-NLS-1$
+	private final NumberFormat			_nfMByte						= NumberFormat.getNumberInstance();
 	{
 		_nfMByte.setMinimumFractionDigits(3);
 		_nfMByte.setMaximumFractionDigits(3);
@@ -169,36 +177,48 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	/*
 	 * UI resources
 	 */
-	private Color						_fullsizeBgColor			= Display.getCurrent()//
-																			.getSystemColor(SWT.COLOR_BLACK);
-	private Color						_fgColor					= Display.getCurrent()//
-																			.getSystemColor(SWT.COLOR_WHITE);
-	private Color						_bgColor					= Display.getCurrent()//
-																			.getSystemColor(SWT.COLOR_RED);
+	private Color						_fullsizeBgColor				= Display.getCurrent()//
+																				.getSystemColor(SWT.COLOR_BLACK);
+	private Color						_fgColor						= Display.getCurrent()//
+																				.getSystemColor(SWT.COLOR_WHITE);
+	private Color						_bgColor						= Display.getCurrent()//
+																				.getSystemColor(SWT.COLOR_RED);
 	private Color						_selectionFgColor;
 	private Color						_noFocusSelectionFgColor;
 
-	private static Image				_exifGpsImage;
-	private static Image				_tourGpsImage;
-
-	private static int					_gpsImageWidth;
-	private static int					_gpsImageHeight;
+	private static Image				_imageExifGps;
+	private static Image				_imageTourGps;
+	private static Image				_imageRatingStar;
+	private static Image				_imageRatingStarHovered;
+	private static Image				_imageRatingStarNotHovered;
 
 	static {
 
 		UI.IMAGE_REGISTRY.put(PHOTO_ANNOTATION_EXIF_GPS, //
 				Activator.getImageDescriptor(Messages.Image__PhotoAnnotationExifGPS));
-
 		UI.IMAGE_REGISTRY.put(PHOTO_ANNOTATION_TOUR_GPS,//
 				Activator.getImageDescriptor(Messages.Image__PhotoAnnotationTourGPS));
 
-		_exifGpsImage = UI.IMAGE_REGISTRY.get(PHOTO_ANNOTATION_EXIF_GPS);
-		_tourGpsImage = UI.IMAGE_REGISTRY.get(PHOTO_ANNOTATION_TOUR_GPS);
+		UI.IMAGE_REGISTRY.put(PHOTO_RATING_STAR,//
+				Activator.getImageDescriptor(Messages.Image__PhotoRatingStar));
+		UI.IMAGE_REGISTRY.put(PHOTO_RATING_STAR_HOVERED,//
+				Activator.getImageDescriptor(Messages.Image__PhotoRatingStarHovered));
+		UI.IMAGE_REGISTRY.put(PHOTO_RATING_STAR_NOT_HOVERED,//
+				Activator.getImageDescriptor(Messages.Image__PhotoRatingStarNotHovered));
 
-		final Rectangle bounds = _exifGpsImage.getBounds();
-		_tourGpsImage.getBounds();
+		_imageExifGps = UI.IMAGE_REGISTRY.get(PHOTO_ANNOTATION_EXIF_GPS);
+		_imageTourGps = UI.IMAGE_REGISTRY.get(PHOTO_ANNOTATION_TOUR_GPS);
+		_imageRatingStar = UI.IMAGE_REGISTRY.get(PHOTO_RATING_STAR);
+		_imageRatingStarHovered = UI.IMAGE_REGISTRY.get(PHOTO_RATING_STAR_HOVERED);
+		_imageRatingStarNotHovered = UI.IMAGE_REGISTRY.get(PHOTO_RATING_STAR_NOT_HOVERED);
+
+		final Rectangle bounds = _imageExifGps.getBounds();
 		_gpsImageWidth = bounds.width;
 		_gpsImageHeight = bounds.height;
+
+		final Rectangle ratingStarBounds = _imageRatingStar.getBounds();
+		_ratingStarImageWidth = ratingStarBounds.width;
+		_ratingStarImageHeight = ratingStarBounds.height;
 	}
 
 	public PhotoRenderer(final GalleryMT20 galleryMT20, final ImageGallery imageGallery) {
@@ -223,10 +243,10 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 			_fontHeight = gc.getFontMetrics().getHeight();
 		}
 
-		boolean isDrawText = true;
+		boolean isDrawAttributes = true;
 
-		_photoX = galleryItemViewPortX + _gridBorder;
-		_photoY = galleryItemViewPortY + _gridBorder;
+		galleryItem.photoPaintedX = galleryItemViewPortX + _gridBorder;
+		galleryItem.photoPaintedY = galleryItemViewPortY + _gridBorder;
 		_photoWidth = galleryItemWidth - _gridBorder;
 		_photoHeight = galleryItemHeight - _gridBorder;
 
@@ -238,8 +258,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		final int border = _imageBorder;
 		final int border2 = border / 2;
 
-		final int imageX = _photoX + (isBorder ? border2 : 0);
-		final int imageY = _photoY + (isBorder ? border2 : 0);
+		final int imageX = galleryItem.photoPaintedX + (isBorder ? border2 : 0);
+		final int imageY = galleryItem.photoPaintedY + (isBorder ? border2 : 0);
 
 		itemImageWidth -= isBorder ? border : 0;
 		itemImageHeight -= isBorder ? border : 0;
@@ -331,7 +351,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 			}
 
 			if (itemImageWidth < _textMinThumbSize) {
-				isDrawText = false;
+				// disable drawing photo attributes when image is too small
+				isDrawAttributes = false;
 			}
 
 			final boolean isPainted = draw_Image(gc, photo, paintedImage, galleryItem,//
@@ -346,7 +367,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 				// error occured painting the image, invalidate canvas
 			}
 
-			// debug box for the image area
+//			// debug box for the image area
 //			gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_RED));
 //			gc.drawRectangle(imageX, imageY, imageWidth - 2, imageHeight - 1);
 
@@ -360,14 +381,16 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 					itemImageWidth,
 					itemImageHeight,
 					requestedImageQuality,
-					isDrawText && _isShowPhotoName,
+					isDrawAttributes && _isShowPhotoName,
 					isSelected,
 					false,
 					_bgColor);
 		}
 
+		final boolean isDrawPhotoDateName = _isShowPhotoName || _isShowDateInfo;
+
 		// draw name & date & annotations
-		if (isDrawText && (_isShowPhotoName || _isShowDateInfo)) {
+		if (isDrawAttributes && isDrawPhotoDateName) {
 			drawPhotoDateName(gc, photo, //
 					imageX,
 					imageY,
@@ -378,16 +401,24 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		// annotations are drawn in the bottom right corner of the image
 		if (_isShowAnnotations && photo.isPhotoWithGps) {
 
-			final Image image = photo.isGeoFromExif ? _exifGpsImage : _tourGpsImage;
+			final Image image = photo.isGeoFromExif ? _imageExifGps : _imageTourGps;
 
 			gc.drawImage(image, //
 					_paintedDestX + _paintedDestWidth - _gpsImageWidth,
 					_paintedDestY + _paintedDestHeight - _gpsImageHeight);
 		}
 
+		if (isDrawAttributes && _isShowPhotoRatingStars /* && photo.ratingStars > 0 */) {
+
+			int ratingStars = photo.ratingStars;
+			ratingStars = 2;
+
+			drawRatingStars(gc, galleryItem, ratingStars);
+		}
+
 //		// debug box for the whole gallery item area
 //		gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_GREEN));
-//		gc.drawRectangle(photoViewPortX - 1, photoViewPortY, galleryItemWidth - 1, galleryItemHeight - 1);
+//		gc.drawRectangle(galleryItemViewPortX - 1, galleryItemViewPortY, galleryItemWidth - 1, galleryItemHeight - 1);
 	}
 
 	/**
@@ -971,6 +1002,54 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		}
 	}
 
+	private void drawRatingStars(final GC gc, final GalleryMT20Item galleryItem, final int ratingStars) {
+
+		final boolean isItemHovered = galleryItem.isHovered;
+		final int hoveredStars = galleryItem.hoveredStars;
+		final boolean isStarHovered = hoveredStars > 0;
+
+		for (int starIndex = 0; starIndex < MAX_RATING_STARS; starIndex++) {
+
+			// draw stars at the top
+
+			Image starImage;
+
+			if (isItemHovered) {
+
+				if (isStarHovered) {
+
+					if (starIndex < hoveredStars) {
+						starImage = _imageRatingStarHovered;
+					} else {
+						starImage = _imageRatingStarNotHovered;
+					}
+
+				} else {
+
+					if (starIndex < ratingStars) {
+						starImage = _imageRatingStar;
+					} else {
+						starImage = _imageRatingStarNotHovered;
+					}
+				}
+
+			} else {
+
+				// item is not hovered
+
+				if (starIndex < ratingStars) {
+					starImage = _imageRatingStar;
+				} else {
+					return;
+				}
+			}
+
+			gc.drawImage(starImage, //
+					galleryItem.photoPaintedX + _photoWidth - (_ratingStarImageWidth * (starIndex + 1)),
+					galleryItem.photoPaintedY);
+		}
+	}
+
 	/**
 	 * @param gc
 	 * @param photo
@@ -1128,6 +1207,32 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	@Override
 	public int getBorderSize() {
 		return _gridBorder + _imageBorder;
+	}
+
+	/**
+	 * @param hoveredItem
+	 * @param itemMouseX
+	 * @param itemMouseY
+	 * @return Returns <code>true</code> when a sensitive area in the gallery item is hovered and
+	 *         must be repainted to draw the hovered state.
+	 */
+	public void itemIsHovered(final GalleryMT20Item hoveredItem, final int itemMouseX, final int itemMouseY) {
+
+		final int hoveredPhotoX = itemMouseX + _gridBorder;
+
+		if (itemMouseX <= _photoWidth//
+				//
+				&& itemMouseX >= _photoWidth - (MAX_RATING_STARS * _ratingStarImageWidth)
+				&& itemMouseY <= _ratingStarImageHeight
+		//
+		) {
+
+			hoveredItem.hoveredStars = (_photoWidth - hoveredPhotoX) / _ratingStarImageWidth + 1;
+
+		} else {
+
+			hoveredItem.hoveredStars = 0;
+		}
 	}
 
 	@Override

@@ -47,6 +47,38 @@ public class GalleryMT20Item {
 	public int					imagePaintedWidth	= -1;
 	public int					imagePaintedHeight;
 
+//	/**
+//	 * Is <code>true</code> when gallery item is hovered with the mouse. This state is reset in the
+//	 * item painter.
+//	 */
+//	public boolean				isRatingStarsHovered;
+//
+//	/**
+//	 * Is <code>true</code> when hovered star rating is not hovered any more and the star drawing
+//	 * should be reset.
+//	 */
+//	public boolean				isResetRatingStarsHovered;
+
+	/**
+	 * Number of stars which are hovered.
+	 */
+	public int					hoveredStars;
+
+	/**
+	 * Is <code>true</code> when this gallery item is currently be hovered with the mouse.
+	 */
+	public boolean				isHovered;
+
+	/**
+	 * X position where this gallery item is painted on the canvas.
+	 */
+	public int					photoPaintedX;
+
+	/**
+	 * Y position where this gallery item is painted on the canvas.
+	 */
+	public int					photoPaintedY;
+
 	public GalleryMT20Item(final GalleryMT20 galleryMT20) {
 		this.gallery = galleryMT20;
 	}
