@@ -15,8 +15,16 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
-public interface IPhotoProvider {
+import java.util.ArrayList;
 
-	public Photo[] getSortedAndFilteredPhotos();
+public interface IPhotoServiceProvider {
+
+	/**
+	 * A mouse down event occured at a hovered gallery item within the star rating area.
+	 * 
+	 * @param photos
+	 *            Photos which star rating should be saved.
+	 */
+	void saveStarRating(ArrayList<Photo> photos);
 
 }

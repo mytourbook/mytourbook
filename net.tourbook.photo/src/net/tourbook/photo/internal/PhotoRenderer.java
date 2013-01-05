@@ -16,9 +16,13 @@
 package net.tourbook.photo.internal;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.photo.IPhotoServiceProvider;
 import net.tourbook.photo.ImageGallery;
 import net.tourbook.photo.ImageQuality;
 import net.tourbook.photo.Photo;
@@ -30,6 +34,7 @@ import net.tourbook.photo.internal.gallery.MT20.AbstractGalleryMT20ItemRenderer;
 import net.tourbook.photo.internal.gallery.MT20.DefaultGalleryMT20ItemRenderer;
 import net.tourbook.photo.internal.gallery.MT20.GalleryMT20;
 import net.tourbook.photo.internal.gallery.MT20.GalleryMT20Item;
+import net.tourbook.photo.internal.gallery.MT20.IGalleryCustomData;
 import net.tourbook.photo.internal.gallery.MT20.PaintingResult;
 import net.tourbook.photo.internal.gallery.MT20.RendererHelper;
 import net.tourbook.photo.internal.gallery.MT20.ZoomState;
@@ -62,6 +67,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	private static final String			PHOTO_RATING_STAR				= "PHOTO_RATING_STAR";						//$NON-NLS-1$
 	private static final String			PHOTO_RATING_STAR_HOVERED		= "PHOTO_RATING_STAR_HOVERED";				//$NON-NLS-1$
 	private static final String			PHOTO_RATING_STAR_NOT_HOVERED	= "PHOTO_RATING_STAR_NOT_HOVERED";			//$NON-NLS-1$
+	private static int					MAX_RATING_STARS_WIDTH;
 
 	private static final int			MAX_RATING_STARS				= 5;
 
@@ -152,6 +158,11 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	private static int					_ratingStarImageWidth;
 	private static int					_ratingStarImageHeight;
 
+	/**
+	 * Right border for the rating stars, this value is relative to the gallery item.
+	 */
+	private int							_ratingStarsRightBorder;
+
 	/*
 	 * full size context fields
 	 */
@@ -219,6 +230,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		final Rectangle ratingStarBounds = _imageRatingStar.getBounds();
 		_ratingStarImageWidth = ratingStarBounds.width;
 		_ratingStarImageHeight = ratingStarBounds.height;
+
+		MAX_RATING_STARS_WIDTH = _ratingStarImageWidth * MAX_RATING_STARS;
 	}
 
 	public PhotoRenderer(final GalleryMT20 galleryMT20, final ImageGallery imageGallery) {
@@ -252,6 +265,9 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 		int itemImageWidth = _photoWidth;
 		int itemImageHeight = _photoHeight;
+
+		// center ratings stars in the middle of the image
+		_ratingStarsRightBorder = _photoWidth / 2 + MAX_RATING_STARS_WIDTH / 2;
 
 		// ignore border for small images
 		final boolean isBorder = itemImageWidth - _imageBorder >= _textMinThumbSize;
@@ -1004,9 +1020,18 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 	private void drawRatingStars(final GC gc, final GalleryMT20Item galleryItem, final int ratingStars) {
 
-		final boolean isItemHovered = galleryItem.isHovered;
+		final boolean isItemHovered = galleryItem.isHovered || galleryItem.isSelectedButNotHovered;
 		final int hoveredStars = galleryItem.hoveredStars;
 		final boolean isStarHovered = hoveredStars > 0;
+
+		System.out.println(UI.timeStampNano()
+				+ (" isHovered=" + galleryItem.isHovered)
+				+ ("\tselected=" + galleryItem.isSelectedButNotHovered)
+				+ ("\t" + galleryItem.uniqueItemID));
+		// TODO remove SYSTEM.OUT.PRINTLN
+
+		// center ratings stars in the middle of the image
+		final int ratingStarsRightBorder = galleryItem.photoPaintedX + _photoWidth / 2 + MAX_RATING_STARS_WIDTH / 2;
 
 		for (int starIndex = 0; starIndex < MAX_RATING_STARS; starIndex++) {
 
@@ -1045,7 +1070,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 			}
 
 			gc.drawImage(starImage, //
-					galleryItem.photoPaintedX + _photoWidth - (_ratingStarImageWidth * (starIndex + 1)),
+					ratingStarsRightBorder - (_ratingStarImageWidth * (starIndex + 1)),
 					galleryItem.photoPaintedY);
 		}
 	}
@@ -1209,30 +1234,148 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		return _gridBorder + _imageBorder;
 	}
 
+	public boolean isMouseDownOnItem(final GalleryMT20Item galleryItem, final int itemMouseX, final int itemMouseY) {
+
+		final IPhotoServiceProvider photoServiceProvider = _galleryMT.getPhotoServiceProvider();
+		if (photoServiceProvider == null) {
+			return false;
+		}
+
+		if (isRatingStarsHovered(itemMouseX, itemMouseY)) {
+
+			// save star rating in the selected tours
+
+			final IGalleryCustomData itemCustomData = galleryItem.customData;
+			if (itemCustomData instanceof Photo) {
+
+				final Photo hoveredPhoto = (Photo) itemCustomData;
+
+				int hoveredStars = galleryItem.hoveredStars;
+
+				if (hoveredStars == hoveredPhoto.ratingStars) {
+
+					/**
+					 * Feature to remove rating stars:
+					 * <p>
+					 * When a rating star is hit and this rating is already set in the photo, the
+					 * ratings stars are removed.
+					 */
+
+					hoveredStars = 0;
+				}
+
+				final ArrayList<Photo> photos = new ArrayList<Photo>();
+				final HashMap<String, GalleryMT20Item> selectedItems = _galleryMT.getSelectedItems();
+
+				if (selectedItems.containsKey(galleryItem.uniqueItemID)) {
+
+					/*
+					 * A selected item is hit by the mouse, the star rating is set for all selected
+					 * items.
+					 */
+
+					for (final GalleryMT20Item item : selectedItems.values()) {
+
+						final IGalleryCustomData customData = item.customData;
+
+						if (customData instanceof Photo) {
+
+							final Photo photo = (Photo) customData;
+							photo.ratingStars = hoveredStars;
+
+							photos.add(photo);
+						}
+					}
+
+				} else {
+
+					/*
+					 * An unselected item is hit by the mouse, only for this item the star rating is
+					 * set
+					 */
+
+					hoveredPhoto.ratingStars = hoveredStars;
+
+					photos.add(hoveredPhoto);
+				}
+
+				if (photos.size() > 0) {
+
+					photoServiceProvider.saveStarRating(photos);
+
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * @param itemMouseX
+	 * @param itemMouseY
+	 * @return Returns <code>true</code> when the rating star area in a gallery item is hovered.
+	 */
+	private boolean isRatingStarsHovered(final int itemMouseX, final int itemMouseY) {
+
+		return itemMouseX <= _ratingStarsRightBorder//
+				//
+				&& itemMouseX >= _ratingStarsRightBorder - MAX_RATING_STARS_WIDTH;
+//				&& itemMouseY <= _ratingStarImageHeight;
+	}
+
 	/**
 	 * @param hoveredItem
 	 * @param itemMouseX
 	 * @param itemMouseY
-	 * @return Returns <code>true</code> when a sensitive area in the gallery item is hovered and
-	 *         must be repainted to draw the hovered state.
 	 */
 	public void itemIsHovered(final GalleryMT20Item hoveredItem, final int itemMouseX, final int itemMouseY) {
 
-		final int hoveredPhotoX = itemMouseX + _gridBorder;
+		int hoveredStars;
 
-		if (itemMouseX <= _photoWidth//
-				//
-				&& itemMouseX >= _photoWidth - (MAX_RATING_STARS * _ratingStarImageWidth)
-				&& itemMouseY <= _ratingStarImageHeight
-		//
-		) {
+		if (isRatingStarsHovered(itemMouseX, itemMouseY)) {
 
-			hoveredItem.hoveredStars = (_photoWidth - hoveredPhotoX) / _ratingStarImageWidth + 1;
+			final int hoveredPhotoX = itemMouseX + _gridBorder;
+
+			hoveredStars = (_ratingStarsRightBorder - hoveredPhotoX) / _ratingStarImageWidth + 1;
 
 		} else {
 
-			hoveredItem.hoveredStars = 0;
+			hoveredStars = 0;
 		}
+
+		final HashMap<String, GalleryMT20Item> selectedItemsMap = _galleryMT.getSelectedItems();
+
+		System.out.println(UI.timeStampNano()
+				+ ("\tindizes=" + _galleryMT.getSelectionIndex().length)
+				+ " selectedItemsMap "
+				+ selectedItemsMap
+);
+		// TODO remove SYSTEM.OUT.PRINTLN
+
+		if (selectedItemsMap.containsKey(hoveredItem.uniqueItemID)) {
+
+			/*
+			 * A selected item is hit by the mouse, the star rating is set for all selected items.
+			 */
+
+			final Collection<GalleryMT20Item> selectedItems = selectedItemsMap.values();
+
+			for (final GalleryMT20Item item : selectedItems) {
+				item.hoveredStars = hoveredStars;
+			}
+
+			hoveredItem.notHoveredButSelectedItems = selectedItems;
+
+		} else {
+
+			/*
+			 * An unselected item is hit by the mouse, only for this item the star rating is set
+			 */
+
+			hoveredItem.hoveredStars = hoveredStars;
+		}
+
 	}
 
 	@Override

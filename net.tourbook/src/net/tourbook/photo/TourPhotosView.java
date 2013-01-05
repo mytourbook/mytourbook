@@ -58,7 +58,7 @@ import org.eclipse.ui.part.ViewPart;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-public class TourPhotosView extends ViewPart implements IPhotoEventListener {
+public class TourPhotosView extends ViewPart implements IPhotoEventListener, IPhotoServiceProvider {
 
 	public static final String				ID								= "net.tourbook.photo.TourPhotosView.ID";	//$NON-NLS-1$
 
@@ -324,6 +324,8 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 					new PhotoGalleryProvider());
 
 			_photoGallery.setDefaultStatusMessage(Messages.Photo_Gallery_Label_NoTourWithPhoto);
+			
+			_photoGallery.setPhotoServiceProvider(this);
 		}
 	}
 
@@ -533,6 +535,15 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 		_photoGallery.setVertical(_isVerticalGallery);
 
 		updateUI_ToogleAction();
+	}
+
+	@Override
+	public void saveStarRating(final ArrayList<Photo> photos) {
+
+		for (final Photo photo : photos) {
+
+		}
+		
 	}
 
 	private void saveState() {

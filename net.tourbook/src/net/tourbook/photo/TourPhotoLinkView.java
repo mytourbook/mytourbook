@@ -335,9 +335,9 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 				if (isRealTour) {
 
-					final ArrayList<Photo> tourPhotoWrapper = photoLink.linkPhotos;
+					final ArrayList<Photo> linkPhotos = photoLink.linkPhotos;
 
-					if (tourPhotoWrapper.size() > 0) {
+					if (linkPhotos.size() > 0) {
 
 						final TourData tourData = tourManager.getTourData(photoLink.tourId);
 
@@ -348,9 +348,9 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 							// remove previous photos
 							tourPhotos.clear();
 
-							for (final Photo photoWrapper : tourPhotoWrapper) {
+							for (final Photo linkPhoto : linkPhotos) {
 
-								final TourPhoto tourPhoto = new TourPhoto(tourData, photoWrapper);
+								final TourPhoto tourPhoto = new TourPhoto(tourData, linkPhoto);
 
 								tourPhotos.add(tourPhoto);
 							}

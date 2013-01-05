@@ -632,7 +632,7 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 	private void showImages_10_InGallery() {
 
 		final IPhotoProvider photoProvider = _sourceGallery.getPhotoProvider();
-		final Photo[] photoWrapper = photoProvider.getSortedAndFilteredPhotoWrapper();
+		final Photo[] photoWrapper = photoProvider.getSortedAndFilteredPhotos();
 
 		final int photosHash = photoWrapper.hashCode();
 		final String galleryPositionKey = photosHash + "_FullScreenPhotoGallery";//$NON-NLS-1$

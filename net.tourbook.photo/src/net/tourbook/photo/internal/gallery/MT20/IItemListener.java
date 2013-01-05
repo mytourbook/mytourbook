@@ -18,6 +18,17 @@ package net.tourbook.photo.internal.gallery.MT20;
 public interface IItemListener {
 
 	/**
+	 * Mouse down event occured in the gallery item.
+	 * 
+	 * @param mouseDownItem
+	 * @param itemMouseX
+	 * @param itemMouseY
+	 * @return Returns <code>true</code> when the mouse down event is handled and no further actions
+	 *         should be done in the gallery (e.g. no select item).
+	 */
+	public boolean itemMouseDown(GalleryMT20Item mouseDownItem, int itemMouseX, int itemMouseY);
+
+	/**
 	 * Mouse has hovered another gallery item.
 	 * 
 	 * @param exitHoveredItem
@@ -27,7 +38,7 @@ public interface IItemListener {
 	 * @param itemMouseX
 	 *            Mouse Y position relative to the hovered item.
 	 */
-	public void exitItem(GalleryMT20Item exitHoveredItem, int itemMouseX, int itemMouseY);
+	public void itemMouseExit(GalleryMT20Item exitHoveredItem, int itemMouseX, int itemMouseY);
 
 	/**
 	 * Mouse has hovered a gallery item.
@@ -39,6 +50,6 @@ public interface IItemListener {
 	 * @param itemMouseX
 	 *            Mouse Y position relative to the hovered item.
 	 */
-	public void hoveredItem(GalleryMT20Item hoveredItem, int itemMouseX, int itemMouseY);
+	public void itemMouseHovered(GalleryMT20Item hoveredItem, int itemMouseX, int itemMouseY);
 
 }

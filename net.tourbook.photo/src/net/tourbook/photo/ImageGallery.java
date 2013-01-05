@@ -1084,26 +1084,6 @@ public class ImageGallery implements IItemListener, IGalleryContextMenuProvider,
 	}
 
 	@Override
-	public void exitItem(final GalleryMT20Item exitHoveredItem, final int itemMouseX, final int itemMouseY) {
-
-		if (_isShowPhotoRatingStars && exitHoveredItem != null) {
-
-//			System.out.println(UI.timeStampNano() + " exitHoveredItem " + exitHoveredItem);
-//			// TODO remove SYSTEM.OUT.PRINTLN
-
-			exitHoveredItem.hoveredStars = 0;
-			exitHoveredItem.isHovered = false;
-
-			_galleryMT20.redraw(
-					exitHoveredItem.viewPortX,
-					exitHoveredItem.viewPortY,
-					exitHoveredItem.width,
-					exitHoveredItem.height,
-					false);
-		}
-	}
-
-	@Override
 	public void fillContextMenu(final IMenuManager menuMgr) {
 
 		menuMgr.add(new Separator(UI.MENU_SEPARATOR_ADDITIONS));
@@ -1287,10 +1267,8 @@ public class ImageGallery implements IItemListener, IGalleryContextMenuProvider,
 	}
 
 	@Override
-	public Photo[] getSortedAndFilteredPhotoWrapper() {
-
+	public Photo[] getSortedAndFilteredPhotos() {
 		return _sortedAndFilteredPhotos;
-
 	}
 
 	/**
@@ -1357,28 +1335,6 @@ public class ImageGallery implements IItemListener, IGalleryContextMenuProvider,
 		} else if (property.equals(IPhotoPreferences.PHOTO_VIEWER_FONT)) {
 
 			onModifyFont();
-		}
-	}
-
-	@Override
-	public void hoveredItem(final GalleryMT20Item hoveredItem, final int itemMouseX, final int itemMouseY) {
-
-		if (_isShowTooltip) {
-			_photoGalleryTooltip.show(hoveredItem);
-		}
-
-		if (_isShowPhotoRatingStars && hoveredItem != null) {
-
-			hoveredItem.isHovered = true;
-
-			_photoRenderer.itemIsHovered(hoveredItem, itemMouseX, itemMouseY);
-
-			_galleryMT20.redraw(
-					hoveredItem.viewPortX,
-					hoveredItem.viewPortY,
-					hoveredItem.width,
-					hoveredItem.height,
-					false);
 		}
 	}
 
@@ -1473,6 +1429,83 @@ public class ImageGallery implements IItemListener, IGalleryContextMenuProvider,
 		}
 
 		return isLoaded[0];
+	}
+
+	@Override
+	public boolean itemMouseDown(final GalleryMT20Item mouseDownItem, final int itemMouseX, final int itemMouseY) {
+
+		if (_isShowPhotoRatingStars && mouseDownItem != null) {
+
+			if (_photoRenderer.isMouseDownOnItem(mouseDownItem, itemMouseX, itemMouseY)) {
+
+				_galleryMT20.redraw(
+						mouseDownItem.viewPortX,
+						mouseDownItem.viewPortY,
+						mouseDownItem.width,
+						mouseDownItem.height,
+						false);
+
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	@Override
+	public void itemMouseExit(final GalleryMT20Item exitHoveredItem, final int itemMouseX, final int itemMouseY) {
+
+		if (_isShowPhotoRatingStars && exitHoveredItem != null) {
+
+			exitHoveredItem.hoveredStars = 0;
+			exitHoveredItem.isHovered = false;
+
+			if (exitHoveredItem.notHoveredButSelectedItems != null) {
+
+				for (final GalleryMT20Item selectedNotHoveredItems : exitHoveredItem.notHoveredButSelectedItems) {
+					selectedNotHoveredItems.isSelectedButNotHovered = false;
+				}
+
+				exitHoveredItem.notHoveredButSelectedItems.clear();
+				exitHoveredItem.notHoveredButSelectedItems = null;
+			}
+
+			_galleryMT20.redraw(
+					exitHoveredItem.viewPortX,
+					exitHoveredItem.viewPortY,
+					exitHoveredItem.width,
+					exitHoveredItem.height,
+					false);
+		}
+	}
+
+	@Override
+	public void itemMouseHovered(final GalleryMT20Item hoveredItem, final int itemMouseX, final int itemMouseY) {
+
+		if (_isShowTooltip) {
+			_photoGalleryTooltip.show(hoveredItem);
+		}
+
+		if (_isShowPhotoRatingStars && hoveredItem != null) {
+
+			hoveredItem.isHovered = true;
+
+			_photoRenderer.itemIsHovered(hoveredItem, itemMouseX, itemMouseY);
+
+			if (hoveredItem.notHoveredButSelectedItems != null) {
+
+				for (final GalleryMT20Item selectedNotHoveredItems : hoveredItem.notHoveredButSelectedItems) {
+					selectedNotHoveredItems.isSelectedButNotHovered = true;
+				}
+			}
+
+			_galleryMT20.redraw(
+					hoveredItem.viewPortX,
+					hoveredItem.viewPortY,
+					hoveredItem.width,
+					hoveredItem.height,
+					false);
+		}
 	}
 
 	private void jobFilter_10_Create() {
@@ -2282,6 +2315,10 @@ public class ImageGallery implements IItemListener, IGalleryContextMenuProvider,
 
 		_fullScreenImageViewer = fullScreenImageViewer;
 		_galleryMT20.setFullScreenImageViewer(fullScreenImageViewer);
+	}
+
+	public void setPhotoServiceProvider(final IPhotoServiceProvider photoServiceProvider) {
+		_galleryMT20.setPhotoServiceProvider(photoServiceProvider);
 	}
 
 	/**

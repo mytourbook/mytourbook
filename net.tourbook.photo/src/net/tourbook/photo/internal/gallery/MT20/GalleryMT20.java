@@ -23,6 +23,7 @@ import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.photo.IExternalGalleryListener;
 import net.tourbook.photo.IPhotoProvider;
+import net.tourbook.photo.IPhotoServiceProvider;
 import net.tourbook.photo.internal.Messages;
 import net.tourbook.photo.internal.preferences.PrefPagePhotoDirectory;
 
@@ -171,8 +172,11 @@ public abstract class GalleryMT20 extends Canvas {
 
 	/**
 	 * Contains gallery items which are currently be selected in the UI.
+	 * <p>
+	 * The key is {@link GalleryMT20Item#uniqueItemID}
 	 */
 	private HashMap<String, GalleryMT20Item>	_selectedItems				= new HashMap<String, GalleryMT20Item>();
+
 	private int[]								_initialSelectedItems;
 
 	/**
@@ -229,6 +233,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 	private int									_lastZoomEventTime;
 
+	private boolean								_isDoNotHandleMouseUp;
 	private boolean								_isMouseClickHandled;
 	private boolean								_isGalleryPanned;
 	/**
@@ -281,6 +286,7 @@ public abstract class GalleryMT20 extends Canvas {
 	private boolean								_isShowOtherShellActions	= true;
 
 	private IPhotoProvider						_photoProvider;
+	private IPhotoServiceProvider				_photoServiceProvider;
 
 	/**
 	 * Mouse X position within a gallery item, useful when item is hovered to get the exact
@@ -696,13 +702,13 @@ public abstract class GalleryMT20 extends Canvas {
 	}
 
 	/**
-	 * fire exit event to the previous hovered item listener
+	 * Fire exit event to the previous hovered item listener
 	 */
 	private void fireItemExitEvent() {
 
 		final Object[] listeners = _itemListeners.getListeners();
 		for (final Object listener : listeners) {
-			((IItemListener) listener).exitItem(_currentHoveredItem, _itemMouseX, _itemMouseY);
+			((IItemListener) listener).itemMouseExit(_currentHoveredItem, _itemMouseX, _itemMouseY);
 		}
 	}
 
@@ -734,8 +740,32 @@ public abstract class GalleryMT20 extends Canvas {
 		// fire event to the hovered listener
 		final Object[] listeners = _itemListeners.getListeners();
 		for (final Object listener : listeners) {
-			((IItemListener) listener).hoveredItem(hoveredItem, _itemMouseX, _itemMouseY);
+			((IItemListener) listener).itemMouseHovered(hoveredItem, _itemMouseX, _itemMouseY);
 		}
+	}
+
+	/**
+	 * Fires mouse down event for the current hovered item.
+	 * 
+	 * @return Returns <code>true</code> when the event is handeled and no further actions should be
+	 *         done in the gallery.
+	 */
+	private boolean fireItemMouseDownEvent() {
+
+		final Object[] listeners = _itemListeners.getListeners();
+		for (final Object listener : listeners) {
+
+			final boolean isEventHandled = ((IItemListener) listener).itemMouseDown(
+					_currentHoveredItem,
+					_itemMouseX,
+					_itemMouseY);
+
+			if (isEventHandled) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -777,6 +807,12 @@ public abstract class GalleryMT20 extends Canvas {
 			int firstItem;
 			int lastItem;
 
+// VERY IMPORTANT - 5.1.2013
+//
+// getting only ONE item would disable the feature when hovering the star rating area and the stars are highlighted in ALL selected photos
+//
+//
+//
 // this is not working, some items are not displayed !!!
 //			if (clipWidth == _itemWidth) {
 //
@@ -791,8 +827,8 @@ public abstract class GalleryMT20 extends Canvas {
 //
 //			} else {
 
-				firstItem = firstLine * _gridHorizItems;
-				lastItem = (lastLine + 1) * _gridHorizItems;
+			firstItem = firstLine * _gridHorizItems;
+			lastItem = (lastLine + 1) * _gridHorizItems;
 //			}
 
 			// exit if no item selected
@@ -1029,6 +1065,10 @@ public abstract class GalleryMT20 extends Canvas {
 		return _photoProvider;
 	}
 
+	public IPhotoServiceProvider getPhotoServiceProvider() {
+		return _photoServiceProvider;
+	}
+
 	public int getScrollBarIncrement() {
 
 		if (_isVertical) {
@@ -1042,6 +1082,13 @@ public abstract class GalleryMT20 extends Canvas {
 
 //		// Standard behavior
 //		return 16;
+	}
+
+	/**
+	 * @return Returns all selected items in a hashmap.
+	 */
+	public HashMap<String, GalleryMT20Item> getSelectedItems() {
+		return _selectedItems;
 	}
 
 	/**
@@ -1653,6 +1700,15 @@ public abstract class GalleryMT20 extends Canvas {
 
 	private void onMouseDown(final MouseEvent mouseEvent) {
 
+		if (fireItemMouseDownEvent()) {
+
+			// prevent handling of mouse up, this could select the gallery item which is not intended
+
+			_isDoNotHandleMouseUp = true;
+
+			return;
+		}
+
 		if (_externalGalleryListener != null) {
 			if (_externalGalleryListener.isMouseEventHandledExternally(SWT.MouseDown, mouseEvent)) {
 				redrawGallery();
@@ -1843,6 +1899,11 @@ public abstract class GalleryMT20 extends Canvas {
 	}
 
 	private void onMouseUp(final MouseEvent mouseEvent) {
+
+		if (_isDoNotHandleMouseUp) {
+			_isDoNotHandleMouseUp = false;
+			return;
+		}
 
 		if (_externalGalleryListener != null) {
 			if (_externalGalleryListener.isMouseEventHandledExternally(SWT.MouseUp, mouseEvent)) {
@@ -2665,6 +2726,12 @@ public abstract class GalleryMT20 extends Canvas {
 		_maxItemWidth = maxItemSize;
 	}
 
+//	public void setSelection(final Collection<GalleryMT20Item> selection) {
+//
+//		// IS NOT YET IMPLEMENTED
+//
+//	}
+
 	/**
 	 * Set item receiver. Usually, this does not trigger gallery update. redraw must be called right
 	 * after setGroupRenderer to reflect this change.
@@ -2680,14 +2747,12 @@ public abstract class GalleryMT20 extends Canvas {
 		redrawGallery();
 	}
 
-//	public void setSelection(final Collection<GalleryMT20Item> selection) {
-//
-//		// IS NOT YET IMPLEMENTED
-//
-//	}
-
 	public void setPhotoProvider(final IPhotoProvider photoProvider) {
 		_photoProvider = photoProvider;
+	}
+
+	public void setPhotoServiceProvider(final IPhotoServiceProvider photoServiceProvider) {
+		_photoServiceProvider = photoServiceProvider;
 	}
 
 	public void setSelectedItemIndex(final int itemIndex) {

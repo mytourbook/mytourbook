@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.photo.internal.gallery.MT20;
 
+import java.util.Collection;
+
 /**
  * This gallery has it's origin in http://www.eclipse.org/nebula/widgets/gallery/gallery.php but has
  * been modified in many areas, like grouping has been removed, filtering has been added.
@@ -22,62 +24,53 @@ package net.tourbook.photo.internal.gallery.MT20;
 
 public class GalleryMT20Item {
 
-	public GalleryMT20			gallery;
+	public GalleryMT20					gallery;
 
 	/**
 	 * Screen viewport for this gallery item where it is painted for the currently scrolled gallery
 	 * position.
 	 */
-	public int					viewPortX;
-	public int					viewPortY;
+	public int							viewPortX;
+	public int							viewPortY;
 
-	public int					width;
-	public int					height;
+	public int							width;
+	public int							height;
 
-	public IGalleryCustomData	customData;
+	public IGalleryCustomData			customData;
 
 	/**
 	 * Each gallery item needs a uniqueue id.
 	 */
-	public String				uniqueItemID;
+	public String						uniqueItemID;
 
 	/**
 	 * When width is <code>-1</code>, the image is not yet painted
 	 */
-	public int					imagePaintedWidth	= -1;
-	public int					imagePaintedHeight;
-
-//	/**
-//	 * Is <code>true</code> when gallery item is hovered with the mouse. This state is reset in the
-//	 * item painter.
-//	 */
-//	public boolean				isRatingStarsHovered;
-//
-//	/**
-//	 * Is <code>true</code> when hovered star rating is not hovered any more and the star drawing
-//	 * should be reset.
-//	 */
-//	public boolean				isResetRatingStarsHovered;
-
-	/**
-	 * Number of stars which are hovered.
-	 */
-	public int					hoveredStars;
+	public int							imagePaintedWidth	= -1;
+	public int							imagePaintedHeight;
 
 	/**
 	 * Is <code>true</code> when this gallery item is currently be hovered with the mouse.
 	 */
-	public boolean				isHovered;
+	public boolean						isHovered;
+
+	public boolean						isSelectedButNotHovered;
+	public Collection<GalleryMT20Item>	notHoveredButSelectedItems;
+
+	/**
+	 * Number of stars which are hovered.
+	 */
+	public int							hoveredStars;
 
 	/**
 	 * X position where this gallery item is painted on the canvas.
 	 */
-	public int					photoPaintedX;
+	public int							photoPaintedX;
 
 	/**
 	 * Y position where this gallery item is painted on the canvas.
 	 */
-	public int					photoPaintedY;
+	public int							photoPaintedY;
 
 	public GalleryMT20Item(final GalleryMT20 galleryMT20) {
 		this.gallery = galleryMT20;
