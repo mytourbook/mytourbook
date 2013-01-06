@@ -308,9 +308,6 @@ public abstract class GalleryMT20 extends Canvas {
 				return;
 			}
 
-//			System.out.println(UI.timeStampNano() + " RedrawTimer\t");
-//			// TODO remove SYSTEM.OUT.PRINTLN
-
 			redrawGallery();
 		}
 	}
@@ -572,6 +569,13 @@ public abstract class GalleryMT20 extends Canvas {
 	}
 
 	/**
+	 * Is called before a selection is modified.
+	 */
+	protected void beforeModifySelection() {
+
+	}
+
+	/**
 	 * Center selected item
 	 * 
 	 * @return Returns center position ratio for the last selected gallery item.
@@ -636,14 +640,6 @@ public abstract class GalleryMT20 extends Canvas {
 		setMenu(_contextMenuMgr.createContextMenu(this));
 	}
 
-	private void delay() {
-		try {
-			Thread.sleep(300);
-		} catch (final InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
-
 	/**
 	 * Deselects all items.
 	 */
@@ -661,6 +657,8 @@ public abstract class GalleryMT20 extends Canvas {
 	 *            If true, a selection event will be sent to all the current selection listeners.
 	 */
 	private void deselectAll(final boolean isNotifyListeners) {
+
+		beforeModifySelection();
 
 		_lastSelectedItem = null;
 		_selectedItems.clear();
@@ -703,12 +701,15 @@ public abstract class GalleryMT20 extends Canvas {
 
 	/**
 	 * Fire exit event to the previous hovered item listener
+	 * 
+	 * @param exitHoveredItem
+	 * @param newHoveredItem
 	 */
-	private void fireItemExitEvent() {
+	private void fireItemExitEvent(final GalleryMT20Item exitHoveredItem) {
 
 		final Object[] listeners = _itemListeners.getListeners();
 		for (final Object listener : listeners) {
-			((IItemListener) listener).itemMouseExit(_currentHoveredItem, _itemMouseX, _itemMouseY);
+			((IItemListener) listener).onItemMouseExit(exitHoveredItem, _itemMouseX, _itemMouseY);
 		}
 	}
 
@@ -731,8 +732,12 @@ public abstract class GalleryMT20 extends Canvas {
 			}
 		}
 
-		if (_currentHoveredItem != null && _currentHoveredItem != hoveredItem) {
-			fireItemExitEvent();
+		if (_currentHoveredItem != null //
+				//
+				// fire the exit event only when another item is hovered
+				&& _currentHoveredItem != hoveredItem) {
+
+			fireItemExitEvent(_currentHoveredItem);
 		}
 
 		_currentHoveredItem = hoveredItem;
@@ -740,7 +745,7 @@ public abstract class GalleryMT20 extends Canvas {
 		// fire event to the hovered listener
 		final Object[] listeners = _itemListeners.getListeners();
 		for (final Object listener : listeners) {
-			((IItemListener) listener).itemMouseHovered(hoveredItem, _itemMouseX, _itemMouseY);
+			((IItemListener) listener).onItemMouseHovered(hoveredItem, _itemMouseX, _itemMouseY);
 		}
 	}
 
@@ -755,7 +760,7 @@ public abstract class GalleryMT20 extends Canvas {
 		final Object[] listeners = _itemListeners.getListeners();
 		for (final Object listener : listeners) {
 
-			final boolean isEventHandled = ((IItemListener) listener).itemMouseDown(
+			final boolean isEventHandled = ((IItemListener) listener).onItemMouseDown(
 					_currentHoveredItem,
 					_itemMouseX,
 					_itemMouseY);
@@ -1037,9 +1042,6 @@ public abstract class GalleryMT20 extends Canvas {
 		_itemMouseX = contentPosX - indexX * _itemWidth;
 		_itemMouseY = contentPosY - indexY * _itemHeight;
 
-//		System.out.println(UI.timeStampNano() + " item x=" + _itemMouseX + "\ty=" + _itemMouseY);
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
 		return itemIndex;
 	}
 
@@ -1085,7 +1087,7 @@ public abstract class GalleryMT20 extends Canvas {
 	}
 
 	/**
-	 * @return Returns all selected items in a hashmap.
+	 * @return Returns all items which are selected.
 	 */
 	public HashMap<String, GalleryMT20Item> getSelectedItems() {
 		return _selectedItems;
@@ -1765,7 +1767,9 @@ public abstract class GalleryMT20 extends Canvas {
 
 	private void onMouseExit(final MouseEvent e) {
 
-		fireItemExitEvent();
+		if (_currentHoveredItem != null) {
+			fireItemExitEvent(_currentHoveredItem);
+		}
 	}
 
 	private void onMouseHandleCtrlLeft(	final MouseEvent e,
@@ -2052,12 +2056,6 @@ public abstract class GalleryMT20 extends Canvas {
 				final int numberOfAreaItems = areaItemsIndices.length;
 				if (numberOfAreaItems > 0) {
 
-//					System.out.println(UI.timeStampNano()
-//							+ " clippingArea="
-//							+ clippingArea
-//							+ ("\titems=" + numberOfAreaItems));
-//					// TODO remove SYSTEM.OUT.PRINTLN
-
 					final int virtualLength = _virtualGalleryItems.length;
 
 					// loop: all gallery items in the clipping area
@@ -2330,6 +2328,8 @@ public abstract class GalleryMT20 extends Canvas {
 			return;
 		}
 
+		beforeModifySelection();
+
 		// Deselect all items if multi selection is disabled
 		if (!_isMultiSelection) {
 			deselectAll(false);
@@ -2373,6 +2373,8 @@ public abstract class GalleryMT20 extends Canvas {
 	 * @param itemIndex
 	 */
 	private void selectionRemove(final int itemIndex) {
+
+		beforeModifySelection();
 
 		_selectionFlags[itemIndex >> 5] &= ~(1 << (itemIndex & 0x1f));
 

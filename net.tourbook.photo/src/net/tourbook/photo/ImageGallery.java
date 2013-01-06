@@ -292,6 +292,8 @@ public class ImageGallery implements IItemListener, IGalleryContextMenuProvider,
 	private ColumnManager			_columnManager;
 	private PixelConverter			_pc;
 
+	private GalleryMT20Item			_hoveredItem;
+
 	private int[]					_delayCounter					= { 0 };
 
 	private final DateTimeFormatter	_dateFormatter					= DateTimeFormat.mediumDate();
@@ -418,6 +420,11 @@ public class ImageGallery implements IItemListener, IGalleryContextMenuProvider,
 
 		public GalleryImplementation(final Composite parent, final int style, final IDialogSettings state) {
 			super(parent, style, state);
+		}
+
+		@Override
+		protected void beforeModifySelection() {
+			onBeforeModifyGallerySelection();
 		}
 
 		@Override
@@ -868,6 +875,23 @@ public class ImageGallery implements IItemListener, IGalleryContextMenuProvider,
 		});
 	}
 
+	/**
+	 * column: tour start time
+	 */
+	private void defineColumn_ExifTime() {
+
+		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_TIME.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Photo photo = (Photo) cell.getElement();
+
+				cell.setText(_timeFormatter.print(photo.imageExifTime));
+			}
+		});
+	}
+
 //	/**
 //	 * column: altitude
 //	 */
@@ -892,23 +916,6 @@ public class ImageGallery implements IItemListener, IGalleryContextMenuProvider,
 //	}
 
 	/**
-	 * column: tour start time
-	 */
-	private void defineColumn_ExifTime() {
-
-		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_TIME.createColumn(_columnManager, _pc);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Photo photo = (Photo) cell.getElement();
-
-				cell.setText(_timeFormatter.print(photo.imageExifTime));
-			}
-		});
-	}
-
-	/**
 	 * column: image direction degree
 	 */
 	private void defineColumn_ImageDirectionDegree() {
@@ -928,6 +935,32 @@ public class ImageGallery implements IItemListener, IGalleryContextMenuProvider,
 					cell.setText(UI.EMPTY_STRING);
 				} else {
 					cell.setText(Integer.toString((int) imageDirection));
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: image direction degree
+	 */
+	private void defineColumn_ImageDirectionText() {
+
+		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_IMAGE_DIRECTION_TEXT//
+				.createColumn(_columnManager, _pc);
+
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Photo photo = (Photo) cell.getElement();
+				final double imageDirection = photo.getImageDirection();
+
+				if (imageDirection == Double.MIN_VALUE) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					final int imageDirectionInt = (int) imageDirection;
+					cell.setText(getDirectionText(imageDirectionInt));
 				}
 			}
 		});
@@ -957,12 +990,11 @@ public class ImageGallery implements IItemListener, IGalleryContextMenuProvider,
 //	}
 
 	/**
-	 * column: image direction degree
+	 * column: name
 	 */
-	private void defineColumn_ImageDirectionText() {
+	private void defineColumn_ImageFileName() {
 
-		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_IMAGE_DIRECTION_TEXT//
-				.createColumn(_columnManager, _pc);
+		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_NAME.createColumn(_columnManager, _pc);
 
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -970,14 +1002,8 @@ public class ImageGallery implements IItemListener, IGalleryContextMenuProvider,
 			public void update(final ViewerCell cell) {
 
 				final Photo photo = (Photo) cell.getElement();
-				final double imageDirection = photo.getImageDirection();
 
-				if (imageDirection == Double.MIN_VALUE) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					final int imageDirectionInt = (int) imageDirection;
-					cell.setText(getDirectionText(imageDirectionInt));
-				}
+				cell.setText(photo.imageFileName);
 			}
 		});
 	}
@@ -1004,25 +1030,6 @@ public class ImageGallery implements IItemListener, IGalleryContextMenuProvider,
 //			}
 //		});
 //	}
-
-	/**
-	 * column: name
-	 */
-	private void defineColumn_ImageFileName() {
-
-		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_NAME.createColumn(_columnManager, _pc);
-
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Photo photo = (Photo) cell.getElement();
-
-				cell.setText(photo.imageFileName);
-			}
-		});
-	}
 
 	/**
 	 * column: location
@@ -1429,83 +1436,6 @@ public class ImageGallery implements IItemListener, IGalleryContextMenuProvider,
 		}
 
 		return isLoaded[0];
-	}
-
-	@Override
-	public boolean itemMouseDown(final GalleryMT20Item mouseDownItem, final int itemMouseX, final int itemMouseY) {
-
-		if (_isShowPhotoRatingStars && mouseDownItem != null) {
-
-			if (_photoRenderer.isMouseDownOnItem(mouseDownItem, itemMouseX, itemMouseY)) {
-
-				_galleryMT20.redraw(
-						mouseDownItem.viewPortX,
-						mouseDownItem.viewPortY,
-						mouseDownItem.width,
-						mouseDownItem.height,
-						false);
-
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	@Override
-	public void itemMouseExit(final GalleryMT20Item exitHoveredItem, final int itemMouseX, final int itemMouseY) {
-
-		if (_isShowPhotoRatingStars && exitHoveredItem != null) {
-
-			exitHoveredItem.hoveredStars = 0;
-			exitHoveredItem.isHovered = false;
-
-			if (exitHoveredItem.notHoveredButSelectedItems != null) {
-
-				for (final GalleryMT20Item selectedNotHoveredItems : exitHoveredItem.notHoveredButSelectedItems) {
-					selectedNotHoveredItems.isSelectedButNotHovered = false;
-				}
-
-				exitHoveredItem.notHoveredButSelectedItems.clear();
-				exitHoveredItem.notHoveredButSelectedItems = null;
-			}
-
-			_galleryMT20.redraw(
-					exitHoveredItem.viewPortX,
-					exitHoveredItem.viewPortY,
-					exitHoveredItem.width,
-					exitHoveredItem.height,
-					false);
-		}
-	}
-
-	@Override
-	public void itemMouseHovered(final GalleryMT20Item hoveredItem, final int itemMouseX, final int itemMouseY) {
-
-		if (_isShowTooltip) {
-			_photoGalleryTooltip.show(hoveredItem);
-		}
-
-		if (_isShowPhotoRatingStars && hoveredItem != null) {
-
-			hoveredItem.isHovered = true;
-
-			_photoRenderer.itemIsHovered(hoveredItem, itemMouseX, itemMouseY);
-
-			if (hoveredItem.notHoveredButSelectedItems != null) {
-
-				for (final GalleryMT20Item selectedNotHoveredItems : hoveredItem.notHoveredButSelectedItems) {
-					selectedNotHoveredItems.isSelectedButNotHovered = true;
-				}
-			}
-
-			_galleryMT20.redraw(
-					hoveredItem.viewPortX,
-					hoveredItem.viewPortY,
-					hoveredItem.width,
-					hoveredItem.height,
-					false);
-		}
 	}
 
 	private void jobFilter_10_Create() {
@@ -2031,6 +1961,48 @@ public class ImageGallery implements IItemListener, IGalleryContextMenuProvider,
 		}
 	}
 
+	private void onBeforeModifyGallerySelection() {
+
+		if (_hoveredItem == null) {
+			return;
+		}
+
+		_hoveredItem.hoveredStars = 0;
+		_hoveredItem.isHovered = false;
+
+		if (_hoveredItem.allSelectedGalleryItems != null) {
+
+			for (final GalleryMT20Item selectedItems : _hoveredItem.allSelectedGalleryItems) {
+
+				selectedItems.isInHoveredGroup = false;
+
+				_galleryMT20.redraw(
+						selectedItems.viewPortX,
+						selectedItems.viewPortY,
+						selectedItems.width,
+						selectedItems.height,
+						false);
+			}
+
+			/**
+			 * This collection cannot be cleared because it's the original list with selected items
+			 * in the gallery, so only the reference is set to <code>null</code>.
+			 */
+			_hoveredItem.allSelectedGalleryItems = null;
+
+		} else {
+
+			_galleryMT20.redraw(
+					_hoveredItem.viewPortX,
+					_hoveredItem.viewPortY,
+					_hoveredItem.width,
+					_hoveredItem.height,
+					false);
+		}
+
+		_hoveredItem = null;
+	}
+
 	private void onDispose() {
 
 		if (_galleryFont != null) {
@@ -2038,6 +2010,112 @@ public class ImageGallery implements IItemListener, IGalleryContextMenuProvider,
 		}
 
 		stopLoadingImages();
+	}
+
+	@Override
+	public boolean onItemMouseDown(final GalleryMT20Item mouseDownItem, final int itemMouseX, final int itemMouseY) {
+
+		if (_isShowPhotoRatingStars && mouseDownItem != null) {
+
+			if (_photoRenderer.isMouseDownOnItem(mouseDownItem, itemMouseX, itemMouseY)) {
+
+				_galleryMT20.redraw(
+						mouseDownItem.viewPortX,
+						mouseDownItem.viewPortY,
+						mouseDownItem.width,
+						mouseDownItem.height,
+						false);
+
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	@Override
+	public void onItemMouseExit(final GalleryMT20Item oldHoveredItem, final int itemMouseX, final int itemMouseY) {
+
+		if (_isShowPhotoRatingStars == false) {
+			return;
+		}
+
+		oldHoveredItem.hoveredStars = 0;
+		oldHoveredItem.isHovered = false;
+
+		if (oldHoveredItem.allSelectedGalleryItems != null) {
+
+			for (final GalleryMT20Item selectedItems : oldHoveredItem.allSelectedGalleryItems) {
+
+				selectedItems.isInHoveredGroup = false;
+
+				_galleryMT20.redraw(
+						selectedItems.viewPortX,
+						selectedItems.viewPortY,
+						selectedItems.width,
+						selectedItems.height,
+						false);
+			}
+
+			/**
+			 * This collection cannot be cleared because it's the original list with selected items
+			 * in the gallery, so only the reference is set to <code>null</code>.
+			 */
+			oldHoveredItem.allSelectedGalleryItems = null;
+
+			_hoveredItem = null;
+
+		} else {
+
+			_galleryMT20.redraw(
+					oldHoveredItem.viewPortX,
+					oldHoveredItem.viewPortY,
+					oldHoveredItem.width,
+					oldHoveredItem.height,
+					false);
+		}
+	}
+
+	@Override
+	public void onItemMouseHovered(final GalleryMT20Item hoveredItem, final int itemMouseX, final int itemMouseY) {
+
+		if (_isShowTooltip) {
+			_photoGalleryTooltip.show(hoveredItem);
+		}
+
+		if (_isShowPhotoRatingStars && hoveredItem != null) {
+
+			_hoveredItem = hoveredItem;
+
+			hoveredItem.isHovered = true;
+
+			// this will set allSelectedGalleryItems in the hovered item
+			_photoRenderer.itemIsHovered(hoveredItem, itemMouseX, itemMouseY);
+
+			if (hoveredItem.allSelectedGalleryItems != null) {
+
+				for (final GalleryMT20Item selectedItems : hoveredItem.allSelectedGalleryItems) {
+
+					selectedItems.isInHoveredGroup = true;
+
+					_galleryMT20.redraw(
+							selectedItems.viewPortX,
+							selectedItems.viewPortY,
+							selectedItems.width,
+							selectedItems.height,
+							false);
+				}
+
+			} else {
+
+				_galleryMT20.redraw(
+						hoveredItem.viewPortX,
+						hoveredItem.viewPortY,
+						hoveredItem.width,
+						hoveredItem.height,
+						false);
+			}
+		}
 	}
 
 	private void onModifyFont() {
@@ -2460,11 +2538,11 @@ public class ImageGallery implements IItemListener, IGalleryContextMenuProvider,
 	/**
 	 * Display images for a list of {@link Photo}.
 	 * 
-	 * @param photoWrapperList
+	 * @param photos
 	 * @param galleryPositionKey
 	 *            Contains a unique key to keep gallery position for different contents
 	 */
-	public void showImages(	final ArrayList<Photo> photoWrapperList,
+	public void showImages(	final ArrayList<Photo> photos,
 							final String galleryPositionKey,
 							final boolean isShowDefaultMessage) {
 
@@ -2492,7 +2570,7 @@ public class ImageGallery implements IItemListener, IGalleryContextMenuProvider,
 
 		_newGalleryPositionKey = galleryPositionKey;
 
-		workerExecute_DisplayImages(photoWrapperList.toArray(new Photo[photoWrapperList.size()]));
+		workerExecute_DisplayImages(photos.toArray(new Photo[photos.size()]));
 	}
 
 	/**
@@ -3054,9 +3132,9 @@ public class ImageGallery implements IItemListener, IGalleryContextMenuProvider,
 		}
 	}
 
-	private void workerExecute_DisplayImages(final Photo[] newPhotoWrapper) {
+	private void workerExecute_DisplayImages(final Photo[] photos) {
 
-		_allPhotos = newPhotoWrapper;
+		_allPhotos = photos;
 
 		_display.syncExec(new Runnable() {
 			public void run() {

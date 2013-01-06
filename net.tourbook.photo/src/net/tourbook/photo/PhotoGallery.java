@@ -265,10 +265,12 @@ public class PhotoGallery extends ImageGallery {
 //		tbm.add(_actionPhotoGalleryType);
 
 		tbm.add(new Separator());
+		tbm.add(_actionShowPhotoTooltip);
+
+		tbm.add(new Separator());
 		tbm.add(_actionShowPhotoRatingStars);
 		tbm.add(_actionShowPhotoDate);
 		tbm.add(_actionShowPhotoName);
-		tbm.add(_actionShowPhotoTooltip);
 		tbm.add(_actionShowGPSAnnotation);
 
 		if (_isShowActionFiltering) {

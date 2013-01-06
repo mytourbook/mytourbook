@@ -62,25 +62,30 @@ import org.joda.time.format.DateTimeFormatter;
  */
 public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
-	private static final String			PHOTO_ANNOTATION_EXIF_GPS		= "PHOTO_ANNOTATION_GPS";					//$NON-NLS-1$
-	private static final String			PHOTO_ANNOTATION_TOUR_GPS		= "PHOTO_ANNOTATION_TOUR_GPS";				//$NON-NLS-1$
-	private static final String			PHOTO_RATING_STAR				= "PHOTO_RATING_STAR";						//$NON-NLS-1$
-	private static final String			PHOTO_RATING_STAR_HOVERED		= "PHOTO_RATING_STAR_HOVERED";				//$NON-NLS-1$
-	private static final String			PHOTO_RATING_STAR_NOT_HOVERED	= "PHOTO_RATING_STAR_NOT_HOVERED";			//$NON-NLS-1$
+	private static final String			PHOTO_ANNOTATION_EXIF_GPS				= "PHOTO_ANNOTATION_GPS";					//$NON-NLS-1$
+	private static final String			PHOTO_ANNOTATION_TOUR_GPS				= "PHOTO_ANNOTATION_TOUR_GPS";				//$NON-NLS-1$
+	private static final String			PHOTO_RATING_STAR						= "PHOTO_RATING_STAR";						//$NON-NLS-1$
+	private static final String			PHOTO_RATING_STAR_AND_HOVERED			= "PHOTO_RATING_STAR_AND_HOVERED";			//$NON-NLS-1$
+	private static final String			PHOTO_RATING_STAR_DELETE				= "PHOTO_RATING_STAR_DELETE";				//$NON-NLS-1$
+	private static final String			PHOTO_RATING_STAR_DISABLED				= "PHOTO_RATING_STAR_DISABLED";			//$NON-NLS-1$
+	private static final String			PHOTO_RATING_STAR_HOVERED				= "PHOTO_RATING_STAR_HOVERED";				//$NON-NLS-1$
+	private static final String			PHOTO_RATING_STAR_NOT_HOVERED			= "PHOTO_RATING_STAR_NOT_HOVERED";			//$NON-NLS-1$
+	private static final String			PHOTO_RATING_STAR_NOT_HOVERED_BUT_SET	= "PHOTO_RATING_STAR_NOT_HOVERED_BUT_SET";	//$NON-NLS-1$
+
 	private static int					MAX_RATING_STARS_WIDTH;
 
-	private static final int			MAX_RATING_STARS				= 5;
+	private static final int			MAX_RATING_STARS						= 5;
 
 	/**
 	 * this value has been evaluated by some test
 	 */
-	private int							_textMinThumbSize				= 50;
+	private int							_textMinThumbSize						= 50;
 
-	private int							_fontHeight						= -1;
+	private int							_fontHeight								= -1;
 
-	private final DateTimeFormatter		_dtFormatterDate				= DateTimeFormat.forStyle("M-");			//$NON-NLS-1$
-	private final DateTimeFormatter		_dtFormatterTime				= DateTimeFormat.forStyle("-F");			//$NON-NLS-1$
-	private final DateTimeFormatter		_dtFormatterDateTime			= DateTimeFormat.forStyle("MM");			//$NON-NLS-1$
+	private final DateTimeFormatter		_dtFormatterDate						= DateTimeFormat.forStyle("M-");			//$NON-NLS-1$
+	private final DateTimeFormatter		_dtFormatterTime						= DateTimeFormat.forStyle("-F");			//$NON-NLS-1$
+	private final DateTimeFormatter		_dtFormatterDateTime					= DateTimeFormat.forStyle("MM");			//$NON-NLS-1$
 
 //	private final DateTimeFormatter		_dtFormatterDateTime	= new DateTimeFormatterBuilder()
 //																		.appendYear(4, 4)
@@ -120,8 +125,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	private ImageGallery				_imageGallery;
 	private GalleryMT20					_galleryMT;
 
-	private int							_gridBorder						= 1;
-	private int							_imageBorder					= 5;
+	private int							_gridBorder								= 1;
+	private int							_imageBorder							= 5;
 
 	/**
 	 * photo dimension without grid border but including image border
@@ -140,7 +145,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	/**
 	 * Width for the painted image or <code>-1</code> when not initialized.
 	 */
-	private int							_paintedDestWidth				= -1;
+	private int							_paintedDestWidth						= -1;
 	private int							_paintedDestHeight;
 
 	private boolean						_isShowFullsizeHQImage;
@@ -171,9 +176,9 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	private boolean						_isFullsizeImageAvailable;
 	private boolean						_isFullsizeLoadingError;
 
-	private final DateTimeFormatter		_dtFormatter					= DateTimeFormat.forStyle("ML");			//$NON-NLS-1$
-	private final DateTimeFormatter		_dtWeekday						= DateTimeFormat.forPattern("E");			//$NON-NLS-1$
-	private final NumberFormat			_nfMByte						= NumberFormat.getNumberInstance();
+	private final DateTimeFormatter		_dtFormatter							= DateTimeFormat.forStyle("ML");			//$NON-NLS-1$
+	private final DateTimeFormatter		_dtWeekday								= DateTimeFormat.forPattern("E");			//$NON-NLS-1$
+	private final NumberFormat			_nfMByte								= NumberFormat.getNumberInstance();
 	{
 		_nfMByte.setMinimumFractionDigits(3);
 		_nfMByte.setMaximumFractionDigits(3);
@@ -188,20 +193,25 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	/*
 	 * UI resources
 	 */
-	private Color						_fullsizeBgColor				= Display.getCurrent()//
-																				.getSystemColor(SWT.COLOR_BLACK);
-	private Color						_fgColor						= Display.getCurrent()//
-																				.getSystemColor(SWT.COLOR_WHITE);
-	private Color						_bgColor						= Display.getCurrent()//
-																				.getSystemColor(SWT.COLOR_RED);
+	private Color						_fullsizeBgColor						= Display.getCurrent()//
+																						.getSystemColor(SWT.COLOR_BLACK);
+	private Color						_fgColor								= Display.getCurrent()//
+																						.getSystemColor(SWT.COLOR_WHITE);
+	private Color						_bgColor								= Display.getCurrent()//
+																						.getSystemColor(SWT.COLOR_RED);
 	private Color						_selectionFgColor;
 	private Color						_noFocusSelectionFgColor;
 
 	private static Image				_imageExifGps;
 	private static Image				_imageTourGps;
+
 	private static Image				_imageRatingStar;
+	private static Image				_imageRatingStarAndHovered;
+	private static Image				_imageRatingStarDisabled;
+	private static Image				_imageRatingStarDelete;
 	private static Image				_imageRatingStarHovered;
 	private static Image				_imageRatingStarNotHovered;
+	private static Image				_imageRatingStarNotHoveredButSet;
 
 	static {
 
@@ -212,16 +222,29 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 		UI.IMAGE_REGISTRY.put(PHOTO_RATING_STAR,//
 				Activator.getImageDescriptor(Messages.Image__PhotoRatingStar));
+		UI.IMAGE_REGISTRY.put(PHOTO_RATING_STAR_AND_HOVERED,//
+				Activator.getImageDescriptor(Messages.Image__PhotoRatingStarAndHovered));
+		UI.IMAGE_REGISTRY.put(PHOTO_RATING_STAR_DISABLED,//
+				Activator.getImageDescriptor(Messages.Image__PhotoRatingStarDisabled));
+		UI.IMAGE_REGISTRY.put(PHOTO_RATING_STAR_DELETE,//
+				Activator.getImageDescriptor(Messages.Image__PhotoRatingStarDelete));
 		UI.IMAGE_REGISTRY.put(PHOTO_RATING_STAR_HOVERED,//
 				Activator.getImageDescriptor(Messages.Image__PhotoRatingStarHovered));
 		UI.IMAGE_REGISTRY.put(PHOTO_RATING_STAR_NOT_HOVERED,//
 				Activator.getImageDescriptor(Messages.Image__PhotoRatingStarNotHovered));
+		UI.IMAGE_REGISTRY.put(PHOTO_RATING_STAR_NOT_HOVERED_BUT_SET,//
+				Activator.getImageDescriptor(Messages.Image__PhotoRatingStarNotHoveredButSet));
 
 		_imageExifGps = UI.IMAGE_REGISTRY.get(PHOTO_ANNOTATION_EXIF_GPS);
 		_imageTourGps = UI.IMAGE_REGISTRY.get(PHOTO_ANNOTATION_TOUR_GPS);
+
 		_imageRatingStar = UI.IMAGE_REGISTRY.get(PHOTO_RATING_STAR);
+		_imageRatingStarAndHovered = UI.IMAGE_REGISTRY.get(PHOTO_RATING_STAR_AND_HOVERED);
+		_imageRatingStarDelete = UI.IMAGE_REGISTRY.get(PHOTO_RATING_STAR_DELETE);
+		_imageRatingStarDisabled = UI.IMAGE_REGISTRY.get(PHOTO_RATING_STAR_DISABLED);
 		_imageRatingStarHovered = UI.IMAGE_REGISTRY.get(PHOTO_RATING_STAR_HOVERED);
 		_imageRatingStarNotHovered = UI.IMAGE_REGISTRY.get(PHOTO_RATING_STAR_NOT_HOVERED);
+		_imageRatingStarNotHoveredButSet = UI.IMAGE_REGISTRY.get(PHOTO_RATING_STAR_NOT_HOVERED_BUT_SET);
 
 		final Rectangle bounds = _imageExifGps.getBounds();
 		_gpsImageWidth = bounds.width;
@@ -427,7 +450,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		if (isDrawAttributes && _isShowPhotoRatingStars /* && photo.ratingStars > 0 */) {
 
 			int ratingStars = photo.ratingStars;
-			ratingStars = 2;
+			ratingStars = 3;
 
 			drawRatingStars(gc, galleryItem, ratingStars);
 		}
@@ -1020,54 +1043,82 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 	private void drawRatingStars(final GC gc, final GalleryMT20Item galleryItem, final int ratingStars) {
 
-		final boolean isItemHovered = galleryItem.isHovered || galleryItem.isSelectedButNotHovered;
+		final boolean isItemHovered = galleryItem.isHovered || galleryItem.isInHoveredGroup;
 		final int hoveredStars = galleryItem.hoveredStars;
 		final boolean isStarHovered = hoveredStars > 0;
+		boolean canSetRating = false;
 
-		System.out.println(UI.timeStampNano()
-				+ (" isHovered=" + galleryItem.isHovered)
-				+ ("\tselected=" + galleryItem.isSelectedButNotHovered)
-				+ ("\t" + galleryItem.uniqueItemID));
-		// TODO remove SYSTEM.OUT.PRINTLN
+		final IGalleryCustomData customData = galleryItem.customData;
+		if (customData instanceof Photo) {
+			canSetRating = ((Photo) customData).isPhotoFromTour;
+		}
 
 		// center ratings stars in the middle of the image
 		final int ratingStarsRightBorder = galleryItem.photoPaintedX + _photoWidth / 2 + MAX_RATING_STARS_WIDTH / 2;
 
 		for (int starIndex = 0; starIndex < MAX_RATING_STARS; starIndex++) {
 
-			// draw stars at the top
-
 			Image starImage;
 
-			if (isItemHovered) {
+			if (canSetRating) {
 
-				if (isStarHovered) {
+				if (isItemHovered) {
 
-					if (starIndex < hoveredStars) {
-						starImage = _imageRatingStarHovered;
+					if (isStarHovered) {
+
+						if (starIndex < hoveredStars) {
+
+							if (starIndex < ratingStars) {
+
+								if (starIndex == ratingStars - 1) {
+									starImage = _imageRatingStarDelete;
+								} else {
+									starImage = _imageRatingStarAndHovered;
+								}
+							} else {
+								starImage = _imageRatingStarHovered;
+							}
+
+						} else {
+							if (starIndex < ratingStars) {
+								starImage = _imageRatingStarNotHoveredButSet;
+							} else {
+								starImage = _imageRatingStarNotHovered;
+							}
+						}
+
 					} else {
-						starImage = _imageRatingStarNotHovered;
+
+						if (starIndex < ratingStars) {
+							starImage = _imageRatingStar;
+						} else {
+							starImage = _imageRatingStarNotHovered;
+						}
 					}
 
 				} else {
+
+					// item is not hovered
 
 					if (starIndex < ratingStars) {
 						starImage = _imageRatingStar;
 					} else {
-						starImage = _imageRatingStarNotHovered;
+						return;
 					}
 				}
-
 			} else {
 
-				// item is not hovered
+				if (starIndex > 0) {
 
-				if (starIndex < ratingStars) {
-					starImage = _imageRatingStar;
-				} else {
+					// draw only one disabled star, thats enough
+
 					return;
 				}
+
+				starImage = _imageRatingStarDisabled;
 			}
+
+			// draw stars at the top
 
 			gc.drawImage(starImage, //
 					ratingStarsRightBorder - (_ratingStarImageWidth * (starIndex + 1)),
@@ -1250,18 +1301,18 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 				final Photo hoveredPhoto = (Photo) itemCustomData;
 
-				int hoveredStars = galleryItem.hoveredStars;
+				int newRatingStars = galleryItem.hoveredStars;
 
-				if (hoveredStars == hoveredPhoto.ratingStars) {
+				if (newRatingStars == hoveredPhoto.ratingStars) {
 
 					/**
 					 * Feature to remove rating stars:
 					 * <p>
 					 * When a rating star is hit and this rating is already set in the photo, the
-					 * ratings stars are removed.
+					 * rating stars are removed.
 					 */
 
-					hoveredStars = 0;
+					newRatingStars = 0;
 				}
 
 				final ArrayList<Photo> photos = new ArrayList<Photo>();
@@ -1281,7 +1332,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 						if (customData instanceof Photo) {
 
 							final Photo photo = (Photo) customData;
-							photo.ratingStars = hoveredStars;
+							photo.ratingStars = newRatingStars;
 
 							photos.add(photo);
 						}
@@ -1294,7 +1345,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 					 * set
 					 */
 
-					hoveredPhoto.ratingStars = hoveredStars;
+					hoveredPhoto.ratingStars = newRatingStars;
 
 					photos.add(hoveredPhoto);
 				}
@@ -1320,8 +1371,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 		return itemMouseX <= _ratingStarsRightBorder//
 				//
-				&& itemMouseX >= _ratingStarsRightBorder - MAX_RATING_STARS_WIDTH;
-//				&& itemMouseY <= _ratingStarImageHeight;
+				&& itemMouseX >= _ratingStarsRightBorder - MAX_RATING_STARS_WIDTH
+				&& itemMouseY <= _ratingStarImageHeight;
 	}
 
 	/**
@@ -1330,6 +1381,14 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	 * @param itemMouseY
 	 */
 	public void itemIsHovered(final GalleryMT20Item hoveredItem, final int itemMouseX, final int itemMouseY) {
+
+		final IGalleryCustomData customData = hoveredItem.customData;
+		if (customData instanceof Photo) {
+			final boolean canSetRating = ((Photo) customData).isPhotoFromTour;
+			if (canSetRating == false) {
+				return;
+			}
+		}
 
 		int hoveredStars;
 
@@ -1346,13 +1405,6 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 		final HashMap<String, GalleryMT20Item> selectedItemsMap = _galleryMT.getSelectedItems();
 
-		System.out.println(UI.timeStampNano()
-				+ ("\tindizes=" + _galleryMT.getSelectionIndex().length)
-				+ " selectedItemsMap "
-				+ selectedItemsMap
-);
-		// TODO remove SYSTEM.OUT.PRINTLN
-
 		if (selectedItemsMap.containsKey(hoveredItem.uniqueItemID)) {
 
 			/*
@@ -1365,7 +1417,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 				item.hoveredStars = hoveredStars;
 			}
 
-			hoveredItem.notHoveredButSelectedItems = selectedItems;
+			hoveredItem.allSelectedGalleryItems = selectedItems;
 
 		} else {
 
@@ -1375,7 +1427,6 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 			hoveredItem.hoveredStars = hoveredStars;
 		}
-
 	}
 
 	@Override

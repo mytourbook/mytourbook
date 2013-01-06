@@ -48,8 +48,16 @@ public class Messages extends NLS {
 	public static String		Image__PhotoInfoDate;
 	public static String		Image__PhotoInfoName;
 	public static String		Image__PhotoRatingStar;
+
+	public static String	Image__PhotoRatingStarAndHovered;
+
+	public static String	Image__PhotoRatingStarDelete;
+
+	public static String	Image__PhotoRatingStarDisabled;
 	public static String		Image__PhotoRatingStarHovered;
 	public static String		Image__PhotoRatingStarNotHovered;
+
+	public static String	Image__PhotoRatingStarNotHoveredButSet;
 	public static String		Image__PhotoRatingStars;
 	public static String		Image__PhotoSortByDate;
 	public static String		Image__PhotoSortByName;

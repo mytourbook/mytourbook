@@ -26,19 +26,20 @@ public interface IItemListener {
 	 * @return Returns <code>true</code> when the mouse down event is handled and no further actions
 	 *         should be done in the gallery (e.g. no select item).
 	 */
-	public boolean itemMouseDown(GalleryMT20Item mouseDownItem, int itemMouseX, int itemMouseY);
+	public boolean onItemMouseDown(GalleryMT20Item mouseDownItem, int itemMouseX, int itemMouseY);
 
 	/**
 	 * Mouse has hovered another gallery item.
 	 * 
 	 * @param exitHoveredItem
-	 *            Item which was previously hovered, can be <code>null</code>.
+	 *            Item which was previously hovered, cannot be <code>null</code>. When it's
+	 *            <code>null</code> this method is not called.
 	 * @param itemMouseY
 	 *            Mouse X position relative to the hovered item.
 	 * @param itemMouseX
 	 *            Mouse Y position relative to the hovered item.
 	 */
-	public void itemMouseExit(GalleryMT20Item exitHoveredItem, int itemMouseX, int itemMouseY);
+	public void onItemMouseExit(GalleryMT20Item exitHoveredItem, int itemMouseX, int itemMouseY);
 
 	/**
 	 * Mouse has hovered a gallery item.
@@ -50,6 +51,6 @@ public interface IItemListener {
 	 * @param itemMouseX
 	 *            Mouse Y position relative to the hovered item.
 	 */
-	public void itemMouseHovered(GalleryMT20Item hoveredItem, int itemMouseX, int itemMouseY);
+	public void onItemMouseHovered(GalleryMT20Item hoveredItem, int itemMouseX, int itemMouseY);
 
 }

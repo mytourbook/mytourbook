@@ -54,8 +54,13 @@ public class GalleryMT20Item {
 	 */
 	public boolean						isHovered;
 
-	public boolean						isSelectedButNotHovered;
-	public Collection<GalleryMT20Item>	notHoveredButSelectedItems;
+	public boolean						isInHoveredGroup;
+
+	/**
+	 * These are the selected gallery items and this values is only set while a gallery item is
+	 * hovered which is contained in this collection.
+	 */
+	public Collection<GalleryMT20Item>	allSelectedGalleryItems;
 
 	/**
 	 * Number of stars which are hovered.

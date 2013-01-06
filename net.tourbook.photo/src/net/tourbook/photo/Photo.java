@@ -116,6 +116,13 @@ public class Photo implements IGalleryCustomData {
 	 */
 	public int											ratingStars;
 
+	/**
+	 * Is <code>true</code> when a photo is saved in a tour.
+	 * <p>
+	 * This allows to set rating stars which requires that they can be saved in a tour.
+	 */
+	public boolean										isPhotoFromTour;
+
 	private PhotoImageMetadata							_photoImageMetadata;
 
 	/**

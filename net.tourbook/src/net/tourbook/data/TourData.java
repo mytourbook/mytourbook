@@ -4355,6 +4355,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 			final Photo galleryPhoto = new Photo(photoFile);
 
+			galleryPhoto.isPhotoFromTour = true;
+
 			galleryPhoto.adjustedTime = tourPhoto.getAdjustedTime();
 			galleryPhoto.imageExifTime = tourPhoto.getImageExifTime();
 			galleryPhoto.ratingStars = tourPhoto.getRatingStars();
