@@ -58,14 +58,13 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 				+ "MAX(MAXALTITUDE)," //								10	//$NON-NLS-1$
 				+ "MAX(MAXPULSE)," //									11	//$NON-NLS-1$
 				//
-				+ "AVG(AVGPULSE)," //									12	//$NON-NLS-1$
-				+ "AVG(AVGCADENCE)," //									13	//$NON-NLS-1$
-				+ "AVG(DOUBLE(AvgTemperature) / TemperatureScale)," //	14	//$NON-NLS-1$
-
-				+ "AVG(WEATHERWINDDIR)," //								15	//$NON-NLS-1$
-				+ "AVG(WEATHERWINDSPD)," //								16	//$NON-NLS-1$
-				+ "AVG(RESTPULSE)," //									17	//$NON-NLS-1$
-
+				+ "AVG( CASE WHEN AVGPULSE = 0			THEN NULL ELSE AVGPULSE END)," //			12	//$NON-NLS-1$
+				+ "AVG( CASE WHEN AVGCADENCE = 0		THEN NULL ELSE AVGCADENCE END )," //		13	//$NON-NLS-1$
+				+ "AVG( CASE WHEN AvgTemperature = 0	THEN NULL ELSE DOUBLE(AvgTemperature) / TemperatureScale END )," //	14	//$NON-NLS-1$
+				+ "AVG( CASE WHEN WEATHERWINDDIR = 0	THEN NULL ELSE WEATHERWINDDIR END )," //	15	//$NON-NLS-1$
+				+ "AVG( CASE WHEN WEATHERWINDSPD = 0	THEN NULL ELSE WEATHERWINDSPD END )," //	16	//$NON-NLS-1$
+				+ "AVG( CASE WHEN RESTPULSE = 0			THEN NULL ELSE RESTPULSE END )," //			17	//$NON-NLS-1$
+				//
 				+ "SUM(CALORIES)," //									18	//$NON-NLS-1$
 				+ "SUM(numberOfTimeSlices)," //							19	//$NON-NLS-1$
 				+ "SUM(numberOfPhotos)"; //								20	//$NON-NLS-1$
