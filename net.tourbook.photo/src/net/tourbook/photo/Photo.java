@@ -123,6 +123,11 @@ public class Photo implements IGalleryCustomData {
 	 */
 	public boolean										isPhotoFromTour;
 
+	/**
+	 * Contains id of the saved photo.
+	 */
+	public long											tourPhotoId;
+
 	private PhotoImageMetadata							_photoImageMetadata;
 
 	/**

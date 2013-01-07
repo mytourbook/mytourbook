@@ -15,6 +15,9 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
@@ -22,6 +25,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
@@ -324,7 +328,7 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener, IPh
 					new PhotoGalleryProvider());
 
 			_photoGallery.setDefaultStatusMessage(Messages.Photo_Gallery_Label_NoTourWithPhoto);
-			
+
 			_photoGallery.setPhotoServiceProvider(this);
 		}
 	}
@@ -540,10 +544,44 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener, IPh
 	@Override
 	public void saveStarRating(final ArrayList<Photo> photos) {
 
-		for (final Photo photo : photos) {
+//		final long start = System.nanoTime();
 
+		Connection conn = null;
+
+		try {
+			conn = TourDatabase.getInstance().getConnection();
+
+			final PreparedStatement sqlUpdate = conn.prepareStatement(//
+					"UPDATE " + TourDatabase.TABLE_TOUR_PHOTO //	//$NON-NLS-1$
+							+ " SET" //								//$NON-NLS-1$
+							+ " ratingStars=? " //					//$NON-NLS-1$
+							+ " WHERE photoId=?"); //				//$NON-NLS-1$
+
+			for (final Photo photo : photos) {
+
+				sqlUpdate.setInt(1, photo.ratingStars);
+				sqlUpdate.setLong(2, photo.tourPhotoId);
+				sqlUpdate.executeUpdate();
+			}
+
+		} catch (final SQLException e) {
+			UI.showSQLException(e);
+		} finally {
+
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (final SQLException e) {
+					UI.showSQLException(e);
+				}
+			}
 		}
-		
+
+//		System.out.println(net.tourbook.common.UI.timeStampNano()
+//				+ " save photo rating\t"
+//				+ ((float) (System.nanoTime() - start) / 1000000)
+//				+ " ms");
+//		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 	private void saveState() {

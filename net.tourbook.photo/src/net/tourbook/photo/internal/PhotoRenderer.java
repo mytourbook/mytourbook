@@ -72,6 +72,9 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	private static final String			PHOTO_RATING_STAR_NOT_HOVERED			= "PHOTO_RATING_STAR_NOT_HOVERED";			//$NON-NLS-1$
 	private static final String			PHOTO_RATING_STAR_NOT_HOVERED_BUT_SET	= "PHOTO_RATING_STAR_NOT_HOVERED_BUT_SET";	//$NON-NLS-1$
 
+	/**
+	 * Device width for all rating stars.
+	 */
 	private static int					MAX_RATING_STARS_WIDTH;
 
 	private static final int			MAX_RATING_STARS						= 5;
@@ -166,7 +169,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	/**
 	 * Right border for the rating stars, this value is relative to the gallery item.
 	 */
-	private int							_ratingStarsRightBorder;
+	private int							_ratingStarsLeftBorder;
 
 	/*
 	 * full size context fields
@@ -290,7 +293,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		int itemImageHeight = _photoHeight;
 
 		// center ratings stars in the middle of the image
-		_ratingStarsRightBorder = _photoWidth / 2 + MAX_RATING_STARS_WIDTH / 2;
+		_ratingStarsLeftBorder = _photoWidth / 2 - MAX_RATING_STARS_WIDTH / 2;
 
 		// ignore border for small images
 		final boolean isBorder = itemImageWidth - _imageBorder >= _textMinThumbSize;
@@ -447,12 +450,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 					_paintedDestY + _paintedDestHeight - _gpsImageHeight);
 		}
 
-		if (isDrawAttributes && _isShowPhotoRatingStars /* && photo.ratingStars > 0 */) {
-
-			int ratingStars = photo.ratingStars;
-			ratingStars = 3;
-
-			drawRatingStars(gc, galleryItem, ratingStars);
+		if (isDrawAttributes && _isShowPhotoRatingStars) {
+			drawRatingStars(gc, galleryItem, photo.ratingStars);
 		}
 
 //		// debug box for the whole gallery item area
@@ -1054,7 +1053,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		}
 
 		// center ratings stars in the middle of the image
-		final int ratingStarsRightBorder = galleryItem.photoPaintedX + _photoWidth / 2 + MAX_RATING_STARS_WIDTH / 2;
+		final int ratingStarsLeftBorder = galleryItem.photoPaintedX + _photoWidth / 2 - MAX_RATING_STARS_WIDTH / 2;
 
 		for (int starIndex = 0; starIndex < MAX_RATING_STARS; starIndex++) {
 
@@ -1121,7 +1120,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 			// draw stars at the top
 
 			gc.drawImage(starImage, //
-					ratingStarsRightBorder - (_ratingStarImageWidth * (starIndex + 1)),
+					ratingStarsLeftBorder + (_ratingStarImageWidth * (starIndex)),
 					galleryItem.photoPaintedY);
 		}
 	}
@@ -1285,7 +1284,14 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		return _gridBorder + _imageBorder;
 	}
 
-	public boolean isMouseDownOnItem(final GalleryMT20Item galleryItem, final int itemMouseX, final int itemMouseY) {
+	/**
+	 * @param galleryItem
+	 * @param itemMouseX
+	 * @param itemMouseY
+	 * @return Returns <code>true</code> when the mouse down event is handled and no further actions
+	 *         should be done in the gallery (e.g. no select item).
+	 */
+	public boolean isMouseDownHandled(final GalleryMT20Item galleryItem, final int itemMouseX, final int itemMouseY) {
 
 		final IPhotoServiceProvider photoServiceProvider = _galleryMT.getPhotoServiceProvider();
 		if (photoServiceProvider == null) {
@@ -1316,7 +1322,9 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 				}
 
 				final ArrayList<Photo> photos = new ArrayList<Photo>();
+
 				final HashMap<String, GalleryMT20Item> selectedItems = _galleryMT.getSelectedItems();
+				final Collection<GalleryMT20Item> selectedItemValues = selectedItems.values();
 
 				if (selectedItems.containsKey(galleryItem.uniqueItemID)) {
 
@@ -1325,7 +1333,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 					 * items.
 					 */
 
-					for (final GalleryMT20Item item : selectedItems.values()) {
+					for (final GalleryMT20Item item : selectedItemValues) {
 
 						final IGalleryCustomData customData = item.customData;
 
@@ -1354,6 +1362,17 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 					photoServiceProvider.saveStarRating(photos);
 
+					// update UI with new star rating
+					for (final GalleryMT20Item item : selectedItemValues) {
+
+						_galleryMT.redraw(//
+								item.viewPortX,
+								item.viewPortY,
+								item.width,
+								item.height,
+								false);
+					}
+
 					return true;
 				}
 			}
@@ -1369,9 +1388,9 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	 */
 	private boolean isRatingStarsHovered(final int itemMouseX, final int itemMouseY) {
 
-		return itemMouseX <= _ratingStarsRightBorder//
+		return itemMouseX >= _ratingStarsLeftBorder//
 				//
-				&& itemMouseX >= _ratingStarsRightBorder - MAX_RATING_STARS_WIDTH
+				&& itemMouseX <= _ratingStarsLeftBorder + MAX_RATING_STARS_WIDTH
 				&& itemMouseY <= _ratingStarImageHeight;
 	}
 
@@ -1396,7 +1415,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 			final int hoveredPhotoX = itemMouseX + _gridBorder;
 
-			hoveredStars = (_ratingStarsRightBorder - hoveredPhotoX) / _ratingStarImageWidth + 1;
+			hoveredStars = (hoveredPhotoX - _ratingStarsLeftBorder) / _ratingStarImageWidth + 1;
 
 		} else {
 

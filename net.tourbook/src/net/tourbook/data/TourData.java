@@ -4356,6 +4356,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			final Photo galleryPhoto = new Photo(photoFile);
 
 			galleryPhoto.isPhotoFromTour = true;
+			galleryPhoto.tourPhotoId = tourPhoto.getPhotoId();
 
 			galleryPhoto.adjustedTime = tourPhoto.getAdjustedTime();
 			galleryPhoto.imageExifTime = tourPhoto.getImageExifTime();
@@ -5003,12 +5004,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public String getTourEndPlace() {
 		return tourEndPlace == null ? UI.EMPTY_STRING : tourEndPlace;
 	}
-
-//	is currently disabled in version 12.12, will be used in further versions
-//
-//	public Set<TourPhoto> getTourPhotos() {
-//		return tourPhotos;
-//	}
 
 	/**
 	 * @return Returns tour end time in ms, this value should be {@link #tourStartTime} +

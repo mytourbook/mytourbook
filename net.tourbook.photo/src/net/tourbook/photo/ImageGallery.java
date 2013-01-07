@@ -2017,7 +2017,7 @@ public class ImageGallery implements IItemListener, IGalleryContextMenuProvider,
 
 		if (_isShowPhotoRatingStars && mouseDownItem != null) {
 
-			if (_photoRenderer.isMouseDownOnItem(mouseDownItem, itemMouseX, itemMouseY)) {
+			if (_photoRenderer.isMouseDownHandled(mouseDownItem, itemMouseX, itemMouseY)) {
 
 				_galleryMT20.redraw(
 						mouseDownItem.viewPortX,

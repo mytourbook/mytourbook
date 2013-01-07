@@ -105,7 +105,7 @@ public class TourPhoto {
 	private TourData		tourData;
 
 	/**
-	 * unique id for manually created markers because the {@link #photoId} is 0 when the marker is
+	 * Unique id for manually created markers because the {@link #photoId} is 0 when the marker is
 	 * not persisted
 	 */
 	@Transient
@@ -230,6 +230,10 @@ public class TourPhoto {
 
 	public double getLongitude() {
 		return longitude;
+	}
+
+	public long getPhotoId() {
+		return photoId;
 	}
 
 	public int getRatingStars() {

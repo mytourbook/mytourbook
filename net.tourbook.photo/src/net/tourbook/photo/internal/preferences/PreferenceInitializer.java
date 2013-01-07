@@ -61,7 +61,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 				new RGB(0x33, 0x33, 0x33));
 
 		PreferenceConverter.setDefault(store, IPhotoPreferences.PHOTO_VIEWER_COLOR_SELECTION_FOREGROUND, //
-				new RGB(0xFF, 0x80, 0x33));
+				new RGB(0xEE, 0x5C, 0x00));
+//				new RGB(0xFF, 0x80, 0x33));
 
 		PreferenceConverter.setDefault(store, IPhotoPreferences.PHOTO_VIEWER_COLOR_FOLDER, //
 				new RGB(0xFF, 0x6A, 0x11));
