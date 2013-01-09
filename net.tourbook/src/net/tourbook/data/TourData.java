@@ -69,6 +69,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.math.Smooth;
 import net.tourbook.photo.Photo;
+import net.tourbook.photo.PhotoCache;
 import net.tourbook.photo.PhotoManager;
 import net.tourbook.photo.TourPhotoLink;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -4351,23 +4352,49 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		// create photo wrapper for all tour photos
 		for (final TourPhoto tourPhoto : tourPhotos) {
 
-			final File photoFile = new File(tourPhoto.getImageFilePathName());
+			Photo galleryPhoto = null;
+			double tourLatitude = 0;
 
-			final Photo galleryPhoto = new Photo(photoFile);
+			final String imageFilePathName = tourPhoto.getImageFilePathName();
 
+			final Photo cachedPhoto = PhotoCache.getPhoto(imageFilePathName);
+			if (cachedPhoto != null) {
+
+				galleryPhoto = cachedPhoto;
+
+			} else {
+
+				/*
+				 * photo is not found in the photo cache, create a new photo
+				 */
+
+				final File photoFile = new File(imageFilePathName);
+
+				galleryPhoto = new Photo(photoFile);
+
+				galleryPhoto.adjustedTime = tourPhoto.getAdjustedTime();
+				galleryPhoto.imageExifTime = tourPhoto.getImageExifTime();
+
+				tourLatitude = tourPhoto.getLatitude();
+
+				galleryPhoto.isGeoFromExif = tourPhoto.isGeoFromPhoto();
+				galleryPhoto.isPhotoWithGps = tourLatitude != 0;
+
+				galleryPhoto.ratingStars = tourPhoto.getRatingStars();
+			}
+
+			/*
+			 * when a photo is in the photo cache it is possible that the tour is from the file
+			 * system, update tour relevant fields
+			 */
 			galleryPhoto.isPhotoFromTour = true;
-			galleryPhoto.tourPhotoId = tourPhoto.getPhotoId();
 
-			galleryPhoto.adjustedTime = tourPhoto.getAdjustedTime();
-			galleryPhoto.imageExifTime = tourPhoto.getImageExifTime();
-			galleryPhoto.ratingStars = tourPhoto.getRatingStars();
+			// ensure this tour is set in the photo
+			galleryPhoto.addTour(tourPhoto.getTourId(), tourPhoto.getPhotoId());
 
-			final double latitude = tourPhoto.getLatitude();
-
-			galleryPhoto.isGeoFromExif = tourPhoto.isGeoFromPhoto();
-			galleryPhoto.isPhotoWithGps = latitude != 0;
-
-			galleryPhoto.setTourGeoPosition(latitude, tourPhoto.getLongitude());
+			if (galleryPhoto.getTourLatitude() == 0 && tourLatitude != 0) {
+				galleryPhoto.setTourGeoPosition(tourLatitude, tourPhoto.getLongitude());
+			}
 
 			_galleryPhotos.add(galleryPhoto);
 		}

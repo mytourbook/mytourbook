@@ -19,6 +19,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -559,9 +560,15 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener, IPh
 
 			for (final Photo photo : photos) {
 
-				sqlUpdate.setInt(1, photo.ratingStars);
-				sqlUpdate.setLong(2, photo.tourPhotoId);
-				sqlUpdate.executeUpdate();
+				final int ratingStars = photo.ratingStars;
+				final Collection<TourPhotoReference> photoRefs = photo.getTourPhotoReferences().values();
+
+				for (final TourPhotoReference photoRef : photoRefs) {
+
+					sqlUpdate.setInt(1, ratingStars);
+					sqlUpdate.setLong(2, photoRef.photoId);
+					sqlUpdate.executeUpdate();
+				}
 			}
 
 		} catch (final SQLException e) {

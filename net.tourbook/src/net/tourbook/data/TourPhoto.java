@@ -240,6 +240,10 @@ public class TourPhoto {
 		return ratingStars;
 	}
 
+	public Long getTourId() {
+		return tourData.getTourId();
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

@@ -314,14 +314,6 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 			return;
 		}
 
-//		if (photoWrapper.imageFileName.equals("IMG_1115.JPG")) {
-//			int a = 0;
-//
-//			final int size1 = PhotoLoadManager.getImageQueueSize();
-//
-//			a++;
-//		}
-
 		final ImageQuality requestedImageQuality = itemImageWidth <= PhotoLoadManager.IMAGE_SIZE_THUMBNAIL
 				? ImageQuality.THUMB
 				: ImageQuality.HQ;
@@ -1309,7 +1301,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 				int newRatingStars = galleryItem.hoveredStars;
 
-				if (newRatingStars == hoveredPhoto.ratingStars) {
+				final int hoveredRatingStars = hoveredPhoto.ratingStars;
+				if (newRatingStars == hoveredRatingStars) {
 
 					/**
 					 * Feature to remove rating stars:
@@ -1340,6 +1333,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 						if (customData instanceof Photo) {
 
 							final Photo photo = (Photo) customData;
+
 							photo.ratingStars = newRatingStars;
 
 							photos.add(photo);
@@ -1518,8 +1512,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 	}
 
-	public void setShowRatingStars(final boolean isVisible) {
-		_isShowPhotoRatingStars = isVisible;
+	public void setShowRatingStars(final RatingStarBehaviour ratingStarBehaviour) {
+		_isShowPhotoRatingStars = ratingStarBehaviour != RatingStarBehaviour.NO_STARS;
 	}
 
 	public void setTextMinThumbSize(final int textMinThumbSize) {

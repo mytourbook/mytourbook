@@ -422,9 +422,9 @@ public class PhotoManager {
 			// real tours are available
 
 			final TourPhotoLink firstTour = _dbTourPhotoLinks.get(0);
-			final Photo firstPhotoWrapper = allPhotos.get(0);
+			final Photo firstPhoto = allPhotos.get(0);
 
-			final DateTime firstPhotoTime = new DateTime(firstPhotoWrapper.adjustedTime);
+			final DateTime firstPhotoTime = new DateTime(firstPhoto.adjustedTime);
 			if (firstPhotoTime.isBefore(firstTour.tourStartTime)) {
 
 				// first photo is before the first tour, create dummy tour
@@ -1192,9 +1192,9 @@ public class PhotoManager {
 
 	private void setTourGPSIntoPhotos_10(final TourPhotoLink tourPhotoLink) {
 
-		final ArrayList<Photo> allPhotoWrapper = tourPhotoLink.linkPhotos;
+		final ArrayList<Photo> allPhotos = tourPhotoLink.linkPhotos;
 
-		final int numberOfPhotos = allPhotoWrapper.size();
+		final int numberOfPhotos = allPhotos.size();
 		if (numberOfPhotos == 0) {
 			// no photos are available for this tour
 			return;
@@ -1235,7 +1235,7 @@ public class PhotoManager {
 		int photoIndex = 0;
 
 		// get first photo
-		Photo photoWrapper = allPhotoWrapper.get(photoIndex);
+		Photo photo = allPhotos.get(photoIndex);
 
 		// loop: time serie
 		while (true) {
@@ -1243,13 +1243,13 @@ public class PhotoManager {
 			// loop: photo serie, check if a photo is in the current time slice
 			while (true) {
 
-				final long imageAdjustedTime = photoWrapper.adjustedTime;
+				final long imageAdjustedTime = photo.adjustedTime;
 				long imageTime = 0;
 
 				if (imageAdjustedTime != Long.MIN_VALUE) {
 					imageTime = imageAdjustedTime;
 				} else {
-					imageTime = photoWrapper.imageExifTime;
+					imageTime = photo.imageExifTime;
 				}
 
 				final long photoTime = imageTime / 1000;
@@ -1261,11 +1261,7 @@ public class PhotoManager {
 					final double tourLatitude = latitudeSerie[timeIndex];
 					final double tourLongitude = longitudeSerie[timeIndex];
 
-					setTourGPSIntoPhotos_20(tourData,
-//							tourPhotosSet,
-							photoWrapper,
-							tourLatitude,
-							tourLongitude);
+					setTourGPSIntoPhotos_20(tourData, photo, tourLatitude, tourLongitude);
 
 					photoIndex++;
 
@@ -1277,7 +1273,7 @@ public class PhotoManager {
 				}
 
 				if (photoIndex < numberOfPhotos) {
-					photoWrapper = allPhotoWrapper.get(photoIndex);
+					photo = allPhotos.get(photoIndex);
 				} else {
 					break;
 				}
@@ -1309,14 +1305,14 @@ public class PhotoManager {
 
 					setTourGPSIntoPhotos_20(tourData,
 //							tourPhotosSet,
-							photoWrapper,
+							photo,
 							tourLatitude,
 							tourLongitude);
 
 					photoIndex++;
 
 					if (photoIndex < numberOfPhotos) {
-						photoWrapper = allPhotoWrapper.get(photoIndex);
+						photo = allPhotos.get(photoIndex);
 					} else {
 						break;
 					}

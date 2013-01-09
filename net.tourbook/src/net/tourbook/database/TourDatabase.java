@@ -1983,13 +1983,13 @@ public class TourDatabase {
 	 */
 	private void createIndex_TourPhoto_023(final Statement stmt) throws SQLException {
 
-//		String sql;
-//
-//		/*
-//		 * CREATE INDEX imageFilePathName
-//		 */
-//		sql = "CREATE INDEX ImageFilePathName ON " + TABLE_TOUR_PHOTO + " (imageFilePathName)"; //$NON-NLS-1$ //$NON-NLS-2$
-//		exec(stmt, sql);
+		String sql;
+
+		/*
+		 * CREATE INDEX imageFilePathName
+		 */
+		sql = "CREATE INDEX ImageFilePathName ON " + TABLE_TOUR_PHOTO + " (imageFilePathName)"; //$NON-NLS-1$ //$NON-NLS-2$
+		exec(stmt, sql);
 	}
 
 	/**

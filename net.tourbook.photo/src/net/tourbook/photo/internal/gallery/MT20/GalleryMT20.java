@@ -2286,6 +2286,15 @@ public abstract class GalleryMT20 extends Canvas {
 		redraw();
 	}
 
+	public void redrawItem(final GalleryMT20Item item) {
+
+		redraw(item.viewPortX, //
+				item.viewPortY,
+				item.width,
+				item.height,
+				false);
+	}
+
 	public void restoreState() {
 
 		_fullScreenImageViewer.restoreState();
@@ -2723,16 +2732,16 @@ public abstract class GalleryMT20 extends Canvas {
 		_isShowOtherShellActions = isShowOtherShellActions;
 	}
 
-	public void setItemMinMaxSize(final int minItemSize, final int maxItemSize) {
-		_minItemWidth = minItemSize;
-		_maxItemWidth = maxItemSize;
-	}
-
 //	public void setSelection(final Collection<GalleryMT20Item> selection) {
 //
 //		// IS NOT YET IMPLEMENTED
 //
 //	}
+
+	public void setItemMinMaxSize(final int minItemSize, final int maxItemSize) {
+		_minItemWidth = minItemSize;
+		_maxItemWidth = maxItemSize;
+	}
 
 	/**
 	 * Set item receiver. Usually, this does not trigger gallery update. redraw must be called right

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,7 @@ package net.tourbook.photo.internal;
 import net.tourbook.photo.ILoadCallBack;
 import net.tourbook.photo.ImageGallery;
 import net.tourbook.photo.internal.gallery.MT20.GalleryMT20Item;
+import net.tourbook.photo.internal.gallery.MT20.IGalleryCustomData;
 
 import org.eclipse.swt.widgets.Display;
 
@@ -41,6 +42,8 @@ class LoadCallbackImage implements ILoadCallBack {
 
 	@Override
 	public void callBackImageIsLoaded(final boolean isUpdateUI) {
+
+		final IGalleryCustomData customData = _galleryItem.customData;
 
 		if (isUpdateUI == false) {
 			return;
@@ -66,12 +69,7 @@ class LoadCallbackImage implements ILoadCallBack {
 				if (isItemVisible) {
 
 					// redraw gallery item WITH background
-					_imageGallery.redrawGallery(
-							_galleryItem.viewPortX,
-							_galleryItem.viewPortY,
-							_galleryItem.width,
-							_galleryItem.height,
-							false);
+					_imageGallery.redrawItem(_galleryItem);
 				}
 			}
 		});

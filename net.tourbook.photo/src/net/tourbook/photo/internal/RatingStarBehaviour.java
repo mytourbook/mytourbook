@@ -13,13 +13,23 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.photo.internal.gallery.MT20;
+package net.tourbook.photo.internal;
 
-public interface IGalleryCustomData {
+public enum RatingStarBehaviour {
 
 	/**
-	 * @return Returns a unique id for this custom data. This id is used to identify selected
-	 *         gallery items.
+	 * No hovered stars are displayed.
 	 */
-	public String getUniqueId();
+	NO_STARS,
+
+	/**
+	 * Hovered stars are displayed when mouse is moved.
+	 */
+	HOVERED_STARS,
+
+	/**
+	 * Rating stars are displayed but the hovered stars are hidden.
+	 */
+	NO_HOVERED_STARS,
+
 }

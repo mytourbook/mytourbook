@@ -112,21 +112,19 @@ public class Photo implements IGalleryCustomData {
 	public boolean										isGeoFromExif;
 
 	/**
-	 * Rating with stars for this photo.
-	 */
-	public int											ratingStars;
-
-	/**
 	 * Is <code>true</code> when a photo is saved in a tour.
 	 * <p>
 	 * This allows to set rating stars which requires that they can be saved in a tour.
 	 */
 	public boolean										isPhotoFromTour;
 
+	private final HashMap<Long, TourPhotoReference>		_tourPhotoRef					= new HashMap<Long, TourPhotoReference>();
+
 	/**
-	 * Contains id of the saved photo.
+	 * Rating stars are very complicated when a photo is saved in multiple tours. Currently
+	 * (8.1.2013) ratings stars can be set for ALL tours.
 	 */
-	public long											tourPhotoId;
+	public int											ratingStars;
 
 	private PhotoImageMetadata							_photoImageMetadata;
 
@@ -231,6 +229,12 @@ public class Photo implements IGalleryCustomData {
 	private org.eclipse.swt.graphics.Point				_mapImageSize					= MAP_IMAGE_DEFAULT_SIZE;
 
 	/**
+	 * When <code>true</code> the photo is created from the file system and {@link #_tourPhotoRef}
+	 * needs to be retrieved from the sql db.
+	 */
+	public boolean										needsTourPhotoInfo;
+
+	/**
 	 * @param galleryItemIndex
 	 */
 	public Photo(final File file) {
@@ -271,6 +275,14 @@ public class Photo implements IGalleryCustomData {
 
 	public static String getImageKeyThumb(final String imageFilePathName) {
 		return Util.computeMD5(imageFilePathName + "_Thumb");//$NON-NLS-1$
+	}
+
+	public void addTour(final Long tourId, final long photoId) {
+
+		if (_tourPhotoRef.containsKey(tourId) == false) {
+
+			_tourPhotoRef.put(tourId, new TourPhotoReference(photoId));
+		}
 	}
 
 	/**
@@ -385,24 +397,6 @@ public class Photo implements IGalleryCustomData {
 
 		return photoMetadata;
 	}
-
-//	/**
-//	 * Update geo position in the cached exif metadata.
-//	 *
-//	 * @param updatedPhotos
-//	 */
-//	public static void updateExifGeoPosition(final ArrayList<PhotoWrapper> updatedPhotos) {
-//
-//		for (final PhotoWrapper photoWrapper : updatedPhotos) {
-//
-//			final PhotoImageMetadata imageMetadata = ExifCache.get(photoWrapper.imageFilePathName);
-//			if (imageMetadata != null) {
-//
-//				imageMetadata.latitude = photoWrapper.photo.getLatitude();
-//				imageMetadata.longitude = photoWrapper.photo.getLongitude();
-//			}
-//		}
-//	}
 
 	public String dumpLoadingState() {
 
@@ -905,6 +899,21 @@ public class Photo implements IGalleryCustomData {
 		return null;
 	}
 
+	/**
+	 * @return Returns latitude.
+	 *         <p>
+	 *         <b> Double.MIN_VALUE cannot be used, it cannot be saved in the database.
+	 *         <p>
+	 *         Returns 0 when the value is not set !!! </b>
+	 */
+	public double getTourLatitude() {
+		return _tourLatitude;
+	}
+
+	public HashMap<Long, TourPhotoReference> getTourPhotoReferences() {
+		return _tourPhotoRef;
+	}
+
 	@Override
 	public String getUniqueId() {
 		return imageFilePathName;
@@ -953,6 +962,10 @@ public class Photo implements IGalleryCustomData {
 
 	public boolean isLoadingError() {
 		return _isLoadingError;
+	}
+
+	public boolean isTourSet(final Long tourId) {
+		return _tourPhotoRef.containsKey(tourId);
 	}
 
 	public void resetTourGeoPosition() {

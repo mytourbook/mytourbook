@@ -34,6 +34,10 @@ Tour Map view
 
 All photo galleries
 
-* 
+* star rating can be set for photos when they are saved in a tour. When a photo is set in multiple tours, star rating can currently not be set (I hope this happens not too often)
 
+
+Fixed bugs
+
+* all average values in the tour book view are wrong, they included tours which values are not set -> average values are too small, http://sourceforge.net/tracker/?func=detail&atid=890604&aid=3599360&group_id=179799
 

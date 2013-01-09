@@ -32,6 +32,7 @@ import net.tourbook.photo.internal.GalleryType;
 import net.tourbook.photo.internal.ImageFilter;
 import net.tourbook.photo.internal.Messages;
 import net.tourbook.photo.internal.PhotoDateInfo;
+import net.tourbook.photo.internal.RatingStarBehaviour;
 import net.tourbook.photo.internal.manager.GallerySorting;
 
 import org.eclipse.jface.action.Action;
@@ -48,9 +49,9 @@ public class PhotoGallery extends ImageGallery {
 	private static final String			STATE_IMAGE_FILTER					= "STATE_IMAGE_FILTER";					//$NON-NLS-1$
 	private static final String			STATE_IS_SHOW_PHOTO_GPS_ANNOTATION	= "STATE_IS_SHOW_PHOTO_GPS_ANNOTATION";	//$NON-NLS-1$
 	private static final String			STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY	= "STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY";	//$NON-NLS-1$
-	private static final String			STATE_IS_SHOW_PHOTO_RATING_STARS	= "STATE_IS_SHOW_PHOTO_RATING_STARS";		//$NON-NLS-1$
 	private static final String			STATE_IS_SHOW_PHOTO_TOOLTIP			= "STATE_IS_SHOW_PHOTO_TOOLTIP";			//$NON-NLS-1$
 	private static final String			STATE_PHOTO_INFO_DATE				= "STATE_PHOTO_INFO_DATE";					//$NON-NLS-1$
+	private static final String			STATE_RATING_STAR_BEHAVIOUR			= "STATE_RATING_STAR_BEHAVIOUR";			//$NON-NLS-1$
 
 	public static final String			IMAGE_PHOTO_FILTER_GPS				= "IMAGE_PHOTO_FILTER_GPS";				//$NON-NLS-1$
 	public static final String			IMAGE_PHOTO_FILTER_NO_GPS			= "IMAGE_PHOTO_FILTER_NO_GPS";				//$NON-NLS-1$
@@ -76,6 +77,8 @@ public class PhotoGallery extends ImageGallery {
 
 	private GallerySorting				_gallerySorting;
 	private GalleryType					_galleryType;
+
+	private RatingStarBehaviour			_ratingStarBehaviour;
 
 	static {
 		UI.IMAGE_REGISTRY.put(//
@@ -173,7 +176,25 @@ public class PhotoGallery extends ImageGallery {
 	}
 
 	public void actionShowPhotoRatingStars() {
-		setShowPhotoRatingStars(_actionShowPhotoRatingStars.isChecked());
+
+		/*
+		 * toggle rating stars
+		 */
+		if (_ratingStarBehaviour == RatingStarBehaviour.NO_STARS) {
+
+			_ratingStarBehaviour = RatingStarBehaviour.HOVERED_STARS;
+
+		} else if (_ratingStarBehaviour == RatingStarBehaviour.HOVERED_STARS) {
+
+			_ratingStarBehaviour = RatingStarBehaviour.NO_HOVERED_STARS;
+
+		} else {
+
+			_ratingStarBehaviour = RatingStarBehaviour.NO_STARS;
+		}
+
+		updateUI_RatingStarBehaviour(_ratingStarBehaviour);
+		setShowPhotoRatingStars(_ratingStarBehaviour);
 	}
 
 	public void actionSortByDate() {
@@ -321,7 +342,6 @@ public class PhotoGallery extends ImageGallery {
 		}
 
 		final boolean isShowPhotoName = Util.getStateBoolean(_state, STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY, false);
-		final boolean isShowPhotoRatingStars = Util.getStateBoolean(_state, STATE_IS_SHOW_PHOTO_RATING_STARS, false);
 		final boolean isShowTooltip = Util.getStateBoolean(_state, STATE_IS_SHOW_PHOTO_TOOLTIP, true);
 		final boolean isShowPhotoAnnotations = Util.getStateBoolean(_state, //
 				STATE_IS_SHOW_PHOTO_GPS_ANNOTATION,
@@ -330,11 +350,9 @@ public class PhotoGallery extends ImageGallery {
 		_actionShowGPSAnnotation.setChecked(isShowPhotoAnnotations);
 		_actionShowPhotoDate.setChecked(_photoDateInfo != PhotoDateInfo.NoDateTime);
 		_actionShowPhotoName.setChecked(isShowPhotoName);
-		_actionShowPhotoRatingStars.setChecked(isShowPhotoRatingStars);
 		_actionShowPhotoTooltip.setChecked(isShowTooltip);
 
 		restoreInfo(isShowPhotoName, _photoDateInfo, isShowPhotoAnnotations, isShowTooltip);
-		setShowPhotoRatingStars(isShowPhotoRatingStars);
 
 		/*
 		 * gallery sorting
@@ -361,6 +379,22 @@ public class PhotoGallery extends ImageGallery {
 		updateUI_GalleryType(_galleryType);
 		selectGalleryType(_galleryType);
 
+		/*
+		 * rating star behaviour
+		 */
+		final String stateValue = Util.getStateString(
+				_state,
+				STATE_RATING_STAR_BEHAVIOUR,
+				RatingStarBehaviour.HOVERED_STARS.name());
+		try {
+			_ratingStarBehaviour = RatingStarBehaviour.valueOf(stateValue);
+		} catch (final Exception e) {
+			// set default
+			_ratingStarBehaviour = RatingStarBehaviour.HOVERED_STARS;
+		}
+		updateUI_RatingStarBehaviour(_ratingStarBehaviour);
+		setShowPhotoRatingStars(_ratingStarBehaviour);
+
 		super.restoreState();
 
 		// !!! overwrite super settings !!!
@@ -383,11 +417,11 @@ public class PhotoGallery extends ImageGallery {
 
 		_state.put(STATE_IS_SHOW_PHOTO_GPS_ANNOTATION, _actionShowGPSAnnotation.isChecked());
 		_state.put(STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY, _actionShowPhotoName.isChecked());
-		_state.put(STATE_IS_SHOW_PHOTO_RATING_STARS, _actionShowPhotoRatingStars.isChecked());
 		_state.put(STATE_IS_SHOW_PHOTO_TOOLTIP, _actionShowPhotoTooltip.isChecked());
 
-		_state.put(STATE_PHOTO_INFO_DATE, _photoDateInfo.name());
 		_state.put(STATE_IMAGE_FILTER, _currentImageFilter.name());
+		_state.put(STATE_PHOTO_INFO_DATE, _photoDateInfo.name());
+		_state.put(STATE_RATING_STAR_BEHAVIOUR, _ratingStarBehaviour.name());
 
 		super.saveState();
 	}
@@ -416,5 +450,35 @@ public class PhotoGallery extends ImageGallery {
 		_actionPhotoGalleryType.setText(text);
 		_actionPhotoGalleryType.setToolTipText(toolTipText);
 		_actionPhotoGalleryType.setImageDescriptor(imageDescriptor);
+	}
+
+	private void updateUI_RatingStarBehaviour(final RatingStarBehaviour ratingStarBehaviour) {
+
+		String toolTipText;
+		ImageDescriptor imageDescriptor;
+
+		if (ratingStarBehaviour == RatingStarBehaviour.NO_STARS) {
+
+			toolTipText = Messages.Photo_Gallery_Action_ShowPhotoRatingStars_NoStars_Tooltip;
+			imageDescriptor = Activator.getImageDescriptor(Messages.Image__PhotoRatingStarAndHovered);
+
+		} else if (ratingStarBehaviour == RatingStarBehaviour.NO_HOVERED_STARS) {
+
+			toolTipText = Messages.Photo_Gallery_Action_ShowPhotoRatingStars_NoHoveredStars_Tooltip;
+			imageDescriptor = Activator.getImageDescriptor(Messages.Image__PhotoRatingStars);
+
+		} else {
+
+			// set default: RatingStarBehaviour.HOVERED_STARS
+
+			toolTipText = Messages.Photo_Gallery_Action_ShowPhotoRatingStars_Tooltip;
+			imageDescriptor = Activator.getImageDescriptor(Messages.Image__PhotoRatingStarsHovered);
+		}
+
+		final boolean isShowRatingStars = ratingStarBehaviour != RatingStarBehaviour.NO_STARS;
+
+		_actionShowPhotoRatingStars.setChecked(isShowRatingStars);
+		_actionShowPhotoRatingStars.setToolTipText(toolTipText);
+		_actionShowPhotoRatingStars.setImageDescriptor(imageDescriptor);
 	}
 }
