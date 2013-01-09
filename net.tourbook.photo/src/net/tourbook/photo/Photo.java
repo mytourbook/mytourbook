@@ -20,13 +20,13 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.map.CommonMapProvider;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
-import net.tourbook.photo.internal.gallery.MT20.IGalleryCustomData;
 import net.tourbook.photo.internal.gallery.MT20.RendererHelper;
 
 import org.apache.commons.imaging.Imaging;
@@ -49,7 +49,7 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-public class Photo implements IGalleryCustomData {
+public class Photo {
 
 	private String										_uniqueId;
 
@@ -229,10 +229,11 @@ public class Photo implements IGalleryCustomData {
 	private org.eclipse.swt.graphics.Point				_mapImageSize					= MAP_IMAGE_DEFAULT_SIZE;
 
 	/**
-	 * When <code>true</code> the photo is created from the file system and {@link #_tourPhotoRef}
-	 * needs to be retrieved from the sql db.
+	 * When sql loading state is {@link PhotoSqlLoadingState#NOT_LOADED}, the photo is created from
+	 * the file system and {@link #_tourPhotoRef} needs to be retrieved from the sql db.
 	 */
-	public boolean										needsTourPhotoInfo;
+	private AtomicReference<PhotoSqlLoadingState>		_photoSqlLoadingState			= new AtomicReference<PhotoSqlLoadingState>(
+																								PhotoSqlLoadingState.NOT_LOADED);
 
 	/**
 	 * @param galleryItemIndex
@@ -847,6 +848,10 @@ public class Photo implements IGalleryCustomData {
 		return _exifDateTime != null ? _exifDateTime : _imageFileDateTime;
 	}
 
+	public  AtomicReference<PhotoSqlLoadingState> getSqlLoadingState() {
+		return _photoSqlLoadingState;
+	}
+
 	private DateTime getTiffValueDate(final TiffImageMetadata tiffMetadata) {
 
 		try {
@@ -914,7 +919,6 @@ public class Photo implements IGalleryCustomData {
 		return _tourPhotoRef;
 	}
 
-	@Override
 	public String getUniqueId() {
 		return imageFilePathName;
 	}

@@ -24,6 +24,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.photo.IExternalGalleryListener;
 import net.tourbook.photo.IPhotoProvider;
 import net.tourbook.photo.IPhotoServiceProvider;
+import net.tourbook.photo.Photo;
 import net.tourbook.photo.internal.Messages;
 import net.tourbook.photo.internal.preferences.PrefPagePhotoDirectory;
 
@@ -899,17 +900,6 @@ public abstract class GalleryMT20 extends Canvas {
 				: _fullScreenImageViewer;
 	}
 
-	/**
-	 * Initializes a gallery item which can be used to set data into the item. This method is called
-	 * before a gallery item is painted.
-	 * 
-	 * @param itemIndex
-	 *            Index within the gallery items, these are the gallery items which the gallery can
-	 *            display.
-	 * @return
-	 */
-	public abstract IGalleryCustomData getCustomData(final int itemIndex);
-
 	public FullScreenImageViewer getFullScreenImageViewer() {
 		return getCurrentFullScreenImageViewer();
 	}
@@ -967,12 +957,12 @@ public abstract class GalleryMT20 extends Canvas {
 
 			galleryItem = new GalleryMT20Item(this);
 
-			final IGalleryCustomData customData = getCustomData(itemIndex);
+			final Photo photo = getPhoto(itemIndex);
 
-			if (customData != null) {
+			if (photo != null) {
 
-				galleryItem.customData = customData;
-				galleryItem.uniqueItemID = customData.getUniqueId();
+				galleryItem.photo = photo;
+				galleryItem.uniqueItemID = photo.getUniqueId();
 
 				_createdGalleryItems.put(galleryItem.uniqueItemID, galleryItem);
 
@@ -1062,6 +1052,17 @@ public abstract class GalleryMT20 extends Canvas {
 	public int getNumberOfHorizontalImages() {
 		return _gridHorizItems;
 	}
+
+	/**
+	 * Initializes a gallery item which can be used to set data into the item. This method is called
+	 * before a gallery item is painted.
+	 * 
+	 * @param itemIndex
+	 *            Index within the gallery items, these are the gallery items which the gallery can
+	 *            display.
+	 * @return
+	 */
+	public abstract Photo getPhoto(final int itemIndex);
 
 	public IPhotoProvider getPhotoProvider() {
 		return _photoProvider;

@@ -15,18 +15,19 @@
  *******************************************************************************/
 package net.tourbook.photo.internal;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import net.tourbook.photo.ILoadCallBack;
 import net.tourbook.photo.ImageGallery;
+import net.tourbook.photo.Photo;
+import net.tourbook.photo.PhotoLoadManager;
+import net.tourbook.photo.PhotoSqlLoadingState;
 import net.tourbook.photo.internal.gallery.MT20.GalleryMT20Item;
-import net.tourbook.photo.internal.gallery.MT20.IGalleryCustomData;
 
 import org.eclipse.swt.widgets.Display;
 
-class LoadCallbackImage implements ILoadCallBack {
+public class LoadCallbackImage implements ILoadCallBack {
 
-	/**
-	 * 
-	 */
 	private final ImageGallery	_imageGallery;
 	private GalleryMT20Item		_galleryItem;
 
@@ -43,11 +44,29 @@ class LoadCallbackImage implements ILoadCallBack {
 	@Override
 	public void callBackImageIsLoaded(final boolean isUpdateUI) {
 
-		final IGalleryCustomData customData = _galleryItem.customData;
+		final Photo photo = _galleryItem.photo;
 
-		if (isUpdateUI == false) {
-			return;
+		final AtomicReference<PhotoSqlLoadingState> sqlLoadingState = photo.getSqlLoadingState();
+
+		final boolean isInLoadingQueue = sqlLoadingState.get() == PhotoSqlLoadingState.IS_IN_LOADING_QUEUE;
+
+		final boolean isSqlLoaded = sqlLoadingState.compareAndSet(
+				PhotoSqlLoadingState.IS_LOADED,
+				PhotoSqlLoadingState.IS_IN_LOADING_QUEUE);
+
+		if (isInLoadingQueue || isSqlLoaded) {
+
+			if (isUpdateUI) {
+				updateUI();
+			}
+
+		} else {
+
+			PhotoLoadManager.putPhotoInLoadingQueueSql(photo, this);
 		}
+	}
+
+	public void updateUI() {
 
 		// mark image area as needed to be redrawn
 		Display.getDefault().syncExec(new Runnable() {

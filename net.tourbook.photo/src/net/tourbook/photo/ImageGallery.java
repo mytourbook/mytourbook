@@ -50,7 +50,6 @@ import net.tourbook.photo.internal.gallery.MT20.FullScreenImageViewer;
 import net.tourbook.photo.internal.gallery.MT20.GalleryMT20;
 import net.tourbook.photo.internal.gallery.MT20.GalleryMT20Item;
 import net.tourbook.photo.internal.gallery.MT20.IGalleryContextMenuProvider;
-import net.tourbook.photo.internal.gallery.MT20.IGalleryCustomData;
 import net.tourbook.photo.internal.gallery.MT20.IItemListener;
 import net.tourbook.photo.internal.manager.ExifCache;
 import net.tourbook.photo.internal.manager.GallerySorting;
@@ -429,7 +428,7 @@ public class ImageGallery implements IItemListener, IGalleryContextMenuProvider,
 		}
 
 		@Override
-		public IGalleryCustomData getCustomData(final int filterIndex) {
+		public Photo getPhoto(final int filterIndex) {
 
 			if (filterIndex >= _sortedAndFilteredPhotos.length) {
 				return null;
@@ -584,10 +583,9 @@ public class ImageGallery implements IItemListener, IGalleryContextMenuProvider,
 
 		for (final GalleryMT20Item item : allItems) {
 
-			final IGalleryCustomData customData = item.customData;
-
-			if (customData instanceof Photo) {
-				photos.add(((Photo) customData));
+			final Photo photo = item.photo;
+			if (photo != null) {
+				photos.add(photo);
 			}
 		}
 
@@ -1235,10 +1233,9 @@ public class ImageGallery implements IItemListener, IGalleryContextMenuProvider,
 
 			for (final GalleryMT20Item item : galleryItems) {
 
-				final IGalleryCustomData customData = item.customData;
-
-				if (customData instanceof Photo) {
-					sortedPhotosArray[itemIndex++] = (Photo) customData;
+				final Photo photo = item.photo;
+				if (photo != null) {
+					sortedPhotosArray[itemIndex++] = photo;
 				}
 			}
 
@@ -3087,8 +3084,6 @@ public class ImageGallery implements IItemListener, IGalleryContextMenuProvider,
 						 */
 
 						galleryPhoto = new Photo(photoFile);
-
-						galleryPhoto.needsTourPhotoInfo = true;
 
 //						galleryPhoto.adjustedTime = tourPhoto.getAdjustedTime();
 //						galleryPhoto.imageExifTime = tourPhoto.getImageExifTime();

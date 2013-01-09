@@ -17,6 +17,8 @@ package net.tourbook.photo.internal.gallery.MT20;
 
 import java.util.Collection;
 
+import net.tourbook.photo.Photo;
+
 /**
  * This gallery has it's origin in http://www.eclipse.org/nebula/widgets/gallery/gallery.php but has
  * been modified in many areas, like grouping has been removed, filtering has been added.
@@ -36,7 +38,10 @@ public class GalleryMT20Item {
 	public int							width;
 	public int							height;
 
-	public IGalleryCustomData			customData;
+	/**
+	 * Photo, can be <code>null</code> when not yet initialized.
+	 */
+	public Photo						photo;
 
 	/**
 	 * Each gallery item needs a uniqueue id.
@@ -81,17 +86,6 @@ public class GalleryMT20Item {
 		this.gallery = galleryMT20;
 	}
 
-//	/**
-//	 * Set data for the gallery item and a unique key to identify it (e.g. for selection)
-//	 *
-//	 * @param data
-//	 * @param uniqueItemID
-//	 */
-//	void setCustomData(final IGalleryCustomData data, final String uniqueItemID) {
-//		this.customData = data;
-//		this.uniqueItemID = uniqueItemID;
-//	}
-
 	@Override
 	public String toString() {
 		return "" //$NON-NLS-1$
@@ -100,7 +94,7 @@ public class GalleryMT20Item {
 				+ ("\ty=" + viewPortY) //$NON-NLS-1$
 				+ ("\t" + width) //$NON-NLS-1$
 				+ ("x" + height) //$NON-NLS-1$
-				+ (" " + customData) //$NON-NLS-1$
+				+ (" " + photo) //$NON-NLS-1$
 //
 		;
 	}

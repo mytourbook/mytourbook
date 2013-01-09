@@ -570,7 +570,7 @@ public class GalleryPhotoToolTip extends AnimatedToolTipShell {
 				reset(true);
 			}
 
-			_photo = (Photo) hoveredItem.customData;
+			_photo = hoveredItem.photo;
 
 			if (_photo == null) {
 

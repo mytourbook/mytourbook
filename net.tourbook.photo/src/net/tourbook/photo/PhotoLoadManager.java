@@ -30,6 +30,7 @@ import net.tourbook.photo.internal.gallery.MT20.GalleryMT20;
 import net.tourbook.photo.internal.gallery.MT20.GalleryMT20Item;
 import net.tourbook.photo.internal.manager.PhotoExifLoader;
 import net.tourbook.photo.internal.manager.PhotoImageLoader;
+import net.tourbook.photo.internal.manager.PhotoSqlLoader;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Display;
@@ -69,10 +70,13 @@ public class PhotoLoadManager {
 	private static ThreadPoolExecutor							_executorHQ;
 	private static ThreadPoolExecutor							_executorOriginal;
 
+	private static ThreadPoolExecutor							_executorSql;
+
 	private static final LinkedBlockingDeque<PhotoExifLoader>	_waitingQueueExif				= new LinkedBlockingDeque<PhotoExifLoader>();
 	private static final LinkedBlockingDeque<PhotoImageLoader>	_waitingQueueThumb				= new LinkedBlockingDeque<PhotoImageLoader>();
 	private static final LinkedBlockingDeque<PhotoImageLoader>	_waitingQueueHQ					= new LinkedBlockingDeque<PhotoImageLoader>();
 	private static final LinkedBlockingDeque<PhotoImageLoader>	_waitingQueueOriginal			= new LinkedBlockingDeque<PhotoImageLoader>();
+	private static final LinkedBlockingDeque<PhotoSqlLoader>	_waitingQueueSql				= new LinkedBlockingDeque<PhotoSqlLoader>();
 
 	/*
 	 * key is the photo image file path
@@ -170,10 +174,28 @@ public class PhotoLoadManager {
 			}
 		};
 
+		final ThreadFactory threadFactorySql = new ThreadFactory() {
+
+			private int	_threadNumber	= 0;
+
+			public Thread newThread(final Runnable r) {
+
+				final String threadName = "LoadImg-Sql-" + _threadNumber++; //$NON-NLS-1$
+
+				final Thread thread = new Thread(r, threadName);
+
+				thread.setPriority(Thread.MIN_PRIORITY);
+				thread.setDaemon(true);
+
+				return thread;
+			}
+		};
+
 		_executorExif = (ThreadPoolExecutor) Executors.newFixedThreadPool(numberOfProcessors, threadFactoryExif);
 		_executorThumb = (ThreadPoolExecutor) Executors.newFixedThreadPool(numberOfProcessors, threadFactoryThumb);
 		_executorHQ = (ThreadPoolExecutor) Executors.newFixedThreadPool(1, threadFactoryHQ);
 		_executorOriginal = (ThreadPoolExecutor) Executors.newFixedThreadPool(1, threadFactoryOriginal);
+		_executorSql = (ThreadPoolExecutor) Executors.newFixedThreadPool(numberOfProcessors, threadFactorySql);
 	}
 
 	/**
@@ -436,6 +458,25 @@ public class PhotoLoadManager {
 			}
 		};
 		_executorOriginal.submit(executorTask);
+	}
+
+	public static void putPhotoInLoadingQueueSql(final Photo photo, final ILoadCallBack loadCallbackImage) {
+
+		// put image loading item into the waiting queue
+		_waitingQueueSql.add(new PhotoSqlLoader(photo, loadCallbackImage));
+
+		final Runnable executorTask = new Runnable() {
+			public void run() {
+
+				// get last added loader item
+				final PhotoSqlLoader loadingItem = _waitingQueueSql.pollLast();
+
+				if (loadingItem != null) {
+					loadingItem.loadSql();
+				}
+			}
+		};
+		_executorSql.submit(executorTask);
 	}
 
 	public static void putImageInLoadingQueueThumbGallery(	final GalleryMT20Item galleryItem,

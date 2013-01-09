@@ -13,13 +13,23 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.photo.internal.gallery.MT20;
+package net.tourbook.photo;
 
-public interface IGalleryCustomData {
+public enum PhotoSqlLoadingState {
 
 	/**
-	 * @return Returns a unique id for this custom data. This id is used to identify selected
-	 *         gallery items.
+	 * 
 	 */
-	public String getUniqueId();
+	NOT_LOADED,
+
+	/**
+	 * 
+	 */
+	IS_IN_LOADING_QUEUE,
+
+	/**
+	 * 
+	 */
+	IS_LOADED
+
 }

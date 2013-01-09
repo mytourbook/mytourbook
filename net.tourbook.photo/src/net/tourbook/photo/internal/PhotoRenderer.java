@@ -34,7 +34,6 @@ import net.tourbook.photo.internal.gallery.MT20.AbstractGalleryMT20ItemRenderer;
 import net.tourbook.photo.internal.gallery.MT20.DefaultGalleryMT20ItemRenderer;
 import net.tourbook.photo.internal.gallery.MT20.GalleryMT20;
 import net.tourbook.photo.internal.gallery.MT20.GalleryMT20Item;
-import net.tourbook.photo.internal.gallery.MT20.IGalleryCustomData;
 import net.tourbook.photo.internal.gallery.MT20.PaintingResult;
 import net.tourbook.photo.internal.gallery.MT20.RendererHelper;
 import net.tourbook.photo.internal.gallery.MT20.ZoomState;
@@ -308,7 +307,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		_paintedDestWidth = itemImageWidth;
 		_paintedDestHeight = itemImageHeight;
 
-		final Photo photo = (Photo) galleryItem.customData;
+		final Photo photo = galleryItem.photo;
 		if (photo == null) {
 			// this case should not happen but it did
 			return;
@@ -581,7 +580,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 										final ZoomState zoomState,
 										final double zoomFactor) {
 
-		final Photo photo = (Photo) galleryItem.customData;
+		final Photo photo = galleryItem.photo;
 		if (photo == null) {
 			return null;
 		}
@@ -796,7 +795,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 											final int monitorWidth,
 											final int monitorHeight) {
 
-		final Photo photo = (Photo) galleryItem.customData;
+		final Photo photo = galleryItem.photo;
 		if (photo == null) {
 			return null;
 		}
@@ -1039,9 +1038,9 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		final boolean isStarHovered = hoveredStars > 0;
 		boolean canSetRating = false;
 
-		final IGalleryCustomData customData = galleryItem.customData;
-		if (customData instanceof Photo) {
-			canSetRating = ((Photo) customData).isPhotoFromTour;
+		final Photo photo = galleryItem.photo;
+		if (photo != null) {
+			canSetRating = photo.isPhotoFromTour;
 		}
 
 		// center ratings stars in the middle of the image
@@ -1294,10 +1293,10 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 			// save star rating in the selected tours
 
-			final IGalleryCustomData itemCustomData = galleryItem.customData;
+			final Photo itemCustomData = galleryItem.photo;
 			if (itemCustomData instanceof Photo) {
 
-				final Photo hoveredPhoto = (Photo) itemCustomData;
+				final Photo hoveredPhoto = itemCustomData;
 
 				int newRatingStars = galleryItem.hoveredStars;
 
@@ -1328,11 +1327,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 					for (final GalleryMT20Item item : selectedItemValues) {
 
-						final IGalleryCustomData customData = item.customData;
-
-						if (customData instanceof Photo) {
-
-							final Photo photo = (Photo) customData;
+						final Photo photo = item.photo;
+						if (photo != null) {
 
 							photo.ratingStars = newRatingStars;
 
@@ -1395,9 +1391,9 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	 */
 	public void itemIsHovered(final GalleryMT20Item hoveredItem, final int itemMouseX, final int itemMouseY) {
 
-		final IGalleryCustomData customData = hoveredItem.customData;
-		if (customData instanceof Photo) {
-			final boolean canSetRating = ((Photo) customData).isPhotoFromTour;
+		final Photo photo = hoveredItem.photo;
+		if (photo != null) {
+			final boolean canSetRating = photo.isPhotoFromTour;
 			if (canSetRating == false) {
 				return;
 			}
