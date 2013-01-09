@@ -27,4 +27,12 @@ public interface IPhotoServiceProvider {
 	 */
 	void saveStarRating(ArrayList<Photo> photos);
 
+	/**
+	 * Set's into the photo for which tours this photo is saved. Multiple tours are valid, e.g. a
+	 * photo is saved for 2 different people).
+	 * 
+	 * @param photo
+	 */
+	void setTourReference(Photo photo);
+
 }

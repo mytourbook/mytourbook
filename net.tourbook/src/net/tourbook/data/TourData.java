@@ -4349,7 +4349,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 		// photos are not yet set
 
-		// create photo wrapper for all tour photos
+		// create gallery photos for all tour photos
 		for (final TourPhoto tourPhoto : tourPhotos) {
 
 			Photo galleryPhoto = null;

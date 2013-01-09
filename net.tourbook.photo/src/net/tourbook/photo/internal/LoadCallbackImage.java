@@ -18,6 +18,7 @@ package net.tourbook.photo.internal;
 import java.util.concurrent.atomic.AtomicReference;
 
 import net.tourbook.photo.ILoadCallBack;
+import net.tourbook.photo.IPhotoServiceProvider;
 import net.tourbook.photo.ImageGallery;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoLoadManager;
@@ -62,7 +63,16 @@ public class LoadCallbackImage implements ILoadCallBack {
 
 		} else {
 
-			PhotoLoadManager.putPhotoInLoadingQueueSql(photo, this);
+			final IPhotoServiceProvider photoServiceProvider = _galleryItem.gallery.getPhotoServiceProvider();
+			if (photoServiceProvider == null) {
+
+				// set to dummy loaded, this should not happen but it can happen when it's not fully setup
+				photo.getSqlLoadingState().set(PhotoSqlLoadingState.IS_LOADED);
+
+			} else {
+
+				PhotoLoadManager.putPhotoInLoadingQueueSql(photo, this, photoServiceProvider);
+			}
 		}
 	}
 

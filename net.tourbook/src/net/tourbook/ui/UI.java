@@ -1162,7 +1162,7 @@ public class UI {
 
 			StatusUtil.log(sqlExceptionText);
 
-			MessageDialog.openError(Display.getCurrent().getActiveShell(), //
+			MessageDialog.openError(Display.getDefault().getActiveShell(), //
 					"SQL Error",//$NON-NLS-1$
 					sqlExceptionText);
 
@@ -1174,7 +1174,7 @@ public class UI {
 
 		final String message = "SQL statement: " + UI.NEW_LINE2 + sqlStatement + Util.getSQLExceptionText(e); //$NON-NLS-1$
 
-		MessageDialog.openError(Display.getCurrent().getActiveShell(), //
+		MessageDialog.openError(Display.getDefault().getActiveShell(), //
 				"SQL Error", //$NON-NLS-1$
 				message);
 

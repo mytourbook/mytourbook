@@ -17,6 +17,7 @@ package net.tourbook.photo;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -496,21 +497,6 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener, IPh
 	@Override
 	public void photoEvent(final PhotoEventId photoEventId, final Object data) {
 
-//		System.out.println(net.tourbook.common.UI.timeStampNano()
-//				+ " TourPhotosView::photoEvent\t"
-////				+ photoEventId
-////				+ "\t"
-//				+ data);
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
-//		if (photoEventId == PhotoEventId.GPS_DATA_IS_UPDATED) {
-//
-//			if (data instanceof ArrayList) {
-//				_photoGallery.updateGPSPosition((ArrayList<?>) data);
-//			}
-//
-//		} else
-
 		if (photoEventId == PhotoEventId.PHOTO_SELECTION) {
 
 			if (data instanceof TourPhotoLinkSelection) {
@@ -600,6 +586,79 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener, IPh
 
 	@Override
 	public void setFocus() {
+
+	}
+
+	@Override
+	public void setTourReference(final Photo photo) {
+
+		Connection conn = null;
+
+		try {
+
+			conn = TourDatabase.getInstance().getConnection();
+
+			final String sql = "SELECT " // 																//$NON-NLS-1$
+											//
+					+ " photoId,											\n" //		1 //$NON-NLS-1$
+					+ (" " + TourDatabase.TABLE_TOUR_DATA + "_tourId		\n") // 	2 //$NON-NLS-1$ //$NON-NLS-2$
+					//
+					+ " FROM " + TourDatabase.TABLE_TOUR_PHOTO + "	\n"//				//$NON-NLS-1$ //$NON-NLS-2$
+					//
+					+ " WHERE imageFilePathName=?"; //									//$NON-NLS-1$
+
+			System.out.println(net.tourbook.common.UI.timeStampNano() + " sql '" + sql + "'");
+			// TODO remove SYSTEM.OUT.PRINTLN
+
+			final PreparedStatement stmt = conn.prepareStatement(sql);
+
+			stmt.setString(1, photo.imageFilePathName);
+
+			final ResultSet result = stmt.executeQuery();
+
+			while (result.next()) {
+
+				final long dbTourId = result.getLong(1);
+				final long dbPhotoId = result.getLong(2);
+
+				photo.addTour(dbTourId, dbPhotoId);
+
+//		galleryPhoto.adjustedTime = tourPhoto.getAdjustedTime();
+//		galleryPhoto.imageExifTime = tourPhoto.getImageExifTime();
+//
+//		tourLatitude = tourPhoto.getLatitude();
+//
+//		galleryPhoto.isGeoFromExif = tourPhoto.isGeoFromPhoto();
+//		galleryPhoto.isPhotoWithGps = tourLatitude != 0;
+//
+//		galleryPhoto.ratingStars = tourPhoto.getRatingStars();
+//
+//	/*
+//	 * when a photo is in the photo cache it is possible that the tour is from the file
+//	 * system, update tour relevant fields
+//	 */
+//	galleryPhoto.isPhotoFromTour = true;
+//
+//	// ensure this tour is set in the photo
+//	galleryPhoto.addTour(tourPhoto.getTourId(), tourPhoto.getPhotoId());
+//
+//	if (galleryPhoto.getTourLatitude() == 0 && tourLatitude != 0) {
+//		galleryPhoto.setTourGeoPosition(tourLatitude, tourPhoto.getLongitude());
+//	}
+			}
+
+		} catch (final SQLException e) {
+			UI.showSQLException(e);
+		} finally {
+
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (final SQLException e) {
+					UI.showSQLException(e);
+				}
+			}
+		}
 
 	}
 

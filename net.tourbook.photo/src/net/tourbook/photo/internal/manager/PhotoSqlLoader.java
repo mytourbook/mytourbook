@@ -16,77 +16,30 @@
 package net.tourbook.photo.internal.manager;
 
 import net.tourbook.photo.ILoadCallBack;
+import net.tourbook.photo.IPhotoServiceProvider;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoSqlLoadingState;
 import net.tourbook.photo.internal.LoadCallbackImage;
 
 public class PhotoSqlLoader {
 
-	private Photo			photo;
-	private ILoadCallBack	imageLoadCallback;
+	private Photo					photo;
+	private IPhotoServiceProvider	photoServiceProvider;
 
-	public PhotoSqlLoader(final Photo photo, final ILoadCallBack imageLoadCallback) {
+	private ILoadCallBack			imageLoadCallback;
+
+	public PhotoSqlLoader(	final Photo photo,
+							final ILoadCallBack imageLoadCallback,
+							final IPhotoServiceProvider photoServiceProvider) {
 
 		this.photo = photo;
 		this.imageLoadCallback = imageLoadCallback;
+		this.photoServiceProvider = photoServiceProvider;
 	}
 
 	public void loadSql() {
 
-//		Connection conn = null;
-//
-//		try {
-//
-//			conn = TourDatabase.getInstance().getConnection();
-//
-////			final PreparedStatement sqlUpdate = conn.prepareStatement(//
-////					//
-////					"SELECT " //
-////								//
-////							+ TourDatabase.TABLE_TOUR_PHOTO //
-////							+ " SET" //								//$NON-NLS-1$
-////							+ " ratingStars=? " //					//$NON-NLS-1$
-////							+ " WHERE photoId=?"); //				//$NON-NLS-1$
-////
-////			sqlUpdate.setInt(1, ratingStars);
-////			sqlUpdate.setLong(2, photoRef.photoId);
-////			sqlUpdate.executeUpdate();
-//
-//		} catch (final SQLException e) {
-////			UI.showSQLException(e);
-//		} finally {
-//
-//			if (conn != null) {
-//				try {
-//					conn.close();
-//				} catch (final SQLException e) {
-////					UI.showSQLException(e);
-//				}
-//			}
-//		}
-
-//		galleryPhoto.adjustedTime = tourPhoto.getAdjustedTime();
-//		galleryPhoto.imageExifTime = tourPhoto.getImageExifTime();
-//
-//		tourLatitude = tourPhoto.getLatitude();
-//
-//		galleryPhoto.isGeoFromExif = tourPhoto.isGeoFromPhoto();
-//		galleryPhoto.isPhotoWithGps = tourLatitude != 0;
-//
-//		galleryPhoto.ratingStars = tourPhoto.getRatingStars();
-//
-//	/*
-//	 * when a photo is in the photo cache it is possible that the tour is from the file
-//	 * system, update tour relevant fields
-//	 */
-//	galleryPhoto.isPhotoFromTour = true;
-//
-//	// ensure this tour is set in the photo
-//	galleryPhoto.addTour(tourPhoto.getTourId(), tourPhoto.getPhotoId());
-//
-//	if (galleryPhoto.getTourLatitude() == 0 && tourLatitude != 0) {
-//		galleryPhoto.setTourGeoPosition(tourLatitude, tourPhoto.getLongitude());
-//	}
+		photoServiceProvider.setTourReference(photo);
 
 		photo.getSqlLoadingState().set(PhotoSqlLoadingState.IS_LOADED);
 

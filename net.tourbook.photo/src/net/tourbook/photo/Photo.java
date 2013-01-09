@@ -121,8 +121,14 @@ public class Photo {
 	private final HashMap<Long, TourPhotoReference>		_tourPhotoRef					= new HashMap<Long, TourPhotoReference>();
 
 	/**
+	 * When sql loading state is {@link PhotoSqlLoadingState#NOT_LOADED}, the photo is created from
+	 * the file system and {@link #_tourPhotoRef} needs to be retrieved from the sql db.
+	 */
+	private AtomicReference<PhotoSqlLoadingState>		_photoSqlLoadingState			= new AtomicReference<PhotoSqlLoadingState>(
+																								PhotoSqlLoadingState.NOT_LOADED);
+	/**
 	 * Rating stars are very complicated when a photo is saved in multiple tours. Currently
-	 * (8.1.2013) ratings stars can be set for ALL tours.
+	 * (8.1.2013) ratings stars can be set only for ALL tours.
 	 */
 	public int											ratingStars;
 
@@ -227,13 +233,6 @@ public class Photo {
 	 * Image size which is painted in the map
 	 */
 	private org.eclipse.swt.graphics.Point				_mapImageSize					= MAP_IMAGE_DEFAULT_SIZE;
-
-	/**
-	 * When sql loading state is {@link PhotoSqlLoadingState#NOT_LOADED}, the photo is created from
-	 * the file system and {@link #_tourPhotoRef} needs to be retrieved from the sql db.
-	 */
-	private AtomicReference<PhotoSqlLoadingState>		_photoSqlLoadingState			= new AtomicReference<PhotoSqlLoadingState>(
-																								PhotoSqlLoadingState.NOT_LOADED);
 
 	/**
 	 * @param galleryItemIndex
@@ -848,7 +847,7 @@ public class Photo {
 		return _exifDateTime != null ? _exifDateTime : _imageFileDateTime;
 	}
 
-	public  AtomicReference<PhotoSqlLoadingState> getSqlLoadingState() {
+	public AtomicReference<PhotoSqlLoadingState> getSqlLoadingState() {
 		return _photoSqlLoadingState;
 	}
 

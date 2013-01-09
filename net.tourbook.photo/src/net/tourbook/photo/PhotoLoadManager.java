@@ -460,25 +460,6 @@ public class PhotoLoadManager {
 		_executorOriginal.submit(executorTask);
 	}
 
-	public static void putPhotoInLoadingQueueSql(final Photo photo, final ILoadCallBack loadCallbackImage) {
-
-		// put image loading item into the waiting queue
-		_waitingQueueSql.add(new PhotoSqlLoader(photo, loadCallbackImage));
-
-		final Runnable executorTask = new Runnable() {
-			public void run() {
-
-				// get last added loader item
-				final PhotoSqlLoader loadingItem = _waitingQueueSql.pollLast();
-
-				if (loadingItem != null) {
-					loadingItem.loadSql();
-				}
-			}
-		};
-		_executorSql.submit(executorTask);
-	}
-
 	public static void putImageInLoadingQueueThumbGallery(	final GalleryMT20Item galleryItem,
 															final Photo photo,
 															final ImageQuality imageQuality,
@@ -598,6 +579,25 @@ public class PhotoLoadManager {
 
 	public static void putPhotoInLoadingErrorMap(final String errorKey) {
 		_photoWithLoadingError.put(errorKey, new Object());
+	}
+
+	public static void putPhotoInLoadingQueueSql(final Photo photo, final ILoadCallBack loadCallbackImage, final IPhotoServiceProvider photoServiceProvider) {
+
+		// put image loading item into the waiting queue
+		_waitingQueueSql.add(new PhotoSqlLoader(photo, loadCallbackImage,photoServiceProvider));
+
+		final Runnable executorTask = new Runnable() {
+			public void run() {
+
+				// get last added loader item
+				final PhotoSqlLoader loadingItem = _waitingQueueSql.pollLast();
+
+				if (loadingItem != null) {
+					loadingItem.loadSql();
+				}
+			}
+		};
+		_executorSql.submit(executorTask);
 	}
 
 	public static void putPhotoInThumbSaveErrorMap(final String errorKey) {
