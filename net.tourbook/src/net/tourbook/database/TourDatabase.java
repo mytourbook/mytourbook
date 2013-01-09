@@ -22,6 +22,7 @@ import java.net.UnknownHostException;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -119,9 +120,9 @@ public class TourDatabase {
 
 	private static final int						MAX_TRIES_TO_PING_SERVER					= 10;
 
-	/*
-	 * !!! database tables, names are set to uppercase otherwise conn.getMetaData().getColumns()
-	 * would not work !!!
+	/**
+	 * <b> !!! Table names are set to uppercase otherwise conn.getMetaData().getColumns() would not
+	 * work !!! </b>
 	 */
 	public static final String						TABLE_SCHEMA								= "USER";									//$NON-NLS-1$
 	private static final String						TABLE_DB_VERSION							= "DBVERSION";								// "DbVersion";			//$NON-NLS-1$
@@ -200,6 +201,7 @@ public class TourDatabase {
 
 	private static String							DERBY_DRIVER_CLASS;
 	private static String							DERBY_URL;
+	private static final String						DERBY_URL_CREATE_TRUE						= ";create=true";
 
 	private boolean									_isDerbyEmbedded;
 
@@ -228,14 +230,16 @@ public class TourDatabase {
 			// use embedded server
 
 			DERBY_DRIVER_CLASS = "org.apache.derby.jdbc.EmbeddedDriver"; //$NON-NLS-1$
-			DERBY_URL = "jdbc:derby:tourbook;create=true"; //$NON-NLS-1$
+
+			DERBY_URL = "jdbc:derby:tourbook"; //$NON-NLS-1$
 
 		} else {
 
 			// use network server
 
 			DERBY_DRIVER_CLASS = "org.apache.derby.jdbc.ClientDriver"; //$NON-NLS-1$
-			DERBY_URL = "jdbc:derby://localhost:1527/tourbook;create=true"; //$NON-NLS-1$
+
+			DERBY_URL = "jdbc:derby://localhost:1527/tourbook"; //$NON-NLS-1$
 		}
 	}
 
@@ -456,6 +460,35 @@ public class TourDatabase {
 		cs.close();
 	}
 
+	private static void ensureDbIsCreated() {
+
+		Connection conn = null;
+
+		// ensure driver is loaded
+		try {
+			Class.forName(DERBY_DRIVER_CLASS);
+		} catch (final ClassNotFoundException e) {
+			StatusUtil.showStatus(e);
+		}
+
+		/*
+		 * Get a connection, this also creates the database when not yet available. The embedded
+		 * driver displays a warning when database already exist.
+		 */
+		try {
+
+			conn = DriverManager.getConnection(//
+					DERBY_URL + DERBY_URL_CREATE_TRUE,
+					TABLE_SCHEMA,
+					TABLE_SCHEMA);
+
+		} catch (final SQLException e) {
+			UI.showSQLException(e);
+		} finally {
+			closeConnection(conn);
+		}
+	}
+
 	/**
 	 * @param tourTypeList
 	 * @return Returns a list with all {@link TourType}'s which are currently used (with filter) to
@@ -490,7 +523,6 @@ public class TourDatabase {
 		} finally {
 			Util.sqlClose(stmt);
 			closeConnection(conn);
-
 		}
 
 		return tourIds;
@@ -742,6 +774,8 @@ public class TourDatabase {
 			synchronized (DB_LOCK) {
 				// check again
 				if (_pooledDataSource == null) {
+
+					ensureDbIsCreated();
 
 					try {
 						_pooledDataSource = new ComboPooledDataSource();
@@ -1780,6 +1814,7 @@ public class TourDatabase {
 			while (tables.next()) {
 				if (tables.getString(3).equalsIgnoreCase(TABLE_TOUR_DATA)) {
 					// table exists
+
 					return;
 				}
 			}
@@ -1988,7 +2023,7 @@ public class TourDatabase {
 		/*
 		 * CREATE INDEX imageFilePathName
 		 */
-		sql = "CREATE INDEX ImageFilePathName ON " + TABLE_TOUR_PHOTO + " (imageFilePathName)"; //$NON-NLS-1$ //$NON-NLS-2$
+		sql = "CREATE INDEX ImageFilePathName ON " + TABLE_TOUR_PHOTO + " (ImageFilePathName)"; //$NON-NLS-1$ //$NON-NLS-2$
 		exec(stmt, sql);
 	}
 
