@@ -25,13 +25,13 @@ public class ActionShowGPSAnnotations extends Action {
 
 	public ActionShowGPSAnnotations(final PhotoGallery photoGallery) {
 
-		super(Messages.Pic_Dir_Action_ShowPhotoAnnotations, AS_CHECK_BOX);
+		super(Messages.Pic_Dir_Action_ShowAnnotations, AS_CHECK_BOX);
 
 		_photoGallery = photoGallery;
 
-		setToolTipText(Messages.Pic_Dir_Action_ShowPhotoAnnotations_Tooltip);
+		setToolTipText(Messages.Pic_Dir_Action_ShowAnnotations_Tooltip);
 
-		setImageDescriptor(Activator.getImageDescriptor(Messages.Image__Photo_Action_ShowGPSAnnotation));
+		setImageDescriptor(Activator.getImageDescriptor(Messages.Image__Photo_Action_ShowAnnotation));
 	}
 
 	@Override

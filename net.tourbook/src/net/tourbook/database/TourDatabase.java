@@ -1813,7 +1813,10 @@ public class TourDatabase {
 			final ResultSet tables = metaData.getTables(null, null, null, null);
 			while (tables.next()) {
 				if (tables.getString(3).equalsIgnoreCase(TABLE_TOUR_DATA)) {
+
 					// table exists
+
+					_isTableChecked = true;
 
 					return;
 				}
@@ -1846,8 +1849,6 @@ public class TourDatabase {
 				createTable_TourTagCategory(stmt);
 
 				createTable_TourWayPoint(stmt);
-
-				_isTableChecked = true;
 
 			} catch (final SQLException e) {
 				UI.showSQLException(e);

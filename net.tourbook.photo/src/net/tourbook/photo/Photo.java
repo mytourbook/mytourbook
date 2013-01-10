@@ -116,7 +116,7 @@ public class Photo {
 	 * <p>
 	 * This allows to set rating stars which requires that they can be saved in a tour.
 	 */
-	public boolean										isPhotoFromTour;
+	public boolean										isSavedInTour;
 
 	private final HashMap<Long, TourPhotoReference>		_tourPhotoRef					= new HashMap<Long, TourPhotoReference>();
 
@@ -169,6 +169,8 @@ public class Photo {
 	 * when available. When requested geo is not available, the other is returned.
 	 */
 	private static boolean								_isGetExifGeo					= false;
+
+	private static IPhotoServiceProvider				_photoServiceProvider;
 
 	/**
 	 * Double.MIN_VALUE cannot be used, it cannot be saved in the database. 0 is the value when the
@@ -275,6 +277,15 @@ public class Photo {
 
 	public static String getImageKeyThumb(final String imageFilePathName) {
 		return Util.computeMD5(imageFilePathName + "_Thumb");//$NON-NLS-1$
+	}
+
+	public static IPhotoServiceProvider getPhotoServiceProvider() {
+		return _photoServiceProvider;
+	}
+
+	public static void setPhotoServiceProvider(final IPhotoServiceProvider photoServiceProvider) {
+		
+		_photoServiceProvider=photoServiceProvider;
 	}
 
 	public void addTour(final Long tourId, final long photoId) {

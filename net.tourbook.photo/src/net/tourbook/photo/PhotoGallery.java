@@ -290,9 +290,9 @@ public class PhotoGallery extends ImageGallery {
 
 		tbm.add(new Separator());
 		tbm.add(_actionShowPhotoRatingStars);
+		tbm.add(_actionShowGPSAnnotation);
 		tbm.add(_actionShowPhotoDate);
 		tbm.add(_actionShowPhotoName);
-		tbm.add(_actionShowGPSAnnotation);
 
 		if (_isShowActionFiltering) {
 			tbm.add(new Separator());

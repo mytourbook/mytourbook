@@ -22,7 +22,6 @@ import java.util.HashMap;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
-import net.tourbook.photo.IPhotoServiceProvider;
 import net.tourbook.photo.ImageGallery;
 import net.tourbook.photo.ImageQuality;
 import net.tourbook.photo.Photo;
@@ -62,6 +61,7 @@ import org.joda.time.format.DateTimeFormatter;
 public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 	private static final String			PHOTO_ANNOTATION_EXIF_GPS				= "PHOTO_ANNOTATION_GPS";					//$NON-NLS-1$
+	private static final String			PHOTO_ANNOTATION_SAVED_IN_TOUR			= "PHOTO_ANNOTATION_SAVED_IN_TOUR";		//$NON-NLS-1$
 	private static final String			PHOTO_ANNOTATION_TOUR_GPS				= "PHOTO_ANNOTATION_TOUR_GPS";				//$NON-NLS-1$
 	private static final String			PHOTO_RATING_STAR						= "PHOTO_RATING_STAR";						//$NON-NLS-1$
 	private static final String			PHOTO_RATING_STAR_AND_HOVERED			= "PHOTO_RATING_STAR_AND_HOVERED";			//$NON-NLS-1$
@@ -160,8 +160,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	private int							_paintedImageWidth;
 	private int							_paintedImageHeight;
 
-	private static int					_gpsImageWidth;
-	private static int					_gpsImageHeight;
+	private static int					_annotationImageWidth;
+	private static int					_annotationImageHeight;
 	private static int					_ratingStarImageWidth;
 	private static int					_ratingStarImageHeight;
 
@@ -204,8 +204,9 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	private Color						_selectionFgColor;
 	private Color						_noFocusSelectionFgColor;
 
-	private static Image				_imageExifGps;
-	private static Image				_imageTourGps;
+	private static Image				_imageAnnotationExifGps;
+	private static Image				_imageAnnotationSavedInTour;
+	private static Image				_imageAnnotationTourGps;
 
 	private static Image				_imageRatingStar;
 	private static Image				_imageRatingStarAndHovered;
@@ -219,6 +220,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 		UI.IMAGE_REGISTRY.put(PHOTO_ANNOTATION_EXIF_GPS, //
 				Activator.getImageDescriptor(Messages.Image__PhotoAnnotationExifGPS));
+		UI.IMAGE_REGISTRY.put(PHOTO_ANNOTATION_SAVED_IN_TOUR,//
+				Activator.getImageDescriptor(Messages.Image__PhotoAnnotationSavedInTour));
 		UI.IMAGE_REGISTRY.put(PHOTO_ANNOTATION_TOUR_GPS,//
 				Activator.getImageDescriptor(Messages.Image__PhotoAnnotationTourGPS));
 
@@ -237,8 +240,9 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		UI.IMAGE_REGISTRY.put(PHOTO_RATING_STAR_NOT_HOVERED_BUT_SET,//
 				Activator.getImageDescriptor(Messages.Image__PhotoRatingStarNotHoveredButSet));
 
-		_imageExifGps = UI.IMAGE_REGISTRY.get(PHOTO_ANNOTATION_EXIF_GPS);
-		_imageTourGps = UI.IMAGE_REGISTRY.get(PHOTO_ANNOTATION_TOUR_GPS);
+		_imageAnnotationExifGps = UI.IMAGE_REGISTRY.get(PHOTO_ANNOTATION_EXIF_GPS);
+		_imageAnnotationSavedInTour = UI.IMAGE_REGISTRY.get(PHOTO_ANNOTATION_SAVED_IN_TOUR);
+		_imageAnnotationTourGps = UI.IMAGE_REGISTRY.get(PHOTO_ANNOTATION_TOUR_GPS);
 
 		_imageRatingStar = UI.IMAGE_REGISTRY.get(PHOTO_RATING_STAR);
 		_imageRatingStarAndHovered = UI.IMAGE_REGISTRY.get(PHOTO_RATING_STAR_AND_HOVERED);
@@ -248,9 +252,9 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		_imageRatingStarNotHovered = UI.IMAGE_REGISTRY.get(PHOTO_RATING_STAR_NOT_HOVERED);
 		_imageRatingStarNotHoveredButSet = UI.IMAGE_REGISTRY.get(PHOTO_RATING_STAR_NOT_HOVERED_BUT_SET);
 
-		final Rectangle bounds = _imageExifGps.getBounds();
-		_gpsImageWidth = bounds.width;
-		_gpsImageHeight = bounds.height;
+		final Rectangle bounds = _imageAnnotationExifGps.getBounds();
+		_annotationImageWidth = bounds.width;
+		_annotationImageHeight = bounds.height;
 
 		final Rectangle ratingStarBounds = _imageRatingStar.getBounds();
 		_ratingStarImageWidth = ratingStarBounds.width;
@@ -432,13 +436,32 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		}
 
 		// annotations are drawn in the bottom right corner of the image
-		if (_isShowAnnotations && photo.isPhotoWithGps) {
+		if (_isShowAnnotations) {
 
-			final Image image = photo.isGeoFromExif ? _imageExifGps : _imageTourGps;
+			int devXAnnotation = _paintedDestX + _paintedDestWidth;
+			final int devYAnnotation = _paintedDestY + _paintedDestHeight - _annotationImageHeight;
 
-			gc.drawImage(image, //
-					_paintedDestX + _paintedDestWidth - _gpsImageWidth,
-					_paintedDestY + _paintedDestHeight - _gpsImageHeight);
+			if (photo.isPhotoWithGps) {
+
+				devXAnnotation -= _annotationImageWidth;
+
+				gc.drawImage(//
+						photo.isGeoFromExif //
+								? _imageAnnotationExifGps
+								: _imageAnnotationTourGps,
+						devXAnnotation,
+						devYAnnotation);
+			}
+
+			if (photo.isSavedInTour) {
+
+				devXAnnotation -= _annotationImageWidth;
+
+				gc.drawImage(//
+						_imageAnnotationSavedInTour,
+						devXAnnotation,
+						devYAnnotation);
+			}
 		}
 
 		if (isDrawAttributes && _isShowPhotoRatingStars) {
@@ -1040,7 +1063,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 		final Photo photo = galleryItem.photo;
 		if (photo != null) {
-			canSetRating = photo.isPhotoFromTour;
+			canSetRating = photo.isSavedInTour;
 		}
 
 		// center ratings stars in the middle of the image
@@ -1284,10 +1307,10 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	 */
 	public boolean isMouseDownHandled(final GalleryMT20Item galleryItem, final int itemMouseX, final int itemMouseY) {
 
-		final IPhotoServiceProvider photoServiceProvider = _galleryMT.getPhotoServiceProvider();
-		if (photoServiceProvider == null) {
-			return false;
-		}
+//		final IPhotoServiceProvider photoServiceProvider = _galleryMT.getPhotoServiceProvider();
+//		if (photoServiceProvider == null) {
+//			return false;
+//		}
 
 		if (isRatingStarsHovered(itemMouseX, itemMouseY)) {
 
@@ -1350,7 +1373,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 				if (photos.size() > 0) {
 
-					photoServiceProvider.saveStarRating(photos);
+					Photo.getPhotoServiceProvider().saveStarRating(photos);
 
 					// update UI with new star rating
 					for (final GalleryMT20Item item : selectedItemValues) {
@@ -1393,7 +1416,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 		final Photo photo = hoveredItem.photo;
 		if (photo != null) {
-			final boolean canSetRating = photo.isPhotoFromTour;
+			final boolean canSetRating = photo.isSavedInTour;
 			if (canSetRating == false) {
 				return;
 			}

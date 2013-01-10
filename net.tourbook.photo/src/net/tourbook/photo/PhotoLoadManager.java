@@ -581,10 +581,13 @@ public class PhotoLoadManager {
 		_photoWithLoadingError.put(errorKey, new Object());
 	}
 
-	public static void putPhotoInLoadingQueueSql(final Photo photo, final ILoadCallBack loadCallbackImage, final IPhotoServiceProvider photoServiceProvider) {
+	public static void putPhotoInLoadingQueueSql(	final Photo photo,
+													final ILoadCallBack loadCallbackImage,
+													final IPhotoServiceProvider photoServiceProvider,
+													final boolean isUpdateUI) {
 
 		// put image loading item into the waiting queue
-		_waitingQueueSql.add(new PhotoSqlLoader(photo, loadCallbackImage,photoServiceProvider));
+		_waitingQueueSql.add(new PhotoSqlLoader(photo, loadCallbackImage, photoServiceProvider, isUpdateUI));
 
 		final Runnable executorTask = new Runnable() {
 			public void run() {

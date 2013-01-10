@@ -55,24 +55,22 @@ public class LoadCallbackImage implements ILoadCallBack {
 				PhotoSqlLoadingState.IS_LOADED,
 				PhotoSqlLoadingState.IS_IN_LOADING_QUEUE);
 
-		if (isInLoadingQueue || isSqlLoaded) {
+		if (isInLoadingQueue == false && isSqlLoaded == false) {
 
-			if (isUpdateUI) {
-				updateUI();
-			}
+			final IPhotoServiceProvider photoServiceProvider = Photo.getPhotoServiceProvider();
+//			if (photoServiceProvider == null) {
+//
+//				// set to dummy loaded, this should not happen but it can happen when it's not fully setup
+//				photo.getSqlLoadingState().set(PhotoSqlLoadingState.IS_LOADED);
+//
+//			} else {
+//
+			PhotoLoadManager.putPhotoInLoadingQueueSql(photo, this, photoServiceProvider, isUpdateUI);
+//			}
+		}
 
-		} else {
-
-			final IPhotoServiceProvider photoServiceProvider = _galleryItem.gallery.getPhotoServiceProvider();
-			if (photoServiceProvider == null) {
-
-				// set to dummy loaded, this should not happen but it can happen when it's not fully setup
-				photo.getSqlLoadingState().set(PhotoSqlLoadingState.IS_LOADED);
-
-			} else {
-
-				PhotoLoadManager.putPhotoInLoadingQueueSql(photo, this, photoServiceProvider);
-			}
+		if (isUpdateUI) {
+			updateUI();
 		}
 	}
 

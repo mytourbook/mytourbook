@@ -3073,6 +3073,101 @@
          offset="1"
          id="stop4420-9" />
     </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient5160-40"
+       id="linearGradient5158-17"
+       x1="168"
+       y1="92.362183"
+       x2="168"
+       y2="102.36218"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(-10,-1.1484374e-6)" />
+    <linearGradient
+       id="linearGradient5160-40">
+      <stop
+         id="stop5162-9"
+         offset="0"
+         style="stop-color:#ffffff;stop-opacity:1;" />
+      <stop
+         style="stop-color:#369df7;stop-opacity:1;"
+         offset="1"
+         id="stop5168-48" />
+    </linearGradient>
+    <linearGradient
+       y2="102.36218"
+       x2="168"
+       y1="92.362183"
+       x1="168"
+       gradientTransform="matrix(0.78855469,0,0,0.73520812,-30.977177,101.9131)"
+       gradientUnits="userSpaceOnUse"
+       id="linearGradient3652"
+       xlink:href="#linearGradient5160-40"
+       inkscape:collect="always" />
+    <radialGradient
+       r="2.75"
+       fy="39.862183"
+       fx="92.5"
+       cy="39.862183"
+       cx="92.5"
+       gradientTransform="matrix(-1.1428549,2.3621653e-6,-2.332069e-6,-1.1428539,198.21418,85.418609)"
+       gradientUnits="userSpaceOnUse"
+       id="radialGradient3245-17"
+       xlink:href="#linearGradient3765-4-1-4-4"
+       inkscape:collect="always" />
+    <linearGradient
+       id="linearGradient3765-4-1-4-4">
+      <stop
+         style="stop-color:#828282;stop-opacity:1;"
+         offset="0"
+         id="stop3788-9-6-0-0" />
+      <stop
+         style="stop-color:#2a2a2a;stop-opacity:1;"
+         offset="1"
+         id="stop3769-4-8-9-9" />
+    </linearGradient>
+    <radialGradient
+       r="2.75"
+       fy="39.862183"
+       fx="92.5"
+       cy="39.862183"
+       cx="92.5"
+       gradientTransform="matrix(-1.1428549,2.3621653e-6,-2.332069e-6,-1.1428539,198.21418,85.418609)"
+       gradientUnits="userSpaceOnUse"
+       id="radialGradient3648"
+       xlink:href="#linearGradient3765-4-1-4-4"
+       inkscape:collect="always" />
+    <linearGradient
+       y2="102.36218"
+       x2="168"
+       y1="92.362183"
+       x1="168"
+       gradientTransform="matrix(0.78855469,0,0,0.73520812,-30.977177,101.9131)"
+       gradientUnits="userSpaceOnUse"
+       id="linearGradient3652-4"
+       xlink:href="#linearGradient5160-40-9"
+       inkscape:collect="always" />
+    <linearGradient
+       id="linearGradient5160-40-9">
+      <stop
+         id="stop5162-9-2"
+         offset="0"
+         style="stop-color:#ffffff;stop-opacity:1;" />
+      <stop
+         style="stop-color:#369df7;stop-opacity:1;"
+         offset="1"
+         id="stop5168-48-9" />
+    </linearGradient>
+    <linearGradient
+       y2="102.36218"
+       x2="168"
+       y1="92.362183"
+       x1="168"
+       gradientTransform="matrix(0.72787632,0,0,0.67868575,-62.283212,107.71355)"
+       gradientUnits="userSpaceOnUse"
+       id="linearGradient4452"
+       xlink:href="#linearGradient5160-40-9"
+       inkscape:collect="always" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -3081,9 +3176,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="22.627417"
-     inkscape:cx="172.35972"
-     inkscape:cy="893.28431"
+     inkscape:zoom="16"
+     inkscape:cx="77.436775"
+     inkscape:cy="877.22604"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -4397,5 +4492,40 @@
          d="m 159,158.36218 8,-8 0,0 0,0 0,0"
          style="fill:#ffffff;stroke:#ff0b0b;stroke-width:1.50000000000000000;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;fill-opacity:1" />
     </g>
+    <image
+       y="170.36218"
+       x="75"
+       id="image3634"
+       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAHCAIAAABcElBNAAAAA3NCSVQICAjb4U/gAAAASElEQVQY lWN8JcjLQAx4Jcj77/dvCMLDZoGofiMmBNf5RkxI5NU7NHEmuDRcDs6AsCFcFkyXwM2AMFDUIZuB aQMDAwMjkf4FAMD+NZkYhxFwAAAAAElFTkSuQmCC "
+       height="7"
+       width="13" />
+    <path
+       style="fill:url(#linearGradient3652);fill-opacity:1;stroke:#158cf7;stroke-width:0.38312595999999999;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 95.191564,177.17061 12.616866,0 c 0,0 0,0 0,-2.94084 -1.5771,-2.2056 -3.82868,-3.67602 -6.30843,-3.67602 -2.479735,0 -4.731327,1.47042 -6.308436,3.67602 0,2.94084 0,2.94084 0,2.94084 z"
+       id="path5150-8"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccscc"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.photo\icons\photo-annotation-saved-in-tour.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       style="color:#000000;fill:none;fill-opacity:1;stroke:#158cf7;stroke-width:0;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect4471"
+       width="16"
+       height="16"
+       x="50"
+       y="161.3622"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.photo\icons\photo-action-show-annotation4.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:url(#linearGradient4452);fill-opacity:1;stroke:#158cf7;stroke-width:0.35399029;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 54.176995,177.18536 11.64601,0 c 0,0 0,0 0,-2.71479 -1.455743,-2.03595 -3.534074,-3.39347 -5.823002,-3.39347 -2.288918,0 -4.367261,1.35752 -5.823008,3.39347 0,2.71479 0,2.71479 0,2.71479 z"
+       id="path5150-8-3"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccscc"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.photo\icons\photo-action-show-annotation4.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
   </g>
 </svg>

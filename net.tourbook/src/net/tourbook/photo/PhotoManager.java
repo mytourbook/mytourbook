@@ -67,11 +67,11 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 import org.joda.time.DateTime;
 
-public class PhotoManager {
+public class PhotoManager implements IPhotoServiceProvider {
 
 	private static final String						STATE_CAMERA_ADJUSTMENT_NAME	= "STATE_CAMERA_ADJUSTMENT_NAME";	//$NON-NLS-1$
-	private static final String						STATE_CAMERA_ADJUSTMENT_TIME	= "STATE_CAMERA_ADJUSTMENT_TIME";	//$NON-NLS-1$
 
+	private static final String						STATE_CAMERA_ADJUSTMENT_TIME	= "STATE_CAMERA_ADJUSTMENT_TIME";	//$NON-NLS-1$
 	private static final String						CAMERA_UNKNOWN_KEY				= "CAMERA_UNKNOWN_KEY";			//$NON-NLS-1$
 
 	private static final String						TEMP_FILE_PREFIX_ORIG			= "_orig_";						//$NON-NLS-1$
@@ -79,8 +79,8 @@ public class PhotoManager {
 	private static final IDialogSettings			_state							= TourbookPlugin.getDefault() //
 																							.getDialogSettingsSection(
 																									"PhotoManager");	//$NON-NLS-1$
-	private static PhotoManager						_instance;
 
+	private static PhotoManager						_instance;
 	/**
 	 * Contains all cameras which are every used, key is the camera name.
 	 */
@@ -90,13 +90,13 @@ public class PhotoManager {
 																							ListenerList.IDENTITY);
 
 	private Connection								_sqlConnection;
+
 	private PreparedStatement						_sqlStatement;
 	private long									_sqlTourStart					= Long.MAX_VALUE;
 	private long									_sqlTourEnd						= Long.MIN_VALUE;
-
 	private ArrayList<TourPhotoLink>				_allDbTourPhotoLinks			= new ArrayList<TourPhotoLink>();
-	private ArrayList<TourPhotoLink>				_dbTourPhotoLinks				= new ArrayList<TourPhotoLink>();
 
+	private ArrayList<TourPhotoLink>				_dbTourPhotoLinks				= new ArrayList<TourPhotoLink>();
 	/**
 	 * Compares 2 photos by the adjusted time.
 	 */
@@ -114,6 +114,13 @@ public class PhotoManager {
 				return diff < 0 ? -1 : diff > 0 ? 1 : 0;
 			}
 		};
+
+	}
+
+	private PhotoManager() {
+
+		// set photo service provider into the Photo plugin
+		Photo.setPhotoServiceProvider(this);
 	}
 
 	public static void addPhotoEventListener(final IPhotoEventListener listener) {
@@ -147,6 +154,9 @@ public class PhotoManager {
 	}
 
 	public static void restoreState() {
+
+		// ensure photo service provider is set in the photo
+		getInstance();
 
 		/*
 		 * cameras + time adjustment
@@ -865,6 +875,55 @@ public class PhotoManager {
 		}
 	}
 
+	@Override
+	public void saveStarRating(final ArrayList<Photo> photos) {
+
+//		final long start = System.nanoTime();
+
+		Connection conn = null;
+
+		try {
+			conn = TourDatabase.getInstance().getConnection();
+
+			final PreparedStatement sqlUpdate = conn.prepareStatement(//
+					"UPDATE " + TourDatabase.TABLE_TOUR_PHOTO //	//$NON-NLS-1$
+							+ " SET" //								//$NON-NLS-1$
+							+ " ratingStars=? " //					//$NON-NLS-1$
+							+ " WHERE photoId=?"); //				//$NON-NLS-1$
+
+			for (final Photo photo : photos) {
+
+				final int ratingStars = photo.ratingStars;
+				final Collection<TourPhotoReference> photoRefs = photo.getTourPhotoReferences().values();
+
+				for (final TourPhotoReference photoRef : photoRefs) {
+
+					sqlUpdate.setInt(1, ratingStars);
+					sqlUpdate.setLong(2, photoRef.photoId);
+					sqlUpdate.executeUpdate();
+				}
+			}
+
+		} catch (final SQLException e) {
+			net.tourbook.ui.UI.showSQLException(e);
+		} finally {
+
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (final SQLException e) {
+					net.tourbook.ui.UI.showSQLException(e);
+				}
+			}
+		}
+
+//		System.out.println(net.tourbook.common.UI.timeStampNano()
+//				+ " save photo rating\t"
+//				+ ((float) (System.nanoTime() - start) / 1000000)
+//				+ " ms");
+//		// TODO remove SYSTEM.OUT.PRINTLN
+	}
+
 	/**
 	 * Creates a camera when not yet created and sets it into the photo.
 	 * 
@@ -1356,6 +1415,94 @@ public class PhotoManager {
 		}
 
 //		tourPhotosSet.add(tourPhoto);
+	}
+
+	@Override
+	public void setTourReference(final Photo photo) {
+
+//		final long start = System.nanoTime();
+
+		Connection conn = null;
+
+		try {
+
+			conn = TourDatabase.getInstance().getConnection();
+
+			final String sql = "SELECT " // 																//$NON-NLS-1$
+											//
+					+ " photoId,											\n" //		1 //$NON-NLS-1$
+					+ (" " + TourDatabase.TABLE_TOUR_DATA + "_tourId,		\n") // 	2 //$NON-NLS-1$ //$NON-NLS-2$
+					//
+					+ " adjustedTime,										\n" //		3 //$NON-NLS-1$
+					+ " imageExifTime,										\n" //		4 //$NON-NLS-1$
+					+ " latitude,											\n" //		5 //$NON-NLS-1$
+					+ " longitude,											\n" //		6 //$NON-NLS-1$
+					+ " isGeoFromPhoto,										\n" //		7 //$NON-NLS-1$
+					+ " ratingStars											\n" //		8 //$NON-NLS-1$
+					//
+					+ " FROM " + TourDatabase.TABLE_TOUR_PHOTO + "	\n"//				//$NON-NLS-1$ //$NON-NLS-2$
+					//
+					+ " WHERE imageFilePathName=?"; //									//$NON-NLS-1$
+
+//			System.out.println(net.tourbook.common.UI.timeStampNano() + " sql '" + sql + "'");
+//			// TODO remove SYSTEM.OUT.PRINTLN
+
+			final PreparedStatement stmt = conn.prepareStatement(sql);
+
+			stmt.setString(1, photo.imageFilePathName);
+
+			final ResultSet result = stmt.executeQuery();
+
+			while (result.next()) {
+
+				final long dbTourId = result.getLong(1);
+				final long dbPhotoId = result.getLong(2);
+				final long dbAdjustedTime = result.getLong(3);
+				final long dbImageExifTime = result.getLong(4);
+				final double dbLatitude = result.getDouble(5);
+				final double dbLongitude = result.getDouble(6);
+				final int dbIsGeoFromPhoto = result.getInt(7);
+				final int dbRatingStars = result.getInt(8);
+
+				photo.addTour(dbTourId, dbPhotoId);
+
+				/*
+				 * when a photo is in the photo cache it is possible that the tour is from the file
+				 * system, update tour relevant fields
+				 */
+				photo.isSavedInTour = true;
+
+				photo.adjustedTime = dbAdjustedTime;
+				photo.imageExifTime = dbImageExifTime;
+
+				photo.isGeoFromExif = dbIsGeoFromPhoto == 1;
+				photo.isPhotoWithGps = dbLatitude != 0;
+
+				photo.ratingStars = dbRatingStars;
+
+				if (photo.getTourLatitude() == 0 && dbLatitude != 0) {
+					photo.setTourGeoPosition(dbLatitude, dbLongitude);
+				}
+			}
+
+		} catch (final SQLException e) {
+			net.tourbook.ui.UI.showSQLException(e);
+		} finally {
+
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (final SQLException e) {
+					net.tourbook.ui.UI.showSQLException(e);
+				}
+			}
+		}
+
+//		System.out.println(net.tourbook.common.UI.timeStampNano()
+//				+ " load sql tourId from photo\t"
+//				+ ((float) (System.nanoTime() - start) / 1000000)
+//				+ " ms");
+//		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 }

@@ -23,7 +23,6 @@ import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.photo.IExternalGalleryListener;
 import net.tourbook.photo.IPhotoProvider;
-import net.tourbook.photo.IPhotoServiceProvider;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.internal.Messages;
 import net.tourbook.photo.internal.preferences.PrefPagePhotoDirectory;
@@ -287,7 +286,7 @@ public abstract class GalleryMT20 extends Canvas {
 	private boolean								_isShowOtherShellActions	= true;
 
 	private IPhotoProvider						_photoProvider;
-	private IPhotoServiceProvider				_photoServiceProvider;
+//	private IPhotoServiceProvider				_photoServiceProvider;
 
 	/**
 	 * Mouse X position within a gallery item, useful when item is hovered to get the exact
@@ -1068,9 +1067,9 @@ public abstract class GalleryMT20 extends Canvas {
 		return _photoProvider;
 	}
 
-	public IPhotoServiceProvider getPhotoServiceProvider() {
-		return _photoServiceProvider;
-	}
+//	public IPhotoServiceProvider getPhotoServiceProvider() {
+//		return _photoServiceProvider;
+//	}
 
 	public int getScrollBarIncrement() {
 
@@ -2763,9 +2762,9 @@ public abstract class GalleryMT20 extends Canvas {
 		_photoProvider = photoProvider;
 	}
 
-	public void setPhotoServiceProvider(final IPhotoServiceProvider photoServiceProvider) {
-		_photoServiceProvider = photoServiceProvider;
-	}
+//	public void setPhotoServiceProvider(final IPhotoServiceProvider photoServiceProvider) {
+//		_photoServiceProvider = photoServiceProvider;
+//	}
 
 	public void setSelectedItemIndex(final int itemIndex) {
 

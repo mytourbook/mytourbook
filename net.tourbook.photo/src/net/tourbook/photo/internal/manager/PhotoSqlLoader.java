@@ -23,29 +23,32 @@ import net.tourbook.photo.internal.LoadCallbackImage;
 
 public class PhotoSqlLoader {
 
-	private Photo					photo;
-	private IPhotoServiceProvider	photoServiceProvider;
+	private Photo					_photo;
+	private IPhotoServiceProvider	_photoServiceProvider;
 
-	private ILoadCallBack			imageLoadCallback;
+	private ILoadCallBack			_imageLoadCallback;
+	private boolean					_isUpdateUI;
 
 	public PhotoSqlLoader(	final Photo photo,
 							final ILoadCallBack imageLoadCallback,
-							final IPhotoServiceProvider photoServiceProvider) {
+							final IPhotoServiceProvider photoServiceProvider,
+							final boolean isUpdateUI) {
 
-		this.photo = photo;
-		this.imageLoadCallback = imageLoadCallback;
-		this.photoServiceProvider = photoServiceProvider;
+		_photo = photo;
+		_imageLoadCallback = imageLoadCallback;
+		_photoServiceProvider = photoServiceProvider;
+		_isUpdateUI = isUpdateUI;
 	}
 
 	public void loadSql() {
 
-		photoServiceProvider.setTourReference(photo);
+		_photoServiceProvider.setTourReference(_photo);
 
-		photo.getSqlLoadingState().set(PhotoSqlLoadingState.IS_LOADED);
+		_photo.getSqlLoadingState().set(PhotoSqlLoadingState.IS_LOADED);
 
 		// update UI in the original callback
-		if (imageLoadCallback instanceof LoadCallbackImage) {
-			((LoadCallbackImage) imageLoadCallback).updateUI();
+		if (_isUpdateUI && _imageLoadCallback instanceof LoadCallbackImage) {
+			((LoadCallbackImage) _imageLoadCallback).updateUI();
 		}
 	}
 

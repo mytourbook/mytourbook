@@ -2351,9 +2351,9 @@ public class ImageGallery implements IItemListener, IGalleryContextMenuProvider,
 		_galleryMT20.setFullScreenImageViewer(fullScreenImageViewer);
 	}
 
-	public void setPhotoServiceProvider(final IPhotoServiceProvider photoServiceProvider) {
-		_galleryMT20.setPhotoServiceProvider(photoServiceProvider);
-	}
+//	public void setPhotoServiceProvider(final IPhotoServiceProvider photoServiceProvider) {
+//		_galleryMT20.setPhotoServiceProvider(photoServiceProvider);
+//	}
 
 	/**
 	 * A custom actionbar can be displayed, by default it is hidden. The actionbar can be retrieved

@@ -4387,7 +4387,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			 * when a photo is in the photo cache it is possible that the tour is from the file
 			 * system, update tour relevant fields
 			 */
-			galleryPhoto.isPhotoFromTour = true;
+			galleryPhoto.isSavedInTour = true;
 
 			// ensure this tour is set in the photo
 			galleryPhoto.addTour(tourPhoto.getTourId(), tourPhoto.getPhotoId());

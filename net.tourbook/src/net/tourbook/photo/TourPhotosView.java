@@ -15,19 +15,13 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
-import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
@@ -64,7 +58,7 @@ import org.eclipse.ui.part.ViewPart;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-public class TourPhotosView extends ViewPart implements IPhotoEventListener, IPhotoServiceProvider {
+public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
 	public static final String				ID								= "net.tourbook.photo.TourPhotosView.ID";	//$NON-NLS-1$
 
@@ -331,7 +325,7 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener, IPh
 
 			_photoGallery.setDefaultStatusMessage(Messages.Photo_Gallery_Label_NoTourWithPhoto);
 
-			_photoGallery.setPhotoServiceProvider(this);
+//			_photoGallery.setPhotoServiceProvider(PhotoManager.getInstance());
 		}
 	}
 
@@ -528,55 +522,6 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener, IPh
 		updateUI_ToogleAction();
 	}
 
-	@Override
-	public void saveStarRating(final ArrayList<Photo> photos) {
-
-//		final long start = System.nanoTime();
-
-		Connection conn = null;
-
-		try {
-			conn = TourDatabase.getInstance().getConnection();
-
-			final PreparedStatement sqlUpdate = conn.prepareStatement(//
-					"UPDATE " + TourDatabase.TABLE_TOUR_PHOTO //	//$NON-NLS-1$
-							+ " SET" //								//$NON-NLS-1$
-							+ " ratingStars=? " //					//$NON-NLS-1$
-							+ " WHERE photoId=?"); //				//$NON-NLS-1$
-
-			for (final Photo photo : photos) {
-
-				final int ratingStars = photo.ratingStars;
-				final Collection<TourPhotoReference> photoRefs = photo.getTourPhotoReferences().values();
-
-				for (final TourPhotoReference photoRef : photoRefs) {
-
-					sqlUpdate.setInt(1, ratingStars);
-					sqlUpdate.setLong(2, photoRef.photoId);
-					sqlUpdate.executeUpdate();
-				}
-			}
-
-		} catch (final SQLException e) {
-			UI.showSQLException(e);
-		} finally {
-
-			if (conn != null) {
-				try {
-					conn.close();
-				} catch (final SQLException e) {
-					UI.showSQLException(e);
-				}
-			}
-		}
-
-//		System.out.println(net.tourbook.common.UI.timeStampNano()
-//				+ " save photo rating\t"
-//				+ ((float) (System.nanoTime() - start) / 1000000)
-//				+ " ms");
-//		// TODO remove SYSTEM.OUT.PRINTLN
-	}
-
 	private void saveState() {
 
 		_state.put(STATE_PHOTO_GALLERY_IS_VERTICAL, _isVerticalGallery);
@@ -586,79 +531,6 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener, IPh
 
 	@Override
 	public void setFocus() {
-
-	}
-
-	@Override
-	public void setTourReference(final Photo photo) {
-
-		Connection conn = null;
-
-		try {
-
-			conn = TourDatabase.getInstance().getConnection();
-
-			final String sql = "SELECT " // 																//$NON-NLS-1$
-											//
-					+ " photoId,											\n" //		1 //$NON-NLS-1$
-					+ (" " + TourDatabase.TABLE_TOUR_DATA + "_tourId		\n") // 	2 //$NON-NLS-1$ //$NON-NLS-2$
-					//
-					+ " FROM " + TourDatabase.TABLE_TOUR_PHOTO + "	\n"//				//$NON-NLS-1$ //$NON-NLS-2$
-					//
-					+ " WHERE imageFilePathName=?"; //									//$NON-NLS-1$
-
-			System.out.println(net.tourbook.common.UI.timeStampNano() + " sql '" + sql + "'");
-			// TODO remove SYSTEM.OUT.PRINTLN
-
-			final PreparedStatement stmt = conn.prepareStatement(sql);
-
-			stmt.setString(1, photo.imageFilePathName);
-
-			final ResultSet result = stmt.executeQuery();
-
-			while (result.next()) {
-
-				final long dbTourId = result.getLong(1);
-				final long dbPhotoId = result.getLong(2);
-
-				photo.addTour(dbTourId, dbPhotoId);
-
-//		galleryPhoto.adjustedTime = tourPhoto.getAdjustedTime();
-//		galleryPhoto.imageExifTime = tourPhoto.getImageExifTime();
-//
-//		tourLatitude = tourPhoto.getLatitude();
-//
-//		galleryPhoto.isGeoFromExif = tourPhoto.isGeoFromPhoto();
-//		galleryPhoto.isPhotoWithGps = tourLatitude != 0;
-//
-//		galleryPhoto.ratingStars = tourPhoto.getRatingStars();
-//
-//	/*
-//	 * when a photo is in the photo cache it is possible that the tour is from the file
-//	 * system, update tour relevant fields
-//	 */
-//	galleryPhoto.isPhotoFromTour = true;
-//
-//	// ensure this tour is set in the photo
-//	galleryPhoto.addTour(tourPhoto.getTourId(), tourPhoto.getPhotoId());
-//
-//	if (galleryPhoto.getTourLatitude() == 0 && tourLatitude != 0) {
-//		galleryPhoto.setTourGeoPosition(tourLatitude, tourPhoto.getLongitude());
-//	}
-			}
-
-		} catch (final SQLException e) {
-			UI.showSQLException(e);
-		} finally {
-
-			if (conn != null) {
-				try {
-					conn.close();
-				} catch (final SQLException e) {
-					UI.showSQLException(e);
-				}
-			}
-		}
 
 	}
 
