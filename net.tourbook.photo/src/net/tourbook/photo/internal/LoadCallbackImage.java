@@ -15,14 +15,8 @@
  *******************************************************************************/
 package net.tourbook.photo.internal;
 
-import java.util.concurrent.atomic.AtomicReference;
-
 import net.tourbook.photo.ILoadCallBack;
-import net.tourbook.photo.IPhotoServiceProvider;
 import net.tourbook.photo.ImageGallery;
-import net.tourbook.photo.Photo;
-import net.tourbook.photo.PhotoLoadManager;
-import net.tourbook.photo.PhotoSqlLoadingState;
 import net.tourbook.photo.internal.gallery.MT20.GalleryMT20Item;
 
 import org.eclipse.swt.widgets.Display;
@@ -44,30 +38,6 @@ public class LoadCallbackImage implements ILoadCallBack {
 
 	@Override
 	public void callBackImageIsLoaded(final boolean isUpdateUI) {
-
-		final Photo photo = _galleryItem.photo;
-
-		final AtomicReference<PhotoSqlLoadingState> sqlLoadingState = photo.getSqlLoadingState();
-
-		final boolean isInLoadingQueue = sqlLoadingState.get() == PhotoSqlLoadingState.IS_IN_LOADING_QUEUE;
-
-		final boolean isSqlLoaded = sqlLoadingState.compareAndSet(
-				PhotoSqlLoadingState.IS_LOADED,
-				PhotoSqlLoadingState.IS_IN_LOADING_QUEUE);
-
-		if (isInLoadingQueue == false && isSqlLoaded == false) {
-
-			final IPhotoServiceProvider photoServiceProvider = Photo.getPhotoServiceProvider();
-//			if (photoServiceProvider == null) {
-//
-//				// set to dummy loaded, this should not happen but it can happen when it's not fully setup
-//				photo.getSqlLoadingState().set(PhotoSqlLoadingState.IS_LOADED);
-//
-//			} else {
-//
-			PhotoLoadManager.putPhotoInLoadingQueueSql(photo, this, photoServiceProvider, isUpdateUI);
-//			}
-		}
 
 		if (isUpdateUI) {
 			updateUI();

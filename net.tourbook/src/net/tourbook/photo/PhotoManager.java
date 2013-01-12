@@ -1420,7 +1420,7 @@ public class PhotoManager implements IPhotoServiceProvider {
 	@Override
 	public void setTourReference(final Photo photo) {
 
-//		final long start = System.nanoTime();
+		final long start = System.nanoTime();
 
 		Connection conn = null;
 
@@ -1430,22 +1430,19 @@ public class PhotoManager implements IPhotoServiceProvider {
 
 			final String sql = "SELECT " // 																//$NON-NLS-1$
 											//
-					+ " photoId,											\n" //		1 //$NON-NLS-1$
-					+ (" " + TourDatabase.TABLE_TOUR_DATA + "_tourId,		\n") // 	2 //$NON-NLS-1$ //$NON-NLS-2$
+					+ " photoId, " //											1 //$NON-NLS-1$
+					+ (" " + TourDatabase.TABLE_TOUR_DATA + "_tourId, ") // 	2 //$NON-NLS-1$ //$NON-NLS-2$
 					//
-					+ " adjustedTime,										\n" //		3 //$NON-NLS-1$
-					+ " imageExifTime,										\n" //		4 //$NON-NLS-1$
-					+ " latitude,											\n" //		5 //$NON-NLS-1$
-					+ " longitude,											\n" //		6 //$NON-NLS-1$
-					+ " isGeoFromPhoto,										\n" //		7 //$NON-NLS-1$
-					+ " ratingStars											\n" //		8 //$NON-NLS-1$
+					+ " adjustedTime, " //										3 //$NON-NLS-1$
+					+ " imageExifTime, " //										4 //$NON-NLS-1$
+					+ " latitude, " //											5 //$NON-NLS-1$
+					+ " longitude, " //											6 //$NON-NLS-1$
+					+ " isGeoFromPhoto, " //									7 //$NON-NLS-1$
+					+ " ratingStars " //										8 //$NON-NLS-1$
 					//
-					+ " FROM " + TourDatabase.TABLE_TOUR_PHOTO + "	\n"//				//$NON-NLS-1$ //$NON-NLS-2$
+					+ " FROM " + TourDatabase.TABLE_TOUR_PHOTO //				//$NON-NLS-1$
 					//
-					+ " WHERE imageFilePathName=?"; //									//$NON-NLS-1$
-
-//			System.out.println(net.tourbook.common.UI.timeStampNano() + " sql '" + sql + "'");
-//			// TODO remove SYSTEM.OUT.PRINTLN
+					+ " WHERE imageFilePathName=?"; //							//$NON-NLS-1$
 
 			final PreparedStatement stmt = conn.prepareStatement(sql);
 
@@ -1470,6 +1467,7 @@ public class PhotoManager implements IPhotoServiceProvider {
 				 * when a photo is in the photo cache it is possible that the tour is from the file
 				 * system, update tour relevant fields
 				 */
+
 				photo.isSavedInTour = true;
 
 				photo.adjustedTime = dbAdjustedTime;
@@ -1498,11 +1496,11 @@ public class PhotoManager implements IPhotoServiceProvider {
 			}
 		}
 
-//		System.out.println(net.tourbook.common.UI.timeStampNano()
-//				+ " load sql tourId from photo\t"
-//				+ ((float) (System.nanoTime() - start) / 1000000)
-//				+ " ms");
-//		// TODO remove SYSTEM.OUT.PRINTLN
+		System.out.println(net.tourbook.common.UI.timeStampNano()
+				+ " load sql tourId from photo\t"
+				+ ((float) (System.nanoTime() - start) / 1000000)
+				+ " ms");
+		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 }

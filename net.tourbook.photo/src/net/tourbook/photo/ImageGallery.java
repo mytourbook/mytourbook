@@ -26,6 +26,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 
 import net.tourbook.common.UI;
@@ -40,9 +41,10 @@ import net.tourbook.photo.internal.Activator;
 import net.tourbook.photo.internal.GalleryActionBar;
 import net.tourbook.photo.internal.GalleryPhotoToolTip;
 import net.tourbook.photo.internal.GalleryType;
-import net.tourbook.photo.internal.ImageFilter;
 import net.tourbook.photo.internal.Messages;
 import net.tourbook.photo.internal.PhotoDateInfo;
+import net.tourbook.photo.internal.PhotoFilterGPS;
+import net.tourbook.photo.internal.PhotoFilterTour;
 import net.tourbook.photo.internal.PhotoRenderer;
 import net.tourbook.photo.internal.RatingStarBehaviour;
 import net.tourbook.photo.internal.TableColumnFactory;
@@ -116,7 +118,7 @@ import org.joda.time.format.DateTimeFormatter;
  * org.apache.commons.sanselan
  * </pre>
  */
-public class ImageGallery implements IItemListener, IGalleryContextMenuProvider, IPhotoProvider, ITourViewer {
+public abstract class ImageGallery implements IItemListener, IGalleryContextMenuProvider, IPhotoProvider, ITourViewer {
 
 	/**
 	 * Number of gallery positions which are cached
@@ -189,7 +191,8 @@ public class ImageGallery implements IItemListener, IGalleryContextMenuProvider,
 	/*
 	 * image loading/filtering
 	 */
-	private ImageFilter				_currentImageFilter;
+	private PhotoFilterGPS			_imageFilterGPS;
+	private PhotoFilterTour			_imageFilterTour;
 
 	private boolean					_filterJob1stRun;
 	private boolean					_filterJobIsCanceled;
@@ -267,11 +270,6 @@ public class ImageGallery implements IItemListener, IGalleryContextMenuProvider,
 	private int						_photoImageSize;
 
 	private int						_photoBorderSize;
-
-	/**
-	 * When not <code>-1</code>, the vertical gallery is not yet fully restored.
-	 */
-//	private int						_verticalRestoreThumbSize		= -1;
 
 	private boolean					_isShowTooltip;
 
@@ -461,6 +459,8 @@ public class ImageGallery implements IItemListener, IGalleryContextMenuProvider,
 				ExifCache.put(__photo.imageFilePathName, metadata);
 			}
 
+			updateSqlState();
+
 			if (__runId != _currentExifRunId) {
 
 				// this callback is from an older run ID, ignore it
@@ -470,6 +470,23 @@ public class ImageGallery implements IItemListener, IGalleryContextMenuProvider,
 
 			jobFilter_22_ScheduleSubsequent(DELAY_JOB_SUBSEQUENT_FILTER);
 			jobUILoading_20_Schedule();
+		}
+
+		private void updateSqlState() {
+
+			final AtomicReference<PhotoSqlLoadingState> sqlLoadingState = __photo.getSqlLoadingState();
+
+			final boolean isInLoadingQueue = sqlLoadingState.get() == PhotoSqlLoadingState.IS_IN_LOADING_QUEUE;
+
+			final boolean isSqlLoaded = sqlLoadingState.compareAndSet(
+					PhotoSqlLoadingState.IS_LOADED,
+					PhotoSqlLoadingState.IS_IN_LOADING_QUEUE);
+
+			if (isInLoadingQueue == false && isSqlLoaded == false) {
+
+				final IPhotoServiceProvider photoServiceProvider = Photo.getPhotoServiceProvider();
+				PhotoLoadManager.putPhotoInLoadingQueueSql(__photo, this, photoServiceProvider, false);
+			}
 		}
 	}
 
@@ -1089,6 +1106,8 @@ public class ImageGallery implements IItemListener, IGalleryContextMenuProvider,
 		ExifCache.clear();
 	}
 
+	protected abstract void enableActions(boolean isAttributesPainted);
+
 	@Override
 	public void fillContextMenu(final IMenuManager menuMgr) {
 
@@ -1101,12 +1120,14 @@ public class ImageGallery implements IItemListener, IGalleryContextMenuProvider,
 	/**
 	 * This is called when a filter button is pressed.
 	 * 
-	 * @param currentImageFilter
+	 * @param photoFilterGPS
+	 * @param photoFilterTour
 	 * @param isUpdateGallery
 	 */
-	public void filterGallery(final ImageFilter currentImageFilter) {
+	public void filterGallery(final PhotoFilterGPS photoFilterGPS, final PhotoFilterTour photoFilterTour) {
 
-		_currentImageFilter = currentImageFilter;
+		_imageFilterGPS = photoFilterGPS;
+		_imageFilterTour = photoFilterTour;
 
 		/*
 		 * deselect all, this could be better implemented to keep selection, but is not yet done
@@ -1574,15 +1595,19 @@ public class ImageGallery implements IItemListener, IGalleryContextMenuProvider,
 			return;
 		}
 
-		final boolean isGPSFilter = _currentImageFilter == ImageFilter.GPS;
-		final boolean isNoGPSFilter = _currentImageFilter == ImageFilter.NoGPS;
+		final boolean isGPSFilter = _imageFilterGPS == PhotoFilterGPS.WITH_GPS;
+		final boolean isNoGPSFilter = _imageFilterGPS == PhotoFilterGPS.NO_GPS;
+		final boolean isTourFilter = _imageFilterTour == PhotoFilterTour.WITH_TOURS;
+		final boolean isNoTourFilter = _imageFilterTour == PhotoFilterTour.NO_TOURS;
+
+		final boolean isFilterSet = isGPSFilter || isNoGPSFilter || isTourFilter || isNoTourFilter;
 
 		// get current dirty counter
 		final int currentDirtyCounter = _jobFilterDirtyCounter;
 
 		Photo[] newFilteredPhotos = null;
 
-		if (isGPSFilter || isNoGPSFilter) {
+		if (isFilterSet) {
 
 			final int numberOfPhotos = _allPhotos.length;
 			final Photo[] tempFilteredPhotos = new Photo[numberOfPhotos];
@@ -1598,6 +1623,8 @@ public class ImageGallery implements IItemListener, IGalleryContextMenuProvider,
 					return;
 				}
 
+				boolean isPhotoInFilter = false;
+
 				if (photo.isExifLoaded == false) {
 
 					// image is not yet loaded, it must be loaded to get the gps state
@@ -1612,21 +1639,36 @@ public class ImageGallery implements IItemListener, IGalleryContextMenuProvider,
 
 					if (isGPSFilter) {
 						if (isPhotoWithGps) {
-
-							tempFilteredPhotos[filterIndex] = _allPhotos[photoIndex];
-
-							filterIndex++;
+							isPhotoInFilter = true;
 						}
 
 					} else if (isNoGPSFilter) {
 
 						if (!isPhotoWithGps) {
-
-							tempFilteredPhotos[filterIndex] = _allPhotos[photoIndex];
-
-							filterIndex++;
+							isPhotoInFilter = true;
 						}
 					}
+				}
+
+				final boolean isSavedInTour = photo.isSavedInTour;
+
+				if (isTourFilter) {
+					if (isSavedInTour) {
+						isPhotoInFilter = true;
+					}
+
+				} else if (isNoTourFilter) {
+
+					if (!isSavedInTour) {
+						isPhotoInFilter = true;
+					}
+				}
+
+				if (isPhotoInFilter) {
+
+					tempFilteredPhotos[filterIndex] = _allPhotos[photoIndex];
+
+					filterIndex++;
 				}
 
 				photoIndex++;
@@ -1701,15 +1743,19 @@ public class ImageGallery implements IItemListener, IGalleryContextMenuProvider,
 
 //		final long start = System.nanoTime();
 
-		final boolean isGPSFilter = _currentImageFilter == ImageFilter.GPS;
-		final boolean isNoGPSFilter = _currentImageFilter == ImageFilter.NoGPS;
+		final boolean isGPSFilter = _imageFilterGPS == PhotoFilterGPS.WITH_GPS;
+		final boolean isNoGPSFilter = _imageFilterGPS == PhotoFilterGPS.NO_GPS;
+		final boolean isTourFilter = _imageFilterTour == PhotoFilterTour.WITH_TOURS;
+		final boolean isNoTourFilter = _imageFilterTour == PhotoFilterTour.NO_TOURS;
+
+		final boolean isFilterSet = isGPSFilter || isNoGPSFilter || isTourFilter || isNoTourFilter;
 
 		// get current dirty counter
 		final int currentDirtyCounter = _jobFilterDirtyCounter;
 
 		Photo[] newFilteredPhotos = null;
 
-		if (isGPSFilter || isNoGPSFilter) {
+		if (isFilterSet) {
 
 			final int numberOfPhotos = _allPhotos.length;
 			final Photo[] tempFilteredPhotos = new Photo[numberOfPhotos];
@@ -1725,27 +1771,60 @@ public class ImageGallery implements IItemListener, IGalleryContextMenuProvider,
 					return;
 				}
 
+				boolean isPhotoInFilterGps = false;
+				boolean isPhotoInFilterTour = false;
+
 				if (photo.isExifLoaded) {
 
 					final boolean isPhotoWithGps = photo.isPhotoWithGps;
 
 					if (isGPSFilter) {
 						if (isPhotoWithGps) {
-
-							tempFilteredPhotos[filterIndex] = _allPhotos[photoIndex];
-
-							filterIndex++;
+							isPhotoInFilterGps = true;
 						}
 
 					} else if (isNoGPSFilter) {
 
 						if (!isPhotoWithGps) {
-
-							tempFilteredPhotos[filterIndex] = _allPhotos[photoIndex];
-
-							filterIndex++;
+							isPhotoInFilterGps = true;
 						}
+
+					} else {
+
+						// no gps filter
+
+						isPhotoInFilterGps = true;
 					}
+				} else {
+
+					// no gps filter
+
+					isPhotoInFilterGps = true;
+				}
+
+				final boolean isSavedInTour = photo.isSavedInTour;
+
+				if (isTourFilter) {
+					if (isSavedInTour) {
+						isPhotoInFilterTour = true;
+					}
+
+				} else if (isNoTourFilter) {
+
+					if (!isSavedInTour) {
+						isPhotoInFilterTour = true;
+					}
+				} else {
+
+					// no tour filter
+					isPhotoInFilterTour = true;
+				}
+
+				if (isPhotoInFilterGps && isPhotoInFilterTour) {
+
+					tempFilteredPhotos[filterIndex] = _allPhotos[photoIndex];
+
+					filterIndex++;
 				}
 
 				photoIndex++;
@@ -2333,27 +2412,27 @@ public class ImageGallery implements IItemListener, IGalleryContextMenuProvider,
 	}
 
 	/**
-	 * This is called when a filter button is pressed.
-	 * 
-	 * @param currentImageFilter
+	 * @param photoFilterGPS
+	 * @param photoFilterTour
 	 */
-	public void setFilter(final ImageFilter currentImageFilter) {
-		_currentImageFilter = currentImageFilter;
+	public void setFilter(final PhotoFilterGPS photoFilterGPS, final PhotoFilterTour photoFilterTour) {
+		_imageFilterGPS = photoFilterGPS;
+		_imageFilterTour = photoFilterTour;
 	}
 
 	public void setFocus() {
 		_galleryMT20.setFocus();
 	}
 
+//	public void setPhotoServiceProvider(final IPhotoServiceProvider photoServiceProvider) {
+//		_galleryMT20.setPhotoServiceProvider(photoServiceProvider);
+//	}
+
 	public void setFullScreenImageViewer(final FullScreenImageViewer fullScreenImageViewer) {
 
 		_fullScreenImageViewer = fullScreenImageViewer;
 		_galleryMT20.setFullScreenImageViewer(fullScreenImageViewer);
 	}
-
-//	public void setPhotoServiceProvider(final IPhotoServiceProvider photoServiceProvider) {
-//		_galleryMT20.setPhotoServiceProvider(photoServiceProvider);
-//	}
 
 	/**
 	 * A custom actionbar can be displayed, by default it is hidden. The actionbar can be retrieved
@@ -2852,6 +2931,10 @@ public class ImageGallery implements IItemListener, IGalleryContextMenuProvider,
 
 			_photoGalleryTooltip.setGalleryImageSize(_photoImageSize);
 			_photoGalleryTooltip.reset(true);
+
+			final boolean isAttributesPainted = _photoRenderer.isAttributesPainted(galleryItemSizeWithBorder);
+
+			enableActions(isAttributesPainted);
 		}
 	}
 
@@ -2871,8 +2954,11 @@ public class ImageGallery implements IItemListener, IGalleryContextMenuProvider,
 		/*
 		 * text minimum thumb size
 		 */
-		_photoRenderer.setTextMinThumbSize(_prefStore.getInt(IPhotoPreferences.PHOTO_VIEWER_TEXT_MIN_THUMB_SIZE));
-		_photoRenderer.setImageBorderSize(_prefStore.getInt(IPhotoPreferences.PHOTO_VIEWER_IMAGE_BORDER_SIZE));
+		final int minThumbSize = _prefStore.getInt(IPhotoPreferences.PHOTO_VIEWER_TEXT_MIN_THUMB_SIZE);
+		final int borderSize = _prefStore.getInt(IPhotoPreferences.PHOTO_VIEWER_IMAGE_BORDER_SIZE);
+
+		_photoRenderer.setSizeImageBorder(borderSize);
+		_photoRenderer.setSizeTextMinThumb(minThumbSize);
 
 		// get update border size
 		_photoBorderSize = _photoRenderer.getBorderSize();

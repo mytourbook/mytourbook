@@ -122,13 +122,18 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	private boolean						_isShowPhotoName;
 	private boolean						_isShowAnnotations;
 	private boolean						_isShowDateInfo;
-	private PhotoDateInfo				_photoDateInfo;
 
+	/**
+	 * Attributes (date, filename, rating stars) are not painted when the photo image is too small.
+	 */
+	private boolean						_isAttributesPainted;
+
+	private PhotoDateInfo				_photoDateInfo;
 	private ImageGallery				_imageGallery;
 	private GalleryMT20					_galleryMT;
 
-	private int							_gridBorder								= 1;
-	private int							_imageBorder							= 5;
+	private int							_gridBorderSize							= 1;
+	private int							_imageBorderSize						= 5;
 
 	/**
 	 * photo dimension without grid border but including image border
@@ -154,6 +159,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	private boolean						_isShowFullsizePreview;
 	private boolean						_isShowFullsizeLoadingMessage;
 	private boolean						_isShowPhotoRatingStars;
+	private boolean						_isRatingStarsPainted;
 
 	private double						_imagePaintedZoomFactor;
 
@@ -278,6 +284,12 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 						final boolean isSelected,
 						final boolean isFocusActive) {
 
+		final Photo photo = galleryItem.photo;
+		if (photo == null) {
+			// this case should not happen but it did
+			return;
+		}
+
 		_isFocusActive = isFocusActive;
 
 		// init fontheight
@@ -285,12 +297,10 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 			_fontHeight = gc.getFontMetrics().getHeight();
 		}
 
-		boolean isDrawAttributes = true;
-
-		galleryItem.photoPaintedX = galleryItemViewPortX + _gridBorder;
-		galleryItem.photoPaintedY = galleryItemViewPortY + _gridBorder;
-		_photoWidth = galleryItemWidth - _gridBorder;
-		_photoHeight = galleryItemHeight - _gridBorder;
+		galleryItem.photoPaintedX = galleryItemViewPortX + _gridBorderSize;
+		galleryItem.photoPaintedY = galleryItemViewPortY + _gridBorderSize;
+		_photoWidth = galleryItemWidth - _gridBorderSize;
+		_photoHeight = galleryItemHeight - _gridBorderSize;
 
 		int itemImageWidth = _photoWidth;
 		int itemImageHeight = _photoHeight;
@@ -298,24 +308,19 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		// center ratings stars in the middle of the image
 		_ratingStarsLeftBorder = _photoWidth / 2 - MAX_RATING_STARS_WIDTH / 2;
 
-		// ignore border for small images
-		final boolean isBorder = itemImageWidth - _imageBorder >= _textMinThumbSize;
-		final int border = _imageBorder;
+		final int border = _imageBorderSize;
 		final int border2 = border / 2;
 
-		final int imageX = galleryItem.photoPaintedX + (isBorder ? border2 : 0);
-		final int imageY = galleryItem.photoPaintedY + (isBorder ? border2 : 0);
+		// ignore border for small images
+		final boolean isBorder = itemImageWidth - border >= _textMinThumbSize;
 
 		itemImageWidth -= isBorder ? border : 0;
 		itemImageHeight -= isBorder ? border : 0;
 		_paintedDestWidth = itemImageWidth;
 		_paintedDestHeight = itemImageHeight;
 
-		final Photo photo = galleryItem.photo;
-		if (photo == null) {
-			// this case should not happen but it did
-			return;
-		}
+		final int imageX = galleryItem.photoPaintedX + (isBorder ? border2 : 0);
+		final int imageY = galleryItem.photoPaintedY + (isBorder ? border2 : 0);
 
 		final ImageQuality requestedImageQuality = itemImageWidth <= PhotoLoadManager.IMAGE_SIZE_THUMBNAIL
 				? ImageQuality.THUMB
@@ -387,11 +392,6 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 				StatusUtil.log(e1);
 			}
 
-			if (itemImageWidth < _textMinThumbSize) {
-				// disable drawing photo attributes when image is too small
-				isDrawAttributes = false;
-			}
-
 			final boolean isPainted = draw_Image(gc, photo, paintedImage, galleryItem,//
 					imageX,
 					imageY,
@@ -418,7 +418,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 					itemImageWidth,
 					itemImageHeight,
 					requestedImageQuality,
-					isDrawAttributes && _isShowPhotoName,
+					_isAttributesPainted && _isShowPhotoName,
 					isSelected,
 					false,
 					_bgColor);
@@ -427,7 +427,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		final boolean isDrawPhotoDateName = _isShowPhotoName || _isShowDateInfo;
 
 		// draw name & date & annotations
-		if (isDrawAttributes && isDrawPhotoDateName) {
+		if (_isAttributesPainted && isDrawPhotoDateName) {
 			drawPhotoDateName(gc, photo, //
 					imageX,
 					imageY,
@@ -464,8 +464,15 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 			}
 		}
 
-		if (isDrawAttributes && _isShowPhotoRatingStars) {
+		if (_isAttributesPainted && _isShowPhotoRatingStars) {
+
 			drawRatingStars(gc, galleryItem, photo.ratingStars);
+
+			_isRatingStarsPainted = true;
+
+		} else {
+
+			_isRatingStarsPainted = false;
 		}
 
 //		// debug box for the whole gallery item area
@@ -1295,7 +1302,29 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 	@Override
 	public int getBorderSize() {
-		return _gridBorder + _imageBorder;
+		return _gridBorderSize + _imageBorderSize;
+	}
+
+	public boolean isAttributesPainted(final int galleryItemSizeWithBorder) {
+
+		final int photoWidth = galleryItemSizeWithBorder - _gridBorderSize;
+
+		int itemImageWidth = photoWidth;
+
+
+		// ignore border for small images
+		final int border = _imageBorderSize;
+		final boolean isBorder = itemImageWidth - border >= _textMinThumbSize;
+
+		itemImageWidth -= isBorder ? border : 0;
+
+		// disable drawing photo attributes when image is too small
+		_isAttributesPainted = true;
+		if (itemImageWidth < _textMinThumbSize) {
+			_isAttributesPainted = false;
+		}
+
+		return _isAttributesPainted;
 	}
 
 	/**
@@ -1307,10 +1336,9 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	 */
 	public boolean isMouseDownHandled(final GalleryMT20Item galleryItem, final int itemMouseX, final int itemMouseY) {
 
-//		final IPhotoServiceProvider photoServiceProvider = _galleryMT.getPhotoServiceProvider();
-//		if (photoServiceProvider == null) {
-//			return false;
-//		}
+		if (_isRatingStarsPainted == false) {
+			return false;
+		}
 
 		if (isRatingStarsHovered(itemMouseX, itemMouseY)) {
 
@@ -1426,7 +1454,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 		if (isRatingStarsHovered(itemMouseX, itemMouseY)) {
 
-			final int hoveredPhotoX = itemMouseX + _gridBorder;
+			final int hoveredPhotoX = itemMouseX + _gridBorderSize;
 
 			hoveredStars = (hoveredPhotoX - _ratingStarsLeftBorder) / _ratingStarImageWidth + 1;
 
@@ -1485,10 +1513,6 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		_galleryMT.setFont(font);
 	}
 
-	public void setImageBorderSize(final int imageBorderSize) {
-		_imageBorder = imageBorderSize;
-	}
-
 	private void setPaintedZoomFactor(	final int imageWidth,
 										final int imageHeight,
 										final int canvasWidth,
@@ -1535,7 +1559,11 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		_isShowPhotoRatingStars = ratingStarBehaviour != RatingStarBehaviour.NO_STARS;
 	}
 
-	public void setTextMinThumbSize(final int textMinThumbSize) {
+	public void setSizeImageBorder(final int imageBorderSize) {
+		_imageBorderSize = imageBorderSize;
+	}
+
+	public void setSizeTextMinThumb(final int textMinThumbSize) {
 		_textMinThumbSize = textMinThumbSize;
 	}
 }

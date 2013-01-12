@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,28 +15,26 @@
  *******************************************************************************/
 package net.tourbook.photo.internal;
 
-
-import net.tourbook.common.UI;
 import net.tourbook.photo.PhotoGallery;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionImageFilterNoGPS extends Action {
+public class ActionPhotoFilterGPS extends Action {
 
 	private PhotoGallery	_photoGallery;
 
-	public ActionImageFilterNoGPS(final PhotoGallery photoGallery) {
+	public ActionPhotoFilterGPS(final PhotoGallery photoGallery) {
 
-		super(Messages.Pic_Dir_Action_PhotoFilterNoGPS, AS_CHECK_BOX);
+		super(Messages.Photo_Gallery_Action_PhotoFilter_GPS, AS_CHECK_BOX);
 
-		setToolTipText(Messages.Pic_Dir_Action_PhotoFilterNoGPS_Tooltip);
-		setImageDescriptor(UI.IMAGE_REGISTRY.getDescriptor(PhotoGallery.IMAGE_PHOTO_FILTER_NO_GPS));
+		setToolTipText(Messages.Photo_Gallery_Action_PhotoFilter_GPS_Tooltip);
+		setImageDescriptor(Activator.getImageDescriptor(Messages.Image__PhotoFilterGPS));
 
 		_photoGallery = photoGallery;
 	}
 
 	@Override
 	public void run() {
-		_photoGallery.actionImageFilter(this);
+		_photoGallery.actionImageFilterGPS(this);
 	}
 }

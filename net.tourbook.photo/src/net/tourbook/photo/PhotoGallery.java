@@ -15,10 +15,11 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
-import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
-import net.tourbook.photo.internal.ActionImageFilterGPS;
-import net.tourbook.photo.internal.ActionImageFilterNoGPS;
+import net.tourbook.photo.internal.ActionPhotoFilterGPS;
+import net.tourbook.photo.internal.ActionPhotoFilterNoGPS;
+import net.tourbook.photo.internal.ActionPhotoFilterNoTour;
+import net.tourbook.photo.internal.ActionPhotoFilterTour;
 import net.tourbook.photo.internal.ActionPhotoGalleryType;
 import net.tourbook.photo.internal.ActionShowGPSAnnotations;
 import net.tourbook.photo.internal.ActionShowPhotoDate;
@@ -29,9 +30,10 @@ import net.tourbook.photo.internal.ActionSortByFileDate;
 import net.tourbook.photo.internal.ActionSortByFileName;
 import net.tourbook.photo.internal.Activator;
 import net.tourbook.photo.internal.GalleryType;
-import net.tourbook.photo.internal.ImageFilter;
 import net.tourbook.photo.internal.Messages;
 import net.tourbook.photo.internal.PhotoDateInfo;
+import net.tourbook.photo.internal.PhotoFilterGPS;
+import net.tourbook.photo.internal.PhotoFilterTour;
 import net.tourbook.photo.internal.RatingStarBehaviour;
 import net.tourbook.photo.internal.manager.GallerySorting;
 
@@ -46,15 +48,13 @@ public class PhotoGallery extends ImageGallery {
 
 	private static final String			STATE_GALLERY_SORTING				= "STATE_GALLERY_SORTING";					//$NON-NLS-1$
 	private static final String			STATE_GALLERY_TYPE					= "STATE_GALLERY_TYPE";					//$NON-NLS-1$
-	private static final String			STATE_IMAGE_FILTER					= "STATE_IMAGE_FILTER";					//$NON-NLS-1$
+	private static final String			STATE_PHOTO_FILTER_GPS				= "STATE_PHOTO_FILTER_GPS";				//$NON-NLS-1$
+	private static final String			STATE_PHOTO_FILTER_TOUR				= "STATE_PHOTO_FILTER_TOUR";				//$NON-NLS-1$
 	private static final String			STATE_IS_SHOW_PHOTO_GPS_ANNOTATION	= "STATE_IS_SHOW_PHOTO_GPS_ANNOTATION";	//$NON-NLS-1$
 	private static final String			STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY	= "STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY";	//$NON-NLS-1$
 	private static final String			STATE_IS_SHOW_PHOTO_TOOLTIP			= "STATE_IS_SHOW_PHOTO_TOOLTIP";			//$NON-NLS-1$
 	private static final String			STATE_PHOTO_INFO_DATE				= "STATE_PHOTO_INFO_DATE";					//$NON-NLS-1$
 	private static final String			STATE_RATING_STAR_BEHAVIOUR			= "STATE_RATING_STAR_BEHAVIOUR";			//$NON-NLS-1$
-
-	public static final String			IMAGE_PHOTO_FILTER_GPS				= "IMAGE_PHOTO_FILTER_GPS";				//$NON-NLS-1$
-	public static final String			IMAGE_PHOTO_FILTER_NO_GPS			= "IMAGE_PHOTO_FILTER_NO_GPS";				//$NON-NLS-1$
 
 	private IDialogSettings				_state;
 	private PhotoDateInfo				_photoDateInfo;
@@ -62,8 +62,10 @@ public class PhotoGallery extends ImageGallery {
 	private boolean						_isShowActionFiltering				= true;
 	private boolean						_isShowActionSorting				= true;
 
-	private ActionImageFilterGPS		_actionImageFilterGPS;
-	private ActionImageFilterNoGPS		_actionImageFilterNoGPS;
+	private ActionPhotoFilterGPS		_actionPhotoFilterGPS;
+	private ActionPhotoFilterNoGPS		_actionPhotoFilterNoGPS;
+	private ActionPhotoFilterTour		_actionPhotoFilterTour;
+	private ActionPhotoFilterNoTour		_actionPhotoFilterNoTour;
 	private ActionPhotoGalleryType		_actionPhotoGalleryType;
 	private ActionShowPhotoName			_actionShowPhotoName;
 	private ActionShowPhotoDate			_actionShowPhotoDate;
@@ -73,21 +75,22 @@ public class PhotoGallery extends ImageGallery {
 	private ActionSortByFileDate		_actionSortFileByDate;
 	private ActionSortByFileName		_actionSortByFileName;
 
-	private ImageFilter					_currentImageFilter					= ImageFilter.NoFilter;
+	private PhotoFilterGPS				_photoFilterGPS						= PhotoFilterGPS.NO_FILTER;
+	private PhotoFilterTour				_photoFilterTour					= PhotoFilterTour.NO_FILTER;
 
 	private GallerySorting				_gallerySorting;
 	private GalleryType					_galleryType;
 
 	private RatingStarBehaviour			_ratingStarBehaviour;
 
-	static {
-		UI.IMAGE_REGISTRY.put(//
-				IMAGE_PHOTO_FILTER_GPS,
-				Activator.getImageDescriptor(Messages.Image__PhotoFilterGPS));
-		UI.IMAGE_REGISTRY.put(//
-				IMAGE_PHOTO_FILTER_NO_GPS,
-				Activator.getImageDescriptor(Messages.Image__PhotoFilterNoGPS));
-	}
+//	static {
+//		UI.IMAGE_REGISTRY.put(//
+//				IMAGE_PHOTO_FILTER_GPS,
+//				Activator.getImageDescriptor(Messages.Image__PhotoFilterGPS));
+//		UI.IMAGE_REGISTRY.put(//
+//				IMAGE_PHOTO_FILTER_NO_GPS,
+//				Activator.getImageDescriptor(Messages.Image__PhotoFilterNoGPS));
+//	}
 
 	public PhotoGallery(final IDialogSettings state) {
 
@@ -96,27 +99,50 @@ public class PhotoGallery extends ImageGallery {
 		_state = state;
 	}
 
-	public void actionImageFilter(final Action actionImageFilter) {
+	public void actionImageFilterGPS(final Action filterAction) {
 
 		/*
 		 * get selected filter, uncheck other
 		 */
-		if (actionImageFilter == _actionImageFilterGPS) {
+		if (filterAction == _actionPhotoFilterGPS) {
 
-			_currentImageFilter = actionImageFilter.isChecked() ? ImageFilter.GPS : ImageFilter.NoFilter;
+			_photoFilterGPS = filterAction.isChecked() ? PhotoFilterGPS.WITH_GPS : PhotoFilterGPS.NO_FILTER;
 
-			_actionImageFilterNoGPS.setChecked(false);
+			_actionPhotoFilterNoGPS.setChecked(false);
 
-		} else if (actionImageFilter == _actionImageFilterNoGPS) {
+		} else if (filterAction == _actionPhotoFilterNoGPS) {
 
-			_currentImageFilter = actionImageFilter.isChecked() ? ImageFilter.NoGPS : ImageFilter.NoFilter;
+			_photoFilterGPS = filterAction.isChecked() ? PhotoFilterGPS.NO_GPS : PhotoFilterGPS.NO_FILTER;
 
-			_actionImageFilterGPS.setChecked(false);
+			_actionPhotoFilterGPS.setChecked(false);
 		}
 
 		// update gallery
 
-		filterGallery(_currentImageFilter);
+		filterGallery(_photoFilterGPS, _photoFilterTour);
+	}
+
+	public void actionImageFilterTour(final Action filterAction) {
+
+		/*
+		 * get selected filter, uncheck other
+		 */
+		if (filterAction == _actionPhotoFilterTour) {
+
+			_photoFilterTour = filterAction.isChecked() ? PhotoFilterTour.WITH_TOURS : PhotoFilterTour.NO_FILTER;
+
+			_actionPhotoFilterNoTour.setChecked(false);
+
+		} else if (filterAction == _actionPhotoFilterNoTour) {
+
+			_photoFilterTour = filterAction.isChecked() ? PhotoFilterTour.NO_TOURS : PhotoFilterTour.NO_FILTER;
+
+			_actionPhotoFilterTour.setChecked(false);
+		}
+
+		// update gallery
+
+		filterGallery(_photoFilterGPS, _photoFilterTour);
 	}
 
 	public void actionPhotoGalleryType() {
@@ -239,8 +265,10 @@ public class PhotoGallery extends ImageGallery {
 
 		_actionPhotoGalleryType = new ActionPhotoGalleryType(this);
 
-		_actionImageFilterGPS = new ActionImageFilterGPS(this);
-		_actionImageFilterNoGPS = new ActionImageFilterNoGPS(this);
+		_actionPhotoFilterGPS = new ActionPhotoFilterGPS(this);
+		_actionPhotoFilterNoGPS = new ActionPhotoFilterNoGPS(this);
+		_actionPhotoFilterTour = new ActionPhotoFilterTour(this);
+		_actionPhotoFilterNoTour = new ActionPhotoFilterNoTour(this);
 
 		_actionShowGPSAnnotation = new ActionShowGPSAnnotations(this);
 
@@ -266,6 +294,14 @@ public class PhotoGallery extends ImageGallery {
 //
 //		_actionShowPhotoName.setEnabled(isEnableGalleryText);
 //		_actionShowPhotoDate.setEnabled(isEnableGalleryText);
+	}
+
+	@Override
+	protected void enableActions(final boolean isAttributesPainted) {
+
+		_actionShowPhotoRatingStars.setEnabled(isAttributesPainted);
+		_actionShowPhotoDate.setEnabled(isAttributesPainted);
+		_actionShowPhotoName.setEnabled(isAttributesPainted);
 	}
 
 	/**
@@ -296,8 +332,10 @@ public class PhotoGallery extends ImageGallery {
 
 		if (_isShowActionFiltering) {
 			tbm.add(new Separator());
-			tbm.add(_actionImageFilterGPS);
-			tbm.add(_actionImageFilterNoGPS);
+			tbm.add(_actionPhotoFilterTour);
+			tbm.add(_actionPhotoFilterNoTour);
+			tbm.add(_actionPhotoFilterGPS);
+			tbm.add(_actionPhotoFilterNoGPS);
 		}
 
 		if (_isShowActionSorting) {
@@ -319,16 +357,34 @@ public class PhotoGallery extends ImageGallery {
 	public void restoreState() {
 
 		/*
-		 * image filter
+		 * photo filter: gps
 		 */
-		final String prefImageFilter = Util.getStateString(_state, STATE_IMAGE_FILTER, ImageFilter.NoFilter.name());
+		final String prefPhotoFilterGPS = Util.getStateString(
+				_state,
+				STATE_PHOTO_FILTER_GPS,
+				PhotoFilterGPS.NO_FILTER.name());
 		try {
-			_currentImageFilter = ImageFilter.valueOf(prefImageFilter);
+			_photoFilterGPS = PhotoFilterGPS.valueOf(prefPhotoFilterGPS);
 		} catch (final Exception e) {
-			_currentImageFilter = ImageFilter.NoFilter;
+			_photoFilterGPS = PhotoFilterGPS.NO_FILTER;
 		}
-		_actionImageFilterGPS.setChecked(_currentImageFilter == ImageFilter.GPS);
-		_actionImageFilterNoGPS.setChecked(_currentImageFilter == ImageFilter.NoGPS);
+		_actionPhotoFilterGPS.setChecked(_photoFilterGPS == PhotoFilterGPS.WITH_GPS);
+		_actionPhotoFilterNoGPS.setChecked(_photoFilterGPS == PhotoFilterGPS.NO_GPS);
+
+		/*
+		 * photo filter: tour
+		 */
+		final String prefPhotoFilterTour = Util.getStateString(
+				_state,
+				STATE_PHOTO_FILTER_TOUR,
+				PhotoFilterTour.NO_FILTER.name());
+		try {
+			_photoFilterTour = PhotoFilterTour.valueOf(prefPhotoFilterTour);
+		} catch (final Exception e) {
+			_photoFilterTour = PhotoFilterTour.NO_FILTER;
+		}
+		_actionPhotoFilterTour.setChecked(_photoFilterTour == PhotoFilterTour.WITH_TOURS);
+		_actionPhotoFilterNoTour.setChecked(_photoFilterTour == PhotoFilterTour.NO_TOURS);
 
 		/*
 		 * photo date / time / name / tooltip / annotation
@@ -399,7 +455,7 @@ public class PhotoGallery extends ImageGallery {
 
 		// !!! overwrite super settings !!!
 		setSorting(_gallerySorting);
-		setFilter(_currentImageFilter);
+		setFilter(_photoFilterGPS, _photoFilterTour);
 
 		enableActions();
 	}
@@ -419,7 +475,9 @@ public class PhotoGallery extends ImageGallery {
 		_state.put(STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY, _actionShowPhotoName.isChecked());
 		_state.put(STATE_IS_SHOW_PHOTO_TOOLTIP, _actionShowPhotoTooltip.isChecked());
 
-		_state.put(STATE_IMAGE_FILTER, _currentImageFilter.name());
+		_state.put(STATE_PHOTO_FILTER_GPS, _photoFilterGPS.name());
+		_state.put(STATE_PHOTO_FILTER_TOUR, _photoFilterTour.name());
+
 		_state.put(STATE_PHOTO_INFO_DATE, _photoDateInfo.name());
 		_state.put(STATE_RATING_STAR_BEHAVIOUR, _ratingStarBehaviour.name());
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,21 +15,21 @@
  *******************************************************************************/
 package net.tourbook.photo.internal;
 
-public enum ImageFilter {
+public enum PhotoFilterGPS {
 
 	/**
 	 * an image filter is not set, all images are displayed
 	 */
-	NoFilter,
+	NO_FILTER,
 
 	/**
 	 * images with GPS data are displayed
 	 */
-	GPS,
+	WITH_GPS,
 
 	/**
 	 * images without GPS data are displayed
 	 */
-	NoGPS,
+	NO_GPS,
 
 }

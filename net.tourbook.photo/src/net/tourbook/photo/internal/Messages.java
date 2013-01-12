@@ -37,34 +37,30 @@ public class Messages extends NLS {
 	public static String		Image__Backward_Nav;
 	public static String		Image__delete;
 	public static String		Image__Forward_Nav;
-	public static String	Image__Photo_Action_ShowAnnotation;
-
+	public static String		Image__Photo_Action_ShowAnnotation;
 	public static String		Image__Photo_Action_ShowGPSAnnotation;
 	public static String		Image__PhotoAnnotationExifGPS;
-
-	public static String	Image__PhotoAnnotationSavedInTour;
+	public static String		Image__PhotoAnnotationSavedInTour;
 	public static String		Image__PhotoAnnotationTourGPS;
+	public static String	Image__PhotoFilter_NoTour;
+
 	public static String		Image__PhotoFilterGPS;
 	public static String		Image__PhotoFilterNoGPS;
+	public static String		Image__PhotoFilterTour;
 	public static String		Image__PhotoFolderGallery;
 	public static String		Image__PhotoFolderGallery_OnlyPhotos;
 	public static String		Image__PhotoFullsizeShellImage128;
 	public static String		Image__PhotoInfoDate;
 	public static String		Image__PhotoInfoName;
 	public static String		Image__PhotoRatingStar;
-
-	public static String	Image__PhotoRatingStarAndHovered;
-
-	public static String	Image__PhotoRatingStarDelete;
-
-	public static String	Image__PhotoRatingStarDisabled;
+	public static String		Image__PhotoRatingStarAndHovered;
+	public static String		Image__PhotoRatingStarDelete;
+	public static String		Image__PhotoRatingStarDisabled;
 	public static String		Image__PhotoRatingStarHovered;
 	public static String		Image__PhotoRatingStarNotHovered;
-
-	public static String	Image__PhotoRatingStarNotHoveredButSet;
+	public static String		Image__PhotoRatingStarNotHoveredButSet;
 	public static String		Image__PhotoRatingStars;
-
-	public static String	Image__PhotoRatingStarsHovered;
+	public static String		Image__PhotoRatingStarsHovered;
 	public static String		Image__PhotoSortByDate;
 	public static String		Image__PhotoSortByName;
 	public static String		Image__PhotoTooltip;
@@ -72,15 +68,21 @@ public class Messages extends NLS {
 	public static String		Image__PotoGalleryThumbnail;
 	public static String		Image__refresh;
 
+	public static String		Photo_Gallery_Action_PhotoFilter_GPS;
+	public static String		Photo_Gallery_Action_PhotoFilter_GPS_Tooltip;
+	public static String		Photo_Gallery_Action_PhotoFilter_NoGPS;
+	public static String		Photo_Gallery_Action_PhotoFilter_NoGPS_Tooltip;
+	public static String		Photo_Gallery_Action_PhotoFilter_Tour;
+	public static String		Photo_Gallery_Action_PhotoFilter_Tour_Tooltip;
+	public static String		Photo_Gallery_Action_PhotoFilter_NoTour;
+	public static String		Photo_Gallery_Action_PhotoFilter_NoTour_Tooltip;
 	public static String		Photo_Gallery_Action_PhotoGalleryThumbnail;
 	public static String		Photo_Gallery_Action_PhotoGalleryThumbnail_Tooltip;
 	public static String		Photo_Gallery_Action_ShowPhotoGalleryDetails;
 	public static String		Photo_Gallery_Action_ShowPhotoGalleryDetails_Tooltip;
 	public static String		Photo_Gallery_Action_ShowPhotoRatingStars;
-	public static String	Photo_Gallery_Action_ShowPhotoRatingStars_NoHoveredStars_Tooltip;
-
-	public static String	Photo_Gallery_Action_ShowPhotoRatingStars_NoStars_Tooltip;
-
+	public static String		Photo_Gallery_Action_ShowPhotoRatingStars_NoHoveredStars_Tooltip;
+	public static String		Photo_Gallery_Action_ShowPhotoRatingStars_NoStars_Tooltip;
 	public static String		Photo_Gallery_Action_ShowPhotoRatingStars_Tooltip;
 
 	public static String		Photo_ToolTip_Description;
@@ -95,18 +97,12 @@ public class Messages extends NLS {
 	public static String		Pic_Dir_Action_DefineExternalApp;
 	public static String		Pic_Dir_Action_NavigateHistoryBackward_Tooltip;
 	public static String		Pic_Dir_Action_NavigateHistoryForward_Tooltip;
-	public static String		Pic_Dir_Action_PhotoFilterGPS;
-	public static String		Pic_Dir_Action_PhotoFilterGPSTooltip;
-	public static String		Pic_Dir_Action_PhotoFilterNoGPS;
-	public static String		Pic_Dir_Action_PhotoFilterNoGPS_Tooltip;
 	public static String		Pic_Dir_Action_Preferences;
 	public static String		Pic_Dir_Action_Refresh;
 	public static String		Pic_Dir_Action_RemoveInvalidFolders;
 	public static String		Pic_Dir_Action_RunExternalAppTitle;
-	public static String	Pic_Dir_Action_ShowAnnotations;
-
-	public static String	Pic_Dir_Action_ShowAnnotations_Tooltip;
-
+	public static String		Pic_Dir_Action_ShowAnnotations;
+	public static String		Pic_Dir_Action_ShowAnnotations_Tooltip;
 	public static String		Pic_Dir_Action_ShowPhotoAnnotations;
 	public static String		Pic_Dir_Action_ShowPhotoAnnotations_Tooltip;
 	public static String		Pic_Dir_Action_ShowPhotoFileName;
