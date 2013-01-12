@@ -32,7 +32,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourChartViewer;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.tourChart.TourChart;
-import net.tourbook.ui.tourChart.TourChartContextProvicer;
+import net.tourbook.ui.tourChart.TourChartContextProvider;
 import net.tourbook.ui.tourChart.TourChartViewPart;
 
 import org.eclipse.jface.viewers.ISelection;
@@ -72,7 +72,7 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart implements I
 		_tourChart.setShowZoomActions(true);
 		_tourChart.setShowSlider(true);
 		_tourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);
-		_tourChart.setContextProvider(new TourChartContextProvicer(this));
+		_tourChart.setContextProvider(new TourChartContextProvider(this));
 		_tourChart.setTourInfoActionsEnabled(true);
 
 		_tourChart.addDoubleClickListener(new Listener() {

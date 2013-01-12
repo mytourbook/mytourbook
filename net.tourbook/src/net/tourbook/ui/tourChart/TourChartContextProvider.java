@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,11 +22,13 @@ import net.tourbook.Messages;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartXSlider;
 import net.tourbook.chart.IChartContextProvider;
+import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.extension.export.ActionExport;
+import net.tourbook.preferences.PrefPageAppearanceTourChart;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
@@ -46,34 +48,34 @@ import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 
-public class TourChartContextProvicer implements IChartContextProvider, ITourProvider {
+public class TourChartContextProvider implements IChartContextProvider, ITourProvider {
 
 	private final ITourChartViewer			_tourChartViewer;
-
-	private ActionEditQuick					_actionQuickEdit;
-	private ActionEditTour					_actionEditTour;
-	private ActionOpenMarkerDialog			_actionOpenMarkerDialog;
-	private ActionOpenAdjustAltitudeDialog	_actionOpenAdjustAltitudeDialog;
-	private ActionOpenTour					_actionOpenTour;
 
 	private ActionCreateRefTour				_actionCreateRefTour;
 	private ActionCreateMarker				_actionCreateMarker;
 	private ActionCreateMarker				_actionCreateMarkerLeft;
 	private ActionCreateMarker				_actionCreateMarkerRight;
+	private ActionEditTour					_actionEditTour;
 	private ActionExport					_actionExportTour;
+	private ActionOpenAdjustAltitudeDialog	_actionOpenAdjustAltitudeDialog;
+	private ActionOpenMarkerDialog			_actionOpenMarkerDialog;
+	private ActionOpenTour					_actionOpenTour;
+	private ActionOpenPrefDialog			_actionPrefDialog;
+	private ActionEditQuick					_actionQuickEdit;
+	private ActionSetTourTypeMenu			_actionSetTourType;
 
 	private TagMenuManager					_tagMenuMgr;
-	private ActionSetTourTypeMenu			_actionSetTourType;
 
 	private ChartXSlider					_leftSlider;
 	private ChartXSlider					_rightSlider;
 
 	/**
 	 * Provides a context menu for a tour chart
-	 *
+	 * 
 	 * @param tourChartViewer
 	 */
-	public TourChartContextProvicer(final ITourChartViewer tourChartViewer) {
+	public TourChartContextProvider(final ITourChartViewer tourChartViewer) {
 
 		_tourChartViewer = tourChartViewer;
 
@@ -110,6 +112,10 @@ public class TourChartContextProvicer implements IChartContextProvider, ITourPro
 		_actionSetTourType = new ActionSetTourTypeMenu(this);
 
 		_tagMenuMgr = new TagMenuManager(this, true);
+
+		_actionPrefDialog = new ActionOpenPrefDialog(
+				Messages.Tour_Action_EditChartPreferences,
+				PrefPageAppearanceTourChart.ID);
 	}
 
 	private void enableActions() {
@@ -168,6 +174,9 @@ public class TourChartContextProvicer implements IChartContextProvider, ITourPro
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionSetTourType);
 		TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, this, true);
+
+		menuMgr.add(new Separator());
+		menuMgr.add(_actionPrefDialog);
 
 		// set slider position in export action
 		_actionExportTour.setTourRange(tourChart.getLeftSlider().getValuesIndex(), //
