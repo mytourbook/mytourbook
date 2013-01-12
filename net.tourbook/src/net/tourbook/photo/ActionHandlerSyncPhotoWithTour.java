@@ -63,7 +63,7 @@ public class ActionHandlerSyncPhotoWithTour extends AbstractHandler {
 				final PhotosWithExifSelection selectedPhotosWithExif = picDirView.getSelectedPhotosWithExif(false);
 
 				if (selectedPhotosWithExif != null) {
-					PhotoManager.getInstance().linkPhotosWithTours(selectedPhotosWithExif);
+					TourPhotoManager.getInstance().linkPhotosWithTours(selectedPhotosWithExif);
 				}
 			} else {
 

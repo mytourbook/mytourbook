@@ -893,6 +893,23 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 		});
 	}
 
+	/**
+	 * column: tour start time
+	 */
+	private void defineColumn_ExifTime() {
+
+		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_TIME.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Photo photo = (Photo) cell.getElement();
+
+				cell.setText(_timeFormatter.print(photo.imageExifTime));
+			}
+		});
+	}
+
 //	/**
 //	 * column: altitude
 //	 */
@@ -917,23 +934,6 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 //	}
 
 	/**
-	 * column: tour start time
-	 */
-	private void defineColumn_ExifTime() {
-
-		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_TIME.createColumn(_columnManager, _pc);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Photo photo = (Photo) cell.getElement();
-
-				cell.setText(_timeFormatter.print(photo.imageExifTime));
-			}
-		});
-	}
-
-	/**
 	 * column: image direction degree
 	 */
 	private void defineColumn_ImageDirectionDegree() {
@@ -953,6 +953,32 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 					cell.setText(UI.EMPTY_STRING);
 				} else {
 					cell.setText(Integer.toString((int) imageDirection));
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: image direction degree
+	 */
+	private void defineColumn_ImageDirectionText() {
+
+		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_IMAGE_DIRECTION_TEXT//
+				.createColumn(_columnManager, _pc);
+
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Photo photo = (Photo) cell.getElement();
+				final double imageDirection = photo.getImageDirection();
+
+				if (imageDirection == Double.MIN_VALUE) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					final int imageDirectionInt = (int) imageDirection;
+					cell.setText(getDirectionText(imageDirectionInt));
 				}
 			}
 		});
@@ -982,12 +1008,11 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 //	}
 
 	/**
-	 * column: image direction degree
+	 * column: name
 	 */
-	private void defineColumn_ImageDirectionText() {
+	private void defineColumn_ImageFileName() {
 
-		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_IMAGE_DIRECTION_TEXT//
-				.createColumn(_columnManager, _pc);
+		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_NAME.createColumn(_columnManager, _pc);
 
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -995,14 +1020,8 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 			public void update(final ViewerCell cell) {
 
 				final Photo photo = (Photo) cell.getElement();
-				final double imageDirection = photo.getImageDirection();
 
-				if (imageDirection == Double.MIN_VALUE) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					final int imageDirectionInt = (int) imageDirection;
-					cell.setText(getDirectionText(imageDirectionInt));
-				}
+				cell.setText(photo.imageFileName);
 			}
 		});
 	}
@@ -1029,25 +1048,6 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 //			}
 //		});
 //	}
-
-	/**
-	 * column: name
-	 */
-	private void defineColumn_ImageFileName() {
-
-		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_NAME.createColumn(_columnManager, _pc);
-
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Photo photo = (Photo) cell.getElement();
-
-				cell.setText(photo.imageFileName);
-			}
-		});
-	}
 
 	/**
 	 * column: location
@@ -2908,6 +2908,20 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 			}
 		}
 
+		_galleryMT20.redraw();
+	}
+
+	/**
+	 * The UI of the photos are updated.
+	 * 
+	 * @param arrayList
+	 *            Items in this list should be of type {@link Photo}.
+	 */
+	public void updatePhotos(final ArrayList<?> arrayList) {
+
+		/*
+		 * this is the easy way to update the UI for all visible photos
+		 */
 		_galleryMT20.redraw();
 	}
 

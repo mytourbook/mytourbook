@@ -70,7 +70,7 @@ import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.math.Smooth;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoCache;
-import net.tourbook.photo.PhotoManager;
+import net.tourbook.photo.TourPhotoManager;
 import net.tourbook.photo.TourPhotoLink;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageComputedValues;
@@ -4404,7 +4404,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			_galleryPhotos.add(galleryPhoto);
 		}
 
-		Collections.sort(_galleryPhotos, PhotoManager.AdjustTimeComparator);
+		Collections.sort(_galleryPhotos, TourPhotoManager.AdjustTimeComparator);
 
 		return _galleryPhotos;
 	}

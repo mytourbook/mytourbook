@@ -34,7 +34,7 @@ public class ActionHandlerLinkPhotoWithTourInGalleryAll extends AbstractHandler 
 			final PhotosWithExifSelection selectedPhotosWithExif = picDirView.getSelectedPhotosWithExif(true);
 
 			if (selectedPhotosWithExif != null) {
-				PhotoManager.getInstance().linkPhotosWithTours(selectedPhotosWithExif);
+				TourPhotoManager.getInstance().linkPhotosWithTours(selectedPhotosWithExif);
 			}
 		}
 

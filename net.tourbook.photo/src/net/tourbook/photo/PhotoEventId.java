@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
+import java.util.ArrayList;
+
 public enum PhotoEventId {
 
 	/**
@@ -23,8 +25,14 @@ public enum PhotoEventId {
 //	GPS_DATA_IS_UPDATED,
 
 	/**
-	 * Event data contains a selection with photos
+	 * Event data contains a selection with photos.
 	 */
-	PHOTO_SELECTION
+	PHOTO_SELECTION,
+
+	/**
+	 * Photo attributes, e.g star rating has been modified. Event data contain an {@link ArrayList}
+	 * with the modified {@link Photo}'s.
+	 */
+	PHOTO_ATTRIBUTES_ARE_MODIFIED
 
 }

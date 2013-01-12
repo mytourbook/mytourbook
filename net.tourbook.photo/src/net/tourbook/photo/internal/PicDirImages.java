@@ -22,6 +22,7 @@ import java.util.Collections;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 import net.tourbook.photo.IPhotoGalleryProvider;
+import net.tourbook.photo.PhotoEventId;
 import net.tourbook.photo.PhotoGallery;
 import net.tourbook.photo.PhotoSelection;
 import net.tourbook.photo.PhotosWithExifSelection;
@@ -407,6 +408,19 @@ public class PicDirImages implements IPhotoGalleryProvider {
 				}
 			}
 		});
+	}
+
+	public void photoEvent(final PhotoEventId photoEventId, final Object data) {
+
+		if (photoEventId == PhotoEventId.PHOTO_ATTRIBUTES_ARE_MODIFIED) {
+
+			if (data instanceof ArrayList<?>) {
+
+				final ArrayList<?> arrayList = (ArrayList<?>) data;
+
+				_photoGallery.updatePhotos(arrayList);
+			}
+		}
 	}
 
 	public void refreshUI() {

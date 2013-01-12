@@ -29,7 +29,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.photo.PhotoManager;
+import net.tourbook.photo.TourPhotoManager;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPagePeople;
 import net.tourbook.proxy.DefaultProxySelector;
@@ -475,7 +475,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		WorkbenchPlugin.getDefault().getPreferenceStore().setValue(IPreferenceConstants.RUN_IN_BACKGROUND, false);
 
 		// must be initialized early to set photoServiceProvider in the Photo
-		PhotoManager.restoreState();
+		TourPhotoManager.restoreState();
 	}
 
 	@Override
@@ -483,7 +483,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 		TagMenuManager.saveTagState();
 		TourTypeMenuManager.saveState();
-		PhotoManager.saveState();
+		TourPhotoManager.saveState();
 
 		return super.preWindowShellClose();
 	}

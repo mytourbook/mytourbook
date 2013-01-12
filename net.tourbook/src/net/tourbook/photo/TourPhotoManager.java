@@ -50,7 +50,6 @@ import org.apache.commons.imaging.formats.jpeg.JpegImageMetadata;
 import org.apache.commons.imaging.formats.tiff.TiffImageMetadata;
 import org.apache.commons.imaging.formats.tiff.write.TiffOutputSet;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -67,7 +66,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 import org.joda.time.DateTime;
 
-public class PhotoManager implements IPhotoServiceProvider {
+public class TourPhotoManager implements IPhotoServiceProvider {
 
 	private static final String						STATE_CAMERA_ADJUSTMENT_NAME	= "STATE_CAMERA_ADJUSTMENT_NAME";	//$NON-NLS-1$
 
@@ -80,14 +79,12 @@ public class PhotoManager implements IPhotoServiceProvider {
 																							.getDialogSettingsSection(
 																									"PhotoManager");	//$NON-NLS-1$
 
-	private static PhotoManager						_instance;
+	private static TourPhotoManager						_instance;
 	/**
 	 * Contains all cameras which are every used, key is the camera name.
 	 */
 	private static HashMap<String, Camera>			_allAvailableCameras			= new HashMap<String, Camera>();
 
-	private static final ListenerList				_photoEventListeners			= new ListenerList(
-																							ListenerList.IDENTITY);
 
 	private Connection								_sqlConnection;
 
@@ -117,41 +114,23 @@ public class PhotoManager implements IPhotoServiceProvider {
 
 	}
 
-	private PhotoManager() {
+	private TourPhotoManager() {
 
 		// set photo service provider into the Photo plugin
 		Photo.setPhotoServiceProvider(this);
 	}
 
-	public static void addPhotoEventListener(final IPhotoEventListener listener) {
-		_photoEventListeners.add(listener);
-	}
 
-	public static void fireEvent(final PhotoEventId photoEventId, final Object data) {
 
-//		System.out.println(UI.timeStampNano() + " PhotoManager\tfireEvent\t" + data.getClass().getSimpleName());
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
-		final Object[] allListeners = _photoEventListeners.getListeners();
-		for (final Object listener : allListeners) {
-			((IPhotoEventListener) listener).photoEvent(photoEventId, data);
-		}
-	}
-
-	public static PhotoManager getInstance() {
+	public static TourPhotoManager getInstance() {
 
 		if (_instance == null) {
-			_instance = new PhotoManager();
+			_instance = new TourPhotoManager();
 		}
 
 		return _instance;
 	}
 
-	public static void removePhotoEventListener(final IPhotoEventListener listener) {
-		if (listener != null) {
-			_photoEventListeners.remove(listener);
-		}
-	}
 
 	public static void restoreState() {
 
@@ -898,27 +877,24 @@ public class PhotoManager implements IPhotoServiceProvider {
 				final int ratingStars = photo.ratingStars;
 				final Collection<TourPhotoReference> photoRefs = photo.getTourPhotoReferences().values();
 
-				boolean isUpdated = false;
+				if (photoRefs.size() > 0) {
 
-				for (final TourPhotoReference photoRef : photoRefs) {
+					for (final TourPhotoReference photoRef : photoRefs) {
 
-					sqlUpdate.setInt(1, ratingStars);
-					sqlUpdate.setLong(2, photoRef.photoId);
-					sqlUpdate.executeUpdate();
+						sqlUpdate.setInt(1, ratingStars);
+						sqlUpdate.setLong(2, photoRef.photoId);
+						sqlUpdate.executeUpdate();
+					}
 
-					isUpdated = true;
-				}
-
-				if (isUpdated) {
 					updatedPhotos.add(photo);
 				}
 			}
 
 			if (updatedPhotos.size() > 0) {
 
-				// fire notification
+				// fire notification to update all galleries with the modified rating stars
 
-//				PhotoManager.fireEvent(PhotoEventId.PHOTO_ATTRIBUTES_ARE_UPDATED, photos);
+				PhotoManager.fireEvent(PhotoEventId.PHOTO_ATTRIBUTES_ARE_MODIFIED, photos);
 			}
 
 		} catch (final SQLException e) {

@@ -504,6 +504,15 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 					onSelectionChanged(linkSelection);
 				}
 			}
+
+		} else if (photoEventId == PhotoEventId.PHOTO_ATTRIBUTES_ARE_MODIFIED) {
+
+			if (data instanceof ArrayList<?>) {
+
+				final ArrayList<?> arrayList = (ArrayList<?>) data;
+
+				_photoGallery.updatePhotos(arrayList);
+			}
 		}
 	}
 

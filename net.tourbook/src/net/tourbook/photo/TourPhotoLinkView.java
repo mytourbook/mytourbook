@@ -123,7 +123,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 																							.getDialogSettingsSection(
 																									ID);
 
-	private static final PhotoManager			_photoMgr							= PhotoManager.getInstance();
+	private static final TourPhotoManager			_photoMgr							= TourPhotoManager.getInstance();
 
 	private ArrayList<TourPhotoLink>			_visibleTourPhotoLinks				= new ArrayList<TourPhotoLink>();
 
@@ -319,6 +319,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 		final TourManager tourManager = TourManager.getInstance();
 
+		final ArrayList<Photo> savedPhotosInTours = new ArrayList<Photo>();
 		final ArrayList<TourData> modifiedTours = new ArrayList<TourData>();
 		final ArrayList<TourPhotoLink> modifiedLinks = new ArrayList<TourPhotoLink>();
 
@@ -353,6 +354,33 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 								final TourPhoto tourPhoto = new TourPhoto(tourData, linkPhoto);
 
 								tourPhotos.add(tourPhoto);
+
+								// set new photo save state
+								linkPhoto.isSavedInTour = true;
+								
+								
+								
+								
+								
+
+								
+								
+								
+//								final saved link photos do not final always display star final rating in all view's only sometimes
+								
+								
+								
+								
+								
+								
+								
+								
+								
+								
+								
+								
+
+								savedPhotosInTours.add(linkPhoto);
 							}
 
 							tourData.setTourPhotos(tourPhotos);
@@ -404,8 +432,10 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 			}
 		}
 
-		// update UI
+		// update viewer UI
 		_tourViewer.update(modifiedLinks.toArray(), null);
+
+		PhotoManager.fireEvent(PhotoEventId.PHOTO_ATTRIBUTES_ARE_MODIFIED, savedPhotosInTours);
 	}
 
 	private void addPartListener() {
@@ -1599,7 +1629,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 			photo.resetWorldPosition();
 		}
 
-		Collections.sort(_allPhotos, PhotoManager.AdjustTimeComparator);
+		Collections.sort(_allPhotos, TourPhotoManager.AdjustTimeComparator);
 	}
 
 	/**

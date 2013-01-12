@@ -71,7 +71,7 @@ public class PhotoGallery extends ImageGallery {
 	private ActionShowPhotoDate			_actionShowPhotoDate;
 	private ActionShowPhotoRatingStars	_actionShowPhotoRatingStars;
 	private ActionShowPhotoTooltip		_actionShowPhotoTooltip;
-	private ActionShowAnnotations	_actionShowGPSAnnotation;
+	private ActionShowAnnotations		_actionShowGPSAnnotation;
 	private ActionSortByFileDate		_actionSortFileByDate;
 	private ActionSortByFileName		_actionSortByFileName;
 
@@ -491,6 +491,8 @@ public class PhotoGallery extends ImageGallery {
 
 		super.saveState();
 	}
+
+
 
 	private void updateUI_GalleryType(final GalleryType galleryType) {
 

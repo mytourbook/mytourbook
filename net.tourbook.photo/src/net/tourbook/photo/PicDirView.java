@@ -44,11 +44,11 @@ import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 
-public class PicDirView extends ViewPart {
+public class PicDirView extends ViewPart implements IPhotoEventListener {
 
 	static public final String				ID									= "net.tourbook.photo.PicDirView";		//$NON-NLS-1$
 
-	private static final String				SEPARATOR_ID_PIC_DIR_VIEW_TOOL_BAR	= "PicDirViewToolBar"; //$NON-NLS-1$
+	private static final String				SEPARATOR_ID_PIC_DIR_VIEW_TOOL_BAR	= "PicDirViewToolBar";					//$NON-NLS-1$
 
 	private static final String				STATE_TREE_WIDTH					= "STATE_TREE_WIDTH";					//$NON-NLS-1$
 
@@ -227,6 +227,7 @@ public class PicDirView extends ViewPart {
 
 		addPartListener();
 		addPrefListener();
+		PhotoManager.addPhotoEventListener(this);
 
 		// set selection provider
 		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider());
@@ -283,6 +284,8 @@ public class PicDirView extends ViewPart {
 
 	@Override
 	public void dispose() {
+
+		PhotoManager.removePhotoEventListener(this);
 
 		getViewSite().getPage().removePartListener(_partListener);
 
@@ -362,6 +365,12 @@ public class PicDirView extends ViewPart {
 		ThumbnailStore.cleanupStoreFiles(false, false);
 
 		saveState();
+	}
+
+	@Override
+	public void photoEvent(final PhotoEventId photoEventId, final Object data) {
+
+		_picDirImages.photoEvent(photoEventId, data);
 	}
 
 	public void refreshUI() {
