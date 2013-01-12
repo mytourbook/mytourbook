@@ -21,7 +21,7 @@ import net.tourbook.photo.internal.ActionPhotoFilterNoGPS;
 import net.tourbook.photo.internal.ActionPhotoFilterNoTour;
 import net.tourbook.photo.internal.ActionPhotoFilterTour;
 import net.tourbook.photo.internal.ActionPhotoGalleryType;
-import net.tourbook.photo.internal.ActionShowGPSAnnotations;
+import net.tourbook.photo.internal.ActionShowAnnotations;
 import net.tourbook.photo.internal.ActionShowPhotoDate;
 import net.tourbook.photo.internal.ActionShowPhotoName;
 import net.tourbook.photo.internal.ActionShowPhotoRatingStars;
@@ -71,7 +71,7 @@ public class PhotoGallery extends ImageGallery {
 	private ActionShowPhotoDate			_actionShowPhotoDate;
 	private ActionShowPhotoRatingStars	_actionShowPhotoRatingStars;
 	private ActionShowPhotoTooltip		_actionShowPhotoTooltip;
-	private ActionShowGPSAnnotations	_actionShowGPSAnnotation;
+	private ActionShowAnnotations	_actionShowGPSAnnotation;
 	private ActionSortByFileDate		_actionSortFileByDate;
 	private ActionSortByFileName		_actionSortByFileName;
 
@@ -270,7 +270,7 @@ public class PhotoGallery extends ImageGallery {
 		_actionPhotoFilterTour = new ActionPhotoFilterTour(this);
 		_actionPhotoFilterNoTour = new ActionPhotoFilterNoTour(this);
 
-		_actionShowGPSAnnotation = new ActionShowGPSAnnotations(this);
+		_actionShowGPSAnnotation = new ActionShowAnnotations(this);
 
 		_actionShowPhotoName = new ActionShowPhotoName(this);
 		_actionShowPhotoDate = new ActionShowPhotoDate(this);
@@ -288,16 +288,26 @@ public class PhotoGallery extends ImageGallery {
 		super.createImageGallery(parent, style, photoGalleryProvider);
 	}
 
-	private void enableActions() {
+	@Override
+	protected void enableActions(final boolean isItemAvailable) {
 
-//		final boolean isEnableGalleryText = _thumbnailSize >= _textMinThumbSize;
-//
-//		_actionShowPhotoName.setEnabled(isEnableGalleryText);
-//		_actionShowPhotoDate.setEnabled(isEnableGalleryText);
+		_actionPhotoGalleryType.setEnabled(isItemAvailable);
+
+		_actionPhotoFilterGPS.setEnabled(isItemAvailable);
+		_actionPhotoFilterNoGPS.setEnabled(isItemAvailable);
+		_actionPhotoFilterTour.setEnabled(isItemAvailable);
+		_actionPhotoFilterNoTour.setEnabled(isItemAvailable);
+
+		_actionShowGPSAnnotation.setEnabled(isItemAvailable);
+
+		_actionShowPhotoTooltip.setEnabled(isItemAvailable);
+
+		_actionSortByFileName.setEnabled(isItemAvailable);
+		_actionSortFileByDate.setEnabled(isItemAvailable);
 	}
 
 	@Override
-	protected void enableActions(final boolean isAttributesPainted) {
+	protected void enableAttributeActions(final boolean isAttributesPainted) {
 
 		_actionShowPhotoRatingStars.setEnabled(isAttributesPainted);
 		_actionShowPhotoDate.setEnabled(isAttributesPainted);
@@ -456,8 +466,6 @@ public class PhotoGallery extends ImageGallery {
 		// !!! overwrite super settings !!!
 		setSorting(_gallerySorting);
 		setFilter(_photoFilterGPS, _photoFilterTour);
-
-		enableActions();
 	}
 
 	@Override

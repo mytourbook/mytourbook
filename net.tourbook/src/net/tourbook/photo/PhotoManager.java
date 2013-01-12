@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -891,17 +891,34 @@ public class PhotoManager implements IPhotoServiceProvider {
 							+ " ratingStars=? " //					//$NON-NLS-1$
 							+ " WHERE photoId=?"); //				//$NON-NLS-1$
 
+			final ArrayList<Photo> updatedPhotos = new ArrayList<Photo>();
+
 			for (final Photo photo : photos) {
 
 				final int ratingStars = photo.ratingStars;
 				final Collection<TourPhotoReference> photoRefs = photo.getTourPhotoReferences().values();
+
+				boolean isUpdated = false;
 
 				for (final TourPhotoReference photoRef : photoRefs) {
 
 					sqlUpdate.setInt(1, ratingStars);
 					sqlUpdate.setLong(2, photoRef.photoId);
 					sqlUpdate.executeUpdate();
+
+					isUpdated = true;
 				}
+
+				if (isUpdated) {
+					updatedPhotos.add(photo);
+				}
+			}
+
+			if (updatedPhotos.size() > 0) {
+
+				// fire notification
+
+//				PhotoManager.fireEvent(PhotoEventId.PHOTO_ATTRIBUTES_ARE_UPDATED, photos);
 			}
 
 		} catch (final SQLException e) {
@@ -1420,7 +1437,7 @@ public class PhotoManager implements IPhotoServiceProvider {
 	@Override
 	public void setTourReference(final Photo photo) {
 
-		final long start = System.nanoTime();
+//		final long start = System.nanoTime();
 
 		Connection conn = null;
 
@@ -1452,8 +1469,9 @@ public class PhotoManager implements IPhotoServiceProvider {
 
 			while (result.next()) {
 
-				final long dbTourId = result.getLong(1);
-				final long dbPhotoId = result.getLong(2);
+				final long dbPhotoId = result.getLong(1);
+				final long dbTourId = result.getLong(2);
+
 				final long dbAdjustedTime = result.getLong(3);
 				final long dbImageExifTime = result.getLong(4);
 				final double dbLatitude = result.getDouble(5);
@@ -1481,6 +1499,8 @@ public class PhotoManager implements IPhotoServiceProvider {
 				if (photo.getTourLatitude() == 0 && dbLatitude != 0) {
 					photo.setTourGeoPosition(dbLatitude, dbLongitude);
 				}
+
+				PhotoCache.setPhoto(photo);
 			}
 
 		} catch (final SQLException e) {
@@ -1496,10 +1516,10 @@ public class PhotoManager implements IPhotoServiceProvider {
 			}
 		}
 
-		System.out.println(net.tourbook.common.UI.timeStampNano()
-				+ " load sql tourId from photo\t"
-				+ ((float) (System.nanoTime() - start) / 1000000)
-				+ " ms");
+//		System.out.println(net.tourbook.common.UI.timeStampNano()
+//				+ " load sql tourId from photo\t"
+//				+ ((float) (System.nanoTime() - start) / 1000000)
+//				+ " ms");
 		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 

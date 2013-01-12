@@ -29,7 +29,9 @@ public class ActionPhotoFilterNoTour extends Action {
 		super(Messages.Photo_Gallery_Action_PhotoFilter_NoTour, AS_CHECK_BOX);
 
 		setToolTipText(Messages.Photo_Gallery_Action_PhotoFilter_NoTour_Tooltip);
+
 		setImageDescriptor(Activator.getImageDescriptor(Messages.Image__PhotoFilter_NoTour));
+		setDisabledImageDescriptor(Activator.getImageDescriptor(Messages.Image__PhotoFilter_NoTour_Disabled));
 
 		_photoGallery = photoGallery;
 	}

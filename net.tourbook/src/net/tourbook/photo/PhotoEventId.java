@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,7 +20,7 @@ public enum PhotoEventId {
 	/**
 	 * Event data contains photos which gps coordinates has been updated.
 	 */
-	GPS_DATA_IS_UPDATED,
+//	GPS_DATA_IS_UPDATED,
 
 	/**
 	 * Event data contains a selection with photos

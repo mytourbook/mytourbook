@@ -248,6 +248,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 	private boolean					_isShowCustomActionBar;
 	private boolean					_isShowThumbsize;
 	private boolean					_isHandleRatingStars;
+	private boolean					_isAttributesPainted;
 
 	/**
 	 * Contains photos for <b>ALL</b> gallery items including <b>HIDDEN</b> items
@@ -485,6 +486,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 			if (isInLoadingQueue == false && isSqlLoaded == false) {
 
 				final IPhotoServiceProvider photoServiceProvider = Photo.getPhotoServiceProvider();
+
 				PhotoLoadManager.putPhotoInLoadingQueueSql(__photo, this, photoServiceProvider, false);
 			}
 		}
@@ -1106,7 +1108,9 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 		ExifCache.clear();
 	}
 
-	protected abstract void enableActions(boolean isAttributesPainted);
+	protected abstract void enableActions(final boolean isItemAvailable);
+
+	protected abstract void enableAttributeActions(boolean isAttributesPainted);
 
 	@Override
 	public void fillContextMenu(final IMenuManager menuMgr) {
@@ -2424,10 +2428,6 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 		_galleryMT20.setFocus();
 	}
 
-//	public void setPhotoServiceProvider(final IPhotoServiceProvider photoServiceProvider) {
-//		_galleryMT20.setPhotoServiceProvider(photoServiceProvider);
-//	}
-
 	public void setFullScreenImageViewer(final FullScreenImageViewer fullScreenImageViewer) {
 
 		_fullScreenImageViewer = fullScreenImageViewer;
@@ -2932,9 +2932,9 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 			_photoGalleryTooltip.setGalleryImageSize(_photoImageSize);
 			_photoGalleryTooltip.reset(true);
 
-			final boolean isAttributesPainted = _photoRenderer.isAttributesPainted(galleryItemSizeWithBorder);
+			_isAttributesPainted = _photoRenderer.isAttributesPainted(galleryItemSizeWithBorder);
 
-			enableActions(isAttributesPainted);
+			enableAttributeActions(_isAttributesPainted);
 		}
 	}
 
@@ -3016,6 +3016,13 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 						}
 					}
 				}
+
+				if (imageCount == 0) {
+					_isAttributesPainted = false;
+				}
+
+				enableActions(imageCount > 0);
+				enableAttributeActions(_isAttributesPainted);
 			}
 		});
 	}
@@ -3057,7 +3064,11 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 					return;
 				}
 
-				if (sortedGalleryItems.length > 0) {
+				final boolean isItemAvailable = sortedGalleryItems.length > 0;
+
+				enableActions(isItemAvailable);
+
+				if (isItemAvailable) {
 
 					// gallery items are available
 
@@ -3166,7 +3177,8 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 					} else {
 
 						/*
-						 * photo is not found in the photo cache, create a new photo
+						 * photo is not found in the photo cache, create a new photo, this photo is
+						 * added into the photo cache when exif data are loaded
 						 */
 
 						galleryPhoto = new Photo(photoFile);

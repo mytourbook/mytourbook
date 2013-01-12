@@ -28,7 +28,9 @@ public class ActionPhotoFilterNoGPS extends Action {
 		super(Messages.Photo_Gallery_Action_PhotoFilter_NoGPS, AS_CHECK_BOX);
 
 		setToolTipText(Messages.Photo_Gallery_Action_PhotoFilter_NoGPS_Tooltip);
+
 		setImageDescriptor(Activator.getImageDescriptor(Messages.Image__PhotoFilterNoGPS));
+		setDisabledImageDescriptor(Activator.getImageDescriptor(Messages.Image__PhotoFilterNoGPSDisabled));
 
 		_photoGallery = photoGallery;
 	}

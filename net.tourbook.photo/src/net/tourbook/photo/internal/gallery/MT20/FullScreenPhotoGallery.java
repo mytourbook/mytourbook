@@ -397,8 +397,6 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 			 */
 			_photoGallery.setShowOtherShellActions(false);
 
-//			_photoGallery.setPhotoServiceProvider(Photo.getPhotoServiceProvider());
-
 			createUI_20_ActionBar(_photoGallery.getCustomActionBarContainer());
 
 			createUI_30_Footer(container);

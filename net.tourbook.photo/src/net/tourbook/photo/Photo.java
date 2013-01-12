@@ -280,12 +280,14 @@ public class Photo {
 	}
 
 	public static IPhotoServiceProvider getPhotoServiceProvider() {
-		return _photoServiceProvider;
+
+		final IPhotoServiceProvider photoServiceProvider = _photoServiceProvider;
+
+		return photoServiceProvider;
 	}
 
 	public static void setPhotoServiceProvider(final IPhotoServiceProvider photoServiceProvider) {
-		
-		_photoServiceProvider=photoServiceProvider;
+		_photoServiceProvider = photoServiceProvider;
 	}
 
 	public void addTour(final Long tourId, final long photoId) {

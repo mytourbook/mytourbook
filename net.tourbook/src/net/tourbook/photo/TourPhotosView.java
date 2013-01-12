@@ -324,8 +324,6 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 					new PhotoGalleryProvider());
 
 			_photoGallery.setDefaultStatusMessage(Messages.Photo_Gallery_Label_NoTourWithPhoto);
-
-//			_photoGallery.setPhotoServiceProvider(PhotoManager.getInstance());
 		}
 	}
 

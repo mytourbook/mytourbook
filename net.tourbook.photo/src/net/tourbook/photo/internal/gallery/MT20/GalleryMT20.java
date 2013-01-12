@@ -286,7 +286,6 @@ public abstract class GalleryMT20 extends Canvas {
 	private boolean								_isShowOtherShellActions	= true;
 
 	private IPhotoProvider						_photoProvider;
-//	private IPhotoServiceProvider				_photoServiceProvider;
 
 	/**
 	 * Mouse X position within a gallery item, useful when item is hovered to get the exact
@@ -1066,10 +1065,6 @@ public abstract class GalleryMT20 extends Canvas {
 	public IPhotoProvider getPhotoProvider() {
 		return _photoProvider;
 	}
-
-//	public IPhotoServiceProvider getPhotoServiceProvider() {
-//		return _photoServiceProvider;
-//	}
 
 	public int getScrollBarIncrement() {
 
@@ -2761,10 +2756,6 @@ public abstract class GalleryMT20 extends Canvas {
 	public void setPhotoProvider(final IPhotoProvider photoProvider) {
 		_photoProvider = photoProvider;
 	}
-
-//	public void setPhotoServiceProvider(final IPhotoServiceProvider photoServiceProvider) {
-//		_photoServiceProvider = photoServiceProvider;
-//	}
 
 	public void setSelectedItemIndex(final int itemIndex) {
 

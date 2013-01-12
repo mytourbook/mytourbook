@@ -4396,6 +4396,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 				galleryPhoto.setTourGeoPosition(tourLatitude, tourPhoto.getLongitude());
 			}
 
+			if (cachedPhoto == null) {
+				// add photo late
+				PhotoCache.setPhoto(galleryPhoto);
+			}
+
 			_galleryPhotos.add(galleryPhoto);
 		}
 

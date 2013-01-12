@@ -61,4 +61,8 @@ public class PhotoCache {
 		return _cache.get(imageFilePathName);
 	}
 
+	public static void setPhoto(final Photo photo) {
+		_cache.put(photo.imageFilePathName, photo);
+	}
+
 }

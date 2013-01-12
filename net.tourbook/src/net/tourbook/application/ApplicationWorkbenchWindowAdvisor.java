@@ -93,8 +93,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 	private IPropertyListener					_partPropertyListener;
 
-//	private boolean								_isViewOpening;
-
 	private static IPreferenceStore				_prefStore		= TourbookPlugin.getDefault().getPreferenceStore();
 
 	public ApplicationWorkbenchWindowAdvisor(	final ApplicationWorkbenchAdvisor wbAdvisor,
@@ -113,7 +111,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		ProxySelector.setDefault(new DefaultProxySelector(ProxySelector.getDefault()));
 
 		// if http-authentication
-//		IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 		final String proxyUser = _prefStore.getString(IPreferences.PROXY_USER);
 		final String proxyPassword = _prefStore.getString(IPreferences.PROXY_PWD);
 
@@ -434,7 +431,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 				TagMenuManager.restoreTagState();
 				TourTypeMenuManager.restoreState();
-				PhotoManager.restoreState();
 
 				loadPeopleData();
 				setupAppSelectionListener();
@@ -466,7 +462,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		uiPrefStore.setValue(IWorkbenchPreferenceConstants.SHOW_PROGRESS_ON_STARTUP, true);
 
 		// show memory monitor
-//		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 		final boolean isMemoryMonitorVisible = _prefStore
 				.getBoolean(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR);
 		uiPrefStore.setValue(IWorkbenchPreferenceConstants.SHOW_MEMORY_MONITOR, isMemoryMonitorVisible);
@@ -478,6 +473,9 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		 * way to display the dialog again
 		 */
 		WorkbenchPlugin.getDefault().getPreferenceStore().setValue(IPreferenceConstants.RUN_IN_BACKGROUND, false);
+
+		// must be initialized early to set photoServiceProvider in the Photo
+		PhotoManager.restoreState();
 	}
 
 	@Override

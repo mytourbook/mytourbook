@@ -271,8 +271,6 @@ public class PicDirImages implements IPhotoGalleryProvider {
 
 		_photoGallery.createActionBar();
 
-//		_photoGallery.setPhotoServiceProvider(Photo.getPhotoServiceProvider());
-
 		final Composite galleryActionBarContainer = _photoGallery.getCustomActionBarContainer();
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(galleryActionBarContainer);
 //		galleryActionBarContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));

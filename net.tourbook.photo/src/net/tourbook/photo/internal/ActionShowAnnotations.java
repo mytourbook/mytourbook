@@ -19,11 +19,11 @@ import net.tourbook.photo.PhotoGallery;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionShowGPSAnnotations extends Action {
+public class ActionShowAnnotations extends Action {
 
 	private PhotoGallery	_photoGallery;
 
-	public ActionShowGPSAnnotations(final PhotoGallery photoGallery) {
+	public ActionShowAnnotations(final PhotoGallery photoGallery) {
 
 		super(Messages.Pic_Dir_Action_ShowAnnotations, AS_CHECK_BOX);
 
@@ -32,6 +32,7 @@ public class ActionShowGPSAnnotations extends Action {
 		setToolTipText(Messages.Pic_Dir_Action_ShowAnnotations_Tooltip);
 
 		setImageDescriptor(Activator.getImageDescriptor(Messages.Image__Photo_Action_ShowAnnotation));
+		setDisabledImageDescriptor(Activator.getImageDescriptor(Messages.Image__Photo_Action_ShowAnnotation_Disabled));
 	}
 
 	@Override
