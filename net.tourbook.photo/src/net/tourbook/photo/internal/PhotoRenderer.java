@@ -1417,6 +1417,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 		if (_isShowAnnotations && galleryItem.isHoveredAnnotationTour) {
 
+			Photo.getPhotoServiceProvider().openTour(galleryItem.photo.getTourPhotoReferences());
+
 			return true;
 		}
 

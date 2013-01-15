@@ -36,11 +36,13 @@ import net.tourbook.Messages;
 import net.tourbook.application.PerspectiveFactoryPhoto;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPhoto;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.SQLFilter;
 
@@ -55,6 +57,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
@@ -62,6 +65,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -95,6 +100,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 	private ArrayList<TourPhotoLink>				_allDbTourPhotoLinks			= new ArrayList<TourPhotoLink>();
 
 	private ArrayList<TourPhotoLink>				_dbTourPhotoLinks				= new ArrayList<TourPhotoLink>();
+
 	/**
 	 * Compares 2 photos by the adjusted time.
 	 */
@@ -834,6 +840,40 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 //				+ "\t"
 //				+ new DateTime(_sqlTourEnd));
 //		// TODO remove SYSTEM.OUT.PRINTLN
+	}
+
+	@Override
+	public void openTour(final HashMap<Long, TourPhotoReference> tourPhotoReferences) {
+
+		for (final TourPhotoReference ref : tourPhotoReferences.values()) {
+
+			// fire a selection for the first tour
+
+			final IWorkbenchWindow wbWin = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+			if (wbWin != null) {
+
+				final IWorkbenchPage wbWinPage = wbWin.getActivePage();
+				if (wbWinPage != null) {
+
+					final IWorkbenchPart wbWinPagePart = wbWinPage.getActivePart();
+					if (wbWinPagePart != null) {
+
+						final IWorkbenchPartSite site = wbWinPagePart.getSite();
+						if (site != null) {
+
+							final ISelectionProvider selectionProvider = site.getSelectionProvider();
+							if (selectionProvider instanceof PostSelectionProvider) {
+
+								((PostSelectionProvider) selectionProvider)
+										.setSelection(new SelectionTourId(ref.tourId));
+							}
+						}
+					}
+				}
+			}
+
+			break;
+		}
 	}
 
 	void resetTourStartEnd() {

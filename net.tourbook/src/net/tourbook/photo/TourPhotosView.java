@@ -75,7 +75,7 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
 	private ISelectionListener				_postSelectionListener;
 	private IPropertyChangeListener			_prefChangeListener;
-	private ITourEventListener				_tourPropertyListener;
+	private ITourEventListener				_tourEventListener;
 	private IPartListener2					_partListener;
 
 	private boolean							_isPartVisible;
@@ -246,7 +246,7 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
 	private void addTourEventListener() {
 
-		_tourPropertyListener = new ITourEventListener() {
+		_tourEventListener = new ITourEventListener() {
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
 				if (part == TourPhotosView.this) {
@@ -264,7 +264,7 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 			}
 		};
 
-		TourManager.getInstance().addTourEventListener(_tourPropertyListener);
+		TourManager.getInstance().addTourEventListener(_tourEventListener);
 	}
 
 	private void clearView() {
@@ -370,7 +370,7 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 		page.removePostSelectionListener(_postSelectionListener);
 		page.removePartListener(_partListener);
 
-		TourManager.getInstance().removeTourEventListener(_tourPropertyListener);
+		TourManager.getInstance().removeTourEventListener(_tourEventListener);
 		PhotoManager.removePhotoEventListener(this);
 
 		_prefStore.removePropertyChangeListener(_prefChangeListener);

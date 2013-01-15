@@ -83,15 +83,6 @@ public class PhotoGallery extends ImageGallery {
 
 	private RatingStarBehaviour			_ratingStarBehaviour;
 
-//	static {
-//		UI.IMAGE_REGISTRY.put(//
-//				IMAGE_PHOTO_FILTER_GPS,
-//				Activator.getImageDescriptor(Messages.Image__PhotoFilterGPS));
-//		UI.IMAGE_REGISTRY.put(//
-//				IMAGE_PHOTO_FILTER_NO_GPS,
-//				Activator.getImageDescriptor(Messages.Image__PhotoFilterNoGPS));
-//	}
-
 	public PhotoGallery(final IDialogSettings state) {
 
 		super(state);

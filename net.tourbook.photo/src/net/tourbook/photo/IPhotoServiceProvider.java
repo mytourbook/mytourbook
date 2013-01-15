@@ -16,8 +16,16 @@
 package net.tourbook.photo;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public interface IPhotoServiceProvider {
+
+	/**
+	 * Key is tourId.
+	 * 
+	 * @param tourPhotoReferences
+	 */
+	void openTour(HashMap<Long, TourPhotoReference> tourPhotoReferences);
 
 	/**
 	 * A mouse down event occured at a hovered gallery item within the star rating area.
