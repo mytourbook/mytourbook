@@ -42,7 +42,11 @@ public class Messages extends NLS {
 	public static String	Image__Photo_Action_ShowAnnotation_Disabled;
 	public static String		Image__Photo_Action_ShowGPSAnnotation;
 	public static String		Image__PhotoAnnotationExifGPS;
+
+	public static String	Image__PhotoAnnotationGPSHovered;
 	public static String		Image__PhotoAnnotationSavedInTour;
+
+	public static String	Image__PhotoAnnotationSavedInTourHovered;
 	public static String		Image__PhotoAnnotationTourGPS;
 	public static String	Image__PhotoFilter_NoTour;
 

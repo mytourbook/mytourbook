@@ -570,7 +570,7 @@ public abstract class GalleryMT20 extends Canvas {
 	/**
 	 * Is called before a selection is modified.
 	 */
-	protected void beforeModifySelection() {
+	protected void onBeforeModifySelection() {
 
 	}
 
@@ -657,7 +657,7 @@ public abstract class GalleryMT20 extends Canvas {
 	 */
 	private void deselectAll(final boolean isNotifyListeners) {
 
-		beforeModifySelection();
+		onBeforeModifySelection();
 
 		_lastSelectedItem = null;
 		_selectedItems.clear();
@@ -1995,6 +1995,10 @@ public abstract class GalleryMT20 extends Canvas {
 			return;
 		}
 
+//		System.out.println(UI.timeStampNano());
+//		System.out.println(UI.timeStampNano() + " onPaint\t");
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
 		/**
 		 * After many hours I discovered, that the gallery background is not painted (with win7) in
 		 * the background color after the shell is hidden and displayed again (in a tooltip),
@@ -2332,7 +2336,7 @@ public abstract class GalleryMT20 extends Canvas {
 			return;
 		}
 
-		beforeModifySelection();
+		onBeforeModifySelection();
 
 		// Deselect all items if multi selection is disabled
 		if (!_isMultiSelection) {
@@ -2378,7 +2382,7 @@ public abstract class GalleryMT20 extends Canvas {
 	 */
 	private void selectionRemove(final int itemIndex) {
 
-		beforeModifySelection();
+		onBeforeModifySelection();
 
 		_selectionFlags[itemIndex >> 5] &= ~(1 << (itemIndex & 0x1f));
 

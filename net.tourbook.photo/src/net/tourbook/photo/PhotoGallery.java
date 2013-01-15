@@ -418,7 +418,7 @@ public class PhotoGallery extends ImageGallery {
 		_actionShowPhotoName.setChecked(isShowPhotoName);
 		_actionShowPhotoTooltip.setChecked(isShowTooltip);
 
-		restoreInfo(isShowPhotoName, _photoDateInfo, isShowPhotoAnnotations, isShowTooltip);
+		setPhotoInfo(isShowPhotoName, _photoDateInfo, isShowPhotoAnnotations, isShowTooltip);
 
 		/*
 		 * gallery sorting
@@ -492,8 +492,6 @@ public class PhotoGallery extends ImageGallery {
 		super.saveState();
 	}
 
-
-
 	private void updateUI_GalleryType(final GalleryType galleryType) {
 
 		String text;
@@ -549,4 +547,5 @@ public class PhotoGallery extends ImageGallery {
 		_actionShowPhotoRatingStars.setToolTipText(toolTipText);
 		_actionShowPhotoRatingStars.setImageDescriptor(imageDescriptor);
 	}
+
 }

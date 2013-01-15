@@ -60,9 +60,11 @@ import org.joda.time.format.DateTimeFormatter;
  */
 public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
-	private static final String			PHOTO_ANNOTATION_EXIF_GPS				= "PHOTO_ANNOTATION_GPS";					//$NON-NLS-1$
+	private static final String			PHOTO_ANNOTATION_GPS_EXIF				= "PHOTO_ANNOTATION_GPS_EXIF";				//$NON-NLS-1$
+	private static final String			PHOTO_ANNOTATION_GPS_TOUR				= "PHOTO_ANNOTATION_GPS_TOUR";				//$NON-NLS-1$
 	private static final String			PHOTO_ANNOTATION_SAVED_IN_TOUR			= "PHOTO_ANNOTATION_SAVED_IN_TOUR";		//$NON-NLS-1$
-	private static final String			PHOTO_ANNOTATION_TOUR_GPS				= "PHOTO_ANNOTATION_TOUR_GPS";				//$NON-NLS-1$
+	private static final String			PHOTO_ANNOTATION_SAVED_IN_TOUR_HOVERED	= "PHOTO_ANNOTATION_SAVED_IN_TOUR_HOVERED"; //$NON-NLS-1$
+
 	private static final String			PHOTO_RATING_STAR						= "PHOTO_RATING_STAR";						//$NON-NLS-1$
 	private static final String			PHOTO_RATING_STAR_AND_HOVERED			= "PHOTO_RATING_STAR_AND_HOVERED";			//$NON-NLS-1$
 	private static final String			PHOTO_RATING_STAR_DELETE				= "PHOTO_RATING_STAR_DELETE";				//$NON-NLS-1$
@@ -146,20 +148,21 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	 */
 	private int							_photoImageWidth;
 	private int							_photoImageHeight;
-	private int							_paintedDestX;
-	private int							_paintedDestY;
+	private int							_paintedDest_DevX;
+	private int							_paintedDest_DevY;
 
 	/**
 	 * Width for the painted image or <code>-1</code> when not initialized.
 	 */
-	private int							_paintedDestWidth						= -1;
-	private int							_paintedDestHeight;
+	private int							_paintedDest_Width						= -1;
+	private int							_paintedDest_Height;
 
 	private boolean						_isShowFullsizeHQImage;
 	private boolean						_isShowFullsizePreview;
 	private boolean						_isShowFullsizeLoadingMessage;
 	private boolean						_isShowPhotoRatingStars;
 	private boolean						_isRatingStarsPainted;
+	private boolean						_isHandleHoveredRatingStars;
 
 	private double						_imagePaintedZoomFactor;
 
@@ -175,6 +178,10 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	 * Right border for the rating stars, this value is relative to the gallery item.
 	 */
 	private int							_ratingStarsLeftBorder;
+
+//	private int							_devYAnnotation;
+//	private int							_devXAnnotationGps;
+//	private int							_devXAnnotationTour;
 
 	/*
 	 * full size context fields
@@ -210,9 +217,10 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	private Color						_selectionFgColor;
 	private Color						_noFocusSelectionFgColor;
 
-	private static Image				_imageAnnotationExifGps;
+	private static Image				_imageAnnotationGpsExif;
+	private static Image				_imageAnnotationGpsTour;
 	private static Image				_imageAnnotationSavedInTour;
-	private static Image				_imageAnnotationTourGps;
+	private static Image				_imageAnnotationSavedInTour_Hovered;
 
 	private static Image				_imageRatingStar;
 	private static Image				_imageRatingStarAndHovered;
@@ -224,12 +232,15 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 	static {
 
-		UI.IMAGE_REGISTRY.put(PHOTO_ANNOTATION_EXIF_GPS, //
+		UI.IMAGE_REGISTRY.put(PHOTO_ANNOTATION_GPS_EXIF, //
 				Activator.getImageDescriptor(Messages.Image__PhotoAnnotationExifGPS));
+		UI.IMAGE_REGISTRY.put(PHOTO_ANNOTATION_GPS_TOUR,//
+				Activator.getImageDescriptor(Messages.Image__PhotoAnnotationTourGPS));
+
 		UI.IMAGE_REGISTRY.put(PHOTO_ANNOTATION_SAVED_IN_TOUR,//
 				Activator.getImageDescriptor(Messages.Image__PhotoAnnotationSavedInTour));
-		UI.IMAGE_REGISTRY.put(PHOTO_ANNOTATION_TOUR_GPS,//
-				Activator.getImageDescriptor(Messages.Image__PhotoAnnotationTourGPS));
+		UI.IMAGE_REGISTRY.put(PHOTO_ANNOTATION_SAVED_IN_TOUR_HOVERED,//
+				Activator.getImageDescriptor(Messages.Image__PhotoAnnotationSavedInTourHovered));
 
 		UI.IMAGE_REGISTRY.put(PHOTO_RATING_STAR,//
 				Activator.getImageDescriptor(Messages.Image__PhotoRatingStar));
@@ -246,9 +257,10 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		UI.IMAGE_REGISTRY.put(PHOTO_RATING_STAR_NOT_HOVERED_BUT_SET,//
 				Activator.getImageDescriptor(Messages.Image__PhotoRatingStarNotHoveredButSet));
 
-		_imageAnnotationExifGps = UI.IMAGE_REGISTRY.get(PHOTO_ANNOTATION_EXIF_GPS);
+		_imageAnnotationGpsExif = UI.IMAGE_REGISTRY.get(PHOTO_ANNOTATION_GPS_EXIF);
+		_imageAnnotationGpsTour = UI.IMAGE_REGISTRY.get(PHOTO_ANNOTATION_GPS_TOUR);
 		_imageAnnotationSavedInTour = UI.IMAGE_REGISTRY.get(PHOTO_ANNOTATION_SAVED_IN_TOUR);
-		_imageAnnotationTourGps = UI.IMAGE_REGISTRY.get(PHOTO_ANNOTATION_TOUR_GPS);
+		_imageAnnotationSavedInTour_Hovered = UI.IMAGE_REGISTRY.get(PHOTO_ANNOTATION_SAVED_IN_TOUR_HOVERED);
 
 		_imageRatingStar = UI.IMAGE_REGISTRY.get(PHOTO_RATING_STAR);
 		_imageRatingStarAndHovered = UI.IMAGE_REGISTRY.get(PHOTO_RATING_STAR_AND_HOVERED);
@@ -258,7 +270,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		_imageRatingStarNotHovered = UI.IMAGE_REGISTRY.get(PHOTO_RATING_STAR_NOT_HOVERED);
 		_imageRatingStarNotHoveredButSet = UI.IMAGE_REGISTRY.get(PHOTO_RATING_STAR_NOT_HOVERED_BUT_SET);
 
-		final Rectangle bounds = _imageAnnotationExifGps.getBounds();
+		final Rectangle bounds = _imageAnnotationGpsExif.getBounds();
 		_annotationImageWidth = bounds.width;
 		_annotationImageHeight = bounds.height;
 
@@ -290,6 +302,21 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 			return;
 		}
 
+//		System.out.println(UI.timeStampNano()
+//				+ (" \t" + photo.imageFileName)
+//				+ ("\tratingStars=" + photo.ratingStars)
+//				+ ("\t" + System.identityHashCode(photo)));
+//		photo.dumpTourReferences();
+//
+////		PhotoCache.dumpAllPhotos();
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
+//		if (photo.imageFileName.equals("P1000641.JPG")) { //$NON-NLS-1$
+//
+//			System.out.println(UI.timeStampNano() + " photo\t" + photo.imageFileName); //$NON-NLS-1$
+//			// TODO remove SYSTEM.OUT.PRINTLN
+//		}
+
 		_isFocusActive = isFocusActive;
 
 		// init fontheight
@@ -316,8 +343,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 		itemImageWidth -= isBorder ? border : 0;
 		itemImageHeight -= isBorder ? border : 0;
-		_paintedDestWidth = itemImageWidth;
-		_paintedDestHeight = itemImageHeight;
+		_paintedDest_Width = itemImageWidth;
+		_paintedDest_Height = itemImageHeight;
 
 		final int imageX = galleryItem.photoPaintedX + (isBorder ? border2 : 0);
 		final int imageY = galleryItem.photoPaintedY + (isBorder ? border2 : 0);
@@ -428,7 +455,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 		// draw name & date & annotations
 		if (_isAttributesPainted && isDrawPhotoDateName) {
-			drawPhotoDateName(gc, photo, //
+			drawAttributes(gc, photo, //
 					imageX,
 					imageY,
 					itemImageWidth,
@@ -437,31 +464,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 		// annotations are drawn in the bottom right corner of the image
 		if (_isShowAnnotations) {
-
-			int devXAnnotation = _paintedDestX + _paintedDestWidth;
-			final int devYAnnotation = _paintedDestY + _paintedDestHeight - _annotationImageHeight;
-
-			if (photo.isPhotoWithGps) {
-
-				devXAnnotation -= _annotationImageWidth;
-
-				gc.drawImage(//
-						photo.isGeoFromExif //
-								? _imageAnnotationExifGps
-								: _imageAnnotationTourGps,
-						devXAnnotation,
-						devYAnnotation);
-			}
-
-			if (photo.isSavedInTour) {
-
-				devXAnnotation -= _annotationImageWidth;
-
-				gc.drawImage(//
-						_imageAnnotationSavedInTour,
-						devXAnnotation,
-						devYAnnotation);
-			}
+			drawAnnotations(gc, galleryItem, photo);
 		}
 
 		if (_isAttributesPainted && _isShowPhotoRatingStars) {
@@ -514,15 +517,15 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 				imageCanvasWidth,
 				imageCanvasHeight);
 
-		_paintedDestWidth = bestSize.x;
-		_paintedDestHeight = bestSize.y;
+		_paintedDest_Width = bestSize.x;
+		_paintedDest_Height = bestSize.y;
 
 		// get center offset
-		final int centerOffsetX = (imageCanvasWidth - _paintedDestWidth) / 2;
-		final int centerOffsetY = (imageCanvasHeight - _paintedDestHeight) / 2;
+		final int centerOffsetX = (imageCanvasWidth - _paintedDest_Width) / 2;
+		final int centerOffsetY = (imageCanvasHeight - _paintedDest_Height) / 2;
 
-		_paintedDestX = photoPosX + centerOffsetX;
-		_paintedDestY = photoPosY + centerOffsetY;
+		_paintedDest_DevX = photoPosX + centerOffsetX;
+		_paintedDest_DevY = photoPosY + centerOffsetY;
 
 		try {
 
@@ -534,13 +537,13 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 						_paintedImageWidth,
 						_paintedImageHeight,
 						//
-						_paintedDestX,
-						_paintedDestY,
-						_paintedDestWidth,
-						_paintedDestHeight);
+						_paintedDest_DevX,
+						_paintedDest_DevY,
+						_paintedDest_Width,
+						_paintedDest_Height);
 
-				galleryItem.imagePaintedWidth = _paintedDestWidth;
-				galleryItem.imagePaintedHeight = _paintedDestHeight;
+				galleryItem.imagePaintedWidth = _paintedDest_Width;
+				galleryItem.imagePaintedHeight = _paintedDest_Height;
 
 			} catch (final Exception e) {
 
@@ -563,7 +566,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 				// draw marker line on the left side
 				gc.setBackground(_isFocusActive ? _selectionFgColor : _noFocusSelectionFgColor);
-				gc.fillRectangle(_paintedDestX, _paintedDestY, 2, _paintedDestHeight);
+				gc.fillRectangle(_paintedDest_DevX, _paintedDest_DevY, 2, _paintedDest_Height);
 			}
 
 			/*
@@ -577,8 +580,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 				gc.setBackground(_selectionFgColor);
 				gc.fillRectangle(//
-						_paintedDestX + _paintedDestWidth - markerSize,
-						_paintedDestY,
+						_paintedDest_DevX + _paintedDest_Width - markerSize,
+						_paintedDest_DevY,
 						markerSize,
 						markerSize);
 			}
@@ -600,6 +603,170 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		}
 
 		return true;
+	}
+
+	private void drawAnnotations(final GC gc, final GalleryMT20Item galleryItem, final Photo photo) {
+
+		final boolean isItemHovered = galleryItem.isHovered;
+
+		final int devXAnnotation = _paintedDest_DevX + _paintedDest_Width;
+		final int devYAnnotation = _paintedDest_DevY + _paintedDest_Height - _annotationImageHeight;
+
+		int devXAnnotationOffset = 0;
+		Image annotationImage;
+
+		if (photo.isPhotoWithGps) {
+
+			devXAnnotationOffset = _annotationImageWidth;
+
+			annotationImage = photo.isGeoFromExif ? _imageAnnotationGpsExif : _imageAnnotationGpsTour;
+
+			gc.drawImage(//
+					annotationImage,
+					devXAnnotation - devXAnnotationOffset,
+					devYAnnotation);
+
+			galleryItem.itemX_AnnotationPainted_Gps = devXAnnotation - _paintedDest_DevX;
+
+		} else {
+
+			galleryItem.itemX_AnnotationPainted_Gps = Integer.MIN_VALUE;
+		}
+
+		if (photo.isSavedInTour) {
+
+			devXAnnotationOffset += _annotationImageWidth;
+
+			if (isItemHovered && galleryItem.isHoveredAnnotationTour) {
+				annotationImage = _imageAnnotationSavedInTour_Hovered;
+			} else {
+				annotationImage = _imageAnnotationSavedInTour;
+			}
+
+			gc.drawImage(//
+					annotationImage,
+					devXAnnotation - devXAnnotationOffset,
+					devYAnnotation);
+
+			galleryItem.itemXAnnotationPaintedTour = devXAnnotation - galleryItem.photoPaintedX - devXAnnotationOffset;
+
+//			galleryItem.photoPaintedX
+
+		} else {
+
+			galleryItem.itemXAnnotationPaintedTour = Integer.MIN_VALUE;
+		}
+
+		galleryItem.itemYAnnotationPainted = devYAnnotation - galleryItem.photoPaintedY;
+	}
+
+	private void drawAttributes(final GC gc,
+								final Photo photo,
+								final int photoPosX,
+								final int photoPosY,
+								final int photoWidth,
+								final int photoHeight) {
+
+		/*
+		 * get text for date/filename
+		 */
+		int textFileNameWidth = -1;
+		int textDateTimeWidth = -1;
+		String textFileName = null;
+		String textDateTime = null;
+
+		int textFileNamePosCenterX = 0;
+		int textDateTimePosCenterX = 0;
+
+		if (_isShowPhotoName) {
+			textFileName = photo.imageFileName;
+			textFileNameWidth = gc.textExtent(textFileName).x;
+
+			textFileNamePosCenterX = (photoWidth - (textFileNameWidth > photoWidth ? photoWidth : textFileNameWidth)) / 2;
+		}
+
+		if (_isShowDateInfo) {
+			final DateTime dateTime = photo.getOriginalDateTime();
+			if (dateTime != null) {
+
+				if (_photoDateInfo == PhotoDateInfo.Date) {
+
+					textDateTime = _dtFormatterDate.print(dateTime);
+
+				} else if (_photoDateInfo == PhotoDateInfo.Time) {
+
+					textDateTime = _dtFormatterTime.print(dateTime);
+
+				} else {
+					textDateTime = _dtFormatterDateTime.print(dateTime);
+				}
+
+				textDateTimeWidth = gc.textExtent(textDateTime).x;
+
+				textDateTimePosCenterX = (photoWidth - (textDateTimeWidth > photoWidth ? photoWidth : textDateTimeWidth)) / 2;
+			}
+		}
+
+		/*
+		 * get text position
+		 */
+		final int defaultTextPosY = photoPosY + photoHeight - _fontHeight;
+
+		int posXFilename = photoPosX;
+		int posYFilename = defaultTextPosY;
+		int posXDate = photoPosX;
+		final int posYDate = defaultTextPosY;
+
+		if (textFileNameWidth != -1 && textDateTimeWidth != -1) {
+
+			// paint filename & date
+
+			final int textSpacing = 10;
+			final int textWidth = textFileNameWidth + textSpacing + textDateTimeWidth;
+
+			if (textWidth > photoWidth) {
+
+				// paint on top of each other, filename first
+
+				posXFilename += textFileNamePosCenterX;
+				posXDate += textDateTimePosCenterX;
+				posYFilename -= _fontHeight;
+
+			} else {
+
+				// center text
+
+				final int textX = (photoWidth - textWidth) / 2;
+				posXFilename += textX;
+				posXDate += textX + textFileNameWidth + textSpacing;
+			}
+
+		} else if (textFileNameWidth != -1) {
+
+			// paint only filename
+			posXFilename += textFileNamePosCenterX;
+
+		} else if (textDateTimeWidth != -1) {
+
+			// paint only date
+			posXDate += textDateTimePosCenterX;
+		}
+
+		/*
+		 * draw text
+		 */
+		gc.setForeground(_fgColor);
+		gc.setBackground(_bgColor);
+
+		// draw filename
+		if (textFileNameWidth != -1) {
+			gc.drawString(textFileName, posXFilename, posYFilename, false);
+		}
+
+		// draw date time
+		if (textDateTimeWidth != -1) {
+			gc.drawString(textDateTime, posXDate, posYDate, false);
+		}
 	}
 
 	@Override
@@ -673,7 +840,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 						_isFullsizeImageAvailable,
 						false);
 
-				setPaintedZoomFactor(_photoImageWidth, _photoImageHeight, _paintedDestWidth, _paintedDestHeight);
+				setPaintedZoomFactor(_photoImageWidth, _photoImageHeight, _paintedDest_Width, _paintedDest_Height);
 
 			} else {
 
@@ -952,118 +1119,11 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 	}
 
-	private void drawPhotoDateName(	final GC gc,
-									final Photo photo,
-									final int photoPosX,
-									final int photoPosY,
-									final int photoWidth,
-									final int photoHeight) {
-
-		/*
-		 * get text for date/filename
-		 */
-		int textFileNameWidth = -1;
-		int textDateTimeWidth = -1;
-		String textFileName = null;
-		String textDateTime = null;
-
-		int textFileNamePosCenterX = 0;
-		int textDateTimePosCenterX = 0;
-
-		if (_isShowPhotoName) {
-			textFileName = photo.imageFileName;
-			textFileNameWidth = gc.textExtent(textFileName).x;
-
-			textFileNamePosCenterX = (photoWidth - (textFileNameWidth > photoWidth ? photoWidth : textFileNameWidth)) / 2;
-		}
-
-		if (_isShowDateInfo) {
-			final DateTime dateTime = photo.getOriginalDateTime();
-			if (dateTime != null) {
-
-				if (_photoDateInfo == PhotoDateInfo.Date) {
-
-					textDateTime = _dtFormatterDate.print(dateTime);
-
-				} else if (_photoDateInfo == PhotoDateInfo.Time) {
-
-					textDateTime = _dtFormatterTime.print(dateTime);
-
-				} else {
-					textDateTime = _dtFormatterDateTime.print(dateTime);
-				}
-
-				textDateTimeWidth = gc.textExtent(textDateTime).x;
-
-				textDateTimePosCenterX = (photoWidth - (textDateTimeWidth > photoWidth ? photoWidth : textDateTimeWidth)) / 2;
-			}
-		}
-
-		/*
-		 * get text position
-		 */
-		final int defaultTextPosY = photoPosY + photoHeight - _fontHeight;
-
-		int posXFilename = photoPosX;
-		int posYFilename = defaultTextPosY;
-		int posXDate = photoPosX;
-		final int posYDate = defaultTextPosY;
-
-		if (textFileNameWidth != -1 && textDateTimeWidth != -1) {
-
-			// paint filename & date
-
-			final int textSpacing = 10;
-			final int textWidth = textFileNameWidth + textSpacing + textDateTimeWidth;
-
-			if (textWidth > photoWidth) {
-
-				// paint on top of each other, filename first
-
-				posXFilename += textFileNamePosCenterX;
-				posXDate += textDateTimePosCenterX;
-				posYFilename -= _fontHeight;
-
-			} else {
-
-				// center text
-
-				final int textX = (photoWidth - textWidth) / 2;
-				posXFilename += textX;
-				posXDate += textX + textFileNameWidth + textSpacing;
-			}
-
-		} else if (textFileNameWidth != -1) {
-
-			// paint only filename
-			posXFilename += textFileNamePosCenterX;
-
-		} else if (textDateTimeWidth != -1) {
-
-			// paint only date
-			posXDate += textDateTimePosCenterX;
-		}
-
-		/*
-		 * draw text
-		 */
-		gc.setForeground(_fgColor);
-		gc.setBackground(_bgColor);
-
-		// draw filename
-		if (textFileNameWidth != -1) {
-			gc.drawString(textFileName, posXFilename, posYFilename, false);
-		}
-
-		// draw date time
-		if (textDateTimeWidth != -1) {
-			gc.drawString(textDateTime, posXDate, posYDate, false);
-		}
-	}
-
 	private void drawRatingStars(final GC gc, final GalleryMT20Item galleryItem, final int ratingStars) {
 
-		final boolean isItemHovered = galleryItem.isHovered || galleryItem.isInHoveredGroup;
+		final boolean isItemHovered = (galleryItem.isHovered || galleryItem.isInHoveredGroup)
+				&& _isHandleHoveredRatingStars;
+
 		final int hoveredStars = galleryItem.hoveredStars;
 		final boolean isStarHovered = hoveredStars > 0;
 		boolean canSetRating = false;
@@ -1128,11 +1188,27 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 				}
 			} else {
 
-				if (starIndex > 0) {
+				// rating stars cannot be set
 
-					// draw only one disabled star, thats enough
+				if (isItemHovered) {
 
-					return;
+					if (isStarHovered == false) {
+
+						if (starIndex > 0) {
+
+							// draw only one disabled star, thats enough
+
+							return;
+						}
+					}
+				} else {
+
+					if (starIndex > 0) {
+
+						// draw only one disabled star, thats enough
+
+						return;
+					}
 				}
 
 				starImage = _imageRatingStarDisabled;
@@ -1311,7 +1387,6 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 		int itemImageWidth = photoWidth;
 
-
 		// ignore border for small images
 		final int border = _imageBorderSize;
 		final boolean isBorder = itemImageWidth - border >= _textMinThumbSize;
@@ -1336,87 +1411,13 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	 */
 	public boolean isMouseDownHandled(final GalleryMT20Item galleryItem, final int itemMouseX, final int itemMouseY) {
 
-		if (_isRatingStarsPainted == false) {
-			return false;
+		if (_isRatingStarsPainted && _isHandleHoveredRatingStars && isRatingStarsHovered(itemMouseX, itemMouseY)) {
+			return saveRatingStars(galleryItem);
 		}
 
-		if (isRatingStarsHovered(itemMouseX, itemMouseY)) {
+		if (_isShowAnnotations && galleryItem.isHoveredAnnotationTour) {
 
-			// save star rating in the selected tours
-
-			final Photo itemCustomData = galleryItem.photo;
-			if (itemCustomData instanceof Photo) {
-
-				final Photo hoveredPhoto = itemCustomData;
-
-				int newRatingStars = galleryItem.hoveredStars;
-
-				final int hoveredRatingStars = hoveredPhoto.ratingStars;
-				if (newRatingStars == hoveredRatingStars) {
-
-					/**
-					 * Feature to remove rating stars:
-					 * <p>
-					 * When a rating star is hit and this rating is already set in the photo, the
-					 * rating stars are removed.
-					 */
-
-					newRatingStars = 0;
-				}
-
-				final ArrayList<Photo> photos = new ArrayList<Photo>();
-
-				final HashMap<String, GalleryMT20Item> selectedItems = _galleryMT.getSelectedItems();
-				final Collection<GalleryMT20Item> selectedItemValues = selectedItems.values();
-
-				if (selectedItems.containsKey(galleryItem.uniqueItemID)) {
-
-					/*
-					 * A selected item is hit by the mouse, the star rating is set for all selected
-					 * items.
-					 */
-
-					for (final GalleryMT20Item item : selectedItemValues) {
-
-						final Photo photo = item.photo;
-						if (photo != null) {
-
-							photo.ratingStars = newRatingStars;
-
-							photos.add(photo);
-						}
-					}
-
-				} else {
-
-					/*
-					 * An unselected item is hit by the mouse, only for this item the star rating is
-					 * set
-					 */
-
-					hoveredPhoto.ratingStars = newRatingStars;
-
-					photos.add(hoveredPhoto);
-				}
-
-				if (photos.size() > 0) {
-
-					Photo.getPhotoServiceProvider().saveStarRating(photos);
-
-					// update UI with new star rating
-					for (final GalleryMT20Item item : selectedItemValues) {
-
-						_galleryMT.redraw(//
-								item.viewPortX,
-								item.viewPortY,
-								item.width,
-								item.height,
-								false);
-					}
-
-					return true;
-				}
-			}
+			return true;
 		}
 
 		return false;
@@ -1442,12 +1443,29 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	 */
 	public void itemIsHovered(final GalleryMT20Item hoveredItem, final int itemMouseX, final int itemMouseY) {
 
-		final Photo photo = hoveredItem.photo;
-		if (photo != null) {
-			final boolean canSetRating = photo.isSavedInTour;
-			if (canSetRating == false) {
-				return;
-			}
+		itemIsHovered_Stars(hoveredItem, itemMouseX, itemMouseY);
+		itemIsHovered_Annotation(hoveredItem, itemMouseX, itemMouseY);
+	}
+
+	private void itemIsHovered_Annotation(final GalleryMT20Item hoveredItem, final int itemMouseX, final int itemMouseY) {
+
+		hoveredItem.isHoveredAnnotationTour = false;
+
+		if (itemMouseY < hoveredItem.itemYAnnotationPainted) {
+			return;
+		}
+
+		final int paintedX = hoveredItem.itemXAnnotationPaintedTour;
+
+		if (paintedX != Integer.MIN_VALUE && itemMouseX >= paintedX && itemMouseX <= paintedX + _annotationImageWidth) {
+			hoveredItem.isHoveredAnnotationTour = true;
+		}
+	}
+
+	private void itemIsHovered_Stars(final GalleryMT20Item hoveredItem, final int itemMouseX, final int itemMouseY) {
+
+		if (_isHandleHoveredRatingStars == false) {
+			return;
 		}
 
 		int hoveredStars;
@@ -1495,6 +1513,82 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		_fullsizePaintedImage = null;
 	}
 
+	/**
+	 * Save star rating of the hovered/selected tours
+	 */
+	private boolean saveRatingStars(final GalleryMT20Item galleryItem) {
+
+		final Photo hoveredPhoto = galleryItem.photo;
+
+		final int hoveredRatingStars = hoveredPhoto.ratingStars;
+		int newRatingStars = galleryItem.hoveredStars;
+
+		if (newRatingStars == hoveredRatingStars) {
+
+			/**
+			 * Feature to remove rating stars:
+			 * <p>
+			 * When a rating star is hit and this rating is already set in the photo, the rating
+			 * stars are removed.
+			 */
+
+			newRatingStars = 0;
+		}
+
+		final ArrayList<Photo> photos = new ArrayList<Photo>();
+
+		final HashMap<String, GalleryMT20Item> selectedItems = _galleryMT.getSelectedItems();
+		final Collection<GalleryMT20Item> selectedItemValues = selectedItems.values();
+
+		if (selectedItems.containsKey(galleryItem.uniqueItemID)) {
+
+			/*
+			 * A selected item is hit by the mouse, the star rating is set for all selected items.
+			 */
+
+			for (final GalleryMT20Item item : selectedItemValues) {
+
+				final Photo photo = item.photo;
+				if (photo != null) {
+
+					photo.ratingStars = newRatingStars;
+
+					photos.add(photo);
+				}
+			}
+
+		} else {
+
+			/*
+			 * An unselected item is hit by the mouse, only for this item the star rating is set
+			 */
+
+			hoveredPhoto.ratingStars = newRatingStars;
+
+			photos.add(hoveredPhoto);
+		}
+
+		if (photos.size() > 0) {
+
+			Photo.getPhotoServiceProvider().saveStarRating(photos);
+
+			// update UI with new star rating
+			for (final GalleryMT20Item item : selectedItemValues) {
+
+				_galleryMT.redraw(//
+						item.viewPortX,
+						item.viewPortY,
+						item.width,
+						item.height,
+						false);
+			}
+
+			return true;
+		}
+
+		return false;
+	}
+
 	public void setColors(	final Color fgColor,
 							final Color bgColor,
 							final Color selectionFgColor,
@@ -1526,16 +1620,6 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		_imagePaintedZoomFactor = (double) maxCanvasSize / maxImageSize;
 	}
 
-	@Override
-	public void setPrefSettings(final boolean isShowFullsizePreview,
-								final boolean isShowLoadingMessage,
-								final boolean isShowHQImage) {
-
-		_isShowFullsizePreview = isShowFullsizePreview;
-		_isShowFullsizeLoadingMessage = isShowLoadingMessage;
-		_isShowFullsizeHQImage = isShowHQImage;
-	}
-
 	/**
 	 * Enables / disables labels at the bottom of each item.
 	 * 
@@ -1543,7 +1627,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	 * @param isShowPhotoName
 	 * @see DefaultGalleryMT20ItemRenderer#isShowLabels()
 	 */
-	public void setShowLabels(	final boolean isShowPhotoName,
+	public void setPhotoInfo(	final boolean isShowPhotoName,
 								final PhotoDateInfo dateInfo,
 								final boolean isShowAnnotations) {
 
@@ -1555,8 +1639,19 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 	}
 
+	@Override
+	public void setPrefSettings(final boolean isShowFullsizePreview,
+								final boolean isShowLoadingMessage,
+								final boolean isShowHQImage) {
+
+		_isShowFullsizePreview = isShowFullsizePreview;
+		_isShowFullsizeLoadingMessage = isShowLoadingMessage;
+		_isShowFullsizeHQImage = isShowHQImage;
+	}
+
 	public void setShowRatingStars(final RatingStarBehaviour ratingStarBehaviour) {
 		_isShowPhotoRatingStars = ratingStarBehaviour != RatingStarBehaviour.NO_STARS;
+		_isHandleHoveredRatingStars = ratingStarBehaviour == RatingStarBehaviour.HOVERED_STARS;
 	}
 
 	public void setSizeImageBorder(final int imageBorderSize) {

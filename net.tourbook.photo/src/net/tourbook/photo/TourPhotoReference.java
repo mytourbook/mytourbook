@@ -19,11 +19,13 @@ package net.tourbook.photo;
  */
 public class TourPhotoReference {
 
+	public long	tourId;
 	public long	photoId;
 
-	public TourPhotoReference(final long photoId) {
+	public TourPhotoReference(final long tourId, final long photoId) {
 
 		this.photoId = photoId;
+		this.tourId = tourId;
 	}
 
 }

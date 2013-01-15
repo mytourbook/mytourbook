@@ -44,6 +44,7 @@ import org.apache.commons.imaging.formats.tiff.constants.GpsTagConstants;
 import org.apache.commons.imaging.formats.tiff.constants.TiffTagConstants;
 import org.apache.commons.imaging.formats.tiff.taginfos.TagInfo;
 import org.apache.commons.imaging.formats.tiff.taginfos.TagInfoShortOrLong;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.osgi.util.NLS;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -64,6 +65,7 @@ public class Photo {
 	 */
 	public File											imageFile;
 
+	public String										imagePathName;
 	public String										imageFileName;
 	public String										imageFileExt;
 
@@ -118,6 +120,9 @@ public class Photo {
 	 */
 	public boolean										isSavedInTour;
 
+	/**
+	 * Key is tourId
+	 */
 	private final HashMap<Long, TourPhotoReference>		_tourPhotoRef					= new HashMap<Long, TourPhotoReference>();
 
 	/**
@@ -247,6 +252,8 @@ public class Photo {
 		imageFilePathName = imageFile.getPath();
 		imageFileLastModified = imageFile.lastModified();
 
+		imagePathName = new Path(imageFilePathName).removeLastSegments(1).toOSString();
+
 		imageFileSize = imageFile.length();
 
 		final int dotPos = imageFileName.lastIndexOf(UI.SYMBOL_DOT);
@@ -294,7 +301,7 @@ public class Photo {
 
 		if (_tourPhotoRef.containsKey(tourId) == false) {
 
-			_tourPhotoRef.put(tourId, new TourPhotoReference(photoId));
+			_tourPhotoRef.put(tourId, new TourPhotoReference(tourId, photoId));
 		}
 	}
 
@@ -420,6 +427,14 @@ public class Photo {
 		sb.append("\tOriginal:" + _photoLoadingStateOriginal); //$NON-NLS-1$
 
 		return sb.toString();
+	}
+
+	public void dumpTourReferences() {
+
+		for (final TourPhotoReference ref : _tourPhotoRef.values()) {
+			System.out.println(UI.timeStampNano() + " \t\tphotoId=" + ref.photoId);
+			// TODO remove SYSTEM.OUT.PRINTLN
+		}
 	}
 
 	@Override
@@ -980,8 +995,8 @@ public class Photo {
 		return _isLoadingError;
 	}
 
-	public boolean isTourSet(final Long tourId) {
-		return _tourPhotoRef.containsKey(tourId);
+	public void removeTour(final Long tourId) {
+		_tourPhotoRef.remove(tourId);
 	}
 
 	public void resetTourGeoPosition() {
@@ -1076,6 +1091,26 @@ public class Photo {
 //				+ (_latitude == 0 ? "\t-no GPS-" : "\t" + _latitude + " - " + _longitude)
 				//
 		;
+	}
+
+	public void updateExifState() {
+
+		if (isSavedInTour) {
+			// keep old exif state
+			return;
+		}
+
+		// photo is not saved any more in a tour
+
+		_tourLatitude = 0;
+		_tourLongitude = 0;
+
+		isPhotoWithGps = isGeoFromExif;
+
+		if (isGeoFromExif == false) {
+			_exifLatitude = 0;
+			_exifLongitude = 0;
+		}
 	}
 
 	public void updateImageMetadata(final PhotoImageMetadata photoImageMetadata) {

@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.application.PerspectiveFactoryPhoto;
@@ -38,6 +39,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourPhoto;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.SQLFilter;
@@ -79,12 +81,11 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 																							.getDialogSettingsSection(
 																									"PhotoManager");	//$NON-NLS-1$
 
-	private static TourPhotoManager						_instance;
+	private static TourPhotoManager					_instance;
 	/**
 	 * Contains all cameras which are every used, key is the camera name.
 	 */
 	private static HashMap<String, Camera>			_allAvailableCameras			= new HashMap<String, Camera>();
-
 
 	private Connection								_sqlConnection;
 
@@ -120,8 +121,6 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 		Photo.setPhotoServiceProvider(this);
 	}
 
-
-
 	public static TourPhotoManager getInstance() {
 
 		if (_instance == null) {
@@ -130,7 +129,6 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
 		return _instance;
 	}
-
 
 	public static void restoreState() {
 
@@ -881,9 +879,20 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
 					for (final TourPhotoReference photoRef : photoRefs) {
 
+						// update db
 						sqlUpdate.setInt(1, ratingStars);
 						sqlUpdate.setLong(2, photoRef.photoId);
 						sqlUpdate.executeUpdate();
+
+						// update tour photo
+						final TourData tourData = TourManager.getInstance().getTourData(photoRef.tourId);
+						final Set<TourPhoto> tourPhotos = tourData.getTourPhotos();
+						for (final TourPhoto tourPhoto : tourPhotos) {
+							if (tourPhoto.getPhotoId() == photoRef.photoId) {
+								tourPhoto.setRatingStars(ratingStars);
+								break;
+							}
+						}
 					}
 
 					updatedPhotos.add(photo);
@@ -1452,7 +1461,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 				final long dbImageExifTime = result.getLong(4);
 				final double dbLatitude = result.getDouble(5);
 				final double dbLongitude = result.getDouble(6);
-				final int dbIsGeoFromPhoto = result.getInt(7);
+				final int dbIsGeoFromExif = result.getInt(7);
 				final int dbRatingStars = result.getInt(8);
 
 				photo.addTour(dbTourId, dbPhotoId);
@@ -1467,7 +1476,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 				photo.adjustedTime = dbAdjustedTime;
 				photo.imageExifTime = dbImageExifTime;
 
-				photo.isGeoFromExif = dbIsGeoFromPhoto == 1;
+				photo.isGeoFromExif = dbIsGeoFromExif == 1;
 				photo.isPhotoWithGps = dbLatitude != 0;
 
 				photo.ratingStars = dbRatingStars;

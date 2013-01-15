@@ -82,6 +82,13 @@ public class GalleryMT20Item {
 	 */
 	public int							photoPaintedY;
 
+	public int							itemX_AnnotationPainted_Gps;
+	public int							itemXAnnotationPaintedTour;
+	public int							itemYAnnotationPainted;
+
+	public boolean						isHoveredAnnotationTour;
+
+
 	public GalleryMT20Item(final GalleryMT20 galleryMT20) {
 		this.gallery = galleryMT20;
 	}

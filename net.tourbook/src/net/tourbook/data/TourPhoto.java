@@ -85,7 +85,7 @@ public class TourPhoto {
 
 	/**
 	 * <code>0</code> geo position is from a tour<br>
-	 * <code>1</code> geo position is from a photo<br>
+	 * <code>1</code> geo position is from a photo, from the EXIF data within the photo file<br>
 	 */
 	private int				isGeoFromPhoto;
 
@@ -253,7 +253,10 @@ public class TourPhoto {
 		return result;
 	}
 
-	public boolean isGeoFromPhoto() {
+	/**
+	 * @return Returns <code>true</code> when geo coordinated are save in the photo image.
+	 */
+	public boolean isGeoFromExif() {
 		return isGeoFromPhoto == 1;
 	}
 
@@ -271,11 +274,11 @@ public class TourPhoto {
 	}
 
 	public void setIsGeoFromPhoto() {
-		isGeoFromPhoto = 0;
+		isGeoFromPhoto = 1;
 	}
 
 	public void setIsGeoFromTour() {
-		isGeoFromPhoto = 1;
+		isGeoFromPhoto = 0;
 	}
 
 	public void setRatingStars(final int ratingStars) {

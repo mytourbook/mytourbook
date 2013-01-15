@@ -15,6 +15,9 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
+/**
+ * This state observes loading of photo data from saved photos in tourphotos.
+ */
 public enum PhotoSqlLoadingState {
 
 	/**

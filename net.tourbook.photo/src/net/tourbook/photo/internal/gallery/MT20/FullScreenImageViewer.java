@@ -64,7 +64,7 @@ public class FullScreenImageViewer {
 
 	private static final int				TIME_BEFORE_CURSOR_GETS_HIDDEN			= 500;
 	private static final int				TIME_BEFORE_SHOW_IMAGE					= UI.IS_OSX ? 100 : 500;
-	private static final int				TIME_BEFORE_WAITING_CURSOR_IS_DISPLAYED	= 200;
+	private static final int				TIME_BEFORE_WAITING_CURSOR_IS_DISPLAYED	= 500;
 
 	private static final String				STATE_FULL_SIZE_VIEWER_ZOOM_STATE		= "STATE_FULL_SIZE_VIEWER_ZOOM_STATE";	//$NON-NLS-1$
 

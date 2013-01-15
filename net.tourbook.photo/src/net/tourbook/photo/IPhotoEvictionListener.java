@@ -15,24 +15,11 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
-import java.util.ArrayList;
-
-public interface IPhotoServiceProvider {
+public interface IPhotoEvictionListener {
 
 	/**
-	 * A mouse down event occured at a hovered gallery item within the star rating area.
-	 * 
-	 * @param photos
-	 *            Photos which star rating should be saved.
+	 * Photo is evicted from the {@link PhotoCache}.
 	 */
-	void saveStarRating(ArrayList<Photo> photos);
-
-	/**
-	 * Set's into the photo for which tours this photo is saved. Multiple tours are valid, e.g. a
-	 * photo is saved for 2 different people.
-	 * 
-	 * @param photo
-	 */
-	void setTourReference(Photo photo);
+	void evictedPhoto(Photo photo);
 
 }

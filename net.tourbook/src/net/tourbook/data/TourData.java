@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -70,8 +71,9 @@ import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.math.Smooth;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoCache;
-import net.tourbook.photo.TourPhotoManager;
 import net.tourbook.photo.TourPhotoLink;
+import net.tourbook.photo.TourPhotoManager;
+import net.tourbook.photo.TourPhotoReference;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageComputedValues;
 import net.tourbook.srtm.ElevationSRTM3;
@@ -4349,62 +4351,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 		// photos are not yet set
 
-		// create gallery photos for all tour photos
-		for (final TourPhoto tourPhoto : tourPhotos) {
-
-			Photo galleryPhoto = null;
-			double tourLatitude = 0;
-
-			final String imageFilePathName = tourPhoto.getImageFilePathName();
-
-			final Photo cachedPhoto = PhotoCache.getPhoto(imageFilePathName);
-			if (cachedPhoto != null) {
-
-				galleryPhoto = cachedPhoto;
-
-			} else {
-
-				/*
-				 * photo is not found in the photo cache, create a new photo
-				 */
-
-				final File photoFile = new File(imageFilePathName);
-
-				galleryPhoto = new Photo(photoFile);
-
-				galleryPhoto.adjustedTime = tourPhoto.getAdjustedTime();
-				galleryPhoto.imageExifTime = tourPhoto.getImageExifTime();
-
-				tourLatitude = tourPhoto.getLatitude();
-
-				galleryPhoto.isGeoFromExif = tourPhoto.isGeoFromPhoto();
-				galleryPhoto.isPhotoWithGps = tourLatitude != 0;
-
-				galleryPhoto.ratingStars = tourPhoto.getRatingStars();
-			}
-
-			/*
-			 * when a photo is in the photo cache it is possible that the tour is from the file
-			 * system, update tour relevant fields
-			 */
-			galleryPhoto.isSavedInTour = true;
-
-			// ensure this tour is set in the photo
-			galleryPhoto.addTour(tourPhoto.getTourId(), tourPhoto.getPhotoId());
-
-			if (galleryPhoto.getTourLatitude() == 0 && tourLatitude != 0) {
-				galleryPhoto.setTourGeoPosition(tourLatitude, tourPhoto.getLongitude());
-			}
-
-			if (cachedPhoto == null) {
-				// add photo late
-				PhotoCache.setPhoto(galleryPhoto);
-			}
-
-			_galleryPhotos.add(galleryPhoto);
-		}
-
-		Collections.sort(_galleryPhotos, TourPhotoManager.AdjustTimeComparator);
+		updateGalleryPhotos();
 
 		return _galleryPhotos;
 	}
@@ -5873,7 +5820,54 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		this.tourPerson = tourPerson;
 	}
 
-	public void setTourPhotos(final Set<TourPhoto> newTourPhotos) {
+	/**
+	 * Set new photos into the tour, existing photos will be replaced.
+	 * 
+	 * @param newTourPhotos
+	 * @param linkPhotos
+	 */
+	public void setTourPhotos(final HashSet<TourPhoto> newTourPhotos, final ArrayList<Photo> newGalleryPhotos) {
+
+		/*
+		 * reset state for photos which are not saved any more in this tour
+		 */
+		final ArrayList<Photo> oldGalleryPhotos = getGalleryPhotos();
+
+		if (oldGalleryPhotos != null) {
+
+			for (final Photo oldGalleryPhoto : oldGalleryPhotos) {
+
+				final String oldImageFilePathName = oldGalleryPhoto.imageFilePathName;
+				boolean isPhotoUsed = false;
+
+				for (final Photo newGalleryPhoto : newGalleryPhotos) {
+
+					if (oldImageFilePathName.equals(newGalleryPhoto.imageFilePathName)) {
+						isPhotoUsed = true;
+						break;
+					}
+				}
+
+				if (isPhotoUsed == false) {
+
+					/*
+					 * photo is not saved any more in this tour, remove tour reference
+					 */
+
+					oldGalleryPhoto.removeTour(tourId);
+
+					final HashMap<Long, TourPhotoReference> photoRefs = oldGalleryPhoto.getTourPhotoReferences();
+
+					if (photoRefs.size() == 0) {
+
+						oldGalleryPhoto.isSavedInTour = false;
+						oldGalleryPhoto.ratingStars = 0;
+
+						oldGalleryPhoto.updateExifState();
+					}
+				}
+			}
+		}
 
 		// force photos to be recreated
 		_galleryPhotos.clear();
@@ -6421,6 +6415,62 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		for (final TourMarker tourMarker : tourMarkers) {
 			tourMarker.updateDatabase_019_to_020();
 		}
+	}
+
+	public void updateGalleryPhotos() {
+
+		// remove photos from cache which are not saved any more
+//		PhotoCache.removePhotos(_galleryPhotos);
+
+		_galleryPhotos.clear();
+
+		// create gallery photos for all tour photos
+		for (final TourPhoto tourPhoto : tourPhotos) {
+
+			final String imageFilePathName = tourPhoto.getImageFilePathName();
+
+			Photo galleryPhoto = PhotoCache.getPhoto(imageFilePathName);
+			if (galleryPhoto == null) {
+
+				/*
+				 * photo is not found in the photo cache, create a new photo
+				 */
+
+				final File photoFile = new File(imageFilePathName);
+
+				galleryPhoto = new Photo(photoFile);
+			}
+
+			/*
+			 * when a photo is in the photo cache it is possible that the tour is from the file
+			 * system, update tour relevant fields
+			 */
+			galleryPhoto.isSavedInTour = true;
+
+			// ensure this tour is set in the photo
+			galleryPhoto.addTour(tourPhoto.getTourId(), tourPhoto.getPhotoId());
+
+			galleryPhoto.adjustedTime = tourPhoto.getAdjustedTime();
+			galleryPhoto.imageExifTime = tourPhoto.getImageExifTime();
+
+			final double tourLatitude = tourPhoto.getLatitude();
+
+			if (tourLatitude != 0) {
+				galleryPhoto.setTourGeoPosition(tourLatitude, tourPhoto.getLongitude());
+			}
+
+			galleryPhoto.isPhotoWithGps = tourLatitude != 0;
+			galleryPhoto.isGeoFromExif = tourPhoto.isGeoFromExif();
+
+			galleryPhoto.ratingStars = tourPhoto.getRatingStars();
+
+			// add photo after it's initialized
+			PhotoCache.setPhoto(galleryPhoto);
+
+			_galleryPhotos.add(galleryPhoto);
+		}
+
+		Collections.sort(_galleryPhotos, TourPhotoManager.AdjustTimeComparator);
 	}
 
 }

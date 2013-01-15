@@ -118,7 +118,8 @@ import org.joda.time.format.DateTimeFormatter;
  * org.apache.commons.sanselan
  * </pre>
  */
-public abstract class ImageGallery implements IItemListener, IGalleryContextMenuProvider, IPhotoProvider, ITourViewer {
+public abstract class ImageGallery implements IItemListener, IGalleryContextMenuProvider, IPhotoProvider, ITourViewer,
+		IPhotoEvictionListener {
 
 	/**
 	 * Number of gallery positions which are cached
@@ -273,6 +274,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 	private int						_photoBorderSize;
 
 	private boolean					_isShowTooltip;
+	private boolean					_isShowAnnotations;
 
 	/**
 	 * keep gallery position for each used folder
@@ -422,11 +424,6 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 		}
 
 		@Override
-		protected void beforeModifySelection() {
-			onBeforeModifyGallerySelection();
-		}
-
-		@Override
 		public Photo getPhoto(final int filterIndex) {
 
 			if (filterIndex >= _sortedAndFilteredPhotos.length) {
@@ -436,6 +433,11 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 			final Photo photo = _sortedAndFilteredPhotos[filterIndex];
 
 			return photo;
+		}
+
+		@Override
+		protected void onBeforeModifySelection() {
+			onBeforeModifyGallerySelection();
 		}
 	}
 
@@ -581,6 +583,8 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 		jobFilter_10_Create();
 		jobUIFilter_10_Create();
 		jobUILoading_10_Create();
+
+		PhotoCache.addEvictionListener(this);
 
 		createUI(parent);
 
@@ -910,6 +914,31 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 		});
 	}
 
+	/**
+	 * column: image direction degree
+	 */
+	private void defineColumn_ImageDirectionDegree() {
+
+		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_IMAGE_DIRECTION_DEGREE//
+				.createColumn(_columnManager, _pc);
+
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Photo photo = (Photo) cell.getElement();
+				final double imageDirection = photo.getImageDirection();
+
+				if (imageDirection == Double.MIN_VALUE) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(Integer.toString((int) imageDirection));
+				}
+			}
+		});
+	}
+
 //	/**
 //	 * column: altitude
 //	 */
@@ -936,31 +965,6 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 	/**
 	 * column: image direction degree
 	 */
-	private void defineColumn_ImageDirectionDegree() {
-
-		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_IMAGE_DIRECTION_DEGREE//
-				.createColumn(_columnManager, _pc);
-
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Photo photo = (Photo) cell.getElement();
-				final double imageDirection = photo.getImageDirection();
-
-				if (imageDirection == Double.MIN_VALUE) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(Integer.toString((int) imageDirection));
-				}
-			}
-		});
-	}
-
-	/**
-	 * column: image direction degree
-	 */
 	private void defineColumn_ImageDirectionText() {
 
 		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_IMAGE_DIRECTION_TEXT//
@@ -980,6 +984,25 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 					final int imageDirectionInt = (int) imageDirection;
 					cell.setText(getDirectionText(imageDirectionInt));
 				}
+			}
+		});
+	}
+
+	/**
+	 * column: name
+	 */
+	private void defineColumn_ImageFileName() {
+
+		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_NAME.createColumn(_columnManager, _pc);
+
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Photo photo = (Photo) cell.getElement();
+
+				cell.setText(photo.imageFileName);
 			}
 		});
 	}
@@ -1008,11 +1031,11 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 //	}
 
 	/**
-	 * column: name
+	 * column: location
 	 */
-	private void defineColumn_ImageFileName() {
+	private void defineColumn_Location() {
 
-		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_NAME.createColumn(_columnManager, _pc);
+		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_LOCATION.createColumn(_columnManager, _pc);
 
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -1021,7 +1044,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 
 				final Photo photo = (Photo) cell.getElement();
 
-				cell.setText(photo.imageFileName);
+				cell.setText(photo.getGpsAreaInfo());
 			}
 		});
 	}
@@ -1048,25 +1071,6 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 //			}
 //		});
 //	}
-
-	/**
-	 * column: location
-	 */
-	private void defineColumn_Location() {
-
-		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_LOCATION.createColumn(_columnManager, _pc);
-
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Photo photo = (Photo) cell.getElement();
-
-				cell.setText(photo.getGpsAreaInfo());
-			}
-		});
-	}
 
 	/**
 	 * column: orientation
@@ -1111,6 +1115,29 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 	protected abstract void enableActions(final boolean isItemAvailable);
 
 	protected abstract void enableAttributeActions(boolean isAttributesPainted);
+
+	@Override
+	public void evictedPhoto(final Photo evictedPhoto) {
+
+		final String evictedImageFilePathName = evictedPhoto.imageFilePathName;
+
+		// check if it is still evicted
+		if (PhotoCache.getPhoto(evictedImageFilePathName) != null) {
+
+			// photo is already recreated
+			return;
+		}
+
+		for (final Photo photo : _allPhotos) {
+			if (photo.imageFilePathName.equals(evictedImageFilePathName)) {
+
+				// evicted photo is still displayed, cache is again
+				PhotoCache.setPhoto(photo);
+
+				break;
+			}
+		}
+	}
 
 	@Override
 	public void fillContextMenu(final IMenuManager menuMgr) {
@@ -2048,8 +2075,9 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 			return;
 		}
 
-		_hoveredItem.hoveredStars = 0;
 		_hoveredItem.isHovered = false;
+		_hoveredItem.hoveredStars = 0;
+		_hoveredItem.isHoveredAnnotationTour = false;
 
 		if (_hoveredItem.allSelectedGalleryItems != null) {
 
@@ -2076,6 +2104,8 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 
 	private void onDispose() {
 
+		PhotoCache.removeEvictionListener(this);
+
 		if (_galleryFont != null) {
 			_galleryFont.dispose();
 		}
@@ -2086,7 +2116,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 	@Override
 	public boolean onItemMouseDown(final GalleryMT20Item mouseDownItem, final int itemMouseX, final int itemMouseY) {
 
-		if (_isHandleRatingStars && mouseDownItem != null) {
+		if (mouseDownItem != null && (_isHandleRatingStars || _isShowAnnotations)) {
 
 			if (_photoRenderer.isMouseDownHandled(mouseDownItem, itemMouseX, itemMouseY)) {
 
@@ -2100,18 +2130,24 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 	}
 
 	@Override
-	public void onItemMouseExit(final GalleryMT20Item oldHoveredItem, final int itemMouseX, final int itemMouseY) {
+	public void onItemMouseExit(final GalleryMT20Item exitHoveredItem, final int itemMouseX, final int itemMouseY) {
 
-		if (_isHandleRatingStars == false) {
+		if (_isHandleRatingStars == false && _isShowAnnotations == false) {
 			return;
 		}
 
-		oldHoveredItem.hoveredStars = 0;
-		oldHoveredItem.isHovered = false;
+		/*
+		 * reset hovering
+		 */
 
-		if (oldHoveredItem.allSelectedGalleryItems != null) {
+		exitHoveredItem.isHovered = false;
 
-			for (final GalleryMT20Item selectedItems : oldHoveredItem.allSelectedGalleryItems) {
+		exitHoveredItem.hoveredStars = 0;
+		exitHoveredItem.isHoveredAnnotationTour = false;
+
+		if (exitHoveredItem.allSelectedGalleryItems != null) {
+
+			for (final GalleryMT20Item selectedItems : exitHoveredItem.allSelectedGalleryItems) {
 
 				selectedItems.isInHoveredGroup = false;
 
@@ -2122,14 +2158,15 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 			 * This collection cannot be cleared because it's the original list with selected items
 			 * in the gallery, so only the reference is set to <code>null</code>.
 			 */
-			oldHoveredItem.allSelectedGalleryItems = null;
+			exitHoveredItem.allSelectedGalleryItems = null;
 
 			_hoveredItem = null;
 
 		} else {
 
-			_galleryMT20.redrawItem(oldHoveredItem);
+			_galleryMT20.redrawItem(exitHoveredItem);
 		}
+
 	}
 
 	@Override
@@ -2139,7 +2176,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 			_photoGalleryTooltip.show(hoveredItem);
 		}
 
-		if (_isHandleRatingStars && hoveredItem != null) {
+		if (hoveredItem != null && (_isHandleRatingStars || _isShowAnnotations)) {
 
 			_hoveredItem = hoveredItem;
 
@@ -2242,16 +2279,6 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 	@Override
 	public void reloadViewer() {
 		_photoViewer.setInput(new Object[0]);
-	}
-
-	public void restoreInfo(final boolean isShowPhotoName,
-							final PhotoDateInfo photoDateInfo,
-							final boolean isShowAnnotations,
-							final boolean isShowTooltip) {
-
-		_photoRenderer.setShowLabels(isShowPhotoName, photoDateInfo, isShowAnnotations);
-
-		_isShowTooltip = isShowTooltip;
 	}
 
 	void restoreState() {
@@ -2432,6 +2459,17 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 
 		_fullScreenImageViewer = fullScreenImageViewer;
 		_galleryMT20.setFullScreenImageViewer(fullScreenImageViewer);
+	}
+
+	public void setPhotoInfo(	final boolean isShowPhotoName,
+								final PhotoDateInfo photoDateInfo,
+								final boolean isShowAnnotations,
+								final boolean isShowTooltip) {
+
+		_isShowTooltip = isShowTooltip;
+		_isShowAnnotations = isShowAnnotations;
+
+		_photoRenderer.setPhotoInfo(isShowPhotoName, photoDateInfo, isShowAnnotations);
 	}
 
 	/**
@@ -2691,9 +2729,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 					final boolean isShowAnnotations,
 					final boolean isShowTooltip) {
 
-		_photoRenderer.setShowLabels(isShowPhotoName, photoDateInfo, isShowAnnotations);
-
-		_isShowTooltip = isShowTooltip;
+		setPhotoInfo(isShowPhotoName, photoDateInfo, isShowAnnotations, isShowTooltip);
 
 		// reset tooltip, otherwise it could be displayed if it should not
 		_photoGalleryTooltip.reset(true);
@@ -2915,9 +2951,35 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 	 * The UI of the photos are updated.
 	 * 
 	 * @param arrayList
-	 *            Items in this list should be of type {@link Photo}.
+	 *            Contains photos which are modified. Items in this list should be of type
+	 *            {@link Photo}.
 	 */
 	public void updatePhotos(final ArrayList<?> arrayList) {
+
+		if (_allPhotos == null) {
+			return;
+		}
+
+		for (int photoIndex = 0; photoIndex < _allPhotos.length; photoIndex++) {
+
+			final Photo galleryPhoto = _allPhotos[photoIndex];
+			final String galleryImageFilePathName = galleryPhoto.imageFilePathName;
+
+			for (final Object object : arrayList) {
+
+				if (object instanceof Photo) {
+
+					final Photo updatedPhoto = (Photo) object;
+
+					if (galleryImageFilePathName.equals(updatedPhoto.imageFilePathName)) {
+
+						_allPhotos[photoIndex] = updatedPhoto;
+
+						break;
+					}
+				}
+			}
+		}
 
 		/*
 		 * this is the easy way to update the UI for all visible photos
@@ -3180,46 +3242,18 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 
 					final File photoFile = files[fileIndex];
 
-					Photo galleryPhoto;
+					Photo galleryPhoto = PhotoCache.getPhoto(photoFile.getAbsolutePath());
 
-					final Photo cachedPhoto = PhotoCache.getPhoto(photoFile.getAbsolutePath());
-
-					if (cachedPhoto != null) {
-
-						galleryPhoto = cachedPhoto;
-
-					} else {
+					if (galleryPhoto == null) {
 
 						/*
-						 * photo is not found in the photo cache, create a new photo, this photo is
-						 * added into the photo cache when exif data are loaded
+						 * photo is not found in the photo cache, create a new photo
 						 */
 
 						galleryPhoto = new Photo(photoFile);
 
-//						galleryPhoto.adjustedTime = tourPhoto.getAdjustedTime();
-//						galleryPhoto.imageExifTime = tourPhoto.getImageExifTime();
-//
-//						tourLatitude = tourPhoto.getLatitude();
-//
-//						galleryPhoto.isGeoFromExif = tourPhoto.isGeoFromPhoto();
-//						galleryPhoto.isPhotoWithGps = tourLatitude != 0;
-//
-//						galleryPhoto.ratingStars = tourPhoto.getRatingStars();
+						PhotoCache.setPhoto(galleryPhoto);
 					}
-
-//					/*
-//					 * when a photo is in the photo cache it is possible that the tour is from the file
-//					 * system, update tour relevant fields
-//					 */
-//					galleryPhoto.isPhotoFromTour = true;
-//
-//					// ensure this tour is set in the photo
-//					galleryPhoto.addTour(tourPhoto.getTourId(), tourPhoto.getPhotoId());
-//
-//					if (galleryPhoto.getTourLatitude() == 0 && tourLatitude != 0) {
-//						galleryPhoto.setTourGeoPosition(tourLatitude, tourPhoto.getLongitude());
-//					}
 
 					newPhotos[fileIndex] = galleryPhoto;
 				}

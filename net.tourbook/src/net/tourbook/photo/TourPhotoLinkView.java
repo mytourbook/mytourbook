@@ -123,7 +123,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 																							.getDialogSettingsSection(
 																									ID);
 
-	private static final TourPhotoManager			_photoMgr							= TourPhotoManager.getInstance();
+	private static final TourPhotoManager		_photoMgr							= TourPhotoManager.getInstance();
 
 	private ArrayList<TourPhotoLink>			_visibleTourPhotoLinks				= new ArrayList<TourPhotoLink>();
 
@@ -319,7 +319,9 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 		final TourManager tourManager = TourManager.getInstance();
 
-		final ArrayList<Photo> savedPhotosInTours = new ArrayList<Photo>();
+		// contains all photos which are modified (it also contains not modified photos)
+		final HashSet<Photo> modifiedPhotos = new HashSet<Photo>();
+
 		final ArrayList<TourData> modifiedTours = new ArrayList<TourData>();
 		final ArrayList<TourPhotoLink> modifiedLinks = new ArrayList<TourPhotoLink>();
 
@@ -344,46 +346,37 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 						if (tourData != null) {
 
-							final Set<TourPhoto> tourPhotos = new HashSet<TourPhoto>();
+							final HashMap<String, TourPhoto> oldTourPhotos = new HashMap<String, TourPhoto>();
+							final Set<TourPhoto> tourPhotosSet = tourData.getTourPhotos();
+							for (final TourPhoto tourPhoto : tourPhotosSet) {
+								oldTourPhotos.put(tourPhoto.getImageFilePathName(), tourPhoto);
+							}
 
-							// remove previous photos
-							tourPhotos.clear();
+							// keep existing photos
+							final ArrayList<Photo> oldGalleryPhotos = tourData.getGalleryPhotos();
+							if (oldGalleryPhotos != null) {
+								modifiedPhotos.addAll(oldGalleryPhotos);
+							}
 
-							for (final Photo linkPhoto : linkPhotos) {
+							final HashSet<TourPhoto> tourPhotos = new HashSet<TourPhoto>();
 
-								final TourPhoto tourPhoto = new TourPhoto(tourData, linkPhoto);
+							for (final Photo galleryPhoto : linkPhotos) {
+
+								// get existing tour photo
+								TourPhoto tourPhoto = oldTourPhotos.get(galleryPhoto.imageFilePathName);
+
+								if (tourPhoto == null) {
+
+									tourPhoto = new TourPhoto(tourData, galleryPhoto);
+								}
 
 								tourPhotos.add(tourPhoto);
 
-								// set new photo save state
-								linkPhoto.isSavedInTour = true;
-								
-								
-								
-								
-								
-
-								
-								
-								
-//								final saved link photos do not final always display star final rating in all view's only sometimes
-								
-								
-								
-								
-								
-								
-								
-								
-								
-								
-								
-								
-
-								savedPhotosInTours.add(linkPhoto);
+								// add new/old photos
+								modifiedPhotos.add(galleryPhoto);
 							}
 
-							tourData.setTourPhotos(tourPhotos);
+							tourData.setTourPhotos(tourPhotos, linkPhotos);
 
 							modifiedTours.add(tourData);
 							modifiedLinks.add(photoLink);
@@ -419,7 +412,14 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 		}
 
-		TourManager.saveModifiedTours(modifiedTours);
+		final ArrayList<TourData> savedTours = TourManager.saveModifiedTours(modifiedTours);
+
+		/*
+		 * after saving tour + photos, update the photos and put them into the photo cache
+		 */
+		for (final TourData savedTourData : savedTours) {
+			savedTourData.updateGalleryPhotos();
+		}
 
 		// update viewer data
 		for (final TourPhotoLink photoLink : modifiedLinks) {
@@ -435,7 +435,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 		// update viewer UI
 		_tourViewer.update(modifiedLinks.toArray(), null);
 
-		PhotoManager.fireEvent(PhotoEventId.PHOTO_ATTRIBUTES_ARE_MODIFIED, savedPhotosInTours);
+		PhotoManager.fireEvent(PhotoEventId.PHOTO_ATTRIBUTES_ARE_MODIFIED, new ArrayList<Photo>(modifiedPhotos));
 	}
 
 	private void addPartListener() {
