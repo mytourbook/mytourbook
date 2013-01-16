@@ -21,6 +21,13 @@ import java.util.HashMap;
 public interface IPhotoServiceProvider {
 
 	/**
+	 * @param selectedPhotos
+	 * @return Returns <code>true</code> when rating stars can be saved, otherwise
+	 *         <code>false</code>.
+	 */
+	boolean canSaveStarRating(int selectedPhotos, int ratingStars);
+
+	/**
 	 * Key is tourId.
 	 * 
 	 * @param tourPhotoReferences
@@ -42,5 +49,6 @@ public interface IPhotoServiceProvider {
 	 * @param photo
 	 */
 	void setTourReference(Photo photo);
+
 
 }

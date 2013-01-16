@@ -22,6 +22,7 @@ import java.util.HashMap;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.photo.IPhotoServiceProvider;
 import net.tourbook.photo.ImageGallery;
 import net.tourbook.photo.ImageQuality;
 import net.tourbook.photo.Photo;
@@ -1520,10 +1521,21 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	 */
 	private boolean saveRatingStars(final GalleryMT20Item galleryItem) {
 
+		final IPhotoServiceProvider photoServiceProvider = Photo.getPhotoServiceProvider();
+
+		final HashMap<String, GalleryMT20Item> selectedItems = _galleryMT.getSelectedItems();
+		final Collection<GalleryMT20Item> selectedItemValues = selectedItems.values();
+		final boolean isMultipleSelection = selectedItems.containsKey(galleryItem.uniqueItemID);
+
 		final Photo hoveredPhoto = galleryItem.photo;
 
 		final int hoveredRatingStars = hoveredPhoto.ratingStars;
 		int newRatingStars = galleryItem.hoveredStars;
+
+		if (isMultipleSelection
+				&& photoServiceProvider.canSaveStarRating(selectedItems.size(), newRatingStars) == false) {
+			return false;
+		}
 
 		if (newRatingStars == hoveredRatingStars) {
 
@@ -1539,10 +1551,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 		final ArrayList<Photo> photos = new ArrayList<Photo>();
 
-		final HashMap<String, GalleryMT20Item> selectedItems = _galleryMT.getSelectedItems();
-		final Collection<GalleryMT20Item> selectedItemValues = selectedItems.values();
-
-		if (selectedItems.containsKey(galleryItem.uniqueItemID)) {
+		if (isMultipleSelection) {
 
 			/*
 			 * A selected item is hit by the mouse, the star rating is set for all selected items.
@@ -1572,7 +1581,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 		if (photos.size() > 0) {
 
-			Photo.getPhotoServiceProvider().saveStarRating(photos);
+			photoServiceProvider.saveStarRating(photos);
 
 			// update UI with new star rating
 			for (final GalleryMT20Item item : selectedItemValues) {

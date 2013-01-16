@@ -42,6 +42,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPhoto;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.SQLFilter;
@@ -53,15 +54,14 @@ import org.apache.commons.imaging.common.IImageMetadata;
 import org.apache.commons.imaging.formats.jpeg.JpegImageMetadata;
 import org.apache.commons.imaging.formats.tiff.TiffImageMetadata;
 import org.apache.commons.imaging.formats.tiff.write.TiffOutputSet;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
@@ -76,11 +76,14 @@ import org.joda.time.DateTime;
 public class TourPhotoManager implements IPhotoServiceProvider {
 
 	private static final String						STATE_CAMERA_ADJUSTMENT_NAME	= "STATE_CAMERA_ADJUSTMENT_NAME";	//$NON-NLS-1$
-
 	private static final String						STATE_CAMERA_ADJUSTMENT_TIME	= "STATE_CAMERA_ADJUSTMENT_TIME";	//$NON-NLS-1$
+
 	private static final String						CAMERA_UNKNOWN_KEY				= "CAMERA_UNKNOWN_KEY";			//$NON-NLS-1$
 
 	private static final String						TEMP_FILE_PREFIX_ORIG			= "_orig_";						//$NON-NLS-1$
+
+	private final IPreferenceStore					_prefStore						= TourbookPlugin.getDefault() //
+																							.getPreferenceStore();
 
 	private static final IDialogSettings			_state							= TourbookPlugin.getDefault() //
 																							.getDialogSettingsSection(
@@ -201,6 +204,48 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 			}
 		}
 		historyTour.tourCameras = sb.toString();
+	}
+
+	@Override
+	public boolean canSaveStarRating(final int selectedPhotos, final int ratingStars) {
+
+		final int warningLevel = 5;
+
+		if (selectedPhotos > warningLevel) {
+
+			final boolean isShowWarning = _prefStore.getBoolean(//
+					ITourbookPreferences.TOGGLE_STATE_SHOW_STAR_RATING_SAVE_WARNING) == false;
+
+			if (isShowWarning) {
+
+				final MessageDialogWithToggle dialog = MessageDialogWithToggle.openOkCancelConfirm(//
+						Display.getCurrent().getActiveShell(),
+						Messages.Photo_TourPhotoMgr_Dialog_SaveStarRating_Title,
+						NLS.bind(//
+								Messages.Photo_TourPhotoMgr_Dialog_SaveStarRating_Message,
+								new Object[] { ratingStars, selectedPhotos, warningLevel }),
+						Messages.App_ToggleState_DoNotShowAgain,
+						false, // toggle default state
+						null,
+						null);
+
+				if (dialog.getReturnCode() == Window.OK) {
+
+					// save toggle state only when OK is pressed
+					_prefStore.setValue(
+							ITourbookPreferences.TOGGLE_STATE_SHOW_STAR_RATING_SAVE_WARNING,
+							dialog.getToggleState());
+
+					return true;
+
+				} else {
+
+					return false;
+				}
+			}
+		}
+
+		return true;
 	}
 
 	/**
@@ -849,6 +894,8 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
 			// fire a selection for the first tour
 
+			final long tourId = ref.tourId;
+
 			final IWorkbenchWindow wbWin = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 			if (wbWin != null) {
 
@@ -864,8 +911,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 							final ISelectionProvider selectionProvider = site.getSelectionProvider();
 							if (selectionProvider instanceof PostSelectionProvider) {
 
-								((PostSelectionProvider) selectionProvider)
-										.setSelection(new SelectionTourId(ref.tourId));
+								((PostSelectionProvider) selectionProvider).setSelection(new SelectionTourId(tourId));
 							}
 						}
 					}
@@ -1030,138 +1076,138 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 											final double longitude,
 											final boolean[] isReadOnlyMessageDisplayed) {
 
-		final Shell activeShell = Display.getCurrent().getActiveShell();
-
-		if (originalJpegImageFile.canWrite() == false) {
-
-			if (isReadOnlyMessageDisplayed[0] == false) {
-
-				isReadOnlyMessageDisplayed[0] = true;
-
-				MessageDialog
-						.openError(activeShell, //
-								"Messages.Photos_AndTours_Dialog_ImageIsReadOnly_Title Set Geo Coordinates",
-								NLS
-										.bind(
-												"Messages.Photos_AndTours_Dialog_ImageIsReadOnly_Message The geo coordinates cannot be set into the image file\n\n{0}\n\nbecause the image file is readonly.\n\nFor subsequent image files which are readonly, this message will not be displayed.",
-												originalJpegImageFile.getAbsolutePath()));
-			}
-
-			return 0;
-		}
-
-		File gpsTempFile = null;
-
-		final IPath originalFilePathName = new Path(originalJpegImageFile.getAbsolutePath());
-		final String originalFileNameWithoutExt = originalFilePathName.removeFileExtension().lastSegment();
-
-		final File originalFilePath = originalFilePathName.removeLastSegments(1).toFile();
-		File renamedOriginalFile = null;
-
-		try {
-
-			boolean returnState = false;
-
-			try {
-
-				gpsTempFile = File.createTempFile(//
-						originalFileNameWithoutExt + UI.SYMBOL_UNDERSCORE,
-						UI.SYMBOL_DOT + originalFilePathName.getFileExtension(),
-						originalFilePath);
-
-				setExifGPSTag_IntoImageFile_WithExifRewriter(originalJpegImageFile, gpsTempFile, latitude, longitude);
-
-				returnState = true;
-
-			} catch (final ImageReadException e) {
-				StatusUtil.log(e);
-			} catch (final ImageWriteException e) {
-				StatusUtil.log(e);
-			} catch (final IOException e) {
-				StatusUtil.log(e);
-			}
-
-			if (returnState == false) {
-				return -1;
-			}
-
-			/*
-			 * replace original file with gps file
-			 */
-
-			try {
-
-				/*
-				 * rename original file into a temp file
-				 */
-				final String nanoString = Long.toString(System.nanoTime());
-				final String nanoTime = nanoString.substring(nanoString.length() - 4);
-
-				renamedOriginalFile = File.createTempFile(//
-						originalFileNameWithoutExt + TEMP_FILE_PREFIX_ORIG + nanoTime,
-						UI.SYMBOL_DOT + originalFilePathName.getFileExtension(),
-						originalFilePath);
-
-				final String renamedOriginalFileName = renamedOriginalFile.getAbsolutePath();
-
-				Util.deleteTempFile(renamedOriginalFile);
-
-				boolean isRenamed = originalJpegImageFile.renameTo(new File(renamedOriginalFileName));
-
-				if (isRenamed == false) {
-
-					// original file cannot be renamed
-					MessageDialog.openError(activeShell, //
-							"Messages.Photos_AndTours_ErrorDialog_Title", //$NON-NLS-1$
-							NLS.bind("The image file:\n\n{0}\n\ncannot be renamed into\n\n{1}", //$NON-NLS-1$
-									originalFilePathName.toOSString(),
-									renamedOriginalFileName));
-					return -1;
-				}
-
-				/*
-				 * rename gps temp file into original file
-				 */
-				isRenamed = gpsTempFile.renameTo(originalFilePathName.toFile());
-
-				if (isRenamed == false) {
-
-					// gps file cannot be renamed to original file
-					MessageDialog
-							.openError(activeShell, //
-									"Messages.Photos_AndTours_ErrorDialog_Title", //$NON-NLS-1$
-									NLS
-											.bind(
-													"THERE IS A SERIOUS PROBLEM\n\nThe image file\n\n{0}\n\nwas renamed to\n\n{1}\n\nbut the task of setting the geo\n\n coordinates cannot be\n\n finished.", //$NON-NLS-1$
-													originalFilePathName.toOSString(),
-													renamedOriginalFile.getAbsolutePath()));
-
-					/*
-					 * prevent of deleting renamed original file because the original file is
-					 * renamed into this
-					 */
-					renamedOriginalFile = null;
-
-					return -1;
-				}
-
-				if (renamedOriginalFile.delete() == false) {
-
-					MessageDialog.openError(activeShell, //
-							"Messages.Photos_AndTours_ErrorDialog_Title", //$NON-NLS-1$
-							NLS.bind("The image file:\n\n{0}\n\nwhich was renamed into\n\n{1}\n\ncannot be deleted.", //$NON-NLS-1$
-									originalFilePathName.toOSString(),
-									renamedOriginalFile.getAbsolutePath()));
-				}
-
-			} catch (final IOException e) {
-				StatusUtil.log(e);
-			}
-
-		} finally {
-
-			Util.deleteTempFile(gpsTempFile);
-		}
+//		final Shell activeShell = Display.getCurrent().getActiveShell();
+//
+//		if (originalJpegImageFile.canWrite() == false) {
+//
+//			if (isReadOnlyMessageDisplayed[0] == false) {
+//
+//				isReadOnlyMessageDisplayed[0] = true;
+//
+//				MessageDialog
+//						.openError(activeShell, //
+//								"Messages.Photos_AndTours_Dialog_ImageIsReadOnly_Title Set Geo Coordinates",
+//								NLS
+//										.bind(
+//												"Messages.Photos_AndTours_Dialog_ImageIsReadOnly_Message The geo coordinates cannot be set into the image file\n\n{0}\n\nbecause the image file is readonly.\n\nFor subsequent image files which are readonly, this message will not be displayed.",
+//												originalJpegImageFile.getAbsolutePath()));
+//			}
+//
+//			return 0;
+//		}
+//
+//		File gpsTempFile = null;
+//
+//		final IPath originalFilePathName = new Path(originalJpegImageFile.getAbsolutePath());
+//		final String originalFileNameWithoutExt = originalFilePathName.removeFileExtension().lastSegment();
+//
+//		final File originalFilePath = originalFilePathName.removeLastSegments(1).toFile();
+//		File renamedOriginalFile = null;
+//
+//		try {
+//
+//			boolean returnState = false;
+//
+//			try {
+//
+//				gpsTempFile = File.createTempFile(//
+//						originalFileNameWithoutExt + UI.SYMBOL_UNDERSCORE,
+//						UI.SYMBOL_DOT + originalFilePathName.getFileExtension(),
+//						originalFilePath);
+//
+//				setExifGPSTag_IntoImageFile_WithExifRewriter(originalJpegImageFile, gpsTempFile, latitude, longitude);
+//
+//				returnState = true;
+//
+//			} catch (final ImageReadException e) {
+//				StatusUtil.log(e);
+//			} catch (final ImageWriteException e) {
+//				StatusUtil.log(e);
+//			} catch (final IOException e) {
+//				StatusUtil.log(e);
+//			}
+//
+//			if (returnState == false) {
+//				return -1;
+//			}
+//
+//			/*
+//			 * replace original file with gps file
+//			 */
+//
+//			try {
+//
+//				/*
+//				 * rename original file into a temp file
+//				 */
+//				final String nanoString = Long.toString(System.nanoTime());
+//				final String nanoTime = nanoString.substring(nanoString.length() - 4);
+//
+//				renamedOriginalFile = File.createTempFile(//
+//						originalFileNameWithoutExt + TEMP_FILE_PREFIX_ORIG + nanoTime,
+//						UI.SYMBOL_DOT + originalFilePathName.getFileExtension(),
+//						originalFilePath);
+//
+//				final String renamedOriginalFileName = renamedOriginalFile.getAbsolutePath();
+//
+//				Util.deleteTempFile(renamedOriginalFile);
+//
+//				boolean isRenamed = originalJpegImageFile.renameTo(new File(renamedOriginalFileName));
+//
+//				if (isRenamed == false) {
+//
+//					// original file cannot be renamed
+//					MessageDialog.openError(activeShell, //
+//							"Messages.Photos_AndTours_ErrorDialog_Title", //$NON-NLS-1$
+//							NLS.bind("The image file:\n\n{0}\n\ncannot be renamed into\n\n{1}", //$NON-NLS-1$
+//									originalFilePathName.toOSString(),
+//									renamedOriginalFileName));
+//					return -1;
+//				}
+//
+//				/*
+//				 * rename gps temp file into original file
+//				 */
+//				isRenamed = gpsTempFile.renameTo(originalFilePathName.toFile());
+//
+//				if (isRenamed == false) {
+//
+//					// gps file cannot be renamed to original file
+//					MessageDialog
+//							.openError(activeShell, //
+//									"Messages.Photos_AndTours_ErrorDialog_Title", //$NON-NLS-1$
+//									NLS
+//											.bind(
+//													"THERE IS A SERIOUS PROBLEM\n\nThe image file\n\n{0}\n\nwas renamed to\n\n{1}\n\nbut the task of setting the geo\n\n coordinates cannot be\n\n finished.", //$NON-NLS-1$
+//													originalFilePathName.toOSString(),
+//													renamedOriginalFile.getAbsolutePath()));
+//
+//					/*
+//					 * prevent of deleting renamed original file because the original file is
+//					 * renamed into this
+//					 */
+//					renamedOriginalFile = null;
+//
+//					return -1;
+//				}
+//
+//				if (renamedOriginalFile.delete() == false) {
+//
+//					MessageDialog.openError(activeShell, //
+//							"Messages.Photos_AndTours_ErrorDialog_Title", //$NON-NLS-1$
+//							NLS.bind("The image file:\n\n{0}\n\nwhich was renamed into\n\n{1}\n\ncannot be deleted.", //$NON-NLS-1$
+//									originalFilePathName.toOSString(),
+//									renamedOriginalFile.getAbsolutePath()));
+//				}
+//
+//			} catch (final IOException e) {
+//				StatusUtil.log(e);
+//			}
+//
+//		} finally {
+//
+//			Util.deleteTempFile(gpsTempFile);
+//		}
 
 		return 1;
 	}

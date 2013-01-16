@@ -790,6 +790,10 @@ public class Messages extends NLS {
 	public static String		Photo_Tooltip_Label_ShellNoResize;
 	public static String		Photo_Tooltip_Label_ShellWithResize;
 
+	public static String	Photo_TourPhotoMgr_Dialog_SaveStarRating_Message;
+
+	public static String	Photo_TourPhotoMgr_Dialog_SaveStarRating_Title;
+
 	public static String		Photos_AndTours_Combo_Camera_Tooltip;
 	public static String	Photos_AndTours_Dialog_CannotSaveHistoryTour_Message;
 
