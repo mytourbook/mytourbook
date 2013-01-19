@@ -300,6 +300,8 @@ public abstract class GalleryMT20 extends Canvas {
 	 */
 	private GalleryMT20Item						_currentHoveredItem;
 
+	private int									_debugCounter;
+
 	private class RedrawTimer implements Runnable {
 		public void run() {
 
@@ -565,13 +567,6 @@ public abstract class GalleryMT20 extends Canvas {
 				}
 			}
 		});
-	}
-
-	/**
-	 * Is called before a selection is modified.
-	 */
-	protected void onBeforeModifySelection() {
-
 	}
 
 	/**
@@ -1406,6 +1401,13 @@ public abstract class GalleryMT20 extends Canvas {
 	}
 
 	/**
+	 * Is called before a selection is modified.
+	 */
+	protected void onBeforeModifySelection() {
+
+	}
+
+	/**
 	 * Fullsize viewer is closed, show last selected item
 	 */
 	void onCloseFullsizeViewer() {
@@ -1995,10 +1997,6 @@ public abstract class GalleryMT20 extends Canvas {
 			return;
 		}
 
-//		System.out.println(UI.timeStampNano());
-//		System.out.println(UI.timeStampNano() + " onPaint\t");
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
 		/**
 		 * After many hours I discovered, that the gallery background is not painted (with win7) in
 		 * the background color after the shell is hidden and displayed again (in a tooltip),
@@ -2126,7 +2124,7 @@ public abstract class GalleryMT20 extends Canvas {
 
 //		final float timeDiff = (float) (System.nanoTime() - start) / 1000000;
 ////		if (timeDiff > 500) {
-//		System.out.println(UI.timeStampNano() + " \tonPaint:\t" + timeDiff + " ms\t");
+//		System.out.println(UI.timeStampNano() + " \tonPaint:\t" + timeDiff + " ms\t" + _debugCounter++);
 ////		}
 ////		 TODO remove SYSTEM.OUT.PRINTLN
 	}

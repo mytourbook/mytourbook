@@ -66,6 +66,7 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
@@ -911,6 +912,17 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 							final ISelectionProvider selectionProvider = site.getSelectionProvider();
 							if (selectionProvider instanceof PostSelectionProvider) {
 
+								/*
+								 * restore view state when this view is maximized
+								 */
+								final IWorkbenchPartReference activePartReference = wbWinPage.getActivePartReference();
+								final int partState = wbWinPage.getPartState(activePartReference);
+
+								if (partState != IWorkbenchPage.STATE_RESTORED) {
+									wbWinPage.setPartState(activePartReference, IWorkbenchPage.STATE_RESTORED);
+								}
+
+								// fire selection
 								((PostSelectionProvider) selectionProvider).setSelection(new SelectionTourId(tourId));
 							}
 						}

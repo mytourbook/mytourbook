@@ -51,59 +51,59 @@ import org.joda.time.DateTimeZone;
 
 public class UI {
 
-	public static final String			EMPTY_STRING					= "";																		//$NON-NLS-1$
-	public static final String			SPACE							= " ";																		//$NON-NLS-1$
-	public static final String			SPACE2							= "  ";																	//$NON-NLS-1$
-	public static final String			SPACE4							= "    ";																	//$NON-NLS-1$
-	public static final String			STRING_0						= "0";																		//$NON-NLS-1$
-	public static final String			COMMA_SPACE						= ", ";																	//$NON-NLS-1$
+	public static final String			EMPTY_STRING						= "";																		//$NON-NLS-1$
+	public static final String			SPACE								= " ";																		//$NON-NLS-1$
+	public static final String			SPACE2								= "  ";																	//$NON-NLS-1$
+	public static final String			SPACE4								= "    ";																	//$NON-NLS-1$
+	public static final String			STRING_0							= "0";																		//$NON-NLS-1$
+	public static final String			COMMA_SPACE							= ", ";																	//$NON-NLS-1$
 
 	/**
 	 * contains a new line
 	 */
-	public static final String			NEW_LINE						= "\n";																	//$NON-NLS-1$
+	public static final String			NEW_LINE							= "\n";																	//$NON-NLS-1$
 
 	/**
 	 * contains 2 new lines
 	 */
-	public static final String			NEW_LINE2						= "\n\n";																	//$NON-NLS-1$
+	public static final String			NEW_LINE2							= "\n\n";																	//$NON-NLS-1$
 
-	public static final String			SYMBOL_AVERAGE					= "\u00f8";																//$NON-NLS-1$
-	public static final String			SYMBOL_AVERAGE_WITH_SPACE		= "\u00f8 ";																//$NON-NLS-1$
-	public static final String			SYMBOL_DASH						= "\u2212";																//$NON-NLS-1$
-	public static final String			SYMBOL_DIFFERENCE				= "\u0394";																//$NON-NLS-1$
-	public static final String			SYMBOL_DIFFERENCE_WITH_SPACE	= "\u0394 ";																//$NON-NLS-1$
-	public static final String			SYMBOL_DOUBLE_HORIZONTAL		= "\u2550";																//$NON-NLS-1$
-	public static final String			SYMBOL_DOUBLE_VERTICAL			= "\u2551";																//$NON-NLS-1$
-	public static final String			SYMBOL_DEGREE					= "\u00B0";																//$NON-NLS-1$
-	public static final String			SYMBOL_ELLIPSIS					= "\u2026";																//$NON-NLS-1$
-	public static final String			SYMBOL_INFINITY					= "\u221E";																//$NON-NLS-1$
-	public static final String			SYMBOL_SUM_WITH_SPACE			= "\u2211 ";																//$NON-NLS-1$
-	public static final String			SYMBOL_TAU						= "\u03c4";																//$NON-NLS-1$
+	public static final String			SYMBOL_AVERAGE						= "\u00f8";																//$NON-NLS-1$
+	public static final String			SYMBOL_AVERAGE_WITH_SPACE			= "\u00f8 ";																//$NON-NLS-1$
+	public static final String			SYMBOL_DASH							= "\u2212";																//$NON-NLS-1$
+	public static final String			SYMBOL_DIFFERENCE					= "\u0394";																//$NON-NLS-1$
+	public static final String			SYMBOL_DIFFERENCE_WITH_SPACE		= "\u0394 ";																//$NON-NLS-1$
+	public static final String			SYMBOL_DOUBLE_HORIZONTAL			= "\u2550";																//$NON-NLS-1$
+	public static final String			SYMBOL_DOUBLE_VERTICAL				= "\u2551";																//$NON-NLS-1$
+	public static final String			SYMBOL_DEGREE						= "\u00B0";																//$NON-NLS-1$
+	public static final String			SYMBOL_ELLIPSIS						= "\u2026";																//$NON-NLS-1$
+	public static final String			SYMBOL_INFINITY						= "\u221E";																//$NON-NLS-1$
+	public static final String			SYMBOL_SUM_WITH_SPACE				= "\u2211 ";																//$NON-NLS-1$
+	public static final String			SYMBOL_TAU							= "\u03c4";																//$NON-NLS-1$
 
-	public static final String			SYMBOL_DOT						= ".";																		//$NON-NLS-1$
-	public static final String			SYMBOL_COLON					= ":";																		//$NON-NLS-1$
-	public static final String			SYMBOL_EQUAL					= "=";																		//$NON-NLS-1$
-	public static final String			SYMBOL_GREATER_THAN				= ">";																		//$NON-NLS-1$
-	public static final String			SYMBOL_LESS_THAN				= "<";																		//$NON-NLS-1$
-	public static final String			SYMBOL_PERCENTAGE				= "%";																		//$NON-NLS-1$
-	public static final String			SYMBOL_UNDERSCORE				= "_";																		//$NON-NLS-1$
-	public static final String			SYMBOL_WIND_WITH_SPACE			= "W ";																	//$NON-NLS-1$
-	public static final String			SYMBOL_EXCLAMATION_POINT		= "!";																		//$NON-NLS-1$
+	public static final String			SYMBOL_DOT							= ".";																		//$NON-NLS-1$
+	public static final String			SYMBOL_COLON						= ":";																		//$NON-NLS-1$
+	public static final String			SYMBOL_EQUAL						= "=";																		//$NON-NLS-1$
+	public static final String			SYMBOL_GREATER_THAN					= ">";																		//$NON-NLS-1$
+	public static final String			SYMBOL_LESS_THAN					= "<";																		//$NON-NLS-1$
+	public static final String			SYMBOL_PERCENTAGE					= "%";																		//$NON-NLS-1$
+	public static final String			SYMBOL_UNDERSCORE					= "_";																		//$NON-NLS-1$
+	public static final String			SYMBOL_WIND_WITH_SPACE				= "W ";																	//$NON-NLS-1$
+	public static final String			SYMBOL_EXCLAMATION_POINT			= "!";																		//$NON-NLS-1$
 
 	/*
 	 * labels for the different measurement systems
 	 */
-	public static final String			UNIT_MBYTES						= "MByte";																	//$NON-NLS-1$
+	public static final String			UNIT_MBYTES							= "MByte";																	//$NON-NLS-1$
 
 	/**
 	 * The ellipsis is the string that is used to represent shortened text.
 	 * 
 	 * @since 3.0
 	 */
-	public static final String			ELLIPSIS						= "...";																	//$NON-NLS-1$
+	public static final String			ELLIPSIS							= "...";																	//$NON-NLS-1$
 
-	private static final char[]			INVALID_FILENAME_CHARS			= new char[] {
+	private static final char[]			INVALID_FILENAME_CHARS				= new char[] {
 			'\\',
 			'/',
 			':',
@@ -112,24 +112,24 @@ public class UI {
 			'"',
 			'<',
 			'>',
-			'|',														};
+			'|',															};
 
-	public static final boolean			IS_LINUX						= "gtk".equals(SWT.getPlatform());											//$NON-NLS-1$
-	public static final boolean			IS_OSX							= "carbon".equals(SWT.getPlatform()) || "cocoa".equals(SWT.getPlatform());	//$NON-NLS-1$ //$NON-NLS-2$
-	public static final boolean			IS_WIN							= "win32".equals(SWT.getPlatform()) || "wpf".equals(SWT.getPlatform());	//$NON-NLS-1$ //$NON-NLS-2$
+	public static final boolean			IS_LINUX							= "gtk".equals(SWT.getPlatform());											//$NON-NLS-1$
+	public static final boolean			IS_OSX								= "carbon".equals(SWT.getPlatform()) || "cocoa".equals(SWT.getPlatform());	//$NON-NLS-1$ //$NON-NLS-2$
+	public static final boolean			IS_WIN								= "win32".equals(SWT.getPlatform()) || "wpf".equals(SWT.getPlatform());	//$NON-NLS-1$ //$NON-NLS-2$
 
-	public static final String			UTF_8							= "UTF-8";																	//$NON-NLS-1$
-	public static final String			UTF_16							= "UTF-16";																//$NON-NLS-1$
-	public static final String			ISO_8859_1						= "ISO-8859-1";															//$NON-NLS-1$
+	public static final String			UTF_8								= "UTF-8";																	//$NON-NLS-1$
+	public static final String			UTF_16								= "UTF-16";																//$NON-NLS-1$
+	public static final String			ISO_8859_1							= "ISO-8859-1";															//$NON-NLS-1$
 
-	public static final Charset			UTF8_CHARSET					= Charset.forName("UTF-8");												//$NON-NLS-1$
+	public static final Charset			UTF8_CHARSET						= Charset.forName("UTF-8");												//$NON-NLS-1$
 
-	public static final String			MENU_SEPARATOR_ADDITIONS		= "additions"; //$NON-NLS-1$
+	public static final String			MENU_SEPARATOR_ADDITIONS			= "additions";																//$NON-NLS-1$
 
 	/**
 	 * layout hint for a description field
 	 */
-	public static final int				DEFAULT_DESCRIPTION_WIDTH		= 350;
+	public static final int				DEFAULT_DESCRIPTION_WIDTH			= 350;
 
 	/*
 	 * SET_FORMATTING_OFF
@@ -140,15 +140,17 @@ public class UI {
 	 * SET_FORMATTING_ON
 	 */
 
-	public static final int				BERLIN_HISTORY_ADJUSTMENT		= 6 * 60 + 32;
+	public static final int				BERLIN_HISTORY_ADJUSTMENT			= 6 * 60 + 32;
 
-	public static final int				DAY_IN_SECONDS					= 24 * 60 * 60;
+	public static final int				DAY_IN_SECONDS						= 24 * 60 * 60;
 
 	/*
 	 * image keys for images which are stored in the image registry
 	 */
-	public static final String			IMAGE_EMPTY_16					= "_empty16";																//$NON-NLS-1$
-	public static final String			IMAGE_CONFIGURE_COLUMNS			= "IMAGE_CONFIGURE_COLUMNS";												//$NON-NLS-1$
+	public static final String			IMAGE_ACTION_PHOTO_FILTER			= "IMAGE_ACTION_PHOTO_FILTER";												//$NON-NLS-1$
+	public static final String			IMAGE_ACTION_PHOTO_FILTER_DISABLED	= "IMAGE_ACTION_PHOTO_FILTER_DISABLED";									//$NON-NLS-1$
+	public static final String			IMAGE_CONFIGURE_COLUMNS				= "IMAGE_CONFIGURE_COLUMNS";												//$NON-NLS-1$
+	public static final String			IMAGE_EMPTY_16						= "_empty16";																//$NON-NLS-1$
 
 	public final static ImageRegistry	IMAGE_REGISTRY;
 
@@ -156,8 +158,11 @@ public class UI {
 
 		IMAGE_REGISTRY = Activator.getDefault().getImageRegistry();
 
-		IMAGE_REGISTRY.put(IMAGE_EMPTY_16, Activator.getImageDescriptor(Messages.Image___Empty16));
+		IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER, Activator.getImageDescriptor(Messages.Image_Action_PhotoFilter));
+		IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER_DISABLED,//
+				Activator.getImageDescriptor(Messages.Image_Action_PhotoFilter_Disabled));
 		IMAGE_REGISTRY.put(IMAGE_CONFIGURE_COLUMNS, Activator.getImageDescriptor(Messages.Image__ConfigureColumns));
+		IMAGE_REGISTRY.put(IMAGE_EMPTY_16, Activator.getImageDescriptor(Messages.Image___Empty16));
 
 		// weather images
 		IMAGE_REGISTRY.put(IWeather.WEATHER_ID_CLEAR, //

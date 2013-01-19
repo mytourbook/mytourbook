@@ -309,7 +309,6 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 	 * UI resources
 	 */
 	private Font					_galleryFont;
-
 	/*
 	 * UI controls
 	 */
@@ -318,19 +317,19 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 	private Composite				_uiContainer;
 
 	private GalleryMT20				_galleryMT20;
-	private GalleryActionBar		_galleryActionBar;
 
+	private GalleryActionBar		_galleryActionBar;
 	private PageBook				_pageBook;
+
 	private Composite				_pageDefault;
 	private Composite				_pageGalleryInfo;
 	private Composite				_pageDetails;
-
 	private Label					_lblDefaultPage;
+
 	private Label					_lblGalleryInfo;
-
 	private GalleryMT20Item[]		_sortedGalleryItems;
-	private Double					_contentGalleryPosition;
 
+	private Double					_contentGalleryPosition;
 	{
 		_galleryPositions = new LRUMap<String, Double>(MAX_GALLERY_POSITIONS);
 
@@ -497,6 +496,10 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 	public ImageGallery(final IDialogSettings state) {
 
 		_state = state;
+	}
+
+	public void closePhotoTooltip() {
+		_photoGalleryTooltip.close();
 	}
 
 	/**
@@ -2076,6 +2079,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 		}
 
 		_hoveredItem.isHovered = false;
+		_hoveredItem.isNeedPostUIUpdate = false;
 		_hoveredItem.hoveredStars = 0;
 		_hoveredItem.isHoveredAnnotationTour = false;
 
@@ -2140,7 +2144,10 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 		 * reset hovering
 		 */
 
+		final boolean isUpdateUI = exitHoveredItem.isNeedPostUIUpdate;
+
 		exitHoveredItem.isHovered = false;
+		exitHoveredItem.isNeedPostUIUpdate = false;
 
 		exitHoveredItem.hoveredStars = 0;
 		exitHoveredItem.isHoveredAnnotationTour = false;
@@ -2151,7 +2158,9 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 
 				selectedItems.isInHoveredGroup = false;
 
-				_galleryMT20.redrawItem(selectedItems);
+				if (isUpdateUI) {
+					_galleryMT20.redrawItem(selectedItems);
+				}
 			}
 
 			/**
@@ -2164,7 +2173,9 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 
 		} else {
 
-			_galleryMT20.redrawItem(exitHoveredItem);
+			if (isUpdateUI) {
+				_galleryMT20.redrawItem(exitHoveredItem);
+			}
 		}
 
 	}
@@ -2176,27 +2187,35 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 			_photoGalleryTooltip.show(hoveredItem);
 		}
 
-		if (hoveredItem != null && (_isHandleRatingStars || _isShowAnnotations)) {
+		final boolean isRatingStarsHandledAndPainted = _isHandleRatingStars && _isAttributesPainted;
+
+		if (hoveredItem != null && (isRatingStarsHandledAndPainted || _isShowAnnotations)) {
 
 			_hoveredItem = hoveredItem;
 
 			hoveredItem.isHovered = true;
 
 			// this will set allSelectedGalleryItems in the hovered item
-			_photoRenderer.itemIsHovered(hoveredItem, itemMouseX, itemMouseY);
+			final boolean isModified = _photoRenderer.itemIsHovered(hoveredItem, itemMouseX, itemMouseY);
 
-			if (hoveredItem.allSelectedGalleryItems != null) {
+			// don't reset here, this is done in the item exit event
+			hoveredItem.isNeedPostUIUpdate |= isModified;
 
-				for (final GalleryMT20Item selectedItems : hoveredItem.allSelectedGalleryItems) {
+			if (isModified) {
 
-					selectedItems.isInHoveredGroup = true;
+				if (hoveredItem.allSelectedGalleryItems != null) {
 
-					_galleryMT20.redrawItem(selectedItems);
+					for (final GalleryMT20Item selectedItems : hoveredItem.allSelectedGalleryItems) {
+
+						selectedItems.isInHoveredGroup = true;
+
+						_galleryMT20.redrawItem(selectedItems);
+					}
+
+				} else {
+
+					_galleryMT20.redrawItem(hoveredItem);
 				}
-
-			} else {
-
-				_galleryMT20.redrawItem(hoveredItem);
 			}
 		}
 	}

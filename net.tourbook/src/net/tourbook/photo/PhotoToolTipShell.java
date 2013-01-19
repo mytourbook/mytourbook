@@ -554,8 +554,12 @@ public abstract class PhotoToolTipShell {
 			return true;
 		}
 
-		return _visibleShell.getShells().length == 0;
+		final Shell[] openedShells = _visibleShell.getShells();
+
+		return openedShells.length == 0;
 	}
+
+	protected abstract void closeInternalShells();
 
 	/**
 	 * Creates the content area of the the tooltip.
@@ -841,13 +845,13 @@ public abstract class PhotoToolTipShell {
 
 //		final long start = System.nanoTime();
 
+		System.out.println(UI.timeStampNano() + " onTTDisplayMouseMove\t");
+		// TODO remove SYSTEM.OUT.PRINTLN
+
 		if (_visibleShell == null || _visibleShell.isDisposed() || _visibleShell.isVisible() == false) {
 			return;
 		}
 
-		if (canCloseShell() == false) {
-			return;
-		}
 
 		if (isToolTipDragged()) {
 			// is true when tooltip is dragged with the mouse
@@ -942,6 +946,8 @@ public abstract class PhotoToolTipShell {
 
 			// mouse is not within the tooltip shell rectangle, reparent to NoResize shell
 
+			closeInternalShells();
+
 			reparentShell(_rrShellNoResize);
 		}
 
@@ -960,6 +966,10 @@ public abstract class PhotoToolTipShell {
 		} else if (isHide) {
 
 			// hide definitively
+
+			if (canCloseShell() == false) {
+				return;
+			}
 
 			ttHide(event);
 		}
@@ -1122,6 +1132,9 @@ public abstract class PhotoToolTipShell {
 	 *            Shell which should be used to display {@link #_ttContentArea}.
 	 */
 	private void reparentShell(final AbstractRRShell newReparentedShell) {
+
+//		System.out.println(UI.timeStampNano() + " reparentShell\t");
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		if (_visibleShell == newReparentedShell.getShell()) {
 			// shell is already visible
@@ -1456,6 +1469,8 @@ public abstract class PhotoToolTipShell {
 	 */
 	void ttHide() {
 
+		closeInternalShells();
+
 		if (canCloseShell() == false) {
 			return;
 		}
@@ -1476,6 +1491,8 @@ public abstract class PhotoToolTipShell {
 		if (_visibleShell == null || _visibleShell.isDisposed() || _visibleShell.isVisible() == false) {
 			return;
 		}
+
+		closeInternalShells();
 
 		if (canCloseShell() == false) {
 			return;

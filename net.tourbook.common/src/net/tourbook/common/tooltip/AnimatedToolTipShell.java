@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -38,29 +38,35 @@ import org.eclipse.swt.widgets.Widget;
  */
 public abstract class AnimatedToolTipShell {
 
+	public static final int				TOOLTIP_STYLE_RECREATE_CONTENT		= 0;
+	public static final int				TOOLTIP_STYLE_KEEP_CONTENT			= 1;
+
+	public static final int				MOUSE_OVER_BEHAVIOUR_NO_IGNORE		= 0;
+	public static final int				MOUSE_OVER_BEHAVIOUR_IGNORE_OWNER	= 1;
+
 	/**
 	 * how long each tick is when fading in/out (in ms)
 	 */
-	private static final int			FADE_TIME_INTERVAL		= UI.IS_OSX ? 10 : 10;
+	private static final int			FADE_TIME_INTERVAL					= UI.IS_OSX ? 10 : 10;
 
 	/**
 	 * Number of steps when fading in
 	 */
-	private static final int			FADE_IN_STEPS			= 20;
+	private static final int			FADE_IN_STEPS						= 20;
 
 	/**
 	 * Number of steps when fading out
 	 */
-	private static final int			FADE_OUT_STEPS			= 10;
+	private static final int			FADE_OUT_STEPS						= 10;
 
 	/**
 	 * Number of steps before fading out
 	 */
-	private static final int			FADE_OUT_DELAY_STEPS	= 20;
+	private static final int			FADE_OUT_DELAY_STEPS				= 20;
 
-	private static final int			MOVE_STEPS				= 20;
+	private static final int			MOVE_STEPS							= 20;
 
-	private static final int			ALPHA_OPAQUE			= 0xff;
+	private static final int			ALPHA_OPAQUE						= 0xff;
 
 	private OwnerControlListener		_ownerControlListener;
 	private OwnerShellListener			_ownerShellListener;
@@ -84,7 +90,7 @@ public abstract class AnimatedToolTipShell {
 	private boolean						_isShellFadingIn;
 
 	private Point						_shellStartLocation;
-	private Point						_shellEndLocation		= new Point(0, 0);
+	private Point						_shellEndLocation					= new Point(0, 0);
 
 	private int							_fadeOutDelayCounter;
 
@@ -92,6 +98,9 @@ public abstract class AnimatedToolTipShell {
 	private int							_animationMoveCounter;
 
 	private boolean						_isReceiveOnMouseMove;
+
+	private int							_toolTipStyle						= TOOLTIP_STYLE_RECREATE_CONTENT;
+	private int							_mouseOverBehaviour					= MOUSE_OVER_BEHAVIOUR_NO_IGNORE;
 
 	/*
 	 * UI resources
@@ -276,6 +285,8 @@ public abstract class AnimatedToolTipShell {
 
 	private void animation10_StartKomplex() {
 
+//		final long start = System.nanoTime();
+
 		if (_isShellFadingIn) {
 
 			// set fading in location
@@ -324,12 +335,15 @@ public abstract class AnimatedToolTipShell {
 			_fadeOutDelayCounter = 0;
 		}
 
-//		System.out.println(UI.timeStampNano() + " animation10_StartKomplex\t" );
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
 		// start animation now
 		_animationMoveCounter = 0;
 		animation20_Runnable();
+
+//		System.out.println(UI.timeStampNano()
+//				+ " animation10_StartKomplex\t"
+//				+ ((float) (System.nanoTime() - start) / 1000000)
+//				+ " ms");
+//		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 	private void animation20_Runnable() {
@@ -473,11 +487,7 @@ public abstract class AnimatedToolTipShell {
 		} finally {
 
 //			final float timeDiff = (float) (System.nanoTime() - start) / 1000000;
-//			System.out.println(UI.timeStampNano()
-//					+ " animation20_Runnable:\t"
-//					+ timeDiff
-//					+ " ms\t"
-//					+ " ms");
+//			System.out.println(UI.timeStampNano() + " animation20_Runnable:\t" + timeDiff + " ms\t" + " ms");
 //			// TODO remove SYSTEM.OUT.PRINTLN
 		}
 	}
@@ -488,6 +498,14 @@ public abstract class AnimatedToolTipShell {
 	protected abstract void beforeHideToolTip();
 
 	protected abstract boolean canShowToolTip();
+
+	public void close() {
+
+		if (_shell != null) {
+			_shell.close();
+			_shell = null;
+		}
+	}
 
 	/**
 	 * Creates the content area of the the tooltip.
@@ -505,7 +523,9 @@ public abstract class AnimatedToolTipShell {
 	 */
 	private void createUI() {
 
+		final boolean isRecreateContent = _toolTipStyle == TOOLTIP_STYLE_RECREATE_CONTENT;
 		boolean isShellCreated = false;
+		boolean isCreateContent = false;
 
 		if (_shell == null || _shell.isDisposed()) {
 
@@ -525,18 +545,28 @@ public abstract class AnimatedToolTipShell {
 
 		} else {
 
-			// hide previous tooltip content
+			if (isRecreateContent) {
 
-			_shell.setRedraw(false);
+				// hide previous tooltip content
 
-			final Control[] shellChildren = _shell.getChildren();
-			for (final Control control : shellChildren) {
-				control.dispose();
+				_shell.setRedraw(false);
+
+				final Control[] shellChildren = _shell.getChildren();
+				for (final Control control : shellChildren) {
+					control.dispose();
+				}
+
+				isCreateContent = true;
 			}
 		}
 
-		// create UI
-		createToolTipContentArea(_shell);
+		final boolean isNewContent = isShellCreated || isCreateContent;
+
+		if (isNewContent) {
+
+			// create content
+			createToolTipContentArea(_shell);
+		}
 
 		if (isShellCreated) {
 			_shell.pack(true);
@@ -547,7 +577,9 @@ public abstract class AnimatedToolTipShell {
 
 		_shell.setRedraw(true);
 
-		addTTAllControlsListener(_shell);
+		if (isNewContent) {
+			addTTAllControlsListener(_shell);
+		}
 	}
 
 	private Point fixupDisplayBounds(final Point tipSize, final Point location) {
@@ -619,6 +651,28 @@ public abstract class AnimatedToolTipShell {
 	 */
 	public void hide() {
 		ttHide(null);
+	}
+
+	protected boolean isToolTipVisible() {
+
+		if (_shell == null || _shell.isDisposed()) {
+			return false;
+		}
+
+		final boolean isShellVisible = _shell.isVisible();
+
+//		System.out.println(UI.timeStampNano() + " isShellVisible=" + isShellVisible);
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
+		return isShellVisible;
+	}
+
+	/**
+	 * @return When the returned rectangle (which has display locations) is hit by the mouse, the
+	 *         tooltip should not be hidden. When <code>null</code> this check is ignored.
+	 */
+	protected Rectangle noHideOnMouseMove() {
+		return null;
 	}
 
 	private void onDispose(final Event event) {
@@ -778,6 +832,9 @@ public abstract class AnimatedToolTipShell {
 		// get control which is hovered with the mouse after the exit, can be null
 		final Control hoveredControl = _display.getCursorControl();
 
+//		System.out.println(UI.timeStampNano() + " onTTDisplayMouseMove - hoveredControl " + hoveredControl);
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
 		if (hoveredControl == null) {
 
 //			System.out.println(UI.timeStampNano() + " exit 0 hide");
@@ -811,7 +868,15 @@ public abstract class AnimatedToolTipShell {
 
 					// mouse is hovering the owner control
 
-					isKeepVisible = true;
+					if (_mouseOverBehaviour == MOUSE_OVER_BEHAVIOUR_NO_IGNORE) {
+
+						/*
+						 * owner is not ignored, which means the when the mouse is hovered the
+						 * owner, the tooltip keeps opened, this is the default
+						 */
+
+						isKeepVisible = true;
+					}
 
 //					System.out.println(UI.timeStampNano() + " exit 2 no hide");
 //					// TODO remove SYSTEM.OUT.PRINTLN
@@ -852,9 +917,9 @@ public abstract class AnimatedToolTipShell {
 		ttShellRect.width += 2 * margin;
 		ttShellRect.height += 2 * margin;
 
-		final Point cursorLocation = _display.getCursorLocation();
+		final Point displayCursorLocation = _display.getCursorLocation();
 
-		final boolean isInTooltip = ttShellRect.contains(cursorLocation);
+		final boolean isInTooltip = ttShellRect.contains(displayCursorLocation);
 
 		if (isKeepVisible == false && isHide == false && isInTooltip == false) {
 			isHide = true;
@@ -868,12 +933,20 @@ public abstract class AnimatedToolTipShell {
 
 		} else if (isHide) {
 
-			// hide definitively
+			final Rectangle noHideArea = noHideOnMouseMove();
 
-			ttHide(event);
+			if (noHideArea == null || noHideArea.contains(displayCursorLocation) == false) {
+
+				// hide definitively
+
+				ttHide(event);
+			}
 		}
 
-//		System.out.println("time\t" + ((float) (System.nanoTime() - start) / 1000000) + " ms");
+//		System.out.println(UI.timeStampNano()
+//				+ " onTTDisplayMouseMove"
+//				+ ((float) (System.nanoTime() - start) / 1000000)
+//				+ " ms");
 //		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
@@ -960,6 +1033,10 @@ public abstract class AnimatedToolTipShell {
 		_isDisplayListenerSet = false;
 	}
 
+	protected void setBehaviourOnMouseOver(final int mouseOverBehaviour) {
+		_mouseOverBehaviour = mouseOverBehaviour;
+	}
+
 	public void setReceiveMouseMoveEvent(final boolean isReceive) {
 		_isReceiveOnMouseMove = isReceive;
 	}
@@ -984,6 +1061,21 @@ public abstract class AnimatedToolTipShell {
 
 			removeTTDisplayListener();
 		}
+	}
+
+	/**
+	 * Set's the tooltip style, default is
+	 * {@link AnimatedToolTipShell#TOOLTIP_STYLE_RECREATE_CONTENT}.
+	 * 
+	 * @param toolTipStyle
+	 *            This is the style how the tooltip content is created.
+	 *            <p>
+	 *            Possible values:<br>
+	 *            {@link AnimatedToolTipShell#TOOLTIP_STYLE_RECREATE_CONTENT}
+	 *            {@link AnimatedToolTipShell#TOOLTIP_STYLE_KEEP_CONTENT}
+	 */
+	protected void setToolTipCreateStyle(final int toolTipStyle) {
+		_toolTipStyle = toolTipStyle;
 	}
 
 	private void showShellWhenVisible() {
@@ -1030,20 +1122,6 @@ public abstract class AnimatedToolTipShell {
 
 		animation10_Start();
 	}
-
-//	/**
-//	 * Hide current shell immediatedly without animation.
-//	 */
-//	void ttHideImmediatedly() {
-//
-//		_shell.setAlpha(0);
-//
-//		// hide shell
-//		setShellVisible(false);
-//
-//		_isShellFadingOut = false;
-//		_isShellFadingOut = false;
-//	}
 
 	private void ttShow() {
 

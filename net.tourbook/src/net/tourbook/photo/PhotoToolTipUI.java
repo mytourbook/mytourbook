@@ -67,7 +67,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 	private int								_displayedPhotosHash;
 
-	private final ArrayList<Photo>			_photoWrapperList				= new ArrayList<Photo>();
+	private final ArrayList<Photo>			_allPhotos						= new ArrayList<Photo>();
 
 	private ActionCloseToolTip				_actionCloseToolTip;
 	private ActionPinToolTip				_actionPinToolTip;
@@ -204,6 +204,14 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 	}
 
 	private void actionCloseToolTip() {
+
+		/*
+		 * hide gallery tooltip shell, when not closed this dialog keeps opened because it checks
+		 * that no other shells are open
+		 */
+		_photoGallery.closePhotoTooltip();
+
+		// hide this shell
 		ttHide();
 	}
 
@@ -292,6 +300,14 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		// force to show the same images
 
 		_displayedPhotosHash = Integer.MIN_VALUE;
+	}
+
+	@Override
+	protected void closeInternalShells() {
+
+		if (_photoGallery != null) {
+			_photoGallery.closePhotoTooltip();
+		}
 	}
 
 	private void createActions() {
@@ -576,14 +592,14 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		 * display photo images
 		 */
 		// create list containing all images
-		_photoWrapperList.clear();
+		_allPhotos.clear();
 		for (final ChartPhoto chartPhoto : hoveredPhotos) {
-			_photoWrapperList.add(chartPhoto.photo);
+			_allPhotos.add(chartPhoto.photo);
 		}
 
 		final String galleryPositionKey = hoveredPhotosHash + "_PhotoToolTipUI";//$NON-NLS-1$
 
-		_photoGallery.showImages(_photoWrapperList, galleryPositionKey);
+		_photoGallery.showImages(_allPhotos, galleryPositionKey);
 	}
 
 	private void updateUI_Colors(final Composite parent) {

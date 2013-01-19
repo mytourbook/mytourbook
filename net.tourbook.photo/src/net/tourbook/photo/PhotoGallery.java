@@ -211,6 +211,7 @@ public class PhotoGallery extends ImageGallery {
 		}
 
 		updateUI_RatingStarBehaviour(_ratingStarBehaviour);
+
 		setShowPhotoRatingStars(_ratingStarBehaviour);
 	}
 

@@ -218,7 +218,6 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 	private TourInfoToolTipProvider					_tourInfoToolTipProvider			= new TourInfoToolTipProvider();
 	private ITourToolTipProvider					_wayPointToolTipProvider			= new WayPointToolTipProvider();
-//	private ITourToolTipProvider					_photoToolTipProvider				= new PhotoToolTipProvider();
 
 	private String									_poiName;
 	private GeoPosition								_poiPosition;
@@ -264,6 +263,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 	private ActionDimMap							_actionDimMap;
 	private ActionManageMapProviders				_actionManageProvider;
+	private ActionPhotoFilter						_actionPhotoFilter;
 	private ActionReloadFailedMapImages				_actionReloadFailedMapImages;
 	private ActionSaveDefaultPosition				_actionSaveDefaultPosition;
 	private ActionSelectMapProvider					_actionSelectMapProvider;
@@ -326,6 +326,11 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		if (dialog.open() == Window.OK) {
 			_actionSelectMapProvider.updateMapProviders();
 		}
+	}
+
+	void actionPhotoFilter(final boolean isFilterActive) {
+		// TODO Auto-generated method stub
+
 	}
 
 	void actionPOI() {
@@ -886,7 +891,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		showDefaultMap(false);
 	}
 
-	private void createActions() {
+	private void createActions(final Composite parent) {
 
 		_actionTourColorAltitude = new ActionTourColor(
 				this,
@@ -945,6 +950,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		_actionSetDefaultPosition = new ActionSetDefaultPosition(this);
 		_actionSaveDefaultPosition = new ActionSaveDefaultPosition(this);
 
+		_actionPhotoFilter = new ActionPhotoFilter(this, parent, _state);
 		_actionShowPhotos = new ActionShowPhotos(this);
 		_actionShowAllPhotos = new ActionShowAllPhotos(this);
 		_actionShowSliderInMap = new ActionShowSliderInMap(this);
@@ -1429,7 +1435,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 			}
 		});
 
-		createActions();
+		createActions(parent);
 		createLegendProviders();
 
 		fillActionBars();
@@ -1528,7 +1534,9 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		/*
 		 * photo actions
 		 */
+		_actionPhotoFilter.setEnabled(canShowPhoto);
 		_actionShowAllPhotos.setEnabled(canShowPhoto);
+		_actionShowPhotos.setEnabled(isPhotoAvailable);
 		_actionSynchWithPhoto.setEnabled(canShowPhoto);
 
 		/*
@@ -1609,6 +1617,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		viewTbm.add(_actionTourColorHrZone);
 		viewTbm.add(new Separator());
 
+		viewTbm.add(_actionPhotoFilter);
 		viewTbm.add(_actionShowPhotos);
 		viewTbm.add(_actionShowAllPhotos);
 		viewTbm.add(_actionSynchWithPhoto);
@@ -1634,15 +1643,15 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		 */
 		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 
-		fillMapMenu(menuMgr);
+		fillMapContextMenu(menuMgr);
 	}
 
 	@Override
 	public void fillContextMenu(final IMenuManager menuMgr) {
-		fillMapMenu(menuMgr);
+		fillMapContextMenu(menuMgr);
 	}
 
-	private void fillMapMenu(final IMenuManager menuMgr) {
+	private void fillMapContextMenu(final IMenuManager menuMgr) {
 
 		menuMgr.add(_actionShowLegendInMap);
 		menuMgr.add(_actionShowScaleInMap);
@@ -2681,6 +2690,8 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		// restore map provider by selecting the last used map factory
 		_actionSelectMapProvider.selectMapProvider(_state.get(MEMENTO_SELECTED_MAP_PROVIDER_ID));
 
+		_actionPhotoFilter.restoreState();
+
 		// default position
 		_defaultZoom = Util.getStateInt(_state, MEMENTO_DEFAULT_POSITION_ZOOM, 10);
 		_defaultPosition = new GeoPosition(//
@@ -2823,6 +2834,8 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 			colorId = TOUR_COLOR_ALTITUDE;
 		}
 		_state.put(MEMENTO_TOUR_COLOR_ID, colorId);
+
+		_actionPhotoFilter.saveState();
 	}
 
 	/**

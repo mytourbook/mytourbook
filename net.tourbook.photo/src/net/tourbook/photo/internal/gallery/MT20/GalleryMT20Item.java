@@ -59,6 +59,11 @@ public class GalleryMT20Item {
 	 */
 	public boolean						isHovered;
 
+	/**
+	 * Is <code>true</code> when this gallery item is hovered and the UI needs to be updated.
+	 */
+	public boolean						isNeedPostUIUpdate;
+
 	public boolean						isInHoveredGroup;
 
 	/**
@@ -83,14 +88,44 @@ public class GalleryMT20Item {
 	public int							photoPaintedY;
 
 	public int							itemX_AnnotationPainted_Gps;
+
 	public int							itemXAnnotationPaintedTour;
+
 	public int							itemYAnnotationPainted;
-
 	public boolean						isHoveredAnnotationTour;
-
 
 	public GalleryMT20Item(final GalleryMT20 galleryMT20) {
 		this.gallery = galleryMT20;
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof GalleryMT20Item)) {
+			return false;
+		}
+		final GalleryMT20Item other = (GalleryMT20Item) obj;
+		if (uniqueItemID == null) {
+			if (other.uniqueItemID != null) {
+				return false;
+			}
+		} else if (!uniqueItemID.equals(other.uniqueItemID)) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((uniqueItemID == null) ? 0 : uniqueItemID.hashCode());
+		return result;
 	}
 
 	@Override

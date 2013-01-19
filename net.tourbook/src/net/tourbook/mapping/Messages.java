@@ -34,6 +34,10 @@ public class Messages extends NLS {
 
 	public static String	Image_Action_Map_SyncPhotoWithMap_Disabled;
 
+	public static String	Image_Action_PhotoFilter;
+
+	public static String	Image_Action_PhotoFilter_Disabled;
+
 	public static String		Image_Action_POI;
 	public static String		Image_Action_POI_Disabled;
 	public static String	Image_Action_ShowAllPhotosInMap;
@@ -110,6 +114,8 @@ public class Messages extends NLS {
 	public static String		map_action_set_default_position;
 
 	public static String		Map_Action_ManageMapProviders;
+	public static String	Map_Action_PhotoFilter_Tooltip;
+
 	public static String		Map_Action_POI;
 	public static String		Map_Action_POI_Tooltip;
 	public static String		Map_Action_SetDefaultMapProviders;

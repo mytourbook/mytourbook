@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -163,6 +163,10 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	private boolean						_isShowFullsizeLoadingMessage;
 	private boolean						_isShowPhotoRatingStars;
 	private boolean						_isRatingStarsPainted;
+
+	/**
+	 * Is <code>true</code> when rating stars can be modified.
+	 */
 	private boolean						_isHandleHoveredRatingStars;
 
 	private double						_imagePaintedZoomFactor;
@@ -1443,19 +1447,32 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	 * @param hoveredItem
 	 * @param itemMouseX
 	 * @param itemMouseY
+	 * @return
 	 */
-	public void itemIsHovered(final GalleryMT20Item hoveredItem, final int itemMouseX, final int itemMouseY) {
+	public boolean itemIsHovered(final GalleryMT20Item hoveredItem, final int itemMouseX, final int itemMouseY) {
 
-		itemIsHovered_Stars(hoveredItem, itemMouseX, itemMouseY);
-		itemIsHovered_Annotation(hoveredItem, itemMouseX, itemMouseY);
+		final boolean isStarsModified = itemIsHovered_Stars(hoveredItem, itemMouseX, itemMouseY);
+		final boolean isAnnotationModified = itemIsHovered_Annotation(hoveredItem, itemMouseX, itemMouseY);
+
+		return isStarsModified || isAnnotationModified;
 	}
 
-	private void itemIsHovered_Annotation(final GalleryMT20Item hoveredItem, final int itemMouseX, final int itemMouseY) {
+	/**
+	 * @param hoveredItem
+	 * @param itemMouseX
+	 * @param itemMouseY
+	 * @return Returns <code>true</code> when the hovered state has changed.
+	 */
+	private boolean itemIsHovered_Annotation(	final GalleryMT20Item hoveredItem,
+												final int itemMouseX,
+												final int itemMouseY) {
+
+		final boolean isHoveredBackup = hoveredItem.isHoveredAnnotationTour;
 
 		hoveredItem.isHoveredAnnotationTour = false;
 
 		if (itemMouseY < hoveredItem.itemYAnnotationPainted) {
-			return;
+			return isHoveredBackup == true;
 		}
 
 		final int paintedX = hoveredItem.itemXAnnotationPaintedTour;
@@ -1463,13 +1480,24 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		if (paintedX != Integer.MIN_VALUE && itemMouseX >= paintedX && itemMouseX <= paintedX + _annotationImageWidth) {
 			hoveredItem.isHoveredAnnotationTour = true;
 		}
+
+		return isHoveredBackup != hoveredItem.isHoveredAnnotationTour;
 	}
 
-	private void itemIsHovered_Stars(final GalleryMT20Item hoveredItem, final int itemMouseX, final int itemMouseY) {
+	/**
+	 * @param hoveredItem
+	 * @param itemMouseX
+	 * @param itemMouseY
+	 * @return Returns <code>true</code> when the hovered state or the selection has changed.
+	 */
+	private boolean itemIsHovered_Stars(final GalleryMT20Item hoveredItem, final int itemMouseX, final int itemMouseY) {
 
-		if (_isHandleHoveredRatingStars == false) {
-			return;
+		if (_isHandleHoveredRatingStars == false || _isAttributesPainted == false) {
+			return false;
 		}
+
+		final int backupHoveredStars = hoveredItem.hoveredStars;
+		final Collection<GalleryMT20Item> backupSelectedItems = hoveredItem.allSelectedGalleryItems;
 
 		int hoveredStars;
 
@@ -1484,6 +1512,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 			hoveredStars = 0;
 		}
 
+		boolean isSelectionModified = false;
 		final HashMap<String, GalleryMT20Item> selectedItemsMap = _galleryMT.getSelectedItems();
 
 		if (selectedItemsMap.containsKey(hoveredItem.uniqueItemID)) {
@@ -1500,6 +1529,11 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 			hoveredItem.allSelectedGalleryItems = selectedItems;
 
+			isSelectionModified = (backupSelectedItems == null && hoveredItem.allSelectedGalleryItems != null)
+			//
+					|| (backupSelectedItems != null && selectedItems != null && backupSelectedItems.hashCode() != selectedItems
+							.hashCode());
+
 		} else {
 
 			/*
@@ -1508,6 +1542,10 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 			hoveredItem.hoveredStars = hoveredStars;
 		}
+
+		final boolean isHoveredStarsModified = backupHoveredStars != hoveredItem.hoveredStars;
+
+		return isHoveredStarsModified || isSelectionModified;
 	}
 
 	@Override
