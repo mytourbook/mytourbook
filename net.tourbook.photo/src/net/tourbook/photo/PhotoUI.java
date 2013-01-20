@@ -15,19 +15,35 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
+import net.tourbook.common.UI;
 import net.tourbook.photo.internal.Activator;
+import net.tourbook.photo.internal.Messages;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.resource.ColorRegistry;
+import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
 
 public class PhotoUI {
 
-	public static Styler	PHOTO_FOLDER_STYLER;
-	public static Styler	PHOTO_FILE_STYLER;
+	public static Styler		PHOTO_FOLDER_STYLER;
+	public static Styler		PHOTO_FILE_STYLER;
+
+	public static final String	PHOTO_ANNOTATION_GPS_EXIF				= "PHOTO_ANNOTATION_GPS_EXIF";				//$NON-NLS-1$
+	public static final String	PHOTO_ANNOTATION_GPS_TOUR				= "PHOTO_ANNOTATION_GPS_TOUR";				//$NON-NLS-1$
+	public static final String	PHOTO_ANNOTATION_SAVED_IN_TOUR			= "PHOTO_ANNOTATION_SAVED_IN_TOUR";		//$NON-NLS-1$
+	public static final String	PHOTO_ANNOTATION_SAVED_IN_TOUR_HOVERED	= "PHOTO_ANNOTATION_SAVED_IN_TOUR_HOVERED"; //$NON-NLS-1$
+
+	public static final String	PHOTO_RATING_STAR						= "PHOTO_RATING_STAR";						//$NON-NLS-1$
+	public static final String	PHOTO_RATING_STAR_AND_HOVERED			= "PHOTO_RATING_STAR_AND_HOVERED";			//$NON-NLS-1$
+	public static final String	PHOTO_RATING_STAR_DELETE				= "PHOTO_RATING_STAR_DELETE";				//$NON-NLS-1$
+	public static final String	PHOTO_RATING_STAR_DISABLED				= "PHOTO_RATING_STAR_DISABLED";			//$NON-NLS-1$
+	public static final String	PHOTO_RATING_STAR_HOVERED				= "PHOTO_RATING_STAR_HOVERED";				//$NON-NLS-1$
+	public static final String	PHOTO_RATING_STAR_NOT_HOVERED			= "PHOTO_RATING_STAR_NOT_HOVERED";			//$NON-NLS-1$
+	public static final String	PHOTO_RATING_STAR_NOT_HOVERED_BUT_SET	= "PHOTO_RATING_STAR_NOT_HOVERED_BUT_SET";	//$NON-NLS-1$
 
 	static {
 
@@ -38,6 +54,34 @@ public class PhotoUI {
 		 */
 		PHOTO_FOLDER_STYLER = StyledString.createColorRegistryStyler(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOLDER, null);
 		PHOTO_FILE_STYLER = StyledString.createColorRegistryStyler(IPhotoPreferences.PHOTO_VIEWER_COLOR_FILE, null);
+
+		final ImageRegistry imageRegistry = UI.IMAGE_REGISTRY;
+
+		imageRegistry.put(PHOTO_ANNOTATION_GPS_EXIF, //
+				Activator.getImageDescriptor(Messages.Image__PhotoAnnotationExifGPS));
+		imageRegistry.put(PHOTO_ANNOTATION_GPS_TOUR,//
+				Activator.getImageDescriptor(Messages.Image__PhotoAnnotationTourGPS));
+
+		imageRegistry.put(PHOTO_ANNOTATION_SAVED_IN_TOUR,//
+				Activator.getImageDescriptor(Messages.Image__PhotoAnnotationSavedInTour));
+		imageRegistry.put(PHOTO_ANNOTATION_SAVED_IN_TOUR_HOVERED,//
+				Activator.getImageDescriptor(Messages.Image__PhotoAnnotationSavedInTourHovered));
+
+		imageRegistry.put(PHOTO_RATING_STAR,//
+				Activator.getImageDescriptor(Messages.Image__PhotoRatingStar));
+		imageRegistry.put(PHOTO_RATING_STAR_AND_HOVERED,//
+				Activator.getImageDescriptor(Messages.Image__PhotoRatingStarAndHovered));
+		imageRegistry.put(PHOTO_RATING_STAR_DISABLED,//
+				Activator.getImageDescriptor(Messages.Image__PhotoRatingStarDisabled));
+		imageRegistry.put(PHOTO_RATING_STAR_DELETE,//
+				Activator.getImageDescriptor(Messages.Image__PhotoRatingStarDelete));
+		imageRegistry.put(PHOTO_RATING_STAR_HOVERED,//
+				Activator.getImageDescriptor(Messages.Image__PhotoRatingStarHovered));
+		imageRegistry.put(PHOTO_RATING_STAR_NOT_HOVERED,//
+				Activator.getImageDescriptor(Messages.Image__PhotoRatingStarNotHovered));
+		imageRegistry.put(PHOTO_RATING_STAR_NOT_HOVERED_BUT_SET,//
+				Activator.getImageDescriptor(Messages.Image__PhotoRatingStarNotHoveredButSet));
+
 	}
 
 	/**

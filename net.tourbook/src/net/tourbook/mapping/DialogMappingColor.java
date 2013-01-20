@@ -231,7 +231,7 @@ public class DialogMappingColor extends TitleAreaDialog {
 			gc.setBackground(transparentColor);
 			gc.fillRectangle(imageBounds);
 
-			TourPainter.drawLegend(gc, imageBounds, _legendProvider, true);
+			TourMapPainter.drawLegend(gc, imageBounds, _legendProvider, true);
 		}
 		gc.dispose();
 		transparentColor.dispose();

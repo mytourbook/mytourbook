@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -66,7 +66,7 @@ import de.byteholder.geoclipse.mapprovider.MP;
 /**
  * Paints a tour into the map
  */
-public class TourPainter extends MapPainter {
+public class TourMapPainter extends MapPainter {
 
 	private static final int				MARKER_MARGIN		= 2;
 	private static final int				MARKER_POLE			= 16;
@@ -137,7 +137,7 @@ public class TourPainter extends MapPainter {
 		}
 	}
 
-	public TourPainter() {
+	public TourMapPainter() {
 
 		super();
 
@@ -572,6 +572,9 @@ public class TourPainter extends MapPainter {
 		final ArrayList<TourData> tourDataList = _tourPaintConfig.getTourData();
 		final ArrayList<Photo> photoList = _tourPaintConfig.getPhotos();
 
+//		System.out.println(net.tourbook.common.UI.timeStampNano() + " doPaint\t" + ("\tphotos=" + photoList.size()));
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
 		if (tourDataList.size() == 0 && photoList.size() == 0) {
 			return false;
 		}
@@ -808,6 +811,7 @@ public class TourPainter extends MapPainter {
 		final int devYPhoto = photoWorldPixel.y - tilwWorldPixelY;
 
 		final org.eclipse.swt.graphics.Point photoSize = photo.getMapImageSize();
+
 		final boolean isPhotoInTile = isPhotoInTile(photoSize, devXPhoto, devYPhoto, tileSize);
 
 		if (isPhotoInTile) {

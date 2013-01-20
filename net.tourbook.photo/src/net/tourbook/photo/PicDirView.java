@@ -41,6 +41,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Sash;
 import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 
@@ -368,12 +369,13 @@ public class PicDirView extends ViewPart implements IPhotoEventListener {
 	}
 
 	@Override
-	public void photoEvent(final PhotoEventId photoEventId, final Object data) {
+	public void photoEvent(final IViewPart viewPart, final PhotoEventId photoEventId, final Object data) {
 
 		_picDirImages.photoEvent(photoEventId, data);
 	}
 
 	public void refreshUI() {
+
 		_picDirImages.refreshUI();
 	}
 

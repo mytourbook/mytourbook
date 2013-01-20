@@ -1732,8 +1732,8 @@ public class Map extends Canvas {
 
 			final GC gc = event.gc;
 
-//			final long startImage = System.nanoTime();
-//			// TODO remove SYSTEM.OUT.PRINTLN
+			final long startImage = System.nanoTime();
+			// TODO remove SYSTEM.OUT.PRINTLN
 
 			gc.drawImage(_mapImage, 0, 0);
 

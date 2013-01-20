@@ -1073,7 +1073,7 @@
 
    <extension
          point="net.tourbook.mapOverlay">
-      <painter class="net.tourbook.mapping.TourPainter"/>
+      <painter class="net.tourbook.mapping.TourMapPainter"/>
    </extension>
 
 

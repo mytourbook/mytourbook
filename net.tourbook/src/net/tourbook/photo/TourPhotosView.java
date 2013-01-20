@@ -51,6 +51,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
@@ -487,7 +488,7 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 	}
 
 	@Override
-	public void photoEvent(final PhotoEventId photoEventId, final Object data) {
+	public void photoEvent(final IViewPart viewPart, final PhotoEventId photoEventId, final Object data) {
 
 		if (photoEventId == PhotoEventId.PHOTO_SELECTION) {
 

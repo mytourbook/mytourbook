@@ -30,6 +30,8 @@ import net.tourbook.photo.PhotoImageCache;
 import net.tourbook.photo.PhotoImageMetadata;
 import net.tourbook.photo.PhotoLoadManager;
 import net.tourbook.photo.PhotoLoadingState;
+import net.tourbook.photo.PhotoUI;
+import net.tourbook.photo.RatingStars;
 import net.tourbook.photo.internal.gallery.MT20.AbstractGalleryMT20ItemRenderer;
 import net.tourbook.photo.internal.gallery.MT20.DefaultGalleryMT20ItemRenderer;
 import net.tourbook.photo.internal.gallery.MT20.GalleryMT20;
@@ -38,6 +40,7 @@ import net.tourbook.photo.internal.gallery.MT20.PaintingResult;
 import net.tourbook.photo.internal.gallery.MT20.RendererHelper;
 import net.tourbook.photo.internal.gallery.MT20.ZoomState;
 
+import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -61,36 +64,21 @@ import org.joda.time.format.DateTimeFormatter;
  */
 public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
-	private static final String			PHOTO_ANNOTATION_GPS_EXIF				= "PHOTO_ANNOTATION_GPS_EXIF";				//$NON-NLS-1$
-	private static final String			PHOTO_ANNOTATION_GPS_TOUR				= "PHOTO_ANNOTATION_GPS_TOUR";				//$NON-NLS-1$
-	private static final String			PHOTO_ANNOTATION_SAVED_IN_TOUR			= "PHOTO_ANNOTATION_SAVED_IN_TOUR";		//$NON-NLS-1$
-	private static final String			PHOTO_ANNOTATION_SAVED_IN_TOUR_HOVERED	= "PHOTO_ANNOTATION_SAVED_IN_TOUR_HOVERED"; //$NON-NLS-1$
-
-	private static final String			PHOTO_RATING_STAR						= "PHOTO_RATING_STAR";						//$NON-NLS-1$
-	private static final String			PHOTO_RATING_STAR_AND_HOVERED			= "PHOTO_RATING_STAR_AND_HOVERED";			//$NON-NLS-1$
-	private static final String			PHOTO_RATING_STAR_DELETE				= "PHOTO_RATING_STAR_DELETE";				//$NON-NLS-1$
-	private static final String			PHOTO_RATING_STAR_DISABLED				= "PHOTO_RATING_STAR_DISABLED";			//$NON-NLS-1$
-	private static final String			PHOTO_RATING_STAR_HOVERED				= "PHOTO_RATING_STAR_HOVERED";				//$NON-NLS-1$
-	private static final String			PHOTO_RATING_STAR_NOT_HOVERED			= "PHOTO_RATING_STAR_NOT_HOVERED";			//$NON-NLS-1$
-	private static final String			PHOTO_RATING_STAR_NOT_HOVERED_BUT_SET	= "PHOTO_RATING_STAR_NOT_HOVERED_BUT_SET";	//$NON-NLS-1$
-
 	/**
 	 * Device width for all rating stars.
 	 */
 	private static int					MAX_RATING_STARS_WIDTH;
 
-	private static final int			MAX_RATING_STARS						= 5;
-
 	/**
 	 * this value has been evaluated by some test
 	 */
-	private int							_textMinThumbSize						= 50;
+	private int							_textMinThumbSize		= 50;
 
-	private int							_fontHeight								= -1;
+	private int							_fontHeight				= -1;
 
-	private final DateTimeFormatter		_dtFormatterDate						= DateTimeFormat.forStyle("M-");			//$NON-NLS-1$
-	private final DateTimeFormatter		_dtFormatterTime						= DateTimeFormat.forStyle("-F");			//$NON-NLS-1$
-	private final DateTimeFormatter		_dtFormatterDateTime					= DateTimeFormat.forStyle("MM");			//$NON-NLS-1$
+	private final DateTimeFormatter		_dtFormatterDate		= DateTimeFormat.forStyle("M-");			//$NON-NLS-1$
+	private final DateTimeFormatter		_dtFormatterTime		= DateTimeFormat.forStyle("-F");			//$NON-NLS-1$
+	private final DateTimeFormatter		_dtFormatterDateTime	= DateTimeFormat.forStyle("MM");			//$NON-NLS-1$
 
 //	private final DateTimeFormatter		_dtFormatterDateTime	= new DateTimeFormatterBuilder()
 //																		.appendYear(4, 4)
@@ -135,8 +123,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	private ImageGallery				_imageGallery;
 	private GalleryMT20					_galleryMT;
 
-	private int							_gridBorderSize							= 1;
-	private int							_imageBorderSize						= 5;
+	private int							_gridBorderSize			= 1;
+	private int							_imageBorderSize		= 5;
 
 	/**
 	 * photo dimension without grid border but including image border
@@ -155,7 +143,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	/**
 	 * Width for the painted image or <code>-1</code> when not initialized.
 	 */
-	private int							_paintedDest_Width						= -1;
+	private int							_paintedDest_Width		= -1;
 	private int							_paintedDest_Height;
 
 	private boolean						_isShowFullsizeHQImage;
@@ -196,9 +184,9 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	private boolean						_isFullsizeImageAvailable;
 	private boolean						_isFullsizeLoadingError;
 
-	private final DateTimeFormatter		_dtFormatter							= DateTimeFormat.forStyle("ML");			//$NON-NLS-1$
-	private final DateTimeFormatter		_dtWeekday								= DateTimeFormat.forPattern("E");			//$NON-NLS-1$
-	private final NumberFormat			_nfMByte								= NumberFormat.getNumberInstance();
+	private final DateTimeFormatter		_dtFormatter			= DateTimeFormat.forStyle("ML");			//$NON-NLS-1$
+	private final DateTimeFormatter		_dtWeekday				= DateTimeFormat.forPattern("E");			//$NON-NLS-1$
+	private final NumberFormat			_nfMByte				= NumberFormat.getNumberInstance();
 	{
 		_nfMByte.setMinimumFractionDigits(3);
 		_nfMByte.setMaximumFractionDigits(3);
@@ -213,12 +201,12 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	/*
 	 * UI resources
 	 */
-	private Color						_fullsizeBgColor						= Display.getCurrent()//
-																						.getSystemColor(SWT.COLOR_BLACK);
-	private Color						_fgColor								= Display.getCurrent()//
-																						.getSystemColor(SWT.COLOR_WHITE);
-	private Color						_bgColor								= Display.getCurrent()//
-																						.getSystemColor(SWT.COLOR_RED);
+	private Color						_fullsizeBgColor		= Display.getCurrent()//
+																		.getSystemColor(SWT.COLOR_BLACK);
+	private Color						_fgColor				= Display.getCurrent()//
+																		.getSystemColor(SWT.COLOR_WHITE);
+	private Color						_bgColor				= Display.getCurrent()//
+																		.getSystemColor(SWT.COLOR_RED);
 	private Color						_selectionFgColor;
 	private Color						_noFocusSelectionFgColor;
 
@@ -237,43 +225,20 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 	static {
 
-		UI.IMAGE_REGISTRY.put(PHOTO_ANNOTATION_GPS_EXIF, //
-				Activator.getImageDescriptor(Messages.Image__PhotoAnnotationExifGPS));
-		UI.IMAGE_REGISTRY.put(PHOTO_ANNOTATION_GPS_TOUR,//
-				Activator.getImageDescriptor(Messages.Image__PhotoAnnotationTourGPS));
+		final ImageRegistry imageRegistry = UI.IMAGE_REGISTRY;
 
-		UI.IMAGE_REGISTRY.put(PHOTO_ANNOTATION_SAVED_IN_TOUR,//
-				Activator.getImageDescriptor(Messages.Image__PhotoAnnotationSavedInTour));
-		UI.IMAGE_REGISTRY.put(PHOTO_ANNOTATION_SAVED_IN_TOUR_HOVERED,//
-				Activator.getImageDescriptor(Messages.Image__PhotoAnnotationSavedInTourHovered));
+		_imageAnnotationGpsExif = imageRegistry.get(PhotoUI.PHOTO_ANNOTATION_GPS_EXIF);
+		_imageAnnotationGpsTour = imageRegistry.get(PhotoUI.PHOTO_ANNOTATION_GPS_TOUR);
+		_imageAnnotationSavedInTour = imageRegistry.get(PhotoUI.PHOTO_ANNOTATION_SAVED_IN_TOUR);
+		_imageAnnotationSavedInTour_Hovered = imageRegistry.get(PhotoUI.PHOTO_ANNOTATION_SAVED_IN_TOUR_HOVERED);
 
-		UI.IMAGE_REGISTRY.put(PHOTO_RATING_STAR,//
-				Activator.getImageDescriptor(Messages.Image__PhotoRatingStar));
-		UI.IMAGE_REGISTRY.put(PHOTO_RATING_STAR_AND_HOVERED,//
-				Activator.getImageDescriptor(Messages.Image__PhotoRatingStarAndHovered));
-		UI.IMAGE_REGISTRY.put(PHOTO_RATING_STAR_DISABLED,//
-				Activator.getImageDescriptor(Messages.Image__PhotoRatingStarDisabled));
-		UI.IMAGE_REGISTRY.put(PHOTO_RATING_STAR_DELETE,//
-				Activator.getImageDescriptor(Messages.Image__PhotoRatingStarDelete));
-		UI.IMAGE_REGISTRY.put(PHOTO_RATING_STAR_HOVERED,//
-				Activator.getImageDescriptor(Messages.Image__PhotoRatingStarHovered));
-		UI.IMAGE_REGISTRY.put(PHOTO_RATING_STAR_NOT_HOVERED,//
-				Activator.getImageDescriptor(Messages.Image__PhotoRatingStarNotHovered));
-		UI.IMAGE_REGISTRY.put(PHOTO_RATING_STAR_NOT_HOVERED_BUT_SET,//
-				Activator.getImageDescriptor(Messages.Image__PhotoRatingStarNotHoveredButSet));
-
-		_imageAnnotationGpsExif = UI.IMAGE_REGISTRY.get(PHOTO_ANNOTATION_GPS_EXIF);
-		_imageAnnotationGpsTour = UI.IMAGE_REGISTRY.get(PHOTO_ANNOTATION_GPS_TOUR);
-		_imageAnnotationSavedInTour = UI.IMAGE_REGISTRY.get(PHOTO_ANNOTATION_SAVED_IN_TOUR);
-		_imageAnnotationSavedInTour_Hovered = UI.IMAGE_REGISTRY.get(PHOTO_ANNOTATION_SAVED_IN_TOUR_HOVERED);
-
-		_imageRatingStar = UI.IMAGE_REGISTRY.get(PHOTO_RATING_STAR);
-		_imageRatingStarAndHovered = UI.IMAGE_REGISTRY.get(PHOTO_RATING_STAR_AND_HOVERED);
-		_imageRatingStarDelete = UI.IMAGE_REGISTRY.get(PHOTO_RATING_STAR_DELETE);
-		_imageRatingStarDisabled = UI.IMAGE_REGISTRY.get(PHOTO_RATING_STAR_DISABLED);
-		_imageRatingStarHovered = UI.IMAGE_REGISTRY.get(PHOTO_RATING_STAR_HOVERED);
-		_imageRatingStarNotHovered = UI.IMAGE_REGISTRY.get(PHOTO_RATING_STAR_NOT_HOVERED);
-		_imageRatingStarNotHoveredButSet = UI.IMAGE_REGISTRY.get(PHOTO_RATING_STAR_NOT_HOVERED_BUT_SET);
+		_imageRatingStar = imageRegistry.get(PhotoUI.PHOTO_RATING_STAR);
+		_imageRatingStarAndHovered = imageRegistry.get(PhotoUI.PHOTO_RATING_STAR_AND_HOVERED);
+		_imageRatingStarDelete = imageRegistry.get(PhotoUI.PHOTO_RATING_STAR_DELETE);
+		_imageRatingStarDisabled = imageRegistry.get(PhotoUI.PHOTO_RATING_STAR_DISABLED);
+		_imageRatingStarHovered = imageRegistry.get(PhotoUI.PHOTO_RATING_STAR_HOVERED);
+		_imageRatingStarNotHovered = imageRegistry.get(PhotoUI.PHOTO_RATING_STAR_NOT_HOVERED);
+		_imageRatingStarNotHoveredButSet = imageRegistry.get(PhotoUI.PHOTO_RATING_STAR_NOT_HOVERED_BUT_SET);
 
 		final Rectangle bounds = _imageAnnotationGpsExif.getBounds();
 		_annotationImageWidth = bounds.width;
@@ -283,7 +248,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		_ratingStarImageWidth = ratingStarBounds.width;
 		_ratingStarImageHeight = ratingStarBounds.height;
 
-		MAX_RATING_STARS_WIDTH = _ratingStarImageWidth * MAX_RATING_STARS;
+		MAX_RATING_STARS_WIDTH = _ratingStarImageWidth * RatingStars.MAX_RATING_STARS;
 	}
 
 	public PhotoRenderer(final GalleryMT20 galleryMT20, final ImageGallery imageGallery) {
@@ -1141,7 +1106,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		// center ratings stars in the middle of the image
 		final int ratingStarsLeftBorder = galleryItem.photoPaintedX + _photoWidth / 2 - MAX_RATING_STARS_WIDTH / 2;
 
-		for (int starIndex = 0; starIndex < MAX_RATING_STARS; starIndex++) {
+		for (int starIndex = 0; starIndex < RatingStars.MAX_RATING_STARS; starIndex++) {
 
 			Image starImage;
 

@@ -435,7 +435,9 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 		// update viewer UI
 		_tourViewer.update(modifiedLinks.toArray(), null);
 
-		PhotoManager.fireEvent(PhotoEventId.PHOTO_ATTRIBUTES_ARE_MODIFIED, new ArrayList<Photo>(modifiedPhotos));
+		PhotoManager.firePhotoEvent(this, //
+				PhotoEventId.PHOTO_ATTRIBUTES_ARE_MODIFIED,
+				new ArrayList<Photo>(modifiedPhotos));
 	}
 
 	private void addPartListener() {
@@ -1276,7 +1278,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 		// fire selection
 		if (_tourPhotoLinkSelection != null) {
-			PhotoManager.fireEvent(PhotoEventId.PHOTO_SELECTION, _tourPhotoLinkSelection);
+			PhotoManager.firePhotoEvent(this, PhotoEventId.PHOTO_SELECTION, _tourPhotoLinkSelection);
 		}
 	}
 
@@ -1414,7 +1416,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 		// create tour selection
 		_tourPhotoLinkSelection = new TourPhotoLinkSelection(_selectedLinks, selectedTourIds);
 
-		PhotoManager.fireEvent(PhotoEventId.PHOTO_SELECTION, _tourPhotoLinkSelection);
+		PhotoManager.firePhotoEvent(this, PhotoEventId.PHOTO_SELECTION, _tourPhotoLinkSelection);
 	}
 
 	@Override

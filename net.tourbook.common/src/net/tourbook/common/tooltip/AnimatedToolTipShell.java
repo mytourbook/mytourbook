@@ -38,35 +38,35 @@ import org.eclipse.swt.widgets.Widget;
  */
 public abstract class AnimatedToolTipShell {
 
-	public static final int				TOOLTIP_STYLE_RECREATE_CONTENT		= 0;
-	public static final int				TOOLTIP_STYLE_KEEP_CONTENT			= 1;
+	public static final int				TOOLTIP_STYLE_RECREATE_CONTENT			= 0;
+	public static final int				TOOLTIP_STYLE_KEEP_CONTENT				= 1;
 
-	public static final int				MOUSE_OVER_BEHAVIOUR_NO_IGNORE		= 0;
-	public static final int				MOUSE_OVER_BEHAVIOUR_IGNORE_OWNER	= 1;
+	public static final int				MOUSE_OVER_BEHAVIOUR_NO_IGNORE			= 0;
+	public static final int				MOUSE_OVER_BEHAVIOUR_IGNORE_OWNER		= 1;
 
 	/**
 	 * how long each tick is when fading in/out (in ms)
 	 */
-	private static final int			FADE_TIME_INTERVAL					= UI.IS_OSX ? 10 : 10;
+	private static final int			FADE_TIME_INTERVAL						= UI.IS_OSX ? 10 : 10;
 
 	/**
 	 * Number of steps when fading in
 	 */
-	private static final int			FADE_IN_STEPS						= 20;
+	private static final int			FADE_IN_STEPS							= 20;
 
 	/**
 	 * Number of steps when fading out
 	 */
-	private static final int			FADE_OUT_STEPS						= 10;
+	private static final int			FADE_OUT_STEPS							= 10;
 
 	/**
 	 * Number of steps before fading out
 	 */
-	private static final int			FADE_OUT_DELAY_STEPS				= 20;
+	private static final int			FADE_OUT_DELAY_STEPS					= 20;
 
-	private static final int			MOVE_STEPS							= 20;
+	private static final int			MOVE_STEPS								= 20;
 
-	private static final int			ALPHA_OPAQUE						= 0xff;
+	private static final int			ALPHA_OPAQUE							= 0xff;
 
 	private OwnerControlListener		_ownerControlListener;
 	private OwnerShellListener			_ownerShellListener;
@@ -90,7 +90,7 @@ public abstract class AnimatedToolTipShell {
 	private boolean						_isShellFadingIn;
 
 	private Point						_shellStartLocation;
-	private Point						_shellEndLocation					= new Point(0, 0);
+	private Point						_shellEndLocation						= new Point(0, 0);
 
 	private int							_fadeOutDelayCounter;
 
@@ -99,8 +99,13 @@ public abstract class AnimatedToolTipShell {
 
 	private boolean						_isReceiveOnMouseMove;
 
-	private int							_toolTipStyle						= TOOLTIP_STYLE_RECREATE_CONTENT;
-	private int							_mouseOverBehaviour					= MOUSE_OVER_BEHAVIOUR_NO_IGNORE;
+	/*
+	 * these settings are modifying the default behaviour which was implemented to show a photo
+	 * gallery tooltip
+	 */
+	private int							_toolTipStyle							= TOOLTIP_STYLE_RECREATE_CONTENT;
+	private int							_mouseOverBehaviour						= MOUSE_OVER_BEHAVIOUR_NO_IGNORE;
+	private boolean						_isKeepToolTipOpenWhenResizedOrMoved	= true;
 
 	/*
 	 * UI resources
@@ -499,6 +504,9 @@ public abstract class AnimatedToolTipShell {
 
 	protected abstract boolean canShowToolTip();
 
+	/**
+	 * Close tooltip immediatedly without animation.
+	 */
 	public void close() {
 
 		if (_shell != null) {
@@ -534,7 +542,10 @@ public abstract class AnimatedToolTipShell {
 			 */
 			_shell = new Shell(_ownerControl.getShell(), //
 					SWT.ON_TOP //
-							| SWT.TOOL
+							/*
+							 * SWT.TOOL must be disabled that NO_FOCUS is working !!!
+							 */
+//							| SWT.TOOL
 							| SWT.NO_FOCUS);
 
 			_shell.setLayout(new FillLayout());
@@ -740,6 +751,7 @@ public abstract class AnimatedToolTipShell {
 		case SWT.Move:
 
 			showShellWhenVisible();
+
 			break;
 		}
 	}
@@ -1037,6 +1049,10 @@ public abstract class AnimatedToolTipShell {
 		_mouseOverBehaviour = mouseOverBehaviour;
 	}
 
+	public void setIsKeepShellOpenWhenMoved(final boolean isKeepShellOpenWhenMoved) {
+		_isKeepToolTipOpenWhenResizedOrMoved = isKeepShellOpenWhenMoved;
+	}
+
 	public void setReceiveMouseMoveEvent(final boolean isReceive) {
 		_isReceiveOnMouseMove = isReceive;
 	}
@@ -1079,6 +1095,10 @@ public abstract class AnimatedToolTipShell {
 	}
 
 	private void showShellWhenVisible() {
+
+		if (_isKeepToolTipOpenWhenResizedOrMoved == false) {
+			return;
+		}
 
 		if (_shell == null || _shell.isDisposed() || _shell.isVisible() == false) {
 			return;

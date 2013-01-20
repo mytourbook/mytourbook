@@ -781,9 +781,31 @@ public class Messages extends NLS {
 
 	public static String		NT001_DialogExtractTour_InvalidTourData;
 
+	public static String	Photo_Filter_Label_NumberOfAllPhotos;
+
+	public static String	Photo_Filter_Label_NumberOfAllPhotos_Tooltip;
+
+	public static String	Photo_Filter_Label_NumberOfFilteredPhotos;
+
+	public static String	Photo_Filter_Label_NumberOfFilteredPhotos_Tooltip;
+
+	public static String	Photo_Filter_Label_RatingStars;
+
+	public static String	Photo_Filter_Label_RatingStars_Tooltip;
+
+	public static String	Photo_Filter_Operator_IsEqual;
+
+	public static String	Photo_Filter_Operator_IsLess;
+
+	public static String	Photo_Filter_Operator_IsMore;
+
 	public static String		Photo_Gallery_Action_ToggleGalleryHorizontal_ToolTip;
 	public static String		Photo_Gallery_Action_ToggleGalleryVertical_ToolTip;
 	public static String		Photo_Gallery_Label_NoTourWithPhoto;
+
+	public static String	Photo_Properties_Label_Size;
+
+	public static String	Photo_Properties_Label_ThumbnailSize_Tooltip;
 
 	public static String		Photo_Tooltip_Action_MoveToolTip_ToolTip;
 	public static String		Photo_Tooltip_Action_PinToolTip_ToolTip;

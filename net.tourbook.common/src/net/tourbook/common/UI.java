@@ -149,6 +149,8 @@ public class UI {
 	 */
 	public static final String			IMAGE_ACTION_PHOTO_FILTER			= "IMAGE_ACTION_PHOTO_FILTER";												//$NON-NLS-1$
 	public static final String			IMAGE_ACTION_PHOTO_FILTER_DISABLED	= "IMAGE_ACTION_PHOTO_FILTER_DISABLED";									//$NON-NLS-1$
+//	public static final String			IMAGE_ACTION_PHOTO_PROPERTIES			= "IMAGE_ACTION_PHOTO_PROPERTIES";											//$NON-NLS-1$
+//	public static final String			IMAGE_ACTION_PHOTO_PROPERTIES_DISABLED	= "IMAGE_ACTION_PHOTO_PROPERTIES_DISABLED";								//$NON-NLS-1$
 	public static final String			IMAGE_CONFIGURE_COLUMNS				= "IMAGE_CONFIGURE_COLUMNS";												//$NON-NLS-1$
 	public static final String			IMAGE_EMPTY_16						= "_empty16";																//$NON-NLS-1$
 
@@ -158,11 +160,18 @@ public class UI {
 
 		IMAGE_REGISTRY = Activator.getDefault().getImageRegistry();
 
-		IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER, Activator.getImageDescriptor(Messages.Image_Action_PhotoFilter));
+		IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER, //
+				Activator.getImageDescriptor(Messages.Image_Action_PhotoFilter));
 		IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER_DISABLED,//
 				Activator.getImageDescriptor(Messages.Image_Action_PhotoFilter_Disabled));
-		IMAGE_REGISTRY.put(IMAGE_CONFIGURE_COLUMNS, Activator.getImageDescriptor(Messages.Image__ConfigureColumns));
-		IMAGE_REGISTRY.put(IMAGE_EMPTY_16, Activator.getImageDescriptor(Messages.Image___Empty16));
+//		IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_PROPERTIES, //
+//				Activator.getImageDescriptor(Messages.Image_Action_PhotoProperties));
+//		IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_PROPERTIES_DISABLED,//
+//				Activator.getImageDescriptor(Messages.Image_Action_PhotoProperties_Disabled));
+		IMAGE_REGISTRY.put(IMAGE_CONFIGURE_COLUMNS, //
+				Activator.getImageDescriptor(Messages.Image__ConfigureColumns));
+		IMAGE_REGISTRY.put(IMAGE_EMPTY_16, //
+				Activator.getImageDescriptor(Messages.Image___Empty16));
 
 		// weather images
 		IMAGE_REGISTRY.put(IWeather.WEATHER_ID_CLEAR, //

@@ -135,10 +135,10 @@ public class DirectMappingPainter implements IDirectPainter {
 		}
 
 		// get first tour painter
-		TourPainter tourPainter = null;
+		TourMapPainter tourPainter = null;
 		for (final MapPainter mapPainter : allMapPainter) {
-			if (mapPainter instanceof TourPainter) {
-				tourPainter = (TourPainter) mapPainter;
+			if (mapPainter instanceof TourMapPainter) {
+				tourPainter = (TourMapPainter) mapPainter;
 				break;
 			}
 		}

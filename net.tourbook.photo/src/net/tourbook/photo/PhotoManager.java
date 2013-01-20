@@ -16,6 +16,7 @@
 package net.tourbook.photo;
 
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.ui.IViewPart;
 
 public class PhotoManager {
 
@@ -29,14 +30,14 @@ public class PhotoManager {
 		_photoEventListeners.add(listener);
 	}
 
-	public static void fireEvent(final PhotoEventId photoEventId, final Object data) {
+	public static void firePhotoEvent(final IViewPart viewPart, final PhotoEventId photoEventId, final Object data) {
 
 //		System.out.println(UI.timeStampNano() + " PhotoManager\tfireEvent\t" + data.getClass().getSimpleName());
 //		// TODO remove SYSTEM.OUT.PRINTLN
 
 		final Object[] allListeners = _photoEventListeners.getListeners();
 		for (final Object listener : allListeners) {
-			((IPhotoEventListener) listener).photoEvent(photoEventId, data);
+			((IPhotoEventListener) listener).photoEvent(viewPart, photoEventId, data);
 		}
 	}
 

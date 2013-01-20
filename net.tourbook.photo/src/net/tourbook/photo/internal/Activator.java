@@ -2,6 +2,7 @@ package net.tourbook.photo.internal;
 
 import net.tourbook.photo.PhotoImageCache;
 import net.tourbook.photo.PhotoLoadManager;
+import net.tourbook.photo.PhotoUI;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -63,8 +64,12 @@ public class Activator extends AbstractUIPlugin {
 
 	@Override
 	public void start(final BundleContext context) throws Exception {
+
 		super.start(context);
+
 		plugin = this;
+
+		PhotoUI.init();
 	}
 
 	@Override

@@ -97,7 +97,7 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 
 	@Override
 	protected void onSelectPhoto(final PhotoSelection photoSelection) {
-		PhotoManager.fireEvent(PhotoEventId.PHOTO_SELECTION, photoSelection);
+		PhotoManager.firePhotoEvent(null, PhotoEventId.PHOTO_SELECTION, photoSelection);
 	}
 
 	@Override

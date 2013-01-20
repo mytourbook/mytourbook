@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -54,7 +54,7 @@ public class Photo {
 
 	private String										_uniqueId;
 
-	private static final int							MAP_IMAGE_DEFAULT_WIDTH_HEIGHT	= 80;
+	public static final int								MAP_IMAGE_DEFAULT_WIDTH_HEIGHT	= 80;
 
 	private static final org.eclipse.swt.graphics.Point	MAP_IMAGE_DEFAULT_SIZE			= new org.eclipse.swt.graphics.Point(
 																								MAP_IMAGE_DEFAULT_WIDTH_HEIGHT,
@@ -242,6 +242,13 @@ public class Photo {
 	private org.eclipse.swt.graphics.Point				_mapImageSize					= MAP_IMAGE_DEFAULT_SIZE;
 
 	/**
+	 * This is the image size which the user has selected to paint a photo image.
+	 */
+	private static int									PAINTED_MAP_IMAGE_WIDTH			= MAP_IMAGE_DEFAULT_WIDTH_HEIGHT;
+
+	private int											_paintedMapImageWidth;
+
+	/**
 	 * @param galleryItemIndex
 	 */
 	public Photo(final File file) {
@@ -291,6 +298,10 @@ public class Photo {
 		final IPhotoServiceProvider photoServiceProvider = _photoServiceProvider;
 
 		return photoServiceProvider;
+	}
+
+	public static void setPaintedMapImageWidth(final int paintedMapImageWidth) {
+		PAINTED_MAP_IMAGE_WIDTH = paintedMapImageWidth;
 	}
 
 	public static void setPhotoServiceProvider(final IPhotoServiceProvider photoServiceProvider) {
@@ -839,6 +850,14 @@ public class Photo {
 	 * @return Returns size when image is painted on the map or <code>null</code>, when not yet set.
 	 */
 	public org.eclipse.swt.graphics.Point getMapImageSize() {
+
+		if (PAINTED_MAP_IMAGE_WIDTH != _paintedMapImageWidth) {
+
+			setMapImageSize();
+
+			_paintedMapImageWidth = PAINTED_MAP_IMAGE_WIDTH;
+		}
+
 		return _mapImageSize;
 	}
 
@@ -1048,7 +1067,7 @@ public class Photo {
 
 	private void setMapImageSize() {
 
-		final int imageCanvasWidth = MAP_IMAGE_DEFAULT_WIDTH_HEIGHT;
+		final int imageCanvasWidth = PAINTED_MAP_IMAGE_WIDTH;
 		final int imageCanvasHeight = imageCanvasWidth;
 
 		_mapImageSize = RendererHelper.getBestSize(this, //

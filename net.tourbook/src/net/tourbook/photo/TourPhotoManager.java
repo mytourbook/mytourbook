@@ -1001,7 +1001,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
 				// fire notification to update all galleries with the modified rating stars
 
-				PhotoManager.fireEvent(PhotoEventId.PHOTO_ATTRIBUTES_ARE_MODIFIED, photos);
+				PhotoManager.firePhotoEvent(null, PhotoEventId.PHOTO_ATTRIBUTES_ARE_MODIFIED, photos);
 			}
 
 		} catch (final SQLException e) {

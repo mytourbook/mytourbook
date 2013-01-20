@@ -845,8 +845,8 @@ public abstract class PhotoToolTipShell {
 
 //		final long start = System.nanoTime();
 
-		System.out.println(UI.timeStampNano() + " onTTDisplayMouseMove\t");
-		// TODO remove SYSTEM.OUT.PRINTLN
+//		System.out.println(UI.timeStampNano() + " onTTDisplayMouseMove\t");
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		if (_visibleShell == null || _visibleShell.isDisposed() || _visibleShell.isVisible() == false) {
 			return;

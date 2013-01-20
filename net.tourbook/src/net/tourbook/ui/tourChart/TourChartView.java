@@ -62,6 +62,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
@@ -551,7 +552,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 	}
 
 	@Override
-	public void photoEvent(final PhotoEventId photoEventId, final Object data) {
+	public void photoEvent(final IViewPart viewPart, final PhotoEventId photoEventId, final Object data) {
 
 		if (photoEventId == PhotoEventId.PHOTO_SELECTION && data instanceof TourPhotoLinkSelection) {
 
@@ -656,7 +657,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 		if (tourData == null) {
 			// nothing to do
-			return;
+			return; 
 		}
 
 		_tourData = tourData;

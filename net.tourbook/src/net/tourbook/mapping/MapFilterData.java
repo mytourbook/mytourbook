@@ -13,20 +13,23 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.photo;
+package net.tourbook.mapping;
 
-import org.eclipse.ui.IViewPart;
+public class MapFilterData {
 
-public interface IPhotoEventListener {
+	public int	allPhotos;
+	public int	filteredPhotos;
 
 	/**
-	 * @param viewPart
-	 *            View which fired this event or <code>null</code> when part in undefined, e.g.
-	 *            fired froom a tooltip.
-	 * @param photoEventId
-	 * @param data
-	 *            Contains event specific data.
+	 * @param allPhotos
+	 *            Number of photos which could be displayed in the map.
+	 * @param filteredPhotos
+	 *            Number of photos which are filtered.
 	 */
-	void photoEvent(IViewPart viewPart, PhotoEventId photoEventId, Object data);
+	public MapFilterData(final int allPhotos, final int filteredPhotos) {
+
+		this.allPhotos = allPhotos;
+		this.filteredPhotos = filteredPhotos;
+	}
 
 }

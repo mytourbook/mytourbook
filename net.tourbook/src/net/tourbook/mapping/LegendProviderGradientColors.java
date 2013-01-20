@@ -206,7 +206,7 @@ public class LegendProviderGradientColors implements ILegendProviderGradientColo
 
 	@Override
 	public int getColorValue(final float legendValue) {
-		return TourPainter.getLegendColor(_legendConfig, _legendColor, legendValue);
+		return TourMapPainter.getLegendColor(_legendConfig, _legendColor, legendValue);
 	}
 
 	public LegendColor getLegendColor() {

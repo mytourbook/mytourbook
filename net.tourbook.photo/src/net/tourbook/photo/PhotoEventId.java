@@ -33,6 +33,11 @@ public enum PhotoEventId {
 	 * Photo attributes, e.g star rating has been modified. Event data contain an {@link ArrayList}
 	 * with the modified {@link Photo}'s.
 	 */
-	PHOTO_ATTRIBUTES_ARE_MODIFIED
+	PHOTO_ATTRIBUTES_ARE_MODIFIED,
+
+	/**
+	 * Photo filter is run, event data contains MapFilterData.
+	 */
+	PHOTO_FILTER
 
 }
