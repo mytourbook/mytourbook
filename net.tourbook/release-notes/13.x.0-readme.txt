@@ -29,7 +29,9 @@ Tour Chart view
 
 Tour Map view
 
-* 
+* filter photos by rating stars
+
+* set photo image size
 
 
 All photo galleries
